@@ -51,7 +51,7 @@ class FeaturesIntegrationSuite extends FunSuite:
     assert(cands(u2.id).nonEmpty, cands.toString)
     assert(!cands.abstained(u2.id))
     val model = DefaultLocalCostModel(semantic = abstain, missingSemantic = 0.5)
-    val breakdown = model.cost(u2, view.node(e5).get, view)
+    val breakdown = model.cost(u2, view.node(e5).get, FidelityMode.Faithful, view)
     assertEqualsDouble(breakdown.term(CostTerm.Semantic), 0.5, 1e-12)
   }
 

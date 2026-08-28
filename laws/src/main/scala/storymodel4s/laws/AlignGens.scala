@@ -118,3 +118,127 @@ object AlignGens:
     GraphHsmm
       .infer(c.recall, c.view, cands, DefaultLocalCostModel(semantic = c.semantic))
       .fold(e => throw new IllegalStateException(e.message), identity)
+
+  // ---- adversarial foil cases for the mode-gate laws (ADR 0001 rev 3 §D5) ------------------
+
+  /** A recall unit built to contradict a chosen leaf on a chosen facet, plus an adversarial
+    * configuration: the semantic distance is 0 (cosine 1) on the contradicted leaf, weights and
+    * temperature are random, refinement passes are random. Law L1 must hold for all of them.
+    */
+  final case class FoilCase(
+      base: Case,
+      target: SourceNodeRef,
+      contradiction: Contradiction,
+      unit: RecallUnit,
+      weights: CostWeights,
+      temperature: Double,
+      passes: Int
+  ):
+    def recall: RecallGraph =
+      RecallGraph(base.recall.transcript, base.recall.atlas, Vector(unit), RecallRelations.empty)
+    def semantic: SemanticDistance =
+      SemanticDistance.of((u, n) => if u.id == unit.id && n.ref == target then 0.0 else 0.95)
+    def costModel: LocalCostModel = DefaultLocalCostModel(weights = weights, semantic = semantic)
+    def config: HsmmConfig = HsmmConfig.unsafe(temperature = temperature, refinementPasses = passes)
+    def candidates: Candidates =
+      CandidateGenerator(semantic, perLevel = 3).generate(Vector(unit), base.view)
+
+  private val contradictionGen: Gen[Contradiction] = Gen.oneOf(
+    Contradiction.RoleReversal,
+    Contradiction.PolarityConflict,
+    Contradiction.ContextConflict,
+    Contradiction.ModalityConflict
+  )
+
+  val foilCase: Gen[FoilCase] =
+    for
+      c <- alignCase
+      leaf <- Gen.oneOf(c.view.leaves)
+      kind <- contradictionGen
+      ws <- Gen.listOfN(6, Gen.choose(0.0, 3.0))
+      tau <- Gen.choose(0.02, 2.0)
+      passes <- Gen.choose(0, 2)
+    yield
+      val pred = leaf.predicate
+      val anna = SketchParticipant(SketchRole.Agent, None, "anna", aliases = Set("she"))
+      val (view, sketch) = kind match
+        case Contradiction.RoleReversal =>
+          // source: anna (agent) acts on the brother; recall: the brother acts on anna
+          val withPatient = c.view.nodes.map(n =>
+            if n.ref == leaf.ref then
+              n.copy(participants =
+                n.participants :+ ParticipantSummary(SketchRole.Patient, "brother", Set("him"))
+              )
+            else n
+          )
+          (
+            InMemorySourceView(withPatient, c.view.edges, c.view.worldOrder, c.view.textLength),
+            PropositionSketch.empty.copy(
+              predicate = pred,
+              participants = Vector(
+                SketchParticipant(SketchRole.Agent, None, "brother", aliases = Set("him")),
+                SketchParticipant(SketchRole.Patient, None, "anna", aliases = Set("she"))
+              )
+            )
+          )
+        case Contradiction.PolarityConflict =>
+          (
+            c.view,
+            PropositionSketch.empty
+              .copy(predicate = pred, participants = Vector(anna), polarity = PolarityTag.Negative)
+          )
+        case Contradiction.ContextConflict =>
+          val speech = c.view.nodes.map(n =>
+            if n.ref == leaf.ref then n.copy(context = ContextTag.Speech) else n
+          )
+          (
+            InMemorySourceView(speech, c.view.edges, c.view.worldOrder, c.view.textLength),
+            PropositionSketch.empty.copy(
+              predicate = pred,
+              participants = Vector(anna),
+              modality = ModalityTag.Asserted
+            )
+          )
+        case _ =>
+          val intended = c.view.nodes.map(n =>
+            if n.ref == leaf.ref then n.copy(modality = ModalityTag.Intended) else n
+          )
+          (
+            InMemorySourceView(intended, c.view.edges, c.view.worldOrder, c.view.textLength),
+            PropositionSketch.empty.copy(
+              predicate = pred,
+              participants = Vector(anna),
+              modality = ModalityTag.Asserted
+            )
+          )
+      val u0 = c.recall.ordered.head
+      val unit = u0.copy(
+        id = RecallUnitId.unsafe("foil"),
+        function = DiscourseFunction.EpisodicAssertion,
+        proposition = sketch.copy(lemmas = pred.toSet + "anna")
+      )
+      FoilCase(
+        c.copy(view = view),
+        leaf.ref,
+        kind,
+        unit,
+        CostWeights.unsafe(ws(0), ws(1), ws(2), ws(3), ws(4), ws(5)),
+        tau,
+        passes
+      )
+
+  /** A cost model that records every `(unit, anchor, mode)` it was asked to price. */
+  final class SpyCostModel(inner: LocalCostModel) extends LocalCostModel:
+    val calls =
+      scala.collection.mutable.ArrayBuffer.empty[(RecallUnitId, SourceNodeRef, FidelityMode)]
+    def cost(
+        unit: RecallUnit,
+        node: NodeSummary,
+        mode: FidelityMode,
+        view: SourceView
+    ): CostBreakdown =
+      calls += ((unit.id, node.ref, mode))
+      inner.cost(unit, node, mode, view)
+    def externalFloor: Double = inner.externalFloor
+    def externalCost(unit: RecallUnit, state: ExternalState): Double =
+      inner.externalCost(unit, state)

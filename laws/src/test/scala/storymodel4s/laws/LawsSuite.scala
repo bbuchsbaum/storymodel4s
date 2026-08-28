@@ -9,11 +9,13 @@ class LawsSuite extends DisciplineSuite:
   import InvalidStoryGens.given
 
   given Arbitrary[AlignGens.Case] = Arbitrary(AlignGens.alignCase)
+  given Arbitrary[AlignGens.FoilCase] = Arbitrary(AlignGens.foilCase)
 
   checkAll("ChartLaws", ChartLaws.chart)
   checkAll("StoryLaws", StoryLaws.validator)
   checkAll("TemporalLaws", TemporalLaws.temporal)
   checkAll("AlignmentLaws", AlignmentLaws.alignment)
+  checkAll("ModeGateLaws", ModeGateLaws.modeGate)
   checkAll("EstimateLaws", EstimateLaws.estimates)
 
   test("every mutation reports its law, and exact mutations report nothing else") {

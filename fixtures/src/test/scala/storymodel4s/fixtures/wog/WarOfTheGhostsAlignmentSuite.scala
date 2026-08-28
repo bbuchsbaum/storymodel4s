@@ -324,58 +324,65 @@ class WarOfTheGhostsAlignmentSuite extends FunSuite:
 
   /** Both WOG foils are composite sentences: the reversed/negated clause plus an embedded clause
     * ("… that one of them had been hit", "… after he was hit") whose content the source does
-    * contain (speech-scoped). The structural outcome to verify is therefore *exclusion of every
-    * contradicted node with zero posterior mass and no MAP anchor on it*, not "external beats
-    * source": a structure-aware aligner is expected to keep the embedded content aligned. The
-    * single-proposition foils in `align.WorkedExampleSuite` verify the fully-external case.
+    * contain (speech-scoped). Under ADR 0001 rev 3 §D5 a contradicted anchor is not excluded: its
+    * *faithful* mode is refused and it stays recallable as `Distorted(facets)`. The structural
+    * outcome to verify is therefore: zero faithful mass on every contradicted telling event, the
+    * contradiction recorded in the admissibility, and any anchor on such an event carried by its
+    * distorted mode. The single-proposition foils in `align.WorkedExampleSuite` verify the
+    * distorted-anchor case end to end.
     */
-  test("role-swapped foil: every reversed telling event is excluded and never the MAP anchor") {
+  test("role-swapped foil: reversed telling events are anchored only as Distorted(RoleReversal)") {
     val r = run(ParaphraseKind.RoleSwappedFoil)
-    val costs = r.result.costs(r.unit.id)
-    val gated = tellingEvents.filter(n => costs.get(AlignState.Source(n)).exists(_.gated))
+    val adm = r.result.admissibility(r.unit.id)
+    val reversed = tellingEvents.filter(n => adm.get(n).exists(_.gated))
     assert(
-      gated.nonEmpty,
-      s"no telling event gated: ${costs.view.mapValues(_.contradictions).toMap}"
+      reversed.nonEmpty,
+      s"no telling event contradicted: ${adm.view.mapValues(_.contradictions).toMap}"
     )
-    gated.foreach { n =>
-      assert(costs(AlignState.Source(n)).contradictions.contains(Contradiction.RoleReversal))
-      assertEqualsDouble(r.row.sourceMassOn(n), 0.0, 0.0)
+    reversed.foreach { n =>
+      assert(adm(n).contradictions.contains(Contradiction.RoleReversal))
+      assert(adm(n).facets.contains(Facet.RoleReversal))
+      assertEqualsDouble(r.row.faithfulMassOn(n), 0.0, 0.0)
+      assert(!r.result.costs(r.unit.id).contains(AlignState.Source(n)))
     }
-    // the directly reversed report is gated by construction of the foil
+    // the directly reversed report is contradicted by construction of the foil
     val report = SourceNodeRef.Situation(WarOfTheGhostsModel.S.theySaidShot)
-    assert(gated.contains(report), s"the report itself must be gated; gated = $gated")
-    assert(r.row.mapSource != Some(report), r.row.topK(5).toString)
-    // W5 (closes the former TODO(M3)): the recall agent "the young man" now carries the nominal
+    assert(reversed.contains(report), s"the report itself must be contradicted; got $reversed")
+    // if the MAP anchor is a reversed telling event, it is the distorted mode that carries it
+    r.row.mapSource.filter(reversed.contains).foreach { n =>
+      assert(r.row.mapMode.exists(_.facetSet.contains(Facet.RoleReversal)), r.row.topK(5).toString)
+      assert(r.row.distortedMassOn(n) > 0.0)
+    }
+    // W5 (closes the former TODO(M3)): the recall agent "the young man" carries the nominal
     // identity key `youngman`, which does not overlap the source agent "the five men"/"the
     // warriors" (`fiveman`, `warrior`), so the warriors' "go home" telling is recognised as
-    // speaker-reversed too. Under ADR 0001 rev 3 D5 this becomes "anchored as
-    // Distorted(RoleReversal), never Faithful" once the anchor/fidelity refactor lands.
+    // speaker-reversed too.
     val goHome = SourceNodeRef.Situation(WarOfTheGhostsModel.S.warriorsSayGoHome)
     assert(
-      gated.contains(goHome),
-      s"the warriors' 'go home' telling must be gated; contradictions = ${costs.get(AlignState.Source(goHome)).map(_.contradictions)}"
+      reversed.contains(goHome),
+      s"the warriors' 'go home' telling must be contradicted; got ${adm.get(goHome).map(_.contradictions)}"
     )
     val agent = r.unit.proposition.agent.get
     assertEquals(agent.distinctiveKey, "young+man")
     assert(!agent.names.contains("man"), agent.names.toString)
   }
 
-  test(
-    "negated foil: the not-feeling-sick state is excluded by polarity and never the MAP anchor"
-  ) {
+  test("negated foil: the not-feeling-sick state is anchored only as Distorted(Polarity)") {
     val r = run(ParaphraseKind.NegatedFoil)
     val notSick = SourceNodeRef.Situation(WarOfTheGhostsModel.S.notFeelSick)
     assertEquals(r.unit.proposition.predicate, Some("feel"))
-    val breakdown = r.result.costs(r.unit.id).get(AlignState.Source(notSick))
-    assert(breakdown.exists(_.gated), s"expected gating, got $breakdown")
-    assert(breakdown.exists(_.contradictions.contains(Contradiction.PolarityConflict)))
-    assertEqualsDouble(r.row.sourceMassOn(notSick), 0.0, 0.0)
-    // no admissible node with the contradicted predicate carries mass
+    val adm = r.result.admissibility(r.unit.id).get(notSick)
+    assert(adm.exists(_.gated), s"expected a refused faithful mode, got $adm")
+    assert(adm.exists(_.contradictions.contains(Contradiction.PolarityConflict)))
+    assertEqualsDouble(r.row.faithfulMassOn(notSick), 0.0, 0.0)
+    // no faithful anchor on any node with the contradicted predicate
     val feelNodes = view.nodes.filter(_.predicate.contains("feel")).map(_.ref)
     feelNodes.foreach(n =>
-      assert(r.row.sourceMassOn(n) < 0.05, s"${n.key} = ${r.row.sourceMassOn(n)}")
+      assert(r.row.faithfulMassOn(n) < 0.05, s"${n.key} = ${r.row.faithfulMassOn(n)}")
     )
-    assert(r.row.mapSource != Some(notSick), r.row.topK(5).toString)
+    r.row.mapSource.filter(_ == notSick).foreach { _ =>
+      assert(r.row.mapMode.exists(_.facetSet.contains(Facet.Polarity)), r.row.topK(5).toString)
+    }
   }
 
   test("blended: mass on both merged events (or their scenes)") {
@@ -434,7 +441,9 @@ class WarOfTheGhostsAlignmentSuite extends FunSuite:
     tracks.foreach(t => assert(t.observations.forall(_.coverage.nonEmpty)))
   }
 
-  test("ablation: the embedding-only transport baseline accepts the foils the HSMM gates") {
+  test(
+    "ablation: the embedding-only transport baseline places faithful mass where the HSMM refuses it"
+  ) {
     val foiled = Map(
       ParaphraseKind.RoleSwappedFoil -> tellingEvents.toSet,
       ParaphraseKind.NegatedFoil -> Set(SourceNodeRef.Situation(WarOfTheGhostsModel.S.notFeelSick))
@@ -447,12 +456,12 @@ class WarOfTheGhostsAlignmentSuite extends FunSuite:
         .fold(e => fail(e.message), identity)
         .rows
         .head
-      val gated =
-        nodes.filter(n => r.result.costs(r.unit.id).get(AlignState.Source(n)).exists(_.gated))
-      assert(gated.nonEmpty, s"$k: nothing gated")
-      val bMass = gated.toVector.map(baseline.sourceMassOn).sum
-      val hMass = gated.toVector.map(r.row.sourceMassOn).sum
+      val refused =
+        nodes.filter(n => r.result.admissibility(r.unit.id).get(n).exists(_.gated))
+      assert(refused.nonEmpty, s"$k: no faithful mode refused")
+      val bMass = refused.toVector.map(baseline.faithfulMassOn).sum
+      val hMass = refused.toVector.map(r.row.faithfulMassOn).sum
       assertEqualsDouble(hMass, 0.0, 0.0)
-      assert(bMass > 0.0, s"$k: baseline should place mass on the foiled node; got $bMass")
+      assert(bMass > 0.0, s"$k: baseline should place faithful mass on the foiled node; got $bMass")
     }
   }

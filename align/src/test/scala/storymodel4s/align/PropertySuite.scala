@@ -179,12 +179,21 @@ class PropertySuite extends ScalaCheckSuite:
     }
   }
 
-  property("gated candidates never carry posterior mass") {
+  property("a refused faithful mode never carries posterior mass; states are admissible pairs") {
     forAll(genCase) { c =>
       val res = infer(c)
-      res.costs.forall { case (unit, byState) =>
-        byState.forall { case (s, b) =>
-          !b.excluded || res.posterior.row(unit).exists(r => r(s) == 0.0)
+      res.admissibility.forall { case (unit, byRef) =>
+        byRef.forall { case (ref, adm) =>
+          val row = res.posterior.row(unit).get
+          (adm.faithful || row.faithfulMassOn(ref) == 0.0) &&
+          (adm.distortion.nonEmpty || row.distortedMassOn(ref) == 0.0)
+        }
+      } && res.costs.forall { case (unit, byState) =>
+        byState.keys.forall {
+          case AlignState.Source(ref)        => res.admissibility(unit).get(ref).forall(_.faithful)
+          case AlignState.Distorted(ref, fs) =>
+            res.admissibility(unit).get(ref).exists(_.distortion.contains(fs))
+          case AlignState.External(_) => true
         }
       }
     }
@@ -195,9 +204,9 @@ class PropertySuite extends ScalaCheckSuite:
       val res = infer(c)
       val cands = candidatesOf(c)
       res.viterbi.zip(c.recall.ordered).forall { (s, u) =>
-        s match
-          case AlignState.Source(ref) => cands(u.id).contains(ref)
-          case AlignState.External(_) => true
+        s.anchor match
+          case Some(ref) => cands(u.id).contains(ref)
+          case None      => true
       } && !res.logLikelihood.isNaN && !res.logLikelihood.isInfinite
     }
   }

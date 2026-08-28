@@ -76,27 +76,40 @@ class WorkedExampleSuite extends FunSuite:
 
   private def foilResult(f: Foil): HsmmResult = infer(f.recall, f.candidates, f.costModel)
 
-  test("role-reversed paraphrase is gated: the contradicted candidate is excluded outright") {
+  test(
+    "role-reversed paraphrase is anchored to event 5 as Distorted(RoleReversal), never Faithful"
+  ) {
     val res = foilResult(roleReversed)
     val r = res.posterior.rows.head
-    assert(r.externalMass > r.sourceMass, s"row = ${r.topK(5)}")
-    assertEqualsDouble(r.sourceMassOn(e5), 0.0, 0.0)
-    val breakdown = res.costs(roleReversed.unit.id)(AlignState.Source(e5))
-    assert(breakdown.contradictions.contains(Contradiction.RoleReversal))
-    assert(breakdown.gated)
-    assertEquals(breakdown.exclusion, Some(Exclusion.Contradicted))
+    val adm = res.admissibility(roleReversed.unit.id)(e5)
+    assert(adm.contradictions.contains(Contradiction.RoleReversal), adm.toString)
+    assert(adm.gated && !adm.faithful)
+    assertEquals(adm.facets, Set(Facet.RoleReversal))
+    // the event is still recalled: distortion is anchored recall, not omission + intrusion
+    assertEqualsDouble(r.faithfulMassOn(e5), 0.0, 0.0)
+    assert(r.distortedMassOn(e5) > 0.5, s"row = ${r.topK(5)}")
+    assert(r.sourceMass > r.externalMass, s"row = ${r.topK(5)}")
+    assertEquals(r.mapSource, Some(e5))
+    assertEquals(r.mapMode.map(_.facetSet), Some(Set(Facet.RoleReversal)))
+    assert(!res.costs(roleReversed.unit.id).contains(AlignState.Source(e5)))
+    val sig = RecallSignature.compute(res, roleReversed.recall, view)
+    assert(sig.distortedMassByFacet.getOrElse(Facet.RoleReversal, 0.0) > 0.5, sig.toString)
+    assert(sig.perUnitFidelity(roleReversed.unit.id)(Facet.RoleReversal) == FacetVerdict.Wrong)
+    assert(sig.intrusionMass < 0.3, sig.toString)
   }
 
-  test("negated paraphrase is gated by polarity conflict") {
+  test("negated paraphrase is anchored as Distorted(Polarity), never Faithful") {
     val res = foilResult(negated)
     val r = res.posterior.rows.head
-    assert(r.externalMass > r.sourceMass, s"row = ${r.topK(5)}")
-    assertEqualsDouble(r.sourceMassOn(e5), 0.0, 0.0)
-    val breakdown = res.costs(negated.unit.id)(AlignState.Source(e5))
-    assert(breakdown.contradictions.contains(Contradiction.PolarityConflict))
+    val adm = res.admissibility(negated.unit.id)(e5)
+    assert(adm.contradictions.contains(Contradiction.PolarityConflict))
+    assertEquals(adm.facets, Set(Facet.Polarity))
+    assertEqualsDouble(r.faithfulMassOn(e5), 0.0, 0.0)
+    assert(r.distortedMassOn(e5) > 0.5, s"row = ${r.topK(5)}")
+    assert(r.sourceMass > r.externalMass, s"row = ${r.topK(5)}")
   }
 
-  test("gating is exclusion: a fully contradicted unit is fully external whatever the fan-out") {
+  test("the mode gate is exclusion of the faithful mode, whatever the fan-out") {
     // every leaf shares the recalled predicate; the sketch contradicts all of them by polarity
     val allFind = InMemorySourceView(
       view.nodes.map(n => if n.isLeaf then n.copy(predicate = Some("find")) else n),
@@ -111,18 +124,24 @@ class WorkedExampleSuite extends FunSuite:
       .infer(negated.recall, allFind, cands, DefaultLocalCostModel(semantic = sem))
       .fold(e => fail(e.message), identity)
     val r = res.posterior.rows.head
-    assertEqualsDouble(r.sourceMass, 0.0, 1e-12)
-    assertEqualsDouble(r.externalMass, 1.0, 1e-9)
+    assertEqualsDouble(r.faithfulMass, 0.0, 0.0)
+    assert(r.distortedMass > 0.0)
+    assertEqualsDouble(r.sourceMass + r.externalMass, 1.0, 1e-9)
+    // and the ungated ablation is a different type that cannot feed a signature
+    val abl = GraphHsmm
+      .ablationUngated(negated.recall, allFind, cands, DefaultLocalCostModel(semantic = sem))
+      .fold(e => fail(e.message), identity)
+    assert(abl.massOn(negated.unit.id, AlignState.Source(e5)) > 0.0)
   }
 
   test("a scene is a gist target unless every engaged leaf under it is contradicted") {
     // sc2 contains e3, e4, e5. In the Anna source only e5 shares the recalled predicate "find"
-    // and it is contradicted by "she didn't find anyone", so the scene is gated (its only engaged
-    // leaf is contradicted). Give e4 a compatible "find" reading too — the reviewer's "he did not
-    // go … he went" scene — and the scene must stay admissible.
-    val model = DefaultLocalCostModel(semantic = negated.semantic)
-    val onlyE5 = model.cost(negated.unit, view.node(sc2).get, view)
+    // and it is contradicted by "she didn't find anyone", so the scene's faithful mode is refused
+    // (its only engaged leaf is contradicted). Give e4 a compatible "find" reading too — the
+    // reviewer's "he did not go … he went" scene — and the scene must stay faithful.
+    val onlyE5 = ModeGate.assess(negated.unit, view.node(sc2).get, view)
     assert(onlyE5.gated, onlyE5.toString)
+    assertEquals(onlyE5.facets, Set(Facet.Polarity))
     val withCompatibleSibling = InMemorySourceView(
       view.nodes.map(n =>
         if n.ref == e4 then n.copy(predicate = Some("find"), polarity = PolarityTag.Negative) else n
@@ -131,28 +150,34 @@ class WorkedExampleSuite extends FunSuite:
       view.worldOrder,
       view.textLength
     )
-    val b = model.cost(negated.unit, withCompatibleSibling.node(sc2).get, withCompatibleSibling)
+    val b =
+      ModeGate.assess(negated.unit, withCompatibleSibling.node(sc2).get, withCompatibleSibling)
     assert(!b.gated, b.toString)
-    assert(b.contradictions.isEmpty, b.toString)
+    assertEquals(b.modes, Vector(FidelityMode.Faithful))
   }
 
-  test("recalling reported content as fact is a context facet error, never a gate") {
+  test(
+    "recalling reported content as fact anchors as Distorted(Context), never an external state"
+  ) {
     val speechE5 = InMemorySourceView(
       view.nodes.map(n => if n.ref == e5 then n.copy(context = ContextTag.Speech) else n),
       view.edges,
       view.worldOrder,
       view.textLength
     )
+    val adm = ModeGate.assess(u2, speechE5.node(e5).get, speechE5)
+    assert(adm.contradictions.contains(Contradiction.ContextConflict))
+    assertEquals(adm.facets, Set(Facet.Context))
     val model = DefaultLocalCostModel(semantic = semantic)
-    val b = model.cost(u2, speechE5.node(e5).get, speechE5)
-    assert(b.contradictions.contains(Contradiction.ContextConflict))
-    assert(!b.gated)
-    assert(b.contextMismatch)
-    val facets = FidelityFacets.assess(u2.proposition, speechE5.node(e5).get)
-    assertEquals(facets(Facet.Context), FacetVerdict.Wrong)
     val cands = CandidateGenerator(semantic, perLevel = 2).generate(recall.ordered, speechE5)
     val res = GraphHsmm.infer(recall, speechE5, cands, model).fold(e => fail(e.message), identity)
-    assertEquals(res.posterior.row(u2.id).get.mapSource, Some(e5))
+    val r = res.posterior.row(u2.id).get
+    assertEquals(r.mapSource, Some(e5))
+    assertEqualsDouble(r.faithfulMassOn(e5), 0.0, 0.0)
+    assert(r.distortedMassOn(e5) > 0.5, r.topK(5).toString)
+    val facets = FidelityFacets.assess(u2.proposition, speechE5.node(e5).get, r.mapMode.get)
+    assertEquals(facets(Facet.Context), FacetVerdict.Wrong)
+    assertEquals(facets(Facet.Action), FacetVerdict.Correct)
   }
 
   test("a blended unit shows bimodal mass over the two blended events") {
@@ -172,10 +197,11 @@ class WorkedExampleSuite extends FunSuite:
         .align(f.recall, view, f.candidates, f.semantic)
         .fold(e => fail(e.message), identity)
       val hsmm = foilResult(f).posterior
-      val b = baseline.rows.head.sourceMassOn(e5)
-      val h = hsmm.rows.head.sourceMassOn(e5)
-      assert(b > 0.5, s"${f.name}: baseline e5 mass = $b")
-      assert(h < b, s"${f.name}: hsmm e5 mass $h should be below baseline $b")
+      val b = baseline.rows.head.faithfulMassOn(e5)
+      val h = hsmm.rows.head.faithfulMassOn(e5)
+      assert(b > 0.5, s"${f.name}: baseline faithful e5 mass = $b")
+      assertEqualsDouble(h, 0.0, 0.0)
+      assert(hsmm.rows.head.distortedMassOn(e5) > 0.0, s"${f.name}: distorted anchor expected")
     }
   }
 
@@ -282,7 +308,7 @@ class WorkedExampleSuite extends FunSuite:
     assert(diag(RelationLayer.WorldTime) > 0.5, diag.toString)
   }
 
-  test("refinement passes keep the anchors, never resurrect a gated candidate, and drive Viterbi") {
+  test("refinement passes keep the anchors, never resurrect a refused mode, and drive Viterbi") {
     val refined = infer(recall, candidates, costModel, HsmmConfig.unsafe(refinementPasses = 2))
     val before = row(u3).sourceMassOn(e2)
     val after = refined.posterior.row(u3.id).get.sourceMassOn(e2)
@@ -297,7 +323,8 @@ class WorkedExampleSuite extends FunSuite:
         negated.costModel,
         HsmmConfig.unsafe(refinementPasses = 3)
       )
-    assertEqualsDouble(gatedRefined.posterior.rows.head.sourceMassOn(e5), 0.0, 0.0)
+    assertEqualsDouble(gatedRefined.posterior.rows.head.faithfulMassOn(e5), 0.0, 0.0)
+    assert(gatedRefined.posterior.rows.head.distortedMassOn(e5) > 0.0)
   }
 
   test("configs are validated, not asserted") {
