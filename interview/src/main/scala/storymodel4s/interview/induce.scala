@@ -100,29 +100,28 @@ object TargetInduction:
     """\b(?:always|usually|every (?:year|time|birthday|summer|week)|used to|we'd|would (?:always|usually|go|have)|typically|normally|tend to|as a rule)\b""".r
   private val OtherEpisodeMarker =
     """\b(?:the year before|the previous year|last year|another (?:time|birthday|year)|a different (?:time|birthday|year)|once when|one time|that other time|two years (?:ago|earlier)|years earlier|on a different)\b""".r
+
+  /** Explicit return to the running target, never a discourse connective (`then`/`later`/`after
+    * that` do not change episode membership).
+    */
   private val ReturnMarker =
-    """\b(?:anyway|back to|but this time|this birthday|that birthday|then|after that|later|eventually|afterwards)\b""".r
-  private val Metacognitive =
-    """\b(?:i (?:can'?t|cannot|don'?t|do not) (?:really )?(?:remember|recall)|i forget|i'?m not sure|i have no memory|it'?s a blur|i'?m blanking)\b""".r
-  private val Evaluative =
-    """\b(?:it was (?:great|wonderful|lovely|awful|terrible|nice|fun|perfect|amazing)|i (?:loved|hated|enjoyed)|the best|the worst|so nice|really nice)\b""".r
-  private val Repair =
-    """\b(?:i mean|sorry|no wait|actually,? no|let me (?:think|start over))\b""".r
+    """\b(?:anyway|back to|but this time|this birthday|that birthday)\b""".r
   private val GeneralFact =
     """\b(?:is (?:a|the) (?:city|capital|kind of|type of)|are (?:usually|generally)|everyone knows|as you know|in general)\b""".r
 
   /** Total classification: every recall-side discourse function has an explicit class; only
     * `EpisodicAssertion` and `Summary` are further refined by lexical cues, and only those two can
     * ever end up in an episode.
+    *
+    * `byCue` may refine those two only inside content space (`Habitual`, `GeneralFact`,
+    * `OtherEpisode`). Metacognitive, repair, and evaluative language on an episodic unit is
+    * recorded on [[ExperientialEvidence]] at assess time and must not erase the episodic address.
     */
   private[interview] def classify(unit: RecallUnit): UnitClass =
     val lower = Text.lower(unit.text)
     def byCue(default: UnitClass): UnitClass =
-      if Metacognitive.findFirstIn(lower).nonEmpty then UnitClass.Metacognitive
-      else if Repair.findFirstIn(lower).nonEmpty then UnitClass.Repair
-      else if Habitual.findFirstIn(lower).nonEmpty then UnitClass.Habitual
+      if Habitual.findFirstIn(lower).nonEmpty then UnitClass.Habitual
       else if GeneralFact.findFirstIn(lower).nonEmpty then UnitClass.GeneralFact
-      else if Evaluative.findFirstIn(lower).nonEmpty then UnitClass.Evaluative
       else if OtherEpisodeMarker.findFirstIn(lower).nonEmpty then UnitClass.OtherEpisode
       else default
     unit.function match
@@ -161,9 +160,11 @@ object TargetInduction:
     val sem = semantic.map(s => 1.0 - s.distance(a, b)).getOrElse(0.0)
     math.max(if shared then 1.0 else 0.0, math.max(lex, sem))
 
-  /** Assign episodic units to clusters: the running cluster continues unless an explicit
-    * other-episode marker opens a new one, and a return marker (or continuity with the seed
-    * cluster) returns to it.
+  /** Assign episodic units to clusters.
+    *
+    * A digression (cluster ≠ 0) returns to the target only when (a) the unit carries an explicit
+    * [[ReturnMarker]] or (b) it is not continuous with any unit already in that digression.
+    * Discourse connectives are not a return.
     */
   private def clusters(
       units: Vector[RecallUnit],
@@ -171,8 +172,8 @@ object TargetInduction:
       semantic: Option[SemanticDistance],
       config: InductionConfig
   ): Map[RecallUnitId, Int] =
-    // The target cluster (0) is the default; an explicit other-episode marker opens a digression
-    // that persists only while successive units stay continuous with it and carry no return cue.
+    // Cluster 0 is the default target. An OtherEpisode marker opens a digression that continues
+    // only while the next episodic unit is continuous with it and has no explicit return cue.
     var current = 0
     var next = 1
     var digression: Vector[RecallUnit] = Vector.empty
