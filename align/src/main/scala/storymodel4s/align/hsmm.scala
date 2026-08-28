@@ -130,6 +130,12 @@ object HsmmConfig:
   * record — therefore cannot inhabit this type, and every consumer that requires it
   * ([[RecallSignature]], [[PopulationAggregate]], [[SupportDensity]]) is guaranteed a gated result.
   * [[AblationResult]] is a separate type with no path here.
+  *
+  * Residual (stated, not hidden): this type proves **gate admission**, not inference provenance. A
+  * caller can place faithful mass on a non-contradicted anchor that was never a nominated candidate
+  * — the gate admits it because nothing contradicts it. Making candidate nomination part of the
+  * proof is a follow-up (tracker bead "candidates as part of the HsmmResult proof"), to be designed
+  * together with the codec decode path, which would then need the `Candidates` in hand.
   */
 final class HsmmResult private[align] (
     val posterior: AlignmentMatrix,
@@ -206,10 +212,26 @@ object HsmmResult:
         else if refinementPasses < 0 then
           Left(AlignError.InconsistentResult("refinementPasses must be nonnegative"))
         else
-          val unknownUnit = rows.collectFirst {
-            case r if !recall.byId.contains(r.unit) =>
-              AlignError.InconsistentResult(s"row unit ${r.unit.value} is not in the recall")
-          }
+          // Rows must be exactly the recall's units in recall order: a reordered, truncated, or
+          // extended matrix (with flow and path rebuilt consistently) would otherwise validate and
+          // fabricate the signature's forward/backward ordering metrics.
+          val expectedOrder = recall.ordered.map(_.id)
+          val unknownUnit =
+            if rows.map(_.unit) == expectedOrder then None
+            else
+              rows
+                .collectFirst {
+                  case r if !recall.byId.contains(r.unit) =>
+                    AlignError.InconsistentResult(s"row unit ${r.unit.value} is not in the recall")
+                }
+                .orElse(
+                  Some(
+                    AlignError.InconsistentResult(
+                      s"rows do not follow the recall's unit order (${rows.size} rows for " +
+                        s"${expectedOrder.size} units; reordered, truncated, or extended)"
+                    )
+                  )
+                )
           val unnormalized = rows.collectFirst {
             case r if !close(r.total, 1.0) =>
               AlignError.InconsistentResult(

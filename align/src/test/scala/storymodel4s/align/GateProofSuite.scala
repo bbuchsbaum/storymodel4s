@@ -128,31 +128,44 @@ class GateProofSuite extends FunSuite:
   }
 
   test("an empty admissibility record admits only external states") {
-    val u0 = result.posterior.rows.head.unit
-    val res = HsmmResult.validated(
+    // Rows must cover every recall unit in order (row-sequence law), so build the full recall:
+    // one row per unit, an all-external flow whose marginals match, and an external path.
+    val units = AnnaFixture.recall.ordered.map(_.id)
+    val ext = AlignState.unranked
+    val externalFlow = TransitionFlow(
+      units.zip(units.drop(1)).map { case (a, b) => FlowStep(a, b, Map((ext, ext) -> 1.0)) }
+    )
+    val anchoredFirst = HsmmResult.validated(
       AnnaFixture.recall,
       view,
-      matrix(Vector(row(u0, Map(AlignState.Source(e1) -> 1.0)))),
-      TransitionFlow(Vector.empty),
-      Vector(AlignState.Source(e1)),
+      matrix(
+        row(units.head, Map(AlignState.Source(e1) -> 1.0)) +:
+          units.tail.map(u => row(u, Map(ext -> 1.0)))
+      ),
+      TransitionFlow(
+        units.zip(units.drop(1)).zipWithIndex.map { case ((a, b), i) =>
+          FlowStep(a, b, Map(((if i == 0 then AlignState.Source(e1) else ext), ext) -> 1.0))
+        }
+      ),
+      AlignState.Source(e1) +: units.tail.map(_ => ext),
       0.0,
       Map.empty,
       Map.empty,
       0
     )
-    assert(res.isLeft)
+    assert(anchoredFirst.isLeft, "an anchored state with no admissibility record validated")
     val ok = HsmmResult.validated(
       AnnaFixture.recall,
       view,
-      matrix(Vector(row(u0, Map(AlignState.unranked -> 1.0)))),
-      TransitionFlow(Vector.empty),
-      Vector(AlignState.unranked),
+      matrix(units.map(u => row(u, Map(ext -> 1.0)))),
+      externalFlow,
+      units.map(_ => ext),
       0.0,
       Map.empty,
       Map.empty,
       0
     )
-    assert(ok.isRight)
+    assert(ok.isRight, s"all-external result rejected: ${ok.left.map(_.message)}")
   }
 
   test("a distorted state with a facet set the gate did not record is rejected") {
@@ -220,6 +233,42 @@ class GateProofSuite extends FunSuite:
       result.flow.steps.updated(0, step0.copy(mass = step0.mass.updated(k, m + 1e-3)))
     )
     assert(revalidate(AnnaFixture.recall, result, flow = Some(bumped)).isLeft, "flow marginal")
+  }
+
+  test("rows must be the recall's units in recall order (truncation and reordering rejected)") {
+    // Consistently truncated: drop the last row, its flow step, its Viterbi state, its costs and
+    // its admissibility record. Every per-row and per-step check still passes; only the
+    // row-sequence check can catch it — and it must, or the ordering metrics are fabricable.
+    val rows = result.posterior.rows
+    assert(rows.size >= 3, "fixture must have at least three units")
+    val dropped = rows.last.unit
+    val truncated = revalidate(
+      AnnaFixture.recall,
+      result,
+      posterior = Some(matrix(rows.init)),
+      flow = Some(TransitionFlow(result.flow.steps.init)),
+      viterbi = Some(result.viterbi.init),
+      costs = Some(result.costs - dropped),
+      admissibility = Some(result.admissibility - dropped)
+    )
+    assert(truncated.isLeft, "truncated matrix validated")
+    assert(
+      truncated.left.exists(_.message.contains("unit order")),
+      s"expected the row-order error, got ${truncated.left.map(_.message)}"
+    )
+    // Reordered: swap the first two rows and rebuild the path consistently; the flow endpoints
+    // then disagree with the rows, and even if they were rebuilt, the order check rejects it.
+    val swappedRows = rows.updated(0, rows(1)).updated(1, rows(0))
+    val swappedPath = result.viterbi.updated(0, result.viterbi(1)).updated(1, result.viterbi(0))
+    assert(
+      revalidate(
+        AnnaFixture.recall,
+        result,
+        posterior = Some(matrix(swappedRows)),
+        viterbi = Some(swappedPath)
+      ).isLeft,
+      "reordered matrix validated"
+    )
   }
 
   test("structural mismatches are rejected before the gate") {
