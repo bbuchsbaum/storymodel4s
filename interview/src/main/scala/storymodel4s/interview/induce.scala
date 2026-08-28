@@ -10,19 +10,70 @@ import storymodel4s.recall.*
 trait SemanticDistance:
   def distance(a: RecallUnit, b: RecallUnit): Double
 
-/** Tunable, uncalibrated parameters of v0.1 induction. None of these are probabilities. */
-final case class InductionConfig(
-    targetMass: Double = 0.85,
-    otherMass: Double = 0.8,
-    habitualMass: Double = 0.6,
-    discourseMass: Double = 0.9,
-    repetitionThreshold: Double = 0.6,
-    continuityThreshold: Double = 0.15,
-    alternativeMargin: Double = 0.25,
-    softwareVersion: String = "storymodel4s-interview-0.1"
+/** Tunable, uncalibrated parameters of v0.1 induction. None of these are probabilities.
+  *
+  * Constructed only through [[InductionConfig.of]] (or [[InductionConfig.default]]), which checks
+  * that every mass lies in `(0, 1]` and every threshold in `[0, 1]`, so induction never has to cope
+  * with negative remainders.
+  */
+final case class InductionConfig private (
+    targetMass: Double,
+    otherMass: Double,
+    habitualMass: Double,
+    discourseMass: Double,
+    repetitionThreshold: Double,
+    continuityThreshold: Double,
+    alternativeMargin: Double,
+    softwareVersion: String
 )
 
-/** Result of joint target-episode induction and detail routing (design record §64). */
+object InductionConfig:
+  val default: InductionConfig =
+    new InductionConfig(0.85, 0.8, 0.6, 0.9, 0.6, 0.15, 0.25, "storymodel4s-interview-0.1")
+
+  def of(
+      targetMass: Double = default.targetMass,
+      otherMass: Double = default.otherMass,
+      habitualMass: Double = default.habitualMass,
+      discourseMass: Double = default.discourseMass,
+      repetitionThreshold: Double = default.repetitionThreshold,
+      continuityThreshold: Double = default.continuityThreshold,
+      alternativeMargin: Double = default.alternativeMargin,
+      softwareVersion: String = default.softwareVersion
+  ): Either[DomainError, InductionConfig] =
+    def mass(name: String, v: Double): Either[DomainError, Unit] =
+      if v > 0.0 && v <= 1.0 && !v.isNaN then Right(())
+      else Left(DomainError.InvariantViolation(s"induction/$name", s"mass $v not in (0, 1]"))
+    def unit(name: String, v: Double): Either[DomainError, Unit] =
+      if v >= 0.0 && v <= 1.0 && !v.isNaN then Right(())
+      else Left(DomainError.InvariantViolation(s"induction/$name", s"value $v not in [0, 1]"))
+    for
+      _ <- mass("targetMass", targetMass)
+      _ <- mass("otherMass", otherMass)
+      _ <- mass("habitualMass", habitualMass)
+      _ <- mass("discourseMass", discourseMass)
+      _ <- unit("repetitionThreshold", repetitionThreshold)
+      _ <- unit("continuityThreshold", continuityThreshold)
+      _ <- unit("alternativeMargin", alternativeMargin)
+      _ <-
+        if softwareVersion.nonEmpty then Right(())
+        else Left(DomainError.InvariantViolation("induction/softwareVersion", "empty"))
+    yield new InductionConfig(
+      targetMass,
+      otherMass,
+      habitualMass,
+      discourseMass,
+      repetitionThreshold,
+      continuityThreshold,
+      alternativeMargin,
+      softwareVersion
+    )
+
+/** Result of joint target-episode induction and detail routing (design record §64).
+  *
+  * `alternatives` are competing target hypotheses scored against the selected target; under the
+  * selected hypothesis they are other specific episodes and appear as such in `otherEpisodes`.
+  */
 final case class InductionResult(
     target: Option[EpisodeModel],
     alternatives: Vector[(EpisodeModel, Double)],
@@ -42,8 +93,8 @@ final case class InductionResult(
   */
 object TargetInduction:
   private[interview] enum UnitClass:
-    case Episodic, OtherEpisode, Habitual, GeneralFact, Metacognitive, Evaluative, Repair,
-      TaskCommentary
+    case Episodic, Summary, OtherEpisode, Habitual, GeneralFact, Metacognitive, Evaluative,
+      Repair, TaskCommentary, Association, Inference, Uninterpretable
 
   private val Habitual =
     """\b(?:always|usually|every (?:year|time|birthday|summer|week)|used to|we'd|would (?:always|usually|go|have)|typically|normally|tend to|as a rule)\b""".r
@@ -60,20 +111,33 @@ object TargetInduction:
   private val GeneralFact =
     """\b(?:is (?:a|the) (?:city|capital|kind of|type of)|are (?:usually|generally)|everyone knows|as you know|in general)\b""".r
 
+  /** Total classification: every recall-side discourse function has an explicit class; only
+    * `EpisodicAssertion` and `Summary` are further refined by lexical cues, and only those two can
+    * ever end up in an episode.
+    */
   private[interview] def classify(unit: RecallUnit): UnitClass =
-    val lower = unit.text.toLowerCase
+    val lower = Text.lower(unit.text)
+    def byCue(default: UnitClass): UnitClass =
+      if Metacognitive.findFirstIn(lower).nonEmpty then UnitClass.Metacognitive
+      else if Repair.findFirstIn(lower).nonEmpty then UnitClass.Repair
+      else if Habitual.findFirstIn(lower).nonEmpty then UnitClass.Habitual
+      else if GeneralFact.findFirstIn(lower).nonEmpty then UnitClass.GeneralFact
+      else if Evaluative.findFirstIn(lower).nonEmpty then UnitClass.Evaluative
+      else if OtherEpisodeMarker.findFirstIn(lower).nonEmpty then UnitClass.OtherEpisode
+      else default
     unit.function match
-      case DiscourseFunction.TaskCommentary   => UnitClass.TaskCommentary
-      case DiscourseFunction.SourceMonitoring => UnitClass.Metacognitive
-      case DiscourseFunction.Evaluation       => UnitClass.Evaluative
-      case _                                  =>
-        if Metacognitive.findFirstIn(lower).nonEmpty then UnitClass.Metacognitive
-        else if Repair.findFirstIn(lower).nonEmpty then UnitClass.Repair
-        else if Habitual.findFirstIn(lower).nonEmpty then UnitClass.Habitual
-        else if GeneralFact.findFirstIn(lower).nonEmpty then UnitClass.GeneralFact
-        else if Evaluative.findFirstIn(lower).nonEmpty then UnitClass.Evaluative
-        else if OtherEpisodeMarker.findFirstIn(lower).nonEmpty then UnitClass.OtherEpisode
-        else UnitClass.Episodic
+      case DiscourseFunction.EpisodicAssertion => byCue(UnitClass.Episodic)
+      case DiscourseFunction.Summary           => byCue(UnitClass.Summary)
+      case DiscourseFunction.Inference         => UnitClass.Inference
+      case DiscourseFunction.Association       => UnitClass.Association
+      case DiscourseFunction.Evaluation        => UnitClass.Evaluative
+      case DiscourseFunction.SourceMonitoring  => UnitClass.Metacognitive
+      case DiscourseFunction.TaskCommentary    => UnitClass.TaskCommentary
+      case DiscourseFunction.Uninterpretable   => UnitClass.Uninterpretable
+
+  private def isEpisodic(c: UnitClass): Boolean = c match
+    case UnitClass.Episodic | UnitClass.Summary | UnitClass.OtherEpisode => true
+    case _                                                               => false
 
   private def lexicalOverlap(a: RecallUnit, b: RecallUnit): Double =
     val x = a.proposition.lemmas
@@ -114,14 +178,14 @@ object TargetInduction:
     var digression: Vector[RecallUnit] = Vector.empty
     val out = Map.newBuilder[RecallUnitId, Int]
     units.foreach { u =>
-      classes(u.id) match
-        case UnitClass.OtherEpisode =>
+      classes.get(u.id) match
+        case Some(UnitClass.OtherEpisode) =>
           current = next
           next += 1
           digression = Vector(u)
           out += u.id -> current
-        case UnitClass.Episodic =>
-          val lower = u.text.toLowerCase
+        case Some(UnitClass.Episodic) | Some(UnitClass.Summary) =>
+          val lower = Text.lower(u.text)
           if current != 0 then
             val stays = ReturnMarker.findFirstIn(lower).isEmpty &&
               digression.exists(d => continuity(d, u, semantic) >= config.continuityThreshold)
@@ -135,8 +199,7 @@ object TargetInduction:
       id: EpisodeId,
       scope: EpisodeScope,
       units: Vector[RecallUnit],
-      details: Vector[Detail],
-      status: EpistemicStatus
+      details: Vector[Detail]
   ): EpisodeModel =
     val unitIds = units.map(_.id).toSet
     val ds = details.filter(d => unitIds.contains(d.sourceUnit))
@@ -147,19 +210,17 @@ object TargetInduction:
         case DetailAtom.MentalStateFact(h, _)    => Some(h)
         case _                                   => None
     }.toSet
-    val locations = units.flatMap(_.proposition.locations).toSet
+    val locations = units.flatMap(_.proposition.locations).map(PlaceName(_)).toSet
     val anchors = ds.collect {
       case Detail(_, DetailAtom.TemporalFact(TemporalClaim.Anchor(_, e)), _, _, _, _) => e
     }
     val relations = ds.collect { case Detail(_, DetailAtom.RelationalFact(r), _, _, _, _) => r }
     val support = SpanSet.of(units.flatMap(_.span.refs.toVector))
-    EpisodeModel
-      .of(id, scope, sits, entities, locations, anchors, relations, status, support)
-      .fold(e => throw new IllegalStateException(e.message), identity)
+    EpisodeModel.hypothesized(id, scope, sits, entities, locations, anchors, relations, support)
 
   private def cueScore(cue: Cue, units: Vector[RecallUnit]): Double =
-    val words = (cue.text + " " + cue.nominatedEvent.getOrElse("")).toLowerCase
-      .split("[^a-z]+")
+    val words = Text
+      .words(Text.lower(cue.text + " " + cue.nominatedEvent.getOrElse("")))
       .filter(w => w.length > 3)
       .toSet
     if words.isEmpty then 0.0
@@ -167,11 +228,22 @@ object TargetInduction:
       val lemmas = units.flatMap(_.proposition.lemmas).toSet
       words.count(w => lemmas.exists(l => l.startsWith(w.take(5)))).toDouble / words.size
 
+  /** A distribution from a primary mass and the split of the remainder; total by construction. */
+  private def dist(
+      primary: (MemoryAddress, Double),
+      remainder: Vector[(MemoryAddress, Double)]
+  ): Distribution[MemoryAddress] =
+    val rest = 1.0 - primary._2
+    val pairs = primary +: remainder.map { case (a, share) => a -> rest * share }
+    Distribution
+      .of(pairs.filter(_._2 > 0.0))
+      .getOrElse(Distribution.point(MemoryAddress.Unresolved))
+
   def induce(
       graph: RecallGraph,
       details: Vector[Detail],
       cue: Cue,
-      config: InductionConfig = InductionConfig(),
+      config: InductionConfig = InductionConfig.default,
       semantic: Option[SemanticDistance] = None
   ): InductionResult =
     val units = graph.ordered
@@ -199,54 +271,34 @@ object TargetInduction:
       episodeOf(
         EpisodeId.unsafe("interview:episode:target"),
         EpisodeScope.TargetSpecific,
-        byCluster(k),
-        details,
-        EpistemicStatus.Hypothesized
+        byCluster.getOrElse(k, Vector.empty),
+        details
       )
     }
-    val best = scored.headOption.map(_._2).getOrElse(0.0)
-    val alternatives = scored
-      .drop(1)
-      .filter { case (_, s) => best - s < config.alternativeMargin }
-      .map { case (k, s) =>
-        (
-          episodeOf(
-            EpisodeId.unsafe(s"interview:episode:alt$k"),
-            EpisodeScope.TargetSpecific,
-            byCluster(k),
-            details,
-            EpistemicStatus.Hypothesized
-          ),
-          s
-        )
-      }
-    val altClusters = alternatives.map(_._1.id).zip(scored.drop(1).map(_._1)).map(_.swap).toMap
-    val others = byCluster.keys.toVector.sorted
+    // Every non-target cluster is materialized exactly once, as an other specific episode under
+    // the selected hypothesis; the ones close enough in score are additionally reported as
+    // competing target hypotheses.
+    val others: Map[Int, EpisodeModel] = byCluster.keys.toVector.sorted
       .filter(k => !targetCluster.contains(k))
       .map { k =>
         k -> episodeOf(
           EpisodeId.unsafe(s"interview:episode:other$k"),
           EpisodeScope.OtherSpecific,
-          byCluster(k),
-          details,
-          EpistemicStatus.Hypothesized
+          byCluster.getOrElse(k, Vector.empty),
+          details
         )
       }
       .toMap
+    val best = scored.headOption.map(_._2).getOrElse(0.0)
+    val alternatives: Vector[(EpisodeModel, Double)] = scored
+      .drop(1)
+      .filter { case (_, s) => best - s < config.alternativeMargin }
+      .flatMap { case (k, s) => others.get(k).map(_ -> s) }
     val repeatedId = EpisodeId.unsafe("interview:episode:repeated")
     val repeated = {
-      val hs = units.filter(u => classes(u.id) == UnitClass.Habitual)
+      val hs = units.filter(u => classes.get(u.id).contains(UnitClass.Habitual))
       if hs.isEmpty then None
-      else
-        Some(
-          episodeOf(
-            repeatedId,
-            EpisodeScope.RepeatedOrCategoric,
-            hs,
-            details,
-            EpistemicStatus.Hypothesized
-          )
-        )
+      else Some(episodeOf(repeatedId, EpisodeScope.RepeatedOrCategoric, hs, details))
     }
 
     // Repetition: a later detail whose unit paraphrases an earlier unit of the same class.
@@ -254,12 +306,13 @@ object TargetInduction:
       val byUnit = details.groupBy(_.sourceUnit)
       val pairs = for
         (u, i) <- units.zipWithIndex
-        if classes(u.id) == UnitClass.Episodic || classes(u.id) == UnitClass.OtherEpisode
+        uc <- classes.get(u.id).toVector
+        if isEpisodic(uc)
         earlier <- units
           .take(i)
           .reverseIterator
           .find { e =>
-            classes(e.id) == classes(u.id) &&
+            classes.get(e.id).contains(uc) &&
             lexicalOverlap(e, u) >= config.repetitionThreshold &&
             e.proposition.predicate == u.proposition.predicate && e.proposition.predicate.nonEmpty
           }
@@ -269,103 +322,89 @@ object TargetInduction:
       yield d.id -> first.id
       pairs.toMap
 
-    val unitOf = details.map(d => d.id -> graph.byId(d.sourceUnit)).toMap
-    val addresses: Map[DetailId, Distribution[MemoryAddress]] = details.map { d =>
-      val u = unitOf(d.id)
-      val dist: Distribution[MemoryAddress] = repetitions.get(d.id) match
-        case Some(of) =>
-          Distribution.unsafe(
-            MemoryAddress.Discourse(
-              InterviewDiscourseFunction.Repetition(of)
-            ) -> config.discourseMass,
-            MemoryAddress.Unresolved -> (1.0 - config.discourseMass)
-          )
-        case None =>
-          classes(u.id) match
-            case UnitClass.Episodic | UnitClass.OtherEpisode =>
-              val k = cl(u.id)
-              if targetCluster.contains(k) then
-                val tid = targetEpisode.get.id
-                val others2 = alternatives.headOption
-                  .map(a => MemoryAddress.Episode(a._1.id, EpisodeScope.TargetSpecific) -> 0.05)
-                Distribution.unsafe(
-                  (Vector(
-                    MemoryAddress.Episode(tid, EpisodeScope.TargetSpecific) -> config.targetMass,
-                    MemoryAddress.Unresolved -> (1.0 - config.targetMass - 0.05),
-                    MemoryAddress.Episode(tid, EpisodeScope.Extended) -> 0.05
-                  ) ++ others2.toVector)*
-                )
-              else
-                val oid = altClusters
-                  .get(k)
-                  .orElse(others.get(k).map(_.id))
-                  .getOrElse(
-                    others.values.head.id
+    val targetAddr: Option[MemoryAddress] =
+      targetEpisode.map(t => MemoryAddress.Episode(t.id, EpisodeScope.TargetSpecific))
+    val altAddr: Option[MemoryAddress] =
+      alternatives.headOption.map(a => MemoryAddress.Episode(a._1.id, EpisodeScope.OtherSpecific))
+
+    def episodicAddress(k: Int): Distribution[MemoryAddress] =
+      if targetCluster.contains(k) then
+        targetAddr match
+          case None    => Distribution.point(MemoryAddress.Unresolved)
+          case Some(t) =>
+            dist(
+              t -> config.targetMass,
+              altAddr.map(_ -> 0.3).toVector :+ (MemoryAddress.Unresolved -> 0.7)
+            )
+      else
+        others.get(k) match
+          case None    => Distribution.point(MemoryAddress.Unresolved)
+          case Some(o) =>
+            dist(
+              MemoryAddress.Episode(o.id, EpisodeScope.OtherSpecific) -> config.otherMass,
+              targetAddr.map(_ -> 0.6).toVector :+ (MemoryAddress.Unresolved -> 0.4)
+            )
+
+    def discourse(f: InterviewDiscourseFunction): Distribution[MemoryAddress] =
+      dist(
+        MemoryAddress.Discourse(f) -> config.discourseMass,
+        Vector(MemoryAddress.Unresolved -> 1.0)
+      )
+
+    val addresses: Map[DetailId, Distribution[MemoryAddress]] = details.flatMap { d =>
+      graph.byId.get(d.sourceUnit).map { u =>
+        val addr: Distribution[MemoryAddress] = repetitions.get(d.id) match
+          case Some(of) => discourse(InterviewDiscourseFunction.Repetition(of))
+          case None     =>
+            classes.getOrElse(u.id, UnitClass.Uninterpretable) match
+              case UnitClass.Episodic | UnitClass.Summary | UnitClass.OtherEpisode =>
+                cl.get(u.id)
+                  .map(episodicAddress)
+                  .getOrElse(Distribution.point(MemoryAddress.Unresolved))
+              case UnitClass.Habitual =>
+                dist(
+                  MemoryAddress.PersonalKnowledge(
+                    PersonalKnowledgeKind.HabitOrRoutine
+                  ) -> config.habitualMass,
+                  Vector(
+                    MemoryAddress.Episode(repeatedId, EpisodeScope.RepeatedOrCategoric) -> 0.8,
+                    MemoryAddress.Unresolved -> 0.2
                   )
-                val tid = targetEpisode.map(_.id).getOrElse(oid)
-                Distribution.unsafe(
-                  MemoryAddress.Episode(oid, EpisodeScope.OtherSpecific) -> config.otherMass,
-                  MemoryAddress.Episode(tid, EpisodeScope.TargetSpecific) -> 0.1,
-                  MemoryAddress.Unresolved -> (1.0 - config.otherMass - 0.1)
                 )
-            case UnitClass.Habitual =>
-              Distribution.unsafe(
-                MemoryAddress.PersonalKnowledge(
-                  PersonalKnowledgeKind.HabitOrRoutine
-                ) -> config.habitualMass,
-                MemoryAddress.Episode(
-                  repeatedId,
-                  EpisodeScope.RepeatedOrCategoric
-                ) -> (1.0 - config.habitualMass - 0.05),
-                MemoryAddress.Unresolved -> 0.05
-              )
-            case UnitClass.GeneralFact =>
-              Distribution.unsafe(
-                MemoryAddress.GeneralKnowledge -> 0.7,
-                MemoryAddress.PersonalKnowledge(PersonalKnowledgeKind.AutobiographicalFact) -> 0.2,
-                MemoryAddress.Unresolved -> 0.1
-              )
-            case UnitClass.Metacognitive =>
-              Distribution.unsafe(
-                MemoryAddress.Discourse(
-                  InterviewDiscourseFunction.Metacognitive
-                ) -> config.discourseMass,
-                MemoryAddress.Unresolved -> (1.0 - config.discourseMass)
-              )
-            case UnitClass.Evaluative =>
-              Distribution.unsafe(
-                MemoryAddress.Discourse(
-                  InterviewDiscourseFunction.Evaluation
-                ) -> config.discourseMass,
-                MemoryAddress.Unresolved -> (1.0 - config.discourseMass)
-              )
-            case UnitClass.Repair =>
-              Distribution.unsafe(
-                MemoryAddress.Discourse(
-                  InterviewDiscourseFunction.ConversationalRepair
-                ) -> config.discourseMass,
-                MemoryAddress.Unresolved -> (1.0 - config.discourseMass)
-              )
-            case UnitClass.TaskCommentary =>
-              Distribution.unsafe(
-                MemoryAddress.Discourse(
-                  InterviewDiscourseFunction.TaskCommentary
-                ) -> config.discourseMass,
-                MemoryAddress.Unresolved -> (1.0 - config.discourseMass)
-              )
-      d.id -> dist
+              case UnitClass.GeneralFact =>
+                dist(
+                  MemoryAddress.GeneralKnowledge -> 0.7,
+                  Vector(
+                    MemoryAddress.PersonalKnowledge(
+                      PersonalKnowledgeKind.AutobiographicalFact
+                    ) -> 0.67,
+                    MemoryAddress.Unresolved -> 0.33
+                  )
+                )
+              case UnitClass.Metacognitive => discourse(InterviewDiscourseFunction.Metacognitive)
+              case UnitClass.Evaluative    => discourse(InterviewDiscourseFunction.Evaluation)
+              case UnitClass.Repair => discourse(InterviewDiscourseFunction.ConversationalRepair)
+              case UnitClass.TaskCommentary  => discourse(InterviewDiscourseFunction.TaskCommentary)
+              case UnitClass.Association     => discourse(InterviewDiscourseFunction.Association)
+              case UnitClass.Inference       => discourse(InterviewDiscourseFunction.Inference)
+              case UnitClass.Uninterpretable => Distribution.point(MemoryAddress.Unresolved)
+        d.id -> addr
+      }
     }.toMap
 
-    val specificity: Map[DetailId, ScoreEstimate] = details.map { d =>
-      val u = unitOf(d.id)
-      val s: ScoreEstimate = classes(u.id) match
-        case UnitClass.Episodic | UnitClass.OtherEpisode =>
-          val anchored = u.proposition.locations.nonEmpty || u.proposition.times.nonEmpty
-          Estimate.observed(if anchored then 0.85 else 0.65)
-        case UnitClass.Habitual    => Estimate.observed(0.15)
-        case UnitClass.GeneralFact => Estimate.observed(0.05)
-        case _                     => Estimate.observed(0.0)
-      d.id -> s
+    val specificity: Map[DetailId, ScoreEstimate] = details.flatMap { d =>
+      graph.byId.get(d.sourceUnit).map { u =>
+        val anchored = u.proposition.locations.nonEmpty || u.proposition.times.nonEmpty
+        val s: ScoreEstimate = classes.getOrElse(u.id, UnitClass.Uninterpretable) match
+          case UnitClass.Episodic | UnitClass.OtherEpisode =>
+            Estimate.observed(if anchored then 0.85 else 0.65)
+          // A summary denotes the episode at reduced specificity (design record §61, §65).
+          case UnitClass.Summary     => Estimate.observed(if anchored then 0.45 else 0.3)
+          case UnitClass.Habitual    => Estimate.observed(0.15)
+          case UnitClass.GeneralFact => Estimate.observed(0.05)
+          case _                     => Estimate.observed(0.0)
+        d.id -> s
+      }
     }.toMap
 
     InductionResult(
@@ -377,57 +416,70 @@ object TargetInduction:
       repetitions
     )
 
-  /** Assemble assessments from an induction result with deterministic claim metadata. */
+  private val FirstPerson =
+    """\bi (?:remember|can still|can see|can hear|saw|heard|felt)\b""".r
+  private val Hearsay =
+    """\b(?:my (?:mother|mom|father|dad|sister|brother) (?:told|says|said)|i was told|they told me)\b""".r
+  private val PhotoCue = """\b(?:photo|picture|video)\b""".r
+  private val RememberCue = """\bi remember\b""".r
+
+  /** Assemble assessments from an induction result with deterministic claim metadata. Details whose
+    * unit or address is unknown are skipped (the model validator reports them as unassessed) rather
+    * than invented.
+    */
   def assess(
       source: InterviewSource,
       graph: RecallGraph,
       details: Vector[Detail],
       result: InductionResult,
-      config: InductionConfig = InductionConfig()
+      config: InductionConfig = InductionConfig.default
   ): Vector[DetailAssessment] =
     val fp = Fingerprint.unsafe(s"interview:target-induction:${config.softwareVersion}")
     val stage = StageId.unsafe("interview-induction")
     val prov = Provenance.deterministic(config.softwareVersion, Checksum.ofText(config.toString))
-    details.map { d =>
-      val u = graph.byId(d.sourceUnit)
-      val offset = d.support.minSpan.start
-      val phase = source.phaseAt(offset)
-      val probe = source.probeBefore(offset).map(_.id)
-      val lower = u.text.toLowerCase
-      val firstPerson = """\bi (?:remember|can still|can see|can hear|saw|heard|felt)\b""".r
-        .findFirstIn(lower)
-        .nonEmpty
-      val monitoring =
-        if """\b(?:my (?:mother|mom|father|dad|sister|brother) (?:told|says|said)|i was told|they told me)\b""".r
-            .findFirstIn(lower)
-            .nonEmpty
-        then Some(SourceMonitoring.Hearsay)
-        else if """\b(?:photo|picture|video)\b""".r.findFirstIn(lower).nonEmpty then
-          Some(SourceMonitoring.Photo)
-        else if """\bi remember\b""".r.findFirstIn(lower).nonEmpty then
-          Some(SourceMonitoring.DirectMemory)
-        else None
-      DetailAssessment(
-        d,
-        result.addresses(d.id),
-        DetailAssessment.defaultFacets(d.atom),
-        result.specificity(d.id),
-        ExperientialEvidence(
-          source.ratings.flatMap(_.reliving),
-          firstPerson,
-          monitoring.toVector
-        ),
-        EpistemicStatus.Hypothesized,
-        PromptContext(phase, probe),
-        monitoring,
-        ClaimMeta(
-          ClaimId.unsafe(s"claim:${d.id.value}"),
-          EpistemicStatus.Hypothesized,
-          Credence.unsafeRaw(result.addresses(d.id).toVector.head._2),
-          NonEmptyVector.one(
-            Evidence(EvidenceId.unsafe(s"ev:${d.id.value}"), Some(d.support), Set.empty, fp, stage)
+    details.flatMap { d =>
+      for
+        u <- graph.byId.get(d.sourceUnit)
+        address <- result.addresses.get(d.id)
+      yield
+        val offset = d.support.minSpan.start
+        val phase = source.phaseAt(offset)
+        val probe = source.probeBefore(offset).map(_.id)
+        val lower = Text.lower(u.text)
+        val firstPerson = FirstPerson.findFirstIn(lower).nonEmpty
+        val monitoring =
+          if Hearsay.findFirstIn(lower).nonEmpty then Some(SourceMonitoring.Hearsay)
+          else if PhotoCue.findFirstIn(lower).nonEmpty then Some(SourceMonitoring.Photo)
+          else if RememberCue.findFirstIn(lower).nonEmpty then Some(SourceMonitoring.DirectMemory)
+          else None
+        val topMass = address.toVector.headOption.map(_._2).getOrElse(0.0)
+        DetailAssessment(
+          d,
+          address,
+          DetailAssessment.defaultFacets(d.atom),
+          result.specificity.getOrElse(d.id, Estimate.observed(0.0)),
+          ExperientialEvidence(
+            source.ratings.flatMap(_.reliving),
+            firstPerson,
+            monitoring.toVector
           ),
-          prov
+          EpistemicStatus.Hypothesized,
+          PromptContext(phase, probe),
+          monitoring,
+          ClaimMeta(
+            ClaimId.unsafe(s"claim:${d.id.value}"),
+            EpistemicStatus.Hypothesized,
+            Credence.unsafeRaw(topMass),
+            NonEmptyVector.one(
+              Evidence(
+                EvidenceId.unsafe(s"ev:${d.id.value}"),
+                Some(d.support),
+                Set.empty,
+                fp,
+                stage
+              )
+            ),
+            prov
+          )
         )
-      )
     }

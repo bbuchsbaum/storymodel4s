@@ -1,7 +1,7 @@
 package storymodel4s.interview.scoring
 
 import storymodel4s.core.*
-import storymodel4s.features.{Estimate, MissingReason, ScoreEstimate}
+import storymodel4s.features.{Coverage, Estimate, MissingReason, ScoreEstimate}
 import storymodel4s.interview.*
 import storymodel4s.story.ModelStatus
 
@@ -20,7 +20,7 @@ enum AiCategory:
 enum HardCountRule:
   case ExpectedRounded, ArgmaxAddress
 
-/** How repetitions are scored. */
+/** How repetitions are scored: counted in their own column, or removed from the count entirely. */
 enum RepetitionRule:
   case CountAsRepetition, Ignore
 
@@ -63,23 +63,37 @@ object AiScoringPolicy:
 final case class Interval(low: Double, high: Double):
   def contains(x: Double): Boolean = x >= low - 1e-9 && x <= high + 1e-9
 
-/** An expected (fractional) count with a bound. */
-final case class ExpectedCount(point: Double, interval: Interval)
+/** An expected (fractional) count with a bound.
+  *
+  * `calibrationModel` names the model whose probabilities the expectation was computed from. When
+  * it is `None` the address masses were raw, uncalibrated scores and the value is a
+  * `RawExpectation`: a count-shaped summary of the model's routing, not a calibrated estimate of
+  * what a manual scorer would count (AGENTS.md contract 3).
+  */
+final case class ExpectedCount(point: Double, interval: Interval, calibrationModel: Option[String]):
+  def isCalibrated: Boolean = calibrationModel.isDefined
+  def label: String = calibrationModel.fold("RawExpectation")(m => s"Calibrated($m)")
 
 object ExpectedCount:
-  val zero: ExpectedCount = ExpectedCount(0.0, Interval(0.0, 0.0))
+  val zero: ExpectedCount = ExpectedCount(0.0, Interval(0.0, 0.0), None)
   def +(a: ExpectedCount, b: ExpectedCount): ExpectedCount =
     ExpectedCount(
       a.point + b.point,
-      Interval(a.interval.low + b.interval.low, a.interval.high + b.interval.high)
+      Interval(a.interval.low + b.interval.low, a.interval.high + b.interval.high),
+      if a.calibrationModel == b.calibrationModel then a.calibrationModel else None
     )
 
-/** Traditional score sheet: expected and hard counts per category, per phase and pooled. */
+/** Traditional score sheet: expected and hard counts per category, per phase and pooled.
+  *
+  * `coverage` says how many details carried an observed count mass: details whose mass is `Missing`
+  * are excluded from every count rather than read as zero.
+  */
 final case class AiCompatibleScores(
     policy: AiScoringPolicy,
     expected: Map[AiCategory, ExpectedCount],
     hard: Map[AiCategory, Int],
-    byPhase: Map[InterviewPhase, Map[AiCategory, ExpectedCount]]
+    byPhase: Map[InterviewPhase, Map[AiCategory, ExpectedCount]],
+    coverage: Coverage
 ):
   def expectedInternal: Double = expected.collect { case (c, e) if c.isInternal => e.point }.sum
   def expectedExternal: Double = expected.collect { case (c, e) if !c.isInternal => e.point }.sum
@@ -96,10 +110,13 @@ final case class AiCompatibleScores(
   * estimate by construction; neither is a calibrated credible interval.
   */
 object TraditionalScoring:
+  /** The category distribution of one assessment, or `None` when the policy removes every
+    * alternative (a pure repetition under `RepetitionRule.Ignore` is not counted at all).
+    */
   def categoryDistribution(
       a: DetailAssessment,
       policy: AiScoringPolicy
-  ): Distribution[AiCategory] =
+  ): Option[Distribution[AiCategory]] =
     val pairs = a.address.toVector.flatMap { case (addr, pa) =>
       addr match
         case MemoryAddress.Episode(_, EpisodeScope.TargetSpecific) =>
@@ -126,19 +143,41 @@ object TraditionalScoring:
         case MemoryAddress.Discourse(_) => Vector(AiCategory.Other -> pa)
         case MemoryAddress.Unresolved   => Vector(AiCategory.Other -> pa)
     }
-    Distribution.of(pairs).getOrElse(Distribution.point(AiCategory.Other))
+    Distribution.of(pairs).toOption
+
+  /** Rows that contribute to counts: observed mass and a non-empty category distribution. */
+  private def rows(
+      as: Vector[DetailAssessment],
+      policy: AiScoringPolicy
+  ): Vector[(Double, Distribution[AiCategory])] =
+    as.flatMap { a =>
+      for
+        w <- a.detail.observedMass
+        d <- categoryDistribution(a, policy)
+      yield (w, d)
+    }
+
+  private def calibrationOf(as: Vector[DetailAssessment]): Option[String] =
+    val models = as.map(_.meta.credence.calibrationModel).distinct
+    models match
+      case Vector(Some(m)) => Some(m)
+      case _               => None
 
   private def expectedCounts(
       as: Vector[DetailAssessment],
       policy: AiScoringPolicy
   ): Map[AiCategory, ExpectedCount] =
-    val rows = as.map(a => (a.detail.mass, categoryDistribution(a, policy)))
+    val rs = rows(as, policy)
+    val model = calibrationOf(as)
     AiCategory.values.toVector.map { c =>
-      val point = rows.map { case (w, d) => w * d(c) }.sum
-      val low = rows.collect { case (w, d) if d.mode == c => w * d(c) }.sum
-      val high = rows.collect { case (w, d) if d(c) > 0.0 => w }.sum
-      c -> ExpectedCount(point, Interval(low, high))
+      val point = rs.map { case (w, d) => w * d(c) }.sum
+      val low = rs.collect { case (w, d) if d.mode == c => w * d(c) }.sum
+      val high = rs.collect { case (w, d) if d(c) > 0.0 => w }.sum
+      c -> ExpectedCount(point, Interval(low, high), model)
     }.toMap
+
+  def massCoverage(as: Vector[DetailAssessment]): Coverage =
+    Coverage(as.size, as.count(_.detail.observedMass.isDefined))
 
   def score(
       model: InterviewModel[ModelStatus.Validated],
@@ -149,18 +188,35 @@ object TraditionalScoring:
       case HardCountRule.ExpectedRounded =>
         expected.view.mapValues(e => math.round(e.point).toInt).toMap
       case HardCountRule.ArgmaxAddress =>
-        val modes = model.assessments.map(a => categoryDistribution(a, policy).mode)
+        val modes = model.assessments.flatMap { a =>
+          if a.detail.observedMass.isDefined then categoryDistribution(a, policy).map(_.mode)
+          else None
+        }
         AiCategory.values.toVector.map(c => c -> modes.count(_ == c)).toMap
     val phases = model.assessments.map(_.promptContext.phase).distinct
     val byPhase = policy.phaseHandling match
       case PhaseHandling.Pooled   => Map.empty[InterviewPhase, Map[AiCategory, ExpectedCount]]
       case PhaseHandling.Separate =>
         phases.map(p => p -> expectedCounts(model.assessmentsIn(p), policy)).toMap
-    AiCompatibleScores(policy, expected, hard, byPhase)
+    AiCompatibleScores(policy, expected, hard, byPhase, massCoverage(model.assessments))
 
-/** The multidimensional autobiographical-memory profile of design record §65.2. */
+/** Evidence for phenomenological re-experiencing, reported as separate strands and never summed
+  * (design record §59.3; AGENTS.md contract 7). No strand is a count of details: `firstPersonRate`
+  * is the proportion of assessed details carrying experiential language, which is invariant under
+  * duplicating the details.
+  */
+final case class PhenomenologyEvidence(
+    explicitRating: Option[ScoreEstimate],
+    firstPersonRate: ScoreEstimate,
+    sourceMonitoring: Map[SourceMonitoring, Int]
+)
+
+/** The multidimensional autobiographical-memory profile of design record §65.2. Ratios whose
+  * denominator is empty are `Missing`, never 0.
+  */
 final case class Profile(
     targetMass: Double,
+    massCoverage: Coverage,
     episodicDensityPerWord: ScoreEstimate,
     episodicDensityPerSecond: ScoreEstimate,
     eventPurity: ScoreEstimate,
@@ -169,15 +225,20 @@ final case class Profile(
     mentalStateProfile: Map[MentalStateKind, Double],
     relationalIntegration: ScoreEstimate,
     fragmentation: ScoreEstimate,
-    semanticization: Double,
-    otherEventDrift: Double,
-    redundancy: Double,
+    semanticization: ScoreEstimate,
+    otherEventDrift: ScoreEstimate,
+    redundancy: ScoreEstimate,
     probeGain: ScoreEstimate,
-    phenomenologicalEvidence: Double,
-    sourceMonitoring: Map[SourceMonitoring, Int]
+    phenomenology: PhenomenologyEvidence
 )
 
 object ProfileScoring:
+  private def weighted(a: DetailAssessment, share: Double): Double =
+    a.detail.observedMass.map(_ * share).getOrElse(0.0)
+
+  private def ratio(num: Double, den: Double): ScoreEstimate =
+    if den <= 0.0 then Estimate.missing(MissingReason.Excluded) else Estimate.observed(num / den)
+
   /** Probe gain (§65.6): new target-specific mass produced after probing, over free plus new mass.
     * "New" excludes repetitions (they are addressed to `Discourse(Repetition)`). When neither free
     * recall nor post-probe material carries target mass the ratio is undefined and reported as
@@ -186,14 +247,30 @@ object ProfileScoring:
   def probeGain(model: InterviewModel[ModelStatus.Validated]): ScoreEstimate =
     val free = model.assessments
       .filter(_.promptContext.phase == InterviewPhase.FreeRecall)
-      .map(a => a.detail.mass * a.targetMass)
+      .map(a => weighted(a, a.targetMass))
       .sum
     val post = model.assessments
       .filter(_.promptContext.phase != InterviewPhase.FreeRecall)
-      .map(a => a.detail.mass * a.targetMass)
+      .map(a => weighted(a, a.targetMass))
       .sum
-    if free + post <= 0.0 then Estimate.missing(MissingReason.Excluded)
-    else Estimate.observed(post / (free + post))
+    ratio(post, free + post)
+
+  /** Phenomenology strands from the assessments and the participant's explicit ratings. */
+  def phenomenology(
+      assessments: Vector[DetailAssessment],
+      ratings: Option[SubjectiveRatings]
+  ): PhenomenologyEvidence =
+    val rate =
+      if assessments.isEmpty then Estimate.missing(MissingReason.Excluded)
+      else
+        Estimate.observed(
+          assessments.count(_.experiential.firstPersonLanguage).toDouble / assessments.size
+        )
+    PhenomenologyEvidence(
+      ratings.flatMap(_.reliving),
+      rate,
+      assessments.flatMap(_.sourceMonitoring).groupMapReduce(identity)(_ => 1)(_ + _)
+    )
 
   private def components(
       nodes: Vector[DetailId],
@@ -220,33 +297,42 @@ object ProfileScoring:
 
   def profile(model: InterviewModel[ModelStatus.Validated]): Profile =
     val as = model.assessments
-    val targetMass = as.map(a => a.detail.mass * a.targetMass).sum
+    val targetMass = as.map(a => weighted(a, a.targetMass)).sum
     val otherSpecific = as
       .map(a =>
-        a.detail.mass * a.massAt {
-          case MemoryAddress.Episode(_, EpisodeScope.OtherSpecific) => true
-          case _                                                    => false
-        }
+        weighted(
+          a,
+          a.massAt {
+            case MemoryAddress.Episode(_, EpisodeScope.OtherSpecific) => true
+            case _                                                    => false
+          }
+        )
       )
       .sum
     val semantic = as
       .map(a =>
-        a.detail.mass * a.massAt {
-          case MemoryAddress.PersonalKnowledge(_) | MemoryAddress.GeneralKnowledge => true
-          case MemoryAddress.Episode(_, EpisodeScope.RepeatedOrCategoric)          => true
-          case _                                                                   => false
-        }
+        weighted(
+          a,
+          a.massAt {
+            case MemoryAddress.PersonalKnowledge(_) | MemoryAddress.GeneralKnowledge => true
+            case MemoryAddress.Episode(_, EpisodeScope.RepeatedOrCategoric)          => true
+            case _                                                                   => false
+          }
+        )
       )
       .sum
     val repetition = as
       .map(a =>
-        a.detail.mass * a.massAt {
-          case MemoryAddress.Discourse(InterviewDiscourseFunction.Repetition(_)) => true
-          case _                                                                 => false
-        }
+        weighted(
+          a,
+          a.massAt {
+            case MemoryAddress.Discourse(InterviewDiscourseFunction.Repetition(_)) => true
+            case _                                                                 => false
+          }
+        )
       )
       .sum
-    val total = as.map(_.detail.mass).sum
+    val total = as.flatMap(_.detail.observedMass).sum
     val words = model.source.transcript.participantTokens.count(u =>
       model.source.transcript.atlas.text(u).exists(_.isLetterOrDigit)
     )
@@ -255,15 +341,6 @@ object ProfileScoring:
       .flatMap(_.audio)
       .map(_.durationMillis)
       .sum / 1000.0
-    val densityWord: ScoreEstimate =
-      if words == 0 then Estimate.missing(MissingReason.Excluded)
-      else Estimate.observed(targetMass / words)
-    val densitySec: ScoreEstimate =
-      if seconds <= 0.0 then Estimate.missing(MissingReason.Excluded)
-      else Estimate.observed(targetMass / seconds)
-    val purity: ScoreEstimate =
-      if targetMass + otherSpecific <= 0.0 then Estimate.missing(MissingReason.Excluded)
-      else Estimate.observed(targetMass / (targetMass + otherSpecific))
 
     val targetAs = as.filter(_.targetMass >= 0.5)
     val anchoring = targetAs.count { a =>
@@ -272,17 +349,16 @@ object ProfileScoring:
         case _                                                      => false
     }.toDouble
     val perceptual = targetAs
-      .collect { case a =>
+      .flatMap { a =>
         a.detail.atom match
-          case DetailAtom.PerceptualFact(_, m, _) => Some(m -> a.detail.mass * a.targetMass)
+          case DetailAtom.PerceptualFact(_, m, _) => Some(m -> weighted(a, a.targetMass))
           case _                                  => None
       }
-      .flatten
       .groupMapReduce(_._1)(_._2)(_ + _)
     val mental = targetAs
       .flatMap { a =>
         a.detail.atom match
-          case DetailAtom.MentalStateFact(_, s) => Some(s.kind -> a.detail.mass * a.targetMass)
+          case DetailAtom.MentalStateFact(_, s) => Some(s.kind -> weighted(a, a.targetMass))
           case _                                => None
       }
       .groupMapReduce(_._1)(_._2)(_ + _)
@@ -300,11 +376,10 @@ object ProfileScoring:
     }.toSet
     val integratedMass = targetAs
       .filter(a => a.detail.atom.situations.exists(related.contains))
-      .map(a => a.detail.mass * a.targetMass)
+      .map(a => weighted(a, a.targetMass))
       .sum
     val integration: ScoreEstimate =
-      if targetMass <= 0.0 then Estimate.missing(MissingReason.Excluded)
-      else Estimate.observed(math.min(1.0, integratedMass / targetMass))
+      ratio(math.min(integratedMass, targetMass), targetMass)
 
     // Fragmentation: 1 - |largest component| / |target atoms|, atoms linked when they share a
     // situation or are joined by a relational atom.
@@ -319,24 +394,20 @@ object ProfileScoring:
         val largest = components(nodes, edges).map(_.size).maxOption.getOrElse(0)
         Estimate.observed(1.0 - largest.toDouble / nodes.size)
 
-    val phenomenology = as.count(a => a.experiential.firstPersonLanguage).toDouble +
-      model.source.ratings.flatMap(_.reliving).flatMap(_.toOption).getOrElse(0.0)
-    val monitoring = as.flatMap(_.sourceMonitoring).groupMapReduce(identity)(_ => 1)(_ + _)
-
     Profile(
       targetMass,
-      densityWord,
-      densitySec,
-      purity,
+      TraditionalScoring.massCoverage(as),
+      ratio(targetMass, words.toDouble),
+      ratio(targetMass, seconds),
+      ratio(targetMass, targetMass + otherSpecific),
       anchoring,
       perceptual,
       mental,
       integration,
       fragmentation,
-      if total <= 0.0 then 0.0 else semantic / total,
-      if total <= 0.0 then 0.0 else otherSpecific / total,
-      if total <= 0.0 then 0.0 else repetition / total,
+      ratio(semantic, total),
+      ratio(otherSpecific, total),
+      ratio(repetition, total),
       probeGain(model),
-      phenomenology,
-      monitoring
+      phenomenology(as, model.source.ratings)
     )

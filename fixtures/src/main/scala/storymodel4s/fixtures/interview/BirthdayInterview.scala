@@ -111,7 +111,9 @@ object BirthdayInterview:
       .fold(e => throw new IllegalStateException(e.message), identity)
 
   /** Run the whole v0.1 pipeline; deterministic. */
-  def build(config: InductionConfig = InductionConfig()): InterviewModel[ModelStatus.Validated] =
+  def build(
+      config: InductionConfig = InductionConfig.default
+  ): InterviewModel[ModelStatus.Validated] =
     val segmented = InterviewSegmenter.segment(interviewSource)
     val graph = segmented.graph
     val unitDetails = graph.ordered.flatMap(u => AtomProjection.fromUnit(u, segmented.turnOf(u.id)))

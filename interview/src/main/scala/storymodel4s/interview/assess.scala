@@ -2,6 +2,7 @@ package storymodel4s.interview
 
 import storymodel4s.core.*
 import storymodel4s.features.ScoreEstimate
+import storymodel4s.recall.DiscourseFunction
 
 /** How a detail relates to an episode (design record §63.1). */
 enum EpisodeScope:
@@ -11,9 +12,16 @@ enum PersonalKnowledgeKind:
   case AutobiographicalFact, SelfKnowledge, RelationshipKnowledge, LifePeriodKnowledge,
     HabitOrRoutine
 
-/** Discourse destinations of the Autobiographical Interview: not memory content at all. */
+/** Discourse destinations of the Autobiographical Interview: not memory content at all.
+  *
+  * `Association` (thematic/associative comment, design record §6.1) and `Inference` (content the
+  * participant derives rather than reports remembering) extend the §63.1 list so that every
+  * recall-side [[storymodel4s.recall.DiscourseFunction]] has an explicit destination; nothing is
+  * ever routed to an episode by default (see [[MemoryAddress.discourseOf]]).
+  */
 enum InterviewDiscourseFunction:
-  case Metacognitive, Editorial, Evaluation, ConversationalRepair, TaskCommentary
+  case Metacognitive, Editorial, Evaluation, ConversationalRepair, TaskCommentary, Association,
+    Inference
   case Repetition(of: DetailId)
 
 /** Where a detail is addressed in memory. Traditional "internal/external" is a projection of this
@@ -29,6 +37,26 @@ enum MemoryAddress:
   def isTargetSpecific: Boolean = this match
     case Episode(_, EpisodeScope.TargetSpecific) => true
     case _                                       => false
+
+object MemoryAddress:
+  /** Total mapping from a recall unit's discourse function to a non-episodic destination.
+    *
+    * `None` means the function carries episodic content whose episode must be induced
+    * (`EpisodicAssertion`, `Summary`); every other function has an explicit non-episodic home.
+    * `Uninterpretable` speech is `Unresolved`, not discourse and not an episode.
+    */
+  def discourseOf(f: DiscourseFunction): Option[MemoryAddress] = f match
+    case DiscourseFunction.EpisodicAssertion => None
+    case DiscourseFunction.Summary           => None
+    case DiscourseFunction.Inference   => Some(Discourse(InterviewDiscourseFunction.Inference))
+    case DiscourseFunction.Association =>
+      Some(Discourse(InterviewDiscourseFunction.Association))
+    case DiscourseFunction.Evaluation => Some(Discourse(InterviewDiscourseFunction.Evaluation))
+    case DiscourseFunction.SourceMonitoring =>
+      Some(Discourse(InterviewDiscourseFunction.Metacognitive))
+    case DiscourseFunction.TaskCommentary =>
+      Some(Discourse(InterviewDiscourseFunction.TaskCommentary))
+    case DiscourseFunction.Uninterpretable => Some(Unresolved)
 
 /** Traditional facet of an internal detail. */
 enum DetailFacet:
@@ -59,6 +87,10 @@ final case class Distribution[A] private (weights: Map[A, Double]):
   def map[B](f: A => B): Distribution[B] =
     Distribution(weights.groupMapReduce { case (a, _) => f(a) } { case (_, w) => w }(_ + _))
 
+  /** Drop alternatives failing `pred` and renormalize; `None` when nothing is left. */
+  def filter(pred: A => Boolean): Option[Distribution[A]] =
+    Distribution.of(weights.filter { case (a, _) => pred(a) }).toOption
+
   def toVector: Vector[(A, Double)] = weights.toVector.sortBy { case (a, w) => (-w, a.toString) }
 
 object Distribution:
@@ -73,6 +105,7 @@ object Distribution:
         Left(DomainError.InvalidFormat("Distribution", merged.toString, "zero total mass"))
       else Right(new Distribution(merged.view.mapValues(_ / total).toMap))
 
+  /** For tests and literals only; library code uses [[of]] or [[point]]. */
   def unsafe[A](pairs: (A, Double)*): Distribution[A] =
     of(pairs).fold(e => throw new IllegalArgumentException(e.message), identity)
 
@@ -124,7 +157,9 @@ object DetailAssessment:
     case DetailAtom.EventOccurrence(_)                     => Distribution.point(DetailFacet.Event)
     case DetailAtom.ParticipantFact(_, _, _)               => Distribution.point(DetailFacet.Event)
     case DetailAtom.AttributeFact(AtomTarget.Entity(_), _) =>
-      Distribution.unsafe(DetailFacet.Place -> 0.5, DetailFacet.Perceptual -> 0.5)
+      Distribution
+        .of(Vector(DetailFacet.Place -> 0.5, DetailFacet.Perceptual -> 0.5))
+        .getOrElse(Distribution.point(DetailFacet.Other))
     case DetailAtom.AttributeFact(_, _)     => Distribution.point(DetailFacet.Other)
     case DetailAtom.TemporalFact(_)         => Distribution.point(DetailFacet.Time)
     case DetailAtom.SpatialFact(_)          => Distribution.point(DetailFacet.Place)
