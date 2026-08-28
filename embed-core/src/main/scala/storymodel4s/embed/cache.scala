@@ -72,12 +72,29 @@ final class CachingEmbedder[F[_]: Monad](
     case NoKey(decision: PolicyDecision.KeyUnavailable)
     case Other(error: EmbedError)
 
+  /** REQUIRED (chief re-review): the store key is resolved ONCE at batch start. A non-public batch
+    * without a key fails closed here — before any delegation, so `Withheld` never describes a
+    * provider call and nothing is ever cached for a denied outcome. When the key is present it is
+    * snapshotted for the whole batch, so a key withdrawn mid-batch cannot desynchronize item
+    * identities from the attempt identity.
+    */
   def embed(batch: EmbedBatch): F[BatchResult] =
+    val nonPublic = batch.itemSensitivity.exists { case (_, s) =>
+      !ReceiptDigest.plainAdmissible.contains(s)
+    }
+    val keyId = keys.currentKeyId
+    val snapshot: Option[SensitiveKeyProvider] =
+      keys.key(keyId).map(bytes => SensitiveKeyProvider.static(keyId, bytes))
+    snapshot match
+      case None if nonPublic => Monad[F].pure(CachingEmbedder.failClosed(batch, keyId))
+      case _                 => embedWith(batch, snapshot.getOrElse(SensitiveKeyProvider.none))
+
+  private def embedWith(batch: EmbedBatch, batchKeys: SensitiveKeyProvider): F[BatchResult] =
     val keyed: Vector[(EmbedRequest, Keyed)] = batch.requests.map { r =>
       val key = underlying.space(r.space) match
         case None    => Keyed.Other(EmbedError.UnknownSpace(r.space.value))
         case Some(s) =>
-          CacheKey.of(s, r.payload, keys) match
+          CacheKey.of(s, r.payload, batchKeys) match
             case Right(k)                   => Keyed.Ok(k)
             case Left(EmbedError.NoKey(id)) =>
               Keyed.NoKey(new PolicyDecision.KeyUnavailable(Some(r.id), KeyId.unsafe(id)))
@@ -99,92 +116,99 @@ final class CachingEmbedder[F[_]: Monad](
         val denials = looked.collect { case (_, Keyed.NoKey(d), _) => d: PolicyDecision }
         val misses = looked.collect { case (r, Keyed.Ok(_), None) => r }
         val run: F[BatchResult] =
-          if misses.isEmpty then
-            Monad[F].pure(
-              BatchResult(
-                Vector.empty,
-                AttemptReceipt.public(Vector.empty, Vector.empty, Vector.empty)
-              )
-            )
+          if misses.isEmpty then Monad[F].pure(BatchResult(Vector.empty, AttemptReceipt.empty))
           else
             EmbedBatch.validated(misses, underlying.spaceIds) match
               case Left(e) =>
                 Monad[F].pure(
                   BatchResult(
                     misses.map(m => EmbedOutcome(m.id, m.space, Left(ExecutionFailure.Invalid(e)))),
-                    AttemptReceipt.public(Vector.empty, Vector.empty, Vector.empty)
+                    AttemptReceipt.empty
                   )
                 )
               case Right(b) => underlying.embed(b)
         run.flatMap { fresh =>
           val freshById = fresh.outcomes.map(o => o.id -> o).toMap
-          val puts = looked.collect { case (r, Keyed.Ok(key), None) =>
-            freshById
-              .get(r.id)
-              .flatMap(_.value.toOption)
-              .flatMap(_.toOption)
-              .map(v => cache.put(key, v))
-          }.flatten
-          puts.sequence_.map { _ =>
-            val outcomes = looked.map {
-              case (r, Keyed.Ok(_), Some(v)) =>
-                EmbedOutcome(r.id, r.space, Right(Estimate.observed(v)))
-              case (r, Keyed.Ok(_), None) =>
-                freshById.getOrElse(
+          val outcomes = looked.map {
+            case (r, Keyed.Ok(_), Some(v)) =>
+              EmbedOutcome(r.id, r.space, Right(Estimate.observed(v)))
+            case (r, Keyed.Ok(_), None) =>
+              freshById.getOrElse(
+                r.id,
+                EmbedOutcome(
                   r.id,
-                  EmbedOutcome(
-                    r.id,
-                    r.space,
-                    Left(ExecutionFailure.Invalid(EmbedError.InvalidResult("no outcome")))
-                  )
+                  r.space,
+                  Left(ExecutionFailure.Invalid(EmbedError.InvalidResult("no outcome")))
                 )
-              case (r, Keyed.NoKey(d), _) =>
-                EmbedOutcome(r.id, r.space, Left(ExecutionFailure.PolicyDenied(d)))
-              case (r, Keyed.Other(e), _) =>
-                EmbedOutcome(r.id, r.space, Left(ExecutionFailure.Invalid(e)))
-            }
-            val cacheDecisions = decisions ++ fresh.receipt.cacheDecisions
-            val policy = fresh.receipt.policyDecisions ++ denials
-            val receipt = AttemptReceipt
-              .of(
-                fresh.receipt.providerCalls,
-                fresh.receipt.embeddingReceipts,
-                cacheDecisions,
-                policy,
-                fresh.receipt.resultDecisions,
-                batch.itemSensitivity,
-                keys
               )
-              .fold(
-                _ =>
-                  // A non-public item was neither keyed nor denied — refuse the whole batch.
-                  AttemptReceipt.failClosed(
-                    fresh.receipt.providerCalls,
-                    fresh.receipt.embeddingReceipts,
-                    cacheDecisions,
-                    policy,
-                    fresh.receipt.resultDecisions,
-                    batch.itemSensitivity,
-                    keys.currentKeyId
-                  ),
-                identity
-              )
-            val finalOutcomes =
-              if receipt.kind == DigestKind.Withheld then
-                outcomes.zip(batch.itemSensitivity).map {
-                  case (o, (_, s))
-                      if !ReceiptDigest.plainAdmissible.contains(s) && o.value.isRight =>
-                    o.copy(value =
-                      Left(
-                        ExecutionFailure.PolicyDenied(
-                          PolicyDecision.KeyUnavailable(Some(o.id), keys.currentKeyId)
-                        )
-                      )
-                    )
-                  case (o, _) => o
-                }
-              else outcomes
-            BatchResult(finalOutcomes, receipt)
+            case (r, Keyed.NoKey(d), _) =>
+              EmbedOutcome(r.id, r.space, Left(ExecutionFailure.PolicyDenied(d)))
+            case (r, Keyed.Other(e), _) =>
+              EmbedOutcome(r.id, r.space, Left(ExecutionFailure.Invalid(e)))
           }
+          val cacheDecisions = decisions ++ fresh.receipt.cacheDecisions
+          val policy = fresh.receipt.policyDecisions ++ denials
+          // The receipt is minted BEFORE any put: a withheld attempt caches nothing.
+          val receipt = AttemptReceipt
+            .of(
+              fresh.receipt.providerCalls,
+              fresh.receipt.embeddingReceipts,
+              cacheDecisions,
+              policy,
+              fresh.receipt.resultDecisions,
+              batch.itemSensitivity,
+              batchKeys
+            )
+            .fold(
+              _ =>
+                // A non-public item was neither keyed nor denied — refuse the whole batch.
+                AttemptReceipt.failClosed(
+                  fresh.receipt.providerCalls,
+                  fresh.receipt.embeddingReceipts,
+                  cacheDecisions,
+                  policy,
+                  fresh.receipt.resultDecisions,
+                  batch.itemSensitivity,
+                  batchKeys.currentKeyId
+                ),
+              identity
+            )
+          val finalOutcomes = receipt.enforceWithholding(outcomes)
+          val puts =
+            if receipt.kind == DigestKind.Withheld then Vector.empty
+            else
+              looked.collect { case (r, Keyed.Ok(key), None) =>
+                finalOutcomes
+                  .find(_.id == r.id)
+                  .flatMap(_.value.toOption)
+                  .flatMap(_.toOption)
+                  .map(v => cache.put(key, v))
+              }.flatten
+          puts.sequence_.map(_ => BatchResult(finalOutcomes, receipt))
         }
       }
+
+object CachingEmbedder:
+  /** Every outcome denied, no provider call, nothing cached, a `Withheld` receipt: the batch needed
+    * a key the store does not have.
+    */
+  private[embed] def failClosed(batch: EmbedBatch, keyId: KeyId): BatchResult =
+    val denials = batch.requests.map(r => new PolicyDecision.KeyUnavailable(Some(r.id), keyId))
+    val outcomes = batch.requests.zip(denials).map { case (r, d) =>
+      EmbedOutcome(r.id, r.space, Left(ExecutionFailure.PolicyDenied(d)))
+    }
+    val cacheDecisions = batch.requests.zip(denials).map { case (r, d) =>
+      CacheDecision.Denied(r.id, d)
+    }
+    BatchResult(
+      outcomes,
+      AttemptReceipt.failClosed(
+        Vector.empty,
+        Vector.empty,
+        cacheDecisions,
+        denials.map(d => d: PolicyDecision),
+        Vector.empty,
+        batch.itemSensitivity,
+        keyId
+      )
+    )

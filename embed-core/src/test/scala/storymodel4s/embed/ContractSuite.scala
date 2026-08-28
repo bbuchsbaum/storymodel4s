@@ -60,7 +60,7 @@ class ContractSuite extends ScalaCheckSuite:
             )
         EmbedOutcome(r.id, r.space, value)
       }
-      BatchResult(outcomes, AttemptReceipt.public(Vector.empty, Vector.empty, Vector.empty))
+      BatchResult(outcomes, AttemptReceipt.empty)
 
   private def req(
       i: Int,
@@ -237,26 +237,44 @@ class ContractSuite extends ScalaCheckSuite:
   }
 
   test("AttemptReceipt digest is deterministic and sensitive to its decisions") {
-    val a = AttemptReceipt.public(
-      Vector.empty,
-      Vector(CacheDecision.Bypassed(RequestId.unsafe("r1"), "x")),
-      Vector.empty
-    )
-    val b = AttemptReceipt.public(
-      Vector.empty,
-      Vector(CacheDecision.Bypassed(RequestId.unsafe("r1"), "x")),
-      Vector.empty
-    )
-    val c = AttemptReceipt.public(
-      Vector.empty,
-      Vector(CacheDecision.Bypassed(RequestId.unsafe("r1"), "y")),
-      Vector.empty
-    )
+    def pub(reason: String): AttemptReceipt =
+      AttemptReceipt
+        .public(
+          Vector.empty,
+          Vector(CacheDecision.Bypassed(RequestId.unsafe("r1"), reason)),
+          Vector.empty,
+          Vector.empty,
+          Vector(RequestId.unsafe("r1") -> Sensitivity.Public)
+        )
+        .fold(e => fail(e.message), identity)
+    val a = pub("x")
+    val b = pub("x")
+    val c = pub("y")
     assertEquals(a.digest, b.digest)
     assertNotEquals(a.digest, c.digest)
-    assertEquals(
-      AttemptReceipt.public(Vector.empty, Vector.empty, Vector.empty).digest.kind,
-      DigestKind.Plain
+    assertEquals(AttemptReceipt.empty.digest.kind, DigestKind.Plain)
+  }
+
+  test("a plain receipt refuses sensitivity evidence that is not public (required (2))") {
+    val refused = AttemptReceipt.public(
+      Vector.empty,
+      Vector.empty,
+      Vector.empty,
+      Vector.empty,
+      Vector(RequestId.unsafe("s1") -> Sensitivity.Sensitive)
+    )
+    assert(refused.isLeft, "a keyed batch must not be re-receipted as plain")
+    assert(
+      AttemptReceipt
+        .public(
+          Vector.empty,
+          Vector.empty,
+          Vector.empty,
+          Vector.empty,
+          Vector(RequestId.unsafe("i1") -> Sensitivity.Internal)
+        )
+        .isLeft,
+      "Internal is not plain-admissible either"
     )
   }
 

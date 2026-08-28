@@ -330,3 +330,67 @@ class ReceiptDigestSuite extends FunSuite:
     assert(ok.isKeyConsistent)
     assertEquals(ok.call.inputChecksum, Checksum.ofText(ReceiptRendering.items(Vector(item))))
   }
+
+  test(
+    "REQUIRED (1): a caching embedder with no key at batch start fails closed before delegating"
+  ) {
+    var innerCalls = 0
+    val inner = new Embedder[Id]:
+      private val base = HashedNgramEmbedder[Id](64, 0L, k1)
+      def info: EmbedderInfo = base.info
+      def spaces: Vector[EmbeddingSpace] = base.spaces
+      def embed(b: EmbedBatch): Id[BatchResult] = { innerCalls += 1; base.embed(b) }
+    val cache = EmbeddingCache.inMemory[Id]
+    val e = new CachingEmbedder[Id](inner, cache, SensitiveKeyProvider.none)
+    val r = e.embed(
+      batch(
+        e,
+        Vector(("a", "the young man", Sensitivity.Public), ("b", canary, Sensitivity.Sensitive))
+      )
+    )
+    assertEquals(innerCalls, 0, "no delegation without a key")
+    assertEquals(r.receipt.providerCalls.size, 0)
+    assertEquals(cache.size, 0)
+    assertEquals(r.receipt.kind, DigestKind.Withheld)
+    assert(r.outcomes.forall(_.value.isLeft), "no vectors may leave with a withheld receipt")
+    assert(r.outcomes.forall {
+      case EmbedOutcome(
+            _,
+            _,
+            Left(ExecutionFailure.PolicyDenied(PolicyDecision.KeyUnavailable(Some(_), _)))
+          ) =>
+        true
+      case _ => false
+    })
+    (r.receipt.digest.render +: r.receipt.policyDecisions.map(_.render) ++: r.receipt.cacheDecisions
+      .map(_.render)).foreach(leaksNothing)
+  }
+
+  test(
+    "REQUIRED (1): the key is resolved once per batch, so a key withdrawn mid-batch cannot desynchronize identities"
+  ) {
+    val onceKeys = new SensitiveKeyProvider:
+      private var served = 0
+      def currentKeyId: KeyId = KeyId.unsafe("k1")
+      def key(id: KeyId): Option[Array[Byte]] =
+        if id == currentKeyId && served == 0 then { served += 1; Some(keyOneBytes) }
+        else None
+    val inner = HashedNgramEmbedder[Id](64, 0L, k1)
+    val cache = EmbeddingCache.inMemory[Id]
+    val e = new CachingEmbedder[Id](inner, cache, onceKeys)
+    val r = e.embed(
+      batch(
+        e,
+        Vector(("a", "the young man", Sensitivity.Public), ("b", canary, Sensitivity.Sensitive))
+      )
+    )
+    // One snapshot serves the whole batch: keyed identities, one call, consistent receipt.
+    assertEquals(r.receipt.kind, DigestKind.Keyed)
+    assertEquals(r.receipt.providerCalls.size, 1)
+    assert(r.outcomes.forall(_.value.isRight))
+    assertEquals(cache.size, 2)
+    assert(r.receipt.cacheDecisions.forall {
+      case CacheDecision.Miss(_, k) => k.kind != DigestKind.Withheld
+      case _                        => false
+    })
+  }

@@ -54,7 +54,7 @@ object EmbedBatch:
 enum ExecutionFailure:
   case TooLong(tokens: Int, max: Int)
   case ProviderError(code: String, attempt: Int)
-  case PolicyDenied(decision: PolicyDecision)
+  case PolicyDenied(decision: PolicyDecision.Denied | PolicyDecision.KeyUnavailable)
   case LocalOnly(decision: PolicyDecision.LocalOnly)
   case Transport(code: String)
   case Invalid(error: EmbedError)
@@ -145,6 +145,35 @@ final class AttemptReceipt private (
   override def hashCode: Int = parts.hashCode
   override def toString: String =
     s"AttemptReceipt(calls=${providerCalls.size}, cache=${cacheDecisions.size}, policy=${policyDecisions.size}, result=${resultDecisions.size}, items=${itemSensitivity.size}, digest=${digest.render})"
+
+  /** Ids of the items whose identity is not plain-admissible (the ones a withheld receipt denies).
+    */
+  private def nonPublicIds: Set[RequestId] =
+    itemSensitivity.collect {
+      case (id, s) if !ReceiptDigest.plainAdmissible.contains(s) => id
+    }.toSet
+
+  /** A withheld receipt describes a batch that could not be keyed: no vector of a non-public item
+    * may leave with it. Every such outcome becomes `PolicyDenied(KeyUnavailable)`; a non-withheld
+    * receipt returns the outcomes unchanged. Shared by the cache wrapper and the conforming wrapper
+    * so both paths withhold identically.
+    */
+  private[embed] def enforceWithholding(outcomes: Vector[EmbedOutcome]): Vector[EmbedOutcome] =
+    digest match
+      case ReceiptDigest.Withheld(missing, _) =>
+        val denied = nonPublicIds
+        outcomes.map { o =>
+          if denied.contains(o.id) && o.value.isRight then
+            o.copy(value =
+              Left(
+                ExecutionFailure.PolicyDenied(
+                  new PolicyDecision.KeyUnavailable(Some(o.id), missing)
+                )
+              )
+            )
+          else o
+        }
+      case _ => outcomes
 
   /** Re-receipt with additional result decisions; the digest is recomputed over the new rendering.
     * The key provider that minted this receipt is reused, so recomputation cannot change the kind
@@ -239,27 +268,63 @@ object AttemptReceipt:
       )
     )
 
-  /** A receipt for a batch with no non-public items (or no items at all): always `Plain`, needs no
-    * key. Used by providers that only ever see public material and by tests.
+  /** The receipt of an attempt that touched nothing: no items, no calls, no decisions. */
+  private[embed] val empty: AttemptReceipt =
+    new AttemptReceipt(
+      Vector.empty,
+      Vector.empty,
+      Vector.empty,
+      Vector.empty,
+      Vector.empty,
+      Vector.empty,
+      ReceiptDigest.plainPublic(
+        rendering(Vector.empty, Vector.empty, Vector.empty, Vector.empty, Vector.empty)
+      ),
+      SensitiveKeyProvider.none
+    )
+
+  /** A `Plain` receipt for a batch whose items are ALL public (or empty): needs no key. It takes
+    * the item sensitivities as evidence and refuses a non-public item — a keyed result can never be
+    * re-receipted as plain (chief re-review, required (2)). `private[embed]`: providers outside the
+    * package go through [[AttemptReceipt.of]].
     */
-  def public(
+  private[embed] def public(
       providerCalls: Vector[ProviderCall],
       cacheDecisions: Vector[CacheDecision],
       policyDecisions: Vector[PolicyDecision],
-      resultDecisions: Vector[ResultDecision] = Vector.empty
-  ): AttemptReceipt =
-    val text =
-      rendering(providerCalls, cacheDecisions, policyDecisions, resultDecisions, Vector.empty)
-    new AttemptReceipt(
-      providerCalls,
-      Vector.empty,
-      cacheDecisions,
-      policyDecisions,
-      resultDecisions,
-      Vector.empty,
-      ReceiptDigest.plainPublic(text),
-      SensitiveKeyProvider.none
-    )
+      resultDecisions: Vector[ResultDecision],
+      itemSensitivity: Vector[(RequestId, Sensitivity)]
+  ): Either[EmbedError, AttemptReceipt] =
+    itemSensitivity.collectFirst {
+      case (id, s) if !ReceiptDigest.plainAdmissible.contains(s) => id
+    } match
+      case Some(id) =>
+        Left(
+          EmbedError.InvalidResult(
+            s"plain receipt refused: item ${id.value} is not public"
+          )
+        )
+      case None =>
+        val text =
+          rendering(
+            providerCalls,
+            cacheDecisions,
+            policyDecisions,
+            resultDecisions,
+            itemSensitivity
+          )
+        Right(
+          new AttemptReceipt(
+            providerCalls,
+            Vector.empty,
+            cacheDecisions,
+            policyDecisions,
+            resultDecisions,
+            itemSensitivity,
+            ReceiptDigest.plainPublic(text),
+            SensitiveKeyProvider.none
+          )
+        )
 
   /** The receipt of a batch that failed closed for lack of key `missing`: every non-public item is
     * recorded as `KeyUnavailable` and the identity is `Withheld` over a material-free rendering.
@@ -407,18 +472,22 @@ object Embedder:
       )
     else
       val decisions = normalized.flatMap(_._2)
-      BatchResult(normalized.map(_._1), result.receipt.addResultDecisions(decisions))
+      val receipt = result.receipt.addResultDecisions(decisions)
+      BatchResult(receipt.enforceWithholding(normalized.map(_._1)), receipt)
 
   private def failClosed(
       batch: EmbedBatch,
       result: BatchResult,
       error: EmbedError
   ): BatchResult =
+    val receipt = result.receipt.addResultDecisions(Vector(ResultDecision.BatchRejected(error)))
     BatchResult(
-      batch.requests.map(request =>
-        EmbedOutcome(request.id, request.space, Left(ExecutionFailure.Invalid(error)))
+      receipt.enforceWithholding(
+        batch.requests.map(request =>
+          EmbedOutcome(request.id, request.space, Left(ExecutionFailure.Invalid(error)))
+        )
       ),
-      result.receipt.addResultDecisions(Vector(ResultDecision.BatchRejected(error)))
+      receipt
     )
 
   /** Preflight one request against the provider's locality/privacy class. Raw sensitive text never

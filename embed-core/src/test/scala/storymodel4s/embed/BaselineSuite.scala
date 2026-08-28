@@ -184,7 +184,20 @@ class BaselineSuite extends ScalaCheckSuite:
         val policy = outcomes.flatMap(_.value.left.toOption).collect {
           case ExecutionFailure.LocalOnly(d) => d
         }
-        BatchResult(outcomes, AttemptReceipt.public(Vector.empty, Vector.empty, policy))
+        BatchResult(
+          outcomes,
+          AttemptReceipt
+            .of(
+              Vector.empty,
+              Vector.empty,
+              Vector.empty,
+              policy,
+              Vector.empty,
+              batch.itemSensitivity,
+              SensitiveKeyProvider.static(KeyId.unsafe("k-test"), "test-key".getBytes("UTF-8"))
+            )
+            .fold(e => fail(e.message), identity)
+        )
     val space = docSpace(inner)
     val b = EmbedBatch
       .validated(
@@ -202,6 +215,7 @@ class BaselineSuite extends ScalaCheckSuite:
     val r = remote.embed(b)
     assert(r.outcomes.head.value.isLeft)
     assertEquals(r.receipt.policyDecisions.size, 1)
+    assertEquals(r.receipt.kind, DigestKind.Keyed, "a sensitive item forbids a plain receipt")
     assert(r.receipt.providerCalls.isEmpty)
     assert(!r.receipt.policyDecisions.head.render.contains("wedding"))
   }

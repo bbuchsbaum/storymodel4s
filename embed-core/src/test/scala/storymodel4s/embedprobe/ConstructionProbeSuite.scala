@@ -72,3 +72,30 @@ class ConstructionProbeSuite extends FunSuite:
       ).isEmpty
     )
   }
+
+  test("AttemptReceipt.public cannot be called outside the package (required (2))") {
+    refused(
+      typeCheckErrors(
+        """storymodel4s.embed.AttemptReceipt.public(
+             Vector.empty, Vector.empty, Vector.empty, Vector.empty, Vector.empty)"""
+      ),
+      "AttemptReceipt.public"
+    )
+  }
+
+  test("ExecutionFailure.PolicyDenied cannot carry an Allowed decision") {
+    refused(
+      typeCheckErrors(
+        """(a: storymodel4s.embed.PolicyDecision.Allowed) =>
+             storymodel4s.embed.ExecutionFailure.PolicyDenied(a)"""
+      ),
+      "PolicyDenied(Allowed)"
+    )
+    refused(
+      typeCheckErrors(
+        """(a: storymodel4s.embed.PolicyDecision.LocalOnly) =>
+             storymodel4s.embed.ExecutionFailure.PolicyDenied(a)"""
+      ),
+      "PolicyDenied(LocalOnly)"
+    )
+  }
