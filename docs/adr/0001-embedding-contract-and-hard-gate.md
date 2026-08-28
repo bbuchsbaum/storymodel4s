@@ -23,7 +23,7 @@ dogfooded and improved rather than re-implemented.
 | Module | Platform | Owns |
 |---|---|---|
 | `embed-core` | JVM/JS/Native | contracts (`Embedder[F]`, `EmbedRequest`, `EmbedResult`), `ValidatedVector`, identity/fingerprints, `SemanticView`, free portable baselines (hashed n-gram, TF-IDF), `EmbeddingCache` interface + in-memory impl, `PrivacyPolicy` types, laws |
-| `embed-structural` | JVM (until grakern gains a portable emitter) | chart → grakern `GraphSample` adapter by **relation reification**, WL subtree/OA features, structural `FeatureSpace`s |
+| `embed-grakern` | JVM-only (until grakern's WL compiler leaves `engine-jvm`) | chart → grakern `GraphSample` adapter by **relation reification**, WL subtree/OA features, `structural.*` `FeatureSpace`s; provider id `structural.wl.grakern` |
 | `embed-onnx` | JVM | ONNX Runtime execution of open sentence encoders; DJL HuggingFace tokenizer binding with committed differential goldens; optional token-embedding output for late pooling |
 | `embed-transport` | JVM | abstract `Transport` (HTTP client, retries, budgets) + per-provider **codecs** (OpenAI, Voyage, Cohere, Gemini, Jina, Ollama/llama.cpp/TEI/vLLM); no provider logic in the transport |
 | `embed-bench` | JVM | benchmark harness and metamorphic corpus tooling (see spike spec) |
@@ -88,6 +88,71 @@ Because it encodes structure it is deliberately **not** foil-indifferent; it
 joins the candidate union and ablations, and the no-model profile may choose
 it as its retrieval default. Upstream grakern work (directed graphs, portable
 emitter, sparse rows, laws, publication) is tracked in grakern's own tracker.
+
+### D4a. Dependency boundary (Codex condition 1–3, 6)
+
+```
+embed-core (portable) ──depends──▶ core, features                      no grakern / graph4s types
+embed-onnx (JVM)      ──▶ embed-core, onnxruntime, djl-tokenizers
+embed-transport (JVM) ──▶ embed-core, acquire, http client
+embed-grakern (JVM)   ──▶ embed-core, proposition,
+                          grakern-standard@SHA ──▶ grakern-graph4s ──▶ graph4s{core,indexed,data}@SHA
+                          grakern-engine-jvm@SHA ──▶ gale-core@SHA
+embed-bench (JVM)     ──▶ all of the above
+align / interview     ──▶ embed-core only (providers injected)
+```
+
+- No grakern or graph4s type appears in `embed-core`, in narrative APIs, in
+  `FeatureSpace` identity, or in serialized `StoryModel` contracts; the
+  adapter's provider ID is `structural.wl.grakern` and is **labelled JVM-only**
+  until grakern's WL compiler leaves `engine-jvm`. There is no hidden in-tree
+  replacement under the same provider ID.
+- Pins are immutable SHAs (`-Dstorymodel4s.grakern.build` override for
+  development only); the transitive SHA set (grakern, graph4s, gale) is
+  recorded in the build receipt and in `packages.toml`. The release path must
+  prove a clean clone builds without sibling checkouts. Pins become published
+  artifacts when grakern 0.1 / graph4s releases exist.
+- Preferred upstream direction: a topology-neutral labelled-neighbourhood /
+  graph-sample protocol and the WL feature compiler in portable grakern
+  modules, with graph4s as one adapter.
+
+### D4b. Two estimands: `d_prop` vs `d_sem` (Codex condition 7)
+
+| Channel | Spaces | Feeds | Foil behaviour |
+|---|---|---|---|
+| Structural (grakern WL over reified charts) | `structural.*` | `LocalCost.d_prop` (with `ChartCompatibility`) and candidate nomination | deliberately foil-**sensitive** |
+| Dense language-model geometry | `semantic.*` | `LocalCost.d_sem` and candidate nomination | expected foil-**indifferent**; gates handle foils |
+
+Both may nominate candidates; RRF produces a rank only, and `Candidates`
+retains per-channel provenance. The feature-use ledger records which channels
+nominated each candidate and which spaces entered any boundary induction.
+
+### D4c. grakern laws required before `embed-grakern` ships (Codex condition 4–5)
+
+- **G1 (direction).** Reversing a directed proposition relation (swapping
+  ARG0/ARG1 fillers, or inverting an edge) changes the structural feature
+  vector and the kernel value; orientation is relative to the incident
+  endpoint. (Under today's undirected `WLTrace` this holds only through
+  relation reification; the upstream bead makes it hold natively.)
+- **G2 (invariance).** Alpha-renaming of concept ids and any edge enumeration
+  order leave features and kernel values bit-identical.
+- **G3 (query overlay).** Prepared source state is immutable; query-only
+  colours never enter the source dictionary; batch cost scales with query
+  size plus sparse output, not with rebuilding the source Gram; cross values
+  equal full recompilation on small oracles.
+- **G4 (kernel).** Normalized kernels are PSD and bounded in [0, 1];
+  `+` is associative and `weighted` is homogeneous (Discipline suites in
+  grakern's currently empty `laws/`).
+
+### D4d. Late-pooled view semantics (Codex condition 8)
+
+`semantic.contextual.latepooled` is a distinct `FeatureSpace`, never a silent
+fallback to the template view. Its receipt records tokenizer offsets, model
+context limit, window/stride policy, overlap-merge rule, pooling rule,
+uncovered support, and Matryoshka dimension. Pooling over a discontinuous
+`SpanSet` uses only covered token ranges; truncation yields partial
+`Coverage` or `Missing`, never fabricated completeness. Use in hierarchy
+induction goes through the feature-use ledger (anti-circularity).
 
 ### D5. The hard-gate invariant (law)
 
