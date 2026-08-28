@@ -64,18 +64,18 @@ enum Eligibility:
   * reducer over the same inputs means something different per situation than per window.
   */
 enum TargetFamily:
-  case Token, Window, Sentence, Boundary, Turn, Situation, Segment, Unit
+  case Token, Window, Sentence, Boundary, Turn, Situation, Segment, SurfaceUnit
 
 object TargetFamily:
   def of(t: FeatureTarget): TargetFamily = t match
-    case _: FeatureTarget.Token     => Token
-    case _: FeatureTarget.Window    => Window
-    case _: FeatureTarget.Sentence  => Sentence
-    case _: FeatureTarget.Boundary  => Boundary
-    case _: FeatureTarget.Turn      => Turn
-    case _: FeatureTarget.Situation => Situation
-    case _: FeatureTarget.Segment   => Segment
-    case _: FeatureTarget.Unit      => Unit
+    case _: FeatureTarget.Token       => Token
+    case _: FeatureTarget.Window      => Window
+    case _: FeatureTarget.Sentence    => Sentence
+    case _: FeatureTarget.Boundary    => Boundary
+    case _: FeatureTarget.Turn        => Turn
+    case _: FeatureTarget.Situation   => Situation
+    case _: FeatureTarget.Segment     => Segment
+    case _: FeatureTarget.SurfaceUnit => SurfaceUnit
 
 /** A centred window of `±halfWidth` narrative units around each unit of a [[NarrativeBasis]]: the
   * narrative counterpart of core's `WindowPlan` (ADR 0002 §9 checkpoint 2, "`WindowBasis.Events`").
@@ -84,6 +84,10 @@ object TargetFamily:
   * windows, and the unit axis (situations, segments) is known only to the story model, so the plan
   * lives here rather than in core. A half-width of 0 is per-unit aggregation. The axis itself is
   * recorded by the derivation's `targetFamily`.
+  *
+  * Decision: narrative windows are centred (the target is the centre unit, clipped at the ends of
+  * the basis), not width/step sliding windows — a sliding window over events would need an "event
+  * range" target that ADR 0002 does not define.
   */
 final case class NarrativeWindowPlan private (halfWidth: Int):
   def canonicalString: String = s"narrative(halfWidth=$halfWidth)"

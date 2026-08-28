@@ -148,7 +148,7 @@ object Fixtures:
       a <- Gen.chooseNum(0, 5000)
       n <- Gen.chooseNum(0, 100)
     yield FeatureTarget.Window(TokenRange.unsafe(a, a + n)),
-    validId.map(s => FeatureTarget.Unit(SurfaceUnitId.unsafe(s)))
+    validId.map(s => FeatureTarget.SurfaceUnit(SurfaceUnitId.unsafe(s)))
   )
 
   given Arbitrary[FeatureTarget] = Arbitrary(featureTarget)

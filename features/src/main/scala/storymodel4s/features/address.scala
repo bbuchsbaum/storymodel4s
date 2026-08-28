@@ -23,7 +23,7 @@ object FeatureTargetKey:
     case FeatureTarget.Turn(i)      => Vector("turn", i.value)
     case FeatureTarget.Window(r)    =>
       Vector("window", r.start.value.toString, r.endExclusive.value.toString)
-    case FeatureTarget.Unit(u) => Vector("unit", u.value)
+    case FeatureTarget.SurfaceUnit(u) => Vector("unit", u.value)
 
   /** Only the canonical decimal rendering is accepted (no sign, no leading zeros), so that every
     * accepted key renders back to itself.
@@ -44,7 +44,7 @@ object FeatureTargetKey:
         b <- canonicalInt(e)
         r <- TokenRange.of(a, b).toOption
       yield FeatureTarget.Window(r)
-    case Vector("unit", u) => SurfaceUnitId.from(u).toOption.map(FeatureTarget.Unit.apply)
+    case Vector("unit", u) => SurfaceUnitId.from(u).toOption.map(FeatureTarget.SurfaceUnit.apply)
     case _                 => None
 
 object FeatureAddress:

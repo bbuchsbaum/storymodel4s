@@ -244,16 +244,16 @@ class StructureSuite extends ScalaCheckSuite:
 
   test("surface-unit targets rank after every existing case and order by id") {
     val ts: Vector[FeatureTarget] = Vector(
-      FeatureTarget.Unit(SurfaceUnitId.unsafe("p2")),
+      FeatureTarget.SurfaceUnit(SurfaceUnitId.unsafe("p2")),
       FeatureTarget.Segment(SegmentId.unsafe("g")),
-      FeatureTarget.Unit(SurfaceUnitId.unsafe("p1")),
+      FeatureTarget.SurfaceUnit(SurfaceUnitId.unsafe("p1")),
       FeatureTarget.Token(TokenIndex.unsafe(3))
     )
     assertEquals(ts.sorted.map(FeatureTarget.rankOf), Vector(0, 6, 7, 7))
-    assertEquals(ts.sorted.last, FeatureTarget.Unit(SurfaceUnitId.unsafe("p2")))
+    assertEquals(ts.sorted.last, FeatureTarget.SurfaceUnit(SurfaceUnitId.unsafe("p2")))
     assertEquals(FeatureTarget.rankOf(ts.head), 7)
-    assertEquals(TargetFamily.of(ts.head), TargetFamily.Unit)
-    assertEquals(TargetFamily.values.last, TargetFamily.Unit)
+    assertEquals(TargetFamily.of(ts.head), TargetFamily.SurfaceUnit)
+    assertEquals(TargetFamily.values.last, TargetFamily.SurfaceUnit)
   }
 
   property("feature target keys round-trip for every case: parse(parts(t)) == Some(t)") {
@@ -288,7 +288,7 @@ class StructureSuite extends ScalaCheckSuite:
     )
     assertEquals(FeatureTargetKey.parse(Vector("unit", "a b")), None)
     assertEquals(
-      FeatureTargetKey.parts(FeatureTarget.Unit(SurfaceUnitId.unsafe("s:p0"))).head,
+      FeatureTargetKey.parts(FeatureTarget.SurfaceUnit(SurfaceUnitId.unsafe("s:p0"))).head,
       "unit"
     )
   }

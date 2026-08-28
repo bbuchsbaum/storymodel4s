@@ -75,17 +75,21 @@ object FeatureCodecs:
     case FeatureTarget.Boundary(u) => Json.obj("type" -> "Boundary".asJson, "afterUnit" -> u.asJson)
     case FeatureTarget.Turn(i)     => Json.obj("type" -> "Turn".asJson, "id" -> i.asJson)
     case FeatureTarget.Window(r)   => Json.obj("type" -> "Window".asJson, "range" -> r.asJson)
+    case FeatureTarget.SurfaceUnit(u) =>
+      Json.obj("type" -> "SurfaceUnit".asJson, "unit" -> u.asJson)
   }
   given Decoder[FeatureTarget] = Decoder.instance { c =>
     field[String](c, "type").flatMap {
-      case "Token"     => field[TokenIndex](c, "index").map(FeatureTarget.Token.apply)
-      case "Sentence"  => field[SurfaceUnitId](c, "unit").map(FeatureTarget.Sentence.apply)
-      case "Situation" => field[SituationId](c, "id").map(FeatureTarget.Situation.apply)
-      case "Segment"   => field[SegmentId](c, "id").map(FeatureTarget.Segment.apply)
-      case "Boundary"  => field[SurfaceUnitId](c, "afterUnit").map(FeatureTarget.Boundary.apply)
-      case "Turn"      => field[TurnId](c, "id").map(FeatureTarget.Turn.apply)
-      case "Window"    => field[TokenRange](c, "range").map(FeatureTarget.Window.apply)
-      case other       => Left(DecodingFailure(s"unknown FeatureTarget $other", c.history))
+      case "Token"       => field[TokenIndex](c, "index").map(FeatureTarget.Token.apply)
+      case "Sentence"    => field[SurfaceUnitId](c, "unit").map(FeatureTarget.Sentence.apply)
+      case "Situation"   => field[SituationId](c, "id").map(FeatureTarget.Situation.apply)
+      case "Segment"     => field[SegmentId](c, "id").map(FeatureTarget.Segment.apply)
+      case "Boundary"    => field[SurfaceUnitId](c, "afterUnit").map(FeatureTarget.Boundary.apply)
+      case "Turn"        => field[TurnId](c, "id").map(FeatureTarget.Turn.apply)
+      case "Window"      => field[TokenRange](c, "range").map(FeatureTarget.Window.apply)
+      case "SurfaceUnit" =>
+        field[SurfaceUnitId](c, "unit").map(FeatureTarget.SurfaceUnit.apply)
+      case other => Left(DecodingFailure(s"unknown FeatureTarget $other", c.history))
     }
   }
   given Encoder[FeatureTarget.Boundary] =
@@ -314,10 +318,17 @@ object FeatureCodecs:
   given Encoder[TargetFamily] = enumEncoder(_.toString)
   given Decoder[TargetFamily] = enumDecoder("TargetFamily", TargetFamily.values, _.toString)
 
+  given Encoder[NarrativeWindowPlan] =
+    Encoder.instance(p => Json.obj("halfWidth" -> p.halfWidth.asJson))
+  given Decoder[NarrativeWindowPlan] = Decoder.instance { c =>
+    field[Int](c, "halfWidth").flatMap(h => domain(c, NarrativeWindowPlan.of(h)))
+  }
+
   given Encoder[FeatureDerivation] = Encoder.instance { d =>
     obj(
       "inputs" -> d.inputs.toVector.asJson,
       "window" -> opt(d.window),
+      "narrativeWindow" -> opt(d.narrativeWindow),
       "reducer" -> d.reducer.asJson,
       "weighting" -> d.weighting.asJson,
       "missing" -> d.missing.asJson,
@@ -334,6 +345,7 @@ object FeatureCodecs:
         .fromVector(ins)
         .toRight(DecodingFailure("derivation requires an input", c.history))
       w <- field[Option[WindowPlan]](c, "window")
+      nw <- field[Option[NarrativeWindowPlan]](c, "narrativeWindow")
       r <- field[ReducerId](c, "reducer")
       wp <- field[WeightingPolicy](c, "weighting")
       m <- field[MissingValuePolicy](c, "missing")
@@ -341,7 +353,7 @@ object FeatureCodecs:
       iv <- field[String](c, "implementationVersion")
       el <- field[Eligibility](c, "eligibility")
       tf <- field[Option[TargetFamily]](c, "targetFamily")
-    yield FeatureDerivation(nev, w, r, wp, m, n, iv, el, tf)
+    yield FeatureDerivation(nev, w, r, wp, m, n, iv, el, tf, nw)
   }
 
   /** Inline tracks over any target, for scalar (`Double`) and categorical (`String`) values. */

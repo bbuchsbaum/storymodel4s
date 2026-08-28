@@ -388,29 +388,29 @@ class WindowSuite extends ScalaCheckSuite:
   test("surface-unit targets resolve paragraphs, and share support with the sentence case") {
     val para = atlas.paragraphs.head
     assertEquals(
-      resolver.support(FeatureTarget.Unit(para.id)).map(_.minSpan),
+      resolver.support(FeatureTarget.SurfaceUnit(para.id)).map(_.minSpan),
       Some(para.span)
     )
     val s1 = atlas.sentences(1).id
     assertEquals(
-      resolver.support(FeatureTarget.Unit(s1)),
+      resolver.support(FeatureTarget.SurfaceUnit(s1)),
       resolver.support(FeatureTarget.Sentence(s1))
     )
-    assertNotEquals(FeatureTarget.Unit(s1): FeatureTarget, FeatureTarget.Sentence(s1))
-    assertEquals(resolver.support(FeatureTarget.Unit(SurfaceUnitId.unsafe("nope"))), None)
-    // a paragraph-scale aggregate: family Unit, coverage over the paragraph's lexical tokens
+    assertNotEquals(FeatureTarget.SurfaceUnit(s1): FeatureTarget, FeatureTarget.Sentence(s1))
+    assertEquals(resolver.support(FeatureTarget.SurfaceUnit(SurfaceUnitId.unsafe("nope"))), None)
+    // a paragraph-scale aggregate: family SurfaceUnit, coverage over the paragraph's lexical tokens
     val raw = imageabilityTrack()
     val agg = Aggregate
       .overTargets(
         raw,
         sequence,
-        Vector((FeatureTarget.Unit(para.id), SpanSet.one(para.span))),
+        Vector((FeatureTarget.SurfaceUnit(para.id), SpanSet.one(para.span))),
         ScalarReducer.Mean,
         MissingValuePolicy.IgnoreMissing
       )
       .toOption
       .get
-    assertEquals(agg.derivation.get.targetFamily, Some(TargetFamily.Unit))
+    assertEquals(agg.derivation.get.targetFamily, Some(TargetFamily.SurfaceUnit))
     assertEquals(agg.observations.head.coverage.get.eligible, sequence.lexicalSize)
     assert(FeatureTrack.validatedScores(agg).isRight)
   }

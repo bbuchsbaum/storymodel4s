@@ -228,7 +228,11 @@ object Windowed:
   /** Centred windows of `±plan.halfWidth` units over a [[NarrativeBasis]]: one observation per unit
     * (an event or a scene), whose support is the union of the member units' supports and whose
     * coverage counts the eligible tokens of that union once. Windows are clipped at the ends of the
-    * basis. Kernel bandwidths count units; `Slope` is over token position.
+    * basis.
+    *
+    * Decision: a kernel's distance for a token is the offset (in units) of the nearest member unit
+    * containing it, so bandwidths count events or scenes, not tokens; `Slope` stays over token
+    * position (discourse order).
     */
   def overBasis[T <: FeatureTarget](
       track: FeatureTrack[FeatureTarget.Token, Double],
@@ -455,7 +459,8 @@ object Aggregate:
   * Why: core's `WindowBasis` counts surface units the atlas knows about; events and scenes are
   * known only to the story model, so their basis is resolved through a [[SupportResolver]] and
   * carried as data (ADR 0002 §9 checkpoint 2). Units keep the caller's order (the model's discourse
-  * order); every id must resolve and appear once.
+  * order). Decision: an id that does not resolve, or appears twice, is a `DomainError` — never
+  * silently dropped, so a derived track always covers exactly the units it was asked for.
   */
 final case class NarrativeBasis[T <: FeatureTarget] private (
     family: TargetFamily,
