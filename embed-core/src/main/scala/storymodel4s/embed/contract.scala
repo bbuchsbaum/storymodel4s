@@ -3,7 +3,7 @@ package storymodel4s.embed
 import cats.{Applicative, Show}
 
 import storymodel4s.core.{Checksum, OpaqueId, ProviderCall}
-import storymodel4s.features.Estimate
+import storymodel4s.features.{Estimate, MalformedReason, MissingReason}
 
 /** Caller-supplied request identity; unique within a batch (checked by [[EmbedBatch]]). */
 object RequestId extends OpaqueId("RequestId")
@@ -71,6 +71,22 @@ final case class EmbedOutcome(
     value: Either[ExecutionFailure, Estimate[ValidatedVector]]
 )
 
+/** A typed audit record for any repair or rejection performed by the conforming wrapper.
+  *
+  * Why: result normalization must remain visible in receipts instead of silently changing provider
+  * output or discarding otherwise valid sibling estimates.
+  */
+enum ResultDecision:
+  case Reordered(id: RequestId, fromIndex: Int, toIndex: Int)
+  case SpaceRejected(id: RequestId, expected: GeometryId, actual: GeometryId)
+  case BatchRejected(error: EmbedError)
+
+  private[embed] def render: String = this match
+    case Reordered(id, from, to)             => s"reordered:${id.value}:$from:$to"
+    case SpaceRejected(id, expected, actual) =>
+      s"space-rejected:${id.value}:${expected.value}:${actual.value}"
+    case BatchRejected(error) => s"batch-rejected:${error.message}"
+
 /** What the cache did for one request. */
 enum CacheDecision:
   case Hit(id: RequestId, key: MaterialDigest)
@@ -84,14 +100,25 @@ final case class AttemptReceipt(
     providerCalls: Vector[ProviderCall],
     cacheDecisions: Vector[CacheDecision],
     policyDecisions: Vector[PolicyDecision],
+    resultDecisions: Vector[ResultDecision],
     digest: Checksum
-)
+):
+  private[embed] def addResultDecisions(decisions: Vector[ResultDecision]): AttemptReceipt =
+    if decisions.isEmpty then this
+    else
+      AttemptReceipt.of(
+        providerCalls,
+        cacheDecisions,
+        policyDecisions,
+        resultDecisions ++ decisions
+      )
 
 object AttemptReceipt:
   def of(
       providerCalls: Vector[ProviderCall],
       cacheDecisions: Vector[CacheDecision],
-      policyDecisions: Vector[PolicyDecision]
+      policyDecisions: Vector[PolicyDecision],
+      resultDecisions: Vector[ResultDecision] = Vector.empty
   ): AttemptReceipt =
     val parts =
       providerCalls.map(c =>
@@ -101,11 +128,12 @@ object AttemptReceipt:
           case CacheDecision.Hit(id, k)      => s"hit:${id.value}:${k.render}"
           case CacheDecision.Miss(id, k)     => s"miss:${id.value}:${k.render}"
           case CacheDecision.Bypassed(id, r) => s"bypass:${id.value}:$r"
-        } ++ policyDecisions.map(_.render)
+        } ++ policyDecisions.map(_.render) ++ resultDecisions.map(_.render)
     AttemptReceipt(
       providerCalls,
       cacheDecisions,
       policyDecisions,
+      resultDecisions,
       Checksum.ofText(parts.mkString("\n"))
     )
 
@@ -150,25 +178,92 @@ trait Embedder[F[_]]:
   final def space(id: GeometryId): Option[EmbeddingSpace] = spaces.find(_.id == id)
 
 object Embedder:
-  /** Wrap any embedder so that a non-conforming result (wrong count/order/space) becomes a typed
-    * per-batch failure instead of a silent mismatch.
+  /** Wrap an embedder so that provably associated siblings survive a malformed item.
+    *
+    * A complete id bijection is normalized into request order. A wrong-space item becomes a typed
+    * missing estimate and a receipt decision; missing, duplicate, or extra ids fail the whole batch
+    * because their vectors cannot be associated safely.
     */
   def conforming[F[_]: Applicative](underlying: Embedder[F]): Embedder[F] =
     new Embedder[F]:
       def info: EmbedderInfo = underlying.info
       def spaces: Vector[EmbeddingSpace] = underlying.spaces
       def embed(batch: EmbedBatch): F[BatchResult] =
-        Applicative[F].map(underlying.embed(batch)) { r =>
-          r.conforms(batch) match
-            case Right(ok) => ok
-            case Left(e)   =>
-              BatchResult(
-                batch.requests.map(q =>
-                  EmbedOutcome(q.id, q.space, Left(ExecutionFailure.Invalid(e)))
-                ),
-                AttemptReceipt.of(Vector.empty, Vector.empty, Vector.empty)
-              )
-        }
+        Applicative[F].map(underlying.embed(batch))(normalize(batch, _))
+
+  private def normalize(batch: EmbedBatch, result: BatchResult): BatchResult =
+    val expectedIds = batch.ids.toSet
+    val grouped = result.outcomes.zipWithIndex.groupMap(_._1.id)(identity)
+    val actualIds = grouped.keySet
+    val duplicateIds = grouped.collect { case (id, values) if values.size > 1 => id }.toVector
+    val missingIds = expectedIds.diff(actualIds).toVector
+    val extraIds = actualIds.diff(expectedIds).toVector
+
+    associationError(result.outcomes.size, batch.requests.size, duplicateIds, missingIds, extraIds)
+      .fold(normalizeBijection(batch, result, grouped))(failClosed(batch, result, _))
+
+  private def associationError(
+      actualSize: Int,
+      expectedSize: Int,
+      duplicateIds: Vector[RequestId],
+      missingIds: Vector[RequestId],
+      extraIds: Vector[RequestId]
+  ): Option[EmbedError] =
+    val details = Vector(
+      Option.when(actualSize != expectedSize)(s"count=$actualSize expected=$expectedSize"),
+      renderIds("duplicate", duplicateIds),
+      renderIds("missing", missingIds),
+      renderIds("extra", extraIds)
+    ).flatten
+    Option.when(details.nonEmpty)(EmbedError.InvalidResult(details.mkString("; ")))
+
+  private def renderIds(label: String, ids: Vector[RequestId]): Option[String] =
+    Option.when(ids.nonEmpty)(s"$label=${ids.map(_.value).sorted.mkString(",")}")
+
+  private def normalizeBijection(
+      batch: EmbedBatch,
+      result: BatchResult,
+      grouped: Map[RequestId, Vector[(EmbedOutcome, Int)]]
+  ): BatchResult =
+    val normalized = batch.requests.zipWithIndex.flatMap { case (request, targetIndex) =>
+      grouped.get(request.id).flatMap(_.headOption).map { case (outcome, sourceIndex) =>
+        val reorder =
+          Option.when(sourceIndex != targetIndex)(
+            ResultDecision.Reordered(request.id, sourceIndex, targetIndex)
+          )
+        if outcome.space == request.space then (outcome, reorder.toVector)
+        else
+          val missing = EmbedOutcome(
+            request.id,
+            request.space,
+            Right(Estimate.missing(MissingReason.Malformed(MalformedReason.ProviderResult)))
+          )
+          val rejection =
+            ResultDecision.SpaceRejected(request.id, request.space, outcome.space)
+          (missing, reorder.toVector :+ rejection)
+      }
+    }
+    if normalized.size != batch.requests.size then
+      failClosed(
+        batch,
+        result,
+        EmbedError.InvalidResult("outcomes did not form a complete request-id bijection")
+      )
+    else
+      val decisions = normalized.flatMap(_._2)
+      BatchResult(normalized.map(_._1), result.receipt.addResultDecisions(decisions))
+
+  private def failClosed(
+      batch: EmbedBatch,
+      result: BatchResult,
+      error: EmbedError
+  ): BatchResult =
+    BatchResult(
+      batch.requests.map(request =>
+        EmbedOutcome(request.id, request.space, Left(ExecutionFailure.Invalid(error)))
+      ),
+      result.receipt.addResultDecisions(Vector(ResultDecision.BatchRejected(error)))
+    )
 
   /** Preflight one request against the provider's locality/privacy class. Raw sensitive text never
     * reaches a remote provider; the decision is recorded, not thrown.

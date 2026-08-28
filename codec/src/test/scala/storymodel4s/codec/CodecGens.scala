@@ -89,6 +89,11 @@ object CodecGens:
     Gen.zip(ident, ident).map(UndefinedReason.Custom.apply)
   )
 
+  val malformedReason: Gen[MalformedReason] = Gen.oneOf(
+    Gen.const(MalformedReason.ProviderResult),
+    Gen.zip(ident, ident).map(MalformedReason.Custom.apply)
+  )
+
   val missingReason: Gen[MissingReason] = Gen.oneOf(
     Gen.const(MissingReason.NotInLexicon),
     Gen.const(MissingReason.OutOfVocabulary),
@@ -96,6 +101,7 @@ object CodecGens:
     Gen.const(MissingReason.Excluded),
     Gen.const(MissingReason.AllMissing),
     Gen.const(MissingReason.Unknown),
+    malformedReason.map(MissingReason.Malformed.apply),
     undefinedReason.map(MissingReason.Undefined.apply)
   )
 

@@ -82,6 +82,7 @@ final case class BatchResult(outcomes: Vector[EmbedOutcome], receipt: AttemptRec
 final case class AttemptReceipt(providerCalls: Vector[ProviderCall],   // zero or more
                                 cacheDecisions: Vector[CacheDecision],
                                 policyDecisions: Vector[PolicyDecision],
+                                resultDecisions: Vector[ResultDecision],
                                 digest: SensitiveDigest)
 trait Embedder[F[_]]:
   def info: EmbedderInfo
@@ -92,6 +93,11 @@ trait Embedder[F[_]]:
 - **Valid absence** is `Estimate.Missing(reason)` (provider abstained, coverage
   policy); **execution failure** is `ExecutionFailure`. They are never the same
   representation.
+- A complete result-id bijection is normalized into request order. A safely
+  associated wrong-space item becomes
+  `Missing(Malformed(ProviderResult))`, with its expected and actual spaces in a
+  typed `ResultDecision`; valid siblings survive. Missing, duplicate, extra, or
+  unknown ids fail the whole batch because no vector may be misassociated.
 - A preflight denial or cache hit produces an `EmbedOutcome` with **no**
   `ProviderCall`; the `AttemptReceipt` records the policy/cache decision instead.
 - `ValidatedVector(dimension: Dimension, normalization: Normalization)` enforces
