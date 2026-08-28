@@ -180,7 +180,7 @@ class BaselineSuite extends ScalaCheckSuite:
         val policy = outcomes.flatMap(_.value.left.toOption).collect {
           case ExecutionFailure.LocalOnly(d) => d
         }
-        BatchResult(outcomes, AttemptReceipt.of(Vector.empty, Vector.empty, policy))
+        BatchResult(outcomes, AttemptReceipt.public(Vector.empty, Vector.empty, policy))
     val space = docSpace(inner)
     val b = EmbedBatch
       .validated(

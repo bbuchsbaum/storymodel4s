@@ -2,7 +2,7 @@ package storymodel4s.embed
 
 import cats.{Order, Show}
 
-import storymodel4s.core.{Checksum, OpaqueId, Sha256}
+import storymodel4s.core.{OpaqueId, Sha256}
 
 /** Identifies a store-local secret key (rotation happens by issuing a new id). */
 object KeyId extends OpaqueId("KeyId")
@@ -35,8 +35,8 @@ object Hmac:
     System.arraycopy(b, 0, out, a.length, b.length)
     out
 
-/** A keyed digest of sensitive material. Distinct from [[Checksum]] on purpose: a plain content
-  * hash of transcript text is dictionary-attackable; this one is not without the key.
+/** A keyed digest of sensitive material. Distinct from [[storymodel4s.core.Checksum]] on purpose: a
+  * plain content hash of transcript text is dictionary-attackable; this one is not without the key.
   */
 final case class SensitiveDigest private (keyId: KeyId, hex: String):
   def render: String = s"hmac:${keyId.value}:$hex"
@@ -52,16 +52,17 @@ object SensitiveDigest:
 
   private[embed] def utf8(s: String): Array[Byte] = s.getBytes("UTF-8")
 
-  /** Cross-platform determinism vector (ADR 0001 D6): the same key and canonical rendering must
+  /** Cross-platform determinism vector (ADR 0001 D6): the same key and the PRODUCTION material
+    * rendering ([[ReceiptRendering.material]] for a query-role request without instruction) must
     * produce this exact digest on JVM, Scala.js and Native, because receipts cross platforms.
     * Changing the rendering format is a receipt-format version bump, not a silent edit.
     */
   object Golden:
     val keyId: KeyId = KeyId.unsafe("golden-key-v1")
     val keyBytes: Array[Byte] = utf8("storymodel4s-golden-key-2026")
-    val rendering: String =
-      "receipt/v1|plain:0000|space:golden|role:Query|view:Surface|material:the young man went to the river"
-    val expectedHex: String = "cd865a8c0bfaf84e5cb20c582504ff4c2b7e3e13e4215de889d3d661c0c5173c"
+    val text: String = "the young man went to the river"
+    val rendering: String = ReceiptRendering.material(Role.Query, None, text)
+    val expectedHex: String = "1ad599f677d0bd96b3f0da58b3737545dfffb2d11d47744dece2423ff5d2ed40"
 
   given Show[SensitiveDigest] = Show.show(_.render)
   given Order[SensitiveDigest] = Order.by(_.render)
@@ -86,29 +87,3 @@ object SensitiveKeyProvider:
       def currentKeyId: KeyId = id
       def key(k: KeyId): Option[Array[Byte]] =
         if k == id then Some(java.util.Arrays.copyOf(bytes, bytes.length)) else None
-
-/** Identity of the exact material sent to a provider, chosen by sensitivity. Kept as the
-  * `CacheDecision` vocabulary; new code should use [[ReceiptDigest]] (PHASE 2 (after P0-1): switch
-  * `CacheDecision` to `ReceiptDigest` and retire this type).
-  */
-enum MaterialDigest:
-  case Plain(checksum: Checksum)
-  case Sensitive(digest: SensitiveDigest)
-
-  def render: String = this match
-    case Plain(c)     => s"plain:${c.hex}"
-    case Sensitive(d) => d.render
-
-object MaterialDigest:
-  /** Digest the rendered provider material: plain SHA-256 for non-sensitive inputs, keyed HMAC for
-    * sensitive ones. The material string is the exact bytes the provider would see (text plus
-    * instruction plus role marker), so a changed instruction never hits a stale cache entry.
-    */
-  def of(
-      sensitivity: Sensitivity,
-      material: String,
-      keys: SensitiveKeyProvider
-  ): Either[EmbedError, MaterialDigest] =
-    ReceiptDigest.of(sensitivity, material, keys).map(_.toMaterial)
-
-  given Order[MaterialDigest] = Order.by(_.render)

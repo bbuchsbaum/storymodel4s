@@ -20,6 +20,11 @@ enum EmbedError:
   case InvalidResult(reason: String)
   case InvalidKey(reason: String)
 
+  /** No key is available under `keyId`: every non-public receipt surface fails closed (ADR 0001
+    * D6). Carries only the key id, never material.
+    */
+  case NoKey(keyId: String)
+
   def message: String = this match
     case DimensionMismatch(e, a)     => s"dimension mismatch: expected $e, got $a"
     case NonFiniteValue(i)           => s"non-finite value at index $i"
@@ -33,3 +38,4 @@ enum EmbedError:
     case InvalidRecipe(r)            => s"invalid recipe: $r"
     case InvalidResult(r)            => s"invalid result: $r"
     case InvalidKey(r)               => s"invalid key: $r"
+    case NoKey(k)                    => s"no key available for '$k'"

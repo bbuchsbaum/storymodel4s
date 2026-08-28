@@ -3,10 +3,15 @@ package storymodel4s.embed
 import cats.Applicative
 
 import storymodel4s.core.{Checksum, ContentAddress, ProviderCall, TextNorm}
-import storymodel4s.features.Estimate
+import storymodel4s.features.{CanonicalDouble, Estimate}
 
 /** Shared plumbing for the free, deterministic, portable baselines: preflight, per-item outcomes,
   * one receipted "call" per batch (cached=false, no remote).
+  *
+  * Identity discipline (ADR 0001 D6): a non-public item without a key is denied as
+  * `PolicyDenied(KeyUnavailable)` with a recorded decision; if the outputs of a keyed batch cannot
+  * be keyed (key vanished between items and outputs) the WHOLE batch fails closed the same way —
+  * there is no path on which a plain identity of non-public material reaches a receipt.
   */
 abstract class LocalBaseline[F[_]: Applicative] extends Embedder[F]:
   protected def vectorFor(
@@ -20,15 +25,15 @@ abstract class LocalBaseline[F[_]: Applicative] extends Embedder[F]:
   protected def keys: SensitiveKeyProvider
 
   def embed(batch: EmbedBatch): F[BatchResult] =
-    Applicative[F].map(embedWithReceipt(batch))(_._1)
+    Applicative[F].pure(embedNow(batch))
 
-  /** `embed` plus the embed-level [[EmbeddingReceipt]] (typed digest kind, per-item identities).
-    * PHASE 2 (after P0-1): `AttemptReceipt` carries this receipt and its own keyed digest; until
-    * then callers that need the kind read it from here.
-    */
-  def embedWithReceipt(batch: EmbedBatch): F[(BatchResult, EmbeddingReceipt)] =
+  private def denied(r: EmbedRequest, keyId: KeyId): (EmbedOutcome, PolicyDecision.KeyUnavailable) =
+    val d = new PolicyDecision.KeyUnavailable(Some(r.id), keyId)
+    (EmbedOutcome(r.id, r.space, Left(ExecutionFailure.PolicyDenied(d))), d)
+
+  private def embedNow(batch: EmbedBatch): BatchResult =
     val policy = Vector.newBuilder[PolicyDecision]
-    val perItem: Vector[(EmbedOutcome, Option[(RequestId, ReceiptDigest)])] =
+    val perItem: Vector[(EmbedOutcome, Option[ItemDigest])] =
       batch.requests.map { r =>
         Embedder.preflight(info, r) match
           case Left(f) =>
@@ -49,32 +54,30 @@ abstract class LocalBaseline[F[_]: Applicative] extends Embedder[F]:
                   None
                 )
               case Some(s) =>
+                val sensitivity = r.payload.sensitivityOf
                 val material = Material.render(s, r.payload)
-                ReceiptDigest.of(r.payload.sensitivityOf, material, keys) match
+                ReceiptDigest.of(sensitivity, material, keys) match
+                  case Left(EmbedError.NoKey(k)) =>
+                    val (o, d) = denied(r, KeyId.unsafe(k))
+                    policy += d
+                    (o, None)
                   case Left(e) =>
-                    // No key for non-public material: fail closed, record nothing about the text.
                     (EmbedOutcome(r.id, r.space, Left(ExecutionFailure.Invalid(e))), None)
                   case Right(digest) =>
-                    val outcome = vectorFor(s, r.payload.materialText) match
-                      case Left(e) => EmbedOutcome(r.id, r.space, Left(ExecutionFailure.Invalid(e)))
-                      case Right(v) => EmbedOutcome(r.id, r.space, Right(v))
-                    (outcome, Some(r.id -> digest))
+                    ItemDigest.of(r.id, sensitivity, digest) match
+                      case Left(e) =>
+                        (EmbedOutcome(r.id, r.space, Left(ExecutionFailure.Invalid(e))), None)
+                      case Right(item) =>
+                        val outcome = vectorFor(s, r.payload.materialText) match
+                          case Left(e) =>
+                            EmbedOutcome(r.id, r.space, Left(ExecutionFailure.Invalid(e)))
+                          case Right(v) => EmbedOutcome(r.id, r.space, Right(v))
+                        (outcome, Some(item))
       }
     val outcomes = perItem.map(_._1)
     val items = perItem.flatMap(_._2)
-    val anyKeyed = items.exists(_._2.kind == DigestKind.Keyed)
-    val outputsMaterial = outcomes
-      .map(o => o.value.fold(_.render, e => e.toOption.fold("missing")(_.values.mkString(","))))
-      .mkString("\n")
-    val outputs: ReceiptDigest =
-      if anyKeyed then
-        // Every keyed item had a key, so this cannot fail; keep the typed path anyway.
-        ReceiptDigest
-          .keyed(outputsMaterial, keys)
-          .getOrElse(
-            ReceiptDigest.Plain(Checksum.ofText("keyed-outputs-unavailable"))
-          )
-      else ReceiptDigest.Plain(Checksum.ofText(outputsMaterial))
+    val anyKeyed = items.exists(_.digest.kind == DigestKind.Keyed)
+    val outputsMaterial = LocalBaseline.outputsRendering(outcomes)
     val base = ProviderCall(
       provider = info.name,
       model = info.version,
@@ -86,22 +89,69 @@ abstract class LocalBaseline[F[_]: Applicative] extends Embedder[F]:
       seed = None,
       cached = false
     )
-    val receipt = EmbeddingReceipt
-      .of(base, items, outputs)
-      .getOrElse(
-        // Unreachable by construction (keyed items ⇒ keyed outputs); kept total for the type.
-        EmbeddingReceipt
-          .of(base, Vector.empty, ReceiptDigest.Plain(Checksum.ofText("")))
-          .toOption
-          .get
+    val outputs: Either[EmbedError, ReceiptDigest] =
+      if anyKeyed then ReceiptDigest.keyed(outputsMaterial, keys)
+      else Right(ReceiptDigest.plainPublic(outputsMaterial))
+    val receipted: Either[EmbedError, EmbeddingReceipt] =
+      outputs.flatMap(o => EmbeddingReceipt.of(base, items, o))
+    receipted match
+      case Right(receipt) =>
+        AttemptReceipt
+          .of(
+            Vector(receipt.call),
+            Vector(receipt),
+            Vector.empty,
+            policy.result(),
+            Vector.empty,
+            batch.itemSensitivity,
+            keys
+          )
+          .fold(
+            _ => LocalBaseline.failClosed(batch, outcomes, policy.result(), keys),
+            r => BatchResult(outcomes, r)
+          )
+      case Left(_) =>
+        // Keyed items whose outputs cannot be keyed (the key vanished mid-batch): fail closed.
+        LocalBaseline.failClosed(batch, outcomes, policy.result(), keys)
+
+object LocalBaseline:
+  /** Canonical rendering of a batch's outcomes (platform-stable doubles; no material). */
+  private[embed] def outputsRendering(outcomes: Vector[EmbedOutcome]): String =
+    (ReceiptRendering.OutputsVersion +: outcomes.map { o =>
+      val v = o.value.fold(
+        f => s"failure=${ReceiptRendering.esc(f.render)}",
+        e => e.toOption.fold("missing")(_.values.map(CanonicalDouble.render).mkString(","))
       )
-    Applicative[F].pure(
-      (
-        BatchResult(
-          outcomes,
-          AttemptReceipt.of(Vector(receipt.call), Vector.empty, policy.result())
-        ),
-        receipt
+      s"${ReceiptRendering.esc(o.id.value)}|$v"
+    }).mkString("\n")
+
+  /** Every non-public item is denied `KeyUnavailable`; public outcomes survive; the receipt is
+    * `Withheld` (no provider call is recorded because no keyed identity exists for it).
+    */
+  private[embed] def failClosed(
+      batch: EmbedBatch,
+      outcomes: Vector[EmbedOutcome],
+      policy: Vector[PolicyDecision],
+      keys: SensitiveKeyProvider
+  ): BatchResult =
+    val missing = keys.currentKeyId
+    val closed = outcomes.zip(batch.itemSensitivity).map {
+      case (o, (_, s)) if !ReceiptDigest.plainAdmissible.contains(s) =>
+        o.copy(value =
+          Left(ExecutionFailure.PolicyDenied(PolicyDecision.KeyUnavailable(Some(o.id), missing)))
+        )
+      case (o, _) => o
+    }
+    BatchResult(
+      closed,
+      AttemptReceipt.failClosed(
+        Vector.empty,
+        Vector.empty,
+        Vector.empty,
+        policy,
+        Vector.empty,
+        batch.itemSensitivity,
+        missing
       )
     )
 

@@ -8,13 +8,14 @@ class PrivacySuite extends FunSuite:
 
   private val policy = PrivacyPolicyId.unsafe("policy")
   private val key = KeyId.unsafe("key")
+  private val suiteKeys = SensitiveKeyProvider.static(key, "privacy-suite-key".getBytes("UTF-8"))
 
   private def checked(
       source: String,
       destination: String,
       offsets: Vector[(TextSpan, TextSpan)]
   ): Either[DomainError, PseudonymizedText] =
-    PseudonymizedText.checked(policy, key, source, destination, offsets)
+    PseudonymizedText.checked(policy, key, source, destination, offsets, suiteKeys)
 
   private def errorOf(result: Either[DomainError, PseudonymizedText]): DomainError =
     result.left.toOption.getOrElse(fail("expected pseudonymization validation to fail"))
@@ -42,7 +43,8 @@ class PrivacySuite extends FunSuite:
         KeyId.unsafe("k"),
         "Jane",
         "[PERSON]",
-        Vector(TextSpan.unsafe(0, 4) -> TextSpan.unsafe(0, 8))
+        Vector(TextSpan.unsafe(0, 4) -> TextSpan.unsafe(0, 8)),
+        SensitiveKeyProvider.static(KeyId.unsafe("k"), "k".getBytes("UTF-8"))
       ).toOption.get.copy(text = "raw")"""
     )
     assert(constructor.nonEmpty)
@@ -272,6 +274,8 @@ class PrivacySuite extends FunSuite:
 
     assertEquals(authorized.map(_.payload), Right(payload))
     assertEquals(authorized.map(_.capability.payloadDigest), Right(payload.digest))
+    assertEquals(payload.digest.kind, DigestKind.Keyed)
+    assertEquals(payload.digest.keyIdOption, Some(key))
   }
 
   test("RemotePolicy never authorizes a raw request") {

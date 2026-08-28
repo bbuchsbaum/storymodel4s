@@ -32,6 +32,8 @@ final case class EmbedRequest(id: RequestId, payload: EmbedPayload, space: Geome
 /** A validated batch: unique ids, spaces known to the target embedder. */
 final case class EmbedBatch private (requests: Vector[EmbedRequest]):
   def ids: Vector[RequestId] = requests.map(_.id)
+  def itemSensitivity: Vector[(RequestId, Sensitivity)] =
+    requests.map(r => r.id -> r.payload.sensitivityOf)
 
 object EmbedBatch:
   def validated(
@@ -47,12 +49,12 @@ object EmbedBatch:
           case None    => Right(EmbedBatch(requests))
 
 /** Execution failure is distinct from valid absence (`Estimate.Missing`). Messages never contain
-  * payload text.
+  * payload text. `PolicyDenied` carries the recorded decision — a plain denial or a missing key.
   */
 enum ExecutionFailure:
   case TooLong(tokens: Int, max: Int)
   case ProviderError(code: String, attempt: Int)
-  case PolicyDenied(decision: PolicyDecision.Denied)
+  case PolicyDenied(decision: PolicyDecision)
   case LocalOnly(decision: PolicyDecision.LocalOnly)
   case Transport(code: String)
   case Invalid(error: EmbedError)
@@ -87,54 +89,208 @@ enum ResultDecision:
       s"space-rejected:${id.value}:${expected.value}:${actual.value}"
     case BatchRejected(error) => s"batch-rejected:${error.message}"
 
-/** What the cache did for one request. */
+/** What the cache did for one request. Keys are typed [[ReceiptDigest]]s, so the digest kind is
+  * visible without parsing a rendering; a request denied for lack of a key is recorded as such.
+  */
 enum CacheDecision:
-  case Hit(id: RequestId, key: MaterialDigest)
-  case Miss(id: RequestId, key: MaterialDigest)
+  case Hit(id: RequestId, key: ReceiptDigest)
+  case Miss(id: RequestId, key: ReceiptDigest)
+  case Denied(id: RequestId, decision: PolicyDecision)
   case Bypassed(id: RequestId, reason: String)
 
-/** Receipt of one `embed` attempt: zero or more provider calls plus every cache/policy decision. A
-  * preflight denial or a full cache hit legitimately has no provider call at all.
+  private[embed] def render: String = this match
+    case Hit(id, k)    => s"cache|hit|${ReceiptRendering.esc(id.value)}|${k.render}"
+    case Miss(id, k)   => s"cache|miss|${ReceiptRendering.esc(id.value)}|${k.render}"
+    case Denied(id, d) =>
+      s"cache|denied|${ReceiptRendering.esc(id.value)}|${ReceiptRendering.esc(d.render)}"
+    case Bypassed(id, r) =>
+      s"cache|bypass|${ReceiptRendering.esc(id.value)}|${ReceiptRendering.esc(r)}"
+
+/** Receipt of one `embed` attempt: zero or more provider calls plus every cache/policy/result
+  * decision and the sensitivity of every item. A preflight denial or a full cache hit legitimately
+  * has no provider call at all.
+  *
+  * Identity discipline (ADR 0001 D6): `digest` is computed from the canonical rendering of the
+  * CONSTRUCTED receipt — every decision vector, including `resultDecisions`, and the item
+  * sensitivities — so no defaulted argument can escape it. It is `Plain` when every item is
+  * `Public`, `Keyed` under the store key when any item is not, and `Withheld` only when the key was
+  * absent and every non-public item carries a recorded `PolicyDecision.KeyUnavailable`. There is no
+  * other case: a non-public batch without a key and without recorded denials cannot be receipted.
   */
-final case class AttemptReceipt(
-    providerCalls: Vector[ProviderCall],
-    cacheDecisions: Vector[CacheDecision],
-    policyDecisions: Vector[PolicyDecision],
-    resultDecisions: Vector[ResultDecision],
-    digest: Checksum
+final class AttemptReceipt private (
+    val providerCalls: Vector[ProviderCall],
+    val embeddingReceipts: Vector[EmbeddingReceipt],
+    val cacheDecisions: Vector[CacheDecision],
+    val policyDecisions: Vector[PolicyDecision],
+    val resultDecisions: Vector[ResultDecision],
+    val itemSensitivity: Vector[(RequestId, Sensitivity)],
+    val digest: ReceiptDigest,
+    private val keys: SensitiveKeyProvider
 ):
+  def kind: DigestKind = digest.kind
+
+  private def parts = (
+    providerCalls,
+    embeddingReceipts,
+    cacheDecisions,
+    policyDecisions,
+    resultDecisions,
+    itemSensitivity,
+    digest
+  )
+
+  override def equals(o: Any): Boolean = o match
+    case that: AttemptReceipt => this.parts == that.parts
+    case _                    => false
+  override def hashCode: Int = parts.hashCode
+  override def toString: String =
+    s"AttemptReceipt(calls=${providerCalls.size}, cache=${cacheDecisions.size}, policy=${policyDecisions.size}, result=${resultDecisions.size}, items=${itemSensitivity.size}, digest=${digest.render})"
+
+  /** Re-receipt with additional result decisions; the digest is recomputed over the new rendering.
+    * The key provider that minted this receipt is reused, so recomputation cannot change the kind
+    * unless the key has since vanished — in which case the receipt is withheld and says so.
+    */
   private[embed] def addResultDecisions(decisions: Vector[ResultDecision]): AttemptReceipt =
     if decisions.isEmpty then this
     else
-      AttemptReceipt.of(
-        providerCalls,
-        cacheDecisions,
-        policyDecisions,
-        resultDecisions ++ decisions
-      )
+      val next = resultDecisions ++ decisions
+      AttemptReceipt
+        .of(
+          providerCalls,
+          embeddingReceipts,
+          cacheDecisions,
+          policyDecisions,
+          next,
+          itemSensitivity,
+          keys
+        )
+        .getOrElse(
+          AttemptReceipt.failClosed(
+            providerCalls,
+            embeddingReceipts,
+            cacheDecisions,
+            policyDecisions,
+            next,
+            itemSensitivity,
+            keys.currentKeyId
+          )
+        )
 
 object AttemptReceipt:
+  /** Canonical rendering of the receipt's content (never material). */
+  private[embed] def rendering(
+      providerCalls: Vector[ProviderCall],
+      cacheDecisions: Vector[CacheDecision],
+      policyDecisions: Vector[PolicyDecision],
+      resultDecisions: Vector[ResultDecision],
+      itemSensitivity: Vector[(RequestId, Sensitivity)]
+  ): String =
+    val e = ReceiptRendering.esc
+    val lines =
+      Vector(ReceiptRendering.AttemptVersion) ++
+        providerCalls.map(c =>
+          s"call|${e(c.provider)}|${e(c.model)}|${e(c.version)}|${c.inputChecksum.hex}|${c.outputChecksum.hex}"
+        ) ++
+        cacheDecisions.map(_.render) ++
+        policyDecisions.map(d => s"policy|${e(d.render)}") ++
+        resultDecisions.map(d => s"result|${e(d.render)}") ++
+        itemSensitivity.map { case (id, s) => s"item|${e(id.value)}|$s" }
+    lines.mkString("\n")
+
+  /** Build a receipt. `Left(NoKey)` only when a non-public item is present, no key is available,
+    * and that item is NOT covered by a recorded `KeyUnavailable` decision — i.e. the caller tried
+    * to receipt sensitive work without either keying or denying it.
+    */
   def of(
+      providerCalls: Vector[ProviderCall],
+      embeddingReceipts: Vector[EmbeddingReceipt],
+      cacheDecisions: Vector[CacheDecision],
+      policyDecisions: Vector[PolicyDecision],
+      resultDecisions: Vector[ResultDecision],
+      itemSensitivity: Vector[(RequestId, Sensitivity)],
+      keys: SensitiveKeyProvider
+  ): Either[EmbedError, AttemptReceipt] =
+    val text =
+      rendering(providerCalls, cacheDecisions, policyDecisions, resultDecisions, itemSensitivity)
+    val nonPublic = itemSensitivity.collect {
+      case (id, s) if !ReceiptDigest.plainAdmissible.contains(s) => id
+    }
+    val digest: Either[EmbedError, ReceiptDigest] =
+      if nonPublic.isEmpty then Right(ReceiptDigest.plainPublic(text))
+      else
+        ReceiptDigest.keyed(text, keys).left.flatMap { err =>
+          val denied = policyDecisions.collect { case PolicyDecision.KeyUnavailable(Some(id), _) =>
+            id
+          }.toSet
+          if nonPublic.forall(denied.contains) then
+            Right(ReceiptDigest.withheld(keys.currentKeyId, text))
+          else Left(err)
+        }
+    digest.map(d =>
+      new AttemptReceipt(
+        providerCalls,
+        embeddingReceipts,
+        cacheDecisions,
+        policyDecisions,
+        resultDecisions,
+        itemSensitivity,
+        d,
+        keys
+      )
+    )
+
+  /** A receipt for a batch with no non-public items (or no items at all): always `Plain`, needs no
+    * key. Used by providers that only ever see public material and by tests.
+    */
+  def public(
       providerCalls: Vector[ProviderCall],
       cacheDecisions: Vector[CacheDecision],
       policyDecisions: Vector[PolicyDecision],
       resultDecisions: Vector[ResultDecision] = Vector.empty
   ): AttemptReceipt =
-    val parts =
-      providerCalls.map(c =>
-        s"call:${c.provider}:${c.model}:${c.inputChecksum.hex}:${c.outputChecksum.hex}"
-      ) ++
-        cacheDecisions.map {
-          case CacheDecision.Hit(id, k)      => s"hit:${id.value}:${k.render}"
-          case CacheDecision.Miss(id, k)     => s"miss:${id.value}:${k.render}"
-          case CacheDecision.Bypassed(id, r) => s"bypass:${id.value}:$r"
-        } ++ policyDecisions.map(_.render) ++ resultDecisions.map(_.render)
-    AttemptReceipt(
+    val text =
+      rendering(providerCalls, cacheDecisions, policyDecisions, resultDecisions, Vector.empty)
+    new AttemptReceipt(
       providerCalls,
+      Vector.empty,
       cacheDecisions,
       policyDecisions,
       resultDecisions,
-      Checksum.ofText(parts.mkString("\n"))
+      Vector.empty,
+      ReceiptDigest.plainPublic(text),
+      SensitiveKeyProvider.none
+    )
+
+  /** The receipt of a batch that failed closed for lack of key `missing`: every non-public item is
+    * recorded as `KeyUnavailable` and the identity is `Withheld` over a material-free rendering.
+    */
+  private[embed] def failClosed(
+      providerCalls: Vector[ProviderCall],
+      embeddingReceipts: Vector[EmbeddingReceipt],
+      cacheDecisions: Vector[CacheDecision],
+      policyDecisions: Vector[PolicyDecision],
+      resultDecisions: Vector[ResultDecision],
+      itemSensitivity: Vector[(RequestId, Sensitivity)],
+      missing: KeyId
+  ): AttemptReceipt =
+    val already = policyDecisions.collect { case PolicyDecision.KeyUnavailable(Some(id), _) =>
+      id
+    }.toSet
+    val denials = itemSensitivity.collect {
+      case (id, s) if !ReceiptDigest.plainAdmissible.contains(s) && !already.contains(id) =>
+        PolicyDecision.KeyUnavailable(Some(id), missing)
+    }
+    val policy = policyDecisions ++ denials
+    val text = rendering(providerCalls, cacheDecisions, policy, resultDecisions, itemSensitivity)
+    new AttemptReceipt(
+      providerCalls,
+      embeddingReceipts,
+      cacheDecisions,
+      policy,
+      resultDecisions,
+      itemSensitivity,
+      ReceiptDigest.withheld(missing, text),
+      SensitiveKeyProvider.none
     )
 
 final case class BatchResult(outcomes: Vector[EmbedOutcome], receipt: AttemptReceipt):
