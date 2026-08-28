@@ -14,52 +14,95 @@ abstract class LocalBaseline[F[_]: Applicative] extends Embedder[F]:
       text: String
   ): Either[EmbedError, Estimate[ValidatedVector]]
 
+  /** Store-local keys for non-public material. `SensitiveKeyProvider.none` makes every non-public
+    * request fail closed (typed) — never a plain identity of sensitive text.
+    */
+  protected def keys: SensitiveKeyProvider
+
   def embed(batch: EmbedBatch): F[BatchResult] =
+    Applicative[F].map(embedWithReceipt(batch))(_._1)
+
+  /** `embed` plus the embed-level [[EmbeddingReceipt]] (typed digest kind, per-item identities).
+    * PHASE 2 (after P0-1): `AttemptReceipt` carries this receipt and its own keyed digest; until
+    * then callers that need the kind read it from here.
+    */
+  def embedWithReceipt(batch: EmbedBatch): F[(BatchResult, EmbeddingReceipt)] =
     val policy = Vector.newBuilder[PolicyDecision]
-    val outcomes = batch.requests.map { r =>
-      Embedder.preflight(info, r) match
-        case Left(f) =>
-          f match
-            case ExecutionFailure.PolicyDenied(d) => policy += d
-            case ExecutionFailure.LocalOnly(d)    => policy += d
-            case _                                => ()
-          EmbedOutcome(r.id, r.space, Left(f))
-        case Right(()) =>
-          space(r.space) match
-            case None =>
-              EmbedOutcome(
-                r.id,
-                r.space,
-                Left(ExecutionFailure.Invalid(EmbedError.UnknownSpace(r.space.value)))
-              )
-            case Some(s) =>
-              vectorFor(s, r.payload.materialText) match
-                case Left(e)  => EmbedOutcome(r.id, r.space, Left(ExecutionFailure.Invalid(e)))
-                case Right(v) => EmbedOutcome(r.id, r.space, Right(v))
-    }
-    val inputs = Checksum.ofText(
-      batch.requests
-        .map(r => space(r.space).fold("")(s => Material.render(s, r.payload)))
-        .mkString("\n")
-    )
-    val outputs = Checksum.ofText(
-      outcomes
-        .map(o => o.value.fold(_.render, e => e.toOption.fold("missing")(_.values.mkString(","))))
-        .mkString("\n")
-    )
-    val call = ProviderCall(
+    val perItem: Vector[(EmbedOutcome, Option[(RequestId, ReceiptDigest)])] =
+      batch.requests.map { r =>
+        Embedder.preflight(info, r) match
+          case Left(f) =>
+            f match
+              case ExecutionFailure.PolicyDenied(d) => policy += d
+              case ExecutionFailure.LocalOnly(d)    => policy += d
+              case _                                => ()
+            (EmbedOutcome(r.id, r.space, Left(f)), None)
+          case Right(()) =>
+            space(r.space) match
+              case None =>
+                (
+                  EmbedOutcome(
+                    r.id,
+                    r.space,
+                    Left(ExecutionFailure.Invalid(EmbedError.UnknownSpace(r.space.value)))
+                  ),
+                  None
+                )
+              case Some(s) =>
+                val material = Material.render(s, r.payload)
+                ReceiptDigest.of(r.payload.sensitivityOf, material, keys) match
+                  case Left(e) =>
+                    // No key for non-public material: fail closed, record nothing about the text.
+                    (EmbedOutcome(r.id, r.space, Left(ExecutionFailure.Invalid(e))), None)
+                  case Right(digest) =>
+                    val outcome = vectorFor(s, r.payload.materialText) match
+                      case Left(e) => EmbedOutcome(r.id, r.space, Left(ExecutionFailure.Invalid(e)))
+                      case Right(v) => EmbedOutcome(r.id, r.space, Right(v))
+                    (outcome, Some(r.id -> digest))
+      }
+    val outcomes = perItem.map(_._1)
+    val items = perItem.flatMap(_._2)
+    val anyKeyed = items.exists(_._2.kind == DigestKind.Keyed)
+    val outputsMaterial = outcomes
+      .map(o => o.value.fold(_.render, e => e.toOption.fold("missing")(_.values.mkString(","))))
+      .mkString("\n")
+    val outputs: ReceiptDigest =
+      if anyKeyed then
+        // Every keyed item had a key, so this cannot fail; keep the typed path anyway.
+        ReceiptDigest
+          .keyed(outputsMaterial, keys)
+          .getOrElse(
+            ReceiptDigest.Plain(Checksum.ofText("keyed-outputs-unavailable"))
+          )
+      else ReceiptDigest.Plain(Checksum.ofText(outputsMaterial))
+    val base = ProviderCall(
       provider = info.name,
       model = info.version,
       version = info.provider.render,
       promptTemplateVersion = None,
-      inputChecksum = inputs,
-      outputChecksum = outputs,
+      inputChecksum = Checksum.ofText(""),
+      outputChecksum = Checksum.ofText(""),
       params = Map("locality" -> "local"),
       seed = None,
       cached = false
     )
+    val receipt = EmbeddingReceipt
+      .of(base, items, outputs)
+      .getOrElse(
+        // Unreachable by construction (keyed items ⇒ keyed outputs); kept total for the type.
+        EmbeddingReceipt
+          .of(base, Vector.empty, ReceiptDigest.Plain(Checksum.ofText("")))
+          .toOption
+          .get
+      )
     Applicative[F].pure(
-      BatchResult(outcomes, AttemptReceipt.of(Vector(call), Vector.empty, policy.result()))
+      (
+        BatchResult(
+          outcomes,
+          AttemptReceipt.of(Vector(receipt.call), Vector.empty, policy.result())
+        ),
+        receipt
+      )
     )
 
 /** Portable word scanner over code points (no `\p{L}` regexes, which Scala.js does not support in
@@ -99,8 +142,11 @@ object Fnv1a:
   * fixed dimension and L2-normalized. Its fingerprint names the hash function, seed and dimension
   * so two configurations never share a `GeometryId`.
   */
-final class HashedNgramEmbedder[F[_]: Applicative](val dimension: Dimension, val seed: Long)
-    extends LocalBaseline[F]:
+final class HashedNgramEmbedder[F[_]: Applicative](
+    val dimension: Dimension,
+    val seed: Long,
+    protected val keys: SensitiveKeyProvider
+) extends LocalBaseline[F]:
   val info: EmbedderInfo = EmbedderInfo(
     provider = ProviderFingerprint
       .of("hashed-ngram", "none", s"fnv1a64:seed=$seed:dim=${dimension.value}", "portable"),
@@ -153,8 +199,12 @@ final class HashedNgramEmbedder[F[_]: Applicative](val dimension: Dimension, val
       ValidatedVector.l2(dimension, acc.toVector).map(Estimate.observed)
 
 object HashedNgramEmbedder:
-  def apply[F[_]: Applicative](dimension: Int = 512, seed: Long = 0L): HashedNgramEmbedder[F] =
-    new HashedNgramEmbedder[F](Dimension.unsafe(dimension), seed)
+  def apply[F[_]: Applicative](
+      dimension: Int = 512,
+      seed: Long = 0L,
+      keys: SensitiveKeyProvider = SensitiveKeyProvider.none
+  ): HashedNgramEmbedder[F] =
+    new HashedNgramEmbedder[F](Dimension.unsafe(dimension), seed, keys)
 
 /** TF-IDF over a fitted vocabulary, L2-normalized. The corpus fingerprint is part of the provider
   * identity, so vectors from different fits never share a space.
@@ -162,7 +212,8 @@ object HashedNgramEmbedder:
 final class TfIdfEmbedder[F[_]: Applicative] private (
     val vocabulary: Vector[String],
     val idf: Vector[Double],
-    val corpusFingerprint: Checksum
+    val corpusFingerprint: Checksum,
+    protected val keys: SensitiveKeyProvider
 ) extends LocalBaseline[F]:
   val dimension: Dimension = Dimension.unsafe(vocabulary.length)
   private val index: Map[String, Int] = vocabulary.zipWithIndex.toMap
@@ -219,7 +270,10 @@ object TfIdfEmbedder:
   def tokens(text: String): Vector[String] = BaselineTokens.words(text)
 
   /** Fit the vocabulary and idf on a corpus (sorted vocabulary ⇒ deterministic dimension order). */
-  def fit[F[_]: Applicative](corpus: Vector[String]): Either[EmbedError, TfIdfEmbedder[F]] =
+  def fit[F[_]: Applicative](
+      corpus: Vector[String],
+      keys: SensitiveKeyProvider = SensitiveKeyProvider.none
+  ): Either[EmbedError, TfIdfEmbedder[F]] =
     val docs = corpus.map(d => tokens(d).toSet)
     val vocab = docs.flatten.distinct.sorted
     if vocab.isEmpty then Left(EmbedError.InvalidRecipe("empty corpus"))
@@ -227,4 +281,4 @@ object TfIdfEmbedder:
       val n = docs.length.toDouble
       val idf = vocab.map(t => math.log((1.0 + n) / (1.0 + docs.count(_.contains(t)))) + 1.0)
       val fp = ContentAddress.digest(corpus)
-      Right(new TfIdfEmbedder[F](vocab, idf, fp))
+      Right(new TfIdfEmbedder[F](vocab, idf, fp, keys))

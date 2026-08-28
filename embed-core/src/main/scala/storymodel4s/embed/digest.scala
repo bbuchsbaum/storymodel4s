@@ -52,6 +52,17 @@ object SensitiveDigest:
 
   private[embed] def utf8(s: String): Array[Byte] = s.getBytes("UTF-8")
 
+  /** Cross-platform determinism vector (ADR 0001 D6): the same key and canonical rendering must
+    * produce this exact digest on JVM, Scala.js and Native, because receipts cross platforms.
+    * Changing the rendering format is a receipt-format version bump, not a silent edit.
+    */
+  object Golden:
+    val keyId: KeyId = KeyId.unsafe("golden-key-v1")
+    val keyBytes: Array[Byte] = utf8("storymodel4s-golden-key-2026")
+    val rendering: String =
+      "receipt/v1|plain:0000|space:golden|role:Query|view:Surface|material:the young man went to the river"
+    val expectedHex: String = "cd865a8c0bfaf84e5cb20c582504ff4c2b7e3e13e4215de889d3d661c0c5173c"
+
   given Show[SensitiveDigest] = Show.show(_.render)
   given Order[SensitiveDigest] = Order.by(_.render)
 
@@ -63,6 +74,12 @@ trait SensitiveKeyProvider:
   def key(id: KeyId): Option[Array[Byte]]
 
 object SensitiveKeyProvider:
+  /** A provider with no keys at all: every non-public digest fails closed with a typed error. */
+  val none: SensitiveKeyProvider =
+    new SensitiveKeyProvider:
+      def currentKeyId: KeyId = KeyId.unsafe("none")
+      def key(k: KeyId): Option[Array[Byte]] = None
+
   /** Test/development provider with one in-memory key. Not for production stores. */
   def static(id: KeyId, bytes: Array[Byte]): SensitiveKeyProvider =
     new SensitiveKeyProvider:
@@ -70,7 +87,10 @@ object SensitiveKeyProvider:
       def key(k: KeyId): Option[Array[Byte]] =
         if k == id then Some(java.util.Arrays.copyOf(bytes, bytes.length)) else None
 
-/** Identity of the exact material sent to a provider, chosen by sensitivity. */
+/** Identity of the exact material sent to a provider, chosen by sensitivity. Kept as the
+  * `CacheDecision` vocabulary; new code should use [[ReceiptDigest]] (PHASE 2 (after P0-1): switch
+  * `CacheDecision` to `ReceiptDigest` and retire this type).
+  */
 enum MaterialDigest:
   case Plain(checksum: Checksum)
   case Sensitive(digest: SensitiveDigest)
@@ -89,12 +109,6 @@ object MaterialDigest:
       material: String,
       keys: SensitiveKeyProvider
   ): Either[EmbedError, MaterialDigest] =
-    sensitivity match
-      case Sensitivity.Sensitive =>
-        val id = keys.currentKeyId
-        keys.key(id) match
-          case None    => Left(EmbedError.InvalidKey(s"no key for ${id.value}"))
-          case Some(k) => SensitiveDigest.compute(id, k, material).map(Sensitive(_))
-      case Sensitivity.Public | Sensitivity.Internal => Right(Plain(Checksum.ofText(material)))
+    ReceiptDigest.of(sensitivity, material, keys).map(_.toMaterial)
 
   given Order[MaterialDigest] = Order.by(_.render)

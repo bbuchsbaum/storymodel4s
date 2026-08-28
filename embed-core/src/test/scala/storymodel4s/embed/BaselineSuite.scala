@@ -93,7 +93,7 @@ class BaselineSuite extends ScalaCheckSuite:
   }
 
   test("caching embedder: second batch hits, receipts record decisions, sensitive keys are HMAC") {
-    val inner = HashedNgramEmbedder[Id](64, 0L)
+    val inner = HashedNgramEmbedder[Id](64, 0L, keys)
     val cache = EmbeddingCache.inMemory[Id]
     val e = new CachingEmbedder[Id](inner, cache, keys)
     val space = docSpace(inner)
@@ -133,7 +133,7 @@ class BaselineSuite extends ScalaCheckSuite:
   }
 
   test("caching embedder never caches abstentions and keys by role/instruction via the space") {
-    val inner = HashedNgramEmbedder[Id](64, 0L)
+    val inner = HashedNgramEmbedder[Id](64, 0L, keys)
     val cache = EmbeddingCache.inMemory[Id]
     val e = new CachingEmbedder[Id](inner, cache, keys)
     val q = querySpace(inner)
