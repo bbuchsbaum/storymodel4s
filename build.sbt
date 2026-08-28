@@ -1,27 +1,27 @@
 import org.typelevel.sbt.gha.JavaSpec
 
-val Scala3           = "3.7.4"
-val catsV            = "2.13.0"
+val Scala3 = "3.7.4"
+val catsV = "2.13.0"
 val catsCollectionsV = "0.9.10"
-val catsParseV       = "1.1.0"
-val circeV           = "0.14.10"
-val munitV           = "1.3.4"
-val munitCheckV      = "1.3.0"
+val catsParseV = "1.1.0"
+val circeV = "0.14.10"
+val munitV = "1.3.4"
+val munitCheckV = "1.3.0"
 val disciplineMunitV = "2.0.0"
-val scalaCheckV      = "1.19.0"
+val scalaCheckV = "1.19.0"
 
-ThisBuild / tlBaseVersion    := "0.1"
-ThisBuild / organization     := "io.github.canardlapin"
+ThisBuild / tlBaseVersion := "0.1"
+ThisBuild / organization := "io.github.canardlapin"
 ThisBuild / organizationName := "Bradley Buchsbaum"
-ThisBuild / startYear        := Some(2026)
-ThisBuild / licenses         := Seq(License.Apache2)
-ThisBuild / developers       := List(
+ThisBuild / startYear := Some(2026)
+ThisBuild / licenses := Seq(License.Apache2)
+ThisBuild / developers := List(
   tlGitHubDev("canardlapin", "Bradley Buchsbaum")
 )
 
-ThisBuild / scalaVersion       := Scala3
+ThisBuild / scalaVersion := Scala3
 ThisBuild / crossScalaVersions := Seq(Scala3)
-ThisBuild / tlJdkRelease       := Some(11)
+ThisBuild / tlJdkRelease := Some(11)
 ThisBuild / githubWorkflowJavaVersions := Seq(
   JavaSpec.temurin("17"),
   JavaSpec.temurin("21")
@@ -33,7 +33,7 @@ lazy val commonSettings = Seq(
     "-Wconf:msg=package scala contains object and package with same name.*caps:silent"
   ),
   libraryDependencies ++= Seq(
-    "org.scalameta" %%% "munit"            % munitV      % Test,
+    "org.scalameta" %%% "munit" % munitV % Test,
     "org.scalameta" %%% "munit-scalacheck" % munitCheckV % Test
   ),
   Test / parallelExecution := false
@@ -60,8 +60,19 @@ def moduleSettings(dir: String) = commonSettings ++ Seq(name := s"storymodel4s-$
 
 lazy val root = tlCrossRootProject
   .aggregate(
-    core, proposition, amrInterop, features, acquire, story, document, recall, align, interview,
-    codec, fixtures, laws
+    core,
+    proposition,
+    amrInterop,
+    features,
+    acquire,
+    story,
+    document,
+    recall,
+    align,
+    interview,
+    codec,
+    fixtures,
+    laws
   )
 
 /** Identity, spans, evidence, claims, credence, provenance, hashing. No I/O. */
@@ -71,7 +82,7 @@ lazy val core = crossProject(JVMPlatform, JSPlatform, NativePlatform)
   .settings(moduleSettings("core"))
   .settings(
     libraryDependencies ++= Seq(
-      "org.typelevel" %%% "cats-core"             % catsV,
+      "org.typelevel" %%% "cats-core" % catsV,
       "org.typelevel" %%% "cats-collections-core" % catsCollectionsV
     )
   )
@@ -105,14 +116,18 @@ lazy val acquire = crossProject(JVMPlatform, JSPlatform, NativePlatform)
   .settings(moduleSettings("acquire"))
   .dependsOn(core, proposition)
 
-/** Narrative ontology: entities, situations, contexts, typed relation layers, hierarchy, trajectory. */
+/** Narrative ontology: entities, situations, contexts, typed relation layers, hierarchy,
+  * trajectory.
+  */
 lazy val story = crossProject(JVMPlatform, JSPlatform, NativePlatform)
   .crossType(CrossType.Pure)
   .in(file("story"))
   .settings(moduleSettings("story"))
   .dependsOn(core, proposition, features)
 
-/** Mention graph (disjoint union of charts), exact-coreference quotient, projection into narrative nodes. */
+/** Mention graph (disjoint union of charts), exact-coreference quotient, projection into narrative
+  * nodes.
+  */
 lazy val document = crossProject(JVMPlatform, JSPlatform, NativePlatform)
   .crossType(CrossType.Pure)
   .in(file("document"))
@@ -148,18 +163,29 @@ lazy val codec = crossProject(JVMPlatform, JSPlatform, NativePlatform)
   .dependsOn(core, proposition, amrInterop, features, acquire, story, recall, align, interview)
   .settings(
     libraryDependencies ++= Seq(
-      "io.circe" %%% "circe-core"   % circeV,
+      "io.circe" %%% "circe-core" % circeV,
       "io.circe" %%% "circe-parser" % circeV
     )
   )
 
-/** Reference fixtures: The War of the Ghosts narrative acceptance fixture, worked recall examples, interview example. */
+/** Reference fixtures: The War of the Ghosts narrative acceptance fixture, worked recall examples,
+  * interview example.
+  */
 lazy val fixtures = crossProject(JVMPlatform, JSPlatform, NativePlatform)
   .crossType(CrossType.Pure)
   .in(file("fixtures"))
   .settings(moduleSettings("fixtures"))
   .dependsOn(
-    core, proposition, amrInterop, features, acquire, document, story, recall, align, interview
+    core,
+    proposition,
+    amrInterop,
+    features,
+    acquire,
+    document,
+    story,
+    recall,
+    align,
+    interview
   )
 
 /** Published law suites and generators (Discipline). */
@@ -170,16 +196,27 @@ lazy val laws = crossProject(JVMPlatform, JSPlatform, NativePlatform)
   .dependsOn(core, proposition, amrInterop, features, acquire, story, recall, align, interview)
   .settings(
     libraryDependencies ++= Seq(
-      "org.scalameta"  %%% "munit"            % munitV,
-      "org.typelevel"  %%% "discipline-munit" % disciplineMunitV,
-      "org.typelevel"  %%% "cats-laws"        % catsV,
-      "org.scalacheck" %%% "scalacheck"       % scalaCheckV
+      "org.scalameta" %%% "munit" % munitV,
+      "org.typelevel" %%% "discipline-munit" % disciplineMunitV,
+      "org.typelevel" %%% "cats-laws" % catsV,
+      "org.scalacheck" %%% "scalacheck" % scalaCheckV
     )
   )
 
 val allModules = List(
-  "core", "proposition", "amrInterop", "features", "acquire", "story", "document", "recall",
-  "align", "interview", "codec", "fixtures", "laws"
+  "core",
+  "proposition",
+  "amrInterop",
+  "features",
+  "acquire",
+  "story",
+  "document",
+  "recall",
+  "align",
+  "interview",
+  "codec",
+  "fixtures",
+  "laws"
 )
 val allPlatforms = List("JVM", "JS", "Native")
 
