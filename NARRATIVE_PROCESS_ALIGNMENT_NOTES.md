@@ -3,7 +3,7 @@
 ## Record status
 
 - **Purpose:** Preserve the complete substance and evolution of a multipart discussion, ending in a concrete plan for a library implementation.
-- **Current coverage:** Parts 1–4 plus AMR reference/fit and automation decision checkpoints.
+- **Current coverage:** Parts 1–4 plus AMR reference/fit, automation, and fully autonomous agent-system decision checkpoints.
 - **Status:** Initial conceptual proposal; nothing here is yet a final implementation decision.
 - **Note-taking rule:** Later parts should add dated/numbered evolution entries, record agreements and revisions explicitly, and retain superseded ideas with their rationale rather than silently rewriting history.
 - **Provisional framework name:** **Narrative Process Alignment (NPA)**.
@@ -100,6 +100,12 @@ AMR's highest-value contribution is hard propositional structure—frame identit
 The earlier proposal to hand-author WOG AMRs is revised: the researcher should not need AMR annotation expertise. Standards examples and licensed gold corpora can validate the AMR kernel. WOG should be bootstrapped through existing parsers, deterministic Scala validation, alignment, model-assisted criticism, candidate agreement, and review in ordinary narrative language.
 
 Machine-produced WOG AMRs are **silver**, not gold. Task-level expert review can validate narrative facts, roles, contexts, and ambiguity without exposing PENMAN. A scientific claim of new gold AMR annotation still requires qualified AMR adjudication, at least on a representative sample.
+
+### Decision checkpoint — Production must be fully autonomous
+
+The preceding proposal for plain-language researcher review is superseded as an operational requirement. The target product must process pages or entire stories unattended. Human annotation/adjudication is permitted for offline benchmark construction, calibration, prompt development, and external scientific audit, but never as a required production stage.
+
+Runtime uncertainty is represented automatically as accepted claims, weighted alternatives, unresolved claims, or rejected candidates. “Fully automatic” does not mean forcing one answer when evidence is inadequate; it means completing the build without human intervention while preserving uncertainty, provenance, and failure status.
 
 ---
 
@@ -3885,3 +3891,274 @@ Replace “hand-author WOG AMR” with:
 8. seek AMR-expert audit only when scientific claims require it.
 
 This preserves ontology-first discipline: the WOG narrative fixture can still be designed and reviewed before prompt/model optimization, but the low-level AMR charts are machine-bootstrapped rather than manually authored by the researcher.
+
+---
+
+# Autonomous Agent-System Checkpoint
+
+## 90. Non-negotiable product requirement
+
+The production workflow is fully automatic:
+
+\[
+\boxed{
+\text{source text}
+\xrightarrow{\text{unattended build}}
+\text{receipted StoryModel with calibrated uncertainty}
+}
+\]
+
+No AMR expert, narrative annotator, or researcher is required during a build. Human work is restricted to offline activities:
+
+- creating/adjudicating benchmark corpora;
+- validating prompt packages and calibration models;
+- auditing a release candidate;
+- revising standards profiles;
+- investigating failures after the system has already produced a complete diagnostic artifact.
+
+The automated system may return `Unresolved` or competing alternatives for a claim. It may fail a validation gate. It must never invent precision merely to avoid asking a person.
+
+## 91. Agent architecture
+
+Agents do not exchange free-form essays or directly mutate the canonical graph. Each receives a bounded task packet and returns typed proposals with evidence.
+
+```text
+Build orchestrator
+  ├── deterministic surface pipeline
+  ├── local semantic workers
+  │     ├── parser candidate provider
+  │     ├── independent AMR proposal agent
+  │     ├── frame/role critic
+  │     └── source-alignment critic
+  ├── document workers
+  │     ├── entity coreference
+  │     ├── event identity/reference
+  │     ├── context/modal scope
+  │     ├── temporal structure
+  │     └── causal/goal proposals
+  ├── hierarchy/trajectory workers
+  ├── global consistency critics
+  ├── deterministic resolver and validators
+  └── artifact writer + build receipt
+```
+
+### 91.1 Deterministic orchestrator
+
+Owns:
+
+- stage dependency graph;
+- stable task IDs and retries;
+- bounded concurrency;
+- cache keys and replay;
+- provider budgets/timeouts;
+- artifact/checkpoint storage;
+- acceptance policy;
+- final gate status.
+
+Agents never decide which stages ran or whether their own answer is canonical.
+
+### 91.2 Proposal-only agents
+
+Every agent returns one of:
+
+```scala
+enum ProposalDisposition:
+  case Proposed
+  case Alternative
+  case Abstained
+  case Unsupported
+
+final case class AgentProposal[A](
+  taskId: TaskId,
+  value: Option[A],
+  disposition: ProposalDisposition,
+  evidence: Vector[EvidenceRef],
+  rawScore: Option[Double],
+  conflicts: Vector[ConflictRef],
+  receipt: AgentCallReceipt
+)
+```
+
+No agent can create `Resolved[A]`, mark its score calibrated, or write directly into `StoryModel`.
+
+### 91.3 Independent critics
+
+Critics are specialized and preferably diverse:
+
+- syntax/graph law critic;
+- PropBank frame-role critic;
+- source entailment/hallucination critic;
+- polarity/modality/context critic;
+- document identity critic;
+- temporal consistency critic;
+- causal overreach critic;
+- hierarchy coherence critic.
+
+They receive the candidate and exact evidence, not another agent's hidden reasoning.
+
+## 92. Scaling to pages and long documents
+
+Use a hierarchical map–reconcile–revisit process.
+
+### 92.1 Map: local windows
+
+- Deterministically segment paragraphs, sentences, clauses, quotations, and tokens.
+- Build overlapping sentence windows so local context is retained.
+- Produce sentence AMR charts independently while recording window context.
+- Extract mentions and candidate relations against stable IDs.
+
+### 92.2 Reconcile: document indexes
+
+Build compact indexed artifacts:
+
+- entity mention index;
+- event/state mention index;
+- locations and time expressions;
+- context/speaker tree;
+- semantic nearest-neighbor candidates;
+- discourse-order neighborhoods;
+- unresolved/conflict index.
+
+Document agents retrieve only relevant candidates and source passages. They do not repeatedly reread the whole document or rely on lossy prose summaries.
+
+### 92.3 Revisit: targeted nonlocal passes
+
+After document proposals:
+
+- revisit local AMRs affected by coreference/context decisions;
+- reconsider prospective versus realized events;
+- resolve retrospective reports;
+- repair time/context contradictions;
+- recompute only invalidated downstream stages.
+
+Content-addressed stage caching makes this iterative process tractable.
+
+## 93. Standards-grounded prompt packages
+
+“Excellent prompts” are versioned, tested program artifacts rather than handcrafted prose stored in application code.
+
+Each prompt package contains:
+
+```text
+task manifest
+  role and scientific purpose
+  exact typed input schema
+  exact typed output schema
+  permitted operations
+  prohibited inferences
+  relevant standards excerpts/IDs
+  frame and role lookup tools
+  positive examples
+  contrastive counterexamples
+  abstention and alternative rules
+  self-check checklist
+  prompt version and checksum
+  benchmark suite and expected behavior
+```
+
+Prompt requirements:
+
+- refer only to stable sentence/token/node IDs;
+- never invent character offsets;
+- distinguish explicit text from entailment/inference/hypothesis;
+- emit alternatives when evidence supports them;
+- treat raw confidence as uncalibrated;
+- avoid global claims outside the assigned task;
+- quote or cite source spans through IDs, not free-text reconstruction;
+- return schema-valid data or explicit abstention.
+
+Standards retrieval should be narrow and deterministic: the agent receives the relevant AMR guideline section, PropBank `FrameSpec`, UMR relation definition, or project policy selected by code. It is not asked to remember the entire standard from model weights.
+
+## 94. Automated resolution
+
+For candidate claim \(c\), collect:
+
+- provider proposals;
+- structural validity;
+- frame-role compatibility;
+- source support;
+- agreement/disagreement;
+- critic findings;
+- document coherence;
+- calibrated family-specific evidence model.
+
+The resolver returns:
+
+```scala
+enum ResolutionState[+A]:
+  case Accepted(value: A, probability: Probability)
+  case Alternatives(values: NonEmptyVector[Weighted[A]])
+  case Unresolved(reason: ResolutionFailure)
+  case Rejected(reason: RejectionReason)
+```
+
+Only offline gold data can calibrate probabilities and thresholds. Agents do not vote by simple majority, and an LLM judge does not have unilateral final authority.
+
+High-impact claim families use conservative policy:
+
+- reported proposition promoted to root-world fact;
+- event coreference/duplication;
+- role reversal;
+- polarity;
+- strict temporal precedence;
+- causal edges;
+- target-episode membership.
+
+## 95. Automatic verification loops
+
+Every build executes proportional verification:
+
+1. schema and graph laws;
+2. source-span recovery;
+3. frame/role checks;
+4. context/modal consistency;
+5. temporal-cycle and containment checks;
+6. duplicate/event-reference checks;
+7. targeted adversarial transformations for high-impact claims;
+8. cross-agent disagreement analysis;
+9. locality-of-change comparison against cached prior build when available;
+10. artifact/receipt integrity.
+
+The system can automatically generate controlled foils for a candidate:
+
+- swap roles;
+- flip polarity;
+- move embedded proposition to root context;
+- change intended to realized;
+- duplicate a retrospective event;
+- remove causal cue while preserving time.
+
+Critics must prefer the source-supported candidate and explain the decision through typed evidence codes. Failure creates `Unresolved` or blocks validation.
+
+## 96. Autonomy versus scientific validity
+
+Fully autonomous inference and scientifically defensible evaluation are compatible if separated:
+
+- **Runtime:** no human intervention.
+- **Development:** human-labeled gold and adversarial tests calibrate components.
+- **Release:** held-out, leave-story/study/provider-out evidence establishes performance.
+- **Artifact:** uncertainty and alternatives are retained.
+- **Claim:** do not call automatic output gold or historically true.
+
+The success criterion is not “the system always emits one confident graph.” It is:
+
+> The system always completes with a reproducible artifact whose accepted claims meet calibrated gates and whose ambiguity/failure is explicitly represented.
+
+## 97. Revised implementation consequence
+
+The plain-language review UI becomes an optional debugging/audit tool, not a production dependency.
+
+The first autonomous vertical slice should:
+
+1. ingest several pages unattended;
+2. run one parser plus an independent structured proposal/critic agent;
+3. validate/canonicalize AMR automatically;
+4. compose mentions into entity/event/context candidates;
+5. resolve WOG's critical cases through conservative automatic policy;
+6. retain alternatives/unresolved claims;
+7. build hierarchy/trajectory from accepted and weighted claims;
+8. emit the full artifact and report without questions or manual edits;
+9. compare against an offline adjudicated fixture and adversarial suite;
+10. replay exactly from cached provider outputs.
+
+The final plan must treat autonomous orchestration, prompt-package testing, calibration, failure representation, and long-document incremental processing as P0—not later operational hardening.

@@ -30,7 +30,6 @@ ThisBuild / githubWorkflowJavaVersions := Seq(
 lazy val commonSettings = Seq(
   scalacOptions ++= Seq(
     "-Wunused:all",
-    "-Wvalue-discard",
     "-Wconf:msg=package scala contains object and package with same name.*caps:silent"
   ),
   libraryDependencies ++= Seq(
@@ -40,18 +39,16 @@ lazy val commonSettings = Seq(
   Test / parallelExecution := false
 )
 
-def module(dir: String) =
-  crossProject(JVMPlatform, JSPlatform, NativePlatform)
-    .crossType(CrossType.Pure)
-    .in(file(dir))
-    .settings(commonSettings)
-    .settings(name := s"storymodel4s-$dir")
+def moduleSettings(dir: String) = commonSettings ++ Seq(name := s"storymodel4s-$dir")
 
 lazy val root = tlCrossRootProject
   .aggregate(core, laws, amr, document, story, recall, align, interview, codec, fixtures)
 
 /** Identity, spans, evidence, claims, credence, provenance, hashing. No I/O. */
-lazy val core = module("core")
+lazy val core = crossProject(JVMPlatform, JSPlatform, NativePlatform)
+  .crossType(CrossType.Pure)
+  .in(file("core"))
+  .settings(moduleSettings("core"))
   .settings(
     libraryDependencies ++= Seq(
       "org.typelevel" %%% "cats-core"             % catsV,
@@ -60,32 +57,53 @@ lazy val core = module("core")
   )
 
 /** PENMAN syntax, checked AMR graphs, role canonicalization, isomorphism, alignment sidecar. */
-lazy val amr = module("amr")
+lazy val amr = crossProject(JVMPlatform, JSPlatform, NativePlatform)
+  .crossType(CrossType.Pure)
+  .in(file("amr"))
+  .settings(moduleSettings("amr"))
   .dependsOn(core)
   .settings(libraryDependencies += "org.typelevel" %%% "cats-parse" % catsParseV)
 
 /** Narrative ontology: entities, situations, contexts, typed relation layers, hierarchy, trajectory. */
-lazy val story = module("story")
+lazy val story = crossProject(JVMPlatform, JSPlatform, NativePlatform)
+  .crossType(CrossType.Pure)
+  .in(file("story"))
+  .settings(moduleSettings("story"))
   .dependsOn(core)
 
 /** Disjoint-union mention graph, exact-coreference quotient, projection into narrative nodes. */
-lazy val document = module("document")
+lazy val document = crossProject(JVMPlatform, JSPlatform, NativePlatform)
+  .crossType(CrossType.Pure)
+  .in(file("document"))
+  .settings(moduleSettings("document"))
   .dependsOn(core, amr, story)
 
 /** Recall-side representation: idea units, discourse function, recall relations. */
-lazy val recall = module("recall")
+lazy val recall = crossProject(JVMPlatform, JSPlatform, NativePlatform)
+  .crossType(CrossType.Pure)
+  .in(file("recall"))
+  .settings(moduleSettings("recall"))
   .dependsOn(core, story)
 
 /** Recall-to-source alignment: costs, unbalanced transport, graph-HSMM trajectories, signatures. */
-lazy val align = module("align")
+lazy val align = crossProject(JVMPlatform, JSPlatform, NativePlatform)
+  .crossType(CrossType.Pure)
+  .in(file("align"))
+  .settings(moduleSettings("align"))
   .dependsOn(core, story, recall)
 
 /** Autobiographical Interview: transcript atlas, detail atoms, memory addresses, derived scores. */
-lazy val interview = module("interview")
+lazy val interview = crossProject(JVMPlatform, JSPlatform, NativePlatform)
+  .crossType(CrossType.Pure)
+  .in(file("interview"))
+  .settings(moduleSettings("interview"))
   .dependsOn(core, story, recall, align)
 
 /** Canonical JSON codecs for all artifacts (circe). */
-lazy val codec = module("codec")
+lazy val codec = crossProject(JVMPlatform, JSPlatform, NativePlatform)
+  .crossType(CrossType.Pure)
+  .in(file("codec"))
+  .settings(moduleSettings("codec"))
   .dependsOn(core, amr, story, recall, align, interview)
   .settings(
     libraryDependencies ++= Seq(
@@ -95,11 +113,17 @@ lazy val codec = module("codec")
   )
 
 /** Hand-authored reference fixtures: The War of the Ghosts, worked recall examples, interview example. */
-lazy val fixtures = module("fixtures")
+lazy val fixtures = crossProject(JVMPlatform, JSPlatform, NativePlatform)
+  .crossType(CrossType.Pure)
+  .in(file("fixtures"))
+  .settings(moduleSettings("fixtures"))
   .dependsOn(core, amr, document, story, recall, align, interview)
 
 /** Published law suites and generators (Discipline). */
-lazy val laws = module("laws")
+lazy val laws = crossProject(JVMPlatform, JSPlatform, NativePlatform)
+  .crossType(CrossType.Pure)
+  .in(file("laws"))
+  .settings(moduleSettings("laws"))
   .dependsOn(core, amr, story, recall, align, interview)
   .settings(
     libraryDependencies ++= Seq(
