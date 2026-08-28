@@ -88,20 +88,27 @@ object PenmanParser:
 
   private val restOfLine: P0[String] = P.charsWhile0(c => c != '\n' && c != '\r')
 
+  /** Split a metadata header without regex lookaround, which Scala Native does not support. */
+  private def metadataParts(line: String): Vector[String] =
+    val result = Vector.newBuilder[String]
+    var start = 0
+    var next = line.indexOf("::", start + 2)
+    while next >= 0 do
+      result += line.substring(start, next)
+      start = next
+      next = line.indexOf("::", start + 2)
+    result += line.substring(start)
+    result.result().map(_.trim).filter(_.nonEmpty)
+
   private val headerLine: P[Vector[Header]] =
     (P.char('#') *> restOfLine).map { raw =>
       val line = raw.trim
       if line.startsWith("::") then
-        line
-          .split("(?=::)")
-          .toVector
-          .map(_.trim)
-          .filter(_.nonEmpty)
-          .map { p =>
+        metadataParts(line).map { p =>
             val body = p.drop(2)
             val i = body.indexWhere(_.isWhitespace)
             if i < 0 then Header.Meta(body, "") else Header.Meta(body.take(i), body.drop(i).trim)
-          }
+        }
       else Vector(Header.Comment(line))
     }
 

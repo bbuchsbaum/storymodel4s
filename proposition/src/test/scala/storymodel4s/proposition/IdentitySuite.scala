@@ -36,12 +36,12 @@ class IdentitySuite extends ScalaCheckSuite:
     }
   }
 
-  property("isomorphism is reflexive and symmetric; forms agree with the verdict") {
+  property("isomorphism is reflexive and symmetric; serializations agree with the verdict") {
     forAll(ChartGens.validChart, ChartGens.validChart) { (a, b) =>
       val iso = ChartIsomorphism.isomorphic(a, b)
       ChartIsomorphism.isomorphic(a, a) &&
       iso == ChartIsomorphism.isomorphic(b, a) &&
-      iso == (Canonical.form(a) == Canonical.form(b))
+      iso == (Canonical.serialization(a) == Canonical.serialization(b))
     }
   }
 
