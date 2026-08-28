@@ -11,6 +11,11 @@ import storymodel4s.core.*
   * in, and the aligner's tests need units whose structure is reproducible. Every heuristic here is
   * meant to be replaced by a provider behind the same `RecallGraph` contract; none of them is a
   * scientific claim about recall language.
+  *
+  * Cue discipline (review findings #23/#24): task-commentary cues fire only when the whole unit is
+  * commentary; "so" is causal only mid-sentence; "like a" is an association only when it is not the
+  * complement of a perception verb; evaluation cues need a speaker-evaluative subject; hedge cues
+  * inside quoted speech are ignored; a discourse "No," is not a negation.
   */
 object RecallSegmenter:
 
@@ -18,22 +23,23 @@ object RecallSegmenter:
 
   private val Pronouns = "(?:he|she|they|it|i|we|there|the|a|an|his|her|their|my|our|you)"
 
-  /** Split points: the match is consumed as separator; the following clause starts after it, except
-    * that the connective word itself is kept with the following clause (so "because …" heads a unit
-    * and can be read as a cue).
+  /** Split points: the match is consumed as separator; the connective word itself is kept with the
+    * following clause (so "because …" heads a unit and can be read as a cue). Case-insensitive so
+    * "…, But then" splits like "…, but then".
     */
   private val Splitters: Vector[Regex] = Vector(
     """;\s+""".r,
-    """,?\s+(?=and then\b)""".r,
-    """,?\s+and\s+(?=then\b)""".r,
-    """,?\s+(?=then\b)""".r,
-    """,?\s+(?=but\b)""".r,
-    """,?\s+(?=so\b)(?!so\s+(?:much|many|far|long)\b)""".r,
-    """,?\s+(?=because\b)""".r,
-    """,?\s+(?=while\b)""".r,
-    """,?\s+(?=before that\b)""".r,
-    """,?\s+(?=after that\b)""".r,
-    (""",?\s+and\s+(?=""" + Pronouns + """\b)""").r
+    """(?i),?\s+(?=and then\b)""".r,
+    """(?i),?\s+and\s+(?=then\b)""".r,
+    """(?i),?\s+(?=then\b)""".r,
+    """(?i),?\s+(?=but\b)""".r,
+    """(?i),?\s+(?=so\b)(?!so\s+(?:much|many|far|long)\b)""".r,
+    """(?i),?\s+(?=because\b)""".r,
+    """(?i),?\s+(?=while\b)""".r,
+    """(?i),?\s+(?=before (?:that|this)\b)""".r,
+    """(?i),?\s+(?=after (?:that|this)\b)""".r,
+    """(?i),?\s+(?=prior to that\b)""".r,
+    ("""(?i),?\s+and\s+(?=""" + Pronouns + """\b)""").r
   )
 
   private val MinClauseTokens = 3
@@ -56,247 +62,184 @@ object RecallSegmenter:
     ("""\bor something\b""".r, false)
   )
 
-  private val AssociationCue = """\bkind of like\b|\blike an?\b|\breminded me\b|\bsimilar to\b""".r
+  /** Strong association cues: always an association. */
+  private val AssociationCue =
+    """\bkind of like\b|\breminded me\b|\bsimilar to\b|\bsort of like\b""".r
+
+  /** Bare "like a/an" is an association unless it completes a perception verb ("sounded like a war
+    * party" is content, not an association).
+    */
+  private val BareLike = """\blike an?\b""".r
+  private val PerceptionBeforeLike =
+    """\b(?:sound(?:ed|s)?|look(?:ed|s)?|seem(?:ed|s)?|smell(?:ed|s)?|taste[ds]?|felt|feels?|appear(?:ed|s)?)\s+like an?\b""".r
+
   private val SourceMonitoringCue =
     """\bi (?:don'?t|can'?t|do not|cannot) remember\b|\bi forget\b|\bi'?m not sure (?:if|whether)\b""".r
-  private val TaskCommentaryCue =
-    """^(?:that'?s (?:all|it)|i'?m done|okay|ok|um+|uh+)\b|\bthat'?s (?:all|it) i (?:remember|got)\b""".r
+
+  /** Whole-unit task commentary: the unit is nothing but the cue (plus punctuation). */
+  private val WholeTaskCommentary =
+    """^(?:okay|ok|um+|uh+|hmm+|that'?s (?:all|it)(?: i (?:remember|got|can recall))?|i'?m done|i think that'?s (?:all|it)|that'?s about it)[\s.,!?]*$""".r
+  private val EmbeddedTaskCommentary = """\bthat'?s (?:all|it) i (?:remember|got|can recall)\b""".r
+
+  /** Leading fillers stripped before classification and sketching ("Um, they went…"). */
+  private val LeadingFiller = """^(?:(?:okay|ok|um+|uh+|hmm+|well|so|yeah|yes|no)[,.\s]+)+""".r
+
+  /** Evaluation needs a speaker-evaluative frame: first person, or an impersonal subject. */
   private val EvaluationCue =
-    """\bi (?:liked|loved|hated|enjoyed)\b|\bwas (?:good|bad|boring|interesting|funny|scary|weird|great|sad)\b|\bgood story\b""".r
+    """\bi (?:liked|loved|hated|enjoyed)\b|\b(?:it|that|this|the (?:story|whole thing|movie|film|ending)) was (?:good|bad|boring|interesting|funny|scary|weird|great|sad|creepy|confusing)\b|\bgood story\b""".r
   private val SummaryCue =
     """\bbasically\b|\boverall\b|\bthe (?:whole|first|second) (?:half|part|story)\b|\bit was about\b|\bthe story was about\b""".r
-  private val InferenceCue = """\bmust have\b|\bprobably because\b|\bi assume\b|\bpresumably\b""".r
+  private val InferenceCue =
+    """\bmust (?:have|be)\b|\bprobably because\b|\bi assume\b|\bpresumably\b|\bmust'?ve\b""".r
 
-  private val Negation = """\b(?:not|never|no|nobody|nothing)\b|n't\b""".r
-  private val Reported = """\b(?:said|told|claimed|announced)\b""".r
+  private val Negation = """\b(?:not|never|no|nobody|nothing|none)\b|n't\b""".r
+  private val Reported = """\b(?:said|told|claimed|announced|says|tells)\b""".r
   private val Intended = """\b(?:going to|wanted to|planned to|were to|was to)\b""".r
 
-  private val StopWords: Set[String] = Set(
-    "the",
-    "a",
-    "an",
-    "and",
-    "or",
-    "but",
-    "so",
-    "then",
-    "of",
-    "to",
-    "in",
-    "on",
-    "at",
-    "into",
-    "this",
-    "that",
-    "these",
-    "those",
-    "it",
-    "its",
-    "is",
-    "was",
-    "were",
-    "be",
-    "been",
-    "are",
-    "he",
-    "she",
-    "they",
-    "them",
-    "his",
-    "her",
-    "their",
-    "i",
-    "we",
-    "you",
-    "me",
-    "us",
-    "my",
-    "there",
-    "here",
-    "kind",
-    "sort",
-    "some",
-    "like",
-    "with",
-    "from",
-    "for",
-    "as",
-    "by",
-    "up",
-    "down",
-    "out",
-    "about",
-    "before",
-    "after",
-    "while",
-    "because",
-    "had",
-    "has",
-    "have",
-    "did",
-    "do",
-    "does",
-    "think",
-    "guess",
-    "maybe",
-    "very",
-    "really",
-    "just",
-    "not",
-    "no",
-    "somebody",
-    "someone",
-    "something",
-    "anyone",
-    "anything",
-    "who",
-    "what",
-    "which"
-  )
+  /** Regions of quoted speech: hedges and cues inside them belong to a quoted speaker. */
+  private val Quoted = """"[^"]*"|“[^”]*”|'[^']{3,}'""".r
 
-  private val VerbLemmas: Map[String, String] = Map(
-    "went" -> "go",
-    "goes" -> "go",
-    "going" -> "go",
-    "gone" -> "go",
-    "found" -> "find",
-    "finds" -> "find",
-    "finding" -> "find",
-    "heard" -> "hear",
-    "hears" -> "hear",
-    "hearing" -> "hear",
-    "saw" -> "see",
-    "sees" -> "see",
-    "seen" -> "see",
-    "seeing" -> "see",
-    "searched" -> "search",
-    "searches" -> "search",
-    "searching" -> "search",
-    "entered" -> "enter",
-    "enters" -> "enter",
-    "entering" -> "enter",
-    "arrived" -> "arrive",
-    "arrives" -> "arrive",
-    "arriving" -> "arrive",
-    "came" -> "come",
-    "comes" -> "come",
-    "coming" -> "come",
-    "said" -> "say",
-    "says" -> "say",
-    "saying" -> "say",
-    "told" -> "tell",
-    "tells" -> "tell",
-    "telling" -> "tell",
-    "took" -> "take",
-    "takes" -> "take",
-    "taking" -> "take",
-    "taken" -> "take",
-    "got" -> "get",
-    "gets" -> "get",
-    "getting" -> "get",
-    "made" -> "make",
-    "makes" -> "make",
-    "making" -> "make",
-    "ran" -> "run",
-    "runs" -> "run",
-    "running" -> "run",
-    "felt" -> "feel",
-    "feels" -> "feel",
-    "feeling" -> "feel",
-    "thought" -> "think",
-    "thinks" -> "think",
-    "killed" -> "kill",
-    "kills" -> "kill",
-    "killing" -> "kill",
-    "died" -> "die",
-    "dies" -> "die",
-    "dying" -> "die",
-    "left" -> "leave",
-    "leaves" -> "leave",
-    "leaving" -> "leave",
-    "gave" -> "give",
-    "gives" -> "give",
-    "giving" -> "give",
-    "hit" -> "hit",
-    "hits" -> "hit",
-    "struck" -> "strike",
-    "strikes" -> "strike",
-    "shot" -> "shoot",
-    "shoots" -> "shoot",
-    "fought" -> "fight",
-    "fights" -> "fight",
-    "fighting" -> "fight",
-    "hid" -> "hide",
-    "hides" -> "hide",
-    "hiding" -> "hide",
-    "returned" -> "return",
-    "returns" -> "return",
-    "returning" -> "return",
-    "fell" -> "fall",
-    "falls" -> "fall",
-    "falling" -> "fall",
-    "cried" -> "cry",
-    "cries" -> "cry",
-    "crying" -> "cry",
-    "wanted" -> "want",
-    "wants" -> "want",
-    "wanting" -> "want",
-    "asked" -> "ask",
-    "asks" -> "ask",
-    "asking" -> "ask",
-    "walked" -> "walk",
-    "walks" -> "walk",
-    "walking" -> "walk",
-    "opened" -> "open",
-    "opens" -> "open",
-    "opening" -> "open",
-    "looked" -> "look",
-    "looks" -> "look",
-    "looking" -> "look",
-    "screamed" -> "scream",
-    "screams" -> "scream",
-    "screaming" -> "scream",
-    "picked" -> "pick",
-    "picks" -> "pick",
-    "picking" -> "pick",
-    "escaped" -> "escape",
-    "escapes" -> "escape",
-    "escaping" -> "escape",
-    "go" -> "go",
-    "find" -> "find",
-    "hear" -> "hear",
-    "see" -> "see",
-    "search" -> "search",
-    "enter" -> "enter",
-    "arrive" -> "arrive",
-    "come" -> "come",
-    "say" -> "say",
-    "tell" -> "tell",
-    "take" -> "take",
-    "get" -> "get",
-    "make" -> "make",
-    "run" -> "run",
-    "feel" -> "feel",
-    "kill" -> "kill",
-    "die" -> "die",
-    "leave" -> "leave",
-    "give" -> "give",
-    "strike" -> "strike",
-    "shoot" -> "shoot",
-    "fight" -> "fight",
-    "hide" -> "hide",
-    "return" -> "return",
-    "fall" -> "fall",
-    "cry" -> "cry",
-    "want" -> "want",
-    "ask" -> "ask",
-    "walk" -> "walk",
-    "open" -> "open",
-    "look" -> "look",
-    "scream" -> "scream",
-    "pick" -> "pick",
-    "escape" -> "escape"
-  )
+  private val StopWords: Set[String] = Lexical.stopwords ++ Set("here", "somebody", "someone")
+
+  private val VerbLemmas: Map[String, String] = {
+    val bases = Vector(
+      "go",
+      "find",
+      "hear",
+      "see",
+      "search",
+      "enter",
+      "arrive",
+      "come",
+      "say",
+      "tell",
+      "take",
+      "get",
+      "make",
+      "run",
+      "feel",
+      "kill",
+      "die",
+      "leave",
+      "give",
+      "strike",
+      "shoot",
+      "fight",
+      "hide",
+      "return",
+      "fall",
+      "cry",
+      "want",
+      "ask",
+      "walk",
+      "open",
+      "look",
+      "scream",
+      "pick",
+      "escape",
+      "lift",
+      "carry",
+      "burst",
+      "paddle",
+      "land",
+      "light",
+      "sit",
+      "stand",
+      "speak",
+      "bring",
+      "know",
+      "meet",
+      "put",
+      "let",
+      "keep",
+      "hold",
+      "hurt",
+      "start",
+      "stop",
+      "help",
+      "call",
+      "try",
+      "turn",
+      "move",
+      "live",
+      "reach",
+      "wait",
+      "follow",
+      "throw",
+      "catch",
+      "eat",
+      "drink",
+      "sing",
+      "dance",
+      "drive",
+      "ride",
+      "fly",
+      "swim",
+      "write",
+      "read",
+      "break",
+      "cut",
+      "hit",
+      "push",
+      "pull",
+      "send",
+      "buy",
+      "sell",
+      "pay",
+      "win",
+      "lose",
+      "wake",
+      "sleep",
+      "grab",
+      "climb",
+      "jump",
+      "shout",
+      "laugh",
+      "smile",
+      "notice",
+      "remember",
+      "forget",
+      "decide",
+      "refuse",
+      "agree",
+      "join",
+      "attack",
+      "recruit",
+      "invite",
+      "tell",
+      "show",
+      "watch",
+      "listen",
+      "hunt",
+      "travel",
+      "sail",
+      "row",
+      "become",
+      "happen",
+      "begin",
+      "continue",
+      "end",
+      "finish"
+    )
+    val out = scala.collection.mutable.Map.empty[String, String]
+    bases.foreach { b =>
+      out(b) = b
+      out(b + "s") = b
+      out(b + "es") = b
+      out(b + "ed") = b
+      out(b + "d") = b
+      out(b + "ing") = b
+      if b.endsWith("e") then out(b.dropRight(1) + "ing") = b
+      if b.endsWith("y") then
+        out(b.dropRight(1) + "ies") = b
+        out(b.dropRight(1) + "ied") = b
+      if b.length >= 3 && !"aeiouy".contains(b.last) && "aeiou".contains(b(b.length - 2)) then
+        out(b + b.last + "ed") = b
+        out(b + b.last + "ing") = b
+    }
+    Lexical.irregular.foreach { case (form, base) => if bases.contains(base) then out(form) = base }
+    out.toMap
+  }
 
   private val LocationWords: Set[String] = Set(
     "house",
@@ -322,7 +265,16 @@ object RecallSegmenter:
     "garden",
     "street",
     "school",
-    "restaurant"
+    "restaurant",
+    "water",
+    "bank",
+    "hill",
+    "mountain",
+    "road",
+    "church",
+    "hospital",
+    "office",
+    "station"
   )
 
   private val SensoryWords: Set[String] = Set(
@@ -345,6 +297,8 @@ object RecallSegmenter:
     "creepy",
     "foggy",
     "fog",
+    "misty",
+    "mist",
     "wet",
     "rain",
     "voice",
@@ -352,12 +306,75 @@ object RecallSegmenter:
     "cry",
     "smoke",
     "fire",
-    "bang"
+    "bang",
+    "still",
+    "calm",
+    "silent"
   )
 
   private val AgentPronouns: Set[String] = Set("he", "she", "they", "i", "we", "it")
-  private val RoleNouns: Set[String] =
-    Set("woman", "man", "girl", "boy", "brother", "sister", "mother", "father", "guy", "lady")
+
+  /** Generic person nouns usable as participants (no story-specific vocabulary). */
+  private val RoleNouns: Set[String] = Set(
+    "woman",
+    "man",
+    "girl",
+    "boy",
+    "brother",
+    "sister",
+    "mother",
+    "father",
+    "guy",
+    "lady",
+    "friend",
+    "friends",
+    "stranger",
+    "strangers",
+    "warrior",
+    "warriors",
+    "soldier",
+    "soldiers",
+    "family",
+    "relative",
+    "relatives",
+    "child",
+    "children",
+    "kid",
+    "kids",
+    "men",
+    "women",
+    "guys",
+    "person",
+    "villager",
+    "villagers",
+    "hunter",
+    "hunters",
+    "companion",
+    "companions",
+    "fellow",
+    "fellows",
+    "ghost",
+    "ghosts",
+    "enemy",
+    "enemies",
+    "husband",
+    "wife",
+    "son",
+    "daughter",
+    "uncle",
+    "aunt",
+    "grandmother",
+    "grandfather",
+    "neighbour",
+    "neighbor",
+    "doctor",
+    "king",
+    "queen",
+    "captain",
+    "chief",
+    "everyone",
+    "everybody"
+  )
   private val Indefinites: Set[String] =
     Set("somebody", "someone", "something", "anyone", "anything", "nobody", "nothing", "people")
 
@@ -368,29 +385,32 @@ object RecallSegmenter:
     val text = transcript.canonicalText
     val sid = transcript.id.value
 
-    val clauseSpans: Vector[(TextSpan, SurfaceUnitId)] =
-      atlas.sentences.flatMap(s => splitClauses(text, s.span).map(c => (c, s.id)))
+    val clauseSpans: Vector[(TextSpan, SurfaceUnit)] =
+      atlas.sentences.flatMap(s => splitClauses(text, s.span).map(c => (c, s)))
 
     val entities = collectEntities(text, clauseSpans.map(_._1))
     val entityByName: Map[String, RecallEntityId] =
-      entities.iterator.map(e => e.label.toLowerCase -> e.id).toMap
+      entities.iterator.flatMap { e =>
+        (e.label +: e.label.split(' ').toVector.filter(_.length > 2)).map(_ -> e.id)
+      }.toMap
 
     val units = clauseSpans.zipWithIndex.map { case ((span, sentence), i) =>
       val raw = span.slice(text).getOrElse("")
-      val lower = raw.toLowerCase
-      val hedges = hedgeCues(lower, span)
+      val lower = Lexical.lower(raw)
+      val quoteMask = maskQuoted(lower)
+      val hedges = hedgeCues(quoteMask, span)
       val uncertainty = hedges match
         case Vector() => ExpressedUncertainty.Unmarked
         case cues     =>
-          val spanSet = SpanSet.unsafe(cues.map { case (s, _) => SpanRef(Some(sentence), s) }*)
+          val spanSet = SpanSet.unsafe(cues.map { case (s, _) => SpanRef(Some(sentence.id), s) }*)
           if cues.exists(_._2) then ExpressedUncertainty.Explicit(spanSet)
           else ExpressedUncertainty.Hedged(spanSet)
       val function = classify(lower)
-      val sketch = sketchOf(lower, hedges.nonEmpty, function, entityByName)
+      val sketch = sketchOf(quoteMask, hedges.nonEmpty, function, entityByName)
       RecallUnit(
         RecallUnitId.unsafe(s"$sid:u$i"),
         i,
-        SpanSet.one(SpanRef(Some(sentence), span)),
+        SpanSet.one(SpanRef(Some(sentence.id), span)),
         raw,
         function,
         uncertainty,
@@ -399,7 +419,9 @@ object RecallSegmenter:
       )
     }
 
-    val (temporal, causal) = connectiveEdges(units)
+    val sentenceStart: Map[RecallUnitId, Int] =
+      units.zip(clauseSpans).map { case (u, (_, s)) => u.id -> s.span.start }.toMap
+    val (temporal, causal) = connectiveEdges(units, sentenceStart)
     RecallGraph(transcript, atlas, units, RecallRelations(temporal, causal, entities, Vector.empty))
 
   // ---- pieces ----------------------------------------------------------------------------
@@ -437,48 +459,57 @@ object RecallSegmenter:
     while b > a && (text.charAt(b - 1).isWhitespace || ",;".contains(text.charAt(b - 1))) do b -= 1
     TextSpan.unsafe(a, b)
 
-  private def hedgeCues(lower: String, span: TextSpan): Vector[(TextSpan, Boolean)] =
+  /** Replace quoted regions with spaces of equal length so offsets are preserved. */
+  private[recall] def maskQuoted(lower: String): String =
+    Quoted.replaceAllIn(lower, m => " " * (m.end - m.start))
+
+  private def hedgeCues(masked: String, span: TextSpan): Vector[(TextSpan, Boolean)] =
     HedgeCues
       .flatMap { case (re, explicit) =>
-        re.findAllMatchIn(lower)
+        re.findAllMatchIn(masked)
           .map(m => (TextSpan.unsafe(span.start + m.start, span.start + m.end), explicit))
           .toVector
       }
       .sortBy(_._1.start)
 
+  private[recall] def stripFiller(lower: String): String =
+    LeadingFiller.replaceFirstIn(lower.trim, "")
+
   private[recall] def classify(lower: String): DiscourseFunction =
-    if lower.trim.isEmpty then DiscourseFunction.Uninterpretable
-    else if TaskCommentaryCue.findFirstIn(lower).nonEmpty then DiscourseFunction.TaskCommentary
-    else if SourceMonitoringCue.findFirstIn(lower).nonEmpty then DiscourseFunction.SourceMonitoring
-    else if AssociationCue.findFirstIn(lower).nonEmpty then DiscourseFunction.Association
-    else if EvaluationCue.findFirstIn(lower).nonEmpty then DiscourseFunction.Evaluation
-    else if SummaryCue.findFirstIn(lower).nonEmpty then DiscourseFunction.Summary
-    else if InferenceCue.findFirstIn(lower).nonEmpty then DiscourseFunction.Inference
+    val trimmed = lower.trim
+    val content = stripFiller(trimmed)
+    if trimmed.isEmpty then DiscourseFunction.Uninterpretable
+    else if WholeTaskCommentary.findFirstIn(trimmed).nonEmpty ||
+      EmbeddedTaskCommentary.findFirstIn(trimmed).nonEmpty || content.isEmpty
+    then DiscourseFunction.TaskCommentary
+    else if SourceMonitoringCue.findFirstIn(content).nonEmpty then
+      DiscourseFunction.SourceMonitoring
+    else if isAssociation(content) then DiscourseFunction.Association
+    else if EvaluationCue.findFirstIn(content).nonEmpty then DiscourseFunction.Evaluation
+    else if SummaryCue.findFirstIn(content).nonEmpty then DiscourseFunction.Summary
+    else if InferenceCue.findFirstIn(content).nonEmpty then DiscourseFunction.Inference
     else DiscourseFunction.EpisodicAssertion
 
-  private def wordsOf(lower: String): Vector[String] =
-    // Explicit ranges rather than \p{L}: Scala.js regexes lack Unicode property classes.
-    """[A-Za-z0-9À-ɏ']+""".r.findAllIn(lower).toVector.map(_.stripSuffix("'s"))
+  private def isAssociation(content: String): Boolean =
+    AssociationCue.findFirstIn(content).nonEmpty || {
+      val bare = BareLike.findAllMatchIn(content).map(_.start).toVector
+      val perceptual = PerceptionBeforeLike.findAllMatchIn(content).map(_.end).toVector
+      // a bare "like a" counts unless every occurrence completes a perception verb
+      bare.exists(b => !perceptual.exists(e => e >= b && e <= b + 8))
+    }
 
-  private[recall] def lemma(word: String): String =
-    VerbLemmas.get(word) match
-      case Some(l) => l
-      case None    =>
-        if word.endsWith("ies") && word.length > 4 then word.dropRight(3) + "y"
-        else if word.length > 4 && Vector("sses", "shes", "ches", "xes", "zes").exists(
-            word.endsWith
-          )
-        then word.dropRight(2)
-        else if word.endsWith("s") && !word.endsWith("ss") && word.length > 3 then word.dropRight(1)
-        else word
+  private def wordsOf(lower: String): Vector[String] = Lexical.words(lower)
+
+  private[recall] def lemma(word: String): String = Lexical.stem(word)
 
   private def sketchOf(
-      lower: String,
+      masked: String,
       hedged: Boolean,
       function: DiscourseFunction,
       entityByName: Map[String, RecallEntityId]
   ): PropositionSketch =
-    val words = wordsOf(lower)
+    val content = stripFiller(masked)
+    val words = wordsOf(content)
     val lemmas = words.filterNot(StopWords.contains).map(lemma).toSet
     val predIdx = words.indexWhere(w => VerbLemmas.contains(w))
     val predicate = if predIdx >= 0 then Some(VerbLemmas(words(predIdx))) else None
@@ -509,14 +540,18 @@ object RecallSegmenter:
           case w if Set("him", "her", "them", "me", "us").contains(w) =>
             SketchParticipant(SketchRole.Patient, None, w)
         }
-    val hedgeMask = HedgeCues.map(_._1).foldLeft(lower)((acc, re) => re.replaceAllIn(acc, " "))
+    // Negation is judged after masking hedges and source-monitoring phrases ("I don't remember"
+    // is not a negated proposition) and after dropping a discourse "No," interjection.
+    val negationMask =
+      (HedgeCues.map(_._1) :+ SourceMonitoringCue)
+        .foldLeft(content)((acc, re) => re.replaceAllIn(acc, " "))
     val polarity =
-      if Negation.findFirstIn(hedgeMask).nonEmpty then PolarityTag.Negative
+      if Negation.findFirstIn(negationMask).nonEmpty then PolarityTag.Negative
       else if predicate.nonEmpty then PolarityTag.Positive
       else PolarityTag.Unknown
     val modality =
-      if Reported.findFirstIn(lower).nonEmpty then ModalityTag.Reported
-      else if Intended.findFirstIn(lower).nonEmpty then ModalityTag.Intended
+      if Reported.findFirstIn(content).nonEmpty then ModalityTag.Reported
+      else if Intended.findFirstIn(content).nonEmpty then ModalityTag.Intended
       else if hedged then ModalityTag.Possible
       else if function == DiscourseFunction.EpisodicAssertion || function == DiscourseFunction.Summary
       then ModalityTag.Asserted
@@ -532,43 +567,78 @@ object RecallSegmenter:
       lemmas
     )
 
+  /** Names: capitalized words that are not pronouns/stopwords; clause-initial capitals count only
+    * when the same word is capitalized mid-clause somewhere else or is followed by another
+    * capitalized word. Consecutive capitalized words merge into one multiword label.
+    */
   private def collectEntities(text: String, clauses: Vector[TextSpan]): Vector[RecallEntity] =
-    val mentions = scala.collection.mutable.LinkedHashMap.empty[String, Vector[TextSpan]]
-    clauses.foreach { c =>
+    val Token = """[A-Za-zÀ-ɏ]+""".r
+    val perClause: Vector[Vector[(String, Int, Int)]] = clauses.map { c =>
       val s = c.slice(text).getOrElse("")
-      """[A-Za-zÀ-ɏ]+""".r.findAllMatchIn(s).foreach { m =>
-        val w = m.matched
-        val lower = w.toLowerCase
-        val isName = w.head.isUpper && m.start > 0 && !AgentPronouns.contains(lower) &&
-          !StopWords.contains(lower)
-        if isName || RoleNouns.contains(lower) then
-          val span = TextSpan.unsafe(c.start + m.start, c.start + m.end)
-          mentions.update(lower, mentions.getOrElse(lower, Vector.empty) :+ span)
+      Token.findAllMatchIn(s).map(m => (m.matched, c.start + m.start, c.start + m.end)).toVector
+    }
+    val midClauseCapitals: Set[String] = perClause.flatMap { toks =>
+      toks.drop(1).collect {
+        case (w, _, _)
+            if w.head.isUpper && !AgentPronouns.contains(Lexical.lower(w)) &&
+              !StopWords.contains(Lexical.lower(w)) =>
+          Lexical.lower(w)
       }
+    }.toSet
+    def nameLike(w: String, first: Boolean, nextCap: Boolean): Boolean =
+      val lw = Lexical.lower(w)
+      w.head.isUpper && !AgentPronouns.contains(lw) && !StopWords.contains(lw) &&
+      (!first || midClauseCapitals.contains(lw) || nextCap)
+    val mentions = scala.collection.mutable.LinkedHashMap.empty[String, Vector[TextSpan]]
+    perClause.foreach { toks =>
+      var i = 0
+      while i < toks.size do
+        val (w, start, _) = toks(i)
+        val nextCap = i + 1 < toks.size && toks(i + 1)._1.head.isUpper &&
+          !StopWords.contains(Lexical.lower(toks(i + 1)._1))
+        if nameLike(w, i == 0, nextCap) then
+          var j = i
+          while j + 1 < toks.size && nameLike(toks(j + 1)._1, first = false, nextCap = false) do
+            j += 1
+          val label = toks.slice(i, j + 1).map(t => Lexical.lower(t._1)).mkString(" ")
+          val span = TextSpan.unsafe(start, toks(j)._3)
+          mentions.update(label, mentions.getOrElse(label, Vector.empty) :+ span)
+          i = j + 1
+        else
+          val lw = Lexical.lower(w)
+          if RoleNouns.contains(lw) then
+            val span = TextSpan.unsafe(start, toks(i)._3)
+            mentions.update(lw, mentions.getOrElse(lw, Vector.empty) :+ span)
+          i += 1
     }
     mentions.toVector.zipWithIndex.map { case ((label, spans), i) =>
-      RecallEntity(RecallEntityId.unsafe(s"re$i:$label"), label, spans)
+      RecallEntity(RecallEntityId.unsafe(s"re$i:${label.replace(' ', '_')}"), label, spans)
     }
 
   private def connectiveEdges(
-      units: Vector[RecallUnit]
+      units: Vector[RecallUnit],
+      sentenceStart: Map[RecallUnitId, Int]
   ): (Vector[RecallTemporalEdge], Vector[RecallCausalEdge]) =
     val ordered = units.sortBy(_.ordinal)
     val pairs = ordered.sliding(2).collect { case Vector(p, u) => (p, u) }.toVector
     val temporal = Vector.newBuilder[RecallTemporalEdge]
     val causal = Vector.newBuilder[RecallCausalEdge]
     pairs.foreach { case (prev, u) =>
-      val lower = u.text.toLowerCase.trim
+      val lower = Lexical.lower(u.text).trim
+      val midSentence = sentenceStart.get(u.id).exists(_ < u.minSpan.start)
       val cueSpan = Some(
         TextSpan.unsafe(u.minSpan.start, math.min(u.minSpan.endExclusive, u.minSpan.start + 12))
       )
       if lower.startsWith("because") then causal += RecallCausalEdge(u.id, prev.id, cueSpan)
-      else if lower.startsWith("so ") then causal += RecallCausalEdge(prev.id, u.id, cueSpan)
-      else if lower.startsWith("before that") || lower.startsWith("before this") then
-        temporal += RecallTemporalEdge(u.id, RecallTemporalRelation.Before, prev.id, cueSpan)
-      else if lower.startsWith("after that") || lower.startsWith("then") ||
-        lower.startsWith("and then") || lower.startsWith("afterwards") ||
-        lower.startsWith("later") || lower.startsWith("next") || lower.startsWith("eventually")
+      else if (lower.startsWith("so ") || lower.startsWith("so that")) && midSentence then
+        causal += RecallCausalEdge(prev.id, u.id, cueSpan)
+      else if lower.startsWith("before that") || lower.startsWith("before this") ||
+        lower.startsWith("earlier") || lower.startsWith("prior to that")
+      then temporal += RecallTemporalEdge(u.id, RecallTemporalRelation.Before, prev.id, cueSpan)
+      else if lower.startsWith("after that") || lower.startsWith("after this") ||
+        lower.startsWith("then") || lower.startsWith("and then") ||
+        lower.startsWith("afterwards") || lower.startsWith("later") ||
+        lower.startsWith("next") || lower.startsWith("eventually")
       then temporal += RecallTemporalEdge(prev.id, RecallTemporalRelation.Before, u.id, cueSpan)
       else if lower.startsWith("while") || lower.startsWith("meanwhile") then
         temporal += RecallTemporalEdge(prev.id, RecallTemporalRelation.Simultaneous, u.id, cueSpan)

@@ -13,11 +13,19 @@ class SinkhornSuite extends ScalaCheckSuite:
       xs <- Gen.listOfN(m * n, Gen.choose(0.0, 1.0))
     yield xs.toVector.grouped(n).toVector
 
+  private def solve(
+      c: Vector[Vector[Double]],
+      a: Vector[Double],
+      b: Vector[Double],
+      cfg: SinkhornConfig = SinkhornConfig()
+  ): SinkhornResult =
+    UnbalancedSinkhorn.solve(c, a, b, cfg).fold(e => throw new AssertionError(e.message), identity)
+
   property("the plan is non-negative and finite") {
     forAll(genCost) { c =>
       val m = c.size
       val n = c.head.size
-      val res = UnbalancedSinkhorn.solve(c, Vector.fill(m)(1.0), Vector.fill(n)(m.toDouble / n))
+      val res = solve(c, Vector.fill(m)(1.0), Vector.fill(n)(m.toDouble / n))
       res.plan.flatten.forall(x => x >= 0.0 && !x.isNaN && !x.isInfinite)
     }
   }
@@ -29,18 +37,49 @@ class SinkhornSuite extends ScalaCheckSuite:
       val a = Vector.fill(m)(1.0)
       val b = Vector.fill(n)(m.toDouble / n)
       val devs = Vector(0.05, 1.0, 50.0).map { rho =>
-        val r = UnbalancedSinkhorn.solve(c, a, b, SinkhornConfig(0.1, rho, rho, 300))
+        val r = solve(c, a, b, SinkhornConfig(0.1, rho, rho, 300, 1e-9))
         r.rowDeviation(a) + r.colDeviation(b)
       }
       devs(0) >= devs(1) - 1e-6 && devs(1) >= devs(2) - 1e-6
     }
   }
 
+  property("iteration stops at convergence and reports it") {
+    forAll(genCost) { c =>
+      val m = c.size
+      val n = c.head.size
+      val r = solve(
+        c,
+        Vector.fill(m)(1.0),
+        Vector.fill(n)(m.toDouble / n),
+        SinkhornConfig(0.1, 1.0, 1.0, 1000, 1e-8)
+      )
+      r.converged && r.iterations < 1000 && r.iterations >= 1
+    }
+  }
+
+  test("a zero row penalty leaves rows unconstrained without producing NaN") {
+    val c = Vector(Vector(0.1, 0.9), Vector(0.8, 0.2))
+    val r = solve(c, Vector(1.0, 0.0), Vector(1.0, 1.0), SinkhornConfig(0.1, 0.0, 1.0, 100))
+    assert(r.plan.flatten.forall(x => !x.isNaN && x >= 0.0), r.plan.toString)
+    val r2 = solve(c, Vector(1.0, 0.0), Vector(1.0, 1.0), SinkhornConfig(0.1, 1.0, 1.0, 100))
+    assert(r2.plan(1).forall(_ == 0.0), "a zero target mass forces the row to zero")
+  }
+
+  test("size mismatches and bad configs are typed errors") {
+    assert(UnbalancedSinkhorn.solve(Vector(Vector(0.1)), Vector(1.0, 1.0), Vector(1.0)).isLeft)
+    assert(
+      UnbalancedSinkhorn
+        .solve(Vector(Vector(0.1)), Vector(1.0), Vector(1.0), SinkhornConfig(epsilon = 0.0))
+        .isLeft
+    )
+  }
+
   test("with a large penalty the transport is nearly balanced") {
     val c = Vector(Vector(0.1, 0.9, 0.5), Vector(0.8, 0.2, 0.6))
     val a = Vector(1.0, 1.0)
     val b = Vector(2.0 / 3, 2.0 / 3, 2.0 / 3)
-    val r = UnbalancedSinkhorn.solve(c, a, b, SinkhornConfig(0.05, 100.0, 100.0, 500))
+    val r = solve(c, a, b, SinkhornConfig(0.05, 100.0, 100.0, 500, 1e-9))
     assert(r.rowDeviation(a) < 0.05, r.rowDeviation(a).toString)
     assert(r.colDeviation(b) < 0.05, r.colDeviation(b).toString)
     // cheapest cells carry the most mass
@@ -50,9 +89,22 @@ class SinkhornSuite extends ScalaCheckSuite:
 
   test("the baseline aligner produces one row per unit over the candidate union") {
     import AnnaFixture.*
-    val rows = BaselineAligner.align(recall, view, candidates, semantic).rows
+    val rows = BaselineAligner
+      .align(recall, view, candidates, semantic)
+      .fold(e => fail(e.message), identity)
+      .rows
     assertEquals(rows.size, recall.size)
     assert(rows.forall(_.mass.keys.forall(_.isSource)))
     // the embedding-only baseline still finds the easy anchors
     assertEquals(rows(2).mapSource, Some(e5))
+  }
+
+  test("the baseline substitutes the same neutral distance as the HSMM when a provider abstains") {
+    import AnnaFixture.*
+    val abstain = SemanticDistance.fromTableOrAbstain(Map((u2.id, e5) -> 0.1))
+    val cands = CandidateGenerator(abstain, perLevel = 2).generate(recall.ordered, view)
+    val half = BaselineAligner.align(recall, view, cands, abstain, missingDistance = 0.5)
+    val one = BaselineAligner.align(recall, view, cands, abstain, missingDistance = 1.0)
+    assert(half.isRight && one.isRight)
+    assertNotEquals(half.toOption.get.rows(0).mass, one.toOption.get.rows(0).mass)
   }

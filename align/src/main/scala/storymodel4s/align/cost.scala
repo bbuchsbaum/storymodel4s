@@ -7,7 +7,7 @@ import storymodel4s.recall.*
 enum CostTerm:
   case Semantic, Propositional, Entity, Sensory, Granularity, Contradiction
 
-final case class CostWeights(
+final case class CostWeights private (
     semantic: Double,
     propositional: Double,
     entity: Double,
@@ -24,24 +24,74 @@ final case class CostWeights(
     case CostTerm.Contradiction => contradiction
 
 object CostWeights:
-  val default: CostWeights = CostWeights(1.0, 0.5, 0.4, 0.15, 0.3, 1.0)
+  /** Weights must be finite and nonnegative. */
+  def of(
+      semantic: Double,
+      propositional: Double,
+      entity: Double,
+      sensory: Double,
+      granularity: Double,
+      contradiction: Double
+  ): Either[AlignError, CostWeights] =
+    val all = Vector(semantic, propositional, entity, sensory, granularity, contradiction)
+    if all.forall(w => w >= 0.0 && !w.isNaN && !w.isInfinite) then
+      Right(new CostWeights(semantic, propositional, entity, sensory, granularity, contradiction))
+    else Left(AlignError.InvalidConfig("CostWeights", "weights must be finite and nonnegative"))
+
+  def unsafe(
+      semantic: Double,
+      propositional: Double,
+      entity: Double,
+      sensory: Double,
+      granularity: Double,
+      contradiction: Double
+  ): CostWeights =
+    of(semantic, propositional, entity, sensory, granularity, contradiction).fold(
+      e => throw new IllegalArgumentException(e.message),
+      identity
+    )
+
+  val default: CostWeights = unsafe(1.0, 0.5, 0.4, 0.15, 0.3, 1.0)
 
   /** Embedding-only weights for the baseline ablation: no structure, no gating. */
-  val semanticOnly: CostWeights = CostWeights(1.0, 0.0, 0.0, 0.0, 0.0, 0.0)
+  val semanticOnly: CostWeights = unsafe(1.0, 0.0, 0.0, 0.0, 0.0, 0.0)
 
-/** Structural incompatibilities that embeddings cannot see. Each one gates: the candidate is pushed
-  * below the external floor rather than merely penalized.
+/** Structural incompatibilities that embeddings cannot see. The gating ones (`RoleReversal`,
+  * `PolarityConflict`, `ModalityConflict`, `OutcomeConflict`) exclude the candidate from the unit's
+  * source states: a fully contradicted unit is fully external however many candidates it has.
+  * `ContextConflict` is deliberately *not* a gate (review #10): recalling reported content as fact
+  * is the canonical Bartlett distortion and must be measured as an aligned unit with a context
+  * facet error, not hidden as an intrusion.
   */
 enum Contradiction:
   case RoleReversal, PolarityConflict, ContextConflict, ModalityConflict, OutcomeConflict
 
+  def gates: Boolean = this != Contradiction.ContextConflict
+
+/** Why a candidate is not a source state for a unit. */
+enum Exclusion:
+  /** A gating contradiction was detected. */
+  case Contradicted
+
+  /** The candidate reference is not a node of the view (bookkeeping, never a recall judgement). */
+  case Unreachable
+
 final case class CostBreakdown(
     terms: Map[CostTerm, Double],
     contradictions: Vector[Contradiction],
-    gated: Boolean,
+    exclusion: Option[Exclusion],
     total: Double
 ):
   def term(t: CostTerm): Double = terms.getOrElse(t, 0.0)
+
+  /** Excluded because of a gating contradiction. */
+  def gated: Boolean = exclusion.contains(Exclusion.Contradicted)
+
+  /** Not a source state for this unit, for any reason. */
+  def excluded: Boolean = exclusion.nonEmpty
+
+  /** Reported content asserted as fact (or vice versa); a fidelity facet, not a gate. */
+  def contextMismatch: Boolean = contradictions.contains(Contradiction.ContextConflict)
 
 /** Graded semantic distance in `[0, 1]` between a recall unit and a source node, or `Missing` when
   * the provider abstains (no embedding for the unit, out-of-domain text, budget exceeded). This is
@@ -79,6 +129,10 @@ object SemanticDistance:
         case Some(d) => Estimate.observed(d)
         case None    => Estimate.missing(MissingReason.ProviderAbstained)
 
+  /** A provider that always abstains. */
+  val abstaining: SemanticDistance =
+    (_, _) => Estimate.missing(MissingReason.ProviderAbstained)
+
   /** Lift a total distance function. */
   def of(f: (RecallUnit, NodeSummary) => Double): SemanticDistance =
     (u, n) => Estimate.observed(f(u, n))
@@ -86,7 +140,13 @@ object SemanticDistance:
   def apply(f: (RecallUnit, NodeSummary) => Estimate[Double]): SemanticDistance = (u, n) => f(u, n)
 
 private[align] object Names:
-  def overlap(a: Set[String], b: Set[String]): Boolean = a.exists(b.contains)
+  /** Token-level overlap: "young man" and "man" co-refer for the purpose of role checks. Labels are
+    * compared after lowercasing and stopword removal.
+    */
+  def tokens(names: Set[String]): Set[String] =
+    names.flatMap(n => Lexical.words(n).filterNot(Lexical.stopwords.contains))
+  def overlap(a: Set[String], b: Set[String]): Boolean =
+    a.exists(b.contains) || tokens(a).exists(tokens(b).contains)
 
 /** Detects structural contradictions between a recall sketch and a source node summary. Rules are
   * conservative: each fires only when the compared slots are both specified.
@@ -135,11 +195,17 @@ object ContradictionDetector:
     if predicateMatch && modalityConflict then out += Contradiction.ModalityConflict
 
     (sketch.outcome, node.outcome) match
-      case (Some(a), Some(b)) if predicateMatch && a.toLowerCase != b.toLowerCase =>
+      case (Some(a), Some(b)) if predicateMatch && Lexical.lower(a) != Lexical.lower(b) =>
         out += Contradiction.OutcomeConflict
       case _ => ()
 
     out.result()
+
+  /** Whether the sketch engages the node structurally at all (shares its predicate or contradicts
+    * it); used to decide which leaves count when a segment inherits contradictions.
+    */
+  def engages(sketch: PropositionSketch, node: NodeSummary): Boolean =
+    sketch.predicate.exists(p => node.predicate.contains(p)) || detect(sketch, node).nonEmpty
 
 /** Prior cost added to every *source* candidate according to the unit's discourse function: an
   * association or a task comment is presumptively external, an episodic assertion is not.
@@ -192,14 +258,14 @@ final case class DefaultLocalCostModel(
     semantic: SemanticDistance = SemanticDistance.lexicalJaccard,
     functionPrior: FunctionPrior = FunctionPrior.default,
     externalFloor: Double = 1.0,
-    gateMargin: Double = 0.5,
     externalMismatch: Double = 0.5,
     gating: Boolean = true,
     missingSemantic: Double = 0.5
 ) extends LocalCostModel:
 
   def externalCost(unit: RecallUnit, state: ExternalState): Double =
-    if ExternalStates.natural(unit.function) == state then externalFloor
+    if state == ExternalState.Unranked then externalFloor
+    else if ExternalStates.natural(unit.function) == state then externalFloor
     else externalFloor + externalMismatch
 
   def cost(unit: RecallUnit, node: NodeSummary, view: SourceView): CostBreakdown =
@@ -222,7 +288,7 @@ final case class DefaultLocalCostModel(
     val dSens =
       if sketch.sensoryTerms.isEmpty then 0.0
       else
-        val hits = sketch.sensoryTerms.count(t => node.lemmas.contains(t.toLowerCase))
+        val hits = sketch.sensoryTerms.count(t => node.lemmas.contains(Lexical.stem(t)))
         1.0 - hits.toDouble / sketch.sensoryTerms.size.toDouble
     // Preferred abstraction level: summaries want a scene, thematic/evaluative remarks want the
     // global level, predicate-bearing assertions want a leaf, predicate-less ones a scene.
@@ -232,19 +298,21 @@ final case class DefaultLocalCostModel(
       case _ if sketch.predicate.isEmpty && sketch.participants.isEmpty => 1
       case _                                                            => 0
     val dGran = math.min(1.0, 0.5 * math.abs(node.level - preferred))
-    // A segment is only a valid gist target if the unit is compatible with what it contains:
-    // contradictions against any leaf under it (e.g. a negated or role-reversed proposition)
-    // are inherited by the segment.
+    // A segment is a valid gist target as long as some leaf under it is compatible: it inherits a
+    // contradiction only when every leaf the sketch engages (same predicate or contradicted) is
+    // contradicted (review #9). Leaves the sketch does not engage do not vote either way.
     val contradictions =
       if !gating then Vector.empty
       else if node.isLeaf then ContradictionDetector.detect(sketch, node)
       else
-        val own = ContradictionDetector.detect(sketch, node)
-        val inherited = view.leavesUnder(node.ref).flatMap { leafRef =>
-          view.node(leafRef).toVector.flatMap(leaf => ContradictionDetector.detect(sketch, leaf))
-        }
-        (own ++ inherited).distinct
-    val cContra = contradictions.size.toDouble
+        val engaged = view
+          .leavesUnder(node.ref)
+          .flatMap(view.node)
+          .filter(ContradictionDetector.engages(sketch, _))
+        val reports = engaged.map(ContradictionDetector.detect(sketch, _))
+        if engaged.nonEmpty && reports.forall(_.exists(_.gates)) then reports.flatten.distinct
+        else reports.flatten.filterNot(_.gates).distinct
+    val cContra = contradictions.count(_.gates).toDouble
     val terms = Map(
       CostTerm.Semantic -> dSem,
       CostTerm.Propositional -> dProp,
@@ -253,10 +321,11 @@ final case class DefaultLocalCostModel(
       CostTerm.Granularity -> dGran,
       CostTerm.Contradiction -> cContra
     )
-    val weighted = terms.map { case (t, v) => weights(t) * v }.sum + functionPrior(unit.function)
-    val gated = contradictions.nonEmpty
-    val total = if gated then math.max(weighted, externalFloor + gateMargin) else weighted
-    CostBreakdown(terms, contradictions, gated, total)
+    val weighted =
+      CostTerm.values.toVector.map(t => weights(t) * terms(t)).sum + functionPrior(unit.function)
+    val gated = contradictions.exists(_.gates)
+    val exclusion = if gated then Some(Exclusion.Contradicted) else None
+    CostBreakdown(terms, contradictions, exclusion, weighted)
 
   private def clamp(x: Double): Double =
     if x.isNaN then 1.0 else math.max(0.0, math.min(1.0, x))

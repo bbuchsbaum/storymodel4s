@@ -2,7 +2,7 @@ package storymodel4s.align
 
 import storymodel4s.core.{SegmentId, SituationId, SpanSet}
 import storymodel4s.features.{Estimate, ScoreEstimate}
-import storymodel4s.recall.{ModalityTag, PolarityTag, SketchRole}
+import storymodel4s.recall.{Lexical, ModalityTag, PolarityTag, SketchRole}
 
 /** An alignable source node: an atomic situation or a composite segment (scene, episode, root). */
 enum SourceNodeRef:
@@ -22,7 +22,10 @@ enum RelationLayer:
   /** `a → b` when `b` is narrated immediately after `a` at the same hierarchy level. */
   case DiscourseSuccession
 
-  /** `a → b` when `a` precedes `b` in story-world time (accepted, context-scoped). */
+  /** `a → b` when `b` is an immediate successor of `a` in narrated-world time: the Hasse cover
+    * (transitive reduction) of accepted strict precedence, so "successor" means *next*, not merely
+    * *later* (review #11). Reachability gives the closure.
+    */
   case WorldTime
 
   /** `a → b` when `a` causes or enables `b`. */
@@ -37,6 +40,15 @@ enum RelationLayer:
   /** Graded semantic neighbourhood (embedding or thematic), symmetric-in-practice. */
   case Semantic
 
+  /** `a → b` for goal relations (motivates, intended-to-achieve, …). */
+  case Goal
+
+  /** `event → state` for state initiation/termination/maintenance. */
+  case StateChange
+
+  /** `mention-event → referred-event` for narrative reference (prospective, retrospective, …). */
+  case Reference
+
 /** Context kind of a source node, reduced to what alignment needs. */
 enum ContextTag:
   case NarratedWorld, Speech, Belief, Desire, Intention, Hypothetical, Counterfactual, Memory,
@@ -44,14 +56,14 @@ enum ContextTag:
 
 /** A source participant as the aligner sees it: role plus every name it may be referred to by. */
 final case class ParticipantSummary(role: SketchRole, label: String, aliases: Set[String]):
-  def names: Set[String] = aliases.map(_.toLowerCase) + label.toLowerCase
+  def names: Set[String] = aliases.map(Lexical.lower) + Lexical.lower(label)
 
 /** Everything the aligner needs to know about one source node.
   *
   * Contract: `level` is 0 for atomic situations and increases toward the root; `parent` is the
   * primary-containment parent; `discoursePosition` is the rank of the node's first mention among
   * all nodes at its level (0-based); `support` is exact evidence in the source text; `lemmas` are
-  * content lemmas of the supporting text plus the predicate and participant labels; `importance` is
+  * content stems of the supporting text plus the predicate and participant labels; `importance` is
   * an injected salience weight used only for importance-weighted coverage, never for matching
   * (`Missing` importance excludes the node from importance-weighted coverage; it is never zero).
   */
@@ -74,13 +86,17 @@ final case class NodeSummary(
 ):
   def byRole(role: SketchRole): Option[ParticipantSummary] = participants.find(_.role == role)
   def agent: Option[ParticipantSummary] = byRole(SketchRole.Agent)
+
+  /** The patient-like participant: patient, else theme, else recipient/addressee. */
   def patient: Option[ParticipantSummary] =
-    byRole(SketchRole.Patient).orElse(byRole(SketchRole.Theme))
+    byRole(SketchRole.Patient)
+      .orElse(byRole(SketchRole.Theme))
+      .orElse(byRole(SketchRole.Beneficiary))
   def allNames: Set[String] = participants.flatMap(_.names).toSet
   def isLeaf: Boolean = level == 0
 
 /** Minimal read-only view of a source story for alignment. `story.AlignmentSource` is bridged to
-  * this trait at integration; tests use [[InMemorySourceView]].
+  * this trait by `align.bridge.StorySourceView`; tests use [[InMemorySourceView]].
   *
   * Contracts:
   *   - `nodes` lists every alignable node exactly once, at every hierarchy level.
@@ -99,6 +115,9 @@ trait SourceView:
   lazy val maxLevel: Int = nodes.map(_.level).maxOption.getOrElse(0)
   lazy val leaves: Vector[NodeSummary] = nodes.filter(_.isLeaf)
   lazy val byLevel: Map[Int, Vector[NodeSummary]] = nodes.groupBy(_.level)
+
+  /** Number of alignable source nodes: the fixed `K` of localizability. */
+  lazy val sourceNodeCount: Int = nodes.size
 
   def weight(layer: RelationLayer, a: SourceNodeRef, b: SourceNodeRef): Double =
     adjacency(layer).getOrElse(a, Map.empty).getOrElse(b, 0.0)
@@ -120,34 +139,59 @@ trait SourceView:
   def descendants(ref: SourceNodeRef): Vector[SourceNodeRef] =
     childrenIndex.getOrElse(ref, Vector.empty).flatMap(c => c +: descendants(c))
 
-  /** Leaves under `ref` (the node itself when it is a leaf). */
+  /** Leaves under `ref` (the node itself when it is a leaf); memoized. */
   def leavesUnder(ref: SourceNodeRef): Vector[SourceNodeRef] =
-    if node(ref).exists(_.isLeaf) then Vector(ref)
-    else descendants(ref).filter(d => node(d).exists(_.isLeaf))
+    leavesIndex.getOrElse(ref, Vector.empty)
 
-  /** Transitive reachability in a layer (BFS over positive-weight edges). */
+  private lazy val leavesIndex: Map[SourceNodeRef, Vector[SourceNodeRef]] =
+    nodes.map { n =>
+      n.ref -> (if n.isLeaf then Vector(n.ref)
+                else descendants(n.ref).filter(d => node(d).exists(_.isLeaf)))
+    }.toMap
+
+  /** Reachability closure per layer, computed lazily once per view (sorted, deterministic). */
+  private val closures =
+    scala.collection.mutable.Map.empty[RelationLayer, Map[SourceNodeRef, Set[SourceNodeRef]]]
+
+  def reachabilityIndex(layer: RelationLayer): Map[SourceNodeRef, Set[SourceNodeRef]] =
+    closures.synchronized {
+      closures.getOrElseUpdate(
+        layer, {
+          val adj = adjacency(layer)
+          adj.keys.toVector.sorted.map { start =>
+            val seen = scala.collection.mutable.LinkedHashSet.empty[SourceNodeRef]
+            val queue = scala.collection.mutable.Queue.empty[SourceNodeRef]
+            adj.getOrElse(start, Map.empty).toVector.sortBy(_._1.key).foreach { case (n, w) =>
+              if w > 0.0 then queue.enqueue(n)
+            }
+            while queue.nonEmpty do
+              val cur = queue.dequeue()
+              if !seen.contains(cur) then
+                seen += cur
+                adj.getOrElse(cur, Map.empty).toVector.sortBy(_._1.key).foreach { case (n, w) =>
+                  if w > 0.0 && !seen.contains(n) then queue.enqueue(n)
+                }
+            start -> seen.toSet
+          }.toMap
+        }
+      )
+    }
+
+  /** Transitive reachability in a layer. */
   def reachable(layer: RelationLayer, from: SourceNodeRef, to: SourceNodeRef): Boolean =
-    val adj = adjacency(layer)
-    val seen = scala.collection.mutable.HashSet.empty[SourceNodeRef]
-    val queue = scala.collection.mutable.Queue(from)
-    var found = false
-    while queue.nonEmpty && !found do
-      val cur = queue.dequeue()
-      adj.getOrElse(cur, Map.empty).foreach { case (nxt, w) =>
-        if w > 0.0 && !seen.contains(nxt) then
-          if nxt == to then found = true
-          seen += nxt
-          queue.enqueue(nxt)
-      }
-    found
+    reachabilityIndex(layer).getOrElse(from, Set.empty).contains(to)
 
-  /** Discourse position of a node normalized to `[0, 1]` by support midpoint. */
-  def relativePosition(ref: SourceNodeRef): Double =
+  /** Relative discourse span of a node: `[start, end]` of its support hull in `[0, 1]`. */
+  def relativeSpan(ref: SourceNodeRef): Option[(Double, Double)] =
     node(ref) match
       case Some(n) if textLength > 0 =>
         val s = n.support.minSpan
-        ((s.start + s.endExclusive) / 2.0) / textLength.toDouble
-      case _ => 0.0
+        Some((s.start.toDouble / textLength, s.endExclusive.toDouble / textLength))
+      case _ => None
+
+  /** Discourse position of a node normalized to `[0, 1]` by support midpoint. */
+  def relativePosition(ref: SourceNodeRef): Double =
+    relativeSpan(ref).map((a, b) => (a + b) / 2.0).getOrElse(0.0)
 
 /** Simple in-memory `SourceView`. Hierarchy adjacency is derived from parents unless supplied. */
 final case class InMemorySourceView(

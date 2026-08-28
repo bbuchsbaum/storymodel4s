@@ -93,9 +93,34 @@ class GraphSuite extends ScalaCheckSuite:
     }
   }
 
-  property("lemmatizer is idempotent on its own output for regular forms") {
-    forAll(Gen.oneOf("found", "goes", "houses", "cries", "boxes", "walked", "scream")) { w =>
-      val l = RecallSegmenter.lemma(w)
-      RecallSegmenter.lemma(l) == l
+  property("stemmer maps every inflected form of a word family to one stem") {
+    val families = Gen.oneOf(
+      Vector("walk", "walked", "walking", "walks"),
+      Vector("cry", "cries", "cried", "crying"),
+      Vector("house", "houses"),
+      Vector("go", "goes", "went", "gone", "going"),
+      Vector("find", "found", "finds", "finding"),
+      Vector("box", "boxes"),
+      Vector("scream", "screams", "screamed", "screaming"),
+      Vector("paddle", "paddles", "paddled", "paddling"),
+      Vector("shoot", "shot", "shoots", "shooting"),
+      Vector("carry", "carried", "carries", "carrying")
+    )
+    forAllNoShrink(families) { fam =>
+      val stems = fam.map(RecallSegmenter.lemma).distinct
+      (stems.size == 1) :| s"$fam -> ${fam.map(RecallSegmenter.lemma)}"
     }
+  }
+
+  test("stemming is story-agnostic: no synonym collapsing") {
+    assertNotEquals(Lexical.stem("boat"), Lexical.stem("canoe"))
+    assertNotEquals(Lexical.stem("misty"), Lexical.stem("fog"))
+    assertNotEquals(Lexical.stem("back"), Lexical.stem("return"))
+  }
+
+  test("lowercasing is locale-independent and per code point") {
+    // simple (per code point) case mapping: dotted capital I maps to plain i on every platform
+    assertEquals(Lexical.lower("İSTANBUL Ünïcode"), "istanbul ünïcode")
+    assertEquals(Lexical.lower("ABC"), "abc")
+    assertEquals(Lexical.words("Anna's house, 😀 cellar!"), Vector("anna", "house", "cellar"))
   }

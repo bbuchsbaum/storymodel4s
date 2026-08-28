@@ -13,27 +13,47 @@ class CalibrationSuite extends FunSuite:
     ((i * 37) % 100) / 100.0 < trueP
   }
 
+  private def right[A](e: Either[AlignError, A]): A = e.fold(x => fail(x.message), identity)
+
   test("Platt scaling reduces expected calibration error on overconfident scores") {
-    val before = Ece.compute(scores, labels)
-    val model = PlattScaling().fit(scores, labels)
-    val after = Ece.compute(scores.map(model(_).value), labels)
+    val before = right(Ece.compute(scores, labels))
+    val model = right(PlattScaling().fit(scores, labels))
+    val after = right(Ece.compute(scores.map(model(_).value), labels))
     assert(after < before, s"before=$before after=$after")
     assert(model.name.startsWith("platt("))
   }
 
-  test("temperature scaling returns probabilities and does not worsen NLL beyond identity") {
-    val model = TemperatureScaling.fit(scores, labels)
+  test("temperature scaling never worsens NLL relative to the identity on its fitting data") {
+    val model = right(TemperatureScaling.fit(scores, labels))
     val ps = scores.map(model(_).value)
     assert(ps.forall(p => p >= 0.0 && p <= 1.0))
     assert(model.name.startsWith("temperature("))
-    assert(Brier.compute(ps, labels) <= Brier.compute(scores, labels) + 1e-9)
+    // the grid contains T = 1, so this is what the fit guarantees (nothing about Brier or ECE)
+    assert(right(Nll.compute(ps, labels)) <= right(Nll.compute(scores, labels)) + 1e-9)
   }
 
-  test("Brier and ECE are zero for perfect confident predictions") {
+  test("Brier and ECE are zero for perfect confident predictions, under both binnings") {
     val ps = Vector(1.0, 0.0, 1.0, 0.0)
     val ys = Vector(true, false, true, false)
-    assertEqualsDouble(Brier.compute(ps, ys), 0.0, 1e-12)
-    assertEqualsDouble(Ece.compute(ps, ys), 0.0, 1e-12)
+    assertEqualsDouble(right(Brier.compute(ps, ys)), 0.0, 1e-12)
+    assertEqualsDouble(right(Ece.compute(ps, ys)), 0.0, 1e-12)
+    assertEqualsDouble(right(Ece.compute(ps, ys, binning = EceBinning.EqualMass)), 0.0, 1e-12)
+  }
+
+  test("equal-mass binning sees miscalibration that equal-width bins hide on skewed scores") {
+    // all scores in one narrow band, half of them wrong: equal-width has one bin with acc 0.5
+    // vs conf ~0.9 → ECE ~0.4; equal-mass also splits into bins but reports the same gap here.
+    val ps = (0 until 100).toVector.map(i => 0.9 + i * 0.0005)
+    val ys = (0 until 100).toVector.map(i => i % 2 == 0)
+    val ew = right(Ece.compute(ps, ys))
+    val em = right(Ece.compute(ps, ys, binning = EceBinning.EqualMass))
+    assert(ew > 0.3 && em > 0.3, s"ew=$ew em=$em")
+  }
+
+  test("size mismatches are typed errors") {
+    assert(Ece.compute(Vector(0.5), Vector.empty).isLeft)
+    assert(Brier.compute(Vector(0.5), Vector.empty).isLeft)
+    assert(TemperatureScaling.fit(Vector(0.5), Vector.empty).isLeft)
   }
 
   test("leave-story-out folds partition the items by story") {

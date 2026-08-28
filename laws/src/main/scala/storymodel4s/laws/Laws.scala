@@ -117,12 +117,18 @@ object AlignmentLaws extends Laws:
           res.posterior.rows(i + 1).mass.forall((s, m) => math.abs(to.getOrElse(s, 0.0) - m) < 1e-6)
         }
       },
-      "localizability lies in [0, 1]" -> forAll { (c: AlignGens.Case) =>
-        AlignGens
-          .infer(c)
-          .posterior
-          .rows
-          .forall(r => r.localizability >= -eps && r.localizability <= 1 + eps)
+      "localizability lies in [0, 1] and is defined iff the unit has source mass" -> forAll {
+        (c: AlignGens.Case) =>
+          val k = c.view.sourceNodeCount
+          AlignGens
+            .infer(c)
+            .posterior
+            .rows
+            .forall { r =>
+              r.localizability(k) match
+                case Some(l) => r.sourceMass > 0.0 && l >= -eps && l <= 1 + eps
+                case None    => r.sourceMass <= 0.0
+            }
       }
     )
 

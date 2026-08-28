@@ -208,6 +208,7 @@ object AtomProjection:
     case SketchRole.Source      => ParticipantRole.Source
     case SketchRole.Instrument  => ParticipantRole.Instrument
     case SketchRole.Time        => ParticipantRole.Time
+    case SketchRole.Beneficiary => ParticipantRole.Beneficiary
     case SketchRole.Other(l)    => ParticipantRole.Custom("recall", l)
 
   private def modalityOf(word: String): Modality =

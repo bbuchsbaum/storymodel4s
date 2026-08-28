@@ -54,7 +54,7 @@ final case class Density(unit: RecallUnitId, grid: Vector[Double], values: Vecto
     FeatureTrack(Density.space(unit), obs, Some(Density.derivation), provenance)
 
 object Density:
-  val SpaceFingerprint: Fingerprint = Fingerprint.unsafe("storymodel4s:align:support-density:0.1")
+  val SpaceFingerprint: Fingerprint = Fingerprint.unsafe("storymodel4s:align:support-density:0.2")
 
   def space(unit: RecallUnitId): FeatureSpace[Double] =
     FeatureSpace[Double](
@@ -69,27 +69,34 @@ object Density:
   val derivation: FeatureDerivation = FeatureDerivation(
     cats.data.NonEmptyVector.one(FeatureSpaceId.unsafe("align.posterior")),
     None,
-    ReducerId.unsafe("kernel-density"),
+    ReducerId.unsafe("smoothed-box-density"),
     WeightingPolicy.Kernel("gaussian", 0.03),
     MissingValuePolicy.IgnoreMissing,
     None,
-    "support-density-1"
+    "support-density-2"
   )
 
+/** Soft support derived (never stored) from exact spans. Each node contributes its posterior mass
+  * spread over its *support interval* — a box over `[start, end]` of its span hull, smoothed by a
+  * Gaussian of `bandwidth` — so a correctly recalled summary reports the width of its segment, not
+  * a spike at its midpoint (review #14). Every contribution is normalized once on the grid so the
+  * unit's density integrates to its source mass (review #38).
+  */
 object SupportDensity:
 
-  /** Soft support derived (never stored) from exact spans: a Gaussian kernel of `bandwidth` (in
-    * units of relative discourse position) around each node's support midpoint.
-    */
   def discourse(
       posterior: AlignmentMatrix,
       view: SourceView,
       grid: Int = 50,
       bandwidth: Double = 0.03
   ): Vector[Density] =
-    build(posterior, grid, bandwidth, ref => Some(view.relativePosition(ref)))
+    build(posterior, grid, bandwidth, view.relativeSpan)
 
-  /** World-time variant using the source's world order ranks when known. */
+  /** World-time variant using the source's world order ranks when known. Ranked nodes occupy the
+    * rank interval `[r, r+1)`; nodes without a rank (e.g. speech-scoped content) get a uniform
+    * prior over `[0, 1]` rather than being dropped, so the density still integrates to the row's
+    * source mass.
+    */
   def worldTime(
       posterior: AlignmentMatrix,
       view: SourceView,
@@ -97,31 +104,47 @@ object SupportDensity:
       bandwidth: Double = 0.03
   ): Option[Vector[Density]] =
     view.worldOrder.map { order =>
-      val maxRank = math.max(1, order.values.maxOption.getOrElse(1))
-      build(posterior, grid, bandwidth, ref => order.get(ref).map(_.toDouble / maxRank))
+      val maxRank = math.max(1, order.values.maxOption.getOrElse(0) + 1)
+      build(
+        posterior,
+        grid,
+        bandwidth,
+        ref =>
+          order.get(ref) match
+            case Some(r) => Some((r.toDouble / maxRank, (r + 1).toDouble / maxRank))
+            case None    => Some((0.0, 1.0))
+      )
     }
 
   private def build(
       posterior: AlignmentMatrix,
       grid: Int,
       bandwidth: Double,
-      position: SourceNodeRef => Option[Double]
+      span: SourceNodeRef => Option[(Double, Double)]
   ): Vector[Density] =
     val g = (0 until grid).toVector.map(k => (k + 0.5) / grid)
+    val bw = math.max(bandwidth, 1e-6)
+    // Smoothed box: Φ((x − a)/bw) − Φ((x − b)/bw) with a minimum width of one grid cell.
+    def kernel(a: Double, b: Double): Vector[Double] =
+      val lo = math.min(a, b)
+      val hi = math.max(lo + 1.0 / grid, b)
+      val raw = g.map(x => Gauss.cdf((x - lo) / bw) - Gauss.cdf((x - hi) / bw))
+      val z = raw.sum
+      if z <= 0.0 then Vector.fill(grid)(1.0 / grid) else raw.map(_ / z)
     posterior.rows.map { row =>
-      val contributions = row.mass.toVector.collect {
-        case (AlignState.Source(ref), m) if m > 0 =>
-          position(ref).map(p => (p, m))
-      }.flatten
-      val values = g.map { x =>
-        contributions.map { case (p, m) =>
-          val k = g.map(y => math.exp(-0.5 * ((y - p) / bandwidth) * ((y - p) / bandwidth)))
-          val z = k.sum
-          if z <= 0 then 0.0
-          else m * math.exp(-0.5 * ((x - p) / bandwidth) * ((x - p) / bandwidth)) / z
-        }.sum
+      val contributions = row.mass.toVector
+        .sortBy(_._1.key)
+        .collect { case (AlignState.Source(ref), m) if m > 0 => span(ref).map(s => (s, m)) }
+        .flatten
+      val acc = Array.fill(grid)(0.0)
+      contributions.foreach { case ((a, b), m) =>
+        val k = kernel(a, b)
+        var i = 0
+        while i < grid do
+          acc(i) += m * k(i)
+          i += 1
       }
-      Density(row.unit, g, values)
+      Density(row.unit, g, acc.toVector)
     }
 
   /** Materialize every unit's density as an aligned feature track (design record §110). */
@@ -137,3 +160,14 @@ object SupportDensity:
       val contributing = row.map(_.mass.count { case (s, m) => s.isSource && m > 0 }).getOrElse(0)
       d.toTrack(tokenCount, contributing, eligible, provenance)
     }
+
+/** Standard normal CDF via the Abramowitz–Stegun 7.1.26 erf approximation (|ε| < 1.5e−7). */
+private[align] object Gauss:
+  def erf(x: Double): Double =
+    val sign = if x < 0 then -1.0 else 1.0
+    val ax = math.abs(x)
+    val t = 1.0 / (1.0 + 0.3275911 * ax)
+    val y = 1.0 - (((((1.061405429 * t - 1.453152027) * t) + 1.421413741) * t - 0.284496736) * t +
+      0.254829592) * t * math.exp(-ax * ax)
+    sign * y
+  def cdf(z: Double): Double = 0.5 * (1.0 + erf(z / math.sqrt(2.0)))

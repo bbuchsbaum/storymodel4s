@@ -119,8 +119,95 @@ class SegmenterSuite extends FunSuite:
     assertEquals(RecallSegmenter.classify(""), DiscourseFunction.Uninterpretable)
   }
 
-  test("recall entities are collected from names and role nouns") {
+  test("recall entities are collected from names and role nouns; multiword names merge") {
     val g = graph(anna)
     assert(g.relations.entities.exists(_.label == "woman"))
-    assert(g.relations.entities.exists(_.label == "stephen"))
+    assert(g.relations.entities.exists(_.label == "stephen king"), g.relations.entities.toString)
+    assert(!g.relations.entities.exists(_.label == "stephen"))
+  }
+
+  test("a clause-initial name counts when it is capitalized mid-clause elsewhere") {
+    val g = graph("Anna went home. Then she met Anna again.")
+    assert(g.relations.entities.exists(_.label == "anna"), g.relations.entities.toString)
+    val g2 = graph("Somebody went home. Then the ghosts came.")
+    assert(!g2.relations.entities.exists(_.label == "somebody"), g2.relations.entities.toString)
+  }
+
+  test("task commentary fires only for whole-unit commentary; leading fillers are stripped") {
+    assertEquals(RecallSegmenter.classify("um, okay."), DiscourseFunction.TaskCommentary)
+    assertEquals(
+      RecallSegmenter.classify("that's all i remember."),
+      DiscourseFunction.TaskCommentary
+    )
+    assertEquals(
+      RecallSegmenter.classify("um, they went up the river"),
+      DiscourseFunction.EpisodicAssertion
+    )
+    assertEquals(
+      RecallSegmenter.classify("okay so the men went hunting"),
+      DiscourseFunction.EpisodicAssertion
+    )
+  }
+
+  test("'like a' after a perception verb is content, not an association") {
+    assertEquals(
+      RecallSegmenter.classify("it sounded like a war party"),
+      DiscourseFunction.EpisodicAssertion
+    )
+    assertEquals(
+      RecallSegmenter.classify("it was like a horror movie"),
+      DiscourseFunction.Association
+    )
+    assertEquals(
+      RecallSegmenter.classify("it felt kind of like a stephen king story"),
+      DiscourseFunction.Association
+    )
+  }
+
+  test("evaluation needs a speaker-evaluative frame") {
+    assertEquals(RecallSegmenter.classify("it was scary"), DiscourseFunction.Evaluation)
+    assertEquals(
+      RecallSegmenter.classify("his family was sad"),
+      DiscourseFunction.EpisodicAssertion
+    )
+  }
+
+  test("hedges inside quoted speech are not the rememberer's hedges") {
+    val g = graph("She said \"I think they were ghosts\" and then she left.")
+    assert(!g.ordered.head.expressedUncertainty.isMarked, g.ordered.head.toString)
+    val g2 = graph("I think she left after that.")
+    assert(g2.ordered.head.expressedUncertainty.isMarked)
+  }
+
+  test("a discourse 'No,' and 'I don't remember' are not negations") {
+    val g = graph("No, he went home after that.")
+    assertEquals(g.ordered.head.proposition.polarity, PolarityTag.Positive)
+    val g2 = graph("I don't remember if he went home.")
+    assertEquals(g2.ordered.head.function, DiscourseFunction.SourceMonitoring)
+    assertNotEquals(g2.ordered.head.proposition.polarity, PolarityTag.Negative)
+  }
+
+  test("sentence-initial 'So' is not a causal connective; mid-sentence 'so' is") {
+    val g = graph("So he went home. She screamed very loudly, so he ran away fast.")
+    assert(
+      g.relations.causal.forall(e => g.unit(e.effect).exists(_.text.startsWith("so he ran"))),
+      g.relations.causal.toString
+    )
+    assert(g.relations.causal.nonEmpty, g.units.map(_.text).toString)
+  }
+
+  test("'earlier' and 'prior to that' state a Before relation backwards") {
+    val g = graph("He found his brother. Earlier he had heard a scream.")
+    val Vector(a, b) = g.ordered.take(2)
+    assert(
+      g.relations.temporal.exists(e =>
+        e.from == b.id && e.to == a.id && e.relation == RecallTemporalRelation.Before
+      ),
+      g.relations.temporal.toString
+    )
+  }
+
+  test("case-insensitive splitting: '…, But then' splits") {
+    val g = graph("He went home, But then he came back.")
+    assertEquals(g.size, 2, g.units.map(_.text).toString)
   }

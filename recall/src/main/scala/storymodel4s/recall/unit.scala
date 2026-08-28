@@ -25,9 +25,12 @@ enum PolarityTag:
 enum ModalityTag:
   case Asserted, Possible, Intended, Desired, Reported, Counterfactual, Unknown
 
-/** Compact role vocabulary shared by recall sketches and source node summaries. */
+/** Compact role vocabulary shared by recall sketches and source node summaries. `Beneficiary`
+  * covers recipients/addressees, the patient-like counterpart of speech and transfer acts.
+  */
 enum SketchRole:
-  case Agent, Patient, Theme, Experiencer, Location, Destination, Source, Instrument, Time
+  case Agent, Patient, Theme, Experiencer, Location, Destination, Source, Instrument, Time,
+    Beneficiary
   case Other(label: String)
 
 /** A participant as the recall unit names it. `specified = false` marks indefinite reference
@@ -59,8 +62,12 @@ final case class PropositionSketch(
 ):
   def byRole(role: SketchRole): Option[SketchParticipant] = participants.find(_.role == role)
   def agent: Option[SketchParticipant] = byRole(SketchRole.Agent)
+
+  /** The patient-like participant: patient, else theme, else recipient/addressee. */
   def patient: Option[SketchParticipant] =
-    byRole(SketchRole.Patient).orElse(byRole(SketchRole.Theme))
+    byRole(SketchRole.Patient)
+      .orElse(byRole(SketchRole.Theme))
+      .orElse(byRole(SketchRole.Beneficiary))
 
 object PropositionSketch:
   val empty: PropositionSketch =

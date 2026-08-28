@@ -1,10 +1,13 @@
 package storymodel4s.align
 
-import storymodel4s.recall.{PropositionSketch, SketchRole}
+import storymodel4s.recall.{Lexical, ModalityTag, PropositionSketch, SketchRole}
 
-/** Detail facets assessed conditionally on the inferred target event. */
+/** Detail facets assessed conditionally on the inferred target event. `Context` records whether the
+  * recall asserted as narrated fact what the source only reports, believes, or intends (or the
+  * reverse): the canonical Bartlett distortion, measured here rather than gated (review #10).
+  */
 enum Facet:
-  case Actor, Action, Object, Location, Outcome, Cause
+  case Actor, Action, Object, Location, Outcome, Cause, Context
 
 /** `Unspecified` means the recall did not commit to the facet; it is not an error. */
 enum FacetVerdict:
@@ -44,17 +47,37 @@ object FidelityFacets:
     val location =
       if sketch.locations.isEmpty then FacetVerdict.Unspecified
       else
-        val sourceLocs = node.locations.map(_.toLowerCase).toSet ++
+        val sourceLocs = node.locations.map(Lexical.lower).toSet ++
           node.byRole(SketchRole.Location).toVector.flatMap(_.names) ++
           node.byRole(SketchRole.Destination).toVector.flatMap(_.names)
-        if sketch.locations.exists(l => sourceLocs.contains(l.toLowerCase)) then
-          FacetVerdict.Correct
+        val sourceTokens = Names.tokens(sourceLocs)
+        if sketch.locations.exists { l =>
+            val ll = Lexical.lower(l)
+            sourceLocs.contains(ll) || sourceTokens.contains(ll)
+          }
+        then FacetVerdict.Correct
         else FacetVerdict.Wrong
     def text(a: Option[String], b: Option[String]): FacetVerdict = (a, b) match
       case (None, _)          => FacetVerdict.Unspecified
       case (Some(x), Some(y)) =>
-        if x.equalsIgnoreCase(y) then FacetVerdict.Correct else FacetVerdict.Wrong
+        if Lexical.lower(x) == Lexical.lower(y) then FacetVerdict.Correct else FacetVerdict.Wrong
       case (Some(_), None) => FacetVerdict.Wrong
+    val context = sketch.modality match
+      case ModalityTag.Asserted =>
+        if node.context == ContextTag.NarratedWorld then FacetVerdict.Correct
+        else FacetVerdict.Wrong
+      case ModalityTag.Reported =>
+        if node.context == ContextTag.Speech then FacetVerdict.Correct
+        else if node.context == ContextTag.NarratedWorld then FacetVerdict.Wrong
+        else FacetVerdict.Unspecified
+      case ModalityTag.Intended | ModalityTag.Desired =>
+        if node.context == ContextTag.Intention || node.context == ContextTag.Desire ||
+          node.modality == ModalityTag.Intended || node.modality == ModalityTag.Desired
+        then FacetVerdict.Correct
+        else if node.context == ContextTag.NarratedWorld && node.modality == ModalityTag.Asserted
+        then FacetVerdict.Wrong
+        else FacetVerdict.Unspecified
+      case _ => FacetVerdict.Unspecified
     FidelityReport(
       Map(
         Facet.Actor -> actor,
@@ -62,6 +85,7 @@ object FidelityFacets:
         Facet.Object -> obj,
         Facet.Location -> location,
         Facet.Outcome -> text(sketch.outcome, node.outcome),
-        Facet.Cause -> text(sketch.cause, node.cause)
+        Facet.Cause -> text(sketch.cause, node.cause),
+        Facet.Context -> context
       )
     )

@@ -45,8 +45,9 @@ object TransitionModel:
 
 /** Feature vector of a source→source move; exposed for diagnostics and learning. */
 final case class TransitionFeatures(values: Map[TransitionKind, Double]):
+  /** Deterministic summation order (review #30). */
   def score(model: TransitionModel): Double =
-    values.iterator.map { case (k, v) => model(k) * v }.sum
+    TransitionKind.values.toVector.map(k => model(k) * values.getOrElse(k, 0.0)).sum
 
 object TransitionFeatures:
   def between(view: SourceView, s: SourceNodeRef, t: SourceNodeRef): TransitionFeatures =
@@ -78,27 +79,62 @@ object TransitionFeatures:
       )
     )
 
-final case class HsmmConfig(
-    temperature: Double = 0.15,
-    transitions: TransitionModel = TransitionModel.default,
-    refinementPasses: Int = 0,
-    refinementWeight: Double = 0.3
+final case class HsmmConfig private (
+    temperature: Double,
+    transitions: TransitionModel,
+    refinementPasses: Int,
+    refinementWeight: Double
 )
+
+object HsmmConfig:
+  def of(
+      temperature: Double = 0.15,
+      transitions: TransitionModel = TransitionModel.default,
+      refinementPasses: Int = 0,
+      refinementWeight: Double = 0.3
+  ): Either[AlignError, HsmmConfig] =
+    if temperature <= 0.0 || temperature.isNaN || temperature.isInfinite then
+      Left(AlignError.InvalidConfig("HsmmConfig.temperature", "must be positive and finite"))
+    else if refinementPasses < 0 then
+      Left(AlignError.InvalidConfig("HsmmConfig.refinementPasses", "must be nonnegative"))
+    else if refinementWeight < 0.0 || refinementWeight.isNaN then
+      Left(AlignError.InvalidConfig("HsmmConfig.refinementWeight", "must be nonnegative"))
+    else if transitions.theta.values.exists(v => v.isNaN || v.isInfinite) then
+      Left(AlignError.InvalidConfig("HsmmConfig.transitions", "weights must be finite"))
+    else Right(new HsmmConfig(temperature, transitions, refinementPasses, refinementWeight))
+
+  val default: HsmmConfig = of().fold(e => throw new IllegalStateException(e.message), identity)
+
+  def unsafe(
+      temperature: Double = 0.15,
+      transitions: TransitionModel = TransitionModel.default,
+      refinementPasses: Int = 0,
+      refinementWeight: Double = 0.3
+  ): HsmmConfig =
+    of(temperature, transitions, refinementPasses, refinementWeight).fold(
+      e => throw new IllegalArgumentException(e.message),
+      identity
+    )
 
 final case class HsmmResult(
     posterior: AlignmentMatrix,
     flow: TransitionFlow,
     viterbi: Vector[AlignState],
     logLikelihood: Double,
-    costs: Map[RecallUnitId, Map[AlignState, CostBreakdown]]
+    costs: Map[RecallUnitId, Map[AlignState, CostBreakdown]],
+    refinementPasses: Int
 )
 
 /** Stage 3: sparse graph-structured HSMM over the recall sequence.
   *
-  * States at unit `i` are that unit's source candidates plus the external states. Emissions are
-  * `exp(−cost/τ)`; external states emit at the floor. Transitions are typed by source structure.
-  * Forward–backward in log space yields `P` and `F` as posteriors; Viterbi gives the MAP path.
-  * Optional refinement passes re-weight emissions by relation preservation (corrective only).
+  * States at unit `i` are that unit's *admissible* source candidates plus the external states: a
+  * candidate excluded by a gating contradiction is not a state at all, so a fully contradicted unit
+  * is fully external however many candidates it had (review #7/#8). A unit the aligner could not
+  * rank has the single state `Unranked`. Emissions are `exp(−cost/τ)`; external states emit at the
+  * floor. Transitions are typed by source structure. Forward–backward in log space yields `P` and
+  * `F` as posteriors; Viterbi gives the MAP path on the same (possibly refined) costs as the
+  * posterior (review #31). Optional refinement passes re-weight emissions by relation preservation
+  * (corrective only) and never touch excluded candidates.
   */
 object GraphHsmm:
 
@@ -107,26 +143,44 @@ object GraphHsmm:
       view: SourceView,
       candidates: Candidates,
       costModel: LocalCostModel,
-      config: HsmmConfig = HsmmConfig()
-  ): HsmmResult =
+      config: HsmmConfig = HsmmConfig.default
+  ): Either[AlignError, HsmmResult] =
     val units = recall.ordered
-    require(units.nonEmpty, "recall has no units")
+    if units.isEmpty then Left(AlignError.EmptyRecall)
+    else Right(inferUnchecked(units, recall, view, candidates, costModel, config))
+
+  private def inferUnchecked(
+      units: Vector[RecallUnit],
+      recall: RecallGraph,
+      view: SourceView,
+      candidates: Candidates,
+      costModel: LocalCostModel,
+      config: HsmmConfig
+  ): HsmmResult =
     val tau = config.temperature
 
-    val states: Vector[Vector[AlignState]] = units.map { u =>
-      candidates(u.id).map(AlignState.Source(_)) ++ AlignState.externals
-    }
-    val breakdowns: Vector[Map[AlignState, CostBreakdown]] = units.zip(states).map { (u, ss) =>
-      ss.map {
-        case s @ AlignState.Source(ref) =>
-          s -> view.node(ref).map(costModel.cost(u, _, view)).getOrElse(unreachable)
+    // Every candidate's cost is computed and reported; only admissible ones become states.
+    val breakdowns: Vector[Map[AlignState, CostBreakdown]] = units.map { u =>
+      val set = candidates.set(u.id)
+      val sources = set.ranked.map { ref =>
+        val s = AlignState.Source(ref)
+        s -> view.node(ref).map(costModel.cost(u, _, view)).getOrElse(unreachable)
+      }
+      val externals =
+        if set.abstained && set.ranked.isEmpty then Vector(AlignState.unranked)
+        else AlignState.externals
+      val ext = externals.map {
         case s @ AlignState.External(x) =>
-          val c = costModel.externalCost(u, x)
-          s -> CostBreakdown(Map.empty, Vector.empty, gated = false, c)
-      }.toMap
+          s -> CostBreakdown(Map.empty, Vector.empty, None, costModel.externalCost(u, x))
+        case s => s -> unreachable
+      }
+      (sources ++ ext).toMap
+    }
+    val states: Vector[Vector[AlignState]] = breakdowns.map { m =>
+      m.toVector.collect { case (s, b) if !b.excluded => s }.sortBy(_.key)
     }
     val baseCost: Vector[Map[AlignState, Double]] =
-      breakdowns.map(_.view.mapValues(_.total).toMap)
+      breakdowns.zip(states).map { (m, ss) => ss.map(s => s -> m(s).total).toMap }
 
     // log transition matrices A_i(s, t): a mixture of "go/stay external" and a feature softmax
     // over the source states available at i+1
@@ -155,7 +209,8 @@ object GraphHsmm:
           val acc = states(i + 1).map(t => logA(i)(s)(t) + logE(i + 1)(t) + logBeta(i + 1)(t))
           s -> logSumExp(acc)
         }.toMap
-      val logZ = logSumExp(logAlpha(n - 1).values.toVector)
+      // deterministic summation order: iterate states, not a map (review #30)
+      val logZ = logSumExp(states(n - 1).map(s => logAlpha(n - 1)(s)))
       val rows = (0 until n).toVector.map { i =>
         AlignmentRow(
           units(i).id,
@@ -173,10 +228,11 @@ object GraphHsmm:
       }
       (AlignmentMatrix(rows), TransitionFlow(steps), logZ)
 
-    var (posterior, flow, logZ) = run(baseCost)
+    var costs = baseCost
+    var (posterior, flow, logZ) = run(costs)
     var pass = 0
     while pass < config.refinementPasses do
-      val refined = RelationPreservation.reweight(
+      costs = RelationPreservation.reweight(
         baseCost,
         units,
         posterior,
@@ -184,17 +240,17 @@ object GraphHsmm:
         view,
         config.refinementWeight
       )
-      val r = run(refined)
+      val r = run(costs)
       posterior = r._1
       flow = r._2
       logZ = r._3
       pass += 1
 
-    val path = viterbi(units, states, baseCost.map(_.view.mapValues(c => -c / tau).toMap), logA)
-    HsmmResult(posterior, flow, path, logZ, units.map(_.id).zip(breakdowns).toMap)
+    val path = viterbi(units, states, costs.map(_.view.mapValues(c => -c / tau).toMap), logA)
+    HsmmResult(posterior, flow, path, logZ, units.map(_.id).zip(breakdowns).toMap, pass)
 
   private def unreachable: CostBreakdown =
-    CostBreakdown(Map.empty, Vector.empty, gated = true, Double.MaxValue / 4)
+    CostBreakdown(Map.empty, Vector.empty, Some(Exclusion.Unreachable), Double.MaxValue / 4)
 
   /** Log transition distribution from `s` over the states `to` available at the next unit. */
   private[align] def transitionRow(
@@ -240,7 +296,7 @@ object GraphHsmm:
       }
       delta(i) = pairs.map(p => p._1 -> p._3).toMap
       back(i) = pairs.map(p => p._1 -> p._2).toMap
-    val last = delta(n - 1).maxBy { case (s, v) => (v, s.key) }._1
+    val last = states(n - 1).map(s => (s, delta(n - 1)(s))).maxBy { case (s, v) => (v, s.key) }._1
     val path = Array.ofDim[AlignState](n)
     path(n - 1) = last
     for i <- (n - 1) until 0 by -1 do path(i - 1) = back(i)(path(i))
@@ -269,8 +325,8 @@ object RelationPreservation:
       (posterior.row(from), posterior.row(to)) match
         case (Some(a), Some(b)) =>
           val pairs = for
-            case (AlignState.Source(s), ma) <- a.mass.toVector
-            case (AlignState.Source(t), mb) <- b.mass.toVector
+            case (AlignState.Source(s), ma) <- a.mass.toVector.sortBy(_._1.key)
+            case (AlignState.Source(t), mb) <- b.mass.toVector.sortBy(_._1.key)
             if ma > 0.0 && mb > 0.0
           yield ma * mb * (if view.reachable(layer, s, t) then 1.0 else 0.0)
           val z = a.sourceMass * b.sourceMass
@@ -287,7 +343,8 @@ object RelationPreservation:
     Map(RelationLayer.WorldTime -> mean(temporal), RelationLayer.Causal -> mean(causal))
 
   /** Lower the cost of candidates that would preserve the recall's explicit relations given the
-    * current posterior of the related units.
+    * current posterior of the related units. Only states present in `base` (i.e. admissible ones)
+    * are touched, so gating can never be undone (review #7).
     */
   private[align] def reweight(
       base: Vector[Map[AlignState, Double]],
@@ -308,19 +365,25 @@ object RelationPreservation:
         rowB <- posterior.row(b)
         rowA <- posterior.row(a)
       do
-        base(i).keys.foreach {
+        base(i).keys.toVector.sortBy(_.key).foreach {
           case s @ AlignState.Source(sr) =>
-            val v = rowB.mass.collect {
-              case (AlignState.Source(t), m) if view.reachable(layer, sr, t) => m
-            }.sum
+            val v = rowB.mass.toVector
+              .sortBy(_._1.key)
+              .collect {
+                case (AlignState.Source(t), m) if view.reachable(layer, sr, t) => m
+              }
+              .sum
             add(i, s, v)
           case _ => ()
         }
-        base(j).keys.foreach {
+        base(j).keys.toVector.sortBy(_.key).foreach {
           case t @ AlignState.Source(tr) =>
-            val v = rowA.mass.collect {
-              case (AlignState.Source(s), m) if view.reachable(layer, s, tr) => m
-            }.sum
+            val v = rowA.mass.toVector
+              .sortBy(_._1.key)
+              .collect {
+                case (AlignState.Source(s), m) if view.reachable(layer, s, tr) => m
+              }
+              .sum
             add(j, t, v)
           case _ => ()
         }
