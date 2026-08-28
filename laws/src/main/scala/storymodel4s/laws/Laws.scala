@@ -264,28 +264,59 @@ object GateProofLaws extends Laws:
     new DefaultRuleSet(
       "align.gateProof",
       None,
-      "every inferred result re-validates to itself" -> forAll { (c: AlignGens.Case) =>
-        val r = AlignGens.infer(c)
-        val (p, f, v, ll, cs, a, n) = parts(r)
-        HsmmResult.validated(p, f, v, ll, cs, a, n) == Right(r)
+      "every inferred result re-validates to itself on its recall and view" -> forAll {
+        (c: AlignGens.Case) =>
+          val r = AlignGens.infer(c)
+          val (p, f, v, ll, cs, a, n) = parts(r)
+          HsmmResult.validated(c.recall, c.view, p, f, v, ll, cs, a, n) == Right(r)
       },
-      "moving any mass onto an inadmissible (anchor, mode) is rejected" ->
+      "every forgery — mass, key, cost, path, flow, or a transplanted authentic record — is rejected" ->
         forAll { (f: AlignGens.FoilCase) =>
           val r = AlignGens.inferFoil(f)
-          AlignGens.forgeries(r).forall { case (p, fl, v, cs) =>
+          AlignGens.forgeries(r).forall { case (p, fl, v, cs, adm) =>
             HsmmResult
-              .validated(p, fl, v, r.logLikelihood, cs, r.admissibility, r.refinementPasses)
+              .validated(
+                f.recall,
+                f.base.view,
+                p,
+                fl,
+                v,
+                r.logLikelihood,
+                cs,
+                adm,
+                r.refinementPasses
+              )
               .isLeft
           }
         },
       "a foil result has at least one inadmissible pair to forge onto" ->
         forAll { (f: AlignGens.FoilCase) => AlignGens.forgeries(AlignGens.inferFoil(f)).nonEmpty },
+      "the gate, not the record, decides: re-validating against another recall fails when the gate disagrees" ->
+        forAll { (f: AlignGens.FoilCase) =>
+          // The foil's recall differs from the base recall only in the contradicting unit; its
+          // result cannot be validated as if it belonged to a recall whose units the gate would
+          // assess differently (unit ids differ, so the record's units are unknown there).
+          val r = AlignGens.inferFoil(f)
+          val (p, fl, v, ll, cs, a, n) = parts(r)
+          HsmmResult.validated(f.base.recall, f.base.view, p, fl, v, ll, cs, a, n).isLeft ||
+          f.base.recall.byId.contains(f.unit.id)
+        },
       "dropping the admissibility record invalidates every anchored result" ->
         forAll { (c: AlignGens.Case) =>
           val r = AlignGens.infer(c)
           val anchored = r.posterior.rows.exists(_.sourceMass > 0.0)
           !anchored || HsmmResult
-            .validated(r.posterior, r.flow, r.viterbi, r.logLikelihood, r.costs, Map.empty, 0)
+            .validated(
+              c.recall,
+              c.view,
+              r.posterior,
+              r.flow,
+              r.viterbi,
+              r.logLikelihood,
+              r.costs,
+              Map.empty,
+              0
+            )
             .isLeft
         }
     )

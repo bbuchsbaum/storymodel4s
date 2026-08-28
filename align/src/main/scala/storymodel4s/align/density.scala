@@ -99,9 +99,11 @@ object SupportDensity:
   def worldTime(result: HsmmResult, view: SourceView): Option[Vector[Density]] =
     worldTime(result.posterior, view)
 
-  /** Densities of a posterior. `AlignmentMatrix` can only be produced by this module's aligners
-    * (its constructor is `private[align]`), so a caller cannot mint one; the baseline aligner's
-    * matrix is the documented ablation input.
+  /** Densities of a bare posterior. Unlike the [[HsmmResult]] overloads above, these accept any
+    * well-formed `AlignmentMatrix` — including one built through [[AlignmentMatrix.of]] or the
+    * baseline aligner's ablation output — and therefore carry no mode-gate proof. Scientific
+    * consumers should use the `HsmmResult` overloads; these forms exist for ablations and
+    * diagnostics.
     */
   def discourse(
       posterior: AlignmentMatrix,

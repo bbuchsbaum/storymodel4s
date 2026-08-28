@@ -123,11 +123,13 @@ object HsmmConfig:
   *
   * The constructor is `private[align]` and the class has no `copy`: the only ways to obtain a value
   * are [[GraphHsmm.infer]] (which itself goes through [[HsmmResult.validated]]) and
-  * [[HsmmResult.validated]], which proves that every anchored state carrying posterior mass, flow
-  * mass, a cost entry, or a Viterbi step is admitted by `admissibility` in exactly that mode. A
-  * forged row on an inadmissible `(anchor, mode)` therefore cannot inhabit this type, and every
-  * consumer that requires it ([[RecallSignature]], [[PopulationAggregate]], [[SupportDensity]]) is
-  * guaranteed a gated result. [[AblationResult]] is a separate type with no path here.
+  * [[HsmmResult.validated]], which takes the recall and the source view and proves that every
+  * anchored state appearing in the posterior, the flow, the costs, or the Viterbi path is admitted
+  * in exactly that mode by an admissibility record that the [[ModeGate]] itself reproduces on that
+  * unit and node. A forged row on an inadmissible `(anchor, mode)` — or a forged admissibility
+  * record — therefore cannot inhabit this type, and every consumer that requires it
+  * ([[RecallSignature]], [[PopulationAggregate]], [[SupportDensity]]) is guaranteed a gated result.
+  * [[AblationResult]] is a separate type with no path here.
   */
 final class HsmmResult private[align] (
     val posterior: AlignmentMatrix,
@@ -150,17 +152,30 @@ final class HsmmResult private[align] (
 
 object HsmmResult:
 
-  /** The sole external constructor: proves the gate invariant over the supplied parts.
+  /** Tolerance for row normalization and flow-marginal consistency (stated constant). */
+  val Tolerance: Double = 1e-9
+
+  /** The sole external constructor: proves the gate invariant over the supplied parts, **anchored
+    * in the [[ModeGate]]**.
     *
-    * Checks, in order: rows well-formed with unique units; `flow` has one step fewer than the rows
-    * with matching consecutive endpoints; `viterbi` has one state per row; `logLikelihood` is not
-    * NaN; and — the gate — for every unit, every anchored state that carries posterior mass, flow
-    * mass (as either endpoint), a cost entry, or the Viterbi step is admitted by
-    * `admissibility(unit)(anchor)` in that exact mode (`Faithful` iff `faithful`; `Distorted(fs)`
-    * iff `distortion == Some(fs)`). A unit with no admissibility entry may carry only external
-    * states (an unrankable unit). External states are never gated.
+    * Checks, in order: rows well-formed with unique units and normalized (`|Σ − 1| ≤ Tolerance`);
+    * every row's unit exists in `recall`; `flow` has one step fewer than the rows with matching
+    * consecutive endpoints, finite nonnegative mass, and step marginals equal to the adjacent rows
+    * within `Tolerance`; `viterbi` has one state per row; `logLikelihood` is not NaN; and — the
+    * gate — for every unit, every anchored state that appears as a key of its posterior row, of a
+    * flow step (either endpoint), of its cost map, or as its Viterbi step (key presence, not
+    * positive mass) is admitted in exactly that mode by the recorded admissibility, AND that
+    * recorded admissibility is precisely what `ModeGate.assess(unit, view.node(ref), view)`
+    * computes now. Every recorded admissibility entry is likewise re-derived from the gate, so a
+    * caller cannot smuggle in a record the gate would not produce. A unit with no admissibility
+    * entry may carry only external states (an unrankable unit). External states are never gated.
+    *
+    * Because the recall and the source view are required, a serialized result can only be decoded
+    * back into this type with both in hand.
     */
   def validated(
+      recall: RecallGraph,
+      view: SourceView,
       posterior: AlignmentMatrix,
       flow: TransitionFlow,
       viterbi: Vector[AlignState],
@@ -177,6 +192,7 @@ object HsmmResult:
         admissibility.get(unit).flatMap(_.get(ref)).exists(_.distortion.contains(fs))
     def violation(unit: RecallUnitId, s: AlignState, where: String): AlignError =
       AlignError.GateViolation(unit, s, s"$where on a state the gate did not admit in this mode")
+    def close(a: Double, b: Double): Boolean = math.abs(a - b) <= Tolerance
     val structural: Either[AlignError, Unit] =
       AlignmentMatrix.of(rows).flatMap { _ =>
         if flow.size != math.max(0, rows.size - 1) then
@@ -190,6 +206,16 @@ object HsmmResult:
         else if refinementPasses < 0 then
           Left(AlignError.InconsistentResult("refinementPasses must be nonnegative"))
         else
+          val unknownUnit = rows.collectFirst {
+            case r if !recall.byId.contains(r.unit) =>
+              AlignError.InconsistentResult(s"row unit ${r.unit.value} is not in the recall")
+          }
+          val unnormalized = rows.collectFirst {
+            case r if !close(r.total, 1.0) =>
+              AlignError.InconsistentResult(
+                s"row ${r.unit.value} sums to ${r.total}, not 1 within $Tolerance"
+              )
+          }
           val endpoints = flow.steps.zipWithIndex.collectFirst {
             case (st, i) if st.from != rows(i).unit || st.to != rows(i + 1).unit =>
               AlignError.InconsistentResult(s"flow step $i does not join rows $i and ${i + 1}")
@@ -200,18 +226,64 @@ object HsmmResult:
                 s"flow step ${st.from.value}→${st.to.value} has malformed mass"
               )
           }
-          endpoints.orElse(stepMass).toLeft(())
+          val marginals = flow.steps.zipWithIndex.collectFirst {
+            case (st, i) if !marginalsMatch(st, rows(i), rows(i + 1)) =>
+              AlignError.InconsistentResult(
+                s"flow step $i marginals do not match rows $i and ${i + 1} within $Tolerance"
+              )
+          }
+          unknownUnit
+            .orElse(unnormalized)
+            .orElse(endpoints)
+            .orElse(stepMass)
+            .orElse(marginals)
+            .toLeft(())
       }
+    // The recorded admissibility must be exactly what the gate computes on this recall and view:
+    // every entry is re-derived, and every anchor that appears anywhere must have an entry.
+    val anchoredInGate: Either[AlignError, Unit] =
+      val entries = admissibility.toVector.sortBy(_._1.value).iterator.flatMap { (u, m) =>
+        m.toVector.sortBy(_._1.key).iterator.map { (ref, a) => (u, ref, a) }
+      }
+      entries
+        .map { (u, ref, a) =>
+          (recall.byId.get(u), view.node(ref)) match
+            case (None, _) =>
+              Left(AlignError.InconsistentResult(s"admissibility for unknown unit ${u.value}"))
+            case (_, None) =>
+              Left(
+                AlignError.GateViolation(
+                  u,
+                  AlignState.Source(ref),
+                  "admissibility recorded for an anchor absent from the source view"
+                )
+              )
+            case (Some(unit), Some(node)) =>
+              val expected = ModeGate.assess(unit, node, view)
+              if expected == a then Right(())
+              else
+                Left(
+                  AlignError.GateViolation(
+                    u,
+                    AlignState.Source(ref),
+                    "recorded admissibility differs from what the mode gate computes"
+                  )
+                )
+        }
+        .collectFirst { case l @ Left(_) => l }
+        .getOrElse(Right(()))
     val gate: Either[AlignError, Unit] =
+      // Key presence, not positive mass: a zero-mass key on an inadmissible state is still a
+      // state a consumer can read (argmax, population.sourceRefs).
       val posteriorV = rows.iterator.flatMap { r =>
-        r.mass.toVector.sortBy(_._1.key).collect {
-          case (s, m) if m > 0.0 && !admitted(r.unit, s) => violation(r.unit, s, "posterior mass")
+        r.mass.keys.toVector.sortBy(_.key).collect {
+          case s if !admitted(r.unit, s) => violation(r.unit, s, "posterior key")
         }
       }
       val flowV = flow.steps.iterator.flatMap { st =>
-        st.mass.toVector.sortBy { case ((a, b), _) => (a.key, b.key) }.collect {
-          case ((a, _), m) if m > 0.0 && !admitted(st.from, a) => violation(st.from, a, "flow mass")
-          case ((_, b), m) if m > 0.0 && !admitted(st.to, b)   => violation(st.to, b, "flow mass")
+        st.mass.keys.toVector.sortBy { case (a, b) => (a.key, b.key) }.collect {
+          case (a, _) if !admitted(st.from, a) => violation(st.from, a, "flow key")
+          case (_, b) if !admitted(st.to, b)   => violation(st.to, b, "flow key")
         }
       }
       val costV = costs.toVector.sortBy(_._1.value).iterator.flatMap { (u, m) =>
@@ -225,6 +297,7 @@ object HsmmResult:
       (posteriorV ++ flowV ++ costV ++ pathV).nextOption().toLeft(())
     for
       _ <- structural
+      _ <- anchoredInGate
       _ <- gate
     yield new HsmmResult(
       posterior,
@@ -235,6 +308,16 @@ object HsmmResult:
       admissibility,
       refinementPasses
     )
+
+  /** Row-marginal consistency of a flow step with its adjacent rows (deterministic key order). */
+  private def marginalsMatch(st: FlowStep, from: AlignmentRow, to: AlignmentRow): Boolean =
+    val byFrom = st.mass.toVector.sortBy { case ((a, b), _) => (a.key, b.key) }
+    val outMass = byFrom.groupMapReduce(_._1._1)(_._2)(_ + _)
+    val inMass = byFrom.groupMapReduce(_._1._2)(_._2)(_ + _)
+    val fromKeys = (from.mass.keySet ++ outMass.keySet).toVector.sortBy(_.key)
+    val toKeys = (to.mass.keySet ++ inMass.keySet).toVector.sortBy(_.key)
+    fromKeys.forall(s => math.abs(outMass.getOrElse(s, 0.0) - from(s)) <= Tolerance) &&
+    toKeys.forall(t => math.abs(inMass.getOrElse(t, 0.0) - to(t)) <= Tolerance)
 
 /** Result of *ungated* inference, for ablations only. It deliberately has no `AlignmentMatrix`:
   * nothing that consumes a posterior ([[RecallSignature]], densities, population aggregates) can be
@@ -277,7 +360,7 @@ object GraphHsmm:
         run(units, recall, view, candidates, costModel, config, gate = true)
       // The engine proves its own output: a gate violation here would be a bug, and it surfaces
       // as a typed error rather than an unproven result (law: every infer output validates).
-      HsmmResult.validated(post, flow, path, logZ, costs, adm, passes)
+      HsmmResult.validated(recall, view, post, flow, path, logZ, costs, adm, passes)
 
   /** Ungated inference for ablations: every candidate is admitted in the faithful mode and no
     * distorted state exists. Returns an [[AblationResult]], never an `HsmmResult`.
