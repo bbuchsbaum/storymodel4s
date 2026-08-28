@@ -83,6 +83,35 @@ class SurfaceSuite extends ScalaCheckSuite:
     }
   }
 
+  test("number-shaped tokens classify as Number; supplementary letters as Word") {
+    val s = seqOf("It cost 3.5 dollars and 1,000 cents; 𝔸 is a letter, 😀 is not.")
+    val classes = s.tokens.map(t => (s.atlas.text(t.unit), t.tokenClass)).toMap
+    assertEquals(classes.get("3.5"), Some(TokenClass.Number))
+    assertEquals(classes.get("1,000"), Some(TokenClass.Number))
+    assertEquals(classes.get("𝔸"), Some(TokenClass.Word))
+    assertEquals(classes.get("😀"), Some(TokenClass.Symbol))
+    assertEquals(s.tokens.find(t => s.atlas.text(t.unit) == "It").flatMap(_.normalized), Some("it"))
+  }
+
+  test("centeredWindows yields one clipped window per basis position") {
+    val ws = sample.centeredWindows(2, WindowBasis.LexicalTokens).toVector
+    assertEquals(ws.size, sample.lexicalSize)
+    assertEquals(ws.map(_.ordinal), (0 until sample.lexicalSize).toVector)
+    assert(!ws.head.complete && !ws.last.complete)
+    assert(ws.forall(w => w.lexicalTokenCount <= 5 && w.lexicalTokenCount >= 3))
+    // the first position has a window centered on itself, unlike the sliding plan
+    assertEquals(ws.head.tokenRange.start.value, sample.lexicalIndices.head.value)
+  }
+
+  test("contextAround supports the sentence basis") {
+    val idx = sample.indexOf(sample.atlas.childrenOf(sample.atlas.sentences(1).id).head.id).get
+    val w = sample.contextAround(idx, 1, WindowBasis.Sentences).get
+    assertEquals(w.ordinal, 1)
+    assert(w.complete)
+    assert(w.support.minSpan.contains(sample.atlas.sentences(0).span))
+    assert(w.support.minSpan.contains(sample.atlas.sentences(2).span))
+  }
+
   test("centered context clips at the edges") {
     val first = sample.contextAround(TokenIndex.Zero, 3, WindowBasis.AllTokens).get
     assertEquals(first.tokenRange.start.value, 0)

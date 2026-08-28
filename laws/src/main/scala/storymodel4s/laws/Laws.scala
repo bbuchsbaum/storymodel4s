@@ -53,7 +53,7 @@ object TemporalLaws extends Laws:
             r,
             b.situations(1),
             b.world,
-            StorySmall.meta("law", EpistemicStatus.SurfaceExplicit, None)
+            StorySmall.meta("law", EpistemicStatus.Hypothesized, None)
           )
           e.inverse.inverse == e
         }
@@ -66,7 +66,7 @@ object TemporalLaws extends Laws:
               r,
               b.situations(1),
               b.world,
-              StorySmall.meta("law", EpistemicStatus.SurfaceExplicit, None)
+              StorySmall.meta("law", EpistemicStatus.Hypothesized, None)
             )
             e.canonical.relation.isCanonical
           }

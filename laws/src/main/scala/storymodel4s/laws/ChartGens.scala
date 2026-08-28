@@ -86,7 +86,7 @@ object ChartGens:
   val claimMeta: Gen[ClaimMeta] = for
     id <- Gen.chooseNum(0, 1000000)
     span <- CoreGens.textSpan
-  yield ClaimMeta(
+  yield ClaimMeta.unsafe(
     ClaimId.unsafe(s"claim:$id"),
     EpistemicStatus.SurfaceExplicit,
     Credence.unsafeRaw(1.0),

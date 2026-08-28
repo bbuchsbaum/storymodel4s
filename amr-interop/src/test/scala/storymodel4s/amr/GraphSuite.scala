@@ -321,7 +321,7 @@ class GraphSuite extends ScalaCheckSuite:
   private val fp = Fingerprint.unsafe("test:hand:1")
   private val stage = StageId.unsafe("amr")
   private def meta(id: String, spans: SpanSet): ClaimMeta =
-    ClaimMeta(
+    ClaimMeta.unsafe(
       ClaimId.unsafe(id),
       EpistemicStatus.SurfaceExplicit,
       Credence.unsafeRaw(1.0),

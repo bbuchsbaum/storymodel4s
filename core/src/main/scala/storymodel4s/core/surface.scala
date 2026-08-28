@@ -123,8 +123,10 @@ object WindowPlan:
       EdgePolicy.KeepPartial
     )
 
-  /** Sliding context of `±halfWidth` around every position: width `2h+1`, step 1, partial edges
-    * kept so that the sequence is covered end to end.
+  /** Sliding plan of width `2h+1`, step 1, partial edges kept. Window `k` is centered on basis
+    * position `k+h`, so the first `h` positions have no window of their own; for a true clipped
+    * context around every position use [[SurfaceSequence.centeredWindows]] or
+    * [[SurfaceSequence.contextAround]].
     */
   def centered(halfWidth: Int, basis: WindowBasis = WindowBasis.LexicalTokens): WindowPlan =
     WindowPlan(
@@ -218,17 +220,7 @@ final class SurfaceSequence private (val atlas: SurfaceAtlas, val tokens: Vector
 
   /** Windows according to `plan`; empty when the basis has no units. */
   def windows(plan: WindowPlan): Iterator[SurfaceWindow] =
-    val positions: Vector[TokenRange] = plan.basis match
-      case WindowBasis.AllTokens =>
-        tokens.indices.map(i => TokenRange.unsafe(i, i + 1)).toVector
-      case WindowBasis.LexicalTokens =>
-        lexicalIndices.map(i => TokenRange.unsafe(i.value, i.value + 1))
-      case WindowBasis.Sentences =>
-        atlas.sentences.flatMap { s =>
-          val idx = coveringIndices(SpanSet.one(s.span))
-          if idx.isEmpty then None
-          else Some(TokenRange.unsafe(idx.head.value, idx.last.value + 1))
-        }
+    val positions: Vector[TokenRange] = basisRanges(plan.basis)
     val n = positions.length
     val w = plan.width.value
     val st = plan.step.value
@@ -255,47 +247,88 @@ final class SurfaceSequence private (val atlas: SurfaceAtlas, val tokens: Vector
         }
     }
 
-  /** The window of `±halfWidth` basis units around a token, clipped at the edges. */
+  /** Basis positions as token ranges: one per token, per lexical token, or per sentence. */
+  private lazy val sentenceRanges: Vector[TokenRange] =
+    atlas.sentences.flatMap { s =>
+      val idx = coveringIndices(SpanSet.one(s.span))
+      if idx.isEmpty then None else Some(TokenRange.unsafe(idx.head.value, idx.last.value + 1))
+    }
+
+  private def basisRanges(basis: WindowBasis): Vector[TokenRange] = basis match
+    case WindowBasis.AllTokens     => tokens.indices.map(i => TokenRange.unsafe(i, i + 1)).toVector
+    case WindowBasis.LexicalTokens =>
+      lexicalIndices.map(i => TokenRange.unsafe(i.value, i.value + 1))
+    case WindowBasis.Sentences => sentenceRanges
+
+  /** Position on the basis axis of the basis unit containing `index`, or the nearest one before it
+    * (a punctuation token on the lexical axis maps to the preceding word). Binary search.
+    */
+  private def basisPosition(ranges: Vector[TokenRange], index: Int): Int =
+    var lo = 0
+    var hi = ranges.length - 1
+    var ans = -1
+    while lo <= hi do
+      val mid = (lo + hi) >>> 1
+      if ranges(mid).start.value <= index then
+        ans = mid
+        lo = mid + 1
+      else hi = mid - 1
+    ans
+
+  private def clippedWindow(
+      ranges: Vector[TokenRange],
+      pos: Int,
+      halfWidth: Int
+  ): Option[SurfaceWindow] =
+    val lo = math.max(0, pos - halfWidth)
+    val hi = math.min(ranges.length - 1, pos + halfWidth)
+    val range = TokenRange.unsafe(ranges(lo).start.value, ranges(hi).endExclusive.value)
+    supportOf(range).map(sup =>
+      SurfaceWindow(
+        pos,
+        range,
+        lexicalCount(range),
+        sup,
+        complete = (hi - lo) == 2 * halfWidth,
+        padding = 0
+      )
+    )
+
+  /** The window of `±halfWidth` basis units around the basis unit containing token `index`, clipped
+    * at the edges; `ordinal` is the basis position. Works for every basis, including sentences.
+    */
   def contextAround(index: TokenIndex, halfWidth: Int, basis: WindowBasis): Option[SurfaceWindow] =
-    if index.value < 0 || index.value >= tokens.length then None
+    if index.value < 0 || index.value >= tokens.length || halfWidth < 0 then None
     else
-      basis match
-        case WindowBasis.Sentences => None
-        case _                     =>
-          val axis: Vector[Int] = basis match
-            case WindowBasis.LexicalTokens => lexicalIndices.map(_.value)
-            case _                         => tokens.indices.toVector
-          // position of `index` on the axis (for lexical basis: nearest lexical at or before it)
-          val pos = axis.lastIndexWhere(_ <= index.value)
-          if pos < 0 then None
-          else
-            val lo = math.max(0, pos - halfWidth)
-            val hi = math.min(axis.length - 1, pos + halfWidth)
-            val range = TokenRange.unsafe(axis(lo), axis(hi) + 1)
-            supportOf(range).map(sup =>
-              SurfaceWindow(
-                pos,
-                range,
-                lexicalCount(range),
-                sup,
-                complete = (hi - lo) == 2 * halfWidth,
-                padding = 0
-              )
-            )
+      val ranges = basisRanges(basis)
+      val pos = basisPosition(ranges, index.value)
+      if pos < 0 then None else clippedWindow(ranges, pos, halfWidth)
+
+  /** One clipped `±halfWidth` window per basis position, in order: the per-position centered
+    * context that [[WindowPlan.centered]] (a sliding plan) does not provide for the first
+    * `halfWidth` positions.
+    */
+  def centeredWindows(halfWidth: Int, basis: WindowBasis): Iterator[SurfaceWindow] =
+    val ranges = basisRanges(basis)
+    if halfWidth < 0 then Iterator.empty
+    else ranges.indices.iterator.flatMap(pos => clippedWindow(ranges, pos, halfWidth))
 
 object SurfaceSequence:
   def apply(atlas: SurfaceAtlas): SurfaceSequence =
     new SurfaceSequence(atlas, atlas.tokens.map(u => classify(u, atlas.source.canonicalText)))
 
-  /** Deterministic token classification from the token's own characters. */
+  /** Deterministic token classification from the token's own code points (surrogate-pair safe,
+    * locale-independent).
+    */
   def classify(unit: SurfaceUnit, text: String): TokenView =
     val s = text.substring(unit.span.start, unit.span.endExclusive)
+    val cps = TextNorm.codePoints(s)
     val cls =
-      if s.isEmpty then TokenClass.Other
-      else if s.exists(_.isLetter) then TokenClass.Word
-      else if s.forall(c => c.isDigit) then TokenClass.Number
-      else if s.length == 1 then
-        Character.getType(s.charAt(0)) match
+      if cps.isEmpty then TokenClass.Other
+      else if cps.exists(Character.isLetter) then TokenClass.Word
+      else if TextNorm.isNumberShaped(s) then TokenClass.Number
+      else if cps.length == 1 then
+        Character.getType(cps.head) match
           case Character.CONNECTOR_PUNCTUATION | Character.DASH_PUNCTUATION |
               Character.START_PUNCTUATION | Character.END_PUNCTUATION |
               Character.INITIAL_QUOTE_PUNCTUATION | Character.FINAL_QUOTE_PUNCTUATION |
@@ -305,10 +338,9 @@ object SurfaceSequence:
               Character.OTHER_SYMBOL =>
             TokenClass.Symbol
           case _ => TokenClass.Other
-      else if s.forall(c => c.isDigit || c == '_') then TokenClass.Number
       else TokenClass.Other
     val normalized = cls match
-      case TokenClass.Word   => Some(s.toLowerCase)
+      case TokenClass.Word   => Some(TextNorm.lower(s))
       case TokenClass.Number => Some(s)
       case _                 => None
     TokenView(unit, cls, normalized)

@@ -55,6 +55,18 @@ class SpanSuite extends ScalaCheckSuite:
       c >= set.spans.map(_.length).toVector.max && c <= set.minSpan.length
     }
 
+  property("isContiguous iff coveredLength == minSpan.length"):
+    forAll { (set: SpanSet) => set.isContiguous == (set.coveredLength == set.minSpan.length) }
+
+  test("a nested member does not break contiguity"):
+    val nested = SpanSet.unsafe(
+      SpanRef(TextSpan.unsafe(0, 10)),
+      SpanRef(TextSpan.unsafe(2, 3)),
+      SpanRef(TextSpan.unsafe(5, 20))
+    )
+    assert(nested.isContiguous)
+    assertEquals(nested.coveredLength, 20)
+
   test("coveredLength counts overlap once; isContiguous detects gaps"):
     val a = SpanRef(TextSpan.unsafe(0, 5))
     val b = SpanRef(TextSpan.unsafe(3, 8))

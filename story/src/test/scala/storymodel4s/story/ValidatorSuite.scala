@@ -330,15 +330,18 @@ class ValidatorSuite extends ScalaCheckSuite:
     assert(laws(b.draft(hierarchy = h)).contains("hierarchy.single-primary-parent"))
   }
 
-  test("claims.explicit-has-spans and claims.unique-ids") {
+  test("claims.unique-ids (explicit-without-spans is unrepresentable in ClaimMeta)") {
     val b = Small.build(2, 1)
-    val noSpans =
-      Small.meta("t:0", EpistemicStatus.SurfaceExplicit, None) // same id as the chain edge claim
-    val e = TemporalEdge(b.situations(0), TemporalRelation.Meets, b.situations(1), b.world, noSpans)
+    // a SurfaceExplicit claim without spans cannot be constructed at all
+    intercept[IllegalArgumentException] {
+      Small.meta("never", EpistemicStatus.SurfaceExplicit, None)
+    }
+    val dupId =
+      Small.meta("t:0", EpistemicStatus.Hypothesized, None) // same id as the chain edge claim
+    val e = TemporalEdge(b.situations(0), TemporalRelation.Meets, b.situations(1), b.world, dupId)
     val g =
       b.graph.copy(relations = b.graph.relations.copy(temporal = b.graph.relations.temporal :+ e))
     val ls = laws(b.draft(graph = g))
-    assert(ls.contains("claims.explicit-has-spans"))
     assert(ls.contains("claims.unique-ids"))
   }
 

@@ -35,8 +35,14 @@ final case class Evidence(
 ):
   def hasSpans: Boolean = spans.nonEmpty
 
-/** Metadata attached to every nontrivial machine assertion. */
-final case class ClaimMeta(
+/** Metadata attached to every nontrivial machine assertion.
+  *
+  * Why the constructor is private: the span law (a `SurfaceExplicit` claim cites at least one
+  * nonempty span set) must hold for every `ClaimMeta` that exists, not only for those that happen
+  * to pass through a ledger. Construct with [[ClaimMeta.of]] (checked) or [[ClaimMeta.unsafe]]
+  * (throws on violation); there is no unchecked path.
+  */
+final case class ClaimMeta private[core] (
     id: ClaimId,
     status: EpistemicStatus,
     credence: Credence,
@@ -46,23 +52,67 @@ final case class ClaimMeta(
   def spans: Option[SpanSet] =
     evidence.toVector.flatMap(_.spans).reduceOption(_ ++ _)
 
+  /** Checked update of the fields that do not affect the span law. */
+  def withCredence(c: Credence): ClaimMeta = copy(credence = c)
+  def withProvenance(p: Provenance): ClaimMeta = copy(provenance = p)
+
+  /** Checked update of status/evidence; fails when the result would violate the span law. */
+  def withStatus(s: EpistemicStatus): Either[DomainError, ClaimMeta] =
+    ClaimMeta.of(id, s, credence, evidence, provenance)
+  def withEvidence(ev: NonEmptyVector[Evidence]): Either[DomainError, ClaimMeta] =
+    ClaimMeta.of(id, status, credence, ev, provenance)
+
 object ClaimMeta:
-  /** Law: surface-explicit claims must cite at least one nonempty span set. */
-  def validated(meta: ClaimMeta): Either[DomainError, ClaimMeta] =
-    meta.status match
-      case EpistemicStatus.SurfaceExplicit if !meta.evidence.exists(_.hasSpans) =>
+  private def spanLaw(
+      id: ClaimId,
+      status: EpistemicStatus,
+      evidence: NonEmptyVector[Evidence]
+  ): Either[DomainError, Unit] =
+    status match
+      case EpistemicStatus.SurfaceExplicit if !evidence.exists(_.hasSpans) =>
         Left(
           DomainError.InvariantViolation(
-            s"claim/${meta.id.value}",
+            s"claim/${id.value}",
             "SurfaceExplicit claim has no span evidence"
           )
         )
-      case _ => Right(meta)
+      case _ => Right(())
+
+  /** The only checked constructor. Law: surface-explicit claims must cite at least one nonempty
+    * span set.
+    */
+  def of(
+      id: ClaimId,
+      status: EpistemicStatus,
+      credence: Credence,
+      evidence: NonEmptyVector[Evidence],
+      provenance: Provenance
+  ): Either[DomainError, ClaimMeta] =
+    spanLaw(id, status, evidence).map(_ =>
+      new ClaimMeta(id, status, credence, evidence, provenance)
+    )
+
+  /** Throws `IllegalArgumentException` when the span law is violated. For fixtures and tests. */
+  def unsafe(
+      id: ClaimId,
+      status: EpistemicStatus,
+      credence: Credence,
+      evidence: NonEmptyVector[Evidence],
+      provenance: Provenance
+  ): ClaimMeta =
+    of(id, status, credence, evidence, provenance)
+      .fold(e => throw new IllegalArgumentException(e.message), identity)
+
+  /** Re-checks an existing value; always `Right` for values built through [[of]], kept so callers
+    * that re-validate ledgers do not need to special-case the type.
+    */
+  def validated(meta: ClaimMeta): Either[DomainError, ClaimMeta] =
+    spanLaw(meta.id, meta.status, meta.evidence).map(_ => meta)
 
 /** A resolved value together with its claim and the alternatives that were not selected.
   *
   * Why: ambiguity must survive resolution; the machine proposal and its rivals stay inspectable
-  * after a value is chosen.
+  * after a value is chosen. A `Resolved` can only carry a lawful `ClaimMeta`.
   */
 final case class Resolved[A](value: A, meta: ClaimMeta, alternatives: Vector[(A, Credence)]):
   def map[B](f: A => B): Resolved[B] =

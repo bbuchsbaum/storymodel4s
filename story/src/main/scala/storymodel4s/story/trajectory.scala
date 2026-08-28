@@ -73,7 +73,7 @@ object DiscourseTrajectory:
         DeriveFingerprint,
         DeriveStage
       )
-      val meta = ClaimMeta(
+      val meta = ClaimMeta.unsafe(
         claimId,
         EpistemicStatus.StructurallyDerived,
         Credence.unsafeRaw(if forward.orElse(backward).isDefined then 1.0 else 0.0),

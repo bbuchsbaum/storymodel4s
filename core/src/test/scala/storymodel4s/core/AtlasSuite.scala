@@ -142,6 +142,86 @@ class AtlasSuite extends ScalaCheckSuite:
     assert(LanguageTag.from("e").isLeft)
     assert(LanguageTag.from("en_CA").isLeft)
 
+class SplitterEdgeSuite extends munit.FunSuite:
+  private def sents(t: String): Vector[String] =
+    val atlas = SurfaceAnalyzer.analyze(StorySource.fromText(t).toOption.get)
+    atlas.sentences.map(atlas.text)
+  private def toks(t: String): Vector[String] =
+    val atlas = SurfaceAnalyzer.analyze(StorySource.fromText(t).toOption.get)
+    atlas.tokens.map(atlas.text)
+
+  test("an unclosed typographic quote does not swallow the paragraph") {
+    assertEquals(
+      sents("“He left early. She stayed. Nobody minded."),
+      Vector("“He left early.", "She stayed.", "Nobody minded.")
+    )
+  }
+
+  test("an unclosed bracket suppresses boundaries only within its reach") {
+    val far = "x " * 200
+    val text = s"He said (as always ${far}enough. Then it ended. Really."
+    val s = sents(text)
+    assert(s.size >= 2, s.mkString("|"))
+    assert(s.last == "Really.", s.mkString("|"))
+  }
+
+  test("ordinary words are not abbreviations") {
+    assertEquals(sents("I said no. Then he left."), Vector("I said no.", "Then he left."))
+    assertEquals(
+      sents("We met in Dec. Then it snowed."),
+      Vector("We met in Dec.", "Then it snowed.")
+    )
+  }
+
+  test("uppercase initialisms and initials") {
+    assertEquals(
+      sents("She went to the U.S. Embassy today."),
+      Vector("She went to the U.S. Embassy today.")
+    )
+    assertEquals(
+      sents("She moved to the U.S. Then she left."),
+      Vector("She moved to the U.S.", "Then she left.")
+    )
+    assertEquals(
+      sents("She got a grade A. Then she left."),
+      Vector("She got a grade A.", "Then she left.")
+    )
+    assertEquals(sents("I met J. Smith there."), Vector("I met J. Smith there."))
+  }
+
+  test("numbers with decimal points and thousands separators are single tokens") {
+    assertEquals(
+      toks("It cost 3.5 dollars, or 1,000 cents."),
+      Vector("It", "cost", "3.5", "dollars", ",", "or", "1,000", "cents", ".")
+    )
+    assertEquals(sents("It was 3. Then 4."), Vector("It was 3.", "Then 4."))
+  }
+
+  test("supplementary-plane characters are never split inside a surrogate pair") {
+    val text = "I saw 𝔸 and 😀 there."
+    val atlas = SurfaceAnalyzer.analyze(StorySource.fromText(text).toOption.get)
+    val ts = atlas.tokens.map(atlas.text)
+    assert(ts.contains("𝔸"), ts.mkString("|"))
+    assert(ts.contains("😀"), ts.mkString("|"))
+    assert(atlas.tokens.forall { u =>
+      val s = atlas.text(u)
+      !Character.isLowSurrogate(s.head) && !Character.isHighSurrogate(s.last)
+    })
+    assert(SurfaceAtlas.validated(atlas).isRight)
+  }
+
+  test("validation rejects overlapping units of one kind") {
+    val src = StorySource.fromText("Alpha beta. Gamma delta.").toOption.get
+    val atlas = SurfaceAnalyzer.analyze(src)
+    val s0 = atlas.sentences.head
+    val overlapping = atlas.copy(units = atlas.units.map { u =>
+      if u.kind == SurfaceUnitKind.Sentence && u.ordinal == 1 then
+        u.copy(span = TextSpan.unsafe(s0.span.endExclusive - 2, u.span.endExclusive))
+      else u
+    })
+    assert(SurfaceAtlas.validated(overlapping).isLeft)
+  }
+
 class QuoteSuite extends munit.FunSuite:
   test("lowercase continuation after a closing quote does not split; parentheses guard"):
     val atlas = SurfaceAnalyzer.analyze(

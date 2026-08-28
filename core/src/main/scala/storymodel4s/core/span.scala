@@ -87,12 +87,21 @@ final case class SpanSet private (refs: NonEmptyVector[SpanRef]):
       }
       ._1
 
-  /** True when the members form one connected run (overlapping or abutting). */
+  /** True when the members form one connected run (overlapping or abutting), tracking the furthest
+    * reach so that a nested member cannot break the chain. Law: `isContiguous` iff
+    * `coveredLength == minSpan.length`.
+    */
   def isContiguous: Boolean =
-    spans.toVector.sliding(2).forall {
-      case Vector(a, b) => a.touches(b) || a.contains(b)
-      case _            => true
-    }
+    val sorted = spans.toVector
+    var reach = sorted.head.endExclusive
+    var ok = true
+    var i = 1
+    while ok && i < sorted.length do
+      val s = sorted(i)
+      if s.start > reach then ok = false
+      else reach = math.max(reach, s.endExclusive)
+      i += 1
+    ok
 
   def units: Set[SurfaceUnitId] = refs.toVector.flatMap(_.unit).toSet
 

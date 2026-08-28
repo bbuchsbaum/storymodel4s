@@ -35,7 +35,7 @@ class DocumentSuite extends ScalaCheckSuite:
       fp,
       StageId.unsafe("test")
     )
-    ClaimMeta(
+    ClaimMeta.unsafe(
       ClaimId.unsafe("claim:doc"),
       EpistemicStatus.StructurallyDerived,
       Credence.unsafeRaw(1.0),
