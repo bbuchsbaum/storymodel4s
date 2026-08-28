@@ -1,5 +1,6 @@
 package storymodel4s.align
 
+import storymodel4s.features.{Estimate, MissingReason}
 import storymodel4s.recall.*
 
 /** Additive terms of the local content cost `C_iv` (design record §7.1). */
@@ -42,29 +43,47 @@ final case class CostBreakdown(
 ):
   def term(t: CostTerm): Double = terms.getOrElse(t, 0.0)
 
-/** Graded semantic distance in `[0, 1]` between a recall unit and a source node. This is the
-  * embedding hook: production supplies cosine distance over feature views; tests supply tables.
-  *
-  * INTEGRATION: replaced by storymodel4s.features (distance results with coverage/missingness).
+/** Graded semantic distance in `[0, 1]` between a recall unit and a source node, or `Missing` when
+  * the provider abstains (no embedding for the unit, out-of-domain text, budget exceeded). This is
+  * the embedding hook: production supplies cosine distance over feature views; tests supply tables.
+  * Missing is never coerced to zero: the cost model substitutes a declared neutral value and
+  * candidate generation skips the dense ranking for that pair.
   */
 trait SemanticDistance:
-  def apply(unit: RecallUnit, node: NodeSummary): Double
+  def apply(unit: RecallUnit, node: NodeSummary): Estimate[Double]
+
+  /** The distance, or `default` when the provider abstained. */
+  def orElse(unit: RecallUnit, node: NodeSummary, default: Double): Double =
+    apply(unit, node).toOption.getOrElse(default)
 
 object SemanticDistance:
-  /** Jaccard distance over content lemmas: a dependency-free fallback. */
-  val lexicalJaccard: SemanticDistance = (unit, node) =>
+  /** Jaccard distance over content lemmas: a dependency-free fallback that never abstains. */
+  val lexicalJaccard: SemanticDistance = SemanticDistance.of { (unit, node) =>
     val a = unit.proposition.lemmas
     val b = node.lemmas
     if a.isEmpty && b.isEmpty then 1.0
     else 1.0 - a.intersect(b).size.toDouble / a.union(b).size.toDouble
+  }
 
   /** Table-driven distance with a default for unlisted pairs (simulates embedding output). */
   def fromTable(
       table: Map[(RecallUnitId, SourceNodeRef), Double],
       default: Double = 0.9
-  ): SemanticDistance = (unit, node) => table.getOrElse((unit.id, node.ref), default)
+  ): SemanticDistance =
+    SemanticDistance.of((unit, node) => table.getOrElse((unit.id, node.ref), default))
 
-  def apply(f: (RecallUnit, NodeSummary) => Double): SemanticDistance = (u, n) => f(u, n)
+  /** Table-driven distance that abstains on unlisted pairs. */
+  def fromTableOrAbstain(table: Map[(RecallUnitId, SourceNodeRef), Double]): SemanticDistance =
+    (unit, node) =>
+      table.get((unit.id, node.ref)) match
+        case Some(d) => Estimate.observed(d)
+        case None    => Estimate.missing(MissingReason.ProviderAbstained)
+
+  /** Lift a total distance function. */
+  def of(f: (RecallUnit, NodeSummary) => Double): SemanticDistance =
+    (u, n) => Estimate.observed(f(u, n))
+
+  def apply(f: (RecallUnit, NodeSummary) => Estimate[Double]): SemanticDistance = (u, n) => f(u, n)
 
 private[align] object Names:
   def overlap(a: Set[String], b: Set[String]): Boolean = a.exists(b.contains)
@@ -175,7 +194,8 @@ final case class DefaultLocalCostModel(
     externalFloor: Double = 1.0,
     gateMargin: Double = 0.5,
     externalMismatch: Double = 0.5,
-    gating: Boolean = true
+    gating: Boolean = true,
+    missingSemantic: Double = 0.5
 ) extends LocalCostModel:
 
   def externalCost(unit: RecallUnit, state: ExternalState): Double =
@@ -184,7 +204,7 @@ final case class DefaultLocalCostModel(
 
   def cost(unit: RecallUnit, node: NodeSummary, view: SourceView): CostBreakdown =
     val sketch = unit.proposition
-    val dSem = clamp(semantic(unit, node))
+    val dSem = clamp(semantic.orElse(unit, node, missingSemantic))
     val dProp = (sketch.predicate, node.predicate) match
       case (Some(a), Some(b)) => if a == b then 0.0 else 1.0
       case _                  => 0.5

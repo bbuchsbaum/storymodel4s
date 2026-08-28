@@ -23,7 +23,7 @@ final case class CandidateGenerator(
   def forUnit(unit: RecallUnit, view: SourceView): Vector[SourceNodeRef] =
     val dense = view.byLevel.toVector.flatMap { case (_, nodes) =>
       nodes
-        .map(n => (n.ref, semantic(unit, n)))
+        .flatMap(n => semantic(unit, n).toOption.map(d => (n.ref, d)))
         .sortBy { case (r, d) => (d, r.key) }
         .take(perLevel)
         .map(_._1)

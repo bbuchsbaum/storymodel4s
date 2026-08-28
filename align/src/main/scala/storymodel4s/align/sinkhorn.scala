@@ -87,7 +87,7 @@ object BaselineAligner:
       AlignmentMatrix(units.map(u => AlignmentRow(u.id, Map.empty)))
     else
       val cost = units.map { u =>
-        columns.map(c => view.node(c).map(n => semantic(u, n)).getOrElse(1.0))
+        columns.map(c => view.node(c).map(n => semantic.orElse(u, n, 1.0)).getOrElse(1.0))
       }
       val a = Vector.fill(units.size)(1.0)
       val b = Vector.fill(columns.size)(units.size.toDouble / columns.size.toDouble)

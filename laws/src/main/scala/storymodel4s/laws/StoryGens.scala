@@ -1,4 +1,6 @@
-package storymodel4s.story
+package storymodel4s.laws
+
+import storymodel4s.story.*
 
 import cats.data.NonEmptyVector
 import org.scalacheck.{Arbitrary, Gen}
@@ -6,7 +8,7 @@ import storymodel4s.core.*
 import storymodel4s.core.NarrativeKind.{EntityK, SituationK}
 
 /** Programmatic construction of small valid story models, and ScalaCheck generators over them. */
-object Small:
+object StorySmall:
   val fp: Fingerprint = Fingerprint.unsafe("test:rules:0")
   val stage: StageId = StageId.unsafe("test")
   val prov: Provenance = Provenance.deterministic("test", Checksum.ofText("test"))
@@ -197,17 +199,17 @@ object Small:
       NarrativeHierarchy(containment, Vector.empty)
     )
 
-object Gens:
-  val built: Gen[Small.Built] = for
+object StoryGens:
+  val built: Gen[StorySmall.Built] = for
     n <- Gen.chooseNum(1, 8)
     m <- Gen.chooseNum(1, 4)
     chain <- Gen.oneOf(true, false)
-  yield Small.build(n, m, chain)
+  yield StorySmall.build(n, m, chain)
 
   val temporalRelation: Gen[TemporalRelation] = Gen.oneOf(TemporalRelation.values.toSeq)
 
   val canonicalRelation: Gen[TemporalRelation] =
     Gen.oneOf(TemporalRelation.values.filter(_.isCanonical).toSeq)
 
-  given Arbitrary[Small.Built] = Arbitrary(built)
+  given Arbitrary[StorySmall.Built] = Arbitrary(built)
   given Arbitrary[TemporalRelation] = Arbitrary(temporalRelation)

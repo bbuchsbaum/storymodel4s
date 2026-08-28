@@ -1,6 +1,7 @@
 package storymodel4s.align
 
 import storymodel4s.core.{SegmentId, SituationId, SpanSet}
+import storymodel4s.features.{Estimate, ScoreEstimate}
 import storymodel4s.recall.{ModalityTag, PolarityTag, SketchRole}
 
 /** An alignable source node: an atomic situation or a composite segment (scene, episode, root). */
@@ -52,7 +53,7 @@ final case class ParticipantSummary(role: SketchRole, label: String, aliases: Se
   * all nodes at its level (0-based); `support` is exact evidence in the source text; `lemmas` are
   * content lemmas of the supporting text plus the predicate and participant labels; `importance` is
   * an injected salience weight used only for importance-weighted coverage, never for matching
-  * (INTEGRATION: `importance` becomes a `storymodel4s.features.ScoreEstimate` with missingness).
+  * (`Missing` importance excludes the node from importance-weighted coverage; it is never zero).
   */
 final case class NodeSummary(
     ref: SourceNodeRef,
@@ -69,7 +70,7 @@ final case class NodeSummary(
     lemmas: Set[String],
     outcome: Option[String] = None,
     cause: Option[String] = None,
-    importance: Double = 1.0
+    importance: ScoreEstimate = Estimate.observed(1.0)
 ):
   def byRole(role: SketchRole): Option[ParticipantSummary] = participants.find(_.role == role)
   def agent: Option[ParticipantSummary] = byRole(SketchRole.Agent)
