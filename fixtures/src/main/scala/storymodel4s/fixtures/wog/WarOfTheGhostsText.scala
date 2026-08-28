@@ -4,10 +4,10 @@ package storymodel4s.fixtures.wog
   *
   * Source: Boas, F. (1901). ''Kathlamet Texts''. Bureau of American Ethnology Bulletin 26, pp.
   * 182–184, "The War of the Ghosts (told 1891)", narrated by Charles Cultee. United States
-  * Government publication; public domain. Obvious OCR errors were corrected against the
-  * interlinear gloss; the place name is normalized to "Egulac" (Boas prints Lgu'laq) as in
-  * Bartlett (1932), whose lightly edited stimulus version differs in wording and is not yet in
-  * the public domain (a lab copy may be registered as a second fixture version later).
+  * Government publication; public domain. Obvious OCR errors were corrected against the interlinear
+  * gloss; the place name is normalized to "Egulac" (Boas prints Lgu'laq) as in Bartlett (1932),
+  * whose lightly edited stimulus version differs in wording and is not yet in the public domain (a
+  * lab copy may be registered as a second fixture version later).
   *
   * Do not edit this text: the fixture's story ID is its checksum.
   */
