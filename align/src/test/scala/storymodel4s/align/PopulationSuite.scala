@@ -5,7 +5,6 @@ import org.scalacheck.{Arbitrary, Gen}
 import org.scalacheck.Prop.forAll
 
 import storymodel4s.features.Estimate
-import storymodel4s.recall.RecallUnitId
 
 class PopulationSuite extends ScalaCheckSuite:
   import AnnaFixture.{view, e1, e5, sc1, sc2, root}
