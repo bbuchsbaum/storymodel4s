@@ -1,0 +1,160 @@
+# ::id g01-control
+(w / want-01
+   :ARG0 (b / boy)
+   :ARG1 (g / go-02
+            :ARG0 b))
+
+# ::id g02-inverse-top
+(b / boy
+   :ARG0-of (s / sing-01))
+
+# ::id g03-reentrancy-embedded
+(s / say-01
+   :ARG0 (g / girl)
+   :ARG1 (l / like-01
+            :ARG0 g
+            :ARG1 (b / boy)))
+
+# ::id g04-polarity
+(g / go-02
+   :ARG0 (b / boy)
+   :polarity -)
+
+# ::id g05-name
+(p / person
+   :name (n / name
+            :op1 "Barack"
+            :op2 "Obama"))
+
+# ::id g06-quantity
+(d / distance-quantity
+   :quant 5
+   :unit (m / mile))
+
+# ::id g07-date
+(d / date-entity
+   :year 2012
+   :month 2
+   :day 29)
+
+# ::id g08-coordination
+(a / and
+   :op1 (b / boy)
+   :op2 (g / girl))
+
+# ::id g09-multi-sentence
+(m / multi-sentence
+   :snt1 (l / leave-11
+            :ARG0 (b / boy))
+   :snt2 (c / cry-02
+            :ARG0 (g / girl)))
+
+# ::id g10-legitimate-cycle
+(w / want-01
+   :ARG0 (b / boy)
+   :ARG1 (b2 / believe-01
+             :ARG0 (g / girl)
+             :ARG1 w))
+
+# ::id g11-metadata-and-alignment ::snt Once when I was six years old I saw a picture.
+(s / see-01~e.6
+   :ARG0 (i / i~e.5)
+   :ARG1 (p / picture~e.8)
+   :time (o / once~e.0))
+
+# ::id g12-string-escape
+(p / person
+   :name (n / name
+            :op1 "O\"Brien"))
+
+# ::id g13-negative-number
+(t / temperature-quantity
+   :quant -5
+   :scale (c / celsius))
+
+# ::id g14-domain
+(t / tall
+   :domain (g / girl))
+
+# ::id g15-consist-of
+(r / ring
+   :consist-of (g / gold))
+
+# ::id g16-imperative
+(g / go-02
+   :ARG0 (y / you)
+   :mode imperative)
+
+# ::id g17-amr-unknown
+(f / find-01
+   :ARG0 (y / you)
+   :ARG1 (a / amr-unknown))
+
+# ::id g18-obligation
+(o / obligate-01
+   :ARG1 (b / boy)
+   :ARG2 (g / go-02
+            :ARG0 b))
+
+# ::id g19-deep-reentrancy
+(w / want-01
+   :ARG0 (b / boy)
+   :ARG1 (b2 / believe-01
+             :ARG0 (g / girl)
+             :ARG1 (l / like-01
+                      :ARG0 g
+                      :ARG1 b)))
+
+# ::id g20-org-role
+(p / person
+   :ARG0-of (h / have-org-role-91
+               :ARG1 (c / country
+                        :name (n / name
+                                 :op1 "France"))
+               :ARG2 (p2 / president)))
+
+# ::id g21-time-weekday
+(g / go-02
+   :ARG0 (b / boy)
+   :time (d / date-entity
+            :weekday (t / tuesday)))
+
+# ::id g22-decimal
+(t / temperature-quantity
+   :quant 1.5
+   :scale (k / kelvin))
+
+# ::id g23-string-with-space
+(c / city
+   :name (n / name
+            :op1 "New York"))
+
+# ::id g24-role-alignment
+(b / boy~e.1
+   :ARG0-of~e.2 (s / sing-01~e.2))
+
+# ::id g25-wiki-dash
+(c / country
+   :wiki -
+   :name (n / name
+            :op1 "Narnia"))
+
+# ::id g26-two-inverse-chain
+(m / man
+   :ARG0-of (s / see-01
+               :ARG1 (d / dog
+                        :ARG1-of (b / bite-01
+                                    :ARG0 m))))
+
+# ::id g27-shared-literal
+(a / and
+   :op1 (c / cost-01
+           :ARG1 (b / book)
+           :ARG2 (m / monetary-quantity
+                    :quant 5
+                    :unit (d / dollar)))
+   :op2 (c2 / cost-01
+            :ARG1 (p / pen)
+            :ARG2 (m2 / monetary-quantity
+                      :quant 5
+                      :unit (d2 / dollar))))
