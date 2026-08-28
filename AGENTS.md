@@ -24,6 +24,7 @@ Package namespace is flat `storymodel4s.<module>`.
 | `align`     | `storymodel4s.align`      | Local costs, unbalanced transport, graph-HSMM trajectory inference, recall signature |
 | `interview` | `storymodel4s.interview`  | Transcript atlas, detail atoms, memory addresses, target-episode induction, AI-compatible scores, rich profile |
 | `embed-core` | `storymodel4s.embed`     | Portable embedding contract (ADR 0001): `ProviderFingerprint` vs per-recipe `EmbeddingSpace`/`GeometryId` with validated `GeometryPair`, `EmbedBatch → BatchResult` with per-item outcomes and `AttemptReceipt`, `ValidatedVector`/`ValidatedDistance`, `SemanticView`, free deterministic baselines (hashed n-gram, TF-IDF), `EmbeddingCache` + keyed `SensitiveDigest`, `RemotePolicy → AuthorizedRemoteRequest`. Depends on `core`, `features`, `acquire`; providers are JVM-only adapters |
+| `embed-grakern` | `storymodel4s.embed.grakern` | **JVM-only** structural channel (ADR 0001 §D4c): `PropositionChart` → grakern `LabelledNeighbourhood` by relation reification with explicit source/target incidence; WL subtree + optimal-assignment kernels; `structural.wl.grakern` spaces; `GrakernStructuralDistance` (`d_wl`) with memoized query rows and `ProviderCall` receipts. Consumes grakern by immutable SHA `ProjectRef` (`-Dstorymodel4s.grakern.build=<local checkout>` required until grakern is pushed); no grakern/graph4s type crosses into portable modules |
 | `codec`     | `storymodel4s.codec`      | Canonical circe JSON codecs |
 | `fixtures`  | `storymodel4s.fixtures`   | Hand-authored *War of the Ghosts* model, recall paraphrases, interview example |
 | `laws`      | `storymodel4s.laws`       | Published Discipline law suites and ScalaCheck generators |
@@ -32,7 +33,9 @@ Package namespace is flat `storymodel4s.<module>`.
 
 - Scala 3.7.4, sbt 1.12.14, sbt-typelevel 0.8.7.
 - `sbt compileAll testAll` (all platforms) before declaring work complete;
-  `sbt testJVM` for a fast loop.
+  `sbt testJVM` for a fast loop. The JVM-only `embed-grakern` project needs
+  `-Dstorymodel4s.grakern.build=/path/to/grakern` (or `STORYMODEL4S_GRAKERN_BUILD`)
+  until grakern is published; it is part of `compileAll`/`testAll`/`testJVM`.
 - Warnings are errors in spirit: keep `-Wunused:all -Wvalue-discard` clean.
 - munit + munit-scalacheck at test scope; law suites in `laws` use discipline-munit.
 - `Test / parallelExecution := false`.
