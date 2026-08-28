@@ -141,7 +141,9 @@ object WindowReducer:
 
   /** Kernel smoothing where the distance of a sample from the window centre is supplied by the
     * caller (`distance`, in basis positions) instead of read off `Sample.position`: the reducer for
-    * centred windows over narrative units, whose bandwidth counts units, not tokens.
+    * centred windows over narrative units, whose bandwidth counts units, not tokens. A declared
+    * point mass whose centre has no observed sample yields the mean of every observed sample at the
+    * minimal distance (the nearest unit), never a single arbitrary sample.
     */
   private[features] def kernelAt(
       shape: KernelShape,
@@ -155,8 +157,11 @@ object WindowReducer:
           val tw = weighted.map(_._2).sum
           if tw > 0.0 then Estimate.observed(weighted.map((v, w) => v * w).sum / tw)
           else if shape.isPointMass then
-            // a declared point mass whose centre unit has no observed sample: the nearest unit
-            Estimate.observed(obs.minBy((s, _) => distance(s))._2)
+            // a declared point mass whose centre unit has no observed sample: the mean of all
+            // observed samples at the minimal distance, i.e. the whole nearest unit
+            val nearest = obs.map((s, _) => distance(s)).min
+            val vs = obs.collect { case (s, v) if distance(s) == nearest => v }
+            Estimate.observed(vs.sum / vs.size)
           else undefined(UndefinedReason.OutsideKernelSupport)
 
 /** Windowed reduction of a token-aligned scalar track into a window-aligned track.
@@ -223,6 +228,9 @@ object Windowed:
       )
     }
 
+  /** Implementation version recorded in narrative-window recipes; bump whenever
+    * [[Windowed.overBasis]] changes any output value, so old derivation ids never alias new ones.
+    */
   val narrativeImplementationVersion = "narrative-windowed-1"
 
   /** Centred windows of `±plan.halfWidth` units over a [[NarrativeBasis]]: one observation per unit
@@ -278,6 +286,9 @@ object Windowed:
       }
       val red = reducer match
         case ScalarReducer.Kernel(shape) =>
+          // every sample position is a key of `distanceOf`: samples come from `eligible`, which is
+          // drawn from `covered`, the very pairs `distanceOf` was folded from — the default is
+          // unreachable and only keeps the lookup total
           WindowReducer.kernelAt(shape, s => distanceOf.getOrElse(s.position, 0).toDouble)
         case other => WindowReducer.scalar(other)
       val support = SpanSet
@@ -489,10 +500,8 @@ object NarrativeBasis:
       resolver: SupportResolver
   ): Either[DomainError, NarrativeBasis[T]] =
     val path = "features/narrative-basis"
-    val duplicate = targets.groupBy(t => t: FeatureTarget).collectFirst {
-      case (t, occurrences) if occurrences.size > 1 => t
-    }
-    duplicate match
+    // the first repeated target in basis order, not hash order
+    targets.diff(targets.distinct).headOption match
       case Some(dup) =>
         Left(DomainError.DuplicateId("FeatureTarget", FeatureTargetKey.parts(dup).mkString("/")))
       case None =>

@@ -353,7 +353,8 @@ object FeatureCodecs:
       iv <- field[String](c, "implementationVersion")
       el <- field[Eligibility](c, "eligibility")
       tf <- field[Option[TargetFamily]](c, "targetFamily")
-    yield FeatureDerivation(nev, w, r, wp, m, n, iv, el, tf, nw)
+      d <- domain(c, FeatureDerivation.of(nev, w, r, wp, m, n, iv, el, tf, nw))
+    yield d
   }
 
   /** Inline tracks over any target, for scalar (`Double`) and categorical (`String`) values. */

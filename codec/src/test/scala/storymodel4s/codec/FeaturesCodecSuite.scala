@@ -44,10 +44,14 @@ class FeaturesCodecSuite extends ScalaCheckSuite:
 
   private val derivation: Gen[FeatureDerivation] = for
     in <- validId.map(FeatureSpaceId.unsafe)
-    w <- Gen.option(
-      Gen.oneOf(WindowPlan.words(20, 5), WindowPlan.sentences(1, 1), WindowPlan.tokens(3, 1))
+    // a recipe slides over at most one axis
+    (w, nw) <- Gen.oneOf(
+      Gen.const((None, None)),
+      Gen
+        .oneOf(WindowPlan.words(20, 5), WindowPlan.sentences(1, 1), WindowPlan.tokens(3, 1))
+        .map(p => (Some(p), None)),
+      narrativePlan.map(p => (None, Some(p)))
     )
-    nw <- Gen.option(narrativePlan)
     red <- reducer
     miss <- Gen.oneOf(
       MissingValuePolicy.IgnoreMissing,
@@ -138,6 +142,22 @@ class FeaturesCodecSuite extends ScalaCheckSuite:
     val planText = Canonical.encode(withPlan)
     assert(planText.contains(""""narrativeWindow":{"halfWidth":2}"""))
     assertEquals(Canonical.decode[FeatureDerivation](planText), Right(withPlan))
+  }
+
+  test("a document carrying both a surface and a narrative window is a typed decode error") {
+    val both = FeatureDerivation(
+      NonEmptyVector.one(FeatureSpaceId.unsafe("imageability.demo")),
+      Some(WindowPlan.words(20, 5)),
+      ScalarReducer.Mean.id,
+      ScalarReducer.Mean.weighting,
+      MissingValuePolicy.IgnoreMissing,
+      None,
+      "codec-test",
+      narrativeWindow = NarrativeWindowPlan.of(1).toOption
+    )
+    Canonical.decode[FeatureDerivation](Canonical.encode(both)) match
+      case Left(e)  => assert(e.toString.contains("narrative window"), e.toString)
+      case Right(d) => fail(s"decoded an invalid recipe: $d")
   }
 
   test("accepted canonical text is a fixed point: encode(decode(json)) == json") {

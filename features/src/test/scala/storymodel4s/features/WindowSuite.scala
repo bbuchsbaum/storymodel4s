@@ -625,6 +625,10 @@ class WindowSuite extends ScalaCheckSuite:
         .flatMap(j => raw.get(FeatureTarget.Token(j)).flatMap(_.toOption))
     )
     assertEqualsDouble(wide.observations(1).estimate.toOption.get, pooled.sum / pooled.size, 1e-9)
+    // the point-mass fallback averages every observed sample of the nearest units (here the two
+    // neighbours at distance 1, several samples each), never a single sample
+    assert(pooled.size >= 2)
+    assertEqualsDouble(point.observations(1).estimate.toOption.get, pooled.sum / pooled.size, 1e-9)
     // the recipe distinguishes kernels by shape and bandwidth
     assertNotEquals(narrow.space.id, wide.space.id)
     assertNotEquals(point.space.id, narrow.space.id)

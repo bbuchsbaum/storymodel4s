@@ -343,5 +343,35 @@ class StructureSuite extends ScalaCheckSuite:
     assert(NarrativeWindowPlan.of(-1).isLeft)
   }
 
+  test("a recipe with both a surface and a narrative window is refused at every boundary") {
+    val plan = NarrativeWindowPlan.of(1).toOption.get
+    val ok = FeatureDerivation.of(
+      NonEmptyVector.one(sp("a")),
+      None,
+      ScalarReducer.Mean.id,
+      WeightingPolicy.Uniform,
+      MissingValuePolicy.IgnoreMissing,
+      None,
+      "test-1",
+      narrativeWindow = Some(plan)
+    )
+    assert(ok.exists(_.hasSingleWindow))
+    val both = FeatureDerivation.of(
+      NonEmptyVector.one(sp("a")),
+      Some(WindowPlan.words(20, 5)),
+      ScalarReducer.Mean.id,
+      WeightingPolicy.Uniform,
+      MissingValuePolicy.IgnoreMissing,
+      None,
+      "test-1",
+      narrativeWindow = Some(plan)
+    )
+    assert(both.isLeft)
+    val raw = deriv(sp("raw")).copy(narrativeWindow = Some(plan))
+    assert(FeatureDerivation.validated(raw).isLeft)
+    assert(DerivationGraph.empty.add(sp("out"), raw).isLeft)
+    assert(DerivationGraph.empty.add(sp("out"), deriv(sp("raw"))).isRight)
+  }
+
   private val GoldenDerivationId: String =
     "c0e730f22d83662f4310fbdba4a1d799bd9badc77ca5657b7e67fc09c2522e45"

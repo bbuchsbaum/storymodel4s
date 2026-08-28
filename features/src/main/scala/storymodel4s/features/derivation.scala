@@ -136,7 +136,9 @@ final case class FeatureDerivation(
       "impl=" + implementationVersion
     )).mkString(";")
 
-  /** A recipe must not slide over two axes at once. */
+  /** A recipe must not slide over two axes at once; enforced by [[FeatureDerivation.of]], the codec
+    * decoder, and [[DerivationGraph.add]].
+    */
   def hasSingleWindow: Boolean = window.isEmpty || narrativeWindow.isEmpty
 
   /** Content address of the recipe. */
@@ -147,6 +149,47 @@ final case class FeatureDerivation(
     */
   def outputSpaceId: FeatureSpaceId =
     FeatureSpaceId.unsafe("derived:" + derivationId.short(32))
+
+object FeatureDerivation:
+  private val path = "features/derivation"
+
+  /** Checked constructor: rejects a recipe carrying both a surface and a narrative window. The
+    * case-class constructor stays public because recipes are also built by `align` and by `copy` in
+    * tests; every boundary that admits a recipe (codec, [[DerivationGraph.add]]) re-validates.
+    */
+  def of(
+      inputs: NonEmptyVector[FeatureSpaceId],
+      window: Option[WindowPlan],
+      reducer: ReducerId,
+      weighting: WeightingPolicy,
+      missing: MissingValuePolicy,
+      normalization: Option[NormalizationPolicy],
+      implementationVersion: String,
+      eligibility: Eligibility = Eligibility.LexicalTokens,
+      targetFamily: Option[TargetFamily] = None,
+      narrativeWindow: Option[NarrativeWindowPlan] = None
+  ): Either[DomainError, FeatureDerivation] =
+    validated(
+      FeatureDerivation(
+        inputs,
+        window,
+        reducer,
+        weighting,
+        missing,
+        normalization,
+        implementationVersion,
+        eligibility,
+        targetFamily,
+        narrativeWindow
+      )
+    )
+
+  def validated(d: FeatureDerivation): Either[DomainError, FeatureDerivation] =
+    if d.hasSingleWindow then Right(d)
+    else
+      Left(
+        DomainError.InvariantViolation(path, "recipe carries both a surface and a narrative window")
+      )
 
 /** Dependency graph over feature spaces: which recipe produced each derived space.
   *
@@ -175,6 +218,10 @@ final case class DerivationGraph private (edges: Map[FeatureSpaceId, FeatureDeri
   def add(output: FeatureSpaceId, d: FeatureDerivation): Either[DomainError, DerivationGraph] =
     val path = s"features/derivations/${output.value}"
     if edges.contains(output) then Left(DomainError.DuplicateId("FeatureSpaceId", output.value))
+    else if !d.hasSingleWindow then
+      Left(
+        DomainError.InvariantViolation(path, "recipe carries both a surface and a narrative window")
+      )
     else if d.inputs.toVector.contains(output) then
       Left(DomainError.InvariantViolation(path, "space derived from itself"))
     else
