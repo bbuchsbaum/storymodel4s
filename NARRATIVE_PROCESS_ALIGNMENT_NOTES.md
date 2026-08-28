@@ -4355,3 +4355,20 @@ The checked-in roadmap is internally inconsistent with the latest decision:
 - provider automation begins later even though unattended acquisition is now P0.
 
 Closure recommendation: reconcile the roadmap, local `AGENTS.md`, module names/dependencies, M0 scope, and fixture policy **before any `amr` source code lands**.
+
+---
+
+# Reconciliation Record — 2026-08-28 (plan revision 2)
+
+## 105. Closure of the §104 inconsistencies
+
+The checked-in roadmap (`docs/plans/2026-08-28-architecture-and-roadmap.md`, revision 2), `AGENTS.md`, and `build.sbt` were reconciled to §84–104 in one commit (`ef44e3f`):
+
+1. **Canonical local object.** `PropositionChart` (`proposition` module) is the contract; `amr-interop` is an adapter with conversion to/from charts and retained AMR provenance; no narrative, recall, or interview API references an AMR type. Module dependency structure is exactly §99.
+2. **Autonomy is P0.** New portable `acquire` module holds task packets, proposal-only agent results, critic findings, typed patches, `ResolutionState`, acceptance policy, stage-cache keys, prompt-package manifests, foil interfaces, and effect-free orchestration contracts; JVM-only providers and the orchestrator runtime are M1 ("autonomous vertical slice"), not later hardening.
+3. **Fixture policy.** WOG is a researcher-reviewed *narrative acceptance fixture* in narrative types plus plain-language expectation records; AMR conformance gold comes from published guideline examples only; story charts are machine-generated silver. No hand-authored AMR anywhere in the plan.
+4. **WOG text.** Bartlett (1932) is not yet public domain (US: 2028); the fixture uses Boas (1901) *Kathlamet Texts* pp. 182–184 (US government publication), stored with provenance; a lab copy of the Bartlett stimulus may be registered later as a second version with its own checksum.
+5. **Deferred from M0:** reification, UMR I/O, Smatch optimization, generated frame builders.
+6. **Parser skepticism** is recorded as a benchmark hypothesis with two acquisition profiles (§101), not a design fact.
+
+Superseded: roadmap revision 1's opening diagram, module table, and M0 scope (retained in git history).
