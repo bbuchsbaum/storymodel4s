@@ -89,7 +89,11 @@ class BaselineSuite extends ScalaCheckSuite:
 
   test("query/document spaces of one baseline form a validated pair") {
     val e = HashedNgramEmbedder[Id](32, 0L)
-    assert(GeometryPair.validated(querySpace(e), docSpace(e)).isRight)
+    assert(
+      GeometryPair
+        .validated(querySpace(e), docSpace(e), GeometryPairRule.IdenticalModelling)
+        .isRight
+    )
   }
 
   test("caching embedder: second batch hits, receipts record decisions, sensitive keys are HMAC") {
