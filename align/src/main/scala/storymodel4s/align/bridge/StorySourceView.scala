@@ -11,6 +11,7 @@ import storymodel4s.story.{
   Modality,
   NarrativeNodeId,
   Polarity,
+  PropositionEvidenceSource,
   StoryModel,
   RelationLayer as StoryLayer
 }
@@ -44,7 +45,8 @@ final class StorySourceView private (
     source: AlignmentSource,
     model: StoryModel[?],
     semantic: Map[SourceNodeRef, Map[SourceNodeRef, Double]],
-    maxFanout: Int
+    maxFanout: Int,
+    evidence: PropositionEvidenceSource
 ) extends SourceView:
 
   private val text: String = model.source.canonicalText
@@ -105,7 +107,10 @@ final class StorySourceView private (
       source.polarityOf(n).map(StorySourceView.polarityTag).getOrElse(PolarityTag.Unknown),
       source.modalityOf(n).map(StorySourceView.modalityTag).getOrElse(ModalityTag.Unknown),
       locations,
-      lemmas
+      lemmas,
+      evidence = n match
+        case NarrativeNodeId.Situation(_) => evidence.propositionEvidenceOf(n)
+        case NarrativeNodeId.Segment(_)   => None // segments never get a fabricated chart
     )
 
   val nodes: Vector[NodeSummary] =
@@ -288,14 +293,28 @@ object StorySourceView:
       source: AlignmentSource,
       model: StoryModel[ModelStatus.Validated],
       semantic: Map[SourceNodeRef, Map[SourceNodeRef, Double]] = Map.empty,
-      maxFanout: Int = DefaultMaxFanout
-  ): StorySourceView = new StorySourceView(source, model, semantic, math.max(1, maxFanout))
+      maxFanout: Int = DefaultMaxFanout,
+      evidence: PropositionEvidenceSource = PropositionEvidenceSource.none
+  ): StorySourceView =
+    new StorySourceView(source, model, semantic, math.max(1, maxFanout), evidence)
 
-  def validated(model: StoryModel[ModelStatus.Validated]): StorySourceView =
-    new StorySourceView(AlignmentSource(model), model, Map.empty, DefaultMaxFanout)
+  def validated(
+      model: StoryModel[ModelStatus.Validated],
+      evidence: PropositionEvidenceSource = PropositionEvidenceSource.none
+  ): StorySourceView =
+    new StorySourceView(AlignmentSource(model), model, Map.empty, DefaultMaxFanout, evidence)
 
-  def adjudicated(model: StoryModel[ModelStatus.Adjudicated]): StorySourceView =
-    new StorySourceView(AlignmentSource.adjudicated(model), model, Map.empty, DefaultMaxFanout)
+  def adjudicated(
+      model: StoryModel[ModelStatus.Adjudicated],
+      evidence: PropositionEvidenceSource = PropositionEvidenceSource.none
+  ): StorySourceView =
+    new StorySourceView(
+      AlignmentSource.adjudicated(model),
+      model,
+      Map.empty,
+      DefaultMaxFanout,
+      evidence
+    )
 
   def sketchRole(role: ParticipantRole): SketchRole = role match
     case ParticipantRole.Agent         => SketchRole.Agent

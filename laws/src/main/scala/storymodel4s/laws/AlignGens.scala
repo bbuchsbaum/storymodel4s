@@ -113,10 +113,13 @@ object AlignGens:
       (r, s) <- recall(v)
     yield Case(v, r, s)
 
-  def infer(c: Case): HsmmResult =
+  def infer(c: Case): HsmmResult = inferWith(c, DefaultLocalCostModel(semantic = c.semantic))
+
+  /** Inference on a case with an explicit cost model (same candidates as [[infer]]). */
+  def inferWith(c: Case, model: LocalCostModel): HsmmResult =
     val cands = CandidateGenerator(c.semantic, perLevel = 2).generate(c.recall.ordered, c.view)
     GraphHsmm
-      .infer(c.recall, c.view, cands, DefaultLocalCostModel(semantic = c.semantic))
+      .infer(c.recall, c.view, cands, model)
       .fold(e => throw new IllegalStateException(e.message), identity)
 
   // ---- adversarial foil cases for the mode-gate laws (ADR 0001 rev 3 §D5) ------------------
