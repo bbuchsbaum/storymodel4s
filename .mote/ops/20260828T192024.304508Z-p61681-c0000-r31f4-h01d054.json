@@ -1,0 +1,1 @@
+{"actor":"claude-storymodel4s","entity":"bd-01M14K85APG7YFHKHRVEKNHS0T","kind":"reserve_open","mode":"exclusive","op":"20260828T192024.304508Z-p61681-c0000-r31f4-h01d054","paths":["fixtures/src/test/scala/storymodel4s/fixtures/wog/WarOfTheGhostsAtlasSuite.scala"],"reservation_id":"rv-01M14X1VFGJ4QQAX4DY7GN308E","ts":"2026-08-28T19:20:24.304508Z","ttl_s":3600,"v":1}
