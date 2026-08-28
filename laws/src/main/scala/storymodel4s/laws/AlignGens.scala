@@ -122,6 +122,73 @@ object AlignGens:
       .infer(c.recall, c.view, cands, model)
       .fold(e => throw new IllegalStateException(e.message), identity)
 
+  // ---- forgeries for the gate-proof laws --------------------------------------------------
+
+  /** Gated inference on a foil case (same construction as ModeGateLaws). */
+  def inferFoil(f: FoilCase): HsmmResult =
+    GraphHsmm
+      .infer(f.recall, f.base.view, f.candidates, f.costModel, f.config)
+      .fold(e => throw new IllegalStateException(e.message), identity)
+
+  /** Every single-edit forgery of an inferred result that puts mass, a cost entry, a flow entry, or
+    * a Viterbi step on an `(anchor, mode)` pair the recorded admissibility does not admit. Each
+    * element is `(posterior, flow, viterbi, costs)` to re-validate against the original
+    * admissibility; all must be rejected. Built only through the public smart constructors.
+    */
+  def forgeries(
+      r: HsmmResult
+  ): Vector[
+    (
+        AlignmentMatrix,
+        TransitionFlow,
+        Vector[AlignState],
+        Map[RecallUnitId, Map[
+          AlignState,
+          CostBreakdown
+        ]]
+    )
+  ] =
+    val rows = r.posterior.rows
+    val spare = cats.data.NonEmptySet.one(Facet.Outcome)
+    def inadmissible(unit: RecallUnitId): Vector[AlignState] =
+      r.admissibility.getOrElse(unit, Map.empty).toVector.sortBy(_._1.key).flatMap { (ref, a) =>
+        val faithful = if a.faithful then Vector.empty else Vector(AlignState.Source(ref))
+        val distorted =
+          if a.distortion.contains(spare) then Vector.empty
+          else Vector(AlignState.Distorted(ref, spare))
+        faithful ++ distorted
+      }
+    def rowWith(row: AlignmentRow, s: AlignState): AlignmentRow =
+      AlignmentRow
+        .of(row.unit, row.mass.updated(s, 0.1))
+        .fold(e => throw new IllegalStateException(e.message), identity)
+    rows.zipWithIndex.flatMap { (row, i) =>
+      inadmissible(row.unit).flatMap { bad =>
+        val posterior = AlignmentMatrix
+          .of(rows.updated(i, rowWith(row, bad)))
+          .fold(e => throw new IllegalStateException(e.message), identity)
+        val onPosterior = (posterior, r.flow, r.viterbi, r.costs)
+        val onPath = (r.posterior, r.flow, r.viterbi.updated(i, bad), r.costs)
+        val onCosts =
+          (
+            r.posterior,
+            r.flow,
+            r.viterbi,
+            r.costs.updated(
+              row.unit,
+              r.costs.getOrElse(row.unit, Map.empty).updated(bad, CostBreakdown.unreachable)
+            )
+          )
+        val onFlow = r.flow.steps.zipWithIndex.collect {
+          case (st, j) if st.from == row.unit =>
+            val other = rows(j + 1).mass.keys.headOption.getOrElse(AlignState.unranked)
+            val steps = r.flow.steps.updated(j, st.copy(mass = st.mass.updated((bad, other), 0.1)))
+            (r.posterior, TransitionFlow(steps), r.viterbi, r.costs)
+        }
+        Vector(onPosterior, onPath, onCosts) ++ onFlow
+      }
+    }
+
   // ---- adversarial foil cases for the mode-gate laws (ADR 0001 rev 3 §D5) ------------------
 
   /** A recall unit built to contradict a chosen leaf on a chosen facet, plus an adversarial

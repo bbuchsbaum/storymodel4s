@@ -84,6 +84,25 @@ object Density:
   */
 object SupportDensity:
 
+  /** Densities of a gated result (the proof type; see [[HsmmResult]]). */
+  def discourse(result: HsmmResult, view: SourceView): Vector[Density] =
+    discourse(result.posterior, view)
+
+  def discourse(
+      result: HsmmResult,
+      view: SourceView,
+      grid: Int,
+      bandwidth: Double
+  ): Vector[Density] =
+    discourse(result.posterior, view, grid, bandwidth)
+
+  def worldTime(result: HsmmResult, view: SourceView): Option[Vector[Density]] =
+    worldTime(result.posterior, view)
+
+  /** Densities of a posterior. `AlignmentMatrix` can only be produced by this module's aligners
+    * (its constructor is `private[align]`), so a caller cannot mint one; the baseline aligner's
+    * matrix is the documented ablation input.
+    */
   def discourse(
       posterior: AlignmentMatrix,
       view: SourceView,

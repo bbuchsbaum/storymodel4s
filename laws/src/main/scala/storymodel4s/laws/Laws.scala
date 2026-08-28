@@ -252,6 +252,44 @@ object ModeGateLaws extends Laws:
         }
     )
 
+/** The gated result is a proof (forward-review P0; ADR 0001 rev 3 L1): only [[GraphHsmm.infer]] or
+  * [[HsmmResult.validated]] can produce an [[HsmmResult]], and `validated` refuses any part that
+  * puts mass, a cost, or a path step on an `(anchor, mode)` pair the gate did not admit.
+  */
+object GateProofLaws extends Laws:
+  private def parts(r: HsmmResult) =
+    (r.posterior, r.flow, r.viterbi, r.logLikelihood, r.costs, r.admissibility, r.refinementPasses)
+
+  def gateProof(using Arbitrary[AlignGens.Case], Arbitrary[AlignGens.FoilCase]): RuleSet =
+    new DefaultRuleSet(
+      "align.gateProof",
+      None,
+      "every inferred result re-validates to itself" -> forAll { (c: AlignGens.Case) =>
+        val r = AlignGens.infer(c)
+        val (p, f, v, ll, cs, a, n) = parts(r)
+        HsmmResult.validated(p, f, v, ll, cs, a, n) == Right(r)
+      },
+      "moving any mass onto an inadmissible (anchor, mode) is rejected" ->
+        forAll { (f: AlignGens.FoilCase) =>
+          val r = AlignGens.inferFoil(f)
+          AlignGens.forgeries(r).forall { case (p, fl, v, cs) =>
+            HsmmResult
+              .validated(p, fl, v, r.logLikelihood, cs, r.admissibility, r.refinementPasses)
+              .isLeft
+          }
+        },
+      "a foil result has at least one inadmissible pair to forge onto" ->
+        forAll { (f: AlignGens.FoilCase) => AlignGens.forgeries(AlignGens.inferFoil(f)).nonEmpty },
+      "dropping the admissibility record invalidates every anchored result" ->
+        forAll { (c: AlignGens.Case) =>
+          val r = AlignGens.infer(c)
+          val anchored = r.posterior.rows.exists(_.sourceMass > 0.0)
+          !anchored || HsmmResult
+            .validated(r.posterior, r.flow, r.viterbi, r.logLikelihood, r.costs, Map.empty, 0)
+            .isLeft
+        }
+    )
+
 /** Discipline rule sets for feature estimates and reducers. */
 object EstimateLaws extends Laws:
   private val reducers: Gen[ScalarReducer] = Gen.oneOf(

@@ -117,20 +117,35 @@ class PopulationSuite extends ScalaCheckSuite:
     val a = SubjectAlignment(sid("s"), full, None)
     assert(PopulationAggregate.of(view, Vector(a, a.copy(wordCount = Some(1)))).isLeft)
     val alien = SourceNodeRef.Situation(storymodel4s.core.SituationId.unsafe("not-in-view"))
-    val badRow = AlignmentRow(RecallUnitId.unsafe("x0"), Map(AlignState.Source(alien) -> 1.0))
-    val badResult = HsmmResult(
-      AlignmentMatrix(Vector(badRow)),
+    val x0 = RecallUnitId.unsafe("x0")
+    val badRow = AlignmentRow(x0, Map(AlignState.Source(alien) -> 1.0))
+    // A gated result whose admissibility admits the alien anchor: the proof holds, but the
+    // population rejects it because the anchor is absent from the view.
+    val badResult = HsmmResult
+      .validated(
+        AlignmentMatrix(Vector(badRow)),
+        TransitionFlow(Vector.empty),
+        Vector(AlignState.Source(alien)),
+        0.0,
+        Map.empty,
+        Map(x0 -> Map(alien -> Admissibility.faithfulOnly)),
+        0
+      )
+      .fold(e => fail(e.message), identity)
+    assert(PopulationAggregate.of(view, Vector(SubjectAlignment(sid("t"), badResult, None))).isLeft)
+    // A NaN row cannot even become a gated result.
+    val x1 = RecallUnitId.unsafe("x1")
+    val nanRow = AlignmentRow(x1, Map(AlignState.Source(e1) -> Double.NaN))
+    val nanResult = HsmmResult.validated(
+      AlignmentMatrix(Vector(nanRow)),
       TransitionFlow(Vector.empty),
-      Vector.empty,
+      Vector(AlignState.Source(e1)),
       0.0,
       Map.empty,
-      Map.empty,
+      Map(x1 -> Map(e1 -> Admissibility.faithfulOnly)),
       0
     )
-    assert(PopulationAggregate.of(view, Vector(SubjectAlignment(sid("t"), badResult, None))).isLeft)
-    val nanRow = AlignmentRow(RecallUnitId.unsafe("x1"), Map(AlignState.Source(e1) -> Double.NaN))
-    val nanResult = badResult.copy(posterior = AlignmentMatrix(Vector(nanRow)))
-    assert(PopulationAggregate.of(view, Vector(SubjectAlignment(sid("u"), nanResult, None))).isLeft)
+    assert(nanResult.isLeft)
   }
 
   // ---- synthetic generators for properties ---------------------------------------------------
@@ -165,15 +180,22 @@ class PopulationSuite extends ScalaCheckSuite:
       rows <- Gen.sequence[Vector[AlignmentRow], AlignmentRow](
         (0 until n).map(genRow(_, allowExternal))
       )
-    yield HsmmResult(
-      AlignmentMatrix(rows),
-      outerFlow(rows),
-      rows.flatMap(_.argmax),
-      0.0,
-      Map.empty,
-      Map.empty,
-      0
-    )
+    yield
+      // Synthetic rows are all faithful anchors or externals: record every anchor as admitted.
+      val adm = rows.map { r =>
+        r.unit -> r.mass.keys.toVector.flatMap(_.anchor).map(_ -> Admissibility.faithfulOnly).toMap
+      }.toMap
+      HsmmResult
+        .validated(
+          AlignmentMatrix(rows),
+          outerFlow(rows),
+          rows.flatMap(_.argmax),
+          0.0,
+          Map.empty,
+          adm,
+          0
+        )
+        .fold(e => throw new AssertionError(e.message), identity)
 
   private def genPopulation(allowExternal: Boolean): Gen[PopulationAggregate] =
     for
@@ -236,15 +258,17 @@ class PopulationSuite extends ScalaCheckSuite:
         Map(AlignState.unranked -> 1.0)
       )
       val extResult =
-        HsmmResult(
-          AlignmentMatrix(Vector(extRow)),
-          TransitionFlow(Vector.empty),
-          Vector.empty,
-          0.0,
-          Map.empty,
-          Map.empty,
-          0
-        )
+        HsmmResult
+          .validated(
+            AlignmentMatrix(Vector(extRow)),
+            TransitionFlow(Vector.empty),
+            Vector(AlignState.unranked),
+            0.0,
+            Map.empty,
+            Map.empty,
+            0
+          )
+          .fold(e => throw new AssertionError(e.message), identity)
       val q = PopulationAggregate
         .of(view, p.subjects :+ SubjectAlignment(sid("zz-ext"), extResult, None))
         .fold(e => throw new AssertionError(e.message), identity)

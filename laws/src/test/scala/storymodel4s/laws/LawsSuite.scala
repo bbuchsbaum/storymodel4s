@@ -16,7 +16,27 @@ class LawsSuite extends DisciplineSuite:
   checkAll("TemporalLaws", TemporalLaws.temporal)
   checkAll("AlignmentLaws", AlignmentLaws.alignment)
   checkAll("ModeGateLaws", ModeGateLaws.modeGate)
+  checkAll("GateProofLaws", GateProofLaws.gateProof)
   checkAll("EstimateLaws", EstimateLaws.estimates)
+
+  test("HsmmResult cannot be constructed or copied outside the align package") {
+    import scala.compiletime.testing.typeCheckErrors
+    val ctor = typeCheckErrors(
+      """new storymodel4s.align.HsmmResult(???, ???, ???, 0.0, ???, ???, 0)"""
+    )
+    assert(ctor.nonEmpty, "the HsmmResult constructor must be private to align")
+    val row = typeCheckErrors(
+      """storymodel4s.align.AlignmentRow(???, ???)"""
+    )
+    assert(row.nonEmpty, "AlignmentRow.apply must be private to align (use AlignmentRow.of)")
+    val matrix = typeCheckErrors(
+      """storymodel4s.align.AlignmentMatrix(???)"""
+    )
+    assert(
+      matrix.nonEmpty,
+      "AlignmentMatrix.apply must be private to align (use AlignmentMatrix.of)"
+    )
+  }
 
   {
     import AddressGens.given
