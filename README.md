@@ -48,7 +48,7 @@ phenomenon the representation must survive; see `docs/plans/` for the roadmap.
 
 M0 (foundation): `core`, `amr`, `story`, `recall`, `align`, `interview` with
 hand fixtures and law suites. No text→AMR parser, LLM adapter, or embedding
-backend is included yet; those are provider interfaces (M2).
+backend is included yet; those are provider interfaces (M1, the unattended vertical slice).
 
 ## Build and verify
 
