@@ -17,6 +17,53 @@ object LanguageTag:
   given cats.Eq[LanguageTag] = cats.Eq.fromUniversalEquals
 type LanguageTag = LanguageTag.LanguageTag
 
+/** Locale-independent, code-point-aware text helpers shared by the surface layer.
+  *
+  * Why: `String.toLowerCase` uses the default locale on the JVM (Turkish dotless-i) and the
+  * tokenizer must never cut inside a surrogate pair; both would make offsets and normalized forms
+  * platform-dependent.
+  */
+private[core] object TextNorm:
+  /** Lowercase by code point, independent of the default locale. */
+  def lower(s: String): String =
+    val sb = new java.lang.StringBuilder(s.length)
+    var i = 0
+    while i < s.length do
+      val cp = s.codePointAt(i)
+      sb.appendCodePoint(Character.toLowerCase(cp))
+      i += Character.charCount(cp)
+    sb.toString
+
+  /** Code points of `s` in order. */
+  def codePoints(s: String): Vector[Int] =
+    val b = Vector.newBuilder[Int]
+    var i = 0
+    while i < s.length do
+      val cp = s.codePointAt(i)
+      b += cp
+      i += Character.charCount(cp)
+    b.result()
+
+  def isWordCodePoint(cp: Int): Boolean =
+    Character.isLetterOrDigit(cp) || Character.getType(cp) == Character.NON_SPACING_MARK ||
+      Character.getType(cp) == Character.COMBINING_SPACING_MARK || cp == '_'
+
+  def isDigitCodePoint(cp: Int): Boolean = Character.isDigit(cp)
+
+  /** `true` for strings shaped like a number: digit runs optionally separated by single `.` or `,`
+    * characters (`3.5`, `1,000`, `2024`).
+    */
+  def isNumberShaped(s: String): Boolean =
+    val cps = codePoints(s)
+    cps.nonEmpty && cps.forall(cp => isDigitCodePoint(cp) || cp == '.' || cp == ',' || cp == '_') &&
+    cps.exists(isDigitCodePoint) &&
+    cps.indices.forall { i =>
+      val cp = cps(i)
+      if cp == '.' || cp == ',' then
+        i > 0 && i + 1 < cps.length && isDigitCodePoint(cps(i - 1)) && isDigitCodePoint(cps(i + 1))
+      else true
+    }
+
 /** The immutable source text of a story with raw and canonical forms and their checksums.
   *
   * All offsets in the model are interpreted against `canonicalText` only.
@@ -38,7 +85,7 @@ object StorySource:
     */
   def canonicalize(raw: String): String =
     val unixLines = raw.replace("\r\n", "\n").replace('\r', '\n')
-    val stripped = unixLines.split("\n", -1).map(_.replaceAll("[ \t ]+$", "")).mkString("\n")
+    val stripped = unixLines.split("\n", -1).map(_.replaceAll("[ \t ]+$", "")).mkString("\n")
     val collapsed = stripped.replaceAll("\n{3,}", "\n\n")
     collapsed.replaceAll("^\n+", "").replaceAll("\n+$", "")
 
@@ -87,8 +134,8 @@ final case class SurfaceUnit(
 /** Exact surface decomposition of a source text.
   *
   * Invariants (checked by [[SurfaceAtlas.validated]]): unique IDs; spans within the text; ordinals
-  * unique and increasing in discourse order per kind; children within parent spans; parents exist
-  * and are of a coarser kind.
+  * unique and increasing in discourse order per kind; units of one kind do not overlap; children
+  * within parent spans; parents exist and are of a coarser kind.
   */
 final case class SurfaceAtlas(source: StorySource, units: Vector[SurfaceUnit]):
   lazy val byId: Map[SurfaceUnitId, SurfaceUnit] = units.iterator.map(u => u.id -> u).toMap
@@ -111,7 +158,9 @@ final case class SurfaceAtlas(source: StorySource, units: Vector[SurfaceUnit]):
   def childrenOf(id: SurfaceUnitId): Vector[SurfaceUnit] = children.getOrElse(id, Vector.empty)
   def parentOf(u: SurfaceUnit): Option[SurfaceUnit] = u.parent.flatMap(byId.get)
 
-  /** The unit of `kind` containing `offset`, by binary search over discourse order. */
+  /** The unit of `kind` containing `offset`, by binary search over discourse order (valid because
+    * units of one kind never overlap).
+    */
   def unitAt(offset: Int, kind: SurfaceUnitKind): Option[SurfaceUnit] =
     val vs = byKind.getOrElse(kind, Vector.empty)
     var lo = 0
@@ -156,16 +205,27 @@ object SurfaceAtlas:
       }
       _ <- atlas.byKind.toVector.traverse_ { (kind, us) =>
         val ords = us.map(_.ordinal)
+        val byOrd = us.sortBy(_.ordinal)
         if ords.distinct.size != ords.size then
           Left(DomainError.InvariantViolation(s"atlas/$kind", "duplicate ordinals"))
         else if ords != ords.sorted then
           Left(DomainError.InvariantViolation(s"atlas/$kind", "ordinals not increasing"))
-        else if us.sortBy(_.ordinal).map(_.span) != us.sortBy(_.ordinal).map(_.span).sorted then
+        else if byOrd.map(_.span) != byOrd.map(_.span).sorted then
           Left(
             DomainError
               .InvariantViolation(s"atlas/$kind", "ordinal order disagrees with span order")
           )
-        else Right(())
+        else
+          byOrd
+            .sliding(2)
+            .collectFirst {
+              case Vector(a, b) if b.span.start < a.span.endExclusive && !a.span.isEmpty =>
+                DomainError.InvariantViolation(
+                  s"atlas/$kind/${b.id.value}",
+                  s"unit ${b.span} overlaps preceding unit ${a.span}"
+                )
+            }
+            .toLeft(())
       }
       _ <- atlas.units.traverse_ { u =>
         u.parent match
@@ -204,6 +264,10 @@ object SurfaceAtlas:
   * reproducible bit-for-bit without any model.
   */
 object SurfaceAnalyzer:
+  /** Abbreviations that end with a period and never end a sentence on their own. Ordinary words
+    * that are occasionally abbreviated (`no`, `co`, `st`, `gen`, month names that are also words)
+    * are deliberately excluded: a missed split costs more downstream than a rare spurious one.
+    */
   private val Abbreviations: Set[String] = Set(
     "mr",
     "mrs",
@@ -212,55 +276,115 @@ object SurfaceAnalyzer:
     "prof",
     "sr",
     "jr",
-    "st",
     "vs",
     "etc",
     "e.g",
     "i.e",
     "inc",
     "ltd",
-    "co",
-    "no",
     "fig",
     "vol",
     "pp",
-    "ed",
     "eds",
     "cf",
     "approx",
     "dept",
-    "est",
-    "gen",
     "gov",
-    "lt",
-    "col",
     "sgt",
     "capt",
-    "rev",
     "hon",
-    "mt",
-    "ft",
     "ave",
     "blvd",
-    "rd",
     "jan",
     "feb",
-    "mar",
     "apr",
     "jun",
     "jul",
     "aug",
-    "sep",
     "sept",
     "oct",
-    "nov",
-    "dec"
+    "nov"
+  )
+
+  /** Words that overwhelmingly begin a sentence when capitalized after a period. Used to decide
+    * that `grade A. Then …` or `the U.S. Then …` ends a sentence although `A.`/`U.S.` look like
+    * initials.
+    */
+  private val SentenceStarters: Set[String] = Set(
+    "the",
+    "then",
+    "he",
+    "she",
+    "it",
+    "they",
+    "we",
+    "i",
+    "you",
+    "but",
+    "and",
+    "so",
+    "after",
+    "before",
+    "when",
+    "while",
+    "now",
+    "there",
+    "this",
+    "that",
+    "these",
+    "those",
+    "his",
+    "her",
+    "my",
+    "our",
+    "their",
+    "its",
+    "in",
+    "on",
+    "at",
+    "a",
+    "an",
+    "one",
+    "later",
+    "next",
+    "suddenly",
+    "meanwhile",
+    "however",
+    "yes",
+    "no",
+    "what",
+    "who",
+    "why",
+    "how",
+    "where",
+    "if",
+    "as",
+    "for",
+    "by",
+    "with",
+    "to",
+    "of",
+    "from",
+    "some",
+    "all",
+    "each",
+    "every",
+    "nobody",
+    "everyone",
+    "someone",
+    "nothing",
+    "something"
   )
 
   private val Terminal = Set('.', '!', '?')
   private val Closers = Set('"', '”', '’', '\'', ')', ']', '}', '»')
-  private val OpenersCurly = Set('“', '(', '[', '{', '«')
-  private val ClosersCurly = Set('”', ')', ']', '}', '»')
+  private val BracketOpeners = Set('(', '[', '{', '«')
+  private val BracketClosers = Set(')', ']', '}', '»')
+
+  /** An unclosed bracket suppresses sentence boundaries only this many characters past it, so a
+    * stray `(` cannot swallow the rest of a paragraph.
+    */
+  private val BracketReach = 300
 
   def analyze(source: StorySource): SurfaceAtlas =
     val text = source.canonicalText
@@ -319,11 +443,30 @@ object SurfaceAnalyzer:
         out += TextSpan.unsafe(start, end)
     out.result()
 
-  private def isAbbreviation(text: String, dotIndex: Int): Boolean =
+  /** The letters of the word starting at `from` (after whitespace), lowercased. */
+  private def nextWord(text: String, from: Int, end: Int): String =
+    var q = from
+    while q < end && !text.charAt(q).isLetter do q += 1
+    val s = q
+    while q < end && text.charAt(q).isLetter do q += 1
+    TextNorm.lower(text.substring(s, q))
+
+  /** Whether the period at `dotIndex` ends an abbreviation, an initial (`J.`), or an uppercase
+    * initialism (`U.S.`) rather than a sentence. Initials and initialisms are still sentence ends
+    * when the following word is a common sentence starter.
+    */
+  private def isAbbreviation(text: String, dotIndex: Int, end: Int): Boolean =
     var j = dotIndex - 1
     while j >= 0 && (text.charAt(j).isLetter || text.charAt(j) == '.') do j -= 1
-    val word = text.substring(j + 1, dotIndex).toLowerCase
-    word.nonEmpty && (Abbreviations.contains(word) || (word.length == 1 && word.forall(_.isLetter)))
+    val raw = text.substring(j + 1, dotIndex)
+    val word = TextNorm.lower(raw)
+    if word.isEmpty then false
+    else if Abbreviations.contains(word) then true
+    else
+      val segments = raw.split('.').toVector
+      val initialLike =
+        segments.nonEmpty && segments.forall(s => s.length == 1 && s.charAt(0).isUpper)
+      initialLike && !SentenceStarters.contains(nextWord(text, dotIndex + 1, end))
 
   private def startsSentence(c: Char): Boolean =
     c.isUpper || c.isDigit || c == '"' || c == '“' || c == '‘' || c == '(' || c == '[' ||
@@ -332,36 +475,40 @@ object SurfaceAnalyzer:
   /** Conservative rule-based sentence splitting inside one paragraph.
     *
     * A boundary needs terminal punctuation (plus any closing quotes/brackets), whitespace, and a
-    * following sentence-initial character; splits never occur inside unclosed brackets, after known
-    * abbreviations or initials, or before a lowercase continuation such as
-    * `"Go home!" she shouted`.
+    * following sentence-initial character. Splits never occur after known abbreviations or
+    * initials, before a lowercase continuation such as `"Go home!" she shouted`, or shortly after
+    * an unclosed bracket. Quotation marks never gate a split: multi-sentence dialogue must yield
+    * one unit per sentence, and an unbalanced quote (typographic paragraph-continuation) must not
+    * merge a paragraph.
     */
   def sentenceSpans(text: String, para: TextSpan): Vector[TextSpan] =
     val out = Vector.newBuilder[TextSpan]
     var i = para.start
     val end = para.endExclusive
-    var depth = 0
+    var openBrackets: List[Int] = Nil
     var start = -1
     while i < end do
       val c = text.charAt(i)
       if start < 0 && !c.isWhitespace then start = i
-      if OpenersCurly.contains(c) then depth += 1
-      else if ClosersCurly.contains(c) then depth = math.max(0, depth - 1)
+      if BracketOpeners.contains(c) then openBrackets = i :: openBrackets
+      else if BracketClosers.contains(c) then openBrackets = openBrackets.drop(1)
       if Terminal.contains(c) then
         // consume the run of terminal punctuation (e.g. "..." or "?!")
         var k = i
         while k + 1 < end && Terminal.contains(text.charAt(k + 1)) do k += 1
-        val abbrev = c == '.' && k == i && isAbbreviation(text, i)
+        val abbrev = c == '.' && k == i && isAbbreviation(text, i, end)
         // consume closing quotes / brackets
         var m = k
         while m + 1 < end && Closers.contains(text.charAt(m + 1)) do
           m += 1
-          if ClosersCurly.contains(text.charAt(m)) then depth = math.max(0, depth - 1)
+          if BracketClosers.contains(text.charAt(m)) then openBrackets = openBrackets.drop(1)
         // look ahead past whitespace
         var q = m + 1
         while q < end && text.charAt(q).isWhitespace do q += 1
+        val insideBracket = openBrackets.headOption.exists(p => i - p <= BracketReach)
         val boundary =
-          !abbrev && depth == 0 && (q >= end || (q > m + 1 && startsSentence(text.charAt(q))))
+          !abbrev && !insideBracket &&
+            (q >= end || (q > m + 1 && startsSentence(text.charAt(q))))
         if boundary then
           out += TextSpan.unsafe(start, m + 1)
           start = -1
@@ -373,33 +520,37 @@ object SurfaceAnalyzer:
       if e > start then out += TextSpan.unsafe(start, e)
     out.result()
 
-  private def isWordChar(c: Char): Boolean =
-    c.isLetterOrDigit || Character.getType(c) == Character.NON_SPACING_MARK ||
-      Character.getType(c) == Character.COMBINING_SPACING_MARK || c == '_'
-
-  /** Tokens: maximal letter/digit runs (allowing internal apostrophes and hyphens between letters),
-    * every other non-whitespace character as its own token.
+  /** Tokens: maximal letter/digit runs (allowing internal apostrophes and hyphens between word
+    * characters and `.`/`,` between digits, so `3.5` and `1,000` are single tokens), every other
+    * non-whitespace code point as its own token. Spans never cut inside a surrogate pair.
     */
   def tokenSpans(text: String, within: TextSpan): Vector[TextSpan] =
     val out = Vector.newBuilder[TextSpan]
     var i = within.start
     val end = within.endExclusive
+    inline def cpAt(k: Int): Int = text.codePointAt(k)
     while i < end do
-      val c = text.charAt(i)
-      if c.isWhitespace then i += 1
-      else if isWordChar(c) then
+      val cp = cpAt(i)
+      val w = Character.charCount(cp)
+      if Character.isWhitespace(cp) then i += w
+      else if TextNorm.isWordCodePoint(cp) then
         val start = i
         var cont = true
         while cont && i < end do
-          val d = text.charAt(i)
-          if isWordChar(d) then i += 1
-          else if (d == '\'' || d == '’' || d == '-') && i + 1 < end && isWordChar(
-              text.charAt(i + 1)
-            ) && i > start
-          then i += 1
+          val d = cpAt(i)
+          val dw = Character.charCount(d)
+          if TextNorm.isWordCodePoint(d) then i += dw
+          else if i > start && i + dw < end then
+            val prev = text.codePointBefore(i)
+            val next = cpAt(i + dw)
+            val joiner =
+              ((d == '\'' || d == '’' || d == '-') && TextNorm.isWordCodePoint(next)) ||
+                ((d == '.' || d == ',') && TextNorm.isDigitCodePoint(prev) &&
+                  TextNorm.isDigitCodePoint(next))
+            if joiner then i += dw else cont = false
           else cont = false
         out += TextSpan.unsafe(start, i)
       else
-        out += TextSpan.unsafe(i, i + 1)
-        i += 1
+        out += TextSpan.unsafe(i, i + w)
+        i += w
     out.result()

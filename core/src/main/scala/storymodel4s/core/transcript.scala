@@ -11,7 +11,12 @@ type TurnId = TurnId.T
 object PromptId extends OpaqueId("PromptId")
 type PromptId = PromptId.T
 
-/** Phase of an Autobiographical-Interview-style protocol in which a turn was produced. */
+/** Phase of an Autobiographical-Interview-style protocol in which a turn was produced.
+  *
+  * `Other(label)` is the `Custom`-style escape for protocol phases outside the standard three (e.g.
+  * a cued-imagery phase); the label is a protocol identifier, never free prose, and comparisons are
+  * exact.
+  */
 enum InterviewPhase:
   case FreeRecall, GeneralProbe, SpecificProbe
   case Other(label: String)

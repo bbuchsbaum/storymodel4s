@@ -12,7 +12,7 @@ object Small:
   val prov: Provenance = Provenance.deterministic("test", Checksum.ofText("test"))
 
   def meta(key: String, status: EpistemicStatus, spans: Option[SpanSet]): ClaimMeta =
-    ClaimMeta(
+    ClaimMeta.unsafe(
       ClaimId.unsafe(s"c:$key"),
       status,
       Credence.unsafeRaw(1.0),

@@ -202,7 +202,7 @@ class InterviewSuite extends ScalaCheckSuite:
     val u = unit("We ate cake at the restaurant.")
     val d = AtomProjection.fromUnit(u, TurnId.unsafe("t")).head
     val fp = Fingerprint.unsafe("test")
-    val meta = ClaimMeta(
+    val meta = ClaimMeta.unsafe(
       ClaimId.unsafe("c"),
       EpistemicStatus.Hypothesized,
       Credence.unsafeRaw(0.9),
@@ -296,7 +296,7 @@ class InterviewSuite extends ScalaCheckSuite:
     forAll(addressGen, facetGen) { (addr, facets) =>
       val u = unit("We ate cake.")
       val d = AtomProjection.fromUnit(u, TurnId.unsafe("t")).head
-      val meta = ClaimMeta(
+      val meta = ClaimMeta.unsafe(
         ClaimId.unsafe("c"),
         EpistemicStatus.Hypothesized,
         Credence.unsafeRaw(0.5),

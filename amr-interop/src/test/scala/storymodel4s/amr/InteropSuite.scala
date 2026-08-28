@@ -220,7 +220,7 @@ class InteropSuite extends ScalaCheckSuite:
   test("alignment sidecar entries become chart alignments, including relation alignments") {
     val g = canonical("(s / see-01 :ARG0 (i / i) :ARG1 (p / picture) :polarity -)")
     val span = SpanSet.unsafe(SpanRef(TextSpan.unsafe(0, 3)))
-    val meta = ClaimMeta(
+    val meta = ClaimMeta.unsafe(
       ClaimId.unsafe("c1"),
       EpistemicStatus.SurfaceExplicit,
       Credence.unsafeRaw(1.0),

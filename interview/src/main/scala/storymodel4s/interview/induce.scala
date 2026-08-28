@@ -420,7 +420,7 @@ object TargetInduction:
         EpistemicStatus.Hypothesized,
         PromptContext(phase, probe),
         monitoring,
-        ClaimMeta(
+        ClaimMeta.unsafe(
           ClaimId.unsafe(s"claim:${d.id.value}"),
           EpistemicStatus.Hypothesized,
           Credence.unsafeRaw(result.addresses(d.id).toVector.head._2),

@@ -71,7 +71,7 @@ object WarOfTheGhostsModel:
       raw: Double = 1.0,
       upstream: Set[ClaimId] = Set.empty
   ): ClaimMeta =
-    ClaimMeta(
+    ClaimMeta.unsafe(
       ClaimId.unsafe(s"wog:claim:$key"),
       status,
       Credence.unsafeRaw(raw),

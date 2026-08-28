@@ -12,8 +12,8 @@ class ClaimSuite extends FunSuite:
   private def evidence(id: String, spans: Option[SpanSet]) =
     Evidence(EvidenceId.unsafe(id), spans, Set.empty, fp, stage)
 
-  private def meta(id: String, status: EpistemicStatus, ev: Evidence*) =
-    ClaimMeta(
+  private def metaE(id: String, status: EpistemicStatus, ev: Evidence*) =
+    ClaimMeta.of(
       ClaimId.unsafe(id),
       status,
       Credence.unsafeRaw(0.9),
@@ -21,20 +21,44 @@ class ClaimSuite extends FunSuite:
       prov
     )
 
-  test("SurfaceExplicit claims require span evidence"):
-    val noSpans = meta("c1", EpistemicStatus.SurfaceExplicit, evidence("e1", None))
-    assert(ClaimMeta.validated(noSpans).isLeft)
+  private def meta(id: String, status: EpistemicStatus, ev: Evidence*) =
+    metaE(id, status, ev*).fold(e => fail(e.message), identity)
+
+  test("SurfaceExplicit claims require span evidence: unrepresentable, not merely rejected"):
+    assert(metaE("c1", EpistemicStatus.SurfaceExplicit, evidence("e1", None)).isLeft)
+    intercept[IllegalArgumentException] {
+      ClaimMeta.unsafe(
+        ClaimId.unsafe("c1"),
+        EpistemicStatus.SurfaceExplicit,
+        Credence.unsafeRaw(0.9),
+        NonEmptyVector.one(evidence("e1", None)),
+        prov
+      )
+    }
     val withSpans =
-      meta(
+      metaE(
         "c2",
         EpistemicStatus.SurfaceExplicit,
         evidence("e2", Some(SpanSet.one(TextSpan.unsafe(0, 3))))
       )
-    assert(ClaimMeta.validated(withSpans).isRight)
+    assert(withSpans.isRight)
+    assert(withSpans.flatMap(ClaimMeta.validated).isRight)
+
+  test("status changes are re-checked"):
+    val inferred = meta("c3", EpistemicStatus.WorldKnowledgeInferred, evidence("e3", None))
+    assert(inferred.withStatus(EpistemicStatus.SurfaceExplicit).isLeft)
+    assert(inferred.withStatus(EpistemicStatus.Hypothesized).isRight)
+    val explicit =
+      meta(
+        "c4",
+        EpistemicStatus.SurfaceExplicit,
+        evidence("e4", Some(SpanSet.one(TextSpan.unsafe(0, 1))))
+      )
+    assert(explicit.withEvidence(NonEmptyVector.one(evidence("e5", None))).isLeft)
+    assertEquals(explicit.withCredence(Credence.unsafeRaw(0.1)).credence.rawScore, 0.1)
 
   test("inferred claims may cite only upstream claims"):
-    val inferred = meta("c3", EpistemicStatus.WorldKnowledgeInferred, evidence("e3", None))
-    assert(ClaimMeta.validated(inferred).isRight)
+    assert(metaE("c3", EpistemicStatus.WorldKnowledgeInferred, evidence("e3", None)).isRight)
 
   test("ledger rejects duplicates and preserves insertion order"):
     val a = meta("a", EpistemicStatus.Hypothesized, evidence("e", None))
@@ -45,10 +69,6 @@ class ClaimSuite extends FunSuite:
     assert(led.flatMap(_.add(a)).isLeft)
     assertEquals(led.toOption.get.byStatus(EpistemicStatus.Hypothesized).size, 2)
     assertEquals(led.toOption.get.byStatus(EpistemicStatus.SurfaceExplicit).size, 0)
-
-  test("ledger applies the span law on add"):
-    val bad = meta("x", EpistemicStatus.SurfaceExplicit, evidence("e", None))
-    assert(ClaimLedger.empty.add(bad).isLeft)
 
   test("Resolved is a functor over value and alternatives"):
     val m = meta("r", EpistemicStatus.Hypothesized, evidence("e", None))
