@@ -391,7 +391,7 @@ object ContradictionDetector:
   * detected, in which case `distortion` names the contradicted facets and the distorted state is
   * the only admissible mode on that anchor.
   */
-final case class Admissibility(
+final case class Admissibility private[align] (
     contradictions: Vector[Contradiction],
     faithful: Boolean,
     distortion: Option[NonEmptySet[Facet]]
@@ -407,9 +407,14 @@ final case class Admissibility(
   def gated: Boolean = !faithful
 
 object Admissibility:
-  val faithfulOnly: Admissibility = Admissibility(Vector.empty, faithful = true, None)
+  /** Construction is `private[align]`: a record originates only in [[ModeGate]] (or the ungated
+    * ablation path), never in a caller — so an admissibility map handed to [[HsmmResult.validated]]
+    * cannot be fabricated, and is in any case re-derived there.
+    */
+  private[align] val faithfulOnly: Admissibility =
+    Admissibility(Vector.empty, faithful = true, None)
 
-  def of(contradictions: Vector[Contradiction]): Admissibility =
+  private[align] def of(contradictions: Vector[Contradiction]): Admissibility =
     val distinct = contradictions.distinct
     if distinct.isEmpty then faithfulOnly
     else

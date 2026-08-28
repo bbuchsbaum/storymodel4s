@@ -122,6 +122,105 @@ object AlignGens:
       .infer(c.recall, c.view, cands, model)
       .fold(e => throw new IllegalStateException(e.message), identity)
 
+  // ---- forgeries for the gate-proof laws --------------------------------------------------
+
+  /** Gated inference on a foil case (same construction as ModeGateLaws). */
+  def inferFoil(f: FoilCase): HsmmResult =
+    GraphHsmm
+      .infer(f.recall, f.base.view, f.candidates, f.costModel, f.config)
+      .fold(e => throw new IllegalStateException(e.message), identity)
+
+  /** One forgery = the parts to re-validate: `(posterior, flow, viterbi, costs, admissibility)`. */
+  type Forgery = (
+      AlignmentMatrix,
+      TransitionFlow,
+      Vector[AlignState],
+      Map[RecallUnitId, Map[AlignState, CostBreakdown]],
+      Map[RecallUnitId, Map[SourceNodeRef, Admissibility]]
+  )
+
+  /** Every single-edit forgery of an inferred result that puts a key (mass, cost entry, flow entry,
+    * or Viterbi step) on an `(anchor, mode)` pair the gate does not admit, plus the chief's probe:
+    * transplanting an *authentic* faithful-admitting record (taken from elsewhere in the result)
+    * onto a gated anchor, with matching faithful rows. Built only through the public smart
+    * constructors — `Admissibility` itself cannot be constructed here. All must be rejected by
+    * [[HsmmResult.validated]] on the original recall and view.
+    */
+  def forgeries(r: HsmmResult): Vector[Forgery] =
+    val rows = r.posterior.rows
+    val spare = cats.data.NonEmptySet.one(Facet.Outcome)
+    def inadmissible(unit: RecallUnitId): Vector[AlignState] =
+      r.admissibility.getOrElse(unit, Map.empty).toVector.sortBy(_._1.key).flatMap { (ref, a) =>
+        val faithful = if a.faithful then Vector.empty else Vector(AlignState.Source(ref))
+        val distorted =
+          if a.distortion.contains(spare) then Vector.empty
+          else Vector(AlignState.Distorted(ref, spare))
+        faithful ++ distorted
+      }
+    def rowWith(row: AlignmentRow, s: AlignState, m: Double): AlignmentRow =
+      // keep the row normalized: give `s` mass `m` and rescale the rest
+      val rest = row.mass.toVector.sortBy(_._1.key)
+      val total = rest.map(_._2).sum
+      val scaled = rest.map { case (k, v) => k -> (if total > 0 then v * (1 - m) / total else v) }
+      AlignmentRow
+        .of(row.unit, (scaled :+ (s -> m)).toMap)
+        .fold(e => throw new IllegalStateException(e.message), identity)
+    def matrixWith(i: Int, row: AlignmentRow): AlignmentMatrix =
+      AlignmentMatrix
+        .of(rows.updated(i, row))
+        .fold(e => throw new IllegalStateException(e.message), identity)
+    val authenticFaithful: Option[Admissibility] =
+      r.admissibility.toVector
+        .sortBy(_._1.value)
+        .flatMap(_._2.toVector.sortBy(_._1.key).map(_._2))
+        .find(_.faithful)
+    rows.zipWithIndex.flatMap { (row, i) =>
+      inadmissible(row.unit).flatMap { bad =>
+        val onPosterior =
+          (matrixWith(i, rowWith(row, bad, 0.0)), r.flow, r.viterbi, r.costs, r.admissibility)
+        val onPath = (r.posterior, r.flow, r.viterbi.updated(i, bad), r.costs, r.admissibility)
+        val onCosts =
+          (
+            r.posterior,
+            r.flow,
+            r.viterbi,
+            r.costs.updated(
+              row.unit,
+              r.costs.getOrElse(row.unit, Map.empty).updated(bad, CostBreakdown.unreachable)
+            ),
+            r.admissibility
+          )
+        val onFlow = r.flow.steps.zipWithIndex.collect {
+          case (st, j) if st.from == row.unit =>
+            val other = rows(j + 1).mass.keys.toVector
+              .sortBy(_.key)
+              .headOption
+              .getOrElse(AlignState.unranked)
+            val steps = r.flow.steps.updated(j, st.copy(mass = st.mass.updated((bad, other), 0.0)))
+            (r.posterior, TransitionFlow(steps), r.viterbi, r.costs, r.admissibility)
+        }
+        // The chief's probe: an authentic faithful record transplanted onto this gated anchor,
+        // with a matching faithful row and path.
+        val transplant = (bad, authenticFaithful) match
+          case (AlignState.Source(ref), Some(auth)) =>
+            val adm = r.admissibility.updated(
+              row.unit,
+              r.admissibility.getOrElse(row.unit, Map.empty).updated(ref, auth)
+            )
+            val faithfulRow = AlignmentRow
+              .of(row.unit, Map(AlignState.Source(ref) -> 1.0))
+              .fold(e => throw new IllegalStateException(e.message), identity)
+            val onlyRow = AlignmentMatrix
+              .of(Vector(faithfulRow))
+              .fold(e => throw new IllegalStateException(e.message), identity)
+            if rows.size == 1 then
+              Vector((onlyRow, TransitionFlow(Vector.empty), Vector(bad), r.costs, adm))
+            else Vector((r.posterior, r.flow, r.viterbi.updated(i, bad), r.costs, adm))
+          case _ => Vector.empty
+        Vector(onPosterior, onPath, onCosts) ++ onFlow ++ transplant
+      }
+    }
+
   // ---- adversarial foil cases for the mode-gate laws (ADR 0001 rev 3 §D5) ------------------
 
   /** A recall unit built to contradict a chosen leaf on a chosen facet, plus an adversarial

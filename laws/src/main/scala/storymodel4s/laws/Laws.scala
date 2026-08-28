@@ -252,6 +252,75 @@ object ModeGateLaws extends Laws:
         }
     )
 
+/** The gated result is a proof (forward-review P0; ADR 0001 rev 3 L1): only [[GraphHsmm.infer]] or
+  * [[HsmmResult.validated]] can produce an [[HsmmResult]], and `validated` refuses any part that
+  * puts mass, a cost, or a path step on an `(anchor, mode)` pair the gate did not admit.
+  */
+object GateProofLaws extends Laws:
+  private def parts(r: HsmmResult) =
+    (r.posterior, r.flow, r.viterbi, r.logLikelihood, r.costs, r.admissibility, r.refinementPasses)
+
+  def gateProof(using Arbitrary[AlignGens.Case], Arbitrary[AlignGens.FoilCase]): RuleSet =
+    new DefaultRuleSet(
+      "align.gateProof",
+      None,
+      "every inferred result re-validates to itself on its recall and view" -> forAll {
+        (c: AlignGens.Case) =>
+          val r = AlignGens.infer(c)
+          val (p, f, v, ll, cs, a, n) = parts(r)
+          HsmmResult.validated(c.recall, c.view, p, f, v, ll, cs, a, n) == Right(r)
+      },
+      "every forgery — mass, key, cost, path, flow, or a transplanted authentic record — is rejected" ->
+        forAll { (f: AlignGens.FoilCase) =>
+          val r = AlignGens.inferFoil(f)
+          AlignGens.forgeries(r).forall { case (p, fl, v, cs, adm) =>
+            HsmmResult
+              .validated(
+                f.recall,
+                f.base.view,
+                p,
+                fl,
+                v,
+                r.logLikelihood,
+                cs,
+                adm,
+                r.refinementPasses
+              )
+              .isLeft
+          }
+        },
+      "a foil result has at least one inadmissible pair to forge onto" ->
+        forAll { (f: AlignGens.FoilCase) => AlignGens.forgeries(AlignGens.inferFoil(f)).nonEmpty },
+      "the gate, not the record, decides: re-validating against another recall fails when the gate disagrees" ->
+        forAll { (f: AlignGens.FoilCase) =>
+          // The foil's recall differs from the base recall only in the contradicting unit; its
+          // result cannot be validated as if it belonged to a recall whose units the gate would
+          // assess differently (unit ids differ, so the record's units are unknown there).
+          val r = AlignGens.inferFoil(f)
+          val (p, fl, v, ll, cs, a, n) = parts(r)
+          HsmmResult.validated(f.base.recall, f.base.view, p, fl, v, ll, cs, a, n).isLeft ||
+          f.base.recall.byId.contains(f.unit.id)
+        },
+      "dropping the admissibility record invalidates every anchored result" ->
+        forAll { (c: AlignGens.Case) =>
+          val r = AlignGens.infer(c)
+          val anchored = r.posterior.rows.exists(_.sourceMass > 0.0)
+          !anchored || HsmmResult
+            .validated(
+              c.recall,
+              c.view,
+              r.posterior,
+              r.flow,
+              r.viterbi,
+              r.logLikelihood,
+              r.costs,
+              Map.empty,
+              0
+            )
+            .isLeft
+        }
+    )
+
 /** Discipline rule sets for feature estimates and reducers. */
 object EstimateLaws extends Laws:
   private val reducers: Gen[ScalarReducer] = Gen.oneOf(
