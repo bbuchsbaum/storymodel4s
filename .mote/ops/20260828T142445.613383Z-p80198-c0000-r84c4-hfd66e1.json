@@ -1,0 +1,1 @@
+{"actor":"claude-storymodel4s","entity":"bd-01M14B3PZXX261HD33B6NJE5VF","kind":"note","note_kind":"note","op":"20260828T142445.613383Z-p80198-c0000-r84c4-hfd66e1","text":"Merged at abac247; checkAll verified on cd67284: scalafmt clean, compileAll JVM/JS/Native clean, tests JVM+JS 906/0, Native 578/0 (after .jvmopts heap fix).","ts":"2026-08-28T14:24:45.613383Z","v":1}
