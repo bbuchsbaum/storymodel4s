@@ -84,6 +84,27 @@ object Density:
   */
 object SupportDensity:
 
+  /** Densities of a gated result (the proof type; see [[HsmmResult]]). */
+  def discourse(result: HsmmResult, view: SourceView): Vector[Density] =
+    discourse(result.posterior, view)
+
+  def discourse(
+      result: HsmmResult,
+      view: SourceView,
+      grid: Int,
+      bandwidth: Double
+  ): Vector[Density] =
+    discourse(result.posterior, view, grid, bandwidth)
+
+  def worldTime(result: HsmmResult, view: SourceView): Option[Vector[Density]] =
+    worldTime(result.posterior, view)
+
+  /** Densities of a bare posterior. Unlike the [[HsmmResult]] overloads above, these accept any
+    * well-formed `AlignmentMatrix` — including one built through [[AlignmentMatrix.of]] or the
+    * baseline aligner's ablation output — and therefore carry no mode-gate proof. Scientific
+    * consumers should use the `HsmmResult` overloads; these forms exist for ablations and
+    * diagnostics.
+    */
   def discourse(
       posterior: AlignmentMatrix,
       view: SourceView,

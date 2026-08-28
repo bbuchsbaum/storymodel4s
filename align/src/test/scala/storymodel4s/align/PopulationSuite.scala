@@ -5,7 +5,6 @@ import org.scalacheck.{Arbitrary, Gen}
 import org.scalacheck.Prop.forAll
 
 import storymodel4s.features.Estimate
-import storymodel4s.recall.RecallUnitId
 
 class PopulationSuite extends ScalaCheckSuite:
   import AnnaFixture.{view, e1, e5, sc1, sc2, root}
@@ -117,63 +116,78 @@ class PopulationSuite extends ScalaCheckSuite:
     val a = SubjectAlignment(sid("s"), full, None)
     assert(PopulationAggregate.of(view, Vector(a, a.copy(wordCount = Some(1)))).isLeft)
     val alien = SourceNodeRef.Situation(storymodel4s.core.SituationId.unsafe("not-in-view"))
-    val badRow = AlignmentRow(RecallUnitId.unsafe("x0"), Map(AlignState.Source(alien) -> 1.0))
-    val badResult = HsmmResult(
-      AlignmentMatrix(Vector(badRow)),
-      TransitionFlow(Vector.empty),
-      Vector.empty,
-      0.0,
-      Map.empty,
-      Map.empty,
-      0
+    // A result anchored on a node absent from the view cannot even become a gated result: the
+    // proof re-derives every admissibility entry from the mode gate on this view.
+    val u0 = full.posterior.rows.head.unit
+    val authentic = full.admissibility(u0)(e1)
+    val alienAdm = full.admissibility.updated(u0, full.admissibility(u0).updated(alien, authentic))
+    val alienResult = HsmmResult.validated(
+      AnnaFixture.recall,
+      view,
+      full.posterior,
+      full.flow,
+      full.viterbi,
+      full.logLikelihood,
+      full.costs,
+      alienAdm,
+      full.refinementPasses
     )
-    assert(PopulationAggregate.of(view, Vector(SubjectAlignment(sid("t"), badResult, None))).isLeft)
-    val nanRow = AlignmentRow(RecallUnitId.unsafe("x1"), Map(AlignState.Source(e1) -> Double.NaN))
-    val nanResult = badResult.copy(posterior = AlignmentMatrix(Vector(nanRow)))
-    assert(PopulationAggregate.of(view, Vector(SubjectAlignment(sid("u"), nanResult, None))).isLeft)
+    assert(alienResult.isLeft)
+    // A NaN row cannot become a gated result either.
+    val r0 = full.posterior.rows.head
+    val nanRows =
+      full.posterior.rows.updated(0, AlignmentRow(r0.unit, r0.mass.map((k, _) => k -> Double.NaN)))
+    val nanResult = HsmmResult.validated(
+      AnnaFixture.recall,
+      view,
+      AlignmentMatrix(nanRows),
+      full.flow,
+      full.viterbi,
+      full.logLikelihood,
+      full.costs,
+      full.admissibility,
+      full.refinementPasses
+    )
+    assert(nanResult.isLeft)
   }
 
-  // ---- synthetic generators for properties ---------------------------------------------------
+  // ---- generators for properties: real gated inferences under varied configurations ---------
+  //
+  // Every property input is produced by GraphHsmm.infer, so admissibility records originate in the
+  // mode gate (never by hand) and the proof invariants hold by construction.
 
-  private val sourceStates: Vector[AlignState] =
-    view.nodes.map(n => AlignState.Source(n.ref)).sortBy(_.key)
-
-  private def genRow(unit: Int, allowExternal: Boolean): Gen[AlignmentRow] =
-    val states = if allowExternal then sourceStates ++ AlignState.externals else sourceStates
-    for
-      raw <- Gen.listOfN(states.size, Gen.choose(0.0, 1.0))
-      zeroed <- Gen.listOfN(states.size, Gen.prob(0.4))
-    yield
-      val masses = raw.zip(zeroed).map((m, z) => if z then 0.0 else m)
-      val total = masses.sum
-      val norm = if total <= 0.0 then masses.updated(0, 1.0) else masses.map(_ / total)
-      AlignmentRow(RecallUnitId.unsafe(s"g$unit"), states.zip(norm).filter(_._2 > 0.0).toMap)
-
-  /** Independent coupling `F_i = P_i ⊗ P_{i+1}`: marginals equal the rows exactly. */
-  private def outerFlow(rows: Vector[AlignmentRow]): TransitionFlow =
-    TransitionFlow(rows.zip(rows.drop(1)).map { (a, b) =>
-      val mass = for
-        (s, ma) <- a.mass.toVector
-        (t, mb) <- b.mass.toVector
-      yield (s, t) -> ma * mb
-      FlowStep(a.unit, b.unit, mass.toMap)
-    })
-
-  private def genResult(allowExternal: Boolean): Gen[HsmmResult] =
-    for
-      n <- Gen.choose(1, 5)
-      rows <- Gen.sequence[Vector[AlignmentRow], AlignmentRow](
-        (0 until n).map(genRow(_, allowExternal))
+  private def inferWith(
+      recall: storymodel4s.recall.RecallGraph,
+      cands: Candidates,
+      model: LocalCostModel,
+      temperature: Double,
+      passes: Int
+  ): HsmmResult =
+    GraphHsmm
+      .infer(
+        recall,
+        view,
+        cands,
+        model,
+        HsmmConfig.unsafe(temperature = temperature, refinementPasses = passes)
       )
-    yield HsmmResult(
-      AlignmentMatrix(rows),
-      outerFlow(rows),
-      rows.flatMap(_.argmax),
-      0.0,
-      Map.empty,
-      Map.empty,
-      0
-    )
+      .fold(e => fail(e.message), identity)
+
+  /** `allowExternal = false` restricts to recalls whose every unit has ranked candidates, so the
+    * flow is source→source dominated; external mass can still be small but nonzero.
+    */
+  private def genResult(allowExternal: Boolean): Gen[HsmmResult] =
+    val temps = Gen.oneOf(0.05, 0.15, 0.5)
+    val passes = Gen.oneOf(0, 1)
+    val anchored = for
+      t <- temps
+      k <- passes
+      f <- Gen.oneOf(Vector(None, Some(AnnaFixture.summary), Some(AnnaFixture.blended)))
+    yield f match
+      case None =>
+        inferWith(AnnaFixture.recall, AnnaFixture.candidates, AnnaFixture.costModel, t, k)
+      case Some(x) => inferWith(x.recall, x.candidates, x.costModel, t, k)
+    if allowExternal then Gen.frequency(4 -> anchored, 1 -> Gen.const(unranked)) else anchored
 
   private def genPopulation(allowExternal: Boolean): Gen[PopulationAggregate] =
     for
@@ -217,34 +231,30 @@ class PopulationSuite extends ScalaCheckSuite:
     }
   }
 
-  property("without external mass, flow row sums equal summed non-final posteriors") {
+  property("flow row sums plus source→external flow equal summed non-final posteriors") {
+    // Marginal consistency (proved by HsmmResult.validated) means the population's source→source
+    // flow out of v is exactly the non-final posterior mass on v minus what left for the externals.
     forAll(genPopulation(allowExternal = false)) { p =>
       p.nodeRefs.forall { v =>
         val out = p.populationFlow.collect { case ((a, _), m) if a == v => m }.sum
+        val toExternal = p.subjects.map { s =>
+          s.result.flow.steps.map { st =>
+            st.mass.collect { case ((a, b), m) if a.anchor.contains(v) && b.isExternal => m }.sum
+          }.sum
+        }.sum
         val exact = p.subjects.map { s =>
           s.result.posterior.rows.dropRight(1).map(_.sourceMassOn(v)).sum
         }.sum
-        math.abs(out - exact) <= 1e-9
+        math.abs(out + toExternal - exact) <= 1e-6
       }
     }
   }
 
   property("an all-external subject changes only external masses and coverage") {
     forAll { (p: PopulationAggregate) =>
-      val extRow = AlignmentRow(
-        RecallUnitId.unsafe("ext0"),
-        Map(AlignState.unranked -> 1.0)
-      )
-      val extResult =
-        HsmmResult(
-          AlignmentMatrix(Vector(extRow)),
-          TransitionFlow(Vector.empty),
-          Vector.empty,
-          0.0,
-          Map.empty,
-          Map.empty,
-          0
-        )
+      // The unrankable recall is a genuine all-external subject (every row is Unranked).
+      val extResult = unranked
+      assert(extResult.posterior.rows.forall(_.sourceMass == 0.0))
       val q = PopulationAggregate
         .of(view, p.subjects :+ SubjectAlignment(sid("zz-ext"), extResult, None))
         .fold(e => throw new AssertionError(e.message), identity)
@@ -256,7 +266,10 @@ class PopulationSuite extends ScalaCheckSuite:
       q.groundedSubjects == p.groundedSubjects &&
       q.visitationRate(p.nodeRefs.head).coverage.eligible ==
         p.visitationRate(p.nodeRefs.head).coverage.eligible + 1 &&
-        q.externalMass(sid("zz-ext")).exists(_(ExternalState.Unranked) == 1.0)
+        q.externalMass(sid("zz-ext")).exists { m =>
+          m.getOrElse(ExternalState.Unranked, 0.0) > 0.0 &&
+          math.abs(m.values.sum - m.getOrElse(ExternalState.Unranked, 0.0)) <= 1e-9
+        }
     }
   }
 

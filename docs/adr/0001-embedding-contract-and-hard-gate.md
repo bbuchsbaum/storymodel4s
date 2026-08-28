@@ -214,11 +214,23 @@ enum FidelityMode:
 - `Pseudonymizer` returns two separately held values: `PseudonymizedText`
   (remote-safe; carries `PolicyId`, `KeyId`, sanitized text, offset map) and
   `ReidentificationKey` (never leaves the local store; rotation by `KeyId`).
+  `PseudonymizedText` has no public constructor or copy path; its checked factory
+  requires a complete, ordered, non-overlapping, bounded, code-point-safe map
+  whose replacements do not contain their source-span text and whose unmapped
+  gaps remain identical. This proves an explained pseudonymization transformation,
+  not the absence of all residual sensitive surface: that trust rests with the
+  caller of `checked`, normally the `Pseudonymizer`.
 - Raw and authorized-remote requests are **different types**:
   `EmbedPayload.Raw` can only be served by `Locality.Local` embedders;
   `AuthorizedRemoteRequest` is constructible only by `RemotePolicy.evaluate`,
   which binds provider, model, purpose, `PolicyId`, expiry, budget, and the
-  exact `PseudonymizedText` digest into a `RemoteCapability`.
+  exact `PseudonymizedText` digest into a `RemoteCapability`. Evaluation derives
+  that value from the request's `EmbedPayload.Sanitized`; its signature has no
+  second payload argument that could authorize material different from the
+  request, and a raw request is denied.
+- A future codec cannot reconstruct the omitted source text and therefore cannot
+  rerun `PseudonymizedText.checked`; decoding will require a narrow
+  `private[embed]` trusted path that preserves the explicit trust boundary.
 - `SensitiveDigest`: an HMAC-SHA256 under a store-local key (identified by
   `KeyId`) used for cache identity and receipts of `Sensitive` inputs; it is a
   distinct type from `Checksum` and is what `EmbeddingReceipt` carries.

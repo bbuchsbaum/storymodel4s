@@ -109,10 +109,11 @@ object AlignState:
 /** One row of `P`: posterior mass of a recall unit over `(anchor, mode)` states and external
   * states. Rows are unbalanced by construction: `sourceMass + externalMass = 1` when produced by
   * the HSMM, but rows from other aligners may sum to less than 1. Masses are nonnegative and finite
-  * (see [[AlignmentRow.of]]); the case-class constructor is retained for the aligners in this
-  * module.
+  * (see [[AlignmentRow.of]]). The constructor (and therefore `apply`/`copy`) is `private[align]`:
+  * rows are produced by the aligners in this module or through the smart constructor, so a consumer
+  * cannot mint mass on a state it did not obtain from an aligner.
   */
-final case class AlignmentRow(unit: RecallUnitId, mass: Map[AlignState, Double]):
+final case class AlignmentRow private[align] (unit: RecallUnitId, mass: Map[AlignState, Double]):
   def apply(state: AlignState): Double = mass.getOrElse(state, 0.0)
 
   /** Deterministic key order for sums (review #30). */
@@ -222,8 +223,10 @@ object AlignmentRow:
     if row.isWellFormed then Right(row)
     else Left(AlignError.MalformedRow(unit, "mass must be nonnegative and finite"))
 
-/** The alignment `P`: one row per recall unit in recall order. */
-final case class AlignmentMatrix(rows: Vector[AlignmentRow]):
+/** The alignment `P`: one row per recall unit in recall order. Construction is `private[align]`
+  * (aligners) or via [[AlignmentMatrix.of]], which rejects malformed rows and repeated units.
+  */
+final case class AlignmentMatrix private[align] (rows: Vector[AlignmentRow]):
   lazy val byUnit: Map[RecallUnitId, AlignmentRow] = rows.iterator.map(r => r.unit -> r).toMap
   def row(unit: RecallUnitId): Option[AlignmentRow] = byUnit.get(unit)
   def size: Int = rows.size
@@ -249,6 +252,18 @@ final case class AlignmentMatrix(rows: Vector[AlignmentRow]):
     columnMass.view.mapValues(m => 1.0 - math.exp(-m)).toMap
 
   def isWellFormed: Boolean = rows.forall(_.isWellFormed)
+
+object AlignmentMatrix:
+  /** Smart constructor: every row well-formed and no unit repeated. */
+  def of(rows: Vector[AlignmentRow]): Either[AlignError, AlignmentMatrix] =
+    rows.find(!_.isWellFormed) match
+      case Some(bad) =>
+        Left(AlignError.MalformedRow(bad.unit, "mass must be nonnegative and finite"))
+      case None =>
+        val dup = rows.map(_.unit).groupBy(identity).collect { case (u, xs) if xs.size > 1 => u }
+        dup.toVector.sortBy(_.value).headOption match
+          case Some(u) => Left(AlignError.MalformedRow(u, "unit appears in more than one row"))
+          case None    => Right(AlignmentMatrix(rows))
 
 /** Transition posteriors between consecutive units: `F_i(s, t)`. */
 final case class FlowStep(
@@ -287,8 +302,18 @@ enum AlignError:
   case MalformedRow(unit: RecallUnitId, detail: String)
   case SizeMismatch(detail: String)
 
+  /** A gated result would carry mass, a cost, or a path step on an `(anchor, mode)` pair that the
+    * recorded admissibility does not admit (ADR 0001 rev 3 L1).
+    */
+  case GateViolation(unit: RecallUnitId, state: AlignState, detail: String)
+
+  /** The parts of a result do not fit together (units, flow endpoints, path length). */
+  case InconsistentResult(detail: String)
+
   def message: String = this match
-    case EmptyRecall         => "recall has no units"
-    case InvalidConfig(f, m) => s"$f: $m"
-    case MalformedRow(u, m)  => s"row ${u.value}: $m"
-    case SizeMismatch(m)     => m
+    case EmptyRecall            => "recall has no units"
+    case InvalidConfig(f, m)    => s"$f: $m"
+    case MalformedRow(u, m)     => s"row ${u.value}: $m"
+    case SizeMismatch(m)        => m
+    case GateViolation(u, s, m) => s"unit ${u.value}, state ${s.key}: $m"
+    case InconsistentResult(m)  => m

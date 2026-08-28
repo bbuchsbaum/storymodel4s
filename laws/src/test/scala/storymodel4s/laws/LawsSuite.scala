@@ -16,7 +16,56 @@ class LawsSuite extends DisciplineSuite:
   checkAll("TemporalLaws", TemporalLaws.temporal)
   checkAll("AlignmentLaws", AlignmentLaws.alignment)
   checkAll("ModeGateLaws", ModeGateLaws.modeGate)
+  checkAll("GateProofLaws", GateProofLaws.gateProof)
   checkAll("EstimateLaws", EstimateLaws.estimates)
+
+  test("HsmmResult, rows, matrices, and admissibility cannot be constructed outside align") {
+    import scala.compiletime.testing.typeCheckErrors
+    // A `private[align]` constructor reports "cannot be accessed"; the companion `apply` it
+    // generates is simply invisible here, which the compiler reports as "does not take
+    // parameters". Both are proofs of inaccessibility; the direct constructor form is asserted
+    // to carry the access error verbatim.
+    inline def inaccessible(inline code: String, what: String, viaApply: Boolean = false): Unit =
+      val errors = typeCheckErrors(code)
+      val ok = errors.exists { e =>
+        e.message.contains("cannot be accessed") ||
+        (viaApply && e.message.contains("does not take parameters"))
+      }
+      assert(ok, s"$what must be private to align (expected an access error): $errors")
+    inaccessible(
+      """new storymodel4s.align.HsmmResult(???, ???, ???, 0.0, ???, ???, 0)""",
+      "the HsmmResult constructor"
+    )
+    inaccessible(
+      """new storymodel4s.align.AlignmentRow(???, ???)""",
+      "the AlignmentRow constructor"
+    )
+    inaccessible(
+      """storymodel4s.align.AlignmentRow(???, ???)""",
+      "AlignmentRow.apply",
+      viaApply = true
+    )
+    inaccessible(
+      """new storymodel4s.align.AlignmentMatrix(???)""",
+      "the AlignmentMatrix constructor"
+    )
+    inaccessible(
+      """storymodel4s.align.AlignmentMatrix(???)""",
+      "AlignmentMatrix.apply",
+      viaApply = true
+    )
+    inaccessible(
+      """new storymodel4s.align.Admissibility(Vector.empty, true, None)""",
+      "the Admissibility constructor"
+    )
+    inaccessible(
+      """storymodel4s.align.Admissibility(Vector.empty, true, None)""",
+      "Admissibility.apply",
+      viaApply = true
+    )
+    inaccessible("""storymodel4s.align.Admissibility.faithfulOnly""", "Admissibility.faithfulOnly")
+    inaccessible("""storymodel4s.align.Admissibility.of(Vector.empty)""", "Admissibility.of")
+  }
 
   {
     import AddressGens.given
