@@ -105,9 +105,9 @@ object PenmanParser:
       val line = raw.trim
       if line.startsWith("::") then
         metadataParts(line).map { p =>
-            val body = p.drop(2)
-            val i = body.indexWhere(_.isWhitespace)
-            if i < 0 then Header.Meta(body, "") else Header.Meta(body.take(i), body.drop(i).trim)
+          val body = p.drop(2)
+          val i = body.indexWhere(_.isWhitespace)
+          if i < 0 then Header.Meta(body, "") else Header.Meta(body.take(i), body.drop(i).trim)
         }
       else Vector(Header.Comment(line))
     }
