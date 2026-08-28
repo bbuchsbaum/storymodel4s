@@ -125,8 +125,8 @@ final case class PopulationAggregate private (view: SourceView, subjects: Vector
     subjectIds
       .flatMap { s =>
         bySubject(s).result.flow.steps.flatMap { step =>
-          step.mass.toVector.collect {
-            case ((AlignState.Source(a), AlignState.Source(b)), m) if m > 0.0 => ((a, b), m)
+          step.mass.toVector.flatMap { case ((x, y), m) =>
+            x.anchor.zip(y.anchor).filter(_ => m > 0.0).map(ab => (ab, m))
           }
         }
       }
@@ -203,11 +203,9 @@ object PopulationAggregate:
     val dup = ids.groupBy(identity).collect { case (id, xs) if xs.size > 1 => id }.toVector.sorted
     val known = view.nodes.map(_.ref).toSet
     def sourceRefs(r: HsmmResult): Vector[SourceNodeRef] =
-      val fromRows = r.posterior.rows.flatMap(_.mass.keys.toVector.collect {
-        case AlignState.Source(ref) => ref
-      })
+      val fromRows = r.posterior.rows.flatMap(_.mass.keys.toVector.flatMap(_.anchor))
       val fromFlow = r.flow.steps.flatMap(_.mass.keys.toVector.flatMap { case (a, b) =>
-        Vector(a, b).collect { case AlignState.Source(ref) => ref }
+        Vector(a, b).flatMap(_.anchor)
       })
       (fromRows ++ fromFlow).distinct.sortBy(_.key)
     val unknown = subjects.flatMap { s =>

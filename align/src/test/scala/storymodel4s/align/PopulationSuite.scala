@@ -124,6 +124,7 @@ class PopulationSuite extends ScalaCheckSuite:
       Vector.empty,
       0.0,
       Map.empty,
+      Map.empty,
       0
     )
     assert(PopulationAggregate.of(view, Vector(SubjectAlignment(sid("t"), badResult, None))).isLeft)
@@ -169,6 +170,7 @@ class PopulationSuite extends ScalaCheckSuite:
       outerFlow(rows),
       rows.flatMap(_.argmax),
       0.0,
+      Map.empty,
       Map.empty,
       0
     )
@@ -239,6 +241,7 @@ class PopulationSuite extends ScalaCheckSuite:
           TransitionFlow(Vector.empty),
           Vector.empty,
           0.0,
+          Map.empty,
           Map.empty,
           0
         )

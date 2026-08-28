@@ -5,14 +5,19 @@ import storymodel4s.recall.{RecallGraph, RecallUnitId}
 /** The decomposed recall signature `m_s` (design record §12). Every component stays separately
   * accessible; a scalar is only ever produced by a declared [[SignatureProjection]].
   *
+  *   - coverage counts anchored mass in *either* mode: a distorted anchor is recall of the event.
+  *   - `distortedMass` / `distortedMassByFacet`: mean per-unit mass on distorted states, overall
+  *     and per contradicted facet — reported separately from omission (uncovered leaves) and from
+  *     intrusion (external mass), because they are different phenomena (design record §9).
+  *   - `fidelity` and `perUnitFidelity`: facets assessed on the MAP `(anchor, mode)`; the facets of
+  *     a distorted mode are wrong by construction.
   *   - `specificity`: mean localizability over units with source mass (K = source node count).
-  *   - `backwardMass` / `worldBackwardMass`: mean per-step source→source mass on moves that go
+  *   - `backwardMass` / `worldBackwardMass`: mean per-step anchor→anchor mass on moves that go
   *     backward in discourse / story-world order, excluding moves to an ancestor (§12.3).
   *   - `causalPreservation`: fraction of source causal edges among recalled leaves whose endpoints
   *     are covered by two *distinct* recall units linked by a recall causal edge, both mapped at or
-  *     below `causalLevelThreshold` (§12.4; review #17).
-  *   - external masses: mean per-unit mass on each explicit external state, including
-  *     `sourceConsistentInferenceMass`, `uninterpretableMass`, and `unrankedMass` (review #39).
+  *     below `causalLevelThreshold` (§12.4).
+  *   - external masses: mean per-unit mass on each explicit external state.
   */
 final case class RecallSignature(
     uniformCoverage: Double,
@@ -30,10 +35,13 @@ final case class RecallSignature(
     sourceConsistentInferenceMass: Double,
     uninterpretableMass: Double,
     unrankedMass: Double,
+    distortedMass: Double,
+    distortedMassByFacet: Map[Facet, Double],
     backwardMass: Double,
     worldBackwardMass: Option[Double],
     perUnitLocalizability: Map[RecallUnitId, Double],
-    perUnitFidelity: Map[RecallUnitId, FidelityReport]
+    perUnitFidelity: Map[RecallUnitId, FidelityReport],
+    perUnitMode: Map[RecallUnitId, FidelityMode]
 ):
   def externalMass: Double =
     associationMass + intrusionMass + commentaryMass + sourceConsistentInferenceMass +
@@ -58,14 +66,18 @@ object RecallSignature:
     val weighted =
       if wsum <= 0 then uniform else importance.map { case (r, w) => w * visitation(r) }.sum / wsum
 
-    val facets: Map[RecallUnitId, FidelityReport] = recall.ordered.flatMap { u =>
-      for
-        row <- p.row(u.id)
-        ref <- row.mapSource
-        node <- view.node(ref)
-        if row.sourceMass > row.externalMass
-      yield u.id -> FidelityFacets.assess(u.proposition, node)
-    }.toMap
+    val anchored: Vector[(RecallUnitId, FidelityReport, FidelityMode)] = recall.ordered.flatMap {
+      u =>
+        for
+          row <- p.row(u.id)
+          ref <- row.mapSource
+          mode <- row.mapMode
+          node <- view.node(ref)
+          if row.sourceMass > row.externalMass
+        yield (u.id, FidelityFacets.assess(u.proposition, node, mode), mode)
+    }
+    val facets = anchored.map(a => a._1 -> a._2).toMap
+    val modes = anchored.map(a => a._1 -> a._3).toMap
     val fid = facets.values.flatMap(_.fidelity).toVector
     val fidelity = if fid.isEmpty then None else Some(fid.sum / fid.size)
 
@@ -146,8 +158,14 @@ object RecallSignature:
     }
     val semanticFlow = if coherence.isEmpty then 1.0 else coherence.sum / coherence.size
 
+    val n = math.max(1, p.rows.size)
     def extMean(state: ExternalState): Double =
-      if p.rows.isEmpty then 0.0 else p.rows.map(_.externalMass(state)).sum / p.rows.size
+      if p.rows.isEmpty then 0.0 else p.rows.map(_.externalMass(state)).sum / n
+    val distorted = if p.rows.isEmpty then 0.0 else p.rows.map(_.distortedMass).sum / n
+    val byFacet = Facet.values.toVector
+      .map(fc => fc -> (if p.rows.isEmpty then 0.0 else p.rows.map(_.distortedMass(fc)).sum / n))
+      .filter(_._2 > 0.0)
+      .toMap
 
     RecallSignature(
       uniform,
@@ -165,21 +183,25 @@ object RecallSignature:
       extMean(ExternalState.SourceConsistentInference),
       extMean(ExternalState.Uninterpretable),
       extMean(ExternalState.Unranked),
+      distorted,
+      byFacet,
       backward,
       worldBackward,
       loc,
-      facets
+      facets,
+      modes
     )
 
-  /** Visitation per leaf, counting mass placed on ancestors as spread over their leaves. */
+  /** Visitation per leaf, counting mass placed on ancestors as spread over their leaves; anchors of
+    * either mode count.
+    */
   def leafVisitation(p: AlignmentMatrix, view: SourceView): Map[SourceNodeRef, Double] =
     val acc = scala.collection.mutable.Map.empty[SourceNodeRef, Double].withDefaultValue(0.0)
     p.rows.foreach { row =>
-      row.mass.toVector.sortBy(_._1.key).foreach {
-        case (AlignState.Source(ref), m) if m > 0 =>
+      row.anchorMass.toVector.sortBy(_._1.key).foreach { case (ref, m) =>
+        if m > 0 then
           val ls = view.leavesUnder(ref)
           if ls.nonEmpty then ls.foreach(l => acc.update(l, acc(l) + m / ls.size))
-        case _ => ()
       }
     }
     view.leaves.map(n => n.ref -> (1.0 - math.exp(-acc(n.ref)))).toMap
@@ -203,6 +225,7 @@ final case class SignatureProjection(version: String, weights: Map[String, Doubl
       "sourceConsistentInferenceMass" -> s.sourceConsistentInferenceMass,
       "uninterpretableMass" -> s.uninterpretableMass,
       "unrankedMass" -> s.unrankedMass,
+      "distortedMass" -> s.distortedMass,
       "backwardMass" -> s.backwardMass,
       "worldBackwardMass" -> s.worldBackwardMass.getOrElse(0.0)
     )

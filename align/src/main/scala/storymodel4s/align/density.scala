@@ -134,8 +134,9 @@ object SupportDensity:
     posterior.rows.map { row =>
       val contributions = row.mass.toVector
         .sortBy(_._1.key)
-        .collect { case (AlignState.Source(ref), m) if m > 0 => span(ref).map(s => (s, m)) }
-        .flatten
+        .flatMap { case (st, m) =>
+          st.anchor.filter(_ => m > 0).flatMap(r => span(r).map(s => (s, m)))
+        }
       val acc = Array.fill(grid)(0.0)
       contributions.foreach { case ((a, b), m) =>
         val k = kernel(a, b)

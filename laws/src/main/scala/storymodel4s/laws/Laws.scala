@@ -4,6 +4,7 @@ import cats.data.NonEmptyVector
 import org.scalacheck.{Arbitrary, Gen, Prop}
 import org.scalacheck.Prop.*
 import org.typelevel.discipline.Laws
+import storymodel4s.align.*
 import storymodel4s.core.*
 import storymodel4s.features.*
 import storymodel4s.proposition.*
@@ -158,6 +159,74 @@ object AlignmentLaws extends Laws:
                 case None    => r.sourceMass <= 0.0
             }
       }
+    )
+
+/** The mode-gate laws of ADR 0001 rev 3 §D5 (L1–L3), checked on adversarial foils: a unit built to
+  * contradict a leaf on one facet, with cosine 1 on that leaf and random weights, temperature, and
+  * refinement passes.
+  */
+object ModeGateLaws extends Laws:
+  private def run(f: AlignGens.FoilCase): HsmmResult =
+    GraphHsmm
+      .infer(f.recall, f.base.view, f.candidates, f.costModel, f.config)
+      .fold(e => throw new IllegalStateException(e.message), identity)
+
+  def modeGate(using Arbitrary[AlignGens.FoilCase]): RuleSet =
+    new DefaultRuleSet(
+      "align.modeGate",
+      None,
+      "L1: the faithful mode of a contradicted anchor never carries mass, for any distance, weights, temperature, or refinement" ->
+        forAll { (f: AlignGens.FoilCase) =>
+          val res = run(f)
+          val row = res.posterior.rows.head
+          val adm = res.admissibility(f.unit.id).get(f.target)
+          adm.exists(a => !a.faithful && a.contradictions.contains(f.contradiction)) &&
+          row.faithfulMassOn(f.target) == 0.0 &&
+          !res.costs(f.unit.id).contains(AlignState.Source(f.target)) &&
+          !res.viterbi.contains(AlignState.Source(f.target))
+        },
+      "L1': the contradicted anchor stays recallable in its distorted mode (no omission + intrusion)" ->
+        forAll { (f: AlignGens.FoilCase) =>
+          val res = run(f)
+          val row = res.posterior.rows.head
+          val facet = f.contradiction.facet
+          row.distortedMassOn(f.target) > 0.0 &&
+          res.costs(f.unit.id).keys.exists {
+            case AlignState.Distorted(r, fs) => r == f.target && fs.contains(facet)
+            case _                           => false
+          }
+        },
+      "L2: candidate order and fused rank never change the posterior" ->
+        forAll { (f: AlignGens.FoilCase) =>
+          val base = f.candidates
+          val set = base.set(f.unit.id)
+          val reversed =
+            Candidates(Map(f.unit.id -> set.copy(nominations = set.nominations.reverse)))
+          val fused =
+            Candidates(
+              Map(f.unit.id -> CandidateSet.fuse(Vector(set, set.without(Channels.lexical))))
+            )
+          val a = run(f)
+          val b = GraphHsmm
+            .infer(f.recall, f.base.view, reversed, f.costModel, f.config)
+            .fold(e => throw new IllegalStateException(e.message), identity)
+          val c = GraphHsmm
+            .infer(f.recall, f.base.view, fused, f.costModel, f.config)
+            .fold(e => throw new IllegalStateException(e.message), identity)
+          a.posterior == b.posterior && a.posterior == c.posterior
+        },
+      "L3: the cost model is consulted only for admissible (anchor, mode) pairs, each once per pass set" ->
+        forAll { (f: AlignGens.FoilCase) =>
+          val spy = new AlignGens.SpyCostModel(f.costModel)
+          val res = GraphHsmm
+            .infer(f.recall, f.base.view, f.candidates, spy, f.config)
+            .fold(e => throw new IllegalStateException(e.message), identity)
+          val adm = res.admissibility(f.unit.id)
+          val expected =
+            adm.toVector.flatMap((ref, a) => a.modes.map(m => (f.unit.id, ref, m))).toSet
+          spy.calls.toSet == expected && spy.calls.size == expected.size &&
+          !spy.calls.contains((f.unit.id, f.target, FidelityMode.Faithful))
+        }
     )
 
 /** Discipline rule sets for feature estimates and reducers. */

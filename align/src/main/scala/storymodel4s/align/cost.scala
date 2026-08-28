@@ -1,11 +1,16 @@
 package storymodel4s.align
 
+import cats.data.NonEmptySet
 import storymodel4s.features.{Estimate, MissingReason}
 import storymodel4s.recall.*
 
-/** Additive terms of the local content cost `C_iv` (design record §7.1). */
+/** Additive terms of the local content cost `C_iv` (design record §7.1). `Distortion` is the
+  * documented penalty of a [[FidelityMode.Distorted]] state — one unit of cost per contradicted
+  * facet, scaled by the contradiction weight — kept separate from graded semantic cost so a
+  * faithful anchor is preferred over a distorted one at equal content match.
+  */
 enum CostTerm:
-  case Semantic, Propositional, Entity, Sensory, Granularity, Contradiction
+  case Semantic, Propositional, Entity, Sensory, Granularity, Distortion
 
 final case class CostWeights private (
     semantic: Double,
@@ -21,7 +26,7 @@ final case class CostWeights private (
     case CostTerm.Entity        => entity
     case CostTerm.Sensory       => sensory
     case CostTerm.Granularity   => granularity
-    case CostTerm.Contradiction => contradiction
+    case CostTerm.Distortion    => contradiction
 
 object CostWeights:
   /** Weights must be finite and nonnegative. */
@@ -53,45 +58,53 @@ object CostWeights:
 
   val default: CostWeights = unsafe(1.0, 0.5, 0.4, 0.15, 0.3, 1.0)
 
-  /** Embedding-only weights for the baseline ablation: no structure, no gating. */
+  /** Embedding-only weights for the baseline ablation: no structure. */
   val semanticOnly: CostWeights = unsafe(1.0, 0.0, 0.0, 0.0, 0.0, 0.0)
 
-/** Structural incompatibilities that embeddings cannot see. The gating ones (`RoleReversal`,
-  * `PolarityConflict`, `ModalityConflict`, `OutcomeConflict`) exclude the candidate from the unit's
-  * source states: a fully contradicted unit is fully external however many candidates it has.
-  * `ContextConflict` is deliberately *not* a gate (review #10): recalling reported content as fact
-  * is the canonical Bartlett distortion and must be measured as an aligned unit with a context
-  * facet error, not hidden as an intrusion.
+/** Structural incompatibilities that embeddings cannot see. Every contradiction is a *fidelity
+  * facet* of the anchor: it makes `(anchor, Faithful)` inadmissible and `(anchor,
+  * Distorted(facets))` admissible (ADR 0001 rev 3 §D5). None excludes the anchor itself.
   */
 enum Contradiction:
   case RoleReversal, PolarityConflict, ContextConflict, ModalityConflict, OutcomeConflict
 
-  def gates: Boolean = this != Contradiction.ContextConflict
+  def facet: Facet = this match
+    case RoleReversal     => Facet.RoleReversal
+    case PolarityConflict => Facet.Polarity
+    case ContextConflict  => Facet.Context
+    case ModalityConflict => Facet.Modality
+    case OutcomeConflict  => Facet.Outcome
 
-/** Why a candidate is not a source state for a unit. */
+/** Why a candidate is not a source state for a unit. Only bookkeeping reasons remain: a recall
+  * judgement never removes an anchor.
+  */
 enum Exclusion:
-  /** A gating contradiction was detected. */
-  case Contradicted
-
-  /** The candidate reference is not a node of the view (bookkeeping, never a recall judgement). */
+  /** The candidate reference is not a node of the view. */
   case Unreachable
 
+/** The cost of one admissible `(anchor, mode)` state (or external state) for one unit. */
 final case class CostBreakdown(
     terms: Map[CostTerm, Double],
-    contradictions: Vector[Contradiction],
+    mode: Option[FidelityMode],
     exclusion: Option[Exclusion],
     total: Double
 ):
   def term(t: CostTerm): Double = terms.getOrElse(t, 0.0)
 
-  /** Excluded because of a gating contradiction. */
-  def gated: Boolean = exclusion.contains(Exclusion.Contradicted)
-
-  /** Not a source state for this unit, for any reason. */
+  /** Not a source state for this unit (bookkeeping only). */
   def excluded: Boolean = exclusion.nonEmpty
 
-  /** Reported content asserted as fact (or vice versa); a fidelity facet, not a gate. */
-  def contextMismatch: Boolean = contradictions.contains(Contradiction.ContextConflict)
+  def isDistorted: Boolean = mode.exists(!_.isFaithful)
+
+  /** Facets contradicted by this state's mode. */
+  def facets: Set[Facet] = mode.map(_.facetSet).getOrElse(Set.empty)
+
+  /** Reported content asserted as fact (or vice versa): the `Context` facet. */
+  def contextMismatch: Boolean = facets.contains(Facet.Context)
+
+object CostBreakdown:
+  def unreachable: CostBreakdown =
+    CostBreakdown(Map.empty, None, Some(Exclusion.Unreachable), Double.MaxValue / 4)
 
 /** Graded semantic distance in `[0, 1]` between a recall unit and a source node, or `Missing` when
   * the provider abstains (no embedding for the unit, out-of-domain text, budget exceeded). This is
@@ -207,6 +220,64 @@ object ContradictionDetector:
   def engages(sketch: PropositionSketch, node: NodeSummary): Boolean =
     sketch.predicate.exists(p => node.predicate.contains(p)) || detect(sketch, node).nonEmpty
 
+/** Which `(anchor, mode)` pairs a unit may occupy on a candidate node. Decided by [[ModeGate]]
+  * before any graded cost is evaluated; `faithful` is false exactly when a contradiction was
+  * detected, in which case `distortion` names the contradicted facets and the distorted state is
+  * the only admissible mode on that anchor.
+  */
+final case class Admissibility(
+    contradictions: Vector[Contradiction],
+    faithful: Boolean,
+    distortion: Option[NonEmptySet[Facet]]
+):
+  /** The admissible modes on this anchor, in a deterministic order. */
+  def modes: Vector[FidelityMode] =
+    (if faithful then Vector(FidelityMode.Faithful) else Vector.empty) ++
+      distortion.toVector.map(FidelityMode.Distorted(_))
+
+  def facets: Set[Facet] = distortion.map(_.toSortedSet.toSet).getOrElse(Set.empty)
+
+  /** The faithful mode was refused. */
+  def gated: Boolean = !faithful
+
+object Admissibility:
+  val faithfulOnly: Admissibility = Admissibility(Vector.empty, faithful = true, None)
+
+  def of(contradictions: Vector[Contradiction]): Admissibility =
+    val distinct = contradictions.distinct
+    if distinct.isEmpty then faithfulOnly
+    else
+      Admissibility(
+        distinct,
+        faithful = false,
+        NonEmptySet.fromSet(
+          scala.collection.immutable.SortedSet.from(distinct.map(_.facet))
+        )
+      )
+
+/** The mode gate (ADR 0001 rev 3 §D5, law L1): decides, per unit and candidate anchor, whether the
+  * faithful mode is admissible and which distorted mode replaces it. It is a typed prepass owned by
+  * [[GraphHsmm]]; no [[LocalCostModel]] can widen it, and no distance, weight, temperature,
+  * candidate channel, or refinement pass can reintroduce a refused mode.
+  *
+  * A segment refuses the faithful mode only when *every* leaf the sketch engages (same predicate or
+  * contradicted) is contradicted; its distorted facets are the union over those leaves. Leaves the
+  * sketch does not engage do not vote either way, so a scene stays a valid gist target while one
+  * compatible leaf exists.
+  */
+object ModeGate:
+  def assess(unit: RecallUnit, node: NodeSummary, view: SourceView): Admissibility =
+    val sketch = unit.proposition
+    if node.isLeaf then Admissibility.of(ContradictionDetector.detect(sketch, node))
+    else
+      val engaged = view
+        .leavesUnder(node.ref)
+        .flatMap(view.node)
+        .filter(ContradictionDetector.engages(sketch, _))
+      val reports = engaged.map(ContradictionDetector.detect(sketch, _))
+      if engaged.nonEmpty && reports.forall(_.nonEmpty) then Admissibility.of(reports.flatten)
+      else Admissibility.faithfulOnly
+
 /** Prior cost added to every *source* candidate according to the unit's discourse function: an
   * association or a task comment is presumptively external, an episodic assertion is not.
   */
@@ -228,10 +299,14 @@ object FunctionPrior:
   )
   val none: FunctionPrior = FunctionPrior(Map.empty)
 
-/** Local cost model: content cost for source candidates and floor cost for external states. */
+/** Local cost model: graded content cost for an *admissible* `(anchor, mode)` state and floor cost
+  * for external states. Implementations never see an inadmissible pair (law L3) and cannot refuse
+  * or admit modes: admissibility is [[ModeGate]]'s alone.
+  */
 trait LocalCostModel:
-  /** Cost of aligning `unit` to `node`; `view` lets segment nodes consult their leaves. */
-  def cost(unit: RecallUnit, node: NodeSummary, view: SourceView): CostBreakdown
+  /** Cost of aligning `unit` to `node` in `mode`; `view` lets segment nodes consult their leaves.
+    */
+  def cost(unit: RecallUnit, node: NodeSummary, mode: FidelityMode, view: SourceView): CostBreakdown
 
   /** Cost of the external floor: a source candidate must beat this to be preferred. */
   def externalFloor: Double
@@ -259,8 +334,8 @@ final case class DefaultLocalCostModel(
     functionPrior: FunctionPrior = FunctionPrior.default,
     externalFloor: Double = 1.0,
     externalMismatch: Double = 0.5,
-    gating: Boolean = true,
-    missingSemantic: Double = 0.5
+    missingSemantic: Double = 0.5,
+    distortionPenalty: Double = 0.3
 ) extends LocalCostModel:
 
   def externalCost(unit: RecallUnit, state: ExternalState): Double =
@@ -268,7 +343,12 @@ final case class DefaultLocalCostModel(
     else if ExternalStates.natural(unit.function) == state then externalFloor
     else externalFloor + externalMismatch
 
-  def cost(unit: RecallUnit, node: NodeSummary, view: SourceView): CostBreakdown =
+  def cost(
+      unit: RecallUnit,
+      node: NodeSummary,
+      mode: FidelityMode,
+      view: SourceView
+  ): CostBreakdown =
     val sketch = unit.proposition
     val dSem = clamp(semantic.orElse(unit, node, missingSemantic))
     val dProp = (sketch.predicate, node.predicate) match
@@ -298,34 +378,22 @@ final case class DefaultLocalCostModel(
       case _ if sketch.predicate.isEmpty && sketch.participants.isEmpty => 1
       case _                                                            => 0
     val dGran = math.min(1.0, 0.5 * math.abs(node.level - preferred))
-    // A segment is a valid gist target as long as some leaf under it is compatible: it inherits a
-    // contradiction only when every leaf the sketch engages (same predicate or contradicted) is
-    // contradicted (review #9). Leaves the sketch does not engage do not vote either way.
-    val contradictions =
-      if !gating then Vector.empty
-      else if node.isLeaf then ContradictionDetector.detect(sketch, node)
-      else
-        val engaged = view
-          .leavesUnder(node.ref)
-          .flatMap(view.node)
-          .filter(ContradictionDetector.engages(sketch, _))
-        val reports = engaged.map(ContradictionDetector.detect(sketch, _))
-        if engaged.nonEmpty && reports.forall(_.exists(_.gates)) then reports.flatten.distinct
-        else reports.flatten.filterNot(_.gates).distinct
-    val cContra = contradictions.count(_.gates).toDouble
+    // The distortion term: `distortionPenalty` per contradicted facet, weighted by
+    // `contradiction`. It separates a distorted anchor from a faithful one at equal content
+    // match and must stay below the external floor so a well-matched distorted anchor is
+    // preferred to intrusion (design record §9). Provisional until W4 calibration.
+    val dDist = distortionPenalty * mode.facetSet.size.toDouble
     val terms = Map(
       CostTerm.Semantic -> dSem,
       CostTerm.Propositional -> dProp,
       CostTerm.Entity -> dEnt,
       CostTerm.Sensory -> dSens,
       CostTerm.Granularity -> dGran,
-      CostTerm.Contradiction -> cContra
+      CostTerm.Distortion -> dDist
     )
     val weighted =
       CostTerm.values.toVector.map(t => weights(t) * terms(t)).sum + functionPrior(unit.function)
-    val gated = contradictions.exists(_.gates)
-    val exclusion = if gated then Some(Exclusion.Contradicted) else None
-    CostBreakdown(terms, contradictions, exclusion, weighted)
+    CostBreakdown(terms, Some(mode), None, weighted)
 
   private def clamp(x: Double): Double =
     if x.isNaN then 1.0 else math.max(0.0, math.min(1.0, x))
