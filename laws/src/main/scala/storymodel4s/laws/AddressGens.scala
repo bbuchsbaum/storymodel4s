@@ -154,7 +154,8 @@ object AddressGens:
     seg.map(FeatureTarget.Segment.apply),
     id.map(s => FeatureTarget.Boundary(SurfaceUnitId.unsafe(s))),
     id.map(s => FeatureTarget.Turn(TurnId.unsafe(s))),
-    tokenRange.map(FeatureTarget.Window.apply)
+    tokenRange.map(FeatureTarget.Window.apply),
+    id.map(s => FeatureTarget.SurfaceUnit(SurfaceUnitId.unsafe(s)))
   )
 
   val featureAddress: Gen[FeatureAddress] = Gen.oneOf(
