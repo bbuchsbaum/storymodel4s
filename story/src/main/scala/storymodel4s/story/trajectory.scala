@@ -3,39 +3,6 @@ package storymodel4s.story
 import cats.data.NonEmptyVector
 import storymodel4s.core.*
 
-// INTEGRATION: WorldTimeTransition, DurationEstimate, TemporalHypothesis move to
-// storymodel4s.features (design record §113).
-
-/** A coarse duration estimate in seconds with an optional range; `gloss` keeps the source wording
-  * ("at midnight", "when the sun rose") when no numeric estimate is justified.
-  */
-final case class DurationEstimate(
-    lowerSeconds: Option[Double],
-    upperSeconds: Option[Double],
-    gloss: String
-)
-
-/** One weighted hypothesis about a world-time transition. */
-final case class TemporalHypothesis(transition: WorldTimeTransition, credence: Credence)
-
-/** How story-world time moves between two adjacent discourse units (design record §113).
-  *
-  * Why: "misordering" is not one thing. A flashback, a return from it, a parallel thread, and
-  * atemporal commentary are different transitions and must not collapse into one scalar jump.
-  */
-enum WorldTimeTransition:
-  case Continues
-  case JumpForward(magnitude: Option[DurationEstimate])
-  case JumpBackward(magnitude: Option[DurationEstimate])
-  case ReturnFromEarlierFrame
-  case SimultaneousThreadSwitch
-  case Atemporal
-  case Unresolved(alternatives: Vector[TemporalHypothesis])
-
-  def isBackward: Boolean = this match
-    case JumpBackward(_) => true
-    case _               => false
-
 /** Change between two adjacent atomic units in discourse order. `featureChanges` holds
   * view-specific discontinuities keyed by the declared feature space that produced them; a missing
   * key means that view was not computed, never that the change was zero.
@@ -131,43 +98,16 @@ object DiscourseTrajectory:
     }
     DiscourseTrajectory(steps)
 
-// INTEGRATION: replaced by storymodel4s.features (Normalization, FeatureSpace, FeatureTarget,
-// FeatureRef, SensoryModality, ScoreEstimate, SensoryProfileKind, SensoryProfile).
-
-/** Declared normalization of a feature space, so numeric checks can be verified. */
-enum Normalization:
-  case UnitNorm, Raw, Standardized
-  case Custom(description: String)
-
-/** A declared vector space. Vectors live in sidecars; only manifests and row references enter the
-  * model.
-  */
-final case class FeatureSpace(
-    id: FeatureSpaceId,
-    dimension: Int,
-    description: String,
-    fingerprint: Fingerprint,
-    normalization: Normalization
-)
-
-enum FeatureTarget:
-  case Situation(id: SituationId)
-  case Segment(id: SegmentId)
-  case Entity(id: EntityId)
-
-/** Reference from a target to a row of a feature-space sidecar. */
-final case class FeatureRef(target: FeatureTarget, space: FeatureSpaceId, row: Int)
-
 enum SensoryModality:
   case Visual, Auditory, Tactile, Motor, Spatial, Olfactory, Gustatory, Interoceptive
-
-/** A scalar estimate with its credence. */
-final case class ScoreEstimate(value: Double, credence: Credence)
 
 /** `Expressed`: sensory language actually present; `Evoked`: model-estimated imagery. */
 enum SensoryProfileKind:
   case Expressed, Evoked
 
+/** Per-modality sensory scores of a situation; `Missing` marks modalities the provider did not
+  * score, never a zero.
+  */
 final case class SensoryProfile(
     kind: SensoryProfileKind,
     scores: Map[SensoryModality, ScoreEstimate]

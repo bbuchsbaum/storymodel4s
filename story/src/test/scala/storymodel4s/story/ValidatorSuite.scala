@@ -415,7 +415,16 @@ class ValidatorSuite extends ScalaCheckSuite:
         -1
       )
     )
-    val spaces = Map(space -> FeatureSpace(space, 8, "sem", Small.fp, Normalization.UnitNorm))
+    val spaces: Map[FeatureSpaceId, FeatureSpace[?]] = Map(
+      space -> FeatureSpace[Vector[Double]](
+        space,
+        "sem",
+        FeatureValueSchema.Vector(8),
+        None,
+        Small.fp,
+        normalized = true
+      )
+    )
     val ls = laws(b.draft(featureSpaces = spaces, featureRefs = refs))
     assertEquals(
       ls,

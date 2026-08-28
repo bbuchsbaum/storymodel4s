@@ -35,7 +35,8 @@ object RecallSignature:
     val leaves = view.leaves.map(_.ref)
     val visitation = leafVisitation(p, view)
     val uniform = if leaves.isEmpty then 0.0 else leaves.map(visitation).sum / leaves.size
-    val importance = view.leaves.map(n => (n.ref, n.importance))
+    // Leaves whose importance is Missing are excluded from the weighted sum (never counted as 0).
+    val importance = view.leaves.flatMap(n => n.importance.toOption.map(w => (n.ref, w)))
     val wsum = importance.map(_._2).sum
     val weighted =
       if wsum <= 0 then uniform else importance.map { case (r, w) => w * visitation(r) }.sum / wsum

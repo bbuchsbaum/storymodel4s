@@ -1,10 +1,13 @@
-package storymodel4s.proposition
+package storymodel4s.laws
 
 import cats.data.{NonEmptySet, NonEmptyVector}
 import org.scalacheck.{Arbitrary, Gen}
 import storymodel4s.core.*
+import storymodel4s.proposition.*
 
-/** Generators for valid charts and for charts with exactly one violation each. */
+/** Public generators for valid propositional charts (the proposition module's test generators,
+  * republished for downstream law suites).
+  */
 object ChartGens:
   val lemma: Gen[String] =
     Gen.oneOf(
@@ -56,6 +59,7 @@ object ChartGens:
     ParticipantRole.Custom("x", "y")
   )
 
+  /** Named roles use the bare AMR spelling (`location`, not `:location`), as the interop bridge. */
   val sourceRole: Gen[SourceRole] = Gen.frequency(
     6 -> Gen.chooseNum(0, SourceRole.MaxNumbered).map(SourceRole.Numbered.apply),
     3 -> Gen.oneOf("location", "time", "mod", "manner").map(SourceRole.Named.apply),
@@ -79,17 +83,9 @@ object ChartGens:
     Gen.oneOf("-", "+", "imperative").map(LiteralValue.Symbol.apply)
   )
 
-  val textSpan: Gen[TextSpan] = for
-    a <- Gen.chooseNum(0, 500)
-    b <- Gen.chooseNum(0, 500)
-  yield TextSpan.unsafe(math.min(a, b), math.max(a, b))
-
-  val spanSet: Gen[SpanSet] =
-    Gen.nonEmptyListOf(textSpan.map(SpanRef(_))).map(rs => SpanSet.of(rs).get)
-
   val claimMeta: Gen[ClaimMeta] = for
     id <- Gen.chooseNum(0, 1000000)
-    span <- textSpan
+    span <- CoreGens.textSpan
   yield ClaimMeta(
     ClaimId.unsafe(s"claim:$id"),
     EpistemicStatus.SurfaceExplicit,
@@ -147,7 +143,7 @@ object ChartGens:
     alignment: Gen[PropositionAlignment] =
       for
         i <- Gen.chooseNum(0, n - 1)
-        span <- spanSet
+        span <- CoreGens.spanSet
         c <- Gen.chooseNum(0.0, 1.0).map(Credence.unsafeRaw)
         m <- claimMeta
       yield PropositionAlignment(AlignmentTarget.Concepts(NonEmptySet.one(id(i))), span, c, m)
@@ -159,93 +155,5 @@ object ChartGens:
     )
     .toOption
     .get
-
-  /** Deterministic renaming that avoids the canonical prefix and the generator prefix. */
-  def renamed[C <: CheckState](chart: PropositionChart[C], salt: Int): PropositionChart[C] =
-    val ids = chart.conceptIds
-    val shuffled = ids.zipWithIndex.sortBy((_, i) => (i * 7919 + salt) % 104729).map(_._1)
-    val map = ids.zip(shuffled).map((a, b) => a -> ConceptId.unsafe(s"z${b.value}_$salt")).toMap
-    chart.relabel(map)
-
-  /** Charts with exactly one injected violation, paired with the expected violation class. */
-  val invalidChart: Gen[(PropositionChart[Unchecked], String)] =
-    validChart.flatMap { ok =>
-      val u = ok.unchecked
-      val ghost = ConceptId.unsafe("ghost")
-      val first = u.conceptIds.head
-      val withFrame = u.conceptIds.find(i => u.concepts(i).frame.nonEmpty)
-      val frameless = u.conceptIds.find(i => u.concepts(i).frame.isEmpty)
-      type Case = (PropositionChart[Unchecked], String)
-      def cs(chart: PropositionChart[Unchecked], name: String): Option[Case] = Some((chart, name))
-      val cases: Vector[Case] = Vector(
-        cs(u.copy(focus = Some(ghost)), "MissingFocus"),
-        cs(
-          u.copy(relations =
-            u.relations :+ PropositionRelation(ghost, RoleAssignment.arg(0), ConceptTarget.Unknown)
-          ),
-          "DanglingRelationSource"
-        ),
-        cs(
-          u.copy(relations =
-            u.relations :+
-              PropositionRelation(first, RoleAssignment.named(":x"), ConceptTarget.Node(ghost))
-          ),
-          "DanglingRelationTarget"
-        ),
-        cs(
-          u.copy(relations =
-            u.relations :+
-              PropositionRelation(
-                first,
-                RoleAssignment(SourceRole.Numbered(11), None),
-                ConceptTarget.Unknown
-              )
-          ),
-          "NumberedRoleOutOfRange"
-        ),
-        frameless.flatMap(f =>
-          cs(
-            u.copy(relations =
-              u.relations :+
-                PropositionRelation(
-                  f,
-                  RoleAssignment(
-                    SourceRole.Numbered(0),
-                    Some((ParticipantRole.Agent, Credence.unsafeRaw(1.0)))
-                  ),
-                  ConceptTarget.Unknown
-                )
-            ),
-            "UnlicensedNormalization"
-          )
-        ),
-        u.relations.headOption.flatMap(r =>
-          cs(u.copy(relations = u.relations :+ r), "DuplicateRelation")
-        ),
-        cs(u.copy(polarity = u.polarity.updated(ghost, Polarity.Negative)), "DanglingPolarity"),
-        cs(
-          u.copy(embedded = u.embedded :+ EmbeddedProposition(ghost, EmbeddingKind.Speech, first)),
-          "DanglingEmbeddingContainer"
-        ),
-        cs(
-          u.copy(embedded = u.embedded :+ EmbeddedProposition(first, EmbeddingKind.Belief, first)),
-          "SelfEmbedding"
-        ),
-        withFrame.flatMap(_ =>
-          cs(
-            u.copy(alignments =
-              u.alignments :+ PropositionAlignment(
-                AlignmentTarget.Concepts(NonEmptySet.one(ghost)),
-                SpanSet.one(TextSpan.unsafe(0, 1)),
-                Credence.unsafeRaw(1.0),
-                claimMeta.sample.get
-              )
-            ),
-            "DanglingAlignmentConcept"
-          )
-        )
-      ).flatten
-      Gen.oneOf(cases)
-    }
 
   given Arbitrary[PropositionChart[Checked]] = Arbitrary(validChart)

@@ -371,25 +371,37 @@ object StoryValidator:
       )
     }
 
-    // features
+    // features: declared spaces, sidecar manifests, and row references
     m.featureRefs.zipWithIndex.foreach { (f, i) =>
       val path = s"featureRefs/$i"
       if !m.featureSpaces.contains(f.space) then
         err("feature.space-exists", path, s"unknown space ${f.space.value}")
       if f.row < 0 then err("feature.row-nonnegative", path, s"row ${f.row}")
+      m.sidecars.get(f.space).foreach { manifest =>
+        if f.row >= manifest.rowCount then
+          err("feature.row-in-range", path, s"row ${f.row} outside [0, ${manifest.rowCount})")
+      }
       f.target match
         case FeatureTarget.Situation(id) => sit("feature.target-exists", path, id)
         case FeatureTarget.Segment(id)   => seg("feature.target-exists", path, id)
-        case FeatureTarget.Entity(id)    => ent("feature.target-exists", path, id)
+        case FeatureTarget.Sentence(u)   =>
+          if !m.atlas.byId.contains(u) then
+            err("feature.target-exists", path, s"unknown surface unit ${u.value}")
+        case FeatureTarget.Boundary(u) =>
+          if !m.atlas.byId.contains(u) then
+            err("feature.target-exists", path, s"unknown surface unit ${u.value}")
+        case FeatureTarget.Token(_) | FeatureTarget.Window(_) | FeatureTarget.Turn(_) => ()
     }
-    m.featureSpaces.values.foreach(s =>
-      if s.dimension <= 0 then
-        err(
-          "feature.dimension-positive",
-          s"featureSpaces/${s.id.value}",
-          s"dimension ${s.dimension}"
-        )
-    )
+    m.sidecars.foreach { (id, manifest) =>
+      val path = s"sidecars/${id.value}"
+      if manifest.space != id then err("feature.sidecar-space", path, "manifest space mismatch")
+      if !m.featureSpaces.contains(id) then
+        err("feature.space-exists", path, s"undeclared space ${id.value}")
+      SidecarManifest
+        .validated(manifest)
+        .left
+        .foreach(e => err("feature.sidecar-valid", path, e.toString))
+    }
     m.sensoryProfiles.keys.foreach(id =>
       sit("sensory.target-exists", s"sensoryProfiles/${id.value}", id)
     )
