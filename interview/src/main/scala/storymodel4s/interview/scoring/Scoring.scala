@@ -201,14 +201,20 @@ object TraditionalScoring:
     AiCompatibleScores(policy, expected, hard, byPhase, massCoverage(model.assessments))
 
 /** Evidence for phenomenological re-experiencing, reported as separate strands and never summed
-  * (design record §59.3; AGENTS.md contract 7). No strand is a count of details: `firstPersonRate`
-  * is the proportion of assessed details carrying experiential language, which is invariant under
-  * duplicating the details.
+  * (design record §59.3; AGENTS.md contract 7).
+  *
+  * What may enter: the participant's explicit reliving rating; whether each unique recall unit
+  * carries first-person language; the per-unit set of source-monitoring statements. What may not:
+  * detail or atom counts, specificity, target mass, internal AI totals, or any other quantity of
+  * content. `firstPersonRate` and `sourceMonitoringRate` are unit ratios. `sourceMonitoring` counts
+  * units per kind, never details. Atomizing one utterance into many details must not change any
+  * strand.
   */
 final case class PhenomenologyEvidence(
     explicitRating: Option[ScoreEstimate],
     firstPersonRate: ScoreEstimate,
-    sourceMonitoring: Map[SourceMonitoring, Int]
+    sourceMonitoring: Map[SourceMonitoring, Int],
+    sourceMonitoringRate: ScoreEstimate
 )
 
 /** The multidimensional autobiographical-memory profile of design record §65.2. Ratios whose
@@ -255,22 +261,43 @@ object ProfileScoring:
       .sum
     ratio(post, free + post)
 
-  /** Phenomenology strands from the assessments and the participant's explicit ratings. */
+  /** Phenomenology strands from the assessments and the participant's explicit ratings.
+    *
+    * Assessments are collapsed by `Detail.sourceUnit` before any ratio is taken. `firstPersonRate`
+    * is the mean of each unit's own first-person fraction. The inducer copies one flag per unit, so
+    * on pipeline data every unit is unanimous and this equals |units with the cue| / |units|.
+    * Source-monitoring is the union of `sourceMonitoring` and
+    * `experiential.sourceMonitoringStatements` on that unit, counted once per unit.
+    */
   def phenomenology(
       assessments: Vector[DetailAssessment],
       ratings: Option[SubjectiveRatings]
   ): PhenomenologyEvidence =
-    val rate =
-      if assessments.isEmpty then Estimate.missing(MissingReason.Excluded)
-      else
-        Estimate.observed(
-          assessments.count(_.experiential.firstPersonLanguage).toDouble / assessments.size
-        )
-    PhenomenologyEvidence(
-      ratings.flatMap(_.reliving),
-      rate,
-      assessments.flatMap(_.sourceMonitoring).groupMapReduce(identity)(_ => 1)(_ + _)
-    )
+    val rating = ratings.flatMap(_.reliving)
+    val byUnit = assessments.groupBy(_.detail.sourceUnit)
+    val n = byUnit.size
+    if n == 0 then
+      PhenomenologyEvidence(
+        rating,
+        Estimate.missing(MissingReason.Excluded),
+        Map.empty,
+        Estimate.missing(MissingReason.Excluded)
+      )
+    else
+      val units = byUnit.values.toVector
+      def firstPersonFraction(as: Vector[DetailAssessment]): Double =
+        as.count(_.experiential.firstPersonLanguage).toDouble / as.size
+      def monitoring(as: Vector[DetailAssessment]): Set[SourceMonitoring] =
+        as.flatMap { a =>
+          a.sourceMonitoring.toVector ++ a.experiential.sourceMonitoringStatements
+        }.toSet
+      val sets = units.map(monitoring)
+      PhenomenologyEvidence(
+        rating,
+        Estimate.observed(units.map(firstPersonFraction).sum / n),
+        sets.flatten.groupMapReduce(identity)(_ => 1)(_ + _),
+        Estimate.observed(sets.count(_.nonEmpty).toDouble / n)
+      )
 
   private def components(
       nodes: Vector[DetailId],

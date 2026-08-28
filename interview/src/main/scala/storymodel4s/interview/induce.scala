@@ -446,6 +446,9 @@ object TargetInduction:
         val phase = source.phaseAt(offset)
         val probe = source.probeBefore(offset).map(_.id)
         val lower = Text.lower(u.text)
+        // Unit-level cues, copied onto every atom of this unit. ProfileScoring.phenomenology
+        // must collapse by sourceUnit — averaging these flags over details would derive
+        // phenomenology from atomization density (contract 7).
         val firstPerson = FirstPerson.findFirstIn(lower).nonEmpty
         val monitoring =
           if Hearsay.findFirstIn(lower).nonEmpty then Some(SourceMonitoring.Hearsay)
