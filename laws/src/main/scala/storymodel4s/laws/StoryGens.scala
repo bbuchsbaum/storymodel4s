@@ -139,7 +139,7 @@ object StorySmall:
         sidecars,
         featureRefs,
         descriptors,
-        sensoryProfiles
+        sensoryProfiles = sensoryProfiles
       )
 
   /** One scene under one root, `n` situations, `m` entities, an optional Before chain. */

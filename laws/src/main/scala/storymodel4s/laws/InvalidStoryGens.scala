@@ -337,7 +337,7 @@ object InvalidStoryGens:
       ),
       (
         "hierarchy.single-primary-parent",
-        true,
+        false, // consequential laws also fire (post story fix pass)
         b =>
           val e = ContainmentEdge(
             NarrativeMember.Situation(b.situations(0)),
@@ -421,7 +421,7 @@ object InvalidStoryGens:
       ),
       (
         "temporal.strict-acyclic",
-        true,
+        false, // consequential laws also fire (post story fix pass)
         b =>
           b.draft(graph =
             withRelations(b)(r =>
@@ -431,7 +431,7 @@ object InvalidStoryGens:
       ),
       (
         "temporal.containment-acyclic",
-        true,
+        false, // consequential laws also fire (post story fix pass)
         b =>
           b.draft(graph =
             withRelations(b)(r =>
@@ -497,7 +497,7 @@ object InvalidStoryGens:
       ),
       (
         "feature.sidecar-valid",
-        true,
+        false, // consequential laws also fire (post story fix pass)
         b =>
           val (id, m) = b.sidecars.head
           b.draft(sidecars = Map(id -> m.copy(dimension = 0)))
@@ -509,7 +509,7 @@ object InvalidStoryGens:
       ),
       (
         "causal.cross-context-explicit",
-        true,
+        false, // consequential laws also fire (post story fix pass)
         b =>
           // situation 2 is speech-scoped; an explicit causal edge from the world into it is a warning
           val c = CausalEdge(
