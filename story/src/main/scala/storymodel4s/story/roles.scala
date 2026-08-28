@@ -1,24 +1,23 @@
 package storymodel4s.story
 
-// INTEGRATION: replaced by storymodel4s.proposition.ParticipantRole
-
 import cats.{Hash, Show}
 
-/** Compact, closed set of normalized participant roles.
+import storymodel4s.proposition
+
+/** Story-level participant roles are exactly the shared `proposition.ParticipantRole` vocabulary.
   *
-  * Why closed: story-level relations must remain a small stable algebra. Imported ontologies
-  * (PropBank numbered arguments, VerbNet thematic roles) map into these or into `Custom`, never
-  * into free strings.
+  * Why an alias rather than a second enum: the local proposition chart and the narrative graph must
+  * agree on one closed role algebra so that projection from charts to participant edges is a
+  * identity on roles, never a lossy mapping. Imported ontologies (PropBank numbered arguments,
+  * VerbNet thematic roles) map into these or into `Custom`, never into free strings.
   */
-enum ParticipantRole:
-  case Agent, Patient, Theme, Experiencer, Stimulus, Instrument, Beneficiary, Source, Destination,
-    Location, Time, Manner, Cause, Result
-  case Custom(namespace: String, label: String)
+type ParticipantRole = proposition.ParticipantRole
+val ParticipantRole: proposition.ParticipantRole.type = proposition.ParticipantRole
 
-  def render: String = this match
-    case Custom(ns, l) => s"$ns:$l"
-    case other         => other.toString
+extension (role: ParticipantRole)
+  def render: String = role match
+    case ParticipantRole.Custom(ns, l) => s"$ns:$l"
+    case other                         => other.toString
 
-object ParticipantRole:
-  given Show[ParticipantRole] = Show.show(_.render)
-  given Hash[ParticipantRole] = Hash.fromUniversalHashCode
+given participantRoleShow: Show[ParticipantRole] = Show.show(_.render)
+given participantRoleHash: Hash[ParticipantRole] = Hash.fromUniversalHashCode
