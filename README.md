@@ -55,8 +55,13 @@ backend is included yet; those are provider interfaces (M1, the unattended verti
 Scala 3.7.4, sbt 1.12.14.
 
 ```
-sbt testJVM      # fast loop
-sbt checkAll     # scalafmt + compile + test on JVM, Scala.js, Native
+sbt -Dstorymodel4s.grakern.build=/path/to/grakern testJVM      # fast loop
+sbt -Dstorymodel4s.grakern.build=/path/to/grakern checkAll     # scalafmt + compile + test on JVM, Scala.js, Native
 ```
+
+The `-D` (or `STORYMODEL4S_GRAKERN_BUILD`) override points the JVM-only
+`embed-grakern` project at a local checkout of the in-house `grakern` library,
+which is consumed as an immutable SHA source pin but is not yet published or
+pushed; grakern's own build fetches its graph4s/gale pins from GitHub.
 
 Apache-2.0.

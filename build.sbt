@@ -74,7 +74,8 @@ lazy val root = tlCrossRootProject
     view,
     codec,
     fixtures,
-    laws
+    laws,
+    embedGrakern
   )
 
 /** Identity, spans, evidence, claims, credence, provenance, hashing. No I/O. */
@@ -166,6 +167,49 @@ lazy val embedCore = crossProject(JVMPlatform, JSPlatform, NativePlatform)
   .settings(moduleSettings("embed-core"))
   .dependsOn(core, features, acquire)
 
+// grakern (in-house graph-kernel calculus) is consumed as an immutable source pin. grakern has no
+// published artifacts and, at this revision, no git remote: until it is pushed, builds MUST supply
+// the local override `-Dstorymodel4s.grakern.build=/path/to/grakern` (or the environment variable
+// STORYMODEL4S_GRAKERN_BUILD). grakern's own build pins graph4s and gale by SHA from GitHub.
+lazy val grakernRevision = "0329c43c88a0b71e9aa4456723bb16bac2fa3841"
+lazy val grakernBuild =
+  sys.props
+    .get("storymodel4s.grakern.build")
+    .orElse(sys.env.get("STORYMODEL4S_GRAKERN_BUILD"))
+    .map(p => file(p).getCanonicalFile.toURI)
+    .getOrElse(uri(s"https://github.com/canardlapin/grakern.git#$grakernRevision"))
+lazy val grakernCoreJVM = ProjectRef(grakernBuild, "coreJVM")
+lazy val grakernStandardJVM = ProjectRef(grakernBuild, "standardJVM")
+lazy val grakernGraph4sAdapterJVM = ProjectRef(grakernBuild, "graph4sAdapterJVM")
+lazy val grakernEngineJVM = ProjectRef(grakernBuild, "engineJVM")
+
+/** JVM-only structural embedding channel (ADR 0001 §D4c): proposition charts reified into grakern
+  * labelled neighbourhoods; WL subtree + optimal-assignment kernels supply `d_wl`. No grakern or
+  * graph4s type crosses into portable modules.
+  */
+lazy val embedGrakern = project
+  .in(file("embed-grakern"))
+  .settings(commonSettings)
+  .settings(
+    name := "storymodel4s-embed-grakern",
+    Compile / sourceGenerators += Def.task {
+      val file =
+        (Compile / sourceManaged).value / "storymodel4s" / "embed" / "grakern" / "GrakernPin.scala"
+      IO.write(
+        file,
+        s"""package storymodel4s.embed.grakern
+           |
+           |/** The immutable grakern revision this build compiles against (generated from build.sbt). */
+           |object GrakernPin:
+           |  val revision: String = "$grakernRevision"
+           |""".stripMargin
+      )
+      Seq(file)
+    }.taskValue
+  )
+  .dependsOn(embedCore.jvm, proposition.jvm, align.jvm % "compile->compile;test->test")
+  .dependsOn(grakernCoreJVM, grakernStandardJVM, grakernGraph4sAdapterJVM, grakernEngineJVM)
+
 /** Portable semantic view artifacts shared by the Narrative Codex and Narrative Atlas. */
 lazy val view = crossProject(JVMPlatform, JSPlatform, NativePlatform)
   .crossType(CrossType.Pure)
@@ -241,13 +285,21 @@ val allModules = List(
 )
 val allPlatforms = List("JVM", "JS", "Native")
 
+val jvmOnlyModules = List("embedGrakern")
+
 addCommandAlias(
   "compileAll",
-  allModules.flatMap(m => allPlatforms.map(p => s"$m$p/compile")).mkString(";", ";", "")
+  (allModules.flatMap(m => allPlatforms.map(p => s"$m$p/compile")) ++
+    jvmOnlyModules.map(m => s"$m/compile")).mkString(";", ";", "")
 )
 addCommandAlias(
   "testAll",
-  allModules.flatMap(m => allPlatforms.map(p => s"$m$p/test")).mkString(";", ";", "")
+  (allModules.flatMap(m => allPlatforms.map(p => s"$m$p/test")) ++
+    jvmOnlyModules.map(m => s"$m/test")).mkString(";", ";", "")
 )
-addCommandAlias("testJVM", allModules.map(m => s"${m}JVM/test").mkString(";", ";", ""))
+addCommandAlias(
+  "testJVM",
+  (allModules.map(m => s"${m}JVM/test") ++ jvmOnlyModules.map(m => s"$m/test"))
+    .mkString(";", ";", "")
+)
 addCommandAlias("checkAll", ";scalafmtCheckAll;scalafmtSbtCheck;compileAll;testAll")
