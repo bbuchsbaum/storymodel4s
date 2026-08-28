@@ -70,6 +70,7 @@ lazy val root = tlCrossRootProject
     recall,
     align,
     interview,
+    embedCore,
     view,
     codec,
     fixtures,
@@ -156,6 +157,15 @@ lazy val interview = crossProject(JVMPlatform, JSPlatform, NativePlatform)
   .settings(moduleSettings("interview"))
   .dependsOn(core, proposition, features, story, recall, align)
 
+/** Portable embedding contract (ADR 0001): identity, batch/result algebra, validated vectors, free
+  * baselines, cache and privacy types. Providers are JVM-only adapters.
+  */
+lazy val embedCore = crossProject(JVMPlatform, JSPlatform, NativePlatform)
+  .crossType(CrossType.Pure)
+  .in(file("embed-core"))
+  .settings(moduleSettings("embed-core"))
+  .dependsOn(core, features, acquire)
+
 /** Portable semantic view artifacts shared by the Narrative Codex and Narrative Atlas. */
 lazy val view = crossProject(JVMPlatform, JSPlatform, NativePlatform)
   .crossType(CrossType.Pure)
@@ -223,6 +233,7 @@ val allModules = List(
   "recall",
   "align",
   "interview",
+  "embedCore",
   "view",
   "codec",
   "fixtures",
