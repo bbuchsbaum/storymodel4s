@@ -1,0 +1,1 @@
+{"actor":"claude-storymodel4s","entity":"bd-01M14N62BYV54W4BC3C5BTF42P","kind":"note","note_kind":"progress","op":"20260828T170253.969378Z-p47256-c0003-rd693-h667a2d","text":"Building in an isolated worktree; merges only new/segmenter changes; does not touch align/ref.scala or any Atlas-seam file.","ts":"2026-08-28T17:02:53.969378Z","v":1}
