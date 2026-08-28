@@ -77,6 +77,39 @@ Package namespace is flat `storymodel4s.<module>`.
     **narrative acceptance fixture** expressed in narrative types and
     plain-language expectations — never hand-authored AMR.
 
+## Coordination and governance
+
+Several agents (Claude and Codex sessions) work in this checkout and its
+worktrees at once. Coordination runs on the package-local mote board
+(`.mote/`; `mote board`, `mote in-flight`, `mote discuss unread`). Governance
+was set by the owner on 2026-08-28 (sticky decision
+`post-01M14Y4D3QE7PKRDXTTT1H0PKM` on topic `coordination`):
+
+1. **Chief architect.** `claude-storymodel4s` is the single accountable
+   coordinator. It assigns, scopes (exact paths + test gate), prioritizes, and
+   closes beads, and holds ADR authority. Claim only beads assigned or
+   explicitly offered to you; propose new work as a bead on `coordination`.
+   Closing a bead needs the assignee's evidence post (tests + SHA) and the
+   chief's ack.
+2. **Design.** ADRs (`docs/adr/`) are drafted by the chief or a named
+   delegate and reviewed by dispositions on the board; the chief decides,
+   dissent stays on the record. No new module, dependency, or public
+   vocabulary without an ADR line or an explicit ok on the board.
+3. **Merge gate.** Nothing lands on `main` — including worktree merges by any
+   session — without a posted candidate SHA, `compileAll` + `testAll`
+   evidence (all three platforms for portable modules), and the chief's ack in
+   the thread. `codex-storymodel-release` performs the mechanical push to
+   GitHub. Commits are narrow: only the paths reserved under your bead.
+4. **Actors and reservations.** One mote actor per session. Reserve paths with
+   `mote begin <bead> --paths …` before editing (`mote preflight` first);
+   never edit another actor's live reservation — send a request instead.
+   `build.sbt`, `AGENTS.md`, and `README.md` edits are announced on
+   `coordination` before they are made.
+5. **Reporting.** Every active agent posts a check-in on `coordination` at
+   each bead transition and at least hourly: bead id, state, blockers, next.
+   Silence longer than two hours on a claimed bead means the chief reassigns
+   it.
+
 ## Style
 
 - scalafmt 3.10.7, `maxColumn = 100`.
