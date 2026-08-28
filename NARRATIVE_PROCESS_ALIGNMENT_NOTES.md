@@ -3,7 +3,7 @@
 ## Record status
 
 - **Purpose:** Preserve the complete substance and evolution of a multipart discussion, ending in a concrete plan for a library implementation.
-- **Current coverage:** Parts 1–4 plus AMR reference/fit, automation, and fully autonomous agent-system decision checkpoints.
+- **Current coverage:** Parts 1–4 plus AMR reference/fit, automation, autonomous-agent, and AMR-boundary review checkpoints.
 - **Status:** Initial conceptual proposal; nothing here is yet a final implementation decision.
 - **Note-taking rule:** Later parts should add dated/numbered evolution entries, record agreements and revisions explicitly, and retain superseded ideas with their rationale rather than silently rewriting history.
 - **Provisional framework name:** **Narrative Process Alignment (NPA)**.
@@ -106,6 +106,12 @@ Machine-produced WOG AMRs are **silver**, not gold. Task-level expert review can
 The preceding proposal for plain-language researcher review is superseded as an operational requirement. The target product must process pages or entire stories unattended. Human annotation/adjudication is permitted for offline benchmark construction, calibration, prompt development, and external scientific audit, but never as a required production stage.
 
 Runtime uncertainty is represented automatically as accepted claims, weighted alternatives, unresolved claims, or rejected candidates. “Fully automatic” does not mean forcing one answer when evidence is inadequate; it means completing the build without human intervention while preserving uncertainty, provenance, and failure status.
+
+### Decision checkpoint — AMR structure retained; AMR conformance moved behind an adapter
+
+The reviewed proposal is directionally correct but changes architecture, not merely emphasis. The canonical local representation should be a provider-neutral `PropositionChart`; standards-compatible AMR/PENMAN is one adapter and schema-constrained agent extraction is another. `document`, `story`, `recall`, and `interview` should depend on the proposition contract, not directly on AMR conformance or successful PropBank frame lookup.
+
+The acquisition claim that LLM proposition extraction will outperform AMR parsers on spoken recall is plausible but unproven and must be evaluated. The previously proposed hand-AMR spike is rejected: use existing gold standards, automatically acquired charts, plain-language expected facts, and controlled foils. Measure both oracle structural value and fully automatic acquisition value.
 
 ---
 
@@ -4162,3 +4168,190 @@ The first autonomous vertical slice should:
 10. replay exactly from cached provider outputs.
 
 The final plan must treat autonomous orchestration, prompt-package testing, calibration, failure representation, and long-document incremental processing as P0—not later operational hardening.
+
+---
+
+# AMR Boundary Review Checkpoint
+
+## 98. Overall assessment of the reviewed position
+
+Agreement is high on substance:
+
+- keep role direction, polarity, embedded propositions, and reentrancy;
+- use a shared local structure for source and recall;
+- make agent output typed proposals rather than free-form story graphs;
+- defer costly AMR features until they demonstrate downstream value;
+- treat parser performance on spoken/disfluent recall as a serious risk;
+- make frame identity optional evidence rather than a universal prerequisite.
+
+Two corrections are required:
+
+1. “AMR is an adapter” is an architectural change if the canonical object is no longer an AMR graph.
+2. The discriminative spike cannot require researcher-authored AMRs and must test end-to-end automatic acquisition, not only oracle charts.
+
+## 99. Recommended module boundary
+
+Preferred dependency structure:
+
+```text
+core
+  ↑
+proposition              canonical local semantic contract
+  ↑             ↑
+amr-interop     provider-agent / provider-parser
+  \             /
+   acquisition candidates
+          ↓
+      document
+          ↓
+   story / recall / interview
+          ↓
+        align
+```
+
+### 99.1 `proposition`
+
+Owns a partial, evidence-backed local chart:
+
+```scala
+final case class PropositionChart[C <: CheckState](
+  focus: Option[ConceptId],
+  concepts: Map[ConceptId, Concept],
+  relations: Vector[PropositionRelation],
+  embedded: Vector[EmbeddedProposition],
+  alignments: Vector[PropositionAlignment],
+  provenance: ChartProvenance
+)
+```
+
+Minimum semantics:
+
+- concept lemma/gloss;
+- optional external frame reference and frame sense;
+- numbered or named source role;
+- optional normalized participant role;
+- polarity;
+- reentrancy/shared nodes;
+- embedded propositions;
+- explicit partial/unknown values;
+- exact source support;
+- proposal evidence and alternatives.
+
+If the frame is absent, a numbered role is not silently interpreted. Either a normalized semantic role is supported separately or the role remains underspecified.
+
+### 99.2 `amr-interop`
+
+Owns:
+
+- lossless-enough PENMAN syntax;
+- standards-compatible AMR graph;
+- AMR validation/canonical roles;
+- conversion to/from `PropositionChart` where defined;
+- retained original AMR artifact/provenance;
+- differential Penman tests;
+- later reification/Smatch/UMR compatibility as justified.
+
+AMR-specific equality, isomorphism, frame lexicon behavior, and serialization do not leak into narrative APIs.
+
+### 99.3 Providers
+
+- clean prose profile: conventional AMR parser candidate plus structured agent critic/proposal;
+- spoken recall/interview profile: schema-constrained proposition extraction as primary candidate, parser as optional independent evidence;
+- actual routing/weighting learned from benchmark results rather than assumed.
+
+## 100. Utility judgment by layer
+
+| Layer | Judgment |
+|---|---|
+| Minimal proposition structure | Essential |
+| AMR/PENMAN import and provenance | Valuable adapter |
+| PropBank role descriptions | Valuable when available, never mandatory |
+| Exact frame sense identity | Weak/optional evidence for most alignment tasks |
+| Reification transforms | Deferred |
+| Full Smatch implementation | Baseline/deferred |
+| Full UMR import/export | Deferred; document concepts may still be borrowed |
+| Off-the-shelf parser as sole acquisition path | Rejected |
+| LLM extractor as unvalidated sole authority | Rejected |
+| Multi-provider automatic candidate resolution | P0 direction |
+
+## 101. Parser-skepticism qualification
+
+The claim that existing AMR parsers will degrade on hedged, disfluent, first-person recall is highly plausible from domain shift but has not been established for this corpus in the current discussion. The stronger claim that an LLM schema extractor will outperform them is a benchmark hypothesis, not a design fact.
+
+Measure separately:
+
+- clean written story source;
+- clean manually transcribed recall;
+- disfluent transcript;
+- ASR transcript;
+- Autobiographical Interview turns;
+- cue/interviewer speech versus participant speech.
+
+The system should support acquisition profiles without hard-coding a winner.
+
+## 102. Frame and role semantics
+
+Frame senses should be optional, but not treated as wholly redundant. They can help:
+
+- interpret numbered argument roles;
+- distinguish genuinely different predicate meanings;
+- compare paraphrases with different lemmas;
+- produce better canonical glosses;
+- diagnose parser disagreement.
+
+However:
+
+- parser sense errors must not block a usable chart;
+- `DetailAtom`/narrative projection never depends on lexicon success;
+- a bare `ARG0` without a frame does not mean Agent;
+- normalized roles need their own evidence/credence;
+- lemma, frame, role structure, and embeddings remain separate signals.
+
+## 103. Revised discriminative spike
+
+Use two linked experiments.
+
+### 103.1 Oracle-structure value
+
+Use official/gold AMR examples and automatically generated controlled variants to test whether proposition structure detects:
+
+- role reversal;
+- polarity change;
+- embedded-versus-root assertion;
+- reentrant participant identity;
+- paraphrase invariance.
+
+This establishes that the representation can express the required distinction.
+
+### 103.2 Automatic-acquisition value
+
+Run parser and schema-agent providers on clean prose and recall-style text. Compare:
+
+1. embeddings only;
+2. embeddings + parser-derived chart;
+3. embeddings + agent-derived chart;
+4. embeddings + automatically resolved multi-provider chart.
+
+Evaluate correct-target ranking, structural-foil rejection, false contradiction, unresolved rate, calibration, stability, cost, latency, and failure localization.
+
+WOG expectations are expressed in plain narrative facts and context constraints, not hand-authored AMR. This experiment tests whether structure survives acquisition—the question that actually determines system utility.
+
+## 104. Current repository implications at this checkpoint
+
+Current verified state on 2026-08-28:
+
+- multi-module scaffold is committed;
+- `core` is implemented and committed;
+- fast JVM suite passes 47/47 tests;
+- architecture/roadmap document is committed;
+- `amr` has no source implementation yet.
+
+The checked-in roadmap is internally inconsistent with the latest decision:
+
+- its top-level flow still makes checked AMR charts the canonical local representation;
+- its module table gives `amr` full PENMAN/AMR/Smatch/reification ownership;
+- a later paragraph redefines `amr` around a minimal proposition chart;
+- milestones still require hand WOG AMRs and a large AMR Phase-A implementation;
+- provider automation begins later even though unattended acquisition is now P0.
+
+Closure recommendation: reconcile the roadmap, local `AGENTS.md`, module names/dependencies, M0 scope, and fixture policy **before any `amr` source code lands**.

@@ -14,9 +14,11 @@ Package namespace is flat `storymodel4s.<module>`.
 | Module      | Package                   | Responsibility |
 |-------------|---------------------------|----------------|
 | `core`      | `storymodel4s.core`       | Opaque IDs, `TextSpan`/`SpanSet`, source atlas, claims/evidence/credence, provenance, content hashing |
-| `amr`       | `storymodel4s.amr`        | PENMAN syntax, checked AMR graphs, role canonicalization, isomorphism, Smatch, alignment sidecar |
+| `proposition` | `storymodel4s.proposition` | **Canonical local semantic contract**: partial, evidence-backed `PropositionChart` (concept with optional frame, numbered/named roles, polarity, reentrancy, embedded propositions, exact alignment, alternatives) |
+| `amr-interop` | `storymodel4s.amr`      | Standards-compatible AMR **adapter**: PENMAN syntax, checked AMR graphs, role canonicalization, isomorphism, frame lexicon, conversion to/from `PropositionChart`. Nothing outside this module depends on AMR types |
+| `acquire`   | `storymodel4s.acquire`    | Autonomous acquisition protocol: task packets, proposal-only agent results, critic findings, typed patches, `ResolutionState`, stage-cache keys, prompt-package manifests. Pure; providers are JVM-only adapters |
 | `story`     | `storymodel4s.story`      | Narrative ontology: entities, situations, contexts, typed relation layers, hierarchy, trajectory, validators, `AlignmentSource` |
-| `document`  | `storymodel4s.document`   | Mention graph (disjoint union of sentence AMRs), exact-coreference quotient, projection to narrative nodes |
+| `document`  | `storymodel4s.document`   | Mention graph (disjoint union of charts), exact-coreference quotient, projection to narrative nodes |
 | `recall`    | `storymodel4s.recall`     | Recall units, discourse functions, recall relations, recall graph |
 | `align`     | `storymodel4s.align`      | Local costs, unbalanced transport, graph-HSMM trajectory inference, recall signature |
 | `interview` | `storymodel4s.interview`  | Transcript atlas, detail atoms, memory addresses, target-episode induction, AI-compatible scores, rich profile |
@@ -59,6 +61,16 @@ Package namespace is flat `storymodel4s.<module>`.
 11. Core depends only on cats-core / cats-collections. No HTTP, LLM, ONNX,
     JVM-only APIs, or graph DB in portable modules.
 12. Prefer `Either[DomainError, A]` / `ValidatedNec` over exceptions.
+13. **Unattended builds are P0.** No human, AMR expert, or annotator is in the
+    loop of a build. Agents return typed proposals with evidence; only the
+    deterministic resolver creates `Resolved`/accepted claims; unresolved and
+    alternative outcomes are legitimate artifacts, never forced precision.
+14. **Fixture policy.** (a) Standards-conformance gold for AMR comes only from
+    published guideline examples (or licensed corpora in authorized envs).
+    (b) Project AMR/charts for stories are machine-generated *silver* with
+    receipts. (c) The *War of the Ghosts* fixture is a researcher-reviewed
+    **narrative acceptance fixture** expressed in narrative types and
+    plain-language expectations — never hand-authored AMR.
 
 ## Style
 

@@ -41,8 +41,28 @@ lazy val commonSettings = Seq(
 
 def moduleSettings(dir: String) = commonSettings ++ Seq(name := s"storymodel4s-$dir")
 
+// Dependency structure (design record §99):
+//
+//   core
+//    ↑
+//   proposition ─────────────── canonical local semantic contract
+//    ↑          ↑
+//   amr-interop  acquire ────── AMR adapter; proposal/critic/resolution protocol
+//         ↖      ↑
+//          document ──────────── mention graph, coreference quotient, projection
+//              ↑
+//   story / recall / interview
+//              ↑
+//            align
+//
+// JVM-only provider adapters (parser services, LLM agents, embeddings) and the CLI are
+// separate sbt projects added in M1; nothing portable may depend on them.
+
 lazy val root = tlCrossRootProject
-  .aggregate(core, laws, amr, document, story, recall, align, interview, codec, fixtures)
+  .aggregate(
+    core, proposition, amrInterop, acquire, story, document, recall, align, interview, codec,
+    fixtures, laws
+  )
 
 /** Identity, spans, evidence, claims, credence, provenance, hashing. No I/O. */
 lazy val core = crossProject(JVMPlatform, JSPlatform, NativePlatform)
@@ -56,55 +76,69 @@ lazy val core = crossProject(JVMPlatform, JSPlatform, NativePlatform)
     )
   )
 
-/** PENMAN syntax, checked AMR graphs, role canonicalization, isomorphism, alignment sidecar. */
-lazy val amr = crossProject(JVMPlatform, JSPlatform, NativePlatform)
+/** Canonical local semantic contract: partial, evidence-backed propositional charts. */
+lazy val proposition = crossProject(JVMPlatform, JSPlatform, NativePlatform)
   .crossType(CrossType.Pure)
-  .in(file("amr"))
-  .settings(moduleSettings("amr"))
+  .in(file("proposition"))
+  .settings(moduleSettings("proposition"))
   .dependsOn(core)
+
+/** Standards-compatible AMR adapter: PENMAN syntax, checked AMR graphs, chart conversion. */
+lazy val amrInterop = crossProject(JVMPlatform, JSPlatform, NativePlatform)
+  .crossType(CrossType.Pure)
+  .in(file("amr-interop"))
+  .settings(moduleSettings("amr-interop"))
+  .dependsOn(core, proposition)
   .settings(libraryDependencies += "org.typelevel" %%% "cats-parse" % catsParseV)
+
+/** Autonomous acquisition protocol: task packets, proposal-only agents, critics, resolution. */
+lazy val acquire = crossProject(JVMPlatform, JSPlatform, NativePlatform)
+  .crossType(CrossType.Pure)
+  .in(file("acquire"))
+  .settings(moduleSettings("acquire"))
+  .dependsOn(core, proposition)
 
 /** Narrative ontology: entities, situations, contexts, typed relation layers, hierarchy, trajectory. */
 lazy val story = crossProject(JVMPlatform, JSPlatform, NativePlatform)
   .crossType(CrossType.Pure)
   .in(file("story"))
   .settings(moduleSettings("story"))
-  .dependsOn(core)
+  .dependsOn(core, proposition)
 
-/** Disjoint-union mention graph, exact-coreference quotient, projection into narrative nodes. */
+/** Mention graph (disjoint union of charts), exact-coreference quotient, projection into narrative nodes. */
 lazy val document = crossProject(JVMPlatform, JSPlatform, NativePlatform)
   .crossType(CrossType.Pure)
   .in(file("document"))
   .settings(moduleSettings("document"))
-  .dependsOn(core, amr, story)
+  .dependsOn(core, proposition, acquire, story)
 
 /** Recall-side representation: idea units, discourse function, recall relations. */
 lazy val recall = crossProject(JVMPlatform, JSPlatform, NativePlatform)
   .crossType(CrossType.Pure)
   .in(file("recall"))
   .settings(moduleSettings("recall"))
-  .dependsOn(core, story)
+  .dependsOn(core, proposition, story)
 
 /** Recall-to-source alignment: costs, unbalanced transport, graph-HSMM trajectories, signatures. */
 lazy val align = crossProject(JVMPlatform, JSPlatform, NativePlatform)
   .crossType(CrossType.Pure)
   .in(file("align"))
   .settings(moduleSettings("align"))
-  .dependsOn(core, story, recall)
+  .dependsOn(core, proposition, story, recall)
 
 /** Autobiographical Interview: transcript atlas, detail atoms, memory addresses, derived scores. */
 lazy val interview = crossProject(JVMPlatform, JSPlatform, NativePlatform)
   .crossType(CrossType.Pure)
   .in(file("interview"))
   .settings(moduleSettings("interview"))
-  .dependsOn(core, story, recall, align)
+  .dependsOn(core, proposition, story, recall, align)
 
 /** Canonical JSON codecs for all artifacts (circe). */
 lazy val codec = crossProject(JVMPlatform, JSPlatform, NativePlatform)
   .crossType(CrossType.Pure)
   .in(file("codec"))
   .settings(moduleSettings("codec"))
-  .dependsOn(core, amr, story, recall, align, interview)
+  .dependsOn(core, proposition, amrInterop, acquire, story, recall, align, interview)
   .settings(
     libraryDependencies ++= Seq(
       "io.circe" %%% "circe-core"   % circeV,
@@ -112,19 +146,19 @@ lazy val codec = crossProject(JVMPlatform, JSPlatform, NativePlatform)
     )
   )
 
-/** Hand-authored reference fixtures: The War of the Ghosts, worked recall examples, interview example. */
+/** Reference fixtures: The War of the Ghosts narrative acceptance fixture, worked recall examples, interview example. */
 lazy val fixtures = crossProject(JVMPlatform, JSPlatform, NativePlatform)
   .crossType(CrossType.Pure)
   .in(file("fixtures"))
   .settings(moduleSettings("fixtures"))
-  .dependsOn(core, amr, document, story, recall, align, interview)
+  .dependsOn(core, proposition, amrInterop, acquire, document, story, recall, align, interview)
 
 /** Published law suites and generators (Discipline). */
 lazy val laws = crossProject(JVMPlatform, JSPlatform, NativePlatform)
   .crossType(CrossType.Pure)
   .in(file("laws"))
   .settings(moduleSettings("laws"))
-  .dependsOn(core, amr, story, recall, align, interview)
+  .dependsOn(core, proposition, amrInterop, acquire, story, recall, align, interview)
   .settings(
     libraryDependencies ++= Seq(
       "org.scalameta"  %%% "munit"            % munitV,
@@ -134,7 +168,10 @@ lazy val laws = crossProject(JVMPlatform, JSPlatform, NativePlatform)
     )
   )
 
-val allModules = List("core", "amr", "story", "document", "recall", "align", "interview", "codec", "fixtures", "laws")
+val allModules = List(
+  "core", "proposition", "amrInterop", "acquire", "story", "document", "recall", "align",
+  "interview", "codec", "fixtures", "laws"
+)
 val allPlatforms = List("JVM", "JS", "Native")
 
 addCommandAlias(
