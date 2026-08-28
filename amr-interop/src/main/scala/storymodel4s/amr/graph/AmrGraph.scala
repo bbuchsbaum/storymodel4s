@@ -106,11 +106,12 @@ object AmrGraph:
       metadata: Vector[(String, String)]
   ): AmrGraph[Checked, R] = AmrGraph(top, nodes, concepts, edges, metadata)
 
-  /** Exact artifact equality: same top, same node identifiers and concepts, same edge set. Edge
-    * order and metadata are not semantic. For renaming-invariant equality use `AmrIsomorphism`.
+  /** Exact artifact equality: same top, same node set, same concepts, same edge set. Edge order and
+    * metadata are not semantic. For renaming-invariant equality use `AmrIsomorphism`.
     */
   given [C <: CheckState, R <: RoleForm]: Eq[AmrGraph[C, R]] = Eq.instance { (a, b) =>
-    a.top == b.top && a.concepts == b.concepts && a.edges.sorted == b.edges.sorted
+    a.top == b.top && a.nodes.toSet == b.nodes.toSet && a.concepts == b.concepts &&
+    a.edges.sorted == b.edges.sorted
   }
 
   extension (g: AmrGraph[Checked, CanonicalRoles])

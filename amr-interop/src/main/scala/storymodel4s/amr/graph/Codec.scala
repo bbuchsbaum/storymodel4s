@@ -33,9 +33,11 @@ object Decoder:
 
     def nodeId(v: Variable): Either[DomainError, NodeId] = NodeId.from(v.name)
 
+    // Number spelling is surface trivia: the tree keeps `1e3`, the graph holds the canonical
+    // `1000`, so graph identity and chart round trips do not depend on how a number was typed.
     def literalOf(l: PenmanLiteral): AmrLiteral = l match
       case PenmanLiteral.Str(s) => AmrLiteral.Text(s)
-      case PenmanLiteral.Num(r) => AmrLiteral.Number(r)
+      case PenmanLiteral.Num(r) => AmrLiteral.Number(AmrLiteral.canonicalNumber(r).getOrElse(r))
       case PenmanLiteral.Sym(s) => AmrLiteral.Symbol(s)
 
     def walk(n: PenmanNode): Either[DomainError, Unit] =

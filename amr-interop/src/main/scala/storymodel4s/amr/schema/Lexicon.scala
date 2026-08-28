@@ -10,10 +10,35 @@ enum Cardinality:
   case Optional
   case Required
 
+/** PropBank functional tags on numbered arguments. Closed where the inventory is stable; `Custom`
+  * keeps unknown or newer tags representable without ever being mistaken for a known one.
+  */
+enum FunctionalTag:
+  case PAG, PPT, GOL, LOC, MNR, TMP, CAU, PRD, DIR, EXT, ADV, COM, PRP, REC, VSP, ADJ, DSP
+  case Custom(raw: String)
+
+  def render: String = this match
+    case Custom(raw) => raw
+    case other       => other.toString
+
+object FunctionalTag:
+  /** The closed inventory (no `values` on an enum with a parameterized case). */
+  val standard: Vector[FunctionalTag] =
+    Vector(PAG, PPT, GOL, LOC, MNR, TMP, CAU, PRD, DIR, EXT, ADV, COM, PRP, REC, VSP, ADJ, DSP)
+
+  private val known: Map[String, FunctionalTag] = standard.map(t => t.render -> t).toMap
+
+  /** Parse a tag as written in a frame file; whitespace is trimmed and ASCII case is normalized
+    * (locale-independently) so `"pag "` still resolves to `PAG`.
+    */
+  def parse(raw: String): FunctionalTag =
+    val norm = raw.trim.map(c => if c >= 'a' && c <= 'z' then (c - 32).toChar else c)
+    known.getOrElse(norm, Custom(norm))
+
 final case class ArgumentSpec(
     index: ArgIndex,
     description: String,
-    functionalTag: Option[String],
+    functionalTag: Option[FunctionalTag],
     cardinality: Cardinality
 )
 
@@ -50,7 +75,7 @@ object Frames:
     ArgumentSpec(
       ArgIndex.unsafe(i),
       description,
-      Option(tag).filter(_.nonEmpty),
+      Option(tag).map(_.trim).filter(_.nonEmpty).map(FunctionalTag.parse),
       if required then Cardinality.Required else Cardinality.Optional
     )
 

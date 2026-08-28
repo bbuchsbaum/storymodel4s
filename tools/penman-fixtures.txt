@@ -158,3 +158,19 @@
             :ARG2 (m2 / monetary-quantity
                       :quant 5
                       :unit (d2 / dollar))))
+
+# ::id g28-prep-out-of
+(l / leave-11
+   :ARG0 (b / boy)
+   :prep-out-of (h / house))
+
+# ::id g29-prep-on-behalf-of
+(a / act-01
+   :ARG0 (l / lawyer)
+   :prep-on-behalf-of (c / client))
+
+# ::id g30-triple-letter-variable
+(s / see-01
+   :ARG0 (iii / i)
+   :ARG1 (d / dog
+            :ARG0-of (b / bark-01)))

@@ -2,6 +2,7 @@ package storymodel4s.amr.interop
 
 import cats.data.NonEmptyVector
 import storymodel4s.amr.graph.*
+import storymodel4s.amr.schema.FunctionalTag
 import storymodel4s.proposition as p
 
 /** Why a conversion between an AMR graph and a [[p.PropositionChart]] failed or would lose meaning.
@@ -55,28 +56,33 @@ object InteropTables:
     "destination" -> p.ParticipantRole.Destination
   )
 
-  /** Raw credence attached to a standard-role normalization: stable AMR semantics, not a guess. */
-  val StandardRoleCredence = 0.9
-
-  /** Raw credence attached to a lexicon-licensed numbered-argument normalization: weak evidence. */
-  val LexiconCredence = 0.5
-
-  /** PropBank functional tags → normalized roles. Unlisted tags become `Custom("propbank", tag)`.
+  /** Uncalibrated raw score attached to a standard-role normalization. It is *not* a probability:
+    * it records that standard-role semantics are stable across frames, nothing more.
     */
-  val functionalTags: Map[String, p.ParticipantRole] = Map(
-    "PAG" -> p.ParticipantRole.Agent,
-    "PPT" -> p.ParticipantRole.Patient,
-    "GOL" -> p.ParticipantRole.Beneficiary,
-    "LOC" -> p.ParticipantRole.Location,
-    "MNR" -> p.ParticipantRole.Manner,
-    "TMP" -> p.ParticipantRole.Time,
-    "CAU" -> p.ParticipantRole.Cause,
-    "PRD" -> p.ParticipantRole.Result,
-    "DIR" -> p.ParticipantRole.Destination
+  val StandardRoleRawScore = 0.9
+
+  /** Uncalibrated raw score attached to a lexicon-licensed numbered-argument normalization: weak
+    * evidence, never a probability.
+    */
+  val LexiconRawScore = 0.5
+
+  /** PropBank functional tags → normalized roles. Tags without a stable participant reading (and
+    * `Custom` tags) become `Custom("propbank", tag)`.
+    */
+  val functionalTags: Map[FunctionalTag, p.ParticipantRole] = Map(
+    FunctionalTag.PAG -> p.ParticipantRole.Agent,
+    FunctionalTag.PPT -> p.ParticipantRole.Patient,
+    FunctionalTag.GOL -> p.ParticipantRole.Beneficiary,
+    FunctionalTag.LOC -> p.ParticipantRole.Location,
+    FunctionalTag.MNR -> p.ParticipantRole.Manner,
+    FunctionalTag.TMP -> p.ParticipantRole.Time,
+    FunctionalTag.CAU -> p.ParticipantRole.Cause,
+    FunctionalTag.PRD -> p.ParticipantRole.Result,
+    FunctionalTag.DIR -> p.ParticipantRole.Destination
   )
 
-  def tagRole(tag: String): p.ParticipantRole =
-    functionalTags.getOrElse(tag, p.ParticipantRole.Custom("propbank", tag))
+  def tagRole(tag: FunctionalTag): p.ParticipantRole =
+    functionalTags.getOrElse(tag, p.ParticipantRole.Custom("propbank", tag.render))
 
   /** Embedding table: `(container frame, role)` whose node-valued, predicate filler is *held* by
     * the container rather than asserted. Unknown containers embed nothing.

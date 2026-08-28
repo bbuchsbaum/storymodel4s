@@ -18,6 +18,12 @@ from penman.models.noop import model as noop_model
 from penman.models.amr import model as amr_model
 
 
+def is_inverted(role):
+    """Penman's AMR model decides inversion (pinned behaviour): only ``:consist-of``,
+    ``:prep-on-behalf-of`` and ``:prep-out-of`` are primary roles ending in ``-of``."""
+    return amr_model.is_role_inverted(role)
+
+
 def triples_of(graph):
     """Canonical triples with inverse roles flipped, as (source, role, target, is_node)."""
     variables = set(graph.variables())
@@ -26,7 +32,7 @@ def triples_of(graph):
         if role == ":instance":
             out.append(["instance", src, tgt, False])
             continue
-        if role.endswith("-of") and role not in (":consist-of",) and tgt in variables:
+        if is_inverted(role) and tgt in variables:
             src, tgt, role = tgt, src, role[:-3]
         out.append([role.lstrip(":"), src, tgt, tgt in variables])
     return out

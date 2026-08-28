@@ -181,7 +181,9 @@ object Cycles:
           if found.isEmpty then
             color(m) match
               case c if c == Grey =>
-                val cyc = (m :: path).reverse.dropWhile(_ != m)
+                // `path` holds the current DFS chain with the newest node first; the cycle is the
+                // suffix from `m` to `n`, closed by `m`. A self-loop therefore reports `[m, m]`.
+                val cyc = path.reverse.dropWhile(_ != m)
                 found = Some((cyc :+ m).toVector)
               case c if c == White => dfs(m, m :: path)
               case _               => ()
