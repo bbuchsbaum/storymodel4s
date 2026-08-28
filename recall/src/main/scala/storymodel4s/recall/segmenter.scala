@@ -18,22 +18,38 @@ object RecallSegmenter:
 
   private val Pronouns = "(?:he|she|they|it|i|we|there|the|a|an|his|her|their|my|our|you)"
 
-  /** Split points: the match is consumed as separator; the following clause starts after it, except
-    * that the connective word itself is kept with the following clause (so "because …" heads a unit
-    * and can be read as a cue).
+  /** A portable split rule. `clauseStartGroup` keeps a matched connective with the next clause;
+    * `None` consumes the whole match as a separator. Regex lookaround is deliberately prohibited:
+    * Scala Native's regex engine does not implement it.
     */
-  private val Splitters: Vector[Regex] = Vector(
-    """;\s+""".r,
-    """,?\s+(?=and then\b)""".r,
-    """,?\s+and\s+(?=then\b)""".r,
-    """,?\s+(?=then\b)""".r,
-    """,?\s+(?=but\b)""".r,
-    """,?\s+(?=so\b)(?!so\s+(?:much|many|far|long)\b)""".r,
-    """,?\s+(?=because\b)""".r,
-    """,?\s+(?=while\b)""".r,
-    """,?\s+(?=before that\b)""".r,
-    """,?\s+(?=after that\b)""".r,
-    (""",?\s+and\s+(?=""" + Pronouns + """\b)""").r
+  private final case class SplitRule(
+      pattern: Regex,
+      clauseStartGroup: Option[Int],
+      rejectedFollowingWords: Set[String] = Set.empty
+  )
+
+  private final case class SplitCandidate(
+      separatorStart: Int,
+      clauseStart: Int,
+      occupiedEnd: Int,
+      priority: Int
+  )
+
+  private val Splitters: Vector[SplitRule] = Vector(
+    SplitRule(""";\s+""".r, None),
+    SplitRule("""(?i),?\s+(and\s+then)\b""".r, Some(1)),
+    SplitRule("""(?i),?\s+(then)\b""".r, Some(1)),
+    SplitRule("""(?i),?\s+(but)\b""".r, Some(1)),
+    SplitRule(
+      """(?i),?\s+(so)\b""".r,
+      Some(1),
+      Set("much", "many", "far", "long")
+    ),
+    SplitRule("""(?i),?\s+(because)\b""".r, Some(1)),
+    SplitRule("""(?i),?\s+(while)\b""".r, Some(1)),
+    SplitRule("""(?i),?\s+(before\s+that)\b""".r, Some(1)),
+    SplitRule("""(?i),?\s+(after\s+that)\b""".r, Some(1)),
+    SplitRule(("""(?i),?\s+and\s+(""" + Pronouns + """)\b""").r, Some(1))
   )
 
   private val MinClauseTokens = 3
@@ -406,15 +422,31 @@ object RecallSegmenter:
 
   private[recall] def splitClauses(text: String, sentence: TextSpan): Vector[TextSpan] =
     val s = sentence.slice(text).getOrElse("")
-    val cuts: Vector[(Int, Int)] = Splitters
-      .flatMap(_.findAllMatchIn(s).map(m => (m.start, m.end)).toVector)
-      .distinct
-      .sortBy(_._1)
-    val boundaries = cuts.foldLeft(Vector.empty[(Int, Int)]) { case (acc, c) =>
-      if acc.exists(b => c._1 < b._2) then acc else acc :+ c
+    val candidates = Splitters.zipWithIndex
+      .flatMap { case (rule, priority) =>
+        rule.pattern.findAllMatchIn(s).flatMap { m =>
+          val rejected = rule.rejectedFollowingWords.contains(wordFollowing(s, m.end))
+          if rejected then None
+          else
+            Some(
+              SplitCandidate(
+                m.start,
+                rule.clauseStartGroup.fold(m.end)(m.start),
+                m.end,
+                priority
+              )
+            )
+        }
+      }
+      .sortBy(c => (c.separatorStart, c.priority))
+    val boundaries = candidates.foldLeft(Vector.empty[SplitCandidate]) { case (acc, c) =>
+      if acc.exists(b => c.separatorStart < b.occupiedEnd) then acc else acc :+ c
     }
-    val pieces = boundaries.foldLeft((Vector.empty[TextSpan], 0)) { case ((acc, from), (cs, ce)) =>
-      (acc :+ TextSpan.unsafe(sentence.start + from, sentence.start + cs), ce)
+    val pieces = boundaries.foldLeft((Vector.empty[TextSpan], 0)) { case ((acc, from), cut) =>
+      (
+        acc :+ TextSpan.unsafe(sentence.start + from, sentence.start + cut.separatorStart),
+        cut.clauseStart
+      )
     }
     val all = pieces._1 :+ TextSpan.unsafe(sentence.start + pieces._2, sentence.endExclusive)
     // Merge fragments that are too short into their predecessor (or successor for the first).
@@ -426,6 +458,13 @@ object RecallSegmenter:
         case _ => acc :+ span
     }
     merged.map(trimSpan(text, _)).filter(_.length > 0)
+
+  private def wordFollowing(text: String, offset: Int): String =
+    var start = offset
+    while start < text.length && text.charAt(start).isWhitespace do start += 1
+    var end = start
+    while end < text.length && text.charAt(end).isLetter do end += 1
+    text.substring(start, end).toLowerCase
 
   private def prevTooShort(text: String, span: TextSpan): Boolean =
     SurfaceAnalyzer.tokenSpans(text, span).count(t => t.length > 1) < MinClauseTokens

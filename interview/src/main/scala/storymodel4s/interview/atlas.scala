@@ -124,6 +124,25 @@ object Pseudonymized:
   * longest-surface-first, whole-word, case-insensitive; reversal needs the key.
   */
 object Pseudonymizer:
+  private def isAsciiWord(c: Char): Boolean =
+    (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || c.isDigit
+
+  /** Whole-word, case-insensitive literal matching without regex lookaround, unsupported on Native.
+    */
+  private def wholeWordMatches(text: String, surface: String): Vector[TextSpan] =
+    val result = Vector.newBuilder[TextSpan]
+    var start = 0
+    while start + surface.length <= text.length do
+      val end = start + surface.length
+      val same = text.substring(start, end).equalsIgnoreCase(surface)
+      val leftBoundary = start == 0 || !isAsciiWord(text.charAt(start - 1))
+      val rightBoundary = end == text.length || !isAsciiWord(text.charAt(end))
+      if same && leftBoundary && rightBoundary then
+        result += TextSpan.unsafe(start, end)
+        start = end
+      else start += 1
+    result.result()
+
   def pseudonymize(
       source: StorySource,
       table: Vector[PseudonymEntry]
@@ -132,12 +151,7 @@ object Pseudonymizer:
     val entries = table.filter(_.surface.nonEmpty).sortBy(e => (-e.surface.length, e.surface))
     val matches: Vector[(TextSpan, String)] = entries
       .flatMap { e =>
-        // No lookbehind (Scala.js regex portability): capture the boundary char, use group 2.
-        val re = ("(?i)(^|[^A-Za-z0-9])(" + java.util.regex.Pattern.quote(e.surface) +
-          ")(?![A-Za-z0-9])").r
-        re.findAllMatchIn(text)
-          .map(m => (TextSpan.unsafe(m.start(2), m.end(2)), e.pseudonym))
-          .toVector
+        wholeWordMatches(text, e.surface).map(_ -> e.pseudonym)
       }
       .sortBy { case (span, _) => (span.start, -span.length) }
       .foldLeft(Vector.empty[(TextSpan, String)]) { (acc, m) =>

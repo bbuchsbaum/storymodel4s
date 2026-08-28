@@ -78,6 +78,12 @@ class SegmenterSuite extends FunSuite:
     assert(RecallGraph.validated(g).isValid)
   }
 
+  test("'so much' is not mistaken for a causal connective") {
+    val g = graph("There was so much noise in the house.")
+    assertEquals(g.size, 1, g.units.map(_.text).toString)
+    assertEquals(g.relations.causal, Vector.empty)
+  }
+
   test("'and then' produces a Before edge; negation flips polarity; 'said' marks reported") {
     val g = graph("He went home and then he said that they were ghosts. She did not feel sick.")
     val units = g.ordered
