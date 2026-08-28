@@ -16,7 +16,7 @@ class DigestPrivacySuite extends FunSuite:
       destination: String,
       keys: SensitiveKeyProvider
   ): Either[DomainError, PseudonymizedText] =
-    PseudonymizedText.checked(
+    checkedEitherWithOffsets(
       policyId,
       keyId,
       source,
@@ -24,6 +24,35 @@ class DigestPrivacySuite extends FunSuite:
       Vector(TextSpan.unsafe(0, source.length) -> TextSpan.unsafe(0, destination.length)),
       keys
     )
+
+  private def checkedEitherWithOffsets(
+      policyId: PrivacyPolicyId,
+      keyId: KeyId,
+      source: String,
+      destination: String,
+      offsets: Vector[(TextSpan, TextSpan)],
+      keys: SensitiveKeyProvider
+  ): Either[DomainError, PseudonymizedText] =
+    val spanConfiguration =
+      offsets.map(_._1).map(s => s"${s.start}:${s.endExclusive}").mkString(",")
+    for
+      detector <- PseudonymizationDetector.checked(
+        PseudonymizationDetectorId.unsafe("storymodel4s.test.digest/v1"),
+        s"digest-test/v1|source-spans=$spanConfiguration",
+        text => if text == source then offsets.map(_._1) else Vector.empty
+      )
+      detection <- detector.detect(source, keyId, keys)
+      payload <- PseudonymizedText.checked(
+        policyId,
+        keyId,
+        source,
+        destination,
+        offsets,
+        detection,
+        detector,
+        keys
+      )
+    yield payload
 
   private def checkedPayload(
       policyId: PrivacyPolicyId,
@@ -84,15 +113,17 @@ class DigestPrivacySuite extends FunSuite:
     "RemotePolicy.evaluate is the only way to obtain an AuthorizedRemoteRequest and binds the keyed payload identity"
   ) {
     val provider = ProviderFingerprint.of("m", "t", "i", "r")
+    val policyId = PrivacyPolicyId.unsafe("pol-1")
+    val payload = checkedPayload(policyId, KeyId.unsafe("k1"), "Jane Smith", "[PERSON_1]", k1)
     val policy = RemotePolicy(
-      PrivacyPolicyId.unsafe("pol-1"),
+      policyId,
       allowedProviders = Set(provider),
       allowedModels = Set("text-embedding-x"),
       allowedPurposes = Set("candidate-retrieval"),
+      allowedDetectors = Set(payload.sourceDetection.get.policyIdentity),
       maxBudgetTokens = 10000,
       ttlMillis = 60000
     )
-    val payload = checkedPayload(policy.id, KeyId.unsafe("k1"), "Jane Smith", "[PERSON_1]", k1)
     val space = EmbeddingSpace
       .of(
         provider,
@@ -121,6 +152,8 @@ class DigestPrivacySuite extends FunSuite:
     assertEquals(cap.payloadDigest.kind, DigestKind.Keyed)
     assertEquals(cap.payloadDigest.keyIdOption, Some(KeyId.unsafe("k1")))
     assertEquals(cap.policyId, policy.id)
+    assertEquals(cap.detectorIdentity, payload.sourceDetection.get.policyIdentity)
+    assert(cap.render.contains(cap.detectorIdentity.render))
     assert(eval(model = "other-model").isLeft)
     assert(eval(prov = ProviderFingerprint.of("x", "t", "i", "r")).isLeft)
     assert(eval(purpose = "training").isLeft)
@@ -143,10 +176,23 @@ class DigestPrivacySuite extends FunSuite:
       SensitiveKeyProvider.static(KeyId.unsafe("k1"), "secret-rotated".getBytes("UTF-8"))
     val rotated =
       checkedPayload(policy.id, KeyId.unsafe("k1"), "Jane Smith", "[PERSON_1]", k1Rotated)
-    assertNotEquals(
-      eval(req = request.copy(payload = EmbedPayload.Sanitized(rotated))).toOption
-        .map(_.capability.payloadDigest.render),
-      Some(cap.payloadDigest.render)
+    val rotatedRequest = request.copy(payload = EmbedPayload.Sanitized(rotated))
+    assert(eval(req = rotatedRequest).isLeft)
+    val rotatedPolicy = policy.copy(
+      allowedDetectors = Set(rotated.sourceDetection.get.policyIdentity)
+    )
+    assert(
+      RemotePolicy
+        .evaluate(
+          rotatedPolicy,
+          rotatedRequest,
+          provider,
+          "text-embedding-x",
+          "candidate-retrieval",
+          1000L,
+          42L
+        )
+        .isRight
     )
     val foreign = checkedPayload(
       PrivacyPolicyId.unsafe("pol-2"),
@@ -162,9 +208,7 @@ class DigestPrivacySuite extends FunSuite:
     assert(!cap.render.contains("PERSON_1"))
   }
 
-  test(
-    "PseudonymizedText digest is keyed and depends on policy, key and text — never on the re-identification key"
-  ) {
+  test("PseudonymizedText digest binds policy, key, text, map and detector evidence") {
     val kk = SensitiveKeyProvider.static(KeyId.unsafe("k"), "secret-k".getBytes("UTF-8"))
     val kk2 = SensitiveKeyProvider.static(KeyId.unsafe("k2"), "secret-k2".getBytes("UTF-8"))
     val a =
@@ -197,31 +241,25 @@ class DigestPrivacySuite extends FunSuite:
       ).isLeft
     )
 
-    val sameTextOneReplacement = PseudonymizedText
-      .checked(
-        PrivacyPolicyId.unsafe("p"),
-        KeyId.unsafe("k"),
-        "Alice Bob",
-        "[P] [Q]",
-        Vector(TextSpan.unsafe(0, 9) -> TextSpan.unsafe(0, 7)),
-        kk
-      )
-      .toOption
-      .get
-    val sameTextTwoReplacements = PseudonymizedText
-      .checked(
-        PrivacyPolicyId.unsafe("p"),
-        KeyId.unsafe("k"),
-        "Alice Bob",
-        "[P] [Q]",
-        Vector(
-          TextSpan.unsafe(0, 5) -> TextSpan.unsafe(0, 3),
-          TextSpan.unsafe(6, 9) -> TextSpan.unsafe(4, 7)
-        ),
-        kk
-      )
-      .toOption
-      .get
+    val sameTextOneReplacement = checkedEitherWithOffsets(
+      PrivacyPolicyId.unsafe("p"),
+      KeyId.unsafe("k"),
+      "Alice Bob",
+      "[P] [Q]",
+      Vector(TextSpan.unsafe(0, 9) -> TextSpan.unsafe(0, 7)),
+      kk
+    ).toOption.get
+    val sameTextTwoReplacements = checkedEitherWithOffsets(
+      PrivacyPolicyId.unsafe("p"),
+      KeyId.unsafe("k"),
+      "Alice Bob",
+      "[P] [Q]",
+      Vector(
+        TextSpan.unsafe(0, 5) -> TextSpan.unsafe(0, 3),
+        TextSpan.unsafe(6, 9) -> TextSpan.unsafe(4, 7)
+      ),
+      kk
+    ).toOption.get
     assertNotEquals(sameTextOneReplacement.offsets, sameTextTwoReplacements.offsets)
-    assertEquals(d(sameTextOneReplacement), d(sameTextTwoReplacements))
+    assertNotEquals(d(sameTextOneReplacement), d(sameTextTwoReplacements))
   }

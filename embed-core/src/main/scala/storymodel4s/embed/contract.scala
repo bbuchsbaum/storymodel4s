@@ -274,6 +274,8 @@ object AttemptReceipt:
         capability.policyId.value,
         capability.expiresAtEpochMillis.toString,
         capability.budgetTokens.toString,
+        capability.detectorIdentity.detectorId.value,
+        capability.detectorIdentity.configurationDigest.render,
         capability.payloadDigest.render
       )
     case PolicyDecision.LocalOnly(policyId, reason) =>

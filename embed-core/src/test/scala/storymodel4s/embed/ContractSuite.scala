@@ -216,17 +216,34 @@ class ContractSuite extends ScalaCheckSuite:
     assert(Embedder.preflight(remote, req(1, "x", s = Sensitivity.Public)).isRight)
     val restricted = remote.copy(privacyClass = PrivacyClass.PublicOnly)
     assert(Embedder.preflight(restricted, req(1, "x", s = Sensitivity.Internal)).isLeft)
+    val pseudonymizationKey = KeyId.unsafe("k")
+    val pseudonymizationKeys =
+      SensitiveKeyProvider.static(pseudonymizationKey, "k".getBytes("UTF-8"))
+    val detector = PseudonymizationDetector
+      .checked(
+        PseudonymizationDetectorId.unsafe("storymodel4s.contract.fixture/v1"),
+        "contract-fixture/v1|surface=redacted",
+        text => if text == "Jane went" then Vector(TextSpan.unsafe(0, 4)) else Vector.empty
+      )
+      .toOption
+      .get
+    val sourceDetection = detector
+      .detect("Jane went", pseudonymizationKey, pseudonymizationKeys)
+      .toOption
+      .get
     val sanitized = EmbedRequest(
       RequestId.unsafe("s"),
       EmbedPayload.Sanitized(
         PseudonymizedText
           .checked(
             PrivacyPolicyId.unsafe("p"),
-            KeyId.unsafe("k"),
+            pseudonymizationKey,
             "Jane went",
             "[PERSON_1] went",
             Vector(TextSpan.unsafe(0, 4) -> TextSpan.unsafe(0, 10)),
-            SensitiveKeyProvider.static(KeyId.unsafe("k"), "k".getBytes("UTF-8"))
+            sourceDetection,
+            detector,
+            pseudonymizationKeys
           )
           .toOption
           .get
