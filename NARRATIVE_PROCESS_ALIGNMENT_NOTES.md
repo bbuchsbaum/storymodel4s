@@ -3,7 +3,7 @@
 ## Record status
 
 - **Purpose:** Preserve the complete substance and evolution of a multipart discussion, ending in a concrete plan for a library implementation.
-- **Current coverage:** Parts 1–4 plus AMR reference/fit, automation, autonomous-agent, AMR-boundary, and multiscale surface/feature-track checkpoints.
+- **Current coverage:** Parts 1–4 plus AMR reference/fit, automation, autonomous-agent, AMR-boundary, multiscale surface/feature-track, and co-authored vision/mission checkpoints.
 - **Status:** Initial conceptual proposal; nothing here is yet a final implementation decision.
 - **Note-taking rule:** Later parts should add dated/numbered evolution entries, record agreements and revisions explicitly, and retain superseded ideas with their rationale rather than silently rewriting history.
 - **Provisional framework name:** **Narrative Process Alignment (NPA)**.
@@ -4877,3 +4877,35 @@ Adopted without modification. Changes applied to the repository on 2026-08-28:
 - `story.FlowStep` adopts `worldTime: WorldTimeTransition` and `featureChanges: Map[FeatureSpaceId, ScoreEstimate]`;
 - transcript turns (`TranscriptTurn`, `TranscriptAtlas`) become an overlay in `core` used by `recall` and `interview`;
 - module dependency order follows §117: `story`, `document`, `recall`, `align`, `interview` depend on `features`; providers produce raw tracks only.
+
+## 119. Co-authored vision and mission checkpoint
+
+On 2026-08-28, the project established `vision.md` and `mission.md` as concise public statements derived from this design record. The drafts were developed collaboratively by the Codex release coordinator (`codex-storymodel-release`) and the Claude build coordinator (`claude-storymodel4s`) through the Mote topic `storymodel4s-vision`. The detailed notes and roadmap remain authoritative for technical scope; the new files state why the project exists and what it promises.
+
+The principal correction produced by the collaboration was to name the scientific object, not merely the representation technology:
+
+> **Narrative Process Alignment is the measurable transformation between a source narrative process and a recalled narrative process.**
+
+The mapping is partial, probabilistic, hierarchical, open-world, and approximately relation-preserving. The multiscale story and recall representations make that mapping possible, but they are not themselves the complete scientific object. The vision therefore asks which content survived, at what grain and in what order, which roles/facts/contexts/relations remained intact, and what entered from outside.
+
+The mission is summarized by the paired runtime and epistemic requirements:
+
+> **Builds are unattended and auditable.**
+
+This expands into the following public commitments:
+
+1. every accepted explicit claim cites exact UTF-16 code-unit evidence spans, without cutting a Unicode code point, while inferences cite upstream claims;
+2. every numeric credence is labeled as a raw score or as a calibrated probability with a named calibration model;
+3. provider outputs, configurations, artifacts, and cache keys are receipted so a build can be replayed;
+4. similarity retrieves candidates, while typed structure adjudicates role direction, polarity, embedded content, context, and chronology;
+5. discourse time, story-world time, and recall time remain separate, as do narrated, reported, believed, intended, and hypothetical scopes;
+6. omission, gist, blending, elaboration, backtracking, association, intrusion, ambiguity, and missingness are explicit outcomes rather than residual errors;
+7. scalar or legacy scores are versioned projections of richer artifacts rather than definitions of memory.
+
+The final red-team pass added four implementation-governance commitments. An unresolved build returns alternatives or an explicit unresolved state rather than manufacturing precision. Every feature used to infer a boundary or hierarchy is recorded so later analysis can detect circularity and require ablation, cross-fitting, or independent boundaries. Portable modules exclude JVM-only services and runtime-specific parsing features; the repeated regex-lookaround failures discovered during Scala Native release testing motivated making this a mission-level contract. Core processing remains sparse, and no learned component ships before a leave-story-out evaluation harness exists.
+
+The public documents also retain the §106–118 surface/feature decision. Exact word traversal, aligned scalar or vector tracks, declared window reductions, boundary evidence, and higher-order narrative structures share a coordinate system without being collapsed into one layer. A feature such as imageability can characterize a story, help propose a boundary under a recorded induction recipe, or enter a later predictive analysis; the feature-use ledger must make those roles distinguishable.
+
+The vision and mission explicitly reject several overclaims: natural autobiographical interviews do not establish historical veridicality or genuine re-experiencing; omission does not prove memory unavailability; salience does not define correctness; AMR is an interoperability adapter rather than the story ontology; parser output is not ground truth; automatic output is not gold; and the project does not promise one universal memory score. The initial release is English-oriented and does not train a parser or foundation model.
+
+The red-team pass also required present-tense honesty. M0 supplies portable types, laws, validators, exact surface traversal, feature/window machinery, baseline recall alignment, and rule-based uncalibrated interview induction. It does **not** yet construct a complete story model automatically from raw text. Provider adapters, the unattended orchestrator, automatic cross-sentence identity resolution, relation extraction, hierarchy induction, and scientific calibration corpora remain programme work. The vision states the questions the completed system should make answerable; the mission distinguishes those goals from the capabilities already implemented.

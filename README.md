@@ -1,6 +1,7 @@
 # storymodel4s
 
-**Pre-release. Nothing is published; APIs will change without notice.**
+**Pre-release. No library artifact has been released; APIs will change without
+notice.**
 
 storymodel4s is a Scala 3 library for representing written stories, human
 recall of those stories, and the mapping between the two — including the
@@ -10,10 +11,16 @@ local kernel), a multiplex narrative graph with contexts, hierarchy, and typed
 temporal/causal relations, and embedding feature views that retrieve but never
 adjudicate.
 
+Read the project [vision](vision.md) and [mission](mission.md) for the scientific
+object, operating commitments, and the boundary between current capabilities
+and programme work.
+
 ## What it does
 
-- Builds a `StoryModel = (atlas, graph, hierarchy, trajectory, claim ledger)`
-  from text, with exact UTF-16 evidence spans on every explicit claim.
+- Defines and validates a
+  `StoryModel = (atlas, graph, hierarchy, trajectory, claim ledger)`, with exact
+  UTF-16 evidence spans on every explicit claim. Complete automatic construction
+  from raw text is programme work; current story fixtures are hand modeled.
 - Represents recall as idea units with discourse functions and expressed
   uncertainty, and aligns them to the story as an **unbalanced, hierarchical,
   directed** posterior `P` over source nodes *plus explicit external states*,
