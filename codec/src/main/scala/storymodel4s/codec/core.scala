@@ -69,8 +69,7 @@ object CoreCodecs:
     Decoder.decodeString.emap(s => LanguageTag.from(s).left.map(_.message))
 
   // ---- universal addresses ---------------------------------------------------------------
-  given Encoder[Address] = Encoder.encodeString.contramap(_.render)
-  given Decoder[Address] = Decoder.decodeString.emap { rendered =>
+  private def canonicalAddress(rendered: String): Either[String, Address] =
     Address.parse(rendered).left.map(_.message).flatMap { address =>
       Either.cond(
         address.render == rendered,
@@ -78,11 +77,11 @@ object CoreCodecs:
         s"non-canonical Address; expected ${address.render}"
       )
     }
-  }
+
+  given Encoder[Address] = Encoder.encodeString.contramap(_.render)
+  given Decoder[Address] = Decoder.decodeString.emap(canonicalAddress)
   given KeyEncoder[Address] = KeyEncoder.instance(_.render)
-  given KeyDecoder[Address] = KeyDecoder.instance { rendered =>
-    Address.parse(rendered).toOption.filter(_.render == rendered)
-  }
+  given KeyDecoder[Address] = KeyDecoder.instance(rendered => canonicalAddress(rendered).toOption)
 
   // ---- spans ----------------------------------------------------------------------------
   given Encoder[TextSpan] =

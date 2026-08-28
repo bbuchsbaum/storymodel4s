@@ -2,6 +2,7 @@ package storymodel4s.codec
 
 import io.circe.{Decoder, Encoder, Json}
 import munit.ScalaCheckSuite
+import org.scalacheck.Gen
 import org.scalacheck.Prop.forAll
 import storymodel4s.core.*
 import storymodel4s.features.*
@@ -15,6 +16,22 @@ import FeatureCodecs.given
 import PropositionCodecs.given
 
 class CodecSuite extends ScalaCheckSuite:
+
+  private val addressWireMutation: Gen[String] = AddressGens.address.flatMap { address =>
+    val rendered = address.render
+    Gen.oneOf(
+      rendered,
+      s"$rendered/%2f",
+      s"$rendered/%41",
+      s"$rendered//",
+      s"$rendered/",
+      s"$rendered/%２F",
+      s"$rendered/%٢F",
+      s"$rendered/%FF",
+      s"$rendered/%C3%A9",
+      s"$rendered/e%CC%81"
+    )
+  }
 
   private def lawsFor[A: Encoder: Decoder](name: String)(using org.scalacheck.Arbitrary[A]): Unit =
     property(s"$name: decode(encode(x)) == x") {
@@ -181,10 +198,10 @@ class CodecSuite extends ScalaCheckSuite:
     assertEquals(Canonical.decode[Address](encoded).map(Canonical.encode(_)), Right(encoded))
   }
 
-  property("Every accepted Address wire string is a canonical fixed point") {
-    forAll(AddressGens.address.map(_.render)) { rendered =>
-      val encoded = Json.fromString(rendered).noSpaces
-      assertEquals(Canonical.decode[Address](encoded).map(Canonical.encode(_)), Right(encoded))
+  property("Every accepted mutated Address wire string is a canonical fixed point") {
+    forAll(addressWireMutation) { rendered =>
+      val wire = Json.fromString(rendered).noSpaces
+      assert(Canonical.decode[Address](wire).forall(a => Canonical.encode(a) == wire), rendered)
     }
   }
 
@@ -192,6 +209,8 @@ class CodecSuite extends ScalaCheckSuite:
     val rejected = Vector(
       "story/situation/sit%2f0", // lowercase escape
       "story/situation/%41", // escaped unreserved character
+      "story/situation/%２F", // non-ASCII hex digit
+      "story/situation/%FF", // invalid UTF-8 decoded as a replacement character
       "story/situation/sit%", // truncated escape
       "story/situation/a b", // unescaped reserved character
       "story/situation" // missing key
