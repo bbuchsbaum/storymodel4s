@@ -230,6 +230,50 @@ object TextAnnotation:
         )
     }
 
+  /** Coalesce repeated semantic proposals at maximum priority without losing audit dependencies. */
+  def coalesce(
+      annotations: Vector[TextAnnotation]
+  ): Either[DomainError, Vector[TextAnnotation]] =
+    annotations
+      .groupBy(_.id)
+      .toVector
+      .sortBy(_._1)
+      .foldLeft[Either[DomainError, Vector[TextAnnotation]]](Right(Vector.empty)) {
+        case (acc, (id, group)) =>
+          acc.flatMap { result =>
+            val head = group.head
+            val sameSemanticIdentity = group.forall(annotation =>
+              annotation.target == head.target && annotation.support == head.support &&
+                annotation.kind == head.kind
+            )
+            val provenances = group.map(_.audit.provenance).distinct
+            if !sameSemanticIdentity then
+              Left(
+                DomainError.InvariantViolation(
+                  s"view/codex/annotations/${id.value}",
+                  "content-address collision across different semantic annotations"
+                )
+              )
+            else if provenances.size != 1 then
+              Left(
+                DomainError.InvariantViolation(
+                  s"view/codex/annotations/${id.value}/audit",
+                  "duplicate semantic proposals carry incompatible provenance"
+                )
+              )
+            else
+              val priority = group.maxBy(_.priority).priority
+              val upstream = group.flatMap(_.audit.upstream)
+              of(
+                head.target,
+                head.support,
+                head.kind,
+                priority,
+                AuditRecord.of(upstream, provenances.head)
+              ).map(result :+ _)
+          }
+      }
+
   private def expectedId(
       target: Address,
       support: SpanSet,
@@ -283,7 +327,9 @@ final case class CodexFlow private (
     source: StorySource,
     runs: Vector[SourceRun],
     annotations: Vector[TextAnnotation],
+    lanes: LaneAllocation,
     navigation: NavigationIndex,
+    contract: CodexContract,
     provenance: ViewProvenance
 ):
   def text(run: SourceRun): Either[DomainError, String] =
@@ -301,24 +347,68 @@ object CodexFlow:
       annotations: Vector[TextAnnotation],
       provenance: ViewProvenance
   ): Either[DomainError, CodexFlow] =
+    of(
+      source,
+      runs,
+      annotations,
+      LanePolicy.Default,
+      CodexContract.foundation(annotations),
+      provenance
+    )
+
+  /** Construct a semantic flow under an explicit lane and view contract. */
+  def of(
+      source: StorySource,
+      runs: Vector[SourceRun],
+      annotations: Vector[TextAnnotation],
+      lanePolicy: LanePolicy,
+      contract: CodexContract,
+      provenance: ViewProvenance
+  ): Either[DomainError, CodexFlow] =
     val orderedRuns = runs.sortBy(_.span)
     val orderedAnnotations = annotations.sortBy(annotationSortKey)
     for
       _ <- validateProvenance(source, provenance)
       _ <- validateRuns(source.canonicalText, orderedRuns)
       _ <- validateAnnotations(source.canonicalText, orderedAnnotations)
+      _ <- validateContract(orderedAnnotations, lanePolicy, contract)
       navigation <- NavigationIndex.from(orderedAnnotations)
-    yield new CodexFlow(source, orderedRuns, orderedAnnotations, navigation, provenance)
+      lanes <- LaneAllocation.allocate(orderedAnnotations, lanePolicy)
+    yield new CodexFlow(
+      source,
+      orderedRuns,
+      orderedAnnotations,
+      lanes,
+      navigation,
+      contract,
+      provenance
+    )
 
   def exact(
       source: StorySource,
       annotations: Vector[TextAnnotation],
       provenance: ViewProvenance
   ): Either[DomainError, CodexFlow] =
+    exact(
+      source,
+      annotations,
+      LanePolicy.Default,
+      CodexContract.foundation(annotations),
+      provenance
+    )
+
+  /** Construct an exact-source flow under an explicit lane and view contract. */
+  def exact(
+      source: StorySource,
+      annotations: Vector[TextAnnotation],
+      lanePolicy: LanePolicy,
+      contract: CodexContract,
+      provenance: ViewProvenance
+  ): Either[DomainError, CodexFlow] =
     for
       span <- TextSpan.of(0, source.canonicalText.length)
       run <- SourceRun.of(span)
-      flow <- of(source, Vector(run), annotations, provenance)
+      flow <- of(source, Vector(run), annotations, lanePolicy, contract, provenance)
     yield flow
 
   private def annotationSortKey(
@@ -345,6 +435,28 @@ object CodexFlow:
           s"${provenance.sourceChecksum.hex} does not match ${source.canonicalChecksum.hex}"
         )
       )
+
+  private def validateContract(
+      annotations: Vector[TextAnnotation],
+      lanePolicy: LanePolicy,
+      contract: CodexContract
+  ): Either[DomainError, Unit] =
+    val undeclared = annotations.iterator.map(_.kind).toSet -- contract.activeKinds
+    if undeclared.nonEmpty then
+      Left(
+        DomainError.InvariantViolation(
+          "view/codex/contract/annotation-kinds",
+          s"annotations use undeclared kinds ${undeclared.toVector.map(_.wireName).sorted.mkString(",")}"
+        )
+      )
+    else if lanePolicy != contract.lanePolicy then
+      Left(
+        DomainError.InvariantViolation(
+          "view/codex/contract/lane-policy",
+          "allocation policy does not match the declared Codex contract"
+        )
+      )
+    else Right(())
 
   private def validateRuns(text: String, runs: Vector[SourceRun]): Either[DomainError, Unit] =
     if runs.isEmpty then
@@ -453,15 +565,41 @@ object CodexTextualTwin:
       .append('\n')
     out.append("Compiler: ").append(flow.provenance.compilerVersion).append('\n')
     out.append("Configuration: ").append(flow.provenance.configChecksum.hex).append("\n\n")
+    out
+      .append("Horizon: ")
+      .append(
+        flow.contract.horizon match
+          case EpistemicHorizon.Omniscient       => "omniscient"
+          case EpistemicHorizon.ReaderAt(offset) => s"reader-at-$offset"
+      )
+      .append('\n')
+    out
+      .append("Channels: ")
+      .append(flow.contract.activeKinds.toVector.map(_.wireName).sorted.mkString(","))
+      .append('\n')
+    out
+      .append("Lane allocator: ")
+      .append(flow.lanes.receipt.algorithm.toString)
+      .append(" v")
+      .append(flow.lanes.receipt.algorithmVersion)
+      .append(" max-per-kind=")
+      .append(flow.lanes.receipt.policy.maxLanesPerKind)
+      .append(" overflow=")
+      .append(flow.lanes.overflow.size)
+      .append("\n\n")
     out.append("Exact canonical text\n---\n")
     // The textual twin is a rendered accessibility/snapshot form, not copied CodexFlow source data.
     out.append(flow.source.canonicalText).append("\n---\n\n")
     out.append("Annotations\n")
     if flow.annotations.isEmpty then out.append("(none)\n")
-    else flow.annotations.foreach(annotation => renderAnnotation(annotation, out))
+    else flow.annotations.foreach(annotation => renderAnnotation(annotation, flow.lanes, out))
     out.result()
 
-  private def renderAnnotation(annotation: TextAnnotation, out: StringBuilder): Unit =
+  private def renderAnnotation(
+      annotation: TextAnnotation,
+      lanes: LaneAllocation,
+      out: StringBuilder
+  ): Unit =
     val spans = annotation.support.refs.toVector.map { ref =>
       val unit = ref.unit.fold("")(id => s"@${id.value}")
       s"[${ref.span.start},${ref.span.endExclusive})$unit"
@@ -477,12 +615,19 @@ object CodexTextualTwin:
       .append(spans.mkString(","))
       .append(" priority=")
       .append(annotation.priority.value)
+      .append(" lane=")
+      .append(renderLane(lanes.slotOf(annotation.id)))
       .append('\n')
     out
       .append("  upstream=")
       .append(annotation.audit.upstream.map(_.render).mkString(","))
       .append('\n')
     renderProvenance(annotation.audit.provenance, out)
+
+  private def renderLane(slot: Option[LaneSlot]): String = slot match
+    case Some(LaneSlot.Lane(index)) => index.value.toString
+    case Some(LaneSlot.Overflow)    => "overflow"
+    case None                       => "unallocated"
 
   private def renderProvenance(provenance: Provenance, out: StringBuilder): Unit =
     out

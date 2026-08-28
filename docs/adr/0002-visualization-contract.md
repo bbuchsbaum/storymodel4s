@@ -97,7 +97,7 @@ needs a quantity the model lacks, it renders the lack. Specific consequences:
 | entity present but unnamed; pronoun vs name | no presence claim; no mention-form field | not drawn (gap beads `bd-01M14K85CDPPTSBXG4VTXJ9P4R`) unless a `DescriptorClaim`/presence claim exists |
 | scene boundary | `NarrativeHierarchy.containment` vs unselected `BoundaryBelief` | accepted containment: solid with probability shown; unselected belief: ghost/dashed, never labelled "scene" |
 | context band over a passage | `ContextFrame.support` may be discontinuous | bands distinguish exact scope evidence, contextual membership, and inferred continuation; never a hull-synthesized contiguous band |
-| reader-at-time *t* | ledger with `Evidence.upstream` | horizon = transitive evidence closure over `ClaimLedger`; `CorefPartition` restricted to mentions ≤ *t*; windows crossing *t* are `SurfaceWindow.complete = false` (partial, not a value); the boundary at *t* is "not yet assessable"; later reinterpretation is a second `ClaimMeta`, never mutation |
+| reader-at-time *t* | ledger with `Evidence.upstream` | horizon = transitive evidence closure over `ClaimLedger`, computed only by `view.EvidenceVisibility` (shared by Codex and Atlas — no compiler re-derives it); `CorefPartition` restricted to mentions ≤ *t*; windows crossing *t* are `SurfaceWindow.complete = false` (partial, not a value); the boundary at *t* is "not yet assessable"; later reinterpretation is a second `ClaimMeta`, never mutation |
 | population recall map | per-recall `AlignmentMatrix` only | not drawn until a cross-subject aggregate type exists (`bd-01M14K85E0D4GS0CTFBNYZJENH`) |
 
 ### D5 Narrative Codex is slice 1; the WOG two-level Atlas tracer is the interaction boundary experiment
@@ -185,53 +185,58 @@ Sugiyama/StoryFlow-style algorithms only behind golden and property tests.
   depends on it.
 - Intaglio changes: only mechanisms proven generic by the tracer (§6).
 
-## 3. Type contract (normative shape, not final signatures)
+## 3. Type contract (as implemented in `view` at checkpoint 1; normative)
 
 ```scala
-// view
-final case class CommonViewState(
-  selection: Set[Address], focus: Option[Address],
-  horizon: EpistemicHorizon,            // Omniscient | ReaderAt(offset: Int)
-  relationLayers: Set[RelationLayer], feature: Option[FeatureDerivationId],
-  uncertainty: UncertaintyPolicy, comparison: Option[ComparisonSpec],
-  audit: AuditTrail)
+// view/ref.scala — the closed coproduct (D8)
+enum ViewRef:
+  case Core(CoreRef); case Feature(FeatureAddress); case Story(StoryRef)
+  case Doc(DocRef);   case Recall(RecallRef);       case Align(AlignRef)
+  def address: Address                      // via each module's Addressable
+object ViewRef: def parse(a: Address): Option[ViewRef]   // dispatch on tag
 
-final case class TextAnnotation(
-  id: AnnotationId,                     // content-addressed from (target, support, kind)
-  target: Address,                      // typed via the seam; never parallel claim/evidence fields
-  support: SpanSet, kind: AnnotationKind,
-  priority: AnnotationPriority, audit: AuditRecord)
-// No universal `status` field: EpistemicStatus is total for claims only. Feature observations,
-// missing estimates, raw-vs-calibrated values, alternatives, unresolved states, and align
-// exclusions carry their own state, resolved from the addressed object (D9). If a cached display
-// state is ever needed it is a checked typed sum over the D9 states, never EpistemicStatus.
-// (Checkpoint-1 correction by codex-storyatlas-root, accepted.)
+// view/codex.scala
+object AnnotationId extends OpaqueId       // content-addressed from (target, kind, support); priority excluded
+enum AnnotationKind(wireName)              // Feature | Hierarchy | Entity | Relation | Context | Claim | Recall — channel families, not a relation ontology
+opaque AnnotationPriority = Int in [0, 1000]
+enum ViewBasis                             // ValidatedBuild | HumanAdjudicated | ResearcherReviewedFixture (D5 label)
+final case class ViewProvenance private (sourceChecksum, modelReceiptChecksum: Option[Checksum], basis, compilerVersion, configChecksum)
+  // ValidatedBuild/HumanAdjudicated REQUIRE a receipt checksum; fixture may omit it; never aliased to the source checksum
+final case class AuditRecord private (upstream: Vector[Address] /* sorted, distinct */, provenance: Provenance)
+final case class SourceRun private (span: TextSpan)          // nonempty; runs tile canonicalText (V-T1)
+final case class TextAnnotation private (id, target: Address, support: SpanSet, kind, priority, audit)
+  // construction rejects targets outside ViewRef and empty support; no status field (D9); no copied text
+final case class NavigationIndex private (byTarget: Map[Address, Vector[AnnotationId]], targetByAnnotation)
+final case class CodexFlow private (source, runs, annotations /* sorted by (minSpan, kind, -priority, id) */,
+  lanes: LaneAllocation, navigation, contract: CodexContract, provenance)
+  // CodexFlow.of validates: provenance.sourceChecksum == source.canonicalChecksum; runs tile with no gap/overlap and
+  // no cut code point; every support span in-text and on code-point boundaries; unique AnnotationIds
+  def textualTwin: String                                    // deterministic (V-D2); a rendering, not an artifact
 
-final case class CodexFlow(
-  source: StorySource,                  // runs reference canonicalText; no copied text
-  runs: Vector[SourceRun],              // tile canonicalText exactly
-  annotations: Vector[TextAnnotation],
-  lanes: LaneAllocation,                // deterministic interval colouring, bounded overflow
-  navigation: NavigationIndex,          // Address -> annotations; annotation -> Address
-  contract: CodexContract, provenance: ViewProvenance)
-
-final case class ProjectionContract(
-  kind: ProjectionKind, x: AxisMeaning, y: AxisMeaning,
-  distance: DistanceMeaning, area: Option[MeasureMeaning],
-  legend: Vector[ChannelMeaning], invariants: Set[VisualInvariant])
-
-final case class NarrativeScene(
-  contract: ProjectionContract, camera: Camera,
-  marks: Vector[VisualPrimitive],       // each carries VisualIdentity(address, status, minLevel, maxLevel)
-  navigation: NavigationIndex, provenance: ViewProvenance)
-
-enum ZoomLevel:                         // two axes, not one linear scale
-  case At(narrative: NarrativeLevel, surface: SurfaceDetail)
+// view/compiler.scala + view/atlas.scala
+final case class CommonViewState private (selection: Set[Address], focus: Option[Address], horizon: EpistemicHorizon,
+  relationLayers: Set[RelationLayer], feature: Option[FeatureSelection] /* Raw(FeatureSpaceId) | Derived(derivationId: Checksum) */)
+final case class ProjectionContract(kind: ProjectionKind, x: AxisMeaning, y: AxisMeaning, distance: DistanceMeaning,
+  area: Option[MeasureMeaning], legend: Vector[ChannelMeaning], invariants: Set[VisualInvariant])
+enum SelectionPlacement: case OnMark(marks: NonEmptyVector[MarkId]); case ViaAncestor(ancestor: Address); case OffProjection
+final case class NarrativeScene(contract, zoom, state: CommonViewState,
+  marks: Vector[VisualPrimitive] /* Region | Landmark | Thread | Portal | Route, each with VisualIdentity(address, level, MarkId) */,
+  navigation, selectionPlacements: Map[Address, SelectionPlacement], provenance)
+object EvidenceVisibility:
+  validateHorizon(text, horizon); visibleClaims(offset, ledger); visibleUnder(horizon, ledger)
+  clipSupport(support, horizon); stateParts(state)   // the single horizon implementation
+final case class ZoomLevel(narrative: NarrativeLevel, surface: SurfaceDetail)   // two axes, not one linear scale
 ```
 
-Compilers accept `StoryModel[Validated]` or `[Adjudicated]`. Draft/unresolved
-material is rendered only in an explicit diagnostic mode with visible status
-chrome.
+Checkpoint-1 compilers accept `StoryModel[Validated]`; an adjudicated entry
+point remains a later, explicitly typed extension. Draft/unresolved material is
+rendered only in an explicit diagnostic mode with visible status chrome.
+Evidence law for compiled annotations (V-E3):
+`annotation.support == horizonRestrict(model.supporting(target), horizon)` for
+narrative-object targets (`horizonRestrict` is the identity when omniscient and
+drops spans ending after *t* under `ReaderAt(t)`; equality in both modes);
+the object's claim and evidence addresses go in `audit.upstream`; a
+`core/claim/…` target is reserved for claim-marker annotations.
 
 ## 4. Reference seam and dependency proof (D8)
 
@@ -307,9 +312,12 @@ fixtures; wrappers insert no characters; **V-T3** no copied canonical text in
 any artifact.
 
 Level of detail — **V-L1** every child has a visible ancestor at a coarser
-level; **V-L2** the selected object cannot disappear during ordinary zoom
-(selection attaches to the nearest visible ancestor with a "contains
-selection" badge); **V-L3** label priority monotone; **V-L4** bounded visible
+level; **V-L2** `SelectionPreserved`: every selected or focused address stays
+in `CommonViewState` and has exactly one typed placement — `OnMark` when it has
+ordinary marks, `ViaAncestor` only when the object's own claim is horizon-visible
+and it has a visible primary ancestor, and `OffProjection` otherwise; the shared
+`HorizonShared` invariant requires Codex and Atlas to use only
+`EvidenceVisibility`; **V-L3** label priority monotone; **V-L4** bounded visible
 mark count; **V-L5** lane allocation deterministic with bounded overflow, never
 dropped annotations.
 
