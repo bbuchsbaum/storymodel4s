@@ -2,18 +2,67 @@ package storymodel4s.interview
 
 import storymodel4s.core.*
 import storymodel4s.features.{Estimate, ScoreEstimate}
-import storymodel4s.proposition.{EmbeddingKind, ParticipantRole, PropositionChart, Checked}
+import storymodel4s.proposition.{Checked, EmbeddingKind, ParticipantRole, PropositionChart}
 import storymodel4s.recall.*
 import storymodel4s.story.NarrativeNodeId
 
+/** Portable text helpers: locale-independent lowercasing and Unicode-aware word splitting, so that
+  * cue matching never depends on the default locale or on ASCII-only character classes.
+  */
+private[interview] object Text:
+  /** Per-code-point simple lowercase mapping: locale independent and available on every platform
+    * (`java.util.Locale` is not part of the Scala.js standard library).
+    */
+  def lower(s: String): String =
+    val sb = new StringBuilder(s.length)
+    var i = 0
+    while i < s.length do
+      val cp = s.codePointAt(i)
+      sb.appendAll(Character.toChars(Character.toLowerCase(cp)))
+      i += Character.charCount(cp)
+    sb.toString
+
+  /** Maximal runs of letters, digits and apostrophes, by code point. */
+  def words(s: String): Vector[String] =
+    val out = Vector.newBuilder[String]
+    val sb = new StringBuilder
+    var i = 0
+    while i < s.length do
+      val cp = s.codePointAt(i)
+      val n = Character.charCount(cp)
+      if Character.isLetterOrDigit(cp) || cp == '\'' then sb.appendAll(Character.toChars(cp))
+      else if sb.nonEmpty then
+        out += sb.toString
+        sb.clear()
+      i += n
+    if sb.nonEmpty then out += sb.toString
+    out.result()
+
 /** Perceptual modality of a detail. Local to `interview` so that detail projection never depends on
-  * the story trajectory types (which are being consolidated into `features`).
+  * the story trajectory types.
   */
 enum Modality:
   case Visual, Auditory, Tactile, Motor, Spatial, Olfactory, Gustatory, Interoceptive
 
-/** A key/value attribute asserted of a node ("colour" → "red", "description" → "small"). */
-final case class Attribute(key: String, value: String)
+/** A named place as the participant referred to it ("restaurant", "Queen Street"). */
+final case class PlaceName(value: String)
+
+/** A temporal expression as uttered ("last year", "at noon"). */
+final case class TimeExpression(value: String)
+
+/** Closed set of attribute keys; imported vocabularies enter through `Custom`, never bare strings.
+  */
+enum AttributeKey:
+  /** A descriptive modifier ("small", "French"). */
+  case Description
+
+  /** A whole unit kept countable because it carried no propositional content. */
+  case Statement
+
+  case Custom(namespace: String, label: String)
+
+/** A key/value attribute asserted of a node. */
+final case class Attribute(key: AttributeKey, value: String)
 
 /** Either a narrative node or an entity, as the target of an attribute. */
 enum AtomTarget:
@@ -22,18 +71,25 @@ enum AtomTarget:
 
 /** A temporal claim between a situation and either another situation or a named anchor. */
 enum TemporalClaim:
-  case Anchor(situation: SituationId, expression: String)
+  case Anchor(situation: SituationId, expression: TimeExpression)
   case Relation(from: SituationId, relation: RecallTemporalRelation, to: SituationId)
 
 /** A spatial claim: a situation located at, or an entity moving to, a named place. */
 enum SpatialClaim:
-  case AtLocation(situation: SituationId, location: String)
-  case Movement(situation: SituationId, from: Option[String], to: Option[String])
+  case AtLocation(situation: SituationId, location: PlaceName)
+  case Movement(situation: SituationId, from: Option[PlaceName], to: Option[PlaceName])
 
 enum MentalStateKind:
   case Thought, Emotion, Intention, Belief, Uncertainty
 
-final case class MentalState(kind: MentalStateKind, label: String)
+/** Closed label vocabulary for mental states; chart-derived or imported labels use `Custom`. */
+enum MentalStateLabel:
+  case Embarrassment, Happiness, Sadness, Nervousness, Anxiety, Fear, Excitement, Pride, Anger,
+    Surprise, Relief, Gratitude, Loneliness, Boredom
+  case Intent, Belief, Thought, Uncertainty
+  case Custom(namespace: String, label: String)
+
+final case class MentalState(kind: MentalStateKind, label: MentalStateLabel)
 
 /** A narrative relation stated between two situations of the transcript. */
 enum NarrativeRelationRef:
@@ -90,7 +146,8 @@ enum DetailAtom:
   * `w_i` (design record §65.1).
   *
   * `expectedCountMass` is `Observed(1.0)` per atom in v0.1 — an explicit placeholder for the
-  * learned, rule-constrained projection; it is never derived from a lexicon lookup.
+  * learned, rule-constrained projection; it is never derived from a lexicon lookup. A `Missing`
+  * mass is never read as zero: scoring excludes the detail and reports the exclusion as coverage.
   */
 final case class Detail(
     id: DetailId,
@@ -100,7 +157,8 @@ final case class Detail(
     sourceUnit: RecallUnitId,
     expectedCountMass: ScoreEstimate
 ):
-  def mass: Double = expectedCountMass.toOption.getOrElse(0.0)
+  /** The count mass when it was observed; `None` means "unknown", not "zero". */
+  def observedMass: Option[Double] = expectedCountMass.toOption
 
 /** Rule-based, conservative projection of a recall unit into detail atoms.
   *
@@ -116,32 +174,32 @@ object AtomProjection:
   /** The speaker as an entity of the inferred episode. */
   val Speaker: EntityId = EntityId.unsafe("interview:speaker")
 
-  private val Emotions: Map[String, String] = Map(
-    "embarrassed" -> "embarrassment",
-    "embarrassing" -> "embarrassment",
-    "embarrassment" -> "embarrassment",
-    "happy" -> "happiness",
-    "happiness" -> "happiness",
-    "sad" -> "sadness",
-    "nervous" -> "nervousness",
-    "anxious" -> "anxiety",
-    "scared" -> "fear",
-    "afraid" -> "fear",
-    "excited" -> "excitement",
-    "proud" -> "pride",
-    "angry" -> "anger",
-    "surprised" -> "surprise",
-    "relieved" -> "relief",
-    "grateful" -> "gratitude",
-    "lonely" -> "loneliness",
-    "bored" -> "boredom"
+  private val Emotions: Map[String, MentalStateLabel] = Map(
+    "embarrassed" -> MentalStateLabel.Embarrassment,
+    "embarrassing" -> MentalStateLabel.Embarrassment,
+    "embarrassment" -> MentalStateLabel.Embarrassment,
+    "happy" -> MentalStateLabel.Happiness,
+    "happiness" -> MentalStateLabel.Happiness,
+    "sad" -> MentalStateLabel.Sadness,
+    "nervous" -> MentalStateLabel.Nervousness,
+    "anxious" -> MentalStateLabel.Anxiety,
+    "scared" -> MentalStateLabel.Fear,
+    "afraid" -> MentalStateLabel.Fear,
+    "excited" -> MentalStateLabel.Excitement,
+    "proud" -> MentalStateLabel.Pride,
+    "angry" -> MentalStateLabel.Anger,
+    "surprised" -> MentalStateLabel.Surprise,
+    "relieved" -> MentalStateLabel.Relief,
+    "grateful" -> MentalStateLabel.Gratitude,
+    "lonely" -> MentalStateLabel.Loneliness,
+    "bored" -> MentalStateLabel.Boredom
   )
   private val ThoughtCues =
     """\b(?:thought|figured|realized|realised|decided|remember thinking)\b""".r
   private val IntentionCues = """\b(?:wanted|planned|hoped|meant) to\b""".r
   private val BeliefCues = """\b(?:believed|assumed|was sure|knew)\b""".r
   private val UncertaintyCues = """\b(?:not sure|don't know|can't remember|unsure)\b""".r
-  private val TimeExpression =
+  private val TimeExpressionRe =
     """\b(?:(?:in )?(?:19|20)\d{2}|(?:last|next|that|the following|the previous) (?:year|month|week|night|morning|evening|summer|winter)|at (?:noon|midnight|\d{1,2}(?::\d{2})?(?: ?[ap]m)?)|(?:the )?year before|on my \w+ birthday|my \w+ birthday|(?:january|february|march|april|may|june|july|august|september|october|november|december)\b(?: \d{1,2})?)\b""".r
   private val Descriptors: Set[String] = Set(
     "small",
@@ -195,8 +253,8 @@ object AtomProjection:
   def entityOf(p: SketchParticipant): EntityId =
     p.entity match
       case Some(e) => EntityId.unsafe(s"interview:ent:${e.value}")
-      case None if Set("i", "me", "we", "us").contains(p.label.toLowerCase) => Speaker
-      case None => EntityId.unsafe(s"interview:ent:${p.label.toLowerCase.replace(' ', '_')}")
+      case None if Set("i", "me", "we", "us").contains(Text.lower(p.label)) => Speaker
+      case None => EntityId.unsafe(s"interview:ent:${Text.lower(p.label).replace(' ', '_')}")
 
   private def roleOf(r: SketchRole): ParticipantRole = r match
     case SketchRole.Agent       => ParticipantRole.Agent
@@ -217,6 +275,19 @@ object AtomProjection:
     else if Tactile.contains(word) then Modality.Tactile
     else Modality.Visual
 
+  /** Embedded-proposition kinds that denote a mental state of the speaker. The mapping is partial
+    * on purpose: speech, hypothetical, counterfactual and imagination embeddings are not mental
+    * states of the rememberer and produce no atom here.
+    */
+  private def mentalKindOf(kind: EmbeddingKind): Option[MentalStateKind] = kind match
+    case EmbeddingKind.Belief    => Some(MentalStateKind.Belief)
+    case EmbeddingKind.Desire    => Some(MentalStateKind.Intention)
+    case EmbeddingKind.Intention => Some(MentalStateKind.Intention)
+    case EmbeddingKind.Memory    => Some(MentalStateKind.Thought)
+    case EmbeddingKind.Speech | EmbeddingKind.Hypothetical | EmbeddingKind.Counterfactual |
+        EmbeddingKind.Imagination | EmbeddingKind.Unknown =>
+      None
+
   def fromUnit(
       unit: RecallUnit,
       turn: TurnId,
@@ -224,8 +295,8 @@ object AtomProjection:
   ): Vector[Detail] =
     val sit = situationOf(unit)
     val node = NarrativeNodeId.Situation(sit)
-    val lower = unit.text.toLowerCase
-    val words = """[a-z']+""".r.findAllIn(lower).toVector
+    val lower = Text.lower(unit.text)
+    val words = Text.words(lower)
     val sketch = unit.proposition
     val atoms = Vector.newBuilder[DetailAtom]
 
@@ -238,10 +309,10 @@ object AtomProjection:
       }
 
     sketch.locations.distinct.foreach { loc =>
-      atoms += DetailAtom.SpatialFact(SpatialClaim.AtLocation(sit, loc))
+      atoms += DetailAtom.SpatialFact(SpatialClaim.AtLocation(sit, PlaceName(loc)))
     }
-    (sketch.times ++ TimeExpression.findAllIn(lower).toVector).distinct.foreach { t =>
-      atoms += DetailAtom.TemporalFact(TemporalClaim.Anchor(sit, t))
+    (sketch.times ++ TimeExpressionRe.findAllIn(lower).toVector).distinct.foreach { t =>
+      atoms += DetailAtom.TemporalFact(TemporalClaim.Anchor(sit, TimeExpression(t)))
     }
     (sketch.sensoryTerms ++ words.filter(SensoryAll.contains)).distinct.foreach { s =>
       atoms += DetailAtom.PerceptualFact(Speaker, modalityOf(s), node)
@@ -250,28 +321,34 @@ object AtomProjection:
       atoms += DetailAtom.MentalStateFact(Speaker, MentalState(MentalStateKind.Emotion, e))
     }
     if IntentionCues.findFirstIn(lower).nonEmpty then
-      atoms += DetailAtom.MentalStateFact(Speaker, MentalState(MentalStateKind.Intention, "intent"))
+      atoms += DetailAtom.MentalStateFact(
+        Speaker,
+        MentalState(MentalStateKind.Intention, MentalStateLabel.Intent)
+      )
     else if BeliefCues.findFirstIn(lower).nonEmpty then
-      atoms += DetailAtom.MentalStateFact(Speaker, MentalState(MentalStateKind.Belief, "belief"))
+      atoms += DetailAtom.MentalStateFact(
+        Speaker,
+        MentalState(MentalStateKind.Belief, MentalStateLabel.Belief)
+      )
     else if ThoughtCues.findFirstIn(lower).nonEmpty then
-      atoms += DetailAtom.MentalStateFact(Speaker, MentalState(MentalStateKind.Thought, "thought"))
+      atoms += DetailAtom.MentalStateFact(
+        Speaker,
+        MentalState(MentalStateKind.Thought, MentalStateLabel.Thought)
+      )
     else if UncertaintyCues.findFirstIn(lower).nonEmpty &&
       unit.function != DiscourseFunction.SourceMonitoring
     then
       atoms += DetailAtom.MentalStateFact(
         Speaker,
-        MentalState(MentalStateKind.Uncertainty, "uncertainty")
+        MentalState(MentalStateKind.Uncertainty, MentalStateLabel.Uncertainty)
       )
     chart.foreach { c =>
       c.embedded.foreach { e =>
-        val kind = e.kind match
-          case EmbeddingKind.Belief    => Some(MentalStateKind.Belief)
-          case EmbeddingKind.Desire    => Some(MentalStateKind.Intention)
-          case EmbeddingKind.Intention => Some(MentalStateKind.Intention)
-          case EmbeddingKind.Memory    => Some(MentalStateKind.Thought)
-          case _                       => None
-        kind.foreach { k =>
-          val label = c.concept(e.content).map(_.lemma.value).getOrElse("embedded")
+        mentalKindOf(e.kind).foreach { k =>
+          val label = c
+            .concept(e.content)
+            .map(cn => MentalStateLabel.Custom("chart", cn.lemma.value))
+            .getOrElse(MentalStateLabel.Custom("chart", "embedded"))
           atoms += DetailAtom.MentalStateFact(Speaker, MentalState(k, label))
         }
       }
@@ -283,14 +360,19 @@ object AtomProjection:
           .map(l => AtomTarget.Entity(EntityId.unsafe(s"interview:loc:$l")))
           .getOrElse(AtomTarget.Node(node))
       descriptors.foreach(d =>
-        atoms += DetailAtom.AttributeFact(target, Attribute("description", d))
+        atoms += DetailAtom.AttributeFact(target, Attribute(AttributeKey.Description, d))
       )
 
     val built = atoms.result()
     val all =
       if built.nonEmpty then built
       else
-        Vector(DetailAtom.AttributeFact(AtomTarget.Node(node), Attribute("statement", unit.text)))
+        Vector(
+          DetailAtom.AttributeFact(
+            AtomTarget.Node(node),
+            Attribute(AttributeKey.Statement, unit.text)
+          )
+        )
     all.zipWithIndex.map { case (atom, i) =>
       Detail(
         DetailId.unsafe(s"${unit.id.value}:d$i"),

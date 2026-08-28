@@ -69,15 +69,15 @@ class BirthdayInterviewSuite extends FunSuite:
   test("restaurant is a target location with attributes") {
     val spatial = model.assessments.filter { a =>
       a.detail.atom match
-        case DetailAtom.SpatialFact(SpatialClaim.AtLocation(_, "restaurant")) => true
-        case _                                                                => false
+        case DetailAtom.SpatialFact(SpatialClaim.AtLocation(_, PlaceName("restaurant"))) => true
+        case _                                                                           => false
     }
     assert(spatial.nonEmpty)
     spatial.foreach(a => assert(a.targetMass >= 0.5, s"target mass ${a.targetMass}"))
     val attrs = model.details.collect {
       case Detail(
             _,
-            DetailAtom.AttributeFact(AtomTarget.Entity(_), Attribute("description", v)),
+            DetailAtom.AttributeFact(AtomTarget.Entity(_), Attribute(AttributeKey.Description, v)),
             _,
             _,
             _,
@@ -91,7 +91,10 @@ class BirthdayInterviewSuite extends FunSuite:
   test("embarrassment is a target mental state and the causal link is recorded") {
     val emotion = model.assessments.filter { a =>
       a.detail.atom match
-        case DetailAtom.MentalStateFact(_, MentalState(MentalStateKind.Emotion, "embarrassment")) =>
+        case DetailAtom.MentalStateFact(
+              _,
+              MentalState(MentalStateKind.Emotion, MentalStateLabel.Embarrassment)
+            ) =>
           true
         case _ => false
     }
@@ -174,7 +177,9 @@ class BirthdayInterviewSuite extends FunSuite:
     val probeAs = model.assessments.filter(_.promptContext.phase == InterviewPhase.SpecificProbe)
     assert(probeAs.exists(_.experiential.firstPersonLanguage))
     assert(probeAs.exists(_.sourceMonitoring.contains(SourceMonitoring.DirectMemory)))
-    assert(profile.sourceMonitoring.getOrElse(SourceMonitoring.DirectMemory, 0) >= 1)
+    assert(profile.phenomenology.sourceMonitoring.getOrElse(SourceMonitoring.DirectMemory, 0) >= 1)
+    assert(profile.phenomenology.firstPersonRate.isObserved)
+    assert(profile.massCoverage.fraction == 1.0)
   }
 
   test("episodic density per word and per second are defined") {

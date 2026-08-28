@@ -6,18 +6,31 @@ import storymodel4s.recall.*
 /** Runs the recall segmenter over an interview transcript and keeps only participant speech.
   *
   * The transcript atlas remains the single coordinate system: units keep their transcript offsets
-  * and are tagged with the turn they fall in; interviewer turns produce no units. Ordinals are
-  * renumbered over the kept units so the resulting `RecallGraph` validates.
+  * and are tagged with the turn they fall in; interviewer turns produce no units. A unit whose
+  * support crosses a turn boundary cannot be attributed to one speaker; it is excluded and reported
+  * in `crossing` rather than silently credited to the first turn. Ordinals are renumbered over the
+  * kept units so the resulting `RecallGraph` validates.
   */
 object InterviewSegmenter:
-  final case class Segmented(graph: RecallGraph, turnOf: Map[RecallUnitId, TurnId])
+  final case class Segmented(
+      graph: RecallGraph,
+      turnOf: Map[RecallUnitId, TurnId],
+      crossing: Vector[RecallUnitId]
+  )
 
   def segment(source: InterviewSource): Segmented =
     val t = source.transcript
     val full = RecallSegmenter.segment(t.atlas.source)
+    val crossing = Vector.newBuilder[RecallUnitId]
     val kept = full.ordered.flatMap { u =>
-      t.turnAt(u.minSpan.start) match
-        case Some(turn) if t.roleOf(turn.speaker).contains(SpeakerRole.Participant) =>
+      val span = u.minSpan
+      val startTurn = t.turnAt(span.start)
+      val endTurn = if span.isEmpty then startTurn else t.turnAt(span.endExclusive - 1)
+      (startTurn, endTurn) match
+        case (Some(a), Some(b)) if a.id != b.id =>
+          crossing += u.id
+          None
+        case (Some(turn), _) if t.roleOf(turn.speaker).contains(SpeakerRole.Participant) =>
           Some((u, turn.id))
         case _ => None
     }
@@ -32,5 +45,6 @@ object InterviewSegmenter:
     )
     Segmented(
       RecallGraph(full.transcript, t.atlas, units, relations),
-      kept.map { case (u, turn) => u.id -> turn }.toMap
+      kept.map { case (u, turn) => u.id -> turn }.toMap,
+      crossing.result()
     )
