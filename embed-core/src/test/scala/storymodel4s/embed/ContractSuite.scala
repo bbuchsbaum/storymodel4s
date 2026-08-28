@@ -3,10 +3,10 @@ package storymodel4s.embed
 import cats.Id
 import munit.ScalaCheckSuite
 import org.scalacheck.Gen
-import org.scalacheck.Prop.forAll
+import org.scalacheck.Prop.{forAll, forAllNoShrink}
 
 import storymodel4s.core.Checksum
-import storymodel4s.features.Estimate
+import storymodel4s.features.{Estimate, MalformedReason, MissingReason}
 
 /** L4 and the contract's failure isolation, checked against a spy embedder. */
 class ContractSuite extends ScalaCheckSuite:
@@ -70,6 +70,29 @@ class ContractSuite extends ScalaCheckSuite:
   ) =
     EmbedRequest(RequestId.unsafe(s"r$i"), EmbedPayload.Raw(text, s), space.id)
 
+  private def batchOf(n: Int, embedder: Embedder[Id]): EmbedBatch =
+    EmbedBatch
+      .validated((1 to n).map(i => req(i, s"text-$i")).toVector, embedder.spaceIds)
+      .toOption
+      .get
+
+  private def mutated(
+      f: Vector[EmbedOutcome] => Vector[EmbedOutcome]
+  ): Embedder[Id] = new Embedder[Id]:
+    val info: EmbedderInfo = spy().info
+    val spaces: Vector[EmbeddingSpace] = spy().spaces
+    def embed(batch: EmbedBatch): BatchResult =
+      val result = spy().embed(batch)
+      result.copy(outcomes = f(result.outcomes))
+
+  private def isBatchFailure(result: BatchResult): Boolean =
+    result.outcomes.forall(_.value match
+      case Left(ExecutionFailure.Invalid(_)) => true
+      case _                                 => false) && result.receipt.resultDecisions.exists {
+      case ResultDecision.BatchRejected(_) => true
+      case _                               => false
+    }
+
   test("L4: one outcome per request id, in order; failures and abstentions are per item") {
     val batch = EmbedBatch
       .validated(
@@ -102,19 +125,89 @@ class ContractSuite extends ScalaCheckSuite:
     }
   }
 
-  test("Embedder.conforming turns a malformed result into per-item typed failures") {
-    val broken: Embedder[Id] = new Embedder[Id]:
-      val info: EmbedderInfo = spy().info
-      val spaces: Vector[EmbeddingSpace] = spy().spaces
-      def embed(batch: EmbedBatch): BatchResult =
-        val r = spy().embed(batch)
-        r.copy(outcomes = r.outcomes.reverse)
-    val batch = EmbedBatch.validated(Vector(req(1, "a"), req(2, "b")), broken.spaceIds).toOption.get
-    val res = Embedder.conforming(broken).embed(batch)
-    assert(res.conforms(batch).isRight)
-    assert(res.outcomes.forall(_.value.isLeft))
-    val single = EmbedBatch.validated(Vector(req(1, "only")), broken.spaceIds).toOption.get
-    assert(Embedder.conforming(broken).embed(single).outcomes.head.value.isRight)
+  property("L4: a wrong-space item becomes missing without poisoning valid siblings") {
+    forAllNoShrink(Gen.choose(2, 6).flatMap(n => Gen.choose(0, n - 1).map(n -> _))) {
+      case (n, bad) =>
+        val broken =
+          mutated(outcomes => outcomes.updated(bad, outcomes(bad).copy(space = querySpace.id)))
+        val batch = batchOf(n, broken)
+        val expected = spy().embed(batch)
+        val result = Embedder.conforming(broken).embed(batch)
+
+        result.conforms(batch).isRight &&
+        result.outcomes.zipWithIndex.forall { case (outcome, index) =>
+          if index == bad then
+            outcome.value == Right(
+              Estimate.Missing(MissingReason.Malformed(MalformedReason.ProviderResult))
+            )
+          else outcome == expected.outcomes(index)
+        } &&
+        result.receipt.resultDecisions.exists {
+          case ResultDecision.SpaceRejected(id, expectedSpace, actualSpace) =>
+            id == batch.requests(bad).id &&
+            expectedSpace == docSpace.id &&
+            actualSpace == querySpace.id
+          case _ => false
+        }
+    }
+  }
+
+  property("L4: a complete id bijection is reordered without misassociation") {
+    forAllNoShrink(Gen.choose(2, 6)) { n =>
+      val broken = mutated(_.reverse)
+      val batch = batchOf(n, broken)
+      val expected = spy().embed(batch)
+      val result = Embedder.conforming(broken).embed(batch)
+
+      result.conforms(batch).isRight &&
+      result.outcomes == expected.outcomes &&
+      result.receipt.resultDecisions.count {
+        case ResultDecision.Reordered(_, _, _) => true
+        case _                                 => false
+      } == n - (n % 2)
+    }
+  }
+
+  property("L4: an unknown replacement id fails the batch closed") {
+    forAllNoShrink(Gen.choose(2, 6).flatMap(n => Gen.choose(0, n - 1).map(n -> _))) {
+      case (n, bad) =>
+        val broken = mutated(outcomes =>
+          outcomes.updated(bad, outcomes(bad).copy(id = RequestId.unsafe(s"unknown-$bad")))
+        )
+        val batch = batchOf(n, broken)
+        val result = Embedder.conforming(broken).embed(batch)
+        result.conforms(batch).isRight && isBatchFailure(result)
+    }
+  }
+
+  property("L4: a missing outcome fails the batch closed") {
+    forAllNoShrink(Gen.choose(2, 6).flatMap(n => Gen.choose(0, n - 1).map(n -> _))) {
+      case (n, bad) =>
+        val broken = mutated(_.patch(bad, Vector.empty, 1))
+        val batch = batchOf(n, broken)
+        val result = Embedder.conforming(broken).embed(batch)
+        result.conforms(batch).isRight && isBatchFailure(result)
+    }
+  }
+
+  property("L4: a duplicate outcome id fails the batch closed") {
+    forAllNoShrink(Gen.choose(2, 6).flatMap(n => Gen.choose(1, n - 1).map(n -> _))) {
+      case (n, bad) =>
+        val broken = mutated(outcomes => outcomes.updated(bad, outcomes.head))
+        val batch = batchOf(n, broken)
+        val result = Embedder.conforming(broken).embed(batch)
+        result.conforms(batch).isRight && isBatchFailure(result)
+    }
+  }
+
+  property("L4: an extra outcome fails the batch closed") {
+    forAllNoShrink(Gen.choose(2, 6)) { n =>
+      val broken =
+        mutated(outcomes => outcomes :+ outcomes.head.copy(id = RequestId.unsafe("extra")))
+      val batch = batchOf(n, broken)
+      val result = Embedder.conforming(broken).embed(batch)
+      result.conforms(batch).isRight && isBatchFailure(result)
+    }
   }
 
   test("preflight: raw sensitive text never reaches a remote provider; privacy class is enforced") {

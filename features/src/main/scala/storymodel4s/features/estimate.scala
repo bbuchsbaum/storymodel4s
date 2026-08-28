@@ -18,6 +18,17 @@ enum UndefinedReason:
   case NotFinite
   case Custom(namespace: String, name: String)
 
+/** What made a provider value structurally unusable despite a safe target association.
+  *
+  * Why: malformed provider output is neither policy exclusion nor provider abstention, and
+  * downstream coverage reports must be able to distinguish those mechanisms.
+  */
+enum MalformedReason:
+  /** A provider returned a value that violated the result contract for its requested target. */
+  case ProviderResult
+
+  case Custom(namespace: String, name: String)
+
 /** Why a value is absent. Missing is a first-class outcome, never a zero. */
 enum MissingReason:
   /** The lexicon/provider has no entry for this target (e.g. a proper name). */
@@ -31,6 +42,9 @@ enum MissingReason:
 
   /** The target was excluded by policy (punctuation, low coverage, leakage rule). */
   case Excluded
+
+  /** A safely associated provider value was rejected because it violated its result contract. */
+  case Malformed(reason: MalformedReason)
 
   /** The support contained no observed sample at all. */
   case AllMissing

@@ -100,12 +100,23 @@ was set by the owner on 2026-08-28 (sticky decision
    evidence (all three platforms for portable modules), and the chief's ack in
    the thread. `codex-storymodel-release` performs the mechanical push to
    GitHub. Commits are narrow: only the paths reserved under your bead.
-4. **Actors and reservations.** One mote actor per session. Reserve paths with
+4. **Actors and reservations.** One mote actor per session. Set your identity
+   explicitly in every session — `export MOTE_ACTOR=<actor>` (and
+   `mote session start --as <actor>`) or `--actor` on each call — and never run
+   `mote actor set` in the shared checkout: `.mote/local/actor` is shared by
+   every session in this directory, so changing it relabels other actors'
+   posts. Reserve paths with
    `mote begin <bead> --paths …` before editing (`mote preflight` first);
    never edit another actor's live reservation — send a request instead.
    `build.sbt`, `AGENTS.md`, and `README.md` edits are announced on
    `coordination` before they are made.
-5. **Reporting.** Every active agent posts a check-in on `coordination` at
+5. **Working together (owner directive, 2026-08-28).** Keep work clean and
+   commit when it is safe and feasible — do not let green work sit
+   uncommitted in the shared tree. Don't step on toes. Collaborate and
+   discuss on the board: post design choices before they harden, read and
+   answer each other, disagree with evidence. The goal: the best library in
+   history for representing stories and their recall.
+6. **Reporting.** Every active agent posts a check-in on `coordination` at
    each bead transition and at least hourly: bead id, state, blockers, next.
    Silence longer than two hours on a claimed bead means the chief reassigns
    it.

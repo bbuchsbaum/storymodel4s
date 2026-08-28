@@ -167,8 +167,26 @@ object FeatureCodecs:
         yield UndefinedReason.Custom(ns, n)
   }
 
+  given Encoder[MalformedReason] = Encoder.instance {
+    case MalformedReason.Custom(ns, n) =>
+      Json.obj("type" -> "Custom".asJson, "namespace" -> ns.asJson, "name" -> n.asJson)
+    case r => r.toString.asJson
+  }
+  given Decoder[MalformedReason] = Decoder.instance { c =>
+    c.value.asString match
+      case Some("ProviderResult") => Right(MalformedReason.ProviderResult)
+      case Some(s)                =>
+        Left(DecodingFailure(s"unknown MalformedReason $s", c.history))
+      case None =>
+        for
+          ns <- field[String](c, "namespace")
+          n <- field[String](c, "name")
+        yield MalformedReason.Custom(ns, n)
+  }
+
   given Encoder[MissingReason] = Encoder.instance {
     case MissingReason.Undefined(r) => Json.obj("type" -> "Undefined".asJson, "reason" -> r.asJson)
+    case MissingReason.Malformed(r) => Json.obj("type" -> "Malformed".asJson, "reason" -> r.asJson)
     case r                          => r.toString.asJson
   }
   given Decoder[MissingReason] = Decoder.instance { c =>
@@ -184,7 +202,12 @@ object FeatureCodecs:
         )
           .find(v => v.toString == s)
           .toRight(DecodingFailure(s"unknown MissingReason $s", c.history))
-      case None => field[UndefinedReason](c, "reason").map(MissingReason.Undefined.apply)
+      case None =>
+        field[String](c, "type").flatMap {
+          case "Undefined" => field[UndefinedReason](c, "reason").map(MissingReason.Undefined.apply)
+          case "Malformed" => field[MalformedReason](c, "reason").map(MissingReason.Malformed.apply)
+          case s           => Left(DecodingFailure(s"unknown MissingReason $s", c.history))
+        }
   }
 
   given [V](using e: Encoder[V]): Encoder[Estimate[V]] = Encoder.instance {
