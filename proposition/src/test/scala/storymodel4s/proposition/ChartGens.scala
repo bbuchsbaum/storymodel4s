@@ -143,7 +143,13 @@ object ChartGens:
               k <- Gen.oneOf(EmbeddingKind.values.toSeq)
             yield EmbeddedProposition(id(a), k, id(b))
           )
-          .map(_.toVector.distinct.take(2))
+          .map { es =>
+            val v = es.toVector.distinct.take(2)
+            // Keep the generated pair acyclic so the DuplicateEmbedding case stays minimal.
+            if v.size == 2 && v(0).container == v(1).content && v(0).content == v(1).container
+            then v.take(1)
+            else v
+          }
     alignment: Gen[PropositionAlignment] =
       for
         i <- Gen.chooseNum(0, n - 1)
@@ -188,9 +194,37 @@ object ChartGens:
         cs(
           u.copy(relations =
             u.relations :+
-              PropositionRelation(first, RoleAssignment.named(":x"), ConceptTarget.Node(ghost))
+              PropositionRelation(first, RoleAssignment.named("x"), ConceptTarget.Node(ghost))
           ),
           "DanglingRelationTarget"
+        ),
+        cs(
+          u.copy(relations =
+            u.relations :+
+              PropositionRelation(first, RoleAssignment.named(":location"), ConceptTarget.Unknown)
+          ),
+          "InvalidRoleName"
+        ),
+        cs(
+          u.copy(relations =
+            u.relations :+
+              PropositionRelation(first, RoleAssignment.named("ARG0"), ConceptTarget.Unknown)
+          ),
+          "NumberedRoleAsNamed"
+        ),
+        cs(
+          u.copy(relations =
+            u.relations :+
+              PropositionRelation(
+                first,
+                RoleAssignment(SourceRole.Extension("x", "arg2"), None),
+                ConceptTarget.Unknown
+              )
+          ),
+          "NumberedRoleAsNamed"
+        ),
+        u.embedded.headOption.flatMap(e =>
+          cs(u.copy(embedded = u.embedded :+ e), "DuplicateEmbedding")
         ),
         cs(
           u.copy(relations =

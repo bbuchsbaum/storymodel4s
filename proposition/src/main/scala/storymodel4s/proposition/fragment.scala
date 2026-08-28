@@ -61,7 +61,7 @@ object Lexicalizer:
       r.normalizedRole
         .map(_.toString.toLowerCase)
         .orElse(r.source match
-          case SourceRole.Named(n) => Some(n.stripPrefix(":"))
+          case SourceRole.Named(n) => Some(n)
           case _                   => None)
 
 /** Conservative verbalization of a chart: every content word comes from a lemma or literal in the

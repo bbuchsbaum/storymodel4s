@@ -185,11 +185,16 @@ object ChartCompatibility:
       case (Polarity.Positive, Polarity.Negative) | (Polarity.Negative, Polarity.Positive) => true
       case _                                                                               => false
 
-    val embeddingConflict = (a.embeddingOf(pa).map(_.kind), b.embeddingOf(pb).map(_.kind)) match
-      case (Some(_), None) | (None, Some(_)) => true
-      case (Some(k1), Some(k2))              =>
-        k1 != k2 && k1 != EmbeddingKind.Unknown && k2 != EmbeddingKind.Unknown
-      case _ => false
+    // A concept may be held under several embeddings (said *and* believed): the pair conflicts
+    // when exactly one side is embedded, or when both are but share no kind (Unknown matches any).
+    val ka = a.embeddingKinds(pa)
+    val kb = b.embeddingKinds(pb)
+    val embeddingConflict =
+      if ka.isEmpty != kb.isEmpty then true
+      else if ka.isEmpty then false
+      else
+        !(ka.contains(EmbeddingKind.Unknown) || kb.contains(EmbeddingKind.Unknown) ||
+          ka.exists(kb.contains))
 
     PairEval(
       concept,

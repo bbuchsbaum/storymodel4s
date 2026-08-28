@@ -38,6 +38,14 @@ final case class Concept(
 object Concept:
   private val UnknownLemma: Lemma = Lemma.unsafe("?")
 
+  private given Order[Credence] =
+    Order.by(c => (c.rawScore, c.calibrated, c.calibrationModel))
+  private given Order[FrameRef] = Order.by(f => (f.namespace, f.id, f.senseCredence))
+  private given Order[ConceptKind] = Order.by(_.ordinal)
+
+  /** Lawful total order consistent with `==` (all fields, in declaration order). */
+  given Order[Concept] = Order.by(c => (c.kind, c.lemma, c.frame, c.gloss))
+
   /** Explicitly underspecified concept: the extractor knows a participant exists but not what. */
   val unknown: Concept = Concept(UnknownLemma, None, None, ConceptKind.Unknown)
 
@@ -63,10 +71,13 @@ enum SourceRole:
   /** `ARG0`..`ARG9`; meaning is frame-specific and never implies a normalized role by itself. */
   case Numbered(index: Int)
 
-  /** `:location`, `:time`, `:mod`, `:polarity`, ... */
+  /** A named role in its *bare* spelling: `location`, `time`, `mod`, `polarity`, ... — never with a
+    * leading `:` (that is PENMAN concrete syntax, not the role). Names shaped like `ARGn` must use
+    * [[Numbered]]; the validator rejects both mistakes.
+    */
   case Named(name: String)
 
-  /** `:op1`, `:op2`, ... */
+  /** `op1`, `op2`, ... */
   case Operand(index: Int)
 
   /** Provider- or project-specific role outside the standard inventory. */
@@ -80,6 +91,10 @@ enum SourceRole:
 
 object SourceRole:
   val MaxNumbered = 9
+
+  /** A role name that is really a numbered argument written as text. */
+  private val NumberedShape = "(?i)arg([0-9]+)".r
+
   def numbered(index: Int): Either[DomainError, SourceRole] =
     if index < 0 || index > MaxNumbered then
       Left(
@@ -88,7 +103,35 @@ object SourceRole:
       )
     else Right(Numbered(index))
 
-  given Order[SourceRole] = Order.by(_.render)
+  /** Why a named role is unacceptable, if it is. */
+  def nameProblem(name: String): Option[String] =
+    if name.isEmpty then Some("empty role name")
+    else if name.startsWith(":") then Some("role name must be bare (no leading ':')")
+    else if name.exists(c => c.isWhitespace || c == '|' || c == '<' || c == '>') then
+      Some("role name contains whitespace or a reserved separator")
+    else None
+
+  /** The numbered index a name like `ARG0` denotes, if it has that shape. */
+  def numberedShape(name: String): Option[Int] = name match
+    case NumberedShape(digits) => digits.toIntOption
+    case _                     => None
+
+  /** A validated bare named role. */
+  def named(name: String): Either[DomainError, SourceRole] =
+    nameProblem(name) match
+      case Some(why) => Left(DomainError.InvalidFormat("SourceRole", name, why))
+      case None      =>
+        if numberedShape(name).nonEmpty then
+          Left(DomainError.InvalidFormat("SourceRole", name, "numbered roles must use Numbered"))
+        else Right(Named(name))
+
+  /** Lawful total order consistent with `==`: by constructor, then by fields. */
+  given Order[SourceRole] = Order.by {
+    case Numbered(i)      => (0, i, "", "")
+    case Named(n)         => (1, 0, n, "")
+    case Operand(i)       => (2, i, "", "")
+    case Extension(ns, n) => (3, 0, ns, n)
+  }
 
 /** A source role plus an optional normalized interpretation carrying its own credence.
   *
@@ -111,10 +154,19 @@ enum LiteralValue:
   case Number(value: BigDecimal)
   case Symbol(value: String)
 
+  /** Rendering used by glosses and serializations; numbers use [[LiteralValue.canonicalNumber]] so
+    * that `==` (numeric, scale-insensitive) and the rendered form agree.
+    */
   def render: String = this match
     case Text(v)   => "\"" + v + "\""
-    case Number(v) => v.toString
+    case Number(v) => LiteralValue.canonicalNumber(v)
     case Symbol(v) => v
+
+object LiteralValue:
+  /** Scale-normalized plain decimal: `1E+3`, `1000.0`, and `1000` all render as `1000`. */
+  def canonicalNumber(v: BigDecimal): String =
+    val stripped = v.bigDecimal.stripTrailingZeros
+    if stripped.signum == 0 then "0" else stripped.toPlainString
 
 enum ConceptTarget:
   case Node(id: ConceptId)
@@ -223,9 +275,23 @@ final case class PropositionChart[C <: CheckState] private[proposition] (
   def predicates: Vector[ConceptId] =
     conceptIds.filter(id => concepts(id).isPredicate)
 
-  /** Concepts held under an embedding rather than asserted at root. */
-  def embeddingOf(id: ConceptId): Option[EmbeddedProposition] = embedded.find(_.content == id)
-  def isEmbedded(id: ConceptId): Boolean = embeddingOf(id).nonEmpty
+  /** Every embedding holding `id` as content (a reentrant proposition may be held several ways,
+    * e.g. both said and believed). Deterministic order.
+    */
+  def embeddingsOf(id: ConceptId): Vector[EmbeddedProposition] =
+    embedded.filter(_.content == id).sortBy(e => (e.kind.ordinal, e.container.value))
+
+  /** The kinds under which `id` is held; empty when asserted at root. */
+  def embeddingKinds(id: ConceptId): Set[EmbeddingKind] = embeddingsOf(id).map(_.kind).toSet
+
+  /** The single embedding of `id` when there is exactly one; `None` if absent *or* ambiguous. Use
+    * [[embeddingsOf]] when several holders are possible.
+    */
+  def embeddingOf(id: ConceptId): Option[EmbeddedProposition] =
+    embeddingsOf(id) match
+      case Vector(one) => Some(one)
+      case _           => None
+  def isEmbedded(id: ConceptId): Boolean = embedded.exists(_.content == id)
 
   /** Concepts with no alignment support at all. */
   def unalignedConcepts: Vector[ConceptId] =
@@ -235,6 +301,22 @@ final case class PropositionChart[C <: CheckState] private[proposition] (
   /** Forget the check state (e.g. before editing). */
   def unchecked: PropositionChart[Unchecked] =
     new PropositionChart[Unchecked](
+      focus,
+      concepts,
+      relations,
+      polarity,
+      embedded,
+      alignments,
+      provenance,
+      sentence
+    )
+
+  /** Same chart with relations and embeddings in a different order (identity-preserving). */
+  private[proposition] def reordered(
+      relations: Vector[PropositionRelation],
+      embedded: Vector[EmbeddedProposition]
+  ): PropositionChart[C] =
+    new PropositionChart[C](
       focus,
       concepts,
       relations,

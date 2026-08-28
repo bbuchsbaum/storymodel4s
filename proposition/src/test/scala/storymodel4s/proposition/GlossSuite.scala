@@ -32,7 +32,7 @@ class GlossSuite extends ScalaCheckSuite:
           rel(s, RoleAssignment.arg(1), p),
           rel(p, RoleAssignment.arg(0), w),
           rel(p, RoleAssignment.arg(1), m),
-          rel(p, RoleAssignment.named(":location"), r)
+          rel(p, RoleAssignment.named("location"), r)
         ),
         polarity = Map(p -> Polarity.Negative),
         embedded = Vector(EmbeddedProposition(s, EmbeddingKind.Speech, p))
