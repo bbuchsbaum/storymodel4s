@@ -6,6 +6,26 @@ import storymodel4s.core.Checksum
 
 class DigestPrivacySuite extends FunSuite:
 
+  private def checkedPayload(
+      policyId: PrivacyPolicyId,
+      keyId: KeyId,
+      source: String,
+      destination: String
+  ): PseudonymizedText =
+    PseudonymizedText
+      .checked(
+        policyId,
+        keyId,
+        source,
+        destination,
+        Vector(
+          storymodel4s.core.TextSpan.unsafe(0, source.length) ->
+            storymodel4s.core.TextSpan.unsafe(0, destination.length)
+        )
+      )
+      .toOption
+      .get
+
   test("HMAC-SHA256 matches RFC 4231 test cases 1 and 2") {
     val key1 = Array.fill[Byte](20)(0x0b)
     assertEquals(
@@ -64,11 +84,11 @@ class DigestPrivacySuite extends FunSuite:
       maxBudgetTokens = 10000,
       ttlMillis = 60000
     )
-    val payload = PseudonymizedText(
+    val payload = checkedPayload(
       policy.id,
       KeyId.unsafe("k1"),
-      "[PERSON_1] danced until midnight",
-      Vector.empty
+      "Jane Smith",
+      "[PERSON_1]"
     )
     val space = EmbeddingSpace
       .of(
@@ -86,7 +106,6 @@ class DigestPrivacySuite extends FunSuite:
     val ok = RemotePolicy.evaluate(
       policy,
       request,
-      payload,
       provider,
       "text-embedding-x",
       "candidate-retrieval",
@@ -103,7 +122,6 @@ class DigestPrivacySuite extends FunSuite:
         .evaluate(
           policy,
           request,
-          payload,
           provider,
           "other-model",
           "candidate-retrieval",
@@ -117,7 +135,6 @@ class DigestPrivacySuite extends FunSuite:
         .evaluate(
           policy,
           request,
-          payload,
           ProviderFingerprint.of("x", "t", "i", "r"),
           "text-embedding-x",
           "candidate-retrieval",
@@ -128,7 +145,7 @@ class DigestPrivacySuite extends FunSuite:
     )
     assert(
       RemotePolicy
-        .evaluate(policy, request, payload, provider, "text-embedding-x", "training", 1000L, 42L)
+        .evaluate(policy, request, provider, "text-embedding-x", "training", 1000L, 42L)
         .isLeft
     )
     assert(
@@ -136,7 +153,6 @@ class DigestPrivacySuite extends FunSuite:
         .evaluate(
           policy,
           request,
-          payload,
           provider,
           "text-embedding-x",
           "candidate-retrieval",
@@ -145,13 +161,18 @@ class DigestPrivacySuite extends FunSuite:
         )
         .isLeft
     )
-    val foreign = payload.copy(policyId = PrivacyPolicyId.unsafe("pol-2"))
+    val foreign = checkedPayload(
+      PrivacyPolicyId.unsafe("pol-2"),
+      KeyId.unsafe("k1"),
+      "Jane Smith",
+      "[PERSON_1]"
+    )
+    val foreignRequest = request.copy(payload = EmbedPayload.Sanitized(foreign))
     assert(
       RemotePolicy
         .evaluate(
           policy,
-          request,
-          foreign,
+          foreignRequest,
           provider,
           "text-embedding-x",
           "candidate-retrieval",
@@ -165,7 +186,6 @@ class DigestPrivacySuite extends FunSuite:
       .evaluate(
         policy,
         request,
-        payload,
         provider,
         "other-model",
         "candidate-retrieval",
@@ -175,21 +195,72 @@ class DigestPrivacySuite extends FunSuite:
       .left
       .toOption
       .get
-    assert(!denied.reason.contains("danced"))
+    assert(!denied.reason.contains("PERSON_1"))
   }
 
   test(
     "PseudonymizedText digest depends on policy, key and text — never on the re-identification key"
   ) {
-    val a =
-      PseudonymizedText(PrivacyPolicyId.unsafe("p"), KeyId.unsafe("k"), "[PERSON_1]", Vector.empty)
-    val b = a.copy(text = "[PERSON_2]")
+    val a = checkedPayload(
+      PrivacyPolicyId.unsafe("p"),
+      KeyId.unsafe("k"),
+      "Alice",
+      "[PERSON_1]"
+    )
+    val b = checkedPayload(
+      PrivacyPolicyId.unsafe("p"),
+      KeyId.unsafe("k"),
+      "Alice",
+      "[PERSON_2]"
+    )
+    val otherPolicy = checkedPayload(
+      PrivacyPolicyId.unsafe("p2"),
+      KeyId.unsafe("k"),
+      "Alice",
+      "[PERSON_1]"
+    )
+    val otherKey = checkedPayload(
+      PrivacyPolicyId.unsafe("p"),
+      KeyId.unsafe("k2"),
+      "Alice",
+      "[PERSON_1]"
+    )
     assertNotEquals(a.digest, b.digest)
-    assertNotEquals(a.digest, a.copy(policyId = PrivacyPolicyId.unsafe("p2")).digest)
-    assertNotEquals(a.digest, a.copy(keyId = KeyId.unsafe("k2")).digest)
-    assertEquals(a.digest, a.copy(offsets = Vector.empty).digest)
+    assertNotEquals(a.digest, otherPolicy.digest)
+    assertNotEquals(a.digest, otherKey.digest)
     assert(
       a.digest != Checksum.ofText(a.text),
       "digest must not be the plain content hash of the text"
     )
+
+    val sameTextOneReplacement = PseudonymizedText
+      .checked(
+        PrivacyPolicyId.unsafe("p"),
+        KeyId.unsafe("k"),
+        "Alice Bob",
+        "[P] [Q]",
+        Vector(
+          storymodel4s.core.TextSpan.unsafe(0, 9) ->
+            storymodel4s.core.TextSpan.unsafe(0, 7)
+        )
+      )
+      .toOption
+      .get
+    val sameTextTwoReplacements = PseudonymizedText
+      .checked(
+        PrivacyPolicyId.unsafe("p"),
+        KeyId.unsafe("k"),
+        "Alice Bob",
+        "[P] [Q]",
+        Vector(
+          storymodel4s.core.TextSpan.unsafe(0, 5) ->
+            storymodel4s.core.TextSpan.unsafe(0, 3),
+          storymodel4s.core.TextSpan.unsafe(6, 9) ->
+            storymodel4s.core.TextSpan.unsafe(4, 7)
+        )
+      )
+      .toOption
+      .get
+    assertNotEquals(sameTextOneReplacement.offsets, sameTextTwoReplacements.offsets)
+    assertEquals(sameTextOneReplacement.digest, sameTextTwoReplacements.digest)
   }

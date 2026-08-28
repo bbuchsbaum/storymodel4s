@@ -14,8 +14,8 @@ import storymodel4s.story.NarrativeNodeId
   * [[LexicalTestResource]], a declared synonym table standing in for the graded semantics an
   * embedding provider will supply. It is a test resource, not evidence: passes obtained with it
   * show that the *structural* machinery behaves as intended once local semantics are available, not
-  * that lexical overlap is an adequate aligner. Assertions that cannot hold even with the resource
-  * are `assume`-skipped and tagged `TODO(M5)`.
+  * that lexical overlap is an adequate aligner. No assertion is skipped; provisional lexical-only
+  * thresholds are marked `TODO(M5)` inline until calibrated defaults exist.
   */
 class WarOfTheGhostsAlignmentSuite extends FunSuite:
   import WarOfTheGhostsExpectations.*

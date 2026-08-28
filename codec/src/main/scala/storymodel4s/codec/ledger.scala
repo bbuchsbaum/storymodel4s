@@ -78,17 +78,3 @@ object Migration:
   /** Parse, migrate, decode. */
   def decode[A](text: String)(using Decoder[A]): Either[CodecError, A] =
     Canonical.parse(text).flatMap(toCurrent).flatMap(Canonical.decodeJson[A])
-
-/** Placeholder for the address seam (codec milestone §1 item 1).
-  *
-  * `core.Address` and the module-local typed refs are being landed by the reference-seam bead;
-  * until they are on main, addresses cross the wire as their canonical rendered string and are
-  * re-typed by the consumer. TODO(reference-seam): replace with `core.Address` codec
-  * (`Address.parse` as the decoder) once `core/address.scala` is committed.
-  */
-opaque type AddressString = String
-object AddressString:
-  def apply(rendered: String): AddressString = rendered
-  extension (a: AddressString) def rendered: String = a
-  given Encoder[AddressString] = Encoder.encodeString.contramap(_.rendered)
-  given Decoder[AddressString] = Decoder.decodeString.map(AddressString.apply)

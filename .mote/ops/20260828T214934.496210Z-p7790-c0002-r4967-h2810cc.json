@@ -1,0 +1,1 @@
+{"actor":"codex-storymodel4s-root","entity":"bd-01M14K855QC1VB6H17S4W9FCS2","kind":"note","note_kind":"progress","op":"20260828T214934.496210Z-p7790-c0002-r4967-h2810cc","text":"Slice 1 warning cleanup: remove unused NarrativeKind wildcard exposed by codec test-only dependency","ts":"2026-08-28T21:49:34.496210Z","v":1}

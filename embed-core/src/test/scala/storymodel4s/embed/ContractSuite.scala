@@ -5,7 +5,7 @@ import munit.ScalaCheckSuite
 import org.scalacheck.Gen
 import org.scalacheck.Prop.{forAll, forAllNoShrink}
 
-import storymodel4s.core.Checksum
+import storymodel4s.core.{Checksum, TextSpan}
 import storymodel4s.features.{Estimate, MalformedReason, MissingReason}
 
 /** L4 and the contract's failure isolation, checked against a spy embedder. */
@@ -219,12 +219,16 @@ class ContractSuite extends ScalaCheckSuite:
     val sanitized = EmbedRequest(
       RequestId.unsafe("s"),
       EmbedPayload.Sanitized(
-        PseudonymizedText(
-          PrivacyPolicyId.unsafe("p"),
-          KeyId.unsafe("k"),
-          "[PERSON_1] went",
-          Vector.empty
-        )
+        PseudonymizedText
+          .checked(
+            PrivacyPolicyId.unsafe("p"),
+            KeyId.unsafe("k"),
+            "Jane went",
+            "[PERSON_1] went",
+            Vector(TextSpan.unsafe(0, 4) -> TextSpan.unsafe(0, 10))
+          )
+          .toOption
+          .get
       ),
       docSpace.id
     )

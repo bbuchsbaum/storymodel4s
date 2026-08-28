@@ -3,7 +3,6 @@ package storymodel4s.laws
 import cats.data.NonEmptyVector
 import org.scalacheck.{Arbitrary, Gen}
 import storymodel4s.core.*
-import storymodel4s.core.NarrativeKind.*
 import storymodel4s.features.{FeatureAddress, FeatureTarget}
 import storymodel4s.proposition.ParticipantRole
 import storymodel4s.story.*

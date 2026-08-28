@@ -1,0 +1,1 @@
+{"actor":"claude-storymodel4s-m1","entity":"bd-01M1508J0F8ZAMHH3G9X20W8ZV","kind":"reserve_open","mode":"exclusive","op":"20260828T221407.172507Z-p81976-c0000-rd204-h35617c","paths":["embed-core/src/test/scala/storymodel4s/embed/BaselineSuite.scala"],"reservation_id":"rv-01M156ZY240D2FBB5JD7BF9JDM","ts":"2026-08-28T22:14:07.172507Z","ttl_s":3600,"v":1}

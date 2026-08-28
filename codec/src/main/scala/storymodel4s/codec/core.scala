@@ -68,6 +68,22 @@ object CoreCodecs:
   given Decoder[LanguageTag] =
     Decoder.decodeString.emap(s => LanguageTag.from(s).left.map(_.message))
 
+  // ---- universal addresses ---------------------------------------------------------------
+  given Encoder[Address] = Encoder.encodeString.contramap(_.render)
+  given Decoder[Address] = Decoder.decodeString.emap { rendered =>
+    Address.parse(rendered).left.map(_.message).flatMap { address =>
+      Either.cond(
+        address.render == rendered,
+        address,
+        s"non-canonical Address; expected ${address.render}"
+      )
+    }
+  }
+  given KeyEncoder[Address] = KeyEncoder.instance(_.render)
+  given KeyDecoder[Address] = KeyDecoder.instance { rendered =>
+    Address.parse(rendered).toOption.filter(_.render == rendered)
+  }
+
   // ---- spans ----------------------------------------------------------------------------
   given Encoder[TextSpan] =
     Encoder.instance(s => Json.obj("start" -> s.start.asJson, "end" -> s.endExclusive.asJson))
