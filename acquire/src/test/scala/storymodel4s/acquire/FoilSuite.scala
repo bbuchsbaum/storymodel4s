@@ -8,10 +8,11 @@ class FoilSuite extends ScalaCheckSuite:
 
   private def o(k: FoilKind, preferred: Boolean) = FoilOutcome(k, preferred, Vector.empty)
 
-  test("empty report has no rates and passes vacuously"):
+  test("empty report has no rates and an undefined gate, never a vacuous pass"):
     assertEquals(FoilReport.empty.overall, None)
     assertEquals(FoilReport.empty.preferenceRate(FoilKind.SwapRoles), None)
-    assert(FoilReport.empty.passes(1.0))
+    assertEquals(FoilReport.empty.passes(1.0), None)
+    assertEquals(FoilReport.empty.untried, FoilKind.values.toSet)
 
   test("per-kind and overall rates"):
     val r = FoilReport(
@@ -25,8 +26,9 @@ class FoilSuite extends ScalaCheckSuite:
     assertEquals(r.preferenceRate(FoilKind.FlipPolarity), Some(1.0))
     assertEquals(r.preferenceRate(FoilKind.RemoveCausalCue), None)
     assertEquals(r.overall, Some(2.0 / 3.0))
-    assert(r.passes(0.5))
-    assert(!r.passes(0.75))
+    assertEquals(r.passes(0.5), Some(true))
+    assertEquals(r.passes(0.75), Some(false))
+    assert(r.untried.contains(FoilKind.RemoveCausalCue))
     assertEquals(r.failures.map(_.kind), Vector(FoilKind.SwapRoles))
 
   property("overall rate is the preferred count over trials and lies in [0,1]"):

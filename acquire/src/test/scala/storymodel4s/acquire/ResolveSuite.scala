@@ -30,6 +30,23 @@ class ResolveSuite extends ScalaCheckSuite:
       case Unresolved(ResolutionFailure.BlockingFinding(_)) => ()
       case other                                            => fail(s"unexpected $other")
 
+  test("a low-confidence blocking finding does not block; an unscored one does"):
+    val low = bundle(
+      Vector(proposed(1, 0.9)),
+      findings = Vector(finding(FindingCode.HallucinatedConcept, score = Some(0.02)))
+    )
+    assert(Resolver.resolve(ordinary, low, policy).isAccepted)
+    val high = bundle(
+      Vector(proposed(1, 0.9)),
+      findings = Vector(finding(FindingCode.HallucinatedConcept, score = Some(0.9)))
+    )
+    assert(!Resolver.resolve(ordinary, high, policy).isAccepted)
+    val unscored = bundle(
+      Vector(proposed(1, 0.9)),
+      findings = Vector(finding(FindingCode.HallucinatedConcept))
+    )
+    assert(!Resolver.resolve(ordinary, unscored, policy).isAccepted)
+
   test("warnings alone do not block"):
     val b = bundle(Vector(proposed(1, 0.9)), findings = Vector(finding(FindingCode.UnknownFrame)))
     assert(Resolver.resolve(ordinary, b, policy).isAccepted)
@@ -38,7 +55,7 @@ class ResolveSuite extends ScalaCheckSuite:
     val b = bundle[Int](Vector(AgentProposal.abstained(task, receipt)))
     assertEquals(Resolver.resolve(ordinary, b, policy), Unresolved(ResolutionFailure.NoProposal))
 
-  test("acceptance requires a calibrated probability"):
+  test("acceptance requires a calibrated probability for the leading value"):
     val single = bundle(Vector(proposed(1, 0.99)), calibrated = None)
     assertEquals(
       Resolver.resolve(ordinary, single, policy),
@@ -49,17 +66,58 @@ class ResolveSuite extends ScalaCheckSuite:
     val dev = AcceptancePolicy(Map.empty, FamilyPolicy.Development)
     assert(Resolver.resolve(ordinary, single, dev).isInstanceOf[Alternatives[?]])
 
-  test("high-impact families need the required number of agreeing proposers"):
+  test("calibration is attached to the value it calibrates, not to the bundle"):
+    // X leads on support; only Y is calibrated → X cannot be accepted on Y's probability
+    val b = bundle(
+      Vector(proposed(1, 0.5, "e1", "parser"), proposed(1, 0.4, "e2", "agent"), proposed(2, 0.9)),
+      calibrated = None
+    ).copy(calibrations =
+      Vector(CandidateCalibration(2, Probability.unsafe(0.95), "test-calibration"))
+    )
+    val r = Resolver.resolve(ordinary, b, policy)
+    assert(!r.isAccepted, s"unexpected $r")
+    assert(r.isInstanceOf[Alternatives[?]])
+
+  test("high-impact families need the required number of agreeing distinct providers"):
     val one = bundle(Vector(proposed(1, 0.9)))
     Resolver.resolve(highImpact, one, policy) match
       case Unresolved(ResolutionFailure.InsufficientAgreement(1, 2)) => ()
       case other                                                     => fail(s"unexpected $other")
-    val two = bundle(Vector(proposed(1, 0.9), proposed(1, 0.8, "e2")))
-    assertEquals(Resolver.resolve(highImpact, two, policy), Accepted(1, Probability.unsafe(0.95)))
+    val sameProvider = bundle(Vector(proposed(1, 0.9), proposed(1, 0.8, "e2")))
+    Resolver.resolve(highImpact, sameProvider, policy) match
+      case Unresolved(ResolutionFailure.InsufficientAgreement(1, 2)) => ()
+      case other                                                     => fail(s"unexpected $other")
+    val two = bundle(Vector(proposed(1, 0.9, "e1", "parser"), proposed(1, 0.8, "e2", "agent")))
+    Resolver.resolve(highImpact, two, policy) match
+      case Accepted(1, p, ev) =>
+        assertEquals(p, Probability.unsafe(0.95))
+        assertEquals(ev.toVector.map(_.evidenceId.value).sorted, Vector("e1", "e2"))
+      case other => fail(s"unexpected $other")
 
   test("conservative families reject with zero source support"):
-    val b = bundle(Vector(proposed(1, 0.9), proposed(1, 0.8)), support = 0.0)
+    val b = bundle(
+      Vector(proposed(1, 0.9, "e1", "parser"), proposed(1, 0.8, "e2", "agent")),
+      support = 0.0
+    )
     assertEquals(Resolver.resolve(highImpact, b, policy), Rejected(RejectionReason.NoSourceSupport))
+
+  test("acceptance needs span evidence unless the family policy waives it"):
+    val noSpans = bundle(Vector(proposed(1, 0.9)), spans = None)
+    assertEquals(
+      Resolver.resolve(ordinary, noSpans, policy),
+      Unresolved(ResolutionFailure.NoSpanEvidence)
+    )
+    val inline = AgentProposal.proposed(
+      task,
+      1,
+      cats.data.NonEmptyVector.one(evWithSpans("s")),
+      Some(RawScore.unsafe(0.9)),
+      Vector.empty,
+      receipt
+    )
+    assert(Resolver.resolve(ordinary, bundle(Vector(inline), spans = None), policy).isAccepted)
+    val dev = AcceptancePolicy(Map.empty, FamilyPolicy.Development)
+    assert(Resolver.resolve(ordinary, noSpans, dev).isAccepted)
 
   test("accept, review, and reject regions follow the family policy"):
     def at(p: Double) =
@@ -70,12 +128,14 @@ class ResolveSuite extends ScalaCheckSuite:
       case Rejected(RejectionReason.BelowRejectBand(_, _)) => ()
       case other                                           => fail(s"unexpected $other")
 
-  test("resolution is not a vote: the leading value is chosen by support then score"):
+  test("resolution is not a vote: the leading value is chosen by providers, then score"):
     val b = bundle(Vector(proposed(1, 0.2), proposed(2, 0.9)))
-    // equal support (1 each) → highest raw score wins
+    // equal provider support (1 each) → highest raw score wins
     assertEquals(Resolver.resolve(ordinary, b, policy).accepted, Some(2))
-    val c = bundle(Vector(proposed(1, 0.2), proposed(1, 0.1, "e2"), proposed(2, 0.9)))
-    // more support wins even with lower scores; the calibrated probability still gates
+    val c = bundle(
+      Vector(proposed(1, 0.2, "e1", "parser"), proposed(1, 0.1, "e2", "agent"), proposed(2, 0.9))
+    )
+    // more independent providers win even with lower scores; the calibrated probability still gates
     assertEquals(Resolver.resolve(ordinary, c, policy).accepted, Some(1))
 
   test("alternatives never count toward agreement"):
@@ -84,6 +144,17 @@ class ResolveSuite extends ScalaCheckSuite:
       case Unresolved(ResolutionFailure.InsufficientAgreement(1, 2)) => ()
       case other                                                     => fail(s"unexpected $other")
 
+  test("a missing raw score is never rendered as zero and sorts last among alternatives"):
+    val b = bundle(
+      Vector(proposedUnscored(1), proposed(2, -0.3, "e2"), proposed(3, 0.4, "e3")),
+      calibrated = None
+    )
+    Resolver.resolve(ordinary, b, policy) match
+      case Alternatives(vs) =>
+        assertEquals(vs.toVector.map(_.value), Vector(3, 2, 1))
+        assertEquals(vs.toVector.map(_.score.map(_.value)), Vector(Some(0.4), Some(-0.3), None))
+      case other => fail(s"unexpected $other")
+
   test("family policy validation"):
     assert(FamilyPolicy.of(Probability.unsafe(0.5), Probability.unsafe(0.6), 1, true, false).isLeft)
     assert(FamilyPolicy.of(Probability.unsafe(0.5), Probability.unsafe(0.4), 0, true, false).isLeft)
@@ -91,11 +162,32 @@ class ResolveSuite extends ScalaCheckSuite:
       FamilyPolicy.of(Probability.unsafe(0.5), Probability.unsafe(0.4), 1, true, false).isRight
     )
 
-  property("Accepted always carries the bundle's calibrated probability"):
+  property("Accepted carries the calibrated probability of the accepted value"):
     forAll { (f: ClaimFamily, b: EvidenceBundle[Int]) =>
       Resolver.resolve(f, b, policy) match
-        case Accepted(_, p) => b.calibrated.contains(p)
-        case _              => true
+        case Accepted(v, p, _) => b.calibrationFor(v).exists(_.probability == p)
+        case _                 => true
+    }
+
+  property("Accepted always carries evidence, with spans somewhere unless waived"):
+    forAll { (f: ClaimFamily, b: EvidenceBundle[Int]) =>
+      Resolver.resolve(f, b, policy) match
+        case Accepted(_, _, ev) =>
+          ev.length > 0 && (b.sourceSupport.spans.nonEmpty || ev.exists(_.spans.nonEmpty))
+        case _ => true
+    }
+
+  property("agreement counts distinct providers, never proposals"):
+    forAll { (f: ClaimFamily, b: EvidenceBundle[Int]) =>
+      Resolver.resolve(f, b, policy) match
+        case Accepted(v, _, _) =>
+          val providers = b.proposals
+            .filter(p => p.disposition == ProposalDisposition.Proposed && p.value.contains(v))
+            .map(_.receipt.call.provider)
+            .distinct
+            .size
+          providers >= policy.forFamily(f).requireAgreement
+        case _ => true
     }
 
   property("resolution is deterministic"):
@@ -103,9 +195,10 @@ class ResolveSuite extends ScalaCheckSuite:
       Resolver.resolve(f, b, policy) == Resolver.resolve(f, b, policy)
     }
 
-  property("blocking findings never yield Accepted or Alternatives"):
+  property("confident blocking findings never yield Accepted or Alternatives"):
     forAll { (f: ClaimFamily, b: EvidenceBundle[Int]) =>
-      if b.findings.exists(_.isBlocking) then
+      val threshold = policy.forFamily(f).criticBlockThreshold
+      if CriticFinding.blocking(b.findings, threshold).nonEmpty then
         Resolver.resolve(f, b, policy) match
           case Rejected(_) | Unresolved(_) => true
           case _                           => false

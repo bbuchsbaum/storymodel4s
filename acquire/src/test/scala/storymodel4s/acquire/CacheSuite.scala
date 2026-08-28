@@ -20,6 +20,49 @@ class CacheSuite extends ScalaCheckSuite:
       key(i, s, c + d, f) != base && key(i, s, c, f + d) != base
     }
 
+  test("stage-local prompt packages, parameters, and seed change the key"):
+    val base = key("i", "s", "c", "f")
+    val local = StageLocalConfig(Vector(Fixtures.promptRef), Map("temperature" -> "0"), Some(1L))
+    val withLocal = StageCacheKey.of(
+      Checksum.ofText("i"),
+      "s",
+      Checksum.ofText("c"),
+      Fingerprint.unsafe("ff"),
+      local
+    )
+    assertNotEquals(withLocal, base)
+    val bumped = local.copy(promptPackages = Vector(Fixtures.manifest.copy(version = "1.0.1").ref))
+    val withBumped = StageCacheKey.of(
+      Checksum.ofText("i"),
+      "s",
+      Checksum.ofText("c"),
+      Fingerprint.unsafe("ff"),
+      local = bumped
+    )
+    assertNotEquals(withBumped, withLocal)
+    val seeded = local.copy(seed = Some(2L))
+    assertNotEquals(
+      StageCacheKey
+        .of(Checksum.ofText("i"), "s", Checksum.ofText("c"), Fingerprint.unsafe("ff"), seeded),
+      withLocal
+    )
+    val reordered = local.copy(providerParams = Map("temperature" -> "0"))
+    assertEquals(
+      StageCacheKey
+        .of(Checksum.ofText("i"), "s", Checksum.ofText("c"), Fingerprint.unsafe("ff"), reordered),
+      withLocal
+    )
+    assertEquals(
+      StageCacheKey.of(
+        Checksum.ofText("i"),
+        "s",
+        Checksum.ofText("c"),
+        Fingerprint.unsafe("ff"),
+        StageLocalConfig.empty
+      ),
+      base
+    )
+
   test("receipt builder records stages in order and layer coverage"):
     val story = StoryId.unsafe("story-1")
     val src = Checksum.ofText("source")

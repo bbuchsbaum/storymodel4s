@@ -2,10 +2,36 @@ package storymodel4s.acquire
 
 import storymodel4s.core.*
 
+/** Per-stage inputs that must be part of a stage's cache key but are not the story input, the
+  * schema, or the build-wide configuration: the prompt packages the stage's agents run under and
+  * the provider decoding parameters and seed (review finding #36).
+  *
+  * Folding these into one global `configHash` would invalidate every stage when one critic's prompt
+  * is bumped, or nothing if the bump is forgotten. Keeping them per stage makes invalidation exact.
+  */
+final case class StageLocalConfig(
+    promptPackages: Vector[PromptPackageRef],
+    providerParams: Map[String, String],
+    seed: Option[Long]
+):
+  /** Deterministic digest: prompt checksums sorted, params sorted by key, then the seed. */
+  def checksum: Checksum =
+    ContentAddress.digest(
+      Vector("stage-local") ++
+        promptPackages.map(p => s"prompt=${p.name}@${p.version}#${p.checksum.hex}").sorted ++
+        providerParams.toVector.sortBy(_._1).map((k, v) => s"param=$k=$v") ++
+        Vector(s"seed=${seed.fold("none")(_.toString)}")
+    )
+
+object StageLocalConfig:
+  val empty: StageLocalConfig = StageLocalConfig(Vector.empty, Map.empty, None)
+
 /** Content-addressed key for one stage execution (design record §31.2).
   *
   * Changing embeddings does not invalidate sentence segmentation; changing the hierarchy does not
-  * rerun entities. The key covers exactly the inputs a stage's output depends on.
+  * rerun entities. The key covers exactly the inputs a stage's output depends on: the input
+  * artifact, the stage schema, the build-wide configuration, the provider fingerprint, and the
+  * stage-local prompt packages, parameters, and seed.
   */
 object StageCacheKey:
   opaque type StageCacheKey = Checksum
@@ -13,7 +39,8 @@ object StageCacheKey:
       inputChecksum: Checksum,
       stageSchemaVersion: String,
       configHash: Checksum,
-      providerFingerprint: Fingerprint
+      providerFingerprint: Fingerprint,
+      local: StageLocalConfig
   ): StageCacheKey =
     ContentAddress.digest(
       Vector(
@@ -21,9 +48,20 @@ object StageCacheKey:
         inputChecksum.hex,
         stageSchemaVersion,
         configHash.hex,
-        providerFingerprint.value
+        providerFingerprint.value,
+        local.checksum.hex
       )
     )
+
+  /** Key for a stage with no prompt packages, parameters, or seed of its own. */
+  def of(
+      inputChecksum: Checksum,
+      stageSchemaVersion: String,
+      configHash: Checksum,
+      providerFingerprint: Fingerprint
+  ): StageCacheKey =
+    of(inputChecksum, stageSchemaVersion, configHash, providerFingerprint, StageLocalConfig.empty)
+
   extension (k: StageCacheKey) def checksum: Checksum = k
   given cats.Show[StageCacheKey] = cats.Show.show(_.hex)
   given cats.Order[StageCacheKey] = cats.Order[Checksum]

@@ -19,7 +19,7 @@ class PromptSuite extends ScalaCheckSuite:
       .fold(errs => assertEquals(errs.length, 3L), _ => fail("valid"))
 
   test("reserved separators are rejected"):
-    val bad = manifest.copy(role = "a\u001fb")
+    val bad = manifest.copy(role = PromptRole.Custom("a\u001fb", "x"))
     assert(PromptPackageManifest.validate(bad).isInvalid)
     val nl = manifest.copy(abstentionRules = Vector("line\nbreak"))
     assert(PromptPackageManifest.validate(nl).isInvalid)
@@ -48,6 +48,23 @@ class PromptSuite extends ScalaCheckSuite:
 
   property("checksum is deterministic"):
     forAll(clean) { (x) =>
-      val m = manifest.copy(role = x)
+      val m = manifest.copy(role = PromptRole.Custom("ns", x.replace(":", "")))
       m.checksum == m.copy().checksum && m.ref == m.ref
     }
+
+  test("custom roles and operations may not contain the rendering separator"):
+    assert(
+      PromptPackageManifest.validate(manifest.copy(role = PromptRole.Custom("a:b", "x"))).isInvalid
+    )
+    assert(
+      PromptPackageManifest
+        .validate(
+          manifest.copy(permittedOperations = Vector(PermittedOperation.Custom("ns", "a:b")))
+        )
+        .isInvalid
+    )
+    assert(
+      PromptPackageManifest
+        .validate(manifest.copy(role = PromptRole.Critic(CriticFamily.FrameRole)))
+        .isValid
+    )
