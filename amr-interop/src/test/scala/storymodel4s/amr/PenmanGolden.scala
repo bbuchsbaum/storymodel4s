@@ -361,5 +361,43 @@ object PenmanGolden:
         ("unit", "m2", "d2", true),
         ("instance", "d2", "dollar", false)
       )
+    ),
+    Case(
+      "g28-prep-out-of",
+      "# ::id g28-prep-out-of\n(l / leave-11\n   :ARG0 (b / boy)\n   :prep-out-of (h / house))",
+      "l",
+      Vector(
+        ("instance", "l", "leave-11", false),
+        ("ARG0", "l", "b", true),
+        ("instance", "b", "boy", false),
+        ("prep-out-of", "l", "h", true),
+        ("instance", "h", "house", false)
+      )
+    ),
+    Case(
+      "g29-prep-on-behalf-of",
+      "# ::id g29-prep-on-behalf-of\n(a / act-01\n   :ARG0 (l / lawyer)\n   :prep-on-behalf-of (c / client))",
+      "a",
+      Vector(
+        ("instance", "a", "act-01", false),
+        ("ARG0", "a", "l", true),
+        ("instance", "l", "lawyer", false),
+        ("prep-on-behalf-of", "a", "c", true),
+        ("instance", "c", "client", false)
+      )
+    ),
+    Case(
+      "g30-triple-letter-variable",
+      "# ::id g30-triple-letter-variable\n(s / see-01\n   :ARG0 (iii / i)\n   :ARG1 (d / dog\n            :ARG0-of (b / bark-01)))",
+      "s",
+      Vector(
+        ("instance", "s", "see-01", false),
+        ("ARG0", "s", "iii", true),
+        ("instance", "iii", "i", false),
+        ("ARG1", "s", "d", true),
+        ("instance", "d", "dog", false),
+        ("ARG0", "b", "d", true),
+        ("instance", "b", "bark-01", false)
+      )
     )
   )

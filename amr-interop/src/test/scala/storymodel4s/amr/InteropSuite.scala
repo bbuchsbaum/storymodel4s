@@ -27,7 +27,7 @@ class InteropSuite extends ScalaCheckSuite:
     ToChart.convert(canonical(s), None, lexicon, sentence).fold(e => fail(e.message), identity)
 
   private def back(c: p.PropositionChart[p.Checked]): AmrGraph[Checked, CanonicalRoles] =
-    FromChart.convert(c).fold(e => fail(e.message), identity)
+    FromChart.convert(c, lexicon).fold(e => fail(e.message), identity)
 
   private def conceptWithLemma(c: p.PropositionChart[p.Checked], lemma: String): p.ConceptId =
     c.conceptIds
@@ -42,7 +42,7 @@ class InteropSuite extends ScalaCheckSuite:
       val ch = ToChart
         .convert(g, None, lexicon, sentence)
         .fold(e => fail(s"${c.name}: ${e.message}"), identity)
-      val g2 = FromChart.convert(ch).fold(e => fail(s"${c.name}: ${e.message}"), identity)
+      val g2 = FromChart.convert(ch, lexicon).fold(e => fail(s"${c.name}: ${e.message}"), identity)
       assert(AmrIsomorphism.isomorphic(g, g2), s"${c.name}: AMR round trip not isomorphic")
     }
   }
@@ -61,7 +61,7 @@ class InteropSuite extends ScalaCheckSuite:
 
   test("golden-derived charts are fully AMR-expressible") {
     PenmanGolden.cases.foreach { c =>
-      assertEquals(FromChart.lossReasons(chart(c.input)), Vector.empty, c.name)
+      assertEquals(FromChart.lossReasons(chart(c.input), lexicon), Vector.empty, c.name)
     }
   }
 
@@ -132,7 +132,7 @@ class InteropSuite extends ScalaCheckSuite:
     val roles = ch.relations.map(r => r.role.source.render -> r.role.normalized).toMap
     assertEquals(roles("ARG0").map(_._1), Some(p.ParticipantRole.Agent))
     assertEquals(roles("ARG1").map(_._1), Some(p.ParticipantRole.Patient))
-    assertEquals(roles("ARG0").map(_._2.rawScore), Some(InteropTables.LexiconCredence))
+    assertEquals(roles("ARG0").map(_._2.rawScore), Some(InteropTables.LexiconRawScore))
     assert(
       roles("ARG0").exists(_._2.calibrated.isEmpty),
       "lexicon credence is raw, never calibrated"
@@ -145,7 +145,7 @@ class InteropSuite extends ScalaCheckSuite:
     val roles = ch.relations.map(r => r.role.source.render -> r.role.normalized).toMap
     assertEquals(roles("location").map(_._1), Some(p.ParticipantRole.Location))
     assertEquals(roles("time").map(_._1), Some(p.ParticipantRole.Time))
-    assertEquals(roles("location").map(_._2.rawScore), Some(InteropTables.StandardRoleCredence))
+    assertEquals(roles("location").map(_._2.rawScore), Some(InteropTables.StandardRoleRawScore))
     assertEquals(roles("mod"), None)
   }
 
@@ -309,11 +309,13 @@ class InteropSuite extends ScalaCheckSuite:
         )
       )
       .fold(v => fail(v.toString), identity)
-    FromChart.convert(withUnknown) match
+    FromChart.convert(withUnknown, lexicon) match
       case Left(InteropError.Lossy(rs)) => assert(rs.exists(_.contains("unknown filler")))
       case other                        => fail(s"expected Lossy, got $other")
     val lossy =
-      FromChart.convert(withUnknown, FromChart.Policy.Lossy).fold(e => fail(e.message), identity)
+      FromChart
+        .convert(withUnknown, lexicon, FromChart.Policy.Lossy)
+        .fold(e => fail(e.message), identity)
     assertEquals(lossy.edgeCount, 1)
   }
 
@@ -332,8 +334,9 @@ class InteropSuite extends ScalaCheckSuite:
         )
       )
       .fold(v => fail(v.toString), identity)
-    assert(FromChart.convert(ch).isLeft)
-    val g = FromChart.convert(ch, FromChart.Policy.Lossy).fold(e => fail(e.message), identity)
+    assert(FromChart.convert(ch, lexicon).isLeft)
+    val g =
+      FromChart.convert(ch, lexicon, FromChart.Policy.Lossy).fold(e => fail(e.message), identity)
     assert(g.concepts.values.exists(_ == Concept.Special("amr-unknown")))
   }
 
@@ -342,9 +345,9 @@ class InteropSuite extends ScalaCheckSuite:
     val ch = p.ChartValidator
       .check(p.PropositionChart.unchecked(None, Map(b -> p.Concept.entity("boy")), Vector.empty))
       .fold(v => fail(v.toString), identity)
-    assert(FromChart.lossReasons(ch).exists(_.contains("focus")))
-    assert(FromChart.convert(ch).isLeft)
-    assert(FromChart.convert(ch, FromChart.Policy.Lossy).isRight)
+    assert(FromChart.lossReasons(ch, lexicon).exists(_.contains("focus")))
+    assert(FromChart.convert(ch, lexicon).isLeft)
+    assert(FromChart.convert(ch, lexicon, FromChart.Policy.Lossy).isRight)
   }
 
   // ---- candidates ------------------------------------------------------------------------

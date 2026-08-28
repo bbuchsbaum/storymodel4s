@@ -15,8 +15,18 @@ object PenmanParser:
     val default: Options = Options(strictVariables = true)
     val lenient: Options = Options(strictVariables = false)
 
-  private val VariableShape = "^[a-z]{1,2}[0-9]*$".r
+  /** Conventional variables: one to three lowercase letters (corpora use `i`, `ii`, `iii` for
+    * repeated pronouns) and an optional numeric suffix. Longer bare symbols (`imperative`,
+    * `expressive`) are literals.
+    */
+  private val VariableShape = "^[a-z]{1,3}[0-9]*$".r
   private val NumberShape = "^[+-]?(\\d+\\.?\\d*|\\.\\d+)([eE][+-]?\\d+)?$".r
+
+  /** Nesting bound: deeper input is a typed error, never a stack overflow. */
+  val MaxDepth: Int = 512
+
+  /** Alignment indices are bounded so a marker can never make the parser throw. */
+  val MaxAlignmentDigits: Int = 9
 
   /** True when `s` is spelled like a PENMAN number literal. */
   def isNumber(s: String): Boolean = NumberShape.matches(s)
@@ -48,7 +58,8 @@ object PenmanParser:
 
   private val alignment: P[AlignmentMarker] =
     val prefix = (P.charsWhile(_.isLetter) <* P.char('.')).backtrack
-    val index = P.charsWhile(_.isDigit).map(_.toInt)
+    val index =
+      P.charsWhile(_.isDigit).filter(_.length <= MaxAlignmentDigits).map(_.toInt)
     (P.char('~') *> prefix.? ~ index.repSep(P.char(','))).map { case (pre, idx) =>
       AlignmentMarker(pre, idx.toList.toVector)
     }
@@ -88,15 +99,26 @@ object PenmanParser:
 
   private val restOfLine: P0[String] = P.charsWhile0(c => c != '\n' && c != '\r')
 
-  /** Split a metadata header without regex lookaround, which Scala Native does not support. */
+  /** Split a metadata header into `::key value` parts without regex lookaround (Scala Native has
+    * none). A `::` starts a new pair only when it follows whitespace and is immediately followed by
+    * a key-initial character (letter or underscore), so `# ::snt a :: b` and `2::1` keep the `::`
+    * inside the value.
+    */
   private def metadataParts(line: String): Vector[String] =
+    def startsKey(i: Int): Boolean =
+      (i == 0 || line.charAt(i - 1).isWhitespace) && i + 2 < line.length && {
+        val c = line.charAt(i + 2)
+        c.isLetter || c == '_'
+      }
     val result = Vector.newBuilder[String]
     var start = 0
-    var next = line.indexOf("::", start + 2)
-    while next >= 0 do
-      result += line.substring(start, next)
-      start = next
-      next = line.indexOf("::", start + 2)
+    var i = 2
+    while i < line.length do
+      if line.startsWith("::", i) && startsKey(i) then
+        result += line.substring(start, i)
+        start = i
+        i += 2
+      else i += 1
     result += line.substring(start)
     result.result().map(_.trim).filter(_.nonEmpty)
 
@@ -170,8 +192,10 @@ object PenmanParser:
         c match
           case '#' if atLineStart => inComment = true
           case '"'                => inStr = true
-          case '('                => depth += 1
-          case ')'                =>
+          case '('                =>
+            depth += 1
+            if depth > MaxDepth then err = Some(PenmanError.TooDeep(i, MaxDepth))
+          case ')' =>
             depth -= 1
             if depth < 0 then err = Some(PenmanError.UnbalancedParentheses(i))
           case _ => ()

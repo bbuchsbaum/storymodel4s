@@ -37,7 +37,9 @@ object Gens:
   )
 
   /** A connected canonical-role graph: a random spanning tree from `n0` plus a few extra edges
-    * (reentrancies, possibly cycles) and literal attributes.
+    * (reentrancies, possibly cycles) and literal attributes. With some probability the tree has
+    * *duplicate-role siblings sharing a concept* (several `:op1 (x / boy)` under one parent) and an
+    * extra reentrancy into one of them, so canonical-form ties are exercised.
     */
   val canonicalGraph: Gen[AmrGraph[Checked, CanonicalRoles]] = for
     n <- Gen.chooseNum(1, 8)
@@ -51,6 +53,10 @@ object Gens:
     )
     attrCount <- Gen.chooseNum(0, 2)
     attrs <- Gen.listOfN(attrCount, Gen.zip(Gen.chooseNum(0, n - 1), literalRole, literal))
+    twins <- Gen.frequency(2 -> Gen.const(0), 1 -> Gen.chooseNum(2, 4))
+    twinRole <- nodeRole
+    twinConcept <- concept
+    twinLink <- Gen.prob(0.5)
   yield
     val ids = (0 until n).map(i => NodeId.unsafe(s"x$i")).toVector
     val treeEdges = parents.zip(roles).zipWithIndex.map { case ((p, r), i) =>
@@ -59,10 +65,16 @@ object Gens:
     val extraEdges =
       extras.map((s, t, r) => Edge(ids(s), SurfaceRole.direct(r), AmrValue.Node(ids(t))))
     val attrEdges = attrs.map((s, r, l) => Edge(ids(s), SurfaceRole.direct(r), AmrValue.Literal(l)))
+    val twinIds = (0 until twins).map(i => NodeId.unsafe(s"w$i")).toVector
+    val twinEdges = twinIds.map(w => Edge(ids(0), SurfaceRole.direct(twinRole), AmrValue.Node(w)))
+    val twinBack =
+      if twinLink && twins > 0 then
+        Vector(Edge(ids(n - 1), SurfaceRole.direct(Role.arg(2)), AmrValue.Node(twinIds.head)))
+      else Vector.empty
     val g = AmrGraph.unchecked(
       ids(0),
-      ids.zip(concepts).toVector,
-      (treeEdges ++ extraEdges ++ attrEdges).toVector
+      ids.zip(concepts).toVector ++ twinIds.map(_ -> twinConcept),
+      (treeEdges ++ extraEdges ++ attrEdges).toVector ++ twinEdges ++ twinBack
     )
     RoleCanonicalizer.canonicalize(AmrValidator.validateOrThrow(g))
 
@@ -75,7 +87,7 @@ object Gens:
       order <- Gen.pick(g.edges.size, g.edges.indices).map(_.toVector)
       flips <- Gen.listOfN(g.edges.size, Gen.prob(0.3))
     yield
-      val ren = g.nodes.zip(perm.map(p => NodeId.unsafe("v" + p.value.drop(1)))).toMap
+      val ren = g.nodes.zip(perm.map(p => NodeId.unsafe("v" + g.nodes.indexOf(p)))).toMap
       val edges = order.zip(flips).map { (i, flip) =>
         val e = g.edges(i)
         val t = e.target match

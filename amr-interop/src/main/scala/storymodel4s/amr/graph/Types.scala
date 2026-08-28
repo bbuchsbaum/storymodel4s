@@ -9,10 +9,19 @@ import storymodel4s.core.{DomainError, OpaqueId}
 object NodeId extends OpaqueId("NodeId")
 type NodeId = NodeId.T
 
-/** A PropBank-style frame identifier such as `want-01` or `be-located-at-91`. */
+/** A PropBank-style frame identifier such as `want-01` or `be-located-at-91`.
+  *
+  * Syntactic rule (documented because it is a heuristic): a frame is a head of at least two
+  * lowercase letters, optionally hyphenated with further lowercase-letter segments, followed by
+  * `-NN` with exactly two digits. Heads containing digits or single letters (`f-16`, `covid-19`
+  * would still pass — see below) are not frames. Tokens that *look* like frames but are not in the
+  * pinned lexicon (`covid-19`) are ambiguous by construction; only a lexicon can settle them, which
+  * is why `SchemaChecker` reports `UnknownFrame` as a warning and nothing downstream may depend on
+  * a lookup succeeding.
+  */
 object FrameId:
   opaque type FrameId = String
-  private val Shape = "^[a-z0-9][a-z0-9-]*-[0-9]{2,}$".r
+  private val Shape = "^[a-z]{2,}(-[a-z]+)*-[0-9]{2}$".r
   def from(raw: String): Either[DomainError, FrameId] =
     if Shape.matches(raw) then Right(raw)
     else Left(DomainError.InvalidFormat("FrameId", raw, "expected lemma-NN"))
@@ -116,7 +125,15 @@ object Concept:
     parse(text).fold(e => throw new IllegalArgumentException(e.message), identity)
 
   given Eq[Concept] = Eq.fromUniversalEquals
-  given Order[Concept] = Order.by(_.render)
+
+  /** Consistent with `==`: the constructor tag participates, so `Lexical("want-01")` and
+    * `Frame(want-01)` (equal renderings) are not `Order`-equal.
+    */
+  given Order[Concept] = Order.by {
+    case Frame(id)     => (0, id.value)
+    case Lexical(l)    => (1, l.value)
+    case Special(name) => (2, name)
+  }
 
 /** A literal target value. */
 enum AmrLiteral:
@@ -134,7 +151,22 @@ enum AmrLiteral:
     case _         => None
 
 object AmrLiteral:
-  given Order[AmrLiteral] = Order.by(_.render)
+  /** Canonical spelling of a number literal: plain (never scientific) notation with trailing zeros
+    * stripped, so `1e3`, `1000`, and `1000.0` are one literal in the graph. The PENMAN tree keeps
+    * the surface spelling; the graph does not.
+    */
+  def canonicalNumber(raw: String): Option[String] =
+    scala.util.Try(BigDecimal(raw)).toOption.map { bd =>
+      val stripped = bd.bigDecimal.stripTrailingZeros
+      if stripped.signum == 0 then "0" else stripped.toPlainString
+    }
+
+  /** Consistent with `==`: `Number("5")` and `Symbol("5")` render alike but differ. */
+  given Order[AmrLiteral] = Order.by {
+    case Text(v)   => (0, v)
+    case Number(r) => (1, r)
+    case Symbol(v) => (2, v)
+  }
 
 /** Semantic role of an edge, in canonical (direct) direction. */
 enum Role:
@@ -193,12 +225,20 @@ final case class SurfaceRole(base: Role, orientation: Orientation):
 object SurfaceRole:
   def direct(role: Role): SurfaceRole = SurfaceRole(role, Orientation.Direct)
 
-  /** Roles whose primary spelling ends in `-of` (their inverse is `-of-of`). */
-  val PrimaryOfRoles: Set[String] = Set("consist-of")
+  /** Roles whose primary spelling ends in `-of` (their inverse is `-of-of`): exactly the AMR
+    * guideline roles `consist-of`, `prep-on-behalf-of`, and `prep-out-of`, pinned to Penman's AMR
+    * model. Any other `X-of` — including `prep-of` and `prep-in-of` — is the inverse of `X`; the
+    * spelling is ambiguous in principle (`prep-in-of` could name a multiword preposition), and the
+    * pinned model resolves it as an inverse so that `parse(render(r)) == r` holds for every role.
+    */
+  val PrimaryOfRoles: Set[String] = Set("consist-of", "prep-on-behalf-of", "prep-out-of")
+
+  /** True when `text` is a primary (direct) role despite ending in `-of`. */
+  def isPrimaryOf(text: String): Boolean = PrimaryOfRoles.contains(text)
 
   /** Parse a role spelling, recognising the `-of` inverse suffix. */
   def parse(text: String): Either[DomainError, SurfaceRole] =
-    if PrimaryOfRoles.contains(text) then RoleName.from(text).map(n => direct(Role.Standard(n)))
+    if isPrimaryOf(text) then RoleName.from(text).map(n => direct(Role.Standard(n)))
     else if text.endsWith("-of") && text.length > 3 then
       Role.parse(text.dropRight(3)).map(SurfaceRole(_, Orientation.Inverse))
     else Role.parse(text).map(SurfaceRole(_, Orientation.Direct))

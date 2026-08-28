@@ -89,9 +89,15 @@ enum PenmanError:
   case UndefinedVariable(variable: Variable, offset: Int)
   case Empty
 
+  /** Nesting deeper than the parser's bound (`PenmanParser.MaxDepth`): refused, never a stack
+    * overflow.
+    */
+  case TooDeep(offset: Int, limit: Int)
+
   def message: String = this match
     case Syntax(o, e)             => s"syntax error at $o: expected $e"
     case DuplicateVariable(v, o)  => s"variable '${v.name}' defined twice (second at $o)"
     case UnbalancedParentheses(o) => s"unbalanced parentheses at $o"
     case UndefinedVariable(v, o)  => s"undefined variable '${v.name}' referenced at $o"
     case Empty                    => "empty input"
+    case TooDeep(o, l)            => s"nesting deeper than $l at $o"

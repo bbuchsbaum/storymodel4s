@@ -82,55 +82,135 @@ object AmrIsomorphism:
     // any nodes not reached (cannot happen for checked graphs) are appended
     out.result() ++ g.nodes.filterNot(seen.contains)
 
-/** Deterministic canonical form: nodes relabelled `n0, n1, ...` by a DFS from the top that orders
-  * siblings by role and by a Weisfeiler–Lehman refinement of their neighbourhoods; edges sorted.
+/** Deterministic canonical form by individualization–refinement.
   *
-  * Law: `AmrIsomorphism.isomorphic(a, b)` iff `form(a) === form(b)` (exact equality). Ties between
-  * WL-indistinguishable siblings that are not automorphic could in principle break the law; such
-  * graphs do not arise in AMR practice and the property suite guards the claim.
+  * Nodes are coloured by concept and attributes, refined Weisfeiler–Lehman style until stable, and
+  * whenever a colour class is still not a singleton the search branches: each member of the first
+  * non-singleton class is individualized in turn, the colouring is refined again, and the
+  * lexicographically smallest serialization among all branches is the canonical form. Members of a
+  * tied class that are structural twins (interchangeable by an automorphism that swaps just the two
+  * of them) are explored once, which keeps `n` identical `:mod` fillers linear rather than
+  * factorial.
+  *
+  * Law: `AmrIsomorphism.isomorphic(a, b)` iff `form(a) === form(b)`. The result depends only on
+  * structure — original variable names never break ties — so it is label-invariant even for graphs
+  * 1-WL cannot separate (e.g. a 6-cycle beside two 3-cycles of identical concepts).
+  *
+  * Complexity: exponential only in the number of non-twin symmetric classes, which for AMR-sized
+  * graphs means a few hundred leaves at most. `BranchBudget` bounds the search; a graph that
+  * exhausts it is reported through `formBounded` rather than silently producing an unsound form.
   */
 object Canonical:
   private type G = AmrGraph[Checked, CanonicalRoles]
 
-  private def refine(g: G): Map[NodeId, String] =
-    var sig: Map[NodeId, String] = g.nodes.map { n =>
-      val attrs = g.attributes(n).map((r, l) => s"${r.render}=${l.render}").sorted.mkString(",")
-      n -> Checksum.ofText(s"${g.concepts(n).render}|$attrs").hex
-    }.toMap
-    var i = 0
-    while i < g.nodeCount do
-      sig = g.nodes.map { n =>
-        val out = g.relations(n).map((r, t) => s"${r.render}>${sig(t)}").sorted.mkString(",")
-        val in = g
-          .incoming(n)
-          .flatMap(_.canonical)
-          .map((s, r, _) => s"${r.render}<${sig(s)}")
-          .sorted
-          .mkString(",")
-        n -> Checksum.ofText(s"${sig(n)}|$out|$in").hex
-      }.toMap
-      i += 1
-    sig
+  /** Maximum number of discrete colourings examined before `formBounded` reports exhaustion. */
+  val BranchBudget: Int = 200000
 
-  /** The relabelling map from original node ids to canonical labels. */
+  private final case class Adj(
+      out: Map[NodeId, Vector[(String, NodeId)]],
+      in: Map[NodeId, Vector[(String, NodeId)]],
+      base: Map[NodeId, String]
+  )
+
+  private def adjacency(g: G): Adj =
+    val out = g.nodes.map(n => n -> g.relations(n).map((r, t) => (r.render, t))).toMap
+    val in = g.nodes.map { n =>
+      n -> g.incoming(n).flatMap(_.canonical).map((s, r, _) => (r.render, s))
+    }.toMap
+    val base = g.nodes.map { n =>
+      val attrs = g.attributes(n).map((r, l) => s"${r.render}=${l.render}").sorted.mkString(",")
+      val top = if n == g.top then "top" else "node"
+      n -> Checksum.ofText(s"$top|${g.concepts(n).render}|$attrs").hex
+    }.toMap
+    Adj(out, in, base)
+
+  /** Refine a colouring to equitable stability. Colours are hashes of structure only. */
+  private def refine(adj: Adj, nodes: Vector[NodeId], start: Map[NodeId, String]) =
+    var colour = start
+    var classes = colour.values.toSet.size
+    var progress = true
+    while progress do
+      val next = nodes.map { n =>
+        val out = adj.out(n).map((r, t) => s"$r>${colour(t)}").sorted.mkString(",")
+        val in = adj.in(n).map((r, s) => s"$r<${colour(s)}").sorted.mkString(",")
+        n -> Checksum.ofText(s"${colour(n)}|$out|$in").hex
+      }.toMap
+      val nextClasses = next.values.toSet.size
+      progress = nextClasses > classes
+      classes = nextClasses
+      colour = next
+    colour
+
+  /** True when swapping `u` and `v` is an automorphism (identical labelled neighbourhoods). */
+  private def twins(adj: Adj, u: NodeId, v: NodeId): Boolean =
+    def swap(x: NodeId): NodeId = if x == u then v else if x == v then u else x
+    adj.base(u) == adj.base(v) &&
+    adj.out(u).map((r, t) => (r, swap(t))).sorted == adj.out(v).sorted &&
+    adj.in(u).map((r, s) => (r, swap(s))).sorted == adj.in(v).sorted
+
+  private final case class Leaf(serialization: String, labels: Map[NodeId, Int])
+
+  private def serialize(g: G, rank: Map[NodeId, Int]): String =
+    val inst = g.nodes.map(n => s"${rank(n)} / ${g.concepts(n).render}").sorted
+    val edges = g.edges.map { e =>
+      val t = e.target match
+        case AmrValue.Node(x)    => s"n${rank(x)}"
+        case AmrValue.Literal(l) => l.render
+      f"${rank(e.source)}%06d :${e.role.render} $t"
+    }.sorted
+    (inst ++ edges).mkString("\n")
+
+  private final case class Search(g: G, adj: Adj):
+    var examined = 0
+    var best: Option[Leaf] = None
+    var exhausted = false
+
+    def run(colour: Map[NodeId, String]): Unit =
+      if exhausted then ()
+      else
+        val refined = refine(adj, g.nodes, colour)
+        val classes = g.nodes.groupBy(refined).toVector.sortBy(_._1)
+        classes.find(_._2.size > 1) match
+          case None =>
+            examined += 1
+            if examined > BranchBudget then exhausted = true
+            else
+              val rank = classes.zipWithIndex.map((c, i) => c._2.head -> i).toMap
+              val leaf = Leaf(serialize(g, rank), rank)
+              if best.forall(b => leaf.serialization < b.serialization) then best = Some(leaf)
+          case Some((tied, members)) =>
+            // explore one representative per twin orbit, in a label-independent order
+            var representatives = Vector.empty[NodeId]
+            members.sortBy(_.value).foreach { m =>
+              if !representatives.exists(r => twins(adj, r, m)) then representatives :+= m
+            }
+            representatives.foreach { m =>
+              run(refined.updated(m, Checksum.ofText(s"${tied}|individualized").hex))
+            }
+
+  private def search(g: G): Search =
+    val adj = adjacency(g)
+    val s = Search(g, adj)
+    s.run(adj.base)
+    s
+
+  /** The relabelling map from original node ids to canonical labels `n0, n1, ...`. */
   def labelling(g: G): Map[NodeId, NodeId] =
-    val sig = refine(g)
-    var label = Map.empty[NodeId, NodeId]
-    var next = 0
-    def visit(n: NodeId): Unit =
-      if !label.contains(n) then
-        label += n -> NodeId.unsafe(s"n$next")
-        next += 1
-        val out = g.relations(n).sortBy((r, t) => (r.render, sig(t), t.value))
-        out.foreach((_, t) => visit(t))
-        val in = g.incoming(n).flatMap(_.canonical).sortBy((s, r, _) => (r.render, sig(s), s.value))
-        in.foreach((s, _, _) => visit(s))
-    visit(g.top)
-    g.nodes.sortBy(n => (sig(n), n.value)).foreach(visit)
-    label
+    val s = search(g)
+    val rank = s.best.map(_.labels).getOrElse(g.nodes.zipWithIndex.toMap)
+    rank.map((n, i) => n -> NodeId.unsafe(s"n$i"))
 
   def form(g: G): G =
     val label = labelling(g)
+    relabel(g, label)
+
+  /** Canonical form together with whether the search completed within `BranchBudget`. */
+  def formBounded(g: G): (G, Boolean) =
+    val s = search(g)
+    val rank = s.best.map(_.labels).getOrElse(g.nodes.zipWithIndex.toMap)
+    (relabel(g, rank.map((n, i) => n -> NodeId.unsafe(s"n$i"))), !s.exhausted)
+
+  private def relabel(g: G, label: Map[NodeId, NodeId]): G =
     val nodes = g.nodes.map(label).sortBy(_.value.drop(1).toInt)
     val concepts = g.concepts.map((n, c) => label(n) -> c)
     val edges = g.edges.map { e =>
