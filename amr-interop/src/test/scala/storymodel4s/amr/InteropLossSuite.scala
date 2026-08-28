@@ -99,7 +99,7 @@ class InteropLossSuite extends ScalaCheckSuite:
     assert(FromChart.lossReasons(sensed, lexicon).exists(_.contains("sense credence")))
     assert(FromChart.lossReasons(foreign, lexicon).exists(_.contains("namespace")))
     val span = SpanSet.one(TextSpan.unsafe(0, 3))
-    val meta = ClaimMeta(
+    val meta = ClaimMeta.unsafe(
       ClaimId.unsafe("a1"),
       EpistemicStatus.SurfaceExplicit,
       Credence.unsafeRaw(1.0),

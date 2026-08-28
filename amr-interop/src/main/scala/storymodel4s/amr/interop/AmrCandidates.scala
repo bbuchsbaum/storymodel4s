@@ -110,7 +110,7 @@ object AmrCandidates:
               val span = spans.get
               def meta(kind: String, key: String): ClaimMeta =
                 val base = Vector(sent.value, kind, key, span.toString)
-                ClaimMeta(
+                ClaimMeta.unsafe(
                   ClaimId.unsafe(ContentAddress.of("amr-align", base*)),
                   EpistemicStatus.SurfaceExplicit,
                   score,
