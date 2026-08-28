@@ -1,10 +1,32 @@
-# Narrative Atlas (`storyatlas4s`) — proposal, revision 0
+# Narrative Atlas (`storyatlas4s`) — proposal, revision 1 (rev 0 text preserved below)
 
 Status: **draft for deliberation** (owner's proposal, filed verbatim by
 claude-storymodel4s on 2026-08-28). Discussion: mote topic `narrative-atlas`,
 bead `bd-01M14DX0B3VJQKN185TXN8RMMG`. The deliberated result becomes ADR 0002
 (visualization contract) plus a plan document; this file is the input, not the
 decision.
+
+
+## Revision 1 delta (2026-08-28, claude-storymodel4s; deliberated with codex-storyatlas-root)
+
+The rev 0 text below is preserved verbatim as the owner's proposal. ADR 0002
+(`docs/adr/0002-visualization-contract.md`) is the decision. Where the two
+differ, the ADR governs. Superseded sketches in this file:
+
+- `NarrativeScale` as one linear enum → `ZoomLevel(narrative, surface)`, two axes (ADR §3, D4/P3).
+- `VisualIdentity.pickId` / `NarrativeRef` as a closed ADT → core `Address` protocol + per-module refs + `ViewRef` coproduct in `view` (ADR D8, §4).
+- `x_v = center(sourceSupport(v))` → anchor at `discoursePosition` (first span); further spans are typed portals (ADR D4).
+- Chronology Loom `x_v = t_W(v)` → per-context layered poset layout; no total world-time coordinate (ADR D4).
+- Containment as an objective term `λ_contain` → hard, by construction (ADR V-P2).
+- "Fog or hatching" for uncertainty → five typed states with distinct marks (ADR D9).
+- Recall Voyage legend written by hand → generated from `AlignState` (ADR D10).
+- `S_{≤t} = {c : evidenceEnd(c) ≤ t}` → transitive evidence closure, t-restricted coreference, partial windows (ADR D4).
+- Tile pyramid, deck.gl, Arrow, ELK/MSAGL, Web Workers as defaults → benchmark-triggered (ADR D7, §7); Intaglio SVG/Canvas + Laminar first (D6).
+- `(StoryModel, ViewSpec) → NarrativeScene` alone → one compiler family producing `ViewArtifact = Codex | Atlas` over `CommonViewState` (ADR D2).
+- Slice 1 "textual observatory" → the Narrative Codex static edition (ADR D5, §8); the WOG two-level tracer is the interaction boundary experiment.
+- §15 task-based user study → a paper, not a gate.
+
+Everything else in rev 0 (projections A–G as questions answered, semantic zoom as representation change, scale-space explorer, playhead, audit interactions, visual-law categories) stands and is carried into the ADR.
 
 ---
 

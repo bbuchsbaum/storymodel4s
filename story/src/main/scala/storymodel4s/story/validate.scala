@@ -5,8 +5,70 @@ import storymodel4s.core.*
 enum Severity:
   case Error, Warning
 
-/** One structural-law failure, addressed by law name and component path. */
-final case class Violation(law: String, severity: Severity, path: String, reason: String)
+/** One structural-law failure, addressed by law name and component path, plus the typed address of
+  * the offending object when the path names one (ADR 0002 §4). Positional paths (`temporal/3`)
+  * resolve to the edge stored at that index; unknown ids and non-object paths (`atlas`) carry no
+  * address rather than a fabricated one.
+  */
+final case class Violation(
+    law: String,
+    severity: Severity,
+    path: String,
+    reason: String,
+    address: Option[Address] = None
+)
+
+object Violation:
+  private val ev = Addressable[StoryRef]
+
+  /** Deterministic path -> address resolution against the graph the violation was raised on. */
+  def addressOf(path: String, g: NarrativeGraph): Option[Address] =
+    val parts = path.split("/", -1).toVector
+    def idx(s: String): Option[Int] = s.toIntOption.filter(_ >= 0)
+    def edge[E](edges: Vector[E], i: String)(mk: E => StoryRef): Option[Address] =
+      idx(i).flatMap(edges.lift).map(e => ev.address(mk(e)))
+    parts match
+      case "entities" +: id +: _ =>
+        EntityId
+          .from(id)
+          .toOption
+          .filter(g.entities.contains)
+          .map(e => ev.address(StoryRef.Entity(e)))
+      case "situations" +: id +: _ =>
+        SituationId
+          .from(id)
+          .toOption
+          .filter(g.situations.contains)
+          .map(s => ev.address(StoryRef.Situation(s)))
+      case "segments" +: id +: _ =>
+        SegmentId
+          .from(id)
+          .toOption
+          .filter(g.segments.contains)
+          .map(s => ev.address(StoryRef.Segment(s)))
+      case "contexts" +: id +: _ =>
+        ContextId
+          .from(id)
+          .toOption
+          .filter(g.contexts.contains)
+          .map(c => ev.address(StoryRef.Context(c)))
+      case "claims" +: id +: _ =>
+        ClaimId.from(id).toOption.map(c => Addressable[CoreRef].address(CoreRef.Claim(c)))
+      case Vector("participants", i) =>
+        edge(g.relations.participants, i)(p => StoryRef.Participant(p.situation, p.role, p.entity))
+      case Vector("entityRelations", i) =>
+        edge(g.relations.entityRelations, i)(e => StoryRef.EntityLink(e.from, e.relation, e.to))
+      case Vector("temporal", i) =>
+        edge(g.relations.temporal, i)(t => StoryRef.Temporal(t.from, t.relation, t.to, t.context))
+      case Vector("causal", i) =>
+        edge(g.relations.causal, i)(c => StoryRef.Causal(c.cause, c.relation, c.effect))
+      case Vector("goals", i) =>
+        edge(g.relations.goals, i)(e => StoryRef.Goal(e.from, e.relation, e.to))
+      case Vector("stateChanges", i) =>
+        edge(g.relations.stateChanges, i)(e => StoryRef.StateChange(e.event, e.change, e.state))
+      case Vector("references", i) =>
+        edge(g.relations.references, i)(e => StoryRef.Reference(e.from, e.mode, e.to))
+      case _ => None
 
 /** Which severities block promotion to `Validated`. */
 final case class ValidationPolicy(blocking: Set[Severity])
@@ -54,9 +116,9 @@ object StoryValidator:
     val h = m.hierarchy
     val out = Vector.newBuilder[Violation]
     def err(law: String, path: String, reason: String): Unit =
-      out += Violation(law, Severity.Error, path, reason)
+      out += Violation(law, Severity.Error, path, reason, Violation.addressOf(path, g))
     def warn(law: String, path: String, reason: String): Unit =
-      out += Violation(law, Severity.Warning, path, reason)
+      out += Violation(law, Severity.Warning, path, reason, Violation.addressOf(path, g))
 
     val textLen = m.source.canonicalText.length
 

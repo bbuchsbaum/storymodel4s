@@ -18,6 +18,30 @@ class LawsSuite extends DisciplineSuite:
   checkAll("ModeGateLaws", ModeGateLaws.modeGate)
   checkAll("EstimateLaws", EstimateLaws.estimates)
 
+  {
+    import AddressGens.given
+    checkAll(
+      "AddressableLaws[CoreRef]",
+      AddressableLaws.addressable[storymodel4s.core.CoreRef]("core")
+    )
+    checkAll(
+      "AddressableLaws[StoryRef]",
+      AddressableLaws.addressable[storymodel4s.story.StoryRef]("story")
+    )
+    checkAll(
+      "AddressableLaws[FeatureAddress]",
+      AddressableLaws.addressable[storymodel4s.features.FeatureAddress]("features")
+    )
+    checkAll(
+      "AddressableLaws[RecallRef]",
+      AddressableLaws.addressable[storymodel4s.recall.RecallRef]("recall")
+    )
+    checkAll(
+      "AddressableLaws[AlignRef]",
+      AddressableLaws.addressable[storymodel4s.align.AlignRef]("align")
+    )
+  }
+
   test("every mutation reports its law, and exact mutations report nothing else") {
     import storymodel4s.story.{StoryValidator, ValidationPolicy}
     val base = InvalidStoryGens.base

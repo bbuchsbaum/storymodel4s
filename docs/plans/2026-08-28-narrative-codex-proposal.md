@@ -1,4 +1,4 @@
-# Narrative Codex — paginated, model-annotated text as a canonical view; proposal, revision 0
+# Narrative Codex — paginated, model-annotated text as a canonical view; proposal, revision 1 (rev 0 text preserved below)
 
 Status: **draft for deliberation** (owner's proposal, filed verbatim by
 claude-storymodel4s on 2026-08-28). Companion to
@@ -6,6 +6,28 @@ claude-storymodel4s on 2026-08-28). Companion to
 `narrative-atlas-intaglio`, bead `bd-01M14DX0B3VJQKN185TXN8RMMG`. Naming note:
 "Codex" collides with the Codex agents on this board and with the `codec`
 module; the deliberation may rename the module (see findings).
+
+
+## Revision 1 delta (2026-08-28, claude-storymodel4s; deliberated with codex-storyatlas-root)
+
+The rev 0 text below is preserved verbatim as the owner's proposal. ADR 0002
+(`docs/adr/0002-visualization-contract.md`) is the decision; the ADR governs
+where they differ. Superseded sketches in this file:
+
+- `StoryModel + CodexViewSpec → AnnotatedPages` → two steps: `CodexFlow` (semantic, portable) then `CodexFlow + PaginationSpec + TextLayoutCapability → PlacedCodex` (ADR D1, D3). Page numbers are derived geometry; the browser guarantees identity stability only; publication pagination uses one owned receipted backend.
+- `Range.getClientRects()` as the mechanism → an interactive adapter only (fonts awaited, measured after layout, invalidated on reflow); one element per token is not required — minimal stable runs plus an offset→text-node map (ADR V-T2).
+- `SemanticLink` enum → projections of existing relations: `CorefPartition`, `NarrativeReference`, `TemporalRelation`, `CausalRelation` (incl. `Prevents`, `Terminates`), `GoalRelation`, `HierarchyKind.LocationThread`, `RelationLayer.Semantic`, `Evidence` (ADR D4, C5).
+- Event underline "spanning all textual support" → only `DirectMention/EventRealization/StateRealization` sources; other `ProjectionMode`s are typed links (ADR D4).
+- "Softened" sentence washes; translucent stacked windows → step functions per `FeatureTarget`; one resampled field with declared sampling; no smoothing without a `Kernel` in the receipt (ADR D11).
+- Scale slider as one axis → recipe selector over named `FeatureDerivation`s; event/clause bases require `WindowBasis.Events` and a surface-unit `FeatureTarget` first (ADR §9).
+- "Pronouns lighter", "active but unnamed", header "active character and location" → not rendered until mention-form and presence claims exist (gap beads; ADR D4).
+- "Dashed = uncertain boundary" → accepted-low-probability (solid + probability) ≠ unselected `BoundaryBelief` (ghost, never labelled scene) (ADR V-U4).
+- `TextAnnotation` with parallel `claim`/`evidence` fields → a single typed `target: Address` + `AuditRecord` (ADR §3).
+- Population memory map; interview lens → wait for a cross-subject aggregate type; interview induction shows its rule-based, uncalibrated status (ADR §9).
+- Module/product naming → module `view`; product name Narrative Codex; no module named `codex` or `folio`.
+- First slice list → ADR §8 ten items (Codex's revision), adopted.
+
+Additions carried into the ADR from this proposal: the reader-horizon as a caret on the page; lens presets enforced by the `CodexSpec` smart constructor; page-carpet contract (V-P5); coverage law (V-T1); fragmentation identity (V-I2); lane determinism (V-L5).
 
 ---
 

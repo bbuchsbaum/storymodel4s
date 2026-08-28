@@ -41,6 +41,24 @@ final case class StoryModel[S <: ModelStatus] private[story] (
   /** The derived, normalized claim ledger; fails on duplicate claim identifiers. */
   lazy val ledger: Either[DomainError, ClaimLedger] = ClaimLedger.empty.addAll(claims)
 
+  /** Evidence support of a reference across graph and hierarchy: containment edges resolve to the
+    * spans their claims cite; everything else delegates to [[NarrativeGraph.supporting]].
+    */
+  def supporting(ref: StoryRef): Option[SpanSet] = ref match
+    case StoryRef.Containment(m, p, k) =>
+      hierarchy.containment
+        .find(e => e.member == m && e.parent == p && e.kind == k)
+        .flatMap(_.meta.spans)
+    case other => graph.supporting(other)
+
+  /** Every graph or hierarchy reference whose evidence overlaps `span`, ordered by address. */
+  def covering(span: TextSpan): Vector[StoryRef] =
+    val fromHierarchy = hierarchy.containment
+      .filter(e => e.meta.spans.exists(_.spans.exists(_.overlaps(span))))
+      .map(e => StoryRef.Containment(e.member, e.parent, e.kind))
+    val ev = Addressable[StoryRef]
+    (graph.covering(span) ++ fromHierarchy).distinct.sortBy(r => ev.address(r).render)
+
   private[story] def withStatus[T <: ModelStatus]: StoryModel[T] =
     new StoryModel[T](
       schemaVersion,

@@ -162,6 +162,94 @@ final case class NarrativeGraph(
       contexts.values.toVector.map(_.meta) ++
       relations.allMeta
 
+  // ---------------------------------------------------------------------------------------------
+  // Read API for views and inspectors (ADR 0002 §4): text -> references, reference -> evidence.
+  // ---------------------------------------------------------------------------------------------
+
+  /** Exact evidence support of a reference: node support for nodes and contexts, and the claim's
+    * cited spans for relation edges. `None` when the reference is unknown to this graph or when an
+    * edge's claim cites no spans (an inferred relation with upstream-only evidence).
+    *
+    * Why edges use claim spans: a relation is "supported by" the words its claim cites, not by the
+    * hull of its endpoints; the evidence law (ADR 0002 V-E3) forbids marking text an edge does not
+    * cite.
+    */
+  def supporting(ref: StoryRef): Option[SpanSet] = ref match
+    case StoryRef.Situation(id)           => situations.get(id).map(_.support)
+    case StoryRef.Segment(id)             => segments.get(id).map(_.support)
+    case StoryRef.Entity(id)              => entities.get(id).map(_.support)
+    case StoryRef.Context(id)             => contexts.get(id).map(_.support)
+    case StoryRef.Participant(s, role, e) =>
+      relations.participants
+        .find(p => p.situation == s && p.role == role && p.entity == e)
+        .flatMap(_.meta.spans)
+    case StoryRef.Temporal(f, r, t, c) =>
+      relations.temporal
+        .find(x => x.from == f && x.relation == r && x.to == t && x.context == c)
+        .flatMap(_.meta.spans)
+    case StoryRef.Causal(f, r, t) =>
+      relations.causal
+        .find(x => x.cause == f && x.relation == r && x.effect == t)
+        .flatMap(_.meta.spans)
+    case StoryRef.Goal(f, r, t) =>
+      relations.goals.find(x => x.from == f && x.relation == r && x.to == t).flatMap(_.meta.spans)
+    case StoryRef.StateChange(f, r, t) =>
+      relations.stateChanges
+        .find(x => x.event == f && x.change == r && x.state == t)
+        .flatMap(_.meta.spans)
+    case StoryRef.Reference(f, r, t) =>
+      relations.references
+        .find(x => x.from == f && x.mode == r && x.to == t)
+        .flatMap(_.meta.spans)
+    case StoryRef.EntityLink(f, r, t) =>
+      relations.entityRelations
+        .find(x => x.from == f && x.relation == r && x.to == t)
+        .flatMap(_.meta.spans)
+    case StoryRef.Containment(_, _, _) =>
+      // Containment lives in NarrativeHierarchy, not in the graph; resolved by the model.
+      None
+
+  /** Every reference of this graph whose evidence support overlaps `span`: nodes and contexts by
+    * their support, relation edges by the spans their claims cite. Deterministic order: by address
+    * rendering. This is the "select text -> every supported claim" query.
+    */
+  def covering(span: TextSpan): Vector[StoryRef] =
+    def hits(s: SpanSet): Boolean = s.spans.exists(_.overlaps(span))
+    val nodes: Vector[StoryRef] =
+      situations.values.toVector.filter(s => hits(s.support)).map(s => StoryRef.Situation(s.id)) ++
+        segments.values.toVector.filter(s => hits(s.support)).map(s => StoryRef.Segment(s.id)) ++
+        entities.values.toVector.filter(e => hits(e.support)).map(e => StoryRef.Entity(e.id)) ++
+        contexts.values.toVector.filter(c => hits(c.support)).map(c => StoryRef.Context(c.id))
+    def cited(meta: ClaimMeta): Boolean = meta.spans.exists(hits)
+    val edges: Vector[StoryRef] =
+      relations.participants
+        .filter(p => cited(p.meta))
+        .map(p => StoryRef.Participant(p.situation, p.role, p.entity)) ++
+        relations.temporal
+          .filter(t => cited(t.meta))
+          .map(t => StoryRef.Temporal(t.from, t.relation, t.to, t.context)) ++
+        relations.causal
+          .filter(c => cited(c.meta))
+          .map(c => StoryRef.Causal(c.cause, c.relation, c.effect)) ++
+        relations.goals
+          .filter(g => cited(g.meta))
+          .map(g => StoryRef.Goal(g.from, g.relation, g.to)) ++
+        relations.stateChanges
+          .filter(x => cited(x.meta))
+          .map(x => StoryRef.StateChange(x.event, x.change, x.state)) ++
+        relations.references
+          .filter(r => cited(r.meta))
+          .map(r => StoryRef.Reference(r.from, r.mode, r.to)) ++
+        relations.entityRelations
+          .filter(e => cited(e.meta))
+          .map(e => StoryRef.EntityLink(e.from, e.relation, e.to))
+    val ev = Addressable[StoryRef]
+    (nodes ++ edges).distinct.sortBy(r => ev.address(r).render)
+
+  /** Situations whose support overlaps `span`, in discourse order. */
+  def situationsCovering(span: TextSpan): Vector[SituationId] =
+    discourseOrder.filter(id => situations.get(id).exists(_.support.spans.exists(_.overlaps(span))))
+
 object NarrativeGraph:
   val empty: NarrativeGraph =
     NarrativeGraph(Map.empty, Map.empty, Map.empty, Map.empty, RelationLayers.empty)

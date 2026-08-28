@@ -70,6 +70,7 @@ lazy val root = tlCrossRootProject
     recall,
     align,
     interview,
+    view,
     codec,
     fixtures,
     laws
@@ -155,6 +156,13 @@ lazy val interview = crossProject(JVMPlatform, JSPlatform, NativePlatform)
   .settings(moduleSettings("interview"))
   .dependsOn(core, proposition, features, story, recall, align)
 
+/** Portable semantic view artifacts shared by the Narrative Codex and Narrative Atlas. */
+lazy val view = crossProject(JVMPlatform, JSPlatform, NativePlatform)
+  .crossType(CrossType.Pure)
+  .in(file("view"))
+  .settings(moduleSettings("view"))
+  .dependsOn(core, proposition, features, acquire, story, document, recall, align)
+
 /** Canonical JSON codecs for all artifacts (circe). */
 lazy val codec = crossProject(JVMPlatform, JSPlatform, NativePlatform)
   .crossType(CrossType.Pure)
@@ -185,7 +193,8 @@ lazy val fixtures = crossProject(JVMPlatform, JSPlatform, NativePlatform)
     story,
     recall,
     align,
-    interview
+    interview,
+    view
   )
 
 /** Published law suites and generators (Discipline). */
@@ -214,6 +223,7 @@ val allModules = List(
   "recall",
   "align",
   "interview",
+  "view",
   "codec",
   "fixtures",
   "laws"
