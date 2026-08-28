@@ -7,7 +7,8 @@ record Part 4, §57–76).
 
 - *event specificity* — does a detail denote one bounded occurrence? (`specificity`)
 - *re-experiencing* — phenomenology, only from explicit ratings and
-  first-person/source-monitoring language (`experiential`)
+  first-person/source-monitoring language (`experiential`), aggregated over
+  unique recall units, never over atomized details
 - *accuracy* — unknowable without an independent source; absent here.
 
 Target-episode membership (`address`) is a fourth, independent axis.

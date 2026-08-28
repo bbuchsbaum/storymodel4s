@@ -4,7 +4,7 @@ import cats.data.NonEmptyVector
 import munit.FunSuite
 
 import storymodel4s.core.*
-import storymodel4s.features.{Estimate, MissingReason}
+import storymodel4s.features.{Coverage, Estimate, MissingReason}
 import storymodel4s.interview.scoring.*
 import storymodel4s.recall.*
 
@@ -73,6 +73,9 @@ class InterviewPhenomenologySuite extends FunSuite:
     assertEquals(b.sourceMonitoring, a.sourceMonitoring)
     assertEquals(a.sourceMonitoringRate, Estimate.observed(0.5))
     assertEquals(b.sourceMonitoringRate, a.sourceMonitoringRate)
+    assertEquals(a.firstPersonCoverage, Coverage.unsafe(2, 2))
+    assertEquals(b.firstPersonCoverage, a.firstPersonCoverage)
+    assertEquals(a.sourceMonitoringCoverage, a.firstPersonCoverage)
     assertEquals(a.explicitRating, None)
   }
 
@@ -85,27 +88,34 @@ class InterviewPhenomenologySuite extends FunSuite:
     assertEquals(b.firstPersonRate, a.firstPersonRate)
     assertEquals(b.sourceMonitoring, a.sourceMonitoring)
     assertEquals(b.sourceMonitoringRate, a.sourceMonitoringRate)
+    assertEquals(b.firstPersonCoverage, a.firstPersonCoverage)
   }
 
-  test("sourceMonitoring counts unique source units, not details") {
+  test("sourceMonitoringUnitCounts counts unique source units, not details") {
     val many = assessments("mem", 4, firstPerson = true, Some(SourceMonitoring.DirectMemory))
     val ev = ProfileScoring.phenomenology(many, None)
-    assertEquals(ev.sourceMonitoring, Map(SourceMonitoring.DirectMemory -> 1))
+    assertEquals(ev.sourceMonitoringUnitCounts, Map(SourceMonitoring.DirectMemory -> 1))
+    assertEquals(ev.sourceMonitoring, ev.sourceMonitoringUnitCounts)
     assertEquals(ev.sourceMonitoringRate, Estimate.observed(1.0))
     assertEquals(ev.firstPersonRate, Estimate.observed(1.0))
+    assertEquals(ev.firstPersonCoverage, Coverage.unsafe(1, 1))
+    assertEquals(ev.sourceMonitoringCoverage, Coverage.unsafe(1, 1))
   }
 
-  test("a mixed-flag unit contributes its own fraction, not an OR") {
+  test("a mixed-flag unit is first-person by OR, not by atom fraction") {
     val mixed = assessments("u", 1, firstPerson = true, None) ++
       assessments("u", 1, firstPerson = false, None)
     val ev = ProfileScoring.phenomenology(mixed, None)
-    assertEquals(ev.firstPersonRate, Estimate.observed(0.5))
-    assertEquals(ev.sourceMonitoring, Map.empty)
+    assertEquals(ev.firstPersonRate, Estimate.observed(1.0))
+    assertEquals(ev.firstPersonCoverage, Coverage.unsafe(1, 1))
+    assertEquals(ev.sourceMonitoringUnitCounts, Map.empty)
   }
 
   test("empty assessments yield missing rates, not zero") {
     val ev = ProfileScoring.phenomenology(Vector.empty, None)
     assertEquals(ev.firstPersonRate, Estimate.missing(MissingReason.Excluded))
     assertEquals(ev.sourceMonitoringRate, Estimate.missing(MissingReason.Excluded))
-    assertEquals(ev.sourceMonitoring, Map.empty)
+    assertEquals(ev.sourceMonitoringUnitCounts, Map.empty)
+    assertEquals(ev.firstPersonCoverage, Coverage.empty)
+    assertEquals(ev.sourceMonitoringCoverage, Coverage.empty)
   }

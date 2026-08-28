@@ -206,16 +206,21 @@ object TraditionalScoring:
   * What may enter: the participant's explicit reliving rating; whether each unique recall unit
   * carries first-person language; the per-unit set of source-monitoring statements. What may not:
   * detail or atom counts, specificity, target mass, internal AI totals, or any other quantity of
-  * content. `firstPersonRate` and `sourceMonitoringRate` are unit ratios. `sourceMonitoring` counts
-  * units per kind, never details. Atomizing one utterance into many details must not change any
-  * strand.
+  * content. `firstPersonRate` is |units with the cue| / |units| (a unit is first-person iff any of
+  * its assessments carries the cue). `sourceMonitoringUnitCounts` counts units per kind, never
+  * details. Both rates carry `Coverage` over those units so a 1.0 over two units is not read like a
+  * 1.0 over forty. Atomizing one utterance into many details must not change any strand.
   */
 final case class PhenomenologyEvidence(
     explicitRating: Option[ScoreEstimate],
     firstPersonRate: ScoreEstimate,
-    sourceMonitoring: Map[SourceMonitoring, Int],
-    sourceMonitoringRate: ScoreEstimate
-)
+    firstPersonCoverage: Coverage,
+    sourceMonitoringUnitCounts: Map[SourceMonitoring, Int],
+    sourceMonitoringRate: ScoreEstimate,
+    sourceMonitoringCoverage: Coverage
+):
+  /** Alias for [[sourceMonitoringUnitCounts]]: unit counts, not detail counts. */
+  def sourceMonitoring: Map[SourceMonitoring, Int] = sourceMonitoringUnitCounts
 
 /** The multidimensional autobiographical-memory profile of design record §65.2. Ratios whose
   * denominator is empty are `Missing`, never 0.
@@ -263,10 +268,8 @@ object ProfileScoring:
 
   /** Phenomenology strands from the assessments and the participant's explicit ratings.
     *
-    * Assessments are collapsed by `Detail.sourceUnit` before any ratio is taken. `firstPersonRate`
-    * is the mean of each unit's own first-person fraction. The inducer copies one flag per unit, so
-    * on pipeline data every unit is unanimous and this equals |units with the cue| / |units|.
-    * Source-monitoring is the union of `sourceMonitoring` and
+    * Assessments are collapsed by `Detail.sourceUnit`. A unit is first-person iff any of its
+    * assessments carries the cue. Source-monitoring is the union of `sourceMonitoring` and
     * `experiential.sourceMonitoringStatements` on that unit, counted once per unit.
     */
   def phenomenology(
@@ -276,17 +279,20 @@ object ProfileScoring:
     val rating = ratings.flatMap(_.reliving)
     val byUnit = assessments.groupBy(_.detail.sourceUnit)
     val n = byUnit.size
+    val coverage = Coverage.unsafe(n, n)
     if n == 0 then
       PhenomenologyEvidence(
         rating,
         Estimate.missing(MissingReason.Excluded),
+        coverage,
         Map.empty,
-        Estimate.missing(MissingReason.Excluded)
+        Estimate.missing(MissingReason.Excluded),
+        coverage
       )
     else
       val units = byUnit.values.toVector
-      def firstPersonFraction(as: Vector[DetailAssessment]): Double =
-        as.count(_.experiential.firstPersonLanguage).toDouble / as.size
+      def firstPerson(as: Vector[DetailAssessment]): Boolean =
+        as.exists(_.experiential.firstPersonLanguage)
       def monitoring(as: Vector[DetailAssessment]): Set[SourceMonitoring] =
         as.flatMap { a =>
           a.sourceMonitoring.toVector ++ a.experiential.sourceMonitoringStatements
@@ -294,9 +300,11 @@ object ProfileScoring:
       val sets = units.map(monitoring)
       PhenomenologyEvidence(
         rating,
-        Estimate.observed(units.map(firstPersonFraction).sum / n),
+        Estimate.observed(units.count(firstPerson).toDouble / n),
+        coverage,
         sets.flatten.groupMapReduce(identity)(_ => 1)(_ + _),
-        Estimate.observed(sets.count(_.nonEmpty).toDouble / n)
+        Estimate.observed(sets.count(_.nonEmpty).toDouble / n),
+        coverage
       )
 
   private def components(
