@@ -206,10 +206,11 @@ object TraditionalScoring:
   * What may enter: the participant's explicit reliving rating; whether each unique recall unit
   * carries first-person language; the per-unit set of source-monitoring statements. What may not:
   * detail or atom counts, specificity, target mass, internal AI totals, or any other quantity of
-  * content. `firstPersonRate` is |units with the cue| / |units| (a unit is first-person iff any of
-  * its assessments carries the cue). `sourceMonitoringUnitCounts` counts units per kind, never
-  * details. Both rates carry `Coverage` over those units so a 1.0 over two units is not read like a
-  * 1.0 over forty. Atomizing one utterance into many details must not change any strand.
+  * content. `firstPersonRate` is |units with the cue| / |assessed units| (a unit is first-person
+  * iff any of its assessments carries the cue). Units without assessments are excluded from the
+  * rate but counted in coverage (`eligible` = participant recall units, `observed` = assessed
+  * units). `sourceMonitoringUnitCounts` counts units per kind, never details. Atomizing one
+  * utterance into many details must not change any strand.
   */
 final case class PhenomenologyEvidence(
     explicitRating: Option[ScoreEstimate],
@@ -269,43 +270,63 @@ object ProfileScoring:
   /** Phenomenology strands from the assessments and the participant's explicit ratings.
     *
     * Assessments are collapsed by `Detail.sourceUnit`. A unit is first-person iff any of its
-    * assessments carries the cue. Source-monitoring is the union of `sourceMonitoring` and
-    * `experiential.sourceMonitoringStatements` on that unit, counted once per unit.
+    * assessments carries the cue. Rates are over assessed units; `participantUnits` is the model's
+    * participant recall-unit count (`RecallGraph.ordered.size`) and becomes coverage eligible.
+    * Units without assessments lower coverage and leave both rates unchanged.
+    */
+  def phenomenology(
+      assessments: Vector[DetailAssessment],
+      ratings: Option[SubjectiveRatings],
+      participantUnits: Int
+  ): PhenomenologyEvidence =
+    val rating = ratings.flatMap(_.reliving)
+    val byUnit = assessments.groupBy(_.detail.sourceUnit)
+    val observed = byUnit.size
+    Coverage.of(participantUnits, observed) match
+      case Left(_) =>
+        PhenomenologyEvidence(
+          rating,
+          Estimate.missing(MissingReason.Excluded),
+          Coverage.empty,
+          Map.empty,
+          Estimate.missing(MissingReason.Excluded),
+          Coverage.empty
+        )
+      case Right(coverage) if observed == 0 =>
+        PhenomenologyEvidence(
+          rating,
+          Estimate.missing(MissingReason.Excluded),
+          coverage,
+          Map.empty,
+          Estimate.missing(MissingReason.Excluded),
+          coverage
+        )
+      case Right(coverage) =>
+        val units = byUnit.values.toVector
+        def firstPerson(as: Vector[DetailAssessment]): Boolean =
+          as.exists(_.experiential.firstPersonLanguage)
+        def monitoring(as: Vector[DetailAssessment]): Set[SourceMonitoring] =
+          as.flatMap { a =>
+            a.sourceMonitoring.toVector ++ a.experiential.sourceMonitoringStatements
+          }.toSet
+        val sets = units.map(monitoring)
+        PhenomenologyEvidence(
+          rating,
+          Estimate.observed(units.count(firstPerson).toDouble / observed),
+          coverage,
+          sets.flatten.groupMapReduce(identity)(_ => 1)(_ + _),
+          Estimate.observed(sets.count(_.nonEmpty).toDouble / observed),
+          coverage
+        )
+
+  /** Isolated-assessment form: eligible defaults to the assessed-unit count so reserved callers
+    * keep compiling. Prefer the three-argument form from `profile`.
     */
   def phenomenology(
       assessments: Vector[DetailAssessment],
       ratings: Option[SubjectiveRatings]
   ): PhenomenologyEvidence =
-    val rating = ratings.flatMap(_.reliving)
-    val byUnit = assessments.groupBy(_.detail.sourceUnit)
-    val n = byUnit.size
-    val coverage = Coverage.unsafe(n, n)
-    if n == 0 then
-      PhenomenologyEvidence(
-        rating,
-        Estimate.missing(MissingReason.Excluded),
-        coverage,
-        Map.empty,
-        Estimate.missing(MissingReason.Excluded),
-        coverage
-      )
-    else
-      val units = byUnit.values.toVector
-      def firstPerson(as: Vector[DetailAssessment]): Boolean =
-        as.exists(_.experiential.firstPersonLanguage)
-      def monitoring(as: Vector[DetailAssessment]): Set[SourceMonitoring] =
-        as.flatMap { a =>
-          a.sourceMonitoring.toVector ++ a.experiential.sourceMonitoringStatements
-        }.toSet
-      val sets = units.map(monitoring)
-      PhenomenologyEvidence(
-        rating,
-        Estimate.observed(units.count(firstPerson).toDouble / n),
-        coverage,
-        sets.flatten.groupMapReduce(identity)(_ => 1)(_ + _),
-        Estimate.observed(sets.count(_.nonEmpty).toDouble / n),
-        coverage
-      )
+    phenomenology(assessments, ratings, assessments.map(_.detail.sourceUnit).toSet.size)
 
   private def components(
       nodes: Vector[DetailId],
@@ -444,5 +465,5 @@ object ProfileScoring:
       ratio(otherSpecific, total),
       ratio(repetition, total),
       probeGain(model),
-      phenomenology(as, model.source.ratings)
+      phenomenology(as, model.source.ratings, model.recall.ordered.size)
     )

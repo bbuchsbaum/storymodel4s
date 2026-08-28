@@ -119,3 +119,26 @@ class InterviewPhenomenologySuite extends FunSuite:
     assertEquals(ev.firstPersonCoverage, Coverage.empty)
     assertEquals(ev.sourceMonitoringCoverage, Coverage.empty)
   }
+
+  test("empty assessments with participant units keep eligible coverage and missing rates") {
+    val ev = ProfileScoring.phenomenology(Vector.empty, None, 40)
+    assertEquals(ev.firstPersonRate, Estimate.missing(MissingReason.Excluded))
+    assertEquals(ev.sourceMonitoringRate, Estimate.missing(MissingReason.Excluded))
+    assertEquals(ev.firstPersonCoverage, Coverage.unsafe(40, 0))
+    assertEquals(ev.sourceMonitoringCoverage, Coverage.unsafe(40, 0))
+  }
+
+  test("unassessed participant units lower coverage and leave rates unchanged") {
+    val assessed = assessments("fp", 1, firstPerson = true, Some(SourceMonitoring.DirectMemory)) ++
+      assessments("tp", 1, firstPerson = false, None)
+    val tight = ProfileScoring.phenomenology(assessed, None, 2)
+    val wide = ProfileScoring.phenomenology(assessed, None, 5)
+    assertEquals(wide.firstPersonRate, tight.firstPersonRate)
+    assertEquals(wide.sourceMonitoringRate, tight.sourceMonitoringRate)
+    assertEquals(wide.sourceMonitoringUnitCounts, tight.sourceMonitoringUnitCounts)
+    assertEquals(tight.firstPersonCoverage, Coverage.unsafe(2, 2))
+    assertEquals(wide.firstPersonCoverage, Coverage.unsafe(5, 2))
+    assertEquals(wide.sourceMonitoringCoverage, Coverage.unsafe(5, 2))
+    assertEquals(tight.firstPersonRate, Estimate.observed(0.5))
+    assertEquals(tight.sourceMonitoringRate, Estimate.observed(0.5))
+  }
