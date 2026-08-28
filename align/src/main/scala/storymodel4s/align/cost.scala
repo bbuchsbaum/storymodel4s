@@ -1,7 +1,7 @@
 package storymodel4s.align
 
 import cats.data.NonEmptySet
-import storymodel4s.features.{Estimate, MissingReason}
+import storymodel4s.features.{Coverage, Estimate, MissingReason}
 import storymodel4s.proposition.{ChartCompatibility, CompatibilityReport, PropositionEvidence}
 import storymodel4s.recall.*
 
@@ -133,22 +133,83 @@ enum Exclusion:
   /** The candidate reference is not a node of the view. */
   case Unreachable
 
+/** The declared estimand for reducing compatible structural member estimates.
+  *
+  * Why: reducer choice changes the scientific question and therefore belongs in every receipt.
+  */
+enum StructuralReducer:
+  /** The closest compatible member represents a segment's structural match. */
+  case Minimum
+
+  private[align] def reduce(values: Vector[Double]): Option[Double] = this match
+    case Minimum => values.minOption
+
+/** One compatible source member and the estimate produced for it.
+  *
+  * Why: an aggregate structural cost must remain traceable to the exact source members and provider
+  * outcomes from which it was reduced.
+  */
+final case class StructuralMemberEstimate private[align] (
+    member: SourceNodeRef,
+    estimate: Estimate[Double]
+)
+
+/** One charted member rejected before reduction by the same contradictions as the ModeGate.
+  *
+  * Why: incompatible charts must be auditable without becoming candidates for a flattering distance
+  * or changing the reducer's estimand.
+  */
+final case class StructuralMemberExclusion private[align] (
+    member: SourceNodeRef,
+    contradictions: Set[Contradiction]
+)
+
+/** Audit receipt for a segment-level structural reduction.
+  *
+  * `sourceChartCoverage` counts charts over all source leaves. `observedEstimateCoverage` counts
+  * observed estimates over compatible chart members only. They are deliberately separate: provider
+  * abstention is not missing source evidence. When the recall unit has no chart, membership cannot
+  * be assessed: both member vectors are empty and observed-estimate coverage is `0/0`, while source
+  * chart coverage remains available.
+  */
+final case class StructuralReductionReceipt private[align] (
+    reducer: StructuralReducer,
+    members: Vector[StructuralMemberEstimate],
+    excludedMembers: Vector[StructuralMemberExclusion],
+    sourceChartCoverage: StructuralCoverage,
+    observedEstimateCoverage: Coverage
+)
+
+/** A structural estimate paired with the complete receipt for its membership and reduction.
+  *
+  * Why: a scalar cost alone cannot reveal provider abstention, incompatible members, coverage, or
+  * which member won the declared reducer.
+  */
+final case class StructuralReduction private[align] (
+    estimate: Estimate[Double],
+    receipt: StructuralReductionReceipt
+)
+
 /** The cost of one admissible `(anchor, mode)` state (or external state) for one unit.
   *
-  * `missingTerms` names the optional terms that were `Missing` for this pair (no evidence, provider
-  * abstained) and therefore contributed nothing — never a substituted value — and `coverage` is the
-  * structural coverage of the candidate (ADR 0001 rev 3 §D4b).
+  * `missingTerms` names optional terms that were `Missing` and therefore contributed nothing.
+  * `sourceChartCoverage` is chart availability over source members only; observed estimate coverage
+  * and member-level outcomes live in the corresponding `reductions` receipt (ADR 0001 rev 3 §D4b).
   */
-final case class CostBreakdown(
+final case class CostBreakdown private[align] (
     terms: Map[CostTerm, Double],
     mode: Option[FidelityMode],
     exclusion: Option[Exclusion],
     total: Double,
     missingTerms: Set[CostTerm] = Set.empty,
-    coverage: Option[StructuralCoverage] = None
+    sourceChartCoverage: Option[StructuralCoverage] = None,
+    reductions: Map[CostTerm, StructuralReductionReceipt] = Map.empty
 ):
   def term(t: CostTerm): Double = terms.getOrElse(t, 0.0)
   def has(t: CostTerm): Boolean = terms.contains(t)
+
+  /** The member-level audit receipt for an optional structural term, when it was evaluated. */
+  def reduction(t: CostTerm): Option[StructuralReductionReceipt] = reductions.get(t)
 
   /** Not a source state for this unit (bookkeeping only). */
   def excluded: Boolean = exclusion.nonEmpty
@@ -240,13 +301,12 @@ object StructuralDistance:
     (a, b) => f(a, b)
 
 /** `d_chart`: graded chart compatibility turned into a distance, plus the gates the charts carry.
-  * On a segment the distance is the best-matching member's distance, blended toward the neutral
-  * value by the fraction of members *without* a chart (coverage-weighted confidence), so an
-  * uncovered segment is never reported as a perfect or a perfect-miss structural match.
+  * Segment membership is established before reduction by the same contradiction detector as the
+  * ModeGate. The minimum is taken over observed compatible-member estimates only; missingness is
+  * reported in the receipt and never imputed into the cost.
   */
 object ChartDistance:
-  /** Neutral value used for the uncovered fraction of a segment. */
-  val Neutral: Double = 0.5
+  private val Reducer: StructuralReducer = StructuralReducer.Minimum
 
   /** Distance between two charts in `[0, 1]`: `1 − structuralScore`. */
   def between(a: PropositionEvidence, b: PropositionEvidence): Double =
@@ -259,22 +319,23 @@ object ChartDistance:
       n <- node.evidence
     yield ChartCompatibility.compare(u.chart, n.chart)
 
-  /** `d_chart` for a unit against a node of any level. `Missing(ProviderAbstained)` when the unit
-    * has no chart; `Missing(Excluded)` when no member under the node has one.
+  /** `d_chart` for a unit against a node of any level.
+    *
+    * This convenience projection preserves the previous result shape; [[reduction]] exposes its
+    * member identities, exclusions, coverage, and reducer.
     */
   def apply(unit: RecallUnit, node: NodeSummary, view: SourceView): Estimate[Double] =
-    unit.evidence match
-      case None    => Estimate.missing(MissingReason.ProviderAbstained)
-      case Some(u) =>
-        val members = view.segmentEvidence(node.ref).members
-        if members.isEmpty then Estimate.missing(MissingReason.Excluded)
-        else
-          val best = members.map(m => between(u, m)).min
-          val cov = view.structuralCoverage(node.ref).fraction
-          Estimate.observed(cov * best + (1.0 - cov) * Neutral)
+    reduction(unit, node, view).estimate
 
-  /** Segment reducer for an injected structural distance: same coverage-weighted best-member rule;
-    * `Missing` when the provider abstains on every covered member.
+  /** Full member-level reduction for deterministic chart compatibility.
+    *
+    * Why: chart availability, compatibility membership, and the resulting scalar are separate
+    * claims and must remain independently auditable.
+    */
+  def reduction(unit: RecallUnit, node: NodeSummary, view: SourceView): StructuralReduction =
+    reduce(unit, node, view)((u, member) => Estimate.observed(between(u, member)))
+
+  /** Structural distance projected to its scalar estimate for compatibility with cost callers.
     */
   def structural(
       distance: StructuralDistance,
@@ -282,17 +343,87 @@ object ChartDistance:
       node: NodeSummary,
       view: SourceView
   ): Estimate[Double] =
+    structuralReduction(distance, unit, node, view).estimate
+
+  /** Full member-level reduction for an injected structural-distance provider.
+    *
+    * Why: provider abstention changes estimate coverage, not source-chart coverage or the observed
+    * reducer value.
+    */
+  def structuralReduction(
+      distance: StructuralDistance,
+      unit: RecallUnit,
+      node: NodeSummary,
+      view: SourceView
+  ): StructuralReduction =
+    reduce(unit, node, view)(distance.apply)
+
+  private def reduce(
+      unit: RecallUnit,
+      node: NodeSummary,
+      view: SourceView
+  )(
+      estimate: (PropositionEvidence, PropositionEvidence) => Estimate[Double]
+  ): StructuralReduction =
+    val sourceCoverage = view.structuralCoverage(node.ref)
     unit.evidence match
-      case None    => Estimate.missing(MissingReason.ProviderAbstained)
-      case Some(u) =>
-        val members = view.segmentEvidence(node.ref).members
-        if members.isEmpty then Estimate.missing(MissingReason.Excluded)
-        else
-          val observed = members.flatMap(m => distance(u, m).toOption)
-          if observed.isEmpty then Estimate.missing(MissingReason.ProviderAbstained)
+      case None =>
+        result(
+          Estimate.missing(MissingReason.ProviderAbstained),
+          Vector.empty,
+          Vector.empty,
+          sourceCoverage
+        )
+      case Some(unitEvidence) =>
+        val charted = view
+          .structuralMembers(node.ref)
+          .flatMap(member => member.evidence.map(evidence => member -> evidence))
+        val classified = charted.map { case (member, evidence) =>
+          val contradictions = ContradictionDetector.detect(unit, member).toSet
+          if contradictions.isEmpty then
+            Left(
+              StructuralMemberEstimate(
+                member.ref,
+                finite(estimate(unitEvidence, evidence))
+              )
+            )
+          else Right(StructuralMemberExclusion(member.ref, contradictions))
+        }
+        val members = classified.collect { case Left(member) => member }
+        val excluded = classified.collect { case Right(member) => member }
+        val observed = members.flatMap(_.estimate.toOption)
+        val aggregate =
+          if charted.isEmpty || members.isEmpty then Estimate.missing(MissingReason.Excluded)
           else
-            val cov = view.structuralCoverage(node.ref).fraction
-            Estimate.observed(cov * observed.min + (1.0 - cov) * Neutral)
+            Reducer
+              .reduce(observed)
+              .fold[Estimate[Double]](Estimate.missing(MissingReason.ProviderAbstained))(
+                Estimate.observed
+              )
+        result(aggregate, members, excluded, sourceCoverage)
+
+  private def finite(estimate: Estimate[Double]): Estimate[Double] = estimate match
+    case Estimate.Observed(value, credence) => Estimate.score(value, credence)
+    case missing @ Estimate.Missing(_)      => missing
+
+  private def result(
+      estimate: Estimate[Double],
+      members: Vector[StructuralMemberEstimate],
+      excluded: Vector[StructuralMemberExclusion],
+      sourceCoverage: StructuralCoverage
+  ): StructuralReduction =
+    val observedEstimateCoverage =
+      Coverage.unsafe(members.size, members.count(_.estimate.isObserved))
+    StructuralReduction(
+      estimate,
+      StructuralReductionReceipt(
+        Reducer,
+        members,
+        excluded,
+        sourceCoverage,
+        observedEstimateCoverage
+      )
+    )
 
 /** Detects structural contradictions between a recall unit and a source node. When both sides carry
   * checked charts, the chart report decides role reversal, polarity and embedding (context)
@@ -564,8 +695,10 @@ final case class DefaultLocalCostModel(
     val dDist = distortionPenalty * mode.facetSet.size.toDouble
     // Optional evidence-backed terms: present only when charts exist on both sides (and, for
     // `d_wl`, a provider answered). Absent terms are inert and recorded, never substituted.
-    val dChart = ChartDistance(unit, node, view)
-    val dWl = ChartDistance.structural(structural, unit, node, view)
+    val chartReduction = ChartDistance.reduction(unit, node, view)
+    val structuralReduction = ChartDistance.structuralReduction(structural, unit, node, view)
+    val dChart = chartReduction.estimate
+    val dWl = structuralReduction.estimate
     val always = Vector(
       CostTerm.Semantic -> dSem,
       CostTerm.Propositional -> dProp,
@@ -588,7 +721,11 @@ final case class DefaultLocalCostModel(
       None,
       weighted,
       missing,
-      Some(view.structuralCoverage(node.ref))
+      Some(view.structuralCoverage(node.ref)),
+      Map(
+        CostTerm.Chart -> chartReduction.receipt,
+        CostTerm.Structural -> structuralReduction.receipt
+      )
     )
 
   private def clamp(x: Double): Double =

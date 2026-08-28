@@ -86,12 +86,17 @@ class EvidenceSuite extends FunSuite:
     )
   }
 
-  test("identical charts give d_chart 0; reversed charts give a positive distance") {
+  test("identical charts give d_chart 0; reversed charts are excluded before reduction") {
     val v = viewWith(Map(e5 -> straight))
     assertEquals(ChartDistance(u2Chart, v.node(e5).get, v), Estimate.observed(0.0))
     val r = viewWith(Map(e5 -> reversed))
-    val d = ChartDistance(u2Chart, r.node(e5).get, r).toOption.get
-    assert(d > 0.0 && d <= 1.0, d)
+    val reduction = ChartDistance.reduction(u2Chart, r.node(e5).get, r)
+    assertEquals(reduction.estimate, Estimate.missing(MissingReason.Excluded))
+    assertEquals(
+      reduction.receipt.excludedMembers.map(_.contradictions),
+      Vector(Set(Contradiction.RoleReversal))
+    )
+    assert(ChartDistance.between(straight, reversed) > 0.0)
   }
 
   // ---- chart gates take precedence over sketch heuristics -----------------------------------
@@ -160,17 +165,16 @@ class EvidenceSuite extends FunSuite:
     assert(v.node(sc2).get.evidence.isEmpty, "a segment never carries a chart of its own")
   }
 
-  test(
-    "segment d_chart is the best member's distance blended toward neutral by uncovered fraction"
-  ) {
+  test("segment d_chart is the minimum observed compatible member without coverage imputation") {
     val v = viewWith(Map(e5 -> straight))
-    val cov = v.structuralCoverage(sc2).fraction
-    val expected = cov * 0.0 + (1.0 - cov) * ChartDistance.Neutral
-    assertEquals(ChartDistance(u2Chart, v.node(sc2).get, v), Estimate.observed(expected))
+    assertEquals(ChartDistance(u2Chart, v.node(sc2).get, v), Estimate.observed(0.0))
     val full = viewWith(v.leavesUnder(sc2).map(_ -> straight).toMap)
     assertEquals(ChartDistance(u2Chart, full.node(sc2).get, full), Estimate.observed(0.0))
     val breakdown = costModel.cost(u2Chart, v.node(sc2).get, FidelityMode.Faithful, v)
-    assertEquals(breakdown.coverage, Some(StructuralCoverage(1, 1, v.leavesUnder(sc2).size)))
+    assertEquals(
+      breakdown.sourceChartCoverage,
+      Some(StructuralCoverage(1, 1, v.leavesUnder(sc2).size))
+    )
   }
 
   // ---- end to end ---------------------------------------------------------------------------
