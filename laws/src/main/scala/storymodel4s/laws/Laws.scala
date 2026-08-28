@@ -145,12 +145,18 @@ object AlignmentLaws extends Laws:
         val res = AlignGens.infer(c)
         res.flow.steps.size == math.max(0, res.posterior.rows.size - 1)
       },
-      "localizability lies in [0, 1]" -> forAll { (c: AlignGens.Case) =>
-        AlignGens
-          .infer(c)
-          .posterior
-          .rows
-          .forall(r => r.localizability >= -eps && r.localizability <= 1 + eps)
+      "localizability lies in [0, 1] and is defined iff the unit has source mass" -> forAll {
+        (c: AlignGens.Case) =>
+          val k = c.view.sourceNodeCount
+          AlignGens
+            .infer(c)
+            .posterior
+            .rows
+            .forall { r =>
+              r.localizability(k) match
+                case Some(l) => r.sourceMass > 0.0 && l >= -eps && l <= 1 + eps
+                case None    => r.sourceMass <= 0.0
+            }
       }
     )
 

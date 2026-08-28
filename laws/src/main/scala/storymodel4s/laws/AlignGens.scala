@@ -115,4 +115,6 @@ object AlignGens:
 
   def infer(c: Case): HsmmResult =
     val cands = CandidateGenerator(c.semantic, perLevel = 2).generate(c.recall.ordered, c.view)
-    GraphHsmm.infer(c.recall, c.view, cands, DefaultLocalCostModel(semantic = c.semantic))
+    GraphHsmm
+      .infer(c.recall, c.view, cands, DefaultLocalCostModel(semantic = c.semantic))
+      .fold(e => throw new IllegalStateException(e.message), identity)

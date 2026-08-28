@@ -135,14 +135,18 @@ class PropertySuite extends ScalaCheckSuite:
       (r, s) <- genRecall(v)
     yield Case(v, r, s)
 
+  private def candidatesOf(c: Case): Candidates =
+    CandidateGenerator(c.semantic, perLevel = 2).generate(c.recall.ordered, c.view)
+
   private def infer(c: Case): HsmmResult =
-    val cands = CandidateGenerator(c.semantic, perLevel = 2).generate(c.recall.ordered, c.view)
-    GraphHsmm.infer(c.recall, c.view, cands, DefaultLocalCostModel(semantic = c.semantic))
+    GraphHsmm
+      .infer(c.recall, c.view, candidatesOf(c), DefaultLocalCostModel(semantic = c.semantic))
+      .fold(e => throw new AssertionError(e.message), identity)
 
   property("posterior rows are distributions over the unit's states") {
     forAll(genCase) { c =>
       val res = infer(c)
-      res.posterior.rows.forall { r =>
+      res.posterior.isWellFormed && res.posterior.rows.forall { r =>
         math.abs(r.total - 1.0) < 1e-6 && r.mass.values.forall(m => m >= 0.0 && m <= 1.0 + 1e-9)
       }
     }
@@ -161,13 +165,27 @@ class PropertySuite extends ScalaCheckSuite:
     }
   }
 
-  property("entropy and localizability are bounded") {
+  property("entropy and localizability are bounded; localizability is defined iff source mass") {
     forAll(genCase) { c =>
       val res = infer(c)
+      val k = c.view.sourceNodeCount
       res.posterior.rows.forall { r =>
-        val k = r.mass.count(_._2 > 0.0)
-        r.entropy >= -1e-12 && r.entropy <= math.log(math.max(1, k).toDouble) + 1e-9 &&
-        r.localizability >= -1e-9 && r.localizability <= 1.0 + 1e-9
+        val states = r.mass.count(_._2 > 0.0)
+        r.entropy >= -1e-12 && r.entropy <= math.log(math.max(1, states).toDouble) + 1e-9 &&
+        (r.localizability(k) match
+          case Some(l) => r.sourceMass > 0.0 && l >= -1e-9 && l <= 1.0 + 1e-9
+          case None    => r.sourceMass <= 0.0)
+      }
+    }
+  }
+
+  property("gated candidates never carry posterior mass") {
+    forAll(genCase) { c =>
+      val res = infer(c)
+      res.costs.forall { case (unit, byState) =>
+        byState.forall { case (s, b) =>
+          !b.excluded || res.posterior.row(unit).exists(r => r(s) == 0.0)
+        }
       }
     }
   }
@@ -175,12 +193,21 @@ class PropertySuite extends ScalaCheckSuite:
   property("Viterbi path lies in the state space and the likelihood is finite") {
     forAll(genCase) { c =>
       val res = infer(c)
-      val cands = CandidateGenerator(c.semantic, perLevel = 2).generate(c.recall.ordered, c.view)
+      val cands = candidatesOf(c)
       res.viterbi.zip(c.recall.ordered).forall { (s, u) =>
         s match
           case AlignState.Source(ref) => cands(u.id).contains(ref)
           case AlignState.External(_) => true
       } && !res.logLikelihood.isNaN && !res.logLikelihood.isInfinite
+    }
+  }
+
+  property("inference is deterministic") {
+    forAll(genCase) { c =>
+      val a = infer(c)
+      val b = infer(c)
+      a.posterior == b.posterior && a.flow == b.flow && a.viterbi == b.viterbi &&
+      a.logLikelihood == b.logLikelihood
     }
   }
 
@@ -210,7 +237,9 @@ class PropertySuite extends ScalaCheckSuite:
       val sem = SemanticDistance.fromTable(table)
       val recall = RecallGraph(src, atlas, units, RecallRelations.empty)
       val cands = CandidateGenerator(sem, perLevel = 2).generate(units, view)
-      val res = GraphHsmm.infer(recall, view, cands, DefaultLocalCostModel(semantic = sem))
+      val res = GraphHsmm
+        .infer(recall, view, cands, DefaultLocalCostModel(semantic = sem))
+        .fold(e => throw new AssertionError(e.message), identity)
       res.viterbi == res.posterior.rows.map(_.argmax.get) &&
       res.viterbi == targets.map(AlignState.Source(_))
     }
@@ -232,6 +261,16 @@ class PropertySuite extends ScalaCheckSuite:
     }
   }
 
+  property("support densities integrate to the row's source mass on both clocks") {
+    forAll(genCase) { c =>
+      val res = infer(c)
+      val d = SupportDensity.discourse(res.posterior, c.view)
+      val w = SupportDensity.worldTime(res.posterior, c.view).get
+      d.zip(res.posterior.rows).forall((x, r) => math.abs(x.mass - r.sourceMass) < 1e-6) &&
+      w.zip(res.posterior.rows).forall((x, r) => math.abs(x.mass - r.sourceMass) < 1e-6)
+    }
+  }
+
   test("a single-unit recall produces one row, no flow, and a finite likelihood") {
     val c = genCase.sample.get
     val text = "Only one thing."
@@ -250,7 +289,9 @@ class PropertySuite extends ScalaCheckSuite:
     )
     val r = RecallGraph(src, atlas, Vector(u), RecallRelations.empty)
     val cands = CandidateGenerator(c.semantic).generate(Vector(u), c.view)
-    val res = GraphHsmm.infer(r, c.view, cands, DefaultLocalCostModel(semantic = c.semantic))
+    val res = GraphHsmm
+      .infer(r, c.view, cands, DefaultLocalCostModel(semantic = c.semantic))
+      .fold(e => fail(e.message), identity)
     assertEquals(res.posterior.size, 1)
     assertEquals(res.flow.size, 0)
     assert(!res.logLikelihood.isNaN)

@@ -11,7 +11,8 @@ import storymodel4s.features.*
 class FeaturesIntegrationSuite extends FunSuite:
   import AnnaFixture.*
 
-  private lazy val result: HsmmResult = GraphHsmm.infer(recall, view, candidates, costModel)
+  private lazy val result: HsmmResult =
+    GraphHsmm.infer(recall, view, candidates, costModel).fold(e => fail(e.message), identity)
 
   test("missing importance excludes a leaf from the weighted coverage instead of weighting it 0") {
     val sig = RecallSignature.compute(result, recall, view)
@@ -46,8 +47,9 @@ class FeaturesIntegrationSuite extends FunSuite:
   test("an abstaining semantic provider is neutral: candidates come from lexical overlap") {
     val abstain = SemanticDistance.fromTableOrAbstain(Map.empty)
     val cands = CandidateGenerator(abstain, perLevel = 3).generate(recall.ordered, view)
-    // dense ranking skipped, lexical hits remain
+    // dense ranking skipped, lexical hits remain; the unit is not "unranked"
     assert(cands(u2.id).nonEmpty, cands.toString)
+    assert(!cands.abstained(u2.id))
     val model = DefaultLocalCostModel(semantic = abstain, missingSemantic = 0.5)
     val breakdown = model.cost(u2, view.node(e5).get, view)
     assertEqualsDouble(breakdown.term(CostTerm.Semantic), 0.5, 1e-12)

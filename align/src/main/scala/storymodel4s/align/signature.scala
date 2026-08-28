@@ -4,12 +4,21 @@ import storymodel4s.recall.{RecallGraph, RecallUnitId}
 
 /** The decomposed recall signature `m_s` (design record §12). Every component stays separately
   * accessible; a scalar is only ever produced by a declared [[SignatureProjection]].
+  *
+  *   - `specificity`: mean localizability over units with source mass (K = source node count).
+  *   - `backwardMass` / `worldBackwardMass`: mean per-step source→source mass on moves that go
+  *     backward in discourse / story-world order, excluding moves to an ancestor (§12.3).
+  *   - `causalPreservation`: fraction of source causal edges among recalled leaves whose endpoints
+  *     are covered by two *distinct* recall units linked by a recall causal edge, both mapped at or
+  *     below `causalLevelThreshold` (§12.4; review #17).
+  *   - external masses: mean per-unit mass on each explicit external state, including
+  *     `sourceConsistentInferenceMass`, `uninterpretableMass`, and `unrankedMass` (review #39).
   */
 final case class RecallSignature(
     uniformCoverage: Double,
     importanceWeightedCoverage: Double,
     fidelity: Option[Double],
-    specificity: Double,
+    specificity: Option[Double],
     compression: Double,
     discourseChronology: Double,
     worldChronology: Option[Double],
@@ -18,17 +27,25 @@ final case class RecallSignature(
     associationMass: Double,
     intrusionMass: Double,
     commentaryMass: Double,
+    sourceConsistentInferenceMass: Double,
+    uninterpretableMass: Double,
+    unrankedMass: Double,
     backwardMass: Double,
+    worldBackwardMass: Option[Double],
     perUnitLocalizability: Map[RecallUnitId, Double],
     perUnitFidelity: Map[RecallUnitId, FidelityReport]
-)
+):
+  def externalMass: Double =
+    associationMass + intrusionMass + commentaryMass + sourceConsistentInferenceMass +
+      uninterpretableMass + unrankedMass
 
 object RecallSignature:
 
   def compute(
       result: HsmmResult,
       recall: RecallGraph,
-      view: SourceView
+      view: SourceView,
+      causalLevelThreshold: Int = 1
   ): RecallSignature =
     val p = result.posterior
     val f = result.flow
@@ -52,8 +69,9 @@ object RecallSignature:
     val fid = facets.values.flatMap(_.fidelity).toVector
     val fidelity = if fid.isEmpty then None else Some(fid.sum / fid.size)
 
-    val loc = p.rows.map(r => r.unit -> r.localizability).toMap
-    val specificity = if loc.isEmpty then 0.0 else loc.values.sum / loc.size
+    val k = view.sourceNodeCount
+    val loc = p.rows.flatMap(r => r.localizability(k).map(r.unit -> _)).toMap
+    val specificity = if loc.isEmpty then None else Some(loc.values.toVector.sorted.sum / loc.size)
 
     val maxLevel = math.max(1, view.maxLevel)
     val levelMass = p.rows.map { r =>
@@ -63,44 +81,50 @@ object RecallSignature:
     }
     val compression = if levelMass.isEmpty then 0.0 else levelMass.sum / levelMass.size
 
+    def isBackward(pos: SourceNodeRef => Option[Double])(a: SourceNodeRef, b: SourceNodeRef) =
+      a != b && !view.isAncestor(b, a) && ((pos(a), pos(b)) match
+        case (Some(x), Some(y)) => y < x
+        case _                  => false)
+    def isForward(pos: SourceNodeRef => Option[Double])(a: SourceNodeRef, b: SourceNodeRef) =
+      a != b && !view.isAncestor(b, a) && !view.isAncestor(a, b) && ((pos(a), pos(b)) match
+        case (Some(x), Some(y)) => y > x
+        case _                  => false)
     def ordered(pos: SourceNodeRef => Option[Double]): Option[Double] =
-      val moves = f.steps.map { s =>
-        val forward = s.sourceMass((a, b) =>
-          a != b && (pos(a), pos(b)).match
-            case (Some(x), Some(y)) => y > x
-            case _                  => false
-        )
-        val backward = s.sourceMass((a, b) =>
-          a != b && (pos(a), pos(b)).match
-            case (Some(x), Some(y)) => y < x
-            case _                  => false
-        )
-        (forward, backward)
-      }
-      val fw = moves.map(_._1).sum
-      val bw = moves.map(_._2).sum
+      val fw = f.steps.map(_.sourceMass(isForward(pos))).sum
+      val bw = f.steps.map(_.sourceMass(isBackward(pos))).sum
       if fw + bw <= 0 then None else Some(fw / (fw + bw))
-    val discourse = ordered(r => Some(view.relativePosition(r))).getOrElse(1.0)
-    val world = view.worldOrder.flatMap(o => ordered(r => o.get(r).map(_.toDouble)))
-    val backward = f.steps.map { s =>
-      s.sourceMass((a, b) => a != b && view.relativePosition(b) < view.relativePosition(a))
-    }.sum / math.max(1, f.steps.size)
+    def backwardMean(pos: SourceNodeRef => Option[Double]): Double =
+      f.steps.map(_.sourceMass(isBackward(pos))).sum / math.max(1, f.steps.size)
+    val discoursePos: SourceNodeRef => Option[Double] = r => Some(view.relativePosition(r))
+    val worldPos: Option[SourceNodeRef => Option[Double]] =
+      view.worldOrder.map(o => r => o.get(r).map(_.toDouble))
+    val discourse = ordered(discoursePos).getOrElse(1.0)
+    val world = worldPos.flatMap(ordered)
+    val backward = backwardMean(discoursePos)
+    val worldBackward = worldPos.map(backwardMean)
 
-    val causalEdges = view.adjacency(RelationLayer.Causal).toVector.flatMap { case (a, m) =>
-      m.collect { case (b, w) if w > 0 => (a, b) }
+    val causalEdges = view.adjacency(RelationLayer.Causal).toVector.sortBy(_._1.key).flatMap {
+      case (a, m) => m.toVector.sortBy(_._1.key).collect { case (b, w) if w > 0 => (a, b) }
     }
     val recalledCausal = causalEdges.filter { case (a, b) =>
       visitation.getOrElse(a, 0.0) > 0.5 && visitation.getOrElse(b, 0.0) > 0.5
     }
     val unitMap: Map[RecallUnitId, SourceNodeRef] = p.rows.flatMap { r =>
-      r.mapSource.filter(_ => r.sourceMass > r.externalMass).map(r.unit -> _)
+      r.mapSource
+        .filter(_ => r.sourceMass > r.externalMass)
+        .filter(ref => view.node(ref).exists(_.level <= causalLevelThreshold))
+        .map(r.unit -> _)
     }.toMap
     def covers(ref: SourceNodeRef, leaf: SourceNodeRef): Boolean =
       ref == leaf || view.leavesUnder(ref).contains(leaf)
     val preserved = recalledCausal.count { case (a, b) =>
-      recall.relations.causal.exists(e =>
-        unitMap.get(e.cause).exists(covers(_, a)) && unitMap.get(e.effect).exists(covers(_, b))
-      )
+      recall.relations.causal.exists { e =>
+        e.cause != e.effect && {
+          (unitMap.get(e.cause), unitMap.get(e.effect)) match
+            case (Some(ca), Some(ef)) => ca != ef && covers(ca, a) && covers(ef, b)
+            case _                    => false
+        }
+      }
     }
     val causal =
       if recalledCausal.isEmpty then None else Some(preserved.toDouble / recalledCausal.size)
@@ -138,7 +162,11 @@ object RecallSignature:
       extMean(ExternalState.Association),
       extMean(ExternalState.Intrusion),
       extMean(ExternalState.Commentary),
+      extMean(ExternalState.SourceConsistentInference),
+      extMean(ExternalState.Uninterpretable),
+      extMean(ExternalState.Unranked),
       backward,
+      worldBackward,
       loc,
       facets
     )
@@ -147,7 +175,7 @@ object RecallSignature:
   def leafVisitation(p: AlignmentMatrix, view: SourceView): Map[SourceNodeRef, Double] =
     val acc = scala.collection.mutable.Map.empty[SourceNodeRef, Double].withDefaultValue(0.0)
     p.rows.foreach { row =>
-      row.mass.foreach {
+      row.mass.toVector.sortBy(_._1.key).foreach {
         case (AlignState.Source(ref), m) if m > 0 =>
           val ls = view.leavesUnder(ref)
           if ls.nonEmpty then ls.foreach(l => acc.update(l, acc(l) + m / ls.size))
@@ -163,7 +191,7 @@ final case class SignatureProjection(version: String, weights: Map[String, Doubl
       "uniformCoverage" -> s.uniformCoverage,
       "importanceWeightedCoverage" -> s.importanceWeightedCoverage,
       "fidelity" -> s.fidelity.getOrElse(0.0),
-      "specificity" -> s.specificity,
+      "specificity" -> s.specificity.getOrElse(0.0),
       "compression" -> s.compression,
       "discourseChronology" -> s.discourseChronology,
       "worldChronology" -> s.worldChronology.getOrElse(0.0),
@@ -172,6 +200,10 @@ final case class SignatureProjection(version: String, weights: Map[String, Doubl
       "associationMass" -> s.associationMass,
       "intrusionMass" -> s.intrusionMass,
       "commentaryMass" -> s.commentaryMass,
-      "backwardMass" -> s.backwardMass
+      "sourceConsistentInferenceMass" -> s.sourceConsistentInferenceMass,
+      "uninterpretableMass" -> s.uninterpretableMass,
+      "unrankedMass" -> s.unrankedMass,
+      "backwardMass" -> s.backwardMass,
+      "worldBackwardMass" -> s.worldBackwardMass.getOrElse(0.0)
     )
-    weights.iterator.map { case (k, w) => w * comps.getOrElse(k, 0.0) }.sum
+    weights.toVector.sortBy(_._1).map { case (k, w) => w * comps.getOrElse(k, 0.0) }.sum
