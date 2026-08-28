@@ -43,7 +43,8 @@ final case class FeatureTrack[T <: FeatureTarget, V](
     observations.flatMap(o => o.estimate.toOption.map(v => o.target -> v))
 
   /** Eligible = all observations; observed = those with a value. */
-  def coverage: Coverage = Coverage(observations.size, observations.count(_.estimate.isObserved))
+  def coverage: Coverage =
+    Coverage.unsafe(observations.size, observations.count(_.estimate.isObserved))
 
   /** Pair with another track on the same target set (targets present in both). */
   def zip[W](other: FeatureTrack[T, W]): Vector[(T, Estimate[V], Estimate[W])] =
@@ -85,3 +86,19 @@ object FeatureTrack:
     else if t.derivation.exists(d => d.inputs.toVector.contains(t.space.id)) then
       Left(DomainError.InvariantViolation(path, "derived track lists itself as an input"))
     else Right(t)
+
+  /** Scalar tracks additionally reject non-finite observed values: NaN is never a measurement. */
+  def validatedScores[T <: FeatureTarget](
+      t: FeatureTrack[T, Double]
+  ): Either[DomainError, FeatureTrack[T, Double]] =
+    validated(t).flatMap { ok =>
+      ok.observations.find(o => o.estimate.isObserved && Estimate.finite(o.estimate).isEmpty) match
+        case Some(o) =>
+          Left(
+            DomainError.InvariantViolation(
+              s"features/track/${t.space.id.value}",
+              s"non-finite observed value at ${o.target}"
+            )
+          )
+        case None => Right(ok)
+    }

@@ -166,7 +166,7 @@ object EstimateLaws extends Laws:
       },
       "coverage counts observed ≤ eligible" -> forAll(Gen.listOf(Gen.oneOf(missing, observed))) {
         ss =>
-          val cov = Coverage(ss.size, ss.count(_.estimate.isObserved))
+          val cov = Coverage.unsafe(ss.size, ss.count(_.estimate.isObserved))
           cov.observed <= cov.eligible && cov.fraction >= 0.0 && cov.fraction <= 1.0
       }
     )

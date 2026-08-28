@@ -17,7 +17,7 @@ enum WeightingPolicy:
 
   def canonicalString: String = this match
     case Uniform      => "uniform"
-    case Kernel(s, b) => s"kernel($s,$b)"
+    case Kernel(s, b) => s"kernel($s,${CanonicalDouble.render(b)})"
     case Provided(d)  => s"provided($d)"
 
 /** What to do when a reduction's support has missing values. */
@@ -33,7 +33,7 @@ enum MissingValuePolicy:
 
   def canonicalString: String = this match
     case IgnoreMissing         => "ignore"
-    case RequireMinCoverage(f) => s"minCoverage($f)"
+    case RequireMinCoverage(f) => s"minCoverage(${CanonicalDouble.render(f)})"
     case Fail                  => "fail"
 
 /** Post-reduction normalization, always tied to the population it was fitted on. */
@@ -47,10 +47,41 @@ enum NormalizationPolicy:
     case MinMax(p)  => s"minmax($p)"
     case UnitLength => "unit"
 
+/** Which tokens of a support are eligible to carry a value. */
+enum Eligibility:
+  /** Words and numbers only (punctuation and symbols are never eligible). */
+  case LexicalTokens
+
+  /** Every token, including punctuation; only meaningful for token-level providers that score it.
+    */
+  case AllTokens
+
+  def canonicalString: String = this match
+    case LexicalTokens => "lexical"
+    case AllTokens     => "all"
+
+/** The family of targets a derived track is attached to. Part of the recipe because the same
+  * reducer over the same inputs means something different per situation than per window.
+  */
+enum TargetFamily:
+  case Token, Window, Sentence, Boundary, Turn, Situation, Segment
+
+object TargetFamily:
+  def of(t: FeatureTarget): TargetFamily = t match
+    case _: FeatureTarget.Token     => Token
+    case _: FeatureTarget.Window    => Window
+    case _: FeatureTarget.Sentence  => Sentence
+    case _: FeatureTarget.Boundary  => Boundary
+    case _: FeatureTarget.Turn      => Turn
+    case _: FeatureTarget.Situation => Situation
+    case _: FeatureTarget.Segment   => Segment
+
 /** The executable recipe that produced a derived track from its inputs.
   *
   * Why: every smoothed or aggregated value must be replayable and diffable; the recipe is
-  * content-addressed so caches and dependency graphs can key on it (design record §110).
+  * content-addressed so caches and dependency graphs can key on it (design record §110). Every
+  * parameter that changes the output is part of the recipe, including eligibility and target
+  * family.
   */
 final case class FeatureDerivation(
     inputs: NonEmptyVector[FeatureSpaceId],
@@ -59,7 +90,9 @@ final case class FeatureDerivation(
     weighting: WeightingPolicy,
     missing: MissingValuePolicy,
     normalization: Option[NormalizationPolicy],
-    implementationVersion: String
+    implementationVersion: String,
+    eligibility: Eligibility = Eligibility.LexicalTokens,
+    targetFamily: Option[TargetFamily] = None
 ):
   def canonicalString: String =
     Vector(
@@ -69,15 +102,19 @@ final case class FeatureDerivation(
       "weighting=" + weighting.canonicalString,
       "missing=" + missing.canonicalString,
       "normalization=" + normalization.map(_.canonicalString).getOrElse("none"),
+      "eligibility=" + eligibility.canonicalString,
+      "targets=" + targetFamily.map(_.toString.toLowerCase).getOrElse("none"),
       "impl=" + implementationVersion
     ).mkString(";")
 
   /** Content address of the recipe. */
   def derivationId: Checksum = Checksum.ofText(canonicalString)
 
-  /** Deterministic identifier for the output space of this recipe applied to its inputs. */
+  /** Deterministic, fixed-length identifier for the output space of this recipe applied to its
+    * inputs. A content address rather than a path so chains of derivations never grow the id.
+    */
   def outputSpaceId: FeatureSpaceId =
-    FeatureSpaceId.unsafe(s"${inputs.head.value}/${derivationId.short(12)}")
+    FeatureSpaceId.unsafe("derived:" + derivationId.short(32))
 
 /** Dependency graph over feature spaces: which recipe produced each derived space.
   *

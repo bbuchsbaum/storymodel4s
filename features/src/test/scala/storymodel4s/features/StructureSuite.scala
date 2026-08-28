@@ -32,7 +32,32 @@ class StructureSuite extends ScalaCheckSuite:
       d.copy(normalization = Some(NormalizationPolicy.ZScore("pop"))).derivationId
     )
     assertNotEquals(d.derivationId, d.copy(implementationVersion = "test-2").derivationId)
-    assert(d.outputSpaceId.value.startsWith("a/"))
+    assertNotEquals(d.derivationId, d.copy(eligibility = Eligibility.AllTokens).derivationId)
+    assertNotEquals(d.derivationId, d.copy(targetFamily = Some(TargetFamily.Window)).derivationId)
+    assert(d.outputSpaceId.value.startsWith("derived:"))
+    assertEquals(d.outputSpaceId.value.length, "derived:".length + 32)
+  }
+
+  test("derivation ids are identical on every platform (golden)") {
+    // Doubles are rendered by IEEE-754 bit pattern, not Double.toString, so JVM and JS agree.
+    val d = FeatureDerivation(
+      NonEmptyVector.one(sp("imageability.demo")),
+      Some(WindowPlan.words(20, 5)),
+      ScalarReducer.Kernel(KernelShape.Gaussian(1.0)).id,
+      ScalarReducer.Kernel(KernelShape.Gaussian(1.0)).weighting,
+      MissingValuePolicy.RequireMinCoverage(0.5),
+      Some(NormalizationPolicy.ZScore("pop")),
+      "golden-1"
+    )
+    assertEquals(CanonicalDouble.render(1.0), "0x3ff0000000000000")
+    assertEquals(CanonicalDouble.render(0.5), "0x3fe0000000000000")
+    assertEquals(CanonicalDouble.render(0.0), "0x0000000000000000")
+    assert(d.canonicalString.contains("kernel(gaussian,0x3ff0000000000000)"))
+    assert(d.canonicalString.contains("minCoverage(0x3fe0000000000000)"))
+    assertEquals(d.derivationId.hex, GoldenDerivationId)
+    // an outputSpaceId chain does not grow: deriving from a derived space keeps a fixed length
+    val second = d.copy(inputs = NonEmptyVector.one(d.outputSpaceId))
+    assertEquals(second.outputSpaceId.value.length, d.outputSpaceId.value.length)
   }
 
   test("derivation graph: ancestors, stale descendants, cycle and self rejection") {
@@ -99,7 +124,7 @@ class StructureSuite extends ScalaCheckSuite:
     assertEquals(ledger.size, 2)
   }
 
-  test("boundary belief input: weights are parameters; missing signals contribute nothing") {
+  test("boundary scores are only issued through the ledger, which records per-signal inputs") {
     val gap: FeatureTarget.Boundary = FeatureTarget.Boundary(atlas.sentences(1).id)
     val ev = BoundaryEvidence(
       gap,
@@ -108,7 +133,10 @@ class StructureSuite extends ScalaCheckSuite:
         BoundarySignal.Location -> Estimate.observed(1.0),
         BoundarySignal.Imageability -> Estimate.Missing(MissingReason.Excluded)
       ),
-      Set(sp("semantic.contextual"), sp("imageability.demo")),
+      Map(
+        BoundarySignal.Semantic -> Set(sp("semantic.contextual")),
+        BoundarySignal.Imageability -> Set(sp("imageability.demo"))
+      ),
       level = 1
     )
     val weights = BoundaryBeliefInput(
@@ -120,17 +148,38 @@ class StructureSuite extends ScalaCheckSuite:
         )
       )
     )
-    assertEqualsDouble(weights.rawScore(ev).get, 2.6, 1e-9)
-    assert(weights.rawScore(ev.copy(level = 2)).isEmpty)
-    assertEquals(weights.usedSpaces(ev), ev.inputSpaces)
-    assert(BoundaryBeliefInput(Map(1 -> Map(BoundarySignal.Goals -> 1.0))).rawScore(ev).isEmpty)
+    val stage = StageId.unsafe("hierarchy")
+    val (ledger, score) = FeatureUseLedger.empty.scoreBoundary(weights, ev, stage)
+    assertEqualsDouble(score.get.rawScore, 2.6, 1e-9)
+    assertEquals(score.get.target, gap)
+    // the missing imageability signal contributed nothing, so its space is not a recorded input
+    assertEquals(weights.usedSpaces(ev), Set(sp("semantic.contextual")))
+    assertEquals(ledger.size, 1)
+    assertEquals(ledger.inductionUses.head.spaces, Set(sp("semantic.contextual")))
+    assertEquals(ledger.inductionUses.head.purpose, UsePurpose.Induction(stage))
+    assertEquals(score.get.use, ledger.inductionUses.head)
+    // the recorded use makes a later analysis of the same feature detectably circular
+    assert(
+      CircularityCheck.dependsOn(Set(sp("semantic.contextual")), ledger.inductionUses).isDefined
+    )
+    assertEquals(
+      CircularityCheck.dependsOn(Set(sp("imageability.demo")), ledger.inductionUses),
+      None
+    )
+    // no weighted signal observed at this level: no score, and nothing recorded
+    val (same, none) = FeatureUseLedger.empty.scoreBoundary(weights, ev.copy(level = 2), stage)
+    assert(none.isEmpty && same.size == 0)
+    val (_, goals) = FeatureUseLedger.empty
+      .scoreBoundary(BoundaryBeliefInput(Map(1 -> Map(BoundarySignal.Goals -> 1.0))), ev, stage)
+    assert(goals.isEmpty)
+    assertEquals(ev.allInputSpaces, Set(sp("semantic.contextual"), sp("imageability.demo")))
   }
 
   test("world-time transitions carry uncertainty instead of manufactured precision") {
     val unresolved = WorldTimeTransition.Unresolved(
       Vector(
-        TemporalHypothesis("before", Credence.unsafeRaw(0.4)),
-        TemporalHypothesis("after", Credence.unsafeRaw(0.3))
+        TemporalHypothesis(TemporalRelationTag.Before, Credence.unsafeRaw(0.4)),
+        TemporalHypothesis(TemporalRelationTag.Overlaps, Credence.unsafeRaw(0.3))
       )
     )
     assert(!unresolved.isBackward)
@@ -165,10 +214,12 @@ class StructureSuite extends ScalaCheckSuite:
   }
 
   test("coverage arithmetic and estimate mapping") {
-    assertEqualsDouble(Coverage(4, 1).fraction, 0.25, 1e-12)
-    assertEquals(Coverage(4, 1) + Coverage(2, 2), Coverage(6, 3))
+    assertEqualsDouble(Coverage.unsafe(4, 1).fraction, 0.25, 1e-12)
+    assertEquals(Coverage.unsafe(4, 1) + Coverage.unsafe(2, 2), Coverage.unsafe(6, 3))
     assertEquals(Coverage.empty.fraction, 0.0)
-    intercept[IllegalArgumentException](Coverage(1, 2))
+    assert(Coverage.of(1, 2).isLeft)
+    assert(Coverage.of(-1, 0).isLeft)
+    assert(Coverage.of(3, 3).isRight)
     assertEquals(Estimate.observed(2.0).map(_ * 2).toOption, Some(4.0))
     assertEquals(
       Estimate.Missing[Double](MissingReason.Unknown).map(_ * 2),
@@ -185,4 +236,11 @@ class StructureSuite extends ScalaCheckSuite:
     )
     assertEquals(ts.sorted.map(FeatureTarget.rankOf), Vector(0, 0, 1, 2))
     assertEquals(ts.sorted.head, FeatureTarget.Token(TokenIndex.unsafe(2)))
+    // window ends compare numerically, not lexically
+    val w9 = FeatureTarget.Window(TokenRange.unsafe(5, 9))
+    val w10 = FeatureTarget.Window(TokenRange.unsafe(5, 10))
+    assert(Ordering[FeatureTarget].lt(w9, w10))
   }
+
+  private val GoldenDerivationId: String =
+    "c0e730f22d83662f4310fbdba4a1d799bd9badc77ca5657b7e67fc09c2522e45"

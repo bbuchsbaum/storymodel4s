@@ -51,14 +51,14 @@ object FeatureTarget:
     case _: Situation => 5
     case _: Segment   => 6
 
-  private def key(t: FeatureTarget): (Int, Int, String) = t match
-    case Token(i)     => (0, i.value, "")
-    case Window(r)    => (1, r.start.value, r.endExclusive.value.toString)
-    case Sentence(u)  => (2, 0, u.value)
-    case Boundary(u)  => (3, 0, u.value)
-    case Turn(i)      => (4, 0, i.value)
-    case Situation(i) => (5, 0, i.value)
-    case Segment(i)   => (6, 0, i.value)
+  private def key(t: FeatureTarget): (Int, Int, Int, String) = t match
+    case Token(i)     => (0, i.value, 0, "")
+    case Window(r)    => (1, r.start.value, r.endExclusive.value, "")
+    case Sentence(u)  => (2, 0, 0, u.value)
+    case Boundary(u)  => (3, 0, 0, u.value)
+    case Turn(i)      => (4, 0, 0, i.value)
+    case Situation(i) => (5, 0, 0, i.value)
+    case Segment(i)   => (6, 0, 0, i.value)
 
   given Order[FeatureTarget] = Order.by(key)
   given Ordering[FeatureTarget] = Order[FeatureTarget].toOrdering

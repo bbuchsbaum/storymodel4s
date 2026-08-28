@@ -88,7 +88,17 @@ object Fixtures:
 
   val scoreEstimate: Gen[ScoreEstimate] = Gen.frequency(
     3 -> Gen.chooseNum(-10.0, 10.0).map(Estimate.observed),
-    1 -> Gen.oneOf(MissingReason.values.toSeq).map(Estimate.Missing(_))
+    1 -> Gen
+      .oneOf(
+        MissingReason.NotInLexicon,
+        MissingReason.OutOfVocabulary,
+        MissingReason.ProviderAbstained,
+        MissingReason.Excluded,
+        MissingReason.AllMissing,
+        MissingReason.Undefined(UndefinedReason.NotFinite),
+        MissingReason.Unknown
+      )
+      .map(Estimate.Missing(_))
   )
 
   val sample: Gen[Sample[Double]] = for

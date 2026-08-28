@@ -5,9 +5,10 @@ import cats.syntax.all.*
 import storymodel4s.core.*
 
 /** A sample inside a reduction: its position on the axis (token index or ordinal), its estimate,
-  * and a nonnegative weight.
+  * and a nonnegative finite weight. Weights are checked by [[Reduction.reduce]].
   */
-final case class Sample[+V](position: Int, estimate: Estimate[V], weight: Double)
+final case class Sample[+V](position: Int, estimate: Estimate[V], weight: Double):
+  def hasValidWeight: Boolean = Estimate.isFinite(weight) && weight >= 0.0
 
 /** Kernel shapes for smoothing reducers; `bandwidth` is in axis positions. */
 enum KernelShape:
@@ -24,6 +25,9 @@ enum KernelShape:
     case _: Rectangular => "rectangular"
     case _: Triangular  => "triangular"
     case _: Gaussian    => "gaussian"
+
+  /** A zero bandwidth is a declared point mass: the value at (or nearest to) the centre. */
+  def isPointMass: Boolean = bw <= 0.0
 
   /** Weight at signed distance `d` from the window centre. A zero bandwidth is a point mass at the
     * centre, so smoothing with it is the identity.
@@ -43,7 +47,7 @@ enum ScalarReducer:
   case Kernel(shape: KernelShape)
 
   def id: ReducerId = ReducerId.unsafe(this match
-    case Kernel(s) => s"kernel-${s.name}-${s.bw}"
+    case Kernel(s) => s"kernel-${s.name}-${CanonicalDouble.render(s.bw)}"
     case other     => other.toString.toLowerCase)
 
   def weighting: WeightingPolicy = this match
@@ -52,17 +56,21 @@ enum ScalarReducer:
     case _            => WeightingPolicy.Uniform
 
 /** Reduces a nonempty set of samples to one estimate. Implementations must return `Missing` (never
-  * zero) when no sample is observed.
+  * zero) when no sample is observed, and must say why.
   */
 trait WindowReducer[V, O]:
   def reduce(samples: NonEmptyVector[Sample[V]]): Estimate[O]
 
 object WindowReducer:
+  /** Observed samples with finite values; non-finite observations are treated as absent. */
   private def observed(samples: NonEmptyVector[Sample[Double]]): Vector[Sample[Double]] =
-    samples.toVector.filter(_.estimate.isObserved)
+    samples.toVector.filter(s => Estimate.finite(s.estimate).isDefined)
 
   private def values(obs: Vector[Sample[Double]]): Vector[Double] =
-    obs.flatMap(_.estimate.toOption)
+    obs.flatMap(s => Estimate.finite(s.estimate))
+
+  private def undefined(r: UndefinedReason): Estimate[Double] =
+    Estimate.Missing(MissingReason.Undefined(r))
 
   /** Population variance. */
   private def variance(xs: Vector[Double]): Double =
@@ -84,7 +92,10 @@ object WindowReducer:
   def scalar(reducer: ScalarReducer): WindowReducer[Double, Double] =
     (samples: NonEmptyVector[Sample[Double]]) =>
       val obs = observed(samples)
-      if obs.isEmpty then Estimate.Missing(MissingReason.Excluded)
+      if obs.isEmpty then
+        val anyNonFinite = samples.exists(s => s.estimate.isObserved)
+        if anyNonFinite then undefined(UndefinedReason.NotFinite)
+        else Estimate.Missing(MissingReason.AllMissing)
       else
         val vs = values(obs)
         reducer match
@@ -93,39 +104,47 @@ object WindowReducer:
           case ScalarReducer.Maximum  => Estimate.observed(vs.max)
           case ScalarReducer.Variance => Estimate.observed(variance(vs))
           case ScalarReducer.Slope    =>
-            slope(obs).fold[Estimate[Double]](Estimate.Missing(MissingReason.Excluded))(
-              Estimate.observed
-            )
+            slope(obs).fold(undefined(UndefinedReason.SlopeNeedsTwoPositions))(Estimate.observed)
           case ScalarReducer.WeightedMean =>
             val w = obs.map(_.weight)
             val tw = w.sum
-            if tw <= 0.0 then Estimate.Missing(MissingReason.Excluded)
+            if tw <= 0.0 then undefined(UndefinedReason.ZeroTotalWeight)
             else Estimate.observed(vs.zip(w).map(_ * _).sum / tw)
           case ScalarReducer.Kernel(shape) =>
             val positions = samples.toVector.map(_.position)
             val centre = (positions.min + positions.max) / 2.0
             val weighted = obs.map(s => (s, shape.weight(s.position - centre)))
             val tw = weighted.map(_._2).sum
-            if tw <= 0.0 then
-              // zero bandwidth with no sample exactly at the centre: nearest observed sample
-              val nearest = obs.minBy(s => math.abs(s.position - centre))
-              nearest.estimate
-            else Estimate.observed(weighted.map((s, w) => s.estimate.toOption.get * w).sum / tw)
+            if tw > 0.0 then
+              Estimate.observed(
+                weighted.map((s, w) => Estimate.finite(s.estimate).get * w).sum / tw
+              )
+            else if shape.isPointMass then
+              // a declared point mass with no sample exactly at the centre (even-length window):
+              // the nearest observed sample is the value at the centre
+              obs.minBy(s => math.abs(s.position - centre)).estimate
+            else
+              // positive bandwidth but every observed sample lies outside the kernel support:
+              // never substitute a value from outside the support
+              undefined(UndefinedReason.OutsideKernelSupport)
 
 /** Windowed reduction of a token-aligned scalar track into a window-aligned track.
   *
   * Every output retains the window's exact support and its coverage (eligible basis tokens vs.
-  * observed values). Missing values are never coerced to zero.
+  * observed values). Missing values are never coerced to zero. Eligibility is lexical by default
+  * regardless of the window basis: punctuation never deflates coverage unless the caller declares
+  * `Eligibility.AllTokens`.
   */
 object Windowed:
-  val implementationVersion = "windowed-1"
+  val implementationVersion = "windowed-2"
 
   def apply(
       track: FeatureTrack[FeatureTarget.Token, Double],
       sequence: SurfaceSequence,
       plan: WindowPlan,
       reducer: ScalarReducer,
-      missing: MissingValuePolicy
+      missing: MissingValuePolicy,
+      eligibility: Eligibility = Eligibility.LexicalTokens
   ): Either[DomainError, FeatureTrack[FeatureTarget.Window, Double]] =
     val derivation = FeatureDerivation(
       NonEmptyVector.one(track.space.id),
@@ -134,14 +153,16 @@ object Windowed:
       reducer.weighting,
       missing,
       None,
-      implementationVersion
+      implementationVersion,
+      eligibility,
+      Some(TargetFamily.Window)
     )
     val red = WindowReducer.scalar(reducer)
     val outs = sequence.windows(plan).toVector.traverse { w =>
       val eligible = w.tokenRange.indices.toVector.filter { i =>
-        plan.basis match
-          case WindowBasis.LexicalTokens => sequence.tokens(i).isLexical
-          case _                         => true
+        eligibility match
+          case Eligibility.LexicalTokens => sequence.tokens(i).isLexical
+          case Eligibility.AllTokens     => true
       }
       val samples = eligible.map { i =>
         val est = track
@@ -193,24 +214,29 @@ object Reduction:
       reducer: WindowReducer[V, O],
       missing: MissingValuePolicy
   ): Either[DomainError, (Estimate[O], Coverage)] =
-    val cov = Coverage(samples.size, samples.count(_.estimate.isObserved))
-    NonEmptyVector.fromVector(samples) match
-      case None      => Right((Estimate.Missing(MissingReason.Excluded), cov))
-      case Some(nev) =>
-        missing match
-          case MissingValuePolicy.Fail if cov.missing > 0 =>
-            Left(
-              DomainError.InvariantViolation("features/reduce", s"${cov.missing} missing samples")
-            )
-          case MissingValuePolicy.RequireMinCoverage(f) if cov.fraction < f =>
-            Right((Estimate.Missing(MissingReason.Excluded), cov))
-          case _ => Right((reducer.reduce(nev), cov))
+    val cov = Coverage.unsafe(samples.size, samples.count(_.estimate.isObserved))
+    if samples.exists(!_.hasValidWeight) then
+      Left(
+        DomainError.InvariantViolation("features/reduce", "negative or non-finite sample weight")
+      )
+    else
+      NonEmptyVector.fromVector(samples) match
+        case None      => Right((Estimate.Missing(MissingReason.AllMissing), cov))
+        case Some(nev) =>
+          missing match
+            case MissingValuePolicy.Fail if cov.missing > 0 =>
+              Left(
+                DomainError.InvariantViolation("features/reduce", s"${cov.missing} missing samples")
+              )
+            case MissingValuePolicy.RequireMinCoverage(f) if cov.fraction < f =>
+              Right((Estimate.Missing(MissingReason.Excluded), cov))
+            case _ => Right((reducer.reduce(nev), cov))
 
 /** Aggregation of a token-aligned track over arbitrary (possibly discontinuous) supports, e.g. a
   * situation's or scene's `SpanSet`.
   */
 object Aggregate:
-  val implementationVersion = "aggregate-1"
+  val implementationVersion = "aggregate-2"
 
   def overTargets[T <: FeatureTarget](
       track: FeatureTrack[FeatureTarget.Token, Double],
@@ -220,6 +246,8 @@ object Aggregate:
       missing: MissingValuePolicy,
       lexicalOnly: Boolean = true
   ): Either[DomainError, FeatureTrack[T, Double]] =
+    val eligibility = if lexicalOnly then Eligibility.LexicalTokens else Eligibility.AllTokens
+    val family = targets.headOption.map((t, _) => TargetFamily.of(t))
     val derivation = FeatureDerivation(
       NonEmptyVector.one(track.space.id),
       None,
@@ -227,32 +255,38 @@ object Aggregate:
       reducer.weighting,
       missing,
       None,
-      implementationVersion
+      implementationVersion,
+      eligibility,
+      family
     )
     val red = WindowReducer.scalar(reducer)
-    targets
-      .traverse { (t, support) =>
-        val idx = sequence
-          .coveringIndices(support)
-          .filter(i => !lexicalOnly || sequence.tokens(i.value).isLexical)
-        val samples = idx.map { i =>
-          val est =
-            track.get(FeatureTarget.Token(i)).getOrElse(Estimate.Missing(MissingReason.Unknown))
-          Sample(i.value, est, 1.0)
+    val mixed = targets.map((t, _) => TargetFamily.of(t)).distinct.size > 1
+    if mixed then
+      Left(DomainError.InvariantViolation("features/aggregate", "targets of mixed families"))
+    else
+      targets
+        .traverse { (t, support) =>
+          val idx = sequence
+            .coveringIndices(support)
+            .filter(i => !lexicalOnly || sequence.tokens(i.value).isLexical)
+          val samples = idx.map { i =>
+            val est =
+              track.get(FeatureTarget.Token(i)).getOrElse(Estimate.Missing(MissingReason.Unknown))
+            Sample(i.value, est, 1.0)
+          }
+          Reduction
+            .reduce(samples, red, missing)
+            .map((est, cov) => FeatureObservation(t, est, Some(support), Some(cov)))
         }
-        Reduction
-          .reduce(samples, red, missing)
-          .map((est, cov) => FeatureObservation(t, est, Some(support), Some(cov)))
-      }
-      .map { obs =>
-        FeatureTrack(
-          Windowed.outputSpace(
-            track.space,
-            derivation,
-            s"${track.space.description} — aggregate ${reducer.id.value}"
-          ),
-          obs.sortBy(o => o.target: FeatureTarget),
-          Some(derivation),
-          track.provenance
-        )
-      }
+        .map { obs =>
+          FeatureTrack(
+            Windowed.outputSpace(
+              track.space,
+              derivation,
+              s"${track.space.description} — aggregate ${reducer.id.value}"
+            ),
+            obs.sortBy(o => o.target: FeatureTarget),
+            Some(derivation),
+            track.provenance
+          )
+        }

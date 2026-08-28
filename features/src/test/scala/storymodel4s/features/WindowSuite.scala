@@ -29,11 +29,15 @@ class WindowSuite extends ScalaCheckSuite:
       ScalarReducer.Slope
     )
     plain.foreach { r =>
-      assertEquals(red(r).reduce(allMissing), Estimate.Missing(MissingReason.Excluded), r.toString)
+      assertEquals(
+        red(r).reduce(allMissing),
+        Estimate.Missing(MissingReason.AllMissing),
+        r.toString
+      )
     }
     assertEquals(
       red(ScalarReducer.Kernel(KernelShape.Gaussian(1.0))).reduce(allMissing),
-      Estimate.Missing(MissingReason.Excluded)
+      Estimate.Missing(MissingReason.AllMissing)
     )
   }
 
@@ -84,7 +88,7 @@ class WindowSuite extends ScalaCheckSuite:
   test("slope needs two distinct positions; variance of one value is zero") {
     assertEquals(
       red(ScalarReducer.Slope).reduce(obs(3.0)),
-      Estimate.Missing(MissingReason.Excluded)
+      Estimate.Missing(MissingReason.Undefined(UndefinedReason.SlopeNeedsTwoPositions))
     )
     assertEquals(red(ScalarReducer.Variance).reduce(obs(3.0)).toOption, Some(0.0))
     assertEquals(red(ScalarReducer.Variance).reduce(obs(1.0, 3.0)).toOption, Some(1.0))
@@ -97,6 +101,63 @@ class WindowSuite extends ScalaCheckSuite:
     assertEqualsDouble(wide, 4.0, 1e-3)
     val rect = red(ScalarReducer.Kernel(KernelShape.Rectangular(5.0))).reduce(s).toOption.get
     assertEqualsDouble(rect, 4.0, 1e-9)
+  }
+
+  test("kernel with positive bandwidth never substitutes a sample outside its support") {
+    val s = NonEmptyVector.fromVectorUnsafe(
+      (0 to 10).toVector.map { i =>
+        val e: Estimate[Double] =
+          if i == 0 || i == 10 then Estimate.observed(i.toDouble)
+          else Estimate.Missing(MissingReason.NotInLexicon)
+        Sample(i, e, 1.0)
+      }
+    )
+    assertEquals(
+      red(ScalarReducer.Kernel(KernelShape.Rectangular(1.0))).reduce(s),
+      Estimate.Missing(MissingReason.Undefined(UndefinedReason.OutsideKernelSupport))
+    )
+    // a declared point mass (zero bandwidth) may fall back to the nearest observed sample
+    assertEquals(
+      red(ScalarReducer.Kernel(KernelShape.Rectangular(0.0))).reduce(s).toOption,
+      Some(0.0)
+    )
+    // a wide enough kernel sees both samples
+    assertEqualsDouble(
+      red(ScalarReducer.Kernel(KernelShape.Rectangular(5.0))).reduce(s).toOption.get,
+      5.0,
+      1e-9
+    )
+  }
+
+  test("non-finite observations are never measurements") {
+    assertEquals(
+      Estimate.score(Double.NaN),
+      Estimate.Missing(MissingReason.Undefined(UndefinedReason.NotFinite))
+    )
+    val nan = NonEmptyVector.of(Sample(0, Estimate.Observed(Double.NaN, None), 1.0))
+    assertEquals(
+      red(ScalarReducer.Mean).reduce(nan),
+      Estimate.Missing(MissingReason.Undefined(UndefinedReason.NotFinite))
+    )
+    val mixed = NonEmptyVector.of(
+      Sample(0, Estimate.Observed(Double.PositiveInfinity, None), 1.0),
+      Sample(1, Estimate.observed(2.0), 1.0)
+    )
+    assertEquals(red(ScalarReducer.Sum).reduce(mixed).toOption, Some(2.0))
+    val raw = imageabilityTrack()
+    val bad = raw.copy(observations =
+      raw.observations
+        .updated(0, raw.observations(0).copy(estimate = Estimate.Observed(Double.NaN, None)))
+    )
+    assert(FeatureTrack.validatedScores(raw).isRight)
+    assert(FeatureTrack.validatedScores(bad).isLeft)
+  }
+
+  test("negative sample weights are rejected by reduction") {
+    val ss = Vector(Sample(0, Estimate.observed(1.0), -1.0))
+    assert(
+      Reduction.reduce(ss, red(ScalarReducer.WeightedMean), MissingValuePolicy.IgnoreMissing).isLeft
+    )
   }
 
   test("weighted mean honours sample weights") {
@@ -114,7 +175,7 @@ class WindowSuite extends ScalaCheckSuite:
     )
     val (e1, c1) =
       Reduction.reduce(ss, red(ScalarReducer.Mean), MissingValuePolicy.IgnoreMissing).toOption.get
-    assertEquals(c1, Coverage(2, 1))
+    assertEquals(c1, Coverage.unsafe(2, 1))
     assertEquals(e1.toOption, Some(2.0))
     val (e2, _) = Reduction
       .reduce(ss, red(ScalarReducer.Mean), MissingValuePolicy.RequireMinCoverage(0.75))
@@ -131,7 +192,7 @@ class WindowSuite extends ScalaCheckSuite:
       .toOption
       .get
     assertEquals(c3, Coverage.empty)
-    assert(!e3.isObserved)
+    assertEquals(e3, Estimate.Missing(MissingReason.AllMissing))
   }
 
   test(
@@ -199,6 +260,39 @@ class WindowSuite extends ScalaCheckSuite:
     )
   }
 
+  test("coverage counts only lexical tokens as eligible under a sentence basis") {
+    val raw = imageabilityTrack()
+    val plan = WindowPlan.sentences(1, 1)
+    val lexical = Windowed(
+      raw,
+      sequence,
+      plan,
+      ScalarReducer.Mean,
+      MissingValuePolicy.IgnoreMissing
+    ).toOption.get
+    val all = Windowed(
+      raw,
+      sequence,
+      plan,
+      ScalarReducer.Mean,
+      MissingValuePolicy.IgnoreMissing,
+      Eligibility.AllTokens
+    ).toOption.get
+    lexical.observations.zip(all.observations).foreach { (l, a) =>
+      val lexicalCount = sequence.slice(l.target.range).count(_.isLexical)
+      assertEquals(l.coverage.get.eligible, lexicalCount)
+      assert(a.coverage.get.eligible >= lexicalCount)
+    }
+    assert(
+      lexical.observations.exists(o =>
+        o.coverage.get.eligible < all.byTarget(o.target).coverage.get.eligible
+      )
+    )
+    assertNotEquals(lexical.space.id, all.space.id)
+    assertEquals(lexical.derivation.get.eligibility, Eligibility.LexicalTokens)
+    assertEquals(lexical.derivation.get.targetFamily, Some(TargetFamily.Window))
+  }
+
   test("aggregate over discontinuous supports") {
     val raw = imageabilityTrack()
     val s0 = atlas.sentences(0).span
@@ -222,6 +316,28 @@ class WindowSuite extends ScalaCheckSuite:
     assertEquals(o.coverage.get.eligible, eligible)
     assert(o.estimate.isObserved)
     assert(o.estimate.toOption.get > 4.0) // concrete sentences
+    // lexicalOnly is part of the recipe: the two variants have distinct ids
+    val aggAll = Aggregate
+      .overTargets(
+        raw,
+        sequence,
+        Vector((FeatureTarget.Situation(sid), disc)),
+        ScalarReducer.Mean,
+        MissingValuePolicy.IgnoreMissing,
+        lexicalOnly = false
+      )
+      .toOption
+      .get
+    assertNotEquals(agg.space.id, aggAll.space.id)
+    assertEquals(agg.derivation.get.targetFamily, Some(TargetFamily.Situation))
+    assert(
+      DerivationGraph.empty
+        .add(agg.space.id, agg.derivation.get)
+        .toOption
+        .get
+        .add(aggAll.space.id, aggAll.derivation.get)
+        .isRight
+    )
   }
 
   test("track validation: duplicate or unordered targets rejected; restrict and zip work") {

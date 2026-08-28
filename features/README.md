@@ -41,3 +41,18 @@ Depends only on `core`. Portable: JVM, Scala.js, Native.
 - `align` uses `ScoreEstimate`/`Coverage` for support densities and importance weights.
 - `recall`/`interview` traverse `TranscriptAtlas` for participant-only and post-probe material.
 - Providers (M1) emit **raw** tracks only; all smoothing/aggregation happens here with a recipe.
+
+## Invariants added in the review fix pass
+
+- Doubles inside recipe ids and config hashes are rendered by IEEE-754 bit pattern
+  (`CanonicalDouble.render`), so `derivationId` is identical on JVM, Scala.js and Native.
+- `FeatureDerivation` includes `eligibility` and `targetFamily`; `outputSpaceId` is a fixed-length
+  content address (`derived:<32 hex>`), never a growing path.
+- Kernel reducers never substitute a sample outside the kernel support; only a declared
+  zero-bandwidth point mass may fall back to the nearest sample. All-missing supports yield
+  `Missing(AllMissing)`; undefined operations yield `Missing(Undefined(reason))`.
+- `Estimate.score` and `FeatureTrack.validatedScores` keep NaN/±∞ out of observations;
+  `Coverage.of` validates counts; negative sample weights fail `Reduction.reduce`.
+- `BoundaryEvidence.inputSpaces` is per signal, and a `BoundaryScore` can only be obtained via
+  `FeatureUseLedger.scoreBoundary`, which records the feature use it depends on (§116).
+

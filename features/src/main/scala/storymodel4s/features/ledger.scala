@@ -29,6 +29,26 @@ final case class FeatureUseLedger private (uses: Vector[FeatureUse]):
   }
   def size: Int = uses.size
 
+  /** Score one candidate boundary for an induction stage, recording the feature use that fed it.
+    *
+    * This is the only way to obtain a [[BoundaryScore]]: the ledger entry and the score are
+    * produced together, so an induction step cannot forget to declare its inputs. Returns the same
+    * ledger and `None` when no weighted signal is observed at the evidence's level (nothing was
+    * used, so nothing is recorded).
+    */
+  def scoreBoundary(
+      weights: BoundaryBeliefInput,
+      evidence: BoundaryEvidence,
+      stage: StageId,
+      excluded: Set[FeatureSpaceId] = Set.empty
+  ): (FeatureUseLedger, Option[BoundaryScore]) =
+    weights.rawScoreUnrecorded(evidence) match
+      case None      => (this, None)
+      case Some(raw) =>
+        val use = FeatureUse(UsePurpose.Induction(stage), weights.usedSpaces(evidence), excluded)
+        val score = BoundaryScore(evidence.target, evidence.level, raw, use)
+        (record(use), Some(score))
+
 object FeatureUseLedger:
   val empty: FeatureUseLedger = FeatureUseLedger(Vector.empty)
 

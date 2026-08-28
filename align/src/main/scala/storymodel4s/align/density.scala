@@ -47,7 +47,7 @@ final case class Density(unit: RecallUnitId, grid: Vector[Double], values: Vecto
               FeatureTarget.Window(TokenRange.unsafe(start, end)),
               Estimate.observed(values(k)),
               None,
-              Some(Coverage(eligible, math.min(eligible, contributing)))
+              Coverage.of(eligible, math.min(eligible, contributing)).toOption
             )
           )
       }
