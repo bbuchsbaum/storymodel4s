@@ -1,0 +1,1 @@
+{"actor":"claude-storymodel4s","entity":"bd-01M14K853WRGGZ2Y5YZ9KWXM6H","kind":"note","note_kind":"progress","op":"20260828T163408.215655Z-p91906-c0003-r83e6-hd44fdb","text":"Implementing core Address protocol (ModuleTag, AddressKey, Address, Addressable) per ADR 0002 §4; view-side coproduct left to view bead","ts":"2026-08-28T16:34:08.215655Z","v":1}
