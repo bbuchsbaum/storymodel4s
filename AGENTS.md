@@ -109,7 +109,12 @@ was set by the owner on 2026-08-28 (sticky decision
    `mote begin <bead> --paths …` before editing (`mote preflight` first);
    never edit another actor's live reservation — send a request instead.
    `build.sbt`, `AGENTS.md`, and `README.md` edits are announced on
-   `coordination` before they are made.
+   `coordination` before they are made. `docs/adr/*.md` are exempt from
+   single-holder reservation for paragraph-disjoint edits: edit only the
+   paragraph your bead names, announce it, include the hunk in your candidate;
+   the chief resolves textual overlap at merge. Mote syncs commit with an
+   explicit pathspec (`git commit -- .mote/ops`), never the whole index, and
+   candidates stay unstaged in the shared tree until the chief's ack.
 5. **Working together (owner directive, 2026-08-28).** Keep work clean and
    commit when it is safe and feasible — do not let green work sit
    uncommitted in the shared tree. Don't step on toes. Collaborate and

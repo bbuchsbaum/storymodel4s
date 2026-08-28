@@ -155,6 +155,42 @@ final case class LatePoolingRecipe(
       matryoshkaDimension.fold("full")(_.toString)
     )
 
+  private[embed] def compatibilityKey: LatePoolingCompatibilityKey =
+    LatePoolingCompatibilityKey(
+      tokenizerFingerprint,
+      contextLimit,
+      window,
+      stride,
+      overlapMerge,
+      pooling,
+      uncovered,
+      matryoshkaDimension
+    )
+
+/** The late-pooling fields that must agree before two vector spaces can be compared. */
+private[embed] final case class LatePoolingCompatibilityKey(
+    tokenizerFingerprint: Fingerprint,
+    contextLimit: Int,
+    window: Int,
+    stride: Int,
+    overlapMerge: String,
+    pooling: PoolingRule,
+    uncovered: UncoveredPolicy,
+    matryoshkaDimension: Option[Int]
+):
+  def mismatch(other: LatePoolingCompatibilityKey): Option[String] =
+    if tokenizerFingerprint != other.tokenizerFingerprint then
+      Some("different late-pooling tokenizer fingerprints")
+    else if contextLimit != other.contextLimit then Some("different late-pooling context limits")
+    else if window != other.window then Some("different late-pooling windows")
+    else if stride != other.stride then Some("different late-pooling strides")
+    else if overlapMerge != other.overlapMerge then Some("different late-pooling overlap merges")
+    else if pooling != other.pooling then Some("different late-pooling pooling rules")
+    else if uncovered != other.uncovered then Some("different late-pooling uncovered policies")
+    else if matryoshkaDimension != other.matryoshkaDimension then
+      Some("different late-pooling matryoshka dimensions")
+    else None
+
 object LatePoolingRecipe:
   def validated(r: LatePoolingRecipe): Either[EmbedError, LatePoolingRecipe] =
     if r.contextLimit <= 0 then Left(EmbedError.InvalidRecipe("contextLimit must be positive"))
@@ -303,26 +339,81 @@ object EmbeddingSpace:
 
   given Show[EmbeddingSpace] = Show.show(s => s"EmbeddingSpace(${s.id.value})")
 
-/** A validated query/document pair whose vectors may be compared. */
-final case class GeometryPair private (query: GeometryId, document: GeometryId)
+/** A named policy that makes intentional query/document modelling asymmetry inspectable. */
+enum GeometryPairRule:
+  /** Requires both the semantic view and instruction digest to match. */
+  case IdenticalModelling
+
+  /** Permits only the semantic view to differ; instruction digests must match. */
+  case AllowViewDifference
+
+  /** Permits only the instruction digest to differ; semantic views must match. */
+  case AllowInstructionDifference
+
+  /** Permits both the semantic view and instruction digest to differ. */
+  case AllowViewAndInstructionDifference
+
+  private[embed] def permitsViewDifference: Boolean = this match
+    case AllowViewDifference | AllowViewAndInstructionDifference => true
+    case IdenticalModelling | AllowInstructionDifference         => false
+
+  private[embed] def permitsInstructionDifference: Boolean = this match
+    case AllowInstructionDifference | AllowViewAndInstructionDifference => true
+    case IdenticalModelling | AllowViewDifference                       => false
+
+/** A validated query/document pair whose vectors may be compared under its recorded rule. */
+final case class GeometryPair private (
+    query: GeometryId,
+    document: GeometryId,
+    rule: GeometryPairRule
+)
 
 object GeometryPair:
-  /** Compatible iff both come from the same provider, dimension, normalization, truncation and
-    * late-pooling recipe, with roles Query and Document respectively. Views may differ (a recall
-    * unit's surface may be compared to a node's gloss) — that is a modelling choice recorded in the
-    * pair, not an error.
+  private final case class CompatibilityKey(
+      provider: ProviderFingerprint,
+      dimension: Dimension,
+      normalization: Normalization,
+      truncation: TruncationPolicy,
+      latePooling: Option[LatePoolingCompatibilityKey]
+  ):
+    def mismatch(other: CompatibilityKey): Option[String] =
+      if provider != other.provider then Some("different providers")
+      else if dimension != other.dimension then Some("different dimensions")
+      else if normalization != other.normalization then Some("different normalizations")
+      else if truncation != other.truncation then Some("different truncation policies")
+      else
+        (latePooling, other.latePooling) match
+          case (None, None)                      => None
+          case (Some(left), Some(right))         => left.mismatch(right)
+          case (None, Some(_)) | (Some(_), None) => Some("different late-pooling presence")
+
+  private def compatibilityKey(space: EmbeddingSpace): CompatibilityKey =
+    CompatibilityKey(
+      space.provider,
+      space.dimension,
+      space.normalization,
+      space.truncation,
+      space.latePooling.map(_.compatibilityKey)
+    )
+
+  /** Compatible iff both spaces have the same hard compatibility key and Query/Document roles. View
+    * or instruction differences require an explicit named rule. Input document identity and
+    * derivation parentage remain recipe provenance rather than coordinate compatibility.
     */
-  def validated(query: EmbeddingSpace, document: EmbeddingSpace): Either[EmbedError, GeometryPair] =
+  def validated(
+      query: EmbeddingSpace,
+      document: EmbeddingSpace,
+      rule: GeometryPairRule
+  ): Either[EmbedError, GeometryPair] =
     def bad(reason: String) =
       Left(EmbedError.IncompatibleSpaces(query.id.value, document.id.value, reason))
     if query.role != Role.Query then bad("query space does not have role Query")
     else if document.role != Role.Document then bad("document space does not have role Document")
-    else if query.provider != document.provider then bad("different providers")
-    else if query.dimension != document.dimension then bad("different dimensions")
-    else if query.normalization != document.normalization then bad("different normalizations")
-    else if query.truncation != document.truncation then bad("different truncation policies")
-    else if query.latePooling.map(_.matryoshkaDimension) != document.latePooling.map(
-        _.matryoshkaDimension
-      )
-    then bad("different late-pooling dimensions")
-    else Right(GeometryPair(query.id, document.id))
+    else if query.view != document.view && !rule.permitsViewDifference then
+      bad("different views require a rule that permits view asymmetry")
+    else if query.instruction != document.instruction && !rule.permitsInstructionDifference then
+      bad("different instructions require a rule that permits instruction asymmetry")
+    else
+      compatibilityKey(query).mismatch(compatibilityKey(document)) match
+        case Some(reason) => bad(reason)
+        case None         => Right(GeometryPair(query.id, document.id, rule))

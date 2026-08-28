@@ -54,13 +54,16 @@ final case class EmbeddingSpace(                        // per recipe; a Feature
   dimension: Dimension, normalization: Normalization,
   truncation: TruncationPolicy,
   latePooling: Option[LatePoolingRecipe])
-final case class GeometryPair(query: GeometryId, document: GeometryId)   // validated compatible pair
+final case class GeometryPair(                                           // validated compatible pair
+  query: GeometryId, document: GeometryId, rule: GeometryPairRule)
 ```
 
 - `Embedder.info: EmbedderInfo(provider, capabilities)` is static; `Embedder.spaces`
   enumerates the recipes it can serve; a request references a `GeometryId`;
   every result returns the `GeometryId` it was produced in.
-- Query/Document compatibility is a validated `GeometryPair`, not prose.
+- Query/Document compatibility is a validated `GeometryPair`, not prose; its
+  closed `GeometryPairRule` may permit named view or instruction asymmetries,
+  but never waive any field of the hard compatibility key.
 - Matryoshka truncations are **derived re-normalized spaces** with their own
   `GeometryId` (parent recorded in the derivation).
 - Free baselines fingerprint their corpus (TF-IDF), hash function, seed, and
