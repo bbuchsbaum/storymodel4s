@@ -3,7 +3,7 @@
 ## Record status
 
 - **Purpose:** Preserve the complete substance and evolution of a multipart discussion, ending in a concrete plan for a library implementation.
-- **Current coverage:** Parts 1–4 plus AMR reference/fit, automation, autonomous-agent, and AMR-boundary review checkpoints.
+- **Current coverage:** Parts 1–4 plus AMR reference/fit, automation, autonomous-agent, AMR-boundary, and multiscale surface/feature-track checkpoints.
 - **Status:** Initial conceptual proposal; nothing here is yet a final implementation decision.
 - **Note-taking rule:** Later parts should add dated/numbered evolution entries, record agreements and revisions explicitly, and retain superseded ideas with their rationale rather than silently rewriting history.
 - **Provisional framework name:** **Narrative Process Alignment (NPA)**.
@@ -112,6 +112,12 @@ Runtime uncertainty is represented automatically as accepted claims, weighted al
 The reviewed proposal is directionally correct but changes architecture, not merely emphasis. The canonical local representation should be a provider-neutral `PropositionChart`; standards-compatible AMR/PENMAN is one adapter and schema-constrained agent extraction is another. `document`, `story`, `recall`, and `interview` should depend on the proposition contract, not directly on AMR conformance or successful PropBank frame lookup.
 
 The acquisition claim that LLM proposition extraction will outperform AMR parsers on spoken recall is plausible but unproven and must be evaluated. The previously proposed hand-AMR spike is rejected: use existing gold standards, automatically acquired charts, plain-language expected facts, and controlled foils. Measure both oracle structural value and fully automatic acquisition value.
+
+### Decision checkpoint — One anchored surface axis, several structures and signals
+
+Fine-grained language, continuous descriptive signals, and higher-order narrative structure should not be forced into one graph or one segmentation. They should share an immutable ordered surface coordinate system. Sentence/clause proposition charts, canonical situations, scenes/episodes, transcript turns, and scalar or vector feature tracks all point back to exact surface support. This permits movement in both directions: words and windows can be summarized into narrative units, while scenes or events can be inspected down to their supporting words.
+
+The current `SurfaceAtlas` already supplies the basic ordered token/sentence traversal and exact span lookup. The missing cross-cutting mechanism is a typed feature-track and window-reduction layer, plus explicit boundary evidence and discourse-to-world-time transition types. Those are now considered fundamental inputs to narrative induction, not merely optional post-hoc analytics. A resolved hierarchy remains a derived interpretation; the raw feature tracks, graph-change tracks, boundary beliefs, and alternative temporal interpretations must remain independently inspectable.
 
 ---
 
@@ -4356,8 +4362,6 @@ The checked-in roadmap is internally inconsistent with the latest decision:
 
 Closure recommendation: reconcile the roadmap, local `AGENTS.md`, module names/dependencies, M0 scope, and fixture policy **before any `amr` source code lands**.
 
----
-
 # Reconciliation Record — 2026-08-28 (plan revision 2)
 
 ## 105. Closure of the §104 inconsistencies
@@ -4372,3 +4376,504 @@ The checked-in roadmap (`docs/plans/2026-08-28-architecture-and-roadmap.md`, rev
 6. **Parser skepticism** is recorded as a benchmark hypothesis with two acquisition profiles (§101), not a design fact.
 
 Superseded: roadmap revision 1's opening diagram, module table, and M0 scope (retained in git history).
+
+---
+
+# Multiscale Surface and Feature-Track Checkpoint — 2026-08-28
+
+## 106. Multiscale structure needs a shared coordinate system, not one universal node type
+
+The fine-grained and higher-order views are complementary projections over the same evidence. The unifying object is an exact, immutable **surface axis**:
+
+\[
+w_0,w_1,\ldots,w_{n-1},
+\]
+
+where the elements are ordered surface tokens with exact source spans. Sentences, clauses, paragraphs, speaker turns, propositions, situations, segments, and feature observations are all anchored to this axis through a `TextSpan` or discontinuous `SpanSet`.
+
+Above that axis, keep distinct layers:
+
+1. **Surface atlas:** exact text, tokens, sentences, clauses, paragraphs, and later transcript turns.
+2. **Local proposition charts:** sentence/clause-level concepts, predicates, arguments, polarity, modality cues, and embedded propositions.
+3. **Document identity and context:** cross-sentence entity/event identity, reported speech, belief, memory, and other scopes.
+4. **Narrative process graph:** canonical situations plus temporal, causal, goal, entity, spatial, and reference relations.
+5. **Hierarchy:** atomic situations grouped into scenes, episodes, and the story root; auxiliary arcs may overlap or be discontinuous.
+6. **Feature tracks:** scalar or vector observations aligned to tokens, spans, situations, segments, or gaps between units.
+7. **Boundary and transition beliefs:** probabilistic interpretations derived from graph changes, feature changes, and discourse cues.
+
+The key design constraint is bidirectional traceability:
+
+- from a word or window, retrieve covering propositions, situations, segments, claims, and features;
+- from a scene or event, recover every supporting word/span and all feature values aggregated over that support.
+
+This avoids two common mistakes. A graph-only system loses gradual flow, and a signal-only system loses predicate roles, identity, scope, and nonlocal relations.
+
+## 107. What the current surface implementation already provides
+
+The checked-in `core` implementation already supplies a useful primitive traversal API:
+
+```scala
+atlas.tokens: Vector[SurfaceUnit]
+atlas.sentences: Vector[SurfaceUnit]
+atlas.paragraphs: Vector[SurfaceUnit]
+atlas.childrenOf(id): Vector[SurfaceUnit]
+atlas.parentOf(unit): Option[SurfaceUnit]
+atlas.unitAt(offset, kind): Option[SurfaceUnit]
+atlas.unitsOverlapping(span, kind): Vector[SurfaceUnit]
+atlas.text(unit): String
+```
+
+Because tokens and sentences are ordered vectors, ordinary Scala traversal is already possible:
+
+```scala
+atlas.tokens.iterator
+atlas.tokens.sliding(20)
+atlas.sentences.zipWithIndex
+atlas.unitsOverlapping(segment.support.minSpan, SurfaceUnitKind.Token)
+```
+
+The atlas validates that ordinals agree with span/discourse order. `TextSpan` is zero-based, half-open, and measured in UTF-16 coordinates. `SpanSet` represents nonempty, possibly discontinuous support, which is important for event recurrence and later retelling.
+
+Current limitations are explicit:
+
+- `tokens` include punctuation, so there is not yet a dedicated lexical-word view;
+- a token does not yet expose a typed class such as word, number, punctuation, or symbol;
+- there is no purpose-built cursor API for previous/next/context operations;
+- there is no reusable typed window plan or boundary policy;
+- transcript speaker turns, prompt phases, and audio-time spans are not yet surface units;
+- feature observations and window-derived tracks are not yet implemented.
+
+The existing `Vector` API is sufficient as the lawful primitive. Convenience traversal should be built on it rather than replacing it with a mutable stream or cursor as the authoritative representation.
+
+## 108. Proposed word traversal and window interface
+
+Add a typed lexical view while preserving the original token sequence:
+
+```scala
+enum TokenClass:
+  case Word, Number, Punctuation, Symbol, Other
+
+final case class TokenView(
+  unit: SurfaceUnit,
+  tokenClass: TokenClass,
+  normalized: Option[String]
+)
+
+opaque type TokenIndex = Int
+```
+
+The atlas or a derived `SurfaceSequence` should expose:
+
+```scala
+trait SurfaceSequence:
+  def tokens: IndexedSeq[TokenView]
+  def lexicalTokens: IndexedSeq[TokenView]
+  def at(index: TokenIndex): Option[TokenView]
+  def previous(index: TokenIndex): Option[TokenView]
+  def next(index: TokenIndex): Option[TokenView]
+  def covering(span: SpanSet): Vector[TokenView]
+  def windows(plan: WindowPlan): Iterator[SurfaceWindow]
+```
+
+A `SurfaceWindow` is a view, not copied text:
+
+```scala
+final case class SurfaceWindow(
+  tokenRange: TokenRange,
+  lexicalTokenCount: Int,
+  support: SpanSet
+)
+```
+
+The minimal window plan needs:
+
+```scala
+final case class WindowPlan(
+  width: PositiveInt,
+  step: PositiveInt,
+  basis: WindowBasis,
+  edgePolicy: EdgePolicy
+)
+
+enum WindowBasis:
+  case AllTokens
+  case LexicalTokens
+  case Sentences
+```
+
+Centered contexts and variable kernels can be added as derived plans. The first API should make the common operations—20 words every 5 words, one sentence at a time, or a centered ±10-word context—obvious and lawful.
+
+A lightweight immutable `SurfaceCursor` may be useful for interactive inspection and parsers, but should remain a convenience wrapper over `(atlas, TokenIndex)`. Scientific computation should prefer explicit ranges/windows so that support and edge behavior are visible in receipts.
+
+## 109. Feature tracks are the general mechanism for imageability and related signals
+
+Imageability is one instance of a general **aligned feature track**. A track binds a declared feature space to observations on a declared target domain:
+
+```scala
+final case class FeatureSpace[V](
+  id: FeatureSpaceId,
+  description: String,
+  valueSchema: FeatureValueSchema,
+  units: Option[String],
+  provider: ModelFingerprint,
+  normalized: Boolean
+)
+
+final case class FeatureObservation[T, V](
+  target: T,
+  support: SpanSet,
+  estimate: Estimate[V],
+  evidence: Vector[EvidenceRef]
+)
+
+final case class FeatureTrack[T, V](
+  space: FeatureSpace[V],
+  observations: Vector[FeatureObservation[T, V]],
+  receipt: FeatureReceipt
+)
+```
+
+Target types may include:
+
+- `TokenTarget` for word-level imageability or lexical frequency;
+- `SurfaceUnitTarget` for sentence-level sentiment or embedding vectors;
+- `SituationTarget` for proposition/event embeddings and sensory profiles;
+- `SegmentTarget` for scene or episode summaries;
+- `BoundaryTarget` for change evidence at gaps;
+- `AudioIntervalTarget` or recall-time targets in later phases.
+
+The value can be a scalar, dense vector, sparse vector, categorical distribution, or a domain-specific record. Scala type parameters should prevent accidentally treating a scalar imageability track as an embedding matrix. Feature-space identifiers, dimensions, normalization, and provider versions remain runtime data because the spaces are open and versioned.
+
+Missingness must be first-class. Punctuation, out-of-vocabulary words, names, and uncertain lexicon matches must not silently receive zero imageability. `Estimate[V]` should carry value, uncertainty when available, and a typed missing reason or coverage status.
+
+Small scalar and structured profiles can live in canonical artifacts. Large dense vectors belong in sidecars referenced by `FeatureRef`. In either case, the logical track and its provenance are part of the model.
+
+## 110. Windowed and segment-level features are derived tracks with recipes
+
+Given token observations $x_j$, a windowed scalar track can be written:
+
+\[
+\tilde x_k
+=
+\operatorname{Reduce}
+\left(
+\{(\omega_{kj},x_j):w_j\in W_k\}
+\right).
+\]
+
+The reducer should be a declared operation, not an anonymous preprocessing step:
+
+```scala
+trait WindowReducer[V, O]:
+  def reduce(values: NonEmptyVector[WeightedEstimate[V]]): Estimate[O]
+
+enum ScalarReducer:
+  case Sum
+  case Mean
+  case WeightedMean
+  case Maximum
+  case Variance
+  case Slope
+```
+
+For an imageability track, useful derived outputs include:
+
+- total imageability mass in a window;
+- mean imageability among covered lexical tokens;
+- imageability density per word or per second;
+- variance or upper quantiles, which distinguish uniformly concrete passages from passages with one vivid word;
+- local slope or first difference;
+- smoothed convolution using a rectangular, triangular, or Gaussian kernel;
+- coverage count and fraction.
+
+Summation alone is confounded by the number of words and lexicon coverage. Therefore every aggregate should retain at least the number of eligible targets, number observed, coverage fraction, and window support. Mean/density and sum answer different questions and should be kept separately.
+
+Every derived track records an executable recipe:
+
+```scala
+final case class FeatureDerivation(
+  inputs: NonEmptyVector[FeatureSpaceId],
+  window: Option[WindowPlan],
+  reducer: ReducerId,
+  weighting: WeightingPolicy,
+  missing: MissingValuePolicy,
+  normalization: Option[NormalizationPolicy],
+  implementationVersion: String
+)
+```
+
+This recipe forms a dependency DAG. It supports content-addressed caching, exact replay, graph-aware diffing, and detection of stale descendants after an input/model change.
+
+Aggregation over an event or scene uses the same machinery, replacing a regular window with that node's `SpanSet`. Discontinuous support is valid: a motif or retrospective event can aggregate over several separate surface regions without pretending they are contiguous.
+
+## 111. Sentence-level semantics and narrative hierarchy
+
+Fine-grained structure is captured locally and then composed; it is not discarded when higher-level units are created:
+
+\[
+\text{tokens/spans}
+\rightarrow
+\text{proposition charts}
+\rightarrow
+\text{canonical situations}
+\rightarrow
+\text{scenes}
+\rightarrow
+\text{episodes/story}.
+\]
+
+The links are explicit many-to-many projections:
+
+- one sentence may express several propositions;
+- one proposition may have discontinuous or cross-sentence support;
+- several mentions may project to one canonical situation;
+- one situation can participate in a scene and several auxiliary arcs;
+- one summary proposition can refer to an entire segment rather than one child.
+
+The primary segmentation hierarchy is nested and primarily discourse-contiguous:
+
+\[
+\text{situation}\subset\text{scene}\subset\text{episode}\subset\text{story}.
+\]
+
+Auxiliary structures—goal arc, character thread, location thread, motif, theme—are allowed to overlap and to have discontinuous membership. They must not be forced into the primary tree.
+
+Higher levels never replace their children. A scene stores a summary claim, membership edges, evidence/support, alternative boundaries, and derived feature views. The atomic charts and exact source remain available for inspection and alignment.
+
+## 112. Scene changes are boundary beliefs supported by heterogeneous evidence
+
+At each eligible gap $g_i$ between adjacent atomic discourse units, construct a typed evidence vector:
+
+\[
+b_i=
+[
+\Delta_{\mathrm{semantic}},
+\Delta_{\mathrm{proposition}},
+\Delta_{\mathrm{entity}},
+\Delta_{\mathrm{location}},
+\Delta_{\mathrm{context}},
+\Delta_{\mathrm{world-time}},
+\Delta_{\mathrm{goal}},
+\Delta_{\mathrm{sensory}},
+\Delta_{\mathrm{affect}},
+\Delta_{\mathrm{imageability}},
+\text{discourse cues},
+\text{provider votes}
+].
+\]
+
+Examples:
+
+- entity turnover can indicate a cast change;
+- a new location plus a forward time jump strongly supports a scene boundary;
+- return from reported speech or memory to the narrated world changes context;
+- semantic/vector discontinuity captures changes not present in the symbolic graph;
+- imageability or sensory change can characterize a transition but is not assumed to be a boundary by itself;
+- explicit phrases such as “three years later” or “back at the house” provide surface evidence.
+
+Store each component separately, then derive:
+
+```scala
+final case class BoundaryEvidence(
+  gap: BoundaryTarget,
+  components: Map[BoundaryFeatureId, ScoreEstimate],
+  claims: Vector[ClaimId]
+)
+
+final case class BoundaryBelief(
+  gap: BoundaryTarget,
+  level: HierarchyLevel,
+  rawScore: Double,
+  calibratedProbability: Option[Probability],
+  evidence: NonEmptyVector[EvidenceRef]
+)
+```
+
+The resolved hierarchy is selected from these beliefs under constraints such as nestedness, root coverage, and nonempty segments. Unselected boundary beliefs remain in the artifact. Thus a scene tree is one versioned interpretation, not the erased source of truth.
+
+## 113. Jumps, flashbacks, and reversals require two temporal structures
+
+Discourse order and story-world time must remain independent.
+
+Suppose situation $e_a$ is mentioned and the next discourse unit describes $e_b$. The surface atlas gives a deterministic discourse adjacency:
+
+\[
+e_a\rightarrow_D e_b.
+\]
+
+The temporal graph may infer:
+
+\[
+e_b\prec_W e_a.
+\]
+
+That combination—not a reversed token sequence—is what identifies a backward world-time jump or flashback.
+
+A discourse `FlowStep` should retain both continuous change and a typed temporal interpretation:
+
+```scala
+enum WorldTimeTransition:
+  case Continues
+  case JumpForward(magnitude: Option[DurationEstimate])
+  case JumpBackward(magnitude: Option[DurationEstimate])
+  case ReturnFromEarlierFrame
+  case SimultaneousThreadSwitch
+  case Atemporal
+  case Unresolved(alternatives: Vector[TemporalHypothesis])
+
+final case class FlowStep(
+  from: AtomicDiscourseTarget,
+  to: AtomicDiscourseTarget,
+  featureChanges: Map[FeatureSpaceId, ScoreEstimate],
+  entityTurnover: ScoreEstimate,
+  locationChange: ClaimEstimate[Boolean],
+  contextChange: ClaimEstimate[Boolean],
+  worldTime: ClaimEstimate[WorldTimeTransition],
+  boundaryBeliefs: Vector[BoundaryBelief]
+)
+```
+
+Story-world time is usually a partial order, not a fully observed numerical axis. A layout coordinate may be derived for visualization, but it cannot replace typed relations such as `Before`, `Overlaps`, `During`, and `Unclear`. The system should preserve alternative temporal readings rather than manufacture a precise jump magnitude.
+
+This representation distinguishes:
+
+- a real flashback from a retrospective mention of an earlier event;
+- a backward jump from a return to the main timeline;
+- intercut simultaneous threads from chronological reversal;
+- presentation-order disruption from causal-order violation;
+- a thematic recurrence from an event coreference claim.
+
+## 114. Transcript traversal is an overlay on the same atlas
+
+For recall and interview transcripts, add a `TranscriptAtlas` or typed annotation layer rather than changing the meaning of story-text units:
+
+```scala
+final case class TranscriptTurn(
+  id: TurnId,
+  speaker: SpeakerId,
+  support: SpanSet,
+  audio: Option[AudioSpan],
+  phase: Option[InterviewPhase],
+  prompt: Option[PromptId]
+)
+
+final case class TranscriptAtlas(
+  surface: SurfaceAtlas,
+  turns: Vector[TranscriptTurn]
+)
+```
+
+Tokens and propositions remain addressable in text coordinates, while optional audio timing enables tracks for pause duration, speaking rate, latency, prosody, and retrieval dynamics. Speaker and prompt filters should make it easy to traverse only participant words, free-recall words, or post-probe material.
+
+The same feature-track machinery can then align values to:
+
+- lexical tokens;
+- participant speaking time;
+- utterances/turns;
+- recall propositions;
+- interviewer probes;
+- gaps and pauses.
+
+Content scores and audio/retrieval-dynamics tracks remain separate because the latter are influenced by language, hearing, motor production, recording conditions, and interviewer behavior.
+
+## 115. Core analytical queries enabled by the design
+
+The combined mechanism should support queries such as:
+
+```scala
+features.values(imageability, tokenRange)
+features.aggregate(imageability, scene.support, Mean)
+features.windowed(imageability, WindowPlan.words(width = 20, step = 5))
+features.change(semanticContextual, discourseGap)
+story.covering(token.id)
+story.supporting(scene.id)
+story.worldTimeTransition(flowStep.id)
+story.boundaryEvidence(gap.id)
+story.segmentFeatureMatrix(level = Scene, spaces = requestedSpaces)
+```
+
+Scientifically useful products include:
+
+- imageability, sensory, affective, entity-density, and semantic trajectories over discourse;
+- distributions of feature values within and across scenes;
+- change-point evidence and uncertainty at every possible boundary;
+- segment-by-feature matrices for behavioral or neural analysis;
+- comparison of feature peaks with event boundaries;
+- recurrence and motif signals at nonadjacent locations;
+- source-versus-recall trajectory comparisons;
+- feature-conditioned coverage, compression, and omission measures.
+
+The same feature can play three roles, which must be declared:
+
+1. **descriptive:** characterize an already constructed story/segment;
+2. **inductive:** provide evidence to the hierarchy or relation resolver;
+3. **predictive:** explain behavioral, alignment, or neural outcomes.
+
+## 116. Prevent circular analysis and feature leakage
+
+If imageability helps define scene boundaries and the subsequent analysis asks whether imageability changes at scene boundaries, the result is partly guaranteed by construction. The artifact therefore needs a feature-dependency and use ledger.
+
+At minimum:
+
+- raw provider tracks remain immutable;
+- every smoothed or aggregated track records its derivation recipe;
+- every boundary/hierarchy build records the exact input feature spaces;
+- analyses can request boundaries constructed without the tested feature;
+- learned boundary weights are fit and evaluated leave-story-out;
+- exploratory and confirmatory feature uses are labeled;
+- calibration/model versions and normalization populations are receipted;
+- no feature derived from a target outcome is allowed to leak into source induction.
+
+Where a feature is both scientifically interesting and useful for induction, use ablations, held-out estimation, cross-fitting, or an independently annotated boundary set.
+
+## 117. Revised module boundary and implementation priority
+
+Feature tracks are not owned solely by `story`: source text, recall, autobiographical interviews, audio, and later video all need them. Add a provider-neutral cross-cutting module—provisionally `features`—that depends only on `core` and owns:
+
+- typed feature spaces and targets;
+- scalar/vector/distribution estimates;
+- missingness and coverage;
+- aligned tracks;
+- window plans and reducers;
+- derivation recipes and dependency DAGs;
+- sidecar manifests/references;
+- feature-level laws.
+
+Suggested dependency direction:
+
+```text
+core (source atlas, spans, token coordinates)
+  ├── proposition
+  ├── features
+  └── acquire/provider APIs
+
+story <- core + proposition + features
+document/recall/interview <- core + proposition + features + story as needed
+provider-embed/provider-onnx -> features
+align -> story + recall + features
+```
+
+`core` should add only the minimal token-classification and explicit window-coordinate primitives necessary to make traversal stable. Numerical reduction, feature manifests, and derived tracks stay outside `core`.
+
+Implementation priority before narrative induction:
+
+1. preserve the current exact `SurfaceAtlas` laws;
+2. add lexical-token classification and typed token ranges;
+3. implement generic aligned scalar tracks and window aggregation with coverage;
+4. add vector sidecar references and derivation receipts;
+5. define `BoundaryTarget`, `BoundaryEvidence`, and `WorldTimeTransition`;
+6. build hierarchy inference over symbolic changes plus selected feature tracks;
+7. add transcript turn/audio overlays without disturbing text coordinates;
+8. validate invariance, locality of change, no silent missing-as-zero, and dependency/provenance laws.
+
+This is not an optional visualization subsystem. It is the mechanism that connects exact words, local meanings, continuous discourse flow, and higher-order narrative structure while keeping each scientifically inspectable.
+
+## 118. Integration of the feature-track checkpoint (§106–117) into plan revision 2
+
+Adopted without modification. Changes applied to the repository on 2026-08-28:
+
+- new portable module `features` (depends only on `core`) owning feature spaces, typed targets, estimates with missingness/coverage, aligned tracks, window plans and declared reducers, derivation recipes (content-addressed DAG), sidecar manifests, `BoundaryTarget`/`BoundaryEvidence`, `WorldTimeTransition`, and the feature-use ledger of §116;
+- `core` gains only token classification (`TokenClass`), a lexical-token view, and explicit window coordinates (`TokenIndex`, `TokenRange`);
+- `story.FlowStep` adopts `worldTime: WorldTimeTransition` and `featureChanges: Map[FeatureSpaceId, ScoreEstimate]`;
+- transcript turns (`TranscriptTurn`, `TranscriptAtlas`) become an overlay in `core` used by `recall` and `interview`;
+- module dependency order follows §117: `story`, `document`, `recall`, `align`, `interview` depend on `features`; providers produce raw tracks only.

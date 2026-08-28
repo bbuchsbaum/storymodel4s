@@ -60,8 +60,8 @@ def moduleSettings(dir: String) = commonSettings ++ Seq(name := s"storymodel4s-$
 
 lazy val root = tlCrossRootProject
   .aggregate(
-    core, proposition, amrInterop, acquire, story, document, recall, align, interview, codec,
-    fixtures, laws
+    core, proposition, amrInterop, features, acquire, story, document, recall, align, interview,
+    codec, fixtures, laws
   )
 
 /** Identity, spans, evidence, claims, credence, provenance, hashing. No I/O. */
@@ -91,6 +91,13 @@ lazy val amrInterop = crossProject(JVMPlatform, JSPlatform, NativePlatform)
   .dependsOn(core, proposition)
   .settings(libraryDependencies += "org.typelevel" %%% "cats-parse" % catsParseV)
 
+/** Aligned feature tracks: spaces, estimates, coverage, windows, reducers, derivation recipes. */
+lazy val features = crossProject(JVMPlatform, JSPlatform, NativePlatform)
+  .crossType(CrossType.Pure)
+  .in(file("features"))
+  .settings(moduleSettings("features"))
+  .dependsOn(core)
+
 /** Autonomous acquisition protocol: task packets, proposal-only agents, critics, resolution. */
 lazy val acquire = crossProject(JVMPlatform, JSPlatform, NativePlatform)
   .crossType(CrossType.Pure)
@@ -103,42 +110,42 @@ lazy val story = crossProject(JVMPlatform, JSPlatform, NativePlatform)
   .crossType(CrossType.Pure)
   .in(file("story"))
   .settings(moduleSettings("story"))
-  .dependsOn(core, proposition)
+  .dependsOn(core, proposition, features)
 
 /** Mention graph (disjoint union of charts), exact-coreference quotient, projection into narrative nodes. */
 lazy val document = crossProject(JVMPlatform, JSPlatform, NativePlatform)
   .crossType(CrossType.Pure)
   .in(file("document"))
   .settings(moduleSettings("document"))
-  .dependsOn(core, proposition, acquire, story)
+  .dependsOn(core, proposition, features, acquire, story)
 
 /** Recall-side representation: idea units, discourse function, recall relations. */
 lazy val recall = crossProject(JVMPlatform, JSPlatform, NativePlatform)
   .crossType(CrossType.Pure)
   .in(file("recall"))
   .settings(moduleSettings("recall"))
-  .dependsOn(core, proposition, story)
+  .dependsOn(core, proposition, features, story)
 
 /** Recall-to-source alignment: costs, unbalanced transport, graph-HSMM trajectories, signatures. */
 lazy val align = crossProject(JVMPlatform, JSPlatform, NativePlatform)
   .crossType(CrossType.Pure)
   .in(file("align"))
   .settings(moduleSettings("align"))
-  .dependsOn(core, proposition, story, recall)
+  .dependsOn(core, proposition, features, story, recall)
 
 /** Autobiographical Interview: transcript atlas, detail atoms, memory addresses, derived scores. */
 lazy val interview = crossProject(JVMPlatform, JSPlatform, NativePlatform)
   .crossType(CrossType.Pure)
   .in(file("interview"))
   .settings(moduleSettings("interview"))
-  .dependsOn(core, proposition, story, recall, align)
+  .dependsOn(core, proposition, features, story, recall, align)
 
 /** Canonical JSON codecs for all artifacts (circe). */
 lazy val codec = crossProject(JVMPlatform, JSPlatform, NativePlatform)
   .crossType(CrossType.Pure)
   .in(file("codec"))
   .settings(moduleSettings("codec"))
-  .dependsOn(core, proposition, amrInterop, acquire, story, recall, align, interview)
+  .dependsOn(core, proposition, amrInterop, features, acquire, story, recall, align, interview)
   .settings(
     libraryDependencies ++= Seq(
       "io.circe" %%% "circe-core"   % circeV,
@@ -151,14 +158,16 @@ lazy val fixtures = crossProject(JVMPlatform, JSPlatform, NativePlatform)
   .crossType(CrossType.Pure)
   .in(file("fixtures"))
   .settings(moduleSettings("fixtures"))
-  .dependsOn(core, proposition, amrInterop, acquire, document, story, recall, align, interview)
+  .dependsOn(
+    core, proposition, amrInterop, features, acquire, document, story, recall, align, interview
+  )
 
 /** Published law suites and generators (Discipline). */
 lazy val laws = crossProject(JVMPlatform, JSPlatform, NativePlatform)
   .crossType(CrossType.Pure)
   .in(file("laws"))
   .settings(moduleSettings("laws"))
-  .dependsOn(core, proposition, amrInterop, acquire, story, recall, align, interview)
+  .dependsOn(core, proposition, amrInterop, features, acquire, story, recall, align, interview)
   .settings(
     libraryDependencies ++= Seq(
       "org.scalameta"  %%% "munit"            % munitV,
@@ -169,8 +178,8 @@ lazy val laws = crossProject(JVMPlatform, JSPlatform, NativePlatform)
   )
 
 val allModules = List(
-  "core", "proposition", "amrInterop", "acquire", "story", "document", "recall", "align",
-  "interview", "codec", "fixtures", "laws"
+  "core", "proposition", "amrInterop", "features", "acquire", "story", "document", "recall",
+  "align", "interview", "codec", "fixtures", "laws"
 )
 val allPlatforms = List("JVM", "JS", "Native")
 
