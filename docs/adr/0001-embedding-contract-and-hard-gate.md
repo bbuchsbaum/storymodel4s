@@ -155,6 +155,16 @@ become published artifacts when grakern 0.1 / graph4s releases exist.
 - Structural coverage is defined per level: leaf nodes use their own chart;
   segments use the multiset of member charts (documented reducer), never a
   fabricated segment chart.
+- For both `d_chart` and `d_wl`, segment reduction is the declared
+  `StructuralReducer.Minimum` over observed pair estimates from member charts
+  that pass the chart-match gate (`ContradictionDetector.detect(unit,
+  member).isEmpty`). Incompatible charts are not members; absent charts and
+  missing or provider-abstained estimates never enter as neutral constants.
+  `CostBreakdown.sourceChartCoverage` retains source-chart availability, while
+  each per-term `StructuralReductionReceipt` separately records the reducer,
+  canonically ordered compatible member ids and estimates, excluded members
+  with contradiction facets, source-chart coverage, and
+  `observedEstimateCoverage`.
 
 ### D4c. grakern laws required before `embed-grakern` ships
 

@@ -169,21 +169,30 @@ trait SourceView:
   def leavesUnder(ref: SourceNodeRef): Vector[SourceNodeRef] =
     leavesIndex.getOrElse(ref, Vector.empty)
 
+  /** Atomic members considered by structural reducers, in canonical reference order.
+    *
+    * Why: segment reduction receipts must retain the identity of every member they considered,
+    * rather than exposing only an anonymous multiset of charts.
+    */
+  def structuralMembers(ref: SourceNodeRef): Vector[NodeSummary] =
+    leavesUnder(ref).flatMap(node).sortBy(_.ref)
+
   /** The proposition evidence under `ref`: the node's own chart for a leaf, the multiset of member
-    * charts for a segment (in leaf order). Never fabricates a segment chart.
+    * charts for a segment (in canonical reference order). Never fabricates a segment chart.
     */
   def segmentEvidence(ref: SourceNodeRef): SegmentEvidence =
-    node(ref) match
-      case Some(n) if n.isLeaf => SegmentEvidence(n.evidence.toVector)
-      case Some(_) => SegmentEvidence(leavesUnder(ref).flatMap(node).flatMap(_.evidence))
-      case None    => SegmentEvidence.empty
+    SegmentEvidence(structuralMembers(ref).flatMap(_.evidence))
 
-  /** Structural coverage of `ref`: how many of its members carry a chart. */
+  /** Source-chart coverage of `ref`, independent of whether a distance provider answered.
+    *
+    * Why: chart availability and provider-observed coverage are distinct quantities; the latter is
+    * recorded by each structural reduction receipt.
+    */
   def structuralCoverage(ref: SourceNodeRef): StructuralCoverage =
     node(ref) match
       case Some(n) if n.isLeaf => StructuralCoverage(0, if n.hasEvidence then 1 else 0, 1)
       case Some(n)             =>
-        val leaves = leavesUnder(ref).flatMap(node)
+        val leaves = structuralMembers(ref)
         StructuralCoverage(n.level, leaves.count(_.hasEvidence), leaves.size)
       case None => StructuralCoverage(0, 0, 0)
 
