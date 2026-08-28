@@ -10,6 +10,10 @@ class WindowSuite extends ScalaCheckSuite:
   import Fixtures.*
 
   private def red(r: ScalarReducer) = WindowReducer.scalar(r)
+
+  /** Coverage of a raw token track counted the way derived tracks count: lexical tokens only. */
+  private def lexicalCoverage(raw: FeatureTrack[FeatureTarget.Token, Double]): Coverage =
+    Coverage.unsafe(sequence.lexicalSize, raw.observed.size)
   private def obs(vs: Double*): NonEmptyVector[Sample[Double]] =
     NonEmptyVector.fromVectorUnsafe(
       vs.zipWithIndex.map((v, i) => Sample(i, Estimate.observed(v), 1.0)).toVector
@@ -378,5 +382,264 @@ class WindowSuite extends ScalaCheckSuite:
     assertEquals(
       resolver.support(FeatureTarget.Window(TokenRange.unsafe(0, 3))).map(_.minSpan),
       Some(sequence.tokens(0).span.hull(sequence.tokens(2).span))
+    )
+  }
+
+  test("surface-unit targets resolve paragraphs, and share support with the sentence case") {
+    val para = atlas.paragraphs.head
+    assertEquals(
+      resolver.support(FeatureTarget.Unit(para.id)).map(_.minSpan),
+      Some(para.span)
+    )
+    val s1 = atlas.sentences(1).id
+    assertEquals(
+      resolver.support(FeatureTarget.Unit(s1)),
+      resolver.support(FeatureTarget.Sentence(s1))
+    )
+    assertNotEquals(FeatureTarget.Unit(s1): FeatureTarget, FeatureTarget.Sentence(s1))
+    assertEquals(resolver.support(FeatureTarget.Unit(SurfaceUnitId.unsafe("nope"))), None)
+    // a paragraph-scale aggregate: family Unit, coverage over the paragraph's lexical tokens
+    val raw = imageabilityTrack()
+    val agg = Aggregate
+      .overTargets(
+        raw,
+        sequence,
+        Vector((FeatureTarget.Unit(para.id), SpanSet.one(para.span))),
+        ScalarReducer.Mean,
+        MissingValuePolicy.IgnoreMissing
+      )
+      .toOption
+      .get
+    assertEquals(agg.derivation.get.targetFamily, Some(TargetFamily.Unit))
+    assertEquals(agg.observations.head.coverage.get.eligible, sequence.lexicalSize)
+    assert(FeatureTrack.validatedScores(agg).isRight)
+  }
+
+  test("narrative basis: order kept, unresolved ids and duplicates rejected") {
+    val basis = NarrativeBasis.situations(situationOrder, resolver).toOption.get
+    assertEquals(basis.family, TargetFamily.Situation)
+    assertEquals(basis.targets, situationOrder.map(FeatureTarget.Situation.apply))
+    assertEquals(basis.size, atlas.sentences.size)
+    val reversed = NarrativeBasis.situations(situationOrder.reverse, resolver).toOption.get
+    assertEquals(reversed.targets, situationOrder.reverse.map(FeatureTarget.Situation.apply))
+    NarrativeBasis.situations(situationOrder :+ SituationId.unsafe("ghost"), resolver) match
+      case Left(DomainError.InvariantViolation(_, reason)) => assert(reason.contains("ghost"))
+      case other => fail(s"expected an unresolved-id violation, got $other")
+    NarrativeBasis.situations(situationOrder :+ situationOrder.head, resolver) match
+      case Left(DomainError.DuplicateId("FeatureTarget", id)) => assert(id.contains("sit-0"))
+      case other => fail(s"expected a duplicate-id error, got $other")
+    val segs = NarrativeBasis.segments(segmentOrder, resolver).toOption.get
+    assertEquals(segs.family, TargetFamily.Segment)
+    assert(NarrativeBasis.segments(Vector(SegmentId.unsafe("x")), resolver).isLeft)
+    val empty = NarrativeBasis.situations(Vector.empty, resolver).toOption.get
+    assert(empty.isEmpty)
+  }
+
+  test("per-situation and per-segment aggregation carry exact support and coverage") {
+    val raw = imageabilityTrack()
+    val events = Aggregate
+      .overSituations(
+        raw,
+        resolver,
+        situationOrder,
+        ScalarReducer.Mean,
+        MissingValuePolicy.IgnoreMissing
+      )
+      .toOption
+      .get
+    assertEquals(events.targets, situationOrder.map(FeatureTarget.Situation.apply))
+    events.observations.zip(atlas.sentences).foreach { (o, sent) =>
+      val idx = sequence.coveringIndices(SpanSet.one(sent.span))
+      assertEquals(o.support, Some(SpanSet.one(sent.span)))
+      assertEquals(o.coverage.get.eligible, idx.count(i => sequence.tokens(i.value).isLexical))
+      assertEquals(
+        o.coverage.get.observed,
+        idx.count(i =>
+          sequence.tokens(i.value).isLexical &&
+            raw.get(FeatureTarget.Token(i)).exists(_.isObserved)
+        )
+      )
+      assert(o.estimate.isObserved)
+    }
+    val d = events.derivation.get
+    assertEquals(d.targetFamily, Some(TargetFamily.Situation))
+    assertEquals(d.window, None)
+    assertEquals(d.narrativeWindow, None)
+    assert(FeatureTrack.validatedScores(events).isRight)
+    // scenes: the two segments partition the sentences, so their coverages sum to the whole
+    val scenes = Aggregate
+      .overSegments(
+        raw,
+        resolver,
+        segmentOrder,
+        ScalarReducer.Sum,
+        MissingValuePolicy.IgnoreMissing
+      )
+      .toOption
+      .get
+    assertEquals(scenes.targets, segmentOrder.map(FeatureTarget.Segment.apply))
+    assertEquals(scenes.observations.map(_.coverage.get).reduce(_ + _), lexicalCoverage(raw))
+    assertEquals(scenes.derivation.get.targetFamily, Some(TargetFamily.Segment))
+    assertEqualsDouble(
+      scenes.observations.map(_.estimate.toOption.get).sum,
+      raw.observed.map(_._2).sum,
+      1e-9
+    )
+    // an empty basis still records its family
+    val none = Aggregate
+      .overSituations(
+        raw,
+        resolver,
+        Vector.empty,
+        ScalarReducer.Mean,
+        MissingValuePolicy.IgnoreMissing
+      )
+      .toOption
+      .get
+    assertEquals(none.size, 0)
+    assertEquals(none.derivation.get.targetFamily, Some(TargetFamily.Situation))
+    assert(
+      Aggregate
+        .overSituations(
+          raw,
+          resolver,
+          Vector(SituationId.unsafe("ghost")),
+          ScalarReducer.Mean,
+          MissingValuePolicy.IgnoreMissing
+        )
+        .isLeft
+    )
+  }
+
+  test("centred narrative windows: per-unit at half-width 0, pooled neighbours at half-width 1") {
+    val raw = imageabilityTrack()
+    val basis = NarrativeBasis.situations(situationOrder, resolver).toOption.get
+    def windowed[T <: FeatureTarget](
+        plan: NarrativeWindowPlan,
+        b: NarrativeBasis[T]
+    ): FeatureTrack[T, Double] =
+      Windowed
+        .overBasis(raw, sequence, b, plan, ScalarReducer.Mean, MissingValuePolicy.IgnoreMissing)
+        .toOption
+        .get
+    val perUnit = windowed(NarrativeWindowPlan.perUnit, basis)
+    val agg = Aggregate
+      .overBasis(raw, sequence, basis, ScalarReducer.Mean, MissingValuePolicy.IgnoreMissing)
+      .toOption
+      .get
+    assertEquals(perUnit.targets, agg.targets)
+    perUnit.observations.zip(agg.observations).foreach { (w, a) =>
+      assertEquals(w.estimate, a.estimate)
+      assertEquals(w.coverage, a.coverage)
+      assertEquals(w.support, a.support)
+    }
+    // same values, different recipe: the window slot is part of the id
+    assertNotEquals(perUnit.space.id, agg.space.id)
+    assertEquals(perUnit.derivation.get.narrativeWindow, Some(NarrativeWindowPlan.perUnit))
+    assertEquals(perUnit.derivation.get.targetFamily, Some(TargetFamily.Situation))
+    assert(perUnit.derivation.get.hasSingleWindow)
+
+    val one = NarrativeWindowPlan.of(1).toOption.get
+    val smooth = windowed(one, basis)
+    assertEquals(smooth.targets, basis.targets)
+    assertNotEquals(smooth.space.id, perUnit.space.id)
+    // the middle unit pools three sentences: support is their union, coverage counts each token once
+    val mid = smooth.observations(2)
+    val trio = Vector(1, 2, 3).map(i => atlas.sentences(i).span)
+    assertEquals(mid.support, SpanSet.of(trio.map(SpanRef(_))))
+    val idx =
+      sequence.coveringIndices(mid.support.get).filter(i => sequence.tokens(i.value).isLexical)
+    assertEquals(mid.coverage.get.eligible, idx.size)
+    val pooled = idx.flatMap(i => raw.get(FeatureTarget.Token(i)).flatMap(_.toOption))
+    assertEqualsDouble(mid.estimate.toOption.get, pooled.sum / pooled.size, 1e-9)
+    assertEquals(mid.coverage.get.observed, pooled.size)
+    // the first unit is clipped: it pools sentences 0 and 1 only
+    val first = smooth.observations.head
+    assertEquals(first.support, SpanSet.of(Vector(0, 1).map(i => SpanRef(atlas.sentences(i).span))))
+    assertEquals(
+      first.coverage.get,
+      agg.observations(0).coverage.get + agg.observations(1).coverage.get
+    )
+    assert(FeatureTrack.validatedScores(smooth).isRight)
+    // half-width is part of the recipe
+    val wider = windowed(NarrativeWindowPlan.of(2).toOption.get, basis)
+    assertNotEquals(wider.space.id, smooth.space.id)
+    assertEquals(wider.observations(2).coverage.get, lexicalCoverage(raw))
+    // scenes smooth the same way, targeted at segments
+    val scenes = windowed(one, NarrativeBasis.segments(segmentOrder, resolver).toOption.get)
+    assertEquals(scenes.targets, segmentOrder.map(FeatureTarget.Segment.apply))
+    assertEquals(scenes.derivation.get.targetFamily, Some(TargetFamily.Segment))
+    scenes.observations.foreach(o => assertEquals(o.coverage.get, lexicalCoverage(raw)))
+  }
+
+  test("narrative kernels measure bandwidth in units and never reach outside their support") {
+    val raw = imageabilityTrack()
+    // a middle situation whose only token is not in the lexicon
+    val nobody = sequence.tokens.indexWhere(_.normalized.contains("nobody"))
+    assert(nobody >= 0)
+    // ids sort a < b < c, so observation 1 is the gap
+    val ids = Vector("a", "b", "c").map(SituationId.unsafe)
+    val supports: Map[SituationId, SpanSet] = Map(
+      ids(0) -> SpanSet.one(atlas.sentences(0).span),
+      ids(1) -> SpanSet.one(sequence.tokens(nobody).span),
+      ids(2) -> SpanSet.one(atlas.sentences(3).span)
+    )
+    val r = SupportResolver(sequence, situation = supports.get)
+    val basis = NarrativeBasis.situations(ids, r).toOption.get
+    val one = NarrativeWindowPlan.of(1).toOption.get
+    def kernel(shape: KernelShape) =
+      Windowed
+        .overBasis(
+          raw,
+          sequence,
+          basis,
+          one,
+          ScalarReducer.Kernel(shape),
+          MissingValuePolicy.IgnoreMissing
+        )
+        .toOption
+        .get
+    val perUnit = Aggregate
+      .overBasis(raw, sequence, basis, ScalarReducer.Mean, MissingValuePolicy.IgnoreMissing)
+      .toOption
+      .get
+    // a point mass at the centre unit reproduces the per-unit mean where the unit is observed
+    val point = kernel(KernelShape.Gaussian(0.0))
+    assertEquals(point.observations(0).estimate, perUnit.observations(0).estimate)
+    assertEquals(point.observations(2).estimate, perUnit.observations(2).estimate)
+    // ... and falls back to the nearest observed unit where it is not
+    assertEquals(perUnit.observations(1).estimate, Estimate.Missing(MissingReason.AllMissing))
+    assert(point.observations(1).estimate.isObserved)
+    // a rectangular kernel narrower than one unit sees only the centre: the gap is outside support
+    val narrow = kernel(KernelShape.Rectangular(0.5))
+    assertEquals(
+      narrow.observations(1).estimate,
+      Estimate.Missing(MissingReason.Undefined(UndefinedReason.OutsideKernelSupport))
+    )
+    assertEquals(narrow.observations(0).estimate, perUnit.observations(0).estimate)
+    // a rectangular kernel of one unit pools the neighbours uniformly
+    val wide = kernel(KernelShape.Rectangular(1.0))
+    val pooled = Vector(0, 2).flatMap(i =>
+      sequence
+        .coveringIndices(supports(ids(i)))
+        .flatMap(j => raw.get(FeatureTarget.Token(j)).flatMap(_.toOption))
+    )
+    assertEqualsDouble(wide.observations(1).estimate.toOption.get, pooled.sum / pooled.size, 1e-9)
+    // the recipe distinguishes kernels by shape and bandwidth
+    assertNotEquals(narrow.space.id, wide.space.id)
+    assertNotEquals(point.space.id, narrow.space.id)
+    assertEquals(wide.derivation.get.weighting, WeightingPolicy.Kernel("rectangular", 1.0))
+    // the strict missing policy refuses the gap
+    assert(
+      Windowed
+        .overBasis(
+          raw,
+          sequence,
+          basis,
+          NarrativeWindowPlan.perUnit,
+          ScalarReducer.Mean,
+          MissingValuePolicy.Fail
+        )
+        .isLeft
     )
   }

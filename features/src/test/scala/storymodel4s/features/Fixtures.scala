@@ -113,3 +113,42 @@ object Fixtures:
       .map(_.toVector.groupBy(_.position).values.map(_.head).toVector.sortBy(_.position))
 
   given Arbitrary[ScoreEstimate] = Arbitrary(scoreEstimate)
+
+  /** One situation per sentence, in discourse order; two segments splitting the paragraph. */
+  val situationOrder: Vector[SituationId] =
+    atlas.sentences.indices.map(i => SituationId.unsafe(s"sit-$i")).toVector
+
+  val situationSupports: Map[SituationId, SpanSet] =
+    situationOrder.zip(atlas.sentences).map((id, s) => id -> SpanSet.one(s.span)).toMap
+
+  val segmentOrder: Vector[SegmentId] = Vector(SegmentId.unsafe("seg-a"), SegmentId.unsafe("seg-b"))
+
+  val segmentSupports: Map[SegmentId, SpanSet] =
+    val (a, b) = atlas.sentences.splitAt(2)
+    Map(
+      segmentOrder(0) -> SpanSet.of(a.map(s => SpanRef(s.span))).get,
+      segmentOrder(1) -> SpanSet.of(b.map(s => SpanRef(s.span))).get
+    )
+
+  val resolver: SupportResolver =
+    SupportResolver(sequence, situation = situationSupports.get, segment = segmentSupports.get)
+
+  private val validId: Gen[String] =
+    Gen.nonEmptyListOf(Gen.oneOf(Gen.alphaNumChar, Gen.oneOf(':', '-', '_'))).map(_.mkString)
+
+  /** Every `FeatureTarget` case, with ids that pass the lexical rules. */
+  val featureTarget: Gen[FeatureTarget] = Gen.oneOf(
+    Gen.chooseNum(0, 5000).map(i => FeatureTarget.Token(TokenIndex.unsafe(i))),
+    validId.map(s => FeatureTarget.Sentence(SurfaceUnitId.unsafe(s))),
+    validId.map(s => FeatureTarget.Situation(SituationId.unsafe(s))),
+    validId.map(s => FeatureTarget.Segment(SegmentId.unsafe(s))),
+    validId.map(s => FeatureTarget.Boundary(SurfaceUnitId.unsafe(s))),
+    validId.map(s => FeatureTarget.Turn(TurnId.unsafe(s))),
+    for
+      a <- Gen.chooseNum(0, 5000)
+      n <- Gen.chooseNum(0, 100)
+    yield FeatureTarget.Window(TokenRange.unsafe(a, a + n)),
+    validId.map(s => FeatureTarget.Unit(SurfaceUnitId.unsafe(s)))
+  )
+
+  given Arbitrary[FeatureTarget] = Arbitrary(featureTarget)

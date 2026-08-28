@@ -242,5 +242,106 @@ class StructureSuite extends ScalaCheckSuite:
     assert(Ordering[FeatureTarget].lt(w9, w10))
   }
 
+  test("surface-unit targets rank after every existing case and order by id") {
+    val ts: Vector[FeatureTarget] = Vector(
+      FeatureTarget.Unit(SurfaceUnitId.unsafe("p2")),
+      FeatureTarget.Segment(SegmentId.unsafe("g")),
+      FeatureTarget.Unit(SurfaceUnitId.unsafe("p1")),
+      FeatureTarget.Token(TokenIndex.unsafe(3))
+    )
+    assertEquals(ts.sorted.map(FeatureTarget.rankOf), Vector(0, 6, 7, 7))
+    assertEquals(ts.sorted.last, FeatureTarget.Unit(SurfaceUnitId.unsafe("p2")))
+    assertEquals(FeatureTarget.rankOf(ts.head), 7)
+    assertEquals(TargetFamily.of(ts.head), TargetFamily.Unit)
+    assertEquals(TargetFamily.values.last, TargetFamily.Unit)
+  }
+
+  property("feature target keys round-trip for every case: parse(parts(t)) == Some(t)") {
+    forAll(featureTarget) { t =>
+      FeatureTargetKey.parse(FeatureTargetKey.parts(t)) == Some(t)
+    }
+  }
+
+  property("accepted key parts render back to themselves: parts(parse(p)) == p") {
+    val perturb: Gen[Vector[String] => Vector[String]] = Gen.oneOf(
+      (p: Vector[String]) => p,
+      (p: Vector[String]) => p.updated(0, p.head.capitalize),
+      (p: Vector[String]) => p :+ "extra",
+      (p: Vector[String]) => p.take(1),
+      (p: Vector[String]) => p.map(x => if x.forall(_.isDigit) then "0" + x else x),
+      (p: Vector[String]) => p.map(x => if x.forall(_.isDigit) then "+" + x else x),
+      (p: Vector[String]) => p.map(x => if x.forall(_.isDigit) then "-" + x else x)
+    )
+    forAll(featureTarget.map(FeatureTargetKey.parts), perturb) { (p, f) =>
+      val q = f(p)
+      FeatureTargetKey.parse(q).forall(t => FeatureTargetKey.parts(t) == q)
+    }
+  }
+
+  test("non-canonical integer parts are not accepted") {
+    assertEquals(FeatureTargetKey.parse(Vector("token", "007")), None)
+    assertEquals(FeatureTargetKey.parse(Vector("token", "+7")), None)
+    assertEquals(FeatureTargetKey.parse(Vector("window", "1", "02")), None)
+    assertEquals(
+      FeatureTargetKey.parse(Vector("token", "7")),
+      Some(FeatureTarget.Token(TokenIndex.unsafe(7)))
+    )
+    assertEquals(FeatureTargetKey.parse(Vector("unit", "a b")), None)
+    assertEquals(
+      FeatureTargetKey.parts(FeatureTarget.Unit(SurfaceUnitId.unsafe("s:p0"))).head,
+      "unit"
+    )
+  }
+
+  property("observation addresses with any target round-trip through Addressable") {
+    val ev = summon[Addressable[FeatureAddress]]
+    forAll(spaceId, featureTarget) { (s, t) =>
+      val a = FeatureAddress.Observation(s, t)
+      val addr = ev.address(a)
+      ev.parse(addr) == Some(a) && Address.parse(addr.render).toOption.flatMap(ev.parse) == Some(a)
+    }
+  }
+
+  test("a surface recipe's canonical string is pinned; a narrative window is a separate slot") {
+    val d = FeatureDerivation(
+      NonEmptyVector.one(sp("imageability.demo")),
+      Some(WindowPlan.words(20, 5)),
+      ScalarReducer.Kernel(KernelShape.Gaussian(1.0)).id,
+      ScalarReducer.Kernel(KernelShape.Gaussian(1.0)).weighting,
+      MissingValuePolicy.RequireMinCoverage(0.5),
+      Some(NormalizationPolicy.ZScore("pop")),
+      "golden-1"
+    )
+    assertEquals(
+      d.canonicalString,
+      "inputs=imageability.demo;" +
+        "window=window(width=20,step=5,basis=LexicalTokens,edge=KeepPartial);" +
+        "reducer=kernel-gaussian-0x3ff0000000000000;" +
+        "weighting=kernel(gaussian,0x3ff0000000000000);" +
+        "missing=minCoverage(0x3fe0000000000000);" +
+        "normalization=zscore(pop);eligibility=lexical;targets=none;impl=golden-1"
+    )
+    assertEquals(d.derivationId.hex, GoldenDerivationId)
+    assertEquals(d.copy(narrativeWindow = None).derivationId.hex, GoldenDerivationId)
+    assert(d.hasSingleWindow)
+    val plan = NarrativeWindowPlan.of(2).toOption.get
+    val n = d.copy(
+      window = None,
+      narrativeWindow = Some(plan),
+      targetFamily = Some(TargetFamily.Situation)
+    )
+    assert(n.hasSingleWindow)
+    assert(!d.copy(narrativeWindow = Some(plan)).hasSingleWindow)
+    assertNotEquals(n.derivationId, d.derivationId)
+    assert(n.canonicalString.contains(";window=none;narrativeWindow=narrative(halfWidth=2);"))
+    assert(n.canonicalString.endsWith(";targets=situation;impl=golden-1"))
+    assertNotEquals(
+      n.derivationId,
+      n.copy(narrativeWindow = Some(NarrativeWindowPlan.perUnit)).derivationId
+    )
+    assertEquals(NarrativeWindowPlan.perUnit.halfWidth, 0)
+    assert(NarrativeWindowPlan.of(-1).isLeft)
+  }
+
   private val GoldenDerivationId: String =
     "c0e730f22d83662f4310fbdba4a1d799bd9badc77ca5657b7e67fc09c2522e45"

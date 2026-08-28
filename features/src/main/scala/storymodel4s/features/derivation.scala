@@ -64,7 +64,7 @@ enum Eligibility:
   * reducer over the same inputs means something different per situation than per window.
   */
 enum TargetFamily:
-  case Token, Window, Sentence, Boundary, Turn, Situation, Segment
+  case Token, Window, Sentence, Boundary, Turn, Situation, Segment, Unit
 
 object TargetFamily:
   def of(t: FeatureTarget): TargetFamily = t match
@@ -75,13 +75,36 @@ object TargetFamily:
     case _: FeatureTarget.Turn      => Turn
     case _: FeatureTarget.Situation => Situation
     case _: FeatureTarget.Segment   => Segment
+    case _: FeatureTarget.Unit      => Unit
+
+/** A centred window of `±halfWidth` narrative units around each unit of a [[NarrativeBasis]]: the
+  * narrative counterpart of core's `WindowPlan` (ADR 0002 §9 checkpoint 2, "`WindowBasis.Events`").
+  *
+  * Why: event and scene recipes of the scale selector must be receipted exactly like surface
+  * windows, and the unit axis (situations, segments) is known only to the story model, so the plan
+  * lives here rather than in core. A half-width of 0 is per-unit aggregation. The axis itself is
+  * recorded by the derivation's `targetFamily`.
+  */
+final case class NarrativeWindowPlan private (halfWidth: Int):
+  def canonicalString: String = s"narrative(halfWidth=$halfWidth)"
+
+object NarrativeWindowPlan:
+  /** Per-unit aggregation: each unit is its own window. */
+  val perUnit: NarrativeWindowPlan = NarrativeWindowPlan(0)
+
+  def of(halfWidth: Int): Either[DomainError, NarrativeWindowPlan] =
+    if halfWidth < 0 then
+      Left(DomainError.InvalidFormat("NarrativeWindowPlan", halfWidth.toString, "negative"))
+    else Right(NarrativeWindowPlan(halfWidth))
 
 /** The executable recipe that produced a derived track from its inputs.
   *
   * Why: every smoothed or aggregated value must be replayable and diffable; the recipe is
   * content-addressed so caches and dependency graphs can key on it (design record §110). Every
   * parameter that changes the output is part of the recipe, including eligibility and target
-  * family.
+  * family. A recipe has at most one window: `window` slides over the surface axis,
+  * `narrativeWindow` over a [[NarrativeBasis]]; the latter is rendered only when present so ids of
+  * surface recipes never change.
   */
 final case class FeatureDerivation(
     inputs: NonEmptyVector[FeatureSpaceId],
@@ -92,12 +115,14 @@ final case class FeatureDerivation(
     normalization: Option[NormalizationPolicy],
     implementationVersion: String,
     eligibility: Eligibility = Eligibility.LexicalTokens,
-    targetFamily: Option[TargetFamily] = None
+    targetFamily: Option[TargetFamily] = None,
+    narrativeWindow: Option[NarrativeWindowPlan] = None
 ):
   def canonicalString: String =
-    Vector(
+    (Vector(
       "inputs=" + inputs.toVector.map(_.value).mkString(","),
-      "window=" + window.map(_.canonicalString).getOrElse("none"),
+      "window=" + window.map(_.canonicalString).getOrElse("none")
+    ) ++ narrativeWindow.map(p => "narrativeWindow=" + p.canonicalString).toVector ++ Vector(
       "reducer=" + reducer.value,
       "weighting=" + weighting.canonicalString,
       "missing=" + missing.canonicalString,
@@ -105,7 +130,10 @@ final case class FeatureDerivation(
       "eligibility=" + eligibility.canonicalString,
       "targets=" + targetFamily.map(_.toString.toLowerCase).getOrElse("none"),
       "impl=" + implementationVersion
-    ).mkString(";")
+    )).mkString(";")
+
+  /** A recipe must not slide over two axes at once. */
+  def hasSingleWindow: Boolean = window.isEmpty || narrativeWindow.isEmpty
 
   /** Content address of the recipe. */
   def derivationId: Checksum = Checksum.ofText(canonicalString)
