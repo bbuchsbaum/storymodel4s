@@ -10,16 +10,55 @@ enum ProjectionMode:
   case DirectMention, EventRealization, StateRealization, ProspectiveDescription,
     RetrospectiveDescription, Summary, Inferred
 
+object ProjectionMode:
+  /** Which modes a projection onto a `K`-kind target may use.
+    *
+    * Entities are only ever mentioned, summarized (a group described collectively), or inferred;
+    * realization and prospective/retrospective description are situation-only notions.
+    */
+  def allowedFor[K <: NarrativeKind](using w: KindWitness[K]): Set[ProjectionMode] =
+    w.tag match
+      case "entity" => Set(DirectMention, Summary, Inferred)
+      case _        => ProjectionMode.values.toSet
+
 /** Evidence-backed projection from one or more chart nodes to a canonical narrative node. Many
   * chart nodes may project to one canonical node; a chart node may take part in several
   * projections, but in at most one `DirectMention` (validated by [[ProjectionIndex]]).
+  *
+  * Constructed only through [[Projection.of]], which restricts the mode per kind and, for
+  * `DirectMention`, checks that every source concept is of the target's kind.
   */
-final case class Projection[K <: NarrativeKind](
+final case class Projection[K <: NarrativeKind] private (
     sources: NonEmptySet[ChartNodeRef],
     target: CanonicalId[K],
     mode: ProjectionMode,
     meta: ClaimMeta
 )
+
+object Projection:
+  def of[K <: NarrativeKind](
+      sources: NonEmptySet[ChartNodeRef],
+      target: CanonicalId[K],
+      mode: ProjectionMode,
+      meta: ClaimMeta,
+      graph: Option[MentionGraph] = None
+  )(using w: KindWitness[K]): Either[DocumentError, Projection[K]] =
+    val path = s"Projection/${target.value}"
+    if !ProjectionMode.allowedFor[K].contains(mode) then
+      Left(DocumentError.ModeNotAllowed(mode, w.tag, path))
+    else
+      val kindClash =
+        if mode != ProjectionMode.DirectMention then None
+        else
+          graph.flatMap { g =>
+            sources.toSortedSet.toVector.iterator
+              .flatMap(n => g.concept(n).map(n -> _))
+              .collectFirst {
+                case (n, c) if !w.accepts(c.kind) =>
+                  DocumentError.SourceKindMismatch(n, c.kind, w.tag, path)
+              }
+          }
+      kindClash.toLeft(Projection(sources, target, mode, meta))
 
 /** A canonical situation's truth-status inside one context: the narrative-side counterpart of an
   * embedded proposition (§47). Reported content lives under its speech context; the same content
