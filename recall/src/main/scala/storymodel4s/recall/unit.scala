@@ -33,17 +33,48 @@ enum SketchRole:
     Beneficiary
   case Other(label: String)
 
+/** Determiner class of a nominal mention, as the rememberer said it. */
+enum Determiner:
+  case Definite, Indefinite, Demonstrative, Possessive, Bare
+
+/** Grammatical number of a nominal mention, from the determiner, a numeral, or plural morphology.
+  * Named `MentionNumber` to avoid shadowing `java.lang.Number`.
+  */
+enum MentionNumber:
+  case Singular, Plural
+
 /** A participant as the recall unit names it. `specified = false` marks indefinite reference
   * ("somebody", "they") so fidelity can report "unspecified" instead of "wrong".
+  *
+  * Nominal structure (W5): `head` is the normalized head lemma, `modifiers` the normalized pre-head
+  * content words (including numerals and quantifiers), so "the young man" and "the five men" are
+  * distinct participants although both heads normalize to `man`. `distinctiveKey` renders that
+  * identity; `aliases` carry the token-safe identity keys the aligner compares (see
+  * [[NominalMention.keys]]).
+  *
+  * Identity rule for `names`: when `aliases` is nonempty the participant is identified by its
+  * aliases only — the display `label` is not an identity token, because a phrase label such as
+  * "young man" would tokenize to the bare head and defeat the very distinction the keys encode. A
+  * participant built with no aliases (hand-written sketches, pronouns) is identified by its label,
+  * as before.
   */
 final case class SketchParticipant(
     role: SketchRole,
     entity: Option[RecallEntityId],
     label: String,
     specified: Boolean = true,
-    aliases: Set[String] = Set.empty
+    aliases: Set[String] = Set.empty,
+    head: String = "",
+    modifiers: Vector[String] = Vector.empty,
+    determiner: Option[Determiner] = None,
+    number: Option[MentionNumber] = None
 ):
-  def names: Set[String] = aliases.map(_.toLowerCase) + label.toLowerCase
+  def names: Set[String] =
+    if aliases.nonEmpty then aliases.map(Lexical.lower) else Set(Lexical.lower(label))
+
+  /** Head plus sorted modifiers, e.g. `young+man`; empty when no head is known. */
+  def distinctiveKey: String =
+    if head.isEmpty then "" else (modifiers.sorted :+ head).mkString("+")
 
 /** Shallow propositional content of a recall unit: enough for structural adjudication (role
   * direction, polarity, modality, location, outcome) without a full semantic graph.

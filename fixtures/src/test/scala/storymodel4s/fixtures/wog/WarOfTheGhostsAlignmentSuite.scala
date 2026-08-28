@@ -51,14 +51,28 @@ class WarOfTheGhostsAlignmentSuite extends FunSuite:
       n.copy(
         predicate = canonPredicate(n.predicate),
         lemmas = canonSet(n.lemmas),
-        participants = n.participants.map(p => p.copy(aliases = canonNames(p.aliases + p.label)))
+        participants = n.participants.map { p =>
+          // source participants keep the stem bag (so a bare "the man" may still match) and gain
+          // the nominal identity keys of their label, so recall keys can match them exactly
+          val keys = NominalMention.parse(p.label).map(_.keysWith(canon)).getOrElse(Set.empty)
+          p.copy(aliases = canonNames(p.aliases + p.label) ++ keys)
+        }
       )
 
+    /** Recall participants keep their token-safe identity keys (W5), re-mapped through the synonym
+      * table stem by stem, so "the strangers" keys as `warrior` and "the young man" keys as
+      * `youngman` — never as the bare head that "the five men" also carries. Participants without
+      * nominal structure (pronouns, hand-written sketches) fall back to the stem bag.
+      */
     def sketch(s: PropositionSketch): PropositionSketch =
       s.copy(
         predicate = canonPredicate(s.predicate),
         lemmas = canonSet(s.lemmas),
-        participants = s.participants.map(p => p.copy(aliases = canonNames(p.aliases + p.label)))
+        participants = s.participants.map { p =>
+          if p.head.nonEmpty then
+            p.copy(aliases = NominalMention.keysOf(p.modifiers.map(canon), canon(p.head)))
+          else p.copy(aliases = canonNames(p.aliases + p.label))
+        }
       )
 
     /** The bridge view with canonicalized lemmas and aliases; structure untouched. */
@@ -331,9 +345,19 @@ class WarOfTheGhostsAlignmentSuite extends FunSuite:
     val report = SourceNodeRef.Situation(WarOfTheGhostsModel.S.theySaidShot)
     assert(gated.contains(report), s"the report itself must be gated; gated = $gated")
     assert(r.row.mapSource != Some(report), r.row.topK(5).toString)
-    // TODO(M3): "the warriors said go home" is not gated because the baseline segmenter cannot
-    // tell "the young man" from "the five men" (both stem to "man"); a provider chart with
-    // coreference will. Until then only the gated telling events are asserted mass-free.
+    // W5 (closes the former TODO(M3)): the recall agent "the young man" now carries the nominal
+    // identity key `youngman`, which does not overlap the source agent "the five men"/"the
+    // warriors" (`fiveman`, `warrior`), so the warriors' "go home" telling is recognised as
+    // speaker-reversed too. Under ADR 0001 rev 3 D5 this becomes "anchored as
+    // Distorted(RoleReversal), never Faithful" once the anchor/fidelity refactor lands.
+    val goHome = SourceNodeRef.Situation(WarOfTheGhostsModel.S.warriorsSayGoHome)
+    assert(
+      gated.contains(goHome),
+      s"the warriors' 'go home' telling must be gated; contradictions = ${costs.get(AlignState.Source(goHome)).map(_.contradictions)}"
+    )
+    val agent = r.unit.proposition.agent.get
+    assertEquals(agent.distinctiveKey, "young+man")
+    assert(!agent.names.contains("man"), agent.names.toString)
   }
 
   test(

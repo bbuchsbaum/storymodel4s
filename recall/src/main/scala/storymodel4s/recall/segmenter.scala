@@ -404,11 +404,18 @@ object RecallSegmenter:
     val clauseSpans: Vector[(TextSpan, SurfaceUnit)] =
       atlas.sentences.flatMap(s => splitClauses(text, s.span).map(c => (c, s)))
 
-    val entities = collectEntities(text, clauseSpans.map(_._1))
+    val found = collectEntities(text, clauseSpans.map(_._1))
+    val entities = found.entities
+    val coreference = found.coreference
+    // nominal entities are addressed by their distinctive key only; name entities also by their
+    // label and its words (so "Anna" and "anna" resolve, but "five" never looks like a head)
     val entityByName: Map[String, RecallEntityId] =
-      entities.iterator.flatMap { e =>
-        (e.label +: e.label.split(' ').toVector.filter(_.length > 2)).map(_ -> e.id)
-      }.toMap
+      found.byKey ++ entities.iterator
+        .filter(e => found.nameLabels.contains(e.label))
+        .flatMap { e =>
+          (e.label +: e.label.split(' ').toVector.filter(_.length > 2)).map(_ -> e.id)
+        }
+        .toMap
 
     val units = clauseSpans.zipWithIndex.map { case ((span, sentence), i) =>
       val raw = span.slice(text).getOrElse("")
@@ -438,7 +445,12 @@ object RecallSegmenter:
     val sentenceStart: Map[RecallUnitId, Int] =
       units.zip(clauseSpans).map { case (u, (_, s)) => u.id -> s.span.start }.toMap
     val (temporal, causal) = connectiveEdges(units, sentenceStart)
-    RecallGraph(transcript, atlas, units, RecallRelations(temporal, causal, entities, Vector.empty))
+    RecallGraph(
+      transcript,
+      atlas,
+      units,
+      RecallRelations(temporal, causal, entities, Vector.empty, coreference)
+    )
 
   // ---- pieces ----------------------------------------------------------------------------
 
@@ -556,29 +568,34 @@ object RecallSegmenter:
     val agent: Option[SketchParticipant] =
       if predIdx < 0 then None
       else
-        words.take(predIdx).reverse.collectFirst {
-          case w
-              if AgentPronouns.contains(w) || RoleNouns.contains(w) || entityByName.contains(w) =>
-            SketchParticipant(
-              SketchRole.Agent,
-              entityByName.get(w),
-              w,
-              specified = !Indefinites.contains(w)
-            )
-          case w if Indefinites.contains(w) =>
-            SketchParticipant(SketchRole.Agent, None, w, specified = false)
-        }
+        // the nearest head-like word before the predicate, expanded leftwards to its noun phrase
+        (predIdx - 1 to 0 by -1).iterator
+          .map { i =>
+            val w = words(i)
+            if AgentPronouns.contains(w) then
+              Some(SketchParticipant(SketchRole.Agent, None, w, specified = true))
+            else if Indefinites.contains(w) then
+              Some(SketchParticipant(SketchRole.Agent, None, w, specified = false))
+            else if isHead(w, entityByName) then
+              Some(nominalParticipant(SketchRole.Agent, words, i, entityByName))
+            else None
+          }
+          .collectFirst { case Some(p) => p }
     val patient: Option[SketchParticipant] =
       if predIdx < 0 then None
       else
-        words.drop(predIdx + 1).collectFirst {
-          case w if Indefinites.contains(w) =>
-            SketchParticipant(SketchRole.Patient, None, w, specified = false)
-          case w if RoleNouns.contains(w) || entityByName.contains(w) =>
-            SketchParticipant(SketchRole.Patient, entityByName.get(w), w)
-          case w if Set("him", "her", "them", "me", "us").contains(w) =>
-            SketchParticipant(SketchRole.Patient, None, w)
-        }
+        (predIdx + 1 until words.size).iterator
+          .map { i =>
+            val w = words(i)
+            if Indefinites.contains(w) then
+              Some(SketchParticipant(SketchRole.Patient, None, w, specified = false))
+            else if isHead(w, entityByName) then
+              Some(nominalParticipant(SketchRole.Patient, words, i, entityByName))
+            else if ObjectPronouns.contains(w) then
+              Some(SketchParticipant(SketchRole.Patient, None, w))
+            else None
+          }
+          .collectFirst { case Some(p) => p }
     // Negation is judged after masking hedges and source-monitoring phrases ("I don't remember"
     // is not a negated proposition) and after dropping a discourse "No," interjection.
     val negationMask =
@@ -606,11 +623,132 @@ object RecallSegmenter:
       lemmas
     )
 
-  /** Names: capitalized words that are not pronouns/stopwords; clause-initial capitals count only
-    * when the same word is capitalized mid-clause somewhere else or is followed by another
-    * capitalized word. Consecutive capitalized words merge into one multiword label.
+  // ---- nominal mentions -----------------------------------------------------------------
+
+  private val ObjectPronouns: Set[String] = Set("him", "her", "them", "me", "us", "it")
+  private val Determiners: Set[String] = Set(
+    "the",
+    "a",
+    "an",
+    "this",
+    "that",
+    "these",
+    "those",
+    "his",
+    "her",
+    "their",
+    "my",
+    "our",
+    "your",
+    "its",
+    "some",
+    "another",
+    "several",
+    "many",
+    "both",
+    "few"
+  )
+  private val NumeralWords: Set[String] = Set(
+    "one",
+    "two",
+    "three",
+    "four",
+    "five",
+    "six",
+    "seven",
+    "eight",
+    "nine",
+    "ten",
+    "several",
+    "many",
+    "both",
+    "few",
+    "couple"
+  )
+
+  /** Pronouns that can be resolved to a preceding nominal mention, with the number they require. */
+  private val ResolvablePronouns: Map[String, MentionNumber] = Map(
+    "he" -> MentionNumber.Singular,
+    "she" -> MentionNumber.Singular,
+    "it" -> MentionNumber.Singular,
+    "him" -> MentionNumber.Singular,
+    "her" -> MentionNumber.Singular,
+    "they" -> MentionNumber.Plural,
+    "them" -> MentionNumber.Plural
+  )
+
+  private def isHead(w: String, entityByName: Map[String, RecallEntityId]): Boolean =
+    RoleNouns.contains(w) || entityByName.contains(w)
+
+  /** Leftmost index of the noun phrase whose head is `words(headIdx)`: at most three pre-head
+    * modifiers (numerals, or content words that are not verbs, pronouns, or stopwords), then an
+    * optional determiner. Multiword names extend leftwards over further name words.
     */
-  private def collectEntities(text: String, clauses: Vector[TextSpan]): Vector[RecallEntity] =
+  private[recall] def phraseStart(words: Vector[String], headIdx: Int): Int =
+    var i = headIdx
+    var mods = 0
+    def modifierLike(w: String): Boolean =
+      NumeralWords.contains(w) ||
+        (!StopWords.contains(w) && !Determiners.contains(w) && !VerbLemmas.contains(w) &&
+          !AgentPronouns.contains(w) && !ObjectPronouns.contains(w) && !RoleNouns.contains(w) &&
+          !Indefinites.contains(w))
+    while i - 1 >= 0 && mods < 3 && modifierLike(words(i - 1)) do
+      i -= 1
+      mods += 1
+    if i - 1 >= 0 && Determiners.contains(words(i - 1)) then i -= 1
+    i
+
+  private def nominalParticipant(
+      role: SketchRole,
+      words: Vector[String],
+      headIdx: Int,
+      entityByName: Map[String, RecallEntityId]
+  ): SketchParticipant =
+    val start = phraseStart(words, headIdx)
+    val phrase = words.slice(start, headIdx + 1).mkString(" ")
+    NominalMention.parse(phrase) match
+      case Some(m) =>
+        val label = (m.modifiers.isEmpty, phrase) match
+          case (true, _) => words(headIdx)
+          case _ => words.slice(start, headIdx + 1).filterNot(Determiners.contains).mkString(" ")
+        SketchParticipant(
+          role,
+          entityByName.get(m.distinctiveKey).orElse(entityByName.get(words(headIdx))),
+          label,
+          specified = true,
+          aliases = m.keys,
+          head = m.head,
+          modifiers = m.modifiers,
+          determiner = Some(m.determiner),
+          number = Some(m.number)
+        )
+      case None =>
+        SketchParticipant(role, entityByName.get(words(headIdx)), words(headIdx))
+
+  /** One nominal or name mention occurrence in the transcript. */
+  private final case class MentionOccurrence(
+      key: String,
+      label: String,
+      span: TextSpan,
+      mention: Option[NominalMention]
+  )
+
+  /** Entities are (a) capitalized names — clause-initial capitals count only when the same word is
+    * capitalized mid-clause elsewhere or is followed by another capitalized word; consecutive name
+    * words merge — and (b) nominal mentions headed by a generic person noun, expanded to their noun
+    * phrase and keyed by [[NominalMention.distinctiveKey]] so "the young man" and "the five men"
+    * are distinct entities. Coreference links are made backwards only: same-key nominals link to
+    * the entity's first mention; pronouns link to the nearest preceding nominal of compatible
+    * number.
+    */
+  private final case class FoundEntities(
+      entities: Vector[RecallEntity],
+      coreference: Vector[RecallCorefLink],
+      byKey: Map[String, RecallEntityId],
+      nameLabels: Set[String]
+  )
+
+  private def collectEntities(text: String, clauses: Vector[TextSpan]): FoundEntities =
     val Token = """[A-Za-zÀ-ɏ]+""".r
     val perClause: Vector[Vector[(String, Int, Int)]] = clauses.map { c =>
       val s = c.slice(text).getOrElse("")
@@ -628,8 +766,11 @@ object RecallSegmenter:
       val lw = Lexical.lower(w)
       w.head.isUpper && !AgentPronouns.contains(lw) && !StopWords.contains(lw) &&
       (!first || midClauseCapitals.contains(lw) || nextCap)
-    val mentions = scala.collection.mutable.LinkedHashMap.empty[String, Vector[TextSpan]]
+
+    val occurrences = Vector.newBuilder[MentionOccurrence]
+    val pronouns = Vector.newBuilder[(String, TextSpan)]
     perClause.foreach { toks =>
+      val lowerWords = toks.map(t => Lexical.lower(t._1))
       var i = 0
       while i < toks.size do
         val (w, start, _) = toks(i)
@@ -639,20 +780,61 @@ object RecallSegmenter:
           var j = i
           while j + 1 < toks.size && nameLike(toks(j + 1)._1, first = false, nextCap = false) do
             j += 1
-          val label = toks.slice(i, j + 1).map(t => Lexical.lower(t._1)).mkString(" ")
-          val span = TextSpan.unsafe(start, toks(j)._3)
-          mentions.update(label, mentions.getOrElse(label, Vector.empty) :+ span)
+          val label = lowerWords.slice(i, j + 1).mkString(" ")
+          occurrences += MentionOccurrence(label, label, TextSpan.unsafe(start, toks(j)._3), None)
           i = j + 1
         else
-          val lw = Lexical.lower(w)
+          val lw = lowerWords(i)
           if RoleNouns.contains(lw) then
-            val span = TextSpan.unsafe(start, toks(i)._3)
-            mentions.update(lw, mentions.getOrElse(lw, Vector.empty) :+ span)
+            val from = phraseStart(lowerWords, i)
+            val phrase = lowerWords.slice(from, i + 1).mkString(" ")
+            NominalMention.parse(phrase) match
+              case Some(m) =>
+                val label =
+                  if m.modifiers.isEmpty then lw
+                  else lowerWords.slice(from, i + 1).filterNot(Determiners.contains).mkString(" ")
+                occurrences += MentionOccurrence(
+                  m.distinctiveKey,
+                  label,
+                  TextSpan.unsafe(toks(from)._2, toks(i)._3),
+                  Some(m)
+                )
+              case None =>
+                occurrences += MentionOccurrence(lw, lw, TextSpan.unsafe(start, toks(i)._3), None)
+          else if ResolvablePronouns.contains(lw) then
+            pronouns += ((lw, TextSpan.unsafe(start, toks(i)._3)))
           i += 1
     }
-    mentions.toVector.zipWithIndex.map { case ((label, spans), i) =>
-      RecallEntity(RecallEntityId.unsafe(s"re$i:${label.replace(' ', '_')}"), label, spans)
+
+    val occs = occurrences.result()
+    val order = occs.map(_.key).distinct
+    val ids: Map[String, RecallEntityId] = order.zipWithIndex.map { case (key, i) =>
+      key -> RecallEntityId.unsafe(s"re$i:${key.replace(' ', '_').replace('+', '_')}")
+    }.toMap
+    val entities = order.map { key =>
+      val mine = occs.filter(_.key == key)
+      RecallEntity(ids(key), mine.head.label, mine.map(_.span))
     }
+    val sameKey = occs
+      .groupBy(_.key)
+      .toVector
+      .flatMap { case (key, mine) =>
+        mine
+          .sortBy(_.span.start)
+          .drop(1)
+          .map(o => RecallCorefLink(o.span, ids(key), RecallCorefKind.SameKey))
+      }
+    val nominalOccs = occs.filter(_.mention.isDefined).sortBy(_.span.start)
+    val pronounLinks = pronouns.result().flatMap { case (p, span) =>
+      val need = ResolvablePronouns(p)
+      nominalOccs
+        .filter(o => o.span.endExclusive <= span.start && o.mention.exists(_.number == need))
+        .lastOption
+        .map(o => RecallCorefLink(span, ids(o.key), RecallCorefKind.Pronoun))
+    }
+    val links = (sameKey ++ pronounLinks).sortBy(l => (l.anaphor.start, l.anaphor.endExclusive))
+    val nameLabels = occs.filter(_.mention.isEmpty).map(_.label).toSet
+    FoundEntities(entities, links, ids, nameLabels)
 
   private def connectiveEdges(
       units: Vector[RecallUnit],
