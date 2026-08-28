@@ -33,7 +33,8 @@ final case class ValidationOutcome(
 )
 
 /** Structural laws of a story model (design record §32.6). Each law has a stable name so gate
-  * reports and tests can address it.
+  * reports and tests can address it. Narrative-consistency rules ([[NarrativeConsistency]]) are
+  * included in the report so a validation policy can block on them.
   */
 object StoryValidator:
 
@@ -41,12 +42,13 @@ object StoryValidator:
       draft: StoryModel[ModelStatus.Draft],
       policy: ValidationPolicy = ValidationPolicy.default
   ): ValidationOutcome =
-    val vs = check(draft)
+    val vs =
+      (check(draft) ++ NarrativeConsistency.check(draft)).sortBy(v => (v.law, v.path, v.reason))
     val report = ValidationReport(vs)
     val blocked = vs.exists(v => policy.blocking.contains(v.severity))
     ValidationOutcome(report, if blocked then None else Some(draft.withStatus))
 
-  /** All violations of all laws, deterministic order. */
+  /** All violations of all structural laws, deterministic order. */
   def check(m: StoryModel[?]): Vector[Violation] =
     val g = m.graph
     val h = m.hierarchy
@@ -57,6 +59,11 @@ object StoryValidator:
       out += Violation(law, Severity.Warning, path, reason)
 
     val textLen = m.source.canonicalText.length
+
+    // atlas: exact recovery against the model's own source
+    SurfaceAtlas.validated(m.atlas).left.foreach(e => err("atlas.valid", "atlas", e.message))
+    if m.atlas.source.canonicalChecksum != m.source.canonicalChecksum then
+      err("atlas.source-match", "atlas", "atlas was built from a different canonical text")
 
     // ids: map keys agree with node ids
     g.entities.foreach((k, e) =>
@@ -72,7 +79,8 @@ object StoryValidator:
       if k != c.id then err("ids.key-consistency", s"contexts/${k.value}", "key differs from id")
     )
 
-    // claims
+    // claims: unique ids, spans inside the text. (Surface-explicit-without-spans is
+    // unrepresentable: ClaimMeta's constructor enforces it.)
     val allClaims = m.claims
     allClaims
       .groupBy(_.id)
@@ -81,10 +89,6 @@ object StoryValidator:
           err("claims.unique-ids", s"claims/${id.value}", s"${cs.size} claims share id")
       )
     allClaims.foreach { c =>
-      ClaimMeta
-        .validated(c)
-        .left
-        .foreach(e => err("claims.explicit-has-spans", s"claims/${c.id.value}", e.message))
       c.evidence.toVector.flatMap(_.spans).foreach { ss =>
         ss.spans.toVector.foreach { sp =>
           if sp.endExclusive > textLen then
@@ -92,6 +96,29 @@ object StoryValidator:
         }
       }
     }
+    // resolved values: no duplicate or self alternative
+    def alternativesLaw[A](path: String, r: Resolved[A]): Unit =
+      val alts = r.alternatives.map(_._1)
+      if alts.distinct.size != alts.size then
+        err("claims.alternatives-distinct", path, "duplicate alternative")
+      if alts.contains(r.value) then
+        err("claims.alternatives-distinct", path, "selected value repeated as an alternative")
+    g.entities.values.foreach(e => alternativesLaw(s"entities/${e.id.value}/label", e.label))
+    g.segments.values.foreach(s => alternativesLaw(s"segments/${s.id.value}/summary", s.summary))
+    m.trajectory.steps.zipWithIndex.foreach((s, i) =>
+      alternativesLaw(s"trajectory/$i/worldTime", s.worldTime)
+    )
+    m.hypotheses.zipWithIndex.foreach { (hyp, i) =>
+      val path = s"hypotheses/$i"
+      alternativesLaw(path, hyp.reading)
+      if !g.situations.contains(hyp.subject) then
+        err("hypothesis.subject-exists", path, s"missing situation ${hyp.subject.value}")
+      if hyp.meta.status != EpistemicStatus.Hypothesized then
+        err("hypothesis.status", path, s"status ${hyp.meta.status} is not Hypothesized")
+      if hyp.reading.alternatives.isEmpty then
+        err("hypothesis.has-alternatives", path, "a hypothesis needs at least one rival reading")
+    }
+
     // node supports within text
     g.situations.values.foreach(s =>
       if s.support.minSpan.endExclusive > textLen then
@@ -149,6 +176,17 @@ object StoryValidator:
       sit("endpoints.participant", path, p.situation)
       ent("endpoints.participant", path, p.entity)
     }
+    g.relations.entityRelations.zipWithIndex.foreach { (e, i) =>
+      val path = s"entityRelations/$i"
+      ent("endpoints.entity-relation", path, e.from)
+      ent("endpoints.entity-relation", path, e.to)
+      if e.from == e.to then err("entity-relation.no-self", path, "self relation")
+    }
+    // membership acyclic
+    g.entities.keys.foreach { e =>
+      if g.groupsOf(e).contains(e) then
+        err("entity-relation.membership-acyclic", s"entities/${e.value}", "cyclic membership")
+    }
     g.relations.temporal.zipWithIndex.foreach { (t, i) =>
       val path = s"temporal/$i"
       val okFrom = sit("endpoints.temporal", path, t.from)
@@ -164,6 +202,9 @@ object StoryValidator:
       if okFrom && okTo && okCtx then
         val ca = g.situations(t.from).context
         val cb = g.situations(t.to).context
+        // An edge may be scoped at or below both endpoints' contexts. An edge scoped to a child
+        // context (a belief, a speech) between two narrated-world situations is legal — it says
+        // how that context orders them — but never contributes to narrated-world chronology.
         if !(g.contextWithin(t.context, ca) && g.contextWithin(t.context, cb)) then
           err(
             "temporal.context-scope",
@@ -171,6 +212,45 @@ object StoryValidator:
             s"edge context ${t.context.value} is not within both endpoint contexts (${ca.value}, ${cb.value})"
           )
     }
+    // duplicate and pairwise-inconsistent temporal edges (per context)
+    g.relations.temporal
+      .groupBy(t => (t.from, t.relation, t.to, t.context))
+      .foreach((k, es) =>
+        if es.size > 1 then
+          err(
+            "temporal.no-duplicate",
+            s"temporal/${k._1.value}-${k._3.value}",
+            s"${es.size} identical ${k._2} edges in ${k._4.value}"
+          )
+      )
+    g.relations.temporal
+      .filter(_.relation.isCanonical)
+      .groupBy(t => (Set(t.from, t.to), t.context))
+      .foreach { (k, es) =>
+        val path = s"temporal/${k._1.map(_.value).toVector.sorted.mkString("-")}"
+        val rels = es.map(_.relation).toSet
+        val definite = rels - TemporalRelation.Unclear
+        if rels.contains(TemporalRelation.Unclear) && definite.nonEmpty then
+          err("temporal.pair-consistent", path, s"Unclear together with ${definite.mkString(",")}")
+        // the same asymmetric relation asserted in both orientations
+        val asymmetric = Set(
+          TemporalRelation.Before,
+          TemporalRelation.Meets,
+          TemporalRelation.Overlaps,
+          TemporalRelation.Starts,
+          TemporalRelation.Finishes
+        )
+        asymmetric.foreach { r =>
+          val oriented = es.filter(_.relation == r).map(e => (e.from, e.to)).toSet
+          if oriented.size > 1 then
+            err("temporal.pair-consistent", path, s"$r asserted in both orientations")
+        }
+        // During/Contains are converses: both orientations must agree
+        val d = es.filter(_.relation == TemporalRelation.During).map(e => (e.from, e.to)).toSet
+        val c = es.filter(_.relation == TemporalRelation.Contains).map(e => (e.to, e.from)).toSet
+        if (d ++ c).size > 1 then
+          err("temporal.pair-consistent", path, "During/Contains asserted in both orientations")
+      }
     g.relations.causal.zipWithIndex.foreach { (c, i) =>
       val path = s"causal/$i"
       val a = sit("endpoints.causal", path, c.cause)
@@ -247,14 +327,25 @@ object StoryValidator:
     // hierarchy
     h.containment.zipWithIndex.foreach { (e, i) =>
       val path = s"containment/$i"
-      e.member match
+      val okMember = e.member match
         case NarrativeMember.Situation(id) => sit("endpoints.containment", path, id)
         case NarrativeMember.Segment(id)   => seg("endpoints.containment", path, id)
-      seg("endpoints.containment", path, e.parent)
+      val okParent = seg("endpoints.containment", path, e.parent)
       if e.weight < 0.0 || e.weight > 1.0 || e.weight.isNaN then
         err("containment.weight-in-unit", path, s"weight ${e.weight}")
       if e.member == NarrativeMember.Segment(e.parent) then
         err("containment.acyclic", path, "segment contains itself")
+      if okMember && okParent && e.isPrimary then
+        val memberSpan = e.member match
+          case NarrativeMember.Situation(id) => g.situations(id).support.minSpan
+          case NarrativeMember.Segment(id)   => g.segments(id).support.minSpan
+        val parentSpan = g.segments(e.parent).support.minSpan
+        if !parentSpan.contains(memberSpan) then
+          err(
+            "hierarchy.member-within-parent",
+            path,
+            s"member span $memberSpan escapes parent span $parentSpan"
+          )
     }
     h.primary
       .groupBy(_.member)
@@ -328,47 +419,62 @@ object StoryValidator:
       if b.level < 1 then err("boundary.level", s"boundaryBeliefs/$i", s"level ${b.level} < 1")
     }
 
-    // temporal consistency per context (strict precedence closure must be acyclic)
+    // temporal consistency per context
     val temporalByCtx = g.relations.temporal
-      .filter(t => g.situations.contains(t.from) && g.situations.contains(t.to))
+      .filter(t =>
+        g.situations.contains(t.from) && g.situations.contains(t.to) && t.relation.isCanonical
+      )
       .groupBy(_.context)
     temporalByCtx.foreach { (c, edges) =>
+      var caught = false
       val strict = edges.filter(_.relation.isStrictPrecedence)
       val equal = edges.filter(_.relation == TemporalRelation.Equal)
       // merge Equal endpoints for the strict cycle check
       val rep = unionFind(equal.map(e => (e.from, e.to)))
       val adj = strict.groupMap(e => rep(e.from))(e => rep(e.to))
-      findCycle(adj).foreach(cycle =>
+      findCycle(adj).foreach { cycle =>
+        caught = true
         err(
           "temporal.strict-acyclic",
           s"contexts/${c.value}",
           s"strict precedence cycle: ${cycle.map(_.value).mkString(" -> ")}"
         )
+      }
+      val containsEdges = edges.flatMap(e =>
+        if e.relation == TemporalRelation.During then Some((e.to, e.from))
+        else if e.relation == TemporalRelation.Contains then Some((e.from, e.to))
+        else None
       )
-      val containsEdges = edges
-        .map(e =>
-          if e.relation == TemporalRelation.During then (e.to, e.from)
-          else if e.relation == TemporalRelation.Contains then (e.from, e.to)
-          else null
-        )
-        .filter(_ != null)
-      findCycle(containsEdges.groupMap(_._1)(_._2)).foreach(cycle =>
+      findCycle(containsEdges.groupMap(_._1)(_._2)).foreach { cycle =>
+        caught = true
         err(
           "temporal.containment-acyclic",
           s"contexts/${c.value}",
           s"interval containment cycle: ${cycle.map(_.value).mkString(" -> ")}"
         )
-      )
+      }
       // strict edge contradicting an Equal
       val strictPairs = strict.map(e => Set(e.from, e.to)).toSet
       equal.foreach(e =>
         if strictPairs.contains(Set(e.from, e.to)) then
+          caught = true
           err(
             "temporal.equal-consistent",
             s"contexts/${c.value}",
             s"${e.from.value} Equal ${e.to.value} but also strictly ordered"
           )
       )
+      // full interval-endpoint consistency (Allen composition through point constraints)
+      if !caught then
+        IntervalConsistency
+          .cycle(edges)
+          .foreach(cycle =>
+            err(
+              "temporal.interval-consistent",
+              s"contexts/${c.value}",
+              s"contradictory interval relations: ${cycle.mkString(" < ")}"
+            )
+          )
     }
 
     // features: declared spaces, sidecar manifests, and row references
@@ -395,8 +501,22 @@ object StoryValidator:
     m.sidecars.foreach { (id, manifest) =>
       val path = s"sidecars/${id.value}"
       if manifest.space != id then err("feature.sidecar-space", path, "manifest space mismatch")
-      if !m.featureSpaces.contains(id) then
-        err("feature.space-exists", path, s"undeclared space ${id.value}")
+      m.featureSpaces.get(id) match
+        case None        => err("feature.space-exists", path, s"undeclared space ${id.value}")
+        case Some(space) =>
+          val expected = space.valueSchema match
+            case FeatureValueSchema.Vector(d)       => Some(d)
+            case FeatureValueSchema.Scalar(_)       => Some(1)
+            case FeatureValueSchema.Categorical(_)  => None
+            case FeatureValueSchema.Distribution(s) => Some(s.size)
+          expected.foreach(d =>
+            if manifest.dimension != d then
+              err(
+                "feature.dimension-consistent",
+                path,
+                s"sidecar dimension ${manifest.dimension} differs from declared $d"
+              )
+          )
       SidecarManifest
         .validated(manifest)
         .left
@@ -406,18 +526,29 @@ object StoryValidator:
       sit("sensory.target-exists", s"sensoryProfiles/${id.value}", id)
     )
 
-    // trajectory steps reference situations in discourse order
+    // trajectory: exactly the adjacent pairs of discourse order, in order; turnover in [0,1]
+    val expectedSteps = g.discourseOrder.zip(g.discourseOrder.drop(1))
+    val actualSteps = m.trajectory.steps.map(s => (s.from, s.to))
+    if actualSteps != expectedSteps then
+      err(
+        "trajectory.complete",
+        "trajectory",
+        s"${actualSteps.size} steps do not match the ${expectedSteps.size} adjacent discourse pairs"
+      )
     m.trajectory.steps.zipWithIndex.foreach { (s, i) =>
       sit("trajectory.endpoints", s"trajectory/$i", s.from)
       sit("trajectory.endpoints", s"trajectory/$i", s.to)
+      if s.entityTurnover.isNaN || s.entityTurnover < 0.0 || s.entityTurnover > 1.0 then
+        err("trajectory.turnover-in-unit", s"trajectory/$i", s"turnover ${s.entityTurnover}")
+      s.worldTimeContext.foreach(c => ctx("trajectory.context-exists", s"trajectory/$i", c))
     }
 
     out.result().sortBy(v => (v.law, v.path, v.reason))
 
   /** Representative map for equality classes over a set of pairs. */
-  private def unionFind(pairs: Vector[(SituationId, SituationId)]): SituationId => SituationId =
-    var parent = Map.empty[SituationId, SituationId]
-    def find(x: SituationId): SituationId =
+  private[story] def unionFind[A](pairs: Vector[(A, A)]): A => A =
+    var parent = Map.empty[A, A]
+    def find(x: A): A =
       parent.get(x) match
         case None              => x
         case Some(p) if p == x => x
@@ -433,15 +564,12 @@ object StoryValidator:
     find
 
   /** First cycle found by iterative DFS over a sparse adjacency; `None` when acyclic. */
-  private[story] def findCycle(
-      adj: Map[SituationId, Vector[SituationId]]
-  ): Option[Vector[SituationId]] =
+  private[story] def findCycle[A: Ordering](adj: Map[A, Vector[A]]): Option[Vector[A]] =
     var white = adj.keys.toSet ++ adj.values.flatten
-    var grey = Set.empty[SituationId]
-    var black = Set.empty[SituationId]
-    var result: Option[Vector[SituationId]] = None
-    def visit(start: SituationId): Unit =
-      // explicit stack of (node, remaining neighbours)
+    var grey = Set.empty[A]
+    var black = Set.empty[A]
+    var result: Option[Vector[A]] = None
+    def visit(start: A): Unit =
       var stack = List((start, adj.getOrElse(start, Vector.empty).toList))
       var path = Vector(start)
       grey += start
@@ -464,3 +592,42 @@ object StoryValidator:
               stack = (n, adj.getOrElse(n, Vector.empty).toList) :: stack
     while white.nonEmpty && result.isEmpty do visit(white.toVector.sorted.head)
     result
+
+/** Allen relations as constraints on interval endpoints. Each interval `X` contributes points
+  * `X.s < X.e`; each relation adds point orderings or equalities; a cycle in the resulting strict
+  * order is a contradiction that no single-relation check can see (e.g. `A Before B`, `C During B`,
+  * `C Before A`).
+  */
+object IntervalConsistency:
+  final case class Point(interval: SituationId, end: Boolean):
+    def render: String = s"${interval.value}.${if end then "e" else "s"}"
+  object Point:
+    given Ordering[Point] = Ordering.by(p => (p.interval, p.end))
+
+  private def s(x: SituationId) = Point(x, false)
+  private def e(x: SituationId) = Point(x, true)
+
+  /** `(strict, equal)` point constraints implied by an edge. */
+  def constraints(t: TemporalEdge): (Vector[(Point, Point)], Vector[(Point, Point)]) =
+    val (a, b) = (t.from, t.to)
+    t.relation match
+      case TemporalRelation.Before   => (Vector((e(a), s(b))), Vector.empty)
+      case TemporalRelation.Meets    => (Vector.empty, Vector((e(a), s(b))))
+      case TemporalRelation.Overlaps =>
+        (Vector((s(a), s(b)), (s(b), e(a)), (e(a), e(b))), Vector.empty)
+      case TemporalRelation.During   => (Vector((s(b), s(a)), (e(a), e(b))), Vector.empty)
+      case TemporalRelation.Contains => (Vector((s(a), s(b)), (e(b), e(a))), Vector.empty)
+      case TemporalRelation.Starts   => (Vector((e(a), e(b))), Vector((s(a), s(b))))
+      case TemporalRelation.Finishes => (Vector((s(b), s(a))), Vector((e(a), e(b))))
+      case TemporalRelation.Equal    => (Vector.empty, Vector((s(a), s(b)), (e(a), e(b))))
+      case TemporalRelation.Unclear  => (Vector.empty, Vector.empty)
+      case other => constraints(t.copy(relation = other.converse, from = b, to = a))
+
+  /** A cycle of point names when the edges are jointly unsatisfiable; `None` when consistent. */
+  def cycle(edges: Vector[TemporalEdge]): Option[Vector[String]] =
+    val intervals = edges.flatMap(t => Vector(t.from, t.to)).distinct
+    val (strictAll, equalAll) = edges.map(constraints).unzip
+    val strict = intervals.map(x => (s(x), e(x))) ++ strictAll.flatten
+    val rep = StoryValidator.unionFind(equalAll.flatten)
+    val adj = strict.groupMap(p => rep(p._1))(p => rep(p._2))
+    StoryValidator.findCycle(adj).map(_.map(_.render))

@@ -147,7 +147,11 @@ class ValidatorSuite extends ScalaCheckSuite:
       )
     )
     val g = b.graph.copy(relations = b.graph.relations.copy(temporal = edges))
-    assertEquals(laws(b.draft(graph = g)), Set("temporal.containment-acyclic"))
+    val ls = laws(b.draft(graph = g))
+    assert(ls.contains("temporal.containment-acyclic"), ls.toString)
+    // the same pair also carries During and Contains in contradictory orientations
+    assert(ls.contains("temporal.pair-consistent"), ls.toString)
+    assertEquals(ls, Set("temporal.containment-acyclic", "temporal.pair-consistent"))
   }
 
   test(
@@ -275,8 +279,19 @@ class ValidatorSuite extends ScalaCheckSuite:
     )
     val out = StoryValidator.validate(b.draft(graph = g))
     assertEquals(out.report.warnings.map(_.law), Vector("causal.cross-context-explicit"))
-    assert(out.validated.isDefined)
-    assert(StoryValidator.validate(b.draft(graph = g), ValidationPolicy.strict).validated.isEmpty)
+    // a surface-explicit causal edge whose evidence carries no causal cue is an error
+    assertEquals(
+      out.report.errors.map(_.law),
+      Vector("explicit-causal-requires-span-with-causal-cue")
+    )
+    assert(out.validated.isEmpty)
+    // the same edge as an entailment: no warning, no error, validates under both policies
+    val entailed =
+      edge.copy(meta = Small.meta("cx2", EpistemicStatus.LinguisticallyEntailed, Some(sp(b, 0))))
+    val g2 = g.copy(relations = g.relations.copy(causal = Vector(entailed)))
+    val out2 = StoryValidator.validate(b.draft(graph = g2), ValidationPolicy.strict)
+    assertEquals(out2.report.violations, Vector.empty, out2.report.render)
+    assert(out2.validated.isDefined)
   }
 
   test("hierarchy.single-primary-root and hierarchy.no-empty-primary-segment") {

@@ -64,7 +64,7 @@ object WarOfTheGhostsModel:
         val rest = sentences.tail.map(n => SpanRef(Some(sent(n).id), sent(n).span))
         SpanSet.of(first +: rest).get
 
-  private def meta(
+  def meta(
       key: String,
       status: EpistemicStatus,
       spans: Option[SpanSet],
@@ -123,7 +123,9 @@ object WarOfTheGhostsModel:
       label: String,
       tpe: EntityType,
       mentionSentences: Vector[Int],
-      attributes: Vector[ScopedAttribute] = Vector.empty
+      attributes: Vector[ScopedAttribute] = Vector.empty,
+      status: EpistemicStatus = EpistemicStatus.SurfaceExplicit,
+      raw: Double = 1.0
   ): EntityNode =
     val support = sp(mentionSentences*)
     EntityNode(
@@ -133,7 +135,7 @@ object WarOfTheGhostsModel:
       NonEmptyVector.fromVectorUnsafe(mentionSentences.map(n => emention(key, n))),
       attributes,
       support,
-      explicit(s"ent:$key", support)
+      meta(s"ent:$key", status, Some(support), raw)
     )
 
   // ---------------------------------------------------------------------------------------------
@@ -175,7 +177,8 @@ object WarOfTheGhostsModel:
       polarity: Polarity = Polarity.Positive,
       modality: Modality = Modality.Asserted,
       raw: Double = 1.0,
-      anchor: Option[(String, Int)] = None
+      anchor: Option[(String, Int)] = None,
+      status: EpistemicStatus = EpistemicStatus.SurfaceExplicit
   ): SituationNode =
     val support = anchoredSupport(sentences, anchor)
     SituationNode.Event(
@@ -189,7 +192,7 @@ object WarOfTheGhostsModel:
         None,
         support,
         NonEmptyVector.fromVectorUnsafe(sentences.map(n => smention(key, n))),
-        explicit(s"sit:$key", sp(sentences*), raw)
+        meta(s"sit:$key", status, Some(sp(sentences*)), raw)
       )
     )
 
@@ -202,7 +205,8 @@ object WarOfTheGhostsModel:
       polarity: Polarity = Polarity.Positive,
       modality: Modality = Modality.Asserted,
       raw: Double = 1.0,
-      anchor: Option[(String, Int)] = None
+      anchor: Option[(String, Int)] = None,
+      status: EpistemicStatus = EpistemicStatus.SurfaceExplicit
   ): SituationNode =
     val support = anchoredSupport(sentences, anchor)
     SituationNode.State(
@@ -215,7 +219,7 @@ object WarOfTheGhostsModel:
         modality,
         support,
         NonEmptyVector.fromVectorUnsafe(sentences.map(n => smention(key, n))),
-        explicit(s"sit:$key", sp(sentences*), raw)
+        meta(s"sit:$key", status, Some(sp(sentences*)), raw)
       )
     )
 
@@ -292,6 +296,9 @@ object WarOfTheGhostsModel:
     val dead = sid("dead")
     val peopleCry = sid("people-cry")
 
+    /** The narrated-world truth of the reported injury, left open (design record §27.2). */
+    val ym2Injured = sid("ym2-injured")
+
   /** Readable segment identifiers. */
   object G:
     val story = gid("story")
@@ -347,12 +354,16 @@ object WarOfTheGhostsModel:
       EntityType.Group,
       Vector(12, 26)
     ),
+    // identifying the decliner's "relatives" (his own words) with the household the survivor
+    // returns to is an inference, not something the text states
     entity(
       "relatives",
       relatives,
-      "the young man's relatives at Egulac",
+      "the young men's people at Egulac",
       EntityType.Group,
-      Vector(16, 48)
+      Vector(0, 16, 48),
+      status = EpistemicStatus.WorldKnowledgeInferred,
+      raw = 0.7
     ),
     entity("shot-fellow", fellow, "the warrior who was shot", EntityType.Person, Vector(28)),
     entity("canoe", canoe, "the warriors' canoe", EntityType.Object, Vector(8, 14, 35)),
@@ -365,7 +376,7 @@ object WarOfTheGhostsModel:
   )
 
   val contexts: Vector[ContextFrame] = Vector(
-    context(world, None, ContextKind.NarratedWorld, 0),
+    context(world, None, ContextKind.NarratedWorld, (0 to 49)*),
     context(thoughtWarParty, Some(world), ContextKind.Belief(youngMen), 5),
     context(speechWarriors1, Some(world), ContextKind.Speech(warriors), 10, 11, 12),
     context(speechYm1a, Some(world), ContextKind.Speech(ym1), 13),
@@ -447,7 +458,6 @@ object WarOfTheGhostsModel:
       world,
       "say",
       "one young man says he has no arrows",
-      raw = 0.6,
       anchor = Some(("said", 0))
     ),
     st(
@@ -762,18 +772,47 @@ object WarOfTheGhostsModel:
     ),
     ev("face-contorted", Vector(46), world, "contort", "his face contorts"),
     st("dead", Vector(47, 49), world, "dead", "he is dead"),
-    ev("people-cry", Vector(48), world, "cry", "the people jump up and cry")
+    ev("people-cry", Vector(48), world, "cry", "the people jump up and cry"),
+    // the positive ambiguity §27.2 demands: whether the young man was in fact injured is a
+    // narrated-world hypothesis with two readings (see `hypotheses`), never an explicit fact
+    ev(
+      "ym2-injured",
+      Vector(30, 32),
+      world,
+      "shoot",
+      "the young man was in fact wounded (open hypothesis)",
+      modality = Possible,
+      raw = 0.5,
+      anchor = Some(("shot", 0)),
+      status = EpistemicStatus.Hypothesized
+    )
   )
 
   // participants ------------------------------------------------------------------------------
 
   import ParticipantRole.*
 
-  private def part(s: SituationId, role: ParticipantRole, e: EntityId, n: Int): ParticipantEdge =
-    ParticipantEdge(s, role, e, explicit(s"part:${s.value}:${role.render}:${e.value}", sp(n)))
+  private def part(
+      s: SituationId,
+      role: ParticipantRole,
+      e: EntityId,
+      n: Int,
+      status: EpistemicStatus = EpistemicStatus.SurfaceExplicit,
+      raw: Double = 1.0
+  ): ParticipantEdge =
+    ParticipantEdge(
+      s,
+      role,
+      e,
+      meta(s"part:${s.value}:${role.render}:${e.value}", status, Some(sp(n)), raw)
+    )
 
   val participants: Vector[ParticipantEdge] = Vector(
     part(S.peopleAtEgulac, Theme, relatives, 0),
+    // the conjectured war party and the canoes are identified with the warriors only by inference
+    part(S.warPartyPresent, Theme, warriors, 5, EpistemicStatus.WorldKnowledgeInferred, 0.6),
+    part(S.canoesComeUp, Theme, canoe, 7, EpistemicStatus.WorldKnowledgeInferred, 0.6),
+    part(S.ym2Injured, Patient, ym2, 30, EpistemicStatus.Hypothesized, 0.5),
     part(S.peopleAtEgulac, Location, egulac, 0),
     part(S.huntSeals, Agent, youngMen, 1),
     part(S.downRiver, Agent, youngMen, 2),
@@ -794,7 +833,8 @@ object WarOfTheGhostsModel:
     part(S.announcedWar, Agent, warriors, 12),
     part(S.announcedWar, Patient, enemy, 12),
     part(S.announcedWar, Location, river, 12),
-    part(S.ym1SaysNoArrows, Agent, ym1, 13),
+    // which of the two speaks is underdetermined by the text: the uncertainty is about the speaker
+    part(S.ym1SaysNoArrows, Agent, ym1, 13, EpistemicStatus.WorldKnowledgeInferred, 0.6),
     part(S.lackArrows, Theme, arrows, 13),
     part(S.lackArrows, Experiencer, ym1, 13),
     part(S.warriorsSayArrows, Agent, warriors, 14),
@@ -968,6 +1008,16 @@ object WarOfTheGhostsModel:
       EpistemicStatus.WorldKnowledgeInferred
     ),
     before(S.battle, S.warriorsGoHome, 33),
+    // closes the narrated-world chain from the battle's internal events to the return
+    before(S.ym2ConcludesGhosts, S.warriorsGoHome, 33),
+    // the hypothesized injury, if it happened, happened during the battle
+    temporal(
+      S.battle,
+      TemporalRelation.Contains,
+      S.ym2Injured,
+      30,
+      EpistemicStatus.Hypothesized
+    ),
     before(S.warriorsGoHome, S.arriveEgulac, 34),
     temporal(
       S.arriveEgulac,
@@ -1108,9 +1158,11 @@ object WarOfTheGhostsModel:
       0.95,
       28
     ),
-    // the cause of death is left open: two competing hypotheses, neither explicit
+    // the cause of death is left open: two competing hypotheses, neither explicit. The wound
+    // hypothesis runs from the *narrated-world* hypothesized injury, not from the warriors' words
+    // and not from the belief content; the rival is that going with the ghosts itself killed him.
     causal(
-      S.reportedShot,
+      S.ym2Injured,
       CausalRelation.Causes,
       S.dead,
       EpistemicStatus.Hypothesized,
@@ -1119,12 +1171,12 @@ object WarOfTheGhostsModel:
       47
     ),
     causal(
-      S.warriorsAreGhosts,
+      S.ym2Accompanies,
       CausalRelation.Causes,
       S.dead,
       EpistemicStatus.Hypothesized,
       0.3,
-      31,
+      19,
       47
     )
   )
@@ -1166,6 +1218,19 @@ object WarOfTheGhostsModel:
       StateChangeKind.Terminates,
       S.nearlyDaylight,
       meta("sc:sun:daylight", EpistemicStatus.LinguisticallyEntailed, Some(sp(43, 44)), 0.9)
+    ),
+    // the belief change: concluding they are ghosts ends the belief that they are people
+    StateChangeEdge(
+      S.ym2ConcludesGhosts,
+      StateChangeKind.Terminates,
+      S.warriorsArePeople,
+      meta("sc:conclude:people", EpistemicStatus.WorldKnowledgeInferred, Some(sp(27, 31)), 0.8)
+    ),
+    StateChangeEdge(
+      S.ym2ConcludesGhosts,
+      StateChangeKind.Initiates,
+      S.warriorsAreGhosts,
+      meta("sc:conclude:ghosts", EpistemicStatus.LinguisticallyEntailed, Some(sp(31)), 0.9)
     )
   )
 
@@ -1195,7 +1260,51 @@ object WarOfTheGhostsModel:
     ref(S.theySaidShot, NarrativeReference.Retrospective, S.warriorsSayGoHome, 41, 30),
     ref(S.iWasShot, NarrativeReference.Retrospective, S.reportedShot, 41, 30),
     ref(S.iDidNotFeelSick, NarrativeReference.Retrospective, S.notFeelSick, 41, 32),
-    ref(S.warriorsAreGhosts, NarrativeReference.Anaphoric, S.warriorsArePeople, 31, 27)
+    // the warriors' report is *about* the (open) narrated-world injury
+    ref(S.reportedShot, NarrativeReference.Partial, S.ym2Injured, 30)
+  )
+
+  // entity relations ---------------------------------------------------------------------------
+
+  private def member(e: EntityId, group: EntityId, n: Int*): EntityEdge =
+    EntityEdge(
+      e,
+      EntityRelation.MemberOf,
+      group,
+      meta(
+        s"member:${e.value}:${group.value}",
+        EpistemicStatus.LinguisticallyEntailed,
+        Some(sp(n*)),
+        0.95
+      )
+    )
+
+  /** The two individuals are members of the pair; their joint actions attach to the group and reach
+    * them through membership (§27.1: separate entities, shared participation).
+    */
+  val entityRelations: Vector[EntityEdge] = Vector(
+    member(ym1, youngMen, 1, 13, 15),
+    member(ym2, youngMen, 1, 17, 19),
+    EntityEdge(
+      fellow,
+      EntityRelation.MemberOf,
+      warriors,
+      meta("member:fellow:warriors", EpistemicStatus.LinguisticallyEntailed, Some(sp(28)), 0.9)
+    )
+  )
+
+  // hypotheses ----------------------------------------------------------------------------------
+
+  /** The narrated-world truth of the injury stays open with both readings retained. */
+  val hypotheses: Vector[HypothesisClaim] = Vector(
+    HypothesisClaim(
+      S.ym2Injured,
+      Resolved(
+        "the young man was in fact wounded in the fight",
+        meta("hyp:ym2-injured", EpistemicStatus.Hypothesized, Some(sp(30, 32)), 0.5),
+        Vector(("no ordinary injury occurred; he felt nothing", Credence.unsafeRaw(0.5)))
+      )
+    )
   )
 
   // segments and hierarchy --------------------------------------------------------------------
@@ -1276,11 +1385,11 @@ object WarOfTheGhostsModel:
       G.sc3b,
       SegmentKind.Scene,
       1,
-      "at the house he tells everything and falls silent",
+      "at the house he tells everything and falls silent as daylight nears",
       37,
-      42
+      43
     ),
-    segment(G.sc3c, SegmentKind.Scene, 1, "at sunrise he collapses and dies", 43, 49)
+    segment(G.sc3c, SegmentKind.Scene, 1, "at sunrise he collapses and dies", 44, 49)
   )
 
   private def contain(member: NarrativeMember, parent: SegmentId): ContainmentEdge =
@@ -1308,7 +1417,7 @@ object WarOfTheGhostsModel:
     else if n <= 22 then G.sc2b
     else if n <= 29 then G.sc2c
     else if n <= 36 then G.sc3a
-    else if n <= 42 then G.sc3b
+    else if n <= 43 then G.sc3b
     else G.sc3c
 
   val containment: Vector[ContainmentEdge] =
@@ -1351,7 +1460,7 @@ object WarOfTheGhostsModel:
     boundary(18, 1, 0.8),
     boundary(22, 1, 0.9),
     boundary(36, 1, 0.8),
-    boundary(42, 1, 0.85),
+    boundary(43, 1, 0.85),
     // a rejected candidate: a scene break at the start of the fight
     boundary(25, 1, 0.3)
   )
@@ -1384,13 +1493,21 @@ object WarOfTheGhostsModel:
     situations.map(s => s.id -> s).toMap,
     segments.map(s => s.id -> s).toMap,
     contexts.map(c => c.id -> c).toMap,
-    RelationLayers(participants, temporal, causal, goals, stateChanges, references)
+    RelationLayers(participants, temporal, causal, goals, stateChanges, references, entityRelations)
   )
 
   val trajectory: DiscourseTrajectory = DiscourseTrajectory.derive(graph, hierarchy, atlas)
 
   val draft: StoryModel[ModelStatus.Draft] =
-    StoryModel.draft(source, atlas, graph, hierarchy, trajectory, descriptors = descriptors)
+    StoryModel.draft(
+      source,
+      atlas,
+      graph,
+      hierarchy,
+      trajectory,
+      descriptors = descriptors,
+      hypotheses = hypotheses
+    )
 
   val validation: ValidationOutcome = StoryValidator.validate(draft, ValidationPolicy.default)
 

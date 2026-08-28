@@ -180,3 +180,14 @@ final case class DescriptorClaim(
     text: String,
     meta: ClaimMeta
 )
+
+/** Competing readings of one situation's narrated-world truth that the model refuses to collapse.
+  *
+  * Why: design record §27.2 requires that an alleged injury reported inside a character's speech
+  * stay open at the narrated-world level, with "injury occurred" and "no ordinary injury occurred"
+  * both retained. The subject is the hypothesized root-world situation; `reading.value` is the
+  * leading reading and `reading.alternatives` its rivals with raw credences. The claim's status
+  * must be `Hypothesized` and it must carry at least one alternative.
+  */
+final case class HypothesisClaim(subject: SituationId, reading: Resolved[String]):
+  def meta: ClaimMeta = reading.meta

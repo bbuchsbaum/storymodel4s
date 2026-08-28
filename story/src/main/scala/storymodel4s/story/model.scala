@@ -11,8 +11,9 @@ object ModelStatus:
   sealed trait Validated extends ModelStatus
   sealed trait Adjudicated extends ModelStatus
 
-/** The full story representation `(A, G, H, X, Γ)` plus feature manifests, descriptors, and an
-  * optional receipt. Constructed only through [[StoryModel.draft]] and promoted by validation.
+/** The full story representation `(A, G, H, X, Γ)` plus feature manifests, descriptors, hypotheses,
+  * and an optional receipt. Constructed only through [[StoryModel.draft]] and promoted by
+  * validation.
   */
 final case class StoryModel[S <: ModelStatus] private[story] (
     schemaVersion: String,
@@ -25,13 +26,17 @@ final case class StoryModel[S <: ModelStatus] private[story] (
     sidecars: Map[FeatureSpaceId, SidecarManifest],
     featureRefs: Vector[FeatureRef],
     descriptors: Vector[DescriptorClaim],
+    hypotheses: Vector[HypothesisClaim],
     sensoryProfiles: Map[SituationId, Vector[SensoryProfile]],
     receipt: Option[BuildReceipt]
 ):
-  /** Every inline claim in the model, in a deterministic order. */
+  /** Every inline claim in the model, in a deterministic order: node claims, resolved-value claims
+    * (entity labels, segment summaries), scoped attributes, every relation layer, containment,
+    * trajectory transitions, descriptors, and hypotheses.
+    */
   lazy val claims: Vector[ClaimMeta] =
-    (graph.allMeta ++ hierarchy.allMeta ++ trajectory.allMeta ++ descriptors.map(_.meta))
-      .sortBy(_.id)
+    (graph.allMeta ++ hierarchy.allMeta ++ trajectory.allMeta ++ descriptors.map(_.meta) ++
+      hypotheses.map(_.meta)).sortBy(_.id)
 
   /** The derived, normalized claim ledger; fails on duplicate claim identifiers. */
   lazy val ledger: Either[DomainError, ClaimLedger] = ClaimLedger.empty.addAll(claims)
@@ -48,6 +53,7 @@ final case class StoryModel[S <: ModelStatus] private[story] (
       sidecars,
       featureRefs,
       descriptors,
+      hypotheses,
       sensoryProfiles,
       receipt
     )
@@ -65,6 +71,7 @@ object StoryModel:
       sidecars: Map[FeatureSpaceId, SidecarManifest] = Map.empty,
       featureRefs: Vector[FeatureRef] = Vector.empty,
       descriptors: Vector[DescriptorClaim] = Vector.empty,
+      hypotheses: Vector[HypothesisClaim] = Vector.empty,
       sensoryProfiles: Map[SituationId, Vector[SensoryProfile]] = Map.empty,
       receipt: Option[BuildReceipt] = None,
       schemaVersion: String = SchemaVersion
@@ -80,6 +87,7 @@ object StoryModel:
       sidecars,
       featureRefs,
       descriptors,
+      hypotheses,
       sensoryProfiles,
       receipt
     )

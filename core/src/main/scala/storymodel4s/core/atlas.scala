@@ -23,7 +23,7 @@ type LanguageTag = LanguageTag.LanguageTag
   * tokenizer must never cut inside a surrogate pair; both would make offsets and normalized forms
   * platform-dependent.
   */
-private[core] object TextNorm:
+object TextNorm:
   /** Lowercase by code point, independent of the default locale. */
   def lower(s: String): String =
     val sb = new java.lang.StringBuilder(s.length)
