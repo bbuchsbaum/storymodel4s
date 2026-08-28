@@ -1,6 +1,7 @@
 package storymodel4s.recall
 
 import storymodel4s.core.{Probability, SpanSet, TextSpan}
+import storymodel4s.proposition.PropositionEvidence
 
 /** What a recall unit is doing in the discourse. Kept separate from source anchoring: an
   * association is not an intrusion, and an evaluation is not an omission.
@@ -115,6 +116,10 @@ object PropositionSketch:
 
 /** One idea unit of a recall: `(z, q, ψ, κ)` in the design record, with `z` (source anchoring) left
   * to the aligner and `grounding` the optional partial-grounding prior α.
+  *
+  * `evidence` is the optional checked proposition chart for this unit (ADR 0001 rev 3 §D4b): when
+  * present, chart-based gates and `d_chart` apply; when absent the sketch is the only structural
+  * signal and chart distances are `Missing`, never imputed.
   */
 final case class RecallUnit(
     id: RecallUnitId,
@@ -124,6 +129,8 @@ final case class RecallUnit(
     function: DiscourseFunction,
     expressedUncertainty: ExpressedUncertainty,
     proposition: PropositionSketch,
-    grounding: Option[Probability]
+    grounding: Option[Probability],
+    evidence: Option[PropositionEvidence] = None
 ):
   def minSpan: TextSpan = span.minSpan
+  def hasEvidence: Boolean = evidence.nonEmpty

@@ -2,6 +2,7 @@ package storymodel4s.align
 
 import cats.data.NonEmptySet
 import storymodel4s.features.{Estimate, MissingReason}
+import storymodel4s.proposition.{ChartCompatibility, CompatibilityReport, PropositionEvidence}
 import storymodel4s.recall.*
 
 /** Additive terms of the local content cost `C_iv` (design record §7.1). `Distortion` is the
@@ -10,7 +11,24 @@ import storymodel4s.recall.*
   * faithful anchor is preferred over a distorted one at equal content match.
   */
 enum CostTerm:
-  case Semantic, Propositional, Entity, Sensory, Granularity, Distortion
+  /** `d_sem`: graded dense-geometry distance (embedding or lexical fallback). */
+  case Semantic
+
+  /** `d_sketch`: predicate agreement of the shallow sketches — the M0 fallback, never labelled a
+    * chart or structural distance.
+    */
+  case Propositional
+  case Entity, Sensory, Granularity, Distortion
+
+  /** `d_chart`: `ChartCompatibility` over checked proposition charts; `Missing` without evidence on
+    * both sides.
+    */
+  case Chart
+
+  /** `d_wl`: injected structural (graph-kernel) distance over charts; `Missing` unless a provider
+    * (`embed-grakern`) is configured and evidence exists.
+    */
+  case Structural
 
 final case class CostWeights private (
     semantic: Double,
@@ -18,7 +36,9 @@ final case class CostWeights private (
     entity: Double,
     sensory: Double,
     granularity: Double,
-    contradiction: Double
+    contradiction: Double,
+    chart: Double,
+    structural: Double
 ):
   def apply(term: CostTerm): Double = term match
     case CostTerm.Semantic      => semantic
@@ -27,20 +47,48 @@ final case class CostWeights private (
     case CostTerm.Sensory       => sensory
     case CostTerm.Granularity   => granularity
     case CostTerm.Distortion    => contradiction
+    case CostTerm.Chart         => chart
+    case CostTerm.Structural    => structural
 
 object CostWeights:
-  /** Weights must be finite and nonnegative. */
+  /** Weights must be finite and nonnegative. `chart` and `structural` weight the optional
+    * evidence-backed distances (ADR 0001 rev 3 §D4b); they are inert whenever those terms are
+    * `Missing`.
+    */
   def of(
       semantic: Double,
       propositional: Double,
       entity: Double,
       sensory: Double,
       granularity: Double,
-      contradiction: Double
+      contradiction: Double,
+      chart: Double = 0.5,
+      structural: Double = 0.5
   ): Either[AlignError, CostWeights] =
-    val all = Vector(semantic, propositional, entity, sensory, granularity, contradiction)
+    val all =
+      Vector(
+        semantic,
+        propositional,
+        entity,
+        sensory,
+        granularity,
+        contradiction,
+        chart,
+        structural
+      )
     if all.forall(w => w >= 0.0 && !w.isNaN && !w.isInfinite) then
-      Right(new CostWeights(semantic, propositional, entity, sensory, granularity, contradiction))
+      Right(
+        new CostWeights(
+          semantic,
+          propositional,
+          entity,
+          sensory,
+          granularity,
+          contradiction,
+          chart,
+          structural
+        )
+      )
     else Left(AlignError.InvalidConfig("CostWeights", "weights must be finite and nonnegative"))
 
   def unsafe(
@@ -49,17 +97,20 @@ object CostWeights:
       entity: Double,
       sensory: Double,
       granularity: Double,
-      contradiction: Double
+      contradiction: Double,
+      chart: Double = 0.5,
+      structural: Double = 0.5
   ): CostWeights =
-    of(semantic, propositional, entity, sensory, granularity, contradiction).fold(
-      e => throw new IllegalArgumentException(e.message),
-      identity
-    )
+    of(semantic, propositional, entity, sensory, granularity, contradiction, chart, structural)
+      .fold(
+        e => throw new IllegalArgumentException(e.message),
+        identity
+      )
 
   val default: CostWeights = unsafe(1.0, 0.5, 0.4, 0.15, 0.3, 1.0)
 
   /** Embedding-only weights for the baseline ablation: no structure. */
-  val semanticOnly: CostWeights = unsafe(1.0, 0.0, 0.0, 0.0, 0.0, 0.0)
+  val semanticOnly: CostWeights = unsafe(1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
 
 /** Structural incompatibilities that embeddings cannot see. Every contradiction is a *fidelity
   * facet* of the anchor: it makes `(anchor, Faithful)` inadmissible and `(anchor,
@@ -82,14 +133,22 @@ enum Exclusion:
   /** The candidate reference is not a node of the view. */
   case Unreachable
 
-/** The cost of one admissible `(anchor, mode)` state (or external state) for one unit. */
+/** The cost of one admissible `(anchor, mode)` state (or external state) for one unit.
+  *
+  * `missingTerms` names the optional terms that were `Missing` for this pair (no evidence, provider
+  * abstained) and therefore contributed nothing — never a substituted value — and `coverage` is the
+  * structural coverage of the candidate (ADR 0001 rev 3 §D4b).
+  */
 final case class CostBreakdown(
     terms: Map[CostTerm, Double],
     mode: Option[FidelityMode],
     exclusion: Option[Exclusion],
-    total: Double
+    total: Double,
+    missingTerms: Set[CostTerm] = Set.empty,
+    coverage: Option[StructuralCoverage] = None
 ):
   def term(t: CostTerm): Double = terms.getOrElse(t, 0.0)
+  def has(t: CostTerm): Boolean = terms.contains(t)
 
   /** Not a source state for this unit (bookkeeping only). */
   def excluded: Boolean = exclusion.nonEmpty
@@ -161,10 +220,109 @@ private[align] object Names:
   def overlap(a: Set[String], b: Set[String]): Boolean =
     a.exists(b.contains) || tokens(a).exists(tokens(b).contains)
 
-/** Detects structural contradictions between a recall sketch and a source node summary. Rules are
-  * conservative: each fires only when the compared slots are both specified.
+/** `d_wl`: an injected structural distance over proposition charts (the grakern channel of ADR 0001
+  * rev 3 §D4b/§D4c). It sees only evidence, never sketches or text, and abstains with `Missing`
+  * whenever either side lacks a chart. The default provider abstains always; the `embed-grakern`
+  * adapter supplies WL-kernel distances later.
+  */
+trait StructuralDistance:
+  def apply(unit: PropositionEvidence, node: PropositionEvidence): Estimate[Double]
+
+object StructuralDistance:
+  /** No structural provider configured: `d_wl` is `Missing` everywhere. */
+  val missing: StructuralDistance =
+    (_, _) => Estimate.missing(MissingReason.ProviderAbstained)
+
+  def of(f: (PropositionEvidence, PropositionEvidence) => Double): StructuralDistance =
+    (a, b) => Estimate.observed(f(a, b))
+
+  def apply(f: (PropositionEvidence, PropositionEvidence) => Estimate[Double]): StructuralDistance =
+    (a, b) => f(a, b)
+
+/** `d_chart`: graded chart compatibility turned into a distance, plus the gates the charts carry.
+  * On a segment the distance is the best-matching member's distance, blended toward the neutral
+  * value by the fraction of members *without* a chart (coverage-weighted confidence), so an
+  * uncovered segment is never reported as a perfect or a perfect-miss structural match.
+  */
+object ChartDistance:
+  /** Neutral value used for the uncovered fraction of a segment. */
+  val Neutral: Double = 0.5
+
+  /** Distance between two charts in `[0, 1]`: `1 − structuralScore`. */
+  def between(a: PropositionEvidence, b: PropositionEvidence): Double =
+    1.0 - ChartCompatibility.compare(a.chart, b.chart).structuralScore
+
+  /** The report the charts give, when both sides carry evidence. */
+  def report(unit: RecallUnit, node: NodeSummary): Option[CompatibilityReport] =
+    for
+      u <- unit.evidence
+      n <- node.evidence
+    yield ChartCompatibility.compare(u.chart, n.chart)
+
+  /** `d_chart` for a unit against a node of any level. `Missing(ProviderAbstained)` when the unit
+    * has no chart; `Missing(Excluded)` when no member under the node has one.
+    */
+  def apply(unit: RecallUnit, node: NodeSummary, view: SourceView): Estimate[Double] =
+    unit.evidence match
+      case None    => Estimate.missing(MissingReason.ProviderAbstained)
+      case Some(u) =>
+        val members = view.segmentEvidence(node.ref).members
+        if members.isEmpty then Estimate.missing(MissingReason.Excluded)
+        else
+          val best = members.map(m => between(u, m)).min
+          val cov = view.structuralCoverage(node.ref).fraction
+          Estimate.observed(cov * best + (1.0 - cov) * Neutral)
+
+  /** Segment reducer for an injected structural distance: same coverage-weighted best-member rule;
+    * `Missing` when the provider abstains on every covered member.
+    */
+  def structural(
+      distance: StructuralDistance,
+      unit: RecallUnit,
+      node: NodeSummary,
+      view: SourceView
+  ): Estimate[Double] =
+    unit.evidence match
+      case None    => Estimate.missing(MissingReason.ProviderAbstained)
+      case Some(u) =>
+        val members = view.segmentEvidence(node.ref).members
+        if members.isEmpty then Estimate.missing(MissingReason.Excluded)
+        else
+          val observed = members.flatMap(m => distance(u, m).toOption)
+          if observed.isEmpty then Estimate.missing(MissingReason.ProviderAbstained)
+          else
+            val cov = view.structuralCoverage(node.ref).fraction
+            Estimate.observed(cov * observed.min + (1.0 - cov) * Neutral)
+
+/** Detects structural contradictions between a recall unit and a source node. When both sides carry
+  * checked charts, the chart report decides role reversal, polarity and embedding (context)
+  * conflict — chart evidence takes precedence over the sketch heuristics for those three facets —
+  * while modality and outcome conflicts still come from the sketch. Rules are conservative: each
+  * fires only when the compared slots are both specified.
   */
 object ContradictionDetector:
+  /** Facets a chart report decides. */
+  private val ChartFacets: Set[Contradiction] =
+    Set(Contradiction.RoleReversal, Contradiction.PolarityConflict, Contradiction.ContextConflict)
+
+  /** Contradictions carried by a chart report. */
+  def fromReport(report: CompatibilityReport): Vector[Contradiction] =
+    Vector(
+      Option.when(report.roleReversal)(Contradiction.RoleReversal),
+      Option.when(report.polarityConflict)(Contradiction.PolarityConflict),
+      Option.when(report.embeddingConflict)(Contradiction.ContextConflict)
+    ).flatten
+
+  /** Evidence-aware detection for a unit: chart facets from the charts when both exist, sketch
+    * facets otherwise; modality/outcome always from the sketch.
+    */
+  def detect(unit: RecallUnit, node: NodeSummary): Vector[Contradiction] =
+    ChartDistance.report(unit, node) match
+      case Some(report) =>
+        val fromSketch = detect(unit.proposition, node).filterNot(ChartFacets.contains)
+        (fromReport(report) ++ fromSketch).distinct
+      case None => detect(unit.proposition, node)
+
   def detect(sketch: PropositionSketch, node: NodeSummary): Vector[Contradiction] =
     val predicateMatch = sketch.predicate.exists(p => node.predicate.exists(_ == p))
     val out = Vector.newBuilder[Contradiction]
@@ -220,6 +378,14 @@ object ContradictionDetector:
   def engages(sketch: PropositionSketch, node: NodeSummary): Boolean =
     sketch.predicate.exists(p => node.predicate.contains(p)) || detect(sketch, node).nonEmpty
 
+  /** Evidence-aware engagement: charts with any matched predicate engage; otherwise the sketch
+    * rule.
+    */
+  def engages(unit: RecallUnit, node: NodeSummary): Boolean =
+    ChartDistance.report(unit, node) match
+      case Some(r) => r.matchedPredicates.nonEmpty || detect(unit, node).nonEmpty
+      case None    => engages(unit.proposition, node)
+
 /** Which `(anchor, mode)` pairs a unit may occupy on a candidate node. Decided by [[ModeGate]]
   * before any graded cost is evaluated; `faithful` is false exactly when a contradiction was
   * detected, in which case `distortion` names the contradicted facets and the distorted state is
@@ -267,14 +433,13 @@ object Admissibility:
   */
 object ModeGate:
   def assess(unit: RecallUnit, node: NodeSummary, view: SourceView): Admissibility =
-    val sketch = unit.proposition
-    if node.isLeaf then Admissibility.of(ContradictionDetector.detect(sketch, node))
+    if node.isLeaf then Admissibility.of(ContradictionDetector.detect(unit, node))
     else
       val engaged = view
         .leavesUnder(node.ref)
         .flatMap(view.node)
-        .filter(ContradictionDetector.engages(sketch, _))
-      val reports = engaged.map(ContradictionDetector.detect(sketch, _))
+        .filter(ContradictionDetector.engages(unit, _))
+      val reports = engaged.map(ContradictionDetector.detect(unit, _))
       if engaged.nonEmpty && reports.forall(_.nonEmpty) then Admissibility.of(reports.flatten)
       else Admissibility.faithfulOnly
 
@@ -328,6 +493,14 @@ object ExternalStates:
     case DiscourseFunction.EpisodicAssertion => ExternalState.Intrusion
     case DiscourseFunction.Summary           => ExternalState.Intrusion
 
+/** The default local cost model. Terms are composed lexicographically after the mode gate: only
+  * admissible pairs reach here, and only *present* terms enter the total. The optional
+  * evidence-backed terms `d_chart` and `d_wl` are `Missing` without charts (or without a structural
+  * provider) and then contribute nothing — they are never imputed from `d_sketch` or `d_sem`, and a
+  * `Missing` term is recorded in `CostBreakdown.missingTerms`. The dense term `d_sem` keeps its M0
+  * behaviour: an abstaining provider is replaced by the declared neutral `missingSemantic` (a
+  * constant, not another term), because unranked units are already routed to `Unranked` upstream.
+  */
 final case class DefaultLocalCostModel(
     weights: CostWeights = CostWeights.default,
     semantic: SemanticDistance = SemanticDistance.lexicalJaccard,
@@ -335,7 +508,8 @@ final case class DefaultLocalCostModel(
     externalFloor: Double = 1.0,
     externalMismatch: Double = 0.5,
     missingSemantic: Double = 0.5,
-    distortionPenalty: Double = 0.3
+    distortionPenalty: Double = 0.3,
+    structural: StructuralDistance = StructuralDistance.missing
 ) extends LocalCostModel:
 
   def externalCost(unit: RecallUnit, state: ExternalState): Double =
@@ -383,7 +557,11 @@ final case class DefaultLocalCostModel(
     // match and must stay below the external floor so a well-matched distorted anchor is
     // preferred to intrusion (design record §9). Provisional until W4 calibration.
     val dDist = distortionPenalty * mode.facetSet.size.toDouble
-    val terms = Map(
+    // Optional evidence-backed terms: present only when charts exist on both sides (and, for
+    // `d_wl`, a provider answered). Absent terms are inert and recorded, never substituted.
+    val dChart = ChartDistance(unit, node, view)
+    val dWl = ChartDistance.structural(structural, unit, node, view)
+    val always = Vector(
       CostTerm.Semantic -> dSem,
       CostTerm.Propositional -> dProp,
       CostTerm.Entity -> dEnt,
@@ -391,9 +569,22 @@ final case class DefaultLocalCostModel(
       CostTerm.Granularity -> dGran,
       CostTerm.Distortion -> dDist
     )
+    val optional = Vector(CostTerm.Chart -> dChart, CostTerm.Structural -> dWl)
+    val present = optional.collect { case (t, Estimate.Observed(v, _)) => t -> clamp(v) }
+    val missing = optional.collect { case (t, Estimate.Missing(_)) => t }.toSet
+    val terms = (always ++ present).toMap
+    // deterministic summation order over the enum, skipping absent terms
     val weighted =
-      CostTerm.values.toVector.map(t => weights(t) * terms(t)).sum + functionPrior(unit.function)
-    CostBreakdown(terms, Some(mode), None, weighted)
+      CostTerm.values.toVector.flatMap(t => terms.get(t).map(weights(t) * _)).sum +
+        functionPrior(unit.function)
+    CostBreakdown(
+      terms,
+      Some(mode),
+      None,
+      weighted,
+      missing,
+      Some(view.structuralCoverage(node.ref))
+    )
 
   private def clamp(x: Double): Double =
     if x.isNaN then 1.0 else math.max(0.0, math.min(1.0, x))

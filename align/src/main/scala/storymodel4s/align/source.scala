@@ -1,8 +1,32 @@
 package storymodel4s.align
 
 import storymodel4s.core.{SegmentId, SituationId, SpanSet}
-import storymodel4s.features.{Estimate, ScoreEstimate}
+import storymodel4s.features.{Coverage, Estimate, ScoreEstimate}
+import storymodel4s.proposition.PropositionEvidence
 import storymodel4s.recall.{Lexical, ModalityTag, PolarityTag, SketchRole}
+
+/** The proposition evidence available under a source node (ADR 0001 rev 3 §D4b). An atomic
+  * situation contributes its own chart (at most one); a segment contributes the multiset of its
+  * members' charts. A segment never receives a fabricated chart of its own.
+  */
+final case class SegmentEvidence(members: Vector[PropositionEvidence]):
+  def isEmpty: Boolean = members.isEmpty
+  def nonEmpty: Boolean = members.nonEmpty
+
+object SegmentEvidence:
+  val empty: SegmentEvidence = SegmentEvidence(Vector.empty)
+
+/** How much of a candidate's structural surface is backed by charts: for a leaf `members = 1`; for
+  * a segment `members` is the number of leaves under it and `membersWithEvidence` how many of them
+  * carry a chart. Chart-based distances on a segment are computed over the covered leaves only and
+  * reported with this coverage, never as if the segment were fully charted.
+  */
+final case class StructuralCoverage(level: Int, membersWithEvidence: Int, members: Int):
+  def coverage: Coverage = Coverage.unsafe(members, membersWithEvidence)
+  def fraction: Double =
+    if members <= 0 then 0.0 else membersWithEvidence.toDouble / members.toDouble
+  def isComplete: Boolean = members > 0 && membersWithEvidence == members
+  def isEmpty: Boolean = membersWithEvidence == 0
 
 /** An alignable source node: an atomic situation or a composite segment (scene, episode, root). */
 enum SourceNodeRef:
@@ -82,8 +106,10 @@ final case class NodeSummary(
     lemmas: Set[String],
     outcome: Option[String] = None,
     cause: Option[String] = None,
-    importance: ScoreEstimate = Estimate.observed(1.0)
+    importance: ScoreEstimate = Estimate.observed(1.0),
+    evidence: Option[PropositionEvidence] = None
 ):
+  def hasEvidence: Boolean = evidence.nonEmpty
   def byRole(role: SketchRole): Option[ParticipantSummary] = participants.find(_.role == role)
   def agent: Option[ParticipantSummary] = byRole(SketchRole.Agent)
 
@@ -142,6 +168,24 @@ trait SourceView:
   /** Leaves under `ref` (the node itself when it is a leaf); memoized. */
   def leavesUnder(ref: SourceNodeRef): Vector[SourceNodeRef] =
     leavesIndex.getOrElse(ref, Vector.empty)
+
+  /** The proposition evidence under `ref`: the node's own chart for a leaf, the multiset of member
+    * charts for a segment (in leaf order). Never fabricates a segment chart.
+    */
+  def segmentEvidence(ref: SourceNodeRef): SegmentEvidence =
+    node(ref) match
+      case Some(n) if n.isLeaf => SegmentEvidence(n.evidence.toVector)
+      case Some(_) => SegmentEvidence(leavesUnder(ref).flatMap(node).flatMap(_.evidence))
+      case None    => SegmentEvidence.empty
+
+  /** Structural coverage of `ref`: how many of its members carry a chart. */
+  def structuralCoverage(ref: SourceNodeRef): StructuralCoverage =
+    node(ref) match
+      case Some(n) if n.isLeaf => StructuralCoverage(0, if n.hasEvidence then 1 else 0, 1)
+      case Some(n)             =>
+        val leaves = leavesUnder(ref).flatMap(node)
+        StructuralCoverage(n.level, leaves.count(_.hasEvidence), leaves.size)
+      case None => StructuralCoverage(0, 0, 0)
 
   private lazy val leavesIndex: Map[SourceNodeRef, Vector[SourceNodeRef]] =
     nodes.map { n =>

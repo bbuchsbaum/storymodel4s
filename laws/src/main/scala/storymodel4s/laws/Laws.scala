@@ -146,6 +146,29 @@ object AlignmentLaws extends Laws:
         val res = AlignGens.infer(c)
         res.flow.steps.size == math.max(0, res.posterior.rows.size - 1)
       },
+      "absent evidence terms are inert: without charts, d_chart and d_wl are Missing and a structural provider changes nothing (ADR 0001 rev 3 §D4b)" ->
+        forAll { (c: AlignGens.Case) =>
+          val base = AlignGens.infer(c)
+          val withProvider = AlignGens.inferWith(
+            c,
+            DefaultLocalCostModel(
+              semantic = c.semantic,
+              structural = StructuralDistance.of((_, _) => 0.0)
+            )
+          )
+          val samePosterior = base.posterior.rows.zip(withProvider.posterior.rows).forall {
+            (a, b) => agree(a.mass, b.mass) && agree(b.mass, a.mass)
+          }
+          val recorded = withProvider.costs.values.forall(_.values.forall { b =>
+            b.exclusion.nonEmpty || b.mode.isEmpty ||
+            (b.missingTerms == Set(CostTerm.Chart, CostTerm.Structural) &&
+              !b.has(CostTerm.Chart) && !b.has(CostTerm.Structural))
+          })
+          val sameTotals = base.costs.forall { (u, m) =>
+            m.forall { (s, b) => withProvider.costs(u).get(s).exists(_.total == b.total) }
+          }
+          samePosterior && recorded && sameTotals
+        },
       "localizability lies in [0, 1] and is defined iff the unit has source mass" -> forAll {
         (c: AlignGens.Case) =>
           val k = c.view.sourceNodeCount
