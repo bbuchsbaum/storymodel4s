@@ -197,6 +197,166 @@ object Small:
       NarrativeHierarchy(containment, Vector.empty)
     )
 
+/** Minimal mutations of a valid built model, one per validator law introduced by the review fix
+  * pass. Each returns a draft that should violate exactly the named law (plus any law it entails).
+  */
+object Mutations:
+  import Small.meta
+
+  private def sp(b: Small.Built, i: Int): SpanSet =
+    SpanSet.one(SpanRef(Some(b.atlas.sentences(i).id), b.atlas.sentences(i).span))
+
+  def edge(
+      b: Small.Built,
+      a: Int,
+      rel: TemporalRelation,
+      c: Int,
+      key: String,
+      ctx: Option[ContextId] = None
+  ): TemporalEdge =
+    TemporalEdge(
+      b.situations(a),
+      rel,
+      b.situations(c),
+      ctx.getOrElse(b.world),
+      meta(key, EpistemicStatus.Hypothesized, None)
+    )
+
+  def withTemporal(b: Small.Built, edges: Vector[TemporalEdge]): StoryModel[ModelStatus.Draft] =
+    b.draft(graph = b.graph.copy(relations = b.graph.relations.copy(temporal = edges)))
+
+  /** `A Before B, C During B, C Before A`: consistent pairwise, contradictory as intervals. */
+  def intervalContradiction1(b: Small.Built): StoryModel[ModelStatus.Draft] =
+    withTemporal(
+      b,
+      Vector(
+        edge(b, 0, TemporalRelation.Before, 1, "ab"),
+        edge(b, 2, TemporalRelation.During, 1, "cb"),
+        edge(b, 2, TemporalRelation.Before, 0, "ca")
+      )
+    )
+
+  /** `A Before B, A Starts B`: A cannot both end before B starts and start with B. */
+  def intervalContradiction2(b: Small.Built): StoryModel[ModelStatus.Draft] =
+    withTemporal(
+      b,
+      Vector(
+        edge(b, 0, TemporalRelation.Before, 1, "ab"),
+        edge(b, 0, TemporalRelation.Starts, 1, "as")
+      )
+    )
+
+  /** A consistent mixed model: `A Overlaps B, B Contains C, C Before D, A Before D`. */
+  def intervalConsistent(b: Small.Built): StoryModel[ModelStatus.Draft] =
+    withTemporal(
+      b,
+      Vector(
+        edge(b, 0, TemporalRelation.Overlaps, 1, "ab"),
+        edge(b, 1, TemporalRelation.Contains, 2, "bc"),
+        edge(b, 2, TemporalRelation.Before, 3, "cd"),
+        edge(b, 0, TemporalRelation.Before, 3, "ad")
+      )
+    )
+
+  def duplicateTemporal(b: Small.Built): StoryModel[ModelStatus.Draft] =
+    withTemporal(
+      b,
+      Vector(
+        edge(b, 0, TemporalRelation.Before, 1, "x"),
+        edge(b, 0, TemporalRelation.Before, 1, "y")
+      )
+    )
+
+  def unclearPlusStrict(b: Small.Built): StoryModel[ModelStatus.Draft] =
+    withTemporal(
+      b,
+      Vector(
+        edge(b, 0, TemporalRelation.Before, 1, "x"),
+        edge(b, 0, TemporalRelation.Unclear, 1, "y")
+      )
+    )
+
+  def overlapsBothWays(b: Small.Built): StoryModel[ModelStatus.Draft] =
+    withTemporal(
+      b,
+      Vector(
+        edge(b, 0, TemporalRelation.Overlaps, 1, "x"),
+        edge(b, 1, TemporalRelation.Overlaps, 0, "y")
+      )
+    )
+
+  /** The atlas of a different text. */
+  def foreignAtlas(b: Small.Built): StoryModel[ModelStatus.Draft] =
+    val other = Small.source(b.situations.size + 1)
+    StoryModel.draft(
+      b.source,
+      SurfaceAnalyzer.analyze(other),
+      b.graph,
+      b.hierarchy,
+      DiscourseTrajectory.derive(b.graph, b.hierarchy, b.atlas)
+    )
+
+  /** A scene whose span no longer covers its members. */
+  def sceneTooSmall(b: Small.Built): StoryModel[ModelStatus.Draft] =
+    val scene = b.graph.segments(b.scene)
+    val shrunk = scene.copy(support = sp(b, 0))
+    b.draft(graph = b.graph.copy(segments = b.graph.segments.updated(b.scene, shrunk)))
+
+  /** The selected entity label repeated as an alternative. */
+  def selfAlternative(b: Small.Built): StoryModel[ModelStatus.Draft] =
+    val e = b.graph.entities(b.entities(0))
+    val bad =
+      e.copy(label = e.label.copy(alternatives = Vector((e.label.value, Credence.unsafeRaw(0.5)))))
+    b.draft(graph = b.graph.copy(entities = b.graph.entities.updated(e.id, bad)))
+
+  /** A trajectory with a step missing. */
+  def incompleteTrajectory(b: Small.Built): StoryModel[ModelStatus.Draft] =
+    val t = DiscourseTrajectory.derive(b.graph, b.hierarchy, b.atlas)
+    StoryModel.draft(b.source, b.atlas, b.graph, b.hierarchy, DiscourseTrajectory(t.steps.drop(1)))
+
+  /** A sidecar whose dimension disagrees with the declared vector schema. */
+  def dimensionMismatch(b: Small.Built): StoryModel[ModelStatus.Draft] =
+    val id = FeatureSpaceId.unsafe("space:v")
+    val space = FeatureSpace[Vector[Double]](
+      id,
+      "vec",
+      FeatureValueSchema.Vector(4),
+      None,
+      Fingerprint.unsafe("test:embed:0"),
+      false,
+      None
+    )
+    val manifest =
+      SidecarManifest(id, 3, 1, storymodel4s.features.Dtype.Float32, Checksum.ofText("x"))
+    StoryModel.draft(
+      b.source,
+      b.atlas,
+      b.graph,
+      b.hierarchy,
+      DiscourseTrajectory.derive(b.graph, b.hierarchy, b.atlas),
+      featureSpaces = Map(id -> space),
+      sidecars = Map(id -> manifest)
+    )
+
+  /** A group membership cycle. */
+  def membershipCycle(b: Small.Built): StoryModel[ModelStatus.Draft] =
+    require(b.entities.size >= 2)
+    val es = Vector(
+      EntityEdge(
+        b.entities(0),
+        EntityRelation.MemberOf,
+        b.entities(1),
+        meta("m1", EpistemicStatus.Hypothesized, None)
+      ),
+      EntityEdge(
+        b.entities(1),
+        EntityRelation.MemberOf,
+        b.entities(0),
+        meta("m2", EpistemicStatus.Hypothesized, None)
+      )
+    )
+    b.draft(graph = b.graph.copy(relations = b.graph.relations.copy(entityRelations = es)))
+
 object Gens:
   val built: Gen[Small.Built] = for
     n <- Gen.chooseNum(1, 8)

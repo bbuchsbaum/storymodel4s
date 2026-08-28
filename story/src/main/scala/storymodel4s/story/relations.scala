@@ -145,6 +145,25 @@ final case class ContainmentEdge(
 ):
   def isPrimary: Boolean = kind == HierarchyKind.PrimarySegmentation
 
+/** Relations between entities.
+  *
+  * Why: a pair of young men acting together is one group entity with two individual members;
+  * without `MemberOf` the individuals' participation in the group's situations is invisible to
+  * entity continuity and the "separate entities, shared participant edges" requirement (§27.1)
+  * cannot be expressed. `SameAs` is an identity hypothesis between entities that were kept
+  * separate.
+  */
+enum EntityRelation:
+  case MemberOf, PartOf, SameAs
+  case Custom(namespace: String, label: String)
+
+final case class EntityEdge(
+    from: EntityId,
+    relation: EntityRelation,
+    to: EntityId,
+    meta: ClaimMeta
+)
+
 /** Sparse typed relation layers. Containment lives in [[NarrativeHierarchy]], not here. */
 final case class RelationLayers(
     participants: Vector[ParticipantEdge],
@@ -152,11 +171,12 @@ final case class RelationLayers(
     causal: Vector[CausalEdge],
     goals: Vector[GoalEdge],
     stateChanges: Vector[StateChangeEdge],
-    references: Vector[ReferenceEdge]
+    references: Vector[ReferenceEdge],
+    entityRelations: Vector[EntityEdge] = Vector.empty
 ):
   def allMeta: Vector[ClaimMeta] =
     participants.map(_.meta) ++ temporal.map(_.meta) ++ causal.map(_.meta) ++ goals.map(_.meta) ++
-      stateChanges.map(_.meta) ++ references.map(_.meta)
+      stateChanges.map(_.meta) ++ references.map(_.meta) ++ entityRelations.map(_.meta)
 
 object RelationLayers:
   val empty: RelationLayers =
@@ -166,8 +186,27 @@ object RelationLayers:
       Vector.empty,
       Vector.empty,
       Vector.empty,
+      Vector.empty,
       Vector.empty
     )
+
+/** Provisional weights by epistemic status used when a relation layer is viewed as a sparse matrix.
+  * Status is never discarded: [[AlignmentSource.relationEdges]] exposes it alongside.
+  */
+object StatusWeight:
+  def of(status: EpistemicStatus): Double = status match
+    case EpistemicStatus.SurfaceExplicit        => 1.0
+    case EpistemicStatus.HumanAdjudicated       => 1.0
+    case EpistemicStatus.LinguisticallyEntailed => 1.0
+    case EpistemicStatus.StructurallyDerived    => 0.8
+    case EpistemicStatus.WorldKnowledgeInferred => 0.5
+    case EpistemicStatus.Hypothesized           => 0.25
+
+  /** Calibrated probability when present, else the status weight scaled by nothing else: raw scores
+    * are not probabilities and must not enter the matrix.
+    */
+  def of(meta: ClaimMeta): Double =
+    meta.credence.calibrated.map(_.value).getOrElse(of(meta.status))
 
 /** Names of the relation views a consumer can request from an [[AlignmentSource]]. Some are stored
   * layers; `EntityContinuity` and `DiscourseSuccession` are derived; `Semantic` is a sidecar view

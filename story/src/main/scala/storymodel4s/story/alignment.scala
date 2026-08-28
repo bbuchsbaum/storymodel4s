@@ -22,6 +22,15 @@ type SparseRelation = Map[(NarrativeNodeId, NarrativeNodeId), Double]
 
 final case class ParticipantSummary(role: ParticipantRole, entity: EntityId, label: String)
 
+/** One edge of a relation view with its status kept: the matrix weight is a projection of this. */
+final case class RelationEdgeView(
+    from: NarrativeNodeId,
+    to: NarrativeNodeId,
+    weight: Double,
+    status: EpistemicStatus,
+    meta: ClaimMeta
+)
+
 /** The explicit source-to-recall-aligner contract (design record §31.7). Only a validated or
   * adjudicated model can provide one.
   */
@@ -36,13 +45,29 @@ trait AlignmentSource:
   /** Discourse position: situations by order of first mention; segments by their first situation.
     */
   def discoursePosition(target: NarrativeNodeId): Option[Int]
+
+  /** The relation view of the narrated world. `WorldTime` is built only from temporal edges scoped
+    * to the root context; chronology asserted inside a speech or belief never leaks into it.
+    */
   def relationMatrix(layer: RelationLayer): SparseRelation
+
+  /** The relation view scoped to one context: `WorldTime` uses edges whose context is exactly
+    * `context`; other layers keep edges whose endpoints both lie within `context`.
+    */
+  def relationMatrixIn(layer: RelationLayer, context: ContextId): SparseRelation
+
+  /** Stored edges of a layer with their epistemic status and claim; derived layers
+    * (`DiscourseSuccession`, `EntityContinuity`, `Hierarchy`) carry `StructurallyDerived`.
+    */
+  def relationEdges(layer: RelationLayer): Vector[RelationEdgeView]
 
   /** Member → parent with containment weight, for every containment edge. */
   def hierarchyMembership: SparseRelation
   def predicateOf(target: NarrativeNodeId): Option[Predicate]
   def participantsOf(target: NarrativeNodeId): Vector[ParticipantSummary]
   def contextOf(target: NarrativeNodeId): Option[ContextKind]
+  def contextIdOf(target: NarrativeNodeId): Option[ContextId]
+  def rootContext: Option[ContextId]
   def polarityOf(target: NarrativeNodeId): Option[Polarity]
   def modalityOf(target: NarrativeNodeId): Option[Modality]
   def levelOf(target: NarrativeNodeId): Int
@@ -82,44 +107,115 @@ private[story] final class StoryAlignmentSource(model: StoryModel[?]) extends Al
 
   private def sit(id: SituationId): NarrativeNodeId = NarrativeNodeId.Situation(id)
 
-  def relationMatrix(layer: RelationLayer): SparseRelation = layer match
-    case RelationLayer.DiscourseSuccession =>
-      g.discourseOrder.zip(g.discourseOrder.drop(1)).map((a, b) => (sit(a), sit(b)) -> 1.0).toMap
-    case RelationLayer.WorldTime =>
-      g.relations.temporal
-        .filter(_.relation.isStrictPrecedence)
-        .map(e => (sit(e.from), sit(e.to)) -> 1.0)
-        .toMap
-    case RelationLayer.Causal =>
-      g.relations.causal
-        .map(e => (sit(e.cause), sit(e.effect)) -> weightOf(e.meta))
-        .groupMapReduce(_._1)(_._2)(math.max)
-    case RelationLayer.Goal =>
-      g.relations.goals.map(e => (sit(e.from), sit(e.to)) -> 1.0).toMap
-    case RelationLayer.StateChange =>
-      g.relations.stateChanges.map(e => (sit(e.event), sit(e.state)) -> 1.0).toMap
-    case RelationLayer.Reference =>
-      g.relations.references.map(e => (sit(e.from), sit(e.to)) -> 1.0).toMap
-    case RelationLayer.Hierarchy        => hierarchyMembership
-    case RelationLayer.Participant      => Map.empty
-    case RelationLayer.Semantic         => Map.empty
-    case RelationLayer.EntityContinuity =>
-      // Jaccard overlap of participant sets between situations that share at least one entity;
-      // built from the entity index so cost is linear in participation, not quadratic in nodes.
-      val pairs = for
-        (_, sits) <- g.situationsByEntity.toVector
-        a <- sits
-        b <- sits
-        if a != b
-      yield (a, b)
-      pairs.distinct.map { (a, b) =>
-        val ea = g.entitiesOf(a)
-        val eb = g.entitiesOf(b)
-        (sit(a), sit(b)) -> ea.intersect(eb).size.toDouble / ea.union(eb).size
-      }.toMap
+  val rootContext: Option[ContextId] = g.rootContext
 
-  private def weightOf(meta: ClaimMeta): Double =
-    meta.credence.calibrated.map(_.value).getOrElse(1.0)
+  private val derivedMeta: ClaimMeta =
+    ClaimMeta.unsafe(
+      ClaimId.unsafe(ContentAddress.of("derived-view", model.source.canonicalChecksum.hex)),
+      EpistemicStatus.StructurallyDerived,
+      Credence.unsafeRaw(1.0),
+      cats.data.NonEmptyVector.one(
+        Evidence(
+          EvidenceId.unsafe(
+            ContentAddress.of("derived-view-ev", model.source.canonicalChecksum.hex)
+          ),
+          None,
+          Set.empty,
+          DiscourseTrajectory.DeriveFingerprint,
+          DiscourseTrajectory.DeriveStage
+        )
+      ),
+      Provenance.deterministic(model.schemaVersion, Checksum.ofText("derived-view"))
+    )
+
+  private def derived(from: NarrativeNodeId, to: NarrativeNodeId, w: Double): RelationEdgeView =
+    RelationEdgeView(from, to, w, EpistemicStatus.StructurallyDerived, derivedMeta)
+
+  private def within(s: SituationId, context: ContextId): Boolean =
+    g.situations.get(s).exists(x => g.contextWithin(x.context, context))
+
+  /** Edges of a layer, optionally restricted to a context. `WorldTime` is restricted by the edge's
+    * own context; every other stored layer by the endpoints' contexts.
+    */
+  private def edgesOf(layer: RelationLayer, context: Option[ContextId]): Vector[RelationEdgeView] =
+    def keep(a: SituationId, b: SituationId): Boolean =
+      context.forall(c => within(a, c) && within(b, c))
+    layer match
+      case RelationLayer.WorldTime =>
+        val scope = context.orElse(g.rootContext)
+        g.relations.temporal
+          .filter(e => e.relation.isStrictPrecedence && scope.contains(e.context))
+          .map(e => RelationEdgeView(sit(e.from), sit(e.to), 1.0, e.meta.status, e.meta))
+      case RelationLayer.Causal =>
+        g.relations.causal
+          .filter(e => keep(e.cause, e.effect))
+          .map(e =>
+            RelationEdgeView(
+              sit(e.cause),
+              sit(e.effect),
+              StatusWeight.of(e.meta),
+              e.meta.status,
+              e.meta
+            )
+          )
+      case RelationLayer.Goal =>
+        g.relations.goals
+          .filter(e => keep(e.from, e.to))
+          .map(e =>
+            RelationEdgeView(sit(e.from), sit(e.to), StatusWeight.of(e.meta), e.meta.status, e.meta)
+          )
+      case RelationLayer.StateChange =>
+        g.relations.stateChanges
+          .filter(e => keep(e.event, e.state))
+          .map(e =>
+            RelationEdgeView(
+              sit(e.event),
+              sit(e.state),
+              StatusWeight.of(e.meta),
+              e.meta.status,
+              e.meta
+            )
+          )
+      case RelationLayer.Reference =>
+        g.relations.references
+          .filter(e => keep(e.from, e.to))
+          .map(e =>
+            RelationEdgeView(sit(e.from), sit(e.to), StatusWeight.of(e.meta), e.meta.status, e.meta)
+          )
+      case RelationLayer.Participant         => Vector.empty
+      case RelationLayer.Semantic            => Vector.empty
+      case RelationLayer.DiscourseSuccession =>
+        val order = context match
+          case None    => g.discourseOrder
+          case Some(c) => g.situationsWithin(c)
+        order.zip(order.drop(1)).map((a, b) => derived(sit(a), sit(b), 1.0))
+      case RelationLayer.Hierarchy =>
+        hierarchyMembership.toVector.map((k, w) => derived(k._1, k._2, w))
+      case RelationLayer.EntityContinuity =>
+        // Jaccard overlap of expanded participant sets between situations that share at least one
+        // entity (directly or through group membership); built from the entity index so cost is
+        // proportional to Σ_e deg(e)², not to the number of situations squared.
+        val pairs = for
+          (_, sits) <- g.situationsByEntity.toVector
+          a <- sits
+          b <- sits
+          if a != b && keep(a, b)
+        yield (a, b)
+        pairs.distinct.map { (a, b) =>
+          val ea = g.expandedEntitiesOf(a)
+          val eb = g.expandedEntitiesOf(b)
+          derived(sit(a), sit(b), ea.intersect(eb).size.toDouble / ea.union(eb).size)
+        }
+
+  private def toMatrix(edges: Vector[RelationEdgeView]): SparseRelation =
+    edges.groupMapReduce(e => (e.from, e.to))(_.weight)(math.max)
+
+  def relationMatrix(layer: RelationLayer): SparseRelation = toMatrix(edgesOf(layer, None))
+
+  def relationMatrixIn(layer: RelationLayer, context: ContextId): SparseRelation =
+    toMatrix(edgesOf(layer, Some(context)))
+
+  def relationEdges(layer: RelationLayer): Vector[RelationEdgeView] = edgesOf(layer, None)
 
   lazy val hierarchyMembership: SparseRelation =
     h.containment.map { e =>
@@ -144,10 +240,12 @@ private[story] final class StoryAlignmentSource(model: StoryModel[?]) extends Al
         .distinct
         .map((r, e) => ParticipantSummary(r, e, entityLabel(e).getOrElse(e.value)))
 
-  def contextOf(target: NarrativeNodeId): Option[ContextKind] = target match
-    case NarrativeNodeId.Situation(id) =>
-      g.situations.get(id).flatMap(s => g.contexts.get(s.context)).map(_.kind)
-    case _ => None
+  def contextIdOf(target: NarrativeNodeId): Option[ContextId] = target match
+    case NarrativeNodeId.Situation(id) => g.situations.get(id).map(_.context)
+    case _                             => None
+
+  def contextOf(target: NarrativeNodeId): Option[ContextKind] =
+    contextIdOf(target).flatMap(g.contexts.get).map(_.kind)
 
   def polarityOf(target: NarrativeNodeId): Option[Polarity] = target match
     case NarrativeNodeId.Situation(id) => g.situations.get(id).map(_.polarity)
