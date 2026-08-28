@@ -5,7 +5,9 @@ import munit.ScalaCheckSuite
 import org.scalacheck.Prop.forAll
 import storymodel4s.core.*
 import storymodel4s.features.*
+import storymodel4s.laws.AddressGens
 import storymodel4s.proposition.{Checked, PropositionChart}
+import AddressGens.given
 import CodecGens.given
 import CanonicalPrimitives.given
 import CoreCodecs.given
@@ -44,6 +46,7 @@ class CodecSuite extends ScalaCheckSuite:
         ks == ks.sorted && obj.values.forall(sortedKeys)
     )
 
+  lawsFor[Address]("Address")
   lawsFor[TextSpan]("TextSpan")
   lawsFor[SpanSet]("SpanSet")
   lawsFor[Credence]("Credence")
@@ -166,7 +169,34 @@ class CodecSuite extends ScalaCheckSuite:
     assert(JsonLines.readClaims(text + text).isLeft)
   }
 
-  test("Address seam placeholder round-trips as a string") {
-    val a = AddressString("story/situation/sit:0")
-    assertEquals(Canonical.decode[AddressString](Canonical.encode(a)), Right(a))
+  test("Address wire form is the canonical rendered string") {
+    val address = Address(
+      ModuleTag.unsafe("story"),
+      AddressKind.unsafe("situation"),
+      AddressKey.of("sit/0", "é%")
+    )
+    val encoded = Canonical.encode(address)
+    assertEquals(encoded, "\"story/situation/sit%2F0/%C3%A9%25\"")
+    assertEquals(Canonical.decode[Address](encoded), Right(address))
+    assertEquals(Canonical.decode[Address](encoded).map(Canonical.encode(_)), Right(encoded))
+  }
+
+  property("Every accepted Address wire string is a canonical fixed point") {
+    forAll(AddressGens.address.map(_.render)) { rendered =>
+      val encoded = Json.fromString(rendered).noSpaces
+      assertEquals(Canonical.decode[Address](encoded).map(Canonical.encode(_)), Right(encoded))
+    }
+  }
+
+  test("Address decoder rejects malformed and non-canonical wire strings") {
+    val rejected = Vector(
+      "story/situation/sit%2f0", // lowercase escape
+      "story/situation/%41", // escaped unreserved character
+      "story/situation/sit%", // truncated escape
+      "story/situation/a b", // unescaped reserved character
+      "story/situation" // missing key
+    )
+    rejected.foreach { rendered =>
+      assert(Canonical.decode[Address](Json.fromString(rendered).noSpaces).isLeft, rendered)
+    }
   }

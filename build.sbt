@@ -223,6 +223,7 @@ lazy val codec = crossProject(JVMPlatform, JSPlatform, NativePlatform)
   .in(file("codec"))
   .settings(moduleSettings("codec"))
   .dependsOn(core, proposition, amrInterop, features, acquire, story, recall, align, interview)
+  .dependsOn(laws % "test->compile")
   .settings(
     libraryDependencies ++= Seq(
       "io.circe" %%% "circe-core" % circeV,
