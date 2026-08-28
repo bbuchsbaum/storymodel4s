@@ -5,7 +5,7 @@ import java.util.concurrent.atomic.AtomicReference
 import cats.kernel.Hash
 
 import grakern.core.{Projection, SampleKey, StableCodec, StableId, StableVersion}
-import grakern.engine.{WLCompiledKernel, WLCompiler}
+import grakern.engine.{WLCompiledKernel, WLCompiler, WLQueryResult}
 import grakern.standard.wl.{WLCodecs, WLKernel, WLRefinement, optimalAssignment, subtree}
 
 import storymodel4s.align.StructuralDistance
@@ -117,42 +117,70 @@ final class PreparedSources private (
     private val indexByChecksum: Map[Checksum, Int],
     val sourceChecksums: Vector[Checksum]
 ):
+  import PreparedSources.traverseEither
+
   def size: Int = sourceChecksums.size
   def contains(chart: PropositionChart[CheckState.Checked]): Boolean =
     indexByChecksum.contains(Canonical.checksum(chart))
+
+  /** Align a batch of query charts against the prepared set with ONE query-overlay compilation
+    * (`WLCompiledKernel.cross`, the API committed at the pinned grakern revision). The prepared
+    * source state is never recompiled; query-only colours stay in the overlay.
+    *
+    * Cost: one refinement pass over the batch plus one sparse cross product against the prepared
+    * feature matrix — `O(Σ query size + nnz)`; batching all recall charts of one alignment into a
+    * single call is therefore preferred over one call per unit.
+    */
+  def crossOf(
+      queries: Vector[PropositionChart[CheckState.Checked]]
+  ): Either[GrakernError, WLQueryResult] =
+    val keyed = queries.map(q => (SampleKey(s"query:${Canonical.checksum(q).hex}"), q))
+    for
+      reified <- keyed.traverseEither { case (key, q) =>
+        ChartNeighbourhood.of(q, key).left.map(e => GrakernError.Reification(key, e.toString))
+      }
+      result <- compiled
+        .cross(reified.map(_.sample))
+        .left
+        .map(e => GrakernError.Query(keyed.headOption.fold(SampleKey("query"))(_._1), e.toString))
+    yield result
+
+  /** Normalized kernel values of each query against every prepared source, keyed by query checksum
+    * then source checksum. One `cross` call for the whole batch.
+    */
+  def kernelRows(
+      queries: Vector[PropositionChart[CheckState.Checked]]
+  ): Either[GrakernError, Map[Checksum, Map[Checksum, Double]]] =
+    if queries.isEmpty then Right(Map.empty)
+    else
+      crossOf(queries).map { result =>
+        val values = result.cross.values
+        queries.zipWithIndex.map { case (q, qi) =>
+          Canonical.checksum(q) ->
+            sourceChecksums.zipWithIndex.map { case (c, si) => c -> values(qi, si) }.toMap
+        }.toMap
+      }
 
   /** Normalized kernel values of `query` against every prepared source, keyed by source checksum.
     */
   def kernelRow(
       query: PropositionChart[CheckState.Checked]
   ): Either[GrakernError, Map[Checksum, Double]] =
-    val qc = Canonical.checksum(query)
-    val key = SampleKey(s"query:${qc.hex}")
-    for
-      reified <- ChartNeighbourhood
-        .of(query, key)
-        .left
-        .map(e => GrakernError.Reification(key, e.toString))
-      row <- compiled.query(reified.sample).left.map(e => GrakernError.Query(key, e.toString))
-    yield sourceChecksums.zipWithIndex.map { case (c, i) => c -> row.cross.valueAt(i) }.toMap
+    kernelRows(Vector(query)).map(_.getOrElse(Canonical.checksum(query), Map.empty))
 
   /** A dense L2-normalized vector over the prepared feature dictionary (novel query colours are
     * dropped — their mass is retained only in the kernel value). Only meaningful for benches.
     */
   def vectorOf(query: PropositionChart[CheckState.Checked]): Either[GrakernError, ValidatedVector] =
-    val qc = Canonical.checksum(query)
-    val key = SampleKey(s"query:${qc.hex}")
+    val key = SampleKey(s"query:${Canonical.checksum(query).hex}")
     for
-      reified <- ChartNeighbourhood
-        .of(query, key)
-        .left
-        .map(e => GrakernError.Reification(key, e.toString))
-      row <- compiled.query(reified.sample).left.map(e => GrakernError.Query(key, e.toString))
-      dim = math.max(1, row.features.columns.size)
+      result <- crossOf(Vector(query))
+      shared = result.features.shared
+      dim = math.max(1, shared.cols)
       dense = {
         val arr = Array.fill(dim)(0.0)
-        row.features.shared.indices.zip(row.features.shared.values).foreach { case (i, v) =>
-          if i < dim then arr(i) = v
+        shared.foreachStoredEntry { (row, col, value) =>
+          if row == 0 && col < dim then arr(col) = value
         }
         arr.toVector
       }
