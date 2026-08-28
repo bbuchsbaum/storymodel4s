@@ -49,9 +49,16 @@ final case class FoilReport(outcomes: Vector[FoilOutcome]):
 
   def failures: Vector[FoilOutcome] = outcomes.filterNot(_.criticPreferredOriginal)
 
-  /** Every kind that was exercised meets `minRate`; kinds with no trials do not count. */
-  def passes(minRate: Double): Boolean =
-    byKind.values.forall(_.preferenceRate.forall(_ >= minRate))
+  /** Whether every exercised kind meets `minRate`. `None` when no foil was tried at all: a gate
+    * with zero trials is undefined, never vacuously passed (review finding #36). Kinds with no
+    * trials are listed in [[untried]] and do not count against the rate.
+    */
+  def passes(minRate: Double): Option[Boolean] =
+    if outcomes.isEmpty then None
+    else Some(byKind.values.forall(_.preferenceRate.forall(_ >= minRate)))
+
+  /** Kinds with no trials in this report. */
+  def untried: Set[FoilKind] = byKind.values.filter(_.trials == 0).map(_.kind).toSet
 
   def ++(other: FoilReport): FoilReport = FoilReport(outcomes ++ other.outcomes)
 

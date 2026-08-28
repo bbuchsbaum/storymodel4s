@@ -91,7 +91,16 @@ final case class CriticFinding(
   def isBlocking: Boolean = code.isBlocking
 
 object CriticFinding:
+  /** Findings whose code is `Blocking` regardless of confidence. */
   def blocking(findings: Iterable[CriticFinding]): Vector[CriticFinding] =
     findings.toVector.filter(_.isBlocking)
+
+  /** Findings that actually block resolution under a confidence threshold: a `Blocking` code blocks
+    * when its raw score is at least `threshold`, or when the critic reported no score (an unscored
+    * blocking finding is taken at face value — the conservative reading). Blocking codes below the
+    * threshold are retained as data but do not block (review finding #36).
+    */
+  def blocking(findings: Iterable[CriticFinding], threshold: Double): Vector[CriticFinding] =
+    findings.toVector.filter(f => f.isBlocking && f.rawScore.forall(_.value >= threshold))
   def maxSeverity(findings: Iterable[CriticFinding]): Option[Severity] =
     findings.map(_.severity).maxOption(using Severity.given_Ordering_Severity)

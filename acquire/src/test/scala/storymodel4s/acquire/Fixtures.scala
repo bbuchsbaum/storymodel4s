@@ -14,10 +14,14 @@ object Fixtures:
   val manifest: PromptPackageManifest = PromptPackageManifest(
     name = "local-semantics",
     version = "1.0.0",
-    role = "propose local propositional charts",
+    role = PromptRole.LocalSemanticsProposer,
     inputSchemaId = "schema:sentence-window:1",
     outputSchemaId = "schema:chart-proposal:1",
-    permittedOperations = Vector("add-concept", "add-relation", "set-focus"),
+    permittedOperations = Vector(
+      PermittedOperation.AddConcept,
+      PermittedOperation.AddRelation,
+      PermittedOperation.SetFocus
+    ),
     prohibitedInferences = Vector("world-knowledge", "cross-sentence-identity"),
     standardsRefs = Vector(StandardsRef("amr-guidelines", "1.2.6", "4.3")),
     exampleIds = Vector("ex-1"),
@@ -28,8 +32,8 @@ object Fixtures:
   )
   val promptRef: PromptPackageRef = manifest.ref
 
-  val call: ProviderCall = ProviderCall(
-    provider = "test",
+  def callFor(provider: String): ProviderCall = ProviderCall(
+    provider = provider,
     model = "stub",
     version = "1",
     promptTemplateVersion = Some("1.0.0"),
@@ -39,21 +43,39 @@ object Fixtures:
     seed = Some(7L),
     cached = false
   )
+  val call: ProviderCall = callFor("test")
   val receipt: AgentCallReceipt = AgentCallReceipt(call, promptRef, task)
+  def receiptFor(provider: String): AgentCallReceipt =
+    AgentCallReceipt(callFor(provider), promptRef, task)
 
   def evidence(id: String, spans: Option[SpanSet] = None): Evidence =
     Evidence(EvidenceId.unsafe(id), spans, Set.empty, fp, stage)
   def ev(id: String): EvidenceRef = EvidenceRef.Inline(evidence(id))
   val someSpans: SpanSet = SpanSet.one(TextSpan.unsafe(0, 4))
+  def evWithSpans(id: String): EvidenceRef = EvidenceRef.Inline(evidence(id, Some(someSpans)))
 
-  def proposed[A](v: A, score: Double, id: String = "e"): AgentProposal[A] =
+  def proposed[A](
+      v: A,
+      score: Double,
+      id: String = "e",
+      provider: String = "test"
+  ): AgentProposal[A] =
     AgentProposal.proposed(
       task,
       v,
       NonEmptyVector.one(ev(id)),
       Some(RawScore.unsafe(score)),
       Vector.empty,
-      receipt
+      receiptFor(provider)
+    )
+  def proposedUnscored[A](v: A, id: String = "e", provider: String = "test"): AgentProposal[A] =
+    AgentProposal.proposed(
+      task,
+      v,
+      NonEmptyVector.one(ev(id)),
+      None,
+      Vector.empty,
+      receiptFor(provider)
     )
   def alternative[A](v: A, score: Double): AgentProposal[A] =
     AgentProposal.alternative(
@@ -65,23 +87,32 @@ object Fixtures:
       receipt
     )
 
-  def finding(code: FindingCode, family: CriticFamily = CriticFamily.FrameRole): CriticFinding =
-    CriticFinding(task, family, code, Vector.empty, Vector.empty, None, None)
+  def finding(
+      code: FindingCode,
+      family: CriticFamily = CriticFamily.FrameRole,
+      score: Option[Double] = None
+  ): CriticFinding =
+    CriticFinding(task, family, code, Vector.empty, Vector.empty, score.map(RawScore.unsafe), None)
 
+  /** A bundle whose calibration, when given, is attached to every proposed value. */
   def bundle[A](
       proposals: Vector[AgentProposal[A]],
       findings: Vector[CriticFinding] = Vector.empty,
       structural: StructuralValidity = StructuralValidity.Valid,
       support: Double = 1.0,
-      calibrated: Option[Double] = Some(0.95)
+      calibrated: Option[Double] = Some(0.95),
+      spans: Option[SpanSet] = Some(someSpans)
   ): EvidenceBundle[A] =
+    val values = proposals.flatMap(_.value).distinct
     EvidenceBundle(
       proposals,
       findings,
       structural,
-      SourceSupport(support, Some(someSpans)),
+      SourceSupport(support, spans),
       agreementScore = 1.0,
-      calibrated.map(Probability.unsafe)
+      calibrated.toVector.flatMap(p =>
+        values.map(v => CandidateCalibration(v, Probability.unsafe(p), "test-calibration"))
+      )
     )
 
   // --- generators ---------------------------------------------------------------------------
@@ -113,13 +144,16 @@ object Fixtures:
   val foilKind: Gen[FoilKind] = Gen.oneOf(FoilKind.values.toSeq)
   val probability: Gen[Probability] = Gen.chooseNum(0.0, 1.0).map(Probability.unsafe)
   val rawScore: Gen[RawScore] = Gen.chooseNum(-5.0, 5.0).map(RawScore.unsafe)
+  val provider: Gen[String] = Gen.oneOf("parser", "agent", "critic")
 
   val proposal: Gen[AgentProposal[Int]] = for
     d <- disposition
     v <- Gen.chooseNum(0, 3)
     s <- Gen.option(rawScore)
+    p <- provider
   yield d match
-    case ProposalDisposition.Proposed    => proposed(v, s.map(_.value).getOrElse(0.0))
+    case ProposalDisposition.Proposed =>
+      s.fold(proposedUnscored(v, provider = p))(r => proposed(v, r.value, provider = p))
     case ProposalDisposition.Alternative => alternative(v, s.map(_.value).getOrElse(0.0))
     case ProposalDisposition.Abstained   => AgentProposal.abstained(task, receipt)
     case ProposalDisposition.Unsupported => AgentProposal.unsupported(task, Vector.empty, receipt)
@@ -127,7 +161,8 @@ object Fixtures:
   val criticFinding: Gen[CriticFinding] = for
     c <- findingCode
     f <- criticFamily
-  yield finding(c, f)
+    s <- Gen.option(Gen.chooseNum(0.0, 1.0))
+  yield finding(c, f, s)
 
   val evidenceBundle: Gen[EvidenceBundle[Int]] = for
     ps <- Gen.listOf(proposal).map(_.toVector)
@@ -135,12 +170,14 @@ object Fixtures:
     valid <- Gen.frequency(4 -> true, 1 -> false)
     support <- Gen.chooseNum(0.0, 1.0)
     cal <- Gen.option(Gen.chooseNum(0.0, 1.0))
+    spans <- Gen.frequency(3 -> Some(someSpans), 1 -> None)
   yield bundle(
     ps,
     fs,
     if valid then StructuralValidity.Valid else StructuralValidity.invalid("x"),
     support,
-    cal
+    cal,
+    spans
   )
 
   val foilOutcome: Gen[FoilOutcome] = for

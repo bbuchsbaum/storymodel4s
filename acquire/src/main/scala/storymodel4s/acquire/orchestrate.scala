@@ -128,10 +128,15 @@ object GateStatus:
 final case class BuildConfig(
     configHash: Checksum,
     providerFingerprints: Map[StageId, Fingerprint],
-    defaultFingerprint: Fingerprint
+    defaultFingerprint: Fingerprint,
+    stageLocal: Map[StageId, StageLocalConfig] = Map.empty
 ):
   def fingerprintFor(stage: StageId): Fingerprint =
     providerFingerprints.getOrElse(stage, defaultFingerprint)
+
+  /** Prompt packages, provider parameters, and seed of one stage; empty when undeclared. */
+  def localFor(stage: StageId): StageLocalConfig =
+    stageLocal.getOrElse(stage, StageLocalConfig.empty)
 
 final case class PlannedStage(spec: StageSpec, key: StageCacheKey, invalidated: Boolean)
 
@@ -171,7 +176,8 @@ object BuildPlan:
               input,
               spec.schemaVersion,
               config.configHash,
-              config.fingerprintFor(id)
+              config.fingerprintFor(id),
+              config.localFor(id)
             )
             val invalidated = !previous.get(id).contains(key)
             (acc :+ PlannedStage(spec, key, invalidated), keys.updated(id, key))

@@ -50,8 +50,8 @@ object SimpleGraph:
               if g.edges.contains((a, l, b)) then Right(())
               else Left(PatchError.InvalidOp(i, "edge absent"))
           yield (g.copy(edges = g.edges - ((a, l, b))), r)
-        case PatchOp.SetFocus(n, _)       => node(n).map(id => (g.copy(focus = Some(id)), r))
-        case PatchOp.MergeMentions(ms, _) =>
+        case PatchOp.SetFocus(n, _)          => node(n).map(id => (g.copy(focus = Some(id)), r))
+        case PatchOp.MergeMentions(ms, _, _) =>
           ms.toVector.traverseE(node).map(ids => (g.copy(merged = g.merged :+ ids.toSet), r))
         case PatchOp.ProposeRelation(rel, f, t, _) =>
           for a <- node(f); b <- node(t)
@@ -59,8 +59,15 @@ object SimpleGraph:
         case PatchOp.SetContext(n, c, _) =>
           for a <- node(n); b <- node(c)
           yield (g.copy(contexts = g.contexts.updated(a, b)), r)
+        case PatchOp.SplitMention(m, into, _, _) =>
+          node(m).map { id =>
+            into.toVector.zipWithIndex.foldLeft((g, r)) { case ((g1, r1), (t, k)) =>
+              val nid = s"$id/$k-${t.value}"
+              (g1.copy(nodes = g1.nodes.updated(nid, g.nodes(id))), r1.bind(t, nid))
+            }
+          }
         case PatchOp.Annotate(n, k, v, _) =>
-          node(n).map(id => (g.copy(annotations = g.annotations.updated((id, k), v)), r))
+          node(n).map(id => (g.copy(annotations = g.annotations.updated((id, k.render), v)), r))
 
   extension [A, E, B](v: Vector[A])
     private def traverseE(f: A => Either[E, B]): Either[E, Vector[B]] =
@@ -112,16 +119,16 @@ class PatchSuite extends ScalaCheckSuite:
       PatchOp.AddNode(t1, "C", Vector.empty),
       PatchOp.AddEdge(ex("a"), "arg0", NodeRef.Temp(t1), Vector.empty),
       PatchOp.SetFocus(NodeRef.Temp(t1), Vector.empty),
-      PatchOp.Annotate(NodeRef.Temp(t1), "k", "v", Vector.empty),
+      PatchOp.Annotate(NodeRef.Temp(t1), AnnotationKey.Note, "v", Vector.empty),
       PatchOp.SetContext(NodeRef.Temp(t1), ex("b"), Vector.empty),
-      PatchOp.MergeMentions(NonEmptyVector.of(ex("a"), NodeRef.Temp(t1)), Vector.empty),
+      PatchOp.MergeMentions(NonEmptyVector.of(ex("a"), NodeRef.Temp(t1)), None, Vector.empty),
       PatchOp.ProposeRelation("before", ex("a"), ex("b"), Vector.empty)
     )
     val g = PatchApplier.applyPatch(base, p).toOption.get
     assertEquals(g.nodes.size, 3)
     val c = g.focus.get
     assert(g.edges.contains(("a", "arg0", c)))
-    assertEquals(g.annotations((c, "k")), "v")
+    assertEquals(g.annotations((c, AnnotationKey.Note.render)), "v")
     assertEquals(g.contexts(c), "b")
     assertEquals(g.merged, Vector(Set("a", c)))
     assert(g.edges.contains(("a", "rel:before", "b")))
@@ -142,7 +149,7 @@ class PatchSuite extends ScalaCheckSuite:
       yield PatchOp.AddEdge(f, l, t, Vector.empty),
       existing.map(n => PatchOp.SetFocus(n, Vector.empty)),
       for n <- existing; k <- Gen.oneOf("k1", "k2"); v <- Gen.oneOf("v1", "v2")
-      yield PatchOp.Annotate(n, k, v, Vector.empty),
+      yield PatchOp.Annotate(n, AnnotationKey.Custom("t", k), v, Vector.empty),
       for n <- existing; c <- existing yield PatchOp.SetContext(n, c, Vector.empty)
     )
   private val patchGen: Gen[Patch[String, String]] = for
@@ -165,3 +172,43 @@ class PatchSuite extends ScalaCheckSuite:
       PatchApplier.applyPatch(base, e ++ p) == PatchApplier.applyPatch(base, p) &&
       PatchApplier.applyPatch(base, p ++ e) == PatchApplier.applyPatch(base, p)
     }
+
+  test("composition keeps per-operation attribution and merges provider calls"):
+    val callA = Fixtures.callFor("parser")
+    val callB = Fixtures.callFor("agent")
+    val pa: Patch[String, String] =
+      Patch(
+        PatchId.unsafe("pa"),
+        Vector(PatchOp.SetFocus(ex("a"), Vector.empty)),
+        prov.copy(calls = Vector(callA))
+      )
+    val pb: Patch[String, String] =
+      Patch(
+        PatchId.unsafe("pb"),
+        Vector(PatchOp.SetFocus(ex("b"), Vector.empty)),
+        prov.copy(calls = Vector(callB))
+      )
+    val c = pa ++ pb
+    assertEquals(c.origins, Vector(PatchId.unsafe("pa"), PatchId.unsafe("pb")))
+    assertEquals(c.opsFrom(PatchId.unsafe("pa")), pa.ops)
+    assertEquals(c.provenance.calls, Vector(callA, callB))
+    val e = Patch.empty[String, String](PatchId.unsafe("e"), prov)
+    assertEquals((pa ++ e).id, pa.id)
+    assertEquals((e ++ pa).id, pa.id)
+
+  test("split introduces temporaries and records what it supersedes"):
+    val claim = ClaimId.unsafe("c-old")
+    val t2 = TempId.unsafe("t2")
+    val p = patch(
+      "split",
+      PatchOp.SplitMention(ex("a"), NonEmptyVector.of(t1, t2), Some(claim), Vector.empty),
+      PatchOp.SetFocus(NodeRef.Temp(t2), Vector.empty)
+    )
+    assertEquals(p.tempIds, Vector(t1, t2))
+    assertEquals(p.supersedes, Vector(claim))
+    val g = PatchApplier.applyPatch(base, p).toOption.get
+    assertEquals(g.nodes.size, 4)
+    assert(g.focus.exists(_.contains("t2")))
+    val dup =
+      patch("dup", PatchOp.SplitMention(ex("a"), NonEmptyVector.of(t1, t1), None, Vector.empty))
+    assert(PatchApplier.applyPatch(base, dup).isLeft)
