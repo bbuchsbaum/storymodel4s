@@ -83,7 +83,21 @@ views, `align-gale` dense kernels) are planned once the core API stabilizes.
 18. **Cats in core.** Intentional: `NonEmptyVector`, `ValidatedNec`, type-class instances are public API of `core`.
 19. **Population/fMRI.** Downstream module `population`, not core.
 
-### Part 3 (§55)
+### Part 3 (§55) — with one emphasis shift
+**AMR is an adapter, not the foundation.** The `amr` module's primary object is a
+minimal *propositional chart*: concept (PropBank frame **or** bare lemma — frame
+optional), numbered/named roles, polarity, reentrancy, embedded propositions,
+exact source alignment, with partial/underspecified charts first-class (no
+frame, hedged arguments). Standards-compatible AMR via PENMAN is one decoder
+into that chart; schema-constrained LLM extraction is another and is expected
+to be the primary acquisition path for spoken recall and interview transcripts,
+where text→AMR parsers will be weakest. Reification, UMR import/export, and
+full Smatch optimization are deferred until the §82 discriminative spike shows
+structure beating embeddings on role/polarity/context foils. Frame *sense*
+identity is treated as weak evidence; role structure and polarity are the hard
+evidence. No narrative or interview API may depend on a frame-lexicon lookup
+succeeding.
+
 1. **Build order.** Parallel tracks: the pure AMR kernel and the hand-modeled WOG ontology spike proceed simultaneously; `document` joins them.
 2. **Scope.** `amr`/`document` are internal modules with clean boundaries, extractable to a standalone artifact later.
 3. **PENMAN profile.** Tree preserves variables, branch order, inverse spellings, comments, metadata lines, and `~e.N` alignment markers; whitespace is not preserved. Graph preserves none of these except through provenance.
