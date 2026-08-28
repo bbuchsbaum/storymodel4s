@@ -217,3 +217,89 @@ class SegmenterSuite extends FunSuite:
     val g = graph("He went home, But then he came back.")
     assertEquals(g.size, 2, g.units.map(_.text).toString)
   }
+
+  // ---- W5: nominal mentions, identity keys, recall-side coreference -----------------------
+
+  test("'the young man' and 'the five men' are distinct participants and entities") {
+    val g = graph("The young man told the five men that he was tired. Then the five men left.")
+    val u0 = g.ordered(0)
+    val agent = u0.proposition.agent.get
+    val patient = u0.proposition.patient.get
+    assertEquals(agent.distinctiveKey, "young+man")
+    assertEquals(patient.distinctiveKey, "five+man")
+    assertEquals(agent.number, Some(MentionNumber.Singular))
+    assertEquals(patient.number, Some(MentionNumber.Plural))
+    assertEquals(agent.determiner, Some(Determiner.Definite))
+    assert(!agent.names.contains("man"), agent.names.toString)
+    assert(agent.names.contains("youngman") && patient.names.contains("fiveman"))
+    assert(agent.names.intersect(patient.names).isEmpty)
+    val keys = g.relations.entities.map(_.label)
+    assert(keys.contains("young man") && keys.contains("five men"), keys.toString)
+    assert(agent.entity != patient.entity)
+  }
+
+  test("'the other young man' and 'the young man' are distinct but share the `youngman` key") {
+    val g = graph("The young man refused. The other young man went with them.")
+    val a = g.ordered(0).proposition.agent.get
+    val b = g.ordered(1).proposition.agent.get
+    assertEquals(a.distinctiveKey, "young+man")
+    assertEquals(b.distinctiveKey, "other+young+man")
+    assert(a.entity != b.entity)
+    assert(a.names.intersect(b.names).contains("youngman"))
+    assertEquals(g.relations.entities.size, 2)
+  }
+
+  test("pronouns link to the nearest preceding nominal of compatible number") {
+    val g = graph("The man went home. Then he lit a fire.")
+    val man = g.relations.entities.find(_.label == "man").get
+    val links = g.relations.coreference
+    assert(
+      links.exists(l => l.antecedent == man.id && l.kind == RecallCorefKind.Pronoun),
+      links.toString
+    )
+    val g2 = graph("The men went home. Then they lit a fire.")
+    val men = g2.relations.entities.find(_.label == "men").get
+    assert(g2.relations.coreference.exists(_.antecedent == men.id))
+    val g3 = graph("The warriors went home. Then they lit a fire.")
+    val warriors = g3.relations.entities.find(_.label == "warriors").get
+    assert(g3.relations.coreference.exists(l => l.antecedent == warriors.id))
+    val g4 = graph("The warrior went home. Then they lit a fire.")
+    assert(g4.relations.coreference.isEmpty, g4.relations.coreference.toString)
+  }
+
+  test("same-key nominal mentions corefer; conflicting modifiers do not") {
+    val g = graph("The young man went home. Later the young man returned. The five men stayed.")
+    val young = g.relations.entities.find(_.label == "young man").get
+    val same = g.relations.coreference.filter(_.kind == RecallCorefKind.SameKey)
+    assertEquals(same.map(_.antecedent), Vector(young.id))
+    assertEquals(young.mentions.size, 2)
+    assert(g.relations.entities.exists(_.label == "five men"))
+  }
+
+  test("capitalized multiword names still work alongside nominal mentions") {
+    val g = graph("Stephen King met the young man. Then Stephen King left.")
+    assert(g.relations.entities.exists(_.label == "stephen king"))
+    assert(g.relations.entities.exists(_.label == "young man"))
+    assert(!g.relations.entities.exists(_.label == "stephen"))
+  }
+
+  test("plural morphology is normalized in heads while number is retained") {
+    assertEquals(
+      NominalMention.parse("the canoes").map(m => (m.head, m.number)),
+      Some(("cano", MentionNumber.Plural))
+    )
+    assertEquals(
+      NominalMention.parse("the warriors").map(m => (m.head, m.number)),
+      Some(("warrior", MentionNumber.Plural))
+    )
+    assertEquals(
+      NominalMention.parse("the men").map(m => (m.head, m.number)),
+      Some(("man", MentionNumber.Plural))
+    )
+    assertEquals(NominalMention.parse("the man who went").map(_.surface), Some("the man"))
+    assertEquals(
+      NominalMention.keysOf(Vector("young", "two"), "man"),
+      Set("youngman", "twoman", "twoyoungman")
+    )
+    assertEquals(NominalMention.keysOf(Vector.empty, "man"), Set("man"))
+  }

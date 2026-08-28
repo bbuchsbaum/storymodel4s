@@ -428,3 +428,133 @@ object Lexical:
         // Step 5b
         if measure(w) > 1 && endsDoubleConsonant(w) && w.last == 'l' then w = w.dropRight(1)
         w
+
+/** A nominal mention decomposed into determiner, pre-head modifiers, head, and number, with the
+  * token-safe identity keys the aligner compares.
+  *
+  * Why keys rather than bags of stems: the aligner's name overlap is token-level, so "the young
+  * man" and "the five men" would co-refer through the shared head. Keys concatenate sorted modifier
+  * stems with the head stem into single tokens (`youngman`, `fiveman`), one per nonempty modifier
+  * subset plus the full key, and the bare head only when the mention has no modifiers. Hence "the
+  * young man" ⊂ "the two young men" (shared key `youngman`) but "the young man" ≠ "the five men"
+  * (no shared key). Everything is generic English; story vocabulary never enters.
+  */
+final case class NominalMention(
+    determiner: Determiner,
+    modifiers: Vector[String],
+    head: String,
+    number: MentionNumber,
+    surface: String
+):
+  /** `young+man`: sorted modifier stems plus the head stem. */
+  def distinctiveKey: String = (modifiers.sorted :+ head).mkString("+")
+
+  /** Token-safe identity keys (see the class doc). */
+  def keys: Set[String] = NominalMention.keysOf(modifiers, head)
+
+  /** Keys after mapping every stem through `canon` (test resources map synonyms this way). */
+  def keysWith(canon: String => String): Set[String] =
+    NominalMention.keysOf(modifiers.map(canon), canon(head))
+
+object NominalMention:
+  private val Definites = Set("the")
+  private val Indefinites = Set("a", "an", "some", "another")
+  private val Demonstratives = Set("this", "that", "these", "those")
+  private val Possessives = Set("his", "her", "their", "my", "our", "your", "its")
+  private val PluralDeterminers = Set("these", "those", "some", "several", "many", "both", "few")
+
+  /** Numerals and quantifiers count as modifiers and fix number. */
+  private val Numerals: Map[String, MentionNumber] = Map(
+    "one" -> MentionNumber.Singular,
+    "two" -> MentionNumber.Plural,
+    "three" -> MentionNumber.Plural,
+    "four" -> MentionNumber.Plural,
+    "five" -> MentionNumber.Plural,
+    "six" -> MentionNumber.Plural,
+    "seven" -> MentionNumber.Plural,
+    "eight" -> MentionNumber.Plural,
+    "nine" -> MentionNumber.Plural,
+    "ten" -> MentionNumber.Plural,
+    "several" -> MentionNumber.Plural,
+    "many" -> MentionNumber.Plural,
+    "both" -> MentionNumber.Plural,
+    "few" -> MentionNumber.Plural,
+    "couple" -> MentionNumber.Plural
+  )
+
+  /** Words that end a mention when they follow the head ("the man who went"). */
+  val relativeMarkers: Set[String] = Set("who", "that", "which", "whom", "whose")
+
+  private val irregularPlurals: Map[String, String] =
+    Map(
+      "men" -> "man",
+      "women" -> "woman",
+      "children" -> "child",
+      "people" -> "people",
+      "feet" -> "foot",
+      "teeth" -> "tooth",
+      "mice" -> "mouse",
+      "geese" -> "goose"
+    )
+
+  /** Number of a head noun from its morphology; `None` when the form is not informative. */
+  def morphologicalNumber(head: String): Option[MentionNumber] =
+    val w = Lexical.lower(head)
+    if irregularPlurals.contains(w) then Some(MentionNumber.Plural)
+    else if w.length > 3 && w.endsWith("s") && !w.endsWith("ss") && !w.endsWith("us") then
+      Some(MentionNumber.Plural)
+    else Some(MentionNumber.Singular)
+
+  /** Parse a mention phrase already known to end at its head (or to contain a relative marker after
+    * it). Words are lower-cased; stopwords other than determiners are dropped from the modifier
+    * list; the head is the last word before a relative marker (or the last word).
+    */
+  def parse(phrase: String): Option[NominalMention] =
+    val all = Lexical.words(phrase)
+    val cut = all.indexWhere(relativeMarkers.contains)
+    val words = if cut >= 0 then all.take(cut) else all
+    if words.isEmpty then None
+    else
+      val det = words.head match
+        case w if Definites.contains(w)      => Some(Determiner.Definite)
+        case w if Indefinites.contains(w)    => Some(Determiner.Indefinite)
+        case w if Demonstratives.contains(w) => Some(Determiner.Demonstrative)
+        case w if Possessives.contains(w)    => Some(Determiner.Possessive)
+        case _                               => None
+      val rest = if det.isDefined then words.tail else words
+      if rest.isEmpty then None
+      else
+        val headWord = rest.last
+        val mods = rest.init.filter(w => Numerals.contains(w) || !Lexical.stopwords.contains(w))
+        val numeral = mods.collectFirst { case w if Numerals.contains(w) => Numerals(w) }
+        val number = numeral
+          .orElse(
+            if PluralDeterminers.contains(words.head) then Some(MentionNumber.Plural) else None
+          )
+          .orElse(morphologicalNumber(headWord))
+          .getOrElse(MentionNumber.Singular)
+        Some(
+          NominalMention(
+            det.getOrElse(Determiner.Bare),
+            mods.map(Lexical.stem),
+            Lexical.stem(irregularPlurals.getOrElse(headWord, headWord)),
+            number,
+            words.mkString(" ")
+          )
+        )
+
+  /** One token per nonempty sorted modifier subset joined with the head, plus the bare head only
+    * when there are no modifiers. Modifier count is capped at 4 (15 keys) to bound growth.
+    */
+  def keysOf(modifiers: Vector[String], head: String): Set[String] =
+    val mods = modifiers.distinct.sorted.take(4)
+    if mods.isEmpty then Set(head)
+    else (1 to mods.size).flatMap(k => mods.combinations(k).map(c => (c :+ head).mkString)).toSet
+
+  /** Two mentions may co-refer only if their numbers agree and no modifier of one contradicts the
+    * other (a modifier present on both sides with a different value counts as a conflict only when
+    * both have modifiers and share none).
+    */
+  def compatible(a: NominalMention, b: NominalMention): Boolean =
+    a.head == b.head && a.number == b.number &&
+      (a.modifiers.isEmpty || b.modifiers.isEmpty || a.modifiers.exists(b.modifiers.contains))
