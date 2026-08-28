@@ -558,6 +558,9 @@ object StoryValidator:
         case FeatureTarget.Boundary(u) =>
           if !m.atlas.byId.contains(u) then
             err("feature.target-exists", path, s"unknown surface unit ${u.value}")
+        case FeatureTarget.SurfaceUnit(u) =>
+          if !m.atlas.byId.contains(u) then
+            err("feature.target-exists", path, s"unknown surface unit ${u.value}")
         case FeatureTarget.Token(_) | FeatureTarget.Window(_) | FeatureTarget.Turn(_) => ()
     }
     m.sidecars.foreach { (id, manifest) =>

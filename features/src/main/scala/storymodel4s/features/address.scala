@@ -23,10 +23,16 @@ object FeatureTargetKey:
     case FeatureTarget.Turn(i)      => Vector("turn", i.value)
     case FeatureTarget.Window(r)    =>
       Vector("window", r.start.value.toString, r.endExclusive.value.toString)
+    case FeatureTarget.SurfaceUnit(u) => Vector("unit", u.value)
+
+  /** Only the canonical decimal rendering is accepted (no sign, no leading zeros), so that every
+    * accepted key renders back to itself.
+    */
+  private def canonicalInt(s: String): Option[Int] = s.toIntOption.filter(_.toString == s)
 
   def parse(parts: Vector[String]): Option[FeatureTarget] = parts match
     case Vector("token", i) =>
-      i.toIntOption.flatMap(TokenIndex.from(_).toOption).map(FeatureTarget.Token.apply)
+      canonicalInt(i).flatMap(TokenIndex.from(_).toOption).map(FeatureTarget.Token.apply)
     case Vector("sentence", u)  => SurfaceUnitId.from(u).toOption.map(FeatureTarget.Sentence.apply)
     case Vector("situation", i) => SituationId.from(i).toOption.map(FeatureTarget.Situation.apply)
     case Vector("segment", i)   => SegmentId.from(i).toOption.map(FeatureTarget.Segment.apply)
@@ -34,11 +40,12 @@ object FeatureTargetKey:
     case Vector("turn", i)      => TurnId.from(i).toOption.map(FeatureTarget.Turn.apply)
     case Vector("window", s, e) =>
       for
-        a <- s.toIntOption
-        b <- e.toIntOption
+        a <- canonicalInt(s)
+        b <- canonicalInt(e)
         r <- TokenRange.of(a, b).toOption
       yield FeatureTarget.Window(r)
-    case _ => None
+    case Vector("unit", u) => SurfaceUnitId.from(u).toOption.map(FeatureTarget.SurfaceUnit.apply)
+    case _                 => None
 
 object FeatureAddress:
   val Tag: ModuleTag = ModuleTag.unsafe("features")

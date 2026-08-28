@@ -66,6 +66,17 @@ object WindowReducer:
   private def observed(samples: NonEmptyVector[Sample[Double]]): Vector[Sample[Double]] =
     samples.toVector.filter(s => Estimate.finite(s.estimate).isDefined)
 
+  /** Observed samples paired with their finite values, or the `Missing` that explains why there are
+    * none (`NotFinite` when something was observed but nothing finite).
+    */
+  private def finiteSamples(
+      samples: NonEmptyVector[Sample[Double]]
+  ): Either[Estimate[Double], Vector[(Sample[Double], Double)]] =
+    val obs = samples.toVector.flatMap(s => Estimate.finite(s.estimate).map(v => (s, v)))
+    if obs.nonEmpty then Right(obs)
+    else if samples.exists(_.estimate.isObserved) then Left(undefined(UndefinedReason.NotFinite))
+    else Left(Estimate.Missing(MissingReason.AllMissing))
+
   private def values(obs: Vector[Sample[Double]]): Vector[Double] =
     obs.flatMap(s => Estimate.finite(s.estimate))
 
@@ -128,6 +139,31 @@ object WindowReducer:
               // never substitute a value from outside the support
               undefined(UndefinedReason.OutsideKernelSupport)
 
+  /** Kernel smoothing where the distance of a sample from the window centre is supplied by the
+    * caller (`distance`, in basis positions) instead of read off `Sample.position`: the reducer for
+    * centred windows over narrative units, whose bandwidth counts units, not tokens. A declared
+    * point mass whose centre has no observed sample yields the mean of every observed sample at the
+    * minimal distance (the nearest unit), never a single arbitrary sample.
+    */
+  private[features] def kernelAt(
+      shape: KernelShape,
+      distance: Sample[Double] => Double
+  ): WindowReducer[Double, Double] =
+    (samples: NonEmptyVector[Sample[Double]]) =>
+      finiteSamples(samples) match
+        case Left(missing) => missing
+        case Right(obs)    =>
+          val weighted = obs.map((s, v) => (v, shape.weight(distance(s))))
+          val tw = weighted.map(_._2).sum
+          if tw > 0.0 then Estimate.observed(weighted.map((v, w) => v * w).sum / tw)
+          else if shape.isPointMass then
+            // a declared point mass whose centre unit has no observed sample: the mean of all
+            // observed samples at the minimal distance, i.e. the whole nearest unit
+            val nearest = obs.map((s, _) => distance(s)).min
+            val vs = obs.collect { case (s, v) if distance(s) == nearest => v }
+            Estimate.observed(vs.sum / vs.size)
+          else undefined(UndefinedReason.OutsideKernelSupport)
+
 /** Windowed reduction of a token-aligned scalar track into a window-aligned track.
   *
   * Every output retains the window's exact support and its coverage (eligible basis tokens vs.
@@ -178,6 +214,90 @@ object Windowed:
           Some(cov)
         )
       }
+    }
+    outs.map { obs =>
+      FeatureTrack(
+        outputSpace(
+          track.space,
+          derivation,
+          s"${track.space.description} — ${plan.canonicalString} ${reducer.id.value}"
+        ),
+        obs.sortBy(o => o.target: FeatureTarget),
+        Some(derivation),
+        track.provenance
+      )
+    }
+
+  /** Implementation version recorded in narrative-window recipes; bump whenever
+    * [[Windowed.overBasis]] changes any output value, so old derivation ids never alias new ones.
+    */
+  val narrativeImplementationVersion = "narrative-windowed-1"
+
+  /** Centred windows of `±plan.halfWidth` units over a [[NarrativeBasis]]: one observation per unit
+    * (an event or a scene), whose support is the union of the member units' supports and whose
+    * coverage counts the eligible tokens of that union once. Windows are clipped at the ends of the
+    * basis.
+    *
+    * Decision: a kernel's distance for a token is the offset (in units) of the nearest member unit
+    * containing it, so bandwidths count events or scenes, not tokens; `Slope` stays over token
+    * position (discourse order).
+    */
+  def overBasis[T <: FeatureTarget](
+      track: FeatureTrack[FeatureTarget.Token, Double],
+      sequence: SurfaceSequence,
+      basis: NarrativeBasis[T],
+      plan: NarrativeWindowPlan,
+      reducer: ScalarReducer,
+      missing: MissingValuePolicy,
+      eligibility: Eligibility = Eligibility.LexicalTokens
+  ): Either[DomainError, FeatureTrack[T, Double]] =
+    val derivation = FeatureDerivation(
+      NonEmptyVector.one(track.space.id),
+      None,
+      reducer.id,
+      reducer.weighting,
+      missing,
+      None,
+      narrativeImplementationVersion,
+      eligibility,
+      Some(basis.family),
+      Some(plan)
+    )
+    val units = basis.units
+    val n = units.size
+    val outs = units.indices.toVector.traverse { p =>
+      val lo = math.max(0, p - plan.halfWidth)
+      val hi = math.min(n - 1, p + plan.halfWidth)
+      val members = (lo to hi).toVector.map(i => (math.abs(i - p), units(i)._2))
+      // a token's distance from the centre is that of the nearest member unit containing it
+      val covered: Vector[(TokenIndex, Int)] =
+        members.flatMap((d, sup) => sequence.coveringIndices(sup).map(i => (i, d)))
+      val distanceOf: Map[Int, Int] = covered.groupMapReduce(_._1.value)(_._2)(math.min)
+      val eligible = covered.map(_._1).distinct.sorted.filter { i =>
+        eligibility match
+          case Eligibility.LexicalTokens => sequence.tokens(i.value).isLexical
+          case Eligibility.AllTokens     => true
+      }
+      val samples = eligible.map { i =>
+        val est = track
+          .get(FeatureTarget.Token(i))
+          .getOrElse(Estimate.Missing(MissingReason.Unknown))
+        Sample(i.value, est, 1.0)
+      }
+      val red = reducer match
+        case ScalarReducer.Kernel(shape) =>
+          // every sample position is a key of `distanceOf`: samples come from `eligible`, which is
+          // drawn from `covered`, the very pairs `distanceOf` was folded from — the default is
+          // unreachable and only keeps the lookup total
+          WindowReducer.kernelAt(shape, s => distanceOf.getOrElse(s.position, 0).toDouble)
+        case other => WindowReducer.scalar(other)
+      val support = SpanSet
+        .of(members.flatMap((_, sup) => sup.refs.toVector))
+        .toRight(DomainError.InvariantViolation("features/narrative-window", "empty window"))
+      for
+        sup <- support
+        reduced <- Reduction.reduce(samples, red, missing)
+      yield FeatureObservation[T, Double](units(p)._1, reduced._1, Some(sup), Some(reduced._2))
     }
     outs.map { obs =>
       FeatureTrack(
@@ -248,6 +368,58 @@ object Aggregate:
   ): Either[DomainError, FeatureTrack[T, Double]] =
     val eligibility = if lexicalOnly then Eligibility.LexicalTokens else Eligibility.AllTokens
     val family = targets.headOption.map((t, _) => TargetFamily.of(t))
+    aggregate(track, sequence, targets, family, reducer, missing, eligibility)
+
+  /** Per-unit aggregation over a [[NarrativeBasis]]: one observation per situation or segment, with
+    * the unit's exact support and coverage. The recipe records the basis family even when the basis
+    * is empty.
+    */
+  def overBasis[T <: FeatureTarget](
+      track: FeatureTrack[FeatureTarget.Token, Double],
+      sequence: SurfaceSequence,
+      basis: NarrativeBasis[T],
+      reducer: ScalarReducer,
+      missing: MissingValuePolicy,
+      eligibility: Eligibility = Eligibility.LexicalTokens
+  ): Either[DomainError, FeatureTrack[T, Double]] =
+    aggregate(track, sequence, basis.units, Some(basis.family), reducer, missing, eligibility)
+
+  /** Per-situation (event) aggregation; every id must resolve through `resolver`. */
+  def overSituations(
+      track: FeatureTrack[FeatureTarget.Token, Double],
+      resolver: SupportResolver,
+      situations: Vector[SituationId],
+      reducer: ScalarReducer,
+      missing: MissingValuePolicy,
+      eligibility: Eligibility = Eligibility.LexicalTokens
+  ): Either[DomainError, FeatureTrack[FeatureTarget.Situation, Double]] =
+    NarrativeBasis
+      .situations(situations, resolver)
+      .flatMap(b => overBasis(track, resolver.sequence, b, reducer, missing, eligibility))
+
+  /** Per-segment (scene) aggregation; every id must resolve through `resolver`. */
+  def overSegments(
+      track: FeatureTrack[FeatureTarget.Token, Double],
+      resolver: SupportResolver,
+      segments: Vector[SegmentId],
+      reducer: ScalarReducer,
+      missing: MissingValuePolicy,
+      eligibility: Eligibility = Eligibility.LexicalTokens
+  ): Either[DomainError, FeatureTrack[FeatureTarget.Segment, Double]] =
+    NarrativeBasis
+      .segments(segments, resolver)
+      .flatMap(b => overBasis(track, resolver.sequence, b, reducer, missing, eligibility))
+
+  private def aggregate[T <: FeatureTarget](
+      track: FeatureTrack[FeatureTarget.Token, Double],
+      sequence: SurfaceSequence,
+      targets: Vector[(T, SpanSet)],
+      family: Option[TargetFamily],
+      reducer: ScalarReducer,
+      missing: MissingValuePolicy,
+      eligibility: Eligibility
+  ): Either[DomainError, FeatureTrack[T, Double]] =
+    val lexicalOnly = eligibility == Eligibility.LexicalTokens
     val derivation = FeatureDerivation(
       NonEmptyVector.one(track.space.id),
       None,
@@ -290,3 +462,59 @@ object Aggregate:
             track.provenance
           )
         }
+
+/** An ordered run of narrative units — situations (events) or segments (scenes) — with their
+  * resolved text supports: the axis that [[Aggregate.overBasis]] aggregates per unit and
+  * [[Windowed.overBasis]] slides over.
+  *
+  * Why: core's `WindowBasis` counts surface units the atlas knows about; events and scenes are
+  * known only to the story model, so their basis is resolved through a [[SupportResolver]] and
+  * carried as data (ADR 0002 §9 checkpoint 2). Units keep the caller's order (the model's discourse
+  * order). Decision: an id that does not resolve, or appears twice, is a `DomainError` — never
+  * silently dropped, so a derived track always covers exactly the units it was asked for.
+  */
+final case class NarrativeBasis[T <: FeatureTarget] private (
+    family: TargetFamily,
+    units: Vector[(T, SpanSet)]
+):
+  def size: Int = units.size
+  def isEmpty: Boolean = units.isEmpty
+  def targets: Vector[T] = units.map(_._1)
+
+object NarrativeBasis:
+  def situations(
+      ids: Vector[SituationId],
+      resolver: SupportResolver
+  ): Either[DomainError, NarrativeBasis[FeatureTarget.Situation]] =
+    resolve(TargetFamily.Situation, ids.map(FeatureTarget.Situation.apply), resolver)
+
+  def segments(
+      ids: Vector[SegmentId],
+      resolver: SupportResolver
+  ): Either[DomainError, NarrativeBasis[FeatureTarget.Segment]] =
+    resolve(TargetFamily.Segment, ids.map(FeatureTarget.Segment.apply), resolver)
+
+  private def resolve[T <: FeatureTarget](
+      family: TargetFamily,
+      targets: Vector[T],
+      resolver: SupportResolver
+  ): Either[DomainError, NarrativeBasis[T]] =
+    val path = "features/narrative-basis"
+    // the first repeated target in basis order, not hash order
+    targets.diff(targets.distinct).headOption match
+      case Some(dup) =>
+        Left(DomainError.DuplicateId("FeatureTarget", FeatureTargetKey.parts(dup).mkString("/")))
+      case None =>
+        targets
+          .traverse { t =>
+            resolver
+              .support(t)
+              .map(sup => (t, sup))
+              .toRight(
+                DomainError.InvariantViolation(
+                  path,
+                  s"unresolved ${FeatureTargetKey.parts(t).mkString("/")}"
+                )
+              )
+          }
+          .map(NarrativeBasis(family, _))

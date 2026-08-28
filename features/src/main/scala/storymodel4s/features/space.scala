@@ -28,7 +28,8 @@ final case class FeatureSpace[V](
 /** Where a feature observation is attached on the surface axis or in the narrative model.
   *
   * Positional order is total for `Token` and `Window`; identifier-based targets sort by ID unless a
-  * resolver supplies positions.
+  * resolver supplies positions. Cases are only ever appended (their rank is part of the sort order
+  * that persisted tracks rely on).
   */
 enum FeatureTarget:
   case Token(index: TokenIndex)
@@ -41,24 +42,33 @@ enum FeatureTarget:
   case Turn(id: TurnId)
   case Window(range: TokenRange)
 
+  /** Any surface unit by id — the clause and paragraph scales of the selector (ADR 0002 §9
+    * checkpoint 2), which have no dedicated case. Decision: `Sentence(u)` stays canonical for
+    * sentences; `SurfaceUnit(u)` on the same id is a distinct target with the same support, and no
+    * normalization between the two is performed.
+    */
+  case SurfaceUnit(unit: SurfaceUnitId)
+
 object FeatureTarget:
   private def rank(t: FeatureTarget): Int = t match
-    case _: Token     => 0
-    case _: Window    => 1
-    case _: Sentence  => 2
-    case _: Boundary  => 3
-    case _: Turn      => 4
-    case _: Situation => 5
-    case _: Segment   => 6
+    case _: Token       => 0
+    case _: Window      => 1
+    case _: Sentence    => 2
+    case _: Boundary    => 3
+    case _: Turn        => 4
+    case _: Situation   => 5
+    case _: Segment     => 6
+    case _: SurfaceUnit => 7
 
   private def key(t: FeatureTarget): (Int, Int, Int, String) = t match
-    case Token(i)     => (0, i.value, 0, "")
-    case Window(r)    => (1, r.start.value, r.endExclusive.value, "")
-    case Sentence(u)  => (2, 0, 0, u.value)
-    case Boundary(u)  => (3, 0, 0, u.value)
-    case Turn(i)      => (4, 0, 0, i.value)
-    case Situation(i) => (5, 0, 0, i.value)
-    case Segment(i)   => (6, 0, 0, i.value)
+    case Token(i)       => (0, i.value, 0, "")
+    case Window(r)      => (1, r.start.value, r.endExclusive.value, "")
+    case Sentence(u)    => (2, 0, 0, u.value)
+    case Boundary(u)    => (3, 0, 0, u.value)
+    case Turn(i)        => (4, 0, 0, i.value)
+    case Situation(i)   => (5, 0, 0, i.value)
+    case Segment(i)     => (6, 0, 0, i.value)
+    case SurfaceUnit(u) => (7, 0, 0, u.value)
 
   given Order[FeatureTarget] = Order.by(key)
   given Ordering[FeatureTarget] = Order[FeatureTarget].toOrdering
@@ -88,9 +98,10 @@ final case class SupportResolver(
       sequence.atlas.byId
         .get(u)
         .map(s => SpanSet.one(TextSpan.unsafe(s.span.endExclusive, s.span.endExclusive)))
-    case FeatureTarget.Situation(i) => situation(i)
-    case FeatureTarget.Segment(i)   => segment(i)
-    case FeatureTarget.Turn(i)      => turn(i)
+    case FeatureTarget.Situation(i)   => situation(i)
+    case FeatureTarget.Segment(i)     => segment(i)
+    case FeatureTarget.Turn(i)        => turn(i)
+    case FeatureTarget.SurfaceUnit(u) => sequence.atlas.byId.get(u).map(s => SpanSet.one(s.span))
 
   /** Discourse position (start offset) of a target, when its support is known. */
   def position(target: FeatureTarget): Option[Int] = support(target).map(_.minSpan.start)

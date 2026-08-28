@@ -64,24 +64,51 @@ enum Eligibility:
   * reducer over the same inputs means something different per situation than per window.
   */
 enum TargetFamily:
-  case Token, Window, Sentence, Boundary, Turn, Situation, Segment
+  case Token, Window, Sentence, Boundary, Turn, Situation, Segment, SurfaceUnit
 
 object TargetFamily:
   def of(t: FeatureTarget): TargetFamily = t match
-    case _: FeatureTarget.Token     => Token
-    case _: FeatureTarget.Window    => Window
-    case _: FeatureTarget.Sentence  => Sentence
-    case _: FeatureTarget.Boundary  => Boundary
-    case _: FeatureTarget.Turn      => Turn
-    case _: FeatureTarget.Situation => Situation
-    case _: FeatureTarget.Segment   => Segment
+    case _: FeatureTarget.Token       => Token
+    case _: FeatureTarget.Window      => Window
+    case _: FeatureTarget.Sentence    => Sentence
+    case _: FeatureTarget.Boundary    => Boundary
+    case _: FeatureTarget.Turn        => Turn
+    case _: FeatureTarget.Situation   => Situation
+    case _: FeatureTarget.Segment     => Segment
+    case _: FeatureTarget.SurfaceUnit => SurfaceUnit
+
+/** A centred window of `±halfWidth` narrative units around each unit of a [[NarrativeBasis]]: the
+  * narrative counterpart of core's `WindowPlan` (ADR 0002 §9 checkpoint 2, "`WindowBasis.Events`").
+  *
+  * Why: event and scene recipes of the scale selector must be receipted exactly like surface
+  * windows, and the unit axis (situations, segments) is known only to the story model, so the plan
+  * lives here rather than in core. A half-width of 0 is per-unit aggregation. The axis itself is
+  * recorded by the derivation's `targetFamily`.
+  *
+  * Decision: narrative windows are centred (the target is the centre unit, clipped at the ends of
+  * the basis), not width/step sliding windows — a sliding window over events would need an "event
+  * range" target that ADR 0002 does not define.
+  */
+final case class NarrativeWindowPlan private (halfWidth: Int):
+  def canonicalString: String = s"narrative(halfWidth=$halfWidth)"
+
+object NarrativeWindowPlan:
+  /** Per-unit aggregation: each unit is its own window. */
+  val perUnit: NarrativeWindowPlan = NarrativeWindowPlan(0)
+
+  def of(halfWidth: Int): Either[DomainError, NarrativeWindowPlan] =
+    if halfWidth < 0 then
+      Left(DomainError.InvalidFormat("NarrativeWindowPlan", halfWidth.toString, "negative"))
+    else Right(NarrativeWindowPlan(halfWidth))
 
 /** The executable recipe that produced a derived track from its inputs.
   *
   * Why: every smoothed or aggregated value must be replayable and diffable; the recipe is
   * content-addressed so caches and dependency graphs can key on it (design record §110). Every
   * parameter that changes the output is part of the recipe, including eligibility and target
-  * family.
+  * family. A recipe has at most one window: `window` slides over the surface axis,
+  * `narrativeWindow` over a [[NarrativeBasis]]; the latter is rendered only when present so ids of
+  * surface recipes never change.
   */
 final case class FeatureDerivation(
     inputs: NonEmptyVector[FeatureSpaceId],
@@ -92,12 +119,14 @@ final case class FeatureDerivation(
     normalization: Option[NormalizationPolicy],
     implementationVersion: String,
     eligibility: Eligibility = Eligibility.LexicalTokens,
-    targetFamily: Option[TargetFamily] = None
+    targetFamily: Option[TargetFamily] = None,
+    narrativeWindow: Option[NarrativeWindowPlan] = None
 ):
   def canonicalString: String =
-    Vector(
+    (Vector(
       "inputs=" + inputs.toVector.map(_.value).mkString(","),
-      "window=" + window.map(_.canonicalString).getOrElse("none"),
+      "window=" + window.map(_.canonicalString).getOrElse("none")
+    ) ++ narrativeWindow.map(p => "narrativeWindow=" + p.canonicalString).toVector ++ Vector(
       "reducer=" + reducer.value,
       "weighting=" + weighting.canonicalString,
       "missing=" + missing.canonicalString,
@@ -105,7 +134,12 @@ final case class FeatureDerivation(
       "eligibility=" + eligibility.canonicalString,
       "targets=" + targetFamily.map(_.toString.toLowerCase).getOrElse("none"),
       "impl=" + implementationVersion
-    ).mkString(";")
+    )).mkString(";")
+
+  /** A recipe must not slide over two axes at once; enforced by [[FeatureDerivation.of]], the codec
+    * decoder, and [[DerivationGraph.add]].
+    */
+  def hasSingleWindow: Boolean = window.isEmpty || narrativeWindow.isEmpty
 
   /** Content address of the recipe. */
   def derivationId: Checksum = Checksum.ofText(canonicalString)
@@ -115,6 +149,47 @@ final case class FeatureDerivation(
     */
   def outputSpaceId: FeatureSpaceId =
     FeatureSpaceId.unsafe("derived:" + derivationId.short(32))
+
+object FeatureDerivation:
+  private val path = "features/derivation"
+
+  /** Checked constructor: rejects a recipe carrying both a surface and a narrative window. The
+    * case-class constructor stays public because recipes are also built by `align` and by `copy` in
+    * tests; every boundary that admits a recipe (codec, [[DerivationGraph.add]]) re-validates.
+    */
+  def of(
+      inputs: NonEmptyVector[FeatureSpaceId],
+      window: Option[WindowPlan],
+      reducer: ReducerId,
+      weighting: WeightingPolicy,
+      missing: MissingValuePolicy,
+      normalization: Option[NormalizationPolicy],
+      implementationVersion: String,
+      eligibility: Eligibility = Eligibility.LexicalTokens,
+      targetFamily: Option[TargetFamily] = None,
+      narrativeWindow: Option[NarrativeWindowPlan] = None
+  ): Either[DomainError, FeatureDerivation] =
+    validated(
+      FeatureDerivation(
+        inputs,
+        window,
+        reducer,
+        weighting,
+        missing,
+        normalization,
+        implementationVersion,
+        eligibility,
+        targetFamily,
+        narrativeWindow
+      )
+    )
+
+  def validated(d: FeatureDerivation): Either[DomainError, FeatureDerivation] =
+    if d.hasSingleWindow then Right(d)
+    else
+      Left(
+        DomainError.InvariantViolation(path, "recipe carries both a surface and a narrative window")
+      )
 
 /** Dependency graph over feature spaces: which recipe produced each derived space.
   *
@@ -143,6 +218,10 @@ final case class DerivationGraph private (edges: Map[FeatureSpaceId, FeatureDeri
   def add(output: FeatureSpaceId, d: FeatureDerivation): Either[DomainError, DerivationGraph] =
     val path = s"features/derivations/${output.value}"
     if edges.contains(output) then Left(DomainError.DuplicateId("FeatureSpaceId", output.value))
+    else if !d.hasSingleWindow then
+      Left(
+        DomainError.InvariantViolation(path, "recipe carries both a surface and a narrative window")
+      )
     else if d.inputs.toVector.contains(output) then
       Left(DomainError.InvariantViolation(path, "space derived from itself"))
     else
