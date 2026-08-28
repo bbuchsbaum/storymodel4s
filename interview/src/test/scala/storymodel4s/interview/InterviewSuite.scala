@@ -565,7 +565,7 @@ class InterviewSuite extends ScalaCheckSuite:
     val a2 = a1.copy(experiential = exp, sourceMonitoring = Some(SourceMonitoring.DirectMemory))
     val once = ProfileScoring.phenomenology(Vector(a1, a2), None)
     val twice = ProfileScoring.phenomenology(Vector(a1, a2, a1, a2), None)
-    assertEquals(once.firstPersonRate, Estimate.observed(0.5))
+    assertEquals(once.firstPersonRate, Estimate.observed(1.0))
     assertEquals(twice.firstPersonRate, once.firstPersonRate)
     assertEquals(once.explicitRating, None)
     assertEquals(once.sourceMonitoring, Map(SourceMonitoring.DirectMemory -> 1))
