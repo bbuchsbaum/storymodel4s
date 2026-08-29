@@ -12,8 +12,12 @@ class WarOfTheGhostsAtlasSuite extends FunSuite:
   val ev = Addressable[StoryRef]
   val all3 = ThreadPolicy.All(PositiveInt.unsafe(3))
 
-  def spec(level: NarrativeLevel, threads: ThreadPolicy = all3): AtlasSpec =
-    AtlasSpec(ZoomLevel(level, SurfaceDetail.Hidden), threads)
+  def spec(
+      level: NarrativeLevel,
+      threads: ThreadPolicy = all3,
+      surface: SurfaceDetail = SurfaceDetail.Hidden
+  ): AtlasSpec =
+    AtlasSpec(ZoomLevel(level, surface), threads)
 
   def provenanceFor(
       sourceModel: StoryModel[ModelStatus.Validated],
@@ -32,9 +36,10 @@ class WarOfTheGhostsAtlasSuite extends FunSuite:
       level: NarrativeLevel,
       state: CommonViewState = CommonViewState.empty,
       threads: ThreadPolicy = all3,
-      sourceModel: StoryModel[ModelStatus.Validated] = model
+      sourceModel: StoryModel[ModelStatus.Validated] = model,
+      surface: SurfaceDetail = SurfaceDetail.Hidden
   ): NarrativeScene =
-    val s = spec(level, threads)
+    val s = spec(level, threads, surface)
     AtlasCompiler(provenanceFor(sourceModel, state, s))
       .compile(sourceModel, state, s)
       .fold(e => fail(e.message), identity)
@@ -85,6 +90,49 @@ class WarOfTheGhostsAtlasSuite extends FunSuite:
 
   def regions(s: NarrativeScene) = s.marks.collect { case r: VisualPrimitive.Region => r }
   def landmarks(s: NarrativeScene) = s.marks.collect { case l: VisualPrimitive.Landmark => l }
+
+  test("surface detail changes marks and preserves a selected token through its sentence"):
+    assert(model.atlas.sentences.size > 1, "fixture must contain multiple sentences")
+    assert(
+      model.atlas.tokens.size > model.atlas.sentences.size,
+      "fixture must contain more tokens than sentences"
+    )
+    val token = model.atlas.tokens.find(_.parent.nonEmpty).getOrElse(fail("missing parented token"))
+    val sentence = token.parent
+      .flatMap(model.atlas.byId.get)
+      .getOrElse(fail("token parent is absent from the surface atlas"))
+    assertEquals(sentence.kind, SurfaceUnitKind.Sentence)
+    val coreRef = Addressable[CoreRef]
+    val tokenAddress = coreRef.address(CoreRef.SurfaceUnit(token.id))
+    val sentenceAddress = coreRef.address(CoreRef.SurfaceUnit(sentence.id))
+    val selected = state(selection = Set(tokenAddress))
+
+    val hidden = scene(NarrativeLevel.Scene, selected)
+    val sentences = scene(
+      NarrativeLevel.Scene,
+      selected,
+      surface = SurfaceDetail.Sentences
+    )
+    val tokens = scene(NarrativeLevel.Scene, selected, surface = SurfaceDetail.Tokens)
+
+    assertNotEquals(hidden.marks.map(_.identity.mark), sentences.marks.map(_.identity.mark))
+    assertNotEquals(sentences.marks.map(_.identity.mark), tokens.marks.map(_.identity.mark))
+    assertEquals(
+      hidden.selectionPlacements.get(tokenAddress),
+      Some(SelectionPlacement.OffProjection)
+    )
+    assertEquals(
+      sentences.selectionPlacements.get(tokenAddress),
+      Some(SelectionPlacement.ViaAncestor(sentenceAddress))
+    )
+    tokens.selectionPlacements.get(tokenAddress) match
+      case Some(SelectionPlacement.OnMark(marks)) =>
+        assertEquals(marks.toVector, tokens.navigation.marksFor(tokenAddress))
+      case other => fail(s"expected selected token on its token mark, found $other")
+    assert(
+      tokens.navigation.marksFor(sentenceAddress).nonEmpty,
+      "token detail must retain sentence marks as the coarser visible ancestors"
+    )
 
   test("story level shows the three episode regions and no landmarks; area is undeclared"):
     val s = scene(NarrativeLevel.Story)
