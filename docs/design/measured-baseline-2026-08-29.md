@@ -29,8 +29,32 @@ travel with every number.
 With `DefaultLocalCostModel`, default weights and `externalFloor`, `lexicalJaccard`, **no** synonym
 table, **no** canonicalisation, public API only:
 
-> **Of the eight WOG paraphrases declaring a source target, ONE is hit at top-5. None at top-1 or
+> **Of the seven WOG paraphrases declaring a source target, ONE is hit at top-5. None at top-1 or
 > top-3.**
+
+*(Corrected from "eight" within the hour. Three paraphrases declare empty targets, not one —
+`RoleSwappedFoil`, `NegatedFoil` and `ExternalAssociation`. The first two are **foils**, meant to
+anchor as `Distorted` rather than to a plain target, so counting them as ordinary misses was wrong
+twice over. The original denominator came from splitting a source file on a string instead of
+counting at runtime.)*
+
+**And more than half of that failure is miscalibration, not missing semantics.** The decomposition:
+
+| configuration | top-5 | mean source mass |
+|---|---|---|
+| defaults | 1/7 | 0.267 |
+| `externalFloor` 1.2 only | 2/7 | 0.466 |
+| suite weights only | 4/7 | 0.605 |
+| suite weights + floor 1.2, **no synonyms** | 4/7 | 0.818 |
+| floor 2.0, default weights | 4/7 | 0.988 |
+
+**Calibration alone takes it from 1/7 to 4/7 with no synonym table at all**, and simply raising
+`externalFloor` to 2.0 with otherwise-default weights does as well as the suite's tuned vector. The
+defaults are wrong in a way that is cheap to fix.
+
+**4/7 is the ceiling across every calibration variant tried.** The remaining three need something
+calibration cannot provide. That is the honest boundary between "tune the numbers" and "we need
+graded semantics" — and it is where the hand-authored synonym table earns its place.
 
 **It does not pick the wrong node — it declines to anchor.** `ext:Intrusion` is the top state for
 seven of ten, at 0.37–0.85 of the row. Summary: 0.812 with 0.073 source mass. Blended: 0.853 with
@@ -94,6 +118,13 @@ From a spike run by an agent with no prior time in these modules:
   every consumer writes its own parser.
 - `sbt coreJVM/console` with redirected input **exits 0 and executes nothing**. A researcher
   following the README would read process success as program execution.
+- **A fixture load order produces a fabricated error.** Touching `WarOfTheGhostsExpectations`
+  before `WarOfTheGhostsModel` makes the model fail validation with four *specific and entirely
+  fictitious* defects — `claims.unique-ids … 2 claims share id`, `entity-relation.membership-acyclic
+  @ entities/null`. Touch the model first and it loads cleanly, 71 situations, suite 114/114 green.
+  A consumer that happens to import in the wrong order is told its model is corrupt. The `null`s
+  are the signature of a nested-object initialisation cycle; the order dependence is demonstrated,
+  the mechanism is not yet proven.
 
 ## What would change this document
 
