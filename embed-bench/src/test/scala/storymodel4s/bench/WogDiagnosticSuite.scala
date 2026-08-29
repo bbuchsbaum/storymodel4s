@@ -146,27 +146,30 @@ class WogDiagnosticSuite extends FunSuite:
     }
   }
 
-  test("a signature refusal is recorded as the exact case failure, never dropped or defaulted") {
+  test("an aggregate importance overflow is recorded as an exact case failure") {
     val base = WogDiagnostic.fullRecallCase
-    val malformedLeaf = base.view.leaves.headOption.fold(fail("WOG has no source leaf"))(_.ref)
+    val overflowingLeaves = base.view.leaves.take(2).map(_.ref).toSet
+    assertEquals(overflowingLeaves.size, 2, "WOG fixture needs two leaves for overflow")
     val edges = RelationLayer.values.toVector.map { layer =>
       val triples = base.view.adjacency(layer).toVector.flatMap { case (from, targets) =>
         targets.toVector.map { case (to, weight) => (from, to, weight) }
       }
       layer -> triples
     }.toMap
-    val malformedView = InMemorySourceView(
+    val overflowingView = InMemorySourceView(
       base.view.nodes.map(n =>
-        if n.ref == malformedLeaf then n.copy(importance = Estimate.observed(Double.NaN)) else n
+        if overflowingLeaves(n.ref) then
+          n.copy(importance = ImportanceWeight.unsafe(Estimate.observed(Double.MaxValue)))
+        else n
       ),
       edges,
       base.view.worldOrder,
       base.view.textLength
     )
-    val malformedCase = base.copy(id = "wog:malformed-importance", view = malformedView)
+    val overflowingCase = base.copy(id = "wog:overflowing-importance", view = overflowingView)
     val result = Bench
       .run(
-        Vector(malformedCase),
+        Vector(overflowingCase),
         WogDiagnostic.factories(dimension = 32, seed = 7L).take(1),
         ProtocolDocument.pinned,
         BenchConfig(seed = 11L, resamples = 1)
@@ -177,7 +180,7 @@ class WogDiagnosticSuite extends FunSuite:
     assertEquals(channel.runs, Vector.empty, "a refused signature became a successful case run")
     channel.failures match
       case Vector(
-            ("wog:malformed-importance", AlignError.MalformedRecord("weightedCoverage", d))
+            ("wog:overflowing-importance", AlignError.MalformedRecord("weightedCoverage", d))
           ) =>
         assert(d.contains("not finite"), d)
       case other => fail(s"signature refusal was dropped or changed: $other")

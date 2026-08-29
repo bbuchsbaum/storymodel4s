@@ -252,7 +252,9 @@ class WireSuite extends FunSuite:
       "lemmas" -> withNode(_.copy(lemmas = Set("x"))),
       "outcome" -> withNode(_.copy(outcome = Some("o"))),
       "cause" -> withNode(_.copy(cause = Some("c"))),
-      "importance" -> withNode(_.copy(importance = Estimate.observed(0.5))),
+      "importance" -> withNode(
+        _.copy(importance = ImportanceWeight.unsafe(Estimate.observed(0.5)))
+      ),
       "evidence on" -> withNode(_.copy(evidence = Some(evidenceA))),
       "evidence other" -> withNode(_.copy(evidence = Some(evidenceB))),
       "outcome/cause re-bracketed A" -> withNode(
@@ -540,7 +542,9 @@ class WireSuite extends FunSuite:
   test("importance is fingerprinted as the full estimate variant, credence included") {
     def withImportance(e: Estimate[Double]): ViewFingerprint =
       InMemorySourceView(
-        view.nodes.map(n => if n.ref == e1 then n.copy(importance = e) else n),
+        view.nodes.map(n =>
+          if n.ref == e1 then n.copy(importance = ImportanceWeight.unsafe(e)) else n
+        ),
         view.edges,
         view.worldOrder,
         view.textLength

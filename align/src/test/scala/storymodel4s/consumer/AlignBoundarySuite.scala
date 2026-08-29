@@ -102,6 +102,54 @@ class AlignBoundarySuite extends FunSuite:
     assert(product.nonEmpty, "WeightedCoverage remained a Product")
   }
 
+  test("ImportanceWeight has no Product, Mirror, copy, constructor, or fromProduct bypass") {
+    val probes = List(
+      typeCheckErrors(
+        "summon[scala.deriving.Mirror.ProductOf[storymodel4s.align.ImportanceWeight]]"
+      ),
+      typeCheckErrors("storymodel4s.align.ImportanceWeight.fromProduct(EmptyTuple)"),
+      typeCheckErrors(
+        "new storymodel4s.align.ImportanceWeight(storymodel4s.features.Estimate.observed(0.0))"
+      ),
+      typeCheckErrors("(w: storymodel4s.align.ImportanceWeight) => w.copy()"),
+      typeCheckErrors("(w: storymodel4s.align.ImportanceWeight) => w: Product")
+    )
+    probes.foreach(errors => assert(errors.nonEmpty, "ImportanceWeight construction bypassed"))
+  }
+
+  test("NodeSummary has no Product, Mirror, constructor, or fromProduct bypass") {
+    val probes = List(
+      typeCheckErrors(
+        "summon[scala.deriving.Mirror.ProductOf[storymodel4s.align.NodeSummary]]"
+      ),
+      typeCheckErrors("storymodel4s.align.NodeSummary.fromProduct(EmptyTuple)"),
+      typeCheckErrors(
+        """new storymodel4s.align.NodeSummary(
+          ???, ???, ???, ???, ???, ???, ???, ???,
+          ???, ???, ???, ???, ???, ???, ???, ???
+        )"""
+      ),
+      typeCheckErrors("(n: storymodel4s.align.NodeSummary) => n: Product")
+    )
+    probes.foreach(errors => assert(errors.nonEmpty, "NodeSummary construction bypassed"))
+  }
+
+  test("NodeSummary checked copy cannot smuggle a raw unvalidated importance estimate") {
+    val copy = typeCheckErrors(
+      """(n: storymodel4s.align.NodeSummary) =>
+        n.copy(importance = storymodel4s.features.Estimate.observed(Double.NaN))"""
+    )
+    assert(copy.nonEmpty, "NodeSummary.copy admitted a raw, unvalidated importance estimate")
+  }
+
+  test("ImportanceWeight unsafe validates rather than bypassing the boundary") {
+    intercept[IllegalArgumentException] {
+      storymodel4s.align.ImportanceWeight.unsafe(
+        storymodel4s.features.Estimate.observed(Double.NaN)
+      )
+    }
+  }
+
   test("public reads and validated factories remain available") {
     val reads = List(
       typeCheckErrors(
@@ -122,7 +170,10 @@ class AlignBoundarySuite extends FunSuite:
       ),
       typeCheckErrors("storymodel4s.align.HsmmConfig.of(temperature = 0.0)"),
       typeCheckErrors("storymodel4s.align.CostWeights.of(1, -1, 0, 0, 0, 0)"),
-      typeCheckErrors("storymodel4s.align.WeightedCoverage.of(0.0, Vector.empty, 0)")
+      typeCheckErrors("storymodel4s.align.WeightedCoverage.of(0.0, Vector.empty, 0)"),
+      typeCheckErrors(
+        "storymodel4s.align.ImportanceWeight.observed(0.0).map(_.toOption)"
+      )
     )
     reads.zipWithIndex.foreach { (errors, i) =>
       assertEquals(errors, Nil, s"public read/factory $i must compile")

@@ -105,7 +105,7 @@ object ViewFingerprint:
       list("lemmas", n.lemmas.toVector.sorted)
       field("outcome", n.outcome.getOrElse(""))
       field("cause", n.cause.getOrElse(""))
-      field("importance", Render.estimate(n.importance))
+      field("importance", Render.estimate(n.importance.estimate))
       field("evidence", n.evidence.map(e => Canonical.checksum(e.chart).hex).getOrElse(""))
     }
     RelationLayer.values.foreach { layer =>
