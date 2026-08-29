@@ -137,13 +137,26 @@ type Probability = Probability.Probability
   * probability.
   *
   * Invariant: a calibrated value is present only if the calibration model that produced it is
-  * named.
+  * named. This is a non-case class so `fromProduct` cannot mint a calibrated probability without
+  * that name (design-contract rule 3).
   */
-final case class Credence private (
-    rawScore: Double,
-    calibrated: Option[Probability],
-    calibrationModel: Option[String]
-)
+final class Credence private (
+    val rawScore: Double,
+    val calibrated: Option[Probability],
+    val calibrationModel: Option[String]
+):
+  override def equals(other: Any): Boolean = other match
+    case that: Credence =>
+      rawScore == that.rawScore &&
+      calibrated == that.calibrated &&
+      calibrationModel == that.calibrationModel
+    case _ => false
+
+  override def hashCode(): Int = (rawScore, calibrated, calibrationModel).hashCode()
+
+  override def toString: String = (calibrated, calibrationModel) match
+    case (Some(p), Some(m)) => s"Credence(raw=$rawScore, p=${p.value}, model=$m)"
+    case _                  => s"Credence(raw=$rawScore)"
 
 object Credence:
   def raw(score: Double): Either[DomainError, Credence] =
@@ -158,7 +171,7 @@ object Credence:
   ): Either[DomainError, Credence] =
     if model.trim.isEmpty then
       Left(DomainError.InvalidFormat("Credence", model, "empty calibration model"))
-    else raw(score).map(_.copy(calibrated = Some(probability), calibrationModel = Some(model)))
+    else raw(score).map(_ => new Credence(score, Some(probability), Some(model)))
 
   def from(
       score: Double,

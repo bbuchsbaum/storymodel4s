@@ -6,9 +6,10 @@ import cats.data.NonEmptyVector
 /** A zero-based, half-open span measured in UTF-16 code units of a canonical text.
   *
   * Why UTF-16: it is the native string index on both the JVM and JavaScript, so offsets round-trip
-  * between Scala backends and browser review tools without conversion.
+  * between Scala backends and browser review tools without conversion. Non-case so `fromProduct`
+  * cannot mint a negative start or an inverted interval.
   */
-final case class TextSpan private (start: Int, endExclusive: Int):
+final class TextSpan private (val start: Int, val endExclusive: Int):
   def length: Int = endExclusive - start
   def isEmpty: Boolean = length == 0
 
@@ -39,6 +40,12 @@ final case class TextSpan private (start: Int, endExclusive: Int):
   def shift(delta: Int): Either[DomainError, TextSpan] =
     TextSpan.of(start + delta, endExclusive + delta)
 
+  override def equals(other: Any): Boolean = other match
+    case that: TextSpan => start == that.start && endExclusive == that.endExclusive
+    case _              => false
+
+  override def hashCode(): Int = (start, endExclusive).hashCode()
+
   override def toString: String = s"[$start, $endExclusive)"
 
 object TextSpan:
@@ -66,9 +73,10 @@ object SpanRef:
 /** Nonempty, sorted, deduplicated evidence support that may be discontinuous.
   *
   * Why: a canonical event can be supported by several distant mentions (a battle, its later
-  * retelling); evidence must be able to point at all of them at once.
+  * retelling); evidence must be able to point at all of them at once. Non-case so `fromProduct`
+  * cannot keep unsorted or duplicate refs.
   */
-final case class SpanSet private (refs: NonEmptyVector[SpanRef]):
+final class SpanSet private (val refs: NonEmptyVector[SpanRef]):
   def ++(other: SpanSet): SpanSet = SpanSet.of(refs.toVector ++ other.refs.toVector).get
   def add(ref: SpanRef): SpanSet = SpanSet.of(refs.toVector :+ ref).get
   def size: Int = refs.length
@@ -104,6 +112,14 @@ final case class SpanSet private (refs: NonEmptyVector[SpanRef]):
     ok
 
   def units: Set[SurfaceUnitId] = refs.toVector.flatMap(_.unit).toSet
+
+  override def equals(other: Any): Boolean = other match
+    case that: SpanSet => refs.toVector == that.refs.toVector
+    case _             => false
+
+  override def hashCode(): Int = refs.toVector.hashCode()
+
+  override def toString: String = s"SpanSet(${refs.toVector.mkString(", ")})"
 
 object SpanSet:
   def of(refs: Iterable[SpanRef]): Option[SpanSet] =

@@ -37,24 +37,40 @@ final case class Evidence(
 
 /** Metadata attached to every nontrivial machine assertion.
   *
-  * Why the constructor is private: the span law (a `SurfaceExplicit` claim cites at least one
-  * nonempty span set) must hold for every `ClaimMeta` that exists, not only for those that happen
-  * to pass through a ledger. Construct with [[ClaimMeta.of]] (checked) or [[ClaimMeta.unsafe]]
+  * Why a non-case class: the span law (a `SurfaceExplicit` claim cites at least one nonempty span
+  * set) must hold for every `ClaimMeta` that exists. A private case-class constructor still emits
+  * `fromProduct`, and `private[core]` still emits `copy` inside the package — both mint
+  * SurfaceExplicit without spans. Construct with [[ClaimMeta.of]] (checked) or [[ClaimMeta.unsafe]]
   * (throws on violation); there is no unchecked path.
   */
-final case class ClaimMeta private[core] (
-    id: ClaimId,
-    status: EpistemicStatus,
-    credence: Credence,
-    evidence: NonEmptyVector[Evidence],
-    provenance: Provenance
+final class ClaimMeta private (
+    val id: ClaimId,
+    val status: EpistemicStatus,
+    val credence: Credence,
+    val evidence: NonEmptyVector[Evidence],
+    val provenance: Provenance
 ):
   def spans: Option[SpanSet] =
     evidence.toVector.flatMap(_.spans).reduceOption(_ ++ _)
 
   /** Checked update of the fields that do not affect the span law. */
-  def withCredence(c: Credence): ClaimMeta = copy(credence = c)
-  def withProvenance(p: Provenance): ClaimMeta = copy(provenance = p)
+  def withCredence(c: Credence): ClaimMeta =
+    new ClaimMeta(id, status, c, evidence, provenance)
+  def withProvenance(p: Provenance): ClaimMeta =
+    new ClaimMeta(id, status, credence, evidence, p)
+
+  override def equals(other: Any): Boolean = other match
+    case that: ClaimMeta =>
+      id == that.id &&
+      status == that.status &&
+      credence == that.credence &&
+      evidence == that.evidence &&
+      provenance == that.provenance
+    case _ => false
+
+  override def hashCode(): Int = (id, status, credence, evidence, provenance).hashCode()
+
+  override def toString: String = s"ClaimMeta(${id.value}, $status)"
 
   /** Checked update of status/evidence; fails when the result would violate the span law. */
   def withStatus(s: EpistemicStatus): Either[DomainError, ClaimMeta] =

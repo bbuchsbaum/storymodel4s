@@ -25,11 +25,22 @@ enum InterviewPhase:
 enum SpeakerRole:
   case Participant, Interviewer, Other
 
-/** Audio interval in milliseconds, half-open. */
-final case class AudioSpan private (startMillis: Long, endMillis: Long):
+/** Audio interval in milliseconds, half-open.
+  *
+  * Non-case so `fromProduct` cannot mint a negative start or an inverted interval.
+  */
+final class AudioSpan private (val startMillis: Long, val endMillis: Long):
   def durationMillis: Long = endMillis - startMillis
   def contains(t: Long): Boolean = t >= startMillis && t < endMillis
   def overlaps(o: AudioSpan): Boolean = startMillis < o.endMillis && o.startMillis < endMillis
+
+  override def equals(other: Any): Boolean = other match
+    case that: AudioSpan => startMillis == that.startMillis && endMillis == that.endMillis
+    case _               => false
+
+  override def hashCode(): Int = (startMillis, endMillis).hashCode()
+
+  override def toString: String = s"AudioSpan[$startMillis, $endMillis)"
 
 object AudioSpan:
   def of(startMillis: Long, endMillis: Long): Either[DomainError, AudioSpan] =

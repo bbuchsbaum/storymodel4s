@@ -66,18 +66,37 @@ object TextNorm:
 
 /** The immutable source text of a story with raw and canonical forms and their checksums.
   *
-  * All offsets in the model are interpreted against `canonicalText` only.
+  * All offsets in the model are interpreted against `canonicalText` only. Non-case so `fromProduct`
+  * cannot mint empty text or checksums that do not match the text.
   */
-final case class StorySource private (
-    id: StoryId,
-    title: Option[String],
-    language: LanguageTag,
-    rawText: String,
-    canonicalText: String,
-    rawChecksum: Checksum,
-    canonicalChecksum: Checksum,
-    metadata: Map[String, String]
-)
+final class StorySource private (
+    val id: StoryId,
+    val title: Option[String],
+    val language: LanguageTag,
+    val rawText: String,
+    val canonicalText: String,
+    val rawChecksum: Checksum,
+    val canonicalChecksum: Checksum,
+    val metadata: Map[String, String]
+):
+  override def equals(other: Any): Boolean = other match
+    case that: StorySource =>
+      id == that.id &&
+      title == that.title &&
+      language == that.language &&
+      rawText == that.rawText &&
+      canonicalText == that.canonicalText &&
+      rawChecksum == that.rawChecksum &&
+      canonicalChecksum == that.canonicalChecksum &&
+      metadata == that.metadata
+    case _ => false
+
+  override def hashCode(): Int =
+    (id, title, language, rawText, canonicalText, rawChecksum, canonicalChecksum, metadata)
+      .hashCode()
+
+  override def toString: String =
+    s"StorySource(${id.value}, title=$title, lang=${language.value}, rawChars=${rawText.length})"
 
 object StorySource:
   /** Line endings to `\n`, trailing whitespace stripped per line, runs of more than two newlines
