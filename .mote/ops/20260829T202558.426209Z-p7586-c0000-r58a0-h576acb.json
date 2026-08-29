@@ -1,0 +1,1 @@
+{"actor":"cursor-grok-4.6-help","entity":"bd-01M176027HM0AKXXD63MR8VBXJ","kind":"note","note_kind":"note","op":"20260829T202558.426209Z-p7586-c0000-r58a0-h576acb","text":"Landed 3468dce (6532f49). WindowReducer.reduce refuses invalid weights; derived scalars go through Estimate.score. Reservations released.","ts":"2026-08-29T20:25:58.426209Z","v":1}
