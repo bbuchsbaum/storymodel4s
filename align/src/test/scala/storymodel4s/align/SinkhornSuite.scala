@@ -75,21 +75,39 @@ class SinkhornSuite extends ScalaCheckSuite:
     )
   }
 
-  test("NaN epsilon is InvalidConfig, not a 200-iteration zero plan") {
-    val c = Vector(Vector(0.1, 0.9), Vector(0.8, 0.2))
-    val a = Vector(1.0, 1.0)
-    val b = Vector(1.0, 1.0)
-    val nanEps =
-      UnbalancedSinkhorn.solve(c, a, b, SinkhornConfig(epsilon = Double.NaN, maxIterations = 200))
-    assert(nanEps.isLeft, s"NaN epsilon must not enter the iteration: $nanEps")
-    val nanRho =
-      UnbalancedSinkhorn.solve(c, a, b, SinkhornConfig(rhoRows = Double.NaN, maxIterations = 200))
-    assert(nanRho.isLeft, s"NaN rhoRows must not enter the iteration: $nanRho")
-    val nanCol =
-      UnbalancedSinkhorn.solve(c, a, b, SinkhornConfig(rhoCols = Double.NaN, maxIterations = 200))
-    assert(nanCol.isLeft, s"NaN rhoCols must not enter the iteration: $nanCol")
-    val good = UnbalancedSinkhorn.solve(c, a, b, SinkhornConfig(0.1, 1.0, 1.0, 200))
-    assert(good.exists(_.plan.flatten.exists(_ > 0.0)), s"control plan must carry mass: $good")
+  test("invalid scale parameters are InvalidConfig and name the field") {
+    val unnamed = SinkhornSuite.scaleCases.flatMap { case (label, cfg) =>
+      UnbalancedSinkhorn.solve(
+        SinkhornSuite.probeCost,
+        SinkhornSuite.probeA,
+        SinkhornSuite.probeB,
+        cfg
+      ) match
+        case Left(err) if err.message.contains(label) => None
+        case other                                    => Some(s"$label -> $other")
+    }
+    assertEquals(unnamed, Vector.empty)
+    val zeroRho = UnbalancedSinkhorn.solve(
+      SinkhornSuite.probeCost,
+      SinkhornSuite.probeA,
+      SinkhornSuite.probeB,
+      SinkhornConfig(rhoRows = 0.0)
+    )
+    assert(zeroRho.exists(_.plan.flatten.exists(_ > 0.0)), s"zero rho is lawful: $zeroRho")
+  }
+
+  test("invalid stopping parameters are InvalidConfig and name the field") {
+    val unnamed = SinkhornSuite.stopCases.flatMap { case (label, cfg) =>
+      UnbalancedSinkhorn.solve(
+        SinkhornSuite.probeCost,
+        SinkhornSuite.probeA,
+        SinkhornSuite.probeB,
+        cfg
+      ) match
+        case Left(err) if err.message.contains(label) => None
+        case other                                    => Some(s"$label -> $other")
+    }
+    assertEquals(unnamed, Vector.empty)
   }
 
   test("with a large penalty the transport is nearly balanced") {
@@ -125,3 +143,39 @@ class SinkhornSuite extends ScalaCheckSuite:
     assert(half.isRight && one.isRight)
     assertNotEquals(half.toOption.get.rows(0).mass, one.toOption.get.rows(0).mass)
   }
+
+object SinkhornSuite:
+  private val probeCost: Vector[Vector[Double]] =
+    Vector(Vector(0.1, 0.9), Vector(0.8, 0.2))
+  private val probeA: Vector[Double] = Vector(1.0, 1.0)
+  private val probeB: Vector[Double] = Vector(1.0, 1.0)
+
+  /** Scout-measured scale siblings plus the polarity cases. Restoring `<= 0 || < 0` leaves NaN/+Inf
+    * unlabelled Rights in this table.
+    */
+  private val scaleCases: Vector[(String, SinkhornConfig)] =
+    Vector(
+      "epsilon" -> SinkhornConfig(epsilon = Double.NaN),
+      "epsilon" -> SinkhornConfig(epsilon = Double.PositiveInfinity),
+      "epsilon" -> SinkhornConfig(epsilon = Double.NegativeInfinity),
+      "epsilon" -> SinkhornConfig(epsilon = 0.0),
+      "epsilon" -> SinkhornConfig(epsilon = -1.0),
+      "rhoRows" -> SinkhornConfig(rhoRows = Double.NaN),
+      "rhoRows" -> SinkhornConfig(rhoRows = Double.PositiveInfinity),
+      "rhoRows" -> SinkhornConfig(rhoRows = -1.0),
+      "rhoCols" -> SinkhornConfig(rhoCols = Double.NaN),
+      "rhoCols" -> SinkhornConfig(rhoCols = Double.PositiveInfinity),
+      "rhoCols" -> SinkhornConfig(rhoCols = -1.0)
+    )
+
+  /** Scout-measured stopping siblings. The old epsilon/rho guard never mentions these fields.
+    */
+  private val stopCases: Vector[(String, SinkhornConfig)] =
+    Vector(
+      "tolerance" -> SinkhornConfig(tolerance = Double.NaN),
+      "tolerance" -> SinkhornConfig(tolerance = 0.0),
+      "tolerance" -> SinkhornConfig(tolerance = -1.0),
+      "tolerance" -> SinkhornConfig(tolerance = Double.PositiveInfinity),
+      "maxIterations" -> SinkhornConfig(maxIterations = 0),
+      "maxIterations" -> SinkhornConfig(maxIterations = -1)
+    )
