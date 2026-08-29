@@ -260,18 +260,23 @@ was set by the owner on 2026-08-28 (sticky decision
    ambiguous across them); cross-repo work is coordinated on the
    `narrative-atlas-intaglio` topic with provider/consumer SHAs recorded as
    notes, never as dependency edges between stores.
-4. **Evidence discipline.** *Thirteen sub-rules; find yours here.* **What counts
-   as proof of a fix:** mutation proof · capacity to fail · distinguishability · a negative
-   compile-time assertion needs a positive control ·
-   a fixture must tell the hypotheses apart · an inequality is not a
-   discriminating assertion. **How to run the gate:** never pipe a gate · a
-   compile-time probe needs a clean recompile. **How to scope a finding:** sweep
-   the shape not the spelling · sweep your own work first · trace the
-   consequence. **What a number may claim:** the estimand check · no value and
-   low support are different failures · dropping a term from a normalized
-   aggregate rescales the rest. *(Five of the thirteen are about whether a test
-   can actually fail, and all five were added after a mutation survived — mostly
-   one lesson, learned five times.)*
+4. **Evidence discipline.** *Eighteen sub-rules; find yours here.* **What counts
+   as proof of a fix (8):** mutation proof · capacity to fail · distinguishability ·
+   a negative compile-time assertion needs a positive control · or kill it with a
+   mutation, which is stronger · a fixture must tell the hypotheses apart · prefer
+   a fixture derived from the pipeline over one synthesised at the consumer · an
+   inequality is not a discriminating assertion. **How to run the gate (3):** never
+   pipe a gate · a trailing success line is not an exit status · a compile-time
+   probe needs a clean recompile. **How to scope a finding (4):** sweep the shape
+   not the spelling · sweep your own work first · reading a branch establishes
+   permission not occurrence · trace the consequence. **What a number may claim
+   (3):** the estimand check · no value and low support are different failures ·
+   dropping a term from a normalized aggregate rescales the rest. *(Eight of the
+   eighteen are about whether a test can actually fail, and every one was added
+   after a test or a probe passed when it should not have — mostly one lesson,
+   learned eight times. This index is load-bearing: it was stale by five entries
+   and wrong by one in its own count before 2026-08-29, because sub-rules get
+   appended where they fit and nobody re-counts. If you add one, re-count.)*
 
    A passing test suite is not evidence; it is the
    absence of one kind of counter-evidence. Three checks, each earned by a
