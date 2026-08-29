@@ -57,6 +57,51 @@ identity and the resolver or ledger receipt**, never reconstruct either from seg
 Reconstructing a task-conditioned quantity from a structural one is precisely how the resolved
 hierarchy would get recycled as gold for the perceptual track.
 
+## A third site, measured 2026-08-29: level decides what can be MEASURED
+
+The context above lists `features` and `story`. `align` belongs on that list, and it arrived by a
+route this ADR did not anticipate — not through an identity question, but through the cost model.
+
+`align/bridge/StorySourceView.scala:112-113`:
+
+    case NarrativeNodeId.Situation(_) => evidence.propositionEvidenceOf(n)
+    case NarrativeNodeId.Segment(_)   => None // segments never get a fabricated chart
+
+The comment says this is deliberate and it is right to be. But its consequence is that **chart
+evidence is available at one hierarchy level and structurally unavailable at another**, so the
+`Chart` cost term is *eligible* for situation cells and *never eligible* for segment cells. Both
+are alignment states in the same row of the same matrix.
+
+This surfaced in the blend-support work (`bd-01M177SHFXZKMR8K39BPC9K6FF`). A proposed fix scales
+each cell's cost to that cell's own eligible weight. On the current corpus it is exactly right and
+was measured to be so — WOG carries no charts, so every cell's eligible weight is identical and the
+question is invisible. On a corpus **with** charts, situation cells would sit on a 3.85 weight
+basis and segment cells on 3.35, and a cell measured on more dimensions has more available
+mismatch. Segments would look systematically cheaper than situations for a structural reason rather
+than a narrative one.
+
+**This generalises the ADR rather than merely adding an example.** The `BoundaryBeliefInput.weights`
+case says a *map key* is a comparability claim. This case says the same of an *aggregation*:
+comparing or pooling quantities across levels asserts that those levels are commensurable, and here
+they provably are not, because the levels differ in what it is even possible to measure. Level is
+therefore not only an identity question about which grain produced a number — **it constrains which
+numbers exist at all**, and any operation that pools across levels inherits that constraint whether
+or not it names it.
+
+Two consequences for the decision above:
+
+1. Hierarchy depth is not inert structural bookkeeping. It has measurement consequences in `align`,
+   so the rule that `SegmentNode.level` must not drift into the public grain vocabulary matters in
+   a module that neither `features` nor `story` imports.
+2. Any cross-level aggregate — a cost compared across states of different depth, a mean over mixed
+   levels, a `Map[Int, …]` pooling both — must **state the basis it puts them on**. "Scale each to
+   its own eligible support" is a defensible rule for one cell and is not automatically a
+   defensible rule for a comparison between two.
+
+*The eligibility question itself is open and belongs to that bead, not to this ADR. Recorded here
+because the site is a third instance of this ADR's subject and was found by someone who was not
+looking for it.*
+
 ## Migration is atomic, and this is not the usual advice
 
 `BoundaryEvidence`, `BoundaryScore`, `BoundaryBeliefInput` keying, the story-side belief
