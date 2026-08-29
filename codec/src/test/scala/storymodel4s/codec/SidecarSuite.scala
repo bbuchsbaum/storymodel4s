@@ -123,10 +123,12 @@ class SidecarSuite extends ScalaCheckSuite:
     assert(bytes.sameElements(reencoded))
   }
 
-  test("Float32 quantization preserves raw Float bits and has a byte fixed point") {
+  test("Float32 quantization preserves raw Float bits, including silent signed underflow") {
     val samples = Vector(
       0.0,
       -0.0,
+      Double.MinPositiveValue,
+      -Double.MinPositiveValue,
       Float.MinPositiveValue.toDouble,
       -Float.MinPositiveValue.toDouble,
       java.lang.Float.intBitsToFloat(0x007fffff).toDouble,
@@ -145,6 +147,8 @@ class SidecarSuite extends ScalaCheckSuite:
       samples.map(v => java.lang.Float.floatToRawIntBits(v.toFloat))
     )
     assertEquals(decoded, samples.map(_.toFloat.toDouble))
+    assertEquals(java.lang.Float.floatToRawIntBits(decoded(2).toFloat), 0)
+    assertEquals(java.lang.Float.floatToRawIntBits(decoded(3).toFloat), Int.MinValue)
     val reencoded = SidecarCodec
       .encodeRows(vectorSpace.id, samples.size, Dtype.Float32, Vector(decoded))
       .toOption
@@ -366,7 +370,10 @@ class SidecarSuite extends ScalaCheckSuite:
       def recast(layout: SidecarLayout): SidecarLayout = layout.copy(rowStride = 0L)
     """)
     assert(materializeErrors.nonEmpty)
-    assert(witnessErrors.nonEmpty)
+    assert(
+      witnessErrors.exists(_.message.toLowerCase.contains("sealed")),
+      witnessErrors.map(_.message).mkString("; ")
+    )
     assert(layoutErrors.nonEmpty)
   }
 
