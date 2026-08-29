@@ -248,6 +248,16 @@ was set by the owner on 2026-08-28 (sticky decision
    for is a defect you have declined to sweep; the chief did exactly that here,
    and 45 forgeable types stayed open until someone walked into one by hand.
 
+   *Never pipe a gate.* In a shell pipeline the exit status is the **last**
+   command's, so `sbt -batch "..." | tail` reports `tail`'s status — which
+   succeeds even when the build fails — and a line-limited pipe silently
+   discards most of the evidence. Redirect the whole run to a file, report the
+   unpiped command's own exit status, and `grep` the file for the summary. An
+   `exit 0` in an evidence post means nothing unless the command producing it
+   was unpiped. (Caught here by comparing against a previous run: three
+   `Passed:` lines became one, for candidates differing by a trimmed test file.
+   Keep the prior gate's numbers visible for exactly this reason.)
+
    *A compile-time probe needs a clean recompile.* A mutation that changes a
    **type's shape** — `case` to non-`case`, a constructor's visibility, or
    anything a compile-time assertion inspects — must be proved after a **clean**
