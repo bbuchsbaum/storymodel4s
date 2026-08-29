@@ -12,17 +12,36 @@ import storymodel4s.story.ModelStatus
   * Its `status` can only be `Hypothesized` or `StructurallyDerived`: an inferred episode is never
   * an observed source, so it can never carry `SurfaceExplicit` truth about the world.
   */
-final case class EpisodeModel private (
-    id: EpisodeId,
-    scope: EpisodeScope,
-    situations: Vector[SituationId],
-    entities: Set[EntityId],
-    locations: Set[PlaceName],
-    temporalAnchors: Vector[TimeExpression],
-    relations: Vector[NarrativeRelationRef],
-    status: EpistemicStatus,
-    support: Option[SpanSet]
-)
+final class EpisodeModel private (
+    val id: EpisodeId,
+    val scope: EpisodeScope,
+    val situations: Vector[SituationId],
+    val entities: Set[EntityId],
+    val locations: Set[PlaceName],
+    val temporalAnchors: Vector[TimeExpression],
+    val relations: Vector[NarrativeRelationRef],
+    val status: EpistemicStatus,
+    val support: Option[SpanSet]
+):
+  override def equals(other: Any): Boolean = other match
+    case that: EpisodeModel =>
+      id == that.id &&
+      scope == that.scope &&
+      situations == that.situations &&
+      entities == that.entities &&
+      locations == that.locations &&
+      temporalAnchors == that.temporalAnchors &&
+      relations == that.relations &&
+      status == that.status &&
+      support == that.support
+    case _ => false
+
+  override def hashCode(): Int =
+    (id, scope, situations, entities, locations, temporalAnchors, relations, status, support).##
+
+  override def toString: String =
+    s"EpisodeModel(id=${id.value}, scope=$scope, status=$status, " +
+      s"situations=${situations.size}, entities=${entities.size})"
 
 object EpisodeModel:
   val AllowedStatuses: Set[EpistemicStatus] =

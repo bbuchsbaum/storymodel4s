@@ -13,12 +13,21 @@ import storymodel4s.core.*
   * summary, partial, bridging, and thematic references are `NarrativeReference` edges, never
   * cluster membership (design record §44.1).
   */
-final case class ExactCorefCluster[K <: NarrativeKind] private (
-    mentions: NonEmptySet[MentionId[K]],
-    canonical: CanonicalId[K]
+final class ExactCorefCluster[K <: NarrativeKind] private (
+    val mentions: NonEmptySet[MentionId[K]],
+    val canonical: CanonicalId[K]
 ):
   def contains(m: MentionId[K]): Boolean = mentions.contains(m)
   def size: Int = mentions.length
+
+  override def equals(other: Any): Boolean = other match
+    case that: ExactCorefCluster[?] => mentions == that.mentions && canonical == that.canonical
+    case _                          => false
+
+  override def hashCode(): Int = (mentions, canonical).##
+
+  override def toString: String =
+    s"ExactCorefCluster(canonical=${canonical.value}, mentions=$size)"
 
 object ExactCorefCluster:
   /** The content address every cluster (and every singleton) is named by. */
@@ -36,7 +45,8 @@ object ExactCorefCluster:
   )(using KindWitness[K]): Either[DocumentError, ExactCorefCluster[K]] =
     mentions.toSortedSet.find(m => !table.contains(m)) match
       case Some(m) => Left(DocumentError.UnknownMention(m.value, "ExactCorefCluster"))
-      case None    => Right(ExactCorefCluster(mentions, canonicalFor(story, mentions.toSortedSet)))
+      case None    =>
+        Right(new ExactCorefCluster(mentions, canonicalFor(story, mentions.toSortedSet)))
 
   /** Accept a caller-supplied canonical only when it equals the content address. */
   def checked[K <: NarrativeKind](
@@ -58,9 +68,9 @@ object ExactCorefCluster:
   * singletons are implicit: a mention in no cluster is its own class, named by the content address
   * of the singleton member set.
   */
-final case class CorefPartition[K <: NarrativeKind] private (
-    story: StoryId,
-    clusters: Vector[ExactCorefCluster[K]]
+final class CorefPartition[K <: NarrativeKind] private (
+    val story: StoryId,
+    val clusters: Vector[ExactCorefCluster[K]]
 )(using w: KindWitness[K]):
   lazy val canonicalOf: Map[MentionId[K], CanonicalId[K]] =
     clusters.flatMap(c => c.mentions.toSortedSet.toVector.map(_ -> c.canonical)).toMap
@@ -81,9 +91,18 @@ final case class CorefPartition[K <: NarrativeKind] private (
 
   def size: Int = clusters.size
 
+  override def equals(other: Any): Boolean = other match
+    case that: CorefPartition[?] => story == that.story && clusters == that.clusters
+    case _                       => false
+
+  override def hashCode(): Int = (story, clusters).##
+
+  override def toString: String =
+    s"CorefPartition(story=${story.value}, clusters=$size)"
+
 object CorefPartition:
   def empty[K <: NarrativeKind](story: StoryId)(using KindWitness[K]): CorefPartition[K] =
-    CorefPartition(story, Vector.empty)
+    new CorefPartition(story, Vector.empty)
 
   /** Build from clusters, rejecting overlaps and duplicate canonical names. */
   def of[K <: NarrativeKind](
@@ -97,7 +116,7 @@ object CorefPartition:
     (dup, dupCanonical) match
       case (Some(m), _) => Left(DocumentError.DuplicateMention(m.value, "CorefPartition"))
       case (_, Some(c)) => Left(DocumentError.DuplicateCanonical(c.value, "CorefPartition"))
-      case _            => Right(CorefPartition(story, clusters.sortBy(_.canonical)))
+      case _            => Right(new CorefPartition(story, clusters.sortBy(_.canonical)))
 
   /** Deterministic union–find closure of identity pairs: the result does not depend on pair order,
     * every mention must be in `table`, and each class is content-addressed from its sorted members.

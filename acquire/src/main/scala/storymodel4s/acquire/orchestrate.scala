@@ -62,14 +62,29 @@ object StageDag:
     walk(start, Vector.empty)
 
 /** Resource policy as data: bounded concurrency, default timeouts, retries, per-stage budgets. */
-final case class BudgetPolicy private (
-    maxConcurrency: Int,
-    defaultTimeoutMillis: Long,
-    maxRetries: Int,
-    perStage: Map[StageId, TaskBudget]
+final class BudgetPolicy private (
+    val maxConcurrency: Int,
+    val defaultTimeoutMillis: Long,
+    val maxRetries: Int,
+    val perStage: Map[StageId, TaskBudget]
 ):
   def budgetFor(stage: StageId): TaskBudget =
     perStage.getOrElse(stage, TaskBudget.unsafe(None, defaultTimeoutMillis, maxRetries))
+
+  override def equals(other: Any): Boolean = other match
+    case that: BudgetPolicy =>
+      maxConcurrency == that.maxConcurrency &&
+      defaultTimeoutMillis == that.defaultTimeoutMillis &&
+      maxRetries == that.maxRetries &&
+      perStage == that.perStage
+    case _ => false
+
+  override def hashCode(): Int =
+    (maxConcurrency, defaultTimeoutMillis, maxRetries, perStage).##
+
+  override def toString: String =
+    s"BudgetPolicy(concurrency=$maxConcurrency, timeoutMillis=$defaultTimeoutMillis, " +
+      s"retries=$maxRetries, stages=${perStage.size})"
 
 object BudgetPolicy:
   def of(
