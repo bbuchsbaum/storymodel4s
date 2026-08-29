@@ -395,24 +395,29 @@ was set by the owner on 2026-08-28 (sticky decision
    ambiguous across them); cross-repo work is coordinated on the
    `narrative-atlas-intaglio` topic with provider/consumer SHAs recorded as
    notes, never as dependency edges between stores.
-4. **Evidence discipline.** *Twenty-two sub-rules; find yours here.* **What
-   counts as proof of a fix (9):** mutation proof · capacity to fail ·
+4. **Evidence discipline.** *Twenty-five sub-rules; find yours here.* **What
+   counts as proof of a fix (10):** mutation proof · capacity to fail ·
    distinguishability · a negative compile-time assertion needs a positive control ·
    or kill it with a mutation, which is stronger · a fixture must tell the
    hypotheses apart · prefer a fixture derived from the pipeline over one
    synthesised at the consumer · check a fixture's inputs are in the form the
-   pipeline produces · an inequality is not a discriminating assertion. **How to run
-   the gate (6):** never pipe a gate · a trailing success line is not an exit
+   pipeline produces · an inequality is not a discriminating assertion · a pinned
+   literal can be updated but a behavioural assertion has to be argued with. **How
+   to run the gate (8):** never pipe a gate · a trailing success line is not an exit
    status · a compile error anywhere makes the gate inconclusive · run the format
    check last · verify the export before you gate it · a compile-time probe needs a
-   clean recompile. **How to scope a finding (4):** sweep the shape not the
-   spelling · sweep your own work first · reading a branch establishes permission
+   clean recompile · a gate with no test totals did not run · a shell equality test
+   over two failed command substitutions passes. **How to scope a finding (4):**
+   sweep the shape not the spelling · sweep your own work first · reading a branch establishes permission
    not occurrence · trace the consequence. **What a number may claim (3):** the
    estimand check · no value and low support are different failures · dropping a
-   term from a normalized aggregate rescales the rest. *(Nine of the twenty-two are
-   about whether a test can actually fail, and SIX are about whether the gate
-   measured anything at all — that second group has doubled in a day, every entry
-   added after a run reported a status with nothing behind it. This index is
+   term from a normalized aggregate rescales the rest. *(Ten of the twenty-five are
+   about whether a test can actually fail, and EIGHT are about whether the gate
+   measured anything at all — that second group went from three to eight in a
+   single day, every entry added after a run reported a status with nothing behind
+   it. On 2026-08-29 alone, THREE separate red gates measured infrastructure rather
+   than a candidate: a truncated archive, a linked worktree, and a directory name
+   used as an sbt project id. This index is
    load-bearing and it ROTS: it was stale by five before 2026-08-29, was corrected
    that day, and was stale by four again within two hours because the same person
    who wrote "if you add one, re-count" added four without re-counting. Re-count
@@ -672,6 +677,47 @@ was set by the owner on 2026-08-28 (sticky decision
    unseeable, and green the whole time. **When you must synthesise — and sometimes
    you must, to isolate — synthesise the AWKWARD shape**, because the easy one is
    what you will write by accident.
+
+   *A gate that produced no test totals did not fail — it did not RUN.* A
+   non-zero exit is not evidence about the code until you have found a test count
+   behind it. Measured twice on 2026-08-29, both on sound candidates: a truncated
+   `git archive | tar` under a full disk reported `GATE_EXIT=1` with 311 errors
+   from 3 of 27 directories, and a gate run inside a LINKED GIT WORKTREE reported
+   `GATE_EXIT=1` with zero totals because sbt-git's jgit call sees a worktree's
+   `.git` FILE as a bare repository and project loading fails before compilation
+   starts. Neither result said anything about the candidate; both looked exactly
+   like a failing test suite. **Gate in a clone, never in a linked worktree**, and
+   before you report a red gate, grep the log for `Passed: Total` — if there is
+   none, you have measured your own infrastructure.
+
+   *A shell equality test over two command substitutions PASSES when both of them
+   fail.* `[ "$(cmd_a)" = "$(cmd_b)" ]` compares two empty strings and succeeds, so
+   a verification step reports agreement precisely when it learned nothing. Measured
+   on 2026-08-29 in this repo's own gate scaffolding: a check that the merged tree
+   equalled the candidate tree printed a confident `YES` while every `rev-parse` in
+   it had failed with `cannot change to ...: No such file or directory`. This is the
+   fail-open guard of rule 7 wearing shell syntax, and it is worse than the ones we
+   hunt in Scala because nothing type-checks it. **Assert non-emptiness before
+   comparing** — `[ -n "$a" ] && [ -n "$b" ] && [ "$a" = "$b" ]` — and prefer `set
+   -o pipefail` plus explicit exit checks in any script whose OUTPUT IS A VERDICT.
+
+   *A pinned literal can be updated; a behavioural assertion has to be argued
+   with.* When a model change moves a number, a test pinned to that number tells
+   you only that it moved — and re-pinning is the normal, correct response, which
+   is exactly the problem: re-pinning an improvement and re-pinning a regression
+   are the same edit. A behavioural assertion states the CLAIM rather than the
+   value (`"'Stephen King' goes to the Association external state, not to a source
+   node"`), so it cannot be re-pinned — making it pass again means writing down
+   something false, which is a decision instead of an edit. Measured on the `d_ent`
+   candidate: four failures, TWO pinned literals (chronology `0.039516 → 0.104070`,
+   specificity `0.678220 → 0.659371`) and TWO behavioural. The implementing
+   engineer states plainly that with only the two literals it would have updated
+   them and shipped — and would have shipped a cost model in which an unmeasurable
+   term acts as a DISCOUNT, making participant-less units cheaper to anchor
+   everywhere. The two behavioural assertions are the whole reason it did not land.
+   **Credit the fixture, not the engineer**: the stop was caused by a test written
+   in the right shape long before, by someone who was not there. So when you pin a
+   number, ask what claim the number stands in for, and assert THAT beside it.
 
    *Reading a branch establishes permission, not occurrence.* That the code
    CAN produce a bad value is a different claim from that it DOES, and the

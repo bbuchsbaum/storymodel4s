@@ -65,11 +65,51 @@ fi
 echo "types defined by this candidate:"
 echo "$types" | sed 's/^/  /'
 echo
-echo "modules that reference them (the gate must cover all of these):"
-{
-  for t in $types; do
-    for m in $(ls -d */ | sed 's#/##' | grep -vE '^(project|target|docs|tools)$'); do
-      if [ -d "$m/src" ] && grep -rqsw "$t" "$m/src"; then echo "$m"; fi
+mods="$(
+  {
+    for t in $types; do
+      for m in $(ls -d */ | sed 's#/##' | grep -vE '^(project|target|docs|tools)$'); do
+        if [ -d "$m/src" ] && grep -rqsw "$t" "$m/src"; then echo "$m"; fi
+      done
     done
-  done
-} | sort -u | sed 's/^/  /'
+  } | sort -u
+)"
+
+echo "modules that reference them (the gate must cover all of these):"
+echo "$mods" | sed 's/^/  /'
+
+# A DIRECTORY NAME IS NOT AN SBT PROJECT ID, and the whole point of this tool is to
+# tell you what to gate -- so emitting a name the gate rejects is emitting nothing.
+# Measured on 2026-08-29: a D2 gate run as `acquire/test` died with "Not a valid
+# command: acquire", GATE_EXIT=1 and zero test totals, which reads exactly like a
+# failing suite. That is the second way in one day to get a red gate that measured
+# nothing (the first was running inside a linked worktree, where sbt-git sees the
+# `.git` FILE as a bare repo and project loading fails outright).
+#
+# The mapping is kebab-case to camelCase plus a `JVM` suffix, WITH TWO EXCEPTIONS
+# that are not guessable and must not be "helpfully" regularised: `embed-bench` and
+# `embed-grakern` are single JVM-only projects with NO platform suffix, so
+# `embedBenchJVM` does not exist and would reproduce the exact failure above.
+#
+# The IDs are derived here rather than scraped from `sbt projects` deliberately.
+# This build stages three sibling builds (grakern, gale, graph4s), and `sbt projects`
+# prints THEIR projects too -- including colliding `coreJVM`, `lawsJVM` and `rootJVM`.
+# Scraping that output without first cutting to this build's own block silently
+# resolves a module to a sibling repo's project.
+sbt_id() {
+  case "$1" in
+    embed-bench)   echo "embedBench" ;;
+    embed-grakern) echo "embedGrakern" ;;
+    *) echo "$1" | awk -F- '{p=$1; for(i=2;i<=NF;i++) p=p toupper(substr($i,1,1)) substr($i,2); print p "JVM"}' ;;
+  esac
+}
+
+cmd=""
+for m in $mods; do cmd="$cmd $(sbt_id "$m")/test;"; done
+echo
+echo "gate command (JVM; paste it, do not retype the module names):"
+echo "  sbt -batch \"$(echo "$cmd" | sed 's/^ //; s/;$//')\""
+echo
+echo "  Run it in a CLONE, never a linked worktree. Capture the exit status. Run"
+echo "  scalafmtCheckAll LAST, separately. Then grep the log for 'Passed: Total' --"
+echo "  a red gate with no totals measured your infrastructure, not the candidate."
