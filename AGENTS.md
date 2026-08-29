@@ -209,6 +209,20 @@ was set by the owner on 2026-08-28 (sticky decision
    dissent stays on the record. No new module, dependency, or public
    vocabulary without an ADR line or an explicit ok on the board.
 3. **Merge gate.** Nothing lands on `main` — including worktree merges by any
+   **Verify the branch before you merge.** `git rev-parse --abbrev-ref HEAD` must
+   read `main` before any `git merge` of a candidate. Nothing warns you otherwise:
+   `git merge` succeeds identically on the wrong branch, and the only symptom is
+   that `main` does not move. Measured 2026-08-29: a candidate merge landed on
+   another agent's slice branch, which someone had checked out in the shared
+   checkout, minutes before they gated it — the gate would have PASSED and carried
+   106 unattributed lines into their candidate. Caught only because the landing
+   routine prints `main`'s SHA afterwards and it had not changed. **Print the thing
+   you are trying to change, not the command's report of itself.** Repairing such a
+   mistake: check the working tree FIRST (another agent's uncommitted reserved work
+   may be in it), switch **unforced** so git refuses rather than clobbers, and move
+   the branch pointer back with `git branch -f <branch> <their tip>` — never
+   `reset --hard`. Corollary: branch switches in the shared checkout change HEAD for
+   everyone, so use a worktree.
    session — without a posted candidate SHA, scoped-gate evidence (see *Build
    and test*: `scalafmtCheckAll`, `compileAll`, and the touched modules' tests
    on every platform they cross-build to), and the chief's ack in the thread.
