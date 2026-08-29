@@ -412,8 +412,9 @@ was set by the owner on 2026-08-28 (sticky decision
    ambiguous across them); cross-repo work is coordinated on the
    `narrative-atlas-intaglio` topic with provider/consumer SHAs recorded as
    notes, never as dependency edges between stores.
-4. **Evidence discipline.** *Twenty-eight sub-rules; find yours here.* **What
-   counts as proof of a fix (11):** mutation proof · capacity to fail ·
+4. **Evidence discipline.** *Twenty-nine sub-rules; find yours here.* **What
+   counts as proof of a fix (12):** a control must fail for the property under
+   test · mutation proof · capacity to fail ·
    distinguishability · a negative compile-time assertion needs a positive control ·
    or kill it with a mutation, which is stronger · a fixture must tell the
    hypotheses apart · prefer a fixture derived from the pipeline over one
@@ -431,7 +432,7 @@ was set by the owner on 2026-08-28 (sticky decision
    sweep the shape not the spelling · sweep your own work first · reading a branch establishes permission
    not occurrence · trace the consequence. **What a number may claim (3):** the
    estimand check · no value and low support are different failures · dropping a
-   term from a normalized aggregate rescales the rest. *(Eleven of the twenty-eight are
+   term from a normalized aggregate rescales the rest. *(Twelve of the twenty-nine are
    about whether a test can actually fail, and TEN are about whether the gate
    measured anything at all — that second group went from three to eight in a
    single day, every entry added after a run reported a status with nothing behind
@@ -674,6 +675,20 @@ was set by the owner on 2026-08-28 (sticky decision
    "`PopulationAggregate` has zero `copy` methods" proved nothing until
    `SubjectAlignment` in the same compile showed five. An absence proves nothing
    without a present case beside it.)
+
+   *A control must fail when THE PROPERTY UNDER TEST is broken — not merely when
+   something is broken.* "Able to fail" is necessary and not sufficient. A control
+   that dies when you break something ADJACENT looks exactly like a control that
+   works, and keeps looking that way until someone mutates the specific property
+   by name. Measured 2026-08-29: a chart-eligibility candidate shipped a positive
+   control that a reviewer killed with `val structuralEligible = false` — and THE
+   TEST STAYED GREEN, because term production happens BEFORE eligibility, so the
+   term was still present and the totals still differed. The test proved provider
+   EXECUTION, not ELIGIBILITY. It was not vacuous; it discriminated something real,
+   just not the thing it was named for, which is far harder to see than a test that
+   always passes. **Reading the test cannot find this** — the assertions look
+   correct and they are, about something else. Mutate the property BY NAME, and if
+   the control survives, it is a control for a different property.
 
    *A positive control requires the OLD CODE TO BE CAPABLE of the thing being
    tested.* Where the fix INTRODUCES the capability, no positive control exists —
