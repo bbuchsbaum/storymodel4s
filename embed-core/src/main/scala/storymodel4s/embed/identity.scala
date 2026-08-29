@@ -182,17 +182,21 @@ enum UncoveredPolicy:
 
 /** Identity of a late-pooled contextual view (ADR 0001 §D4/§D4d). Every field that changes which
   * tokens are pooled is part of identity.
+  *
+  * Why a non-case class: `validated` was a self-returning inspector on a public case class, so
+  * `fromProduct` could mint a window or stride the inspector would refuse. Construction is
+  * `of(...)` only.
   */
-final case class LatePoolingRecipe(
-    documentDigest: Checksum,
-    tokenizerFingerprint: Fingerprint,
-    contextLimit: Int,
-    window: Int,
-    stride: Int,
-    overlapMerge: String,
-    pooling: PoolingRule,
-    uncovered: UncoveredPolicy,
-    matryoshkaDimension: Option[Int]
+final class LatePoolingRecipe private (
+    val documentDigest: Checksum,
+    val tokenizerFingerprint: Fingerprint,
+    val contextLimit: Int,
+    val window: Int,
+    val stride: Int,
+    val overlapMerge: String,
+    val pooling: PoolingRule,
+    val uncovered: UncoveredPolicy,
+    val matryoshkaDimension: Option[Int]
 ):
   def parts: Vector[String] =
     Vector(
@@ -207,6 +211,30 @@ final case class LatePoolingRecipe(
       matryoshkaDimension.fold("full")(_.toString)
     )
 
+  /** Rebuild through [[LatePoolingRecipe.of]] so a field change cannot skip the checks. */
+  def replace(
+      documentDigest: Checksum = documentDigest,
+      tokenizerFingerprint: Fingerprint = tokenizerFingerprint,
+      contextLimit: Int = contextLimit,
+      window: Int = window,
+      stride: Int = stride,
+      overlapMerge: String = overlapMerge,
+      pooling: PoolingRule = pooling,
+      uncovered: UncoveredPolicy = uncovered,
+      matryoshkaDimension: Option[Int] = matryoshkaDimension
+  ): Either[EmbedError, LatePoolingRecipe] =
+    LatePoolingRecipe.of(
+      documentDigest,
+      tokenizerFingerprint,
+      contextLimit,
+      window,
+      stride,
+      overlapMerge,
+      pooling,
+      uncovered,
+      matryoshkaDimension
+    )
+
   private[embed] def compatibilityKey: LatePoolingCompatibilityKey =
     LatePoolingCompatibilityKey(
       tokenizerFingerprint,
@@ -218,6 +246,35 @@ final case class LatePoolingRecipe(
       uncovered,
       matryoshkaDimension
     )
+
+  override def equals(other: Any): Boolean = other match
+    case that: LatePoolingRecipe =>
+      documentDigest == that.documentDigest &&
+      tokenizerFingerprint == that.tokenizerFingerprint &&
+      contextLimit == that.contextLimit &&
+      window == that.window &&
+      stride == that.stride &&
+      overlapMerge == that.overlapMerge &&
+      pooling == that.pooling &&
+      uncovered == that.uncovered &&
+      matryoshkaDimension == that.matryoshkaDimension
+    case _ => false
+
+  override def hashCode(): Int =
+    (
+      documentDigest,
+      tokenizerFingerprint,
+      contextLimit,
+      window,
+      stride,
+      overlapMerge,
+      pooling,
+      uncovered,
+      matryoshkaDimension
+    ).hashCode()
+
+  override def toString: String =
+    s"LatePoolingRecipe(window=$window, stride=$stride, limit=$contextLimit)"
 
 /** The late-pooling fields that must agree before two vector spaces can be compared. */
 private[embed] final case class LatePoolingCompatibilityKey(
@@ -244,15 +301,48 @@ private[embed] final case class LatePoolingCompatibilityKey(
     else None
 
 object LatePoolingRecipe:
+  def of(
+      documentDigest: Checksum,
+      tokenizerFingerprint: Fingerprint,
+      contextLimit: Int,
+      window: Int,
+      stride: Int,
+      overlapMerge: String,
+      pooling: PoolingRule,
+      uncovered: UncoveredPolicy,
+      matryoshkaDimension: Option[Int]
+  ): Either[EmbedError, LatePoolingRecipe] =
+    check(contextLimit, window, stride, matryoshkaDimension).map(_ =>
+      new LatePoolingRecipe(
+        documentDigest,
+        tokenizerFingerprint,
+        contextLimit,
+        window,
+        stride,
+        overlapMerge,
+        pooling,
+        uncovered,
+        matryoshkaDimension
+      )
+    )
+
   def validated(r: LatePoolingRecipe): Either[EmbedError, LatePoolingRecipe] =
-    if r.contextLimit <= 0 then Left(EmbedError.InvalidRecipe("contextLimit must be positive"))
-    else if r.window <= 0 || r.window > r.contextLimit then
+    check(r.contextLimit, r.window, r.stride, r.matryoshkaDimension).map(_ => r)
+
+  private def check(
+      contextLimit: Int,
+      window: Int,
+      stride: Int,
+      matryoshkaDimension: Option[Int]
+  ): Either[EmbedError, Unit] =
+    if contextLimit <= 0 then Left(EmbedError.InvalidRecipe("contextLimit must be positive"))
+    else if window <= 0 || window > contextLimit then
       Left(EmbedError.InvalidRecipe("window must be in (0, contextLimit]"))
-    else if r.stride <= 0 || r.stride > r.window then
+    else if stride <= 0 || stride > window then
       Left(EmbedError.InvalidRecipe("stride must be in (0, window]"))
-    else if r.matryoshkaDimension.exists(_ <= 0) then
+    else if matryoshkaDimension.exists(_ <= 0) then
       Left(EmbedError.InvalidRecipe("matryoshka dimension must be positive"))
-    else Right(r)
+    else Right(())
 
 /** Content-addressed identity of one embedding recipe. */
 object GeometryId extends OpaqueId("GeometryId")
@@ -282,19 +372,36 @@ final class EmbeddingSpace private[embed] (
         EmbedError.InvalidRecipe(s"truncation ${dim.value} must be smaller than ${dimension.value}")
       )
     else
-      Right(
-        EmbeddingSpace.build(
-          provider,
-          role,
-          view,
-          instruction,
-          dim,
-          Normalization.L2,
-          truncation,
-          latePooling.map(_.copy(matryoshkaDimension = Some(dim.value))),
-          Some(id)
-        )
-      )
+      latePooling match
+        case None =>
+          Right(
+            EmbeddingSpace.build(
+              provider,
+              role,
+              view,
+              instruction,
+              dim,
+              Normalization.L2,
+              truncation,
+              None,
+              Some(id)
+            )
+          )
+        case Some(r) =>
+          r.replace(matryoshkaDimension = Some(dim.value))
+            .map(v =>
+              EmbeddingSpace.build(
+                provider,
+                role,
+                view,
+                instruction,
+                dim,
+                Normalization.L2,
+                truncation,
+                Some(v),
+                Some(id)
+              )
+            )
 
   /** The `features` space this recipe populates. Vectors live in sidecars; the graph never holds
     * them.

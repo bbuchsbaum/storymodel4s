@@ -215,18 +215,19 @@ class IdentitySuite extends ScalaCheckSuite:
       Gens.dimension,
       Gens.latePooling.suchThat(r => r.window < r.contextLimit && r.stride < r.window)
     ) { (provider, dimension, generatedRecipe) =>
-      val recipe = generatedRecipe.copy(documentDigest = Checksum.ofText("query-document"))
+      val recipe =
+        generatedRecipe.replace(documentDigest = Checksum.ofText("query-document")).toOption.get
       val query = pooledSpace(
         provider,
         Role.Query,
         dimension,
-        recipe.copy(documentDigest = Checksum.ofText("query"))
+        recipe.replace(documentDigest = Checksum.ofText("query")).toOption.get
       )
       val document = pooledSpace(
         provider,
         Role.Document,
         dimension,
-        recipe.copy(documentDigest = Checksum.ofText("document"))
+        recipe.replace(documentDigest = Checksum.ofText("document")).toOption.get
       )
       val otherNormalization =
         if document.normalization == Normalization.L2 then Normalization.Unnormalized
@@ -242,22 +243,38 @@ class IdentitySuite extends ScalaCheckSuite:
         case UncoveredPolicy.PartialCoverage => UncoveredPolicy.Missing
         case UncoveredPolicy.Missing         => UncoveredPolicy.PartialCoverage
       val recipeMutations = Vector(
-        "different late-pooling tokenizer fingerprints" -> recipe.copy(
-          tokenizerFingerprint = Fingerprint.unsafe("other-tokenizer")
-        ),
-        "different late-pooling context limits" -> recipe.copy(
-          contextLimit = recipe.contextLimit + 1
-        ),
-        "different late-pooling windows" -> recipe.copy(window = recipe.window + 1),
-        "different late-pooling strides" -> recipe.copy(stride = recipe.stride + 1),
-        "different late-pooling overlap merges" -> recipe.copy(
-          overlapMerge = recipe.overlapMerge + ":other"
-        ),
-        "different late-pooling pooling rules" -> recipe.copy(pooling = otherPooling),
-        "different late-pooling uncovered policies" -> recipe.copy(uncovered = otherUncovered),
-        "different late-pooling matryoshka dimensions" -> recipe.copy(
-          matryoshkaDimension = Some(dimension.value)
-        )
+        "different late-pooling tokenizer fingerprints" -> recipe
+          .replace(tokenizerFingerprint = Fingerprint.unsafe("other-tokenizer"))
+          .toOption
+          .get,
+        "different late-pooling context limits" -> recipe
+          .replace(contextLimit = recipe.contextLimit + 1)
+          .toOption
+          .get,
+        "different late-pooling windows" -> recipe
+          .replace(window = recipe.window + 1)
+          .toOption
+          .get,
+        "different late-pooling strides" -> recipe
+          .replace(stride = recipe.stride + 1)
+          .toOption
+          .get,
+        "different late-pooling overlap merges" -> recipe
+          .replace(overlapMerge = recipe.overlapMerge + ":other")
+          .toOption
+          .get,
+        "different late-pooling pooling rules" -> recipe
+          .replace(pooling = otherPooling)
+          .toOption
+          .get,
+        "different late-pooling uncovered policies" -> recipe
+          .replace(uncovered = otherUncovered)
+          .toOption
+          .get,
+        "different late-pooling matryoshka dimensions" -> recipe
+          .replace(matryoshkaDimension = Some(dimension.value))
+          .toOption
+          .get
       )
       val recipeVariants =
         recipeMutations.map { case (reason, r) =>
@@ -388,24 +405,27 @@ class IdentitySuite extends ScalaCheckSuite:
   test("GeometryPair rejects the original incompatible late-pooling repro under every rule") {
     val provider = ProviderFingerprint.of("model", "tokenizer", "implementation", "runtime")
     val dimension = Dimension.unsafe(8)
-    val queryRecipe = LatePoolingRecipe(
-      documentDigest = Checksum.ofText("query"),
-      tokenizerFingerprint = Fingerprint.unsafe("tok-a"),
-      contextLimit = 512,
-      window = 128,
-      stride = 64,
-      overlapMerge = "mean",
-      pooling = PoolingRule.Mean,
-      uncovered = UncoveredPolicy.PartialCoverage,
-      matryoshkaDimension = None
+    val queryRecipe = latePooling(
+      Checksum.ofText("query"),
+      Fingerprint.unsafe("tok-a"),
+      512,
+      128,
+      64,
+      "mean",
+      PoolingRule.Mean,
+      UncoveredPolicy.PartialCoverage,
+      None
     )
-    val documentRecipe = queryRecipe.copy(
-      documentDigest = Checksum.ofText("document"),
-      tokenizerFingerprint = Fingerprint.unsafe("tok-b"),
-      window = 64,
-      stride = 32,
-      pooling = PoolingRule.Max,
-      uncovered = UncoveredPolicy.Missing
+    val documentRecipe = latePooling(
+      Checksum.ofText("document"),
+      Fingerprint.unsafe("tok-b"),
+      512,
+      64,
+      32,
+      "mean",
+      PoolingRule.Max,
+      UncoveredPolicy.Missing,
+      None
     )
     val query = pooledSpace(provider, Role.Query, dimension, queryRecipe)
     val document = pooledSpace(provider, Role.Document, dimension, documentRecipe)
@@ -430,16 +450,16 @@ class IdentitySuite extends ScalaCheckSuite:
   test("late-pooled view requires a validated recipe; other views must not carry one") {
     val p = ProviderFingerprint.of("m", "t", "i", "r")
     val d = Dimension.unsafe(4)
-    val recipe = LatePoolingRecipe(
-      storymodel4s.core.Checksum.ofText("doc"),
-      storymodel4s.core.Fingerprint.unsafe("tok"),
-      contextLimit = 512,
-      window = 128,
-      stride = 64,
-      overlapMerge = "mean",
-      pooling = PoolingRule.Mean,
-      uncovered = UncoveredPolicy.PartialCoverage,
-      matryoshkaDimension = None
+    val recipe = latePooling(
+      Checksum.ofText("doc"),
+      Fingerprint.unsafe("tok"),
+      512,
+      128,
+      64,
+      "mean",
+      PoolingRule.Mean,
+      UncoveredPolicy.PartialCoverage,
+      None
     )
     assert(
       EmbeddingSpace
@@ -469,16 +489,17 @@ class IdentitySuite extends ScalaCheckSuite:
         .isLeft
     )
     assert(
-      EmbeddingSpace
+      LatePoolingRecipe
         .of(
-          p,
-          Role.Document,
-          SemanticView.ContextualLatePooled,
-          None,
-          d,
-          Normalization.L2,
-          TruncationPolicy.Reject,
-          Some(recipe.copy(stride = 999))
+          Checksum.ofText("doc"),
+          Fingerprint.unsafe("tok"),
+          512,
+          128,
+          999,
+          "mean",
+          PoolingRule.Mean,
+          UncoveredPolicy.PartialCoverage,
+          None
         )
         .isLeft
     )
@@ -504,7 +525,19 @@ class IdentitySuite extends ScalaCheckSuite:
         d,
         Normalization.L2,
         TruncationPolicy.Reject,
-        Some(recipe.copy(window = 64))
+        Some(
+          latePooling(
+            Checksum.ofText("doc"),
+            Fingerprint.unsafe("tok"),
+            512,
+            64,
+            64,
+            "mean",
+            PoolingRule.Mean,
+            UncoveredPolicy.PartialCoverage,
+            None
+          )
+        )
       )
       .toOption
       .get
@@ -519,6 +552,32 @@ class IdentitySuite extends ScalaCheckSuite:
       fs.id.value.contains(s.id.value)
     }
   }
+
+  private def latePooling(
+      documentDigest: Checksum,
+      tokenizerFingerprint: Fingerprint,
+      contextLimit: Int,
+      window: Int,
+      stride: Int,
+      overlapMerge: String,
+      pooling: PoolingRule,
+      uncovered: UncoveredPolicy,
+      matryoshkaDimension: Option[Int]
+  ): LatePoolingRecipe =
+    LatePoolingRecipe
+      .of(
+        documentDigest,
+        tokenizerFingerprint,
+        contextLimit,
+        window,
+        stride,
+        overlapMerge,
+        pooling,
+        uncovered,
+        matryoshkaDimension
+      )
+      .toOption
+      .get
 
   private def pooledSpace(
       provider: ProviderFingerprint,

@@ -11,25 +11,28 @@ object Fixtures:
   val task: TaskId = TaskId.unsafe("task-1")
   val cfg: Checksum = Checksum.ofText("config")
 
-  val manifest: PromptPackageManifest = PromptPackageManifest(
-    name = "local-semantics",
-    version = "1.0.0",
-    role = PromptRole.LocalSemanticsProposer,
-    inputSchemaId = "schema:sentence-window:1",
-    outputSchemaId = "schema:chart-proposal:1",
-    permittedOperations = Vector(
-      PermittedOperation.AddConcept,
-      PermittedOperation.AddRelation,
-      PermittedOperation.SetFocus
-    ),
-    prohibitedInferences = Vector("world-knowledge", "cross-sentence-identity"),
-    standardsRefs = Vector(StandardsRef("amr-guidelines", "1.2.6", "4.3")),
-    exampleIds = Vector("ex-1"),
-    counterexampleIds = Vector("cx-1"),
-    abstentionRules = Vector("abstain when the sentence has no predicate"),
-    selfCheck = Vector("every concept cites a token id"),
-    benchmarkSuiteId = "bench:local-semantics:1"
-  )
+  val manifest: PromptPackageManifest = PromptPackageManifest
+    .of(
+      name = "local-semantics",
+      version = "1.0.0",
+      role = PromptRole.LocalSemanticsProposer,
+      inputSchemaId = "schema:sentence-window:1",
+      outputSchemaId = "schema:chart-proposal:1",
+      permittedOperations = Vector(
+        PermittedOperation.AddConcept,
+        PermittedOperation.AddRelation,
+        PermittedOperation.SetFocus
+      ),
+      prohibitedInferences = Vector("world-knowledge", "cross-sentence-identity"),
+      standardsRefs = Vector(StandardsRef("amr-guidelines", "1.2.6", "4.3")),
+      exampleIds = Vector("ex-1"),
+      counterexampleIds = Vector("cx-1"),
+      abstentionRules = Vector("abstain when the sentence has no predicate"),
+      selfCheck = Vector("every concept cites a token id"),
+      benchmarkSuiteId = "bench:local-semantics:1"
+    )
+    .toOption
+    .get
   val promptRef: PromptPackageRef = manifest.ref
 
   def callFor(provider: String): ProviderCall = ProviderCall(
