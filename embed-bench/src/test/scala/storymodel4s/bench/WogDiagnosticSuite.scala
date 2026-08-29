@@ -2,7 +2,14 @@ package storymodel4s.bench
 
 import munit.FunSuite
 
-import storymodel4s.align.{CandidateGenerator, DefaultLocalCostModel, GraphHsmm, SemanticDistance}
+import storymodel4s.align.{
+  CandidateGenerator,
+  CandidateSet,
+  Candidates,
+  DefaultLocalCostModel,
+  GraphHsmm,
+  SemanticDistance
+}
 import storymodel4s.features.{Estimate, MissingReason}
 import storymodel4s.fixtures.wog.{WarOfTheGhostsExpectations, WarOfTheGhostsText}
 
@@ -212,7 +219,8 @@ class WogDiagnosticSuite extends FunSuite:
     )
     // The first unit of any case has no predecessor, so it must abstain rather than score.
     full.foreach { r =>
-      val first = r.observations.byMetric(Metrics.Names.routeSupportMidpointDirection).head
+      val first =
+        r.observations.byMetric(Metrics.Names.routeSupportMidpointDirection).head
       assertEquals(
         first.observation,
         MetricObservation.Ineligible,
@@ -237,7 +245,8 @@ class WogDiagnosticSuite extends FunSuite:
     val full = hashed.runs.find(_.caseId == WogDiagnostic.fullRecallCase.id).getOrElse {
       fail("the hashed n-gram channel did not run the full-recall case")
     }
-    val route = full.observations.byMetric(Metrics.Names.routeSupportMidpointDirection)
+    val route =
+      full.observations.byMetric(Metrics.Names.routeSupportMidpointDirection)
 
     // These three deterministic transitions agree on the source-support midpoint axis. The retired
     // per-level-rank metric scored every one as disagreement: its gold and inferred anchors drew
@@ -247,4 +256,40 @@ class WogDiagnosticSuite extends FunSuite:
         case MetricObservation.Observed(value) => assertEquals(value, 1.0)
         case other => fail(s"transition at index $laterUnitIndex was not observed: $other")
     }
+  }
+
+  test("an Unranked route step is eligible missing, never ineligible") {
+    val c = WogDiagnostic.fullRecallCase
+    val candidates = Candidates(
+      c.recall.ordered.iterator.map(u => u.id -> CandidateSet.unranked).toMap
+    )
+    val result = GraphHsmm
+      .infer(
+        c.recall,
+        c.view,
+        candidates,
+        DefaultLocalCostModel(semantic = SemanticDistance.abstaining)
+      )
+      .fold(e => fail(e.message), identity)
+    val observations = Metrics.observe(c, result)
+    val route = observations.byMetric(Metrics.Names.routeSupportMidpointDirection)
+    val missing = MetricObservation.Missing(MissingReason.ProviderAbstained)
+
+    assertEquals(route.head.observation, MetricObservation.Ineligible)
+    val eligibleIndexes = c.recall.ordered.indices.drop(1).filter { i =>
+      c.gold(c.recall.ordered(i - 1).id).flatMap(_.primary).nonEmpty &&
+      c.gold(c.recall.ordered(i).id).flatMap(_.primary).nonEmpty
+    }
+    assert(eligibleIndexes.nonEmpty, "the fixture has no gold source-to-source transition")
+    eligibleIndexes.foreach(i => assertEquals(route(i).observation, missing))
+
+    val aggregate = Metrics.aggregate(
+      Metrics.Names.routeSupportMidpointDirection,
+      Vector(observations),
+      Vector(c.inputChecksum),
+      seed = 1L
+    )
+    assertEquals(aggregate.value, Estimate.missing(MissingReason.ProviderAbstained))
+    assertEquals(aggregate.coverage.eligible, eligibleIndexes.size)
+    assertEquals(aggregate.coverage.observed, 0)
   }

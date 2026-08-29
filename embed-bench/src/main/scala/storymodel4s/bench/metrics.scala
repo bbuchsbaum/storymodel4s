@@ -286,20 +286,28 @@ object Metrics:
         view.node(ref).map(_ => view.relativePosition(ref))
       def goldPos(u: RecallUnit): Option[Double] =
         c.gold(u.id).flatMap(_.primary).map(_.node).flatMap(positionOf)
-      def inferredPos(u: RecallUnit): Option[Double] =
-        result.posterior.row(u.id).flatMap(mapAnchor).flatMap(positionOf)
       val values = units.zipWithIndex.map { case (u, i) =>
-        val v =
-          if i == 0 then None
+        val observation =
+          if i == 0 then MetricObservation.Ineligible
           else
             val prev = units(i - 1)
-            for
-              gp <- goldPos(prev)
-              gc <- goldPos(u)
-              ip <- inferredPos(prev)
-              ic <- inferredPos(u)
-            yield ind(stepDirection(gp, gc) == stepDirection(ip, ic))
-        UnitObservation(u.id, MetricObservation.fromOption(v))
+            (goldPos(prev), goldPos(u)) match
+              case (Some(gp), Some(gc)) =>
+                (result.posterior.row(prev.id), result.posterior.row(u.id)) match
+                  case (Some(previousRow), Some(currentRow))
+                      if previousRow.externalMass(ExternalState.Unranked) > 0.0 ||
+                        currentRow.externalMass(ExternalState.Unranked) > 0.0 =>
+                    MetricObservation.Missing(MissingReason.ProviderAbstained)
+                  case (Some(previousRow), Some(currentRow)) =>
+                    val agreement =
+                      for
+                        ip <- mapAnchor(previousRow).flatMap(positionOf)
+                        ic <- mapAnchor(currentRow).flatMap(positionOf)
+                      yield ind(stepDirection(gp, gc) == stepDirection(ip, ic))
+                    MetricObservation.fromOption(agreement)
+                  case _ => MetricObservation.Ineligible
+              case _ => MetricObservation.Ineligible
+        UnitObservation(u.id, observation)
       }
       Names.routeSupportMidpointDirection -> values
     val structuralCoverage = obs(Names.structuralTermCoverage)(termCoverage(CostTerm.Structural))
