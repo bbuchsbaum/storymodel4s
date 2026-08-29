@@ -406,13 +406,13 @@ class SignatureSuite extends FunSuite:
     assert(d.support > 0.0 && d.support < 1.0, s"fixture cannot distinguish coverage: ${d.render}")
 
     // Pinned, because this is the number the migration exists to surface: the chronology figure on
-    // the worked example rests on 25.6% of the route mass. The value itself is unchanged - the
-    // arithmetic was always a ratio of sums - but 0.0468 read as a statement about this person's
-    // recall when three quarters of their route was never judgeable. A reader who saw only the
-    // value would have had no way to know that.
-    assertEqualsDouble(d.value.getOrElse(fail(d.render)), 0.046818, 1e-6)
-    assertEqualsDouble(d.support, 0.255856, 1e-6)
-    assertEqualsDouble(d.conditioningMass, 0.767568, 1e-6)
+    // the worked example rests on 30.5% of the route mass. The value itself is unchanged in KIND -
+    // the arithmetic was always a ratio of sums - but 0.0395 read as a statement about this person's
+    // recall when nearly seventy percent of their route was never judgeable. A reader who saw only
+    // the value would have had no way to know that.
+    assertEqualsDouble(d.value.getOrElse(fail(d.render)), 0.039516, 1e-6)
+    assertEqualsDouble(d.support, 0.304620, 1e-6)
+    assertEqualsDouble(d.conditioningMass, 0.913861, 1e-6)
 
     // The distinction the world field must keep, and the one I got wrong first: a view with NO
     // world order is 0 of 0 - the source has no world chronology to violate - while a view that
@@ -513,11 +513,11 @@ class SignatureSuite extends FunSuite:
       s"the two formulas coincide here, so this fixture proves nothing: $massWeighted"
     )
     // Pinned literals, hand-read from this fixture. The inequality above survives any change that
-    // moves both formulas together; these do not. Mass-weighting publishes 0.6583 where
-    // mean-of-ratios published 0.6103 - the low-mass units were voting at full weight.
-    assertEqualsDouble(massWeighted, 0.658321, 1e-6)
-    assertEqualsDouble(meanOfRatios, 0.610311, 1e-6)
-    assertEqualsDouble(s.specificityMass.conditioningMass, 2.629218, 1e-6)
+    // moves both formulas together; these do not. Mass-weighting publishes 0.6782 where
+    // mean-of-ratios published 0.6284 - the low-mass units were voting at full weight.
+    assertEqualsDouble(massWeighted, 0.678220, 1e-6)
+    assertEqualsDouble(meanOfRatios, 0.628359, 1e-6)
+    assertEqualsDouble(s.specificityMass.conditioningMass, 2.736038, 1e-6)
   }
 
   test("compression conditions on SOURCE MASS, not on a count of units") {
