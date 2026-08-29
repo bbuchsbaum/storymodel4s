@@ -1197,7 +1197,7 @@ object NarrativeCompiler:
     val attempts = (resolvedAttempts ++ trajectoryAttempts).sortBy(_.target)
     val candidateSet = ContentAddress.digest(
       Vector(
-        "narrative-candidates/v2",
+        "narrative-candidates/v3",
         input.source.id.value,
         input.source.canonicalChecksum.hex,
         input.receipt.contentChecksum.hex,
@@ -1209,39 +1209,39 @@ object NarrativeCompiler:
         renderPolicy(input.policy) ++
         situationRecords.flatMap(r =>
           renderFields(
-            "candidate/v2",
+            "candidate/v3",
             Vector(ClaimFamily.SituationMention.toString, r.target.render)
           ) +:
             renderBundle(r.bundle, renderSituation)
         ) ++
         contextRecords.flatMap(r =>
           renderFields(
-            "candidate/v2",
+            "candidate/v3",
             Vector(ClaimFamily.ContextAssignment.toString, r.target.render)
           ) +:
             renderBundle(r.bundle, renderContextAssignment)
         ) ++
         (renderFields(
-          "candidate/v2",
+          "candidate/v3",
           Vector(ClaimFamily.Summary.toString, summaryRecord.target.render)
         ) +:
           renderBundle(summaryRecord.bundle, renderSummary)) ++
         membershipRecords.flatMap(r =>
           renderFields(
-            "candidate/v2",
+            "candidate/v3",
             Vector(ClaimFamily.SegmentMembership.toString, r.target.render)
           ) +:
             renderBundle(r.bundle, renderSegmentMembership)
         ) ++
         causalRecords.flatMap(r =>
           renderFields(
-            "candidate/v2",
+            "candidate/v3",
             Vector(ClaimFamily.CausalEdge.toString, r.target.render)
           ) +:
             renderBundle(r.bundle, renderCausal)
         ) ++
         trajectoryGaps.map(g =>
-          renderFields("candidate/v2", Vector(g.family.toString, g.target.render))
+          renderFields("candidate/v3", Vector(g.family.toString, g.target.render))
         )
     )
     val acceptedClaimMeta =
@@ -1403,8 +1403,8 @@ object NarrativeCompiler:
     )
 
   private def renderBundle[A](bundle: EvidenceBundle[A], render: A => String): Vector[String] =
-    bundle.proposals.map(p => renderFields("proposal/v1", Vector(renderProposal(p, render)))) ++
-      bundle.findings.map(f => renderFields("finding/v1", Vector(renderFinding(f)))) ++
+    bundle.proposals.map(p => renderFields("proposal/v2", Vector(renderProposal(p, render)))) ++
+      bundle.findings.map(f => renderFields("finding/v2", Vector(renderFinding(f)))) ++
       Vector(
         renderFields(
           "structural/v1",
@@ -1414,10 +1414,10 @@ object NarrativeCompiler:
           )
         ),
         renderFields(
-          "source-support/v1",
+          "source-support/v2",
           Vector(
             bundle.sourceSupport.score.toString,
-            bundle.sourceSupport.spans.fold("")(renderSpans)
+            renderOption(bundle.sourceSupport.spans)(renderSpans)
           )
         ),
         renderFields("agreement/v1", Vector(bundle.agreementScore.toString))
@@ -1435,12 +1435,12 @@ object NarrativeCompiler:
       .map(c => renderFields("conflict/v1", Vector(renderConflictTarget(c.target), c.reason)))
       .sorted
     renderFields(
-      "agent-proposal/v1",
+      "agent-proposal/v2",
       Vector(
         proposal.taskId.value,
         proposal.disposition.toString,
-        proposal.value.fold("")(render),
-        proposal.rawScore.fold("")(_.value.toString),
+        renderOption(proposal.value)(render),
+        renderOption(proposal.rawScore)(_.value.toString),
         evidence,
         renderFields("conflict-list/v1", conflicts),
         renderAgentReceipt(proposal.receipt)
@@ -1449,7 +1449,7 @@ object NarrativeCompiler:
 
   private def renderFinding(finding: CriticFinding): String =
     renderFields(
-      "critic-finding/v1",
+      "critic-finding/v2",
       Vector(
         finding.taskId.value,
         finding.family.toString,
@@ -1459,8 +1459,8 @@ object NarrativeCompiler:
           finding.targets.map(t => renderFields("target/v1", Vector(t.kind.toString, t.id))).sorted
         ),
         renderFields("evidence-list/v1", finding.evidence.map(renderEvidenceRef).sorted),
-        finding.rawScore.fold("")(_.value.toString),
-        finding.note.getOrElse("")
+        renderOption(finding.rawScore)(_.value.toString),
+        renderOption(finding.note)(value => value)
       )
     )
 
@@ -1479,19 +1479,19 @@ object NarrativeCompiler:
 
   private[document] def renderProviderCall(call: ProviderCall): String =
     renderFields(
-      "provider-call/v1",
+      "provider-call/v2",
       Vector(
         call.provider,
         call.model,
         call.version,
-        call.promptTemplateVersion.getOrElse(""),
+        renderOption(call.promptTemplateVersion)(value => value),
         call.inputChecksum.hex,
         call.outputChecksum.hex,
         renderFields(
           "params/v1",
           call.params.toVector.sortBy(_._1).map((k, v) => renderFields("param/v1", Vector(k, v)))
         ),
-        call.seed.fold("")(_.toString),
+        renderOption(call.seed)(_.toString),
         call.cached.toString
       )
     )
@@ -1508,10 +1508,10 @@ object NarrativeCompiler:
 
   private def renderEvidence(evidence: Evidence): String =
     renderFields(
-      "evidence/v1",
+      "evidence/v2",
       Vector(
         evidence.id.value,
-        evidence.spans.fold("")(renderSpans),
+        renderOption(evidence.spans)(renderSpans),
         renderFields("upstream/v1", evidence.upstream.toVector.sorted.map(_.value)),
         evidence.extractor.value,
         evidence.stage.value
@@ -1520,13 +1520,13 @@ object NarrativeCompiler:
 
   private def renderClaimMeta(meta: ClaimMeta): String =
     renderFields(
-      "claim-meta/v1",
+      "claim-meta/v2",
       Vector(
         meta.id.value,
         meta.status.toString,
         meta.credence.rawScore.toString,
-        meta.credence.calibrated.fold("")(_.value.toString),
-        meta.credence.calibrationModel.getOrElse(""),
+        renderOption(meta.credence.calibrated)(_.value.toString),
+        renderOption(meta.credence.calibrationModel)(value => value),
         renderFields("claim-evidence/v1", meta.evidence.toVector.map(renderEvidence)),
         renderProvenance(meta.provenance)
       )
@@ -1544,12 +1544,12 @@ object NarrativeCompiler:
 
   private def renderSpans(spans: SpanSet): String =
     renderFields(
-      "spans/v1",
+      "spans/v2",
       spans.refs.toVector.map(ref =>
         renderFields(
-          "span/v1",
+          "span/v2",
           Vector(
-            ref.unit.fold("")(_.value),
+            renderOption(ref.unit)(_.value),
             ref.span.start.toString,
             ref.span.endExclusive.toString
           )
@@ -1617,16 +1617,16 @@ object NarrativeCompiler:
 
   private def renderSituation(value: SituationProposal): String =
     renderFields(
-      "situation/v1",
+      "situation/v2",
       Vector(
         value.kind.toString,
         value.predicate.lemma,
-        value.predicate.frame.getOrElse(""),
+        renderOption(value.predicate.frame)(value => value),
         value.predicate.gloss,
         value.description,
         value.polarity.toString,
         value.modality.toString,
-        value.aspect.fold("")(_.toString)
+        renderOption(value.aspect)(_.toString)
       )
     )
 
@@ -1641,6 +1641,11 @@ object NarrativeCompiler:
 
   private def renderSegmentMembership(value: SegmentMembershipProposal): String =
     renderFields("segment-membership/v1", Vector(value.toString))
+
+  private def renderOption[A](value: Option[A])(render: A => String): String =
+    value match
+      case None       => renderFields("option/v1", Vector("none"))
+      case Some(item) => renderFields("option/v1", Vector("some", render(item)))
 
   private def renderFields(tag: String, fields: Iterable[String]): String =
     (tag +: fields.toVector).map(value => s"${value.length}:$value").mkString
@@ -1689,7 +1694,7 @@ object NarrativeCompiler:
       .map(renderClaimMeta)
     ContentAddress.digest(
       Vector(
-        "narrative-compilation/v1",
+        "narrative-compilation/v2",
         input.source.canonicalChecksum.hex,
         input.receipt.contentChecksum.hex,
         derivation.candidateSet.hex

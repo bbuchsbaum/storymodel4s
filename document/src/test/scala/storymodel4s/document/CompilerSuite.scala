@@ -77,7 +77,8 @@ class CompilerSuite extends FunSuite:
       salt: String,
       calibrated: Boolean = true,
       additionalProviders: Vector[String] = Vector.empty,
-      evidenceRef: Option[EvidenceRef] = None
+      evidenceRef: Option[EvidenceRef] = None,
+      findings: Vector[CriticFinding] = Vector.empty
   ): EvidenceBundle[A] =
     val proposals = (provider +: additionalProviders).zipWithIndex.map { (name, index) =>
       val task = TaskId.unsafe(s"task:$salt:$index")
@@ -93,7 +94,7 @@ class CompilerSuite extends FunSuite:
     }
     EvidenceBundle(
       proposals,
-      Vector.empty,
+      findings,
       StructuralValidity.Valid,
       SourceSupport(1.0, ev.spans),
       agreementScore = 1.0,
@@ -338,6 +339,67 @@ class CompilerSuite extends FunSuite:
 
     assertNotEquals(compiledLeft.derivation.candidateSet, compiledRight.derivation.candidateSet)
     assertNotEquals(compiledLeft.fingerprint, compiledRight.fingerprint)
+  }
+
+  test("provider-call prompt version None cannot collide with Some empty") {
+    val oneSituation = Vector(
+      SituationAttempt(ref0, bundle(situation0, ev0, "situation-agent", "s0"))
+    )
+    val baseCall = call("base-provider", "option-prompt")
+    val absent = compile(
+      input(
+        situationAttempts = oneSituation,
+        provenanceCalls = Vector(baseCall.copy(promptTemplateVersion = None))
+      )
+    )
+    val presentEmpty = compile(
+      input(
+        situationAttempts = oneSituation,
+        provenanceCalls = Vector(baseCall.copy(promptTemplateVersion = Some("")))
+      )
+    )
+
+    assertNotEquals(absent, presentEmpty)
+    assertEquals(absent.draft.graph, presentEmpty.draft.graph)
+    assertNotEquals(absent.derivation.candidateSet, presentEmpty.derivation.candidateSet)
+    assertNotEquals(absent.fingerprint, presentEmpty.fingerprint)
+  }
+
+  test("critic-finding note None cannot collide with Some empty") {
+    val baseFinding = CriticFinding(
+      TaskId.unsafe("task:critic-option-note"),
+      CriticFamily.SourceEntailment,
+      FindingCode.MissingConcept,
+      Vector.empty,
+      Vector.empty,
+      None,
+      None
+    )
+    def compiled(note: Option[String]): NarrativeCompilation =
+      compile(
+        input(
+          situationAttempts = Vector(
+            SituationAttempt(
+              ref0,
+              bundle(
+                situation0,
+                ev0,
+                "situation-agent",
+                "critic-option-note",
+                findings = Vector(baseFinding.copy(note = note))
+              )
+            )
+          )
+        )
+      )
+
+    val absent = compiled(None)
+    val presentEmpty = compiled(Some(""))
+
+    assertNotEquals(absent, presentEmpty)
+    assertEquals(absent.draft.graph, presentEmpty.draft.graph)
+    assertNotEquals(absent.derivation.candidateSet, presentEmpty.derivation.candidateSet)
+    assertNotEquals(absent.fingerprint, presentEmpty.fingerprint)
   }
 
   test("a non-accepted causal candidate is absent and recorded, never emitted at a default") {
