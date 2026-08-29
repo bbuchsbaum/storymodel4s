@@ -215,18 +215,19 @@ class IdentitySuite extends ScalaCheckSuite:
       Gens.dimension,
       Gens.latePooling.suchThat(r => r.window < r.contextLimit && r.stride < r.window)
     ) { (provider, dimension, generatedRecipe) =>
-      val recipe = generatedRecipe.copy(documentDigest = Checksum.ofText("query-document"))
+      val recipe =
+        generatedRecipe.replace(documentDigest = Checksum.ofText("query-document")).toOption.get
       val query = pooledSpace(
         provider,
         Role.Query,
         dimension,
-        recipe.copy(documentDigest = Checksum.ofText("query"))
+        recipe.replace(documentDigest = Checksum.ofText("query")).toOption.get
       )
       val document = pooledSpace(
         provider,
         Role.Document,
         dimension,
-        recipe.copy(documentDigest = Checksum.ofText("document"))
+        recipe.replace(documentDigest = Checksum.ofText("document")).toOption.get
       )
       val otherNormalization =
         if document.normalization == Normalization.L2 then Normalization.Unnormalized
@@ -242,22 +243,38 @@ class IdentitySuite extends ScalaCheckSuite:
         case UncoveredPolicy.PartialCoverage => UncoveredPolicy.Missing
         case UncoveredPolicy.Missing         => UncoveredPolicy.PartialCoverage
       val recipeMutations = Vector(
-        "different late-pooling tokenizer fingerprints" -> recipe.copy(
-          tokenizerFingerprint = Fingerprint.unsafe("other-tokenizer")
-        ),
-        "different late-pooling context limits" -> recipe.copy(
-          contextLimit = recipe.contextLimit + 1
-        ),
-        "different late-pooling windows" -> recipe.copy(window = recipe.window + 1),
-        "different late-pooling strides" -> recipe.copy(stride = recipe.stride + 1),
-        "different late-pooling overlap merges" -> recipe.copy(
-          overlapMerge = recipe.overlapMerge + ":other"
-        ),
-        "different late-pooling pooling rules" -> recipe.copy(pooling = otherPooling),
-        "different late-pooling uncovered policies" -> recipe.copy(uncovered = otherUncovered),
-        "different late-pooling matryoshka dimensions" -> recipe.copy(
-          matryoshkaDimension = Some(dimension.value)
-        )
+        "different late-pooling tokenizer fingerprints" -> recipe
+          .replace(tokenizerFingerprint = Fingerprint.unsafe("other-tokenizer"))
+          .toOption
+          .get,
+        "different late-pooling context limits" -> recipe
+          .replace(contextLimit = recipe.contextLimit + 1)
+          .toOption
+          .get,
+        "different late-pooling windows" -> recipe
+          .replace(window = recipe.window + 1)
+          .toOption
+          .get,
+        "different late-pooling strides" -> recipe
+          .replace(stride = recipe.stride + 1)
+          .toOption
+          .get,
+        "different late-pooling overlap merges" -> recipe
+          .replace(overlapMerge = recipe.overlapMerge + ":other")
+          .toOption
+          .get,
+        "different late-pooling pooling rules" -> recipe
+          .replace(pooling = otherPooling)
+          .toOption
+          .get,
+        "different late-pooling uncovered policies" -> recipe
+          .replace(uncovered = otherUncovered)
+          .toOption
+          .get,
+        "different late-pooling matryoshka dimensions" -> recipe
+          .replace(matryoshkaDimension = Some(dimension.value))
+          .toOption
+          .get
       )
       val recipeVariants =
         recipeMutations.map { case (reason, r) =>

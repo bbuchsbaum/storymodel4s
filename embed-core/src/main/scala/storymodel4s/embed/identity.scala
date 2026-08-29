@@ -211,6 +211,30 @@ final class LatePoolingRecipe private (
       matryoshkaDimension.fold("full")(_.toString)
     )
 
+  /** Rebuild through [[LatePoolingRecipe.of]] so a field change cannot skip the checks. */
+  def replace(
+      documentDigest: Checksum = documentDigest,
+      tokenizerFingerprint: Fingerprint = tokenizerFingerprint,
+      contextLimit: Int = contextLimit,
+      window: Int = window,
+      stride: Int = stride,
+      overlapMerge: String = overlapMerge,
+      pooling: PoolingRule = pooling,
+      uncovered: UncoveredPolicy = uncovered,
+      matryoshkaDimension: Option[Int] = matryoshkaDimension
+  ): Either[EmbedError, LatePoolingRecipe] =
+    LatePoolingRecipe.of(
+      documentDigest,
+      tokenizerFingerprint,
+      contextLimit,
+      window,
+      stride,
+      overlapMerge,
+      pooling,
+      uncovered,
+      matryoshkaDimension
+    )
+
   private[embed] def compatibilityKey: LatePoolingCompatibilityKey =
     LatePoolingCompatibilityKey(
       tokenizerFingerprint,
@@ -364,18 +388,7 @@ final class EmbeddingSpace private[embed] (
             )
           )
         case Some(r) =>
-          LatePoolingRecipe
-            .of(
-              r.documentDigest,
-              r.tokenizerFingerprint,
-              r.contextLimit,
-              r.window,
-              r.stride,
-              r.overlapMerge,
-              r.pooling,
-              r.uncovered,
-              Some(dim.value)
-            )
+          r.replace(matryoshkaDimension = Some(dim.value))
             .map(v =>
               EmbeddingSpace.build(
                 provider,
