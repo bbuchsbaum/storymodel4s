@@ -1,5 +1,6 @@
 package storymodel4s.align
 
+import storymodel4s.features.{Estimate, MissingReason, ScoreEstimate}
 import storymodel4s.recall.{RecallGraph, RecallUnitId}
 
 /** The decomposed recall signature `m_s` (design record §12). Every component stays separately
@@ -21,7 +22,7 @@ import storymodel4s.recall.{RecallGraph, RecallUnitId}
   */
 final case class RecallSignature(
     uniformCoverage: Double,
-    importanceWeightedCoverage: Double,
+    importanceWeightedCoverage: ScoreEstimate,
     fidelityMass: MassRatio,
     fidelityByFacet: Map[Facet, MassRatio],
     specificity: Option[Double],
@@ -258,8 +259,13 @@ object RecallSignature:
     // Leaves whose importance is Missing are excluded from the weighted sum (never counted as 0).
     val importance = view.leaves.flatMap(n => n.importance.toOption.map(w => (n.ref, w)))
     val wsum = importance.map(_._2).sum
-    val weighted =
-      if wsum <= 0 then uniform else importance.map { case (r, w) => w * visitation(r) }.sum / wsum
+    // Missing when no node carried an importance: republishing the UNIFORM figure under the
+    // importance-weighted name told a caller that a salience-weighted measurement had been made
+    // when none had. The two fields would then be the same number under two names, which is the
+    // inference a reader cannot help making.
+    val weighted: ScoreEstimate =
+      if wsum <= 0 then Estimate.missing(MissingReason.AllMissing)
+      else Estimate.observed(importance.map { case (r, w) => w * visitation(r) }.sum / wsum)
 
     val anchored: Vector[(RecallUnitId, FidelityReport, FidelityMode)] = recall.ordered.flatMap {
       u =>
@@ -463,6 +469,51 @@ object RecallSignature:
     }
     view.leaves.map(n => n.ref -> (1.0 - math.exp(-acc(n.ref)))).toMap
 
+/** A scalar projection with the support behind it.
+  *
+  * NO VALUE and LOW SUPPORT are different failures. A weighted component with no value refuses -
+  * dropping it would silently compute a different linear functional under the same name and
+  * weights. A component with a value but thin support contributes, and the scalar publishes the
+  * WEAKEST support among the components that carry one, named: a chain is no better supported than
+  * its thinnest link, and naming the link is what makes it actionable.
+  */
+final class SupportedScalar private (
+    val value: Double,
+    val weakestSupport: Option[Double],
+    val weakestComponent: Option[String],
+    /** Weighted components that carry no support notion at all (ADR 0003 field backlog). */
+    val unsupportedComponents: Vector[String]
+):
+  def render: String =
+    val s = weakestSupport
+      .map(x => f"support $x%.4f set by ${weakestComponent.getOrElse("?")}")
+      .getOrElse("no component carries support")
+    val u =
+      if unsupportedComponents.isEmpty then ""
+      else s"; ${unsupportedComponents.size} weighted components carry no support"
+    f"$value%.4f ($s$u)"
+
+  override def equals(other: Any): Boolean = other match
+    case that: SupportedScalar =>
+      value == that.value && weakestSupport == that.weakestSupport &&
+      weakestComponent == that.weakestComponent &&
+      unsupportedComponents == that.unsupportedComponents
+    case _ => false
+
+  override def hashCode: Int =
+    (value, weakestSupport, weakestComponent, unsupportedComponents).hashCode
+
+  override def toString: String = s"SupportedScalar(${render})"
+
+object SupportedScalar:
+  private[align] def unsafe(
+      value: Double,
+      weakestSupport: Option[Double],
+      weakestComponent: Option[String],
+      unsupportedComponents: Vector[String]
+  ): SupportedScalar =
+    new SupportedScalar(value, weakestSupport, weakestComponent, unsupportedComponents)
+
 /** Why a scalar projection could not be produced. Both cases used to be silent zeros. */
 enum ProjectionError:
   /** A weight names a component that does not exist — a typo used to delete a term. */
@@ -500,10 +551,10 @@ final class SignatureProjection private (
 
   override def toString: String = s"SignatureProjection($version, ${weights.size} weights)"
 
-  def apply(s: RecallSignature): Either[ProjectionError, Double] =
+  def apply(s: RecallSignature): Either[ProjectionError, SupportedScalar] =
     val comps: Map[String, Option[Double]] = Map(
       "uniformCoverage" -> Some(s.uniformCoverage),
-      "importanceWeightedCoverage" -> Some(s.importanceWeightedCoverage),
+      "importanceWeightedCoverage" -> s.importanceWeightedCoverage.toOption,
       "fidelity" -> s.fidelityMass.value,
       "specificity" -> s.specificity,
       "compression" -> s.compression.value,
@@ -527,9 +578,31 @@ final class SignatureProjection private (
         case Some(None)    => Left(ProjectionError.MissingComponent(k))
         case Some(Some(v)) => Right(w * v)
     }
+    // Support, per component, for those that carry one at all. The rest are named so the reader
+    // sees what the minimum does NOT cover rather than reading it as a guarantee.
+    val support: Map[String, Double] = Map(
+      "fidelity" -> s.fidelityMass.support,
+      "compression" -> s.compression.support,
+      "semanticFlowCoherence" -> s.semanticFlowCoherence.support
+    ) ++ s.backwardMass.map(m => "backwardMass" -> m.comparableSteps.toDouble / m.totalSteps).toMap
+      ++ s.worldBackwardMass
+        .map(m => "worldBackwardMass" -> m.comparableSteps.toDouble / m.totalSteps)
+        .toMap
+
     terms.collectFirst { case Left(e) => e } match
       case Some(e) => Left(e)
-      case None    => Right(terms.collect { case Right(v) => v }.sum)
+      case None    =>
+        val weighted = weights.keys.toVector.sorted
+        val supported = weighted.flatMap(k => support.get(k).map(k -> _))
+        val weakest = supported.minByOption(_._2)
+        Right(
+          SupportedScalar.unsafe(
+            terms.collect { case Right(v) => v }.sum,
+            weakest.map(_._2),
+            weakest.map(_._1),
+            weighted.filterNot(support.contains)
+          )
+        )
 
 object SignatureProjection:
   /** The known component names, so a weight set can be checked before it is ever applied. */

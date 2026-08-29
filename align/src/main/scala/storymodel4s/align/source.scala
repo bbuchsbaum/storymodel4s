@@ -1,7 +1,7 @@
 package storymodel4s.align
 
 import storymodel4s.core.{SegmentId, SituationId, SpanSet}
-import storymodel4s.features.{Coverage, Estimate, ScoreEstimate}
+import storymodel4s.features.{Coverage, Estimate, ScoreEstimate, MissingReason}
 import storymodel4s.proposition.PropositionEvidence
 import storymodel4s.recall.{Lexical, ModalityTag, PolarityTag, SketchRole}
 
@@ -106,7 +106,12 @@ final case class NodeSummary(
     lemmas: Set[String],
     outcome: Option[String] = None,
     cause: Option[String] = None,
-    importance: ScoreEstimate = Estimate.observed(1.0),
+    /** Injected salience. Defaults to `Missing`: nobody measured this node's importance, and
+      * `observed(1.0)` asserted MAXIMAL salience for every node at once - a claim, not a default.
+      * With it Missing, importance-weighted coverage abstains until a caller supplies importances,
+      * instead of silently duplicating uniform coverage under a second name.
+      */
+    importance: ScoreEstimate = Estimate.missing(MissingReason.AllMissing),
     evidence: Option[PropositionEvidence] = None
 ):
   def hasEvidence: Boolean = evidence.nonEmpty

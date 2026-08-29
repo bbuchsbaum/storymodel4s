@@ -521,7 +521,14 @@ class WireSuite extends FunSuite:
       withImportance(Estimate.missing(MissingReason.Unknown)),
       withImportance(Estimate.missing(MissingReason.ProviderAbstained))
     )
-    assertEquals(fps.head, view.contentFingerprint)
+    // The base view's nodes now default to Missing importance, so the fingerprint that matches it
+    // is the Missing one - not observed(1.0), which used to be the default and is now a stated
+    // salience like any other.
+    assertEquals(
+      withImportance(Estimate.missing(MissingReason.AllMissing)),
+      view.contentFingerprint
+    )
+    assertNotEquals(withImportance(Estimate.observed(1.0)), view.contentFingerprint)
     assertEquals(fps.distinct.size, fps.size)
   }
 
