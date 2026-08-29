@@ -1,0 +1,1 @@
+{"actor":"claude-storymodel4s","entity":"bd-01M161EEPDV8NMC932KA8AY0QC","kind":"create","op":"20260829T055625.933992Z-p85439-c0000-rfbc5-hd5bd55","set":{"status":"open","title":"align: ExternalMassReport is publicly constructible in invalid states (negative, >1, NaN, inconsistent mass)"},"ts":"2026-08-29T05:56:25.933992Z","v":1}
