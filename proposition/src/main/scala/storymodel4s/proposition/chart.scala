@@ -249,15 +249,15 @@ type Checked = CheckState.Checked
   * Reentrancy is representational only: a concept referenced by several relations. Polarity is
   * recorded per concept (normally predicates). Embedded propositions are held, not asserted.
   */
-final case class PropositionChart[C <: CheckState] private[proposition] (
-    focus: Option[ConceptId],
-    concepts: Map[ConceptId, Concept],
-    relations: Vector[PropositionRelation],
-    polarity: Map[ConceptId, Polarity],
-    embedded: Vector[EmbeddedProposition],
-    alignments: Vector[PropositionAlignment],
-    provenance: ChartProvenance,
-    sentence: Option[SurfaceUnitId]
+final class PropositionChart[C <: CheckState] private[proposition] (
+    val focus: Option[ConceptId],
+    val concepts: Map[ConceptId, Concept],
+    val relations: Vector[PropositionRelation],
+    val polarity: Map[ConceptId, Polarity],
+    val embedded: Vector[EmbeddedProposition],
+    val alignments: Vector[PropositionAlignment],
+    val provenance: ChartProvenance,
+    val sentence: Option[SurfaceUnitId]
 ):
   def isEmpty: Boolean = concepts.isEmpty
   def conceptIds: Vector[ConceptId] = concepts.keys.toVector.sorted
@@ -311,6 +311,31 @@ final case class PropositionChart[C <: CheckState] private[proposition] (
       sentence
     )
 
+  /** Internal mutation hook for validator fixtures and canonical transforms. Changing any field
+    * invalidates the phantom witness, so callers must state the resulting check state explicitly or
+    * supply it from the expected result type.
+    */
+  private[proposition] def copy[D <: CheckState](
+      focus: Option[ConceptId] = focus,
+      concepts: Map[ConceptId, Concept] = concepts,
+      relations: Vector[PropositionRelation] = relations,
+      polarity: Map[ConceptId, Polarity] = polarity,
+      embedded: Vector[EmbeddedProposition] = embedded,
+      alignments: Vector[PropositionAlignment] = alignments,
+      provenance: ChartProvenance = provenance,
+      sentence: Option[SurfaceUnitId] = sentence
+  ): PropositionChart[D] =
+    new PropositionChart[D](
+      focus,
+      concepts,
+      relations,
+      polarity,
+      embedded,
+      alignments,
+      provenance,
+      sentence
+    )
+
   /** Same chart with relations and embeddings in a different order (identity-preserving). */
   private[proposition] def reordered(
       relations: Vector[PropositionRelation],
@@ -347,7 +372,41 @@ final case class PropositionChart[C <: CheckState] private[proposition] (
       sentence
     )
 
+  override def equals(other: Any): Boolean = other match
+    case that: PropositionChart[?] =>
+      focus == that.focus && concepts == that.concepts && relations == that.relations &&
+      polarity == that.polarity && embedded == that.embedded && alignments == that.alignments &&
+      provenance == that.provenance && sentence == that.sentence
+    case _ => false
+
+  override def hashCode: Int =
+    (focus, concepts, relations, polarity, embedded, alignments, provenance, sentence).##
+
+  override def toString: String =
+    s"PropositionChart(concepts=${concepts.size}, relations=${relations.size})"
+
 object PropositionChart:
+  private[proposition] def apply[C <: CheckState](
+      focus: Option[ConceptId],
+      concepts: Map[ConceptId, Concept],
+      relations: Vector[PropositionRelation],
+      polarity: Map[ConceptId, Polarity],
+      embedded: Vector[EmbeddedProposition],
+      alignments: Vector[PropositionAlignment],
+      provenance: ChartProvenance,
+      sentence: Option[SurfaceUnitId]
+  ): PropositionChart[C] =
+    new PropositionChart[C](
+      focus,
+      concepts,
+      relations,
+      polarity,
+      embedded,
+      alignments,
+      provenance,
+      sentence
+    )
+
   /** Build an unchecked chart; run [[ChartValidator.validate]] to obtain a checked one. */
   def unchecked(
       focus: Option[ConceptId],

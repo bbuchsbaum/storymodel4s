@@ -13,12 +13,12 @@ import storymodel4s.amr.graph.RoleForm.{CanonicalRoles, SurfaceRoles}
   * Why a phantom-typed single class: downstream code can demand `AmrGraph[Checked, CanonicalRoles]`
   * and be guaranteed that dangling references, missing concepts, and inverse spellings are gone.
   */
-final case class AmrGraph[C <: CheckState, R <: RoleForm] private[amr] (
-    top: NodeId,
-    nodes: Vector[NodeId],
-    concepts: Map[NodeId, Concept],
-    edges: Vector[Edge],
-    metadata: Vector[(String, String)]
+final class AmrGraph[C <: CheckState, R <: RoleForm] private[amr] (
+    val top: NodeId,
+    val nodes: Vector[NodeId],
+    val concepts: Map[NodeId, Concept],
+    val edges: Vector[Edge],
+    val metadata: Vector[(String, String)]
 ):
   def nodeCount: Int = nodes.size
   def edgeCount: Int = edges.size
@@ -60,11 +60,22 @@ final case class AmrGraph[C <: CheckState, R <: RoleForm] private[amr] (
     val referenced = edges.flatMap(e => e.source +: e.target.nodeId.toVector).toSet
     (referenced + top) -- concepts.keySet
 
-  def withMetadata(meta: Vector[(String, String)]): AmrGraph[C, R] = copy(metadata = meta)
+  def withMetadata(meta: Vector[(String, String)]): AmrGraph[C, R] =
+    new AmrGraph[C, R](top, nodes, concepts, edges, meta)
 
   /** Forget the check state (e.g. after an edit). */
   def uncheck: AmrGraph[Unchecked, SurfaceRoles] =
-    AmrGraph[Unchecked, SurfaceRoles](top, nodes, concepts, edges, metadata)
+    new AmrGraph[Unchecked, SurfaceRoles](top, nodes, concepts, edges, metadata)
+
+  override def equals(other: Any): Boolean = other match
+    case that: AmrGraph[?, ?] =>
+      top == that.top && nodes == that.nodes && concepts == that.concepts && edges == that.edges &&
+      metadata == that.metadata
+    case _ => false
+
+  override def hashCode: Int = (top, nodes, concepts, edges, metadata).##
+
+  override def toString: String = s"AmrGraph(nodes=$nodeCount, edges=$edgeCount)"
 
   /** Deterministic multi-line rendering of the triples, for diagnostics. */
   def renderTriples: String =
@@ -83,7 +94,7 @@ object AmrGraph:
     val conceptMap = concepts.foldLeft(Map.empty[NodeId, Concept]) { case (m, (n, c)) =>
       if m.contains(n) then m else m.updated(n, c)
     }
-    AmrGraph(top, nodes, conceptMap, edges, metadata)
+    new AmrGraph[Unchecked, SurfaceRoles](top, nodes, conceptMap, edges, metadata)
 
   /** Build an unchecked graph whose node list may include nodes defined without a concept (as
     * PENMAN `(b)` permits); validation reports them as `MissingConcept`.
@@ -96,7 +107,13 @@ object AmrGraph:
       metadata: Vector[(String, String)] = Vector.empty
   ): AmrGraph[Unchecked, SurfaceRoles] =
     val base = unchecked(top, concepts, edges, metadata)
-    base.copy(nodes = (nodes ++ base.nodes).distinct)
+    new AmrGraph[Unchecked, SurfaceRoles](
+      base.top,
+      (nodes ++ base.nodes).distinct,
+      base.concepts,
+      base.edges,
+      base.metadata
+    )
 
   private[amr] def checked[R <: RoleForm](
       top: NodeId,
@@ -104,7 +121,7 @@ object AmrGraph:
       concepts: Map[NodeId, Concept],
       edges: Vector[Edge],
       metadata: Vector[(String, String)]
-  ): AmrGraph[Checked, R] = AmrGraph(top, nodes, concepts, edges, metadata)
+  ): AmrGraph[Checked, R] = new AmrGraph[Checked, R](top, nodes, concepts, edges, metadata)
 
   /** Exact artifact equality: same top, same node set, same concepts, same edge set. Edge order and
     * metadata are not semantic. For renaming-invariant equality use `AmrIsomorphism`.
@@ -117,4 +134,4 @@ object AmrGraph:
   extension (g: AmrGraph[Checked, CanonicalRoles])
     /** A canonical-role graph is trivially a valid surface-role graph. */
     def asSurface: AmrGraph[Checked, SurfaceRoles] =
-      AmrGraph(g.top, g.nodes, g.concepts, g.edges, g.metadata)
+      new AmrGraph[Checked, SurfaceRoles](g.top, g.nodes, g.concepts, g.edges, g.metadata)
