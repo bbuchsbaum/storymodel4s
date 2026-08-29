@@ -155,15 +155,24 @@ object WeightedCoverage:
                     coverage
                   )
                 )
-            else if numerator > conditioningWeight + 1e-9 then
-              malformed(
-                s"numerator $numerator exceeds conditioning weight $conditioningWeight"
-              )
             else
               val value = numerator / conditioningWeight
               if !finite(value) || value < 0.0 then malformed("weighted outcome is invalid")
+              else if value > 1.0 + 1e-9 then
+                malformed(
+                  s"numerator $numerator exceeds conditioning weight $conditioningWeight"
+                )
               else
-                Right(new WeightedCoverage(Estimate.observed(value), conditioningWeight, coverage))
+                // Floating accumulation can put a lawful proportion infinitesimally above one.
+                // Apply tolerance to the dimensionless quotient, not to the raw masses: an
+                // absolute mass tolerance would admit an arbitrarily large ratio at tiny weights.
+                Right(
+                  new WeightedCoverage(
+                    Estimate.observed(math.min(value, 1.0)),
+                    conditioningWeight,
+                    coverage
+                  )
+                )
 
 /** A ratio-of-sums with the support it rests on: value = N / A, support = A / T.
   *

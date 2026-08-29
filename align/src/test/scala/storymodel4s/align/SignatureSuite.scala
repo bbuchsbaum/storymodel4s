@@ -382,6 +382,9 @@ class SignatureSuite extends FunSuite:
     assert(WeightedCoverage.of(0.0, Vector(-1.0, 2.0), 2).isLeft)
     assert(WeightedCoverage.of(0.0, Vector(1.0, 1.0), 1).isLeft)
     assert(WeightedCoverage.of(1.1, Vector(1.0), 1).isLeft)
+    assert(WeightedCoverage.of(1e-9, Vector(1e-12), 1).isLeft)
+    assert(WeightedCoverage.of(1.0 + 2e-9, Vector(1.0), 1).isLeft)
+    assertEquals(weighted(1.0 + 1e-9, Vector(1.0), 1).estimate.toOption, Some(1.0))
   }
 
   test("weighted coverage reports weight mass separately from leaf-count coverage") {
