@@ -10,10 +10,18 @@ record Part 4, §57–76).
   first-person/source-monitoring language (`experiential`), aggregated per
   unique recall unit, never over atomized details. Rates are over assessed
   units; coverage is assessed units over participant recall units.
-  Profile density, purity, probe gain, and related rates are 1-per-unit;
-  anchoring, perceptual, integration, and fragmentation are 1-per-situation.
+  Profile strands (every rate carries `Coverage`):
+
+  | Grain | Strands |
+  | --- | --- |
+  | unique recall unit | density, purity, probe gain, semanticization, drift, redundancy, mental |
+  | situation, else unit | perceptual |
+  | situation | anchoring (Anchor / AtLocation / Movement only), integration, fragmentation |
+
   `targetMass` is atom mass for the traditional sheet, not a measure of
-  remembering.
+  remembering. A unit is in a class only when some assessment has mass ≥ 0.5
+  on that class. `RepeatedOrCategoric` is semanticization here; Levine's
+  standard sheet maps that scope to ExternalEvent, not ExternalSemantic.
 - *accuracy* — unknowable without an independent source; absent here.
 
 Target-episode membership (`address`) is a fourth, independent axis.

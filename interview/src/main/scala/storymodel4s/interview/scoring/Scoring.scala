@@ -3,6 +3,7 @@ package storymodel4s.interview.scoring
 import storymodel4s.core.*
 import storymodel4s.features.{Coverage, Estimate, MissingReason, ScoreEstimate}
 import storymodel4s.interview.*
+import storymodel4s.recall.RecallUnitId
 import storymodel4s.story.ModelStatus
 
 /** Categories of the traditional Autobiographical Interview score sheet. */
@@ -177,7 +178,7 @@ object TraditionalScoring:
     }.toMap
 
   def massCoverage(as: Vector[DetailAssessment]): Coverage =
-    Coverage.unsafe(as.size, as.count(_.detail.observedMass.isDefined))
+    Coverage.of(as.size, as.count(_.detail.observedMass.isDefined)).getOrElse(Coverage.empty)
 
   def score(
       model: InterviewModel[ModelStatus.Validated],
@@ -223,68 +224,101 @@ final case class PhenomenologyEvidence(
   /** Alias for [[sourceMonitoringUnitCounts]]: unit counts, not detail counts. */
   def sourceMonitoring: Map[SourceMonitoring, Int] = sourceMonitoringUnitCounts
 
+/** A profile rate together with how much of its eligible support was observed.
+  *
+  * Why a pair: a 1.0 over two assessed units is not a 1.0 over forty participant units. Bead 9
+  * (`ProfileStrand`) will wrap these with contributor ids.
+  */
+final case class CoveredScore(estimate: ScoreEstimate, coverage: Coverage):
+  def toOption: Option[Double] = estimate.toOption
+  def isObserved: Boolean = estimate.isObserved
+
 /** The multidimensional autobiographical-memory profile of design record §65.2. Ratios whose
   * denominator is empty are `Missing`, never 0.
   *
   * `targetMass` is the raw atom-mass sum for the traditional sheet; it is not a measure of
   * remembering. Density, purity, probe gain, and the other rates are 1-per-unit or 1-per-situation
   * and must not be derived from `targetMass`.
+  *
+  * Unit membership (purity, semanticization, otherEventDrift, redundancy, target, probeGain): a
+  * unit is in a class iff any of its assessments has mass ≥ 0.5 on that class. Residual mass below
+  * 0.5 (including induction's 0.045 OtherSpecific leak when alternatives exist) does not classify
+  * the unit.
   */
 final case class Profile(
     /** Atom-mass sum for the traditional sheet; not a measure of remembering. */
     targetMass: Double,
     massCoverage: Coverage,
-    /** UNIT grain: |target units| / participant words. */
-    episodicDensityPerWord: ScoreEstimate,
-    /** UNIT grain: |target units| / participant seconds. */
-    episodicDensityPerSecond: ScoreEstimate,
-    /** UNIT grain: target units / (target + other-specific units). */
-    eventPurity: ScoreEstimate,
-    /** SITUATION grain: unique situations with a place or time fact. */
-    spatiotemporalAnchoring: Double,
-    /** SITUATION grain when the atom has situations; else the source unit. */
-    perceptualProfile: Map[Modality, Double],
-    /** UNIT grain: unique source units per mental-state kind (`MentalStateFact` has no situation).
+    /** UNIT grain: |target units| / participant words. Coverage eligible = participant units. */
+    episodicDensityPerWord: CoveredScore,
+    /** UNIT grain: |target units| / participant seconds. Coverage eligible = participant units. */
+    episodicDensityPerSecond: CoveredScore,
+    /** UNIT grain: target units / (target + other-specific units). Membership ≥ 0.5. */
+    eventPurity: CoveredScore,
+    /** SITUATION grain: unique Anchor / AtLocation / Movement situations. Not
+      * TemporalFact.Relation.
       */
-    mentalStateProfile: Map[MentalStateKind, Double],
+    spatiotemporalAnchoring: CoveredScore,
+    /** SITUATION grain when the atom has situations; else the source unit. */
+    perceptualProfile: Map[Modality, CoveredScore],
+    /** UNIT grain: unique source units per kind (`MentalStateFact` has no situation). */
+    mentalStateProfile: Map[MentalStateKind, CoveredScore],
     /** SITUATION grain: related situations / target situations. */
-    relationalIntegration: ScoreEstimate,
+    relationalIntegration: CoveredScore,
     /** SITUATION graph: 1 − |largest component| / |target situations|; mental atoms add no node. */
-    fragmentation: ScoreEstimate,
-    /** UNIT grain: semantic units / assessed units. */
-    semanticization: ScoreEstimate,
-    /** UNIT grain: other-specific units / assessed units. */
-    otherEventDrift: ScoreEstimate,
-    /** UNIT grain: repetition units / assessed units. */
-    redundancy: ScoreEstimate,
+    fragmentation: CoveredScore,
+    /** UNIT grain: semantic units / assessed units (PK | GK | RepeatedOrCategoric; Levine maps
+      * RepeatedOrCategoric to ExternalEvent, not ExternalSemantic). Membership ≥ 0.5.
+      */
+    semanticization: CoveredScore,
+    /** UNIT grain: other-specific units / assessed units. Membership ≥ 0.5. */
+    otherEventDrift: CoveredScore,
+    /** UNIT grain: repetition units / assessed units. Membership ≥ 0.5. */
+    redundancy: CoveredScore,
     /** UNIT grain: post-probe target units / (free + post target units). */
-    probeGain: ScoreEstimate,
+    probeGain: CoveredScore,
     phenomenology: PhenomenologyEvidence
 )
 
 object ProfileScoring:
+  /** Shared unit-membership threshold: a unit is in a class iff any assessment has mass ≥ this. */
+  private val MembershipThreshold = 0.5
+
+  private enum GrainKey:
+    case Situation(id: SituationId)
+    case Unit(id: RecallUnitId)
+
   private def weighted(a: DetailAssessment, share: Double): Double =
     a.detail.observedMass.map(_ * share).getOrElse(0.0)
 
   private def ratio(num: Double, den: Double): ScoreEstimate =
-    if den <= 0.0 then Estimate.missing(MissingReason.Excluded) else Estimate.observed(num / den)
+    if !num.isFinite || !den.isFinite || den <= 0.0 then Estimate.missing(MissingReason.Excluded)
+    else Estimate.observed(num / den)
+
+  private def coverageOf(eligible: Int, observed: Int): Coverage =
+    Coverage.of(eligible, observed).getOrElse(Coverage.empty)
+
+  private def covered(est: ScoreEstimate, eligible: Int, observed: Int): CoveredScore =
+    CoveredScore(est, coverageOf(eligible, observed))
 
   /** Probe gain (§65.6): |target units after a probe| / |free + post target units|.
     *
-    * A unit contributes 1 if any of its assessments in that phase is target-specific. Re-atomizing
-    * a phase must not change the ratio. When neither phase has a target unit the ratio is
-    * `Missing(Excluded)`, never 0 or 1.
+    * A unit contributes 1 if any of its assessments in that phase is target-specific (mass ≥ 0.5).
+    * Re-atomizing a phase must not change the ratio. When neither phase has a target unit the ratio
+    * is `Missing(Excluded)`, never 0 or 1.
     */
-  def probeGain(assessments: Vector[DetailAssessment]): ScoreEstimate =
+  def probeGain(assessments: Vector[DetailAssessment], participantUnits: Int): CoveredScore =
     val byUnit = assessments.groupBy(_.detail.sourceUnit).values
     def hasTarget(phasePred: InterviewPhase => Boolean): Int =
-      byUnit.count(as => as.exists(a => phasePred(a.promptContext.phase) && a.targetMass >= 0.5))
+      byUnit.count(as =>
+        as.exists(a => phasePred(a.promptContext.phase) && a.targetMass >= MembershipThreshold)
+      )
     val free = hasTarget(_ == InterviewPhase.FreeRecall)
     val post = hasTarget(_ != InterviewPhase.FreeRecall)
-    ratio(post.toDouble, (free + post).toDouble)
+    covered(ratio(post.toDouble, (free + post).toDouble), participantUnits, free + post)
 
-  def probeGain(model: InterviewModel[ModelStatus.Validated]): ScoreEstimate =
-    probeGain(model.assessments)
+  def probeGain(model: InterviewModel[ModelStatus.Validated]): CoveredScore =
+    probeGain(model.assessments, model.recall.ordered.size)
 
   /** Phenomenology strands from the assessments and the participant's explicit ratings.
     *
@@ -338,15 +372,6 @@ object ProfileScoring:
           coverage
         )
 
-  /** Package-private compile bridge for the reserved `InterviewSuite` 2-arg calls. Delete once that
-    * suite passes `participantUnits` (W3 hunk). Not part of the public scoring API.
-    */
-  private[interview] def phenomenology(
-      assessments: Vector[DetailAssessment],
-      ratings: Option[SubjectiveRatings]
-  ): PhenomenologyEvidence =
-    phenomenology(assessments, ratings, assessments.map(_.detail.sourceUnit).toSet.size)
-
   private def components[A](nodes: Vector[A], edges: Vector[(A, A)]): Vector[Set[A]] =
     val adj = edges.flatMap { case (a, b) => Vector(a -> b, b -> a) }.groupMap(_._1)(_._2)
     var seen = Set.empty[A]
@@ -372,18 +397,28 @@ object ProfileScoring:
   ): Vector[Vector[DetailAssessment]] =
     assessments.groupBy(_.detail.sourceUnit).values.toVector
 
+  private def unitClassified(as: Vector[DetailAssessment])(
+      pred: MemoryAddress => Boolean
+  ): Boolean =
+    as.exists(_.massAt(pred) >= MembershipThreshold)
+
   private def isTargetUnit(as: Vector[DetailAssessment]): Boolean =
-    as.exists(_.targetMass >= 0.5)
+    unitClassified(as)(_.isTargetSpecific)
 
-  private def unitHas(as: Vector[DetailAssessment])(pred: MemoryAddress => Boolean): Boolean =
-    as.exists(_.massAt(pred) > 0.0)
-
-  /** Grain key for situation-level strands: the atom's situations, or the source unit when the atom
-    * carries none (`MentalStateFact` is empty by construction).
+  /** Typed grain: situations when the atom has them, otherwise the source unit. Never a shared
+    * string space of SituationId and RecallUnitId values.
     */
-  private def grainKeys(a: DetailAssessment): Set[String] =
+  private def grainKeys(a: DetailAssessment): Set[GrainKey] =
     val sits = a.detail.atom.situations
-    if sits.nonEmpty then sits.map(_.value) else Set(a.detail.sourceUnit.value)
+    if sits.nonEmpty then sits.map(GrainKey.Situation.apply)
+    else Set(GrainKey.Unit(a.detail.sourceUnit))
+
+  private def anchoringSituations(atom: DetailAtom): Set[SituationId] =
+    atom match
+      case DetailAtom.TemporalFact(TemporalClaim.Anchor(s, _))    => Set(s)
+      case DetailAtom.SpatialFact(SpatialClaim.AtLocation(s, _))  => Set(s)
+      case DetailAtom.SpatialFact(SpatialClaim.Movement(s, _, _)) => Set(s)
+      case _                                                      => Set.empty
 
   private def relationEdges(atom: DetailAtom): Vector[(SituationId, SituationId)] =
     atom match
@@ -409,32 +444,29 @@ object ProfileScoring:
     val assessed = units.size
     val targetUnits = units.count(isTargetUnit)
     val otherUnits = units.count(
-      unitHas(_) {
+      unitClassified(_) {
         case MemoryAddress.Episode(_, EpisodeScope.OtherSpecific) => true
         case _                                                    => false
       }
     )
     val semanticUnits = units.count(
-      unitHas(_) {
+      unitClassified(_) {
         case MemoryAddress.PersonalKnowledge(_) | MemoryAddress.GeneralKnowledge => true
         case MemoryAddress.Episode(_, EpisodeScope.RepeatedOrCategoric)          => true
         case _                                                                   => false
       }
     )
     val repetitionUnits = units.count(
-      unitHas(_) {
+      unitClassified(_) {
         case MemoryAddress.Discourse(InterviewDiscourseFunction.Repetition(_)) => true
         case _                                                                 => false
       }
     )
-    val targetAs = assessments.filter(_.targetMass >= 0.5)
+    val targetAs = assessments.filter(_.targetMass >= MembershipThreshold)
     val targetSits = targetAs.flatMap(_.detail.atom.situations).toSet
-    val anchoringSits = targetAs.flatMap { a =>
-      a.detail.atom match
-        case DetailAtom.TemporalFact(_) | DetailAtom.SpatialFact(_) => a.detail.atom.situations
-        case _                                                      => Set.empty
-    }.toSet
-    val perceptual = targetAs
+    val anchoringSits = targetAs.flatMap(a => anchoringSituations(a.detail.atom)).toSet
+    val sitEligible = math.max(targetSits.size, anchoringSits.size)
+    val perceptualCounts = targetAs
       .flatMap { a =>
         a.detail.atom match
           case DetailAtom.PerceptualFact(_, m, _) => grainKeys(a).map(k => (m, k))
@@ -442,9 +474,18 @@ object ProfileScoring:
       }
       .groupMap(_._1)(_._2)
       .view
-      .mapValues(_.toSet.size.toDouble)
+      .mapValues(_.toSet)
       .toMap
-    val mental = targetAs
+    val perceptualEligible = perceptualCounts.values.flatten.toSet.size
+    val perceptual = perceptualCounts.view.mapValues { ks =>
+      val n = ks.size
+      covered(
+        if n == 0 then Estimate.missing(MissingReason.Excluded) else Estimate.observed(n.toDouble),
+        math.max(perceptualEligible, n),
+        n
+      )
+    }.toMap
+    val mentalCounts = targetAs
       .flatMap { a =>
         a.detail.atom match
           case DetailAtom.MentalStateFact(_, s) => Some(s.kind -> a.detail.sourceUnit)
@@ -452,18 +493,25 @@ object ProfileScoring:
       }
       .groupMap(_._1)(_._2)
       .view
-      .mapValues(_.toSet.size.toDouble)
+      .mapValues(_.toSet)
       .toMap
+    val mental = mentalCounts.view.mapValues { us =>
+      val n = us.size
+      covered(
+        if n == 0 then Estimate.missing(MissingReason.Excluded) else Estimate.observed(n.toDouble),
+        math.max(targetUnits, n),
+        n
+      )
+    }.toMap
     val related = targetAs
       .flatMap(a => relationEdges(a.detail.atom))
       .flatMap { case (a, b) =>
         Vector(a, b)
       }
       .toSet
-    val integration = ratio(related.size.toDouble, targetSits.size.toDouble)
     val nodes = targetSits.toVector
     val edges = targetAs.flatMap(a => relationEdges(a.detail.atom))
-    val fragmentation: ScoreEstimate =
+    val fragmentationEst: ScoreEstimate =
       if nodes.isEmpty then Estimate.missing(MissingReason.Excluded)
       else
         val largest = components(nodes, edges).map(_.size).maxOption.getOrElse(0)
@@ -471,21 +519,26 @@ object ProfileScoring:
     val targetMass = assessments.map(a => weighted(a, a.targetMass)).sum
     def unitRatio(num: Double, den: Double): ScoreEstimate =
       if assessed == 0 then Estimate.missing(MissingReason.Excluded) else ratio(num, den)
+    val unitCov = coverageOf(participantUnits, assessed)
+    def unitCovered(est: ScoreEstimate): CoveredScore = CoveredScore(est, unitCov)
+    val anchoringEst =
+      if anchoringSits.isEmpty then Estimate.missing(MissingReason.Excluded)
+      else Estimate.observed(anchoringSits.size.toDouble)
     Profile(
       targetMass,
       TraditionalScoring.massCoverage(assessments),
-      unitRatio(targetUnits.toDouble, words),
-      unitRatio(targetUnits.toDouble, seconds),
-      unitRatio(targetUnits.toDouble, (targetUnits + otherUnits).toDouble),
-      anchoringSits.size.toDouble,
+      unitCovered(unitRatio(targetUnits.toDouble, words)),
+      unitCovered(unitRatio(targetUnits.toDouble, seconds)),
+      unitCovered(unitRatio(targetUnits.toDouble, (targetUnits + otherUnits).toDouble)),
+      covered(anchoringEst, sitEligible, anchoringSits.size),
       perceptual,
       mental,
-      integration,
-      fragmentation,
-      ratio(semanticUnits.toDouble, assessed.toDouble),
-      ratio(otherUnits.toDouble, assessed.toDouble),
-      ratio(repetitionUnits.toDouble, assessed.toDouble),
-      probeGain(assessments),
+      covered(ratio(related.size.toDouble, targetSits.size.toDouble), sitEligible, related.size),
+      covered(fragmentationEst, sitEligible, nodes.size),
+      unitCovered(ratio(semanticUnits.toDouble, assessed.toDouble)),
+      unitCovered(ratio(otherUnits.toDouble, assessed.toDouble)),
+      unitCovered(ratio(repetitionUnits.toDouble, assessed.toDouble)),
+      probeGain(assessments, participantUnits),
       phenomenology(assessments, ratings, participantUnits)
     )
 

@@ -4,7 +4,7 @@ import cats.data.NonEmptyVector
 import munit.FunSuite
 
 import storymodel4s.core.*
-import storymodel4s.features.{Estimate, MissingReason}
+import storymodel4s.features.{Coverage, Estimate, MissingReason}
 import storymodel4s.interview.scoring.*
 import storymodel4s.recall.*
 import storymodel4s.story.NarrativeNodeId
@@ -111,8 +111,8 @@ class InterviewProfileSuite extends FunSuite:
   test("anchoring is invariant under copying the same place atom") {
     val once = scored(Vector(place("u", "d0", "p")), 1)
     val copies = scored((0 until 4).toVector.map(i => place("u", s"d$i", "p")), 1)
-    assertEquals(once.spatiotemporalAnchoring, 1.0)
-    assertEquals(copies.spatiotemporalAnchoring, once.spatiotemporalAnchoring)
+    assertEquals(once.spatiotemporalAnchoring.estimate, Estimate.observed(1.0))
+    assertEquals(copies.spatiotemporalAnchoring.estimate, once.spatiotemporalAnchoring.estimate)
   }
 
   test("mental atoms add no fragmentation node") {
@@ -120,8 +120,8 @@ class InterviewProfileSuite extends FunSuite:
     val withMental = twoEvents ++ (0 until 3).toVector.map(i => mental("u", s"m$i"))
     val a = scored(twoEvents, 1)
     val b = scored(withMental, 1)
-    assertEquals(a.fragmentation, Estimate.observed(0.0))
-    assertEquals(b.fragmentation, a.fragmentation)
+    assertEquals(a.fragmentation.estimate, Estimate.observed(0.0))
+    assertEquals(b.fragmentation.estimate, a.fragmentation.estimate)
   }
 
   test("density is invariant under re-atomizing the same unit") {
@@ -129,9 +129,9 @@ class InterviewProfileSuite extends FunSuite:
     val dense = (0 until 5).toVector.map(i => event("u", s"e$i", "s"))
     val a = scored(sparse, 1)
     val b = scored(dense, 1)
-    assertEquals(a.episodicDensityPerWord, Estimate.observed(0.1))
-    assertEquals(b.episodicDensityPerWord, a.episodicDensityPerWord)
-    assertEquals(b.episodicDensityPerSecond, a.episodicDensityPerSecond)
+    assertEquals(a.episodicDensityPerWord.estimate, Estimate.observed(0.1))
+    assertEquals(b.episodicDensityPerWord.estimate, a.episodicDensityPerWord.estimate)
+    assertEquals(b.episodicDensityPerSecond.estimate, a.episodicDensityPerSecond.estimate)
   }
 
   test("purity is invariant under within-episode re-atomization") {
@@ -143,8 +143,8 @@ class InterviewProfileSuite extends FunSuite:
       assessment("o", "o0", DetailAtom.EventOccurrence(sit("o")), otherAddr)
     val a = scored(oneEach, 2)
     val b = scored(fourTarget, 2)
-    assertEquals(a.eventPurity, Estimate.observed(0.5))
-    assertEquals(b.eventPurity, a.eventPurity)
+    assertEquals(a.eventPurity.estimate, Estimate.observed(0.5))
+    assertEquals(b.eventPurity.estimate, a.eventPurity.estimate)
   }
 
   test("probeGain is invariant under re-atomizing a phase") {
@@ -167,22 +167,28 @@ class InterviewProfileSuite extends FunSuite:
         InterviewPhase.SpecificProbe
       )
     )
-    assertEquals(ProfileScoring.probeGain(oneProbe), Estimate.observed(0.5))
-    assertEquals(ProfileScoring.probeGain(fourProbe), ProfileScoring.probeGain(oneProbe))
+    assertEquals(ProfileScoring.probeGain(oneProbe, 2).estimate, Estimate.observed(0.5))
+    assertEquals(ProfileScoring.probeGain(fourProbe, 2).estimate, Estimate.observed(0.5))
   }
 
   test("perceptual profile is a rate over unique situations") {
     val once = scored(Vector(visual("u", "v0", "s")), 1)
     val copies = scored((0 until 4).toVector.map(i => visual("u", s"v$i", "s")), 1)
-    assertEquals(once.perceptualProfile, Map(Modality.Visual -> 1.0))
-    assertEquals(copies.perceptualProfile, once.perceptualProfile)
+    assertEquals(once.perceptualProfile(Modality.Visual).estimate, Estimate.observed(1.0))
+    assertEquals(
+      copies.perceptualProfile(Modality.Visual).estimate,
+      once.perceptualProfile(Modality.Visual).estimate
+    )
   }
 
   test("mental profile counts unique units, not atoms") {
     val once = scored(Vector(mental("u", "m0")), 1)
     val copies = scored((0 until 4).toVector.map(i => mental("u", s"m$i")), 1)
-    assertEquals(once.mentalStateProfile, Map(MentalStateKind.Emotion -> 1.0))
-    assertEquals(copies.mentalStateProfile, once.mentalStateProfile)
+    assertEquals(once.mentalStateProfile(MentalStateKind.Emotion).estimate, Estimate.observed(1.0))
+    assertEquals(
+      copies.mentalStateProfile(MentalStateKind.Emotion).estimate,
+      once.mentalStateProfile(MentalStateKind.Emotion).estimate
+    )
   }
 
   test("strands are invariant under assessment order") {
@@ -206,8 +212,98 @@ class InterviewProfileSuite extends FunSuite:
 
   test("empty target situations yield missing fragmentation, not zero") {
     val ev = scored(Vector.empty, 0)
-    assertEquals(ev.fragmentation, Estimate.missing(MissingReason.Excluded))
-    assertEquals(ev.episodicDensityPerWord, Estimate.missing(MissingReason.Excluded))
-    assertEquals(ev.eventPurity, Estimate.missing(MissingReason.Excluded))
-    assertEquals(ev.probeGain, Estimate.missing(MissingReason.Excluded))
+    assertEquals(ev.fragmentation.estimate, Estimate.missing(MissingReason.Excluded))
+    assertEquals(ev.episodicDensityPerWord.estimate, Estimate.missing(MissingReason.Excluded))
+    assertEquals(ev.eventPurity.estimate, Estimate.missing(MissingReason.Excluded))
+    assertEquals(ev.probeGain.estimate, Estimate.missing(MissingReason.Excluded))
+    assertEquals(ev.spatiotemporalAnchoring.estimate, Estimate.missing(MissingReason.Excluded))
+  }
+
+  test("residual mass below 0.5 does not classify a unit") {
+    val leak = Distribution.unsafe(
+      targetAddr -> 0.85,
+      otherAddr -> 0.045,
+      MemoryAddress.Unresolved -> 0.105
+    )
+    val mixed = Distribution.unsafe(targetAddr -> 0.9, otherAddr -> 0.1)
+    def withAddr(id: String, dist: Distribution[MemoryAddress]): DetailAssessment =
+      event("u", id, "s").copy(address = dist)
+    val leaked = scored(Vector(withAddr("d0", leak)), 1)
+    val mixedP = scored(Vector(withAddr("d1", mixed)), 1)
+    assertEquals(leaked.eventPurity.estimate, Estimate.observed(1.0))
+    assertEquals(leaked.otherEventDrift.estimate, Estimate.observed(0.0))
+    assertEquals(mixedP.eventPurity.estimate, Estimate.observed(1.0))
+    assertEquals(mixedP.otherEventDrift.estimate, Estimate.observed(0.0))
+  }
+
+  test("TemporalFact.Relation is not an anchor") {
+    val rel = assessment(
+      "u",
+      "r0",
+      DetailAtom.TemporalFact(
+        TemporalClaim.Relation(sit("a"), RecallTemporalRelation.Before, sit("b"))
+      ),
+      targetAddr
+    )
+    val ev = scored(Vector(rel), 1)
+    assertEquals(ev.spatiotemporalAnchoring.estimate, Estimate.missing(MissingReason.Excluded))
+  }
+
+  test("induced alternative leak does not reclassify the target unit") {
+    val text = "We ate cake at the restaurant yesterday. The year before we drove to Montreal."
+    val graph = RecallSegmenter.segment(StorySource.fromText(text).toOption.get)
+    assert(
+      graph.ordered.size >= 2,
+      graph.ordered.map(u => u.text -> TargetInduction.classify(u)).toString
+    )
+    val details = graph.ordered.flatMap(u => AtomProjection.fromUnit(u, TurnId.unsafe("t")))
+    val cfg = InductionConfig.of(alternativeMargin = 1.0).toOption.get
+    val induced = TargetInduction.induce(graph, details, Cue("what happened", None, None), cfg)
+    assert(
+      induced.alternatives.nonEmpty,
+      s"alts=${induced.alternatives} others=${induced.otherEpisodes} units=${graph.ordered
+          .map(u => u.text -> TargetInduction.classify(u))}"
+    )
+    val as = details.flatMap { d =>
+      induced.addresses.get(d.id).map { addr =>
+        assessment(d.sourceUnit.value, d.id.value, d.atom, targetAddr).copy(
+          detail = d,
+          address = addr
+        )
+      }
+    }
+    def otherMass(a: DetailAssessment): Double =
+      a.massAt {
+        case MemoryAddress.Episode(_, EpisodeScope.OtherSpecific) => true
+        case _                                                    => false
+      }
+    val targetAs = as.filter(_.targetMass >= 0.5)
+    assert(targetAs.exists(a => otherMass(a) > 0.0 && otherMass(a) < 0.5))
+    val byUnit = as.groupBy(_.detail.sourceUnit).values
+    val targetN = byUnit.count(_.exists(_.targetMass >= 0.5))
+    val otherN = byUnit.count(_.exists(a => otherMass(a) >= 0.5))
+    assert(targetN >= 1)
+    assertEquals(otherN, 1)
+    val ev = scored(as, byUnit.size)
+    assertEquals(
+      ev.eventPurity.estimate,
+      Estimate.observed(targetN.toDouble / (targetN + otherN).toDouble)
+    )
+    assertEquals(
+      ev.otherEventDrift.estimate,
+      Estimate.observed(otherN.toDouble / byUnit.size.toDouble)
+    )
+  }
+
+  test("unit-rate coverage uses participantUnits, not assessed count") {
+    val as = Vector(
+      event("t", "t0", "s"),
+      assessment("o", "o0", DetailAtom.EventOccurrence(sit("o")), otherAddr)
+    )
+    val tight = scored(as, 2)
+    val wide = scored(as, 5)
+    assertEquals(tight.episodicDensityPerWord.estimate, wide.episodicDensityPerWord.estimate)
+    assertEquals(tight.episodicDensityPerWord.coverage, Coverage.unsafe(2, 2))
+    assertEquals(wide.episodicDensityPerWord.coverage, Coverage.unsafe(5, 2))
+    assertEquals(wide.eventPurity.coverage, Coverage.unsafe(5, 2))
   }
