@@ -1,6 +1,6 @@
 # ADR 0003 — Estimand support: shared law, carrier-specific result types
 
-**Status:** Proposed
+**Status:** Accepted (ratified 2026-08-29)
 
 **Date:** 2026-08-29
 
@@ -59,10 +59,23 @@ Every public scientific result MUST satisfy these six properties:
 6. **Obey the carrier-specific law.** Subprobabilities conserve mass; missing count information
    widens bounds; hard classifications abstain; and projections propagate support.
 
+**Conditioning mass is coverage.** When a quantity is a ratio conditioned on some mass, that mass
+is not a nuisance denominator: it MUST travel with the conditional value as support. Renormalizing
+by the mass while omitting it hides how little evidence the value rests on; when the conditioning
+mass is zero, the value is `Missing`. Unless a different reducer is explicitly named as part of the
+estimand, aggregate conditional quantities as a ratio of supported sums rather than a mean of
+per-unit ratios, which gives a tiny surviving residue the same vote as a fully supported unit.
+
 The condition is part of the estimand's identity. For example, "chronology among eligible
 source-to-source transitions" is a different quantity from unconditional trajectory chronology.
 Likewise, "coverage among leaves with resolved importance" is not a substitute for importance-
 weighted coverage over all leaves.
+
+Any change to a public estimand's definition, conditioning event, grain, weighting rule, or reducer
+MUST change a typed definition identity derived by the producer from the algorithm and its material
+parameters. A caller-supplied string or a version that identifies projection weights does not
+identify the input estimand. Publishing a redefined quantity under the old definition identity is
+itself a contract violation.
 
 ## Carrier contracts
 
@@ -204,5 +217,8 @@ the carrier law.
 The chief ratified the shared rule and the six properties on Mote coordination post
 `post-01M160WXB04D5HB6FXC9Z9XX47`. The motivating estimand audit is recorded in
 `post-01M160NCBZ0VJ6RTDX7ZV3BYNR`; the review that exposed a producer-path test gap is
-`post-01M160R50Z1QX1ZST1Y4HWWHYG`. This ADR is the chief-assigned work item
+`post-01M160R50Z1QX1ZST1Y4HWWHYG`. The conditioning-mass principle originates in m1's design
+analysis `post-01M162BWDYZ3H41SPNEZ2473F4`; the chief ratified it in
+`post-01M162FEB1VNM6TWMRQ7XMPEHD` and adopted the carrier algebra and derived-version refinements
+in `post-01M162GWXD475BKJV0M5JGFW50`. This ADR is the chief-assigned work item
 `bd-01M160WXHFCNTTW3VZD3BSTRGP`.
