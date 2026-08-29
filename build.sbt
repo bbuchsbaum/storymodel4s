@@ -75,7 +75,8 @@ lazy val root = tlCrossRootProject
     codec,
     fixtures,
     laws,
-    embedGrakern
+    embedGrakern,
+    embedBench
   )
 
 /** Identity, spans, evidence, claims, credence, provenance, hashing. No I/O. */
@@ -210,6 +211,16 @@ lazy val embedGrakern = project
   .dependsOn(embedCore.jvm, proposition.jvm, align.jvm % "compile->compile;test->test")
   .dependsOn(grakernCoreJVM, grakernStandardJVM, grakernGraph4sAdapterJVM, grakernEngineJVM)
 
+/** JVM-only evaluation harness (M1 W4(10), ADR 0001 §D7): scores gated alignments against
+  * adjudicated gold from frozen sets verified by manifest checksum, or against diagnostic material
+  * that can never be labelled calibrated. No portable module depends on it.
+  */
+lazy val embedBench = project
+  .in(file("embed-bench"))
+  .settings(commonSettings)
+  .settings(name := "storymodel4s-embed-bench")
+  .dependsOn(embedCore.jvm, embedGrakern, align.jvm, fixtures.jvm, laws.jvm % Test)
+
 /** Portable semantic view artifacts shared by the Narrative Codex and Narrative Atlas. */
 lazy val view = crossProject(JVMPlatform, JSPlatform, NativePlatform)
   .crossType(CrossType.Pure)
@@ -286,7 +297,7 @@ val allModules = List(
 )
 val allPlatforms = List("JVM", "JS", "Native")
 
-val jvmOnlyModules = List("embedGrakern")
+val jvmOnlyModules = List("embedGrakern", "embedBench")
 
 addCommandAlias(
   "compileAll",
