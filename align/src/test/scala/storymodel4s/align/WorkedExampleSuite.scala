@@ -265,7 +265,7 @@ class WorkedExampleSuite extends FunSuite:
   test("causal preservation needs two distinct recalled units linked by a recall causal edge") {
     // e4 → e5 is a source causal edge; recalled by u2 (e5) alone: not preserved
     val sig = RecallSignature.compute(result, recall, view)
-    assert(sig.causalPreservation.forall(_ == 0.0), sig.causalPreservation.toString)
+    assert(sig.causalPreservation.value.forall(_ == 0.0), sig.causalPreservation.render)
     // add a unit anchoring e4 and a recall causal edge u4 → u2
     val extraText = recallText + " She went down to the cellar."
     val src = StorySource.fromText(extraText).toOption.get
@@ -307,7 +307,7 @@ class WorkedExampleSuite extends FunSuite:
       .infer(rg, view, cands, DefaultLocalCostModel(semantic = sem))
       .fold(e => fail(e.message), identity)
     val sig2 = RecallSignature.compute(res, rg, view)
-    assert(sig2.causalPreservation.exists(_ > 0.0), sig2.causalPreservation.toString)
+    assert(sig2.causalPreservation.value.exists(_ > 0.0), sig2.causalPreservation.render)
   }
 
   test("relation preservation: the recalled 'before' is preserved in source world time") {

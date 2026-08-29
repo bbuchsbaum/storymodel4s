@@ -29,7 +29,7 @@ final case class RecallSignature(
     compression: MassRatio,
     discourseChronology: Option[Double],
     worldChronology: Option[Double],
-    causalPreservation: Option[Double],
+    causalPreservation: MassRatio,
     semanticFlowCoherence: MassRatio,
     associationMass: Double,
     intrusionMass: Double,
@@ -405,8 +405,17 @@ object RecallSignature:
         }
       }
     }
-    val causal =
-      if recalledCausal.isEmpty then None else Some(preserved.toDouble / recalledCausal.size)
+    // Causal preservation as a ratio of sums, per ADR 0003. The conditioning event is "this source
+    // causal edge was recalled at both endpoints", and its measure is a COUNT here rather than a
+    // mass - deliberately, and not by inattention to the specificity ruling. Localizability is
+    // defined on source mass and describes how concentrated that mass is, so summing mass was the
+    // only coherent denominator there. A causal edge is a discrete object in the source graph: it
+    // is recalled or it is not, and there is no partial edge for a mass to measure.
+    //
+    // The support is what the bare ratio never said: preserving 2 of 2 recalled edges out of 40 in
+    // the source is not the same finding as preserving 38 of 38 out of 40, and both published 1.0.
+    val causalRatio =
+      MassRatio.unsafe(preserved.toDouble, recalledCausal.size.toDouble, causalEdges.size.toDouble)
 
     // Coherence as a ratio of SUMS: N is coherent source-to-source mass summed over steps, A is all
     // source-to-source mass, T is every step's mass. A step with no source-to-source mass used to
@@ -446,7 +455,7 @@ object RecallSignature:
       compression,
       discourse,
       world,
-      causal,
+      causalRatio,
       semanticFlow,
       extMean(ExternalState.Association),
       extMean(ExternalState.Intrusion),
@@ -568,7 +577,7 @@ final class SignatureProjection private (
       "compression" -> s.compression.value,
       "discourseChronology" -> s.discourseChronology,
       "worldChronology" -> s.worldChronology,
-      "causalPreservation" -> s.causalPreservation,
+      "causalPreservation" -> s.causalPreservation.value,
       "semanticFlowCoherence" -> s.semanticFlowCoherence.value,
       "associationMass" -> Some(s.associationMass),
       "intrusionMass" -> Some(s.intrusionMass),
@@ -591,6 +600,7 @@ final class SignatureProjection private (
     val support: Map[String, Double] = Map(
       "fidelity" -> s.fidelityMass.support,
       "specificity" -> s.specificityMass.support,
+      "causalPreservation" -> s.causalPreservation.support,
       "compression" -> s.compression.support,
       "semanticFlowCoherence" -> s.semanticFlowCoherence.support
     ) ++ s.backwardMass.map(m => "backwardMass" -> m.comparableSteps.toDouble / m.totalSteps).toMap

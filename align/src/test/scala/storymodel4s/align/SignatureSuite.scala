@@ -60,7 +60,7 @@ class SignatureSuite extends FunSuite:
       compression = MassRatio.of(0.0, 0.0, 0.0).fold(e => fail(e.message), identity),
       discourseChronology = Some(0.0),
       worldChronology = None,
-      causalPreservation = None,
+      causalPreservation = MassRatio.of(0.0, 0.0, 0.0).fold(e => fail(e.message), identity),
       semanticFlowCoherence = MassRatio.of(0.0, 0.0, 0.0).fold(e => fail(e.message), identity),
       associationMass = associationMass,
       intrusionMass = intrusionMass,
@@ -173,7 +173,7 @@ class SignatureSuite extends FunSuite:
     // has no world order, so worldChronology is Missing by construction here.
     val name =
       if sig.worldChronology.isEmpty then "worldChronology"
-      else if sig.causalPreservation.isEmpty then "causalPreservation"
+      else if sig.causalPreservation.value.isEmpty then "causalPreservation"
       else if sig.backwardMass.isEmpty then "backwardMass"
       else fail("this fixture measures every component; the test needs one that is Missing")
     val p = SignatureProjection.of("v0", Map(name -> 1.0)).fold(e => fail(e.message), identity)
@@ -385,6 +385,48 @@ class SignatureSuite extends FunSuite:
     )
   }
 
+  test("causal preservation reports how much of the causal structure was reached") {
+    // The finding the bare ratio could not state. Preserving 2 of 2 recalled edges when the source
+    // has 40 published 1.0, and so did preserving 38 of 38. Same number, entirely different claim
+    // about the participant - the first is a person who recalled almost no causal structure and got
+    // the little they recalled right.
+    val result = GraphHsmm
+      .infer(recall, view, candidates, costModel)
+      .fold(e => fail(e.message), identity)
+    val s = RecallSignature.compute(result, recall, view)
+    val c = s.causalPreservation
+
+    // Support is the share of the SOURCE's causal edges that were recalled at both endpoints, so it
+    // is bounded by 1 and is not the ratio's own denominator dressed up.
+    assert(c.support >= 0.0 && c.support <= 1.0, c.render)
+    assert(c.conditioningMass <= c.totalMass, c.render)
+
+    // Independently derived, so this fails if the conditioning event silently changes to something
+    // else with the same cardinality on this fixture.
+    val edges = view
+      .adjacency(RelationLayer.Causal)
+      .toVector
+      .flatMap { case (a, m) => m.toVector.collect { case (b, w) if w > 0 => (a, b) } }
+    assertEqualsDouble(c.totalMass, edges.size.toDouble, 1e-9)
+    assert(edges.nonEmpty, "fixture has no causal edges, so this test proves nothing")
+
+    // No value when nothing was reached, rather than a 0.0 that reads as "preserved nothing".
+    if c.conditioningMass == 0.0 then assertEquals(c.value, None, c.render)
+
+    // THE ACTUAL GAIN, and it is visible on this very fixture: the participant reached NONE of the
+    // three causal edges, so the value abstains. Before the migration that abstention was a bare
+    // None, indistinguishable from a source that HAS no causal structure to preserve. Now the two
+    // are different objects - conditioning 0 of 3 versus 0 of 0 - and only the first is a fact
+    // about the participant. An abstention that cannot say why it abstained is barely better than
+    // the 1.0 it replaced.
+    assertEqualsDouble(c.conditioningMass, 0.0, 1e-9)
+    assertEqualsDouble(c.totalMass, 3.0, 1e-9)
+    assertEquals(c.value, None, c.render)
+    val noStructure = MassRatio.unsafe(0.0, 0.0, 0.0)
+    assertEquals(noStructure.value, c.value, "both abstain, as they should")
+    assertNotEquals(noStructure.totalMass, c.totalMass, "but they must not be the same object")
+  }
+
   test("specificity conditions on source MASS, and the two formulas differ on this fixture") {
     // Required by the ruling: a fixture with UNEQUAL source mass per unit, because an equal-mass
     // fixture cannot distinguish mass-weighting from mean-of-ratios - which is exactly how the
@@ -576,7 +618,7 @@ class SignatureSuite extends FunSuite:
     // computes a different linear functional under the same name and weights.
     val name =
       if sig.worldChronology.isEmpty then "worldChronology"
-      else if sig.causalPreservation.isEmpty then "causalPreservation"
+      else if sig.causalPreservation.value.isEmpty then "causalPreservation"
       else fail("this fixture measures every component; the test needs one that is Missing")
     val p = SignatureProjection
       .of("v0", Map(name -> 1.0, "compression" -> 1.0))
