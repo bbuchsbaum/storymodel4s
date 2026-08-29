@@ -89,6 +89,24 @@ Package namespace is flat `storymodel4s.<module>`.
    surviving `Map[Int, _]` or codec field re-bridges the coordinates for
    everything downstream, so a half-done migration is not a smaller done one — it
    is an undone one that looks done.
+   **And an empty-guard constant must declare its class.** `if xs.isEmpty then
+   <k>` appears at 16 sites carrying FIVE different meanings, with nothing at any
+   site saying which: *forced* (the guarded branch is never evaluated —
+   `hsmm.scala:665`), *delete-sentinel* (the value is filtered out downstream —
+   `StorySourceView.scala:236`, whose `0.0` is dropped by the next line's
+   `.filter(_._3 > 0.0)`), *conservative-as-1.0* (a distance refusing to claim
+   similarity — `lexicalJaccard`), *conservative-as-0.0* (a similarity refusing to
+   claim one — `lexicalOverlap`), and *flattering* (`dSens` scoring absence as a
+   perfect match, `dEnt` as mid-agreement). **Do not unify the constants** —
+   `lexicalJaccard`'s 1.0 and `lexicalOverlap`'s 0.0 are both correct, one being a
+   distance and the other a similarity. Unifying them would break working code to
+   satisfy a pattern. Require instead that each site SAYS which class it is; three
+   of the five are then cheap to review and only *flattering* needs argument. This
+   is why two adjacent methods on one object (`SoftCompatibility.frameOverlap`
+   returning 1.0, `argumentAgreement` returning 0.0, both higher-is-better) can
+   disagree with nobody noticing: neither states an intent, so there is nothing to
+   contradict.
+
 8. **Smart constructors + phantom states.** Invalid states are unrepresentable
    when rules are stable (`Checked`/`Unchecked`, `Draft`/`Validated`);
    validated/versioned data when the ontology is open (PropBank frames).
