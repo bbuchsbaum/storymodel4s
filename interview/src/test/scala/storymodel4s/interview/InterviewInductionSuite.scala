@@ -3,6 +3,7 @@ package storymodel4s.interview
 import munit.FunSuite
 
 import storymodel4s.core.*
+import storymodel4s.features.{Estimate, MissingReason}
 import storymodel4s.recall.*
 
 /** Laws for bd-01M15BM30JHMDHC28EZX8WTQBY and bd-01M15BM32YMTAWDM7ZSVN0KCP5.
@@ -156,4 +157,82 @@ class InterviewInductionSuite extends FunSuite:
     )
     assert(addr.support.exists(_.isTargetSpecific), addr.support.toString)
     assert(addr.mass(_.isTargetSpecific) > 0.4, addr.toVector.toString)
+  }
+
+  test("an absent class lookup is missing, never an observed specificity") {
+    assertEquals(
+      TargetInduction.specificityOf(None, anchored = false),
+      Estimate.missing(SpecificityMissingReason.Unclassified)
+    )
+  }
+
+  test("an explicitly uninterpretable unit has a distinct missing specificity") {
+    val text = "I cannot interpret this memory."
+    val source = StorySource.fromText(text).toOption.get
+    val base = RecallSegmenter.segment(source)
+    val uninterpretable = base.ordered.head.copy(function = DiscourseFunction.Uninterpretable)
+    val graph = base.copy(units = Vector(uninterpretable))
+    val details = AtomProjection.fromUnit(uninterpretable, TurnId.unsafe("uninterpretable"))
+    val result = TargetInduction.induce(graph, details, Cue("memory", None, None))
+
+    assert(details.nonEmpty)
+    details.foreach { detail =>
+      assertEquals(
+        result.specificity(detail.id),
+        Estimate.missing(SpecificityMissingReason.ClassifiedUninterpretable)
+      )
+    }
+  }
+
+  test("a detail whose source unit is absent gets a source-absent missing reason") {
+    val source = StorySource.fromText("We ate soup.").toOption.get
+    val graph = RecallSegmenter.segment(source)
+    val foreign = unit("I remember the birthday cake.")
+    val details = AtomProjection.fromUnit(foreign, TurnId.unsafe("foreign"))
+    val result = TargetInduction.induce(graph, details, Cue("birthday", None, None))
+
+    assert(details.nonEmpty)
+    details.foreach { detail =>
+      assertEquals(
+        result.specificity(detail.id),
+        Estimate.missing(SpecificityMissingReason.SourceUnitAbsent)
+      )
+    }
+  }
+
+  test("assessment never turns an omitted specificity entry into observed zero") {
+    val text = "I remember we ate cake."
+    val source = StorySource.fromText(text).toOption.get
+    val graph = RecallSegmenter.segment(source)
+    val turnId = TurnId.unsafe("assess")
+    val details = graph.ordered.flatMap(u => AtomProjection.fromUnit(u, turnId))
+    val result = TargetInduction
+      .induce(graph, details, Cue("cake", None, None))
+      .copy(specificity = Map.empty)
+    val participant = SpeakerId.unsafe("participant")
+    val interview = InterviewSource(
+      TranscriptAtlas(
+        SurfaceAnalyzer.analyze(source),
+        Vector(
+          TranscriptTurn(
+            turnId,
+            participant,
+            SpanSet.one(TextSpan.unsafe(0, source.canonicalText.length)),
+            None,
+            Some(InterviewPhase.FreeRecall),
+            None
+          )
+        ),
+        Map(participant -> SpeakerRole.Participant)
+      ),
+      Cue("cake", None, None),
+      Vector.empty,
+      None
+    )
+    val assessments = TargetInduction.assess(interview, graph, details, result)
+
+    assert(assessments.nonEmpty)
+    assessments.foreach { assessment =>
+      assertEquals(assessment.specificity, Estimate.missing(MissingReason.Unknown))
+    }
   }

@@ -3,8 +3,22 @@ package storymodel4s.interview
 import cats.data.NonEmptyVector
 
 import storymodel4s.core.*
-import storymodel4s.features.{Estimate, ScoreEstimate}
+import storymodel4s.features.{Estimate, MissingReason, ScoreEstimate}
 import storymodel4s.recall.*
+
+/** Namespaced reasons why interview specificity was applicable but unavailable. */
+object SpecificityMissingReason:
+  private val Namespace = "storymodel4s.interview.specificity"
+
+  /** Classification was absent despite the induction graph containing the source unit. */
+  val Unclassified: MissingReason = MissingReason.Custom(Namespace, "unclassified")
+
+  /** The source unit was explicitly classified as uninterpretable. */
+  val ClassifiedUninterpretable: MissingReason =
+    MissingReason.Custom(Namespace, "classified-uninterpretable")
+
+  /** The input detail referred to no unit in the induction graph. */
+  val SourceUnitAbsent: MissingReason = MissingReason.Custom(Namespace, "source-unit-absent")
 
 /** Injected semantic distance between two recall units (embeddings); `None` = lexical only. */
 trait SemanticDistance:
@@ -137,6 +151,24 @@ object TargetInduction:
   private def isEpisodic(c: UnitClass): Boolean = c match
     case UnitClass.Episodic | UnitClass.Summary | UnitClass.OtherEpisode => true
     case _                                                               => false
+
+  private[interview] def specificityOf(
+      classification: Option[UnitClass],
+      anchored: Boolean
+  ): ScoreEstimate =
+    classification match
+      case Some(UnitClass.Episodic) | Some(UnitClass.OtherEpisode) =>
+        Estimate.observed(if anchored then 0.85 else 0.65)
+      // A summary denotes the episode at reduced specificity (design record §61, §65).
+      case Some(UnitClass.Summary)         => Estimate.observed(if anchored then 0.45 else 0.3)
+      case Some(UnitClass.Habitual)        => Estimate.observed(0.15)
+      case Some(UnitClass.GeneralFact)     => Estimate.observed(0.05)
+      case Some(UnitClass.Uninterpretable) =>
+        Estimate.missing(SpecificityMissingReason.ClassifiedUninterpretable)
+      // Eligibility for the remaining discourse classes requires a portable three-way carrier;
+      // bd-01M16DBEH9PKER423BZ47ZKBMV owns that migration.
+      case Some(_) => Estimate.observed(0.0)
+      case None    => Estimate.missing(SpecificityMissingReason.Unclassified)
 
   private def lexicalOverlap(a: RecallUnit, b: RecallUnit): Double =
     val x = a.proposition.lemmas
@@ -465,19 +497,13 @@ object TargetInduction:
       }
     }.toMap
 
-    val specificity: Map[DetailId, ScoreEstimate] = details.flatMap { d =>
-      graph.byId.get(d.sourceUnit).map { u =>
-        val anchored = u.proposition.locations.nonEmpty || u.proposition.times.nonEmpty
-        val s: ScoreEstimate = classes.getOrElse(u.id, UnitClass.Uninterpretable) match
-          case UnitClass.Episodic | UnitClass.OtherEpisode =>
-            Estimate.observed(if anchored then 0.85 else 0.65)
-          // A summary denotes the episode at reduced specificity (design record §61, §65).
-          case UnitClass.Summary     => Estimate.observed(if anchored then 0.45 else 0.3)
-          case UnitClass.Habitual    => Estimate.observed(0.15)
-          case UnitClass.GeneralFact => Estimate.observed(0.05)
-          case _                     => Estimate.observed(0.0)
-        d.id -> s
-      }
+    val specificity: Map[DetailId, ScoreEstimate] = details.map { d =>
+      val estimate = graph.byId.get(d.sourceUnit) match
+        case Some(u) =>
+          val anchored = u.proposition.locations.nonEmpty || u.proposition.times.nonEmpty
+          specificityOf(classes.get(u.id), anchored)
+        case None => Estimate.missing(SpecificityMissingReason.SourceUnitAbsent)
+      d.id -> estimate
     }.toMap
 
     InductionResult(
@@ -533,7 +559,7 @@ object TargetInduction:
           d,
           address,
           DetailAssessment.defaultFacets(d.atom),
-          result.specificity.getOrElse(d.id, Estimate.observed(0.0)),
+          result.specificity.getOrElse(d.id, Estimate.missing(MissingReason.Unknown)),
           ExperientialEvidence(
             source.ratings.flatMap(_.reliving),
             firstPerson,
