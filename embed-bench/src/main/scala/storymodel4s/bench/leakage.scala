@@ -112,33 +112,43 @@ object LeakageControl:
       LeakageVerdict.NotApplicable("no memorizing channel under test", findings)
     else
       val baselineGains = baselines.flatMap(_.gain)
-      val baselineGain =
-        if baselineGains.isEmpty then None else Some(baselineGains.sum / baselineGains.size)
-      val withExcess = findings.map { f =>
-        if f.highStories > 0 && f.lowStories > 0 then
-          f.copy(
-            baselineGain = baselineGain,
-            excess = for g <- f.gain; b <- baselineGain yield g - b
-          )
-        else f
-      }
-      val receipt = ContentAddress.digest(
-        Vector("leakage/v1", metric, threshold.toString) ++
-          withExcess.flatMap(f =>
-            Vector(
-              f.channel,
-              f.exposure.render,
-              f.highStories.toString,
-              f.lowStories.toString,
-              f.excess.map(x => java.lang.Double.doubleToLongBits(x).toHexString).getOrElse("none")
+      if baselineGains.isEmpty then
+        // Baselines are present but none produced a usable contrast, so there is nothing to
+        // subtract. Falling through would report Clear — "measured, found nothing" — when nothing
+        // was measured, which is the one thing this verdict must never say.
+        LeakageVerdict.NotApplicable(
+          "baselines present but none has a computable gain; nothing to subtract",
+          findings
+        )
+      else
+        val baselineGain = Some(baselineGains.sum / baselineGains.size)
+        val withExcess = findings.map { f =>
+          if f.highStories > 0 && f.lowStories > 0 then
+            f.copy(
+              baselineGain = baselineGain,
+              excess = for g <- f.gain; b <- baselineGain yield g - b
             )
-          )
-      )
-      val suspect = withExcess.exists(f =>
-        f.exposure == ChannelExposure.Memorizing && f.excess.exists(_ > threshold)
-      )
-      if suspect then LeakageVerdict.Suspected(withExcess, threshold, receipt)
-      else LeakageVerdict.Clear(withExcess, threshold, receipt)
+          else f
+        }
+        val receipt = ContentAddress.digest(
+          Vector("leakage/v1", metric, threshold.toString) ++
+            withExcess.flatMap(f =>
+              Vector(
+                f.channel,
+                f.exposure.render,
+                f.highStories.toString,
+                f.lowStories.toString,
+                f.excess
+                  .map(x => java.lang.Double.doubleToLongBits(x).toHexString)
+                  .getOrElse("none")
+              )
+            )
+        )
+        val suspect = withExcess.exists(f =>
+          f.exposure == ChannelExposure.Memorizing && f.excess.exists(_ > threshold)
+        )
+        if suspect then LeakageVerdict.Suspected(withExcess, threshold, receipt)
+        else LeakageVerdict.Clear(withExcess, threshold, receipt)
 
   private def finding(
       report: ChannelReport,
