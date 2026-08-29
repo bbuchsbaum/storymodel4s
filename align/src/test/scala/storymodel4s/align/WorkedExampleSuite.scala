@@ -243,16 +243,20 @@ class WorkedExampleSuite extends FunSuite:
       sig.uniformCoverage > 0.25 && sig.uniformCoverage < 0.85,
       s"coverage = ${sig.uniformCoverage}"
     )
-    assert(sig.backwardMass > 0.1, s"backward = ${sig.backwardMass}")
-    assert(sig.worldBackwardMass.exists(_ > 0.1), s"world backward = ${sig.worldBackwardMass}")
-    assert(sig.discourseChronology < 1.0)
+    assert(sig.backwardMass.exists(_.perStep > 0.1), s"backward = ${sig.backwardMass}")
+    assert(
+      sig.worldBackwardMass.exists(_.perStep > 0.1),
+      s"world backward = ${sig.worldBackwardMass}"
+    )
+    assert(sig.discourseChronology.exists(_ < 1.0), sig.discourseChronology.toString)
     assert(sig.fidelity.exists(_ > 0.5), s"fidelity = ${sig.fidelity}")
     assert(sig.perUnitFidelity.contains(u2.id))
     assert(sig.specificity.exists(s => s > 0.0 && s <= 1.0), sig.specificity.toString)
     assertEqualsDouble(sig.unrankedMass, 0.0, 0.0)
-    val scalar =
-      SignatureProjection("v0", Map("uniformCoverage" -> 1.0, "intrusionMass" -> -1.0))(sig)
-    assert(scalar > 0.0)
+    val scalar = SignatureProjection
+      .of("v0", Map("uniformCoverage" -> 1.0, "intrusionMass" -> -1.0))
+      .fold(e => fail(e.message), identity)(sig)
+    assert(scalar.exists(_ > 0.0), scalar.toString)
   }
 
   test("causal preservation needs two distinct recalled units linked by a recall causal edge") {
@@ -305,7 +309,36 @@ class WorkedExampleSuite extends FunSuite:
 
   test("relation preservation: the recalled 'before' is preserved in source world time") {
     val diag = RelationPreservation.diagnostic(p, recall, view)
-    assert(diag(RelationLayer.WorldTime) > 0.5, diag.toString)
+    val l = diag(RelationLayer.WorldTime)
+    assert(l.mean.exists(_ > 0.5), l.render)
+    assert(l.evaluated > 0 && l.evaluated <= l.stated, l.render)
+  }
+
+  test("a layer the recall states no relations of is Missing, not perfectly preserved") {
+    // The retracted-but-real half of bd-01M162YNC4QQ2VKWQZQJZMFD9V: reporting 1.0 here claimed
+    // "every recalled relation is preserved" about a recall that claimed no relations at all.
+    val bare = recall.copy(relations = storymodel4s.recall.RecallRelations.empty)
+    val diag = RelationPreservation.diagnostic(p, bare, view)
+    assertEquals(diag(RelationLayer.WorldTime).mean, None)
+    assertEquals(diag(RelationLayer.WorldTime).stated, 0)
+    assertEquals(diag(RelationLayer.Causal).mean, None)
+  }
+
+  test("stated relations we cannot evaluate are reported as support, not scored as unpreserved") {
+    // A relation whose endpoints carry no source mass is not evidence of non-preservation - we
+    // could not place the units. It used to contribute 0.0 and drag the layer's mean down.
+    val ext = AlignState.unranked
+    val allExternal = AlignmentMatrix
+      .of(
+        recall.ordered
+          .map(u => AlignmentRow.of(u.id, Map(ext -> 1.0)).fold(e => fail(e.message), identity))
+      )
+      .fold(e => fail(e.message), identity)
+    val diag = RelationPreservation.diagnostic(allExternal, recall, view)
+    val l = diag(RelationLayer.WorldTime)
+    assert(l.stated > 0, s"this recall states temporal relations: ${l.render}")
+    assertEquals(l.evaluated, 0, l.render)
+    assertEquals(l.mean, None, s"unplaceable endpoints must not score as unpreserved: ${l.render}")
   }
 
   test("refinement passes keep the anchors, never resurrect a refused mode, and drive Viterbi") {
@@ -349,4 +382,20 @@ class WorkedExampleSuite extends FunSuite:
     val wt = SupportDensity.worldTime(p, view)
     assert(wt.nonEmpty)
     wt.get.zip(p.rows).foreach((d, r) => assertEqualsDouble(d.mass, r.sourceMass, 1e-6))
+  }
+
+  test("a simultaneity claim has no direction to preserve, so it is not scored as unpreserved") {
+    // WorldTime preservation asks whether a recalled ordering survives in the source. A claim that
+    // two things happened AT THE SAME TIME states no ordering, so there is nothing to preserve or
+    // violate; it used to contribute 0.0 and count as a failure to preserve.
+    import storymodel4s.recall.{RecallTemporalEdge, RecallTemporalRelation}
+    val simultaneousOnly = recall.copy(relations =
+      recall.relations.copy(temporal =
+        Vector(RecallTemporalEdge(u3.id, RecallTemporalRelation.Simultaneous, u2.id, None))
+      )
+    )
+    val l = RelationPreservation.diagnostic(p, simultaneousOnly, view)(RelationLayer.WorldTime)
+    assertEquals(l.stated, 1, l.render)
+    assertEquals(l.evaluated, 0, s"a simultaneity is not evaluable as an ordering: ${l.render}")
+    assertEquals(l.mean, None, l.render)
   }

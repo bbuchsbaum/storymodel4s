@@ -25,7 +25,7 @@ final case class RecallSignature(
     fidelity: Option[Double],
     specificity: Option[Double],
     compression: Double,
-    discourseChronology: Double,
+    discourseChronology: Option[Double],
     worldChronology: Option[Double],
     causalPreservation: Option[Double],
     semanticFlowCoherence: Double,
@@ -37,8 +37,8 @@ final case class RecallSignature(
     unrankedMass: Double,
     distortedMass: Double,
     distortedMassByFacet: Map[Facet, Double],
-    backwardMass: Double,
-    worldBackwardMass: Option[Double],
+    backwardMass: Option[StepMass],
+    worldBackwardMass: Option[StepMass],
     perUnitLocalizability: Map[RecallUnitId, Double],
     perUnitFidelity: Map[RecallUnitId, FidelityReport],
     perUnitMode: Map[RecallUnitId, FidelityMode]
@@ -57,11 +57,61 @@ final case class RecallSignature(
     * without carrying the caveat, because there is no method that hands back the sum.
     */
   def externalMass: ExternalMassReport =
-    ExternalMassReport(
+    ExternalMassReport.unsafe(
       attributed = associationMass + intrusionMass + commentaryMass +
         sourceConsistentInferenceMass + uninterpretableMass,
       unranked = unrankedMass
     )
+
+/** A per-step route quantity together with the support it rests on.
+  *
+  * The mean is over EVERY step of the route, not only the steps that carried comparable mass:
+  * dropping the others and renormalizing turns "one of three steps moved backward" into "the route
+  * moved backward", which is the same manufactured certainty this file exists to remove. The
+  * support says how many steps could be compared at all, so a reader can see that a per-step mass
+  * of 1/3 rests on one step out of three.
+  */
+final class StepMass private (
+    val perStep: Double,
+    val comparableSteps: Int,
+    val totalSteps: Int
+):
+  def render: String = f"$perStep%.4f (over $comparableSteps/$totalSteps comparable steps)"
+
+  override def equals(other: Any): Boolean = other match
+    case that: StepMass =>
+      perStep == that.perStep && comparableSteps == that.comparableSteps &&
+      totalSteps == that.totalSteps
+    case _ => false
+
+  override def hashCode: Int = (perStep, comparableSteps, totalSteps).hashCode
+  override def toString: String = s"StepMass(${render})"
+
+object StepMass:
+  /** Trusted construction from inside `align`, where the computation guarantees the invariants. */
+  private[align] def unsafe(perStep: Double, comparableSteps: Int, totalSteps: Int): StepMass =
+    new StepMass(perStep, comparableSteps, totalSteps)
+
+  /** Checked construction for anyone outside: a per-step mass must be a finite fraction, and the
+    * comparable steps must be a sub-count of the total.
+    */
+  def of(
+      perStep: Double,
+      comparableSteps: Int,
+      totalSteps: Int
+  ): Either[AlignError, StepMass] =
+    if perStep.isNaN || perStep.isInfinite || perStep < 0.0 || perStep > 1.0 then
+      Left(AlignError.MalformedRecord("stepMass", s"perStep must be a fraction, got $perStep"))
+    else if totalSteps < 1 then
+      Left(AlignError.MalformedRecord("stepMass", "a route with no steps has no per-step mass"))
+    else if comparableSteps < 0 || comparableSteps > totalSteps then
+      Left(
+        AlignError.MalformedRecord(
+          "stepMass",
+          s"comparableSteps $comparableSteps is not a sub-count of $totalSteps"
+        )
+      )
+    else Right(new StepMass(perStep, comparableSteps, totalSteps))
 
 /** External mass split into what the participant did and what we could not do.
   *
@@ -69,12 +119,45 @@ final case class RecallSignature(
   * prevent, and a caller that genuinely wants the sum must write it at the call site where a
   * reviewer can see it.
   */
-final case class ExternalMassReport(attributed: Double, unranked: Double):
+final class ExternalMassReport private (val attributed: Double, val unranked: Double):
   /** Fraction of mass the aligner was able to rank at all — the coverage of `attributed`. */
   def rankedMass: Double = 1.0 - unranked
 
   def render: String =
     f"external(attributed)=$attributed%.4f unranked=$unranked%.4f ranked=${rankedMass}%.4f"
+
+  override def equals(other: Any): Boolean = other match
+    case that: ExternalMassReport =>
+      attributed == that.attributed && unranked == that.unranked
+    case _ => false
+
+  override def hashCode: Int = (attributed, unranked).hashCode
+  override def toString: String = s"ExternalMassReport(${render})"
+
+object ExternalMassReport:
+  /** Trusted construction from inside `align`. */
+  private[align] def unsafe(attributed: Double, unranked: Double): ExternalMassReport =
+    new ExternalMassReport(attributed, unranked)
+
+  /** Checked construction: both halves are mean masses per unit, so each is a fraction and their
+    * sum cannot exceed the whole. A report claiming 1.2 of external mass is not a report.
+    */
+  def of(attributed: Double, unranked: Double): Either[AlignError, ExternalMassReport] =
+    val bad = Vector("attributed" -> attributed, "unranked" -> unranked).collectFirst {
+      case (n, v) if v.isNaN || v.isInfinite || v < 0.0 || v > 1.0 =>
+        AlignError.MalformedRecord("externalMassReport", s"$n must be a fraction, got $v")
+    }
+    bad match
+      case Some(e) => Left(e)
+      case None    =>
+        if attributed + unranked > 1.0 + 1e-9 then
+          Left(
+            AlignError.MalformedRecord(
+              "externalMassReport",
+              s"attributed + unranked is ${attributed + unranked}, more than the whole"
+            )
+          )
+        else Right(new ExternalMassReport(attributed, unranked))
 
 object RecallSignature:
 
@@ -134,15 +217,32 @@ object RecallSignature:
       val fw = f.steps.map(_.sourceMass(isForward(pos))).sum
       val bw = f.steps.map(_.sourceMass(isBackward(pos))).sum
       if fw + bw <= 0 then None else Some(fw / (fw + bw))
-    def backwardMean(pos: SourceNodeRef => Option[Double]): Double =
-      f.steps.map(_.sourceMass(isBackward(pos))).sum / math.max(1, f.steps.size)
+
+    /** Mean per-step backward mass over EVERY step, with the comparable-step support beside it.
+      *
+      * `None` only when the route has no steps at all — dividing by `max(1, 0)` used to report 0.0,
+      * "this person never moved backwards", when we never saw a move to judge. A step that carried
+      * no source-to-source mass is still a step of the route and stays in the denominator;
+      * excluding it would renormalize the residue into a stronger claim than the evidence.
+      */
+    def backwardMean(pos: SourceNodeRef => Option[Double]): Option[StepMass] =
+      if f.steps.isEmpty then None
+      else
+        val comparable = f.steps.count(st =>
+          st.sourceMass(isBackward(pos)) > 0.0 || st.sourceMass(isForward(pos)) > 0.0
+        )
+        val mean = f.steps.map(_.sourceMass(isBackward(pos))).sum / f.steps.size
+        Some(StepMass.unsafe(mean, comparable, f.steps.size))
     val discoursePos: SourceNodeRef => Option[Double] = r => Some(view.relativePosition(r))
     val worldPos: Option[SourceNodeRef => Option[Double]] =
       view.worldOrder.map(o => r => o.get(r).map(_.toDouble))
-    val discourse = ordered(discoursePos).getOrElse(1.0)
+    // `ordered` already abstains when no step carries directional mass; the previous
+    // `.getOrElse(1.0)` threw that away and published PERFECT forward chronology for a recall we
+    // could not place at all. The honest value is None.
+    val discourse = ordered(discoursePos)
     val world = worldPos.flatMap(ordered)
     val backward = backwardMean(discoursePos)
-    val worldBackward = worldPos.map(backwardMean)
+    val worldBackward = worldPos.flatMap(backwardMean)
 
     val causalEdges = view.adjacency(RelationLayer.Causal).toVector.sortBy(_._1.key).flatMap {
       case (a, m) => m.toVector.sortBy(_._1.key).collect { case (b, w) if w > 0 => (a, b) }
@@ -235,27 +335,115 @@ object RecallSignature:
     }
     view.leaves.map(n => n.ref -> (1.0 - math.exp(-acc(n.ref)))).toMap
 
-/** A declared scalar projection of the signature: explicit, versioned weights. */
-final case class SignatureProjection(version: String, weights: Map[String, Double]):
-  def apply(s: RecallSignature): Double =
-    val comps: Map[String, Double] = Map(
-      "uniformCoverage" -> s.uniformCoverage,
-      "importanceWeightedCoverage" -> s.importanceWeightedCoverage,
-      "fidelity" -> s.fidelity.getOrElse(0.0),
-      "specificity" -> s.specificity.getOrElse(0.0),
-      "compression" -> s.compression,
+/** Why a scalar projection could not be produced. Both cases used to be silent zeros. */
+enum ProjectionError:
+  /** A weight names a component that does not exist — a typo used to delete a term. */
+  case UnknownComponent(name: String)
+
+  /** A weighted component has no measurement; the projection abstains rather than inventing one. */
+  case MissingComponent(name: String)
+
+  /** A weight set that cannot define a projection: empty, or not finite. */
+  case InvalidWeights(detail: String)
+
+  def message: String = this match
+    case UnknownComponent(n) => s"projection weight names no such signature component: $n"
+    case MissingComponent(n) => s"projection weights $n, which this signature did not measure"
+    case InvalidWeights(d)   => s"projection weights are not a usable set: $d"
+
+/** A declared scalar projection of the signature: explicit, versioned weights.
+  *
+  * Returns `Either` because both failure modes are real and were previously invisible: a weight
+  * naming a component that does not exist silently dropped the term (a typo cost you a whole
+  * dimension of the score), and a component with no measurement was substituted with 0.0, so "we
+  * did not measure this" became "this scored worst" — or, under a negative weight, best.
+  */
+final class SignatureProjection private (
+    val version: String,
+    val weights: Map[String, Double]
+):
+  // Not a case class: a private constructor does not suppress the derived Mirror, whose public
+  // fromProduct would rebuild a projection from unvalidated weights.
+  override def equals(other: Any): Boolean = other match
+    case that: SignatureProjection => version == that.version && weights == that.weights
+    case _                         => false
+
+  override def hashCode: Int = (version, weights).hashCode
+
+  override def toString: String = s"SignatureProjection($version, ${weights.size} weights)"
+
+  def apply(s: RecallSignature): Either[ProjectionError, Double] =
+    val comps: Map[String, Option[Double]] = Map(
+      "uniformCoverage" -> Some(s.uniformCoverage),
+      "importanceWeightedCoverage" -> Some(s.importanceWeightedCoverage),
+      "fidelity" -> s.fidelity,
+      "specificity" -> s.specificity,
+      "compression" -> Some(s.compression),
       "discourseChronology" -> s.discourseChronology,
-      "worldChronology" -> s.worldChronology.getOrElse(0.0),
-      "causalPreservation" -> s.causalPreservation.getOrElse(0.0),
-      "semanticFlowCoherence" -> s.semanticFlowCoherence,
-      "associationMass" -> s.associationMass,
-      "intrusionMass" -> s.intrusionMass,
-      "commentaryMass" -> s.commentaryMass,
-      "sourceConsistentInferenceMass" -> s.sourceConsistentInferenceMass,
-      "uninterpretableMass" -> s.uninterpretableMass,
-      "unrankedMass" -> s.unrankedMass,
-      "distortedMass" -> s.distortedMass,
-      "backwardMass" -> s.backwardMass,
-      "worldBackwardMass" -> s.worldBackwardMass.getOrElse(0.0)
+      "worldChronology" -> s.worldChronology,
+      "causalPreservation" -> s.causalPreservation,
+      "semanticFlowCoherence" -> Some(s.semanticFlowCoherence),
+      "associationMass" -> Some(s.associationMass),
+      "intrusionMass" -> Some(s.intrusionMass),
+      "commentaryMass" -> Some(s.commentaryMass),
+      "sourceConsistentInferenceMass" -> Some(s.sourceConsistentInferenceMass),
+      "uninterpretableMass" -> Some(s.uninterpretableMass),
+      "unrankedMass" -> Some(s.unrankedMass),
+      "distortedMass" -> Some(s.distortedMass),
+      "backwardMass" -> s.backwardMass.map(_.perStep),
+      "worldBackwardMass" -> s.worldBackwardMass.map(_.perStep)
     )
-    weights.toVector.sortBy(_._1).map { case (k, w) => w * comps.getOrElse(k, 0.0) }.sum
+    val terms = weights.toVector.sortBy(_._1).map { case (k, w) =>
+      comps.get(k) match
+        case None          => Left(ProjectionError.UnknownComponent(k))
+        case Some(None)    => Left(ProjectionError.MissingComponent(k))
+        case Some(Some(v)) => Right(w * v)
+    }
+    terms.collectFirst { case Left(e) => e } match
+      case Some(e) => Left(e)
+      case None    => Right(terms.collect { case Right(v) => v }.sum)
+
+object SignatureProjection:
+  /** The known component names, so a weight set can be checked before it is ever applied. */
+  val components: Set[String] = Set(
+    "uniformCoverage",
+    "importanceWeightedCoverage",
+    "fidelity",
+    "specificity",
+    "compression",
+    "discourseChronology",
+    "worldChronology",
+    "causalPreservation",
+    "semanticFlowCoherence",
+    "associationMass",
+    "intrusionMass",
+    "commentaryMass",
+    "sourceConsistentInferenceMass",
+    "uninterpretableMass",
+    "unrankedMass",
+    "distortedMass",
+    "backwardMass",
+    "worldBackwardMass"
+  )
+
+  /** Smart constructor: a projection with no weights, or a non-finite weight, is not a projection.
+    *
+    * Empty weights used to produce `Right(0.0)` — a scalar summary of a signature computed from
+    * nothing — and a NaN or infinite weight produced a NaN or infinite score that would propagate
+    * silently through any aggregate built on it.
+    */
+  def of(
+      version: String,
+      weights: Map[String, Double]
+  ): Either[ProjectionError, SignatureProjection] =
+    if version.trim.isEmpty then Left(ProjectionError.InvalidWeights("version must be non-empty"))
+    else if weights.isEmpty then
+      Left(ProjectionError.InvalidWeights("a projection needs at least one weighted component"))
+    else
+      weights.toVector.sortBy(_._1).collectFirst {
+        case (k, w) if w.isNaN || w.isInfinite =>
+          ProjectionError.InvalidWeights(s"weight for $k is not finite")
+        case (k, _) if !components.contains(k) => ProjectionError.UnknownComponent(k)
+      } match
+        case Some(e) => Left(e)
+        case None    => Right(new SignatureProjection(version, weights))

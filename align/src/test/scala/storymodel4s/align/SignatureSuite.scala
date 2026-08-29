@@ -10,11 +10,18 @@ import munit.FunSuite
   * differ.
   */
 class SignatureSuite extends FunSuite:
+  import AnnaFixture.*
+
+  private lazy val sig: RecallSignature =
+    val result = GraphHsmm
+      .infer(recall, view, candidates, costModel)
+      .fold(e => fail(e.message), identity)
+    RecallSignature.compute(result, recall, view)
 
   private val eps = 1e-12
 
   private def report(attributed: Double, unranked: Double) =
-    ExternalMassReport(attributed, unranked)
+    ExternalMassReport.of(attributed, unranked).fold(e => fail(e.message), identity)
 
   test("RecallSignature.externalMass computes the exact production split") {
     val associationMass = 0.01
@@ -48,7 +55,7 @@ class SignatureSuite extends FunSuite:
       fidelity = None,
       specificity = None,
       compression = 0.0,
-      discourseChronology = 0.0,
+      discourseChronology = Some(0.0),
       worldChronology = None,
       causalPreservation = None,
       semanticFlowCoherence = 0.0,
@@ -60,7 +67,7 @@ class SignatureSuite extends FunSuite:
       unrankedMass = unrankedMass,
       distortedMass = 0.0,
       distortedMassByFacet = Map.empty,
-      backwardMass = 0.0,
+      backwardMass = Some(StepMass.of(0.0, 0, 1).fold(e => fail(e.message), identity)),
       worldBackwardMass = None,
       perUnitLocalizability = Map.empty,
       perUnitFidelity = Map.empty,
@@ -113,14 +120,201 @@ class SignatureSuite extends FunSuite:
     // here does. Verified by mutation: with `total` present and this file recompiled, the check
     // reports true and the test fails.
     assert(
-      !scala.compiletime.testing.typeChecks("ExternalMassReport(0.1, 0.2).total"),
+      !scala.compiletime.testing.typeChecks("ExternalMassReport.of(0.1, 0.2).toOption.get.total"),
       "ExternalMassReport.total exists; it re-creates the conflation this type prevents"
     )
     assert(
-      !scala.compiletime.testing.typeChecks("ExternalMassReport(0.1, 0.2).externalMass"),
+      !scala.compiletime.testing
+        .typeChecks("ExternalMassReport.of(0.1, 0.2).toOption.get.externalMass"),
       "an accessor named externalMass on the report would invite the same misreading"
     )
     // The control: the accessors that SHOULD exist do.
-    assert(scala.compiletime.testing.typeChecks("ExternalMassReport(0.1, 0.2).attributed"))
-    assert(scala.compiletime.testing.typeChecks("ExternalMassReport(0.1, 0.2).unranked"))
+    assert(
+      scala.compiletime.testing.typeChecks(
+        "ExternalMassReport.of(0.1, 0.2).toOption.get.attributed"
+      )
+    )
+    assert(
+      scala.compiletime.testing.typeChecks("ExternalMassReport.of(0.1, 0.2).toOption.get.unranked")
+    )
+  }
+
+  // --- the projection abstains instead of inventing (chief/scout estimand audit) ---
+
+  test("a weight naming a component that does not exist is rejected at construction") {
+    // Previously the typo survived construction and silently deleted that dimension of the score.
+    SignatureProjection.of("v0", Map("uniformCoverge" -> 1.0)) match
+      case Left(ProjectionError.UnknownComponent(n)) => assertEquals(n, "uniformCoverge")
+      case other => fail(s"a typo was accepted as a projection: $other")
+  }
+
+  test("a weight set that cannot define a projection is refused") {
+    // Empty weights used to produce Right(0.0): a scalar summary computed from nothing.
+    assert(SignatureProjection.of("v0", Map.empty).isLeft, "empty weights accepted")
+    assert(
+      SignatureProjection.of("v0", Map("uniformCoverage" -> Double.NaN)).isLeft,
+      "NaN weight accepted"
+    )
+    assert(
+      SignatureProjection.of("v0", Map("uniformCoverage" -> Double.PositiveInfinity)).isLeft,
+      "infinite weight accepted"
+    )
+    assert(SignatureProjection.of("", Map("uniformCoverage" -> 1.0)).isLeft, "empty version")
+  }
+
+  test("a weighted component with no measurement abstains, it does not score zero") {
+    // Zero is the worst possible value for a coverage-like component and the best under a negative
+    // weight, so substituting it turns 'not measured' into a substantive claim in either direction.
+    // Deterministic, not `assume`: an assume turns into a green skip the moment the fixture gains
+    // a world order, and a test that can silently stop running is not a guard. AnnaFixture's view
+    // has no world order, so worldChronology is Missing by construction here.
+    val name =
+      if sig.worldChronology.isEmpty then "worldChronology"
+      else if sig.causalPreservation.isEmpty then "causalPreservation"
+      else if sig.backwardMass.isEmpty then "backwardMass"
+      else fail("this fixture measures every component; the test needs one that is Missing")
+    val p = SignatureProjection.of("v0", Map(name -> 1.0)).fold(e => fail(e.message), identity)
+    p(sig) match
+      case Left(ProjectionError.MissingComponent(n)) => assertEquals(n, name)
+      case other => fail(s"a missing component was scored rather than abstained: $other")
+  }
+
+  test("a projection over present components still produces a number") {
+    val p = SignatureProjection
+      .of("v0", Map("uniformCoverage" -> 1.0, "intrusionMass" -> -1.0))
+      .fold(e => fail(e.message), identity)
+    // Pin the exact scalar: asserting only isRight lets any arithmetic mutation through.
+    val expected = sig.uniformCoverage - sig.intrusionMass
+    assertEqualsDouble(p(sig).fold(e => fail(e.message), identity), expected, 1e-12)
+  }
+
+  test("a recall with no comparable transition has NO chronology, not a perfect one") {
+    // The failure this replaces: `ordered(...)` already abstained when no step carried directional
+    // mass, and the caller substituted 1.0 - PERFECT forward chronology - for a recall we could not
+    // place at all. The best possible score, published from no evidence whatsoever.
+    val transcript =
+      storymodel4s.core.StorySource.fromText("nothing here.", Some("probe")).toOption.get
+    val silent = storymodel4s.recall.RecallGraph(
+      transcript,
+      storymodel4s.core.SurfaceAnalyzer.analyze(transcript),
+      Vector.empty,
+      storymodel4s.recall.RecallRelations.empty
+    )
+    val proof = HsmmResult
+      .validated(
+        silent,
+        view,
+        Map.empty,
+        AlignmentMatrix.of(Vector.empty).toOption.get,
+        TransitionFlow(Vector.empty),
+        Vector.empty,
+        -1.0,
+        Map.empty,
+        0
+      )
+      .fold(e => fail(e.message), identity)
+    val s = RecallSignature.compute(proof, silent, view)
+    assertEquals(s.discourseChronology, None, "no eligible step must not report perfect chronology")
+    assertEquals(s.backwardMass, None, "no eligible step must not report zero backward movement")
+    assertEquals(s.worldBackwardMass, None)
+  }
+
+  test("per-step mass keeps every step in the denominator, comparable or not") {
+    // The capacity gap the second review found. My first version used an EMPTY recall, which only
+    // exercises the empty-vector branch: a mutant that renormalized onto the comparable steps
+    // survived it, because in AnnaFixture every step happens to be comparable. This construction
+    // makes the first unit external, so step 0 carries no source-to-source mass while the rest do -
+    // the mixed case where renormalization and honest averaging give different answers.
+    val real = GraphHsmm
+      .infer(recall, view, candidates, costModel)
+      .fold(e => fail(e.message), identity)
+    val units = recall.ordered.map(_.id)
+    assert(units.size >= 3, "this construction needs at least three units")
+    val ext = AlignState.unranked
+    // Keep the REAL route, which already contains a backward move, and make only the FIRST unit
+    // external. Step 0 then carries no source-to-source mass while the rest do, so the route is
+    // mixed and its backward mass is nonzero - the case where renormalizing onto the comparable
+    // steps gives a different answer from averaging over the route.
+    val realState = (u: storymodel4s.recall.RecallUnitId) =>
+      real.posterior.row(u).flatMap(_.argmax).getOrElse(fail(s"no argmax for $u"))
+    val rows = units.zipWithIndex.map { case (u, i) =>
+      val st = if i == 0 then ext else realState(u)
+      AlignmentRow.of(u, Map(st -> 1.0)).fold(e => fail(e.message), identity)
+    }
+    val flow = TransitionFlow(
+      units.zip(units.tail).zipWithIndex.map { case ((a, b), i) =>
+        val from = if i == 0 then ext else realState(a)
+        FlowStep(a, b, Map((from, realState(b)) -> 1.0))
+      }
+    )
+    val costs = units.zipWithIndex.map { case (u, i) =>
+      val st = if i == 0 then ext else realState(u)
+      u -> real.costs.getOrElse(u, Map.empty).filter { case (k, _) => k == st }
+    }.toMap
+    val mixed = HsmmResult
+      .validated(
+        recall,
+        view,
+        real.candidateAnchors,
+        AlignmentMatrix.of(rows).fold(e => fail(e.message), identity),
+        flow,
+        rows.map(_.mass.head._1),
+        real.logLikelihood,
+        costs,
+        0
+      )
+      .fold(e => fail(s"mixed construction rejected: ${e.message}"), identity)
+    val s = RecallSignature.compute(mixed, recall, view)
+    s.backwardMass match
+      case None    => fail("a route with steps must report a per-step mass")
+      case Some(m) =>
+        assertEquals(m.totalSteps, units.size - 1, "denominator must be EVERY step")
+        assert(m.comparableSteps < m.totalSteps, s"construction is not mixed: ${m.render}")
+        assert(m.comparableSteps > 0, s"construction has no comparable step: ${m.render}")
+        assert(m.perStep > 0.0, s"construction has no backward mass to compare: ${m.render}")
+        // Every step in this construction carries exactly 1.0 of mass on a single state pair, so
+        // the total backward mass is at most comparableSteps and the honest per-step mean is at
+        // most comparableSteps/totalSteps. Renormalizing onto the comparable steps lifts it to at
+        // most 1.0, which breaks this bound whenever some step is not comparable.
+        //
+        // The bound is deliberately NOT computed from m.perStep. An earlier version of this test
+        // asserted perStep < perStep * total / comparable, which is invariant under the very
+        // mutation it was meant to catch - the expectation must not come from the code under test.
+        val bound = m.comparableSteps.toDouble / m.totalSteps
+        assert(m.perStep <= bound + 1e-12, s"per-step mass was renormalized: ${m.render}")
+  }
+
+  // --- the report types cannot be constructed in invalid states (bd-01M161EEPDV8NMC932KA8AY0QC) ---
+
+  test("an external mass report refuses masses that are not fractions of the whole") {
+    assert(ExternalMassReport.of(-0.1, 0.2).isLeft, "negative attributed accepted")
+    assert(ExternalMassReport.of(0.2, Double.NaN).isLeft, "NaN unranked accepted")
+    assert(ExternalMassReport.of(1.2, 0.0).isLeft, "attributed above 1 accepted")
+    // The pair is a split of the same whole, so together they cannot exceed it.
+    assert(ExternalMassReport.of(0.7, 0.7).isLeft, "attributed + unranked above 1 accepted")
+    assert(ExternalMassReport.of(0.4, 0.6).isRight)
+  }
+
+  test("a per-step mass refuses a comparable count that is not a sub-count of the total") {
+    assert(StepMass.of(0.5, 4, 3).isLeft, "more comparable steps than steps accepted")
+    assert(StepMass.of(0.5, -1, 3).isLeft, "negative comparable accepted")
+    assert(StepMass.of(0.5, 0, 0).isLeft, "a route with no steps reported a per-step mass")
+    assert(StepMass.of(Double.NaN, 1, 3).isLeft, "NaN per-step accepted")
+    assert(StepMass.of(1.5, 1, 3).isLeft, "per-step above 1 accepted")
+    assert(StepMass.of(0.5, 1, 3).isRight)
+  }
+
+  test("none of the report types derives a Mirror, so none can be forged past its constructor") {
+    // The same forge closed on PlacementResolution: a private constructor does not suppress
+    // Mirror.ProductOf, whose fromProduct rebuilds the value without consulting `of`.
+    assert(
+      !scala.compiletime.testing.typeChecks(
+        "summon[scala.deriving.Mirror.ProductOf[ExternalMassReport]]"
+      )
+    )
+    assert(
+      !scala.compiletime.testing.typeChecks(
+        "summon[scala.deriving.Mirror.ProductOf[StepMass]]"
+      )
+    )
   }
