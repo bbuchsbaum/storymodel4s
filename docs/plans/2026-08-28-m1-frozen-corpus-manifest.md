@@ -1,4 +1,4 @@
-# M1 W4(9) — Frozen corpus manifest (candidate list, rev 1)
+# M1 W4(9) — Frozen corpus manifest (candidate list, rev 2)
 
 **Bead:** bd-01M14YJ8FG15S0R1ART7DTM1XZ. **Status:** candidate list for **set 1**, under
 the adjudication protocol rev 1 (decisions of the chief, 2026-08-28,
@@ -81,6 +81,48 @@ Recall panel for set 1 (immediate free recall only): 6 development stories × 3 
 5 calibration stories × 3 + 5 untouched-test stories × 5 = **58 recalls**; set 2 adds
 15 test recalls (5 × 3) for the test → 8 expansion, plus the delayed-recall panel.
 
+## Training-data contamination (added rev 2; raised by the Araby proposal,
+`general/post-01M15PYE2TDDBB2GN0T2911B1Q`, and it indicts this manifest as first written)
+
+A frozen set exists to **select defaults** (ADR 0001 §D7). Every tested LLM channel has
+plausibly memorized famous stories *and their published summaries*; the free baselines
+(hashed n-gram, TF-IDF) and the structural channel have memorized nothing. Scoring both
+on a canonical text is therefore not a fair comparison — it can bias default selection
+toward the provider for a reason that has nothing to do with alignment quality. *The War
+of the Ghosts* was obscure, and that obscurity was doing quiet work we never wrote down.
+
+As first written this manifest ignored the problem and then selected some of the
+most-summarized short stories in English (`f3-ohenry-gift-of-the-magi`,
+`f3-saki-open-window`, `f3-bierce-owl-creek`, `f3-chopin-story-of-an-hour`,
+`f3-london-to-build-a-fire`). Rules, in force from rev 2:
+
+1. **Fame is a selection criterion.** Each story carries a `contaminationRisk` of
+   `low | medium | high`, judged by whether the text and student-facing summaries of it
+   are widely reproduced online. It is recorded in the manifest and in the freeze
+   receipt.
+2. **The untouched-test partition decides defaults, so it takes the strictest rule**:
+   `high` is disqualifying there, `medium` needs a written justification. Development and
+   calibration partitions may hold `medium`; `high` anywhere requires the report to name
+   it.
+3. **Contamination is reported, never assumed away.** A calibrated report states each
+   story's risk. A default selected on a set containing any `high` story is not
+   publishable as calibrated.
+4. **Fame×channel leakage control.** Because per-story macro means already exist, the
+   bench can test the leakage directly: within a channel, compare scores on `low` vs
+   `high` stories *relative to the free baselines on the same stories*. A provider that
+   gains on famous stories where the baselines do not is showing prior knowledge, not
+   alignment skill. This control runs before any default is selected.
+5. Published summaries, study guides, and student précis are **never** recall data.
+   Recall enters only as collected recalls under the protocol, or as authored paraphrases
+   explicitly labelled as such in an acceptance fixture.
+
+Consequence for the current list: the five stories named above are re-scored under rule
+1 before set 1 is frozen, and the `untouched test` slots (`f3-saki-open-window`,
+`f3-bierce-owl-creek`) are the ones that must move or be justified. This is a selection
+change, not a protocol change, so it does not disturb `protocolChecksum`; if the chief
+would rather make it a protocol law, that costs a protocol revision plus the one-line
+`ProtocolDocument.pinned` update in `embed-bench`, and both should land together.
+
 ## Fetch and provenance rules
 
 1. Fetch from the listed edition only; record `provenance.json` per story with URL or
@@ -99,8 +141,8 @@ Recall panel for set 1 (immediate free recall only): 6 development stories × 3 
 6. **Freeze receipt.** The manifest names the adjudication protocol's content checksum
    (`protocolChecksum`, protocol rev 1) so that any later edit of the protocol is
    detectable by the bench; it also records `panelSizes`, `recallConditions`,
-   `ceilingMargin`, `assistance`, `plannedExpansions`, and pseudonymized `staffing`
-   (protocol §6).
+   `ceilingMargin`, `assistance`, `plannedExpansions`, per-story `contaminationRisk`,
+   and pseudonymized `staffing` (protocol §6).
 
 ## Sign-off checklist (verify before freeze)
 
