@@ -123,7 +123,7 @@ was set by the owner on 2026-08-28 (sticky decision
    `storymodel4s` from source (`-Dstoryatlas4s.storymodel4s.build`), so it
    inherits every dependency edge added here. Whenever `main` moves in a way
    that touches anything it consumes — a new inter-module `dependsOn`, a change
-   to `core`/`view`/`features` — compile and test-compile `storyatlas4s` against
+   to `core`/`view`/`features` — compile and **run its test suite** against
    it. This is **part of the gate, not a follow-up**: for a candidate touching a
    consumed module, the seam check runs *before* the ack, exactly like the test
    run. Landing first and checking after is how the parity landing `04fdf6b`
