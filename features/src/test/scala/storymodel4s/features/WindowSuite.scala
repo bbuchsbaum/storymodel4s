@@ -220,6 +220,37 @@ class WindowSuite extends ScalaCheckSuite:
     )
   }
 
+  test("derived scalars refuse non-finite results; Maximum of MaxValue stays Observed") {
+    val missing = Estimate.Missing[Double](MissingReason.Undefined(UndefinedReason.NotFinite))
+    val maxPair = NonEmptyVector.of(
+      Sample(0, Estimate.observed(Double.MaxValue), 1.0),
+      Sample(1, Estimate.observed(Double.MaxValue), 1.0)
+    )
+    val signed = NonEmptyVector.of(
+      Sample(0, Estimate.observed(Double.MaxValue), 1.0),
+      Sample(1, Estimate.observed(-Double.MaxValue), 1.0)
+    )
+    assertEquals(red(ScalarReducer.Sum).reduce(maxPair), missing, "Sum")
+    assertEquals(red(ScalarReducer.Mean).reduce(maxPair), missing, "Mean")
+    assertEquals(red(ScalarReducer.Variance).reduce(signed), missing, "Variance")
+    assertEquals(red(ScalarReducer.Slope).reduce(signed), missing, "Slope")
+    assertEquals(
+      red(ScalarReducer.Maximum).reduce(maxPair),
+      Estimate.observed(Double.MaxValue),
+      "Maximum is the finite control"
+    )
+    assertEquals(
+      red(ScalarReducer.Kernel(KernelShape.Gaussian(1.0))).reduce(maxPair),
+      missing,
+      "scalar Kernel"
+    )
+    assertEquals(
+      WindowReducer.kernelAt(KernelShape.Gaussian(1.0), _.position.toDouble).reduce(maxPair),
+      missing,
+      "kernelAt"
+    )
+  }
+
   test("weighted mean honours sample weights") {
     val s = NonEmptyVector.of(
       Sample(0, Estimate.observed(1.0), 3.0),

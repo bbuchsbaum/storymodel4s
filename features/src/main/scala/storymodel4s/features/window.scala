@@ -123,10 +123,7 @@ object WindowReducer:
   ): Estimate[Double] =
     val tw = weights.sum
     if !Estimate.isFinite(tw) then undefined(UndefinedReason.NotFinite)
-    else if tw > 0.0 then
-      val q = values.zip(weights).map(_ * _).sum / tw
-      if Estimate.isFinite(q) then Estimate.observed(q)
-      else undefined(UndefinedReason.NotFinite)
+    else if tw > 0.0 then Estimate.score(values.zip(weights).map(_ * _).sum / tw)
     else undefined(UndefinedReason.ZeroTotalWeight)
 
   def scalar(reducer: ScalarReducer): WindowReducer[Double, Double] =
@@ -140,12 +137,12 @@ object WindowReducer:
         else
           val vs = values(obs)
           reducer match
-            case ScalarReducer.Sum      => Estimate.observed(vs.sum)
-            case ScalarReducer.Mean     => Estimate.observed(vs.sum / vs.size)
-            case ScalarReducer.Maximum  => Estimate.observed(vs.max)
-            case ScalarReducer.Variance => Estimate.observed(variance(vs))
+            case ScalarReducer.Sum      => Estimate.score(vs.sum)
+            case ScalarReducer.Mean     => Estimate.score(vs.sum / vs.size)
+            case ScalarReducer.Maximum  => Estimate.score(vs.max)
+            case ScalarReducer.Variance => Estimate.score(variance(vs))
             case ScalarReducer.Slope    =>
-              slope(obs).fold(undefined(UndefinedReason.SlopeNeedsTwoPositions))(Estimate.observed)
+              slope(obs).fold(undefined(UndefinedReason.SlopeNeedsTwoPositions))(Estimate.score(_))
             case ScalarReducer.WeightedMean =>
               finiteWeightedMean(vs, obs.map(_.weight))
             case ScalarReducer.Kernel(shape) =>
@@ -155,9 +152,9 @@ object WindowReducer:
               val tw = weighted.map(_._2).sum
               if !Estimate.isFinite(tw) then undefined(UndefinedReason.NotFinite)
               else if tw > 0.0 then
-                val q = weighted.map((s, w) => Estimate.finite(s.estimate).get * w).sum / tw
-                if Estimate.isFinite(q) then Estimate.observed(q)
-                else undefined(UndefinedReason.NotFinite)
+                Estimate.score(
+                  weighted.map((s, w) => Estimate.finite(s.estimate).get * w).sum / tw
+                )
               else if shape.isPointMass then
                 // a declared point mass with no sample exactly at the centre (even-length window):
                 // the nearest observed sample is the value at the centre
@@ -191,7 +188,7 @@ object WindowReducer:
                 // observed samples at the minimal distance, i.e. the whole nearest unit
                 val nearest = obs.map((s, _) => distance(s)).min
                 val vs = obs.collect { case (s, v) if distance(s) == nearest => v }
-                Estimate.observed(vs.sum / vs.size)
+                Estimate.score(vs.sum / vs.size)
               case Estimate.Missing(MissingReason.Undefined(UndefinedReason.ZeroTotalWeight)) =>
                 undefined(UndefinedReason.OutsideKernelSupport)
               case other => other
