@@ -99,7 +99,15 @@ not read the first trace and stopped at the same joint.
 3. The segmentation is **hand-overridden** — `segmentOne` merges the segmenter's two idea units into
    one because expectations are stated per statement, so the number is computed on a unit the
    pipeline does not produce.
-4. The synonym bridging is hand-authored and **carries the lexical argmax on 5 of 10 paraphrases**.
+4. The synonym bridging is hand-authored. It moves the **lexical** argmax on 5 of 10 paraphrases —
+   but its net contribution to the **full aligner** is **one paraphrase of seven**. The other four
+   are rescued by predicate, entity, granularity, structural and the HSMM transitions. *(Corrected
+   the same day: the "half the cases" figure is true of the lexical channel and false of the
+   aligner. Layer 4 is much thinner than it first appeared. The `Sensory` case, made most of in the
+   original report, hits **without** the table once the full model runs.)* Caveat carried from the
+   measurement: it uses a uniform top-5 source-hit metric, whereas the suite asserts differently
+   per case — `subtreeMass` for Vague, segment-level for Summary, `Distorted`-state checks for the
+   foils.
 
 Each is individually defensible and each is documented at the point it happens. The **stack** was
 invisible because nobody had counted it. If a second acceptance fixture is built, record not another
