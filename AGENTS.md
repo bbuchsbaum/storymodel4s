@@ -210,7 +210,19 @@ was set by the owner on 2026-08-28 (sticky decision
    ambiguous across them); cross-repo work is coordinated on the
    `narrative-atlas-intaglio` topic with provider/consumer SHAs recorded as
    notes, never as dependency edges between stores.
-4. **Evidence discipline.** A passing test suite is not evidence; it is the
+4. **Evidence discipline.** *Thirteen sub-rules; find yours here.* **What counts
+   as proof of a fix:** mutation proof · capacity to fail · distinguishability ·
+   a fixture must tell the hypotheses apart · an inequality is not a
+   discriminating assertion. **How to run the gate:** never pipe a gate · a
+   compile-time probe needs a clean recompile. **How to scope a finding:** sweep
+   the shape not the spelling · sweep your own work first · trace the
+   consequence. **What a number may claim:** the estimand check · no value and
+   low support are different failures · dropping a term from a normalized
+   aggregate rescales the rest. *(Five of the thirteen are about whether a test
+   can actually fail, and all five were added after a mutation survived — mostly
+   one lesson, learned five times.)*
+
+   A passing test suite is not evidence; it is the
    absence of one kind of counter-evidence. Three checks, each earned by a
    defect that a green suite did not catch:
 
