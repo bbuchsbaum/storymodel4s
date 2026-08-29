@@ -550,7 +550,11 @@ class InterviewSuite extends ScalaCheckSuite:
       )
     )
     InterviewSource(
-      TranscriptAtlas(atlas, turns, Map(iv -> probeTurnRole, pv -> SpeakerRole.Participant)),
+      TranscriptAtlas.unsafe(
+        atlas,
+        turns,
+        Map(iv -> probeTurnRole, pv -> SpeakerRole.Participant)
+      ),
       Cue("Tell me more.", None, None),
       Vector(Probe(probe, ProbeKind.General, TurnId.unsafe("t0"))),
       None

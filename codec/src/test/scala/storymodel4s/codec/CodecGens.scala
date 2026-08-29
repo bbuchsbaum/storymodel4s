@@ -660,7 +660,7 @@ object CodecFixture:
   val transcriptAtlas: TranscriptAtlas =
     val ra = recall.atlas
     val speaker = SpeakerId.unsafe("sp:participant")
-    val t = TranscriptAtlas(
+    TranscriptAtlas.unsafe(
       ra,
       Vector(
         TranscriptTurn(
@@ -674,4 +674,3 @@ object CodecFixture:
       ),
       Map(speaker -> SpeakerRole.Participant)
     )
-    TranscriptAtlas.validated(t).fold(e => throw new IllegalStateException(e.message), identity)

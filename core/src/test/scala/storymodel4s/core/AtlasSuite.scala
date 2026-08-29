@@ -95,46 +95,38 @@ class AtlasSuite extends ScalaCheckSuite:
     val src = source("Alpha beta. Gamma delta.")
     val atlas = SurfaceAnalyzer.analyze(src)
     val sent = atlas.sentences.head
-    val escaped = atlas.copy(units = atlas.units.map { u =>
+    val escaped = atlas.units.map { u =>
       if u.kind == SurfaceUnitKind.Token && u.parent.contains(sent.id) && u.ordinal == 0 then
         u.copy(span = TextSpan.unsafe(0, src.canonicalText.length))
       else u
-    })
-    assert(SurfaceAtlas.validated(escaped).isLeft)
-    val badOrd = atlas.copy(units =
+    }
+    assert(SurfaceAtlas.of(src, escaped).isLeft)
+    val badOrd =
       atlas.units.map(u => if u.kind == SurfaceUnitKind.Sentence then u.copy(ordinal = 0) else u)
+    assert(SurfaceAtlas.of(src, badOrd).isLeft)
+    val orphan = atlas.units :+ SurfaceUnit(
+      SurfaceUnitId.unsafe("orphan"),
+      SurfaceUnitKind.Token,
+      TextSpan.unsafe(0, 1),
+      999,
+      Some(SurfaceUnitId.unsafe("nope"))
     )
-    assert(SurfaceAtlas.validated(badOrd).isLeft)
-    val orphan = atlas.copy(units =
-      atlas.units :+ SurfaceUnit(
-        SurfaceUnitId.unsafe("orphan"),
-        SurfaceUnitKind.Token,
-        TextSpan.unsafe(0, 1),
-        999,
-        Some(SurfaceUnitId.unsafe("nope"))
-      )
+    assert(SurfaceAtlas.of(src, orphan).isLeft)
+    val tooLong = atlas.units :+ SurfaceUnit(
+      SurfaceUnitId.unsafe("long"),
+      SurfaceUnitKind.Paragraph,
+      TextSpan.unsafe(0, 10000),
+      5,
+      None
     )
-    assert(SurfaceAtlas.validated(orphan).isLeft)
-    val tooLong = atlas.copy(units =
-      atlas.units :+ SurfaceUnit(
-        SurfaceUnitId.unsafe("long"),
-        SurfaceUnitKind.Paragraph,
-        TextSpan.unsafe(0, 10000),
-        5,
-        None
-      )
+    assert(SurfaceAtlas.of(src, tooLong).isLeft)
+    val dup = atlas.units :+ atlas.units.head
+    assert(SurfaceAtlas.of(src, dup).isLeft)
+    val inverted = atlas.units.map(u =>
+      if u.kind == SurfaceUnitKind.Sentence then u.copy(parent = atlas.tokens.headOption.map(_.id))
+      else u
     )
-    assert(SurfaceAtlas.validated(tooLong).isLeft)
-    val dup = atlas.copy(units = atlas.units :+ atlas.units.head)
-    assert(SurfaceAtlas.validated(dup).isLeft)
-    val inverted = atlas.copy(units =
-      atlas.units.map(u =>
-        if u.kind == SurfaceUnitKind.Sentence then
-          u.copy(parent = atlas.tokens.headOption.map(_.id))
-        else u
-      )
-    )
-    assert(SurfaceAtlas.validated(inverted).isLeft)
+    assert(SurfaceAtlas.of(src, inverted).isLeft)
 
   test("language tags"):
     assert(LanguageTag.from("en").isRight)
@@ -214,12 +206,12 @@ class SplitterEdgeSuite extends munit.FunSuite:
     val src = StorySource.fromText("Alpha beta. Gamma delta.").toOption.get
     val atlas = SurfaceAnalyzer.analyze(src)
     val s0 = atlas.sentences.head
-    val overlapping = atlas.copy(units = atlas.units.map { u =>
+    val overlapping = atlas.units.map { u =>
       if u.kind == SurfaceUnitKind.Sentence && u.ordinal == 1 then
         u.copy(span = TextSpan.unsafe(s0.span.endExclusive - 2, u.span.endExclusive))
       else u
-    })
-    assert(SurfaceAtlas.validated(overlapping).isLeft)
+    }
+    assert(SurfaceAtlas.of(src, overlapping).isLeft)
   }
 
 class QuoteSuite extends munit.FunSuite:

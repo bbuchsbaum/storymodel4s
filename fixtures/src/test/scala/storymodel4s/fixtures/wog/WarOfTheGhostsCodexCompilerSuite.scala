@@ -27,7 +27,7 @@ class WarOfTheGhostsCodexCompilerSuite extends ScalaCheckSuite:
     parent = Some(model.atlas.sentences.head.id)
   )
   private val scaleAtlas = SurfaceAtlas
-    .validated(model.atlas.copy(units = model.atlas.units :+ clauseUnit))
+    .of(model.atlas.source, model.atlas.units :+ clauseUnit)
     .fold(error => fail(error.message), identity)
   private val tokenTarget: FeatureTarget = FeatureTarget.Token(TokenIndex.Zero)
   private val sentenceTarget: FeatureTarget = FeatureTarget.Sentence(model.atlas.sentences.head.id)

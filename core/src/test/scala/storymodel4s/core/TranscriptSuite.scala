@@ -68,7 +68,7 @@ class TranscriptSuite extends FunSuite:
   )
   private val roles =
     Map(interviewer -> SpeakerRole.Interviewer, participant -> SpeakerRole.Participant)
-  private val transcript = TranscriptAtlas(atlas, turns, roles)
+  private val transcript = TranscriptAtlas.unsafe(atlas, turns, roles)
 
   test("valid transcript validates") {
     assert(TranscriptAtlas.validated(transcript).isRight)
@@ -112,31 +112,27 @@ class TranscriptSuite extends FunSuite:
   }
 
   test("overlapping turns are rejected") {
-    val bad = transcript.copy(turns =
-      turns.updated(
-        1,
-        turns(1).copy(support =
-          SpanSet.one(atlas.paragraphs(0).span.hull(atlas.paragraphs(1).span))
-        )
-      )
+    val bad = turns.updated(
+      1,
+      turns(1).copy(support = SpanSet.one(atlas.paragraphs(0).span.hull(atlas.paragraphs(1).span)))
     )
-    assert(TranscriptAtlas.validated(bad).isLeft)
+    assert(TranscriptAtlas.of(atlas, bad, roles).isLeft)
   }
 
   test(
     "unordered turns, undeclared speakers, duplicate ids, and out-of-text support are rejected"
   ) {
-    assert(TranscriptAtlas.validated(transcript.copy(turns = turns.reverse)).isLeft)
-    assert(TranscriptAtlas.validated(transcript.copy(speakers = roles - participant)).isLeft)
-    assert(TranscriptAtlas.validated(transcript.copy(turns = turns :+ turns(0))).isLeft)
+    assert(TranscriptAtlas.of(atlas, turns.reverse, roles).isLeft)
+    assert(TranscriptAtlas.of(atlas, turns, roles - participant).isLeft)
+    assert(TranscriptAtlas.of(atlas, turns :+ turns(0), roles).isLeft)
     val far =
       turns(3).copy(support = SpanSet.one(TextSpan.unsafe(text.length + 5, text.length + 9)))
-    assert(TranscriptAtlas.validated(transcript.copy(turns = turns.init :+ far)).isLeft)
+    assert(TranscriptAtlas.of(atlas, turns.init :+ far, roles).isLeft)
   }
 
   test("audio order must agree with text order") {
     val swapped = turns.updated(3, turns(3).copy(audio = Some(AudioSpan.unsafe(100, 200))))
-    assert(TranscriptAtlas.validated(transcript.copy(turns = swapped)).isLeft)
+    assert(TranscriptAtlas.of(atlas, swapped, roles).isLeft)
   }
 
   test("AudioSpan smart constructor") {

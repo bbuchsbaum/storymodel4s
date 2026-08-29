@@ -89,7 +89,7 @@ object BirthdayInterview:
     }
 
   val transcript: TranscriptAtlas =
-    TranscriptAtlas(
+    TranscriptAtlas.unsafe(
       atlas,
       turns,
       Map(interviewer -> SpeakerRole.Interviewer, participant -> SpeakerRole.Participant)

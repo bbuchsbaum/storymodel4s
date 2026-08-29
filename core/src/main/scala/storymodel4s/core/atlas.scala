@@ -152,11 +152,15 @@ final case class SurfaceUnit(
 
 /** Exact surface decomposition of a source text.
   *
-  * Invariants (checked by [[SurfaceAtlas.validated]]): unique IDs; spans within the text; ordinals
-  * unique and increasing in discourse order per kind; units of one kind do not overlap; children
-  * within parent spans; parents exist and are of a coarser kind.
+  * Why a non-case class: unique IDs, bounded spans, coherent ordinals, non-overlap, and valid
+  * parentage must hold for every atlas that exists. Construct with [[SurfaceAtlas.of]] (checked) or
+  * [[SurfaceAtlas.unsafe]] (throws on violation); there is no unchecked `copy` or `fromProduct`
+  * path.
   */
-final case class SurfaceAtlas(source: StorySource, units: Vector[SurfaceUnit]):
+final class SurfaceAtlas private (
+    val source: StorySource,
+    val units: Vector[SurfaceUnit]
+):
   lazy val byId: Map[SurfaceUnitId, SurfaceUnit] = units.iterator.map(u => u.id -> u).toMap
 
   lazy val byKind: Map[SurfaceUnitKind, Vector[SurfaceUnit]] =
@@ -199,6 +203,15 @@ final case class SurfaceAtlas(source: StorySource, units: Vector[SurfaceUnit]):
 
   def text(u: SurfaceUnit): String = u.text(source)
 
+  override def equals(other: Any): Boolean = other match
+    case that: SurfaceAtlas => source == that.source && units == that.units
+    case _                  => false
+
+  override def hashCode(): Int = (source, units).hashCode()
+
+  override def toString: String =
+    s"SurfaceAtlas(${source.id.value}, units=${units.size})"
+
 object SurfaceAtlas:
   private val coarseness: Map[SurfaceUnitKind, Int] = Map(
     SurfaceUnitKind.Paragraph -> 0,
@@ -207,7 +220,7 @@ object SurfaceAtlas:
     SurfaceUnitKind.Token -> 3
   )
 
-  def validated(atlas: SurfaceAtlas): Either[DomainError, SurfaceAtlas] =
+  private def validate(atlas: SurfaceAtlas): Either[DomainError, SurfaceAtlas] =
     val textLen = atlas.source.canonicalText.length
     val dupId = atlas.units.groupBy(_.id).collectFirst { case (id, us) if us.size > 1 => id }
     val checks: Either[DomainError, Unit] = for
@@ -276,6 +289,22 @@ object SurfaceAtlas:
       }
     yield ()
     checks.as(atlas)
+
+  /** Checked constructor enforcing all surface-atlas invariants. */
+  def of(
+      source: StorySource,
+      units: Vector[SurfaceUnit]
+  ): Either[DomainError, SurfaceAtlas] =
+    validate(new SurfaceAtlas(source, units))
+
+  /** Throws `IllegalArgumentException` when any surface-atlas invariant is violated. */
+  def unsafe(source: StorySource, units: Vector[SurfaceUnit]): SurfaceAtlas =
+    of(source, units).fold(e => throw new IllegalArgumentException(e.message), identity)
+
+  /** Re-checks an existing value; always `Right` for values built through [[of]], kept for
+    * aggregate validators that recursively validate their members.
+    */
+  def validated(atlas: SurfaceAtlas): Either[DomainError, SurfaceAtlas] = validate(atlas)
 
 /** Deterministic, dependency-free surface analysis: paragraphs, sentences, tokens.
   *
@@ -434,7 +463,7 @@ object SurfaceAnalyzer:
         }
       }
     }
-    SurfaceAtlas(source, paragraphs.result() ++ sentences.result() ++ tokens.result())
+    SurfaceAtlas.unsafe(source, paragraphs.result() ++ sentences.result() ++ tokens.result())
 
   /** Paragraphs are maximal runs separated by one or more blank lines; leading/trailing whitespace
     * is excluded from the span.

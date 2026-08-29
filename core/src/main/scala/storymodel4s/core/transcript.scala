@@ -73,15 +73,15 @@ final case class TranscriptTurn(
 
 /** A surface atlas plus speaker turns and speaker roles.
   *
-  * Invariants (checked by [[TranscriptAtlas.validated]]): unique turn IDs; every turn's support
-  * lies within the text; turns are ordered by start and their hulls do not overlap (hence every
-  * token is covered by at most one turn); every turn's speaker has a declared role; audio spans,
-  * when present, are ordered consistently with text order.
+  * Why a non-case class: unique IDs, bounded non-overlapping supports, declared speakers, and
+  * coherent text/audio order must hold for every transcript that exists. Construct with
+  * [[TranscriptAtlas.of]] (checked) or [[TranscriptAtlas.unsafe]] (throws on violation); there is
+  * no unchecked `copy` or `fromProduct` path.
   */
-final case class TranscriptAtlas(
-    atlas: SurfaceAtlas,
-    turns: Vector[TranscriptTurn],
-    speakers: Map[SpeakerId, SpeakerRole]
+final class TranscriptAtlas private (
+    val atlas: SurfaceAtlas,
+    val turns: Vector[TranscriptTurn],
+    val speakers: Map[SpeakerId, SpeakerRole]
 ):
   lazy val byId: Map[TurnId, TranscriptTurn] = turns.iterator.map(t => t.id -> t).toMap
 
@@ -124,8 +124,18 @@ final case class TranscriptAtlas(
 
   def phaseOf(offset: Int): Option[InterviewPhase] = turnAt(offset).flatMap(_.phase)
 
+  override def equals(other: Any): Boolean = other match
+    case that: TranscriptAtlas =>
+      atlas == that.atlas && turns == that.turns && speakers == that.speakers
+    case _ => false
+
+  override def hashCode(): Int = (atlas, turns, speakers).hashCode()
+
+  override def toString: String =
+    s"TranscriptAtlas(${atlas.source.id.value}, turns=${turns.size}, speakers=${speakers.size})"
+
 object TranscriptAtlas:
-  def validated(t: TranscriptAtlas): Either[DomainError, TranscriptAtlas] =
+  private def validate(t: TranscriptAtlas): Either[DomainError, TranscriptAtlas] =
     val textLen = t.atlas.source.canonicalText.length
     val dup = t.turns.groupBy(_.id).collectFirst { case (id, ts) if ts.size > 1 => id }
     val checks: Either[DomainError, Unit] = for
@@ -153,3 +163,24 @@ object TranscriptAtlas:
       }
     yield ()
     checks.as(t)
+
+  /** Checked constructor enforcing all transcript-atlas invariants. */
+  def of(
+      atlas: SurfaceAtlas,
+      turns: Vector[TranscriptTurn],
+      speakers: Map[SpeakerId, SpeakerRole]
+  ): Either[DomainError, TranscriptAtlas] =
+    validate(new TranscriptAtlas(atlas, turns, speakers))
+
+  /** Throws `IllegalArgumentException` when any transcript-atlas invariant is violated. */
+  def unsafe(
+      atlas: SurfaceAtlas,
+      turns: Vector[TranscriptTurn],
+      speakers: Map[SpeakerId, SpeakerRole]
+  ): TranscriptAtlas =
+    of(atlas, turns, speakers).fold(e => throw new IllegalArgumentException(e.message), identity)
+
+  /** Re-checks an existing value; always `Right` for values built through [[of]], kept for
+    * aggregate validators that recursively validate their members.
+    */
+  def validated(t: TranscriptAtlas): Either[DomainError, TranscriptAtlas] = validate(t)

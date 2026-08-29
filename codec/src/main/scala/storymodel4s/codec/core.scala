@@ -173,7 +173,7 @@ object CoreCodecs:
     for
       s <- field[StorySource](c, "source")
       u <- field[Vector[SurfaceUnit]](c, "units")
-      a <- domain(c, SurfaceAtlas.validated(SurfaceAtlas(s, u)))
+      a <- domain(c, SurfaceAtlas.of(s, u))
     yield a
   }
 
@@ -186,7 +186,7 @@ object CoreCodecs:
   def decodeAtlasUnits(c: io.circe.HCursor, source: StorySource): Decoder.Result[SurfaceAtlas] =
     for
       u <- c.downField("units").as[Vector[SurfaceUnit]]
-      a <- domain(c, SurfaceAtlas.validated(SurfaceAtlas(source, u)))
+      a <- domain(c, SurfaceAtlas.of(source, u))
     yield a
 
   // ---- claims ---------------------------------------------------------------------------
@@ -409,7 +409,7 @@ object CoreCodecs:
       a <- field[SurfaceAtlas](c, "atlas")
       t <- field[Vector[TranscriptTurn]](c, "turns")
       s <- field[Map[SpeakerId, SpeakerRole]](c, "speakers")
-      r <- domain(c, TranscriptAtlas.validated(TranscriptAtlas(a, t, s)))
+      r <- domain(c, TranscriptAtlas.of(a, t, s))
     yield r
   }
 

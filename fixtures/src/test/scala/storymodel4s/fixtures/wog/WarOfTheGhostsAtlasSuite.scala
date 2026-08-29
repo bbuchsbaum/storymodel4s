@@ -79,7 +79,7 @@ class WarOfTheGhostsAtlasSuite extends FunSuite:
 
   def validatedAtlas(units: Vector[storymodel4s.core.SurfaceUnit]): SurfaceAtlas =
     SurfaceAtlas
-      .validated(SurfaceAtlas(model.source, units))
+      .of(model.source, units)
       .fold(error => fail(error.message), identity)
 
   def groundedHierarchy(evidenceSentence: Int = 0): NarrativeHierarchy =

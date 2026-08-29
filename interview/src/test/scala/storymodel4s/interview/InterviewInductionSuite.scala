@@ -248,7 +248,7 @@ class InterviewInductionSuite extends FunSuite:
       .copy(specificity = Map.empty)
     val participant = SpeakerId.unsafe("participant")
     val interview = InterviewSource(
-      TranscriptAtlas(
+      TranscriptAtlas.unsafe(
         SurfaceAnalyzer.analyze(source),
         Vector(
           TranscriptTurn(
