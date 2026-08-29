@@ -98,6 +98,11 @@ object Metrics:
     val structuralTermCoverage = "cost:structural-term-coverage"
     val semanticTermCoverage = "cost:semantic-term-coverage"
     val routeSupportMidpointDirection = "route:support-midpoint-direction"
+    val routeRevisitPairRecall = "route:revisit-pair-recall"
+    val routeRevisitPairPrecision = "route:revisit-pair-precision"
+    val routeGoldLevelCloseness = "route:gold-level-closeness"
+    val routeGoldLevelSignedBias = "route:gold-level-signed-bias"
+    val routeTransitionDisplacementCloseness = "route:transition-displacement-closeness"
     val all: Vector[String] =
       Ks.map(strictRecall) ++ Ks.map(ancestorCredit) ++ Vector(
         mrr,
@@ -113,7 +118,12 @@ object Metrics:
         inferenceMass,
         structuralTermCoverage,
         semanticTermCoverage,
-        routeSupportMidpointDirection
+        routeSupportMidpointDirection,
+        routeRevisitPairRecall,
+        routeRevisitPairPrecision,
+        routeGoldLevelCloseness,
+        routeGoldLevelSignedBias,
+        routeTransitionDisplacementCloseness
       )
     val openWorld: Set[String] = Set(externalRule, externalSubtype, inferenceMass)
 
@@ -149,6 +159,21 @@ object Metrics:
     */
   private[bench] def stepDirection(from: Double, to: Double): Int =
     math.signum(to - from).toInt
+
+  /** Exact recurrence pairs, linked to the most recent earlier occurrence of the same anchor.
+    * Adjacent equal anchors are dwell, not revisit.
+    */
+  private[bench] def recurrencePairs(
+      anchors: Vector[Option[SourceNodeRef]]
+  ): Vector[(Int, Int)] =
+    val lastSeen = scala.collection.mutable.Map.empty[SourceNodeRef, Int]
+    anchors.zipWithIndex.flatMap { case (anchor, current) =>
+      anchor.toVector.flatMap { ref =>
+        val pair = lastSeen.get(ref).filter(previous => current > previous + 1).map(_ -> current)
+        lastSeen.update(ref, current)
+        pair
+      }
+    }
 
   /** Strict recall at k: is any target inside the first k of the anchored ranking. */
   private[bench] def recallAt(
@@ -193,6 +218,11 @@ object Metrics:
       if g.isSourceAnchored then f else None
     def mapAnchor(row: AlignmentRow): Option[SourceNodeRef] = anchoredRanking(row).headOption
     def levelOf(ref: SourceNodeRef): Option[Int] = view.node(ref).map(_.level)
+    def hasUnranked(row: AlignmentRow): Boolean =
+      row.externalMass(ExternalState.Unranked) > 0.0
+    def unavailable(row: AlignmentRow): MetricObservation =
+      if hasUnranked(row) then MetricObservation.Missing(MissingReason.ProviderAbstained)
+      else MetricObservation.Missing(MissingReason.AllMissing)
 
     val recallAtK = Ks.map { k =>
       obs(Names.strictRecall(k)) { (row, g) =>
@@ -264,6 +294,30 @@ object Metrics:
         ranked(row)(row.externalMass(ExternalState.SourceConsistentInference))
       else MetricObservation.Ineligible
     }
+
+    def hierarchyMetric(name: String)(score: (Int, Int, Int) => Double) =
+      typedObs(name) { (row, g) =>
+        if view.maxLevel <= 0 then MetricObservation.Ineligible
+        else
+          g.primary match
+            case None                        => MetricObservation.Ineligible
+            case Some(_) if hasUnranked(row) =>
+              MetricObservation.Missing(MissingReason.ProviderAbstained)
+            case Some(gold) =>
+              mapAnchor(row).flatMap(levelOf) match
+                case Some(inferredLevel) =>
+                  MetricObservation.observed(score(inferredLevel, gold.level, view.maxLevel))
+                case None => unavailable(row)
+      }
+
+    val goldLevelCloseness = hierarchyMetric(Names.routeGoldLevelCloseness) {
+      (inferred, gold, maxLevel) =>
+        1.0 - math.abs(inferred - gold).toDouble / maxLevel
+    }
+    val goldLevelSignedBias = hierarchyMetric(Names.routeGoldLevelSignedBias) {
+      (inferred, gold, maxLevel) =>
+        (inferred - gold).toDouble / maxLevel
+    }
     def termCoverage(term: CostTerm): (AlignmentRow, GoldUnit) => Option[Double] = (row, _) =>
       val breakdowns = result.costs.getOrElse(row.unit, Map.empty).toVector.collect {
         case (s, b) if s.isSource => b
@@ -310,6 +364,70 @@ object Metrics:
         UnitObservation(u.id, observation)
       }
       Names.routeSupportMidpointDirection -> values
+
+    def positionOf(ref: SourceNodeRef): Option[Double] =
+      view.node(ref).map(_ => view.relativePosition(ref))
+    def goldAnchor(unit: RecallUnit): Option[SourceNodeRef] =
+      c.gold(unit.id).flatMap(_.primary).map(_.node)
+    val goldAnchors = units.map(goldAnchor)
+    val inferredRows = units.map(u => result.posterior.row(u.id))
+    val inferredAnchors = inferredRows.map(_.flatMap(mapAnchor))
+    def intervalHasUnranked(from: Int, to: Int): Boolean =
+      inferredRows.slice(from, to + 1).exists(_.exists(hasUnranked))
+    def pairObservations(
+        pairs: Vector[(Int, Int)],
+        comparison: Set[(Int, Int)]
+    ): Vector[UnitObservation] =
+      pairs.map { case pair @ (from, to) =>
+        val observation =
+          if intervalHasUnranked(from, to) then
+            MetricObservation.Missing(MissingReason.ProviderAbstained)
+          else MetricObservation.observed(ind(comparison.contains(pair)))
+        UnitObservation(units(to).id, observation)
+      }
+
+    val goldRecurrences = recurrencePairs(goldAnchors)
+    val inferredRecurrences = recurrencePairs(inferredAnchors)
+    val revisitRecall =
+      Names.routeRevisitPairRecall -> pairObservations(
+        goldRecurrences,
+        inferredRecurrences.toSet
+      )
+    val revisitPrecision =
+      Names.routeRevisitPairPrecision -> pairObservations(
+        inferredRecurrences,
+        goldRecurrences.toSet
+      )
+
+    val displacement =
+      val values = units.zipWithIndex.map { case (u, i) =>
+        val observation =
+          if i == 0 then MetricObservation.Ineligible
+          else
+            val previous = units(i - 1)
+            (goldAnchor(previous).flatMap(positionOf), goldAnchor(u).flatMap(positionOf)) match
+              case (Some(goldPrevious), Some(goldCurrent)) =>
+                (inferredRows(i - 1), inferredRows(i)) match
+                  case (Some(previousRow), Some(currentRow))
+                      if hasUnranked(previousRow) || hasUnranked(currentRow) =>
+                    MetricObservation.Missing(MissingReason.ProviderAbstained)
+                  case (Some(previousRow), Some(currentRow)) =>
+                    (
+                      mapAnchor(previousRow).flatMap(positionOf),
+                      mapAnchor(currentRow).flatMap(positionOf)
+                    ) match
+                      case (Some(inferredPrevious), Some(inferredCurrent)) =>
+                        val goldDistance = math.abs(goldCurrent - goldPrevious)
+                        val inferredDistance = math.abs(inferredCurrent - inferredPrevious)
+                        MetricObservation.observed(
+                          1.0 - math.abs(goldDistance - inferredDistance)
+                        )
+                      case _ => MetricObservation.Missing(MissingReason.AllMissing)
+                  case _ => MetricObservation.Missing(MissingReason.AllMissing)
+              case _ => MetricObservation.Ineligible
+        UnitObservation(u.id, observation)
+      }
+      Names.routeTransitionDisplacementCloseness -> values
     val structuralCoverage = obs(Names.structuralTermCoverage)(termCoverage(CostTerm.Structural))
     val semanticCoverage = obs(Names.semanticTermCoverage)(termCoverage(CostTerm.Semantic))
 
@@ -317,6 +435,11 @@ object Metrics:
       c.id,
       (recallAtK ++ ancestorAtK ++ Vector(
         route,
+        revisitRecall,
+        revisitPrecision,
+        goldLevelCloseness,
+        goldLevelSignedBias,
+        displacement,
         mrr,
         levelExact,
         summaryAccuracy,
