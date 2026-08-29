@@ -146,6 +146,43 @@ class WogDiagnosticSuite extends FunSuite:
     }
   }
 
+  test("a signature refusal is recorded as the exact case failure, never dropped or defaulted") {
+    val base = WogDiagnostic.fullRecallCase
+    val malformedLeaf = base.view.leaves.headOption.fold(fail("WOG has no source leaf"))(_.ref)
+    val edges = RelationLayer.values.toVector.map { layer =>
+      val triples = base.view.adjacency(layer).toVector.flatMap { case (from, targets) =>
+        targets.toVector.map { case (to, weight) => (from, to, weight) }
+      }
+      layer -> triples
+    }.toMap
+    val malformedView = InMemorySourceView(
+      base.view.nodes.map(n =>
+        if n.ref == malformedLeaf then n.copy(importance = Estimate.observed(Double.NaN)) else n
+      ),
+      edges,
+      base.view.worldOrder,
+      base.view.textLength
+    )
+    val malformedCase = base.copy(id = "wog:malformed-importance", view = malformedView)
+    val result = Bench
+      .run(
+        Vector(malformedCase),
+        WogDiagnostic.factories(dimension = 32, seed = 7L).take(1),
+        ProtocolDocument.pinned,
+        BenchConfig(seed = 11L, resamples = 1)
+      )
+      .fold(e => fail(e.message), identity)
+    val channel = result.channelReports.headOption.getOrElse(fail("bench produced no channel"))
+
+    assertEquals(channel.runs, Vector.empty, "a refused signature became a successful case run")
+    channel.failures match
+      case Vector(
+            ("wog:malformed-importance", AlignError.MalformedRecord("weightedCoverage", d))
+          ) =>
+        assert(d.contains("not finite"), d)
+      case other => fail(s"signature refusal was dropped or changed: $other")
+  }
+
   test(
     "absence is reported, not scored: WOG carries no charts, so the structural term has zero coverage"
   ) {
