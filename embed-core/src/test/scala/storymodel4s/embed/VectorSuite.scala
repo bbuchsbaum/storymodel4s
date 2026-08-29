@@ -20,7 +20,9 @@ class VectorSuite extends ScalaCheckSuite:
     )
     assert(ValidatedVector.of(d4, Normalization.L2, Vector(1.0, 2.0, 3.0, 4.0)).isLeft)
     assert(ValidatedVector.of(d4, Normalization.L2, Vector(1.0, 0.0, 0.0, 0.0)).isRight)
-    assert(ValidatedVector.of(d4, Normalization.L2, Vector(1.0 + 5e-7, 0.0, 0.0, 0.0)).isRight)
+    val near =
+      ValidatedVector.of(d4, Normalization.L2, Vector(1.0 + 5e-7, 0.0, 0.0, 0.0)).toOption.get
+    assert(math.abs(near.norm - 1.0) < 1e-15, s"near-unit L2 stored unabsorbed: norm=${near.norm}")
     assert(ValidatedVector.l2(d4, Vector(0.0, 0.0, 0.0, 0.0)).isLeft)
     assert(Dimension.of(0).isLeft && Dimension.of(-3).isLeft && Dimension.of(1).isRight)
   }
@@ -39,6 +41,29 @@ class VectorSuite extends ScalaCheckSuite:
     assertEquals(
       first.toString,
       "ValidatedVector(dimension=4, normalization=unnormalized, size=4)"
+    )
+  }
+
+  test("L2 of absorbs slack inside NormTolerance and refuses past it") {
+    // Occurs unmeasured. The type claims unit norm; storing the originals would leave the
+    // label and the coordinates disagreeing. NormTolerance itself is not retuned here.
+    // `1.0 - NormTolerance` needs the same one-ulp fold as PlacementResolution: the
+    // constructed literal is otherwise just outside the stated bound.
+    val t = ValidatedVector.NormTolerance
+    val high =
+      ValidatedVector.of(d4, Normalization.L2, Vector(1.0 + t, 0.0, 0.0, 0.0)).toOption.get
+    assert(math.abs(high.norm - 1.0) < 1e-15, s"1 + NormTolerance stored unabsorbed: ${high.norm}")
+    assert(high.values(0) != 1.0 + t, "admitted slack was published unchanged")
+    val low =
+      ValidatedVector.of(d4, Normalization.L2, Vector(1.0 - t, 0.0, 0.0, 0.0)).toOption.get
+    assert(math.abs(low.norm - 1.0) < 1e-15, s"1 - NormTolerance stored unabsorbed: ${low.norm}")
+    assert(
+      ValidatedVector.of(d4, Normalization.L2, Vector(1.0 + 2 * t, 0.0, 0.0, 0.0)).isLeft,
+      "1 + 2*NormTolerance absorbed"
+    )
+    assert(
+      ValidatedVector.of(d4, Normalization.L2, Vector(1.0 - 2 * t, 0.0, 0.0, 0.0)).isLeft,
+      "1 - 2*NormTolerance absorbed"
     )
   }
 
