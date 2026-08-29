@@ -78,6 +78,27 @@ object Metrics:
       )
     val openWorld: Set[String] = Set(externalRule, externalSubtype, inferenceMass)
 
+  /** Rank of the first target in an anchored ranking, as a reciprocal; 0 when absent.
+    *
+    * Extracted as a pure function because the arithmetic is a claim in its own right: an off-by-one
+    * here silently rescales every MRR the bench has ever reported, and no aggregation test can see
+    * it.
+    */
+  private[bench] def reciprocalRank(
+      ranking: Vector[SourceNodeRef],
+      targets: Set[SourceNodeRef]
+  ): Double =
+    val idx = ranking.indexWhere(targets.contains)
+    if idx < 0 then 0.0 else 1.0 / (idx + 1)
+
+  /** Strict recall at k: is any target inside the first k of the anchored ranking. */
+  private[bench] def recallAt(
+      ranking: Vector[SourceNodeRef],
+      targets: Set[SourceNodeRef],
+      k: Int
+  ): Double =
+    if ranking.take(k).exists(targets.contains) then 1.0 else 0.0
+
   def observe(c: BenchCase, result: HsmmResult): CaseObservations =
     val view = c.view
     val units = c.recall.ordered
@@ -110,7 +131,7 @@ object Metrics:
 
     val recallAtK = Ks.map { k =>
       obs(Names.strictRecall(k)) { (row, g) =>
-        sourceOnly(g)(Some(ind(hit(g, anchoredRanking(row).take(k)))))
+        sourceOnly(g)(Some(recallAt(anchoredRanking(row), g.targetNodes.toSet, k)))
       }
     }
     val ancestorAtK = Ks.map { k =>
@@ -122,11 +143,7 @@ object Metrics:
       }
     }
     val mrr = obs(Names.mrr) { (row, g) =>
-      sourceOnly(g) {
-        val ranking = anchoredRanking(row)
-        val idx = ranking.indexWhere(g.targetNodes.contains)
-        Some(if idx < 0 then 0.0 else 1.0 / (idx + 1))
-      }
+      sourceOnly(g)(Some(reciprocalRank(anchoredRanking(row), g.targetNodes.toSet)))
     }
     val levelExact = obs(Names.levelExact) { (row, g) =>
       sourceOnly(g) {

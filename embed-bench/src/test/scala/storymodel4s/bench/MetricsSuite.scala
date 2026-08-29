@@ -2,7 +2,8 @@ package storymodel4s.bench
 
 import munit.FunSuite
 
-import storymodel4s.core.Checksum
+import storymodel4s.align.SourceNodeRef
+import storymodel4s.core.{Checksum, SituationId}
 import storymodel4s.features.Estimate
 import storymodel4s.recall.RecallUnitId
 
@@ -82,4 +83,29 @@ class MetricsSuite extends FunSuite:
     assert(Metrics.Names.openWorld.subsetOf(all.toSet))
     assert(Metrics.Names.openWorld.forall(_.startsWith("open-world:")))
     assert(all.filterNot(Metrics.Names.openWorld).forall(n => !n.startsWith("open-world:")))
+  }
+
+  // --- the scoring arithmetic itself, not merely its aggregation ---
+
+  private def ref(i: Int) = SourceNodeRef.Situation(SituationId.unsafe(s"n$i"))
+
+  test("reciprocal rank is exactly 1, 1/2, 1/3 by position, and 0 when the target is absent") {
+    val ranking = Vector(ref(1), ref(2), ref(3))
+    assertEquals(Metrics.reciprocalRank(ranking, Set(ref(1))), 1.0)
+    assertEquals(Metrics.reciprocalRank(ranking, Set(ref(2))), 0.5)
+    assertEquals(Metrics.reciprocalRank(ranking, Set(ref(3))), 1.0 / 3.0)
+    assertEquals(Metrics.reciprocalRank(ranking, Set(ref(9))), 0.0)
+    // the FIRST target found wins, not the best-numbered one
+    assertEquals(Metrics.reciprocalRank(ranking, Set(ref(2), ref(3))), 0.5)
+    assertEquals(Metrics.reciprocalRank(Vector.empty, Set(ref(1))), 0.0)
+  }
+
+  test("strict recall at k is a step function at exactly k, with no off-by-one") {
+    val ranking = Vector(ref(1), ref(2), ref(3), ref(4))
+    assertEquals(Metrics.recallAt(ranking, Set(ref(3)), 2), 0.0)
+    assertEquals(Metrics.recallAt(ranking, Set(ref(3)), 3), 1.0)
+    assertEquals(Metrics.recallAt(ranking, Set(ref(1)), 1), 1.0)
+    assertEquals(Metrics.recallAt(ranking, Set(ref(2)), 1), 0.0)
+    assertEquals(Metrics.recallAt(ranking, Set(ref(1)), 0), 0.0)
+    assertEquals(Metrics.recallAt(ranking, Set(ref(9)), 4), 0.0)
   }
