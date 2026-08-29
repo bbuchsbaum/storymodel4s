@@ -573,6 +573,19 @@ object CodexTextualTwin:
           case EpistemicHorizon.ReaderAt(offset) => s"reader-at-$offset"
       )
       .append('\n')
+    out.append("Scale: ").append(flow.contract.scale.label).append('\n')
+    out
+      .append("Feature selection: ")
+      .append(renderFeatureSelection(flow.contract.feature))
+      .append('\n')
+    out
+      .append("Resolved feature space: ")
+      .append(flow.contract.feature.resolvedSpaceId.fold("none")(_.value))
+      .append('\n')
+    out
+      .append("Feature channel: ")
+      .append(renderFeatureState(flow.contract.feature))
+      .append('\n')
     out
       .append("Channels: ")
       .append(flow.contract.activeKinds.toVector.map(_.wireName).sorted.mkString(","))
@@ -594,6 +607,19 @@ object CodexTextualTwin:
     if flow.annotations.isEmpty then out.append("(none)\n")
     else flow.annotations.foreach(annotation => renderAnnotation(annotation, flow.lanes, out))
     out.result()
+
+  private def renderFeatureSelection(state: FeatureChannelState): String = state match
+    case FeatureChannelState.NotRequested                     => "none"
+    case FeatureChannelState.Unresolved(selection, _)         => selection.canonicalString
+    case FeatureChannelState.Missing(selection, _)            => selection.canonicalString
+    case FeatureChannelState.SidecarRequired(selection, _, _) => selection.canonicalString
+
+  private def renderFeatureState(state: FeatureChannelState): String = state match
+    case FeatureChannelState.NotRequested         => "not-requested"
+    case FeatureChannelState.Unresolved(_, issue) => s"unresolved:${issue.canonicalString}"
+    case FeatureChannelState.Missing(_, _)        => "missing"
+    case FeatureChannelState.SidecarRequired(_, _, observationCount) =>
+      s"sidecar-required:observations=$observationCount"
 
   private def renderAnnotation(
       annotation: TextAnnotation,
