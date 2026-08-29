@@ -2,7 +2,7 @@ package storymodel4s.align
 
 import munit.FunSuite
 
-import storymodel4s.features.{Estimate, MissingReason}
+import storymodel4s.features.{MissingReason, UndefinedReason}
 
 /** External mass must not let our failure to align be read as the participant's behaviour.
   *
@@ -24,6 +24,13 @@ class SignatureSuite extends FunSuite:
 
   private def report(attributed: Double, unranked: Double) =
     ExternalMassReport.of(attributed, unranked).fold(e => fail(e.message), identity)
+
+  private def weighted(
+      numerator: Double,
+      weights: Vector[Double],
+      eligible: Int
+  ): WeightedCoverage =
+    WeightedCoverage.of(numerator, weights, eligible).fold(e => fail(e.message), identity)
 
   test("RecallSignature.externalMass computes the exact production split") {
     val associationMass = 0.01
@@ -53,7 +60,7 @@ class SignatureSuite extends FunSuite:
 
     val signature = RecallSignature(
       uniformCoverage = 0.0,
-      importanceWeightedCoverage = Estimate.missing(MissingReason.AllMissing),
+      importanceWeightedCoverage = weighted(0.0, Vector.empty, 0),
       fidelityMass = MassRatio.of(0.0, 0.0, 0.0).fold(e => fail(e.message), identity),
       fidelityByFacet = Map.empty,
       specificityMass = MassRatio.of(0.0, 0.0, 0.0).fold(e => fail(e.message), identity),
@@ -326,6 +333,11 @@ class SignatureSuite extends FunSuite:
         "summon[scala.deriving.Mirror.ProductOf[StepMass]]"
       )
     )
+    assert(
+      !scala.compiletime.testing.typeChecks(
+        "summon[scala.deriving.Mirror.ProductOf[WeightedCoverage]]"
+      )
+    )
     // Every smart-constructed carrier here, not only the two a review named. Per
     // docs/design/unforgeable-types.md these are non-case classes so that fromProduct and copy do
     // not exist.
@@ -345,6 +357,40 @@ class SignatureSuite extends FunSuite:
         "summon[scala.deriving.Mirror.ProductOf[LayerPreservation]]"
       )
     )
+  }
+
+  test("weighted coverage distinguishes absent importance from observed zero total weight") {
+    val absent = weighted(0.0, Vector.empty, 3)
+    val zero = weighted(0.0, Vector(0.0), 3)
+
+    assertEquals(absent.estimate, storymodel4s.features.Estimate.missing(MissingReason.AllMissing))
+    assertEquals(
+      zero.estimate,
+      storymodel4s.features.Estimate.missing(
+        MissingReason.Undefined(UndefinedReason.ZeroTotalWeight)
+      )
+    )
+    assertEquals(absent.coverage.observed, 0)
+    assertEquals(zero.coverage.observed, 1)
+  }
+
+  test("weighted coverage refuses malformed weights, outcomes, and count relations") {
+    assert(WeightedCoverage.of(Double.NaN, Vector(1.0), 1).isLeft)
+    assert(WeightedCoverage.of(-0.1, Vector(1.0), 1).isLeft)
+    assert(WeightedCoverage.of(0.0, Vector(Double.NaN), 1).isLeft)
+    assert(WeightedCoverage.of(0.0, Vector(Double.PositiveInfinity), 1).isLeft)
+    assert(WeightedCoverage.of(0.0, Vector(-1.0, 2.0), 2).isLeft)
+    assert(WeightedCoverage.of(0.0, Vector(1.0, 1.0), 1).isLeft)
+    assert(WeightedCoverage.of(1.1, Vector(1.0), 1).isLeft)
+  }
+
+  test("weighted coverage reports weight mass separately from leaf-count coverage") {
+    val r = weighted(0.5, Vector(0.25, 0.75), 4)
+    assertEquals(r.estimate.toOption, Some(0.5))
+    assertEqualsDouble(r.conditioningWeight, 1.0, eps)
+    assertEqualsDouble(r.support, 0.5, eps)
+    assert(r.render.contains("conditioning weight 1.0000"), r.render)
+    assert(r.render.contains("coverage 2/4"), r.render)
   }
 
   // --- ratio-of-sums estimands (bd-01M162FEGPSY50MFHTYH3C3RHF) ---

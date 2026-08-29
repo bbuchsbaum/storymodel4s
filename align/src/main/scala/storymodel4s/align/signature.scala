@@ -1,6 +1,6 @@
 package storymodel4s.align
 
-import storymodel4s.features.{Estimate, MissingReason, ScoreEstimate}
+import storymodel4s.features.{Coverage, Estimate, MissingReason, ScoreEstimate, UndefinedReason}
 import storymodel4s.recall.{RecallGraph, RecallUnitId}
 import storymodel4s.recall.RecallGraphStatus.Checked
 
@@ -23,7 +23,7 @@ import storymodel4s.recall.RecallGraphStatus.Checked
   */
 final case class RecallSignature(
     uniformCoverage: Double,
-    importanceWeightedCoverage: ScoreEstimate,
+    importanceWeightedCoverage: WeightedCoverage,
     fidelityMass: MassRatio,
     fidelityByFacet: Map[Facet, MassRatio],
     specificityMass: MassRatio,
@@ -75,6 +75,95 @@ final case class RecallSignature(
         sourceConsistentInferenceMass + uninterpretableMass,
       unranked = unrankedMass
     )
+
+/** Importance-weighted leaf coverage with both kinds of support that make it interpretable.
+  *
+  * `conditioningWeight` is the observed importance mass used by the weighted mean; `coverage`
+  * counts how many eligible leaves actually carried an importance. The weight mass is rendered
+  * separately and is never divided by the eligible count: mass and count answer different support
+  * questions. Missing all importances and observing only zero weights are also distinct states.
+  */
+final class WeightedCoverage private (
+    val estimate: ScoreEstimate,
+    val conditioningWeight: Double,
+    val coverage: Coverage
+):
+  /** Fraction of eligible leaves whose importance was observed. */
+  def support: Double = coverage.fraction
+
+  def render: String =
+    val value = estimate.toOption.map(v => f"$v%.4f").getOrElse("n/a")
+    f"$value (conditioning weight $conditioningWeight%.4f; " +
+      s"coverage ${coverage.observed}/${coverage.eligible})"
+
+  override def equals(other: Any): Boolean = other match
+    case that: WeightedCoverage =>
+      estimate == that.estimate && conditioningWeight == that.conditioningWeight &&
+      coverage == that.coverage
+    case _ => false
+
+  override def hashCode: Int = (estimate, conditioningWeight, coverage).hashCode
+  override def toString: String = s"WeightedCoverage(${render})"
+
+object WeightedCoverage:
+  /** Checked construction from a weighted numerator and every observed leaf weight.
+    *
+    * Individual weights are retained as inputs so a negative value cannot hide behind a positive
+    * sum. Zero observed weights means `AllMissing`; observed weights summing to zero means the
+    * weighted mean is `Undefined(ZeroTotalWeight)`; otherwise the finite quotient is observed.
+    */
+  def of(
+      numerator: Double,
+      observedWeights: Vector[Double],
+      eligibleLeaves: Int
+  ): Either[AlignError, WeightedCoverage] =
+    def malformed(detail: String) =
+      Left(AlignError.MalformedRecord("weightedCoverage", detail))
+    def finite(value: Double): Boolean = !value.isNaN && !value.isInfinite
+
+    Coverage.of(eligibleLeaves, observedWeights.size) match
+      case Left(error)     => malformed(error.message)
+      case Right(coverage) =>
+        observedWeights.zipWithIndex.collectFirst {
+          case (weight, index) if !finite(weight) => s"weight $index is not finite"
+          case (weight, index) if weight < 0.0    => s"weight $index is negative"
+        } match
+          case Some(detail) => malformed(detail)
+          case None         =>
+            val conditioningWeight = observedWeights.sum
+            if !finite(numerator) then malformed("numerator is not finite")
+            else if numerator < 0.0 then malformed("numerator is negative")
+            else if !finite(conditioningWeight) then malformed("conditioning weight is not finite")
+            else if coverage.observed == 0 then
+              if numerator != 0.0 || conditioningWeight != 0.0 then
+                malformed("no observed leaf may carry a numerator or conditioning weight")
+              else
+                Right(
+                  new WeightedCoverage(
+                    Estimate.missing(MissingReason.AllMissing),
+                    conditioningWeight,
+                    coverage
+                  )
+                )
+            else if conditioningWeight == 0.0 then
+              if numerator != 0.0 then malformed("zero total weight cannot carry a numerator")
+              else
+                Right(
+                  new WeightedCoverage(
+                    Estimate.missing(MissingReason.Undefined(UndefinedReason.ZeroTotalWeight)),
+                    conditioningWeight,
+                    coverage
+                  )
+                )
+            else if numerator > conditioningWeight + 1e-9 then
+              malformed(
+                s"numerator $numerator exceeds conditioning weight $conditioningWeight"
+              )
+            else
+              val value = numerator / conditioningWeight
+              if !finite(value) || value < 0.0 then malformed("weighted outcome is invalid")
+              else
+                Right(new WeightedCoverage(Estimate.observed(value), conditioningWeight, coverage))
 
 /** A ratio-of-sums with the support it rests on: value = N / A, support = A / T.
   *
@@ -265,14 +354,10 @@ object RecallSignature:
     val uniform = if leaves.isEmpty then 0.0 else leaves.map(visitation).sum / leaves.size
     // Leaves whose importance is Missing are excluded from the weighted sum (never counted as 0).
     val importance = view.leaves.flatMap(n => n.importance.toOption.map(w => (n.ref, w)))
-    val wsum = importance.map(_._2).sum
-    // Missing when no node carried an importance: republishing the UNIFORM figure under the
-    // importance-weighted name told a caller that a salience-weighted measurement had been made
-    // when none had. The two fields would then be the same number under two names, which is the
-    // inference a reader cannot help making.
-    val weighted: ScoreEstimate =
-      if wsum <= 0 then Estimate.missing(MissingReason.AllMissing)
-      else Estimate.observed(importance.map { case (r, w) => w * visitation(r) }.sum / wsum)
+    val weightedNumerator = importance.map { case (r, w) => w * visitation(r) }.sum
+    val weighted = WeightedCoverage
+      .of(weightedNumerator, importance.map(_._2), leaves.size)
+      .fold(error => throw new IllegalArgumentException(error.message), identity)
 
     val anchored: Vector[(RecallUnitId, FidelityReport, FidelityMode)] = recall.ordered.flatMap {
       u =>
@@ -593,7 +678,7 @@ final class SignatureProjection private (
   def apply(s: RecallSignature): Either[ProjectionError, SupportedScalar] =
     val comps: Map[String, Option[Double]] = Map(
       "uniformCoverage" -> Some(s.uniformCoverage),
-      "importanceWeightedCoverage" -> s.importanceWeightedCoverage.toOption,
+      "importanceWeightedCoverage" -> s.importanceWeightedCoverage.estimate.toOption,
       "fidelity" -> s.fidelityMass.value,
       "specificity" -> s.specificityMass.value,
       "compression" -> s.compression.value,
@@ -626,7 +711,8 @@ final class SignatureProjection private (
       "discourseChronology" -> s.discourseChronology.support,
       "worldChronology" -> s.worldChronology.support,
       "compression" -> s.compression.support,
-      "semanticFlowCoherence" -> s.semanticFlowCoherence.support
+      "semanticFlowCoherence" -> s.semanticFlowCoherence.support,
+      "importanceWeightedCoverage" -> s.importanceWeightedCoverage.support
     ) ++ s.backwardMass.map(m => "backwardMass" -> m.comparableSteps.toDouble / m.totalSteps).toMap
       ++ s.worldBackwardMass
         .map(m => "worldBackwardMass" -> m.comparableSteps.toDouble / m.totalSteps)
