@@ -2,7 +2,7 @@ package storymodel4s.bench
 
 import storymodel4s.align.*
 import storymodel4s.core.{Checksum, ContentAddress}
-import storymodel4s.features.{Coverage, Estimate, MissingReason}
+import storymodel4s.features.{Coverage, Estimate, MissingReason, UndefinedReason}
 import storymodel4s.recall.{RecallUnit, RecallUnitId}
 
 /** A percentile bootstrap interval over story-macro means. */
@@ -28,8 +28,45 @@ final case class MetricValue(
       interval.map(i => f" [${i.lower}%.4f, ${i.upper}%.4f] (B=${i.resamples})").getOrElse("")
     s"$name = $v cov=${coverage.observed}/${coverage.eligible} stories=$stories$ci receipt=${receipt.short()}"
 
-/** A per-unit observation of one metric: `None` when the unit is not eligible for it. */
-final case class UnitObservation(unit: RecallUnitId, value: Option[Double])
+/** Whether one unit was outside a metric's estimand, measured, or eligible but unmeasurable.
+  *
+  * Why three cases: `Ineligible` is not missing evidence, while `Missing` is. Collapsing both to
+  * `None` lets aggregation silently drop an aligner abstention and renormalize accuracy over the
+  * surviving units.
+  */
+enum MetricObservation:
+  case Ineligible
+  private[bench] case Observed(value: Double)
+  case Missing(reason: MissingReason)
+
+  /** Eliminate an observation without discarding eligibility, value, or missingness.
+    *
+    * The observed constructor stays package-private so non-finite values cannot bypass
+    * [[MetricObservation.observed]], while this total public operation lets consumers inspect the
+    * finite value without depending on that constructor.
+    */
+  def fold[A](
+      onIneligible: => A,
+      onObserved: Double => A,
+      onMissing: MissingReason => A
+  ): A = this match
+    case Ineligible      => onIneligible
+    case Observed(value) => onObserved(value)
+    case Missing(reason) => onMissing(reason)
+
+object MetricObservation:
+  /** A finite observation, or a typed absence when arithmetic produced no real score. */
+  def observed(value: Double): MetricObservation =
+    if value.isNaN || value.isInfinite then
+      Missing(MissingReason.Undefined(UndefinedReason.NotFinite))
+    else Observed(value)
+
+  /** Lift the ordinary optional scoring path: absence means the metric does not apply. */
+  def fromOption(value: Option[Double]): MetricObservation =
+    value.fold(Ineligible)(observed)
+
+/** A per-unit metric outcome with eligibility and missingness kept distinct. */
+final case class UnitObservation(unit: RecallUnitId, observation: MetricObservation)
 
 /** Per-case, per-metric raw observations, kept so aggregation is a pure function of them. */
 final case class CaseObservations(caseId: String, byMetric: Map[String, Vector[UnitObservation]])
@@ -123,17 +160,23 @@ object Metrics:
   def observe(c: BenchCase, result: HsmmResult): CaseObservations =
     val view = c.view
     val units = c.recall.ordered
+    def typedObs(
+        name: String
+    )(f: (AlignmentRow, GoldUnit) => MetricObservation): (String, Vector[UnitObservation]) =
+      name -> units.map { u =>
+        val observation = (c.gold(u.id), result.posterior.row(u.id)) match
+          case (Some(g), Some(row)) => f(row, g)
+          case _                    => MetricObservation.Ineligible
+        UnitObservation(u.id, observation)
+      }
     def obs(
         name: String
     )(f: (AlignmentRow, GoldUnit) => Option[Double]): (String, Vector[UnitObservation]) =
-      name -> units.map { u =>
-        val v = for
-          g <- c.gold(u.id)
-          row <- result.posterior.row(u.id)
-          x <- f(row, g)
-        yield x
-        UnitObservation(u.id, v)
-      }
+      typedObs(name)((row, gold) => MetricObservation.fromOption(f(row, gold)))
+    def ranked(row: AlignmentRow)(value: => Double): MetricObservation =
+      if row.externalMass(ExternalState.Unranked) > 0.0 then
+        MetricObservation.Missing(MissingReason.ProviderAbstained)
+      else MetricObservation.observed(value)
     def anchoredRanking(row: AlignmentRow): Vector[SourceNodeRef] =
       row.mass.toVector
         .collect { case (s, m) if s.isSource && m > 0.0 => (s, m) }
@@ -203,21 +246,22 @@ object Metrics:
         Some(ind(best.exists(_._1 == g.facets)))
       else None
     }
-    val externalRule = obs(Names.externalRule) { (row, g) =>
+    val externalRule = typedObs(Names.externalRule) { (row, g) =>
       g.groundedness match
         case Groundedness.Association | Groundedness.Intrusion | Groundedness.Uninterpretable =>
-          Some(ind(row.externalMass > row.sourceMass))
-        case _ => None
+          ranked(row)(ind(row.externalMass > row.sourceMass))
+        case _ => MetricObservation.Ineligible
     }
-    val externalSubtype = obs(Names.externalSubtype) { (row, g) =>
-      g.externalSubtype.map { expected =>
-        ind(row.argmax.contains(AlignState.External(expected)))
-      }
+    val externalSubtype = typedObs(Names.externalSubtype) { (row, g) =>
+      g.externalSubtype match
+        case Some(expected) =>
+          ranked(row)(ind(row.argmax.contains(AlignState.External(expected))))
+        case None => MetricObservation.Ineligible
     }
-    val inference = obs(Names.inferenceMass) { (row, g) =>
+    val inference = typedObs(Names.inferenceMass) { (row, g) =>
       if g.groundedness == Groundedness.Inference then
-        Some(row.externalMass(ExternalState.SourceConsistentInference))
-      else None
+        ranked(row)(row.externalMass(ExternalState.SourceConsistentInference))
+      else MetricObservation.Ineligible
     }
     def termCoverage(term: CostTerm): (AlignmentRow, GoldUnit) => Option[Double] = (row, _) =>
       val breakdowns = result.costs.getOrElse(row.unit, Map.empty).toVector.collect {
@@ -252,7 +296,7 @@ object Metrics:
               ip <- inferredPos(prev)
               ic <- inferredPos(u)
             yield ind(stepDirection(gp, gc) == stepDirection(ip, ic))
-        UnitObservation(u.id, v)
+        UnitObservation(u.id, MetricObservation.fromOption(v))
       }
       Names.routeAgreement -> values
     val structuralCoverage = obs(Names.structuralTermCoverage)(termCoverage(CostTerm.Structural))
@@ -283,6 +327,10 @@ object Metrics:
     * Why story-macro: the spec's pass/fail rules are stated per story family with story-macro CIs,
     * so one long story may not dominate a rate. Cases with no eligible unit for a metric do not
     * contribute a mean (and are not in the coverage), rather than contributing zero.
+    *
+    * Any explicitly missing eligible observation makes the aggregate missing. Conditioning on the
+    * surviving observations would let a channel improve its accuracy by abstaining selectively on
+    * failures; coverage stays attached so the missing support remains visible.
     */
   def aggregate(
       name: String,
@@ -291,18 +339,29 @@ object Metrics:
       seed: Long,
       resamples: Int = 200
   ): MetricValue =
-    val perCase: Vector[(Coverage, Option[Double])] = cases.map { c =>
+    val perCase: Vector[(Coverage, Option[Double], Vector[MissingReason])] = cases.map { c =>
       val obs = c.byMetric.getOrElse(name, Vector.empty)
-      val observed = obs.flatMap(_.value)
-      val coverage = Coverage.of(obs.size, observed.size).getOrElse(Coverage.empty)
-      (coverage, if observed.isEmpty then None else Some(observed.sum / observed.size))
+      val eligible = obs.filter(_.observation != MetricObservation.Ineligible)
+      val observed = eligible.collect {
+        case UnitObservation(_, MetricObservation.Observed(value)) => value
+      }
+      val missing = eligible.collect { case UnitObservation(_, MetricObservation.Missing(reason)) =>
+        reason
+      }
+      val coverage = Coverage.of(eligible.size, observed.size).getOrElse(Coverage.empty)
+      val mean =
+        if observed.isEmpty || missing.nonEmpty then None else Some(observed.sum / observed.size)
+      (coverage, mean, missing)
     }
     val coverage = perCase.map(_._1).foldLeft(Coverage.empty)(_ + _)
     val means = perCase.flatMap(_._2)
+    val missing = perCase.flatMap(_._3).sortBy(_.toString)
     val receipt = ContentAddress.digest(
-      Vector("metric/v1", name, seed.toString, resamples.toString) ++ inputs.map(_.hex)
+      Vector("metric/v2", name, seed.toString, resamples.toString) ++ inputs.map(_.hex)
     )
-    if means.isEmpty then
+    if missing.nonEmpty then
+      MetricValue(name, Estimate.missing(missing.head), coverage, 0, None, receipt)
+    else if means.isEmpty then
       MetricValue(name, Estimate.missing(MissingReason.AllMissing), coverage, 0, None, receipt)
     else
       val mean = means.sum / means.size

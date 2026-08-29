@@ -3,8 +3,8 @@ package storymodel4s.bench
 import munit.FunSuite
 
 import storymodel4s.align.SourceNodeRef
-import storymodel4s.core.{Checksum, SituationId}
-import storymodel4s.features.Estimate
+import storymodel4s.core.{Checksum, ContentAddress, SituationId}
+import storymodel4s.features.{Estimate, MissingReason, UndefinedReason}
 import storymodel4s.recall.RecallUnitId
 
 /** Hand-checkable aggregation: story-macro means, coverage, missing-vs-zero, and a seeded bootstrap
@@ -13,6 +13,17 @@ import storymodel4s.recall.RecallUnitId
 class MetricsSuite extends FunSuite:
   private def u(i: Int) = RecallUnitId.unsafe(s"u$i")
   private def obs(caseId: String, name: String, values: Vector[Option[Double]]): CaseObservations =
+    CaseObservations(
+      caseId,
+      Map(name -> values.zipWithIndex.map { case (v, i) =>
+        UnitObservation(u(i), MetricObservation.fromOption(v))
+      })
+    )
+  private def outcomes(
+      caseId: String,
+      name: String,
+      values: Vector[MetricObservation]
+  ): CaseObservations =
     CaseObservations(
       caseId,
       Map(name -> values.zipWithIndex.map { case (v, i) => UnitObservation(u(i), v) })
@@ -38,18 +49,62 @@ class MetricsSuite extends FunSuite:
     assertEquals(m.coverage.eligible, 10)
   }
 
-  test(
-    "ineligible units count toward eligibility but not the mean; an all-missing metric is Missing"
-  ) {
+  test("ineligible units are outside coverage; no eligible unit yields Missing") {
     val c = obs("s", "x", Vector(None, Some(0.5), None))
     val m = Metrics.aggregate("x", Vector(c), inputs, seed = 1L)
     assertEquals(m.value, Estimate.observed(0.5))
-    assertEquals(m.coverage.eligible, 3)
+    assertEquals(m.coverage.eligible, 1)
     assertEquals(m.coverage.observed, 1)
     val none = Metrics.aggregate("x", Vector(obs("s", "x", Vector(None, None))), inputs, 1L)
     assert(!none.value.isObserved, none.render)
+    assertEquals(none.coverage.eligible, 0)
     assertEquals(none.stories, 0)
     assertEquals(none.interval, None)
+  }
+
+  test("eligible abstention cannot improve or worsen any open-world metric") {
+    Metrics.Names.openWorld.toVector.sorted.foreach { name =>
+      val before = outcomes(
+        "s",
+        name,
+        Vector(MetricObservation.observed(1.0), MetricObservation.observed(0.0))
+      )
+      val improve = outcomes(
+        "s",
+        name,
+        Vector(
+          MetricObservation.observed(1.0),
+          MetricObservation.Missing(MissingReason.ProviderAbstained)
+        )
+      )
+      val worsen = outcomes(
+        "s",
+        name,
+        Vector(
+          MetricObservation.observed(0.0),
+          MetricObservation.Missing(MissingReason.ProviderAbstained)
+        )
+      )
+      val baseline = Metrics.aggregate(name, Vector(before), inputs, seed = 1L)
+      assertEquals(baseline.value, Estimate.observed(0.5), name)
+      Vector(improve, worsen).foreach { abstained =>
+        val after = Metrics.aggregate(name, Vector(abstained), inputs, seed = 1L)
+        assertEquals(after.value, Estimate.missing(MissingReason.ProviderAbstained), name)
+        assertEquals(after.coverage.eligible, 2, name)
+        assertEquals(after.coverage.observed, 1, name)
+        assertEquals(after.stories, 0, name)
+        assertEquals(after.interval, None, name)
+      }
+    }
+  }
+
+  test("a non-finite metric observation is typed missing before aggregation") {
+    val reason = MissingReason.Undefined(UndefinedReason.NotFinite)
+    assertEquals(MetricObservation.observed(Double.NaN), MetricObservation.Missing(reason))
+    assertEquals(
+      MetricObservation.observed(Double.PositiveInfinity),
+      MetricObservation.Missing(reason)
+    )
   }
 
   test("bootstrap is deterministic under a seed and changes with it") {
@@ -75,6 +130,10 @@ class MetricsSuite extends FunSuite:
     val b = Metrics.aggregate("x", Vector(c), Vector(Checksum.ofText("two")), 1L)
     assertNotEquals(a.receipt, b.receipt)
     assertEquals(a.value, b.value)
+    assertEquals(
+      a.receipt,
+      ContentAddress.digest(Vector("metric/v2", "x", "1", "200", Checksum.ofText("one").hex))
+    )
   }
 
   test("every named metric is either source-anchor or open-world, never both") {

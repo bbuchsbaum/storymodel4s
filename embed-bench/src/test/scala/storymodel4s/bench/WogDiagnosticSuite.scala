@@ -2,6 +2,8 @@ package storymodel4s.bench
 
 import munit.FunSuite
 
+import storymodel4s.align.{CandidateGenerator, DefaultLocalCostModel, GraphHsmm, SemanticDistance}
+import storymodel4s.features.{Estimate, MissingReason}
 import storymodel4s.fixtures.wog.{WarOfTheGhostsExpectations, WarOfTheGhostsText}
 
 /** End-to-end: the WOG diagnostic cases through the free channels. The numbers are regression
@@ -76,9 +78,8 @@ class WogDiagnosticSuite extends FunSuite:
       assert(cr.openWorld.forall(m => Metrics.Names.openWorld.contains(m.name)))
       assert(cr.metrics.forall(m => !Metrics.Names.openWorld.contains(m.name)))
       val rule = cr.openWorld.find(_.name == Metrics.Names.externalRule).get
-      // eligibility counts every unit of every case; observations exist exactly for the units whose
-      // gold groundedness is association/intrusion/uninterpretable (here: the association paraphrase
-      // and its unit(s) inside the full recall), never for a source-anchored unit
+      // Eligibility is exactly the units whose gold groundedness this rule can score (here: the
+      // association paraphrase and its unit(s) inside the full recall), never every recall unit.
       val expected = WogDiagnostic.cases
         .flatMap(_.gold.byUnit.values)
         .count(g =>
@@ -87,8 +88,52 @@ class WogDiagnosticSuite extends FunSuite:
         )
       assert(expected >= 2, expected)
       assertEquals(rule.coverage.observed, expected, rule.render)
-      assertEquals(rule.coverage.eligible, WogDiagnostic.cases.map(_.recall.size).sum, rule.render)
+      assertEquals(rule.coverage.eligible, expected, rule.render)
     }
+  }
+
+  private def unrankedObservations(c: BenchCase): CaseObservations =
+    val semantic = SemanticDistance.abstaining
+    val candidates = CandidateGenerator(semantic, lexicalOverlap = false)
+      .generate(c.recall.ordered, c.view)
+    assert(c.recall.ordered.forall(u => candidates.abstained(u.id)))
+    val result = GraphHsmm
+      .infer(c.recall, c.view, candidates, DefaultLocalCostModel(semantic = semantic))
+      .fold(e => fail(e.message), identity)
+    Metrics.observe(c, result)
+
+  private def caseWith(groundedness: Groundedness): BenchCase =
+    WogDiagnostic.paraphraseCases
+      .find(_.gold.byUnit.values.exists(_.groundedness == groundedness))
+      .getOrElse(fail(s"no $groundedness diagnostic case"))
+
+  private def assertMissing(c: BenchCase, observations: CaseObservations, metric: String): Unit =
+    val values = observations.byMetric(metric)
+    assertEquals(values.size, 1)
+    assertEquals(
+      values.head.observation,
+      MetricObservation.Missing(MissingReason.ProviderAbstained),
+      metric
+    )
+    val aggregate = Metrics.aggregate(metric, Vector(observations), Vector(c.inputChecksum), 1L)
+    assertEquals(aggregate.value, Estimate.missing(MissingReason.ProviderAbstained), metric)
+    assertEquals(aggregate.coverage.eligible, 1, metric)
+    assertEquals(aggregate.coverage.observed, 0, metric)
+
+  test("unrankable open-world units abstain from every eligible metric") {
+    val association = caseWith(Groundedness.Association)
+    val associationObs = unrankedObservations(association)
+    assertMissing(association, associationObs, Metrics.Names.externalRule)
+    assertMissing(association, associationObs, Metrics.Names.externalSubtype)
+
+    val inference = caseWith(Groundedness.Inference)
+    val inferenceObs = unrankedObservations(inference)
+    assertMissing(inference, inferenceObs, Metrics.Names.externalSubtype)
+    assertMissing(inference, inferenceObs, Metrics.Names.inferenceMass)
+    assertEquals(
+      inferenceObs.byMetric(Metrics.Names.externalRule).head.observation,
+      MetricObservation.Ineligible
+    )
   }
 
   test(
@@ -161,18 +206,25 @@ class WogDiagnosticSuite extends FunSuite:
     val observed = full.flatMap(_.observations.byMetric(Metrics.Names.routeAgreement))
     assert(observed.nonEmpty, "route metric absent from the full-recall case")
     assert(
-      observed.exists(_.value.isDefined),
+      observed.exists(_.observation.isInstanceOf[MetricObservation.Observed]),
       "route metric is Missing on every unit of the only case that has a route"
     )
     // The first unit of any case has no predecessor, so it must abstain rather than score.
     full.foreach { r =>
       val first = r.observations.byMetric(Metrics.Names.routeAgreement).head
-      assertEquals(first.value, None, "the first unit cannot have a transition")
+      assertEquals(
+        first.observation,
+        MetricObservation.Ineligible,
+        "the first unit cannot have a transition"
+      )
     }
     // Single-unit paraphrase cases have no transition at all.
     val single = runs.filter(_.caseId != WogDiagnostic.fullRecallCase.id)
     single.foreach { r =>
       val vs = r.observations.byMetric(Metrics.Names.routeAgreement)
-      assert(vs.forall(_.value.isEmpty), s"a single-unit case scored a route: ${r.caseId}")
+      assert(
+        vs.forall(_.observation == MetricObservation.Ineligible),
+        s"a single-unit case scored a route: ${r.caseId}"
+      )
     }
   }
