@@ -74,6 +74,19 @@ class WireSuite extends FunSuite:
     assert(malformed(rebuild(b.copy(terms = b.terms.updated(CostTerm.Distortion, 0.3)))))
     // a mandatory term declared missing, or a term both present and missing
     assert(malformed(rebuild(b.copy(missingTerms = Set(CostTerm.Semantic)))))
+    // Sensory may be absent (it can lack evidence) but cannot carry a structural receipt
+    assert(
+      rebuild(
+        b.copy(terms = b.terms - CostTerm.Sensory, missingTerms = b.missingTerms + CostTerm.Sensory)
+      ).isRight
+    )
+    assert(
+      malformed(
+        rebuild(
+          b.copy(reductions = b.reductions + (CostTerm.Sensory -> b.reductions(CostTerm.Chart)))
+        )
+      )
+    )
     assert(
       malformed(
         rebuild(

@@ -128,7 +128,7 @@ class EvidenceSuite extends FunSuite:
 
   test("without evidence the optional terms are absent, recorded, and inert") {
     val base = costModel.cost(u2, e5Node, FidelityMode.Faithful, view)
-    assertEquals(base.missingTerms, Set(CostTerm.Chart, CostTerm.Structural))
+    assertEquals(base.missingTerms, Set(CostTerm.Chart, CostTerm.Structural, CostTerm.Sensory))
     assert(!base.has(CostTerm.Chart) && !base.has(CostTerm.Structural))
     val withProvider =
       costModel
@@ -142,12 +142,12 @@ class EvidenceSuite extends FunSuite:
     val v = viewWith(Map(e5 -> straight))
     val b = costModel.cost(u2Chart, v.node(e5).get, FidelityMode.Faithful, v)
     assert(b.has(CostTerm.Chart))
-    assertEquals(b.missingTerms, Set(CostTerm.Structural))
+    assertEquals(b.missingTerms, Set(CostTerm.Structural, CostTerm.Sensory))
     assertEquals(b.term(CostTerm.Chart), 0.0)
     val provided = costModel.copy(structural = StructuralDistance.of((_, _) => 0.25))
     val c = provided.cost(u2Chart, v.node(e5).get, FidelityMode.Faithful, v)
     assert(c.has(CostTerm.Structural))
-    assertEquals(c.missingTerms, Set.empty[CostTerm])
+    assertEquals(c.missingTerms, Set(CostTerm.Sensory))
     assertEquals(c.term(CostTerm.Structural), 0.25)
     assert(c.total > b.total)
   }
