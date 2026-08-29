@@ -26,6 +26,28 @@ Two further doors, both easy to get wrong:
 - **The `Product` surface is a *read* door for a type that hides a field.** `CheckedSidecarPrelude`
   declares `private[codec] val blockDigests`; `javap` shows a public `_2()` returning it.
 
+### What does *not* close the door
+
+Measured with a minimal same-package probe (four shapes, all plain case classes):
+
+| shape | `Mirror.ProductOf` |
+|---|---|
+| bare `private` constructor | **resolves** |
+| `private[x]` constructor | **resolves** |
+| bare `private` + a user-written companion | **resolves** |
+| `private[x]` + a user-written companion | **resolves** |
+
+So **writing your own companion with a smart constructor does not suppress the Mirror** — which is
+exactly the thing an author is most likely to believe closes the door, because it is the thing they
+just did. The same probe confirms the asymmetry: bare `private` suppresses the *generated* `apply`
+(`BarePrivate.apply(1)` does not compile) while leaving `fromProduct` intact.
+
+**Verify your probe can fail.** A negative compile-time assertion — `assert(!typeChecks("summon[…
+Mirror.ProductOf[T]]"))` — returns `false` on *any* error and does not say which, so it can pass
+for a reason unrelated to Mirrors and keep passing through a mutation that should break it. This
+has already happened here on two carriers. Put a positive control in the same file and scope, and
+use `typeCheckErrors` to read the real message when diagnosing.
+
 ## The criterion
 
 > A forgeable type's documented promise survives the forge **only if some field's type is both
