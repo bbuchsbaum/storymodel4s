@@ -89,6 +89,20 @@ Package namespace is flat `storymodel4s.<module>`.
    surviving `Map[Int, _]` or codec field re-bridges the coordinates for
    everything downstream, so a half-done migration is not a smaller done one — it
    is an undone one that looks done.
+   **A numeric guard must state what it does with `NaN` — every comparison against
+   it is false, so `if x <= 0` FAILS OPEN.** Measured 2026-08-29: leaf importance had
+   no finite/nonnegative boundary, and the sole degenerate-weight guard
+   `if wsum <= 0 then Missing` did not fire for `NaN`, so `Estimate.observed` accepted
+   the quotient and `importanceWeightedCoverage` published **`Observed(NaN)`** — a
+   value asserting that a measurement was made and handing the consumer something no
+   arithmetic can use, which is strictly worse than `Missing`. The author wrote a
+   defence against degenerate weights and got one that admits the worst degenerate
+   weight there is. Two consequences: validate finiteness **at the source** of any
+   weight or score, because catching it at one consumer leaves the hole open for
+   every other; and a type whose constructor advertises checked construction must
+   **refuse** non-finite input rather than assume its upstream — a checked
+   constructor with an internal unsafe path is making a false claim about itself.
+
    **And an empty-guard constant must declare its class.** `if xs.isEmpty then
    <k>` appears at 16 sites carrying FIVE different meanings, with nothing at any
    site saying which: *forced* (the guarded branch is never evaluated —
