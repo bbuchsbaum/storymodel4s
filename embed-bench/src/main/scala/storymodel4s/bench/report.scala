@@ -215,8 +215,8 @@ object Bench:
             sig.discourseChronology,
             sig.worldChronology,
             sig.compression,
-            sig.backwardMass,
-            sig.worldBackwardMass
+            sig.backwardMass.map(_.perStep),
+            sig.worldBackwardMass.map(_.perStep)
           )
         )
       }

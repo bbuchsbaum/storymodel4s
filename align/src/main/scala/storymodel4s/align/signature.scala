@@ -37,8 +37,8 @@ final case class RecallSignature(
     unrankedMass: Double,
     distortedMass: Double,
     distortedMassByFacet: Map[Facet, Double],
-    backwardMass: Option[Double],
-    worldBackwardMass: Option[Double],
+    backwardMass: Option[StepMass],
+    worldBackwardMass: Option[StepMass],
     perUnitLocalizability: Map[RecallUnitId, Double],
     perUnitFidelity: Map[RecallUnitId, FidelityReport],
     perUnitMode: Map[RecallUnitId, FidelityMode]
@@ -62,6 +62,17 @@ final case class RecallSignature(
         sourceConsistentInferenceMass + uninterpretableMass,
       unranked = unrankedMass
     )
+
+/** A per-step route quantity together with the support it rests on.
+  *
+  * The mean is over EVERY step of the route, not only the steps that carried comparable mass:
+  * dropping the others and renormalizing turns "one of three steps moved backward" into "the route
+  * moved backward", which is the same manufactured certainty this file exists to remove. The
+  * support says how many steps could be compared at all, so a reader can see that a per-step mass
+  * of 1/3 rests on one step out of three.
+  */
+final case class StepMass(perStep: Double, comparableSteps: Int, totalSteps: Int):
+  def render: String = f"$perStep%.4f (over $comparableSteps/$totalSteps comparable steps)"
 
 /** External mass split into what the participant did and what we could not do.
   *
@@ -135,18 +146,21 @@ object RecallSignature:
       val bw = f.steps.map(_.sourceMass(isBackward(pos))).sum
       if fw + bw <= 0 then None else Some(fw / (fw + bw))
 
-    /** Mean per-step backward mass, or `None` when no step carries any anchor-to-anchor mass.
+    /** Mean per-step backward mass over EVERY step, with the comparable-step support beside it.
       *
-      * Dividing by `max(1, steps.size)` returned 0.0 for a recall with no comparable transition at
-      * all, which reads as "this person never moved backwards" when the truth is that we never saw
-      * a move to judge.
+      * `None` only when the route has no steps at all — dividing by `max(1, 0)` used to report 0.0,
+      * "this person never moved backwards", when we never saw a move to judge. A step that carried
+      * no source-to-source mass is still a step of the route and stays in the denominator;
+      * excluding it would renormalize the residue into a stronger claim than the evidence.
       */
-    def backwardMean(pos: SourceNodeRef => Option[Double]): Option[Double] =
-      val comparable = f.steps.filter(st =>
-        st.sourceMass(isBackward(pos)) > 0.0 || st.sourceMass(isForward(pos)) > 0.0
-      )
-      if comparable.isEmpty then None
-      else Some(f.steps.map(_.sourceMass(isBackward(pos))).sum / comparable.size)
+    def backwardMean(pos: SourceNodeRef => Option[Double]): Option[StepMass] =
+      if f.steps.isEmpty then None
+      else
+        val comparable = f.steps.count(st =>
+          st.sourceMass(isBackward(pos)) > 0.0 || st.sourceMass(isForward(pos)) > 0.0
+        )
+        val mean = f.steps.map(_.sourceMass(isBackward(pos))).sum / f.steps.size
+        Some(StepMass(mean, comparable, f.steps.size))
     val discoursePos: SourceNodeRef => Option[Double] = r => Some(view.relativePosition(r))
     val worldPos: Option[SourceNodeRef => Option[Double]] =
       view.worldOrder.map(o => r => o.get(r).map(_.toDouble))
@@ -257,9 +271,13 @@ enum ProjectionError:
   /** A weighted component has no measurement; the projection abstains rather than inventing one. */
   case MissingComponent(name: String)
 
+  /** A weight set that cannot define a projection: empty, or not finite. */
+  case InvalidWeights(detail: String)
+
   def message: String = this match
     case UnknownComponent(n) => s"projection weight names no such signature component: $n"
     case MissingComponent(n) => s"projection weights $n, which this signature did not measure"
+    case InvalidWeights(d)   => s"projection weights are not a usable set: $d"
 
 /** A declared scalar projection of the signature: explicit, versioned weights.
   *
@@ -268,7 +286,7 @@ enum ProjectionError:
   * dimension of the score), and a component with no measurement was substituted with 0.0, so "we
   * did not measure this" became "this scored worst" — or, under a negative weight, best.
   */
-final case class SignatureProjection(version: String, weights: Map[String, Double]):
+final case class SignatureProjection private (version: String, weights: Map[String, Double]):
   def apply(s: RecallSignature): Either[ProjectionError, Double] =
     val comps: Map[String, Option[Double]] = Map(
       "uniformCoverage" -> Some(s.uniformCoverage),
@@ -287,8 +305,8 @@ final case class SignatureProjection(version: String, weights: Map[String, Doubl
       "uninterpretableMass" -> Some(s.uninterpretableMass),
       "unrankedMass" -> Some(s.unrankedMass),
       "distortedMass" -> Some(s.distortedMass),
-      "backwardMass" -> s.backwardMass,
-      "worldBackwardMass" -> s.worldBackwardMass
+      "backwardMass" -> s.backwardMass.map(_.perStep),
+      "worldBackwardMass" -> s.worldBackwardMass.map(_.perStep)
     )
     val terms = weights.toVector.sortBy(_._1).map { case (k, w) =>
       comps.get(k) match
@@ -299,3 +317,48 @@ final case class SignatureProjection(version: String, weights: Map[String, Doubl
     terms.collectFirst { case Left(e) => e } match
       case Some(e) => Left(e)
       case None    => Right(terms.collect { case Right(v) => v }.sum)
+
+object SignatureProjection:
+  /** The known component names, so a weight set can be checked before it is ever applied. */
+  val components: Set[String] = Set(
+    "uniformCoverage",
+    "importanceWeightedCoverage",
+    "fidelity",
+    "specificity",
+    "compression",
+    "discourseChronology",
+    "worldChronology",
+    "causalPreservation",
+    "semanticFlowCoherence",
+    "associationMass",
+    "intrusionMass",
+    "commentaryMass",
+    "sourceConsistentInferenceMass",
+    "uninterpretableMass",
+    "unrankedMass",
+    "distortedMass",
+    "backwardMass",
+    "worldBackwardMass"
+  )
+
+  /** Smart constructor: a projection with no weights, or a non-finite weight, is not a projection.
+    *
+    * Empty weights used to produce `Right(0.0)` — a scalar summary of a signature computed from
+    * nothing — and a NaN or infinite weight produced a NaN or infinite score that would propagate
+    * silently through any aggregate built on it.
+    */
+  def of(
+      version: String,
+      weights: Map[String, Double]
+  ): Either[ProjectionError, SignatureProjection] =
+    if version.trim.isEmpty then Left(ProjectionError.InvalidWeights("version must be non-empty"))
+    else if weights.isEmpty then
+      Left(ProjectionError.InvalidWeights("a projection needs at least one weighted component"))
+    else
+      weights.toVector.sortBy(_._1).collectFirst {
+        case (k, w) if w.isNaN || w.isInfinite =>
+          ProjectionError.InvalidWeights(s"weight for $k is not finite")
+        case (k, _) if !components.contains(k) => ProjectionError.UnknownComponent(k)
+      } match
+        case Some(e) => Left(e)
+        case None    => Right(new SignatureProjection(version, weights))
