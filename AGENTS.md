@@ -77,18 +77,29 @@ Package namespace is flat `storymodel4s.<module>`.
    **A private constructor on a `case` class is not a boundary.** Scala 3 gives
    every case-class companion a public `fromProduct` through `Mirror.Product`,
    and marking the constructor private does not remove it. That is the whole
-   defect and the only door **for a type whose fields are public anyway** — the
-   common case: `copy` *is* suppressed by a private constructor, and `unapply`,
-   the positional accessors, and `Product` membership are read-only, exposing
-   only what the public accessors already do, so do not close them. **The
+   defect **only when the constructor is bare `private`**. A qualified
+   `private[x]` constructor gives `copy` the same `private[x]` access, so `copy`
+   still exists and is callable from anywhere inside `x` — and `copy` is the
+   more dangerous door, because it is idiomatic: `valid.copy(field = bad)`
+   produces an invalid instance from a valid one, and in-package code does that
+   without thinking. Measured: 54 of the repo's private-constructor case classes
+   are bare `private` (no `copy` emitted); **25 are `private[x]` and do emit
+   `copy`**, across ten modules. Verified with a control — `PopulationAggregate`
+   and `SensitiveDigest` (bare) have zero `copy` methods; `CheckedSidecarPrelude`,
+   `RemoteCapability`, and `AlignmentRow` (qualified) each have one.
+   `unapply`, the positional accessors, and `Product` membership are read-only
+   and expose only what the public accessors already do, so do not close them —
+   **unless the type hides a field**, below. **The
    exception is a type whose purpose is to hide a field**, where `_1` hands out
    exactly what the type promised to gate; such a type must not be a case class
    at all, because every *read* door has to close too. That case is rarer and
    strictly worse: a forged instance announces itself as invalid at the next
-   validation, a leaked gated value announces nothing, ever. (No instance
-   exists on `main` — no case class declares a private or protected field, and
-   `PseudonymizedText`/`PseudonymizedTranscript` are already non-case classes —
-   so this is a prospective guard, not a backlog. The mechanical shape is
+   validation, a leaked gated value announces nothing, ever. (**One instance exists on `main`**, found only after the
+   first sweep's filter was corrected: `CheckedSidecarPrelude` declares
+   `private[codec] val blockDigests`, and `javap` confirms a public `_2()`
+   returning it. The first sweep reported zero because its exclusion filter
+   dropped every class that *also* had a private constructor — which is nearly
+   all of them. The mechanical shape is
    greppable; a *public* field that should have been gated is a judgement, and
    is yours to raise.) A validating type must be a `final`
    **non-case** class with explicit accessors, structural `equals`/`hashCode`,
