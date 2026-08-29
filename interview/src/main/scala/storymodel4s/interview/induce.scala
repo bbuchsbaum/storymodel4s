@@ -348,6 +348,16 @@ object TargetInduction:
       .of(pairs.filter(_._2 > 0.0))
       .getOrElse(Distribution.point(MemoryAddress.Unresolved))
 
+  /** Read-only cluster assignments for measurement fixtures. Same function `induce` uses. */
+  private[interview] def clusterAssignments(
+      graph: RecallGraph,
+      config: InductionConfig = InductionConfig.default,
+      semantic: Option[SemanticDistance] = None
+  ): Map[RecallUnitId, ClusterAssignment] =
+    val units = graph.ordered
+    val classes = units.map(u => u.id -> classify(u)).toMap
+    clusters(units, classes, semantic, config)
+
   def induce(
       graph: RecallGraph,
       details: Vector[Detail],
@@ -357,7 +367,7 @@ object TargetInduction:
   ): InductionResult =
     val units = graph.ordered
     val classes = units.map(u => u.id -> classify(u)).toMap
-    val cl = clusters(units, classes, semantic, config)
+    val cl = clusterAssignments(graph, config, semantic)
     val clusterOf: Map[RecallUnitId, Int] = cl.view.mapValues(_.cluster).toMap
     val byCluster: Map[Int, Vector[RecallUnit]] =
       units
