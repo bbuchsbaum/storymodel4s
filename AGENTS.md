@@ -340,7 +340,12 @@ was set by the owner on 2026-08-28 (sticky decision
    under test — and keep passing after a mutation that should break it. Put a
    positive control in the same file and scope: assert `typeChecks` is **true**
    for a type that certainly has the property. If the control fails, every
-   negative assertion beside it is meaningless. Use `typeCheckErrors` to read
+   negative assertion beside it is meaningless. **The control must match the
+   shape under test**, not merely be some type with the property — a control
+   that differs structurally can fail for an unrelated compiler-shape reason and
+   tell you nothing. Observed on slice 5: only a control matching a *live
+   private-constructor case class* showed the probe could see the actual
+   `fromProduct` door. Use `typeCheckErrors` to read
    the actual message when diagnosing. (Same shape as the `copy` control:
    "`PopulationAggregate` has zero `copy` methods" proved nothing until
    `SubjectAlignment` in the same compile showed five. An absence proves nothing
