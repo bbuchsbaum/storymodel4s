@@ -405,15 +405,24 @@ object HsmmResult:
       // A cost record's own mode and exclusion must agree with the key it sits under: consumers
       // read `breakdown.isDistorted`/`facets` and must never receive a record that contradicts
       // its state (cross-record invariant, upheld amendment to the wire checkpoint).
+      // A state a consumer can READ must never carry an excluded record. A state the inference
+      // DROPPED may and should: the excluded breakdown is the audit trail saying why the anchor was
+      // not ranked, and discarding it would make an exclusion indistinguishable from a candidate
+      // that was never nominated. So the test is membership of the posterior, not membership of the
+      // costs map.
+      val readable: Map[RecallUnitId, Set[AlignState]] =
+        rows.map(r => r.unit -> r.mass.keySet).toMap
+
       def coherent(u: RecallUnitId, s: AlignState, b: CostBreakdown): Option[AlignError] =
         val expectedMode = s.mode
-        if b.exclusion.nonEmpty then
+        if b.exclusion.nonEmpty && readable.get(u).exists(_.contains(s)) then
           Some(
             AlignError.MalformedRecord(
               "CostBreakdown",
-              s"unit ${u.value}, state ${s.key}: an admitted state's record cannot be excluded"
+              s"unit ${u.value}, state ${s.key}: a state carrying posterior mass cannot be excluded"
             )
           )
+        else if b.exclusion.nonEmpty then None // dropped state: the record is its audit trail
         else if b.mode != expectedMode then
           Some(
             AlignError.MalformedRecord(

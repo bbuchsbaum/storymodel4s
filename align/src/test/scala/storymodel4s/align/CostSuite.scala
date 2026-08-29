@@ -2,8 +2,6 @@ package storymodel4s.align
 
 import munit.FunSuite
 
-import storymodel4s.recall.RecallUnit
-
 /** The local cost blend, pinned by literal expected values.
   *
   * Every other assertion in align that touches a total compares one computed total to another —
@@ -174,6 +172,54 @@ class CostSuite extends FunSuite:
 
     // And the cost the model actually produces must be the honest one, not the inflated one.
     assertEqualsDouble(b.total, honest, 1e-9, "the model counted an ineligible term as eligible")
+  }
+
+  test("LAW 3: zero-support weights infer to a Right whose source states are all excluded") {
+    // The boundary my first two laws could not see. LAW 1 is about cells with FULL support and
+    // LAW 2 about cells with an INELIGIBLE term; both assume something was measured. A cell where
+    // every eligible term carries zero weight falls between them, and it is where the whole change
+    // nearly reintroduced the defect it removes: with no weighted evidence the cost falls to the
+    // function prior, BELOW the external floor, so the cell that measured nothing would win.
+    //
+    // Found by codex-storymodel4s-scout on a candidate that had already passed ten modules.
+    val w = CostWeights.of(0.0, 0.0, 0.0, 1.0, 0.0, 0.0).fold(e => fail(e.message), identity)
+    val model = DefaultLocalCostModel(weights = w, semantic = SemanticDistance.lexicalJaccard)
+    val stripped = storymodel4s.recall.RecallGraph
+      .validated(AnnaFixture.recall.copy(units = AnnaFixture.recall.units.map { u =>
+        u.copy(proposition = u.proposition.copy(sensoryTerms = Vector.empty))
+      }))
+      .fold(e => fail(e.toString), identity)
+
+    val r = GraphHsmm
+      .infer(stripped, AnnaFixture.view, AnnaFixture.candidates, model)
+      .fold(e => fail(s"zero-support weights must still infer: ${e.message}"), identity)
+
+    // INFERENCE SUCCEEDS. Before the fix this was a Left - the excluded breakdowns stayed in
+    // `costs` and validated rejected every one, so a lawful weight vector broke the aligner
+    // outright.
+    val excluded = r.costs.values.flatMap(_.values).filter(_.excluded)
+    assert(excluded.nonEmpty, "nothing was excluded, so this fixture does not reach the boundary")
+    assert(
+      excluded.forall(_.exclusion.contains(Exclusion.Unassessable)),
+      "a zero-support cell must be Unassessable, not Unreachable - the node IS in the view"
+    )
+
+    // NO SOURCE STATE SURVIVES INTO THE POSTERIOR, which is the point: with no weighted evidence
+    // we have no basis to rank any anchor, so the unit goes external rather than to the cheapest
+    // unmeasured cell.
+    r.posterior.rows.foreach { row =>
+      assert(
+        row.mass.keys.forall(_.isExternal),
+        s"a zero-support unit kept a source state: ${row.mass.keys.map(_.key).mkString(",")}"
+      )
+    }
+
+    // AND THE AUDIT TRAIL SURVIVES. Dropping the excluded records would make an exclusion
+    // indistinguishable from a candidate that was never nominated.
+    assert(
+      excluded.forall(_.supportWeight == 0.0),
+      "an excluded zero-support record must carry supportWeight 0, not a fabricated 1.0"
+    )
   }
 
   test("the default weights are the ones the model actually ships with") {
