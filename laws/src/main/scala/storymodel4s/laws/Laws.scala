@@ -476,6 +476,79 @@ object WireLaws extends Laws:
         }
     )
 
+/** Discipline rule sets for the population same-view law (design record §11): an aggregate pools
+  * only proofs gated against its own view, and each proof only with the recall it was made from.
+  */
+object PopulationLaws extends Laws:
+  def population(using Arbitrary[AlignGens.Case]): RuleSet =
+    new DefaultRuleSet(
+      "align.population",
+      None,
+      "an aggregate accepts a proof of its own view and its receipt is bound to that view" ->
+        forAll { (c: AlignGens.Case) =>
+          val r = AlignGens.infer(c)
+          val subject = SubjectAlignment(SubjectId.unsafe("s0"), c.recall, r, None)
+          PopulationAggregate.of(c.view, Vector(subject)).exists { p =>
+            p.receipt.viewFingerprint == c.view.contentFingerprint &&
+            p.receipt.subjectCount == 1 &&
+            p.receipt.recallChecksums == Vector(AlignWire.recallChecksum(c.recall))
+          }
+        },
+      "an aggregate refuses a proof from any view with different content, even with the same node ids" ->
+        forAll { (c: AlignGens.Case) =>
+          val r = AlignGens.infer(c)
+          val subject = SubjectAlignment(SubjectId.unsafe("s0"), c.recall, r, None)
+          val (same, different) = AlignGens.fingerprintVariants(c.view)
+          def viewMismatch(e: Either[AlignError, PopulationAggregate]) = e.left.exists {
+            case AlignError.FingerprintMismatch(f, _, _) => f.startsWith("viewFingerprint")
+            case _                                       => false
+          }
+          same.forall(v => PopulationAggregate.of(v, Vector(subject)).isRight) &&
+          different.forall((_, v) => viewMismatch(PopulationAggregate.of(v, Vector(subject))))
+        },
+      "a population succeeds iff every subject's proof is of the aggregate's view" ->
+        forAll { (c: AlignGens.Case) =>
+          val own = AlignGens.infer(c)
+          val (_, different) = AlignGens.fingerprintVariants(c.view)
+          val lemmaView = different.collectFirst { case ("lemmas", v) => v }.get
+          val foreign = AlignGens.infer(c.copy(view = lemmaView))
+          val a = SubjectAlignment(SubjectId.unsafe("a"), c.recall, own, None)
+          val b = SubjectAlignment(SubjectId.unsafe("b"), c.recall, foreign, None)
+          val mixed = PopulationAggregate.of(c.view, Vector(a, b))
+          val mixedNamesB = mixed.left.exists {
+            case AlignError.FingerprintMismatch(f, _, _) => f.contains("(subject b)")
+            case _                                       => false
+          }
+          PopulationAggregate.of(c.view, Vector(a)).isRight &&
+          PopulationAggregate.of(lemmaView, Vector(b)).isRight &&
+          mixedNamesB &&
+          PopulationAggregate.of(lemmaView, Vector(a, b)).isLeft
+        },
+      "an aggregate refuses a subject whose recall is not the recall of its proof" ->
+        forAll { (c: AlignGens.Case) =>
+          val r = AlignGens.infer(c)
+          val u0 = c.recall.ordered.head
+          val other = c.recall.copy(units =
+            c.recall.units.map(x => if x.id == u0.id then u0.copy(text = u0.text + "!") else x)
+          )
+          val subject = SubjectAlignment(SubjectId.unsafe("s0"), other, r, None)
+          PopulationAggregate.of(c.view, Vector(subject)).left.exists {
+            case AlignError.FingerprintMismatch(f, _, _) => f.startsWith("recallChecksum")
+            case _                                       => false
+          }
+        },
+      "the receipt is invariant under subject order" ->
+        forAll { (c: AlignGens.Case) =>
+          val r = AlignGens.infer(c)
+          val subjects = Vector("b", "a", "c").map(id =>
+            SubjectAlignment(SubjectId.unsafe(id), c.recall, r, None)
+          )
+          val x = PopulationAggregate.of(c.view, subjects)
+          val y = PopulationAggregate.of(c.view, subjects.reverse)
+          x.isRight && x.map(_.receipt) == y.map(_.receipt) && x == y
+        }
+    )
+
 /** Discipline rule sets for feature estimates and reducers. */
 object EstimateLaws extends Laws:
   private val reducers: Gen[ScalarReducer] = Gen.oneOf(

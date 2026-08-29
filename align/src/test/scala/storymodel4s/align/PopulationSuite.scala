@@ -4,7 +4,9 @@ import munit.ScalaCheckSuite
 import org.scalacheck.{Arbitrary, Gen}
 import org.scalacheck.Prop.forAll
 
+import storymodel4s.core.{StorySource, SurfaceAnalyzer}
 import storymodel4s.features.Estimate
+import storymodel4s.recall.{RecallGraph, RecallRelations}
 
 class PopulationSuite extends ScalaCheckSuite:
   import AnnaFixture.{view, e1, e5, sc1, sc2, root}
@@ -37,9 +39,9 @@ class PopulationSuite extends ScalaCheckSuite:
       .of(
         view,
         Vector(
-          SubjectAlignment(sid("s-full"), full, Some(40)),
-          SubjectAlignment(sid("s-summary"), summary, Some(8)),
-          SubjectAlignment(sid("s-unranked"), unranked, None)
+          SubjectAlignment(sid("s-full"), AnnaFixture.recall, full, Some(40)),
+          SubjectAlignment(sid("s-summary"), AnnaFixture.summary.recall, summary, Some(8)),
+          SubjectAlignment(sid("s-unranked"), AnnaFixture.recall, unranked, None)
         )
       )
       .fold(e => fail(e.message), identity)
@@ -113,7 +115,7 @@ class PopulationSuite extends ScalaCheckSuite:
 
   test("of rejects empty populations, duplicate ids, unknown nodes, malformed rows") {
     assert(PopulationAggregate.of(view, Vector.empty).isLeft)
-    val a = SubjectAlignment(sid("s"), full, None)
+    val a = SubjectAlignment(sid("s"), AnnaFixture.recall, full, None)
     assert(PopulationAggregate.of(view, Vector(a, a.copy(wordCount = Some(1)))).isLeft)
     val alien = SourceNodeRef.Situation(storymodel4s.core.SituationId.unsafe("not-in-view"))
     // A result nominating a node absent from the view cannot even become a gated result: the
@@ -153,6 +155,119 @@ class PopulationSuite extends ScalaCheckSuite:
     assert(nanResult.isLeft)
   }
 
+  // ---- same-view law: a population is bound to one view and to each subject's recall ---------
+
+  /** The same node ids as [[AnnaFixture.view]] with one lemma added to `e1`: a view a reader would
+    * confuse with the original, and exactly what the fingerprint must distinguish.
+    */
+  private lazy val foilView: InMemorySourceView =
+    InMemorySourceView(
+      view.nodes.map(n => if n.ref == e1 then n.copy(lemmas = n.lemmas + "zzz") else n),
+      view.edges,
+      view.worldOrder,
+      view.textLength
+    )
+
+  private lazy val fullOnFoil: HsmmResult =
+    GraphHsmm
+      .infer(AnnaFixture.recall, foilView, AnnaFixture.candidates, AnnaFixture.costModel)
+      .fold(e => fail(e.message), identity)
+
+  private def fingerprintError(e: Either[AlignError, ?], field: String): Boolean =
+    e.left.exists {
+      case AlignError.FingerprintMismatch(f, _, _) => f.startsWith(field)
+      case _                                       => false
+    }
+
+  test("same-view law: a proof gated against a different view is refused, naming the subject") {
+    assertNotEquals(foilView.contentFingerprint, view.contentFingerprint)
+    assertEquals(fullOnFoil.viewFingerprint, foilView.contentFingerprint)
+    val foreign = SubjectAlignment(sid("s-foreign"), AnnaFixture.recall, fullOnFoil, None)
+    val own = SubjectAlignment(sid("s-own"), AnnaFixture.recall, full, None)
+    val mixed = PopulationAggregate.of(view, Vector(own, foreign))
+    assert(fingerprintError(mixed, "viewFingerprint"), s"expected a view mismatch, got $mixed")
+    assert(mixed.left.exists(_.message.contains("s-foreign")))
+    // the wrong way round is refused too: the original proof does not fit the foil view
+    assert(fingerprintError(PopulationAggregate.of(foilView, Vector(own)), "viewFingerprint"))
+    // and the foil proof aggregates on the foil view, receipt bound to it
+    val onFoil =
+      PopulationAggregate.of(foilView, Vector(foreign)).fold(e => fail(e.message), identity)
+    assertEquals(onFoil.receipt.viewFingerprint, foilView.contentFingerprint)
+  }
+
+  test("same-view law: the view check precedes the node check") {
+    // every anchor of the foreign proof exists in both views, so without the fingerprint check
+    // the proof would pass the unknown-node scan; the fingerprint is what refuses it
+    val foreign = SubjectAlignment(sid("s-foreign"), AnnaFixture.recall, fullOnFoil, None)
+    val known = view.nodes.map(_.ref).toSet
+    assert(foreign.result.candidateAnchors.values.flatten.forall(known.contains))
+    assert(fingerprintError(PopulationAggregate.of(view, Vector(foreign)), "viewFingerprint"))
+  }
+
+  test("same-view law: a subject whose recall is not the recall of its proof is refused") {
+    val wrongRecall = SubjectAlignment(sid("s-wrong"), AnnaFixture.summary.recall, full, None)
+    val r = PopulationAggregate.of(view, Vector(wrongRecall))
+    assert(fingerprintError(r, "recallChecksum"), s"expected a recall mismatch, got $r")
+    assert(r.left.exists(_.message.contains("s-wrong")))
+  }
+
+  test("receipt names the view fingerprint, the subject count, and the sorted recall checksums") {
+    val rc = real.receipt
+    assertEquals(rc.viewFingerprint, view.contentFingerprint)
+    assertEquals(rc.subjectCount, 3)
+    val expected = Vector(
+      AlignWire.recallChecksum(AnnaFixture.recall),
+      AlignWire.recallChecksum(AnnaFixture.summary.recall),
+      AlignWire.recallChecksum(AnnaFixture.recall)
+    ).sortBy(_.hex)
+    assertEquals(rc.recallChecksums, expected)
+    assertEquals(rc.recallChecksums.map(_.hex), rc.recallChecksums.map(_.hex).sorted)
+    assertEquals(rc.contentlessSubjects, Vector.empty)
+  }
+
+  test("a silent participant is counted, not hidden and not refused") {
+    // HsmmResult.validated accepts an empty recall - every structural guard passes vacuously - and
+    // that is right: "this participant recalled nothing" is a finding, not an error. What must not
+    // happen is a subjectCount that quietly includes them, so the receipt names them separately.
+    val transcript = StorySource.fromText("nothing here.", Some("silent")).toOption.get
+    val silentRecall =
+      RecallGraph(
+        transcript,
+        SurfaceAnalyzer.analyze(transcript),
+        Vector.empty,
+        RecallRelations.empty
+      )
+    val silentProof = HsmmResult
+      .validated(
+        silentRecall,
+        view,
+        Map.empty,
+        AlignmentMatrix.of(Vector.empty).toOption.get,
+        TransitionFlow(Vector.empty),
+        Vector.empty,
+        -1.0,
+        Map.empty,
+        0
+      )
+      .fold(e => fail(s"an empty recall should still validate: ${e.message}"), identity)
+    val withSilent = PopulationAggregate
+      .of(view, real.subjects :+ SubjectAlignment(sid("s-silent"), silentRecall, silentProof, None))
+      .fold(e => fail(e.message), identity)
+    assertEquals(withSilent.receipt.subjectCount, 4)
+    assertEquals(withSilent.receipt.contentlessSubjects, Vector(sid("s-silent")))
+    // and the silent subject contributes no mass: the grounded-subject counts are unchanged
+    assertEquals(withSilent.groundedSubjects, real.groundedSubjects)
+  }
+
+  test("receipt and aggregate are invariant under subject order") {
+    val reversed = PopulationAggregate
+      .of(view, real.subjects.reverse)
+      .fold(e => fail(e.message), identity)
+    assertEquals(reversed.receipt, real.receipt)
+    assertEquals(reversed, real)
+    assertEquals(reversed.visitationMatrix, real.visitationMatrix)
+  }
+
   // ---- generators for properties: real gated inferences under varied configurations ---------
   //
   // Every property input is produced by GraphHsmm.infer, so admissibility records originate in the
@@ -178,7 +293,9 @@ class PopulationSuite extends ScalaCheckSuite:
   /** `allowExternal = false` restricts to recalls whose every unit has ranked candidates, so the
     * flow is source→source dominated; external mass can still be small but nonzero.
     */
-  private def genResult(allowExternal: Boolean): Gen[HsmmResult] =
+  private def genResult(
+      allowExternal: Boolean
+  ): Gen[(storymodel4s.recall.RecallGraph, HsmmResult)] =
     val temps = Gen.oneOf(0.05, 0.15, 0.5)
     val passes = Gen.oneOf(0, 1)
     val anchored = for
@@ -187,9 +304,12 @@ class PopulationSuite extends ScalaCheckSuite:
       f <- Gen.oneOf(Vector(None, Some(AnnaFixture.summary), Some(AnnaFixture.blended)))
     yield f match
       case None =>
-        inferWith(AnnaFixture.recall, AnnaFixture.candidates, AnnaFixture.costModel, t, k)
-      case Some(x) => inferWith(x.recall, x.candidates, x.costModel, t, k)
-    if allowExternal then Gen.frequency(4 -> anchored, 1 -> Gen.const(unranked)) else anchored
+        AnnaFixture.recall ->
+          inferWith(AnnaFixture.recall, AnnaFixture.candidates, AnnaFixture.costModel, t, k)
+      case Some(x) => x.recall -> inferWith(x.recall, x.candidates, x.costModel, t, k)
+    if allowExternal then
+      Gen.frequency(4 -> anchored, 1 -> Gen.const(AnnaFixture.recall -> unranked))
+    else anchored
 
   private def genPopulation(allowExternal: Boolean): Gen[PopulationAggregate] =
     for
@@ -198,7 +318,9 @@ class PopulationSuite extends ScalaCheckSuite:
     yield PopulationAggregate
       .of(
         view,
-        results.zipWithIndex.map((r, i) => SubjectAlignment(sid(s"p$i"), r, None)).toVector
+        results.zipWithIndex.map { case ((g, r), i) =>
+          SubjectAlignment(sid(s"p$i"), g, r, None)
+        }.toVector
       )
       .fold(e => throw new AssertionError(e.message), identity)
 
@@ -258,7 +380,10 @@ class PopulationSuite extends ScalaCheckSuite:
       val extResult = unranked
       assert(extResult.posterior.rows.forall(_.sourceMass == 0.0))
       val q = PopulationAggregate
-        .of(view, p.subjects :+ SubjectAlignment(sid("zz-ext"), extResult, None))
+        .of(
+          view,
+          p.subjects :+ SubjectAlignment(sid("zz-ext"), AnnaFixture.recall, extResult, None)
+        )
         .fold(e => throw new AssertionError(e.message), identity)
       val nodesSame = p.nodeRefs.forall { v =>
         q.columnMass(v) == p.columnMass(v) && q.expectedVisits(v) == p.expectedVisits(v) &&
