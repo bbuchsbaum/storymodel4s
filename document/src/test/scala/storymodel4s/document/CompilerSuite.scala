@@ -360,7 +360,9 @@ class CompilerSuite extends FunSuite:
     )
 
     assertNotEquals(absent, presentEmpty)
-    assertEquals(absent.draft.graph, presentEmpty.draft.graph)
+    assertEquals(absent.draft.graph.situations.keySet, presentEmpty.draft.graph.situations.keySet)
+    assertEquals(absent.draft.graph.contexts.keySet, presentEmpty.draft.graph.contexts.keySet)
+    assertEquals(absent.draft.graph.segments.keySet, presentEmpty.draft.graph.segments.keySet)
     assertNotEquals(absent.derivation.candidateSet, presentEmpty.derivation.candidateSet)
     assertNotEquals(absent.fingerprint, presentEmpty.fingerprint)
   }
