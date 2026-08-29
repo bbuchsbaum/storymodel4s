@@ -237,3 +237,34 @@ class BirthdayInterviewSuite extends FunSuite:
       model.assessments.map(a => (a.detail.id, a.address.toVector))
     )
   }
+
+  test("the internal ratio carries the placement resolution it rests on") {
+    // Production path for bd-01M15YYPEZ9GMRY378KHB85HVM. Unresolved mass no longer enters the
+    // denominator as an external detail, and the ratio cannot be quoted without the resolution
+    // behind it - reading it requires whenResolved, which abstains below the threshold.
+    val r = scores.resolution
+    assertEqualsDouble(r.resolved + r.unresolved + r.excluded, 1.0, 1e-9)
+    assert(r.unresolved > 0.0, s"this account has Unattached details: ${r.render}")
+    val ratio = scores.internalRatio
+    assertEquals(ratio.resolution, r)
+    // The value is reachable only through the condition; a bare accessor does not exist.
+    assert(!scala.compiletime.testing.typeChecks("scores.internalRatio.value"))
+    ratio.whenResolved match
+      case Some(v) => assert(v.forall(x => x >= 0.0 && x <= 1.0), v.toString)
+      case None    => assert(!r.clearsThreshold, r.render)
+  }
+
+  test("expected counts total the mass actually PLACED, never the whole observed mass") {
+    // The discriminating assertion for the renormalization trap. Dropping unresolved mass from the
+    // category distribution renormalizes the survivors, so unless the detail's weight is scaled by
+    // the fraction actually placed, a detail half of whose mass we could not place contributes a
+    // WHOLE detail's worth of categories. The counts would then exceed the evidence.
+    val placedMass = BirthdayInterview.model.assessments.flatMap { a =>
+      a.detail.observedMass.map(w => w * (1.0 - a.address.mass(_ == MemoryAddress.Unresolved)))
+    }.sum
+    val observedMass = BirthdayInterview.model.assessments.flatMap(_.detail.observedMass).sum
+    assert(placedMass < observedMass - 1e-9, "this fixture has no unresolved mass to discriminate")
+    val counted = scores.expected.values.map(_.point).sum
+    assertEqualsDouble(counted, placedMass, 1e-9)
+    assert(counted < observedMass - 1e-9, s"counts totalled the whole observed mass: $counted")
+  }

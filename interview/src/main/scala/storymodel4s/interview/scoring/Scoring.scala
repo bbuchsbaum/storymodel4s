@@ -1,6 +1,7 @@
 package storymodel4s.interview.scoring
 
 import storymodel4s.core.*
+import storymodel4s.interview.scoring.{Conditional, PlacementGrain, PlacementResolution}
 import storymodel4s.features.{Coverage, Estimate, MissingReason, ScoreEstimate}
 import storymodel4s.interview.*
 import storymodel4s.recall.RecallUnitId
@@ -94,13 +95,31 @@ final case class AiCompatibleScores(
     expected: Map[AiCategory, ExpectedCount],
     hard: Map[AiCategory, Int],
     byPhase: Map[InterviewPhase, Map[AiCategory, ExpectedCount]],
-    coverage: Coverage
+    coverage: Coverage,
+    /** How much of the account's detail mass we actually placed (protocol vehicle, ADR 0003).
+      *
+      * Distinct from `coverage`, which says whether a detail was OBSERVED. This says how much of
+      * its placement was RESOLVED, and it is what keeps our own uncertainty out of the ratio.
+      */
+    resolution: PlacementResolution
 ):
   def expectedInternal: Double = expected.collect { case (c, e) if c.isInternal => e.point }.sum
   def expectedExternal: Double = expected.collect { case (c, e) if !c.isInternal => e.point }.sum
-  def internalRatio: Option[Double] =
+
+  /** The Autobiographical Interview's headline measure, carried with the resolution it rests on.
+    *
+    * Unresolved mass enters NEITHER the numerator nor the denominator. It used to enter the
+    * denominator as an external detail, which depressed the ratio by exactly the amount of our own
+    * uncertainty - and that uncertainty is largest for vaguer, more disorganised accounts, which
+    * are produced by the very groups these studies compare. A model-uncertainty term correlated
+    * with group membership and pushing the headline measure one direction can manufacture a group
+    * difference that is not in the data.
+    *
+    * Returned as `Conditional` so the figure cannot be quoted without the resolution behind it.
+    */
+  def internalRatio: Conditional[Option[Double]] =
     val t = expectedInternal + expectedExternal
-    if t <= 0.0 then None else Some(expectedInternal / t)
+    Conditional(if t <= 0.0 then None else Some(expectedInternal / t), resolution)
 
 /** Projection of assessments onto traditional scores.
   *
@@ -142,7 +161,12 @@ object TraditionalScoring:
             case RepetitionRule.CountAsRepetition => Vector(AiCategory.Repetition -> pa)
             case RepetitionRule.Ignore            => Vector.empty
         case MemoryAddress.Discourse(_) => Vector(AiCategory.Other -> pa)
-        case MemoryAddress.Unresolved   => Vector(AiCategory.Other -> pa)
+        // Unresolved is OUR failure to place the detail, not the participant editorializing.
+        // In Levine et al. the external-other column is a positively identified category -
+        // metacognitive statements, inferences - and mapping unplaced mass onto it turned
+        // "we do not know where this belongs" into a scored external detail. It is now carried
+        // as unresolved mass on the score sheet's PlacementResolution instead.
+        case MemoryAddress.Unresolved => Vector.empty
     }
     Distribution.of(pairs).toOption
 
@@ -155,8 +179,23 @@ object TraditionalScoring:
       for
         w <- a.detail.observedMass
         d <- categoryDistribution(a, policy)
-      yield (w, d)
+      // The category distribution is conditional on placement - it is normalized over the
+      // categories that remain once unresolved and policy-excluded mass are removed. So the
+      // detail's WEIGHT must be scaled by the fraction actually placed, or dropping those terms
+      // would renormalize them away and inflate every remaining count: a detail half of whose
+      // mass we could not place would contribute a whole detail's worth of categories.
+      yield (w * placedFraction(a, policy), d)
     }
+
+  /** Fraction of a detail's address mass that reaches a scored category. */
+  private def placedFraction(a: DetailAssessment, policy: AiScoringPolicy): Double =
+    val unplaced = a.address.toVector.collect {
+      case (MemoryAddress.Unresolved, p) => p
+      case (MemoryAddress.Discourse(InterviewDiscourseFunction.Repetition(_)), p)
+          if policy.repetitionRule == RepetitionRule.Ignore =>
+        p
+    }.sum
+    math.max(0.0, 1.0 - unplaced)
 
   private def calibrationOf(as: Vector[DetailAssessment]): Option[String] =
     val models = as.map(_.meta.credence.calibrationModel).distinct
@@ -199,7 +238,48 @@ object TraditionalScoring:
       case PhaseHandling.Pooled   => Map.empty[InterviewPhase, Map[AiCategory, ExpectedCount]]
       case PhaseHandling.Separate =>
         phases.map(p => p -> expectedCounts(model.assessmentsIn(p), policy)).toMap
-    AiCompatibleScores(policy, expected, hard, byPhase, massCoverage(model.assessments))
+    AiCompatibleScores(
+      policy,
+      expected,
+      hard,
+      byPhase,
+      massCoverage(model.assessments),
+      placementResolution(model.assessments, policy)
+    )
+
+  /** The three placement masses of a whole account, normalized over its observed detail mass.
+    *
+    * `resolved` is mass that reached a scored category, `unresolved` is mass the model declined to
+    * place, and `excluded` is mass a POLICY removed - a repetition dropped under
+    * `RepetitionRule.Ignore` is a scoring decision, not a model outcome, and folding it into either
+    * of the other two would misattribute one for the other.
+    */
+  private[scoring] def placementResolution(
+      as: Vector[DetailAssessment],
+      policy: AiScoringPolicy
+  ): PlacementResolution =
+    var resolved = 0.0
+    var unresolved = 0.0
+    var excluded = 0.0
+    as.foreach { a =>
+      a.detail.observedMass.foreach { w =>
+        a.address.toVector.foreach { case (addr, pa) =>
+          val m = w * pa
+          addr match
+            case MemoryAddress.Unresolved => unresolved += m
+            case MemoryAddress.Discourse(InterviewDiscourseFunction.Repetition(_))
+                if policy.repetitionRule == RepetitionRule.Ignore =>
+              excluded += m
+            case _ => resolved += m
+        }
+      }
+    }
+    val total = resolved + unresolved + excluded
+    if total <= 0.0 then PlacementResolution.complete(PlacementGrain.Phase)
+    else
+      PlacementResolution
+        .of(PlacementGrain.Phase, resolved / total, unresolved / total, excluded / total)
+        .fold(e => throw new IllegalStateException(e.message), identity)
 
 /** Evidence for phenomenological re-experiencing, reported as separate strands and never summed
   * (design record §59.3; AGENTS.md contract 7).
