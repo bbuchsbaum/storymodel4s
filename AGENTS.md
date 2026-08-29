@@ -32,8 +32,12 @@ Package namespace is flat `storymodel4s.<module>`.
 ## Build and test
 
 - Scala 3.7.4, sbt 1.12.14, sbt-typelevel 0.8.7.
-- `sbt compileAll testAll` (all platforms) before declaring work complete;
-  `sbt testJVM` for a fast loop. The JVM-only `embed-grakern` project needs
+- Candidate authors run a **scoped gate**: `scalafmtCheckAll`, `compileAll`, and
+  the test tasks for the modules the change touches, on all platforms those
+  modules cross-build to. The full `testAll` court is the **chief's**, run once
+  before a push — concurrent full courts on one machine were the cause of
+  stalled and killed audits, not any one slow suite. `sbt testJVM` for a fast
+  loop. The JVM-only `embed-grakern` project needs
   `-Dstorymodel4s.grakern.build=/path/to/grakern` (or `STORYMODEL4S_GRAKERN_BUILD`)
   until grakern is published; it is part of `compileAll`/`testAll`/`testJVM`.
 - Warnings are errors in spirit: keep `-Wunused:all -Wvalue-discard` clean.
@@ -105,9 +109,10 @@ was set by the owner on 2026-08-28 (sticky decision
    dissent stays on the record. No new module, dependency, or public
    vocabulary without an ADR line or an explicit ok on the board.
 3. **Merge gate.** Nothing lands on `main` — including worktree merges by any
-   session — without a posted candidate SHA, `compileAll` + `testAll`
-   evidence (all three platforms for portable modules), and the chief's ack in
-   the thread. `codex-storymodel-release` performs the mechanical push to
+   session — without a posted candidate SHA, scoped-gate evidence (see *Build
+   and test*: `scalafmtCheckAll`, `compileAll`, and the touched modules' tests
+   on every platform they cross-build to), and the chief's ack in the thread.
+   The chief gates the merged tree and runs the full court before a push. `codex-storymodel-release` performs the mechanical push to
    GitHub. Commits are narrow: only the paths reserved under your bead.
 
    *Ancestry.* Before merging, verify the candidate's parent chain contains
