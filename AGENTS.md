@@ -439,6 +439,19 @@ was set by the owner on 2026-08-28 (sticky decision
    `Passed:` lines became one, for candidates differing by a trimmed test file.
    Keep the prior gate's numbers visible for exactly this reason.)
 
+   *Run the format check LAST.* sbt's `;` aborts the chain on first failure, so
+   `scalafmtCheckAll; compileAll; testJVM` lets a whitespace nit destroy the
+   correctness signal for everyone. Formatting stays IN the gate — nothing lands
+   unformatted, and the captured exit status still covers the whole chain — but it
+   belongs at the end. Measured on one candidate, same tree, order the only
+   variable: format-first gave `GATE_EXIT=1`, 7 errors, **zero** test totals and no
+   information; format-last gave the same exit status and the same 7 errors *plus*
+   17 suite totals and 1355 passing tests, which said the candidate's logic was
+   sound and only its whitespace was not. Same verdict, one of them actionable.
+   Note this is the *inconclusive* rule above arriving through chain ORDER rather
+   than through anyone's broken code — a rule you have just written is at its least
+   useful when you believe you already comply with it.
+
    *A compile error anywhere makes the gate INCONCLUSIVE, not partially clean.*
    `compileAll` aborts before any test runs, so a green-looking partial log means
    nothing was measured — a runtime break in an unrelated module stays hidden
