@@ -7,7 +7,11 @@ import storymodel4s.align.*
 import storymodel4s.embed.{SensitiveKeyProvider, Sensitivity}
 import storymodel4s.features.Estimate
 import storymodel4s.proposition.*
-import storymodel4s.recall.RecallUnit
+import storymodel4s.recall.{RecallGraph, RecallUnit}
+import storymodel4s.recall.RecallGraphStatus.{
+  Checked as RecallChecked,
+  Unchecked as RecallUnchecked
+}
 
 /** The structural channel inside alignment: `d_wl` lowers the cost of the true target relative to a
   * role-reversed foil, while the fidelity mode still comes from the ModeGate — structure grades, it
@@ -16,6 +20,9 @@ import storymodel4s.recall.RecallUnit
 class IntegrationSuite extends FunSuite:
   import AnnaFixture.*
   import Charts.*
+
+  private def checkedRecall(g: RecallGraph[RecallUnchecked]): RecallGraph[RecallChecked] =
+    RecallGraph.validated(g).fold(errors => fail(s"invalid structural recall: $errors"), identity)
 
   private val straight = transitive("find", "anna", "brother")
   private val reversed = transitive("find", "brother", "anna")
@@ -59,7 +66,9 @@ class IntegrationSuite extends FunSuite:
       .prepare(Vector(straight, reversed), publicReceipts)
       .fold(e => fail(e.message), identity)
     val vReversed = viewWith(Map(e5 -> PropositionEvidence.hand(reversed)))
-    val recallR = recall.copy(units = recall.units.map(u => if u.id == u2.id then unitChart else u))
+    val recallR = checkedRecall(
+      recall.copy(units = recall.units.map(u => if u.id == u2.id then unitChart else u))
+    )
     def facetsOnE5(provider: StructuralDistance): Set[NonEmptySet[Facet]] =
       val cands = CandidateGenerator(semantic, perLevel = 2).generate(recallR.ordered, vReversed)
       val res = GraphHsmm
@@ -85,7 +94,9 @@ class IntegrationSuite extends FunSuite:
       .prepare(Vector(straight), publicReceipts)
       .fold(e => fail(e.message), identity)
     val v = viewWith(Map(e5 -> PropositionEvidence.hand(straight)))
-    val recallV = recall.copy(units = recall.units.map(u => if u.id == u2.id then unitChart else u))
+    val recallV = checkedRecall(
+      recall.copy(units = recall.units.map(u => if u.id == u2.id then unitChart else u))
+    )
     val cands = CandidateGenerator(semantic, perLevel = 2).generate(recallV.ordered, v)
     val res = GraphHsmm.infer(recallV, v, cands, costModel.copy(structural = grakern)).toOption.get
     val row = res.posterior.row(u2.id).get

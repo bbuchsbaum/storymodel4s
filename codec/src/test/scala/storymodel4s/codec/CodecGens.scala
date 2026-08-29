@@ -7,6 +7,7 @@ import storymodel4s.core.NarrativeKind.{EntityK, SituationK}
 import storymodel4s.features.*
 import storymodel4s.proposition.*
 import storymodel4s.recall.*
+import storymodel4s.recall.RecallGraphStatus.{Checked as RecallChecked}
 import storymodel4s.story.*
 
 /** Minimal generators and fixtures for codec laws. Kept local: `laws` depends on `codec`'s peers
@@ -582,7 +583,7 @@ object CodecFixture:
     * text that is not the words its span points at, which is the case that lets a trace explain a
     * different string than the one embedded.
     */
-  val recall: RecallGraph =
+  val recall: RecallGraph[RecallChecked] =
     val transcript = StorySource.fromText("A woman went home. Then she slept.").toOption.get
     val ratlas = SurfaceAnalyzer.analyze(transcript)
     def rs(i: Int): SpanSet =
@@ -653,8 +654,9 @@ object CodecFixture:
       Vector(ElaborationEdge(u0, u1)),
       Vector(RecallCorefLink(ratlas.sentences(1).span, woman, RecallCorefKind.Pronoun))
     )
-    val g = RecallGraph(transcript, ratlas, units, rels)
-    RecallGraph.validated(g).fold(es => throw new IllegalStateException(es.toString), identity)
+    RecallGraph
+      .validated(transcript, ratlas, units, rels)
+      .fold(es => throw new IllegalStateException(es.toString), identity)
 
   /** A transcript overlay over the recall transcript: one participant turn covering everything. */
   val transcriptAtlas: TranscriptAtlas =

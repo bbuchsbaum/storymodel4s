@@ -6,6 +6,7 @@ import scala.compiletime.testing.typeCheckErrors
 import storymodel4s.align.*
 import storymodel4s.core.*
 import storymodel4s.recall.*
+import storymodel4s.recall.RecallGraphStatus.Checked
 
 /** Contextual and adversarial laws for the gated HSMM wire artifact. */
 class AlignCodecSuite extends FunSuite:
@@ -33,17 +34,49 @@ class AlignCodecSuite extends FunSuite:
       case other => fail(s"expected a view fingerprint rejection, got $other")
   }
 
-  test("same transcript boundaries with changed unit text fail recall-checksum matching") {
-    val first = fixture.recall.ordered.head
-    val changed = fixture.recall.copy(units =
-      fixture.recall.units.map(unit =>
-        if unit.id == first.id then unit.copy(text = unit.text + " changed") else unit
+  test("a different valid recall fails recall-checksum matching") {
+    val original = fixture.recall.transcript.canonicalText
+    val changedText = original.updated(0, original.head.toLower)
+    val transcript = StorySource.fromText(changedText, Some("checksum foil")).toOption.get
+    val atlas = SurfaceAnalyzer.analyze(transcript)
+    val units = fixture.recall.units.zip(atlas.sentences).map { case (unit, sentence) =>
+      unit.copy(
+        span = SpanSet.one(SpanRef(Some(sentence.id), sentence.span)),
+        text = atlas.text(sentence)
       )
-    )
+    }
+    val changed = RecallGraph
+      .validated(transcript, atlas, units, fixture.recall.relations)
+      .fold(errors => fail(s"checksum foil must be a valid recall: $errors"), identity)
     HsmmResultCodec.decode(encoded, changed, fixture.view) match
       case Left(HsmmCodecError.Rejected(AlignError.FingerprintMismatch(field, _, _))) =>
         assertEquals(field, "recallChecksum")
       case other => fail(s"expected a recall checksum rejection, got $other")
+  }
+
+  test("an edited unchecked recall cannot reach the contextual decoder") {
+    val positive = typeCheckErrors("""
+      import storymodel4s.align.SourceView
+      import storymodel4s.codec.HsmmResultCodec
+      import storymodel4s.core.StorySource
+      import storymodel4s.recall.RecallSegmenter
+      val source = StorySource.fromText("A remembered event.").toOption.get
+      val checked = RecallSegmenter.segment(source)
+      val view: SourceView = ???
+      HsmmResultCodec.decode("{}", checked, view)
+    """)
+    val rejected = typeCheckErrors("""
+      import storymodel4s.align.SourceView
+      import storymodel4s.codec.HsmmResultCodec
+      import storymodel4s.core.StorySource
+      import storymodel4s.recall.RecallSegmenter
+      val source = StorySource.fromText("A remembered event.").toOption.get
+      val unchecked = RecallSegmenter.segment(source).copy()
+      val view: SourceView = ???
+      HsmmResultCodec.decode("{}", unchecked, view)
+    """)
+    assert(positive.isEmpty, positive.toString)
+    assert(rejected.nonEmpty, rejected.toString)
   }
 
   test("an admissibility echo mutation is gate drift, never construction authority") {
@@ -156,7 +189,7 @@ class AlignCodecSuite extends FunSuite:
     }
 
   private final case class Fixture(
-      recall: RecallGraph,
+      recall: RecallGraph[Checked],
       view: InMemorySourceView,
       result: HsmmResult
   )
@@ -237,7 +270,7 @@ class AlignCodecSuite extends FunSuite:
         )
       }
       val recall = RecallGraph
-        .validated(RecallGraph(transcript, recallAtlas, units, RecallRelations.empty))
+        .validated(transcript, recallAtlas, units, RecallRelations.empty)
         .toOption
         .get
       val candidates = Candidates.of(

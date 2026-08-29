@@ -4,6 +4,7 @@ import storymodel4s.core.*
 import storymodel4s.features.{Estimate, ScoreEstimate}
 import storymodel4s.proposition.{Checked, EmbeddingKind, ParticipantRole, PropositionChart}
 import storymodel4s.recall.*
+import storymodel4s.recall.RecallGraphStatus.{Checked as RecallChecked}
 import storymodel4s.story.NarrativeNodeId
 
 /** Portable text helpers: locale-independent lowercasing and Unicode-aware word splitting, so that
@@ -386,7 +387,10 @@ object AtomProjection:
     }
 
   /** Relational atoms from explicit recall relations (causal/temporal connectives). */
-  def fromRelations(graph: RecallGraph, turnOf: RecallUnitId => Option[TurnId]): Vector[Detail] =
+  def fromRelations(
+      graph: RecallGraph[RecallChecked],
+      turnOf: RecallUnitId => Option[TurnId]
+  ): Vector[Detail] =
     def sit(id: RecallUnitId): Option[SituationId] = graph.unit(id).map(situationOf)
     val causal = graph.relations.causal.flatMap { e =>
       for

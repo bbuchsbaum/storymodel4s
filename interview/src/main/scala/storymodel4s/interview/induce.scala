@@ -5,6 +5,7 @@ import cats.data.NonEmptyVector
 import storymodel4s.core.*
 import storymodel4s.features.{Estimate, MissingReason, ScoreEstimate}
 import storymodel4s.recall.*
+import storymodel4s.recall.RecallGraphStatus.Checked
 
 /** Namespaced reasons why interview specificity was applicable but unavailable. */
 object SpecificityMissingReason:
@@ -350,7 +351,7 @@ object TargetInduction:
 
   /** Read-only cluster assignments for measurement fixtures. Same function `induce` uses. */
   private[interview] def clusterAssignments(
-      graph: RecallGraph,
+      graph: RecallGraph[Checked],
       config: InductionConfig = InductionConfig.default,
       semantic: Option[SemanticDistance] = None
   ): Map[RecallUnitId, ClusterAssignment] =
@@ -359,7 +360,7 @@ object TargetInduction:
     clusters(units, classes, semantic, config)
 
   def induce(
-      graph: RecallGraph,
+      graph: RecallGraph[Checked],
       details: Vector[Detail],
       cue: Cue,
       config: InductionConfig = InductionConfig.default,
@@ -565,7 +566,7 @@ object TargetInduction:
     */
   def assess(
       source: InterviewSource,
-      graph: RecallGraph,
+      graph: RecallGraph[Checked],
       details: Vector[Detail],
       result: InductionResult,
       config: InductionConfig = InductionConfig.default

@@ -5,10 +5,15 @@ import org.scalacheck.Gen
 import storymodel4s.align.*
 import storymodel4s.core.*
 import storymodel4s.recall.*
+import storymodel4s.recall.RecallGraphStatus.Checked
 
 /** Generators for small in-memory sources and recalls with table-driven semantic distances. */
 object AlignGens:
-  final case class Case(view: InMemorySourceView, recall: RecallGraph, semantic: SemanticDistance)
+  final case class Case(
+      view: InMemorySourceView,
+      recall: RecallGraph[Checked],
+      semantic: SemanticDistance
+  )
 
   def leaf(i: Int): SourceNodeRef = SourceNodeRef.Situation(SituationId.unsafe(s"e$i"))
   def scene(i: Int): SourceNodeRef = SourceNodeRef.Segment(SegmentId.unsafe(s"s$i"))
@@ -78,7 +83,7 @@ object AlignGens:
   val discourseFunction: Gen[DiscourseFunction] = Gen.oneOf(DiscourseFunction.values.toSeq)
 
   /** A recall of 1–5 units with random functions, predicates, polarities, and distances. */
-  def recall(view: InMemorySourceView): Gen[(RecallGraph, SemanticDistance)] =
+  def recall(view: InMemorySourceView): Gen[(RecallGraph[Checked], SemanticDistance)] =
     for
       k <- Gen.choose(1, 5)
       functions <- Gen.listOfN(k, discourseFunction)
@@ -106,7 +111,14 @@ object AlignGens:
         (u, i) <- units.zipWithIndex
         (n, j) <- view.nodes.zipWithIndex
       yield (u.id, n.ref) -> dists(i * view.nodes.size + j)).toMap
-      (RecallGraph(src, atlas, units, RecallRelations.empty), SemanticDistance.fromTable(table))
+      val checked = RecallGraph
+        .validated(src, atlas, units, RecallRelations.empty)
+        .fold(
+          errors =>
+            throw new IllegalStateException(s"AlignGens produced an invalid recall: $errors"),
+          identity
+        )
+      (checked, SemanticDistance.fromTable(table))
 
   val alignCase: Gen[Case] =
     for
@@ -142,7 +154,7 @@ object AlignGens:
   )
 
   /** Re-validate a forgery on the original recall and view (no echo). */
-  def revalidate(recall: RecallGraph, view: SourceView, r: HsmmResult, f: Forgery) =
+  def revalidate(recall: RecallGraph[Checked], view: SourceView, r: HsmmResult, f: Forgery) =
     val (anchors, p, fl, v, cs) = f
     HsmmResult.validated(recall, view, anchors, p, fl, v, r.logLikelihood, cs, r.refinementPasses)
 
@@ -337,8 +349,13 @@ object AlignGens:
       temperature: Double,
       passes: Int
   ):
-    def recall: RecallGraph =
-      RecallGraph(base.recall.transcript, base.recall.atlas, Vector(unit), RecallRelations.empty)
+    def recall: RecallGraph[Checked] =
+      RecallGraph
+        .validated(base.recall.transcript, base.recall.atlas, Vector(unit), RecallRelations.empty)
+        .fold(
+          errors => throw new IllegalStateException(s"foil produced an invalid recall: $errors"),
+          identity
+        )
     def semantic: SemanticDistance =
       SemanticDistance.of((u, n) => if u.id == unit.id && n.ref == target then 0.0 else 0.95)
     def costModel: LocalCostModel = DefaultLocalCostModel(weights = weights, semantic = semantic)

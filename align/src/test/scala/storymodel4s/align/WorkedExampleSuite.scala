@@ -3,13 +3,24 @@ package storymodel4s.align
 import munit.FunSuite
 import storymodel4s.core.*
 import storymodel4s.recall.*
+import storymodel4s.recall.RecallGraphStatus.Checked
 
 /** Design record §13 reproduced as executable expectations, plus the adversarial foils of §14.4. */
 class WorkedExampleSuite extends FunSuite:
   import AnnaFixture.*
 
+  private def checkedRecall(
+      source: StorySource,
+      atlas: SurfaceAtlas,
+      units: Vector[RecallUnit],
+      relations: RecallRelations = RecallRelations.empty
+  ): RecallGraph[Checked] =
+    RecallGraph
+      .validated(source, atlas, units, relations)
+      .fold(errors => fail(s"invalid test recall: $errors"), identity)
+
   private def infer(
-      r: RecallGraph,
+      r: RecallGraph[Checked],
       c: Candidates,
       m: LocalCostModel,
       cfg: HsmmConfig = HsmmConfig.default
@@ -220,7 +231,7 @@ class WorkedExampleSuite extends FunSuite:
       PropositionSketch.empty.copy(lemmas = Set("zxqv", "plorth", "wibble")),
       None
     )
-    val rg = RecallGraph(src, at, Vector(u), RecallRelations.empty)
+    val rg = checkedRecall(src, at, Vector(u))
     val cands = CandidateGenerator(SemanticDistance.abstaining).generate(Vector(u), view)
     assert(cands.abstained(u.id))
     val res = GraphHsmm
@@ -290,7 +301,7 @@ class WorkedExampleSuite extends FunSuite:
       ),
       None
     )
-    val rg = RecallGraph(
+    val rg = checkedRecall(
       src,
       at,
       Vector(u0, u1, u2, u3, u4),
@@ -320,7 +331,9 @@ class WorkedExampleSuite extends FunSuite:
   test("a layer the recall states no relations of is Missing, not perfectly preserved") {
     // The retracted-but-real half of bd-01M162YNC4QQ2VKWQZQJZMFD9V: reporting 1.0 here claimed
     // "every recalled relation is preserved" about a recall that claimed no relations at all.
-    val bare = recall.copy(relations = storymodel4s.recall.RecallRelations.empty)
+    val bare = RecallGraph
+      .validated(recall.copy(relations = storymodel4s.recall.RecallRelations.empty))
+      .fold(errors => fail(s"invalid relation-free recall: $errors"), identity)
     val diag = RelationPreservation.diagnostic(p, bare, view)
     assertEquals(diag(RelationLayer.WorldTime).mean, None)
     assertEquals(diag(RelationLayer.WorldTime).stated, 0)
@@ -368,7 +381,7 @@ class WorkedExampleSuite extends FunSuite:
     assert(HsmmConfig.of(refinementPasses = -1).isLeft)
     assert(CostWeights.of(1, -1, 0, 0, 0, 0).isLeft)
     assert(CostWeights.of(1, Double.NaN, 0, 0, 0, 0).isLeft)
-    val empty = RecallGraph(transcript, rAtlas, Vector.empty, RecallRelations.empty)
+    val empty = checkedRecall(transcript, rAtlas, Vector.empty)
     assertEquals(GraphHsmm.infer(empty, view, candidates, costModel), Left(AlignError.EmptyRecall))
   }
 
@@ -392,11 +405,15 @@ class WorkedExampleSuite extends FunSuite:
     // two things happened AT THE SAME TIME states no ordering, so there is nothing to preserve or
     // violate; it used to contribute 0.0 and count as a failure to preserve.
     import storymodel4s.recall.{RecallTemporalEdge, RecallTemporalRelation}
-    val simultaneousOnly = recall.copy(relations =
-      recall.relations.copy(temporal =
-        Vector(RecallTemporalEdge(u3.id, RecallTemporalRelation.Simultaneous, u2.id, None))
+    val simultaneousOnly = RecallGraph
+      .validated(
+        recall.copy(relations =
+          recall.relations.copy(temporal =
+            Vector(RecallTemporalEdge(u3.id, RecallTemporalRelation.Simultaneous, u2.id, None))
+          )
+        )
       )
-    )
+      .fold(errors => fail(s"invalid simultaneous-only recall: $errors"), identity)
     val l = RelationPreservation.diagnostic(p, simultaneousOnly, view)(RelationLayer.WorldTime)
     assertEquals(l.stated, 1, l.render)
     assertEquals(l.evaluated, 0, s"a simultaneity is not evaluable as an ordering: ${l.render}")

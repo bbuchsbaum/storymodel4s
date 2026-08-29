@@ -1,6 +1,7 @@
 package storymodel4s.align
 
 import storymodel4s.recall.RecallGraph
+import storymodel4s.recall.RecallGraphStatus.Checked
 
 final case class SinkhornConfig(
     epsilon: Double = 0.1,
@@ -108,7 +109,7 @@ object BaselineAligner:
     SinkhornConfig(epsilon = 0.05, rhoRows = 10.0, rhoCols = 0.1, maxIterations = 300)
 
   def align(
-      recall: RecallGraph,
+      recall: RecallGraph[Checked],
       view: SourceView,
       candidates: Candidates,
       semantic: SemanticDistance,

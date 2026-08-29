@@ -8,6 +8,7 @@ import org.scalacheck.Prop.forAll
 import storymodel4s.core.{StorySource, SurfaceAnalyzer}
 import storymodel4s.features.Estimate
 import storymodel4s.recall.{RecallGraph, RecallRelations}
+import storymodel4s.recall.RecallGraphStatus.Checked
 
 class PopulationSuite extends ScalaCheckSuite:
   import AnnaFixture.{view, e1, e5, sc1, sc2, root}
@@ -15,7 +16,7 @@ class PopulationSuite extends ScalaCheckSuite:
   private val eps = 1e-9
 
   private def infer(
-      recall: storymodel4s.recall.RecallGraph,
+      recall: RecallGraph[Checked],
       cands: Candidates,
       model: LocalCostModel
   ): HsmmResult =
@@ -271,13 +272,14 @@ class PopulationSuite extends ScalaCheckSuite:
     // HsmmResult.validated accepts a recall with no units. Its non-empty transcript proves that the
     // observable fact is only "no segmented recall units", not that the participant was silent.
     val transcript = StorySource.fromText("nothing here.", Some("no-units")).toOption.get
-    val zeroUnitRecall =
-      RecallGraph(
+    val zeroUnitRecall = RecallGraph
+      .validated(
         transcript,
         SurfaceAnalyzer.analyze(transcript),
         Vector.empty,
         RecallRelations.empty
       )
+      .fold(errors => fail(s"invalid empty recall: $errors"), identity)
     val zeroUnitProof = HsmmResult
       .validated(
         zeroUnitRecall,
@@ -362,7 +364,7 @@ class PopulationSuite extends ScalaCheckSuite:
   // mode gate (never by hand) and the proof invariants hold by construction.
 
   private def inferWith(
-      recall: storymodel4s.recall.RecallGraph,
+      recall: RecallGraph[Checked],
       cands: Candidates,
       model: LocalCostModel,
       temperature: Double,
@@ -383,7 +385,7 @@ class PopulationSuite extends ScalaCheckSuite:
     */
   private def genResult(
       allowExternal: Boolean
-  ): Gen[(storymodel4s.recall.RecallGraph, HsmmResult)] =
+  ): Gen[(RecallGraph[Checked], HsmmResult)] =
     val temps = Gen.oneOf(0.05, 0.15, 0.5)
     val passes = Gen.oneOf(0, 1)
     val anchored = for

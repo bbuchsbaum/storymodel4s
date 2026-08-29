@@ -4,6 +4,7 @@ import cats.data.NonEmptyVector
 import storymodel4s.core.{Checksum, OpaqueId}
 import storymodel4s.features.{Coverage, Estimate, MissingReason}
 import storymodel4s.recall.RecallGraph
+import storymodel4s.recall.RecallGraphStatus.Checked
 
 /** Identity of one rememberer in a population analysis. */
 object SubjectId extends OpaqueId("SubjectId")
@@ -17,7 +18,7 @@ type SubjectId = SubjectId.T
   */
 final case class SubjectAlignment(
     subject: SubjectId,
-    recall: RecallGraph,
+    recall: RecallGraph[Checked],
     result: HsmmResult,
     wordCount: Option[Int]
 )

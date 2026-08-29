@@ -5,6 +5,7 @@ import cats.syntax.all.*
 
 import storymodel4s.core.*
 import storymodel4s.recall.RecallGraph
+import storymodel4s.recall.RecallGraphStatus.Checked
 import storymodel4s.story.ModelStatus
 
 /** An episode as implied by the transcript (design record §60.1).
@@ -112,7 +113,7 @@ object EpisodeModel:
 final case class InterviewModel[S <: ModelStatus] private[interview] (
     schemaVersion: String,
     source: InterviewSource,
-    recall: RecallGraph,
+    recall: RecallGraph[Checked],
     details: Vector[Detail],
     assessments: Vector[DetailAssessment],
     target: Option[EpisodeModel],
@@ -134,7 +135,7 @@ object InterviewModel:
 
   def draft(
       source: InterviewSource,
-      recall: RecallGraph,
+      recall: RecallGraph[Checked],
       details: Vector[Detail],
       assessments: Vector[DetailAssessment],
       target: Option[EpisodeModel],

@@ -4,16 +4,29 @@ import cats.data.ValidatedNec
 import cats.syntax.all.*
 import storymodel4s.core.{DomainError, StorySource, SurfaceAtlas}
 
+/** Phantom validation state of a recall graph, so downstream analyses can require checked input. */
+sealed trait RecallGraphStatus
+object RecallGraphStatus:
+  /** A graph assembled or edited since its invariants were last checked. */
+  sealed trait Unchecked extends RecallGraphStatus
+
+  /** A graph whose structural and text-at-span invariants have all been checked. */
+  sealed trait Checked extends RecallGraphStatus
+
 /** A structured recall: transcript, its surface atlas, ordered idea units, and typed relations.
   *
-  * Invariants (see [[RecallGraph.validated]]): ordinals are `0..n-1`; unit spans lie inside the
-  * transcript; relation endpoints exist; no self-edges; participant entity references resolve.
+  * `S` records whether the invariants have been checked. Construction is private: fresh parts enter
+  * through [[RecallGraph.validated]], and every field replacement returns `Unchecked` so an edit
+  * cannot silently retain a `Checked` witness.
+  *
+  * Invariants: ordinals are `0..n-1`; unit spans lie inside the transcript and reproduce unit text;
+  * relation endpoints exist; no self-edges; participant entity references resolve.
   */
-final case class RecallGraph(
-    transcript: StorySource,
-    atlas: SurfaceAtlas,
-    units: Vector[RecallUnit],
-    relations: RecallRelations
+final class RecallGraph[S <: RecallGraphStatus] private (
+    val transcript: StorySource,
+    val atlas: SurfaceAtlas,
+    val units: Vector[RecallUnit],
+    val relations: RecallRelations
 ):
   lazy val byId: Map[RecallUnitId, RecallUnit] = units.iterator.map(u => u.id -> u).toMap
   lazy val byOrdinal: Map[Int, RecallUnit] = units.iterator.map(u => u.ordinal -> u).toMap
@@ -30,8 +43,42 @@ final case class RecallGraph(
   def unit(id: RecallUnitId): Option[RecallUnit] = byId.get(id)
   def size: Int = units.size
 
+  /** Replace any fields while deliberately forgetting the validation witness. */
+  def copy(
+      transcript: StorySource = transcript,
+      atlas: SurfaceAtlas = atlas,
+      units: Vector[RecallUnit] = units,
+      relations: RecallRelations = relations
+  ): RecallGraph[RecallGraphStatus.Unchecked] =
+    new RecallGraph[RecallGraphStatus.Unchecked](transcript, atlas, units, relations)
+
+  override def equals(other: Any): Boolean = other match
+    case that: RecallGraph[?] =>
+      transcript == that.transcript && atlas == that.atlas && units == that.units &&
+      relations == that.relations
+    case _ => false
+
+  override def hashCode: Int = (transcript, atlas, units, relations).##
+
+  override def toString: String = s"RecallGraph(units=${units.size})"
+
 object RecallGraph:
-  def validated(g: RecallGraph): ValidatedNec[DomainError, RecallGraph] =
+  import RecallGraphStatus.{Checked, Unchecked}
+
+  /** Assemble and validate a fresh graph, returning a checked witness only when every law passes.
+    */
+  def validated(
+      transcript: StorySource,
+      atlas: SurfaceAtlas,
+      units: Vector[RecallUnit],
+      relations: RecallRelations
+  ): ValidatedNec[DomainError, RecallGraph[Checked]] =
+    validated(unchecked(transcript, atlas, units, relations))
+
+  /** Revalidate an assembled or edited graph, accumulating all invariant violations. */
+  def validated(
+      g: RecallGraph[Unchecked]
+  ): ValidatedNec[DomainError, RecallGraph[Checked]] =
     val ids = g.units.map(_.id)
     val dup = ids.diff(ids.distinct).distinct
     val dupCheck: ValidatedNec[DomainError, Unit] =
@@ -111,4 +158,15 @@ object RecallGraph:
             )
             .invalidNec
       }
-    (dupCheck, ordCheck, spanCheck, relCheck, partCheck, textCheck).mapN((_, _, _, _, _, _) => g)
+    (dupCheck, ordCheck, spanCheck, relCheck, partCheck, textCheck).mapN { (_, _, _, _, _, _) =>
+      new RecallGraph[Checked](g.transcript, g.atlas, g.units, g.relations)
+    }
+
+  /** Raw construction for validator fixtures inside `recall`; public callers validate parts. */
+  private[recall] def unchecked(
+      transcript: StorySource,
+      atlas: SurfaceAtlas,
+      units: Vector[RecallUnit],
+      relations: RecallRelations
+  ): RecallGraph[Unchecked] =
+    new RecallGraph[Unchecked](transcript, atlas, units, relations)

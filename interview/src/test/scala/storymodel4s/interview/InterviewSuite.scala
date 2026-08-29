@@ -658,7 +658,9 @@ class InterviewSuite extends ScalaCheckSuite:
     val ds = AtomProjection.fromUnit(u, TurnId.unsafe("t"))
     val src = StorySource.fromText("Something happened somewhere.").toOption.get
     val g = RecallSegmenter.segment(src)
-    val graph = g.copy(units = g.units.map(_.copy(function = DiscourseFunction.Uninterpretable)))
+    val graph = RecallGraph
+      .validated(g.copy(units = g.units.map(_.copy(function = DiscourseFunction.Uninterpretable))))
+      .fold(errors => fail(s"invalid uninterpretable recall: $errors"), identity)
     val r = TargetInduction.induce(graph, ds, Cue("cue", None, None))
     ds.foreach(d => assertEquals(r.addresses(d.id).mode, MemoryAddress.Unresolved))
   }

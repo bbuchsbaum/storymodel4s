@@ -2,6 +2,7 @@ package storymodel4s.align
 
 import storymodel4s.features.{Estimate, MissingReason, ScoreEstimate}
 import storymodel4s.recall.{RecallGraph, RecallUnitId}
+import storymodel4s.recall.RecallGraphStatus.Checked
 
 /** The decomposed recall signature `m_s` (design record §12). Every component stays separately
   * accessible; a scalar is only ever produced by a declared [[SignatureProjection]].
@@ -253,7 +254,7 @@ object RecallSignature:
 
   def compute(
       result: HsmmResult,
-      recall: RecallGraph,
+      recall: RecallGraph[Checked],
       view: SourceView,
       causalLevelThreshold: Int = 1
   ): RecallSignature =

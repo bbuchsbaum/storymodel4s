@@ -2,6 +2,7 @@ package storymodel4s.align
 
 import storymodel4s.core.*
 import storymodel4s.recall.*
+import storymodel4s.recall.RecallGraphStatus.Checked
 
 /** The worked example of design record §13: a five-event source and a four-unit recall, plus
   * adversarial foils. Semantic distances are injected from a table that stands in for an embedding
@@ -297,17 +298,19 @@ object AnnaFixture:
     )
   )
 
-  val recall: RecallGraph = RecallGraph(
-    transcript,
-    rAtlas,
-    Vector(u0, u1, u2, u3),
-    RecallRelations(
-      Vector(RecallTemporalEdge(u3.id, RecallTemporalRelation.Before, u2.id, None)),
-      Vector.empty,
-      Vector.empty,
-      Vector.empty
+  val recall: RecallGraph[Checked] = RecallGraph
+    .validated(
+      transcript,
+      rAtlas,
+      Vector(u0, u1, u2, u3),
+      RecallRelations(
+        Vector(RecallTemporalEdge(u3.id, RecallTemporalRelation.Before, u2.id, None)),
+        Vector.empty,
+        Vector.empty,
+        Vector.empty
+      )
     )
-  )
+    .fold(errors => throw new IllegalStateException(s"invalid Anna recall: $errors"), identity)
 
   /** Stand-in for embedding cosine distances. */
   val table: Map[(RecallUnitId, SourceNodeRef), Double] = Map(
@@ -337,7 +340,11 @@ object AnnaFixture:
 
   // ---- foils ------------------------------------------------------------------------------
 
-  final case class Foil(name: String, recall: RecallGraph, semantic: SemanticDistance):
+  final case class Foil(
+      name: String,
+      recall: RecallGraph[Checked],
+      semantic: SemanticDistance
+  ):
     val unit: RecallUnit = recall.ordered.head
     def candidates: Candidates =
       CandidateGenerator(semantic, perLevel = 2).generate(recall.ordered, view)
@@ -367,7 +374,9 @@ object AnnaFixture:
     val table = distances.map { case (ref, d) => (id, ref) -> d }
     Foil(
       name,
-      RecallGraph(src, at, Vector(u), RecallRelations.empty),
+      RecallGraph
+        .validated(src, at, Vector(u), RecallRelations.empty)
+        .fold(errors => throw new IllegalStateException(s"invalid Anna foil: $errors"), identity),
       SemanticDistance.fromTable(table)
     )
 

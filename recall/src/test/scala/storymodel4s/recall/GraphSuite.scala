@@ -25,7 +25,7 @@ class GraphSuite extends ScalaCheckSuite:
     )
 
   private val good =
-    RecallGraph(src, atlas, Vector(unit(0), unit(1), unit(2)), RecallRelations.empty)
+    RecallGraph.unchecked(src, atlas, Vector(unit(0), unit(1), unit(2)), RecallRelations.empty)
 
   test("a well-formed graph validates and exposes the chain") {
     assert(RecallGraph.validated(good).isValid)

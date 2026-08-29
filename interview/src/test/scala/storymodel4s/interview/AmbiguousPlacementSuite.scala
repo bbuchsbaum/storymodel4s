@@ -4,6 +4,7 @@ import munit.FunSuite
 
 import storymodel4s.core.*
 import storymodel4s.recall.*
+import storymodel4s.recall.RecallGraphStatus.Checked
 
 /** Production-path reachability fixture for bd-01M16TAM38RKYXVJK113Y83M4B.
   *
@@ -23,13 +24,13 @@ class AmbiguousPlacementSuite extends FunSuite:
   private def transcript(probe: String): String =
     s"We ate cake at the restaurant. The year before we went to Montreal. $probe"
 
-  private def induce(text: String): (RecallGraph, Vector[Detail], InductionResult) =
+  private def induce(text: String): (RecallGraph[Checked], Vector[Detail], InductionResult) =
     val src = StorySource.fromText(text).toOption.get
     val g = RecallSegmenter.segment(src)
     val ds = g.ordered.flatMap(u => AtomProjection.fromUnit(u, TurnId.unsafe("t")))
     (g, ds, TargetInduction.induce(g, ds, cue))
 
-  private def unitContaining(g: RecallGraph, fragment: String): RecallUnit =
+  private def unitContaining(g: RecallGraph[Checked], fragment: String): RecallUnit =
     g.ordered
       .find(_.text.toLowerCase.contains(fragment.toLowerCase))
       .getOrElse(fail(s"no unit contains '$fragment'; units=${g.ordered.map(_.text)}"))
@@ -52,7 +53,7 @@ class AmbiguousPlacementSuite extends FunSuite:
     val neither = induce(transcript("The dog barked in the park."))
 
     def sides(
-        run: (RecallGraph, Vector[Detail], InductionResult),
+        run: (RecallGraph[Checked], Vector[Detail], InductionResult),
         frag: String
     ): (Boolean, Boolean) =
       val g = run._1
