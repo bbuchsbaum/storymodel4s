@@ -637,6 +637,27 @@ object ExternalStates:
   * behaviour: an abstaining provider is replaced by the declared neutral `missingSemantic` (a
   * constant, not another term), because unranked units are already routed to `Unranked` upstream.
   */
+
+/** The local cost blend, extracted so the arithmetic is addressable.
+  *
+  * This number decides which alignment wins, and every assertion that compares one computed total
+  * to another survives a systematic change to it: both sides move together. So it is pinned by
+  * literal expected values in `CostSuite`, not by recomputation through this same function.
+  */
+object DefaultLocalCostModel:
+
+  /** Weighted sum over the terms actually present, in `CostTerm` enum order, plus the unit's
+    * discourse-function prior. Absent terms contribute nothing — they are not zero-valued terms,
+    * they are terms the model could not compute, and the distinction is recorded separately in
+    * `CostBreakdown.missingTerms`.
+    */
+  private[align] def blend(
+      terms: Map[CostTerm, Double],
+      weights: CostWeights,
+      functionPrior: Double
+  ): Double =
+    CostTerm.values.toVector.flatMap(t => terms.get(t).map(weights(t) * _)).sum + functionPrior
+
 final case class DefaultLocalCostModel(
     weights: CostWeights = CostWeights.default,
     semantic: SemanticDistance = SemanticDistance.lexicalJaccard,
@@ -711,10 +732,7 @@ final case class DefaultLocalCostModel(
     val present = optional.collect { case (t, Estimate.Observed(v, _)) => t -> clamp(v) }
     val missing = optional.collect { case (t, Estimate.Missing(_)) => t }.toSet
     val terms = (always ++ present).toMap
-    // deterministic summation order over the enum, skipping absent terms
-    val weighted =
-      CostTerm.values.toVector.flatMap(t => terms.get(t).map(weights(t) * _)).sum +
-        functionPrior(unit.function)
+    val weighted = DefaultLocalCostModel.blend(terms, weights, functionPrior(unit.function))
     CostBreakdown(
       terms,
       Some(mode),
