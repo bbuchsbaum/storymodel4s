@@ -5,6 +5,13 @@ import storymodel4s.core.*
 import storymodel4s.core.NarrativeKind.{EntityK, SituationK}
 import storymodel4s.story.*
 
+// File scope is deliberate: the public nested E/C/S/G namespaces must initialize without forcing
+// the enclosing model while one of those namespaces is still only partly initialized.
+private def eid(k: String): EntityId = EntityId.unsafe(s"wog:ent:$k")
+private def sid(k: String): SituationId = SituationId.unsafe(s"wog:sit:$k")
+private def gid(k: String): SegmentId = SegmentId.unsafe(s"wog:seg:$k")
+private def cid(k: String): ContextId = ContextId.unsafe(s"wog:ctx:$k")
+
 /** Hand-authored narrative acceptance fixture for *The War of the Ghosts* (design record §27).
   *
   * This is a researcher-reviewed model in narrative types — entities, situations, contexts, typed
@@ -86,11 +93,6 @@ object WarOfTheGhostsModel:
 
   private def resolved(key: String, value: String, spans: SpanSet): Resolved[String] =
     Resolved(value, explicit(key, spans), Vector.empty)
-
-  private def eid(k: String): EntityId = EntityId.unsafe(s"wog:ent:$k")
-  private def sid(k: String): SituationId = SituationId.unsafe(s"wog:sit:$k")
-  private def gid(k: String): SegmentId = SegmentId.unsafe(s"wog:seg:$k")
-  private def cid(k: String): ContextId = ContextId.unsafe(s"wog:ctx:$k")
 
   private def emention(k: String, n: Int): MentionId[EntityK] =
     MentionId.unsafe[EntityK](s"wog:m:ent:$k:s$n")
