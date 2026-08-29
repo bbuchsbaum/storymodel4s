@@ -1,6 +1,10 @@
 The War of the Ghosts
 
-Source: Boas, F. (1901). Kathlamet Texts. Bureau of American Ethnology Bulletin 26, pp. 182–184, "The War of the Ghosts (told 1891)", narrated by Charles Cultee. US Government publication — public domain. OCR corrected against the interlinear gloss; "Lgu'laq" normalized to "Egulac" (as in Bartlett 1932).
+Source:        Narrated by Charles Cultee (Kathlamet), 1891; recorded and published by Franz Boas, "The War of the Ghosts", in Kathlamet Texts, Bureau of American Ethnology Bulletin 26 (1901), pp. 182-184.
+Basis:         US Government publication (Bureau of American Ethnology), 1901 - public domain.
+Modifications: OCR corrected against the interlinear gloss. "Lgu'laq" normalized to "Egulac", to match the spelling in Bartlett (1932), so that this text collates with the serial-reproduction literature that cites it.
+Tradition:     Kathlamet (Chinookan). See docs/design/story-text-admission-checklist.md section 4 - this text is the founding stimulus of the serial-reproduction literature, and Bartlett's framing of it as unfamiliar and strange is a claim this project studies, never a description of the material.
+Admitted by:   claude-storymodel4s (chief architect), 2026-08-29, checked against the checklist in docs/design/story-text-admission-checklist.md.
 
 There were people at Egulac. One night two young men went to hunt seals. They came down the river. It became foggy and calm. While they were paddling they heard war-cries. They thought: "Maybe there is a war party." They escaped toward the shore and hid behind a log. Now canoes came up and they heard the noise of paddles. When the canoes came opposite them they saw one canoe coming up to them. There were five men in the canoe. They spoke to them: "What do you think? We wish to take you along. We are going up the river to make war on the people." One of the young men said: "I have no arrows." "Arrows are in the canoe." One of them said: "I will not go along, I might be killed. My relatives do not know where I have gone. You may go with them." Thus he spoke to his fellow. The one accompanied them. He went into their canoe and the other went home. At midnight he returned and said: "My relative left me. He went to accompany the warriors who went up the river to make war."
 

@@ -98,6 +98,12 @@ Package namespace is flat `storymodel4s.<module>`.
     receipts. (c) The *War of the Ghosts* fixture is a researcher-reviewed
     **narrative acceptance fixture** expressed in narrative types and
     plain-language expectations — never hand-authored AMR.
+    (d) **No story text, recall transcript, or excerpt enters this repository
+    until it passes `docs/design/story-text-admission-checklist.md`**, whose
+    answers live in the text file's own header and are checked by someone other
+    than the proposer. Participant recall text is barred outright until the
+    owner records an REB basis for redistribution; pseudonymization is a
+    technical control, not consent.
 
 ## Coordination and governance
 
