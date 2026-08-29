@@ -77,8 +77,32 @@ class AddressSuite extends ScalaCheckSuite:
     assert(AddressEscape.decode("%").isLeft)
     assert(AddressEscape.decode("%2").isLeft)
     assert(AddressEscape.decode("%zz").isLeft)
+    assertEquals(
+      AddressEscape.decode("%２F"),
+      Left(DomainError.InvalidFormat("AddressKey", "%２F", "malformed escape"))
+    )
+    assertEquals(
+      AddressEscape.decode("%٢F"),
+      Left(DomainError.InvalidFormat("AddressKey", "%٢F", "malformed escape"))
+    )
     assert(AddressEscape.decode("a/b").isLeft)
     assert(AddressEscape.decode("a b").isLeft)
+
+  test("malformed UTF-8 escapes are rejected, not replaced"):
+    val malformed = Vector(
+      "%FF", // illegal leading byte
+      "%C0%AF", // overlong slash
+      "%E2%82", // truncated three-byte sequence
+      "%ED%A0%80", // encoded surrogate
+      "%F4%90%80%80" // code point above U+10FFFF
+    )
+    malformed.foreach { encoded =>
+      assertEquals(
+        AddressEscape.decode(encoded),
+        Left(DomainError.InvalidFormat("AddressKey", encoded, "malformed UTF-8"))
+      )
+    }
+    assertEquals(AddressEscape.decode("%F0%9F%99%82"), Right("🙂"))
 
   property("address render/parse is a round trip"):
     forAll { (a: Address) => Address.parse(a.render) == Right(a) }

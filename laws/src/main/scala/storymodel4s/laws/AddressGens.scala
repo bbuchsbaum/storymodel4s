@@ -17,7 +17,16 @@ object AddressGens:
   val anyPart: Gen[String] = Gen.oneOf(
     Gen.asciiStr,
     Gen
-      .listOf(Gen.chooseNum(0x20, 0xffff).map(_.toChar).suchThat(c => !Character.isSurrogate(c)))
+      .listOf(
+        Gen.frequency(
+          8 -> Gen
+            .chooseNum(0x20, 0xffff)
+            .map(_.toChar)
+            .suchThat(c => !Character.isSurrogate(c))
+            .map(_.toString),
+          1 -> Gen.chooseNum(0x10000, 0x10ffff).map(cp => new String(Character.toChars(cp)))
+        )
+      )
       .map(_.mkString),
     Gen.oneOf("", "/", "%", "%2F", "a/b", "tag:kind", "x y", "é/ß%")
   )
