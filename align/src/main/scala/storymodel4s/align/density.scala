@@ -66,7 +66,7 @@ object Density:
       normalized = false
     )
 
-  val derivation: FeatureDerivation = FeatureDerivation(
+  val derivation: FeatureDerivation = FeatureDerivation.unsafe(
     cats.data.NonEmptyVector.one(FeatureSpaceId.unsafe("align.posterior")),
     None,
     ReducerId.unsafe("smoothed-box-density"),

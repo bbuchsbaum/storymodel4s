@@ -462,7 +462,7 @@ object InvalidStoryGens:
         "feature.space-exists",
         true,
         b =>
-          val ref = FeatureRef(
+          val ref = FeatureRef.unsafe(
             FeatureTarget.Situation(b.situations(0)),
             FeatureSpaceId.unsafe("space:missing"),
             0
@@ -470,22 +470,25 @@ object InvalidStoryGens:
           b.draft(featureRefs = b.featureRefs :+ ref)
       ),
       (
-        "feature.row-nonnegative",
-        true,
-        b => b.draft(featureRefs = b.featureRefs :+ b.featureRefs.head.copy(row = -1))
-      ),
-      (
         "feature.row-in-range",
         true,
         b =>
-          b.draft(featureRefs = b.featureRefs :+ b.featureRefs.head.copy(row = b.situations.size))
+          val head = b.featureRefs.head
+          b.draft(featureRefs =
+            b.featureRefs :+ FeatureRef.unsafe(head.target, head.space, b.situations.size)
+          )
       ),
       (
         "feature.target-exists",
         true,
         b =>
+          val head = b.featureRefs.head
           b.draft(featureRefs =
-            b.featureRefs :+ b.featureRefs.head.copy(target = FeatureTarget.Situation(missingSit))
+            b.featureRefs :+ FeatureRef.unsafe(
+              FeatureTarget.Situation(missingSit),
+              head.space,
+              head.row
+            )
           )
       ),
       (
@@ -493,14 +496,18 @@ object InvalidStoryGens:
         true,
         b =>
           val (id, m) = b.sidecars.head
-          b.draft(sidecars = Map(id -> m.copy(space = FeatureSpaceId.unsafe("space:other"))))
-      ),
-      (
-        "feature.sidecar-valid",
-        false, // consequential laws also fire (post story fix pass)
-        b =>
-          val (id, m) = b.sidecars.head
-          b.draft(sidecars = Map(id -> m.copy(dimension = 0)))
+          b.draft(sidecars =
+            Map(
+              id -> SidecarManifest.unsafe(
+                FeatureSpaceId.unsafe("space:other"),
+                m.dimension,
+                m.rowCount,
+                m.dtype,
+                m.checksum,
+                m.layout
+              )
+            )
+          )
       ),
       (
         "sensory.target-exists",

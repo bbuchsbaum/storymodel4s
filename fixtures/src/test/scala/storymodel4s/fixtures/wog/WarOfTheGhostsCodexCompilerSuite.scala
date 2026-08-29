@@ -48,7 +48,7 @@ class WarOfTheGhostsCodexCompilerSuite extends ScalaCheckSuite:
     sceneTarget,
     episodeTarget,
     storyTarget
-  ).zipWithIndex.map((target, row) => FeatureRef(target, featureSpaceId, row))
+  ).zipWithIndex.map((target, row) => FeatureRef.unsafe(target, featureSpaceId, row))
 
   private val scalesAndTargets = Vector(
     FeatureScale.SurfaceUnit(SurfaceUnitKind.Token) -> tokenTarget,
@@ -66,7 +66,7 @@ class WarOfTheGhostsCodexCompilerSuite extends ScalaCheckSuite:
       spaceId: FeatureSpaceId = featureSpaceId,
       atlas: SurfaceAtlas = scaleAtlas
   ): StoryModel[ModelStatus.Validated] =
-    val manifest = SidecarManifest(
+    val manifest = SidecarManifest.unsafe(
       spaceId,
       dimension = 1,
       rowCount = refs.size,
@@ -551,7 +551,7 @@ class WarOfTheGhostsCodexCompilerSuite extends ScalaCheckSuite:
   test("a legacy derived selection resolves its output space and audits the derivation"):
     val derivation = Checksum.ofText("wog:derived:scale-selector")
     val derivedSpace = FeatureSpaceId.unsafe("derived:" + derivation.short(32))
-    val refs = featureRefs.map(_.copy(space = derivedSpace))
+    val refs = featureRefs.map(r => FeatureRef.unsafe(r.target, derivedSpace, r.row))
     val derivedModel = modelWithFeatureRefs(refs, derivedSpace)
     val selection = FeatureSelection.Derived(derivation)
     val state = CommonViewState
@@ -594,7 +594,7 @@ class WarOfTheGhostsCodexCompilerSuite extends ScalaCheckSuite:
       .of(feature = Some(FeatureSelection.Raw(featureSpaceId)))
       .fold(error => fail(error.message), identity)
     val paragraphOnly = modelWithFeatureRefs(
-      Vector(FeatureRef(paragraphTarget, featureSpaceId, row = 0))
+      Vector(FeatureRef.unsafe(paragraphTarget, featureSpaceId, row = 0))
     )
     Vector(SurfaceUnitKind.Clause, SurfaceUnitKind.Sentence).foreach { kind =>
       val spec = CodexSpec
@@ -613,7 +613,7 @@ class WarOfTheGhostsCodexCompilerSuite extends ScalaCheckSuite:
 
     val sentenceTaggedParagraph = modelWithFeatureRefs(
       Vector(
-        FeatureRef(
+        FeatureRef.unsafe(
           FeatureTarget.Sentence(model.atlas.paragraphs.head.id),
           featureSpaceId,
           row = 0
@@ -634,8 +634,8 @@ class WarOfTheGhostsCodexCompilerSuite extends ScalaCheckSuite:
   test("duplicate targets in one feature space fail closed instead of coalescing rows"):
     val duplicateModel = modelWithFeatureRefs(
       Vector(
-        FeatureRef(paragraphTarget, featureSpaceId, row = 0),
-        FeatureRef(paragraphTarget, featureSpaceId, row = 1)
+        FeatureRef.unsafe(paragraphTarget, featureSpaceId, row = 0),
+        FeatureRef.unsafe(paragraphTarget, featureSpaceId, row = 1)
       )
     )
     val state = CommonViewState

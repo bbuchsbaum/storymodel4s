@@ -467,7 +467,7 @@ class SidecarSuite extends ScalaCheckSuite:
 
     val nan = bytes.clone()
     writeLongLE(nan, SidecarCodec.HeaderBytes, java.lang.Double.doubleToRawLongBits(Double.NaN))
-    val nanManifest = manifest.copy(checksum = Checksum.ofBytes(nan))
+    val nanManifest = remanifest(manifest)(checksum = Checksum.ofBytes(nan))
     assert(SidecarCodec.validateBytes(nanManifest, nan).isLeft)
 
     val (floatManifest, floatBytes) = SidecarCodec
@@ -476,15 +476,25 @@ class SidecarSuite extends ScalaCheckSuite:
       .get
     val infinity = floatBytes.clone()
     writeIntLE(infinity, SidecarCodec.HeaderBytes, 0x7f800000)
-    val infinityManifest = floatManifest.copy(checksum = Checksum.ofBytes(infinity))
+    val infinityManifest = remanifest(floatManifest)(checksum = Checksum.ofBytes(infinity))
     assert(SidecarCodec.validateBytes(infinityManifest, infinity).isLeft)
 
     val unsignedOverflow = bytes.clone()
     unsignedOverflow(15) = 0x80.toByte
     assert(SidecarCodec.validateBytes(manifest, unsignedOverflow).isLeft)
 
-    val enormous = manifest.copy(dimension = Int.MaxValue, rowCount = Int.MaxValue)
-    assert(SidecarCodec.validateBytes(enormous, Array.emptyByteArray).isLeft)
+    assert(
+      SidecarManifest
+        .of(
+          manifest.space,
+          Int.MaxValue,
+          Int.MaxValue,
+          manifest.dtype,
+          manifest.checksum,
+          manifest.layout
+        )
+        .isLeft
+    )
   }
 
   test("SM4SFT02 rejects inconsistent headers before trusting their sizes") {
@@ -547,7 +557,7 @@ class SidecarSuite extends ScalaCheckSuite:
     writeChecksum(forged, SidecarCodec.BlockedHeaderBytes, digest)
     val forgedIndexChecksum = Checksum.ofBytes(forged.slice(0, layout.preludeByteLength.toInt))
     val forgedManifest = withIndexChecksum(
-      manifest.copy(checksum = Checksum.ofBytes(forged)),
+      remanifest(manifest)(checksum = Checksum.ofBytes(forged)),
       forgedIndexChecksum
     )
     val checkedPrelude = SidecarCodec
@@ -568,7 +578,7 @@ class SidecarSuite extends ScalaCheckSuite:
     val perRowWithIndex = rowStride + SidecarCodec.BlockDigestBytes.toLong
     val lastSafeRows = ((Long.MaxValue - SidecarCodec.BlockedHeaderBytes) / perRowWithIndex).toInt
     val blockRows = SidecarBlockRows.from(1).toOption.get
-    val base = SidecarManifest(
+    val base = SidecarManifest.unsafe(
       vectorSpace.id,
       dimension,
       lastSafeRows,
@@ -577,7 +587,17 @@ class SidecarSuite extends ScalaCheckSuite:
       Layout.BlockedRowMajor(blockRows, Checksum.ofText("last-safe-index"))
     )
     val lastSafe = SidecarCodec.blockedLayout(base).toOption.get
-    val firstOverflow = base.copy(rowCount = lastSafeRows + 1)
+    val firstOverflow = SidecarManifest
+      .of(
+        base.space,
+        base.dimension,
+        lastSafeRows + 1,
+        base.dtype,
+        base.checksum,
+        base.layout
+      )
+      .toOption
+      .get
 
     assert(lastSafe.fileByteLength <= Long.MaxValue)
     assert(Long.MaxValue - lastSafe.fileByteLength < perRowWithIndex)
@@ -618,21 +638,32 @@ class SidecarSuite extends ScalaCheckSuite:
         observations,
         proxy.derivation,
         proxy.provenance,
-        proxy.manifest.copy(rowCount = rows)
+        SidecarManifest.unsafe(
+          proxy.manifest.space,
+          proxy.manifest.dimension,
+          rows,
+          proxy.manifest.dtype,
+          proxy.manifest.checksum,
+          proxy.manifest.layout
+        )
       )
 
     val wrongTarget = first.copy(
-      estimate = Estimate.Observed(ref.copy(target = target(9)), None)
+      estimate = Estimate.Observed(FeatureRef.unsafe(target(9), ref.space, ref.row), None)
     ) +: proxy.observations.tail
     assert(check(wrongTarget, 2).isLeft)
 
     val wrongSpace = first.copy(
-      estimate = Estimate.Observed(ref.copy(space = FeatureSpaceId.unsafe("space:other")), None)
+      estimate = Estimate.Observed(
+        FeatureRef.unsafe(ref.target, FeatureSpaceId.unsafe("space:other"), ref.row),
+        None
+      )
     ) +: proxy.observations.tail
     assert(check(wrongSpace, 2).isLeft)
 
-    val gap = first.copy(estimate = Estimate.Observed(ref.copy(row = 1), None)) +:
-      proxy.observations.tail
+    val gap =
+      first.copy(estimate = Estimate.Observed(FeatureRef.unsafe(ref.target, ref.space, 1), None)) +:
+        proxy.observations.tail
     assert(check(gap, 2).isLeft)
     assert(check(proxy.observations, 3).isLeft)
 
@@ -751,6 +782,16 @@ class SidecarSuite extends ScalaCheckSuite:
         case other => fail(s"missingness changed: $other")
     }
 
+  private def remanifest(m: SidecarManifest)(
+      space: FeatureSpaceId = m.space,
+      dimension: Int = m.dimension,
+      rowCount: Int = m.rowCount,
+      dtype: Dtype = m.dtype,
+      checksum: Checksum = m.checksum,
+      layout: Layout = m.layout
+  ): SidecarManifest =
+    SidecarManifest.unsafe(space, dimension, rowCount, dtype, checksum, layout)
+
   private def blockBytes(bytes: Array[Byte], range: SidecarBlockRange): Array[Byte] =
     bytes.slice(range.byteOffset.toInt, range.byteEndExclusive.toInt)
 
@@ -760,7 +801,7 @@ class SidecarSuite extends ScalaCheckSuite:
   ): SidecarManifest =
     manifest.layout match
       case Layout.BlockedRowMajor(rows, _) =>
-        manifest.copy(layout = Layout.BlockedRowMajor(rows, checksum))
+        remanifest(manifest)(layout = Layout.BlockedRowMajor(rows, checksum))
       case other => fail(s"expected blocked layout, found $other")
 
   private def testBlockDigest(

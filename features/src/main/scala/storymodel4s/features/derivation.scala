@@ -142,19 +142,20 @@ object NarrativeWindowPlan:
   * parameter that changes the output is part of the recipe, including eligibility and target
   * family. A recipe has at most one window: `window` slides over the surface axis,
   * `narrativeWindow` over a [[NarrativeBasis]]; the latter is rendered only when present so ids of
-  * surface recipes never change.
+  * surface recipes never change. Not a case class: `fromProduct` would mint both windows at once,
+  * which [[FeatureDerivation.of]] refuses.
   */
-final case class FeatureDerivation(
-    inputs: NonEmptyVector[FeatureSpaceId],
-    window: Option[WindowPlan],
-    reducer: ReducerId,
-    weighting: WeightingPolicy,
-    missing: MissingValuePolicy,
-    normalization: Option[NormalizationPolicy],
-    implementationVersion: String,
-    eligibility: Eligibility = Eligibility.LexicalTokens,
-    targetFamily: Option[TargetFamily] = None,
-    narrativeWindow: Option[NarrativeWindowPlan] = None
+final class FeatureDerivation private (
+    val inputs: NonEmptyVector[FeatureSpaceId],
+    val window: Option[WindowPlan],
+    val reducer: ReducerId,
+    val weighting: WeightingPolicy,
+    val missing: MissingValuePolicy,
+    val normalization: Option[NormalizationPolicy],
+    val implementationVersion: String,
+    val eligibility: Eligibility,
+    val targetFamily: Option[TargetFamily],
+    val narrativeWindow: Option[NarrativeWindowPlan]
 ):
   def canonicalString: String =
     (Vector(
@@ -170,9 +171,7 @@ final case class FeatureDerivation(
       "impl=" + implementationVersion
     )).mkString(";")
 
-  /** A recipe must not slide over two axes at once; enforced by [[FeatureDerivation.of]], the codec
-    * decoder, and [[DerivationGraph.add]].
-    */
+  /** A recipe must not slide over two axes at once; enforced by [[FeatureDerivation.of]]. */
   def hasSingleWindow: Boolean = window.isEmpty || narrativeWindow.isEmpty
 
   /** Content address of the recipe. */
@@ -190,13 +189,35 @@ final case class FeatureDerivation(
       "derived:" + Checksum.ofText(derivationId.hex + "|" + basis.checksum.hex).short(32)
     )
 
+  override def equals(other: Any): Boolean = other match
+    case that: FeatureDerivation =>
+      inputs == that.inputs && window == that.window && reducer == that.reducer &&
+      weighting == that.weighting && missing == that.missing &&
+      normalization == that.normalization &&
+      implementationVersion == that.implementationVersion && eligibility == that.eligibility &&
+      targetFamily == that.targetFamily && narrativeWindow == that.narrativeWindow
+    case _ => false
+
+  override def hashCode(): Int =
+    (
+      inputs,
+      window,
+      reducer,
+      weighting,
+      missing,
+      normalization,
+      implementationVersion,
+      eligibility,
+      targetFamily,
+      narrativeWindow
+    ).##
+
+  override def toString: String = s"FeatureDerivation($canonicalString)"
+
 object FeatureDerivation:
   private val path = "features/derivation"
 
-  /** Checked constructor: rejects a recipe carrying both a surface and a narrative window. The
-    * case-class constructor stays public because recipes are also built by `align` and by `copy` in
-    * tests; every boundary that admits a recipe (codec, [[DerivationGraph.add]]) re-validates.
-    */
+  /** Checked constructor: rejects a recipe carrying both a surface and a narrative window. */
   def of(
       inputs: NonEmptyVector[FeatureSpaceId],
       window: Option[WindowPlan],
@@ -209,20 +230,44 @@ object FeatureDerivation:
       targetFamily: Option[TargetFamily] = None,
       narrativeWindow: Option[NarrativeWindowPlan] = None
   ): Either[DomainError, FeatureDerivation] =
-    validated(
-      FeatureDerivation(
-        inputs,
-        window,
-        reducer,
-        weighting,
-        missing,
-        normalization,
-        implementationVersion,
-        eligibility,
-        targetFamily,
-        narrativeWindow
-      )
+    val d = new FeatureDerivation(
+      inputs,
+      window,
+      reducer,
+      weighting,
+      missing,
+      normalization,
+      implementationVersion,
+      eligibility,
+      targetFamily,
+      narrativeWindow
     )
+    validated(d)
+
+  def unsafe(
+      inputs: NonEmptyVector[FeatureSpaceId],
+      window: Option[WindowPlan],
+      reducer: ReducerId,
+      weighting: WeightingPolicy,
+      missing: MissingValuePolicy,
+      normalization: Option[NormalizationPolicy],
+      implementationVersion: String,
+      eligibility: Eligibility = Eligibility.LexicalTokens,
+      targetFamily: Option[TargetFamily] = None,
+      narrativeWindow: Option[NarrativeWindowPlan] = None
+  ): FeatureDerivation =
+    of(
+      inputs,
+      window,
+      reducer,
+      weighting,
+      missing,
+      normalization,
+      implementationVersion,
+      eligibility,
+      targetFamily,
+      narrativeWindow
+    ).fold(e => throw new IllegalArgumentException(e.message), identity)
 
   def validated(d: FeatureDerivation): Either[DomainError, FeatureDerivation] =
     if d.hasSingleWindow then Right(d)

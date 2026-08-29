@@ -327,7 +327,7 @@ object Mutations:
       None
     )
     val manifest =
-      SidecarManifest(id, 3, 1, storymodel4s.features.Dtype.Float32, Checksum.ofText("x"))
+      SidecarManifest.unsafe(id, 3, 1, storymodel4s.features.Dtype.Float32, Checksum.ofText("x"))
     StoryModel.draft(
       b.source,
       b.atlas,

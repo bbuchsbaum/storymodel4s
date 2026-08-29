@@ -148,7 +148,7 @@ object FeatureCodecs:
       t <- field[Dtype](c, "dtype")
       h <- field[Checksum](c, "checksum")
       l <- field[Layout](c, "layout")
-      m <- domain(c, SidecarManifest.validated(SidecarManifest(s, d, r, t, h, l)))
+      m <- domain(c, SidecarManifest.of(s, d, r, t, h, l))
     yield m
   }
 
@@ -160,7 +160,8 @@ object FeatureCodecs:
       t <- field[FeatureTarget](c, "target")
       s <- field[FeatureSpaceId](c, "space")
       r <- field[Int](c, "row")
-    yield FeatureRef(t, s, r)
+      ref <- domain(c, FeatureRef.of(t, s, r))
+    yield ref
   }
 
   given Encoder[Coverage] = Encoder.instance(cv =>
