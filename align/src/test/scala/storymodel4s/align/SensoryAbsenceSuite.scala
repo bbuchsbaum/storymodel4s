@@ -40,10 +40,22 @@ class SensoryAbsenceSuite extends FunSuite:
     assert(miss.has(CostTerm.Sensory))
     assert(!miss.missingTerms.contains(CostTerm.Sensory), miss.missingTerms)
     assertEqualsDouble(miss.term(CostTerm.Sensory), expected, eps)
-    assertEqualsDouble(
-      miss.total - empty.total,
-      CostWeights.default(CostTerm.Sensory) * expected,
-      eps
+    // THE LAW: a looked-up miss must cost MORE than no sensory evidence at all. Absence is not a
+    // free pass, which is the whole point of admitting Sensory to MayBeMissing.
+    assert(
+      miss.total > empty.total,
+      s"a sensory miss (${miss.total}) must cost more than sensory absence (${empty.total})"
+    )
+
+    // THE VALUE, and it is LESS than the raw sensory weight of 0.15. That is not a rounding
+    // artefact: the cost is scaled to the support it could have had, so adding a measured term
+    // raises the numerator AND the present weight, shrinking the scale factor. A term's marginal
+    // contribution is therefore always below its own weight once scaling applies. Pinned rather
+    // than derived so a change to either the weight or the scale rule fails here.
+    assertEqualsDouble(miss.total - empty.total, 0.142969, 1e-6)
+    assert(
+      miss.total - empty.total < CostWeights.default(CostTerm.Sensory) * expected,
+      "the marginal contribution must be below the raw weight once the scale applies"
     )
   }
 

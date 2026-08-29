@@ -2,6 +2,8 @@ package storymodel4s.align
 
 import munit.FunSuite
 
+import storymodel4s.recall.RecallUnit
+
 /** The local cost blend, pinned by literal expected values.
   *
   * Every other assertion in align that touches a total compares one computed total to another —
@@ -109,6 +111,69 @@ class CostSuite extends FunSuite:
       java.lang.Double.doubleToLongBits(DefaultLocalCostModel.blend(a, w, 0.0)),
       java.lang.Double.doubleToLongBits(DefaultLocalCostModel.blend(b, w, 0.0))
     )
+  }
+
+  test("LAW 1: a cell whose eligible terms were all measured is bit-identical") {
+    // The guarantee that makes scaling safe to adopt. If every eligible term was measured, the
+    // factor is exactly 1 and the cost is the number it was before the scale existed - so the
+    // calibrated weights, external floor, mismatch and priors all keep their meaning.
+    val terms = Map(
+      CostTerm.Semantic -> 1.0,
+      CostTerm.Propositional -> 2.0,
+      CostTerm.Entity -> 4.0
+    )
+    val eligible = terms.keySet
+    val scaled = DefaultLocalCostModel.blend(terms, w, 0.3, eligible)
+    val unscaled = DefaultLocalCostModel.blend(terms, w, 0.3)
+    assertEqualsDouble(
+      DefaultLocalCostModel.scaleToEligible(terms.keySet, eligible, w),
+      1.0,
+      0.0,
+      "full support must scale by EXACTLY one, not approximately"
+    )
+    assertEqualsDouble(scaled, unscaled, 0.0, "a fully measured cell must not move at all")
+
+    // And the control: it is only bit-identical because present == eligible. Widen eligible and
+    // the same terms scale up, or the law above would hold for any input and prove nothing.
+    val wider = eligible + CostTerm.Sensory
+    assert(
+      DefaultLocalCostModel.blend(terms, w, 0.3, wider) > scaled,
+      "a cell missing an ELIGIBLE term must scale up; otherwise LAW 1 is vacuous"
+    )
+  }
+
+  test("LAW 2: an INELIGIBLE term is inert - it cannot change the source/external balance") {
+    // The law as I can defensibly state it. A term that could never have been measured for this
+    // cell must not affect the outcome at all: including it in the eligible set or leaving it out
+    // must give the same source-versus-external comparison.
+    //
+    // NOTE THIS IS A REGRESSION GUARD, NOT A POSITIVE CONTROL, and I want that on the record rather
+    // than implied. Today's code has no eligibility concept at all, so it passes this trivially -
+    // it cannot fail on the unfixed model. What it protects is the fix: if a later change lets
+    // ineligible terms into the scale denominator, the balance moves and this fails.
+    val model = DefaultLocalCostModel()
+    val unit = AnnaFixture.recall.ordered.head
+    val node = AnnaFixture.view.nodes.head
+    val b = model.cost(unit, node, FidelityMode.Faithful, AnnaFixture.view)
+
+    // Chart is ineligible here: neither side carries a chart. Adding it to the eligible set is
+    // exactly the "invent a dimension the data cannot have" error that collapsed every row when I
+    // scaled over all terms.
+    val honest = DefaultLocalCostModel.blend(b.terms, CostWeights.default, 0.0, b.terms.keySet)
+    val inflated =
+      DefaultLocalCostModel.blend(
+        b.terms,
+        CostWeights.default,
+        0.0,
+        b.terms.keySet + CostTerm.Chart
+      )
+    assert(
+      inflated > honest,
+      "counting an ineligible term as eligible must inflate the cost; if it does not, the scale is inert and LAW 2 proves nothing"
+    )
+
+    // And the cost the model actually produces must be the honest one, not the inflated one.
+    assertEqualsDouble(b.total, honest, 1e-9, "the model counted an ineligible term as eligible")
   }
 
   test("the default weights are the ones the model actually ships with") {

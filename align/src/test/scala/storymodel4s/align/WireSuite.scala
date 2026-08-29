@@ -34,7 +34,8 @@ class WireSuite extends FunSuite:
       b.total,
       b.missingTerms,
       b.sourceChartCoverage,
-      b.reductions
+      b.reductions,
+      b.supportWeight
     )
 
   /** A small checked chart (as in EvidenceSuite), for evidence toggles. */
@@ -596,7 +597,8 @@ class WireSuite extends FunSuite:
             b.total,
             b.missingTerms,
             b.sourceChartCoverage,
-            receipts
+            receipts,
+            b.supportWeight
           )
           .fold(e => fail(e.message), identity)
       }

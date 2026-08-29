@@ -161,6 +161,21 @@ enum Exclusion:
   /** The candidate reference is not a node of the view. */
   case Unreachable
 
+  /** Every term that could have been measured for this cell carries zero weight, so the cost rests
+    * on no evidence at all.
+    *
+    * DISTINCT FROM Unreachable, and the distinction is the point: Unreachable is a claim about the
+    * REFERENCE - that node is not in the view. This is a claim about the EVIDENCE - the node is
+    * there and we have no weighted basis to judge it. Collapsing them would be the same lie the
+    * support carrier exists to prevent.
+    *
+    * It must be an exclusion rather than a price. With no weighted terms the blend contributes
+    * nothing and the cost falls to the function prior alone, which sits BELOW the external floor -
+    * so a cell that measured nothing would become the cheapest anchor available. That is absence
+    * scored as a perfect match, at the level of a whole cell.
+    */
+  case Unassessable
+
 /** The declared estimand for reducing compatible structural member estimates.
   *
   * Why: reducer choice changes the scientific question and therefore belongs in every receipt.
@@ -232,7 +247,16 @@ final case class CostBreakdown private[align] (
     total: Double,
     missingTerms: Set[CostTerm] = Set.empty,
     sourceChartCoverage: Option[StructuralCoverage] = None,
-    reductions: Map[CostTerm, StructuralReductionReceipt] = Map.empty
+    reductions: Map[CostTerm, StructuralReductionReceipt] = Map.empty,
+    /** Share of the ELIGIBLE term weight actually measured for this cell.
+      *
+      * `total` is scaled up to eligible support, which assumes the unmeasured eligible terms behave
+      * like the measured ones. This names that assumption: 1.0 means nothing was assumed, and a
+      * lower value says how much of the cost is extrapolation. A consumer comparing costs across
+      * cells with different support is comparing claims of different strength, and this is what
+      * lets it notice — or refuse.
+      */
+    supportWeight: Double = 1.0
 ):
   def term(t: CostTerm): Double = terms.getOrElse(t, 0.0)
   def has(t: CostTerm): Boolean = terms.contains(t)
@@ -254,6 +278,19 @@ final case class CostBreakdown private[align] (
 object CostBreakdown:
   def unreachable: CostBreakdown =
     CostBreakdown(Map.empty, None, Some(Exclusion.Unreachable), Double.MaxValue / 4)
+
+  /** A cell with no weighted evidence: excluded, and priced beyond reach so that any consumer which
+    * ignores the exclusion still cannot prefer it. Support is 0 because nothing was measured — the
+    * honest value, and the one the [0, 1] guard exists to admit.
+    */
+  def unassessable: CostBreakdown =
+    CostBreakdown(
+      Map.empty,
+      None,
+      Some(Exclusion.Unassessable),
+      Double.MaxValue / 4,
+      supportWeight = 0.0
+    )
 
 /** Graded semantic distance in `[0, 1]` between a recall unit and a source node, or `Missing` when
   * the provider abstains (no embedding for the unit, out-of-domain text, budget exceeded). This is
@@ -685,9 +722,53 @@ object DefaultLocalCostModel:
   private[align] def blend(
       terms: Map[CostTerm, Double],
       weights: CostWeights,
-      functionPrior: Double
+      functionPrior: Double,
+      eligible: Set[CostTerm] = Set.empty
   ): Double =
-    CostTerm.values.toVector.flatMap(t => terms.get(t).map(weights(t) * _)).sum + functionPrior
+    val present = CostTerm.values.toVector.flatMap(t => terms.get(t).map(weights(t) * _)).sum
+    functionPrior + present * scaleToEligible(terms.keySet, eligible, weights)
+
+  /** `W_eligible / W_present` — scales a partially measured cost up to the support it COULD have
+    * had.
+    *
+    * Scaling to ELIGIBLE weight, not to all terms, is the whole point. A term that could never have
+    * been measured for this cell — `d_chart` where neither side carries a chart — is not a
+    * measurement we failed to make, and inflating as though it were invents a dimension the data
+    * cannot have. Measured on WOG: eligible-aware gives 1.0000 for fully measured cells and 1.0469
+    * for cells missing only Sensory; scaling over all terms gives 1.2985 and 1.3594, and collapses
+    * every row to External.
+    *
+    * IT IS STILL AN IMPUTATION: it assumes the unmeasured eligible terms behave like the measured
+    * ones. The difference from imputing per term is that this one is named in
+    * [[CostBreakdown.supportWeight]] and can be refused. The blend does NOT refuse on its own — the
+    * aligner must produce a posterior — so the refusal is the consumer's to make.
+    */
+  private[align] def scaleToEligible(
+      present: Set[CostTerm],
+      eligible: Set[CostTerm],
+      weights: CostWeights
+  ): Double =
+    // An empty eligible set means the caller did not declare eligibility, and the safe reading is
+    // "everything present was everything possible" - factor 1, today's behaviour. Defaulting to ALL
+    // terms would silently scale an unaware caller to a support it never claimed, which is the
+    // failure that collapsed every row when I scaled over all terms.
+    if eligible.isEmpty then 1.0
+    else
+      val wPresent = present.toVector.map(weights(_)).sum
+      val wEligible = eligible.toVector.map(weights(_)).sum
+      if !(wPresent > 0.0) || !(wEligible > 0.0) then 1.0 else wEligible / wPresent
+
+  /** Share of the ELIGIBLE term weight that was actually measured; 1.0 when nothing was assumed. */
+  private[align] def supportOf(
+      present: Set[CostTerm],
+      eligible: Set[CostTerm],
+      weights: CostWeights
+  ): Double =
+    if eligible.isEmpty then 1.0
+    else
+      val wEligible = eligible.toVector.map(weights(_)).sum
+      if !(wEligible > 0.0) then 1.0
+      else math.min(1.0, present.toVector.map(weights(_)).sum / wEligible)
 
 final case class DefaultLocalCostModel(
     weights: CostWeights = CostWeights.default,
@@ -763,19 +844,40 @@ final case class DefaultLocalCostModel(
     val present = optional.collect { case (t, Estimate.Observed(v, _)) => t -> clamp(v) }
     val missing = optional.collect { case (t, Estimate.Missing(_)) => t }.toSet
     val terms = (always ++ present).toMap
-    val weighted = DefaultLocalCostModel.blend(terms, weights, functionPrior(unit.function))
-    CostBreakdown(
-      terms,
-      Some(mode),
-      None,
-      weighted,
-      missing,
-      Some(view.structuralCoverage(node.ref)),
-      Map(
-        CostTerm.Chart -> chartReduction.receipt,
-        CostTerm.Structural -> structuralReduction.receipt
+    // ELIGIBILITY IS PER-CELL, not per-view. A chartless node in a mixed view could never have been
+    // chart-compared, so treating it as a missed measurement would invent a dimension that cell
+    // cannot have — the same error as scaling over all terms, which collapsed every row to External.
+    // Chart needs evidence on BOTH sides (ChartDistance.report, cost.scala:346-348); Structural
+    // needs a supplied provider AND unit evidence (cost.scala:398).
+    val chartEligible = unit.evidence.nonEmpty && node.evidence.nonEmpty
+    val structuralEligible = structural != StructuralDistance.missing && unit.evidence.nonEmpty
+    val eligible = always.map(_._1).toSet ++
+      Set(CostTerm.Sensory) ++
+      Option.when(chartEligible)(CostTerm.Chart) ++
+      Option.when(structuralEligible)(CostTerm.Structural)
+    val support = DefaultLocalCostModel.supportOf(terms.keySet, eligible, weights)
+    // ZERO SUPPORT IS AN EXCLUSION, NOT A PRICE. With no weighted evidence the blend contributes
+    // nothing and the cost falls to the function prior, which is below the external floor - so the
+    // cell that measured nothing would win. Excluding it drops the state from the space entirely
+    // (hsmm.scala builds states from `!b.excluded`), which says the true thing: we have no basis to
+    // rank this anchor, rather than a very good one.
+    if support <= 0.0 then CostBreakdown.unassessable
+    else
+      val weighted =
+        DefaultLocalCostModel.blend(terms, weights, functionPrior(unit.function), eligible)
+      CostBreakdown(
+        terms,
+        Some(mode),
+        None,
+        weighted,
+        missing,
+        Some(view.structuralCoverage(node.ref)),
+        Map(
+          CostTerm.Chart -> chartReduction.receipt,
+          CostTerm.Structural -> structuralReduction.receipt
+        ),
+        support
       )
-    )
 
   private def clamp(x: Double): Double =
     if x.isNaN then 1.0 else math.max(0.0, math.min(1.0, x))

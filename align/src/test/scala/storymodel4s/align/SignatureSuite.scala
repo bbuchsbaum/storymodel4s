@@ -478,14 +478,17 @@ class SignatureSuite extends FunSuite:
     assert(d.conditioningMass <= d.totalMass + 1e-9, d.render)
     assert(d.support > 0.0 && d.support < 1.0, s"fixture cannot distinguish coverage: ${d.render}")
 
-    // Pinned, because this is the number the migration exists to surface: the chronology figure on
-    // the worked example rests on 30.5% of the route mass. The value itself is unchanged in KIND -
-    // the arithmetic was always a ratio of sums - but 0.0395 read as a statement about this person's
-    // recall when nearly seventy percent of their route was never judgeable. A reader who saw only
-    // the value would have had no way to know that.
-    assertEqualsDouble(d.value.getOrElse(fail(d.render)), 0.039516, 1e-6)
-    assertEqualsDouble(d.support, 0.304620, 1e-6)
-    assertEqualsDouble(d.conditioningMass, 0.913861, 1e-6)
+    // Pinned, because this is the number the migration exists to surface: the chronology figure
+    // rests on a fraction of the route mass, and a reader seeing only the value would not know it.
+    //
+    // THE VALUE MOVED 0.039516 -> 0.027088 when the blend began scaling costs to their eligible
+    // support. That is not a change to this estimand's arithmetic - it was always a ratio of sums.
+    // It is the posterior shifting underneath, because units measurable on fewer dimensions no
+    // longer get cheaper source cells against an unmoved external floor. Re-derived against 855b754
+    // rather than carried over: the tolerance trio and WeightedCoverage landings do not move it.
+    assertEqualsDouble(d.value.getOrElse(fail(d.render)), 0.027088, 1e-6)
+    assertEqualsDouble(d.support, 0.300646, 1e-6)
+    assertEqualsDouble(d.conditioningMass, 0.901938, 1e-6)
 
     // The distinction the world field must keep, and the one I got wrong first: a view with NO
     // world order is 0 of 0 - the source has no world chronology to violate - while a view that
@@ -586,11 +589,20 @@ class SignatureSuite extends FunSuite:
       s"the two formulas coincide here, so this fixture proves nothing: $massWeighted"
     )
     // Pinned literals, hand-read from this fixture. The inequality above survives any change that
-    // moves both formulas together; these do not. Mass-weighting publishes 0.6782 where
-    // mean-of-ratios published 0.6284 - the low-mass units were voting at full weight.
-    assertEqualsDouble(massWeighted, 0.678220, 1e-6)
-    assertEqualsDouble(meanOfRatios, 0.628359, 1e-6)
-    assertEqualsDouble(s.specificityMass.conditioningMass, 2.736038, 1e-6)
+    // moves both formulas together; these do not. Mass-weighting publishes 0.6870 where
+    // mean-of-ratios publishes 0.6284 - the low-mass units were voting at full weight.
+    //
+    // BOTH figures moved when the blend began scaling to eligible support, because the posterior
+    // shifted underneath them: mass-weighted 0.678220 -> 0.687021, mean-of-ratios 0.628359 ->
+    // 0.635733. I first wrote that mean-of-ratios was unmoved, reasoning that it depends on
+    // localizability alone; that was wrong, because WHICH ROWS ARE LOCALIZABLE is itself a function
+    // of the posterior. The test caught it.
+    //
+    // The gap widened slightly, 0.049861 -> 0.051288, so the discriminator is no weaker than
+    // before. That is a consequence worth having pinned rather than a property worth relying on.
+    assertEqualsDouble(massWeighted, 0.687021, 1e-6)
+    assertEqualsDouble(meanOfRatios, 0.635733, 1e-6)
+    assertEqualsDouble(massWeighted - meanOfRatios, 0.051288, 1e-6)
   }
 
   test("compression conditions on SOURCE MASS, not on a count of units") {
