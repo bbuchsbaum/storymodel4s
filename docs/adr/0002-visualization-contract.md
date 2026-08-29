@@ -221,6 +221,34 @@ use the exact Codex grammars above. `zoom.narrative` is
 rendering; changing any field, order, grammar, or escaping requires a new
 version.
 
+### D14a `SurfaceDetail` is compiled into the scene, not projected by the renderer
+
+**Decision.** `storymodel4s.view` compiles surface primitives into `NarrativeScene.marks`.
+`SurfaceDetail` is **not** a renderer-layer projection that a consumer applies to `SurfaceAtlas`
+itself.
+
+**Why, and the argument is not aesthetic.** `EvidenceHorizon` is "the one evidence-horizon
+computation shared by every view compiler" (D4, row 7) and it lives in `view`. `V-L1` (every child
+has a visible ancestor at a coarser level), `V-L2` (a selected address survives as `OnMark`,
+`ViaAncestor` with a descent path, or `OffProjection`) and `selectionPlacements` are all properties
+of `NarrativeScene.marks`. **Marks a renderer adds on its own are covered by none of them.** A
+consumer-side projection could therefore render a token belonging to a narrative node the horizon
+hides — the precise leak class already fixed once when the Atlas ancestor climb could reveal a
+placement reachable only through horizon-hidden evidence.
+
+**This does not weaken the no-inference law (D4).** `SurfaceUnit(id, kind, span, ordinal, parent)`
+is canonical, already carries stable ids, and already carries the parent chain. Compiling it is
+*selection and placement of existing units*, not derivation of new claims. A surface mark asserts
+nothing the `SurfaceAtlas` did not already assert.
+
+**Acceptance.** Until surface marks are compiled, `SurfaceDetail` must not be exposed as a control.
+Measured on `main` at the time of this decision: compiling the same scene at `Hidden`, `Sentences`
+and `Tokens` yields identical marks (83, 83, 83), identical navigation and identical
+`selectionPlacements`, but **three distinct configuration checksums**. Exposing a selector over an
+inert axis would mint three identities for one representation and look like the feature had
+shipped. The axis is receipted but semantically inert, and a receipt that distinguishes what is not
+different is the mirror of every defect this project has been correcting.
+
 ### D14 Module placement
 - `view` (new, portable, cross-built JVM/JS/Native, depends on all domain
   modules, **not** on codec, DOM, Intaglio, or any JVM-only layout): owns
