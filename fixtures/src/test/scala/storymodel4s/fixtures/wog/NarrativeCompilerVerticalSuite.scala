@@ -243,7 +243,8 @@ class NarrativeCompilerVerticalSuite extends FunSuite:
     val result = GraphHsmm
       .infer(recall, view, candidates, DefaultLocalCostModel(semantic = semantic))
       .fold(e => fail(e.message), identity)
-    val signature = RecallSignature.compute(result, recall, view)
+    val signature =
+      RecallSignature.compute(result, recall, view).fold(e => fail(e.message), identity)
 
     assertEquals(compiled.derivation.gaps, Vector.empty)
     assertEquals(view.leaves.size, 1)
