@@ -2,7 +2,7 @@ package storymodel4s.embed
 
 import cats.{Order, Show}
 
-import storymodel4s.core.{Checksum, DomainError, OpaqueId, TextSpan}
+import storymodel4s.core.{DomainError, OpaqueId, TextSpan}
 
 /** How sensitive an input is. Autobiographical transcripts are `Sensitive` by construction. */
 enum Sensitivity:
@@ -49,41 +49,54 @@ final class PseudonymizedText private (
     val policyId: PrivacyPolicyId,
     val keyId: KeyId,
     val text: String,
-    val offsets: Vector[(TextSpan, TextSpan)]
+    val offsets: Vector[(TextSpan, TextSpan)],
+    /** Keyed identity of this payload under its pseudonymization key (ADR 0001 D6): an HMAC over
+      * the canonical `pseudo/v1` rendering, minted by [[PseudonymizedText.checked]] and never a
+      * plain hash of the sanitized text. Always `DigestKind.Keyed` under `keyId`.
+      */
+    val digest: ReceiptDigest
 ):
-  def digest: Checksum = Checksum.ofText(s"${policyId.value}\u0000${keyId.value}\u0000$text")
-
   override def equals(other: Any): Boolean = other match
     case that: PseudonymizedText =>
       policyId == that.policyId && keyId == that.keyId && text == that.text &&
-      offsets == that.offsets
+      offsets == that.offsets && digest == that.digest
     case _ => false
 
-  override def hashCode: Int = (policyId, keyId, text, offsets).##
+  override def hashCode: Int = (policyId, keyId, text, offsets, digest).##
 
   override def toString: String =
     s"PseudonymizedText(<redacted>, length=${text.length}, replacements=${offsets.size})"
 
 object PseudonymizedText:
-  /** Check that an offset map is a complete, code-point-safe account of pseudonymization.
+  /** Invariant path reported when the pseudonymization key `keyId` is unavailable in `keys`. */
+  val KeyPath: String = "pseudonymization/key"
+
+  /** Check that an offset map is a complete, code-point-safe account of pseudonymization, and mint
+    * the payload's keyed identity under `keyId` from `keys`.
     *
     * Each pair maps a nonempty source span to its replacement span in `text`. Text outside mapped
     * spans must be unchanged, so callers cannot hide an unexplained transformation or present raw
     * text with an empty/fictitious map. Validation errors report only positions and invariant
-    * names, never source or destination text.
+    * names, never source or destination text. A missing key fails closed with
+    * `InvariantViolation(KeyPath, …)`: no `PseudonymizedText` exists without a keyed digest.
     */
   def checked(
       policyId: PrivacyPolicyId,
       keyId: KeyId,
       sourceText: String,
       text: String,
-      offsets: Vector[(TextSpan, TextSpan)]
+      offsets: Vector[(TextSpan, TextSpan)],
+      keys: SensitiveKeyProvider
   ): Either[DomainError, PseudonymizedText] =
     for
       _ <- validateUtf16(sourceText, "source")
       _ <- validateUtf16(text, "destination")
       _ <- validateMap(sourceText, text, offsets)
-    yield new PseudonymizedText(policyId, keyId, text, offsets)
+      digest <- ReceiptDigest
+        .keyedUnder(keyId, ReceiptRendering.pseudonymized(policyId, keyId, text), keys)
+        .left
+        .map(e => DomainError.InvariantViolation(KeyPath, e.message))
+    yield new PseudonymizedText(policyId, keyId, text, offsets, digest)
 
   private def validateMap(
       sourceText: String,
@@ -237,10 +250,14 @@ enum PolicyDecision:
   case LocalOnly(policyId: Option[PrivacyPolicyId], reason: String)
   case Denied(policyId: Option[PrivacyPolicyId], reason: String)
 
+  /** A required store key was absent: the item (or, with `None`, the batch) failed closed. */
+  case KeyUnavailable(id: Option[RequestId], keyId: KeyId)
+
   def render: String = this match
-    case Allowed(p, c)   => s"allowed:${p.value}:${c.render}"
-    case LocalOnly(p, r) => s"local-only:${p.fold("-")(_.value)}:$r"
-    case Denied(p, r)    => s"denied:${p.fold("-")(_.value)}:$r"
+    case Allowed(p, c)         => s"allowed:${p.value}:${c.render}"
+    case LocalOnly(p, r)       => s"local-only:${p.fold("-")(_.value)}:$r"
+    case Denied(p, r)          => s"denied:${p.fold("-")(_.value)}:$r"
+    case KeyUnavailable(id, k) => s"key-unavailable:${id.fold("-")(_.value)}:${k.value}"
 
 /** Time is supplied by the caller (epoch millis) so the module stays clock-free and testable. */
 final case class RemoteCapability private[embed] (
@@ -250,10 +267,10 @@ final case class RemoteCapability private[embed] (
     policyId: PrivacyPolicyId,
     expiresAtEpochMillis: Long,
     budgetTokens: Long,
-    payloadDigest: Checksum
+    payloadDigest: ReceiptDigest
 ):
   def render: String =
-    s"cap:${provider.render.take(12)}:$model:$purpose:${policyId.value}:$expiresAtEpochMillis:$budgetTokens:${payloadDigest.hex.take(12)}"
+    s"cap:${provider.render.take(12)}:$model:$purpose:${policyId.value}:$expiresAtEpochMillis:$budgetTokens:${payloadDigest.render.takeRight(12)}"
 
 /** A remote policy: which providers/models/purposes may receive which sanitized payloads. */
 final case class RemotePolicy(

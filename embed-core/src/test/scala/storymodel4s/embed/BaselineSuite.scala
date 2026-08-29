@@ -97,7 +97,7 @@ class BaselineSuite extends ScalaCheckSuite:
   }
 
   test("caching embedder: second batch hits, receipts record decisions, sensitive keys are HMAC") {
-    val inner = HashedNgramEmbedder[Id](64, 0L)
+    val inner = HashedNgramEmbedder[Id](64, 0L, keys)
     val cache = EmbeddingCache.inMemory[Id]
     val e = new CachingEmbedder[Id](inner, cache, keys)
     val space = docSpace(inner)
@@ -137,7 +137,7 @@ class BaselineSuite extends ScalaCheckSuite:
   }
 
   test("caching embedder never caches abstentions and keys by role/instruction via the space") {
-    val inner = HashedNgramEmbedder[Id](64, 0L)
+    val inner = HashedNgramEmbedder[Id](64, 0L, keys)
     val cache = EmbeddingCache.inMemory[Id]
     val e = new CachingEmbedder[Id](inner, cache, keys)
     val q = querySpace(inner)
@@ -184,7 +184,20 @@ class BaselineSuite extends ScalaCheckSuite:
         val policy = outcomes.flatMap(_.value.left.toOption).collect {
           case ExecutionFailure.LocalOnly(d) => d
         }
-        BatchResult(outcomes, AttemptReceipt.of(Vector.empty, Vector.empty, policy))
+        BatchResult(
+          outcomes,
+          AttemptReceipt
+            .of(
+              Vector.empty,
+              Vector.empty,
+              Vector.empty,
+              policy,
+              Vector.empty,
+              batch.itemSensitivity,
+              SensitiveKeyProvider.static(KeyId.unsafe("k-test"), "test-key".getBytes("UTF-8"))
+            )
+            .fold(e => fail(e.message), identity)
+        )
     val space = docSpace(inner)
     val b = EmbedBatch
       .validated(
@@ -202,6 +215,7 @@ class BaselineSuite extends ScalaCheckSuite:
     val r = remote.embed(b)
     assert(r.outcomes.head.value.isLeft)
     assertEquals(r.receipt.policyDecisions.size, 1)
+    assertEquals(r.receipt.kind, DigestKind.Keyed, "a sensitive item forbids a plain receipt")
     assert(r.receipt.providerCalls.isEmpty)
     assert(!r.receipt.policyDecisions.head.render.contains("wedding"))
   }

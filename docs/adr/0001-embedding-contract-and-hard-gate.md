@@ -82,11 +82,13 @@ enum ExecutionFailure { case TooLong(tokens, max); case ProviderError(code, atte
 final case class EmbedOutcome(id: RequestId, space: GeometryId,
                               value: Either[ExecutionFailure, Estimate[ValidatedVector]])
 final case class BatchResult(outcomes: Vector[EmbedOutcome], receipt: AttemptReceipt)
-final case class AttemptReceipt(providerCalls: Vector[ProviderCall],   // zero or more
-                                cacheDecisions: Vector[CacheDecision],
-                                policyDecisions: Vector[PolicyDecision],
-                                resultDecisions: Vector[ResultDecision],
-                                digest: SensitiveDigest)
+final class AttemptReceipt private (providerCalls: Vector[ProviderCall],   // zero or more
+                                    embeddingReceipts: Vector[EmbeddingReceipt],
+                                    cacheDecisions: Vector[CacheDecision],
+                                    policyDecisions: Vector[PolicyDecision],
+                                    resultDecisions: Vector[ResultDecision],
+                                    itemSensitivity: Vector[(RequestId, Sensitivity)],
+                                    digest: ReceiptDigest)                 // (D6) typed kind
 trait Embedder[F[_]]:
   def info: EmbedderInfo
   def spaces: Vector[EmbeddingSpace]
@@ -237,7 +239,7 @@ enum FidelityMode:
   `EmbedPayload.Raw` can only be served by `Locality.Local` embedders;
   `AuthorizedRemoteRequest` is constructible only by `RemotePolicy.evaluate`,
   which binds provider, model, purpose, `PolicyId`, expiry, budget, and the
-  exact `PseudonymizedText` digest into a `RemoteCapability`. Evaluation derives
+  exact `PseudonymizedText` keyed digest into a `RemoteCapability`. Evaluation derives
   that value from the request's `EmbedPayload.Sanitized`; its signature has no
   second payload argument that could authorize material different from the
   request, and a raw request is denied.
@@ -245,13 +247,72 @@ enum FidelityMode:
   rerun `PseudonymizedText.checked`; decoding will require a narrow
   `private[embed]` trusted path that preserves the explicit trust boundary.
 - `SensitiveDigest`: an HMAC-SHA256 under a store-local key (identified by
-  `KeyId`) used for cache identity and receipts of `Sensitive` inputs; it is a
-  distinct type from `Checksum` and is what `EmbeddingReceipt` carries.
-- Cache key = (`GeometryId`, exact rendered provider material digest); sensitive
-  inputs use `SensitiveDigest`. In-memory portable impl; file-backed JVM impl
-  behind `EncryptedStore`.
+  `KeyId`) used for cache identity and receipts of non-public inputs; it is a
+  distinct type from `Checksum`.
+- **Receipt identity is a sealed sum, `ReceiptDigest`**, with a typed
+  `DigestKind`:
+  - `Plain(checksum)` — admissible **only** for `Sensitivity.Public`
+    (`ReceiptDigest.plainAdmissible`); rendered `plain:<hex>`.
+  - `Keyed(digest: SensitiveDigest)` — every non-public input; the `KeyId` is
+    derived from the digest (one key id, never a second field); rendered
+    `hmac:<keyId>:<hex>`.
+  - `Withheld(missingKey, checksum)` — a material-free identity minted only by
+    `AttemptReceipt` when the store key is absent and every non-public item in
+    the batch carries a recorded `PolicyDecision.KeyUnavailable`; rendered
+    `withheld:<keyId>:<hex>` over the decision vectors only.
+  All constructors are `private[embed]`; the only public paths are the checked
+  factories `ReceiptDigest.of(sensitivity, material, keys)` (Plain iff Public,
+  else keyed, else `Left(EmbedError.NoKey(keyId))`), `ReceiptDigest.keyed`, and
+  `ReceiptDigest.keyedUnder(keyId, …)`. `CacheKey` and `ItemDigest` are likewise
+  `private[embed]`-constructed. A probe suite outside the package
+  (`storymodel4s.embedprobe`) asserts these do not type-check.
+- **No plain fallback, anywhere.** A missing key is `EmbedError.NoKey(keyId)`
+  at the factory and, on every provider-call surface (baselines, cache, remote
+  evaluation), a per-item `ExecutionFailure.PolicyDenied(PolicyDecision.KeyUnavailable(id, keyId))`
+  with the decision recorded in `policyDecisions` (`CacheDecision.Denied` on the
+  cache surface). `PseudonymizedText.checked(…, keys)` takes the key provider
+  and mints the payload's `Keyed` digest under its `KeyId` at construction
+  (`InvariantViolation(PseudonymizedText.KeyPath, …)` when unavailable), so no
+  `PseudonymizedText` — and hence no `RemoteCapability` — exists without a keyed
+  identity. A batch containing any non-public item is atomic with respect to
+  receipt keys: if the required key is unavailable, no item is computed,
+  delegated, or cached; every outcome is denied with `KeyUnavailable`, and the
+  `Withheld` attempt receipt is call-free.
+- **Canonical rendering** (`ReceiptRendering`): one escaped, versioned,
+  `|`-delimited rendering is the sole HMAC/checksum input on every surface.
+  Escapes: `\` → `\\`, `|` → `\|`, newline → `\n`, NUL → `\0`; renderings
+  never contain literal NUL bytes. Version tags: `material/v1`
+  (`role=…|instruction=…|text=…`, produced by `Material.render` for cache keys
+  and provider input), `pseudo/v1` (`policy=…|key=…|text=…` for
+  `PseudonymizedText.digest`/`RemoteCapability.payloadDigest`), `items/v1`
+  (`item|id|sensitivity|<digest.render>` per item), `outputs/v1`, and
+  `attempt/v1` (legacy display-based fields) and `attempt/v2`. Version 2 is the
+  receipt identity format: indexed full `ProviderCall` and `EmbeddingReceipt`
+  fields, sorted call parameters, typed cache/policy/result/error fields with
+  full capability fingerprints and digests, and item sensitivities. Tagged
+  options and individually escaped fields make every equality field
+  unambiguous; changing any such field changes the attempt digest. The
+  golden vector `SensitiveDigest.Golden` hashes the **production** `material/v1`
+  rendering and is asserted on JVM, JS and Native.
+- **ProviderCall checksums for non-public material are hash-of-keyed-digest,
+  never material**: `inputChecksum = sha256(items/v1 rendering of the
+  ItemDigests)`, `outputChecksum = sha256(outputs digest render)` where the
+  outputs digest is keyed whenever any item is keyed. `EmbeddingReceipt` carries
+  the typed `kind` (also in `ProviderCall.params["digest-kind"]` /
+  `"digest-key-id"`) and refuses keyed items with plain outputs.
+- `AttemptReceipt.digest` is `Keyed` under the policy key when any item is
+  non-public, `Plain` only for all-public batches; its HMAC input is the
+  `attempt/v2` rendering of the constructed receipt over full validated
+  embedding provenance and **all** decision vectors including
+  `resultDecisions`, so amending any equality field changes the digest. Provider
+  calls must exactly equal the calls of key-consistent `EmbeddingReceipt`s.
+- Cache key = (`GeometryId`, `ReceiptDigest` of the exact `material/v1`
+  rendering). In-memory portable impl; file-backed JVM impl behind
+  `EncryptedStore`.
 - Errors and logs are sanitized (no echo of payloads); sidecars and receipts for
-  sensitive inputs carry no raw text or reversible identifiers.
+  sensitive inputs carry no raw text, key bytes, or reversible identifiers, and
+  the same material under two store keys yields different identities on every
+  surface (cache, pseudonymized payload, capability, attempt, provider call).
 
 ### D7. Defaults by evidence only, from frozen adjudicated fixtures (P0-5)
 

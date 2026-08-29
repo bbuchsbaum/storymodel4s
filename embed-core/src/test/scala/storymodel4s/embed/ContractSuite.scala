@@ -5,7 +5,7 @@ import munit.ScalaCheckSuite
 import org.scalacheck.Gen
 import org.scalacheck.Prop.{forAll, forAllNoShrink}
 
-import storymodel4s.core.{Checksum, TextSpan}
+import storymodel4s.core.TextSpan
 import storymodel4s.features.{Estimate, MalformedReason, MissingReason}
 
 /** L4 and the contract's failure isolation, checked against a spy embedder. */
@@ -60,7 +60,7 @@ class ContractSuite extends ScalaCheckSuite:
             )
         EmbedOutcome(r.id, r.space, value)
       }
-      BatchResult(outcomes, AttemptReceipt.of(Vector.empty, Vector.empty, Vector.empty))
+      BatchResult(outcomes, AttemptReceipt.empty)
 
   private def req(
       i: Int,
@@ -225,7 +225,8 @@ class ContractSuite extends ScalaCheckSuite:
             KeyId.unsafe("k"),
             "Jane went",
             "[PERSON_1] went",
-            Vector(TextSpan.unsafe(0, 4) -> TextSpan.unsafe(0, 10))
+            Vector(TextSpan.unsafe(0, 4) -> TextSpan.unsafe(0, 10)),
+            SensitiveKeyProvider.static(KeyId.unsafe("k"), "k".getBytes("UTF-8"))
           )
           .toOption
           .get
@@ -236,26 +237,44 @@ class ContractSuite extends ScalaCheckSuite:
   }
 
   test("AttemptReceipt digest is deterministic and sensitive to its decisions") {
-    val a = AttemptReceipt.of(
-      Vector.empty,
-      Vector(CacheDecision.Bypassed(RequestId.unsafe("r1"), "x")),
-      Vector.empty
-    )
-    val b = AttemptReceipt.of(
-      Vector.empty,
-      Vector(CacheDecision.Bypassed(RequestId.unsafe("r1"), "x")),
-      Vector.empty
-    )
-    val c = AttemptReceipt.of(
-      Vector.empty,
-      Vector(CacheDecision.Bypassed(RequestId.unsafe("r1"), "y")),
-      Vector.empty
-    )
+    def pub(reason: String): AttemptReceipt =
+      AttemptReceipt
+        .public(
+          Vector.empty,
+          Vector(CacheDecision.Bypassed(RequestId.unsafe("r1"), reason)),
+          Vector.empty,
+          Vector.empty,
+          Vector(RequestId.unsafe("r1") -> Sensitivity.Public)
+        )
+        .fold(e => fail(e.message), identity)
+    val a = pub("x")
+    val b = pub("x")
+    val c = pub("y")
     assertEquals(a.digest, b.digest)
     assertNotEquals(a.digest, c.digest)
-    assertEquals(
-      AttemptReceipt.of(Vector.empty, Vector.empty, Vector.empty).digest,
-      Checksum.ofText("")
+    assertEquals(AttemptReceipt.empty.digest.kind, DigestKind.Plain)
+  }
+
+  test("a plain receipt refuses sensitivity evidence that is not public (required (2))") {
+    val refused = AttemptReceipt.public(
+      Vector.empty,
+      Vector.empty,
+      Vector.empty,
+      Vector.empty,
+      Vector(RequestId.unsafe("s1") -> Sensitivity.Sensitive)
+    )
+    assert(refused.isLeft, "a keyed batch must not be re-receipted as plain")
+    assert(
+      AttemptReceipt
+        .public(
+          Vector.empty,
+          Vector.empty,
+          Vector.empty,
+          Vector.empty,
+          Vector(RequestId.unsafe("i1") -> Sensitivity.Internal)
+        )
+        .isLeft,
+      "Internal is not plain-admissible either"
     )
   }
 
