@@ -16,6 +16,13 @@ class WarOfTheGhostsCodecGoldenSuite extends FunSuite:
     assert(encoded.length < 100000, s"unexpectedly large golden candidate: ${encoded.length} bytes")
     assert(!encoded.contains(context.recall.transcript.canonicalText))
     assert(!encoded.contains(WarOfTheGhostsText.text))
+    val surfaceCanaries =
+      context.recall.atlas.sentences.map(context.recall.atlas.text) ++
+        WarOfTheGhostsModel.atlas.sentences.map(WarOfTheGhostsModel.atlas.text) :+
+        WarOfTheGhostsText.title
+    surfaceCanaries.filter(_.nonEmpty).foreach { surface =>
+      assert(!encoded.contains(surface), s"golden leaked story text: $surface")
+    }
   }
 
   test("the WOG hsmm/v1 bytes contextually decode to the inferred result") {
