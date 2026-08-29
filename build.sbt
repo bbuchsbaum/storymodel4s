@@ -249,6 +249,7 @@ lazy val fixtures = crossProject(JVMPlatform, JSPlatform, NativePlatform)
     recall,
     align,
     interview,
+    codec,
     view
   )
 

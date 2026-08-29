@@ -44,7 +44,10 @@ object SidecarValue:
 /** A logical feature track whose observed values are stored as checked sidecar row references.
   *
   * Why: the wire document must retain the true `FeatureSpace[V]`; substituting `FeatureRef` for `V`
-  * in `FeatureTrack` would falsely claim that storage identities inhabit the numeric space.
+  * in `FeatureTrack` would falsely claim that storage identities inhabit the numeric space. Float32
+  * materialization currently leaves the logical derivation/space identity unchanged and records
+  * quantization only in the manifest dtype; first-class storage-quantization provenance is an
+  * explicit follow-up.
   */
 final case class SidecarTrack[T <: FeatureTarget, V] private (
     space: FeatureSpace[V],

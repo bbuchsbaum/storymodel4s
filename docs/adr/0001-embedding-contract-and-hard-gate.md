@@ -283,7 +283,40 @@ reaches the codec).
 - `admissibility-echo/v1` — tagged like the others: `entries` (count), then per
   `(unit, anchor)` sorted: `unit`, `anchor`, `contradictions` (list, in detection
   order), `faithful`, `facets` (list, sorted).
-- hsmm/v1: JSON object field list owned by codec (HsmmResultCodec); the field list is added below by the codec candidate.
+- `hsmm/v1` is the canonical JSON object owned by `HsmmResultCodec`. Its top-level
+  fields are exactly `schemaVersion`, `posterior`, `flow`, `viterbi`,
+  `logLikelihood`, `costs`, `candidateAnchors`, `admissibilityEcho`,
+  `viewFingerprint`, `recallChecksum`, and `refinementPasses`. The sparse DTOs
+  are arrays, never maps with composite string keys:
+  - each posterior row is `{unit, mass}` and each mass is `{state, mass}`;
+  - each flow step is `{from, to, mass}` and each mass is
+    `{fromState, toState, mass}`;
+  - each unit-cost entry is `{unit, costs}` and each state cost is
+    `{state, cost}`;
+  - each candidate entry is `{unit, anchors}`.
+- An alignment state is `{type: Source, ref}`, `{type: Distorted, ref, facets}`,
+  or `{type: External, state}`; a source reference is `{type: Situation, id}` or
+  `{type: Segment, id}`. A cost is exactly `{terms, mode?, exclusion?, total,
+  missingTerms, sourceChartCoverage?, reductions}`: a term is `{term, value}`;
+  a reduction is `{term, receipt}`; and a receipt is `{reducer, members,
+  excludedMembers, sourceChartCoverage, observedEstimateCoverage}`. Receipt
+  members are `{member, estimate}` and exclusions are `{member,
+  contradictions}`; structural coverage is `{level, membersWithEvidence,
+  members}`. `Estimate` and `Coverage` use their shared codec schemas.
+- Encoding orders posterior and flow in inference order; Viterbi in recall
+  order; state masses by state key; flow masses by `(fromState, toState)` key;
+  unit maps by recall-unit id; state costs by state key; terms, missing terms,
+  reductions, facets, and contradictions by enum order; and anchors and receipt
+  members by source-reference key. Duplicate sparse keys or set members are
+  rejected before conversion to `Map`/`Set`. Optional fields are omitted when
+  absent. Checksums are lowercase hexadecimal and every `Double` is the shared
+  canonical IEEE-754 rendering. Thus decoding and re-encoding one artifact is
+  byte-exact; the schema does not claim that separately rerunning transcendental
+  inference on different numeric runtimes produces bit-identical doubles.
+- There is deliberately no context-free `Decoder[HsmmResult]`. Decoding requires
+  the original `RecallGraph` and `SourceView`, rebuilds rows and records through
+  smart constructors and `AlignWire`, calls `HsmmResult.validated`, then requires
+  `AlignWire.matched` for the two contextual digests.
 
 ### D6. Privacy, cache, receipts (P0-3)
 
