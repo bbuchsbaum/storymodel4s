@@ -168,12 +168,13 @@ class ConstructionProbeSuite extends FunSuite:
       typeCheckErrors(
         """(
              provider: storymodel4s.embed.ProviderFingerprint,
+             model: storymodel4s.embed.PolicyModelIdentity,
              policy: storymodel4s.embed.PrivacyPolicyId,
              detector: storymodel4s.embed.DetectorPolicyIdentity,
              digest: storymodel4s.embed.ReceiptDigest.Keyed
            ) => storymodel4s.embed.RemoteCapability(
              provider,
-             "model",
+             model,
              "purpose",
              policy,
              1L,
@@ -187,7 +188,7 @@ class ConstructionProbeSuite extends FunSuite:
     refused(
       typeCheckErrors(
         """(capability: storymodel4s.embed.RemoteCapability) =>
-             capability.copy(model = "substituted")"""
+             capability.copy(model = capability.model)"""
       ),
       "RemoteCapability.copy"
     )
@@ -207,6 +208,40 @@ class ConstructionProbeSuite extends FunSuite:
         """(request: storymodel4s.embed.AuthorizedRemoteRequest) => request.copy()"""
       ),
       "AuthorizedRemoteRequest.copy"
+    )
+  }
+
+  test("remote policy callers cannot assert provider or model identity separately") {
+    refused(
+      typeCheckErrors(
+        """storymodel4s.embed.PolicyModelIdentity("policy-model/v1|1:a1:1")"""
+      ),
+      "PolicyModelIdentity.apply"
+    )
+    refused(
+      typeCheckErrors(
+        """(
+             policy: storymodel4s.embed.RemotePolicy,
+             request: storymodel4s.embed.EmbedRequest,
+             provider: storymodel4s.embed.ProviderFingerprint
+           ) => storymodel4s.embed.RemotePolicy.evaluate(
+             policy,
+             request,
+             provider,
+             "model",
+             "purpose",
+             0L,
+             1L
+           )"""
+      ),
+      "caller-asserted provider/model RemotePolicy.evaluate"
+    )
+    refused(
+      typeCheckErrors(
+        """(info: storymodel4s.embed.EmbedderInfo) =>
+             storymodel4s.embed.PolicyModelIdentity.parse("policy-model/v1|1:a1:1", info)"""
+      ),
+      "PolicyModelIdentity.parse"
     )
   }
 

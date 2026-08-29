@@ -34,6 +34,58 @@ object ProviderFingerprint:
   given Order[ProviderFingerprint] = Order.by(_.render)
   given Hash[ProviderFingerprint] = Hash.fromUniversalHashCode
 
+/** Prevents a policy from authorizing a same-named embedder after its advertised version changes.
+  */
+object PolicyModelIdentity:
+  opaque type PolicyModelIdentity = String
+
+  private val Prefix = "policy-model/v1|"
+
+  private def encodedPart(value: String): String = s"${value.length}:$value"
+
+  private def encode(name: String, version: String): PolicyModelIdentity =
+    Prefix + encodedPart(name) + encodedPart(version)
+
+  private def readPart(value: String, offset: Int): Option[(String, Int)] =
+    val colon = value.indexOf(':', offset)
+    if colon <= offset then None
+    else
+      val lengthText = value.substring(offset, colon)
+      if !lengthText.forall(_.isDigit) then None
+      else
+        lengthText.toIntOption.flatMap { length =>
+          val start = colon + 1
+          val end = start.toLong + length.toLong
+          if end > value.length.toLong then None
+          else Some(value.substring(start, end.toInt) -> end.toInt)
+        }
+
+  private[embed] def from(info: EmbedderInfo): PolicyModelIdentity =
+    encode(info.name, info.version)
+
+  private[embed] def parse(
+      rendered: String,
+      info: EmbedderInfo
+  ): Option[PolicyModelIdentity] =
+    Option.when(rendered.startsWith(Prefix))(rendered.drop(Prefix.length)).flatMap { body =>
+      for
+        (name, versionOffset) <- readPart(body, 0)
+        (version, end) <- readPart(body, versionOffset)
+        if end == body.length
+        canonical = encode(name, version)
+        if canonical == rendered
+        if name == info.name && version == info.version
+      yield from(info)
+    }
+
+  extension (identity: PolicyModelIdentity) def render: String = identity
+
+  given Show[PolicyModelIdentity] = Show.show(_.render)
+  given Order[PolicyModelIdentity] = Order.by(_.render)
+  given Hash[PolicyModelIdentity] = Hash.fromUniversalHashCode
+
+type PolicyModelIdentity = PolicyModelIdentity.PolicyModelIdentity
+
 /** Vector length; strictly positive. */
 object Dimension:
   opaque type Dimension = Int

@@ -1,5 +1,6 @@
 package storymodel4s.embed
 
+import cats.Id
 import munit.FunSuite
 
 import storymodel4s.core.{Checksum, DomainError, TextSpan}
@@ -113,38 +114,29 @@ class DigestPrivacySuite extends FunSuite:
   test(
     "RemotePolicy.evaluate is the only way to obtain an AuthorizedRemoteRequest and binds the keyed payload identity"
   ) {
-    val provider = ProviderFingerprint.of("m", "t", "i", "r")
+    val embedder = HashedNgramEmbedder[Id](3)
+    val provider = embedder.info.provider
+    val model = embedder.info.policyModelIdentity
     val policyId = PrivacyPolicyId.unsafe("pol-1")
     val payload = checkedPayload(policyId, KeyId.unsafe("k1"), "Jane Smith", "[PERSON_1]", k1)
     val policy = RemotePolicy(
       policyId,
       allowedProviders = Set(provider),
-      allowedModels = Set("text-embedding-x"),
+      allowedModels = Set(model),
       allowedPurposes = Set("candidate-retrieval"),
       allowedDetectors = Set(payload.sourceDetection.get.policyIdentity),
       maxBudgetTokens = 10000,
       ttlMillis = 60000
     )
-    val space = EmbeddingSpace
-      .of(
-        provider,
-        Role.Query,
-        SemanticView.Surface,
-        None,
-        Dimension.unsafe(3),
-        Normalization.L2,
-        TruncationPolicy.Reject
-      )
-      .toOption
-      .get
+    val space =
+      embedder.spaces.find(s => s.role == Role.Query && s.view == SemanticView.Surface).get
     val request = EmbedRequest(RequestId.unsafe("r1"), EmbedPayload.Sanitized(payload), space.id)
     def eval(
+        policyValue: RemotePolicy = policy,
         req: EmbedRequest = request,
-        prov: ProviderFingerprint = provider,
-        model: String = "text-embedding-x",
         purpose: String = "candidate-retrieval",
         tokens: Long = 42L
-    ) = RemotePolicy.evaluate(policy, req, prov, model, purpose, 1000L, tokens)
+    ) = RemotePolicy.evaluate(policyValue, req, embedder, purpose, 1000L, tokens)
     val ok = eval()
     assert(ok.isRight)
     val cap = ok.toOption.get.capability
@@ -153,10 +145,12 @@ class DigestPrivacySuite extends FunSuite:
     assertEquals(cap.payloadDigest.kind, DigestKind.Keyed)
     assertEquals(cap.payloadDigest.keyIdOption, Some(KeyId.unsafe("k1")))
     assertEquals(cap.policyId, policy.id)
+    assertEquals(cap.provider, embedder.info.provider)
+    assertEquals(cap.model, embedder.info.policyModelIdentity)
     assertEquals(cap.detectorIdentity, payload.sourceDetection.get.policyIdentity)
     assert(cap.render.contains(cap.detectorIdentity.render))
-    assert(eval(model = "other-model").isLeft)
-    assert(eval(prov = ProviderFingerprint.of("x", "t", "i", "r")).isLeft)
+    assert(eval(policyValue = policy.copy(allowedModels = Set.empty)).isLeft)
+    assert(eval(policyValue = policy.copy(allowedProviders = Set.empty)).isLeft)
     assert(eval(purpose = "training").isLeft)
     assert(eval(tokens = 20000L).isLeft)
     // The pseudonymization key must be available at construction: no key ⇒ no payload, so no
@@ -187,8 +181,7 @@ class DigestPrivacySuite extends FunSuite:
         .evaluate(
           rotatedPolicy,
           rotatedRequest,
-          provider,
-          "text-embedding-x",
+          embedder,
           "candidate-retrieval",
           1000L,
           42L
@@ -204,7 +197,7 @@ class DigestPrivacySuite extends FunSuite:
     )
     assert(eval(req = request.copy(payload = EmbedPayload.Sanitized(foreign))).isLeft)
     // Denial reasons and capability renderings never echo payload text.
-    val denied = eval(model = "other-model").left.toOption.get
+    val denied = eval(policyValue = policy.copy(allowedModels = Set.empty)).left.toOption.get
     assert(!denied.reason.contains("PERSON_1"))
     assert(!cap.render.contains("PERSON_1"))
   }

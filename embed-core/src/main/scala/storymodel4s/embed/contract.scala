@@ -315,7 +315,7 @@ object AttemptReceipt:
         "allowed",
         policyId.value,
         capability.provider.render,
-        capability.model,
+        capability.model.render,
         capability.purpose,
         capability.policyId.value,
         capability.expiresAtEpochMillis.toString,
@@ -848,7 +848,9 @@ final case class EmbedderInfo(
     supportsInstructions: Boolean,
     tokenEmbeddings: Boolean,
     matryoshkaDims: Option[Vector[Int]]
-)
+):
+  /** Derive the only model identity accepted by remote-policy allowlists. */
+  def policyModelIdentity: PolicyModelIdentity = PolicyModelIdentity.from(this)
 
 /** The embedding contract (ADR 0001 §D3). Implementations must satisfy L4 (one outcome per request
   * id, in order; failures per item) — [[Embedder.conforming]] enforces it for any implementation.
