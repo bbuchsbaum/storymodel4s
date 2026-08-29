@@ -418,6 +418,29 @@ was set by the owner on 2026-08-28 (sticky decision
    who wrote "if you add one, re-count" added four without re-counting. Re-count
    mechanically; do not trust the number above without checking it.)*
 
+   **A finding has a CHAIN, and reporting one link as the whole chain is the most
+   common way work here has been wrong.** Four questions, each answered by a
+   different method, each capable of overturning the last:
+
+   | link | question | method |
+   |---|---|---|
+   | **permits** | can the code produce this? | read it |
+   | **occurs** | does it actually happen? | measure the corpus |
+   | **produces** | what comes out when it does? | **run it** |
+   | **consumes** | who depends on that output? | trace forward |
+
+   Measured against the chief's own rulings on 2026-08-29, all four caught by other
+   agents: `trajectory.scala` was ranked worst-placed on a consumer that does not
+   exist (*permits*, never traced *consumes*); the WOG segmenter override was sized
+   as systemic when it fires for one paraphrase of ten (*permits*, never measured
+   *occurs*); three NaN guards were called live when one is reachable (*permits*,
+   never traced *occurs*); and that one reachable site publishes a degenerate
+   all-zero plan rather than the `NaN` predicted (*occurs*, never ran *produces*).
+   **Each correction moved one link further along a chain the chief had not
+   walked.** Severity is a property of the whole chain: a defect that is permitted,
+   occurs, produces garbage, and is consumed by a published figure is a different
+   thing from one that stops at any earlier link. Say which link you reached.
+
    **The one principle under most of what follows: READ THE ARTIFACT, NOT THE
    STATUS.** A step that reports success while having done nothing — or part of a
    thing — is the single most common way work here has gone wrong, and it has
