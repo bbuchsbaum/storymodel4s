@@ -106,7 +106,11 @@ was set by the owner on 2026-08-28 (sticky decision
    must exit nonzero for every unlanded candidate. A tree-equality check on the
    touched paths cannot see an unlanded — possibly blocked — commit sitting in
    the parent chain, which is how `cf162a9` was landed and `main` had to be
-   reset on 2026-08-29.
+   reset on 2026-08-29. *Unlanded* means **not an ancestor of `main`**: a commit
+   already in `main`'s history is landed by definition and needs no check, even
+   if it never passed through a merge (docs committed directly under a live
+   reservation, for instance). The rule guards the reverse case — a parent chain
+   containing something that is not yet in `main` and might never be.
 
    *Stale bases.* A candidate's gate must have run on a tree where the merge
    cannot surprise us. If the candidate and the upstream commits its base is
