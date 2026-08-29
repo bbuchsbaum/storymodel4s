@@ -19,8 +19,9 @@ object RecallGraphStatus:
   * through [[RecallGraph.validated]], and every field replacement returns `Unchecked` so an edit
   * cannot silently retain a `Checked` witness.
   *
-  * Invariants: ordinals are `0..n-1`; unit spans lie inside the transcript and reproduce unit text;
-  * relation endpoints exist; no self-edges; participant entity references resolve.
+  * Invariants: the atlas belongs to the transcript; ordinals are `0..n-1`; unit spans lie inside
+  * the transcript and reproduce unit text; relation endpoints exist; no self-edges; participant
+  * entity references resolve.
   */
 final class RecallGraph[S <: RecallGraphStatus] private (
     val transcript: StorySource,
@@ -79,6 +80,12 @@ object RecallGraph:
   def validated(
       g: RecallGraph[Unchecked]
   ): ValidatedNec[DomainError, RecallGraph[Checked]] =
+    val atlasCheck: ValidatedNec[DomainError, Unit] =
+      if g.atlas.source == g.transcript then ().validNec
+      else
+        DomainError
+          .InvariantViolation("recall/atlas", "atlas source must equal transcript")
+          .invalidNec
     val ids = g.units.map(_.id)
     val dup = ids.diff(ids.distinct).distinct
     val dupCheck: ValidatedNec[DomainError, Unit] =
@@ -158,8 +165,9 @@ object RecallGraph:
             )
             .invalidNec
       }
-    (dupCheck, ordCheck, spanCheck, relCheck, partCheck, textCheck).mapN { (_, _, _, _, _, _) =>
-      new RecallGraph[Checked](g.transcript, g.atlas, g.units, g.relations)
+    (atlasCheck, dupCheck, ordCheck, spanCheck, relCheck, partCheck, textCheck).mapN {
+      (_, _, _, _, _, _, _) =>
+        new RecallGraph[Checked](g.transcript, g.atlas, g.units, g.relations)
     }
 
   /** Raw construction for validator fixtures inside `recall`; public callers validate parts. */
