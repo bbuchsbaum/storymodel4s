@@ -454,6 +454,18 @@ was set by the owner on 2026-08-28 (sticky decision
    `Passed:` lines became one, for candidates differing by a trimmed test file.
    Keep the prior gate's numbers visible for exactly this reason.)
 
+   *Verify the export before you gate it.* An export is an INPUT to the gate, not
+   infrastructure that either works or crashes — it does neither. `git archive | tar`
+   truncated by a full disk exits clean and leaves a directory that still looks like
+   a project; sbt loads the partial tree happily, and every failure after that is
+   attributed to the code under test. Measured 2026-08-29: a merged-tree gate
+   returned `GATE_EXIT=1` with **311 error lines** on a sound candidate, because the
+   export held 3 of 27 top-level directories. The tell was the FIRST error —
+   `FileNotFoundException` writing a JUnit report XML, a shape no Scala defect
+   produces. After extracting, assert the entry count and that `build.sbt` exists,
+   before starting sbt. Two seconds, and it separates "the candidate is broken" from
+   "I never gave the compiler the candidate."
+
    *Run the format check LAST.* sbt's `;` aborts the chain on first failure, so
    `scalafmtCheckAll; compileAll; testJVM` lets a whitespace nit destroy the
    correctness signal for everyone. Formatting stays IN the gate — nothing lands
