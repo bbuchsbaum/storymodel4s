@@ -33,12 +33,22 @@ object TokenIndex:
   given Show[TokenIndex] = Show.show(_.toString)
 type TokenIndex = TokenIndex.TokenIndex
 
-/** Half-open range of token positions `[start, endExclusive)`. */
-final case class TokenRange private (start: TokenIndex, endExclusive: TokenIndex):
+/** Half-open range of token positions `[start, endExclusive)`.
+  *
+  * Non-case so `fromProduct` cannot mint an inverted interval.
+  */
+final class TokenRange private (val start: TokenIndex, val endExclusive: TokenIndex):
   def length: Int = endExclusive.value - start.value
   def isEmpty: Boolean = length == 0
   def contains(i: TokenIndex): Boolean = i.value >= start.value && i.value < endExclusive.value
   def indices: Range = start.value until endExclusive.value
+
+  override def equals(other: Any): Boolean = other match
+    case that: TokenRange => start == that.start && endExclusive == that.endExclusive
+    case _                => false
+
+  override def hashCode(): Int = (start, endExclusive).hashCode()
+
   override def toString: String = s"tokens[${start.value}, ${endExclusive.value})"
 
 object TokenRange:
