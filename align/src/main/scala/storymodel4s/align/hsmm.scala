@@ -698,10 +698,54 @@ object GraphHsmm:
 /** Preservation of one relation layer, with the support behind it: how many of the recall's stated
   * relations of that layer could actually be evaluated against the alignment.
   */
-final case class LayerPreservation(mean: Option[Double], evaluated: Int, stated: Int):
+final class LayerPreservation private (
+    val mean: Option[Double],
+    val evaluated: Int,
+    val stated: Int
+):
   def render: String =
     val m = mean.map(x => f"$x%.4f").getOrElse("n/a")
     s"$m (over $evaluated/$stated evaluable relations)"
+
+  override def equals(other: Any): Boolean = other match
+    case that: LayerPreservation =>
+      mean == that.mean && evaluated == that.evaluated && stated == that.stated
+    case _ => false
+
+  override def hashCode: Int = (mean, evaluated, stated).hashCode
+  override def toString: String = s"LayerPreservation(${render})"
+
+object LayerPreservation:
+  /** Trusted construction from inside `align`. */
+  private[align] def unsafe(mean: Option[Double], evaluated: Int, stated: Int): LayerPreservation =
+    new LayerPreservation(mean, evaluated, stated)
+
+  /** Checked construction: a mean is present exactly when something was evaluable, it is a
+    * fraction, and the evaluated relations are a sub-count of those stated.
+    */
+  def of(
+      mean: Option[Double],
+      evaluated: Int,
+      stated: Int
+  ): Either[AlignError, LayerPreservation] =
+    if evaluated < 0 || stated < 0 || evaluated > stated then
+      Left(
+        AlignError
+          .MalformedRecord(
+            "layerPreservation",
+            s"evaluated $evaluated is not a sub-count of $stated"
+          )
+      )
+    else if mean.exists(m => m.isNaN || m.isInfinite || m < 0.0 || m > 1.0) then
+      Left(AlignError.MalformedRecord("layerPreservation", "mean must be a fraction"))
+    else if mean.isDefined != (evaluated > 0) then
+      Left(
+        AlignError.MalformedRecord(
+          "layerPreservation",
+          "a mean exists exactly when at least one relation was evaluable"
+        )
+      )
+    else Right(new LayerPreservation(mean, evaluated, stated))
 
 object RelationPreservation:
 
@@ -749,7 +793,7 @@ object RelationPreservation:
       // distinguishable from "none of the three you stated could be evaluated" - collapsing both
       // to a bare None would lose the more informative of the two.
       val mean = if evaluated.isEmpty then None else Some(evaluated.sum / evaluated.size)
-      LayerPreservation(mean, evaluated.size, stated.size)
+      LayerPreservation.unsafe(mean, evaluated.size, stated.size)
     Map(RelationLayer.WorldTime -> layer(temporal), RelationLayer.Causal -> layer(causal))
 
   /** Lower the cost of states that would preserve the recall's explicit relations given the current

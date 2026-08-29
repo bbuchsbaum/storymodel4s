@@ -57,7 +57,7 @@ final case class RecallSignature(
     * without carrying the caveat, because there is no method that hands back the sum.
     */
   def externalMass: ExternalMassReport =
-    ExternalMassReport(
+    ExternalMassReport.unsafe(
       attributed = associationMass + intrusionMass + commentaryMass +
         sourceConsistentInferenceMass + uninterpretableMass,
       unranked = unrankedMass
@@ -71,8 +71,47 @@ final case class RecallSignature(
   * support says how many steps could be compared at all, so a reader can see that a per-step mass
   * of 1/3 rests on one step out of three.
   */
-final case class StepMass(perStep: Double, comparableSteps: Int, totalSteps: Int):
+final class StepMass private (
+    val perStep: Double,
+    val comparableSteps: Int,
+    val totalSteps: Int
+):
   def render: String = f"$perStep%.4f (over $comparableSteps/$totalSteps comparable steps)"
+
+  override def equals(other: Any): Boolean = other match
+    case that: StepMass =>
+      perStep == that.perStep && comparableSteps == that.comparableSteps &&
+      totalSteps == that.totalSteps
+    case _ => false
+
+  override def hashCode: Int = (perStep, comparableSteps, totalSteps).hashCode
+  override def toString: String = s"StepMass(${render})"
+
+object StepMass:
+  /** Trusted construction from inside `align`, where the computation guarantees the invariants. */
+  private[align] def unsafe(perStep: Double, comparableSteps: Int, totalSteps: Int): StepMass =
+    new StepMass(perStep, comparableSteps, totalSteps)
+
+  /** Checked construction for anyone outside: a per-step mass must be a finite fraction, and the
+    * comparable steps must be a sub-count of the total.
+    */
+  def of(
+      perStep: Double,
+      comparableSteps: Int,
+      totalSteps: Int
+  ): Either[AlignError, StepMass] =
+    if perStep.isNaN || perStep.isInfinite || perStep < 0.0 || perStep > 1.0 then
+      Left(AlignError.MalformedRecord("stepMass", s"perStep must be a fraction, got $perStep"))
+    else if totalSteps < 1 then
+      Left(AlignError.MalformedRecord("stepMass", "a route with no steps has no per-step mass"))
+    else if comparableSteps < 0 || comparableSteps > totalSteps then
+      Left(
+        AlignError.MalformedRecord(
+          "stepMass",
+          s"comparableSteps $comparableSteps is not a sub-count of $totalSteps"
+        )
+      )
+    else Right(new StepMass(perStep, comparableSteps, totalSteps))
 
 /** External mass split into what the participant did and what we could not do.
   *
@@ -80,12 +119,45 @@ final case class StepMass(perStep: Double, comparableSteps: Int, totalSteps: Int
   * prevent, and a caller that genuinely wants the sum must write it at the call site where a
   * reviewer can see it.
   */
-final case class ExternalMassReport(attributed: Double, unranked: Double):
+final class ExternalMassReport private (val attributed: Double, val unranked: Double):
   /** Fraction of mass the aligner was able to rank at all — the coverage of `attributed`. */
   def rankedMass: Double = 1.0 - unranked
 
   def render: String =
     f"external(attributed)=$attributed%.4f unranked=$unranked%.4f ranked=${rankedMass}%.4f"
+
+  override def equals(other: Any): Boolean = other match
+    case that: ExternalMassReport =>
+      attributed == that.attributed && unranked == that.unranked
+    case _ => false
+
+  override def hashCode: Int = (attributed, unranked).hashCode
+  override def toString: String = s"ExternalMassReport(${render})"
+
+object ExternalMassReport:
+  /** Trusted construction from inside `align`. */
+  private[align] def unsafe(attributed: Double, unranked: Double): ExternalMassReport =
+    new ExternalMassReport(attributed, unranked)
+
+  /** Checked construction: both halves are mean masses per unit, so each is a fraction and their
+    * sum cannot exceed the whole. A report claiming 1.2 of external mass is not a report.
+    */
+  def of(attributed: Double, unranked: Double): Either[AlignError, ExternalMassReport] =
+    val bad = Vector("attributed" -> attributed, "unranked" -> unranked).collectFirst {
+      case (n, v) if v.isNaN || v.isInfinite || v < 0.0 || v > 1.0 =>
+        AlignError.MalformedRecord("externalMassReport", s"$n must be a fraction, got $v")
+    }
+    bad match
+      case Some(e) => Left(e)
+      case None    =>
+        if attributed + unranked > 1.0 + 1e-9 then
+          Left(
+            AlignError.MalformedRecord(
+              "externalMassReport",
+              s"attributed + unranked is ${attributed + unranked}, more than the whole"
+            )
+          )
+        else Right(new ExternalMassReport(attributed, unranked))
 
 object RecallSignature:
 
@@ -160,7 +232,7 @@ object RecallSignature:
           st.sourceMass(isBackward(pos)) > 0.0 || st.sourceMass(isForward(pos)) > 0.0
         )
         val mean = f.steps.map(_.sourceMass(isBackward(pos))).sum / f.steps.size
-        Some(StepMass(mean, comparable, f.steps.size))
+        Some(StepMass.unsafe(mean, comparable, f.steps.size))
     val discoursePos: SourceNodeRef => Option[Double] = r => Some(view.relativePosition(r))
     val worldPos: Option[SourceNodeRef => Option[Double]] =
       view.worldOrder.map(o => r => o.get(r).map(_.toDouble))

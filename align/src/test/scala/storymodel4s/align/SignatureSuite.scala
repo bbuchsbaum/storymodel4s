@@ -21,7 +21,7 @@ class SignatureSuite extends FunSuite:
   private val eps = 1e-12
 
   private def report(attributed: Double, unranked: Double) =
-    ExternalMassReport(attributed, unranked)
+    ExternalMassReport.of(attributed, unranked).fold(e => fail(e.message), identity)
 
   test("RecallSignature.externalMass computes the exact production split") {
     val associationMass = 0.01
@@ -67,7 +67,7 @@ class SignatureSuite extends FunSuite:
       unrankedMass = unrankedMass,
       distortedMass = 0.0,
       distortedMassByFacet = Map.empty,
-      backwardMass = Some(StepMass(0.0, 0, 0)),
+      backwardMass = Some(StepMass.of(0.0, 0, 1).fold(e => fail(e.message), identity)),
       worldBackwardMass = None,
       perUnitLocalizability = Map.empty,
       perUnitFidelity = Map.empty,
@@ -120,16 +120,23 @@ class SignatureSuite extends FunSuite:
     // here does. Verified by mutation: with `total` present and this file recompiled, the check
     // reports true and the test fails.
     assert(
-      !scala.compiletime.testing.typeChecks("ExternalMassReport(0.1, 0.2).total"),
+      !scala.compiletime.testing.typeChecks("ExternalMassReport.of(0.1, 0.2).toOption.get.total"),
       "ExternalMassReport.total exists; it re-creates the conflation this type prevents"
     )
     assert(
-      !scala.compiletime.testing.typeChecks("ExternalMassReport(0.1, 0.2).externalMass"),
+      !scala.compiletime.testing
+        .typeChecks("ExternalMassReport.of(0.1, 0.2).toOption.get.externalMass"),
       "an accessor named externalMass on the report would invite the same misreading"
     )
     // The control: the accessors that SHOULD exist do.
-    assert(scala.compiletime.testing.typeChecks("ExternalMassReport(0.1, 0.2).attributed"))
-    assert(scala.compiletime.testing.typeChecks("ExternalMassReport(0.1, 0.2).unranked"))
+    assert(
+      scala.compiletime.testing.typeChecks(
+        "ExternalMassReport.of(0.1, 0.2).toOption.get.attributed"
+      )
+    )
+    assert(
+      scala.compiletime.testing.typeChecks("ExternalMassReport.of(0.1, 0.2).toOption.get.unranked")
+    )
   }
 
   // --- the projection abstains instead of inventing (chief/scout estimand audit) ---
@@ -275,4 +282,39 @@ class SignatureSuite extends FunSuite:
         // mutation it was meant to catch - the expectation must not come from the code under test.
         val bound = m.comparableSteps.toDouble / m.totalSteps
         assert(m.perStep <= bound + 1e-12, s"per-step mass was renormalized: ${m.render}")
+  }
+
+  // --- the report types cannot be constructed in invalid states (bd-01M161EEPDV8NMC932KA8AY0QC) ---
+
+  test("an external mass report refuses masses that are not fractions of the whole") {
+    assert(ExternalMassReport.of(-0.1, 0.2).isLeft, "negative attributed accepted")
+    assert(ExternalMassReport.of(0.2, Double.NaN).isLeft, "NaN unranked accepted")
+    assert(ExternalMassReport.of(1.2, 0.0).isLeft, "attributed above 1 accepted")
+    // The pair is a split of the same whole, so together they cannot exceed it.
+    assert(ExternalMassReport.of(0.7, 0.7).isLeft, "attributed + unranked above 1 accepted")
+    assert(ExternalMassReport.of(0.4, 0.6).isRight)
+  }
+
+  test("a per-step mass refuses a comparable count that is not a sub-count of the total") {
+    assert(StepMass.of(0.5, 4, 3).isLeft, "more comparable steps than steps accepted")
+    assert(StepMass.of(0.5, -1, 3).isLeft, "negative comparable accepted")
+    assert(StepMass.of(0.5, 0, 0).isLeft, "a route with no steps reported a per-step mass")
+    assert(StepMass.of(Double.NaN, 1, 3).isLeft, "NaN per-step accepted")
+    assert(StepMass.of(1.5, 1, 3).isLeft, "per-step above 1 accepted")
+    assert(StepMass.of(0.5, 1, 3).isRight)
+  }
+
+  test("none of the report types derives a Mirror, so none can be forged past its constructor") {
+    // The same forge closed on PlacementResolution: a private constructor does not suppress
+    // Mirror.ProductOf, whose fromProduct rebuilds the value without consulting `of`.
+    assert(
+      !scala.compiletime.testing.typeChecks(
+        "summon[scala.deriving.Mirror.ProductOf[ExternalMassReport]]"
+      )
+    )
+    assert(
+      !scala.compiletime.testing.typeChecks(
+        "summon[scala.deriving.Mirror.ProductOf[StepMass]]"
+      )
+    )
   }
