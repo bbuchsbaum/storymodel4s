@@ -114,6 +114,18 @@ object WindowReducer:
       )
     else None
 
+  /** Input weights can each be finite and still overflow the total or the quotient.
+    * `Estimate.observed` does not validate finiteness; refuse rather than publish NaN.
+    */
+  private def finiteWeightedMean(values: Vector[Double], weights: Vector[Double]): Estimate[Double] =
+    val tw = weights.sum
+    if !Estimate.isFinite(tw) then undefined(UndefinedReason.NotFinite)
+    else if tw > 0.0 then
+      val q = values.zip(weights).map(_ * _).sum / tw
+      if Estimate.isFinite(q) then Estimate.observed(q)
+      else undefined(UndefinedReason.NotFinite)
+    else undefined(UndefinedReason.ZeroTotalWeight)
+
   def scalar(reducer: ScalarReducer): WindowReducer[Double, Double] =
     (samples: NonEmptyVector[Sample[Double]]) =>
       refuseInvalidWeights[Double, Double](samples).getOrElse {
@@ -132,20 +144,17 @@ object WindowReducer:
             case ScalarReducer.Slope    =>
               slope(obs).fold(undefined(UndefinedReason.SlopeNeedsTwoPositions))(Estimate.observed)
             case ScalarReducer.WeightedMean =>
-              val w = obs.map(_.weight)
-              val tw = w.sum
-              // fail-closed: NaN comparisons are false, so `tw <= 0` would compute on NaN.
-              if tw > 0.0 then Estimate.observed(vs.zip(w).map(_ * _).sum / tw)
-              else undefined(UndefinedReason.ZeroTotalWeight)
+              finiteWeightedMean(vs, obs.map(_.weight))
             case ScalarReducer.Kernel(shape) =>
               val positions = samples.toVector.map(_.position)
               val centre = (positions.min + positions.max) / 2.0
               val weighted = obs.map(s => (s, shape.weight(s.position - centre)))
               val tw = weighted.map(_._2).sum
-              if tw > 0.0 then
-                Estimate.observed(
-                  weighted.map((s, w) => Estimate.finite(s.estimate).get * w).sum / tw
-                )
+              if !Estimate.isFinite(tw) then undefined(UndefinedReason.NotFinite)
+              else if tw > 0.0 then
+                val q = weighted.map((s, w) => Estimate.finite(s.estimate).get * w).sum / tw
+                if Estimate.isFinite(q) then Estimate.observed(q)
+                else undefined(UndefinedReason.NotFinite)
               else if shape.isPointMass then
                 // a declared point mass with no sample exactly at the centre (even-length window):
                 // the nearest observed sample is the value at the centre
@@ -172,15 +181,17 @@ object WindowReducer:
           case Left(missing) => missing
           case Right(obs)    =>
             val weighted = obs.map((s, v) => (v, shape.weight(distance(s))))
-            val tw = weighted.map(_._2).sum
-            if tw > 0.0 then Estimate.observed(weighted.map((v, w) => v * w).sum / tw)
-            else if shape.isPointMass then
-              // a declared point mass whose centre unit has no observed sample: the mean of all
-              // observed samples at the minimal distance, i.e. the whole nearest unit
-              val nearest = obs.map((s, _) => distance(s)).min
-              val vs = obs.collect { case (s, v) if distance(s) == nearest => v }
-              Estimate.observed(vs.sum / vs.size)
-            else undefined(UndefinedReason.OutsideKernelSupport)
+            finiteWeightedMean(weighted.map(_._1), weighted.map(_._2)) match
+              case Estimate.Missing(MissingReason.Undefined(UndefinedReason.ZeroTotalWeight))
+                  if shape.isPointMass =>
+                // a declared point mass whose centre unit has no observed sample: the mean of all
+                // observed samples at the minimal distance, i.e. the whole nearest unit
+                val nearest = obs.map((s, _) => distance(s)).min
+                val vs = obs.collect { case (s, v) if distance(s) == nearest => v }
+                Estimate.observed(vs.sum / vs.size)
+              case Estimate.Missing(MissingReason.Undefined(UndefinedReason.ZeroTotalWeight)) =>
+                undefined(UndefinedReason.OutsideKernelSupport)
+              case other => other
       }
 
 /** Windowed reduction of a token-aligned scalar track into a window-aligned track.

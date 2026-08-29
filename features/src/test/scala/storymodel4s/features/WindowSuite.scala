@@ -209,6 +209,17 @@ class WindowSuite extends ScalaCheckSuite:
     )
   }
 
+  test("WeightedMean of two MaxValue weights is Missing(NotFinite), not Observed(NaN)") {
+    val overflow = NonEmptyVector.of(
+      Sample(0, Estimate.observed(1.0), Double.MaxValue),
+      Sample(1, Estimate.observed(1.0), Double.MaxValue)
+    )
+    assertEquals(
+      red(ScalarReducer.WeightedMean).reduce(overflow),
+      Estimate.Missing(MissingReason.Undefined(UndefinedReason.NotFinite))
+    )
+  }
+
   test("weighted mean honours sample weights") {
     val s = NonEmptyVector.of(
       Sample(0, Estimate.observed(1.0), 3.0),
