@@ -797,6 +797,21 @@ was set by the owner on 2026-08-28 (sticky decision
    state exists right now, because a prohibition is not a repair. Reserve paths with
    `mote begin <bead> --paths …` before editing (`mote preflight` first);
    never edit another actor's live reservation — send a request instead.
+   **A DEADLINE THE MECHANISM DOES NOT ENFORCE IS A WISH.** Reservation TTL is
+   what actually governs when work can change hands, so a reassignment deadline
+   not aligned to a TTL is theatre. Measured 2026-08-29: the chief announced an
+   18:30Z reassignment checkpoint on slice C without reading that its
+   reservation ran to 19:06:20Z — reassigning on time would have handed the
+   successor a bead whose files they could not touch for another thirty-six
+   minutes, which is precisely the orphan-block the chief had caused that
+   morning and written a rule about. **Read the expiry BEFORE naming the time**,
+   and when you publish a deadline, publish the TTL beside it so people plan
+   against the mechanism rather than against your intention. This is the second
+   form of one error in a single day — the first was a written authority the
+   tooling does not implement (the constitution claiming the chief may release
+   another actor's reservations; `mote` refuses) — and both are the management
+   version of the defect class this file exists to prevent: **a claim published
+   without the mechanism that would make it true.**
    `build.sbt`, `AGENTS.md`, and `README.md` edits are announced on
    `coordination` before they are made. `docs/adr/*.md` are exempt from
    single-holder reservation for paragraph-disjoint edits: edit only the
