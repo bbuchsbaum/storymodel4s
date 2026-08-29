@@ -20,6 +20,19 @@ class ReceiptDigestSuite extends ScalaCheckSuite:
   private val k2 = SensitiveKeyProvider.static(KeyId.unsafe("k2"), keyTwoBytes)
   private val keyHexes = Vector(keyOneBytes, keyTwoBytes).map(b => b.map("%02x".format(_)).mkString)
 
+  private def policyModel(name: String, version: String = "1"): PolicyModelIdentity =
+    EmbedderInfo(
+      ProviderFingerprint.of("model", "tokenizer", "implementation", "runtime"),
+      name,
+      version,
+      Locality.Remote,
+      PrivacyClass.PublicOnly,
+      8192,
+      supportsInstructions = true,
+      tokenEmbeddings = false,
+      matryoshkaDims = None
+    ).policyModelIdentity
+
   private def leaksNothing(rendered: String): Unit =
     assert(!rendered.contains("wedding"), rendered)
     assert(!rendered.contains("restaurant"), rendered)
@@ -445,7 +458,7 @@ class ReceiptDigestSuite extends ScalaCheckSuite:
         policyId,
         RemoteCapability(
           provider,
-          "model",
+          policyModel("model"),
           "purpose",
           policyId,
           100L,
@@ -496,7 +509,7 @@ class ReceiptDigestSuite extends ScalaCheckSuite:
       val base =
         RemoteCapability(
           provider,
-          "model",
+          policyModel("model"),
           "purpose",
           policyId,
           100L,
@@ -506,7 +519,7 @@ class ReceiptDigestSuite extends ScalaCheckSuite:
         )
       val mutations = Vector(
         base.copy(provider = otherProvider),
-        base.copy(model = token),
+        base.copy(model = policyModel(token)),
         base.copy(purpose = token),
         base.copy(policyId = otherPolicyId),
         base.copy(expiresAtEpochMillis = 101L),

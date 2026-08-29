@@ -360,9 +360,12 @@ reaches the codec).
   `AuthorizedRemoteRequest` is constructible only by `RemotePolicy.evaluate`,
   which binds provider, model, purpose, `PolicyId`, expiry, budget, and the
   exact `PseudonymizedText` keyed digest into a `RemoteCapability`. Evaluation derives
-  that value from the request's `EmbedPayload.Sanitized`; its signature has no
-  second payload argument that could authorize material different from the
-  request, and a raw request is denied. A policy also carries a mandatory
+  provider and a length-delimited, version-qualified `PolicyModelIdentity` from the target
+  `Embedder`, resolves the requested `GeometryId` through that embedder, and rejects an
+  unadvertised space or an advertised space owned by a different provider before allowlist checks.
+  Evaluation derives the payload value from the request's `EmbedPayload.Sanitized`; its signature
+  has no second payload argument that could authorize material different from the request, and a raw
+  request is denied. A policy also carries a mandatory
   allowlist of exact `DetectorPolicyIdentity` values (versioned detector id plus
   keyed canonical-configuration digest). Both retained source and destination
   detector receipts must be allowed; an empty allowlist denies every payload.

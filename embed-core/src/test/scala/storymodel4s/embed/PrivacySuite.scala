@@ -1,5 +1,6 @@
 package storymodel4s.embed
 
+import cats.Id
 import munit.FunSuite
 
 import storymodel4s.core.{DomainError, TextSpan}
@@ -126,6 +127,27 @@ class PrivacySuite extends FunSuite:
 
   private def errorOf(result: Either[DomainError, PseudonymizedText]): DomainError =
     result.left.toOption.getOrElse(fail("expected pseudonymization validation to fail"))
+
+  private def remotePayload: PseudonymizedText =
+    checked(
+      "Jane Smith",
+      "[PERSON_1]",
+      Vector(TextSpan.unsafe(0, 10) -> TextSpan.unsafe(0, 10))
+    ).toOption.get
+
+  private def remotePolicyFor(
+      embedder: Embedder[Id],
+      payload: PseudonymizedText
+  ): RemotePolicy =
+    RemotePolicy(
+      policy,
+      allowedProviders = Set(embedder.info.provider),
+      allowedModels = Set(embedder.info.policyModelIdentity),
+      allowedPurposes = Set("research"),
+      allowedDetectors = Set(payload.sourceDetection.get.policyIdentity),
+      maxBudgetTokens = 100,
+      ttlMillis = 1000
+    )
 
   test("PseudonymizedText has no public constructor, apply, or copy escape hatch") {
     val constructor = compileErrors(
@@ -650,28 +672,19 @@ class PrivacySuite extends FunSuite:
   }
 
   test("RemotePolicy authorization uses the sanitized value carried by the request") {
-    val provider = ProviderFingerprint.of("model", "tokenizer", "implementation", "runtime")
+    val embedder = HashedNgramEmbedder[Id](3)
+    val provider = embedder.info.provider
     val payload = checked(
       "Jane Smith",
       "[PERSON_1]",
       Vector(TextSpan.unsafe(0, 10) -> TextSpan.unsafe(0, 10))
     ).toOption.get
-    val space = EmbeddingSpace
-      .of(
-        provider,
-        Role.Query,
-        SemanticView.Surface,
-        None,
-        Dimension.unsafe(3),
-        Normalization.L2,
-        TruncationPolicy.Reject
-      )
-      .toOption
-      .get
+    val space =
+      embedder.spaces.find(s => s.role == Role.Query && s.view == SemanticView.Surface).get
     val policyValue = RemotePolicy(
       policy,
       Set(provider),
-      Set("model"),
+      Set(embedder.info.policyModelIdentity),
       Set("research"),
       allowedDetectors = Set(payload.sourceDetection.get.policyIdentity),
       maxBudgetTokens = 100,
@@ -686,8 +699,7 @@ class PrivacySuite extends FunSuite:
     val authorized = RemotePolicy.evaluate(
       policyValue,
       request,
-      provider,
-      "model",
+      embedder,
       "research",
       nowEpochMillis = 10,
       estimatedTokens = 5
@@ -702,8 +714,7 @@ class PrivacySuite extends FunSuite:
         .evaluate(
           policyValue.copy(allowedDetectors = Set.empty),
           request,
-          provider,
-          "model",
+          embedder,
           "research",
           nowEpochMillis = 10,
           estimatedTokens = 5
@@ -744,8 +755,7 @@ class PrivacySuite extends FunSuite:
         .evaluate(
           policyValue,
           request.copy(payload = EmbedPayload.Sanitized(absent)),
-          provider,
-          "model",
+          embedder,
           "research",
           nowEpochMillis = 10,
           estimatedTokens = 5
@@ -757,8 +767,7 @@ class PrivacySuite extends FunSuite:
         .evaluate(
           policyValue,
           request.copy(payload = EmbedPayload.Sanitized(swapped)),
-          provider,
-          "model",
+          embedder,
           "research",
           nowEpochMillis = 10,
           estimatedTokens = 5
@@ -768,28 +777,19 @@ class PrivacySuite extends FunSuite:
   }
 
   test("RemotePolicy never authorizes a raw request") {
-    val provider = ProviderFingerprint.of("model", "tokenizer", "implementation", "runtime")
+    val embedder = HashedNgramEmbedder[Id](3)
+    val provider = embedder.info.provider
     val policyValue = RemotePolicy(
       policy,
       Set(provider),
-      Set("model"),
+      Set(embedder.info.policyModelIdentity),
       Set("research"),
       allowedDetectors = Set.empty,
       maxBudgetTokens = 100,
       ttlMillis = 1000
     )
-    val space = EmbeddingSpace
-      .of(
-        provider,
-        Role.Query,
-        SemanticView.Surface,
-        None,
-        Dimension.unsafe(3),
-        Normalization.L2,
-        TruncationPolicy.Reject
-      )
-      .toOption
-      .get
+    val space =
+      embedder.spaces.find(s => s.role == Role.Query && s.view == SemanticView.Surface).get
     val request = EmbedRequest(
       RequestId.unsafe("request"),
       EmbedPayload.Raw("Jane Smith had cancer", Sensitivity.Sensitive),
@@ -799,8 +799,7 @@ class PrivacySuite extends FunSuite:
     val denied = RemotePolicy.evaluate(
       policyValue,
       request,
-      provider,
-      "model",
+      embedder,
       "research",
       nowEpochMillis = 10,
       estimatedTokens = 5
@@ -808,4 +807,98 @@ class PrivacySuite extends FunSuite:
 
     assert(denied.isLeft)
     assert(!denied.left.toOption.get.reason.contains("Jane"))
+  }
+
+  test("RemotePolicy denies a foreign-provider GeometryId despite allowed target identity") {
+    val target = HashedNgramEmbedder[Id](3, seed = 0L)
+    val foreign = HashedNgramEmbedder[Id](3, seed = 1L)
+    val payload = remotePayload
+    val request = EmbedRequest(
+      RequestId.unsafe("foreign-geometry"),
+      EmbedPayload.Sanitized(payload),
+      foreign.spaces.head.id
+    )
+
+    val denied = RemotePolicy
+      .evaluate(remotePolicyFor(target, payload), request, target, "research", 10L, 5L)
+      .left
+      .toOption
+      .get
+    assertEquals(denied.reason, "requested space is not advertised by embedder")
+  }
+
+  test("RemotePolicy denies an advertised space owned by a different provider first") {
+    val target = HashedNgramEmbedder[Id](3, seed = 0L)
+    val foreign = HashedNgramEmbedder[Id](3, seed = 1L)
+    val mismatched = new Embedder[Id]:
+      def info: EmbedderInfo = target.info
+      def spaces: Vector[EmbeddingSpace] = foreign.spaces
+      def embed(batch: EmbedBatch): BatchResult = foreign.embed(batch)
+    val payload = remotePayload
+    val request = EmbedRequest(
+      RequestId.unsafe("mismatched-advertisement"),
+      EmbedPayload.Sanitized(payload),
+      foreign.spaces.head.id
+    )
+    val disallowEverything = remotePolicyFor(target, payload).copy(
+      allowedProviders = Set.empty,
+      allowedModels = Set.empty
+    )
+
+    val denied = RemotePolicy
+      .evaluate(disallowEverything, request, mismatched, "research", 10L, 5L)
+      .left
+      .toOption
+      .get
+    assertEquals(denied.reason, "advertised space provider does not match embedder provider")
+  }
+
+  test("RemotePolicy denies an unadvertised same-provider space") {
+    val target = HashedNgramEmbedder[Id](3, seed = 0L)
+    val unadvertised = EmbeddingSpace
+      .of(
+        target.info.provider,
+        Role.Query,
+        SemanticView.Surface,
+        None,
+        Dimension.unsafe(4),
+        Normalization.L2,
+        TruncationPolicy.Reject
+      )
+      .toOption
+      .get
+    val payload = remotePayload
+    val request = EmbedRequest(
+      RequestId.unsafe("unknown-space"),
+      EmbedPayload.Sanitized(payload),
+      unadvertised.id
+    )
+
+    val denied = RemotePolicy
+      .evaluate(remotePolicyFor(target, payload), request, target, "research", 10L, 5L)
+      .left
+      .toOption
+      .get
+    assertEquals(denied.reason, "requested space is not advertised by embedder")
+  }
+
+  test("RemotePolicy derives and enforces the target embedder version") {
+    val original = HashedNgramEmbedder[Id](3)
+    val upgraded = new Embedder[Id]:
+      def info: EmbedderInfo = original.info.copy(version = "2")
+      def spaces: Vector[EmbeddingSpace] = original.spaces
+      def embed(batch: EmbedBatch): BatchResult = original.embed(batch)
+    val payload = remotePayload
+    val request = EmbedRequest(
+      RequestId.unsafe("upgraded-model"),
+      EmbedPayload.Sanitized(payload),
+      original.spaces.head.id
+    )
+
+    val denied = RemotePolicy
+      .evaluate(remotePolicyFor(original, payload), request, upgraded, "research", 10L, 5L)
+      .left
+      .toOption
+      .get
+    assertEquals(denied.reason, "model not allowed")
   }

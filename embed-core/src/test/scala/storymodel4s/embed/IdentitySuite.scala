@@ -8,6 +8,42 @@ import storymodel4s.features.FeatureValueSchema
 
 class IdentitySuite extends ScalaCheckSuite:
 
+  private def embedderInfo(name: String, version: String): EmbedderInfo =
+    EmbedderInfo(
+      ProviderFingerprint.of("model", "tokenizer", "implementation", "runtime"),
+      name,
+      version,
+      Locality.Remote,
+      PrivacyClass.PublicOnly,
+      8192,
+      supportsInstructions = true,
+      tokenEmbeddings = false,
+      matryoshkaDims = None
+    )
+
+  test("PolicyModelIdentity has a checked canonical rendering fixed point") {
+    val info = embedderInfo("model|with:delimiters", "v1|revision:2")
+    val identity = info.policyModelIdentity
+    assertEquals(PolicyModelIdentity.parse(identity.render, info), Some(identity))
+    assertEquals(PolicyModelIdentity.parse(identity.render + "trailing", info), None)
+    assertEquals(PolicyModelIdentity.parse("policy-model/v1|x:model1:v", info), None)
+    assertEquals(PolicyModelIdentity.parse("policy-model/v1|01:a1:1", info), None)
+    assertEquals(PolicyModelIdentity.parse(identity.render, info.copy(version = "other")), None)
+  }
+
+  test("PolicyModelIdentity length delimiting prevents name/version boundary collisions") {
+    val left = embedderInfo("a@b", "c").policyModelIdentity
+    val right = embedderInfo("a", "b@c").policyModelIdentity
+    assertNotEquals(left, right)
+    assertNotEquals(left.render, right.render)
+  }
+
+  test("PolicyModelIdentity changes when the advertised embedder version changes") {
+    val first = embedderInfo("model", "1").policyModelIdentity
+    val second = embedderInfo("model", "2").policyModelIdentity
+    assertNotEquals(first, second)
+  }
+
   property("equal recipes yield equal GeometryIds; ids are content-addressed") {
     forAll(Gens.space) { s =>
       val again = EmbeddingSpace

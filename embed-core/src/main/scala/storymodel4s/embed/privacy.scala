@@ -742,7 +742,7 @@ enum PolicyDecision:
 /** Time is supplied by the caller (epoch millis) so the module stays clock-free and testable. */
 final case class RemoteCapability private[embed] (
     provider: ProviderFingerprint,
-    model: String,
+    model: PolicyModelIdentity,
     purpose: String,
     policyId: PrivacyPolicyId,
     expiresAtEpochMillis: Long,
@@ -751,14 +751,14 @@ final case class RemoteCapability private[embed] (
     payloadDigest: ReceiptDigest.Keyed
 ):
   def render: String =
-    s"cap:${provider.render.take(12)}:$model:$purpose:${policyId.value}:$expiresAtEpochMillis:$budgetTokens:${detectorIdentity.render}:${payloadDigest.render.takeRight(12)}"
+    s"cap:${provider.render.take(12)}:${model.render}:$purpose:${policyId.value}:$expiresAtEpochMillis:$budgetTokens:${detectorIdentity.render}:${payloadDigest.render.takeRight(12)}"
 
 /** A remote policy: which providers/models/purposes and detector configs may send sanitized data.
   */
 final case class RemotePolicy(
     id: PrivacyPolicyId,
     allowedProviders: Set[ProviderFingerprint],
-    allowedModels: Set[String],
+    allowedModels: Set[PolicyModelIdentity],
     allowedPurposes: Set[String],
     allowedDetectors: Set[DetectorPolicyIdentity],
     maxBudgetTokens: Long,
@@ -777,55 +777,64 @@ final case class AuthorizedRemoteRequest private[embed] (
 )
 
 object RemotePolicy:
-  /** Evaluate the request's sanitized payload against a policy for a provider/model/purpose.
+  /** Evaluate the request's sanitized payload against a policy for an embedder and purpose. The
+    * provider, version-qualified model identity, and target space are derived from that embedder.
     * Returns the authorized request bound to that exact payload and a capability, or a typed denial
     * (never an exception, never the payload text in the reason).
     */
-  def evaluate(
+  def evaluate[F[_]](
       policy: RemotePolicy,
       request: EmbedRequest,
-      provider: ProviderFingerprint,
-      model: String,
+      embedder: Embedder[F],
       purpose: String,
       nowEpochMillis: Long,
       estimatedTokens: Long
   ): Either[PolicyDecision.Denied, AuthorizedRemoteRequest] =
     def deny(reason: String): Either[PolicyDecision.Denied, AuthorizedRemoteRequest] =
       Left(PolicyDecision.Denied(request.id, Some(policy.id), reason))
-    request.payload match
-      case EmbedPayload.Raw(_, _)          => deny("request payload is not pseudonymized")
-      case EmbedPayload.Sanitized(payload) =>
-        if !payload.isDetectorCertified then deny("payload lacks detector certification")
-        else
-          (payload.sourceDetection, payload.destinationDetection) match
-            case (Some(source), Some(destination)) =>
-              val identities = Vector(source.policyIdentity, destination.policyIdentity)
-              identities.find(identity => !policy.allowedDetectors.contains(identity)) match
-                case Some(unlisted) =>
-                  deny(s"detector configuration not allowed: ${unlisted.render}")
-                case None =>
-                  val detectorIdentity = source.policyIdentity
-                  if payload.policyId != policy.id then
-                    deny("payload pseudonymized under a different policy")
-                  else if !policy.allowedProviders.contains(provider) then
-                    deny("provider not allowed")
-                  else if !policy.allowedModels.contains(model) then deny("model not allowed")
-                  else if !policy.allowedPurposes.contains(purpose) then deny("purpose not allowed")
-                  else if estimatedTokens < 0 || estimatedTokens > policy.maxBudgetTokens then
-                    deny("budget exceeded")
-                  else if policy.ttlMillis <= 0 then deny("policy has no validity window")
-                  else
-                    val cap = RemoteCapability(
-                      provider,
-                      model,
-                      purpose,
-                      policy.id,
-                      nowEpochMillis + policy.ttlMillis,
-                      estimatedTokens,
-                      detectorIdentity,
-                      payload.digest
-                    )
-                    Right(AuthorizedRemoteRequest(request.id, request.space, payload, cap))
-            case _ => deny("payload lacks detector certification")
+    val info = embedder.info
+    val provider = info.provider
+    val model = info.policyModelIdentity
+    embedder.space(request.space) match
+      case None => deny("requested space is not advertised by embedder")
+      case Some(space) if space.provider != provider =>
+        deny("advertised space provider does not match embedder provider")
+      case Some(_) =>
+        request.payload match
+          case EmbedPayload.Raw(_, _)          => deny("request payload is not pseudonymized")
+          case EmbedPayload.Sanitized(payload) =>
+            if !payload.isDetectorCertified then deny("payload lacks detector certification")
+            else
+              (payload.sourceDetection, payload.destinationDetection) match
+                case (Some(source), Some(destination)) =>
+                  val identities = Vector(source.policyIdentity, destination.policyIdentity)
+                  identities.find(identity => !policy.allowedDetectors.contains(identity)) match
+                    case Some(unlisted) =>
+                      deny(s"detector configuration not allowed: ${unlisted.render}")
+                    case None =>
+                      val detectorIdentity = source.policyIdentity
+                      if payload.policyId != policy.id then
+                        deny("payload pseudonymized under a different policy")
+                      else if !policy.allowedProviders.contains(provider) then
+                        deny("provider not allowed")
+                      else if !policy.allowedModels.contains(model) then deny("model not allowed")
+                      else if !policy.allowedPurposes.contains(purpose) then
+                        deny("purpose not allowed")
+                      else if estimatedTokens < 0 || estimatedTokens > policy.maxBudgetTokens then
+                        deny("budget exceeded")
+                      else if policy.ttlMillis <= 0 then deny("policy has no validity window")
+                      else
+                        val cap = RemoteCapability(
+                          provider,
+                          model,
+                          purpose,
+                          policy.id,
+                          nowEpochMillis + policy.ttlMillis,
+                          estimatedTokens,
+                          detectorIdentity,
+                          payload.digest
+                        )
+                        Right(AuthorizedRemoteRequest(request.id, request.space, payload, cap))
+                case _ => deny("payload lacks detector certification")
 
   given Show[PolicyDecision] = Show.show(_.render)

@@ -1,5 +1,6 @@
 package storymodel4s.interview
 
+import cats.Id
 import cats.data.NonEmptyVector
 import munit.ScalaCheckSuite
 import org.scalacheck.{Arbitrary, Gen}
@@ -182,27 +183,18 @@ class InterviewSuite extends ScalaCheckSuite:
   }
 
   test("interview authorizes only the exact sanitized payload carried by its remote request") {
-    val provider = ProviderFingerprint.of("model", "tokenizer", "implementation", "runtime")
+    val embedder = HashedNgramEmbedder[Id](3)
+    val provider = embedder.info.provider
     val (transcript, _) = pseudonymize(
       StorySource.fromText("Anna remembered the dinner.").toOption.get,
       Vector(PseudonymEntry("Anna", "[PERSON_1]"))
     )
-    val space = EmbeddingSpace
-      .of(
-        provider,
-        Role.Query,
-        SemanticView.Surface,
-        None,
-        Dimension.unsafe(3),
-        Normalization.L2,
-        TruncationPolicy.Reject
-      )
-      .toOption
-      .get
+    val space =
+      embedder.spaces.find(s => s.role == Role.Query && s.view == SemanticView.Surface).get
     val policy = RemotePolicy(
       privacyPolicy,
       allowedProviders = Set(provider),
-      allowedModels = Set("model"),
+      allowedModels = Set(embedder.info.policyModelIdentity),
       allowedPurposes = Set("interview-research"),
       allowedDetectors = Set(transcript.payload.sourceDetection.get.policyIdentity),
       maxBudgetTokens = 100,
@@ -217,8 +209,7 @@ class InterviewSuite extends ScalaCheckSuite:
     val authorized = RemotePolicy.evaluate(
       policy,
       request,
-      provider,
-      "model",
+      embedder,
       "interview-research",
       nowEpochMillis = 10,
       estimatedTokens = 5
@@ -233,8 +224,7 @@ class InterviewSuite extends ScalaCheckSuite:
         .evaluate(
           policy,
           raw,
-          provider,
-          "model",
+          embedder,
           "interview-research",
           nowEpochMillis = 10,
           estimatedTokens = 5
@@ -256,23 +246,14 @@ class InterviewSuite extends ScalaCheckSuite:
       Some(trustedIdentity)
     )
 
-    val provider = ProviderFingerprint.of("model", "tokenizer", "implementation", "runtime")
-    val space = EmbeddingSpace
-      .of(
-        provider,
-        Role.Query,
-        SemanticView.Surface,
-        None,
-        Dimension.unsafe(3),
-        Normalization.L2,
-        TruncationPolicy.Reject
-      )
-      .toOption
-      .get
+    val embedder = HashedNgramEmbedder[Id](3)
+    val provider = embedder.info.provider
+    val space =
+      embedder.spaces.find(s => s.role == Role.Query && s.view == SemanticView.Surface).get
     val policy = RemotePolicy(
       privacyPolicy,
       allowedProviders = Set(provider),
-      allowedModels = Set("model"),
+      allowedModels = Set(embedder.info.policyModelIdentity),
       allowedPurposes = Set("interview-research"),
       allowedDetectors = Set(trustedIdentity),
       maxBudgetTokens = 100,
@@ -288,8 +269,7 @@ class InterviewSuite extends ScalaCheckSuite:
         .evaluate(
           policy,
           trustedRequest,
-          provider,
-          "model",
+          embedder,
           "interview-research",
           nowEpochMillis = 10,
           estimatedTokens = 5
@@ -426,23 +406,14 @@ class InterviewSuite extends ScalaCheckSuite:
     assert(strict.sourceDetection.forall(receipt => !receipt.render.contains("Mark")))
     assert(strict.sourceDetection.forall(receipt => !receipt.render.contains("PERSON")))
 
-    val provider = ProviderFingerprint.of("model", "tokenizer", "implementation", "runtime")
-    val space = EmbeddingSpace
-      .of(
-        provider,
-        Role.Query,
-        SemanticView.Surface,
-        None,
-        Dimension.unsafe(3),
-        Normalization.L2,
-        TruncationPolicy.Reject
-      )
-      .toOption
-      .get
+    val embedder = HashedNgramEmbedder[Id](3)
+    val provider = embedder.info.provider
+    val space =
+      embedder.spaces.find(s => s.role == Role.Query && s.view == SemanticView.Surface).get
     val policy = RemotePolicy(
       privacyPolicy,
       Set(provider),
-      Set("model"),
+      Set(embedder.info.policyModelIdentity),
       Set("research"),
       allowedDetectors = Set(strict.sourceDetection.get.policyIdentity),
       maxBudgetTokens = 100,
@@ -456,8 +427,7 @@ class InterviewSuite extends ScalaCheckSuite:
           EmbedPayload.Sanitized(payload),
           space.id
         ),
-        provider,
-        "model",
+        embedder,
         "research",
         nowEpochMillis = 10,
         estimatedTokens = 5
