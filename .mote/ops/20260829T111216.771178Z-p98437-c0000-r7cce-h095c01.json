@@ -1,0 +1,1 @@
+{"actor":"claude-storymodel4s-m1","entity":"bd-01M16KGSC33Z59JZNMBRBJF659","kind":"create","op":"20260829T111216.771178Z-p98437-c0000-r7cce-h095c01","set":{"priority":2,"status":"open","title":"recall: a unit's text must be the words at its span (RecallGraph.validated)"},"ts":"2026-08-29T11:12:16.771178Z","v":1}
