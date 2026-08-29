@@ -412,7 +412,7 @@ was set by the owner on 2026-08-28 (sticky decision
    ambiguous across them); cross-repo work is coordinated on the
    `narrative-atlas-intaglio` topic with provider/consumer SHAs recorded as
    notes, never as dependency edges between stores.
-4. **Evidence discipline.** *Twenty-six sub-rules; find yours here.* **What
+4. **Evidence discipline.** *Twenty-seven sub-rules; find yours here.* **What
    counts as proof of a fix (11):** mutation proof · capacity to fail ·
    distinguishability · a negative compile-time assertion needs a positive control ·
    or kill it with a mutation, which is stronger · a fixture must tell the
@@ -421,7 +421,8 @@ was set by the owner on 2026-08-28 (sticky decision
    pipeline produces · an inequality is not a discriminating assertion · a pinned
    literal can be updated but a behavioural assertion has to be argued with · a
    positive control requires the old code to be capable of the thing tested. **How
-   to run the gate (8):** never pipe a gate · a trailing success line is not an exit
+   to run the gate (9):** never pipe a gate · a check and the action it gates must
+   not share a batch · a trailing success line is not an exit
    status · a compile error anywhere makes the gate inconclusive · run the format
    check last · verify the export before you gate it · a compile-time probe needs a
    clean recompile · a gate with no test totals did not run · a shell equality test
@@ -429,8 +430,8 @@ was set by the owner on 2026-08-28 (sticky decision
    sweep the shape not the spelling · sweep your own work first · reading a branch establishes permission
    not occurrence · trace the consequence. **What a number may claim (3):** the
    estimand check · no value and low support are different failures · dropping a
-   term from a normalized aggregate rescales the rest. *(Eleven of the twenty-six are
-   about whether a test can actually fail, and EIGHT are about whether the gate
+   term from a normalized aggregate rescales the rest. *(Eleven of the twenty-seven are
+   about whether a test can actually fail, and NINE are about whether the gate
    measured anything at all — that second group went from three to eight in a
    single day, every entry added after a run reported a status with nothing behind
    it. On 2026-08-29 alone, THREE separate red gates measured infrastructure rather
@@ -578,6 +579,17 @@ was set by the owner on 2026-08-28 (sticky decision
    equals the summed source mass and not the row count (2.629, not 4.0). This is
    protocol law **I6** — a set must be able to falsify the model — applied to
    unit-test fixtures rather than benchmark corpora.
+
+   *A check and the action it gates must not run in the SAME BATCH.* Piping
+   destroys the exit status; batching destroys the DECISION. If the format check,
+   the commit and the push are one command sequence, there is no point at which the
+   check's answer can change what happens next — you read the failure after the
+   push has already landed. Measured 2026-08-29, by the chief, on a commit whose
+   subject was "NormTolerance states the precision it defends": `scalafmtCheckAll`
+   returned 1 and main took the unformatted file anyway, four minutes before the
+   repair. The same batch also released the reservation, so repairing an unverified
+   push required re-reserving a file already given up. **Run the gate, READ IT, then
+   act** — and never release a hold in the same breath as the work it protects.
 
    *Never pipe a gate.* In a shell pipeline the exit status is the **last**
    command's, so `sbt -batch "..." | tail` reports `tail`'s status — which
