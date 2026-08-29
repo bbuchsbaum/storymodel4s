@@ -53,6 +53,8 @@ class SignatureSuite extends FunSuite:
       uniformCoverage = 0.0,
       importanceWeightedCoverage = 0.0,
       fidelity = None,
+      fidelityMass = MassRatio.of(0.0, 0.0, 0.0).fold(e => fail(e.message), identity),
+      fidelityByFacet = Map.empty,
       specificity = None,
       compression = MassRatio.of(0.0, 0.0, 0.0).fold(e => fail(e.message), identity),
       discourseChronology = Some(0.0),
@@ -396,4 +398,85 @@ class SignatureSuite extends FunSuite:
     assert(sig.estimandVersion.startsWith("recall-signature/"), sig.estimandVersion)
     // A caller-set version would be an ungrounded assertion about what produced the numbers.
     assert(!scala.compiletime.testing.typeChecks("sig.copy(estimandVersion = \"forged\")"))
+  }
+
+  // --- mass-weighted fidelity over the anchor distribution ---
+
+  test("fidelity conditions on assessed MASS, not on a count of units past a threshold") {
+    // The distinguishing assertion, written before the abstention one this time. The old formula
+    // admitted a unit only when sourceMass > externalMass - a cliff at 0.5 - and then counted its
+    // MAP verdict at full weight. So its denominator was a COUNT of surviving units. The new one
+    // conditions on the mass whose facets were actually specified, which is a continuous quantity
+    // and cannot equal a unit count except by coincidence.
+    val result = GraphHsmm
+      .infer(recall, view, candidates, costModel)
+      .fold(e => fail(e.message), identity)
+    val s = RecallSignature.compute(result, recall, view)
+    val units = result.posterior.rows.size.toDouble
+    assertNotEquals(
+      s.fidelityMass.conditioningMass,
+      units,
+      "fidelity conditions on a unit count; that is the cliff formula"
+    )
+    assert(s.fidelityMass.conditioningMass > 0.0, s.fidelityMass.render)
+    // The mass it rests on cannot exceed the source mass it was drawn from.
+    val sourceMass = result.posterior.rows.map(_.sourceMass).sum
+    assert(s.fidelityMass.conditioningMass <= sourceMass + eps, s.fidelityMass.render)
+    // Recompute the DENOMINATOR independently: the mass of every anchored state whose assessment
+    // specified at least one facet. A different expression over the same inputs, so it pins the
+    // mass-versus-count distinction exactly rather than by inequality.
+    val expectedA = recall.ordered.map { u =>
+      result.posterior
+        .row(u.id)
+        .map(
+          _.mass.toVector
+            .map { case (st, m) =>
+              val specified = for
+                ref <- st.anchor
+                mode <- st.mode
+                node <- view.node(ref)
+              yield FidelityFacets.assess(u.proposition, node, mode).specified > 0
+              if m > 0.0 && specified.contains(true) then m else 0.0
+            }
+            .sum
+        )
+        .getOrElse(0.0)
+    }.sum
+    assertEqualsDouble(s.fidelityMass.conditioningMass, expectedA, 1e-9)
+    assertEquals(s.fidelity, s.fidelityMass.value)
+  }
+
+  test("every anchor of a split unit contributes, not only its MAP") {
+    // A unit split 0.51/0.49 across two anchors used to be scored as though the first were
+    // certain. Both anchors now contribute in proportion to their mass, so the assessed mass of a
+    // split unit exceeds the mass of its MAP alone.
+    val result = GraphHsmm
+      .infer(recall, view, candidates, costModel)
+      .fold(e => fail(e.message), identity)
+    val split = result.posterior.rows.filter(_.mass.count { case (st, m) =>
+      st.isSource && m > 0
+    } > 1)
+    assume(split.nonEmpty, "this fixture has no unit with mass on two anchors")
+    val s = RecallSignature.compute(result, recall, view)
+    val mapMassOnly =
+      result.posterior.rows.flatMap(r => r.mass.filter(_._1.isSource).values.maxOption).sum
+    assert(
+      s.fidelityMass.conditioningMass > mapMassOnly * 0.5,
+      s"assessed mass looks like MAP-only: ${s.fidelityMass.render}"
+    )
+  }
+
+  test("an unspecified facet leaves the denominator rather than counting as wrong") {
+    // UNPROVEN BY MUTATION, stated rather than implied: every anchored assessment in AnnaFixture
+    // specifies all four facets, so the Unspecified branch is unreachable from this corpus and a
+    // mutant that counts Unspecified into the denominator survives. What follows are bounds, not a
+    // discrimination. Proving it needs a unit whose proposition omits a facet.
+    // Unspecified means the recall did not commit to the facet. Counting it against the unit would
+    // punish a participant for what they did not say.
+    for (facet, ratio) <- sig.fidelityByFacet do
+      assert(
+        ratio.conditioningMass <= sig.fidelityMass.totalMass + eps,
+        s"$facet: ${ratio.render}"
+      )
+      assert(ratio.value.forall(v => v >= 0.0 && v <= 1.0), s"$facet: ${ratio.render}")
   }

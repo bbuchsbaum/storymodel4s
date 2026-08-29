@@ -23,6 +23,8 @@ final case class RecallSignature(
     uniformCoverage: Double,
     importanceWeightedCoverage: Double,
     fidelity: Option[Double],
+    fidelityMass: MassRatio,
+    fidelityByFacet: Map[Facet, MassRatio],
     specificity: Option[Double],
     compression: MassRatio,
     discourseChronology: Option[Double],
@@ -272,8 +274,46 @@ object RecallSignature:
     }
     val facets = anchored.map(a => a._1 -> a._2).toMap
     val modes = anchored.map(a => a._1 -> a._3).toMap
-    val fid = facets.values.flatMap(_.fidelity).toVector
-    val fidelity = if fid.isEmpty then None else Some(fid.sum / fid.size)
+    // Fidelity as a mass-weighted ratio of sums over the ANCHOR DISTRIBUTION, not over the MAP of
+    // units that cleared a 0.5 cliff. Two defects removed at once: a unit at 0.51 source mass used
+    // to contribute its MAP verdict at FULL weight while one at 0.49 contributed nothing, and a
+    // unit split 0.51/0.49 across two anchors was scored as though the first were certain.
+    //
+    // Per facet, N_f is correct-verdict mass and A_f is SPECIFIED-verdict mass: Unspecified is
+    // assessment support the recall never committed to, not a wrong answer, so it leaves the
+    // denominator rather than counting against the unit.
+    val facetSums = scala.collection.mutable.Map.empty[Facet, (Double, Double)]
+    var fidelityN = 0.0
+    var fidelityA = 0.0
+    recall.ordered.foreach { u =>
+      p.row(u.id).foreach { row =>
+        row.mass.toVector.sortBy(_._1.key).foreach { case (state, m) =>
+          if m > 0.0 then
+            for
+              ref <- state.anchor
+              mode <- state.mode
+              node <- view.node(ref)
+            do
+              val report = FidelityFacets.assess(u.proposition, node, mode)
+              Facet.values.foreach { f =>
+                val (n, a) = facetSums.getOrElse(f, (0.0, 0.0))
+                report(f) match
+                  case FacetVerdict.Correct     => facetSums.update(f, (n + m, a + m))
+                  case FacetVerdict.Wrong       => facetSums.update(f, (n, a + m))
+                  case FacetVerdict.Unspecified => ()
+              }
+              if report.specified > 0 then
+                fidelityN += m * report.correct.toDouble / report.specified.toDouble
+                fidelityA += m
+        }
+      }
+    }
+    val sourceMassTotal = p.rows.map(_.sourceMass).sum
+    val fidelityRatio = MassRatio.unsafe(fidelityN, fidelityA, sourceMassTotal)
+    val fidelityByFacet: Map[Facet, MassRatio] = facetSums.iterator.map { case (f, (n, a)) =>
+      f -> MassRatio.unsafe(n, a, sourceMassTotal)
+    }.toMap
+    val fidelity = fidelityRatio.value
 
     val k = view.sourceNodeCount
     val loc = p.rows.flatMap(r => r.localizability(k).map(r.unit -> _)).toMap
@@ -389,6 +429,8 @@ object RecallSignature:
       uniform,
       weighted,
       fidelity,
+      fidelityRatio,
+      fidelityByFacet,
       specificity,
       compression,
       discourse,
