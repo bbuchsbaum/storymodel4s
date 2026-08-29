@@ -75,6 +75,23 @@ class SinkhornSuite extends ScalaCheckSuite:
     )
   }
 
+  test("NaN epsilon is InvalidConfig, not a 200-iteration zero plan") {
+    val c = Vector(Vector(0.1, 0.9), Vector(0.8, 0.2))
+    val a = Vector(1.0, 1.0)
+    val b = Vector(1.0, 1.0)
+    val nanEps =
+      UnbalancedSinkhorn.solve(c, a, b, SinkhornConfig(epsilon = Double.NaN, maxIterations = 200))
+    assert(nanEps.isLeft, s"NaN epsilon must not enter the iteration: $nanEps")
+    val nanRho =
+      UnbalancedSinkhorn.solve(c, a, b, SinkhornConfig(rhoRows = Double.NaN, maxIterations = 200))
+    assert(nanRho.isLeft, s"NaN rhoRows must not enter the iteration: $nanRho")
+    val nanCol =
+      UnbalancedSinkhorn.solve(c, a, b, SinkhornConfig(rhoCols = Double.NaN, maxIterations = 200))
+    assert(nanCol.isLeft, s"NaN rhoCols must not enter the iteration: $nanCol")
+    val good = UnbalancedSinkhorn.solve(c, a, b, SinkhornConfig(0.1, 1.0, 1.0, 200))
+    assert(good.exists(_.plan.flatten.exists(_ > 0.0)), s"control plan must carry mass: $good")
+  }
+
   test("with a large penalty the transport is nearly balanced") {
     val c = Vector(Vector(0.1, 0.9, 0.5), Vector(0.8, 0.2, 0.6))
     val a = Vector(1.0, 1.0)
