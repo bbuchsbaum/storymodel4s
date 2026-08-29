@@ -15,20 +15,20 @@ object ModelStatus:
   * and an optional receipt. Constructed only through [[StoryModel.draft]] and promoted by
   * validation.
   */
-final case class StoryModel[S <: ModelStatus] private[story] (
-    schemaVersion: String,
-    source: StorySource,
-    atlas: SurfaceAtlas,
-    graph: NarrativeGraph,
-    hierarchy: NarrativeHierarchy,
-    trajectory: DiscourseTrajectory,
-    featureSpaces: Map[FeatureSpaceId, FeatureSpace[?]],
-    sidecars: Map[FeatureSpaceId, SidecarManifest],
-    featureRefs: Vector[FeatureRef],
-    descriptors: Vector[DescriptorClaim],
-    hypotheses: Vector[HypothesisClaim],
-    sensoryProfiles: Map[SituationId, Vector[SensoryProfile]],
-    receipt: Option[BuildReceipt]
+final class StoryModel[S <: ModelStatus] private[story] (
+    val schemaVersion: String,
+    val source: StorySource,
+    val atlas: SurfaceAtlas,
+    val graph: NarrativeGraph,
+    val hierarchy: NarrativeHierarchy,
+    val trajectory: DiscourseTrajectory,
+    val featureSpaces: Map[FeatureSpaceId, FeatureSpace[?]],
+    val sidecars: Map[FeatureSpaceId, SidecarManifest],
+    val featureRefs: Vector[FeatureRef],
+    val descriptors: Vector[DescriptorClaim],
+    val hypotheses: Vector[HypothesisClaim],
+    val sensoryProfiles: Map[SituationId, Vector[SensoryProfile]],
+    val receipt: Option[BuildReceipt]
 ):
   /** Every inline claim in the model, in a deterministic order: node claims, resolved-value claims
     * (entity labels, segment summaries), scoped attributes, every relation layer, containment,
@@ -59,6 +59,40 @@ final case class StoryModel[S <: ModelStatus] private[story] (
     val ev = Addressable[StoryRef]
     (graph.covering(span) ++ fromHierarchy).distinct.sortBy(r => ev.address(r).render)
 
+  /** Internal mutation hook for validator fixtures. Any changed field requires the resulting status
+    * to be supplied explicitly or by the expected result type.
+    */
+  private[story] def copy[T <: ModelStatus](
+      schemaVersion: String = schemaVersion,
+      source: StorySource = source,
+      atlas: SurfaceAtlas = atlas,
+      graph: NarrativeGraph = graph,
+      hierarchy: NarrativeHierarchy = hierarchy,
+      trajectory: DiscourseTrajectory = trajectory,
+      featureSpaces: Map[FeatureSpaceId, FeatureSpace[?]] = featureSpaces,
+      sidecars: Map[FeatureSpaceId, SidecarManifest] = sidecars,
+      featureRefs: Vector[FeatureRef] = featureRefs,
+      descriptors: Vector[DescriptorClaim] = descriptors,
+      hypotheses: Vector[HypothesisClaim] = hypotheses,
+      sensoryProfiles: Map[SituationId, Vector[SensoryProfile]] = sensoryProfiles,
+      receipt: Option[BuildReceipt] = receipt
+  ): StoryModel[T] =
+    new StoryModel[T](
+      schemaVersion,
+      source,
+      atlas,
+      graph,
+      hierarchy,
+      trajectory,
+      featureSpaces,
+      sidecars,
+      featureRefs,
+      descriptors,
+      hypotheses,
+      sensoryProfiles,
+      receipt
+    )
+
   private[story] def withStatus[T <: ModelStatus]: StoryModel[T] =
     new StoryModel[T](
       schemaVersion,
@@ -75,6 +109,36 @@ final case class StoryModel[S <: ModelStatus] private[story] (
       sensoryProfiles,
       receipt
     )
+
+  override def equals(other: Any): Boolean = other match
+    case that: StoryModel[?] =>
+      schemaVersion == that.schemaVersion && source == that.source && atlas == that.atlas &&
+      graph == that.graph && hierarchy == that.hierarchy && trajectory == that.trajectory &&
+      featureSpaces == that.featureSpaces && sidecars == that.sidecars &&
+      featureRefs == that.featureRefs && descriptors == that.descriptors &&
+      hypotheses == that.hypotheses && sensoryProfiles == that.sensoryProfiles &&
+      receipt == that.receipt
+    case _ => false
+
+  override def hashCode: Int =
+    (
+      schemaVersion,
+      source,
+      atlas,
+      graph,
+      hierarchy,
+      trajectory,
+      featureSpaces,
+      sidecars,
+      featureRefs,
+      descriptors,
+      hypotheses,
+      sensoryProfiles,
+      receipt
+    ).##
+
+  override def toString: String =
+    s"StoryModel(schemaVersion=$schemaVersion, situations=${graph.situations.size})"
 
 object StoryModel:
   val SchemaVersion: String = "0.1.0"
