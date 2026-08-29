@@ -16,14 +16,22 @@ class LabelSuite extends FunSuite:
     "stories/s1/model.json" -> modelBytes
   )
 
-  private def manifest(protocolChecksum: Checksum = protocol, version: Int = 1): FrozenManifest =
+  private def manifest(
+      protocolChecksum: Checksum = protocol,
+      version: Int = 1,
+      risk: ContaminationRisk = ContaminationRisk.Low,
+      partition: Partition = Partition.Calibration,
+      justification: Map[String, String] = Map.empty
+  ): FrozenManifest =
     val m = FrozenManifest(
       setId = "f-20260828-PLACEHOLDER",
       protocolVersion = version,
       protocolChecksum = protocolChecksum,
       files = store.view.mapValues(Checksum.ofBytes).toMap,
       stories = Vector("s1"),
-      partitions = Map("s1" -> Partition.Calibration)
+      partitions = Map("s1" -> partition),
+      contamination = Map("s1" -> risk),
+      mediumJustifications = justification
     )
     m.copy(setId = s"f-20260828-${m.idSuffix}")
 
@@ -124,4 +132,47 @@ class LabelSuite extends FunSuite:
     BenchReport.label(Vector.empty, Vector.empty, protocol, 0L) match
       case BenchReport.Diagnostic(DiagnosticReason.NoCases, _, _) => ()
       case r => fail(s"expected NoCases, got ${r.label}")
+  }
+
+  test("Law I5: a high-risk story in the set downgrades a calibrated report, naming it") {
+    val set = FrozenSet.verify(manifest(risk = ContaminationRisk.High), store.get).toOption.get
+    val report = BenchReport.label(Vector(caseWith("f", set.origin("s1").get)), Vector.empty, protocol, 1L)
+    report match
+      case BenchReport.Diagnostic(DiagnosticReason.ContaminatedSet(_, ids), _, _) =>
+        assertEquals(ids, Vector("s1"))
+      case other => fail(s"expected ContaminatedSet, got ${other.label}")
+  }
+
+  test("Law I5: medium in the untouched-test partition needs a written justification") {
+    val bad = manifest(risk = ContaminationRisk.Medium, partition = Partition.UntouchedTest)
+    val badSet = FrozenSet.verify(bad, store.get).toOption.get
+    BenchReport.label(Vector(caseWith("f", badSet.origin("s1").get)), Vector.empty, protocol, 1L) match
+      case BenchReport.Diagnostic(DiagnosticReason.UnjustifiedMedium(_, ids), _, _) =>
+        assertEquals(ids, Vector("s1"))
+      case other => fail(s"expected UnjustifiedMedium, got ${other.label}")
+    val good = manifest(
+      risk = ContaminationRisk.Medium,
+      partition = Partition.UntouchedTest,
+      justification = Map("s1" -> "scored medium: one summary surface, argued in the receipt")
+    )
+    val goodSet = FrozenSet.verify(good, store.get).toOption.get
+    assertEquals(
+      BenchReport.label(Vector(caseWith("f", goodSet.origin("s1").get)), Vector.empty, protocol, 1L).label,
+      "calibrated"
+    )
+  }
+
+  test("Law I5: a manifest with an unrecorded risk fails closed, it does not default to low") {
+    val m = manifest()
+    val stale = reId(m.copy(contamination = Map.empty))
+    FrozenSet.verify(stale, store.get) match
+      case Left(FreezeError.NoStoryContamination(_, story)) => assertEquals(story, "s1")
+      case other => fail(s"expected NoStoryContamination, got $other")
+  }
+
+  test("risk is part of set identity: changing it changes the manifest checksum and the set id") {
+    val low = manifest(risk = ContaminationRisk.Low)
+    val high = manifest(risk = ContaminationRisk.High)
+    assertNotEquals(low.checksum, high.checksum)
+    assertNotEquals(low.setId, high.setId)
   }

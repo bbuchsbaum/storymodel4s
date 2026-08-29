@@ -13,6 +13,10 @@ enum DiagnosticReason:
   case MixedSets(setIds: Vector[String])
   case ProtocolDrift(setId: String, recorded: Checksum, current: Checksum)
   case ProtocolVersion(setId: String, recorded: Int, expected: Int)
+  /** Law I5 clause 3: a set containing a memorized story cannot back a calibrated claim. */
+  case ContaminatedSet(setId: String, storyIds: Vector[String])
+  /** Law I5 clause 2: `medium` in the partition that selects a default needs a justification. */
+  case UnjustifiedMedium(setId: String, storyIds: Vector[String])
 
   def render: String = this match
     case NoCases                => "no cases"
@@ -21,6 +25,11 @@ enum DiagnosticReason:
     case ProtocolDrift(s, r, c) =>
       s"protocol drift on $s: frozen under ${r.short()}, candidate has ${c.short()}"
     case ProtocolVersion(s, r, e) => s"protocol version on $s: frozen under v$r, bench expects v$e"
+    case ContaminatedSet(s, ids)  =>
+      s"contaminated set $s (Law I5): high-risk stories ${ids.mkString(",")}"
+    case UnjustifiedMedium(s, ids) =>
+      s"unjustified medium-risk stories in the untouched-test partition of $s " +
+        s"(Law I5): ${ids.mkString(",")}"
 
 /** The three narrative clocks of one case (spec: sequential and three-clock panels), read from the
   * recall signature of the proven result.
@@ -132,6 +141,14 @@ object BenchReport:
         else if o.protocolChecksum != currentProtocol then
           Diagnostic(
             DiagnosticReason.ProtocolDrift(o.setId, o.protocolChecksum, currentProtocol),
+            channels,
+            seed
+          )
+        else if o.highRiskStories.nonEmpty then
+          Diagnostic(DiagnosticReason.ContaminatedSet(o.setId, o.highRiskStories), channels, seed)
+        else if o.unjustifiedMediumInTest.nonEmpty then
+          Diagnostic(
+            DiagnosticReason.UnjustifiedMedium(o.setId, o.unjustifiedMediumInTest),
             channels,
             seed
           )

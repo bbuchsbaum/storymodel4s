@@ -11,6 +11,22 @@ enum Partition:
     case Calibration   => "calibration"
     case UntouchedTest => "untouched-test"
 
+/** Protocol Law I5: how likely a story's text or its published summaries sit in a tested channel's
+  * training data. Measured by the manifest's recorded procedure (counted summary surfaces on a
+  * frozen site list), never by anyone's impression of how famous a story is.
+  *
+  * It is here rather than in the corpus document because a validity condition the label-minting
+  * function does not check is decoration: a set of memorized stories must not be able to mint a
+  * calibrated number just because a human forgot to read the protocol.
+  */
+enum ContaminationRisk:
+  case Low, Medium, High
+
+  def render: String = this match
+    case Low    => "low"
+    case Medium => "medium"
+    case High   => "high"
+
 /** Where a bench case comes from. The type is the label discipline: only cases whose origin is a
   * verified [[Origin.Frozen]] set can contribute to a `Calibrated` report; anything under the
   * diagnostic root, or any hand-wired fixture, is [[Origin.Diagnostic]] and can never be promoted.
@@ -25,7 +41,11 @@ enum Origin:
       protocolVersion: Int,
       protocolChecksum: Checksum,
       manifestChecksum: Checksum,
-      partition: Partition
+      partition: Partition,
+      /** Stories in the SET (not merely in this run) scored `high` — Law I5 clause 3. */
+      highRiskStories: Vector[String],
+      /** `medium` stories in the untouched-test partition with no recorded justification. */
+      unjustifiedMediumInTest: Vector[String]
   )
 
   /** Material from the diagnostic root or a code fixture; `reason` says why it is not selection
@@ -34,12 +54,16 @@ enum Origin:
   case Diagnostic(root: String, reason: String)
 
   def isFrozen: Boolean = this match
-    case Frozen(_, _, _, _, _) => true
-    case Diagnostic(_, _)      => false
+    case Frozen(_, _, _, _, _, _, _) => true
+    case Diagnostic(_, _)            => false
 
   def render: String = this match
-    case Frozen(set, v, p, m, part) =>
-      s"frozen:$set protocol=v$v/${p.short()} manifest=${m.short()} partition=${part.render}"
+    case Frozen(set, v, p, m, part, high, medium) =>
+      val i5 =
+        if high.nonEmpty then s" contaminated=${high.mkString(",")}"
+        else if medium.nonEmpty then s" unjustified-medium=${medium.mkString(",")}"
+        else ""
+      s"frozen:$set protocol=v$v/${p.short()} manifest=${m.short()} partition=${part.render}$i5"
     case Diagnostic(root, reason) => s"diagnostic:$root ($reason)"
 
 /** The adjudication protocol document, pinned by content checksum (protocol §6, manifest rule 6).
@@ -70,6 +94,7 @@ enum FreezeError:
   case SetIdMismatch(setId: String, expectedSuffix: String)
   case EmptySet(setId: String)
   case NoStoryPartition(setId: String, storyId: String)
+  case NoStoryContamination(setId: String, storyId: String)
 
   def message: String = this match
     case MissingFile(s, p)            => s"$s: manifest lists $p but the store has no such file"
@@ -77,6 +102,9 @@ enum FreezeError:
     case SetIdMismatch(s, suffix)     => s"$s: set id does not end with the manifest suffix $suffix"
     case EmptySet(s)                  => s"$s: the manifest lists no story"
     case NoStoryPartition(s, story)   => s"$s: story $story has no partition"
+    case NoStoryContamination(s, story) =>
+      s"$s: story $story has no recorded contaminationRisk (Law I5); a manifest that predates " +
+        "the law fails closed rather than defaulting to low"
 
 /** The typed content of a frozen set's `manifest.json` (protocol §6). Parsing the JSON is the
   * codec's job (the codec module is not a dependency of the bench); the bench owns the verification
@@ -88,7 +116,11 @@ final case class FrozenManifest(
     protocolChecksum: Checksum,
     files: Map[String, Checksum],
     stories: Vector[String],
-    partitions: Map[String, Partition]
+    partitions: Map[String, Partition],
+    /** Law I5 clause 1: the measured risk of every story. Absence is a verification failure. */
+    contamination: Map[String, ContaminationRisk],
+    /** Written justifications for `medium` stories in the untouched-test partition (clause 2). */
+    mediumJustifications: Map[String, String] = Map.empty
 ):
   /** Content address of the manifest itself: every field, in a canonical order. */
   def checksum: Checksum =
@@ -96,8 +128,24 @@ final case class FrozenManifest(
       Vector("frozen-manifest/v1", protocolVersion.toString, protocolChecksum.hex) ++
         files.toVector.sortBy(_._1).flatMap { case (p, c) => Vector(p, c.hex) } ++
         stories.sorted ++
-        partitions.toVector.sortBy(_._1).flatMap { case (s, p) => Vector(s, p.render) }
+        partitions.toVector.sortBy(_._1).flatMap { case (s, p) => Vector(s, p.render) } ++
+        contamination.toVector.sortBy(_._1).flatMap { case (s, r) => Vector(s, r.render) } ++
+        mediumJustifications.toVector.sortBy(_._1).flatMap { case (s, j) => Vector(s, j) }
     )
+
+  /** Stories scored `high` anywhere in the set (Law I5 clause 3). */
+  def highRiskStories: Vector[String] =
+    stories.filter(s => contamination.get(s).contains(ContaminationRisk.High)).sorted
+
+  /** `medium` stories in the untouched-test partition carrying no written justification. */
+  def unjustifiedMediumInTest: Vector[String] =
+    stories
+      .filter(s =>
+        contamination.get(s).contains(ContaminationRisk.Medium) &&
+          partitions.get(s).contains(Partition.UntouchedTest) &&
+          !mediumJustifications.get(s).exists(_.trim.nonEmpty)
+      )
+      .sorted
 
   /** The suffix a conforming set id carries: `f-<yyyymmdd>-<8 hex of the manifest checksum>`. */
   def idSuffix: String = checksum.hex.take(8)
@@ -113,7 +161,9 @@ final class FrozenSet private[bench] (val manifest: FrozenManifest):
         manifest.protocolVersion,
         manifest.protocolChecksum,
         manifest.checksum,
-        p
+        p,
+        manifest.highRiskStories,
+        manifest.unjustifiedMediumInTest
       )
     }
 
@@ -135,6 +185,11 @@ object FrozenSet:
         manifest.stories
           .find(s => !manifest.partitions.contains(s))
           .map(FreezeError.NoStoryPartition(id, _))
+          .orElse(
+            manifest.stories
+              .find(s => !manifest.contamination.contains(s))
+              .map(FreezeError.NoStoryContamination(id, _))
+          )
       partitionError match
         case Some(e) => Left(e)
         case None    =>
