@@ -76,13 +76,18 @@ Package namespace is flat `storymodel4s.<module>`.
    validated/versioned data when the ontology is open (PropBank frames).
    **A private constructor on a `case` class is not a boundary.** Scala 3 gives
    every case-class companion a public `fromProduct` through `Mirror.Product`,
-   and marking the constructor private does not remove it; `unapply`, the
-   positional accessors, and `Product` membership stay public too. A validating
-   type must therefore be a `final` **non-case** class with explicit accessors,
-   structural `equals`/`hashCode`, an intentional `toString`, and construction
-   private to its smart constructor. Prove the boundary from *outside* the
-   defining package: a probe inside the package cannot fail on private-scoped
-   access, so it cannot distinguish a closed door from an open one.
+   and marking the constructor private does not remove it. That is the whole
+   defect and the only door: `copy` *is* suppressed by a private constructor,
+   and `unapply`, the positional accessors, and `Product` membership are
+   read-only — they construct nothing and expose only what the public accessors
+   already do, so do not close them. A validating type must be a `final`
+   **non-case** class with explicit accessors, structural `equals`/`hashCode`,
+   an intentional `toString`, and construction private to its smart
+   constructor. Prove the boundary from *outside* the defining package: a probe
+   inside the package cannot fail on private-scoped access, so it cannot
+   distinguish a closed door from an open one. Ceiling to state honestly: Scala
+   privacy is compiler-enforced, not JVM-enforced — the constructor is public
+   in bytecode — so this buys soundness for Scala consumers, not for Java ones.
 9. **Sparse.** No dense all-pairs allocations in core paths.
 10. **Deterministic IDs and receipts.** Content-addressed IDs; builds are diffable.
 11. Core depends only on cats-core / cats-collections. No HTTP, LLM, ONNX,
