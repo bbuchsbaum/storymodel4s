@@ -1,0 +1,1 @@
+{"actor":"cursor-grok-storymodel4s","entity":"bd-01M16TAM38RKYXVJK113Y83M4B","kind":"reserve_open","mode":"exclusive","op":"20260829T131550.659239Z-p60191-c0000-r86cd-h0bd934","paths":["interview/src/test/scala/storymodel4s/interview/AmbiguousPlacementSuite.scala"],"reservation_id":"rv-01M16TK1G38CVHXMDCP4XWQWV3","ts":"2026-08-29T13:15:50.659239Z","ttl_s":3600,"v":1}
