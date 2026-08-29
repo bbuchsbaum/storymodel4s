@@ -99,8 +99,25 @@ Package namespace is flat `storymodel4s.<module>`.
    path. `if x > 0.0 then compute else safe` is correct under `NaN` **for free** —
    no `isNaN` call, no cost — while the other form needs an explicit defence
    somebody has to remember. This sorts a codebase by grep, without per-site
-   judgement: the fail-closed half needs no thought at all. **But polarity replaces
-   only the fail-open/fail-closed judgement — it does NOT replace reachability.** A
+   judgement: the fail-closed half needs no thought at all. **A NaN finding has
+   THREE questions and they must be answered separately:**
+
+   | question | what it asks | how you answer it |
+   |---|---|---|
+   | **polarity** | how the guard behaves under `NaN` | mechanical — sorts by grep |
+   | **reachability** | whether `NaN` can arrive there at all | source tracing |
+   | **consequence** | what actually comes out when it does | **must be run** |
+
+   Measured 2026-08-29 on `sinkhorn.scala:44`: polarity predicted the validator
+   fails open — correct. Reachability confirmed a public `SinkhornConfig` puts
+   `epsilon = NaN` one keystroke away — correct. Running it published **no `NaN` at
+   all**: the caller gets a silently degenerate all-zero transport plan after 200
+   iterations, with `converged=false` returned, so a caller who checks can detect
+   it. The measurer expected `NaN`, did not get it, and led with the contradiction.
+   Stopping at polarity would have reported a `NaN` that does not occur; stopping at
+   reachability would have missed the `converged=false` mitigation. **So polarity
+   replaces only the fail-open/fail-closed judgement — it does NOT replace
+   reachability, and neither replaces running the thing.** A
    fail-open guard on a value that cannot be `NaN` is not a defect, and the two
    questions must be answered separately. Measured 2026-08-29 across 19
    Double-literal guards, which found three fail-open *polarities* and exactly **one
