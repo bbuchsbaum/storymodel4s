@@ -236,6 +236,19 @@ was set by the owner on 2026-08-28 (sticky decision
    for is a defect you have declined to sweep; the chief did exactly that here,
    and 45 forgeable types stayed open until someone walked into one by hand.
 
+   *A compile-time probe needs a clean recompile.* A mutation that changes a
+   **type's shape** — `case` to non-`case`, a constructor's visibility, or
+   anything a compile-time assertion inspects — must be proved after a **clean**
+   recompilation of the module. `typeCheckErrors` and friends are compile-time
+   macros, and Zinc may reuse stale test bytecode across such a mutation: the
+   probe never re-runs, the suite goes green, and the author records a killed
+   mutation that was never tested. A false green in the exact test whose job is
+   to prove the boundary holds. State in the evidence post that the recompile
+   was clean; "mutation killed" without it is not accepted for a compile-time
+   probe. (Chief gates satisfy this by construction — they run from a fresh
+   `git archive` export with no target directories — so the hazard belongs to
+   authors gating in a warm worktree.)
+
    *Trace the consequence.* A claim about what a defect **feeds** — what depends
    on it, what it corrupts downstream — is a claim about the call graph, and the
    call graph is cheap to check. Do not escalate a consequence you have not
