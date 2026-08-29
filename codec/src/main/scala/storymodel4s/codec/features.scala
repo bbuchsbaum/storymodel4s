@@ -98,6 +98,8 @@ object FeatureCodecs:
     case b: FeatureTarget.Boundary => Right(b)
     case other                     => Left(s"expected Boundary target, got $other")
   }
+  given Encoder[BasisId] = summon[Encoder[Checksum]].contramap(_.checksum)
+  given Decoder[BasisId] = summon[Decoder[Checksum]].map(BasisId.fromChecksum)
 
   given Encoder[Dtype] = enumEncoder(_.toString)
   given Decoder[Dtype] = enumDecoder("Dtype", Dtype.values, _.toString)
@@ -346,8 +348,6 @@ object FeatureCodecs:
   given Decoder[Eligibility] = enumDecoder("Eligibility", Eligibility.values, _.toString)
   given Encoder[TargetFamily] = enumEncoder(_.toString)
   given Decoder[TargetFamily] = enumDecoder("TargetFamily", TargetFamily.values, _.toString)
-  given Encoder[BasisId] = summon[Encoder[Checksum]].contramap(_.checksum)
-  given Decoder[BasisId] = summon[Decoder[Checksum]].map(BasisId.fromChecksum)
 
   given Encoder[NarrativeWindowPlan] =
     Encoder.instance(p => Json.obj("halfWidth" -> p.halfWidth.asJson))

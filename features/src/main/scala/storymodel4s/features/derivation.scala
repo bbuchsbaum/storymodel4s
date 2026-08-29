@@ -107,8 +107,7 @@ object BasisId:
   /** Rebuild a wire identity after the checksum decoder has validated its representation. */
   def fromChecksum(checksum: Checksum): BasisId = checksum
 
-  extension (id: BasisId)
-    def checksum: Checksum = id
+  extension (id: BasisId) def checksum: Checksum = id
 
 type BasisId = BasisId.BasisId
 

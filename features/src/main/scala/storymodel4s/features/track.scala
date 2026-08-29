@@ -13,8 +13,8 @@ final case class FeatureObservation[+T <: FeatureTarget, +V](
 ):
   def map[W](f: V => W): FeatureObservation[T, W] = copy(estimate = estimate.map(f))
 
-/** Where a track came from: a raw provider run or a deterministic derivation, including the
-  * ordered basis when the caller supplied the derivation axis.
+/** Where a track came from: a raw provider run or a deterministic derivation, including the ordered
+  * basis when the caller supplied the derivation axis.
   */
 final case class TrackProvenance(
     provenance: Provenance,

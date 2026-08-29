@@ -366,14 +366,21 @@ class WindowSuite extends ScalaCheckSuite:
       )
       .toOption
       .get
-    assert(FeatureTrack.validated(raw.copy(provenance = raw.provenance.copy(basisId = Some(basis)))).isLeft)
+    assert(
+      FeatureTrack
+        .validated(raw.copy(provenance = raw.provenance.copy(basisId = Some(basis))))
+        .isLeft
+    )
 
     val derived = Aggregate
       .overTargets(
         raw,
         sequence,
         Vector(
-          (FeatureTarget.Situation(SituationId.unsafe("validation")), SpanSet.one(atlas.sentences.head.span))
+          (
+            FeatureTarget.Situation(SituationId.unsafe("validation")),
+            SpanSet.one(atlas.sentences.head.span)
+          )
         ),
         ScalarReducer.Mean,
         MissingValuePolicy.IgnoreMissing
@@ -475,9 +482,10 @@ class WindowSuite extends ScalaCheckSuite:
 
   test("caller-supplied aggregate bases determine output identity and provenance") {
     val raw = imageabilityTrack()
-    val alpha = FeatureTarget.Situation(SituationId.unsafe("alpha"))
-    val beta = FeatureTarget.Situation(SituationId.unsafe("beta"))
-    val targets = Vector(
+    val alpha: FeatureTarget.Situation =
+      FeatureTarget.Situation(SituationId.unsafe("alpha"))
+    val beta: FeatureTarget.Situation = FeatureTarget.Situation(SituationId.unsafe("beta"))
+    val targets: Vector[(FeatureTarget.Situation, SpanSet)] = Vector(
       alpha -> SpanSet.one(atlas.sentences(0).span),
       beta -> SpanSet.one(atlas.sentences(1).span)
     )
@@ -499,7 +507,7 @@ class WindowSuite extends ScalaCheckSuite:
     assertNotEquals(forward.provenance.basisId, reversed.provenance.basisId)
     assertNotEquals(forward.space.id, reversed.space.id)
     assertEquals(
-      forward.provenance.basisId.map(forward.derivation.get.outputSpaceId),
+      forward.provenance.basisId.map(basis => forward.derivation.get.outputSpaceId(basis)),
       Some(forward.space.id)
     )
     assertEquals(
@@ -594,7 +602,10 @@ class WindowSuite extends ScalaCheckSuite:
     assertEquals(d.targetFamily, Some(TargetFamily.Situation))
     assertEquals(d.window, None)
     assertEquals(d.narrativeWindow, None)
-    assertEquals(events.provenance.basisId, Some(NarrativeBasis.situations(situationOrder, resolver).toOption.get.basisId))
+    assertEquals(
+      events.provenance.basisId,
+      Some(NarrativeBasis.situations(situationOrder, resolver).toOption.get.basisId)
+    )
     assert(FeatureTrack.validatedScores(events).isRight)
     // scenes: the two segments partition the sentences, so their coverages sum to the whole
     val scenes = Aggregate

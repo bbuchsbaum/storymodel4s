@@ -388,8 +388,19 @@ object Aggregate:
       family: TargetFamily,
       targets: Vector[(T, SpanSet)],
       reducer: ScalarReducer,
+      missing: MissingValuePolicy
+  ): Either[DomainError, FeatureTrack[T, Double]] =
+    overTargets(track, sequence, family, targets, reducer, missing, lexicalOnly = true)
+
+  /** Aggregate over an explicit target family with a caller-selected eligibility policy. */
+  def overTargets[T <: FeatureTarget](
+      track: FeatureTrack[FeatureTarget.Token, Double],
+      sequence: SurfaceSequence,
+      family: TargetFamily,
+      targets: Vector[(T, SpanSet)],
+      reducer: ScalarReducer,
       missing: MissingValuePolicy,
-      lexicalOnly: Boolean = true
+      lexicalOnly: Boolean
   ): Either[DomainError, FeatureTrack[T, Double]] =
     val eligibility = if lexicalOnly then Eligibility.LexicalTokens else Eligibility.AllTokens
     BasisId
@@ -471,32 +482,32 @@ object Aggregate:
     )
     val red = WindowReducer.scalar(reducer)
     targets
-        .traverse { (t, support) =>
-          val idx = sequence
-            .coveringIndices(support)
-            .filter(i => !lexicalOnly || sequence.tokens(i.value).isLexical)
-          val samples = idx.map { i =>
-            val est =
-              track.get(FeatureTarget.Token(i)).getOrElse(Estimate.Missing(MissingReason.Unknown))
-            Sample(i.value, est, 1.0)
-          }
-          Reduction
-            .reduce(samples, red, missing)
-            .map((est, cov) => FeatureObservation(t, est, Some(support), Some(cov)))
+      .traverse { (t, support) =>
+        val idx = sequence
+          .coveringIndices(support)
+          .filter(i => !lexicalOnly || sequence.tokens(i.value).isLexical)
+        val samples = idx.map { i =>
+          val est =
+            track.get(FeatureTarget.Token(i)).getOrElse(Estimate.Missing(MissingReason.Unknown))
+          Sample(i.value, est, 1.0)
         }
-        .map { obs =>
-          FeatureTrack(
-            Windowed.outputSpace(
-              track.space,
-              derivation,
-              s"${track.space.description} — aggregate ${reducer.id.value}",
-              Some(basisId)
-            ),
-            obs.sortBy(o => o.target: FeatureTarget),
-            Some(derivation),
-            track.provenance.copy(basisId = Some(basisId))
-          )
-        }
+        Reduction
+          .reduce(samples, red, missing)
+          .map((est, cov) => FeatureObservation(t, est, Some(support), Some(cov)))
+      }
+      .map { obs =>
+        FeatureTrack(
+          Windowed.outputSpace(
+            track.space,
+            derivation,
+            s"${track.space.description} — aggregate ${reducer.id.value}",
+            Some(basisId)
+          ),
+          obs.sortBy(o => o.target: FeatureTarget),
+          Some(derivation),
+          track.provenance.copy(basisId = Some(basisId))
+        )
+      }
 
 /** An ordered run of narrative units — situations (events) or segments (scenes) — with their
   * resolved text supports: the axis that [[Aggregate.overBasis]] aggregates per unit and
