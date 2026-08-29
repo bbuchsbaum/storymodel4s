@@ -8,11 +8,11 @@ import storymodel4s.core.*
 import storymodel4s.recall.*
 import storymodel4s.recall.RecallGraphStatus.Checked
 
-/** Locks `hsmm/v1` to a real inferred War of the Ghosts result without serializing story text. */
+/** Locks `hsmm/v2` to a real inferred War of the Ghosts result without serializing story text. */
 class WarOfTheGhostsCodecGoldenSuite extends FunSuite:
   import WarOfTheGhostsCodecGolden.*
 
-  test("the WOG hsmm/v1 bytes are canonical, sparse, and contain no story text") {
+  test("the WOG hsmm/v2 bytes are canonical, sparse, and contain no story text") {
     assertEquals(Canonical.parse(encoded).map(Canonical.print), Right(encoded))
     assert(encoded.length < 100000, s"unexpectedly large golden candidate: ${encoded.length} bytes")
     assert(!encoded.contains(context.recall.transcript.canonicalText))
@@ -26,7 +26,7 @@ class WarOfTheGhostsCodecGoldenSuite extends FunSuite:
     }
   }
 
-  test("the WOG hsmm/v1 bytes contextually decode to the inferred result") {
+  test("the WOG hsmm/v2 bytes contextually decode to the inferred result") {
     val decoded = HsmmResultCodec.decode(encoded, context.recall, context.view)
     assertEquals(decoded, Right(context.result))
     assertEquals(decoded.map(HsmmResultCodec.encode), Right(encoded))
@@ -43,7 +43,7 @@ private[wog] object WarOfTheGhostsCodecGolden:
     * Previous: 3c183c3cb4dc01dad930fcae7354fa828dbd2e8714b1901449c792552fc4fb9f, 25,598 bytes.
     */
   val ExpectedChecksum: String =
-    "44a76b728b8dfc7474536cc17aed9f7a2718116f672711c2c0cb773c989b9ba9"
+    "13222a02bbdc6e49fe0882102e5f748f8a9ab1f141d7f439bdf2f6de19dd14f9"
 
   lazy val context: GoldenContext = GoldenContext.build()
   lazy val encoded: String = HsmmResultCodec.encode(context.result)

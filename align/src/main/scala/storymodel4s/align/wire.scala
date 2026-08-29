@@ -287,13 +287,29 @@ object AlignWire:
       total: Double,
       missingTerms: Set[CostTerm],
       sourceChartCoverage: Option[StructuralCoverage],
-      reductions: Map[CostTerm, StructuralReductionReceipt]
+      reductions: Map[CostTerm, StructuralReductionReceipt],
+      // NO DEFAULT, deliberately. A default lets a caller omit the field and fabricate maximal
+      // support, which is exactly how the laws round-trip site compiled while dropping it. Making
+      // it required turns every reconstruction into a compile error the author must answer.
+      supportWeight: Double
   ): Either[AlignError, CostBreakdown] =
     val r = "CostBreakdown"
     val badTerm = terms.toVector.sortBy(_._1.ordinal).collectFirst {
       case (t, v) if !finite(v) || v < 0.0 => bad(r, s"term $t is not finite and nonnegative")
     }
     val checks: Vector[Option[AlignError]] = Vector(
+      // Explicit finiteness rather than a comparison against 0: `NaN <= 0.0` is false, so a bare
+      // range guard would FAIL OPEN and admit a NaN support (AGENTS.md rule 7).
+      // Range is [0, 1], NOT (0, 1]. ZERO IS A PRODUCIBLE AND HONEST VALUE: a cell where nothing
+      // eligible was measured rests on no support at all, and supportOf returns exactly 0 for it.
+      // Refusing zero would mean the producer can emit a value its own checked constructor rejects
+      // - and the alternative, making supportOf return 1.0 when nothing was measured, would
+      // fabricate FULL support for a cell that measured nothing, which is the defect this whole
+      // change exists to remove. Finiteness is tested explicitly because NaN fails every
+      // comparison and a bare range check would admit it (AGENTS.md rule 7).
+      Option.when(!finite(supportWeight) || supportWeight < 0.0 || supportWeight > 1.0)(
+        bad(r, "supportWeight must be finite and in [0, 1]")
+      ),
       badTerm,
       Option.when(!finite(total) || total < 0.0)(bad(r, "total is not finite and nonnegative")),
       Option.when(!missingTerms.subsetOf(MayBeMissing))(
@@ -347,7 +363,16 @@ object AlignWire:
       }
     )
     checks.flatten.headOption.toLeft(
-      CostBreakdown(terms, mode, exclusion, total, missingTerms, sourceChartCoverage, reductions)
+      CostBreakdown(
+        terms,
+        mode,
+        exclusion,
+        total,
+        missingTerms,
+        sourceChartCoverage,
+        reductions,
+        supportWeight
+      )
     )
 
   /** The cost model's clamp of an optional term into `[0, 1]` (`DefaultLocalCostModel.clamp`). */

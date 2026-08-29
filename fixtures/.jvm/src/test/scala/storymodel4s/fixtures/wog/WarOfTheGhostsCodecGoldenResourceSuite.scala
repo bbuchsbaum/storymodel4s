@@ -8,8 +8,8 @@ import storymodel4s.core.Checksum
 class WarOfTheGhostsCodecGoldenResourceSuite extends FunSuite:
   import WarOfTheGhostsCodecGolden.*
 
-  test("the committed hsmm/v1 resource matches the inferred artifact and fixed checksum") {
-    val path = "/golden/hsmm-v1-wog.json"
+  test("the committed hsmm/v2 resource matches the inferred artifact and fixed checksum") {
+    val path = "/golden/hsmm-v2-wog.json"
     val stream = Option(getClass.getResourceAsStream(path)).getOrElse {
       fail(s"test resource not available: $path")
     }

@@ -33,8 +33,17 @@ enum HsmmCodecError:
   * stringly JSON keys and duplicate entries are rejected before construction.
   */
 object HsmmResultCodec:
-  /** Version of the complete HSMM wire object, independent of the package-wide JSON version. */
-  val SchemaVersion: String = "hsmm/v1"
+  /** Version of the complete HSMM wire object, independent of the package-wide JSON version.
+    *
+    * v2 adds a REQUIRED `supportWeight` to every cost breakdown. It is required in both directions,
+    * so a v1 decoder cannot read a v2 record and a v1 record cannot satisfy the v2 decoder. There
+    * is deliberately NO MIGRATION STEP: a v1 artifact does not carry the support its costs rest on,
+    * and inventing a value for it - 1.0, the only candidate - would assert full support for cells
+    * whose support was never computed. That is the defect this version exists to record. A v1
+    * artifact is not upgradable; it is re-derivable from its inputs, which is what makes the
+    * fingerprint chain meaningful.
+    */
+  val SchemaVersion: String = "hsmm/v2"
 
   private final case class StateMassWire(state: AlignState, mass: Double)
   private final case class RowWire(unit: RecallUnitId, mass: Vector[StateMassWire])
@@ -72,7 +81,8 @@ object HsmmResultCodec:
       total: Double,
       missingTerms: Vector[CostTerm],
       sourceChartCoverage: Option[StructuralCoverage],
-      reductions: Vector[ReductionWire]
+      reductions: Vector[ReductionWire],
+      supportWeight: Double
   )
   private final case class StateCostWire(state: AlignState, cost: CostBreakdownWire)
   private final case class UnitCostsWire(unit: RecallUnitId, costs: Vector[StateCostWire])
@@ -355,7 +365,8 @@ object HsmmResultCodec:
       "total" -> cost.total.asJson,
       "missingTerms" -> cost.missingTerms.asJson,
       "sourceChartCoverage" -> opt(cost.sourceChartCoverage),
-      "reductions" -> cost.reductions.asJson
+      "reductions" -> cost.reductions.asJson,
+      "supportWeight" -> cost.supportWeight.asJson
     )
   }
   private given Decoder[CostBreakdownWire] = Decoder.instance { c =>
@@ -367,6 +378,7 @@ object HsmmResultCodec:
       missing <- field[Vector[CostTerm]](c, "missingTerms")
       sourceCoverage <- field[Option[StructuralCoverage]](c, "sourceChartCoverage")
       reductions <- field[Vector[ReductionWire]](c, "reductions")
+      supportWeight <- field[Double](c, "supportWeight")
     yield CostBreakdownWire(
       terms,
       mode,
@@ -374,7 +386,8 @@ object HsmmResultCodec:
       total,
       missing,
       sourceCoverage,
-      reductions
+      reductions,
+      supportWeight
     )
   }
 
@@ -503,7 +516,8 @@ object HsmmResultCodec:
         cost.sourceChartCoverage,
         cost.reductions.toVector.sortBy(_._1.ordinal).map { case (term, receipt) =>
           ReductionWire(term, ReductionReceiptWire.from(receipt))
-        }
+        },
+        cost.supportWeight
       )
 
   private object ReductionReceiptWire:
@@ -600,7 +614,8 @@ object HsmmResultCodec:
           wire.total,
           missingTerms,
           wire.sourceChartCoverage,
-          reductionMap
+          reductionMap,
+          wire.supportWeight
         )
       yield cost
 
