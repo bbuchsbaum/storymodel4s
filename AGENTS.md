@@ -412,6 +412,23 @@ was set by the owner on 2026-08-28 (sticky decision
    1 failed / 1 passed / 2 total. Weak control, live probes — which is exactly
    why the mutation is worth running rather than reasoning about.
 
+   *Prefer a fixture DERIVED from the pipeline over one SYNTHESISED at the
+   consumer.* A synthesised fixture defaults to the easy shape, because the easy
+   shape is what you reach for when the fixture is not the thing you are testing.
+   A derived one inherits the real distribution whether you were thinking about it
+   or not. Measured across two modules: `interview` tests call
+   `Distribution.point` 20 times and `Distribution.of` 4 times — and three of
+   those four are in `InterviewSuite` testing `Distribution.of`'s OWN validation
+   (that it rejects zero and negative mass), leaving ONE that builds a real
+   spread. `InterviewProfileSuite`, which scores every profile metric, had zero
+   spread-mass cases. `align`, whose fixtures come from 8 `GraphHsmm.infer` calls,
+   carries spread rows for free. So an entire module whose subject is DISTRIBUTED
+   PLACEMENT was scored almost exclusively on point masses, and every defect that
+   appears only when mass is spread was structurally invisible — not missed, but
+   unseeable, and green the whole time. **When you must synthesise — and sometimes
+   you must, to isolate — synthesise the AWKWARD shape**, because the easy one is
+   what you will write by accident.
+
    *Reading a branch establishes permission, not occurrence.* That the code
    CAN produce a bad value is a different claim from that it DOES, and the
    second one needs a measurement. A finding derived by reading a branch must
