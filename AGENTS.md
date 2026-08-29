@@ -110,6 +110,28 @@ Package namespace is flat `storymodel4s.<module>`.
    distinguish a closed door from an open one. Ceiling to state honestly: Scala
    privacy is compiler-enforced, not JVM-enforced — the constructor is public
    in bytecode — so this buys soundness for Scala consumers, not for Java ones.
+   **A sweep for defeated boundaries cannot find a MISSING one.** The
+   `fromProduct` population is private-constructor case classes — types that
+   *tried* to be boundaries and were defeated by `Mirror`. A type with no
+   boundary at all has no privacy to defeat, so it appears in no such sweep, and
+   tightening that sweep's criterion pushes it further out of view. The
+   complementary population has a greppable signature: **a validator whose return
+   type is its own argument type**, on a type that is publicly constructible.
+   `def validated(g: RecallGraph): ValidatedNec[DomainError, RecallGraph]` says,
+   in the type system's own words, *I checked this and I have no way to tell
+   you* — nothing downstream can distinguish a checked value from an unchecked
+   one, and `copy` on a validated instance produces an unvalidated one silently.
+   Measured: 13 validators wear the signature; of the nine types resolved, **eight
+   are public case classes** (`TranscriptAtlas`, `SurfaceAtlas`,
+   `LatePoolingRecipe`, `SidecarManifest`, `FeatureDerivation`, `InterviewSource`,
+   `RecallGraph`, `PromptPackageManifest`), four of them in `core` and `features`.
+   `ClaimMeta` is the control — identical signature, **not** a defect, because a
+   sweep slice gave it a private constructor, which is also the proof that the fix
+   moves a type from the defective population into the safe one. The signature
+   alone is not the defect: for a private-constructor type, returning its own type
+   is correct, since the validator is then the only way to obtain one. Always
+   cross-reference against constructibility before filing.
+
    **This binds new types, not only old ones.** The sweep is a floor, not an
    event: a cleanup that runs once loses to a codebase that keeps growing. On
    2026-08-29 slice 2 was removing forgeable construction from `Credence`,
