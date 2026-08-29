@@ -12,8 +12,12 @@ class WarOfTheGhostsAtlasSuite extends FunSuite:
   val ev = Addressable[StoryRef]
   val all3 = ThreadPolicy.All(PositiveInt.unsafe(3))
 
-  def spec(level: NarrativeLevel, threads: ThreadPolicy = all3): AtlasSpec =
-    AtlasSpec(ZoomLevel(level, SurfaceDetail.Hidden), threads)
+  def spec(
+      level: NarrativeLevel,
+      threads: ThreadPolicy = all3,
+      surface: SurfaceDetail = SurfaceDetail.Hidden
+  ): AtlasSpec =
+    AtlasSpec(ZoomLevel(level, surface), threads)
 
   def provenanceFor(
       sourceModel: StoryModel[ModelStatus.Validated],
@@ -32,9 +36,10 @@ class WarOfTheGhostsAtlasSuite extends FunSuite:
       level: NarrativeLevel,
       state: CommonViewState = CommonViewState.empty,
       threads: ThreadPolicy = all3,
-      sourceModel: StoryModel[ModelStatus.Validated] = model
+      sourceModel: StoryModel[ModelStatus.Validated] = model,
+      surface: SurfaceDetail = SurfaceDetail.Hidden
   ): NarrativeScene =
-    val s = spec(level, threads)
+    val s = spec(level, threads, surface)
     AtlasCompiler(provenanceFor(sourceModel, state, s))
       .compile(sourceModel, state, s)
       .fold(e => fail(e.message), identity)
@@ -50,15 +55,16 @@ class WarOfTheGhostsAtlasSuite extends FunSuite:
       .fold(e => fail(e.message), identity)
 
   def rebuilt(
+      atlas: SurfaceAtlas = model.atlas,
       graph: NarrativeGraph = model.graph,
       hierarchy: NarrativeHierarchy = model.hierarchy
   ): StoryModel[ModelStatus.Validated] =
     val draft = StoryModel.draft(
       model.source,
-      model.atlas,
+      atlas,
       graph,
       hierarchy,
-      DiscourseTrajectory.derive(graph, hierarchy, model.atlas),
+      DiscourseTrajectory.derive(graph, hierarchy, atlas),
       model.featureSpaces,
       model.sidecars,
       model.featureRefs,
@@ -70,6 +76,11 @@ class WarOfTheGhostsAtlasSuite extends FunSuite:
     )
     val outcome = StoryValidator.validate(draft)
     outcome.validated.getOrElse(fail(outcome.report.render))
+
+  def validatedAtlas(units: Vector[storymodel4s.core.SurfaceUnit]): SurfaceAtlas =
+    SurfaceAtlas
+      .validated(SurfaceAtlas(model.source, units))
+      .fold(error => fail(error.message), identity)
 
   def groundedHierarchy(evidenceSentence: Int = 0): NarrativeHierarchy =
     val containment = model.hierarchy.containment.zipWithIndex.map { (edge, index) =>
@@ -85,6 +96,175 @@ class WarOfTheGhostsAtlasSuite extends FunSuite:
 
   def regions(s: NarrativeScene) = s.marks.collect { case r: VisualPrimitive.Region => r }
   def landmarks(s: NarrativeScene) = s.marks.collect { case l: VisualPrimitive.Landmark => l }
+  def surfaceUnits(s: NarrativeScene) =
+    s.marks.collect { case unit: VisualPrimitive.SurfaceUnit => unit }
+
+  test("surface detail changes marks and preserves a selected token through its sentence"):
+    assert(model.atlas.sentences.size > 1, "fixture must contain multiple sentences")
+    assert(
+      model.atlas.tokens.size > model.atlas.sentences.size,
+      "fixture must contain more tokens than sentences"
+    )
+    val token = model.atlas.tokens.find(_.parent.nonEmpty).getOrElse(fail("missing parented token"))
+    val sentence = token.parent
+      .flatMap(model.atlas.byId.get)
+      .getOrElse(fail("token parent is absent from the surface atlas"))
+    assertEquals(sentence.kind, SurfaceUnitKind.Sentence)
+    val coreRef = Addressable[CoreRef]
+    val tokenAddress = coreRef.address(CoreRef.SurfaceUnit(token.id))
+    val sentenceAddress = coreRef.address(CoreRef.SurfaceUnit(sentence.id))
+    val selected = state(selection = Set(tokenAddress))
+
+    val hidden = scene(NarrativeLevel.Scene, selected)
+    val sentences = scene(
+      NarrativeLevel.Scene,
+      selected,
+      surface = SurfaceDetail.Sentences
+    )
+    val tokens = scene(NarrativeLevel.Scene, selected, surface = SurfaceDetail.Tokens)
+
+    assertNotEquals(hidden.marks.map(_.identity.mark), sentences.marks.map(_.identity.mark))
+    assertNotEquals(sentences.marks.map(_.identity.mark), tokens.marks.map(_.identity.mark))
+    assertEquals(surfaceUnits(hidden), Vector.empty)
+    assertEquals(surfaceUnits(sentences).size, model.atlas.sentences.size)
+    assertEquals(
+      surfaceUnits(tokens).size,
+      model.atlas.sentences.size + model.atlas.tokens.size
+    )
+    assertEquals(surfaceUnits(sentences).map(_.kind).toSet, Set(SurfaceUnitKind.Sentence))
+    assertEquals(
+      surfaceUnits(tokens).map(_.kind).toSet,
+      Set(SurfaceUnitKind.Sentence, SurfaceUnitKind.Token)
+    )
+    val sentenceMarkIds = surfaceUnits(sentences).map(u => u.address -> u.identity.mark).toMap
+    val tokenDetailSentenceMarkIds = surfaceUnits(tokens)
+      .filter(_.kind == SurfaceUnitKind.Sentence)
+      .map(u => u.address -> u.identity.mark)
+      .toMap
+    assertEquals(tokenDetailSentenceMarkIds, sentenceMarkIds)
+    assertEquals(
+      hidden.selectionPlacements.get(tokenAddress),
+      Some(SelectionPlacement.OffProjection)
+    )
+    assertEquals(
+      sentences.selectionPlacements.get(tokenAddress),
+      Some(SelectionPlacement.ViaAncestor(sentenceAddress))
+    )
+    tokens.selectionPlacements.get(tokenAddress) match
+      case Some(SelectionPlacement.OnMark(marks)) =>
+        assertEquals(marks.toVector, tokens.navigation.marksFor(tokenAddress))
+      case other => fail(s"expected selected token on its token mark, found $other")
+    assert(
+      tokens.navigation.marksFor(sentenceAddress).nonEmpty,
+      "token detail must retain sentence marks as the coarser visible ancestors"
+    )
+    model.atlas.sentences.foreach(unit =>
+      assert(!tokens.textualTwin.contains(model.atlas.text(unit)))
+    )
+
+  test("mid-sentence horizon keeps a complete token but not its incomplete sentence"):
+    val (token, sentence) = model.atlas.tokens
+      .flatMap(token =>
+        token.parent
+          .flatMap(model.atlas.byId.get)
+          .filter(parent =>
+            parent.kind == SurfaceUnitKind.Sentence &&
+              token.span.endExclusive < parent.span.endExclusive
+          )
+          .map(token -> _)
+      )
+      .headOption
+      .getOrElse(fail("fixture has no token ending strictly inside its sentence"))
+    val coreRef = Addressable[CoreRef]
+    val tokenAddress = coreRef.address(CoreRef.SurfaceUnit(token.id))
+    val sentenceAddress = coreRef.address(CoreRef.SurfaceUnit(sentence.id))
+    val horizon = token.span.endExclusive
+    val before = scene(
+      NarrativeLevel.Scene,
+      state(
+        selection = Set(tokenAddress),
+        horizon = EpistemicHorizon.ReaderAt(horizon - 1)
+      ),
+      surface = SurfaceDetail.Tokens
+    )
+    val tokens = scene(
+      NarrativeLevel.Scene,
+      state(
+        selection = Set(tokenAddress),
+        horizon = EpistemicHorizon.ReaderAt(horizon)
+      ),
+      surface = SurfaceDetail.Tokens
+    )
+    val sentences = scene(
+      NarrativeLevel.Scene,
+      state(
+        selection = Set(tokenAddress),
+        horizon = EpistemicHorizon.ReaderAt(horizon)
+      ),
+      surface = SurfaceDetail.Sentences
+    )
+
+    assertEquals(before.navigation.marksFor(tokenAddress), Vector.empty)
+    assertEquals(
+      before.selectionPlacements.get(tokenAddress),
+      Some(SelectionPlacement.OffProjection)
+    )
+    assert(tokens.navigation.marksFor(tokenAddress).nonEmpty)
+    tokens.selectionPlacements.get(tokenAddress) match
+      case Some(SelectionPlacement.OnMark(marks)) =>
+        assertEquals(marks.toVector, tokens.navigation.marksFor(tokenAddress))
+      case other => fail(s"expected completed token on its mark, found $other")
+    assertEquals(sentences.navigation.marksFor(sentenceAddress), Vector.empty)
+    assertEquals(
+      sentences.selectionPlacements.get(tokenAddress),
+      Some(SelectionPlacement.OffProjection)
+    )
+
+  test("missing sentence refinement is preflightable and compilation refuses it"):
+    val atlas = validatedAtlas(
+      model.atlas.units.map {
+        case unit if unit.kind == SurfaceUnitKind.Sentence =>
+          unit.copy(kind = SurfaceUnitKind.Clause)
+        case unit => unit
+      }
+    )
+    val sourceModel = rebuilt(atlas = atlas)
+    val support = SurfaceDetailSupport.inspect(atlas)
+    assert(!support.availableKinds.contains(SurfaceUnitKind.Sentence))
+    assertEquals(support.supportedDetails, Set(SurfaceDetail.Hidden))
+    val requested = spec(NarrativeLevel.Scene, surface = SurfaceDetail.Sentences)
+
+    AtlasCompiler(provenanceFor(sourceModel, CommonViewState.empty, requested))
+      .compile(sourceModel, CommonViewState.empty, requested) match
+      case Left(AtlasCompileError.UnsupportedSurfaceDetail(SurfaceDetail.Sentences, found)) =>
+        assertEquals(found, support)
+      case other => fail(s"expected typed missing-sentence refusal, found $other")
+
+  test("token detail refuses mixed ancestry even when sentence and token kinds both exist"):
+    val token = model.atlas.tokens.headOption.getOrElse(fail("fixture has no token"))
+    val paragraph = model.atlas
+      .unitAt(token.span.start, SurfaceUnitKind.Paragraph)
+      .getOrElse(fail("token has no containing paragraph"))
+    val atlas = validatedAtlas(
+      model.atlas.units.map {
+        case unit if unit.id == token.id => unit.copy(parent = Some(paragraph.id))
+        case unit                        => unit
+      }
+    )
+    val sourceModel = rebuilt(atlas = atlas)
+    val support = SurfaceDetailSupport.inspect(atlas)
+    assert(support.availableKinds.contains(SurfaceUnitKind.Sentence))
+    assert(support.availableKinds.contains(SurfaceUnitKind.Token))
+    assertEquals(support.unsupportedTokenIds, Vector(token.id))
+    assert(!support.supports(SurfaceDetail.Sentences))
+    assert(!support.supports(SurfaceDetail.Tokens))
+    val requested = spec(NarrativeLevel.Scene, surface = SurfaceDetail.Tokens)
+
+    AtlasCompiler(provenanceFor(sourceModel, CommonViewState.empty, requested))
+      .compile(sourceModel, CommonViewState.empty, requested) match
+      case Left(AtlasCompileError.UnsupportedSurfaceDetail(SurfaceDetail.Tokens, found)) =>
+        assertEquals(found, support)
+      case other => fail(s"expected typed mixed-ancestry refusal, found $other")
 
   test("story level shows the three episode regions and no landmarks; area is undeclared"):
     val s = scene(NarrativeLevel.Story)
@@ -185,10 +365,27 @@ class WarOfTheGhostsAtlasSuite extends FunSuite:
     assertEquals(s.selectionPlacements.get(selected), Some(SelectionPlacement.OffProjection))
 
   test("V-E3: every mark resolves to model evidence; threads connect participations only"):
-    val s = scene(NarrativeLevel.Scene, threads = ThreadPolicy.All(PositiveInt.unsafe(5)))
-    s.marks.foreach(m =>
-      assert(ev.parse(m.address).flatMap(model.supporting).isDefined, m.address.render)
+    val s = scene(
+      NarrativeLevel.Scene,
+      threads = ThreadPolicy.All(PositiveInt.unsafe(5)),
+      surface = SurfaceDetail.Tokens
     )
+    s.marks.foreach {
+      case unit: VisualPrimitive.SurfaceUnit =>
+        val id = Addressable[CoreRef].parse(unit.address) match
+          case Some(CoreRef.SurfaceUnit(id)) => id
+          case other                         => fail(s"not a surface-unit address: $other")
+        val exact = model.atlas.byId.getOrElse(id, fail(s"unknown surface unit ${id.value}"))
+        assertEquals(unit.span, exact.span)
+        assertEquals(unit.kind, exact.kind)
+        assertEquals(unit.unitOrdinal, exact.ordinal)
+        assertEquals(
+          unit.parent,
+          exact.parent.map(parent => Addressable[CoreRef].address(CoreRef.SurfaceUnit(parent)))
+        )
+      case mark =>
+        assert(ev.parse(mark.address).flatMap(model.supporting).isDefined, mark.address.render)
+    }
     val threads = s.marks.collect { case t: VisualPrimitive.Thread => t }
     assert(threads.nonEmpty)
     threads.foreach { t =>
