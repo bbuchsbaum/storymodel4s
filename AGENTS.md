@@ -99,14 +99,21 @@ Package namespace is flat `storymodel4s.<module>`.
    path. `if x > 0.0 then compute else safe` is correct under `NaN` **for free** —
    no `isNaN` call, no cost — while the other form needs an explicit defence
    somebody has to remember. This sorts a codebase by grep, without per-site
-   judgement: the fail-closed half needs no thought at all. Measured 2026-08-29
-   across 19 Double-literal guards, which found three live fail-open sites,
-   including `MassRatio.unsafe` — the carrier for seven migrated ADR 0003 fields,
-   whose whole purpose is refusing unsupported numbers, admitting `Some(NaN)` — and
-   `sinkhorn`'s config validator, where a `NaN` epsilon fails all three range checks
-   and is therefore ACCEPTED. `features/window.scala` contains both polarities
-   fifteen lines apart, which is the same no-convention signature as the empty-guard
-   sweep.
+   judgement: the fail-closed half needs no thought at all. **But polarity replaces
+   only the fail-open/fail-closed judgement — it does NOT replace reachability.** A
+   fail-open guard on a value that cannot be `NaN` is not a defect, and the two
+   questions must be answered separately. Measured 2026-08-29 across 19
+   Double-literal guards, which found three fail-open *polarities* and exactly **one
+   confirmed reachable defect**: `sinkhorn`'s config validator, where `SinkhornConfig`
+   is a public case class passed straight to `solve`, so a `NaN` epsilon fails all
+   three range checks and is ACCEPTED. Of the other two — `MassRatio.unsafe` admits
+   `Some(NaN)` by polarity, but `MassRatio.of` explicitly rejects `NaN`/infinite and
+   `unsafe` is `private[align]`, so reachability needs a production-path probe;
+   `features/window.scala:122` is guarded upstream at :341, which rejects any sample
+   failing `hasValidWeight` (finite and non-negative), so it is not reachable by the
+   public path at all. `window.scala` does contain both polarities fifteen lines
+   apart, which is the no-convention signature the empty-guard sweep found — but a
+   mixed convention is a readability defect, not a live one.
 
    **A numeric guard must state what it does with `NaN` — every comparison against
    it is false, so `if x <= 0` FAILS OPEN.** Measured 2026-08-29: leaf importance had
