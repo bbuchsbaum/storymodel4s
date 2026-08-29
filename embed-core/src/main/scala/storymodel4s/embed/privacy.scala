@@ -181,6 +181,11 @@ final class PseudonymizationDetector private (
         .zip(offsets)
         .zipWithIndex
         .collectFirst {
+          case ((matched, (source, _)), offsetIndex) if matched.span != source =>
+            DomainError.InvariantViolation(
+              s"pseudonymizationDetector/table/${matched.entryIndex}",
+              s"mapped source at offset index $offsetIndex does not equal the detector match"
+            )
           case ((matched, (_, destination)), offsetIndex)
               if destinationText.substring(destination.start, destination.endExclusive) !=
                 matched.pseudonym =>
@@ -204,7 +209,9 @@ object PseudonymizationDetector:
   /** Create the fixed Unicode whole-word detector from typed table data.
     *
     * There is deliberately no factory accepting a function: equal detector identities therefore
-    * imply equal span-finding behaviour.
+    * imply equal span-finding behaviour. Case-insensitive rows compare code points by Unicode
+    * simple upper- or lower-case mappings: U+0130 compares equal to ASCII `i`, so `ismail` detects
+    * `İSMAIL`.
     */
   def wholeWordTable(
       entries: Vector[PseudonymizationTableEntry]
