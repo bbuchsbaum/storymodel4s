@@ -48,6 +48,34 @@ class BaselineSuite extends ScalaCheckSuite:
     assert(a.spaces.map(_.id).intersect(b.spaces.map(_.id)).isEmpty)
   }
 
+  test("an empty sensitive key is reported as invalid without provider work") {
+    val emptyKeys = SensitiveKeyProvider.static(KeyId.unsafe("empty"), Array.emptyByteArray)
+    val e = HashedNgramEmbedder[Id](64, 0L, emptyKeys)
+    val space = docSpace(e)
+    val request = EmbedBatch
+      .validated(
+        Vector(
+          EmbedRequest(
+            RequestId.unsafe("s"),
+            EmbedPayload.Raw("my sister's wedding", Sensitivity.Sensitive),
+            space.id
+          )
+        ),
+        e.spaceIds
+      )
+      .toOption
+      .get
+
+    val result = e.embed(request)
+
+    result.outcomes.head.value match
+      case Left(ExecutionFailure.Invalid(EmbedError.InvalidKey("empty key"))) => ()
+      case other => fail(s"expected InvalidKey(empty key), got $other")
+    assertEquals(result.receipt.kind, DigestKind.Withheld)
+    assertEquals(result.receipt.providerCalls, Vector.empty)
+    assertEquals(result.receipt.embeddingReceipts, Vector.empty)
+  }
+
   test("paraphrase-ish neighbours are closer than unrelated text; empty input abstains") {
     val e = HashedNgramEmbedder[Id](256, 0L)
     val space = docSpace(e)
@@ -164,6 +192,101 @@ class BaselineSuite extends ScalaCheckSuite:
     assert(r.outcomes(2).value.exists(x => !x.isObserved))
   }
 
+  test("caching embedder never stores a vector returned in the wrong space") {
+    val baseline = HashedNgramEmbedder[Id](64, 0L, keys)
+    val requested = docSpace(baseline)
+    val wrong = querySpace(baseline)
+    val vector = baseline
+      .embed(batch(baseline, Vector("river"), wrong))
+      .outcomes
+      .head
+      .value
+      .toOption
+      .get
+    var calls = 0
+    val wrongSpace = new Embedder[Id]:
+      val info: EmbedderInfo = baseline.info
+      val spaces: Vector[EmbeddingSpace] = baseline.spaces
+      def embed(batch: EmbedBatch): BatchResult =
+        calls += 1
+        val outcomes =
+          batch.requests.map(request => EmbedOutcome(request.id, wrong.id, Right(vector)))
+        BatchResult(outcomes, AttemptReceipt.empty)
+    val cache = EmbeddingCache.inMemory[Id]
+    val cached = new CachingEmbedder[Id](wrongSpace, cache, keys)
+    val request = batch(cached, Vector("river"), requested)
+
+    cached.embed(request)
+    cached.embed(request)
+
+    assertEquals(calls, 2)
+    assertEquals(cache.size, 0)
+  }
+
+  test("cache receipt failure drops untrusted provenance and caches nothing") {
+    val foreignKeys =
+      SensitiveKeyProvider.static(KeyId.unsafe("k2"), "foreign-secret".getBytes("UTF-8"))
+    val base = HashedNgramEmbedder[Id](64, 0L, foreignKeys)
+    var calls = 0
+    val untrusted = new Embedder[Id]:
+      val info: EmbedderInfo = base.info
+      val spaces: Vector[EmbeddingSpace] = base.spaces
+      def embed(batch: EmbedBatch): BatchResult =
+        calls += 1
+        val result = base.embed(batch)
+        val id = batch.requests.head.id
+        val injected = AttemptReceipt
+          .of(
+            result.receipt.providerCalls,
+            result.receipt.embeddingReceipts,
+            Vector(CacheDecision.Bypassed(id, "foreign-cache-canary")),
+            Vector(PolicyDecision.Denied(id, None, "foreign-policy-canary")),
+            result.receipt.resultDecisions,
+            batch.itemSensitivity,
+            foreignKeys
+          )
+          .fold(e => fail(e.message), identity)
+        result.copy(receipt = injected)
+    val cache = EmbeddingCache.inMemory[Id]
+    val cached = new CachingEmbedder[Id](untrusted, cache, keys)
+    val space = docSpace(cached)
+    val request = EmbedBatch
+      .validated(
+        Vector(
+          EmbedRequest(
+            RequestId.unsafe("untrusted"),
+            EmbedPayload.Raw("private material", Sensitivity.Sensitive),
+            space.id
+          )
+        ),
+        cached.spaceIds
+      )
+      .toOption
+      .get
+
+    val result = cached.embed(request)
+
+    assertEquals(calls, 1)
+    assertEquals(cache.size, 0)
+    assertEquals(result.receipt.kind, DigestKind.Keyed)
+    assertEquals(result.receipt.providerCalls, Vector.empty)
+    assertEquals(result.receipt.embeddingReceipts, Vector.empty)
+    assertEquals(
+      result.receipt.cacheDecisions.collect { case CacheDecision.Miss(id, _) => id },
+      Vector(RequestId.unsafe("untrusted"))
+    )
+    assert(!result.receipt.cacheDecisions.exists(_.render.contains("foreign-cache-canary")))
+    assertEquals(result.receipt.policyDecisions, Vector.empty)
+    assert(result.receipt.resultDecisions.exists {
+      case ResultDecision.BatchRejected(_) => true
+      case _                               => false
+    })
+    assert(result.outcomes.forall {
+      case EmbedOutcome(_, _, Left(ExecutionFailure.Invalid(_))) => true
+      case _                                                     => false
+    })
+  }
+
   test(
     "remote-locality provider refuses raw sensitive text at preflight, recorded in the receipt"
   ) {
@@ -215,6 +338,10 @@ class BaselineSuite extends ScalaCheckSuite:
     val r = remote.embed(b)
     assert(r.outcomes.head.value.isLeft)
     assertEquals(r.receipt.policyDecisions.size, 1)
+    assert(r.receipt.policyDecisions.exists {
+      case PolicyDecision.LocalOnly(id, None, _) => id == RequestId.unsafe("s")
+      case _                                     => false
+    })
     assertEquals(r.receipt.kind, DigestKind.Keyed, "a sensitive item forbids a plain receipt")
     assert(r.receipt.providerCalls.isEmpty)
     assert(!r.receipt.policyDecisions.head.render.contains("wedding"))

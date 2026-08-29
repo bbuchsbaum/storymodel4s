@@ -167,10 +167,10 @@ class ReceiptDigestSuite extends ScalaCheckSuite:
 
   private def attempt(
       receipt: EmbeddingReceipt,
-      cache: Vector[CacheDecision] = Vector.empty,
-      policy: Vector[PolicyDecision] = Vector.empty,
-      result: Vector[ResultDecision] = Vector.empty,
-      sensitivity: Option[Vector[(RequestId, Sensitivity)]] = None,
+      cache: Vector[CacheDecision],
+      policy: Vector[PolicyDecision],
+      result: Vector[ResultDecision],
+      sensitivity: Option[Vector[(RequestId, Sensitivity)]],
       keys: SensitiveKeyProvider = SensitiveKeyProvider.none
   ): AttemptReceipt =
     val itemSensitivity = sensitivity.getOrElse(receipt.items.map(i => i.id -> i.sensitivity))
@@ -193,9 +193,19 @@ class ReceiptDigestSuite extends ScalaCheckSuite:
       val call = baseCall("base")
       val receipt = embeddingReceipt(call, item, "output-base")
       val cache = Vector(CacheDecision.Bypassed(RequestId.unsafe("cache-id"), "cache-base"))
-      val policy = Vector(PolicyDecision.Denied(None, "policy-base"))
+      val policy = Vector(
+        PolicyDecision.Denied(RequestId.unsafe("policy-id"), None, "policy-base")
+      )
       val result = Vector(ResultDecision.Reordered(RequestId.unsafe("result-id"), 0, 1))
-      val sensitivities = Some(Vector(item.id -> Sensitivity.Public))
+      val sensitivities = Some(
+        Vector(
+          item.id,
+          RequestId.unsafe("cache-id"),
+          RequestId.unsafe("policy-id"),
+          RequestId.unsafe("result-id"),
+          RequestId.unsafe(token)
+        ).map(_ -> Sensitivity.Public)
+      )
       val original = attempt(receipt, cache, policy, result, sensitivities)
       val same = attempt(receipt, cache, policy, result, sensitivities)
       val callMutations = Vector(
@@ -210,12 +220,11 @@ class ReceiptDigestSuite extends ScalaCheckSuite:
         call.copy(cached = true)
       ).map(embeddingReceipt(_, item, "output-base"))
       val receiptMutations = callMutations ++ Vector(
-        embeddingReceipt(call, publicItem("provider-item-mutated", "input-base"), "output-base"),
         embeddingReceipt(call, publicItem("provider-item", token), "output-base"),
         embeddingReceipt(call, item, token)
       )
       val mutations =
-        receiptMutations.map(attempt(_)) ++ Vector(
+        receiptMutations.map(attempt(_, cache, policy, result, sensitivities)) ++ Vector(
           attempt(
             receipt,
             Vector(CacheDecision.Bypassed(RequestId.unsafe("cache-id"), token)),
@@ -233,14 +242,20 @@ class ReceiptDigestSuite extends ScalaCheckSuite:
           attempt(
             receipt,
             cache,
-            Vector(PolicyDecision.Denied(None, token)),
+            Vector(PolicyDecision.Denied(RequestId.unsafe("policy-id"), None, token)),
             result,
             sensitivities
           ),
           attempt(
             receipt,
             cache,
-            Vector(PolicyDecision.Denied(Some(PrivacyPolicyId.unsafe(token)), "policy-base")),
+            Vector(
+              PolicyDecision.Denied(
+                RequestId.unsafe("policy-id"),
+                Some(PrivacyPolicyId.unsafe(token)),
+                "policy-base"
+              )
+            ),
             result,
             sensitivities
           ),
@@ -266,10 +281,153 @@ class ReceiptDigestSuite extends ScalaCheckSuite:
             sensitivities
           )
         )
+      val secondItem = publicItem("provider-item-2", "input-2")
+      val orderedSensitivity = Some(
+        Vector(
+          item.id,
+          secondItem.id,
+          RequestId.unsafe("cache-id"),
+          RequestId.unsafe("policy-id"),
+          RequestId.unsafe("result-id")
+        ).map(_ -> Sensitivity.Public)
+      )
+      def ordered(items: Vector[ItemDigest]): AttemptReceipt =
+        val orderedReceipt = EmbeddingReceipt
+          .of(call, items, ReceiptDigest.plainPublic("output-base"))
+          .toOption
+          .get
+        attempt(orderedReceipt, cache, policy, result, orderedSensitivity)
 
       assertEquals(original.digest, same.digest)
       assert(mutations.forall(_.digest != original.digest))
+      assertNotEquals(
+        ordered(Vector(item, secondItem)).digest,
+        ordered(Vector(secondItem, item)).digest
+      )
     }
+  }
+
+  test("attempt/v2 escaping defeats parameter and newline separator forgeries") {
+    val item = publicItem("separator-item", "separator-input")
+    val sensitivity = Some(
+      Vector(item.id, RequestId.unsafe("cache-id"), RequestId.unsafe("forged-id")).map(
+        _ -> Sensitivity.Public
+      )
+    )
+    val paramA = baseCall("separator").copy(params = Map("a|b" -> "c"))
+    val paramB = baseCall("separator").copy(params = Map("a" -> "b|c"))
+    val naiveParamA = paramA.params.toVector
+      .map { case (key, value) =>
+        s"call-param|0|$key|$value"
+      }
+      .mkString("\n")
+    val naiveParamB = paramB.params.toVector
+      .map { case (key, value) =>
+        s"call-param|0|$key|$value"
+      }
+      .mkString("\n")
+    assertEquals(naiveParamA, naiveParamB, "the stripped renderer must collide")
+    assertNotEquals(
+      attempt(
+        embeddingReceipt(paramA, item, "separator-output"),
+        Vector.empty,
+        Vector.empty,
+        Vector.empty,
+        sensitivity
+      ).digest,
+      attempt(
+        embeddingReceipt(paramB, item, "separator-output"),
+        Vector.empty,
+        Vector.empty,
+        Vector.empty,
+        sensitivity
+      ).digest
+    )
+
+    val cacheA = Vector(
+      CacheDecision.Bypassed(
+        RequestId.unsafe("cache-id"),
+        "ok\ncache|1|bypassed|forged-id|forged-reason"
+      )
+    )
+    val cacheB = Vector(
+      CacheDecision.Bypassed(RequestId.unsafe("cache-id"), "ok"),
+      CacheDecision.Bypassed(RequestId.unsafe("forged-id"), "forged-reason")
+    )
+    def naiveCache(decisions: Vector[CacheDecision]): String =
+      decisions.zipWithIndex
+        .map {
+          case (CacheDecision.Bypassed(id, reason), index) =>
+            s"cache|$index|bypassed|${id.value}|$reason"
+          case _ => fail("separator fixture must contain only bypass decisions")
+        }
+        .mkString("\n")
+    assertEquals(naiveCache(cacheA), naiveCache(cacheB), "the stripped renderer must collide")
+    val receipt = embeddingReceipt(baseCall("newline"), item, "separator-output")
+    assertNotEquals(
+      attempt(receipt, cacheA, Vector.empty, Vector.empty, sensitivity).digest,
+      attempt(receipt, cacheB, Vector.empty, Vector.empty, sensitivity).digest
+    )
+
+    val deniedA = PolicyDecision.Denied(
+      RequestId.unsafe("a|some"),
+      Some(PrivacyPolicyId.unsafe("b")),
+      "c"
+    )
+    val deniedB = PolicyDecision.Denied(
+      RequestId.unsafe("a"),
+      Some(PrivacyPolicyId.unsafe("some|b")),
+      "c"
+    )
+    def naiveDenied(index: Int, decision: PolicyDecision): String = decision match
+      case PolicyDecision.Denied(id, policyId, reason) =>
+        val option = policyId.fold("none|")(value => s"some|${value.value}")
+        s"policy|$index|denied|${id.value}|$option|$reason"
+      case _ => fail("separator fixture must contain only denied decisions")
+    assertEquals(naiveDenied(0, deniedA), naiveDenied(0, deniedB))
+    def policyAttempt(
+        decisions: Vector[PolicyDecision],
+        ids: Vector[RequestId]
+    ): AttemptReceipt =
+      AttemptReceipt
+        .of(
+          Vector.empty,
+          Vector.empty,
+          Vector.empty,
+          decisions,
+          Vector.empty,
+          ids.map(_ -> Sensitivity.Public),
+          SensitiveKeyProvider.none
+        )
+        .fold(error => fail(error.message), identity)
+    val pipeIds = Vector(RequestId.unsafe("a|some"), RequestId.unsafe("a"))
+    assertNotEquals(
+      policyAttempt(Vector(deniedA), pipeIds).digest,
+      policyAttempt(Vector(deniedB), pipeIds).digest
+    )
+
+    val policyId = RequestId.unsafe("policy-id")
+    val forgedId = RequestId.unsafe("x")
+    val newlineA = Vector(
+      PolicyDecision.Denied(
+        policyId,
+        None,
+        "ok\npolicy|1|denied|x|none||why"
+      )
+    )
+    val newlineB = Vector(
+      PolicyDecision.Denied(policyId, None, "ok"),
+      PolicyDecision.Denied(forgedId, None, "why")
+    )
+    assertEquals(
+      newlineA.zipWithIndex.map((decision, index) => naiveDenied(index, decision)).mkString("\n"),
+      newlineB.zipWithIndex.map((decision, index) => naiveDenied(index, decision)).mkString("\n")
+    )
+    val newlineIds = Vector(policyId, forgedId)
+    assertNotEquals(
+      policyAttempt(newlineA, newlineIds).digest,
+      policyAttempt(newlineB, newlineIds).digest
+    )
   }
 
   test("attempt/v2 commits full capability fields even when human renderings collide") {
@@ -299,10 +457,22 @@ class ReceiptDigestSuite extends ScalaCheckSuite:
     val decisionA = allowed(providerA)
     val decisionB = allowed(providerB)
     assertEquals(decisionA.render, decisionB.render, "the display rendering is deliberately lossy")
-    val receipt = embeddingReceipt(baseCall("capability"), publicItem("p", "in"), "out")
+    val id = RequestId.unsafe("capability")
+    def receipted(decision: PolicyDecision): AttemptReceipt =
+      AttemptReceipt
+        .of(
+          Vector.empty,
+          Vector.empty,
+          Vector(CacheDecision.Hit(id, payload)),
+          Vector(decision),
+          Vector.empty,
+          Vector(id -> Sensitivity.Sensitive),
+          k1
+        )
+        .fold(error => fail(error.message), identity)
     assertNotEquals(
-      attempt(receipt, policy = Vector(decisionA)).digest,
-      attempt(receipt, policy = Vector(decisionB)).digest
+      receipted(decisionA).digest,
+      receipted(decisionB).digest
     )
   }
 
@@ -345,15 +515,16 @@ class ReceiptDigestSuite extends ScalaCheckSuite:
         base.copy(payloadDigest = otherPayload)
       )
       def noCallAttempt(capability: RemoteCapability): AttemptReceipt =
+        val id = RequestId.unsafe("capability")
         AttemptReceipt
           .of(
             Vector.empty,
             Vector.empty,
-            Vector.empty,
+            Vector(CacheDecision.Hit(id, payload)),
             Vector(PolicyDecision.Allowed(policyId, capability)),
             Vector.empty,
-            Vector(RequestId.unsafe("public") -> Sensitivity.Public),
-            SensitiveKeyProvider.none
+            Vector(id -> Sensitivity.Sensitive),
+            k1
           )
           .fold(error => fail(error.message), identity)
       val original = noCallAttempt(base)
@@ -412,6 +583,97 @@ class ReceiptDigestSuite extends ScalaCheckSuite:
       SensitiveKeyProvider.none
     )
     assert(callBearingWithheld.isLeft)
+  }
+
+  test("non-public attempt construction requires keyed item or explicit coverage evidence") {
+    val sensitiveId = RequestId.unsafe("sensitive-uncovered")
+    val keyedOutput = ReceiptDigest.keyed("keyed-output", k1).toOption.get
+    val emptyReceipt = EmbeddingReceipt
+      .of(baseCall("empty-items"), Vector.empty, keyedOutput)
+      .toOption
+      .get
+    val emptyItems = AttemptReceipt.of(
+      Vector(emptyReceipt.call),
+      Vector(emptyReceipt),
+      Vector.empty,
+      Vector.empty,
+      Vector.empty,
+      Vector(sensitiveId -> Sensitivity.Sensitive),
+      k1
+    )
+    assert(emptyItems.swap.exists(_.message.contains("empty-item receipt")))
+    val keyedPublicBatch = AttemptReceipt.of(
+      Vector(emptyReceipt.call),
+      Vector(emptyReceipt),
+      Vector.empty,
+      Vector.empty,
+      Vector.empty,
+      Vector(RequestId.unsafe("public-only") -> Sensitivity.Public),
+      k1
+    )
+    assert(keyedPublicBatch.swap.exists(_.message.contains("public batch")))
+
+    val public = publicItem("public-provider-item", "public-input")
+    val publicReceipt = embeddingReceipt(baseCall("public-only"), public, "public-output")
+    val uncovered = AttemptReceipt.of(
+      Vector(publicReceipt.call),
+      Vector(publicReceipt),
+      Vector.empty,
+      Vector.empty,
+      Vector.empty,
+      Vector(public.id -> Sensitivity.Public, sensitiveId -> Sensitivity.Sensitive),
+      k1
+    )
+    assert(uncovered.swap.exists(_.message.contains(sensitiveId.value)))
+
+    val plainHitDoesNotCover = AttemptReceipt.of(
+      Vector(publicReceipt.call),
+      Vector(publicReceipt),
+      Vector(CacheDecision.Hit(sensitiveId, ReceiptDigest.plainPublic("unsafe-hit"))),
+      Vector.empty,
+      Vector.empty,
+      Vector(public.id -> Sensitivity.Public, sensitiveId -> Sensitivity.Sensitive),
+      k1
+    )
+    assert(plainHitDoesNotCover.swap.exists(_.message.contains(sensitiveId.value)))
+
+    val covered = AttemptReceipt.of(
+      Vector(publicReceipt.call),
+      Vector(publicReceipt),
+      Vector(CacheDecision.Hit(sensitiveId, keyedOutput)),
+      Vector.empty,
+      Vector.empty,
+      Vector(public.id -> Sensitivity.Public, sensitiveId -> Sensitivity.Sensitive),
+      k1
+    )
+    assert(covered.isRight)
+  }
+
+  test("receipt decisions must name declared items and cache denials must agree") {
+    val declared = RequestId.unsafe("declared")
+    val other = RequestId.unsafe("other")
+    val policy = PolicyDecision.Denied(other, None, "denied")
+    val undeclared = AttemptReceipt.of(
+      Vector.empty,
+      Vector.empty,
+      Vector.empty,
+      Vector(policy),
+      Vector.empty,
+      Vector(declared -> Sensitivity.Public),
+      SensitiveKeyProvider.none
+    )
+    assert(undeclared.swap.exists(_.message.contains("undeclared item")))
+
+    val mismatched = AttemptReceipt.of(
+      Vector.empty,
+      Vector.empty,
+      Vector(CacheDecision.Denied(declared, policy)),
+      Vector.empty,
+      Vector.empty,
+      Vector(declared -> Sensitivity.Public, other -> Sensitivity.Public),
+      SensitiveKeyProvider.none
+    )
+    assert(mismatched.swap.exists(_.message.contains("cache denial")))
   }
 
   test(
@@ -522,15 +784,47 @@ class ReceiptDigestSuite extends ScalaCheckSuite:
     val e = HashedNgramEmbedder[Id](64, 0L, k1)
     val b = batch(e, Vector(("b", canary, Sensitivity.Sensitive)))
     val r = e.embed(b)
+    val snapshot = SensitiveKeySnapshot.capture(k1.currentKeyId, k1).toOption.get
     assertEquals(r.receipt.kind, DigestKind.Keyed)
-    val amended = r.receipt.addResultDecisions(
-      Vector(ResultDecision.Reordered(RequestId.unsafe("b"), 0, 1))
-    )
+    val amended = r.receipt
+      .addResultDecisions(
+        Vector(ResultDecision.Reordered(RequestId.unsafe("b"), 0, 1)),
+        Some(snapshot)
+      )
+      .toOption
+      .get
     assertEquals(amended.kind, DigestKind.Keyed)
     assertNotEquals(amended.digest, r.receipt.digest)
     assertEquals(amended.resultDecisions.size, r.receipt.resultDecisions.size + 1)
     // Idempotent when nothing is added.
-    assertEquals(r.receipt.addResultDecisions(Vector.empty), r.receipt)
+    assertEquals(r.receipt.addResultDecisions(Vector.empty, Some(snapshot)), Right(r.receipt))
+
+    val wrongSnapshot = SensitiveKeySnapshot.capture(k2.currentKeyId, k2).toOption.get
+    val mismatch = r.receipt
+      .addResultDecisions(
+        Vector(ResultDecision.Reordered(RequestId.unsafe("b"), 0, 1)),
+        Some(wrongSnapshot)
+      )
+      .swap
+      .toOption
+      .get
+    assertEquals(
+      mismatch,
+      EmbedError.AuthorityMismatch(KeyId.unsafe("k1"), KeyId.unsafe("k2"))
+    )
+    val rejected = AttemptReceipt.rejectProviderResult(
+      r.receipt.providerCalls,
+      r.receipt.itemSensitivity,
+      mismatch,
+      Some(snapshot)
+    )
+    assertEquals(rejected.kind, DigestKind.Keyed)
+    assertEquals(rejected.providerCalls, r.receipt.providerCalls)
+    assertEquals(rejected.embeddingReceipts, Vector.empty)
+    assert(rejected.resultDecisions.exists {
+      case ResultDecision.ReceiptRejected(EmbedError.AuthorityMismatch(_, _)) => true
+      case _                                                                  => false
+    })
   }
 
   test(

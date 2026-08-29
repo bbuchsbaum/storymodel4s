@@ -20,6 +20,12 @@ enum EmbedError:
   case InvalidResult(reason: String)
   case InvalidKey(reason: String)
 
+  /** A delegate returned a keyed receipt under a different authority than the batch snapshot. */
+  case ReceiptKeyMismatch(expected: KeyId, found: KeyId)
+
+  /** A receipt amendment was supplied a different authority than the stored receipt identity. */
+  case AuthorityMismatch(stored: KeyId, supplied: KeyId)
+
   /** No key is available under `keyId`: every non-public receipt surface fails closed (ADR 0001
     * D6). Carries only the key id, never material.
     */
@@ -38,4 +44,8 @@ enum EmbedError:
     case InvalidRecipe(r)            => s"invalid recipe: $r"
     case InvalidResult(r)            => s"invalid result: $r"
     case InvalidKey(r)               => s"invalid key: $r"
-    case NoKey(k)                    => s"no key available for '$k'"
+    case ReceiptKeyMismatch(e, f)    =>
+      s"receipt key mismatch: expected '${e.value}', found '${f.value}'"
+    case AuthorityMismatch(s, a) =>
+      s"receipt authority mismatch: stored '${s.value}', supplied '${a.value}'"
+    case NoKey(k) => s"no key available for '$k'"

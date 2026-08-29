@@ -37,8 +37,10 @@ abstract class LocalBaseline[F[_]: Applicative] extends Embedder[F]:
     }
     val keyId = keys.currentKeyId
     SensitiveKeySnapshot.capture(keyId, keys) match
-      case Right(snapshot)      => embedNowWith(batch, snapshot.provider)
-      case Left(_) if nonPublic => LocalBaseline.failClosed(batch, keyId)
+      case Right(snapshot) => embedNowWith(batch, snapshot.provider)
+      case Left(error @ EmbedError.InvalidKey(_)) if nonPublic =>
+        BatchResult.invalidKey(batch, keyId, error)
+      case Left(_) if nonPublic => BatchResult.keyUnavailable(batch, keyId)
       case Left(_)              => embedNowWith(batch, SensitiveKeyProvider.none)
 
   private def embedNowWith(
@@ -120,12 +122,12 @@ abstract class LocalBaseline[F[_]: Applicative] extends Embedder[F]:
             batchKeys
           )
           .fold(
-            _ => LocalBaseline.failClosed(batch, batchKeys.currentKeyId),
+            _ => BatchResult.keyUnavailable(batch, batchKeys.currentKeyId),
             r => BatchResult(outcomes, r)
           )
       case Left(_) =>
         // The owned non-empty batch key makes this unreachable; retain a conservative guard.
-        LocalBaseline.failClosed(batch, batchKeys.currentKeyId)
+        BatchResult.keyUnavailable(batch, batchKeys.currentKeyId)
 
 object LocalBaseline:
   /** Canonical rendering of a batch's outcomes (platform-stable doubles; no material). */
@@ -137,33 +139,6 @@ object LocalBaseline:
       )
       s"${ReceiptRendering.esc(o.id.value)}|$v"
     }).mkString("\n")
-
-  /** Deny an atomic keyless batch before vector computation: no provider call and no vector leaves.
-    */
-  private[embed] def failClosed(
-      batch: EmbedBatch,
-      missing: KeyId
-  ): BatchResult =
-    val denials = batch.requests.map { request =>
-      new PolicyDecision.KeyUnavailable(Some(request.id), missing)
-    }
-    val outcomes = batch.requests.zip(denials).map { case (request, denial) =>
-      EmbedOutcome(
-        request.id,
-        request.space,
-        Left(ExecutionFailure.PolicyDenied(denial))
-      )
-    }
-    BatchResult(
-      outcomes,
-      AttemptReceipt.failClosed(
-        Vector.empty,
-        denials.map(d => d: PolicyDecision),
-        Vector.empty,
-        batch.itemSensitivity,
-        missing
-      )
-    )
 
 /** Portable word scanner over code points (no `\p{L}` regexes, which Scala.js does not support in
   * `String.split`). Letters, digits and apostrophes form words; everything else separates.
