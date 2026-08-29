@@ -195,7 +195,9 @@ The Atlas configuration uses the same escaping and the canonical rendering
 `atlas-compiler-config/v2`. Its exact field order is `rendering`, `horizon`,
 `focus`, `feature`, `scale`, `selection.count`, indexed selections,
 `relation.count`, indexed relations, `zoom.narrative`, `zoom.surface`, `threads`,
-and `projection`. `zoom.narrative` is `story | episode | scene | event`;
+and `projection`. Horizon, focus, feature, scale, selection, and relation values
+use the exact Codex grammars above. `zoom.narrative` is
+`story | episode | scene | event`;
 `zoom.surface` is `hidden | sentences | tokens`; `threads` is `selected` or
 `all:<positive-int>`; and the only current projection value is
 `discourse-atlas`. `AtlasCompiler.configurationChecksum` hashes exactly this
@@ -239,12 +241,14 @@ final case class TextAnnotation private (id, target: Address, support: SpanSet, 
   // construction rejects targets outside ViewRef and empty support; no status field (D9); no copied text
 final case class NavigationIndex private (byTarget: Map[Address, Vector[AnnotationId]], targetByAnnotation,
   ancestorsByTarget: Map[Address, Vector[Address]])
-  // annotationsFor resolves exact first, then the nearest visible annotated primary ancestor
+  // exactAnnotationsFor never falls back; annotationsFor resolves exact first, then the nearest
+  // visible annotated primary ancestor
 final case class CodexFlow private (source, runs, annotations /* sorted by (minSpan, kind, -priority, id) */,
   lanes: LaneAllocation, navigation, selectionPlacements: Map[Address, SelectionPlacement[AnnotationId]],
   contract: CodexContract, provenance)
   // CodexFlow.of validates: provenance.sourceChecksum == source.canonicalChecksum; runs tile with no gap/overlap and
-  // no cut code point; every support span in-text and on code-point boundaries; unique AnnotationIds
+  // no cut code point; every support span in-text and on code-point boundaries; unique AnnotationIds; because an
+  // externally constructed flow has no model hierarchy, its missing targets are OffProjection, never ViaAncestor
   def textualTwin: String                                    // deterministic (V-D2); a rendering, not an artifact
 
 // view/compiler.scala + view/atlas.scala
@@ -353,11 +357,16 @@ Level of detail — **V-L1** every child has a visible ancestor at a coarser
 level; **V-L2** `SelectionPreserved`: every selected or focused address stays
 in `CommonViewState` and has exactly one typed placement — `OnMark` when it has
 ordinary marks, `ViaAncestor` only when the object's own claim is horizon-visible
-and it has a visible primary ancestor, and `OffProjection` otherwise; the shared
+and it has a marked primary ancestor reachable through an entirely horizon-visible
+primary-parent chain; traversal truncates at the first hidden ancestor.
+`OffProjection` therefore covers both an off-horizon object and a horizon-visible
+object with no reachable ordinary mark; the textual twin's `Horizon` line distinguishes
+the active evidence boundary rather than inventing a second placement state. The shared
 `HorizonShared` invariant requires Codex and Atlas to use only
 `EvidenceVisibility`. `CodexFlow.selectionPlacements` uses annotation ids for
-`OnMark`, and `NavigationIndex.annotationsFor` performs the same exact-then-nearest-
-visible-ancestor resolution; **V-L3** label priority monotone; **V-L4** bounded
+`OnMark`; `NavigationIndex.exactAnnotationsFor` never climbs, while
+`NavigationIndex.annotationsFor` performs the same exact-then-nearest-visible-ancestor
+resolution; **V-L3** label priority monotone; **V-L4** bounded
 visible mark count; **V-L5** lane allocation deterministic with bounded overflow,
 never dropped annotations.
 

@@ -632,14 +632,16 @@ final class AtlasCompiler private (provenance: ViewProvenance):
         case StoryRef.Situation(s) if objectVisible(ref) => Some(NarrativeMember.Situation(s))
         case StoryRef.Segment(s) if objectVisible(ref)   => Some(NarrativeMember.Segment(s))
         case _                                           => None
-      def climb(m: NarrativeMember, seen: Set[NarrativeMember]): Option[Address] =
-        primaryParent.get(m).flatMap { p =>
-          val a = storyRef.address(StoryRef.Segment(p))
-          if marked.contains(a) then Some(a)
-          else if seen.contains(NarrativeMember.Segment(p)) then None
-          else climb(NarrativeMember.Segment(p), seen + m)
-        }
-      start.flatMap(climb(_, Set.empty))
+      def segmentVisible(id: SegmentId): Boolean =
+        g.segments
+          .get(id)
+          .exists(segment =>
+            claimVisible(segment.summary.meta) && clipped(segment.support).nonEmpty
+          )
+      start
+        .flatMap(member =>
+          VisibleAncestorChain.from(member, primaryParent, segmentVisible).find(marked.contains)
+        )
     val placements: Map[Address, SelectionPlacement[MarkId]] =
       (state.selection ++ state.focus).toVector
         .sortBy(_.render)

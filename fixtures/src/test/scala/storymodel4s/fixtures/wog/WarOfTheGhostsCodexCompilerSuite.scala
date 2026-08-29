@@ -1,12 +1,14 @@
 package storymodel4s.fixtures.wog
 
-import munit.FunSuite
+import munit.ScalaCheckSuite
+import org.scalacheck.Gen
+import org.scalacheck.Prop.forAll
 import storymodel4s.core.*
 import storymodel4s.features.{Dtype, FeatureAddress, Layout}
 import storymodel4s.story.*
 import storymodel4s.view.*
 
-class WarOfTheGhostsCodexCompilerSuite extends FunSuite:
+class WarOfTheGhostsCodexCompilerSuite extends ScalaCheckSuite:
   private val model = WarOfTheGhostsModel.model
   private val featureSpaceId = FeatureSpaceId.unsafe("wog:feature:scale-selector")
   private val featureSpace = FeatureSpace[Double](
@@ -132,10 +134,11 @@ class WarOfTheGhostsCodexCompilerSuite extends FunSuite:
   private def compileAtlas(
       sourceModel: StoryModel[ModelStatus.Validated],
       state: CommonViewState,
-      scale: FeatureScale
+      scale: FeatureScale,
+      level: NarrativeLevel = NarrativeLevel.Scene
   ): NarrativeScene =
     val spec = AtlasSpec(
-      ZoomLevel(NarrativeLevel.Scene, SurfaceDetail.Hidden),
+      ZoomLevel(level, SurfaceDetail.Hidden),
       ThreadPolicy.Selected,
       scale
     )
@@ -149,6 +152,52 @@ class WarOfTheGhostsCodexCompilerSuite extends FunSuite:
     AtlasCompiler(provenance)
       .compile(sourceModel, state, spec)
       .fold(error => fail(error.message), identity)
+
+  private def rebuilt(
+      graph: NarrativeGraph,
+      hierarchy: NarrativeHierarchy
+  ): StoryModel[ModelStatus.Validated] =
+    val draft = StoryModel.draft(
+      model.source,
+      model.atlas,
+      graph,
+      hierarchy,
+      DiscourseTrajectory.derive(graph, hierarchy, model.atlas),
+      model.featureSpaces,
+      model.sidecars,
+      model.featureRefs,
+      model.descriptors,
+      model.hypotheses,
+      model.sensoryProfiles,
+      model.receipt,
+      model.schemaVersion
+    )
+    val outcome = StoryValidator.validate(draft)
+    outcome.validated.getOrElse(fail(outcome.report.render))
+
+  private def groundedHierarchy(): NarrativeHierarchy =
+    val containment = model.hierarchy.containment.zipWithIndex.map { (edge, index) =>
+      edge.copy(
+        meta = WarOfTheGhostsModel.meta(
+          s"selection:grounded-containment:$index",
+          EpistemicStatus.HumanAdjudicated,
+          Some(WarOfTheGhostsModel.sp(0))
+        )
+      )
+    }
+    NarrativeHierarchy(containment, model.hierarchy.boundaryBeliefs)
+
+  private enum NormalizedPlacement:
+    case OnMark
+    case ViaAncestor(ancestor: Address)
+    case OffProjection
+
+  private def normalize[Mark](placement: SelectionPlacement[Mark]): NormalizedPlacement =
+    placement match
+      case SelectionPlacement.OnMark(_)             => NormalizedPlacement.OnMark
+      case SelectionPlacement.ViaAncestor(ancestor) =>
+        NormalizedPlacement.ViaAncestor(ancestor)
+      case SelectionPlacement.OffProjection => NormalizedPlacement.OffProjection
 
   private def featureSpec(scale: FeatureScale): CodexSpec =
     CodexSpec
@@ -273,6 +322,94 @@ class WarOfTheGhostsCodexCompilerSuite extends FunSuite:
       Some(SelectionPlacement.OffProjection)
     )
     assertEquals(hiddenFlow.navigation.annotationsFor(battle), Vector.empty)
+
+  property("V-L2: Codex and Atlas placements agree for generated selections and horizons"):
+    val addresses = model.graph.situations.keys.toVector.sorted.map(id =>
+      Addressable[StoryRef].address(StoryRef.Situation(id))
+    )
+    val selectionGen = Gen.nonEmptyListOf(Gen.oneOf(addresses)).map(_.toSet)
+    val horizonGen = Gen.frequency(
+      1 -> Gen.const(EpistemicHorizon.Omniscient),
+      4 -> Gen
+        .chooseNum(0, model.source.canonicalText.length)
+        .map(EpistemicHorizon.ReaderAt.apply)
+    )
+    val hierarchyOnly = CodexSpec
+      .of(Vector(AnnotationChannel(AnnotationKind.Hierarchy, AnnotationPriority.Default)))
+      .fold(error => fail(error.message), identity)
+
+    forAll(selectionGen, horizonGen) { (selection, horizon) =>
+      val state = CommonViewState
+        .of(selection = selection, horizon = horizon)
+        .fold(error => fail(error.message), identity)
+      val codex = compile(state, hierarchyOnly)
+      val atlas = compileAtlas(
+        model,
+        state,
+        FeatureScale.Default,
+        NarrativeLevel.Episode
+      )
+
+      selection.foreach { address =>
+        assertEquals(
+          codex.selectionPlacements.get(address).map(normalize),
+          atlas.selectionPlacements.get(address).map(normalize),
+          clues(address.render, horizon)
+        )
+      }
+    }
+
+  test("V-L2: a hidden parent cannot reveal a visible marked grandparent"):
+    val selected = Addressable[StoryRef]
+      .address(StoryRef.Situation(WarOfTheGhostsModel.S.battle))
+    val hiddenParentId = WarOfTheGhostsModel.G.sc2c
+    val markedGrandparentId = WarOfTheGhostsModel.G.ep2
+    val hiddenParent = model.graph.segments(hiddenParentId)
+    val hiddenMeta = WarOfTheGhostsModel.meta(
+      "selection:hidden-intermediate",
+      EpistemicStatus.Hypothesized,
+      None
+    )
+    val graph = model.graph.copy(
+      segments = model.graph.segments.updated(
+        hiddenParentId,
+        hiddenParent.copy(summary = hiddenParent.summary.copy(meta = hiddenMeta))
+      )
+    )
+    val sourceModel = rebuilt(graph, groundedHierarchy())
+    val state = CommonViewState
+      .of(
+        selection = Set(selected),
+        horizon = EpistemicHorizon.ReaderAt(sourceModel.source.canonicalText.length)
+      )
+      .fold(error => fail(error.message), identity)
+    val hierarchyOnly = CodexSpec
+      .of(Vector(AnnotationChannel(AnnotationKind.Hierarchy, AnnotationPriority.Default)))
+      .fold(error => fail(error.message), identity)
+    val codex = compile(sourceModel, state, hierarchyOnly)
+    val atlas = compileAtlas(
+      sourceModel,
+      state,
+      FeatureScale.Default,
+      NarrativeLevel.Story
+    )
+    val hiddenParentAddress =
+      Addressable[StoryRef].address(StoryRef.Segment(hiddenParentId))
+    val markedGrandparentAddress =
+      Addressable[StoryRef].address(StoryRef.Segment(markedGrandparentId))
+
+    assertEquals(codex.navigation.exactAnnotationsFor(hiddenParentAddress), Vector.empty)
+    assert(codex.navigation.exactAnnotationsFor(markedGrandparentAddress).nonEmpty)
+    assertEquals(atlas.navigation.marksFor(hiddenParentAddress), Vector.empty)
+    assert(atlas.navigation.marksFor(markedGrandparentAddress).nonEmpty)
+    assertEquals(
+      codex.selectionPlacements.get(selected),
+      Some(SelectionPlacement.OffProjection)
+    )
+    assertEquals(
+      atlas.selectionPlacements.get(selected),
+      Some(SelectionPlacement.OffProjection)
+    )
 
   test("a missing feature request remains explicit missingness rather than a zero-valued mark"):
     val derivation = Checksum.ofText("feature:missing-from-wog")

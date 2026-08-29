@@ -297,6 +297,10 @@ final case class NavigationIndex private (
     targetByAnnotation: Map[AnnotationId, Address],
     ancestorsByTarget: Map[Address, Vector[Address]]
 ):
+  /** Find annotations whose target is exactly this address, without ancestor fallback. */
+  def exactAnnotationsFor(target: Address): Vector[AnnotationId] =
+    byTarget.getOrElse(target, Vector.empty)
+
   /** Find exact annotations or, when absent, those of the nearest annotated primary ancestor. */
   def annotationsFor(target: Address): Vector[AnnotationId] =
     resolutionFor(target).fold(Vector.empty)(_._2.toVector)
@@ -373,6 +377,7 @@ final case class CodexFlow private (
     CodexTextualTwin.render(this)
 
 object CodexFlow:
+  /** Construct a semantic flow without model ancestry; missing targets remain off-projection. */
   def of(
       source: StorySource,
       runs: Vector[SourceRun],
@@ -388,7 +393,9 @@ object CodexFlow:
       provenance
     )
 
-  /** Construct a semantic flow under an explicit lane and view contract. */
+  /** Construct a semantic flow under an explicit contract; only a compiler-built flow can place a
+    * missing target via an ancestor because an external flow has no model hierarchy.
+    */
   def of(
       source: StorySource,
       runs: Vector[SourceRun],

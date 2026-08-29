@@ -552,19 +552,7 @@ final class CodexCompiler private (provenance: ViewProvenance):
       .map(edge => edge.member -> edge.parent)
       .toMap
     def ancestors(member: NarrativeMember): Vector[Address] =
-      def loop(
-          current: Option[SegmentId],
-          seen: Set[SegmentId],
-          result: Vector[Address]
-      ): Vector[Address] = current match
-        case Some(parent) if !seen.contains(parent) && segmentVisible(parent) =>
-          loop(
-            primaryParent.get(NarrativeMember.Segment(parent)),
-            seen + parent,
-            result :+ addressable.address(StoryRef.Segment(parent))
-          )
-        case _ => result
-      loop(primaryParent.get(member), Set.empty, Vector.empty)
+      VisibleAncestorChain.from(member, primaryParent, segmentVisible)
 
     val situations = graph.situations.keysIterator.collect {
       case id if situationVisible(id) =>
