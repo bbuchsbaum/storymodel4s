@@ -74,6 +74,15 @@ Package namespace is flat `storymodel4s.<module>`.
 8. **Smart constructors + phantom states.** Invalid states are unrepresentable
    when rules are stable (`Checked`/`Unchecked`, `Draft`/`Validated`);
    validated/versioned data when the ontology is open (PropBank frames).
+   **A private constructor on a `case` class is not a boundary.** Scala 3 gives
+   every case-class companion a public `fromProduct` through `Mirror.Product`,
+   and marking the constructor private does not remove it; `unapply`, the
+   positional accessors, and `Product` membership stay public too. A validating
+   type must therefore be a `final` **non-case** class with explicit accessors,
+   structural `equals`/`hashCode`, an intentional `toString`, and construction
+   private to its smart constructor. Prove the boundary from *outside* the
+   defining package: a probe inside the package cannot fail on private-scoped
+   access, so it cannot distinguish a closed door from an open one.
 9. **Sparse.** No dense all-pairs allocations in core paths.
 10. **Deterministic IDs and receipts.** Content-addressed IDs; builds are diffable.
 11. Core depends only on cats-core / cats-collections. No HTTP, LLM, ONNX,
