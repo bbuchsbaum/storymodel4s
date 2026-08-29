@@ -79,6 +79,29 @@ class AlignBoundarySuite extends FunSuite:
     assert(ctor.nonEmpty, "the private CostWeights constructor was public")
   }
 
+  test("WeightedCoverage has no construction, Product, copy, or Mirror bypass") {
+    val mirror = typeCheckErrors(
+      "summon[scala.deriving.Mirror.ProductOf[storymodel4s.align.WeightedCoverage]]"
+    )
+    val fromProduct = typeCheckErrors(
+      "storymodel4s.align.WeightedCoverage.fromProduct(EmptyTuple)"
+    )
+    val ctor = typeCheckErrors(
+      "new storymodel4s.align.WeightedCoverage(???, 0.0, storymodel4s.features.Coverage.empty)"
+    )
+    val copy = typeCheckErrors(
+      "(w: storymodel4s.align.WeightedCoverage) => w.copy()"
+    )
+    val product = typeCheckErrors(
+      "(w: storymodel4s.align.WeightedCoverage) => w: Product"
+    )
+    assert(mirror.nonEmpty, "Mirror.ProductOf reconstructed an unchecked WeightedCoverage")
+    assert(fromProduct.nonEmpty, "fromProduct reconstructed an unchecked WeightedCoverage")
+    assert(ctor.nonEmpty, "the private WeightedCoverage constructor was public")
+    assert(copy.nonEmpty, "copy edited WeightedCoverage without revalidation")
+    assert(product.nonEmpty, "WeightedCoverage remained a Product")
+  }
+
   test("public reads and validated factories remain available") {
     val reads = List(
       typeCheckErrors(
@@ -98,7 +121,8 @@ class AlignBoundarySuite extends FunSuite:
           val _obs = w(storymodel4s.align.CostTerm.Semantic) + w.semantic"""
       ),
       typeCheckErrors("storymodel4s.align.HsmmConfig.of(temperature = 0.0)"),
-      typeCheckErrors("storymodel4s.align.CostWeights.of(1, -1, 0, 0, 0, 0)")
+      typeCheckErrors("storymodel4s.align.CostWeights.of(1, -1, 0, 0, 0, 0)"),
+      typeCheckErrors("storymodel4s.align.WeightedCoverage.of(0.0, Vector.empty, 0)")
     )
     reads.zipWithIndex.foreach { (errors, i) =>
       assertEquals(errors, Nil, s"public read/factory $i must compile")

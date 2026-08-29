@@ -118,6 +118,40 @@ counts answer the estimand's actual support question. It is not a universal unce
 Fractional attribution, unresolved mass, classification margins, and eligible graph trials require
 their own domain types.
 
+### Amendment: importance-weighted leaf coverage
+
+`RecallSignature.importanceWeightedCoverage` uses `WeightedCoverage`, not `MassRatio` and not a
+bare `ScoreEstimate`. Its weighted mean is conditioned on observed importance mass, while its
+availability is counted over eligible source leaves; these are different support grains and neither
+may stand in for the other. The carrier therefore keeps the estimate, `conditioningWeight`, and
+`Coverage(eligible, observed)` together. The conditioning weight renders separately and is never
+divided by the eligible count.
+
+The checked constructor derives count coverage from the complete vector of observed weights and
+refuses negative or non-finite weights, numerators, conditioning totals, and outcomes. It preserves
+three scientifically distinct states:
+
+- no observed leaf importance: `Missing(AllMissing)` with observed count zero;
+- observed importances whose total weight is zero:
+  `Missing(Undefined(ZeroTotalWeight))` with a nonzero observed count; and
+- positive conditioning weight: the observed weighted mean, accompanied by that weight and the
+  leaf-count coverage.
+
+The type is a private-constructor non-case class because these fields jointly assert a derived
+relation. `SignatureProjection` consumes its typed estimate and uses its count coverage when
+reporting weakest support; the canonical carrier report retains the conditioning weight and both
+counts. `RecallSignature.compute` returns `Either[AlignError, RecallSignature]`, preserving a
+checked-construction refusal instead of turning malformed public importance input or aggregate
+overflow into an exception or a default signature. There is currently no `RecallSignature` codec,
+so no codec path exists to migrate in this amendment. Adding one later must round-trip the full
+carrier rather than only the scalar estimate.
+
+This amendment does not burn a new `RecallSignature` estimand identity. Version `v2` is still an
+unreleased transition, the repository contains no recorded numeric importance-weighted result,
+and the author retained no finite local figure from the intermediate scalar-only state. The
+weighted estimate is unchanged for positive finite inputs; the correction adds its missing support
+and splits two previously conflated missing states.
+
 ## API, projection, and codec consequences
 
 The canonical API for a scientific quantity returns its value and support together. Convenience

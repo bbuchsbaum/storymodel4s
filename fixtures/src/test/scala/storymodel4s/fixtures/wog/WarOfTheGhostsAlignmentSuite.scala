@@ -459,7 +459,7 @@ class WarOfTheGhostsAlignmentSuite extends FunSuite:
     val candidates = generator.generate(recall.units, view)
     val result =
       GraphHsmm.infer(recall, view, candidates, costModel).fold(e => fail(e.message), identity)
-    val sig = RecallSignature.compute(result, recall, view)
+    val sig = RecallSignature.compute(result, recall, view).fold(e => fail(e.message), identity)
     assert(sig.uniformCoverage > 0.0 && sig.uniformCoverage <= 1.0)
     assert(sig.associationMass > 0.0, sig.toString)
     assert(sig.perUnitLocalizability.size <= recall.units.size)

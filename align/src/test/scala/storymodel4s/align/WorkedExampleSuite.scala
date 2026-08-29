@@ -27,6 +27,14 @@ class WorkedExampleSuite extends FunSuite:
   ): HsmmResult =
     GraphHsmm.infer(r, view, c, m, cfg).fold(e => fail(e.message), identity)
 
+  /** Test fixtures fail loudly: no test converts a refused scientific result into a default. */
+  private def signature(
+      result: HsmmResult,
+      recall: RecallGraph[Checked],
+      sourceView: SourceView
+  ): RecallSignature =
+    RecallSignature.compute(result, recall, sourceView).fold(e => fail(e.message), identity)
+
   private lazy val result: HsmmResult = infer(recall, candidates, costModel)
   private lazy val p = result.posterior
 
@@ -103,7 +111,7 @@ class WorkedExampleSuite extends FunSuite:
     assertEquals(r.mapSource, Some(e5))
     assertEquals(r.mapMode.map(_.facetSet), Some(Set(Facet.RoleReversal)))
     assert(!res.costs(roleReversed.unit.id).contains(AlignState.Source(e5)))
-    val sig = RecallSignature.compute(res, roleReversed.recall, view)
+    val sig = signature(res, roleReversed.recall, view)
     assert(sig.distortedMassByFacet.getOrElse(Facet.RoleReversal, 0.0) > 0.5, sig.toString)
     assert(sig.perUnitFidelity(roleReversed.unit.id)(Facet.RoleReversal) == FacetVerdict.Wrong)
     assert(sig.intrusionMass < 0.3, sig.toString)
@@ -240,14 +248,14 @@ class WorkedExampleSuite extends FunSuite:
     val r = res.posterior.rows.head
     assertEqualsDouble(r.externalMass(ExternalState.Unranked), 1.0, 1e-9)
     assertEqualsDouble(r.externalMass(ExternalState.Intrusion), 0.0, 0.0)
-    val sig = RecallSignature.compute(res, rg, view)
+    val sig = signature(res, rg, view)
     assertEqualsDouble(sig.unrankedMass, 1.0, 1e-9)
     assertEqualsDouble(sig.intrusionMass, 0.0, 0.0)
     assertEquals(sig.specificityMass.value, None)
   }
 
   test("recall signature decomposes the outcome") {
-    val sig = RecallSignature.compute(result, recall, view)
+    val sig = signature(result, recall, view)
     assert(sig.associationMass > 0.15, s"association = ${sig.associationMass}")
     assert(sig.intrusionMass < 0.15, s"intrusion = ${sig.intrusionMass}")
     assert(
@@ -275,7 +283,7 @@ class WorkedExampleSuite extends FunSuite:
 
   test("causal preservation needs two distinct recalled units linked by a recall causal edge") {
     // e4 → e5 is a source causal edge; recalled by u2 (e5) alone: not preserved
-    val sig = RecallSignature.compute(result, recall, view)
+    val sig = signature(result, recall, view)
     assert(sig.causalPreservation.value.forall(_ == 0.0), sig.causalPreservation.render)
     // add a unit anchoring e4 and a recall causal edge u4 → u2
     val extraText = recallText + " She went down to the cellar."
@@ -317,7 +325,7 @@ class WorkedExampleSuite extends FunSuite:
     val res = GraphHsmm
       .infer(rg, view, cands, DefaultLocalCostModel(semantic = sem))
       .fold(e => fail(e.message), identity)
-    val sig2 = RecallSignature.compute(res, rg, view)
+    val sig2 = signature(res, rg, view)
     assert(sig2.causalPreservation.value.exists(_ > 0.0), sig2.causalPreservation.render)
   }
 

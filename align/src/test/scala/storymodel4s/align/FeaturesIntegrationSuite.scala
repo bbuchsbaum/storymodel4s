@@ -14,6 +14,10 @@ class FeaturesIntegrationSuite extends FunSuite:
   private lazy val result: HsmmResult =
     GraphHsmm.infer(recall, view, candidates, costModel).fold(e => fail(e.message), identity)
 
+  /** Test fixtures fail loudly: no test converts a refused scientific result into a default. */
+  private def signature(sourceView: SourceView): RecallSignature =
+    RecallSignature.compute(result, recall, sourceView).fold(e => fail(e.message), identity)
+
   test("missing importance excludes a leaf from the weighted coverage instead of weighting it 0") {
     // The base view now states its importances EXPLICITLY. They used to arrive from a default of
     // observed(1.0), which asserted maximal salience for every node without anyone measuring it -
@@ -24,7 +28,7 @@ class FeaturesIntegrationSuite extends FunSuite:
       view.worldOrder,
       view.textLength
     )
-    val sig = RecallSignature.compute(result, recall, weighted)
+    val sig = signature(weighted)
     val missingE3 = InMemorySourceView(
       weighted.nodes.map(n =>
         if n.ref == e3 then n.copy(importance = Estimate.missing(MissingReason.ProviderAbstained))
@@ -42,34 +46,129 @@ class FeaturesIntegrationSuite extends FunSuite:
       view.worldOrder,
       view.textLength
     )
-    val sigMissing = RecallSignature.compute(result, recall, missingE3)
-    val sigZero = RecallSignature.compute(result, recall, zeroE3)
+    val sigMissing = signature(missingE3)
+    val sigZero = signature(zeroE3)
     assertEqualsDouble(sigMissing.uniformCoverage, sig.uniformCoverage, 1e-12)
     // e3 is not recalled, so dropping it from the weighted average raises weighted coverage;
     // weighting it zero does the same thing here, but for a different reason (documented).
     assert(
-      sigMissing.importanceWeightedCoverage.toOption
-        .zip(sig.importanceWeightedCoverage.toOption)
+      sigMissing.importanceWeightedCoverage.estimate.toOption
+        .zip(sig.importanceWeightedCoverage.estimate.toOption)
         .exists((m, b) => m >= b - 1e-12),
       s"${sigMissing.importanceWeightedCoverage} vs ${sig.importanceWeightedCoverage}"
     )
     assertEquals(
-      sigMissing.importanceWeightedCoverage.toOption,
-      sigZero.importanceWeightedCoverage.toOption
+      sigMissing.importanceWeightedCoverage.estimate.toOption,
+      sigZero.importanceWeightedCoverage.estimate.toOption
     )
+    assertEquals(sigMissing.importanceWeightedCoverage.coverage.observed, 4)
+    assertEquals(sigZero.importanceWeightedCoverage.coverage.observed, 5)
+    assertEqualsDouble(
+      sigMissing.importanceWeightedCoverage.conditioningWeight,
+      sigZero.importanceWeightedCoverage.conditioningWeight,
+      1e-12
+    )
+
+    val projection = SignatureProjection
+      .of("weighted-coverage-only", Map("importanceWeightedCoverage" -> 1.0))
+      .fold(e => fail(e.message), identity)
+    val projected = projection(sig).fold(e => fail(e.message), identity)
+    assertEqualsDouble(
+      projected.weakestSupport.getOrElse(fail(projected.render)),
+      sig.importanceWeightedCoverage.support,
+      1e-12
+    )
+    assertEquals(projected.weakestComponent, Some("importanceWeightedCoverage"))
+    assertEquals(projected.unsupportedComponents, Vector.empty)
   }
 
   test("with no importances supplied, weighted coverage ABSTAINS rather than duplicating uniform") {
     // In every production run StorySourceView supplies no importances, so this was the real
     // behaviour: two named fields that were the same number, which a reader takes for two
     // measurements.
-    val sig = RecallSignature.compute(result, recall, view)
+    val sig = signature(view)
     assertEquals(
-      sig.importanceWeightedCoverage.toOption,
+      sig.importanceWeightedCoverage.estimate,
+      Estimate.missing(MissingReason.AllMissing),
+      "weighted coverage misclassified absent importances"
+    )
+    assertEquals(
+      sig.importanceWeightedCoverage.estimate.toOption,
       None,
       "weighted coverage reported a figure with no importances behind it"
     )
+    assertEquals(sig.importanceWeightedCoverage.coverage.eligible, view.leaves.size)
+    assertEquals(sig.importanceWeightedCoverage.coverage.observed, 0)
+    assertEqualsDouble(sig.importanceWeightedCoverage.conditioningWeight, 0.0, 1e-12)
     assert(sig.uniformCoverage > 0.0, "uniform coverage is still measured and reported")
+  }
+
+  test("weight conditioning and numeric value do not erase leaf-count coverage") {
+    val visitation = RecallSignature.leafVisitation(result.posterior, view)
+    val ordered = visitation.toVector.sortBy(_._2)
+    val (lowRef, low) = ordered.head
+    val (highRef, high) = ordered.last
+    val (middleRef, middle) = ordered
+      .find { case (_, value) => value > low + 1e-12 && value < high - 1e-12 }
+      .getOrElse(fail(s"fixture needs three distinct visitation values: $ordered"))
+    val lowWeight = (high - middle) / (high - low)
+    val highWeight = (middle - low) / (high - low)
+    assert(lowWeight > 0.0 && highWeight > 0.0)
+    assertEqualsDouble(lowWeight + highWeight, 1.0, 1e-12)
+
+    def weightedView(weights: Map[SourceNodeRef, Double]): InMemorySourceView =
+      InMemorySourceView(
+        view.nodes.map(n =>
+          n.copy(importance =
+            weights
+              .get(n.ref)
+              .fold[ScoreEstimate](Estimate.missing(MissingReason.ProviderAbstained))(
+                Estimate.observed
+              )
+          )
+        ),
+        view.edges,
+        view.worldOrder,
+        view.textLength
+      )
+
+    val oneHeavy =
+      signature(weightedView(Map(middleRef -> 1.0))).importanceWeightedCoverage
+    val twoLight =
+      signature(
+        weightedView(Map(lowRef -> lowWeight, highRef -> highWeight))
+      ).importanceWeightedCoverage
+
+    assertEquals(oneHeavy.coverage.eligible, twoLight.coverage.eligible)
+    assertEquals(oneHeavy.coverage.observed, 1)
+    assertEquals(twoLight.coverage.observed, 2)
+    assertEqualsDouble(oneHeavy.conditioningWeight, 1.0, 1e-12)
+    assertEqualsDouble(twoLight.conditioningWeight, 1.0, 1e-12)
+    assertEqualsDouble(oneHeavy.estimate.toOption.getOrElse(fail(oneHeavy.render)), middle, 1e-12)
+    assertEqualsDouble(
+      twoLight.estimate.toOption.getOrElse(fail(twoLight.render)),
+      middle,
+      1e-12
+    )
+    assertNotEquals(oneHeavy.coverage, twoLight.coverage)
+  }
+
+  test("RecallSignature refuses a non-finite observed importance") {
+    val malformed = InMemorySourceView(
+      view.nodes.map(n =>
+        n.copy(importance =
+          if n.ref == e1 then Estimate.observed(Double.NaN)
+          else Estimate.missing(MissingReason.ProviderAbstained)
+        )
+      ),
+      view.edges,
+      view.worldOrder,
+      view.textLength
+    )
+    RecallSignature.compute(result, recall, malformed) match
+      case Left(AlignError.MalformedRecord("weightedCoverage", detail)) =>
+        assert(detail.contains("not finite"), detail)
+      case other => fail(s"expected typed weighted-coverage refusal, got $other")
   }
 
   test("an abstaining semantic provider is neutral: candidates come from lexical overlap") {

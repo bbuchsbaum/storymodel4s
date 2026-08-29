@@ -4,7 +4,7 @@ ADR 0003 states that the `RecallSignature` metrics are "migration sites, not gra
 exceptions". It does not say which are migrated. This file does, so that the gap is visible
 rather than assumed closed because the ADR is frequently cited.
 
-**Audited 2026-08-29; re-audited 09:35Z after that night's landings.** Re-audit before claiming
+**Audited 2026-08-29; re-audited 17:30Z after that day's landings.** Re-audit before claiming
 the contract holds — this file went stale within an hour of being written, which is the normal
 case for a status file and the reason it carries a timestamp rather than a verdict.
 
@@ -22,8 +22,8 @@ does, substitute a constant.
 
 ## `RecallSignature` — 22 numeric fields
 
-**Re-audited 2026-08-29 09:35Z after the night's landings.** Six fields now carry support, up
-from none.
+**Re-audited 2026-08-29 17:30Z after the day's landings.** Eleven fields now carry their required
+support or typed absence, up from none at the start of the audit.
 
 | Field | Type on `main` (derived 2026-08-29T16:05Z, commit e7b6498) | State |
 |---|---|---|
@@ -37,7 +37,7 @@ from none.
 | `discourseChronology` | `MassRatio` | **migrated** — was `Option[Double]` |
 | `worldChronology` | `MassRatio` | **migrated** |
 | `causalPreservation` | `MassRatio` | **migrated** |
-| `importanceWeightedCoverage` | `ScoreEstimate` | **partial** — can express absence, but carries no coverage. Needs `WeightedCoverage` (see below) |
+| `importanceWeightedCoverage` | `WeightedCoverage` | **migrated** — estimate plus observed importance mass and leaf-count `Coverage`; distinguishes absent importance from observed zero total weight |
 | `uniformCoverage` | `Double` | not migrated — absence-only defect (zero leaves) |
 | `associationMass` | `Double` | not migrated — external term |
 | `intrusionMass` | `Double` | not migrated — external term |
@@ -49,25 +49,22 @@ from none.
 | `distortedMassByFacet` | `Map[Facet, Double]` | not migrated — **empty map conflates no-rows with true zero** |
 | `perUnitLocalizability` | `Map[RecallUnitId, Double]` | not migrated — needs per-unit typed absence |
 
-**Ten migrated, one partial, eleven outstanding.** This table was materially stale before
+**Eleven migrated, eleven outstanding.** This table was materially stale before
 2026-08-29T16:05Z — it listed `specificity`, `discourseChronology`, `worldChronology` and
 `causalPreservation` as unmigrated after all four had landed, and `importanceWeightedCoverage` as a
 bare `Double` after it became a `ScoreEstimate`. It has been **re-derived from source**, not
 patched, because a status document corrected from memory is how it went stale in the first place.
 
-**The outstanding eleven are FIVE DIFFERENT SHAPES, not one** (classified by
+**The outstanding eleven are FOUR DIFFERENT SHAPES, not one** (classified by
 `codex-storymodel4s-scout`):
 
 1. `uniformCoverage` — unconditional leaf proportion; only a zero-leaf absence defect.
-2. `importanceWeightedCoverage` — weight-sum value conditioning **and** separate leaf-availability
-   coverage. Ruled: needs both carriers; `MassRatio` cannot hold them (three masses, and coverage
-   is a count pair). New `WeightedCoverage(estimate, conditioningWeight, coverage)` approved.
-3. The six external terms plus `distortedMass` — unconditional mean-per-unit row masses. **Rows may
+2. The six external terms plus `distortedMass` — unconditional mean-per-unit row masses. **Rows may
    be subnormalized, so swapping a count for a summed mass CHANGES the estimand.** Applying
    `specificityMass`'s ratio-of-sums fix here mechanically would be wrong, and wrong in a way that
    produces a plausible number.
-4. `distortedMassByFacet` — an empty map conflates *no rows* with *true zero*.
-5. `perUnitLocalizability` — needs per-unit typed absence.
+3. `distortedMassByFacet` — an empty map conflates *no rows* with *true zero*.
+4. `perUnitLocalizability` — needs per-unit typed absence.
 
 **Do not size this backlog as one migration.** It was offered that way once and the offer was
 withdrawn.
@@ -121,23 +118,21 @@ anything actually injects importance made it decidable. It is
 `bd-01M16C9HT9V9Q80F7411V87BBY` (P1). *An open question that can be closed by checking is not an
 open question; it is unfinished work.*
 
-`NodeSummary.importance` defaults to `Estimate.observed(1.0)`. The **only** production
-construction site is `bridge/StorySourceView.scala:98`, which passes positional arguments through
-`lemmas` and then jumps to `evidence =` by name — it never passes `importance`. The sole other
-writer in the repository is a laws generator. So every node in every real run carries
-`observed(1.0)`.
+`NodeSummary.importance` formerly defaulted to `Estimate.observed(1.0)`. The production bridge did
+not supply importance, so every real run carried the same invented maximum salience. That wiring
+defect is closed: absent importance is now typed missing.
 
-The arithmetic then collapses (`signature.scala:91-96`): `uniform` is
+Before that correction, the arithmetic collapsed: `uniform` was
 `sum(visitation)/leaves.size`; `weighted` is `sum(w·visitation)/wsum`; with every `w = 1.0`,
 `wsum = leaves.size` and `weighted` reduces to exactly `uniform`. **`uniformCoverage` and
 `importanceWeightedCoverage` are identical by construction in every production run.** A
 researcher comparing them finds them always equal and may conclude importance weighting does not
 affect coverage — a finding about participants caused by a wiring gap in our pipeline.
 
-A second, independent defect survives even if the wiring is fixed: `if wsum <= 0 then uniform`
-fills the weighted figure with the uniform figure when every importance is `Missing`. The comment
-one line above has the right instinct — Missing importance is excluded, never counted as zero —
-and then the all-Missing case substitutes a different measurement instead of abstaining.
+The separate all-missing fallback defect is also closed. The field now carries `WeightedCoverage`:
+zero observed leaves are `Missing(AllMissing)`, observed leaves with zero total weight are
+`Missing(Undefined(ZeroTotalWeight))`, and positive weight produces the weighted value alongside
+both conditioning weight and leaf-count coverage.
 
 ## The pattern is mostly right elsewhere
 

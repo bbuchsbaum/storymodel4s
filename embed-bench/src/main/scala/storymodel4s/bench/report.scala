@@ -212,9 +212,13 @@ object Bench:
         (acc, c) => acc.flatMap(done => factory.build(c).map(ch => done :+ (c, ch)))
       }
     built.map { pairs =>
-      val outcomes = pairs.map { case (c, ch) => (c, ch, infer(c, ch, config)) }
-      val runs = outcomes.collect { case (c, ch, Right(r)) =>
-        val sig = RecallSignature.compute(r, c.recall, c.view)
+      val outcomes = pairs.map { case (c, ch) =>
+        val run = infer(c, ch, config).flatMap { result =>
+          RecallSignature.compute(result, c.recall, c.view).map(result -> _)
+        }
+        (c, ch, run)
+      }
+      val runs = outcomes.collect { case (c, ch, Right((r, sig))) =>
         CaseRun(
           c.id,
           ch.name,
