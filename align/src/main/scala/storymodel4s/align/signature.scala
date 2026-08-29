@@ -22,7 +22,6 @@ import storymodel4s.recall.{RecallGraph, RecallUnitId}
 final case class RecallSignature(
     uniformCoverage: Double,
     importanceWeightedCoverage: Double,
-    fidelity: Option[Double],
     fidelityMass: MassRatio,
     fidelityByFacet: Map[Facet, MassRatio],
     specificity: Option[Double],
@@ -313,7 +312,6 @@ object RecallSignature:
     val fidelityByFacet: Map[Facet, MassRatio] = facetSums.iterator.map { case (f, (n, a)) =>
       f -> MassRatio.unsafe(n, a, sourceMassTotal)
     }.toMap
-    val fidelity = fidelityRatio.value
 
     val k = view.sourceNodeCount
     val loc = p.rows.flatMap(r => r.localizability(k).map(r.unit -> _)).toMap
@@ -428,7 +426,6 @@ object RecallSignature:
     RecallSignature(
       uniform,
       weighted,
-      fidelity,
       fidelityRatio,
       fidelityByFacet,
       specificity,
@@ -507,7 +504,7 @@ final class SignatureProjection private (
     val comps: Map[String, Option[Double]] = Map(
       "uniformCoverage" -> Some(s.uniformCoverage),
       "importanceWeightedCoverage" -> Some(s.importanceWeightedCoverage),
-      "fidelity" -> s.fidelity,
+      "fidelity" -> s.fidelityMass.value,
       "specificity" -> s.specificity,
       "compression" -> s.compression.value,
       "discourseChronology" -> s.discourseChronology,
