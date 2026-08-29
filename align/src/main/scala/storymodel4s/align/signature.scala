@@ -1,5 +1,6 @@
 package storymodel4s.align
 
+import storymodel4s.features.{Estimate, MissingReason, ScoreEstimate}
 import storymodel4s.recall.{RecallGraph, RecallUnitId}
 
 /** The decomposed recall signature `m_s` (design record §12). Every component stays separately
@@ -21,7 +22,7 @@ import storymodel4s.recall.{RecallGraph, RecallUnitId}
   */
 final case class RecallSignature(
     uniformCoverage: Double,
-    importanceWeightedCoverage: Double,
+    importanceWeightedCoverage: ScoreEstimate,
     fidelityMass: MassRatio,
     fidelityByFacet: Map[Facet, MassRatio],
     specificity: Option[Double],
@@ -258,8 +259,13 @@ object RecallSignature:
     // Leaves whose importance is Missing are excluded from the weighted sum (never counted as 0).
     val importance = view.leaves.flatMap(n => n.importance.toOption.map(w => (n.ref, w)))
     val wsum = importance.map(_._2).sum
-    val weighted =
-      if wsum <= 0 then uniform else importance.map { case (r, w) => w * visitation(r) }.sum / wsum
+    // Missing when no node carried an importance: republishing the UNIFORM figure under the
+    // importance-weighted name told a caller that a salience-weighted measurement had been made
+    // when none had. The two fields would then be the same number under two names, which is the
+    // inference a reader cannot help making.
+    val weighted: ScoreEstimate =
+      if wsum <= 0 then Estimate.missing(MissingReason.AllMissing)
+      else Estimate.observed(importance.map { case (r, w) => w * visitation(r) }.sum / wsum)
 
     val anchored: Vector[(RecallUnitId, FidelityReport, FidelityMode)] = recall.ordered.flatMap {
       u =>
@@ -503,7 +509,7 @@ final class SignatureProjection private (
   def apply(s: RecallSignature): Either[ProjectionError, Double] =
     val comps: Map[String, Option[Double]] = Map(
       "uniformCoverage" -> Some(s.uniformCoverage),
-      "importanceWeightedCoverage" -> Some(s.importanceWeightedCoverage),
+      "importanceWeightedCoverage" -> s.importanceWeightedCoverage.toOption,
       "fidelity" -> s.fidelityMass.value,
       "specificity" -> s.specificity,
       "compression" -> s.compression.value,

@@ -2,6 +2,8 @@ package storymodel4s.align
 
 import munit.FunSuite
 
+import storymodel4s.features.{Estimate, MissingReason}
+
 /** External mass must not let our failure to align be read as the participant's behaviour.
   *
   * `unrankedMass` is the destination of a unit the aligner could not rank at all. The other five
@@ -51,7 +53,7 @@ class SignatureSuite extends FunSuite:
 
     val signature = RecallSignature(
       uniformCoverage = 0.0,
-      importanceWeightedCoverage = 0.0,
+      importanceWeightedCoverage = Estimate.missing(MissingReason.AllMissing),
       fidelityMass = MassRatio.of(0.0, 0.0, 0.0).fold(e => fail(e.message), identity),
       fidelityByFacet = Map.empty,
       specificity = None,

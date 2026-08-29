@@ -15,9 +15,18 @@ class FeaturesIntegrationSuite extends FunSuite:
     GraphHsmm.infer(recall, view, candidates, costModel).fold(e => fail(e.message), identity)
 
   test("missing importance excludes a leaf from the weighted coverage instead of weighting it 0") {
-    val sig = RecallSignature.compute(result, recall, view)
+    // The base view now states its importances EXPLICITLY. They used to arrive from a default of
+    // observed(1.0), which asserted maximal salience for every node without anyone measuring it -
+    // and made importance-weighted coverage identical to uniform coverage in every production run.
+    val weighted = InMemorySourceView(
+      view.nodes.map(_.copy(importance = Estimate.observed(1.0))),
+      view.edges,
+      view.worldOrder,
+      view.textLength
+    )
+    val sig = RecallSignature.compute(result, recall, weighted)
     val missingE3 = InMemorySourceView(
-      view.nodes.map(n =>
+      weighted.nodes.map(n =>
         if n.ref == e3 then n.copy(importance = Estimate.missing(MissingReason.ProviderAbstained))
         else n
       ),
@@ -26,7 +35,9 @@ class FeaturesIntegrationSuite extends FunSuite:
       view.textLength
     )
     val zeroE3 = InMemorySourceView(
-      view.nodes.map(n => if n.ref == e3 then n.copy(importance = Estimate.observed(0.0)) else n),
+      weighted.nodes.map(n =>
+        if n.ref == e3 then n.copy(importance = Estimate.observed(0.0)) else n
+      ),
       view.edges,
       view.worldOrder,
       view.textLength
@@ -36,12 +47,29 @@ class FeaturesIntegrationSuite extends FunSuite:
     assertEqualsDouble(sigMissing.uniformCoverage, sig.uniformCoverage, 1e-12)
     // e3 is not recalled, so dropping it from the weighted average raises weighted coverage;
     // weighting it zero does the same thing here, but for a different reason (documented).
-    assert(sigMissing.importanceWeightedCoverage >= sig.importanceWeightedCoverage - 1e-12)
-    assertEqualsDouble(
-      sigMissing.importanceWeightedCoverage,
-      sigZero.importanceWeightedCoverage,
-      1e-12
+    assert(
+      sigMissing.importanceWeightedCoverage.toOption
+        .zip(sig.importanceWeightedCoverage.toOption)
+        .exists((m, b) => m >= b - 1e-12),
+      s"${sigMissing.importanceWeightedCoverage} vs ${sig.importanceWeightedCoverage}"
     )
+    assertEquals(
+      sigMissing.importanceWeightedCoverage.toOption,
+      sigZero.importanceWeightedCoverage.toOption
+    )
+  }
+
+  test("with no importances supplied, weighted coverage ABSTAINS rather than duplicating uniform") {
+    // In every production run StorySourceView supplies no importances, so this was the real
+    // behaviour: two named fields that were the same number, which a reader takes for two
+    // measurements.
+    val sig = RecallSignature.compute(result, recall, view)
+    assertEquals(
+      sig.importanceWeightedCoverage.toOption,
+      None,
+      "weighted coverage reported a figure with no importances behind it"
+    )
+    assert(sig.uniformCoverage > 0.0, "uniform coverage is still measured and reported")
   }
 
   test("an abstaining semantic provider is neutral: candidates come from lexical overlap") {
