@@ -34,6 +34,7 @@ object EvidenceVisibility:
         )
       else Right(())
 
+  /** Compute the transitive evidence closure visible at one canonical UTF-16 source offset. */
   def visibleClaims(offset: Int, ledger: ClaimLedger): Set[ClaimId] =
     val memo = scala.collection.mutable.Map.empty[ClaimId, Boolean]
 
