@@ -439,6 +439,13 @@ was set by the owner on 2026-08-28 (sticky decision
    `Passed:` lines became one, for candidates differing by a trimmed test file.
    Keep the prior gate's numbers visible for exactly this reason.)
 
+   *A compile error anywhere makes the gate INCONCLUSIVE, not partially clean.*
+   `compileAll` aborts before any test runs, so a green-looking partial log means
+   nothing was measured — a runtime break in an unrelated module stays hidden
+   behind it. Never report "module X passed" from a run whose compile failed
+   elsewhere; the honest word is *inconclusive*, and the remedy is to fix the
+   compile and re-run, not to read around the error.
+
    *And a trailing success line is not an exit status.* Redirecting to a file is
    only half of it; if you do not actually record the status, the log's last line
    is what you are left with, and that line lies in a specific way. sbt prints
@@ -488,6 +495,14 @@ was set by the owner on 2026-08-28 (sticky decision
    AmrGraph → suite:27, StoryModel → suite:23, PropositionChart → suite:28, each
    1 failed / 1 passed / 2 total. Weak control, live probes — which is exactly
    why the mutation is worth running rather than reasoning about.
+
+   *Check a fixture's inputs are in the form the pipeline produces before pinning
+   a literal from it.* A pinned expectation is only as good as the shape it was
+   computed from, and a fixture that feeds the code a shape production never
+   emits produces real numbers that measure nothing. Three separate defects came
+   from this one thing: unstemmed lemmas where production stems, text without the
+   punctuation its span includes, and point masses in a module whose subject is
+   distributed mass.
 
    *Prefer a fixture DERIVED from the pipeline over one SYNTHESISED at the
    consumer.* A synthesised fixture defaults to the easy shape, because the easy
