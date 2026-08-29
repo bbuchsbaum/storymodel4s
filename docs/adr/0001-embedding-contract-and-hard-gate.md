@@ -432,6 +432,18 @@ reaches the codec).
   outputs digest is keyed whenever any item is keyed. `EmbeddingReceipt` carries
   the typed `kind` (also in `ProviderCall.params["digest-kind"]` /
   `"digest-key-id"`) and refuses keyed items with plain outputs.
+- **Chart-material sensitivity is owned by the receipt operation, not by proposition identity.**
+  `PropositionEvidence` carries no `Sensitivity`, and `ChartOrigin` never implies disclosure: the
+  same chart may be public after authorized release, internal during curation, or sensitive when
+  transcript-derived. Every chart-processing adapter that emits receipts therefore requires an
+  explicit, no-default context containing source and query sensitivities plus captured key
+  authority. Composite sensitivity is their maximum under
+  `Public < Internal < Sensitive`; only `Public`/`Public` may remain reproducibly `Plain`, while any
+  non-public input without a key fails before computation, caching, or receipt creation.
+  Classification never enters `Canonical.checksum`, proposition equality, or alignment semantics.
+  Revisit a portable classification vocabulary only when a second chart provider must re-derive
+  this context, or a consumer outside `embed-grakern` must choose plain versus keyed without enough
+  information to ground that choice; a caller-set but ungrounded `Public` field is not evidence.
 - `AttemptReceipt.digest` is `Keyed` under the policy key when any item is
   non-public, `Plain` only for all-public batches; its HMAC input is the
   `attempt/v2` rendering of the constructed receipt over full validated
