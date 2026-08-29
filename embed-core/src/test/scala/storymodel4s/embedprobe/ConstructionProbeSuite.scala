@@ -4,9 +4,8 @@ import scala.compiletime.testing.typeCheckErrors
 
 import munit.FunSuite
 
-/** Probes from OUTSIDE `storymodel4s.embed`: receipt identities can only be minted through the
-  * checked factories. A public constructor on any of these would let a caller forge a Plain
-  * identity for sensitive material (P0-2 HIGH-1).
+/** Probes from OUTSIDE `storymodel4s.embed`: validating values expose public observations without
+  * exposing derived reconstruction paths around their checked factories and policy gate.
   */
 class ConstructionProbeSuite extends FunSuite:
 
@@ -62,6 +61,143 @@ class ConstructionProbeSuite extends FunSuite:
       ),
       "ItemDigest"
     )
+  }
+
+  test("ValidatedVector has no derived fromProduct bypass") {
+    refused(
+      typeCheckErrors(
+        """storymodel4s.embed.ValidatedVector.fromProduct(EmptyTuple)"""
+      ),
+      "ValidatedVector.fromProduct"
+    )
+  }
+
+  test("EmbeddingReceipt has no derived fromProduct bypass") {
+    refused(
+      typeCheckErrors(
+        """storymodel4s.embed.EmbeddingReceipt.fromProduct(EmptyTuple)"""
+      ),
+      "EmbeddingReceipt.fromProduct"
+    )
+  }
+
+  test("ItemDigest has no derived fromProduct bypass") {
+    refused(
+      typeCheckErrors(
+        """storymodel4s.embed.ItemDigest.fromProduct(EmptyTuple)"""
+      ),
+      "ItemDigest.fromProduct"
+    )
+  }
+
+  test("SensitiveDigest has no derived fromProduct bypass") {
+    refused(
+      typeCheckErrors(
+        """storymodel4s.embed.SensitiveDigest.fromProduct(EmptyTuple)"""
+      ),
+      "SensitiveDigest.fromProduct"
+    )
+  }
+
+  test("CacheKey has no derived fromProduct bypass") {
+    refused(
+      typeCheckErrors(
+        """storymodel4s.embed.CacheKey.fromProduct(EmptyTuple)"""
+      ),
+      "CacheKey.fromProduct"
+    )
+  }
+
+  test("EmbeddingSpace has no derived fromProduct bypass") {
+    refused(
+      typeCheckErrors(
+        """storymodel4s.embed.EmbeddingSpace.fromProduct(EmptyTuple)"""
+      ),
+      "EmbeddingSpace.fromProduct"
+    )
+  }
+
+  test("GeometryPair has no derived fromProduct bypass") {
+    refused(
+      typeCheckErrors(
+        """storymodel4s.embed.GeometryPair.fromProduct(EmptyTuple)"""
+      ),
+      "GeometryPair.fromProduct"
+    )
+  }
+
+  test("RemoteCapability has no derived fromProduct bypass") {
+    refused(
+      typeCheckErrors(
+        """storymodel4s.embed.RemoteCapability.fromProduct(EmptyTuple)"""
+      ),
+      "RemoteCapability.fromProduct"
+    )
+  }
+
+  test("AuthorizedRemoteRequest has no derived fromProduct bypass") {
+    refused(
+      typeCheckErrors(
+        """storymodel4s.embed.AuthorizedRemoteRequest.fromProduct(EmptyTuple)"""
+      ),
+      "AuthorizedRemoteRequest.fromProduct"
+    )
+  }
+
+  test("EmbedBatch has no derived fromProduct bypass") {
+    refused(
+      typeCheckErrors(
+        """storymodel4s.embed.EmbedBatch.fromProduct(EmptyTuple)"""
+      ),
+      "EmbedBatch.fromProduct"
+    )
+  }
+
+  test("the ten validating values retain public read access") {
+    val reads = List(
+      typeCheckErrors(
+        """(value: storymodel4s.embed.ValidatedVector) =>
+             (value.dimension, value.normalization, value.values)"""
+      ),
+      typeCheckErrors(
+        """(value: storymodel4s.embed.EmbeddingReceipt) =>
+             (value.call, value.kind, value.items, value.outputs)"""
+      ),
+      typeCheckErrors(
+        """(value: storymodel4s.embed.ItemDigest) =>
+             (value.id, value.sensitivity, value.digest)"""
+      ),
+      typeCheckErrors(
+        """(value: storymodel4s.embed.SensitiveDigest) => (value.keyId, value.hex)"""
+      ),
+      typeCheckErrors(
+        """(value: storymodel4s.embed.CacheKey) => (value.space, value.digest)"""
+      ),
+      typeCheckErrors(
+        """(value: storymodel4s.embed.EmbeddingSpace) =>
+             (value.id, value.provider, value.role, value.view, value.instruction,
+              value.dimension, value.normalization, value.truncation,
+              value.latePooling, value.parent)"""
+      ),
+      typeCheckErrors(
+        """(value: storymodel4s.embed.GeometryPair) =>
+             (value.query, value.document, value.rule)"""
+      ),
+      typeCheckErrors(
+        """(value: storymodel4s.embed.RemoteCapability) =>
+             (value.provider, value.model, value.purpose, value.policyId,
+              value.expiresAtEpochMillis, value.budgetTokens, value.detectorIdentity,
+              value.payloadDigest)"""
+      ),
+      typeCheckErrors(
+        """(value: storymodel4s.embed.AuthorizedRemoteRequest) =>
+             (value.id, value.space, value.payload, value.capability)"""
+      ),
+      typeCheckErrors(
+        """(value: storymodel4s.embed.EmbedBatch) => value.requests"""
+      )
+    )
+    assert(reads.forall(_.isEmpty), reads.flatten.mkString("\n"))
   }
 
   test("the checked factories remain the public path") {
@@ -187,13 +323,6 @@ class ConstructionProbeSuite extends FunSuite:
     )
     refused(
       typeCheckErrors(
-        """(capability: storymodel4s.embed.RemoteCapability) =>
-             capability.copy(model = capability.model)"""
-      ),
-      "RemoteCapability.copy"
-    )
-    refused(
-      typeCheckErrors(
         """(
              id: storymodel4s.embed.RequestId,
              space: storymodel4s.embed.GeometryId,
@@ -202,12 +331,6 @@ class ConstructionProbeSuite extends FunSuite:
            ) => storymodel4s.embed.AuthorizedRemoteRequest(id, space, payload, capability)"""
       ),
       "AuthorizedRemoteRequest"
-    )
-    refused(
-      typeCheckErrors(
-        """(request: storymodel4s.embed.AuthorizedRemoteRequest) => request.copy()"""
-      ),
-      "AuthorizedRemoteRequest.copy"
     )
   }
 

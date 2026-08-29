@@ -139,7 +139,17 @@ class DigestPrivacySuite extends FunSuite:
     ) = RemotePolicy.evaluate(policyValue, req, embedder, purpose, 1000L, tokens)
     val ok = eval()
     assert(ok.isRight)
-    val cap = ok.toOption.get.capability
+    val authorized = ok.toOption.get
+    val same = eval().toOption.get
+    val cap = authorized.capability
+    assertEquals(authorized, same)
+    assertEquals(authorized.hashCode, same.hashCode)
+    assertEquals(cap, same.capability)
+    assertEquals(cap.hashCode, same.capability.hashCode)
+    assert(authorized.toString.contains("payload=<redacted>"))
+    assert(!authorized.toString.contains("PERSON_1"))
+    assert(!authorized.toString.contains("Jane Smith"))
+    assert(cap.toString.startsWith("RemoteCapability(cap:"))
     assertEquals(cap.expiresAtEpochMillis, 61000L)
     assertEquals(cap.payloadDigest, payload.digest)
     assertEquals(cap.payloadDigest.kind, DigestKind.Keyed)

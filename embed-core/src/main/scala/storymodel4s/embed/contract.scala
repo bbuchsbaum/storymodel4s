@@ -30,10 +30,18 @@ enum EmbedPayload:
 final case class EmbedRequest(id: RequestId, payload: EmbedPayload, space: GeometryId)
 
 /** A validated batch: unique ids, spaces known to the target embedder. */
-final case class EmbedBatch private (requests: Vector[EmbedRequest]):
+final class EmbedBatch private (val requests: Vector[EmbedRequest]):
   def ids: Vector[RequestId] = requests.map(_.id)
   def itemSensitivity: Vector[(RequestId, Sensitivity)] =
     requests.map(r => r.id -> r.payload.sensitivityOf)
+
+  override def equals(other: Any): Boolean = other match
+    case that: EmbedBatch => requests == that.requests
+    case _                => false
+
+  override def hashCode(): Int = requests.hashCode
+
+  override def toString: String = s"EmbedBatch(size=${requests.size})"
 
 object EmbedBatch:
   def validated(
@@ -46,7 +54,7 @@ object EmbedBatch:
       case None     =>
         requests.find(r => !knownSpaces.contains(r.space)) match
           case Some(r) => Left(EmbedError.UnknownSpace(r.space.value))
-          case None    => Right(EmbedBatch(requests))
+          case None    => Right(new EmbedBatch(requests))
 
 /** Execution failure is distinct from valid absence (`Estimate.Missing`). Messages never contain
   * payload text. `PolicyDenied` carries the recorded decision — a plain denial or a missing key.

@@ -54,6 +54,32 @@ class IdentitySuite extends ScalaCheckSuite:
     }
   }
 
+  test("EmbeddingSpace retains structural identity and a concise recipe rendering") {
+    val provider = ProviderFingerprint.of("model", "tokenizer", "implementation", "runtime")
+    def build: EmbeddingSpace =
+      EmbeddingSpace
+        .of(
+          provider,
+          Role.Document,
+          SemanticView.Surface,
+          None,
+          Dimension.unsafe(4),
+          Normalization.L2,
+          TruncationPolicy.Reject
+        )
+        .toOption
+        .get
+
+    val first = build
+    val same = build
+    assertEquals(first, same)
+    assertEquals(first.hashCode, same.hashCode)
+    assertEquals(
+      first.toString,
+      s"EmbeddingSpace(id=${first.id.value}, role=document, view=surface)"
+    )
+  }
+
   property("changing any recipe component changes the GeometryId") {
     forAll(Gens.space) { s =>
       val otherRole = if s.role == Role.Query then Role.Document else Role.Query
@@ -147,6 +173,40 @@ class IdentitySuite extends ScalaCheckSuite:
         GeometryPair.validated(q, t, GeometryPairRule.IdenticalModelling).isLeft
       )
     }
+  }
+
+  test("GeometryPair retains structural identity and its explicit comparison rule") {
+    val provider = ProviderFingerprint.of("model", "tokenizer", "implementation", "runtime")
+    def space(role: Role): EmbeddingSpace =
+      EmbeddingSpace
+        .of(
+          provider,
+          role,
+          SemanticView.Surface,
+          None,
+          Dimension.unsafe(4),
+          Normalization.L2,
+          TruncationPolicy.Reject
+        )
+        .toOption
+        .get
+    val query = space(Role.Query)
+    val document = space(Role.Document)
+    val first =
+      GeometryPair.validated(query, document, GeometryPairRule.IdenticalModelling).toOption.get
+    val same =
+      GeometryPair.validated(query, document, GeometryPairRule.IdenticalModelling).toOption.get
+
+    assertEquals(first, same)
+    assertEquals(first.hashCode, same.hashCode)
+    assertEquals(first.query, query.id)
+    assertEquals(first.document, document.id)
+    assertEquals(first.rule, GeometryPairRule.IdenticalModelling)
+    assertEquals(
+      first.toString,
+      s"GeometryPair(query=${query.id.value}, document=${document.id.value}, " +
+        "rule=IdenticalModelling)"
+    )
   }
 
   property("GeometryPair rejects every hard compatibility-key mutation") {
@@ -355,19 +415,15 @@ class IdentitySuite extends ScalaCheckSuite:
     )
   }
 
-  test("GeometryPair cannot bypass its validator or omit its explicit rule") {
+  test("GeometryPair constructor cannot bypass its validator or omit its explicit rule") {
     val applyErrors = compileErrors(
       "storymodel4s.embed.GeometryPair(storymodel4s.embed.GeometryId.unsafe(\"query\"), storymodel4s.embed.GeometryId.unsafe(\"document\"), storymodel4s.embed.GeometryPairRule.IdenticalModelling)"
-    )
-    val copyErrors = compileErrors(
-      "def forge(pair: storymodel4s.embed.GeometryPair, document: storymodel4s.embed.GeometryId): storymodel4s.embed.GeometryPair = pair.copy(document = document)"
     )
     val missingRuleErrors = compileErrors(
       "def compare(query: storymodel4s.embed.EmbeddingSpace, document: storymodel4s.embed.EmbeddingSpace) = storymodel4s.embed.GeometryPair.validated(query, document)"
     )
 
     assert(applyErrors.nonEmpty)
-    assert(copyErrors.nonEmpty)
     assert(missingRuleErrors.nonEmpty)
   }
 

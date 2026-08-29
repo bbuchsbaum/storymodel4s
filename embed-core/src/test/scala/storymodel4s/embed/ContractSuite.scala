@@ -127,6 +127,21 @@ class ContractSuite extends ScalaCheckSuite:
     }
   }
 
+  test("EmbedBatch retains structural value semantics without rendering request payloads") {
+    val requests = Vector(req(1, "private batch text"), req(2, "another payload"))
+    val first = EmbedBatch.validated(requests, spy().spaceIds).toOption.get
+    val same = EmbedBatch.validated(requests, spy().spaceIds).toOption.get
+    val different = EmbedBatch.validated(requests.take(1), spy().spaceIds).toOption.get
+
+    assertEquals(first, same)
+    assertEquals(first.hashCode, same.hashCode)
+    assertNotEquals(first, different)
+    assertEquals(first.requests, requests)
+    assertEquals(first.toString, "EmbedBatch(size=2)")
+    assert(!first.toString.contains("private batch text"))
+    assert(!first.toString.contains("another payload"))
+  }
+
   property("L4: a wrong-space item becomes missing without poisoning valid siblings") {
     forAllNoShrink(Gen.choose(2, 6).flatMap(n => Gen.choose(0, n - 1).map(n -> _))) {
       case (n, bad) =>

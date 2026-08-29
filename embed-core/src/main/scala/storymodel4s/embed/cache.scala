@@ -11,8 +11,17 @@ import storymodel4s.features.Estimate
   * `private[embed]`: a key can only be minted through [[CacheKey.of]], which routes the digest
   * through [[ReceiptDigest.of]] (Plain iff Public).
   */
-final case class CacheKey private[embed] (space: GeometryId, digest: ReceiptDigest):
+final class CacheKey private[embed] (val space: GeometryId, val digest: ReceiptDigest):
   def render: String = s"${space.value}|${digest.render}"
+
+  override def equals(other: Any): Boolean = other match
+    case that: CacheKey => space == that.space && digest == that.digest
+    case _              => false
+
+  override def hashCode(): Int = (space, digest).hashCode
+
+  override def toString: String =
+    s"CacheKey(space=${space.value}, digestKind=${digest.kind.render})"
 
 object CacheKey:
   def of(
@@ -22,7 +31,7 @@ object CacheKey:
   ): Either[EmbedError, CacheKey] =
     ReceiptDigest
       .of(payload.sensitivityOf, Material.render(space, payload), keys)
-      .map(CacheKey(space.id, _))
+      .map(digest => new CacheKey(space.id, digest))
 
 /** A cache of validated vectors. Values are only ever `Observed` vectors; misses are absence, not
   * `Missing` estimates (abstention is a provider outcome, not a cache outcome).
