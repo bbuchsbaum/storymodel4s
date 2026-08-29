@@ -49,6 +49,11 @@ class AtlasSuite extends FunSuite:
       AtlasSpec(ZoomLevel(NarrativeLevel.Story, SurfaceDetail.Hidden), ThreadPolicy.Selected)
     val scene =
       AtlasSpec(ZoomLevel(NarrativeLevel.Scene, SurfaceDetail.Hidden), ThreadPolicy.Selected)
+    val paragraph = AtlasSpec(
+      ZoomLevel(NarrativeLevel.Story, SurfaceDetail.Hidden),
+      ThreadPolicy.Selected,
+      FeatureScale.SurfaceUnit(SurfaceUnitKind.Paragraph)
+    )
     assertEquals(
       AtlasCompiler.configurationChecksum(s1, story),
       AtlasCompiler.configurationChecksum(s2, story)
@@ -56,4 +61,25 @@ class AtlasSuite extends FunSuite:
     assertNotEquals(
       AtlasCompiler.configurationChecksum(s1, story),
       AtlasCompiler.configurationChecksum(s1, scene)
+    )
+    assertNotEquals(
+      AtlasCompiler.configurationChecksum(s1, story),
+      AtlasCompiler.configurationChecksum(s1, paragraph)
+    )
+
+  test("Atlas config v2 has a pinned field order and shared escaping rule"):
+    val spec =
+      AtlasSpec(ZoomLevel(NarrativeLevel.Story, SurfaceDetail.Hidden), ThreadPolicy.Selected)
+    val rendering = AtlasCompiler.configurationRendering(CommonViewState.empty, spec)
+
+    assertEquals(spec.featureScale, FeatureScale.Default)
+    assertEquals(
+      rendering,
+      "rendering=atlas-compiler-config/v2|horizon=omniscient|focus=none|feature=none|" +
+        "scale=surface:sentence|selection.count=0|relation.count=0|zoom.narrative=story|" +
+        "zoom.surface=hidden|threads=selected|projection=discourse-atlas"
+    )
+    assertEquals(
+      AtlasCompiler.configurationChecksum(CommonViewState.empty, spec),
+      Checksum.ofText(rendering)
     )

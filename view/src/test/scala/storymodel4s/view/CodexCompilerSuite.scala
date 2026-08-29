@@ -75,6 +75,18 @@ class CodexCompilerSuite extends FunSuite:
     assertEquals(result.head.priority, AnnotationPriority.unsafe(900))
     assertEquals(result.head.audit.upstream, Vector(firstUpstream, secondUpstream).sorted)
 
+  test("exact navigation lookup never falls back to an ancestor"):
+    val child = claimAddress("claim:navigation-child")
+    val parent = claimAddress("claim:navigation-parent")
+    val parentAnnotation = annotation("claim:navigation-parent", TextSpan.unsafe(0, 4))
+    val navigation = NavigationIndex
+      .from(Vector(parentAnnotation), Map(child -> Vector(parent)))
+      .fold(error => fail(error.message), identity)
+
+    assertEquals(navigation.exactAnnotationsFor(child), Vector.empty)
+    assertEquals(navigation.annotationsFor(child), Vector(parentAnnotation.id))
+    assertEquals(navigation.exactAnnotationsFor(parent), Vector(parentAnnotation.id))
+
   test("lane allocation is deterministic, bounded, and never drops overflowed annotations"):
     val annotations = Vector(
       annotation("claim:lane-a", TextSpan.unsafe(0, 10)),
@@ -167,13 +179,13 @@ class CodexCompilerSuite extends FunSuite:
     val sentence = CodexSpec
       .forLens(
         CodexLens.Reading,
-        scale = CodexScale.SurfaceUnit(SurfaceUnitKind.Sentence)
+        scale = FeatureScale.SurfaceUnit(SurfaceUnitKind.Sentence)
       )
       .fold(error => fail(error.message), identity)
     val paragraph = CodexSpec
       .forLens(
         CodexLens.Reading,
-        scale = CodexScale.SurfaceUnit(SurfaceUnitKind.Paragraph)
+        scale = FeatureScale.SurfaceUnit(SurfaceUnitKind.Paragraph)
       )
       .fold(error => fail(error.message), identity)
 

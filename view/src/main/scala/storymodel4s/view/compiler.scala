@@ -1,5 +1,6 @@
 package storymodel4s.view
 
+import cats.data.NonEmptyVector
 import cats.syntax.all.*
 import storymodel4s.core.*
 import storymodel4s.features.{FeatureAddress, FeatureTargetKey, SupportResolver}
@@ -47,7 +48,7 @@ enum FeatureSelection:
     case Derived(_, Some(basisId)) =>
       Left(FeatureResolutionIssue.BasisIdentityUnavailable(basisId))
 
-/** The narrative-unit axis a Codex scale may select. */
+/** The narrative-unit axis a portable feature scale may select. */
 enum NarrativeUnitBasis:
   /** Atomic event/state situations in discourse order. */
   case Situations
@@ -55,10 +56,12 @@ enum NarrativeUnitBasis:
   /** Composite units of exactly one declared segment kind. */
   case Segments(kind: SegmentKind)
 
+  /** Versioned configuration value shared by every view compiler. */
   def canonicalString: String = this match
     case Situations     => "situations"
     case Segments(kind) => s"segments:${NarrativeUnitBasis.segmentKindName(kind)}"
 
+  /** Human-readable description used by textual twins. */
   def label: String = this match
     case Situations     => "situations"
     case Segments(kind) => s"${NarrativeUnitBasis.segmentKindName(kind)} segments"
@@ -70,25 +73,27 @@ object NarrativeUnitBasis:
     case SegmentKind.Story   => "story"
     case SegmentKind.Arc     => "arc"
 
-/** The exact target family from which a Codex feature overlay and its lanes are compiled. */
-enum CodexScale:
+/** The exact target family from which any feature-bearing view is compiled. */
+enum FeatureScale:
   /** A surface axis; token and sentence use their canonical dedicated target cases. */
   case SurfaceUnit(kind: SurfaceUnitKind)
 
   /** A story-model axis resolved from situations or typed segments. */
   case NarrativeUnit(basis: NarrativeUnitBasis)
 
+  /** Versioned configuration value shared by Codex and Atlas receipts. */
   def canonicalString: String = this match
-    case SurfaceUnit(kind)   => s"surface:${CodexScale.surfaceKindName(kind)}"
+    case SurfaceUnit(kind)   => s"surface:${FeatureScale.surfaceKindName(kind)}"
     case NarrativeUnit(axis) => s"narrative:${axis.canonicalString}"
 
+  /** Human-readable scale description used by textual twins. */
   def label: String = this match
-    case SurfaceUnit(kind)   => s"surface ${CodexScale.surfaceKindName(kind)}"
+    case SurfaceUnit(kind)   => s"surface ${FeatureScale.surfaceKindName(kind)}"
     case NarrativeUnit(axis) => s"narrative ${axis.label}"
 
-object CodexScale:
-  /** The source-compatible default for callers that have not yet exposed the scale selector. */
-  val Default: CodexScale = CodexScale.SurfaceUnit(SurfaceUnitKind.Sentence)
+object FeatureScale:
+  /** The stable default for callers that have not yet exposed the shared scale selector. */
+  val Default: FeatureScale = FeatureScale.SurfaceUnit(SurfaceUnitKind.Sentence)
 
   private def surfaceKindName(kind: SurfaceUnitKind): String = kind match
     case SurfaceUnitKind.Paragraph => "paragraph"
@@ -231,7 +236,7 @@ final case class CodexSpec private (
     channels: Vector[AnnotationChannel],
     channelBudget: ChannelBudget,
     lanePolicy: LanePolicy,
-    scale: CodexScale
+    scale: FeatureScale
 ):
   def activeKinds: Set[AnnotationKind] = channels.iterator.map(_.kind).toSet
 
@@ -241,7 +246,7 @@ object CodexSpec:
       channels: Vector[AnnotationChannel],
       channelBudget: ChannelBudget = ChannelBudget.Normal,
       lanePolicy: LanePolicy = LanePolicy.Default,
-      scale: CodexScale = CodexScale.Default
+      scale: FeatureScale = FeatureScale.Default
   ): Either[DomainError, CodexSpec] =
     val ordered = channels.sortBy(channel => (channel.kind.wireName, -channel.priority.value))
     val active = ordered.iterator.map(_.kind).toSet
@@ -259,7 +264,7 @@ object CodexSpec:
       lens: CodexLens,
       channelBudget: ChannelBudget = ChannelBudget.Normal,
       lanePolicy: LanePolicy = LanePolicy.Default,
-      scale: CodexScale = CodexScale.Default
+      scale: FeatureScale = FeatureScale.Default
   ): Either[DomainError, CodexSpec] =
     of(lens.channels, channelBudget, lanePolicy, scale)
 
@@ -277,6 +282,7 @@ enum FeatureChannelState:
   case SidecarRequired(
       selection: FeatureSelection,
       resolvedSpace: FeatureSpaceId,
+      /** Number of checked references at this scale before the reader horizon is applied. */
       observationCount: Int
   )
 
@@ -285,12 +291,50 @@ enum FeatureChannelState:
     case SidecarRequired(_, space, _)    => Some(space)
     case NotRequested | Unresolved(_, _) => None
 
+  /** Selected feature identity, if this channel was requested. */
+  def selectedFeature: Option[FeatureSelection] = this match
+    case NotRequested                    => None
+    case Unresolved(selected, _)         => Some(selected)
+    case Missing(selected, _)            => Some(selected)
+    case SidecarRequired(selected, _, _) => Some(selected)
+
+  /** Stable textual-twin rendering of materialization state, distinct from magnitude. */
+  def canonicalString: String = this match
+    case NotRequested                    => "not-requested"
+    case Unresolved(_, issue)            => s"unresolved:${issue.canonicalString}"
+    case Missing(_, _)                   => "missing"
+    case SidecarRequired(_, _, refCount) => s"sidecar-required:observations=$refCount"
+
+/** One exact, horizon-visible feature observation planned identically for every projection.
+  *
+  * The placement deliberately carries no numeric value. Its checked sidecar row is materialized by
+  * a downstream resolver; [[xExtents]] preserves every discontinuous evidence span independently.
+  */
+final case class FeatureObservationPlacement private[view] (
+    space: FeatureSpaceId,
+    target: FeatureTarget,
+    support: SpanSet,
+    audit: AuditRecord
+):
+  /** Typed semantic address used to synchronize this observation across canonical views. */
+  def address: Address =
+    Addressable[FeatureAddress].address(FeatureAddress.Observation(space, target))
+
+  /** Exact half-open source extents; no hull is synthesized across discontinuous support. */
+  def xExtents: NonEmptyVector[TextSpan] = support.spans
+
+/** Shared feature-planning result before a projection chooses page lanes or map geometry. */
+private[view] final case class PlannedFeatureLayer(
+    state: FeatureChannelState,
+    observations: Vector[FeatureObservationPlacement]
+)
+
 /** Auditable semantic contract carried by a Codex flow independently of placed page geometry. */
 final case class CodexContract private (
     selection: Set[Address],
     focus: Option[Address],
     horizon: EpistemicHorizon,
-    scale: CodexScale,
+    scale: FeatureScale,
     activeKinds: Set[AnnotationKind],
     relationLayers: Set[RelationLayer],
     feature: FeatureChannelState,
@@ -321,7 +365,7 @@ object CodexContract:
       Set.empty,
       None,
       EpistemicHorizon.Omniscient,
-      CodexScale.Default,
+      FeatureScale.Default,
       annotations.iterator.map(_.kind).toSet,
       Set.empty,
       FeatureChannelState.NotRequested,
@@ -473,14 +517,52 @@ final class CodexCompiler private (provenance: ViewProvenance):
       feature <- compileFeature(model, state, spec)
       annotations <- TextAnnotation.coalesce(proposals.flatten ++ feature.annotations)
       contract = CodexContract.compiled(state, spec, feature.state)
-      flow <- CodexFlow.exact(
+      ancestors = visibleAncestorChains(model, visibleClaims, state.horizon)
+      flow <- CodexFlow.compiledExact(
         model.source,
         annotations,
         spec.lanePolicy,
         contract,
+        ancestors,
         provenance
       )
     yield flow
+
+  private def visibleAncestorChains(
+      model: StoryModel[ModelStatus.Validated],
+      visibleClaims: Option[Set[ClaimId]],
+      horizon: EpistemicHorizon
+  ): Map[Address, Vector[Address]] =
+    val graph = model.graph
+    val addressable = Addressable[StoryRef]
+    def claimVisible(meta: ClaimMeta): Boolean = visibleClaims.forall(_.contains(meta.id))
+    def supportVisible(ref: StoryRef): Boolean =
+      model.supporting(ref).flatMap(EvidenceVisibility.clipSupport(_, horizon)).nonEmpty
+    def situationVisible(id: SituationId): Boolean =
+      graph.situations
+        .get(id)
+        .exists(node => claimVisible(node.meta) && supportVisible(StoryRef.Situation(id)))
+    def segmentVisible(id: SegmentId): Boolean =
+      graph.segments
+        .get(id)
+        .exists(node => claimVisible(node.summary.meta) && supportVisible(StoryRef.Segment(id)))
+
+    val primaryParent = model.hierarchy.primary
+      .filter(edge => claimVisible(edge.meta))
+      .map(edge => edge.member -> edge.parent)
+      .toMap
+    def ancestors(member: NarrativeMember): Vector[Address] =
+      VisibleAncestorChain.from(member, primaryParent, segmentVisible)
+
+    val situations = graph.situations.keysIterator.collect {
+      case id if situationVisible(id) =>
+        addressable.address(StoryRef.Situation(id)) -> ancestors(NarrativeMember.Situation(id))
+    }
+    val segments = graph.segments.keysIterator.collect {
+      case id if segmentVisible(id) =>
+        addressable.address(StoryRef.Segment(id)) -> ancestors(NarrativeMember.Segment(id))
+    }
+    (situations ++ segments).toMap
 
   private def proposal(
       model: StoryModel[ModelStatus.Validated],
@@ -567,115 +649,118 @@ final class CodexCompiler private (provenance: ViewProvenance):
       model: StoryModel[ModelStatus.Validated],
       state: CommonViewState,
       spec: CodexSpec
-  ): Either[DomainError, CodexCompiler.FeatureCompilation] = state.feature match
-    case None =>
-      Right(CodexCompiler.FeatureCompilation(FeatureChannelState.NotRequested, Vector.empty))
-    case Some(selection) =>
-      selection.resolveSpace match
+  ): Either[DomainError, CodexCompiler.FeatureCompilation] =
+    FeaturePlanner
+      .plan(model, state.feature, spec.scale, state.horizon, provenance)
+      .flatMap { planned =>
+        val priorities = spec.channels.collect {
+          case AnnotationChannel(AnnotationKind.Feature, priority) => priority
+        }
+        planned.observations
+          .flatMap(observation => priorities.map(priority => observation -> priority))
+          .traverse(featureAnnotation)
+          .map(CodexCompiler.FeatureCompilation(planned.state, _))
+      }
+
+  private def featureAnnotation(
+      observation: FeatureObservationPlacement,
+      priority: AnnotationPriority
+  ): Either[DomainError, TextAnnotation] =
+    TextAnnotation.of(
+      observation.address,
+      observation.support,
+      AnnotationKind.Feature,
+      priority,
+      observation.audit
+    )
+
+/** One pure feature planner shared by every canonical view compiler. */
+private[view] object FeaturePlanner:
+  def plan(
+      model: StoryModel[ModelStatus.Validated],
+      selection: Option[FeatureSelection],
+      scale: FeatureScale,
+      horizon: EpistemicHorizon,
+      provenance: ViewProvenance
+  ): Either[DomainError, PlannedFeatureLayer] = selection match
+    case None => Right(PlannedFeatureLayer(FeatureChannelState.NotRequested, Vector.empty))
+    case Some(selected) =>
+      selected.resolveSpace match
         case Left(issue) =>
           Right(
-            CodexCompiler.FeatureCompilation(
-              FeatureChannelState.Unresolved(selection, issue),
+            PlannedFeatureLayer(
+              FeatureChannelState.Unresolved(selected, issue),
               Vector.empty
             )
           )
         case Right(space) =>
-          CodexCompiler
-            .validateFeatureRefs(space, model.featureRefs.filter(_.space == space))
-            .flatMap { spaceRefs =>
+          validateFeatureRefs(space, model.featureRefs.filter(_.space == space)).flatMap {
+            spaceRefs =>
               val refs = spaceRefs
-                .filter(ref => CodexCompiler.atScale(model, spec.scale, ref.target))
+                .filter(ref => atScale(model, scale, ref.target))
                 .sortBy(ref => (ref.target, ref.row))
               val available =
                 model.featureSpaces.contains(space) &&
                   model.sidecars.contains(space) && refs.nonEmpty
               if !available then
                 Right(
-                  CodexCompiler.FeatureCompilation(
-                    FeatureChannelState.Missing(selection, space),
+                  PlannedFeatureLayer(
+                    FeatureChannelState.Missing(selected, space),
                     Vector.empty
                   )
                 )
               else
-                val priorities = spec.channels.collect {
-                  case AnnotationChannel(AnnotationKind.Feature, priority) => priority
-                }
-                val resolver = CodexCompiler.supportResolver(model)
+                val resolver = supportResolver(model)
                 refs
-                  .flatMap(ref => priorities.map(priority => ref -> priority))
-                  .traverse { (ref, priority) =>
-                    featureProposal(selection, space, ref, priority, resolver, state.horizon)
-                  }
-                  .map(proposals =>
-                    CodexCompiler.FeatureCompilation(
-                      FeatureChannelState.SidecarRequired(selection, space, refs.size),
-                      proposals.flatten
+                  .traverse(ref => placement(selected, space, ref, resolver, horizon, provenance))
+                  .map(observations =>
+                    PlannedFeatureLayer(
+                      FeatureChannelState.SidecarRequired(selected, space, refs.size),
+                      observations.flatten
                     )
                   )
-            }
+          }
 
-  private def featureProposal(
+  private def placement(
       selection: FeatureSelection,
       space: FeatureSpaceId,
       ref: FeatureRef,
-      priority: AnnotationPriority,
       resolver: SupportResolver,
-      horizon: EpistemicHorizon
-  ): Either[DomainError, Option[TextAnnotation]] =
+      horizon: EpistemicHorizon,
+      provenance: ViewProvenance
+  ): Either[DomainError, Option[FeatureObservationPlacement]] =
     resolver
       .support(ref.target)
       .toRight(
         DomainError.InvariantViolation(
-          "view/codex/feature-support",
+          "view/features/support",
           s"unresolved ${FeatureTargetKey.parts(ref.target).mkString("/")}"
         )
       )
-      .flatMap { support =>
-        EvidenceVisibility.clipSupport(support, horizon) match
-          case None                 => Right(None)
-          case Some(visibleSupport) =>
-            val target = Addressable[FeatureAddress].address(
-              FeatureAddress.Observation(space, ref.target)
+      .map(EvidenceVisibility.clipSupport(_, horizon))
+      .map(
+        _.map { visibleSupport =>
+          val upstream =
+            Vector(Addressable[FeatureAddress].address(FeatureAddress.Space(space))) ++
+              (selection match
+                case FeatureSelection.Raw(_)                 => Vector.empty
+                case FeatureSelection.Derived(derivation, _) =>
+                  Vector(
+                    Addressable[FeatureAddress].address(
+                      FeatureAddress.Derivation(derivation)
+                    )
+                  ))
+          FeatureObservationPlacement(
+            space,
+            ref.target,
+            visibleSupport,
+            AuditRecord.of(
+              upstream,
+              Provenance.deterministic(provenance.compilerVersion, provenance.configChecksum)
             )
-            val upstream =
-              Vector(Addressable[FeatureAddress].address(FeatureAddress.Space(space))) ++
-                (selection match
-                  case FeatureSelection.Raw(_)                 => Vector.empty
-                  case FeatureSelection.Derived(derivation, _) =>
-                    Vector(
-                      Addressable[FeatureAddress].address(
-                        FeatureAddress.Derivation(derivation)
-                      )
-                    ))
-            TextAnnotation
-              .of(
-                target,
-                visibleSupport,
-                AnnotationKind.Feature,
-                priority,
-                AuditRecord.of(
-                  upstream,
-                  Provenance.deterministic(provenance.compilerVersion, provenance.configChecksum)
-                )
-              )
-              .map(Some(_))
-      }
-
-object CodexCompiler:
-  private final case class FeatureCompilation(
-      state: FeatureChannelState,
-      annotations: Vector[TextAnnotation]
-  )
-
-  private final case class Candidate(
-      ref: StoryRef,
-      meta: ClaimMeta,
-      kind: AnnotationKind,
-      layer: Option[RelationLayer]
-  )
-
-  /** Bind compilation to a model/config provenance receipt before inspecting any story data. */
-  def apply(provenance: ViewProvenance): CodexCompiler = new CodexCompiler(provenance)
+          )
+        }
+      )
 
   private def supportResolver(
       model: StoryModel[ModelStatus.Validated]
@@ -704,7 +789,7 @@ object CodexCompiler:
       case Some(target) =>
         Left(
           DomainError.InvariantViolation(
-            s"view/codex/features/${space.value}",
+            s"view/features/${space.value}",
             s"duplicate target ${FeatureTargetKey.parts(target).mkString("/")}"
           )
         )
@@ -713,7 +798,7 @@ object CodexCompiler:
           case Some(row) =>
             Left(
               DomainError.InvariantViolation(
-                s"view/codex/features/${space.value}",
+                s"view/features/${space.value}",
                 s"sidecar row $row is referenced by more than one target"
               )
             )
@@ -721,10 +806,10 @@ object CodexCompiler:
 
   private[view] def atScale(
       model: StoryModel[ModelStatus.Validated],
-      scale: CodexScale,
+      scale: FeatureScale,
       target: FeatureTarget
   ): Boolean = scale match
-    case CodexScale.SurfaceUnit(kind) =>
+    case FeatureScale.SurfaceUnit(kind) =>
       kind match
         case SurfaceUnitKind.Token =>
           target match
@@ -740,7 +825,7 @@ object CodexCompiler:
             case FeatureTarget.SurfaceUnit(id) =>
               model.atlas.byId.get(id).exists(_.kind == expected)
             case _ => false
-    case CodexScale.NarrativeUnit(basis) =>
+    case FeatureScale.NarrativeUnit(basis) =>
       basis match
         case NarrativeUnitBasis.Situations =>
           target match
@@ -751,6 +836,54 @@ object CodexCompiler:
             case FeatureTarget.Segment(id) =>
               model.graph.segments.get(id).exists(_.kind == kind)
             case _ => false
+
+/** Shared one-pass escaping for versioned view-compiler configuration receipts. */
+private[view] object ViewConfigurationRendering:
+  def horizonValue(horizon: EpistemicHorizon): String = horizon match
+    case EpistemicHorizon.Omniscient       => "omniscient"
+    case EpistemicHorizon.ReaderAt(offset) => s"reader:$offset"
+
+  def featureValue(feature: Option[FeatureSelection]): String =
+    feature.fold("none")(_.canonicalString)
+
+  def selections(state: CommonViewState): Vector[String] =
+    state.selection.toVector.sortBy(_.render).map(_.render)
+
+  def relations(state: CommonViewState): Vector[String] =
+    state.relationLayers.toVector.sortBy(_.toString).map(_.toString)
+
+  def render(fields: Vector[(String, String)]): String =
+    fields
+      .map((key, value) => s"${escape(key)}=${escape(value)}")
+      .mkString("|")
+
+  def escape(value: String): String =
+    value.iterator
+      .foldLeft(new java.lang.StringBuilder(value.length)) { (builder, character) =>
+        character match
+          case '\\'     => builder.append("\\\\")
+          case '|'      => builder.append("\\|")
+          case '\n'     => builder.append("\\n")
+          case '\u0000' => builder.append("\\0")
+          case other    => builder.append(other)
+      }
+      .toString
+
+object CodexCompiler:
+  private final case class FeatureCompilation(
+      state: FeatureChannelState,
+      annotations: Vector[TextAnnotation]
+  )
+
+  private final case class Candidate(
+      ref: StoryRef,
+      meta: ClaimMeta,
+      kind: AnnotationKind,
+      layer: Option[RelationLayer]
+  )
+
+  /** Bind compilation to a model/config provenance receipt before inspecting any story data. */
+  def apply(provenance: ViewProvenance): CodexCompiler = new CodexCompiler(provenance)
 
   /** Canonical checksum of the semantic state and spec, independent of collection iteration order.
     */
@@ -764,40 +897,25 @@ object CodexCompiler:
       state: CommonViewState,
       spec: CodexSpec
   ): String =
-    configurationFields(state, spec)
-      .map((key, value) => s"${escapeConfiguration(key)}=${escapeConfiguration(value)}")
-      .mkString("|")
+    ViewConfigurationRendering.render(configurationFields(state, spec))
 
   private[view] def escapeConfiguration(value: String): String =
-    value.iterator
-      .foldLeft(new java.lang.StringBuilder(value.length)) { (builder, character) =>
-        character match
-          case '\\'     => builder.append("\\\\")
-          case '|'      => builder.append("\\|")
-          case '\n'     => builder.append("\\n")
-          case '\u0000' => builder.append("\\0")
-          case other    => builder.append(other)
-      }
-      .toString
+    ViewConfigurationRendering.escape(value)
 
   private def configurationFields(
       state: CommonViewState,
       spec: CodexSpec
   ): Vector[(String, String)] =
-    val horizon = state.horizon match
-      case EpistemicHorizon.Omniscient       => "omniscient"
-      case EpistemicHorizon.ReaderAt(offset) => s"reader:$offset"
     val focus = state.focus.fold("none")(_.render)
-    val feature = state.feature.fold("none")(_.canonicalString)
-    val selections = state.selection.toVector.sortBy(_.render).map(_.render)
-    val relations = state.relationLayers.toVector.sortBy(_.toString).map(_.toString)
+    val selections = ViewConfigurationRendering.selections(state)
+    val relations = ViewConfigurationRendering.relations(state)
     val channels =
       spec.channels.map(channel => s"${channel.kind.wireName}:${channel.priority.value}")
     Vector(
       "rendering" -> ConfigurationRenderingVersion,
-      "horizon" -> horizon,
+      "horizon" -> ViewConfigurationRendering.horizonValue(state.horizon),
       "focus" -> focus,
-      "feature" -> feature,
+      "feature" -> ViewConfigurationRendering.featureValue(state.feature),
       "scale" -> spec.scale.canonicalString,
       "selection.count" -> selections.size.toString
     ) ++ selections.zipWithIndex.map((value, index) => s"selection.$index" -> value) ++ Vector(

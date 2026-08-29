@@ -1,6 +1,7 @@
 package storymodel4s.view
 
 import cats.{Hash, Order, Show}
+import cats.data.NonEmptyVector
 import storymodel4s.core.*
 
 /** Stable identity of one semantic annotation before pagination fragments it.
@@ -293,18 +294,49 @@ object TextAnnotation:
 /** Bidirectional semantic navigation that never uses page or renderer identifiers. */
 final case class NavigationIndex private (
     byTarget: Map[Address, Vector[AnnotationId]],
-    targetByAnnotation: Map[AnnotationId, Address]
+    targetByAnnotation: Map[AnnotationId, Address],
+    ancestorsByTarget: Map[Address, Vector[Address]]
 ):
-  def annotationsFor(target: Address): Vector[AnnotationId] =
+  /** Find annotations whose target is exactly this address, without ancestor fallback. */
+  def exactAnnotationsFor(target: Address): Vector[AnnotationId] =
     byTarget.getOrElse(target, Vector.empty)
+
+  /** Find exact annotations or, when absent, those of the nearest annotated primary ancestor. */
+  def annotationsFor(target: Address): Vector[AnnotationId] =
+    resolutionFor(target).fold(Vector.empty)(_._2.toVector)
 
   def targetOf(annotation: AnnotationId): Option[Address] =
     targetByAnnotation.get(annotation)
 
+  private[view] def placementFor(target: Address): SelectionPlacement[AnnotationId] =
+    resolutionFor(target) match
+      case Some((resolved, annotations)) if resolved == target =>
+        SelectionPlacement.OnMark(annotations)
+      case Some((resolved, _)) => SelectionPlacement.ViaAncestor(resolved)
+      case None                => SelectionPlacement.OffProjection
+
+  private def resolutionFor(
+      target: Address
+  ): Option[(Address, NonEmptyVector[AnnotationId])] =
+    (target +: ancestorsByTarget.getOrElse(target, Vector.empty)).iterator
+      .flatMap(address =>
+        byTarget
+          .get(address)
+          .flatMap(NonEmptyVector.fromVector)
+          .map(address -> _)
+      )
+      .nextOption()
+
 object NavigationIndex:
-  val empty: NavigationIndex = new NavigationIndex(Map.empty, Map.empty)
+  val empty: NavigationIndex = new NavigationIndex(Map.empty, Map.empty, Map.empty)
 
   def from(annotations: Vector[TextAnnotation]): Either[DomainError, NavigationIndex] =
+    from(annotations, Map.empty)
+
+  private[view] def from(
+      annotations: Vector[TextAnnotation],
+      ancestorsByTarget: Map[Address, Vector[Address]]
+  ): Either[DomainError, NavigationIndex] =
     val duplicates = annotations
       .groupMapReduce(_.id)(_ => 1)(_ + _)
       .collect { case (id, count) if count > 1 => id }
@@ -320,7 +352,10 @@ object NavigationIndex:
           .toMap
         val reverse =
           annotations.iterator.map(annotation => annotation.id -> annotation.target).toMap
-        Right(new NavigationIndex(byTarget, reverse))
+        val ancestors = ancestorsByTarget.map { (target, chain) =>
+          target -> chain.filterNot(_ == target).distinct
+        }
+        Right(new NavigationIndex(byTarget, reverse, ancestors))
 
 /** Reflow-independent Narrative Codex source flow compiled from exact spans and addresses. */
 final case class CodexFlow private (
@@ -329,6 +364,7 @@ final case class CodexFlow private (
     annotations: Vector[TextAnnotation],
     lanes: LaneAllocation,
     navigation: NavigationIndex,
+    selectionPlacements: Map[Address, SelectionPlacement[AnnotationId]],
     contract: CodexContract,
     provenance: ViewProvenance
 ):
@@ -341,6 +377,7 @@ final case class CodexFlow private (
     CodexTextualTwin.render(this)
 
 object CodexFlow:
+  /** Construct a semantic flow without model ancestry; missing targets remain off-projection. */
   def of(
       source: StorySource,
       runs: Vector[SourceRun],
@@ -356,13 +393,34 @@ object CodexFlow:
       provenance
     )
 
-  /** Construct a semantic flow under an explicit lane and view contract. */
+  /** Construct a semantic flow under an explicit contract; only a compiler-built flow can place a
+    * missing target via an ancestor because an external flow has no model hierarchy.
+    */
   def of(
       source: StorySource,
       runs: Vector[SourceRun],
       annotations: Vector[TextAnnotation],
       lanePolicy: LanePolicy,
       contract: CodexContract,
+      provenance: ViewProvenance
+  ): Either[DomainError, CodexFlow] =
+    compiled(
+      source,
+      runs,
+      annotations,
+      lanePolicy,
+      contract,
+      Map.empty,
+      provenance
+    )
+
+  private def compiled(
+      source: StorySource,
+      runs: Vector[SourceRun],
+      annotations: Vector[TextAnnotation],
+      lanePolicy: LanePolicy,
+      contract: CodexContract,
+      ancestorsByTarget: Map[Address, Vector[Address]],
       provenance: ViewProvenance
   ): Either[DomainError, CodexFlow] =
     val orderedRuns = runs.sortBy(_.span)
@@ -372,14 +430,19 @@ object CodexFlow:
       _ <- validateRuns(source.canonicalText, orderedRuns)
       _ <- validateAnnotations(source.canonicalText, orderedAnnotations)
       _ <- validateContract(orderedAnnotations, lanePolicy, contract)
-      navigation <- NavigationIndex.from(orderedAnnotations)
+      navigation <- NavigationIndex.from(orderedAnnotations, ancestorsByTarget)
       lanes <- LaneAllocation.allocate(orderedAnnotations, lanePolicy)
+      placements = (contract.selection ++ contract.focus).toVector
+        .sortBy(_.render)
+        .map(address => address -> navigation.placementFor(address))
+        .toMap
     yield new CodexFlow(
       source,
       orderedRuns,
       orderedAnnotations,
       lanes,
       navigation,
+      placements,
       contract,
       provenance
     )
@@ -409,6 +472,28 @@ object CodexFlow:
       span <- TextSpan.of(0, source.canonicalText.length)
       run <- SourceRun.of(span)
       flow <- of(source, Vector(run), annotations, lanePolicy, contract, provenance)
+    yield flow
+
+  private[view] def compiledExact(
+      source: StorySource,
+      annotations: Vector[TextAnnotation],
+      lanePolicy: LanePolicy,
+      contract: CodexContract,
+      ancestorsByTarget: Map[Address, Vector[Address]],
+      provenance: ViewProvenance
+  ): Either[DomainError, CodexFlow] =
+    for
+      span <- TextSpan.of(0, source.canonicalText.length)
+      run <- SourceRun.of(span)
+      flow <- compiled(
+        source,
+        Vector(run),
+        annotations,
+        lanePolicy,
+        contract,
+        ancestorsByTarget,
+        provenance
+      )
     yield flow
 
   private def annotationSortKey(
@@ -600,6 +685,20 @@ object CodexTextualTwin:
       .append(" overflow=")
       .append(flow.lanes.overflow.size)
       .append("\n\n")
+    if flow.selectionPlacements.nonEmpty then
+      out.append("Selection placements\n")
+      flow.selectionPlacements.toVector
+        .sortBy(_._1.render)
+        .foreach { (address, placement) =>
+          val rendered = placement match
+            case SelectionPlacement.OnMark(annotations) =>
+              s"on-mark(${annotations.toVector.map(_.value).mkString(",")})"
+            case SelectionPlacement.ViaAncestor(ancestor) =>
+              s"via-ancestor(${ancestor.render})"
+            case SelectionPlacement.OffProjection => "off-projection"
+          out.append("- ").append(address.render).append(" -> ").append(rendered).append('\n')
+        }
+      out.append('\n')
     out.append("Exact canonical text\n---\n")
     // The textual twin is a rendered accessibility/snapshot form, not copied CodexFlow source data.
     out.append(flow.source.canonicalText).append("\n---\n\n")
@@ -608,18 +707,10 @@ object CodexTextualTwin:
     else flow.annotations.foreach(annotation => renderAnnotation(annotation, flow.lanes, out))
     out.result()
 
-  private def renderFeatureSelection(state: FeatureChannelState): String = state match
-    case FeatureChannelState.NotRequested                     => "none"
-    case FeatureChannelState.Unresolved(selection, _)         => selection.canonicalString
-    case FeatureChannelState.Missing(selection, _)            => selection.canonicalString
-    case FeatureChannelState.SidecarRequired(selection, _, _) => selection.canonicalString
+  private def renderFeatureSelection(state: FeatureChannelState): String =
+    state.selectedFeature.fold("none")(_.canonicalString)
 
-  private def renderFeatureState(state: FeatureChannelState): String = state match
-    case FeatureChannelState.NotRequested         => "not-requested"
-    case FeatureChannelState.Unresolved(_, issue) => s"unresolved:${issue.canonicalString}"
-    case FeatureChannelState.Missing(_, _)        => "missing"
-    case FeatureChannelState.SidecarRequired(_, _, observationCount) =>
-      s"sidecar-required:observations=$observationCount"
+  private def renderFeatureState(state: FeatureChannelState): String = state.canonicalString
 
   private def renderAnnotation(
       annotation: TextAnnotation,
