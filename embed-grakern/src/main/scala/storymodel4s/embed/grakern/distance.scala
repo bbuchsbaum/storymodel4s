@@ -9,14 +9,21 @@ import grakern.engine.{WLCompiledKernel, WLCompiler, WLQueryResult}
 import grakern.standard.wl.{WLCodecs, WLKernel, WLRefinement, optimalAssignment, subtree}
 
 import storymodel4s.align.StructuralDistance
-import storymodel4s.core.{Checksum, ContentAddress, ProviderCall}
+import storymodel4s.core.{Checksum, ProviderCall}
 import storymodel4s.embed.{
   Dimension,
   EmbeddingSpace,
+  EmbeddingReceipt,
+  ItemDigest,
   Normalization,
   ProviderFingerprint,
+  ReceiptDigest,
+  RequestId,
   Role,
   SemanticView,
+  SensitiveKeyProvider,
+  SensitiveKeySnapshot,
+  Sensitivity,
   TruncationPolicy,
   ValidatedVector
 }
@@ -30,12 +37,14 @@ enum GrakernError:
   case Refinement(detail: String)
   case Compile(detail: String)
   case Query(sample: SampleKey, detail: String)
+  case Receipt(error: EmbedError)
 
   def message: String = this match
     case Reification(s, d) => s"reification of ${s.value} failed: $d"
     case Refinement(d)     => s"WL refinement: $d"
     case Compile(d)        => s"grakern compile: $d"
     case Query(s, d)       => s"grakern query for ${s.value} failed: $d"
+    case Receipt(e)        => s"grakern receipt: ${e.message}"
 
 /** The fixed WL program of the structural channel: `rounds` refinement rounds over reified charts,
   * `subtree + optimalAssignment`, normalized. Codecs are named and versioned so grakern's
@@ -105,6 +114,51 @@ object StructuralSpaces:
         truncation = TruncationPolicy.Reject
       )
     }
+
+/** Prevents structural receipts from guessing whether chart material may use a plain identity. */
+final class StructuralReceiptContext private (
+    val sourceSensitivity: Sensitivity,
+    val querySensitivity: Sensitivity,
+    private[grakern] val keys: SensitiveKeyProvider
+):
+  private[grakern] val outputSensitivity: Sensitivity =
+    if sourceSensitivity == Sensitivity.Sensitive || querySensitivity == Sensitivity.Sensitive then
+      Sensitivity.Sensitive
+    else if sourceSensitivity == Sensitivity.Internal || querySensitivity == Sensitivity.Internal
+    then Sensitivity.Internal
+    else Sensitivity.Public
+
+object StructuralReceiptContext:
+  /** Capture one immutable key authority when either side is non-public; public/public contexts do
+    * not require a key. There is deliberately no default context.
+    */
+  def of(
+      sourceSensitivity: Sensitivity,
+      querySensitivity: Sensitivity,
+      keys: SensitiveKeyProvider
+  ): Either[GrakernError, StructuralReceiptContext] =
+    val nonPublic =
+      sourceSensitivity != Sensitivity.Public || querySensitivity != Sensitivity.Public
+    if !nonPublic then
+      Right(
+        new StructuralReceiptContext(
+          sourceSensitivity,
+          querySensitivity,
+          SensitiveKeyProvider.none
+        )
+      )
+    else
+      SensitiveKeySnapshot
+        .capture(keys.currentKeyId, keys)
+        .left
+        .map(GrakernError.Receipt.apply)
+        .map(snapshot =>
+          new StructuralReceiptContext(
+            sourceSensitivity,
+            querySensitivity,
+            snapshot.provider
+          )
+        )
 
 /** Immutable prepared source state: the source charts compiled once, queried many times.
   *
@@ -233,11 +287,16 @@ object PreparedSources:
   */
 final class GrakernStructuralDistance private (
     val prepared: PreparedSources,
+    val receiptContext: StructuralReceiptContext,
     private val rowCache: AtomicReference[Map[Checksum, Map[Checksum, Double]]],
-    private val log: AtomicReference[Vector[ProviderCall]]
+    private val log: AtomicReference[Vector[EmbeddingReceipt]]
 ) extends StructuralDistance:
 
-  def receipts: Vector[ProviderCall] = log.get()
+  /** Typed receipts retain whether each provider-call identity is plain or keyed. */
+  def embeddingReceipts: Vector[EmbeddingReceipt] = log.get()
+
+  /** Provider-call compatibility view; digest kind and key id remain recorded in call params. */
+  def receipts: Vector[ProviderCall] = embeddingReceipts.map(_.call)
 
   def apply(unit: PropositionEvidence, node: PropositionEvidence): Estimate[Double] =
     val uc = Canonical.checksum(unit.chart)
@@ -262,23 +321,39 @@ final class GrakernStructuralDistance private (
     rowCache.get().get(uc) match
       case Some(row) => Right(row)
       case None      =>
-        prepared.kernelRow(chart).map { row =>
-          rowCache.updateAndGet(_.updated(uc, row))
-          log.updateAndGet(_ :+ receipt(uc, row))
-          row
+        prepared.kernelRow(chart).flatMap { row =>
+          receipt(uc, row).map { recorded =>
+            rowCache.updateAndGet(_.updated(uc, row))
+            log.updateAndGet(_ :+ recorded)
+            row
+          }
         }
 
-  private def receipt(uc: Checksum, row: Map[Checksum, Double]): ProviderCall =
-    val out = ContentAddress.digest(
-      row.toVector.sortBy(_._1.hex).map { case (c, k) => s"${c.hex}=${k.toString}" }
+  private def canonical(version: String, values: Vector[String]): String =
+    (version +: values).map(value => s"${value.length}:$value").mkString
+
+  private def receipt(
+      uc: Checksum,
+      row: Map[Checksum, Double]
+  ): Either[GrakernError, EmbeddingReceipt] =
+    val queryMaterial = canonical("grakern-query/v1", Vector(uc.hex))
+    val sourceMaterial = canonical(
+      "grakern-sources/v1",
+      prepared.sourceChecksums.map(_.hex)
     )
-    ProviderCall(
+    val outputMaterial = canonical(
+      "grakern-output/v1",
+      row.toVector.sortBy(_._1.hex).map { case (checksum, kernel) =>
+        s"${checksum.hex}=${kernel.toString}"
+      }
+    )
+    val base = ProviderCall(
       provider = prepared.program.providerName,
       model = prepared.program.modelName,
       version = GrakernPin.revision,
       promptTemplateVersion = None,
-      inputChecksum = ContentAddress.digest(Vector(uc.hex) ++ prepared.sourceChecksums.map(_.hex)),
-      outputChecksum = out,
+      inputChecksum = Checksum.ofText(""),
+      outputChecksum = Checksum.ofText(""),
       params = Map(
         "rounds" -> prepared.program.rounds.toString,
         "codecs" -> s"${StructuralProgram.NodeCodecId}@${StructuralProgram.CodecVersion}",
@@ -289,6 +364,40 @@ final class GrakernStructuralDistance private (
       seed = None,
       cached = false
     )
+    for
+      queryDigest <- ReceiptDigest
+        .of(receiptContext.querySensitivity, queryMaterial, receiptContext.keys)
+        .left
+        .map(GrakernError.Receipt.apply)
+      sourceDigest <- ReceiptDigest
+        .of(receiptContext.sourceSensitivity, sourceMaterial, receiptContext.keys)
+        .left
+        .map(GrakernError.Receipt.apply)
+      queryItem <- ItemDigest
+        .of(
+          RequestId.unsafe("grakern-query"),
+          receiptContext.querySensitivity,
+          queryDigest
+        )
+        .left
+        .map(GrakernError.Receipt.apply)
+      sourceItem <- ItemDigest
+        .of(
+          RequestId.unsafe("grakern-sources"),
+          receiptContext.sourceSensitivity,
+          sourceDigest
+        )
+        .left
+        .map(GrakernError.Receipt.apply)
+      outputDigest <- ReceiptDigest
+        .of(receiptContext.outputSensitivity, outputMaterial, receiptContext.keys)
+        .left
+        .map(GrakernError.Receipt.apply)
+      recorded <- EmbeddingReceipt
+        .of(base, Vector(queryItem, sourceItem), outputDigest)
+        .left
+        .map(GrakernError.Receipt.apply)
+    yield recorded
 
 object GrakernStructuralDistance:
   /** Kernel values within this of 1.0 are treated as exact identity (floating-point noise of the
@@ -296,9 +405,13 @@ object GrakernStructuralDistance:
     */
   val Epsilon: Double = 1e-9
 
-  def of(prepared: PreparedSources): GrakernStructuralDistance =
+  def of(
+      prepared: PreparedSources,
+      receiptContext: StructuralReceiptContext
+  ): GrakernStructuralDistance =
     new GrakernStructuralDistance(
       prepared,
+      receiptContext,
       new AtomicReference(Map.empty),
       new AtomicReference(Vector.empty)
     )
@@ -306,9 +419,10 @@ object GrakernStructuralDistance:
   /** Prepare the given source charts under a program with `rounds` refinement rounds. */
   def prepare(
       sources: Vector[PropositionChart[CheckState.Checked]],
+      receiptContext: StructuralReceiptContext,
       rounds: Int = 2
   ): Either[GrakernError, GrakernStructuralDistance] =
     for
       program <- StructuralProgram.of(rounds)
       prepared <- PreparedSources.of(program, sources)
-    yield of(prepared)
+    yield of(prepared, receiptContext)

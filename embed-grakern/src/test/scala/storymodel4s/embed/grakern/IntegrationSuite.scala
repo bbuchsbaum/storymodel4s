@@ -4,6 +4,7 @@ import cats.data.NonEmptySet
 import munit.FunSuite
 
 import storymodel4s.align.*
+import storymodel4s.embed.{SensitiveKeyProvider, Sensitivity}
 import storymodel4s.features.Estimate
 import storymodel4s.proposition.*
 import storymodel4s.recall.RecallUnit
@@ -18,6 +19,9 @@ class IntegrationSuite extends FunSuite:
 
   private val straight = transitive("find", "anna", "brother")
   private val reversed = transitive("find", "brother", "anna")
+  private val publicReceipts = StructuralReceiptContext
+    .of(Sensitivity.Public, Sensitivity.Public, SensitiveKeyProvider.none)
+    .fold(e => fail(e.message), identity)
 
   private def viewWith(evidence: Map[SourceNodeRef, PropositionEvidence]): InMemorySourceView =
     InMemorySourceView(
@@ -31,7 +35,7 @@ class IntegrationSuite extends FunSuite:
 
   test("d_wl grades: straight source chart is closer than the reversed one under grakern") {
     val provider = GrakernStructuralDistance
-      .prepare(Vector(straight, reversed))
+      .prepare(Vector(straight, reversed), publicReceipts)
       .fold(e => fail(e.message), identity)
     val vStraight = viewWith(Map(e5 -> PropositionEvidence.hand(straight)))
     val vReversed = viewWith(Map(e5 -> PropositionEvidence.hand(reversed)))
@@ -52,7 +56,7 @@ class IntegrationSuite extends FunSuite:
     "mode comes from the gate, not from d_wl: reversed source is Distorted(RoleReversal) with any provider"
   ) {
     val grakern = GrakernStructuralDistance
-      .prepare(Vector(straight, reversed))
+      .prepare(Vector(straight, reversed), publicReceipts)
       .fold(e => fail(e.message), identity)
     val vReversed = viewWith(Map(e5 -> PropositionEvidence.hand(reversed)))
     val recallR = recall.copy(units = recall.units.map(u => if u.id == u2.id then unitChart else u))
@@ -78,7 +82,7 @@ class IntegrationSuite extends FunSuite:
 
   test("straight source chart stays Faithful on e5 with the grakern provider (no regression)") {
     val grakern = GrakernStructuralDistance
-      .prepare(Vector(straight))
+      .prepare(Vector(straight), publicReceipts)
       .fold(e => fail(e.message), identity)
     val v = viewWith(Map(e5 -> PropositionEvidence.hand(straight)))
     val recallV = recall.copy(units = recall.units.map(u => if u.id == u2.id then unitChart else u))

@@ -5,6 +5,8 @@ import cats.data.NonEmptyVector
 import storymodel4s.align.*
 import storymodel4s.align.bridge.StorySourceView
 import storymodel4s.core.StorySource
+import storymodel4s.embed.{SensitiveKeyProvider, Sensitivity}
+import storymodel4s.embed.grakern.StructuralReceiptContext
 import storymodel4s.fixtures.wog.{WarOfTheGhostsExpectations, WarOfTheGhostsModel}
 import storymodel4s.recall.*
 import storymodel4s.story.NarrativeNodeId
@@ -18,6 +20,12 @@ import storymodel4s.story.NarrativeNodeId
   */
 object WogDiagnostic:
   import WarOfTheGhostsExpectations.*
+
+  private val publicReceipts: Either[ChannelError, StructuralReceiptContext] =
+    StructuralReceiptContext
+      .of(Sensitivity.Public, Sensitivity.Public, SensitiveKeyProvider.none)
+      .left
+      .map(e => ChannelError.Grakern(e.message))
 
   /** Forces the story model before anything touches the fixture's nested id objects: initializing
     * `WarOfTheGhostsExpectations` first enters `WarOfTheGhostsModel.S`/`G` before the outer object,
@@ -187,7 +195,8 @@ object WogDiagnostic:
         "hashed-ngram",
         c =>
           for
-            structural <- BenchChannels.grakern(c.view.nodes)
+            receipts <- publicReceipts
+            structural <- BenchChannels.grakern(c.view.nodes, receipts)
             ch <- BenchChannels
               .hashedNgram(c.recall.ordered, nodeTexts(c), dimension, seed, structural)
           yield ch
@@ -197,7 +206,8 @@ object WogDiagnostic:
         c =>
           val nodes = nodeTexts(c)
           for
-            structural <- BenchChannels.grakern(c.view.nodes)
+            receipts <- publicReceipts
+            structural <- BenchChannels.grakern(c.view.nodes, receipts)
             ch <- BenchChannels.tfIdf(
               c.recall.ordered,
               nodes,

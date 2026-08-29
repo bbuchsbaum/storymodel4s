@@ -5,7 +5,7 @@ import cats.Id
 import storymodel4s.align.{NodeSummary, SemanticDistance, SourceNodeRef, StructuralDistance}
 import storymodel4s.core.{Checksum, ContentAddress}
 import storymodel4s.embed.*
-import storymodel4s.embed.grakern.GrakernStructuralDistance
+import storymodel4s.embed.grakern.{GrakernStructuralDistance, StructuralReceiptContext}
 import storymodel4s.features.{Estimate, MissingReason}
 import storymodel4s.recall.RecallUnit
 
@@ -199,6 +199,7 @@ object BenchChannels:
     */
   def grakern(
       nodes: Vector[NodeSummary],
+      receiptContext: StructuralReceiptContext,
       rounds: Int = 2
   ): Either[ChannelError, (StructuralDistance, StructuralIdentity)] =
     val charts = nodes.flatMap(_.evidence).map(_.chart)
@@ -211,7 +212,7 @@ object BenchChannels:
       )
     else
       GrakernStructuralDistance
-        .prepare(charts, rounds)
+        .prepare(charts, receiptContext, rounds)
         .left
         .map(e => ChannelError.Grakern(e.message))
         .map(d => (d, StructuralIdentity.Grakern(d.prepared.program.fingerprint, charts.size)))

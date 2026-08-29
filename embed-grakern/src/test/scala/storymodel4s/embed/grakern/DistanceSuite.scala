@@ -2,6 +2,8 @@ package storymodel4s.embed.grakern
 
 import munit.FunSuite
 
+import storymodel4s.core.ContentAddress
+import storymodel4s.embed.{DigestKind, KeyId, SensitiveKeyProvider, Sensitivity}
 import storymodel4s.features.{Estimate, MissingReason}
 import storymodel4s.proposition.*
 import storymodel4s.proposition.CheckState.Checked
@@ -18,9 +20,31 @@ class DistanceSuite extends FunSuite:
   private val renamed =
     transitive("find", "anna", "brother", ids = ("x1", "y2", "z3"), relationOrder = false)
   private val other = transitive("hear", "anna", "scream")
+  private val canary =
+    transitive("remember", "my-sister-wedding-canary", "secret-restaurant-canary")
+
+  private val k1 =
+    SensitiveKeyProvider.static(KeyId.unsafe("k1"), "grakern-secret-one".getBytes("UTF-8"))
+  private val k2 =
+    SensitiveKeyProvider.static(KeyId.unsafe("k2"), "grakern-secret-two".getBytes("UTF-8"))
+
+  private def context(
+      source: Sensitivity = Sensitivity.Public,
+      query: Sensitivity = Sensitivity.Public,
+      keys: SensitiveKeyProvider = SensitiveKeyProvider.none
+  ): StructuralReceiptContext =
+    StructuralReceiptContext.of(source, query, keys).fold(e => fail(e.message), identity)
 
   private def prepared(sources: PropositionChart[Checked]*): GrakernStructuralDistance =
-    GrakernStructuralDistance.prepare(sources.toVector).fold(e => fail(e.message), identity)
+    preparedWith(context(), sources*)
+
+  private def preparedWith(
+      receiptContext: StructuralReceiptContext,
+      sources: PropositionChart[Checked]*
+  ): GrakernStructuralDistance =
+    GrakernStructuralDistance
+      .prepare(sources.toVector, receiptContext)
+      .fold(e => fail(e.message), identity)
 
   private def d(
       dist: GrakernStructuralDistance,
@@ -90,7 +114,69 @@ class DistanceSuite extends FunSuite:
     assert(calls.forall(_.version == GrakernPin.revision))
     assert(calls.forall(_.params("rounds") == "2"))
     assert(calls.forall(_.params.contains("fingerprint")))
+    assert(calls.forall(_.params("digest-kind") == "plain"))
+    assert(dist.embeddingReceipts.forall(_.kind == DigestKind.Plain))
+    assert(dist.embeddingReceipts.forall(_.isKeyConsistent))
     assertEquals(GrakernPin.revision.length, 40)
+  }
+
+  test("non-public receipt context requires a key at construction") {
+    StructuralReceiptContext.of(
+      Sensitivity.Public,
+      Sensitivity.Sensitive,
+      SensitiveKeyProvider.none
+    ) match
+      case Left(GrakernError.Receipt(error)) => assert(error.message.contains("no key"))
+      case other                             => fail(s"expected a receipt-key failure, got $other")
+  }
+
+  test("sensitive query receipts defeat the former plain-checksum dictionary attack") {
+    val dist = preparedWith(context(query = Sensitivity.Sensitive, keys = k1), straight, other)
+    d(dist, canary, straight)
+    val receipt = dist.embeddingReceipts.head
+    val call = receipt.call
+    val formerPlainIdentity = ContentAddress.digest(
+      Vector(Canonical.checksum(canary).hex) ++ dist.prepared.sourceChecksums.map(_.hex)
+    )
+    val rendered = call.toString
+
+    assertEquals(receipt.kind, DigestKind.Keyed)
+    assert(receipt.isKeyConsistent)
+    assertEquals(call.params("digest-kind"), "keyed")
+    assertEquals(call.params("digest-key-id"), "k1")
+    assertNotEquals(call.inputChecksum, formerPlainIdentity)
+    assert(!rendered.contains("my-sister-wedding-canary"))
+    assert(!rendered.contains("secret-restaurant-canary"))
+  }
+
+  test("sensitive structural receipt identity changes under key rotation") {
+    val first = preparedWith(context(query = Sensitivity.Sensitive, keys = k1), straight)
+    val second = preparedWith(context(query = Sensitivity.Sensitive, keys = k2), straight)
+    d(first, canary, straight)
+    d(second, canary, straight)
+    assertNotEquals(first.receipts.head.inputChecksum, second.receipts.head.inputChecksum)
+    assertNotEquals(first.receipts.head.outputChecksum, second.receipts.head.outputChecksum)
+  }
+
+  test("receipt context snapshots key authority at construction") {
+    var active = k1
+    val rotating = new SensitiveKeyProvider:
+      def currentKeyId: KeyId = active.currentKeyId
+      def key(id: KeyId): Option[Array[Byte]] = active.key(id)
+    val captured = context(query = Sensitivity.Sensitive, keys = rotating)
+    active = k2
+    val afterRotation = preparedWith(captured, straight)
+    val original = preparedWith(context(query = Sensitivity.Sensitive, keys = k1), straight)
+    d(afterRotation, canary, straight)
+    d(original, canary, straight)
+    assertEquals(afterRotation.receipts, original.receipts)
+  }
+
+  test("structural distance construction has no implicit public receipt context") {
+    val errors = compileErrors(
+      """GrakernStructuralDistance.prepare(Vector.empty)"""
+    )
+    assert(errors.nonEmpty)
   }
 
   test("determinism: two independent preparations agree bit-for-bit and receipt checksums match") {

@@ -44,7 +44,10 @@ sbt -Dstorymodel4s.grakern.build=/path/to/grakern embedGrakern/test
 
 grakern's own build pins graph4s and gale by SHA from GitHub; the first load clones them. The
 generated `GrakernPin.revision` and every `ProviderCall` receipt record the pin; the transitive
-graph4s/gale SHAs are recorded as "via grakern@<sha>".
+graph4s/gale SHAs are recorded as "via grakern@<sha>". Receipt construction requires an explicit
+`StructuralReceiptContext`: public charts keep reproducible plain identities, while internal or
+sensitive charts use a construction-captured `SensitiveKeyProvider` snapshot and fail if no key is
+available.
 
 ## API
 
@@ -56,8 +59,12 @@ graph4s/gale SHAs are recorded as "via grakern@<sha>".
   colours are dropped).
 - `StructuralSpaces.of(program, dictionarySize)` → the `structural.wl.grakern.r<rounds>`
   `EmbeddingSpace` identity.
-- `GrakernStructuralDistance.prepare(sources, rounds = 2)` → `align.StructuralDistance` with
-  memoized query rows and `receipts: Vector[ProviderCall]`.
+- `StructuralReceiptContext.of(sourceSensitivity, querySensitivity, keys)` → one immutable receipt
+  authority for an entire distance instance. Both sensitivities are mandatory; there is no implicit
+  public default and an instance never mixes query sensitivities.
+- `GrakernStructuralDistance.prepare(sources, receiptContext, rounds = 2)` →
+  `align.StructuralDistance` with memoized query rows, typed `embeddingReceipts`, and a compatibility
+  `receipts: Vector[ProviderCall]` view. Any non-public input makes the derived output identity keyed.
 
 ## Deferred
 
