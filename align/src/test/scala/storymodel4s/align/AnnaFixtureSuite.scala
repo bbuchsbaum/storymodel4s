@@ -20,3 +20,12 @@ class AnnaFixtureSuite extends munit.FunSuite:
     assertEquals(inputRefs.distinct.size, inputRefs.size)
     assertEquals(inputRefs.toSet, nodeRefs.toSet)
   }
+
+  test("AnnaFixture normalization does not pass vacuously with raw lemmas") {
+    val firstEvent = AnnaFixture.nodes
+      .find(_.ref == AnnaFixture.e1)
+      .getOrElse(fail("AnnaFixture is missing its first event"))
+
+    assert(firstEvent.lemmas.contains("isol"))
+    assert(!firstEvent.lemmas.contains("isolated"))
+  }
