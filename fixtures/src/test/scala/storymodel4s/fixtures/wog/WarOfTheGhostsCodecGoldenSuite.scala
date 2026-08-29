@@ -34,8 +34,16 @@ class WarOfTheGhostsCodecGoldenSuite extends FunSuite:
 private[wog] object WarOfTheGhostsCodecGolden:
   import WarOfTheGhostsExpectations.*
 
+  /** Re-cut on 2026-08-29 for bd-01M16C9HT9V9Q80F7411V87BBY: NodeSummary.importance changed its
+    * default from observed(1.0) to Missing, and importance is rendered into the view's content
+    * address (wire.scala), so viewFingerprint moved by design. The golden CAUGHT that change - a
+    * ratified estimand change reaching the wire is exactly what it is for, and a fingerprint that
+    * had NOT moved would have meant the content address was not addressing the content.
+    *
+    * Previous: e3a667f6ea228661d591cce094252633e2b36aa47e9f0d856e348fc66c9f6f68, 25,598 bytes.
+    */
   val ExpectedChecksum: String =
-    "e3a667f6ea228661d591cce094252633e2b36aa47e9f0d856e348fc66c9f6f68"
+    "3c183c3cb4dc01dad930fcae7354fa828dbd2e8714b1901449c792552fc4fb9f"
 
   lazy val context: GoldenContext = GoldenContext.build()
   lazy val encoded: String = HsmmResultCodec.encode(context.result)
