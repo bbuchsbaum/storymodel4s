@@ -1,0 +1,1 @@
+{"actor":"cursor-grok-4.6-help","entity":"bd-01M16JJPDW36J3TWVBDJ5H6FFB","kind":"note","note_kind":"progress","op":"20260829T121649.825334Z-p55396-c0000-r76ac-h5f1c4e","text":"storyatlas seam died at project load (NoClassDefFoundError hashed class) — shared sbt boot corruption, not a type break. Will retry isolated when serial.","ts":"2026-08-29T12:16:49.825334Z","v":1}
