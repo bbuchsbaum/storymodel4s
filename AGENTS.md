@@ -376,6 +376,25 @@ was set by the owner on 2026-08-28 (sticky decision
    reservation, for instance). The rule guards the reverse case — a parent chain
    containing something that is not yet in `main` and might never be.
 
+   *Ledger phase is advisory; git is authoritative.* Before treating any
+   candidate as outstanding — to work it, review it, report it as blocked, or
+   cite it as a hold — run `git merge-base --is-ancestor <candidate-commit>
+   main`. Exit 0 means **the work is landed** and the ledger row is a recording
+   artifact, not a hold. This is the mirror of *Ancestry*: that rule asks
+   whether a candidate's parents are landed, this one asks whether the candidate
+   itself already is. Measured 2026-08-29: four of six candidates carried
+   `ancestor_abandoned`, and of the three showing `pending blocked`, **two were
+   already on `main`** (`e022c5f`, `7ae2ec9`) — including an audit the chief had
+   been citing all evening as a landed result while the board called it blocked.
+   A `pending blocked` row cannot distinguish *not yet landed* from *landed,
+   recorded late*, so reading the board without this check reports finished work
+   as a backlog and gets people assigned to it. `mote board` already prints
+   *[advisory: read from git, not from replayed state]* over RECENT COMMITS; the
+   same staleness applies to CANDIDATES, where the consequence is larger.
+   Corollary for the chief: when a state machine mislabels one candidate it
+   mislabels every candidate in that position — **rule on the class, not the
+   instance**, and the first question about any reported block is *how many*.
+
    *Stale bases.* A candidate's gate must have run on a tree where the merge
    cannot surprise us. If the candidate and the upstream commits its base is
    missing touch the **same file**, the author rebases and re-gates — not
