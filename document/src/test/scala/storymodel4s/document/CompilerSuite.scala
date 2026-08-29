@@ -463,15 +463,18 @@ class CompilerSuite extends FunSuite:
       )
     )
     val result = compile(compilerInput)
-    val contextClaim = result.derivation.attempts.collectFirst {
-      case DerivationAttempt(
-            _,
-            ClaimFamily.ContextAssignment,
-            DerivationDisposition.Emitted(id)
-          ) =>
-        id
-    }.getOrElse(fail("missing emitted context-assignment claim"))
-    val changedContextMeta = result.derivation.emittedClaims(contextClaim)
+    val contextClaim = result.derivation.attempts
+      .collectFirst {
+        case DerivationAttempt(
+              _,
+              ClaimFamily.ContextAssignment,
+              DerivationDisposition.Emitted(id)
+            ) =>
+          id
+      }
+      .getOrElse(fail("missing emitted context-assignment claim"))
+    val changedContextMeta = result.derivation
+      .emittedClaims(contextClaim)
       .withStatus(EpistemicStatus.LinguisticallyEntailed)
       .fold(e => fail(e.message), identity)
     val changedDerivation = DerivationReceipt
