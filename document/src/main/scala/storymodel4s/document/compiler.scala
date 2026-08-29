@@ -145,7 +145,7 @@ final case class DerivationAttempt(
 final class DerivationReceipt private (
     val candidateSet: Checksum,
     val attempts: Vector[DerivationAttempt],
-    val emittedClaims: Set[ClaimId],
+    val emittedClaims: Map[ClaimId, ClaimMeta],
     val gaps: Vector[DerivationGap]
 ):
   override def equals(other: Any): Boolean = other match
@@ -166,7 +166,7 @@ object DerivationReceipt:
   private[document] def of(
       candidateSet: Checksum,
       attempts: Vector[DerivationAttempt],
-      emittedClaims: Set[ClaimId],
+      emittedClaims: Map[ClaimId, ClaimMeta],
       gaps: Vector[DerivationGap]
   ): Either[DomainError, DerivationReceipt] =
     val targets = attempts.map(_.target)
@@ -185,7 +185,9 @@ object DerivationReceipt:
         Some("every gap must name an attempted target")
       else if gaps.map(_.target).distinct.size != gaps.size then
         Some("each attempted target may have at most one gap")
-      else if !emittedByAttempts.subsetOf(emittedClaims) then
+      else if emittedClaims.exists((id, meta) => id != meta.id) then
+        Some("every emitted-claim ledger key must equal its ClaimMeta id")
+      else if !emittedByAttempts.subsetOf(emittedClaims.keySet) then
         Some("every emitted attempt must name a claim in emittedClaims")
       else None
     failure
@@ -455,6 +457,9 @@ object NarrativeCompilerInput:
           case Left(e) =>
             Left(NarrativeCompilerError.InvalidInput(NonEmptyVector.one(e)))
           case Right(graph) =>
+            val canonicalProvenance = provenance.copy(
+              calls = provenance.calls.distinct.sortBy(NarrativeCompiler.renderProviderCall)
+            )
             Right(
               new NarrativeCompilerInput(
                 source,
@@ -469,7 +474,7 @@ object NarrativeCompilerInput:
                 causalVec,
                 policy,
                 receipt,
-                provenance
+                canonicalProvenance
               )
             )
 
@@ -580,6 +585,8 @@ final class NarrativeCompilation private (
     val projections: ProjectionIndex,
     val resolutions: NarrativeResolutions,
     val derivation: DerivationReceipt,
+    val evidenceLedger: Map[EvidenceId, Evidence],
+    val provenance: Provenance,
     val draft: StoryModel[ModelStatus.Draft],
     val validation: ValidationOutcome,
     val receipt: BuildReceipt,
@@ -598,6 +605,8 @@ final class NarrativeCompilation private (
       projections == that.projections &&
       resolutions == that.resolutions &&
       derivation == that.derivation &&
+      evidenceLedger == that.evidenceLedger &&
+      provenance == that.provenance &&
       draft == that.draft &&
       validation == that.validation &&
       receipt == that.receipt &&
@@ -614,6 +623,8 @@ final class NarrativeCompilation private (
       projections,
       resolutions,
       derivation,
+      evidenceLedger,
+      provenance,
       draft,
       validation,
       receipt,
@@ -634,6 +645,8 @@ object NarrativeCompilation:
       projections: ProjectionIndex,
       resolutions: NarrativeResolutions,
       derivation: DerivationReceipt,
+      evidenceLedger: Map[EvidenceId, Evidence],
+      provenance: Provenance,
       draft: StoryModel[ModelStatus.Draft],
       validation: ValidationOutcome,
       receipt: BuildReceipt,
@@ -646,13 +659,35 @@ object NarrativeCompilation:
         resolutions.memberships.map(_.target) ++
         resolutions.causal.map(_.target)
     val attemptedTargets = derivation.attempts.map(_.target).toSet
-    val draftClaims = draft.claims.map(_.id).toSet
+    val draftClaims = draft.claims.map(meta => meta.id -> meta).toMap
+    val claimLedger = derivation.emittedClaims
+    val emittedAttemptClaims = derivation.attempts.collect {
+      case DerivationAttempt(_, _, DerivationDisposition.Emitted(id)) => id
+    }.toSet
+    val gapEvidence = derivation.gaps.flatMap(_.evidence)
+    val missingGapEvidence = gapEvidence.collect {
+      case EvidenceRef.ById(id) if !evidenceLedger.contains(id) => id
+    }
+    val retainedEvidence =
+      evidenceLedger.values.toVector ++
+        gapEvidence.collect { case EvidenceRef.Inline(evidence) => evidence } ++
+        claimLedger.values.toVector.flatMap(_.evidence.toVector)
+    val missingEvidenceUpstream = retainedEvidence.flatMap(_.upstream).toSet -- claimLedger.keySet
+    val missingGapUpstream = derivation.gaps.flatMap(_.upstreamClaims).toSet -- claimLedger.keySet
     val failure =
       if draft.receipt != Some(receipt) then Some("draft and compilation receipts differ")
       else if validation.validated.exists(_ != draft) then
         Some("validated promotion does not represent the compilation draft")
-      else if !draftClaims.subsetOf(derivation.emittedClaims) then
+      else if draftClaims.exists((id, meta) => claimLedger.get(id) != Some(meta)) then
         Some("derivation receipt omits claims present in the draft")
+      else if !emittedAttemptClaims.subsetOf(claimLedger.keySet) then
+        Some("an emitted derivation attempt has no retained ClaimMeta")
+      else if missingGapEvidence.nonEmpty then
+        Some("a derivation gap has a dangling evidence reference")
+      else if missingEvidenceUpstream.nonEmpty then
+        Some("retained evidence has a dangling upstream claim reference")
+      else if missingGapUpstream.nonEmpty then
+        Some("a derivation gap has a dangling upstream claim reference")
       else if !resolvedTargets.forall(attemptedTargets) then
         Some("derivation receipt omits a resolver target")
       else None
@@ -667,6 +702,8 @@ object NarrativeCompilation:
           projections,
           resolutions,
           derivation,
+          evidenceLedger,
+          provenance,
           draft,
           validation,
           receipt,
@@ -759,7 +796,7 @@ object NarrativeCompiler:
             record.bundle,
             accepted,
             renderContextAssignment,
-            _ => EpistemicStatus.LinguisticallyEntailed
+            _ => EpistemicStatus.Hypothesized
           ) match
             case Left(reason) =>
               gaps += gap(record.target, record.bundle, ClaimFamily.ContextAssignment, reason)
@@ -922,7 +959,7 @@ object NarrativeCompiler:
               record.bundle,
               accepted,
               renderCausal,
-              _ => EpistemicStatus.LinguisticallyEntailed
+              _ => EpistemicStatus.Hypothesized
             ) match
               case Left(reason) =>
                 gaps += gap(record.target, record.bundle, ClaimFamily.CausalEdge, reason)
@@ -1006,7 +1043,7 @@ object NarrativeCompiler:
               record.bundle,
               accepted,
               renderSegmentMembership,
-              _ => EpistemicStatus.LinguisticallyEntailed
+              _ => EpistemicStatus.Hypothesized
             ) match
               case Left(reason) =>
                 gaps += gap(record.target, record.bundle, ClaimFamily.SegmentMembership, reason)
@@ -1207,7 +1244,13 @@ object NarrativeCompiler:
           renderFields("candidate/v2", Vector(g.family.toString, g.target.render))
         )
     )
-    val emittedClaims = draft.claims.map(_.id).toSet ++ emittedByAddress.values
+    val acceptedClaimMeta =
+      acceptedContextBySource.values.map(_.meta).toVector ++ emitted.map(_.meta) ++
+        graph.relations.causal.map(_.meta) ++ summaryMaterial.toVector.map(_.meta) ++
+        hierarchy.containment.map(_.meta)
+    val emittedClaims = (draft.claims ++ acceptedClaimMeta)
+      .map(meta => meta.id -> meta)
+      .toMap
     val derivation = DerivationReceipt.of(candidateSet, attempts, emittedClaims, gapVec) match
       case Left(error)  => return Left(NarrativeCompilerError.DerivationConstruction(error))
       case Right(value) => value
@@ -1229,6 +1272,8 @@ object NarrativeCompiler:
         projections,
         resolutions,
         derivation,
+        input.evidence,
+        input.provenance,
         draft,
         validation,
         input.receipt,
@@ -1274,7 +1319,7 @@ object NarrativeCompiler:
             )
             val calls = proposals.map(_.receipt.call)
             val provenance = input.provenance.copy(
-              calls = (input.provenance.calls ++ calls).distinct
+              calls = (input.provenance.calls ++ calls).distinct.sortBy(renderProviderCall)
             )
             ClaimMeta.of(claimId, status(value), credence, evs, provenance) match
               case Left(e)     => Left(DerivationGapReason.InvalidAccepted(e))
@@ -1432,7 +1477,7 @@ object NarrativeCompiler:
       )
     )
 
-  private def renderProviderCall(call: ProviderCall): String =
+  private[document] def renderProviderCall(call: ProviderCall): String =
     renderFields(
       "provider-call/v1",
       Vector(

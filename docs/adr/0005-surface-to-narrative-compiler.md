@@ -113,10 +113,12 @@ The artifact retains:
 - entity and situation mention tables and exact-coreference partitions;
 - projections from chart nodes to canonical narrative nodes;
 - the candidate and resolution record for every attempted claim;
+- the canonical input evidence ledger and base provenance needed to interpret retained references;
 - accepted graph, context, relation, segment, and containment values that could be assembled;
 - all `Alternatives`, `Unresolved`, and `Rejected` outcomes;
 - a derivation receipt that identifies every sparse candidate the compiler evaluated, which
-  candidates it emitted, and why it did not emit the others;
+  candidates it emitted, the complete `ClaimMeta` for those emissions, and why it did not emit the
+  others;
 - structural and scientific gate findings;
 - a `StoryModel[Draft]` assembled from the accepted values, including when the draft is partial;
 - the corresponding `ValidationOutcome`;
@@ -157,8 +159,9 @@ Stages consume only declared upstream artifacts. An agent cannot choose the stag
 own proposal accepted, construct `Resolved[A]`, or write directly into a story model.
 
 Ordering is part of the contract. Every map-to-vector transition uses canonical identifier order,
-and every content address uses a versioned rendering. Reordering equivalent provider responses
-therefore leaves compilation fingerprints and accepted IDs unchanged.
+provider-call ledgers are canonicalized once at input construction, and every content address uses
+a versioned rendering. Reordering equivalent provider responses or base provenance calls therefore
+leaves compilation structure, fingerprints, and accepted IDs unchanged.
 
 ### 5. Missing and disputed claims remain explicit
 
@@ -171,6 +174,12 @@ accepted upstream claims. Raw provider scores remain raw unless a named calibrat
 the `Probability` required by the policy. Provider proposals do not carry `EpistemicStatus`: the
 compiler assigns a restricted status by claim family, so provider output cannot call itself human
 adjudication, structural derivation, or root-world truth.
+
+The compiler also may not invent an epistemic license merely because a proposal was accepted.
+Provider-proposed causal, context-assignment, and primary-membership claims without a typed
+linguistic licensing basis are `Hypothesized`, not `LinguisticallyEntailed`. Calibration states
+confidence; it does not establish what licenses the claim. A richer typed licensing basis is a
+separate design and is not inferred in this slice.
 
 Some unresolved claims prevent only a field or edge from being emitted. Others prevent a usable
 draft or its promotion. For example, an unresolved causal relation can remain absent with its
@@ -192,7 +201,7 @@ The distinction must remain machine-readable. `NarrativeCompilation` therefore c
 final class DerivationReceipt private (
   candidateSet: Checksum,
   attempts: Vector[DerivationAttempt],
-  emittedClaims: Set[ClaimId],
+  emittedClaims: Map[ClaimId, ClaimMeta],
   gaps: Vector[DerivationGap]
 )
 
@@ -211,6 +220,13 @@ dense all-pairs relation candidates. A pair outside that set is **not evaluated*
 zero-weight relation. A nominated pair with an `Alternatives`, `Unresolved`, or `Rejected` outcome
 is **evaluated but not emitted**. Downstream code can condition only on recorded support or refuse
 the operation; it cannot average a manufactured value into an estimand.
+
+The compilation retains the canonical input `Evidence` ledger and base `Provenance` alongside this
+receipt. Smart construction enforces closure: every emitted attempt resolves to a retained
+`ClaimMeta`; every gap `ById` reference resolves to retained evidence; and every upstream claim
+named by a gap or retained evidence resolves in the emitted-claim ledger. Hashing a missing record
+would prove identity but not auditability, so a checksum is never accepted as a substitute for the
+record itself.
 
 The candidate-set checksum, attempts, emissions, and gaps all participate in the compilation
 fingerprint. Two compilations with the same emitted graph but different missing support are not the
@@ -286,7 +302,11 @@ The first implementation must make the boundary executable before adding broad p
    software, configuration, and exact `BuildReceipt` produces structurally equal values and the
    same content fingerprint. Canonical byte replay is deferred until `codec` owns a versioned wire
    format.
-12. **No fixture backdoor.** The vertical acceptance path does not import the hand-authored WOG
+12. **Durable audit closure.** After compiler input disposal, every `ById` evidence reference and
+    every evidence-upstream claim remains resolvable within `NarrativeCompilation`.
+13. **No fabricated epistemic license.** An accepted provider causal proposal without a typed
+    linguistic basis is retained as `Hypothesized`, never `LinguisticallyEntailed` by default.
+14. **No fixture backdoor.** The vertical acceptance path does not import the hand-authored WOG
     graph or hierarchy into production compilation.
 
 The first end-to-end acceptance fixture supplies raw source text and a raw recall transcript. It
@@ -306,7 +326,9 @@ The first slice is deliberately smaller than the full M1 provider stack. It adds
 5. one unresolved variant that still emits a complete compilation record but cannot reach
    `AlignmentSource`;
 6. one non-accepted relation variant that emits no default edge and records the typed gap;
-7. content-fingerprint replay, proposal-order, and absence-erasing mutation tests.
+7. durable evidence/claim-ledger closure after input disposal;
+8. conservative causal epistemic status; and
+9. content-fingerprint replay, provider-order, and absence-erasing mutation tests.
 
 This slice proves the transformation and its failure semantics. Live provider adapters, CLI
 commands, long-document scheduling, and calibration quality remain later slices with separate

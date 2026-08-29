@@ -76,7 +76,8 @@ class CompilerSuite extends FunSuite:
       provider: String,
       salt: String,
       calibrated: Boolean = true,
-      additionalProviders: Vector[String] = Vector.empty
+      additionalProviders: Vector[String] = Vector.empty,
+      evidenceRef: Option[EvidenceRef] = None
   ): EvidenceBundle[A] =
     val proposals = (provider +: additionalProviders).zipWithIndex.map { (name, index) =>
       val task = TaskId.unsafe(s"task:$salt:$index")
@@ -84,7 +85,7 @@ class CompilerSuite extends FunSuite:
       AgentProposal.proposed(
         task,
         value,
-        NonEmptyVector.one(EvidenceRef.Inline(ev)),
+        NonEmptyVector.one(evidenceRef.getOrElse(EvidenceRef.Inline(ev))),
         Some(RawScore.unsafe(0.91)),
         Vector.empty,
         receipt
@@ -157,7 +158,8 @@ class CompilerSuite extends FunSuite:
       summaryAttempt: StorySummaryAttempt = StorySummaryAttempt(
         bundle(summary, evSummary, "summary-agent", "summary")
       ),
-      membershipAttempts: Option[Vector[SegmentMembershipAttempt]] = None
+      membershipAttempts: Option[Vector[SegmentMembershipAttempt]] = None,
+      provenanceCalls: Vector[ProviderCall] = Vector.empty
   ): Either[NarrativeCompilerError, NarrativeCompilerInput] =
     val receipt = BuildReceipt(
       source.id,
@@ -178,7 +180,7 @@ class CompilerSuite extends FunSuite:
       causal,
       AcceptancePolicy.Conservative,
       receipt,
-      Provenance(Vector.empty, StoryModel.SchemaVersion, Checksum.ofText("compiler-test"))
+      Provenance(provenanceCalls, StoryModel.SchemaVersion, Checksum.ofText("compiler-test"))
     )
 
   private def input(
@@ -195,7 +197,8 @@ class CompilerSuite extends FunSuite:
       summaryAttempt: StorySummaryAttempt = StorySummaryAttempt(
         bundle(summary, evSummary, "summary-agent", "summary")
       ),
-      membershipAttempts: Option[Vector[SegmentMembershipAttempt]] = None
+      membershipAttempts: Option[Vector[SegmentMembershipAttempt]] = None,
+      provenanceCalls: Vector[ProviderCall] = Vector.empty
   ): NarrativeCompilerInput =
     attemptedInput(
       situationAttempts,
@@ -203,7 +206,8 @@ class CompilerSuite extends FunSuite:
       contextAttempts,
       causal,
       summaryAttempt,
-      membershipAttempts
+      membershipAttempts,
+      provenanceCalls
     )
       .fold(e => fail(e.message), identity)
 
@@ -290,6 +294,24 @@ class CompilerSuite extends FunSuite:
     assertEquals(replayed.fingerprint, first.fingerprint)
   }
 
+  test("base provenance call order is canonical in structural replay and fingerprinting") {
+    val baseCalls = Vector(call("base-b", "base-b"), call("base-a", "base-a"))
+    val oneSituation = Vector(
+      SituationAttempt(ref0, bundle(situation0, ev0, "situation-agent", "s0"))
+    )
+    val ordinary = compile(input(situationAttempts = oneSituation, provenanceCalls = baseCalls))
+    val reversed = compile(
+      input(situationAttempts = oneSituation, provenanceCalls = baseCalls.reverse)
+    )
+
+    assertEquals(reversed, ordinary)
+    assertEquals(reversed.fingerprint, ordinary.fingerprint)
+    assertEquals(
+      ordinary.provenance.calls,
+      baseCalls.sortBy(NarrativeCompiler.renderProviderCall)
+    )
+  }
+
   test("length-framed proposal identity cannot collide on provider punctuation") {
     val left = situation0.copy(
       predicate = situation0.predicate.copy(gloss = "enter|quietly"),
@@ -336,6 +358,100 @@ class CompilerSuite extends FunSuite:
       case other                             => fail(other.render)
     assert(result.isPartial)
     assertNotEquals(result.fingerprint, withoutCandidate.fingerprint)
+  }
+
+  test("a gap retains ledger-backed evidence after compiler input disposal") {
+    val causalValue = CausalProposal(CausalRelation.Causes)
+    val result = compile(
+      input(causal =
+        Vector(
+          CausalAttempt(
+            ref0,
+            ref1,
+            bundle(
+              causalValue,
+              evSummary,
+              "causal-agent-a",
+              "causal-by-id",
+              evidenceRef = Some(EvidenceRef.ById(evSummary.id))
+            )
+          )
+        )
+      )
+    )
+    val gap = result.derivation.gaps
+      .find(_.family == ClaimFamily.CausalEdge)
+      .getOrElse(fail("missing causal gap"))
+
+    assertEquals(gap.evidence, Vector(EvidenceRef.ById(evSummary.id)))
+    assertEquals(result.evidenceLedger.get(evSummary.id), Some(evSummary))
+  }
+
+  test("accepted context evidence and its derived upstream claim remain auditably closed") {
+    val byIdContext = ContextAssignmentAttempt(
+      ref0,
+      bundle(
+        ContextAssignmentProposal.NarratedWorld,
+        ev0,
+        "context-agent-a",
+        "context-by-id",
+        additionalProviders = Vector("context-agent-b"),
+        evidenceRef = Some(EvidenceRef.ById(ev0.id))
+      )
+    )
+    val result = compile(
+      input(
+        situationAttempts = Vector(
+          SituationAttempt(ref0, bundle(situation0, ev0, "situation-agent", "s0"))
+        ),
+        contextAttempts = Some(Vector(byIdContext))
+      )
+    )
+    val contextClaim = result.derivation.attempts.collectFirst {
+      case DerivationAttempt(
+            _,
+            ClaimFamily.ContextAssignment,
+            DerivationDisposition.Emitted(id)
+          ) =>
+        id
+    }.getOrElse(fail("missing emitted context-assignment claim"))
+    val contextMeta = result.derivation.emittedClaims
+      .getOrElse(contextClaim, fail("context ClaimMeta was not retained"))
+    val rootMeta = result.draft.graph.contexts.values.headOption
+      .map(_.meta)
+      .getOrElse(fail("missing derived root context"))
+    val rootUpstream = rootMeta.evidence.toVector.flatMap(_.upstream).toSet
+
+    assertEquals(result.evidenceLedger.get(ev0.id), Some(ev0))
+    assertEquals(contextMeta.evidence.toVector, Vector(ev0))
+    assertEquals(contextMeta.status, EpistemicStatus.Hypothesized)
+    assertEquals(rootUpstream, Set(contextClaim))
+    assert(rootUpstream.subsetOf(result.derivation.emittedClaims.keySet))
+  }
+
+  test("accepted provider causal relations retain the conservative epistemic floor") {
+    val causalValue = CausalProposal(CausalRelation.Causes)
+    val result = compile(
+      input(causal =
+        Vector(
+          CausalAttempt(
+            ref0,
+            ref1,
+            bundle(
+              causalValue,
+              evSummary,
+              "causal-agent-a",
+              "causal-accepted",
+              additionalProviders = Vector("causal-agent-b")
+            )
+          )
+        )
+      )
+    )
+    val edge = result.draft.graph.relations.causal.headOption
+      .getOrElse(fail("accepted causal proposal emitted no edge"))
+
+    assertEquals(edge.meta.status, EpistemicStatus.Hypothesized)
   }
 
   test("uncalibrated situation proposals remain gaps and cannot reach AlignmentSource") {
