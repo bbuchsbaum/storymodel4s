@@ -814,8 +814,6 @@ class ReceiptDigestSuite extends ScalaCheckSuite:
     )
     val rejected = AttemptReceipt.rejectProviderResult(
       r.receipt.providerCalls,
-      r.receipt.cacheDecisions,
-      r.receipt.policyDecisions,
       r.receipt.itemSensitivity,
       mismatch,
       Some(snapshot)

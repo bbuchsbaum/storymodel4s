@@ -657,8 +657,6 @@ object AttemptReceipt:
   /** Reject an invalid provider result under the trusted batch authority, preserving only calls. */
   private[embed] def rejectProviderResult(
       providerCalls: Vector[ProviderCall],
-      cacheDecisions: Vector[CacheDecision],
-      policyDecisions: Vector[PolicyDecision],
       itemSensitivity: Vector[(RequestId, Sensitivity)],
       error: EmbedError,
       snapshot: Option[SensitiveKeySnapshot]
@@ -673,8 +671,8 @@ object AttemptReceipt:
     build(
       providerCalls,
       Vector.empty,
-      cacheDecisions,
-      policyDecisions,
+      Vector.empty,
+      Vector.empty,
       receiptRejected :+ ResultDecision.BatchRejected(error),
       itemSensitivity,
       authority
@@ -1045,8 +1043,6 @@ object Embedder:
   ): BatchResult =
     val receipt = AttemptReceipt.rejectProviderResult(
       result.receipt.providerCalls,
-      result.receipt.cacheDecisions,
-      result.receipt.policyDecisions,
       batch.itemSensitivity,
       error,
       snapshot

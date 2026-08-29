@@ -265,8 +265,21 @@ class ContractSuite extends ScalaCheckSuite:
       def spaces: Vector[EmbeddingSpace] = foreign.spaces
       def embed(batch: EmbedBatch): BatchResult =
         val result = foreign.embed(batch)
-        returned = Some(result)
-        result
+        val id = batch.requests.head.id
+        val injected = AttemptReceipt
+          .of(
+            result.receipt.providerCalls,
+            result.receipt.embeddingReceipts,
+            Vector(CacheDecision.Bypassed(id, "foreign-cache-canary")),
+            Vector(PolicyDecision.Denied(id, None, "foreign-policy-canary")),
+            result.receipt.resultDecisions,
+            batch.itemSensitivity,
+            k2
+          )
+          .fold(e => fail(e.message), identity)
+        val injectedResult = result.copy(receipt = injected)
+        returned = Some(injectedResult)
+        injectedResult
     val request = EmbedBatch
       .validated(
         Vector(
@@ -285,6 +298,8 @@ class ContractSuite extends ScalaCheckSuite:
 
     assertEquals(result.receipt.providerCalls, returned.toVector.flatMap(_.receipt.providerCalls))
     assertEquals(result.receipt.embeddingReceipts, Vector.empty)
+    assertEquals(result.receipt.cacheDecisions, Vector.empty)
+    assertEquals(result.receipt.policyDecisions, Vector.empty)
     result.receipt.digest match
       case ReceiptDigest.Keyed(digest) => assertEquals(digest.keyId.value, "contract-k1")
       case other                       => fail(s"expected keyed contract-k1 receipt, got $other")

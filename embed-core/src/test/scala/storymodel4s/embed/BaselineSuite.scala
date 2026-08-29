@@ -224,14 +224,29 @@ class BaselineSuite extends ScalaCheckSuite:
   }
 
   test("cache receipt failure drops untrusted provenance and caches nothing") {
-    val base = HashedNgramEmbedder[Id](64, 0L, keys)
+    val foreignKeys =
+      SensitiveKeyProvider.static(KeyId.unsafe("k2"), "foreign-secret".getBytes("UTF-8"))
+    val base = HashedNgramEmbedder[Id](64, 0L, foreignKeys)
     var calls = 0
     val untrusted = new Embedder[Id]:
       val info: EmbedderInfo = base.info
       val spaces: Vector[EmbeddingSpace] = base.spaces
       def embed(batch: EmbedBatch): BatchResult =
         calls += 1
-        base.embed(batch).copy(receipt = AttemptReceipt.empty)
+        val result = base.embed(batch)
+        val id = batch.requests.head.id
+        val injected = AttemptReceipt
+          .of(
+            result.receipt.providerCalls,
+            result.receipt.embeddingReceipts,
+            Vector(CacheDecision.Bypassed(id, "foreign-cache-canary")),
+            Vector(PolicyDecision.Denied(id, None, "foreign-policy-canary")),
+            result.receipt.resultDecisions,
+            batch.itemSensitivity,
+            foreignKeys
+          )
+          .fold(e => fail(e.message), identity)
+        result.copy(receipt = injected)
     val cache = EmbeddingCache.inMemory[Id]
     val cached = new CachingEmbedder[Id](untrusted, cache, keys)
     val space = docSpace(cached)
@@ -256,6 +271,12 @@ class BaselineSuite extends ScalaCheckSuite:
     assertEquals(result.receipt.kind, DigestKind.Keyed)
     assertEquals(result.receipt.providerCalls, Vector.empty)
     assertEquals(result.receipt.embeddingReceipts, Vector.empty)
+    assertEquals(
+      result.receipt.cacheDecisions.collect { case CacheDecision.Miss(id, _) => id },
+      Vector(RequestId.unsafe("untrusted"))
+    )
+    assert(!result.receipt.cacheDecisions.exists(_.render.contains("foreign-cache-canary")))
+    assertEquals(result.receipt.policyDecisions, Vector.empty)
     assert(result.receipt.resultDecisions.exists {
       case ResultDecision.BatchRejected(_) => true
       case _                               => false

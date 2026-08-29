@@ -184,8 +184,8 @@ final class CachingEmbedder[F[_]: Monad](
                   AttemptReceipt.ofSnapshot(
                     Vector.empty,
                     Vector.empty,
-                    cacheDecisions,
-                    policy,
+                    decisions,
+                    denials,
                     rejection,
                     batch.itemSensitivity,
                     authority
@@ -194,8 +194,8 @@ final class CachingEmbedder[F[_]: Monad](
                   AttemptReceipt.of(
                     Vector.empty,
                     Vector.empty,
-                    cacheDecisions,
-                    policy,
+                    decisions,
+                    denials,
                     rejection,
                     batch.itemSensitivity,
                     SensitiveKeyProvider.none
@@ -203,8 +203,6 @@ final class CachingEmbedder[F[_]: Monad](
               rebuilt.getOrElse(
                 AttemptReceipt.rejectProviderResult(
                   Vector.empty,
-                  cacheDecisions,
-                  policy,
                   batch.itemSensitivity,
                   error,
                   snapshot
