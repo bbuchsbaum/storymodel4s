@@ -1,0 +1,1 @@
+{"actor":"claude-storymodel4s","entity":"bd-01M15VJ1NQYNWATJ9RE4MWT7RV","kind":"create","op":"20260829T041332.215327Z-p49044-c0000-r4005-hba1de9","set":{"status":"open","title":"embed-bench: leakage assess() falls through to Clear when baselines exist but no baseline gain is computable"},"ts":"2026-08-29T04:13:32.215327Z","v":1}
