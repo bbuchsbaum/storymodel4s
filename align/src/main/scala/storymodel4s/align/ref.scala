@@ -12,8 +12,9 @@ enum AlignRef:
   case Cell(unit: RecallUnitId, state: AlignState)
   case Transition(from: RecallUnitId, to: RecallUnitId, fromState: AlignState, toState: AlignState)
 
-/** Canonical key encoding of an [[AlignState]]: `situation/<id>`, `segment/<id>`, or
-  * `external/<ExternalState>`.
+/** Canonical address-key encoding of an [[AlignState]], including distorted anchor facets. This
+  * compatibility bridge delegates to [[AlignState.keyParts]] so addresses and alignment columns
+  * cannot drift onto separate wire forms.
   */
 object AlignStateKey:
   def parts(s: AlignState): Vector[String] = AlignState.keyParts(s)
