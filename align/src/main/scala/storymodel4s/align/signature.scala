@@ -24,11 +24,11 @@ final case class RecallSignature(
     importanceWeightedCoverage: Double,
     fidelity: Option[Double],
     specificity: Option[Double],
-    compression: Double,
+    compression: MassRatio,
     discourseChronology: Option[Double],
     worldChronology: Option[Double],
     causalPreservation: Option[Double],
-    semanticFlowCoherence: Double,
+    semanticFlowCoherence: MassRatio,
     associationMass: Double,
     intrusionMass: Double,
     commentaryMass: Double,
@@ -56,12 +56,85 @@ final case class RecallSignature(
     * Returning a pair rather than a scalar is the point: a caller cannot quote the external mass
     * without carrying the caveat, because there is no method that hands back the sum.
     */
+  /** Which estimand definitions produced these numbers.
+    *
+    * DERIVED from the code that computed them, never supplied by a caller: a caller-set version is
+    * an ungrounded assertion, the same defect rejected for portable sensitivity. It changes when a
+    * definition changes, so a figure from before a redefinition cannot be silently compared with
+    * one from after - which is the honesty of the number's HISTORY, distinct from the honesty of
+    * the number.
+    */
+  def estimandVersion: String = RecallSignature.EstimandVersion
+
   def externalMass: ExternalMassReport =
     ExternalMassReport.unsafe(
       attributed = associationMass + intrusionMass + commentaryMass +
         sourceConsistentInferenceMass + uninterpretableMass,
       unranked = unrankedMass
     )
+
+/** A ratio-of-sums with the support it rests on: value = N / A, support = A / T.
+  *
+  * The ratified shape for every conditional signature quantity. Two things it makes impossible.
+  * First, MEAN-OF-RATIOS: dividing per unit and averaging gives a unit carrying 0.01 of source mass
+  * the same vote as a fully placed one, so a single barely-placed unit can move the published
+  * figure as much as a confident one. Ratio-of-sums weights each unit by the mass it actually
+  * contributed. Second, INVENTION FROM NOTHING: when the conditioning mass A is zero there is no
+  * ratio, and `value` is None rather than a 0.0 or 1.0 standing in for it.
+  */
+final class MassRatio private (
+    val value: Option[Double],
+    val conditioningMass: Double,
+    val totalMass: Double
+):
+  /** Fraction of the whole that the value rests on; 0 when nothing was eligible. */
+  def support: Double = if totalMass <= 0.0 then 0.0 else conditioningMass / totalMass
+
+  def render: String =
+    val v = value.map(x => f"$x%.4f").getOrElse("n/a")
+    f"$v (support ${support}%.4f = $conditioningMass%.4f/$totalMass%.4f)"
+
+  override def equals(other: Any): Boolean = other match
+    case that: MassRatio =>
+      value == that.value && conditioningMass == that.conditioningMass &&
+      totalMass == that.totalMass
+    case _ => false
+
+  override def hashCode: Int = (value, conditioningMass, totalMass).hashCode
+  override def toString: String = s"MassRatio(${render})"
+
+object MassRatio:
+  /** Trusted construction from inside `align`, where the sums are computed together. */
+  private[align] def unsafe(numerator: Double, conditioning: Double, total: Double): MassRatio =
+    val v = if conditioning <= 0.0 then None else Some(numerator / conditioning)
+    new MassRatio(v, conditioning, total)
+
+  /** Checked construction: masses finite and non-negative, conditioning no larger than the total,
+    * and a value present exactly when there was conditioning mass to divide by.
+    */
+  def of(numerator: Double, conditioning: Double, total: Double): Either[AlignError, MassRatio] =
+    val bad = Vector("numerator" -> numerator, "conditioning" -> conditioning, "total" -> total)
+      .collectFirst {
+        case (n, v) if v.isNaN || v.isInfinite || v < 0.0 =>
+          AlignError.MalformedRecord("massRatio", s"$n must be finite and nonnegative, got $v")
+      }
+    bad match
+      case Some(e)                             => Left(e)
+      case None if conditioning > total + 1e-9 =>
+        Left(
+          AlignError.MalformedRecord(
+            "massRatio",
+            s"conditioning mass $conditioning exceeds the total $total"
+          )
+        )
+      case None if numerator > conditioning + 1e-9 =>
+        Left(
+          AlignError.MalformedRecord(
+            "massRatio",
+            s"numerator $numerator exceeds its conditioning mass $conditioning"
+          )
+        )
+      case None => Right(unsafe(numerator, conditioning, total))
 
 /** A per-step route quantity together with the support it rests on.
   *
@@ -161,6 +234,15 @@ object ExternalMassReport:
 
 object RecallSignature:
 
+  /** Bumped whenever any signature quantity changes what it MEANS rather than what it computes.
+    *
+    * v2 is the ratio-of-sums rework: compression and semantic-flow coherence became MassRatio with
+    * explicit conditioning mass, chronology and per-step backward mass became Option, and external
+    * mass split attributed from unranked. A v1 figure and a v2 figure of the same name are not
+    * comparable, and this marker is what says so.
+    */
+  val EstimandVersion: String = "recall-signature/v2"
+
   def compute(
       result: HsmmResult,
       recall: RecallGraph,
@@ -197,13 +279,17 @@ object RecallSignature:
     val loc = p.rows.flatMap(r => r.localizability(k).map(r.unit -> _)).toMap
     val specificity = if loc.isEmpty then None else Some(loc.values.toVector.sorted.sum / loc.size)
 
+    // Compression as a ratio of SUMS, per the ratified estimand: N is level mass summed over every
+    // unit, A is the source mass those levels were placed on, T is all row mass. Dividing per unit
+    // and averaging gave a unit carrying 0.01 of source mass the same vote as a fully placed one,
+    // and emitted 0.0 - maximally fine-grained - for a unit with no source mass at all.
     val maxLevel = math.max(1, view.maxLevel)
-    val levelMass = p.rows.map { r =>
-      val src = r.sourceMass
-      if src <= 0 then 0.0
-      else (0 to view.maxLevel).map(l => l * r.massAtLevel(view, l)).sum / src / maxLevel
-    }
-    val compression = if levelMass.isEmpty then 0.0 else levelMass.sum / levelMass.size
+    val compressionN = p.rows.map { r =>
+      (0 to view.maxLevel).map(l => l * r.massAtLevel(view, l)).sum / maxLevel
+    }.sum
+    val compressionA = p.rows.map(_.sourceMass).sum
+    val compressionT = p.rows.map(r => r.mass.values.sum).sum
+    val compression = MassRatio.unsafe(compressionN, compressionA, compressionT)
 
     def isBackward(pos: SourceNodeRef => Option[Double])(a: SourceNodeRef, b: SourceNodeRef) =
       a != b && !view.isAncestor(b, a) && ((pos(a), pos(b)) match
@@ -270,22 +356,25 @@ object RecallSignature:
     val causal =
       if recalledCausal.isEmpty then None else Some(preserved.toDouble / recalledCausal.size)
 
-    val coherence = f.steps.map { s =>
-      val total = s.sourceToSourceMass
-      if total <= 0 then 1.0
-      else
-        s.sourceMass((a, b) =>
-          a == b || view.hasEdge(RelationLayer.DiscourseSuccession, a, b) ||
-            view.hasEdge(RelationLayer.Causal, a, b) || view.hasEdge(RelationLayer.Causal, b, a) ||
-            view.isAncestor(a, b) || view.isAncestor(b, a) ||
-            view.weight(RelationLayer.Semantic, a, b) > 0 || view.weight(
-              RelationLayer.Semantic,
-              b,
-              a
-            ) > 0
-        ) / total
-    }
-    val semanticFlow = if coherence.isEmpty then 1.0 else coherence.sum / coherence.size
+    // Coherence as a ratio of SUMS: N is coherent source-to-source mass summed over steps, A is all
+    // source-to-source mass, T is every step's mass. A step with no source-to-source mass used to
+    // score 1.0 - PERFECT coherence for a step we could not evaluate - and an empty flow scored 1.0
+    // for a route with no steps at all.
+    def coherentMass(s: FlowStep): Double =
+      s.sourceMass((a, b) =>
+        a == b || view.hasEdge(RelationLayer.DiscourseSuccession, a, b) ||
+          view.hasEdge(RelationLayer.Causal, a, b) || view.hasEdge(RelationLayer.Causal, b, a) ||
+          view.isAncestor(a, b) || view.isAncestor(b, a) ||
+          view.weight(RelationLayer.Semantic, a, b) > 0 || view.weight(
+            RelationLayer.Semantic,
+            b,
+            a
+          ) > 0
+      )
+    val coherenceN = f.steps.map(coherentMass).sum
+    val coherenceA = f.steps.map(_.sourceToSourceMass).sum
+    val coherenceT = f.steps.map(_.mass.values.sum).sum
+    val semanticFlow = MassRatio.unsafe(coherenceN, coherenceA, coherenceT)
 
     val n = math.max(1, p.rows.size)
     def extMean(state: ExternalState): Double =
@@ -378,11 +467,11 @@ final class SignatureProjection private (
       "importanceWeightedCoverage" -> Some(s.importanceWeightedCoverage),
       "fidelity" -> s.fidelity,
       "specificity" -> s.specificity,
-      "compression" -> Some(s.compression),
+      "compression" -> s.compression.value,
       "discourseChronology" -> s.discourseChronology,
       "worldChronology" -> s.worldChronology,
       "causalPreservation" -> s.causalPreservation,
-      "semanticFlowCoherence" -> Some(s.semanticFlowCoherence),
+      "semanticFlowCoherence" -> s.semanticFlowCoherence.value,
       "associationMass" -> Some(s.associationMass),
       "intrusionMass" -> Some(s.intrusionMass),
       "commentaryMass" -> Some(s.commentaryMass),

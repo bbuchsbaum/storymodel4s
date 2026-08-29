@@ -40,14 +40,14 @@ final case class ClockPanel(
     caseId: String,
     discourseChronology: Option[Double],
     worldChronology: Option[Double],
-    compression: Double,
+    compression: Option[Double],
     backwardMass: Option[Double],
     worldBackwardMass: Option[Double]
 ):
   def render: String =
     def num(v: Option[Double]) = v.map(x => f"$x%.3f").getOrElse("n/a")
     s"$caseId: discourse=${num(discourseChronology)} world=${num(worldChronology)} " +
-      f"compression=$compression%.3f backward=${num(backwardMass)} " +
+      s"compression=${num(compression)} backward=${num(backwardMass)} " +
       s"worldBackward=${num(worldBackwardMass)}"
 
 /** One channel run over one case: the proof, its fingerprints, and the observations. */
@@ -214,7 +214,7 @@ object Bench:
             c.id,
             sig.discourseChronology,
             sig.worldChronology,
-            sig.compression,
+            sig.compression.value,
             sig.backwardMass.map(_.perStep),
             sig.worldBackwardMass.map(_.perStep)
           )
