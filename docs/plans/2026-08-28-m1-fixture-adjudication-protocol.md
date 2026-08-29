@@ -1,4 +1,4 @@
-# M1 W4(9) — Frozen-fixture adjudication protocol (rev 1, decided)
+# M1 W4(9) — Frozen-fixture adjudication protocol (rev 2, decided)
 
 **Bead:** bd-01M14YJ8FG15S0R1ART7DTM1XZ (claude-storymodel4s-m1). **Status:** rev 0 was
 a design checkpoint; the seven open decisions were taken by the chief architect on
@@ -72,6 +72,49 @@ actor) is an annotator, adjudicator, or transcriber for a selection set. The age
 is **auditor only**: checking I1–I3 and the leakage checklist (§5) and writing the freeze
 receipt's `audit.json` (§6). Agents may annotate material under the `diagnostic/` root
 (§5), which is never selection evidence.
+
+**Law I5 (corpus independence — no memorized sources).** *A story whose text or whose
+published summaries plausibly sit in a tested channel's training data cannot back a
+calibrated claim.* A frozen set exists to select defaults (ADR 0001 §D7); every tested
+LLM channel has plausibly memorized canonical stories and their study-guide summaries,
+while the free baselines and the structural channel have memorized nothing. Scoring both
+on a famous text is therefore not a comparison of alignment quality, and a default chosen
+that way is an artifact of exposure. *The War of the Ghosts* was obscure, and that
+obscurity was load-bearing.
+
+Consequences, binding on every set:
+
+1. Each story carries a measured `contaminationRisk` of `low | medium | high`, scored by
+   the reproducible procedure the corpus manifest defines (a frozen site list, counted
+   summary surfaces, recorded with count and date) — never by anyone's impression of how
+   famous a story is.
+2. In the **untouched-test** partition, which is the partition that selects a default,
+   `high` is disqualifying and `medium` requires a written justification in the freeze
+   receipt. Other partitions may hold `medium`; `high` anywhere must be named in the
+   report.
+3. A report from a set containing any `high` story may not be labelled **calibrated**
+   (§7).
+4. **The leakage control is the real defence, and it is mandatory before any default is
+   selected**: within a channel, compare its scores on `low`-risk against `high`-risk
+   stories *relative to the free baselines on the same stories*. A channel that gains
+   where the baselines do not is exhibiting prior knowledge, not alignment skill. The
+   score in (1) is triage — it proxies how much summary text exists on the open web, not
+   what any provider actually trained on — and only this control measures the effect.
+5. Published summaries, study guides, and student précis are **never** recall data. They
+   are edited study artifacts, not free recall from a person who read the story under
+   known conditions.
+
+**Law I6 (the set must be able to falsify the model).** A selection set contains at
+least one story with genuine discourse-level **anachrony** — story-world order
+materially different from telling order (flashback, frame narration, reconstruction of a
+past event). This library models partial, unbalanced, hierarchical alignment including
+omission, merge, split, **reorder**, revisit, and external destinations. On an all-linear
+corpus every recall route looks the same, so the reorder half of the model is not merely
+uncertain, it is **unfalsifiable** — and an unfalsifiable number must not be published as
+calibrated. The anachrony story is subject to I5 like any other, and its selection
+records why its structural confounds (heavy dialect, archaic orthography, extreme length)
+were judged acceptable, since a confound that makes a segmentation failure
+indistinguishable from a reorder failure defeats the purpose of the slot.
 
 ## 2. Annotation layers (in order; each has an agreement measure and a stop rule)
 
