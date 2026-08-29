@@ -426,11 +426,11 @@ class ValidatorSuite extends ScalaCheckSuite:
     val b = Small.build(1, 1)
     val space = FeatureSpaceId.unsafe("fs:sem")
     val refs = Vector(
-      FeatureRef(FeatureTarget.Situation(b.situations(0)), space, 0),
-      FeatureRef(
+      FeatureRef.unsafe(FeatureTarget.Situation(b.situations(0)), space, 0),
+      FeatureRef.unsafe(
         FeatureTarget.Situation(SituationId.unsafe("sit:none")),
         FeatureSpaceId.unsafe("fs:none"),
-        -1
+        0
       )
     )
     val spaces: Map[FeatureSpaceId, FeatureSpace[?]] = Map(
@@ -446,7 +446,7 @@ class ValidatorSuite extends ScalaCheckSuite:
     val ls = laws(b.draft(featureSpaces = spaces, featureRefs = refs))
     assertEquals(
       ls,
-      Set("feature.space-exists", "feature.target-exists", "feature.row-nonnegative")
+      Set("feature.space-exists", "feature.target-exists")
     )
   }
 

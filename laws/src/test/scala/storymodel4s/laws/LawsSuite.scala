@@ -175,11 +175,9 @@ class LawsSuite extends DisciplineSuite:
       "temporal.containment-acyclic",
       "temporal.equal-consistent",
       "feature.space-exists",
-      "feature.row-nonnegative",
       "feature.row-in-range",
       "feature.target-exists",
       "feature.sidecar-space",
-      "feature.sidecar-valid",
       "sensory.target-exists",
       "causal.cross-context-explicit"
     )

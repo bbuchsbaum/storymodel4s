@@ -11,7 +11,7 @@ class StructureSuite extends ScalaCheckSuite:
 
   private def sp(s: String) = FeatureSpaceId.unsafe(s)
   private def deriv(inputs: FeatureSpaceId*): FeatureDerivation =
-    FeatureDerivation(
+    FeatureDerivation.unsafe(
       NonEmptyVector.fromVectorUnsafe(inputs.toVector),
       Some(WindowPlan.words(20, 5)),
       ScalarReducer.Mean.id,
@@ -21,19 +21,50 @@ class StructureSuite extends ScalaCheckSuite:
       "test-1"
     )
 
+  private def rewrite(d: FeatureDerivation)(
+      inputs: NonEmptyVector[FeatureSpaceId] = d.inputs,
+      window: Option[WindowPlan] = d.window,
+      reducer: ReducerId = d.reducer,
+      weighting: WeightingPolicy = d.weighting,
+      missing: MissingValuePolicy = d.missing,
+      normalization: Option[NormalizationPolicy] = d.normalization,
+      implementationVersion: String = d.implementationVersion,
+      eligibility: Eligibility = d.eligibility,
+      targetFamily: Option[TargetFamily] = d.targetFamily,
+      narrativeWindow: Option[NarrativeWindowPlan] = d.narrativeWindow
+  ): FeatureDerivation =
+    FeatureDerivation.unsafe(
+      inputs,
+      window,
+      reducer,
+      weighting,
+      missing,
+      normalization,
+      implementationVersion,
+      eligibility,
+      targetFamily,
+      narrativeWindow
+    )
+
   test("derivation ids are content-addressed and sensitive to every field") {
     val d = deriv(sp("a"))
     assertEquals(d.derivationId, deriv(sp("a")).derivationId)
-    assertNotEquals(d.derivationId, d.copy(reducer = ScalarReducer.Sum.id).derivationId)
-    assertNotEquals(d.derivationId, d.copy(window = Some(WindowPlan.words(20, 10))).derivationId)
-    assertNotEquals(d.derivationId, d.copy(missing = MissingValuePolicy.Fail).derivationId)
+    assertNotEquals(d.derivationId, rewrite(d)(reducer = ScalarReducer.Sum.id).derivationId)
     assertNotEquals(
       d.derivationId,
-      d.copy(normalization = Some(NormalizationPolicy.ZScore("pop"))).derivationId
+      rewrite(d)(window = Some(WindowPlan.words(20, 10))).derivationId
     )
-    assertNotEquals(d.derivationId, d.copy(implementationVersion = "test-2").derivationId)
-    assertNotEquals(d.derivationId, d.copy(eligibility = Eligibility.AllTokens).derivationId)
-    assertNotEquals(d.derivationId, d.copy(targetFamily = Some(TargetFamily.Window)).derivationId)
+    assertNotEquals(d.derivationId, rewrite(d)(missing = MissingValuePolicy.Fail).derivationId)
+    assertNotEquals(
+      d.derivationId,
+      rewrite(d)(normalization = Some(NormalizationPolicy.ZScore("pop"))).derivationId
+    )
+    assertNotEquals(d.derivationId, rewrite(d)(implementationVersion = "test-2").derivationId)
+    assertNotEquals(d.derivationId, rewrite(d)(eligibility = Eligibility.AllTokens).derivationId)
+    assertNotEquals(
+      d.derivationId,
+      rewrite(d)(targetFamily = Some(TargetFamily.Window)).derivationId
+    )
     assert(d.outputSpaceId.value.startsWith("derived:"))
     assertEquals(d.outputSpaceId.value.length, "derived:".length + 32)
   }
@@ -64,7 +95,7 @@ class StructureSuite extends ScalaCheckSuite:
   }
 
   test("one recipe on different bases has distinct graph-addressable output spaces") {
-    val d = deriv(sp("raw")).copy(window = None, targetFamily = Some(TargetFamily.Situation))
+    val d = rewrite(deriv(sp("raw")))(window = None, targetFamily = Some(TargetFamily.Situation))
     val alpha = FeatureTarget.Situation(SituationId.unsafe("alpha"))
     val beta = FeatureTarget.Situation(SituationId.unsafe("beta"))
     val first = BasisId.of(TargetFamily.Situation, Vector(alpha, beta)).toOption.get
@@ -85,7 +116,7 @@ class StructureSuite extends ScalaCheckSuite:
 
   test("derivation ids are identical on every platform (golden)") {
     // Doubles are rendered by IEEE-754 bit pattern, not Double.toString, so JVM and JS agree.
-    val d = FeatureDerivation(
+    val d = FeatureDerivation.unsafe(
       NonEmptyVector.one(sp("imageability.demo")),
       Some(WindowPlan.words(20, 5)),
       ScalarReducer.Kernel(KernelShape.Gaussian(1.0)).id,
@@ -113,7 +144,7 @@ class StructureSuite extends ScalaCheckSuite:
       .get
     assertEquals(d.outputSpaceId(basis).value, "derived:0ea2b30cedbf3768302fd1023d4ef871")
     // an outputSpaceId chain does not grow: deriving from a derived space keeps a fixed length
-    val second = d.copy(inputs = NonEmptyVector.one(d.outputSpaceId))
+    val second = rewrite(d)(inputs = NonEmptyVector.one(d.outputSpaceId))
     assertEquals(second.outputSpaceId.value.length, d.outputSpaceId.value.length)
   }
 
@@ -258,16 +289,28 @@ class StructureSuite extends ScalaCheckSuite:
   }
 
   test("sidecar manifests and refs are validated") {
-    val m = SidecarManifest(sp("semantic.surface"), 384, 10, Dtype.Float32, Checksum.ofText("x"))
+    val m =
+      SidecarManifest.unsafe(sp("semantic.surface"), 384, 10, Dtype.Float32, Checksum.ofText("x"))
     assert(SidecarManifest.validated(m).isRight)
     assertEquals(m.expectedByteLength, Right(384L * 10 * 4))
-    assert(SidecarManifest.validated(m.copy(dimension = 0)).isLeft)
-    val ok = FeatureRef(FeatureTarget.Sentence(atlas.sentences(0).id), m.space, 9)
+    assert(
+      SidecarManifest.of(sp("semantic.surface"), 0, 10, Dtype.Float32, Checksum.ofText("x")).isLeft
+    )
+    val ok = FeatureRef.unsafe(FeatureTarget.Sentence(atlas.sentences(0).id), m.space, 9)
     assert(FeatureRef.validated(ok, m).isRight)
-    assert(FeatureRef.validated(ok.copy(row = 10), m).isLeft)
-    assert(FeatureRef.validated(ok.copy(space = sp("other")), m).isLeft)
-    assert(FeatureRef.validatedAll(Vector(ok, ok.copy(row = 0)), Map(m.space -> m)).isRight)
-    assert(FeatureRef.validatedAll(Vector(ok.copy(space = sp("other"))), Map(m.space -> m)).isLeft)
+    assert(FeatureRef.validated(FeatureRef.unsafe(ok.target, ok.space, 10), m).isLeft)
+    assert(FeatureRef.validated(FeatureRef.unsafe(ok.target, sp("other"), ok.row), m).isLeft)
+    assert(FeatureRef.of(ok.target, ok.space, -1).isLeft)
+    assert(
+      FeatureRef
+        .validatedAll(Vector(ok, FeatureRef.unsafe(ok.target, ok.space, 0)), Map(m.space -> m))
+        .isRight
+    )
+    assert(
+      FeatureRef
+        .validatedAll(Vector(FeatureRef.unsafe(ok.target, sp("other"), ok.row)), Map(m.space -> m))
+        .isLeft
+    )
   }
 
   test("blocked sidecar granularity is explicitly positive and part of the typed layout") {
@@ -275,7 +318,7 @@ class StructureSuite extends ScalaCheckSuite:
     assert(SidecarBlockRows.from(-1).isLeft)
     val rows = SidecarBlockRows.from(64).toOption.get
     val indexChecksum = Checksum.ofText("trusted sidecar prelude")
-    val manifest = SidecarManifest(
+    val manifest = SidecarManifest.unsafe(
       sp("semantic.blocked"),
       3,
       129,
@@ -293,21 +336,26 @@ class StructureSuite extends ScalaCheckSuite:
     val dimension = Int.MaxValue
     val bytesPerValue = 8L
     val lastSafeRowCount = (Long.MaxValue / bytesPerValue / dimension).toInt
-    val lastSafe = SidecarManifest(
+    val lastSafe = SidecarManifest.unsafe(
       sp("semantic.overflow-boundary"),
       dimension,
       lastSafeRowCount,
       Dtype.Float64,
       Checksum.ofText("boundary")
     )
-    val firstOverflow = lastSafe.copy(rowCount = lastSafeRowCount + 1)
+    val firstOverflow = SidecarManifest.of(
+      sp("semantic.overflow-boundary"),
+      dimension,
+      lastSafeRowCount + 1,
+      Dtype.Float64,
+      Checksum.ofText("boundary")
+    )
 
     assertEquals(
       lastSafe.expectedByteLength,
       Right(dimension.toLong * lastSafeRowCount.toLong * bytesPerValue)
     )
-    assert(firstOverflow.expectedByteLength.isLeft)
-    assert(SidecarManifest.validated(firstOverflow).isLeft)
+    assert(firstOverflow.isLeft)
   }
 
   test("coverage arithmetic and estimate mapping") {
@@ -400,7 +448,7 @@ class StructureSuite extends ScalaCheckSuite:
   }
 
   test("a surface recipe's canonical string is pinned; a narrative window is a separate slot") {
-    val d = FeatureDerivation(
+    val d = FeatureDerivation.unsafe(
       NonEmptyVector.one(sp("imageability.demo")),
       Some(WindowPlan.words(20, 5)),
       ScalarReducer.Kernel(KernelShape.Gaussian(1.0)).id,
@@ -419,22 +467,37 @@ class StructureSuite extends ScalaCheckSuite:
         "normalization=zscore(pop);eligibility=lexical;targets=none;impl=golden-1"
     )
     assertEquals(d.derivationId.hex, GoldenDerivationId)
-    assertEquals(d.copy(narrativeWindow = None).derivationId.hex, GoldenDerivationId)
+    assertEquals(rewrite(d)(narrativeWindow = None).derivationId.hex, GoldenDerivationId)
     assert(d.hasSingleWindow)
     val plan = NarrativeWindowPlan.of(2).toOption.get
-    val n = d.copy(
+    val n = rewrite(d)(
       window = None,
       narrativeWindow = Some(plan),
       targetFamily = Some(TargetFamily.Situation)
     )
     assert(n.hasSingleWindow)
-    assert(!d.copy(narrativeWindow = Some(plan)).hasSingleWindow)
+    assert(
+      FeatureDerivation
+        .of(
+          d.inputs,
+          d.window,
+          d.reducer,
+          d.weighting,
+          d.missing,
+          d.normalization,
+          d.implementationVersion,
+          d.eligibility,
+          d.targetFamily,
+          Some(plan)
+        )
+        .isLeft
+    )
     assertNotEquals(n.derivationId, d.derivationId)
     assert(n.canonicalString.contains(";window=none;narrativeWindow=narrative(halfWidth=2);"))
     assert(n.canonicalString.endsWith(";targets=situation;impl=golden-1"))
     assertNotEquals(
       n.derivationId,
-      n.copy(narrativeWindow = Some(NarrativeWindowPlan.perUnit)).derivationId
+      rewrite(n)(narrativeWindow = Some(NarrativeWindowPlan.perUnit)).derivationId
     )
     assertEquals(NarrativeWindowPlan.perUnit.halfWidth, 0)
     assert(NarrativeWindowPlan.of(-1).isLeft)
@@ -464,9 +527,6 @@ class StructureSuite extends ScalaCheckSuite:
       narrativeWindow = Some(plan)
     )
     assert(both.isLeft)
-    val raw = deriv(sp("raw")).copy(narrativeWindow = Some(plan))
-    assert(FeatureDerivation.validated(raw).isLeft)
-    assert(DerivationGraph.empty.add(sp("out"), raw).isLeft)
     assert(DerivationGraph.empty.add(sp("out"), deriv(sp("raw"))).isRight)
   }
 

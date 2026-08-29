@@ -61,7 +61,7 @@ class FeaturesCodecSuite extends ScalaCheckSuite:
     norm <- Gen.option(Gen.oneOf(NormalizationPolicy.UnitLength, NormalizationPolicy.ZScore("pop")))
     el <- Gen.oneOf(Eligibility.values.toSeq)
     tf <- Gen.option(Gen.oneOf(TargetFamily.values.toSeq))
-  yield FeatureDerivation(
+  yield FeatureDerivation.unsafe(
     NonEmptyVector.one(in),
     w,
     red.id,
@@ -140,7 +140,7 @@ class FeaturesCodecSuite extends ScalaCheckSuite:
   }
 
   test("FeatureTrack decoding rejects a basis that does not match its output space") {
-    val derivation = FeatureDerivation(
+    val derivation = FeatureDerivation.unsafe(
       NonEmptyVector.one(FeatureSpaceId.unsafe("raw.demo")),
       None,
       ScalarReducer.Mean.id,
@@ -202,7 +202,7 @@ class FeaturesCodecSuite extends ScalaCheckSuite:
   }
 
   test("a recipe without a narrative window has no such key; an absent key decodes to None") {
-    val d = FeatureDerivation(
+    val d = FeatureDerivation.unsafe(
       NonEmptyVector.one(FeatureSpaceId.unsafe("imageability.demo")),
       Some(WindowPlan.words(20, 5)),
       ScalarReducer.Mean.id,
@@ -214,24 +214,41 @@ class FeaturesCodecSuite extends ScalaCheckSuite:
     val text = Canonical.encode(d)
     assert(!text.contains("narrativeWindow"))
     assertEquals(Canonical.decode[FeatureDerivation](text).map(_.narrativeWindow), Right(None))
-    val withPlan = d.copy(window = None, narrativeWindow = NarrativeWindowPlan.of(2).toOption)
+    val withPlan = FeatureDerivation.unsafe(
+      d.inputs,
+      None,
+      d.reducer,
+      d.weighting,
+      d.missing,
+      d.normalization,
+      d.implementationVersion,
+      d.eligibility,
+      d.targetFamily,
+      NarrativeWindowPlan.of(2).toOption
+    )
     val planText = Canonical.encode(withPlan)
     assert(planText.contains(""""narrativeWindow":{"halfWidth":2}"""))
     assertEquals(Canonical.decode[FeatureDerivation](planText), Right(withPlan))
   }
 
   test("a document carrying both a surface and a narrative window is a typed decode error") {
-    val both = FeatureDerivation(
+    val valid = FeatureDerivation.unsafe(
       NonEmptyVector.one(FeatureSpaceId.unsafe("imageability.demo")),
       Some(WindowPlan.words(20, 5)),
       ScalarReducer.Mean.id,
       ScalarReducer.Mean.weighting,
       MissingValuePolicy.IgnoreMissing,
       None,
-      "codec-test",
-      narrativeWindow = NarrativeWindowPlan.of(1).toOption
+      "codec-test"
     )
-    Canonical.decode[FeatureDerivation](Canonical.encode(both)) match
+    val both = io.circe.parser
+      .parse(Canonical.encode(valid))
+      .toOption
+      .get
+      .mapObject(
+        _.add("narrativeWindow", io.circe.Json.obj("halfWidth" -> io.circe.Json.fromInt(1)))
+      )
+    Canonical.decodeJson[FeatureDerivation](both) match
       case Left(e)  => assert(e.toString.contains("narrative window"), e.toString)
       case Right(d) => fail(s"decoded an invalid recipe: $d")
   }

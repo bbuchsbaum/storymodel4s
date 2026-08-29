@@ -440,15 +440,17 @@ object SidecarCodec:
       bytes <- allocate(payloadLength)
       _ = writeHeader(bytes, payloadLength)
       _ = writeRows(bytes, rows, dtype)
-      manifest = SidecarManifest(
-        space,
-        dimension,
-        rows.size,
-        dtype,
-        Checksum.ofBytes(bytes),
-        Layout.RowMajor
-      )
-      checked <- SidecarManifest.validated(manifest).left.map(CodecError.Domain.apply)
+      checked <- SidecarManifest
+        .of(
+          space,
+          dimension,
+          rows.size,
+          dtype,
+          Checksum.ofBytes(bytes),
+          Layout.RowMajor
+        )
+        .left
+        .map(CodecError.Domain.apply)
     yield checked -> bytes
 
   /** Encode one range-loadable monolith whose complete compact rows form independent blocks.
@@ -482,15 +484,17 @@ object SidecarCodec:
         writeChecksum(bytes, BlockedHeaderBytes + block * BlockDigestBytes, digest)
       }
       indexChecksum = Checksum.ofBytes(bytes.slice(0, checkedLayout.payloadOffset.toInt))
-      manifest = SidecarManifest(
-        space,
-        dimension,
-        rows.size,
-        dtype,
-        Checksum.ofBytes(bytes),
-        Layout.BlockedRowMajor(rowsPerBlock, indexChecksum)
-      )
-      checked <- SidecarManifest.validated(manifest).left.map(CodecError.Domain.apply)
+      checked <- SidecarManifest
+        .of(
+          space,
+          dimension,
+          rows.size,
+          dtype,
+          Checksum.ofBytes(bytes),
+          Layout.BlockedRowMajor(rowsPerBlock, indexChecksum)
+        )
+        .left
+        .map(CodecError.Domain.apply)
     yield checked -> bytes
 
   /** Check a manifest's exact offsets and sizes without reading a sidecar file. */
@@ -781,7 +785,7 @@ object SidecarCodec:
     observations.map { observation =>
       val estimate: Estimate[FeatureRef] = observation.estimate match
         case Estimate.Observed(_, credence) =>
-          val ref = FeatureRef(observation.target, space, row)
+          val ref = FeatureRef.unsafe(observation.target, space, row)
           row += 1
           Estimate.Observed(ref, credence)
         case Estimate.Missing(reason) => Estimate.Missing(reason)

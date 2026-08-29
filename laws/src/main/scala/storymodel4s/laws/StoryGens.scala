@@ -423,8 +423,9 @@ object StorySmall:
             fp,
             true
           )
-        val manifest = SidecarManifest(spaceId, 4, n, Dtype.Float32, Checksum.ofText("rows"))
-        val rs = sits.zipWithIndex.map((s, i) => FeatureRef(FeatureTarget.Situation(s), spaceId, i))
+        val manifest = SidecarManifest.unsafe(spaceId, 4, n, Dtype.Float32, Checksum.ofText("rows"))
+        val rs =
+          sits.zipWithIndex.map((s, i) => FeatureRef.unsafe(FeatureTarget.Situation(s), spaceId, i))
         (Map(spaceId -> space), Map(spaceId -> manifest), rs)
       else (Map.empty, Map.empty, Vector.empty)
     val graph = NarrativeGraph(

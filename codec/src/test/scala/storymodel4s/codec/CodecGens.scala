@@ -512,12 +512,12 @@ object CodecFixture:
     )
   )
   val sidecars: Map[FeatureSpaceId, SidecarManifest] = Map(
-    vectorSpace -> SidecarManifest(vectorSpace, 3, 3, Dtype.Float32, Checksum.ofText("emb"))
+    vectorSpace -> SidecarManifest.unsafe(vectorSpace, 3, 3, Dtype.Float32, Checksum.ofText("emb"))
   )
   val featureRefs: Vector[FeatureRef] = Vector(
-    FeatureRef(FeatureTarget.Situation(s0), vectorSpace, 0),
-    FeatureRef(FeatureTarget.Situation(s1), vectorSpace, 1),
-    FeatureRef(FeatureTarget.Situation(s2), vectorSpace, 2)
+    FeatureRef.unsafe(FeatureTarget.Situation(s0), vectorSpace, 0),
+    FeatureRef.unsafe(FeatureTarget.Situation(s1), vectorSpace, 1),
+    FeatureRef.unsafe(FeatureTarget.Situation(s2), vectorSpace, 2)
   )
 
   val draft: StoryModel[ModelStatus.Draft] =

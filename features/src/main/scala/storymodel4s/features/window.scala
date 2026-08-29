@@ -182,7 +182,7 @@ object Windowed:
       missing: MissingValuePolicy,
       eligibility: Eligibility = Eligibility.LexicalTokens
   ): Either[DomainError, FeatureTrack[FeatureTarget.Window, Double]] =
-    val derivation = FeatureDerivation(
+    val derivation = FeatureDerivation.unsafe(
       NonEmptyVector.one(track.space.id),
       Some(plan),
       reducer.id,
@@ -252,7 +252,7 @@ object Windowed:
       eligibility: Eligibility = Eligibility.LexicalTokens
   ): Either[DomainError, FeatureTrack[T, Double]] =
     val basisId = basis.basisId
-    val derivation = FeatureDerivation(
+    val derivation = FeatureDerivation.unsafe(
       NonEmptyVector.one(track.space.id),
       None,
       reducer.id,
@@ -469,7 +469,7 @@ object Aggregate:
       eligibility: Eligibility
   ): Either[DomainError, FeatureTrack[T, Double]] =
     val lexicalOnly = eligibility == Eligibility.LexicalTokens
-    val derivation = FeatureDerivation(
+    val derivation = FeatureDerivation.unsafe(
       NonEmptyVector.one(track.space.id),
       None,
       reducer.id,
