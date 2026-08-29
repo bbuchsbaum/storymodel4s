@@ -248,6 +248,18 @@ was set by the owner on 2026-08-28 (sticky decision
    for is a defect you have declined to sweep; the chief did exactly that here,
    and 45 forgeable types stayed open until someone walked into one by hand.
 
+   *An inequality is not a discriminating assertion.* `!=`, `<=`, and bounds
+   generally can be satisfied by **both** the correct implementation and the
+   mutant, so a suite built on them records kills it never made. The fix is to
+   **recompute the expected value independently** — a different expression over
+   the same inputs — and assert equality against it. Observed on mass-weighted
+   fidelity: `conditioningMass != unitCount` and `conditioningMass <= sourceMass`
+   both passed under the mutation, because the surviving-unit count was 2.0 and
+   the source mass 2.63, an inequality that happens to hold. The assertion that
+   kills it recomputes the denominator as the mass of every anchored state whose
+   assessment specified at least one facet. Its author reports this as the sixth
+   such survival in one session.
+
    *A fixture must be able to tell the hypotheses apart.* When you replace one
    formula with another, the fixture has to be one on which the two **disagree**
    — otherwise the mutation survives, the suite is green, and the evidence post
