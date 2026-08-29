@@ -25,7 +25,7 @@ does, substitute a constant.
 **Re-audited 2026-08-29 09:35Z after the night's landings.** Six fields now carry support, up
 from none.
 
-| Field | Type on `main` | State |
+| Field | Type on `main` (derived 2026-08-29T16:05Z, commit e7b6498) | State |
 |---|---|---|
 | `fidelityMass` | `MassRatio` | **migrated** — value `N/A`, support `A/T` |
 | `fidelityByFacet` | `Map[Facet, MassRatio]` | **migrated** — per facet, `A_f` is *specified*-verdict mass |
@@ -33,21 +33,44 @@ from none.
 | `semanticFlowCoherence` | `MassRatio` | **migrated** — ratio-of-sums |
 | `backwardMass` | `Option[StepMass]` | **migrated** — carries comparable/total steps |
 | `worldBackwardMass` | `Option[StepMass]` | **migrated** |
-| `discourseChronology` | `Option[Double]` | improved (was bare `Double`), not migrated |
-| `specificity` | `Option[Double]` | not migrated |
-| `worldChronology` | `Option[Double]` | not migrated |
-| `causalPreservation` | `Option[Double]` | not migrated |
-| `uniformCoverage` | `Double` | not migrated |
-| `importanceWeightedCoverage` | `Double` | not migrated — and see `bd-01M16C9HT9V9Q80F7411V87BBY` |
-| `associationMass` | `Double` | not migrated |
-| `intrusionMass` | `Double` | not migrated |
-| `commentaryMass` | `Double` | not migrated |
-| `sourceConsistentInferenceMass` | `Double` | not migrated |
-| `uninterpretableMass` | `Double` | not migrated |
-| `unrankedMass` | `Double` | not migrated |
-| `distortedMass` | `Double` | not migrated |
-| `distortedMassByFacet` | `Map[Facet, Double]` | not migrated |
-| `perUnitLocalizability` | `Map[RecallUnitId, Double]` | not migrated |
+| `specificityMass` | `MassRatio` | **migrated** — *renamed from `specificity`*; published figure moved 0.6103 → 0.6583 |
+| `discourseChronology` | `MassRatio` | **migrated** — was `Option[Double]` |
+| `worldChronology` | `MassRatio` | **migrated** |
+| `causalPreservation` | `MassRatio` | **migrated** |
+| `importanceWeightedCoverage` | `ScoreEstimate` | **partial** — can express absence, but carries no coverage. Needs `WeightedCoverage` (see below) |
+| `uniformCoverage` | `Double` | not migrated — absence-only defect (zero leaves) |
+| `associationMass` | `Double` | not migrated — external term |
+| `intrusionMass` | `Double` | not migrated — external term |
+| `commentaryMass` | `Double` | not migrated — external term |
+| `sourceConsistentInferenceMass` | `Double` | not migrated — external term |
+| `uninterpretableMass` | `Double` | not migrated — external term |
+| `unrankedMass` | `Double` | not migrated — external term |
+| `distortedMass` | `Double` | not migrated — same shape as the external terms |
+| `distortedMassByFacet` | `Map[Facet, Double]` | not migrated — **empty map conflates no-rows with true zero** |
+| `perUnitLocalizability` | `Map[RecallUnitId, Double]` | not migrated — needs per-unit typed absence |
+
+**Ten migrated, one partial, eleven outstanding.** This table was materially stale before
+2026-08-29T16:05Z — it listed `specificity`, `discourseChronology`, `worldChronology` and
+`causalPreservation` as unmigrated after all four had landed, and `importanceWeightedCoverage` as a
+bare `Double` after it became a `ScoreEstimate`. It has been **re-derived from source**, not
+patched, because a status document corrected from memory is how it went stale in the first place.
+
+**The outstanding eleven are FIVE DIFFERENT SHAPES, not one** (classified by
+`codex-storymodel4s-scout`):
+
+1. `uniformCoverage` — unconditional leaf proportion; only a zero-leaf absence defect.
+2. `importanceWeightedCoverage` — weight-sum value conditioning **and** separate leaf-availability
+   coverage. Ruled: needs both carriers; `MassRatio` cannot hold them (three masses, and coverage
+   is a count pair). New `WeightedCoverage(estimate, conditioningWeight, coverage)` approved.
+3. The six external terms plus `distortedMass` — unconditional mean-per-unit row masses. **Rows may
+   be subnormalized, so swapping a count for a summed mass CHANGES the estimand.** Applying
+   `specificityMass`'s ratio-of-sums fix here mechanically would be wrong, and wrong in a way that
+   produces a plausible number.
+4. `distortedMassByFacet` — an empty map conflates *no rows* with *true zero*.
+5. `perUnitLocalizability` — needs per-unit typed absence.
+
+**Do not size this backlog as one migration.** It was offered that way once and the offer was
+withdrawn.
 
 `externalMass` remains a derived method returning `ExternalMassReport`, holding our own failure
 (`unrankedMass`) apart from claims about the participant, with no accessor returning their sum.
