@@ -188,7 +188,7 @@ class SignatureSuite extends FunSuite:
       .fold(e => fail(e.message), identity)
     // Pin the exact scalar: asserting only isRight lets any arithmetic mutation through.
     val expected = sig.uniformCoverage - sig.intrusionMass
-    assertEqualsDouble(p(sig).fold(e => fail(e.message), identity), expected, 1e-12)
+    assertEqualsDouble(p(sig).fold(e => fail(e.message), _.value), expected, 1e-12)
   }
 
   test("a recall with no comparable transition has NO chronology, not a perfect one") {
@@ -483,4 +483,48 @@ class SignatureSuite extends FunSuite:
         s"$facet: ${ratio.render}"
       )
       assert(ratio.value.forall(v => v >= 0.0 && v <= 1.0), s"$facet: ${ratio.render}")
+  }
+
+  test("a projection publishes the WEAKEST support among its components, and names it") {
+    // A chain is no better supported than its thinnest link. compression rests on every unit's
+    // source mass; coherence on source-to-source step mass. Whichever is thinner sets the figure,
+    // and the reader is told which one so the number is actionable rather than merely qualified.
+    val p = SignatureProjection
+      .of("v0", Map("compression" -> 1.0, "semanticFlowCoherence" -> 1.0))
+      .fold(e => fail(e.message), identity)
+    val r = p(sig).fold(e => fail(e.message), identity)
+    val expected = math.min(sig.compression.support, sig.semanticFlowCoherence.support)
+    assertEqualsDouble(r.weakestSupport.getOrElse(fail(r.render)), expected, 1e-12)
+    assert(
+      r.weakestComponent.exists(Set("compression", "semanticFlowCoherence").contains),
+      r.render
+    )
+    assertEquals(r.unsupportedComponents, Vector.empty, r.render)
+  }
+
+  test("weighted components with no support notion are named, not silently ignored") {
+    // uniformCoverage is a bare Double from the ADR 0003 backlog. A minimum taken over only the
+    // supported components would OVERSTATE what is known unless the others are visible.
+    val p = SignatureProjection
+      .of("v0", Map("uniformCoverage" -> 1.0, "compression" -> 1.0))
+      .fold(e => fail(e.message), identity)
+    val r = p(sig).fold(e => fail(e.message), identity)
+    assertEquals(r.unsupportedComponents, Vector("uniformCoverage"), r.render)
+    assertEqualsDouble(r.weakestSupport.getOrElse(fail(r.render)), sig.compression.support, 1e-12)
+    assert(r.render.contains("carry no support"), r.render)
+  }
+
+  test("a weighted component with NO VALUE still refuses; low support is not the same failure") {
+    // The distinction the bead's option (a) would have erased: dropping a Missing component
+    // computes a different linear functional under the same name and weights.
+    val name =
+      if sig.worldChronology.isEmpty then "worldChronology"
+      else if sig.causalPreservation.isEmpty then "causalPreservation"
+      else fail("this fixture measures every component; the test needs one that is Missing")
+    val p = SignatureProjection
+      .of("v0", Map(name -> 1.0, "compression" -> 1.0))
+      .fold(e => fail(e.message), identity)
+    p(sig) match
+      case Left(ProjectionError.MissingComponent(n)) => assertEquals(n, name)
+      case other => fail(s"a Missing component was dropped rather than refused: $other")
   }

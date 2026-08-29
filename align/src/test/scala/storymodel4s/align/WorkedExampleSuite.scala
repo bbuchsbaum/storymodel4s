@@ -256,7 +256,7 @@ class WorkedExampleSuite extends FunSuite:
     val scalar = SignatureProjection
       .of("v0", Map("uniformCoverage" -> 1.0, "intrusionMass" -> -1.0))
       .fold(e => fail(e.message), identity)(sig)
-    assert(scalar.exists(_ > 0.0), scalar.toString)
+    assert(scalar.exists(_.value > 0.0), scalar.toString)
   }
 
   test("causal preservation needs two distinct recalled units linked by a recall causal edge") {
