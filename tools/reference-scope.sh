@@ -45,8 +45,19 @@
 # Do not add a filter to suppress these -- a heuristic narrow enough to drop a
 # same-named test class is narrow enough to drop a real shared helper, and this
 # tool exists because the scope was too narrow, not because it was too wide.
+# PASS THE MERGE BASE, NOT `main`, when main has advanced past the candidate's
+# parent. `git diff main..CAND` reports files that MAIN added and the candidate
+# lacks as if the candidate had changed them -- so a freshly merged sibling's files
+# show up REVERSED, in the candidate's type list, and widen the scope with types it
+# never touched. Measured on 2026-08-29: gating D1 off `main` after D2 had landed
+# named all 16 modules and listed D2's BirthdayInterview and ConstructionBoundarySuite
+# among "types defined by this candidate". Use:
+#     bash tools/reference-scope.sh "$(git merge-base main CAND)" CAND
+# The error is toward a WIDER scope here, which is the safe direction, but it also
+# misreports what the candidate does -- and the same arithmetic can mislead in the
+# other direction when reasoning about who a change affects.
 set -euo pipefail
-BASE="${1:?usage: reference-scope.sh BASE [HEAD]}"
+BASE="${1:?usage: reference-scope.sh BASE [HEAD]   (BASE should usually be $(git merge-base main HEAD))}"
 HEAD_REF="${2:-HEAD}"
 
 types="$(
