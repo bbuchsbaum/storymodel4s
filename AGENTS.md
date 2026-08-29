@@ -118,6 +118,17 @@ was set by the owner on 2026-08-28 (sticky decision
    negotiable. If they are in **different modules**, the chief merges locally
    and gates the merged tree himself rather than charging the author a rebase,
    and backs the merge out if it is red.
+
+   *Sibling seam.* `storyatlas4s` is a sibling repository that builds
+   `storymodel4s` from source (`-Dstoryatlas4s.storymodel4s.build`), so it
+   inherits every dependency edge added here. Whenever `main` moves in a way
+   that touches anything it consumes — a new inter-module `dependsOn`, a change
+   to `core`/`view`/`features` — compile and test-compile `storyatlas4s` against
+   the new `main` before calling `main` good. The two repositories keep separate
+   mote stores (relative reservation paths like `build.sbt` would otherwise be
+   ambiguous across them); cross-repo work is coordinated on the
+   `narrative-atlas-intaglio` topic with provider/consumer SHAs recorded as
+   notes, never as dependency edges between stores.
 4. **Actors and reservations.** One mote actor per session. Set your identity
    explicitly in every session — `export MOTE_ACTOR=<actor>` (and
    `mote session start --as <actor>`) or `--actor` on each call — and never run
