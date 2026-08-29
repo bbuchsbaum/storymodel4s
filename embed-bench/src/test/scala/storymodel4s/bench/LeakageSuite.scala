@@ -50,7 +50,7 @@ class LeakageSuite extends FunSuite:
           caseId,
           Map(metric -> Vector(UnitObservation(unit, observation)))
         ),
-        clocks = ClockPanel(caseId, Some(1.0), None, 1.0, Some(0.0), None)
+        clocks = ClockPanel(caseId, Some(1.0), None, Some(1.0), Some(0.0), None)
       )
     }
     ChannelReport(

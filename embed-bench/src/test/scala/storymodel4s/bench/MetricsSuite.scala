@@ -200,14 +200,14 @@ class MetricsSuite extends FunSuite:
   test("a clock panel renders an unmeasured quantity as n/a, never as a number") {
     // The review's gap: ClockPanel carries Options in source, but every test constructed Some
     // values, so a renderer that printed 0.0 for None would have passed unnoticed.
-    val none = ClockPanel("c", None, None, 0.5, None, None)
+    val none = ClockPanel("c", None, None, None, None, None)
     val rendered = none.render
     assert(rendered.contains("discourse=n/a"), rendered)
     assert(rendered.contains("backward=n/a"), rendered)
     assert(rendered.contains("world=n/a"), rendered)
     assert(rendered.contains("worldBackward=n/a"), rendered)
     assert(!rendered.contains("0.000"), s"an unmeasured clock printed a number: $rendered")
-    val some = ClockPanel("c", Some(0.25), None, 0.5, Some(0.125), None)
+    val some = ClockPanel("c", Some(0.25), None, Some(0.5), Some(0.125), None)
     assert(some.render.contains("discourse=0.250"), some.render)
     assert(some.render.contains("backward=0.125"), some.render)
   }

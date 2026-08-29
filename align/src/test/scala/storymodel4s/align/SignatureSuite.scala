@@ -54,11 +54,11 @@ class SignatureSuite extends FunSuite:
       importanceWeightedCoverage = 0.0,
       fidelity = None,
       specificity = None,
-      compression = 0.0,
+      compression = MassRatio.of(0.0, 0.0, 0.0).fold(e => fail(e.message), identity),
       discourseChronology = Some(0.0),
       worldChronology = None,
       causalPreservation = None,
-      semanticFlowCoherence = 0.0,
+      semanticFlowCoherence = MassRatio.of(0.0, 0.0, 0.0).fold(e => fail(e.message), identity),
       associationMass = associationMass,
       intrusionMass = intrusionMass,
       commentaryMass = commentaryMass,
@@ -317,4 +317,83 @@ class SignatureSuite extends FunSuite:
         "summon[scala.deriving.Mirror.ProductOf[StepMass]]"
       )
     )
+  }
+
+  // --- ratio-of-sums estimands (bd-01M162FEGPSY50MFHTYH3C3RHF) ---
+
+  test("a mass ratio is None when there is no conditioning mass to divide by") {
+    val nothing = MassRatio.of(0.0, 0.0, 5.0).fold(e => fail(e.message), identity)
+    assertEquals(nothing.value, None, "a ratio with no denominator reported a number")
+    assertEqualsDouble(nothing.support, 0.0, eps)
+    assert(nothing.render.contains("n/a"), nothing.render)
+  }
+
+  test("support says what fraction of the whole the value rests on") {
+    val r = MassRatio.of(1.0, 2.0, 8.0).fold(e => fail(e.message), identity)
+    assertEquals(r.value, Some(0.5))
+    assertEqualsDouble(r.support, 0.25, eps)
+  }
+
+  test("a mass ratio refuses sums that cannot be a ratio") {
+    assert(MassRatio.of(3.0, 2.0, 8.0).isLeft, "numerator above its conditioning mass accepted")
+    assert(MassRatio.of(1.0, 9.0, 8.0).isLeft, "conditioning above the total accepted")
+    assert(MassRatio.of(-1.0, 2.0, 8.0).isLeft, "negative numerator accepted")
+    assert(MassRatio.of(Double.NaN, 2.0, 8.0).isLeft, "NaN accepted")
+    assert(
+      !scala.compiletime.testing.typeChecks(
+        "summon[scala.deriving.Mirror.ProductOf[MassRatio]]"
+      )
+    )
+  }
+
+  test("ratio-of-sums: a barely-placed unit cannot outvote a fully-placed one") {
+    // This is the whole reason for the shape. Mean-of-ratios gives every unit one vote regardless
+    // of the mass behind it, so a unit carrying 0.01 of source mass with an extreme per-unit ratio
+    // moves the published figure as much as a unit carrying all of its mass.
+    //
+    // Two units: one fully placed contributing 0 of the quantity, one barely placed contributing
+    // all of its 0.01. Ratio-of-sums = 0.01/1.01 ~ 0.0099. Mean-of-ratios would be (0 + 1)/2 = 0.5,
+    // fifty times larger, driven entirely by a unit we hardly placed.
+    val ratioOfSums = MassRatio.of(0.01, 1.01, 1.01).fold(e => fail(e.message), identity)
+    assert(ratioOfSums.value.exists(_ < 0.02), ratioOfSums.render)
+    val meanOfRatios = (0.0 + 1.0) / 2
+    assert(
+      ratioOfSums.value.exists(v => math.abs(v - meanOfRatios) > 0.4),
+      s"ratio-of-sums collapsed onto mean-of-ratios: ${ratioOfSums.render}"
+    )
+  }
+
+  test("compression conditions on SOURCE MASS, not on a count of units") {
+    // The distinguishing assertion between ratio-of-sums and mean-of-ratios: the denominator is
+    // the source mass actually placed, not the number of rows. Under mean-of-ratios the
+    // conditioning mass would be the row count, which is what gives a 0.01-mass unit a full vote.
+    val result = GraphHsmm
+      .infer(recall, view, candidates, costModel)
+      .fold(e => fail(e.message), identity)
+    val s = RecallSignature.compute(result, recall, view)
+    val sourceMassSum = result.posterior.rows.map(_.sourceMass).sum
+    assertEqualsDouble(s.compression.conditioningMass, sourceMassSum, 1e-9)
+    assertNotEquals(
+      s.compression.conditioningMass,
+      result.posterior.rows.size.toDouble,
+      "conditioning mass equals the row count; that is mean-of-ratios"
+    )
+    val totalRowMass = result.posterior.rows.map(_.mass.values.sum).sum
+    assertEqualsDouble(s.compression.totalMass, totalRowMass, 1e-9)
+  }
+
+  test("compression and coherence carry their conditioning mass, and abstain without it") {
+    assertEquals(sig.compression.value.isDefined, sig.compression.conditioningMass > 0.0)
+    assertEquals(
+      sig.semanticFlowCoherence.value.isDefined,
+      sig.semanticFlowCoherence.conditioningMass > 0.0
+    )
+    assert(sig.compression.support >= 0.0 && sig.compression.support <= 1.0 + eps)
+  }
+
+  test("the estimand version is derived from the code, never supplied by a caller") {
+    assertEquals(sig.estimandVersion, RecallSignature.EstimandVersion)
+    assert(sig.estimandVersion.startsWith("recall-signature/"), sig.estimandVersion)
+    // A caller-set version would be an ungrounded assertion about what produced the numbers.
+    assert(!scala.compiletime.testing.typeChecks("sig.copy(estimandVersion = \"forged\")"))
   }
