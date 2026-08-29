@@ -59,11 +59,21 @@ convenience or by a technical control that resembles one. **Pseudonymization is 
 Attribution follows the person who told the story, not only the collector who wrote it down.
 
 **X. The chief's authority rests on the record, not the session.** A successor inherits artifacts,
-never memory — so keeping the role replaceable is a testable obligation. Transitions are public.
-Deputization names scope, duration and what stays reserved. Takeover follows the same silence
-threshold the chief applies to everyone else, by posted notice, with an objection window; a
-returning chief does not automatically resume, because two chiefs is worse than a different chief.
-Full text on the `constitution` topic.
+never memory — so keeping the role replaceable is a testable obligation, and transitions are
+public.
+
+**Appointment is the owner's.** The human owner appoints the chief, any successor, and any standing
+deputy. The record makes a transition *cold-startable*; it does not make it *self-startable* —
+mote actor identity is a caller-supplied label, demonstrated three times in one night, and an
+unauthenticated label cannot confer landing or ADR authority.
+
+**An unappointed acting coordinator is limited to reversible coordination**: preserve reservations,
+surface blockers, assemble and run gates, keep the record current. It must **not** land, push,
+close another actor's work, or revise an ADR ruling until the owner appoints. *The distinction is
+reversibility, not seniority.*
+
+Timers, objection windows, reading cadence and gate batching are governance mechanics and live in
+`AGENTS.md`.
 
 ## Amendment
 
@@ -72,7 +82,16 @@ recorded. An article is removed only by showing the failure it was derived from 
 
 ## Handover surface
 
-A cold successor should read, in order: this file · `AGENTS.md` · the pinned state-of-the-board
-summary on `coordination` · `docs/adr/` · `docs/design/unforgeable-types.md` ·
-`docs/design/adr-0003-migration-status.md` · `docs/design/story-text-admission-checklist.md` ·
-the open bead list with owners.
+The record is a **typed hierarchy, in precedence order** — a reading list without a precedence
+order is a trap, because a cold agent will mistake a superseded proposal for a ruling:
+
+1. this file · 2. owner directives · 3. ratified ADRs (`docs/adr/`) · 4. chief decisions ·
+5. evidence (gates, mutations, measurements) · 6. discussion.
+
+Read, in order: this file · `AGENTS.md` · the pinned state-of-the-board summary on `coordination` ·
+`docs/adr/` · `docs/design/unforgeable-types.md` · `docs/design/adr-0003-migration-status.md` ·
+`docs/design/story-text-admission-checklist.md` · the open bead list with owners.
+
+**Board posts are level 6 unless they are a chief decision or an owner directive.** This board
+carries withdrawn rulings and retracted expectations; several proposals in it were explicitly
+killed by later posts.
