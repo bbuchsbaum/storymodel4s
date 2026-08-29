@@ -110,6 +110,24 @@ Package namespace is flat `storymodel4s.<module>`.
    distinguish a closed door from an open one. Ceiling to state honestly: Scala
    privacy is compiler-enforced, not JVM-enforced — the constructor is public
    in bytecode — so this buys soundness for Scala consumers, not for Java ones.
+   **This binds new types, not only old ones.** The sweep is a floor, not an
+   event: a cleanup that runs once loses to a codebase that keeps growing. On
+   2026-08-29 slice 2 was removing forgeable construction from `Credence`,
+   `TextSpan` and `StorySource` in the same hours a new candidate introduced it
+   in a fresh public type (`SurfaceDetailSupport`, a `final case class ...
+   private` whose three fields stand in a derived proof relation). So: **any new
+   public type whose fields encode a relation the constructor is supposed to
+   establish must be born unforgeable** — it is not enough to audit what exists.
+   Note what was and was not at risk there, because the distinction is the whole
+   skill: the *compiled* path was safe, since the compiler recomputed the proof
+   rather than trusting the value; the *public preflight contract* was not,
+   because a caller could mint a report claiming a capability the inspector
+   would have refused, then serialize or display it. And note that the candidate
+   was correctly author-gated and mutation-tested when the defect was found. Both
+   facts hold at once. A gate proves what code **does**; forging is not a
+   behaviour the code performs, so neither a green suite nor a mutation score can
+   see a missing refusal at a construction boundary. That is why the static pass
+   runs *alongside* the gate and not downstream of it.
 9. **Sparse.** No dense all-pairs allocations in core paths.
 10. **Deterministic IDs and receipts.** Content-addressed IDs; builds are diffable.
 11. Core depends only on cats-core / cats-collections. No HTTP, LLM, ONNX,
