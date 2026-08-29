@@ -100,44 +100,61 @@ object WindowReducer:
       val sxy = xs.zip(ys).map((x, y) => (x - mx) * (y - my)).sum
       Some(sxy / sxx)
 
+  /** Same weight contract as `Reduction.reduce`. The public `reduce` door must refuse here;
+    * pointing at the gated caller does not close this door.
+    */
+  private def refuseInvalidWeights[V, O](
+      samples: NonEmptyVector[Sample[V]]
+  ): Option[Estimate[O]] =
+    if samples.exists(!_.hasValidWeight) then
+      Some(
+        Estimate.Missing(
+          MissingReason.Undefined(UndefinedReason.Custom("features", "invalid-sample-weight"))
+        )
+      )
+    else None
+
   def scalar(reducer: ScalarReducer): WindowReducer[Double, Double] =
     (samples: NonEmptyVector[Sample[Double]]) =>
-      val obs = observed(samples)
-      if obs.isEmpty then
-        val anyNonFinite = samples.exists(s => s.estimate.isObserved)
-        if anyNonFinite then undefined(UndefinedReason.NotFinite)
-        else Estimate.Missing(MissingReason.AllMissing)
-      else
-        val vs = values(obs)
-        reducer match
-          case ScalarReducer.Sum      => Estimate.observed(vs.sum)
-          case ScalarReducer.Mean     => Estimate.observed(vs.sum / vs.size)
-          case ScalarReducer.Maximum  => Estimate.observed(vs.max)
-          case ScalarReducer.Variance => Estimate.observed(variance(vs))
-          case ScalarReducer.Slope    =>
-            slope(obs).fold(undefined(UndefinedReason.SlopeNeedsTwoPositions))(Estimate.observed)
-          case ScalarReducer.WeightedMean =>
-            val w = obs.map(_.weight)
-            val tw = w.sum
-            if tw <= 0.0 then undefined(UndefinedReason.ZeroTotalWeight)
-            else Estimate.observed(vs.zip(w).map(_ * _).sum / tw)
-          case ScalarReducer.Kernel(shape) =>
-            val positions = samples.toVector.map(_.position)
-            val centre = (positions.min + positions.max) / 2.0
-            val weighted = obs.map(s => (s, shape.weight(s.position - centre)))
-            val tw = weighted.map(_._2).sum
-            if tw > 0.0 then
-              Estimate.observed(
-                weighted.map((s, w) => Estimate.finite(s.estimate).get * w).sum / tw
-              )
-            else if shape.isPointMass then
-              // a declared point mass with no sample exactly at the centre (even-length window):
-              // the nearest observed sample is the value at the centre
-              obs.minBy(s => math.abs(s.position - centre)).estimate
-            else
-              // positive bandwidth but every observed sample lies outside the kernel support:
-              // never substitute a value from outside the support
-              undefined(UndefinedReason.OutsideKernelSupport)
+      refuseInvalidWeights[Double, Double](samples).getOrElse {
+        val obs = observed(samples)
+        if obs.isEmpty then
+          val anyNonFinite = samples.exists(s => s.estimate.isObserved)
+          if anyNonFinite then undefined(UndefinedReason.NotFinite)
+          else Estimate.Missing(MissingReason.AllMissing)
+        else
+          val vs = values(obs)
+          reducer match
+            case ScalarReducer.Sum      => Estimate.observed(vs.sum)
+            case ScalarReducer.Mean     => Estimate.observed(vs.sum / vs.size)
+            case ScalarReducer.Maximum  => Estimate.observed(vs.max)
+            case ScalarReducer.Variance => Estimate.observed(variance(vs))
+            case ScalarReducer.Slope    =>
+              slope(obs).fold(undefined(UndefinedReason.SlopeNeedsTwoPositions))(Estimate.observed)
+            case ScalarReducer.WeightedMean =>
+              val w = obs.map(_.weight)
+              val tw = w.sum
+              // fail-closed: NaN comparisons are false, so `tw <= 0` would compute on NaN.
+              if tw > 0.0 then Estimate.observed(vs.zip(w).map(_ * _).sum / tw)
+              else undefined(UndefinedReason.ZeroTotalWeight)
+            case ScalarReducer.Kernel(shape) =>
+              val positions = samples.toVector.map(_.position)
+              val centre = (positions.min + positions.max) / 2.0
+              val weighted = obs.map(s => (s, shape.weight(s.position - centre)))
+              val tw = weighted.map(_._2).sum
+              if tw > 0.0 then
+                Estimate.observed(
+                  weighted.map((s, w) => Estimate.finite(s.estimate).get * w).sum / tw
+                )
+              else if shape.isPointMass then
+                // a declared point mass with no sample exactly at the centre (even-length window):
+                // the nearest observed sample is the value at the centre
+                obs.minBy(s => math.abs(s.position - centre)).estimate
+              else
+                // positive bandwidth but every observed sample lies outside the kernel support:
+                // never substitute a value from outside the support
+                undefined(UndefinedReason.OutsideKernelSupport)
+      }
 
   /** Kernel smoothing where the distance of a sample from the window centre is supplied by the
     * caller (`distance`, in basis positions) instead of read off `Sample.position`: the reducer for
@@ -150,19 +167,21 @@ object WindowReducer:
       distance: Sample[Double] => Double
   ): WindowReducer[Double, Double] =
     (samples: NonEmptyVector[Sample[Double]]) =>
-      finiteSamples(samples) match
-        case Left(missing) => missing
-        case Right(obs)    =>
-          val weighted = obs.map((s, v) => (v, shape.weight(distance(s))))
-          val tw = weighted.map(_._2).sum
-          if tw > 0.0 then Estimate.observed(weighted.map((v, w) => v * w).sum / tw)
-          else if shape.isPointMass then
-            // a declared point mass whose centre unit has no observed sample: the mean of all
-            // observed samples at the minimal distance, i.e. the whole nearest unit
-            val nearest = obs.map((s, _) => distance(s)).min
-            val vs = obs.collect { case (s, v) if distance(s) == nearest => v }
-            Estimate.observed(vs.sum / vs.size)
-          else undefined(UndefinedReason.OutsideKernelSupport)
+      refuseInvalidWeights[Double, Double](samples).getOrElse {
+        finiteSamples(samples) match
+          case Left(missing) => missing
+          case Right(obs)    =>
+            val weighted = obs.map((s, v) => (v, shape.weight(distance(s))))
+            val tw = weighted.map(_._2).sum
+            if tw > 0.0 then Estimate.observed(weighted.map((v, w) => v * w).sum / tw)
+            else if shape.isPointMass then
+              // a declared point mass whose centre unit has no observed sample: the mean of all
+              // observed samples at the minimal distance, i.e. the whole nearest unit
+              val nearest = obs.map((s, _) => distance(s)).min
+              val vs = obs.collect { case (s, v) if distance(s) == nearest => v }
+              Estimate.observed(vs.sum / vs.size)
+            else undefined(UndefinedReason.OutsideKernelSupport)
+      }
 
 /** Windowed reduction of a token-aligned scalar track into a window-aligned track.
   *

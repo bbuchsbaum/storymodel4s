@@ -164,6 +164,38 @@ class WindowSuite extends ScalaCheckSuite:
     )
   }
 
+  test("WindowReducer.reduce refuses invalid weights; it does not publish Observed(NaN)") {
+    val refused = Estimate.Missing[Double](
+      MissingReason.Undefined(UndefinedReason.Custom("features", "invalid-sample-weight"))
+    )
+    val nanW = NonEmptyVector.of(Sample(0, Estimate.observed(1.0), Double.NaN))
+    val infW = NonEmptyVector.of(Sample(0, Estimate.observed(1.0), Double.PositiveInfinity))
+    val negW = NonEmptyVector.of(Sample(0, Estimate.observed(1.0), -1.0))
+    // Mean ignores weight in its arithmetic; the door must still refuse, or a NaN
+    // weight on WeightedMean publishes Observed(NaN) (`tw <= 0` fails open).
+    Vector(ScalarReducer.WeightedMean, ScalarReducer.Mean, ScalarReducer.Sum).foreach { r =>
+      assertEquals(red(r).reduce(nanW), refused, r.toString)
+      assertEquals(red(r).reduce(infW), refused, r.toString)
+      assertEquals(red(r).reduce(negW), refused, r.toString)
+    }
+    assert(
+      Reduction
+        .reduce(nanW.toVector, red(ScalarReducer.WeightedMean), MissingValuePolicy.IgnoreMissing)
+        .isLeft
+    )
+  }
+
+  test("weighted mean of all-zero weights is ZeroTotalWeight, not Observed") {
+    val zeros = NonEmptyVector.of(
+      Sample(0, Estimate.observed(1.0), 0.0),
+      Sample(1, Estimate.observed(5.0), 0.0)
+    )
+    assertEquals(
+      red(ScalarReducer.WeightedMean).reduce(zeros),
+      Estimate.Missing(MissingReason.Undefined(UndefinedReason.ZeroTotalWeight))
+    )
+  }
+
   test("weighted mean honours sample weights") {
     val s = NonEmptyVector.of(
       Sample(0, Estimate.observed(1.0), 3.0),
