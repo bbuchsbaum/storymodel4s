@@ -128,6 +128,14 @@ was set by the owner on 2026-08-28 (sticky decision
    and gates the merged tree himself rather than charging the author a rebase,
    and backs the merge out if it is red.
 
+   *A conflict-free merge is not a working merge.* Textual non-conflict says
+   nothing about whether the types still agree. When two candidates touch the
+   same file, run the affected module's suite on the **merged** tree before
+   landing — regardless of whether either base is stale. Observed twice on
+   `SignatureSuite.scala`: two actors appended to different regions while the
+   types underneath moved, `git` reported a clean merge and then a clean rebase,
+   and both results failed to compile with the same two errors.
+
    *Sibling seam.* `storyatlas4s` is a sibling repository that builds
    `storymodel4s` from source (`-Dstoryatlas4s.storymodel4s.build`), so it
    inherits every dependency edge added here. Whenever `main` moves in a way
