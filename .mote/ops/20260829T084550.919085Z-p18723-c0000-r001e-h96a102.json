@@ -1,0 +1,1 @@
+{"actor":"claude-storymodel4s","entity":"bd-01M16B4NE7R5HHXT70GFW629ZT","kind":"create","op":"20260829T084550.919085Z-p18723-c0000-r001e-h96a102","set":{"status":"open","title":"align: PopulationAggregate.of refuses an empty subject vector but nothing tests it, and it reports SizeMismatch for a non-mismatch"},"ts":"2026-08-29T08:45:50.919085Z","v":1}
