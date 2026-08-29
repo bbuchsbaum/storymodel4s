@@ -319,6 +319,10 @@ class SignatureSuite extends FunSuite:
     // The pair is a split of the same whole, so together they cannot exceed it.
     assert(ExternalMassReport.of(0.7, 0.7).isLeft, "attributed + unranked above 1 accepted")
     assert(ExternalMassReport.of(0.4, 0.6).isRight)
+    val clamped = report(0.4, 0.6 + 1e-9)
+    assertEqualsDouble(clamped.attributed + clamped.unranked, 1.0, 0.0)
+    assertEqualsDouble(clamped.attributed, 0.4 / (1.0 + 1e-9), 1e-15)
+    assert(ExternalMassReport.of(0.4, 0.6 + 2e-9).isLeft)
   }
 
   test("a per-step mass refuses a comparable count that is not a sub-count of the total") {
@@ -426,6 +430,14 @@ class SignatureSuite extends FunSuite:
     assert(MassRatio.of(1.0, 9.0, 8.0).isLeft, "conditioning above the total accepted")
     assert(MassRatio.of(-1.0, 2.0, 8.0).isLeft, "negative numerator accepted")
     assert(MassRatio.of(Double.NaN, 2.0, 8.0).isLeft, "NaN accepted")
+    val valueClamped = MassRatio.of(1.0 + 1e-9, 1.0, 2.0).fold(e => fail(e.message), identity)
+    assertEquals(valueClamped.value, Some(1.0))
+    assert(MassRatio.of(1.0 + 2e-9, 1.0, 2.0).isLeft)
+    val supportClamped = MassRatio.of(0.5, 1.0 + 1e-9, 1.0).fold(e => fail(e.message), identity)
+    assertEqualsDouble(supportClamped.conditioningMass, 1.0, 0.0)
+    assertEqualsDouble(supportClamped.support, 1.0, 0.0)
+    assert(MassRatio.of(0.5, 1.0 + 2e-9, 1.0).isLeft)
+    assert(MassRatio.of(0.0, 1e-9, 1e-12).isLeft, "absolute mass tolerance was scale-dependent")
     assert(
       !scala.compiletime.testing.typeChecks(
         "summon[scala.deriving.Mirror.ProductOf[MassRatio]]"
