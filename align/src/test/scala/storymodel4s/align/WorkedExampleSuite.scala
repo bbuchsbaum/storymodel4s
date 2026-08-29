@@ -249,7 +249,7 @@ class WorkedExampleSuite extends FunSuite:
       s"world backward = ${sig.worldBackwardMass}"
     )
     assert(sig.discourseChronology.exists(_ < 1.0), sig.discourseChronology.toString)
-    assert(sig.fidelity.exists(_ > 0.5), s"fidelity = ${sig.fidelity}")
+    assert(sig.fidelityMass.value.exists(_ > 0.5), s"fidelity = ${sig.fidelityMass.render}")
     assert(sig.perUnitFidelity.contains(u2.id))
     assert(sig.specificity.exists(s => s > 0.0 && s <= 1.0), sig.specificity.toString)
     assertEqualsDouble(sig.unrankedMass, 0.0, 0.0)

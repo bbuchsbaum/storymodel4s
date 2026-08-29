@@ -52,7 +52,6 @@ class SignatureSuite extends FunSuite:
     val signature = RecallSignature(
       uniformCoverage = 0.0,
       importanceWeightedCoverage = 0.0,
-      fidelity = None,
       fidelityMass = MassRatio.of(0.0, 0.0, 0.0).fold(e => fail(e.message), identity),
       fidelityByFacet = Map.empty,
       specificity = None,
@@ -443,7 +442,10 @@ class SignatureSuite extends FunSuite:
         .getOrElse(0.0)
     }.sum
     assertEqualsDouble(s.fidelityMass.conditioningMass, expectedA, 1e-9)
-    assertEquals(s.fidelity, s.fidelityMass.value)
+    // The bare `fidelity: Option[Double]` twin is gone: a supported figure and an unsupported
+    // copy of it side by side is the convenience leak ADR 0003 clause 2 forbids, and it is the
+    // same thing externalMass prevents by refusing to expose a sum.
+    assert(!scala.compiletime.testing.typeChecks("s.fidelity"))
   }
 
   test("every anchor of a split unit contributes, not only its MAP") {
