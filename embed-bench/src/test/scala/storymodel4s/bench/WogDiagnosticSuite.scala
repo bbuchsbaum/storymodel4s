@@ -1,17 +1,12 @@
 package storymodel4s.bench
 
+import cats.data.NonEmptyVector
 import munit.FunSuite
 
-import storymodel4s.align.{
-  CandidateGenerator,
-  CandidateSet,
-  Candidates,
-  DefaultLocalCostModel,
-  GraphHsmm,
-  SemanticDistance
-}
+import storymodel4s.align.*
 import storymodel4s.features.{Estimate, MissingReason}
 import storymodel4s.fixtures.wog.{WarOfTheGhostsExpectations, WarOfTheGhostsText}
+import storymodel4s.recall.{RecallGraph, RecallRelations}
 
 /** End-to-end: the WOG diagnostic cases through the free channels. The numbers are regression
   * material, not evidence (WOG never selects); what the suite pins is that the harness runs the
@@ -29,6 +24,85 @@ class WogDiagnosticSuite extends FunSuite:
         BenchConfig(seed = 11L, resamples = 50)
       )
       .fold(e => fail(e.message), identity)
+
+  private def routeCase(id: String, goldAnchors: Vector[SourceNodeRef]): BenchCase =
+    val base = WogDiagnostic.fullRecallCase
+    val units = base.recall.ordered.take(goldAnchors.size)
+    assertEquals(units.size, goldAnchors.size, "the fixture has too few recall units")
+    val recall =
+      RecallGraph(base.recall.transcript, base.recall.atlas, units, RecallRelations.empty)
+    val gold = Gold
+      .validated(
+        units.zip(goldAnchors).map { case (unit, anchor) =>
+          val level =
+            base.view.node(anchor).fold(fail(s"unknown source node ${anchor.key}"))(_.level)
+          GoldUnit.anchored(unit.id, NonEmptyVector.one(GoldTarget(anchor, level)))
+        },
+        base.view
+      )
+      .fold(e => fail(e.message), identity)
+    BenchCase(id, base.storyId, base.family, base.origin, base.story, base.view, recall, gold)
+
+  private def resultFor(
+      c: BenchCase,
+      inferredAnchors: Vector[Option[SourceNodeRef]],
+      absentState: ExternalState = ExternalState.Unranked
+  ): HsmmResult =
+    val units = c.recall.ordered
+    assertEquals(units.size, inferredAnchors.size, "one inferred anchor is required per unit")
+    val states = units.zip(inferredAnchors).map { case (unit, anchor) =>
+      anchor match
+        case None      => AlignState.External(absentState)
+        case Some(ref) =>
+          val node = c.view.node(ref).fold(fail(s"unknown source node ${ref.key}"))(identity)
+          val mode = ModeGate
+            .assess(unit, node, c.view)
+            .modes
+            .headOption
+            .fold(fail(s"no admissible mode for ${unit.id.value} -> ${ref.key}"))(identity)
+          AlignState.anchored(ref, mode)
+    }
+    val rows = units.zip(states).map { case (unit, state) =>
+      AlignmentRow.of(unit.id, Map(state -> 1.0)).fold(e => fail(e.message), identity)
+    }
+    val posterior = AlignmentMatrix.of(rows).fold(e => fail(e.message), identity)
+    val flow = TransitionFlow(
+      units.indices
+        .drop(1)
+        .map { i =>
+          FlowStep(units(i - 1).id, units(i).id, Map((states(i - 1), states(i)) -> 1.0))
+        }
+        .toVector
+    )
+    val candidates = units
+      .zip(inferredAnchors)
+      .map { case (unit, anchor) =>
+        unit.id -> anchor.toVector
+      }
+      .toMap
+    HsmmResult
+      .validated(
+        c.recall,
+        c.view,
+        candidates,
+        posterior,
+        flow,
+        states,
+        logLikelihood = 0.0,
+        costs = Map.empty,
+        refinementPasses = 0
+      )
+      .fold(e => fail(e.message), identity)
+
+  private def observedValue(observation: MetricObservation): Double = observation match
+    case MetricObservation.Observed(value) => value
+    case other                             => fail(s"expected an observed value, got $other")
+
+  private lazy val leafRefs: Vector[SourceNodeRef] =
+    WogDiagnostic.view.nodes
+      .filter(_.level == 0)
+      .sortBy(n => WogDiagnostic.view.relativePosition(n.ref))
+      .map(_.ref)
 
   test("WOG is wired as diagnostic cases: one per paraphrase plus one full recall") {
     val cases = WogDiagnostic.cases
@@ -292,4 +366,197 @@ class WogDiagnosticSuite extends FunSuite:
     assertEquals(aggregate.value, Estimate.missing(MissingReason.ProviderAbstained))
     assertEquals(aggregate.coverage.eligible, eligibleIndexes.size)
     assertEquals(aggregate.coverage.observed, 0)
+  }
+
+  test("revisit pair recall and precision score exact recurrence shape, not dwell") {
+    assert(leafRefs.size >= 4, s"need four distinct leaves, found ${leafRefs.size}")
+    val a = leafRefs(0)
+    val b = leafRefs(1)
+    val c = leafRefs(2)
+    val d = leafRefs(3)
+    val route = routeCase("route:revisit", Vector(a, b, a, c, d))
+    val exact = Metrics.observe(
+      route,
+      resultFor(route, Vector(a, b, a, c, d).map(Some(_)))
+    )
+    assertEquals(
+      exact.byMetric(Metrics.Names.routeRevisitPairRecall).map(o => observedValue(o.observation)),
+      Vector(1.0)
+    )
+    assertEquals(
+      exact
+        .byMetric(Metrics.Names.routeRevisitPairPrecision)
+        .map(o => observedValue(o.observation)),
+      Vector(1.0)
+    )
+
+    // The first recurrence is correct, while the alternating tail invents two more revisits.
+    val alternating = Metrics.observe(
+      route,
+      resultFor(route, Vector(a, b, a, b, a).map(Some(_)))
+    )
+    val recall = Metrics.aggregate(
+      Metrics.Names.routeRevisitPairRecall,
+      Vector(alternating),
+      Vector(route.inputChecksum),
+      seed = 1L
+    )
+    val precision = Metrics.aggregate(
+      Metrics.Names.routeRevisitPairPrecision,
+      Vector(alternating),
+      Vector(route.inputChecksum),
+      seed = 1L
+    )
+    assertEquals(recall.value, Estimate.observed(1.0))
+    assertEquals(precision.value, Estimate.observed(1.0 / 3.0))
+    assertEquals(precision.coverage.eligible, 3)
+
+    val noRevisit = routeCase("route:no-revisit", Vector(a, b, c))
+    val noRevisitObs = Metrics.observe(
+      noRevisit,
+      resultFor(noRevisit, Vector(a, b, c).map(Some(_)))
+    )
+    val empty = Metrics.aggregate(
+      Metrics.Names.routeRevisitPairRecall,
+      Vector(noRevisitObs),
+      Vector(noRevisit.inputChecksum),
+      seed = 1L
+    )
+    assertEquals(empty.value, Estimate.missing(MissingReason.AllMissing))
+    assertEquals(empty.coverage.eligible, 0)
+    assertEquals(empty.coverage.observed, 0)
+  }
+
+  test("Unranked inside a revisit interval is missing, never survivor-renormalized") {
+    assert(leafRefs.size >= 2, s"need two distinct leaves, found ${leafRefs.size}")
+    val a = leafRefs.head
+    val b = leafRefs(1)
+    val route = routeCase("route:unranked-revisit", Vector(a, b, a))
+    val observations = Metrics.observe(route, resultFor(route, Vector(Some(a), None, Some(a))))
+    val missing = MetricObservation.Missing(MissingReason.ProviderAbstained)
+    assertEquals(
+      observations.byMetric(Metrics.Names.routeRevisitPairRecall).map(_.observation),
+      Vector(missing)
+    )
+    assertEquals(
+      observations.byMetric(Metrics.Names.routeRevisitPairPrecision).map(_.observation),
+      Vector(missing)
+    )
+  }
+
+  test("gold-level route metrics report magnitude and signed overcompression") {
+    val view = WogDiagnostic.view
+    assert(view.maxLevel > 0, "the fixture has no hierarchy to test")
+    val leaf = leafRefs.head
+    val coarse = view.nodes.maxBy(_.level).ref
+    val route = routeCase("route:levels", Vector(leaf))
+    val observations = Metrics.observe(route, resultFor(route, Vector(Some(coarse))))
+    val inferredLevel = view.node(coarse).fold(fail("coarse node missing"))(_.level)
+    val goldLevel = view.node(leaf).fold(fail("leaf node missing"))(_.level)
+    assertEquals(inferredLevel, view.maxLevel)
+    assertEquals(goldLevel, 0)
+    assertEquals(
+      observedValue(observations.byMetric(Metrics.Names.routeGoldLevelCloseness).head.observation),
+      0.0
+    )
+    assertEquals(
+      observedValue(observations.byMetric(Metrics.Names.routeGoldLevelSignedBias).head.observation),
+      1.0
+    )
+
+    val reverse = routeCase("route:levels-reverse", Vector(coarse))
+    val reverseObservations = Metrics.observe(reverse, resultFor(reverse, Vector(Some(leaf))))
+    assertEquals(
+      observedValue(
+        reverseObservations.byMetric(Metrics.Names.routeGoldLevelCloseness).head.observation
+      ),
+      0.0
+    )
+    assertEquals(
+      observedValue(
+        reverseObservations.byMetric(Metrics.Names.routeGoldLevelSignedBias).head.observation
+      ),
+      -1.0
+    )
+
+    val intermediate = view.nodes
+      .find(node => node.level > 0 && node.level < view.maxLevel)
+      .fold(fail("the fixture cannot distinguish graded closeness from level exactness"))(_.ref)
+    val gradient = routeCase("route:levels-gradient", Vector(leaf))
+    val gradientObservations = Metrics.observe(
+      gradient,
+      resultFor(gradient, Vector(Some(intermediate)))
+    )
+    val intermediateLevel = view.node(intermediate).fold(fail("intermediate node missing"))(_.level)
+    assertEquals(intermediateLevel, 1)
+    assertEquals(view.maxLevel, 3)
+    // Hand-pinned: one level of error across a three-level hierarchy is 1 - 1/3, not exact-match 0.
+    val expectedCloseness = 0.6666666666666667
+    assertEquals(
+      observedValue(
+        gradientObservations.byMetric(Metrics.Names.routeGoldLevelCloseness).head.observation
+      ),
+      expectedCloseness
+    )
+  }
+
+  test("transition displacement distinguishes a short inferred step from a long gold step") {
+    assert(leafRefs.size >= 3, s"need three distinct leaves, found ${leafRefs.size}")
+    val first = leafRefs.head
+    val middle = leafRefs(leafRefs.size / 2)
+    val last = leafRefs.last
+    val route = routeCase("route:displacement", Vector(first, last))
+    val observations = Metrics.observe(
+      route,
+      resultFor(route, Vector(Some(first), Some(middle)))
+    )
+    // Hand-pinned from the WOG support-midpoint positions. A direction-only mutant returns 1.0.
+    val expected = 0.5483944954128441
+    val displacement = observations
+      .byMetric(Metrics.Names.routeTransitionDisplacementCloseness)
+      .map(_.observation)
+    assertEquals(displacement.head, MetricObservation.Ineligible)
+    assertEquals(observedValue(displacement(1)), expected)
+    assert(
+      expected > 0.0 && expected < 1.0,
+      s"fixture does not distinguish displacement: $expected"
+    )
+  }
+
+  test("Unranked is typed missing for hierarchy and displacement route metrics") {
+    val a = leafRefs.head
+    val b = leafRefs.last
+    val route = routeCase("route:unranked", Vector(a, b))
+    val observations = Metrics.observe(route, resultFor(route, Vector(Some(a), None)))
+    val missing = MetricObservation.Missing(MissingReason.ProviderAbstained)
+    assertEquals(
+      observations.byMetric(Metrics.Names.routeGoldLevelCloseness)(1).observation,
+      missing
+    )
+    assertEquals(
+      observations.byMetric(Metrics.Names.routeGoldLevelSignedBias)(1).observation,
+      missing
+    )
+    assertEquals(
+      observations.byMetric(Metrics.Names.routeTransitionDisplacementCloseness)(1).observation,
+      missing
+    )
+
+    val unsupported = Metrics.observe(
+      route,
+      resultFor(route, Vector(Some(a), None), absentState = ExternalState.Intrusion)
+    )
+    val allMissing = MetricObservation.Missing(MissingReason.AllMissing)
+    assertEquals(
+      unsupported.byMetric(Metrics.Names.routeGoldLevelCloseness)(1).observation,
+      allMissing
+    )
+    assertEquals(
+      unsupported.byMetric(Metrics.Names.routeGoldLevelSignedBias)(1).observation,
+      allMissing
+    )
+    assertEquals(
+      unsupported.byMetric(Metrics.Names.routeTransitionDisplacementCloseness)(1).observation,
+      allMissing
+    )
   }

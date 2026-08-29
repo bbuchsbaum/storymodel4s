@@ -143,6 +143,14 @@ class MetricsSuite extends FunSuite:
       Metrics.Names.routeSupportMidpointDirection,
       "route:support-midpoint-direction"
     )
+    assertEquals(Metrics.Names.routeRevisitPairRecall, "route:revisit-pair-recall")
+    assertEquals(Metrics.Names.routeRevisitPairPrecision, "route:revisit-pair-precision")
+    assertEquals(Metrics.Names.routeGoldLevelCloseness, "route:gold-level-closeness")
+    assertEquals(Metrics.Names.routeGoldLevelSignedBias, "route:gold-level-signed-bias")
+    assertEquals(
+      Metrics.Names.routeTransitionDisplacementCloseness,
+      "route:transition-displacement-closeness"
+    )
     assert(
       !all.contains("route:transition-direction"),
       "the broken metric identity must be retired"
@@ -185,6 +193,25 @@ class MetricsSuite extends FunSuite:
     // are the same DIRECTION, and a route metric that distinguished them would be scoring
     // distance, not route.
     assertEquals(Metrics.stepDirection(0.0, 0.99), Metrics.stepDirection(0.0, 0.01))
+  }
+
+  test("recurrence pairs distinguish revisit from dwell and link the most recent occurrence") {
+    val a = ref(1)
+    val b = ref(2)
+    val c = ref(3)
+    assertEquals(
+      Metrics.recurrencePairs(Vector(Some(a), Some(b), Some(a))),
+      Vector(0 -> 2)
+    )
+    assertEquals(Metrics.recurrencePairs(Vector(Some(a), Some(a))), Vector.empty)
+    assertEquals(
+      Metrics.recurrencePairs(Vector(Some(a), Some(b), Some(a), Some(a), Some(c), Some(a))),
+      Vector(0 -> 2, 3 -> 5)
+    )
+    assertEquals(
+      Metrics.recurrencePairs(Vector(Some(a), None, Some(a))),
+      Vector(0 -> 2)
+    )
   }
 
   test("false gating abstains when the gate never saw the anchor") {
