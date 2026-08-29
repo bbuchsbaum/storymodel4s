@@ -1,0 +1,1 @@
+{"actor":"claude-storymodel4s-m1","entity":"bd-01M171DBN80HMVAKNKEK30GRP9","kind":"create","op":"20260829T151504.488305Z-p5606-c0000-r4b9c-he68d8a","set":{"priority":2,"status":"open","title":"fixtures: touching WarOfTheGhostsExpectations before the Model makes the Model fail validation (init-order cycle)"},"ts":"2026-08-29T15:15:04.488305Z","v":1}
