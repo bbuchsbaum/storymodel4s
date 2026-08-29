@@ -7,17 +7,18 @@ import storymodel4s.story.*
 
 /** The Atlas sibling of [[CodexFlow]] (ADR 0002 D2): placed geometric marks under a declared
   * [[ProjectionContract]]. This file implements the default projection, the **Discourse Atlas**,
-  * whose only exact coordinate is source order. Nothing here infers: every mark's address resolves
-  * through `StoryModel.supporting`, containment is by construction (a parent region is the hull of
-  * its children), visibility under a reader horizon is the shared [[EvidenceVisibility]] closure,
-  * and the vertical axis is declared as a *lane*, not a measurement.
+  * whose only exact coordinate is source order. Nothing here infers: every narrative mark's address
+  * resolves through `StoryModel.supporting`, every surface mark exactly matches the source atlas,
+  * containment is by construction (a parent region is the hull of its children), visibility under a
+  * reader horizon is the shared [[EvidenceVisibility]] closure, and the vertical axis is declared
+  * as a *lane*, not a measurement.
   */
 enum ProjectionKind:
   case DiscourseAtlas
 
 /** Visual channels a contract may give meaning to. */
 enum VisualChannel:
-  case X, Y, RegionExtent, LandmarkPosition, Thread, Portal, Route, Distance, Area
+  case X, Y, SurfaceUnit, RegionExtent, LandmarkPosition, Thread, Portal, Route, Distance, Area
 
 /** Meanings permitted for a declared projection axis. */
 enum AxisMeaning:
@@ -88,6 +89,12 @@ object ProjectionContract:
         "context lane (narrated world = 0); vertical distance has no meaning"
       ),
       ChannelMeaning(
+        VisualChannel.SurfaceUnit,
+        "exact half-open UTF-16 x span; no projection-y coordinate; any renderer-assigned " +
+          "vertical placement or categorical subrow is layout-only outside ContextLane and " +
+          "carries no vertical-position or distance meaning"
+      ),
+      ChannelMeaning(
         VisualChannel.RegionExtent,
         "half-open x-range = hull of the exact support of the segment's visible children; lanes = those children's lanes"
       ),
@@ -137,10 +144,84 @@ enum NarrativeLevel:
     case Scene | Event => true
     case _             => false
 
-/** Surface detail is the other zoom axis (ADR 0002 P3); the Atlas records it, the app renders it.
+/** Surface detail is the other zoom axis (ADR 0002 D14a); the Atlas compiles it into checked marks.
   */
 enum SurfaceDetail:
   case Hidden, Sentences, Tokens
+
+/** Unforgeable preflight report of the surface-detail levels an exact [[SurfaceAtlas]] supports.
+  *
+  * Why: its three observations form one derived capability proof, so a plain class prevents
+  * `apply`, `copy`, or `fromProduct` from manufacturing a report that disagrees with the atlas.
+  */
+final class SurfaceDetailSupport private (
+    val availableKinds: Set[SurfaceUnitKind],
+    val supportedDetails: Set[SurfaceDetail],
+    val unsupportedTokenIds: Vector[SurfaceUnitId]
+):
+  /** Whether compilation can answer this surface-detail request without silent degradation. */
+  def supports(detail: SurfaceDetail): Boolean = supportedDetails.contains(detail)
+
+  /** Refuse a requested surface-detail level the atlas cannot support structurally. */
+  def require(detail: SurfaceDetail): Either[AtlasCompileError, Unit] =
+    Either.cond(supports(detail), (), AtlasCompileError.UnsupportedSurfaceDetail(detail, this))
+
+  override def equals(other: Any): Boolean = other match
+    case that: SurfaceDetailSupport =>
+      availableKinds == that.availableKinds && supportedDetails == that.supportedDetails &&
+      unsupportedTokenIds == that.unsupportedTokenIds
+    case _ => false
+
+  override def hashCode(): Int =
+    (availableKinds, supportedDetails, unsupportedTokenIds).hashCode
+
+  override def toString: String =
+    val kinds = availableKinds.toVector.map(_.toString).sorted.mkString(",")
+    val details = supportedDetails.toVector.map(_.toString).sorted.mkString(",")
+    val unsupported = unsupportedTokenIds.map(_.value).mkString(",")
+    s"SurfaceDetailSupport(availableKinds=[$kinds], supportedDetails=[$details], unsupportedTokenIds=[$unsupported])"
+
+object SurfaceDetailSupport:
+  /** Inspect existing unit kinds and token ancestry without deriving any missing surface units. */
+  def inspect(atlas: SurfaceAtlas): SurfaceDetailSupport =
+    def reachesSentence(unit: storymodel4s.core.SurfaceUnit): Boolean =
+      @scala.annotation.tailrec
+      def climb(next: Option[SurfaceUnitId], seen: Set[SurfaceUnitId]): Boolean = next match
+        case Some(id) if !seen.contains(id) =>
+          atlas.byId.get(id) match
+            case Some(parent) if parent.kind == SurfaceUnitKind.Sentence => true
+            case Some(parent) => climb(parent.parent, seen + id)
+            case None         => false
+        case _ => false
+
+      climb(unit.parent, Set(unit.id))
+
+    val kinds = atlas.byKind.keySet
+    val unsupportedTokens = atlas.tokens.filterNot(reachesSentence).map(_.id).sorted
+    val sentenceLayerSupported =
+      kinds.contains(SurfaceUnitKind.Sentence) && unsupportedTokens.isEmpty
+    val details = Set(SurfaceDetail.Hidden) ++
+      Option.when(sentenceLayerSupported)(SurfaceDetail.Sentences) ++
+      Option.when(
+        sentenceLayerSupported && kinds.contains(SurfaceUnitKind.Token)
+      )(SurfaceDetail.Tokens)
+    new SurfaceDetailSupport(kinds, details, unsupportedTokens)
+
+/** Typed failures unique to Atlas compilation, preserving ordinary domain failures unchanged. */
+enum AtlasCompileError:
+  /** A pre-existing domain validation failed before a scene could be compiled. */
+  case Domain(error: DomainError)
+
+  /** The requested surface level is absent or lacks complete token-to-sentence ancestry. */
+  case UnsupportedSurfaceDetail(requested: SurfaceDetail, support: SurfaceDetailSupport)
+
+  def message: String = this match
+    case Domain(error)                                => error.message
+    case UnsupportedSurfaceDetail(requested, support) =>
+      val kinds = support.availableKinds.toVector.map(_.toString).sorted.mkString(",")
+      val details = support.supportedDetails.toVector.map(_.toString).sorted.mkString(",")
+      val unsupported = support.unsupportedTokenIds.map(_.value).mkString(",")
+      s"unsupported surface detail $requested: available kinds=[$kinds], supported details=[$details], tokens without sentence ancestors=[$unsupported]"
 
 /** Independent narrative and surface-detail coordinates of semantic zoom. */
 final case class ZoomLevel(narrative: NarrativeLevel, surface: SurfaceDetail)
@@ -212,17 +293,25 @@ enum LandmarkKind:
 
 /** Closed content-address salt for each renderer-neutral mark family. */
 private[view] enum AtlasMarkKind:
-  case Region, Landmark, Thread, Portal, Route
+  case SurfaceUnit, Region, Landmark, Thread, Portal, Route
 
   def salt: String = this match
-    case Region   => "region"
-    case Landmark => "landmark"
-    case Thread   => "thread"
-    case Portal   => "portal"
-    case Route    => "route"
+    case SurfaceUnit => "surface-unit"
+    case Region      => "region"
+    case Landmark    => "landmark"
+    case Thread      => "thread"
+    case Portal      => "portal"
+    case Route       => "route"
 
 /** Closed renderer-neutral marks emitted by the first Discourse Atlas compiler. */
 enum VisualPrimitive:
+  case SurfaceUnit(
+      identity: VisualIdentity,
+      span: TextSpan,
+      kind: SurfaceUnitKind,
+      unitOrdinal: Int,
+      parent: Option[Address]
+  )
   case Region(identity: VisualIdentity, extent: Extent, label: String, parent: Option[Address])
   case Landmark(identity: VisualIdentity, at: Anchor, label: String, kind: LandmarkKind)
   case Thread(identity: VisualIdentity, label: String, points: Vector[Anchor])
@@ -333,24 +422,32 @@ final class AtlasCompiler private (provenance: ViewProvenance):
       model: StoryModel[ModelStatus.Validated],
       state: CommonViewState,
       spec: AtlasSpec
-  ): Either[DomainError, NarrativeScene] =
+  ): Either[AtlasCompileError, NarrativeScene] =
+    def domain[A](result: Either[DomainError, A]): Either[AtlasCompileError, A] =
+      result.leftMap(AtlasCompileError.Domain.apply)
+    val surfaceSupport = SurfaceDetailSupport.inspect(model.atlas)
     for
-      _ <- EvidenceVisibility.validateHorizon(model.source.canonicalText, state.horizon)
-      _ <- validateProvenance(model, state, spec)
-      feature <- FeaturePlanner.plan(
-        model,
-        state.feature,
-        spec.featureScale,
-        state.horizon,
-        provenance
+      _ <- domain(EvidenceVisibility.validateHorizon(model.source.canonicalText, state.horizon))
+      _ <- domain(validateProvenance(model, state, spec))
+      _ <- surfaceSupport.require(spec.zoom.surface)
+      feature <- domain(
+        FeaturePlanner.plan(
+          model,
+          state.feature,
+          spec.featureScale,
+          state.horizon,
+          provenance
+        )
       )
-      ledger <- model.ledger
-      scene <- build(
-        model,
-        ledger,
-        state,
-        spec,
-        AtlasFeatureLayer.compiled(spec.featureScale, feature)
+      ledger <- domain(model.ledger)
+      scene <- domain(
+        build(
+          model,
+          ledger,
+          state,
+          spec,
+          AtlasFeatureLayer.compiled(spec.featureScale, feature)
+        )
       )
     yield scene
 
@@ -365,6 +462,7 @@ final class AtlasCompiler private (provenance: ViewProvenance):
     val h = model.hierarchy
     val level = spec.zoom.narrative
     val storyRef = Addressable[StoryRef]
+    val coreRef = Addressable[CoreRef]
 
     // D4 row 7: the shared evidence closure decides visibility; support is then clipped.
     val visibleClaims: Option[Set[ClaimId]] =
@@ -372,6 +470,9 @@ final class AtlasCompiler private (provenance: ViewProvenance):
     def claimVisible(meta: ClaimMeta): Boolean = visibleClaims.forall(_.contains(meta.id))
     def clipped(support: SpanSet): Option[SpanSet] =
       EvidenceVisibility.clipSupport(support, state.horizon)
+    def surfaceUnitVisible(unit: storymodel4s.core.SurfaceUnit): Boolean = state.horizon match
+      case EpistemicHorizon.Omniscient       => true
+      case EpistemicHorizon.ReaderAt(offset) => unit.span.endExclusive <= offset
 
     // Every structural edge that contributes to geometry must itself be visible. Under the
     // omniscient horizon `claimVisible` admits the complete validated hierarchy unchanged.
@@ -456,6 +557,9 @@ final class AtlasCompiler private (provenance: ViewProvenance):
     def identity(ref: StoryRef, kind: AtlasMarkKind): VisualIdentity =
       val a = storyRef.address(ref)
       VisualIdentity.of(a, level, markId(a, kind))
+    def surfaceIdentity(id: SurfaceUnitId): VisualIdentity =
+      val a = coreRef.address(CoreRef.SurfaceUnit(id))
+      VisualIdentity.of(a, level, markId(a, AtlasMarkKind.SurfaceUnit))
 
     val regions: Vector[VisualPrimitive] =
       g.segments.values.toVector
@@ -611,7 +715,24 @@ final class AtlasCompiler private (provenance: ViewProvenance):
           else Vector.empty
         causal ++ goals
 
-    val marks = (regions ++ landmarks ++ threads ++ portals ++ routes).sortBy(_.identity.mark)
+    val surfaceUnits: Vector[storymodel4s.core.SurfaceUnit] = spec.zoom.surface match
+      case SurfaceDetail.Hidden    => Vector.empty
+      case SurfaceDetail.Sentences => model.atlas.sentences
+      case SurfaceDetail.Tokens    => model.atlas.sentences ++ model.atlas.tokens
+    val surfaceMarks: Vector[VisualPrimitive] =
+      surfaceUnits.filter(surfaceUnitVisible).map { unit =>
+        VisualPrimitive.SurfaceUnit(
+          surfaceIdentity(unit.id),
+          unit.span,
+          unit.kind,
+          unit.ordinal,
+          unit.parent.map(id => coreRef.address(CoreRef.SurfaceUnit(id)))
+        )
+      }
+
+    val marks =
+      (surfaceMarks ++ regions ++ landmarks ++ threads ++ portals ++ routes)
+        .sortBy(_.identity.mark)
 
     // V-L2: selection and focus identity survive every projection. A missing ordinary mark uses a
     // visible primary ancestor when one exists and otherwise remains explicitly off-projection.
@@ -642,6 +763,23 @@ final class AtlasCompiler private (provenance: ViewProvenance):
         .flatMap(member =>
           VisibleAncestorChain.from(member, primaryParent, segmentVisible).find(marked.contains)
         )
+    def visibleSurfaceAncestor(id: SurfaceUnitId): Option[Address] =
+      @scala.annotation.tailrec
+      def climb(next: Option[SurfaceUnitId], seen: Set[SurfaceUnitId]): Option[Address] =
+        next match
+          case Some(parentId) if !seen.contains(parentId) =>
+            model.atlas.byId.get(parentId).filter(surfaceUnitVisible) match
+              case Some(parent) =>
+                val address = coreRef.address(CoreRef.SurfaceUnit(parent.id))
+                if marked.contains(address) then Some(address)
+                else climb(parent.parent, seen + parentId)
+              case None => None
+          case _ => None
+
+      model.atlas.byId
+        .get(id)
+        .filter(surfaceUnitVisible)
+        .flatMap(unit => climb(unit.parent, Set(unit.id)))
     val placements: Map[Address, SelectionPlacement[MarkId]] =
       (state.selection ++ state.focus).toVector
         .sortBy(_.render)
@@ -653,6 +791,13 @@ final class AtlasCompiler private (provenance: ViewProvenance):
               storyRef
                 .parse(address)
                 .flatMap(visibleAncestor)
+                .map(SelectionPlacement.ViaAncestor.apply)
+            )
+            .orElse(
+              coreRef
+                .parse(address)
+                .collect { case CoreRef.SurfaceUnit(id) => id }
+                .flatMap(visibleSurfaceAncestor)
                 .map(SelectionPlacement.ViaAncestor.apply)
             )
             .getOrElse(SelectionPlacement.OffProjection)
@@ -718,20 +863,31 @@ final class AtlasCompiler private (provenance: ViewProvenance):
             )
           )
 
-  /** V-E1/V-E3: every mark resolves to an object the model supports with exact spans. */
+  /** V-E1/V-E3: every mark resolves to exact narrative evidence or an exact surface unit. */
   private def checkEvidence(
       model: StoryModel[?],
       mark: VisualPrimitive
   ): Either[DomainError, Unit] =
-    Addressable[StoryRef].parse(mark.address).flatMap(model.supporting) match
-      case Some(_) => Right(())
-      case None    =>
-        Left(
-          DomainError.InvariantViolation(
-            s"view/atlas/marks/${mark.identity.mark.value}",
-            s"${mark.address.render} has no evidence support"
-          )
+    val supported = mark match
+      case VisualPrimitive.SurfaceUnit(_, span, kind, unitOrdinal, parent) =>
+        Addressable[CoreRef].parse(mark.address) match
+          case Some(CoreRef.SurfaceUnit(id)) =>
+            model.atlas.byId.get(id).exists { unit =>
+              unit.span == span && unit.kind == kind && unit.ordinal == unitOrdinal &&
+              unit.parent.map(parentId =>
+                Addressable[CoreRef].address(CoreRef.SurfaceUnit(parentId))
+              ) == parent
+            }
+          case _ => false
+      case _ => Addressable[StoryRef].parse(mark.address).flatMap(model.supporting).nonEmpty
+    if supported then Right(())
+    else
+      Left(
+        DomainError.InvariantViolation(
+          s"view/atlas/marks/${mark.identity.mark.value}",
+          s"${mark.address.render} has no exact evidence support"
         )
+      )
 
 object AtlasCompiler:
   /** Bind Atlas compilation to a source, model-basis, compiler, and configuration receipt. */
@@ -847,6 +1003,10 @@ object AtlasTextualTwin:
     out.append("Marks\n")
     if scene.marks.isEmpty then out.append("  (none)\n")
     scene.marks.foreach {
+      case VisualPrimitive.SurfaceUnit(id, span, kind, unitOrdinal, parent) =>
+        out.append(
+          s"  surface-unit ${id.mark.value} ${id.address.render} kind=$kind span=[${span.start},${span.endExclusive}) ordinal=$unitOrdinal parent=${parent.fold("-")(_.render)}\n"
+        )
       case VisualPrimitive.Region(id, e, label, parent) =>
         out.append(
           s"  region ${id.mark.value} ${id.address.render} x=[${e.x0},${e.x1Exclusive}) lanes=[${e.lane0},${e.lane1}] parent=${parent.fold("-")(_.render)} \"$label\"\n"
