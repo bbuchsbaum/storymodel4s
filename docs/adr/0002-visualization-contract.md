@@ -174,6 +174,23 @@ versioned, receipted, and excluded from publication paths. Start with the
 simplest deterministic constraint layout that passes the laws; adopt
 Sugiyama/StoryFlow-style algorithms only behind golden and property tests.
 
+Range loading under D7 uses codec `SM4SFT02`, one blocked monolith whose blocks
+contain complete compact observed rows. Storage blocks are deliberately not
+semantic `(projection, level, tokenRange)` tiles: a target range can be sparse
+after explicit missingness, and one sidecar serves both Codex and Atlas, so a
+projection change must not rewrite storage. `FeatureRef.row` remains global and
+Missing consumes no row; a resolver maps the required rows to derived block
+ordinals and may coalesce adjacent byte ranges above the portable codec. The
+trusted manifest, never the fetched file, supplies the checksum of the exact
+header/digest-index prelude. Each independently verifiable block digest binds
+its ordinal, first row, row count, and bytes; offsets and lengths are derived
+from checked shape/granularity fields and are never read from a table. The
+whole-file checksum retains its original meaning. Re-blocking is a physical
+rewrite with a different sidecar and containing model identity, even when the
+logical values are unchanged. Plain checksums provide integrity relative to a
+trusted manifest only, not authenticity, confidentiality, or a safe non-public
+receipt identity.
+
 The Codex compiler configuration uses the canonical rendering
 `codex-compiler-config/v2`. It is a `|`-delimited sequence of `key=value`
 fields in this exact order: `rendering`, `horizon`, `focus`, `feature`, `scale`,
@@ -434,7 +451,9 @@ projection kinds.
 - **mesh4s** — no demonstrated geometry need for slices 1–3.
 - **Tiles / Web Workers** — the Discourse Atlas index is one-dimensional
   `(projection, level, tokenRange)`; keep a tile-compatible boundary, build no
-  pyramid; workers only if a layout exceeds ~50 ms after caching.
+  pyramid; semantic tiles map sparse `FeatureRef` rows to independently checked
+  `SM4SFT02` storage blocks as specified in D13, never define storage identity;
+  workers only if a layout exceeds ~50 ms after caching.
 
 ## 8. Sequencing
 

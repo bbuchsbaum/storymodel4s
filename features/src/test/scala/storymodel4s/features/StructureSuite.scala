@@ -213,6 +213,25 @@ class StructureSuite extends ScalaCheckSuite:
     assert(FeatureRef.validatedAll(Vector(ok.copy(space = sp("other"))), Map(m.space -> m)).isLeft)
   }
 
+  test("blocked sidecar granularity is explicitly positive and part of the typed layout") {
+    assert(SidecarBlockRows.from(0).isLeft)
+    assert(SidecarBlockRows.from(-1).isLeft)
+    val rows = SidecarBlockRows.from(64).toOption.get
+    val indexChecksum = Checksum.ofText("trusted sidecar prelude")
+    val manifest = SidecarManifest(
+      sp("semantic.blocked"),
+      3,
+      129,
+      Dtype.Float32,
+      Checksum.ofText("whole blocked file"),
+      Layout.BlockedRowMajor(rows, indexChecksum)
+    )
+
+    assertEquals(rows.value, 64)
+    assertEquals(SidecarManifest.validated(manifest), Right(manifest))
+    assertEquals(manifest.expectedByteLength, Right(3L * 129L * 4L))
+  }
+
   test("sidecar byte length rejects the first overflowing Float64 product") {
     val dimension = Int.MaxValue
     val bytesPerValue = 8L

@@ -101,8 +101,32 @@ object FeatureCodecs:
 
   given Encoder[Dtype] = enumEncoder(_.toString)
   given Decoder[Dtype] = enumDecoder("Dtype", Dtype.values, _.toString)
-  given Encoder[Layout] = enumEncoder(_.toString)
-  given Decoder[Layout] = enumDecoder("Layout", Layout.values, _.toString)
+  given Encoder[Layout] = Encoder.instance {
+    case Layout.RowMajor                                     => Json.fromString("RowMajor")
+    case Layout.BlockedRowMajor(rowsPerBlock, indexChecksum) =>
+      Json.obj(
+        "type" -> Json.fromString("BlockedRowMajor"),
+        "rowsPerBlock" -> rowsPerBlock.value.asJson,
+        "indexChecksum" -> indexChecksum.asJson
+      )
+  }
+  given Decoder[Layout] = Decoder.instance { c =>
+    c.value.asString match
+      case Some("RowMajor") => Right(Layout.RowMajor)
+      case Some(other)      => Left(DecodingFailure(s"unknown Layout $other", c.history))
+      case None             =>
+        for
+          kind <- field[String](c, "type")
+          _ <- Either.cond(
+            kind == "BlockedRowMajor",
+            (),
+            DecodingFailure(s"unknown Layout $kind", c.history)
+          )
+          rawRows <- field[Int](c, "rowsPerBlock")
+          rows <- domain(c, SidecarBlockRows.from(rawRows))
+          indexChecksum <- field[Checksum](c, "indexChecksum")
+        yield Layout.BlockedRowMajor(rows, indexChecksum)
+  }
 
   given Encoder[SidecarManifest] = Encoder.instance { m =>
     Json.obj(

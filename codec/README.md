@@ -39,19 +39,36 @@ re-encoding it is byte-exact.
 
 ## Numeric sidecars
 
-`SidecarCodec` writes a 16-byte header (ASCII `SM4SFT01`, then an unsigned 64-bit little-endian
-payload byte-count field) followed by finite row-major Float32 or Float64 values. This portable
-implementation deliberately accepts only the nonnegative signed-`Long` / `Array[Byte]` capacity
-subset of that field. The manifest checksum covers the complete file. Float32 storage is an
-explicit quantization recorded by the manifest dtype; decoding widens those exact Float32 values
-to Double and never pretends they equal the unquantized input. Finite Double values smaller than
-the Float32 subnormal range silently underflow to `+0.0` or `-0.0`; preserving the resulting raw
-Float bits, including the sign of zero, is part of the declared quantization law.
+`SidecarCodec` preserves the original full-fetch `SM4SFT01` format: a 16-byte header (eight-byte
+magic/version, then an unsigned 64-bit little-endian payload byte count) followed by finite
+row-major Float32 or Float64 values. `SM4SFT02` is its range-loadable blocked form. Its aligned
+48-byte header binds payload bytes, dimension, row count, dtype, and an explicit positive
+`SidecarBlockRows`; a fixed 32-byte digest per derived block follows, then the same row-major
+payload. Blocks contain complete compact observed rows, never semantic Atlas/Codex tiles and never
+partial rows. Missing observations still consume no row.
 
-On little-endian browsers, a validated file admits a zero-copy typed-array view at byte offset 16.
-A big-endian host must use a little-endian `DataView`/copy fallback. The checksum proves full-file
-integrity only: it is not confidentiality protection and does not authenticate individual range
-fetches. Sensitive sidecars require the separately tracked keyed/encrypted artifact contract.
+The V2 manifest supplies the checksum of the exact header/index prelude; that expected root is
+never read from the file being verified. Each index digest binds the block ordinal, first global
+row, row count, and exact bytes, so a fetched block is independently verifiable and cannot be
+relocated. Offsets and lengths are derived from the checked manifest rather than accepted from a
+file table. The existing manifest checksum retains its meaning over the complete file. Re-blocking
+the same logical values is a physical rewrite with a different layout and checksum; callers must
+not cache one block size under another's identity. Partial validation returns checked blocks, never
+a `FeatureTrack` that would falsely imply the unfetched file was validated.
+
+Both formats deliberately accept only the nonnegative signed-`Long` / `Array[Byte]` capacity subset
+of their unsigned header fields. Float32 storage is an explicit quantization recorded by the
+manifest dtype; decoding widens those exact Float32 values to Double and never pretends they equal
+the unquantized input. Finite Double values smaller than the Float32 subnormal range silently
+underflow to `+0.0` or `-0.0`; preserving the resulting raw Float bits, including the sign of zero,
+is part of the declared quantization law.
+
+On little-endian browsers, a validated V1 file admits a zero-copy typed-array view at byte offset
+16; V2 block ranges begin at checked eight-byte-aligned offsets. A big-endian host must use a
+little-endian `DataView`/copy fallback. These plain SHA-256 checks prove integrity relative to a
+trusted manifest only: they are not authenticity or confidentiality protection, and they are not a
+safe receipt identity for non-public material. Sensitive sidecars still require a separately typed
+keyed/encrypted artifact contract.
 
 ## Seams (deferred, marked in code)
 

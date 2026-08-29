@@ -5,8 +5,36 @@ import storymodel4s.core.*
 enum Dtype:
   case Float32, Float64
 
+/** A positive count of complete compact rows in one independently checked sidecar block.
+  *
+  * Why: storage blocks must never split a logical feature row, and invalid zero/negative
+  * granularities must be rejected before any byte-layout arithmetic.
+  */
+opaque type SidecarBlockRows = Int
+
+object SidecarBlockRows:
+  /** Check an explicit storage granularity; the library deliberately supplies no guessed default.
+    */
+  def from(value: Int): Either[DomainError, SidecarBlockRows] =
+    Either.cond(
+      value > 0,
+      value,
+      DomainError.InvariantViolation(
+        "features/sidecar/layout/rowsPerBlock",
+        "rows per block must be positive"
+      )
+    )
+
+  extension (rows: SidecarBlockRows) def value: Int = rows
+
+/** The physical organization and independently trusted range index of a numeric sidecar.
+  *
+  * Why: a blocked layout keeps global feature-row identity independent of Atlas/Codex semantic
+  * tiles while carrying the manifest-rooted checksum needed to verify partial range reads.
+  */
 enum Layout:
   case RowMajor
+  case BlockedRowMajor(rowsPerBlock: SidecarBlockRows, indexChecksum: Checksum)
 
 /** Description of a binary vector sidecar: one row per target, never written into canonical JSON.
   *
@@ -46,7 +74,12 @@ object SidecarManifest:
       else Right(valueCount * bytesPerValue)
 
   def validated(m: SidecarManifest): Either[DomainError, SidecarManifest] =
-    m.expectedByteLength.map(_ => m)
+    for
+      _ <- m.expectedByteLength
+      _ <- m.layout match
+        case Layout.RowMajor                 => Right(())
+        case Layout.BlockedRowMajor(rows, _) => SidecarBlockRows.from(rows.value).map(_ => ())
+    yield m
 
 /** Reference from a target to a row of a sidecar. */
 final case class FeatureRef(target: FeatureTarget, space: FeatureSpaceId, row: Int)
