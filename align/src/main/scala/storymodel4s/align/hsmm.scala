@@ -695,18 +695,35 @@ object GraphHsmm:
 /** Relation-preservation term `D_r(B^{(r)}, P A^{(r)} P^T)` restricted to explicit recall
   * relations. Used as a diagnostic and as an optional corrective on emissions.
   */
+/** Preservation of one relation layer, with the support behind it: how many of the recall's stated
+  * relations of that layer could actually be evaluated against the alignment.
+  */
+final case class LayerPreservation(mean: Option[Double], evaluated: Int, stated: Int):
+  def render: String =
+    val m = mean.map(x => f"$x%.4f").getOrElse("n/a")
+    s"$m (over $evaluated/$stated evaluable relations)"
+
 object RelationPreservation:
 
-  /** For each source layer with a recall counterpart, the mean induced source weight over the
-    * recall's explicit edges (1 = every recalled relation is preserved in the source). Anchors of
-    * either mode count.
+  /** Mean induced source weight over the recall's explicit edges of a layer, with the support it
+    * rests on: 1 means every EVALUABLE recalled relation is preserved in the source.
+    *
+    * The mean is `None` for a layer the recall stated no relations of — reporting 1.0 there said
+    * "every recalled relation is preserved" about a recall that claimed no relations at all. A
+    * relation whose endpoints carry no source mass is likewise not evidence of non-preservation: it
+    * is excluded from the mean and counted in `stated` but not `evaluated`, rather than scored 0.0
+    * and dragging the layer down for a unit we simply could not place.
+    *
+    * This is a diagnostic, not an inference input: `reweight` is the production path and it adds no
+    * bonus when a recall has no relations. Said explicitly because I once claimed otherwise on the
+    * board and the call graph disagreed.
     */
   def diagnostic(
       posterior: AlignmentMatrix,
       recall: RecallGraph,
       view: SourceView
-  ): Map[RelationLayer, Double] =
-    def induced(layer: RelationLayer, from: RecallUnitId, to: RecallUnitId): Double =
+  ): Map[RelationLayer, LayerPreservation] =
+    def induced(layer: RelationLayer, from: RecallUnitId, to: RecallUnitId): Option[Double] =
       (posterior.row(from), posterior.row(to)) match
         case (Some(a), Some(b)) =>
           val pairs = for
@@ -715,17 +732,25 @@ object RelationPreservation:
             if ma > 0.0 && mb > 0.0
           yield ma * mb * (if view.reachable(layer, s, t) then 1.0 else 0.0)
           val z = a.sourceMass * b.sourceMass
-          if z <= 0.0 then 0.0 else pairs.sum / z
-        case _ => 0.0
+          if z <= 0.0 then None else Some(pairs.sum / z)
+        case _ => None
     val temporal = recall.relations.temporal.map { e =>
       e.relation match
-        case RecallTemporalRelation.Before       => induced(RelationLayer.WorldTime, e.from, e.to)
-        case RecallTemporalRelation.After        => induced(RelationLayer.WorldTime, e.to, e.from)
-        case RecallTemporalRelation.Simultaneous => 0.0
+        case RecallTemporalRelation.Before => induced(RelationLayer.WorldTime, e.from, e.to)
+        case RecallTemporalRelation.After  => induced(RelationLayer.WorldTime, e.to, e.from)
+        // A simultaneity claim has no direction to preserve in a world-time ordering, so there is
+        // nothing to evaluate; it used to score 0.0, i.e. "not preserved".
+        case RecallTemporalRelation.Simultaneous => None
     }
     val causal = recall.relations.causal.map(e => induced(RelationLayer.Causal, e.cause, e.effect))
-    def mean(xs: Vector[Double]): Double = if xs.isEmpty then 1.0 else xs.sum / xs.size
-    Map(RelationLayer.WorldTime -> mean(temporal), RelationLayer.Causal -> mean(causal))
+    def layer(stated: Vector[Option[Double]]): LayerPreservation =
+      val evaluated = stated.flatten
+      // The support is always reported, so "you stated no relations of this layer" stays
+      // distinguishable from "none of the three you stated could be evaluated" - collapsing both
+      // to a bare None would lose the more informative of the two.
+      val mean = if evaluated.isEmpty then None else Some(evaluated.sum / evaluated.size)
+      LayerPreservation(mean, evaluated.size, stated.size)
+    Map(RelationLayer.WorldTime -> layer(temporal), RelationLayer.Causal -> layer(causal))
 
   /** Lower the cost of states that would preserve the recall's explicit relations given the current
     * posterior of the related units. Only states present in `base` (the admissible ones) are
