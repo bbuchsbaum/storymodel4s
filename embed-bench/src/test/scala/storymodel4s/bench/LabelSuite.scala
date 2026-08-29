@@ -136,7 +136,8 @@ class LabelSuite extends FunSuite:
 
   test("Law I5: a high-risk story in the set downgrades a calibrated report, naming it") {
     val set = FrozenSet.verify(manifest(risk = ContaminationRisk.High), store.get).toOption.get
-    val report = BenchReport.label(Vector(caseWith("f", set.origin("s1").get)), Vector.empty, protocol, 1L)
+    val report =
+      BenchReport.label(Vector(caseWith("f", set.origin("s1").get)), Vector.empty, protocol, 1L)
     report match
       case BenchReport.Diagnostic(DiagnosticReason.ContaminatedSet(_, ids), _, _) =>
         assertEquals(ids, Vector("s1"))
@@ -146,7 +147,12 @@ class LabelSuite extends FunSuite:
   test("Law I5: medium in the untouched-test partition needs a written justification") {
     val bad = manifest(risk = ContaminationRisk.Medium, partition = Partition.UntouchedTest)
     val badSet = FrozenSet.verify(bad, store.get).toOption.get
-    BenchReport.label(Vector(caseWith("f", badSet.origin("s1").get)), Vector.empty, protocol, 1L) match
+    BenchReport.label(
+      Vector(caseWith("f", badSet.origin("s1").get)),
+      Vector.empty,
+      protocol,
+      1L
+    ) match
       case BenchReport.Diagnostic(DiagnosticReason.UnjustifiedMedium(_, ids), _, _) =>
         assertEquals(ids, Vector("s1"))
       case other => fail(s"expected UnjustifiedMedium, got ${other.label}")
@@ -157,7 +163,9 @@ class LabelSuite extends FunSuite:
     )
     val goodSet = FrozenSet.verify(good, store.get).toOption.get
     assertEquals(
-      BenchReport.label(Vector(caseWith("f", goodSet.origin("s1").get)), Vector.empty, protocol, 1L).label,
+      BenchReport
+        .label(Vector(caseWith("f", goodSet.origin("s1").get)), Vector.empty, protocol, 1L)
+        .label,
       "calibrated"
     )
   }

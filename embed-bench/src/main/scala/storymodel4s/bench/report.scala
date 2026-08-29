@@ -13,8 +13,10 @@ enum DiagnosticReason:
   case MixedSets(setIds: Vector[String])
   case ProtocolDrift(setId: String, recorded: Checksum, current: Checksum)
   case ProtocolVersion(setId: String, recorded: Int, expected: Int)
+
   /** Law I5 clause 3: a set containing a memorized story cannot back a calibrated claim. */
   case ContaminatedSet(setId: String, storyIds: Vector[String])
+
   /** Law I5 clause 2: `medium` in the partition that selects a default needs a justification. */
   case UnjustifiedMedium(setId: String, storyIds: Vector[String])
 
