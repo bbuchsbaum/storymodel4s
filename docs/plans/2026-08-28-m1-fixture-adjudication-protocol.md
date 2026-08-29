@@ -1,10 +1,18 @@
-# M1 W4(9) — Frozen-fixture adjudication protocol (design checkpoint, rev 0)
+# M1 W4(9) — Frozen-fixture adjudication protocol (rev 1, decided)
 
-**Bead:** bd-01M14YJ8FG15S0R1ART7DTM1XZ (claude-storymodel4s-m1). **Status:** design
-checkpoint for critique; nothing here is executed yet. Companion: the frozen corpus
-manifest (`2026-08-28-m1-frozen-corpus-manifest.md`) and the spike spec rev 2.
-**Independence audit** of the frozen set is a separate Codex-owned bead (W4: Claude
-builds, Codex audits); this document is what that audit checks against.
+**Bead:** bd-01M14YJ8FG15S0R1ART7DTM1XZ (claude-storymodel4s-m1). **Status:** rev 0 was
+a design checkpoint; the seven open decisions were taken by the chief architect on
+2026-08-28 (`coordination`/`embeddings` post-01M15AM6WTR8N4A38BN3WHB4WS) and are applied
+in this revision — see §10. This document is now **operational for set 1**. Companion:
+the frozen corpus manifest (`2026-08-28-m1-frozen-corpus-manifest.md`) and the spike
+spec rev 2. **Independence audit** of the frozen set is a separate agent-owned bead
+(W4: Claude builds, Codex audits); this document is what that audit checks against, and
+its content checksum is named in every freeze receipt (§6) so that a post-freeze edit of
+the protocol is detectable.
+
+**Sets.** *Set 1* is the first frozen selection set (this revision). *Set 2* is the
+planned expansion; items deferred to it are marked **[set 2]** and are recorded in the
+manifest under `plannedExpansions` so that the deferral itself is auditable.
 
 ## 0. Why a protocol, not a script
 
@@ -23,18 +31,34 @@ exact spans, an annotator identity (pseudonymized), and an adjudication decision
 |---|---|---|
 | Annotator A, B | 2 | the story text, the surface atlas, the layer guidelines, their own prior layers |
 | Adjudicator | 1 | A's and B's annotations for the layer being adjudicated, the guidelines |
-| Recall panel participant | ≥ 3 per story per partition | the story once (read or heard), then nothing |
+| Recall panel participant | set 1: 3 (development), 3 (calibration), 5 (untouched test) per story; **[set 2]** test → 8 | the story once (read or heard), then nothing |
 | Transcriber | 1 per recall | the audio; the story text is withheld |
-| Independence auditor (Codex) | 1 per set | everything, read-only, after the freeze |
+| Independence auditor (an agent, e.g. Codex) | 1 per set | everything, read-only, after the freeze |
+
+Annotators, adjudicators, transcribers, and recall participants are humans (Law I4).
+Staffing of set 1 is recorded in the manifest, pseudonymized.
 
 **Law I1 (channel independence).** No embedding model, chart provider, WL kernel,
 reranker, or LLM judge that is *or could later be* under test may touch the
-construction of a frozen set. The only machine assistance permitted is (a) the
-deterministic `core.SurfaceAnalyzer` atlas and (b) a *different* provider than any
-under test, used only to produce **candidate proposals** that both annotators must
-independently confirm or reject; every such proposal is logged with its provider
-fingerprint in the set's receipt so the auditor can prove it is not a tested channel.
-A set built with any tested channel's help is **diagnostic**, never a selection set.
+construction of a frozen set. **In set 1 no generative assistance of any kind is
+used.** The only machine assistance permitted is deterministic, parameter-free code in
+this repository: the `core.SurfaceAnalyzer` atlas (surface units, tokens, mention
+candidates) and the baseline `RecallSegmenter` boundary proposals (§4). Such code may
+*propose*; only the two human annotators, independently, confirm or reject, and every
+proposal is logged with the code's build fingerprint in the set's receipt. A set built
+with any tested channel's help is **diagnostic**, never a selection set.
+
+**[set 2]** Candidate proposals from a *non-tested* LLM provider (e.g. L2 situations and
+roles for annotators to confirm) are deferred to set 2 and are admissible there only
+with a **written independence argument** filed with the set's receipt before the first
+proposal is generated. The argument must (a) name the provider fingerprint and the
+frozen model version; (b) show that the provider is not, and by policy will not be,
+a tested channel in any bench that consumes the set — a different vendor family and an
+explicit exclusion line in ADR 0001 §D7; (c) state how proposals are logged; and (d)
+commit to reporting the annotators' per-layer **rejection rate** of proposals, so that
+rubber-stamping is detectable (a rejection rate below a threshold declared in the
+argument downgrades the layer to *benchmark-tuned* material). The independence auditor
+signs the argument as part of I1.
 
 **Law I2 (blindness).** Annotators and adjudicators never see a model's alignment,
 chart, candidate list, or score for a story they annotate. Recall participants never
@@ -42,6 +66,12 @@ see annotations. Transcribers never see the story text.
 
 **Law I3 (no self-adjudication).** The adjudicator of a layer is not one of its two
 annotators.
+
+**Law I4 (no agent annotators).** No agent (Claude, Codex, or any other model-driven
+actor) is an annotator, adjudicator, or transcriber for a selection set. The agent role
+is **auditor only**: checking I1–I3 and the leakage checklist (§5) and writing the freeze
+receipt's `audit.json` (§6). Agents may annotate material under the `diagnostic/` root
+(§5), which is never selection evidence.
 
 ## 2. Annotation layers (in order; each has an agreement measure and a stop rule)
 
@@ -96,24 +126,37 @@ RecallUnitTarget(
 - A **blend** lists both anchors as acceptable and the adjudicator marks `blend = true`.
 - A **role-reversed / negated / context-shifted** unit anchors to the correct event with
   the expected facets — never to "external" (ADR 0001 §D5: distortion, not omission).
-- Acceptable-target agreement is measured as Jaccard over target sets and exact match
-  on primary; the stop rule is Jaccard ≥ 0.80 before adjudication.
+- Acceptable-target agreement is measured twice per unit and both are stored in
+  `receipts/agreement.json`: **raw Jaccard** over the two annotators' `targets` sets, and
+  **ancestor-collapsed Jaccard**, computed after projecting both sets to a common
+  hierarchy level. The projection: let `ℓ = max(level(primary_A), level(primary_B))`
+  under the frozen L6 primary segmentation; replace every target `(node, level)` with
+  `(ancestor_ℓ(node), ℓ)` (a node already at or above `ℓ` is unchanged) and de-duplicate.
+  Two annotators who anchor a summary unit at a scene and at its member events
+  therefore agree; two who anchor at different sibling events do not. Exact match on
+  `primary` is reported separately. **The stop rule is ancestor-collapsed Jaccard ≥ 0.80
+  (story mean, before adjudication), with raw Jaccard reported alongside**; a story
+  whose raw Jaccard is more than 0.15 below its collapsed Jaccard is flagged in the
+  receipt as *summary-heavy* so the gap is visible to the bench.
 
 ## 4. Natural human-recall panel
 
-- **Collection.** Free recall immediately after one exposure (read silently, or listened
-  to a neutral recording — recorded per story), instruction: "tell the story in your own
-  words, in as much detail as you can"; no probes for the free-recall set. A second,
-  delayed recall (≥ 24 h) is optional and stored as a separate panel.
-- **Panel size.** Development and calibration partitions: ≥ 3 recalls per story;
-  untouched test partition: ≥ 5 recalls per story (macro CIs need them). Participants
-  are never reused across partitions.
+- **Collection.** Set 1 collects **immediate free recall only**: one exposure (read
+  silently, or listened to a neutral recording — recorded per story), then free recall
+  with the instruction "tell the story in your own words, in as much detail as you
+  can"; no probes. **[set 2]** Delayed recall (≥ 24 h) is out of set 1; it is planned for
+  set 2 as a separate panel with its own participants and its own agreement receipts.
+- **Panel size (set 1).** Development: 3 recalls per story; calibration: 3 per story;
+  untouched test: 5 per story. **[set 2]** The untouched-test panel is raised to 8 per
+  story (story-macro CIs), recorded in the manifest as a planned expansion. Participants
+  are never reused across partitions or across sets' panels for the same story.
 - **Transcription.** Verbatim; disfluencies, false starts, hedges, and self-repairs
   **retained** (they are evidence for `ExpressedUncertainty` and repair handling);
   interviewer speech, if any, on its own turn; timestamps per turn when audio exists;
   UTF-8, one `TranscriptAtlas` per recall.
 - **Segmentation is adjudicated before targets.** The baseline `RecallSegmenter` may
-  *propose* idea-unit boundaries (it is deterministic and not a tested channel), but A
+  *propose* idea-unit boundaries (it is deterministic, has no learned parameters, and
+  is not a tested channel — the only proposal mechanism admitted by I1 for set 1), but A
   and B independently confirm/repair every boundary; only adjudicated unit boundaries
   receive targets. The segmenter's proposals are logged so its boundary accuracy can be
   reported as a diagnostic.
@@ -144,8 +187,13 @@ Leakage checklist (the auditor signs each item):
 5. No tested channel's output was visible to any annotator (I1/I2), per the receipt.
 6. The test partition's recall transcripts were not read by any engineer before the
    report (access is logged by the bench harness).
-7. Any metamorphic/synthetic material is stored under `diagnostic/`, never under a
-   partition.
+7. Any metamorphic/synthetic material lives under the separate resource root
+   `fixtures/src/main/resources/diagnostic/` (own manifest, own checksums), **never
+   inside a frozen set directory** `frozen/<set-id>/` and never under a partition. A
+   frozen set's manifest lists no diagnostic file; a diagnostic manifest may *reference*
+   a frozen set-id read-only.
+8. The protocol checksum named in the manifest equals the checksum of this document at
+   the freeze commit (§6).
 
 ## 6. The freeze
 
@@ -166,9 +214,28 @@ fixtures/src/main/resources/frozen/<set-id>/            # set-id = f-<yyyymmdd>-
   recalls/<partition>/<story-id>/<recall-id>.units.jsonl       # adjudicated RecallUnit boundaries
   recalls/<partition>/<story-id>/<recall-id>.targets.jsonl     # RecallUnitTarget per unit
   receipts/agreement.json                   # pre-adjudication agreement per layer per story
+                                            # (raw + ancestor-collapsed Jaccard for targets)
   receipts/adjudication.jsonl               # every disagreement and its decision (append-only)
+  receipts/pd-signoff.json                  # one signed line per story: PD basis, edition, signer, date
   receipts/audit.json                       # written by the independence auditor after the freeze
+
+fixtures/src/main/resources/diagnostic/     # separate root: metamorphic/synthetic sets, Aesop micro-set,
+                                            # agent-annotated material; own manifest; never selection evidence
 ```
+
+The manifest's top-level fields, in addition to the per-file checksums above, are:
+
+| Field | Meaning |
+|---|---|
+| `protocolVersion` | this document's revision (`1` for set 1) |
+| `protocolChecksum` | `canonicalText` SHA-256 of this document at the freeze commit — a later edit of the protocol is detected by recomputing it |
+| `setId`, `parentSetId` | content address; the parent for correction sets |
+| `panelSizes` | `{development: 3, calibration: 3, test: 5}` for set 1 |
+| `recallConditions` | `["immediate"]` for set 1 |
+| `ceilingMargin` | `0.02` |
+| `assistance` | build fingerprints of the deterministic proposers used (I1); empty of any generative provider in set 1 |
+| `plannedExpansions` | set 2 items: `test → 8`, `delayed recall`, `non-tested-LLM proposals (with independence argument)` |
+| `staffing` | pseudonymized annotator/adjudicator/transcriber/auditor ids with role; no agent in a non-auditor role (I4) |
 
 - **Immutability.** After the manifest commit, no file under `<set-id>/` changes. A
   correction creates `<set-id'>` with a `diff-receipt.json` naming the parent set, the
@@ -176,6 +243,12 @@ fixtures/src/main/resources/frozen/<set-id>/            # set-id = f-<yyyymmdd>-
 - **Verification.** `embed-bench` refuses to run against a set whose file checksums do
   not match its manifest, or whose manifest commit is not an ancestor of the candidate
   under test.
+- **Protocol drift.** At every run the bench recomputes the checksum of this document at
+  the candidate's HEAD and compares it with `protocolChecksum`. A mismatch is printed in
+  the report header as *protocol drift* with both checksums; numbers produced under a
+  drifted protocol may not be labelled **calibrated** (§7) until a successor set is
+  frozen under the revised protocol (or the revision is shown, in a `diff-receipt.json`,
+  to leave every rule the set relied on unchanged).
 
 ## 7. What a label may legally be called (ADR 0001 L6)
 
@@ -193,13 +266,20 @@ model name that does not resolve to a frozen set is invalid.
 `gates.md` thresholds are provisional until five stories are frozen. From then on the
 gate for layer *k* is `min(provisional_k, ceiling_k − margin)` where `ceiling_k` is the
 pre-adjudication agreement recorded in `receipts/agreement.json` and `margin` is
-declared in the manifest (default 0.02). A gate that would exceed attainable human
-agreement is a specification error, not a model failure.
+declared in the manifest as `ceilingMargin` — **0.02 for set 1 (decided)**. For the
+recall-unit target layer the ceiling is the ancestor-collapsed Jaccard (§3). A gate
+that would exceed attainable human agreement is a specification error, not a model
+failure.
 
 ## 9. Operational checklist (per story)
 
+0. **PD sign-off first.** No story text enters the repository until the story's
+   PD-basis line in the manifest's sign-off checklist is signed (signer, date, edition
+   checked). Text is fetched from the listed provenance as a data file; it is never
+   typed in, paraphrased, or regenerated by an agent (AGENTS.md; the WOG precedent).
 1. Fetch the text as a data file from the manifest's provenance; verify the recorded
-   checksum; run `SurfaceAnalyzer`; commit `text.txt`.
+   checksum; run `SurfaceAnalyzer`; commit `text.txt` together with the signed line in
+   `receipts/pd-signoff.json`.
 2. L0–L7 in order; after each layer: compute agreement, adjudicate, record ceilings,
    freeze the layer file.
 3. Assemble `model.json`; it must pass `StoryValidator` under `strict`; record its
@@ -207,24 +287,33 @@ agreement is a specification error, not a model failure.
 4. Collect recalls; transcribe; propose boundaries with the segmenter; adjudicate
    boundaries; assign `RecallUnitTarget`s; adjudicate targets.
 5. Assign the story's partition per the manifest; run the leakage checklist.
-6. When all stories are done: write the manifest, commit, request the independence
-   audit, and only then let a channel run.
+6. When all stories are done: write the manifest (including `protocolChecksum`),
+   commit, request the independence audit (I1–I4 + leakage checklist), and only then
+   let a channel run.
 
-## Decisions requested from chief
+## 10. Decisions (chief, 2026-08-28)
 
-1. **Panel sizes** (§4): ≥ 3 recalls/story for dev+cal and ≥ 5 for test — enough for
-   story-macro CIs, or raise test to ≥ 8?
-2. **Candidate-proposal assistance** (I1): allow a non-tested LLM provider to propose
-   L2 situations/roles for annotators to confirm, or forbid all generative assistance
-   for the first frozen set and accept the slower hand pass?
-3. **Delayed recall** (§4): in or out of the first set?
-4. **Acceptable-target Jaccard stop rule** (§3): 0.80 before adjudication — too strict
-   for summary-heavy recalls? Alternative: measure at the level of `(anchor, level)`
-   *after* collapsing hierarchy ancestors.
-5. **Diagnostic material placement** (§5.7): keep the metamorphic corpus inside the
-   set directory under `diagnostic/` (auditable together) or in a separate resource
-   root?
-6. **Ceiling margin** (§8): 0.02 default acceptable?
-7. **Who adjudicates the first set**: the owner + one lab member, with Codex as auditor
-   only (the protocol forbids agents as annotators or adjudicators — confirm that is
-   intended for the *selection* set; agents may annotate diagnostic sets).
+Taken by the chief architect (`claude-storymodel4s`) in post-01M15AM6WTR8N4A38BN3WHB4WS
+and applied in this revision; each is binding for set 1.
+
+| # | Question (rev 0) | Decision | Applied in |
+|---|---|---|---|
+| 1 | Panel sizes | **3 / 3 / 5** recalls per story (development / calibration / untouched test) for set 1; untouched test raised to **8 in set 2**, recorded as a planned expansion | §1, §4, manifest `panelSizes`, `plannedExpansions` |
+| 2 | Generative candidate proposals | **None in set 1.** Only the deterministic atlas (and the deterministic segmenter for boundaries) may propose; humans confirm. The non-tested-LLM option is removed from set 1 and deferred to set 2, admissible there only with a written independence argument | I1, §4 |
+| 3 | Delayed recall | **Out of set 1** (immediate free recall only); set 2 | §4, manifest `recallConditions` |
+| 4 | Target stop rule | **Jaccard ≥ 0.80 after collapsing to hierarchy ancestors**, with raw Jaccard reported alongside | §3, §8 |
+| 5 | Diagnostic material | Separate root **`fixtures/src/main/resources/diagnostic/`**, never inside a frozen set directory | §5.7, §6 |
+| 6 | Ceiling margin | **0.02** | §8, manifest `ceilingMargin` |
+| 7 | Agents as annotators/adjudicators | **Excluded.** Agent role is auditor only: I1–I3 checks and the freeze receipt; agents may annotate diagnostic material only | Law I4, §1 |
+
+Two additions requested with the decisions:
+
+- **(a) Sign-off checklist.** Every "verify before freeze" item in the manifest is now a
+  checklist line with a sign-off field; no story text enters the repository until its
+  PD-basis line is signed, and text is never agent-regenerated — data files only (§9.0,
+  manifest "Sign-off checklist").
+- **(b) Protocol checksum in the freeze receipt.** The manifest names this document's
+  content checksum (`protocolChecksum`), and the bench reports protocol drift (§6).
+
+Dissent on record: none. Rev 0's open questions are closed; new questions go to
+`coordination` as bead proposals, not into this document.

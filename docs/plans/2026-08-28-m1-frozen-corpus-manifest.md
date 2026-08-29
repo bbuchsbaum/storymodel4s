@@ -1,11 +1,22 @@
-# M1 W4(9) — Frozen corpus manifest (candidate list, rev 0)
+# M1 W4(9) — Frozen corpus manifest (candidate list, rev 1)
 
-**Bead:** bd-01M14YJ8FG15S0R1ART7DTM1XZ. **Status:** candidate list for critique; no
-text is reproduced here and none is fetched yet. Texts enter the repository only as
-data files under `fixtures/src/main/resources/frozen/<set-id>/stories/<story-id>/text.txt`,
-fetched from the provenance below, checksummed in the manifest, never agent-generated
-(per AGENTS.md and the WOG precedent). *The War of the Ghosts* stays a regression
-fixture and is excluded from every partition.
+**Bead:** bd-01M14YJ8FG15S0R1ART7DTM1XZ. **Status:** candidate list for **set 1**, under
+the adjudication protocol rev 1 (decisions of the chief, 2026-08-28,
+post-01M15AM6WTR8N4A38BN3WHB4WS — see the protocol's §10). No text is reproduced here
+and none is fetched yet. Texts enter the repository only as data files under
+`fixtures/src/main/resources/frozen/<set-id>/stories/<story-id>/text.txt`, fetched from
+the provenance below, checksummed in the manifest, **never agent-generated or
+agent-regenerated** (per AGENTS.md and the WOG precedent), and **only after the story's
+PD-basis line in the sign-off checklist below is signed**. *The War of the Ghosts* stays
+a regression fixture and is excluded from every partition.
+
+**Set 1 parameters (decided).** Recall condition: immediate free recall only. Panel
+sizes: 3 (development) / 3 (calibration) / 5 (untouched test) recalls per story.
+Ceiling margin: 0.02. Assistance: deterministic atlas and segmenter proposals only; no
+generative provider. Annotation and adjudication by humans; agents audit only.
+**Planned expansions (set 2, recorded in `plannedExpansions`):** untouched-test panel
+→ 8 per story; a delayed-recall (≥ 24 h) panel; non-tested-LLM candidate proposals
+with a written independence argument.
 
 Families: **F1 folktale/oral** (ethnographic transcriptions, US-government
 publications), **F2 fairy tale, literary** (pre-1929 English editions/translations),
@@ -41,7 +52,7 @@ done for WOG).
 | f2-jacobs-mr-fox | Mr. Fox | Joseph Jacobs, *English Fairy Tales*, 1890 | published 1890 | Project Gutenberg #7439 | 900–1,200 | nested narration ("it is not so, nor it was not so"); repeated motif; retrospective telling contradicted by evidence | calibration |
 | f2-jacobs-molly-whuppie | Molly Whuppie | Jacobs, *English Fairy Tales*, 1890 | published 1890 | PG #7439 | 1,000–1,400 | repeated episodes with variation; similar characters (three sisters); goal/attempt/success structure | development |
 | f2-perrault-bluebeard | Blue Beard | Perrault, in Lang (ed.), *The Blue Fairy Book*, 1889 | published 1889 | Project Gutenberg #503 | 1,800–2,200 | suspense with unresolved cause (the wives); dialogue-heavy; explicit summary ending (moral) | calibration |
-| f2-aesop-set | Aesop micro-set: 4 fables (The Fox and the Grapes; The Dog and the Shadow; The Lion and the Mouse; The Boy Who Cried Wolf — titles per edition **verify**) | Aesop, tr. George Fyler Townsend, 1867 | published 1867 | Project Gutenberg #21 | 4 × 80–200 | explicit summary (morals); minimal event graphs — diagnostic-first, promote to a partition only if the bench needs very short stories | diagnostic (not a partition) |
+| f2-aesop-set | Aesop micro-set: 4 fables (The Fox and the Grapes; The Dog and the Shadow; The Lion and the Mouse; The Boy Who Cried Wolf — titles per edition **verify**) | Aesop, tr. George Fyler Townsend, 1867 | published 1867 | Project Gutenberg #21 | 4 × 80–200 | explicit summary (morals); minimal event graphs — diagnostic-first, promote to a partition only if the bench needs very short stories | diagnostic root (`fixtures/src/main/resources/diagnostic/aesop/`), not a partition |
 
 ## F3 — short fiction, literary (pre-1929 originals/translations)
 
@@ -61,10 +72,14 @@ done for WOG).
 | development | f1-kathlamet-cultee-ghosts, f1-pawnee-1, f2-grimm-fisherman, f2-jacobs-molly-whuppie, f3-chopin-story-of-an-hour, f3-london-to-build-a-fire |
 | calibration | f1-kathlamet-2, f2-jacobs-mr-fox, f2-perrault-bluebeard, f3-ohenry-gift-of-the-magi, f3-chekhov-the-bet |
 | untouched test | f1-chinook-1, f1-tlingit-1, f2-grimm-robber-bridegroom, f3-saki-open-window, f3-bierce-owl-creek |
-| diagnostic only | f2-aesop-set, all metamorphic material, WOG |
+| diagnostic only (separate root `fixtures/src/main/resources/diagnostic/`, never inside `frozen/<set-id>/`) | f2-aesop-set, all metamorphic material, agent-annotated material, WOG |
 
 Sixteen stories across three families (≥ 8 stories / ≥ 3 families satisfied with margin);
 every family appears in every partition.
+
+Recall panel for set 1 (immediate free recall only): 6 development stories × 3 +
+5 calibration stories × 3 + 5 untouched-test stories × 5 = **58 recalls**; set 2 adds
+15 test recalls (5 × 3) for the test → 8 expansion, plus the delayed-recall panel.
 
 ## Fetch and provenance rules
 
@@ -76,14 +91,52 @@ every family appears in every partition.
    system; a differing edition is a different story-id.
 4. If a PD basis marked **verify** cannot be confirmed, drop the item (do not
    substitute a modern translation).
+5. **Sign-off before fetch.** A story's `text.txt` is committed only after its line in
+   the sign-off checklist below is signed; the signed line is copied into the set's
+   `receipts/pd-signoff.json` (story-id, PD basis, edition checked, signer, date). No
+   agent types, paraphrases, or regenerates story text — data files fetched from the
+   listed provenance only.
+6. **Freeze receipt.** The manifest names the adjudication protocol's content checksum
+   (`protocolChecksum`, protocol rev 1) so that any later edit of the protocol is
+   detectable by the bench; it also records `panelSizes`, `recallConditions`,
+   `ceilingMargin`, `assistance`, `plannedExpansions`, and pseudonymized `staffing`
+   (protocol §6).
 
-## PD-status uncertainties to resolve before freeze
+## Sign-off checklist (verify before freeze)
 
-- Exact titles/pages of the second Kathlamet, the Chinook, the Tlingit, and the Pawnee
-  tales (the volumes are PD; the specific tale choice is open).
-- Archive.org identifier for Dorsey 1904.
-- Gutenberg edition containing Chopin's *The Story of an Hour* (PG #160 is believed to
-  include it; confirm).
-- Chekhov *The Bet*: which pre-1929 translation to use and its Gutenberg identifier.
-- Bierce: confirm PG #4366 is *In the Midst of Life* containing *Owl Creek*.
-- Hunt 1884 Grimm: confirm PG #5314 contains both selected tales under those titles.
+Each line is signed by a human (actor id, ISO date) after checking the actual edition;
+an agent may prepare the evidence (catalog page, scan page number) but may not sign.
+**No story text is fetched into the repository until its PD-basis line is signed.** An
+unsigned line at freeze time means the story is dropped from the set (rule 4 above).
+
+PD basis / edition (one line per story):
+
+- [ ] f1-kathlamet-cultee-ghosts — Boas 1901, BAE Bull. 26, US GPO; page range confirmed. Signed: ________ (date ________)
+- [ ] f1-kathlamet-2 — tale title chosen; Boas 1901; page range confirmed. Signed: ________ (date ________)
+- [ ] f1-chinook-1 — tale title chosen; Boas 1894, BAE Bull. 20; page range confirmed. Signed: ________ (date ________)
+- [ ] f1-tlingit-1 — tale title chosen; Swanton 1909, BAE Bull. 39; page range confirmed. Signed: ________ (date ________)
+- [ ] f1-pawnee-1 — tale title chosen; Dorsey 1904 archive.org identifier confirmed; published 1904. Signed: ________ (date ________)
+- [ ] f2-grimm-fisherman — Hunt 1884 in PG #5314 under that title confirmed. Signed: ________ (date ________)
+- [ ] f2-grimm-robber-bridegroom — Hunt 1884 in PG #5314 under that title confirmed. Signed: ________ (date ________)
+- [ ] f2-jacobs-mr-fox — Jacobs 1890, PG #7439 confirmed. Signed: ________ (date ________)
+- [ ] f2-jacobs-molly-whuppie — Jacobs 1890, PG #7439 confirmed. Signed: ________ (date ________)
+- [ ] f2-perrault-bluebeard — Lang 1889, PG #503 confirmed. Signed: ________ (date ________)
+- [ ] f2-aesop-set (diagnostic root only) — Townsend 1867, PG #21; four titles confirmed per edition. Signed: ________ (date ________)
+- [ ] f3-chopin-story-of-an-hour — story present in PG #160 confirmed; published 1894. Signed: ________ (date ________)
+- [ ] f3-ohenry-gift-of-the-magi — PG #7256 confirmed; published 1905/1906. Signed: ________ (date ________)
+- [ ] f3-saki-open-window — PG #1477 confirmed; published 1914. Signed: ________ (date ________)
+- [ ] f3-bierce-owl-creek — PG #4366 is *In the Midst of Life* containing *Owl Creek*, confirmed. Signed: ________ (date ________)
+- [ ] f3-chekhov-the-bet — pre-1929 translation and its Gutenberg identifier chosen and confirmed. Signed: ________ (date ________)
+- [ ] f3-london-to-build-a-fire — PG #2429 (*Lost Face*), 1908 version confirmed. Signed: ________ (date ________)
+
+Set-level items:
+
+- [ ] Partition map final (every family in every partition; WOG in none). Signed: ________ (date ________)
+- [ ] Panel sizes 3/3/5 and immediate-recall-only condition recorded in the manifest. Signed: ________ (date ________)
+- [ ] `plannedExpansions` (test → 8; delayed recall; non-tested-LLM proposals with independence argument) recorded. Signed: ________ (date ________)
+- [ ] `assistance` lists only deterministic proposers (atlas, segmenter) with build fingerprints; no generative provider. Signed: ________ (date ________)
+- [ ] `staffing` has no agent in a non-auditor role (Law I4). Signed: ________ (date ________)
+- [ ] `ceilingMargin = 0.02` recorded. Signed: ________ (date ________)
+- [ ] No diagnostic file under `frozen/<set-id>/`; diagnostic material under `fixtures/src/main/resources/diagnostic/`. Signed: ________ (date ________)
+- [ ] `protocolChecksum` equals the protocol document's content checksum at the freeze commit. Signed (auditor): ________ (date ________)
+- [ ] Independence audit (I1–I4 + leakage checklist) written to `receipts/audit.json`. Signed (auditor): ________ (date ________)
