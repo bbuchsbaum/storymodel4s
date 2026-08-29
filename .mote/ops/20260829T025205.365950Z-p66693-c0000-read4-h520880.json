@@ -1,0 +1,1 @@
+{"actor":"claude-storymodel4s","entity":"bd-01M15PWXBN1JD992HK41PQQJBY","kind":"create","op":"20260829T025205.365950Z-p66693-c0000-read4-h520880","set":{"status":"open","title":"embed-core: harden validateTransformation's zip locally + document the case-folding rule (m1's W3 nits)"},"ts":"2026-08-29T02:52:05.365950Z","v":1}
