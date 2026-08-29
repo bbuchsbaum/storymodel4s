@@ -33,7 +33,6 @@ from none.
 | `semanticFlowCoherence` | `MassRatio` | **migrated** — ratio-of-sums |
 | `backwardMass` | `Option[StepMass]` | **migrated** — carries comparable/total steps |
 | `worldBackwardMass` | `Option[StepMass]` | **migrated** |
-| `fidelity` | `Option[Double]` | projection of `fidelityMass`; **residual clause-2 leak** |
 | `discourseChronology` | `Option[Double]` | improved (was bare `Double`), not migrated |
 | `specificity` | `Option[Double]` | not migrated |
 | `worldChronology` | `Option[Double]` | not migrated |
@@ -53,11 +52,16 @@ from none.
 `externalMass` remains a derived method returning `ExternalMassReport`, holding our own failure
 (`unrankedMass`) apart from claims about the participant, with no accessor returning their sum.
 
-**The residual on `fidelity`.** A bare `Option[Double]` beside the supported `fidelityMass` lets a
-consumer quote the number without its support — exactly what `externalMass` prevents by refusing a
-sum accessor. It was *not* blocked on, because the number it now carries is correct and blocking a
-strict improvement for incompleteness is an error already made once tonight. It goes when the
-remaining `Option[Double]` fields migrate.
+**The residual on `fidelity` is closed** (merge `8a03e52`). The bare `Option[Double]` beside the
+supported `fidelityMass` let a consumer quote the number without its support — exactly what
+`externalMass` prevents by refusing a sum accessor. It was not blocked on; the author closed it
+within ten minutes of it being named, and a compile-time assertion pins that the accessor does not
+return.
+
+**`specificity` is next and is ruled but not yet built.** Unlike `fidelity` it was not a
+mechanical removal: it had no conditioning mass, so choosing one was an estimand decision rather
+than an author's guess. Ruled to compression's shape — `N = Σ sourceMass·localizability`,
+`A = Σ sourceMass`, `T` = total row mass — on `post-01M16EMSQN1N134AEM3AWTWS44`.
 
 ## Consumers that substitute a constant
 
