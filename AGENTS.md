@@ -71,6 +71,22 @@ Package namespace is flat `storymodel4s.<module>`.
    split, reorder, revisit, elaborate, or go external. External destinations
    are explicit states, not error residue.
 7. **Truth ≠ salience ≠ phenomenology ≠ veridicality.** Never derive one from another.
+   **THE CLASS THIS FILE IS MOSTLY ABOUT, NAMED ONCE: a value that cannot be told
+   apart from a different value it must be told apart from.** Eight instances were
+   found on 2026-08-29 alone, all by people reading code, none by a suite going
+   red — because a suite cannot detect what is indistinguishable BY CONSTRUCTION:
+   an imputed `0.5` identical to a measured `0.5`; `relativePosition` mapping
+   absence to `0.0`, a real position; `None` and `Some("")` sharing one
+   fingerprint; a schema version that did not move when a required field was
+   added, so two incompatible formats shared a tag; `supportWeight` defaulting to
+   `1.0`, making "unmeasured" identical to "fully measured"; a tolerance admitting
+   a value and then storing the unabsorbed one; `Unknown` used for a field the
+   primary record establishes but our bundle omits, conflating *we do not know*
+   with *we did not fetch*; and a PENMAN alignment marker whose token set depends
+   on an undeclared dialect. **When you find the ninth, you will not recognise it
+   from any single rule below — recognise it from this sentence.** The test is
+   always the same: name two things that ought to differ, then ask what published
+   field differs between them. If the answer is none, it is this.
    **A DEFAULT EPISTEMIC STATUS IS A FABRICATED LICENSE.** An unmeasurable value
    given a plausible number is the defect this file is mostly about; an
    unestablished *status* given a confident one is its deeper form. A weight says
