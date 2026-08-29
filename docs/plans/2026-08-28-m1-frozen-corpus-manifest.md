@@ -1,4 +1,4 @@
-# M1 W4(9) — Frozen corpus manifest (candidate list, rev 2)
+# M1 W4(9) — Frozen corpus manifest (candidate list, rev 3)
 
 **Bead:** bd-01M14YJ8FG15S0R1ART7DTM1XZ. **Status:** candidate list for **set 1**, under
 the adjudication protocol rev 1 (decisions of the chief, 2026-08-28,
@@ -122,6 +122,50 @@ Consequence for the current list: the five stories named above are re-scored und
 change, not a protocol change, so it does not disturb `protocolChecksum`; if the chief
 would rather make it a protocol law, that costs a protocol revision plus the one-line
 `ProtocolDocument.pinned` update in `embed-bench`, and both should land together.
+
+## Scoring `contaminationRisk`, and the replacements it forces (rev 3)
+
+**The score is measured, not guessed.** Nobody's intuition about "how famous is this
+story" belongs in a freeze receipt. Procedure, run once per candidate story and recorded
+with its evidence in the manifest before freeze:
+
+1. Count study-guide and summary surfaces for the exact title+author on a fixed list of
+   sites (SparkNotes, CliffsNotes, Shmoop, LitCharts, GradeSaver, Wikipedia plot
+   section, Course Hero, eNotes). The list is frozen with the set so the score is
+   reproducible.
+2. `high` = a dedicated plot summary on ≥ 3 of them, or a Wikipedia article with a plot
+   section. `medium` = 1–2, or a Wikipedia mention without a plot section. `low` = none.
+3. Record the count, the date, and the site list. A story's score is re-checked if a set
+   is re-frozen.
+
+This is a proxy, and it should be described as one: it measures *how much summary text
+about the story exists on the open web*, which is what a channel would have memorized.
+It does not measure whether any particular provider trained on it. That is precisely why
+rule 4 above (the fame×channel leakage control) is the real defence — it measures the
+effect rather than the exposure.
+
+**Provisional scores and replacements.** These are my reading and must be confirmed by
+the procedure before freeze; they are recorded now so the partition work can start.
+Every replacement is chosen to preserve the *phenomenon* the original was selected for —
+the phenomenon list is the reason a story is in the set, and swapping for obscurity alone
+would trade one bias for a worse one.
+
+| Original | Provisional | Phenomenon to preserve | Replacement candidate (PD basis **verify**) |
+|---|---|---|---|
+| `f3-saki-open-window` (untouched test) | high | unreliable embedded report that must not become narrated-world fact | Saki, *A Defensive Diamond* or *The Schartz-Metterklume Method* (*Beasts and Super-Beasts*, 1914) — same author, same device, far less summarized |
+| `f3-bierce-owl-creek` (untouched test) | high | flashback; imagined vs actual; discourse order ≠ story-world order | Bierce, *The Boarded Window* or *One of the Missing* (*Tales of Soldiers and Civilians*, 1891) — retrospective flashback and subjective time, without Owl Creek's fame |
+| `f3-ohenry-gift-of-the-magi` (calibration) | high | converging parallel plots; narrator's explicit coda | O. Henry, a lesser story from *The Four Million* (1906), e.g. *The Coming-Out of Maggie* |
+| `f3-chopin-story-of-an-hour` (development) | high | belief vs fact; explicit reversal; unresolved cause | Chopin, *A Respectable Woman* or *Regret* (*A Night in Acadie* / periodical, 1890s) |
+| `f3-london-to-build-a-fire` (development) | high | long, low-dialogue rising tension; the length-scaling slot | London, *Love of Life* (*Love of Life and Other Stories*, 1907) — comparable length and sensory trajectory |
+
+**Gap this does not close, and I want it on the record.** After these swaps the set still
+has no story with *genuine anachrony at the discourse level* except the Bierce
+replacement — and partial, unbalanced, hierarchical alignment with omission, merge,
+split, **reorder**, revisit and external destinations is the core of what this library
+models. One deliberately anachronic, low-fame story is worth more to set 1 than a sixth
+linear one. Frame-narration candidates worth scoring: Chesnutt, *The Goophered Grapevine*
+(*The Conjure Woman*, 1899 — embedded retrospective telling by a motivated narrator, and
+a retrospective-narrator stress case of the kind the chief wants from Araby).
 
 ## Fetch and provenance rules
 
