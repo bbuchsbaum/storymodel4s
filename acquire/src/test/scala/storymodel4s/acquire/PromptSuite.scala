@@ -12,20 +12,49 @@ class PromptSuite extends ScalaCheckSuite:
     assert(PromptPackageManifest.verify(manifest, manifest.ref))
 
   test("missing required fields are all reported"):
-    val bad =
-      manifest.copy(name = " ", permittedOperations = Vector.empty, selfCheck = Vector.empty)
-    PromptPackageManifest
-      .validate(bad)
-      .fold(errs => assertEquals(errs.length, 3L), _ => fail("valid"))
+    val bad = PromptPackageManifest.of(
+      name = " ",
+      version = manifest.version,
+      role = manifest.role,
+      inputSchemaId = manifest.inputSchemaId,
+      outputSchemaId = manifest.outputSchemaId,
+      permittedOperations = Vector.empty,
+      prohibitedInferences = manifest.prohibitedInferences,
+      standardsRefs = manifest.standardsRefs,
+      exampleIds = manifest.exampleIds,
+      counterexampleIds = manifest.counterexampleIds,
+      abstentionRules = manifest.abstentionRules,
+      selfCheck = Vector.empty,
+      benchmarkSuiteId = manifest.benchmarkSuiteId
+    )
+    bad.fold(errs => assertEquals(errs.length, 3L), _ => fail("valid"))
 
   test("reserved separators are rejected"):
-    val bad = manifest.copy(role = PromptRole.Custom("a\u001fb", "x"))
-    assert(PromptPackageManifest.validate(bad).isInvalid)
-    val nl = manifest.copy(abstentionRules = Vector("line\nbreak"))
-    assert(PromptPackageManifest.validate(nl).isInvalid)
+    assert(
+      PromptPackageManifest
+        .of(
+          manifest.name,
+          manifest.version,
+          PromptRole.Custom("a\u001fb", "x"),
+          manifest.inputSchemaId,
+          manifest.outputSchemaId,
+          manifest.permittedOperations,
+          manifest.prohibitedInferences,
+          manifest.standardsRefs,
+          manifest.exampleIds,
+          manifest.counterexampleIds,
+          manifest.abstentionRules,
+          manifest.selfCheck,
+          manifest.benchmarkSuiteId
+        )
+        .isInvalid
+    )
+    assert(
+      manifest.replace(abstentionRules = Vector("line\nbreak")).isInvalid
+    )
 
   test("checksum changes with content and a stale ref fails verification"):
-    val changed = manifest.copy(version = "1.0.1")
+    val changed = manifest.replace(version = "1.0.1").toOption.get
     assertNotEquals(changed.checksum, manifest.checksum)
     assert(!PromptPackageManifest.verify(changed, manifest.ref))
     assert(!PromptPackageManifest.verify(manifest, manifest.ref.copy(name = "other")))
@@ -34,37 +63,35 @@ class PromptSuite extends ScalaCheckSuite:
 
   property("canonical form is injective on list boundaries"):
     forAll(clean, clean) { (a, b) =>
-      val one = manifest.copy(exampleIds = Vector(a + b))
-      val two = manifest.copy(exampleIds = Vector(a, b))
+      val one = manifest.replace(exampleIds = Vector(a + b)).toOption.get
+      val two = manifest.replace(exampleIds = Vector(a, b)).toOption.get
       one.canonicalForm != two.canonicalForm && one.checksum != two.checksum
     }
 
   property("canonical form is injective across fields"):
     forAll(clean) { (x) =>
-      val a = manifest.copy(exampleIds = Vector(x), counterexampleIds = Vector.empty)
-      val b = manifest.copy(exampleIds = Vector.empty, counterexampleIds = Vector(x))
+      val a = manifest
+        .replace(exampleIds = Vector(x), counterexampleIds = Vector.empty)
+        .toOption
+        .get
+      val b = manifest
+        .replace(exampleIds = Vector.empty, counterexampleIds = Vector(x))
+        .toOption
+        .get
       a.checksum != b.checksum
     }
 
   property("checksum is deterministic"):
     forAll(clean) { (x) =>
-      val m = manifest.copy(role = PromptRole.Custom("ns", x.replace(":", "")))
-      m.checksum == m.copy().checksum && m.ref == m.ref
+      val m = manifest.replace(role = PromptRole.Custom("ns", x.replace(":", ""))).toOption.get
+      m.checksum == m.replace().toOption.get.checksum && m.ref == m.ref
     }
 
   test("custom roles and operations may not contain the rendering separator"):
+    assert(manifest.replace(role = PromptRole.Custom("a:b", "x")).isInvalid)
     assert(
-      PromptPackageManifest.validate(manifest.copy(role = PromptRole.Custom("a:b", "x"))).isInvalid
-    )
-    assert(
-      PromptPackageManifest
-        .validate(
-          manifest.copy(permittedOperations = Vector(PermittedOperation.Custom("ns", "a:b")))
-        )
+      manifest
+        .replace(permittedOperations = Vector(PermittedOperation.Custom("ns", "a:b")))
         .isInvalid
     )
-    assert(
-      PromptPackageManifest
-        .validate(manifest.copy(role = PromptRole.Critic(CriticFamily.FrameRole)))
-        .isValid
-    )
+    assert(manifest.replace(role = PromptRole.Critic(CriticFamily.FrameRole)).isValid)

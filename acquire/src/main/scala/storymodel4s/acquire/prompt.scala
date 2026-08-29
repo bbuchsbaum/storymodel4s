@@ -47,21 +47,25 @@ enum PermittedOperation:
 /** A prompt package is a versioned, tested program artifact, not prose in application code (design
   * record §93). This is its data contract; the prompt text itself lives with the provider that
   * renders it.
+  *
+  * Why a non-case class: `validate` was a self-returning inspector on a public case class, so
+  * `fromProduct` could mint a blank name the inspector would refuse. Construction is `of(...)`
+  * only.
   */
-final case class PromptPackageManifest(
-    name: String,
-    version: String,
-    role: PromptRole,
-    inputSchemaId: String,
-    outputSchemaId: String,
-    permittedOperations: Vector[PermittedOperation],
-    prohibitedInferences: Vector[String],
-    standardsRefs: Vector[StandardsRef],
-    exampleIds: Vector[String],
-    counterexampleIds: Vector[String],
-    abstentionRules: Vector[String],
-    selfCheck: Vector[String],
-    benchmarkSuiteId: String
+final class PromptPackageManifest private (
+    val name: String,
+    val version: String,
+    val role: PromptRole,
+    val inputSchemaId: String,
+    val outputSchemaId: String,
+    val permittedOperations: Vector[PermittedOperation],
+    val prohibitedInferences: Vector[String],
+    val standardsRefs: Vector[StandardsRef],
+    val exampleIds: Vector[String],
+    val counterexampleIds: Vector[String],
+    val abstentionRules: Vector[String],
+    val selfCheck: Vector[String],
+    val benchmarkSuiteId: String
 ):
   /** Deterministic, injective serialization: one `key<US>value` line per field, list items joined
     * by `<RS>`, `StandardsRef` fields joined by `<GS>`. Fields may not contain these separators or
@@ -89,6 +93,74 @@ final case class PromptPackageManifest(
 
   def checksum: Checksum = Checksum.ofText(canonicalForm)
   def ref: PromptPackageRef = PromptPackageRef(name, version, checksum)
+
+  /** Rebuild through [[PromptPackageManifest.of]] so a field change cannot skip the checks. */
+  def replace(
+      name: String = name,
+      version: String = version,
+      role: PromptRole = role,
+      inputSchemaId: String = inputSchemaId,
+      outputSchemaId: String = outputSchemaId,
+      permittedOperations: Vector[PermittedOperation] = permittedOperations,
+      prohibitedInferences: Vector[String] = prohibitedInferences,
+      standardsRefs: Vector[StandardsRef] = standardsRefs,
+      exampleIds: Vector[String] = exampleIds,
+      counterexampleIds: Vector[String] = counterexampleIds,
+      abstentionRules: Vector[String] = abstentionRules,
+      selfCheck: Vector[String] = selfCheck,
+      benchmarkSuiteId: String = benchmarkSuiteId
+  ): ValidatedNec[DomainError, PromptPackageManifest] =
+    PromptPackageManifest.of(
+      name,
+      version,
+      role,
+      inputSchemaId,
+      outputSchemaId,
+      permittedOperations,
+      prohibitedInferences,
+      standardsRefs,
+      exampleIds,
+      counterexampleIds,
+      abstentionRules,
+      selfCheck,
+      benchmarkSuiteId
+    )
+
+  override def equals(other: Any): Boolean = other match
+    case that: PromptPackageManifest =>
+      name == that.name &&
+      version == that.version &&
+      role == that.role &&
+      inputSchemaId == that.inputSchemaId &&
+      outputSchemaId == that.outputSchemaId &&
+      permittedOperations == that.permittedOperations &&
+      prohibitedInferences == that.prohibitedInferences &&
+      standardsRefs == that.standardsRefs &&
+      exampleIds == that.exampleIds &&
+      counterexampleIds == that.counterexampleIds &&
+      abstentionRules == that.abstentionRules &&
+      selfCheck == that.selfCheck &&
+      benchmarkSuiteId == that.benchmarkSuiteId
+    case _ => false
+
+  override def hashCode(): Int =
+    (
+      name,
+      version,
+      role,
+      inputSchemaId,
+      outputSchemaId,
+      permittedOperations,
+      prohibitedInferences,
+      standardsRefs,
+      exampleIds,
+      counterexampleIds,
+      abstentionRules,
+      selfCheck,
+      benchmarkSuiteId
+    ).hashCode()
+
+  override def toString: String = s"PromptPackageManifest($name@$version)"
 
 object PromptPackageManifest:
   /** Unit separator between key and value. */
@@ -125,6 +197,39 @@ object PromptPackageManifest:
   private def customParts(op: PermittedOperation): Vector[String] = op match
     case PermittedOperation.Custom(ns, n) => Vector(ns, n)
     case _                                => Vector.empty
+
+  def of(
+      name: String,
+      version: String,
+      role: PromptRole,
+      inputSchemaId: String,
+      outputSchemaId: String,
+      permittedOperations: Vector[PermittedOperation],
+      prohibitedInferences: Vector[String],
+      standardsRefs: Vector[StandardsRef],
+      exampleIds: Vector[String],
+      counterexampleIds: Vector[String],
+      abstentionRules: Vector[String],
+      selfCheck: Vector[String],
+      benchmarkSuiteId: String
+  ): ValidatedNec[DomainError, PromptPackageManifest] =
+    validate(
+      new PromptPackageManifest(
+        name,
+        version,
+        role,
+        inputSchemaId,
+        outputSchemaId,
+        permittedOperations,
+        prohibitedInferences,
+        standardsRefs,
+        exampleIds,
+        counterexampleIds,
+        abstentionRules,
+        selfCheck,
+        benchmarkSuiteId
+      )
+    )
 
   /** Required fields present; nonempty operations, abstention rules, and self-check; no reserved
     * separators anywhere (which is what makes `canonicalForm` injective). `Custom` role/operation
