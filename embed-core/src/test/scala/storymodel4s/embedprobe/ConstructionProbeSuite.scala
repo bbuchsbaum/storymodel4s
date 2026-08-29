@@ -368,6 +368,71 @@ class ConstructionProbeSuite extends FunSuite:
     )
   }
 
+  test("positive control: a remaining case class still has fromProduct") {
+    val errors = typeCheckErrors(
+      """storymodel4s.embed.InstructionDigest.fromProduct(
+           Tuple1(storymodel4s.core.Checksum.ofText("instr"))
+         )"""
+    )
+    assert(
+      errors.isEmpty,
+      s"if InstructionDigest.fromProduct fails to typecheck, LatePoolingRecipe refusals are meaningless:\n${errors.mkString("\n")}"
+    )
+  }
+
+  test("LatePoolingRecipe has no derived fromProduct bypass") {
+    refused(
+      typeCheckErrors("""storymodel4s.embed.LatePoolingRecipe.fromProduct(EmptyTuple)"""),
+      "LatePoolingRecipe.fromProduct"
+    )
+  }
+
+  test("LatePoolingRecipe has no copy door") {
+    refused(
+      typeCheckErrors("""(r: storymodel4s.embed.LatePoolingRecipe) => r.copy(window = 0)"""),
+      "LatePoolingRecipe.copy"
+    )
+  }
+
+  test("LatePoolingRecipe retains public read access") {
+    assert(
+      typeCheckErrors(
+        """(r: storymodel4s.embed.LatePoolingRecipe) =>
+             (r.documentDigest, r.window, r.stride, r.contextLimit)"""
+      ).isEmpty
+    )
+  }
+
+  test("LatePoolingRecipe.of remains the public path and still rejects window = 0") {
+    assert(
+      typeCheckErrors(
+        """storymodel4s.embed.LatePoolingRecipe.of(
+             storymodel4s.core.Checksum.ofText("doc"),
+             storymodel4s.core.Fingerprint.unsafe("tok"),
+             512, 128, 64, "mean",
+             storymodel4s.embed.PoolingRule.Mean,
+             storymodel4s.embed.UncoveredPolicy.PartialCoverage,
+             None
+           )"""
+      ).isEmpty
+    )
+    assert(
+      storymodel4s.embed.LatePoolingRecipe
+        .of(
+          storymodel4s.core.Checksum.ofText("doc"),
+          storymodel4s.core.Fingerprint.unsafe("tok"),
+          512,
+          0,
+          64,
+          "mean",
+          storymodel4s.embed.PoolingRule.Mean,
+          storymodel4s.embed.UncoveredPolicy.PartialCoverage,
+          None
+        )
+        .isLeft
+    )
+  }
+
   test("the public detector factory accepts table data but no executable finder") {
     refused(
       typeCheckErrors(

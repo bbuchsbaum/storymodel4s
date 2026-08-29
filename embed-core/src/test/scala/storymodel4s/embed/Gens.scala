@@ -45,17 +45,20 @@ object Gens:
       pooling <- Gen.oneOf(PoolingRule.Mean, PoolingRule.Max, PoolingRule.FirstToken)
       unc <- Gen.oneOf(UncoveredPolicy.PartialCoverage, UncoveredPolicy.Missing)
       doc <- Gen.alphaStr
-    yield LatePoolingRecipe(
-      Checksum.ofText(doc),
-      Fingerprint.unsafe("tok"),
-      limit,
-      window,
-      stride,
-      "merge:mean",
-      pooling,
-      unc,
-      None
-    )
+    yield LatePoolingRecipe
+      .of(
+        Checksum.ofText(doc),
+        Fingerprint.unsafe("tok"),
+        limit,
+        window,
+        stride,
+        "merge:mean",
+        pooling,
+        unc,
+        None
+      )
+      .toOption
+      .get
 
   /** A root recipe (non-late-pooled view). */
   val space: Gen[EmbeddingSpace] =
