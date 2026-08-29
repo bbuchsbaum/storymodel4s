@@ -34,16 +34,15 @@ class WarOfTheGhostsCodecGoldenSuite extends FunSuite:
 private[wog] object WarOfTheGhostsCodecGolden:
   import WarOfTheGhostsExpectations.*
 
-  /** Re-cut on 2026-08-29 for bd-01M16C9HT9V9Q80F7411V87BBY: NodeSummary.importance changed its
-    * default from observed(1.0) to Missing, and importance is rendered into the view's content
-    * address (wire.scala), so viewFingerprint moved by design. The golden CAUGHT that change - a
-    * ratified estimand change reaching the wire is exactly what it is for, and a fingerprint that
-    * had NOT moved would have meant the content address was not addressing the content.
+  /** Re-cut on 2026-08-29 for bd-01M16S2Y6YS82TE6WBWQPKNZR3: empty sensoryTerms is recorded missing
+    * instead of present-at-0.0. Sensory moves from present-at-0.0 to absent; totals, flow,
+    * posterior and viewFingerprint are byte-identical. This is a recut of the record, not an
+    * estimand change: the 0.0 term was already a no-op in the sum.
     *
-    * Previous: e3a667f6ea228661d591cce094252633e2b36aa47e9f0d856e348fc66c9f6f68, 25,598 bytes.
+    * Previous: 3c183c3cb4dc01dad930fcae7354fa828dbd2e8714b1901449c792552fc4fb9f, 25,598 bytes.
     */
   val ExpectedChecksum: String =
-    "3c183c3cb4dc01dad930fcae7354fa828dbd2e8714b1901449c792552fc4fb9f"
+    "44a76b728b8dfc7474536cc17aed9f7a2718116f672711c2c0cb773c989b9ba9"
 
   lazy val context: GoldenContext = GoldenContext.build()
   lazy val encoded: String = HsmmResultCodec.encode(context.result)

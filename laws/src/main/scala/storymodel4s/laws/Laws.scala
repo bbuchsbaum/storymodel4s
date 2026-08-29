@@ -160,11 +160,20 @@ object AlignmentLaws extends Laws:
           val samePosterior = base.posterior.rows.zip(withProvider.posterior.rows).forall {
             (a, b) => agree(a.mass, b.mass) && agree(b.mass, a.mass)
           }
-          val recorded = withProvider.costs.values.forall(_.values.forall { b =>
-            b.exclusion.nonEmpty || b.mode.isEmpty ||
-            (b.missingTerms == Set(CostTerm.Chart, CostTerm.Structural) &&
-              !b.has(CostTerm.Chart) && !b.has(CostTerm.Structural))
-          })
+          val units = c.recall.ordered.map(u => u.id -> u).toMap
+          val recorded = withProvider.costs.forall { (uid, m) =>
+            val sensoryEmpty = units.get(uid).exists(_.proposition.sensoryTerms.isEmpty)
+            m.values.forall { b =>
+              b.exclusion.nonEmpty || b.mode.isEmpty || {
+                val expected =
+                  Set(CostTerm.Chart, CostTerm.Structural) ++
+                    (if sensoryEmpty then Set(CostTerm.Sensory) else Set.empty)
+                b.missingTerms == expected &&
+                !b.has(CostTerm.Chart) && !b.has(CostTerm.Structural) &&
+                (if sensoryEmpty then !b.has(CostTerm.Sensory) else b.has(CostTerm.Sensory))
+              }
+            }
+          }
           val sameTotals = base.costs.forall { (u, m) =>
             m.forall { (s, b) => withProvider.costs(u).get(s).exists(_.total == b.total) }
           }

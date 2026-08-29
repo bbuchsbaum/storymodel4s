@@ -180,7 +180,19 @@ type AdmissibilityEcho = AdmissibilityEcho.AdmissibilityEcho
   * which is the proof.
   */
 object AlignWire:
-  private val OptionalTerms: Set[CostTerm] = Set(CostTerm.Chart, CostTerm.Structural)
+  /** Terms that may be absent because they can lack evidence. Sensory belongs: an empty
+    * `sensoryTerms` list is no observation, not a perfect match. Chart and Structural belong
+    * because a missing chart is not a zero distance. Semantic does not: it is dense and imputed.
+    * This is not a permission list — a new term joins only if it can genuinely have no evidence.
+    */
+  private val MayBeMissing: Set[CostTerm] =
+    Set(CostTerm.Chart, CostTerm.Structural, CostTerm.Sensory)
+
+  /** Terms whose scalar is a reducer over a [[StructuralReductionReceipt]]. These are the terms
+    * that have chart-sourced members. Sensory has no chart source, so it cannot carry a structural
+    * receipt — a different property from being allowed to go missing.
+    */
+  private val HasReductionReceipt: Set[CostTerm] = Set(CostTerm.Chart, CostTerm.Structural)
 
   private def finite(d: Double): Boolean = !d.isNaN && !d.isInfinite
   private def bad(record: String, detail: String): AlignError =
@@ -283,14 +295,14 @@ object AlignWire:
     val checks: Vector[Option[AlignError]] = Vector(
       badTerm,
       Option.when(!finite(total) || total < 0.0)(bad(r, "total is not finite and nonnegative")),
-      Option.when(!missingTerms.subsetOf(OptionalTerms))(
-        bad(r, "missingTerms may name only the optional terms Chart and Structural")
+      Option.when(!missingTerms.subsetOf(MayBeMissing))(
+        bad(r, "missingTerms may name only terms that can lack evidence")
       ),
       Option.when(missingTerms.exists(terms.contains))(
         bad(r, "a term cannot be both present and missing")
       ),
-      Option.when(!reductions.keySet.subsetOf(OptionalTerms))(
-        bad(r, "reductions may be recorded only for the optional terms Chart and Structural")
+      Option.when(!reductions.keySet.subsetOf(HasReductionReceipt))(
+        bad(r, "reductions may be recorded only for terms that have a chart-sourced receipt")
       ),
       Option.when(exclusion.nonEmpty && (terms.nonEmpty || mode.nonEmpty))(
         bad(r, "an excluded state carries neither terms nor a mode")
@@ -304,10 +316,11 @@ object AlignWire:
       Option.when(sourceChartCoverage.exists(c => !coverageOk(c)))(
         bad(r, "sourceChartCoverage is malformed")
       ),
-      // Receipt coherence: an optional term is exactly the reducer over its receipt's observed
-      // members (clamped as the cost model clamps), a missing term has a receipt that reduces to
-      // nothing, and every receipt's source-chart coverage is the breakdown's.
-      OptionalTerms.toVector
+      // Receipt coherence: a chart-sourced term is exactly the reducer over its receipt's
+      // observed members (clamped as the cost model clamps), a missing receipt term has a
+      // receipt that reduces to nothing, and every receipt's source-chart coverage is the
+      // breakdown's. Sensory is allowed to be missing without a receipt.
+      HasReductionReceipt.toVector
         .sortBy(_.ordinal)
         .flatMap { t =>
           val reduced = reductions

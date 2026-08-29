@@ -220,7 +220,8 @@ final case class StructuralReduction private[align] (
 
 /** The cost of one admissible `(anchor, mode)` state (or external state) for one unit.
   *
-  * `missingTerms` names optional terms that were `Missing` and therefore contributed nothing.
+  * `missingTerms` names terms that were `Missing` and therefore contributed nothing. Chart and
+  * Structural are missing without charts; Sensory is missing when the unit lists no sensory terms.
   * `sourceChartCoverage` is chart availability over source members only; observed estimate coverage
   * and member-level outcomes live in the corresponding `reductions` receipt (ADR 0001 rev 3 §D4b).
   */
@@ -660,10 +661,12 @@ object ExternalStates:
 /** The default local cost model. Terms are composed lexicographically after the mode gate: only
   * admissible pairs reach here, and only *present* terms enter the total. The optional
   * evidence-backed terms `d_chart` and `d_wl` are `Missing` without charts (or without a structural
-  * provider) and then contribute nothing — they are never imputed from `d_sketch` or `d_sem`, and a
-  * `Missing` term is recorded in `CostBreakdown.missingTerms`. The dense term `d_sem` keeps its M0
-  * behaviour: an abstaining provider is replaced by the declared neutral `missingSemantic` (a
-  * constant, not another term), because unranked units are already routed to `Unranked` upstream.
+  * provider) and then contribute nothing — they are never imputed from `d_sketch` or `d_sem`.
+  * `d_sens` is `Missing` when the unit lists no sensory terms: that is no observation, not a
+  * perfect match (a `0.0` would invent agreement). A `Missing` term is recorded in
+  * `CostBreakdown.missingTerms`. The dense term `d_sem` keeps its M0 behaviour: an abstaining
+  * provider is replaced by the declared neutral `missingSemantic` (a constant, not another term),
+  * because unranked units are already routed to `Unranked` upstream.
   */
 
 /** The local cost blend, extracted so the arithmetic is addressable.
@@ -725,10 +728,10 @@ final case class DefaultLocalCostModel(
         }.sum
         1.0 - credit / specified.size.toDouble
     val dSens =
-      if sketch.sensoryTerms.isEmpty then 0.0
+      if sketch.sensoryTerms.isEmpty then Estimate.missing(MissingReason.AllMissing)
       else
         val hits = sketch.sensoryTerms.count(t => node.lemmas.contains(Lexical.stem(t)))
-        1.0 - hits.toDouble / sketch.sensoryTerms.size.toDouble
+        Estimate.observed(1.0 - hits.toDouble / sketch.sensoryTerms.size.toDouble)
     // Preferred abstraction level: summaries want a scene, thematic/evaluative remarks want the
     // global level, predicate-bearing assertions want a leaf, predicate-less ones a scene.
     val preferred = unit.function match
@@ -752,11 +755,11 @@ final case class DefaultLocalCostModel(
       CostTerm.Semantic -> dSem,
       CostTerm.Propositional -> dProp,
       CostTerm.Entity -> dEnt,
-      CostTerm.Sensory -> dSens,
       CostTerm.Granularity -> dGran,
       CostTerm.Distortion -> dDist
     )
-    val optional = Vector(CostTerm.Chart -> dChart, CostTerm.Structural -> dWl)
+    val optional =
+      Vector(CostTerm.Chart -> dChart, CostTerm.Structural -> dWl, CostTerm.Sensory -> dSens)
     val present = optional.collect { case (t, Estimate.Observed(v, _)) => t -> clamp(v) }
     val missing = optional.collect { case (t, Estimate.Missing(_)) => t }.toSet
     val terms = (always ++ present).toMap
