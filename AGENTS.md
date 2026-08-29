@@ -348,6 +348,20 @@ was set by the owner on 2026-08-28 (sticky decision
    who wrote "if you add one, re-count" added four without re-counting. Re-count
    mechanically; do not trust the number above without checking it.)*
 
+   **The one principle under most of what follows: READ THE ARTIFACT, NOT THE
+   STATUS.** A step that reports success while having done nothing — or part of a
+   thing — is the single most common way work here has gone wrong, and it has
+   appeared in four different tools in one day: `mote discuss post --body -` printed
+   *"posted"* and stored a hyphen; `sbt console` with redirected input exited 0 and
+   executed nothing; a `scalafmtCheckAll; compileAll; testJVM` chain returned an exit
+   status with **zero tests** behind it; `git archive | tar` truncated by a full disk
+   exited clean and left a directory that still looked like a project. In every case
+   the status was green or explicable, and the artifact — the body length, the test
+   totals, the log contents, the directory size — was obviously wrong the moment
+   anyone looked. Several sub-rules below are this principle wearing different
+   clothes. If you remember one thing from rule 4, remember to look at the thing that
+   was produced rather than the report that it was produced.
+
    A passing test suite is not evidence; it is the
    absence of one kind of counter-evidence. Three checks, each earned by a
    defect that a green suite did not catch:
