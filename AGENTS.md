@@ -211,7 +211,8 @@ was set by the owner on 2026-08-28 (sticky decision
    `narrative-atlas-intaglio` topic with provider/consumer SHAs recorded as
    notes, never as dependency edges between stores.
 4. **Evidence discipline.** *Thirteen sub-rules; find yours here.* **What counts
-   as proof of a fix:** mutation proof · capacity to fail · distinguishability ·
+   as proof of a fix:** mutation proof · capacity to fail · distinguishability · a negative
+   compile-time assertion needs a positive control ·
    a fixture must tell the hypotheses apart · an inequality is not a
    discriminating assertion. **How to run the gate:** never pipe a gate · a
    compile-time probe needs a clean recompile. **How to scope a finding:** sweep
@@ -332,6 +333,18 @@ was set by the owner on 2026-08-28 (sticky decision
    was unpiped. (Caught here by comparing against a previous run: three
    `Passed:` lines became one, for candidates differing by a trimmed test file.
    Keep the prior gate's numbers visible for exactly this reason.)
+
+   *A negative compile-time assertion needs a positive control.* `typeChecks`
+   returns `false` if the snippet produces **any** error and does not say which,
+   so `assert(!typeChecks(...))` can pass for a reason unrelated to the property
+   under test — and keep passing after a mutation that should break it. Put a
+   positive control in the same file and scope: assert `typeChecks` is **true**
+   for a type that certainly has the property. If the control fails, every
+   negative assertion beside it is meaningless. Use `typeCheckErrors` to read
+   the actual message when diagnosing. (Same shape as the `copy` control:
+   "`PopulationAggregate` has zero `copy` methods" proved nothing until
+   `SubjectAlignment` in the same compile showed five. An absence proves nothing
+   without a present case beside it.)
 
    *A compile-time probe needs a clean recompile.* A mutation that changes a
    **type's shape** — `case` to non-`case`, a constructor's visibility, or
