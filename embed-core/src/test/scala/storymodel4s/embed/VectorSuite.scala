@@ -25,6 +25,23 @@ class VectorSuite extends ScalaCheckSuite:
     assert(Dimension.of(0).isLeft && Dimension.of(-3).isLeft && Dimension.of(1).isRight)
   }
 
+  test("ValidatedVector retains structural value semantics without exposing coordinates") {
+    val first =
+      ValidatedVector.of(d4, Normalization.Unnormalized, Vector(1.0, 2.0, 3.0, 4.0)).toOption.get
+    val same =
+      ValidatedVector.of(d4, Normalization.Unnormalized, Vector(1.0, 2.0, 3.0, 4.0)).toOption.get
+    val different =
+      ValidatedVector.of(d4, Normalization.Unnormalized, Vector(4.0, 3.0, 2.0, 1.0)).toOption.get
+
+    assertEquals(first, same)
+    assertEquals(first.hashCode, same.hashCode)
+    assertNotEquals(first, different)
+    assertEquals(
+      first.toString,
+      "ValidatedVector(dimension=4, normalization=unnormalized, size=4)"
+    )
+  }
+
   property("l2 produces unit vectors within tolerance") {
     forAll(Gens.dimension.flatMap(d => Gens.unit(d))) { v =>
       math.abs(v.norm - 1.0) <= ValidatedVector.NormTolerance && v.normalization == Normalization.L2

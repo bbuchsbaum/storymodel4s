@@ -38,8 +38,16 @@ object Hmac:
 /** A keyed digest of sensitive material. Distinct from [[storymodel4s.core.Checksum]] on purpose: a
   * plain content hash of transcript text is dictionary-attackable; this one is not without the key.
   */
-final case class SensitiveDigest private (keyId: KeyId, hex: String):
+final class SensitiveDigest private (val keyId: KeyId, val hex: String):
   def render: String = s"hmac:${keyId.value}:$hex"
+
+  override def equals(other: Any): Boolean = other match
+    case that: SensitiveDigest => keyId == that.keyId && hex == that.hex
+    case _                     => false
+
+  override def hashCode(): Int = (keyId, hex).hashCode
+
+  override def toString: String = s"SensitiveDigest(keyId=${keyId.value}, hex=<redacted>)"
 
 object SensitiveDigest:
   def compute(
@@ -48,11 +56,11 @@ object SensitiveDigest:
       material: String
   ): Either[EmbedError, SensitiveDigest] =
     if key.isEmpty then Left(EmbedError.InvalidKey("empty key"))
-    else Right(SensitiveDigest(keyId, Hmac.hex(key, utf8(material))))
+    else Right(new SensitiveDigest(keyId, Hmac.hex(key, utf8(material))))
 
   /** Compute from an already-validated owned key. The snapshot constructor proves non-emptiness. */
   private[embed] def compute(snapshot: SensitiveKeySnapshot, material: String): SensitiveDigest =
-    SensitiveDigest(snapshot.keyId, Hmac.hex(snapshot.bytes, utf8(material)))
+    new SensitiveDigest(snapshot.keyId, Hmac.hex(snapshot.bytes, utf8(material)))
 
   private[embed] def utf8(s: String): Array[Byte] = s.getBytes("UTF-8")
 

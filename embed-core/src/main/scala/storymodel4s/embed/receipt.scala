@@ -194,11 +194,20 @@ object ReceiptDigest:
   * digest kind. Constructed only through [[ItemDigest.of]], which refuses a `Plain` digest for
   * non-public material.
   */
-final case class ItemDigest private[embed] (
-    id: RequestId,
-    sensitivity: Sensitivity,
-    digest: ReceiptDigest
-)
+final class ItemDigest private[embed] (
+    val id: RequestId,
+    val sensitivity: Sensitivity,
+    val digest: ReceiptDigest
+):
+  override def equals(other: Any): Boolean = other match
+    case that: ItemDigest =>
+      id == that.id && sensitivity == that.sensitivity && digest == that.digest
+    case _ => false
+
+  override def hashCode(): Int = (id, sensitivity, digest).hashCode
+
+  override def toString: String =
+    s"ItemDigest(id=${id.value}, sensitivity=$sensitivity, digestKind=${digest.kind.render})"
 
 object ItemDigest:
   def of(
@@ -211,7 +220,7 @@ object ItemDigest:
         Left(EmbedError.InvalidResult(s"plain identity for $sensitivity item ${id.value}"))
       case DigestKind.Withheld =>
         Left(EmbedError.InvalidResult(s"withheld identity is not an item identity (${id.value})"))
-      case _ => Right(ItemDigest(id, sensitivity, digest))
+      case _ => Right(new ItemDigest(id, sensitivity, digest))
 
 /** The embed-level authority on how a provider call identified its material.
   *
@@ -220,11 +229,11 @@ object ItemDigest:
   * hash of HMAC outputs, still key-gated — and `kind` states that fact in a typed way so an auditor
   * never has to infer it from `params` (ADR 0001 D6).
   */
-final case class EmbeddingReceipt private (
-    call: ProviderCall,
-    kind: DigestKind,
-    items: Vector[ItemDigest],
-    outputs: ReceiptDigest
+final class EmbeddingReceipt private (
+    val call: ProviderCall,
+    val kind: DigestKind,
+    val items: Vector[ItemDigest],
+    val outputs: ReceiptDigest
 ):
   /** True iff no rendered identity in this receipt is a plain hash of non-public material. */
   def isKeyConsistent: Boolean =
@@ -235,6 +244,17 @@ final case class EmbeddingReceipt private (
         case DigestKind.Plain    => outputs.kind == DigestKind.Plain
         case DigestKind.Keyed    => outputs.kind == DigestKind.Keyed
         case DigestKind.Withheld => false)
+
+  override def equals(other: Any): Boolean = other match
+    case that: EmbeddingReceipt =>
+      call == that.call && kind == that.kind && items == that.items && outputs == that.outputs
+    case _ => false
+
+  override def hashCode(): Int = (call, kind, items, outputs).hashCode
+
+  override def toString: String =
+    s"EmbeddingReceipt(kind=${kind.render}, items=${items.size}, " +
+      s"keyConsistent=$isKeyConsistent)"
 
 object EmbeddingReceipt:
   val KindParam = "digest-kind"
@@ -268,4 +288,4 @@ object EmbeddingReceipt:
         outputChecksum = outputIdentity,
         params = base.params ++ Map(KindParam -> kind.render) ++ keyParams
       )
-      Right(EmbeddingReceipt(call, kind, items, outputs))
+      Right(new EmbeddingReceipt(call, kind, items, outputs))

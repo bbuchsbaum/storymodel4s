@@ -7,10 +7,10 @@ import storymodel4s.features.{Estimate, MissingReason}
   * Why: a raw `Array[Double]` of the wrong length or with a NaN would poison every downstream
   * distance silently; checking once here means distances never clamp or guess.
   */
-final case class ValidatedVector private (
-    dimension: Dimension,
-    normalization: Normalization,
-    values: Vector[Double]
+final class ValidatedVector private (
+    val dimension: Dimension,
+    val normalization: Normalization,
+    val values: Vector[Double]
 ):
   def norm: Double = math.sqrt(values.foldLeft(0.0)((acc, v) => acc + v * v))
 
@@ -38,6 +38,19 @@ final case class ValidatedVector private (
       val n = math.sqrt(head.foldLeft(0.0)((a, v) => a + v * v))
       if n == 0.0 then Left(EmbedError.NotNormalized(0.0, Normalization.L2))
       else ValidatedVector.of(dim, Normalization.L2, head.map(_ / n))
+
+  override def equals(other: Any): Boolean = other match
+    case that: ValidatedVector =>
+      dimension == that.dimension &&
+      normalization == that.normalization &&
+      values == that.values
+    case _ => false
+
+  override def hashCode(): Int = (dimension, normalization, values).hashCode
+
+  override def toString: String =
+    s"ValidatedVector(dimension=${dimension.value}, normalization=${normalization.render}, " +
+      s"size=${values.size})"
 
 object ValidatedVector:
   /** Relative tolerance on the unit norm for `L2` vectors. */

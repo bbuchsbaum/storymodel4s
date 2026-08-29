@@ -261,17 +261,17 @@ type GeometryId = GeometryId.T
 /** One embedding recipe. A `FeatureSpace` is derived from it; vectors of different recipes are
   * never compared unless a [[GeometryPair]] declares them compatible.
   */
-final case class EmbeddingSpace private[embed] (
-    id: GeometryId,
-    provider: ProviderFingerprint,
-    role: Role,
-    view: SemanticView,
-    instruction: Option[InstructionDigest],
-    dimension: Dimension,
-    normalization: Normalization,
-    truncation: TruncationPolicy,
-    latePooling: Option[LatePoolingRecipe],
-    parent: Option[GeometryId]
+final class EmbeddingSpace private[embed] (
+    val id: GeometryId,
+    val provider: ProviderFingerprint,
+    val role: Role,
+    val view: SemanticView,
+    val instruction: Option[InstructionDigest],
+    val dimension: Dimension,
+    val normalization: Normalization,
+    val truncation: TruncationPolicy,
+    val latePooling: Option[LatePoolingRecipe],
+    val parent: Option[GeometryId]
 ):
   /** Matryoshka truncation: a derived, re-normalized space with its own identity and a recorded
     * parent. Fails if the target dimension is not smaller than the current one.
@@ -322,6 +322,37 @@ final case class EmbeddingSpace private[embed] (
     ) ++ latePooling.fold(Vector("no-latepool"))(r => "latepool" +: r.parts) ++
       parent.fold(Vector("no-parent"))(p => Vector("parent", p.value))
 
+  override def equals(other: Any): Boolean = other match
+    case that: EmbeddingSpace =>
+      id == that.id &&
+      provider == that.provider &&
+      role == that.role &&
+      view == that.view &&
+      instruction == that.instruction &&
+      dimension == that.dimension &&
+      normalization == that.normalization &&
+      truncation == that.truncation &&
+      latePooling == that.latePooling &&
+      parent == that.parent
+    case _ => false
+
+  override def hashCode(): Int =
+    (
+      id,
+      provider,
+      role,
+      view,
+      instruction,
+      dimension,
+      normalization,
+      truncation,
+      latePooling,
+      parent
+    ).hashCode
+
+  override def toString: String =
+    s"EmbeddingSpace(id=${id.value}, role=${role.render}, view=${view.render})"
+
 object EmbeddingSpace:
   private[embed] def build(
       provider: ProviderFingerprint,
@@ -334,21 +365,21 @@ object EmbeddingSpace:
       latePooling: Option[LatePoolingRecipe],
       parent: Option[GeometryId]
   ): EmbeddingSpace =
-    val provisional = EmbeddingSpace(
-      GeometryId.unsafe("pending"),
-      provider,
-      role,
-      view,
-      instruction,
-      dimension,
-      normalization,
-      truncation,
-      latePooling,
-      parent
-    )
-    provisional.copy(id =
-      GeometryId.unsafe(ContentAddress.of("geometry", provisional.identityParts*))
-    )
+    def create(id: GeometryId): EmbeddingSpace =
+      new EmbeddingSpace(
+        id,
+        provider,
+        role,
+        view,
+        instruction,
+        dimension,
+        normalization,
+        truncation,
+        latePooling,
+        parent
+      )
+    val provisional = create(GeometryId.unsafe("pending"))
+    create(GeometryId.unsafe(ContentAddress.of("geometry", provisional.identityParts*)))
 
   /** Construct a root recipe (no parent). Late-pooled views must carry a validated recipe and the
     * `ContextualLatePooled` view; other views must not carry one.
@@ -414,11 +445,20 @@ enum GeometryPairRule:
     case IdenticalModelling | AllowViewDifference                       => false
 
 /** A validated query/document pair whose vectors may be compared under its recorded rule. */
-final case class GeometryPair private (
-    query: GeometryId,
-    document: GeometryId,
-    rule: GeometryPairRule
-)
+final class GeometryPair private (
+    val query: GeometryId,
+    val document: GeometryId,
+    val rule: GeometryPairRule
+):
+  override def equals(other: Any): Boolean = other match
+    case that: GeometryPair =>
+      query == that.query && document == that.document && rule == that.rule
+    case _ => false
+
+  override def hashCode(): Int = (query, document, rule).hashCode
+
+  override def toString: String =
+    s"GeometryPair(query=${query.value}, document=${document.value}, rule=$rule)"
 
 object GeometryPair:
   private final case class CompatibilityKey(
@@ -468,4 +508,4 @@ object GeometryPair:
     else
       compatibilityKey(query).mismatch(compatibilityKey(document)) match
         case Some(reason) => bad(reason)
-        case None         => Right(GeometryPair(query.id, document.id, rule))
+        case None         => Right(new GeometryPair(query.id, document.id, rule))

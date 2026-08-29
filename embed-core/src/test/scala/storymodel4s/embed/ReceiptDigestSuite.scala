@@ -58,6 +58,18 @@ class ReceiptDigestSuite extends ScalaCheckSuite:
       .get
     assertEquals(d.hex, SensitiveDigest.Golden.expectedHex)
     assertEquals(d.render, s"hmac:golden-key-v1:${SensitiveDigest.Golden.expectedHex}")
+    val same = SensitiveDigest
+      .compute(
+        SensitiveDigest.Golden.keyId,
+        SensitiveDigest.Golden.keyBytes,
+        SensitiveDigest.Golden.rendering
+      )
+      .toOption
+      .get
+    assertEquals(d, same)
+    assertEquals(d.hashCode, same.hashCode)
+    assertEquals(d.toString, "SensitiveDigest(keyId=golden-key-v1, hex=<redacted>)")
+    assert(!d.toString.contains(SensitiveDigest.Golden.expectedHex))
   }
 
   test("canonical rendering escapes every separator so no field can forge one") {
@@ -127,6 +139,15 @@ class ReceiptDigestSuite extends ScalaCheckSuite:
     assert(ItemDigest.of(RequestId.unsafe("x"), Sensitivity.Sensitive, plain).isLeft)
     assert(ItemDigest.of(RequestId.unsafe("x"), Sensitivity.Internal, plain).isLeft)
     assert(ItemDigest.of(RequestId.unsafe("x"), Sensitivity.Public, plain).isRight)
+
+    val first = ItemDigest.of(RequestId.unsafe("x"), Sensitivity.Public, plain).toOption.get
+    val same = ItemDigest.of(RequestId.unsafe("x"), Sensitivity.Public, plain).toOption.get
+    val different = ItemDigest.of(RequestId.unsafe("y"), Sensitivity.Public, plain).toOption.get
+    assertEquals(first, same)
+    assertEquals(first.hashCode, same.hashCode)
+    assertNotEquals(first, different)
+    assertEquals(first.toString, "ItemDigest(id=x, sensitivity=Public, digestKind=plain)")
+    assert(!first.toString.contains(plain.render))
   }
 
   private def space(e: Embedder[Id]): EmbeddingSpace =
@@ -456,7 +477,7 @@ class ReceiptDigestSuite extends ScalaCheckSuite:
     def allowed(provider: ProviderFingerprint): PolicyDecision =
       PolicyDecision.Allowed(
         policyId,
-        RemoteCapability(
+        new RemoteCapability(
           provider,
           policyModel("model"),
           "purpose",
@@ -506,26 +527,37 @@ class ReceiptDigestSuite extends ScalaCheckSuite:
         PseudonymizationDetectorId.unsafe("test-detector/v1"),
         ReceiptDigest.keyedUnder(KeyId.unsafe("k1"), token, k1).toOption.get
       )
-      val base =
-        RemoteCapability(
-          provider,
-          policyModel("model"),
-          "purpose",
-          policyId,
-          100L,
-          5L,
-          detectorIdentity,
-          payload
+      def capability(
+          providerValue: ProviderFingerprint = provider,
+          modelValue: PolicyModelIdentity = policyModel("model"),
+          purposeValue: String = "purpose",
+          policyIdValue: PrivacyPolicyId = policyId,
+          expiresAtEpochMillisValue: Long = 100L,
+          budgetTokensValue: Long = 5L,
+          detectorIdentityValue: DetectorPolicyIdentity = detectorIdentity,
+          payloadDigestValue: ReceiptDigest.Keyed = payload
+      ): RemoteCapability =
+        new RemoteCapability(
+          providerValue,
+          modelValue,
+          purposeValue,
+          policyIdValue,
+          expiresAtEpochMillisValue,
+          budgetTokensValue,
+          detectorIdentityValue,
+          payloadDigestValue
         )
+      val base = capability()
+      val same = capability()
       val mutations = Vector(
-        base.copy(provider = otherProvider),
-        base.copy(model = policyModel(token)),
-        base.copy(purpose = token),
-        base.copy(policyId = otherPolicyId),
-        base.copy(expiresAtEpochMillis = 101L),
-        base.copy(budgetTokens = 6L),
-        base.copy(detectorIdentity = otherDetectorIdentity),
-        base.copy(payloadDigest = otherPayload)
+        capability(providerValue = otherProvider),
+        capability(modelValue = policyModel(token)),
+        capability(purposeValue = token),
+        capability(policyIdValue = otherPolicyId),
+        capability(expiresAtEpochMillisValue = 101L),
+        capability(budgetTokensValue = 6L),
+        capability(detectorIdentityValue = otherDetectorIdentity),
+        capability(payloadDigestValue = otherPayload)
       )
       def noCallAttempt(capability: RemoteCapability): AttemptReceipt =
         val id = RequestId.unsafe("capability")
@@ -541,7 +573,10 @@ class ReceiptDigestSuite extends ScalaCheckSuite:
           )
           .fold(error => fail(error.message), identity)
       val original = noCallAttempt(base)
-      assert(mutations.forall(capability => noCallAttempt(capability).digest != original.digest))
+      assertEquals(base, same)
+      assertEquals(base.hashCode, same.hashCode)
+      assert(mutations.forall(candidate => candidate != base))
+      assert(mutations.forall(candidate => noCallAttempt(candidate).digest != original.digest))
     }
   }
 
@@ -847,10 +882,18 @@ class ReceiptDigestSuite extends ScalaCheckSuite:
     val sp = space(inner)
     val payload = EmbedPayload.Raw(canary, Sensitivity.Sensitive)
     val keyed1 = CacheKey.of(sp, payload, k1).toOption.get
+    val keyed1Again = CacheKey.of(sp, payload, k1).toOption.get
     val keyed2 = CacheKey.of(sp, payload, k2).toOption.get
     val plain = CacheKey.of(sp, EmbedPayload.Raw(canary, Sensitivity.Public), k1).toOption.get
     assertNotEquals(keyed1.render, keyed2.render)
     assertNotEquals(keyed1.render, plain.render)
+    assertEquals(keyed1, keyed1Again)
+    assertEquals(keyed1.hashCode, keyed1Again.hashCode)
+    assertEquals(
+      keyed1.toString,
+      s"CacheKey(space=${sp.id.value}, digestKind=keyed)"
+    )
+    assert(!keyed1.toString.contains(keyed1.digest.render))
     assertEquals(keyed1.digest.kind, DigestKind.Keyed)
     assertEquals(plain.digest.kind, DigestKind.Plain)
     leaksNothing(keyed1.render)
@@ -916,8 +959,13 @@ class ReceiptDigestSuite extends ScalaCheckSuite:
     val item = ItemDigest.of(RequestId.unsafe("x"), Sensitivity.Sensitive, keyed).toOption.get
     assert(EmbeddingReceipt.of(base, Vector(item), plain).isLeft)
     val ok = EmbeddingReceipt.of(base, Vector(item), keyed).toOption.get
+    val same = EmbeddingReceipt.of(base, Vector(item), keyed).toOption.get
     assertEquals(ok.kind, DigestKind.Keyed)
     assert(ok.isKeyConsistent)
+    assertEquals(ok, same)
+    assertEquals(ok.hashCode, same.hashCode)
+    assertEquals(ok.toString, "EmbeddingReceipt(kind=keyed, items=1, keyConsistent=true)")
+    assert(!ok.toString.contains(keyed.render))
     assertEquals(ok.call.inputChecksum, Checksum.ofText(ReceiptRendering.items(Vector(item))))
   }
 

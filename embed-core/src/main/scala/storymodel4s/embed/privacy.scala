@@ -739,19 +739,49 @@ enum PolicyDecision:
     case Denied(id, p, r)      => s"denied:${id.value}:${p.fold("-")(_.value)}:$r"
     case KeyUnavailable(id, k) => s"key-unavailable:${id.fold("-")(_.value)}:${k.value}"
 
-/** Time is supplied by the caller (epoch millis) so the module stays clock-free and testable. */
-final case class RemoteCapability private[embed] (
-    provider: ProviderFingerprint,
-    model: PolicyModelIdentity,
-    purpose: String,
-    policyId: PrivacyPolicyId,
-    expiresAtEpochMillis: Long,
-    budgetTokens: Long,
-    detectorIdentity: DetectorPolicyIdentity,
-    payloadDigest: ReceiptDigest.Keyed
+/** A time-bounded authorization whose public construction path is [[RemotePolicy.evaluate]].
+  *
+  * Time is supplied by the caller (epoch millis) so the module stays clock-free and testable. The
+  * fields are the evidence of a policy decision, not caller-asserted transport metadata.
+  */
+final class RemoteCapability private[embed] (
+    val provider: ProviderFingerprint,
+    val model: PolicyModelIdentity,
+    val purpose: String,
+    val policyId: PrivacyPolicyId,
+    val expiresAtEpochMillis: Long,
+    val budgetTokens: Long,
+    val detectorIdentity: DetectorPolicyIdentity,
+    val payloadDigest: ReceiptDigest.Keyed
 ):
   def render: String =
     s"cap:${provider.render.take(12)}:${model.render}:$purpose:${policyId.value}:$expiresAtEpochMillis:$budgetTokens:${detectorIdentity.render}:${payloadDigest.render.takeRight(12)}"
+
+  override def equals(other: Any): Boolean = other match
+    case that: RemoteCapability =>
+      provider == that.provider &&
+      model == that.model &&
+      purpose == that.purpose &&
+      policyId == that.policyId &&
+      expiresAtEpochMillis == that.expiresAtEpochMillis &&
+      budgetTokens == that.budgetTokens &&
+      detectorIdentity == that.detectorIdentity &&
+      payloadDigest == that.payloadDigest
+    case _ => false
+
+  override def hashCode(): Int =
+    (
+      provider,
+      model,
+      purpose,
+      policyId,
+      expiresAtEpochMillis,
+      budgetTokens,
+      detectorIdentity,
+      payloadDigest
+    ).hashCode
+
+  override def toString: String = s"RemoteCapability(${render})"
 
 /** A remote policy: which providers/models/purposes and detector configs may send sanitized data.
   */
@@ -765,16 +795,31 @@ final case class RemotePolicy(
     ttlMillis: Long
 )
 
-/** The only request type a remote transport accepts. Constructible solely through
-  * [[RemotePolicy.evaluate]]; the constructor is private so no code path can hand raw text to a
-  * remote provider.
+/** The only request type a remote transport accepts.
+  *
+  * [[PseudonymizedText]] keeps raw text out of the payload type. The sole public construction path,
+  * [[RemotePolicy.evaluate]], additionally proves that the sanitized payload, provider, model,
+  * purpose, detector, budget, and expiry passed one named policy together.
   */
-final case class AuthorizedRemoteRequest private[embed] (
-    id: RequestId,
-    space: GeometryId,
-    payload: PseudonymizedText,
-    capability: RemoteCapability
-)
+final class AuthorizedRemoteRequest private[embed] (
+    val id: RequestId,
+    val space: GeometryId,
+    val payload: PseudonymizedText,
+    val capability: RemoteCapability
+):
+  override def equals(other: Any): Boolean = other match
+    case that: AuthorizedRemoteRequest =>
+      id == that.id &&
+      space == that.space &&
+      payload == that.payload &&
+      capability == that.capability
+    case _ => false
+
+  override def hashCode(): Int = (id, space, payload, capability).hashCode
+
+  override def toString: String =
+    s"AuthorizedRemoteRequest(id=${id.value}, space=${space.value}, payload=<redacted>, " +
+      s"capability=${capability.render})"
 
 object RemotePolicy:
   /** Evaluate the request's sanitized payload against a policy for an embedder and purpose. The
@@ -824,7 +869,7 @@ object RemotePolicy:
                         deny("budget exceeded")
                       else if policy.ttlMillis <= 0 then deny("policy has no validity window")
                       else
-                        val cap = RemoteCapability(
+                        val cap = new RemoteCapability(
                           provider,
                           model,
                           purpose,
@@ -834,7 +879,9 @@ object RemotePolicy:
                           detectorIdentity,
                           payload.digest
                         )
-                        Right(AuthorizedRemoteRequest(request.id, request.space, payload, cap))
+                        Right(
+                          new AuthorizedRemoteRequest(request.id, request.space, payload, cap)
+                        )
                 case _ => deny("payload lacks detector certification")
 
   given Show[PolicyDecision] = Show.show(_.render)
