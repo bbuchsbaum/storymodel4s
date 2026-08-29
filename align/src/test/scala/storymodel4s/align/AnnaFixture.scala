@@ -35,7 +35,7 @@ object AnnaFixture:
     SpanSet.unsafe((a to b).map(i => SpanRef(Some(sentences(i).id), sentences(i).span))*)
 
   /** Normalize fixture node terms through the same pipeline used by [[StorySourceView]]. */
-  private def nodeLemmasFrom(terms: Vector[String]): Set[String] =
+  private def nodeLemmasFromRawTerms(terms: Vector[String]): Set[String] =
     terms.iterator.flatMap(Lexical.stems).toSet
 
   private[align] val e1LemmaInputs =
@@ -86,7 +86,7 @@ object AnnaFixture:
       Positive,
       Asserted,
       Vector("house"),
-      nodeLemmasFrom(e1LemmaInputs)
+      nodeLemmasFromRawTerms(e1LemmaInputs)
     ),
     NodeSummary(
       e2,
@@ -100,7 +100,7 @@ object AnnaFixture:
       Positive,
       Asserted,
       Vector("cellar"),
-      nodeLemmasFrom(e2LemmaInputs)
+      nodeLemmasFromRawTerms(e2LemmaInputs)
     ),
     NodeSummary(
       e3,
@@ -114,7 +114,7 @@ object AnnaFixture:
       Positive,
       Asserted,
       Vector("upstairs"),
-      nodeLemmasFrom(e3LemmaInputs)
+      nodeLemmasFromRawTerms(e3LemmaInputs)
     ),
     NodeSummary(
       e4,
@@ -131,7 +131,7 @@ object AnnaFixture:
       Positive,
       Asserted,
       Vector("cellar", "downstairs"),
-      nodeLemmasFrom(e4LemmaInputs)
+      nodeLemmasFromRawTerms(e4LemmaInputs)
     ),
     NodeSummary(
       e5,
@@ -145,7 +145,7 @@ object AnnaFixture:
       Positive,
       Asserted,
       Vector("cellar", "downstairs"),
-      nodeLemmasFrom(e5LemmaInputs),
+      nodeLemmasFromRawTerms(e5LemmaInputs),
       outcome = Some("brother found")
     ),
     NodeSummary(
@@ -160,7 +160,7 @@ object AnnaFixture:
       Positive,
       Asserted,
       Vector("house", "cellar"),
-      nodeLemmasFrom(sc1LemmaInputs)
+      nodeLemmasFromRawTerms(sc1LemmaInputs)
     ),
     NodeSummary(
       sc2,
@@ -174,7 +174,7 @@ object AnnaFixture:
       Positive,
       Asserted,
       Vector("upstairs", "cellar", "house"),
-      nodeLemmasFrom(sc2LemmaInputs)
+      nodeLemmasFromRawTerms(sc2LemmaInputs)
     ),
     NodeSummary(
       root,
@@ -188,7 +188,7 @@ object AnnaFixture:
       Positive,
       Asserted,
       Vector("house"),
-      nodeLemmasFrom(rootLemmaInputs)
+      nodeLemmasFromRawTerms(rootLemmaInputs)
     )
   )
 
