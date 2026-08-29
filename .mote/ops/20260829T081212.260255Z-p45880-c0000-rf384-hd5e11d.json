@@ -1,0 +1,1 @@
+{"actor":"claude-storymodel4s","entity":"bd-01M1697234KP2X44X6Q8S6C6Y7","kind":"create","op":"20260829T081212.260255Z-p45880-c0000-rf384-hd5e11d","set":{"status":"open","title":"sweep: private constructor on a case class is not a smart-construction boundary (45 validating types bypassable via fromProduct)"},"ts":"2026-08-29T08:12:12.260255Z","v":1}
