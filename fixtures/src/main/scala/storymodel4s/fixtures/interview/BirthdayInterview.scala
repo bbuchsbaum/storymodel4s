@@ -96,19 +96,15 @@ object BirthdayInterview:
     )
 
   val interviewSource: InterviewSource =
-    InterviewSource
-      .validated(
-        InterviewSource(
-          transcript,
-          Cue(cueText, None, Some("fortieth birthday dinner")),
-          Vector(
-            Probe(generalProbe, ProbeKind.General, TurnId.unsafe("turn:2")),
-            Probe(specificProbe, ProbeKind.Specific, TurnId.unsafe("turn:4"))
-          ),
-          Some(SubjectiveRatings(Some(Estimate.observed(0.8)), Some(Estimate.observed(0.7)), None))
-        )
-      )
-      .fold(e => throw new IllegalStateException(e.message), identity)
+    InterviewSource.unsafe(
+      transcript,
+      Cue(cueText, None, Some("fortieth birthday dinner")),
+      Vector(
+        Probe(generalProbe, ProbeKind.General, TurnId.unsafe("turn:2")),
+        Probe(specificProbe, ProbeKind.Specific, TurnId.unsafe("turn:4"))
+      ),
+      Some(SubjectiveRatings(Some(Estimate.observed(0.8)), Some(Estimate.observed(0.7)), None))
+    )
 
   /** Run the whole v0.1 pipeline; deterministic. */
   def build(

@@ -549,7 +549,7 @@ class InterviewSuite extends ScalaCheckSuite:
         Some(probe)
       )
     )
-    InterviewSource(
+    InterviewSource.of(
       TranscriptAtlas.unsafe(
         atlas,
         turns,
@@ -561,22 +561,24 @@ class InterviewSuite extends ScalaCheckSuite:
     )
 
   test("probes must reference interviewer turns with a consistent phase") {
-    assert(
-      InterviewSource
-        .validated(twoTurnSource(SpeakerRole.Interviewer, Some(InterviewPhase.GeneralProbe)))
-        .isRight
-    )
-    assert(
-      InterviewSource
-        .validated(twoTurnSource(SpeakerRole.Participant, Some(InterviewPhase.GeneralProbe)))
-        .isLeft
-    )
-    assert(
-      InterviewSource
-        .validated(twoTurnSource(SpeakerRole.Interviewer, Some(InterviewPhase.SpecificProbe)))
-        .isLeft
-    )
-    assert(InterviewSource.validated(twoTurnSource(SpeakerRole.Interviewer, None)).isRight)
+    assert(twoTurnSource(SpeakerRole.Interviewer, Some(InterviewPhase.GeneralProbe)).isRight)
+    assert(twoTurnSource(SpeakerRole.Participant, Some(InterviewPhase.GeneralProbe)).isLeft)
+    assert(twoTurnSource(SpeakerRole.Interviewer, Some(InterviewPhase.SpecificProbe)).isLeft)
+    assert(twoTurnSource(SpeakerRole.Interviewer, None).isRight)
+  }
+
+  test("checked interview sources retain structural value semantics and redact source text") {
+    val first =
+      twoTurnSource(SpeakerRole.Interviewer, Some(InterviewPhase.GeneralProbe)).toOption.get
+    val second = InterviewSource
+      .of(first.transcript, first.cue, first.probes, first.ratings)
+      .toOption
+      .get
+
+    assertEquals(first, second)
+    assertEquals(first.hashCode, second.hashCode)
+    assert(!first.toString.contains(first.cue.text))
+    assert(InterviewSource.validated(first).contains(first))
   }
 
   // ---- Atoms -------------------------------------------------------------------------------
@@ -769,10 +771,8 @@ class InterviewSuite extends ScalaCheckSuite:
       addressOf: (Detail, EpisodeModel) => Distribution[MemoryAddress],
       duplicateAssessment: Boolean = false
   ) =
-    val source = InterviewSource
-      .validated(twoTurnSource(SpeakerRole.Interviewer, Some(InterviewPhase.GeneralProbe)))
-      .toOption
-      .get
+    val source =
+      twoTurnSource(SpeakerRole.Interviewer, Some(InterviewPhase.GeneralProbe)).toOption.get
     val seg = InterviewSegmenter.segment(source)
     val details = seg.graph.ordered.flatMap(u => AtomProjection.fromUnit(u, seg.turnOf(u.id)))
     val other = EpisodeModel.hypothesized(

@@ -23,17 +23,18 @@ final case class SubjectiveRatings(
     confidence: Option[ScoreEstimate]
 )
 
-/** An Autobiographical-Interview transcript with its protocol structure.
+/** An Autobiographical-Interview transcript with its checked protocol structure.
   *
-  * Invariants (see [[InterviewSource.validated]]): each probe references an interviewer turn; a
-  * probe's turn carries a phase consistent with the probe kind; participant turns after a probe
-  * carry that probe's phase or a later one.
+  * Why a non-case class: each probe must reference an interviewer turn with a compatible phase, and
+  * phases must be monotone. Construct with [[InterviewSource.of]] (checked) or
+  * [[InterviewSource.unsafe]] (throws on violation); there is no unchecked `copy` or `fromProduct`
+  * path.
   */
-final case class InterviewSource(
-    transcript: TranscriptAtlas,
-    cue: Cue,
-    probes: Vector[Probe],
-    ratings: Option[SubjectiveRatings]
+final class InterviewSource private (
+    val transcript: TranscriptAtlas,
+    val cue: Cue,
+    val probes: Vector[Probe],
+    val ratings: Option[SubjectiveRatings]
 ):
   def probeById(id: PromptId): Option[Probe] = probes.find(_.id == id)
 
@@ -53,6 +54,18 @@ final case class InterviewSource(
         case None                                  => InterviewPhase.FreeRecall
     }
 
+  override def equals(other: Any): Boolean = other match
+    case that: InterviewSource =>
+      transcript == that.transcript && cue == that.cue && probes == that.probes &&
+      ratings == that.ratings
+    case _ => false
+
+  override def hashCode(): Int = (transcript, cue, probes, ratings).##
+
+  override def toString: String =
+    s"InterviewSource(source=${transcript.atlas.source.id.value}, turns=${transcript.turns.size}, " +
+      s"probes=${probes.size}, ratings=${ratings.isDefined})"
+
 object InterviewSource:
   private val phaseRank: InterviewPhase => Int =
     case InterviewPhase.FreeRecall    => 0
@@ -60,8 +73,8 @@ object InterviewSource:
     case InterviewPhase.SpecificProbe => 2
     case InterviewPhase.Other(_)      => 3
 
-  def validated(src: InterviewSource): Either[DomainError, InterviewSource] =
-    for
+  private def validate(src: InterviewSource): Either[DomainError, InterviewSource] =
+    val checks = for
       t <- TranscriptAtlas.validated(src.transcript)
       _ <- src.probes.traverse_ { p =>
         val path = s"interview/probes/${p.id.value}"
@@ -82,4 +95,29 @@ object InterviewSource:
         if ranks == ranks.sorted then Right(())
         else Left(DomainError.InvariantViolation("interview/turns", "phases are not monotone"))
       }
-    yield src.copy(transcript = t)
+    yield ()
+    checks.as(src)
+
+  /** Checked constructor enforcing all interview-source invariants. */
+  def of(
+      transcript: TranscriptAtlas,
+      cue: Cue,
+      probes: Vector[Probe],
+      ratings: Option[SubjectiveRatings]
+  ): Either[DomainError, InterviewSource] =
+    validate(new InterviewSource(transcript, cue, probes, ratings))
+
+  /** Throws `IllegalArgumentException` when any interview-source invariant is violated. */
+  def unsafe(
+      transcript: TranscriptAtlas,
+      cue: Cue,
+      probes: Vector[Probe],
+      ratings: Option[SubjectiveRatings]
+  ): InterviewSource =
+    of(transcript, cue, probes, ratings)
+      .fold(e => throw new IllegalArgumentException(e.message), identity)
+
+  /** Re-checks an existing value; always `Right` for values built through [[of]], kept for
+    * aggregate validators that recursively validate their members.
+    */
+  def validated(src: InterviewSource): Either[DomainError, InterviewSource] = validate(src)
