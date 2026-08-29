@@ -42,7 +42,8 @@ object RecallGraph:
     val ordCheck: ValidatedNec[DomainError, Unit] =
       if ordinals == (0 until g.units.size).toVector then ().validNec
       else DomainError.InvariantViolation("recall/units", "ordinals must be 0..n-1").invalidNec
-    val len = g.transcript.canonicalText.length
+    val canonical = g.transcript.canonicalText
+    val len = canonical.length
     val spanCheck: ValidatedNec[DomainError, Unit] =
       g.units.traverse_ { u =>
         if u.span.minSpan.endExclusive <= len then ().validNec
@@ -85,4 +86,29 @@ object RecallGraph:
             case _ => ().validNec
         }
       }
-    (dupCheck, ordCheck, spanCheck, relCheck, partCheck).mapN((_, _, _, _, _) => g)
+    // A unit's `text` must be the words its `span` points at. Without this, a unit can claim any
+    // text while its span points somewhere else, and "which words support this cell" gets two
+    // different answers with no law that they agree: the only code that turns a unit into a vector
+    // reads `text` (embed-bench channels), while a span-based trace reads the transcript. The
+    // recall checksum commits to both, so it faithfully IDENTIFIES an incoherent graph and never
+    // refuses one - identity is not validity, which is the gap this closes.
+    //
+    // Compared against the hull (`minSpan`), so a discontinuous SpanSet is checked as the covered
+    // extent rather than concatenated pieces: a unit spanning two sentences carries the text
+    // between them too, and slicing per-ref would reject that legitimately-gappy case.
+    val textCheck: ValidatedNec[DomainError, Unit] =
+      g.units.traverse_ { u =>
+        val hull = u.span.minSpan
+        // Guarded by spanCheck above, but validated accumulates rather than short-circuits, so a
+        // graph failing the span check would reach this and throw on substring without the guard.
+        if hull.endExclusive > len then ().validNec
+        else if canonical.substring(hull.start, hull.endExclusive) == u.text then ().validNec
+        else
+          DomainError
+            .InvariantViolation(
+              s"recall/units/${u.id.value}",
+              "text must be the transcript at the unit's span"
+            )
+            .invalidNec
+      }
+    (dupCheck, ordCheck, spanCheck, relCheck, partCheck, textCheck).mapN((_, _, _, _, _, _) => g)
