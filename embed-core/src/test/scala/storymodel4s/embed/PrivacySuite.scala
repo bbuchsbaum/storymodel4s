@@ -272,6 +272,42 @@ class PrivacySuite extends FunSuite:
     }
   }
 
+  test("transformation validation checks its source-span ordering locally") {
+    val detector = PseudonymizationDetector
+      .wholeWordTable(Vector(PseudonymizationTableEntry("Jane", "[P]")))
+      .toOption
+      .get
+    val result = detector.validateTransformation(
+      "Jane met Jane",
+      "[P] met [P]",
+      Vector(
+        TextSpan.unsafe(9, 13) -> TextSpan.unsafe(0, 3),
+        TextSpan.unsafe(0, 4) -> TextSpan.unsafe(8, 11)
+      )
+    )
+
+    val error = result.left.toOption.getOrElse(fail("expected transformation validation to fail"))
+    error match
+      case DomainError.InvariantViolation(path, reason) =>
+        assertEquals(path, "pseudonymizationDetector/table/0")
+        assert(reason.contains("mapped source at offset index 0"))
+      case other => fail(s"expected typed detector-table failure, got ${other.message}")
+    assert(!error.message.contains("Jane"))
+  }
+
+  test("case-insensitive tables use Unicode simple case mappings") {
+    val detector = PseudonymizationDetector
+      .wholeWordTable(
+        Vector(PseudonymizationTableEntry("ismail", "[P]", caseInsensitive = true))
+      )
+      .toOption
+      .get
+
+    val detection = detector.detect("İSMAIL", key, suiteKeys)
+
+    assertEquals(detection.map(_.spans), Right(Vector(TextSpan.unsafe(0, 6))))
+  }
+
   test("pseudonymization table rows redact both text fields from diagnostics") {
     val entry = PseudonymizationTableEntry("Jane", "[PERSON_1]", caseInsensitive = true)
     assert(!entry.toString.contains("Jane"))
