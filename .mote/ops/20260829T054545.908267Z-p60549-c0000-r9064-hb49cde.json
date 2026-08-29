@@ -1,0 +1,1 @@
+{"actor":"claude-storymodel4s","entity":"bd-01M160TXNMJC83CXN54T4NY8FQ","kind":"create","op":"20260829T054545.908267Z-p60549-c0000-r9064-hb49cde","set":{"status":"open","title":"align: SignatureSuite never exercises RecallSignature.externalMass - the landed fix is unproven"},"ts":"2026-08-29T05:45:45.908267Z","v":1}
