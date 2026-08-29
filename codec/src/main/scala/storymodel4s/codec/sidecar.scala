@@ -216,17 +216,40 @@ object SidecarLayout:
 /** One complete SM4SFT02 block's derived global-row and byte range.
   *
   * Why: HTTP adapters need checked range coordinates without accepting offsets or lengths from an
-  * attacker-controlled table.
+  * attacker-controlled table. The type is a plain class so `fromProduct` cannot mint attacker
+  * offsets; only [[BlockedSidecarLayout.blockRange]] produces one.
   */
-final case class SidecarBlockRange private[codec] (
-    block: Int,
-    firstRow: Int,
-    rowCount: Int,
-    byteOffset: Long,
-    byteLength: Long
+final class SidecarBlockRange private (
+    val block: Int,
+    val firstRow: Int,
+    val rowCount: Int,
+    val byteOffset: Long,
+    val byteLength: Long
 ):
   def rowEndExclusive: Long = firstRow.toLong + rowCount.toLong
   def byteEndExclusive: Long = byteOffset + byteLength
+
+  override def equals(other: Any): Boolean = other match
+    case that: SidecarBlockRange =>
+      block == that.block && firstRow == that.firstRow && rowCount == that.rowCount &&
+      byteOffset == that.byteOffset && byteLength == that.byteLength
+    case _ => false
+
+  override def hashCode(): Int =
+    (block, firstRow, rowCount, byteOffset, byteLength).hashCode
+
+  override def toString: String =
+    s"SidecarBlockRange(block=$block, firstRow=$firstRow, rowCount=$rowCount)"
+
+object SidecarBlockRange:
+  private[codec] def checked(
+      block: Int,
+      firstRow: Int,
+      rowCount: Int,
+      byteOffset: Long,
+      byteLength: Long
+  ): SidecarBlockRange =
+    new SidecarBlockRange(block, firstRow, rowCount, byteOffset, byteLength)
 
 /** Checked SM4SFT02 arithmetic derived only from the trusted manifest.
   *
@@ -257,7 +280,7 @@ final case class BlockedSidecarLayout private (
       val first = block.toLong * rowsPerBlock.value.toLong
       val count = math.min(rowsPerBlock.value.toLong, rowCount.toLong - first)
       Right(
-        new SidecarBlockRange(
+        SidecarBlockRange.checked(
           block,
           first.toInt,
           count.toInt,
@@ -324,29 +347,65 @@ object BlockedSidecarLayout:
 /** A verified SM4SFT02 header and digest index rooted in the manifest's index checksum.
   *
   * Why: individual block checks are trustworthy only after the small prelude has been verified
-  * against evidence that did not come from the sidecar file itself.
+  * against evidence that did not come from the sidecar file itself. A forged prelude would be a
+  * witness that witnessed nothing; the type is a plain class so `fromProduct` cannot mint one, and
+  * `blockDigests` is not a public Product slot.
   */
-final case class CheckedSidecarPrelude private[codec] (
-    layout: BlockedSidecarLayout,
+final class CheckedSidecarPrelude private (
+    val layout: BlockedSidecarLayout,
     private[codec] val blockDigests: Vector[Checksum]
 ):
   def blocksForRows(rows: Iterable[Int]): Either[CodecError, Vector[SidecarBlockRange]] =
     layout.blocksForRows(rows)
 
+  override def equals(other: Any): Boolean = other match
+    case that: CheckedSidecarPrelude =>
+      layout == that.layout && blockDigests == that.blockDigests
+    case _ => false
+
+  override def hashCode(): Int = (layout, blockDigests).hashCode
+
+  override def toString: String =
+    s"CheckedSidecarPrelude(blocks=${blockDigests.size})"
+
+object CheckedSidecarPrelude:
+  private[codec] def checked(
+      layout: BlockedSidecarLayout,
+      blockDigests: Vector[Checksum]
+  ): CheckedSidecarPrelude =
+    new CheckedSidecarPrelude(layout, blockDigests)
+
 /** One independently verified SM4SFT02 block decoded at its global compact-row position.
   *
   * Why: a partial fetch must never masquerade as validation of the complete sidecar or a fully
-  * materialized `FeatureTrack`.
+  * materialized `FeatureTrack`. The type is a plain class so `fromProduct` cannot mint unverified
+  * rows.
   */
-final case class CheckedSidecarBlock private[codec] (
-    range: SidecarBlockRange,
-    rows: Vector[Vector[Double]]
+final class CheckedSidecarBlock private (
+    val range: SidecarBlockRange,
+    val rows: Vector[Vector[Double]]
 ):
   /** Read a decoded row by its global compact index. */
   def row(globalRow: Int): Option[Vector[Double]] =
     Option.when(globalRow >= range.firstRow && globalRow < range.rowEndExclusive)(
       rows(globalRow - range.firstRow)
     )
+
+  override def equals(other: Any): Boolean = other match
+    case that: CheckedSidecarBlock => range == that.range && rows == that.rows
+    case _                         => false
+
+  override def hashCode(): Int = (range, rows).hashCode
+
+  override def toString: String =
+    s"CheckedSidecarBlock(block=${range.block}, rows=${rows.size})"
+
+object CheckedSidecarBlock:
+  private[codec] def checked(
+      range: SidecarBlockRange,
+      rows: Vector[Vector[Double]]
+  ): CheckedSidecarBlock =
+    new CheckedSidecarBlock(range, rows)
 
 /** Portable binary codec for typed numeric feature sidecars.
   *
@@ -534,7 +593,7 @@ object SidecarCodec:
           digest <- readChecksum(bytes, BlockedHeaderBytes + block * BlockDigestBytes)
         yield built :+ digest
       }
-    yield new CheckedSidecarPrelude(checked, digests)
+    yield CheckedSidecarPrelude.checked(checked, digests)
 
   /** Verify and decode one complete block using only the checked prelude and this block's bytes. */
   def validateBlockedBlock(
@@ -570,7 +629,7 @@ object SidecarCodec:
         bytes,
         0
       )
-    yield new CheckedSidecarBlock(range, rows)
+    yield CheckedSidecarBlock.checked(range, rows)
 
   /** Validate a complete SM4SFT02 file, including its retained whole-file identity. */
   def validateBlockedBytes(
