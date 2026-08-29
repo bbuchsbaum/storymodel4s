@@ -14,6 +14,31 @@ class CostSuite extends FunSuite:
 
   private val eps = 1e-12
 
+  /** One valid hand chart, shared by the eligibility laws below. Suite-level so the chartless and
+    * charted views are built from the same evidence and differ only in where it is attached.
+    */
+  private val costChartEvidence: storymodel4s.proposition.PropositionEvidence =
+    import storymodel4s.proposition.*
+    val predicate = ConceptId.unsafe("p")
+    val actor = ConceptId.unsafe("a")
+    val target = ConceptId.unsafe("b")
+    val unchecked = PropositionChart.unchecked(
+      Some(predicate),
+      Map(
+        predicate -> Concept.predicate("find"),
+        actor -> Concept.entity("anna"),
+        target -> Concept.entity("brother")
+      ),
+      Vector(
+        PropositionRelation(predicate, RoleAssignment.arg(0), ConceptTarget.Node(actor)),
+        PropositionRelation(predicate, RoleAssignment.arg(1), ConceptTarget.Node(target))
+      ),
+      polarity = Map(predicate -> Polarity.Positive)
+    )
+    PropositionEvidence.hand(
+      ChartValidator.check(unchecked).fold(v => fail(s"invalid chart: $v"), identity)
+    )
+
   /** Distinct weights so that swapping any two terms changes the result. */
   private val w = CostWeights
     .of(
@@ -233,4 +258,131 @@ class CostSuite extends FunSuite:
     assertEqualsDouble(d(CostTerm.Distortion), 1.0, eps)
     assertEqualsDouble(d(CostTerm.Chart), 0.5, eps)
     assertEqualsDouble(d(CostTerm.Structural), 0.5, eps)
+  }
+
+  /** A segment cell must not be discounted for having measured its members' charts.
+    *
+    * A segment node never has a chart of its own — `StorySourceView` is explicit that "segments
+    * never get a fabricated chart" — but the Chart term is produced by `ChartDistance.reduction`,
+    * which measures over `view.structuralMembers(node.ref)`, the LEAVES. `chartEligible` used to
+    * test `node.evidence`, which is the contract of `ChartDistance.report` — a different function
+    * from the one that actually runs. The two predicates coincide on a leaf and diverge on a
+    * segment, so Chart came out present-but-not-eligible.
+    *
+    * The consequence was compound and both halves pointed the same way. `wPresent` exceeded
+    * `wEligible`, so `scaleToEligible` fell to 0.9054 and multiplied the cost DOWN — the cell was
+    * made to look better BECAUSE it had measured more — while `supportOf`, which clamps with
+    * `math.min(1.0, _)`, reported the ratio above one as a flat 1.0: full support, nothing assumed,
+    * on a cell that had in fact assumed Sensory. Measured against the correct scaling of 1.0405 the
+    * cell was priced 14.9% too low.
+    *
+    * It lands only on segment cells and only once charts exist, which is a systematic thumb on the
+    * scale for coarse anchors over leaf anchors — recall made to look more scene-level than it is.
+    * WOG carries no charts, so no fixture in this suite could have caught it.
+    */
+  test("a segment cell is not discounted for measuring its members' charts") {
+    import AnnaFixture.*
+    val v = InMemorySourceView(
+      view.nodes.map(n => n.copy(evidence = if n.ref == e4 then Some(costChartEvidence) else None)),
+      view.edges,
+      view.worldOrder,
+      view.textLength
+    )
+    val segment = v.node(sc2).get
+    // Preconditions, asserted rather than assumed: the law is vacuous if the fixture stops being a
+    // chartless segment over a charted leaf, and a vacuous law is how the last two defects survived.
+    assert(!segment.isLeaf, "fixture: sc2 must be a segment")
+    assert(segment.evidence.isEmpty, "fixture: a segment must carry no chart of its own")
+    assert(
+      v.structuralMembers(sc2).exists(_.hasEvidence),
+      "fixture: a leaf under sc2 must be charted"
+    )
+    val b = DefaultLocalCostModel().cost(
+      u2.copy(evidence = Some(costChartEvidence)),
+      segment,
+      FidelityMode.Faithful,
+      v
+    )
+    assert(b.terms.contains(CostTerm.Chart), "fixture: the Chart term must actually be measured")
+    // Sensory is eligible and absent here, so honest support is below one. Before the fix this read
+    // exactly 1.0 — the clamp turning an over-unity ratio into a claim that nothing was assumed.
+    assert(
+      b.supportWeight < 1.0,
+      s"support ${b.supportWeight} claims nothing was assumed, but Sensory was"
+    )
+    assertEqualsDouble(b.supportWeight, 0.961038961038961, 1e-9)
+  }
+
+  /** Configuring a structural provider must be inert on a cell with no source chart to compare.
+    *
+    * The mirror of the Chart defect above, found by scout on the candidate that fixed Chart.
+    * `structuralReduction` reads the same `structuralMembers` population, but `structuralEligible`
+    * asked only whether a provider was configured and the unit had evidence — never whether the
+    * source had a chart at all. On a chartless cell the Structural term is absent either way, so
+    * configuration alone moved `(supportWeight, total)` from `(0.9552, 1.37045)` to
+    * `(0.8312, 1.575)`: the cell paid a 15% inflation for a measurement it could never have had,
+    * which biases chartless cells toward External.
+    *
+    * Eligibility is "could this cell have been measured", not "is a provider switched on". A
+    * contradiction that excludes every charted member is a genuine missed measurement and must
+    * still lower support; a source with no charts is a dimension the cell does not have.
+    */
+  test("a configured structural provider is inert on a chartless cell") {
+    import AnnaFixture.*
+    val chartless = InMemorySourceView(
+      view.nodes.map(_.copy(evidence = None)),
+      view.edges,
+      view.worldOrder,
+      view.textLength
+    )
+    val segment = chartless.node(sc2).get
+    assert(
+      !chartless.structuralMembers(sc2).exists(_.hasEvidence),
+      "fixture: every structural member must be chartless"
+    )
+    val withUnitChart = u2.copy(evidence = Some(costChartEvidence))
+    val configured = DefaultLocalCostModel(structural = StructuralDistance.of((_, _) => 0.0))
+      .cost(withUnitChart, segment, FidelityMode.Faithful, chartless)
+    val absent = DefaultLocalCostModel(structural = StructuralDistance.missing)
+      .cost(withUnitChart, segment, FidelityMode.Faithful, chartless)
+    assert(
+      !configured.terms.contains(CostTerm.Structural),
+      "fixture: the Structural term must be absent on a chartless cell"
+    )
+    assertEqualsDouble(configured.supportWeight, absent.supportWeight, eps)
+    assertEqualsDouble(configured.total, absent.total, eps)
+  }
+
+  /** Positive control for the law above: where the source IS charted, configuration must matter.
+    *
+    * Without this, "a configured provider is inert" would be satisfiable by ignoring the provider
+    * everywhere, which is a worse bug than the one being fixed.
+    */
+  test("a configured structural provider is not inert where the source is charted") {
+    import AnnaFixture.*
+    val charted = InMemorySourceView(
+      view.nodes.map(n => n.copy(evidence = if n.ref == e4 then Some(costChartEvidence) else None)),
+      view.edges,
+      view.worldOrder,
+      view.textLength
+    )
+    val segment = charted.node(sc2).get
+    val withUnitChart = u2.copy(evidence = Some(costChartEvidence))
+    val configured = DefaultLocalCostModel(structural = StructuralDistance.of((_, _) => 0.0))
+      .cost(withUnitChart, segment, FidelityMode.Faithful, charted)
+    val absent = DefaultLocalCostModel(structural = StructuralDistance.missing)
+      .cost(withUnitChart, segment, FidelityMode.Faithful, charted)
+    assert(configured.terms.contains(CostTerm.Structural), "the provider was ignored entirely")
+    assert(!absent.terms.contains(CostTerm.Structural))
+    assertNotEquals(configured.total, absent.total)
+    // The literals above this line are NOT a control on eligibility, and scout proved it: term
+    // production happens BEFORE eligibility is consulted, so the independent mutation
+    // `val structuralEligible = false` leaves the Structural term present and the two totals
+    // different, and every assertion up to here stays green. Under that mutation the configured
+    // cell reads (1.0, 1.2) - full support, because nothing eligible went unmeasured once the
+    // eligible set stopped containing Structural. Pinning the true tuple is what kills it.
+    assertEqualsDouble(configured.supportWeight, 0.9655172413793105, eps)
+    assertEqualsDouble(configured.total, 1.3558441558441556, eps)
+    assertEqualsDouble(absent.supportWeight, 0.961038961038961, eps)
+    assertEqualsDouble(absent.total, 1.3621621621621622, eps)
   }

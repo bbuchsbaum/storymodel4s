@@ -847,10 +847,29 @@ final case class DefaultLocalCostModel(
     // ELIGIBILITY IS PER-CELL, not per-view. A chartless node in a mixed view could never have been
     // chart-compared, so treating it as a missed measurement would invent a dimension that cell
     // cannot have — the same error as scaling over all terms, which collapsed every row to External.
-    // Chart needs evidence on BOTH sides (ChartDistance.report, cost.scala:346-348); Structural
-    // needs a supplied provider AND unit evidence (cost.scala:398).
-    val chartEligible = unit.evidence.nonEmpty && node.evidence.nonEmpty
-    val structuralEligible = structural != StructuralDistance.missing && unit.evidence.nonEmpty
+    // Chart eligibility must be asked of the function that PRODUCES the term. `dChart` comes from
+    // ChartDistance.reduction, which measures over `view.structuralMembers(node.ref)` — the leaves.
+    // It does NOT come from ChartDistance.report, whose `(unit, node)` signature genuinely does
+    // need a chart on each side. Testing `node.evidence` here applied report's contract to
+    // reduction's term: identical on a leaf, wrong on a segment, because StorySourceView gives a
+    // segment no chart of its own ("segments never get a fabricated chart") while its leaves carry
+    // the charts actually compared. Chart then came out present-but-not-eligible, wPresent exceeded
+    // wEligible, and the blend multiplied the cost DOWN while supportOf's clamp reported the
+    // over-unity ratio as full support. `leavesUnder` returns the node itself for a leaf, so this
+    // predicate is a strict generalization and no leaf cell moves.
+    //
+    // Structural has the SAME defect mirrored, found by scout on this candidate. It is produced by
+    // ChartDistance.structuralReduction, which reads the same structuralMembers population, but its
+    // eligibility asked only whether a provider was configured and the unit had evidence — never
+    // whether the source had a chart to compare against. On a chartless cell the term is absent
+    // either way, yet CONFIGURATION ALONE moved (support, total) from (0.9552, 1.37045) to
+    // (0.8312, 1.575): a 15% cost inflation for a measurement that cell could never have had,
+    // biasing chartless cells toward External. That is exactly the error the paragraph above warns
+    // about, in the term I did not check. Both now ask the population the measurement reads.
+    val chartedMembers = view.structuralMembers(node.ref).exists(_.hasEvidence)
+    val chartEligible = unit.evidence.nonEmpty && chartedMembers
+    val structuralEligible =
+      structural != StructuralDistance.missing && unit.evidence.nonEmpty && chartedMembers
     val eligible = always.map(_._1).toSet ++
       Set(CostTerm.Sensory) ++
       Option.when(chartEligible)(CostTerm.Chart) ++
