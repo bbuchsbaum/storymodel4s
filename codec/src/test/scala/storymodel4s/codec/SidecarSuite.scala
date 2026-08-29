@@ -79,7 +79,7 @@ class SidecarSuite extends ScalaCheckSuite:
         Vector(8, 0, 0, 0, 0, 0, 0, 0) ++
         Vector(0, 0, 128, 63, 0, 0, 32, 192)
     assertEquals(bytes.map(_ & 0xff).toVector, expected)
-    assertEquals(manifest.expectedByteLength, 8L)
+    assertEquals(manifest.expectedByteLength, Right(8L))
     assertEquals(manifest.checksum, Checksum.ofBytes(bytes))
     val layout = SidecarCodec.validateBytes(manifest, bytes).toOption.get
     assertEquals(layout.payloadOffset, 16)

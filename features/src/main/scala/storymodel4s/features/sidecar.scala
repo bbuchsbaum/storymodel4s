@@ -24,14 +24,29 @@ final case class SidecarManifest(
   def bytesPerValue: Int = dtype match
     case Dtype.Float32 => 4
     case Dtype.Float64 => 8
-  def expectedByteLength: Long = dimension.toLong * rowCount.toLong * bytesPerValue
+
+  /** Computes the payload size without permitting a wrapped byte count. */
+  def expectedByteLength: Either[DomainError, Long] =
+    SidecarManifest.expectedByteLength(this)
 
 object SidecarManifest:
+  private def path(m: SidecarManifest): String = s"features/sidecar/${m.space.value}"
+
+  private def expectedByteLength(m: SidecarManifest): Either[DomainError, Long] =
+    val errorPath = path(m)
+    if m.dimension <= 0 then
+      Left(DomainError.InvariantViolation(errorPath, "non-positive dimension"))
+    else if m.rowCount < 0 then
+      Left(DomainError.InvariantViolation(errorPath, "negative row count"))
+    else
+      val valueCount = m.dimension.toLong * m.rowCount.toLong
+      val bytesPerValue = m.bytesPerValue.toLong
+      if valueCount > Long.MaxValue / bytesPerValue then
+        Left(DomainError.InvariantViolation(errorPath, "expected byte length exceeds Long range"))
+      else Right(valueCount * bytesPerValue)
+
   def validated(m: SidecarManifest): Either[DomainError, SidecarManifest] =
-    val path = s"features/sidecar/${m.space.value}"
-    if m.dimension <= 0 then Left(DomainError.InvariantViolation(path, "non-positive dimension"))
-    else if m.rowCount < 0 then Left(DomainError.InvariantViolation(path, "negative row count"))
-    else Right(m)
+    m.expectedByteLength.map(_ => m)
 
 /** Reference from a target to a row of a sidecar. */
 final case class FeatureRef(target: FeatureTarget, space: FeatureSpaceId, row: Int)
