@@ -109,3 +109,13 @@ class MetricsSuite extends FunSuite:
     assertEquals(Metrics.recallAt(ranking, Set(ref(1)), 0), 0.0)
     assertEquals(Metrics.recallAt(ranking, Set(ref(9)), 4), 0.0)
   }
+
+  test("step direction is the sign of the move, so a route can be compared to gold") {
+    assertEquals(Metrics.stepDirection(1, 5), 1)
+    assertEquals(Metrics.stepDirection(5, 1), -1)
+    assertEquals(Metrics.stepDirection(3, 3), 0)
+    // magnitude must not leak into the comparison: a long jump forward and a short step forward
+    // are the same DIRECTION, and a route metric that distinguished them would be scoring
+    // distance, not route.
+    assertEquals(Metrics.stepDirection(0, 99), Metrics.stepDirection(0, 1))
+  }
