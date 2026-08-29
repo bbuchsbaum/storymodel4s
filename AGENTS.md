@@ -248,6 +248,20 @@ was set by the owner on 2026-08-28 (sticky decision
    for is a defect you have declined to sweep; the chief did exactly that here,
    and 45 forgeable types stayed open until someone walked into one by hand.
 
+   *Dropping a term from a normalized aggregate silently rescales the rest.*
+   Excluding unplaceable mass from a distribution does not remove its influence
+   — normalization redistributes it over the survivors, so a detail half of
+   whose mass could not be placed starts contributing a **whole** detail's worth
+   of counts. Scale the item's weight by the fraction actually retained, so
+   counts track evidence rather than proportion. On the Birthday fixture the
+   difference is 49.0 expected detail-counts renormalized against 33.7 honest: a
+   third of the account's counted detail manufactured from mass nobody placed.
+   **The dangerous part is that it looks like a fix** — it is the natural repair
+   for over-counting, and it replaces one bias with its mirror image while
+   appearing to remove it. Encountered twice: once in a chief-prescribed fix
+   caught in review before it was written, once inside the very candidate
+   correcting the bias it mirrors.
+
    *An inequality is not a discriminating assertion.* `!=`, `<=`, and bounds
    generally can be satisfied by **both** the correct implementation and the
    mutant, so a suite built on them records kills it never made. The fix is to
