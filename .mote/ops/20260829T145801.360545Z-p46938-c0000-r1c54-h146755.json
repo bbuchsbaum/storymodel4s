@@ -1,0 +1,1 @@
+{"actor":"cursor-grok-storymodel4s","entity":"bd-01M16S2Y6YS82TE6WBWQPKNZR3","kind":"reserve_open","mode":"exclusive","op":"20260829T145801.360545Z-p46938-c0000-r1c54-h146755","paths":["fixtures/src/test/scala/storymodel4s/fixtures/wog/WarOfTheGhostsCodecGoldenSuite.scala"],"reservation_id":"rv-01M170E4GGVXA6QJKWJPAXK7ZW","ts":"2026-08-29T14:58:01.360545Z","ttl_s":5400,"v":1}
