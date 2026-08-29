@@ -151,3 +151,28 @@ class WogDiagnosticSuite extends FunSuite:
     assert(rendered.contains("DIAGNOSTIC"))
     assert(rendered.contains("three clocks"))
   }
+
+  test("the route metric actually fires on the multi-unit case, and abstains elsewhere") {
+    // A metric that is always Missing is not a measurement. The full-recall case is the only one
+    // with transitions, so it is the only place a route can exist.
+    val runs = report.channelReports.flatMap(_.runs)
+    val full = runs.filter(_.caseId == WogDiagnostic.fullRecallCase.id)
+    assert(full.nonEmpty, "the full-recall case produced no run")
+    val observed = full.flatMap(_.observations.byMetric(Metrics.Names.routeAgreement))
+    assert(observed.nonEmpty, "route metric absent from the full-recall case")
+    assert(
+      observed.exists(_.value.isDefined),
+      "route metric is Missing on every unit of the only case that has a route"
+    )
+    // The first unit of any case has no predecessor, so it must abstain rather than score.
+    full.foreach { r =>
+      val first = r.observations.byMetric(Metrics.Names.routeAgreement).head
+      assertEquals(first.value, None, "the first unit cannot have a transition")
+    }
+    // Single-unit paraphrase cases have no transition at all.
+    val single = runs.filter(_.caseId != WogDiagnostic.fullRecallCase.id)
+    single.foreach { r =>
+      val vs = r.observations.byMetric(Metrics.Names.routeAgreement)
+      assert(vs.forall(_.value.isEmpty), s"a single-unit case scored a route: ${r.caseId}")
+    }
+  }
