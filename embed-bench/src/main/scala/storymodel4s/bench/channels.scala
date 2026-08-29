@@ -48,14 +48,23 @@ final case class Channel(
     semantic: SemanticDistance,
     semanticIdentity: SemanticIdentity,
     structural: StructuralDistance,
-    structuralIdentity: StructuralIdentity
+    structuralIdentity: StructuralIdentity,
+    /** Law I5 clause 4: declared, never inferred. See [[ChannelExposure]]. */
+    exposure: ChannelExposure
 ):
   def identityChecksum: Checksum =
     ContentAddress.digest(
-      Vector("channel/v1", name, semanticIdentity.render, structuralIdentity.render)
+      Vector(
+        "channel/v1",
+        name,
+        semanticIdentity.render,
+        structuralIdentity.render,
+        exposure.render
+      )
     )
 
-  def render: String = s"$name [${semanticIdentity.render}; ${structuralIdentity.render}]"
+  def render: String =
+    s"$name [${semanticIdentity.render}; ${structuralIdentity.render}; ${exposure.render}]"
 
 enum ChannelError:
   case Embed(error: EmbedError)
@@ -150,7 +159,14 @@ object BenchChannels:
   ): Either[ChannelError, Channel] =
     EmbedderSemantic.of(HashedNgramEmbedder[Id](dimension, seed), units, nodes).map {
       case (d, id) =>
-        Channel(s"hashed-ngram:d$dimension:s$seed", d, id, structural._1, structural._2)
+        Channel(
+          s"hashed-ngram:d$dimension:s$seed",
+          d,
+          id,
+          structural._1,
+          structural._2,
+          ChannelExposure.NonMemorizing
+        )
     }
 
   /** TF-IDF fitted on the given corpus (its fingerprint is part of the provider identity). Fitting
@@ -165,7 +181,14 @@ object BenchChannels:
     for
       e <- TfIdfEmbedder.fit[Id](corpus).left.map(ChannelError.Embed(_))
       s <- EmbedderSemantic.of(e, units, nodes)
-    yield Channel(s"tfidf:corpus-fit", s._1, s._2, structural._1, structural._2)
+    yield Channel(
+      s"tfidf:corpus-fit",
+      s._1,
+      s._2,
+      structural._1,
+      structural._2,
+      ChannelExposure.NonMemorizing
+    )
 
   /** No structural side: the structural term is `Missing` everywhere and reported as such. */
   val noStructure: (StructuralDistance, StructuralIdentity) =

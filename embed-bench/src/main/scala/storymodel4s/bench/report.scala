@@ -247,7 +247,8 @@ object Bench:
         0
       ),
       StructuralDistance.missing,
-      StructuralIdentity.Absent("no case")
+      StructuralIdentity.Absent("no case"),
+      ChannelExposure.NonMemorizing
     )
 
   private def infer(
