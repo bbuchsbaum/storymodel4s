@@ -6,6 +6,7 @@ import org.scalacheck.{Arbitrary, Gen}
 import org.scalacheck.Prop.forAll
 
 import storymodel4s.core.*
+import storymodel4s.embed.*
 import storymodel4s.features.{Estimate, MissingReason}
 import storymodel4s.proposition.ParticipantRole
 import storymodel4s.recall.*
@@ -49,6 +50,21 @@ class InterviewSuite extends ScalaCheckSuite:
     .fromText("Yesterday Anna met Bob Smith at Bob's cafe. Anna laughed; annabelle did not.")
     .toOption
     .get
+  private val privacyPolicy = PrivacyPolicyId.unsafe("interview-test-policy")
+  private val reidentificationKeyId = KeyId.unsafe("interview-test-key")
+  private val suiteKeys = SensitiveKeyProvider.static(
+    reidentificationKeyId,
+    Array[Byte](11, 23, 37, 41, 59, 67, 73, 89)
+  )
+
+  private def pseudonymize(
+      source: StorySource,
+      table: Vector[PseudonymEntry]
+  ): (PseudonymizedTranscript, ReidentificationKey) =
+    Pseudonymizer
+      .pseudonymize(source, table, privacyPolicy, reidentificationKeyId, suiteKeys)
+      .toOption
+      .get
 
   test("pseudonymization is relational, whole-word, deterministic, and reversible with the key") {
     val table = Vector(
@@ -56,52 +72,403 @@ class InterviewSuite extends ScalaCheckSuite:
       PseudonymEntry("Bob Smith", "[PERSON_2]"),
       PseudonymEntry("Bob", "[PERSON_2]")
     )
-    val p = Pseudonymizer.pseudonymize(plain, table).toOption.get
+    val (p, key) = pseudonymize(plain, table)
     val out = p.source.canonicalText
     assertEquals(
       out,
       "Yesterday [PERSON_1] met [PERSON_2] at [PERSON_2]'s cafe. [PERSON_1] laughed; annabelle did not."
     )
     assert(!out.contains("Anna "))
-    assertEquals(Pseudonymizer.pseudonymize(plain, table).toOption.get.source.id, p.source.id)
-    // Relational (many-to-one) keys are explicitly irreversible.
-    assert(!p.isReversible)
-    assert(Pseudonymizer.reverse(p).isLeft)
-    // Reversal is exact when the key is one-to-one.
-    val unique =
-      Pseudonymizer.pseudonymize(plain, Vector(PseudonymEntry("Anna", "[PERSON_1]"))).toOption.get
-    assert(unique.isReversible)
-    assertEquals(Pseudonymizer.reverse(unique), Right(plain.canonicalText))
+    assertEquals(pseudonymize(plain, table)._1.source.id, p.source.id)
+    val permuted = pseudonymize(plain, table.reverse)._1
+    assertEquals(permuted.payload.digest, p.payload.digest)
+    assertEquals(permuted.payload.sourceDetection, p.payload.sourceDetection)
+    assert(table.forall(e => Pseudonymizer.occurrences(out, e.surface, e.caseInsensitive).isEmpty))
+    // Occurrence-level originals make relational many-to-one replacement exactly reversible.
+    assertEquals(Pseudonymizer.reverse(p, key), Right(plain.canonicalText))
+    assert(!p.toString.contains("Anna"))
+    assert(!key.toString.contains("Anna"))
     // pseudonymization never mutates the original
     assertEquals(plain.canonicalText.take(9), "Yesterday")
   }
 
-  test("matching is case-sensitive by default and never rewrites ordinary words") {
-    val src = StorySource.fromText("I will go when Will arrives. Mark the date, Mark.").toOption.get
-    val strict = Pseudonymizer
-      .pseudonymize(
-        src,
-        Vector(PseudonymEntry("Will", "[PERSON_3]"), PseudonymEntry("Mark", "[PERSON_4]"))
+  test("pseudonymization snapshots the caller key exactly once") {
+    val keyBytes = Array[Byte](11, 23, 37, 41, 59, 67, 73, 89)
+    var reads = 0
+    val oneReadKeys = new SensitiveKeyProvider:
+      def currentKeyId: KeyId = reidentificationKeyId
+      def key(id: KeyId): Option[Array[Byte]] =
+        reads += 1
+        Option.when(id == reidentificationKeyId && reads == 1)(keyBytes)
+
+    val result = Pseudonymizer.pseudonymize(
+      plain,
+      Vector(PseudonymEntry("Anna", "[PERSON_1]")),
+      privacyPolicy,
+      reidentificationKeyId,
+      oneReadKeys
+    )
+
+    assert(result.isRight)
+    assertEquals(reads, 1)
+  }
+
+  test("reversal requires the exact separately held key") {
+    val (transcript, _) = pseudonymize(plain, Vector(PseudonymEntry("Anna", "[PERSON_1]")))
+    val (_, wrongKey) = pseudonymize(plain, Vector(PseudonymEntry("Anna", "[PERSON_X]")))
+    val denied = Pseudonymizer.reverse(transcript, wrongKey)
+    assert(denied.isLeft)
+    assert(!denied.left.toOption.get.message.contains("Anna"))
+    val noKeyApi = compileErrors(
+      "Pseudonymizer.reverse(null.asInstanceOf[PseudonymizedTranscript])"
+    )
+    assert(noKeyApi.nonEmpty)
+    val keyContents = compileErrors(
+      "null.asInstanceOf[ReidentificationKey].entries"
+    )
+    val keyCopy = compileErrors(
+      "null.asInstanceOf[ReidentificationKey].copy()"
+    )
+    assert(keyContents.nonEmpty)
+    assert(keyCopy.nonEmpty)
+  }
+
+  test("pseudonymization rejects residual detector surfaces and no-op tables") {
+    val residual = Pseudonymizer.pseudonymize(
+      StorySource.fromText("Anna arrived.").toOption.get,
+      Vector(PseudonymEntry("Anna", "[Bob]"), PseudonymEntry("Bob", "[PERSON_2]")),
+      privacyPolicy,
+      reidentificationKeyId,
+      suiteKeys
+    )
+    assert(residual.isLeft)
+    assert(!residual.left.toOption.get.message.contains("Anna"))
+    assert(!residual.left.toOption.get.message.contains("Bob"))
+
+    val noDetection = Pseudonymizer.pseudonymize(
+      StorySource.fromText("No names here.").toOption.get,
+      Vector(PseudonymEntry("Anna", "[PERSON_1]")),
+      privacyPolicy,
+      reidentificationKeyId,
+      suiteKeys
+    )
+    assert(noDetection.isLeft)
+  }
+
+  test("sanitized transcript metadata and detector rendering never retain source identifiers") {
+    val entry = PseudonymEntry("Anna", "[PERSON_1]")
+    val source = StorySource
+      .fromText(
+        "Anna remembered the dinner.",
+        title = Some("Anna's clinical interview"),
+        metadata = Map("participant" -> "Anna", "clinic" -> "Example Clinic")
       )
       .toOption
       .get
+    val (transcript, _) = pseudonymize(source, Vector(entry))
+
+    assertEquals(transcript.source.title, None)
+    assertEquals(
+      transcript.source.metadata,
+      Map(
+        "pseudonymized" -> "true",
+        "privacyPolicyId" -> privacyPolicy.value,
+        "keyId" -> reidentificationKeyId.value
+      )
+    )
+    assert(!entry.toString.contains("Anna"))
+    assert(!transcript.source.toString.contains("Anna"))
+    assert(!transcript.source.toString.contains("Clinic"))
+  }
+
+  test("interview authorizes only the exact sanitized payload carried by its remote request") {
+    val provider = ProviderFingerprint.of("model", "tokenizer", "implementation", "runtime")
+    val (transcript, _) = pseudonymize(
+      StorySource.fromText("Anna remembered the dinner.").toOption.get,
+      Vector(PseudonymEntry("Anna", "[PERSON_1]"))
+    )
+    val space = EmbeddingSpace
+      .of(
+        provider,
+        Role.Query,
+        SemanticView.Surface,
+        None,
+        Dimension.unsafe(3),
+        Normalization.L2,
+        TruncationPolicy.Reject
+      )
+      .toOption
+      .get
+    val policy = RemotePolicy(
+      privacyPolicy,
+      allowedProviders = Set(provider),
+      allowedModels = Set("model"),
+      allowedPurposes = Set("interview-research"),
+      allowedDetectors = Set(transcript.payload.sourceDetection.get.policyIdentity),
+      maxBudgetTokens = 100,
+      ttlMillis = 1000
+    )
+    val request = EmbedRequest(
+      RequestId.unsafe("interview-request"),
+      EmbedPayload.Sanitized(transcript.payload),
+      space.id
+    )
+
+    val authorized = RemotePolicy.evaluate(
+      policy,
+      request,
+      provider,
+      "model",
+      "interview-research",
+      nowEpochMillis = 10,
+      estimatedTokens = 5
+    )
+    assertEquals(authorized.map(_.payload), Right(transcript.payload))
+
+    val raw = request.copy(
+      payload = EmbedPayload.Raw("Anna remembered the dinner.", Sensitivity.Sensitive)
+    )
+    assert(
+      RemotePolicy
+        .evaluate(
+          policy,
+          raw,
+          provider,
+          "model",
+          "interview-research",
+          nowEpochMillis = 10,
+          estimatedTokens = 5
+        )
+        .isLeft
+    )
+  }
+
+  test("trusted detector identity fixes whole-word table behaviour") {
+    val source = StorySource.fromText("Anna met Bob.").toOption.get
+    val table = Vector(PseudonymEntry("Anna", "[P1]"), PseudonymEntry("Bob", "[P2]"))
+    val trustedIdentity = Pseudonymizer
+      .detectorPolicyIdentity(table, reidentificationKeyId, suiteKeys)
+      .toOption
+      .get
+    val (trustedTranscript, _) = pseudonymize(source, table)
+    assertEquals(
+      trustedTranscript.payload.sourceDetection.map(_.policyIdentity),
+      Some(trustedIdentity)
+    )
+
+    val provider = ProviderFingerprint.of("model", "tokenizer", "implementation", "runtime")
+    val space = EmbeddingSpace
+      .of(
+        provider,
+        Role.Query,
+        SemanticView.Surface,
+        None,
+        Dimension.unsafe(3),
+        Normalization.L2,
+        TruncationPolicy.Reject
+      )
+      .toOption
+      .get
+    val policy = RemotePolicy(
+      privacyPolicy,
+      allowedProviders = Set(provider),
+      allowedModels = Set("model"),
+      allowedPurposes = Set("interview-research"),
+      allowedDetectors = Set(trustedIdentity),
+      maxBudgetTokens = 100,
+      ttlMillis = 1000
+    )
+    val trustedRequest = EmbedRequest(
+      RequestId.unsafe("trusted-table-request"),
+      EmbedPayload.Sanitized(trustedTranscript.payload),
+      space.id
+    )
+    assert(
+      RemotePolicy
+        .evaluate(
+          policy,
+          trustedRequest,
+          provider,
+          "model",
+          "interview-research",
+          nowEpochMillis = 10,
+          estimatedTokens = 5
+        )
+        .isRight
+    )
+
+    val detector = PseudonymizationDetector
+      .wholeWordTable(
+        table.map(entry =>
+          PseudonymizationTableEntry(entry.surface, entry.pseudonym, entry.caseInsensitive)
+        )
+      )
+      .toOption
+      .get
+    val sourceDetection =
+      detector.detect(source.canonicalText, reidentificationKeyId, suiteKeys).toOption.get
+    val attemptedLaundering = PseudonymizedText.checked(
+      privacyPolicy,
+      reidentificationKeyId,
+      source.canonicalText,
+      "[P1] met Bob.",
+      Vector(TextSpan.unsafe(0, 4) -> TextSpan.unsafe(0, 4)),
+      sourceDetection,
+      detector,
+      suiteKeys
+    )
+
+    assertEquals(sourceDetection.policyIdentity, trustedIdentity)
+    assertEquals(
+      sourceDetection.spans,
+      Vector(TextSpan.unsafe(0, 4), TextSpan.unsafe(9, 12))
+    )
+    assert(attemptedLaundering.isLeft)
+    assert(!attemptedLaundering.left.toOption.get.message.contains("Anna"))
+    assert(!attemptedLaundering.left.toOption.get.message.contains("Bob"))
+  }
+
+  test("matching is case-sensitive by default and never rewrites ordinary words") {
+    val src = StorySource.fromText("I will go when Will arrives. Mark the date, Mark.").toOption.get
+    val strict = pseudonymize(
+      src,
+      Vector(PseudonymEntry("Will", "[PERSON_3]"), PseudonymEntry("Mark", "[PERSON_4]"))
+    )._1
     assertEquals(
       strict.source.canonicalText,
       "I will go when [PERSON_3] arrives. [PERSON_4] the date, [PERSON_4]."
     )
-    val loose = Pseudonymizer
-      .pseudonymize(src, Vector(PseudonymEntry("will", "[PERSON_3]", caseInsensitive = true)))
-      .toOption
-      .get
+    val loose = pseudonymize(
+      src,
+      Vector(PseudonymEntry("will", "[PERSON_3]", caseInsensitive = true))
+    )._1
     assertEquals(
       loose.source.canonicalText,
       "I [PERSON_3] go when [PERSON_3] arrives. Mark the date, Mark."
     )
   }
 
+  test("whole-word matching is Unicode-aware, normalization-sensitive, and code-point-safe") {
+    val deseretName = "\ud801\udc00\ud801\udc28"
+    val decomposedCafe = "Cafe\u0301"
+    val src = StorySource
+      .fromText(
+        s"Egulac met Kalama. Caf\u00e9 met $decomposedCafe; ${deseretName} arrived. " +
+          s"X${deseretName}Y and ${decomposedCafe}s stayed unchanged."
+      )
+      .toOption
+      .get
+    val table = Vector(
+      PseudonymEntry("Egulac", "[PLACE_1]"),
+      PseudonymEntry("Kalama", "[PLACE_2]"),
+      PseudonymEntry("Caf\u00e9", "[PERSON_1]"),
+      PseudonymEntry(decomposedCafe, "[PERSON_2]"),
+      PseudonymEntry(deseretName, "[PERSON_3]")
+    )
+
+    val out = pseudonymize(src, table)._1.source.canonicalText
+    assertEquals(
+      out,
+      s"[PLACE_1] met [PLACE_2]. [PERSON_1] met [PERSON_2]; [PERSON_3] arrived. " +
+        s"X${deseretName}Y and ${decomposedCafe}s stayed unchanged."
+    )
+    assert(!out.contains("Egulac"))
+    assert(!out.contains("Kalama"))
+  }
+
+  test("case-insensitive matching is locale-independent but remains diacritic-sensitive") {
+    val deseretUpper = "\ud801\udc00\ud801\udc01"
+    val deseretLower = "\ud801\udc28\ud801\udc29"
+    val src = StorySource
+      .fromText(s"MARK met Mark and M\u00e1rk. $deseretUpper met $deseretLower.")
+      .toOption
+      .get
+    val out = pseudonymize(
+      src,
+      Vector(
+        PseudonymEntry("Mark", "[PERSON_1]", caseInsensitive = true),
+        PseudonymEntry(deseretUpper, "[PERSON_2]", caseInsensitive = true)
+      )
+    )._1.source.canonicalText
+    assertEquals(out, "[PERSON_1] met [PERSON_1] and M\u00e1rk. [PERSON_2] met [PERSON_2].")
+  }
+
+  test("overlapping case policies cannot assign different relational pseudonyms") {
+    val ambiguous = Pseudonymizer.pseudonymize(
+      StorySource.fromText("Claire arrived.").toOption.get,
+      Vector(
+        PseudonymEntry("Claire", "[PERSON_1]"),
+        PseudonymEntry("claire", "[PERSON_2]", caseInsensitive = true)
+      ),
+      privacyPolicy,
+      reidentificationKeyId,
+      suiteKeys
+    )
+    assert(ambiguous.isLeft)
+    assert(!ambiguous.left.toOption.get.message.contains("Claire"))
+  }
+
+  test("the canonical detector configuration binds the case flag under the same key") {
+    val source = StorySource.fromText("Mark arrived.").toOption.get
+    val strict = pseudonymize(source, Vector(PseudonymEntry("Mark", "[PERSON_1]")))._1.payload
+    val insensitive = pseudonymize(
+      source,
+      Vector(PseudonymEntry("Mark", "[PERSON_1]", caseInsensitive = true))
+    )._1.payload
+
+    assertEquals(strict.text, insensitive.text)
+    assertEquals(strict.offsets, insensitive.offsets)
+    assertNotEquals(
+      strict.sourceDetection.map(_.configurationDigest),
+      insensitive.sourceDetection.map(_.configurationDigest)
+    )
+    assertNotEquals(strict.digest, insensitive.digest)
+    assert(strict.sourceDetection.forall(receipt => !receipt.render.contains("Mark")))
+    assert(strict.sourceDetection.forall(receipt => !receipt.render.contains("PERSON")))
+
+    val provider = ProviderFingerprint.of("model", "tokenizer", "implementation", "runtime")
+    val space = EmbeddingSpace
+      .of(
+        provider,
+        Role.Query,
+        SemanticView.Surface,
+        None,
+        Dimension.unsafe(3),
+        Normalization.L2,
+        TruncationPolicy.Reject
+      )
+      .toOption
+      .get
+    val policy = RemotePolicy(
+      privacyPolicy,
+      Set(provider),
+      Set("model"),
+      Set("research"),
+      allowedDetectors = Set(strict.sourceDetection.get.policyIdentity),
+      maxBudgetTokens = 100,
+      ttlMillis = 1000
+    )
+    def evaluate(payload: PseudonymizedText) =
+      RemotePolicy.evaluate(
+        policy,
+        EmbedRequest(
+          RequestId.unsafe("case-policy-request"),
+          EmbedPayload.Sanitized(payload),
+          space.id
+        ),
+        provider,
+        "model",
+        "research",
+        nowEpochMillis = 10,
+        estimatedTokens = 5
+      )
+    assert(evaluate(strict).isRight)
+    assert(evaluate(insensitive).isLeft)
+  }
+
   private def checkAllTokensMap(text: String, table: Vector[PseudonymEntry]): Unit =
     val src = StorySource.fromText(text).toOption.get
-    val p = Pseudonymizer.pseudonymize(src, table).toOption.get
+    val p = pseudonymize(src, table)._1
     val atlas = SurfaceAnalyzer.analyze(src)
     val newText = p.source.canonicalText
     // Expected token text: the same whole-word rewrite applied to the token alone (a token such
@@ -118,8 +485,9 @@ class InterviewSuite extends ScalaCheckSuite:
       val slice = mapped.slice(newText).toOption.get
       // A token strictly inside a multi-token replacement ("Bob" in "Bob Smith") maps to the
       // whole pseudonym; every other token maps to its own rewrite.
-      p.segments.find(s => s.replaced.isDefined && s.original.contains(tok.span)) match
-        case Some(seg) if seg.original != tok.span => assertEquals(slice, seg.replaced.get)
+      p.payload.offsets.find(_._1.contains(tok.span)) match
+        case Some((sourceSpan, targetSpan)) if sourceSpan != tok.span =>
+          assertEquals(slice, targetSpan.slice(newText).toOption.get)
         case _ => assertEquals(slice, rewrite(original), s"token '$original' in '$text'")
     }
 
@@ -138,11 +506,13 @@ class InterviewSuite extends ScalaCheckSuite:
   private val wordGen: Gen[String] = Gen.oneOf("went", "home", "the", "cake", "then", "late")
   private val punctGen: Gen[String] = Gen.oneOf("", ",", ".", ";", "!", "?", "'s")
   private val sentenceGen: Gen[String] =
-    Gen
-      .nonEmptyListOf(
+    for
+      name <- nameGen
+      namePunctuation <- punctGen
+      rest <- Gen.listOf(
         Gen.zip(Gen.frequency(1 -> nameGen, 2 -> wordGen), punctGen).map { case (w, p) => w + p }
       )
-      .map(_.mkString(" "))
+    yield ((name + namePunctuation) +: rest).mkString(" ")
 
   property("offset map is exact for every token on random name-bearing sentences") {
     forAll(sentenceGen) { text =>
@@ -156,6 +526,24 @@ class InterviewSuite extends ScalaCheckSuite:
         )
       )
       true
+    }
+  }
+
+  property("pseudonymization is exactly reversible with its key and leaves zero detections") {
+    val table = Vector(
+      PseudonymEntry("Anna", "[P1]"),
+      PseudonymEntry("Bob", "[P2]"),
+      PseudonymEntry("Claire", "[SISTER]"),
+      PseudonymEntry("Dmitri", "[UNCLE_OF_SPEAKER]")
+    )
+    forAll(sentenceGen) { text =>
+      val source = StorySource.fromText(text).toOption.get
+      val (transcript, key) = pseudonymize(source, table)
+      val sanitized = transcript.payload.text
+      Pseudonymizer.reverse(transcript, key).contains(source.canonicalText) &&
+      table.forall(entry =>
+        Pseudonymizer.occurrences(sanitized, entry.surface, entry.caseInsensitive).isEmpty
+      )
     }
   }
 
@@ -563,13 +951,16 @@ class InterviewSuite extends ScalaCheckSuite:
       Distribution.point(DetailFacet.Event)
     )
     val a2 = a1.copy(experiential = exp, sourceMonitoring = Some(SourceMonitoring.DirectMemory))
-    val once = ProfileScoring.phenomenology(Vector(a1, a2), None)
-    val twice = ProfileScoring.phenomenology(Vector(a1, a2, a1, a2), None)
+    val once = ProfileScoring.phenomenology(Vector(a1, a2), None, 1)
+    val twice = ProfileScoring.phenomenology(Vector(a1, a2, a1, a2), None, 1)
     assertEquals(once.firstPersonRate, Estimate.observed(1.0))
     assertEquals(twice.firstPersonRate, once.firstPersonRate)
     assertEquals(once.explicitRating, None)
     assertEquals(once.sourceMonitoring, Map(SourceMonitoring.DirectMemory -> 1))
-    assertEquals(ProfileScoring.phenomenology(Vector.empty, None).firstPersonRate.isObserved, false)
+    assertEquals(
+      ProfileScoring.phenomenology(Vector.empty, None, 0).firstPersonRate.isObserved,
+      false
+    )
   }
 
   test("a Missing count mass excludes the detail and is reported as coverage") {

@@ -2,7 +2,7 @@ package storymodel4s.embed
 
 import cats.{Order, Show}
 
-import storymodel4s.core.{Checksum, ProviderCall}
+import storymodel4s.core.{Checksum, ProviderCall, TextSpan}
 
 /** Whether a receipt identity is a plain content hash, an HMAC under a store-local key, or a
   * material-free hash produced because a required key was absent.
@@ -32,6 +32,11 @@ enum DigestKind:
 object ReceiptRendering:
   val MaterialVersion = "material/v1"
   val PseudoVersion = "pseudo/v1"
+  val PseudoV2Version = "pseudo/v2"
+  val DetectorConfigurationVersion = "detector-config/v1"
+  val DetectorSourceVersion = "detector-source/v1"
+  val DetectionVersion = "detection/v1"
+  val DetectorPolicyVersion = "detector-policy/v1"
   val ItemsVersion = "items/v1"
   val OutputsVersion = "outputs/v1"
   val AttemptVersion = "attempt/v1"
@@ -56,6 +61,49 @@ object ReceiptRendering:
   /** Identity input of a pseudonymized payload: policy, key id and sanitized text. */
   def pseudonymized(policyId: PrivacyPolicyId, keyId: KeyId, text: String): String =
     s"$PseudoVersion|policy=${esc(policyId.value)}|key=${esc(keyId.value)}|text=${esc(text)}"
+
+  /** HMAC input for one detector's confidential, versioned canonical configuration. */
+  def detectorConfiguration(
+      detectorId: PseudonymizationDetectorId,
+      configuration: String
+  ): String =
+    s"$DetectorConfigurationVersion|detector=${esc(detectorId.value)}|configuration=${esc(configuration)}"
+
+  /** HMAC input binding canonical source text to one detector configuration. */
+  def detectorSource(
+      detectorId: PseudonymizationDetectorId,
+      configurationDigest: ReceiptDigest.Keyed,
+      text: String
+  ): String =
+    s"$DetectorSourceVersion|detector=${esc(detectorId.value)}|configuration=${esc(configurationDigest.render)}|text=${esc(text)}"
+
+  /** Safe rendering of one detector-relative receipt; it contains digests and offsets, never text.
+    */
+  def detection(receipt: PseudonymizationDetection): String =
+    val spans = receipt.spans.map(renderSpan).mkString(",")
+    s"$DetectionVersion|detector=${esc(receipt.detectorId.value)}|configuration=${esc(receipt.configurationDigest.render)}|source=${esc(receipt.sourceDigest.render)}|spans=$spans"
+
+  /** Safe policy identity: detector algorithm/version and configuration HMAC, never config text. */
+  def detectorPolicy(identity: DetectorPolicyIdentity): String =
+    s"$DetectorPolicyVersion|detector=${esc(identity.detectorId.value)}|configuration=${esc(identity.configurationDigest.render)}"
+
+  /** Keyed identity input for a detector-certified pseudonymized payload. */
+  def pseudonymizedV2(
+      policyId: PrivacyPolicyId,
+      keyId: KeyId,
+      text: String,
+      offsets: Vector[(TextSpan, TextSpan)],
+      sourceDetection: PseudonymizationDetection,
+      destinationDetection: PseudonymizationDetection
+  ): String =
+    val map = offsets
+      .map { case (source, destination) =>
+        s"${renderSpan(source)}>${renderSpan(destination)}"
+      }
+      .mkString(",")
+    s"$PseudoV2Version|policy=${esc(policyId.value)}|key=${esc(keyId.value)}|text=${esc(text)}|offsets=$map|source-detection=${esc(sourceDetection.render)}|destination-detection=${esc(destinationDetection.render)}"
+
+  private def renderSpan(span: TextSpan): String = s"${span.start}:${span.endExclusive}"
 
   /** Per-item identities of one provider call (no material, only rendered digests). */
   def items(items: Vector[ItemDigest]): String =
@@ -127,7 +175,7 @@ object ReceiptDigest:
       keyId: KeyId,
       material: String,
       keys: SensitiveKeyProvider
-  ): Either[EmbedError, ReceiptDigest] =
+  ): Either[EmbedError, ReceiptDigest.Keyed] =
     keys.key(keyId) match
       case None    => Left(EmbedError.NoKey(keyId.value))
       case Some(k) => SensitiveDigest.compute(keyId, k, material).map(Keyed(_))

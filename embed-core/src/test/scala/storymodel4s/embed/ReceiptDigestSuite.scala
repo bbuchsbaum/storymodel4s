@@ -276,17 +276,28 @@ class ReceiptDigestSuite extends ScalaCheckSuite:
     val sharedPrefix = "a" * 12
     val providerA = ProviderFingerprint(Checksum.unsafe(sharedPrefix + ("0" * 52)))
     val providerB = ProviderFingerprint(Checksum.unsafe(sharedPrefix + ("1" * 52)))
-    val sharedSuffix = "b" * 12
-    val payloadA = ReceiptDigest.Plain(Checksum.unsafe(("0" * 52) + sharedSuffix))
-    val payloadB = ReceiptDigest.Plain(Checksum.unsafe(("1" * 52) + sharedSuffix))
+    val payload = ReceiptDigest.keyedUnder(KeyId.unsafe("k1"), "payload", k1).toOption.get
+    val detectorIdentity = new DetectorPolicyIdentity(
+      PseudonymizationDetectorId.unsafe("test-detector/v1"),
+      ReceiptDigest.keyedUnder(KeyId.unsafe("k1"), "detector-config", k1).toOption.get
+    )
     val policyId = PrivacyPolicyId.unsafe("policy")
-    def allowed(provider: ProviderFingerprint, payload: ReceiptDigest): PolicyDecision =
+    def allowed(provider: ProviderFingerprint): PolicyDecision =
       PolicyDecision.Allowed(
         policyId,
-        RemoteCapability(provider, "model", "purpose", policyId, 100L, 5L, payload)
+        RemoteCapability(
+          provider,
+          "model",
+          "purpose",
+          policyId,
+          100L,
+          5L,
+          detectorIdentity,
+          payload
+        )
       )
-    val decisionA = allowed(providerA, payloadA)
-    val decisionB = allowed(providerB, payloadB)
+    val decisionA = allowed(providerA)
+    val decisionB = allowed(providerB)
     assertEquals(decisionA.render, decisionB.render, "the display rendering is deliberately lossy")
     val receipt = embeddingReceipt(baseCall("capability"), publicItem("p", "in"), "out")
     assertNotEquals(
@@ -302,9 +313,27 @@ class ReceiptDigestSuite extends ScalaCheckSuite:
       val otherProvider = ProviderFingerprint.of(token, "tokenizer", "impl", "runtime")
       val policyId = PrivacyPolicyId.unsafe("policy")
       val otherPolicyId = PrivacyPolicyId.unsafe(token)
-      val payload = ReceiptDigest.plainPublic("payload")
-      val otherPayload = ReceiptDigest.plainPublic(token)
-      val base = RemoteCapability(provider, "model", "purpose", policyId, 100L, 5L, payload)
+      val payload = ReceiptDigest.keyedUnder(KeyId.unsafe("k1"), "payload", k1).toOption.get
+      val otherPayload = ReceiptDigest.keyedUnder(KeyId.unsafe("k1"), token, k1).toOption.get
+      val detectorIdentity = new DetectorPolicyIdentity(
+        PseudonymizationDetectorId.unsafe("test-detector/v1"),
+        ReceiptDigest.keyedUnder(KeyId.unsafe("k1"), "detector-config", k1).toOption.get
+      )
+      val otherDetectorIdentity = new DetectorPolicyIdentity(
+        PseudonymizationDetectorId.unsafe("test-detector/v1"),
+        ReceiptDigest.keyedUnder(KeyId.unsafe("k1"), token, k1).toOption.get
+      )
+      val base =
+        RemoteCapability(
+          provider,
+          "model",
+          "purpose",
+          policyId,
+          100L,
+          5L,
+          detectorIdentity,
+          payload
+        )
       val mutations = Vector(
         base.copy(provider = otherProvider),
         base.copy(model = token),
@@ -312,6 +341,7 @@ class ReceiptDigestSuite extends ScalaCheckSuite:
         base.copy(policyId = otherPolicyId),
         base.copy(expiresAtEpochMillis = 101L),
         base.copy(budgetTokens = 6L),
+        base.copy(detectorIdentity = otherDetectorIdentity),
         base.copy(payloadDigest = otherPayload)
       )
       def noCallAttempt(capability: RemoteCapability): AttemptReceipt =

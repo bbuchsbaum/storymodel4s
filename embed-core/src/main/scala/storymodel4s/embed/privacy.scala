@@ -38,31 +38,424 @@ enum PrivacyClass:
 object PrivacyPolicyId extends OpaqueId("PrivacyPolicyId")
 type PrivacyPolicyId = PrivacyPolicyId.T
 
+/** Identifies a pseudonymization detector algorithm and version in durable evidence. */
+object PseudonymizationDetectorId extends OpaqueId("PseudonymizationDetectorId")
+type PseudonymizationDetectorId = PseudonymizationDetectorId.T
+
+/** The exact keyed detector configuration a remote policy is willing to trust. */
+final class DetectorPolicyIdentity private[embed] (
+    val detectorId: PseudonymizationDetectorId,
+    val configurationDigest: ReceiptDigest.Keyed
+):
+  /** Safe policy rendering: algorithm/version and configuration HMAC, never configuration text. */
+  def render: String = ReceiptRendering.detectorPolicy(this)
+
+  override def equals(other: Any): Boolean = other match
+    case that: DetectorPolicyIdentity =>
+      detectorId == that.detectorId && configurationDigest == that.configurationDigest
+    case _ => false
+
+  override def hashCode: Int = (detectorId, configurationDigest).##
+
+  override def toString: String = render
+
+/** Detector-relative evidence over one exact canonical text.
+  *
+  * The detector configuration and source identities are HMACs under `keyId`; only the ordered
+  * detected spans remain visible. Construction is confined to embed-core so a detector
+  * implementation can find spans but cannot mint its own evidence.
+  */
+final class PseudonymizationDetection private[embed] (
+    val detectorId: PseudonymizationDetectorId,
+    val configurationDigest: ReceiptDigest.Keyed,
+    val sourceDigest: ReceiptDigest.Keyed,
+    val spans: Vector[TextSpan]
+):
+  /** Detector/configuration identity suitable for a [[RemotePolicy]] allowlist. */
+  def policyIdentity: DetectorPolicyIdentity =
+    new DetectorPolicyIdentity(detectorId, configurationDigest)
+
+  /** Canonical safe rendering for the enclosing payload receipt. */
+  def render: String = ReceiptRendering.detection(this)
+
+  override def equals(other: Any): Boolean = other match
+    case that: PseudonymizationDetection =>
+      detectorId == that.detectorId && configurationDigest == that.configurationDigest &&
+      sourceDigest == that.sourceDigest && spans == that.spans
+    case _ => false
+
+  override def hashCode: Int = (detectorId, configurationDigest, sourceDigest, spans).##
+
+  override def toString: String = render
+
+/** One row in the closed whole-word detector algorithm.
+  *
+  * The pseudonym is both part of configuration identity and the only destination replacement this
+  * row can certify. [[PseudonymizationDetector.wholeWordTable]] validates the complete table before
+  * constructing a detector.
+  */
+final case class PseudonymizationTableEntry(
+    surface: String,
+    pseudonym: String,
+    caseInsensitive: Boolean = false
+):
+  override def toString: String =
+    s"PseudonymizationTableEntry(<redacted>, <redacted>, caseInsensitive=$caseInsensitive)"
+
+/** A closed detector whose identity completely determines its span-finding behaviour.
+  *
+  * The only public factory is [[PseudonymizationDetector.wholeWordTable]]; callers supply typed
+  * table data, never an executable finder. The final `detect` method runs embed-core's fixed
+  * Unicode whole-word algorithm and alone mints evidence; checked transformations must also use the
+  * exact configured pseudonym for every winning table entry.
+  */
+final class PseudonymizationDetector private (
+    val id: PseudonymizationDetectorId,
+    configuration: String,
+    entries: Vector[PseudonymizationTableEntry]
+):
+  private def policyIdentityUnder(
+      keyId: KeyId,
+      keys: SensitiveKeyProvider
+  ): Either[DomainError, DetectorPolicyIdentity] =
+    PseudonymizationDetector
+      .keyedDigest(
+        "pseudonymizationDetector/configuration",
+        keyId,
+        ReceiptRendering.detectorConfiguration(id, configuration),
+        keys
+      )
+      .map(digest => new DetectorPolicyIdentity(id, digest))
+
+  /** Bind this exact algorithm/version and configuration for a remote-policy allowlist. */
+  def policyIdentity(
+      keyId: KeyId,
+      keys: SensitiveKeyProvider
+  ): Either[DomainError, DetectorPolicyIdentity] =
+    for
+      stableKeys <- PseudonymizationDetector.snapshotKeys(keyId, keys)
+      identity <- policyIdentityUnder(keyId, stableKeys)
+    yield identity
+
+  /** Detect spans in `text` and bind them to this detector under `keyId`. */
+  def detect(
+      text: String,
+      keyId: KeyId,
+      keys: SensitiveKeyProvider
+  ): Either[DomainError, PseudonymizationDetection] =
+    for
+      _ <- PseudonymizedText.validateUtf16(text, "pseudonymizationDetector/source")
+      stableKeys <- PseudonymizationDetector.snapshotKeys(keyId, keys)
+      identity <- policyIdentityUnder(keyId, stableKeys)
+      sourceDigest <- PseudonymizationDetector.keyedDigest(
+        "pseudonymizationDetector/source",
+        keyId,
+        ReceiptRendering.detectorSource(id, identity.configurationDigest, text),
+        stableKeys
+      )
+      spans <- detectedSpans(text)
+    yield new PseudonymizationDetection(id, identity.configurationDigest, sourceDigest, spans)
+
+  private[storymodel4s] def detectedSpans(text: String): Either[DomainError, Vector[TextSpan]] =
+    for
+      _ <- PseudonymizedText.validateUtf16(text, "pseudonymizationDetector/source")
+      spans = PseudonymizationDetector.detectTable(text, entries)
+      _ <- PseudonymizationDetector.validateSpans(text, spans)
+    yield spans
+
+  private[embed] def validateTransformation(
+      sourceText: String,
+      destinationText: String,
+      offsets: Vector[(TextSpan, TextSpan)]
+  ): Either[DomainError, Unit] =
+    val matches = PseudonymizationDetector.detectTableMatches(sourceText, entries)
+    if matches.size != offsets.size then
+      Left(
+        DomainError.InvariantViolation(
+          "pseudonymizedText/offsets",
+          "detected source spans must have one configured destination replacement"
+        )
+      )
+    else
+      matches
+        .zip(offsets)
+        .zipWithIndex
+        .collectFirst {
+          case ((matched, (_, destination)), offsetIndex)
+              if destinationText.substring(destination.start, destination.endExclusive) !=
+                matched.pseudonym =>
+            DomainError.InvariantViolation(
+              s"pseudonymizationDetector/table/${matched.entryIndex}",
+              s"mapped destination at offset index $offsetIndex does not equal the configured pseudonym"
+            )
+        }
+        .toLeft(())
+
+  override def toString: String = s"PseudonymizationDetector(${id.value}, <redacted>)"
+
+object PseudonymizationDetector:
+  private final case class IndexedEntry(index: Int, entry: PseudonymizationTableEntry)
+  private final case class TableMatch(span: TextSpan, pseudonym: String, entryIndex: Int)
+
+  private val WholeWordTableId =
+    PseudonymizationDetectorId.unsafe("storymodel4s.whole-word-table/v1")
+  private val WholeWordTableVersion = "whole-word-table/v1"
+
+  /** Create the fixed Unicode whole-word detector from typed table data.
+    *
+    * There is deliberately no factory accepting a function: equal detector identities therefore
+    * imply equal span-finding behaviour.
+    */
+  def wholeWordTable(
+      entries: Vector[PseudonymizationTableEntry]
+  ): Either[DomainError, PseudonymizationDetector] =
+    validateTable(entries).map { _ =>
+      val canonical = canonicalTable(entries)
+      new PseudonymizationDetector(WholeWordTableId, canonical, entries)
+    }
+
+  private def keyedDigest(
+      path: String,
+      keyId: KeyId,
+      rendering: String,
+      keys: SensitiveKeyProvider
+  ): Either[DomainError, ReceiptDigest.Keyed] =
+    ReceiptDigest
+      .keyedUnder(keyId, rendering, keys)
+      .left
+      .map {
+        case error @ EmbedError.NoKey(_) =>
+          DomainError.InvariantViolation(PseudonymizedText.KeyPath, error.message)
+        case error => DomainError.InvariantViolation(path, error.message)
+      }
+
+  private[storymodel4s] def snapshotKeys(
+      keyId: KeyId,
+      keys: SensitiveKeyProvider
+  ): Either[DomainError, SensitiveKeyProvider] =
+    SensitiveKeySnapshot
+      .capture(keyId, keys)
+      .left
+      .map(error => DomainError.InvariantViolation(PseudonymizedText.KeyPath, error.message))
+      .map(_.provider)
+
+  private def validateTable(
+      entries: Vector[PseudonymizationTableEntry]
+  ): Either[DomainError, Unit] =
+    entries.zipWithIndex
+      .foldLeft[Either[DomainError, Unit]](Right(())) { case (validated, (entry, index)) =>
+        validated.flatMap { _ =>
+          if entry.surface.isEmpty then
+            Left(
+              DomainError.InvariantViolation(
+                s"pseudonymizationDetector/table/$index/surface",
+                "detector surfaces must be nonempty"
+              )
+            )
+          else if entry.pseudonym.isEmpty then
+            Left(
+              DomainError.InvariantViolation(
+                s"pseudonymizationDetector/table/$index/pseudonym",
+                "relational pseudonyms must be nonempty"
+              )
+            )
+          else
+            PseudonymizedText
+              .validateUtf16(entry.surface, s"pseudonymizationDetector/table/$index/surface")
+              .flatMap(_ =>
+                PseudonymizedText.validateUtf16(
+                  entry.pseudonym,
+                  s"pseudonymizationDetector/table/$index/pseudonym"
+                )
+              )
+        }
+      }
+      .flatMap { _ =>
+        entries
+          .combinations(2)
+          .collectFirst {
+            case Vector(left, right)
+                if left.pseudonym != right.pseudonym &&
+                  left.surface.length == right.surface.length &&
+                  (left.surface == right.surface ||
+                    (left.caseInsensitive || right.caseInsensitive) &&
+                    regionMatches(left.surface, 0, right.surface, caseInsensitive = true)) =>
+              DomainError.InvariantViolation(
+                "pseudonymizationDetector/table",
+                "overlapping detector surfaces cannot map to multiple pseudonyms"
+              )
+          }
+          .toLeft(())
+      }
+
+  private def canonicalTable(entries: Vector[PseudonymizationTableEntry]): String =
+    val ordered = canonicalEntries(entries).map(_.entry)
+    (Vector(WholeWordTableVersion, s"table|entry-count=${ordered.size}") ++
+      ordered.map(entry =>
+        s"entry|surface=${ReceiptRendering.esc(entry.surface)}|pseudonym=${ReceiptRendering.esc(entry.pseudonym)}|case-insensitive=${entry.caseInsensitive}"
+      )).mkString("\n")
+
+  private def canonicalEntries(
+      entries: Vector[PseudonymizationTableEntry]
+  ): Vector[IndexedEntry] =
+    entries
+      .sortBy(entry => (entry.surface, entry.pseudonym, entry.caseInsensitive))
+      .zipWithIndex
+      .map((entry, index) => IndexedEntry(index, entry))
+
+  private def isWordCodePoint(codePoint: Int): Boolean =
+    Character.isLetterOrDigit(codePoint) || (Character.getType(codePoint) match
+      case Character.NON_SPACING_MARK | Character.COMBINING_SPACING_MARK |
+          Character.ENCLOSING_MARK =>
+        true
+      case _ => false)
+
+  private def boundaryBefore(text: String, index: Int): Boolean =
+    index == 0 || !isWordCodePoint(text.codePointBefore(index))
+
+  private def boundaryAfter(text: String, index: Int): Boolean =
+    index >= text.length || !isWordCodePoint(text.codePointAt(index))
+
+  private def regionMatches(
+      text: String,
+      at: Int,
+      surface: String,
+      caseInsensitive: Boolean
+  ): Boolean =
+    if !caseInsensitive then text.regionMatches(false, at, surface, 0, surface.length)
+    else
+      var textIndex = at
+      var surfaceIndex = 0
+      val textEnd = at + surface.length
+      var same = textEnd <= text.length
+      while same && textIndex < textEnd && surfaceIndex < surface.length do
+        val textCodePoint = text.codePointAt(textIndex)
+        val surfaceCodePoint = surface.codePointAt(surfaceIndex)
+        same = textCodePoint == surfaceCodePoint ||
+          Character.toUpperCase(textCodePoint) == Character.toUpperCase(surfaceCodePoint) ||
+          Character.toLowerCase(textCodePoint) == Character.toLowerCase(surfaceCodePoint)
+        textIndex += Character.charCount(textCodePoint)
+        surfaceIndex += Character.charCount(surfaceCodePoint)
+      same && textIndex == textEnd && surfaceIndex == surface.length
+
+  private def occurrences(
+      text: String,
+      surface: String,
+      caseInsensitive: Boolean
+  ): Vector[TextSpan] =
+    val out = Vector.newBuilder[TextSpan]
+    var index = 0
+    val width = surface.length
+    while index + width <= text.length do
+      if regionMatches(text, index, surface, caseInsensitive) && boundaryBefore(
+          text,
+          index
+        ) && boundaryAfter(text, index + width)
+      then
+        out += TextSpan.unsafe(index, index + width)
+        index += width
+      else index += Character.charCount(text.codePointAt(index))
+    out.result()
+
+  private def detectTable(
+      text: String,
+      entries: Vector[PseudonymizationTableEntry]
+  ): Vector[TextSpan] =
+    detectTableMatches(text, entries).map(_.span)
+
+  private def detectTableMatches(
+      text: String,
+      entries: Vector[PseudonymizationTableEntry]
+  ): Vector[TableMatch] =
+    canonicalEntries(entries)
+      .sortBy(indexed =>
+        (
+          -indexed.entry.surface.length,
+          indexed.entry.surface,
+          indexed.entry.pseudonym,
+          indexed.entry.caseInsensitive,
+          indexed.index
+        )
+      )
+      .flatMap { indexed =>
+        val entry = indexed.entry
+        occurrences(text, entry.surface, entry.caseInsensitive).map(span =>
+          TableMatch(span, entry.pseudonym, indexed.index)
+        )
+      }
+      .sortBy(matched => (matched.span.start, -matched.span.length, matched.entryIndex))
+      .foldLeft(Vector.empty[TableMatch]) { (accepted, candidate) =>
+        if accepted.exists(_.span.overlaps(candidate.span)) then accepted else accepted :+ candidate
+      }
+
+  private def validateSpans(text: String, spans: Vector[TextSpan]): Either[DomainError, Unit] =
+    var previousEnd = 0
+    var index = 0
+    var problem: Option[DomainError] = None
+    while index < spans.size && problem.isEmpty do
+      val span = spans(index)
+      val path = s"pseudonymizationDetector/spans/$index"
+      problem = PseudonymizedText
+        .validateSpan(text, span, path, allowEmpty = false)
+        .orElse(
+          Option.when(span.start < previousEnd)(
+            DomainError
+              .InvariantViolation(path, "detected spans must be ordered and nonoverlapping")
+          )
+        )
+      previousEnd = span.endExclusive
+      index += 1
+    problem.toLeft(())
+
 /** Text carrying an explained pseudonymization transformation under a named policy and key.
   *
   * This value carries no re-identification key; the key is a separately held `ReidentificationKey`
   * in the interview module. Construction is private so unchecked text cannot be laundered into
-  * [[EmbedPayload.Sanitized]] by choosing that enum case. Residual sensitivity is a trust boundary:
-  * it rests with the caller of [[PseudonymizedText.checked]], normally the `Pseudonymizer`.
+  * [[EmbedPayload.Sanitized]] by choosing that enum case. A checked value retains the exact source
+  * detection and the zero-residual destination detection that certified it.
   */
-final class PseudonymizedText private (
+final class PseudonymizedText private[embed] (
     val policyId: PrivacyPolicyId,
     val keyId: KeyId,
     val text: String,
     val offsets: Vector[(TextSpan, TextSpan)],
+    /** Source receipt whose detected spans exactly equal the source side of `offsets`. */
+    val sourceDetection: Option[PseudonymizationDetection],
+    /** Destination receipt from the same detector; a certified payload has no detected spans. */
+    val destinationDetection: Option[PseudonymizationDetection],
     /** Keyed identity of this payload under its pseudonymization key (ADR 0001 D6): an HMAC over
-      * the canonical `pseudo/v1` rendering, minted by [[PseudonymizedText.checked]] and never a
-      * plain hash of the sanitized text. Always `DigestKind.Keyed` under `keyId`.
+      * the canonical `pseudo/v2` rendering, minted by [[PseudonymizedText.checked]] and never a
+      * plain hash of the sanitized text.
       */
-    val digest: ReceiptDigest
+    val digest: ReceiptDigest.Keyed,
+    private val detectorCertified: Boolean
 ):
+  private[embed] def isDetectorCertified: Boolean =
+    detectorCertified && sourceDetection
+      .zip(destinationDetection)
+      .exists { case (source, destination) =>
+        source.policyIdentity == destination.policyIdentity && destination.spans.isEmpty
+      }
+
   override def equals(other: Any): Boolean = other match
     case that: PseudonymizedText =>
       policyId == that.policyId && keyId == that.keyId && text == that.text &&
-      offsets == that.offsets && digest == that.digest
+      offsets == that.offsets && sourceDetection == that.sourceDetection &&
+      destinationDetection == that.destinationDetection && digest == that.digest &&
+      detectorCertified == that.detectorCertified
     case _ => false
 
-  override def hashCode: Int = (policyId, keyId, text, offsets, digest).##
+  override def hashCode: Int =
+    (
+      policyId,
+      keyId,
+      text,
+      offsets,
+      sourceDetection,
+      destinationDetection,
+      digest,
+      detectorCertified
+    ).##
 
   override def toString: String =
     s"PseudonymizedText(<redacted>, length=${text.length}, replacements=${offsets.size})"
@@ -71,14 +464,17 @@ object PseudonymizedText:
   /** Invariant path reported when the pseudonymization key `keyId` is unavailable in `keys`. */
   val KeyPath: String = "pseudonymization/key"
 
-  /** Check that an offset map is a complete, code-point-safe account of pseudonymization, and mint
-    * the payload's keyed identity under `keyId` from `keys`.
+  /** Check an exact offset map and detector evidence, then mint the payload's keyed identity.
     *
-    * Each pair maps a nonempty source span to its replacement span in `text`. Text outside mapped
-    * spans must be unchanged, so callers cannot hide an unexplained transformation or present raw
-    * text with an empty/fictitious map. Validation errors report only positions and invariant
-    * names, never source or destination text. A missing key fails closed with
-    * `InvariantViolation(KeyPath, …)`: no `PseudonymizedText` exists without a keyed digest.
+    * Each pair maps a nonempty source span to the exact pseudonym configured for the detector's
+    * winning table entry. Text outside mapped spans must be unchanged, so callers cannot hide an
+    * unexplained transformation or present raw text with an empty/fictitious map. Validation errors
+    * report only positions, canonical table-entry indices, and invariant names, never source or
+    * destination text. The source receipt must be the exact result of the supplied detector and its
+    * spans must equal the mapped source spans; the same detector is run independently on the
+    * destination and must find zero spans. A missing key fails closed with
+    * `InvariantViolation(KeyPath, …)`: no certified `PseudonymizedText` exists without a keyed
+    * digest.
     */
   def checked(
       policyId: PrivacyPolicyId,
@@ -86,19 +482,77 @@ object PseudonymizedText:
       sourceText: String,
       text: String,
       offsets: Vector[(TextSpan, TextSpan)],
+      sourceDetection: PseudonymizationDetection,
+      detector: PseudonymizationDetector,
       keys: SensitiveKeyProvider
   ): Either[DomainError, PseudonymizedText] =
     for
       _ <- validateUtf16(sourceText, "source")
       _ <- validateUtf16(text, "destination")
       _ <- validateMap(sourceText, text, offsets)
+      stableKeys <- PseudonymizationDetector.snapshotKeys(keyId, keys)
+      verifiedSource <- detector.detect(sourceText, keyId, stableKeys)
+      _ <- Either.cond(
+        sourceDetection == verifiedSource,
+        (),
+        DomainError.InvariantViolation(
+          "pseudonymizedText/sourceDetection",
+          "source detection receipt is not bound to this detector and source"
+        )
+      )
+      _ <- Either.cond(
+        sourceDetection.spans.nonEmpty,
+        (),
+        DomainError.InvariantViolation(
+          "pseudonymizedText/sourceDetection/spans",
+          "a detector-certified transformation requires at least one detected source span"
+        )
+      )
+      _ <- Either.cond(
+        sourceDetection.spans == offsets.map(_._1),
+        (),
+        DomainError.InvariantViolation(
+          "pseudonymizedText/sourceDetection/spans",
+          "detected source spans must equal mapped source spans"
+        )
+      )
+      _ <- detector.validateTransformation(sourceText, text, offsets)
+      destinationDetection <- detector.detect(text, keyId, stableKeys)
+      _ <- Either.cond(
+        destinationDetection.spans.isEmpty,
+        (),
+        DomainError.InvariantViolation(
+          "pseudonymizedText/destinationDetection",
+          s"destination retains ${destinationDetection.spans.size} detector-recognized spans"
+        )
+      )
       digest <- ReceiptDigest
-        .keyedUnder(keyId, ReceiptRendering.pseudonymized(policyId, keyId, text), keys)
+        .keyedUnder(
+          keyId,
+          ReceiptRendering.pseudonymizedV2(
+            policyId,
+            keyId,
+            text,
+            offsets,
+            sourceDetection,
+            destinationDetection
+          ),
+          stableKeys
+        )
         .left
         .map(e => DomainError.InvariantViolation(KeyPath, e.message))
-    yield new PseudonymizedText(policyId, keyId, text, offsets, digest)
+    yield new PseudonymizedText(
+      policyId,
+      keyId,
+      text,
+      offsets,
+      Some(sourceDetection),
+      Some(destinationDetection),
+      digest,
+      detectorCertified = true
+    )
 
-  private def validateMap(
+  private[embed] def validateMap(
       sourceText: String,
       destinationText: String,
       offsets: Vector[(TextSpan, TextSpan)]
@@ -161,10 +615,10 @@ object PseudonymizedText:
           .orElse {
             val sourceSurface = sourceText.substring(source.start, source.endExclusive)
             val replacement = destinationText.substring(destination.start, destination.endExclusive)
-            Option.when(replacement.contains(sourceSurface))(
+            Option.when(containsCaseInsensitively(replacement, sourceSurface))(
               DomainError.InvariantViolation(
                 path,
-                "a replacement must not contain its source span text"
+                "a replacement must not contain a case variant of its source span text"
               )
             )
           }
@@ -185,7 +639,26 @@ object PseudonymizedText:
         )
         .toLeft(())
 
-  private def validateSpan(
+  private def containsCaseInsensitively(text: String, surface: String): Boolean =
+    var start = 0
+    var found = surface.isEmpty
+    while !found && start < text.length do
+      var textIndex = start
+      var surfaceIndex = 0
+      var same = true
+      while same && textIndex < text.length && surfaceIndex < surface.length do
+        val textCodePoint = text.codePointAt(textIndex)
+        val surfaceCodePoint = surface.codePointAt(surfaceIndex)
+        same = textCodePoint == surfaceCodePoint ||
+          Character.toUpperCase(textCodePoint) == Character.toUpperCase(surfaceCodePoint) ||
+          Character.toLowerCase(textCodePoint) == Character.toLowerCase(surfaceCodePoint)
+        textIndex += Character.charCount(textCodePoint)
+        surfaceIndex += Character.charCount(surfaceCodePoint)
+      found = same && surfaceIndex == surface.length
+      start += Character.charCount(text.codePointAt(start))
+    found
+
+  private[embed] def validateSpan(
       text: String,
       span: TextSpan,
       path: String,
@@ -219,7 +692,7 @@ object PseudonymizedText:
       )
     else None
 
-  private def validateUtf16(text: String, path: String): Either[DomainError, Unit] =
+  private[embed] def validateUtf16(text: String, path: String): Either[DomainError, Unit] =
     var index = 0
     var problem: Option[DomainError] = None
     while index < text.length && problem.isEmpty do
@@ -238,7 +711,7 @@ object PseudonymizedText:
       else index += 1
     problem.toLeft(())
 
-  private def isCodePointBoundary(text: String, offset: Int): Boolean =
+  private[embed] def isCodePointBoundary(text: String, offset: Int): Boolean =
     offset >= 0 && offset <= text.length &&
       (offset == 0 || offset == text.length ||
         !(Character.isHighSurrogate(text.charAt(offset - 1)) &&
@@ -267,17 +740,20 @@ final case class RemoteCapability private[embed] (
     policyId: PrivacyPolicyId,
     expiresAtEpochMillis: Long,
     budgetTokens: Long,
-    payloadDigest: ReceiptDigest
+    detectorIdentity: DetectorPolicyIdentity,
+    payloadDigest: ReceiptDigest.Keyed
 ):
   def render: String =
-    s"cap:${provider.render.take(12)}:$model:$purpose:${policyId.value}:$expiresAtEpochMillis:$budgetTokens:${payloadDigest.render.takeRight(12)}"
+    s"cap:${provider.render.take(12)}:$model:$purpose:${policyId.value}:$expiresAtEpochMillis:$budgetTokens:${detectorIdentity.render}:${payloadDigest.render.takeRight(12)}"
 
-/** A remote policy: which providers/models/purposes may receive which sanitized payloads. */
+/** A remote policy: which providers/models/purposes and detector configs may send sanitized data.
+  */
 final case class RemotePolicy(
     id: PrivacyPolicyId,
     allowedProviders: Set[ProviderFingerprint],
     allowedModels: Set[String],
     allowedPurposes: Set[String],
+    allowedDetectors: Set[DetectorPolicyIdentity],
     maxBudgetTokens: Long,
     ttlMillis: Long
 )
@@ -312,23 +788,37 @@ object RemotePolicy:
     request.payload match
       case EmbedPayload.Raw(_, _)          => deny("request payload is not pseudonymized")
       case EmbedPayload.Sanitized(payload) =>
-        if payload.policyId != policy.id then deny("payload pseudonymized under a different policy")
-        else if !policy.allowedProviders.contains(provider) then deny("provider not allowed")
-        else if !policy.allowedModels.contains(model) then deny("model not allowed")
-        else if !policy.allowedPurposes.contains(purpose) then deny("purpose not allowed")
-        else if estimatedTokens < 0 || estimatedTokens > policy.maxBudgetTokens then
-          deny("budget exceeded")
-        else if policy.ttlMillis <= 0 then deny("policy has no validity window")
+        if !payload.isDetectorCertified then deny("payload lacks detector certification")
         else
-          val cap = RemoteCapability(
-            provider,
-            model,
-            purpose,
-            policy.id,
-            nowEpochMillis + policy.ttlMillis,
-            estimatedTokens,
-            payload.digest
-          )
-          Right(AuthorizedRemoteRequest(request.id, request.space, payload, cap))
+          (payload.sourceDetection, payload.destinationDetection) match
+            case (Some(source), Some(destination)) =>
+              val identities = Vector(source.policyIdentity, destination.policyIdentity)
+              identities.find(identity => !policy.allowedDetectors.contains(identity)) match
+                case Some(unlisted) =>
+                  deny(s"detector configuration not allowed: ${unlisted.render}")
+                case None =>
+                  val detectorIdentity = source.policyIdentity
+                  if payload.policyId != policy.id then
+                    deny("payload pseudonymized under a different policy")
+                  else if !policy.allowedProviders.contains(provider) then
+                    deny("provider not allowed")
+                  else if !policy.allowedModels.contains(model) then deny("model not allowed")
+                  else if !policy.allowedPurposes.contains(purpose) then deny("purpose not allowed")
+                  else if estimatedTokens < 0 || estimatedTokens > policy.maxBudgetTokens then
+                    deny("budget exceeded")
+                  else if policy.ttlMillis <= 0 then deny("policy has no validity window")
+                  else
+                    val cap = RemoteCapability(
+                      provider,
+                      model,
+                      purpose,
+                      policy.id,
+                      nowEpochMillis + policy.ttlMillis,
+                      estimatedTokens,
+                      detectorIdentity,
+                      payload.digest
+                    )
+                    Right(AuthorizedRemoteRequest(request.id, request.space, payload, cap))
+            case _ => deny("payload lacks detector certification")
 
   given Show[PolicyDecision] = Show.show(_.render)

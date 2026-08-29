@@ -99,3 +99,135 @@ class ConstructionProbeSuite extends FunSuite:
       "PolicyDenied(LocalOnly)"
     )
   }
+
+  test("detector evidence cannot be minted or copied outside embed-core") {
+    refused(
+      typeCheckErrors(
+        """(
+             id: storymodel4s.embed.PseudonymizationDetectorId,
+             digest: storymodel4s.embed.ReceiptDigest.Keyed
+           ) => new storymodel4s.embed.PseudonymizationDetection(
+             id,
+             digest,
+             digest,
+             Vector.empty
+           )"""
+      ),
+      "PseudonymizationDetection"
+    )
+    refused(
+      typeCheckErrors(
+        """(d: storymodel4s.embed.PseudonymizationDetection) => d.copy(spans = Vector.empty)"""
+      ),
+      "PseudonymizationDetection.copy"
+    )
+    refused(
+      typeCheckErrors(
+        """new storymodel4s.embed.PseudonymizationDetector(
+             storymodel4s.embed.PseudonymizationDetectorId.unsafe("detector/v1"),
+             "config/v1",
+             _ => Vector.empty
+           )"""
+      ),
+      "PseudonymizationDetector"
+    )
+    refused(
+      typeCheckErrors(
+        """(
+             id: storymodel4s.embed.PseudonymizationDetectorId,
+             digest: storymodel4s.embed.ReceiptDigest.Keyed
+           ) => new storymodel4s.embed.DetectorPolicyIdentity(id, digest)"""
+      ),
+      "DetectorPolicyIdentity"
+    )
+    refused(
+      typeCheckErrors(
+        """(identity: storymodel4s.embed.DetectorPolicyIdentity) => identity.copy()"""
+      ),
+      "DetectorPolicyIdentity.copy"
+    )
+  }
+
+  test("legacy and corruption seams are unavailable outside embed-core") {
+    refused(
+      typeCheckErrors(
+        """storymodel4s.embed.PseudonymizedText.legacyV1ForTest _"""
+      ),
+      "PseudonymizedText.legacyV1ForTest"
+    )
+    refused(
+      typeCheckErrors(
+        """storymodel4s.embed.PseudonymizedText.substituteDetectionsForTest _"""
+      ),
+      "PseudonymizedText.substituteDetectionsForTest"
+    )
+  }
+
+  test("remote capabilities and authorized requests cannot be forged outside embed-core") {
+    refused(
+      typeCheckErrors(
+        """(
+             provider: storymodel4s.embed.ProviderFingerprint,
+             policy: storymodel4s.embed.PrivacyPolicyId,
+             detector: storymodel4s.embed.DetectorPolicyIdentity,
+             digest: storymodel4s.embed.ReceiptDigest.Keyed
+           ) => storymodel4s.embed.RemoteCapability(
+             provider,
+             "model",
+             "purpose",
+             policy,
+             1L,
+             1L,
+             detector,
+             digest
+           )"""
+      ),
+      "RemoteCapability"
+    )
+    refused(
+      typeCheckErrors(
+        """(capability: storymodel4s.embed.RemoteCapability) =>
+             capability.copy(model = "substituted")"""
+      ),
+      "RemoteCapability.copy"
+    )
+    refused(
+      typeCheckErrors(
+        """(
+             id: storymodel4s.embed.RequestId,
+             space: storymodel4s.embed.GeometryId,
+             payload: storymodel4s.embed.PseudonymizedText,
+             capability: storymodel4s.embed.RemoteCapability
+           ) => storymodel4s.embed.AuthorizedRemoteRequest(id, space, payload, capability)"""
+      ),
+      "AuthorizedRemoteRequest"
+    )
+    refused(
+      typeCheckErrors(
+        """(request: storymodel4s.embed.AuthorizedRemoteRequest) => request.copy()"""
+      ),
+      "AuthorizedRemoteRequest.copy"
+    )
+  }
+
+  test("the public detector factory accepts table data but no executable finder") {
+    refused(
+      typeCheckErrors(
+        """storymodel4s.embed.PseudonymizationDetector.checked(
+             storymodel4s.embed.PseudonymizationDetectorId.unsafe("detector/v1"),
+             "config/v1",
+             _ => Vector.empty
+           )"""
+      ),
+      "PseudonymizationDetector.checked(finder)"
+    )
+    assert(
+      typeCheckErrors(
+        """storymodel4s.embed.PseudonymizationDetector.wholeWordTable(
+             Vector(
+               storymodel4s.embed.PseudonymizationTableEntry("Jane", "[P1]")
+             )
+           )"""
+      ).isEmpty
+    )
+  }

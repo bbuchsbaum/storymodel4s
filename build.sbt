@@ -156,7 +156,7 @@ lazy val interview = crossProject(JVMPlatform, JSPlatform, NativePlatform)
   .crossType(CrossType.Pure)
   .in(file("interview"))
   .settings(moduleSettings("interview"))
-  .dependsOn(core, proposition, features, story, recall, align)
+  .dependsOn(core, proposition, features, story, recall, align, embedCore)
 
 /** Portable embedding contract (ADR 0001): identity, batch/result algebra, validated vectors, free
   * baselines, cache and privacy types. Providers are JVM-only adapters.

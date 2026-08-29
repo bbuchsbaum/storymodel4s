@@ -288,14 +288,40 @@ reaches the codec).
 ### D6. Privacy, cache, receipts (P0-3)
 
 - `Pseudonymizer` returns two separately held values: `PseudonymizedText`
-  (remote-safe; carries `PolicyId`, `KeyId`, sanitized text, offset map) and
+  (remote-safe; carries `PolicyId`, `KeyId`, sanitized text, offset map, and
+  detector receipts) and
   `ReidentificationKey` (never leaves the local store; rotation by `KeyId`).
   `PseudonymizedText` has no public constructor or copy path; its checked factory
   requires a complete, ordered, non-overlapping, bounded, code-point-safe map
-  whose replacements do not contain their source-span text and whose unmapped
-  gaps remain identical. This proves an explained pseudonymization transformation,
-  not the absence of all residual sensitive surface: that trust rests with the
-  caller of `checked`, normally the `Pseudonymizer`.
+  whose destination spans equal the exact configured pseudonyms of the detector's
+  winning table entries, whose replacements do not contain a Unicode simple-case
+  variant of their source-span text, and whose unmapped gaps remain identical.
+  A mismatch is a typed invariant error naming only the canonical table-entry
+  index and offset index, never either text value. The factory also requires an
+  unforgeable source detection receipt
+  whose ordered spans equal the source side of the map, then independently reruns
+  the same detector on the destination and requires a zero-span receipt. A
+  zero-hit source is not a pseudonymization and cannot be certified.
+- `PseudonymizationDetector` is a final factory-owned contract whose identity
+  determines detection and configured-replacement validation behaviour. Its public
+  factory accepts typed whole-word table rows, never an executable span finder;
+  embed-core owns the fixed Unicode matcher, canonical configuration, exact
+  replacement verifier, and `PseudonymizationDetection` construction. Detection identity is the
+  algorithm/version `PseudonymizationDetectorId`, `Keyed` HMAC of canonical
+  configuration, `Keyed` HMAC of canonical source text, and ordered spans. The
+  table configuration is `whole-word-table/v1`, with records
+  in this exact order: version; `table|entry-count`; sorted
+  `entry|surface|pseudonym|case-insensitive` records, using
+  `ReceiptRendering.esc`; changing field order, escaping, or case semantics is a
+  new configuration version. Only the configuration HMAC enters evidence.
+  `PseudonymizedText` retains source and zero-residual destination receipts, and
+  `pseudo/v2` binds policy, key, sanitized text, offset map, and both receipt
+  identities. `pseudo/v1` remains the pre-detector rendering; it is never silently
+  reinterpreted as v2, and a legacy value constructed solely by test-source support is denied by
+  `RemotePolicy.evaluate`. Any rendering change is a new version.
+- Interview pseudonymization strips the original title and metadata (including
+  any `pseudonymizedFrom` value) before constructing its sanitized `StorySource`;
+  only the privacy policy id, key id, and pseudonymized marker are retained.
 - Raw and authorized-remote requests are **different types**:
   `EmbedPayload.Raw` can only be served by `Locality.Local` embedders;
   `AuthorizedRemoteRequest` is constructible only by `RemotePolicy.evaluate`,
@@ -303,7 +329,12 @@ reaches the codec).
   exact `PseudonymizedText` keyed digest into a `RemoteCapability`. Evaluation derives
   that value from the request's `EmbedPayload.Sanitized`; its signature has no
   second payload argument that could authorize material different from the
-  request, and a raw request is denied.
+  request, and a raw request is denied. A policy also carries a mandatory
+  allowlist of exact `DetectorPolicyIdentity` values (versioned detector id plus
+  keyed canonical-configuration digest). Both retained source and destination
+  detector receipts must be allowed; an empty allowlist denies every payload.
+  The selected identity is recorded in the capability. Because the configuration
+  digest is keyed, key rotation changes the identity and requires policy reissue.
 - A future codec cannot reconstruct the omitted source text and therefore cannot
   rerun `PseudonymizedText.checked`; decoding will require a narrow
   `private[embed]` trusted path that preserves the explicit trust boundary.
@@ -331,8 +362,8 @@ reaches the codec).
   at the factory and, on every provider-call surface (baselines, cache, remote
   evaluation), a per-item `ExecutionFailure.PolicyDenied(PolicyDecision.KeyUnavailable(id, keyId))`
   with the decision recorded in `policyDecisions` (`CacheDecision.Denied` on the
-  cache surface). `PseudonymizedText.checked(…, keys)` takes the key provider
-  and mints the payload's `Keyed` digest under its `KeyId` at construction
+  cache surface). `PseudonymizedText.checked(…, sourceDetection, detector, keys)`
+  takes the key provider and mints the payload's `Keyed` digest under its `KeyId` at construction
   (`InvariantViolation(PseudonymizedText.KeyPath, …)` when unavailable), so no
   `PseudonymizedText` — and hence no `RemoteCapability` — exists without a keyed
   identity. A batch containing any non-public item is atomic with respect to
@@ -344,15 +375,19 @@ reaches the codec).
   Escapes: `\` → `\\`, `|` → `\|`, newline → `\n`, NUL → `\0`; renderings
   never contain literal NUL bytes. Version tags: `material/v1`
   (`role=…|instruction=…|text=…`, produced by `Material.render` for cache keys
-  and provider input), `pseudo/v1` (`policy=…|key=…|text=…` for
-  `PseudonymizedText.digest`/`RemoteCapability.payloadDigest`), `items/v1`
-  (`item|id|sensitivity|<digest.render>` per item), `outputs/v1`, and
-  `attempt/v1` (legacy display-based fields) and `attempt/v2`. Version 2 is the
-  receipt identity format: indexed full `ProviderCall` and `EmbeddingReceipt`
+  and provider input), legacy `pseudo/v1` (`policy=…|key=…|text=…`), current
+  `pseudo/v2` (policy, key, sanitized text, exact offset map, and both detector
+  receipts), `detector-config/v1`, `detector-source/v1`, `detection/v1`,
+  `detector-policy/v1`,
+  `items/v1` (`item|id|sensitivity|<digest.render>` per item), `outputs/v1`, and
+  `attempt/v2`. The former `attempt/v1` display-based identifier is unsupported
+  legacy, not a construction or decoding path. Version 2 is the receipt identity
+  format: indexed full `ProviderCall` and `EmbeddingReceipt`
   fields, sorted call parameters, typed cache/policy/result/error fields with
-  full capability fingerprints and digests, and item sensitivities. Tagged
-  options and individually escaped fields make every equality field
-  unambiguous; changing any such field changes the attempt digest. The
+  full capability fingerprints and digests (including the exact detector
+  policy identity), and item sensitivities. Tagged options and individually
+  escaped fields make every equality field unambiguous; changing any such field
+  changes the attempt digest. The
   golden vector `SensitiveDigest.Golden` hashes the **production** `material/v1`
   rendering and is asserted on JVM, JS and Native.
 - **ProviderCall checksums for non-public material are hash-of-keyed-digest,
