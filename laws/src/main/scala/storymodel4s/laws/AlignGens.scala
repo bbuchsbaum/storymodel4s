@@ -305,9 +305,11 @@ object AlignGens:
       "cause" -> withNode(_.copy(cause = Some("zzz"))),
       "importance" -> withNode(_.copy(importance = storymodel4s.features.Estimate.observed(0.25))),
       "evidence" -> withNode(_.copy(evidence = Some(evidence))),
-      "outcome/cause re-bracketed A" -> withNode(_.copy(outcome = Some("o cause c"), cause = None)),
+      "outcome/cause re-bracketed A" -> withNode(
+        _.copy(outcome = Some("o\u0000cause\u0000c"), cause = None)
+      ),
       "outcome/cause re-bracketed B" -> withNode(
-        _.copy(outcome = Some("o"), cause = Some("c cause "))
+        _.copy(outcome = Some("o"), cause = Some("c\u0000cause\u0000"))
       ),
       "edge" -> InMemorySourceView(
         v.nodes,

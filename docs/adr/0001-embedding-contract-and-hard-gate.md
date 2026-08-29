@@ -257,8 +257,9 @@ token vector: every value is preceded by its tag and by its own length (decimal
 UTF-16 code units) as a separate token; every list by its tag and its element
 count, each element length-prefixed; composite values length-prefix each
 component and join with U+0001. Re-bracketing adjacent values therefore cannot
-collide (`outcome = "o cause c", cause = ""` ≠ `outcome = "o", cause =
-"c cause "`). Evidence identity is `proposition.Canonical.checksum` (align never
+collide: with U+0000 embedded in a value, `outcome = "o\0cause\0c", cause = ""`
+and `outcome = "o", cause = "c\0cause\0"` NUL-join to the same bytes but
+length-prefix differently. Evidence identity is `proposition.Canonical.checksum` (align never
 reaches the codec).
 
 - `view-fingerprint/v1` — nodes sorted by reference key, each: `ref`, `level`,

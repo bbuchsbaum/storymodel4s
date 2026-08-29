@@ -8,10 +8,11 @@ import storymodel4s.recall.{ExpressedUncertainty, RecallGraph, RecallUnitId}
 /** Align-local tagged, length-prefixed rendering shared by the wire digests (ADR 0001 §D5, "wire
   * renderings"). Every digest is a `ContentAddress.digest` over a flat token vector in which every
   * value is preceded by its tag and by its own length (decimal code units) as a separate token, and
-  * every list by its length, so no re-bracketing of adjacent values can collide (the pair
-  * `outcome = "o cause c", cause = ""` differs from `outcome = "o", cause = "c cause "`); composite
-  * values length-prefix each component the same way. Evidence identity is
-  * `proposition.Canonical.checksum` — align never reaches the codec.
+  * every list by its length, so no re-bracketing of adjacent values can collide even when a value
+  * embeds the NUL separator (`outcome = "o\0cause\0c", cause = ""` NUL-joins to the same bytes as
+  * `outcome = "o", cause = "c\0cause\0"` but length-prefixes differently); composite values
+  * length-prefix each component the same way. Evidence identity is `proposition.Canonical.checksum`
+  * — align never reaches the codec.
   */
 private[align] object Render:
   val Sep: String = "\u0001"

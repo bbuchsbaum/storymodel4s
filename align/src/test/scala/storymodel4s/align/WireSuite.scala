@@ -235,9 +235,11 @@ class WireSuite extends FunSuite:
       "importance" -> withNode(_.copy(importance = Estimate.observed(0.5))),
       "evidence on" -> withNode(_.copy(evidence = Some(evidenceA))),
       "evidence other" -> withNode(_.copy(evidence = Some(evidenceB))),
-      "outcome/cause re-bracketed A" -> withNode(_.copy(outcome = Some("o cause c"), cause = None)),
+      "outcome/cause re-bracketed A" -> withNode(
+        _.copy(outcome = Some("o\u0000cause\u0000c"), cause = None)
+      ),
       "outcome/cause re-bracketed B" -> withNode(
-        _.copy(outcome = Some("o"), cause = Some("c cause "))
+        _.copy(outcome = Some("o"), cause = Some("c\u0000cause\u0000"))
       ),
       "edge" -> InMemorySourceView(
         view.nodes,
@@ -266,6 +268,49 @@ class WireSuite extends FunSuite:
     )
     variants.foreach { (name, fp) => assertNotEquals(fp, base, s"$name change not fingerprinted") }
     assertEquals(variants.map(_._2).distinct.size, variants.size, "variants collide")
+  }
+
+  test(
+    "PROOF: the legacy NUL-joined rendering collides on embedded separators; Render.Tokens does not"
+  ) {
+    // What 3c1777e did: a flat token vector, NUL-joined by ContentAddress.digest, with no length
+    // token. Two (outcome, cause) pairs whose values embed the separator re-bracket to the same
+    // byte string.
+    def legacy(outcome: Option[String], cause: Option[String]) =
+      storymodel4s.core.ContentAddress.digest(
+        Vector("outcome", outcome.getOrElse(""), "cause", cause.getOrElse(""))
+      )
+    def tagged(outcome: Option[String], cause: Option[String]) =
+      val b = Render.Tokens()
+      b.field("outcome", outcome.getOrElse(""))
+      b.field("cause", cause.getOrElse(""))
+      b.digest
+    val a = (Some("o\u0000cause\u0000c"), None)
+    val bb = (Some("o"), Some("c\u0000cause\u0000"))
+    assertEquals(legacy(a._1, a._2), legacy(bb._1, bb._2), "the legacy rendering must collide")
+    assertNotEquals(tagged(a._1, a._2), tagged(bb._1, bb._2), "length-prefixing must separate")
+    // and through the real digests, on both sides of the wire
+    def node(outcome: Option[String], cause: Option[String]) =
+      InMemorySourceView(
+        view.nodes.map(n => if n.ref == e1 then n.copy(outcome = outcome, cause = cause) else n),
+        view.edges,
+        view.worldOrder,
+        view.textLength
+      ).contentFingerprint
+    assertNotEquals(node(a._1, a._2), node(bb._1, bb._2))
+    val recall = AnnaFixture.recall
+    val u0 = recall.ordered.head
+    def unit(outcome: Option[String], cause: Option[String]) =
+      AlignWire.recallChecksum(
+        recall.copy(units =
+          recall.units.map(x =>
+            if x.id == u0.id then
+              x.copy(proposition = x.proposition.copy(outcome = outcome, cause = cause))
+            else x
+          )
+        )
+      )
+    assertNotEquals(unit(a._1, a._2), unit(bb._1, bb._2))
   }
 
   test("the recall checksum names the transcript and the units' ids, order, and spans") {
@@ -350,10 +395,14 @@ class WireSuite extends FunSuite:
         )
       ),
       "outcome/cause re-bracketed A" -> swap(
-        u0.copy(proposition = u0.proposition.copy(outcome = Some("o cause c"), cause = None))
+        u0.copy(proposition =
+          u0.proposition.copy(outcome = Some("o\u0000cause\u0000c"), cause = None)
+        )
       ),
       "outcome/cause re-bracketed B" -> swap(
-        u0.copy(proposition = u0.proposition.copy(outcome = Some("o"), cause = Some("c cause ")))
+        u0.copy(proposition =
+          u0.proposition.copy(outcome = Some("o"), cause = Some("c\u0000cause\u0000"))
+        )
       ),
       "causal relation" -> AlignWire.recallChecksum(
         recall.copy(relations =
