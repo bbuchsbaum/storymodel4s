@@ -243,6 +243,30 @@ object AlignGens:
       Vector(swapExternal, swapSource, swapDistorted, excluded).flatten
     }
 
+  /** A small checked chart, for evidence toggles in the fingerprint laws. */
+  lazy val evidence: storymodel4s.proposition.PropositionEvidence =
+    import storymodel4s.proposition.*
+    val p = ConceptId.unsafe("p")
+    val a = ConceptId.unsafe("a")
+    val b = ConceptId.unsafe("b")
+    val unchecked = PropositionChart.unchecked(
+      Some(p),
+      Map(
+        p -> Concept.predicate("find"),
+        a -> Concept.entity("anna"),
+        b -> Concept.entity("brother")
+      ),
+      Vector(
+        PropositionRelation(p, RoleAssignment.arg(0), ConceptTarget.Node(a)),
+        PropositionRelation(p, RoleAssignment.arg(1), ConceptTarget.Node(b))
+      )
+    )
+    PropositionEvidence.hand(
+      ChartValidator
+        .check(unchecked)
+        .fold(v => throw new IllegalStateException(v.toString), identity)
+    )
+
   /** Views that must fingerprint equal to `v` (iteration order only) and views that must not (one
     * field of one node, one edge, the world order, or the text length changed).
     */
@@ -280,6 +304,11 @@ object AlignGens:
       "outcome" -> withNode(_.copy(outcome = Some("zzz"))),
       "cause" -> withNode(_.copy(cause = Some("zzz"))),
       "importance" -> withNode(_.copy(importance = storymodel4s.features.Estimate.observed(0.25))),
+      "evidence" -> withNode(_.copy(evidence = Some(evidence))),
+      "outcome/cause re-bracketed A" -> withNode(_.copy(outcome = Some("o cause c"), cause = None)),
+      "outcome/cause re-bracketed B" -> withNode(
+        _.copy(outcome = Some("o"), cause = Some("c cause "))
+      ),
       "edge" -> InMemorySourceView(
         v.nodes,
         v.edges.updated(RelationLayer.Goal, Vector((target.ref, root, 1.0))),

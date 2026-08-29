@@ -292,7 +292,7 @@ object GateProofLaws extends Laws:
           r.admissibility.forall((u, m) => m.keySet == r.candidateAnchors(u).toSet) &&
           AlignWire.matched(r, r.viewFingerprint, r.recallChecksum) == Right(r)
         },
-      "every forgery — mass, key, cost, path, flow, or a key on an un-nominated anchor — is rejected" ->
+      "every forgery of a foil result — mass, key, cost, path, flow, cross-record — is rejected (the un-nominated class is covered by the Case-based law: a foil nominates every node)" ->
         forAll { (f: AlignGens.FoilCase) =>
           val r = AlignGens.inferFoil(f)
           AlignGens

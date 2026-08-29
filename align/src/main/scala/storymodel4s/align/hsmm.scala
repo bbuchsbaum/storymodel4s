@@ -327,9 +327,12 @@ object HsmmResult:
     // Derivation: the gate over exactly the nominated anchors — never all view nodes, never the
     // anchors that happen to appear in the parts.
     def derive: Map[RecallUnitId, Map[SourceNodeRef, Admissibility]] =
+      // The nomination pass has already refused absent anchors; derivation still goes through
+      // `view.node` totally (an anchor without a node simply has no record, and would then fail
+      // the gate below rather than throw).
       recall.ordered.iterator.map { unit =>
-        unit.id -> candidateAnchors(unit.id).iterator.map { ref =>
-          ref -> ModeGate.assess(unit, view.node(ref).get, view)
+        unit.id -> candidateAnchors(unit.id).iterator.flatMap { ref =>
+          view.node(ref).map(node => ref -> ModeGate.assess(unit, node, view))
         }.toMap
       }.toMap
     def drift(derived: Map[RecallUnitId, Map[SourceNodeRef, Admissibility]]) =
@@ -467,11 +470,15 @@ object GraphHsmm:
         run(units, recall, view, candidates, costModel, config, gate = true)
       // The engine proves its own output: a gate violation here would be a bug, and it surfaces
       // as a typed error rather than an unproven result (law: every infer output validates). The
-      // anchors it used are handed over as the nominated set, and its own gate records as the echo.
+      // anchors it used are handed over as the nominated set — candidates that are not nodes of
+      // the view are dropped here and from the cost keys (`run`), never nominated: the proof
+      // refuses absent anchors, and an unreachable candidate is a nomination error, not a state.
       HsmmResult.validated(
         recall,
         view,
-        candidates.anchorsByUnit(units.map(_.id)),
+        candidates
+          .anchorsByUnit(units.map(_.id))
+          .map((u, refs) => u -> refs.filter(ref => view.node(ref).nonEmpty)),
         post,
         flow,
         path,
@@ -528,11 +535,12 @@ object GraphHsmm:
     val breakdowns: Vector[Map[AlignState, CostBreakdown]] =
       units.zip(admissibility).map { (u, adm) =>
         val set = candidates.set(u.id)
+        // Candidates absent from the view are dropped (not priced, not nominated): the gated
+        // result carries only anchors the proof can re-derive on this view.
         val sources = set.ranked.flatMap { ref =>
-          view.node(ref) match
-            case None    => Vector(AlignState.Source(ref) -> CostBreakdown.unreachable)
-            case Some(n) =>
-              adm(ref).modes.map(m => AlignState.anchored(ref, m) -> costModel.cost(u, n, m, view))
+          view.node(ref).toVector.flatMap { n =>
+            adm(ref).modes.map(m => AlignState.anchored(ref, m) -> costModel.cost(u, n, m, view))
+          }
         }
         val externals =
           if set.abstained && set.ranked.isEmpty then Vector(AlignState.unranked)

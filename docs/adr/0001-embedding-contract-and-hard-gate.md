@@ -244,14 +244,22 @@ derived inside `validated` and are mandatory match fields on the wire
 term–mode contradictions, and receipt-inconsistent terms (an optional term must
 equal the receipt's reducer over its observed members, clamped as the cost model
 clamps; the observed/missing partition must agree with `missingTerms`; each
-receipt's source-chart coverage must equal the breakdown's).
+receipt's source-chart coverage must equal the breakdown's; a `Missing`
+reduction may not hide members that reduce to a value). Stated residual:
+`CostBreakdown.total` is a cached value, not verified on the wire — the weights
+and function prior that produced it are not on the record; a consumer that
+needs it re-derivable carries `CostWeights`/`FunctionPrior` and recomputes.
 
 The wire digests are **versioned canonical renderings** with the same rule as
 receipt renderings: a change to what a gate or cost reads is a version bump. All
-are `ContentAddress.digest` over an align-local tagged, length-separated token
-vector (every value preceded by its tag, every list by its length; composite
-values joined by U+0001); evidence identity is `proposition.Canonical.checksum`
-(align never reaches the codec).
+are `ContentAddress.digest` over an align-local tagged, **length-prefixed**
+token vector: every value is preceded by its tag and by its own length (decimal
+UTF-16 code units) as a separate token; every list by its tag and its element
+count, each element length-prefixed; composite values length-prefix each
+component and join with U+0001. Re-bracketing adjacent values therefore cannot
+collide (`outcome = "o cause c", cause = ""` ≠ `outcome = "o", cause =
+"c cause "`). Evidence identity is `proposition.Canonical.checksum` (align never
+reaches the codec).
 
 - `view-fingerprint/v1` — nodes sorted by reference key, each: `ref`, `level`,
   `parent`, `discoursePosition`, `support` (sorted span refs: surface unit id,
@@ -271,8 +279,9 @@ values joined by U+0001); evidence identity is `proposition.Canonical.checksum`
   `lemmas` sorted, `outcome`, `cause`), `grounding`, `evidence` (chart
   checksum); then the explicit `temporal` and `causal` relations (sorted). Same
   boundaries with different content therefore fail `matched`.
-- `admissibility-echo/v1` — entry count, then per `(unit, anchor)` sorted:
-  contradictions, faithful flag, facets sorted.
+- `admissibility-echo/v1` — tagged like the others: `entries` (count), then per
+  `(unit, anchor)` sorted: `unit`, `anchor`, `contradictions` (list, in detection
+  order), `faithful`, `facets` (list, sorted).
 - hsmm/v1: JSON object field list owned by codec (HsmmResultCodec); the field list is added below by the codec candidate.
 
 ### D6. Privacy, cache, receipts (P0-3)

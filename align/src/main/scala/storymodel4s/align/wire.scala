@@ -5,30 +5,56 @@ import storymodel4s.features.{CanonicalDouble, Coverage, Estimate}
 import storymodel4s.proposition.Canonical
 import storymodel4s.recall.{ExpressedUncertainty, RecallGraph, RecallUnitId}
 
-/** Align-local tagged, length-separated rendering shared by the wire digests (ADR 0001 §D5, "wire
+/** Align-local tagged, length-prefixed rendering shared by the wire digests (ADR 0001 §D5, "wire
   * renderings"). Every digest is a `ContentAddress.digest` over a flat token vector in which every
-  * value is preceded by its tag and every list by its length, so no concatenation of two values can
-  * collide with another; composite values use a control-character separator. Evidence identity is
+  * value is preceded by its tag and by its own length (decimal code units) as a separate token, and
+  * every list by its length, so no re-bracketing of adjacent values can collide (the pair
+  * `outcome = "o cause c", cause = ""` differs from `outcome = "o", cause = "c cause "`); composite
+  * values length-prefix each component the same way. Evidence identity is
   * `proposition.Canonical.checksum` — align never reaches the codec.
   */
 private[align] object Render:
   val Sep: String = "\u0001"
 
+  /** A component-wise length-prefixed join: injective on the component sequence. */
+  def composite(parts: Iterable[String]): String =
+    parts.map(x => s"${x.length}$Sep$x").mkString(Sep)
+
+  /** The flat token vector of a digest: `tag, length, value` per field; `tag, count` then
+    * `length, value` per element for a list.
+    */
+  final class Tokens:
+    private val b = Vector.newBuilder[String]
+    def field(name: String, v: String): Unit =
+      b += name
+      b += v.length.toString
+      b += v
+    def list(name: String, xs: Iterable[String]): Unit =
+      b += name
+      b += xs.size.toString
+      xs.foreach { x =>
+        b += x.length.toString
+        b += x
+      }
+    def digest: Checksum = ContentAddress.digest(b.result())
+
   def spanRef(r: SpanRef): String =
-    s"${r.unit.map(_.value).getOrElse("")}$Sep${r.span.start}$Sep${r.span.endExclusive}"
+    composite(
+      Vector(r.unit.map(_.value).getOrElse(""), r.span.start.toString, r.span.endExclusive.toString)
+    )
 
   /** The full `Estimate[Double]` variant: an observed value with its credence, or the reason. */
   def estimate(e: Estimate[Double]): String = e match
     case Estimate.Observed(v, credence) =>
-      val c = credence.fold("") { c =>
+      val c = credence.toVector.flatMap { c =>
         Vector(
           CanonicalDouble.render(c.rawScore),
           c.calibrated.map(p => CanonicalDouble.render(p.value)).getOrElse(""),
           c.calibrationModel.getOrElse("")
-        ).mkString(Sep)
+        )
       }
-      s"observed$Sep${CanonicalDouble.render(v)}$Sep$c"
-    case Estimate.Missing(reason) => s"missing$Sep$reason"
+      composite(Vector("observed", CanonicalDouble.render(v)) ++ c)
+    case Estimate.Missing(reason) => composite(Vector("missing", reason.toString))
 
 /** Content address of a [[SourceView]] as the aligner reads it (`view-fingerprint/v1`, ADR 0001
   * §D5; bead `HsmmResult wire`). A gated result carries the fingerprint of the view it was proved
@@ -50,12 +76,8 @@ object ViewFingerprint:
     * text length.
     */
   def of(view: SourceView): ViewFingerprint =
-    val b = Vector.newBuilder[String]
-    def field(name: String, v: String): Unit = { b += name; b += v }
-    def list(name: String, xs: Iterable[String]): Unit =
-      b += name
-      b += xs.size.toString
-      xs.foreach(x => b += x)
+    val b = Render.Tokens()
+    import b.{field, list}
     field("view-fingerprint", "v1")
     val nodes = view.nodes.sortBy(_.ref.key)
     field("nodes", nodes.size.toString)
@@ -69,8 +91,9 @@ object ViewFingerprint:
       list(
         "participants",
         n.participants.map(p =>
-          (Vector(p.role.toString, p.label, p.aliases.size.toString) ++ p.aliases.toVector.sorted)
-            .mkString(Render.Sep)
+          Render.composite(
+            Vector(p.role.toString, p.label, p.aliases.size.toString) ++ p.aliases.toVector.sorted
+          )
         )
       )
       field("context", n.context.toString)
@@ -92,16 +115,18 @@ object ViewFingerprint:
       list(
         layer.toString,
         entries.map { (a, c, w) =>
-          s"${a.key}${Render.Sep}${c.key}${Render.Sep}${CanonicalDouble.render(w)}"
+          Render.composite(Vector(a.key, c.key, CanonicalDouble.render(w)))
         }
       )
     }
     list(
       "worldOrder",
-      view.worldOrder.toVector.flatMap(_.toVector.sortBy(_._1.key).map((r, i) => s"${r.key}:$i"))
+      view.worldOrder.toVector.flatMap(
+        _.toVector.sortBy(_._1.key).map((r, i) => Render.composite(Vector(r.key, i.toString)))
+      )
     )
     field("textLength", view.textLength.toString)
-    ContentAddress.digest(b.result())
+    b.digest
 
   /** Rehydrate a fingerprint carried on the wire; the value is compared, never trusted. */
   def fromChecksum(c: Checksum): ViewFingerprint = c
@@ -126,20 +151,19 @@ object AdmissibilityEcho:
   opaque type AdmissibilityEcho = Checksum
 
   def of(admissibility: Map[RecallUnitId, Map[SourceNodeRef, Admissibility]]): AdmissibilityEcho =
-    val parts = admissibility.toVector.sortBy(_._1.value).flatMap { (u, m) =>
-      m.toVector.sortBy(_._1.key).flatMap { (ref, a) =>
-        Vector(
-          u.value,
-          ref.key,
-          a.contradictions.map(_.toString).mkString(","),
-          a.faithful.toString,
-          a.facets.toVector.sorted.map(_.toString).mkString(",")
-        )
+    val b = Render.Tokens()
+    b.field("admissibility-echo", "v1")
+    b.field("entries", admissibility.values.map(_.size).sum.toString)
+    admissibility.toVector.sortBy(_._1.value).foreach { (u, m) =>
+      m.toVector.sortBy(_._1.key).foreach { (ref, a) =>
+        b.field("unit", u.value)
+        b.field("anchor", ref.key)
+        b.list("contradictions", a.contradictions.map(_.toString))
+        b.field("faithful", a.faithful.toString)
+        b.list("facets", a.facets.toVector.sorted.map(_.toString))
       }
     }
-    ContentAddress.digest(
-      (Vector("admissibility-echo", "v1", admissibility.values.map(_.size).sum.toString)) ++ parts
-    )
+    b.digest
 
   def fromChecksum(c: Checksum): AdmissibilityEcho = c
 
@@ -174,12 +198,8 @@ object AlignWire:
     * this value and the decoder compares.
     */
   def recallChecksum(recall: RecallGraph): Checksum =
-    val b = Vector.newBuilder[String]
-    def field(name: String, v: String): Unit = { b += name; b += v }
-    def list(name: String, xs: Iterable[String]): Unit =
-      b += name
-      b += xs.size.toString
-      xs.foreach(x => b += x)
+    val b = Render.Tokens()
+    import b.{field, list}
     def spans(s: storymodel4s.core.SpanSet): Vector[String] =
       s.refs.toVector.sorted.map(Render.spanRef)
     field("recall-checksum", "v1")
@@ -200,16 +220,18 @@ object AlignWire:
       list(
         "participants",
         p.participants.map(sp =>
-          (Vector(
-            sp.role.toString,
-            sp.entity.map(_.value).getOrElse(""),
-            sp.label,
-            sp.specified.toString,
-            sp.head,
-            sp.determiner.map(_.toString).getOrElse(""),
-            sp.number.map(_.toString).getOrElse("")
-          ) ++ (sp.modifiers.size.toString +: sp.modifiers) ++
-            (sp.aliases.size.toString +: sp.aliases.toVector.sorted)).mkString(Render.Sep)
+          Render.composite(
+            Vector(
+              sp.role.toString,
+              sp.entity.map(_.value).getOrElse(""),
+              sp.label,
+              sp.specified.toString,
+              sp.head,
+              sp.determiner.map(_.toString).getOrElse(""),
+              sp.number.map(_.toString).getOrElse("")
+            ) ++ (sp.modifiers.size.toString +: sp.modifiers) ++
+              (sp.aliases.size.toString +: sp.aliases.toVector.sorted)
+          )
         )
       )
       field("polarity", p.polarity.toString)
@@ -226,16 +248,24 @@ object AlignWire:
     list(
       "temporal",
       recall.relations.temporal
-        .map(e => s"${e.from.value}${Render.Sep}${e.relation}${Render.Sep}${e.to.value}")
+        .map(e => Render.composite(Vector(e.from.value, e.relation.toString, e.to.value)))
         .sorted
     )
     list(
       "causal",
-      recall.relations.causal.map(e => s"${e.cause.value}${Render.Sep}${e.effect.value}").sorted
+      recall.relations.causal
+        .map(e => Render.composite(Vector(e.cause.value, e.effect.value)))
+        .sorted
     )
-    ContentAddress.digest(b.result())
+    b.digest
 
-  /** Rebuild a [[CostBreakdown]] from its parts (fields mirrored exactly). */
+  /** Rebuild a [[CostBreakdown]] from its parts (fields mirrored exactly).
+    *
+    * Stated residual: `total` is a **cached value, not verified on the wire** — the weights and the
+    * function prior that produced it are not on the record, so the factory checks only that it is
+    * finite and nonnegative. A consumer that needs the total re-derivable must carry the
+    * `CostWeights`/`FunctionPrior` alongside the wire and recompute.
+    */
   def costBreakdown(
       terms: Map[CostTerm, Double],
       mode: Option[FidelityMode],
@@ -376,7 +406,7 @@ object AlignWire:
 
   /** A structural reduction: the scalar must be what the receipt's reducer produces over the
     * receipt's observed member estimates, so a flattering distance cannot ride a receipt that does
-    * not yield it.
+    * not yield it — and a `Missing` estimate cannot hide members that do reduce to a value.
     */
   def structuralReduction(
       estimate: Estimate[Double],
@@ -392,7 +422,10 @@ object AlignWire:
           case Some(expected)                  =>
             Left(bad(r, s"estimate $v is not the ${receipt.reducer} of the members ($expected)"))
           case None => Left(bad(r, "an observed estimate needs an observed member"))
-      case Estimate.Missing(_) => Right(StructuralReduction(estimate, receipt))
+      case Estimate.Missing(_) =>
+        receipt.reducer.reduce(observed) match
+          case Some(x) => Left(bad(r, s"estimate is missing but the members reduce to $x"))
+          case None    => Right(StructuralReduction(estimate, receipt))
 
   /** The decoder's mandatory match: the fingerprints carried on the wire must equal the values the
     * proof derived from the recall and view in hand.

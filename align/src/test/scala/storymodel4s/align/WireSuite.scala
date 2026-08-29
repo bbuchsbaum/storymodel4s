@@ -3,7 +3,9 @@ package storymodel4s.align
 import munit.FunSuite
 import storymodel4s.core.{SpanRef, SpanSet, TextSpan}
 import storymodel4s.features.{Coverage, Estimate, MissingReason}
-import storymodel4s.recall.RecallUnitId
+import storymodel4s.proposition.*
+import storymodel4s.proposition.CheckState.Checked
+import storymodel4s.recall.{RecallUnitId, SketchParticipant}
 
 /** The wire side of a gated result (bead `HsmmResult wire`): validating factories rebuild the
   * records a result carries and refuse malformed or inconsistent ones; fingerprints are content
@@ -27,6 +29,23 @@ class WireSuite extends FunSuite:
       b.sourceChartCoverage,
       b.reductions
     )
+
+  /** A small checked chart (as in EvidenceSuite), for evidence toggles. */
+  private def chart(agent: String, patient: String): PropositionChart[Checked] =
+    val p = ConceptId.unsafe("p")
+    val a = ConceptId.unsafe("a")
+    val b = ConceptId.unsafe("b")
+    val unchecked = PropositionChart.unchecked(
+      Some(p),
+      Map(p -> Concept.predicate("find"), a -> Concept.entity(agent), b -> Concept.entity(patient)),
+      Vector(
+        PropositionRelation(p, RoleAssignment.arg(0), ConceptTarget.Node(a)),
+        PropositionRelation(p, RoleAssignment.arg(1), ConceptTarget.Node(b))
+      )
+    )
+    ChartValidator.check(unchecked).fold(v => fail(s"invalid chart: $v"), identity)
+  private lazy val evidenceA = PropositionEvidence.hand(chart("anna", "brother"))
+  private lazy val evidenceB = PropositionEvidence.hand(chart("brother", "anna"))
 
   private def malformed(e: Either[AlignError, ?]): Boolean = e match
     case Left(AlignError.MalformedRecord(_, _)) => true
@@ -130,7 +149,10 @@ class WireSuite extends FunSuite:
     assert(malformed(AlignWire.structuralReduction(Estimate.observed(0.4), r)), "not the minimum")
     assert(malformed(AlignWire.structuralReduction(Estimate.observed(0.1), r)), "flattering")
     assert(malformed(AlignWire.structuralReduction(Estimate.observed(Double.NaN), r)))
-    assert(AlignWire.structuralReduction(Estimate.missing(MissingReason.Excluded), r).isRight)
+    assert(
+      malformed(AlignWire.structuralReduction(Estimate.missing(MissingReason.Excluded), r)),
+      "missing over members that reduce"
+    )
     // observed with nothing observed
     val none = receipt(Vector(member(e1, Estimate.missing(MissingReason.ProviderAbstained))))
       .fold(e => fail(e.message), identity)
@@ -211,6 +233,12 @@ class WireSuite extends FunSuite:
       "outcome" -> withNode(_.copy(outcome = Some("o"))),
       "cause" -> withNode(_.copy(cause = Some("c"))),
       "importance" -> withNode(_.copy(importance = Estimate.observed(0.5))),
+      "evidence on" -> withNode(_.copy(evidence = Some(evidenceA))),
+      "evidence other" -> withNode(_.copy(evidence = Some(evidenceB))),
+      "outcome/cause re-bracketed A" -> withNode(_.copy(outcome = Some("o cause c"), cause = None)),
+      "outcome/cause re-bracketed B" -> withNode(
+        _.copy(outcome = Some("o"), cause = Some("c cause "))
+      ),
       "edge" -> InMemorySourceView(
         view.nodes,
         view.edges.updated(RelationLayer.Causal, Vector((e1, e5, 1.0))),
@@ -267,6 +295,9 @@ class WireSuite extends FunSuite:
     val recall = AnnaFixture.recall
     val base = AlignWire.recallChecksum(recall)
     val u0 = recall.ordered.head
+    assert(u0.proposition.participants.nonEmpty, "u0 must have a participant to vary")
+    def participantWith(f: SketchParticipant => SketchParticipant): Vector[SketchParticipant] =
+      u0.proposition.participants.updated(0, f(u0.proposition.participants.head))
     def swap(u: storymodel4s.recall.RecallUnit) =
       AlignWire.recallChecksum(
         recall.copy(units = recall.units.map(x => if x.id == u0.id then u else x))
@@ -300,6 +331,30 @@ class WireSuite extends FunSuite:
       "outcome" -> swap(u0.copy(proposition = u0.proposition.copy(outcome = Some("zzz")))),
       "cause" -> swap(u0.copy(proposition = u0.proposition.copy(cause = Some("zzz")))),
       "grounding" -> swap(u0.copy(grounding = Some(storymodel4s.core.Probability.unsafe(0.5)))),
+      "evidence only" -> swap(u0.copy(evidence = Some(evidenceA))),
+      "evidence other" -> swap(u0.copy(evidence = Some(evidenceB))),
+      "ordinal only" -> swap(u0.copy(ordinal = u0.ordinal + 100)),
+      "participant alias" -> swap(
+        u0.copy(proposition =
+          u0.proposition.copy(participants = participantWith(_.copy(aliases = Set("zzz"))))
+        )
+      ),
+      "participant specified" -> swap(
+        u0.copy(proposition =
+          u0.proposition.copy(participants = participantWith(_.copy(specified = false)))
+        )
+      ),
+      "participant head" -> swap(
+        u0.copy(proposition =
+          u0.proposition.copy(participants = participantWith(_.copy(head = "zzz")))
+        )
+      ),
+      "outcome/cause re-bracketed A" -> swap(
+        u0.copy(proposition = u0.proposition.copy(outcome = Some("o cause c"), cause = None))
+      ),
+      "outcome/cause re-bracketed B" -> swap(
+        u0.copy(proposition = u0.proposition.copy(outcome = Some("o"), cause = Some("c cause ")))
+      ),
       "causal relation" -> AlignWire.recallChecksum(
         recall.copy(relations =
           recall.relations.copy(causal =
@@ -312,6 +367,15 @@ class WireSuite extends FunSuite:
     )
     variants.foreach { (name, c) => assertNotEquals(c, base, s"$name change not in the checksum") }
     assertEquals(variants.map(_._2).distinct.size, variants.size, "variants collide")
+  }
+
+  test("a missing reduction cannot hide members that reduce to a value") {
+    val members = Vector(member(e1, Estimate.observed(0.4)), member(e2, Estimate.observed(0.2)))
+    val rc = receipt(members).fold(e => fail(e.message), identity)
+    assert(malformed(AlignWire.structuralReduction(Estimate.missing(MissingReason.Excluded), rc)))
+    val none = receipt(Vector(member(e1, Estimate.missing(MissingReason.ProviderAbstained))))
+      .fold(e => fail(e.message), identity)
+    assert(AlignWire.structuralReduction(Estimate.missing(MissingReason.Excluded), none).isRight)
   }
 
   test("a receipt-inconsistent optional term is rejected by the factory") {

@@ -423,6 +423,25 @@ class GateProofSuite extends FunSuite:
     })
   }
 
+  test("a candidate absent from the view is dropped by infer, never nominated (alien candidate)") {
+    val alien = SourceNodeRef.Situation(storymodel4s.core.SituationId.unsafe("not-in-view"))
+    val withAlien = Candidates(
+      AnnaFixture.candidates.byUnit.map((u, set) =>
+        u -> CandidateSet(
+          set.nominations :+ Nomination(alien, Channels.unspecified, set.size, None, None, None),
+          set.abstained
+        )
+      )
+    )
+    val res = GraphHsmm
+      .infer(AnnaFixture.recall, view, withAlien, AnnaFixture.costModel)
+      .fold(e => fail(s"an alien candidate must not fail inference: ${e.message}"), identity)
+    assertEquals(res, result)
+    res.candidateAnchors.values.foreach(refs => assert(!refs.contains(alien)))
+    res.costs.values.foreach(m => assert(!m.keys.exists(_.anchor.contains(alien))))
+    assert(res.costs.values.flatMap(_.values).forall(_.exclusion.isEmpty))
+  }
+
   test("costs recorded for a unit outside the recall are rejected") {
     val stray = RecallUnitId.unsafe("stray")
     val costs = result.costs.updated(stray, Map(AlignState.unranked -> CostBreakdown.unreachable))
