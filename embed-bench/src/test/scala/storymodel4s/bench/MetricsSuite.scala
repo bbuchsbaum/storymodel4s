@@ -139,6 +139,14 @@ class MetricsSuite extends FunSuite:
   test("every named metric is either source-anchor or open-world, never both") {
     val all = Metrics.Names.all
     assertEquals(all.distinct.size, all.size)
+    assertEquals(
+      Metrics.Names.routeSupportMidpointDirection,
+      "route:support-midpoint-direction"
+    )
+    assert(
+      !all.contains("route:transition-direction"),
+      "the broken metric identity must be retired"
+    )
     assert(Metrics.Names.openWorld.subsetOf(all.toSet))
     assert(Metrics.Names.openWorld.forall(_.startsWith("open-world:")))
     assert(all.filterNot(Metrics.Names.openWorld).forall(n => !n.startsWith("open-world:")))
@@ -170,13 +178,13 @@ class MetricsSuite extends FunSuite:
   }
 
   test("step direction is the sign of the move, so a route can be compared to gold") {
-    assertEquals(Metrics.stepDirection(1, 5), 1)
-    assertEquals(Metrics.stepDirection(5, 1), -1)
-    assertEquals(Metrics.stepDirection(3, 3), 0)
+    assertEquals(Metrics.stepDirection(0.1, 0.5), 1)
+    assertEquals(Metrics.stepDirection(0.5, 0.1), -1)
+    assertEquals(Metrics.stepDirection(0.3, 0.3), 0)
     // magnitude must not leak into the comparison: a long jump forward and a short step forward
     // are the same DIRECTION, and a route metric that distinguished them would be scoring
     // distance, not route.
-    assertEquals(Metrics.stepDirection(0, 99), Metrics.stepDirection(0, 1))
+    assertEquals(Metrics.stepDirection(0.0, 0.99), Metrics.stepDirection(0.0, 0.01))
   }
 
   test("false gating abstains when the gate never saw the anchor") {
