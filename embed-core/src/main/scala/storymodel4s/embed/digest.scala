@@ -50,6 +50,10 @@ object SensitiveDigest:
     if key.isEmpty then Left(EmbedError.InvalidKey("empty key"))
     else Right(SensitiveDigest(keyId, Hmac.hex(key, utf8(material))))
 
+  /** Compute from an already-validated owned key. The snapshot constructor proves non-emptiness. */
+  private[embed] def compute(snapshot: SensitiveKeySnapshot, material: String): SensitiveDigest =
+    SensitiveDigest(snapshot.keyId, Hmac.hex(snapshot.bytes, utf8(material)))
+
   private[embed] def utf8(s: String): Array[Byte] = s.getBytes("UTF-8")
 
   /** Cross-platform determinism vector (ADR 0001 D6): the same key and the PRODUCTION material
@@ -83,7 +87,33 @@ object SensitiveKeyProvider:
 
   /** Test/development provider with one in-memory key. Not for production stores. */
   def static(id: KeyId, bytes: Array[Byte]): SensitiveKeyProvider =
+    val owned = java.util.Arrays.copyOf(bytes, bytes.length)
     new SensitiveKeyProvider:
       def currentKeyId: KeyId = id
       def key(k: KeyId): Option[Array[Byte]] =
-        if k == id then Some(java.util.Arrays.copyOf(bytes, bytes.length)) else None
+        if k == id then Some(java.util.Arrays.copyOf(owned, owned.length)) else None
+
+/** An immutable, non-empty, batch-local copy of one sensitive-digest key.
+  *
+  * Why: key providers may rotate or return aliased mutable arrays. A receipt attempt must keep one
+  * owned authority from the first identity through every later result-decision amendment.
+  */
+private[embed] final class SensitiveKeySnapshot private (
+    val keyId: KeyId,
+    private val owned: Vector[Byte]
+):
+  private[embed] def bytes: Array[Byte] = owned.toArray
+
+  private[embed] def provider: SensitiveKeyProvider =
+    SensitiveKeyProvider.static(keyId, bytes)
+
+private[embed] object SensitiveKeySnapshot:
+  /** Capture exactly the requested key id, cloning its bytes and rejecting an empty secret. */
+  private[embed] def capture(
+      keyId: KeyId,
+      provider: SensitiveKeyProvider
+  ): Either[EmbedError, SensitiveKeySnapshot] =
+    provider.key(keyId) match
+      case None                         => Left(EmbedError.NoKey(keyId.value))
+      case Some(bytes) if bytes.isEmpty => Left(EmbedError.InvalidKey("empty key"))
+      case Some(bytes)                  => Right(new SensitiveKeySnapshot(keyId, bytes.toVector))

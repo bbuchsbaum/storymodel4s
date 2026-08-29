@@ -264,8 +264,10 @@ enum FidelityMode:
   and mints the payload's `Keyed` digest under its `KeyId` at construction
   (`InvariantViolation(PseudonymizedText.KeyPath, …)` when unavailable), so no
   `PseudonymizedText` — and hence no `RemoteCapability` — exists without a keyed
-  identity. A batch that cannot key every non-public item produces **no**
-  provider call and a `Withheld` receipt.
+  identity. A batch containing any non-public item is atomic with respect to
+  receipt keys: if the required key is unavailable, no item is computed,
+  delegated, or cached; every outcome is denied with `KeyUnavailable`, and the
+  `Withheld` attempt receipt is call-free.
 - **Canonical rendering** (`ReceiptRendering`): one escaped, versioned,
   `|`-delimited rendering is the sole HMAC/checksum input on every surface.
   Escapes: `\` → `\\`, `|` → `\|`, newline → `\n`, NUL → `\0`; renderings
@@ -274,7 +276,12 @@ enum FidelityMode:
   and provider input), `pseudo/v1` (`policy=…|key=…|text=…` for
   `PseudonymizedText.digest`/`RemoteCapability.payloadDigest`), `items/v1`
   (`item|id|sensitivity|<digest.render>` per item), `outputs/v1`, and
-  `attempt/v1` (calls, cache/policy/result decisions, item sensitivities). The
+  `attempt/v1` (legacy display-based fields) and `attempt/v2`. Version 2 is the
+  receipt identity format: indexed full `ProviderCall` and `EmbeddingReceipt`
+  fields, sorted call parameters, typed cache/policy/result/error fields with
+  full capability fingerprints and digests, and item sensitivities. Tagged
+  options and individually escaped fields make every equality field
+  unambiguous; changing any such field changes the attempt digest. The
   golden vector `SensitiveDigest.Golden` hashes the **production** `material/v1`
   rendering and is asserted on JVM, JS and Native.
 - **ProviderCall checksums for non-public material are hash-of-keyed-digest,
@@ -285,8 +292,10 @@ enum FidelityMode:
   `"digest-key-id"`) and refuses keyed items with plain outputs.
 - `AttemptReceipt.digest` is `Keyed` under the policy key when any item is
   non-public, `Plain` only for all-public batches; its HMAC input is the
-  `attempt/v1` rendering of the constructed receipt over **all** decision
-  vectors including `resultDecisions`, so amending decisions changes the digest.
+  `attempt/v2` rendering of the constructed receipt over full validated
+  embedding provenance and **all** decision vectors including
+  `resultDecisions`, so amending any equality field changes the digest. Provider
+  calls must exactly equal the calls of key-consistent `EmbeddingReceipt`s.
 - Cache key = (`GeometryId`, `ReceiptDigest` of the exact `material/v1`
   rendering). In-memory portable impl; file-backed JVM impl behind
   `EncryptedStore`.

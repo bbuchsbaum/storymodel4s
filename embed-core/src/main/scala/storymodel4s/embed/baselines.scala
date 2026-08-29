@@ -32,6 +32,19 @@ abstract class LocalBaseline[F[_]: Applicative] extends Embedder[F]:
     (EmbedOutcome(r.id, r.space, Left(ExecutionFailure.PolicyDenied(d))), d)
 
   private def embedNow(batch: EmbedBatch): BatchResult =
+    val nonPublic = batch.itemSensitivity.exists { case (_, sensitivity) =>
+      !ReceiptDigest.plainAdmissible.contains(sensitivity)
+    }
+    val keyId = keys.currentKeyId
+    SensitiveKeySnapshot.capture(keyId, keys) match
+      case Right(snapshot)      => embedNowWith(batch, snapshot.provider)
+      case Left(_) if nonPublic => LocalBaseline.failClosed(batch, keyId)
+      case Left(_)              => embedNowWith(batch, SensitiveKeyProvider.none)
+
+  private def embedNowWith(
+      batch: EmbedBatch,
+      batchKeys: SensitiveKeyProvider
+  ): BatchResult =
     val policy = Vector.newBuilder[PolicyDecision]
     val perItem: Vector[(EmbedOutcome, Option[ItemDigest])] =
       batch.requests.map { r =>
@@ -56,7 +69,7 @@ abstract class LocalBaseline[F[_]: Applicative] extends Embedder[F]:
               case Some(s) =>
                 val sensitivity = r.payload.sensitivityOf
                 val material = Material.render(s, r.payload)
-                ReceiptDigest.of(sensitivity, material, keys) match
+                ReceiptDigest.of(sensitivity, material, batchKeys) match
                   case Left(EmbedError.NoKey(k)) =>
                     val (o, d) = denied(r, KeyId.unsafe(k))
                     policy += d
@@ -90,7 +103,7 @@ abstract class LocalBaseline[F[_]: Applicative] extends Embedder[F]:
       cached = false
     )
     val outputs: Either[EmbedError, ReceiptDigest] =
-      if anyKeyed then ReceiptDigest.keyed(outputsMaterial, keys)
+      if anyKeyed then ReceiptDigest.keyed(outputsMaterial, batchKeys)
       else Right(ReceiptDigest.plainPublic(outputsMaterial))
     val receipted: Either[EmbedError, EmbeddingReceipt] =
       outputs.flatMap(o => EmbeddingReceipt.of(base, items, o))
@@ -104,15 +117,15 @@ abstract class LocalBaseline[F[_]: Applicative] extends Embedder[F]:
             policy.result(),
             Vector.empty,
             batch.itemSensitivity,
-            keys
+            batchKeys
           )
           .fold(
-            _ => LocalBaseline.failClosed(batch, outcomes, policy.result(), keys),
+            _ => LocalBaseline.failClosed(batch, batchKeys.currentKeyId),
             r => BatchResult(outcomes, r)
           )
       case Left(_) =>
-        // Keyed items whose outputs cannot be keyed (the key vanished mid-batch): fail closed.
-        LocalBaseline.failClosed(batch, outcomes, policy.result(), keys)
+        // The owned non-empty batch key makes this unreachable; retain a conservative guard.
+        LocalBaseline.failClosed(batch, batchKeys.currentKeyId)
 
 object LocalBaseline:
   /** Canonical rendering of a batch's outcomes (platform-stable doubles; no material). */
@@ -125,30 +138,27 @@ object LocalBaseline:
       s"${ReceiptRendering.esc(o.id.value)}|$v"
     }).mkString("\n")
 
-  /** Every non-public item is denied `KeyUnavailable`; public outcomes survive; the receipt is
-    * `Withheld` (no provider call is recorded because no keyed identity exists for it).
+  /** Deny an atomic keyless batch before vector computation: no provider call and no vector leaves.
     */
   private[embed] def failClosed(
       batch: EmbedBatch,
-      outcomes: Vector[EmbedOutcome],
-      policy: Vector[PolicyDecision],
-      keys: SensitiveKeyProvider
+      missing: KeyId
   ): BatchResult =
-    val missing = keys.currentKeyId
-    val closed = outcomes.zip(batch.itemSensitivity).map {
-      case (o, (_, s)) if !ReceiptDigest.plainAdmissible.contains(s) =>
-        o.copy(value =
-          Left(ExecutionFailure.PolicyDenied(PolicyDecision.KeyUnavailable(Some(o.id), missing)))
-        )
-      case (o, _) => o
+    val denials = batch.requests.map { request =>
+      new PolicyDecision.KeyUnavailable(Some(request.id), missing)
+    }
+    val outcomes = batch.requests.zip(denials).map { case (request, denial) =>
+      EmbedOutcome(
+        request.id,
+        request.space,
+        Left(ExecutionFailure.PolicyDenied(denial))
+      )
     }
     BatchResult(
-      closed,
+      outcomes,
       AttemptReceipt.failClosed(
         Vector.empty,
-        Vector.empty,
-        Vector.empty,
-        policy,
+        denials.map(d => d: PolicyDecision),
         Vector.empty,
         batch.itemSensitivity,
         missing

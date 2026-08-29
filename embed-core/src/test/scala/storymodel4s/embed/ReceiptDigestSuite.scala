@@ -1,7 +1,9 @@
 package storymodel4s.embed
 
 import cats.Id
-import munit.FunSuite
+import munit.ScalaCheckSuite
+import org.scalacheck.Gen
+import org.scalacheck.Prop.forAll
 
 import storymodel4s.core.{Checksum, ProviderCall}
 
@@ -9,7 +11,7 @@ import storymodel4s.core.{Checksum, ProviderCall}
   * provider-call), Plain only for public material, fail-closed without a key, canonical rendering,
   * cross-platform determinism.
   */
-class ReceiptDigestSuite extends FunSuite:
+class ReceiptDigestSuite extends ScalaCheckSuite:
 
   private val canary = "my sister's wedding at the small french restaurant"
   private val keyOneBytes = "store-local-secret-one".getBytes("UTF-8")
@@ -130,6 +132,258 @@ class ReceiptDigestSuite extends FunSuite:
 
   private def receiptOf(r: BatchResult): EmbeddingReceipt = r.receipt.embeddingReceipts.head
 
+  private def publicItem(id: String, material: String): ItemDigest =
+    ItemDigest
+      .of(
+        RequestId.unsafe(id),
+        Sensitivity.Public,
+        ReceiptDigest.plainPublic(material)
+      )
+      .toOption
+      .get
+
+  private def baseCall(token: String): ProviderCall =
+    ProviderCall(
+      provider = s"provider-$token",
+      model = s"model-$token",
+      version = s"version-$token",
+      promptTemplateVersion = Some(s"prompt-$token"),
+      inputChecksum = Checksum.ofText("overwritten-input"),
+      outputChecksum = Checksum.ofText("overwritten-output"),
+      params = Map("z" -> s"last-$token", "a" -> s"first-$token"),
+      seed = Some(17L),
+      cached = false
+    )
+
+  private def embeddingReceipt(
+      call: ProviderCall,
+      item: ItemDigest,
+      outputMaterial: String
+  ): EmbeddingReceipt =
+    EmbeddingReceipt
+      .of(call, Vector(item), ReceiptDigest.plainPublic(outputMaterial))
+      .toOption
+      .get
+
+  private def attempt(
+      receipt: EmbeddingReceipt,
+      cache: Vector[CacheDecision] = Vector.empty,
+      policy: Vector[PolicyDecision] = Vector.empty,
+      result: Vector[ResultDecision] = Vector.empty,
+      sensitivity: Option[Vector[(RequestId, Sensitivity)]] = None,
+      keys: SensitiveKeyProvider = SensitiveKeyProvider.none
+  ): AttemptReceipt =
+    val itemSensitivity = sensitivity.getOrElse(receipt.items.map(i => i.id -> i.sensitivity))
+    AttemptReceipt
+      .of(
+        Vector(receipt.call),
+        Vector(receipt),
+        cache,
+        policy,
+        result,
+        itemSensitivity,
+        keys
+      )
+      .fold(error => fail(error.message), identity)
+
+  property("attempt/v2 changes for every generated equality-field mutation") {
+    forAll(Gen.alphaNumStr) { generated =>
+      val token = s"mut|$generated"
+      val item = publicItem("provider-item", "input-base")
+      val call = baseCall("base")
+      val receipt = embeddingReceipt(call, item, "output-base")
+      val cache = Vector(CacheDecision.Bypassed(RequestId.unsafe("cache-id"), "cache-base"))
+      val policy = Vector(PolicyDecision.Denied(None, "policy-base"))
+      val result = Vector(ResultDecision.Reordered(RequestId.unsafe("result-id"), 0, 1))
+      val sensitivities = Some(Vector(item.id -> Sensitivity.Public))
+      val original = attempt(receipt, cache, policy, result, sensitivities)
+      val same = attempt(receipt, cache, policy, result, sensitivities)
+      val callMutations = Vector(
+        call.copy(provider = token),
+        call.copy(model = token),
+        call.copy(version = token),
+        call.copy(promptTemplateVersion = Some(token)),
+        call.copy(promptTemplateVersion = None),
+        call.copy(params = call.params.updated(token, "value")),
+        call.copy(seed = Some(18L)),
+        call.copy(seed = None),
+        call.copy(cached = true)
+      ).map(embeddingReceipt(_, item, "output-base"))
+      val receiptMutations = callMutations ++ Vector(
+        embeddingReceipt(call, publicItem("provider-item-mutated", "input-base"), "output-base"),
+        embeddingReceipt(call, publicItem("provider-item", token), "output-base"),
+        embeddingReceipt(call, item, token)
+      )
+      val mutations =
+        receiptMutations.map(attempt(_)) ++ Vector(
+          attempt(
+            receipt,
+            Vector(CacheDecision.Bypassed(RequestId.unsafe("cache-id"), token)),
+            policy,
+            result,
+            sensitivities
+          ),
+          attempt(
+            receipt,
+            Vector(CacheDecision.Bypassed(RequestId.unsafe(token), "cache-base")),
+            policy,
+            result,
+            sensitivities
+          ),
+          attempt(
+            receipt,
+            cache,
+            Vector(PolicyDecision.Denied(None, token)),
+            result,
+            sensitivities
+          ),
+          attempt(
+            receipt,
+            cache,
+            Vector(PolicyDecision.Denied(Some(PrivacyPolicyId.unsafe(token)), "policy-base")),
+            result,
+            sensitivities
+          ),
+          attempt(
+            receipt,
+            cache,
+            policy,
+            Vector(ResultDecision.Reordered(RequestId.unsafe("result-id"), 0, 2)),
+            sensitivities
+          ),
+          attempt(
+            receipt,
+            cache,
+            policy,
+            Vector(ResultDecision.Reordered(RequestId.unsafe(token), 0, 1)),
+            sensitivities
+          ),
+          attempt(
+            receipt,
+            cache,
+            policy,
+            Vector(ResultDecision.Reordered(RequestId.unsafe("result-id"), 2, 1)),
+            sensitivities
+          )
+        )
+
+      assertEquals(original.digest, same.digest)
+      assert(mutations.forall(_.digest != original.digest))
+    }
+  }
+
+  test("attempt/v2 commits full capability fields even when human renderings collide") {
+    val sharedPrefix = "a" * 12
+    val providerA = ProviderFingerprint(Checksum.unsafe(sharedPrefix + ("0" * 52)))
+    val providerB = ProviderFingerprint(Checksum.unsafe(sharedPrefix + ("1" * 52)))
+    val sharedSuffix = "b" * 12
+    val payloadA = ReceiptDigest.Plain(Checksum.unsafe(("0" * 52) + sharedSuffix))
+    val payloadB = ReceiptDigest.Plain(Checksum.unsafe(("1" * 52) + sharedSuffix))
+    val policyId = PrivacyPolicyId.unsafe("policy")
+    def allowed(provider: ProviderFingerprint, payload: ReceiptDigest): PolicyDecision =
+      PolicyDecision.Allowed(
+        policyId,
+        RemoteCapability(provider, "model", "purpose", policyId, 100L, 5L, payload)
+      )
+    val decisionA = allowed(providerA, payloadA)
+    val decisionB = allowed(providerB, payloadB)
+    assertEquals(decisionA.render, decisionB.render, "the display rendering is deliberately lossy")
+    val receipt = embeddingReceipt(baseCall("capability"), publicItem("p", "in"), "out")
+    assertNotEquals(
+      attempt(receipt, policy = Vector(decisionA)).digest,
+      attempt(receipt, policy = Vector(decisionB)).digest
+    )
+  }
+
+  property("attempt/v2 commits every RemoteCapability equality field") {
+    forAll(Gen.alphaNumStr) { generated =>
+      val token = s"cap|$generated"
+      val provider = ProviderFingerprint.of("model", "tokenizer", "impl", "runtime")
+      val otherProvider = ProviderFingerprint.of(token, "tokenizer", "impl", "runtime")
+      val policyId = PrivacyPolicyId.unsafe("policy")
+      val otherPolicyId = PrivacyPolicyId.unsafe(token)
+      val payload = ReceiptDigest.plainPublic("payload")
+      val otherPayload = ReceiptDigest.plainPublic(token)
+      val base = RemoteCapability(provider, "model", "purpose", policyId, 100L, 5L, payload)
+      val mutations = Vector(
+        base.copy(provider = otherProvider),
+        base.copy(model = token),
+        base.copy(purpose = token),
+        base.copy(policyId = otherPolicyId),
+        base.copy(expiresAtEpochMillis = 101L),
+        base.copy(budgetTokens = 6L),
+        base.copy(payloadDigest = otherPayload)
+      )
+      def noCallAttempt(capability: RemoteCapability): AttemptReceipt =
+        AttemptReceipt
+          .of(
+            Vector.empty,
+            Vector.empty,
+            Vector.empty,
+            Vector(PolicyDecision.Allowed(policyId, capability)),
+            Vector.empty,
+            Vector(RequestId.unsafe("public") -> Sensitivity.Public),
+            SensitiveKeyProvider.none
+          )
+          .fold(error => fail(error.message), identity)
+      val original = noCallAttempt(base)
+      assert(mutations.forall(capability => noCallAttempt(capability).digest != original.digest))
+    }
+  }
+
+  test("attempt construction refuses mismatched or call-bearing withheld provenance") {
+    val item = publicItem("provider-item", "input")
+    val first = embeddingReceipt(baseCall("first"), item, "output")
+    val second = embeddingReceipt(baseCall("second"), item, "output")
+    val mismatch = AttemptReceipt.of(
+      Vector(first.call),
+      Vector(second),
+      Vector.empty,
+      Vector.empty,
+      Vector.empty,
+      Vector(second.items.head.id -> Sensitivity.Public),
+      SensitiveKeyProvider.none
+    )
+    assert(mismatch.isLeft)
+
+    val mismatchedSensitivity = AttemptReceipt.of(
+      Vector(first.call),
+      Vector(first),
+      Vector.empty,
+      Vector.empty,
+      Vector.empty,
+      Vector(first.items.head.id -> Sensitivity.Internal),
+      k1
+    )
+    assert(mismatchedSensitivity.isLeft)
+
+    val sensitiveId = RequestId.unsafe("sensitive")
+    val missing = KeyId.unsafe("missing")
+    val sensitiveDigest = ReceiptDigest
+      .of(Sensitivity.Sensitive, "sensitive-input", k1)
+      .toOption
+      .get
+    val sensitiveItem = ItemDigest
+      .of(sensitiveId, Sensitivity.Sensitive, sensitiveDigest)
+      .toOption
+      .get
+    val sensitiveOutput = ReceiptDigest.keyed("sensitive-output", k1).toOption.get
+    val sensitiveReceipt = EmbeddingReceipt
+      .of(baseCall("sensitive"), Vector(sensitiveItem), sensitiveOutput)
+      .toOption
+      .get
+    val callBearingWithheld = AttemptReceipt.of(
+      Vector(sensitiveReceipt.call),
+      Vector(sensitiveReceipt),
+      Vector.empty,
+      Vector(PolicyDecision.KeyUnavailable(Some(sensitiveId), missing)),
+      Vector.empty,
+      Vector(sensitiveId -> Sensitivity.Sensitive),
+      SensitiveKeyProvider.none
+    )
+    assert(callBearingWithheld.isLeft)
+  }
+
   test(
     "provider-call surface: keyed batch identities differ by key; kind is typed on the attempt; nothing leaks"
   ) {
@@ -194,22 +448,28 @@ class ReceiptDigestSuite extends FunSuite:
     val reqs =
       Vector(("a", "the young man", Sensitivity.Public), ("b", canary, Sensitivity.Sensitive))
     val r = e.embed(batch(e, reqs))
-    assert(r.outcomes(0).value.isRight)
-    r.outcomes(1).value match
-      case Left(ExecutionFailure.PolicyDenied(PolicyDecision.KeyUnavailable(Some(id), k))) =>
-        assertEquals(id.value, "b"); assertEquals(k.value, "none")
-      case other => fail(s"expected PolicyDenied(KeyUnavailable), got $other")
+    assert(r.outcomes.forall {
+      case EmbedOutcome(
+            _,
+            _,
+            Left(ExecutionFailure.PolicyDenied(PolicyDecision.KeyUnavailable(Some(_), k)))
+          ) =>
+        k.value == "none"
+      case _ => false
+    })
     assert(r.receipt.policyDecisions.exists {
       case PolicyDecision.KeyUnavailable(Some(id), _) => id.value == "b"
       case _                                          => false
     })
     assertEquals(r.receipt.kind, DigestKind.Withheld)
+    assert(r.receipt.providerCalls.isEmpty)
+    assert(r.receipt.embeddingReceipts.isEmpty)
     assert(r.receipt.digest.render.startsWith("withheld:none:"))
     r.receipt.policyDecisions.map(_.render).foreach(leaksNothing)
   }
 
-  test("HIGH-2: a key that vanishes after the items are keyed fails the whole batch closed") {
-    // The key is served exactly once (for the sensitive item), then withdrawn before outputs.
+  test("an owned baseline key snapshot survives provider withdrawal for the whole batch") {
+    // The live key is served exactly once; the baseline owns it before vector computation.
     val onceKeys = new SensitiveKeyProvider:
       private var served = 0
       def currentKeyId: KeyId = KeyId.unsafe("k1")
@@ -220,18 +480,11 @@ class ReceiptDigestSuite extends FunSuite:
     val reqs =
       Vector(("a", "the young man", Sensitivity.Public), ("b", canary, Sensitivity.Sensitive))
     val r = e.embed(batch(e, reqs))
-    r.outcomes(1).value match
-      case Left(ExecutionFailure.PolicyDenied(PolicyDecision.KeyUnavailable(Some(_), _))) => ()
-      case other => fail(s"expected fail-closed PolicyDenied(KeyUnavailable), got $other")
-    assertEquals(r.receipt.kind, DigestKind.Withheld)
-    assert(
-      r.receipt.providerCalls.isEmpty,
-      "no provider call may be receipted without keyed identity"
-    )
-    assert(r.receipt.policyDecisions.exists {
-      case PolicyDecision.KeyUnavailable(Some(id), _) => id.value == "b"
-      case _                                          => false
-    })
+    assert(r.outcomes.forall(_.value.isRight))
+    assertEquals(r.receipt.kind, DigestKind.Keyed)
+    assertEquals(r.receipt.providerCalls.size, 1)
+    assertEquals(r.receipt.embeddingReceipts.size, 1)
+    assertEquals(r.receipt.providerCalls, r.receipt.embeddingReceipts.map(_.call))
     (r.receipt.digest.render +: r.receipt.policyDecisions.map(_.render)).foreach(leaksNothing)
   }
 
@@ -350,6 +603,7 @@ class ReceiptDigestSuite extends FunSuite:
     )
     assertEquals(innerCalls, 0, "no delegation without a key")
     assertEquals(r.receipt.providerCalls.size, 0)
+    assertEquals(r.receipt.embeddingReceipts.size, 0)
     assertEquals(cache.size, 0)
     assertEquals(r.receipt.kind, DigestKind.Withheld)
     assert(r.outcomes.forall(_.value.isLeft), "no vectors may leave with a withheld receipt")
@@ -393,4 +647,31 @@ class ReceiptDigestSuite extends FunSuite:
       case CacheDecision.Miss(_, k) => k.kind != DigestKind.Withheld
       case _                        => false
     })
+  }
+
+  test("a mutable provider array cannot mutate the owned cache-batch key snapshot") {
+    val aliased = keyOneBytes.clone()
+    val aliasProvider = new SensitiveKeyProvider:
+      def currentKeyId: KeyId = KeyId.unsafe("k1")
+      def key(id: KeyId): Option[Array[Byte]] =
+        Option.when(id == currentKeyId)(aliased)
+    val base = HashedNgramEmbedder[Id](64, 0L, k1)
+    val mutating = new Embedder[Id]:
+      def info: EmbedderInfo = base.info
+      def spaces: Vector[EmbeddingSpace] = base.spaces
+      def embed(batch: EmbedBatch): BatchResult =
+        java.util.Arrays.fill(aliased, 0.toByte)
+        base.embed(batch)
+    val requests =
+      Vector(("a", "the young man", Sensitivity.Public), ("b", canary, Sensitivity.Sensitive))
+    val mutated =
+      new CachingEmbedder[Id](mutating, EmbeddingCache.inMemory[Id], aliasProvider)
+    val control = new CachingEmbedder[Id](base, EmbeddingCache.inMemory[Id], k1)
+    val mutatedResult = mutated.embed(batch(mutated, requests))
+    val controlResult = control.embed(batch(control, requests))
+
+    assert(aliased.forall(_ == 0.toByte), "the adversary must actually mutate its aliased array")
+    assertEquals(mutatedResult.receipt.cacheDecisions, controlResult.receipt.cacheDecisions)
+    assertEquals(mutatedResult.receipt.digest, controlResult.receipt.digest)
+    assertEquals(mutatedResult.receipt.kind, DigestKind.Keyed)
   }

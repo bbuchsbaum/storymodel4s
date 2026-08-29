@@ -84,7 +84,7 @@ final class CachingEmbedder[F[_]: Monad](
     }
     val keyId = keys.currentKeyId
     val snapshot: Option[SensitiveKeyProvider] =
-      keys.key(keyId).map(bytes => SensitiveKeyProvider.static(keyId, bytes))
+      keys.key(keyId).filter(_.nonEmpty).map(bytes => SensitiveKeyProvider.static(keyId, bytes))
     snapshot match
       case None if nonPublic => Monad[F].pure(CachingEmbedder.failClosed(batch, keyId))
       case _                 => embedWith(batch, snapshot.getOrElse(SensitiveKeyProvider.none))
@@ -149,7 +149,7 @@ final class CachingEmbedder[F[_]: Monad](
           val cacheDecisions = decisions ++ fresh.receipt.cacheDecisions
           val policy = fresh.receipt.policyDecisions ++ denials
           // The receipt is minted BEFORE any put: a withheld attempt caches nothing.
-          val receipt = AttemptReceipt
+          val receipted = AttemptReceipt
             .of(
               fresh.receipt.providerCalls,
               fresh.receipt.embeddingReceipts,
@@ -159,23 +159,18 @@ final class CachingEmbedder[F[_]: Monad](
               batch.itemSensitivity,
               batchKeys
             )
-            .fold(
-              _ =>
-                // A non-public item was neither keyed nor denied — refuse the whole batch.
-                AttemptReceipt.failClosed(
-                  fresh.receipt.providerCalls,
-                  fresh.receipt.embeddingReceipts,
-                  cacheDecisions,
-                  policy,
-                  fresh.receipt.resultDecisions,
-                  batch.itemSensitivity,
-                  batchKeys.currentKeyId
-                ),
-              identity
-            )
-          val finalOutcomes = receipt.enforceWithholding(outcomes)
+          val receipt = receipted.fold(
+            error =>
+              // Preserve a real provider call if an internal receipt invariant ever fails.
+              fresh.receipt.addResultDecisions(Vector(ResultDecision.BatchRejected(error))),
+            identity
+          )
+          val finalOutcomes = receipted match
+            case Left(error) =>
+              outcomes.map(o => o.copy(value = Left(ExecutionFailure.Invalid(error))))
+            case Right(_) => receipt.enforceWithholding(outcomes)
           val puts =
-            if receipt.kind == DigestKind.Withheld then Vector.empty
+            if receipted.isLeft || receipt.kind == DigestKind.Withheld then Vector.empty
             else
               looked.collect { case (r, Keyed.Ok(key), None) =>
                 finalOutcomes
@@ -203,8 +198,6 @@ object CachingEmbedder:
     BatchResult(
       outcomes,
       AttemptReceipt.failClosed(
-        Vector.empty,
-        Vector.empty,
         cacheDecisions,
         denials.map(d => d: PolicyDecision),
         Vector.empty,
