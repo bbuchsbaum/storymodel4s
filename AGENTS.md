@@ -362,6 +362,19 @@ was set by the owner on 2026-08-28 (sticky decision
    `Passed:` lines became one, for candidates differing by a trimmed test file.
    Keep the prior gate's numbers visible for exactly this reason.)
 
+   *And a trailing success line is not an exit status.* Redirecting to a file is
+   only half of it; if you do not actually record the status, the log's last line
+   is what you are left with, and that line lies in a specific way. sbt prints
+   `[success] Total time: Ns` for **each command in the chain**, so a run killed
+   after its last test suite ends in exactly the text a completed run ends in.
+   Zero `[error]` lines do not close the gap either — a run that never reached a
+   failing suite has none. Append the status to the log itself
+   (`... > log 2>&1; echo "GATE_EXIT=$?" >> log`) and certify on that marker, not
+   on the shape of the tail. Caught on slice 7: the first run showed 17 suite
+   totals, zero errors and a trailing `[success]`, and was **unverifiable** —
+   re-running it in the same export with the status captured gave `GATE_EXIT=0`
+   and 1295 tests. Same result, but only the second one was evidence.
+
    *A negative compile-time assertion needs a positive control.* `typeChecks`
    returns `false` if the snippet produces **any** error and does not say which,
    so `assert(!typeChecks(...))` can pass for a reason unrelated to the property
