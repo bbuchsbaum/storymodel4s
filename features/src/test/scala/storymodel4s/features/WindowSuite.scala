@@ -185,6 +185,19 @@ class WindowSuite extends ScalaCheckSuite:
     )
   }
 
+  test("kernelAt refuses invalid weights; scalar-door tests cannot see this door") {
+    val refused = Estimate.Missing[Double](
+      MissingReason.Undefined(UndefinedReason.Custom("features", "invalid-sample-weight"))
+    )
+    val ker = WindowReducer.kernelAt(KernelShape.Gaussian(1.0), _.position.toDouble)
+    val nanW = NonEmptyVector.of(Sample(0, Estimate.observed(1.0), Double.NaN))
+    val infW = NonEmptyVector.of(Sample(0, Estimate.observed(1.0), Double.PositiveInfinity))
+    val negW = NonEmptyVector.of(Sample(0, Estimate.observed(1.0), -1.0))
+    assertEquals(ker.reduce(nanW), refused)
+    assertEquals(ker.reduce(infW), refused)
+    assertEquals(ker.reduce(negW), refused)
+  }
+
   test("weighted mean of all-zero weights is ZeroTotalWeight, not Observed") {
     val zeros = NonEmptyVector.of(
       Sample(0, Estimate.observed(1.0), 0.0),
