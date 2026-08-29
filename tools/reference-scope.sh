@@ -27,6 +27,16 @@
 # three known failures before adoption -- run it on the commit that broke, and
 # check it names the module that broke.
 #
+# `opaque` is DELIBERATELY ABSENT from the alternation, and this is not an
+# oversight to be helpfully corrected. Checked against every opaque type in
+# core, story and features: all of them except one have a companion object or
+# class, so the tool already finds them by that name. The exception is
+# `opaque type T = String`, an abstract type MEMBER of OpaqueId (core/ids.scala)
+# rather than a standalone type -- and adding `opaque` would put a bare `T` in
+# the type list for any candidate touching ids.scala, where `grep -w T` matches
+# 12 of 13 modules. The tool would then name every module on every such change,
+# which is not a wider scope, it is no signal at all.
+#
 # IT OVER-APPROXIMATES, AND THAT IS THE SAFE DIRECTION. It matches bare NAMES,
 # so two unrelated classes sharing a name put both their modules on the list:
 # 4383a85 touches recall's GraphSuite and the tool therefore also names `story`
