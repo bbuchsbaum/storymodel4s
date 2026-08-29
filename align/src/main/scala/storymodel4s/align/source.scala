@@ -135,6 +135,11 @@ object ImportanceWeight:
   * content stems of the supporting text plus the predicate and participant labels; `importance` is
   * an injected salience weight used only for importance-weighted coverage, never for matching
   * (`Missing` importance excludes the node from importance-weighted coverage; it is never zero).
+  *
+  * Source compatibility: this is deliberately not a case class. Closing unchecked construction
+  * removed `Product`, the generated `Mirror`/`fromProduct`, and generated `unapply` pattern
+  * matching. Consumers should use the public reads and rebuild with `NodeSummary.apply` or the
+  * explicit `copy`; both require a validated [[ImportanceWeight]].
   */
 final class NodeSummary private (
     val ref: SourceNodeRef,
