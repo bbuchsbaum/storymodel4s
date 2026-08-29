@@ -25,7 +25,7 @@ final case class RecallSignature(
     importanceWeightedCoverage: ScoreEstimate,
     fidelityMass: MassRatio,
     fidelityByFacet: Map[Facet, MassRatio],
-    specificity: Option[Double],
+    specificityMass: MassRatio,
     compression: MassRatio,
     discourseChronology: Option[Double],
     worldChronology: Option[Double],
@@ -321,7 +321,15 @@ object RecallSignature:
 
     val k = view.sourceNodeCount
     val loc = p.rows.flatMap(r => r.localizability(k).map(r.unit -> _)).toMap
-    val specificity = if loc.isEmpty then None else Some(loc.values.toVector.sorted.sum / loc.size)
+    // Specificity as a ratio of SUMS, per the ruling. Localizability is defined only ON source
+    // mass and describes how concentrated that mass is, so the conditioning event is "this unit
+    // has source mass" and its natural measure is the mass itself, not the fact of the unit's
+    // existence. Mean-of-ratios gave a unit with 0.01 of source mass the same vote as a fully
+    // placed one - the same defect compression had nine lines earlier in this function.
+    val specificityN = p.rows.map(r => r.localizability(k).fold(0.0)(_ * r.sourceMass)).sum
+    val specificityA = p.rows.filter(r => r.localizability(k).isDefined).map(_.sourceMass).sum
+    val specificityT = p.rows.map(r => r.mass.values.sum).sum
+    val specificityRatio = MassRatio.unsafe(specificityN, specificityA, specificityT)
 
     // Compression as a ratio of SUMS, per the ratified estimand: N is level mass summed over every
     // unit, A is the source mass those levels were placed on, T is all row mass. Dividing per unit
@@ -434,7 +442,7 @@ object RecallSignature:
       weighted,
       fidelityRatio,
       fidelityByFacet,
-      specificity,
+      specificityRatio,
       compression,
       discourse,
       world,
@@ -556,7 +564,7 @@ final class SignatureProjection private (
       "uniformCoverage" -> Some(s.uniformCoverage),
       "importanceWeightedCoverage" -> s.importanceWeightedCoverage.toOption,
       "fidelity" -> s.fidelityMass.value,
-      "specificity" -> s.specificity,
+      "specificity" -> s.specificityMass.value,
       "compression" -> s.compression.value,
       "discourseChronology" -> s.discourseChronology,
       "worldChronology" -> s.worldChronology,
@@ -582,6 +590,7 @@ final class SignatureProjection private (
     // sees what the minimum does NOT cover rather than reading it as a guarantee.
     val support: Map[String, Double] = Map(
       "fidelity" -> s.fidelityMass.support,
+      "specificity" -> s.specificityMass.support,
       "compression" -> s.compression.support,
       "semanticFlowCoherence" -> s.semanticFlowCoherence.support
     ) ++ s.backwardMass.map(m => "backwardMass" -> m.comparableSteps.toDouble / m.totalSteps).toMap

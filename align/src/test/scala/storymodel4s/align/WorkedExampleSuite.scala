@@ -232,7 +232,7 @@ class WorkedExampleSuite extends FunSuite:
     val sig = RecallSignature.compute(res, rg, view)
     assertEqualsDouble(sig.unrankedMass, 1.0, 1e-9)
     assertEqualsDouble(sig.intrusionMass, 0.0, 0.0)
-    assertEquals(sig.specificity, None)
+    assertEquals(sig.specificityMass.value, None)
   }
 
   test("recall signature decomposes the outcome") {
@@ -251,7 +251,10 @@ class WorkedExampleSuite extends FunSuite:
     assert(sig.discourseChronology.exists(_ < 1.0), sig.discourseChronology.toString)
     assert(sig.fidelityMass.value.exists(_ > 0.5), s"fidelity = ${sig.fidelityMass.render}")
     assert(sig.perUnitFidelity.contains(u2.id))
-    assert(sig.specificity.exists(s => s > 0.0 && s <= 1.0), sig.specificity.toString)
+    assert(
+      sig.specificityMass.value.exists(s => s > 0.0 && s <= 1.0),
+      sig.specificityMass.render
+    )
     assertEqualsDouble(sig.unrankedMass, 0.0, 0.0)
     val scalar = SignatureProjection
       .of("v0", Map("uniformCoverage" -> 1.0, "intrusionMass" -> -1.0))

@@ -56,7 +56,7 @@ class SignatureSuite extends FunSuite:
       importanceWeightedCoverage = Estimate.missing(MissingReason.AllMissing),
       fidelityMass = MassRatio.of(0.0, 0.0, 0.0).fold(e => fail(e.message), identity),
       fidelityByFacet = Map.empty,
-      specificity = None,
+      specificityMass = MassRatio.of(0.0, 0.0, 0.0).fold(e => fail(e.message), identity),
       compression = MassRatio.of(0.0, 0.0, 0.0).fold(e => fail(e.message), identity),
       discourseChronology = Some(0.0),
       worldChronology = None,
@@ -383,6 +383,44 @@ class SignatureSuite extends FunSuite:
       ratioOfSums.value.exists(v => math.abs(v - meanOfRatios) > 0.4),
       s"ratio-of-sums collapsed onto mean-of-ratios: ${ratioOfSums.render}"
     )
+  }
+
+  test("specificity conditions on source MASS, and the two formulas differ on this fixture") {
+    // Required by the ruling: a fixture with UNEQUAL source mass per unit, because an equal-mass
+    // fixture cannot distinguish mass-weighting from mean-of-ratios - which is exactly how the
+    // compression mutation survived its first test set.
+    val result = GraphHsmm
+      .infer(recall, view, candidates, costModel)
+      .fold(e => fail(e.message), identity)
+    val s = RecallSignature.compute(result, recall, view)
+    val k = view.sourceNodeCount
+    val rows = result.posterior.rows.filter(_.localizability(k).isDefined)
+    val masses = rows.map(_.sourceMass)
+    assert(masses.distinct.size > 1, s"fixture has equal source mass per unit: $masses")
+
+    // Denominator is summed source mass, never a unit count.
+    assertEqualsDouble(s.specificityMass.conditioningMass, masses.sum, 1e-9)
+    assertNotEquals(s.specificityMass.conditioningMass, rows.size.toDouble)
+
+    // Independent recomputation of both formulas, so the movement is measured rather than asserted.
+    val massWeighted =
+      rows.map(r => r.localizability(k).get * r.sourceMass).sum / masses.sum
+    val meanOfRatios = rows.flatMap(_.localizability(k)).sum / rows.size
+    assertEqualsDouble(
+      s.specificityMass.value.getOrElse(fail(s.specificityMass.render)),
+      massWeighted,
+      1e-9
+    )
+    assert(
+      math.abs(massWeighted - meanOfRatios) > 1e-9,
+      s"the two formulas coincide here, so this fixture proves nothing: $massWeighted"
+    )
+    // Pinned literals, hand-read from this fixture. The inequality above survives any change that
+    // moves both formulas together; these do not. Mass-weighting publishes 0.6583 where
+    // mean-of-ratios published 0.6103 - the low-mass units were voting at full weight.
+    assertEqualsDouble(massWeighted, 0.658321, 1e-6)
+    assertEqualsDouble(meanOfRatios, 0.610311, 1e-6)
+    assertEqualsDouble(s.specificityMass.conditioningMass, 2.629218, 1e-6)
   }
 
   test("compression conditions on SOURCE MASS, not on a count of units") {
