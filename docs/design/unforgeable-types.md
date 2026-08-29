@@ -54,7 +54,15 @@ use `typeCheckErrors` to read the real message when diagnosing.
 > unforgeable and not otherwise obtainable.**
 
 Both halves are required. A field type that is unforgeable but freely obtainable protects nothing,
-because a caller simply obtains one. This is the test to apply *before* ranking a type's severity —
+because a caller simply obtains one.
+
+**Or the representation cannot express the violation.** A second survival mode, and the one most
+likely to produce a wasted slice. `MentionGraph.of` rejects duplicate `SurfaceUnitId` pairs before
+materializing its `Map`; `fromProduct` accepts the *already-materialized* `Map`, and **no `Map`
+value can encode duplicate keys**. The invariant is enforced by the data structure, so there is no
+invalid state to forge. Check this before writing a probe: if you cannot construct the invalid
+value by hand, the type is not a site, and manufacturing a forge the representation cannot express
+is the over-correction, not diligence. This is the test to apply *before* ranking a type's severity —
 not "does it validate itself", which is blind to types validated by an external gate, and which is
 how the most security-relevant type in the sweep was initially ranked below four arithmetic ones.
 
