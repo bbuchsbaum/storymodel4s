@@ -9,6 +9,7 @@ import storymodel4s.embed.{SensitiveKeyProvider, Sensitivity}
 import storymodel4s.embed.grakern.StructuralReceiptContext
 import storymodel4s.fixtures.wog.{WarOfTheGhostsExpectations, WarOfTheGhostsModel}
 import storymodel4s.recall.*
+import storymodel4s.recall.RecallGraphStatus.Checked
 import storymodel4s.story.NarrativeNodeId
 
 /** *The War of the Ghosts* wired as **diagnostic** cases only.
@@ -104,22 +105,37 @@ object WogDiagnostic:
       case _ =>
         GoldUnit.anchored(unit, NonEmptyVector.fromVectorUnsafe(targets))
 
-  /** One idea unit per paraphrase: the baseline segmenter may split on connectives, and the
-    * expectations are stated per statement (as the alignment suite does).
+  /** Adapt statement-grain diagnostic gold to one recall unit without claiming this is the
+    * production segmentation policy.
+    *
+    * Exactly one current paraphrase (`Precise`) is split into two production units. Gold targets
+    * are declared for its whole statement; copying them onto both clauses would invent evidence, so
+    * the diagnostic retains an explicit coarser grain until clause-level gold is annotated.
     */
-  private def oneUnit(kind: ParaphraseKind, text: String): RecallGraph =
+  private def statementAcceptanceRecall(kind: ParaphraseKind, text: String): RecallGraph[Checked] =
     val transcript = StorySource.fromText(text, Some(kind.toString)).toOption.get
     val recall = RecallSegmenter.segment(transcript)
     if recall.units.size == 1 then recall
     else
       val all = recall.ordered
       val first = all.head
+      val span = all.map(_.span).reduce(_ ++ _)
       val unit = first.copy(
-        span = all.map(_.span).reduce(_ ++ _),
-        text = all.map(_.text).mkString(" "),
+        span = span,
+        text = transcript.canonicalText.substring(span.minSpan.start, span.minSpan.endExclusive),
         proposition = all.map(_.proposition).reduce(mergeSketch)
       )
-      RecallGraph(recall.transcript, recall.atlas, Vector(unit), RecallRelations.empty)
+      RecallGraph
+        .validated(
+          recall.transcript,
+          recall.atlas,
+          Vector(unit),
+          RecallRelations.empty.copy(entities = recall.relations.entities)
+        )
+        .fold(
+          errors => throw new IllegalStateException(s"invalid benchmark recall: $errors"),
+          identity
+        )
 
   private def mergeSketch(a: PropositionSketch, b: PropositionSketch): PropositionSketch =
     PropositionSketch(
@@ -138,7 +154,7 @@ object WogDiagnostic:
   /** One single-unit case per paraphrase. */
   lazy val paraphraseCases: Vector[BenchCase] =
     recallParaphrases.map { p =>
-      val recall = oneUnit(p.kind, p.text)
+      val recall = statementAcceptanceRecall(p.kind, p.text)
       val unit = recall.ordered.head
       val gold = Gold
         .validated(Vector(goldFor(view, unit.id, p)), view)

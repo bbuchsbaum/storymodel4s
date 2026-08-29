@@ -4,18 +4,20 @@ import munit.FunSuite
 import storymodel4s.core.StorySource
 
 class SegmenterSuite extends FunSuite:
+  import RecallGraphStatus.Checked
 
   private val anna =
     "A woman goes into this creepy old house. It felt kind of like a Stephen King story. " +
       "She eventually finds somebody downstairs. Before that there was some kind of noise, I think."
 
-  private def graph(text: String): RecallGraph =
+  private def graph(text: String): RecallGraph[Checked] =
     RecallSegmenter.segment(StorySource.fromText(text).toOption.get)
 
   test("the §13 recall yields four idea units that validate") {
     val g = graph(anna)
+    val revalidated = RecallGraph.validated(g.copy())
     assertEquals(g.size, 4)
-    assert(RecallGraph.validated(g).isValid, RecallGraph.validated(g).toString)
+    assert(revalidated.isValid, revalidated.toString)
     assertEquals(g.ordered.map(_.ordinal), Vector(0, 1, 2, 3))
   }
 
@@ -75,7 +77,7 @@ class SegmenterSuite extends FunSuite:
     assert(c.text.toLowerCase.startsWith("because"))
     assert(g.relations.causal.exists(e => e.cause == a.id && e.effect == b.id))
     assert(g.relations.causal.exists(e => e.cause == c.id && e.effect == b.id))
-    assert(RecallGraph.validated(g).isValid)
+    assert(RecallGraph.validated(g.copy()).isValid)
   }
 
   test("'so much' is not mistaken for a causal connective") {

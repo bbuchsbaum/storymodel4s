@@ -29,8 +29,14 @@ class WogDiagnosticSuite extends FunSuite:
     val base = WogDiagnostic.fullRecallCase
     val units = base.recall.ordered.take(goldAnchors.size)
     assertEquals(units.size, goldAnchors.size, "the fixture has too few recall units")
-    val recall =
-      RecallGraph(base.recall.transcript, base.recall.atlas, units, RecallRelations.empty)
+    val recall = RecallGraph
+      .validated(
+        base.recall.transcript,
+        base.recall.atlas,
+        units,
+        RecallRelations.empty.copy(entities = base.recall.relations.entities)
+      )
+      .fold(errors => fail(s"invalid route recall: $errors"), identity)
     val gold = Gold
       .validated(
         units.zip(goldAnchors).map { case (unit, anchor) =>
@@ -107,6 +113,7 @@ class WogDiagnosticSuite extends FunSuite:
   test("WOG is wired as diagnostic cases: one per paraphrase plus one full recall") {
     val cases = WogDiagnostic.cases
     assertEquals(cases.size, WarOfTheGhostsExpectations.recallParaphrases.size + 1)
+    assertEquals(WogDiagnostic.paraphraseCases.map(_.recall.size).distinct, Vector(1))
     assert(cases.forall(!_.origin.isFrozen))
     assert(
       WogDiagnostic.fullRecallCase.recall.size >= WarOfTheGhostsExpectations.recallParaphrases.size

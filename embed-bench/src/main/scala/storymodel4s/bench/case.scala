@@ -3,6 +3,7 @@ package storymodel4s.bench
 import storymodel4s.align.{SourceNodeRef, SourceView}
 import storymodel4s.core.{Checksum, ContentAddress, StorySource}
 import storymodel4s.recall.RecallGraph
+import storymodel4s.recall.RecallGraphStatus.Checked
 
 /** One story–recall pair with its gold and its provenance.
   *
@@ -17,7 +18,7 @@ final case class BenchCase(
     origin: Origin,
     story: StorySource,
     view: SourceView,
-    recall: RecallGraph,
+    recall: RecallGraph[Checked],
     gold: Gold
 ):
   /** Text under a source node's support, sliced from the story's canonical text. */

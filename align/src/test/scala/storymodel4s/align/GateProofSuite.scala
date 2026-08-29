@@ -8,6 +8,7 @@ import scala.collection.immutable.SortedSet
 import storymodel4s.core.StorySource
 import storymodel4s.core.SurfaceAnalyzer
 import storymodel4s.recall.{RecallGraph, RecallUnitId}
+import storymodel4s.recall.RecallGraphStatus.Checked
 
 /** The gated result is a proof anchored in the mode gate and bounded by the nominated candidates,
   * not a record (forward-review P0; chief re-review; ADR 0001 rev 3 L1; bead `HsmmResult wire`).
@@ -45,11 +46,15 @@ class GateProofSuite extends FunSuite:
       .fold(e => fail(e.message), identity)
 
   /** What the gate says about `unit` on `ref` — the only legitimate way to obtain a record. */
-  private def gateOf(recall: RecallGraph, unit: RecallUnitId, ref: SourceNodeRef): Admissibility =
+  private def gateOf(
+      recall: RecallGraph[Checked],
+      unit: RecallUnitId,
+      ref: SourceNodeRef
+  ): Admissibility =
     ModeGate.assess(recall.byId(unit), view.node(ref).get, view)
 
   private def revalidate(
-      recall: RecallGraph,
+      recall: RecallGraph[Checked],
       base: HsmmResult,
       candidateAnchors: Option[Map[RecallUnitId, Vector[SourceNodeRef]]] = None,
       posterior: Option[AlignmentMatrix] = None,
@@ -288,8 +293,11 @@ class GateProofSuite extends FunSuite:
   ) {
     // Same units and spans, a longer transcript: the canonical text checksum differs.
     val longer = StorySource.fromText(AnnaFixture.recallText + " Then nothing more.").toOption.get
-    val recall2 =
-      AnnaFixture.recall.copy(transcript = longer, atlas = SurfaceAnalyzer.analyze(longer))
+    val recall2 = RecallGraph
+      .validated(
+        AnnaFixture.recall.copy(transcript = longer, atlas = SurfaceAnalyzer.analyze(longer))
+      )
+      .fold(errors => fail(s"invalid longer-transcript recall: $errors"), identity)
     assertNotEquals(AlignWire.recallChecksum(recall2), result.recallChecksum)
     val r2 = revalidate(recall2, result).fold(e => fail(e.message), identity)
     assertEquals(r2.recallChecksum, AlignWire.recallChecksum(recall2))
@@ -525,7 +533,9 @@ class GateProofSuite extends FunSuite:
     val errors = typeCheckErrors(
       """
       val a: storymodel4s.align.AblationResult = ???
-      val recall: storymodel4s.recall.RecallGraph = ???
+      val recall: storymodel4s.recall.RecallGraph[
+        storymodel4s.recall.RecallGraphStatus.Checked
+      ] = ???
       val view: storymodel4s.align.SourceView = ???
       storymodel4s.align.RecallSignature.compute(a, recall, view)
       """
@@ -536,4 +546,55 @@ class GateProofSuite extends FunSuite:
     )
     // Inaccessibility of the constructors (HsmmResult, rows, matrices, Admissibility) from outside
     // `align` is checked in the laws module (LawsSuite), which lives in another package.
+  }
+
+  test("alignment doors require a checked recall witness") {
+    import scala.compiletime.testing.typeCheckErrors
+    val checked = typeCheckErrors(
+      """
+      val recall: storymodel4s.recall.RecallGraph[
+        storymodel4s.recall.RecallGraphStatus.Checked
+      ] = ???
+      val view: storymodel4s.align.SourceView = ???
+      val candidates: storymodel4s.align.Candidates = ???
+      val model: storymodel4s.align.LocalCostModel = ???
+      val result: storymodel4s.align.HsmmResult = ???
+      storymodel4s.align.GraphHsmm.infer(recall, view, candidates, model)
+      storymodel4s.align.AlignWire.recallChecksum(recall)
+      storymodel4s.align.RecallSignature.compute(result, recall, view)
+      """
+    )
+    val inferUnchecked = typeCheckErrors(
+      """
+      val recall: storymodel4s.recall.RecallGraph[
+        storymodel4s.recall.RecallGraphStatus.Unchecked
+      ] = ???
+      val view: storymodel4s.align.SourceView = ???
+      val candidates: storymodel4s.align.Candidates = ???
+      val model: storymodel4s.align.LocalCostModel = ???
+      storymodel4s.align.GraphHsmm.infer(recall, view, candidates, model)
+      """
+    )
+    val checksumUnchecked = typeCheckErrors(
+      """
+      val recall: storymodel4s.recall.RecallGraph[
+        storymodel4s.recall.RecallGraphStatus.Unchecked
+      ] = ???
+      storymodel4s.align.AlignWire.recallChecksum(recall)
+      """
+    )
+    val signatureUnchecked = typeCheckErrors(
+      """
+      val recall: storymodel4s.recall.RecallGraph[
+        storymodel4s.recall.RecallGraphStatus.Unchecked
+      ] = ???
+      val view: storymodel4s.align.SourceView = ???
+      val result: storymodel4s.align.HsmmResult = ???
+      storymodel4s.align.RecallSignature.compute(result, recall, view)
+      """
+    )
+    assert(checked.isEmpty, checked.toString)
+    assert(inferUnchecked.nonEmpty, inferUnchecked.toString)
+    assert(checksumUnchecked.nonEmpty, checksumUnchecked.toString)
+    assert(signatureUnchecked.nonEmpty, signatureUnchecked.toString)
   }

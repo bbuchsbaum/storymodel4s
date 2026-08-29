@@ -5,6 +5,7 @@ import storymodel4s.align.*
 import storymodel4s.align.bridge.StorySourceView
 import storymodel4s.core.*
 import storymodel4s.recall.*
+import storymodel4s.recall.RecallGraphStatus.Checked
 import storymodel4s.story.NarrativeNodeId
 
 /** End-to-end alignment of the manual recall paraphrases against the hand-modeled story through the
@@ -209,41 +210,79 @@ class WarOfTheGhostsAlignmentSuite extends FunSuite:
 
   private final case class Run(
       paraphrase: RecallParaphrase,
-      recall: RecallGraph,
+      recall: RecallGraph[Checked],
       result: HsmmResult
   ):
     def row: AlignmentRow = result.posterior.rows.head
     def unit: RecallUnit = recall.ordered.head
     def targets: Vector[SourceNodeRef] = paraphrase.targets.map(ref)
 
-  private def segmentOne(kind: ParaphraseKind): (RecallParaphrase, RecallGraph) =
+  /** Adapt the statement-grain acceptance gold to one recall unit without claiming this is the
+    * production segmentation policy.
+    *
+    * Gold targets are annotated per whole paraphrase. Copying those targets onto every production
+    * clause would invent evidence, so this diagnostic keeps the honest coarser grain. At present
+    * only `Precise` diverges: it has two production units and two statement-level targets. A future
+    * clause-grain fixture therefore needs annotations only for that case, but must add them rather
+    * than infer them here.
+    */
+  private def statementAcceptanceRecall(
+      kind: ParaphraseKind
+  ): (RecallParaphrase, RecallGraph[Checked]) =
     val p = recallParaphrases.find(_.kind == kind).get
     val transcript = StorySource.fromText(p.text, Some(kind.toString)).toOption.get
     val recall = RecallSegmenter.segment(transcript)
     val merged =
-      // one idea unit per paraphrase: the baseline segmenter may split on connectives, and the
-      // expectations are stated per statement
+      // The acceptance estimand is one statement; this is deliberately not a segmenter output.
       if recall.units.size == 1 then recall
       else
         val first = recall.ordered.head
         val all = recall.ordered
+        val span = all.map(_.span).reduce(_ ++ _)
         val unit = first.copy(
-          span = all.map(_.span).reduce(_ ++ _),
-          text = all.map(_.text).mkString(" "),
+          span = span,
+          text = transcript.canonicalText.substring(span.minSpan.start, span.minSpan.endExclusive),
           proposition = all.map(_.proposition).reduce(mergeSketch)
         )
-        RecallGraph(recall.transcript, recall.atlas, Vector(unit), RecallRelations.empty)
-    val canon = merged.copy(units =
-      merged.units.map(u => u.copy(proposition = LexicalTestResource.sketch(u.proposition)))
-    )
+        RecallGraph
+          .validated(
+            recall.transcript,
+            recall.atlas,
+            Vector(unit),
+            RecallRelations.empty.copy(entities = recall.relations.entities)
+          )
+          .fold(errors => fail(s"invalid merged recall: $errors"), identity)
+    val canon = RecallGraph
+      .validated(
+        merged.copy(units =
+          merged.units.map(u => u.copy(proposition = LexicalTestResource.sketch(u.proposition)))
+        )
+      )
+      .fold(errors => fail(s"invalid canonical recall: $errors"), identity)
     (p, canon)
 
   private def run(kind: ParaphraseKind): Run =
-    val (p, recall) = segmentOne(kind)
+    val (p, recall) = statementAcceptanceRecall(kind)
     val candidates = generator.generate(recall.units, view)
     val result =
       GraphHsmm.infer(recall, view, candidates, costModel).fold(e => fail(e.message), identity)
     Run(p, recall, result)
+
+  test("statement-grain gold diverges from production only for the two-unit Precise case") {
+    // Load the model first: the fixture's lazy initialization order is itself guarded separately.
+    val _ = WarOfTheGhostsModel.model
+    val divergent = recallParaphrases.flatMap { p =>
+      val source = StorySource.fromText(p.text, Some(p.kind.toString)).toOption.get
+      val count = RecallSegmenter.segment(source).size
+      Option.when(count != 1)(p.kind -> count)
+    }
+    assertEquals(divergent, Vector(ParaphraseKind.Precise -> 2))
+    val precise = recallParaphrases.find(_.kind == ParaphraseKind.Precise).get
+    assertEquals(precise.targets.size, 2)
+
+    val (_, adapted) = statementAcceptanceRecall(ParaphraseKind.Precise)
+    assertEquals(adapted.size, 1)
+  }
 
   private def mergeSketch(a: PropositionSketch, b: PropositionSketch): PropositionSketch =
     PropositionSketch(

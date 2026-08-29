@@ -6,6 +6,7 @@ import storymodel4s.align.bridge.StorySourceView
 import storymodel4s.codec.{Canonical, HsmmResultCodec}
 import storymodel4s.core.*
 import storymodel4s.recall.*
+import storymodel4s.recall.RecallGraphStatus.Checked
 
 /** Locks `hsmm/v1` to a real inferred War of the Ghosts result without serializing story text. */
 class WarOfTheGhostsCodecGoldenSuite extends FunSuite:
@@ -48,7 +49,7 @@ private[wog] object WarOfTheGhostsCodecGolden:
   lazy val encoded: String = HsmmResultCodec.encode(context.result)
 
   final case class GoldenContext(
-      recall: RecallGraph,
+      recall: RecallGraph[Checked],
       view: SourceView,
       result: HsmmResult
   )

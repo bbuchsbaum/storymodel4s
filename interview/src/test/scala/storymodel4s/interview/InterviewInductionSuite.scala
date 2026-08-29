@@ -5,12 +5,16 @@ import munit.FunSuite
 import storymodel4s.core.*
 import storymodel4s.features.{Estimate, MissingReason}
 import storymodel4s.recall.*
+import storymodel4s.recall.RecallGraphStatus.{Checked, Unchecked}
 
 /** Laws for bd-01M15BM30JHMDHC28EZX8WTQBY and bd-01M15BM32YMTAWDM7ZSVN0KCP5.
   *
   * InterviewSuite is held by W3; this suite owns the induction foils only.
   */
 class InterviewInductionSuite extends FunSuite:
+
+  private def checked(graph: RecallGraph[Unchecked]): RecallGraph[Checked] =
+    RecallGraph.validated(graph).fold(errors => fail(s"invalid test recall: $errors"), identity)
 
   private def unit(
       text: String,
@@ -19,7 +23,7 @@ class InterviewInductionSuite extends FunSuite:
     val src = StorySource.fromText(text).toOption.get
     RecallSegmenter.segment(src).ordered.head.copy(function = function, text = text)
 
-  private def induce(text: String): (RecallGraph, Vector[Detail], InductionResult) =
+  private def induce(text: String): (RecallGraph[Checked], Vector[Detail], InductionResult) =
     val src = StorySource.fromText(text).toOption.get
     val g = RecallSegmenter.segment(src)
     val ds = g.ordered.flatMap(u => AtomProjection.fromUnit(u, TurnId.unsafe("t")))
@@ -40,9 +44,17 @@ class InterviewInductionSuite extends FunSuite:
     assertEquals(u.function, DiscourseFunction.EpisodicAssertion)
     assertEquals(TargetInduction.classify(u), TargetInduction.UnitClass.Episodic)
     val src = StorySource.fromText(text).toOption.get
-    val base = RecallSegmenter.segment(src)
-    val g = base.copy(units = base.units.map(_.copy(text = text, function = u.function)))
-    val ds = AtomProjection.fromUnit(u, TurnId.unsafe("t"))
+    val atlas = SurfaceAnalyzer.analyze(src)
+    val sentence = atlas.sentences.head
+    val whole = u.copy(
+      ordinal = 0,
+      span = SpanSet.one(SpanRef(Some(sentence.id), sentence.span)),
+      text = text
+    )
+    val g = RecallGraph
+      .validated(src, atlas, Vector(whole), RecallRelations.empty)
+      .fold(errors => fail(s"invalid embedded-language recall: $errors"), identity)
+    val ds = AtomProjection.fromUnit(whole, TurnId.unsafe("t"))
     val r = TargetInduction.induce(g, ds, Cue("birthday cake", None, Some("birthday")))
     assert(ds.nonEmpty)
     ds.foreach { d =>
@@ -208,7 +220,7 @@ class InterviewInductionSuite extends FunSuite:
     val source = StorySource.fromText(text).toOption.get
     val base = RecallSegmenter.segment(source)
     val uninterpretable = base.ordered.head.copy(function = DiscourseFunction.Uninterpretable)
-    val graph = base.copy(units = Vector(uninterpretable))
+    val graph = checked(base.copy(units = Vector(uninterpretable)))
     val details = AtomProjection.fromUnit(uninterpretable, TurnId.unsafe("uninterpretable"))
     val result = TargetInduction.induce(graph, details, Cue("memory", None, None))
 

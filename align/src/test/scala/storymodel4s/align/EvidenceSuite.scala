@@ -5,6 +5,10 @@ import storymodel4s.features.{Estimate, MissingReason}
 import storymodel4s.proposition.*
 import storymodel4s.proposition.CheckState.Checked
 import storymodel4s.recall.*
+import storymodel4s.recall.RecallGraphStatus.{
+  Checked as RecallChecked,
+  Unchecked as RecallUnchecked
+}
 
 /** W2 (ADR 0001 rev 3 §D4b): proposition evidence is an optional channel; `d_chart` and `d_wl` are
   * separate terms that are `Missing` without it; chart gates take precedence over sketch
@@ -12,6 +16,9 @@ import storymodel4s.recall.*
   */
 class EvidenceSuite extends FunSuite:
   import AnnaFixture.*
+
+  private def checkedRecall(g: RecallGraph[RecallUnchecked]): RecallGraph[RecallChecked] =
+    RecallGraph.validated(g).fold(errors => fail(s"invalid evidence recall: $errors"), identity)
 
   // ---- charts -------------------------------------------------------------------------------
 
@@ -183,7 +190,10 @@ class EvidenceSuite extends FunSuite:
     "end to end: reversed source chart anchors u2 on e5 as Distorted(RoleReversal), never Faithful"
   ) {
     val r = viewWith(Map(e5 -> reversed))
-    val recallR = recall.copy(units = recall.units.map(u => if u.id == u2.id then u2Chart else u))
+    val recallR =
+      checkedRecall(
+        recall.copy(units = recall.units.map(u => if u.id == u2.id then u2Chart else u))
+      )
     val cands = CandidateGenerator(semantic, perLevel = 2).generate(recallR.ordered, r)
     val res = GraphHsmm.infer(recallR, r, cands, costModel).toOption.get
     val row = res.posterior.row(u2.id).get
@@ -197,7 +207,10 @@ class EvidenceSuite extends FunSuite:
 
   test("end to end: straight source chart keeps u2 Faithful on e5 (no regression against M0)") {
     val v = viewWith(Map(e5 -> straight))
-    val recallV = recall.copy(units = recall.units.map(u => if u.id == u2.id then u2Chart else u))
+    val recallV =
+      checkedRecall(
+        recall.copy(units = recall.units.map(u => if u.id == u2.id then u2Chart else u))
+      )
     val cands = CandidateGenerator(semantic, perLevel = 2).generate(recallV.ordered, v)
     val res = GraphHsmm.infer(recallV, v, cands, costModel).toOption.get
     val row = res.posterior.row(u2.id).get

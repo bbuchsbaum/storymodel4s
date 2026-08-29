@@ -18,6 +18,7 @@ import storymodel4s.core.*
   * inside quoted speech are ignored; a discourse "No," is not a negation.
   */
 object RecallSegmenter:
+  import RecallGraphStatus.Checked
 
   // ---- clause splitting -------------------------------------------------------------------
 
@@ -396,7 +397,7 @@ object RecallSegmenter:
 
   // ---- public entry point -----------------------------------------------------------------
 
-  def segment(transcript: StorySource): RecallGraph =
+  def segment(transcript: StorySource): RecallGraph[Checked] =
     val atlas = SurfaceAnalyzer.analyze(transcript)
     val text = transcript.canonicalText
     val sid = transcript.id.value
@@ -445,12 +446,18 @@ object RecallSegmenter:
     val sentenceStart: Map[RecallUnitId, Int] =
       units.zip(clauseSpans).map { case (u, (_, s)) => u.id -> s.span.start }.toMap
     val (temporal, causal) = connectiveEdges(units, sentenceStart)
-    RecallGraph(
-      transcript,
-      atlas,
-      units,
-      RecallRelations(temporal, causal, entities, Vector.empty, coreference)
-    )
+    RecallGraph
+      .validated(
+        transcript,
+        atlas,
+        units,
+        RecallRelations(temporal, causal, entities, Vector.empty, coreference)
+      )
+      .fold(
+        errors =>
+          throw new IllegalStateException(s"RecallSegmenter produced an invalid graph: $errors"),
+        identity
+      )
 
   // ---- pieces ----------------------------------------------------------------------------
 

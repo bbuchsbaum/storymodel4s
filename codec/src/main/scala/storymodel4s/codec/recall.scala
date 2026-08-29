@@ -4,6 +4,7 @@ import io.circe.{Decoder, DecodingFailure, Encoder, Json}
 import io.circe.syntax.*
 import storymodel4s.core.*
 import storymodel4s.recall.*
+import storymodel4s.recall.RecallGraphStatus.Checked
 import CanonicalPrimitives.{*, given}
 import CoreCodecs.given
 
@@ -247,7 +248,7 @@ object RecallCodecs:
   /** Transcripts are encoded as plain `StorySource` until ADR 0001 rev 3 D6 lands the
     * `PseudonymizedText` / `ReidentificationKey` split; a reidentification key is never encoded.
     */
-  given Encoder[RecallGraph] = Encoder.instance { g =>
+  given Encoder[RecallGraph[Checked]] = Encoder.instance { g =>
     Json.obj(
       "schemaVersion" -> SchemaVersions.Current.asJson,
       "transcript" -> g.transcript.asJson,
@@ -256,7 +257,7 @@ object RecallCodecs:
       "relations" -> g.relations.asJson
     )
   }
-  given Decoder[RecallGraph] = Decoder.instance { c =>
+  given Decoder[RecallGraph[Checked]] = Decoder.instance { c =>
     for
       _ <- SchemaVersions.check(c)
       t <- field[StorySource](c, "transcript")
@@ -268,7 +269,7 @@ object RecallCodecs:
       u <- field[Vector[RecallUnit]](c, "units")
       r <- field[RecallRelations](c, "relations")
       g <- RecallGraph
-        .validated(RecallGraph(t, a, u, r))
+        .validated(t, a, u, r)
         .toEither
         .left
         .map(es => DecodingFailure(es.toChain.toVector.map(_.message).mkString("; "), c.history))

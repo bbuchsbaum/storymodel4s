@@ -2,6 +2,7 @@ package storymodel4s.interview
 
 import storymodel4s.core.*
 import storymodel4s.recall.*
+import storymodel4s.recall.RecallGraphStatus.Checked
 
 /** Runs the recall segmenter over an interview transcript and keeps only participant speech.
   *
@@ -13,7 +14,7 @@ import storymodel4s.recall.*
   */
 object InterviewSegmenter:
   final case class Segmented(
-      graph: RecallGraph,
+      graph: RecallGraph[Checked],
       turnOf: Map[RecallUnitId, TurnId],
       crossing: Vector[RecallUnitId]
   )
@@ -43,8 +44,11 @@ object InterviewSegmenter:
       rel.entities,
       rel.elaboration.filter(e => keptIds.contains(e.parent) && keptIds.contains(e.child))
     )
-    Segmented(
-      RecallGraph(full.transcript, t.atlas, units, relations),
-      kept.map { case (u, turn) => u.id -> turn }.toMap,
-      crossing.result()
-    )
+    val graph = RecallGraph
+      .validated(full.transcript, t.atlas, units, relations)
+      .fold(
+        errors =>
+          throw new IllegalStateException(s"InterviewSegmenter produced an invalid graph: $errors"),
+        identity
+      )
+    Segmented(graph, kept.map { case (u, turn) => u.id -> turn }.toMap, crossing.result())

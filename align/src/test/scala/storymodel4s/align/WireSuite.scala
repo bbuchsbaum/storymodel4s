@@ -5,7 +5,11 @@ import storymodel4s.core.{SpanRef, SpanSet, TextSpan}
 import storymodel4s.features.{Coverage, Estimate, MissingReason}
 import storymodel4s.proposition.*
 import storymodel4s.proposition.CheckState.Checked
-import storymodel4s.recall.{RecallUnitId, SketchParticipant}
+import storymodel4s.recall.{RecallGraph, RecallRelations, RecallUnitId, SketchParticipant}
+import storymodel4s.recall.RecallGraphStatus.{
+  Checked as RecallChecked,
+  Unchecked as RecallUnchecked
+}
 
 /** The wire side of a gated result (bead `HsmmResult wire`): validating factories rebuild the
   * records a result carries and refuse malformed or inconsistent ones; fingerprints are content
@@ -13,6 +17,9 @@ import storymodel4s.recall.{RecallUnitId, SketchParticipant}
   */
 class WireSuite extends FunSuite:
   import AnnaFixture.{view, e1, e2, e5, sc1}
+
+  private def checkedRecall(g: RecallGraph[RecallUnchecked]): RecallGraph[RecallChecked] =
+    RecallGraph.validated(g).fold(errors => fail(s"invalid checksum recall: $errors"), identity)
 
   private lazy val result: HsmmResult =
     GraphHsmm
@@ -315,11 +322,13 @@ class WireSuite extends FunSuite:
     val u0 = recall.ordered.head
     def unit(outcome: Option[String], cause: Option[String]) =
       AlignWire.recallChecksum(
-        recall.copy(units =
-          recall.units.map(x =>
-            if x.id == u0.id then
-              x.copy(proposition = x.proposition.copy(outcome = outcome, cause = cause))
-            else x
+        checkedRecall(
+          recall.copy(units =
+            recall.units.map(x =>
+              if x.id == u0.id then
+                x.copy(proposition = x.proposition.copy(outcome = outcome, cause = cause))
+              else x
+            )
           )
         )
       )
@@ -327,29 +336,41 @@ class WireSuite extends FunSuite:
   }
 
   test("the recall checksum names the transcript and the units' ids, order, and spans") {
-    val recall = AnnaFixture.recall
+    val recall = checkedRecall(AnnaFixture.recall.copy(relations = RecallRelations.empty))
     val base = AlignWire.recallChecksum(recall)
-    assertEquals(AlignWire.recallChecksum(recall.copy(units = recall.units.reverse)), base)
+    assertEquals(
+      AlignWire.recallChecksum(checkedRecall(recall.copy(units = recall.units.reverse))),
+      base
+    )
     val u0 = recall.ordered.head
-    val shifted = u0.copy(span = SpanSet.one(SpanRef(TextSpan.unsafe(0, 1))))
-    val moved = recall.copy(units = recall.units.map(u => if u.id == u0.id then shifted else u))
+    val shiftedSpan = SpanSet.one(SpanRef(TextSpan.unsafe(0, 1)))
+    val shifted = u0.copy(
+      span = shiftedSpan,
+      text = recall.transcript.canonicalText.substring(0, 1)
+    )
+    val moved = checkedRecall(
+      recall.copy(units = recall.units.map(u => if u.id == u0.id then shifted else u))
+    )
     assertNotEquals(AlignWire.recallChecksum(moved), base)
     val renamed = u0.copy(id = RecallUnitId.unsafe("renamed"))
-    val withRenamed =
+    val withRenamed = checkedRecall(
       recall.copy(units = recall.units.map(u => if u.id == u0.id then renamed else u))
+    )
     assertNotEquals(AlignWire.recallChecksum(withRenamed), base)
     val u1 = recall.ordered(1)
-    val swapped = recall.copy(units =
-      recall.units.map(u =>
-        if u.id == u0.id then u.copy(ordinal = u1.ordinal)
-        else if u.id == u1.id then u.copy(ordinal = u0.ordinal)
-        else u
+    val swapped = checkedRecall(
+      recall.copy(units =
+        recall.units.map(u =>
+          if u.id == u0.id then u.copy(ordinal = u1.ordinal)
+          else if u.id == u1.id then u.copy(ordinal = u0.ordinal)
+          else u
+        )
       )
     )
     assertNotEquals(AlignWire.recallChecksum(swapped), base)
   }
 
-  test("the recall checksum binds the full unit content, not only its boundaries") {
+  test("the recall checksum binds the full independently mutable unit content") {
     val recall = AnnaFixture.recall
     val base = AlignWire.recallChecksum(recall)
     val u0 = recall.ordered.head
@@ -358,10 +379,11 @@ class WireSuite extends FunSuite:
       u0.proposition.participants.updated(0, f(u0.proposition.participants.head))
     def swap(u: storymodel4s.recall.RecallUnit) =
       AlignWire.recallChecksum(
-        recall.copy(units = recall.units.map(x => if x.id == u0.id then u else x))
+        checkedRecall(
+          recall.copy(units = recall.units.map(x => if x.id == u0.id then u else x))
+        )
       )
     val variants = Vector(
-      "text" -> swap(u0.copy(text = u0.text + " indeed")),
       "function" -> swap(u0.copy(function = storymodel4s.recall.DiscourseFunction.Association)),
       "uncertainty" -> swap(
         u0.copy(expressedUncertainty = storymodel4s.recall.ExpressedUncertainty.Hedged(u0.span))
@@ -391,7 +413,6 @@ class WireSuite extends FunSuite:
       "grounding" -> swap(u0.copy(grounding = Some(storymodel4s.core.Probability.unsafe(0.5)))),
       "evidence only" -> swap(u0.copy(evidence = Some(evidenceA))),
       "evidence other" -> swap(u0.copy(evidence = Some(evidenceB))),
-      "ordinal only" -> swap(u0.copy(ordinal = u0.ordinal + 100)),
       "participant alias" -> swap(
         u0.copy(proposition =
           u0.proposition.copy(participants = participantWith(_.copy(aliases = Set("zzz"))))
@@ -418,10 +439,12 @@ class WireSuite extends FunSuite:
         )
       ),
       "causal relation" -> AlignWire.recallChecksum(
-        recall.copy(relations =
-          recall.relations.copy(causal =
-            Vector(
-              storymodel4s.recall.RecallCausalEdge(u0.id, recall.ordered(1).id, None)
+        checkedRecall(
+          recall.copy(relations =
+            recall.relations.copy(causal =
+              Vector(
+                storymodel4s.recall.RecallCausalEdge(u0.id, recall.ordered(1).id, None)
+              )
             )
           )
         )

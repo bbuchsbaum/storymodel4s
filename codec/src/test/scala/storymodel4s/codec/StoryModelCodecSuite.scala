@@ -4,6 +4,7 @@ import io.circe.Json
 import munit.FunSuite
 import storymodel4s.core.*
 import storymodel4s.recall.RecallGraph
+import storymodel4s.recall.RecallGraphStatus.Checked
 import storymodel4s.story.*
 import CoreCodecs.given
 import RecallCodecs.given
@@ -113,7 +114,7 @@ class StoryModelCodecSuite extends FunSuite:
 
   test("RecallGraph: exact round trip and fixed point") {
     val text = Canonical.encode(recall)
-    assertEquals(Canonical.decode[RecallGraph](text), Right(recall))
+    assertEquals(Canonical.decode[RecallGraph[Checked]](text), Right(recall))
     assert(Canonical.isFixedPoint(recall))
   }
 

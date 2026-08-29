@@ -2,6 +2,7 @@ package storymodel4s.align
 
 import storymodel4s.core.Checksum
 import storymodel4s.recall.*
+import storymodel4s.recall.RecallGraphStatus.Checked
 
 /** Typed transition features between source states. Each has a weight θ. Source→source moves are a
   * softmax of `Σ_k θ_k φ_k(s, t)` over the source states available at the next unit; `ExternalIn`
@@ -221,7 +222,7 @@ object HsmmResult:
     * copies through [[AlignWire.matched]].
     */
   def validated(
-      recall: RecallGraph,
+      recall: RecallGraph[Checked],
       view: SourceView,
       candidateAnchors: Map[RecallUnitId, Vector[SourceNodeRef]],
       posterior: AlignmentMatrix,
@@ -472,7 +473,7 @@ final case class AblationResult(
 object GraphHsmm:
 
   def infer(
-      recall: RecallGraph,
+      recall: RecallGraph[Checked],
       view: SourceView,
       candidates: Candidates,
       costModel: LocalCostModel,
@@ -507,7 +508,7 @@ object GraphHsmm:
     * distorted state exists. Returns an [[AblationResult]], never an `HsmmResult`.
     */
   def ablationUngated(
-      recall: RecallGraph,
+      recall: RecallGraph[Checked],
       view: SourceView,
       candidates: Candidates,
       costModel: LocalCostModel,
@@ -525,7 +526,7 @@ object GraphHsmm:
 
   private def run(
       units: Vector[RecallUnit],
-      recall: RecallGraph,
+      recall: RecallGraph[Checked],
       view: SourceView,
       candidates: Candidates,
       costModel: LocalCostModel,
@@ -779,7 +780,7 @@ object RelationPreservation:
     */
   def diagnostic(
       posterior: AlignmentMatrix,
-      recall: RecallGraph,
+      recall: RecallGraph[Checked],
       view: SourceView
   ): Map[RelationLayer, LayerPreservation] =
     def induced(layer: RelationLayer, from: RecallUnitId, to: RecallUnitId): Option[Double] =
@@ -819,7 +820,7 @@ object RelationPreservation:
       base: Vector[Map[AlignState, Double]],
       units: Vector[RecallUnit],
       posterior: AlignmentMatrix,
-      recall: RecallGraph,
+      recall: RecallGraph[Checked],
       view: SourceView,
       lambda: Double
   ): Vector[Map[AlignState, Double]] =

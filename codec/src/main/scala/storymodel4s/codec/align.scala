@@ -8,6 +8,7 @@ import storymodel4s.align.*
 import storymodel4s.core.*
 import storymodel4s.features.{Coverage, Estimate}
 import storymodel4s.recall.{RecallGraph, RecallUnitId}
+import storymodel4s.recall.RecallGraphStatus.Checked
 import CanonicalPrimitives.{*, given}
 import CoreCodecs.given
 import FeatureCodecs.given
@@ -101,7 +102,7 @@ object HsmmResultCodec:
   /** Decode canonical JSON text only after revalidating it against `recall` and `view`. */
   def decode(
       text: String,
-      recall: RecallGraph,
+      recall: RecallGraph[Checked],
       view: SourceView
   ): Either[HsmmCodecError, HsmmResult] =
     Canonical
@@ -113,7 +114,7 @@ object HsmmResultCodec:
   /** Decode a JSON value only after revalidating it against `recall` and `view`. */
   def decodeJson(
       json: Json,
-      recall: RecallGraph,
+      recall: RecallGraph[Checked],
       view: SourceView
   ): Either[HsmmCodecError, HsmmResult] =
     Canonical
@@ -522,7 +523,7 @@ object HsmmResultCodec:
 
   extension (wire: Wire)
     private def materialize(
-        recall: RecallGraph,
+        recall: RecallGraph[Checked],
         view: SourceView
     ): Either[AlignError, HsmmResult] =
       for

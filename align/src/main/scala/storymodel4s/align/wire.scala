@@ -4,6 +4,7 @@ import storymodel4s.core.{Checksum, ContentAddress, SpanRef}
 import storymodel4s.features.{CanonicalDouble, Coverage, Estimate}
 import storymodel4s.proposition.Canonical
 import storymodel4s.recall.{ExpressedUncertainty, RecallGraph, RecallUnitId}
+import storymodel4s.recall.RecallGraphStatus.Checked
 
 /** Align-local tagged, length-prefixed rendering shared by the wire digests (ADR 0001 §D5, "wire
   * renderings"). Every digest is a `ContentAddress.digest` over a flat token vector in which every
@@ -210,7 +211,7 @@ object AlignWire:
     * reads. Same boundaries with different content therefore fail [[matched]]. The proof re-derives
     * this value and the decoder compares.
     */
-  def recallChecksum(recall: RecallGraph): Checksum =
+  def recallChecksum(recall: RecallGraph[Checked]): Checksum =
     val b = Render.Tokens()
     import b.{field, list}
     def spans(s: storymodel4s.core.SpanSet): Vector[String] =

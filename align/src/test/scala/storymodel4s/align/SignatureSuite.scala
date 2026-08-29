@@ -197,12 +197,14 @@ class SignatureSuite extends FunSuite:
     // place at all. The best possible score, published from no evidence whatsoever.
     val transcript =
       storymodel4s.core.StorySource.fromText("nothing here.", Some("probe")).toOption.get
-    val silent = storymodel4s.recall.RecallGraph(
-      transcript,
-      storymodel4s.core.SurfaceAnalyzer.analyze(transcript),
-      Vector.empty,
-      storymodel4s.recall.RecallRelations.empty
-    )
+    val silent = storymodel4s.recall.RecallGraph
+      .validated(
+        transcript,
+        storymodel4s.core.SurfaceAnalyzer.analyze(transcript),
+        Vector.empty,
+        storymodel4s.recall.RecallRelations.empty
+      )
+      .fold(errors => fail(s"invalid empty recall: $errors"), identity)
     val proof = HsmmResult
       .validated(
         silent,

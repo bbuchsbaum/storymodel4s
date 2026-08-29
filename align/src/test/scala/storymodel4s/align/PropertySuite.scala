@@ -5,15 +5,25 @@ import org.scalacheck.{Gen, Prop}
 import org.scalacheck.Prop.*
 import storymodel4s.core.*
 import storymodel4s.recall.*
+import storymodel4s.recall.RecallGraphStatus.Checked
 
 /** Structural laws of the HSMM posteriors and flows on random small sources and recalls. */
 class PropertySuite extends ScalaCheckSuite:
 
   final case class Case(
       view: InMemorySourceView,
-      recall: RecallGraph,
+      recall: RecallGraph[Checked],
       semantic: SemanticDistance
   )
+
+  private def checkedRecall(
+      source: StorySource,
+      atlas: SurfaceAtlas,
+      units: Vector[RecallUnit]
+  ): RecallGraph[Checked] =
+    RecallGraph
+      .validated(source, atlas, units, RecallRelations.empty)
+      .fold(errors => throw new AssertionError(s"invalid generated recall: $errors"), identity)
 
   private def leaf(i: Int): SourceNodeRef = SourceNodeRef.Situation(SituationId.unsafe(s"e$i"))
   private def scene(i: Int): SourceNodeRef = SourceNodeRef.Segment(SegmentId.unsafe(s"s$i"))
@@ -99,7 +109,7 @@ class PropertySuite extends ScalaCheckSuite:
 
   private val genFunction: Gen[DiscourseFunction] = Gen.oneOf(DiscourseFunction.values.toSeq)
 
-  private def genRecall(view: InMemorySourceView): Gen[(RecallGraph, SemanticDistance)] =
+  private def genRecall(view: InMemorySourceView): Gen[(RecallGraph[Checked], SemanticDistance)] =
     for
       k <- Gen.choose(1, 5)
       functions <- Gen.listOfN(k, genFunction)
@@ -127,7 +137,7 @@ class PropertySuite extends ScalaCheckSuite:
         (u, i) <- units.zipWithIndex
         (n, j) <- view.nodes.zipWithIndex
       yield (u.id, n.ref) -> dists(i * view.nodes.size + j)).toMap
-      (RecallGraph(src, atlas, units, RecallRelations.empty), SemanticDistance.fromTable(table))
+      (checkedRecall(src, atlas, units), SemanticDistance.fromTable(table))
 
   private val genCase: Gen[Case] =
     for
@@ -244,7 +254,7 @@ class PropertySuite extends ScalaCheckSuite:
         n <- view.nodes
       yield (u.id, n.ref) -> (if n.ref == targets(i) then 0.0 else 1.0)).toMap
       val sem = SemanticDistance.fromTable(table)
-      val recall = RecallGraph(src, atlas, units, RecallRelations.empty)
+      val recall = checkedRecall(src, atlas, units)
       val cands = CandidateGenerator(sem, perLevel = 2).generate(units, view)
       val res = GraphHsmm
         .infer(recall, view, cands, DefaultLocalCostModel(semantic = sem))
@@ -296,7 +306,7 @@ class PropertySuite extends ScalaCheckSuite:
       PropositionSketch.empty,
       None
     )
-    val r = RecallGraph(src, atlas, Vector(u), RecallRelations.empty)
+    val r = checkedRecall(src, atlas, Vector(u))
     val cands = CandidateGenerator(c.semantic).generate(Vector(u), c.view)
     val res = GraphHsmm
       .infer(r, c.view, cands, DefaultLocalCostModel(semantic = c.semantic))

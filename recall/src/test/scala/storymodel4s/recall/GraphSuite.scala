@@ -25,11 +25,29 @@ class GraphSuite extends ScalaCheckSuite:
     )
 
   private val good =
-    RecallGraph(src, atlas, Vector(unit(0), unit(1), unit(2)), RecallRelations.empty)
+    RecallGraph.unchecked(src, atlas, Vector(unit(0), unit(1), unit(2)), RecallRelations.empty)
 
   test("a well-formed graph validates and exposes the chain") {
     assert(RecallGraph.validated(good).isValid)
     assertEquals(good.chain.map { case (a, b) => (a.ordinal, b.ordinal) }, Vector((0, 1), (1, 2)))
+  }
+
+  test("an atlas built for another source cannot prove this transcript") {
+    // Keep the canonical text and resulting surface units identical. The only mutation is source
+    // identity (the title), so this test cannot pass accidentally because a span or unit-text law
+    // rejected the graph first.
+    val foreignSource = StorySource.fromText(text, Some("foreign source")).toOption.get
+    val foreignAtlas = SurfaceAnalyzer.analyze(foreignSource)
+    val mismatched = good.copy(atlas = foreignAtlas)
+    val errors = RecallGraph.validated(mismatched).swap.toOption.get.toChain.toVector
+
+    assertEquals(
+      errors,
+      Vector(
+        DomainError.InvariantViolation("recall/atlas", "atlas source must equal transcript")
+      )
+    )
+    assert(RecallGraph.validated(good).isValid)
   }
 
   test("a unit whose text is not the words at its span is rejected") {

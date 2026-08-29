@@ -8,7 +8,11 @@ import storymodel4s.align.*
 import storymodel4s.core.*
 import storymodel4s.features.*
 import storymodel4s.proposition.*
-import storymodel4s.recall.{DiscourseFunction, RecallUnit, RecallUnitId}
+import storymodel4s.recall.{DiscourseFunction, RecallGraph, RecallUnit, RecallUnitId}
+import storymodel4s.recall.RecallGraphStatus.{
+  Checked as RecallChecked,
+  Unchecked as RecallUnchecked
+}
 import storymodel4s.story.*
 
 /** Discipline rule sets for the propositional chart contract. */
@@ -384,6 +388,10 @@ object GateProofLaws extends Laws:
   * factories are the identity on records a real inference produced.
   */
 object WireLaws extends Laws:
+  private def checkedRecall(
+      g: RecallGraph[RecallUnchecked]
+  ): Option[RecallGraph[RecallChecked]] = RecallGraph.validated(g).toOption
+
   def wire(using Arbitrary[AlignGens.Case]): RuleSet =
     new DefaultRuleSet(
       "align.wire",
@@ -404,33 +412,41 @@ object WireLaws extends Laws:
         forAll { (c: AlignGens.Case) =>
           val base = AlignWire.recallChecksum(c.recall)
           val u0 = c.recall.ordered.head
-          val shifted = u0.copy(span = SpanSet.one(TextSpan.unsafe(0, 1)))
+          val shifted = u0.copy(
+            span = SpanSet.one(TextSpan.unsafe(0, 1)),
+            text = c.recall.transcript.canonicalText.substring(0, 1)
+          )
           val renamed = u0.copy(id = RecallUnitId.unsafe("zzz-renamed"))
           def swap(u: RecallUnit) =
             c.recall.copy(units = c.recall.units.map(x => if x.id == u0.id then u else x))
-          AlignWire.recallChecksum(c.recall.copy(units = c.recall.units.reverse)) == base &&
-          AlignWire.recallChecksum(swap(shifted)) != base &&
-          AlignWire.recallChecksum(swap(renamed)) != base
+          (for
+            reordered <- checkedRecall(c.recall.copy(units = c.recall.units.reverse))
+            moved <- checkedRecall(swap(shifted))
+            withRenamed <- checkedRecall(swap(renamed))
+          yield AlignWire.recallChecksum(reordered) == base &&
+            AlignWire.recallChecksum(moved) != base &&
+            AlignWire.recallChecksum(withRenamed) != base).contains(true)
         },
-      "a unit-text-only change flips the recall checksum (same boundaries, different content)" ->
+      "independently mutable unit content changes flip the recall checksum" ->
         forAll { (c: AlignGens.Case) =>
           val base = AlignWire.recallChecksum(c.recall)
           val u0 = c.recall.ordered.head
           def swap(u: RecallUnit) =
             c.recall.copy(units = c.recall.units.map(x => if x.id == u0.id then u else x))
-          AlignWire.recallChecksum(swap(u0.copy(text = u0.text + "!"))) != base &&
-          AlignWire.recallChecksum(
-            swap(u0.copy(proposition = u0.proposition.copy(lemmas = u0.proposition.lemmas + "zz")))
-          ) != base &&
-          AlignWire.recallChecksum(
-            swap(
-              u0.copy(function =
-                if u0.function == DiscourseFunction.TaskCommentary then
-                  DiscourseFunction.Association
-                else DiscourseFunction.TaskCommentary
-              )
+          val withLemma = swap(
+            u0.copy(proposition = u0.proposition.copy(lemmas = u0.proposition.lemmas + "zz"))
+          )
+          val withFunction = swap(
+            u0.copy(function =
+              if u0.function == DiscourseFunction.TaskCommentary then DiscourseFunction.Association
+              else DiscourseFunction.TaskCommentary
             )
-          ) != base
+          )
+          (for
+            lemmaRecall <- checkedRecall(withLemma)
+            functionRecall <- checkedRecall(withFunction)
+          yield AlignWire.recallChecksum(lemmaRecall) != base &&
+            AlignWire.recallChecksum(functionRecall) != base).contains(true)
         },
       "a receipt-inconsistent optional term is rejected by the factory" ->
         forAll { (c: AlignGens.Case) =>
@@ -489,6 +505,10 @@ object WireLaws extends Laws:
   * only proofs gated against its own view, and each proof only with the recall it was made from.
   */
 object PopulationLaws extends Laws:
+  private def checkedRecall(
+      g: RecallGraph[RecallUnchecked]
+  ): Option[RecallGraph[RecallChecked]] = RecallGraph.validated(g).toOption
+
   def population(using Arbitrary[AlignGens.Case]): RuleSet =
     new DefaultRuleSet(
       "align.population",
@@ -563,16 +583,22 @@ object PopulationLaws extends Laws:
         forAll { (c: AlignGens.Case) =>
           val r = AlignGens.infer(c)
           val u0 = c.recall.ordered.head
-          val other = c.recall.copy(units =
-            c.recall.units.map(x => if x.id == u0.id then u0.copy(text = u0.text + "!") else x)
+          val edited = c.recall.copy(units =
+            c.recall.units.map(x =>
+              if x.id == u0.id then
+                u0.copy(proposition = u0.proposition.copy(lemmas = u0.proposition.lemmas + "zz"))
+              else x
+            )
           )
-          val subject = SubjectAlignment(SubjectId.unsafe("s0"), other, r, None)
-          PopulationAggregate.of(c.view, Vector(subject)).left.exists {
-            case AlignError.PopulationRecallMismatch(s, proof, suppliedRecall) =>
-              s == subject.subject &&
-              proof == r.recallChecksum &&
-              suppliedRecall == AlignWire.recallChecksum(other)
-            case _ => false
+          checkedRecall(edited).exists { other =>
+            val subject = SubjectAlignment(SubjectId.unsafe("s0"), other, r, None)
+            PopulationAggregate.of(c.view, Vector(subject)).left.exists {
+              case AlignError.PopulationRecallMismatch(s, proof, suppliedRecall) =>
+                s == subject.subject &&
+                proof == r.recallChecksum &&
+                suppliedRecall == AlignWire.recallChecksum(other)
+              case _ => false
+            }
           }
         },
       "the receipt is invariant under subject order" ->
