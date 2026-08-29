@@ -29,7 +29,16 @@ final case class SubjectAlignment(
 final case class PopulationReceipt(
     viewFingerprint: ViewFingerprint,
     subjectCount: Int,
-    recallChecksums: Vector[Checksum]
+    recallChecksums: Vector[Checksum],
+    /** Subjects whose recall has no units at all.
+      *
+      * A proof over an empty recall is legitimate — "this participant recalled nothing" is a
+      * finding, not an error, and refusing it would delete a datum. But it admits nothing and
+      * contributes no mass, so a bare `subjectCount` of 20 that silently includes 10 silent
+      * participants overstates what the aggregate rests on. Counted here so the headline cannot
+      * hide them.
+      */
+    contentlessSubjects: Vector[SubjectId]
 )
 
 /** A sparse row-major matrix with string row/column identities; only nonzero entries are stored. */
@@ -84,7 +93,8 @@ final case class PopulationAggregate private (view: SourceView, subjects: Vector
     PopulationReceipt(
       view.contentFingerprint,
       subjects.size,
-      subjects.map(_.result.recallChecksum).sortBy(_.hex)
+      subjects.map(_.result.recallChecksum).sortBy(_.hex),
+      subjects.filter(_.recall.units.isEmpty).map(_.subject).sorted
     )
 
   /** Alignable nodes in deterministic order. */

@@ -4,7 +4,9 @@ import munit.ScalaCheckSuite
 import org.scalacheck.{Arbitrary, Gen}
 import org.scalacheck.Prop.forAll
 
+import storymodel4s.core.{StorySource, SurfaceAnalyzer}
 import storymodel4s.features.Estimate
+import storymodel4s.recall.{RecallGraph, RecallRelations}
 
 class PopulationSuite extends ScalaCheckSuite:
   import AnnaFixture.{view, e1, e5, sc1, sc2, root}
@@ -220,6 +222,41 @@ class PopulationSuite extends ScalaCheckSuite:
     ).sortBy(_.hex)
     assertEquals(rc.recallChecksums, expected)
     assertEquals(rc.recallChecksums.map(_.hex), rc.recallChecksums.map(_.hex).sorted)
+    assertEquals(rc.contentlessSubjects, Vector.empty)
+  }
+
+  test("a silent participant is counted, not hidden and not refused") {
+    // HsmmResult.validated accepts an empty recall - every structural guard passes vacuously - and
+    // that is right: "this participant recalled nothing" is a finding, not an error. What must not
+    // happen is a subjectCount that quietly includes them, so the receipt names them separately.
+    val transcript = StorySource.fromText("nothing here.", Some("silent")).toOption.get
+    val silentRecall =
+      RecallGraph(
+        transcript,
+        SurfaceAnalyzer.analyze(transcript),
+        Vector.empty,
+        RecallRelations.empty
+      )
+    val silentProof = HsmmResult
+      .validated(
+        silentRecall,
+        view,
+        Map.empty,
+        AlignmentMatrix.of(Vector.empty).toOption.get,
+        TransitionFlow(Vector.empty),
+        Vector.empty,
+        -1.0,
+        Map.empty,
+        0
+      )
+      .fold(e => fail(s"an empty recall should still validate: ${e.message}"), identity)
+    val withSilent = PopulationAggregate
+      .of(view, real.subjects :+ SubjectAlignment(sid("s-silent"), silentRecall, silentProof, None))
+      .fold(e => fail(e.message), identity)
+    assertEquals(withSilent.receipt.subjectCount, 4)
+    assertEquals(withSilent.receipt.contentlessSubjects, Vector(sid("s-silent")))
+    // and the silent subject contributes no mass: the grounded-subject counts are unchanged
+    assertEquals(withSilent.groundedSubjects, real.groundedSubjects)
   }
 
   test("receipt and aggregate are invariant under subject order") {
