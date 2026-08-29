@@ -507,7 +507,12 @@ object RecallSignature:
         )
         val mean = f.steps.map(_.sourceMass(isBackward(pos))).sum / f.steps.size
         Some(StepMass.unsafe(mean, comparable, f.steps.size))
-    val discoursePos: SourceNodeRef => Option[Double] = r => Some(view.relativePosition(r))
+    // Was `r => Some(view.relativePosition(r))`: an Option whose None was structurally
+    // unreachable, because relativePosition substitutes 0.0 for an unresolvable ref. That
+    // published the START OF THE DISCOURSE as the measured position of a node we could not place,
+    // and fed it to chronology. `worldPos` on the line below always used its absence channel
+    // correctly; this one was hardcoded shut beside it.
+    val discoursePos: SourceNodeRef => Option[Double] = view.measuredPosition
     val worldPos: Option[SourceNodeRef => Option[Double]] =
       view.worldOrder.map(o => r => o.get(r).map(_.toDouble))
     // `ordered` already abstains when no step carries directional mass; the previous

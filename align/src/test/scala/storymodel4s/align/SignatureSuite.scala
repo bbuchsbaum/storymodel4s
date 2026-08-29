@@ -16,6 +16,53 @@ import storymodel4s.recall.RecallGraphStatus.Checked
 class SignatureSuite extends FunSuite:
   import AnnaFixture.*
 
+  /** A node AT the start of the discourse and a node we could not place at all must not render
+    * identically. `relativePosition` gives both `0.0`; `measuredPosition` separates them.
+    *
+    * This is the distinction `signature` used to destroy: `discoursePos` was
+    * `r => Some(view.relativePosition(r))`, an absence channel with `None` made structurally
+    * unreachable, so an unplaceable node entered chronology as the beginning of the story.
+    *
+    * Mutation run 2026-08-29: replacing `measuredPosition`'s body with
+    * `Some(relativeSpan(ref).map((a, b) => (a + b) / 2.0).getOrElse(0.0))` fails the first
+    * assertion below and leaves every other assertion in this suite green — which is why the defect
+    * survived: nothing else in 769 lines can see it.
+    */
+  test("measuredPosition separates an unplaceable node from one at position zero") {
+    import storymodel4s.core.SituationId
+    val phantom = SourceNodeRef.Situation(SituationId.unsafe("ghost"))
+    object Foil extends SourceView:
+      val nodes: Vector[NodeSummary] = Vector.empty
+      def node(ref: SourceNodeRef): Option[NodeSummary] = None
+      def adjacency(layer: RelationLayer): Map[SourceNodeRef, Map[SourceNodeRef, Double]] =
+        Map(phantom -> Map.empty)
+      def worldOrder: Option[Map[SourceNodeRef, Int]] = None
+      def textLength: Int = 100
+
+    assertEquals(
+      Foil.measuredPosition(phantom),
+      None,
+      "an unresolvable ref has NO measured position"
+    )
+    assertEquals(Foil.relativePosition(phantom), 0.0, "the lossy accessor still fabricates 0.0")
+
+    // The other half, and the reason `None` is not simply "position 0": a node the view CAN place
+    // at the very start must report a measured Some(0.0), not an absence. If `measuredPosition`
+    // returned None for a real leading node the fix would have traded one conflation for another.
+    val leading = view.leaves.map(_.ref).minBy(r => view.relativePosition(r))
+    assert(view.measuredPosition(leading).isDefined, "a placeable node must report a position")
+
+    // And a view with no measured length cannot place anything, including its own real nodes.
+    object Unmeasured extends SourceView:
+      val nodes: Vector[NodeSummary] = Foil.nodes
+      def node(ref: SourceNodeRef): Option[NodeSummary] = None
+      def adjacency(layer: RelationLayer): Map[SourceNodeRef, Map[SourceNodeRef, Double]] =
+        Map.empty
+      def worldOrder: Option[Map[SourceNodeRef, Int]] = None
+      def textLength: Int = 0
+    assertEquals(Unmeasured.measuredPosition(phantom), None)
+  }
+
   private lazy val sig: RecallSignature =
     val result = GraphHsmm
       .infer(recall, view, candidates, costModel)

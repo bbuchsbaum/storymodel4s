@@ -423,9 +423,27 @@ trait SourceView:
         Some((s.start.toDouble / textLength, s.endExclusive.toDouble / textLength))
       case _ => None
 
-  /** Discourse position of a node normalized to `[0, 1]` by support midpoint. */
+  /** Discourse position of a node normalized to `[0, 1]` by support midpoint, or `None` when the
+    * ref does not resolve in this view or the source has no measured length.
+    *
+    * '''Prefer this to [[relativePosition]] wherever the caller can carry an absence.'''
+    * `relativePosition` substitutes `0.0` for both of those failures, and `0.0` is not a missing
+    * marker — it is the very start of the discourse. A caller that wraps it as
+    * `Some(view.relativePosition(r))` declares an absence channel and then makes `None`
+    * structurally unreachable, publishing a fabricated position as a measured one.
+    */
+  def measuredPosition(ref: SourceNodeRef): Option[Double] =
+    relativeSpan(ref).map((a, b) => (a + b) / 2.0)
+
+  /** Discourse position of a node normalized to `[0, 1]` by support midpoint, substituting `0.0`
+    * for an unresolvable ref or an unmeasured source.
+    *
+    * The substitution is why [[measuredPosition]] exists: `0.0` is a real position, so this method
+    * cannot tell a node at the start of the story from one it could not place at all. Use it only
+    * where the caller genuinely has no absence channel, and never to fill one that exists.
+    */
   def relativePosition(ref: SourceNodeRef): Double =
-    relativeSpan(ref).map((a, b) => (a + b) / 2.0).getOrElse(0.0)
+    measuredPosition(ref).getOrElse(0.0)
 
 /** Simple in-memory `SourceView`. Hierarchy adjacency is derived from parents unless supplied. */
 final case class InMemorySourceView(
