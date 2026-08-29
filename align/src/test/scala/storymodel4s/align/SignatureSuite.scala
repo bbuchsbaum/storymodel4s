@@ -320,6 +320,25 @@ class SignatureSuite extends FunSuite:
         "summon[scala.deriving.Mirror.ProductOf[StepMass]]"
       )
     )
+    // Every smart-constructed carrier here, not only the two a review named. Per
+    // docs/design/unforgeable-types.md these are non-case classes so that fromProduct and copy do
+    // not exist.
+    //
+    // HONESTY NOTE: the next two are CORRECT but UNPROVEN. Mutating these types to `case class`
+    // did not make them fail and I could not isolate why - a minimal probe confirmed Mirror IS
+    // derivable for ordinary case classes under bare-private, qualified-private and user-companion
+    // constructors alike, so the general rule holds and something specific to these two defeats
+    // the check. Treat them as documentation shaped like a tripwire until one is seen to fire.
+    assert(
+      !scala.compiletime.testing.typeChecks(
+        "summon[scala.deriving.Mirror.ProductOf[SupportedScalar]]"
+      )
+    )
+    assert(
+      !scala.compiletime.testing.typeChecks(
+        "summon[scala.deriving.Mirror.ProductOf[LayerPreservation]]"
+      )
+    )
   }
 
   // --- ratio-of-sums estimands (bd-01M162FEGPSY50MFHTYH3C3RHF) ---
