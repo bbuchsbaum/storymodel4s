@@ -48,6 +48,34 @@ class BaselineSuite extends ScalaCheckSuite:
     assert(a.spaces.map(_.id).intersect(b.spaces.map(_.id)).isEmpty)
   }
 
+  test("an empty sensitive key is reported as invalid without provider work") {
+    val emptyKeys = SensitiveKeyProvider.static(KeyId.unsafe("empty"), Array.emptyByteArray)
+    val e = HashedNgramEmbedder[Id](64, 0L, emptyKeys)
+    val space = docSpace(e)
+    val request = EmbedBatch
+      .validated(
+        Vector(
+          EmbedRequest(
+            RequestId.unsafe("s"),
+            EmbedPayload.Raw("my sister's wedding", Sensitivity.Sensitive),
+            space.id
+          )
+        ),
+        e.spaceIds
+      )
+      .toOption
+      .get
+
+    val result = e.embed(request)
+
+    result.outcomes.head.value match
+      case Left(ExecutionFailure.Invalid(EmbedError.InvalidKey("empty key"))) => ()
+      case other => fail(s"expected InvalidKey(empty key), got $other")
+    assertEquals(result.receipt.kind, DigestKind.Withheld)
+    assertEquals(result.receipt.providerCalls, Vector.empty)
+    assertEquals(result.receipt.embeddingReceipts, Vector.empty)
+  }
+
   test("paraphrase-ish neighbours are closer than unrelated text; empty input abstains") {
     val e = HashedNgramEmbedder[Id](256, 0L)
     val space = docSpace(e)
@@ -162,6 +190,37 @@ class BaselineSuite extends ScalaCheckSuite:
     assertEquals(keysRendered.distinct.size, 3)
     // …but only the two observed vectors were stored; the abstention was not cached.
     assert(r.outcomes(2).value.exists(x => !x.isObserved))
+  }
+
+  test("caching embedder never stores a vector returned in the wrong space") {
+    val baseline = HashedNgramEmbedder[Id](64, 0L, keys)
+    val requested = docSpace(baseline)
+    val wrong = querySpace(baseline)
+    val vector = baseline
+      .embed(batch(baseline, Vector("river"), wrong))
+      .outcomes
+      .head
+      .value
+      .toOption
+      .get
+    var calls = 0
+    val wrongSpace = new Embedder[Id]:
+      val info: EmbedderInfo = baseline.info
+      val spaces: Vector[EmbeddingSpace] = baseline.spaces
+      def embed(batch: EmbedBatch): BatchResult =
+        calls += 1
+        val outcomes =
+          batch.requests.map(request => EmbedOutcome(request.id, wrong.id, Right(vector)))
+        BatchResult(outcomes, AttemptReceipt.empty)
+    val cache = EmbeddingCache.inMemory[Id]
+    val cached = new CachingEmbedder[Id](wrongSpace, cache, keys)
+    val request = batch(cached, Vector("river"), requested)
+
+    cached.embed(request)
+    cached.embed(request)
+
+    assertEquals(calls, 2)
+    assertEquals(cache.size, 0)
   }
 
   test(

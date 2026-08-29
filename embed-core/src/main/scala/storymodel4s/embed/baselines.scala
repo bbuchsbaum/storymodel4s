@@ -37,7 +37,9 @@ abstract class LocalBaseline[F[_]: Applicative] extends Embedder[F]:
     }
     val keyId = keys.currentKeyId
     SensitiveKeySnapshot.capture(keyId, keys) match
-      case Right(snapshot)      => embedNowWith(batch, snapshot.provider)
+      case Right(snapshot) => embedNowWith(batch, snapshot.provider)
+      case Left(error @ EmbedError.InvalidKey(_)) if nonPublic =>
+        LocalBaseline.invalidKey(batch, keyId, error)
       case Left(_) if nonPublic => LocalBaseline.failClosed(batch, keyId)
       case Left(_)              => embedNowWith(batch, SensitiveKeyProvider.none)
 
@@ -162,6 +164,32 @@ object LocalBaseline:
         Vector.empty,
         batch.itemSensitivity,
         missing
+      )
+    )
+
+  /** Preserve a corrupt-key error in every outcome while withholding the non-public attempt.
+    * Receipt policy still records why no sensitive identity could be minted; no work or call
+    * occurs.
+    */
+  private[embed] def invalidKey(
+      batch: EmbedBatch,
+      keyId: KeyId,
+      error: EmbedError.InvalidKey
+  ): BatchResult =
+    val denials = batch.requests.map { request =>
+      new PolicyDecision.KeyUnavailable(Some(request.id), keyId)
+    }
+    val outcomes = batch.requests.map { request =>
+      EmbedOutcome(request.id, request.space, Left(ExecutionFailure.Invalid(error)))
+    }
+    BatchResult(
+      outcomes,
+      AttemptReceipt.failClosed(
+        Vector.empty,
+        denials.map(d => d: PolicyDecision),
+        Vector(ResultDecision.BatchRejected(error)),
+        batch.itemSensitivity,
+        keyId
       )
     )
 

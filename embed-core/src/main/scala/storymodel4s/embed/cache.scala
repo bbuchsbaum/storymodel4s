@@ -175,6 +175,7 @@ final class CachingEmbedder[F[_]: Monad](
               looked.collect { case (r, Keyed.Ok(key), None) =>
                 finalOutcomes
                   .find(_.id == r.id)
+                  .filter(_.space == r.space)
                   .flatMap(_.value.toOption)
                   .flatMap(_.toOption)
                   .map(v => cache.put(key, v))
