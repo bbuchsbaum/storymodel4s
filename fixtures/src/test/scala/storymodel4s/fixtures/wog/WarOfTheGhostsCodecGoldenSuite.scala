@@ -34,11 +34,10 @@ class WarOfTheGhostsCodecGoldenSuite extends FunSuite:
 private[wog] object WarOfTheGhostsCodecGolden:
   import WarOfTheGhostsExpectations.*
 
-  /** Re-cut on 2026-08-29 for bd-01M16S2Y6YS82TE6WBWQPKNZR3: empty sensoryTerms is
-    * recorded missing instead of present-at-0.0. Sensory moves from present-at-0.0
-    * to absent; totals, flow, posterior and viewFingerprint are byte-identical.
-    * This is a recut of the record, not an estimand change: the 0.0 term was
-    * already a no-op in the sum.
+  /** Re-cut on 2026-08-29 for bd-01M16S2Y6YS82TE6WBWQPKNZR3: empty sensoryTerms is recorded missing
+    * instead of present-at-0.0. Sensory moves from present-at-0.0 to absent; totals, flow,
+    * posterior and viewFingerprint are byte-identical. This is a recut of the record, not an
+    * estimand change: the 0.0 term was already a no-op in the sum.
     *
     * Previous: 3c183c3cb4dc01dad930fcae7354fa828dbd2e8714b1901449c792552fc4fb9f, 25,598 bytes.
     */
