@@ -100,6 +100,20 @@ was set by the owner on 2026-08-28 (sticky decision
    evidence (all three platforms for portable modules), and the chief's ack in
    the thread. `codex-storymodel-release` performs the mechanical push to
    GitHub. Commits are narrow: only the paths reserved under your bead.
+
+   *Ancestry.* Before merging, verify the candidate's parent chain contains
+   only landed commits: `git merge-base --is-ancestor <unlanded> <candidate>`
+   must exit nonzero for every unlanded candidate. A tree-equality check on the
+   touched paths cannot see an unlanded — possibly blocked — commit sitting in
+   the parent chain, which is how `cf162a9` was landed and `main` had to be
+   reset on 2026-08-29.
+
+   *Stale bases.* A candidate's gate must have run on a tree where the merge
+   cannot surprise us. If the candidate and the upstream commits its base is
+   missing touch the **same file**, the author rebases and re-gates — not
+   negotiable. If they are in **different modules**, the chief merges locally
+   and gates the merged tree himself rather than charging the author a rebase,
+   and backs the merge out if it is red.
 4. **Actors and reservations.** One mote actor per session. Set your identity
    explicitly in every session — `export MOTE_ACTOR=<actor>` (and
    `mote session start --as <actor>`) or `--actor` on each call — and never run
