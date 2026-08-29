@@ -43,9 +43,38 @@ final case class RecallSignature(
     perUnitFidelity: Map[RecallUnitId, FidelityReport],
     perUnitMode: Map[RecallUnitId, FidelityMode]
 ):
-  def externalMass: Double =
-    associationMass + intrusionMass + commentaryMass + sourceConsistentInferenceMass +
-      uninterpretableMass + unrankedMass
+  /** External mass, with our own failure held apart from the participant's behaviour.
+    *
+    * Deliberately NOT a `Double`. The five attributed terms are claims about the person — they said
+    * something associative, intrusive, commentarial, source-consistently inferred, or
+    * uninterpretable. `unrankedMass` is a claim about US: the aligner could not rank the unit at
+    * all (see `AlignState.External(Unranked)`). Summing the two into one number lets our inability
+    * to align be quoted as evidence that the participant produced content outside the source — and
+    * unranked mass is highest for vaguer, sparser recall, so the error runs one way and correlates
+    * with exactly the participant properties a study compares.
+    *
+    * Returning a pair rather than a scalar is the point: a caller cannot quote the external mass
+    * without carrying the caveat, because there is no method that hands back the sum.
+    */
+  def externalMass: ExternalMassReport =
+    ExternalMassReport(
+      attributed = associationMass + intrusionMass + commentaryMass +
+        sourceConsistentInferenceMass + uninterpretableMass,
+      unranked = unrankedMass
+    )
+
+/** External mass split into what the participant did and what we could not do.
+  *
+  * There is no `total`: re-adding the two halves is exactly the conflation this type exists to
+  * prevent, and a caller that genuinely wants the sum must write it at the call site where a
+  * reviewer can see it.
+  */
+final case class ExternalMassReport(attributed: Double, unranked: Double):
+  /** Fraction of mass the aligner was able to rank at all — the coverage of `attributed`. */
+  def rankedMass: Double = 1.0 - unranked
+
+  def render: String =
+    f"external(attributed)=$attributed%.4f unranked=$unranked%.4f ranked=${rankedMass}%.4f"
 
 object RecallSignature:
 
