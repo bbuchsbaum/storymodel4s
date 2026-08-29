@@ -143,55 +143,104 @@ object TargetInduction:
     val y = b.proposition.lemmas
     if x.isEmpty || y.isEmpty then 0.0 else x.intersect(y).size.toDouble / x.union(y).size
 
-  private def continuity(
-      a: RecallUnit,
-      b: RecallUnit,
-      semantic: Option[SemanticDistance]
-  ): Double =
-    val shared =
-      a.proposition.locations.intersect(b.proposition.locations).nonEmpty ||
-        a.proposition.participants
-          .flatMap(_.entity)
-          .toSet
-          .intersect(b.proposition.participants.flatMap(_.entity).toSet)
-          .nonEmpty ||
-        a.proposition.times.intersect(b.proposition.times).nonEmpty
-    val lex = lexicalOverlap(a, b)
-    val sem = semantic.map(s => 1.0 - s.distance(a, b)).getOrElse(0.0)
-    math.max(if shared then 1.0 else 0.0, math.max(lex, sem))
+  /** Why a unit was placed in a cluster. The basis is the examinable record of the interpretation.
+    */
+  private[interview] enum PlacementBasis:
+    case OtherEpisodeMarker, ExplicitReturn, ContinuityStay, ContinuityReturn, Unattached,
+      Ambiguous
+
+  /** Cluster id plus the reason it was chosen, so address mass can stay examinable. */
+  private[interview] final case class ClusterAssignment(cluster: Int, basis: PlacementBasis)
+
+  /** One continuity predicate for staying in a digression, returning to the target, and opening an
+    * unattached cluster. Opening by [[OtherEpisodeMarker]] is a separate explicit cue.
+    */
+  private[interview] object ClusterContinuity:
+    def score(
+        a: RecallUnit,
+        b: RecallUnit,
+        semantic: Option[SemanticDistance]
+    ): Double =
+      val shared =
+        a.proposition.locations.intersect(b.proposition.locations).nonEmpty ||
+          a.proposition.participants
+            .flatMap(_.entity)
+            .toSet
+            .intersect(b.proposition.participants.flatMap(_.entity).toSet)
+            .nonEmpty ||
+          a.proposition.times.intersect(b.proposition.times).nonEmpty
+      val lex = lexicalOverlap(a, b)
+      val sem = semantic.map(s => 1.0 - s.distance(a, b)).getOrElse(0.0)
+      math.max(if shared then 1.0 else 0.0, math.max(lex, sem))
+
+    def holds(
+        a: RecallUnit,
+        b: RecallUnit,
+        semantic: Option[SemanticDistance],
+        threshold: Double
+    ): Boolean =
+      score(a, b, semantic) >= threshold
+
+    def withAny(
+        u: RecallUnit,
+        group: Vector[RecallUnit],
+        semantic: Option[SemanticDistance],
+        threshold: Double
+    ): Boolean =
+      group.exists(g => holds(u, g, semantic, threshold))
 
   /** Assign episodic units to clusters.
     *
-    * A digression (cluster ≠ 0) returns to the target only when (a) the unit carries an explicit
-    * [[ReturnMarker]] or (b) it is not continuous with any unit already in that digression.
-    * Discourse connectives are not a return.
+    * From a digression, return to the target iff (a) an explicit [[ReturnMarker]] or (b) continuity
+    * with the digression is lost AND continuity with the target holds. Lost with both opens a new
+    * cluster ([[PlacementBasis.Unattached]]). Continuous with both is [[PlacementBasis.Ambiguous]],
+    * not iteration order. Discourse connectives are not a return.
     */
   private def clusters(
       units: Vector[RecallUnit],
       classes: Map[RecallUnitId, UnitClass],
       semantic: Option[SemanticDistance],
       config: InductionConfig
-  ): Map[RecallUnitId, Int] =
-    // Cluster 0 is the default target. An OtherEpisode marker opens a digression that continues
-    // only while the next episodic unit is continuous with it and has no explicit return cue.
+  ): Map[RecallUnitId, ClusterAssignment] =
+    val threshold = config.continuityThreshold
     var current = 0
     var next = 1
     var digression: Vector[RecallUnit] = Vector.empty
-    val out = Map.newBuilder[RecallUnitId, Int]
+    var targetUnits: Vector[RecallUnit] = Vector.empty
+    val out = Map.newBuilder[RecallUnitId, ClusterAssignment]
     units.foreach { u =>
       classes.get(u.id) match
         case Some(UnitClass.OtherEpisode) =>
           current = next
           next += 1
           digression = Vector(u)
-          out += u.id -> current
+          out += u.id -> ClusterAssignment(current, PlacementBasis.OtherEpisodeMarker)
         case Some(UnitClass.Episodic) | Some(UnitClass.Summary) =>
           val lower = Text.lower(u.text)
-          if current != 0 then
-            val stays = ReturnMarker.findFirstIn(lower).isEmpty &&
-              digression.exists(d => continuity(d, u, semantic) >= config.continuityThreshold)
-            if stays then digression = digression :+ u else current = 0
-          out += u.id -> current
+          val assignment =
+            if current == 0 then ClusterAssignment(0, PlacementBasis.ContinuityStay)
+            else
+              val marked = ReturnMarker.findFirstIn(lower).nonEmpty
+              val withDig = ClusterContinuity.withAny(u, digression, semantic, threshold)
+              val withTarget = ClusterContinuity.withAny(u, targetUnits, semantic, threshold)
+              if marked then
+                current = 0
+                ClusterAssignment(0, PlacementBasis.ExplicitReturn)
+              else if withDig && !withTarget then
+                digression = digression :+ u
+                ClusterAssignment(current, PlacementBasis.ContinuityStay)
+              else if !withDig && withTarget then
+                current = 0
+                ClusterAssignment(0, PlacementBasis.ContinuityReturn)
+              else if withDig && withTarget then
+                ClusterAssignment(current, PlacementBasis.Ambiguous)
+              else
+                current = next
+                next += 1
+                digression = Vector(u)
+                ClusterAssignment(current, PlacementBasis.Unattached)
+          if assignment.cluster == 0 then targetUnits = targetUnits :+ u
+          out += u.id -> assignment
         case _ => ()
     }
     out.result()
@@ -250,8 +299,13 @@ object TargetInduction:
     val units = graph.ordered
     val classes = units.map(u => u.id -> classify(u)).toMap
     val cl = clusters(units, classes, semantic, config)
+    val clusterOf: Map[RecallUnitId, Int] = cl.view.mapValues(_.cluster).toMap
     val byCluster: Map[Int, Vector[RecallUnit]] =
-      units.filter(u => cl.contains(u.id)).groupBy(u => cl(u.id))
+      units
+        .filter { u =>
+          cl.get(u.id).exists(a => a.basis != PlacementBasis.Ambiguous)
+        }
+        .groupBy(u => clusterOf(u.id))
 
     // Target selection: cue compatibility + prominence (unit share) + coherence (relations/locs).
     val scored: Vector[(Int, Double)] = byCluster.toVector
@@ -328,7 +382,7 @@ object TargetInduction:
     val altAddr: Option[MemoryAddress] =
       alternatives.headOption.map(a => MemoryAddress.Episode(a._1.id, EpisodeScope.OtherSpecific))
 
-    def episodicAddress(k: Int): Distribution[MemoryAddress] =
+    def clusterAddress(k: Int): Distribution[MemoryAddress] =
       if targetCluster.contains(k) then
         targetAddr match
           case None    => Distribution.point(MemoryAddress.Unresolved)
@@ -345,6 +399,23 @@ object TargetInduction:
               MemoryAddress.Episode(o.id, EpisodeScope.OtherSpecific) -> config.otherMass,
               targetAddr.map(_ -> 0.6).toVector :+ (MemoryAddress.Unresolved -> 0.4)
             )
+
+    def episodicAddress(assignment: ClusterAssignment): Distribution[MemoryAddress] =
+      val otherAddr = others.get(assignment.cluster).map { o =>
+        MemoryAddress.Episode(o.id, EpisodeScope.OtherSpecific)
+      }
+      assignment.basis match
+        case PlacementBasis.Unattached =>
+          dist(
+            MemoryAddress.Unresolved -> 0.55,
+            otherAddr.map(_ -> 1.0).toVector
+          )
+        case PlacementBasis.Ambiguous =>
+          dist(
+            MemoryAddress.Unresolved -> 0.4,
+            targetAddr.map(_ -> 0.5).toVector ++ otherAddr.map(_ -> 0.5).toVector
+          )
+        case _ => clusterAddress(assignment.cluster)
 
     def discourse(f: InterviewDiscourseFunction): Distribution[MemoryAddress] =
       dist(

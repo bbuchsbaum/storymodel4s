@@ -24,11 +24,14 @@ class InterviewInductionSuite extends FunSuite:
     val ds = g.ordered.flatMap(u => AtomProjection.fromUnit(u, TurnId.unsafe("t")))
     (g, ds, TargetInduction.induce(g, ds, Cue("birthday cake", None, Some("birthday"))))
 
-  private def modeOf(text: String, fragment: String): MemoryAddress =
+  private def distOf(text: String, fragment: String): Distribution[MemoryAddress] =
     val (g, ds, r) = induce(text)
     val u = g.ordered.find(_.text.toLowerCase.contains(fragment)).get
     val d = ds.find(_.sourceUnit == u.id).get
-    r.addresses(d.id).mode
+    r.addresses(d.id)
+
+  private def modeOf(text: String, fragment: String): MemoryAddress =
+    distOf(text, fragment).mode
 
   test("embedded retrieval-failure language does not erase an episodic unit") {
     val text = "I remember we ate cake but I don't remember the street."
@@ -77,7 +80,7 @@ class InterviewInductionSuite extends FunSuite:
       case other => fail(s"expected OtherSpecific, got $other")
   }
 
-  test("loss of continuity still returns to the target without a connective") {
+  test("lost digression continuity returns only when the target still holds") {
     val text =
       "We ate cake at the restaurant. The year before we went to Montreal. The waiter brought a cake."
     modeOf(text, "the waiter brought") match
@@ -91,4 +94,53 @@ class InterviewInductionSuite extends FunSuite:
     modeOf(text, "anyway we sang") match
       case MemoryAddress.Episode(_, EpisodeScope.TargetSpecific) => ()
       case other => fail(s"expected TargetSpecific, got $other")
+  }
+
+  test("ClusterContinuity is symmetric and is the stay/return predicate") {
+    val text =
+      "We ate cake at the restaurant. The year before we went to Montreal. Then we walked around Montreal."
+    val (g, _, _) = induce(text)
+    val cake = g.ordered.find(_.text.toLowerCase.contains("ate cake")).get
+    val montreal = g.ordered.find(_.text.toLowerCase.contains("year before")).get
+    val walk = g.ordered.find(_.text.toLowerCase.contains("walked")).get
+    val th = InductionConfig.default.continuityThreshold
+    assertEquals(
+      TargetInduction.ClusterContinuity.holds(montreal, walk, None, th),
+      TargetInduction.ClusterContinuity.holds(walk, montreal, None, th)
+    )
+    assert(TargetInduction.ClusterContinuity.holds(montreal, walk, None, th))
+    assert(!TargetInduction.ClusterContinuity.holds(cake, walk, None, th))
+    modeOf(text, "walked around montreal") match
+      case MemoryAddress.Episode(_, EpisodeScope.OtherSpecific) => ()
+      case other => fail(s"stay must match ClusterContinuity, got $other")
+  }
+
+  test("discontinuous with both digression and target is not a silent target") {
+    val text =
+      "We ate cake at the restaurant. The year before we went to Montreal. The dog barked in the park."
+    val addr = distOf(text, "the dog barked")
+    assertEquals(addr.mode, MemoryAddress.Unresolved)
+    assert(!addr.support.exists(_.isTargetSpecific), addr.support.toString)
+    assert(
+      addr.support.exists {
+        case MemoryAddress.Episode(_, EpisodeScope.OtherSpecific) => true
+        case _                                                    => false
+      },
+      addr.support.toString
+    )
+  }
+
+  test("continuous with both digression and target is recorded as ambiguous") {
+    val text =
+      "We ate cake at the restaurant. The year before we went to Montreal. We ate cake in Montreal."
+    val addr = distOf(text, "ate cake in montreal")
+    assertEquals(addr.mode, MemoryAddress.Unresolved)
+    assert(addr.support.exists(_.isTargetSpecific), addr.support.toString)
+    assert(
+      addr.support.exists {
+        case MemoryAddress.Episode(_, EpisodeScope.OtherSpecific) => true
+        case _                                                    => false
+      },
+      addr.support.toString
+    )
   }
