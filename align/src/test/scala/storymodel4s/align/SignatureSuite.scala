@@ -10,6 +10,13 @@ import munit.FunSuite
   * differ.
   */
 class SignatureSuite extends FunSuite:
+  import AnnaFixture.*
+
+  private lazy val sig: RecallSignature =
+    val result = GraphHsmm
+      .infer(recall, view, candidates, costModel)
+      .fold(e => fail(e.message), identity)
+    RecallSignature.compute(result, recall, view)
 
   private val eps = 1e-12
 
@@ -123,4 +130,59 @@ class SignatureSuite extends FunSuite:
     // The control: the accessors that SHOULD exist do.
     assert(scala.compiletime.testing.typeChecks("ExternalMassReport(0.1, 0.2).attributed"))
     assert(scala.compiletime.testing.typeChecks("ExternalMassReport(0.1, 0.2).unranked"))
+  }
+
+  // --- the projection abstains instead of inventing (chief/scout estimand audit) ---
+
+  test("a weight naming a component that does not exist is an error, not a dropped term") {
+    val typo = SignatureProjection("v0", Map("uniformCoverge" -> 1.0))
+    typo(sig) match
+      case Left(ProjectionError.UnknownComponent(n)) => assertEquals(n, "uniformCoverge")
+      case other => fail(s"a typo silently dropped a whole dimension: $other")
+  }
+
+  test("a weighted component with no measurement abstains, it does not score zero") {
+    // Zero is the worst possible value for a coverage-like component and the best under a negative
+    // weight, so substituting it turns 'not measured' into a substantive claim in either direction.
+    assume(sig.worldChronology.isEmpty || sig.causalPreservation.isEmpty, "fixture has no gap")
+    val name = if sig.worldChronology.isEmpty then "worldChronology" else "causalPreservation"
+    SignatureProjection("v0", Map(name -> 1.0))(sig) match
+      case Left(ProjectionError.MissingComponent(n)) => assertEquals(n, name)
+      case other => fail(s"a missing component was scored rather than abstained: $other")
+  }
+
+  test("a projection over present components still produces a number") {
+    val p = SignatureProjection("v0", Map("uniformCoverage" -> 1.0, "intrusionMass" -> -1.0))
+    assert(p(sig).isRight, p(sig).toString)
+  }
+
+  test("a recall with no comparable transition has NO chronology, not a perfect one") {
+    // The failure this replaces: `ordered(...)` already abstained when no step carried directional
+    // mass, and the caller substituted 1.0 - PERFECT forward chronology - for a recall we could not
+    // place at all. The best possible score, published from no evidence whatsoever.
+    val transcript =
+      storymodel4s.core.StorySource.fromText("nothing here.", Some("probe")).toOption.get
+    val silent = storymodel4s.recall.RecallGraph(
+      transcript,
+      storymodel4s.core.SurfaceAnalyzer.analyze(transcript),
+      Vector.empty,
+      storymodel4s.recall.RecallRelations.empty
+    )
+    val proof = HsmmResult
+      .validated(
+        silent,
+        view,
+        Map.empty,
+        AlignmentMatrix.of(Vector.empty).toOption.get,
+        TransitionFlow(Vector.empty),
+        Vector.empty,
+        -1.0,
+        Map.empty,
+        0
+      )
+      .fold(e => fail(e.message), identity)
+    val s = RecallSignature.compute(proof, silent, view)
+    assertEquals(s.discourseChronology, None, "no eligible step must not report perfect chronology")
+    assertEquals(s.backwardMass, None, "no eligible step must not report zero backward movement")
+    assertEquals(s.worldBackwardMass, None)
   }

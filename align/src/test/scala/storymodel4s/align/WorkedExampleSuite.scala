@@ -243,16 +243,16 @@ class WorkedExampleSuite extends FunSuite:
       sig.uniformCoverage > 0.25 && sig.uniformCoverage < 0.85,
       s"coverage = ${sig.uniformCoverage}"
     )
-    assert(sig.backwardMass > 0.1, s"backward = ${sig.backwardMass}")
+    assert(sig.backwardMass.exists(_ > 0.1), s"backward = ${sig.backwardMass}")
     assert(sig.worldBackwardMass.exists(_ > 0.1), s"world backward = ${sig.worldBackwardMass}")
-    assert(sig.discourseChronology < 1.0)
+    assert(sig.discourseChronology.exists(_ < 1.0), sig.discourseChronology.toString)
     assert(sig.fidelity.exists(_ > 0.5), s"fidelity = ${sig.fidelity}")
     assert(sig.perUnitFidelity.contains(u2.id))
     assert(sig.specificity.exists(s => s > 0.0 && s <= 1.0), sig.specificity.toString)
     assertEqualsDouble(sig.unrankedMass, 0.0, 0.0)
     val scalar =
       SignatureProjection("v0", Map("uniformCoverage" -> 1.0, "intrusionMass" -> -1.0))(sig)
-    assert(scalar > 0.0)
+    assert(scalar.exists(_ > 0.0), scalar.toString)
   }
 
   test("causal preservation needs two distinct recalled units linked by a recall causal edge") {

@@ -38,14 +38,17 @@ enum DiagnosticReason:
   */
 final case class ClockPanel(
     caseId: String,
-    discourseChronology: Double,
+    discourseChronology: Option[Double],
     worldChronology: Option[Double],
     compression: Double,
-    backwardMass: Double,
+    backwardMass: Option[Double],
     worldBackwardMass: Option[Double]
 ):
   def render: String =
-    f"$caseId: discourse=$discourseChronology%.3f world=${worldChronology.map(w => f"$w%.3f").getOrElse("n/a")} compression=$compression%.3f backward=$backwardMass%.3f worldBackward=${worldBackwardMass.map(w => f"$w%.3f").getOrElse("n/a")}"
+    def num(v: Option[Double]) = v.map(x => f"$x%.3f").getOrElse("n/a")
+    s"$caseId: discourse=${num(discourseChronology)} world=${num(worldChronology)} " +
+      f"compression=$compression%.3f backward=${num(backwardMass)} " +
+      s"worldBackward=${num(worldBackwardMass)}"
 
 /** One channel run over one case: the proof, its fingerprints, and the observations. */
 final case class CaseRun(

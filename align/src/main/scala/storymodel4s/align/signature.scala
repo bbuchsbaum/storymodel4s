@@ -25,7 +25,7 @@ final case class RecallSignature(
     fidelity: Option[Double],
     specificity: Option[Double],
     compression: Double,
-    discourseChronology: Double,
+    discourseChronology: Option[Double],
     worldChronology: Option[Double],
     causalPreservation: Option[Double],
     semanticFlowCoherence: Double,
@@ -37,7 +37,7 @@ final case class RecallSignature(
     unrankedMass: Double,
     distortedMass: Double,
     distortedMassByFacet: Map[Facet, Double],
-    backwardMass: Double,
+    backwardMass: Option[Double],
     worldBackwardMass: Option[Double],
     perUnitLocalizability: Map[RecallUnitId, Double],
     perUnitFidelity: Map[RecallUnitId, FidelityReport],
@@ -134,15 +134,29 @@ object RecallSignature:
       val fw = f.steps.map(_.sourceMass(isForward(pos))).sum
       val bw = f.steps.map(_.sourceMass(isBackward(pos))).sum
       if fw + bw <= 0 then None else Some(fw / (fw + bw))
-    def backwardMean(pos: SourceNodeRef => Option[Double]): Double =
-      f.steps.map(_.sourceMass(isBackward(pos))).sum / math.max(1, f.steps.size)
+
+    /** Mean per-step backward mass, or `None` when no step carries any anchor-to-anchor mass.
+      *
+      * Dividing by `max(1, steps.size)` returned 0.0 for a recall with no comparable transition at
+      * all, which reads as "this person never moved backwards" when the truth is that we never saw
+      * a move to judge.
+      */
+    def backwardMean(pos: SourceNodeRef => Option[Double]): Option[Double] =
+      val comparable = f.steps.filter(st =>
+        st.sourceMass(isBackward(pos)) > 0.0 || st.sourceMass(isForward(pos)) > 0.0
+      )
+      if comparable.isEmpty then None
+      else Some(f.steps.map(_.sourceMass(isBackward(pos))).sum / comparable.size)
     val discoursePos: SourceNodeRef => Option[Double] = r => Some(view.relativePosition(r))
     val worldPos: Option[SourceNodeRef => Option[Double]] =
       view.worldOrder.map(o => r => o.get(r).map(_.toDouble))
-    val discourse = ordered(discoursePos).getOrElse(1.0)
+    // `ordered` already abstains when no step carries directional mass; the previous
+    // `.getOrElse(1.0)` threw that away and published PERFECT forward chronology for a recall we
+    // could not place at all. The honest value is None.
+    val discourse = ordered(discoursePos)
     val world = worldPos.flatMap(ordered)
     val backward = backwardMean(discoursePos)
-    val worldBackward = worldPos.map(backwardMean)
+    val worldBackward = worldPos.flatMap(backwardMean)
 
     val causalEdges = view.adjacency(RelationLayer.Causal).toVector.sortBy(_._1.key).flatMap {
       case (a, m) => m.toVector.sortBy(_._1.key).collect { case (b, w) if w > 0 => (a, b) }
@@ -235,27 +249,53 @@ object RecallSignature:
     }
     view.leaves.map(n => n.ref -> (1.0 - math.exp(-acc(n.ref)))).toMap
 
-/** A declared scalar projection of the signature: explicit, versioned weights. */
+/** Why a scalar projection could not be produced. Both cases used to be silent zeros. */
+enum ProjectionError:
+  /** A weight names a component that does not exist — a typo used to delete a term. */
+  case UnknownComponent(name: String)
+
+  /** A weighted component has no measurement; the projection abstains rather than inventing one. */
+  case MissingComponent(name: String)
+
+  def message: String = this match
+    case UnknownComponent(n) => s"projection weight names no such signature component: $n"
+    case MissingComponent(n) => s"projection weights $n, which this signature did not measure"
+
+/** A declared scalar projection of the signature: explicit, versioned weights.
+  *
+  * Returns `Either` because both failure modes are real and were previously invisible: a weight
+  * naming a component that does not exist silently dropped the term (a typo cost you a whole
+  * dimension of the score), and a component with no measurement was substituted with 0.0, so "we
+  * did not measure this" became "this scored worst" — or, under a negative weight, best.
+  */
 final case class SignatureProjection(version: String, weights: Map[String, Double]):
-  def apply(s: RecallSignature): Double =
-    val comps: Map[String, Double] = Map(
-      "uniformCoverage" -> s.uniformCoverage,
-      "importanceWeightedCoverage" -> s.importanceWeightedCoverage,
-      "fidelity" -> s.fidelity.getOrElse(0.0),
-      "specificity" -> s.specificity.getOrElse(0.0),
-      "compression" -> s.compression,
+  def apply(s: RecallSignature): Either[ProjectionError, Double] =
+    val comps: Map[String, Option[Double]] = Map(
+      "uniformCoverage" -> Some(s.uniformCoverage),
+      "importanceWeightedCoverage" -> Some(s.importanceWeightedCoverage),
+      "fidelity" -> s.fidelity,
+      "specificity" -> s.specificity,
+      "compression" -> Some(s.compression),
       "discourseChronology" -> s.discourseChronology,
-      "worldChronology" -> s.worldChronology.getOrElse(0.0),
-      "causalPreservation" -> s.causalPreservation.getOrElse(0.0),
-      "semanticFlowCoherence" -> s.semanticFlowCoherence,
-      "associationMass" -> s.associationMass,
-      "intrusionMass" -> s.intrusionMass,
-      "commentaryMass" -> s.commentaryMass,
-      "sourceConsistentInferenceMass" -> s.sourceConsistentInferenceMass,
-      "uninterpretableMass" -> s.uninterpretableMass,
-      "unrankedMass" -> s.unrankedMass,
-      "distortedMass" -> s.distortedMass,
+      "worldChronology" -> s.worldChronology,
+      "causalPreservation" -> s.causalPreservation,
+      "semanticFlowCoherence" -> Some(s.semanticFlowCoherence),
+      "associationMass" -> Some(s.associationMass),
+      "intrusionMass" -> Some(s.intrusionMass),
+      "commentaryMass" -> Some(s.commentaryMass),
+      "sourceConsistentInferenceMass" -> Some(s.sourceConsistentInferenceMass),
+      "uninterpretableMass" -> Some(s.uninterpretableMass),
+      "unrankedMass" -> Some(s.unrankedMass),
+      "distortedMass" -> Some(s.distortedMass),
       "backwardMass" -> s.backwardMass,
-      "worldBackwardMass" -> s.worldBackwardMass.getOrElse(0.0)
+      "worldBackwardMass" -> s.worldBackwardMass
     )
-    weights.toVector.sortBy(_._1).map { case (k, w) => w * comps.getOrElse(k, 0.0) }.sum
+    val terms = weights.toVector.sortBy(_._1).map { case (k, w) =>
+      comps.get(k) match
+        case None          => Left(ProjectionError.UnknownComponent(k))
+        case Some(None)    => Left(ProjectionError.MissingComponent(k))
+        case Some(Some(v)) => Right(w * v)
+    }
+    terms.collectFirst { case Left(e) => e } match
+      case Some(e) => Left(e)
+      case None    => Right(terms.collect { case Right(v) => v }.sum)
