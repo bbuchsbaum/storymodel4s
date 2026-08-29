@@ -215,3 +215,26 @@ class LeakageSuite extends FunSuite:
     assert(f.highMean.isInstanceOf[Estimate.Missing[?]], f.render)
     assertEquals(f.gain, None)
   }
+
+  test("the invariant that makes the empty-baseline-gain branch unreachable") {
+    // assess() guards against baselines that exist but yield no computable gain. That branch is
+    // unreachable only because a finding with both arms non-empty always has an observed mean in
+    // each, hence a gain. Pin the invariant here: if someone later lets an arm report a positive
+    // story count with a Missing estimate, this fails and points at the guard rather than letting
+    // a "Clear" verdict quietly mean "nothing was measured".
+    val shapes = Vector(
+      Map("famous-1" -> 0.1, "obscure-1" -> 0.9),
+      Map("famous-1" -> 0.5, "famous-2" -> 0.5, "obscure-1" -> 0.5),
+      Map("famous-1" -> 0.0, "obscure-1" -> 0.0, "unscored-1" -> 1.0),
+      Map("famous-2" -> 1.0, "obscure-2" -> 0.25, "not-in-manifest" -> 0.75)
+    )
+    for (scores, i) <- shapes.zipWithIndex do
+      val reports = Vector(
+        channelReport(s"base-$i", ChannelExposure.NonMemorizing, scores),
+        channelReport(s"prov-$i", ChannelExposure.Memorizing, scores)
+      )
+      for f <- LeakageControl.assess(reports, riskOf, metric).findings do
+        if f.highStories > 0 && f.lowStories > 0 then
+          assert(f.gain.isDefined, s"both arms non-empty but no gain: ${f.render}")
+        else assertEquals(f.gain, None, f.render)
+  }
