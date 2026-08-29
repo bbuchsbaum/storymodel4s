@@ -1,0 +1,1 @@
+{"actor":"cursor-grok-storymodel4s","entity":"bd-01M16TAM38RKYXVJK113Y83M4B","kind":"note","note_kind":"progress","op":"20260829T131946.317188Z-p73196-c0002-r7a81-hcc5914","text":"read-only clusterAssignments so the fixture can assert PlacementBasis.Ambiguous; no threshold/arithmetic change","ts":"2026-08-29T13:19:46.317188Z","v":1}
