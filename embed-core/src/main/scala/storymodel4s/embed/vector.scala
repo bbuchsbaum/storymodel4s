@@ -55,28 +55,26 @@ final class ValidatedVector private (
 object ValidatedVector:
   /** Relative tolerance on the unit norm for `L2` vectors.
     *
-    * '''It defends a FLOAT32 ROUND TRIP, not float64 arithmetic''', and that is the whole
-    * reason for its magnitude. `Dtype.Float32` is a real storage type here
-    * (`codec/sidecar.scala:953`, `:978`, `:1068`), so a unit vector written as float32 and
-    * widened back to double does not return with norm exactly `1.0` — it returns a few
-    * float32 epsilons away. float32 epsilon is `1.1920929e-07`, so `1e-6` is roughly `8.4x`
-    * headroom: an ordinary margin, not slack.
+    * '''It defends a FLOAT32 ROUND TRIP, not float64 arithmetic''', and that is the whole reason
+    * for its magnitude. `Dtype.Float32` is a real storage type here (`codec/sidecar.scala:953`,
+    * `:978`, `:1068`), so a unit vector written as float32 and widened back to double does not
+    * return with norm exactly `1.0` — it returns a few float32 epsilons away. float32 epsilon is
+    * `1.1920929e-07`, so `1e-6` is roughly `8.4x` headroom: an ordinary margin, not slack.
     *
     * Stated because the value looks indefensible if you compute against the wrong precision.
-    * Accumulated error in a float64 L2 normalization is nearer `1e-15`, which makes `1e-6`
-    * appear nine orders of magnitude too wide — and the chief proposed tightening it on
-    * exactly that reasoning (2026-08-29) before measuring the premise rather than the
-    * arithmetic.
+    * Accumulated error in a float64 L2 normalization is nearer `1e-15`, which makes `1e-6` appear
+    * nine orders of magnitude too wide — and the chief proposed tightening it on exactly that
+    * reasoning (2026-08-29) before measuring the premise rather than the arithmetic.
     *
-    * It also currently protects a path no caller takes: every `L2` construction in `main`
-    * either divides by the norm first ([[l2]], and `:40`) or routes through `l2`. A constant
-    * defending an unexercised path, with no statement of what it defends, is the shape that
-    * invites a wrong "cleanup". Do not tighten it without first measuring the precision of
-    * whatever provider is actually supplying vectors.
+    * It also currently protects a path no caller takes: every `L2` construction in `main` either
+    * divides by the norm first ([[l2]], and `:40`) or routes through `l2`. A constant defending an
+    * unexercised path, with no statement of what it defends, is the shape that invites a wrong
+    * "cleanup". Do not tighten it without first measuring the precision of whatever provider is
+    * actually supplying vectors.
     *
-    * NOT TRACED: that a decoded float32 sidecar row reaches [[of]] with `Normalization.L2`
-    * today. float32 storage exists and this is the right order for it; the end-to-end path is
-    * unverified. Permits, not occurs.
+    * NOT TRACED: that a decoded float32 sidecar row reaches [[of]] with `Normalization.L2` today.
+    * float32 storage exists and this is the right order for it; the end-to-end path is unverified.
+    * Permits, not occurs.
     */
   val NormTolerance: Double = 1e-6
 
