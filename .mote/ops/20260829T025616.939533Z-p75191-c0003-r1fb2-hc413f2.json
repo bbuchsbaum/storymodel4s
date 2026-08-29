@@ -1,0 +1,1 @@
+{"actor":"codex-storymodel4s-root","entity":"bd-01M15PQPJJHGM5KABPDRZ5VM50","kind":"note","note_kind":"progress","op":"20260829T025616.939533Z-p75191-c0003-r1fb2-hc413f2","text":"Move source/recall/title canary scan to portable golden suite; JVM suite retains resource byte equality and checksum only","ts":"2026-08-29T02:56:16.939533Z","v":1}
