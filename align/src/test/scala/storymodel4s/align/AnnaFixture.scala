@@ -34,6 +34,36 @@ object AnnaFixture:
   private def supportRange(a: Int, b: Int): SpanSet =
     SpanSet.unsafe((a to b).map(i => SpanRef(Some(sentences(i).id), sentences(i).span))*)
 
+  /** Normalize fixture node terms through the same pipeline used by [[StorySourceView]]. */
+  private def nodeLemmasFrom(terms: Vector[String]): Set[String] =
+    terms.iterator.flatMap(Lexical.stems).toSet
+
+  private[align] val e1LemmaInputs =
+    Vector("anna", "arrive", "isolated", "house", "woman", "go", "enter")
+  private[align] val e2LemmaInputs =
+    Vector("anna", "hear", "scream", "cellar", "noise", "sound")
+  private[align] val e3LemmaInputs = Vector("anna", "search", "upstairs", "look")
+  private[align] val e4LemmaInputs =
+    Vector("anna", "enter", "cellar", "go", "downstairs", "basement")
+  private[align] val e5LemmaInputs =
+    Vector("anna", "find", "brother", "injured", "cellar", "downstairs")
+  private[align] val sc1LemmaInputs =
+    Vector("anna", "arrive", "house", "hear", "scream", "cellar", "noise")
+  private[align] val sc2LemmaInputs =
+    Vector("anna", "search", "enter", "find", "brother", "cellar", "upstairs", "house")
+  private[align] val rootLemmaInputs = Vector("anna", "house", "brother", "cellar", "story")
+
+  private[align] val nodeLemmaInputs: Vector[(SourceNodeRef, Vector[String])] = Vector(
+    e1 -> e1LemmaInputs,
+    e2 -> e2LemmaInputs,
+    e3 -> e3LemmaInputs,
+    e4 -> e4LemmaInputs,
+    e5 -> e5LemmaInputs,
+    sc1 -> sc1LemmaInputs,
+    sc2 -> sc2LemmaInputs,
+    root -> rootLemmaInputs
+  )
+
   val anna: ParticipantSummary =
     ParticipantSummary(SketchRole.Agent, "Anna", Set("she", "woman", "girl", "her"))
   val brother: ParticipantSummary =
@@ -56,7 +86,7 @@ object AnnaFixture:
       Positive,
       Asserted,
       Vector("house"),
-      Set("anna", "arrive", "isolated", "house", "woman", "go", "enter")
+      nodeLemmasFrom(e1LemmaInputs)
     ),
     NodeSummary(
       e2,
@@ -70,7 +100,7 @@ object AnnaFixture:
       Positive,
       Asserted,
       Vector("cellar"),
-      Set("anna", "hear", "scream", "cellar", "noise", "sound")
+      nodeLemmasFrom(e2LemmaInputs)
     ),
     NodeSummary(
       e3,
@@ -84,7 +114,7 @@ object AnnaFixture:
       Positive,
       Asserted,
       Vector("upstairs"),
-      Set("anna", "search", "upstairs", "look")
+      nodeLemmasFrom(e3LemmaInputs)
     ),
     NodeSummary(
       e4,
@@ -101,7 +131,7 @@ object AnnaFixture:
       Positive,
       Asserted,
       Vector("cellar", "downstairs"),
-      Set("anna", "enter", "cellar", "go", "downstairs", "basement")
+      nodeLemmasFrom(e4LemmaInputs)
     ),
     NodeSummary(
       e5,
@@ -115,7 +145,7 @@ object AnnaFixture:
       Positive,
       Asserted,
       Vector("cellar", "downstairs"),
-      Set("anna", "find", "brother", "injured", "cellar", "downstairs"),
+      nodeLemmasFrom(e5LemmaInputs),
       outcome = Some("brother found")
     ),
     NodeSummary(
@@ -130,7 +160,7 @@ object AnnaFixture:
       Positive,
       Asserted,
       Vector("house", "cellar"),
-      Set("anna", "arrive", "house", "hear", "scream", "cellar", "noise")
+      nodeLemmasFrom(sc1LemmaInputs)
     ),
     NodeSummary(
       sc2,
@@ -144,7 +174,7 @@ object AnnaFixture:
       Positive,
       Asserted,
       Vector("upstairs", "cellar", "house"),
-      Set("anna", "search", "enter", "find", "brother", "cellar", "upstairs", "house")
+      nodeLemmasFrom(sc2LemmaInputs)
     ),
     NodeSummary(
       root,
@@ -158,7 +188,7 @@ object AnnaFixture:
       Positive,
       Asserted,
       Vector("house"),
-      Set("anna", "house", "brother", "cellar", "story")
+      nodeLemmasFrom(rootLemmaInputs)
     )
   )
 
