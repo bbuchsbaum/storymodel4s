@@ -1,13 +1,13 @@
 package storymodel4s.laws
 
-import cats.data.NonEmptyVector
+import cats.data.{NonEmptySet, NonEmptyVector}
 import org.scalacheck.{Arbitrary, Gen}
 import storymodel4s.core.*
 import storymodel4s.features.{FeatureAddress, FeatureTarget}
 import storymodel4s.proposition.ParticipantRole
 import storymodel4s.story.*
 import storymodel4s.recall.{RecallEntityId, RecallRef, RecallTemporalRelation, RecallUnitId}
-import storymodel4s.align.{AlignRef, AlignState, ExternalState, SourceNodeRef}
+import storymodel4s.align.{AlignRef, AlignState, ExternalState, Facet, SourceNodeRef}
 
 /** Generators for the address protocol and every module's typed reference. */
 object AddressGens:
@@ -187,9 +187,22 @@ object AddressGens:
     yield RecallRef.Elaboration(f, t)
   )
 
+  private val sourceNodeRef: Gen[SourceNodeRef] = Gen.oneOf(
+    sit.map(SourceNodeRef.Situation.apply),
+    seg.map(SourceNodeRef.Segment.apply)
+  )
+
+  private val facetSet: Gen[NonEmptySet[Facet]] =
+    Gen
+      .nonEmptyListOf(Gen.oneOf(Facet.values.toSeq))
+      .map(fs => NonEmptySet.fromSetUnsafe(scala.collection.immutable.SortedSet.from(fs)))
+
   val alignState: Gen[AlignState] = Gen.oneOf(
-    sit.map(s => AlignState.Source(SourceNodeRef.Situation(s))),
-    seg.map(s => AlignState.Source(SourceNodeRef.Segment(s))),
+    sourceNodeRef.map(AlignState.Source.apply),
+    for
+      ref <- sourceNodeRef
+      facets <- facetSet
+    yield AlignState.Distorted(ref, facets),
     Gen.oneOf(ExternalState.values.toSeq).map(AlignState.External.apply)
   )
 

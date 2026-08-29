@@ -16,19 +16,9 @@ enum AlignRef:
   * `external/<ExternalState>`.
   */
 object AlignStateKey:
-  def parts(s: AlignState): Vector[String] = s match
-    case AlignState.Source(SourceNodeRef.Situation(id)) => Vector("situation", id.value)
-    case AlignState.Source(SourceNodeRef.Segment(id))   => Vector("segment", id.value)
-    case AlignState.External(e)                         => Vector("external", e.toString)
+  def parts(s: AlignState): Vector[String] = AlignState.keyParts(s)
 
-  def parse(parts: Vector[String]): Option[AlignState] = parts match
-    case Vector("situation", id) =>
-      SituationId.from(id).toOption.map(i => AlignState.Source(SourceNodeRef.Situation(i)))
-    case Vector("segment", id) =>
-      SegmentId.from(id).toOption.map(i => AlignState.Source(SourceNodeRef.Segment(i)))
-    case Vector("external", e) =>
-      ExternalState.values.find(_.toString == e).map(AlignState.External.apply)
-    case _ => None
+  def parse(parts: Vector[String]): Option[AlignState] = AlignState.parseKeyParts(parts)
 
 object AlignRef:
   val Tag: ModuleTag = ModuleTag.unsafe("align")
@@ -57,20 +47,24 @@ object AlignRef:
       def u(s: String) = RecallUnitId.from(s).toOption
       kind match
         case Kinds.cell =>
-          if parts.length != 3 then None
-          else
+          parts.headOption.flatMap { rawUnit =>
             for
-              unit <- u(parts(0))
+              unit <- u(rawUnit)
               st <- AlignStateKey.parse(parts.drop(1))
             yield AlignRef.Cell(unit, st)
+          }
         case Kinds.transition =>
-          if parts.length != 6 then None
+          if parts.length < 6 then None
           else
             for
               f <- u(parts(0))
               t <- u(parts(1))
-              a <- AlignStateKey.parse(parts.slice(2, 4))
-              b <- AlignStateKey.parse(parts.slice(4, 6))
-            yield AlignRef.Transition(f, t, a, b)
+              states <- Vector(2, 4).flatMap { split =>
+                for
+                  a <- AlignStateKey.parse(parts.slice(2, 2 + split))
+                  b <- AlignStateKey.parse(parts.drop(2 + split))
+                yield (a, b)
+              }.headOption
+            yield AlignRef.Transition(f, t, states._1, states._2)
         case _ => None
     }(addr)
