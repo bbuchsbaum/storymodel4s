@@ -63,6 +63,22 @@ mechanical removal: it had no conditioning mass, so choosing one was an estimand
 than an author's guess. Ruled to compression's shape — `N = Σ sourceMass·localizability`,
 `A = Σ sourceMass`, `T` = total row mass — on `post-01M16EMSQN1N134AEM3AWTWS44`.
 
+## Why this matters — one measured number
+
+`discourseChronology` on the worked example publishes **0.0468**, resting on **25.6%** of the
+route (conditioning mass 0.7676 of a total step mass of 3.0000). `worldChronology` is the same.
+The value is not wrong — `fw/(fw+bw)` was always a ratio of sums — what was missing was **T**.
+Only *ordered* pairs can be forward or backward at all; a step onto an ancestor, or onto a node
+with no position, is **unjudgeable, not disordered**.
+
+So two participants could both report 0.0468 while one rests on 90% of their route and the other
+on 5%, and until that field carried its support **nothing in the type could tell them apart**.
+
+*War of the Ghosts* is curated, adjudicated, and deliberately well-formed. If it is at 25.6%, real
+interview data will not be better — which means every chronology comparison run on this library so
+far has been over an unstated and probably wildly varying denominator. That is the empirical case
+for this whole migration, and it is worth more than the argument for it.
+
 ## Consumers that substitute a constant
 
 These are the live consequence of the table above — the point where an untyped absence becomes a
