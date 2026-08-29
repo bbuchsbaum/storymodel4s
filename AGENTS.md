@@ -39,6 +39,15 @@ Package namespace is flat `storymodel4s.<module>`.
 - Warnings are errors in spirit: keep `-Wunused:all -Wvalue-discard` clean.
 - munit + munit-scalacheck at test scope; law suites in `laws` use discipline-munit.
 - `Test / parallelExecution := false`.
+- **sbt does not build in a linked git worktree.** sbt-git's jgit backend raises
+  `NoWorkTreeException` (or `MissingObjectException`) when `.git` is a file
+  pointing at the parent repository, which is how `git worktree add` sets things
+  up. This has cost several sessions time. Two workarounds, both proven here:
+  export the exact commit and build that — `mkdir -p $DIR && git archive <sha> |
+  tar -x -C $DIR` — which is also what the chief's gate does so evidence is
+  bound to a SHA rather than a dirty tree; or build in a standalone clone. A
+  `zz-worktree-local.sbt` shim pinning `git.gitUncommittedChanges := false` and
+  friends works for some tasks but is not reliable for all of them.
 
 ## Design contract (non-negotiable)
 
