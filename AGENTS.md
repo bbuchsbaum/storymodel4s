@@ -159,6 +159,21 @@ was set by the owner on 2026-08-28 (sticky decision
    compliance were all found this way, and none failed a test. Note also that
    the naive repair — dropping the uncertain observations — replaces one bias
    with its mirror image: carry the uncertainty through the arithmetic instead.
+
+   *Sweep the shape, not the spelling.* When you find one instance of a defect
+   class, sweep for its **shape** across the codebase, not its literal text. A
+   fix for a chronology default missed an identical defect nine lines away
+   because the search was for `.getOrElse`; sweeping four shapes instead — `if
+   X.isEmpty then <literal>`, `.getOrElse(<numeric>)`, `math.max(1, n)` as a
+   denominator, vacuous `forall`/`exists` in a scoring position — found the
+   relation-preservation prior that defaulted to *perfectly preserved* and so
+   biased the aligner itself, not merely a number computed from it.
+
+   *Distinguishability.* Where a test separates a correct value from a specific
+   wrong one, assert that the two differ by more than the comparison tolerance.
+   Capacity to fail is not enough: inputs whose right and wrong answers fall
+   within `eps` produce a test that passes under both the fix and the defect
+   while looking rigorous.
 5. **Actors and reservations.** One mote actor per session. Set your identity
    explicitly in every session — `export MOTE_ACTOR=<actor>` (and
    `mote session start --as <actor>`) or `--actor` on each call — and never run
