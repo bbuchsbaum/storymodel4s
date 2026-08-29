@@ -72,6 +72,28 @@ surface blockers, assemble and run gates, keep the record current. It must **not
 close another actor's work, or revise an ADR ruling until the owner appoints. *The distinction is
 reversibility, not seniority.*
 
+**What the chief CANNOT do, measured rather than assumed (2026-08-29).** The role's limits are not
+only normative; several are enforced by the tooling, and the chief discovered all three by trying:
+
+- **Release another actor's reservation.** `mote unreserve` rejects it outright — *"reservation is
+  owned by X"*. There is no chief override. Note this clause already said an acting coordinator
+  should *preserve* reservations; the chief nonetheless announced publicly that releasing one was
+  "reversible coordination squarely inside what the constitution permits", citing this document as
+  granting a power it frames as a duty of restraint. **Do not cite this document for a capability
+  without running the command.**
+- **Close another actor's bead without orphaning its reservations.** `mote done` closes and releases
+  together, but its release half is owner-only. `mote close` is available and releases nothing. So
+  the only close available to the chief is the one that orphans — a structural consequence, not
+  carelessness. Run `who-has` first; if paths are held, ask the holder to `done` it.
+- **Delete files outside the repository.** `rm -rf` is permission-denied in the chief's environment.
+  When the chief's own gate exports reached 6.9G on a 99%-full volume, it could report the problem
+  and change its practice, and could not clear it.
+
+The general lesson is the one this document should carry into every future revision: **a written
+authority that the tooling does not implement is worse than no authority**, because it will be
+cited in good faith and then fail at the moment somebody is relying on it. Any clause here that
+asserts a capability should name the command that exercises it.
+
 Timers, objection windows, reading cadence and gate batching are governance mechanics and live in
 `AGENTS.md`.
 
