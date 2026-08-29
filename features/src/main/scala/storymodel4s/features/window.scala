@@ -117,7 +117,10 @@ object WindowReducer:
   /** Input weights can each be finite and still overflow the total or the quotient.
     * `Estimate.observed` does not validate finiteness; refuse rather than publish NaN.
     */
-  private def finiteWeightedMean(values: Vector[Double], weights: Vector[Double]): Estimate[Double] =
+  private def finiteWeightedMean(
+      values: Vector[Double],
+      weights: Vector[Double]
+  ): Estimate[Double] =
     val tw = weights.sum
     if !Estimate.isFinite(tw) then undefined(UndefinedReason.NotFinite)
     else if tw > 0.0 then
