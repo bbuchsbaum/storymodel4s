@@ -71,6 +71,23 @@ Package namespace is flat `storymodel4s.<module>`.
    split, reorder, revisit, elaborate, or go external. External destinations
    are explicit states, not error residue.
 7. **Truth ≠ salience ≠ phenomenology ≠ veridicality.** Never derive one from another.
+   **A DEFAULT EPISTEMIC STATUS IS A FABRICATED LICENSE.** An unmeasurable value
+   given a plausible number is the defect this file is mostly about; an
+   unestablished *status* given a confident one is its deeper form. A weight says
+   how much; a status says **what entitles us to say it at all**. Measured
+   2026-08-29 in the surface-to-narrative compiler: every accepted
+   `CausalProposal` was materialised as `EpistemicStatus.LinguisticallyEntailed`
+   while `CausalProposal` carries only a `CausalRelation` — so nothing in the
+   provider schema or the compiler established that the relation follows from
+   linguistic form, and `CausalEdge`'s own contract says precedence never
+   licenses causation and `meta.status` records *how* it was licensed. Found by a
+   second reviewer reading code, after the chief had certified the governing
+   requirement as met from a prose checkpoint. **When you cannot establish the
+   license, take the conservative truthful status**, and file the typed basis as
+   its own bead rather than widening the slice.
+   *(The chief's original requirement said "never present at a default WEIGHT".
+   That was the units of the hour, not the rule. The binding form is never
+   present with a default LICENSE.)*
    **And typing a conflated quantity does not un-conflate it — it launders it.**
    When one primitive is carrying two different meanings, wrapping every use in a
    single new type compiles, gates green, passes review, and preserves the exact
