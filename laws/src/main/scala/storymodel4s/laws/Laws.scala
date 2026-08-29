@@ -522,7 +522,8 @@ object WireLaws extends Laws:
               b.missingTerms - CostTerm.Chart,
               b.sourceChartCoverage,
               b.reductions,
-              b.supportWeight
+              b.supportWeight,
+              b.imputedTerms
             )
             val unrecorded = AlignWire.costBreakdown(
               b.terms,
@@ -532,7 +533,8 @@ object WireLaws extends Laws:
               b.missingTerms - CostTerm.Structural,
               b.sourceChartCoverage,
               b.reductions,
-              b.supportWeight
+              b.supportWeight,
+              b.imputedTerms
             )
             present.isLeft && unrecorded.isLeft
           }
@@ -549,7 +551,8 @@ object WireLaws extends Laws:
               b.missingTerms,
               b.sourceChartCoverage,
               b.reductions,
-              b.supportWeight
+              b.supportWeight,
+              b.imputedTerms
             ) == Right(b) &&
             b.reductions.values.forall { rc =>
               AlignWire.reductionReceipt(

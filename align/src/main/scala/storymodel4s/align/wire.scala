@@ -1,7 +1,7 @@
 package storymodel4s.align
 
 import storymodel4s.core.{Checksum, ContentAddress, SpanRef}
-import storymodel4s.features.{CanonicalDouble, Coverage, Estimate}
+import storymodel4s.features.{CanonicalDouble, Coverage, Estimate, MissingReason}
 import storymodel4s.proposition.Canonical
 import storymodel4s.recall.{ExpressedUncertainty, RecallGraph, RecallUnitId}
 import storymodel4s.recall.RecallGraphStatus.Checked
@@ -189,6 +189,26 @@ object AlignWire:
   private val MayBeMissing: Set[CostTerm] =
     Set(CostTerm.Chart, CostTerm.Structural, CostTerm.Sensory)
 
+  /** Terms that can legitimately be PRICED FROM A DECLARED CONSTANT rather than measured.
+    *
+    * Semantic only, and the restriction is the point. Semantic has a provider that returns
+    * `Estimate.Missing` for a comparison that was possible but unanswered, and a documented neutral
+    * to substitute (`DefaultLocalCostModel.missingSemantic`). No other term has either:
+    * Propositional and Entity fall to 0.5 when the cell HAS NO SUCH DIMENSION - no predicate on one
+    * side, no specified participants - which is ineligibility, not an unanswered measurement, and
+    * belongs in eligibility rather than here. Granularity and Distortion are computed
+    * deterministically from the mode and the level and are never imputed at all.
+    *
+    * Without this set the wire checked only that an imputed term was priced, so an external v3
+    * artifact could claim `Granularity -> ProviderAbstained` or `Entity -> BudgetExceeded` and be
+    * accepted - the candidate's own disclosure said those terms must not share this carrier while
+    * its validation permitted exactly that. Found by codex-storymodel4s-scout.
+    *
+    * Like [[MayBeMissing]], NOT a permission list: a term joins only when it has a provider that
+    * can abstain and a declared constant to stand in for it, and that is an estimand decision.
+    */
+  private val MayBeImputed: Set[CostTerm] = Set(CostTerm.Semantic)
+
   /** Terms whose scalar is a reducer over a [[StructuralReductionReceipt]]. These are the terms
     * that have chart-sourced members. Sensory has no chart source, so it cannot carry a structural
     * receipt — a different property from being allowed to go missing.
@@ -291,7 +311,11 @@ object AlignWire:
       // NO DEFAULT, deliberately. A default lets a caller omit the field and fabricate maximal
       // support, which is exactly how the laws round-trip site compiled while dropping it. Making
       // it required turns every reconstruction into a compile error the author must answer.
-      supportWeight: Double
+      supportWeight: Double,
+      // NO DEFAULT, same reasoning: "nothing was imputed" is the flattering answer, and an omitted
+      // field here would reconstruct an imputed cell as a measured one - erasing exactly the
+      // distinction this carrier exists to record.
+      imputedTerms: Map[CostTerm, MissingReason]
   ): Either[AlignError, CostBreakdown] =
     val r = "CostBreakdown"
     val badTerm = terms.toVector.sortBy(_._1.ordinal).collectFirst {
@@ -318,6 +342,19 @@ object AlignWire:
       Option.when(missingTerms.exists(terms.contains))(
         bad(r, "a term cannot be both present and missing")
       ),
+      // IMPUTED IS A CLAIM ABOUT A PRICED TERM. An imputed term is priced from a declared constant,
+      // so it MUST be present in `terms`; naming one that is absent would describe a substitution
+      // that never entered the total.
+      Option.when(!imputedTerms.keySet.subsetOf(terms.keySet))(
+        bad(r, "an imputed term must be priced, so it must be present")
+      ),
+      Option.when(!imputedTerms.keySet.subsetOf(MayBeImputed))(
+        bad(r, "imputedTerms may name only terms that have a provider and a declared constant")
+      ),
+      // ... and it must not ALSO be called missing. Missing means "absent, contributed nothing";
+      // imputed means "present, contributed weight, rested on no observation". A cell claiming both
+      // is internally false, which is why Semantic is recorded here rather than in missingTerms.
+
       Option.when(!reductions.keySet.subsetOf(HasReductionReceipt))(
         bad(r, "reductions may be recorded only for terms that have a chart-sourced receipt")
       ),
@@ -371,7 +408,8 @@ object AlignWire:
         missingTerms,
         sourceChartCoverage,
         reductions,
-        supportWeight
+        supportWeight,
+        imputedTerms
       )
     )
 

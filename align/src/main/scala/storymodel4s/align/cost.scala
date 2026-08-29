@@ -256,10 +256,33 @@ final case class CostBreakdown private[align] (
       * cells with different support is comparing claims of different strength, and this is what
       * lets it notice — or refuse.
       */
-    supportWeight: Double = 1.0
+    supportWeight: Double = 1.0,
+    /** Terms that were PRICED but not MEASURED, with the reason the provider gave.
+      *
+      * Distinct from [[missingTerms]], and the distinction is the point. A missing term is absent
+      * from `terms` and contributes nothing to the total. An imputed term IS in `terms`, carries
+      * its full weight into the price, and rests on a declared constant rather than an observation.
+      * Conflating them would make the record internally false, because `terms` and `missingTerms`
+      * are defined as disjoint and the wire enforces it.
+      *
+      * Before this existed, these two cells competing for the SAME ranked unit were identical in
+      * every published field — one resting on evidence, one on a default:
+      *
+      * e4 semantic MEASURED 0.5 support 0.9552238805970149 missing {Chart, Structural, Sensory} e5
+      * semantic ABSTAINED support 0.9552238805970149 missing {Chart, Structural, Sensory}
+      *
+      * The price is deliberately unchanged (the M0 decision at [[DefaultLocalCostModel]] stands and
+      * is a separate bead); only the accounting moves, so `total` is byte-identical and
+      * `supportWeight` now excludes imputed weight from its numerator while keeping it eligible in
+      * the denominator.
+      */
+    imputedTerms: Map[CostTerm, MissingReason] = Map.empty
 ):
   def term(t: CostTerm): Double = terms.getOrElse(t, 0.0)
   def has(t: CostTerm): Boolean = terms.contains(t)
+
+  /** Whether this term's scalar is a declared constant rather than an observation. */
+  def imputed(t: CostTerm): Boolean = imputedTerms.contains(t)
 
   /** The member-level audit receipt for an optional structural term, when it was evaluated. */
   def reduction(t: CostTerm): Option[StructuralReductionReceipt] = reductions.get(t)
@@ -793,7 +816,14 @@ final case class DefaultLocalCostModel(
       view: SourceView
   ): CostBreakdown =
     val sketch = unit.proposition
-    val dSem = clamp(semantic.orElse(unit, node, missingSemantic))
+    // The provider's own answer is kept, not collapsed to a Double, so that "abstained" survives to
+    // the receipt. The PRICE is unchanged - `missingSemantic` is still substituted, and the M0
+    // decision at cost.scala:705 stands - but the substitution is now recorded rather than silent.
+    val semEstimate = semantic(unit, node)
+    val dSem = clamp(semEstimate.toOption.getOrElse(missingSemantic))
+    val semImputed: Map[CostTerm, MissingReason] = semEstimate match
+      case Estimate.Missing(reason) => Map(CostTerm.Semantic -> reason)
+      case _                        => Map.empty
     val dProp = (sketch.predicate, node.predicate) match
       case (Some(a), Some(b)) => if a == b then 0.0 else 1.0
       case _                  => 0.5
@@ -874,7 +904,12 @@ final case class DefaultLocalCostModel(
       Set(CostTerm.Sensory) ++
       Option.when(chartEligible)(CostTerm.Chart) ++
       Option.when(structuralEligible)(CostTerm.Structural)
-    val support = DefaultLocalCostModel.supportOf(terms.keySet, eligible, weights)
+    // SUPPORT COUNTS MEASURED WEIGHT, NOT PRICED WEIGHT. An imputed term stays in `terms` (it is
+    // priced) and stays in `eligible` (the comparison was possible), so it leaves the numerator
+    // only. That is exactly the gap the two-cell court measures: support must differ between a
+    // measured and an imputed cell by semanticWeight / eligibleWeight, and nothing else may move.
+    val measured = terms.keySet -- semImputed.keySet
+    val support = DefaultLocalCostModel.supportOf(measured, eligible, weights)
     // ZERO SUPPORT IS AN EXCLUSION, NOT A PRICE. With no weighted evidence the blend contributes
     // nothing and the cost falls to the function prior, which is below the external floor - so the
     // cell that measured nothing would win. Excluding it drops the state from the space entirely
@@ -895,7 +930,8 @@ final case class DefaultLocalCostModel(
           CostTerm.Chart -> chartReduction.receipt,
           CostTerm.Structural -> structuralReduction.receipt
         ),
-        support
+        support,
+        semImputed
       )
 
   private def clamp(x: Double): Double =
