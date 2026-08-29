@@ -119,3 +119,13 @@ class MetricsSuite extends FunSuite:
     // distance, not route.
     assertEquals(Metrics.stepDirection(0, 99), Metrics.stepDirection(0, 1))
   }
+
+  test("false gating abstains when the gate never saw the anchor") {
+    // The anchor was not nominated, so the gate did not refuse it - the candidate generator missed
+    // it, which strict-recall@k and candidate-burden already measure. Scoring 0.0 here would report
+    // the gate as well behaved precisely when it was never exercised, and a channel that nominated
+    // nothing would post a perfect false-gating score.
+    assertEquals(Metrics.falseGate(None), None)
+    // (The Some cases are exercised end to end by WogDiagnosticSuite: Admissibility construction is
+    // private[align], so a real gate record is the only honest source of one.)
+  }

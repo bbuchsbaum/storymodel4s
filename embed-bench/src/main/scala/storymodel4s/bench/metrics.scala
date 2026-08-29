@@ -93,6 +93,17 @@ object Metrics:
     val idx = ranking.indexWhere(targets.contains)
     if idx < 0 then 0.0 else 1.0 / (idx + 1)
 
+  /** Did the gate refuse an anchor the gold says is faithful?
+    *
+    * `None` when the gate never considered the anchor at all — an anchor that was never nominated
+    * was not refused by the gate, it was missed by the candidate generator, which is what
+    * `strict-recall@k` and `candidate-burden` measure. Scoring that as 0.0 would report the gate as
+    * well-behaved precisely when it was never exercised, and a channel that nominated nothing would
+    * post a perfect false-gating score.
+    */
+  private[bench] def falseGate(admissibility: Option[Admissibility]): Option[Double] =
+    admissibility.map(a => if a.gated then 1.0 else 0.0)
+
   /** Which way a recall step moved through the source: forward, backward, or staying put.
     *
     * The vision asks whether recall followed presentation order, story-world time, or a route with
@@ -174,10 +185,7 @@ object Metrics:
     }
     val falseGating = obs(Names.falseGating) { (row, g) =>
       if g.isFaithful then
-        g.primary.map { p =>
-          val refused = result.admissibility.get(row.unit).flatMap(_.get(p.node)).exists(_.gated)
-          ind(refused)
-        }
+        g.primary.flatMap(p => falseGate(result.admissibility.get(row.unit).flatMap(_.get(p.node))))
       else None
     }
     val detection = obs(Names.distortionDetection) { (row, g) =>
