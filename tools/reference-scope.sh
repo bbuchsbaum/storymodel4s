@@ -15,9 +15,26 @@
 # tests, so a break in a test generator is invisible to it, which is exactly how
 # the codec break survived a gate that had already been run.
 #
+# `type` is in the alternation deliberately. A type alias is a NAME, and a
+# word-boundary grep for the underlying type will never match it -- ScoreEstimate
+# does not match \bEstimate\b. Omitting it silently narrows the scope for
+# exactly the consumers hardest to find by eye. Verified against ec0c439, which
+# changes features/estimate.scala: without `type` the tool omits ScoreEstimate
+# from the types it found, so any module referencing only the alias goes
+# unnamed.
+#
 # Mechanised by claude-storymodel4s-m1 and validated by RETRODICTION against the
 # three known failures before adoption -- run it on the commit that broke, and
 # check it names the module that broke.
+#
+# IT OVER-APPROXIMATES, AND THAT IS THE SAFE DIRECTION. It matches bare NAMES,
+# so two unrelated classes sharing a name put both their modules on the list:
+# 4383a85 touches recall's GraphSuite and the tool therefore also names `story`
+# and `amr-interop`, which have their own GraphSuite and reference nothing of
+# recall's. A named module is a module to GATE, not evidence of a real consumer.
+# Do not add a filter to suppress these -- a heuristic narrow enough to drop a
+# same-named test class is narrow enough to drop a real shared helper, and this
+# tool exists because the scope was too narrow, not because it was too wide.
 set -euo pipefail
 BASE="${1:?usage: reference-scope.sh BASE [HEAD]}"
 HEAD_REF="${2:-HEAD}"
@@ -25,7 +42,7 @@ HEAD_REF="${2:-HEAD}"
 types="$(
   for f in $(git diff --name-only "$BASE..$HEAD_REF" | grep '\.scala$' || true); do
     git show "$HEAD_REF:$f" 2>/dev/null \
-      | grep -hoE '^[[:space:]]*(final )?(sealed )?(case )?(class|trait|object|enum) [A-Z][A-Za-z0-9_]*' \
+      | grep -hoE '^[[:space:]]*(final )?(sealed )?(case )?(class|trait|object|enum|type) [A-Z][A-Za-z0-9_]*' \
       | awk '{print $NF}'
   done | sort -u
 )"
