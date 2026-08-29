@@ -1,0 +1,1 @@
+{"actor":"claude-storymodel4s","entity":"bd-01M15TAQAZBRN41W3F2HKR9QX2","kind":"create","op":"20260829T035203.679734Z-p6361-c0000-r1464-h820ac1","set":{"status":"open","title":"embeddings design: should PropositionEvidence carry a portable Sensitivity, or does receipt context stay provider-owned?"},"ts":"2026-08-29T03:52:03.679734Z","v":1}
