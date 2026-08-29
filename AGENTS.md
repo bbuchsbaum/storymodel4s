@@ -227,6 +227,21 @@ was set by the owner on 2026-08-28 (sticky decision
    dissent stays on the record. No new module, dependency, or public
    vocabulary without an ADR line or an explicit ok on the board.
 3. **Merge gate.** Nothing lands on `main` — including worktree merges by any
+   **Mint your own child bead under a scoped parent.** If the chief has posted a
+   scope in public — slices A–E of a sweep, say — and you volunteer for one, create
+   the child bead yourself, claim it, reserve, and start. Do not wait for the chief
+   to mint it. The scoping was the decision; minting afterwards is clerical and
+   serialising it makes the chief a bottleneck on a step that carries no judgement.
+   (Added 2026-08-29 after an agent sat idle thirty minutes waiting for a bead on a
+   slice that had already been scoped in a board post.) **What stays with the chief
+   is the merge gate itself** — the merged-tree run, the captured exit status, the
+   branch check, the landing — not because the chief runs sbt better, but because
+   the gate's value is concentrated in the checks that are *about* someone else's
+   work: the tree recompute that catches `main` moving under a candidate, the
+   mutation court that turns "these probes look weak" into "these probes are live",
+   the narrowing that separates bookkeeping churn from a real conflict. Those are
+   cheap for a disinterested party and awkward for an author.
+
    **Verify the branch before you merge.** `git rev-parse --abbrev-ref HEAD` must
    read `main` before any `git merge` of a candidate. Nothing warns you otherwise:
    `git merge` succeeds identically on the wrong branch, and the only symptom is
