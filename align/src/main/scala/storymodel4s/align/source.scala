@@ -1,7 +1,7 @@
 package storymodel4s.align
 
-import storymodel4s.core.{SegmentId, SituationId, SpanSet}
-import storymodel4s.features.{Coverage, Estimate, ScoreEstimate, MissingReason}
+import storymodel4s.core.{Credence, SegmentId, SituationId, SpanSet}
+import storymodel4s.features.{Coverage, Estimate, MissingReason, ScoreEstimate}
 import storymodel4s.proposition.PropositionEvidence
 import storymodel4s.recall.{Lexical, ModalityTag, PolarityTag, SketchRole}
 
@@ -82,6 +82,51 @@ enum ContextTag:
 final case class ParticipantSummary(role: SketchRole, label: String, aliases: Set[String]):
   def names: Set[String] = aliases.map(Lexical.lower) + Lexical.lower(label)
 
+/** A measured node-salience weight, or an explicit reason why salience was not measured.
+  *
+  * Why: importance conditions a published estimand, so a non-finite or negative observation must be
+  * refused before it enters a [[NodeSummary]]. Missing and observed zero remain distinct: the
+  * former says nobody supplied a weight; the latter is a measured zero-salience result.
+  */
+final class ImportanceWeight private (val estimate: ScoreEstimate):
+  /** The measured weight, if a lawful observation exists. */
+  def toOption: Option[Double] = estimate.toOption
+
+  override def equals(other: Any): Boolean = other match
+    case that: ImportanceWeight => estimate == that.estimate
+    case _                      => false
+
+  override def hashCode(): Int = estimate.hashCode()
+  override def toString: String = s"ImportanceWeight($estimate)"
+
+object ImportanceWeight:
+  /** Validate an existing estimate without changing its credence or missing reason. */
+  def from(estimate: ScoreEstimate): Either[AlignError, ImportanceWeight] =
+    estimate match
+      case Estimate.Observed(value, _) if value.isNaN || value.isInfinite =>
+        Left(AlignError.MalformedRecord("importanceWeight", "observed value is not finite"))
+      case Estimate.Observed(value, _) if value < 0.0 =>
+        Left(AlignError.MalformedRecord("importanceWeight", "observed value is negative"))
+      case _ => Right(new ImportanceWeight(estimate))
+
+  /** Construct a measured importance while preserving any recorded credence. */
+  def observed(
+      value: Double,
+      credence: Option[Credence] = None
+  ): Either[AlignError, ImportanceWeight] =
+    from(Estimate.Observed(value, credence))
+
+  /** Construct an explicit absence; missing importance is never silently converted to zero. */
+  def missing(reason: MissingReason): ImportanceWeight =
+    new ImportanceWeight(Estimate.missing(reason))
+
+  /** The default says that nobody measured this node's importance. */
+  val unmeasured: ImportanceWeight = missing(MissingReason.AllMissing)
+
+  /** Validate a source literal and throw on an invalid value. */
+  def unsafe(estimate: ScoreEstimate): ImportanceWeight =
+    from(estimate).fold(error => throw new IllegalArgumentException(error.message), identity)
+
 /** Everything the aligner needs to know about one source node.
   *
   * Contract: `level` is 0 for atomic situations and increases toward the root; `parent` is the
@@ -91,28 +136,28 @@ final case class ParticipantSummary(role: SketchRole, label: String, aliases: Se
   * an injected salience weight used only for importance-weighted coverage, never for matching
   * (`Missing` importance excludes the node from importance-weighted coverage; it is never zero).
   */
-final case class NodeSummary(
-    ref: SourceNodeRef,
-    level: Int,
-    parent: Option[SourceNodeRef],
-    discoursePosition: Int,
-    support: SpanSet,
-    predicate: Option[String],
-    participants: Vector[ParticipantSummary],
-    context: ContextTag,
-    polarity: PolarityTag,
-    modality: ModalityTag,
-    locations: Vector[String],
-    lemmas: Set[String],
-    outcome: Option[String] = None,
-    cause: Option[String] = None,
+final class NodeSummary private (
+    val ref: SourceNodeRef,
+    val level: Int,
+    val parent: Option[SourceNodeRef],
+    val discoursePosition: Int,
+    val support: SpanSet,
+    val predicate: Option[String],
+    val participants: Vector[ParticipantSummary],
+    val context: ContextTag,
+    val polarity: PolarityTag,
+    val modality: ModalityTag,
+    val locations: Vector[String],
+    val lemmas: Set[String],
+    val outcome: Option[String],
+    val cause: Option[String],
     /** Injected salience. Defaults to `Missing`: nobody measured this node's importance, and
       * `observed(1.0)` asserted MAXIMAL salience for every node at once - a claim, not a default.
       * With it Missing, importance-weighted coverage abstains until a caller supplies importances,
       * instead of silently duplicating uniform coverage under a second name.
       */
-    importance: ScoreEstimate = Estimate.missing(MissingReason.AllMissing),
-    evidence: Option[PropositionEvidence] = None
+    val importance: ImportanceWeight,
+    val evidence: Option[PropositionEvidence]
 ):
   def hasEvidence: Boolean = evidence.nonEmpty
   def byRole(role: SketchRole): Option[ParticipantSummary] = participants.find(_.role == role)
@@ -125,6 +170,110 @@ final case class NodeSummary(
       .orElse(byRole(SketchRole.Beneficiary))
   def allNames: Set[String] = participants.flatMap(_.names).toSet
   def isLeaf: Boolean = level == 0
+
+  /** Rebuild this node while preserving the validated importance boundary. */
+  def copy(
+      ref: SourceNodeRef = ref,
+      level: Int = level,
+      parent: Option[SourceNodeRef] = parent,
+      discoursePosition: Int = discoursePosition,
+      support: SpanSet = support,
+      predicate: Option[String] = predicate,
+      participants: Vector[ParticipantSummary] = participants,
+      context: ContextTag = context,
+      polarity: PolarityTag = polarity,
+      modality: ModalityTag = modality,
+      locations: Vector[String] = locations,
+      lemmas: Set[String] = lemmas,
+      outcome: Option[String] = outcome,
+      cause: Option[String] = cause,
+      importance: ImportanceWeight = importance,
+      evidence: Option[PropositionEvidence] = evidence
+  ): NodeSummary =
+    new NodeSummary(
+      ref,
+      level,
+      parent,
+      discoursePosition,
+      support,
+      predicate,
+      participants,
+      context,
+      polarity,
+      modality,
+      locations,
+      lemmas,
+      outcome,
+      cause,
+      importance,
+      evidence
+    )
+
+  private def fields =
+    (
+      ref,
+      level,
+      parent,
+      discoursePosition,
+      support,
+      predicate,
+      participants,
+      context,
+      polarity,
+      modality,
+      locations,
+      lemmas,
+      outcome,
+      cause,
+      importance,
+      evidence
+    )
+
+  override def equals(other: Any): Boolean = other match
+    case that: NodeSummary => fields == that.fields
+    case _                 => false
+
+  override def hashCode(): Int = fields.hashCode()
+  override def toString: String = s"NodeSummary$fields"
+
+object NodeSummary:
+  /** Construct a source node whose importance has already passed [[ImportanceWeight]]. */
+  def apply(
+      ref: SourceNodeRef,
+      level: Int,
+      parent: Option[SourceNodeRef],
+      discoursePosition: Int,
+      support: SpanSet,
+      predicate: Option[String],
+      participants: Vector[ParticipantSummary],
+      context: ContextTag,
+      polarity: PolarityTag,
+      modality: ModalityTag,
+      locations: Vector[String],
+      lemmas: Set[String],
+      outcome: Option[String] = None,
+      cause: Option[String] = None,
+      importance: ImportanceWeight = ImportanceWeight.unmeasured,
+      evidence: Option[PropositionEvidence] = None
+  ): NodeSummary =
+    new NodeSummary(
+      ref,
+      level,
+      parent,
+      discoursePosition,
+      support,
+      predicate,
+      participants,
+      context,
+      polarity,
+      modality,
+      locations,
+      lemmas,
+      outcome,
+      cause,
+      importance,
+      evidence
+    )
 
 /** Minimal read-only view of a source story for alignment. `story.AlignmentSource` is bridged to
   * this trait by `align.bridge.StorySourceView`; tests use [[InMemorySourceView]].

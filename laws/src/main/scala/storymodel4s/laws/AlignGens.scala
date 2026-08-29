@@ -315,7 +315,9 @@ object AlignGens:
       "lemmas" -> withNode(n => n.copy(lemmas = n.lemmas + "zzz")),
       "outcome" -> withNode(_.copy(outcome = Some("zzz"))),
       "cause" -> withNode(_.copy(cause = Some("zzz"))),
-      "importance" -> withNode(_.copy(importance = storymodel4s.features.Estimate.observed(0.25))),
+      "importance" -> withNode(
+        _.copy(importance = ImportanceWeight.unsafe(storymodel4s.features.Estimate.observed(0.25)))
+      ),
       "evidence" -> withNode(_.copy(evidence = Some(evidence))),
       "outcome/cause re-bracketed A" -> withNode(
         _.copy(outcome = Some("o\u0000cause\u0000c"), cause = None)

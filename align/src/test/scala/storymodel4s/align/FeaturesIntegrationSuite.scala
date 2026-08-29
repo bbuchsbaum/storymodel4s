@@ -18,12 +18,15 @@ class FeaturesIntegrationSuite extends FunSuite:
   private def signature(sourceView: SourceView): RecallSignature =
     RecallSignature.compute(result, recall, sourceView).fold(e => fail(e.message), identity)
 
+  private def importance(value: Double): ImportanceWeight =
+    ImportanceWeight.observed(value).fold(e => fail(e.message), identity)
+
   test("missing importance excludes a leaf from the weighted coverage instead of weighting it 0") {
     // The base view now states its importances EXPLICITLY. They used to arrive from a default of
     // observed(1.0), which asserted maximal salience for every node without anyone measuring it -
     // and made importance-weighted coverage identical to uniform coverage in every production run.
     val weighted = InMemorySourceView(
-      view.nodes.map(_.copy(importance = Estimate.observed(1.0))),
+      view.nodes.map(_.copy(importance = importance(1.0))),
       view.edges,
       view.worldOrder,
       view.textLength
@@ -31,7 +34,8 @@ class FeaturesIntegrationSuite extends FunSuite:
     val sig = signature(weighted)
     val missingE3 = InMemorySourceView(
       weighted.nodes.map(n =>
-        if n.ref == e3 then n.copy(importance = Estimate.missing(MissingReason.ProviderAbstained))
+        if n.ref == e3 then
+          n.copy(importance = ImportanceWeight.missing(MissingReason.ProviderAbstained))
         else n
       ),
       view.edges,
@@ -39,9 +43,7 @@ class FeaturesIntegrationSuite extends FunSuite:
       view.textLength
     )
     val zeroE3 = InMemorySourceView(
-      weighted.nodes.map(n =>
-        if n.ref == e3 then n.copy(importance = Estimate.observed(0.0)) else n
-      ),
+      weighted.nodes.map(n => if n.ref == e3 then n.copy(importance = importance(0.0)) else n),
       view.edges,
       view.worldOrder,
       view.textLength
@@ -122,9 +124,9 @@ class FeaturesIntegrationSuite extends FunSuite:
           n.copy(importance =
             weights
               .get(n.ref)
-              .fold[ScoreEstimate](Estimate.missing(MissingReason.ProviderAbstained))(
-                Estimate.observed
-              )
+              .fold(
+                ImportanceWeight.missing(MissingReason.ProviderAbstained)
+              )(importance)
           )
         ),
         view.edges,
@@ -153,22 +155,37 @@ class FeaturesIntegrationSuite extends FunSuite:
     assertNotEquals(oneHeavy.coverage, twoLight.coverage)
   }
 
-  test("RecallSignature refuses a non-finite observed importance") {
-    val malformed = InMemorySourceView(
-      view.nodes.map(n =>
-        n.copy(importance =
-          if n.ref == e1 then Estimate.observed(Double.NaN)
-          else Estimate.missing(MissingReason.ProviderAbstained)
-        )
-      ),
-      view.edges,
-      view.worldOrder,
-      view.textLength
+  test("importance refuses non-finite and negative observations before NodeSummary storage") {
+    Vector(Double.NaN, Double.PositiveInfinity, Double.NegativeInfinity).foreach { value =>
+      ImportanceWeight.observed(value) match
+        case Left(AlignError.MalformedRecord("importanceWeight", detail)) =>
+          assert(detail.contains("not finite"), detail)
+        case other => fail(s"expected typed non-finite importance refusal for $value, got $other")
+    }
+    ImportanceWeight.observed(-1.0) match
+      case Left(AlignError.MalformedRecord("importanceWeight", detail)) =>
+        assert(detail.contains("negative"), detail)
+      case other => fail(s"expected typed negative importance refusal, got $other")
+  }
+
+  test("importance preserves lawful credence and missing reasons without conflating zero") {
+    val credence = Credence.raw(0.7).fold(e => fail(e.message), identity)
+    val measured = Estimate.Observed(0.0, Some(credence))
+    assertEquals(
+      ImportanceWeight.from(measured).map(_.estimate),
+      Right(measured),
+      "observed zero and its credence must survive validation"
     )
-    RecallSignature.compute(result, recall, malformed) match
-      case Left(AlignError.MalformedRecord("weightedCoverage", detail)) =>
-        assert(detail.contains("not finite"), detail)
-      case other => fail(s"expected typed weighted-coverage refusal, got $other")
+    val missing = Estimate.missing[Double](MissingReason.ProviderAbstained)
+    assertEquals(
+      ImportanceWeight.from(missing).map(_.estimate),
+      Right(missing),
+      "missing reason must survive validation"
+    )
+    assertNotEquals(
+      ImportanceWeight.unsafe(measured).estimate,
+      ImportanceWeight.missing(MissingReason.ProviderAbstained).estimate
+    )
   }
 
   test("an abstaining semantic provider is neutral: candidates come from lexical overlap") {
