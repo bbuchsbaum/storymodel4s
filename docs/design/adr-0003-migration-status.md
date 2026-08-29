@@ -4,7 +4,9 @@ ADR 0003 states that the `RecallSignature` metrics are "migration sites, not gra
 exceptions". It does not say which are migrated. This file does, so that the gap is visible
 rather than assumed closed because the ADR is frequently cited.
 
-**Audited 2026-08-29 against `main`.** Re-audit before claiming the contract holds.
+**Audited 2026-08-29; re-audited 09:35Z after that night's landings.** Re-audit before claiming
+the contract holds — this file went stale within an hour of being written, which is the normal
+case for a status file and the reason it carries a timestamp rather than a verdict.
 
 ## What "migrated" means here
 
@@ -18,35 +20,44 @@ applies and could not be answered), it carries no coverage, and any aggregate th
 silently renormalizes. Every `Option[Double]` below is a site where a consumer can, and on `main`
 does, substitute a constant.
 
-## `RecallSignature` — 20 numeric fields
+## `RecallSignature` — 22 numeric fields
 
-| Field | Type on `main` | State | Tracked by |
-|---|---|---|---|
-| `uniformCoverage` | `Double` | not migrated | — |
-| `importanceWeightedCoverage` | `Double` | not migrated | — |
-| `fidelity` | `Option[Double]` | redefinition specified | `bd-01M162FEGPSY50MFHTYH3C3RHF` |
-| `specificity` | `Option[Double]` | not migrated | — |
-| `compression` | `Double` | redefinition specified | `bd-01M162FEGPSY50MFHTYH3C3RHF` |
-| `discourseChronology` | `Double` | not migrated | — |
-| `worldChronology` | `Option[Double]` | not migrated | — |
-| `causalPreservation` | `Option[Double]` | not migrated | — |
-| `semanticFlowCoherence` | `Double` | redefinition specified | `bd-01M162FEGPSY50MFHTYH3C3RHF` |
-| `associationMass` | `Double` | not migrated | — |
-| `intrusionMass` | `Double` | not migrated | — |
-| `commentaryMass` | `Double` | not migrated | — |
-| `sourceConsistentInferenceMass` | `Double` | not migrated | — |
-| `uninterpretableMass` | `Double` | not migrated | — |
-| `unrankedMass` | `Double` | not migrated | — |
-| `distortedMass` | `Double` | not migrated | — |
-| `distortedMassByFacet` | `Map[Facet, Double]` | not migrated | — |
-| `backwardMass` | `Double` | `StepMass` in flight | m1 stack |
-| `worldBackwardMass` | `Option[Double]` | `StepMass` in flight | m1 stack |
-| `perUnitLocalizability` | `Map[RecallUnitId, Double]` | not migrated | — |
+**Re-audited 2026-08-29 09:35Z after the night's landings.** Six fields now carry support, up
+from none.
 
-**Migrated on `main`: none.** The one correct construct on the type is `externalMass`, a *derived
-method* returning `ExternalMassReport`, which holds our own failure (`unrankedMass`) apart from
-claims about the participant and deliberately offers no method returning their sum. Its Scaladoc
-argues the case better than ADR 0003 does and is the model for the rest.
+| Field | Type on `main` | State |
+|---|---|---|
+| `fidelityMass` | `MassRatio` | **migrated** — value `N/A`, support `A/T` |
+| `fidelityByFacet` | `Map[Facet, MassRatio]` | **migrated** — per facet, `A_f` is *specified*-verdict mass |
+| `compression` | `MassRatio` | **migrated** — ratio-of-sums |
+| `semanticFlowCoherence` | `MassRatio` | **migrated** — ratio-of-sums |
+| `backwardMass` | `Option[StepMass]` | **migrated** — carries comparable/total steps |
+| `worldBackwardMass` | `Option[StepMass]` | **migrated** |
+| `fidelity` | `Option[Double]` | projection of `fidelityMass`; **residual clause-2 leak** |
+| `discourseChronology` | `Option[Double]` | improved (was bare `Double`), not migrated |
+| `specificity` | `Option[Double]` | not migrated |
+| `worldChronology` | `Option[Double]` | not migrated |
+| `causalPreservation` | `Option[Double]` | not migrated |
+| `uniformCoverage` | `Double` | not migrated |
+| `importanceWeightedCoverage` | `Double` | not migrated — and see `bd-01M16C9HT9V9Q80F7411V87BBY` |
+| `associationMass` | `Double` | not migrated |
+| `intrusionMass` | `Double` | not migrated |
+| `commentaryMass` | `Double` | not migrated |
+| `sourceConsistentInferenceMass` | `Double` | not migrated |
+| `uninterpretableMass` | `Double` | not migrated |
+| `unrankedMass` | `Double` | not migrated |
+| `distortedMass` | `Double` | not migrated |
+| `distortedMassByFacet` | `Map[Facet, Double]` | not migrated |
+| `perUnitLocalizability` | `Map[RecallUnitId, Double]` | not migrated |
+
+`externalMass` remains a derived method returning `ExternalMassReport`, holding our own failure
+(`unrankedMass`) apart from claims about the participant, with no accessor returning their sum.
+
+**The residual on `fidelity`.** A bare `Option[Double]` beside the supported `fidelityMass` lets a
+consumer quote the number without its support — exactly what `externalMass` prevents by refusing a
+sum accessor. It was *not* blocked on, because the number it now carries is correct and blocking a
+strict improvement for incompleteness is an error already made once tonight. It goes when the
+remaining `Option[Double]` fields migrate.
 
 ## Consumers that substitute a constant
 
