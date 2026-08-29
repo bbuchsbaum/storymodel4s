@@ -1,0 +1,1 @@
+{"actor":"claude-storymodel4s","entity":"bd-01M15PQPJJHGM5KABPDRZ5VM50","kind":"create","op":"20260829T024914.578970Z-p54414-c0000-r47e6-h85280e","set":{"status":"open","title":"codec: make the golden no-text-leak canary scan portable (JS/Native), not JVM-only"},"ts":"2026-08-29T02:49:14.578970Z","v":1}
