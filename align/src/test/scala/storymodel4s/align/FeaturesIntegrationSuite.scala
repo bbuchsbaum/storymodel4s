@@ -14,6 +14,10 @@ class FeaturesIntegrationSuite extends FunSuite:
   private lazy val result: HsmmResult =
     GraphHsmm.infer(recall, view, candidates, costModel).fold(e => fail(e.message), identity)
 
+  /** Test fixtures fail loudly: no test converts a refused scientific result into a default. */
+  private def signature(sourceView: SourceView): RecallSignature =
+    RecallSignature.compute(result, recall, sourceView).fold(e => fail(e.message), identity)
+
   test("missing importance excludes a leaf from the weighted coverage instead of weighting it 0") {
     // The base view now states its importances EXPLICITLY. They used to arrive from a default of
     // observed(1.0), which asserted maximal salience for every node without anyone measuring it -
@@ -24,7 +28,7 @@ class FeaturesIntegrationSuite extends FunSuite:
       view.worldOrder,
       view.textLength
     )
-    val sig = RecallSignature.compute(result, recall, weighted)
+    val sig = signature(weighted)
     val missingE3 = InMemorySourceView(
       weighted.nodes.map(n =>
         if n.ref == e3 then n.copy(importance = Estimate.missing(MissingReason.ProviderAbstained))
@@ -42,8 +46,8 @@ class FeaturesIntegrationSuite extends FunSuite:
       view.worldOrder,
       view.textLength
     )
-    val sigMissing = RecallSignature.compute(result, recall, missingE3)
-    val sigZero = RecallSignature.compute(result, recall, zeroE3)
+    val sigMissing = signature(missingE3)
+    val sigZero = signature(zeroE3)
     assertEqualsDouble(sigMissing.uniformCoverage, sig.uniformCoverage, 1e-12)
     // e3 is not recalled, so dropping it from the weighted average raises weighted coverage;
     // weighting it zero does the same thing here, but for a different reason (documented).
@@ -82,7 +86,7 @@ class FeaturesIntegrationSuite extends FunSuite:
     // In every production run StorySourceView supplies no importances, so this was the real
     // behaviour: two named fields that were the same number, which a reader takes for two
     // measurements.
-    val sig = RecallSignature.compute(result, recall, view)
+    val sig = signature(view)
     assertEquals(
       sig.importanceWeightedCoverage.estimate,
       Estimate.missing(MissingReason.AllMissing),
@@ -128,20 +132,12 @@ class FeaturesIntegrationSuite extends FunSuite:
         view.textLength
       )
 
-    val oneHeavy = RecallSignature
-      .compute(
-        result,
-        recall,
-        weightedView(Map(middleRef -> 1.0))
-      )
-      .importanceWeightedCoverage
-    val twoLight = RecallSignature
-      .compute(
-        result,
-        recall,
+    val oneHeavy =
+      signature(weightedView(Map(middleRef -> 1.0))).importanceWeightedCoverage
+    val twoLight =
+      signature(
         weightedView(Map(lowRef -> lowWeight, highRef -> highWeight))
-      )
-      .importanceWeightedCoverage
+      ).importanceWeightedCoverage
 
     assertEquals(oneHeavy.coverage.eligible, twoLight.coverage.eligible)
     assertEquals(oneHeavy.coverage.observed, 1)
@@ -169,7 +165,10 @@ class FeaturesIntegrationSuite extends FunSuite:
       view.worldOrder,
       view.textLength
     )
-    intercept[IllegalArgumentException](RecallSignature.compute(result, recall, malformed))
+    RecallSignature.compute(result, recall, malformed) match
+      case Left(AlignError.MalformedRecord("weightedCoverage", detail)) =>
+        assert(detail.contains("not finite"), detail)
+      case other => fail(s"expected typed weighted-coverage refusal, got $other")
   }
 
   test("an abstaining semantic provider is neutral: candidates come from lexical overlap") {

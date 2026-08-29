@@ -3,6 +3,8 @@ package storymodel4s.align
 import munit.FunSuite
 
 import storymodel4s.features.{MissingReason, UndefinedReason}
+import storymodel4s.recall.RecallGraph
+import storymodel4s.recall.RecallGraphStatus.Checked
 
 /** External mass must not let our failure to align be read as the participant's behaviour.
   *
@@ -18,7 +20,7 @@ class SignatureSuite extends FunSuite:
     val result = GraphHsmm
       .infer(recall, view, candidates, costModel)
       .fold(e => fail(e.message), identity)
-    RecallSignature.compute(result, recall, view)
+    computeSignature(result, recall, view)
 
   private val eps = 1e-12
 
@@ -31,6 +33,14 @@ class SignatureSuite extends FunSuite:
       eligible: Int
   ): WeightedCoverage =
     WeightedCoverage.of(numerator, weights, eligible).fold(e => fail(e.message), identity)
+
+  /** Test fixtures fail loudly: no test converts a refused scientific result into a default. */
+  private def computeSignature(
+      result: HsmmResult,
+      recall: RecallGraph[Checked],
+      view: SourceView
+  ): RecallSignature =
+    RecallSignature.compute(result, recall, view).fold(e => fail(e.message), identity)
 
   test("RecallSignature.externalMass computes the exact production split") {
     val associationMass = 0.01
@@ -225,7 +235,7 @@ class SignatureSuite extends FunSuite:
         0
       )
       .fold(e => fail(e.message), identity)
-    val s = RecallSignature.compute(proof, silent, view)
+    val s = computeSignature(proof, silent, view)
     assertEquals(
       s.discourseChronology.value,
       None,
@@ -280,7 +290,7 @@ class SignatureSuite extends FunSuite:
         0
       )
       .fold(e => fail(s"mixed construction rejected: ${e.message}"), identity)
-    val s = RecallSignature.compute(mixed, recall, view)
+    val s = computeSignature(mixed, recall, view)
     s.backwardMass match
       case None    => fail("a route with steps must report a per-step mass")
       case Some(m) =>
@@ -444,7 +454,7 @@ class SignatureSuite extends FunSuite:
     val result = GraphHsmm
       .infer(recall, view, candidates, costModel)
       .fold(e => fail(e.message), identity)
-    val s = RecallSignature.compute(result, recall, view)
+    val s = computeSignature(result, recall, view)
     val d = s.discourseChronology
 
     // Only ORDERED pairs can be forward or backward. A step onto an ancestor, or onto a node with
@@ -480,7 +490,7 @@ class SignatureSuite extends FunSuite:
     val noWorldResult = GraphHsmm
       .infer(recall, noWorld, candidates, costModel)
       .fold(e => fail(e.message), identity)
-    val ws = RecallSignature.compute(noWorldResult, recall, noWorld).worldChronology
+    val ws = computeSignature(noWorldResult, recall, noWorld).worldChronology
     assertEquals(ws.value, None, ws.render)
     assertEqualsDouble(
       ws.totalMass,
@@ -499,7 +509,7 @@ class SignatureSuite extends FunSuite:
     val result = GraphHsmm
       .infer(recall, view, candidates, costModel)
       .fold(e => fail(e.message), identity)
-    val s = RecallSignature.compute(result, recall, view)
+    val s = computeSignature(result, recall, view)
     val c = s.causalPreservation
 
     // Support is the share of the SOURCE's causal edges that were recalled at both endpoints, so it
@@ -540,7 +550,7 @@ class SignatureSuite extends FunSuite:
     val result = GraphHsmm
       .infer(recall, view, candidates, costModel)
       .fold(e => fail(e.message), identity)
-    val s = RecallSignature.compute(result, recall, view)
+    val s = computeSignature(result, recall, view)
     val k = view.sourceNodeCount
     val rows = result.posterior.rows.filter(_.localizability(k).isDefined)
     val masses = rows.map(_.sourceMass)
@@ -578,7 +588,7 @@ class SignatureSuite extends FunSuite:
     val result = GraphHsmm
       .infer(recall, view, candidates, costModel)
       .fold(e => fail(e.message), identity)
-    val s = RecallSignature.compute(result, recall, view)
+    val s = computeSignature(result, recall, view)
     val sourceMassSum = result.posterior.rows.map(_.sourceMass).sum
     assertEqualsDouble(s.compression.conditioningMass, sourceMassSum, 1e-9)
     assertNotEquals(
@@ -617,7 +627,7 @@ class SignatureSuite extends FunSuite:
     val result = GraphHsmm
       .infer(recall, view, candidates, costModel)
       .fold(e => fail(e.message), identity)
-    val s = RecallSignature.compute(result, recall, view)
+    val s = computeSignature(result, recall, view)
     val units = result.posterior.rows.size.toDouble
     assertNotEquals(
       s.fidelityMass.conditioningMass,
@@ -666,7 +676,7 @@ class SignatureSuite extends FunSuite:
       st.isSource && m > 0
     } > 1)
     assume(split.nonEmpty, "this fixture has no unit with mass on two anchors")
-    val s = RecallSignature.compute(result, recall, view)
+    val s = computeSignature(result, recall, view)
     val mapMassOnly =
       result.posterior.rows.flatMap(r => r.mass.filter(_._1.isSource).values.maxOption).sum
     assert(

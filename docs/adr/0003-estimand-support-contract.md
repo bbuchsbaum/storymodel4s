@@ -140,8 +140,11 @@ three scientifically distinct states:
 The type is a private-constructor non-case class because these fields jointly assert a derived
 relation. `SignatureProjection` consumes its typed estimate and uses its count coverage when
 reporting weakest support; the canonical carrier report retains the conditioning weight and both
-counts. There is currently no `RecallSignature` codec, so no codec path exists to migrate in this
-amendment. Adding one later must round-trip the full carrier rather than only the scalar estimate.
+counts. `RecallSignature.compute` returns `Either[AlignError, RecallSignature]`, preserving a
+checked-construction refusal instead of turning malformed public importance input or aggregate
+overflow into an exception or a default signature. There is currently no `RecallSignature` codec,
+so no codec path exists to migrate in this amendment. Adding one later must round-trip the full
+carrier rather than only the scalar estimate.
 
 This amendment does not burn a new `RecallSignature` estimand identity. Version `v2` is still an
 unreleased transition, the repository contains no recorded numeric importance-weighted result,

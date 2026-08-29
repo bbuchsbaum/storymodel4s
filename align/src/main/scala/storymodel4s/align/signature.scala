@@ -350,12 +350,15 @@ object RecallSignature:
     */
   val EstimandVersion: String = "recall-signature/v2"
 
+  /** Computes the supported signature, preserving malformed importance or aggregate overflow as a
+    * typed refusal rather than publishing a default or throwing from this pure boundary.
+    */
   def compute(
       result: HsmmResult,
       recall: RecallGraph[Checked],
       view: SourceView,
       causalLevelThreshold: Int = 1
-  ): RecallSignature =
+  ): Either[AlignError, RecallSignature] =
     val p = result.posterior
     val f = result.flow
     val leaves = view.leaves.map(_.ref)
@@ -364,9 +367,7 @@ object RecallSignature:
     // Leaves whose importance is Missing are excluded from the weighted sum (never counted as 0).
     val importance = view.leaves.flatMap(n => n.importance.toOption.map(w => (n.ref, w)))
     val weightedNumerator = importance.map { case (r, w) => w * visitation(r) }.sum
-    val weighted = WeightedCoverage
-      .of(weightedNumerator, importance.map(_._2), leaves.size)
-      .fold(error => throw new IllegalArgumentException(error.message), identity)
+    val weighted = WeightedCoverage.of(weightedNumerator, importance.map(_._2), leaves.size)
 
     val anchored: Vector[(RecallUnitId, FidelityReport, FidelityMode)] = recall.ordered.flatMap {
       u =>
@@ -562,31 +563,33 @@ object RecallSignature:
       .filter(_._2 > 0.0)
       .toMap
 
-    RecallSignature(
-      uniform,
-      weighted,
-      fidelityRatio,
-      fidelityByFacet,
-      specificityRatio,
-      compression,
-      discourse,
-      world,
-      causalRatio,
-      semanticFlow,
-      extMean(ExternalState.Association),
-      extMean(ExternalState.Intrusion),
-      extMean(ExternalState.Commentary),
-      extMean(ExternalState.SourceConsistentInference),
-      extMean(ExternalState.Uninterpretable),
-      extMean(ExternalState.Unranked),
-      distorted,
-      byFacet,
-      backward,
-      worldBackward,
-      loc,
-      facets,
-      modes
-    )
+    weighted.map { importanceWeightedCoverage =>
+      RecallSignature(
+        uniform,
+        importanceWeightedCoverage,
+        fidelityRatio,
+        fidelityByFacet,
+        specificityRatio,
+        compression,
+        discourse,
+        world,
+        causalRatio,
+        semanticFlow,
+        extMean(ExternalState.Association),
+        extMean(ExternalState.Intrusion),
+        extMean(ExternalState.Commentary),
+        extMean(ExternalState.SourceConsistentInference),
+        extMean(ExternalState.Uninterpretable),
+        extMean(ExternalState.Unranked),
+        distorted,
+        byFacet,
+        backward,
+        worldBackward,
+        loc,
+        facets,
+        modes
+      )
+    }
 
   /** Visitation per leaf, counting mass placed on ancestors as spread over their leaves; anchors of
     * either mode count.
