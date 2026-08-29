@@ -38,6 +38,51 @@ class StructureSuite extends ScalaCheckSuite:
     assertEquals(d.outputSpaceId.value.length, "derived:".length + 32)
   }
 
+  test("basis ids are family- and order-sensitive content addresses") {
+    val alpha = FeatureTarget.Situation(SituationId.unsafe("alpha"))
+    val beta = FeatureTarget.Situation(SituationId.unsafe("beta"))
+    val alphaBeta = BasisId.of(TargetFamily.Situation, Vector(alpha, beta)).toOption.get
+    val betaAlpha = BasisId.of(TargetFamily.Situation, Vector(beta, alpha)).toOption.get
+    val emptySituations = BasisId.of(TargetFamily.Situation, Vector.empty).toOption.get
+    val emptySegments = BasisId.of(TargetFamily.Segment, Vector.empty).toOption.get
+
+    assertEquals(
+      alphaBeta.checksum.hex,
+      "08a021d6168401f260a1d9e5c7539480bce58da18b4687a113ff90f2be9b664a"
+    )
+    assertNotEquals(alphaBeta, betaAlpha)
+    assertNotEquals(emptySituations, emptySegments)
+    assertEquals(
+      BasisId.of(TargetFamily.Situation, Vector(alpha, beta)),
+      Right(alphaBeta)
+    )
+    assert(
+      BasisId
+        .of(TargetFamily.Situation, Vector(FeatureTarget.Segment(SegmentId.unsafe("scene"))))
+        .isLeft
+    )
+  }
+
+  test("one recipe on different bases has distinct graph-addressable output spaces") {
+    val d = deriv(sp("raw")).copy(window = None, targetFamily = Some(TargetFamily.Situation))
+    val alpha = FeatureTarget.Situation(SituationId.unsafe("alpha"))
+    val beta = FeatureTarget.Situation(SituationId.unsafe("beta"))
+    val first = BasisId.of(TargetFamily.Situation, Vector(alpha, beta)).toOption.get
+    val second = BasisId.of(TargetFamily.Situation, Vector(beta, alpha)).toOption.get
+    val firstOutput = d.outputSpaceId(first)
+    val secondOutput = d.outputSpaceId(second)
+
+    assertNotEquals(firstOutput, secondOutput)
+    assertNotEquals(firstOutput, d.outputSpaceId)
+    assertEquals(
+      DerivationGraph.empty
+        .add(firstOutput, d)
+        .flatMap(_.add(secondOutput, d))
+        .map(_.size),
+      Right(2)
+    )
+  }
+
   test("derivation ids are identical on every platform (golden)") {
     // Doubles are rendered by IEEE-754 bit pattern, not Double.toString, so JVM and JS agree.
     val d = FeatureDerivation(

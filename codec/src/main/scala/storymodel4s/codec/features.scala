@@ -272,13 +272,18 @@ object FeatureCodecs:
   }
 
   given Encoder[TrackProvenance] = Encoder.instance(p =>
-    obj("provenance" -> p.provenance.asJson, "storyChecksum" -> opt(p.storyChecksum))
+    obj(
+      "provenance" -> p.provenance.asJson,
+      "storyChecksum" -> opt(p.storyChecksum),
+      "basisId" -> opt(p.basisId)
+    )
   )
   given Decoder[TrackProvenance] = Decoder.instance { c =>
     for
       p <- field[Provenance](c, "provenance")
       s <- field[Option[Checksum]](c, "storyChecksum")
-    yield TrackProvenance(p, s)
+      b <- field[Option[BasisId]](c, "basisId")
+    yield TrackProvenance(p, s, b)
   }
 
   given Encoder[WeightingPolicy] = Encoder.instance {
@@ -341,6 +346,8 @@ object FeatureCodecs:
   given Decoder[Eligibility] = enumDecoder("Eligibility", Eligibility.values, _.toString)
   given Encoder[TargetFamily] = enumEncoder(_.toString)
   given Decoder[TargetFamily] = enumDecoder("TargetFamily", TargetFamily.values, _.toString)
+  given Encoder[BasisId] = summon[Encoder[Checksum]].contramap(_.checksum)
+  given Decoder[BasisId] = summon[Decoder[Checksum]].map(BasisId.fromChecksum)
 
   given Encoder[NarrativeWindowPlan] =
     Encoder.instance(p => Json.obj("halfWidth" -> p.halfWidth.asJson))

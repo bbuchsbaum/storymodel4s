@@ -13,10 +13,13 @@ final case class FeatureObservation[+T <: FeatureTarget, +V](
 ):
   def map[W](f: V => W): FeatureObservation[T, W] = copy(estimate = estimate.map(f))
 
-/** Where a track came from: a raw provider run or a deterministic derivation. */
+/** Where a track came from: a raw provider run or a deterministic derivation, including the
+  * ordered basis when the caller supplied the derivation axis.
+  */
 final case class TrackProvenance(
     provenance: Provenance,
-    storyChecksum: Option[Checksum]
+    storyChecksum: Option[Checksum],
+    basisId: Option[BasisId] = None
 )
 
 /** A feature space bound to observations over a target domain.
@@ -85,7 +88,18 @@ object FeatureTrack:
       Left(DomainError.InvariantViolation(path, "coverage observed > eligible"))
     else if t.derivation.exists(d => d.inputs.toVector.contains(t.space.id)) then
       Left(DomainError.InvariantViolation(path, "derived track lists itself as an input"))
-    else Right(t)
+    else if t.derivation.isEmpty && t.provenance.basisId.nonEmpty then
+      Left(DomainError.InvariantViolation(path, "raw track carries a derivation basis id"))
+    else
+      (t.derivation, t.provenance.basisId) match
+        case (Some(d), Some(basis)) if t.space.id != d.outputSpaceId(basis) =>
+          Left(
+            DomainError.InvariantViolation(
+              path,
+              "basis id does not match the derived output space id"
+            )
+          )
+        case _ => Right(t)
 
   /** Scalar tracks additionally reject non-finite observed values: NaN is never a measurement. */
   def validatedScores[T <: FeatureTarget](
