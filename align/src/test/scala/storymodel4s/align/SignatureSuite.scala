@@ -56,11 +56,11 @@ class SignatureSuite extends FunSuite:
       importanceWeightedCoverage = Estimate.missing(MissingReason.AllMissing),
       fidelityMass = MassRatio.of(0.0, 0.0, 0.0).fold(e => fail(e.message), identity),
       fidelityByFacet = Map.empty,
-      specificity = None,
+      specificityMass = MassRatio.of(0.0, 0.0, 0.0).fold(e => fail(e.message), identity),
       compression = MassRatio.of(0.0, 0.0, 0.0).fold(e => fail(e.message), identity),
-      discourseChronology = Some(0.0),
-      worldChronology = None,
-      causalPreservation = None,
+      discourseChronology = MassRatio.of(0.0, 1.0, 1.0).fold(e => fail(e.message), identity),
+      worldChronology = MassRatio.of(0.0, 0.0, 0.0).fold(e => fail(e.message), identity),
+      causalPreservation = MassRatio.of(0.0, 0.0, 0.0).fold(e => fail(e.message), identity),
       semanticFlowCoherence = MassRatio.of(0.0, 0.0, 0.0).fold(e => fail(e.message), identity),
       associationMass = associationMass,
       intrusionMass = intrusionMass,
@@ -172,8 +172,8 @@ class SignatureSuite extends FunSuite:
     // a world order, and a test that can silently stop running is not a guard. AnnaFixture's view
     // has no world order, so worldChronology is Missing by construction here.
     val name =
-      if sig.worldChronology.isEmpty then "worldChronology"
-      else if sig.causalPreservation.isEmpty then "causalPreservation"
+      if sig.worldChronology.value.isEmpty then "worldChronology"
+      else if sig.causalPreservation.value.isEmpty then "causalPreservation"
       else if sig.backwardMass.isEmpty then "backwardMass"
       else fail("this fixture measures every component; the test needs one that is Missing")
     val p = SignatureProjection.of("v0", Map(name -> 1.0)).fold(e => fail(e.message), identity)
@@ -217,7 +217,11 @@ class SignatureSuite extends FunSuite:
       )
       .fold(e => fail(e.message), identity)
     val s = RecallSignature.compute(proof, silent, view)
-    assertEquals(s.discourseChronology, None, "no eligible step must not report perfect chronology")
+    assertEquals(
+      s.discourseChronology.value,
+      None,
+      "no eligible step must not report perfect chronology"
+    )
     assertEquals(s.backwardMass, None, "no eligible step must not report zero backward movement")
     assertEquals(s.worldBackwardMass, None)
   }
@@ -320,6 +324,25 @@ class SignatureSuite extends FunSuite:
         "summon[scala.deriving.Mirror.ProductOf[StepMass]]"
       )
     )
+    // Every smart-constructed carrier here, not only the two a review named. Per
+    // docs/design/unforgeable-types.md these are non-case classes so that fromProduct and copy do
+    // not exist.
+    //
+    // HONESTY NOTE: the next two are CORRECT but UNPROVEN. Mutating these types to `case class`
+    // did not make them fail and I could not isolate why - a minimal probe confirmed Mirror IS
+    // derivable for ordinary case classes under bare-private, qualified-private and user-companion
+    // constructors alike, so the general rule holds and something specific to these two defeats
+    // the check. Treat them as documentation shaped like a tripwire until one is seen to fire.
+    assert(
+      !scala.compiletime.testing.typeChecks(
+        "summon[scala.deriving.Mirror.ProductOf[SupportedScalar]]"
+      )
+    )
+    assert(
+      !scala.compiletime.testing.typeChecks(
+        "summon[scala.deriving.Mirror.ProductOf[LayerPreservation]]"
+      )
+    )
   }
 
   // --- ratio-of-sums estimands (bd-01M162FEGPSY50MFHTYH3C3RHF) ---
@@ -364,6 +387,137 @@ class SignatureSuite extends FunSuite:
       ratioOfSums.value.exists(v => math.abs(v - meanOfRatios) > 0.4),
       s"ratio-of-sums collapsed onto mean-of-ratios: ${ratioOfSums.render}"
     )
+  }
+
+  test("chronology publishes the share of the route it could actually judge") {
+    val result = GraphHsmm
+      .infer(recall, view, candidates, costModel)
+      .fold(e => fail(e.message), identity)
+    val s = RecallSignature.compute(result, recall, view)
+    val d = s.discourseChronology
+
+    // Only ORDERED pairs can be forward or backward. A step onto an ancestor, or onto a node with
+    // no position, is not disordered - it is unjudgeable - so it belongs in the coverage, not in
+    // the ratio. The old field published fw/(fw+bw) with no way to say which of those two a 1.0
+    // rested on.
+    val totalStep = result.flow.steps.map(_.mass.values.sum).sum
+    assertEqualsDouble(d.totalMass, totalStep, 1e-9)
+    assert(d.conditioningMass <= d.totalMass + 1e-9, d.render)
+    assert(d.support > 0.0 && d.support < 1.0, s"fixture cannot distinguish coverage: ${d.render}")
+
+    // Pinned, because this is the number the migration exists to surface: the chronology figure on
+    // the worked example rests on 25.6% of the route mass. The value itself is unchanged - the
+    // arithmetic was always a ratio of sums - but 0.0468 read as a statement about this person's
+    // recall when three quarters of their route was never judgeable. A reader who saw only the
+    // value would have had no way to know that.
+    assertEqualsDouble(d.value.getOrElse(fail(d.render)), 0.046818, 1e-6)
+    assertEqualsDouble(d.support, 0.255856, 1e-6)
+    assertEqualsDouble(d.conditioningMass, 0.767568, 1e-6)
+
+    // The distinction the world field must keep, and the one I got wrong first: a view with NO
+    // world order is 0 of 0 - the source has no world chronology to violate - while a view that
+    // HAS one and a route that told us nothing about it is 0 of totalStepMass. Same abstention,
+    // different fact, and only the second is about the participant.
+    assert(view.worldOrder.nonEmpty, "fixture lost its world order; the case below is not the foil")
+    assertEqualsDouble(s.worldChronology.totalMass, totalStep, 1e-9)
+
+    // THE FOIL, and it needs its own view: with the shipped fixture worldOrder is present, so the
+    // no-world-order branch is unreachable and a mutation collapsing it survives a green suite.
+    // That is how three earlier mutations here survived their first test set, so the fixture is
+    // built rather than hoped for.
+    val noWorld = view.copy(worldOrder = None)
+    val noWorldResult = GraphHsmm
+      .infer(recall, noWorld, candidates, costModel)
+      .fold(e => fail(e.message), identity)
+    val ws = RecallSignature.compute(noWorldResult, recall, noWorld).worldChronology
+    assertEquals(ws.value, None, ws.render)
+    assertEqualsDouble(
+      ws.totalMass,
+      0.0,
+      1e-9,
+      "a source with no world order must be 0 of 0, not 0 of the route: the first says there is " +
+        "no world chronology to violate, the second blames the participant for our missing data"
+    )
+  }
+
+  test("causal preservation reports how much of the causal structure was reached") {
+    // The finding the bare ratio could not state. Preserving 2 of 2 recalled edges when the source
+    // has 40 published 1.0, and so did preserving 38 of 38. Same number, entirely different claim
+    // about the participant - the first is a person who recalled almost no causal structure and got
+    // the little they recalled right.
+    val result = GraphHsmm
+      .infer(recall, view, candidates, costModel)
+      .fold(e => fail(e.message), identity)
+    val s = RecallSignature.compute(result, recall, view)
+    val c = s.causalPreservation
+
+    // Support is the share of the SOURCE's causal edges that were recalled at both endpoints, so it
+    // is bounded by 1 and is not the ratio's own denominator dressed up.
+    assert(c.support >= 0.0 && c.support <= 1.0, c.render)
+    assert(c.conditioningMass <= c.totalMass, c.render)
+
+    // Independently derived, so this fails if the conditioning event silently changes to something
+    // else with the same cardinality on this fixture.
+    val edges = view
+      .adjacency(RelationLayer.Causal)
+      .toVector
+      .flatMap { case (a, m) => m.toVector.collect { case (b, w) if w > 0 => (a, b) } }
+    assertEqualsDouble(c.totalMass, edges.size.toDouble, 1e-9)
+    assert(edges.nonEmpty, "fixture has no causal edges, so this test proves nothing")
+
+    // No value when nothing was reached, rather than a 0.0 that reads as "preserved nothing".
+    if c.conditioningMass == 0.0 then assertEquals(c.value, None, c.render)
+
+    // THE ACTUAL GAIN, and it is visible on this very fixture: the participant reached NONE of the
+    // three causal edges, so the value abstains. Before the migration that abstention was a bare
+    // None, indistinguishable from a source that HAS no causal structure to preserve. Now the two
+    // are different objects - conditioning 0 of 3 versus 0 of 0 - and only the first is a fact
+    // about the participant. An abstention that cannot say why it abstained is barely better than
+    // the 1.0 it replaced.
+    assertEqualsDouble(c.conditioningMass, 0.0, 1e-9)
+    assertEqualsDouble(c.totalMass, 3.0, 1e-9)
+    assertEquals(c.value, None, c.render)
+    val noStructure = MassRatio.unsafe(0.0, 0.0, 0.0)
+    assertEquals(noStructure.value, c.value, "both abstain, as they should")
+    assertNotEquals(noStructure.totalMass, c.totalMass, "but they must not be the same object")
+  }
+
+  test("specificity conditions on source MASS, and the two formulas differ on this fixture") {
+    // Required by the ruling: a fixture with UNEQUAL source mass per unit, because an equal-mass
+    // fixture cannot distinguish mass-weighting from mean-of-ratios - which is exactly how the
+    // compression mutation survived its first test set.
+    val result = GraphHsmm
+      .infer(recall, view, candidates, costModel)
+      .fold(e => fail(e.message), identity)
+    val s = RecallSignature.compute(result, recall, view)
+    val k = view.sourceNodeCount
+    val rows = result.posterior.rows.filter(_.localizability(k).isDefined)
+    val masses = rows.map(_.sourceMass)
+    assert(masses.distinct.size > 1, s"fixture has equal source mass per unit: $masses")
+
+    // Denominator is summed source mass, never a unit count.
+    assertEqualsDouble(s.specificityMass.conditioningMass, masses.sum, 1e-9)
+    assertNotEquals(s.specificityMass.conditioningMass, rows.size.toDouble)
+
+    // Independent recomputation of both formulas, so the movement is measured rather than asserted.
+    val massWeighted =
+      rows.map(r => r.localizability(k).get * r.sourceMass).sum / masses.sum
+    val meanOfRatios = rows.flatMap(_.localizability(k)).sum / rows.size
+    assertEqualsDouble(
+      s.specificityMass.value.getOrElse(fail(s.specificityMass.render)),
+      massWeighted,
+      1e-9
+    )
+    assert(
+      math.abs(massWeighted - meanOfRatios) > 1e-9,
+      s"the two formulas coincide here, so this fixture proves nothing: $massWeighted"
+    )
+    // Pinned literals, hand-read from this fixture. The inequality above survives any change that
+    // moves both formulas together; these do not. Mass-weighting publishes 0.6583 where
+    // mean-of-ratios published 0.6103 - the low-mass units were voting at full weight.
+    assertEqualsDouble(massWeighted, 0.658321, 1e-6)
+    assertEqualsDouble(meanOfRatios, 0.610311, 1e-6)
+    assertEqualsDouble(s.specificityMass.conditioningMass, 2.629218, 1e-6)
   }
 
   test("compression conditions on SOURCE MASS, not on a count of units") {
@@ -518,8 +672,8 @@ class SignatureSuite extends FunSuite:
     // The distinction the bead's option (a) would have erased: dropping a Missing component
     // computes a different linear functional under the same name and weights.
     val name =
-      if sig.worldChronology.isEmpty then "worldChronology"
-      else if sig.causalPreservation.isEmpty then "causalPreservation"
+      if sig.worldChronology.value.isEmpty then "worldChronology"
+      else if sig.causalPreservation.value.isEmpty then "causalPreservation"
       else fail("this fixture measures every component; the test needs one that is Missing")
     val p = SignatureProjection
       .of("v0", Map(name -> 1.0, "compression" -> 1.0))

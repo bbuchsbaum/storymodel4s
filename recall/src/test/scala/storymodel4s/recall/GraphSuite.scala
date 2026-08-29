@@ -32,6 +32,54 @@ class GraphSuite extends ScalaCheckSuite:
     assertEquals(good.chain.map { case (a, b) => (a.ordinal, b.ordinal) }, Vector((0, 1), (1, 2)))
   }
 
+  test("a unit whose text is not the words at its span is rejected") {
+    // The discriminating case. Without this law "which words support this cell" has two answers:
+    // the span resolved against the transcript, and unit.text. The only code that turns a unit
+    // into a vector reads text; a span-based trace reads the transcript. Nothing required them to
+    // agree, so a unit could be embedded as one sentence and explained as another.
+    val lying =
+      good.copy(units = Vector(unit(0).copy(text = "THE GHOSTS WERE ANGRY"), unit(1), unit(2)))
+    assert(RecallGraph.validated(lying).isInvalid)
+    // Control, and it is the half that matters: the honest graph must still pass, or the law is
+    // just a way of rejecting everything.
+    assert(RecallGraph.validated(good).isValid)
+  }
+
+  test("a near miss is still a miss: trailing whitespace is not the same words") {
+    // Pinned deliberately. A tolerant comparison here would let the trace quote text that is not
+    // in the transcript, which is the whole failure being closed - and trimming is the tempting
+    // "harmless" relaxation someone will reach for the first time this law fails on real input.
+    val off = good.copy(units = Vector(unit(0).copy(text = unit(0).text + " "), unit(1), unit(2)))
+    assert(RecallGraph.validated(off).isInvalid)
+  }
+
+  test("a unit spanning two sentences carries the text between them") {
+    // The check compares against the hull, not against concatenated per-ref slices, so a unit whose
+    // support is discontinuous keeps the material in the gap. Asserting the accepted text IS the
+    // hull slice, so a change to per-ref concatenation fails here rather than silently narrowing
+    // what a legitimate multi-sentence unit is allowed to say.
+    val s0 = atlas.sentences(0)
+    val s1 = atlas.sentences(1)
+    val merged = SpanSet.unsafe(SpanRef(Some(s0.id), s0.span), SpanRef(Some(s1.id), s1.span))
+    val hull = merged.minSpan
+    val hullText = text.substring(hull.start, hull.endExclusive)
+    val wide =
+      good.copy(units = Vector(unit(0).copy(span = merged, text = hullText), unit(1), unit(2)))
+    assert(RecallGraph.validated(wide).isValid, s"hull text refused: [$hullText]")
+    assert(hullText.contains("Then the second"), hullText)
+  }
+
+  test("a span past the end of the transcript is refused, not thrown on") {
+    // validated accumulates rather than short-circuits, so the text check runs even when the span
+    // check has already failed. Without its guard this substring call throws and the caller gets a
+    // StringIndexOutOfBoundsException instead of the typed refusal it asked for.
+    val past = TextSpan.unsafe(text.length - 2, text.length + 40)
+    val bad = good.copy(units =
+      Vector(unit(0).copy(span = SpanSet.one(SpanRef(None, past))), unit(1), unit(2))
+    )
+    assert(RecallGraph.validated(bad).isInvalid)
+  }
+
   test("non-contiguous ordinals are rejected") {
     val bad = good.copy(units = Vector(unit(0), unit(1, 5), unit(2)))
     assert(RecallGraph.validated(bad).isInvalid)

@@ -42,13 +42,24 @@ final case class ClockPanel(
     worldChronology: Option[Double],
     compression: Option[Double],
     backwardMass: Option[Double],
-    worldBackwardMass: Option[Double]
+    worldBackwardMass: Option[Double],
+    /** Support for each clock above, by name, as a fraction of the mass the clock could have been
+      * judged on. A clock is not comparable across cases without it: discourseChronology on the
+      * worked example is 0.047 resting on 0.256 of the route, and a case reporting the same 0.047
+      * on 0.9 of its route is making a far stronger claim. Empty for a clock whose upstream carrier
+      * does not yet report support (ADR 0003 field backlog), which is why absence is a missing KEY
+      * rather than a zero - zero support is a real and different statement.
+      */
+    support: Map[String, Double] = Map.empty
 ):
   def render: String =
     def num(v: Option[Double]) = v.map(x => f"$x%.3f").getOrElse("n/a")
-    s"$caseId: discourse=${num(discourseChronology)} world=${num(worldChronology)} " +
-      s"compression=${num(compression)} backward=${num(backwardMass)} " +
-      s"worldBackward=${num(worldBackwardMass)}"
+    def sup(k: String) = support.get(k).map(x => f"@$x%.3f").getOrElse("@?")
+    s"$caseId: discourse=${num(discourseChronology)}${sup("discourseChronology")} " +
+      s"world=${num(worldChronology)}${sup("worldChronology")} " +
+      s"compression=${num(compression)}${sup("compression")} " +
+      s"backward=${num(backwardMass)}${sup("backwardMass")} " +
+      s"worldBackward=${num(worldBackwardMass)}${sup("worldBackwardMass")}"
 
 /** One channel run over one case: the proof, its fingerprints, and the observations. */
 final case class CaseRun(
@@ -212,11 +223,17 @@ object Bench:
           Metrics.observe(c, r),
           ClockPanel(
             c.id,
-            sig.discourseChronology,
-            sig.worldChronology,
+            sig.discourseChronology.value,
+            sig.worldChronology.value,
             sig.compression.value,
             sig.backwardMass.map(_.perStep),
-            sig.worldBackwardMass.map(_.perStep)
+            sig.worldBackwardMass.map(_.perStep),
+            Map(
+              "discourseChronology" -> sig.discourseChronology.support,
+              "worldChronology" -> sig.worldChronology.support,
+              "compression" -> sig.compression.support
+            ) ++ sig.backwardMass.map("backwardMass" -> _.support).toMap
+              ++ sig.worldBackwardMass.map("worldBackwardMass" -> _.support).toMap
           )
         )
       }

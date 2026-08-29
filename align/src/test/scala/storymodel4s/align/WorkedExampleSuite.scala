@@ -232,7 +232,7 @@ class WorkedExampleSuite extends FunSuite:
     val sig = RecallSignature.compute(res, rg, view)
     assertEqualsDouble(sig.unrankedMass, 1.0, 1e-9)
     assertEqualsDouble(sig.intrusionMass, 0.0, 0.0)
-    assertEquals(sig.specificity, None)
+    assertEquals(sig.specificityMass.value, None)
   }
 
   test("recall signature decomposes the outcome") {
@@ -248,10 +248,13 @@ class WorkedExampleSuite extends FunSuite:
       sig.worldBackwardMass.exists(_.perStep > 0.1),
       s"world backward = ${sig.worldBackwardMass}"
     )
-    assert(sig.discourseChronology.exists(_ < 1.0), sig.discourseChronology.toString)
+    assert(sig.discourseChronology.value.exists(_ < 1.0), sig.discourseChronology.render)
     assert(sig.fidelityMass.value.exists(_ > 0.5), s"fidelity = ${sig.fidelityMass.render}")
     assert(sig.perUnitFidelity.contains(u2.id))
-    assert(sig.specificity.exists(s => s > 0.0 && s <= 1.0), sig.specificity.toString)
+    assert(
+      sig.specificityMass.value.exists(s => s > 0.0 && s <= 1.0),
+      sig.specificityMass.render
+    )
     assertEqualsDouble(sig.unrankedMass, 0.0, 0.0)
     val scalar = SignatureProjection
       .of("v0", Map("uniformCoverage" -> 1.0, "intrusionMass" -> -1.0))
@@ -262,7 +265,7 @@ class WorkedExampleSuite extends FunSuite:
   test("causal preservation needs two distinct recalled units linked by a recall causal edge") {
     // e4 → e5 is a source causal edge; recalled by u2 (e5) alone: not preserved
     val sig = RecallSignature.compute(result, recall, view)
-    assert(sig.causalPreservation.forall(_ == 0.0), sig.causalPreservation.toString)
+    assert(sig.causalPreservation.value.forall(_ == 0.0), sig.causalPreservation.render)
     // add a unit anchoring e4 and a recall causal edge u4 → u2
     val extraText = recallText + " She went down to the cellar."
     val src = StorySource.fromText(extraText).toOption.get
@@ -304,7 +307,7 @@ class WorkedExampleSuite extends FunSuite:
       .infer(rg, view, cands, DefaultLocalCostModel(semantic = sem))
       .fold(e => fail(e.message), identity)
     val sig2 = RecallSignature.compute(res, rg, view)
-    assert(sig2.causalPreservation.exists(_ > 0.0), sig2.causalPreservation.toString)
+    assert(sig2.causalPreservation.value.exists(_ > 0.0), sig2.causalPreservation.render)
   }
 
   test("relation preservation: the recalled 'before' is preserved in source world time") {

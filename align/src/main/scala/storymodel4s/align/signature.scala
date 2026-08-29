@@ -25,11 +25,11 @@ final case class RecallSignature(
     importanceWeightedCoverage: ScoreEstimate,
     fidelityMass: MassRatio,
     fidelityByFacet: Map[Facet, MassRatio],
-    specificity: Option[Double],
+    specificityMass: MassRatio,
     compression: MassRatio,
-    discourseChronology: Option[Double],
-    worldChronology: Option[Double],
-    causalPreservation: Option[Double],
+    discourseChronology: MassRatio,
+    worldChronology: MassRatio,
+    causalPreservation: MassRatio,
     semanticFlowCoherence: MassRatio,
     associationMass: Double,
     intrusionMass: Double,
@@ -151,6 +151,12 @@ final class StepMass private (
     val comparableSteps: Int,
     val totalSteps: Int
 ):
+  /** Share of the route's steps that could be judged, named to match [[MassRatio.support]] so the
+    * two support carriers answer the same question through the same word. A consumer reporting a
+    * clock alongside its support should not have to know which carrier produced it.
+    */
+  def support: Double = if totalSteps <= 0 then 0.0 else comparableSteps.toDouble / totalSteps
+
   def render: String = f"$perStep%.4f (over $comparableSteps/$totalSteps comparable steps)"
 
   override def equals(other: Any): Boolean = other match
@@ -321,7 +327,15 @@ object RecallSignature:
 
     val k = view.sourceNodeCount
     val loc = p.rows.flatMap(r => r.localizability(k).map(r.unit -> _)).toMap
-    val specificity = if loc.isEmpty then None else Some(loc.values.toVector.sorted.sum / loc.size)
+    // Specificity as a ratio of SUMS, per the ruling. Localizability is defined only ON source
+    // mass and describes how concentrated that mass is, so the conditioning event is "this unit
+    // has source mass" and its natural measure is the mass itself, not the fact of the unit's
+    // existence. Mean-of-ratios gave a unit with 0.01 of source mass the same vote as a fully
+    // placed one - the same defect compression had nine lines earlier in this function.
+    val specificityN = p.rows.map(r => r.localizability(k).fold(0.0)(_ * r.sourceMass)).sum
+    val specificityA = p.rows.filter(r => r.localizability(k).isDefined).map(_.sourceMass).sum
+    val specificityT = p.rows.map(r => r.mass.values.sum).sum
+    val specificityRatio = MassRatio.unsafe(specificityN, specificityA, specificityT)
 
     // Compression as a ratio of SUMS, per the ratified estimand: N is level mass summed over every
     // unit, A is the source mass those levels were placed on, T is all row mass. Dividing per unit
@@ -335,6 +349,7 @@ object RecallSignature:
     val compressionT = p.rows.map(r => r.mass.values.sum).sum
     val compression = MassRatio.unsafe(compressionN, compressionA, compressionT)
 
+    val totalStepMass = f.steps.map(_.mass.values.sum).sum
     def isBackward(pos: SourceNodeRef => Option[Double])(a: SourceNodeRef, b: SourceNodeRef) =
       a != b && !view.isAncestor(b, a) && ((pos(a), pos(b)) match
         case (Some(x), Some(y)) => y < x
@@ -343,10 +358,20 @@ object RecallSignature:
       a != b && !view.isAncestor(b, a) && !view.isAncestor(a, b) && ((pos(a), pos(b)) match
         case (Some(x), Some(y)) => y > x
         case _                  => false)
-    def ordered(pos: SourceNodeRef => Option[Double]): Option[Double] =
+
+    /** Forward share of the directionally comparable route mass, with that comparability beside it.
+      *
+      * The ratio was already a ratio of sums, so the arithmetic is unchanged; what was missing is
+      * T. A chronology of 1.0 computed on 2% of the route mass and one computed on 90% published
+      * the same number, and the first is a claim about almost nothing. Only ORDERED pairs can be
+      * forward or backward at all - a step onto an ancestor, or onto a node with no position, is
+      * not disordered, it is unjudgeable - so the comparable mass is the conditioning event and the
+      * rest of the route is the coverage it is missing.
+      */
+    def ordered(pos: SourceNodeRef => Option[Double]): MassRatio =
       val fw = f.steps.map(_.sourceMass(isForward(pos))).sum
       val bw = f.steps.map(_.sourceMass(isBackward(pos))).sum
-      if fw + bw <= 0 then None else Some(fw / (fw + bw))
+      MassRatio.unsafe(fw, fw + bw, totalStepMass)
 
     /** Mean per-step backward mass over EVERY step, with the comparable-step support beside it.
       *
@@ -370,7 +395,11 @@ object RecallSignature:
     // `.getOrElse(1.0)` threw that away and published PERFECT forward chronology for a recall we
     // could not place at all. The honest value is None.
     val discourse = ordered(discoursePos)
-    val world = worldPos.flatMap(ordered)
+    // A view with NO world order and a route with no judgeable steps are different failures, and
+    // the total is what separates them: 0 of 0 says the source has no world chronology to violate,
+    // 0 of totalStepMass says it has one and this route told us nothing about it. Collapsing them
+    // is the same conflation causalPreservation had, one field earlier.
+    val world = worldPos.map(ordered).getOrElse(MassRatio.unsafe(0.0, 0.0, 0.0))
     val backward = backwardMean(discoursePos)
     val worldBackward = worldPos.flatMap(backwardMean)
 
@@ -397,8 +426,17 @@ object RecallSignature:
         }
       }
     }
-    val causal =
-      if recalledCausal.isEmpty then None else Some(preserved.toDouble / recalledCausal.size)
+    // Causal preservation as a ratio of sums, per ADR 0003. The conditioning event is "this source
+    // causal edge was recalled at both endpoints", and its measure is a COUNT here rather than a
+    // mass - deliberately, and not by inattention to the specificity ruling. Localizability is
+    // defined on source mass and describes how concentrated that mass is, so summing mass was the
+    // only coherent denominator there. A causal edge is a discrete object in the source graph: it
+    // is recalled or it is not, and there is no partial edge for a mass to measure.
+    //
+    // The support is what the bare ratio never said: preserving 2 of 2 recalled edges out of 40 in
+    // the source is not the same finding as preserving 38 of 38 out of 40, and both published 1.0.
+    val causalRatio =
+      MassRatio.unsafe(preserved.toDouble, recalledCausal.size.toDouble, causalEdges.size.toDouble)
 
     // Coherence as a ratio of SUMS: N is coherent source-to-source mass summed over steps, A is all
     // source-to-source mass, T is every step's mass. A step with no source-to-source mass used to
@@ -434,11 +472,11 @@ object RecallSignature:
       weighted,
       fidelityRatio,
       fidelityByFacet,
-      specificity,
+      specificityRatio,
       compression,
       discourse,
       world,
-      causal,
+      causalRatio,
       semanticFlow,
       extMean(ExternalState.Association),
       extMean(ExternalState.Intrusion),
@@ -556,11 +594,11 @@ final class SignatureProjection private (
       "uniformCoverage" -> Some(s.uniformCoverage),
       "importanceWeightedCoverage" -> s.importanceWeightedCoverage.toOption,
       "fidelity" -> s.fidelityMass.value,
-      "specificity" -> s.specificity,
+      "specificity" -> s.specificityMass.value,
       "compression" -> s.compression.value,
-      "discourseChronology" -> s.discourseChronology,
-      "worldChronology" -> s.worldChronology,
-      "causalPreservation" -> s.causalPreservation,
+      "discourseChronology" -> s.discourseChronology.value,
+      "worldChronology" -> s.worldChronology.value,
+      "causalPreservation" -> s.causalPreservation.value,
       "semanticFlowCoherence" -> s.semanticFlowCoherence.value,
       "associationMass" -> Some(s.associationMass),
       "intrusionMass" -> Some(s.intrusionMass),
@@ -582,6 +620,10 @@ final class SignatureProjection private (
     // sees what the minimum does NOT cover rather than reading it as a guarantee.
     val support: Map[String, Double] = Map(
       "fidelity" -> s.fidelityMass.support,
+      "specificity" -> s.specificityMass.support,
+      "causalPreservation" -> s.causalPreservation.support,
+      "discourseChronology" -> s.discourseChronology.support,
+      "worldChronology" -> s.worldChronology.support,
       "compression" -> s.compression.support,
       "semanticFlowCoherence" -> s.semanticFlowCoherence.support
     ) ++ s.backwardMass.map(m => "backwardMass" -> m.comparableSteps.toDouble / m.totalSteps).toMap

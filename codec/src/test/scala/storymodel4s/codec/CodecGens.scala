@@ -574,7 +574,14 @@ object CodecFixture:
     val out = StoryValidator.validate(draft, ValidationPolicy.default)
     out.validated.getOrElse(throw new IllegalStateException(out.report.toString))
 
-  /** A small recall graph over its own transcript. */
+  /** A small recall graph over its own transcript.
+    *
+    * The unit texts include their sentence-final punctuation because they must EQUAL the transcript
+    * at their spans - RecallGraph.validated enforces it, and the real segmenter produces text that
+    * way. Dropping the period here made the fixture an object the model forbids: a unit claiming
+    * text that is not the words its span points at, which is the case that lets a trace explain a
+    * different string than the one embedded.
+    */
   val recall: RecallGraph =
     val transcript = StorySource.fromText("A woman went home. Then she slept.").toOption.get
     val ratlas = SurfaceAnalyzer.analyze(transcript)
@@ -588,7 +595,7 @@ object CodecFixture:
         u0,
         0,
         rs(0),
-        "A woman went home",
+        "A woman went home.",
         DiscourseFunction.EpisodicAssertion,
         ExpressedUncertainty.Unmarked,
         PropositionSketch(
@@ -619,7 +626,7 @@ object CodecFixture:
         u1,
         1,
         rs(1),
-        "Then she slept",
+        "Then she slept.",
         DiscourseFunction.EpisodicAssertion,
         ExpressedUncertainty.Hedged(rs(1)),
         PropositionSketch(
