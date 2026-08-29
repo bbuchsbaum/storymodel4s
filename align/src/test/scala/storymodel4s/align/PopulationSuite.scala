@@ -116,20 +116,22 @@ class PopulationSuite extends ScalaCheckSuite:
     val a = SubjectAlignment(sid("s"), full, None)
     assert(PopulationAggregate.of(view, Vector(a, a.copy(wordCount = Some(1)))).isLeft)
     val alien = SourceNodeRef.Situation(storymodel4s.core.SituationId.unsafe("not-in-view"))
-    // A result anchored on a node absent from the view cannot even become a gated result: the
-    // proof re-derives every admissibility entry from the mode gate on this view.
+    // A result nominating a node absent from the view cannot even become a gated result: the
+    // proof derives every admissibility entry from the mode gate on this view over the nominated
+    // anchors, and a nominated anchor must be a node of the view.
     val u0 = full.posterior.rows.head.unit
-    val authentic = full.admissibility(u0)(e1)
-    val alienAdm = full.admissibility.updated(u0, full.admissibility(u0).updated(alien, authentic))
+    assert(full.admissibility(u0).contains(e1))
+    val alienAnchors =
+      full.candidateAnchors.updated(u0, (full.candidateAnchors(u0) :+ alien).sorted)
     val alienResult = HsmmResult.validated(
       AnnaFixture.recall,
       view,
+      alienAnchors,
       full.posterior,
       full.flow,
       full.viterbi,
       full.logLikelihood,
       full.costs,
-      alienAdm,
       full.refinementPasses
     )
     assert(alienResult.isLeft)
@@ -140,12 +142,12 @@ class PopulationSuite extends ScalaCheckSuite:
     val nanResult = HsmmResult.validated(
       AnnaFixture.recall,
       view,
+      full.candidateAnchors,
       AlignmentMatrix(nanRows),
       full.flow,
       full.viterbi,
       full.logLikelihood,
       full.costs,
-      full.admissibility,
       full.refinementPasses
     )
     assert(nanResult.isLeft)

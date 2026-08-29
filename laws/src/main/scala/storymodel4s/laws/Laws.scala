@@ -8,6 +8,7 @@ import storymodel4s.align.*
 import storymodel4s.core.*
 import storymodel4s.features.*
 import storymodel4s.proposition.*
+import storymodel4s.recall.{DiscourseFunction, RecallUnit, RecallUnitId}
 import storymodel4s.story.*
 
 /** Discipline rule sets for the propositional chart contract. */
@@ -257,67 +258,221 @@ object ModeGateLaws extends Laws:
   * puts mass, a cost, or a path step on an `(anchor, mode)` pair the gate did not admit.
   */
 object GateProofLaws extends Laws:
-  private def parts(r: HsmmResult) =
-    (r.posterior, r.flow, r.viterbi, r.logLikelihood, r.costs, r.admissibility, r.refinementPasses)
+  private def parts(r: HsmmResult): AlignGens.Forgery =
+    (r.candidateAnchors, r.posterior, r.flow, r.viterbi, r.costs)
 
   def gateProof(using Arbitrary[AlignGens.Case], Arbitrary[AlignGens.FoilCase]): RuleSet =
     new DefaultRuleSet(
       "align.gateProof",
       None,
-      "every inferred result re-validates to itself on its recall and view" -> forAll {
-        (c: AlignGens.Case) =>
+      "every inferred result re-validates to itself on its recall and view, with and without its echo" ->
+        forAll { (c: AlignGens.Case) =>
           val r = AlignGens.infer(c)
-          val (p, f, v, ll, cs, a, n) = parts(r)
-          HsmmResult.validated(c.recall, c.view, p, f, v, ll, cs, a, n) == Right(r)
-      },
-      "every forgery — mass, key, cost, path, flow, or a transplanted authentic record — is rejected" ->
+          val (a, p, f, v, cs) = parts(r)
+          AlignGens.revalidate(c.recall, c.view, r, parts(r)) == Right(r) &&
+          HsmmResult.validated(
+            c.recall,
+            c.view,
+            a,
+            p,
+            f,
+            v,
+            r.logLikelihood,
+            cs,
+            r.refinementPasses,
+            Some(r.admissibilityEcho)
+          ) == Right(r)
+        },
+      "the derived fields name the recall and the view: fingerprints match and matched accepts" ->
+        forAll { (c: AlignGens.Case) =>
+          val r = AlignGens.infer(c)
+          r.viewFingerprint == c.view.contentFingerprint &&
+          r.recallChecksum == AlignWire.recallChecksum(c.recall) &&
+          r.candidateAnchors.keySet == c.recall.units.map(_.id).toSet &&
+          r.admissibility.forall((u, m) => m.keySet == r.candidateAnchors(u).toSet) &&
+          AlignWire.matched(r, r.viewFingerprint, r.recallChecksum) == Right(r)
+        },
+      "every forgery of a foil result — mass, key, cost, path, flow, cross-record — is rejected (the un-nominated class is covered by the Case-based law: a foil nominates every node)" ->
         forAll { (f: AlignGens.FoilCase) =>
           val r = AlignGens.inferFoil(f)
-          AlignGens.forgeries(r).forall { case (p, fl, v, cs, adm) =>
-            HsmmResult
-              .validated(
-                f.recall,
-                f.base.view,
-                p,
-                fl,
-                v,
-                r.logLikelihood,
-                cs,
-                adm,
-                r.refinementPasses
-              )
-              .isLeft
+          AlignGens
+            .forgeries(r, f.base.view)
+            .forall(fg => AlignGens.revalidate(f.recall, f.base.view, r, fg).isLeft)
+        },
+      "the un-nominated forgery is refused by nomination, not by silence" ->
+        forAll { (c: AlignGens.Case) =>
+          val r = AlignGens.infer(c)
+          val rows = r.posterior.rows
+          rows.zipWithIndex.forall { (row, i) =>
+            val nominated = r.candidateAnchors(row.unit).toSet
+            c.view.nodes.map(_.ref).filterNot(nominated.contains).sorted.forall { ref =>
+              val bad = AlignState.Source(ref)
+              val forged = AlignmentMatrix
+                .of(
+                  rows
+                    .updated(i, AlignmentRow.of(row.unit, row.mass.updated(bad, 0.0)).toOption.get)
+                )
+                .toOption
+                .get
+              AlignGens.revalidate(
+                c.recall,
+                c.view,
+                r,
+                (r.candidateAnchors, forged, r.flow, r.viterbi, r.costs)
+              ) match
+                case Left(AlignError.GateViolation(u, s, d)) =>
+                  u == row.unit && s == bad && d.contains("not nominated")
+                case _ => false
+            }
           }
         },
       "a foil result has at least one inadmissible pair to forge onto" ->
-        forAll { (f: AlignGens.FoilCase) => AlignGens.forgeries(AlignGens.inferFoil(f)).nonEmpty },
+        forAll { (f: AlignGens.FoilCase) =>
+          AlignGens.forgeries(AlignGens.inferFoil(f), f.base.view).nonEmpty
+        },
       "the gate, not the record, decides: re-validating against another recall fails when the gate disagrees" ->
         forAll { (f: AlignGens.FoilCase) =>
           // The foil's recall differs from the base recall only in the contradicting unit; its
           // result cannot be validated as if it belonged to a recall whose units the gate would
           // assess differently (unit ids differ, so the record's units are unknown there).
           val r = AlignGens.inferFoil(f)
-          val (p, fl, v, ll, cs, a, n) = parts(r)
-          HsmmResult.validated(f.base.recall, f.base.view, p, fl, v, ll, cs, a, n).isLeft ||
+          AlignGens.revalidate(f.base.recall, f.base.view, r, parts(r)).isLeft ||
           f.base.recall.byId.contains(f.unit.id)
         },
-      "dropping the admissibility record invalidates every anchored result" ->
+      "an echo that is not the gate's digest is refused as drift, before any key is gated" ->
+        forAll { (c: AlignGens.Case) =>
+          val r = AlignGens.infer(c)
+          val stale = AdmissibilityEcho.of(Map.empty)
+          stale == r.admissibilityEcho || {
+            val (a, p, f, v, cs) = parts(r)
+            HsmmResult.validated(
+              c.recall,
+              c.view,
+              a,
+              p,
+              f,
+              v,
+              r.logLikelihood,
+              cs,
+              r.refinementPasses,
+              Some(stale)
+            ) == Left(AlignError.GateDrift(stale, r.admissibilityEcho))
+          }
+        },
+      "dropping every nomination invalidates every anchored result" ->
         forAll { (c: AlignGens.Case) =>
           val r = AlignGens.infer(c)
           val anchored = r.posterior.rows.exists(_.sourceMass > 0.0)
-          !anchored || HsmmResult
-            .validated(
-              c.recall,
-              c.view,
-              r.posterior,
-              r.flow,
-              r.viterbi,
-              r.logLikelihood,
-              r.costs,
-              Map.empty,
-              0
-            )
+          val none = r.candidateAnchors.map((u, _) => u -> Vector.empty[SourceNodeRef])
+          !anchored || AlignGens
+            .revalidate(c.recall, c.view, r, (none, r.posterior, r.flow, r.viterbi, r.costs))
             .isLeft
+        }
+    )
+
+/** The wire laws (bead `HsmmResult wire`): fingerprints are content addresses — invariant under
+  * iteration order, sensitive to every field the aligner reads — and the validating record
+  * factories are the identity on records a real inference produced.
+  */
+object WireLaws extends Laws:
+  def wire(using Arbitrary[AlignGens.Case]): RuleSet =
+    new DefaultRuleSet(
+      "align.wire",
+      None,
+      "the view fingerprint is invariant under node, edge, and world-order iteration order" ->
+        forAll { (c: AlignGens.Case) =>
+          val (same, _) = AlignGens.fingerprintVariants(c.view)
+          same.forall(_.contentFingerprint == c.view.contentFingerprint)
+        },
+      "the view fingerprint changes under any node-summary field, edge, world-order, or length change" ->
+        forAll { (c: AlignGens.Case) =>
+          val (_, different) = AlignGens.fingerprintVariants(c.view)
+          val base = c.view.contentFingerprint
+          different.forall((_, v) => v.contentFingerprint != base) &&
+          different.map(_._2.contentFingerprint).distinct.size == different.size
+        },
+      "the recall checksum is invariant under unit storage order and changes with a span or id" ->
+        forAll { (c: AlignGens.Case) =>
+          val base = AlignWire.recallChecksum(c.recall)
+          val u0 = c.recall.ordered.head
+          val shifted = u0.copy(span = SpanSet.one(TextSpan.unsafe(0, 1)))
+          val renamed = u0.copy(id = RecallUnitId.unsafe("zzz-renamed"))
+          def swap(u: RecallUnit) =
+            c.recall.copy(units = c.recall.units.map(x => if x.id == u0.id then u else x))
+          AlignWire.recallChecksum(c.recall.copy(units = c.recall.units.reverse)) == base &&
+          AlignWire.recallChecksum(swap(shifted)) != base &&
+          AlignWire.recallChecksum(swap(renamed)) != base
+        },
+      "a unit-text-only change flips the recall checksum (same boundaries, different content)" ->
+        forAll { (c: AlignGens.Case) =>
+          val base = AlignWire.recallChecksum(c.recall)
+          val u0 = c.recall.ordered.head
+          def swap(u: RecallUnit) =
+            c.recall.copy(units = c.recall.units.map(x => if x.id == u0.id then u else x))
+          AlignWire.recallChecksum(swap(u0.copy(text = u0.text + "!"))) != base &&
+          AlignWire.recallChecksum(
+            swap(u0.copy(proposition = u0.proposition.copy(lemmas = u0.proposition.lemmas + "zz")))
+          ) != base &&
+          AlignWire.recallChecksum(
+            swap(
+              u0.copy(function =
+                if u0.function == DiscourseFunction.TaskCommentary then
+                  DiscourseFunction.Association
+                else DiscourseFunction.TaskCommentary
+              )
+            )
+          ) != base
+        },
+      "a receipt-inconsistent optional term is rejected by the factory" ->
+        forAll { (c: AlignGens.Case) =>
+          val r = AlignGens.infer(c)
+          r.costs.values.flatMap(_.values).filter(_.mode.nonEmpty).forall { b =>
+            // the generated cases carry no charts: every optional receipt reduces to nothing, so a
+            // present optional term, or an unrecorded missing one, contradicts its receipt
+            val present = AlignWire.costBreakdown(
+              b.terms.updated(CostTerm.Chart, 0.25),
+              b.mode,
+              b.exclusion,
+              b.total,
+              b.missingTerms - CostTerm.Chart,
+              b.sourceChartCoverage,
+              b.reductions
+            )
+            val unrecorded = AlignWire.costBreakdown(
+              b.terms,
+              b.mode,
+              b.exclusion,
+              b.total,
+              b.missingTerms - CostTerm.Structural,
+              b.sourceChartCoverage,
+              b.reductions
+            )
+            present.isLeft && unrecorded.isLeft
+          }
+        },
+      "every cost breakdown and reduction receipt of a real result rebuilds to itself" ->
+        forAll { (c: AlignGens.Case) =>
+          val r = AlignGens.infer(c)
+          r.costs.values.flatMap(_.values).forall { b =>
+            AlignWire.costBreakdown(
+              b.terms,
+              b.mode,
+              b.exclusion,
+              b.total,
+              b.missingTerms,
+              b.sourceChartCoverage,
+              b.reductions
+            ) == Right(b) &&
+            b.reductions.values.forall { rc =>
+              AlignWire.reductionReceipt(
+                rc.reducer,
+                rc.members,
+                rc.excludedMembers,
+                rc.sourceChartCoverage,
+                rc.observedEstimateCoverage
+              ) == Right(rc)
+            }
+          }
         }
     )
 

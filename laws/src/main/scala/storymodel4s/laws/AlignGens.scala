@@ -1,5 +1,6 @@
 package storymodel4s.laws
 
+import cats.syntax.all.*
 import org.scalacheck.Gen
 import storymodel4s.align.*
 import storymodel4s.core.*
@@ -130,33 +131,45 @@ object AlignGens:
       .infer(f.recall, f.base.view, f.candidates, f.costModel, f.config)
       .fold(e => throw new IllegalStateException(e.message), identity)
 
-  /** One forgery = the parts to re-validate: `(posterior, flow, viterbi, costs, admissibility)`. */
+  /** One forgery = the parts to re-validate: `(candidateAnchors, posterior, flow, viterbi, costs)`.
+    */
   type Forgery = (
+      Map[RecallUnitId, Vector[SourceNodeRef]],
       AlignmentMatrix,
       TransitionFlow,
       Vector[AlignState],
-      Map[RecallUnitId, Map[AlignState, CostBreakdown]],
-      Map[RecallUnitId, Map[SourceNodeRef, Admissibility]]
+      Map[RecallUnitId, Map[AlignState, CostBreakdown]]
   )
+
+  /** Re-validate a forgery on the original recall and view (no echo). */
+  def revalidate(recall: RecallGraph, view: SourceView, r: HsmmResult, f: Forgery) =
+    val (anchors, p, fl, v, cs) = f
+    HsmmResult.validated(recall, view, anchors, p, fl, v, r.logLikelihood, cs, r.refinementPasses)
 
   /** Every single-edit forgery of an inferred result that puts a key (mass, cost entry, flow entry,
     * or Viterbi step) on an `(anchor, mode)` pair the gate does not admit, plus the chief's probe:
-    * transplanting an *authentic* faithful-admitting record (taken from elsewhere in the result)
-    * onto a gated anchor, with matching faithful rows. Built only through the public smart
-    * constructors — `Admissibility` itself cannot be constructed here. All must be rejected by
-    * [[HsmmResult.validated]] on the original recall and view.
+    * a key on an anchor of the view that the gate *would* admit faithfully but that was never
+    * nominated for the unit (nomination is part of the proof). Built only through the public smart
+    * constructors — `Admissibility` cannot be constructed here and is not an input. All must be
+    * rejected by [[HsmmResult.validated]] on the original recall and view.
     */
-  def forgeries(r: HsmmResult): Vector[Forgery] =
+  def forgeries(r: HsmmResult, view: SourceView): Vector[Forgery] =
     val rows = r.posterior.rows
     val spare = cats.data.NonEmptySet.one(Facet.Outcome)
     def inadmissible(unit: RecallUnitId): Vector[AlignState] =
-      r.admissibility.getOrElse(unit, Map.empty).toVector.sortBy(_._1.key).flatMap { (ref, a) =>
-        val faithful = if a.faithful then Vector.empty else Vector(AlignState.Source(ref))
-        val distorted =
-          if a.distortion.contains(spare) then Vector.empty
-          else Vector(AlignState.Distorted(ref, spare))
-        faithful ++ distorted
-      }
+      val admitted =
+        r.admissibility.getOrElse(unit, Map.empty).toVector.sortBy(_._1.key).flatMap { (ref, a) =>
+          val faithful = if a.faithful then Vector.empty else Vector(AlignState.Source(ref))
+          val distorted =
+            if a.distortion.contains(spare) then Vector.empty
+            else Vector(AlignState.Distorted(ref, spare))
+          faithful ++ distorted
+        }
+      // the chief's probe: nodes of the view never nominated for this unit
+      val nominated = r.candidateAnchors.getOrElse(unit, Vector.empty).toSet
+      val unnominated =
+        view.nodes.map(_.ref).filterNot(nominated.contains).sorted.map(AlignState.Source(_))
+      admitted ++ unnominated
     def rowWith(row: AlignmentRow, s: AlignState, m: Double): AlignmentRow =
       // keep the row normalized: give `s` mass `m` and rescale the rest
       val rest = row.mass.toVector.sortBy(_._1.key)
@@ -169,26 +182,22 @@ object AlignGens:
       AlignmentMatrix
         .of(rows.updated(i, row))
         .fold(e => throw new IllegalStateException(e.message), identity)
-    val authenticFaithful: Option[Admissibility] =
-      r.admissibility.toVector
-        .sortBy(_._1.value)
-        .flatMap(_._2.toVector.sortBy(_._1.key).map(_._2))
-        .find(_.faithful)
+    val anchors = r.candidateAnchors
     rows.zipWithIndex.flatMap { (row, i) =>
       inadmissible(row.unit).flatMap { bad =>
         val onPosterior =
-          (matrixWith(i, rowWith(row, bad, 0.0)), r.flow, r.viterbi, r.costs, r.admissibility)
-        val onPath = (r.posterior, r.flow, r.viterbi.updated(i, bad), r.costs, r.admissibility)
+          (anchors, matrixWith(i, rowWith(row, bad, 0.0)), r.flow, r.viterbi, r.costs)
+        val onPath = (anchors, r.posterior, r.flow, r.viterbi.updated(i, bad), r.costs)
         val onCosts =
           (
+            anchors,
             r.posterior,
             r.flow,
             r.viterbi,
             r.costs.updated(
               row.unit,
               r.costs.getOrElse(row.unit, Map.empty).updated(bad, CostBreakdown.unreachable)
-            ),
-            r.admissibility
+            )
           )
         val onFlow = r.flow.steps.zipWithIndex.collect {
           case (st, j) if st.from == row.unit =>
@@ -197,29 +206,121 @@ object AlignGens:
               .headOption
               .getOrElse(AlignState.unranked)
             val steps = r.flow.steps.updated(j, st.copy(mass = st.mass.updated((bad, other), 0.0)))
-            (r.posterior, TransitionFlow(steps), r.viterbi, r.costs, r.admissibility)
+            (anchors, r.posterior, TransitionFlow(steps), r.viterbi, r.costs)
         }
-        // The chief's probe: an authentic faithful record transplanted onto this gated anchor,
-        // with a matching faithful row and path.
-        val transplant = (bad, authenticFaithful) match
-          case (AlignState.Source(ref), Some(auth)) =>
-            val adm = r.admissibility.updated(
-              row.unit,
-              r.admissibility.getOrElse(row.unit, Map.empty).updated(ref, auth)
-            )
-            val faithfulRow = AlignmentRow
-              .of(row.unit, Map(AlignState.Source(ref) -> 1.0))
-              .fold(e => throw new IllegalStateException(e.message), identity)
-            val onlyRow = AlignmentMatrix
-              .of(Vector(faithfulRow))
-              .fold(e => throw new IllegalStateException(e.message), identity)
-            if rows.size == 1 then
-              Vector((onlyRow, TransitionFlow(Vector.empty), Vector(bad), r.costs, adm))
-            else Vector((r.posterior, r.flow, r.viterbi.updated(i, bad), r.costs, adm))
-          case _ => Vector.empty
-        Vector(onPosterior, onPath, onCosts) ++ onFlow ++ transplant
+        Vector(onPosterior, onPath, onCosts) ++ onFlow
       }
+    } ++ recordForgeries(r)
+
+  /** Cross-record forgeries: a cost record whose own mode or exclusion disagrees with the key it
+    * sits under — an External key carrying a source-mode record, an anchored key carrying the
+    * mode-less external record, a Distorted key carrying a Faithful record, and an admitted key
+    * carrying an excluded record. All must be rejected as `MalformedRecord`.
+    */
+  def recordForgeries(r: HsmmResult): Vector[Forgery] =
+    val anchors = r.candidateAnchors
+    def withCosts(cs: Map[RecallUnitId, Map[AlignState, CostBreakdown]]): Forgery =
+      (anchors, r.posterior, r.flow, r.viterbi, cs)
+    r.costs.toVector.sortBy(_._1.value).flatMap { (u, m) =>
+      val entries = m.toVector.sortBy(_._1.key)
+      val external = entries.collectFirst { case (s @ AlignState.External(_), b) => (s, b) }
+      val faithful = entries.collectFirst {
+        case (s @ AlignState.Source(_), b) if b.mode.exists(_.isFaithful) => (s, b)
+      }
+      val distorted = entries.collectFirst { case (s @ AlignState.Distorted(_, _), b) => (s, b) }
+      val swapExternal = (external, faithful).mapN { case ((e, _), (_, fb)) =>
+        withCosts(r.costs.updated(u, m.updated(e, fb)))
+      }
+      val swapSource = (external, faithful).mapN { case ((_, eb), (s, _)) =>
+        withCosts(r.costs.updated(u, m.updated(s, eb)))
+      }
+      val swapDistorted = (distorted, faithful).mapN { case ((d, _), (_, fb)) =>
+        withCosts(r.costs.updated(u, m.updated(d, fb)))
+      }
+      val excluded = faithful.map { (s, _) =>
+        withCosts(r.costs.updated(u, m.updated(s, CostBreakdown.unreachable)))
+      }
+      Vector(swapExternal, swapSource, swapDistorted, excluded).flatten
     }
+
+  /** A small checked chart, for evidence toggles in the fingerprint laws. */
+  lazy val evidence: storymodel4s.proposition.PropositionEvidence =
+    import storymodel4s.proposition.*
+    val p = ConceptId.unsafe("p")
+    val a = ConceptId.unsafe("a")
+    val b = ConceptId.unsafe("b")
+    val unchecked = PropositionChart.unchecked(
+      Some(p),
+      Map(
+        p -> Concept.predicate("find"),
+        a -> Concept.entity("anna"),
+        b -> Concept.entity("brother")
+      ),
+      Vector(
+        PropositionRelation(p, RoleAssignment.arg(0), ConceptTarget.Node(a)),
+        PropositionRelation(p, RoleAssignment.arg(1), ConceptTarget.Node(b))
+      )
+    )
+    PropositionEvidence.hand(
+      ChartValidator
+        .check(unchecked)
+        .fold(v => throw new IllegalStateException(v.toString), identity)
+    )
+
+  /** Views that must fingerprint equal to `v` (iteration order only) and views that must not (one
+    * field of one node, one edge, the world order, or the text length changed).
+    */
+  def fingerprintVariants(
+      v: InMemorySourceView
+  ): (Vector[InMemorySourceView], Vector[(String, InMemorySourceView)]) =
+    val same = Vector(
+      InMemorySourceView(
+        v.nodes.reverse,
+        v.edges.map((l, es) => l -> es.reverse),
+        v.worldOrder.map(_.toVector.reverse.toMap),
+        v.textLength
+      )
+    )
+    val target = v.leaves.head
+    def withNode(f: NodeSummary => NodeSummary): InMemorySourceView =
+      InMemorySourceView(
+        v.nodes.map(n => if n.ref == target.ref then f(n) else n),
+        v.edges,
+        v.worldOrder,
+        v.textLength
+      )
+    val different = Vector(
+      "level" -> withNode(n => n.copy(level = n.level + 1)),
+      "parent" -> withNode(_.copy(parent = None)),
+      "discoursePosition" -> withNode(n => n.copy(discoursePosition = n.discoursePosition + 1)),
+      "support" -> withNode(_.copy(support = SpanSet.one(TextSpan.unsafe(0, 1)))),
+      "predicate" -> withNode(_.copy(predicate = Some("zzz"))),
+      "participants" -> withNode(_.copy(participants = Vector.empty)),
+      "context" -> withNode(_.copy(context = ContextTag.Belief)),
+      "polarity" -> withNode(_.copy(polarity = PolarityTag.Negative)),
+      "modality" -> withNode(_.copy(modality = ModalityTag.Intended)),
+      "locations" -> withNode(_.copy(locations = Vector("zzz"))),
+      "lemmas" -> withNode(n => n.copy(lemmas = n.lemmas + "zzz")),
+      "outcome" -> withNode(_.copy(outcome = Some("zzz"))),
+      "cause" -> withNode(_.copy(cause = Some("zzz"))),
+      "importance" -> withNode(_.copy(importance = storymodel4s.features.Estimate.observed(0.25))),
+      "evidence" -> withNode(_.copy(evidence = Some(evidence))),
+      "outcome/cause re-bracketed A" -> withNode(
+        _.copy(outcome = Some("o\u0000cause\u0000c"), cause = None)
+      ),
+      "outcome/cause re-bracketed B" -> withNode(
+        _.copy(outcome = Some("o"), cause = Some("c\u0000cause\u0000"))
+      ),
+      "edge" -> InMemorySourceView(
+        v.nodes,
+        v.edges.updated(RelationLayer.Goal, Vector((target.ref, root, 1.0))),
+        v.worldOrder,
+        v.textLength
+      ),
+      "worldOrder" -> InMemorySourceView(v.nodes, v.edges, None, v.textLength),
+      "textLength" -> InMemorySourceView(v.nodes, v.edges, v.worldOrder, v.textLength + 1)
+    )
+    (same, different)
 
   // ---- adversarial foil cases for the mode-gate laws (ADR 0001 rev 3 §D5) ------------------
 

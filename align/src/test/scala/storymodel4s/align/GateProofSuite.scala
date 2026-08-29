@@ -5,11 +5,14 @@ import munit.FunSuite
 
 import scala.collection.immutable.SortedSet
 
+import storymodel4s.core.StorySource
+import storymodel4s.core.SurfaceAnalyzer
 import storymodel4s.recall.{RecallGraph, RecallUnitId}
 
-/** The gated result is a proof anchored in the mode gate, not a record (forward-review P0; chief
-  * re-review; ADR 0001 rev 3 L1). Admissibility records in these tests are never written by hand:
-  * they come from [[ModeGate.assess]] over the fixture, or from a real inference.
+/** The gated result is a proof anchored in the mode gate and bounded by the nominated candidates,
+  * not a record (forward-review P0; chief re-review; ADR 0001 rev 3 L1; bead `HsmmResult wire`).
+  * Admissibility is never written by hand here: it is derived inside `validated` from the recall,
+  * the view, and the candidate-anchor set.
   */
 class GateProofSuite extends FunSuite:
   import AnnaFixture.{view, e1, e5}
@@ -27,32 +30,46 @@ class GateProofSuite extends FunSuite:
       .fold(e => fail(e.message), identity)
   private lazy val foilUnit: RecallUnitId = foil.recall.ordered.head.id
 
+  /** The foil inferred over an explicitly narrow nomination (e4, e5, sc2): every other node of the
+    * view — e1 in particular — is a real, uncontradicted anchor the gate would admit faithfully but
+    * that was never nominated for the unit.
+    */
+  private lazy val narrowFoilResult: HsmmResult =
+    GraphHsmm
+      .infer(
+        foil.recall,
+        view,
+        Candidates.of(Map(foilUnit -> Vector(AnnaFixture.e4, e5, AnnaFixture.sc2))),
+        foil.costModel
+      )
+      .fold(e => fail(e.message), identity)
+
   /** What the gate says about `unit` on `ref` — the only legitimate way to obtain a record. */
   private def gateOf(recall: RecallGraph, unit: RecallUnitId, ref: SourceNodeRef): Admissibility =
     ModeGate.assess(recall.byId(unit), view.node(ref).get, view)
 
-  private def parts(r: HsmmResult) =
-    (r.posterior, r.flow, r.viterbi, r.logLikelihood, r.costs, r.admissibility, r.refinementPasses)
-
   private def revalidate(
       recall: RecallGraph,
       base: HsmmResult,
+      candidateAnchors: Option[Map[RecallUnitId, Vector[SourceNodeRef]]] = None,
       posterior: Option[AlignmentMatrix] = None,
       flow: Option[TransitionFlow] = None,
       viterbi: Option[Vector[AlignState]] = None,
       costs: Option[Map[RecallUnitId, Map[AlignState, CostBreakdown]]] = None,
-      admissibility: Option[Map[RecallUnitId, Map[SourceNodeRef, Admissibility]]] = None
+      echo: Option[AdmissibilityEcho] = None,
+      against: SourceView = view
   ): Either[AlignError, HsmmResult] =
     HsmmResult.validated(
       recall,
-      view,
+      against,
+      candidateAnchors.getOrElse(base.candidateAnchors),
       posterior.getOrElse(base.posterior),
       flow.getOrElse(base.flow),
       viterbi.getOrElse(base.viterbi),
       base.logLikelihood,
       costs.getOrElse(base.costs),
-      admissibility.getOrElse(base.admissibility),
-      base.refinementPasses
+      base.refinementPasses,
+      echo
     )
 
   private def matrix(rows: Vector[AlignmentRow]): AlignmentMatrix =
@@ -60,17 +77,59 @@ class GateProofSuite extends FunSuite:
   private def row(unit: RecallUnitId, mass: Map[AlignState, Double]): AlignmentRow =
     AlignmentRow.of(unit, mass).fold(e => fail(e.message), identity)
 
-  test("every inferred result re-validates to an equal result (idempotence)") {
-    val (p, f, v, ll, c, a, n) = parts(result)
+  /** All-external parts over the full recall (rows in recall order, matching flow and path). */
+  private def allExternal(
+      anchors: Map[RecallUnitId, Vector[SourceNodeRef]]
+  ): Either[AlignError, HsmmResult] =
+    val units = AnnaFixture.recall.ordered.map(_.id)
+    val ext = AlignState.unranked
+    HsmmResult.validated(
+      AnnaFixture.recall,
+      view,
+      anchors,
+      matrix(units.map(u => row(u, Map(ext -> 1.0)))),
+      TransitionFlow(
+        units.zip(units.drop(1)).map { case (a, b) => FlowStep(a, b, Map((ext, ext) -> 1.0)) }
+      ),
+      units.map(_ => ext),
+      0.0,
+      Map.empty,
+      0
+    )
+
+  test("every inferred result re-validates to an equal result, with and without its echo") {
+    assertEquals(revalidate(AnnaFixture.recall, result), Right(result))
     assertEquals(
-      HsmmResult.validated(AnnaFixture.recall, view, p, f, v, ll, c, a, n),
+      revalidate(AnnaFixture.recall, result, echo = Some(result.admissibilityEcho)),
       Right(result)
     )
-    val (fp, ff, fv, fll, fc, fa, fn) = parts(foilResult)
+    assertEquals(revalidate(foil.recall, foilResult), Right(foilResult))
     assertEquals(
-      HsmmResult.validated(foil.recall, view, fp, ff, fv, fll, fc, fa, fn),
+      revalidate(foil.recall, foilResult, echo = Some(foilResult.admissibilityEcho)),
       Right(foilResult)
     )
+  }
+
+  test("the derived fingerprints name the view and the recall the proof was made against") {
+    assertEquals(result.viewFingerprint, view.contentFingerprint)
+    assertEquals(result.viewFingerprint, ViewFingerprint.of(view))
+    assertEquals(result.recallChecksum, AlignWire.recallChecksum(AnnaFixture.recall))
+    assertEquals(foilResult.viewFingerprint, result.viewFingerprint)
+    assertNotEquals(foilResult.recallChecksum, result.recallChecksum)
+    assertEquals(
+      AlignWire.matched(result, result.viewFingerprint, result.recallChecksum),
+      Right(result)
+    )
+  }
+
+  test("the candidate anchors are the nominated set in canonical order and cover every unit") {
+    val units = AnnaFixture.recall.ordered.map(_.id)
+    assertEquals(result.candidateAnchors.keySet, units.toSet)
+    units.foreach { u =>
+      assertEquals(result.candidateAnchors(u), AnnaFixture.candidates.anchorsOf(u))
+      assertEquals(result.candidateAnchors(u), result.candidateAnchors(u).distinct.sorted)
+      assertEquals(result.admissibility(u).keySet, result.candidateAnchors(u).toSet)
+    }
   }
 
   test("the gate refuses the faithful mode on the foil's true event") {
@@ -88,56 +147,168 @@ class GateProofSuite extends FunSuite:
       viterbi = Some(Vector(AlignState.Source(e5)))
     )
     forged match
-      case Left(AlignError.GateViolation(u, s, _)) =>
+      case Left(AlignError.GateViolation(u, s, detail)) =>
         assertEquals(u, foilUnit)
         assertEquals(s, AlignState.Source(e5))
+        assert(detail.contains("did not admit"), detail)
       case other => fail(s"expected a gate violation, got $other")
   }
 
-  test("the chief's probe: a transplanted faithful-admitting record is rejected by the gate") {
-    // Take a genuine, gate-produced faithful record from the full recall (unit u0 on e1) and
-    // transplant it onto the foil unit's gated anchor e5, with matching faithful rows. The record
-    // itself is authentic; the proof must still fail because ModeGate.assess(foilUnit, e5) does
-    // not reproduce it.
-    val u0 = result.posterior.rows.head.unit
-    val authenticFaithful = result.admissibility(u0)(e1)
-    assert(authenticFaithful.faithful)
-    val transplanted = foilResult.admissibility
-      .updated(foilUnit, foilResult.admissibility(foilUnit).updated(e5, authenticFaithful))
-    val rows = Vector(row(foilUnit, Map(AlignState.Source(e5) -> 1.0)))
+  test(
+    "an anchored key outside the nominated set is rejected as not nominated (the chief's probe)"
+  ) {
+    // e1 is a real, uncontradicted node of the view; the gate would admit it faithfully. It was
+    // never nominated for the foil unit, so a key on it — even with zero mass — is refused by
+    // nomination, not admitted by silence.
+    assert(!narrowFoilResult.candidateAnchors(foilUnit).contains(e1))
+    assert(
+      gateOf(foil.recall, foilUnit, e1).faithful,
+      "e1 must be admissible, so only nomination refuses it"
+    )
+    val r0 = narrowFoilResult.posterior.rows.head
     val res = revalidate(
       foil.recall,
-      foilResult,
-      posterior = Some(matrix(rows)),
-      viterbi = Some(Vector(AlignState.Source(e5))),
-      admissibility = Some(transplanted)
+      narrowFoilResult,
+      posterior = Some(matrix(Vector(row(foilUnit, r0.mass.updated(AlignState.Source(e1), 0.0)))))
     )
     res match
-      case Left(AlignError.GateViolation(u, _, detail)) =>
+      case Left(AlignError.GateViolation(u, s, detail)) =>
         assertEquals(u, foilUnit)
-        assert(detail.contains("mode gate"), detail)
-      case other => fail(s"expected a gate violation from the transplanted record, got $other")
+        assertEquals(s, AlignState.Source(e1))
+        assert(detail.contains("not nominated"), detail)
+      case other => fail(s"expected a nomination violation, got $other")
+    // The same probe on the cost map and on the Viterbi path.
+    val costs = narrowFoilResult.costs
+      .updated(
+        foilUnit,
+        narrowFoilResult.costs(foilUnit).updated(AlignState.Source(e1), CostBreakdown.unreachable)
+      )
+    assert(revalidate(foil.recall, narrowFoilResult, costs = Some(costs)).left.exists {
+      case AlignError.GateViolation(_, _, d) => d.contains("not nominated")
+      case _                                 => false
+    })
+    assert(
+      revalidate(
+        foil.recall,
+        narrowFoilResult,
+        viterbi = Some(Vector(AlignState.Source(e1)))
+      ).isLeft
+    )
   }
 
-  test("an admissibility entry for an anchor absent from the view is rejected") {
-    val alien = SourceNodeRef.Situation(storymodel4s.core.SituationId.unsafe("not-in-view"))
-    val authentic = result.admissibility(result.posterior.rows.head.unit)(e1)
+  test("widening the nomination is construction data: the widened result is valid but different") {
+    val widened = narrowFoilResult.candidateAnchors
+      .updated(foilUnit, (narrowFoilResult.candidateAnchors(foilUnit) :+ e1).distinct.sorted)
+    val res = revalidate(foil.recall, narrowFoilResult, candidateAnchors = Some(widened))
+    val r = res.fold(e => fail(e.message), identity)
+    assertNotEquals(r, narrowFoilResult)
+    assertEquals(r.admissibility(foilUnit)(e1), gateOf(foil.recall, foilUnit, e1))
+    assertNotEquals(r.admissibilityEcho, narrowFoilResult.admissibilityEcho)
+    // the widened result is the one the echo of the widened derivation names, not the narrow one
+    assert(
+      revalidate(
+        foil.recall,
+        narrowFoilResult,
+        candidateAnchors = Some(widened),
+        echo = Some(narrowFoilResult.admissibilityEcho)
+      ).isLeft
+    )
+  }
+
+  test("candidate anchors must name exactly the recall's units, canonical, present in the view") {
     val u0 = result.posterior.rows.head.unit
-    val adm = result.admissibility.updated(u0, result.admissibility(u0).updated(alien, authentic))
-    assert(revalidate(AnnaFixture.recall, result, admissibility = Some(adm)).isLeft)
+    val anchors = result.candidateAnchors
+    assert(revalidate(AnnaFixture.recall, result, candidateAnchors = Some(anchors - u0)).isLeft)
+    val alienUnit = RecallUnitId.unsafe("not-a-unit")
+    assert(
+      revalidate(
+        AnnaFixture.recall,
+        result,
+        candidateAnchors = Some(anchors.updated(alienUnit, Vector.empty))
+      ).isLeft
+    )
+    val reversed = anchors.updated(u0, anchors(u0).reverse)
+    assert(anchors(u0).size >= 2, "fixture must nominate at least two anchors for u0")
+    assert(
+      revalidate(AnnaFixture.recall, result, candidateAnchors = Some(reversed)).left
+        .exists(_.message.contains("canonical order"))
+    )
+    val duplicated = anchors.updated(u0, anchors(u0) ++ anchors(u0).take(1))
+    assert(revalidate(AnnaFixture.recall, result, candidateAnchors = Some(duplicated)).isLeft)
+    val alien = SourceNodeRef.Situation(storymodel4s.core.SituationId.unsafe("not-in-view"))
+    val withAlien = anchors.updated(u0, (anchors(u0) :+ alien).sorted)
+    revalidate(AnnaFixture.recall, result, candidateAnchors = Some(withAlien)) match
+      case Left(AlignError.GateViolation(u, s, detail)) =>
+        assertEquals(u, u0)
+        assertEquals(s, AlignState.Source(alien))
+        assert(detail.contains("absent from the source view"), detail)
+      case other => fail(s"expected a gate violation for the alien anchor, got $other")
   }
 
-  test("an empty admissibility record admits only external states") {
-    // Rows must cover every recall unit in order (row-sequence law), so build the full recall:
-    // one row per unit, an all-external flow whose marginals match, and an external path.
+  test("an admissibility echo that is not the gate's digest is rejected as gate drift") {
+    val stale = foilResult.admissibilityEcho
+    assertNotEquals(stale, result.admissibilityEcho)
+    revalidate(AnnaFixture.recall, result, echo = Some(stale)) match
+      case Left(AlignError.GateDrift(recorded, derived)) =>
+        assertEquals(recorded, stale)
+        assertEquals(derived, result.admissibilityEcho)
+      case other => fail(s"expected gate drift, got $other")
+    // Drift is reported before any key is gated: the parts are untouched.
+    assertEquals(
+      revalidate(AnnaFixture.recall, result, echo = Some(result.admissibilityEcho)),
+      Right(result)
+    )
+  }
+
+  test(
+    "a result validated against a different view carries a different fingerprint, and matched refuses it"
+  ) {
+    // Same node ids, one lemma more on e1: the gate agrees, the fingerprint does not.
+    val altered = InMemorySourceView(
+      view.nodes.map(n => if n.ref == e1 then n.copy(lemmas = n.lemmas + "porch") else n),
+      view.edges,
+      view.worldOrder,
+      view.textLength
+    )
+    assertNotEquals(altered.contentFingerprint, view.contentFingerprint)
+    val r2 =
+      revalidate(AnnaFixture.recall, result, against = altered).fold(e => fail(e.message), identity)
+    assertEquals(r2.viewFingerprint, altered.contentFingerprint)
+    assertNotEquals(r2, result)
+    AlignWire.matched(r2, result.viewFingerprint, result.recallChecksum) match
+      case Left(AlignError.FingerprintMismatch(field, recorded, derived)) =>
+        assertEquals(field, "viewFingerprint")
+        assertEquals(recorded, result.viewFingerprint.checksum.hex)
+        assertEquals(derived, altered.contentFingerprint.checksum.hex)
+      case other => fail(s"expected a view fingerprint mismatch, got $other")
+  }
+
+  test(
+    "a result validated against a different recall carries a different checksum, and matched refuses it"
+  ) {
+    // Same units and spans, a longer transcript: the canonical text checksum differs.
+    val longer = StorySource.fromText(AnnaFixture.recallText + " Then nothing more.").toOption.get
+    val recall2 =
+      AnnaFixture.recall.copy(transcript = longer, atlas = SurfaceAnalyzer.analyze(longer))
+    assertNotEquals(AlignWire.recallChecksum(recall2), result.recallChecksum)
+    val r2 = revalidate(recall2, result).fold(e => fail(e.message), identity)
+    assertEquals(r2.recallChecksum, AlignWire.recallChecksum(recall2))
+    AlignWire.matched(r2, result.viewFingerprint, result.recallChecksum) match
+      case Left(AlignError.FingerprintMismatch(field, _, _)) =>
+        assertEquals(field, "recallChecksum")
+      case other => fail(s"expected a recall checksum mismatch, got $other")
+  }
+
+  test("a unit with no nomination admits only external states") {
+    val noAnchors = AnnaFixture.recall.ordered.map(_.id -> Vector.empty[SourceNodeRef]).toMap
+    val ok = allExternal(noAnchors)
+    assert(ok.isRight, s"all-external result rejected: ${ok.left.map(_.message)}")
     val units = AnnaFixture.recall.ordered.map(_.id)
     val ext = AlignState.unranked
-    val externalFlow = TransitionFlow(
-      units.zip(units.drop(1)).map { case (a, b) => FlowStep(a, b, Map((ext, ext) -> 1.0)) }
-    )
     val anchoredFirst = HsmmResult.validated(
       AnnaFixture.recall,
       view,
+      noAnchors,
       matrix(
         row(units.head, Map(AlignState.Source(e1) -> 1.0)) +:
           units.tail.map(u => row(u, Map(ext -> 1.0)))
@@ -150,25 +321,12 @@ class GateProofSuite extends FunSuite:
       AlignState.Source(e1) +: units.tail.map(_ => ext),
       0.0,
       Map.empty,
-      Map.empty,
       0
     )
-    assert(anchoredFirst.isLeft, "an anchored state with no admissibility record validated")
-    val ok = HsmmResult.validated(
-      AnnaFixture.recall,
-      view,
-      matrix(units.map(u => row(u, Map(ext -> 1.0)))),
-      externalFlow,
-      units.map(_ => ext),
-      0.0,
-      Map.empty,
-      Map.empty,
-      0
-    )
-    assert(ok.isRight, s"all-external result rejected: ${ok.left.map(_.message)}")
+    assert(anchoredFirst.isLeft, "an anchored state with no nomination validated")
   }
 
-  test("a distorted state with a facet set the gate did not record is rejected") {
+  test("a distorted state with a facet set the gate did not derive is rejected") {
     val gated = foilResult.admissibility(foilUnit)(e5)
     val rightFacets = gated.distortion.get
     val wrongFacets = NonEmptySet.fromSetUnsafe(SortedSet(Facet.Outcome))
@@ -177,12 +335,12 @@ class GateProofSuite extends FunSuite:
       HsmmResult.validated(
         foil.recall,
         view,
+        Map(foilUnit -> Vector(e5)),
         matrix(Vector(row(foilUnit, Map(AlignState.Distorted(e5, fs) -> 1.0)))),
         TransitionFlow(Vector.empty),
         Vector(AlignState.Distorted(e5, fs)),
         0.0,
         Map.empty,
-        Map(foilUnit -> Map(e5 -> gated)),
         0
       )
     assert(attempt(wrongFacets).isLeft)
@@ -192,9 +350,8 @@ class GateProofSuite extends FunSuite:
   test("flow keys, cost entries, and the Viterbi path are gated too (key presence, not mass)") {
     val u0 = result.posterior.rows.head.unit
     val u1 = result.posterior.rows(1).unit
-    // Splice the foil unit's gated record for e5 onto u0/u1 is not possible (the gate would not
-    // reproduce it); instead pick a state the gate does not admit for u0 at all: a distorted mode
-    // on an anchor the gate admits only faithfully.
+    // A state the gate does not admit for u0 at all: a distorted mode on an anchor the gate admits
+    // only faithfully.
     val a0 = result.admissibility(u0)
     val (ref, _) = a0.toVector.sortBy(_._1.key).find(_._2.faithful).get
     val bad = AlignState.Distorted(ref, NonEmptySet.one(Facet.Outcome))
@@ -212,6 +369,85 @@ class GateProofSuite extends FunSuite:
     assert(
       revalidate(AnnaFixture.recall, result, posterior = Some(matrix(zeroKey))).isLeft,
       "zero-mass posterior key"
+    )
+  }
+
+  test("a cost record whose mode or exclusion disagrees with its key is rejected (cross-record)") {
+    // A Distorted key carrying a Faithful breakdown.
+    val distortedKey = foilResult
+      .costs(foilUnit)
+      .keys
+      .collectFirst { case s @ AlignState.Distorted(`e5`, _) =>
+        s
+      }
+      .get
+    val faithfulRecord = foilResult
+      .costs(foilUnit)
+      .collectFirst {
+        case (AlignState.Source(_), b) if b.mode.exists(_.isFaithful) => b
+      }
+      .get
+    val swapped = foilResult.costs
+      .updated(foilUnit, foilResult.costs(foilUnit).updated(distortedKey, faithfulRecord))
+    revalidate(foil.recall, foilResult, costs = Some(swapped)) match
+      case Left(AlignError.MalformedRecord(record, detail)) =>
+        assertEquals(record, "CostBreakdown")
+        assert(detail.contains("does not agree with its key"), detail)
+      case other => fail(s"expected a malformed cost record, got $other")
+    // An External key carrying a source mode.
+    val externalKey = AlignState.External(ExternalState.Intrusion)
+    assert(foilResult.costs(foilUnit).contains(externalKey))
+    val external = foilResult.costs
+      .updated(foilUnit, foilResult.costs(foilUnit).updated(externalKey, faithfulRecord))
+    assert(revalidate(foil.recall, foilResult, costs = Some(external)).left.exists {
+      case AlignError.MalformedRecord(_, d) => d.contains("does not agree with its key")
+      case _                                => false
+    })
+    // A Source key carrying an external (mode-less) record, and an admitted key carrying an
+    // excluded record.
+    val sourceKey = foilResult
+      .costs(foilUnit)
+      .collectFirst {
+        case (s @ AlignState.Source(_), b) if b.mode.exists(_.isFaithful) => s
+      }
+      .get
+    val externalRecord = foilResult.costs(foilUnit)(externalKey)
+    val modeless = foilResult.costs
+      .updated(foilUnit, foilResult.costs(foilUnit).updated(sourceKey, externalRecord))
+    assert(revalidate(foil.recall, foilResult, costs = Some(modeless)).isLeft)
+    val excluded = foilResult.costs
+      .updated(foilUnit, foilResult.costs(foilUnit).updated(sourceKey, CostBreakdown.unreachable))
+    assert(revalidate(foil.recall, foilResult, costs = Some(excluded)).left.exists {
+      case AlignError.MalformedRecord(_, d) => d.contains("excluded")
+      case _                                => false
+    })
+  }
+
+  test("a candidate absent from the view is dropped by infer, never nominated (alien candidate)") {
+    val alien = SourceNodeRef.Situation(storymodel4s.core.SituationId.unsafe("not-in-view"))
+    val withAlien = Candidates(
+      AnnaFixture.candidates.byUnit.map((u, set) =>
+        u -> CandidateSet(
+          set.nominations :+ Nomination(alien, Channels.unspecified, set.size, None, None, None),
+          set.abstained
+        )
+      )
+    )
+    val res = GraphHsmm
+      .infer(AnnaFixture.recall, view, withAlien, AnnaFixture.costModel)
+      .fold(e => fail(s"an alien candidate must not fail inference: ${e.message}"), identity)
+    assertEquals(res, result)
+    res.candidateAnchors.values.foreach(refs => assert(!refs.contains(alien)))
+    res.costs.values.foreach(m => assert(!m.keys.exists(_.anchor.contains(alien))))
+    assert(res.costs.values.flatMap(_.values).forall(_.exclusion.isEmpty))
+  }
+
+  test("costs recorded for a unit outside the recall are rejected") {
+    val stray = RecallUnitId.unsafe("stray")
+    val costs = result.costs.updated(stray, Map(AlignState.unranked -> CostBreakdown.unreachable))
+    assert(
+      revalidate(AnnaFixture.recall, result, costs = Some(costs)).left
+        .exists(_.message.contains("unknown unit"))
     )
   }
 
@@ -237,19 +473,19 @@ class GateProofSuite extends FunSuite:
 
   test("rows must be the recall's units in recall order (truncation and reordering rejected)") {
     // Consistently truncated: drop the last row, its flow step, its Viterbi state, its costs and
-    // its admissibility record. Every per-row and per-step check still passes; only the
-    // row-sequence check can catch it — and it must, or the ordering metrics are fabricable.
+    // its nomination. Every per-row and per-step check still passes; only the row-sequence check
+    // can catch it — and it must, or the ordering metrics are fabricable.
     val rows = result.posterior.rows
     assert(rows.size >= 3, "fixture must have at least three units")
     val dropped = rows.last.unit
     val truncated = revalidate(
       AnnaFixture.recall,
       result,
+      candidateAnchors = Some(result.candidateAnchors - dropped),
       posterior = Some(matrix(rows.init)),
       flow = Some(TransitionFlow(result.flow.steps.init)),
       viterbi = Some(result.viterbi.init),
-      costs = Some(result.costs - dropped),
-      admissibility = Some(result.admissibility - dropped)
+      costs = Some(result.costs - dropped)
     )
     assert(truncated.isLeft, "truncated matrix validated")
     assert(

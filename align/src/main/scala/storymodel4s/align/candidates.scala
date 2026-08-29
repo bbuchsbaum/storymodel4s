@@ -79,6 +79,18 @@ final case class Candidates(byUnit: Map[RecallUnitId, CandidateSet]):
     byUnit.get(unit).map(_.ranked).getOrElse(Vector.empty)
   def set(unit: RecallUnitId): CandidateSet = byUnit.getOrElse(unit, CandidateSet.unranked)
   def abstained(unit: RecallUnitId): Boolean = set(unit).abstained
+
+  /** The nominated anchors of a unit in canonical order (ascending reference key, unique): the
+    * per-unit candidate-anchor set an [[HsmmResult]] carries as construction input, over which the
+    * proof re-derives admissibility.
+    */
+  def anchorsOf(unit: RecallUnitId): Vector[SourceNodeRef] = set(unit).ranked
+
+  /** The candidate-anchor map for exactly `units` (a unit with no nomination maps to an empty
+    * vector), in the form [[HsmmResult.validated]] requires.
+    */
+  def anchorsByUnit(units: Vector[RecallUnitId]): Map[RecallUnitId, Vector[SourceNodeRef]] =
+    units.iterator.map(u => u -> anchorsOf(u)).toMap
   def union: Vector[SourceNodeRef] = byUnit.values.flatMap(_.ranked).toVector.distinct.sorted
   def totalSize: Int = byUnit.values.map(_.size).sum
 

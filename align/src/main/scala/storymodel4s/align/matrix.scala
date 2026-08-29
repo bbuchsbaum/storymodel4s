@@ -310,6 +310,20 @@ enum AlignError:
   /** The parts of a result do not fit together (units, flow endpoints, path length). */
   case InconsistentResult(detail: String)
 
+  /** The admissibility echo carried with a result is not the digest of what the [[ModeGate]]
+    * derives now: the gate that produced the record is not the gate being run (wire drift), as
+    * distinct from a forged key.
+    */
+  case GateDrift(recorded: AdmissibilityEcho, derived: AdmissibilityEcho)
+
+  /** A fingerprint carried on the wire (`viewFingerprint`, `recallChecksum`) differs from the value
+    * the proof derived from the recall and view in hand.
+    */
+  case FingerprintMismatch(field: String, recorded: String, derived: String)
+
+  /** A record rebuilt through [[AlignWire]] is malformed or internally inconsistent. */
+  case MalformedRecord(record: String, detail: String)
+
   def message: String = this match
     case EmptyRecall            => "recall has no units"
     case InvalidConfig(f, m)    => s"$f: $m"
@@ -317,3 +331,7 @@ enum AlignError:
     case SizeMismatch(m)        => m
     case GateViolation(u, s, m) => s"unit ${u.value}, state ${s.key}: $m"
     case InconsistentResult(m)  => m
+    case GateDrift(r, d)        =>
+      s"admissibility echo ${r.checksum.short()} differs from the gate's ${d.checksum.short()}"
+    case FingerprintMismatch(f, r, d) => s"$f on the wire ($r) differs from the derived value ($d)"
+    case MalformedRecord(r, m)        => s"$r: $m"

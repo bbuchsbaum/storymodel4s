@@ -224,6 +224,67 @@ enum FidelityMode:
   `benchmark-tuned`, never `calibrated`. Retrieval calibration and open-world
   rejection calibration are separate models with separate ECE/Brier.
 
+#### D5.1 The gated result as a proof over the nominated candidates; wire renderings
+
+`HsmmResult` is a proof of gate admission **over the nominated candidate set**:
+`candidateAnchors: Map[RecallUnitId, Vector[SourceNodeRef]]` (canonical order:
+ascending reference key, unique; key set = the recall's units) is construction
+input; `admissibility` is derived inside `HsmmResult.validated` by running
+`ModeGate.assess` over exactly those anchors — never over all view nodes, never
+over the anchors that happen to appear in the parts — and every anchored key of
+the posterior, flow, costs, or Viterbi path must be nominated *and* admitted in
+exactly that mode (key presence, not mass). A cost record's own `mode`/`exclusion`
+must agree with the key it sits under. `viewFingerprint` and `recallChecksum` are
+derived inside `validated` and are mandatory match fields on the wire
+(`AlignWire.matched`); `AdmissibilityEcho` is carried for drift detection only
+(`AlignError.GateDrift`), never as authority. Stated residual: nomination
+*provenance* (which channel nominated an anchor) is not proven. Records
+(`CostBreakdown`, structural-reduction receipts) are rebuilt only through the
+`AlignWire` validating factories, which refuse non-finite/negative values,
+term–mode contradictions, and receipt-inconsistent terms (an optional term must
+equal the receipt's reducer over its observed members, clamped as the cost model
+clamps; the observed/missing partition must agree with `missingTerms`; each
+receipt's source-chart coverage must equal the breakdown's; a `Missing`
+reduction may not hide members that reduce to a value). Stated residual:
+`CostBreakdown.total` is a cached value, not verified on the wire — the weights
+and function prior that produced it are not on the record; a consumer that
+needs it re-derivable carries `CostWeights`/`FunctionPrior` and recomputes.
+
+The wire digests are **versioned canonical renderings** with the same rule as
+receipt renderings: a change to what a gate or cost reads is a version bump. All
+are `ContentAddress.digest` over an align-local tagged, **length-prefixed**
+token vector: every value is preceded by its tag and by its own length (decimal
+UTF-16 code units) as a separate token; every list by its tag and its element
+count, each element length-prefixed; composite values length-prefix each
+component and join with U+0001. Re-bracketing adjacent values therefore cannot
+collide: with U+0000 embedded in a value, `outcome = "o\0cause\0c", cause = ""`
+and `outcome = "o", cause = "c\0cause\0"` NUL-join to the same bytes but
+length-prefix differently. Evidence identity is `proposition.Canonical.checksum` (align never
+reaches the codec).
+
+- `view-fingerprint/v1` — nodes sorted by reference key, each: `ref`, `level`,
+  `parent`, `discoursePosition`, `support` (sorted span refs: surface unit id,
+  start, end), `predicate`, `participants` (in order: role, label, aliases sorted
+  with count), `context`, `polarity`, `modality`, `locations` (in order),
+  `lemmas` (sorted), `outcome`, `cause`, `importance` (the full `Estimate`
+  variant: observed value + credence raw score / calibrated probability /
+  model, or the missing reason), `evidence` (chart checksum or empty); then per
+  `RelationLayer` in enum order the sorted `(from, to, weight)` entries with
+  weight > 0 (IEEE-754 rendered); then `worldOrder` (sorted) and `textLength`.
+- `recall-checksum/v1` — the transcript's canonical checksum; then per unit in
+  recall order the **full** unit content anything reads: `id`, `ordinal`,
+  `span` (sorted span refs), `text`, `function`, expressed uncertainty (variant
+  and cue spans), the whole proposition sketch (`predicate`, `participants` with
+  role / entity / label / specified / head / determiner / number / modifiers /
+  aliases, `polarity`, `modality`, `locations`, `times`, `sensoryTerms`,
+  `lemmas` sorted, `outcome`, `cause`), `grounding`, `evidence` (chart
+  checksum); then the explicit `temporal` and `causal` relations (sorted). Same
+  boundaries with different content therefore fail `matched`.
+- `admissibility-echo/v1` — tagged like the others: `entries` (count), then per
+  `(unit, anchor)` sorted: `unit`, `anchor`, `contradictions` (list, in detection
+  order), `faithful`, `facets` (list, sorted).
+- hsmm/v1: JSON object field list owned by codec (HsmmResultCodec); the field list is added below by the codec candidate.
+
 ### D6. Privacy, cache, receipts (P0-3)
 
 - `Pseudonymizer` returns two separately held values: `PseudonymizedText`
