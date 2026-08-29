@@ -87,6 +87,8 @@ enum ClaimFamily:
   case StateChange
   case Reference
   case Boundary
+  case SegmentMembership
+  case DiscourseTrajectory
   case Summary
   case DetailAtom
   case Custom(namespace: String, name: String)
@@ -99,8 +101,10 @@ object ClaimFamily:
     EventCoreference,
     RoleReversal,
     Polarity,
+    ContextAssignment,
     StrictPrecedence,
     CausalEdge,
+    SegmentMembership,
     TargetEpisodeMembership
   )
 
