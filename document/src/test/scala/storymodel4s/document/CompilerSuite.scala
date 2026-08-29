@@ -407,14 +407,16 @@ class CompilerSuite extends FunSuite:
         contextAttempts = Some(Vector(byIdContext))
       )
     )
-    val contextClaim = result.derivation.attempts.collectFirst {
-      case DerivationAttempt(
-            _,
-            ClaimFamily.ContextAssignment,
-            DerivationDisposition.Emitted(id)
-          ) =>
-        id
-    }.getOrElse(fail("missing emitted context-assignment claim"))
+    val contextClaim = result.derivation.attempts
+      .collectFirst {
+        case DerivationAttempt(
+              _,
+              ClaimFamily.ContextAssignment,
+              DerivationDisposition.Emitted(id)
+            ) =>
+          id
+      }
+      .getOrElse(fail("missing emitted context-assignment claim"))
     val contextMeta = result.derivation.emittedClaims
       .getOrElse(contextClaim, fail("context ClaimMeta was not retained"))
     val rootMeta = result.draft.graph.contexts.values.headOption
