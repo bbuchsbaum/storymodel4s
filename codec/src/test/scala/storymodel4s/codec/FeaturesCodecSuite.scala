@@ -102,6 +102,74 @@ class FeaturesCodecSuite extends ScalaCheckSuite:
     )
   }
 
+  test("BasisId and basis-bearing provenance round-trip; an absent legacy field is None") {
+    val basis = BasisId
+      .of(
+        TargetFamily.Situation,
+        Vector(
+          FeatureTarget.Situation(SituationId.unsafe("alpha")),
+          FeatureTarget.Situation(SituationId.unsafe("beta"))
+        )
+      )
+      .toOption
+      .get
+    assertEquals(Canonical.decode[BasisId](Canonical.encode(basis)), Right(basis))
+    assert(Canonical.isFixedPoint(basis))
+
+    val provenance = TrackProvenance(
+      Provenance.deterministic("basis-codec", Checksum.ofText("receipt")),
+      None,
+      Some(basis)
+    )
+    assertEquals(
+      Canonical.decode[TrackProvenance](Canonical.encode(provenance)),
+      Right(provenance)
+    )
+    val legacy = provenance.copy(basisId = None)
+    val legacyJson = Canonical.encode(legacy)
+    assert(!legacyJson.contains("basisId"))
+    assertEquals(Canonical.decode[TrackProvenance](legacyJson), Right(legacy))
+  }
+
+  test("FeatureTrack decoding rejects a basis that does not match its output space") {
+    val derivation = FeatureDerivation(
+      NonEmptyVector.one(FeatureSpaceId.unsafe("raw.demo")),
+      None,
+      ScalarReducer.Mean.id,
+      WeightingPolicy.Uniform,
+      MissingValuePolicy.IgnoreMissing,
+      None,
+      "basis-codec",
+      targetFamily = Some(TargetFamily.Situation)
+    )
+    val basis = BasisId
+      .of(
+        TargetFamily.Situation,
+        Vector(FeatureTarget.Situation(SituationId.unsafe("alpha")))
+      )
+      .toOption
+      .get
+    val space: FeatureSpace[Double] = FeatureSpace(
+      derivation.outputSpaceId,
+      "deliberately mismatched basis output",
+      FeatureValueSchema.Scalar(None),
+      None,
+      Fingerprint.unsafe("codec:basis:1"),
+      normalized = false
+    )
+    val invalid: FeatureTrack[FeatureTarget, Double] = FeatureTrack(
+      space,
+      Vector.empty,
+      Some(derivation),
+      TrackProvenance(
+        Provenance.deterministic("basis-codec", Checksum.ofText("receipt")),
+        None,
+        Some(basis)
+      )
+    )
+    assert(Canonical.decode[FeatureTrack[FeatureTarget, Double]](Canonical.encode(invalid)).isLeft)
+  }
+
   property("NarrativeWindowPlan round-trips; a negative half-width is refused") {
     forAll(narrativePlan) { p =>
       assertEquals(Canonical.decode[NarrativeWindowPlan](Canonical.encode(p)), Right(p))

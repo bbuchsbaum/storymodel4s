@@ -251,6 +251,7 @@ object Windowed:
       missing: MissingValuePolicy,
       eligibility: Eligibility = Eligibility.LexicalTokens
   ): Either[DomainError, FeatureTrack[T, Double]] =
+    val basisId = basis.basisId
     val derivation = FeatureDerivation(
       NonEmptyVector.one(track.space.id),
       None,
@@ -304,21 +305,23 @@ object Windowed:
         outputSpace(
           track.space,
           derivation,
-          s"${track.space.description} — ${plan.canonicalString} ${reducer.id.value}"
+          s"${track.space.description} — ${plan.canonicalString} ${reducer.id.value}",
+          Some(basisId)
         ),
         obs.sortBy(o => o.target: FeatureTarget),
         Some(derivation),
-        track.provenance
+        track.provenance.copy(basisId = Some(basisId))
       )
     }
 
   private[features] def outputSpace(
       in: FeatureSpace[Double],
       d: FeatureDerivation,
-      description: String
+      description: String,
+      basisId: Option[BasisId] = None
   ): FeatureSpace[Double] =
     FeatureSpace(
-      d.outputSpaceId,
+      basisId.fold(d.outputSpaceId)(basis => d.outputSpaceId(basis)),
       description,
       FeatureValueSchema.Scalar(in.units),
       in.units,
@@ -366,9 +369,45 @@ object Aggregate:
       missing: MissingValuePolicy,
       lexicalOnly: Boolean = true
   ): Either[DomainError, FeatureTrack[T, Double]] =
+    targets.headOption
+      .map((t, _) => TargetFamily.of(t))
+      .toRight(
+        DomainError.InvariantViolation(
+          "features/aggregate",
+          "empty target basis requires an explicit target family"
+        )
+      )
+      .flatMap(family =>
+        overTargets(track, sequence, family, targets, reducer, missing, lexicalOnly)
+      )
+
+  /** Aggregate over targets with an explicit family, required when the ordered basis is empty. */
+  def overTargets[T <: FeatureTarget](
+      track: FeatureTrack[FeatureTarget.Token, Double],
+      sequence: SurfaceSequence,
+      family: TargetFamily,
+      targets: Vector[(T, SpanSet)],
+      reducer: ScalarReducer,
+      missing: MissingValuePolicy
+  ): Either[DomainError, FeatureTrack[T, Double]] =
+    overTargets(track, sequence, family, targets, reducer, missing, lexicalOnly = true)
+
+  /** Aggregate over an explicit target family with a caller-selected eligibility policy. */
+  def overTargets[T <: FeatureTarget](
+      track: FeatureTrack[FeatureTarget.Token, Double],
+      sequence: SurfaceSequence,
+      family: TargetFamily,
+      targets: Vector[(T, SpanSet)],
+      reducer: ScalarReducer,
+      missing: MissingValuePolicy,
+      lexicalOnly: Boolean
+  ): Either[DomainError, FeatureTrack[T, Double]] =
     val eligibility = if lexicalOnly then Eligibility.LexicalTokens else Eligibility.AllTokens
-    val family = targets.headOption.map((t, _) => TargetFamily.of(t))
-    aggregate(track, sequence, targets, family, reducer, missing, eligibility)
+    BasisId
+      .of(family, targets.map((t, _) => t: FeatureTarget))
+      .flatMap(basisId =>
+        aggregate(track, sequence, targets, family, basisId, reducer, missing, eligibility)
+      )
 
   /** Per-unit aggregation over a [[NarrativeBasis]]: one observation per situation or segment, with
     * the unit's exact support and coverage. The recipe records the basis family even when the basis
@@ -382,7 +421,16 @@ object Aggregate:
       missing: MissingValuePolicy,
       eligibility: Eligibility = Eligibility.LexicalTokens
   ): Either[DomainError, FeatureTrack[T, Double]] =
-    aggregate(track, sequence, basis.units, Some(basis.family), reducer, missing, eligibility)
+    aggregate(
+      track,
+      sequence,
+      basis.units,
+      basis.family,
+      basis.basisId,
+      reducer,
+      missing,
+      eligibility
+    )
 
   /** Per-situation (event) aggregation; every id must resolve through `resolver`. */
   def overSituations(
@@ -414,7 +462,8 @@ object Aggregate:
       track: FeatureTrack[FeatureTarget.Token, Double],
       sequence: SurfaceSequence,
       targets: Vector[(T, SpanSet)],
-      family: Option[TargetFamily],
+      family: TargetFamily,
+      basisId: BasisId,
       reducer: ScalarReducer,
       missing: MissingValuePolicy,
       eligibility: Eligibility
@@ -429,39 +478,36 @@ object Aggregate:
       None,
       implementationVersion,
       eligibility,
-      family
+      Some(family)
     )
     val red = WindowReducer.scalar(reducer)
-    val mixed = targets.map((t, _) => TargetFamily.of(t)).distinct.size > 1
-    if mixed then
-      Left(DomainError.InvariantViolation("features/aggregate", "targets of mixed families"))
-    else
-      targets
-        .traverse { (t, support) =>
-          val idx = sequence
-            .coveringIndices(support)
-            .filter(i => !lexicalOnly || sequence.tokens(i.value).isLexical)
-          val samples = idx.map { i =>
-            val est =
-              track.get(FeatureTarget.Token(i)).getOrElse(Estimate.Missing(MissingReason.Unknown))
-            Sample(i.value, est, 1.0)
-          }
-          Reduction
-            .reduce(samples, red, missing)
-            .map((est, cov) => FeatureObservation(t, est, Some(support), Some(cov)))
+    targets
+      .traverse { (t, support) =>
+        val idx = sequence
+          .coveringIndices(support)
+          .filter(i => !lexicalOnly || sequence.tokens(i.value).isLexical)
+        val samples = idx.map { i =>
+          val est =
+            track.get(FeatureTarget.Token(i)).getOrElse(Estimate.Missing(MissingReason.Unknown))
+          Sample(i.value, est, 1.0)
         }
-        .map { obs =>
-          FeatureTrack(
-            Windowed.outputSpace(
-              track.space,
-              derivation,
-              s"${track.space.description} — aggregate ${reducer.id.value}"
-            ),
-            obs.sortBy(o => o.target: FeatureTarget),
-            Some(derivation),
-            track.provenance
-          )
-        }
+        Reduction
+          .reduce(samples, red, missing)
+          .map((est, cov) => FeatureObservation(t, est, Some(support), Some(cov)))
+      }
+      .map { obs =>
+        FeatureTrack(
+          Windowed.outputSpace(
+            track.space,
+            derivation,
+            s"${track.space.description} — aggregate ${reducer.id.value}",
+            Some(basisId)
+          ),
+          obs.sortBy(o => o.target: FeatureTarget),
+          Some(derivation),
+          track.provenance.copy(basisId = Some(basisId))
+        )
+      }
 
 /** An ordered run of narrative units — situations (events) or segments (scenes) — with their
   * resolved text supports: the axis that [[Aggregate.overBasis]] aggregates per unit and
@@ -475,7 +521,8 @@ object Aggregate:
   */
 final case class NarrativeBasis[T <: FeatureTarget] private (
     family: TargetFamily,
-    units: Vector[(T, SpanSet)]
+    units: Vector[(T, SpanSet)],
+    basisId: BasisId
 ):
   def size: Int = units.size
   def isEmpty: Boolean = units.isEmpty
@@ -517,4 +564,8 @@ object NarrativeBasis:
                 )
               )
           }
-          .map(NarrativeBasis(family, _))
+          .flatMap { units =>
+            BasisId
+              .of(family, units.map((target, _) => target: FeatureTarget))
+              .map(NarrativeBasis(family, units, _))
+          }

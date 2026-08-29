@@ -77,6 +77,40 @@ object TargetFamily:
     case _: FeatureTarget.Segment     => Segment
     case _: FeatureTarget.SurfaceUnit => SurfaceUnit
 
+/** Content identity of the ordered target axis on which a derivation ran.
+  *
+  * Why: a recipe alone does not identify its outputs when the caller supplies the situations,
+  * segments, or other targets and their order. The family is included even for an empty basis, and
+  * targets are hashed in caller order using their canonical address parts.
+  */
+object BasisId:
+  opaque type BasisId = Checksum
+  private val path = "features/basis"
+
+  /** Build an identity only when every target belongs to the declared family. */
+  def of(family: TargetFamily, targets: Vector[FeatureTarget]): Either[DomainError, BasisId] =
+    targets.find(TargetFamily.of(_) != family) match
+      case Some(target) =>
+        Left(
+          DomainError.InvariantViolation(
+            path,
+            s"${FeatureTargetKey.parts(target).mkString("/")} is not a $family target"
+          )
+        )
+      case None =>
+        Right(
+          ContentAddress.digest(
+            family.toString +: targets.flatMap(FeatureTargetKey.parts)
+          )
+        )
+
+  /** Rebuild a wire identity after the checksum decoder has validated its representation. */
+  def fromChecksum(checksum: Checksum): BasisId = checksum
+
+  extension (id: BasisId) def checksum: Checksum = id
+
+type BasisId = BasisId.BasisId
+
 /** A centred window of `±halfWidth` narrative units around each unit of a [[NarrativeBasis]]: the
   * narrative counterpart of core's `WindowPlan` (ADR 0002 §9 checkpoint 2, "`WindowBasis.Events`").
   *
@@ -149,6 +183,12 @@ final case class FeatureDerivation(
     */
   def outputSpaceId: FeatureSpaceId =
     FeatureSpaceId.unsafe("derived:" + derivationId.short(32))
+
+  /** Output identity when this recipe ran on a caller-supplied ordered basis. */
+  def outputSpaceId(basis: BasisId): FeatureSpaceId =
+    FeatureSpaceId.unsafe(
+      "derived:" + Checksum.ofText(derivationId.hex + "|" + basis.checksum.hex).short(32)
+    )
 
 object FeatureDerivation:
   private val path = "features/derivation"

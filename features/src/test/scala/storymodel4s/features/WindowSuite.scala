@@ -295,6 +295,7 @@ class WindowSuite extends ScalaCheckSuite:
     assertNotEquals(lexical.space.id, all.space.id)
     assertEquals(lexical.derivation.get.eligibility, Eligibility.LexicalTokens)
     assertEquals(lexical.derivation.get.targetFamily, Some(TargetFamily.Window))
+    assertEquals(lexical.provenance.basisId, None)
   }
 
   test("aggregate over discontinuous supports") {
@@ -357,6 +358,47 @@ class WindowSuite extends ScalaCheckSuite:
     assertEquals(raw.zip(raw).size, raw.size)
     assertEquals(raw.coverage.eligible, sequence.size)
     assertEquals(raw.coverage.observed, raw.observed.size)
+
+    val basis = BasisId
+      .of(
+        TargetFamily.Situation,
+        Vector(FeatureTarget.Situation(SituationId.unsafe("validation")))
+      )
+      .toOption
+      .get
+    assert(
+      FeatureTrack
+        .validated(raw.copy(provenance = raw.provenance.copy(basisId = Some(basis))))
+        .isLeft
+    )
+
+    val derived = Aggregate
+      .overTargets(
+        raw,
+        sequence,
+        Vector(
+          (
+            FeatureTarget.Situation(SituationId.unsafe("validation")),
+            SpanSet.one(atlas.sentences.head.span)
+          )
+        ),
+        ScalarReducer.Mean,
+        MissingValuePolicy.IgnoreMissing
+      )
+      .toOption
+      .get
+    val wrongBasis = BasisId
+      .of(
+        TargetFamily.Situation,
+        Vector(FeatureTarget.Situation(SituationId.unsafe("different")))
+      )
+      .toOption
+      .get
+    assert(
+      FeatureTrack
+        .validated(derived.copy(provenance = derived.provenance.copy(basisId = Some(wrongBasis))))
+        .isLeft
+    )
   }
 
   test("support resolver resolves surface targets and delegates narrative targets") {
@@ -422,6 +464,7 @@ class WindowSuite extends ScalaCheckSuite:
     assertEquals(basis.size, atlas.sentences.size)
     val reversed = NarrativeBasis.situations(situationOrder.reverse, resolver).toOption.get
     assertEquals(reversed.targets, situationOrder.reverse.map(FeatureTarget.Situation.apply))
+    assertNotEquals(basis.basisId, reversed.basisId)
     NarrativeBasis.situations(situationOrder :+ SituationId.unsafe("ghost"), resolver) match
       case Left(DomainError.InvariantViolation(_, reason)) => assert(reason.contains("ghost"))
       case other => fail(s"expected an unresolved-id violation, got $other")
@@ -433,6 +476,100 @@ class WindowSuite extends ScalaCheckSuite:
     assert(NarrativeBasis.segments(Vector(SegmentId.unsafe("x")), resolver).isLeft)
     val empty = NarrativeBasis.situations(Vector.empty, resolver).toOption.get
     assert(empty.isEmpty)
+    val emptySegments = NarrativeBasis.segments(Vector.empty, resolver).toOption.get
+    assertNotEquals(empty.basisId, emptySegments.basisId)
+  }
+
+  test("caller-supplied aggregate bases determine output identity and provenance") {
+    val raw = imageabilityTrack()
+    val alpha: FeatureTarget.Situation =
+      FeatureTarget.Situation(SituationId.unsafe("alpha"))
+    val beta: FeatureTarget.Situation = FeatureTarget.Situation(SituationId.unsafe("beta"))
+    val targets: Vector[(FeatureTarget.Situation, SpanSet)] = Vector(
+      alpha -> SpanSet.one(atlas.sentences(0).span),
+      beta -> SpanSet.one(atlas.sentences(1).span)
+    )
+    def aggregate(ts: Vector[(FeatureTarget.Situation, SpanSet)]) =
+      Aggregate
+        .overTargets(
+          raw,
+          sequence,
+          ts,
+          ScalarReducer.Mean,
+          MissingValuePolicy.IgnoreMissing
+        )
+        .toOption
+        .get
+
+    val forward = aggregate(targets)
+    val reversed = aggregate(targets.reverse)
+    assertEquals(forward.derivation.map(_.derivationId), reversed.derivation.map(_.derivationId))
+    assertNotEquals(forward.provenance.basisId, reversed.provenance.basisId)
+    assertNotEquals(forward.space.id, reversed.space.id)
+    assertEquals(
+      forward.provenance.basisId.map(basis => forward.derivation.get.outputSpaceId(basis)),
+      Some(forward.space.id)
+    )
+    assertEquals(
+      DerivationGraph.empty
+        .add(forward.space.id, forward.derivation.get)
+        .flatMap(_.add(reversed.space.id, reversed.derivation.get))
+        .map(_.size),
+      Right(2)
+    )
+
+    val emptySituations = Aggregate
+      .overTargets(
+        raw,
+        sequence,
+        TargetFamily.Situation,
+        Vector.empty[(FeatureTarget.Situation, SpanSet)],
+        ScalarReducer.Mean,
+        MissingValuePolicy.IgnoreMissing
+      )
+      .toOption
+      .get
+    val emptySegments = Aggregate
+      .overTargets(
+        raw,
+        sequence,
+        TargetFamily.Segment,
+        Vector.empty[(FeatureTarget.Segment, SpanSet)],
+        ScalarReducer.Mean,
+        MissingValuePolicy.IgnoreMissing
+      )
+      .toOption
+      .get
+    assertNotEquals(emptySituations.provenance.basisId, emptySegments.provenance.basisId)
+    assertNotEquals(emptySituations.space.id, emptySegments.space.id)
+    assert(
+      Aggregate
+        .overTargets(
+          raw,
+          sequence,
+          Vector.empty[(FeatureTarget.Situation, SpanSet)],
+          ScalarReducer.Mean,
+          MissingValuePolicy.IgnoreMissing
+        )
+        .isLeft
+    )
+
+    val mixed: Vector[(FeatureTarget, SpanSet)] = Vector(
+      alpha -> SpanSet.one(atlas.sentences(0).span),
+      FeatureTarget.Segment(SegmentId.unsafe("scene")) -> SpanSet.one(atlas.sentences(1).span)
+    )
+    assert(
+      Aggregate
+        .overTargets(
+          raw,
+          sequence,
+          TargetFamily.Situation,
+          mixed,
+          ScalarReducer.Mean,
+          MissingValuePolicy.IgnoreMissing
+        )
+        .isLeft
+    )
   }
 
   test("per-situation and per-segment aggregation carry exact support and coverage") {
@@ -465,6 +602,10 @@ class WindowSuite extends ScalaCheckSuite:
     assertEquals(d.targetFamily, Some(TargetFamily.Situation))
     assertEquals(d.window, None)
     assertEquals(d.narrativeWindow, None)
+    assertEquals(
+      events.provenance.basisId,
+      Some(NarrativeBasis.situations(situationOrder, resolver).toOption.get.basisId)
+    )
     assert(FeatureTrack.validatedScores(events).isRight)
     // scenes: the two segments partition the sentences, so their coverages sum to the whole
     val scenes = Aggregate
@@ -537,6 +678,7 @@ class WindowSuite extends ScalaCheckSuite:
     assertNotEquals(perUnit.space.id, agg.space.id)
     assertEquals(perUnit.derivation.get.narrativeWindow, Some(NarrativeWindowPlan.perUnit))
     assertEquals(perUnit.derivation.get.targetFamily, Some(TargetFamily.Situation))
+    assertEquals(perUnit.provenance.basisId, Some(basis.basisId))
     assert(perUnit.derivation.get.hasSingleWindow)
 
     val one = NarrativeWindowPlan.of(1).toOption.get
