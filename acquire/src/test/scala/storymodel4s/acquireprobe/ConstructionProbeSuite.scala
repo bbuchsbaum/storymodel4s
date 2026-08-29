@@ -6,8 +6,8 @@ import munit.FunSuite
 
 import storymodel4s.acquire.{PermittedOperation, PromptPackageManifest, PromptRole}
 
-/** Probes from OUTSIDE `storymodel4s.acquire`. Live hole demonstrated first: `fromProduct` minted
-  * a blank-name manifest that `validate` refused. That door is closed.
+/** Probes from OUTSIDE `storymodel4s.acquire`. Live hole demonstrated first: `fromProduct` minted a
+  * blank-name manifest that `validate` refused. That door is closed.
   */
 class ConstructionProbeSuite extends FunSuite:
 
