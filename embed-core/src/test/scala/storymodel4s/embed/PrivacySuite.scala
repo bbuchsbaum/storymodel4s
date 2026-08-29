@@ -76,7 +76,8 @@ class PrivacySuite extends FunSuite:
 
   private def detectorFor(
       source: String,
-      sourceSpans: Vector[TextSpan]
+      sourceSpans: Vector[TextSpan],
+      pseudonyms: Vector[String]
   ): Either[DomainError, PseudonymizationDetector] =
     val validSpans = sourceSpans.filter(span =>
       span.endExclusive <= source.length &&
@@ -84,12 +85,12 @@ class PrivacySuite extends FunSuite:
         PseudonymizedText.isCodePointBoundary(source, span.endExclusive)
     )
     PseudonymizationDetector.wholeWordTable(
-      validSpans.map(span =>
+      validSpans.zipWithIndex.map { case (span, index) =>
         PseudonymizationTableEntry(
           source.substring(span.start, span.endExclusive),
-          "[REDACTED]"
+          pseudonyms.lift(index).getOrElse("[REDACTED]")
         )
-      )
+      }
     )
 
   private def checked(
@@ -98,8 +99,18 @@ class PrivacySuite extends FunSuite:
       offsets: Vector[(TextSpan, TextSpan)],
       detectedSourceSpans: Option[Vector[TextSpan]] = None
   ): Either[DomainError, PseudonymizedText] =
+    val sourceSpans = detectedSourceSpans.getOrElse(offsets.map(_._1))
+    val configuredPseudonyms = sourceSpans.map { sourceSpan =>
+      offsets
+        .collectFirst {
+          case (`sourceSpan`, destinationSpan)
+              if destinationSpan.endExclusive <= destination.length =>
+            destination.substring(destinationSpan.start, destinationSpan.endExclusive)
+        }
+        .getOrElse("[REDACTED]")
+    }
     for
-      detector <- detectorFor(source, detectedSourceSpans.getOrElse(offsets.map(_._1)))
+      detector <- detectorFor(source, sourceSpans, configuredPseudonyms)
       sourceDetection <- detector.detect(source, key, suiteKeys)
       payload <- PseudonymizedText.checked(
         policy,
@@ -194,6 +205,80 @@ class PrivacySuite extends FunSuite:
     )
   }
 
+  test("a detector table cannot certify an arbitrary unconfigured replacement") {
+    val detector = PseudonymizationDetector
+      .wholeWordTable(Vector(PseudonymizationTableEntry("Jane", "[REDACTED]")))
+      .toOption
+      .get
+    val sourceDetection = detector.detect("Jane", key, suiteKeys).toOption.get
+    val result = PseudonymizedText.checked(
+      policy,
+      key,
+      "Jane",
+      "UNLISTED-SECRET",
+      Vector(TextSpan.unsafe(0, 4) -> TextSpan.unsafe(0, 15)),
+      sourceDetection,
+      detector,
+      suiteKeys
+    )
+
+    val error = errorOf(result)
+    error match
+      case DomainError.InvariantViolation(path, reason) =>
+        assertEquals(path, "pseudonymizationDetector/table/0")
+        assert(reason.contains("offset index 0"))
+      case other => fail(s"expected typed detector-table failure, got ${other.message}")
+    assert(!error.message.contains("Jane"))
+    assert(!error.message.contains("SECRET"))
+    assert(!error.message.contains("REDACTED"))
+  }
+
+  test("replacement failures name the canonical table entry under input permutation") {
+    val entries = Vector(
+      PseudonymizationTableEntry("Jane", "[P1]"),
+      PseudonymizationTableEntry("Bob", "[P2]")
+    )
+    val detectors = Vector(entries, entries.reverse).map(table =>
+      PseudonymizationDetector.wholeWordTable(table).toOption.get
+    )
+    val source = "Jane met Bob"
+    val destination = "BAD met [P2]"
+    val offsets = Vector(
+      TextSpan.unsafe(0, 4) -> TextSpan.unsafe(0, 3),
+      TextSpan.unsafe(9, 12) -> TextSpan.unsafe(8, 12)
+    )
+
+    assertEquals(detectors.map(_.policyIdentity(key, suiteKeys)).distinct.size, 1)
+    val errors = detectors.map { detector =>
+      val detection = detector.detect(source, key, suiteKeys).toOption.get
+      errorOf(
+        PseudonymizedText.checked(
+          policy,
+          key,
+          source,
+          destination,
+          offsets,
+          detection,
+          detector,
+          suiteKeys
+        )
+      )
+    }
+    errors.foreach {
+      case DomainError.InvariantViolation(path, reason) =>
+        assertEquals(path, "pseudonymizationDetector/table/1")
+        assert(reason.contains("offset index 0"))
+      case other => fail(s"expected typed detector-table failure, got ${other.message}")
+    }
+  }
+
+  test("pseudonymization table rows redact both text fields from diagnostics") {
+    val entry = PseudonymizationTableEntry("Jane", "[PERSON_1]", caseInsensitive = true)
+    assert(!entry.toString.contains("Jane"))
+    assert(!entry.toString.contains("PERSON"))
+    assert(entry.toString.contains("caseInsensitive=true"))
+  }
+
   test("detection receipts retain only keyed identities and offsets") {
     val detector = PseudonymizationDetector
       .wholeWordTable(
@@ -214,7 +299,7 @@ class PrivacySuite extends FunSuite:
     val source = "Jane"
     val destination = "[PERSON_1]"
     val offsets = Vector(TextSpan.unsafe(0, 4) -> TextSpan.unsafe(0, 10))
-    val detector = detectorFor(source, offsets.map(_._1)).toOption.get
+    val detector = detectorFor(source, offsets.map(_._1), Vector(destination)).toOption.get
     val sourceDetection = detector.detect(source, key, suiteKeys).toOption.get
     val keyBytes = Array[Byte](3, 5, 7, 11, 13, 17, 19, 23)
     var reads = 0

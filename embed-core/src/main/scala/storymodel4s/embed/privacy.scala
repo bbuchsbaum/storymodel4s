@@ -90,21 +90,24 @@ final class PseudonymizationDetection private[embed] (
 
 /** One row in the closed whole-word detector algorithm.
   *
-  * The pseudonym participates in configuration identity even though detection depends on the source
-  * surface and case rule. [[PseudonymizationDetector.wholeWordTable]] validates the complete table
-  * before constructing a detector.
+  * The pseudonym is both part of configuration identity and the only destination replacement this
+  * row can certify. [[PseudonymizationDetector.wholeWordTable]] validates the complete table before
+  * constructing a detector.
   */
 final case class PseudonymizationTableEntry(
     surface: String,
     pseudonym: String,
     caseInsensitive: Boolean = false
-)
+):
+  override def toString: String =
+    s"PseudonymizationTableEntry(<redacted>, <redacted>, caseInsensitive=$caseInsensitive)"
 
 /** A closed detector whose identity completely determines its span-finding behaviour.
   *
   * The only public factory is [[PseudonymizationDetector.wholeWordTable]]; callers supply typed
   * table data, never an executable finder. The final `detect` method runs embed-core's fixed
-  * Unicode whole-word algorithm and alone mints evidence.
+  * Unicode whole-word algorithm and alone mints evidence; checked transformations must also use the
+  * exact configured pseudonym for every winning table entry.
   */
 final class PseudonymizationDetector private (
     val id: PseudonymizationDetectorId,
@@ -160,9 +163,40 @@ final class PseudonymizationDetector private (
       _ <- PseudonymizationDetector.validateSpans(text, spans)
     yield spans
 
+  private[embed] def validateTransformation(
+      sourceText: String,
+      destinationText: String,
+      offsets: Vector[(TextSpan, TextSpan)]
+  ): Either[DomainError, Unit] =
+    val matches = PseudonymizationDetector.detectTableMatches(sourceText, entries)
+    if matches.size != offsets.size then
+      Left(
+        DomainError.InvariantViolation(
+          "pseudonymizedText/offsets",
+          "detected source spans must have one configured destination replacement"
+        )
+      )
+    else
+      matches
+        .zip(offsets)
+        .zipWithIndex
+        .collectFirst {
+          case ((matched, (_, destination)), offsetIndex)
+              if destinationText.substring(destination.start, destination.endExclusive) !=
+                matched.pseudonym =>
+            DomainError.InvariantViolation(
+              s"pseudonymizationDetector/table/${matched.entryIndex}",
+              s"mapped destination at offset index $offsetIndex does not equal the configured pseudonym"
+            )
+        }
+        .toLeft(())
+
   override def toString: String = s"PseudonymizationDetector(${id.value}, <redacted>)"
 
 object PseudonymizationDetector:
+  private final case class IndexedEntry(index: Int, entry: PseudonymizationTableEntry)
+  private final case class TableMatch(span: TextSpan, pseudonym: String, entryIndex: Int)
+
   private val WholeWordTableId =
     PseudonymizationDetectorId.unsafe("storymodel4s.whole-word-table/v1")
   private val WholeWordTableVersion = "whole-word-table/v1"
@@ -255,11 +289,19 @@ object PseudonymizationDetector:
       }
 
   private def canonicalTable(entries: Vector[PseudonymizationTableEntry]): String =
-    val ordered = entries.sortBy(entry => (entry.surface, entry.pseudonym, entry.caseInsensitive))
+    val ordered = canonicalEntries(entries).map(_.entry)
     (Vector(WholeWordTableVersion, s"table|entry-count=${ordered.size}") ++
       ordered.map(entry =>
         s"entry|surface=${ReceiptRendering.esc(entry.surface)}|pseudonym=${ReceiptRendering.esc(entry.pseudonym)}|case-insensitive=${entry.caseInsensitive}"
       )).mkString("\n")
+
+  private def canonicalEntries(
+      entries: Vector[PseudonymizationTableEntry]
+  ): Vector[IndexedEntry] =
+    entries
+      .sortBy(entry => (entry.surface, entry.pseudonym, entry.caseInsensitive))
+      .zipWithIndex
+      .map((entry, index) => IndexedEntry(index, entry))
 
   private def isWordCodePoint(codePoint: Int): Boolean =
     Character.isLetterOrDigit(codePoint) || (Character.getType(codePoint) match
@@ -319,14 +361,31 @@ object PseudonymizationDetector:
       text: String,
       entries: Vector[PseudonymizationTableEntry]
   ): Vector[TextSpan] =
-    entries
-      .sortBy(entry =>
-        (-entry.surface.length, entry.surface, entry.pseudonym, entry.caseInsensitive)
+    detectTableMatches(text, entries).map(_.span)
+
+  private def detectTableMatches(
+      text: String,
+      entries: Vector[PseudonymizationTableEntry]
+  ): Vector[TableMatch] =
+    canonicalEntries(entries)
+      .sortBy(indexed =>
+        (
+          -indexed.entry.surface.length,
+          indexed.entry.surface,
+          indexed.entry.pseudonym,
+          indexed.entry.caseInsensitive,
+          indexed.index
+        )
       )
-      .flatMap(entry => occurrences(text, entry.surface, entry.caseInsensitive))
-      .sortBy(span => (span.start, -span.length))
-      .foldLeft(Vector.empty[TextSpan]) { (accepted, candidate) =>
-        if accepted.exists(_.overlaps(candidate)) then accepted else accepted :+ candidate
+      .flatMap { indexed =>
+        val entry = indexed.entry
+        occurrences(text, entry.surface, entry.caseInsensitive).map(span =>
+          TableMatch(span, entry.pseudonym, indexed.index)
+        )
+      }
+      .sortBy(matched => (matched.span.start, -matched.span.length, matched.entryIndex))
+      .foldLeft(Vector.empty[TableMatch]) { (accepted, candidate) =>
+        if accepted.exists(_.span.overlaps(candidate.span)) then accepted else accepted :+ candidate
       }
 
   private def validateSpans(text: String, spans: Vector[TextSpan]): Either[DomainError, Unit] =
@@ -407,12 +466,13 @@ object PseudonymizedText:
 
   /** Check an exact offset map and detector evidence, then mint the payload's keyed identity.
     *
-    * Each pair maps a nonempty source span to its replacement span in `text`. Text outside mapped
-    * spans must be unchanged, so callers cannot hide an unexplained transformation or present raw
-    * text with an empty/fictitious map. Validation errors report only positions and invariant
-    * names, never source or destination text. The source receipt must be the exact result of the
-    * supplied detector and its spans must equal the mapped source spans; the same detector is run
-    * independently on the destination and must find zero spans. A missing key fails closed with
+    * Each pair maps a nonempty source span to the exact pseudonym configured for the detector's
+    * winning table entry. Text outside mapped spans must be unchanged, so callers cannot hide an
+    * unexplained transformation or present raw text with an empty/fictitious map. Validation errors
+    * report only positions, canonical table-entry indices, and invariant names, never source or
+    * destination text. The source receipt must be the exact result of the supplied detector and its
+    * spans must equal the mapped source spans; the same detector is run independently on the
+    * destination and must find zero spans. A missing key fails closed with
     * `InvariantViolation(KeyPath, …)`: no certified `PseudonymizedText` exists without a keyed
     * digest.
     */
@@ -456,6 +516,7 @@ object PseudonymizedText:
           "detected source spans must equal mapped source spans"
         )
       )
+      _ <- detector.validateTransformation(sourceText, text, offsets)
       destinationDetection <- detector.detect(text, keyId, stableKeys)
       _ <- Either.cond(
         destinationDetection.spans.isEmpty,

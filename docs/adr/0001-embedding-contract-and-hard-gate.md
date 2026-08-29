@@ -232,16 +232,20 @@ enum FidelityMode:
   `ReidentificationKey` (never leaves the local store; rotation by `KeyId`).
   `PseudonymizedText` has no public constructor or copy path; its checked factory
   requires a complete, ordered, non-overlapping, bounded, code-point-safe map
-  whose replacements do not contain a Unicode simple-case variant of their
-  source-span text and whose unmapped gaps remain identical. It also requires an
+  whose destination spans equal the exact configured pseudonyms of the detector's
+  winning table entries, whose replacements do not contain a Unicode simple-case
+  variant of their source-span text, and whose unmapped gaps remain identical.
+  A mismatch is a typed invariant error naming only the canonical table-entry
+  index and offset index, never either text value. The factory also requires an
   unforgeable source detection receipt
   whose ordered spans equal the source side of the map, then independently reruns
   the same detector on the destination and requires a zero-span receipt. A
   zero-hit source is not a pseudonymization and cannot be certified.
 - `PseudonymizationDetector` is a final factory-owned contract whose identity
-  determines behaviour. Its public factory accepts typed whole-word table rows,
-  never an executable span finder; embed-core owns the fixed Unicode matcher,
-  canonical configuration, and `PseudonymizationDetection` construction. Detection identity is the
+  determines detection and configured-replacement validation behaviour. Its public
+  factory accepts typed whole-word table rows, never an executable span finder;
+  embed-core owns the fixed Unicode matcher, canonical configuration, exact
+  replacement verifier, and `PseudonymizationDetection` construction. Detection identity is the
   algorithm/version `PseudonymizationDetectorId`, `Keyed` HMAC of canonical
   configuration, `Keyed` HMAC of canonical source text, and ordered spans. The
   table configuration is `whole-word-table/v1`, with records

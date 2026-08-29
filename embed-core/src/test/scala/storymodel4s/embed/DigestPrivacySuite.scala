@@ -35,14 +35,12 @@ class DigestPrivacySuite extends FunSuite:
   ): Either[DomainError, PseudonymizedText] =
     for
       detector <- PseudonymizationDetector.wholeWordTable(
-        offsets
-          .map(_._1)
-          .map(span =>
-            PseudonymizationTableEntry(
-              source.substring(span.start, span.endExclusive),
-              "[REDACTED]"
-            )
+        offsets.map { case (sourceSpan, destinationSpan) =>
+          PseudonymizationTableEntry(
+            source.substring(sourceSpan.start, sourceSpan.endExclusive),
+            destination.substring(destinationSpan.start, destinationSpan.endExclusive)
           )
+        }
       )
       detection <- detector.detect(source, keyId, keys)
       payload <- PseudonymizedText.checked(
