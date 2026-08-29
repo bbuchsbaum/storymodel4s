@@ -158,11 +158,21 @@ object LeakageControl:
     val byRisk = report.runs.groupBy(r => riskOf(r.caseId))
     def arm(risk: ContaminationRisk): (Estimate[Double], Int) =
       val runs = byRisk.getOrElse(Some(risk), Vector.empty)
-      val means = runs.flatMap { r =>
-        val obs = r.observations.byMetric.getOrElse(metric, Vector.empty).flatMap(_.value)
-        if obs.isEmpty then None else Some(obs.sum / obs.size)
+      val outcomes = runs.map { r =>
+        val obs = r.observations.byMetric.getOrElse(metric, Vector.empty)
+        val missing = obs.collect { case UnitObservation(_, MetricObservation.Missing(reason)) =>
+          reason
+        }
+        val observed = obs.collect { case UnitObservation(_, MetricObservation.Observed(value)) =>
+          value
+        }
+        if missing.nonEmpty then Left(missing.sortBy(_.toString).head)
+        else Right(if observed.isEmpty then None else Some(observed.sum / observed.size))
       }
-      if means.isEmpty then (Estimate.missing(MissingReason.AllMissing), 0)
+      val missing = outcomes.collect { case Left(reason) => reason }.sortBy(_.toString)
+      val means = outcomes.collect { case Right(Some(mean)) => mean }
+      if missing.nonEmpty then (Estimate.missing(missing.head), 0)
+      else if means.isEmpty then (Estimate.missing(MissingReason.AllMissing), 0)
       else (Estimate.observed(means.sum / means.size), means.size)
 
     val (high, highN) = arm(ContaminationRisk.High)

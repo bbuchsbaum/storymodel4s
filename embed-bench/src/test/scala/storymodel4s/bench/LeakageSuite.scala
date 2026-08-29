@@ -3,7 +3,7 @@ package storymodel4s.bench
 import munit.FunSuite
 
 import storymodel4s.align.{AlignWire, SemanticDistance, StructuralDistance, contentFingerprint}
-import storymodel4s.features.Estimate
+import storymodel4s.features.{Estimate, MissingReason}
 
 /** Protocol Law I5 clause 4. The control has to separate "famous stories are easier for everyone"
   * from "this channel is reciting", so every test here fixes the baseline gain and varies only the
@@ -28,18 +28,28 @@ class LeakageSuite extends FunSuite:
       exposure: ChannelExposure,
       scores: Map[String, Double]
   ): ChannelReport =
+    val outcomes = scores.view.mapValues(MetricObservation.observed).toMap
+    channelReportOutcomes(name, exposure, outcomes)
+
+  private def channelReportOutcomes(
+      name: String,
+      exposure: ChannelExposure,
+      scores: Map[String, MetricObservation]
+  ): ChannelReport =
     val template = WogDiagnostic.paraphraseCases.head
     val unit = template.recall.ordered.head.id
     val fingerprint = template.view.contentFingerprint
     val checksum = AlignWire.recallChecksum(template.recall)
-    val runs = scores.toVector.sortBy(_._1).map { case (caseId, value) =>
+    val runs = scores.toVector.sortBy(_._1).map { case (caseId, observation) =>
       CaseRun(
         caseId = caseId,
         channel = name,
         viewFingerprint = fingerprint,
         recallChecksum = checksum,
-        observations =
-          CaseObservations(caseId, Map(metric -> Vector(UnitObservation(unit, Some(value))))),
+        observations = CaseObservations(
+          caseId,
+          Map(metric -> Vector(UnitObservation(unit, observation)))
+        ),
         clocks = ClockPanel(caseId, 1.0, None, 1.0, 0.0, None)
       )
     }
@@ -214,6 +224,28 @@ class LeakageSuite extends FunSuite:
     val f = LeakageControl.assess(reports, riskOf, metric).findings.head
     assert(f.highMean.isInstanceOf[Estimate.Missing[?]], f.render)
     assertEquals(f.gain, None)
+  }
+
+  test("an eligible missing observation makes the leakage arm missing, not survivor-conditioned") {
+    val provider = channelReportOutcomes(
+      "provider",
+      ChannelExposure.Memorizing,
+      Map(
+        "famous-1" -> MetricObservation.observed(0.9),
+        "famous-2" -> MetricObservation.Missing(MissingReason.ProviderAbstained),
+        "obscure-1" -> MetricObservation.observed(0.5),
+        "obscure-2" -> MetricObservation.observed(0.5)
+      )
+    )
+    val reports = Vector(flat("tfidf", ChannelExposure.NonMemorizing, 0.4), provider)
+    val finding = LeakageControl
+      .assess(reports, riskOf, metric)
+      .findings
+      .find(_.channel == "provider")
+      .getOrElse(fail("provider finding absent"))
+    assertEquals(finding.highMean, Estimate.missing(MissingReason.ProviderAbstained))
+    assertEquals(finding.gain, None)
+    assertEquals(finding.excess, None)
   }
 
   test("the invariant that makes the empty-baseline-gain branch unreachable") {
