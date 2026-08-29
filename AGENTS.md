@@ -134,7 +134,32 @@ was set by the owner on 2026-08-28 (sticky decision
    ambiguous across them); cross-repo work is coordinated on the
    `narrative-atlas-intaglio` topic with provider/consumer SHAs recorded as
    notes, never as dependency edges between stores.
-4. **Actors and reservations.** One mote actor per session. Set your identity
+4. **Evidence discipline.** A passing test suite is not evidence; it is the
+   absence of one kind of counter-evidence. Three checks, each earned by a
+   defect that a green suite did not catch:
+
+   *Mutation proof.* If a candidate adds a guard, delete the guard, show a test
+   goes red, restore it. "The guard exists" and "the guard is load-bearing" are
+   different claims.
+
+   *Capacity to fail.* Assert the preconditions of a test's own meaningfulness
+   before asserting content — that the probe set is large enough, the corpus
+   non-empty, the rendering non-trivial. A leak canary that probed whole
+   sentences missed a six-word slice straddling two of them; a metric that is
+   always `Missing` passes a no-failures check forever.
+
+   *Estimand check.* For every number the code publishes: name what it claims to
+   measure about the subject; say where **our own uncertainty** goes — numerator,
+   denominator, abstention, or silently nowhere; and ask whether that number
+   moves in a consistent direction when our uncertainty correlates with a
+   property of the subject (vagueness, disorganisation, length). A yes to the
+   last is **P1 by default**: it can manufacture a group difference that is not
+   there. Unresolved placement scored as an external detail, unranked mass
+   summed into `externalMass`, and absent admissibility scored as gate
+   compliance were all found this way, and none failed a test. Note also that
+   the naive repair — dropping the uncertain observations — replaces one bias
+   with its mirror image: carry the uncertainty through the arithmetic instead.
+5. **Actors and reservations.** One mote actor per session. Set your identity
    explicitly in every session — `export MOTE_ACTOR=<actor>` (and
    `mote session start --as <actor>`) or `--actor` on each call — and never run
    `mote actor set` in the shared checkout: `.mote/local/actor` is shared by
@@ -149,13 +174,13 @@ was set by the owner on 2026-08-28 (sticky decision
    the chief resolves textual overlap at merge. Mote syncs commit with an
    explicit pathspec (`git commit -- .mote/ops`), never the whole index, and
    candidates stay unstaged in the shared tree until the chief's ack.
-5. **Working together (owner directive, 2026-08-28).** Keep work clean and
+6. **Working together (owner directive, 2026-08-28).** Keep work clean and
    commit when it is safe and feasible — do not let green work sit
    uncommitted in the shared tree. Don't step on toes. Collaborate and
    discuss on the board: post design choices before they harden, read and
    answer each other, disagree with evidence. The goal: the best library in
    history for representing stories and their recall.
-6. **Reporting.** Every active agent posts a check-in on `coordination` at
+7. **Reporting.** Every active agent posts a check-in on `coordination` at
    each bead transition and at least hourly: bead id, state, blockers, next.
    Silence longer than two hours on a claimed bead means the chief reassigns
    it.
