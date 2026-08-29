@@ -24,6 +24,23 @@ behaviour on prose we wrote. None is a finding about recall. This does not dimin
 work — a ratio-of-sums is right and a mean-of-ratios wrong on any data — but the distinction must
 travel with every number.
 
+*(Amended 17:55Z. This heading is about **this repository**, and it must not be read as "suitable
+data are unavailable" — that would be a stronger claim than anything measured here, and it is now
+false. An owner-supplied corpus survey identifies NFRD (OSF `h2pkv`) as a credible anchor: reported
+229 participants, four spoken narratives, source and genuine participant recall together,
+word-level timing, CC0. Nothing has been fetched and no participant text has entered the checkout,
+pending primary-source inspection and the owner's ethics decision — which is a **separate gate from
+the licence**, since CC0 answers whether we may redistribute and says nothing about whether we
+should run analyses over participant speech in a checkout shared by twenty agents.*
+
+*One qualification travels with that corpus and it is not a footnote: NFRD's transcript correction
+reportedly removes fillers and immediate word repetitions. That makes those transcripts a **content
+transcript — a derivation — not a raw observation**, and this pipeline treats the recall transcript
+AS the observation. For recall research the removed material is not noise: false starts,
+repetitions and self-corrections are data about retrieval. Admitting that corpus without recording
+the distinction would import an unauditable preprocessing step into every estimand downstream —
+this document's own defect class, arriving one layer earlier than we have been looking.)*
+
 ## 2. Out of the box, the library does not anchor recall to source events
 
 With `DefaultLocalCostModel`, default weights and `externalFloor`, `lexicalJaccard`, **no** synonym
@@ -70,6 +87,44 @@ from the baseline segmenter… TODO(M5): replace with calibrated defaults once e
 charts exist; these numbers are provisional, not scientific."* The defaults were never claimed to
 work. What was never stated is how far off they are. Now it is.
 
+## 2b. The cost model makes a unit cheaper to anchor when we could measure less of it
+
+*(Added 17:58Z. Measured by `claude-storymodel4s-m1` on WOG, verified in source by the chief.)*
+
+`cost.scala:690` blends the local cost as a **bare sum over the terms that are PRESENT**, with no
+normalisation and no record of how many there were. `externalCost` (`:703-706`) returns a **flat
+constant** — `externalFloor`, or `externalFloor + externalMismatch` — which does not move at all.
+
+    source cell   = sum over PRESENT terms + prior    shrinks when a term is absent
+    external cell = externalFloor                     a constant
+
+So the two sides of the source-versus-external decision are **not on the same scale**, and a recall
+unit we could measure on fewer dimensions has a cheaper source cost against a floor that did not
+move. On WOG: 13 units at present-weight 3.200 against 13 at 3.350, a gap of 0.15 in *what was
+measurable* rather than in what matched. This is the mechanism behind a behavioural failure caught
+by a fixture — "'Stephen King' goes to the Association external state, not to a source node" — where
+an external-state assertion gained source mass.
+
+**Two things this is not.** It is not source-versus-source corruption: present-term sets are uniform
+*within* a row, because the absence conditions are properties of the recall unit rather than the
+source node, so the offset cancels in the softmax and again in Viterbi. An earlier and more
+alarming claim by this document's author was withdrawn on that measurement. And it is not caused by
+recording absence honestly — `ee258bf` is correct and stays. Before it, every blended cell carried
+identical terms, so the defect was **real in the code and invisible in the data**. Recording
+absence ended the uniformity that was concealing it.
+
+**Why it is in an honest baseline.** An imputed `0.0` in a *cost* means no penalty, and no penalty
+is indistinguishable from perfect agreement. The library has been scoring *unmeasurable* sensory
+agreement as *perfect* sensory agreement. That is harmless only while every cell gets the same free
+pass, and nothing guarantees that — it is a property of the corpus, not of the code, and it can flip
+without an edit to any line.
+
+Open as `bd-01M177SHFXZKMR8K39BPC9K6FF`. The ruled direction scales the sum **up to full support**
+rather than down to a mean, so cells at full support are bit-identical and WOG's tuned weights need
+no recalibration — deliberately, because re-tuning against the only fixture we validate on would be
+fitting the model to the test set. It remains an imputation, now a named one, and ships with the
+support carrier that lets a consumer refuse it.
+
 ## 3. What *does* work unaided
 
 **External classification.** `ExternalAssociation` → `ext:Association` at 0.874. The Inference
@@ -98,6 +153,19 @@ type it would have to return.
 
 Independently traced twice: from the build graph, and blind from the raw text by an agent that had
 not read the first trace and stopped at the same joint.
+
+*(Status 17:58Z: **staffed and in progress**, `bd-01M176GSTHHQQX744F5YPPDWW7`. `document` is the
+compiler boundary — it already depends on both `acquire` and `story`, which `acquire` does not and
+should not. `NarrativeCompilation` is the durable artifact of the transformation and wraps
+`ValidationOutcome`; it does not replace `StoryModel`, and a partial run emits a typed draft rather
+than minting `Validated`. Its **definition of done is this document's own criterion** — a real
+transcript reaching a `RecallSignature`, green — not a compiler that compiles. `compiler.scala` and
+a `NarrativeCompilerVerticalSuite` are reserved.*
+
+*One requirement was added to that ADR and it is the reason this section matters beyond plumbing:
+**a relation the compiler cannot derive must be absent-and-recorded, never present at a default
+weight.** This compiler sits upstream of every number in this document, so anything it invents is
+inherited by all of them.)*
 
 ## 5. Our one end-to-end demonstration has four layers of hand-authorship
 
@@ -147,3 +215,9 @@ One honest end-to-end run on real recall data, with estimands reported alongside
 against a benchmark someone outside this project would accept. Until then the library can be proven
 correct and cannot be shown to measure anything, and no amount of further correctness work closes
 that gap.
+
+*(17:58Z: both halves of that sentence are now staffed — the path by
+`bd-01M176GSTHHQQX744F5YPPDWW7`, the data by NFRD inspection under the owner's ethics gate — and
+they are deliberately **not** blocked on each other, because one has engineering latency and the
+other has calendar latency. Nothing above is retracted by that. This paragraph is the standard, and
+it is met by a run, not by a plan to do one.)*
