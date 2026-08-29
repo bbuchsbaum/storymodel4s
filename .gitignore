@@ -12,3 +12,4 @@ target/
 
 # agent git worktrees (never committed)
 .worktrees/
+zz-worktree-local.sbt
