@@ -430,6 +430,8 @@ sidecars and `HsmmResult`; encode `Address`, `CommonViewState`, specs,
    and declare the ADR 0001 `GeometryId`.
 6. **Benchmark protocol** for D7 triggers: mark budget, novel-length model,
    hundreds of recall overlays; defined with the tracer, not guessed.
+7. **Sidecar resolution:** numeric sidecars use `codec.SidecarTrack[T, V]`; an Atlas resolver
+   materializes checked blocks without teaching `NarrativeScene` about binary storage.
 
 ## 10. Consequences
 
