@@ -348,19 +348,47 @@ final class EmbeddingSpace private[embed] (
         EmbedError.InvalidRecipe(s"truncation ${dim.value} must be smaller than ${dimension.value}")
       )
     else
-      Right(
-        EmbeddingSpace.build(
-          provider,
-          role,
-          view,
-          instruction,
-          dim,
-          Normalization.L2,
-          truncation,
-          latePooling.map(_.copy(matryoshkaDimension = Some(dim.value))),
-          Some(id)
-        )
-      )
+      latePooling match
+        case None =>
+          Right(
+            EmbeddingSpace.build(
+              provider,
+              role,
+              view,
+              instruction,
+              dim,
+              Normalization.L2,
+              truncation,
+              None,
+              Some(id)
+            )
+          )
+        case Some(r) =>
+          LatePoolingRecipe
+            .of(
+              r.documentDigest,
+              r.tokenizerFingerprint,
+              r.contextLimit,
+              r.window,
+              r.stride,
+              r.overlapMerge,
+              r.pooling,
+              r.uncovered,
+              Some(dim.value)
+            )
+            .map(v =>
+              EmbeddingSpace.build(
+                provider,
+                role,
+                view,
+                instruction,
+                dim,
+                Normalization.L2,
+                truncation,
+                Some(v),
+                Some(id)
+              )
+            )
 
   /** The `features` space this recipe populates. Vectors live in sidecars; the graph never holds
     * them.
