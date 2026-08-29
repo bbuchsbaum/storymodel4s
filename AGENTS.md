@@ -412,14 +412,15 @@ was set by the owner on 2026-08-28 (sticky decision
    ambiguous across them); cross-repo work is coordinated on the
    `narrative-atlas-intaglio` topic with provider/consumer SHAs recorded as
    notes, never as dependency edges between stores.
-4. **Evidence discipline.** *Twenty-five sub-rules; find yours here.* **What
-   counts as proof of a fix (10):** mutation proof · capacity to fail ·
+4. **Evidence discipline.** *Twenty-six sub-rules; find yours here.* **What
+   counts as proof of a fix (11):** mutation proof · capacity to fail ·
    distinguishability · a negative compile-time assertion needs a positive control ·
    or kill it with a mutation, which is stronger · a fixture must tell the
    hypotheses apart · prefer a fixture derived from the pipeline over one
    synthesised at the consumer · check a fixture's inputs are in the form the
    pipeline produces · an inequality is not a discriminating assertion · a pinned
-   literal can be updated but a behavioural assertion has to be argued with. **How
+   literal can be updated but a behavioural assertion has to be argued with · a
+   positive control requires the old code to be capable of the thing tested. **How
    to run the gate (8):** never pipe a gate · a trailing success line is not an exit
    status · a compile error anywhere makes the gate inconclusive · run the format
    check last · verify the export before you gate it · a compile-time probe needs a
@@ -428,7 +429,7 @@ was set by the owner on 2026-08-28 (sticky decision
    sweep the shape not the spelling · sweep your own work first · reading a branch establishes permission
    not occurrence · trace the consequence. **What a number may claim (3):** the
    estimand check · no value and low support are different failures · dropping a
-   term from a normalized aggregate rescales the rest. *(Ten of the twenty-five are
+   term from a normalized aggregate rescales the rest. *(Eleven of the twenty-six are
    about whether a test can actually fail, and EIGHT are about whether the gate
    measured anything at all — that second group went from three to eight in a
    single day, every entry added after a run reported a status with nothing behind
@@ -649,6 +650,23 @@ was set by the owner on 2026-08-28 (sticky decision
    "`PopulationAggregate` has zero `copy` methods" proved nothing until
    `SubjectAlignment` in the same compile showed five. An absence proves nothing
    without a present case beside it.)
+
+   *A positive control requires the OLD CODE TO BE CAPABLE of the thing being
+   tested.* Where the fix INTRODUCES the capability, no positive control exists —
+   only a regression guard, and the two must not share a name. Measured
+   2026-08-29: the chief required a law stating that dropping an unmeasurable term
+   must not change which state wins, and justified it as "today's code fails this,
+   so it is a positive control rather than a hope." Today's code has NO ELIGIBILITY
+   CONCEPT, so "drop a term that could not be measured" is not an operation the
+   unfixed model can perform and no arm of it can fail. The engineer wrote the law
+   twice — once VACUOUS (it passed with the scaling disabled, found only by
+   mutating) and once TOO STRONG (it failed on the correct implementation, and
+   should have: a unit that supplies a sensory term and gets it wrong ought to cost
+   more than one that never claimed sensory content, and the law as specified would
+   have made the term useless) — then reported that the specification could not be
+   met instead of adjusting it until it passed. **Ship the regression guard and say
+   in the test that it is one.** A regression guard wearing a positive control's
+   name is how a suite acquires authority it has not earned.
 
    *Or kill it with a mutation, which is stronger.* The control is a PROXY: it
    asks "would this snippet compile if the door were open?" by compiling an
