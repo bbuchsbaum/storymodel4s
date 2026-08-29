@@ -83,13 +83,18 @@ class ResolutionSuite extends FunSuite:
     // payload through generated Product members - _1, productElement(0) and unapply - so the
     // "no unconditional accessor" claim was false while .value and .get were absent. Checking only
     // the names I had thought of is how a tripwire misses the door that is actually open.
+    //
+    // Note the asymmetry with PlacementResolution below: there the Product surface is harmless
+    // because every field is public anyway and only fromProduct (which CONSTRUCTS) is a defect.
+    // Here the payload is deliberately hidden, so the read-only Product members ARE the hole. A
+    // probe for `copy` is deliberately absent: Scala 3 suppresses copy when the constructor is
+    // private, so asserting its absence tests the compiler rather than this code.
     assert(!scala.compiletime.testing.typeChecks("Conditional(0.5, res(1.0, 0.0)).value"))
     assert(!scala.compiletime.testing.typeChecks("Conditional(0.5, res(1.0, 0.0)).get"))
     assert(!scala.compiletime.testing.typeChecks("Conditional(0.5, res(1.0, 0.0))._1"))
     assert(
       !scala.compiletime.testing.typeChecks("Conditional(0.5, res(1.0, 0.0)).productElement(0)")
     )
-    assert(!scala.compiletime.testing.typeChecks("Conditional(0.5, res(1.0, 0.0)).copy(0.9)"))
     assert(!scala.compiletime.testing.typeChecks("""
       Conditional(0.5, res(1.0, 0.0)) match { case Conditional(v, _) => v }
     """))
@@ -122,4 +127,25 @@ class ResolutionSuite extends FunSuite:
     assertEqualsDouble(c.resolved, 1.0, eps)
     assertEqualsDouble(c.unresolved, 0.0, eps)
     assert(c.clearsThreshold)
+  }
+
+  test("the smart constructor cannot be walked past through the derived Mirror") {
+    // A case class with a PRIVATE constructor still derives Mirror.ProductOf, and its public
+    // fromProduct rebuilds the type field by field without consulting `of`. Demonstrated on this
+    // type before the fix: fromProduct produced masses summing to 3.0 with a threshold of -5.0,
+    // every invariant violated, while `of` rejected the identical values. Making it a non-case
+    // class removes the Mirror, so this no longer compiles.
+    assert(
+      !scala.compiletime.testing.typeChecks(
+        "summon[scala.deriving.Mirror.ProductOf[PlacementResolution]]"
+      ),
+      "PlacementResolution still derives a Mirror; fromProduct forges invalid states"
+    )
+    assert(
+      !scala.compiletime.testing.typeChecks(
+        "PlacementResolution.fromProduct((PlacementGrain.Detail, 1.0, 1.0, 1.0, -5.0))"
+      )
+    )
+    // The invariants the forge used to bypass are still enforced on the real door.
+    assert(PlacementResolution.of(PlacementGrain.Detail, 1.0, 1.0, 1.0, -5.0).isLeft)
   }

@@ -286,7 +286,20 @@ enum ProjectionError:
   * dimension of the score), and a component with no measurement was substituted with 0.0, so "we
   * did not measure this" became "this scored worst" — or, under a negative weight, best.
   */
-final case class SignatureProjection private (version: String, weights: Map[String, Double]):
+final class SignatureProjection private (
+    val version: String,
+    val weights: Map[String, Double]
+):
+  // Not a case class: a private constructor does not suppress the derived Mirror, whose public
+  // fromProduct would rebuild a projection from unvalidated weights.
+  override def equals(other: Any): Boolean = other match
+    case that: SignatureProjection => version == that.version && weights == that.weights
+    case _                         => false
+
+  override def hashCode: Int = (version, weights).hashCode
+
+  override def toString: String = s"SignatureProjection($version, ${weights.size} weights)"
+
   def apply(s: RecallSignature): Either[ProjectionError, Double] =
     val comps: Map[String, Option[Double]] = Map(
       "uniformCoverage" -> Some(s.uniformCoverage),

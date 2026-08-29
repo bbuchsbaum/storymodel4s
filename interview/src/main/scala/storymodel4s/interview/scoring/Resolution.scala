@@ -35,12 +35,12 @@ enum PlacementGrain:
   * error this type exists to prevent: it converts "we placed 40% of this" into "we placed all of
   * it", which is a stronger claim than the evidence and always in the flattering direction.
   */
-final case class PlacementResolution private (
-    grain: PlacementGrain,
-    resolved: Double,
-    unresolved: Double,
-    excluded: Double,
-    abstentionThreshold: Double
+final class PlacementResolution private (
+    val grain: PlacementGrain,
+    val resolved: Double,
+    val unresolved: Double,
+    val excluded: Double,
+    val abstentionThreshold: Double
 ):
   /** Whether the resolved mass clears the threshold in force, so a caller can abstain on the same
     * rule the summary was built with instead of inventing its own cutoff.
@@ -50,6 +50,21 @@ final case class PlacementResolution private (
   def render: String =
     f"${grain.render}: resolved=$resolved%.4f unresolved=$unresolved%.4f excluded=$excluded%.4f " +
       f"(threshold $abstentionThreshold%.2f)"
+
+  // Written out because this is deliberately NOT a case class: a case class with a private
+  // constructor still derives Mirror.ProductOf, whose public fromProduct reconstructs the type
+  // field-by-field and walks straight past `of`. Demonstrated on this very type - fromProduct
+  // built one with masses summing to 3.0 and a threshold of -5.0.
+  override def equals(other: Any): Boolean = other match
+    case that: PlacementResolution =>
+      grain == that.grain && resolved == that.resolved && unresolved == that.unresolved &&
+      excluded == that.excluded && abstentionThreshold == that.abstentionThreshold
+    case _ => false
+
+  override def hashCode: Int =
+    (grain, resolved, unresolved, excluded, abstentionThreshold).hashCode
+
+  override def toString: String = s"PlacementResolution(${render})"
 
 object PlacementResolution:
   /** Tolerance on the mass sum, matching the alignment tolerance used elsewhere. */
