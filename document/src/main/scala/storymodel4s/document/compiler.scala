@@ -1518,6 +1518,30 @@ object NarrativeCompiler:
       )
     )
 
+  private def renderClaimMeta(meta: ClaimMeta): String =
+    renderFields(
+      "claim-meta/v1",
+      Vector(
+        meta.id.value,
+        meta.status.toString,
+        meta.credence.rawScore.toString,
+        meta.credence.calibrated.fold("")(_.value.toString),
+        meta.credence.calibrationModel.getOrElse(""),
+        renderFields("claim-evidence/v1", meta.evidence.toVector.map(renderEvidence)),
+        renderProvenance(meta.provenance)
+      )
+    )
+
+  private def renderProvenance(provenance: Provenance): String =
+    renderFields(
+      "provenance/v1",
+      Vector(
+        provenance.softwareVersion,
+        provenance.configHash.hex,
+        renderFields("provider-calls/v1", provenance.calls.map(renderProviderCall))
+      )
+    )
+
   private def renderSpans(spans: SpanSet): String =
     renderFields(
       "spans/v1",
@@ -1621,7 +1645,7 @@ object NarrativeCompiler:
   private def renderFields(tag: String, fields: Iterable[String]): String =
     (tag +: fields.toVector).map(value => s"${value.length}:$value").mkString
 
-  private def fingerprint(
+  private[document] def fingerprint(
       input: NarrativeCompilerInput,
       derivation: DerivationReceipt,
       graph: NarrativeGraph,
@@ -1660,13 +1684,16 @@ object NarrativeCompiler:
             Vector(e.member.render, e.parent.value, e.kind.toString, e.meta.id.value)
           )
         )
+    val claims = derivation.emittedClaims.values.toVector
+      .sortBy(_.id.value)
+      .map(renderClaimMeta)
     ContentAddress.digest(
       Vector(
         "narrative-compilation/v1",
         input.source.canonicalChecksum.hex,
         input.receipt.contentChecksum.hex,
         derivation.candidateSet.hex
-      ) ++ attempts ++ nodes ++ edges ++
+      ) ++ attempts ++ nodes ++ edges ++ claims ++
         validation.report.violations.map(v =>
           renderFields("violation/v1", Vector(v.law, v.path, v.reason))
         )

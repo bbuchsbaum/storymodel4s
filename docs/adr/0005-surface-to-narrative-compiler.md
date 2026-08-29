@@ -228,9 +228,9 @@ named by a gap or retained evidence resolves in the emitted-claim ledger. Hashin
 would prove identity but not auditability, so a checksum is never accepted as a substitute for the
 record itself.
 
-The candidate-set checksum, attempts, emissions, and gaps all participate in the compilation
-fingerprint. Two compilations with the same emitted graph but different missing support are not the
-same artifact.
+The candidate-set checksum, attempts, full emitted `ClaimMeta` ledger, and gaps all participate in
+the compilation fingerprint. Two compilations with the same emitted graph but different missing
+support, epistemic status, credence, evidence, or provenance are not the same artifact.
 
 ### 7. Review for absence-erasing derivations
 

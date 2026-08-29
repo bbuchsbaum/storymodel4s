@@ -456,6 +456,43 @@ class CompilerSuite extends FunSuite:
     assertEquals(edge.meta.status, EpistemicStatus.Hypothesized)
   }
 
+  test("the compilation fingerprint includes hidden emitted claim metadata") {
+    val compilerInput = input(
+      situationAttempts = Vector(
+        SituationAttempt(ref0, bundle(situation0, ev0, "situation-agent", "s0"))
+      )
+    )
+    val result = compile(compilerInput)
+    val contextClaim = result.derivation.attempts.collectFirst {
+      case DerivationAttempt(
+            _,
+            ClaimFamily.ContextAssignment,
+            DerivationDisposition.Emitted(id)
+          ) =>
+        id
+    }.getOrElse(fail("missing emitted context-assignment claim"))
+    val changedContextMeta = result.derivation.emittedClaims(contextClaim)
+      .withStatus(EpistemicStatus.LinguisticallyEntailed)
+      .fold(e => fail(e.message), identity)
+    val changedDerivation = DerivationReceipt
+      .of(
+        result.derivation.candidateSet,
+        result.derivation.attempts,
+        result.derivation.emittedClaims.updated(contextClaim, changedContextMeta),
+        result.derivation.gaps
+      )
+      .fold(e => fail(e.message), identity)
+    val changedFingerprint = NarrativeCompiler.fingerprint(
+      compilerInput,
+      changedDerivation,
+      result.draft.graph,
+      result.draft.hierarchy,
+      result.validation
+    )
+
+    assertNotEquals(changedFingerprint, result.fingerprint)
+  }
+
   test("uncalibrated situation proposals remain gaps and cannot reach AlignmentSource") {
     val unresolved = Vector(
       SituationAttempt(ref0, bundle(situation0, ev0, "situation-agent", "u0", calibrated = false)),
