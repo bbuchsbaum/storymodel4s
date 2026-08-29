@@ -108,6 +108,75 @@ class InterviewProfileSuite extends FunSuite:
   ): Profile =
     ProfileScoring.profile(as, participantUnits, words, 10.0, None)
 
+  test("an Ambiguous placement is publishable and a member of nothing") {
+    // The end-to-end consequence of the induction fixture in InterviewInductionSuite. Every other
+    // assessment in this suite uses Distribution.point, so the split case has never been scored
+    // here - which is why this went unnoticed.
+    //
+    // Induction emits exactly this for PlacementBasis.Ambiguous: 0.4 Unresolved, 0.3 target,
+    // 0.3 other-specific. Not invented for the test; measured off TargetInduction.
+    val split = Distribution
+      .of(
+        Vector(
+          MemoryAddress.Unresolved -> 0.4,
+          targetAddr -> 0.3,
+          otherAddr -> 0.3
+        )
+      )
+      .getOrElse(fail("could not build the split distribution"))
+
+    val d = proto.copy(
+      id = DetailId.unsafe("d-amb"),
+      atom = DetailAtom.EventOccurrence(sit("s")),
+      sourceUnit = RecallUnitId.unsafe("u-amb")
+    )
+    val ambiguous = DetailAssessment(
+      d,
+      split,
+      DetailAssessment.defaultFacets(d.atom),
+      Estimate.observed(0.5),
+      ExperientialEvidence.none,
+      EpistemicStatus.Hypothesized,
+      PromptContext(InterviewPhase.FreeRecall, None),
+      None,
+      metaFor(d)
+    )
+
+    val p = scored(Vector(ambiguous), 1)
+
+    // MEASURED, not reasoned from the masses. The unit reaches NEITHER class: 0.3 is below the
+    // 0.5 membership threshold on both, so it is neither a target unit nor an other-specific one.
+    // eventPurity is target / (target + other-specific) and both arms are empty, so it abstains.
+    assert(
+      p.eventPurity.estimate.isInstanceOf[Estimate.Missing[?]],
+      s"eventPurity should abstain when the unit is in neither class: ${p.eventPurity}"
+    )
+
+    // POSITIVE CONTROL, without which the assertion above proves nothing: the SAME detail with a
+    // concentrated placement must NOT abstain. Otherwise "eventPurity is Missing" could be Missing
+    // for any unrelated reason and this test would pass while measuring nothing.
+    val concentrated = ambiguous.copy(address = Distribution.point(targetAddr))
+    val control = scored(Vector(concentrated), 1)
+    assertEquals(
+      control.eventPurity.estimate,
+      Estimate.observed(1.0),
+      s"control: a concentrated target placement must score, not abstain: ${control.eventPurity}"
+    )
+
+    // Meanwhile 0.6 of this detail's mass IS placed. It is not an abstention by the model - the
+    // model committed 60% of it to real episodes and simply spread it across two. A resolution
+    // summary built from these masses clears its own 0.5 threshold and says "publish", while every
+    // membership metric has dropped the unit. Two thresholds, both 0.5, different quantities.
+    assertEqualsDouble(1.0 - split(MemoryAddress.Unresolved), 0.6, 1e-9)
+    assert(
+      PlacementResolution
+        .of(PlacementGrain.Detail, 0.6, 0.4, 0.0)
+        .fold(e => fail(e.message), identity)
+        .clearsThreshold,
+      "resolution says publish while the profile counts the unit nowhere"
+    )
+  }
+
   test("anchoring is invariant under copying the same place atom") {
     val once = scored(Vector(place("u", "d0", "p")), 1)
     val copies = scored((0 until 4).toVector.map(i => place("u", s"d$i", "p")), 1)

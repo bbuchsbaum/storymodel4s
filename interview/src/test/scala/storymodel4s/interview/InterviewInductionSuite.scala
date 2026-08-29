@@ -73,6 +73,43 @@ class InterviewInductionSuite extends FunSuite:
     )
   }
 
+  test("a unit continuous with BOTH clusters reaches Ambiguous, and the corpus had no such case") {
+    // The genuinely hard case: the speaker says something that belongs to the target AND to the
+    // digression at once. No fixture in this suite reached it before - measured, 33 details across
+    // the four texts, zero Ambiguous - so the branch that decides it was untested. That is the
+    // case where an honest placement summary matters most.
+    //
+    // "restaurant" and "cake" tie it to the target; "Montreal" ties it to the digression.
+    val text =
+      "We ate cake at the restaurant. The year before we went to Montreal. " +
+        "The Montreal restaurant had cake too."
+    val (g, ds, r) = induce(text)
+    val third = g.ordered.last
+    val ids = ds.filter(_.support.minSpan.start >= third.minSpan.start).map(_.id)
+    assert(ids.nonEmpty, "third sentence produced no details")
+
+    ids.flatMap(r.addresses.get).foreach { d =>
+      val unresolved = d(MemoryAddress.Unresolved)
+      val placed = d.weights.filter(_._1 != MemoryAddress.Unresolved)
+      // The Ambiguous signature from induce(): primary Unresolved 0.4, the remaining 0.6 split
+      // evenly between the target and the digression. Asserted as VALUES, because "it is split"
+      // is true of many shapes and only these numbers identify the branch that produced them.
+      assertEqualsDouble(unresolved, 0.4, 1e-9, d.weights.toString)
+      assertEquals(placed.size, 2, d.weights.toString)
+      placed.values.foreach(v => assertEqualsDouble(v, 0.3, 1e-9, d.weights.toString))
+
+      // AND THE CONSEQUENCE, which is the reason this fixture exists. Resolved mass is 0.6, which
+      // clears PlacementResolution's 0.5 abstention threshold - the summary says "resolved enough,
+      // publish". But ProfileScoring's membership threshold is also 0.5 and applies to mass on ONE
+      // class, and neither class has more than 0.3. So the same detail is simultaneously
+      // publishable and a member of nothing. Two thresholds, both 0.5, measuring different
+      // quantities.
+      val resolved = 1.0 - unresolved
+      assert(resolved >= 0.5, s"resolved $resolved")
+      assert(placed.values.forall(_ < 0.5), placed.toString)
+    }
+  }
+
   test("then does not yank a continuous digression onto the target") {
     val text =
       "We ate cake at the restaurant. The year before we went to Montreal. Then we walked around Montreal."
