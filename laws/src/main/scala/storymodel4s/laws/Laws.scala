@@ -123,6 +123,66 @@ object TemporalLaws extends Laws:
     )
 
 /** Discipline rule sets for alignment posteriors and flows. */
+/** The `SourceView` totality contract: every ref a view EXPOSES resolves through `node`.
+  *
+  * Asserted over BOTH implementations, because the invariant is currently satisfied by accident in
+  * each of them and stated by neither. A violation is silent rather than loud: an unresolvable ref
+  * makes `relativeSpan` return `None`, `relativePosition` maps that to `0.0`, and `0.0` is the
+  * beginning of the discourse rather than a missing marker — so the view reports the node as
+  * occurring first and feeds that to chronology.
+  */
+object SourceViewLaws extends Laws:
+
+  /** Refs the view puts into circulation: node index, both endpoints of every adjacency layer, and
+    * the world-order domain.
+    */
+  def exposedRefs(v: SourceView): Set[SourceNodeRef] =
+    val fromNodes = v.nodes.map(_.ref).toSet
+    val fromAdjacency =
+      storymodel4s.align.RelationLayer.values.toVector.flatMap { l =>
+        val adj = v.adjacency(l)
+        adj.keySet ++ adj.values.flatMap(_.keySet)
+      }.toSet
+    val fromWorldOrder = v.worldOrder.map(_.keySet).getOrElse(Set.empty)
+    fromNodes ++ fromAdjacency ++ fromWorldOrder
+
+  /** The contract itself. */
+  def total(v: SourceView): Boolean =
+    exposedRefs(v).forall(r => v.node(r).isDefined)
+
+  /** The consequence that makes it matter: with a non-empty text, every exposed ref has a real
+    * discourse span, so no consumer of `relativePosition` can be handed a fabricated `0.0`.
+    */
+  def positionsAreMeasured(v: SourceView): Boolean =
+    v.textLength <= 0 || exposedRefs(v).forall(r => v.relativeSpan(r).isDefined)
+
+  def sourceView(using
+      Arbitrary[AlignGens.Case],
+      Arbitrary[StorySmall.Built]
+  ): RuleSet =
+    new DefaultRuleSet(
+      "align.sourceView",
+      None,
+      "InMemorySourceView: node is total over the refs the view exposes" ->
+        forAll((c: AlignGens.Case) => total(c.view)),
+      "InMemorySourceView: every exposed ref has a measured discourse span" ->
+        forAll((c: AlignGens.Case) => positionsAreMeasured(c.view)),
+      "StorySourceView: node is total over the refs the view exposes" ->
+        forAll { (b: StorySmall.Built) =>
+          StoryValidator
+            .validate(b.draft(), ValidationPolicy.strict)
+            .validated
+            .forall(m => total(bridge.StorySourceView.validated(m)))
+        },
+      "StorySourceView: every exposed ref has a measured discourse span" ->
+        forAll { (b: StorySmall.Built) =>
+          StoryValidator
+            .validate(b.draft(), ValidationPolicy.strict)
+            .validated
+            .forall(m => positionsAreMeasured(bridge.StorySourceView.validated(m)))
+        }
+    )
+
 object AlignmentLaws extends Laws:
   private val eps = 1e-9
 

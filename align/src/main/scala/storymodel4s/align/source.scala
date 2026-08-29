@@ -135,6 +135,28 @@ final case class NodeSummary(
   *     `[0, 1]` and `> 0` means the relation holds (graded for `Semantic`).
   *   - `worldOrder` gives a total or partial rank by story-world time when the source knows it.
   *   - `textLength` is the canonical text length, the denominator for discourse positions.
+  *
+  * ==Totality of `node` (contract, not a suggestion)==
+  *
+  * '''Every ref a view EXPOSES must resolve through `node`.''' The exposed refs are those in
+  * [[nodes]], those appearing as either endpoint of any [[adjacency]] layer, and the keys of
+  * [[worldOrder]]. An implementation that mentions a ref in adjacency or world order without
+  * placing it in the node index breaks this contract.
+  *
+  * This is load-bearing rather than tidy. [[relativeSpan]] returns `None` for an unresolvable ref
+  * and [[relativePosition]] then maps that `None` to `0.0` — which is not a missing marker but a
+  * MEANINGFUL POSITION, the very start of the discourse. Downstream, `signature` and `population`
+  * both build `SourceNodeRef => Option[Double]` as `Some(view.relativePosition(r))`, an `Option`
+  * that can never be `None`. So a violation of this contract does not throw and does not surface as
+  * an absent value: it silently reports every unresolvable node as occurring at the beginning of
+  * the story, and feeds that into chronology.
+  *
+  * Both current implementations satisfy it, and both do so BY ACCIDENT rather than by construction
+  * — `StorySourceView` because it filters `all` to nodes with source support before anything else
+  * is derived from it, `InMemorySourceView` because its index is built from the same `nodes` its
+  * refs come from. Neither states the invariant, so neither would notice losing it.
+  * `SourceViewLaws` in the `laws` module asserts it for both, with a foil that violates it
+  * deliberately so the law is known to be able to fail.
   */
 trait SourceView:
   def nodes: Vector[NodeSummary]

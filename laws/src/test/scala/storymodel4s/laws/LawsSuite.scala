@@ -20,6 +20,36 @@ class LawsSuite extends DisciplineSuite:
   checkAll("WireLaws", WireLaws.wire)
   checkAll("PopulationLaws", PopulationLaws.population)
   checkAll("EstimateLaws", EstimateLaws.estimates)
+  checkAll("SourceViewLaws", SourceViewLaws.sourceView)
+
+  // POSITIVE CONTROL for SourceViewLaws. Both real implementations satisfy the totality
+  // contract, so the law above passes without ever demonstrating it CAN fail -- and a law with
+  // no capacity to fail is not evidence. This foil violates the contract in the cheapest
+  // possible way: it exposes a ref through `adjacency` that its node index does not contain.
+  test(
+    "SourceView totality: the law rejects a view whose adjacency names a ref outside its node index"
+  ) {
+    import storymodel4s.align.*
+    import storymodel4s.core.SituationId
+    val phantom = SourceNodeRef.Situation(SituationId.unsafe("ghost"))
+    object Foil extends SourceView:
+      val nodes: Vector[NodeSummary] = Vector.empty
+      def node(ref: SourceNodeRef): Option[NodeSummary] = None
+      def adjacency(layer: RelationLayer): Map[SourceNodeRef, Map[SourceNodeRef, Double]] =
+        Map(phantom -> Map.empty)
+      def worldOrder: Option[Map[SourceNodeRef, Int]] = None
+      def textLength: Int = 100
+
+    assert(SourceViewLaws.exposedRefs(Foil).contains(phantom), "the foil must expose the ref")
+    assert(!SourceViewLaws.total(Foil), "the totality law must REJECT this view")
+    assert(!SourceViewLaws.positionsAreMeasured(Foil), "the span law must REJECT this view")
+
+    // And this is why the contract is load-bearing rather than tidy: the violation is silent.
+    // Nothing throws; the phantom is simply reported as occurring at the very start of the
+    // discourse, which is a real position and indistinguishable from a measured one.
+    assertEquals(Foil.relativeSpan(phantom), None)
+    assertEquals(Foil.relativePosition(phantom), 0.0)
+  }
 
   test("HsmmResult, rows, matrices, and admissibility cannot be constructed outside align") {
     import scala.compiletime.testing.typeCheckErrors
