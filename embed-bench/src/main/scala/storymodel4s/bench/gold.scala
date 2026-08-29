@@ -69,10 +69,22 @@ object GoldUnit:
 
 /** The gold for a whole recall. `validated` checks that every target is a node of the view at its
   * declared level, so a gold file cannot silently name a node the bench never scores.
+  *
+  * Why a non-case class: `validated` is a real smart constructor, but a public case class still
+  * exposes `fromProduct` / `copy`, which can mint a map `validated` would refuse.
   */
-final case class Gold(byUnit: Map[RecallUnitId, GoldUnit]):
+final class Gold private (val byUnit: Map[RecallUnitId, GoldUnit]):
   def apply(unit: RecallUnitId): Option[GoldUnit] = byUnit.get(unit)
   def size: Int = byUnit.size
+
+  override def equals(other: Any): Boolean = other match
+    case that: Gold => byUnit == that.byUnit
+    case _          => false
+
+  override def hashCode(): Int = byUnit.hashCode()
+
+  override def toString: String =
+    s"Gold(${byUnit.keys.toVector.sortBy(_.value).map(_.value).mkString(",")})"
 
 object Gold:
   enum GoldError:
@@ -107,4 +119,4 @@ object Gold:
     }
     problems.nextOption() match
       case Some(e) => Left(e)
-      case None    => Right(Gold(units.iterator.map(g => g.unit -> g).toMap))
+      case None    => Right(new Gold(units.iterator.map(g => g.unit -> g).toMap))
