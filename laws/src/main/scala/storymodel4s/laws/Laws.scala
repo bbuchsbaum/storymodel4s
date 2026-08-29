@@ -489,9 +489,20 @@ object PopulationLaws extends Laws:
           val r = AlignGens.infer(c)
           val subject = SubjectAlignment(SubjectId.unsafe("s0"), c.recall, r, None)
           PopulationAggregate.of(c.view, Vector(subject)).exists { p =>
+            val expectedChecksum = AlignWire.recallChecksum(c.recall)
+            val expectedNoUnits =
+              if c.recall.units.isEmpty then Vector(subject.subject) else Vector.empty
             p.receipt.viewFingerprint == c.view.contentFingerprint &&
             p.receipt.subjectCount == 1 &&
-            p.receipt.recallChecksums == Vector(AlignWire.recallChecksum(c.recall))
+            p.receipt.members.toVector == Vector(
+              PopulationMemberReceipt(
+                subject.subject,
+                expectedChecksum,
+                unitPresence = c.recall.units.nonEmpty
+              )
+            ) &&
+            p.receipt.recallChecksums == Vector(expectedChecksum) &&
+            p.receipt.subjectsWithNoRecallUnits == expectedNoUnits
           }
         },
       "an aggregate refuses a proof from any view with different content, even with the same node ids" ->
@@ -499,12 +510,16 @@ object PopulationLaws extends Laws:
           val r = AlignGens.infer(c)
           val subject = SubjectAlignment(SubjectId.unsafe("s0"), c.recall, r, None)
           val (same, different) = AlignGens.fingerprintVariants(c.view)
-          def viewMismatch(e: Either[AlignError, PopulationAggregate]) = e.left.exists {
-            case AlignError.FingerprintMismatch(f, _, _) => f.startsWith("viewFingerprint")
-            case _                                       => false
-          }
           same.forall(v => PopulationAggregate.of(v, Vector(subject)).isRight) &&
-          different.forall((_, v) => viewMismatch(PopulationAggregate.of(v, Vector(subject))))
+          different.forall { (_, v) =>
+            PopulationAggregate.of(v, Vector(subject)).left.exists {
+              case AlignError.PopulationViewMismatch(s, proof, aggregate) =>
+                s == subject.subject &&
+                proof == r.viewFingerprint &&
+                aggregate == v.contentFingerprint
+              case _ => false
+            }
+          }
         },
       "a population succeeds iff every subject's proof is of the aggregate's view" ->
         forAll { (c: AlignGens.Case) =>
@@ -515,14 +530,25 @@ object PopulationLaws extends Laws:
           val a = SubjectAlignment(SubjectId.unsafe("a"), c.recall, own, None)
           val b = SubjectAlignment(SubjectId.unsafe("b"), c.recall, foreign, None)
           val mixed = PopulationAggregate.of(c.view, Vector(a, b))
-          val mixedNamesB = mixed.left.exists {
-            case AlignError.FingerprintMismatch(f, _, _) => f.contains("(subject b)")
-            case _                                       => false
+          val mixedIdentifiesB = mixed.left.exists {
+            case AlignError.PopulationViewMismatch(s, proof, aggregate) =>
+              s == b.subject &&
+              proof == foreign.viewFingerprint &&
+              aggregate == c.view.contentFingerprint
+            case _ => false
           }
+          val mixedOnLemmaIdentifiesA =
+            PopulationAggregate.of(lemmaView, Vector(a, b)).left.exists {
+              case AlignError.PopulationViewMismatch(s, proof, aggregate) =>
+                s == a.subject &&
+                proof == own.viewFingerprint &&
+                aggregate == lemmaView.contentFingerprint
+              case _ => false
+            }
           PopulationAggregate.of(c.view, Vector(a)).isRight &&
           PopulationAggregate.of(lemmaView, Vector(b)).isRight &&
-          mixedNamesB &&
-          PopulationAggregate.of(lemmaView, Vector(a, b)).isLeft
+          mixedIdentifiesB &&
+          mixedOnLemmaIdentifiesA
         },
       "an aggregate refuses a subject whose recall is not the recall of its proof" ->
         forAll { (c: AlignGens.Case) =>
@@ -533,8 +559,11 @@ object PopulationLaws extends Laws:
           )
           val subject = SubjectAlignment(SubjectId.unsafe("s0"), other, r, None)
           PopulationAggregate.of(c.view, Vector(subject)).left.exists {
-            case AlignError.FingerprintMismatch(f, _, _) => f.startsWith("recallChecksum")
-            case _                                       => false
+            case AlignError.PopulationRecallMismatch(s, proof, suppliedRecall) =>
+              s == subject.subject &&
+              proof == r.recallChecksum &&
+              suppliedRecall == AlignWire.recallChecksum(other)
+            case _ => false
           }
         },
       "the receipt is invariant under subject order" ->

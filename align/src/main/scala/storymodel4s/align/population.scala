@@ -1,5 +1,6 @@
 package storymodel4s.align
 
+import cats.data.NonEmptyVector
 import storymodel4s.core.{Checksum, OpaqueId}
 import storymodel4s.features.{Coverage, Estimate, MissingReason}
 import storymodel4s.recall.RecallGraph
@@ -21,25 +22,57 @@ final case class SubjectAlignment(
     wordCount: Option[Int]
 )
 
-/** What a population artifact is bound to: the fingerprint of the one view every proof was gated
-  * against, how many subjects it pools, and the checksum of each subject's recall (sorted, so the
-  * receipt is independent of subject order). Downstream population models cite this receipt so a
-  * result can never be read against a view it was not computed on.
+/** One subject-to-recall binding retained by a [[PopulationReceipt]].
+  *
+  * `unitPresence` reports only whether the supplied recall contains any segmented units. It does
+  * not claim that a participant was silent when none are present.
   */
-final case class PopulationReceipt(
-    viewFingerprint: ViewFingerprint,
-    subjectCount: Int,
-    recallChecksums: Vector[Checksum],
-    /** Subjects whose recall has no units at all.
-      *
-      * A proof over an empty recall is legitimate — "this participant recalled nothing" is a
-      * finding, not an error, and refusing it would delete a datum. But it admits nothing and
-      * contributes no mass, so a bare `subjectCount` of 20 that silently includes 10 silent
-      * participants overstates what the aggregate rests on. Counted here so the headline cannot
-      * hide them.
-      */
-    contentlessSubjects: Vector[SubjectId]
+final case class PopulationMemberReceipt(
+    subject: SubjectId,
+    recallChecksum: Checksum,
+    unitPresence: Boolean
 )
+
+/** What a population artifact is bound to, with each recall checksum kept beside its subject.
+  *
+  * The constructor is private and the canonical members are non-empty and sorted by subject, so the
+  * subject count, recall checksums, and no-unit set cannot drift as parallel public fields.
+  * Downstream population models cite this receipt so a result cannot be read against a view or
+  * recall collection it was not computed on.
+  */
+final class PopulationReceipt private (
+    val viewFingerprint: ViewFingerprint,
+    val members: NonEmptyVector[PopulationMemberReceipt]
+):
+  /** Number of subject bindings in this receipt. */
+  def subjectCount: Int = members.length
+
+  /** Recall checksums in the same canonical subject order as [[members]]. */
+  def recallChecksums: Vector[Checksum] = members.toVector.map(_.recallChecksum)
+
+  /** Subjects whose supplied recall contains no segmented units. */
+  def subjectsWithNoRecallUnits: Vector[SubjectId] =
+    members.toVector.collect { case m if !m.unitPresence => m.subject }
+
+  override def equals(other: Any): Boolean = other match
+    case that: PopulationReceipt =>
+      viewFingerprint == that.viewFingerprint && members == that.members
+    case _ => false
+
+  override def hashCode(): Int = 31 * viewFingerprint.hashCode + members.hashCode
+
+  override def toString: String =
+    s"PopulationReceipt(view=${viewFingerprint.checksum.short()}, subjects=$subjectCount, " +
+      s"noRecallUnits=${subjectsWithNoRecallUnits.size})"
+
+object PopulationReceipt:
+  private[align] def from(
+      viewFingerprint: ViewFingerprint,
+      members: NonEmptyVector[PopulationMemberReceipt]
+  ): PopulationReceipt =
+    val ordered =
+      NonEmptyVector.fromVector(members.toVector.sortBy(_.subject.value)).getOrElse(members)
+    new PopulationReceipt(viewFingerprint, ordered)
 
 /** A sparse row-major matrix with string row/column identities; only nonzero entries are stored. */
 final case class SparseMatrix(
@@ -81,7 +114,12 @@ final case class BackwardFlow(discourse: Estimate[Double], world: Option[Estimat
   * reference and the population flow is its learned deformation, never a replacement. All sums use
   * sorted keys so results are bit-reproducible. No dense subject×node×node structure is allocated.
   */
-final case class PopulationAggregate private (view: SourceView, subjects: Vector[SubjectAlignment]):
+final class PopulationAggregate private (
+    val view: SourceView,
+    private val nonEmptySubjects: NonEmptyVector[SubjectAlignment]
+):
+  /** Subject proofs in canonical subject-id order. */
+  val subjects: Vector[SubjectAlignment] = nonEmptySubjects.toVector
 
   /** Subjects in deterministic order. */
   lazy val subjectIds: Vector[SubjectId] = subjects.map(_.subject).sorted
@@ -90,12 +128,26 @@ final case class PopulationAggregate private (view: SourceView, subjects: Vector
     * checksums (design record §11; bead same-view law).
     */
   lazy val receipt: PopulationReceipt =
-    PopulationReceipt(
+    PopulationReceipt.from(
       view.contentFingerprint,
-      subjects.size,
-      subjects.map(_.result.recallChecksum).sortBy(_.hex),
-      subjects.filter(_.recall.units.isEmpty).map(_.subject).sorted
+      nonEmptySubjects.map { s =>
+        PopulationMemberReceipt(
+          s.subject,
+          s.result.recallChecksum,
+          unitPresence = s.recall.units.nonEmpty
+        )
+      }
     )
+
+  override def equals(other: Any): Boolean = other match
+    case that: PopulationAggregate => view == that.view && subjects == that.subjects
+    case _                         => false
+
+  override def hashCode(): Int = 31 * view.hashCode + subjects.hashCode
+
+  override def toString: String =
+    s"PopulationAggregate(view=${view.contentFingerprint.checksum.short()}, " +
+      s"subjects=${subjects.size})"
 
   /** Alignable nodes in deterministic order. */
   lazy val nodeRefs: Vector[SourceNodeRef] = view.nodes.map(_.ref).sortBy(_.key)
@@ -236,12 +288,13 @@ object PopulationAggregate:
 
   /** Aggregate alignments that all target `view`.
     *
-    * Fails when subject ids repeat; when a subject's proof was gated against a different view (its
-    * `viewFingerprint` is not this view's content fingerprint — same node ids with different
-    * content count as a different view); when a subject's proof was made from a different recall
-    * than the one it carries (`recallChecksum` mismatch); when a result references a source node
-    * absent from the view; or when a posterior row is malformed. The fingerprint checks come first:
-    * a proof from another view is refused even if its nodes happen to exist here.
+    * Fails when there are no subjects; when subject ids repeat; when a subject's proof was gated
+    * against a different view (its `viewFingerprint` is not this view's content fingerprint — same
+    * node ids with different content count as a different view); when a subject's proof was made
+    * from a different recall than the one it carries (`recallChecksum` mismatch); when a result
+    * references a source node absent from the view; or when a posterior row is malformed. The
+    * fingerprint checks come first: a proof from another view is refused even if its nodes happen
+    * to exist here.
     */
   def of(
       view: SourceView,
@@ -274,19 +327,15 @@ object PopulationAggregate:
     else if foreignView.nonEmpty then
       val s = foreignView.get
       Left(
-        AlignError.FingerprintMismatch(
-          s"viewFingerprint (subject ${s.subject.value})",
-          s.result.viewFingerprint.checksum.hex,
-          expectedView.checksum.hex
-        )
+        AlignError.PopulationViewMismatch(s.subject, s.result.viewFingerprint, expectedView)
       )
     else if foreignRecall.nonEmpty then
       val s = foreignRecall.get
       Left(
-        AlignError.FingerprintMismatch(
-          s"recallChecksum (subject ${s.subject.value})",
-          s.result.recallChecksum.hex,
-          AlignWire.recallChecksum(s.recall).hex
+        AlignError.PopulationRecallMismatch(
+          s.subject,
+          s.result.recallChecksum,
+          AlignWire.recallChecksum(s.recall)
         )
       )
     else if unknown.nonEmpty then
@@ -295,4 +344,7 @@ object PopulationAggregate:
     else if malformed.nonEmpty then
       val (s, u) = malformed.head
       Left(AlignError.MalformedRow(u, s"subject ${s.value}: mass must be nonnegative and finite"))
-    else Right(new PopulationAggregate(view, ordered))
+    else
+      NonEmptyVector.fromVector(ordered) match
+        case Some(nonEmpty) => Right(new PopulationAggregate(view, nonEmpty))
+        case None           => Left(AlignError.SizeMismatch("population has no subjects"))

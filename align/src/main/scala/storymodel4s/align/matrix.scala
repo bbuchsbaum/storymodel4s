@@ -1,6 +1,7 @@
 package storymodel4s.align
 
 import cats.data.NonEmptySet
+import storymodel4s.core.Checksum
 import storymodel4s.recall.RecallUnitId
 
 /** Explicit open-world destinations for recall mass that is not source-grounded.
@@ -321,6 +322,20 @@ enum AlignError:
     */
   case FingerprintMismatch(field: String, recorded: String, derived: String)
 
+  /** An in-memory population member proof was gated against a different source view. */
+  case PopulationViewMismatch(
+      subject: SubjectId,
+      proof: ViewFingerprint,
+      aggregate: ViewFingerprint
+  )
+
+  /** An in-memory population member proof was derived from a different supplied recall. */
+  case PopulationRecallMismatch(
+      subject: SubjectId,
+      proof: Checksum,
+      suppliedRecall: Checksum
+  )
+
   /** A record rebuilt through [[AlignWire]] is malformed or internally inconsistent. */
   case MalformedRecord(record: String, detail: String)
 
@@ -334,4 +349,8 @@ enum AlignError:
     case GateDrift(r, d)        =>
       s"admissibility echo ${r.checksum.short()} differs from the gate's ${d.checksum.short()}"
     case FingerprintMismatch(f, r, d) => s"$f on the wire ($r) differs from the derived value ($d)"
-    case MalformedRecord(r, m)        => s"$r: $m"
+    case PopulationViewMismatch(s, p, a) =>
+      s"subject ${s.value}: proof view ${p.checksum.short()} differs from aggregate view ${a.checksum.short()}"
+    case PopulationRecallMismatch(s, p, r) =>
+      s"subject ${s.value}: proof recall ${p.short()} differs from supplied recall ${r.short()}"
+    case MalformedRecord(r, m) => s"$r: $m"

@@ -1,5 +1,6 @@
 package storymodel4s.align
 
+import cats.data.NonEmptyVector
 import munit.ScalaCheckSuite
 import org.scalacheck.{Arbitrary, Gen}
 import org.scalacheck.Prop.forAll
@@ -114,7 +115,10 @@ class PopulationSuite extends ScalaCheckSuite:
   // ---- constructor checks --------------------------------------------------------------------
 
   test("of rejects empty populations, duplicate ids, unknown nodes, malformed rows") {
-    assert(PopulationAggregate.of(view, Vector.empty).isLeft)
+    assertEquals(
+      PopulationAggregate.of(view, Vector.empty),
+      Left(AlignError.SizeMismatch("population has no subjects"))
+    )
     val a = SubjectAlignment(sid("s"), AnnaFixture.recall, full, None)
     assert(PopulationAggregate.of(view, Vector(a, a.copy(wordCount = Some(1)))).isLeft)
     val alien = SourceNodeRef.Situation(storymodel4s.core.SituationId.unsafe("not-in-view"))
@@ -173,22 +177,26 @@ class PopulationSuite extends ScalaCheckSuite:
       .infer(AnnaFixture.recall, foilView, AnnaFixture.candidates, AnnaFixture.costModel)
       .fold(e => fail(e.message), identity)
 
-  private def fingerprintError(e: Either[AlignError, ?], field: String): Boolean =
-    e.left.exists {
-      case AlignError.FingerprintMismatch(f, _, _) => f.startsWith(field)
-      case _                                       => false
-    }
-
   test("same-view law: a proof gated against a different view is refused, naming the subject") {
     assertNotEquals(foilView.contentFingerprint, view.contentFingerprint)
     assertEquals(fullOnFoil.viewFingerprint, foilView.contentFingerprint)
     val foreign = SubjectAlignment(sid("s-foreign"), AnnaFixture.recall, fullOnFoil, None)
     val own = SubjectAlignment(sid("s-own"), AnnaFixture.recall, full, None)
     val mixed = PopulationAggregate.of(view, Vector(own, foreign))
-    assert(fingerprintError(mixed, "viewFingerprint"), s"expected a view mismatch, got $mixed")
-    assert(mixed.left.exists(_.message.contains("s-foreign")))
+    assert(mixed.isLeft, "a mixed-view population must be refused regardless of error shape")
+    mixed match
+      case Left(AlignError.PopulationViewMismatch(subject, proof, aggregate)) =>
+        assertEquals(subject, sid("s-foreign"))
+        assertEquals(proof, foilView.contentFingerprint)
+        assertEquals(aggregate, view.contentFingerprint)
+      case other => fail(s"expected a typed population-view mismatch, got $other")
     // the wrong way round is refused too: the original proof does not fit the foil view
-    assert(fingerprintError(PopulationAggregate.of(foilView, Vector(own)), "viewFingerprint"))
+    PopulationAggregate.of(foilView, Vector(own)) match
+      case Left(AlignError.PopulationViewMismatch(subject, proof, aggregate)) =>
+        assertEquals(subject, sid("s-own"))
+        assertEquals(proof, view.contentFingerprint)
+        assertEquals(aggregate, foilView.contentFingerprint)
+      case other => fail(s"expected a typed population-view mismatch, got $other")
     // and the foil proof aggregates on the foil view, receipt bound to it
     val onFoil =
       PopulationAggregate.of(foilView, Vector(foreign)).fold(e => fail(e.message), identity)
@@ -201,45 +209,78 @@ class PopulationSuite extends ScalaCheckSuite:
     val foreign = SubjectAlignment(sid("s-foreign"), AnnaFixture.recall, fullOnFoil, None)
     val known = view.nodes.map(_.ref).toSet
     assert(foreign.result.candidateAnchors.values.flatten.forall(known.contains))
-    assert(fingerprintError(PopulationAggregate.of(view, Vector(foreign)), "viewFingerprint"))
+    val mismatch = PopulationAggregate.of(view, Vector(foreign))
+    assert(mismatch.isLeft, "a foreign-view proof must be refused regardless of error shape")
+    mismatch match
+      case Left(AlignError.PopulationViewMismatch(subject, proof, aggregate)) =>
+        assertEquals(subject, sid("s-foreign"))
+        assertEquals(proof, foilView.contentFingerprint)
+        assertEquals(aggregate, view.contentFingerprint)
+      case other => fail(s"expected the view check to run first, got $other")
   }
 
   test("same-view law: a subject whose recall is not the recall of its proof is refused") {
     val wrongRecall = SubjectAlignment(sid("s-wrong"), AnnaFixture.summary.recall, full, None)
     val r = PopulationAggregate.of(view, Vector(wrongRecall))
-    assert(fingerprintError(r, "recallChecksum"), s"expected a recall mismatch, got $r")
-    assert(r.left.exists(_.message.contains("s-wrong")))
+    assert(r.isLeft, "a proof/recall mismatch must be refused regardless of error shape")
+    r match
+      case Left(AlignError.PopulationRecallMismatch(subject, proof, suppliedRecall)) =>
+        assertEquals(subject, sid("s-wrong"))
+        assertEquals(proof, full.recallChecksum)
+        assertEquals(suppliedRecall, AlignWire.recallChecksum(AnnaFixture.summary.recall))
+      case other => fail(s"expected a typed population-recall mismatch, got $other")
   }
 
-  test("receipt names the view fingerprint, the subject count, and the sorted recall checksums") {
+  test("receipt keeps each subject bound to its recall and derives every summary") {
     val rc = real.receipt
     assertEquals(rc.viewFingerprint, view.contentFingerprint)
     assertEquals(rc.subjectCount, 3)
     val expected = Vector(
-      AlignWire.recallChecksum(AnnaFixture.recall),
-      AlignWire.recallChecksum(AnnaFixture.summary.recall),
-      AlignWire.recallChecksum(AnnaFixture.recall)
-    ).sortBy(_.hex)
-    assertEquals(rc.recallChecksums, expected)
-    assertEquals(rc.recallChecksums.map(_.hex), rc.recallChecksums.map(_.hex).sorted)
-    assertEquals(rc.contentlessSubjects, Vector.empty)
+      PopulationMemberReceipt(
+        sid("s-full"),
+        AlignWire.recallChecksum(AnnaFixture.recall),
+        unitPresence = true
+      ),
+      PopulationMemberReceipt(
+        sid("s-summary"),
+        AlignWire.recallChecksum(AnnaFixture.summary.recall),
+        unitPresence = true
+      ),
+      PopulationMemberReceipt(
+        sid("s-unranked"),
+        AlignWire.recallChecksum(AnnaFixture.recall),
+        unitPresence = true
+      )
+    )
+    assertEquals(rc.members.toVector, expected)
+    assertEquals(rc.recallChecksums, expected.map(_.recallChecksum))
+    assertEquals(rc.subjectCount, rc.members.length)
+    assertEquals(rc.subjectsWithNoRecallUnits, Vector.empty)
   }
 
-  test("a silent participant is counted, not hidden and not refused") {
-    // HsmmResult.validated accepts an empty recall - every structural guard passes vacuously - and
-    // that is right: "this participant recalled nothing" is a finding, not an error. What must not
-    // happen is a subjectCount that quietly includes them, so the receipt names them separately.
-    val transcript = StorySource.fromText("nothing here.", Some("silent")).toOption.get
-    val silentRecall =
+  test("receipt construction canonicalizes subject order") {
+    val reversed = NonEmptyVector
+      .fromVector(real.receipt.members.toVector.reverse)
+      .getOrElse(fail("the real receipt must contain members"))
+    val rebuilt = PopulationReceipt.from(real.receipt.viewFingerprint, reversed)
+    assertEquals(rebuilt, real.receipt)
+    assertEquals(rebuilt.members.toVector.map(_.subject), real.subjectIds)
+  }
+
+  test("a non-empty transcript with no recall units is counted and named exactly") {
+    // HsmmResult.validated accepts a recall with no units. Its non-empty transcript proves that the
+    // observable fact is only "no segmented recall units", not that the participant was silent.
+    val transcript = StorySource.fromText("nothing here.", Some("no-units")).toOption.get
+    val zeroUnitRecall =
       RecallGraph(
         transcript,
         SurfaceAnalyzer.analyze(transcript),
         Vector.empty,
         RecallRelations.empty
       )
-    val silentProof = HsmmResult
+    val zeroUnitProof = HsmmResult
       .validated(
-        silentRecall,
+        zeroUnitRecall,
         view,
         Map.empty,
         AlignmentMatrix.of(Vector.empty).toOption.get,
@@ -249,14 +290,46 @@ class PopulationSuite extends ScalaCheckSuite:
         Map.empty,
         0
       )
-      .fold(e => fail(s"an empty recall should still validate: ${e.message}"), identity)
-    val withSilent = PopulationAggregate
-      .of(view, real.subjects :+ SubjectAlignment(sid("s-silent"), silentRecall, silentProof, None))
+      .fold(e => fail(s"a zero-unit recall should still validate: ${e.message}"), identity)
+    val withNoUnits = PopulationAggregate
+      .of(
+        view,
+        real.subjects :+
+          SubjectAlignment(sid("s-no-units"), zeroUnitRecall, zeroUnitProof, None)
+      )
       .fold(e => fail(e.message), identity)
-    assertEquals(withSilent.receipt.subjectCount, 4)
-    assertEquals(withSilent.receipt.contentlessSubjects, Vector(sid("s-silent")))
-    // and the silent subject contributes no mass: the grounded-subject counts are unchanged
-    assertEquals(withSilent.groundedSubjects, real.groundedSubjects)
+    assertEquals(withNoUnits.receipt.subjectCount, 4)
+    assertEquals(withNoUnits.receipt.subjectsWithNoRecallUnits, Vector(sid("s-no-units")))
+    assertEquals(
+      withNoUnits.receipt.members.toVector.find(_.subject == sid("s-no-units")).map(_.unitPresence),
+      Some(false)
+    )
+    // The zero-unit subject contributes no mass, so grounded-subject counts are unchanged.
+    assertEquals(withNoUnits.groundedSubjects, real.groundedSubjects)
+  }
+
+  test("receipt identity changes when the same recalls are assigned to different subjects") {
+    def aggregate(subjects: Vector[SubjectAlignment]): PopulationAggregate =
+      PopulationAggregate.of(view, subjects).fold(e => fail(e.message), identity)
+    val original = aggregate(
+      Vector(
+        SubjectAlignment(sid("a"), AnnaFixture.recall, full, None),
+        SubjectAlignment(sid("b"), AnnaFixture.summary.recall, summary, None)
+      )
+    )
+    val swapped = aggregate(
+      Vector(
+        SubjectAlignment(sid("a"), AnnaFixture.summary.recall, summary, None),
+        SubjectAlignment(sid("b"), AnnaFixture.recall, full, None)
+      )
+    )
+    assertEquals(
+      original.receipt.recallChecksums.sortBy(_.hex),
+      swapped.receipt.recallChecksums.sortBy(_.hex),
+      "the old independently sorted checksum field would collide"
+    )
+    assertNotEquals(original.receipt, swapped.receipt)
+    assertNotEquals(original.receipt.members, swapped.receipt.members)
   }
 
   test("receipt and aggregate are invariant under subject order") {
@@ -266,6 +339,21 @@ class PopulationSuite extends ScalaCheckSuite:
     assertEquals(reversed.receipt, real.receipt)
     assertEquals(reversed, real)
     assertEquals(reversed.visitationMatrix, real.visitationMatrix)
+  }
+
+  test("population rendering is summary-only, never a dump of subjects or recalls") {
+    val renderedAggregate = real.toString
+    val renderedReceipt = real.receipt.toString
+    assert(renderedAggregate.contains("subjects=3"), renderedAggregate)
+    assert(renderedReceipt.contains("subjects=3"), renderedReceipt)
+    assert(renderedReceipt.contains("noRecallUnits=0"), renderedReceipt)
+    real.subjectIds.foreach { subject =>
+      assert(!renderedAggregate.contains(subject.value), renderedAggregate)
+      assert(!renderedReceipt.contains(subject.value), renderedReceipt)
+    }
+    real.receipt.recallChecksums.foreach { checksum =>
+      assert(!renderedReceipt.contains(checksum.hex), renderedReceipt)
+    }
   }
 
   // ---- generators for properties: real gated inferences under varied configurations ---------
