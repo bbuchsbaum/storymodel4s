@@ -174,9 +174,21 @@ was set by the owner on 2026-08-28 (sticky decision
    fix for a chronology default missed an identical defect nine lines away
    because the search was for `.getOrElse`; sweeping four shapes instead — `if
    X.isEmpty then <literal>`, `.getOrElse(<numeric>)`, `math.max(1, n)` as a
-   denominator, vacuous `forall`/`exists` in a scoring position — found the
-   relation-preservation prior that defaulted to *perfectly preserved* and so
-   biased the aligner itself, not merely a number computed from it.
+   denominator, vacuous `forall`/`exists` in a scoring position — surfaced
+   several more instances that a string search had missed. (The sweep's most
+   dramatic hit, a relation-preservation prior said to bias the aligner, was
+   **retracted**: the defaulting function has one caller and it is a test. See
+   *Trace the consequence* below — that retraction is why this paragraph no
+   longer cites it.)
+
+   *Trace the consequence.* A claim about what a defect **feeds** — what depends
+   on it, what it corrupts downstream — is a claim about the call graph, and the
+   call graph is cheap to check. Do not escalate a consequence you have not
+   traced. A finding that matches an already-confirmed pattern needs **more**
+   verification than one that does not, not less: it arrives feeling
+   pre-validated, which is exactly when the check gets skipped. This rule exists
+   because the chief escalated a pattern-matching finding to P1 above all other
+   work without running one `grep` for its callers.
 
    *Distinguishability.* Where a test separates a correct value from a specific
    wrong one, assert that the two differ by more than the comparison tolerance.
