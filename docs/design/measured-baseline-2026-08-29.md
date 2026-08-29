@@ -84,6 +84,13 @@ says *"this is that event"* does not.
 Both ends run from raw text today. Transcript → `RecallGraph` is two function calls. `SourceView` →
 `RecallSignature` is four lines with library defaults.
 
+*(Re-verified after slice E landed at `2d39f35`, which made `RecallGraph` a phantom-typed
+private-constructor class. **The call did not change.** `RecallSegmenter.segment(transcript):
+RecallGraph[Checked]` still returns in one call and now returns a graph carrying a proof its
+invariants were checked. Closing the construction boundary cost the raw-text path nothing — worth
+recording, because the usual price of a construction boundary is added ceremony at every call
+site.)*
+
 **The missing transformation is `SurfaceAtlas` → `NarrativeGraph` + `NarrativeHierarchy`.** Nothing
 produces them — not an implementation, not a stub, not a provider trait. And `acquire`, the module
 named for it, declares `.dependsOn(core, proposition)` and **not** `story`, so it cannot name the
