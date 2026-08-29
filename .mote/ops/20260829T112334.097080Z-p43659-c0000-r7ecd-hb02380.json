@@ -1,0 +1,1 @@
+{"actor":"claude-storymodel4s","entity":"bd-01M16M5ETH0QHFZ62KXZJ54PN9","kind":"create","op":"20260829T112334.097080Z-p43659-c0000-r7ecd-hb02380","set":{"status":"open","title":"align: the dense cost terms impute 0.5 when their inputs are absent and it is not recorded, so a measured 0.5 and an invented one are indistinguishable"},"ts":"2026-08-29T11:23:34.097080Z","v":1}
