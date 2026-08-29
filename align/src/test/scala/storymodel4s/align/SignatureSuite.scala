@@ -58,8 +58,8 @@ class SignatureSuite extends FunSuite:
       fidelityByFacet = Map.empty,
       specificityMass = MassRatio.of(0.0, 0.0, 0.0).fold(e => fail(e.message), identity),
       compression = MassRatio.of(0.0, 0.0, 0.0).fold(e => fail(e.message), identity),
-      discourseChronology = Some(0.0),
-      worldChronology = None,
+      discourseChronology = MassRatio.of(0.0, 1.0, 1.0).fold(e => fail(e.message), identity),
+      worldChronology = MassRatio.of(0.0, 0.0, 0.0).fold(e => fail(e.message), identity),
       causalPreservation = MassRatio.of(0.0, 0.0, 0.0).fold(e => fail(e.message), identity),
       semanticFlowCoherence = MassRatio.of(0.0, 0.0, 0.0).fold(e => fail(e.message), identity),
       associationMass = associationMass,
@@ -172,7 +172,7 @@ class SignatureSuite extends FunSuite:
     // a world order, and a test that can silently stop running is not a guard. AnnaFixture's view
     // has no world order, so worldChronology is Missing by construction here.
     val name =
-      if sig.worldChronology.isEmpty then "worldChronology"
+      if sig.worldChronology.value.isEmpty then "worldChronology"
       else if sig.causalPreservation.value.isEmpty then "causalPreservation"
       else if sig.backwardMass.isEmpty then "backwardMass"
       else fail("this fixture measures every component; the test needs one that is Missing")
@@ -217,7 +217,11 @@ class SignatureSuite extends FunSuite:
       )
       .fold(e => fail(e.message), identity)
     val s = RecallSignature.compute(proof, silent, view)
-    assertEquals(s.discourseChronology, None, "no eligible step must not report perfect chronology")
+    assertEquals(
+      s.discourseChronology.value,
+      None,
+      "no eligible step must not report perfect chronology"
+    )
     assertEquals(s.backwardMass, None, "no eligible step must not report zero backward movement")
     assertEquals(s.worldBackwardMass, None)
   }
@@ -382,6 +386,57 @@ class SignatureSuite extends FunSuite:
     assert(
       ratioOfSums.value.exists(v => math.abs(v - meanOfRatios) > 0.4),
       s"ratio-of-sums collapsed onto mean-of-ratios: ${ratioOfSums.render}"
+    )
+  }
+
+  test("chronology publishes the share of the route it could actually judge") {
+    val result = GraphHsmm
+      .infer(recall, view, candidates, costModel)
+      .fold(e => fail(e.message), identity)
+    val s = RecallSignature.compute(result, recall, view)
+    val d = s.discourseChronology
+
+    // Only ORDERED pairs can be forward or backward. A step onto an ancestor, or onto a node with
+    // no position, is not disordered - it is unjudgeable - so it belongs in the coverage, not in
+    // the ratio. The old field published fw/(fw+bw) with no way to say which of those two a 1.0
+    // rested on.
+    val totalStep = result.flow.steps.map(_.mass.values.sum).sum
+    assertEqualsDouble(d.totalMass, totalStep, 1e-9)
+    assert(d.conditioningMass <= d.totalMass + 1e-9, d.render)
+    assert(d.support > 0.0 && d.support < 1.0, s"fixture cannot distinguish coverage: ${d.render}")
+
+    // Pinned, because this is the number the migration exists to surface: the chronology figure on
+    // the worked example rests on 25.6% of the route mass. The value itself is unchanged - the
+    // arithmetic was always a ratio of sums - but 0.0468 read as a statement about this person's
+    // recall when three quarters of their route was never judgeable. A reader who saw only the
+    // value would have had no way to know that.
+    assertEqualsDouble(d.value.getOrElse(fail(d.render)), 0.046818, 1e-6)
+    assertEqualsDouble(d.support, 0.255856, 1e-6)
+    assertEqualsDouble(d.conditioningMass, 0.767568, 1e-6)
+
+    // The distinction the world field must keep, and the one I got wrong first: a view with NO
+    // world order is 0 of 0 - the source has no world chronology to violate - while a view that
+    // HAS one and a route that told us nothing about it is 0 of totalStepMass. Same abstention,
+    // different fact, and only the second is about the participant.
+    assert(view.worldOrder.nonEmpty, "fixture lost its world order; the case below is not the foil")
+    assertEqualsDouble(s.worldChronology.totalMass, totalStep, 1e-9)
+
+    // THE FOIL, and it needs its own view: with the shipped fixture worldOrder is present, so the
+    // no-world-order branch is unreachable and a mutation collapsing it survives a green suite.
+    // That is how three earlier mutations here survived their first test set, so the fixture is
+    // built rather than hoped for.
+    val noWorld = view.copy(worldOrder = None)
+    val noWorldResult = GraphHsmm
+      .infer(recall, noWorld, candidates, costModel)
+      .fold(e => fail(e.message), identity)
+    val ws = RecallSignature.compute(noWorldResult, recall, noWorld).worldChronology
+    assertEquals(ws.value, None, ws.render)
+    assertEqualsDouble(
+      ws.totalMass,
+      0.0,
+      1e-9,
+      "a source with no world order must be 0 of 0, not 0 of the route: the first says there is " +
+        "no world chronology to violate, the second blames the participant for our missing data"
     )
   }
 
@@ -617,7 +672,7 @@ class SignatureSuite extends FunSuite:
     // The distinction the bead's option (a) would have erased: dropping a Missing component
     // computes a different linear functional under the same name and weights.
     val name =
-      if sig.worldChronology.isEmpty then "worldChronology"
+      if sig.worldChronology.value.isEmpty then "worldChronology"
       else if sig.causalPreservation.value.isEmpty then "causalPreservation"
       else fail("this fixture measures every component; the test needs one that is Missing")
     val p = SignatureProjection

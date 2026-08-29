@@ -27,8 +27,8 @@ final case class RecallSignature(
     fidelityByFacet: Map[Facet, MassRatio],
     specificityMass: MassRatio,
     compression: MassRatio,
-    discourseChronology: Option[Double],
-    worldChronology: Option[Double],
+    discourseChronology: MassRatio,
+    worldChronology: MassRatio,
     causalPreservation: MassRatio,
     semanticFlowCoherence: MassRatio,
     associationMass: Double,
@@ -343,6 +343,7 @@ object RecallSignature:
     val compressionT = p.rows.map(r => r.mass.values.sum).sum
     val compression = MassRatio.unsafe(compressionN, compressionA, compressionT)
 
+    val totalStepMass = f.steps.map(_.mass.values.sum).sum
     def isBackward(pos: SourceNodeRef => Option[Double])(a: SourceNodeRef, b: SourceNodeRef) =
       a != b && !view.isAncestor(b, a) && ((pos(a), pos(b)) match
         case (Some(x), Some(y)) => y < x
@@ -351,10 +352,20 @@ object RecallSignature:
       a != b && !view.isAncestor(b, a) && !view.isAncestor(a, b) && ((pos(a), pos(b)) match
         case (Some(x), Some(y)) => y > x
         case _                  => false)
-    def ordered(pos: SourceNodeRef => Option[Double]): Option[Double] =
+
+    /** Forward share of the directionally comparable route mass, with that comparability beside it.
+      *
+      * The ratio was already a ratio of sums, so the arithmetic is unchanged; what was missing is
+      * T. A chronology of 1.0 computed on 2% of the route mass and one computed on 90% published
+      * the same number, and the first is a claim about almost nothing. Only ORDERED pairs can be
+      * forward or backward at all - a step onto an ancestor, or onto a node with no position, is
+      * not disordered, it is unjudgeable - so the comparable mass is the conditioning event and the
+      * rest of the route is the coverage it is missing.
+      */
+    def ordered(pos: SourceNodeRef => Option[Double]): MassRatio =
       val fw = f.steps.map(_.sourceMass(isForward(pos))).sum
       val bw = f.steps.map(_.sourceMass(isBackward(pos))).sum
-      if fw + bw <= 0 then None else Some(fw / (fw + bw))
+      MassRatio.unsafe(fw, fw + bw, totalStepMass)
 
     /** Mean per-step backward mass over EVERY step, with the comparable-step support beside it.
       *
@@ -378,7 +389,11 @@ object RecallSignature:
     // `.getOrElse(1.0)` threw that away and published PERFECT forward chronology for a recall we
     // could not place at all. The honest value is None.
     val discourse = ordered(discoursePos)
-    val world = worldPos.flatMap(ordered)
+    // A view with NO world order and a route with no judgeable steps are different failures, and
+    // the total is what separates them: 0 of 0 says the source has no world chronology to violate,
+    // 0 of totalStepMass says it has one and this route told us nothing about it. Collapsing them
+    // is the same conflation causalPreservation had, one field earlier.
+    val world = worldPos.map(ordered).getOrElse(MassRatio.unsafe(0.0, 0.0, 0.0))
     val backward = backwardMean(discoursePos)
     val worldBackward = worldPos.flatMap(backwardMean)
 
@@ -575,8 +590,8 @@ final class SignatureProjection private (
       "fidelity" -> s.fidelityMass.value,
       "specificity" -> s.specificityMass.value,
       "compression" -> s.compression.value,
-      "discourseChronology" -> s.discourseChronology,
-      "worldChronology" -> s.worldChronology,
+      "discourseChronology" -> s.discourseChronology.value,
+      "worldChronology" -> s.worldChronology.value,
       "causalPreservation" -> s.causalPreservation.value,
       "semanticFlowCoherence" -> s.semanticFlowCoherence.value,
       "associationMass" -> Some(s.associationMass),
@@ -601,6 +616,8 @@ final class SignatureProjection private (
       "fidelity" -> s.fidelityMass.support,
       "specificity" -> s.specificityMass.support,
       "causalPreservation" -> s.causalPreservation.support,
+      "discourseChronology" -> s.discourseChronology.support,
+      "worldChronology" -> s.worldChronology.support,
       "compression" -> s.compression.support,
       "semanticFlowCoherence" -> s.semanticFlowCoherence.support
     ) ++ s.backwardMass.map(m => "backwardMass" -> m.comparableSteps.toDouble / m.totalSteps).toMap
