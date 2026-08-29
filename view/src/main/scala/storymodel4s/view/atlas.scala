@@ -247,16 +247,42 @@ enum ThreadPolicy:
   case All(max: PositiveInt)
 
 /** What the Atlas shows besides regions and landmarks. */
-final case class AtlasSpec private (zoom: ZoomLevel, threads: ThreadPolicy)
+final case class AtlasSpec private (
+    zoom: ZoomLevel,
+    threads: ThreadPolicy,
+    featureScale: FeatureScale
+)
 
 object AtlasSpec:
   /** Construct a Discourse Atlas specification from already checked closed policies. */
-  def apply(zoom: ZoomLevel, threads: ThreadPolicy): AtlasSpec = new AtlasSpec(zoom, threads)
+  def apply(
+      zoom: ZoomLevel,
+      threads: ThreadPolicy,
+      featureScale: FeatureScale = FeatureScale.Default
+  ): AtlasSpec = new AtlasSpec(zoom, threads, featureScale)
 
-/** Where a selected or focused semantic address is represented in this projection. */
-enum SelectionPlacement:
-  /** The address has one or more ordinary marks at this level. */
-  case OnMark(marks: NonEmptyVector[MarkId])
+/** Value-free feature plan awaiting checked numeric sidecar materialization downstream. */
+final case class AtlasFeatureLayer private[view] (
+    scale: FeatureScale,
+    state: FeatureChannelState,
+    observations: Vector[FeatureObservationPlacement]
+)
+
+object AtlasFeatureLayer:
+  private[view] def compiled(
+      scale: FeatureScale,
+      planned: PlannedFeatureLayer
+  ): AtlasFeatureLayer =
+    new AtlasFeatureLayer(scale, planned.state, planned.observations)
+
+/** Where a selected or focused semantic address is represented in one compiled view.
+  *
+  * `Mark` is the renderer-neutral identity used by that view: [[MarkId]] in an Atlas and
+  * [[AnnotationId]] in a Codex.
+  */
+enum SelectionPlacement[+Mark]:
+  /** The address has one or more ordinary marks in this view. */
+  case OnMark(marks: NonEmptyVector[Mark])
 
   /** The address is preserved through its nearest visible primary ancestor. */
   case ViaAncestor(ancestor: Address)
@@ -270,9 +296,10 @@ final case class NarrativeScene private[view] (
     contract: ProjectionContract,
     zoom: ZoomLevel,
     state: CommonViewState,
+    featureLayer: AtlasFeatureLayer,
     marks: Vector[VisualPrimitive],
     navigation: SceneNavigation,
-    selectionPlacements: Map[Address, SelectionPlacement],
+    selectionPlacements: Map[Address, SelectionPlacement[MarkId]],
     provenance: ViewProvenance
 ):
   def textualTwin: String = AtlasTextualTwin.render(this)
@@ -310,15 +337,29 @@ final class AtlasCompiler private (provenance: ViewProvenance):
     for
       _ <- EvidenceVisibility.validateHorizon(model.source.canonicalText, state.horizon)
       _ <- validateProvenance(model, state, spec)
+      feature <- FeaturePlanner.plan(
+        model,
+        state.feature,
+        spec.featureScale,
+        state.horizon,
+        provenance
+      )
       ledger <- model.ledger
-      scene <- build(model, ledger, state, spec)
+      scene <- build(
+        model,
+        ledger,
+        state,
+        spec,
+        AtlasFeatureLayer.compiled(spec.featureScale, feature)
+      )
     yield scene
 
   private def build(
       model: StoryModel[ModelStatus.Validated],
       ledger: ClaimLedger,
       state: CommonViewState,
-      spec: AtlasSpec
+      spec: AtlasSpec,
+      featureLayer: AtlasFeatureLayer
   ): Either[DomainError, NarrativeScene] =
     val g = model.graph
     val h = model.hierarchy
@@ -599,7 +640,7 @@ final class AtlasCompiler private (provenance: ViewProvenance):
           else climb(NarrativeMember.Segment(p), seen + m)
         }
       start.flatMap(climb(_, Set.empty))
-    val placements: Map[Address, SelectionPlacement] =
+    val placements: Map[Address, SelectionPlacement[MarkId]] =
       (state.selection ++ state.focus).toVector
         .sortBy(_.render)
         .map { address =>
@@ -624,6 +665,7 @@ final class AtlasCompiler private (provenance: ViewProvenance):
       ProjectionContract.discourseAtlas,
       spec.zoom,
       state,
+      featureLayer,
       marks,
       nav,
       placements,
@@ -693,17 +735,51 @@ object AtlasCompiler:
   /** Bind Atlas compilation to a source, model-basis, compiler, and configuration receipt. */
   def apply(provenance: ViewProvenance): AtlasCompiler = new AtlasCompiler(provenance)
 
-  /** Content address of the exact view configuration, shared-state parts first. */
+  /** Content address of the exact versioned Atlas compiler configuration. */
   def configurationChecksum(state: CommonViewState, spec: AtlasSpec): Checksum =
+    Checksum.ofText(configurationRendering(state, spec))
+
+  private val ConfigurationRenderingVersion = "atlas-compiler-config/v2"
+
+  /** Versioned canonical rendering committed to by [[configurationChecksum]]. */
+  private[view] def configurationRendering(state: CommonViewState, spec: AtlasSpec): String =
+    ViewConfigurationRendering.render(configurationFields(state, spec))
+
+  private def configurationFields(
+      state: CommonViewState,
+      spec: AtlasSpec
+  ): Vector[(String, String)] =
     val threads = spec.threads match
-      case ThreadPolicy.Selected => "threads:selected"
-      case ThreadPolicy.All(max) => s"threads:all:${max.value}"
-    val parts = EvidenceVisibility.stateParts(state) ++ Vector(
-      s"zoom:${spec.zoom.narrative}:${spec.zoom.surface}",
-      threads,
-      s"projection:${ProjectionKind.DiscourseAtlas}"
+      case ThreadPolicy.Selected => "selected"
+      case ThreadPolicy.All(max) => s"all:${max.value}"
+    val selections = ViewConfigurationRendering.selections(state)
+    val relations = ViewConfigurationRendering.relations(state)
+    Vector(
+      "rendering" -> ConfigurationRenderingVersion,
+      "horizon" -> ViewConfigurationRendering.horizonValue(state.horizon),
+      "focus" -> state.focus.fold("none")(_.render),
+      "feature" -> ViewConfigurationRendering.featureValue(state.feature),
+      "scale" -> spec.featureScale.canonicalString,
+      "selection.count" -> selections.size.toString
+    ) ++ selections.zipWithIndex.map((value, index) => s"selection.$index" -> value) ++ Vector(
+      "relation.count" -> relations.size.toString
+    ) ++ relations.zipWithIndex.map((value, index) => s"relation.$index" -> value) ++ Vector(
+      "zoom.narrative" -> narrativeLevelValue(spec.zoom.narrative),
+      "zoom.surface" -> surfaceDetailValue(spec.zoom.surface),
+      "threads" -> threads,
+      "projection" -> "discourse-atlas"
     )
-    ContentAddress.digest(parts)
+
+  private def narrativeLevelValue(level: NarrativeLevel): String = level match
+    case NarrativeLevel.Story   => "story"
+    case NarrativeLevel.Episode => "episode"
+    case NarrativeLevel.Scene   => "scene"
+    case NarrativeLevel.Event   => "event"
+
+  private def surfaceDetailValue(detail: SurfaceDetail): String = detail match
+    case SurfaceDetail.Hidden    => "hidden"
+    case SurfaceDetail.Sentences => "sentences"
+    case SurfaceDetail.Tokens    => "tokens"
 
 /** Deterministic plain-text twin of a scene (ADR 0002 V-D2). */
 object AtlasTextualTwin:
@@ -724,6 +800,38 @@ object AtlasTextualTwin:
     EvidenceVisibility
       .stateParts(scene.state)
       .foreach(part => out.append("  ").append(part).append('\n'))
+    val feature = scene.featureLayer
+    out.append("Feature layer\n")
+    out
+      .append("  scale: ")
+      .append(feature.scale.label)
+      .append(" [")
+      .append(feature.scale.canonicalString)
+      .append("]\n")
+    out
+      .append("  selection: ")
+      .append(feature.state.selectedFeature.fold("none")(_.canonicalString))
+      .append('\n')
+    out
+      .append("  resolved space: ")
+      .append(feature.state.resolvedSpaceId.fold("none")(_.value))
+      .append('\n')
+    out.append("  state: ").append(feature.state.canonicalString).append('\n')
+    out.append("  observations: ").append(feature.observations.size).append('\n')
+    feature.observations.foreach { observation =>
+      val extents = observation.xExtents.toVector
+        .map(span => s"[${span.start},${span.endExclusive})")
+        .mkString(",")
+      val upstream = observation.audit.upstream.map(_.render).mkString(",")
+      out
+        .append("  - ")
+        .append(observation.address.render)
+        .append(" x=")
+        .append(extents)
+        .append(" audit=")
+        .append(upstream)
+        .append('\n')
+    }
     out.append("Contract\n")
     out.append(
       s"  x: ${scene.contract.x}; y: ${scene.contract.y}; distance: ${scene.contract.distance}; area: ${scene.contract.area.fold("none")(_.toString)}\n"

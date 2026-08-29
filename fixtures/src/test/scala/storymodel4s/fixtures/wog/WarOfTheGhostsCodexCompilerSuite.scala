@@ -49,14 +49,14 @@ class WarOfTheGhostsCodexCompilerSuite extends FunSuite:
   ).zipWithIndex.map((target, row) => FeatureRef(target, featureSpaceId, row))
 
   private val scalesAndTargets = Vector(
-    CodexScale.SurfaceUnit(SurfaceUnitKind.Token) -> tokenTarget,
-    CodexScale.SurfaceUnit(SurfaceUnitKind.Sentence) -> sentenceTarget,
-    CodexScale.SurfaceUnit(SurfaceUnitKind.Clause) -> clauseTarget,
-    CodexScale.SurfaceUnit(SurfaceUnitKind.Paragraph) -> paragraphTarget,
-    CodexScale.NarrativeUnit(NarrativeUnitBasis.Situations) -> situationTarget,
-    CodexScale.NarrativeUnit(NarrativeUnitBasis.Segments(SegmentKind.Scene)) -> sceneTarget,
-    CodexScale.NarrativeUnit(NarrativeUnitBasis.Segments(SegmentKind.Episode)) -> episodeTarget,
-    CodexScale.NarrativeUnit(NarrativeUnitBasis.Segments(SegmentKind.Story)) -> storyTarget
+    FeatureScale.SurfaceUnit(SurfaceUnitKind.Token) -> tokenTarget,
+    FeatureScale.SurfaceUnit(SurfaceUnitKind.Sentence) -> sentenceTarget,
+    FeatureScale.SurfaceUnit(SurfaceUnitKind.Clause) -> clauseTarget,
+    FeatureScale.SurfaceUnit(SurfaceUnitKind.Paragraph) -> paragraphTarget,
+    FeatureScale.NarrativeUnit(NarrativeUnitBasis.Situations) -> situationTarget,
+    FeatureScale.NarrativeUnit(NarrativeUnitBasis.Segments(SegmentKind.Scene)) -> sceneTarget,
+    FeatureScale.NarrativeUnit(NarrativeUnitBasis.Segments(SegmentKind.Episode)) -> episodeTarget,
+    FeatureScale.NarrativeUnit(NarrativeUnitBasis.Segments(SegmentKind.Story)) -> storyTarget
   )
 
   private def modelWithFeatureRefs(
@@ -129,6 +129,46 @@ class WarOfTheGhostsCodexCompilerSuite extends FunSuite:
   private def compile(state: CommonViewState, spec: CodexSpec): CodexFlow =
     compile(model, state, spec)
 
+  private def compileAtlas(
+      sourceModel: StoryModel[ModelStatus.Validated],
+      state: CommonViewState,
+      scale: FeatureScale
+  ): NarrativeScene =
+    val spec = AtlasSpec(
+      ZoomLevel(NarrativeLevel.Scene, SurfaceDetail.Hidden),
+      ThreadPolicy.Selected,
+      scale
+    )
+    val provenance = ViewProvenance
+      .fixture(
+        sourceModel.source.canonicalChecksum,
+        "wog-atlas-feature-test",
+        AtlasCompiler.configurationChecksum(state, spec)
+      )
+      .fold(error => fail(error.message), identity)
+    AtlasCompiler(provenance)
+      .compile(sourceModel, state, spec)
+      .fold(error => fail(error.message), identity)
+
+  private def featureSpec(scale: FeatureScale): CodexSpec =
+    CodexSpec
+      .of(
+        Vector(AnnotationChannel(AnnotationKind.Feature, AnnotationPriority.unsafe(700))),
+        scale = scale
+      )
+      .fold(error => fail(error.message), identity)
+
+  private def codexPlacements(flow: CodexFlow): Vector[(Address, SpanSet)] =
+    flow.annotations
+      .filter(_.kind == AnnotationKind.Feature)
+      .map(annotation => annotation.target -> annotation.support)
+      .sortBy(_._1.render)
+
+  private def atlasPlacements(scene: NarrativeScene): Vector[(Address, SpanSet)] =
+    scene.featureLayer.observations
+      .map(observation => observation.address -> observation.support)
+      .sortBy(_._1.render)
+
   test("the WOG compiler emits only evidence-backed model objects and deterministic lanes"):
     val state = CommonViewState
       .of(relationLayers = relationLayers)
@@ -177,6 +217,63 @@ class WarOfTheGhostsCodexCompilerSuite extends FunSuite:
       })
     }
 
+  test("V-L2: Codex selections resolve on-mark, through a visible ancestor, or off-projection"):
+    val storyAddress = Addressable[StoryRef]
+    val battle = storyAddress.address(StoryRef.Situation(WarOfTheGhostsModel.S.battle))
+    val scene = storyAddress.address(StoryRef.Segment(WarOfTheGhostsModel.G.sc2c))
+    val offProjection =
+      Addressable[CoreRef].address(CoreRef.Claim(ClaimId.unsafe("wog:selection:off-projection")))
+    val state = CommonViewState
+      .of(selection = Set(battle), focus = Some(offProjection))
+      .fold(error => fail(error.message), identity)
+    val hierarchyOnly = CodexSpec
+      .of(Vector(AnnotationChannel(AnnotationKind.Hierarchy, AnnotationPriority.Default)))
+      .fold(error => fail(error.message), identity)
+    val ancestorFlow = compile(state, hierarchyOnly)
+    val sceneAnnotations = ancestorFlow.navigation.annotationsFor(scene)
+
+    assert(sceneAnnotations.nonEmpty)
+    assertEquals(sceneAnnotations.flatMap(ancestorFlow.navigation.targetOf).distinct, Vector(scene))
+    assertEquals(
+      ancestorFlow.navigation.annotationsFor(battle),
+      sceneAnnotations
+    )
+    assertEquals(
+      ancestorFlow.selectionPlacements.get(battle),
+      Some(SelectionPlacement.ViaAncestor(scene))
+    )
+    assertEquals(
+      ancestorFlow.selectionPlacements.get(offProjection),
+      Some(SelectionPlacement.OffProjection)
+    )
+    assertEquals(ancestorFlow.selectionPlacements.keySet, state.selection ++ state.focus)
+    assert(ancestorFlow.textualTwin.contains(s"${battle.render} -> via-ancestor(${scene.render})"))
+    assert(ancestorFlow.textualTwin.contains(s"${offProjection.render} -> off-projection"))
+
+    val claims = CodexSpec
+      .of(Vector(AnnotationChannel(AnnotationKind.Claim, AnnotationPriority.Default)))
+      .fold(error => fail(error.message), identity)
+    val exactFlow = compile(state, claims)
+    exactFlow.selectionPlacements.get(battle) match
+      case Some(SelectionPlacement.OnMark(annotations)) =>
+        assertEquals(annotations.toVector, exactFlow.navigation.annotationsFor(battle))
+      case other => fail(s"expected on-mark placement, found $other")
+
+    val hiddenState = CommonViewState
+      .of(
+        selection = Set(battle),
+        horizon = EpistemicHorizon.ReaderAt(
+          model.graph.situations(WarOfTheGhostsModel.S.battle).support.minSpan.start
+        )
+      )
+      .fold(error => fail(error.message), identity)
+    val hiddenFlow = compile(hiddenState, hierarchyOnly)
+    assertEquals(
+      hiddenFlow.selectionPlacements.get(battle),
+      Some(SelectionPlacement.OffProjection)
+    )
+    assertEquals(hiddenFlow.navigation.annotationsFor(battle), Vector.empty)
+
   test("a missing feature request remains explicit missingness rather than a zero-valued mark"):
     val derivation = Checksum.ofText("feature:missing-from-wog")
     val missing = FeatureSelection.Derived(derivation)
@@ -188,8 +285,11 @@ class WarOfTheGhostsCodexCompilerSuite extends FunSuite:
       .forLens(CodexLens.Structure)
       .fold(error => fail(error.message), identity)
     val flow = compile(state, spec)
+    val atlas = compileAtlas(model, state, FeatureScale.Default)
 
     assertEquals(flow.contract.feature, FeatureChannelState.Missing(missing, resolvedSpace))
+    assertEquals(atlas.featureLayer.state, flow.contract.feature)
+    assertEquals(atlas.featureLayer.observations, Vector.empty)
     assert(!flow.annotations.exists(_.kind == AnnotationKind.Feature))
 
   test("a basis-aware derived selection fails closed until BasisId resolution lands"):
@@ -202,10 +302,15 @@ class WarOfTheGhostsCodexCompilerSuite extends FunSuite:
     val spec = CodexSpec
       .of(
         Vector(AnnotationChannel(AnnotationKind.Feature, AnnotationPriority.unsafe(700))),
-        scale = CodexScale.NarrativeUnit(NarrativeUnitBasis.Situations)
+        scale = FeatureScale.NarrativeUnit(NarrativeUnitBasis.Situations)
       )
       .fold(error => fail(error.message), identity)
     val flow = compile(state, spec)
+    val atlas = compileAtlas(
+      model,
+      state,
+      FeatureScale.NarrativeUnit(NarrativeUnitBasis.Situations)
+    )
 
     assertEquals(
       flow.contract.feature,
@@ -214,6 +319,8 @@ class WarOfTheGhostsCodexCompilerSuite extends FunSuite:
         FeatureResolutionIssue.BasisIdentityUnavailable(basis)
       )
     )
+    assertEquals(atlas.featureLayer.state, flow.contract.feature)
+    assertEquals(atlas.featureLayer.observations, Vector.empty)
     assert(!flow.annotations.exists(_.kind == AnnotationKind.Feature))
     assert(flow.textualTwin.contains("Resolved feature space: none"))
     assert(flow.textualTwin.contains("basis-identity-unavailable:" + basis.hex))
@@ -255,6 +362,55 @@ class WarOfTheGhostsCodexCompilerSuite extends FunSuite:
       assert(flow.textualTwin.contains("Resolved feature space: " + featureSpaceId.value))
     }
 
+  test("Codex and Atlas plan identical observations at every scale and horizon"):
+    val selection = FeatureSelection.Raw(featureSpaceId)
+    scalesAndTargets.foreach { (scale, expectedTarget) =>
+      val support = featureSupport(expectedTarget)
+      val horizons = Vector(
+        EpistemicHorizon.Omniscient,
+        EpistemicHorizon.ReaderAt(support.spans.head.endExclusive)
+      )
+      horizons.foreach { horizon =>
+        val state = CommonViewState
+          .of(horizon = horizon, feature = Some(selection))
+          .fold(error => fail(error.message), identity)
+        val codex = compile(featureModel, state, featureSpec(scale))
+        val atlas = compileAtlas(featureModel, state, scale)
+        val expected = EvidenceVisibility
+          .clipSupport(support, horizon)
+          .toVector
+          .map(visible =>
+            Addressable[FeatureAddress]
+              .address(FeatureAddress.Observation(featureSpaceId, expectedTarget)) -> visible
+          )
+
+        assertEquals(atlas.featureLayer.scale, scale)
+        assertEquals(atlas.featureLayer.state, codex.contract.feature)
+        assertEquals(codexPlacements(codex), expected, scale.canonicalString)
+        assertEquals(atlasPlacements(atlas), expected, scale.canonicalString)
+      }
+    }
+
+  test("Atlas feature extents preserve discontinuous situation support without a hull"):
+    val selection = FeatureSelection.Raw(featureSpaceId)
+    val state = CommonViewState
+      .of(feature = Some(selection))
+      .fold(error => fail(error.message), identity)
+    val scale = FeatureScale.NarrativeUnit(NarrativeUnitBasis.Situations)
+    val scene = compileAtlas(featureModel, state, scale)
+    val placement = scene.featureLayer.observations
+      .find(_.target == situationTarget)
+      .getOrElse(fail("missing battle feature placement"))
+    val support = featureSupport(situationTarget)
+
+    assert(support.size > 1)
+    assert(!support.isContiguous)
+    assertEquals(placement.support, support)
+    assertEquals(placement.xExtents, support.spans)
+    assertNotEquals(placement.xExtents.toVector, Vector(support.minSpan))
+    assert(!scene.marks.exists(_.address == placement.address))
+    assert(scene.textualTwin.contains(placement.address.render))
+
   test("a legacy derived selection resolves its output space and audits the derivation"):
     val derivation = Checksum.ofText("wog:derived:scale-selector")
     val derivedSpace = FeatureSpaceId.unsafe("derived:" + derivation.short(32))
@@ -267,12 +423,18 @@ class WarOfTheGhostsCodexCompilerSuite extends FunSuite:
     val spec = CodexSpec
       .of(
         Vector(AnnotationChannel(AnnotationKind.Feature, AnnotationPriority.unsafe(700))),
-        scale = CodexScale.SurfaceUnit(SurfaceUnitKind.Paragraph)
+        scale = FeatureScale.SurfaceUnit(SurfaceUnitKind.Paragraph)
       )
       .fold(error => fail(error.message), identity)
     val flow = compile(derivedModel, state, spec)
+    val atlas = compileAtlas(
+      derivedModel,
+      state,
+      FeatureScale.SurfaceUnit(SurfaceUnitKind.Paragraph)
+    )
     val annotation =
       flow.annotations.find(_.kind == AnnotationKind.Feature).getOrElse(fail("feature"))
+    val placement = atlas.featureLayer.observations.headOption.getOrElse(fail("atlas feature"))
 
     assertEquals(
       flow.contract.feature,
@@ -285,6 +447,10 @@ class WarOfTheGhostsCodexCompilerSuite extends FunSuite:
         Addressable[FeatureAddress].address(FeatureAddress.Derivation(derivation))
       ).sorted
     )
+    assertEquals(atlas.featureLayer.state, flow.contract.feature)
+    assertEquals(placement.address, annotation.target)
+    assertEquals(placement.support, annotation.support)
+    assertEquals(placement.audit.upstream, annotation.audit.upstream)
 
   test("surface target cases are not coerced across sentence, clause, and paragraph scales"):
     val state = CommonViewState
@@ -297,7 +463,7 @@ class WarOfTheGhostsCodexCompilerSuite extends FunSuite:
       val spec = CodexSpec
         .of(
           Vector(AnnotationChannel(AnnotationKind.Feature, AnnotationPriority.unsafe(700))),
-          scale = CodexScale.SurfaceUnit(kind)
+          scale = FeatureScale.SurfaceUnit(kind)
         )
         .fold(error => fail(error.message), identity)
       val flow = compile(paragraphOnly, state, spec)
@@ -320,7 +486,7 @@ class WarOfTheGhostsCodexCompilerSuite extends FunSuite:
     val sentenceSpec = CodexSpec
       .of(
         Vector(AnnotationChannel(AnnotationKind.Feature, AnnotationPriority.unsafe(700))),
-        scale = CodexScale.SurfaceUnit(SurfaceUnitKind.Sentence)
+        scale = FeatureScale.SurfaceUnit(SurfaceUnitKind.Sentence)
       )
       .fold(error => fail(error.message), identity)
     assertEquals(
@@ -341,7 +507,7 @@ class WarOfTheGhostsCodexCompilerSuite extends FunSuite:
     val spec = CodexSpec
       .of(
         Vector(AnnotationChannel(AnnotationKind.Feature, AnnotationPriority.unsafe(700))),
-        scale = CodexScale.SurfaceUnit(SurfaceUnitKind.Paragraph)
+        scale = FeatureScale.SurfaceUnit(SurfaceUnitKind.Paragraph)
       )
       .fold(error => fail(error.message), identity)
     val provenance = ViewProvenance
@@ -394,16 +560,23 @@ class WarOfTheGhostsCodexCompilerSuite extends FunSuite:
     val spec = CodexSpec
       .of(
         Vector(AnnotationChannel(AnnotationKind.Feature, AnnotationPriority.unsafe(700))),
-        scale = CodexScale.SurfaceUnit(SurfaceUnitKind.Paragraph)
+        scale = FeatureScale.SurfaceUnit(SurfaceUnitKind.Paragraph)
       )
       .fold(error => fail(error.message), identity)
     val flow = compile(featureModel, state, spec)
+    val atlas = compileAtlas(
+      featureModel,
+      state,
+      FeatureScale.SurfaceUnit(SurfaceUnitKind.Paragraph)
+    )
 
     assertEquals(
       EvidenceVisibility.clipSupport(featureSupport(paragraphTarget), horizon),
       None
     )
     assert(!flow.annotations.exists(_.kind == AnnotationKind.Feature))
+    assertEquals(atlas.featureLayer.state, flow.contract.feature)
+    assertEquals(atlas.featureLayer.observations, Vector.empty)
 
   test("feature-ref input order cannot change compiled annotations or lanes"):
     val selection = FeatureSelection.Raw(featureSpaceId)
@@ -413,13 +586,25 @@ class WarOfTheGhostsCodexCompilerSuite extends FunSuite:
     val spec = CodexSpec
       .of(
         Vector(AnnotationChannel(AnnotationKind.Feature, AnnotationPriority.unsafe(700))),
-        scale = CodexScale.NarrativeUnit(NarrativeUnitBasis.Situations)
+        scale = FeatureScale.NarrativeUnit(NarrativeUnitBasis.Situations)
       )
       .fold(error => fail(error.message), identity)
 
     assertEquals(
       compile(featureModel, state, spec),
       compile(modelWithFeatureRefs(featureRefs.reverse), state, spec)
+    )
+    assertEquals(
+      compileAtlas(
+        featureModel,
+        state,
+        FeatureScale.NarrativeUnit(NarrativeUnitBasis.Situations)
+      ),
+      compileAtlas(
+        modelWithFeatureRefs(featureRefs.reverse),
+        state,
+        FeatureScale.NarrativeUnit(NarrativeUnitBasis.Situations)
+      )
     )
 
   test("changing feature scale does not hide non-feature narrative annotations"):
@@ -431,18 +616,27 @@ class WarOfTheGhostsCodexCompilerSuite extends FunSuite:
       .fold(error => fail(error.message), identity)
     val channels = CodexLens.Overview.channels :+
       AnnotationChannel(AnnotationKind.Feature, AnnotationPriority.unsafe(700))
-    def at(scale: CodexScale): CodexFlow =
+    def at(scale: FeatureScale): CodexFlow =
       val spec = CodexSpec
         .of(channels, ChannelBudget.All, scale = scale)
         .fold(error => fail(error.message), identity)
       compile(featureModel, state, spec)
 
-    val paragraph = at(CodexScale.SurfaceUnit(SurfaceUnitKind.Paragraph))
-    val situations = at(CodexScale.NarrativeUnit(NarrativeUnitBasis.Situations))
+    val paragraph = at(FeatureScale.SurfaceUnit(SurfaceUnitKind.Paragraph))
+    val situations = at(FeatureScale.NarrativeUnit(NarrativeUnitBasis.Situations))
     assertEquals(
       paragraph.annotations.filterNot(_.kind == AnnotationKind.Feature),
       situations.annotations.filterNot(_.kind == AnnotationKind.Feature)
     )
+    val paragraphAtlas =
+      compileAtlas(featureModel, state, FeatureScale.SurfaceUnit(SurfaceUnitKind.Paragraph))
+    val situationAtlas = compileAtlas(
+      featureModel,
+      state,
+      FeatureScale.NarrativeUnit(NarrativeUnitBasis.Situations)
+    )
+    assertEquals(paragraphAtlas.marks, situationAtlas.marks)
+    assertNotEquals(paragraphAtlas.featureLayer, situationAtlas.featureLayer)
 
   test("a zero-lane policy overflows a feature annotation without dropping it"):
     val selection = FeatureSelection.Raw(featureSpaceId)
@@ -454,7 +648,7 @@ class WarOfTheGhostsCodexCompilerSuite extends FunSuite:
       .of(
         Vector(AnnotationChannel(AnnotationKind.Feature, AnnotationPriority.unsafe(700))),
         lanePolicy = noLanes,
-        scale = CodexScale.SurfaceUnit(SurfaceUnitKind.Paragraph)
+        scale = FeatureScale.SurfaceUnit(SurfaceUnitKind.Paragraph)
       )
       .fold(error => fail(error.message), identity)
     val flow = compile(featureModel, state, spec)

@@ -149,11 +149,14 @@ omission = `columnMass` below threshold; elaboration = recall-side
 Token → word underlay; Sentence → sentence step-wash; `Window(TokenRange)` →
 one resampled scalar field with a declared sampling rule (no alpha-stacking of
 overlapping windows); Situation/Segment → field over the `SpanSet`. The scale
-control is a **recipe selector** among named `FeatureDerivation`s (each with a
-`derivationId`); no visual smoothing without a `Kernel` reducer in the receipt;
-coverage/missingness is a separate mask; every displayed aggregate carries its
-`FeatureUseLedger` circularity status. Event aggregation requires a real
-`WindowBasis` first; clause requires a `FeatureTarget` for surface units.
+control is the shared `FeatureScale`: `SurfaceUnit(Token | Sentence | Clause |
+Paragraph)` or `NarrativeUnit(Situations | Segments(Scene | Episode | Story))`.
+It selects only the exact checked `FeatureTarget` case and kind; it never coerces
+paragraph observations into sentences or situations into segments. Windowed
+scales arrive only with a real `WindowBasis` and named `FeatureDerivation`; no
+visual smoothing occurs without a `Kernel` reducer in the receipt. Coverage and
+missingness are separate masks, and every displayed aggregate carries its
+`FeatureUseLedger` circularity status.
 
 ### D12 Every artifact has a textual twin
 `ViewArtifact → String` is deterministic and total. It is the screen-reader
@@ -187,6 +190,17 @@ values are `none`, `raw:<space-id>`, or
 `channel.i` value is `<annotation-wire-name>:<priority>`.
 `CodexCompiler.configurationChecksum` hashes exactly this rendering. Any field,
 ordering, or escaping change requires a new rendering version.
+
+The Atlas configuration uses the same escaping and the canonical rendering
+`atlas-compiler-config/v2`. Its exact field order is `rendering`, `horizon`,
+`focus`, `feature`, `scale`, `selection.count`, indexed selections,
+`relation.count`, indexed relations, `zoom.narrative`, `zoom.surface`, `threads`,
+and `projection`. `zoom.narrative` is `story | episode | scene | event`;
+`zoom.surface` is `hidden | sentences | tokens`; `threads` is `selected` or
+`all:<positive-int>`; and the only current projection value is
+`discourse-atlas`. `AtlasCompiler.configurationChecksum` hashes exactly this
+rendering; changing any field, order, grammar, or escaping requires a new
+version.
 
 ### D14 Module placement
 - `view` (new, portable, cross-built JVM/JS/Native, depends on all domain
@@ -223,9 +237,12 @@ final case class AuditRecord private (upstream: Vector[Address] /* sorted, disti
 final case class SourceRun private (span: TextSpan)          // nonempty; runs tile canonicalText (V-T1)
 final case class TextAnnotation private (id, target: Address, support: SpanSet, kind, priority, audit)
   // construction rejects targets outside ViewRef and empty support; no status field (D9); no copied text
-final case class NavigationIndex private (byTarget: Map[Address, Vector[AnnotationId]], targetByAnnotation)
+final case class NavigationIndex private (byTarget: Map[Address, Vector[AnnotationId]], targetByAnnotation,
+  ancestorsByTarget: Map[Address, Vector[Address]])
+  // annotationsFor resolves exact first, then the nearest visible annotated primary ancestor
 final case class CodexFlow private (source, runs, annotations /* sorted by (minSpan, kind, -priority, id) */,
-  lanes: LaneAllocation, navigation, contract: CodexContract, provenance)
+  lanes: LaneAllocation, navigation, selectionPlacements: Map[Address, SelectionPlacement[AnnotationId]],
+  contract: CodexContract, provenance)
   // CodexFlow.of validates: provenance.sourceChecksum == source.canonicalChecksum; runs tile with no gap/overlap and
   // no cut code point; every support span in-text and on code-point boundaries; unique AnnotationIds
   def textualTwin: String                                    // deterministic (V-D2); a rendering, not an artifact
@@ -233,12 +250,16 @@ final case class CodexFlow private (source, runs, annotations /* sorted by (minS
 // view/compiler.scala + view/atlas.scala
 final case class CommonViewState private (selection: Set[Address], focus: Option[Address], horizon: EpistemicHorizon,
   relationLayers: Set[RelationLayer], feature: Option[FeatureSelection] /* Raw(FeatureSpaceId) | Derived(derivationId: Checksum) */)
+enum FeatureScale: case SurfaceUnit(kind: SurfaceUnitKind); case NarrativeUnit(basis: NarrativeUnitBasis)
+final case class AtlasFeatureLayer private (scale: FeatureScale, state: FeatureChannelState,
+  observations: Vector[FeatureObservationPlacement] /* exact horizon-clipped SpanSets + audit; no numeric values */)
 final case class ProjectionContract(kind: ProjectionKind, x: AxisMeaning, y: AxisMeaning, distance: DistanceMeaning,
   area: Option[MeasureMeaning], legend: Vector[ChannelMeaning], invariants: Set[VisualInvariant])
-enum SelectionPlacement: case OnMark(marks: NonEmptyVector[MarkId]); case ViaAncestor(ancestor: Address); case OffProjection
+enum SelectionPlacement[+Mark]: case OnMark(marks: NonEmptyVector[Mark]); case ViaAncestor(ancestor: Address); case OffProjection
 final case class NarrativeScene(contract, zoom, state: CommonViewState,
+  featureLayer: AtlasFeatureLayer,
   marks: Vector[VisualPrimitive] /* Region | Landmark | Thread | Portal | Route, each with VisualIdentity(address, level, MarkId) */,
-  navigation, selectionPlacements: Map[Address, SelectionPlacement], provenance)
+  navigation, selectionPlacements: Map[Address, SelectionPlacement[MarkId]], provenance)
 object EvidenceVisibility:
   validateHorizon(text, horizon); visibleClaims(offset, ledger); visibleUnder(horizon, ledger)
   clipSupport(support, horizon); stateParts(state)   // the single horizon implementation
@@ -334,9 +355,11 @@ in `CommonViewState` and has exactly one typed placement — `OnMark` when it ha
 ordinary marks, `ViaAncestor` only when the object's own claim is horizon-visible
 and it has a visible primary ancestor, and `OffProjection` otherwise; the shared
 `HorizonShared` invariant requires Codex and Atlas to use only
-`EvidenceVisibility`; **V-L3** label priority monotone; **V-L4** bounded visible
-mark count; **V-L5** lane allocation deterministic with bounded overflow, never
-dropped annotations.
+`EvidenceVisibility`. `CodexFlow.selectionPlacements` uses annotation ids for
+`OnMark`, and `NavigationIndex.annotationsFor` performs the same exact-then-nearest-
+visible-ancestor resolution; **V-L3** label priority monotone; **V-L4** bounded
+visible mark count; **V-L5** lane allocation deterministic with bounded overflow,
+never dropped annotations.
 
 Uncertainty and style — **V-U1** missingness is a distinct mask, never zero
 and never faded; **V-U2** raw and calibrated quantities never share a scale;

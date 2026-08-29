@@ -167,13 +167,13 @@ class CodexCompilerSuite extends FunSuite:
     val sentence = CodexSpec
       .forLens(
         CodexLens.Reading,
-        scale = CodexScale.SurfaceUnit(SurfaceUnitKind.Sentence)
+        scale = FeatureScale.SurfaceUnit(SurfaceUnitKind.Sentence)
       )
       .fold(error => fail(error.message), identity)
     val paragraph = CodexSpec
       .forLens(
         CodexLens.Reading,
-        scale = CodexScale.SurfaceUnit(SurfaceUnitKind.Paragraph)
+        scale = FeatureScale.SurfaceUnit(SurfaceUnitKind.Paragraph)
       )
       .fold(error => fail(error.message), identity)
 
