@@ -324,10 +324,10 @@ object AttemptReceipt:
         capability.detectorIdentity.configurationDigest.render,
         capability.payloadDigest.render
       )
-    case PolicyDecision.LocalOnly(policyId, reason) =>
-      Vector("local-only") ++ optionFields(policyId.map(_.value)) :+ reason
-    case PolicyDecision.Denied(policyId, reason) =>
-      Vector("denied") ++ optionFields(policyId.map(_.value)) :+ reason
+    case PolicyDecision.LocalOnly(id, policyId, reason) =>
+      Vector("local-only", id.value) ++ optionFields(policyId.map(_.value)) :+ reason
+    case PolicyDecision.Denied(id, policyId, reason) =>
+      Vector("denied", id.value) ++ optionFields(policyId.map(_.value)) :+ reason
     case PolicyDecision.KeyUnavailable(id, keyId) =>
       Vector("key-unavailable") ++ optionFields(id.map(_.value)) :+ keyId.value
 
@@ -423,6 +423,7 @@ object AttemptReceipt:
       itemSensitivity: Vector[(RequestId, Sensitivity)]
   ): Either[EmbedError, Unit] =
     val declaredIds = itemSensitivity.map(_._1)
+    val declaredSet = declaredIds.toSet
     val nonPublicIds = itemSensitivity.collect {
       case (id, sensitivity) if !ReceiptDigest.plainAdmissible.contains(sensitivity) => id
     }.toSet
@@ -436,10 +437,39 @@ object AttemptReceipt:
     val publicCarriesKeyedEvidence =
       nonPublicIds.isEmpty && (embeddingReceipts.exists(_.kind == DigestKind.Keyed) ||
         keyedCacheIdentity || policyDecisions.exists(policyDigests(_).nonEmpty))
+    val evidenceIds = cacheDecisions.map {
+      case CacheDecision.Hit(id, _)      => id
+      case CacheDecision.Miss(id, _)     => id
+      case CacheDecision.Denied(id, _)   => id
+      case CacheDecision.Bypassed(id, _) => id
+    } ++ policyDecisions.flatMap {
+      case PolicyDecision.LocalOnly(id, _, _)         => Vector(id)
+      case PolicyDecision.Denied(id, _, _)            => Vector(id)
+      case PolicyDecision.KeyUnavailable(Some(id), _) => Vector(id)
+      case _                                          => Vector.empty
+    } ++ resultDecisions.flatMap {
+      case ResultDecision.Reordered(id, _, _)     => Vector(id)
+      case ResultDecision.SpaceRejected(id, _, _) => Vector(id)
+      case ResultDecision.ReceiptRejected(_)      => Vector.empty
+      case ResultDecision.BatchRejected(_)        => Vector.empty
+    }
+    val invalidCacheDenial = cacheDecisions.exists {
+      case CacheDecision.Denied(cacheId, PolicyDecision.LocalOnly(id, _, _)) => cacheId != id
+      case CacheDecision.Denied(cacheId, PolicyDecision.Denied(id, _, _))    => cacheId != id
+      case CacheDecision.Denied(cacheId, PolicyDecision.KeyUnavailable(Some(id), _)) =>
+        cacheId != id
+      case CacheDecision.Denied(_, PolicyDecision.Allowed(_, _))           => true
+      case CacheDecision.Denied(_, PolicyDecision.KeyUnavailable(None, _)) => true
+      case _                                                               => false
+    }
     if declaredIds.distinct.size != declaredIds.size then
       Left(EmbedError.InvalidResult("duplicate item sensitivity evidence"))
     else if embeddedIds.distinct.size != embeddedIds.size then
       Left(EmbedError.InvalidResult("duplicate embedded item identity"))
+    else if evidenceIds.exists(id => !declaredSet.contains(id)) then
+      Left(EmbedError.InvalidResult("receipt decision names an undeclared item"))
+    else if invalidCacheDenial then
+      Left(EmbedError.InvalidResult("cache denial does not match its policy item"))
     else if nonPublicIds.nonEmpty && embeddingReceipts.exists(_.items.isEmpty) then
       Left(EmbedError.InvalidResult("non-public batch cannot contain an empty-item receipt"))
     else if publicCarriesKeyedEvidence then
@@ -470,6 +500,8 @@ object AttemptReceipt:
             case CacheDecision.Denied(id, _)                                => id
           }.toSet
           val policyCovered = policyDecisions.collect {
+            case PolicyDecision.LocalOnly(id, _, _)         => id
+            case PolicyDecision.Denied(id, _, _)            => id
             case PolicyDecision.KeyUnavailable(Some(id), _) => id
           }.toSet
           val batchRejected = resultDecisions.exists {
@@ -1035,13 +1067,21 @@ object Embedder:
         if info.locality == Locality.Remote && s == Sensitivity.Sensitive then
           Left(
             ExecutionFailure.LocalOnly(
-              PolicyDecision.LocalOnly(None, "raw sensitive text to remote provider")
+              PolicyDecision.LocalOnly(
+                request.id,
+                None,
+                "raw sensitive text to remote provider"
+              )
             )
           )
         else if !info.privacyClass.admits(s) then
           Left(
             ExecutionFailure.PolicyDenied(
-              PolicyDecision.Denied(None, s"provider privacy class does not admit $s")
+              PolicyDecision.Denied(
+                request.id,
+                None,
+                s"provider privacy class does not admit $s"
+              )
             )
           )
         else Right(())

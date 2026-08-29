@@ -727,16 +727,16 @@ object PseudonymizedText:
 /** Outcome of a policy evaluation; recorded in receipts, never containing payload text. */
 enum PolicyDecision:
   case Allowed(policyId: PrivacyPolicyId, capability: RemoteCapability)
-  case LocalOnly(policyId: Option[PrivacyPolicyId], reason: String)
-  case Denied(policyId: Option[PrivacyPolicyId], reason: String)
+  case LocalOnly(id: RequestId, policyId: Option[PrivacyPolicyId], reason: String)
+  case Denied(id: RequestId, policyId: Option[PrivacyPolicyId], reason: String)
 
   /** A required store key was absent: the item (or, with `None`, the batch) failed closed. */
   case KeyUnavailable(id: Option[RequestId], keyId: KeyId)
 
   def render: String = this match
     case Allowed(p, c)         => s"allowed:${p.value}:${c.render}"
-    case LocalOnly(p, r)       => s"local-only:${p.fold("-")(_.value)}:$r"
-    case Denied(p, r)          => s"denied:${p.fold("-")(_.value)}:$r"
+    case LocalOnly(id, p, r)   => s"local-only:${id.value}:${p.fold("-")(_.value)}:$r"
+    case Denied(id, p, r)      => s"denied:${id.value}:${p.fold("-")(_.value)}:$r"
     case KeyUnavailable(id, k) => s"key-unavailable:${id.fold("-")(_.value)}:${k.value}"
 
 /** Time is supplied by the caller (epoch millis) so the module stays clock-free and testable. */
@@ -791,7 +791,7 @@ object RemotePolicy:
       estimatedTokens: Long
   ): Either[PolicyDecision.Denied, AuthorizedRemoteRequest] =
     def deny(reason: String): Either[PolicyDecision.Denied, AuthorizedRemoteRequest] =
-      Left(PolicyDecision.Denied(Some(policy.id), reason))
+      Left(PolicyDecision.Denied(request.id, Some(policy.id), reason))
     request.payload match
       case EmbedPayload.Raw(_, _)          => deny("request payload is not pseudonymized")
       case EmbedPayload.Sanitized(payload) =>

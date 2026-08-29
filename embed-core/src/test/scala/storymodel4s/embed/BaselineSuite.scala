@@ -317,6 +317,10 @@ class BaselineSuite extends ScalaCheckSuite:
     val r = remote.embed(b)
     assert(r.outcomes.head.value.isLeft)
     assertEquals(r.receipt.policyDecisions.size, 1)
+    assert(r.receipt.policyDecisions.exists {
+      case PolicyDecision.LocalOnly(id, None, _) => id == RequestId.unsafe("s")
+      case _                                     => false
+    })
     assertEquals(r.receipt.kind, DigestKind.Keyed, "a sensitive item forbids a plain receipt")
     assert(r.receipt.providerCalls.isEmpty)
     assert(!r.receipt.policyDecisions.head.render.contains("wedding"))

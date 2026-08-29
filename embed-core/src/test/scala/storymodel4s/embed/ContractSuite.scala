@@ -214,10 +214,16 @@ class ContractSuite extends ScalaCheckSuite:
 
   test("preflight: raw sensitive text never reaches a remote provider; privacy class is enforced") {
     val remote = spy(Locality.Remote).info
-    assert(Embedder.preflight(remote, req(1, "x", s = Sensitivity.Sensitive)).isLeft)
+    Embedder.preflight(remote, req(1, "x", s = Sensitivity.Sensitive)) match
+      case Left(ExecutionFailure.LocalOnly(PolicyDecision.LocalOnly(id, None, _))) =>
+        assertEquals(id, RequestId.unsafe("r1"))
+      case other => fail(s"expected request-scoped LocalOnly, got $other")
     assert(Embedder.preflight(remote, req(1, "x", s = Sensitivity.Public)).isRight)
     val restricted = remote.copy(privacyClass = PrivacyClass.PublicOnly)
-    assert(Embedder.preflight(restricted, req(1, "x", s = Sensitivity.Internal)).isLeft)
+    Embedder.preflight(restricted, req(1, "x", s = Sensitivity.Internal)) match
+      case Left(ExecutionFailure.PolicyDenied(PolicyDecision.Denied(id, None, _))) =>
+        assertEquals(id, RequestId.unsafe("r1"))
+      case other => fail(s"expected request-scoped Denied, got $other")
     val pseudonymizationKey = KeyId.unsafe("k")
     val pseudonymizationKeys =
       SensitiveKeyProvider.static(pseudonymizationKey, "k".getBytes("UTF-8"))
