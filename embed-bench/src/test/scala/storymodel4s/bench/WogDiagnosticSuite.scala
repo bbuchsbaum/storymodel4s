@@ -203,7 +203,8 @@ class WogDiagnosticSuite extends FunSuite:
     val runs = report.channelReports.flatMap(_.runs)
     val full = runs.filter(_.caseId == WogDiagnostic.fullRecallCase.id)
     assert(full.nonEmpty, "the full-recall case produced no run")
-    val observed = full.flatMap(_.observations.byMetric(Metrics.Names.routeAgreement))
+    val observed =
+      full.flatMap(_.observations.byMetric(Metrics.Names.routeSupportMidpointDirection))
     assert(observed.nonEmpty, "route metric absent from the full-recall case")
     assert(
       observed.exists(_.observation.isInstanceOf[MetricObservation.Observed]),
@@ -211,7 +212,7 @@ class WogDiagnosticSuite extends FunSuite:
     )
     // The first unit of any case has no predecessor, so it must abstain rather than score.
     full.foreach { r =>
-      val first = r.observations.byMetric(Metrics.Names.routeAgreement).head
+      val first = r.observations.byMetric(Metrics.Names.routeSupportMidpointDirection).head
       assertEquals(
         first.observation,
         MetricObservation.Ineligible,
@@ -221,10 +222,29 @@ class WogDiagnosticSuite extends FunSuite:
     // Single-unit paraphrase cases have no transition at all.
     val single = runs.filter(_.caseId != WogDiagnostic.fullRecallCase.id)
     single.foreach { r =>
-      val vs = r.observations.byMetric(Metrics.Names.routeAgreement)
+      val vs = r.observations.byMetric(Metrics.Names.routeSupportMidpointDirection)
       assert(
         vs.forall(_.observation == MetricObservation.Ineligible),
         s"a single-unit case scored a route: ${r.caseId}"
       )
+    }
+  }
+
+  test("the route metric uses the source-support midpoint axis on live WOG transitions") {
+    val hashed = report.channelReports.find(_.channel.name.startsWith("hashed-ngram:")).getOrElse {
+      fail("the deterministic hashed n-gram channel is absent")
+    }
+    val full = hashed.runs.find(_.caseId == WogDiagnostic.fullRecallCase.id).getOrElse {
+      fail("the hashed n-gram channel did not run the full-recall case")
+    }
+    val route = full.observations.byMetric(Metrics.Names.routeSupportMidpointDirection)
+
+    // These three deterministic transitions agree on the source-support midpoint axis. The retired
+    // per-level-rank metric scored every one as disagreement: its gold and inferred anchors drew
+    // their positions from independently restarting level scales.
+    Vector(2, 4, 8).foreach { laterUnitIndex =>
+      route(laterUnitIndex).observation match
+        case MetricObservation.Observed(value) => assertEquals(value, 1.0)
+        case other => fail(s"transition at index $laterUnitIndex was not observed: $other")
     }
   }

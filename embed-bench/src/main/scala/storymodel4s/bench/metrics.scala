@@ -97,7 +97,7 @@ object Metrics:
     val inferenceMass = "open-world:source-consistent-inference-mass"
     val structuralTermCoverage = "cost:structural-term-coverage"
     val semanticTermCoverage = "cost:semantic-term-coverage"
-    val routeAgreement = "route:transition-direction"
+    val routeSupportMidpointDirection = "route:support-midpoint-direction"
     val all: Vector[String] =
       Ks.map(strictRecall) ++ Ks.map(ancestorCredit) ++ Vector(
         mrr,
@@ -113,7 +113,7 @@ object Metrics:
         inferenceMass,
         structuralTermCoverage,
         semanticTermCoverage,
-        routeAgreement
+        routeSupportMidpointDirection
       )
     val openWorld: Set[String] = Set(externalRule, externalSubtype, inferenceMass)
 
@@ -147,7 +147,8 @@ object Metrics:
     * jumps and reversals. Every other metric here scores WHERE a single unit landed; this is the
     * only one that scores the STEP BETWEEN two units, which is where a route lives.
     */
-  private[bench] def stepDirection(from: Int, to: Int): Int = math.signum(to - from)
+  private[bench] def stepDirection(from: Double, to: Double): Int =
+    math.signum(to - from).toInt
 
   /** Strict recall at k: is any target inside the first k of the anchored ranking. */
   private[bench] def recallAt(
@@ -270,20 +271,22 @@ object Metrics:
       if breakdowns.isEmpty then None
       else Some(breakdowns.count(_.has(term)).toDouble / breakdowns.size)
 
-    /** Route agreement, recorded on the later unit of each adjacent pair.
+    /** Support-midpoint route agreement, recorded on the later unit of each adjacent pair.
       *
       * For each step, compare the direction the GOLD route took through the source with the
-      * direction the inferred MAP anchors took. A channel can place every unit on a plausible
-      * anchor and still reconstruct the wrong journey; nothing else in this suite would notice,
-      * because every other metric scores units independently. Steps where either side is not
-      * source-anchored are `None` — an external destination is a legitimate route, but it is not a
-      * step through the source, and scoring it as agreement or disagreement would be an invention.
+      * direction the inferred MAP anchors took on the level-independent source-support midpoint
+      * axis. A channel can place every unit on a plausible anchor and still reconstruct the wrong
+      * journey; nothing else in this suite would notice, because every other metric scores units
+      * independently. Steps where either side is not source-anchored are `None` — an external
+      * destination is a legitimate route, but it is not a step through the source, and scoring it
+      * as agreement or disagreement would be an invention.
       */
     val route: (String, Vector[UnitObservation]) =
-      def positionOf(ref: SourceNodeRef): Option[Int] = view.node(ref).map(_.discoursePosition)
-      def goldPos(u: RecallUnit): Option[Int] =
+      def positionOf(ref: SourceNodeRef): Option[Double] =
+        view.node(ref).map(_ => view.relativePosition(ref))
+      def goldPos(u: RecallUnit): Option[Double] =
         c.gold(u.id).flatMap(_.primary).map(_.node).flatMap(positionOf)
-      def inferredPos(u: RecallUnit): Option[Int] =
+      def inferredPos(u: RecallUnit): Option[Double] =
         result.posterior.row(u.id).flatMap(mapAnchor).flatMap(positionOf)
       val values = units.zipWithIndex.map { case (u, i) =>
         val v =
@@ -298,7 +301,7 @@ object Metrics:
             yield ind(stepDirection(gp, gc) == stepDirection(ip, ic))
         UnitObservation(u.id, MetricObservation.fromOption(v))
       }
-      Names.routeAgreement -> values
+      Names.routeSupportMidpointDirection -> values
     val structuralCoverage = obs(Names.structuralTermCoverage)(termCoverage(CostTerm.Structural))
     val semanticCoverage = obs(Names.semanticTermCoverage)(termCoverage(CostTerm.Semantic))
 
