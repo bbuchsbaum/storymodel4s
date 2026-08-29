@@ -10,6 +10,10 @@ record Part 4, §57–76).
   first-person/source-monitoring language (`experiential`), aggregated per
   unique recall unit, never over atomized details. Rates are over assessed
   units; coverage is assessed units over participant recall units.
+  Profile density, purity, probe gain, and related rates are 1-per-unit;
+  anchoring, perceptual, integration, and fragmentation are 1-per-situation.
+  `targetMass` is atom mass for the traditional sheet, not a measure of
+  remembering.
 - *accuracy* — unknowable without an independent source; absent here.
 
 Target-episode membership (`address`) is a fourth, independent axis.
