@@ -30,15 +30,18 @@ enum CostTerm:
     */
   case Structural
 
-final case class CostWeights private (
-    semantic: Double,
-    propositional: Double,
-    entity: Double,
-    sensory: Double,
-    granularity: Double,
-    contradiction: Double,
-    chart: Double,
-    structural: Double
+/** Nonnegative finite weights over [[CostTerm]]. Not a case class: `fromProduct` would mint a
+  * negative or non-finite weight that [[CostWeights.of]] refuses.
+  */
+final class CostWeights private (
+    val semantic: Double,
+    val propositional: Double,
+    val entity: Double,
+    val sensory: Double,
+    val granularity: Double,
+    val contradiction: Double,
+    val chart: Double,
+    val structural: Double
 ):
   def apply(term: CostTerm): Double = term match
     case CostTerm.Semantic      => semantic
@@ -49,6 +52,31 @@ final case class CostWeights private (
     case CostTerm.Distortion    => contradiction
     case CostTerm.Chart         => chart
     case CostTerm.Structural    => structural
+
+  override def equals(other: Any): Boolean = other match
+    case that: CostWeights =>
+      semantic == that.semantic && propositional == that.propositional &&
+      entity == that.entity && sensory == that.sensory &&
+      granularity == that.granularity && contradiction == that.contradiction &&
+      chart == that.chart && structural == that.structural
+    case _ => false
+
+  override def hashCode(): Int =
+    (
+      semantic,
+      propositional,
+      entity,
+      sensory,
+      granularity,
+      contradiction,
+      chart,
+      structural
+    ).hashCode
+
+  override def toString: String =
+    s"CostWeights(semantic=$semantic, propositional=$propositional, entity=$entity, " +
+      s"sensory=$sensory, granularity=$granularity, contradiction=$contradiction, " +
+      s"chart=$chart, structural=$structural)"
 
 object CostWeights:
   /** Weights must be finite and nonnegative. `chart` and `structural` weight the optional

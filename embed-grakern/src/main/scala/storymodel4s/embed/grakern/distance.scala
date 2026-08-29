@@ -48,12 +48,13 @@ enum GrakernError:
 
 /** The fixed WL program of the structural channel: `rounds` refinement rounds over reified charts,
   * `subtree + optimalAssignment`, normalized. Codecs are named and versioned so grakern's
-  * `SemanticFingerprint` is durable.
+  * `SemanticFingerprint` is durable. Not a case class: `fromProduct` would mint a program whose
+  * `rounds` never passed [[StructuralProgram.of]].
   */
-final case class StructuralProgram private (
-    rounds: Int,
-    refinement: WLRefinement[ReifiedKey, ArcKind, ReifiedKey, ArcKind],
-    kernel: WLKernel[ReifiedKey, ArcKind, ReifiedKey, ArcKind]
+final class StructuralProgram private (
+    val rounds: Int,
+    val refinement: WLRefinement[ReifiedKey, ArcKind, ReifiedKey, ArcKind],
+    val kernel: WLKernel[ReifiedKey, ArcKind, ReifiedKey, ArcKind]
 ):
   /** Static identity of this program (ADR 0001 §D2): grakern revision, codec ids/versions, rounds.
     */
@@ -67,6 +68,15 @@ final case class StructuralProgram private (
 
   val providerName: String = "grakern"
   val modelName: String = s"wl.subtree+oa.normalized.r$rounds"
+
+  override def equals(other: Any): Boolean = other match
+    case that: StructuralProgram =>
+      rounds == that.rounds && refinement == that.refinement && kernel == that.kernel
+    case _ => false
+
+  override def hashCode(): Int = (rounds, refinement, kernel).hashCode
+
+  override def toString: String = s"StructuralProgram(rounds=$rounds)"
 
 object StructuralProgram:
   val NodeCodecId = "storymodel4s.embed.grakern.reified-key"
@@ -91,7 +101,7 @@ object StructuralProgram:
         .create[ReifiedKey, ArcKind, ReifiedKey, ArcKind](rounds, nodeKey, edgeKey, codecs)
         .left
         .map(e => GrakernError.Refinement(e.toString))
-    yield StructuralProgram(
+    yield new StructuralProgram(
       rounds,
       refinement,
       (refinement.subtree + refinement.optimalAssignment).normalized

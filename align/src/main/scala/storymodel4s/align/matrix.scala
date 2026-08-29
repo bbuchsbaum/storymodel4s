@@ -110,11 +110,13 @@ object AlignState:
 /** One row of `P`: posterior mass of a recall unit over `(anchor, mode)` states and external
   * states. Rows are unbalanced by construction: `sourceMass + externalMass = 1` when produced by
   * the HSMM, but rows from other aligners may sum to less than 1. Masses are nonnegative and finite
-  * (see [[AlignmentRow.of]]). The constructor (and therefore `apply`/`copy`) is `private[align]`:
-  * rows are produced by the aligners in this module or through the smart constructor, so a consumer
-  * cannot mint mass on a state it did not obtain from an aligner.
+  * (see [[AlignmentRow.of]]). Not a case class: `fromProduct` would mint negative or non-finite
+  * mass from any package. In-module construction stays `private[align]` for the aligners.
   */
-final case class AlignmentRow private[align] (unit: RecallUnitId, mass: Map[AlignState, Double]):
+final class AlignmentRow private[align] (
+    val unit: RecallUnitId,
+    val mass: Map[AlignState, Double]
+):
   def apply(state: AlignState): Double = mass.getOrElse(state, 0.0)
 
   /** Deterministic key order for sums (review #30). */
@@ -217,7 +219,18 @@ final case class AlignmentRow private[align] (unit: RecallUnitId, mass: Map[Alig
   /** Whether every mass is nonnegative and finite. */
   def isWellFormed: Boolean = mass.values.forall(m => m >= 0.0 && !m.isNaN && !m.isInfinite)
 
+  override def equals(other: Any): Boolean = other match
+    case that: AlignmentRow => unit == that.unit && mass == that.mass
+    case _                  => false
+
+  override def hashCode(): Int = (unit, mass).hashCode
+
+  override def toString: String = s"AlignmentRow($unit, states=${mass.size})"
+
 object AlignmentRow:
+  private[align] def apply(unit: RecallUnitId, mass: Map[AlignState, Double]): AlignmentRow =
+    new AlignmentRow(unit, mass)
+
   /** Smart constructor rejecting negative or non-finite mass. */
   def of(unit: RecallUnitId, mass: Map[AlignState, Double]): Either[AlignError, AlignmentRow] =
     val row = AlignmentRow(unit, mass)
@@ -225,9 +238,10 @@ object AlignmentRow:
     else Left(AlignError.MalformedRow(unit, "mass must be nonnegative and finite"))
 
 /** The alignment `P`: one row per recall unit in recall order. Construction is `private[align]`
-  * (aligners) or via [[AlignmentMatrix.of]], which rejects malformed rows and repeated units.
+  * (aligners) or via [[AlignmentMatrix.of]], which rejects malformed rows and repeated units. Not a
+  * case class: `fromProduct` would accept a vector of malformed rows.
   */
-final case class AlignmentMatrix private[align] (rows: Vector[AlignmentRow]):
+final class AlignmentMatrix private[align] (val rows: Vector[AlignmentRow]):
   lazy val byUnit: Map[RecallUnitId, AlignmentRow] = rows.iterator.map(r => r.unit -> r).toMap
   def row(unit: RecallUnitId): Option[AlignmentRow] = byUnit.get(unit)
   def size: Int = rows.size
@@ -254,7 +268,18 @@ final case class AlignmentMatrix private[align] (rows: Vector[AlignmentRow]):
 
   def isWellFormed: Boolean = rows.forall(_.isWellFormed)
 
+  override def equals(other: Any): Boolean = other match
+    case that: AlignmentMatrix => rows == that.rows
+    case _                     => false
+
+  override def hashCode(): Int = rows.hashCode
+
+  override def toString: String = s"AlignmentMatrix(rows=${rows.size})"
+
 object AlignmentMatrix:
+  private[align] def apply(rows: Vector[AlignmentRow]): AlignmentMatrix =
+    new AlignmentMatrix(rows)
+
   /** Smart constructor: every row well-formed and no unit repeated. */
   def of(rows: Vector[AlignmentRow]): Either[AlignError, AlignmentMatrix] =
     rows.find(!_.isWellFormed) match

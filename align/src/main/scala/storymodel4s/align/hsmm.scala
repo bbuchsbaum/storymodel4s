@@ -80,12 +80,27 @@ object TransitionFeatures:
       )
     )
 
-final case class HsmmConfig private (
-    temperature: Double,
-    transitions: TransitionModel,
-    refinementPasses: Int,
-    refinementWeight: Double
-)
+/** Inference knobs. Not a case class: `fromProduct` would mint a non-positive temperature or
+  * negative refinement weight that [[HsmmConfig.of]] refuses.
+  */
+final class HsmmConfig private (
+    val temperature: Double,
+    val transitions: TransitionModel,
+    val refinementPasses: Int,
+    val refinementWeight: Double
+):
+  override def equals(other: Any): Boolean = other match
+    case that: HsmmConfig =>
+      temperature == that.temperature && transitions == that.transitions &&
+      refinementPasses == that.refinementPasses && refinementWeight == that.refinementWeight
+    case _ => false
+
+  override def hashCode(): Int =
+    (temperature, transitions, refinementPasses, refinementWeight).hashCode
+
+  override def toString: String =
+    s"HsmmConfig(temperature=$temperature, refinementPasses=$refinementPasses, " +
+      s"refinementWeight=$refinementWeight)"
 
 object HsmmConfig:
   def of(

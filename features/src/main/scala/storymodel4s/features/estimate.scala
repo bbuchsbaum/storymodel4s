@@ -100,16 +100,26 @@ final case class WeightedEstimate[+V](estimate: Estimate[V], weight: Double)
   *
   * Why: sums and means over windows are confounded by lexicon coverage; every aggregate must say
   * how much of its support it actually observed. Construction is validated: `observed ≤ eligible`
-  * and both nonnegative.
+  * and both nonnegative. Not a case class: a companion `fromProduct` would mint
+  * `observed > eligible` and `+` would propagate it (see `featuresprobe.CoverageBoundarySuite`).
   */
-final case class Coverage private (eligible: Int, observed: Int):
+final class Coverage private (val eligible: Int, val observed: Int):
   def fraction: Double = if eligible == 0 then 0.0 else observed.toDouble / eligible
   def missing: Int = eligible - observed
   def isEmpty: Boolean = eligible == 0
-  def +(o: Coverage): Coverage = Coverage(eligible + o.eligible, observed + o.observed)
+  def +(o: Coverage): Coverage =
+    Coverage.unsafe(eligible + o.eligible, observed + o.observed)
+
+  override def equals(other: Any): Boolean = other match
+    case that: Coverage => eligible == that.eligible && observed == that.observed
+    case _              => false
+
+  override def hashCode(): Int = (eligible, observed).hashCode
+
+  override def toString: String = s"Coverage($eligible, $observed)"
 
 object Coverage:
-  val empty: Coverage = Coverage(0, 0)
+  val empty: Coverage = new Coverage(0, 0)
 
   def of(eligible: Int, observed: Int): Either[DomainError, Coverage] =
     if eligible < 0 || observed < 0 then
@@ -121,7 +131,7 @@ object Coverage:
           s"observed $observed exceeds eligible $eligible"
         )
       )
-    else Right(Coverage(eligible, observed))
+    else Right(new Coverage(eligible, observed))
 
   /** For counts that are correct by construction (e.g. a filter over a known set). */
   def unsafe(eligible: Int, observed: Int): Coverage =
