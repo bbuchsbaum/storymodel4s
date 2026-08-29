@@ -1460,7 +1460,7 @@ object NarrativeCompiler:
         ),
         renderFields("evidence-list/v1", finding.evidence.map(renderEvidenceRef).sorted),
         renderOption(finding.rawScore)(_.value.toString),
-        renderOption(finding.note)(value => value)
+        renderOption(finding.note)(_.value)
       )
     )
 
@@ -1484,7 +1484,7 @@ object NarrativeCompiler:
         call.provider,
         call.model,
         call.version,
-        renderOption(call.promptTemplateVersion)(value => value),
+        renderOption(call.promptTemplateVersion)(_.value),
         call.inputChecksum.hex,
         call.outputChecksum.hex,
         renderFields(

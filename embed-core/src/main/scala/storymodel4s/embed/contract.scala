@@ -279,7 +279,7 @@ object AttemptReceipt:
   private def providerCallLines(index: Int, call: ProviderCall): Vector[String] =
     val fields =
       Vector(index.toString, call.provider, call.model, call.version) ++
-        optionFields(call.promptTemplateVersion) ++
+        optionFields(call.promptTemplateVersion.map(_.value)) ++
         Vector(
           call.inputChecksum.hex,
           call.outputChecksum.hex

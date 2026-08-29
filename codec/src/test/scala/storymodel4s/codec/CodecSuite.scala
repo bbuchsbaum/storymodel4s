@@ -135,6 +135,24 @@ class CodecSuite extends ScalaCheckSuite:
     assert(Canonical.decodeJson[ClaimMeta](json).isLeft)
   }
 
+  test("ProviderCall: prompt-template versions round trip and blank legacy JSON is rejected") {
+    val call = ProviderCall(
+      "provider",
+      "model",
+      "version",
+      Some(PromptTemplateVersion.unsafe("  prompt-v1  ")),
+      Checksum.ofText("input"),
+      Checksum.ofText("output"),
+      Map.empty,
+      None,
+      cached = false
+    )
+    val json = summon[Encoder[ProviderCall]](call)
+    assertEquals(Canonical.decodeJson[ProviderCall](json), Right(call))
+    val blank = json.mapObject(_.add("promptTemplateVersion", Json.fromString("\u2003")))
+    assert(Canonical.decodeJson[ProviderCall](blank).isLeft)
+  }
+
   test("TextSpan: end before start is rejected on decode") {
     assert(Canonical.decode[TextSpan]("""{"end":1,"start":4}""").isLeft)
   }

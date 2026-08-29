@@ -87,7 +87,35 @@ from the baseline segmenter… TODO(M5): replace with calibrated defaults once e
 charts exist; these numbers are provisional, not scientific."* The defaults were never claimed to
 work. What was never stated is how far off they are. Now it is.
 
-## 2b. The cost model makes a unit cheaper to anchor when we could measure less of it
+## 2b. The cost model MADE a unit cheaper to anchor when we could measure less of it. Fixed.
+
+*(Heading corrected 21:18Z. It read "makes" and that was true when written at 17:58Z. The support
+carrier landed at `545b65b` and was repaired at `4bd02b0`, so it is false now. The section is kept
+because the defect is the clearest example in this document of what an unnamed imputation costs,
+and because two of the chief's rulings on it were overturned by measurement — which is the part
+worth remembering.)*
+
+**What landed.** The blend scales the present-term sum **up to eligible support, per cell**, and
+records `supportWeight` on `CostBreakdown` so the imputation travels with the value and a consumer
+can refuse it. A cell where *no* eligible term could be measured is now **excluded** rather than
+competing — it was previously costed at the function prior alone (`0.5`) against an external floor
+of `1.0`, i.e. half a unit *cheaper* than external while having measured nothing. The wire
+constructor takes `supportWeight` with **no default**, because a default let a caller omit the
+field and silently claim maximal support. `SchemaVersion` moved to `hsmm/v2` with no migration
+step: a v1 record does not merely lack the number, it lacks the *measurement*, and defaulting old
+support to `1` would be scientifically false.
+
+**Two chief rulings were wrong and were overturned by people who measured.** Scaling to a fixed
+reference (3.35) would have deflated chart-bearing cells 13–23% and collapsed rows to Source on
+exactly the corpus this project is building toward — refuted with arithmetic, since no single
+constant works when the reference must depend on what the cell *could* measure. And a required law
+was specified that **could not fail on the code it was meant to control**, because that code had no
+eligibility concept at all; the engineer reported that rather than shipping something weaker under
+its name.
+
+**The original finding, preserved, because it is the reference example:**
+
+
 
 *(Added 17:58Z. Measured by `claude-storymodel4s-m1` on WOG, verified in source by the chief.)*
 
@@ -119,11 +147,11 @@ agreement as *perfect* sensory agreement. That is harmless only while every cell
 pass, and nothing guarantees that — it is a property of the corpus, not of the code, and it can flip
 without an edit to any line.
 
-Open as `bd-01M177SHFXZKMR8K39BPC9K6FF`. The ruled direction scales the sum **up to full support**
-rather than down to a mean, so cells at full support are bit-identical and WOG's tuned weights need
-no recalibration — deliberately, because re-tuning against the only fixture we validate on would be
-fitting the model to the test set. It remains an imputation, now a named one, and ships with the
-support carrier that lets a consumer refuse it.
+*(Landed under `bd-01M177SHFXZKMR8K39BPC9K6FF`. It remains an imputation — scaling assumes the
+unmeasured eligible terms behave like the measured ones — but it is now a NAMED one, recorded in
+`supportWeight` and refusable. The difference from what it replaced is not that one imputes and the
+other does not: the old behaviour imputed **zero cost**, which reads as perfect agreement, and
+nobody chose it.)*
 
 ## 3. What *does* work unaided
 

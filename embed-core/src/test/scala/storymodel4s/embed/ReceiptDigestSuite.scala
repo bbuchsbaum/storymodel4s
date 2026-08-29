@@ -5,7 +5,7 @@ import munit.ScalaCheckSuite
 import org.scalacheck.Gen
 import org.scalacheck.Prop.forAll
 
-import storymodel4s.core.{Checksum, ProviderCall}
+import storymodel4s.core.{Checksum, PromptTemplateVersion, ProviderCall}
 
 /** P0-2 laws: keyed identities on every receipt surface (cache, pseudo, capability, attempt,
   * provider-call), Plain only for public material, fail-closed without a key, canonical rendering,
@@ -181,7 +181,7 @@ class ReceiptDigestSuite extends ScalaCheckSuite:
       provider = s"provider-$token",
       model = s"model-$token",
       version = s"version-$token",
-      promptTemplateVersion = Some(s"prompt-$token"),
+      promptTemplateVersion = Some(PromptTemplateVersion.unsafe(s"prompt-$token")),
       inputChecksum = Checksum.ofText("overwritten-input"),
       outputChecksum = Checksum.ofText("overwritten-output"),
       params = Map("z" -> s"last-$token", "a" -> s"first-$token"),
@@ -246,7 +246,7 @@ class ReceiptDigestSuite extends ScalaCheckSuite:
         call.copy(provider = token),
         call.copy(model = token),
         call.copy(version = token),
-        call.copy(promptTemplateVersion = Some(token)),
+        call.copy(promptTemplateVersion = Some(PromptTemplateVersion.unsafe(token))),
         call.copy(promptTemplateVersion = None),
         call.copy(params = call.params.updated(token, "value")),
         call.copy(seed = Some(18L)),

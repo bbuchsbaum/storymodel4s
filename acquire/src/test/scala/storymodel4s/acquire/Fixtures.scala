@@ -39,7 +39,7 @@ object Fixtures:
     provider = provider,
     model = "stub",
     version = "1",
-    promptTemplateVersion = Some("1.0.0"),
+    promptTemplateVersion = Some(PromptTemplateVersion.unsafe("1.0.0")),
     inputChecksum = Checksum.ofText("in"),
     outputChecksum = Checksum.ofText("out"),
     params = Map.empty,

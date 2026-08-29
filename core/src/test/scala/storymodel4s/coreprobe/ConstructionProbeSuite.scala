@@ -68,6 +68,49 @@ class ConstructionProbeSuite extends FunSuite:
     assert(Credence.raw(0.1).exists(c => c.calibrated.isEmpty && c.calibrationModel.isEmpty))
   }
 
+  test("ProviderCall apply cannot admit a raw prompt-template version") {
+    refused(
+      typeCheckErrors(
+        """(p: storymodel4s.core.ProviderCall) =>
+             storymodel4s.core.ProviderCall(
+               p.provider, p.model, p.version, Some(" "), p.inputChecksum,
+               p.outputChecksum, p.params, p.seed, p.cached
+             )"""
+      ),
+      "ProviderCall.apply with a raw blank prompt-template version"
+    )
+  }
+
+  test("ProviderCall copy cannot admit a raw prompt-template version") {
+    refused(
+      typeCheckErrors(
+        """(p: storymodel4s.core.ProviderCall) =>
+             p.copy(promptTemplateVersion = Some(" "))"""
+      ),
+      "ProviderCall.copy with a raw blank prompt-template version"
+    )
+  }
+
+  test("ProviderCall has no fromProduct door for a raw prompt-template version") {
+    refused(
+      typeCheckErrors(
+        """(p: storymodel4s.core.ProviderCall) =>
+             storymodel4s.core.ProviderCall.fromProduct((
+               p.provider, p.model, p.version, Some(" "), p.inputChecksum,
+               p.outputChecksum, p.params, p.seed, p.cached
+             ))"""
+      ),
+      "ProviderCall.fromProduct with a raw blank prompt-template version"
+    )
+  }
+
+  test("PromptTemplateVersion rejects blanks and preserves admitted bytes") {
+    Vector("", " ", "\t\n", "\u2003").foreach(raw => assert(PromptTemplateVersion.from(raw).isLeft))
+    val admitted = "  provider-v1  "
+    assertEquals(PromptTemplateVersion.from(admitted).map(_.value), Right(admitted))
+    intercept[IllegalArgumentException](PromptTemplateVersion.unsafe(" "))
+  }
+
   test("TextSpan has no derived fromProduct bypass") {
     refused(
       typeCheckErrors("""storymodel4s.core.TextSpan.fromProduct((-1, 4))"""),

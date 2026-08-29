@@ -22,7 +22,7 @@ class CompilerSuite extends FunSuite:
       provider,
       "test-model",
       "1",
-      Some("1"),
+      Some(PromptTemplateVersion.unsafe("1")),
       source.canonicalChecksum,
       Checksum.ofText(s"output:$salt"),
       Map.empty,
@@ -341,7 +341,7 @@ class CompilerSuite extends FunSuite:
     assertNotEquals(compiledLeft.fingerprint, compiledRight.fingerprint)
   }
 
-  test("provider-call prompt version None cannot collide with Some empty") {
+  test("provider-call prompt version presence remains fingerprint-significant") {
     val oneSituation = Vector(
       SituationAttempt(ref0, bundle(situation0, ev0, "situation-agent", "s0"))
     )
@@ -352,22 +352,24 @@ class CompilerSuite extends FunSuite:
         provenanceCalls = Vector(baseCall.copy(promptTemplateVersion = None))
       )
     )
-    val presentEmpty = compile(
+    val present = compile(
       input(
         situationAttempts = oneSituation,
-        provenanceCalls = Vector(baseCall.copy(promptTemplateVersion = Some("")))
+        provenanceCalls = Vector(
+          baseCall.copy(promptTemplateVersion = Some(PromptTemplateVersion.unsafe("present")))
+        )
       )
     )
 
-    assertNotEquals(absent, presentEmpty)
-    assertEquals(absent.draft.graph.situations.keySet, presentEmpty.draft.graph.situations.keySet)
-    assertEquals(absent.draft.graph.contexts.keySet, presentEmpty.draft.graph.contexts.keySet)
-    assertEquals(absent.draft.graph.segments.keySet, presentEmpty.draft.graph.segments.keySet)
-    assertNotEquals(absent.derivation.candidateSet, presentEmpty.derivation.candidateSet)
-    assertNotEquals(absent.fingerprint, presentEmpty.fingerprint)
+    assertNotEquals(absent, present)
+    assertEquals(absent.draft.graph.situations.keySet, present.draft.graph.situations.keySet)
+    assertEquals(absent.draft.graph.contexts.keySet, present.draft.graph.contexts.keySet)
+    assertEquals(absent.draft.graph.segments.keySet, present.draft.graph.segments.keySet)
+    assertNotEquals(absent.derivation.candidateSet, present.derivation.candidateSet)
+    assertNotEquals(absent.fingerprint, present.fingerprint)
   }
 
-  test("critic-finding note None cannot collide with Some empty") {
+  test("critic-finding note presence remains fingerprint-significant") {
     val baseFinding = CriticFinding(
       TaskId.unsafe("task:critic-option-note"),
       CriticFamily.SourceEntailment,
@@ -377,7 +379,7 @@ class CompilerSuite extends FunSuite:
       None,
       None
     )
-    def compiled(note: Option[String]): NarrativeCompilation =
+    def compiled(note: Option[FindingNote]): NarrativeCompilation =
       compile(
         input(
           situationAttempts = Vector(
@@ -396,12 +398,12 @@ class CompilerSuite extends FunSuite:
       )
 
     val absent = compiled(None)
-    val presentEmpty = compiled(Some(""))
+    val present = compiled(Some(FindingNote.unsafe("present")))
 
-    assertNotEquals(absent, presentEmpty)
-    assertEquals(absent.draft.graph, presentEmpty.draft.graph)
-    assertNotEquals(absent.derivation.candidateSet, presentEmpty.derivation.candidateSet)
-    assertNotEquals(absent.fingerprint, presentEmpty.fingerprint)
+    assertNotEquals(absent, present)
+    assertEquals(absent.draft.graph, present.draft.graph)
+    assertNotEquals(absent.derivation.candidateSet, present.derivation.candidateSet)
+    assertNotEquals(absent.fingerprint, present.fingerprint)
   }
 
   test("a non-accepted causal candidate is absent and recorded, never emitted at a default") {

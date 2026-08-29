@@ -234,7 +234,7 @@ object CoreCodecs:
       "provider" -> p.provider.asJson,
       "model" -> p.model.asJson,
       "version" -> p.version.asJson,
-      "promptTemplateVersion" -> opt(p.promptTemplateVersion),
+      "promptTemplateVersion" -> opt(p.promptTemplateVersion.map(_.value)),
       "inputChecksum" -> p.inputChecksum.asJson,
       "outputChecksum" -> p.outputChecksum.asJson,
       "params" -> p.params.asJson,
@@ -247,7 +247,15 @@ object CoreCodecs:
       pr <- field[String](c, "provider")
       m <- field[String](c, "model")
       v <- field[String](c, "version")
-      pt <- field[Option[String]](c, "promptTemplateVersion")
+      pt <- field[Option[String]](c, "promptTemplateVersion").flatMap {
+        case Some(raw) =>
+          PromptTemplateVersion
+            .from(raw)
+            .left
+            .map(error => DecodingFailure(error.message, c.history))
+            .map(Some(_))
+        case None => Right(None)
+      }
       i <- field[Checksum](c, "inputChecksum")
       o <- field[Checksum](c, "outputChecksum")
       ps <- field[Map[String, String]](c, "params")
