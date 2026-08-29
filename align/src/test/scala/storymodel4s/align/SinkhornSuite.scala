@@ -83,8 +83,9 @@ class SinkhornSuite extends ScalaCheckSuite:
         SinkhornSuite.probeB,
         cfg
       ) match
-        case Left(err) if err.message.contains(label) => None
-        case other                                    => Some(s"$label -> $other")
+        case Left(AlignError.InvalidConfig("SinkhornConfig", detail)) if detail.contains(label) =>
+          None
+        case other => Some(s"$label -> $other")
     }
     assertEquals(unnamed, Vector.empty)
     val zeroRho = UnbalancedSinkhorn.solve(
@@ -104,8 +105,9 @@ class SinkhornSuite extends ScalaCheckSuite:
         SinkhornSuite.probeB,
         cfg
       ) match
-        case Left(err) if err.message.contains(label) => None
-        case other                                    => Some(s"$label -> $other")
+        case Left(AlignError.InvalidConfig("SinkhornConfig", detail)) if detail.contains(label) =>
+          None
+        case other => Some(s"$label -> $other")
     }
     assertEquals(unnamed, Vector.empty)
   }
