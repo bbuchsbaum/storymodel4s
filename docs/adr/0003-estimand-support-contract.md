@@ -212,6 +212,34 @@ the carrier law.
 - New scientific metrics must identify their carrier and support grain during review. If neither is
   stated, the API is incomplete.
 
+## When identity obligations attach
+
+A metric's version identity exists to protect someone who **holds a recorded number** against a
+silent redefinition. It follows that the obligation attaches at **release** — at the point a
+number is recorded, published, or handed to a consumer — and **not at every commit to `main`**.
+
+Reading it per-commit defeats it. Every correction made between two releases would have to burn a
+fresh identity, so a metric found wrong an hour after landing would ship as `…-v2`, and the
+namespace would fill with versions that never measured anything for anyone. That is the rule
+consuming itself rather than serving its purpose.
+
+Therefore: **within a single unreleased transition, a correction may land under the same new
+identity, provided no result has been recorded from the intermediate state.** Discharging that
+proviso is the author's duty and it is not rhetorical — the repository can show that nothing was
+recorded *in it*, but only the author knows whether a number was taken from a local run. If one
+was, the identity is burned honestly.
+
+This does not soften the rule it qualifies. Once a number is released, changing what it means
+without changing its identity remains prohibited, and a wrong metric is retired rather than kept
+beside its replacement.
+
+*Originating incident:* `route:transition-direction` was retired for
+`route:support-midpoint-direction` (merge `e959b3a`); its author self-blocked twenty-four seconds
+later, having found that the replacement inherited a support defect — `Unranked` collapsing to
+`Ineligible` instead of `Missing(ProviderAbstained)`. The defect **predated** the rename, so
+`main` was strictly better with the fix than without it, and reverting would have restored a
+known-wrong axis to remove nothing. Ruled on `post-01M16BA12TPX32N3J29ZSGKYNZ`.
+
 ## Governance record
 
 The chief ratified the shared rule and the six properties on Mote coordination post
