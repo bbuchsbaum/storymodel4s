@@ -224,10 +224,18 @@ namespace would fill with versions that never measured anything for anyone. That
 consuming itself rather than serving its purpose.
 
 Therefore: **within a single unreleased transition, a correction may land under the same new
-identity, provided no result has been recorded from the intermediate state.** Discharging that
-proviso is the author's duty and it is not rhetorical — the repository can show that nothing was
-recorded *in it*, but only the author knows whether a number was taken from a local run. If one
-was, the identity is burned honestly.
+identity, provided the correction does not change any figure that was recorded from the
+intermediate state.** The test is not *whether* a number was recorded but *whether the correction
+moves it*: if every recorded figure — value **and** support — remains true under the corrected
+definition, no holder is misled, and burning an identity would teach readers that a number changed
+when it did not, which makes the next real burn less legible.
+
+Discharging this is the author's duty and it is not rhetorical: the repository can show what was
+recorded *in it*, but only the author knows what was taken from a local run. State it, and make
+the claim falsifiable — assert the recorded figures still hold after the correction, so the
+argument for keeping the identity is a test rather than a judgement. **The default on uncertainty
+is to burn.** A needless burn costs a name; a missed burn costs a reader's trust in every number
+the project publishes.
 
 This does not soften the rule it qualifies. Once a number is released, changing what it means
 without changing its identity remains prohibited, and a wrong metric is retired rather than kept
@@ -239,6 +247,12 @@ later, having found that the replacement inherited a support defect — `Unranke
 `Ineligible` instead of `Missing(ProviderAbstained)`. The defect **predated** the rename, so
 `main` was strictly better with the fix than without it, and reverting would have restored a
 known-wrong axis to remove nothing. Ruled on `post-01M16BA12TPX32N3J29ZSGKYNZ`.
+
+The proviso was then corrected on `post-01M16BDTNE3FA1PFY6HN4W860X`. As first written it asked
+whether a number had been recorded; the author answered honestly that one had, and was about to
+burn a second identity for figures the correction leaves untouched. An author must not narrow a
+rule in their own favour — that instinct was right — but the chief may correct a rule he wrote
+badly, and the wording above is the correction.
 
 ## Governance record
 
