@@ -134,7 +134,31 @@ segmenter, not from semantic matching, and need none of the hand-authored resour
 So: the part of the model that says *"this came from outside the story"* functions. The part that
 says *"this is that event"* does not.
 
-## 4. The end-to-end path is severed at exactly one link
+## 4. The end-to-end path WAS severed at exactly one link. It no longer is.
+
+*(Heading corrected 20:08Z. It read "is severed" for most of 2026-08-29 and that was true when
+written. The compiler landed at `e661470` and it is false now. What replaces it is below; the
+section is kept rather than deleted because the shape of the gap is what made the fix findable.)*
+
+**Status: the link exists; the path is demonstrated on ONE SENTENCE.** `document` now compiles a
+`SurfaceAtlas` plus checked local charts and typed proposal/critic evidence into a
+`NarrativeCompilation`, and raw source plus raw recall reaches a `RecallSignature` through a
+deterministic fixture provider that is named as such. That is **mechanical reachability**, not an
+answered research question and not a narrative-validity claim — the author's own wording, kept
+because it is the wording most likely to be lost in retelling.
+
+So the honest position moved from *severed* to *narrow*. Narrow is a scaling problem. Severed
+was not. Neither is *done*: nothing here demonstrates that a real transcript produces a defensible
+number, and §1 still holds — there is no real human recall data in this repository.
+
+**What it cost, and what that says about the code:** four reviewer blockers, none of which a
+green suite could have caught — a receipt recording WHICH claims but not WHAT THEY WERE; a
+fabricated `LinguisticallyEntailed` license on causal edges whose proposals carry no linguistic
+basis; a provenance-ordering fingerprint disagreement; and `None` and `Some("")` sharing one
+fingerprint. Every one was found by a reviewer reading code. **A suite cannot detect what is
+indistinguishable by construction**, which is the general reason this document exists.
+
+
 
 Both ends run from raw text today. Transcript → `RecallGraph` is two function calls. `SourceView` →
 `RecallSignature` is four lines with library defaults.
