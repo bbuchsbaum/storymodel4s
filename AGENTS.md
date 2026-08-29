@@ -259,6 +259,19 @@ was set by the owner on 2026-08-28 (sticky decision
    for is a defect you have declined to sweep; the chief did exactly that here,
    and 45 forgeable types stayed open until someone walked into one by hand.
 
+   *No value and low support are different failures.* **No value** means the
+   term cannot be computed and any substitute is invention — **refuse**. **Low
+   support** means it *was* computed, from little evidence — **publish it with
+   the evidence**, because refusing discards a real measurement. Most defects
+   found here have been the first mistake, which primes everyone to see
+   invention everywhere; the over-correction is a library that abstains whenever
+   support is thin, and that is not more honest, it is differently dishonest —
+   it withholds real evidence and leaves the researcher with nothing. Where an
+   aggregate's support can only be computed over *some* of its terms, report the
+   minimum over the terms that carry support **and** the count of contributing
+   terms that carry none: a support figure covering four of eleven terms is a
+   different claim from one covering eleven.
+
    *Dropping a term from a normalized aggregate silently rescales the rest.*
    Excluding unplaceable mass from a distribution does not remove its influence
    — normalization redistributes it over the survivors, so a detail half of
