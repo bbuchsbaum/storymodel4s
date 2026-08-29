@@ -151,6 +151,12 @@ final class StepMass private (
     val comparableSteps: Int,
     val totalSteps: Int
 ):
+  /** Share of the route's steps that could be judged, named to match [[MassRatio.support]] so the
+    * two support carriers answer the same question through the same word. A consumer reporting a
+    * clock alongside its support should not have to know which carrier produced it.
+    */
+  def support: Double = if totalSteps <= 0 then 0.0 else comparableSteps.toDouble / totalSteps
+
   def render: String = f"$perStep%.4f (over $comparableSteps/$totalSteps comparable steps)"
 
   override def equals(other: Any): Boolean = other match
