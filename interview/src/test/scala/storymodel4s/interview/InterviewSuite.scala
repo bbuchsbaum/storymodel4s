@@ -881,10 +881,18 @@ class InterviewSuite extends ScalaCheckSuite:
   property("category distribution preserves total mass and internal mass equals target mass") {
     forAll(addressGen, facetGen) { (addr, facets) =>
       val a = assessment(addr, facets)
-      val cats = TraditionalScoring.categoryDistribution(a, AiScoringPolicy.Standard).get
-      val internal = cats.mass(_.isInternal)
-      val expectedInternal = a.targetMass * facets.mass(_ != DetailFacet.Other)
-      math.abs(internal - expectedInternal) < 1e-9
+      // A detail whose placement is entirely unresolved has no category distribution at all:
+      // unresolved mass is our failure to place it, not a category the participant produced.
+      TraditionalScoring.categoryDistribution(a, AiScoringPolicy.Standard) match
+        case None       => a.address.mass(_ == MemoryAddress.Unresolved) > 1.0 - 1e-9
+        case Some(cats) =>
+          // The distribution is conditional on placement, so compare it against target mass
+          // conditioned the same way. Unresolved mass is not redistributed onto categories; it
+          // leaves the conditional entirely, and the weight carries that in `rows`.
+          val placed = 1.0 - a.address.mass(_ == MemoryAddress.Unresolved)
+          val internal = cats.mass(_.isInternal) * placed
+          val expectedInternal = a.targetMass * facets.mass(_ != DetailFacet.Other)
+          math.abs(internal - expectedInternal) < 1e-9
     }
   }
 
@@ -947,3 +955,19 @@ class InterviewSuite extends ScalaCheckSuite:
   }
 
   given Arbitrary[Double] = Arbitrary(Gen.choose(0.0, 1.0))
+
+  test("unresolved placement is not scored as an external detail") {
+    // The bias this removes: internalRatio is the AI's headline measure, and unresolved mass used
+    // to enter its denominator as an external-other detail. That depressed the ratio by exactly
+    // the amount of OUR uncertainty - which is largest for the vaguer, more disorganised accounts
+    // that the groups these studies compare tend to produce.
+    val unresolved = assessment(
+      Distribution.point(MemoryAddress.Unresolved),
+      Distribution.point(DetailFacet.Event)
+    )
+    assertEquals(
+      TraditionalScoring.categoryDistribution(unresolved, AiScoringPolicy.Standard),
+      None,
+      "unresolved placement produced a scored category"
+    )
+  }
