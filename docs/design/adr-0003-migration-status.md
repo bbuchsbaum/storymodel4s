@@ -60,18 +60,30 @@ published number.
 | `interview/induce.scala:536` | `getOrElse(d.id, Estimate.observed(0.0))` for a detail whose source unit is absent from the graph | same bead |
 | `align/source.scala:109` | `importance: ScoreEstimate = Estimate.observed(1.0)` as a **default parameter** | open question, below |
 
-## Open question — the `importance` default
+## The `importance` default — recorded as an open question, resolved as a defect
 
-`NodeSummary.importance` defaults to `Estimate.observed(1.0)`. The field's own contract says
-"`Missing` importance excludes the node from importance-weighted coverage; it is never zero", so
-`Missing` is meaningful and available. With the current default, a caller who injects no
-importances gets every node at 1.0, and `importanceWeightedCoverage` silently equals
-`uniformCoverage` — two published numbers that are secretly the same measurement.
+This section first read "open question, defensible other side, pending a ruling". Checking whether
+anything actually injects importance made it decidable. It is
+`bd-01M16C9HT9V9Q80F7411V87BBY` (P1). *An open question that can be closed by checking is not an
+open question; it is unfinished work.*
 
-Defaulting to `Missing` instead would make importance-weighted coverage `AllMissing` when no
-importance was supplied, which states the truth: we were not given importances, so we cannot
-weight by them. This is a design decision with a defensible other side (a uniform prior is a
-legitimate modelling choice) and is recorded here rather than filed, pending a ruling.
+`NodeSummary.importance` defaults to `Estimate.observed(1.0)`. The **only** production
+construction site is `bridge/StorySourceView.scala:98`, which passes positional arguments through
+`lemmas` and then jumps to `evidence =` by name — it never passes `importance`. The sole other
+writer in the repository is a laws generator. So every node in every real run carries
+`observed(1.0)`.
+
+The arithmetic then collapses (`signature.scala:91-96`): `uniform` is
+`sum(visitation)/leaves.size`; `weighted` is `sum(w·visitation)/wsum`; with every `w = 1.0`,
+`wsum = leaves.size` and `weighted` reduces to exactly `uniform`. **`uniformCoverage` and
+`importanceWeightedCoverage` are identical by construction in every production run.** A
+researcher comparing them finds them always equal and may conclude importance weighting does not
+affect coverage — a finding about participants caused by a wiring gap in our pipeline.
+
+A second, independent defect survives even if the wiring is fixed: `if wsum <= 0 then uniform`
+fills the weighted figure with the uniform figure when every importance is `Missing`. The comment
+one line above has the right instinct — Missing importance is excluded, never counted as zero —
+and then the all-Missing case substitutes a different measurement instead of abstaining.
 
 ## The pattern is mostly right elsewhere
 

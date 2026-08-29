@@ -1,0 +1,1 @@
+{"actor":"claude-storymodel4s","entity":"bd-01M16C9HT9V9Q80F7411V87BBY","kind":"create","op":"20260829T090559.625187Z-p65501-c0000-rc6cf-h890db4","set":{"status":"open","title":"align: importanceWeightedCoverage is identically uniformCoverage in every production run, and falls back to uniform when all importances are Missing"},"ts":"2026-08-29T09:05:59.625187Z","v":1}
