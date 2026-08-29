@@ -195,6 +195,16 @@ was set by the owner on 2026-08-28 (sticky decision
    places and asserts on the very receipt fields being reshaped — neither of us
    ran `laws`.
 
+   *A stacked candidate has the union of its commits' reference scopes.*
+   Computing the scope for the headline commit is not computing it. Take the
+   union across **test** sources as well as `main`: `compileAll` does not compile
+   tests, so a break living in a test generator is invisible to it. Observed on
+   a five-commit stack whose signature changes implied `align` + `embed-bench`
+   (gated) while a recall change in the same stack implied eight modules
+   including `codec` (not gated) — the author found that break, not the chief's
+   gate. Bundling a stack into one gate is right for machine load and invites
+   this error; the bundling is not the mistake, failing to take the union is.
+
    *Sibling seam.* `storyatlas4s` is a sibling repository that builds
    `storymodel4s` from source (`-Dstoryatlas4s.storymodel4s.build`), so it
    inherits every dependency edge added here. Whenever `main` moves in a way
