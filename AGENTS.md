@@ -227,6 +227,19 @@ was set by the owner on 2026-08-28 (sticky decision
    dissent stays on the record. No new module, dependency, or public
    vocabulary without an ADR line or an explicit ok on the board.
 3. **Merge gate.** Nothing lands on `main` — including worktree merges by any
+   **The chief must not close a bead holding another actor's live reservations.**
+   `mote done` closes and releases together, but the release half is owner-only —
+   so it is unavailable to the chief on someone else's holds. `mote close` is
+   available and releases nothing. `mote unreserve` refuses outright. **The only
+   close available to a chief is the one that orphans**, which makes this a
+   structural failure mode rather than carelessness: landing a candidate and
+   closing its bead in one tidy motion is exactly how it happens. Before closing
+   another actor's bead, run `who-has` on its paths; if anything is held, ask the
+   holder to `mote done` it instead. (Recorded 2026-08-29 after the chief orphaned
+   two reservations this way, twenty minutes after advising a different agent to
+   prefer `done` for precisely this reason, and blocked a third party who could not
+   clear them either.)
+
    **Mint your own child bead under a scoped parent.** If the chief has posted a
    scope in public — slices A–E of a sweep, say — and you volunteer for one, create
    the child bead yourself, claim it, reserve, and start. Do not wait for the chief
