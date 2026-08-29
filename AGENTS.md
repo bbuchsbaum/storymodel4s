@@ -89,6 +89,25 @@ Package namespace is flat `storymodel4s.<module>`.
    surviving `Map[Int, _]` or codec field re-bridges the coordinates for
    everything downstream, so a half-done migration is not a smaller done one — it
    is an undone one that looks done.
+   **Polarity decides whether a numeric guard fails open or closed — prefer the
+   fail-closed shape.**
+
+       if x <= 0.0 then SAFE else COMPUTE    NaN falls to ELSE → arithmetic on NaN.  FAILS OPEN
+       if x >  0.0 then COMPUTE else SAFE    NaN falls to ELSE → SAFE.               FAILS CLOSED
+
+   Same check, opposite outcome, decided entirely by which branch holds the safe
+   path. `if x > 0.0 then compute else safe` is correct under `NaN` **for free** —
+   no `isNaN` call, no cost — while the other form needs an explicit defence
+   somebody has to remember. This sorts a codebase by grep, without per-site
+   judgement: the fail-closed half needs no thought at all. Measured 2026-08-29
+   across 19 Double-literal guards, which found three live fail-open sites,
+   including `MassRatio.unsafe` — the carrier for seven migrated ADR 0003 fields,
+   whose whole purpose is refusing unsupported numbers, admitting `Some(NaN)` — and
+   `sinkhorn`'s config validator, where a `NaN` epsilon fails all three range checks
+   and is therefore ACCEPTED. `features/window.scala` contains both polarities
+   fifteen lines apart, which is the same no-convention signature as the empty-guard
+   sweep.
+
    **A numeric guard must state what it does with `NaN` — every comparison against
    it is false, so `if x <= 0` FAILS OPEN.** Measured 2026-08-29: leaf importance had
    no finite/nonnegative boundary, and the sole degenerate-weight guard
