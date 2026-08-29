@@ -71,6 +71,24 @@ Package namespace is flat `storymodel4s.<module>`.
    split, reorder, revisit, elaborate, or go external. External destinations
    are explicit states, not error residue.
 7. **Truth ≠ salience ≠ phenomenology ≠ veridicality.** Never derive one from another.
+   **And typing a conflated quantity does not un-conflate it — it launders it.**
+   When one primitive is carrying two different meanings, wrapping every use in a
+   single new type compiles, gates green, passes review, and preserves the exact
+   conflation under a name that now *implies* semantics it does not have. That is
+   worse than the primitive it replaced: a bare `Int` is honest, advertising that
+   it carries no meaning, so a reader knows to go and find out; `Level` announces
+   the question is settled. The fix is as many coordinates as there are meanings,
+   never one wrapper over all of them. Live case (2026-08-29): `level: Int` spans
+   `BoundaryEvidence`/`BoundaryScore` (task-conditioned perceptual grain) and
+   `SegmentNode`/`descendantsAtLevel` (structural containment depth) — two
+   estimands, one primitive. The sharpest site is
+   `BoundaryBeliefInput.weights: Map[Int, …]`, because **a map key is a
+   comparability claim**: two entries under key 2 are asserted to be the same
+   level by the data structure itself, with no code having decided it. Note also
+   that such a migration is **not sliceable**, unlike a per-type sweep: one
+   surviving `Map[Int, _]` or codec field re-bridges the coordinates for
+   everything downstream, so a half-done migration is not a smaller done one — it
+   is an undone one that looks done.
 8. **Smart constructors + phantom states.** Invalid states are unrepresentable
    when rules are stable (`Checked`/`Unchecked`, `Draft`/`Validated`);
    validated/versioned data when the ontology is open (PropBank frames).
