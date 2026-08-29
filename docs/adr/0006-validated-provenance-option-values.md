@@ -63,6 +63,9 @@ continue to prove that absent and present admitted values affect fingerprints di
 - `None` call sites and wire payloads are unchanged.
 - The public field types become more precise and are source-incompatible for callers that passed
   `Some(String)` directly.
+- The two containing types no longer implement `Product` or expose generated `Mirror`,
+  `fromProduct`, or `unapply` operations. External generic-product and pattern-match consumers must
+  migrate to public field reads and the explicit `apply`/`copy` operations.
 - No `NarrativeCompilation`, provider receipt, or critic finding can retain an empty present value.
 - Distinct nonblank values retain their exact bytes and remain distinct in codecs and fingerprints.
 
