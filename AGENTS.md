@@ -171,6 +171,18 @@ was set by the owner on 2026-08-28 (sticky decision
    types underneath moved, `git` reported a clean merge and then a clean rebase,
    and both results failed to compile with the same two errors.
 
+   *Reference scope.* The gate must cover **every module that references the
+   changed type**, not only the module that contains it. Find them
+   mechanically — grep the type name across `*/src/main/scala` — and name them
+   in the evidence post. `compileAll` catches a broken signature; it does not
+   catch a law that still compiles and now asserts something different, which
+   is what a change to a receipt's identity or canonical ordering does to
+   `laws/Laws.scala`. Observed on the population reference-shape candidate:
+   author evidence was `alignJVM` only and the chief's gate was `align` on
+   three platforms, while `Laws.scala` calls `PopulationAggregate.of` in ten
+   places and asserts on the very receipt fields being reshaped — neither of us
+   ran `laws`.
+
    *Sibling seam.* `storyatlas4s` is a sibling repository that builds
    `storymodel4s` from source (`-Dstoryatlas4s.storymodel4s.build`), so it
    inherits every dependency edge added here. Whenever `main` moves in a way
