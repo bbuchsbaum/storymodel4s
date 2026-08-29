@@ -58,6 +58,15 @@ object AddressEscape:
     (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') ||
       c == '.' || c == '_' || c == '-' || c == ':'
 
+  private def asciiHexDigit(c: Char): Int =
+    if c >= '0' && c <= '9' then c - '0'
+    else if c >= 'a' && c <= 'f' then c - 'a' + 10
+    else if c >= 'A' && c <= 'F' then c - 'A' + 10
+    else -1
+
+  private def sameBytes(left: Array[Byte], right: Array[Byte]): Boolean =
+    left.length == right.length && left.indices.forall(i => left(i) == right(i))
+
   def encode(part: String): String =
     if part.forall(unreserved) then part
     else
@@ -86,8 +95,8 @@ object AddressEscape:
         if c == '%' then
           if i + 2 >= encoded.length then err = Some("truncated escape")
           else
-            val hi = Character.digit(encoded.charAt(i + 1), 16)
-            val lo = Character.digit(encoded.charAt(i + 2), 16)
+            val hi = asciiHexDigit(encoded.charAt(i + 1))
+            val lo = asciiHexDigit(encoded.charAt(i + 2))
             if hi < 0 || lo < 0 then err = Some("malformed escape")
             else
               out.write((hi << 4) | lo)
@@ -98,7 +107,11 @@ object AddressEscape:
         else err = Some("unescaped reserved character")
       err match
         case Some(r) => bad(r)
-        case None    => Right(new String(out.toByteArray, StandardCharsets.UTF_8))
+        case None    =>
+          val bytes = out.toByteArray
+          val decoded = new String(bytes, StandardCharsets.UTF_8)
+          if sameBytes(bytes, decoded.getBytes(StandardCharsets.UTF_8)) then Right(decoded)
+          else bad("malformed UTF-8")
 
 /** A canonical, nonempty sequence of key parts. Parts may be any string (including empty); the
   * rendered form is unambiguous because parts are escaped before being joined with `/`.
