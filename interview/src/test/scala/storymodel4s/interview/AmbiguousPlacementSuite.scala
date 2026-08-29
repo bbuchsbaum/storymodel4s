@@ -51,8 +51,10 @@ class AmbiguousPlacementSuite extends FunSuite:
     val ret = induce(transcript("The waiter brought a cake."))
     val neither = induce(transcript("The dog barked in the park."))
 
-    def sides(run: (RecallGraph, Vector[Detail], InductionResult), frag: String)
-        : (Boolean, Boolean) =
+    def sides(
+        run: (RecallGraph, Vector[Detail], InductionResult),
+        frag: String
+    ): (Boolean, Boolean) =
       val g = run._1
       val seed = unitContaining(g, "ate cake at the restaurant")
       val marker = unitContaining(g, "year before")
