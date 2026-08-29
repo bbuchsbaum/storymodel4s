@@ -782,7 +782,19 @@ was set by the owner on 2026-08-28 (sticky decision
    `mote session start --as <actor>`) or `--actor` on each call — and never run
    `mote actor set` in the shared checkout: `.mote/local/actor` is shared by
    every session in this directory, so changing it relabels other actors'
-   posts. Reserve paths with
+   posts. **A DEFAULT IDENTITY THAT IS A REAL ACTOR FORGES THAT ACTOR**, and
+   this rule already existed while the hazard sat in the checkout unremoved.
+   Measured 2026-08-29: `.mote/local/actor` held `claude-storymodel4s` — the
+   CHIEF — so any invocation that missed the override, or any subcommand that
+   did not thread it, posted with ruling authority. It published a substantive
+   architecture position under the chief's name; the actual author noticed and
+   corrected it append-only before the chief finished investigating. The chief
+   meanwhile chased PIDs, which prove nothing, because every `mote` call is a
+   fresh process. Fixed with `mote actor clear`: identity now resolves to
+   *actor identity unresolved* and writes fail CLOSED. The general lesson is not
+   about mote. **A rule forbidding the CREATION of a bad state does not remove
+   the instance already there** — when you write one, go and check whether the
+   state exists right now, because a prohibition is not a repair. Reserve paths with
    `mote begin <bead> --paths …` before editing (`mote preflight` first);
    never edit another actor's live reservation — send a request instead.
    `build.sbt`, `AGENTS.md`, and `README.md` edits are announced on
