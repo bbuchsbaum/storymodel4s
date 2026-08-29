@@ -203,7 +203,7 @@ class StructureSuite extends ScalaCheckSuite:
   test("sidecar manifests and refs are validated") {
     val m = SidecarManifest(sp("semantic.surface"), 384, 10, Dtype.Float32, Checksum.ofText("x"))
     assert(SidecarManifest.validated(m).isRight)
-    assertEquals(m.expectedByteLength, 384L * 10 * 4)
+    assertEquals(m.expectedByteLength, Right(384L * 10 * 4))
     assert(SidecarManifest.validated(m.copy(dimension = 0)).isLeft)
     val ok = FeatureRef(FeatureTarget.Sentence(atlas.sentences(0).id), m.space, 9)
     assert(FeatureRef.validated(ok, m).isRight)
@@ -211,6 +211,27 @@ class StructureSuite extends ScalaCheckSuite:
     assert(FeatureRef.validated(ok.copy(space = sp("other")), m).isLeft)
     assert(FeatureRef.validatedAll(Vector(ok, ok.copy(row = 0)), Map(m.space -> m)).isRight)
     assert(FeatureRef.validatedAll(Vector(ok.copy(space = sp("other"))), Map(m.space -> m)).isLeft)
+  }
+
+  test("sidecar byte length rejects the first overflowing Float64 product") {
+    val dimension = Int.MaxValue
+    val bytesPerValue = 8L
+    val lastSafeRowCount = (Long.MaxValue / bytesPerValue / dimension).toInt
+    val lastSafe = SidecarManifest(
+      sp("semantic.overflow-boundary"),
+      dimension,
+      lastSafeRowCount,
+      Dtype.Float64,
+      Checksum.ofText("boundary")
+    )
+    val firstOverflow = lastSafe.copy(rowCount = lastSafeRowCount + 1)
+
+    assertEquals(
+      lastSafe.expectedByteLength,
+      Right(dimension.toLong * lastSafeRowCount.toLong * bytesPerValue)
+    )
+    assert(firstOverflow.expectedByteLength.isLeft)
+    assert(SidecarManifest.validated(firstOverflow).isLeft)
   }
 
   test("coverage arithmetic and estimate mapping") {
