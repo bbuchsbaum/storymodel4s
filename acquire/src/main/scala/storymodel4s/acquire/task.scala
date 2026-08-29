@@ -30,11 +30,22 @@ enum TaskKind:
 final case class StandardsRef(standard: String, version: String, section: String)
 
 /** Resource limits for one task. Timeouts and retries are data so the orchestrator can budget. */
-final case class TaskBudget private (
-    maxTokens: Option[Long],
-    timeoutMillis: Long,
-    maxRetries: Int
-)
+final class TaskBudget private (
+    val maxTokens: Option[Long],
+    val timeoutMillis: Long,
+    val maxRetries: Int
+):
+  override def equals(other: Any): Boolean = other match
+    case that: TaskBudget =>
+      maxTokens == that.maxTokens &&
+      timeoutMillis == that.timeoutMillis &&
+      maxRetries == that.maxRetries
+    case _ => false
+
+  override def hashCode(): Int = (maxTokens, timeoutMillis, maxRetries).##
+
+  override def toString: String =
+    s"TaskBudget(maxTokens=$maxTokens, timeoutMillis=$timeoutMillis, maxRetries=$maxRetries)"
 
 object TaskBudget:
   def of(

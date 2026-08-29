@@ -76,17 +76,36 @@ final case class AgentCallReceipt(
   * No agent can construct a `Resolved`, mark a score calibrated, or write into a model; only the
   * deterministic resolver does that.
   */
-final case class AgentProposal[A] private (
-    taskId: TaskId,
-    value: Option[A],
-    disposition: ProposalDisposition,
-    evidence: Vector[EvidenceRef],
-    rawScore: Option[RawScore],
-    conflicts: Vector[ConflictRef],
-    receipt: AgentCallReceipt
+final class AgentProposal[A] private (
+    val taskId: TaskId,
+    val value: Option[A],
+    val disposition: ProposalDisposition,
+    val evidence: Vector[EvidenceRef],
+    val rawScore: Option[RawScore],
+    val conflicts: Vector[ConflictRef],
+    val receipt: AgentCallReceipt
 ):
   def isSubstantive: Boolean = value.isDefined
-  def map[B](f: A => B): AgentProposal[B] = copy(value = value.map(f))
+  def map[B](f: A => B): AgentProposal[B] =
+    new AgentProposal(taskId, value.map(f), disposition, evidence, rawScore, conflicts, receipt)
+
+  override def equals(other: Any): Boolean = other match
+    case that: AgentProposal[?] =>
+      taskId == that.taskId &&
+      value == that.value &&
+      disposition == that.disposition &&
+      evidence == that.evidence &&
+      rawScore == that.rawScore &&
+      conflicts == that.conflicts &&
+      receipt == that.receipt
+    case _ => false
+
+  override def hashCode(): Int =
+    (taskId, value, disposition, evidence, rawScore, conflicts, receipt).##
+
+  override def toString: String =
+    s"AgentProposal(task=${taskId.value}, disposition=$disposition, hasValue=${value.nonEmpty}, " +
+      s"evidence=${evidence.size}, conflicts=${conflicts.size})"
 
 object AgentProposal:
   import ProposalDisposition.*

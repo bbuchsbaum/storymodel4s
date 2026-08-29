@@ -63,16 +63,24 @@ enum DocumentError:
   * table nothing connects the two and kind safety cannot be checked. Validation requires every node
   * to exist in the graph and to carry a concept the kind witness accepts.
   */
-final case class MentionTable[K <: NarrativeKind] private (
-    entries: Map[MentionId[K], ChartNodeRef]
+final class MentionTable[K <: NarrativeKind] private (
+    val entries: Map[MentionId[K], ChartNodeRef]
 ):
   def node(m: MentionId[K]): Option[ChartNodeRef] = entries.get(m)
   def contains(m: MentionId[K]): Boolean = entries.contains(m)
   def mentions: Vector[MentionId[K]] = entries.keys.toVector.sorted
   def size: Int = entries.size
 
+  override def equals(other: Any): Boolean = other match
+    case that: MentionTable[?] => entries == that.entries
+    case _                     => false
+
+  override def hashCode(): Int = entries.##
+
+  override def toString: String = s"MentionTable(entries=$size)"
+
 object MentionTable:
-  def empty[K <: NarrativeKind]: MentionTable[K] = MentionTable(Map.empty)
+  def empty[K <: NarrativeKind]: MentionTable[K] = new MentionTable(Map.empty)
 
   /** Build and validate against the mention graph. */
   def of[K <: NarrativeKind](
@@ -94,4 +102,4 @@ object MentionTable:
                   if w.accepts(c.kind) then Right(acc.updated(m, node))
                   else Left(DocumentError.KindMismatch(m.value, node, c.kind, w.tag))
           }
-          .map(MentionTable(_))
+          .map(new MentionTable(_))

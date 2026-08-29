@@ -28,12 +28,21 @@ object ProjectionMode:
   * Constructed only through [[Projection.of]], which restricts the mode per kind and, for
   * `DirectMention`, checks that every source concept is of the target's kind.
   */
-final case class Projection[K <: NarrativeKind] private (
-    sources: NonEmptySet[ChartNodeRef],
-    target: CanonicalId[K],
-    mode: ProjectionMode,
-    meta: ClaimMeta
-)
+final class Projection[K <: NarrativeKind] private (
+    val sources: NonEmptySet[ChartNodeRef],
+    val target: CanonicalId[K],
+    val mode: ProjectionMode,
+    val meta: ClaimMeta
+):
+  override def equals(other: Any): Boolean = other match
+    case that: Projection[?] =>
+      sources == that.sources && target == that.target && mode == that.mode && meta == that.meta
+    case _ => false
+
+  override def hashCode(): Int = (sources, target, mode, meta).##
+
+  override def toString: String =
+    s"Projection(target=${target.value}, mode=$mode, sources=${sources.length})"
 
 object Projection:
   def of[K <: NarrativeKind](
@@ -58,7 +67,7 @@ object Projection:
                   DocumentError.SourceKindMismatch(n, c.kind, w.tag, path)
               }
           }
-      kindClash.toLeft(Projection(sources, target, mode, meta))
+      kindClash.toLeft(new Projection(sources, target, mode, meta))
 
 /** A canonical situation's truth-status inside one context: the narrative-side counterpart of an
   * embedded proposition (§47). Reported content lives under its speech context; the same content

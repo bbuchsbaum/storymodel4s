@@ -67,7 +67,7 @@ enum DetailFacet:
   * Why: every assessment axis is a distribution, not a label; hard labels are produced only by a
   * declared policy at scoring time.
   */
-final case class Distribution[A] private (weights: Map[A, Double]):
+final class Distribution[A] private (val weights: Map[A, Double]):
   def apply(a: A): Double = weights.getOrElse(a, 0.0)
   def support: Set[A] = weights.keySet
   def mass(pred: A => Boolean): Double = weights.iterator.collect {
@@ -85,13 +85,21 @@ final case class Distribution[A] private (weights: Map[A, Double]):
     weights.toVector.maxBy { case (a, w) => (w, a.toString) }._1
 
   def map[B](f: A => B): Distribution[B] =
-    Distribution(weights.groupMapReduce { case (a, _) => f(a) } { case (_, w) => w }(_ + _))
+    new Distribution(weights.groupMapReduce { case (a, _) => f(a) } { case (_, w) => w }(_ + _))
 
   /** Drop alternatives failing `pred` and renormalize; `None` when nothing is left. */
   def filter(pred: A => Boolean): Option[Distribution[A]] =
     Distribution.of(weights.filter { case (a, _) => pred(a) }).toOption
 
   def toVector: Vector[(A, Double)] = weights.toVector.sortBy { case (a, w) => (-w, a.toString) }
+
+  override def equals(other: Any): Boolean = other match
+    case that: Distribution[?] => weights == that.weights
+    case _                     => false
+
+  override def hashCode(): Int = weights.##
+
+  override def toString: String = s"Distribution(support=${weights.size})"
 
 object Distribution:
   /** Normalize nonnegative weights; fails when they are all zero or any is negative/non-finite. */

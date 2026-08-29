@@ -182,9 +182,9 @@ object MentionPosition:
   * total over the table. Positions come from the mention graph's sentence order (see
   * [[MentionPosition]]); `MentionForms.of` fails if a mention's node is absent from the graph.
   */
-final case class MentionForms private (
-    forms: Map[MentionId[EntityK], MentionForm],
-    positions: Map[MentionId[EntityK], MentionPosition]
+final class MentionForms private (
+    val forms: Map[MentionId[EntityK], MentionForm],
+    val positions: Map[MentionId[EntityK], MentionPosition]
 ):
   def formOf(m: MentionId[EntityK]): Option[MentionForm] = forms.get(m)
   def positionOf(m: MentionId[EntityK]): Option[MentionPosition] = positions.get(m)
@@ -198,6 +198,14 @@ final case class MentionForms private (
     forms.collect { case (m, f) if f.isPronominal => m }.toVector.sorted
   def introducingMentions: Vector[MentionId[EntityK]] =
     forms.collect { case (m, f) if f.isIntroducing => m }.toVector.sorted
+
+  override def equals(other: Any): Boolean = other match
+    case that: MentionForms => forms == that.forms && positions == that.positions
+    case _                  => false
+
+  override def hashCode(): Int = (forms, positions).##
+
+  override def toString: String = s"MentionForms(mentions=${forms.size})"
 
   /** Mentions in discourse order (position, then id). */
   def inDiscourseOrder: Vector[MentionId[EntityK]] =
@@ -265,7 +273,7 @@ object MentionForms:
                 case None    => Left(DocumentError.MentionNotInGraph(m.value, node, "MentionForms"))
                 case Some(r) => Right(acc.updated(m, MentionPosition(r, node.concept)))
           }
-        positioned.map(MentionForms(forms, _))
+        positioned.map(new MentionForms(forms, _))
 
   /** Infer every mention's form from its chart concept and optional aligned surface text. */
   def infer(

@@ -30,16 +30,43 @@ trait SemanticDistance:
   * that every mass lies in `(0, 1]` and every threshold in `[0, 1]`, so induction never has to cope
   * with negative remainders.
   */
-final case class InductionConfig private (
-    targetMass: Double,
-    otherMass: Double,
-    habitualMass: Double,
-    discourseMass: Double,
-    repetitionThreshold: Double,
-    continuityThreshold: Double,
-    alternativeMargin: Double,
-    softwareVersion: String
-)
+final class InductionConfig private (
+    val targetMass: Double,
+    val otherMass: Double,
+    val habitualMass: Double,
+    val discourseMass: Double,
+    val repetitionThreshold: Double,
+    val continuityThreshold: Double,
+    val alternativeMargin: Double,
+    val softwareVersion: String
+):
+  override def equals(other: Any): Boolean = other match
+    case that: InductionConfig =>
+      targetMass == that.targetMass &&
+      otherMass == that.otherMass &&
+      habitualMass == that.habitualMass &&
+      discourseMass == that.discourseMass &&
+      repetitionThreshold == that.repetitionThreshold &&
+      continuityThreshold == that.continuityThreshold &&
+      alternativeMargin == that.alternativeMargin &&
+      softwareVersion == that.softwareVersion
+    case _ => false
+
+  override def hashCode(): Int =
+    (
+      targetMass,
+      otherMass,
+      habitualMass,
+      discourseMass,
+      repetitionThreshold,
+      continuityThreshold,
+      alternativeMargin,
+      softwareVersion
+    ).##
+
+  override def toString: String =
+    s"InductionConfig(version=$softwareVersion, targetMass=$targetMass, " +
+      s"otherMass=$otherMass, habitualMass=$habitualMass, discourseMass=$discourseMass)"
 
 object InductionConfig:
   val default: InductionConfig =

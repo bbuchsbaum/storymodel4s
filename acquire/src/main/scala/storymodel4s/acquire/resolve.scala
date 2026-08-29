@@ -114,15 +114,40 @@ object ClaimFamily:
   *   - `criticBlockThreshold`: a `Blocking` finding blocks only when its raw score is at least this
   *     value or absent; low-confidence blocking findings are retained as warnings.
   */
-final case class FamilyPolicy private (
-    acceptThreshold: Probability,
-    reviewBand: Probability,
-    requireAgreement: Int,
-    requireCalibration: Boolean,
-    conservative: Boolean,
-    requireSpanEvidence: Boolean,
-    criticBlockThreshold: Double
-)
+final class FamilyPolicy private (
+    val acceptThreshold: Probability,
+    val reviewBand: Probability,
+    val requireAgreement: Int,
+    val requireCalibration: Boolean,
+    val conservative: Boolean,
+    val requireSpanEvidence: Boolean,
+    val criticBlockThreshold: Double
+):
+  override def equals(other: Any): Boolean = other match
+    case that: FamilyPolicy =>
+      acceptThreshold == that.acceptThreshold &&
+      reviewBand == that.reviewBand &&
+      requireAgreement == that.requireAgreement &&
+      requireCalibration == that.requireCalibration &&
+      conservative == that.conservative &&
+      requireSpanEvidence == that.requireSpanEvidence &&
+      criticBlockThreshold == that.criticBlockThreshold
+    case _ => false
+
+  override def hashCode(): Int =
+    (
+      acceptThreshold,
+      reviewBand,
+      requireAgreement,
+      requireCalibration,
+      conservative,
+      requireSpanEvidence,
+      criticBlockThreshold
+    ).##
+
+  override def toString: String =
+    s"FamilyPolicy(accept=${acceptThreshold.value}, review=${reviewBand.value}, " +
+      s"agreement=$requireAgreement, calibration=$requireCalibration, conservative=$conservative)"
 
 object FamilyPolicy:
   val DefaultCriticBlockThreshold: Double = 0.5
