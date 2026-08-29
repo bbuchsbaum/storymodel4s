@@ -4,6 +4,69 @@ import munit.FunSuite
 
 import storymodel4s.core.{DomainError, TextSpan}
 
+private[embed] object PseudonymizedTextTestSupport:
+  def legacyV1(
+      policyId: PrivacyPolicyId,
+      keyId: KeyId,
+      sourceText: String,
+      text: String,
+      offsets: Vector[(TextSpan, TextSpan)],
+      keys: SensitiveKeyProvider
+  ): Either[DomainError, PseudonymizedText] =
+    for
+      _ <- PseudonymizedText.validateUtf16(sourceText, "source")
+      _ <- PseudonymizedText.validateUtf16(text, "destination")
+      _ <- PseudonymizedText.validateMap(sourceText, text, offsets)
+      digest <- ReceiptDigest
+        .keyedUnder(keyId, ReceiptRendering.pseudonymized(policyId, keyId, text), keys)
+        .left
+        .map(error => DomainError.InvariantViolation(PseudonymizedText.KeyPath, error.message))
+    yield new PseudonymizedText(
+      policyId,
+      keyId,
+      text,
+      offsets,
+      None,
+      None,
+      digest,
+      detectorCertified = false
+    )
+
+  def substituteDetections(
+      payload: PseudonymizedText,
+      sourceDetection: Option[PseudonymizationDetection],
+      destinationDetection: Option[PseudonymizationDetection],
+      keys: SensitiveKeyProvider
+  ): Either[DomainError, PseudonymizedText] =
+    val rendering = (sourceDetection, destinationDetection) match
+      case (Some(source), Some(destination)) =>
+        ReceiptRendering.pseudonymizedV2(
+          payload.policyId,
+          payload.keyId,
+          payload.text,
+          payload.offsets,
+          source,
+          destination
+        )
+      case _ =>
+        ReceiptRendering.pseudonymized(payload.policyId, payload.keyId, payload.text)
+    ReceiptDigest
+      .keyedUnder(payload.keyId, rendering, keys)
+      .left
+      .map(error => DomainError.InvariantViolation(PseudonymizedText.KeyPath, error.message))
+      .map(digest =>
+        new PseudonymizedText(
+          payload.policyId,
+          payload.keyId,
+          payload.text,
+          payload.offsets,
+          sourceDetection,
+          destinationDetection,
+          digest,
+          detectorCertified = false
+        )
+      )
+
 class PrivacySuite extends FunSuite:
 
   private val policy = PrivacyPolicyId.unsafe("policy")
@@ -13,33 +76,30 @@ class PrivacySuite extends FunSuite:
 
   private def detectorFor(
       source: String,
-      destination: String,
-      sourceSpans: Vector[TextSpan],
-      destinationSpans: Vector[TextSpan]
+      sourceSpans: Vector[TextSpan]
   ): Either[DomainError, PseudonymizationDetector] =
-    PseudonymizationDetector.checked(
-      PseudonymizationDetectorId.unsafe("storymodel4s.test.detector/v1"),
-      "test-detector/v1|mode=exact-fixture",
-      text =>
-        if text == source then sourceSpans
-        else if text == destination then destinationSpans
-        else Vector.empty
+    val validSpans = sourceSpans.filter(span =>
+      span.endExclusive <= source.length &&
+        PseudonymizedText.isCodePointBoundary(source, span.start) &&
+        PseudonymizedText.isCodePointBoundary(source, span.endExclusive)
+    )
+    PseudonymizationDetector.wholeWordTable(
+      validSpans.map(span =>
+        PseudonymizationTableEntry(
+          source.substring(span.start, span.endExclusive),
+          "[REDACTED]"
+        )
+      )
     )
 
   private def checked(
       source: String,
       destination: String,
       offsets: Vector[(TextSpan, TextSpan)],
-      detectedSourceSpans: Option[Vector[TextSpan]] = None,
-      detectedDestinationSpans: Vector[TextSpan] = Vector.empty
+      detectedSourceSpans: Option[Vector[TextSpan]] = None
   ): Either[DomainError, PseudonymizedText] =
     for
-      detector <- detectorFor(
-        source,
-        destination,
-        detectedSourceSpans.getOrElse(offsets.map(_._1)),
-        detectedDestinationSpans
-      )
+      detector <- detectorFor(source, detectedSourceSpans.getOrElse(offsets.map(_._1)))
       sourceDetection <- detector.detect(source, key, suiteKeys)
       payload <- PseudonymizedText.checked(
         policy,
@@ -114,52 +174,30 @@ class PrivacySuite extends FunSuite:
     assert(!result.toOption.get.toString.contains("PERSON"))
   }
 
-  test("detector factory requires versioned identities and validates minted spans") {
+  test("whole-word detector factory rejects malformed table data") {
     assert(
       PseudonymizationDetector
-        .checked(
-          PseudonymizationDetectorId.unsafe("unversioned"),
-          "config/v1",
-          _ => Vector.empty
-        )
+        .wholeWordTable(Vector(PseudonymizationTableEntry("", "[P1]")))
         .isLeft
     )
     assert(
       PseudonymizationDetector
-        .checked(
-          PseudonymizationDetectorId.unsafe("detector/v1"),
-          "unversioned",
-          _ => Vector.empty
-        )
+        .wholeWordTable(Vector(PseudonymizationTableEntry("Jane", "")))
         .isLeft
     )
     assert(
       PseudonymizationDetector
-        .checked(
-          PseudonymizationDetectorId.unsafe("detector/v1"),
-          "config/v1|malformed=\ud83d",
-          _ => Vector.empty
+        .wholeWordTable(
+          Vector(PseudonymizationTableEntry("Jane", "[P1]\ud83d"))
         )
         .isLeft
     )
-
-    val invalid = PseudonymizationDetector
-      .checked(
-        PseudonymizationDetectorId.unsafe("detector/v1"),
-        "config/v1|mode=invalid-span-fixture",
-        _ => Vector(TextSpan.unsafe(0, 2), TextSpan.unsafe(1, 3))
-      )
-      .toOption
-      .get
-    assert(invalid.detect("Jane", key, suiteKeys).isLeft)
   }
 
   test("detection receipts retain only keyed identities and offsets") {
     val detector = PseudonymizationDetector
-      .checked(
-        PseudonymizationDetectorId.unsafe("detector.safe/v1"),
-        "secret-config/v1|surface=Jane|pseudonym=[PERSON_1]",
-        text => if text == "Jane" then Vector(TextSpan.unsafe(0, 4)) else Vector.empty
+      .wholeWordTable(
+        Vector(PseudonymizationTableEntry("Jane", "[PERSON_1]"))
       )
       .toOption
       .get
@@ -176,7 +214,7 @@ class PrivacySuite extends FunSuite:
     val source = "Jane"
     val destination = "[PERSON_1]"
     val offsets = Vector(TextSpan.unsafe(0, 4) -> TextSpan.unsafe(0, 10))
-    val detector = detectorFor(source, destination, offsets.map(_._1), Vector.empty).toOption.get
+    val detector = detectorFor(source, offsets.map(_._1)).toOption.get
     val sourceDetection = detector.detect(source, key, suiteKeys).toOption.get
     val keyBytes = Array[Byte](3, 5, 7, 11, 13, 17, 19, 23)
     var reads = 0
@@ -199,6 +237,35 @@ class PrivacySuite extends FunSuite:
 
     assert(result.isRight)
     assertEquals(reads, 1)
+  }
+
+  test("detector snapshots reject empty key material") {
+    val detector = PseudonymizationDetector
+      .wholeWordTable(Vector(PseudonymizationTableEntry("Jane", "[P1]")))
+      .toOption
+      .get
+    val emptyKeys = SensitiveKeyProvider.static(key, Array.emptyByteArray)
+
+    assert(detector.detect("Jane", key, emptyKeys).isLeft)
+    assert(detector.policyIdentity(key, emptyKeys).isLeft)
+  }
+
+  test("a zero-hit source cannot be detector-certified as pseudonymized") {
+    val detector = PseudonymizationDetector.wholeWordTable(Vector.empty).toOption.get
+    val sourceDetection = detector.detect("", key, suiteKeys).toOption.get
+    val result = PseudonymizedText.checked(
+      policy,
+      key,
+      "",
+      "",
+      Vector.empty,
+      sourceDetection,
+      detector,
+      suiteKeys
+    )
+
+    assert(result.isLeft)
+    assert(result.left.toOption.get.message.contains("detected source span"))
   }
 
   test("raw sensitive surface text cannot be laundered through an empty offset map") {
@@ -402,28 +469,25 @@ class PrivacySuite extends FunSuite:
     assert(!result.left.toOption.get.message.contains("Bob"))
   }
 
-  test("destination re-detection catches a deliberately under-detecting source detector") {
-    def firstJane(text: String): Vector[TextSpan] =
-      val first = text.indexOf("Jane")
-      if first < 0 then Vector.empty else Vector(TextSpan.unsafe(first, first + 4))
-
+  test("destination re-detection catches a residual table surface") {
     val detector = PseudonymizationDetector
-      .checked(
-        PseudonymizationDetectorId.unsafe("storymodel4s.test.underdetector/v1"),
-        "under-detector/v1|surface=redacted",
-        firstJane
+      .wholeWordTable(
+        Vector(
+          PseudonymizationTableEntry("Jane", "[P1]"),
+          PseudonymizationTableEntry("Bob", "[P2]")
+        )
       )
       .toOption
       .get
-    val source = "Jane met Jane"
-    val destination = "[P1] met Jane"
+    val source = "Jane"
+    val destination = "Bob"
     val sourceDetection = detector.detect(source, key, suiteKeys).toOption.get
     val result = PseudonymizedText.checked(
       policy,
       key,
       source,
       destination,
-      Vector(TextSpan.unsafe(0, 4) -> TextSpan.unsafe(0, 4)),
+      Vector(TextSpan.unsafe(0, 4) -> TextSpan.unsafe(0, 3)),
       sourceDetection,
       detector,
       suiteKeys
@@ -432,6 +496,36 @@ class PrivacySuite extends FunSuite:
     assert(result.isLeft)
     assert(result.left.toOption.get.message.contains("destination"))
     assert(!result.left.toOption.get.message.contains("Jane"))
+  }
+
+  test("trusted table identity cannot be paired with foreign detector behaviour") {
+    val table = Vector(
+      PseudonymizationTableEntry("Jane", "[P1]"),
+      PseudonymizationTableEntry("Bob", "[P2]"),
+      PseudonymizationTableEntry("Smith", "[P3]")
+    )
+    val detector = PseudonymizationDetector.wholeWordTable(table).toOption.get
+    val source = "Jane met Bob and Smith."
+    val sourceDetection = detector.detect(source, key, suiteKeys).toOption.get
+    val attemptedLaundering = PseudonymizedText.checked(
+      policy,
+      key,
+      source,
+      "[P1] met Bob and Smith.",
+      Vector(TextSpan.unsafe(0, 4) -> TextSpan.unsafe(0, 4)),
+      sourceDetection,
+      detector,
+      suiteKeys
+    )
+
+    assertEquals(
+      sourceDetection.spans,
+      Vector(TextSpan.unsafe(0, 4), TextSpan.unsafe(9, 12), TextSpan.unsafe(17, 22))
+    )
+    assert(attemptedLaundering.isLeft)
+    assert(!attemptedLaundering.left.toOption.get.message.contains("Jane"))
+    assert(!attemptedLaundering.left.toOption.get.message.contains("Bob"))
+    assert(!attemptedLaundering.left.toOption.get.message.contains("Smith"))
   }
 
   test("RemotePolicy authorization uses the sanitized value carried by the request") {
@@ -496,8 +590,8 @@ class PrivacySuite extends FunSuite:
         .isLeft
     )
 
-    val absent = PseudonymizedText
-      .legacyV1ForTest(
+    val absent = PseudonymizedTextTestSupport
+      .legacyV1(
         policy,
         key,
         "Jane Smith",
@@ -512,8 +606,8 @@ class PrivacySuite extends FunSuite:
       "[PERSON_1]",
       Vector(TextSpan.unsafe(0, 10) -> TextSpan.unsafe(0, 10))
     ).toOption.get
-    val swapped = PseudonymizedText
-      .substituteDetectionsForTest(
+    val swapped = PseudonymizedTextTestSupport
+      .substituteDetections(
         payload,
         other.sourceDetection,
         payload.destinationDetection,

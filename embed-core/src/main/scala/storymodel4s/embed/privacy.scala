@@ -88,16 +88,28 @@ final class PseudonymizationDetection private[embed] (
 
   override def toString: String = render
 
-/** A closed detector whose final `detect` method alone mints detection evidence.
+/** One row in the closed whole-word detector algorithm.
   *
-  * Implementations supply a private canonical configuration rendering and a pure span finder. The
-  * factory and receipt construction remain final, so evidence always records the same algorithm,
-  * keyed configuration, keyed source, and ordered spans.
+  * The pseudonym participates in configuration identity even though detection depends on the source
+  * surface and case rule. [[PseudonymizationDetector.wholeWordTable]] validates the complete table
+  * before constructing a detector.
+  */
+final case class PseudonymizationTableEntry(
+    surface: String,
+    pseudonym: String,
+    caseInsensitive: Boolean = false
+)
+
+/** A closed detector whose identity completely determines its span-finding behaviour.
+  *
+  * The only public factory is [[PseudonymizationDetector.wholeWordTable]]; callers supply typed
+  * table data, never an executable finder. The final `detect` method runs embed-core's fixed
+  * Unicode whole-word algorithm and alone mints evidence.
   */
 final class PseudonymizationDetector private (
     val id: PseudonymizationDetectorId,
     configuration: String,
-    findSpans: String => Vector[TextSpan]
+    entries: Vector[PseudonymizationTableEntry]
 ):
   private def policyIdentityUnder(
       keyId: KeyId,
@@ -138,40 +150,35 @@ final class PseudonymizationDetector private (
         ReceiptRendering.detectorSource(id, identity.configurationDigest, text),
         stableKeys
       )
-      spans = findSpans(text)
-      _ <- PseudonymizationDetector.validateSpans(text, spans)
+      spans <- detectedSpans(text)
     yield new PseudonymizationDetection(id, identity.configurationDigest, sourceDigest, spans)
+
+  private[storymodel4s] def detectedSpans(text: String): Either[DomainError, Vector[TextSpan]] =
+    for
+      _ <- PseudonymizedText.validateUtf16(text, "pseudonymizationDetector/source")
+      spans = PseudonymizationDetector.detectTable(text, entries)
+      _ <- PseudonymizationDetector.validateSpans(text, spans)
+    yield spans
 
   override def toString: String = s"PseudonymizationDetector(${id.value}, <redacted>)"
 
 object PseudonymizationDetector:
-  private val VersionTag = "[a-z][a-z0-9.-]*/v[1-9][0-9]*".r
+  private val WholeWordTableId =
+    PseudonymizationDetectorId.unsafe("storymodel4s.whole-word-table/v1")
+  private val WholeWordTableVersion = "whole-word-table/v1"
 
-  /** Create a detector from versioned canonical configuration material and a pure span finder. */
-  def checked(
-      id: PseudonymizationDetectorId,
-      configuration: String,
-      findSpans: String => Vector[TextSpan]
+  /** Create the fixed Unicode whole-word detector from typed table data.
+    *
+    * There is deliberately no factory accepting a function: equal detector identities therefore
+    * imply equal span-finding behaviour.
+    */
+  def wholeWordTable(
+      entries: Vector[PseudonymizationTableEntry]
   ): Either[DomainError, PseudonymizationDetector] =
-    val configurationVersion = configuration.takeWhile(c => c != '|' && c != '\n')
-    if !VersionTag.pattern.matcher(id.value).matches() then
-      Left(
-        DomainError.InvariantViolation(
-          "pseudonymizationDetector/id",
-          "detector identity must include an algorithm version"
-        )
-      )
-    else if !VersionTag.pattern.matcher(configurationVersion).matches() then
-      Left(
-        DomainError.InvariantViolation(
-          "pseudonymizationDetector/configuration",
-          "configuration must start with a canonical version tag"
-        )
-      )
-    else
-      PseudonymizedText
-        .validateUtf16(configuration, "pseudonymizationDetector/configuration")
-        .map(_ => new PseudonymizationDetector(id, configuration, findSpans))
+    validateTable(entries).map { _ =>
+      val canonical = canonicalTable(entries)
+      new PseudonymizationDetector(WholeWordTableId, canonical, entries)
+    }
 
   private def keyedDigest(
       path: String,
@@ -188,21 +195,139 @@ object PseudonymizationDetector:
         case error => DomainError.InvariantViolation(path, error.message)
       }
 
-  private[embed] def snapshotKeys(
+  private[storymodel4s] def snapshotKeys(
       keyId: KeyId,
       keys: SensitiveKeyProvider
   ): Either[DomainError, SensitiveKeyProvider] =
-    keys.key(keyId) match
-      case None =>
-        Left(
-          DomainError.InvariantViolation(
-            PseudonymizedText.KeyPath,
-            EmbedError.NoKey(keyId.value).message
-          )
-        )
-      case Some(bytes) =>
-        val snapshot = java.util.Arrays.copyOf(bytes, bytes.length)
-        Right(SensitiveKeyProvider.static(keyId, snapshot))
+    SensitiveKeySnapshot
+      .capture(keyId, keys)
+      .left
+      .map(error => DomainError.InvariantViolation(PseudonymizedText.KeyPath, error.message))
+      .map(_.provider)
+
+  private def validateTable(
+      entries: Vector[PseudonymizationTableEntry]
+  ): Either[DomainError, Unit] =
+    entries.zipWithIndex
+      .foldLeft[Either[DomainError, Unit]](Right(())) { case (validated, (entry, index)) =>
+        validated.flatMap { _ =>
+          if entry.surface.isEmpty then
+            Left(
+              DomainError.InvariantViolation(
+                s"pseudonymizationDetector/table/$index/surface",
+                "detector surfaces must be nonempty"
+              )
+            )
+          else if entry.pseudonym.isEmpty then
+            Left(
+              DomainError.InvariantViolation(
+                s"pseudonymizationDetector/table/$index/pseudonym",
+                "relational pseudonyms must be nonempty"
+              )
+            )
+          else
+            PseudonymizedText
+              .validateUtf16(entry.surface, s"pseudonymizationDetector/table/$index/surface")
+              .flatMap(_ =>
+                PseudonymizedText.validateUtf16(
+                  entry.pseudonym,
+                  s"pseudonymizationDetector/table/$index/pseudonym"
+                )
+              )
+        }
+      }
+      .flatMap { _ =>
+        entries
+          .combinations(2)
+          .collectFirst {
+            case Vector(left, right)
+                if left.pseudonym != right.pseudonym &&
+                  left.surface.length == right.surface.length &&
+                  (left.surface == right.surface ||
+                    (left.caseInsensitive || right.caseInsensitive) &&
+                    regionMatches(left.surface, 0, right.surface, caseInsensitive = true)) =>
+              DomainError.InvariantViolation(
+                "pseudonymizationDetector/table",
+                "overlapping detector surfaces cannot map to multiple pseudonyms"
+              )
+          }
+          .toLeft(())
+      }
+
+  private def canonicalTable(entries: Vector[PseudonymizationTableEntry]): String =
+    val ordered = entries.sortBy(entry => (entry.surface, entry.pseudonym, entry.caseInsensitive))
+    (Vector(WholeWordTableVersion, s"table|entry-count=${ordered.size}") ++
+      ordered.map(entry =>
+        s"entry|surface=${ReceiptRendering.esc(entry.surface)}|pseudonym=${ReceiptRendering.esc(entry.pseudonym)}|case-insensitive=${entry.caseInsensitive}"
+      )).mkString("\n")
+
+  private def isWordCodePoint(codePoint: Int): Boolean =
+    Character.isLetterOrDigit(codePoint) || (Character.getType(codePoint) match
+      case Character.NON_SPACING_MARK | Character.COMBINING_SPACING_MARK |
+          Character.ENCLOSING_MARK =>
+        true
+      case _ => false)
+
+  private def boundaryBefore(text: String, index: Int): Boolean =
+    index == 0 || !isWordCodePoint(text.codePointBefore(index))
+
+  private def boundaryAfter(text: String, index: Int): Boolean =
+    index >= text.length || !isWordCodePoint(text.codePointAt(index))
+
+  private def regionMatches(
+      text: String,
+      at: Int,
+      surface: String,
+      caseInsensitive: Boolean
+  ): Boolean =
+    if !caseInsensitive then text.regionMatches(false, at, surface, 0, surface.length)
+    else
+      var textIndex = at
+      var surfaceIndex = 0
+      val textEnd = at + surface.length
+      var same = textEnd <= text.length
+      while same && textIndex < textEnd && surfaceIndex < surface.length do
+        val textCodePoint = text.codePointAt(textIndex)
+        val surfaceCodePoint = surface.codePointAt(surfaceIndex)
+        same = textCodePoint == surfaceCodePoint ||
+          Character.toUpperCase(textCodePoint) == Character.toUpperCase(surfaceCodePoint) ||
+          Character.toLowerCase(textCodePoint) == Character.toLowerCase(surfaceCodePoint)
+        textIndex += Character.charCount(textCodePoint)
+        surfaceIndex += Character.charCount(surfaceCodePoint)
+      same && textIndex == textEnd && surfaceIndex == surface.length
+
+  private def occurrences(
+      text: String,
+      surface: String,
+      caseInsensitive: Boolean
+  ): Vector[TextSpan] =
+    val out = Vector.newBuilder[TextSpan]
+    var index = 0
+    val width = surface.length
+    while index + width <= text.length do
+      if regionMatches(text, index, surface, caseInsensitive) && boundaryBefore(
+          text,
+          index
+        ) && boundaryAfter(text, index + width)
+      then
+        out += TextSpan.unsafe(index, index + width)
+        index += width
+      else index += Character.charCount(text.codePointAt(index))
+    out.result()
+
+  private def detectTable(
+      text: String,
+      entries: Vector[PseudonymizationTableEntry]
+  ): Vector[TextSpan] =
+    entries
+      .sortBy(entry =>
+        (-entry.surface.length, entry.surface, entry.pseudonym, entry.caseInsensitive)
+      )
+      .flatMap(entry => occurrences(text, entry.surface, entry.caseInsensitive))
+      .sortBy(span => (span.start, -span.length))
+      .foldLeft(Vector.empty[TextSpan]) { (accepted, candidate) =>
+        if accepted.exists(_.overlaps(candidate)) then accepted else accepted :+ candidate
+      }
 
   private def validateSpans(text: String, spans: Vector[TextSpan]): Either[DomainError, Unit] =
     var previousEnd = 0
@@ -230,7 +355,7 @@ object PseudonymizationDetector:
   * [[EmbedPayload.Sanitized]] by choosing that enum case. A checked value retains the exact source
   * detection and the zero-residual destination detection that certified it.
   */
-final class PseudonymizedText private (
+final class PseudonymizedText private[embed] (
     val policyId: PrivacyPolicyId,
     val keyId: KeyId,
     val text: String,
@@ -316,6 +441,14 @@ object PseudonymizedText:
         )
       )
       _ <- Either.cond(
+        sourceDetection.spans.nonEmpty,
+        (),
+        DomainError.InvariantViolation(
+          "pseudonymizedText/sourceDetection/spans",
+          "a detector-certified transformation requires at least one detected source span"
+        )
+      )
+      _ <- Either.cond(
         sourceDetection.spans == offsets.map(_._1),
         (),
         DomainError.InvariantViolation(
@@ -357,70 +490,6 @@ object PseudonymizedText:
       digest,
       detectorCertified = true
     )
-
-  /** Test-only legacy seam proving that a keyed `pseudo/v1` value without detection is denied. */
-  private[embed] def legacyV1ForTest(
-      policyId: PrivacyPolicyId,
-      keyId: KeyId,
-      sourceText: String,
-      text: String,
-      offsets: Vector[(TextSpan, TextSpan)],
-      keys: SensitiveKeyProvider
-  ): Either[DomainError, PseudonymizedText] =
-    for
-      _ <- validateUtf16(sourceText, "source")
-      _ <- validateUtf16(text, "destination")
-      _ <- validateMap(sourceText, text, offsets)
-      digest <- ReceiptDigest
-        .keyedUnder(keyId, ReceiptRendering.pseudonymized(policyId, keyId, text), keys)
-        .left
-        .map(e => DomainError.InvariantViolation(KeyPath, e.message))
-    yield new PseudonymizedText(
-      policyId,
-      keyId,
-      text,
-      offsets,
-      None,
-      None,
-      digest,
-      detectorCertified = false
-    )
-
-  /** Test-only corruption seam: recompute identity for substituted evidence but do not certify it.
-    */
-  private[embed] def substituteDetectionsForTest(
-      payload: PseudonymizedText,
-      sourceDetection: Option[PseudonymizationDetection],
-      destinationDetection: Option[PseudonymizationDetection],
-      keys: SensitiveKeyProvider
-  ): Either[DomainError, PseudonymizedText] =
-    val rendering = (sourceDetection, destinationDetection) match
-      case (Some(source), Some(destination)) =>
-        ReceiptRendering.pseudonymizedV2(
-          payload.policyId,
-          payload.keyId,
-          payload.text,
-          payload.offsets,
-          source,
-          destination
-        )
-      case _ => ReceiptRendering.pseudonymized(payload.policyId, payload.keyId, payload.text)
-    ReceiptDigest
-      .keyedUnder(payload.keyId, rendering, keys)
-      .left
-      .map(e => DomainError.InvariantViolation(KeyPath, e.message))
-      .map(digest =>
-        new PseudonymizedText(
-          payload.policyId,
-          payload.keyId,
-          payload.text,
-          payload.offsets,
-          sourceDetection,
-          destinationDetection,
-          digest,
-          detectorCertified = false
-        )
-      )
 
   private[embed] def validateMap(
       sourceText: String,

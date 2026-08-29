@@ -142,23 +142,6 @@ object ReidentificationKey:
 object Pseudonymizer:
   private final case class Match(span: TextSpan, entry: PseudonymEntry)
 
-  private val DetectorId =
-    PseudonymizationDetectorId.unsafe("storymodel4s.interview.table/v1")
-  private val ConfigurationVersion = "interview-pseudonym-table/v1"
-
-  private def isWordChar(cp: Int): Boolean =
-    Character.isLetterOrDigit(cp) || (Character.getType(cp) match
-      case Character.NON_SPACING_MARK | Character.COMBINING_SPACING_MARK |
-          Character.ENCLOSING_MARK =>
-        true
-      case _ => false)
-
-  private def boundaryBefore(text: String, i: Int): Boolean =
-    i == 0 || !isWordChar(text.codePointBefore(i))
-
-  private def boundaryAfter(text: String, end: Int): Boolean =
-    end >= text.length || !isWordChar(text.codePointAt(end))
-
   private def regionMatches(text: String, at: Int, surface: String, ci: Boolean): Boolean =
     if !ci then text.regionMatches(false, at, surface, 0, surface.length)
     else
@@ -176,97 +159,52 @@ object Pseudonymizer:
         surfaceIndex += Character.charCount(surfaceCodePoint)
       same && textIndex == textEnd && surfaceIndex == surface.length
 
-  /** All whole-word occurrences of `surface` in `text`, left to right. */
+  /** Whole-word occurrences through embed-core's closed detector, exposed only for fixture laws. */
   private[interview] def occurrences(
       text: String,
       surface: String,
       caseInsensitive: Boolean
   ): Vector[TextSpan] =
-    val out = Vector.newBuilder[TextSpan]
-    var i = 0
-    val n = surface.length
-    while i + n <= text.length do
-      if regionMatches(text, i, surface, caseInsensitive) && boundaryBefore(
-          text,
-          i
-        ) && boundaryAfter(text, i + n)
-      then
-        out += TextSpan.unsafe(i, i + n)
-        i += n
-      else i += 1
-    out.result()
-
-  private def validateTable(table: Vector[PseudonymEntry]): Either[DomainError, Unit] =
-    table.zipWithIndex.collectFirst {
-      case (entry, index) if entry.surface.isEmpty =>
-        DomainError.InvariantViolation(
-          s"pseudonymize/table/$index/surface",
-          "detector surfaces must be nonempty"
-        )
-      case (entry, index) if entry.pseudonym.isEmpty =>
-        DomainError.InvariantViolation(
-          s"pseudonymize/table/$index/pseudonym",
-          "relational pseudonyms must be nonempty"
-        )
-    } match
-      case Some(error) => Left(error)
-      case None        =>
-        table
-          .combinations(2)
-          .collectFirst {
-            case Vector(left, right)
-                if left.pseudonym != right.pseudonym &&
-                  left.surface.length == right.surface.length &&
-                  (left.surface == right.surface ||
-                    (left.caseInsensitive || right.caseInsensitive) &&
-                    regionMatches(left.surface, 0, right.surface, ci = true)) =>
-              DomainError.InvariantViolation(
-                "pseudonymize/table",
-                "overlapping detector surfaces cannot map to multiple pseudonyms"
-              )
-          }
-          .toLeft(())
-
-  private def detect(text: String, table: Vector[PseudonymEntry]): Vector[Match] =
-    table
-      .sortBy(e => (-e.surface.length, e.surface, e.pseudonym, e.caseInsensitive))
-      .flatMap(e => occurrences(text, e.surface, e.caseInsensitive).map(Match(_, e)))
-      .sortBy(m => (m.span.start, -m.span.length, m.entry.pseudonym))
-      .foldLeft(Vector.empty[Match]) { (accepted, candidate) =>
-        if accepted.exists(_.span.overlaps(candidate.span)) then accepted else accepted :+ candidate
-      }
+    PseudonymizationDetector
+      .wholeWordTable(
+        Vector(PseudonymizationTableEntry(surface, "[FIXTURE]", caseInsensitive))
+      )
+      .flatMap(_.detectedSpans(text))
+      .getOrElse(Vector.empty)
 
   private def detector(
       table: Vector[PseudonymEntry]
   ): Either[DomainError, PseudonymizationDetector] =
-    PseudonymizationDetector.checked(
-      DetectorId,
-      canonicalConfiguration(table),
-      text => detect(text, table).map(_.span)
+    PseudonymizationDetector.wholeWordTable(
+      table.map(entry =>
+        PseudonymizationTableEntry(entry.surface, entry.pseudonym, entry.caseInsensitive)
+      )
     )
 
-  private def canonicalConfiguration(table: Vector[PseudonymEntry]): String =
-    val entries = table.sortBy(entry => (entry.surface, entry.pseudonym, entry.caseInsensitive))
-    (Vector(ConfigurationVersion, s"table|entry-count=${entries.size}") ++
-      entries.map(entry =>
-        s"entry|surface=${ReceiptRendering.esc(entry.surface)}|pseudonym=${ReceiptRendering.esc(entry.pseudonym)}|case-insensitive=${entry.caseInsensitive}"
-      )).mkString("\n")
-
-  private def snapshotKeys(
-      keyId: KeyId,
-      keys: SensitiveKeyProvider
-  ): Either[DomainError, SensitiveKeyProvider] =
-    keys.key(keyId) match
-      case None =>
-        Left(
-          DomainError.InvariantViolation(
-            PseudonymizedText.KeyPath,
-            EmbedError.NoKey(keyId.value).message
-          )
-        )
-      case Some(bytes) =>
-        val snapshot = java.util.Arrays.copyOf(bytes, bytes.length)
-        Right(SensitiveKeyProvider.static(keyId, snapshot))
+  private def matchesForDetection(
+      text: String,
+      table: Vector[PseudonymEntry],
+      spans: Vector[TextSpan]
+  ): Either[DomainError, Vector[Match]] =
+    val ordered =
+      table.sortBy(entry => (-entry.surface.length, entry.surface, entry.pseudonym))
+    spans.zipWithIndex.foldLeft[Either[DomainError, Vector[Match]]](Right(Vector.empty)) {
+      case (matches, (span, index)) =>
+        matches.flatMap { accepted =>
+          ordered
+            .find(entry =>
+              entry.surface.length == span.length &&
+                regionMatches(text, span.start, entry.surface, entry.caseInsensitive)
+            )
+            .map(entry => accepted :+ Match(span, entry))
+            .toRight(
+              DomainError.InvariantViolation(
+                s"pseudonymize/detection/$index",
+                "detected span has no canonical table entry"
+              )
+            )
+        }
+    }
 
   /** Bind this exact pseudonym table and case policy for a remote-policy detector allowlist. */
   def detectorPolicyIdentity(
@@ -275,8 +213,7 @@ object Pseudonymizer:
       keys: SensitiveKeyProvider
   ): Either[DomainError, DetectorPolicyIdentity] =
     for
-      _ <- validateTable(table)
-      stableKeys <- snapshotKeys(keyId, keys)
+      stableKeys <- PseudonymizationDetector.snapshotKeys(keyId, keys)
       tableDetector <- detector(table)
       identity <- tableDetector.policyIdentity(keyId, stableKeys)
     yield identity
@@ -294,19 +231,18 @@ object Pseudonymizer:
       keys: SensitiveKeyProvider
   ): Either[DomainError, (PseudonymizedTranscript, ReidentificationKey)] =
     for
-      _ <- validateTable(table)
-      stableKeys <- snapshotKeys(keyId, keys)
+      stableKeys <- PseudonymizationDetector.snapshotKeys(keyId, keys)
       detector <- detector(table)
-      matches = detect(source.canonicalText, table)
+      sourceDetection <- detector.detect(source.canonicalText, keyId, stableKeys)
       _ <- Either.cond(
-        matches.nonEmpty,
+        sourceDetection.spans.nonEmpty,
         (),
         DomainError.InvariantViolation(
           "pseudonymize/detection",
           "the detector found no replaceable surface"
         )
       )
-      sourceDetection <- detector.detect(source.canonicalText, keyId, stableKeys)
+      matches <- matchesForDetection(source.canonicalText, table, sourceDetection.spans)
       rendered = render(source.canonicalText, matches)
       (text, offsets, originals) = rendered
       sanitized <- StorySource.fromText(

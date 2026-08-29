@@ -33,13 +33,16 @@ class DigestPrivacySuite extends FunSuite:
       offsets: Vector[(TextSpan, TextSpan)],
       keys: SensitiveKeyProvider
   ): Either[DomainError, PseudonymizedText] =
-    val spanConfiguration =
-      offsets.map(_._1).map(s => s"${s.start}:${s.endExclusive}").mkString(",")
     for
-      detector <- PseudonymizationDetector.checked(
-        PseudonymizationDetectorId.unsafe("storymodel4s.test.digest/v1"),
-        s"digest-test/v1|source-spans=$spanConfiguration",
-        text => if text == source then offsets.map(_._1) else Vector.empty
+      detector <- PseudonymizationDetector.wholeWordTable(
+        offsets
+          .map(_._1)
+          .map(span =>
+            PseudonymizationTableEntry(
+              source.substring(span.start, span.endExclusive),
+              "[REDACTED]"
+            )
+          )
       )
       detection <- detector.detect(source, keyId, keys)
       payload <- PseudonymizedText.checked(

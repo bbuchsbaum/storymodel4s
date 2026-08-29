@@ -236,13 +236,15 @@ enum FidelityMode:
   source-span text and whose unmapped gaps remain identical. It also requires an
   unforgeable source detection receipt
   whose ordered spans equal the source side of the map, then independently reruns
-  the same detector on the destination and requires a zero-span receipt.
-- `PseudonymizationDetector` is a final factory-owned contract: implementations
-  supply only a pure span finder and a confidential versioned configuration; only
-  embed-core mints `PseudonymizationDetection`. Detection identity is the
+  the same detector on the destination and requires a zero-span receipt. A
+  zero-hit source is not a pseudonymization and cannot be certified.
+- `PseudonymizationDetector` is a final factory-owned contract whose identity
+  determines behaviour. Its public factory accepts typed whole-word table rows,
+  never an executable span finder; embed-core owns the fixed Unicode matcher,
+  canonical configuration, and `PseudonymizationDetection` construction. Detection identity is the
   algorithm/version `PseudonymizationDetectorId`, `Keyed` HMAC of canonical
   configuration, `Keyed` HMAC of canonical source text, and ordered spans. The
-  interview table configuration is `interview-pseudonym-table/v1`, with records
+  table configuration is `whole-word-table/v1`, with records
   in this exact order: version; `table|entry-count`; sorted
   `entry|surface|pseudonym|case-insensitive` records, using
   `ReceiptRendering.esc`; changing field order, escaping, or case semantics is a
@@ -250,8 +252,11 @@ enum FidelityMode:
   `PseudonymizedText` retains source and zero-residual destination receipts, and
   `pseudo/v2` binds policy, key, sanitized text, offset map, and both receipt
   identities. `pseudo/v1` remains the pre-detector rendering; it is never silently
-  reinterpreted as v2, and a private test-only legacy value is denied by
+  reinterpreted as v2, and a legacy value constructed solely by test-source support is denied by
   `RemotePolicy.evaluate`. Any rendering change is a new version.
+- Interview pseudonymization strips the original title and metadata (including
+  any `pseudonymizedFrom` value) before constructing its sanitized `StorySource`;
+  only the privacy policy id, key id, and pseudonymized marker are retained.
 - Raw and authorized-remote requests are **different types**:
   `EmbedPayload.Raw` can only be served by `Locality.Local` embedders;
   `AuthorizedRemoteRequest` is constructible only by `RemotePolicy.evaluate`,
@@ -310,8 +315,9 @@ enum FidelityMode:
   receipts), `detector-config/v1`, `detector-source/v1`, `detection/v1`,
   `detector-policy/v1`,
   `items/v1` (`item|id|sensitivity|<digest.render>` per item), `outputs/v1`, and
-  `attempt/v1` (legacy display-based fields) and `attempt/v2`. Version 2 is the
-  receipt identity format: indexed full `ProviderCall` and `EmbeddingReceipt`
+  `attempt/v2`. The former `attempt/v1` display-based identifier is unsupported
+  legacy, not a construction or decoding path. Version 2 is the receipt identity
+  format: indexed full `ProviderCall` and `EmbeddingReceipt`
   fields, sorted call parameters, typed cache/policy/result/error fields with
   full capability fingerprints and digests (including the exact detector
   policy identity), and item sensitivities. Tagged options and individually

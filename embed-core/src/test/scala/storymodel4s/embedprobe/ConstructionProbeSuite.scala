@@ -210,13 +210,23 @@ class ConstructionProbeSuite extends FunSuite:
     )
   }
 
-  test("the final detector factory is the public evidence path") {
-    assert(
+  test("the public detector factory accepts table data but no executable finder") {
+    refused(
       typeCheckErrors(
         """storymodel4s.embed.PseudonymizationDetector.checked(
              storymodel4s.embed.PseudonymizationDetectorId.unsafe("detector/v1"),
              "config/v1",
              _ => Vector.empty
+           )"""
+      ),
+      "PseudonymizationDetector.checked(finder)"
+    )
+    assert(
+      typeCheckErrors(
+        """storymodel4s.embed.PseudonymizationDetector.wholeWordTable(
+             Vector(
+               storymodel4s.embed.PseudonymizationTableEntry("Jane", "[P1]")
+             )
            )"""
       ).isEmpty
     )

@@ -220,11 +220,7 @@ class ContractSuite extends ScalaCheckSuite:
     val pseudonymizationKeys =
       SensitiveKeyProvider.static(pseudonymizationKey, "k".getBytes("UTF-8"))
     val detector = PseudonymizationDetector
-      .checked(
-        PseudonymizationDetectorId.unsafe("storymodel4s.contract.fixture/v1"),
-        "contract-fixture/v1|surface=redacted",
-        text => if text == "Jane went" then Vector(TextSpan.unsafe(0, 4)) else Vector.empty
-      )
+      .wholeWordTable(Vector(PseudonymizationTableEntry("Jane", "[PERSON_1]")))
       .toOption
       .get
     val sourceDetection = detector

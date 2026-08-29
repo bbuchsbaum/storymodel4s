@@ -243,7 +243,7 @@ class InterviewSuite extends ScalaCheckSuite:
     )
   }
 
-  test("remote policy trusts an exact detector configuration, not an arbitrary certified finder") {
+  test("trusted detector identity fixes whole-word table behaviour") {
     val source = StorySource.fromText("Anna met Bob.").toOption.get
     val table = Vector(PseudonymEntry("Anna", "[P1]"), PseudonymEntry("Bob", "[P2]"))
     val trustedIdentity = Pseudonymizer
@@ -297,51 +297,35 @@ class InterviewSuite extends ScalaCheckSuite:
         .isRight
     )
 
-    val sourceText = source.canonicalText
-    val destination = "[P1] met Bob."
-    val sourceSpan = TextSpan.unsafe(0, 4)
-    val permissive = PseudonymizationDetector
-      .checked(
-        trustedIdentity.detectorId,
-        "permissive/v1|mode=caller-map-only",
-        text => if text == sourceText then Vector(sourceSpan) else Vector.empty
+    val detector = PseudonymizationDetector
+      .wholeWordTable(
+        table.map(entry =>
+          PseudonymizationTableEntry(entry.surface, entry.pseudonym, entry.caseInsensitive)
+        )
       )
       .toOption
       .get
-    val permissiveDetection =
-      permissive.detect(sourceText, reidentificationKeyId, suiteKeys).toOption.get
-    val laundered = PseudonymizedText
-      .checked(
-        privacyPolicy,
-        reidentificationKeyId,
-        sourceText,
-        destination,
-        Vector(sourceSpan -> TextSpan.unsafe(0, 4)),
-        permissiveDetection,
-        permissive,
-        suiteKeys
-      )
-      .toOption
-      .get
-    val denied = RemotePolicy.evaluate(
-      policy,
-      trustedRequest.copy(payload = EmbedPayload.Sanitized(laundered)),
-      provider,
-      "model",
-      "interview-research",
-      nowEpochMillis = 10,
-      estimatedTokens = 5
+    val sourceDetection =
+      detector.detect(source.canonicalText, reidentificationKeyId, suiteKeys).toOption.get
+    val attemptedLaundering = PseudonymizedText.checked(
+      privacyPolicy,
+      reidentificationKeyId,
+      source.canonicalText,
+      "[P1] met Bob.",
+      Vector(TextSpan.unsafe(0, 4) -> TextSpan.unsafe(0, 4)),
+      sourceDetection,
+      detector,
+      suiteKeys
     )
-    assert(denied.isLeft)
-    assert(denied.left.toOption.get.reason.contains(trustedIdentity.detectorId.value))
-    assert(
-      denied.left.toOption.get.reason.contains(
-        laundered.sourceDetection.get.configurationDigest.render
-      )
+
+    assertEquals(sourceDetection.policyIdentity, trustedIdentity)
+    assertEquals(
+      sourceDetection.spans,
+      Vector(TextSpan.unsafe(0, 4), TextSpan.unsafe(9, 12))
     )
-    assert(!denied.left.toOption.get.reason.contains("Anna"))
-    assert(!denied.left.toOption.get.reason.contains("Bob"))
-    assert(!denied.left.toOption.get.reason.contains("caller-map-only"))
+    assert(attemptedLaundering.isLeft)
+    assert(!attemptedLaundering.left.toOption.get.message.contains("Anna"))
+    assert(!attemptedLaundering.left.toOption.get.message.contains("Bob"))
   }
 
   test("matching is case-sensitive by default and never rewrites ordinary words") {
