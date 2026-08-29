@@ -100,6 +100,18 @@ class StructureSuite extends ScalaCheckSuite:
     assert(d.canonicalString.contains("kernel(gaussian,0x3ff0000000000000)"))
     assert(d.canonicalString.contains("minCoverage(0x3fe0000000000000)"))
     assertEquals(d.derivationId.hex, GoldenDerivationId)
+    assertEquals(d.outputSpaceId.value, "derived:c0e730f22d83662f4310fbdba4a1d799")
+    val basis = BasisId
+      .of(
+        TargetFamily.Situation,
+        Vector(
+          FeatureTarget.Situation(SituationId.unsafe("alpha")),
+          FeatureTarget.Situation(SituationId.unsafe("beta"))
+        )
+      )
+      .toOption
+      .get
+    assertEquals(d.outputSpaceId(basis).value, "derived:0ea2b30cedbf3768302fd1023d4ef871")
     // an outputSpaceId chain does not grow: deriving from a derived space keeps a fixed length
     val second = d.copy(inputs = NonEmptyVector.one(d.outputSpaceId))
     assertEquals(second.outputSpaceId.value.length, d.outputSpaceId.value.length)
