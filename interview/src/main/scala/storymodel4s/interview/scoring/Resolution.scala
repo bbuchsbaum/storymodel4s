@@ -70,7 +70,23 @@ final class PlacementResolution private (
   override def toString: String = s"PlacementResolution(${render})"
 
 object PlacementResolution:
-  /** Tolerance on the mass sum, matching the alignment tolerance used elsewhere. */
+  /** Tolerance on the three-way mass sum `resolved + unresolved + excluded`.
+    *
+    * '''INHERITED, NOT DERIVED.''' It matches `align`'s `HsmmResult.Tolerance` because that is
+    * where the number came from, and it has never been computed against this constructor's own
+    * phenomenon. The phenomenon here is small: three float64 additions, so error near `1e-16` —
+    * about seven orders below the tolerance. The value is very likely fine and is certainly not
+    * tight.
+    *
+    * Said this way on purpose. A constant that reads as chosen invites a reader to reason about the
+    * precision it defends and "correct" it; a constant that says it was inherited tells them the
+    * honest thing, which is that nobody has done that work yet. If you tighten it, measure this
+    * constructor's inputs rather than copying a bound from `align` a second time.
+    *
+    * Unlike a bare comparison tolerance, this one ADMITS a value that is then stored — so it
+    * carries the absorption obligation: a within-tolerance partition is renormalised before
+    * construction so the stored triple sums to exactly 1.
+    */
   val Tolerance: Double = 1e-9
 
   /** Default threshold below which a conditional quantity should abstain rather than be published.

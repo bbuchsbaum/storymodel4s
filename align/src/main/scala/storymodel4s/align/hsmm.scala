@@ -198,7 +198,22 @@ final class HsmmResult private[align] (
 
 object HsmmResult:
 
-  /** Tolerance for row normalization and flow-marginal consistency (stated constant). */
+  /** Tolerance for row normalization and flow-marginal consistency.
+    *
+    * '''Defends float64 accumulation across a row''' — a posterior row is a sum of per-state masses
+    * produced by `logsumexp`, and the naive summation error grows with the number of states: about
+    * `n * 2.22e-16`, so roughly `2e-14` at 100 states and `2e-13` at 1000. `1e-9` is therefore four
+    * to five orders ABOVE the phenomenon.
+    *
+    * '''That margin is wide and is not derived.''' It is a round number chosen to sit comfortably
+    * above accumulation error, not a bound computed from a state count. Recorded plainly so nobody
+    * re-derives it as tight, and so that a future row two orders larger is understood to eat into
+    * the margin rather than to break an exact bound.
+    *
+    * It is used ONLY for comparisons here (`close`, row-sum and marginal checks), never to admit a
+    * value that is then stored unabsorbed — which is the failure this project found in `MassRatio`,
+    * `ExternalMassReport` and `PlacementResolution` on 2026-08-29.
+    */
   val Tolerance: Double = 1e-9
 
   /** The sole external constructor: proves the gate invariant over the supplied parts, **anchored
