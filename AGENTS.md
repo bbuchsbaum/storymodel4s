@@ -637,7 +637,21 @@ was set by the owner on 2026-08-28 (sticky decision
    Capacity to fail is not enough: inputs whose right and wrong answers fall
    within `eps` produce a test that passes under both the fix and the defect
    while looking rigorous.
-5. **Actors and reservations.** One mote actor per session. Set your identity
+5. **Actors and reservations.** **A grep over a name is not an actor filter — parse
+   the field.** Matching `"<actor>"` anywhere in an op file also matches the actor's
+   name inside the BODY of messages written *to* them, so chasing someone makes your
+   monitor report them as increasingly active. Measured 2026-08-29: an agent's last
+   operation was 15:07 while a name-grep reported 15:22, the difference being three
+   escalating messages the chief had sent naming that agent — **the more they were
+   chased, the more alive they appeared.** This is the second instance of the same
+   shape in one day; earlier, an agent was reported silent five times while posting
+   under an inherited actor, because the board scan filtered the chief's own name as
+   noise. A monitor that hides your own name cannot see someone wearing it; a monitor
+   that matches free text counts your own voice as theirs. Read the `actor` key.
+   **Check liveness before escalating urgency, not after** — the tone of a third
+   chase reads very differently once you learn nobody was there to receive the first.
+
+   One mote actor per session. Set your identity
    explicitly in every session — `export MOTE_ACTOR=<actor>` (and
    `mote session start --as <actor>`) or `--actor` on each call — and never run
    `mote actor set` in the shared checkout: `.mote/local/actor` is shared by
