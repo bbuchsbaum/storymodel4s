@@ -77,10 +77,20 @@ Package namespace is flat `storymodel4s.<module>`.
    **A private constructor on a `case` class is not a boundary.** Scala 3 gives
    every case-class companion a public `fromProduct` through `Mirror.Product`,
    and marking the constructor private does not remove it. That is the whole
-   defect and the only door: `copy` *is* suppressed by a private constructor,
-   and `unapply`, the positional accessors, and `Product` membership are
-   read-only — they construct nothing and expose only what the public accessors
-   already do, so do not close them. A validating type must be a `final`
+   defect and the only door **for a type whose fields are public anyway** — the
+   common case: `copy` *is* suppressed by a private constructor, and `unapply`,
+   the positional accessors, and `Product` membership are read-only, exposing
+   only what the public accessors already do, so do not close them. **The
+   exception is a type whose purpose is to hide a field**, where `_1` hands out
+   exactly what the type promised to gate; such a type must not be a case class
+   at all, because every *read* door has to close too. That case is rarer and
+   strictly worse: a forged instance announces itself as invalid at the next
+   validation, a leaked gated value announces nothing, ever. (No instance
+   exists on `main` — no case class declares a private or protected field, and
+   `PseudonymizedText`/`PseudonymizedTranscript` are already non-case classes —
+   so this is a prospective guard, not a backlog. The mechanical shape is
+   greppable; a *public* field that should have been gated is a judgement, and
+   is yours to raise.) A validating type must be a `final`
    **non-case** class with explicit accessors, structural `equals`/`hashCode`,
    an intentional `toString`, and construction private to its smart
    constructor. Prove the boundary from *outside* the defining package: a probe
