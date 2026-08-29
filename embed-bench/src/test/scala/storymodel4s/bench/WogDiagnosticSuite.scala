@@ -114,16 +114,40 @@ class WogDiagnosticSuite extends FunSuite:
     assertEquals(again.render, report.render)
   }
 
-  test("the rendered report carries no story or recall text") {
-    val rendered = report.render
+  /** Sentences and shorter phrases of the source, so a partial leak is caught too: a report that
+    * printed half a sentence would pass a whole-sentence check.
+    */
+  private lazy val storyProbes: Vector[String] =
     val sentences = WarOfTheGhostsText.text
       .split("(?<=[.!?])\\s+")
       .map(_.trim)
       .filter(_.length > 12)
-    sentences.foreach(s => assert(!rendered.contains(s), s"story sentence leaked: ${s.take(20)}…"))
-    WarOfTheGhostsExpectations.recallParaphrases.foreach { p =>
-      assert(!rendered.contains(p.text), s"recall text leaked for ${p.kind}")
-    }
+      .toVector
+    // Windows over the WHOLE word stream, not per sentence: a fragment that straddles a sentence
+    // boundary is still the story's text, and a per-sentence probe set cannot see it. That gap was
+    // real — a six-word slice spanning the title and the opening line passed the earlier version.
+    val words = WarOfTheGhostsText.text.split("\\s+").toVector.filter(_.nonEmpty)
+    val windows =
+      if words.size < 6 then Vector.empty else words.sliding(6).map(_.mkString(" ")).toVector
+    sentences ++ windows
+
+  private def leaks(text: String): Option[String] =
+    storyProbes
+      .find(text.contains)
+      .orElse(WarOfTheGhostsExpectations.recallParaphrases.map(_.text).find(text.contains))
+
+  test("the rendered report carries no story or recall text") {
+    val rendered = report.render
+    // The check must be capable of firing: a vacuous probe set, or a render that produced nothing,
+    // would make every assertion below pass while looking rigorous.
+    assert(storyProbes.size > 20, s"probe set is too small to be evidence: ${storyProbes.size}")
+    assert(rendered.length > 200, s"render is too short to have been checked: ${rendered.length}")
+    // Positive control: the detector finds a leak when there is one to find.
+    assert(
+      leaks(rendered + " " + storyProbes.head).contains(storyProbes.head),
+      "the canary cannot detect a leak it is shown, so its silence means nothing"
+    )
+    assertEquals(leaks(rendered), None, s"leaked: ${leaks(rendered).map(_.take(30))}")
     assert(rendered.contains("DIAGNOSTIC"))
     assert(rendered.contains("three clocks"))
   }
