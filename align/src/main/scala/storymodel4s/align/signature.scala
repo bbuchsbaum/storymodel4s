@@ -205,37 +205,51 @@ final class MassRatio private (
   override def toString: String = s"MassRatio(${render})"
 
 object MassRatio:
+  private val Tolerance = 1e-9
+
   /** Trusted construction from inside `align`, where the sums are computed together. */
   private[align] def unsafe(numerator: Double, conditioning: Double, total: Double): MassRatio =
     val v = if conditioning <= 0.0 then None else Some(numerator / conditioning)
     new MassRatio(v, conditioning, total)
 
   /** Checked construction: masses finite and non-negative, conditioning no larger than the total,
-    * and a value present exactly when there was conditioning mass to divide by.
+    * and a value present exactly when there was conditioning mass to divide by. Relative overflow
+    * within the floating-point tolerance is absorbed before the ratio is stored.
     */
   def of(numerator: Double, conditioning: Double, total: Double): Either[AlignError, MassRatio] =
+    def normalizeSubmass(
+        part: Double,
+        whole: Double,
+        detail: => String
+    ): Either[AlignError, Double] =
+      if whole == 0.0 then
+        if part == 0.0 then Right(0.0)
+        else Left(AlignError.MalformedRecord("massRatio", detail))
+      else
+        val fraction = part / whole
+        if fraction > 1.0 + Tolerance then Left(AlignError.MalformedRecord("massRatio", detail))
+        else Right(math.min(part, whole))
+
     val bad = Vector("numerator" -> numerator, "conditioning" -> conditioning, "total" -> total)
       .collectFirst {
         case (n, v) if v.isNaN || v.isInfinite || v < 0.0 =>
           AlignError.MalformedRecord("massRatio", s"$n must be finite and nonnegative, got $v")
       }
     bad match
-      case Some(e)                             => Left(e)
-      case None if conditioning > total + 1e-9 =>
-        Left(
-          AlignError.MalformedRecord(
-            "massRatio",
+      case Some(e) => Left(e)
+      case None    =>
+        for
+          normalizedConditioning <- normalizeSubmass(
+            conditioning,
+            total,
             s"conditioning mass $conditioning exceeds the total $total"
           )
-        )
-      case None if numerator > conditioning + 1e-9 =>
-        Left(
-          AlignError.MalformedRecord(
-            "massRatio",
-            s"numerator $numerator exceeds its conditioning mass $conditioning"
+          normalizedNumerator <- normalizeSubmass(
+            numerator,
+            normalizedConditioning,
+            s"numerator $numerator exceeds its conditioning mass $normalizedConditioning"
           )
-        )
-      case None => Right(unsafe(numerator, conditioning, total))
+        yield unsafe(normalizedNumerator, normalizedConditioning, total)
 
 /** A per-step route quantity together with the support it rests on.
   *
@@ -315,12 +329,15 @@ final class ExternalMassReport private (val attributed: Double, val unranked: Do
   override def toString: String = s"ExternalMassReport(${render})"
 
 object ExternalMassReport:
+  private val Tolerance = 1e-9
+
   /** Trusted construction from inside `align`. */
   private[align] def unsafe(attributed: Double, unranked: Double): ExternalMassReport =
     new ExternalMassReport(attributed, unranked)
 
   /** Checked construction: both halves are mean masses per unit, so each is a fraction and their
-    * sum cannot exceed the whole. A report claiming 1.2 of external mass is not a report.
+    * sum cannot exceed the whole. A report claiming 1.2 of external mass is not a report. Overflow
+    * within the floating-point tolerance is normalized before the partition is stored.
     */
   def of(attributed: Double, unranked: Double): Either[AlignError, ExternalMassReport] =
     val bad = Vector("attributed" -> attributed, "unranked" -> unranked).collectFirst {
@@ -330,13 +347,19 @@ object ExternalMassReport:
     bad match
       case Some(e) => Left(e)
       case None    =>
-        if attributed + unranked > 1.0 + 1e-9 then
+        val sum = attributed + unranked
+        if sum > 1.0 + Tolerance then
           Left(
             AlignError.MalformedRecord(
               "externalMassReport",
-              s"attributed + unranked is ${attributed + unranked}, more than the whole"
+              s"attributed + unranked is $sum, more than the whole"
             )
           )
+        else if sum > 1.0 then
+          // Preserve the split while making the stored partition agree with the tolerance
+          // decision. Computing the second part as the complement pins the accepted whole.
+          val normalizedAttributed = attributed / sum
+          Right(new ExternalMassReport(normalizedAttributed, 1.0 - normalizedAttributed))
         else Right(new ExternalMassReport(attributed, unranked))
 
 object RecallSignature:
