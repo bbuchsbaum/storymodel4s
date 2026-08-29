@@ -871,6 +871,19 @@ was set by the owner on 2026-08-28 (sticky decision
    another actor's reservations; `mote` refuses) — and both are the management
    version of the defect class this file exists to prevent: **a claim published
    without the mechanism that would make it true.**
+   **IN A SHARED TREE, `git add <path>` FOLLOWED BY A BARE `git commit` COMMITS
+   THE WHOLE INDEX** — including whatever another agent has staged. Use
+   `git commit --only <paths>`, or run `git status --short` **with no pathspec**
+   and read all of it first. Measured 2026-08-29: the chief added one doc, ran a
+   bare commit, and landed NINE FILES — another agent's entire in-flight
+   canonicalisation across `core`, `acquire`, `codec` and `document` — under a
+   commit message about something else, ungated as its own candidate. It had
+   written the hazard down forty minutes earlier and named those exact files.
+   The check that failed was `git status --short <my own file>`, which **only
+   reports the file you ask about**: it confirms yours is staged and cannot tell
+   you what else is. A status query scoped to your own work cannot answer "what
+   am I about to take". (It survived only because a later full-main audit
+   happened to cover it — that was luck, not process.)
    `build.sbt`, `AGENTS.md`, and `README.md` edits are announced on
    `coordination` before they are made. `docs/adr/*.md` are exempt from
    single-holder reservation for paragraph-disjoint edits: edit only the
