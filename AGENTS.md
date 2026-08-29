@@ -248,6 +248,18 @@ was set by the owner on 2026-08-28 (sticky decision
    for is a defect you have declined to sweep; the chief did exactly that here,
    and 45 forgeable types stayed open until someone walked into one by hand.
 
+   *A fixture must be able to tell the hypotheses apart.* When you replace one
+   formula with another, the fixture has to be one on which the two **disagree**
+   — otherwise the mutation survives, the suite is green, and the evidence post
+   records a killed mutant that was never killed. Observed on the compression
+   estimand: reverting ratio-of-sums to mean-of-ratios survived, because the
+   assertions checked only that the value abstains without conditioning mass,
+   which *both* formulas satisfy; the two diverge only when units carry
+   **unequal** source mass. The killing assertion is that the conditioning mass
+   equals the summed source mass and not the row count (2.629, not 4.0). This is
+   protocol law **I6** — a set must be able to falsify the model — applied to
+   unit-test fixtures rather than benchmark corpora.
+
    *Never pipe a gate.* In a shell pipeline the exit status is the **last**
    command's, so `sbt -batch "..." | tail` reports `tail`'s status — which
    succeeds even when the build fails — and a line-limited pipe silently
