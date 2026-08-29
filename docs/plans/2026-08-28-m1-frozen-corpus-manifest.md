@@ -1,7 +1,8 @@
-# M1 W4(9) — Frozen corpus manifest (candidate list, rev 3)
+# M1 W4(9) — Frozen corpus manifest (candidate list, rev 4)
 
 **Bead:** bd-01M14YJ8FG15S0R1ART7DTM1XZ. **Status:** candidate list for **set 1**, under
-the adjudication protocol rev 1 (decisions of the chief, 2026-08-28,
+the adjudication protocol rev 2 (Laws I5 corpus independence and I6 falsifiability;
+decisions of the chief, 2026-08-28,
 post-01M15AM6WTR8N4A38BN3WHB4WS — see the protocol's §10). No text is reproduced here
 and none is fetched yet. Texts enter the repository only as data files under
 `fixtures/src/main/resources/frozen/<set-id>/stories/<story-id>/text.txt`, fetched from
@@ -74,12 +75,34 @@ done for WOG).
 | untouched test | f1-chinook-1, f1-tlingit-1, f2-grimm-robber-bridegroom, f3-saki-open-window, f3-bierce-owl-creek |
 | diagnostic only (separate root `fixtures/src/main/resources/diagnostic/`, never inside `frozen/<set-id>/`) | f2-aesop-set, all metamorphic material, agent-annotated material, WOG |
 
-Sixteen stories across three families (≥ 8 stories / ≥ 3 families satisfied with margin);
+**Anachrony slot (protocol Law I6, added rev 4).** One further F3 story joins the
+**untouched-test** partition: `f3-anachrony-1`, selected for discourse-level anachrony
+(story-world order materially different from telling order). Seventeen stories; the
+recall arithmetic below includes it.
+
+*Which story, and the confound the chief flagged.* The obvious frame-narrative candidate,
+Chesnutt's *The Goophered Grapevine*, is written in heavy eye-dialect, and for **this**
+slot that is disqualifying rather than merely awkward: the slot exists to test whether we
+can recover reordered story-world time, and eye-dialect stresses tokenization and
+unit segmentation so hard that a reorder failure and a segmentation failure would be
+indistinguishable — exactly the ambiguity a calibration set must not contain. The
+property to preserve is *embedded retrospective telling with reordered story-world time*,
+not this particular story. Primary candidate instead: **Susan Glaspell, *A Jury of Her
+Peers* (1917)** — the whole story is a present-time investigation reconstructing a past
+event out of order, which is the reorder phenomenon in its purest form and also mirrors
+what this library does; standard orthography with light regional flavour, no eye-dialect.
+Secondary: Bierce, *The Boarded Window* (already the Owl Creek replacement — if it takes
+the anachrony slot, the untouched-test unreliable-report slot needs a different filler).
+Chesnutt stays on the list as a **diagnostic** candidate, where the dialect is an asset
+rather than a confound. All PD bases **verify before freeze**; contamination scored by
+the procedure above before selection.
+
+Seventeen stories across three families (≥ 8 stories / ≥ 3 families satisfied with margin);
 every family appears in every partition.
 
 Recall panel for set 1 (immediate free recall only): 6 development stories × 3 +
-5 calibration stories × 3 + 5 untouched-test stories × 5 = **58 recalls**; set 2 adds
-15 test recalls (5 × 3) for the test → 8 expansion, plus the delayed-recall panel.
+5 calibration stories × 3 + 6 untouched-test stories × 5 = **63 recalls** (the
+anachrony slot adds 5); set 2 adds 18 test recalls (6 × 3) for the test → 8 expansion, plus the delayed-recall panel.
 
 ## Training-data contamination (added rev 2; raised by the Araby proposal,
 `general/post-01M15PYE2TDDBB2GN0T2911B1Q`, and it indicts this manifest as first written)
