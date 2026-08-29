@@ -42,9 +42,10 @@ object UnbalancedSinkhorn:
     val n = if m == 0 then 0 else cost.head.size
     if a.size != m || b.size != n || cost.exists(_.size != n) then
       Left(AlignError.SizeMismatch("marginal sizes must match the cost matrix"))
-    else if config.epsilon <= 0.0 || config.rhoRows < 0.0 || config.rhoCols < 0.0 then
-      Left(AlignError.InvalidConfig("SinkhornConfig", "epsilon > 0 and penalties ≥ 0 required"))
-    else
+    // Fail-closed under NaN: `x > 0` / `x >= 0` send NaN to the safe branch.
+    // The previous `<= 0 || < 0` polarity accepted NaN and ran 200 iterations
+    // of -c/NaN, returning an all-zero plan with converged=false.
+    else if config.epsilon > 0.0 && config.rhoRows >= 0.0 && config.rhoCols >= 0.0 then
       val eps = config.epsilon
       val logK = cost.map(_.map(c => -c / eps))
       val logA = a.map(x => if x > 0 then math.log(x) else Double.NegativeInfinity)
@@ -95,6 +96,7 @@ object UnbalancedSinkhorn:
           converged
         )
       )
+    else Left(AlignError.InvalidConfig("SinkhornConfig", "epsilon > 0 and penalties ≥ 0 required"))
 
 /** The embedding-plus-transport baseline: semantic cost only, no gating, no external states, one
   * column per candidate node. Reproduced so ablations can be run against it.
