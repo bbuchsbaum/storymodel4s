@@ -50,7 +50,7 @@ enum VisualInvariant:
   case Deterministic // V-D1
 
 /** What the geometry of a scene means. Declared data, never documentation (ADR 0002 §2). */
-final case class ProjectionContract(
+final case class ProjectionContract private (
     kind: ProjectionKind,
     x: AxisMeaning,
     y: AxisMeaning,
@@ -61,7 +61,18 @@ final case class ProjectionContract(
 )
 
 object ProjectionContract:
-  val discourseAtlas: ProjectionContract = ProjectionContract(
+  private[view] def of(
+      kind: ProjectionKind,
+      x: AxisMeaning,
+      y: AxisMeaning,
+      distance: DistanceMeaning,
+      area: Option[MeasureMeaning],
+      legend: Vector[ChannelMeaning],
+      invariants: Set[VisualInvariant]
+  ): ProjectionContract =
+    new ProjectionContract(kind, x, y, distance, area, legend, invariants)
+
+  val discourseAtlas: ProjectionContract = of(
     ProjectionKind.DiscourseAtlas,
     AxisMeaning.DiscourseOffset,
     AxisMeaning.ContextLane,
@@ -121,6 +132,7 @@ enum NarrativeLevel:
     case Scene   => Set(SegmentKind.Scene)
     case Event   => Set(SegmentKind.Scene)
 
+  /** Whether this level exposes atomic event/state landmarks. */
   def showsSituations: Boolean = this match
     case Scene | Event => true
     case _             => false
@@ -138,7 +150,12 @@ object MarkId extends OpaqueId("MarkId")
 type MarkId = MarkId.T
 
 /** Stable semantic and mark identities kept separate across levels and renderers. */
-final case class VisualIdentity(address: Address, level: NarrativeLevel, mark: MarkId)
+final case class VisualIdentity private (address: Address, level: NarrativeLevel, mark: MarkId)
+
+object VisualIdentity:
+  /** Construct identity only inside the validated scene compiler. */
+  private[view] def of(address: Address, level: NarrativeLevel, mark: MarkId): VisualIdentity =
+    new VisualIdentity(address, level, mark)
 
 /** Axis-aligned extent: half-open in x (`[x0, x1Exclusive)`, like [[TextSpan]]) and inclusive in
   * lanes. Checked construction: no negative bounds, `x0 <= x1Exclusive`, `lane0 <= lane1`.
@@ -157,6 +174,7 @@ final case class Extent private (x0: Int, x1Exclusive: Int, lane0: Int, lane1: I
     )
 
 object Extent:
+  /** Construct an extent only when its half-open x bounds and inclusive lanes are ordered. */
   def of(x0: Int, x1Exclusive: Int, lane0: Int, lane1: Int): Either[DomainError, Extent] =
     if x0 < 0 || lane0 < 0 then
       Left(
@@ -171,16 +189,37 @@ object Extent:
     else if lane1 < lane0 then
       Left(DomainError.InvalidFormat("Extent", s"lanes $lane0..$lane1", "lane end precedes start"))
     else Right(new Extent(x0, x1Exclusive, lane0, lane1))
-  def unsafe(x0: Int, x1Exclusive: Int, lane0: Int, lane1: Int): Extent =
-    of(x0, x1Exclusive, lane0, lane1)
-      .fold(e => throw new IllegalArgumentException(e.message), identity)
 
 /** One point of a route or thread: exact offset and layout-only lane. */
-final case class Anchor(x: Int, lane: Int)
+final case class Anchor private (x: Int, lane: Int)
+
+object Anchor:
+  /** Construct an anchor only at a nonnegative source offset and layout lane. */
+  def of(x: Int, lane: Int): Either[DomainError, Anchor] =
+    if x < 0 || lane < 0 then
+      Left(
+        DomainError.InvalidFormat(
+          "Anchor",
+          s"($x,$lane)",
+          "source offset and lane must be nonnegative"
+        )
+      )
+    else Right(new Anchor(x, lane))
 
 /** Whether a landmark represents an event or a state without a Boolean sentinel. */
 enum LandmarkKind:
   case Event, State
+
+/** Closed content-address salt for each renderer-neutral mark family. */
+private[view] enum AtlasMarkKind:
+  case Region, Landmark, Thread, Portal, Route
+
+  def salt: String = this match
+    case Region   => "region"
+    case Landmark => "landmark"
+    case Thread   => "thread"
+    case Portal   => "portal"
+    case Route    => "route"
 
 /** Closed renderer-neutral marks emitted by the first Discourse Atlas compiler. */
 enum VisualPrimitive:
@@ -208,7 +247,11 @@ enum ThreadPolicy:
   case All(max: PositiveInt)
 
 /** What the Atlas shows besides regions and landmarks. */
-final case class AtlasSpec(zoom: ZoomLevel, threads: ThreadPolicy)
+final case class AtlasSpec private (zoom: ZoomLevel, threads: ThreadPolicy)
+
+object AtlasSpec:
+  /** Construct a Discourse Atlas specification from already checked closed policies. */
+  def apply(zoom: ZoomLevel, threads: ThreadPolicy): AtlasSpec = new AtlasSpec(zoom, threads)
 
 /** Where a selected or focused semantic address is represented in this projection. */
 enum SelectionPlacement:
@@ -242,6 +285,7 @@ final case class SceneNavigation private (
   def marksFor(address: Address): Vector[MarkId] = byAddress.getOrElse(address, Vector.empty)
 
 object SceneNavigation:
+  /** Build a bidirectional navigation index, rejecting duplicate renderer identities. */
   def from(marks: Vector[VisualPrimitive]): Either[DomainError, SceneNavigation] =
     val ids = marks.map(_.identity.mark)
     ids.groupBy(identity).collectFirst { case (id, xs) if xs.size > 1 => id } match
@@ -255,8 +299,9 @@ object SceneNavigation:
         )
 
 /** Compiles the Discourse Atlas. Pure and deterministic in `(model, state, spec)`. */
-final class AtlasCompiler(provenance: ViewProvenance):
+final class AtlasCompiler private (provenance: ViewProvenance):
 
+  /** Compile a validated story into an evidence-backed scene under the exact supplied receipt. */
   def compile(
       model: StoryModel[ModelStatus.Validated],
       state: CommonViewState,
@@ -297,8 +342,9 @@ final class AtlasCompiler(provenance: ViewProvenance):
 
     val situationSupport: Map[SituationId, SpanSet] =
       g.discourseOrder.flatMap { id =>
-        val n = g.situations(id)
-        if claimVisible(n.meta) then clipped(n.support).map(id -> _) else None
+        g.situations.get(id).flatMap { node =>
+          if claimVisible(node.meta) then clipped(node.support).map(id -> _) else None
+        }
       }.toMap
     val visibleSituations: Vector[SituationId] = g.discourseOrder.filter(situationSupport.contains)
     val visibleSet = visibleSituations.toSet
@@ -311,16 +357,42 @@ final class AtlasCompiler(provenance: ViewProvenance):
       val root = g.rootContext.filter(visibleContexts.contains).toVector
       val rest = visibleContexts.toVector.filterNot(root.contains).sorted
       (root ++ rest).zipWithIndex.toMap
-    def laneOf(s: SituationId): Int = lanes.getOrElse(g.situations(s).context, 0)
-    def anchorOf(s: SituationId): Anchor = Anchor(situationSupport(s).minSpan.start, laneOf(s))
 
-    // Situation extents (first visible span) and segment extents by construction: the hull of the
-    // visible primary children, recursively.
-    val situationExtent: Map[SituationId, Extent] =
-      visibleSituations.map { id =>
-        val sp = situationSupport(id).minSpan
-        id -> Extent.unsafe(sp.start, sp.endExclusive, laneOf(id), laneOf(id))
-      }.toMap
+    val checkedGeometry: Either[
+      DomainError,
+      Vector[(SituationId, Anchor, Extent)]
+    ] = visibleSituations.traverse { id =>
+      for
+        support <- situationSupport
+          .get(id)
+          .toRight(
+            DomainError.InvariantViolation(
+              "view/atlas/geometry/support",
+              s"visible situation ${id.value} has no clipped support"
+            )
+          )
+        node <- g.situations
+          .get(id)
+          .toRight(
+            DomainError.InvariantViolation(
+              "view/atlas/geometry/situation",
+              s"discourse situation ${id.value} is absent from the graph"
+            )
+          )
+        lane = lanes.getOrElse(node.context, 0)
+        span = support.minSpan
+        anchor <- Anchor.of(span.start, lane)
+        extent <- Extent.of(span.start, span.endExclusive, lane, lane)
+      yield (id, anchor, extent)
+    }
+
+    val geometry = checkedGeometry match
+      case Right(value) => value
+      case Left(error)  => return Left(error)
+    val anchorBySituation = geometry.map((id, anchor, _) => id -> anchor).toMap
+    val situationExtent = geometry.map((id, _, extent) => id -> extent).toMap
+
+    // Segment extents are by construction the hull of their visible primary children.
     val segmentExtent: Map[SegmentId, Extent] =
       val memo = scala.collection.mutable.Map.empty[SegmentId, Option[Extent]]
       def extent(seg: SegmentId, seen: Set[SegmentId]): Option[Extent] =
@@ -338,11 +410,11 @@ final class AtlasCompiler(provenance: ViewProvenance):
         )
       g.segments.keys.toVector.sorted.flatMap(s => extent(s, Set.empty).map(s -> _)).toMap
 
-    def markId(address: Address, kind: String): MarkId =
-      MarkId.unsafe(ContentAddress.of("mark", address.render, kind, level.toString))
-    def identity(ref: StoryRef, kind: String): VisualIdentity =
+    def markId(address: Address, kind: AtlasMarkKind): MarkId =
+      MarkId.unsafe(ContentAddress.of("mark", address.render, kind.salt, level.toString))
+    def identity(ref: StoryRef, kind: AtlasMarkKind): VisualIdentity =
       val a = storyRef.address(ref)
-      VisualIdentity(a, level, markId(a, kind))
+      VisualIdentity.of(a, level, markId(a, kind))
 
     val regions: Vector[VisualPrimitive] =
       g.segments.values.toVector
@@ -356,7 +428,7 @@ final class AtlasCompiler(provenance: ViewProvenance):
               .filter(segmentExtent.contains)
               .map(p => storyRef.address(StoryRef.Segment(p)))
             VisualPrimitive.Region(
-              identity(StoryRef.Segment(s.id), "region"),
+              identity(StoryRef.Segment(s.id), AtlasMarkKind.Region),
               ext,
               s.summary.value,
               parent
@@ -367,15 +439,16 @@ final class AtlasCompiler(provenance: ViewProvenance):
     val landmarks: Vector[VisualPrimitive] =
       if !level.showsSituations then Vector.empty
       else
-        visibleSituations.map { id =>
-          val n = g.situations(id)
-          val kind = if n.isState then LandmarkKind.State else LandmarkKind.Event
-          VisualPrimitive.Landmark(
-            identity(StoryRef.Situation(id), "landmark"),
-            anchorOf(id),
-            n.description,
-            kind
-          )
+        geometry.flatMap { (id, anchor, _) =>
+          g.situations.get(id).map { node =>
+            val kind = if node.isState then LandmarkKind.State else LandmarkKind.Event
+            VisualPrimitive.Landmark(
+              identity(StoryRef.Situation(id), AtlasMarkKind.Landmark),
+              anchor,
+              node.description,
+              kind
+            )
+          }
         }
 
     val visibleMemberOf: Map[EntityId, Vector[EntityId]] =
@@ -420,15 +493,17 @@ final class AtlasCompiler(provenance: ViewProvenance):
             .take(max.value)
             .map(_._1)
       candidates.flatMap { e =>
-        val pts = participationsByEntity.getOrElse(e, Vector.empty).map(anchorOf)
-        val entityVisible = g.entities.get(e).exists(n => claimVisible(n.meta))
-        Option.when(pts.size >= 2 && entityVisible)(
-          VisualPrimitive.Thread(
-            identity(StoryRef.Entity(e), "thread"),
-            g.entities(e).label.value,
-            pts
+        val points =
+          participationsByEntity.getOrElse(e, Vector.empty).flatMap(anchorBySituation.get)
+        g.entities.get(e).flatMap { entity =>
+          Option.when(points.size >= 2 && claimVisible(entity.meta))(
+            VisualPrimitive.Thread(
+              identity(StoryRef.Entity(e), AtlasMarkKind.Thread),
+              entity.label.value,
+              points
+            )
           )
-        )
+        }
       }
 
     val edgesVisible = level.showsSituations
@@ -440,12 +515,17 @@ final class AtlasCompiler(provenance: ViewProvenance):
         val visiblePosition = visibleSituations.zipWithIndex.toMap
         g.relations.references
           .filter(r => endpointsVisible(r.from, r.to, r.meta))
-          .filter(r => math.abs(visiblePosition(r.from) - visiblePosition(r.to)) > 1)
-          .map(r =>
-            VisualPrimitive.Portal(
-              identity(StoryRef.Reference(r.from, r.mode, r.to), "portal"),
-              anchorOf(r.from),
-              anchorOf(r.to),
+          .flatMap(r =>
+            for
+              fromPosition <- visiblePosition.get(r.from)
+              toPosition <- visiblePosition.get(r.to)
+              if math.abs(fromPosition - toPosition) > 1
+              from <- anchorBySituation.get(r.from)
+              to <- anchorBySituation.get(r.to)
+            yield VisualPrimitive.Portal(
+              identity(StoryRef.Reference(r.from, r.mode, r.to), AtlasMarkKind.Portal),
+              from,
+              to,
               r.mode
             )
           )
@@ -456,28 +536,36 @@ final class AtlasCompiler(provenance: ViewProvenance):
           if state.relationLayers.contains(RelationLayer.Causal) then
             g.relations.causal
               .filter(c => endpointsVisible(c.cause, c.effect, c.meta))
-              .map(c =>
-                VisualPrimitive.Route(
-                  identity(StoryRef.Causal(c.cause, c.relation, c.effect), "route"),
-                  anchorOf(c.cause),
-                  anchorOf(c.effect),
-                  RelationLayer.Causal,
-                  c.meta.status
-                )
+              .flatMap(c =>
+                (anchorBySituation.get(c.cause), anchorBySituation.get(c.effect)).mapN {
+                  (from, to) =>
+                    VisualPrimitive.Route(
+                      identity(
+                        StoryRef.Causal(c.cause, c.relation, c.effect),
+                        AtlasMarkKind.Route
+                      ),
+                      from,
+                      to,
+                      RelationLayer.Causal,
+                      c.meta.status
+                    )
+                }
               )
           else Vector.empty
         val goals =
           if state.relationLayers.contains(RelationLayer.Goal) then
             g.relations.goals
               .filter(e => endpointsVisible(e.from, e.to, e.meta))
-              .map(e =>
-                VisualPrimitive.Route(
-                  identity(StoryRef.Goal(e.from, e.relation, e.to), "route"),
-                  anchorOf(e.from),
-                  anchorOf(e.to),
-                  RelationLayer.Goal,
-                  e.meta.status
-                )
+              .flatMap(e =>
+                (anchorBySituation.get(e.from), anchorBySituation.get(e.to)).mapN { (from, to) =>
+                  VisualPrimitive.Route(
+                    identity(StoryRef.Goal(e.from, e.relation, e.to), AtlasMarkKind.Route),
+                    from,
+                    to,
+                    RelationLayer.Goal,
+                    e.meta.status
+                  )
+                }
               )
           else Vector.empty
         causal ++ goals
@@ -602,6 +690,7 @@ final class AtlasCompiler(provenance: ViewProvenance):
         )
 
 object AtlasCompiler:
+  /** Bind Atlas compilation to a source, model-basis, compiler, and configuration receipt. */
   def apply(provenance: ViewProvenance): AtlasCompiler = new AtlasCompiler(provenance)
 
   /** Content address of the exact view configuration, shared-state parts first. */
@@ -618,6 +707,7 @@ object AtlasCompiler:
 
 /** Deterministic plain-text twin of a scene (ADR 0002 V-D2). */
 object AtlasTextualTwin:
+  /** Render a deterministic, total screen-reader and snapshot twin of a scene. */
   def render(scene: NarrativeScene): String =
     val out = new StringBuilder
     val p = scene.provenance

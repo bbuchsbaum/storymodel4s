@@ -5,6 +5,9 @@ import storymodel4s.core.*
 
 /** Fixture-free Atlas contract checks; the WOG laws live in fixtures (WarOfTheGhostsAtlasSuite). */
 class AtlasSuite extends FunSuite:
+  private def extent(x0: Int, x1Exclusive: Int, lane0: Int, lane1: Int): Extent =
+    Extent.of(x0, x1Exclusive, lane0, lane1).fold(error => fail(error.message), identity)
+
   test("the Discourse Atlas contract declares every channel it uses and no area semantics"):
     val c = ProjectionContract.discourseAtlas
     assertEquals(c.x, AxisMeaning.DiscourseOffset)
@@ -19,16 +22,21 @@ class AtlasSuite extends FunSuite:
     assert(Extent.of(-1, 2, 0, 0).isLeft)
     assert(Extent.of(3, 2, 0, 0).isLeft)
     assert(Extent.of(0, 2, 1, 0).isLeft)
-    val a = Extent.unsafe(0, 10, 0, 0)
-    val b = Extent.unsafe(3, 5, 0, 0)
+    val a = extent(0, 10, 0, 0)
+    val b = extent(3, 5, 0, 0)
     assert(a.contains(b) && !b.contains(a))
-    assertEquals(a.hull(Extent.unsafe(20, 30, 2, 2)), Extent.unsafe(0, 30, 0, 2))
+    assertEquals(a.hull(extent(20, 30, 2, 2)), extent(0, 30, 0, 2))
     assert(a.containsX(9) && !a.containsX(10))
+
+  test("anchors reject negative source offsets and lanes"):
+    assert(Anchor.of(-1, 0).isLeft)
+    assert(Anchor.of(0, -1).isLeft)
+    assertEquals(Anchor.of(3, 2).map(anchor => (anchor.x, anchor.lane)), Right((3, 2)))
 
   test("scene navigation rejects duplicate mark ids"):
     val addr = Addressable[CoreRef].address(CoreRef.Claim(ClaimId.unsafe("c1")))
-    val id = VisualIdentity(addr, NarrativeLevel.Story, MarkId.unsafe("m1"))
-    val r = VisualPrimitive.Region(id, Extent.unsafe(0, 1, 0, 0), "x", None)
+    val id = VisualIdentity.of(addr, NarrativeLevel.Story, MarkId.unsafe("m1"))
+    val r = VisualPrimitive.Region(id, extent(0, 1, 0, 0), "x", None)
     assert(SceneNavigation.from(Vector(r, r)).isLeft)
     assertEquals(SceneNavigation.from(Vector(r)).map(_.marksFor(addr)), Right(Vector(id.mark)))
 
