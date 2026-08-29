@@ -171,6 +171,23 @@ versioned, receipted, and excluded from publication paths. Start with the
 simplest deterministic constraint layout that passes the laws; adopt
 Sugiyama/StoryFlow-style algorithms only behind golden and property tests.
 
+The Codex compiler configuration uses the canonical rendering
+`codex-compiler-config/v2`. It is a `|`-delimited sequence of `key=value`
+fields in this exact order: `rendering`, `horizon`, `focus`, `feature`, `scale`,
+`selection.count`, indexed selections, `relation.count`, indexed relations,
+`channel.count`, indexed channels, `budget.annotationKinds`,
+`budget.relationLayers`, and `lanes.maxPerKind`. Selections are sorted by
+canonical `Address.render`, relations by enum name, and channels by the checked
+`CodexSpec` order. In both keys and values, escaping is applied left to right:
+`\` becomes `\\`, `|` becomes `\|`, LF becomes `\n`, and NUL becomes `\0`.
+Horizon values are `omniscient` or `reader:<nonnegative-offset>`; feature
+values are `none`, `raw:<space-id>`, or
+`derived:<derivation-hex>:basis:<basis-hex|none>`; scale values are
+`surface:<surface-kind>` or `narrative:<narrative-basis>`; and each
+`channel.i` value is `<annotation-wire-name>:<priority>`.
+`CodexCompiler.configurationChecksum` hashes exactly this rendering. Any field,
+ordering, or escaping change requires a new rendering version.
+
 ### D14 Module placement
 - `view` (new, portable, cross-built JVM/JS/Native, depends on all domain
   modules, **not** on codec, DOM, Intaglio, or any JVM-only layout): owns

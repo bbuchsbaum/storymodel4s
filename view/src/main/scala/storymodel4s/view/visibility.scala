@@ -78,7 +78,10 @@ object EvidenceVisibility:
     val focus = Vector(state.focus.fold("focus:none")(a => s"focus:some:${a.render}"))
     val relations = state.relationLayers.toVector.sortBy(_.toString).map(r => s"relation:$r")
     val feature = Vector(state.feature.fold("feature:none") {
-      case FeatureSelection.Raw(space)       => s"feature:raw:${space.value}"
-      case FeatureSelection.Derived(receipt) => s"feature:derived:${receipt.hex}"
+      case FeatureSelection.Raw(space)                => s"feature:raw:${space.value}"
+      case FeatureSelection.Derived(derivation, None) =>
+        s"feature:derived:${derivation.hex}"
+      case FeatureSelection.Derived(derivation, Some(basisId)) =>
+        s"feature:derived:${derivation.hex}:basis:${basisId.hex}"
     })
     Vector(horizon) ++ selection ++ focus ++ relations ++ feature

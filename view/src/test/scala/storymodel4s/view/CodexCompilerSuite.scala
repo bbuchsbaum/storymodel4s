@@ -134,6 +134,66 @@ class CodexCompilerSuite extends FunSuite:
       CodexCompiler.configurationChecksum(stateB, specB)
     )
 
+  test("Codex config v2 has a pinned field order and escaping rule"):
+    val spec = CodexSpec
+      .forLens(CodexLens.Reading)
+      .fold(error => fail(error.message), identity)
+    val rendering = CodexCompiler.configurationRendering(CommonViewState.empty, spec)
+
+    assertEquals(
+      rendering,
+      "rendering=codex-compiler-config/v2|horizon=omniscient|focus=none|feature=none|" +
+        "scale=surface:sentence|selection.count=0|relation.count=0|channel.count=0|" +
+        "budget.annotationKinds=4|budget.relationLayers=2|lanes.maxPerKind=4"
+    )
+    assertEquals(
+      CodexCompiler.escapeConfiguration("back\\slash|line\nzero\u0000"),
+      "back\\\\slash\\|line\\nzero\\0"
+    )
+    assertEquals(
+      CodexCompiler.configurationChecksum(CommonViewState.empty, spec),
+      Checksum.ofText(rendering)
+    )
+
+  test("scale and a derived basis identity are part of compiler configuration identity"):
+    val derivation = Checksum.ofText("derived-feature")
+    val basis = Checksum.ofText("ordered-basis")
+    val withoutBasis = CommonViewState
+      .of(feature = Some(FeatureSelection.Derived(derivation)))
+      .fold(error => fail(error.message), identity)
+    val withBasis = CommonViewState
+      .of(feature = Some(FeatureSelection.Derived(derivation, Some(basis))))
+      .fold(error => fail(error.message), identity)
+    val sentence = CodexSpec
+      .forLens(
+        CodexLens.Reading,
+        scale = CodexScale.SurfaceUnit(SurfaceUnitKind.Sentence)
+      )
+      .fold(error => fail(error.message), identity)
+    val paragraph = CodexSpec
+      .forLens(
+        CodexLens.Reading,
+        scale = CodexScale.SurfaceUnit(SurfaceUnitKind.Paragraph)
+      )
+      .fold(error => fail(error.message), identity)
+
+    assertNotEquals(
+      CodexCompiler.configurationChecksum(withoutBasis, sentence),
+      CodexCompiler.configurationChecksum(withBasis, sentence)
+    )
+    assertNotEquals(
+      CodexCompiler.configurationChecksum(withoutBasis, sentence),
+      CodexCompiler.configurationChecksum(withoutBasis, paragraph)
+    )
+    assertEquals(
+      EvidenceVisibility.stateParts(withoutBasis).last,
+      s"feature:derived:${derivation.hex}"
+    )
+    assertEquals(
+      EvidenceVisibility.stateParts(withBasis).last,
+      s"feature:derived:${derivation.hex}:basis:${basis.hex}"
+    )
+
   test("shared evidence visibility is transitive, cycle-guarded, and clips future support"):
     val fingerprint = Fingerprint.unsafe("rule:visibility-test:1")
     val stage = StageId.unsafe("visibility-test")
