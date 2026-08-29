@@ -214,6 +214,18 @@ was set by the owner on 2026-08-28 (sticky decision
    *Trace the consequence* below — that retraction is why this paragraph no
    longer cites it.)
 
+   *Sweep your own work first.* When a review catches a shape in **your** code,
+   sweep your own work for that shape **before** fixing the instance: the
+   reviewer found one, you own the rest. The sweep instinct fires readily on
+   other people's code, where a defect is a discovery, and poorly on your own,
+   where it is a correction. Observed three times in five hours on one shape —
+   case-class machinery defeating a private constructor — met once as a
+   hand-written reflection filter, once as a reviewer's block, and only then
+   generalized, with two more instances sitting two files away in the same
+   commit. **This binds reviewers hardest.** A defect you ratify a one-site fix
+   for is a defect you have declined to sweep; the chief did exactly that here,
+   and 45 forgeable types stayed open until someone walked into one by hand.
+
    *Trace the consequence.* A claim about what a defect **feeds** — what depends
    on it, what it corrupts downstream — is a claim about the call graph, and the
    call graph is cheap to check. Do not escalate a consequence you have not
