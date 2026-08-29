@@ -412,7 +412,7 @@ was set by the owner on 2026-08-28 (sticky decision
    ambiguous across them); cross-repo work is coordinated on the
    `narrative-atlas-intaglio` topic with provider/consumer SHAs recorded as
    notes, never as dependency edges between stores.
-4. **Evidence discipline.** *Twenty-seven sub-rules; find yours here.* **What
+4. **Evidence discipline.** *Twenty-eight sub-rules; find yours here.* **What
    counts as proof of a fix (11):** mutation proof · capacity to fail ·
    distinguishability · a negative compile-time assertion needs a positive control ·
    or kill it with a mutation, which is stronger · a fixture must tell the
@@ -421,7 +421,8 @@ was set by the owner on 2026-08-28 (sticky decision
    pipeline produces · an inequality is not a discriminating assertion · a pinned
    literal can be updated but a behavioural assertion has to be argued with · a
    positive control requires the old code to be capable of the thing tested. **How
-   to run the gate (9):** never pipe a gate · a check and the action it gates must
+   to run the gate (10):** never pipe a gate · the gate is not the last step, re-read
+   the board before merging · a check and the action it gates must
    not share a batch · a trailing success line is not an exit
    status · a compile error anywhere makes the gate inconclusive · run the format
    check last · verify the export before you gate it · a compile-time probe needs a
@@ -430,8 +431,8 @@ was set by the owner on 2026-08-28 (sticky decision
    sweep the shape not the spelling · sweep your own work first · reading a branch establishes permission
    not occurrence · trace the consequence. **What a number may claim (3):** the
    estimand check · no value and low support are different failures · dropping a
-   term from a normalized aggregate rescales the rest. *(Eleven of the twenty-seven are
-   about whether a test can actually fail, and NINE are about whether the gate
+   term from a normalized aggregate rescales the rest. *(Eleven of the twenty-eight are
+   about whether a test can actually fail, and TEN are about whether the gate
    measured anything at all — that second group went from three to eight in a
    single day, every entry added after a run reported a status with nothing behind
    it. On 2026-08-29 alone, THREE separate red gates measured infrastructure rather
@@ -579,6 +580,17 @@ was set by the owner on 2026-08-28 (sticky decision
    equals the summed source mass and not the row count (2.629, not 4.0). This is
    protocol law **I6** — a set must be able to falsify the model — applied to
    unit-test fixtures rather than benchmark corpora.
+
+   *THE GATE IS NOT THE LAST STEP — RE-READ THE BOARD IMMEDIATELY BEFORE THE
+   MERGE COMMIT.* A gate takes minutes and reviewers work in parallel, so a hold
+   can arrive INSIDE your gate window. Measured 2026-08-29: a reviewer posted an
+   exact-SHA HOLD at 20:40:24 and the chief merged that candidate ninety seconds
+   later, having checked the board BEFORE gating and not again after. The hold was
+   correct and the defect went to main — `GraphHsmm.infer` returning `Left` on a
+   lawful weighting, found by a runnable probe no test in the suite constructs.
+   **A 950-test green gate is evidence about the code, not about the board.**
+   Checking before you start tells you what was known then; the merge needs what is
+   known now.
 
    *A check and the action it gates must not run in the SAME BATCH.* Piping
    destroys the exit status; batching destroys the DECISION. If the format check,
