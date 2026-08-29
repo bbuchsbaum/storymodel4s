@@ -10,6 +10,8 @@ import storymodel4s.features.{Estimate, MalformedReason, MissingReason}
 
 /** L4 and the contract's failure isolation, checked against a spy embedder. */
 class ContractSuite extends ScalaCheckSuite:
+  private val k1 = SensitiveKeyProvider.static(KeyId.unsafe("contract-k1"), Array[Byte](1, 2, 3))
+  private val k2 = SensitiveKeyProvider.static(KeyId.unsafe("contract-k2"), Array[Byte](4, 5, 6))
   private val provider = ProviderFingerprint.of("spy", "none", "1", "test")
   private val d = Dimension.unsafe(3)
   private val docSpace =
@@ -247,6 +249,115 @@ class ContractSuite extends ScalaCheckSuite:
       docSpace.id
     )
     assert(Embedder.preflight(remote, sanitized).isRight)
+  }
+
+  test("conforming rejects a foreign keyed receipt under the one batch authority") {
+    val foreign = HashedNgramEmbedder[Id](64, 0L, k2)
+    var returned: Option[BatchResult] = None
+    val delegate = new Embedder[Id]:
+      def info: EmbedderInfo = foreign.info
+      def spaces: Vector[EmbeddingSpace] = foreign.spaces
+      def embed(batch: EmbedBatch): BatchResult =
+        val result = foreign.embed(batch)
+        returned = Some(result)
+        result
+    val request = EmbedBatch
+      .validated(
+        Vector(
+          EmbedRequest(
+            RequestId.unsafe("foreign-key"),
+            EmbedPayload.Raw("private material", Sensitivity.Sensitive),
+            foreign.spaces.head.id
+          )
+        ),
+        foreign.spaceIds
+      )
+      .toOption
+      .get
+
+    val result = Embedder.conforming(delegate, k1).embed(request)
+
+    assertEquals(result.receipt.providerCalls, returned.toVector.flatMap(_.receipt.providerCalls))
+    assertEquals(result.receipt.embeddingReceipts, Vector.empty)
+    result.receipt.digest match
+      case ReceiptDigest.Keyed(digest) => assertEquals(digest.keyId.value, "contract-k1")
+      case other                       => fail(s"expected keyed contract-k1 receipt, got $other")
+    assert(result.receipt.resultDecisions.exists {
+      case ResultDecision.ReceiptRejected(
+            EmbedError.ReceiptKeyMismatch(expected, found)
+          ) =>
+        expected.value == "contract-k1" && found.value == "contract-k2"
+      case _ => false
+    })
+    assert(result.outcomes.forall {
+      case EmbedOutcome(
+            _,
+            _,
+            Left(ExecutionFailure.Invalid(EmbedError.ReceiptKeyMismatch(expected, found)))
+          ) =>
+        expected.value == "contract-k1" && found.value == "contract-k2"
+      case _ => false
+    })
+  }
+
+  test("conforming snapshots once before delegation and ignores mid-batch withdrawal") {
+    val once = new SensitiveKeyProvider:
+      private var served = false
+      def currentKeyId: KeyId = KeyId.unsafe("contract-k1")
+      def key(id: KeyId): Option[Array[Byte]] =
+        Option.when(id == currentKeyId && !served) {
+          served = true
+          Array[Byte](1, 2, 3)
+        }
+    val inner = HashedNgramEmbedder[Id](64, 0L, k1)
+    val request = EmbedBatch
+      .validated(
+        Vector(
+          EmbedRequest(
+            RequestId.unsafe("withdrawn"),
+            EmbedPayload.Raw("private material", Sensitivity.Sensitive),
+            inner.spaces.head.id
+          )
+        ),
+        inner.spaceIds
+      )
+      .toOption
+      .get
+
+    val result = Embedder.conforming(inner, once).embed(request)
+
+    assert(result.outcomes.forall(_.value.isRight))
+    assertEquals(result.receipt.kind, DigestKind.Keyed)
+  }
+
+  test("conforming without a non-public key fails before delegate work") {
+    val base = HashedNgramEmbedder[Id](64, 0L, k1)
+    var calls = 0
+    val delegate = new Embedder[Id]:
+      def info: EmbedderInfo = base.info
+      def spaces: Vector[EmbeddingSpace] = base.spaces
+      def embed(batch: EmbedBatch): BatchResult =
+        calls += 1
+        base.embed(batch)
+    val request = EmbedBatch
+      .validated(
+        Vector(
+          EmbedRequest(
+            RequestId.unsafe("no-key"),
+            EmbedPayload.Raw("private material", Sensitivity.Sensitive),
+            base.spaces.head.id
+          )
+        ),
+        base.spaceIds
+      )
+      .toOption
+      .get
+
+    val result = Embedder.conforming(delegate).embed(request)
+
+    assertEquals(calls, 0)
+    assertEquals(result.receipt.kind, DigestKind.Withheld)
+    assertEquals(result.receipt.providerCalls, Vector.empty)
   }
 
   test("AttemptReceipt digest is deterministic and sensitive to its decisions") {

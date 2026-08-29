@@ -223,6 +223,49 @@ class BaselineSuite extends ScalaCheckSuite:
     assertEquals(cache.size, 0)
   }
 
+  test("cache receipt failure drops untrusted provenance and caches nothing") {
+    val base = HashedNgramEmbedder[Id](64, 0L, keys)
+    var calls = 0
+    val untrusted = new Embedder[Id]:
+      val info: EmbedderInfo = base.info
+      val spaces: Vector[EmbeddingSpace] = base.spaces
+      def embed(batch: EmbedBatch): BatchResult =
+        calls += 1
+        base.embed(batch).copy(receipt = AttemptReceipt.empty)
+    val cache = EmbeddingCache.inMemory[Id]
+    val cached = new CachingEmbedder[Id](untrusted, cache, keys)
+    val space = docSpace(cached)
+    val request = EmbedBatch
+      .validated(
+        Vector(
+          EmbedRequest(
+            RequestId.unsafe("untrusted"),
+            EmbedPayload.Raw("private material", Sensitivity.Sensitive),
+            space.id
+          )
+        ),
+        cached.spaceIds
+      )
+      .toOption
+      .get
+
+    val result = cached.embed(request)
+
+    assertEquals(calls, 1)
+    assertEquals(cache.size, 0)
+    assertEquals(result.receipt.kind, DigestKind.Keyed)
+    assertEquals(result.receipt.providerCalls, Vector.empty)
+    assertEquals(result.receipt.embeddingReceipts, Vector.empty)
+    assert(result.receipt.resultDecisions.exists {
+      case ResultDecision.BatchRejected(_) => true
+      case _                               => false
+    })
+    assert(result.outcomes.forall {
+      case EmbedOutcome(_, _, Left(ExecutionFailure.Invalid(_))) => true
+      case _                                                     => false
+    })
+  }
+
   test(
     "remote-locality provider refuses raw sensitive text at preflight, recorded in the receipt"
   ) {

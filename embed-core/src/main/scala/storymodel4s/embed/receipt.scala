@@ -39,7 +39,6 @@ object ReceiptRendering:
   val DetectorPolicyVersion = "detector-policy/v1"
   val ItemsVersion = "items/v1"
   val OutputsVersion = "outputs/v1"
-  val AttemptVersion = "attempt/v1"
 
   def esc(s: String): String =
     val sb = new StringBuilder(s.length + 8)

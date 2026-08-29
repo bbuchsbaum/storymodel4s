@@ -83,13 +83,19 @@ final class CachingEmbedder[F[_]: Monad](
       !ReceiptDigest.plainAdmissible.contains(s)
     }
     val keyId = keys.currentKeyId
-    val snapshot: Option[SensitiveKeyProvider] =
-      keys.key(keyId).filter(_.nonEmpty).map(bytes => SensitiveKeyProvider.static(keyId, bytes))
-    snapshot match
-      case None if nonPublic => Monad[F].pure(CachingEmbedder.failClosed(batch, keyId))
-      case _                 => embedWith(batch, snapshot.getOrElse(SensitiveKeyProvider.none))
+    if !nonPublic then embedWith(batch, None)
+    else
+      SensitiveKeySnapshot.capture(keyId, keys) match
+        case Right(snapshot)                        => embedWith(batch, Some(snapshot))
+        case Left(error @ EmbedError.InvalidKey(_)) =>
+          Monad[F].pure(BatchResult.invalidKey(batch, keyId, error))
+        case Left(_) => Monad[F].pure(BatchResult.cacheKeyUnavailable(batch, keyId))
 
-  private def embedWith(batch: EmbedBatch, batchKeys: SensitiveKeyProvider): F[BatchResult] =
+  private def embedWith(
+      batch: EmbedBatch,
+      snapshot: Option[SensitiveKeySnapshot]
+  ): F[BatchResult] =
+    val batchKeys = snapshot.fold[SensitiveKeyProvider](SensitiveKeyProvider.none)(_.provider)
     val keyed: Vector[(EmbedRequest, Keyed)] = batch.requests.map { r =>
       val key = underlying.space(r.space) match
         case None    => Keyed.Other(EmbedError.UnknownSpace(r.space.value))
@@ -149,20 +155,62 @@ final class CachingEmbedder[F[_]: Monad](
           val cacheDecisions = decisions ++ fresh.receipt.cacheDecisions
           val policy = fresh.receipt.policyDecisions ++ denials
           // The receipt is minted BEFORE any put: a withheld attempt caches nothing.
-          val receipted = AttemptReceipt
-            .of(
-              fresh.receipt.providerCalls,
-              fresh.receipt.embeddingReceipts,
-              cacheDecisions,
-              policy,
-              fresh.receipt.resultDecisions,
-              batch.itemSensitivity,
-              batchKeys
-            )
+          val receipted = snapshot match
+            case Some(authority) =>
+              AttemptReceipt.ofSnapshot(
+                fresh.receipt.providerCalls,
+                fresh.receipt.embeddingReceipts,
+                cacheDecisions,
+                policy,
+                fresh.receipt.resultDecisions,
+                batch.itemSensitivity,
+                authority
+              )
+            case None =>
+              AttemptReceipt.of(
+                fresh.receipt.providerCalls,
+                fresh.receipt.embeddingReceipts,
+                cacheDecisions,
+                policy,
+                fresh.receipt.resultDecisions,
+                batch.itemSensitivity,
+                batchKeys
+              )
           val receipt = receipted.fold(
             error =>
-              // Preserve a real provider call if an internal receipt invariant ever fails.
-              fresh.receipt.addResultDecisions(Vector(ResultDecision.BatchRejected(error))),
+              val rejection = Vector(ResultDecision.BatchRejected(error))
+              val rebuilt = snapshot match
+                case Some(authority) =>
+                  AttemptReceipt.ofSnapshot(
+                    Vector.empty,
+                    Vector.empty,
+                    cacheDecisions,
+                    policy,
+                    rejection,
+                    batch.itemSensitivity,
+                    authority
+                  )
+                case None =>
+                  AttemptReceipt.of(
+                    Vector.empty,
+                    Vector.empty,
+                    cacheDecisions,
+                    policy,
+                    rejection,
+                    batch.itemSensitivity,
+                    SensitiveKeyProvider.none
+                  )
+              rebuilt.getOrElse(
+                AttemptReceipt.rejectProviderResult(
+                  Vector.empty,
+                  cacheDecisions,
+                  policy,
+                  batch.itemSensitivity,
+                  error,
+                  snapshot
+                )
+              )
+            ,
             identity
           )
           val finalOutcomes = receipted match
@@ -183,26 +231,3 @@ final class CachingEmbedder[F[_]: Monad](
           puts.sequence_.map(_ => BatchResult(finalOutcomes, receipt))
         }
       }
-
-object CachingEmbedder:
-  /** Every outcome denied, no provider call, nothing cached, a `Withheld` receipt: the batch needed
-    * a key the store does not have.
-    */
-  private[embed] def failClosed(batch: EmbedBatch, keyId: KeyId): BatchResult =
-    val denials = batch.requests.map(r => new PolicyDecision.KeyUnavailable(Some(r.id), keyId))
-    val outcomes = batch.requests.zip(denials).map { case (r, d) =>
-      EmbedOutcome(r.id, r.space, Left(ExecutionFailure.PolicyDenied(d)))
-    }
-    val cacheDecisions = batch.requests.zip(denials).map { case (r, d) =>
-      CacheDecision.Denied(r.id, d)
-    }
-    BatchResult(
-      outcomes,
-      AttemptReceipt.failClosed(
-        cacheDecisions,
-        denials.map(d => d: PolicyDecision),
-        Vector.empty,
-        batch.itemSensitivity,
-        keyId
-      )
-    )

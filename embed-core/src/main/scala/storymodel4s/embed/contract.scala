@@ -81,13 +81,15 @@ final case class EmbedOutcome(
 enum ResultDecision:
   case Reordered(id: RequestId, fromIndex: Int, toIndex: Int)
   case SpaceRejected(id: RequestId, expected: GeometryId, actual: GeometryId)
+  case ReceiptRejected(error: EmbedError.ReceiptKeyMismatch | EmbedError.AuthorityMismatch)
   case BatchRejected(error: EmbedError)
 
   private[embed] def render: String = this match
     case Reordered(id, from, to)             => s"reordered:${id.value}:$from:$to"
     case SpaceRejected(id, expected, actual) =>
       s"space-rejected:${id.value}:${expected.value}:${actual.value}"
-    case BatchRejected(error) => s"batch-rejected:${error.message}"
+    case ReceiptRejected(error) => s"receipt-rejected:${error.message}"
+    case BatchRejected(error)   => s"batch-rejected:${error.message}"
 
 /** What the cache did for one request. Keys are typed [[ReceiptDigest]]s, so the digest kind is
   * visible without parsing a rendering; a request denied for lack of a key is recorded as such.
@@ -124,20 +126,8 @@ final class AttemptReceipt private (
     val policyDecisions: Vector[PolicyDecision],
     val resultDecisions: Vector[ResultDecision],
     val itemSensitivity: Vector[(RequestId, Sensitivity)],
-    private val digestAuthority: AttemptReceipt.DigestAuthority
+    val digest: ReceiptDigest
 ):
-  val digest: ReceiptDigest =
-    digestAuthority.digest(
-      AttemptReceipt.rendering(
-        providerCalls,
-        embeddingReceipts,
-        cacheDecisions,
-        policyDecisions,
-        resultDecisions,
-        itemSensitivity
-      )
-    )
-
   def kind: DigestKind = digest.kind
 
   private def parts = (
@@ -186,21 +176,16 @@ final class AttemptReceipt private (
         }
       case _ => outcomes
 
-  /** Re-receipt with additional result decisions under the same owned digest authority. The key was
-    * snapshotted before work, so an amendment can neither change the digest kind nor erase a call.
+  /** Re-receipt with additional result decisions under the batch-scoped authority. The receipt
+    * stores only its final digest; a keyed amendment must therefore be supplied the immutable
+    * snapshot captured before work. It can neither change authority nor erase a call.
     */
-  private[embed] def addResultDecisions(decisions: Vector[ResultDecision]): AttemptReceipt =
-    if decisions.isEmpty then this
-    else
-      new AttemptReceipt(
-        providerCalls,
-        embeddingReceipts,
-        cacheDecisions,
-        policyDecisions,
-        resultDecisions ++ decisions,
-        itemSensitivity,
-        digestAuthority
-      )
+  private[embed] def addResultDecisions(
+      decisions: Vector[ResultDecision],
+      snapshot: Option[SensitiveKeySnapshot]
+  ): Either[EmbedError, AttemptReceipt] =
+    if decisions.isEmpty then Right(this)
+    else AttemptReceipt.amend(this, decisions, snapshot)
 
 object AttemptReceipt:
   private val AttemptVersion = "attempt/v2"
@@ -214,6 +199,67 @@ object AttemptReceipt:
       case Plain             => ReceiptDigest.plainPublic(rendering)
       case Keyed(snapshot)   => ReceiptDigest.Keyed(SensitiveDigest.compute(snapshot, rendering))
       case Withheld(missing) => ReceiptDigest.withheld(missing, rendering)
+
+  private def build(
+      providerCalls: Vector[ProviderCall],
+      embeddingReceipts: Vector[EmbeddingReceipt],
+      cacheDecisions: Vector[CacheDecision],
+      policyDecisions: Vector[PolicyDecision],
+      resultDecisions: Vector[ResultDecision],
+      itemSensitivity: Vector[(RequestId, Sensitivity)],
+      authority: DigestAuthority
+  ): AttemptReceipt =
+    val material = rendering(
+      providerCalls,
+      embeddingReceipts,
+      cacheDecisions,
+      policyDecisions,
+      resultDecisions,
+      itemSensitivity
+    )
+    new AttemptReceipt(
+      providerCalls,
+      embeddingReceipts,
+      cacheDecisions,
+      policyDecisions,
+      resultDecisions,
+      itemSensitivity,
+      authority.digest(material)
+    )
+
+  private def amend(
+      receipt: AttemptReceipt,
+      decisions: Vector[ResultDecision],
+      snapshot: Option[SensitiveKeySnapshot]
+  ): Either[EmbedError, AttemptReceipt] =
+    val authority = receipt.digest match
+      case ReceiptDigest.Plain(_) =>
+        snapshot match
+          case None    => Right(DigestAuthority.Plain)
+          case Some(_) => Left(EmbedError.InvalidResult("plain receipt supplied a keyed authority"))
+      case ReceiptDigest.Keyed(stored) =>
+        snapshot match
+          case Some(supplied) if supplied.keyId == stored.keyId =>
+            Right(DigestAuthority.Keyed(supplied))
+          case Some(supplied) =>
+            Left(EmbedError.AuthorityMismatch(stored.keyId, supplied.keyId))
+          case None => Left(EmbedError.NoKey(stored.keyId.value))
+      case ReceiptDigest.Withheld(missing, _) =>
+        snapshot match
+          case None           => Right(DigestAuthority.Withheld(missing))
+          case Some(supplied) =>
+            Left(EmbedError.AuthorityMismatch(missing, supplied.keyId))
+    authority.map(a =>
+      build(
+        receipt.providerCalls,
+        receipt.embeddingReceipts,
+        receipt.cacheDecisions,
+        receipt.policyDecisions,
+        receipt.resultDecisions ++ decisions,
+        receipt.itemSensitivity,
+        a
+      )
+    )
 
   private def record(tag: String, fields: Vector[String]): String =
     (tag +: fields.map(ReceiptRendering.esc)).mkString("|")
@@ -285,6 +331,12 @@ object AttemptReceipt:
     case PolicyDecision.KeyUnavailable(id, keyId) =>
       Vector("key-unavailable") ++ optionFields(id.map(_.value)) :+ keyId.value
 
+  private def policyDigests(decision: PolicyDecision): Vector[ReceiptDigest.Keyed] =
+    decision match
+      case PolicyDecision.Allowed(_, capability) =>
+        Vector(capability.detectorIdentity.configurationDigest, capability.payloadDigest)
+      case _ => Vector.empty
+
   private def cacheDecisionLine(index: Int, decision: CacheDecision): String = decision match
     case CacheDecision.Hit(id, key) =>
       record("cache", Vector(index.toString, "hit", id.value, key.render))
@@ -309,10 +361,14 @@ object AttemptReceipt:
       Vector("incompatible-spaces", query, document, reason)
     case EmbedError.InvalidDistance(value) =>
       Vector("invalid-distance", CanonicalDouble.render(value))
-    case EmbedError.InvalidRecipe(reason) => Vector("invalid-recipe", reason)
-    case EmbedError.InvalidResult(reason) => Vector("invalid-result", reason)
-    case EmbedError.InvalidKey(reason)    => Vector("invalid-key", reason)
-    case EmbedError.NoKey(keyId)          => Vector("no-key", keyId)
+    case EmbedError.InvalidRecipe(reason)               => Vector("invalid-recipe", reason)
+    case EmbedError.InvalidResult(reason)               => Vector("invalid-result", reason)
+    case EmbedError.InvalidKey(reason)                  => Vector("invalid-key", reason)
+    case EmbedError.ReceiptKeyMismatch(expected, found) =>
+      Vector("receipt-key-mismatch", expected.value, found.value)
+    case EmbedError.AuthorityMismatch(stored, supplied) =>
+      Vector("authority-mismatch", stored.value, supplied.value)
+    case EmbedError.NoKey(keyId) => Vector("no-key", keyId)
 
   private def resultDecisionLine(index: Int, decision: ResultDecision): String = decision match
     case ResultDecision.Reordered(id, from, to) =>
@@ -322,28 +378,10 @@ object AttemptReceipt:
         "result",
         Vector(index.toString, "space-rejected", id.value, expected.value, actual.value)
       )
+    case ResultDecision.ReceiptRejected(error) =>
+      record("result", Vector(index.toString, "receipt-rejected") ++ errorFields(error))
     case ResultDecision.BatchRejected(error) =>
       record("result", Vector(index.toString, "batch-rejected") ++ errorFields(error))
-
-  /** Legacy attempt/v1 rendering, retained byte-for-byte for format identification. */
-  private[embed] def renderingV1(
-      providerCalls: Vector[ProviderCall],
-      cacheDecisions: Vector[CacheDecision],
-      policyDecisions: Vector[PolicyDecision],
-      resultDecisions: Vector[ResultDecision],
-      itemSensitivity: Vector[(RequestId, Sensitivity)]
-  ): String =
-    val e = ReceiptRendering.esc
-    val lines =
-      Vector(ReceiptRendering.AttemptVersion) ++
-        providerCalls.map(c =>
-          s"call|${e(c.provider)}|${e(c.model)}|${e(c.version)}|${c.inputChecksum.hex}|${c.outputChecksum.hex}"
-        ) ++
-        cacheDecisions.map(_.render) ++
-        policyDecisions.map(d => s"policy|${e(d.render)}") ++
-        resultDecisions.map(d => s"result|${e(d.render)}") ++
-        itemSensitivity.map { case (id, s) => s"item|${e(id.value)}|$s" }
-    lines.mkString("\n")
 
   /** Canonical attempt/v2 rendering of every value field (never material). */
   private[embed] def rendering(
@@ -379,15 +417,33 @@ object AttemptReceipt:
   private def validateProviderReceipts(
       providerCalls: Vector[ProviderCall],
       embeddingReceipts: Vector[EmbeddingReceipt],
+      cacheDecisions: Vector[CacheDecision],
+      policyDecisions: Vector[PolicyDecision],
+      resultDecisions: Vector[ResultDecision],
       itemSensitivity: Vector[(RequestId, Sensitivity)]
   ): Either[EmbedError, Unit] =
     val declaredIds = itemSensitivity.map(_._1)
+    val nonPublicIds = itemSensitivity.collect {
+      case (id, sensitivity) if !ReceiptDigest.plainAdmissible.contains(sensitivity) => id
+    }.toSet
     val embeddedItems = embeddingReceipts.flatMap(_.items)
     val embeddedIds = embeddedItems.map(_.id)
+    val keyedCacheIdentity = cacheDecisions.exists {
+      case CacheDecision.Hit(_, digest)  => digest.kind == DigestKind.Keyed
+      case CacheDecision.Miss(_, digest) => digest.kind == DigestKind.Keyed
+      case _                             => false
+    }
+    val publicCarriesKeyedEvidence =
+      nonPublicIds.isEmpty && (embeddingReceipts.exists(_.kind == DigestKind.Keyed) ||
+        keyedCacheIdentity || policyDecisions.exists(policyDigests(_).nonEmpty))
     if declaredIds.distinct.size != declaredIds.size then
       Left(EmbedError.InvalidResult("duplicate item sensitivity evidence"))
     else if embeddedIds.distinct.size != embeddedIds.size then
       Left(EmbedError.InvalidResult("duplicate embedded item identity"))
+    else if nonPublicIds.nonEmpty && embeddingReceipts.exists(_.items.isEmpty) then
+      Left(EmbedError.InvalidResult("non-public batch cannot contain an empty-item receipt"))
+    else if publicCarriesKeyedEvidence then
+      Left(EmbedError.InvalidResult("public batch cannot contain keyed receipt evidence"))
     else if embeddingReceipts.exists(receipt => !receipt.isKeyConsistent) then
       Left(EmbedError.InvalidResult("inconsistent embedding receipt identity"))
     else if providerCalls != embeddingReceipts.map(_.call) then
@@ -405,7 +461,29 @@ object AttemptReceipt:
               "embedded item sensitivity must match the batch evidence"
             )
           )
-        case None => Right(())
+        case None =>
+          val keyedItems = embeddedItems.collect {
+            case item if item.digest.kind == DigestKind.Keyed => item.id
+          }.toSet
+          val cacheCovered = cacheDecisions.collect {
+            case CacheDecision.Hit(id, key) if key.kind == DigestKind.Keyed => id
+            case CacheDecision.Denied(id, _)                                => id
+          }.toSet
+          val policyCovered = policyDecisions.collect {
+            case PolicyDecision.KeyUnavailable(Some(id), _) => id
+          }.toSet
+          val batchRejected = resultDecisions.exists {
+            case ResultDecision.BatchRejected(_) => true
+            case _                               => false
+          }
+          val uncovered = nonPublicIds -- keyedItems -- cacheCovered -- policyCovered
+          if uncovered.nonEmpty && !batchRejected then
+            Left(
+              EmbedError.InvalidResult(
+                s"non-public items lack keyed or denial evidence: ${uncovered.toVector.map(_.value).sorted.mkString(",")}"
+              )
+            )
+          else Right(())
 
   /** Build a receipt. `Left(NoKey)` only when a non-public item is present, no key is available,
     * and that item is NOT covered by a recorded `KeyUnavailable` decision — i.e. the caller tried
@@ -420,45 +498,159 @@ object AttemptReceipt:
       itemSensitivity: Vector[(RequestId, Sensitivity)],
       keys: SensitiveKeyProvider
   ): Either[EmbedError, AttemptReceipt] =
-    validateProviderReceipts(providerCalls, embeddingReceipts, itemSensitivity).flatMap { _ =>
-      val nonPublic = itemSensitivity.collect {
-        case (id, s) if !ReceiptDigest.plainAdmissible.contains(s) => id
-      }
-      val authority: Either[EmbedError, DigestAuthority] =
-        if nonPublic.isEmpty then Right(DigestAuthority.Plain)
-        else
-          val keyId = keys.currentKeyId
-          SensitiveKeySnapshot.capture(keyId, keys).map(DigestAuthority.Keyed(_)).left.flatMap {
-            case error @ EmbedError.NoKey(_) =>
-              val denied = policyDecisions.collect {
-                case PolicyDecision.KeyUnavailable(Some(id), _) => id
-              }.toSet
-              if !nonPublic.forall(denied.contains) then Left(error)
-              else if providerCalls.nonEmpty || embeddingReceipts.nonEmpty then
-                Left(
-                  EmbedError.InvalidResult(
-                    "withheld receipt cannot describe provider calls"
-                  )
-                )
-              else Right(DigestAuthority.Withheld(keyId))
-            case error => Left(error)
-          }
-      authority.map(a =>
-        new AttemptReceipt(
+    val nonPublic = itemSensitivity.collect {
+      case (id, s) if !ReceiptDigest.plainAdmissible.contains(s) => id
+    }
+    if nonPublic.isEmpty then
+      validateProviderReceipts(
+        providerCalls,
+        embeddingReceipts,
+        cacheDecisions,
+        policyDecisions,
+        resultDecisions,
+        itemSensitivity
+      ).map(_ =>
+        build(
           providerCalls,
           embeddingReceipts,
           cacheDecisions,
           policyDecisions,
           resultDecisions,
           itemSensitivity,
-          a
+          DigestAuthority.Plain
         )
       )
+    else
+      val keyId = keys.currentKeyId
+      SensitiveKeySnapshot.capture(keyId, keys) match
+        case Right(snapshot) =>
+          ofSnapshot(
+            providerCalls,
+            embeddingReceipts,
+            cacheDecisions,
+            policyDecisions,
+            resultDecisions,
+            itemSensitivity,
+            snapshot
+          )
+        case Left(error @ EmbedError.NoKey(_)) =>
+          validateProviderReceipts(
+            providerCalls,
+            embeddingReceipts,
+            cacheDecisions,
+            policyDecisions,
+            resultDecisions,
+            itemSensitivity
+          ).flatMap { _ =>
+            val denied = policyDecisions.collect {
+              case PolicyDecision.KeyUnavailable(Some(id), _) => id
+            }.toSet
+            if !nonPublic.forall(denied.contains) then Left(error)
+            else if providerCalls.nonEmpty || embeddingReceipts.nonEmpty then
+              Left(EmbedError.InvalidResult("withheld receipt cannot describe provider calls"))
+            else
+              Right(
+                build(
+                  providerCalls,
+                  embeddingReceipts,
+                  cacheDecisions,
+                  policyDecisions,
+                  resultDecisions,
+                  itemSensitivity,
+                  DigestAuthority.Withheld(keyId)
+                )
+              )
+          }
+        case Left(error) => Left(error)
+
+  /** Build under the one immutable key snapshot captured before non-public delegation. */
+  private[embed] def ofSnapshot(
+      providerCalls: Vector[ProviderCall],
+      embeddingReceipts: Vector[EmbeddingReceipt],
+      cacheDecisions: Vector[CacheDecision],
+      policyDecisions: Vector[PolicyDecision],
+      resultDecisions: Vector[ResultDecision],
+      itemSensitivity: Vector[(RequestId, Sensitivity)],
+      snapshot: SensitiveKeySnapshot
+  ): Either[EmbedError, AttemptReceipt] =
+    val hasNonPublic = itemSensitivity.exists { case (_, sensitivity) =>
+      !ReceiptDigest.plainAdmissible.contains(sensitivity)
     }
+    if !hasNonPublic then Left(EmbedError.InvalidResult("keyed receipt requires a non-public item"))
+    else
+      validateProviderReceipts(
+        providerCalls,
+        embeddingReceipts,
+        cacheDecisions,
+        policyDecisions,
+        resultDecisions,
+        itemSensitivity
+      ).flatMap { _ =>
+        val receiptDigests =
+          embeddingReceipts.flatMap(receipt => receipt.outputs +: receipt.items.map(_.digest))
+        val cacheDigests = cacheDecisions.flatMap {
+          case CacheDecision.Hit(_, digest)    => Vector(digest)
+          case CacheDecision.Miss(_, digest)   => Vector(digest)
+          case CacheDecision.Denied(_, policy) => policyDigests(policy)
+          case CacheDecision.Bypassed(_, _)    => Vector.empty
+        }
+        val keyedDigests = (receiptDigests ++ cacheDigests ++ policyDecisions.flatMap(
+          policyDigests
+        )).collect { case ReceiptDigest.Keyed(digest) => digest }
+        val missingKeys =
+          policyDecisions.collect { case PolicyDecision.KeyUnavailable(_, keyId) => keyId } ++
+            cacheDecisions.collect {
+              case CacheDecision.Denied(_, PolicyDecision.KeyUnavailable(_, keyId)) => keyId
+            }
+        keyedDigests.find(_.keyId != snapshot.keyId) match
+          case Some(digest) =>
+            Left(EmbedError.ReceiptKeyMismatch(snapshot.keyId, digest.keyId))
+          case None =>
+            missingKeys.find(_ != snapshot.keyId) match
+              case Some(keyId) => Left(EmbedError.ReceiptKeyMismatch(snapshot.keyId, keyId))
+              case None        =>
+                Right(
+                  build(
+                    providerCalls,
+                    embeddingReceipts,
+                    cacheDecisions,
+                    policyDecisions,
+                    resultDecisions,
+                    itemSensitivity,
+                    DigestAuthority.Keyed(snapshot)
+                  )
+                )
+      }
+
+  /** Reject an invalid provider result under the trusted batch authority, preserving only calls. */
+  private[embed] def rejectProviderResult(
+      providerCalls: Vector[ProviderCall],
+      cacheDecisions: Vector[CacheDecision],
+      policyDecisions: Vector[PolicyDecision],
+      itemSensitivity: Vector[(RequestId, Sensitivity)],
+      error: EmbedError,
+      snapshot: Option[SensitiveKeySnapshot]
+  ): AttemptReceipt =
+    val receiptRejected = error match
+      case mismatch @ EmbedError.ReceiptKeyMismatch(_, _) =>
+        Vector(ResultDecision.ReceiptRejected(mismatch))
+      case mismatch @ EmbedError.AuthorityMismatch(_, _) =>
+        Vector(ResultDecision.ReceiptRejected(mismatch))
+      case _ => Vector.empty
+    val authority = snapshot.fold[DigestAuthority](DigestAuthority.Plain)(DigestAuthority.Keyed(_))
+    build(
+      providerCalls,
+      Vector.empty,
+      cacheDecisions,
+      policyDecisions,
+      receiptRejected :+ ResultDecision.BatchRejected(error),
+      itemSensitivity,
+      authority
+    )
 
   /** The receipt of an attempt that touched nothing: no items, no calls, no decisions. */
   private[embed] val empty: AttemptReceipt =
-    new AttemptReceipt(
+    build(
       Vector.empty,
       Vector.empty,
       Vector.empty,
@@ -480,7 +672,14 @@ object AttemptReceipt:
       resultDecisions: Vector[ResultDecision],
       itemSensitivity: Vector[(RequestId, Sensitivity)]
   ): Either[EmbedError, AttemptReceipt] =
-    validateProviderReceipts(providerCalls, Vector.empty, itemSensitivity).flatMap { _ =>
+    validateProviderReceipts(
+      providerCalls,
+      Vector.empty,
+      cacheDecisions,
+      policyDecisions,
+      resultDecisions,
+      itemSensitivity
+    ).flatMap { _ =>
       itemSensitivity.collectFirst {
         case (id, s) if !ReceiptDigest.plainAdmissible.contains(s) => id
       } match
@@ -492,7 +691,7 @@ object AttemptReceipt:
           )
         case None =>
           Right(
-            new AttemptReceipt(
+            build(
               providerCalls,
               Vector.empty,
               cacheDecisions,
@@ -522,7 +721,7 @@ object AttemptReceipt:
         PolicyDecision.KeyUnavailable(Some(id), missing)
     }
     val policy = policyDecisions ++ denials
-    new AttemptReceipt(
+    build(
       Vector.empty,
       Vector.empty,
       cacheDecisions,
@@ -547,6 +746,66 @@ final case class BatchResult(outcomes: Vector[EmbedOutcome], receipt: AttemptRec
       }
       if bad >= 0 then Left(EmbedError.InvalidResult(s"outcome $bad does not match its request"))
       else Right(this)
+
+object BatchResult:
+  /** Deny a keyless non-public provider batch before any call is made. */
+  private[embed] def keyUnavailable(batch: EmbedBatch, keyId: KeyId): BatchResult =
+    keyUnavailable(batch, keyId, cacheAttempt = false)
+
+  /** Deny a keyless cache batch before lookup or delegation, recording cache denials. */
+  private[embed] def cacheKeyUnavailable(batch: EmbedBatch, keyId: KeyId): BatchResult =
+    keyUnavailable(batch, keyId, cacheAttempt = true)
+
+  private def keyUnavailable(
+      batch: EmbedBatch,
+      keyId: KeyId,
+      cacheAttempt: Boolean
+  ): BatchResult =
+    val denials = batch.requests.map { request =>
+      new PolicyDecision.KeyUnavailable(Some(request.id), keyId)
+    }
+    val outcomes = batch.requests.zip(denials).map { case (request, denial) =>
+      EmbedOutcome(request.id, request.space, Left(ExecutionFailure.PolicyDenied(denial)))
+    }
+    val cacheDecisions =
+      if cacheAttempt then
+        batch.requests.zip(denials).map { case (request, denial) =>
+          CacheDecision.Denied(request.id, denial)
+        }
+      else Vector.empty
+    BatchResult(
+      outcomes,
+      AttemptReceipt.failClosed(
+        cacheDecisions,
+        denials.map(d => d: PolicyDecision),
+        Vector.empty,
+        batch.itemSensitivity,
+        keyId
+      )
+    )
+
+  /** Reject a corrupt batch key before provider work while preserving the typed key failure. */
+  private[embed] def invalidKey(
+      batch: EmbedBatch,
+      keyId: KeyId,
+      error: EmbedError.InvalidKey
+  ): BatchResult =
+    val denials = batch.requests.map { request =>
+      new PolicyDecision.KeyUnavailable(Some(request.id), keyId)
+    }
+    val outcomes = batch.requests.map { request =>
+      EmbedOutcome(request.id, request.space, Left(ExecutionFailure.Invalid(error)))
+    }
+    BatchResult(
+      outcomes,
+      AttemptReceipt.failClosed(
+        Vector.empty,
+        denials.map(d => d: PolicyDecision),
+        Vector(ResultDecision.BatchRejected(error)),
+        batch.itemSensitivity,
+        keyId
+      )
+    )
 
 /** Static capabilities of a provider. */
 final case class EmbedderInfo(
@@ -577,25 +836,99 @@ object Embedder:
     *
     * A complete id bijection is normalized into request order. A wrong-space item becomes a typed
     * missing estimate and a receipt decision; missing, duplicate, or extra ids fail the whole batch
-    * because their vectors cannot be associated safely.
+    * because their vectors cannot be associated safely. For a non-public batch, `keys` is captured
+    * once before delegation and every escaping receipt is reconstructed under that authority.
     */
-  def conforming[F[_]: Applicative](underlying: Embedder[F]): Embedder[F] =
+  def conforming[F[_]: Applicative](
+      underlying: Embedder[F],
+      keys: SensitiveKeyProvider = SensitiveKeyProvider.none
+  ): Embedder[F] =
     new Embedder[F]:
       def info: EmbedderInfo = underlying.info
       def spaces: Vector[EmbeddingSpace] = underlying.spaces
       def embed(batch: EmbedBatch): F[BatchResult] =
-        Applicative[F].map(underlying.embed(batch))(normalize(batch, _))
+        val nonPublic = batch.itemSensitivity.exists { case (_, sensitivity) =>
+          !ReceiptDigest.plainAdmissible.contains(sensitivity)
+        }
+        if !nonPublic then Applicative[F].map(underlying.embed(batch))(normalize(batch, _, None))
+        else
+          val keyId = keys.currentKeyId
+          SensitiveKeySnapshot.capture(keyId, keys) match
+            case Right(snapshot) =>
+              Applicative[F].map(underlying.embed(batch))(normalize(batch, _, Some(snapshot)))
+            case Left(error @ EmbedError.InvalidKey(_)) =>
+              Applicative[F].pure(BatchResult.invalidKey(batch, keyId, error))
+            case Left(_) => Applicative[F].pure(BatchResult.keyUnavailable(batch, keyId))
 
-  private def normalize(batch: EmbedBatch, result: BatchResult): BatchResult =
-    val expectedIds = batch.ids.toSet
-    val grouped = result.outcomes.zipWithIndex.groupMap(_._1.id)(identity)
-    val actualIds = grouped.keySet
-    val duplicateIds = grouped.collect { case (id, values) if values.size > 1 => id }.toVector
-    val missingIds = expectedIds.diff(actualIds).toVector
-    val extraIds = actualIds.diff(expectedIds).toVector
+  private def normalize(
+      batch: EmbedBatch,
+      result: BatchResult,
+      snapshot: Option[SensitiveKeySnapshot]
+  ): BatchResult =
+    trustedReceipt(batch, result.receipt, snapshot) match
+      case Left(error)    => rejectUntrusted(batch, result, error, snapshot)
+      case Right(receipt) =>
+        val trusted = result.copy(receipt = receipt)
+        val expectedIds = batch.ids.toSet
+        val grouped = trusted.outcomes.zipWithIndex.groupMap(_._1.id)(identity)
+        val actualIds = grouped.keySet
+        val duplicateIds = grouped.collect {
+          case (id, values) if values.size > 1 => id
+        }.toVector
+        val missingIds = expectedIds.diff(actualIds).toVector
+        val extraIds = actualIds.diff(expectedIds).toVector
 
-    associationError(result.outcomes.size, batch.requests.size, duplicateIds, missingIds, extraIds)
-      .fold(normalizeBijection(batch, result, grouped))(failClosed(batch, result, _))
+        associationError(
+          trusted.outcomes.size,
+          batch.requests.size,
+          duplicateIds,
+          missingIds,
+          extraIds
+        ).fold(normalizeBijection(batch, trusted, grouped, snapshot))(
+          rejectTrusted(batch, trusted, _, snapshot)
+        )
+
+  private def trustedReceipt(
+      batch: EmbedBatch,
+      receipt: AttemptReceipt,
+      snapshot: Option[SensitiveKeySnapshot]
+  ): Either[EmbedError, AttemptReceipt] =
+    snapshot match
+      case Some(authority) =>
+        receipt.digest match
+          case ReceiptDigest.Keyed(digest) if digest.keyId != authority.keyId =>
+            Left(EmbedError.ReceiptKeyMismatch(authority.keyId, digest.keyId))
+          case ReceiptDigest.Keyed(_) =>
+            AttemptReceipt
+              .ofSnapshot(
+                receipt.providerCalls,
+                receipt.embeddingReceipts,
+                receipt.cacheDecisions,
+                receipt.policyDecisions,
+                receipt.resultDecisions,
+                batch.itemSensitivity,
+                authority
+              )
+              .flatMap { rebuilt =>
+                if rebuilt.digest == receipt.digest then Right(rebuilt)
+                else
+                  Left(EmbedError.InvalidResult("attempt receipt digest does not match its body"))
+              }
+          case _ =>
+            Left(EmbedError.InvalidResult("non-public batch returned a non-keyed receipt"))
+      case None =>
+        receipt.digest match
+          case ReceiptDigest.Plain(_) =>
+            AttemptReceipt.of(
+              receipt.providerCalls,
+              receipt.embeddingReceipts,
+              receipt.cacheDecisions,
+              receipt.policyDecisions,
+              receipt.resultDecisions,
+              batch.itemSensitivity,
+              SensitiveKeyProvider.none
+            )
+          case _ => Left(EmbedError.InvalidResult("public batch returned a non-plain receipt"))
 
   private def associationError(
       actualSize: Int,
@@ -618,7 +951,8 @@ object Embedder:
   private def normalizeBijection(
       batch: EmbedBatch,
       result: BatchResult,
-      grouped: Map[RequestId, Vector[(EmbedOutcome, Int)]]
+      grouped: Map[RequestId, Vector[(EmbedOutcome, Int)]],
+      snapshot: Option[SensitiveKeySnapshot]
   ): BatchResult =
     val normalized = batch.requests.zipWithIndex.flatMap { case (request, targetIndex) =>
       grouped.get(request.id).flatMap(_.headOption).map { case (outcome, sourceIndex) =>
@@ -639,27 +973,55 @@ object Embedder:
       }
     }
     if normalized.size != batch.requests.size then
-      failClosed(
+      rejectTrusted(
         batch,
         result,
-        EmbedError.InvalidResult("outcomes did not form a complete request-id bijection")
+        EmbedError.InvalidResult("outcomes did not form a complete request-id bijection"),
+        snapshot
       )
     else
       val decisions = normalized.flatMap(_._2)
-      val receipt = result.receipt.addResultDecisions(decisions)
-      BatchResult(receipt.enforceWithholding(normalized.map(_._1)), receipt)
+      result.receipt.addResultDecisions(decisions, snapshot) match
+        case Right(receipt) =>
+          BatchResult(receipt.enforceWithholding(normalized.map(_._1)), receipt)
+        case Left(error) => rejectUntrusted(batch, result, error, snapshot)
 
-  private def failClosed(
+  private def rejectTrusted(
       batch: EmbedBatch,
       result: BatchResult,
-      error: EmbedError
+      error: EmbedError,
+      snapshot: Option[SensitiveKeySnapshot]
   ): BatchResult =
-    val receipt = result.receipt.addResultDecisions(Vector(ResultDecision.BatchRejected(error)))
+    result.receipt
+      .addResultDecisions(Vector(ResultDecision.BatchRejected(error)), snapshot)
+      .fold(
+        amendmentError => rejectUntrusted(batch, result, amendmentError, snapshot),
+        receipt =>
+          BatchResult(
+            batch.requests.map(request =>
+              EmbedOutcome(request.id, request.space, Left(ExecutionFailure.Invalid(error)))
+            ),
+            receipt
+          )
+      )
+
+  private def rejectUntrusted(
+      batch: EmbedBatch,
+      result: BatchResult,
+      error: EmbedError,
+      snapshot: Option[SensitiveKeySnapshot]
+  ): BatchResult =
+    val receipt = AttemptReceipt.rejectProviderResult(
+      result.receipt.providerCalls,
+      result.receipt.cacheDecisions,
+      result.receipt.policyDecisions,
+      batch.itemSensitivity,
+      error,
+      snapshot
+    )
     BatchResult(
-      receipt.enforceWithholding(
-        batch.requests.map(request =>
-          EmbedOutcome(request.id, request.space, Left(ExecutionFailure.Invalid(error)))
-        )
+      batch.requests.map(request =>
+        EmbedOutcome(request.id, request.space, Left(ExecutionFailure.Invalid(error)))
       ),
       receipt
     )
