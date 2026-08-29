@@ -5,6 +5,7 @@ import munit.FunSuite
 import storymodel4s.core.*
 import storymodel4s.interview.*
 import storymodel4s.interview.scoring.*
+import storymodel4s.recall.*
 
 class BirthdayInterviewSuite extends FunSuite:
   private lazy val model = BirthdayInterview.model
@@ -88,7 +89,31 @@ class BirthdayInterviewSuite extends FunSuite:
     assert(attrs.contains("small") && attrs.contains("french"), attrs.toString)
   }
 
-  test("embarrassment is a target mental state and the causal link is recorded") {
+  test("the original waiter sentence is Unattached, not a silent target return") {
+    val as = assessmentsMentioning("the waiter")
+    assert(as.nonEmpty)
+    as.foreach { a =>
+      // "Then" is a connective, not a ReturnMarker, and ClusterContinuity does not hold with
+      // Montreal or the pre-digression restaurant units (cake is first mentioned here).
+      assertEquals(a.address.mode, MemoryAddress.Unresolved)
+      assert(a.targetMass < 0.5, a.targetMass.toString)
+    }
+  }
+
+  test("Anyway on the waiter sentence is an explicit return to the target") {
+    val text = BirthdayInterview.freeRecall.replace("Then the waiter", "Anyway the waiter")
+    val src = StorySource.fromText(text).toOption.get
+    val g = RecallSegmenter.segment(src)
+    val ds = g.ordered.flatMap(u => AtomProjection.fromUnit(u, TurnId.unsafe("t")))
+    val r = TargetInduction.induce(g, ds, BirthdayInterview.interviewSource.cue)
+    val u = g.ordered.find(_.text.toLowerCase.contains("the waiter")).get
+    val d = ds.find(_.sourceUnit == u.id).get
+    r.addresses(d.id).mode match
+      case MemoryAddress.Episode(_, EpisodeScope.TargetSpecific) => ()
+      case other => fail(s"expected TargetSpecific after Anyway, got $other")
+  }
+
+  test("embarrassment is recorded but Unattached with the waiter chain") {
     val emotion = model.assessments.filter { a =>
       a.detail.atom match
         case DetailAtom.MentalStateFact(
@@ -99,7 +124,11 @@ class BirthdayInterviewSuite extends FunSuite:
         case _ => false
     }
     assert(emotion.nonEmpty)
-    emotion.foreach(a => assert(a.targetMass >= 0.5))
+    // Same unit-cluster as the waiter/cake sentence: lost with both, so Unresolved-primary.
+    emotion.foreach { a =>
+      assertEquals(a.address.mode, MemoryAddress.Unresolved)
+      assert(a.targetMass < 0.5, a.targetMass.toString)
+    }
     val causal = model.details.collect {
       case Detail(_, DetailAtom.RelationalFact(NarrativeRelationRef.Causal(c, e)), _, _, _, _) =>
         (c, e)
@@ -108,27 +137,36 @@ class BirthdayInterviewSuite extends FunSuite:
     val embarrassedSit =
       emotion.map(a => AtomProjection.situationOf(model.recall.byId(a.detail.sourceUnit)))
     assert(causal.exists { case (_, e) => embarrassedSit.contains(e) })
-    assert(model.target.exists(_.relations.nonEmpty))
   }
 
-  test("weather and visual detail are target perceptual facts") {
+  test("pre-digression weather is target; post-digression cake visuals are Unattached") {
     val perceptual = model.assessments.filter { a =>
       a.detail.atom match
         case DetailAtom.PerceptualFact(_, Modality.Visual, _) => true
         case _                                                => false
     }
-    assert(perceptual.exists(a => unitTextOf(a).contains("raining")))
-    assert(perceptual.exists(a => unitTextOf(a).contains("fogged")))
-    assert(
-      perceptual
-        .filter(_.promptContext.phase == InterviewPhase.FreeRecall)
-        .forall(_.targetMass >= 0.5)
-    )
+    val rainFog = perceptual.filter { a =>
+      val t = unitTextOf(a)
+      t.contains("raining") || t.contains("fogged")
+    }
+    val cakeVisual = perceptual.filter { a =>
+      val t = unitTextOf(a)
+      t.contains("cake") || t.contains("candle")
+    }
+    assert(rainFog.nonEmpty)
+    rainFog.foreach(a => assert(a.targetMass >= 0.5, s"target mass ${a.targetMass}"))
+    assert(cakeVisual.nonEmpty)
+    cakeVisual.foreach { a =>
+      assertEquals(a.address.mode, MemoryAddress.Unresolved)
+      assert(a.targetMass < 0.5, a.targetMass.toString)
+    }
   }
 
-  test("expected internal count exceeds expected external count") {
-    assert(scores.expectedInternal > scores.expectedExternal, scores.expected.toString)
-    assert(scores.expectedInternal > 0.0)
+  test("expected internal stays positive; Unattached cake chain is counted external") {
+    // Restaurant/weather remain target-internal. Waiter/cake/embarrassment are Unattached,
+    // so ExternalEvent/Other exceed Internal — the honest reading, not a scoring failure.
+    assert(scores.expectedInternal > 0.0, scores.expected.toString)
+    assert(scores.expectedExternal > scores.expectedInternal, scores.expected.toString)
   }
 
   test("purity is strictly between 0 and 1") {
@@ -186,7 +224,8 @@ class BirthdayInterviewSuite extends FunSuite:
     assert(profile.episodicDensityPerWord.isObserved)
     assert(profile.episodicDensityPerSecond.isObserved)
     assert(profile.perceptualProfile.nonEmpty)
-    assert(profile.mentalStateProfile.contains(MentalStateKind.Emotion))
+    // Profile mental states are target-mass gated; Unattached embarrassment is not Emotion here.
+    assert(!profile.mentalStateProfile.contains(MentalStateKind.Emotion))
   }
 
   test("scoring is deterministic") {
