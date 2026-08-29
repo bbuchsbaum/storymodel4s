@@ -17,6 +17,7 @@ class LawsSuite extends DisciplineSuite:
   checkAll("AlignmentLaws", AlignmentLaws.alignment)
   checkAll("ModeGateLaws", ModeGateLaws.modeGate)
   checkAll("GateProofLaws", GateProofLaws.gateProof)
+  checkAll("WireLaws", WireLaws.wire)
   checkAll("EstimateLaws", EstimateLaws.estimates)
 
   test("HsmmResult, rows, matrices, and admissibility cannot be constructed outside align") {
@@ -33,7 +34,7 @@ class LawsSuite extends DisciplineSuite:
       }
       assert(ok, s"$what must be private to align (expected an access error): $errors")
     inaccessible(
-      """new storymodel4s.align.HsmmResult(???, ???, ???, 0.0, ???, ???, 0)""",
+      """new storymodel4s.align.HsmmResult(???, ???, ???, 0.0, ???, ???, ???, ???, ???, 0)""",
       "the HsmmResult constructor"
     )
     inaccessible(
