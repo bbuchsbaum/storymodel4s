@@ -18,6 +18,7 @@ class LawsSuite extends DisciplineSuite:
   checkAll("ModeGateLaws", ModeGateLaws.modeGate)
   checkAll("GateProofLaws", GateProofLaws.gateProof)
   checkAll("WireLaws", WireLaws.wire)
+  checkAll("PopulationLaws", PopulationLaws.population)
   checkAll("EstimateLaws", EstimateLaws.estimates)
 
   test("HsmmResult, rows, matrices, and admissibility cannot be constructed outside align") {

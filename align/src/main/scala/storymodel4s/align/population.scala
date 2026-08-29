@@ -1,14 +1,36 @@
 package storymodel4s.align
 
-import storymodel4s.core.OpaqueId
+import storymodel4s.core.{Checksum, OpaqueId}
 import storymodel4s.features.{Coverage, Estimate, MissingReason}
+import storymodel4s.recall.RecallGraph
 
 /** Identity of one rememberer in a population analysis. */
 object SubjectId extends OpaqueId("SubjectId")
 type SubjectId = SubjectId.T
 
-/** One subject's alignment against the shared source, plus an optional verbosity offset. */
-final case class SubjectAlignment(subject: SubjectId, result: HsmmResult, wordCount: Option[Int])
+/** One subject's alignment against the shared source, plus an optional verbosity offset.
+  *
+  * The subject carries the recall its proof was made from, so the aggregate can check that the
+  * proof's `recallChecksum` is the checksum of *this* recall: a population is a set of proofs each
+  * bound to its own transcript and all bound to one view.
+  */
+final case class SubjectAlignment(
+    subject: SubjectId,
+    recall: RecallGraph,
+    result: HsmmResult,
+    wordCount: Option[Int]
+)
+
+/** What a population artifact is bound to: the fingerprint of the one view every proof was gated
+  * against, how many subjects it pools, and the checksum of each subject's recall (sorted, so the
+  * receipt is independent of subject order). Downstream population models cite this receipt so a
+  * result can never be read against a view it was not computed on.
+  */
+final case class PopulationReceipt(
+    viewFingerprint: ViewFingerprint,
+    subjectCount: Int,
+    recallChecksums: Vector[Checksum]
+)
 
 /** A sparse row-major matrix with string row/column identities; only nonzero entries are stored. */
 final case class SparseMatrix(
@@ -54,6 +76,16 @@ final case class PopulationAggregate private (view: SourceView, subjects: Vector
 
   /** Subjects in deterministic order. */
   lazy val subjectIds: Vector[SubjectId] = subjects.map(_.subject).sorted
+
+  /** The view fingerprint every subject's proof carries, the subject count, and the sorted recall
+    * checksums (design record §11; bead same-view law).
+    */
+  lazy val receipt: PopulationReceipt =
+    PopulationReceipt(
+      view.contentFingerprint,
+      subjects.size,
+      subjects.map(_.result.recallChecksum).sortBy(_.hex)
+    )
 
   /** Alignable nodes in deterministic order. */
   lazy val nodeRefs: Vector[SourceNodeRef] = view.nodes.map(_.ref).sortBy(_.key)
@@ -192,8 +224,14 @@ final case class PopulationAggregate private (view: SourceView, subjects: Vector
 
 object PopulationAggregate:
 
-  /** Aggregate alignments that all target `view`. Fails when subject ids repeat, when a result
-    * references a source node absent from the view, or when a posterior row is malformed.
+  /** Aggregate alignments that all target `view`.
+    *
+    * Fails when subject ids repeat; when a subject's proof was gated against a different view (its
+    * `viewFingerprint` is not this view's content fingerprint — same node ids with different
+    * content count as a different view); when a subject's proof was made from a different recall
+    * than the one it carries (`recallChecksum` mismatch); when a result references a source node
+    * absent from the view; or when a posterior row is malformed. The fingerprint checks come first:
+    * a proof from another view is refused even if its nodes happen to exist here.
     */
   def of(
       view: SourceView,
@@ -214,13 +252,37 @@ object PopulationAggregate:
     val malformed = subjects.flatMap { s =>
       s.result.posterior.rows.filterNot(_.isWellFormed).map(row => (s.subject, row.unit))
     }
+    val expectedView = view.contentFingerprint
+    val ordered = subjects.sortBy(_.subject.value)
+    val foreignView = ordered.find(_.result.viewFingerprint != expectedView)
+    val foreignRecall = ordered.find { s =>
+      s.result.recallChecksum != AlignWire.recallChecksum(s.recall)
+    }
     if subjects.isEmpty then Left(AlignError.SizeMismatch("population has no subjects"))
     else if dup.nonEmpty then
       Left(AlignError.SizeMismatch(s"duplicate subject ids: ${dup.map(_.value).mkString(", ")}"))
+    else if foreignView.nonEmpty then
+      val s = foreignView.get
+      Left(
+        AlignError.FingerprintMismatch(
+          s"viewFingerprint (subject ${s.subject.value})",
+          s.result.viewFingerprint.checksum.hex,
+          expectedView.checksum.hex
+        )
+      )
+    else if foreignRecall.nonEmpty then
+      val s = foreignRecall.get
+      Left(
+        AlignError.FingerprintMismatch(
+          s"recallChecksum (subject ${s.subject.value})",
+          s.result.recallChecksum.hex,
+          AlignWire.recallChecksum(s.recall).hex
+        )
+      )
     else if unknown.nonEmpty then
       val (s, r) = unknown.head
       Left(AlignError.SizeMismatch(s"subject ${s.value} references ${r.key}, absent from the view"))
     else if malformed.nonEmpty then
       val (s, u) = malformed.head
       Left(AlignError.MalformedRow(u, s"subject ${s.value}: mass must be nonnegative and finite"))
-    else Right(new PopulationAggregate(view, subjects.sortBy(_.subject.value)))
+    else Right(new PopulationAggregate(view, ordered))
