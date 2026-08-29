@@ -52,6 +52,9 @@ enum MissingReason:
   /** The support had observed samples but the operation is undefined on them. */
   case Undefined(reason: UndefinedReason)
 
+  /** A namespaced domain reason that does not belong in the portable closed vocabulary. */
+  case Custom(namespace: String, label: String)
+
   case Unknown
 
 /** An observed value with optional uncertainty, or a typed absence. */

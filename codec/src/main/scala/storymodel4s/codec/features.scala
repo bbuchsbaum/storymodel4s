@@ -217,7 +217,9 @@ object FeatureCodecs:
   given Encoder[MissingReason] = Encoder.instance {
     case MissingReason.Undefined(r) => Json.obj("type" -> "Undefined".asJson, "reason" -> r.asJson)
     case MissingReason.Malformed(r) => Json.obj("type" -> "Malformed".asJson, "reason" -> r.asJson)
-    case r                          => r.toString.asJson
+    case MissingReason.Custom(ns, label) =>
+      Json.obj("type" -> "Custom".asJson, "namespace" -> ns.asJson, "label" -> label.asJson)
+    case r => r.toString.asJson
   }
   given Decoder[MissingReason] = Decoder.instance { c =>
     c.value.asString match
@@ -236,7 +238,12 @@ object FeatureCodecs:
         field[String](c, "type").flatMap {
           case "Undefined" => field[UndefinedReason](c, "reason").map(MissingReason.Undefined.apply)
           case "Malformed" => field[MalformedReason](c, "reason").map(MissingReason.Malformed.apply)
-          case s           => Left(DecodingFailure(s"unknown MissingReason $s", c.history))
+          case "Custom"    =>
+            for
+              ns <- field[String](c, "namespace")
+              label <- field[String](c, "label")
+            yield MissingReason.Custom(ns, label)
+          case s => Left(DecodingFailure(s"unknown MissingReason $s", c.history))
         }
   }
 

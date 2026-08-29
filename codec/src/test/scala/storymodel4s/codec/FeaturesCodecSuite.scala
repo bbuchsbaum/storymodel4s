@@ -102,6 +102,14 @@ class FeaturesCodecSuite extends ScalaCheckSuite:
     )
   }
 
+  test("a custom missing reason preserves its namespace and label") {
+    val reason = MissingReason.Custom("storymodel4s.interview.specificity", "unclassified")
+    val json =
+      """{"label":"unclassified","namespace":"storymodel4s.interview.specificity","type":"Custom"}"""
+    assertEquals(Canonical.encode(reason), json)
+    assertEquals(Canonical.decode[MissingReason](json), Right(reason))
+  }
+
   test("BasisId and basis-bearing provenance round-trip; an absent legacy field is None") {
     val basis = BasisId
       .of(

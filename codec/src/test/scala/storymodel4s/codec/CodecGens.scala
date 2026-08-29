@@ -101,6 +101,7 @@ object CodecGens:
     Gen.const(MissingReason.Excluded),
     Gen.const(MissingReason.AllMissing),
     Gen.const(MissingReason.Unknown),
+    Gen.zip(ident, ident).map(MissingReason.Custom.apply),
     malformedReason.map(MissingReason.Malformed.apply),
     undefinedReason.map(MissingReason.Undefined.apply)
   )
