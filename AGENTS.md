@@ -124,7 +124,12 @@ was set by the owner on 2026-08-28 (sticky decision
    inherits every dependency edge added here. Whenever `main` moves in a way
    that touches anything it consumes — a new inter-module `dependsOn`, a change
    to `core`/`view`/`features` — compile and test-compile `storyatlas4s` against
-   the new `main` before calling `main` good. The two repositories keep separate
+   it. This is **part of the gate, not a follow-up**: for a candidate touching a
+   consumed module, the seam check runs *before* the ack, exactly like the test
+   run. Landing first and checking after is how the parity landing `04fdf6b`
+   shipped a `SelectionPlacement[+Mark]` signature that broke the sibling's app
+   module — a break no storymodel4s gate can see, because our tests cannot
+   compile a separate repository. The two repositories keep separate
    mote stores (relative reservation paths like `build.sbt` would otherwise be
    ambiguous across them); cross-repo work is coordinated on the
    `narrative-atlas-intaglio` topic with provider/consumer SHAs recorded as
