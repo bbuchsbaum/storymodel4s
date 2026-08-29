@@ -412,6 +412,23 @@ was set by the owner on 2026-08-28 (sticky decision
    1 failed / 1 passed / 2 total. Weak control, live probes — which is exactly
    why the mutation is worth running rather than reasoning about.
 
+   *Reading a branch establishes permission, not occurrence.* That the code
+   CAN produce a bad value is a different claim from that it DOES, and the
+   second one needs a measurement. A finding derived by reading a branch must
+   state whether the branch FIRES — and if that is unknown, say so in the
+   finding itself, not in a footnote. Otherwise it is a mutation surviving
+   because the corpus cannot reach it, wearing the costume of a finding.
+   Measured: a P1 escalation derived the exact masses a `PlacementBasis.Ambiguous`
+   branch would emit (0.4 / 0.3 / 0.3) and called them incoherent; across four
+   induction fixtures and 33 details the incoherent set was **zero** and the
+   branch never fired at all, real distributions being concentrated
+   ([0.08 0.12 0.80], [0.11 0.89]). What survived was narrower and true: the two
+   thresholds do measure different quantities and the code permits them to
+   disagree. What could not survive was that it happens. Note the better finding
+   hiding inside the retraction — **no fixture reaches that branch**, which is
+   worth more than the claim it replaced, because an untested branch is a real
+   gap where a mis-read one is only a wasted hour.
+
    *A compile-time probe needs a clean recompile.* A mutation that changes a
    **type's shape** — `case` to non-`case`, a constructor's visibility, or
    anything a compile-time assertion inspects — must be proved after a **clean**
