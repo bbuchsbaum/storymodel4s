@@ -74,7 +74,8 @@ Package namespace is flat `storymodel4s.<module>`.
 8. **Smart constructors + phantom states.** Invalid states are unrepresentable
    when rules are stable (`Checked`/`Unchecked`, `Draft`/`Validated`);
    validated/versioned data when the ontology is open (PropBank frames).
-   **A private constructor on a `case` class is not a boundary.** Scala 3 gives
+   **A private constructor on a `case` class is not a boundary** (see
+   `docs/design/unforgeable-types.md` for the criterion and the working pattern). Scala 3 gives
    every case-class companion a public `fromProduct` through `Mirror.Product`,
    and marking the constructor private does not remove it. That is the whole
    defect **only when the constructor is bare `private`**. A qualified
