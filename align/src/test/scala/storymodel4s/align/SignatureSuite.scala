@@ -16,6 +16,63 @@ class SignatureSuite extends FunSuite:
   private def report(attributed: Double, unranked: Double) =
     ExternalMassReport(attributed, unranked)
 
+  test("RecallSignature.externalMass computes the exact production split") {
+    val associationMass = 0.01
+    val intrusionMass = 0.02
+    val commentaryMass = 0.03
+    val sourceConsistentInferenceMass = 0.04
+    val uninterpretableMass = 0.05
+    val unrankedMass = 0.06
+    val participantMasses = Vector(
+      associationMass,
+      intrusionMass,
+      commentaryMass,
+      sourceConsistentInferenceMass,
+      uninterpretableMass
+    )
+    val allExternalMasses = participantMasses :+ unrankedMass
+    val expectedAttributed = 0.15
+    val expectedConflated = 0.21
+
+    // Capacity to fail: every term is nonzero and distinct, and folding unranked into the
+    // attributed result would observably change the expected value.
+    assertEquals(allExternalMasses.distinct.size, 6)
+    assert(allExternalMasses.forall(_ > 0.0))
+    assertEqualsDouble(participantMasses.sum, expectedAttributed, eps)
+    assertEqualsDouble(allExternalMasses.sum, expectedConflated, eps)
+    assert(math.abs(expectedAttributed - expectedConflated) > eps)
+
+    val signature = RecallSignature(
+      uniformCoverage = 0.0,
+      importanceWeightedCoverage = 0.0,
+      fidelity = None,
+      specificity = None,
+      compression = 0.0,
+      discourseChronology = 0.0,
+      worldChronology = None,
+      causalPreservation = None,
+      semanticFlowCoherence = 0.0,
+      associationMass = associationMass,
+      intrusionMass = intrusionMass,
+      commentaryMass = commentaryMass,
+      sourceConsistentInferenceMass = sourceConsistentInferenceMass,
+      uninterpretableMass = uninterpretableMass,
+      unrankedMass = unrankedMass,
+      distortedMass = 0.0,
+      distortedMassByFacet = Map.empty,
+      backwardMass = 0.0,
+      worldBackwardMass = None,
+      perUnitLocalizability = Map.empty,
+      perUnitFidelity = Map.empty,
+      perUnitMode = Map.empty
+    )
+
+    val actual = signature.externalMass
+    assertEqualsDouble(actual.attributed, expectedAttributed, eps)
+    assertEqualsDouble(actual.unranked, unrankedMass, eps)
+    assertEqualsDouble(actual.rankedMass, 1.0 - unrankedMass, eps)
+  }
+
   test("attributed mass and unranked mass are reported separately") {
     val r = report(0.2, 0.5)
     assertEqualsDouble(r.attributed, 0.2, eps)
