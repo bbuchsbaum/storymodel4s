@@ -31,7 +31,9 @@ class CacheSuite extends ScalaCheckSuite:
       local
     )
     assertNotEquals(withLocal, base)
-    val bumped = local.copy(promptPackages = Vector(Fixtures.manifest.copy(version = "1.0.1").ref))
+    val bumped = local.copy(promptPackages =
+      Vector(Fixtures.manifest.replace(version = "1.0.1").toOption.get.ref)
+    )
     val withBumped = StageCacheKey.of(
       Checksum.ofText("i"),
       "s",
