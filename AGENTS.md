@@ -392,6 +392,26 @@ was set by the owner on 2026-08-28 (sticky decision
    `SubjectAlignment` in the same compile showed five. An absence proves nothing
    without a present case beside it.)
 
+   *Or kill it with a mutation, which is stronger.* The control is a PROXY: it
+   asks "would this snippet compile if the door were open?" by compiling an
+   equivalent snippet against a forgeable stand-in. A mutation asks the same
+   question **directly, of the real type** — open the door and watch the probe go
+   red. So a demonstrated mutation kill SATISFIES this rule and the control is
+   the substitute for when you cannot mutate. **But a mutation kill counts only
+   if the mutant COMPILES and the failure is the NAMED ASSERTION rather than a
+   blanket red** — a mutation that breaks the module turns every test in it red,
+   and "the probe failed" then carries no information whatever. The signature to
+   report is the discriminating one: the mutant compiled, the sibling test in the
+   same suite still PASSED, and the failure cites a line. One failed and one
+   passed is evidence; all red is not. Measured on the three slice 7 phantom
+   witnesses, whose only structural control was
+   `summon[Mirror.ProductOf[(Int, String)]]` — a tuple, which always has a Mirror
+   and so cannot fail for any reason connected to the type under test. Minimal
+   mutation `final class` → `final case class`, clean recompile per module:
+   AmrGraph → suite:27, StoryModel → suite:23, PropositionChart → suite:28, each
+   1 failed / 1 passed / 2 total. Weak control, live probes — which is exactly
+   why the mutation is worth running rather than reasoning about.
+
    *A compile-time probe needs a clean recompile.* A mutation that changes a
    **type's shape** — `case` to non-`case`, a constructor's visibility, or
    anything a compile-time assertion inspects — must be proved after a **clean**
