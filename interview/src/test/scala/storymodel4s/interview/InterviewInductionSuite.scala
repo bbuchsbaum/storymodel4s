@@ -144,3 +144,16 @@ class InterviewInductionSuite extends FunSuite:
       addr.support.toString
     )
   }
+
+  test("unattached keeps materialized competitor mass when that cluster wins the target") {
+    val text =
+      "We ate at the restaurant. The year before we went to Montreal. The birthday cake had candles."
+    val addr = distOf(text, "birthday cake")
+    assertEquals(addr.mode, MemoryAddress.Unresolved)
+    assert(
+      addr(MemoryAddress.Unresolved) > 0.5 && addr(MemoryAddress.Unresolved) < 0.6,
+      addr.toVector.toString
+    )
+    assert(addr.support.exists(_.isTargetSpecific), addr.support.toString)
+    assert(addr.mass(_.isTargetSpecific) > 0.4, addr.toVector.toString)
+  }

@@ -8,9 +8,8 @@ import storymodel4s.story.ModelStatus
 
 /** A short synthetic Autobiographical-Interview transcript (design record §66) with invented,
   * neutral content: a target dinner at a named restaurant, weather and visual detail, a habitual
-  * family statement, a different prior-year trip, an explicit retrieval failure, an explicit return
-  * to the dinner, and a cake → singing → embarrassment causal chain, across free recall, a general
-  * probe, and a specific probe.
+  * family statement, a different prior-year trip, an explicit retrieval failure, and a cake →
+  * singing → embarrassment causal chain, across free recall, a general probe, and a specific probe.
   *
   * Speaker labels sit in their own paragraphs so that every utterance paragraph is exactly one
   * turn's support in the shared transcript atlas.
@@ -28,7 +27,7 @@ object BirthdayInterview:
     "My fortieth birthday. We went out for dinner at a small French restaurant called Maison " +
       "Bleue on Queen Street. It was raining that night and the windows were all fogged up. " +
       "My family always goes out for birthdays, that is just what we do. The year before we had " +
-      "gone to Montreal for a long weekend. I can't remember what I ordered. Anyway the waiter " +
+      "gone to Montreal for a long weekend. I can't remember what I ordered. Then the waiter " +
       "came out with a cake with candles and everyone in the room started singing, so I felt " +
       "horribly embarrassed."
 

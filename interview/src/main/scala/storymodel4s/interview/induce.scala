@@ -146,7 +146,7 @@ object TargetInduction:
   /** Why a unit was placed in a cluster. The basis is the examinable record of the interpretation.
     */
   private[interview] enum PlacementBasis:
-    case OtherEpisodeMarker, ExplicitReturn, ContinuityStay, ContinuityReturn, Unattached,
+    case Seed, OtherEpisodeMarker, ExplicitReturn, ContinuityStay, ContinuityReturn, Unattached,
       Ambiguous
 
   /** Cluster id plus the reason it was chosen, so address mass can stay examinable. */
@@ -218,7 +218,7 @@ object TargetInduction:
         case Some(UnitClass.Episodic) | Some(UnitClass.Summary) =>
           val lower = Text.lower(u.text)
           val assignment =
-            if current == 0 then ClusterAssignment(0, PlacementBasis.ContinuityStay)
+            if current == 0 then ClusterAssignment(0, PlacementBasis.Seed)
             else
               val marked = ReturnMarker.findFirstIn(lower).nonEmpty
               val withDig = ClusterContinuity.withAny(u, digression, semantic, threshold)
@@ -400,20 +400,21 @@ object TargetInduction:
               targetAddr.map(_ -> 0.6).toVector :+ (MemoryAddress.Unresolved -> 0.4)
             )
 
+    def addrOf(k: Int): Option[MemoryAddress] =
+      if targetCluster.contains(k) then targetAddr
+      else others.get(k).map(o => MemoryAddress.Episode(o.id, EpisodeScope.OtherSpecific))
+
     def episodicAddress(assignment: ClusterAssignment): Distribution[MemoryAddress] =
-      val otherAddr = others.get(assignment.cluster).map { o =>
-        MemoryAddress.Episode(o.id, EpisodeScope.OtherSpecific)
-      }
       assignment.basis match
         case PlacementBasis.Unattached =>
           dist(
             MemoryAddress.Unresolved -> 0.55,
-            otherAddr.map(_ -> 1.0).toVector
+            addrOf(assignment.cluster).map(_ -> 1.0).toVector
           )
         case PlacementBasis.Ambiguous =>
           dist(
             MemoryAddress.Unresolved -> 0.4,
-            targetAddr.map(_ -> 0.5).toVector ++ otherAddr.map(_ -> 0.5).toVector
+            addrOf(0).map(_ -> 0.5).toVector ++ addrOf(assignment.cluster).map(_ -> 0.5).toVector
           )
         case _ => clusterAddress(assignment.cluster)
 
