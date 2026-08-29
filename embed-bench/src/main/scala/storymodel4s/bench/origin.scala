@@ -56,7 +56,7 @@ object ProtocolDocument:
     * A test recomputes it from the repository so an unnoticed edit fails the build.
     */
   val pinned: Checksum =
-    Checksum.unsafe("1d9bf73d18b5f995c82592f398adfb2990b8e94752b7ad35fea3abac5580ed09")
+    Checksum.unsafe("510a1a9dc738290f349429ecde08e1f014e12e08f1392266b93c4b064f3d872e")
 
   /** The checksum of a protocol document's text, canonicalized exactly as a story text is. */
   def checksumOf(documentText: String): Checksum =
