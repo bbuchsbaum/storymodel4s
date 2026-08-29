@@ -164,6 +164,93 @@ class WindowSuite extends ScalaCheckSuite:
     )
   }
 
+  test("WindowReducer.reduce refuses invalid weights; it does not publish Observed(NaN)") {
+    val refused = Estimate.Missing[Double](
+      MissingReason.Undefined(UndefinedReason.Custom("features", "invalid-sample-weight"))
+    )
+    val nanW = NonEmptyVector.of(Sample(0, Estimate.observed(1.0), Double.NaN))
+    val infW = NonEmptyVector.of(Sample(0, Estimate.observed(1.0), Double.PositiveInfinity))
+    val negW = NonEmptyVector.of(Sample(0, Estimate.observed(1.0), -1.0))
+    // Mean ignores weight in its arithmetic; the door must still refuse, or a NaN
+    // weight on WeightedMean publishes Observed(NaN) (`tw <= 0` fails open).
+    Vector(ScalarReducer.WeightedMean, ScalarReducer.Mean, ScalarReducer.Sum).foreach { r =>
+      assertEquals(red(r).reduce(nanW), refused, r.toString)
+      assertEquals(red(r).reduce(infW), refused, r.toString)
+      assertEquals(red(r).reduce(negW), refused, r.toString)
+    }
+    assert(
+      Reduction
+        .reduce(nanW.toVector, red(ScalarReducer.WeightedMean), MissingValuePolicy.IgnoreMissing)
+        .isLeft
+    )
+  }
+
+  test("kernelAt refuses invalid weights; scalar-door tests cannot see this door") {
+    val refused = Estimate.Missing[Double](
+      MissingReason.Undefined(UndefinedReason.Custom("features", "invalid-sample-weight"))
+    )
+    val ker = WindowReducer.kernelAt(KernelShape.Gaussian(1.0), _.position.toDouble)
+    val nanW = NonEmptyVector.of(Sample(0, Estimate.observed(1.0), Double.NaN))
+    val infW = NonEmptyVector.of(Sample(0, Estimate.observed(1.0), Double.PositiveInfinity))
+    val negW = NonEmptyVector.of(Sample(0, Estimate.observed(1.0), -1.0))
+    assertEquals(ker.reduce(nanW), refused)
+    assertEquals(ker.reduce(infW), refused)
+    assertEquals(ker.reduce(negW), refused)
+  }
+
+  test("weighted mean of all-zero weights is ZeroTotalWeight, not Observed") {
+    val zeros = NonEmptyVector.of(
+      Sample(0, Estimate.observed(1.0), 0.0),
+      Sample(1, Estimate.observed(5.0), 0.0)
+    )
+    assertEquals(
+      red(ScalarReducer.WeightedMean).reduce(zeros),
+      Estimate.Missing(MissingReason.Undefined(UndefinedReason.ZeroTotalWeight))
+    )
+  }
+
+  test("WeightedMean of two MaxValue weights is Missing(NotFinite), not Observed(NaN)") {
+    val overflow = NonEmptyVector.of(
+      Sample(0, Estimate.observed(1.0), Double.MaxValue),
+      Sample(1, Estimate.observed(1.0), Double.MaxValue)
+    )
+    assertEquals(
+      red(ScalarReducer.WeightedMean).reduce(overflow),
+      Estimate.Missing(MissingReason.Undefined(UndefinedReason.NotFinite))
+    )
+  }
+
+  test("derived scalars refuse non-finite results; Maximum of MaxValue stays Observed") {
+    val missing = Estimate.Missing[Double](MissingReason.Undefined(UndefinedReason.NotFinite))
+    val maxPair = NonEmptyVector.of(
+      Sample(0, Estimate.observed(Double.MaxValue), 1.0),
+      Sample(1, Estimate.observed(Double.MaxValue), 1.0)
+    )
+    val signed = NonEmptyVector.of(
+      Sample(0, Estimate.observed(Double.MaxValue), 1.0),
+      Sample(1, Estimate.observed(-Double.MaxValue), 1.0)
+    )
+    assertEquals(red(ScalarReducer.Sum).reduce(maxPair), missing, "Sum")
+    assertEquals(red(ScalarReducer.Mean).reduce(maxPair), missing, "Mean")
+    assertEquals(red(ScalarReducer.Variance).reduce(signed), missing, "Variance")
+    assertEquals(red(ScalarReducer.Slope).reduce(signed), missing, "Slope")
+    assertEquals(
+      red(ScalarReducer.Maximum).reduce(maxPair),
+      Estimate.observed(Double.MaxValue),
+      "Maximum is the finite control"
+    )
+    assertEquals(
+      red(ScalarReducer.Kernel(KernelShape.Gaussian(1.0))).reduce(maxPair),
+      missing,
+      "scalar Kernel"
+    )
+    assertEquals(
+      WindowReducer.kernelAt(KernelShape.Gaussian(1.0), _.position.toDouble).reduce(maxPair),
+      missing,
+      "kernelAt"
+    )
+  }
+
   test("weighted mean honours sample weights") {
     val s = NonEmptyVector.of(
       Sample(0, Estimate.observed(1.0), 3.0),
