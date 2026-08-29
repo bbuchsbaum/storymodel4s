@@ -67,12 +67,19 @@ object ValidatedVector:
       val bad = values.indexWhere(v => v.isNaN || v.isInfinite)
       if bad >= 0 then Left(EmbedError.NonFiniteValue(bad))
       else
-        val v = new ValidatedVector(dimension, normalization, values)
         normalization match
-          case Normalization.Unnormalized => Right(v)
-          case Normalization.L2           =>
-            val n = v.norm
-            if math.abs(n - 1.0) <= NormTolerance then Right(v)
+          case Normalization.Unnormalized =>
+            Right(new ValidatedVector(dimension, normalization, values))
+          case Normalization.L2 =>
+            val n = math.sqrt(values.foldLeft(0.0)((acc, x) => acc + x * x))
+            // Fail-closed under NaN: abs(NaN - 1) <= tol is false, so the reject branch holds.
+            // Absorb slack so Normalization.L2 is a claim the stored coordinates satisfy, not a
+            // label on a near-miss. Do not change NormTolerance here.
+            // `1.0 - NormTolerance` is not Tolerance away from 1 in IEEE; fold one ulp of 1
+            // so the constructed literal is the stated boundary. `1.0 + 2*NormTolerance`
+            // still misses.
+            if math.abs(n - 1.0) <= NormTolerance + math.ulp(1.0) then
+              Right(new ValidatedVector(dimension, normalization, values.map(_ / n)))
             else Left(EmbedError.NotNormalized(n, Normalization.L2))
 
   /** Normalize to unit length and validate; zero vectors are rejected. */

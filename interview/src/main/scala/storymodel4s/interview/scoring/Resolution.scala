@@ -25,15 +25,18 @@ enum PlacementGrain:
   * published as certain absence, at full coverage — because integer coverage has no way to say "we
   * saw it and could not place it".
   *
-  * Three masses, and they are never renormalized:
+  * Three masses:
   *   - `resolved` — mass on addresses we placed;
   *   - `unresolved` — mass the model declined to place;
   *   - `excluded` — mass a scoring policy removed before counting (a repetition dropped under
   *     `RepetitionRule.Ignore` is not unresolved, and it is not resolved either).
   *
-  * They sum to one. Renormalizing `resolved` to fill the gap left by the other two is the specific
-  * error this type exists to prevent: it converts "we placed 40% of this" into "we placed all of
-  * it", which is a stronger claim than the evidence and always in the flattering direction.
+  * They sum to one. Float slack inside [[PlacementResolution.Tolerance]] is absorbed by scaling so
+  * the stored parts are a partition of unity — the decision that admitted them. That is not
+  * gap-filling: a 0.4 + 0.0 summary is still refused. Renormalizing `resolved` to fill the gap left
+  * by the other two is the specific error this type exists to prevent: it converts "we placed 40%
+  * of this" into "we placed all of it", which is a stronger claim than the evidence and always in
+  * the flattering direction.
   */
 final class PlacementResolution private (
     val grain: PlacementGrain,
@@ -98,21 +101,37 @@ object PlacementResolution:
       case Some(e) => Left(e)
       case None    =>
         val total = resolved + unresolved + excluded
-        if math.abs(total - 1.0) > Tolerance then
+        // Fail-closed under NaN: a comparison against NaN is false, so the reject branch holds.
+        // `1.0 + Tolerance` is not Tolerance away from 1 in IEEE — the subtraction leaves
+        // ~0.4 ulp extra — so the stated boundary is the constructed literal only if the
+        // comparison folds that ulp. `1.0 + 2*Tolerance` still misses.
+        if math.abs(total - 1.0) <= Tolerance + math.ulp(1.0) then
+          if abstentionThreshold.isNaN || abstentionThreshold < 0.0 || abstentionThreshold > 1.0
+          then
+            Left(
+              DomainError
+                .InvariantViolation("placementResolution/threshold", "threshold must be in [0, 1]")
+            )
+          else
+            // Absorb slack so the stored parts are the admitted partition, not the unclamped
+            // near-miss. Divide-all-three, not a residual on one slot: 1 - r - u can go
+            // slightly negative from rounding and would publish a mass `of` itself refuses.
+            Right(
+              new PlacementResolution(
+                grain,
+                resolved / total,
+                unresolved / total,
+                excluded / total,
+                abstentionThreshold
+              )
+            )
+        else
           Left(
             DomainError.InvariantViolation(
               "placementResolution/total",
               s"resolved + unresolved + excluded must be 1 within $Tolerance, got $total"
             )
           )
-        else if abstentionThreshold.isNaN || abstentionThreshold < 0.0 || abstentionThreshold > 1.0
-        then
-          Left(
-            DomainError
-              .InvariantViolation("placementResolution/threshold", "threshold must be in [0, 1]")
-          )
-        else
-          Right(new PlacementResolution(grain, resolved, unresolved, excluded, abstentionThreshold))
 
   /** Everything placed: the case where a caller genuinely resolved all of the mass.
     *

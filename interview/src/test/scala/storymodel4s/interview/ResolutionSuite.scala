@@ -22,6 +22,35 @@ class ResolutionSuite extends FunSuite:
     assertEqualsDouble(p.resolved + p.unresolved + p.excluded, 1.0, eps)
   }
 
+  test("within-tolerance slack is absorbed so the stored parts sum to one") {
+    // Permission, not occurrence: no production caller has been measured to hand `of` a
+    // 1 +/- Tolerance triple. The pin is that the door that admits the slack does not then
+    // publish the unabsorbed value. `1.0 + Tolerance` is the constructed literal; IEEE makes
+    // (1.0 + 1e-9) - 1.0 slightly larger than 1e-9, which is why the guard folds one ulp.
+    // Gap-filling (0.4 + 0.0) stays refused below.
+    val t = PlacementResolution.Tolerance
+    val high = PlacementResolution
+      .of(PlacementGrain.Detail, 1.0 + t, 0.0, 0.0)
+      .fold(err => fail(s"1 + Tolerance refused: ${err.message}"), identity)
+    assertEqualsDouble(high.resolved + high.unresolved + high.excluded, 1.0, eps)
+    assertEqualsDouble(high.resolved, 1.0, eps)
+    assertEqualsDouble(high.unresolved, 0.0, eps)
+    assertEqualsDouble(high.excluded, 0.0, eps)
+    val low = PlacementResolution
+      .of(PlacementGrain.Detail, 1.0 - t, 0.0, 0.0)
+      .fold(err => fail(s"1 - Tolerance refused: ${err.message}"), identity)
+    assertEqualsDouble(low.resolved + low.unresolved + low.excluded, 1.0, eps)
+    assertEqualsDouble(low.resolved, 1.0, eps)
+    assert(
+      PlacementResolution.of(PlacementGrain.Detail, 1.0 + 2 * t, 0.0, 0.0).isLeft,
+      "1 + 2*Tolerance absorbed"
+    )
+    assert(
+      PlacementResolution.of(PlacementGrain.Detail, 1.0 - 2 * t, 0.0, 0.0).isLeft,
+      "1 - 2*Tolerance absorbed"
+    )
+  }
+
   test("a summary that does not account for all the mass is refused") {
     // 0.4 resolved and nothing else is not "40% resolved", it is an incomplete summary - the other
     // 0.6 has to be attributed to something before the figure means anything.
