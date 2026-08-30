@@ -6,8 +6,25 @@ import storymodel4s.align.{NodeSummary, SemanticDistance, SourceNodeRef, Structu
 import storymodel4s.core.{Checksum, ContentAddress}
 import storymodel4s.embed.*
 import storymodel4s.embed.grakern.{GrakernStructuralDistance, StructuralReceiptContext}
+import storymodel4s.embed.onnx.OnnxSentenceEmbedder
 import storymodel4s.features.{Estimate, MissingReason}
 import storymodel4s.recall.RecallUnit
+
+/** Scientific class of a semantic channel, stated rather than inferred from a provider name. */
+enum SemanticChannelKind:
+  /** Free lexical control whose geometry is not evidence of neural semantic generalization. */
+  case LexicalBaseline
+
+  /** Learned sentence encoder executed against real model weights. */
+  case NeuralEncoder
+
+  /** No provider ran, as in an empty failed benchmark row. */
+  case Unavailable
+
+  def render: String = this match
+    case LexicalBaseline => "lexical-baseline"
+    case NeuralEncoder   => "neural-encoder"
+    case Unavailable     => "unavailable"
 
 /** Identity of the semantic side of a channel: which provider produced the vectors, in which
   * geometries, and how many provider calls it took. Fingerprints, never names, so two runs of the
@@ -18,10 +35,27 @@ final case class SemanticIdentity(
     querySpace: GeometryId,
     documentSpace: GeometryId,
     pairRule: GeometryPairRule,
-    providerCalls: Int
+    providerCalls: Int,
+    kind: SemanticChannelKind = SemanticChannelKind.Unavailable
 ):
   def render: String =
-    s"semantic=${provider.render.take(12)} q=${querySpace.value.take(12)} d=${documentSpace.value.take(12)} pair=$pairRule calls=$providerCalls"
+    s"semantic=${kind.render}:${provider.render.take(12)} q=${querySpace.value.take(12)} d=${documentSpace.value.take(12)} pair=$pairRule calls=$providerCalls"
+
+  private[bench] def identityParts: Vector[String] =
+    Vector(
+      "semantic/v1",
+      kind.render,
+      provider.render,
+      querySpace.value,
+      documentSpace.value,
+      pairRule match
+        case GeometryPairRule.IdenticalModelling                => "identical-modelling"
+        case GeometryPairRule.AllowViewDifference               => "allow-view-difference"
+        case GeometryPairRule.AllowInstructionDifference        => "allow-instruction-difference"
+        case GeometryPairRule.AllowViewAndInstructionDifference =>
+          "allow-view-and-instruction-difference",
+      providerCalls.toString
+    )
 
 /** Identity of the structural side of a channel. */
 enum StructuralIdentity:
@@ -36,6 +70,11 @@ enum StructuralIdentity:
   def render: String = this match
     case Grakern(p, n)  => s"structural=grakern:${p.render.take(12)} sources=$n"
     case Absent(reason) => s"structural=absent ($reason)"
+
+  private[bench] def identityParts: Vector[String] = this match
+    case Grakern(provider, preparedSources) =>
+      Vector("structural/grakern/v1", provider.render, preparedSources.toString)
+    case Absent(reason) => Vector("structural/absent/v1", reason)
 
 /** One system under test: a semantic distance, a structural distance, and their identities.
   *
@@ -54,13 +93,8 @@ final case class Channel(
 ):
   def identityChecksum: Checksum =
     ContentAddress.digest(
-      Vector(
-        "channel/v1",
-        name,
-        semanticIdentity.render,
-        structuralIdentity.render,
-        exposure.render
-      )
+      Vector("channel/v3", name) ++ semanticIdentity.identityParts ++
+        structuralIdentity.identityParts ++ Vector("exposure", exposure.render)
     )
 
   def render: String =
@@ -84,11 +118,12 @@ enum ChannelError:
   * the receipt count meaningless. The table is keyed by unit id and node ref, so the distance is a
   * pure lookup during inference.
   */
-object EmbedderSemantic:
+private object EmbedderSemantic:
   def of(
       embedder: Embedder[Id],
       units: Vector[RecallUnit],
       nodes: Vector[(SourceNodeRef, String)],
+      kind: SemanticChannelKind,
       view: SemanticView = SemanticView.Surface
   ): Either[ChannelError, (SemanticDistance, SemanticIdentity)] =
     def space(role: Role): Either[ChannelError, EmbeddingSpace] =
@@ -143,7 +178,8 @@ object EmbedderSemantic:
         q.id,
         d.id,
         GeometryPairRule.IdenticalModelling,
-        unitVectors._2 + nodeVectors._2
+        unitVectors._2 + nodeVectors._2,
+        kind
       )
       (distance, identity)
 
@@ -157,8 +193,14 @@ object BenchChannels:
       seed: Long = 0L,
       structural: (StructuralDistance, StructuralIdentity) = noStructure
   ): Either[ChannelError, Channel] =
-    EmbedderSemantic.of(HashedNgramEmbedder[Id](dimension, seed), units, nodes).map {
-      case (d, id) =>
+    EmbedderSemantic
+      .of(
+        HashedNgramEmbedder[Id](dimension, seed),
+        units,
+        nodes,
+        SemanticChannelKind.LexicalBaseline
+      )
+      .map { case (d, id) =>
         Channel(
           s"hashed-ngram:d$dimension:s$seed",
           d,
@@ -167,7 +209,7 @@ object BenchChannels:
           structural._2,
           ChannelExposure.NonMemorizing
         )
-    }
+      }
 
   /** TF-IDF fitted on the given corpus (its fingerprint is part of the provider identity). Fitting
     * on the case's own texts is benchmark-tuned by construction — the channel name says so.
@@ -180,7 +222,7 @@ object BenchChannels:
   ): Either[ChannelError, Channel] =
     for
       e <- TfIdfEmbedder.fit[Id](corpus).left.map(ChannelError.Embed(_))
-      s <- EmbedderSemantic.of(e, units, nodes)
+      s <- EmbedderSemantic.of(e, units, nodes, SemanticChannelKind.LexicalBaseline)
     yield Channel(
       s"tfidf:corpus-fit",
       s._1,
@@ -189,6 +231,28 @@ object BenchChannels:
       structural._2,
       ChannelExposure.NonMemorizing
     )
+
+  /** A real learned sentence encoder, visibly distinct from both lexical controls in identity and
+    * report rendering.
+    */
+  def neural(
+      embedder: OnnxSentenceEmbedder,
+      units: Vector[RecallUnit],
+      nodes: Vector[(SourceNodeRef, String)],
+      structural: (StructuralDistance, StructuralIdentity) = noStructure
+  ): Either[ChannelError, Channel] =
+    EmbedderSemantic
+      .of(embedder, units, nodes, SemanticChannelKind.NeuralEncoder)
+      .map { case (distance, identity) =>
+        Channel(
+          s"neural:${embedder.info.name}:${embedder.info.provider.render.take(12)}",
+          distance,
+          identity,
+          structural._1,
+          structural._2,
+          ChannelExposure.Memorizing
+        )
+      }
 
   /** No structural side: the structural term is `Missing` everywhere and reported as such. */
   val noStructure: (StructuralDistance, StructuralIdentity) =

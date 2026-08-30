@@ -1,0 +1,169 @@
+embed-bench report: DIAGNOSTIC (diagnostic-origin cases: wog:Blended,wog:ExternalAssociation,wog:Inference,wog:NegatedFoil,wog:Precise,wog:Retrospective,wog:RoleSwappedFoil,wog:Sensory,wog:Summary,wog:Vague,wog:full-recall) seed=11
+channel hashed-ngram:d256:s7 [semantic=lexical-baseline:966c416391ec q=geometry:c95 d=geometry:1e0 pair=IdenticalModelling calls=2; structural=absent (the source view carries no proposition charts); non-memorizing]
+  identity=f67dcbba6a5d
+  run wog:Precise view=322aff222888 recall=65834c5a6f9a
+  run wog:Vague view=322aff222888 recall=6bccf24fd6da
+  run wog:Summary view=322aff222888 recall=a3c5a92aef79
+  run wog:Sensory view=322aff222888 recall=69fe6b4be8f1
+  run wog:Retrospective view=322aff222888 recall=8579c93c35c8
+  run wog:RoleSwappedFoil view=322aff222888 recall=6d38778f99f2
+  run wog:NegatedFoil view=322aff222888 recall=bdc10189b09b
+  run wog:Blended view=322aff222888 recall=6d2bf57fdcdc
+  run wog:ExternalAssociation view=322aff222888 recall=ad6b34f16427
+  run wog:Inference view=322aff222888 recall=26b7e974adfa
+  run wog:full-recall view=322aff222888 recall=306d7cbb0071
+  source-anchor metrics:
+    strict-recall@1 = 0.2200 cov=19/19 stories=10 [0.0400, 0.5200] (B=50) receipt=023cb51cecc1
+    strict-recall@3 = 0.2200 cov=19/19 stories=10 [0.0000, 0.5200] (B=50) receipt=c02e99253ded
+    strict-recall@5 = 0.3300 cov=19/19 stories=10 [0.0300, 0.5300] (B=50) receipt=f8345f6f6110
+    strict-recall@10 = 0.4400 cov=19/19 stories=10 [0.0400, 0.7400] (B=50) receipt=3f3fd65244fc
+    ancestor-credit@1 = 0.2200 cov=19/19 stories=10 [0.0200, 0.6000] (B=50) receipt=122c89271fff
+    ancestor-credit@3 = 0.4600 cov=19/19 stories=10 [0.2000, 0.7000] (B=50) receipt=7caa2a11de18
+    ancestor-credit@5 = 0.4500 cov=19/19 stories=10 [0.2000, 0.6500] (B=50) receipt=e46e37e71e90
+    ancestor-credit@10 = 0.4500 cov=19/19 stories=10 [0.1500, 0.7000] (B=50) receipt=7d2f0dc3310f
+    mrr = 0.2733 cov=19/19 stories=10 [0.0881, 0.4683] (B=50) receipt=7b2af93a3747
+    level-exact = 0.4400 cov=19/19 stories=10 [0.2000, 0.8000] (B=50) receipt=4b744fec64cb
+    summary-accuracy = 1.0000 cov=2/2 stories=2 [1.0000, 1.0000] (B=50) receipt=ce9f2f71a424
+    blend-coverage@5 = 0.0000 cov=2/2 stories=2 [0.0000, 0.0000] (B=50) receipt=ad896fd9f0fe
+    candidate-burden = 36.8099 cov=21/21 stories=11 [24.7851, 49.6281] (B=50) receipt=b24be0f8fd84
+    false-gating = 0.0000 cov=8/8 stories=5 [0.0000, 0.0000] (B=50) receipt=6c889f0d9e21
+    distortion-anchor-detection@5 = 0.5000 cov=4/4 stories=3 [0.0000, 1.0000] (B=50) receipt=352c020b1b95
+    distortion-facets-correct = 1.0000 cov=2/2 stories=2 [1.0000, 1.0000] (B=50) receipt=16412adad440
+    cost:structural-term-coverage = 0.0000 cov=21/21 stories=11 [0.0000, 0.0000] (B=50) receipt=45c6d1feebec
+    cost:semantic-term-coverage = 1.0000 cov=21/21 stories=11 [1.0000, 1.0000] (B=50) receipt=0e5a9aa7b1a7
+    route:support-midpoint-direction = 0.8750 cov=8/8 stories=1 receipt=5ebb7844adaa
+    route:revisit-pair-recall = missing(AllMissing) cov=0/0 stories=0 receipt=d2e633b1cb6c
+    route:revisit-pair-precision = 0.0000 cov=3/3 stories=1 receipt=68da50991014
+    route:gold-level-closeness = 0.8133 cov=19/19 stories=10 [0.7133, 0.9000] (B=50) receipt=84e051481e6f
+    route:gold-level-signed-bias = 0.1133 cov=19/19 stories=10 [-0.0067, 0.2333] (B=50) receipt=227e8c30c390
+    route:transition-displacement-closeness = 0.7515 cov=8/8 stories=1 receipt=26d1d46cd851
+  open-world metrics (never pooled):
+    open-world:external-over-source = 1.0000 cov=2/2 stories=2 [1.0000, 1.0000] (B=50) receipt=5307b9cea1e0
+    open-world:subtype-correct = 1.0000 cov=4/4 stories=3 [1.0000, 1.0000] (B=50) receipt=8a80a06a9853
+    open-world:source-consistent-inference-mass = 0.6383 cov=2/2 stories=2 [0.6013, 0.6752] (B=50) receipt=d36eaef69463
+  three clocks:
+    wog:Precise: discourse=n/a@0.000 world=n/a@0.000 compression=0.276@0.481 backward=n/a@? worldBackward=n/a@?
+    wog:Vague: discourse=n/a@0.000 world=n/a@0.000 compression=0.128@0.793 backward=n/a@? worldBackward=n/a@?
+    wog:Summary: discourse=n/a@0.000 world=n/a@0.000 compression=0.334@0.201 backward=n/a@? worldBackward=n/a@?
+    wog:Sensory: discourse=n/a@0.000 world=n/a@0.000 compression=0.309@0.321 backward=n/a@? worldBackward=n/a@?
+    wog:Retrospective: discourse=n/a@0.000 world=n/a@0.000 compression=0.269@0.290 backward=n/a@? worldBackward=n/a@?
+    wog:RoleSwappedFoil: discourse=n/a@0.000 world=n/a@0.000 compression=0.176@0.454 backward=n/a@? worldBackward=n/a@?
+    wog:NegatedFoil: discourse=n/a@0.000 world=n/a@0.000 compression=0.075@0.123 backward=n/a@? worldBackward=n/a@?
+    wog:Blended: discourse=n/a@0.000 world=n/a@0.000 compression=0.336@0.087 backward=n/a@? worldBackward=n/a@?
+    wog:ExternalAssociation: discourse=n/a@0.000 world=n/a@0.000 compression=0.546@0.002 backward=n/a@? worldBackward=n/a@?
+    wog:Inference: discourse=n/a@0.000 world=n/a@0.000 compression=0.058@0.313 backward=n/a@? worldBackward=n/a@?
+    wog:full-recall: discourse=0.553@0.027 world=0.573@0.021 compression=0.213@0.178 backward=0.012@1.000 worldBackward=0.009@1.000
+channel tfidf:corpus-fit [semantic=lexical-baseline:c07959597a1c q=geometry:6e0 d=geometry:c4c pair=IdenticalModelling calls=2; structural=absent (the source view carries no proposition charts); non-memorizing]
+  identity=1a59b948697c
+  run wog:Precise view=322aff222888 recall=65834c5a6f9a
+  run wog:Vague view=322aff222888 recall=6bccf24fd6da
+  run wog:Summary view=322aff222888 recall=a3c5a92aef79
+  run wog:Sensory view=322aff222888 recall=69fe6b4be8f1
+  run wog:Retrospective view=322aff222888 recall=8579c93c35c8
+  run wog:RoleSwappedFoil view=322aff222888 recall=6d38778f99f2
+  run wog:NegatedFoil view=322aff222888 recall=bdc10189b09b
+  run wog:Blended view=322aff222888 recall=6d2bf57fdcdc
+  run wog:ExternalAssociation view=322aff222888 recall=ad6b34f16427
+  run wog:Inference view=322aff222888 recall=26b7e974adfa
+  run wog:full-recall view=322aff222888 recall=306d7cbb0071
+  source-anchor metrics:
+    strict-recall@1 = 0.2200 cov=19/19 stories=10 [0.0400, 0.5200] (B=50) receipt=f193b3c281cd
+    strict-recall@3 = 0.2200 cov=19/19 stories=10 [0.0000, 0.5200] (B=50) receipt=5bfaf647ddda
+    strict-recall@5 = 0.3300 cov=19/19 stories=10 [0.1300, 0.6300] (B=50) receipt=8891c10d5384
+    strict-recall@10 = 0.6600 cov=19/19 stories=10 [0.4600, 1.0000] (B=50) receipt=94d913a51800
+    ancestor-credit@1 = 0.2200 cov=19/19 stories=10 [0.0200, 0.6000] (B=50) receipt=1b26a667602b
+    ancestor-credit@3 = 0.5500 cov=19/19 stories=10 [0.3000, 0.8000] (B=50) receipt=f71e4b6e572c
+    ancestor-credit@5 = 0.4500 cov=19/19 stories=10 [0.1500, 0.6500] (B=50) receipt=1edeacaf318d
+    ancestor-credit@10 = 0.2300 cov=19/19 stories=10 [0.0300, 0.4300] (B=50) receipt=93f6a3d90be5
+    mrr = 0.3014 cov=19/19 stories=10 [0.1593, 0.5146] (B=50) receipt=b7faff1bb050
+    level-exact = 0.4400 cov=19/19 stories=10 [0.2000, 0.8000] (B=50) receipt=0614e3a7ee05
+    summary-accuracy = 1.0000 cov=2/2 stories=2 [1.0000, 1.0000] (B=50) receipt=49b5deeb8631
+    blend-coverage@5 = 0.0000 cov=2/2 stories=2 [0.0000, 0.0000] (B=50) receipt=ddb10e3ed1e0
+    candidate-burden = 36.0248 cov=21/21 stories=11 [24.3719, 48.9339] (B=50) receipt=2ced3bdaebe4
+    false-gating = 0.0000 cov=10/10 stories=6 [0.0000, 0.0000] (B=50) receipt=ba9b40c65e38
+    distortion-anchor-detection@5 = 0.5000 cov=4/4 stories=3 [0.0000, 1.0000] (B=50) receipt=d8642989579a
+    distortion-facets-correct = 1.0000 cov=2/2 stories=2 [1.0000, 1.0000] (B=50) receipt=af06a5cd7f13
+    cost:structural-term-coverage = 0.0000 cov=21/21 stories=11 [0.0000, 0.0000] (B=50) receipt=4e603c92c440
+    cost:semantic-term-coverage = 1.0000 cov=21/21 stories=11 [1.0000, 1.0000] (B=50) receipt=8db40d52d801
+    route:support-midpoint-direction = 0.6250 cov=8/8 stories=1 receipt=45af3e146577
+    route:revisit-pair-recall = missing(AllMissing) cov=0/0 stories=0 receipt=142a91b9ba88
+    route:revisit-pair-precision = 0.0000 cov=2/2 stories=1 receipt=bc036a3ea5b2
+    route:gold-level-closeness = 0.8133 cov=19/19 stories=10 [0.7133, 0.9000] (B=50) receipt=0b67a821fa6c
+    route:gold-level-signed-bias = 0.1133 cov=19/19 stories=10 [-0.0067, 0.2333] (B=50) receipt=39166f8a2595
+    route:transition-displacement-closeness = 0.8522 cov=8/8 stories=1 receipt=4e70e9144581
+  open-world metrics (never pooled):
+    open-world:external-over-source = 1.0000 cov=2/2 stories=2 [1.0000, 1.0000] (B=50) receipt=649afb6ed388
+    open-world:subtype-correct = 1.0000 cov=4/4 stories=3 [1.0000, 1.0000] (B=50) receipt=7ed3f3148fb0
+    open-world:source-consistent-inference-mass = 0.7216 cov=2/2 stories=2 [0.6938, 0.7495] (B=50) receipt=23eacaf794cf
+  three clocks:
+    wog:Precise: discourse=n/a@0.000 world=n/a@0.000 compression=0.202@0.242 backward=n/a@? worldBackward=n/a@?
+    wog:Vague: discourse=n/a@0.000 world=n/a@0.000 compression=0.046@0.683 backward=n/a@? worldBackward=n/a@?
+    wog:Summary: discourse=n/a@0.000 world=n/a@0.000 compression=0.293@0.096 backward=n/a@? worldBackward=n/a@?
+    wog:Sensory: discourse=n/a@0.000 world=n/a@0.000 compression=0.306@0.269 backward=n/a@? worldBackward=n/a@?
+    wog:Retrospective: discourse=n/a@0.000 world=n/a@0.000 compression=0.180@0.130 backward=n/a@? worldBackward=n/a@?
+    wog:RoleSwappedFoil: discourse=n/a@0.000 world=n/a@0.000 compression=0.144@0.243 backward=n/a@? worldBackward=n/a@?
+    wog:NegatedFoil: discourse=n/a@0.000 world=n/a@0.000 compression=0.048@0.150 backward=n/a@? worldBackward=n/a@?
+    wog:Blended: discourse=n/a@0.000 world=n/a@0.000 compression=0.349@0.054 backward=n/a@? worldBackward=n/a@?
+    wog:ExternalAssociation: discourse=n/a@0.000 world=n/a@0.000 compression=0.594@0.002 backward=n/a@? worldBackward=n/a@?
+    wog:Inference: discourse=n/a@0.000 world=n/a@0.000 compression=0.042@0.207 backward=n/a@? worldBackward=n/a@?
+    wog:full-recall: discourse=0.571@0.006 world=0.590@0.005 compression=0.146@0.106 backward=0.003@1.000 worldBackward=0.002@1.000
+channel neural:onnx-sentence-encoder:90ab783abc61 [semantic=neural-encoder:90ab783abc61 q=geometry:d22 d=geometry:5c9 pair=IdenticalModelling calls=2; structural=absent (the source view carries no proposition charts); memorizing]
+  identity=47accd7527a6
+  run wog:Precise view=322aff222888 recall=65834c5a6f9a
+  run wog:Vague view=322aff222888 recall=6bccf24fd6da
+  run wog:Summary view=322aff222888 recall=a3c5a92aef79
+  run wog:Sensory view=322aff222888 recall=69fe6b4be8f1
+  run wog:Retrospective view=322aff222888 recall=8579c93c35c8
+  run wog:RoleSwappedFoil view=322aff222888 recall=6d38778f99f2
+  run wog:NegatedFoil view=322aff222888 recall=bdc10189b09b
+  run wog:Blended view=322aff222888 recall=6d2bf57fdcdc
+  run wog:ExternalAssociation view=322aff222888 recall=ad6b34f16427
+  run wog:Inference view=322aff222888 recall=26b7e974adfa
+  run wog:full-recall view=322aff222888 recall=306d7cbb0071
+  source-anchor metrics:
+    strict-recall@1 = 0.2200 cov=19/19 stories=10 [0.0400, 0.5200] (B=50) receipt=0a3548ccaf4a
+    strict-recall@3 = 0.4400 cov=19/19 stories=10 [0.2000, 0.8400] (B=50) receipt=b3871cc155a7
+    strict-recall@5 = 0.4400 cov=19/19 stories=10 [0.2000, 0.7200] (B=50) receipt=734f1dc11b2c
+    strict-recall@10 = 0.8700 cov=19/19 stories=10 [0.7400, 1.0000] (B=50) receipt=e5a9b5366423
+    ancestor-credit@1 = 0.3300 cov=19/19 stories=10 [0.0600, 0.5600] (B=50) receipt=686cb1724923
+    ancestor-credit@3 = 0.3400 cov=19/19 stories=10 [0.1400, 0.7000] (B=50) receipt=1dcbc1e42aca
+    ancestor-credit@5 = 0.4500 cov=19/19 stories=10 [0.2000, 0.7500] (B=50) receipt=ec16d5bbf58e
+    ancestor-credit@10 = 0.1300 cov=19/19 stories=10 [0.0000, 0.4000] (B=50) receipt=d35d919e85b6
+    mrr = 0.3627 cov=19/19 stories=10 [0.2380, 0.5840] (B=50) receipt=c7ed77b29de4
+    level-exact = 0.4400 cov=19/19 stories=10 [0.2000, 0.8000] (B=50) receipt=ff8c5fbc0937
+    summary-accuracy = 1.0000 cov=2/2 stories=2 [1.0000, 1.0000] (B=50) receipt=ff950996f135
+    blend-coverage@5 = 0.0000 cov=2/2 stories=2 [0.0000, 0.0000] (B=50) receipt=967e75dc4d56
+    candidate-burden = 36.1074 cov=21/21 stories=11 [23.7438, 49.2893] (B=50) receipt=aec9b7b17daf
+    false-gating = 0.0000 cov=12/12 stories=7 [0.0000, 0.0000] (B=50) receipt=4b66837ff6cb
+    distortion-anchor-detection@5 = 1.0000 cov=4/4 stories=3 [1.0000, 1.0000] (B=50) receipt=f170c679e2c8
+    distortion-facets-correct = 0.5000 cov=4/4 stories=3 [0.1667, 1.0000] (B=50) receipt=3cd4a9187d77
+    cost:structural-term-coverage = 0.0000 cov=21/21 stories=11 [0.0000, 0.0000] (B=50) receipt=b73d17239290
+    cost:semantic-term-coverage = 1.0000 cov=21/21 stories=11 [1.0000, 1.0000] (B=50) receipt=ea6df3d6b7aa
+    route:support-midpoint-direction = 0.8750 cov=8/8 stories=1 receipt=226bf0e0ce0f
+    route:revisit-pair-recall = missing(AllMissing) cov=0/0 stories=0 receipt=9a2fc442d08b
+    route:revisit-pair-precision = 0.0000 cov=2/2 stories=1 receipt=038d09391e25
+    route:gold-level-closeness = 0.8133 cov=19/19 stories=10 [0.7133, 0.9000] (B=50) receipt=9d06a8afcd3d
+    route:gold-level-signed-bias = 0.1133 cov=19/19 stories=10 [-0.0067, 0.2333] (B=50) receipt=5962831a50ac
+    route:transition-displacement-closeness = 0.8521 cov=8/8 stories=1 receipt=90cab8df8a57
+  open-world metrics (never pooled):
+    open-world:external-over-source = 1.0000 cov=2/2 stories=2 [1.0000, 1.0000] (B=50) receipt=b79fc279b815
+    open-world:subtype-correct = 1.0000 cov=4/4 stories=3 [1.0000, 1.0000] (B=50) receipt=78327fa266ee
+    open-world:source-consistent-inference-mass = 0.5298 cov=2/2 stories=2 [0.4801, 0.5795] (B=50) receipt=2a2728d5ba07
+  three clocks:
+    wog:Precise: discourse=n/a@0.000 world=n/a@0.000 compression=0.230@0.653 backward=n/a@? worldBackward=n/a@?
+    wog:Vague: discourse=n/a@0.000 world=n/a@0.000 compression=0.017@0.963 backward=n/a@? worldBackward=n/a@?
+    wog:Summary: discourse=n/a@0.000 world=n/a@0.000 compression=0.302@0.311 backward=n/a@? worldBackward=n/a@?
+    wog:Sensory: discourse=n/a@0.000 world=n/a@0.000 compression=0.285@0.608 backward=n/a@? worldBackward=n/a@?
+    wog:Retrospective: discourse=n/a@0.000 world=n/a@0.000 compression=0.235@0.413 backward=n/a@? worldBackward=n/a@?
+    wog:RoleSwappedFoil: discourse=n/a@0.000 world=n/a@0.000 compression=0.113@0.525 backward=n/a@? worldBackward=n/a@?
+    wog:NegatedFoil: discourse=n/a@0.000 world=n/a@0.000 compression=0.009@0.782 backward=n/a@? worldBackward=n/a@?
+    wog:Blended: discourse=n/a@0.000 world=n/a@0.000 compression=0.358@0.294 backward=n/a@? worldBackward=n/a@?
+    wog:ExternalAssociation: discourse=n/a@0.000 world=n/a@0.000 compression=0.768@0.014 backward=n/a@? worldBackward=n/a@?
+    wog:Inference: discourse=n/a@0.000 world=n/a@0.000 compression=0.080@0.451 backward=n/a@? worldBackward=n/a@?
+    wog:full-recall: discourse=0.585@0.117 world=0.610@0.096 compression=0.169@0.398 backward=0.049@1.000 worldBackward=0.037@1.000
+comparison delta neural-minus-hashed-ngram:d256:s7 strict-recall@1 = 0.000000
+comparison delta neural-minus-hashed-ngram:d256:s7 mrr = 0.089427
+comparison delta neural-minus-hashed-ngram:d256:s7 candidate-burden = -0.702479
+comparison delta neural-minus-tfidf:corpus-fit strict-recall@1 = 0.000000
+comparison delta neural-minus-tfidf:corpus-fit mrr = 0.061258
+comparison delta neural-minus-tfidf:corpus-fit candidate-burden = 0.082645
