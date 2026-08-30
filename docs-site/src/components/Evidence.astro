@@ -1,24 +1,45 @@
 ---
+import { sourceVerified } from '../lib/provenance';
+
 interface Props {
   status: 'Confirmed' | 'Qualified' | 'Intent';
   source: string;
-  href?: string;
+  href?: string | null;
 }
 
 const { status, source, href } = Astro.props;
+
+// "Directly inspectable at the cited source revision" is FALSE when there is no
+// verified revision to cite. codex-storymodel-collab demonstrated this by editing one
+// tracked file without committing: the build succeeded and every Confirmed block went
+// on claiming inspectability against a revision that did not contain the edit.
+//
+// A Confirmed claim therefore cannot outrank its own provenance. When the source
+// revision is unverified, Confirmed degrades to Qualified for display and says why.
+const effectiveStatus = status === 'Confirmed' && !sourceVerified ? 'Qualified' : status;
+
 const descriptions = {
   Confirmed: 'Directly inspectable at the cited source revision.',
   Qualified: 'Observed with stated limits; not independently verified for publication.',
   Intent: 'A design direction or unfinished capability, not a present result.',
 };
+
+const downgraded = effectiveStatus !== status;
 ---
 
-<aside class:list={['evidence-note', `evidence-${status.toLowerCase()}`]}>
+<aside class:list={['evidence-note', `evidence-${effectiveStatus.toLowerCase()}`]}>
   <p class="evidence-heading">
     <span class="evidence-dot" aria-hidden="true"></span>
-    <strong>{status}</strong>
+    <strong>{effectiveStatus}</strong>
   </p>
-  <p>{descriptions[status]}</p>
+  <p>{descriptions[effectiveStatus]}</p>
+  {downgraded && (
+    <p class="evidence-downgraded">
+      Recorded as <strong>Confirmed</strong> in the source, shown as Qualified here: this
+      build has no verified source revision, so nothing on the page can be pinned to an
+      exact commit.
+    </p>
+  )}
   <p class="evidence-source">
     Provenance:
     {href ? <a href={href}>{source}</a> : <span>{source}</span>}

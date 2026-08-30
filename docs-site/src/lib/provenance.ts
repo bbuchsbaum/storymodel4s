@@ -38,7 +38,7 @@ function git(...args: string[]): string {
 
 type Provenance =
   | { verified: true; revision: string; dirty: boolean }
-  | { verified: false; reason: string };
+  | { verified: false; reason: string; head?: string };
 
 function deriveProvenance(): Provenance {
   let head: string;
@@ -62,8 +62,17 @@ function deriveProvenance(): Provenance {
     );
   }
 
-  // A dirty tree means HEAD does not describe what was built, so a clean SHA in the
-  // receipt would be false in a second way that the original code never considered.
+  // A dirty tree means HEAD does not describe the bytes that were built, so the
+  // revision is NOT verified -- it is merely known. The first version of this fix
+  // returned `verified: true` here and merely appended a warning to the receipt.
+  // codex-storymodel-collab broke that in a disposable clone by editing one tracked
+  // title without committing: the build still exited 0, still linked HEAD, and every
+  // Evidence block still read "Confirmed - directly inspectable at the cited source
+  // revision" while the cited revision demonstrably did not contain the mutation.
+  //
+  // A warning beside a link does not stop the link from asserting something false.
+  // Dirty therefore fails the same way as no-git: no revision is published, so every
+  // sourceLink returns null and the exact-revision evidence claims degrade with it.
   let dirty = false;
   try {
     dirty = git('status', '--porcelain').length > 0;
@@ -71,7 +80,15 @@ function deriveProvenance(): Provenance {
     return { verified: false, reason: 'could not determine whether the build tree is clean' };
   }
 
-  return { verified: true, revision: head, dirty };
+  if (dirty) {
+    return {
+      verified: false,
+      reason: `the build tree has uncommitted changes, so HEAD (${head.slice(0, 12)}) does not describe what was built`,
+      head,
+    };
+  }
+
+  return { verified: true, revision: head, dirty: false };
 }
 
 const provenance = deriveProvenance();
@@ -83,7 +100,8 @@ export const sourceRevision = provenance.verified ? provenance.revision : null;
 
 export const sourceRevisionShort = sourceRevision ? sourceRevision.slice(0, 12) : null;
 
-export const sourceDirty = provenance.verified ? provenance.dirty : false;
+/** The tree's HEAD when it is known but NOT the built identity. Never rendered as a claim. */
+export const headRevisionUnverified = provenance.verified ? null : (provenance.head ?? null);
 
 /**
  * What the receipt should SAY. Callers must render this rather than assuming a
@@ -91,9 +109,7 @@ export const sourceDirty = provenance.verified ? provenance.dirty : false;
  * instead of silently omitting the caveat.
  */
 export const sourceStatement = provenance.verified
-  ? provenance.dirty
-    ? `${provenance.revision.slice(0, 12)} plus uncommitted changes — this build does not correspond to any commit`
-    : provenance.revision.slice(0, 12)
+  ? provenance.revision.slice(0, 12)
   : `source revision unverified: ${provenance.reason}`;
 
 // DOCS_GENERATED_AT is deliberately still overridable. A timestamp is not an
