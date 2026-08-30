@@ -4,12 +4,18 @@
 notice.**
 
 storymodel4s is a Scala 3 library for representing written stories, human
-recall of those stories, and the mapping between the two — including the
-Autobiographical Interview, treated as recall against a *latent* source. It is
-neurosymbolic by construction: typed propositional structure (an AMR-compatible
-local kernel), a multiplex narrative graph with contexts, hierarchy, and typed
-temporal/causal relations, and embedding feature views that retrieve but never
-adjudicate.
+recall of those stories, and the mapping between the two.
+
+A story says some things and reports others; a person recalling it may preserve
+an event but reverse who acted, or promote something a character merely said
+into something that happened. The library keeps those apart, and every claim it
+records cites the sentence it came from.
+
+It also treats the Autobiographical Interview as recall against a *latent*
+source. It is neurosymbolic by construction: typed propositional structure (an
+AMR-compatible local kernel), a multiplex narrative graph with contexts,
+hierarchy, and typed temporal/causal relations, and embedding feature views that
+retrieve but never adjudicate.
 
 Read the project [vision](vision.md) and [mission](mission.md) for the scientific
 object, operating commitments, and the boundary between current capabilities
