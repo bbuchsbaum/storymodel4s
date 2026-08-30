@@ -1,0 +1,92 @@
+---
+title: Core concepts
+description: The conceptual distinctions storymodel4s keeps separate by construction.
+sidebar:
+  order: 3
+---
+
+import Evidence from '../../../components/Evidence.astro';
+import { sourceLink } from '../../../lib/provenance';
+
+The library's value lies less in a list of types than in the distinctions those types refuse to
+collapse.
+
+## Surface evidence is the anchor
+
+Source and transcript text live on explicit surface axes. Claims cite exact span sets; an inference
+cites upstream claims. Evidence is not a comment attached after the model is built—it is part of
+the accepted claim.
+
+Offsets are UTF-16 because they must round-trip with common text and browser systems. Surface time
+or position is not assumed to be story-world time.
+
+## A context is not optional metadata
+
+Every situation lives in a context. The root is a **NarratedWorld**, not an assertion about
+objective reality. Speech, belief, intention, and nested reports stay within their own frames
+unless evidence licenses a relationship to the root.
+
+This is what prevents “the warriors said he was shot” from silently becoming “he was shot.”
+
+<Evidence
+  status="Confirmed"
+  source="ContextFrame, ContextKind, and narrative-graph validation source"
+  href={sourceLink('story/src/main/scala/storymodel4s/story/nodes.scala')}
+ />
+
+## Three clocks remain three clocks
+
+- **Discourse order**: where content appears in the telling.
+- **Story-world time**: when represented events occur.
+- **Recall time**: the order in which a person produces recall units.
+
+A retelling can mention an earlier event after a later one. A recall can jump backward or revisit a
+scene. Collapsing these axes makes genuine reorderings disappear.
+
+## Partial alignment includes elsewhere
+
+A recall need not map neatly onto one source event. It may omit, merge, split, reorder, elaborate,
+or add content. Alignment therefore distributes mass over source nodes **and explicit external
+states** such as association or task commentary. External mass is a modeled destination, not error
+residue.
+
+## Fidelity is faceted
+
+An event can be recalled while one aspect is wrong. Actor, object, action, location, context,
+polarity, modality, and role structure can be assessed separately. A role-reversed recall should
+still anchor to the event it distorts; it should not be counted as faithful or discarded as a pure
+intrusion.
+
+## Missing support stays missing
+
+Coverage travels with estimates. Missing evidence does not silently become zero, one, or a neutral
+constant, and downstream normalization must not redistribute unsupported mass without naming a
+different estimand.
+
+<Evidence
+  status="Confirmed"
+  source="ADR 0003, estimand support contract"
+  href={sourceLink('docs/adr/0003-estimand-support-contract.md')}
+ />
+
+## Embeddings nominate; they do not decide
+
+The portable embedding contract includes deterministic hashed n-gram and TF-IDF baselines. A local
+ONNX sentence-encoder adapter and a structural graph-kernel adapter also exist in JVM-only modules.
+All of them are feature views. No vector participates in model identity, equality, graph structure,
+or claim acceptance.
+
+<Evidence
+  status="Confirmed"
+  source="ADR 0001 and embed-core public contracts"
+  href={sourceLink('embed-core/src/main/scala/storymodel4s/embed/contract.scala')}
+ />
+
+No public result currently establishes a calibrated production embedding default or a general
+accuracy gain from the local encoder.
+
+<Evidence
+  status="Intent"
+  source="Embedding calibration and default selection remain evidence-gated work"
+  href={sourceLink('docs/adr/0001-embedding-contract-and-hard-gate.md')}
+ />

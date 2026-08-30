@@ -1,0 +1,21 @@
+---
+import { generatedAt, sourceRevision, sourceRevisionShort } from '../lib/provenance';
+
+const sourceUrl = `https://github.com/bbuchsbaum/storymodel4s/tree/${sourceRevision}`;
+const generatedDate = new Intl.DateTimeFormat('en-CA', {
+  dateStyle: 'long',
+  timeZone: 'UTC',
+}).format(new Date(generatedAt));
+---
+
+<aside class="build-receipt" aria-labelledby="build-receipt-title">
+  <div>
+    <p class="receipt-kicker" id="build-receipt-title">Documentation build receipt</p>
+    <p class="receipt-summary">
+      Generated from
+      <a href={sourceUrl}><code>{sourceRevisionShort}</code></a>
+      on <time datetime={generatedAt}>{generatedDate}</time>.
+    </p>
+  </div>
+  <a class="receipt-action" href="/method/evidence/">How claims are graded →</a>
+</aside>

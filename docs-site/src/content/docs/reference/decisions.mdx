@@ -1,0 +1,32 @@
+---
+title: Decision records
+description: Exact-revision links to the seven architectural decision records.
+---
+
+import BuildReceipt from '../../../components/BuildReceipt.astro';
+import Evidence from '../../../components/Evidence.astro';
+import { sourceLink } from '../../../lib/provenance';
+
+<BuildReceipt />
+
+Architectural decision records are primary sources. They contain context, rejected alternatives,
+consequences, and—where recorded—the disagreement that made the decision meaningful. This site
+does not reproduce or silently rewrite them.
+
+1. <a href={sourceLink('docs/adr/0001-embedding-contract-and-hard-gate.md')}>ADR 0001 — Embedding contract, anchor/fidelity modes, and the non-bypassable gate</a>
+2. <a href={sourceLink('docs/adr/0002-visualization-contract.md')}>ADR 0002 — Visualization contract: one compiler family, typed projections, no view-side inference</a>
+3. <a href={sourceLink('docs/adr/0003-estimand-support-contract.md')}>ADR 0003 — Estimand support: shared law, carrier-specific result types</a>
+4. <a href={sourceLink('docs/adr/0004-hierarchy-level-two-coordinates.md')}>ADR 0004 — Hierarchy level: two coordinates, not one wrapper</a>
+5. <a href={sourceLink('docs/adr/0005-surface-to-narrative-compiler.md')}>ADR 0005 — Compile proposal evidence into a narrative model</a>
+6. <a href={sourceLink('docs/adr/0006-validated-provenance-option-values.md')}>ADR 0006 — Validate present provenance option values at construction</a>
+7. <a href={sourceLink('docs/adr/0007-film-source-representation.md')}>ADR 0007 — Represent film through typed evidence and a presentation axis</a>
+
+<Evidence
+  status="Confirmed"
+  source="Seven ADR files are present at the documentation source revision"
+  href={sourceLink('docs/adr')}
+ />
+
+Some records describe accepted architecture whose implementation is incomplete or still under
+review. Read each record's own status and evidence section; inclusion here is not a claim that every
+decision has shipped.

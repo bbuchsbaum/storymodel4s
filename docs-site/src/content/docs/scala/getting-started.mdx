@@ -1,0 +1,100 @@
+---
+title: Start from source
+description: Run the pre-release Scala library honestly, without assuming a published artifact or automatic acquisition pipeline.
+sidebar:
+  order: 1
+---
+
+import Evidence from '../../../components/Evidence.astro';
+import { sourceLink } from '../../../lib/provenance';
+
+storymodel4s is not published to a package repository. The supported evaluation path is the source
+tree at the revision shown in this site's build receipt.
+
+<Evidence
+  status="Confirmed"
+  source="README.md pre-release notice"
+  href={sourceLink('README.md')}
+ />
+
+## Prerequisites
+
+- JDK 17 or 21
+- sbt 1.12.14 (the repository wrapper metadata pins the build)
+- Scala 3.7.4 through sbt
+- A local `grakern` checkout when running aggregate gates, until that source dependency is
+  published
+
+## Verify the source tree
+
+```sh
+git clone https://github.com/bbuchsbaum/storymodel4s.git
+cd storymodel4s
+
+sbt -Dstorymodel4s.grakern.build=/absolute/path/to/grakern testJVM
+```
+
+The broader repository gate compiles and tests portable modules on JVM, Scala.js, and Scala Native:
+
+```sh
+sbt -Dstorymodel4s.grakern.build=/absolute/path/to/grakern checkAll
+```
+
+A passing command is evidence about the exact checkout and environment in which it ran. It is not
+evidence that an artifact has been released.
+
+## The smallest surface example
+
+This example creates a source document and derives its deterministic surface atlas. It does not
+construct a complete narrative model.
+
+```scala
+import storymodel4s.core.*
+
+val source = StorySource
+  .fromText(
+    "One night two young men left Egulac.",
+    title = Some("A short story")
+  )
+  .toOption
+  .get
+
+val atlas = SurfaceAnalyzer.analyze(source)
+
+atlas.byKind(SurfaceUnitKind.Sentence).size // 1
+```
+
+<Evidence
+  status="Confirmed"
+  source="StorySource and SurfaceAnalyzer source; example also appears in README.md"
+  href={sourceLink('core/src/main/scala/storymodel4s/core/surface.scala')}
+ />
+
+Production code should handle the `Either` returned by smart constructors rather than calling
+`.get`. The abbreviated form keeps the first example focused on the surface axis.
+
+## Inspect the acceptance fixture
+
+The `fixtures` module exposes the hand-authored *War of the Ghosts* model and its plain-language
+expectations. It is appropriate for learning the narrative types and testing downstream consumers.
+It is not a template for bypassing acquisition in production.
+
+```scala
+import storymodel4s.fixtures.wog.*
+
+val model = WarOfTheGhostsModel.model
+val expectations = WarOfTheGhostsExpectations.all
+
+expectations.map(_.phenomenon)
+```
+
+## Choose the next layer deliberately
+
+- Need evidence spans, identifiers, claims, or provenance? Start in `core`.
+- Need typed local meaning? Add `proposition`.
+- Need entities, situations, contexts, and narrative relations? Add `story`.
+- Need recall units and recall-side relations? Add `recall`.
+- Need partial source alignment and signatures? Add `align`.
+- Need embeddings? Read ADR 0001 before choosing a portable baseline or JVM adapter.
+
+[See the complete module map →](/scala/modules/)

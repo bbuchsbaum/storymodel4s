@@ -1,0 +1,54 @@
+---
+title: Contribute safely
+description: A public contribution route centered on bounded scope, evidence, and falsifiable checks.
+sidebar:
+  order: 1
+---
+
+This route is intentionally separate from the learning path. You do not need the project's
+internal operating record to evaluate the method or use the source library.
+
+## Begin with a claim small enough to test
+
+A useful contribution names:
+
+1. the behavior, invariant, or scientific distinction it changes;
+2. the exact modules and paths in scope;
+3. the evidence that would distinguish success from a plausible wrong answer;
+4. the platform and command that exercise that evidence;
+5. what remains unsupported after the change.
+
+That shape works for code, fixtures, docs, and design proposals. It also makes review less about
+confidence and more about whether the proposed court can fail.
+
+## Respect the architecture before extending it
+
+storymodel4s keeps provider code out of portable modules, makes contexts mandatory, carries support
+with estimates, and prevents embeddings from adjudicating narrative truth. A new dependency,
+module, or public vocabulary should begin as an architectural discussion, not appear incidentally
+inside an implementation diff.
+
+[Read the exact decision records →](/reference/decisions/)
+
+## Treat fixtures as scientific material
+
+Story and participant text need a recorded attribution and redistribution basis. The *War of the
+Ghosts* fixture is attributed to narrator Charles Cultee and uses the public-domain English
+translation in the 1901 US Government publication recorded by Franz Boas. A convenient online copy
+or a pseudonymized transcript does not by itself establish permission.
+
+## Report evidence at the right strength
+
+- Source inspection can confirm a type or schema fact.
+- A local test run is a bounded observation.
+- Performance needs a named dataset, configuration, metric, baseline, and exact artifact.
+- A release or deployment needs evidence from the released or deployed object.
+
+Do not upgrade a result in prose. If the evidence is local or partial, label it that way and make
+the next stronger check obvious.
+
+## Keep the public story readable
+
+Documentation should answer a reader's question before exposing build mechanics. Public pages are
+authored for their reader and cite exact primary sources. Internal plans, review transcripts, and
+governance history remain internal rather than becoming accidental reference material.
