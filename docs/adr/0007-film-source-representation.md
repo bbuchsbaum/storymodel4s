@@ -284,9 +284,9 @@ the only component that creates accepted claims.
 Changing the four atlas annotations does not by itself complete film support. `Evidence`,
 `SourceSupport`, story nodes, `AlignmentSource`, and aligner summaries still contain `SpanSet`.
 Their migration to `EvidenceSupport` or a typed primary-axis projection belongs to the later
-contract slice and must preserve text source compatibility. The important claim is that the
-compiler's scientific transformation and stage order do not fork, not that its current signatures
-already accept film.
+contract slice and must preserve semantic compatibility for existing text evidence. The
+important claim is that the compiler's scientific transformation and stage order do not fork,
+not that its current signatures already accept film.
 
 The later implementation ownership is therefore narrow but cross-module:
 
@@ -499,7 +499,9 @@ policies. No model adapter begins before its licence and access disposition is r
 - Shot and scene boundaries remain comparable in time while remaining different scientific
   claims.
 - `SurfaceAtlas` keeps its closed construction boundary.
-- Text callers retain exact UTF-16 support and a source-compatible ordinary path.
+- Text callers retain exact UTF-16 support and a text-workflow-compatible ordinary path.
+  ("Source-compatible" is deliberately avoided here: in this repository `source` names the
+  narrative source, and this migration IS Scala-source-breaking at `StoryModel`'s public fields.)
 - The support migration is wider than four compiler annotations, but its semantic depth is
   concentrated in axis selection and missingness rather than in 47 independent normalizations.
 - The Sherlock source is useful sooner, with a narrower claim: sparse temporal source alignment
