@@ -1,0 +1,18 @@
+---
+interface Props {
+  eyebrow: string;
+  title: string;
+  description: string;
+  href: string;
+  accent?: 'teal' | 'coral' | 'gold';
+}
+
+const { eyebrow, title, description, href, accent = 'teal' } = Astro.props;
+---
+
+<a class:list={['route-card', `route-${accent}`]} href={href}>
+  <span class="route-eyebrow">{eyebrow}</span>
+  <strong>{title}</strong>
+  <span>{description}</span>
+  <span class="route-arrow" aria-hidden="true">↗</span>
+</a>

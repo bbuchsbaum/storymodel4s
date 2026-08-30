@@ -1,0 +1,93 @@
+---
+title: Evidence-first models of stories and recall
+description: A human guide to storymodel4s, an experimental Scala library for auditable narrative representation and recall alignment.
+template: splash
+hero:
+  tagline: Keep what the text says, what a person recalls, and what the model infers in view at the same time.
+  actions:
+    - text: Understand the method
+      link: /method/orientation/
+      icon: right-arrow
+      variant: primary
+    - text: Inspect one success
+      link: /method/one-honest-success/
+      icon: open-book
+---
+
+import BuildReceipt from '../../components/BuildReceipt.astro';
+import Evidence from '../../components/Evidence.astro';
+import RouteCard from '../../components/RouteCard.astro';
+import { sourceLink } from '../../lib/provenance';
+
+<BuildReceipt />
+
+<div class="route-grid">
+  <RouteCard
+    eyebrow="Primary route"
+    title="Understand the method"
+    description="See what the representation preserves, where it abstains, and how a recall maps back to evidence."
+    href="/method/orientation/"
+    accent="teal"
+  />
+  <RouteCard
+    eyebrow="Scala route"
+    title="Use the source library"
+    description="Run the current source tree, inspect its typed boundaries, and avoid promises the pre-release API does not make."
+    href="/scala/getting-started/"
+    accent="coral"
+  />
+  <RouteCard
+    eyebrow="Public, separate"
+    title="Contribute safely"
+    description="Bring a claim, its evidence, and a failure-sensitive check. Learn the public contribution shape without the internal audit trail."
+    href="/collaborate/"
+    accent="gold"
+  />
+</div>
+
+<div class="principle-strip">
+  <p>A story model should make uncertainty easier to inspect, not easier to hide.</p>
+  <small>The project in one sentence</small>
+</div>
+
+## What exists now
+
+storymodel4s is a Scala 3 source library for representing written stories, recalls of those
+stories, and partial mappings between the two. Its central move is to keep surface evidence,
+narrative structure, recall structure, and uncertainty separate enough that a reader can ask how
+each conclusion was made.
+
+<Evidence
+  status="Confirmed"
+  source="README.md and the current module graph"
+  href={sourceLink('README.md')}
+ />
+
+The current repository includes typed narrative and recall models, alignment machinery, a
+researcher-reviewed acceptance fixture, deterministic lexical embedding baselines, and JVM-only
+structural and local ONNX adapters. Embeddings remain feature views: they can retrieve or compare;
+they do not become narrative claims.
+
+## What does not exist yet
+
+There is no released library artifact, and APIs may change without notice. A raw story does not yet
+flow unattended into a complete accepted model. The main story fixture is hand-authored, and a
+local encoder's existence is not evidence that it improves recall alignment.
+
+<Evidence
+  status="Intent"
+  source="README.md maturity boundary and ADR 0005"
+  href={sourceLink('README.md')}
+ />
+
+That boundary is not fine print. It determines the path through this guide: first understand one
+thing the current representation demonstrably preserves, then learn the concepts, and only then
+inspect the Scala surface.
+
+## Begin with a difficult distinction
+
+In *The War of the Ghosts*, a wound is reported in speech, the wounded state remains a hypothesis,
+and a conflicting bodily state is explicitly negated in the narrated world. A flat event list can
+silently promote the report to fact. The fixture is designed to make that mistake visible.
+
+[Inspect the example →](/method/one-honest-success/)

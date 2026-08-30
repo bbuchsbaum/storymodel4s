@@ -1,0 +1,26 @@
+---
+interface Props {
+  status: 'Confirmed' | 'Qualified' | 'Intent';
+  source: string;
+  href?: string;
+}
+
+const { status, source, href } = Astro.props;
+const descriptions = {
+  Confirmed: 'Directly inspectable at the cited source revision.',
+  Qualified: 'Observed with stated limits; not independently verified for publication.',
+  Intent: 'A design direction or unfinished capability, not a present result.',
+};
+---
+
+<aside class:list={['evidence-note', `evidence-${status.toLowerCase()}`]}>
+  <p class="evidence-heading">
+    <span class="evidence-dot" aria-hidden="true"></span>
+    <strong>{status}</strong>
+  </p>
+  <p>{descriptions[status]}</p>
+  <p class="evidence-source">
+    Provenance:
+    {href ? <a href={href}>{source}</a> : <span>{source}</span>}
+  </p>
+</aside>

@@ -1,0 +1,82 @@
+---
+title: Orientation
+description: What storymodel4s represents, why the distinctions matter, and where the current method stops.
+sidebar:
+  order: 1
+---
+
+import Evidence from '../../../components/Evidence.astro';
+import { sourceLink } from '../../../lib/provenance';
+
+Suppose a person hears a story and later recalls it. “How accurate was the recall?” sounds like one
+question. In practice it hides several:
+
+- Which parts of the story were recalled at all?
+- Was an event preserved but one participant reversed?
+- Did the person compress several moments into a gist?
+- Did the recall move backward, revisit a scene, or add an association?
+- Was a statement asserted by the narrator, reported by a character, or merely believed?
+
+storymodel4s provides typed structures for keeping those questions apart. It is an experimental
+library, not a finished automatic scoring system.
+
+## The path through a model
+
+1. **Surface evidence** gives every source and recall passage stable offsets.
+2. **Narrative structure** represents entities, situations, contexts, relations, hierarchy, and
+   story-world order.
+3. **Recall structure** represents idea units, discourse function, expressed uncertainty, and
+   recall-side relations.
+4. **Alignment** assigns partial mass from each recall unit to source nodes and explicit external
+   states. It also records transition flow between successive units.
+5. **Derived summaries** describe coverage, fidelity facets, localizability, compression,
+   chronology deformation, and intrusion mass—with support carried alongside results.
+
+This is not a funnel that turns uncertain input into one authoritative number. Each layer retains
+the information needed to challenge the next.
+
+<Evidence
+  status="Confirmed"
+  source="core, story, recall, and align public source at this revision"
+  href={sourceLink('align/src/main/scala/storymodel4s/align/signature.scala')}
+ />
+
+## What “neurosymbolic” means here
+
+Symbolic structure carries the claims: typed propositions, narrative contexts, participant roles,
+temporal and causal relations, and explicit evidence. Numerical feature views may help nominate
+possible matches or contribute declared costs. They never define identity, graph structure, or
+truth.
+
+That boundary matters because two passages can be close under a vector space while disagreeing on
+who did what, polarity, or context. The alignment model may still anchor a distorted recall to the
+right event, but it must not call the match faithful.
+
+<Evidence
+  status="Confirmed"
+  source="ADR 0001, embedding contract and non-bypassable fidelity gate"
+  href={sourceLink('docs/adr/0001-embedding-contract-and-hard-gate.md')}
+ />
+
+## Where the method stops today
+
+The repository validates and analyzes models once they exist. It also contains a deterministic
+compiler boundary for accepted proposal evidence. It does not yet supply the unattended providers
+that turn arbitrary raw prose into a complete accepted story model.
+
+The most complete story example is therefore a researcher-reviewed acceptance fixture. That makes
+it useful for testing hard representational distinctions; it does not make it evidence of automatic
+acquisition accuracy.
+
+<Evidence
+  status="Intent"
+  source="README.md and ADR 0005 identify automatic construction as programme work"
+  href={sourceLink('docs/adr/0005-surface-to-narrative-compiler.md')}
+ />
+
+## Next
+
+Move from the architecture to one concrete success: preserving the difference between a report,
+a hypothesis, and a narrated-world fact.
+
+[Inspect one honest success →](/method/one-honest-success/)
