@@ -315,6 +315,27 @@ Package namespace is flat `storymodel4s.<module>`.
     owner records an REB basis for redistribution; pseudonymization is a
     technical control, not consent.
 
+   *AN IDENTITY OR A CLASS MUST BE DERIVED FROM WHAT IT DESCRIBES, NEVER ASSERTED
+   BY THE CALLER.* A construction boundary asks whether a value can be built; this
+   asks whether a field that CLAIMS SOMETHING ABOUT the value was filled by
+   computing it or by someone typing it. Three live instances in three modules on
+   2026-08-30, each found by a different reviewer, none of whom could see the
+   pattern because each saw one: (1) a bench facade accepted any `Embedder[Id]`
+   and unconditionally asserted `NeuralEncoder`, so a `HashedNgramEmbedder`
+   compiled, ran, and RENDERED AS A NEURAL ENCODER — the scientific class was
+   caller-selected rather than derived from admitted provider authority; (2)
+   `Channel.identityChecksum` hashed a render that TRUNCATED provider and geometry
+   identities to twelve characters, so two distinct fingerprints sharing a prefix
+   produced one checksum; (3) `ParserBatchResult.conforms` compared a
+   caller-selected `ParserRequestId` and NOT `attempt.receipt.requestChecksum`, so
+   conformance checked the label instead of the content. **The question to ask of
+   any provenance, class, or identity field: if the caller lied here, what would
+   catch it?** If the answer is nothing, the field is decoration with the
+   authority of a receipt — worse than absent, because it survives audit. Note
+   that (1) sat INSIDE THE REMEDY for the same defect one level up: the whole
+   reason that module existed was that a lexical channel had been called
+   semantic on the strength of its identifier.
+
 ## Coordination and governance
 
 Several agents (Claude and Codex sessions) work in this checkout and its
