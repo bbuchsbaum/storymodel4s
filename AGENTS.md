@@ -412,6 +412,42 @@ was set by the owner on 2026-08-28 (sticky decision
    mislabels every candidate in that position — **rule on the class, not the
    instance**, and the first question about any reported block is *how many*.
 
+   *Recording a landing is half of landing it, and the unrecorded half rots.*
+   The rule above tells a reader how to compensate for a stale row; this one says
+   do not create it. `git merge` and `mote candidate landed` are two acts, and
+   deferring the second to the end of a tick is how 2026-08-30 produced a queue
+   that was 42% bookkeeping: **five of twelve pending candidates were already
+   ancestors of `main`**. The cost is not cosmetic. An unrecorded landing keeps
+   its author's reservations alive: `cand-7SRW` held `cost.scala`, `Laws.scala`
+   and eight other paths under `codex-storymodel-new-engineer` for an hour on
+   nothing but a row nobody had written, and the reservation released within
+   seconds of the record being made. **Record the landing before you report the
+   merge**, not at the end of the batch.
+
+   *A reason string phrased as a measurement may be a cached one.* Landability
+   reasons are replayed from recorded evidence, but they are written in the
+   vocabulary of live git — `ancestor_ambiguous: base relation is missing; tip
+   relation is not_ancestor`. Measured 2026-08-30: that exact string was reported
+   for `cand-4X710` while `git merge-base --is-ancestor 7ae2ec9 main` exited 0
+   and the commit sat in `main` at `795fe12`. The ledger asserted a false git
+   fact in git's own idiom, which is much harder to disbelieve than a phase
+   label is. Never let a reason string stand in for the command; run the command.
+
+   *Evidence is minted in a clone, and a clone cannot see an uncommitted op.*
+   The store is tracked in git, so a producer's `.mote` is only as current as
+   their last pull. Measured 2026-08-30: 641 ops sat untracked in the shared tree
+   while three candidates — all with approving reviews and granted authorization
+   — reported `git_evidence_stale` naming a proposal op from `13:23:12Z`. The
+   producer minted a fresh receipt at `13:28:38Z`, five minutes later, and it
+   still did not cover it, **because a receipt minted after a proposal cannot
+   miss it by timing — only by not being able to see it**. Each new proposal then
+   invalidated every outstanding receipt, and no producer could mint a covering
+   one, so with six live actors the covered set could never close. **Commit
+   `.mote` before asking anyone to re-mint.** When a producer reports stale
+   evidence they cannot fix, suspect the store's visibility before suspecting
+   their receipt — and note the asymmetry: the only actor who can clear it is the
+   one holding the shared tree, and nothing in the error says so.
+
    *Stale bases.* A candidate's gate must have run on a tree where the merge
    cannot surprise us. If the candidate and the upstream commits its base is
    missing touch the **same file**, the author rebases and re-gates — not
