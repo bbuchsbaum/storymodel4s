@@ -1,7 +1,12 @@
 ---
-import { generatedAt, sourceRevision, sourceRevisionShort } from '../lib/provenance';
+import { generatedAt, sourceRevision, sourceRevisionShort, sourceStatement, sourceVerified, sourceDirty } from '../lib/provenance';
 
-const sourceUrl = `https://github.com/bbuchsbaum/storymodel4s/tree/${sourceRevision}`;
+// Only build a URL when the revision was DERIVED and verified. The previous version
+// interpolated sourceRevision unconditionally, so an unverifiable build still rendered
+// a confident link to a revision nobody had checked.
+const sourceUrl = sourceRevision
+  ? `https://github.com/bbuchsbaum/storymodel4s/tree/${sourceRevision}`
+  : null;
 const generatedDate = new Intl.DateTimeFormat('en-CA', {
   dateStyle: 'long',
   timeZone: 'UTC',
@@ -12,9 +17,22 @@ const generatedDate = new Intl.DateTimeFormat('en-CA', {
   <div>
     <p class="receipt-kicker" id="build-receipt-title">Documentation build receipt</p>
     <p class="receipt-summary">
-      Generated from
-      <a href={sourceUrl}><code>{sourceRevisionShort}</code></a>
-      on <time datetime={generatedAt}>{generatedDate}</time>.
+      {sourceVerified ? (
+        <>
+          Generated from
+          {sourceUrl
+            ? <a href={sourceUrl}><code>{sourceRevisionShort}</code></a>
+            : <code>{sourceRevisionShort}</code>}
+          {sourceDirty && <span class="receipt-warning"> (tree had uncommitted changes — this page does not correspond to any commit)</span>}
+          on <time datetime={generatedAt}>{generatedDate}</time>.
+        </>
+      ) : (
+        <>
+          Built on <time datetime={generatedAt}>{generatedDate}</time>, but the
+          source revision could not be verified: {sourceStatement}. No revision is
+          claimed here, because a receipt that cannot be checked is not evidence.
+        </>
+      )}
     </p>
   </div>
   <a class="receipt-action" href="/method/evidence/">How claims are graded →</a>

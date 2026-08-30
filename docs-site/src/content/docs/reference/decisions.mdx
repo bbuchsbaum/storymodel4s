@@ -5,7 +5,7 @@ description: Exact-revision links to the seven architectural decision records.
 
 import BuildReceipt from '../../../components/BuildReceipt.astro';
 import Evidence from '../../../components/Evidence.astro';
-import { sourceLink } from '../../../lib/provenance';
+import { sourceLink, sourceTreeLink } from '../../../lib/provenance';
 
 <BuildReceipt />
 
@@ -24,7 +24,7 @@ does not reproduce or silently rewrite them.
 <Evidence
   status="Confirmed"
   source="Seven ADR files are present at the documentation source revision"
-  href={sourceLink('docs/adr')}
+  href={sourceTreeLink('docs/adr')}
  />
 
 Some records describe accepted architecture whose implementation is incomplete or still under
