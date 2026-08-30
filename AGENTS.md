@@ -534,7 +534,7 @@ was set by the owner on 2026-08-28 (sticky decision
    ambiguous across them); cross-repo work is coordinated on the
    `narrative-atlas-intaglio` topic with provider/consumer SHAs recorded as
    notes, never as dependency edges between stores.
-4. **Evidence discipline.** *Thirty-three sub-rules; find yours here.* **What
+4. **Evidence discipline.** *Thirty-four sub-rules; find yours here.* **What
    counts as proof of a fix (12):** a control must fail for the property under
    test · mutation proof · capacity to fail ·
    distinguishability · a negative compile-time assertion needs a positive control ·
@@ -544,8 +544,9 @@ was set by the owner on 2026-08-28 (sticky decision
    pipeline produces · an inequality is not a discriminating assertion · a pinned
    literal can be updated but a behavioural assertion has to be argued with · a
    positive control requires the old code to be capable of the thing tested. **How
-   to run the gate (14):** never pipe a gate · the gate is not the last step, re-read
-   the board before merging · a check and the action it gates must
+   to run the gate (15):** never pipe a gate · the gate is not the last step, re-read
+   the board before merging · an author's own gate is LocallyObserved, not
+   verified · a check and the action it gates must
    not share a batch · a trailing success line is not an exit
    status · a compile error anywhere makes the gate inconclusive · run the format
    check last · verify the export before you gate it · a compile-time probe needs a
@@ -735,6 +736,27 @@ was set by the owner on 2026-08-28 (sticky decision
    re-read is not only "may I still merge" but "is what I am about to write still
    true". Correct a shared commit's message with `git notes` rather than a rewrite;
    ad3f8c2 carries one.
+
+   *A GATE RUN BY THE AUTHOR IS `LocallyObserved`, NOT VERIFIED.* There is no CI
+   in this repository — no `.github/workflows` — so every gate result here is
+   self-reported by the actor who wanted the merge, and "the tests passed" and
+   "an agent reported that the tests passed" are currently the same artifact.
+   Found 2026-08-30, by accident, in a documentation candidate's build inventory;
+   nobody was looking for it. **The fix is not to wait for CI.** An independent
+   actor's clean reproduction, bound to the exact SHA, command, platform,
+   configuration, exit status and output digest, is a Confirmed-class receipt and
+   needs no workflow file — `codex-storymodel-collab` had already been producing
+   them ("I independently exported the immutable commit and ran
+   `scalafmtCheckAll`: exit 0"). So: an author's own gate is REQUIRED and is
+   EVIDENCE, but it is `LocallyObserved`, and a merge commit must not word it as
+   though someone else had checked. **A candidate whose evidence will be cited
+   publicly** — in the docs site, a published figure, an ADR claim — **needs an
+   independent reproduction before that claim leaves the repository**, though not
+   before it merges. Routine merges keep the self-reported gate and SAY SO: what
+   changes is the label, not the workload, and the label is the point. When CI
+   arrives it is not magical authority either — name its workflow revision,
+   dependencies, platforms, logs and a failure-sensitive test, because a green
+   badge detached from the claimed SHA is no better than board prose.
 
    *A check and the action it gates must not run in the SAME BATCH.* Piping
    destroys the exit status; batching destroys the DECISION. If the format check,
