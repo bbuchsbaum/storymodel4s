@@ -1,9 +1,9 @@
 ---
 title: Evidence-first models of stories and recall
-description: A human guide to storymodel4s, an experimental Scala library for auditable narrative representation and recall alignment.
+description: A human guide to storymodel4s, a Scala library that records what a story states, what its characters merely say, and what a person recalled - keeping the three apart and citing the sentence behind each one.
 template: splash
 hero:
-  tagline: Keep what the text says, what a person recalls, and what the model infers in view at the same time.
+  tagline: A young man says "I have no arrows." The saying happened; whether he has none is claimed only inside his speech. This library keeps those apart, and measures what a recall does to them.
   actions:
     - text: Understand the method
       link: /method/orientation/
@@ -49,6 +49,35 @@ import { sourceLink } from '../../lib/provenance';
   <p>A story model should make uncertainty easier to inspect, not easier to hide.</p>
   <small>The project in one sentence</small>
 </div>
+
+## What it does, in one sentence of one story
+
+*The War of the Ghosts* contains the line:
+
+> I have no arrows.
+
+A young man says it. From that single sentence the fixture records **two different things**, and
+refuses to merge them:
+
+| Record | Context | Predicate | What it asserts |
+| --- | --- | --- | --- |
+| `ym1-says-no-arrows` | `world` | `say` | one young man **says** he has no arrows |
+| `lack-arrows` | `speechYm1a` | `have` | he has no arrows |
+
+The *saying* happened in the narrated world. Whether he actually **has** no arrows is asserted only
+inside his speech, so it lives in the speech context and not in the world. Both records cite
+sentence 13, and you can follow either one back to it.
+
+That distinction is the library. Someone recalling this story may report "he had no arrows" as a
+plain fact — and that is a real, measurable recall phenomenon, not a parsing error to be corrected
+away. A flat list of events cannot tell the two apart, so it cannot notice when a recall promotes
+one into the other.
+
+<Evidence
+  status="Confirmed"
+  source="WarOfTheGhostsModel.scala — both records at span 13, contexts world and speechYm1a"
+  href={sourceLink('fixtures/src/main/scala/storymodel4s/fixtures/wog/WarOfTheGhostsModel.scala')}
+ />
 
 ## What exists now
 
