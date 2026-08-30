@@ -5336,3 +5336,293 @@ Two governance gates remain visible rather than being papered over:
 
 The architecture is therefore mature enough to guide implementation, but implementation must
 begin at the first lawful open gate rather than at the most visually impressive model adapter.
+
+## 121. Movie time-contract refinement and current implementation baseline
+
+After the movie plan landed, a primary-source audit of FFmpeg's
+[packet](https://ffmpeg.org/doxygen/trunk/structAVPacket.html),
+[stream](https://ffmpeg.org/doxygen/trunk/structAVStream.html), and
+[rational-rescale](https://ffmpeg.org/doxygen/trunk/group__lavu__math.html) contracts exposed a
+useful distinction between a sound architecture and a complete time contract. The architecture
+remains accepted, but its pre-C1 contract must be tightened before public media types are designed.
+
+### 121.1 Missingness, duration, origin, and clock epochs
+
+An ingest timestamp is not simply an integer. PTS and DTS are independently either present signed
+ticks or missing. A sentinel such as `AV_NOPTS_VALUE` cannot masquerade as a valid coordinate.
+Packet duration zero means unknown in the relevant source contract, not a measured empty interval
+or instant. Negative timestamps and nonzero origins are lawful.
+
+Raw counters also need epoch or unwrap identity. The same raw tick before and after a wrap, reset,
+splice, or discontinuity does not identify the same occurrence. Clock repair may be monotone inside
+one declared epoch; it cannot erase a reset by treating the unsplit raw counter as globally
+monotone. The F0 fixture and receipts should retain wrap width and unwrap or discontinuity evidence
+when the source exposes them.
+
+### 121.2 Edition playback time is not the picture-stream clock
+
+The primary presentation axis is the audience-facing edition playback timeline. Picture, audio,
+subtitle, and other native tracks compose onto it. An interval with continuing audio but no picture
+sample remains part of the edition, and an unknown final-frame duration cannot be stretched to the
+edition end merely to fill the axis. A designated authority track remains useful ingest provenance;
+it does not become the ontology of presentation time.
+
+### 121.3 Exact rational projection and quantization
+
+Exact rational source coordinates do not generally land on an integral target lattice. Projection
+therefore either remains exact-rational or returns a typed quantized or enclosing result with a
+declared rounding policy and residual or error bound. A rounded target integer is never relabelled
+exact. Half-open interval endpoint rounding must be explicit and may not invent coverage.
+Intermediate arithmetic is overflow-safe or refuses; it must be tested against an independent
+arbitrary-precision oracle. Arithmetic or quantization refusal is a first-class projection outcome,
+not a presentation gap, outside-domain result, absent correspondence, ambiguity, or missing value.
+
+### 121.4 Tolerance, relation identity, and derivation identity
+
+Mapping tolerance is an admission or residual bound for a fitted relation, separate from
+localization uncertainty. It is not fuzzy coordinate equality, interval membership, deduplication,
+axis identity, or correspondence: threshold closeness is nontransitive.
+
+Three identities remain separate:
+
+1. the source and target axes and their directed roles;
+2. the canonical mapping relation, including mapping family, directed source/target roles, exact
+   geometry, occurrences, and explicit epoch or discontinuity seams;
+3. the derivation receipt containing algorithm, parameters, parser or fitter version, inputs,
+   residuals, and provenance.
+
+One affine segment and two contiguous collinear restrictions of the same exact affine function can
+denote the same canonical relation while retaining different derivation receipts only when they
+share mapping family, directed source/target roles, and occurrence identity; have no intervening gap,
+hold, epoch, or discontinuity seam; and have compatible half-open endpoint semantics. Equal slope
+alone is insufficient. Changing mapping family, directed role, gap, hold, explicit seam, occurrence,
+slope, intercept, or endpoint changes the relation itself.
+
+### 121.5 Reverse mappings and conditional round trips
+
+Exact `reverse(project(p)) == p` is required only on an exact bijective segment. Holds, repeated or
+reordered source ranges, quantization, and cross-edition correspondence are not functions in both
+directions. Reverse projection must retain all occurrence-scoped preimages, a bounded extent or set,
+or typed ambiguity; it cannot select the first match. Composed mappings preserve every intervening
+gap rather than inferring coverage from mapped endpoints on either side.
+
+The accepted mutation courts now include missing-value sentinels, unknown duration represented as
+zero, negative origins, epoch collisions, rational-to-integral collapse, overflow, nontransitive
+tolerance, audio-only edition intervals, false final-frame extension, segment-coalescing identity,
+mapping-family or directed-role substitution with geometry held fixed, deletion of an explicit epoch
+or discontinuity seam before coalescing, set-valued reverse, occurrence loss, and gap-bridging
+composition.
+
+### 121.6 What is already implemented and what is not
+
+A read-only current-main audit at `0b414b443e62cf4ee67a7f81e4846c2a8c13ab36` found a substantial
+portable foundation:
+
+- `core.SurfaceSequence` provides stable word/token traversal, span lookup, previous/next
+  navigation, and receipted window plans;
+- `features` provides tracks, explicit missingness, window reduction, derivation graphs, sidecars,
+  boundary evidence, and world-time transition values;
+- `acquire` provides provider-neutral proposals, critics, deterministic resolution, alternatives,
+  rejection, and append-only candidate ledgers;
+- `document` provides validated surface-to-narrative compilation with sparse candidate addresses,
+  attempt receipts, and typed derivation gaps;
+- `story` provides the shared graph, hierarchy, trajectory, claims, and validation;
+- `view` provides renderer-neutral Narrative Atlas and Codex artifacts.
+
+The current implementation is nevertheless text-bound at the source seam: `StoryModel` stores a
+`StorySource`, `SurfaceAtlas`, and `SpanSet`-based support, while feature targets and supports are
+lexical or narrative rather than media-axis observations. There is no landed `SourceBundle`,
+edition-level `PresentationAxis`, typed media-coordinate or mapping implementation, multimodal
+`EvidenceSupport`, `MediaAtlas`, timed-language lattice, audiovisual observation-track store,
+worker wire schema, FFmpeg adapter, or PySceneDetect execution.
+
+The first C1 implementation slice therefore remains a portable, provider-free substrate
+generalization with text conformance tests. It must reuse these proven seams rather than create a
+parallel movie ontology. No media, package, checkpoint, provider, or runtime action follows from
+the documentation amendment.
+
+This documentation pass also retires the earlier shorthand “weightless PySceneDetect.” The intended
+property is learned-checkpoint-free classical detection, and the first recipe nominates
+`ContentDetector` specifically; its numeric component weights are ordinary algorithm parameters,
+not learned model weights.
+
+### 121.7 The legacy timed-transcript seam
+
+The current-main inventory initially overlooked a small but important existing contract:
+`AudioSpan`, `TranscriptTurn.audio`, and `TranscriptAtlas.turnAtAudio`. This is a useful text-first
+millisecond overlay, but it is not an edition-aware media clock. It carries no source bundle,
+edition, stream, axis, rational timebase, origin, epoch, occurrence, or rendition identity, and its
+checked constructor permits an explicit empty `[t,t)` span.
+
+The pre-C1 plan was therefore amended to require timed-transcript conformance rather than silently
+reusing or discarding this seam. C1 must preserve the existing transcript text, turn order, speaker,
+phase, prompt, source support, and half-open lookup behaviour. An unbound `AudioSpan` refuses
+promotion to media `EvidenceSupport`. A caller may explicitly bind it to a named local millisecond
+axis with exact `1/1000` scale, but edition playback use still requires a checked mapping. Changing
+the bound stream, axis, origin, epoch, occurrence, or rendition changes support identity.
+
+The smallest portable court uses three turns: absent timing, one nonempty `AudioSpan`, and one
+explicit empty legacy span. It keeps those states distinct from unknown packet duration and from
+coordinate or mapping refusal. This is a conformance and migration requirement only; it does not
+authorize a decoder, provider, package, media asset, runtime, or new public API.
+
+## 122. Late D2 source-boundary review: provenance beats raw timestamp value
+
+After the V7 documentation candidate was frozen, the board received a read-only source-contract
+advisory (`post-01M19ET424EE0X2DYWTA60NK1P`). The review agreed with the general D2 model but found
+two source-boundary courts that V7 implied without stating. The movie lead verified both against
+the official FFmpeg packet and rational-rescale contracts, accepted the advisory at
+`post-01M19F842PBX8VNNBP93EVE78K`, stopped V7 from landing, and required a narrow successor rather
+than treating an already-reviewed candidate as immutable truth.
+
+### 122.1 One raw value, two different outcomes
+
+`AV_NOPTS_VALUE` is `INT64_MIN`. A packet PTS or DTS field carrying that sentinel means that the
+timestamp is absent. Independently, `av_rescale_rnd` can return `INT64_MIN` when the requested
+result is not representable. The bit pattern therefore cannot determine the domain outcome:
+
+- packet-field sentinel provenance becomes `MissingTimestamp` before coordinate construction;
+- an unrepresentable rescale result becomes `ArithmeticRefusal`;
+- `AV_ROUND_PASS_MINMAX` passthrough preserves the sentinel's missingness provenance and may not
+  turn it into a present coordinate;
+- a classifier that sees only the raw integer, or that treats every `INT64_MIN` as the same
+  outcome, fails the mutation court.
+
+The operation provenance in this rule cannot itself be a caller-selected label. In C1,
+packet-field normalization may consume only an explicitly synthetic, fixture-scoped packet witness
+and select PTS or DTS from that witness; exact rescaling consumes the exact operands, rational
+scales, target axis, and rounding and endpoint policy and computes its own result or refusal. A
+generic checked constructor accepting `(rawTick, provenanceTag)` or `(rawTick, outcomeKind)` would
+merely move the ambiguity into a forgeable tag and is therefore outside the admissible API.
+
+This is a concrete instance of a broader rule already present elsewhere in the architecture:
+semantic identity is not recoverable from untyped payload equality after provenance has been
+discarded.
+
+### 122.2 PTS and DTS form a packet contract
+
+The two timestamp fields also cannot be validated independently and then assumed jointly valid.
+For an actual packet after demuxer or format conversion, if both values are present the FFmpeg
+contract requires `PTS >= DTS`. A present `PTS < DTS` pair becomes a typed source-contract
+violation or refusal. The record retains the original PTS, DTS, timebase, packet identity, and
+extractor provenance for diagnosis.
+
+The adapter must not make the packet appear admissible by swapping the fields, clamping one value,
+relabelling PTS as DTS, reordering packets, or silently discarding a field. Each such repair is a
+mutation that the court must reject. This does not make DTS evidence or impose global monotonicity:
+DTS remains decode-order provenance, PTS remains presentation provenance, and resets, wraps,
+splices, and epochs retain their existing typed treatment.
+
+Packet, extractor/build, and rescale-operation identities are derived from the complete canonical
+preimage of the thing each describes and recomputed at decode and join boundaries. A supplied
+identity is never proof of the packet, extractor, or operation it names. More importantly, a
+matching derived identity proves content integrity, not that an admitted decoder ran. Any record
+claiming runtime packet/extractor provenance therefore remains draft through D0 and D1. Only the
+separately authorized E0 decoder adapter may join it to an adapter-owned, orchestrator-issued
+invocation and exact result recorded in the append-only build journal. Generic codec rehydration
+never performs that promotion.
+
+### 122.3 Scope of the amendment
+
+These are ingest/C1 construction and refusal laws, not generic narrative or semantic-mapping rules.
+D2 records them normatively so that C1 cannot choose an API that makes the distinction impossible.
+The documentation amendment does not add FFmpeg code, a decoder dependency, media access, or a
+provider. Executable JVM/JS/Native fixture-scoped domain courts belong to C1; D0 and D1 remain
+decoder free, and the first actual decoder realization belongs only to separately authorized E0
+after admission and the upstream gates close.
+
+## 123. V9 identity audit: checked provenance must be derived
+
+After V8 was frozen, repository rule `24ce308` made explicit a cross-cutting contract that an
+identity or classification must be derived from what it describes rather than asserted by its
+caller. The component-ledger reviewer re-audited exact V8 against that rule and found one admissible
+blocker: V8 distinguished packet-field missingness from rescale refusal using operation provenance,
+but did not yet prevent a caller from relabelling identical `INT64_MIN` values or substituting a
+packet, extractor, or rescale receipt. The reviewer found no second blocker in mapping identity,
+refinement construction, or worker identity.
+
+V9 resolves that first defect without adding a decoder, provider, dependency, media access, or
+runtime implementation:
+
+- packet PTS/DTS normalization and exact rescaling are separate checked operations, not one generic
+  raw-value classifier with a provenance tag;
+- the C1 packet normalizer derives its field class from an explicitly synthetic, fixture-scoped
+  packet witness, and the rescaler derives its outcome from exact operands and declared arithmetic
+  policy;
+- packet, extractor, and rescale-operation identities are recomputed from complete canonical
+  receipt preimages at decode and join boundaries;
+- raw adapter payloads and claimed provenance remain unchecked until this join succeeds;
+- every public or package-visible construction and factory path is enumerated, and no generic or
+  caller-accessible ordinary or unsafe-named `apply`, `copy`, companion `fromProduct`,
+  `summon[Mirror.ProductOf[T]].fromProduct`, codec rehydration, or reflection path may mint a checked
+  classification or identity from caller-supplied labels. Only the private construction door reached
+  by the corresponding checked operation or verified receipt join may do so.
+
+The required C1 JVM/JS/Native courts now include provenance-flip, packet-receipt substitution,
+rescale-receipt substitution, supplied-identity mismatch, and exhaustive checked-construction-door
+mutations. Every refusal has an individual same-mechanism positive control: correct packet and
+rescale receipts join, matching recomputed identities validate, a lawful non-sentinel packet field
+constructs a present tick, a packet-field sentinel becomes `MissingTimestamp`, a representable exact
+rescale succeeds, and an actually unrepresentable exact rescale becomes `ArithmeticRefusal`. Each
+checked result family remains constructible through its lawful operation-specific private door.
+Separately, every forbidden generic-door probe has a same-mechanism, same-shape compile-success
+control on an honest Cartesian control type: `apply`, `copy`, companion `fromProduct`,
+`Mirror.ProductOf.fromProduct`, codec rehydration, reflection, and any unsafe-named factory are each
+exercised under the same platform, imports, package visibility, codec configuration, and compiler
+settings as their negative probe. An always-refuse join, an uninhabitable checked type, or a broken
+import, package, codec, reflection, or compiler probe cannot pass the court.
+
+## 124. V10 authority audit: receipt integrity is not provenance authority
+
+The independent video-admission reviewer then found a second, deeper indistinguishable pair. V9
+could reject a substituted or mismatched receipt, but a caller could still author a complete,
+internally consistent packet payload and receipt preimage, recompute every identity, and present it
+as though an admitted decoder had emitted it. Hashing the claim proves integrity; it does not prove
+extractor execution. Treating that record as runtime observed would either grant C1 false evidence
+authority or silently import the D0 decoder into the portable stage.
+
+V10 makes the stage and authority boundary explicit:
+
+- C1 can mint pure exact-rescale outcomes and checked packet outcomes only for explicitly
+  synthetic, fixture-scoped witnesses;
+- fixture-scoped packet outcomes cannot become runtime media evidence or enter a production
+  `NarrativeSourceAtlas`;
+- all records claiming decoder packet/extractor provenance remain draft in C1, even if their fields,
+  checksums, fingerprints, preimages, and derived identities are internally consistent;
+- only E0's separately authorized admitted adapter-owned invocation/result join may mint
+  runtime-observed packet/extractor
+  provenance; it binds an orchestrator-issued invocation, admitted source and input checksum,
+  adapter build/configuration fingerprint, exact result digest, terminal receipt, and append-only
+  build-journal entry;
+- the issuance capability is not a serializable tag, and generic codec replay yields draft until
+  the E0 verifier rejoins it to the issued invocation and exact result.
+
+The decisive court holds the entire packet content and canonical receipt preimage fixed. A
+caller-authored, self-consistent whole receipt without the adapter-owned issued invocation/result
+join remains draft; the adapter-emitted record with the join may become runtime observed. Its
+positive control proves that a correct issued invocation, exact result, receipt, and digest do join.
+This is distinct from the V9 identity and construction-door courts: content identity, receipt
+integrity, and observation authority are three separate claims.
+
+For avoidance of ambiguity, V10 supersedes V9 references to a generic verified packet receipt join
+or runtime packet positive control in C1. C1 packet controls are fixture scoped. V10 initially put
+the runtime issuance join in D0; the stage correction below supersedes that placement.
+
+## 125. V11 stage audit: runtime decoding begins at E0, not D0
+
+The video-admission reviewer accepted V10's integrity-versus-authority distinction but found one
+stage violation. D0 had already been accepted as a read-only Sherlock atlas adapter with no decoder
+dependency, and the component-admission ledger holds FFmpeg/PySceneDetect execution for a later,
+separately authorized implementation bead. Assigning the trusted decoder join to D0 would silently
+open execution before the accepted C1 -> D0/D1 -> E0 sequence permits it.
+
+V11 therefore keeps every purported runtime decoder record draft through C1, D0, and D1. The
+adapter-owned issued invocation/result plus append-only journal join, its generic-codec draft
+boundary, and the forged-whole-receipt versus issued-receipt court move to E0. E0 itself opens only
+under a separately authorized decoder/component-realization bead after its upstream gates close.
+The component's project-authored F0 and admitted F1 courts run before any runtime observation enters
+the film/recall vertical.
+
+This correction changes stage ownership, not the V10 authority semantics: content identity,
+receipt integrity, and observation authority remain separate, and no documentation candidate opens
+package acquisition, decoder execution, media access, or runtime implementation.
