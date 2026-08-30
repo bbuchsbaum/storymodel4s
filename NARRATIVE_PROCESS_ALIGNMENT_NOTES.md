@@ -3,7 +3,7 @@
 ## Record status
 
 - **Purpose:** Preserve the complete substance and evolution of a multipart discussion, ending in a concrete plan for a library implementation.
-- **Current coverage:** Parts 1–4 plus AMR reference/fit, automation, autonomous-agent, AMR-boundary, multiscale surface/feature-track, and co-authored vision/mission checkpoints.
+- **Current coverage:** Parts 1–4 plus AMR reference/fit, automation, autonomous-agent, AMR-boundary, multiscale surface/feature-track, co-authored vision/mission, and multimodal movie-source architecture checkpoints.
 - **Status:** Initial conceptual proposal; nothing here is yet a final implementation decision.
 - **Note-taking rule:** Later parts should add dated/numbered evolution entries, record agreements and revisions explicitly, and retain superseded ideas with their rationale rather than silently rewriting history.
 - **Provisional framework name:** **Narrative Process Alignment (NPA)**.
@@ -4909,3 +4909,430 @@ The public documents also retain the §106–118 surface/feature decision. Exact
 The vision and mission explicitly reject several overclaims: natural autobiographical interviews do not establish historical veridicality or genuine re-experiencing; omission does not prove memory unavailability; salience does not define correctness; AMR is an interoperability adapter rather than the story ontology; parser output is not ground truth; automatic output is not gold; and the project does not promise one universal memory score. The initial release is English-oriented and does not train a parser or foundation model.
 
 The red-team pass also required present-tense honesty. M0 supplies portable types, laws, validators, exact surface traversal, feature/window machinery, baseline recall alignment, and rule-based uncalibrated interview induction. It does **not** yet construct a complete story model automatically from raw text. Provider adapters, the unattended orchestrator, automatic cross-sentence identity resolution, relation extraction, hierarchy induction, and scientific calibration corpora remain programme work. The vision states the questions the completed system should make answerable; the mission distinguishes those goals from the capabilities already implemented.
+
+## 120. Multimodal movie-source architecture checkpoint
+
+On 2026-08-29, an outside advisor supplied a comprehensive proposal for admitting movies into the
+Narrative Process Alignment programme. The owner appointed `codex-movie-architecture` to lead a
+dedicated, public design discussion, solicit specialist criticism, resolve objections, and turn the
+proposal into a staged plan. The durable discussion is the Mote topic
+`movie-narrative-architecture`; its routed planning item is
+`bd-01M18459K9QS09Y4H09HPY7BTZ`. The resulting consensus candidate is the
+[movie narrative architecture and implementation plan](docs/plans/2026-08-29-movie-narrative-architecture.md).
+
+This checkpoint records how the proposal changed under review. It does not duplicate the plan's
+construction details and does not authorize implementation, source access, dependency admission,
+model downloads, acceptance of provider terms, or a public-API migration.
+
+### 120.1 The advisor's central recommendation
+
+The advisor's strongest recommendation was to avoid building an autonomous “video understanding”
+ontology and translating it afterward into the text-story system. Text and movies should instead
+be treated as different observational substrates for the same narrative model:
+
+\[
+\boxed{
+\text{Movie source}
+=
+\text{media atlas}
++
+\text{timed language}
++
+\text{audiovisual observations}
++
+\text{identity resolution}
++
+\text{shared narrative interpretation}
+}
+\]
+
+The reusable semantic object remains:
+
+\[
+\mathcal N=
+(\text{entities},\text{situations},\text{contexts},
+\text{relations},\text{hierarchy},\text{features},\text{claims}).
+\]
+
+The movie-specific acquisition layers explain where the evidence came from: spoken words,
+subtitles, visible action, faces, objects, motion, environmental sound, music, on-screen text,
+off-screen voices, or several modalities together. The advisor summarized the desired authority
+gradient as:
+
+```text
+raw synchronized evidence
+  -> modality-specific observations
+  -> shared narrative interpretation
+```
+
+The memorable design rule is:
+
+> **Fuse interpretations late; retain evidence early.**
+
+This principle was accepted. It preserves exact evidence, timing, modality, alternatives, and
+missingness while still letting downstream compilation and recall alignment operate over one
+narrative ontology.
+
+### 120.2 What the movie acquisition plane must preserve
+
+The proposal made several acquisition problems concrete.
+
+First, movies introduce multiple clocks that must not be conflated:
+
+- native video, audio, and subtitle coordinates;
+- the pinned edition's audience-facing presentation time;
+- story-world time;
+- recall time;
+- optional experiment or scanner time.
+
+Second, a film's language is a lattice rather than a transcript. ASR, subtitles, closed captions,
+scripts, OCR, audio description, translations, and human transcripts can disagree in wording,
+timing, presence, and scope. A deleted screenplay line can resemble a subtitle without having been
+spoken in the released edition. A translated subtitle can convey meaning without being an exact
+record of the soundtrack. A resolved working utterance must therefore retain its contributing
+tracks and alternatives instead of overwriting them.
+
+Third, speaker attribution requires several identity domains:
+
+- acoustic speech activity and voice clusters;
+- shot-scoped face tracks;
+- cross-shot visual continuity;
+- story characters;
+- optionally, and later, real-world performers.
+
+These are related by evidence-backed proposals, not by casts or string equality. The visible face
+may be the listener. A voice may be off-screen, dubbed, device-mediated, narrated, sung, crowded,
+or overlapped. Active-speaker evidence, linguistic address, face continuity, voice continuity,
+character depiction, and character vocal attribution therefore remain distinct relations, with
+abstention when the evidence does not identify a character.
+
+Fourth, movies require persistent perceptual and continuous feature tracks. Candidate tracks
+include:
+
+- frames, keyframes, shots, dissolves, fades, black frames, and camera motion;
+- faces, bodies, important objects, places, entrances, exits, occlusions, and state changes;
+- frame appearance, dense spatial features, motion, action, video–text geometry, affect, and
+  cinematography;
+- speech activity, prosody, music, environmental sound, effects, silence, auditory novelty, and
+  sound–text or audiovisual geometry.
+
+These tracks are valuable both analytically and structurally. They can characterize a movie,
+support retrieval, nominate expensive interpretation windows, and contribute boundary evidence.
+As in §§106–118, a feature used to infer hierarchy must be distinguished from an independent
+feature later used to evaluate that hierarchy.
+
+Fifth, language, vision, and sound should initially produce local evidence-backed charts or
+proposals. A visible hand and door movement, an audible impact, and dialogue about a door may
+support different claims. They can later be resolved into one event, but an audible bang plus a
+visible fall does not automatically establish a shooting or a causal relation. Directly visible,
+directly audible, linguistically expressed, cross-modally supported, entailed, inferred, and
+hypothesized are not interchangeable forms of authority.
+
+Finally, acquisition should be coarse to fine:
+
+1. deterministic ingest and cheap whole-source scans;
+2. source-only nomination of shots, dialogue exchanges, scene candidates, uncertain regions, and
+   important nonverbal intervals;
+3. expensive local interpretation of bounded windows;
+4. global deterministic identity, event, context, time, causal, and hierarchy resolution;
+5. separately identified diagnostic or cross-fitted expansion when later evidence motivates
+   reinspection.
+
+The source used for primary recall scoring must remain frozen with respect to held-out recalls.
+Recall-driven reanalysis can be scientifically useful, but it cannot silently rewrite the source
+against which that same recall is scored.
+
+### 120.3 What was accepted, amended, and rejected
+
+The advisor's scientific direction was accepted, but several illustrative API sketches were not.
+The discussion retained the controlling decisions of ADR 0007 rather than creating a second
+architecture.
+
+Accepted:
+
+- movies and prose compile into the same `NarrativeGraph` and hierarchy;
+- the movie acquisition layer preserves raw media, timed language, observations, feature sidecars,
+  identity evidence, proposals, alternatives, and receipts;
+- AMR or another proposition chart remains useful for local language semantics, but vision and
+  audio are not forced into AMR-shaped graphs;
+- multimodal models act as bounded interpreters and critics, not authorities over exact timing,
+  character identity, causal truth, or accepted graph structure;
+- Scala owns scientific identity, typed contracts, laws, validation, scheduling, deterministic
+  resolution, caching, compilation, and recall alignment;
+- GPU-oriented workers may own decoding and inference behind versioned batch or service protocols;
+- runtime construction is unattended, with explicit unresolved, unsupported, no-candidate, and
+  failed outcomes.
+
+Amended:
+
+- one bare microsecond `Long` and a pair of Scala mapping functions were replaced by native integer
+  timestamps, exact rational timebases, path-dependent axis identities, and serializable checked
+  mapping records;
+- source-time mapping was divided into clock repair, native-track composition into edition
+  playback time, and cross-edition content correspondence;
+- working utterances became immutable content-addressed resolution artifacts rather than canonical
+  replacement strings;
+- a checked proposition chart was kept structurally separate from the multimodal claim envelope
+  that carries media evidence;
+- the worker boundary gained a checked join over the issued request, source bundle, stream, axis,
+  extent, schema, terminal outcome, provider attempt, payload or sidecar digest, evidence support,
+  and cache lineage;
+- model critique became a separately scheduled `CriticFinding`, not an in-place mutation of a
+  proposal;
+- execution reproducibility was separated from evidential independence;
+- source-only, diagnostic, and cross-fitted refinement became construction boundaries rather than
+  descriptive tags;
+- the proposed “full audiovisual model must win” gate became an outcome-neutral requirement to
+  answer a predeclared scientific contrast completely, regardless of whether the result is
+  positive, null, or negative.
+
+Rejected:
+
+- a sibling `FilmModel` or generic medium parameter as the semantic foundation;
+- subtitles, scripts, ASR, or an omni-model summary as the movie's ground truth;
+- generic mixed-axis intervals, mixed-support hulls, normalized runtime fractions, nominal frame
+  rate, floating-point seconds, or DTS as evidence coordinates;
+- direct conversion from diarizer labels or face clusters into narrative `EntityId` values;
+- treating cross-modal agreement as automatic truth;
+- allowing vectors, tracks, or structurally valid charts to mint narrative propositions;
+- allowing a worker to assert cache authority, validation, evidential independence, or acceptance;
+- making real-world performer identity a first-vertical requirement;
+- treating a named current model family as part of the ontology or as a permanently selected
+  provider.
+
+### 120.4 The adversarial review changed the contract
+
+The review was organized around ten decisions: acquisition ownership, time, timed language,
+identity, observation/chart boundaries, workers, scheduling, the first lawful vertical,
+validation, and StoryAtlas. Specialist reviewers examined compiler/acquisition seams, time and
+identity binding, unattended operation, corpus and component admission, aggregate-metric failure,
+and visualization. Their criticisms produced several important safeguards.
+
+The central adversarial example was a pipeline that appears excellent on component metrics while
+constructing a false joint event. Such a pipeline can:
+
+- convert packet PTS or DTS to floating-point seconds or `frame / fps`;
+- ignore an edit list or alternate-cut occurrence;
+- align ASR and faces by nearest midpoint;
+- interpret a rendition-local `spk0` label as global identity;
+- choose the most visible face during shot/reverse-shot;
+- treat a song or device-mediated voice as ordinary dialogue;
+- map the resulting label directly to a story character.
+
+On a variable-frame-rate alternate edition with a leading empty edit, a dub, an off-screen caller,
+a visible listener, and overlapping music, ASR, diarization, face tracking, and name accuracy can
+all be individually high while the integrated graph asserts that the listener spoke the lyric.
+This is the failure the architecture must defeat.
+
+The plan therefore requires factorial binding courts that hold marginal provider outputs fixed
+while permuting the edit list, visible face, rendition, overlap, and occurrence. Time must follow
+the checked edition composition; attribution must remain rendition scoped; listener visibility
+cannot determine speaker identity; device, off-screen, sung, and overlap coordinates survive
+independently; and a missing or substituted join resolves to uncertainty rather than a convenient
+character.
+
+The review also found a concrete deterministic-resolution defect in the current acquisition
+implementation: equal-support candidate values can be selected according to their first arrival.
+The planned repair does not replace arrival order with an arbitrary lexical or hash winner. When
+distinct values tie on every declared evidential factor, the scientifically honest result is a
+canonically serialized set of `Alternatives`. Proposal order is never semantic input.
+
+Other mandatory mutation courts cover:
+
+- PTS/DTS substitution and decode-order permutations;
+- variable frame rate and rational timebase rescaling;
+- empty edits, holds, repeated ranges, gaps, and ambiguous reverse projection;
+- equal numeric timestamps in different editions;
+- speaker and track-label collisions across streams or renditions;
+- listener-face, dub, song, crowd, device, and overlap permutations;
+- subtitle divergence and script lines missing from the released cut;
+- request/call/payload/support substitution;
+- equal request keys with different realized provider outputs;
+- incomplete or aliased coverage partitions;
+- direct and transitive leakage from held-out recalls, benchmark queries, answers, or labels;
+- a coder record being laundered into direct visual evidence;
+- draft or invalid compilation entering recall alignment;
+- silent action, unseen sound, flashback, montage, role reversal, temporal misbinding, and plausible
+  but unsupported causation.
+
+Every court requires a mutation witness: deliberately remove the intended guard and show that the
+wrong result would otherwise pass.
+
+### 120.5 The settled contract by decision area
+
+The consensus candidate records the following direction.
+
+**Acquisition ownership.** Portable source identity and evidence geometry belong in `core`;
+aligned measurements belong in `features`; semantic proposals, critic findings, and deterministic
+resolution belong in `acquire`; accepted narrative meaning remains in the existing document/story
+pipeline. Heavy runtimes sit behind later JVM adapters. Source evidence, measurements, and semantic
+interpretations persist as different artifacts.
+
+**Time.** Every native stream retains integer PTS and optional DTS under an exact reduced rational
+timebase, origin, edition, stream, axis, and rendition identity. DTS is decode provenance only.
+Native PTS enters the audience-facing edition axis through checked track-composition data binding
+container/edit-list semantics and parser receipts. Mapping results distinguish mapped,
+presentation gap, outside domain, no correspondence, and ambiguity. Cross-edition correspondence
+is evidential, potentially many-to-many and nonmonotone, and retains occurrence identity.
+
+**Boundaries.** Boundary existence/localization, transition morphology and extent, visual rhyme,
+shot adjacency, coded scenes, and narrative-event boundaries are separate claims. A hard cut is an
+instant; a dissolve or fade occupies an interval. `NotExamined`, `ExaminedNoCandidate`, and an
+actual negative proposal are different outcomes.
+
+**Timed language.** Every language source remains immutable. A resolved utterance retains the
+contributing text atlases, alternatives, timing or typed absence, correspondence claims, mappings,
+policy, and receipt. Lexical correspondence is not proof of spoken occurrence. Proposition-chart
+alignment remains exact to text; typed media support belongs to the surrounding proposal or claim.
+
+**Identity.** Acoustic activity and clusters, shot-scoped face tracks, cross-shot appearance
+continuity, and narrative characters are non-convertible. Visibility/coverage, emission path,
+vocalization kind, diegesis, and rendition are orthogonal. Active-speaker, depiction, continuity,
+device emission, and vocal-character attribution are separate proposals. A story-level speech
+context is formed only after accepted attribution.
+
+**Authority and status.** The system separates source-anchor geometry, evidence mode, artifact
+relation, resolver disposition, and epistemic status. A timestamped human coding is evidence of a
+coding act and may be derived from an episode; it is not automatically direct visual evidence. A
+total claim-family licensing policy either assigns the strongest status actually warranted or
+leaves the claim conservative or unresolved.
+
+**Workers and caching.** A worker returns an untrusted terminal outcome for an exact requested
+extent. A fail-closed JVM adapter constructs the only result eligible for resolution by checking
+the full relational join. Every planned extent has exactly one coverage outcome. Request identity
+and realized artifact identity are different; changed output under an equal request branches or
+produces provider-drift evidence. An `ExecutionFingerprint` proves reproducible configuration;
+separately admitted `IndependenceLineage` determines whether two outputs count as independent
+evidence.
+
+**Scheduling and leakage.** Primary estimates consume only `SourceFrozen` artifacts with no direct
+or transitive held-out-recall, query, answer, label, or gold lineage. Diagnostic expansion produces
+a separate non-estimand child. Cross-fitted expansion binds disjoint informing and evaluation
+partitions. Search policy, requested extents, terminal outcomes, coverage, receipts, and realized
+outputs all participate in artifact identity, even when the final accepted graph happens to match.
+
+**Validation.** Source assets, annotations, foils, and human gold are admitted separately. A source
+artifact is not its own evaluation set. Recall alignment accepts only a present
+`NarrativeCompilation.validated`; drafts, partial compilations, gaps, and refusals remain useful
+diagnostics but cannot be coerced into alignment. Scientific comparisons declare estimand,
+population, support, missingness, uncertainty, and common compute/coverage budget before comparing
+transcript-only, visual-only, audio-only, late-fusion, and one-shot baselines.
+
+**Visualization.** `storymodel4s` supplies renderer-neutral source-observation, narrative,
+alignment, navigation, and coordination packets. The sibling StoryAtlas consumes a SHA-pinned
+artifact and never becomes a scientific dependency. Playback cursor, epistemic horizon, discourse
+position, story-world time, recall position, scanner time, and screen coordinates remain distinct.
+Credentials, locators, signed URLs, cookies, and filesystem paths belong to a non-scientific
+runtime playback binding and never enter saved scientific state. If playback is unavailable, the
+evidence and claims remain inspectable; another cut cannot be substituted helpfully.
+
+### 120.6 Admission and the first lawful fixtures
+
+The admission audit separated three evidence tiers:
+
+- **F0:** tiny project-authored deterministic media for clock, gap, mapping, timed-text, evidence,
+  serialization, and refusal laws;
+- **F1:** a pinned open movie or excerpt for source-side construction, with annotations and gold
+  admitted separately;
+- **F2:** an exact stimulus edition lawfully paired with human recalls, and with neural streams only
+  when their acquisition clocks and permissions are independently admitted.
+
+No exact F2 source-film plus human-recall pair was admitted during this discussion.
+
+The FilmFestival OpenNeuro deposit omits the ten films for copyright, and its companion repository
+does not by itself grant the missing media or code. Sherlock's pinned deposit has unresolved
+licence metadata, its workbook repository supplies no licence, and the BBC episode has separate
+rights. Brain Treebank is useful as an external benchmark but its film-derived transcripts and
+screenshots require artifact-level clarification. MF² is potentially valuable for narrative facts,
+causal and order questions, and counterfactual foils, but the released benchmark is noncommercial
+share-alike and does not transfer rights from its films or subtitles; it is excluded from defaults
+pending an owner decision.
+
+The leading open F1 fixture is a short, checksummed *Big Buck Bunny* excerpt under the Blender
+Foundation's CC BY 3.0 terms. It is suitable for media ingest, timing, shot boundaries, visual and
+audio features, and replay, but not dialogue. A small *Sintel* excerpt is a possible later dialogue
+fixture, with its exact transcript or subtitles admitted separately.
+
+The smallest proposed acquisition court is therefore:
+
+1. project-authored F0 bytes with declared PTS, VFR, repeated frames, gap, synthetic tones,
+   overlapping activity intervals, and invented subtitle cues;
+2. an exact, preferably LGPL-only FFmpeg build for deterministic ingest;
+3. weightless PySceneDetect algorithms for boundary proposals;
+4. a checksummed 20–40 second *Big Buck Bunny* F1 excerpt;
+5. no ASR, diarizer, tracker, embedding model, or multimodal interpreter until its own scientific,
+   licence, weight, runtime, and provider conditions are admitted.
+
+The advisor's suggested model families remain a research menu, not architectural commitments.
+Candidates discussed included Whisper or WhisperX and Montreal Forced Aligner for speech and word
+timing; pyannote or Sortformer for acoustic diarization; Light-ASD for active-speaker evidence;
+face-specific encoders, ByteTrack, and SAM-family tracking for visual continuity; TransNet V2 for
+learned shot boundaries; DINO, V-JEPA, InternVideo, and Perception Encoder families for visual or
+audiovisual features; CLAP or OpenBEATs for audio; and Qwen-family vision or omni models for bounded
+interpretation and critique. Their code, weights, training provenance, gated terms, preprocessing,
+containers, tokenizers, quantizers, privacy, retention, and service conditions are separate
+admission questions. In particular, a permissively licensed repository does not prove that its
+weights or training media have the same disposition.
+
+### 120.7 The gate correction and staged order
+
+The board discussion caught and corrected one consequential false progress claim. Commit
+`e66147071ba1beeeed477aef38ae26051ae453f7` closes the mechanical compiler seam. It proves that the
+current types can reach compilation; it does **not** satisfy the Stage 1b research prerequisite.
+The real-transcript gate remains open until one lawfully admitted real transcript reaches one
+declared, answered research question through deterministic resolution and compilation with exact
+receipts.
+
+The source/component admission gate is independently open. Closing one gate does not close the
+other. Under the current ADR order:
+
+1. P0, the mechanical compiler seam, is closed;
+2. P1, the admitted real-transcript research vertical, remains open;
+3. B0 must settle exact Sherlock and other source/component dispositions, two-run time repair, and
+   aggregate-only fixtures;
+4. C1 adds only portable source, time, evidence, boundary, and atlas contracts after both P1 and B0;
+5. D0 is a narrow read-only Sherlock adapter;
+6. D1 migrates the compiler, status, feature, codec, alignment, worker-join, cache, independence,
+   and resolver seams exposed by the new source contract;
+7. E0 produces the first lawful film-plus-real-recall scientific answer from a validated
+   compilation, regardless of the result's sign;
+8. general timed-language, identity, perceptual, expanded-source, and paired-comparison stages
+   follow only after that minimal vertical;
+9. renderer-neutral StoryAtlas packets precede a separately authorized sibling-repository
+   consumer.
+
+Later stages describe dependencies; they are not standing implementation authorization. The next
+executable library vertical is P1. A separately assigned B0 audit can proceed as documentation, but
+it cannot fetch source media, accept terms, add dependencies, or unlock C1 by assertion.
+
+### 120.8 Fully automatic runtime and current consensus state
+
+The owner clarified that the goal is a fully automatic system, not a partially automated tool that
+depends on expert repair. The consensus plan therefore treats human activity as development and
+governance:
+
+- create and adjudicate gold data;
+- calibrate claim families;
+- audit releases and licences;
+- decide gated access and provider terms;
+- inspect errors and improve later versions.
+
+No human is required to fix a particular production graph. If automation cannot justify a claim,
+the lawful product is an explicit alternative, unresolved state, unsupported scope, no-candidate
+result, failure record, or partial compilation. Such outcomes are scientifically meaningful and
+preserve the distinction between an automatic system and one that merely hides manual completion.
+
+At the checkpoint, the 669-line consensus candidate had SHA-256
+`b12f79ceb61e020cd02c43c631ed015a9034d9c3b9c597da726337425a21e748`. Exact-hash acceptance was
+recorded by the compiler/acquisition, unattended-build, and StoryAtlas reviewers. The time/identity
+adversary, admission audit, status and boundary critic, leakage critic, and playback critic all
+materially changed the candidate and their stated blocking conditions were addressed in the text.
+
+Two governance gates remain visible rather than being papered over:
+
+1. the board treats ADR 0007 as ratified at `220cbdc` with wording repair `6530ac4`, while the ADR
+   file header still says `Proposed`; ADR authority must reconcile that metadata;
+2. P1 and B0/Q5 remain independently open, and no exact F2 pair is currently admitted.
+
+The architecture is therefore mature enough to guide implementation, but implementation must
+begin at the first lawful open gate rather than at the most visually impressive model adapter.
