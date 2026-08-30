@@ -1,7 +1,12 @@
 package storymodel4s.interview.scoring
 
 import storymodel4s.core.*
-import storymodel4s.interview.scoring.{Conditional, PlacementGrain, PlacementResolution}
+import storymodel4s.interview.scoring.{
+  Conditional,
+  ExclusionCause,
+  PlacementGrain,
+  PlacementResolution
+}
 import storymodel4s.features.{Coverage, Estimate, MissingReason, ScoreEstimate}
 import storymodel4s.interview.*
 import storymodel4s.recall.RecallUnitId
@@ -277,8 +282,22 @@ object TraditionalScoring:
     val total = resolved + unresolved + excluded
     if total <= 0.0 then PlacementResolution.complete(PlacementGrain.Phase)
     else
+      // The excluded arm here is ALWAYS RepetitionPolicy: the only branch above that adds to it is
+      // a Repetition address under RepetitionRule.Ignore. Attributing it is not bookkeeping - the
+      // constructor REFUSES unattributed exclusion, so omitting this makes a live production path
+      // throw. Found by codex-storymodel4s-scout; my own three-module gate missed it because no
+      // test exercises the Ignore branch, which is a coverage gap worth its own bead rather than a
+      // silent pass.
       PlacementResolution
-        .of(PlacementGrain.Phase, resolved / total, unresolved / total, excluded / total)
+        .of(
+          PlacementGrain.Phase,
+          resolved / total,
+          unresolved / total,
+          excluded / total,
+          excludedBy =
+            if excluded > 0.0 then Map(ExclusionCause.RepetitionPolicy -> excluded / total)
+            else Map.empty
+        )
         .fold(e => throw new IllegalStateException(e.message), identity)
 
 /** Evidence for phenomenological re-experiencing, reported as separate strands and never summed

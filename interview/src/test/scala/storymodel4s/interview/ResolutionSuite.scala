@@ -2,7 +2,12 @@ package storymodel4s.interview
 
 import munit.FunSuite
 
-import storymodel4s.interview.scoring.{Conditional, PlacementGrain, PlacementResolution}
+import storymodel4s.interview.scoring.{
+  Conditional,
+  ExclusionCause,
+  PlacementGrain,
+  PlacementResolution
+}
 
 /** The vehicle five estimand fixes share. Its whole job is to make one error unrepresentable —
   * renormalizing resolved mass to fill the gap left by unresolved and excluded mass — so the tests
@@ -14,7 +19,13 @@ class ResolutionSuite extends FunSuite:
 
   private def res(r: Double, u: Double, e: Double = 0.0) =
     PlacementResolution
-      .of(PlacementGrain.Detail, r, u, e)
+      .of(
+        PlacementGrain.Detail,
+        r,
+        u,
+        e,
+        excludedBy = if e > 0.0 then Map(ExclusionCause.RepetitionPolicy -> e) else Map.empty
+      )
       .fold(err => fail(err.message), identity)
 
   test("the three masses account for all of the placement") {
@@ -177,4 +188,231 @@ class ResolutionSuite extends FunSuite:
     )
     // The invariants the forge used to bypass are still enforced on the real door.
     assert(PlacementResolution.of(PlacementGrain.Detail, 1.0, 1.0, 1.0, -5.0).isLeft)
+  }
+
+  test("excluded mass must say which rule removed it") {
+    // Chief's requirement on this bead: "record WHICH threshold each exclusion failed. Six metrics
+    // moving with an undifferentiated `excluded` tells a later reader that something changed and
+    // not what." So unattributed exclusion is not a lesser record, it is refused.
+    assert(
+      PlacementResolution.of(PlacementGrain.Detail, 0.7, 0.0, 0.3).isLeft,
+      "excluded mass with no attribution was accepted"
+    )
+    // ... and the attribution may not name mass that was never excluded.
+    assert(
+      PlacementResolution
+        .of(
+          PlacementGrain.Detail,
+          1.0,
+          0.0,
+          0.0,
+          excludedBy = Map(ExclusionCause.RepetitionPolicy -> 0.3)
+        )
+        .isLeft,
+      "an attribution without excluded mass was accepted"
+    )
+  }
+
+  test("the attribution must account for the whole exclusion, not merely accompany it") {
+    // The failure this forbids is subtler than an absent map: naming one cause for a tenth of the
+    // mass and staying silent about the rest is the undifferentiated `excluded` the ruling
+    // rejected, wearing a label.
+    assert(
+      PlacementResolution
+        .of(
+          PlacementGrain.Detail,
+          0.7,
+          0.0,
+          0.3,
+          excludedBy = Map(ExclusionCause.RepetitionPolicy -> 0.1)
+        )
+        .isLeft,
+      "an attribution that under-accounts for the exclusion was accepted"
+    )
+    val split = PlacementResolution
+      .of(
+        PlacementGrain.Detail,
+        0.7,
+        0.0,
+        0.3,
+        excludedBy =
+          Map(ExclusionCause.RepetitionPolicy -> 0.1, ExclusionCause.BelowMembership(0.5) -> 0.2)
+      )
+      .fold(e => fail(e.message), identity)
+    assertEqualsDouble(split.excludedBy.values.sum, split.excluded, eps)
+    assertEqualsDouble(split.excludedBy(ExclusionCause.BelowMembership(0.5)), 0.2, eps)
+  }
+
+  test("the two exclusion causes are different claims and stay apart") {
+    // A repetition dropped by policy is a scoring decision. Mass resolved but too spread to be a
+    // member of any class failed the MEMBERSHIP threshold, which is a different number from the
+    // abstention threshold and a different question. Folding them together would report a scoring
+    // decision and a measurement limit as the same event.
+    val policy = PlacementResolution
+      .of(
+        PlacementGrain.Detail,
+        0.7,
+        0.0,
+        0.3,
+        excludedBy = Map(ExclusionCause.RepetitionPolicy -> 0.3)
+      )
+      .fold(e => fail(e.message), identity)
+    val membership = PlacementResolution
+      .of(
+        PlacementGrain.Detail,
+        0.7,
+        0.0,
+        0.3,
+        excludedBy = Map(ExclusionCause.BelowMembership(0.5) -> 0.3)
+      )
+      .fold(e => fail(e.message), identity)
+    assertEqualsDouble(policy.excluded, membership.excluded, eps)
+    assertNotEquals(policy.excludedBy, membership.excludedBy)
+    assertNotEquals(policy, membership)
+  }
+
+  test("absorbing float slack rescales the attribution with the masses") {
+    // `of` divides the three masses by their total to absorb within-tolerance slack. If the
+    // attribution were not scaled by the same factor it would stop summing to the `excluded` it
+    // explains, and the invariant above would hold at construction and be false in the stored
+    // value - true on the way in, wrong once published.
+    val t = PlacementResolution.Tolerance
+    val r = PlacementResolution
+      .of(
+        PlacementGrain.Detail,
+        0.7 + t,
+        0.0,
+        0.3,
+        excludedBy = Map(ExclusionCause.BelowMembership(0.5) -> 0.3)
+      )
+      .fold(e => fail(e.message), identity)
+    assertEqualsDouble(r.excludedBy.values.sum, r.excluded, eps)
+  }
+
+  test("an admitted inner mismatch is absorbed, not stored") {
+    // collab's BLOCK on 067e35b. The tolerance ADMITS an excludedBy that misses `excluded` by less
+    // than Tolerance; the first version then merely divided it by the outer total, which PRESERVES
+    // the discrepancy. So the whole-attribution invariant held at the door and was false in the
+    // stored value - 0.3000000005 against an excluded of 0.3, failing this suite's own eps.
+    // Absorbing is what the three masses already do; this is the same obligation one field over.
+    val t = PlacementResolution.Tolerance
+    val r = PlacementResolution
+      .of(
+        PlacementGrain.Detail,
+        0.7,
+        0.0,
+        0.3,
+        excludedBy = Map(ExclusionCause.RepetitionPolicy -> (0.3 + t / 2))
+      )
+      .fold(e => fail(e.message), identity)
+    assertEqualsDouble(r.excludedBy.values.sum, r.excluded, eps)
+    assertEqualsDouble(r.excludedBy(ExclusionCause.RepetitionPolicy), 0.3, eps)
+  }
+
+  test("a mismatch beyond the tolerance is refused, so absorption is not a licence") {
+    // The other side of the boundary collab asked to be pinned. Absorbing a near-miss must not
+    // become "any attribution is normalised onto the excluded mass" - that would make the sum
+    // invariant unfalsifiable, which is the failure mode this whole bead is about.
+    val t = PlacementResolution.Tolerance
+    assert(
+      PlacementResolution
+        .of(
+          PlacementGrain.Detail,
+          0.7,
+          0.0,
+          0.3,
+          excludedBy = Map(ExclusionCause.RepetitionPolicy -> (0.3 + 4 * t))
+        )
+        .isLeft,
+      "an attribution well outside the tolerance was absorbed instead of refused"
+    )
+  }
+
+  test("BelowMembership names the threshold it failed, not just the rule") {
+    // Chief required "record WHICH THRESHOLD each exclusion failed". I implemented "which rule" and
+    // flagged it as an interpretation; scout blocked it because the numeric value was erased. Two
+    // exclusions at different membership thresholds are different claims and must not compare equal.
+    val strict = PlacementResolution
+      .of(
+        PlacementGrain.Detail,
+        0.7,
+        0.0,
+        0.3,
+        excludedBy = Map(ExclusionCause.BelowMembership(0.8) -> 0.3)
+      )
+      .fold(e => fail(e.message), identity)
+    val lax = PlacementResolution
+      .of(
+        PlacementGrain.Detail,
+        0.7,
+        0.0,
+        0.3,
+        excludedBy = Map(ExclusionCause.BelowMembership(0.5) -> 0.3)
+      )
+      .fold(e => fail(e.message), identity)
+    assertNotEquals(strict.excludedBy, lax.excludedBy)
+    assertNotEquals(strict, lax)
+    assert(strict.render.contains("0.8000"), strict.render)
+  }
+
+  test("a membership threshold must be finite and in [0, 1]") {
+    // collab's BLOCK on 3c3b617. `abstentionThreshold` is guarded three lines above in the same
+    // constructor; the threshold a CAUSE carries was not, so BelowMembership(NaN) and friends were
+    // accepted and published as the rule in force. A receipt naming an impossible cutoff is worse
+    // than one naming none, because it reads as measured.
+    //
+    // isNaN is tested explicitly in the guard rather than relying on the range comparison: NaN
+    // fails every comparison, so `t < 0.0 || t > 1.0` alone FAILS OPEN and admits it.
+    val bad = Vector(Double.NaN, Double.PositiveInfinity, Double.NegativeInfinity, -0.1, 1.1)
+    bad.foreach { t =>
+      assert(
+        PlacementResolution
+          .of(
+            PlacementGrain.Detail,
+            0.7,
+            0.0,
+            0.3,
+            excludedBy = Map(ExclusionCause.BelowMembership(t) -> 0.3)
+          )
+          .isLeft,
+        s"a membership threshold of $t was accepted and published"
+      )
+    }
+    // Controls: the boundary values that ARE lawful must still be admitted, or the guard is a wall.
+    Vector(0.0, 0.5, 1.0).foreach { t =>
+      assert(
+        PlacementResolution
+          .of(
+            PlacementGrain.Detail,
+            0.7,
+            0.0,
+            0.3,
+            excludedBy = Map(ExclusionCause.BelowMembership(t) -> 0.3)
+          )
+          .isRight,
+        s"a lawful membership threshold of $t was refused"
+      )
+    }
+  }
+
+  test("render does not depend on how the attribution map was built") {
+    // collab's BLOCK on fa1c4e1. `sortBy(_._1.ordinal)` is not a total order over ExclusionCause -
+    // every BelowMembership shares one ordinal - so two resolutions that COMPARE EQUAL rendered
+    // their exclusions in whichever order the map happened to iterate. A receipt whose text depends
+    // on construction order cannot be diffed, quoted or audited.
+    val a = ExclusionCause.BelowMembership(0.3)
+    val b = ExclusionCause.BelowMembership(0.8)
+    val forward = PlacementResolution
+      .of(PlacementGrain.Detail, 0.4, 0.0, 0.6, excludedBy = Map(a -> 0.2, b -> 0.4))
+      .fold(e => fail(e.message), identity)
+    val reversed = PlacementResolution
+      .of(PlacementGrain.Detail, 0.4, 0.0, 0.6, excludedBy = Map(b -> 0.4, a -> 0.2))
+      .fold(e => fail(e.message), identity)
+    assertEquals(forward, reversed, "the two resolutions must be equal to make this a real court")
+    assertEquals(forward.render, reversed.render)
+    // And the order is the SEMANTIC one, ascending by threshold, not an accident of iteration.
+    assert(
+      forward.render.indexOf("0.3000") < forward.render.indexOf("0.8000"),
+      forward.render
+    )
   }
