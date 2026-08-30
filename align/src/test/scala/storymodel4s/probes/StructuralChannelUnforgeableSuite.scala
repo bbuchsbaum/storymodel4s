@@ -70,48 +70,48 @@ class StructuralChannelUnforgeableSuite extends FunSuite:
     )
   }
 
-  test("KNOWN BAD: the Mirror door is open on all four structural types") {
+  test("the Mirror door is CLOSED on all four structural types") {
     assert(
-      typeChecks(
+      !typeChecks(
         "import storymodel4s.align.*; summon[scala.deriving.Mirror.ProductOf[StructuralMemberEstimate]]"
       ),
-      "REPAIRED: flip this to !typeChecks and say so in the commit"
+      "the Mirror/fromProduct door is open again: the seal has regressed"
     )
     assert(
-      typeChecks(
+      !typeChecks(
         "import storymodel4s.align.*; summon[scala.deriving.Mirror.ProductOf[StructuralMemberExclusion]]"
       ),
-      "REPAIRED: flip this to !typeChecks and say so in the commit"
+      "the Mirror/fromProduct door is open again: the seal has regressed"
     )
     assert(
-      typeChecks(
+      !typeChecks(
         "import storymodel4s.align.*; summon[scala.deriving.Mirror.ProductOf[StructuralReduction]]"
       ),
-      "REPAIRED: flip this to !typeChecks and say so in the commit"
+      "the Mirror/fromProduct door is open again: the seal has regressed"
     )
     assert(
-      typeChecks(
+      !typeChecks(
         "import storymodel4s.align.*; summon[scala.deriving.Mirror.ProductOf[StructuralReductionReceipt]]"
       ),
-      "REPAIRED: flip this to !typeChecks and say so in the commit"
+      "the Mirror/fromProduct door is open again: the seal has regressed"
     )
   }
 
-  test("KNOWN BAD: the companion fromProduct door is open on all four structural types") {
+  test("the companion fromProduct door is CLOSED on all four structural types") {
     assert(
-      typeChecks("import storymodel4s.align.*; StructuralMemberEstimate.fromProduct(???)"),
-      "REPAIRED: flip this to !typeChecks and say so in the commit"
+      !typeChecks("import storymodel4s.align.*; StructuralMemberEstimate.fromProduct(???)"),
+      "the Mirror/fromProduct door is open again: the seal has regressed"
     )
     assert(
-      typeChecks("import storymodel4s.align.*; StructuralMemberExclusion.fromProduct(???)"),
-      "REPAIRED: flip this to !typeChecks and say so in the commit"
+      !typeChecks("import storymodel4s.align.*; StructuralMemberExclusion.fromProduct(???)"),
+      "the Mirror/fromProduct door is open again: the seal has regressed"
     )
     assert(
-      typeChecks("import storymodel4s.align.*; StructuralReduction.fromProduct(???)"),
-      "REPAIRED: flip this to !typeChecks and say so in the commit"
+      !typeChecks("import storymodel4s.align.*; StructuralReduction.fromProduct(???)"),
+      "the Mirror/fromProduct door is open again: the seal has regressed"
     )
     assert(
-      typeChecks("import storymodel4s.align.*; StructuralReductionReceipt.fromProduct(???)"),
-      "REPAIRED: flip this to !typeChecks and say so in the commit"
+      !typeChecks("import storymodel4s.align.*; StructuralReductionReceipt.fromProduct(???)"),
+      "the Mirror/fromProduct door is open again: the seal has regressed"
     )
   }
