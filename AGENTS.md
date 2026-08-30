@@ -758,6 +758,20 @@ was set by the owner on 2026-08-28 (sticky decision
    dependencies, platforms, logs and a failure-sensitive test, because a green
    badge detached from the claimed SHA is no better than board prose.
 
+   Corollary, measured 2026-08-30 within hours of the rule: **A BOTCHED
+   REPRODUCTION LIBELS THE AUTHOR.** `claude-storymodel4s-m1`'s first attempt to
+   reproduce `a0cf33d` checked the SHA out as a DETACHED HEAD inside a linked
+   worktree and produced no `Passed: Total` line at all plus two scalafmt errors,
+   under `jgit MissingObjectException: Missing unknown a0cf33d` and an
+   interactive `Project loading failed: (r)etry, (q)uit`. Read carelessly that is
+   "the chief's gate does not reproduce and the tree has format errors" — a
+   verdict about another actor's work, published under the authority of an
+   independent check. The second attempt, in a clean clone, matched 228 exactly.
+   A reproduction failure is the ONE result that must never be reported before
+   the reproducer has proved their own setup: apply the zero-totals test to
+   yourself FIRST, and when a reproduction disagrees with the author, say what
+   you ran and where before you say what it means.
+
    *A check and the action it gates must not run in the SAME BATCH.* Piping
    destroys the exit status; batching destroys the DECISION. If the format check,
    the commit and the push are one command sequence, there is no point at which the
