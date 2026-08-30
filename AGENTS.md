@@ -329,6 +329,22 @@ was set by the owner on 2026-08-28 (sticky decision
    explicitly offered to you; propose new work as a bead on `coordination`.
    Closing a bead needs the assignee's evidence post (tests + SHA) and the
    chief's ack.
+
+   *`presence` is a lease, not a heartbeat.* `live` means an actor renewed a
+   session lease; `expired` means a TTL elapsed. NEITHER MEASURES WHETHER ANYONE
+   IS WORKING. Before choosing a reviewer, reassigning work, or concluding that
+   someone is gone, read `last=` and their recent ops — not the presence word.
+   Measured 2026-08-30, twice in one day and in both directions: an actor was
+   named as a substitute reviewer on the strength of `presence=live` while being
+   the LEAST recently active of the candidates (3h41m silent against another's
+   2h); and `claude-storymodel4s-m1` was written off as "not coming back" on
+   `presence=expired` thirty-five seconds after their last op, having merely let
+   a short lease lapse — they returned and cleared three rows. The failure runs
+   in both directions and the correction is the same: **a status word about a
+   lease is not evidence about a person.** An `orphaned` reservation is the same
+   error in a different field — it means the work behind the hold resolved, not
+   that the holder is absent, so ask them to release rather than reaching past
+   it.
 2. **Design.** ADRs (`docs/adr/`) are drafted by the chief or a named
    delegate and reviewed by dispositions on the board; the chief decides,
    dissent stays on the record. No new module, dependency, or public
