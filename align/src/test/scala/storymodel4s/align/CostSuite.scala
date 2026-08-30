@@ -386,3 +386,71 @@ class CostSuite extends FunSuite:
     assertEqualsDouble(absent.supportWeight, 0.961038961038961, eps)
     assertEqualsDouble(absent.total, 1.3621621621621622, eps)
   }
+
+  /** An imputed term is priced like a measured one and accounted differently.
+    *
+    * The M0 decision at `DefaultLocalCostModel` stands: an abstaining semantic provider is replaced
+    * by the declared neutral `missingSemantic`, because unranked units are routed to `Unranked`
+    * upstream. That defence is per-UNIT. `fromTableOrAbstain` abstains per PAIR, so a correctly
+    * ranked unit can carry cells that differ in whether the distance was measured at all, and
+    * before `imputedTerms` those cells were identical in every published field:
+    *
+    * e4 semantic MEASURED 0.5 support 0.9552238805970149 missing {Chart, Structural, Sensory} e5
+    * semantic ABSTAINED support 0.9552238805970149 missing {Chart, Structural, Sensory}
+    *
+    * So this pins PRICE UNCHANGED and ACCOUNTING SPLIT, on one cell under two providers that differ
+    * only in whether they answer. Whether an abstained semantic should COST more is a separate
+    * bead: it contradicts a documented decision and moves fixture numbers, and it does not get
+    * decided as a side effect of fixing a receipt.
+    */
+  test("an imputed term is priced like a measured one and accounted differently") {
+    import AnnaFixture.*
+    import storymodel4s.features.MissingReason
+    val node = view.node(e5).get
+    val measuring = SemanticDistance.fromTableOrAbstain(Map((u2.id, e5) -> 0.5))
+    val abstaining = SemanticDistance.fromTableOrAbstain(Map.empty)
+    val m = DefaultLocalCostModel(semantic = measuring).cost(u2, node, FidelityMode.Faithful, view)
+    val i = DefaultLocalCostModel(semantic = abstaining).cost(u2, node, FidelityMode.Faithful, view)
+
+    // Court 1: the price is untouched. MUTATION KILLED: dropping the imputed price (making Semantic
+    // absent from `terms` instead of priced) moves the total to 0.7853... and fails here.
+    assertEquals(
+      m.terms,
+      i.terms,
+      "the priced terms must not depend on whether the provider answered"
+    )
+    assertEqualsDouble(m.total, i.total, eps)
+    assertEqualsDouble(m.total, 0.5234375, eps)
+
+    // Court 2: only the abstained cell records it, and it keeps the provider's reason.
+    assertEquals(m.imputedTerms, Map.empty[CostTerm, MissingReason])
+    assertEquals(i.imputedTerms, Map(CostTerm.Semantic -> MissingReason.ProviderAbstained))
+    assert(i.imputed(CostTerm.Semantic))
+    assert(!m.imputed(CostTerm.Semantic))
+
+    // Court 2b: imputed is NOT missing. `missingTerms` means absent-and-contributed-nothing; an
+    // imputed term is present and carries full weight. Recording Semantic there would make the
+    // record internally false, and the wire rejects the combination.
+    assert(!i.missingTerms.contains(CostTerm.Semantic))
+    assertEquals(m.missingTerms, i.missingTerms)
+
+    // Court 3: support differs by EXACTLY the semantic share of eligible weight, and by nothing
+    // else. MUTATION KILLED: counting imputed weight as measured (supportOf over `terms.keySet`
+    // instead of `measured`) makes these equal at 0.9552238805970149 and fails here.
+    val w = CostWeights.default
+    val eligible = Set(
+      CostTerm.Semantic,
+      CostTerm.Propositional,
+      CostTerm.Entity,
+      CostTerm.Granularity,
+      CostTerm.Distortion,
+      CostTerm.Sensory
+    )
+    assertEqualsDouble(m.supportWeight, 0.9552238805970149, eps)
+    assertEqualsDouble(i.supportWeight, 0.6567164179104478, eps)
+    assertEqualsDouble(
+      m.supportWeight - i.supportWeight,
+      w(CostTerm.Semantic) / eligible.toVector.map(w(_)).sum,
+      eps
+    )
+  }

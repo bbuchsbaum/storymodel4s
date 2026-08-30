@@ -35,15 +35,21 @@ class WarOfTheGhostsCodecGoldenSuite extends FunSuite:
 private[wog] object WarOfTheGhostsCodecGolden:
   import WarOfTheGhostsExpectations.*
 
-  /** Re-cut on 2026-08-29 for bd-01M16S2Y6YS82TE6WBWQPKNZR3: empty sensoryTerms is recorded missing
-    * instead of present-at-0.0. Sensory moves from present-at-0.0 to absent; totals, flow,
-    * posterior and viewFingerprint are byte-identical. This is a recut of the record, not an
-    * estimand change: the 0.0 term was already a no-op in the sum.
+  /** Re-cut on 2026-08-29 for bd-01M16M5ETH0QHFZ62KXZJ54PN9: hsmm/v3 records `imputedTerms`, the
+    * terms priced from a declared constant rather than measured.
     *
-    * Previous: 3c183c3cb4dc01dad930fcae7354fa828dbd2e8714b1901449c792552fc4fb9f, 25,598 bytes.
+    * A RECUT OF THE RECORD, NOT AN ESTIMAND CHANGE, and the file proves it rather than asserting
+    * it. The delta is 25,960 -> 26,284 bytes = 324 = 18 x len("imputedTerms":[]), one empty entry
+    * per cost breakdown, and the same 18 breakdowns the supportWeight recut touched. Every entry is
+    * EMPTY: WOG runs on `lexicalJaccard`, which never abstains, so nothing here is imputed and no
+    * total, flow, posterior or fingerprint moves. The field is how a corpus WITH an abstaining
+    * provider would differ from this one - on WOG it is a receipt that says "nothing substituted",
+    * which is a claim worth being able to make.
+    *
+    * Previous: 13222a02bbdc6e49fe0882102e5f748f8a9ab1f141d7f439bdf2f6de19dd14f9, 25,960 bytes.
     */
   val ExpectedChecksum: String =
-    "13222a02bbdc6e49fe0882102e5f748f8a9ab1f141d7f439bdf2f6de19dd14f9"
+    "ce61e761a131c1e2ffeebcf912a9c04d9dd2bf2fb4c09f9d4bda0c2741f2cf1a"
 
   lazy val context: GoldenContext = GoldenContext.build()
   lazy val encoded: String = HsmmResultCodec.encode(context.result)

@@ -35,7 +35,8 @@ class WireSuite extends FunSuite:
       b.missingTerms,
       b.sourceChartCoverage,
       b.reductions,
-      b.supportWeight
+      b.supportWeight,
+      b.imputedTerms
     )
 
   /** A small checked chart (as in EvidenceSuite), for evidence toggles. */
@@ -602,7 +603,8 @@ class WireSuite extends FunSuite:
             b.missingTerms,
             b.sourceChartCoverage,
             receipts,
-            b.supportWeight
+            b.supportWeight,
+            b.imputedTerms
           )
           .fold(e => fail(e.message), identity)
       }
@@ -632,4 +634,87 @@ class WireSuite extends FunSuite:
       ),
       Right(result)
     )
+  }
+
+  test("the wire preserves imputed terms and refuses the two states that would be false") {
+    // An imputed term is PRESENT in `terms` and carries full weight, unlike a missing term which is
+    // absent and contributes nothing. The wire has to enforce that difference, because a record
+    // claiming both, or claiming an imputation that was never priced, describes a cell that cannot
+    // exist and would put the support figure and the total into contradiction.
+    val abstaining = SemanticDistance.fromTableOrAbstain(Map.empty)
+    val b = DefaultLocalCostModel(semantic = abstaining)
+      .cost(AnnaFixture.u2, view.node(AnnaFixture.e5).get, FidelityMode.Faithful, view)
+    assert(b.imputedTerms.contains(CostTerm.Semantic), "fixture: this cell must impute Semantic")
+
+    // Round-trip: the distinction survives, rather than being dropped and silently reconstructed
+    // as a measured cell.
+    assertEquals(rebuild(b), Right(b))
+    assertEquals(rebuild(b).map(_.imputedTerms), Right(b.imputedTerms))
+
+    // Imputed but not priced: names a substitution that never entered the total.
+    val notPriced = AlignWire.costBreakdown(
+      b.terms - CostTerm.Semantic,
+      b.mode,
+      b.exclusion,
+      b.total,
+      b.missingTerms,
+      b.sourceChartCoverage,
+      b.reductions,
+      b.supportWeight,
+      b.imputedTerms
+    )
+    assert(notPriced.isLeft, "an imputed term that is not priced was accepted")
+
+    // Imputed AND missing: absent-and-weightless and present-at-full-weight at the same time.
+    // NO DEDICATED GUARD, deliberately. This is REFUSED BY IMPLICATION - "an imputed term must be
+    // priced" puts it in `terms`, and "a term cannot be both present and missing" then rejects it.
+    // I wrote a third check for this and removed it after measuring: deleting it left this suite
+    // green 16/16, so it could never fire. A guard that cannot fire reads as enforcement and is
+    // not, which is the thing this bead is about. The property is asserted here; the derivation is
+    // named so a future edit that relaxes either rule knows this one rests on both.
+    val alsoMissing = AlignWire.costBreakdown(
+      b.terms,
+      b.mode,
+      b.exclusion,
+      b.total,
+      b.missingTerms + CostTerm.Semantic,
+      b.sourceChartCoverage,
+      b.reductions,
+      b.supportWeight,
+      b.imputedTerms
+    )
+    assert(alsoMissing.isLeft, "a term recorded as both imputed and missing was accepted")
+  }
+
+  test("only a term with a provider and a declared constant may be called imputed") {
+    // Found by scout on the predecessor: the wire checked that an imputed term was PRICED, and
+    // nothing else. So a v3 artifact could claim Granularity or Distortion was imputed - terms
+    // computed deterministically from the level and the mode, with no provider to abstain and no
+    // declared constant to substitute. The candidate's own docstring said dProp/dEnt are
+    // ineligibility and must not share this carrier while its validation permitted exactly that.
+    //
+    // The court uses ACTUALLY PRICED deterministic terms, so the rejection cannot be coming from
+    // the imputed-must-be-priced rule instead - that would make this pass for the wrong reason.
+    val b = DefaultLocalCostModel(semantic = SemanticDistance.fromTableOrAbstain(Map.empty))
+      .cost(AnnaFixture.u2, view.node(AnnaFixture.e5).get, FidelityMode.Faithful, view)
+    for deterministic <- Vector(CostTerm.Granularity, CostTerm.Distortion, CostTerm.Entity) do
+      assert(
+        b.terms.contains(deterministic),
+        s"fixture: $deterministic must be priced, or this court proves nothing"
+      )
+      val forged = AlignWire.costBreakdown(
+        b.terms,
+        b.mode,
+        b.exclusion,
+        b.total,
+        b.missingTerms,
+        b.sourceChartCoverage,
+        b.reductions,
+        b.supportWeight,
+        b.imputedTerms + (deterministic -> MissingReason.ProviderAbstained)
+      )
+      assert(forged.isLeft, s"$deterministic was accepted as imputed")
+    // Control: Semantic, which does have a provider and a declared constant, is still admitted.
+    assertEquals(rebuild(b), Right(b))
+    assert(b.imputedTerms.contains(CostTerm.Semantic))
   }

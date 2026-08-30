@@ -6,7 +6,7 @@ import io.circe.syntax.*
 import scala.collection.immutable.SortedSet
 import storymodel4s.align.*
 import storymodel4s.core.*
-import storymodel4s.features.{Coverage, Estimate}
+import storymodel4s.features.{Coverage, Estimate, MissingReason}
 import storymodel4s.recall.{RecallGraph, RecallUnitId}
 import storymodel4s.recall.RecallGraphStatus.Checked
 import CanonicalPrimitives.{*, given}
@@ -42,8 +42,21 @@ object HsmmResultCodec:
     * whose support was never computed. That is the defect this version exists to record. A v1
     * artifact is not upgradable; it is re-derivable from its inputs, which is what makes the
     * fingerprint chain meaningful.
+    *
+    * v3 adds a REQUIRED `imputedTerms` to every cost breakdown: the terms that were PRICED from a
+    * declared constant rather than measured, with the provider's reason. Same no-migration
+    * reasoning, and for the same shape of defect. A v2 artifact records that a cell had, say,
+    * 0.9552 support without recording that the highest-weighted term in it was substituted; the
+    * only value a migration could invent is "nothing was imputed", which is precisely the false
+    * claim THE CHECKED WIRE REFUSES. Deliberately not "makes unrepresentable": CostBreakdown is a
+    * case class with a private[align] constructor, so its derived Mirror.fromProduct rebuilds it
+    * outside align and bypasses every check here. The invariant is enforced by AlignWire, not by
+    * the type, and the difference matters to anyone reading this as a guarantee
+    * (bd-01M17ZNXY6AS1CMBQJRH3JMNVX). Note what v2 could not distinguish: two cells competing for
+    * the SAME ranked unit, one with a measured semantic distance and one with an abstained
+    * provider, were byte-identical in every published field.
     */
-  val SchemaVersion: String = "hsmm/v2"
+  val SchemaVersion: String = "hsmm/v3"
 
   private final case class StateMassWire(state: AlignState, mass: Double)
   private final case class RowWire(unit: RecallUnitId, mass: Vector[StateMassWire])
@@ -58,6 +71,12 @@ object HsmmResultCodec:
       mass: Vector[TransitionMassWire]
   )
   private final case class TermWire(term: CostTerm, value: Double)
+
+  /** A term that was PRICED from a declared constant rather than measured, with the provider's
+    * reason. Carried separately from `missingTerms`, which means "absent and contributed nothing":
+    * an imputed term is present in `terms` and contributes its full weight to `total`.
+    */
+  private final case class ImputedWire(term: CostTerm, reason: MissingReason)
   private final case class MemberEstimateWire(member: SourceNodeRef, estimate: Estimate[Double])
   private final case class MemberExclusionWire(
       member: SourceNodeRef,
@@ -82,7 +101,8 @@ object HsmmResultCodec:
       missingTerms: Vector[CostTerm],
       sourceChartCoverage: Option[StructuralCoverage],
       reductions: Vector[ReductionWire],
-      supportWeight: Double
+      supportWeight: Double,
+      imputedTerms: Vector[ImputedWire]
   )
   private final case class StateCostWire(state: AlignState, cost: CostBreakdownWire)
   private final case class UnitCostsWire(unit: RecallUnitId, costs: Vector[StateCostWire])
@@ -305,6 +325,16 @@ object HsmmResultCodec:
     yield TermWire(term, value)
   }
 
+  private given Encoder[ImputedWire] = Encoder.instance { imputed =>
+    Json.obj("term" -> imputed.term.asJson, "reason" -> imputed.reason.asJson)
+  }
+  private given Decoder[ImputedWire] = Decoder.instance { c =>
+    for
+      term <- field[CostTerm](c, "term")
+      reason <- field[MissingReason](c, "reason")
+    yield ImputedWire(term, reason)
+  }
+
   private given Encoder[MemberEstimateWire] = Encoder.instance { member =>
     Json.obj("member" -> member.member.asJson, "estimate" -> member.estimate.asJson)
   }
@@ -366,7 +396,8 @@ object HsmmResultCodec:
       "missingTerms" -> cost.missingTerms.asJson,
       "sourceChartCoverage" -> opt(cost.sourceChartCoverage),
       "reductions" -> cost.reductions.asJson,
-      "supportWeight" -> cost.supportWeight.asJson
+      "supportWeight" -> cost.supportWeight.asJson,
+      "imputedTerms" -> cost.imputedTerms.asJson
     )
   }
   private given Decoder[CostBreakdownWire] = Decoder.instance { c =>
@@ -379,6 +410,7 @@ object HsmmResultCodec:
       sourceCoverage <- field[Option[StructuralCoverage]](c, "sourceChartCoverage")
       reductions <- field[Vector[ReductionWire]](c, "reductions")
       supportWeight <- field[Double](c, "supportWeight")
+      imputed <- field[Vector[ImputedWire]](c, "imputedTerms")
     yield CostBreakdownWire(
       terms,
       mode,
@@ -387,7 +419,8 @@ object HsmmResultCodec:
       missing,
       sourceCoverage,
       reductions,
-      supportWeight
+      supportWeight,
+      imputed
     )
   }
 
@@ -517,7 +550,8 @@ object HsmmResultCodec:
         cost.reductions.toVector.sortBy(_._1.ordinal).map { case (term, receipt) =>
           ReductionWire(term, ReductionReceiptWire.from(receipt))
         },
-        cost.supportWeight
+        cost.supportWeight,
+        cost.imputedTerms.toVector.sortBy(_._1.ordinal).map(ImputedWire.apply)
       )
 
   private object ReductionReceiptWire:
@@ -607,6 +641,10 @@ object HsmmResultCodec:
         }
         reductionMap <- uniqueMap("CostBreakdown.reductions", reductions)
         missingTerms <- uniqueSet("CostBreakdown.missingTerms", wire.missingTerms)
+        imputedTerms <- uniqueMap(
+          "CostBreakdown.imputedTerms",
+          wire.imputedTerms.map(i => i.term -> i.reason)
+        )
         cost <- AlignWire.costBreakdown(
           terms,
           wire.mode,
@@ -615,7 +653,8 @@ object HsmmResultCodec:
           missingTerms,
           wire.sourceChartCoverage,
           reductionMap,
-          wire.supportWeight
+          wire.supportWeight,
+          imputedTerms
         )
       yield cost
 
