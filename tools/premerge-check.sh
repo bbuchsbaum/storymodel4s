@@ -139,16 +139,34 @@ rows=d if isinstance(d,list) else d.get("candidates",d.get("items",[]))
 for r in rows:
     o=(r.get("identity") or {}).get("commit_oid") or r.get("commit_oid")
     if o: print(o)' > "$cands_tmp" 2>/dev/null && [ -s "$cands_tmp" ]; then
-  bypass=0
-  for c in $(git rev-list --first-parent -60 main 2>/dev/null); do
-    [ "$(git log -1 --format=%P "$c" | wc -w | tr -d ' ')" -gt 1 ] && continue
-    if grep -qx "$c" "$cands_tmp"; then
+  # NO WINDOW, AND NO LOOP. Two separate defects, both found by someone else re-running this:
+  #
+  # The window: the first version scanned 20 commits and missed the live case entirely; the second
+  # scanned 60 and found one. claude-storymodel4s-m1 ran the same predicate over main's ENTIRE
+  # first-parent line -- 865 commits against 45 candidate oids -- and found THREE. A window is a
+  # number someone picked, and every value of it is wrong for some history. Two of m1's three were
+  # ABANDONED candidates, so they block nothing today; they are still the same structural event,
+  # and a check that reports "clean" because it stopped short is the defect this file is about.
+  #
+  # The loop: scanning all 865 by shelling out `git log -1` per commit took 53 SECONDS, and a
+  # pre-merge check that slow is a pre-merge check people skip -- worse than absent, because it
+  # also carries a claim to have looked. `--parents` prints "<sha> <parent>..." so a line with
+  # exactly two fields is a non-merge commit; intersect those with the candidate oids in one grep.
+  nonmerge_tmp="$(mktemp)"
+  git rev-list --first-parent --parents main 2>/dev/null \
+    | awk 'NF==2 {print $1}' > "$nonmerge_tmp"
+  hits="$(grep -Fx -f "$cands_tmp" "$nonmerge_tmp" 2>/dev/null || true)"
+  rm -f "$nonmerge_tmp"
+  if [ -z "$hits" ]; then
+    note "no proposed commit sits on main's first-parent line ($(wc -l < "$cands_tmp" | tr -d ' ') candidates checked)"
+  else
+    while IFS= read -r c; do
+      [ -z "$c" ] && continue
       printf 'FAIL: gate bypass: %s %s\n' "$(git rev-parse --short "$c")" \
         "$(git log -1 --format=%s "$c")" >&2
-      bypass=1
-    fi
-  done
-  if [ "$bypass" -eq 0 ]; then note "no proposed commit sits on main's first-parent line"; else fail=1; fi
+    done <<< "$hits"
+    fail=1
+  fi
 else
   bad "could not enumerate candidate commits -- cannot check for gate bypasses"
 fi
