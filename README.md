@@ -80,10 +80,13 @@ Seventeen build modules are present:
 - JVM-only structural work: `embed-grakern` and `embed-bench`.
 
 `embed-core` includes deterministic hashed n-gram and TF-IDF baselines;
-`embed-grakern` provides the JVM structural channel. The repository does not yet
-include an unattended text→AMR parser, an LLM acquisition adapter, an HTTP/ONNX
-provider, or calibrated production defaults. Complete automatic construction
-remains programme work.
+`embed-grakern` provides the JVM structural channel; `embed-onnx` runs a pinned
+sentence encoder locally and offline, with committed model and tokenizer
+checksums. That encoder has not yet been compared against the lexical baselines
+on any story, so no claim is made here about what it improves. The repository
+does not yet include an unattended text→AMR parser, an LLM acquisition adapter,
+a remote (HTTP) embedding provider, or calibrated production defaults. Complete
+automatic construction remains programme work.
 
 ## Build and verify
 
