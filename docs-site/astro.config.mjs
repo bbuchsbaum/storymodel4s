@@ -25,6 +25,7 @@ export default defineConfig({
           items: [
             { label: 'Orientation', slug: 'method/orientation' },
             { label: 'One honest success', slug: 'method/one-honest-success' },
+            { label: 'Align and interpret a recall', slug: 'method/align-and-interpret' },
             { label: 'Core concepts', slug: 'method/concepts' },
             { label: 'Evidence and maturity', slug: 'method/evidence' },
           ],
