@@ -45,7 +45,11 @@ object TransitionModel:
     )
   )
 
-/** Feature vector of a source→source move; exposed for diagnostics and learning. */
+/** Feature vector of a source→source move; exposed for diagnostics and learning.
+  *
+  * Position-dependent keys are absent when either endpoint has no measured position. A present zero
+  * is therefore a measured zero, not an encoded absence.
+  */
 final case class TransitionFeatures(values: Map[TransitionKind, Double]):
   /** Deterministic summation order (review #30). */
   def score(model: TransitionModel): Double =
@@ -53,9 +57,14 @@ final case class TransitionFeatures(values: Map[TransitionKind, Double]):
 
 object TransitionFeatures:
   def between(view: SourceView, s: SourceNodeRef, t: SourceNodeRef): TransitionFeatures =
-    val ps = view.relativePosition(s)
-    val pt = view.relativePosition(t)
     def ind(b: Boolean): Double = if b then 1.0 else 0.0
+    val positionFeatures = (view.measuredPosition(s), view.measuredPosition(t)) match
+      case (Some(ps), Some(pt)) =>
+        Map(
+          TransitionKind.Backward -> ind(s != t && pt < ps && !view.isAncestor(t, s)),
+          TransitionKind.LongJump -> math.abs(pt - ps)
+        )
+      case _ => Map.empty
     TransitionFeatures(
       Map(
         TransitionKind.Stay -> ind(s == t),
@@ -75,10 +84,8 @@ object TransitionFeatures:
         TransitionKind.SemanticNeighbor -> math.max(
           view.weight(RelationLayer.Semantic, s, t),
           view.weight(RelationLayer.Semantic, t, s)
-        ),
-        TransitionKind.Backward -> ind(s != t && pt < ps && !view.isAncestor(t, s)),
-        TransitionKind.LongJump -> math.abs(pt - ps)
-      )
+        )
+      ) ++ positionFeatures
     )
 
 /** Inference knobs. Not a case class: `fromProduct` would mint a non-positive temperature or
