@@ -9,6 +9,48 @@ import munit.FunSuite
   */
 class ConstructionProbeSuite extends FunSuite:
 
+  /** Sweep 3 slice: the Mirror.ProductOf door across embed-core's private-constructor case classes.
+    *
+    * `case class X private (...)` still derives `Mirror.ProductOf` in Scala 3, so the private
+    * constructor is defeated from outside the package. Pins the measured state; closing any of
+    * these makes this FAIL and asks for the name to be removed. Tracked on
+    * bd-01M183VBPNEAPT5JNQMBMYMKQ9.
+    */
+  test("sweep 3: Mirror.ProductOf door across embed-core private-constructor case classes") {
+    assertEquals(
+      typeCheckErrors("summon[scala.deriving.Mirror.ProductOf[storymodel4s.core.SurfaceUnit]]"),
+      Nil,
+      "the summon control must compile or every result below is meaningless"
+    )
+    val results: List[(String, List[scala.compiletime.testing.Error])] = List(
+      (
+        "ReceiptDigest.Plain",
+        typeCheckErrors(
+          "summon[scala.deriving.Mirror.ProductOf[storymodel4s.embed.ReceiptDigest.Plain]]"
+        )
+      ),
+      (
+        "ReceiptDigest.Keyed",
+        typeCheckErrors(
+          "summon[scala.deriving.Mirror.ProductOf[storymodel4s.embed.ReceiptDigest.Keyed]]"
+        )
+      ),
+      (
+        "ReceiptDigest.Withheld",
+        typeCheckErrors(
+          "summon[scala.deriving.Mirror.ProductOf[storymodel4s.embed.ReceiptDigest.Withheld]]"
+        )
+      )
+    )
+    val forgeable = results.collect { case (n, errs) if errs.isEmpty => n }.toSet
+    assertEquals(
+      forgeable,
+      results.map(_._1).toSet,
+      "sweep 3 expects the Mirror door OPEN here; a difference means one was closed (update this " +
+        "list) or a new private-constructor case class was added unmeasured"
+    )
+  }
+
   private def refused(errors: List[scala.compiletime.testing.Error], what: String): Unit =
     assert(errors.nonEmpty, s"$what must not be constructible outside storymodel4s.embed")
 
