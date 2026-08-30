@@ -1,0 +1,116 @@
+---
+title: Align and interpret a recall
+description: A complete program that maps a recall onto a story model using only public API, its exact output, and a straight reading of numbers that came out badly.
+sidebar:
+  order: 3
+---
+
+import Evidence from '../../../components/Evidence.astro';
+import { sourceLink } from '../../../lib/provenance';
+import { readFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import { resolve } from 'node:path';
+
+export const programPath = 'docs-site/examples/PublicAlignAndInterpret.scala';
+export const outputPath = 'docs-site/examples/align-and-interpret.output.txt';
+
+{/*
+  Read and hash at BUILD time. The snippet below is the file, not a copy of it, so it
+  cannot drift; and the SHA shown to you is computed here rather than typed in, so it
+  cannot be wrong in the way a transcribed hash can. Same rule as the build receipt.
+*/}
+export const program = readFileSync(resolve(process.cwd(), 'examples/PublicAlignAndInterpret.scala'), 'utf8');
+export const output = readFileSync(resolve(process.cwd(), 'examples/align-and-interpret.output.txt'), 'utf8');
+export const programSha = createHash('sha256').update(program).digest('hex');
+
+The previous page shows what the representation **preserves**. This one shows the
+machinery **running**: a complete program that takes a recall transcript, aligns it
+against a story model, and computes a recall signature.
+
+It imports nothing but public `storymodel4s` API. No test sources, no copied internal
+helpers, no demonstration facade written to make the page work. That constraint was
+not a stylistic preference — it was the measurement. Before this guide existed we did
+not know whether an ordinary consumer *could* drive the library end to end, and the
+honest way to find out was to try it and let it fail if it was going to.
+
+It did not fail. Nothing was added to the library to make this page possible.
+
+## The program
+
+<pre><code class="language-scala">{program}</code></pre>
+
+<Evidence
+  status="Confirmed"
+  source={`docs-site/examples/PublicAlignAndInterpret.scala — SHA-256 ${programSha.slice(0, 16)}…, executed against exported main daefa36`}
+  href={sourceLink(programPath)}
+ />
+
+## What it printed
+
+<pre><code>{output}</code></pre>
+
+<Evidence
+  status="Confirmed"
+  source="Captured from that program, that run. Not transcribed, not re-run for a better number."
+  href={sourceLink(outputPath)}
+ />
+
+## Reading it straight
+
+**The structure is found.** 71 situations, 84 alignable nodes, 2 recall units, 86
+surviving sparse candidates. The recall is short — a precise paraphrase — and both of
+its units get a MAP anchor: unit 0 lands on `ym1-says-no-arrows`, the young man's
+statement about arrows, and unit 1 on the canoe's arrival.
+
+**And the alignment is poor.** Look at the mass rather than the anchors:
+
+| | unit 0 | unit 1 |
+| --- | --- | --- |
+| source mass | 0.4608 | 0.0209 |
+| external mass | 0.5392 | 0.9791 |
+
+Unit 1 is 98% external. The model is saying that almost none of that recall unit is
+attributable to anything in the source, and it is right to say so: `lexicalJaccard` is
+a bag-of-words baseline with no synonymy, so a paraphrase that says the same thing in
+different words looks like new material. `uniform coverage: 0.0067` is the same fact
+from the other end — essentially none of the story's 71 situations was recovered.
+
+**None of that is a bug, and none of it is a good result.** It is a deterministic,
+dependency-free baseline doing exactly what a deterministic, dependency-free baseline
+does. It exercises the whole pipeline and it is not a quality claim. A quality claim
+needs a declared semantic provider and its own evidence, which this page does not have
+and does not pretend to.
+
+## The line worth the whole page
+
+```
+importance-weighted coverage: n/a (conditioning weight 0.0000; coverage 0/71)
+```
+
+The library was asked for a number it could not support, and it declined — then
+printed the conditioning mass that made it decline, so you can check the refusal
+rather than take it on faith.
+
+A system built to look good here would have returned `0.0`. That would be a *number*,
+it would sit neatly in a table, it would average with other numbers, and it would be
+false: zero coverage and unmeasurable coverage are different findings, and the second
+one is the one that happened. Everything else on this page is downstream of that
+distinction.
+
+`specificity: 0.1747 (support 0.2409 = 0.4817/2.0000)` shows the same discipline in
+its other mode. The value is published *with* the mass conditioning it, so a reader
+can see that it rests on about a quarter of the available support and weigh it
+accordingly, instead of receiving `0.1747` as though it were solid.
+
+<Evidence
+  status="Qualified"
+  source="Single JVM run, Homebrew Java 25.0.1, lexical baseline only. No JS/Native, no semantic provider, no claim about alignment quality."
+ />
+
+## What this does not show
+
+This is one of six workflows the documentation owes you. It does not cover typed
+acquisition, autobiographical-interview scoring, canonical persistence, or the output
+bundle. It uses the hand-authored *War of the Ghosts* fixture, not arbitrary prose —
+the library does not yet turn a raw story into a complete model unattended, and no
+page here should imply otherwise.
