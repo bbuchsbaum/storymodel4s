@@ -72,6 +72,11 @@ these were written for.
   first-parent line. It exits nonzero on any doubt, including doubt about whether
   it could check at all.
 
+- `bash tools/nan-polarity.sh [REF]` — sorts every numeric zero-guard in the main
+  sources into FAILS-OPEN / FAILS-CLOSED / GUARDED by the NaN polarity criterion in
+  rule 7. A survey, not a gate: polarity is syntax and says nothing about whether NaN
+  can ARRIVE or what comes OUT when it does. A FAILS-OPEN line is a site to read.
+
 Both encode the same lesson and it generalises: when a rule here has caught a real
 break more than once, the next step is not a firmer sentence, it is a script. Add
 the check to the script and leave one line here pointing at it.
