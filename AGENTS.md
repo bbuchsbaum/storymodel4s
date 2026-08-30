@@ -315,6 +315,22 @@ Package namespace is flat `storymodel4s.<module>`.
     owner records an REB basis for redistribution; pseudonymization is a
     technical control, not consent.
 
+   *AN IMPOSSIBILITY CLAIM NEEDS MORE SCRUTINY THAN A POSITIVE ONE, NOT LESS.* A
+   negative result establishes that a thing did not happen IN THE SETUP TESTED; it
+   never establishes that no setup exists. Measured 2026-08-30: an author showed
+   four sound measurements concluding that `typeChecks` cannot reach the companion
+   members of a type compiled in the same run, and therefore that a test-only
+   probe anchor could NEVER exercise the companion door. The chief verified the
+   measurements were internally consistent and built a rule on them — that the
+   door must be anchored on main source. A reviewer then produced the working
+   configuration in one scratch mutation: the DERIVED companion member is
+   unreachable in the same run, an EXPLICITLY DECLARED one is. Every measurement
+   had been correct; only the "never" was wrong, and it was the chief who promoted
+   it to a rule. **Ask of any impossibility: is there a configuration in which it
+   would work?** These are the most expensive claims to accept on trust, because
+   they close a design space permanently and nobody re-tests a door someone has
+   declared welded shut.
+
    *AN IDENTITY OR A CLASS MUST BE DERIVED FROM WHAT IT DESCRIBES, NEVER ASSERTED
    BY THE CALLER.* A construction boundary asks whether a value can be built; this
    asks whether a field that CLAIMS SOMETHING ABOUT the value was filled by
