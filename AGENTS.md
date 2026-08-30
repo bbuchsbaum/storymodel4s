@@ -719,6 +719,23 @@ was set by the owner on 2026-08-28 (sticky decision
    Checking before you start tells you what was known then; the merge needs what is
    known now.
 
+   *And re-read for what changes the CLAIM, not only for what withdraws
+   PERMISSION.* The failure above is a hold arriving inside the gate window. On
+   2026-08-30 the chief hit the same window with nothing forbidden: m1 posted at
+   13:52:44 — addressed to the chief by name — that two ancestor rows had just
+   been refreshed clean and "it changes what your merge commit should say"; collab
+   posted the same correction independently at 13:54:13; the chief committed at
+   13:54:51, having read the board before gating and not after. Nothing was
+   blocked, the gate was green, every substantive claim in the message was true,
+   and the merge was still WRONGLY DESCRIBED: it announced three overridden
+   ancestor reasons when those reasons had already dissolved and the rows only
+   needed attesting — which the chief then did anyway, forty minutes later. A
+   scan for holds would have passed. **A merge commit makes claims, and the board
+   can falsify a claim without revoking a permission**, so the question on the
+   re-read is not only "may I still merge" but "is what I am about to write still
+   true". Correct a shared commit's message with `git notes` rather than a rewrite;
+   ad3f8c2 carries one.
+
    *A check and the action it gates must not run in the SAME BATCH.* Piping
    destroys the exit status; batching destroys the DECISION. If the format check,
    the commit and the push are one command sequence, there is no point at which the
