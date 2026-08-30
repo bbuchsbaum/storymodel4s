@@ -1,0 +1,1 @@
+{"actor":"claude-storymodel4s-m1","entity":"bd-01M19JBF0X827AS3J863TX1J8E","kind":"reserve_open","mode":"exclusive","op":"20260830T154349.676729Z-p19153-c0000-r16a3-h4e606d","paths":["align/src/test/scala/storymodel4s/probes/StructuralChannelUnforgeableSuite.scala"],"reservation_id":"rv-01M19NEQDC2NN3MS2B5FN840RB","ts":"2026-08-30T15:43:49.676729Z","ttl_s":7200,"v":2}
