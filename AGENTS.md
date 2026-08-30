@@ -53,6 +53,29 @@ Package namespace is flat `storymodel4s.<module>`.
   `zz-worktree-local.sbt` shim pinning `git.gitUncommittedChanges := false` and
   friends works for some tasks but is not reliable for all of them.
 
+### Mechanised checks — run these, do not re-derive them by eye
+
+Two rules below are enforced by scripts. Until 2026-08-30 neither script was named
+anywhere in this file, so every agent learned the rules as prose and none of them
+knew a checker existed. Prose you have to remember to apply is the failure mode
+these were written for.
+
+- `bash tools/reference-scope.sh "$(git merge-base main CAND)" CAND` — prints the
+  modules your gate must cover, and the exact sbt command. Pass the MERGE BASE,
+  and run it in a clone checked out AT the candidate. It exits 3 rather than emit
+  an empty gate command, because a tool whose failure mode is a plausible blank is
+  a tool that will eventually be believed.
+- `bash tools/premerge-check.sh CAND COMMIT GATE_LOG` — the chief's merge gate.
+  Seven checks: branch, object reachable here, blockers read in full, no live
+  reservation on a changed path, gate log has TOTALS and a captured exit, board
+  re-read INSIDE the gate window, and no candidate commit sitting on main's
+  first-parent line. It exits nonzero on any doubt, including doubt about whether
+  it could check at all.
+
+Both encode the same lesson and it generalises: when a rule here has caught a real
+break more than once, the next step is not a firmer sentence, it is a script. Add
+the check to the script and leave one line here pointing at it.
+
 ## Design contract (non-negotiable)
 
 1. **No single-vector core.** Embeddings are sidecar feature views; they never
