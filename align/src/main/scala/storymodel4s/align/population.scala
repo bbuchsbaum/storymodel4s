@@ -268,7 +268,13 @@ final class PopulationAggregate private (
       else
         val bw = sortedFlow.collect { case ((a, b), m) if isBackward(pos)(a, b) => m }.sum
         Estimate.observed(bw / totalFlow)
-    val discoursePos: SourceNodeRef => Option[Double] = r => Some(view.relativePosition(r))
+    // Was `r => Some(view.relativePosition(r))`: an Option whose None was structurally
+    // unreachable, because relativePosition substitutes 0.0 for an unresolvable ref. Here that
+    // reaches further than in `signature` -- discoursePos feeds isBackward, so a node the view
+    // could not place counted as the START OF THE DISCOURSE and inflated a PUBLISHED
+    // BackwardFlow fraction. `worldPos` on the next line always used its absence channel
+    // correctly. Paired with signature.scala at 3b246ea; see SourceView.measuredPosition.
+    val discoursePos: SourceNodeRef => Option[Double] = view.measuredPosition
     val worldPos: Option[SourceNodeRef => Option[Double]] =
       view.worldOrder.map(o => r => o.get(r).map(_.toDouble))
     BackwardFlow(fraction(discoursePos), worldPos.map(fraction))

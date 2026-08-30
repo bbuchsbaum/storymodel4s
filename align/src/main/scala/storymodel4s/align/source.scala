@@ -299,11 +299,17 @@ object NodeSummary:
   *
   * This is load-bearing rather than tidy. [[relativeSpan]] returns `None` for an unresolvable ref
   * and [[relativePosition]] then maps that `None` to `0.0` — which is not a missing marker but a
-  * MEANINGFUL POSITION, the very start of the discourse. Downstream, `signature` and `population`
-  * both build `SourceNodeRef => Option[Double]` as `Some(view.relativePosition(r))`, an `Option`
-  * that can never be `None`. So a violation of this contract does not throw and does not surface as
-  * an absent value: it silently reports every unresolvable node as occurring at the beginning of
-  * the story, and feeds that into chronology.
+  * MEANINGFUL POSITION, the very start of the discourse. So a violation of this contract does not
+  * throw and does not surface as an absent value: it reports an unresolvable node as occurring at
+  * the beginning of the story.
+  *
+  * `signature` and `population` USED to launder that through `r => Some(view.relativePosition(r))`
+  * — an `Option` whose `None` was structurally unreachable. Both now call [[measuredPosition]] and
+  * carry the absence (3b246ea and its successor). The contract is still load-bearing because
+  * `hsmm.TransitionFeatures.between` reads [[relativePosition]] RAW into the `Backward` and
+  * `LongJump` features, where a fabricated `0.0` changes which alignment is found rather than
+  * merely how one is described — tracked as bd-01M17Y03XGDD0XR26PN41TJVRJ. Do not delete this
+  * paragraph when that lands; replace it with whatever is then true.
   *
   * Both current implementations satisfy it, and both do so BY ACCIDENT rather than by construction
   * — `StorySourceView` because it filters `all` to nodes with source support before anything else
