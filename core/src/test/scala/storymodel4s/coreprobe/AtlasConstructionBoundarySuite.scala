@@ -29,6 +29,39 @@ class AtlasConstructionBoundarySuite extends FunSuite:
     )
   }
 
+  /** Scala 3 has TWO product-reconstruction doors: the companion's own `fromProduct`, and
+    * `summon[Mirror.ProductOf[T]].fromProduct`. The suite probed only the first. For a
+    * `final class ... private` no `Mirror.ProductOf` is derived at all, so this asserts the SECOND
+    * door is absent too — an independent witness, and the one that would catch a regression to
+    * `case class` even if the companion probe were edited away.
+    *
+    * The positive control above is what makes these refusals mean anything: it forges a real
+    * same-module case class through the companion door and asserts that compiles.
+    */
+  test("SurfaceAtlas and TranscriptAtlas have no Mirror.ProductOf summon door") {
+    refused(
+      typeCheckErrors(
+        "summon[scala.deriving.Mirror.ProductOf[storymodel4s.core.SurfaceAtlas]]"
+      ),
+      "Mirror.ProductOf[SurfaceAtlas]"
+    )
+    refused(
+      typeCheckErrors(
+        "summon[scala.deriving.Mirror.ProductOf[storymodel4s.core.TranscriptAtlas]]"
+      ),
+      "Mirror.ProductOf[TranscriptAtlas]"
+    )
+    // Same-shape positive control for THIS door specifically: a case class in the same module
+    // must still summon, or both refusals above are vacuous.
+    assertEquals(
+      typeCheckErrors(
+        "summon[scala.deriving.Mirror.ProductOf[storymodel4s.core.SurfaceUnit]]"
+      ),
+      Nil,
+      "the summon control must compile or the two refusals beside it prove nothing"
+    )
+  }
+
   test("SurfaceAtlas has no derived fromProduct bypass") {
     refused(
       typeCheckErrors(
