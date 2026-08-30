@@ -31,10 +31,25 @@ enum KernelShape:
 
   /** Weight at signed distance `d` from the window centre. A zero bandwidth is a point mass at the
     * centre, so smoothing with it is the identity.
+    *
+    * A NON-FINITE BANDWIDTH YIELDS NaN FOR EVERY SHAPE, DELIBERATELY. NaN escapes the `b <= 0.0`
+    * test (every NaN comparison is false), so before this guard existed a NaN bandwidth was neither
+    * a point mass nor a window: `Triangular` and `Gaussian` propagated the NaN through arithmetic
+    * and were caught downstream by [[Sample.hasValidWeight]], but `Rectangular` compares --
+    * `math.abs(d) <= NaN` is false for every `d` -- and so returned 0.0 EVERYWHERE. Zero is finite
+    * and non-negative, so it passed the validity check and reached a reducer as a legitimate window
+    * in which every weight happened to be zero. The reducer then saw NO SUPPORT rather than AN
+    * ERROR, and those are different facts.
+    *
+    * Comparison is where NaN stops being contagious, which is why two of three shapes were guarded
+    * by arithmetic alone and the third was not. Returning NaN here restores the invariant the
+    * existing wire boundary already assumes: an unusable bandwidth produces an unusable weight, and
+    * `hasValidWeight` rejects it for all three shapes alike.
     */
   def weight(d: Double): Double =
     val b = bw
-    if b <= 0.0 then (if d == 0.0 then 1.0 else 0.0)
+    if !Estimate.isFinite(b) then Double.NaN
+    else if b <= 0.0 then (if d == 0.0 then 1.0 else 0.0)
     else
       this match
         case _: Rectangular => if math.abs(d) <= b then 1.0 else 0.0

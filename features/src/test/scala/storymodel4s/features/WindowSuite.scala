@@ -876,3 +876,35 @@ class WindowSuite extends ScalaCheckSuite:
         .isLeft
     )
   }
+
+  /** A non-finite bandwidth must be unusable for EVERY shape, not two of three.
+    *
+    * Before the guard in `KernelShape.weight`, `Rectangular(NaN)` returned 0.0 for every distance,
+    * because `math.abs(d) <= NaN` is false and NaN escapes the `b <= 0.0` point-mass test. Zero is
+    * finite and non-negative, so it passed `Sample.hasValidWeight` and reached a reducer as a
+    * legitimate window whose every weight was zero -- NO SUPPORT rather than AN ERROR. Triangular
+    * and Gaussian were caught only because arithmetic propagates NaN and comparison does not.
+    *
+    * The positive control matters: a FINITE bandwidth must still produce ordinary usable weights,
+    * or this court would pass against a `weight` that returned NaN unconditionally.
+    */
+  test("a non-finite bandwidth is unusable for every kernel shape") {
+    val shapes = (b: Double) =>
+      Vector(KernelShape.Rectangular(b), KernelShape.Triangular(b), KernelShape.Gaussian(b))
+
+    for bad <- Vector(Double.NaN, Double.PositiveInfinity, Double.NegativeInfinity) do
+      for shape <- shapes(bad) do
+        for d <- Vector(0.0, 1.0, -2.5) do
+          val w = shape.weight(d)
+          assert(
+            !Sample(0, Estimate.observed(0.0), w).hasValidWeight,
+            s"$shape at d=$d produced $w, which passes hasValidWeight"
+          )
+
+    // POSITIVE CONTROL, same shape as the assertions above.
+    for shape <- shapes(1.0) do
+      assert(
+        Sample(0, Estimate.observed(0.0), shape.weight(0.0)).hasValidWeight,
+        s"control: $shape with a finite bandwidth must produce a usable weight at the centre"
+      )
+  }
