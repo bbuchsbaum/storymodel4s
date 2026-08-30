@@ -192,20 +192,38 @@ enum StructuralReducer:
   * Why: an aggregate structural cost must remain traceable to the exact source members and provider
   * outcomes from which it was reduced.
   */
-final case class StructuralMemberEstimate private[align] (
-    member: SourceNodeRef,
-    estimate: Estimate[Double]
-)
+final class StructuralMemberEstimate private[align] (
+    val member: SourceNodeRef,
+    val estimate: Estimate[Double]
+):
+  // NOT A CASE CLASS. A case class with a private constructor still derives Mirror.ProductOf, whose
+  // public fromProduct rebuilds it field by field outside `align` and past AlignWire.memberEstimate
+  // - which is the only thing that refuses a NON-FINITE observed estimate. Demonstrated forgeable
+  // at a0cf33d; the remedy is confirmed against PlacementResolution at dad96e6.
+  override def equals(other: Any): Boolean = other match
+    case that: StructuralMemberEstimate => member == that.member && estimate == that.estimate
+    case _                              => false
+  override def hashCode: Int = (member, estimate).hashCode
+  override def toString: String = s"StructuralMemberEstimate(${member.key}, $estimate)"
 
 /** One charted member rejected before reduction by the same contradictions as the ModeGate.
   *
   * Why: incompatible charts must be auditable without becoming candidates for a flattering distance
   * or changing the reducer's estimand.
   */
-final case class StructuralMemberExclusion private[align] (
-    member: SourceNodeRef,
-    contradictions: Set[Contradiction]
-)
+final class StructuralMemberExclusion private[align] (
+    val member: SourceNodeRef,
+    val contradictions: Set[Contradiction]
+):
+  // Sealed for the same reason: AlignWire.memberExclusion refuses an exclusion naming NO
+  // contradiction, and fromProduct walked past it. An exclusion with an empty contradiction set is
+  // a member recorded as rejected for no reason - absence presented as a judgement.
+  override def equals(other: Any): Boolean = other match
+    case that: StructuralMemberExclusion =>
+      member == that.member && contradictions == that.contradictions
+    case _ => false
+  override def hashCode: Int = (member, contradictions).hashCode
+  override def toString: String = s"StructuralMemberExclusion(${member.key}, $contradictions)"
 
 /** Audit receipt for a segment-level structural reduction.
   *
@@ -215,23 +233,46 @@ final case class StructuralMemberExclusion private[align] (
   * be assessed: both member vectors are empty and observed-estimate coverage is `0/0`, while source
   * chart coverage remains available.
   */
-final case class StructuralReductionReceipt private[align] (
-    reducer: StructuralReducer,
-    members: Vector[StructuralMemberEstimate],
-    excludedMembers: Vector[StructuralMemberExclusion],
-    sourceChartCoverage: StructuralCoverage,
-    observedEstimateCoverage: Coverage
-)
+final class StructuralReductionReceipt private[align] (
+    val reducer: StructuralReducer,
+    val members: Vector[StructuralMemberEstimate],
+    val excludedMembers: Vector[StructuralMemberExclusion],
+    val sourceChartCoverage: StructuralCoverage,
+    val observedEstimateCoverage: Coverage
+):
+  // The receipt is the audit trail for a structural reduction, so a forged one is a receipt
+  // attesting a reduction that never happened - members it never compared, coverage it never
+  // measured. AlignWire.reductionReceipt checks the coverage relation; fromProduct did not.
+  override def equals(other: Any): Boolean = other match
+    case that: StructuralReductionReceipt =>
+      reducer == that.reducer && members == that.members &&
+      excludedMembers == that.excludedMembers &&
+      sourceChartCoverage == that.sourceChartCoverage &&
+      observedEstimateCoverage == that.observedEstimateCoverage
+    case _ => false
+  override def hashCode: Int =
+    (reducer, members, excludedMembers, sourceChartCoverage, observedEstimateCoverage).hashCode
+  override def toString: String =
+    s"StructuralReductionReceipt($reducer, ${members.size} members, " +
+      s"${excludedMembers.size} excluded, $sourceChartCoverage, $observedEstimateCoverage)"
 
 /** A structural estimate paired with the complete receipt for its membership and reduction.
   *
   * Why: a scalar cost alone cannot reveal provider abstention, incompatible members, coverage, or
   * which member won the declared reducer.
   */
-final case class StructuralReduction private[align] (
-    estimate: Estimate[Double],
-    receipt: StructuralReductionReceipt
-)
+final class StructuralReduction private[align] (
+    val estimate: Estimate[Double],
+    val receipt: StructuralReductionReceipt
+):
+  // Pairs a scalar with the receipt it was reduced from. Forging it lets the two DISAGREE - an
+  // estimate that its own receipt does not produce - which is the cheapest possible way to publish
+  // a number with an audit trail that does not support it.
+  override def equals(other: Any): Boolean = other match
+    case that: StructuralReduction => estimate == that.estimate && receipt == that.receipt
+    case _                         => false
+  override def hashCode: Int = (estimate, receipt).hashCode
+  override def toString: String = s"StructuralReduction($estimate, $receipt)"
 
 /** The cost of one admissible `(anchor, mode)` state (or external state) for one unit.
   *
