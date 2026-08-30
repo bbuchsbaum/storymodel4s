@@ -4,7 +4,13 @@ import munit.FunSuite
 import scala.compiletime.testing.typeChecks
 
 class AmrGraphUnforgeableSuite extends FunSuite:
+  // Macro snippets are strings, so this real reference is what makes Zinc invalidate the court
+  // when AmrGraph changes instead of retaining a stale compile-time answer.
+  private val dependsOn: Class[?] =
+    classOf[storymodel4s.amr.graph.AmrGraph[?, ?]]
+
   test("Checked and CanonicalRoles cannot be claimed through Mirror.fromProduct") {
+    assert(dependsOn != null)
     assert(
       typeChecks("""
         import storymodel4s.amr.graph.*
