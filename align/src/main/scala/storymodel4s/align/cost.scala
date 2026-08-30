@@ -264,6 +264,9 @@ final case class CostBreakdown private[align] (
       * its full weight into the price, and rests on a declared constant rather than an observation.
       * Conflating them would make the record internally false, because `terms` and `missingTerms`
       * are defined as disjoint and the wire enforces it.
+      * That guarantee applies only to values produced through [[AlignWire]]: outside `align`,
+      * `summon[Mirror.ProductOf[CostBreakdown]].fromProduct` can reconstruct this case class
+      * without the checked door (bd-01M17ZNXY6AS1CMBQJRH3JMNVX).
       *
       * Before this existed, these two cells competing for the SAME ranked unit were identical in
       * every published field — one resting on evidence, one on a default:
