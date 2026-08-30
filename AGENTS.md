@@ -482,7 +482,7 @@ was set by the owner on 2026-08-28 (sticky decision
    ambiguous across them); cross-repo work is coordinated on the
    `narrative-atlas-intaglio` topic with provider/consumer SHAs recorded as
    notes, never as dependency edges between stores.
-4. **Evidence discipline.** *Thirty-two sub-rules; find yours here.* **What
+4. **Evidence discipline.** *Thirty-three sub-rules; find yours here.* **What
    counts as proof of a fix (12):** a control must fail for the property under
    test · mutation proof · capacity to fail ·
    distinguishability · a negative compile-time assertion needs a positive control ·
@@ -492,7 +492,7 @@ was set by the owner on 2026-08-28 (sticky decision
    pipeline produces · an inequality is not a discriminating assertion · a pinned
    literal can be updated but a behavioural assertion has to be argued with · a
    positive control requires the old code to be capable of the thing tested. **How
-   to run the gate (13):** never pipe a gate · the gate is not the last step, re-read
+   to run the gate (14):** never pipe a gate · the gate is not the last step, re-read
    the board before merging · a check and the action it gates must
    not share a batch · a trailing success line is not an exit
    status · a compile error anywhere makes the gate inconclusive · run the format
@@ -500,13 +500,14 @@ was set by the owner on 2026-08-28 (sticky decision
    clean recompile · a gate with no test totals did not run · a shell equality test
    over two failed command substitutions passes · a backgrounded gate's exit status
    describes the fork not the run · a shared-tree gate compiles other agents'
-   untracked files · never head a list whose length is the finding. **How to scope a finding (4):**
+   untracked files · never head a list whose length is the finding · `>` inside `[ ]` is a redirect.
+   **How to scope a finding (4):**
    sweep the shape not the spelling · sweep your own work first · reading a branch establishes permission
    not occurrence · trace the consequence. **What a number may claim (3):** the
    estimand check · no value and low support are different failures · dropping a
-   term from a normalized aggregate rescales the rest. *(Twelve of the thirty-two are
-   about whether a test can actually fail, and THIRTEEN are about whether the gate
-   measured anything at all — that second group went from three to thirteen in a
+   term from a normalized aggregate rescales the rest. *(Twelve of the thirty-three are
+   about whether a test can actually fail, and FOURTEEN are about whether the gate
+   measured anything at all — that second group went from three to fourteen in a
    single day, every entry added after a run reported a status with nothing behind
    it, and the last of them after a run reported SUCCESS with nothing behind it.
    On 2026-08-29 alone, THREE separate red gates measured infrastructure rather
@@ -886,6 +887,18 @@ was set by the owner on 2026-08-28 (sticky decision
    hunt in Scala because nothing type-checks it. **Assert non-emptiness before
    comparing** — `[ -n "$a" ] && [ -n "$b" ] && [ "$a" = "$b" ]` — and prefer `set
    -o pipefail` plus explicit exit checks in any script whose OUTPUT IS A VERDICT.
+
+   *`>` and `<` inside `[ ... ]` are REDIRECTS, not comparisons.* `[ "$x" > 0.0 ]`
+   reduces to `[ "$x" ]` — true for ANY non-empty left operand — and silently creates
+   a file named `0.0` in the working directory. So a numeric threshold written this way
+   is a guard that CANNOT FAIL, and its only symptom is an unexplained file named after
+   its own right-hand side. Verified 2026-08-30: `[ "5" > 0.0 ]` and `[ "0" > 0.0 ]`
+   both return true and both create `./0.0`, while `awk 'BEGIN{...}'` correctly reports
+   `0 > 0.0` as false. Diagnosed by claude-storymodel4s-m1 after a zero-byte `0.0` sat
+   unexplained at the repo root for six hours, visible in every `git status` any of us
+   ran. Use `awk 'BEGIN{exit !(a>b)}'`, `bc -l`, or `[ "$x" -gt "$y" ]` for integers.
+   Third member of this family, with the two above: a shell construct that looks like a
+   test, is not one, and fails toward "pass".
 
    *A pinned literal can be updated; a behavioural assertion has to be argued
    with.* When a model change moves a number, a test pinned to that number tells
