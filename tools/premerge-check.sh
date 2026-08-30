@@ -121,6 +121,39 @@ else
 fi
 echo "  READ THOSE. This check cannot judge them for you; it only refuses to let you skip looking."
 
+echo "== 7. has anything reached main WITHOUT the merge gate? =="
+# Measured 2026-08-30: a candidate's commit sat on main's FIRST-PARENT LINE, committed directly,
+# seven hours before anyone noticed -- while its candidate row was still pending with a BLOCKING
+# review. Every candidate based on main then inherited `ancestor_blocked` from a row nobody could
+# resolve, holding up another actor's approved work.
+#
+# The signal is precise: a commit that was PROPOSED as a candidate yet sits on the first-parent
+# line never went through a merge. Matching must be on the candidate's commit_oid specifically --
+# a raw grep of the candidate JSON also hits base_oid and landing targets, which flagged two of my
+# own ordinary commits as bypasses when I first wrote this.
+cands_tmp="$(mktemp)"
+if mote candidate list --json 2>/dev/null \
+  | python3 -c 'import sys,json
+d=json.load(sys.stdin)
+rows=d if isinstance(d,list) else d.get("candidates",d.get("items",[]))
+for r in rows:
+    o=(r.get("identity") or {}).get("commit_oid") or r.get("commit_oid")
+    if o: print(o)' > "$cands_tmp" 2>/dev/null && [ -s "$cands_tmp" ]; then
+  bypass=0
+  for c in $(git rev-list --first-parent -60 main 2>/dev/null); do
+    [ "$(git log -1 --format=%P "$c" | wc -w | tr -d ' ')" -gt 1 ] && continue
+    if grep -qx "$c" "$cands_tmp"; then
+      printf 'FAIL: gate bypass: %s %s\n' "$(git rev-parse --short "$c")" \
+        "$(git log -1 --format=%s "$c")" >&2
+      bypass=1
+    fi
+  done
+  if [ "$bypass" -eq 0 ]; then note "no proposed commit sits on main's first-parent line"; else fail=1; fi
+else
+  bad "could not enumerate candidate commits -- cannot check for gate bypasses"
+fi
+rm -f "$cands_tmp"
+
 echo
 if [ "$fail" -ne 0 ]; then
   echo "PRE-MERGE CHECK FAILED. Do not merge." >&2
