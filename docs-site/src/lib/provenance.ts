@@ -73,9 +73,24 @@ function deriveProvenance(): Provenance {
   // A warning beside a link does not stop the link from asserting something false.
   // Dirty therefore fails the same way as no-git: no revision is published, so every
   // sourceLink returns null and the exact-revision evidence claims degrade with it.
+  // WHICH dirtiness matters is not obvious, and the first version got it wrong in the
+  // opposite direction: a bare `git status --porcelain` at the repository root counted
+  // 117 untracked .mote board-op files and reported the docs unverified forever. A guard
+  // that always fires carries exactly as much information as one that never fires, and
+  // it is worse, because people learn to ignore it.
+  //
+  // Two things genuinely break the "these bytes came from this commit" claim:
+  //   * a modification to a TRACKED file anywhere -- this is collab's mutation, and it
+  //     also covers edits to the source files the site cites and links;
+  //   * an unignored UNTRACKED file inside docs-site -- a page built into the site that
+  //     exists in no commit.
+  // Untracked files elsewhere (board ops, scratch output) change neither the built bytes
+  // nor the cited source, so they are not dirtiness for this purpose.
   let dirty = false;
   try {
-    dirty = git('status', '--porcelain').length > 0;
+    const trackedEdits = git('status', '--porcelain', '--untracked-files=no');
+    const siteAdditions = git('status', '--porcelain', '--', 'docs-site');
+    dirty = trackedEdits.length > 0 || siteAdditions.length > 0;
   } catch {
     return { verified: false, reason: 'could not determine whether the build tree is clean' };
   }
