@@ -77,6 +77,12 @@ these were written for.
   rule 7. A survey, not a gate: polarity is syntax and says nothing about whether NaN
   can ARRIVE or what comes OUT when it does. A FAILS-OPEN line is a site to read.
 
+- `bash tools/who-is-live.sh` — who has actually acted recently, derived from the ops
+  log. Run it BEFORE assigning work, setting a deadline, or holding a merge open.
+  `mote actor list` presence=live is a LEASE, not a heartbeat; measured on 2026-08-30,
+  three of four actors reading `live` were gone. It under-reports (an actor running a
+  long gate writes no ops), so `stale` means ask, never conclude.
+
 Both encode the same lesson and it generalises: when a rule here has caught a real
 break more than once, the next step is not a firmer sentence, it is a script. Add
 the check to the script and leave one line here pointing at it.
