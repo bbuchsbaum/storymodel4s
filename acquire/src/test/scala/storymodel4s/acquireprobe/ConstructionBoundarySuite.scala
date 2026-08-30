@@ -6,6 +6,20 @@ import munit.FunSuite
 
 /** External-package proof that validated acquire values have no case-class construction bypass. */
 class ConstructionBoundarySuite extends FunSuite:
+  /** A REAL REFERENCE, so the incremental compiler knows this suite depends on what it guards.
+    *
+    * Every assertion below names its type inside a STRING passed to a compile-time macro, so Zinc
+    * sees no dependency edge from this file to the sources it protects. Measured 2026-08-30:
+    * un-sealing CandidateLedger and re-running incrementally left the macro's OLD result baked in
+    * and the court PASSED; the same mutation under `Test/clean` failed correctly. A guard that does
+    * not re-run when the thing it guards changes is not a guard.
+    *
+    * These bindings are never used. They exist so that touching resolve.scala invalidates this
+    * suite and forces the macros to be re-evaluated.
+    */
+  private val dependsOn: (Class[?], Class[?]) =
+    (classOf[storymodel4s.acquire.CandidateLedger[?]], classOf[storymodel4s.acquire.LedgerEntry[?]])
+
   private def refused(errors: List[scala.compiletime.testing.Error], what: String): Unit =
     assert(errors.nonEmpty, s"$what still exposes fromProduct")
 
@@ -66,5 +80,37 @@ class ConstructionBoundarySuite extends FunSuite:
              x.taskId.value.length + x.value.size + x.evidence.size + x.conflicts.size"""
       ),
       Nil
+    )
+  }
+
+  /** `CandidateLedger` is SEALED, and this court is what keeps it that way.
+    *
+    * It is an APPEND-ONLY RECORD -- its scaladoc cites design record 85.4 and 94: entries are never
+    * removed or overwritten, so the machine record survives adjudication. `add` enforces that,
+    * refusing a duplicate ClaimId and refusing a `supersedes` that points at a claim the ledger
+    * does not hold.
+    *
+    * Before it was sealed it was a `case class` with a private constructor, which closes `apply`
+    * and `copy` and leaves BOTH product doors open. Anyone outside `acquire` could mint a ledger
+    * with entries removed, with `order` inconsistent with `entries`, or with a supersedes chain
+    * pointing nowhere. AN APPEND-ONLY RECORD THAT CAN BE CONSTRUCTED WITH ARBITRARY CONTENTS IS NOT
+    * APPEND-ONLY, and "the machine record survives adjudication" was the guarantee it did not keep.
+    */
+  test("CandidateLedger has no product construction bypass") {
+    refused(
+      typeCheckErrors(
+        """summon[scala.deriving.Mirror.ProductOf[storymodel4s.acquire.CandidateLedger[Int]]]"""
+      ),
+      "CandidateLedger Mirror.ProductOf"
+    )
+    refused(
+      typeCheckErrors("""storymodel4s.acquire.CandidateLedger.fromProduct(EmptyTuple)"""),
+      "CandidateLedger.fromProduct"
+    )
+    refused(
+      typeCheckErrors(
+        """storymodel4s.acquire.CandidateLedger[Int](Map.empty, Vector.empty)"""
+      ),
+      "CandidateLedger public apply"
     )
   }

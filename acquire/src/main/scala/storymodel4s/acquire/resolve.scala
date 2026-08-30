@@ -366,9 +366,9 @@ final case class LedgerEntry[A](
   * Entries are never removed or overwritten; a re-resolution adds a new claim identifier that
   * supersedes the old one, so the machine record survives adjudication.
   */
-final case class CandidateLedger[A] private (
-    entries: Map[ClaimId, LedgerEntry[A]],
-    order: Vector[ClaimId]
+final class CandidateLedger[A] private (
+    val entries: Map[ClaimId, LedgerEntry[A]],
+    val order: Vector[ClaimId]
 ):
   def add(id: ClaimId, entry: LedgerEntry[A]): Either[DomainError, CandidateLedger[A]] =
     if entries.contains(id) then Left(DomainError.DuplicateId("ClaimId", id.value))
