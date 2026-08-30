@@ -56,6 +56,21 @@
 # The error is toward a WIDER scope here, which is the safe direction, but it also
 # misreports what the candidate does -- and the same arithmetic can mislead in the
 # other direction when reasoning about who a change affects.
+# RUN THIS IN A CLONE CHECKED OUT AT THE CANDIDATE, NOT IN THE SHARED TREE. It reads
+# type NAMES from the candidate via `git show`, but greps for CONSUMERS in the
+# WORKING TREE. When the candidate DEFINES A NEW TYPE, the working tree contains
+# nothing that references it yet, so the consumer grep finds nothing and the module
+# list comes back EMPTY. Measured 2026-08-30 on 72b106c, which introduces
+# CellCoordinates: run from the shared tree it emitted `sbt -batch ""` and named no
+# module; run from a clone at the candidate it correctly named `align`.
+#
+# AN EMPTY SCOPE IS A TOOL RESULT, NOT A FINDING, and it fails in the dangerous
+# direction -- silently, and toward gating nothing. It is the same shape as a red
+# gate with no test totals: the output looks like an answer and measured nothing.
+# The check below therefore EXITS NONZERO rather than printing an empty gate
+# command, because a tool whose failure mode is a plausible-looking blank is a tool
+# that will eventually be believed.
+
 set -euo pipefail
 BASE="${1:?usage: reference-scope.sh BASE [HEAD]   (BASE should usually be $(git merge-base main HEAD))}"
 HEAD_REF="${2:-HEAD}"
@@ -85,6 +100,19 @@ mods="$(
     done
   } | sort -u
 )"
+
+if [ -z "$mods" ]; then
+  echo "EMPTY SCOPE -- REFUSING TO EMIT A GATE COMMAND." >&2
+  echo "No module in this tree references any type defined by the candidate. That is" >&2
+  echo "almost never true of real work; the usual cause is running this in the shared" >&2
+  echo "tree while the candidate DEFINES a new type, so nothing here references it yet." >&2
+  echo "Re-run in a clone checked out AT the candidate commit:" >&2
+  echo "    git clone --no-hardlinks . /tmp/scope && git -C /tmp/scope checkout $HEAD_REF" >&2
+  echo "    bash /tmp/scope/tools/reference-scope.sh \"$BASE\" $HEAD_REF" >&2
+  echo "If it is still empty there, gate the module that DEFINES the types and say so" >&2
+  echo "explicitly in the merge commit. Do not gate nothing." >&2
+  exit 3
+fi
 
 echo "modules that reference them (the gate must cover all of these):"
 echo "$mods" | sed 's/^/  /'
