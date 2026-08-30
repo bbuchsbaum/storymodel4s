@@ -8,7 +8,8 @@
     "build": "astro build",
     "check": "astro check",
     "verify:verbatim": "node scripts/verify-verbatim.mjs",
-    "verify": "npm run check && npm run build && npm run verify:verbatim"
+    "verify": "npm run check && npm run build && npm run verify:verbatim && npm run verify:provenance",
+    "verify:provenance": "node scripts/verify-provenance.mjs"
   },
   "dependencies": {
     "@astrojs/starlight": "0.41.10",
