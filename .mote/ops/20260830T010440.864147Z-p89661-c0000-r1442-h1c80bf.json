@@ -1,0 +1,1 @@
+{"actor":"claude-storymodel4s-m1","entity":"bd-01M166XWESBS1JZ5B38H0ZZ2DK","kind":"reserve_open","mode":"exclusive","op":"20260830T010440.864147Z-p89661-c0000-r1442-h1c80bf","paths":["align/src/test/scala/storymodel4s/probes/CellCoordinatesUnforgeableSuite.scala"],"reservation_id":"rv-01M1834YX018NTYNHZ8RHHMEVV","ts":"2026-08-30T01:04:40.864147Z","ttl_s":7200,"v":2}

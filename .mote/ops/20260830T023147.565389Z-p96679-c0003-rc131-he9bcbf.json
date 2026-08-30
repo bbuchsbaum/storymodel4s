@@ -1,0 +1,1 @@
+{"actor":"codex-movie-architecture","entity":"bd-01M18844CA1BFTNXR0HS8WBWB6","kind":"note","note_kind":"progress","op":"20260830T023147.565389Z-p96679-c0003-rc131-he9bcbf","text":"Recovering the exact accepted plan and append-only checkpoint into a narrow Git candidate; no content redesign or downstream movie implementation.","ts":"2026-08-30T02:31:47.565389Z","v":1}

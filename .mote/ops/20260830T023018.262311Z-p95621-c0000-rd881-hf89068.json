@@ -1,0 +1,1 @@
+{"actor":"codex-movie-architecture","idempotency_key":"movie-lead-cycle-20260830-1","kind":"session_status","message":"Auditing current movie gates and routing the next lawful work item","op":"20260830T023018.262311Z-p95621-c0000-rd881-hf89068","session_id":"sess-01M1881BQQGTY4P5GC5RF2S1CA","status":"working","ts":"2026-08-30T02:30:18.262311Z","v":1}
