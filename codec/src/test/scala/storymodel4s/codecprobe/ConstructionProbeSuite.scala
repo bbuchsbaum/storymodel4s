@@ -134,3 +134,40 @@ class ConstructionProbeSuite extends FunSuite:
       "CheckedSidecarPrelude._2"
     )
   }
+
+  // ---------------------------------------------------------------------------------------------
+  // KNOWN BAD. Everything above asserts a door is CLOSED, because those three witnesses were
+  // repaired into plain classes. The two courts below assert a door is OPEN, because it is.
+  // Measured 2026-08-30 from this package:
+  //     BlockedSidecarLayout  mirror=true  fromProduct=true  copy=false  apply=false
+  // Its constructor is fully `private` -- not `private[codec]` -- and that makes NO DIFFERENCE to
+  // Mirror derivation. I measured it rather than assuming it matched the four `private[align]`
+  // types found the same day, and it does match: `private` closes apply and copy and leaves the
+  // Mirror door wide open from any package.
+  //
+  // WHY THIS TYPE IS WORTH A COURT. Its own scaladoc: "Checked SM4SFT02 arithmetic derived only
+  // from the trusted manifest... range readers must know the exact prelude and block ranges BEFORE
+  // INSPECTING FILE-SUPPLIED BYTES, with every multiplication and addition checked once." The type
+  // IS the evidence that the arithmetic was checked. A forged one is a set of byte offsets and
+  // lengths that were never checked, handed to a reader that is about to index into a file with
+  // them -- and every field it carries (payloadOffset, rowStride, fileByteLength) is an offset or
+  // a length.
+  //
+  // These two assertions are MEANT TO FAIL when the boundary is repaired. Flip them to `refused`
+  // deliberately, so a silent repair and a silent regression do not look alike.
+
+  test("KNOWN BAD: BlockedSidecarLayout derives a Mirror outside storymodel4s.codec") {
+    assert(
+      typeCheckErrors(
+        """summon[scala.deriving.Mirror.ProductOf[storymodel4s.codec.BlockedSidecarLayout]]"""
+      ).isEmpty,
+      "REPAIRED: the Mirror door is now closed -- change this court to `refused` and say so"
+    )
+  }
+
+  test("KNOWN BAD: BlockedSidecarLayout has a reachable fromProduct bypass") {
+    assert(
+      typeCheckErrors("""storymodel4s.codec.BlockedSidecarLayout.fromProduct(???)""").isEmpty,
+      "REPAIRED: the fromProduct door is now closed -- change this court to `refused` and say so"
+    )
+  }
