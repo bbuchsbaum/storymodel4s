@@ -6,6 +6,7 @@ import storymodel4s.align.{NodeSummary, SemanticDistance, SourceNodeRef, Structu
 import storymodel4s.core.{Checksum, ContentAddress}
 import storymodel4s.embed.*
 import storymodel4s.embed.grakern.{GrakernStructuralDistance, StructuralReceiptContext}
+import storymodel4s.embed.onnx.OnnxSentenceEmbedder
 import storymodel4s.features.{Estimate, MissingReason}
 import storymodel4s.recall.RecallUnit
 
@@ -40,6 +41,22 @@ final case class SemanticIdentity(
   def render: String =
     s"semantic=${kind.render}:${provider.render.take(12)} q=${querySpace.value.take(12)} d=${documentSpace.value.take(12)} pair=$pairRule calls=$providerCalls"
 
+  private[bench] def identityParts: Vector[String] =
+    Vector(
+      "semantic/v1",
+      kind.render,
+      provider.render,
+      querySpace.value,
+      documentSpace.value,
+      pairRule match
+        case GeometryPairRule.IdenticalModelling                => "identical-modelling"
+        case GeometryPairRule.AllowViewDifference               => "allow-view-difference"
+        case GeometryPairRule.AllowInstructionDifference        => "allow-instruction-difference"
+        case GeometryPairRule.AllowViewAndInstructionDifference =>
+          "allow-view-and-instruction-difference",
+      providerCalls.toString
+    )
+
 /** Identity of the structural side of a channel. */
 enum StructuralIdentity:
   /** grakern `d_wl` over the given prepared source charts. */
@@ -53,6 +70,11 @@ enum StructuralIdentity:
   def render: String = this match
     case Grakern(p, n)  => s"structural=grakern:${p.render.take(12)} sources=$n"
     case Absent(reason) => s"structural=absent ($reason)"
+
+  private[bench] def identityParts: Vector[String] = this match
+    case Grakern(provider, preparedSources) =>
+      Vector("structural/grakern/v1", provider.render, preparedSources.toString)
+    case Absent(reason) => Vector("structural/absent/v1", reason)
 
 /** One system under test: a semantic distance, a structural distance, and their identities.
   *
@@ -71,13 +93,8 @@ final case class Channel(
 ):
   def identityChecksum: Checksum =
     ContentAddress.digest(
-      Vector(
-        "channel/v2",
-        name,
-        semanticIdentity.render,
-        structuralIdentity.render,
-        exposure.render
-      )
+      Vector("channel/v3", name) ++ semanticIdentity.identityParts ++
+        structuralIdentity.identityParts ++ Vector("exposure", exposure.render)
     )
 
   def render: String =
@@ -101,7 +118,7 @@ enum ChannelError:
   * the receipt count meaningless. The table is keyed by unit id and node ref, so the distance is a
   * pure lookup during inference.
   */
-object EmbedderSemantic:
+private object EmbedderSemantic:
   def of(
       embedder: Embedder[Id],
       units: Vector[RecallUnit],
@@ -219,7 +236,7 @@ object BenchChannels:
     * report rendering.
     */
   def neural(
-      embedder: Embedder[Id],
+      embedder: OnnxSentenceEmbedder,
       units: Vector[RecallUnit],
       nodes: Vector[(SourceNodeRef, String)],
       structural: (StructuralDistance, StructuralIdentity) = noStructure

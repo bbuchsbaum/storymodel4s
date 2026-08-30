@@ -1,13 +1,13 @@
 package storymodel4s.bench
 
-import cats.Id
 import cats.data.NonEmptyVector
 
 import storymodel4s.align.*
 import storymodel4s.align.bridge.StorySourceView
 import storymodel4s.core.StorySource
-import storymodel4s.embed.{Embedder, SensitiveKeyProvider, Sensitivity}
+import storymodel4s.embed.{SensitiveKeyProvider, Sensitivity}
 import storymodel4s.embed.grakern.StructuralReceiptContext
+import storymodel4s.embed.onnx.OnnxSentenceEmbedder
 import storymodel4s.fixtures.wog.{WarOfTheGhostsExpectations, WarOfTheGhostsModel}
 import storymodel4s.recall.*
 import storymodel4s.recall.RecallGraphStatus.Checked
@@ -239,7 +239,7 @@ object WogDiagnostic:
     * structural evidence on all three sides of the comparison.
     */
   def comparisonFactories(
-      embedder: Embedder[Id],
+      embedder: OnnxSentenceEmbedder,
       dimension: Int = 512,
       seed: Long = 0L
   ): Vector[Bench.ChannelFactory] =

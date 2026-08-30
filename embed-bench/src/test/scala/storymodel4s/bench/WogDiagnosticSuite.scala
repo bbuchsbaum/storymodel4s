@@ -2,6 +2,7 @@ package storymodel4s.bench
 
 import java.nio.file.Paths
 
+import scala.compiletime.testing.typeCheckErrors
 import scala.io.Source
 
 import cats.data.NonEmptyVector
@@ -114,6 +115,55 @@ class WogDiagnosticSuite extends FunSuite:
       .filter(_.level == 0)
       .sortBy(n => WogDiagnostic.view.relativePosition(n.ref))
       .map(_.ref)
+
+  test("the neural facade admits the closed ONNX encoder, not a caller-labelled lexical embedder") {
+    val admitted = typeCheckErrors(
+      """(embedder: storymodel4s.embed.onnx.OnnxSentenceEmbedder) =>
+        storymodel4s.bench.BenchChannels.neural(
+          embedder,
+          Vector.empty[storymodel4s.recall.RecallUnit],
+          Vector.empty[(storymodel4s.align.SourceNodeRef, String)]
+        )"""
+    )
+    assert(admitted.isEmpty, admitted.mkString("\n"))
+
+    val relabelled = typeCheckErrors(
+      """storymodel4s.bench.BenchChannels.neural(
+        storymodel4s.embed.HashedNgramEmbedder[cats.Id](32, 0L),
+        Vector.empty[storymodel4s.recall.RecallUnit],
+        Vector.empty[(storymodel4s.align.SourceNodeRef, String)]
+      )"""
+    )
+    assert(relabelled.nonEmpty, "a lexical embedder was admitted as a neural encoder")
+  }
+
+  test("channel checksums use full identities even when report labels share display prefixes") {
+    def channel(suffix: Char): Channel =
+      val shared = "0123456789ab"
+      val provider = storymodel4s.embed.ProviderFingerprint(
+        storymodel4s.core.Checksum.unsafe(shared + suffix.toString * 52)
+      )
+      Channel(
+        "collision-court",
+        SemanticDistance.abstaining,
+        SemanticIdentity(
+          provider,
+          storymodel4s.embed.GeometryId.unsafe(shared + s"-query-$suffix"),
+          storymodel4s.embed.GeometryId.unsafe(shared + s"-document-$suffix"),
+          storymodel4s.embed.GeometryPairRule.IdenticalModelling,
+          0,
+          SemanticChannelKind.NeuralEncoder
+        ),
+        StructuralDistance.missing,
+        StructuralIdentity.Absent("collision court"),
+        ChannelExposure.Memorizing
+      )
+
+    val left = channel('a')
+    val right = channel('b')
+    assertEquals(left.render, right.render, "court must collide in the truncated display")
+    assertNotEquals(left.identityChecksum, right.identityChecksum)
+  }
 
   test("WOG is wired as diagnostic cases: one per paraphrase plus one full recall") {
     val cases = WogDiagnostic.cases
