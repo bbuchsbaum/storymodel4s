@@ -107,8 +107,8 @@ channel tfidf:corpus-fit [semantic=lexical-baseline:c07959597a1c q=geometry:6e0 
     wog:ExternalAssociation: discourse=n/a@0.000 world=n/a@0.000 compression=0.594@0.002 backward=n/a@? worldBackward=n/a@?
     wog:Inference: discourse=n/a@0.000 world=n/a@0.000 compression=0.042@0.207 backward=n/a@? worldBackward=n/a@?
     wog:full-recall: discourse=0.571@0.006 world=0.590@0.005 compression=0.146@0.106 backward=0.003@1.000 worldBackward=0.002@1.000
-channel neural:onnx-sentence-encoder:90ab783abc61 [semantic=neural-encoder:90ab783abc61 q=geometry:d22 d=geometry:5c9 pair=IdenticalModelling calls=2; structural=absent (the source view carries no proposition charts); non-memorizing]
-  identity=c3c0eda7d749
+channel neural:onnx-sentence-encoder:90ab783abc61 [semantic=neural-encoder:90ab783abc61 q=geometry:d22 d=geometry:5c9 pair=IdenticalModelling calls=2; structural=absent (the source view carries no proposition charts); memorizing]
+  identity=d1378ac27f5a
   run wog:Precise view=322aff222888 recall=65834c5a6f9a
   run wog:Vague view=322aff222888 recall=6bccf24fd6da
   run wog:Summary view=322aff222888 recall=a3c5a92aef79
@@ -121,34 +121,34 @@ channel neural:onnx-sentence-encoder:90ab783abc61 [semantic=neural-encoder:90ab7
   run wog:Inference view=322aff222888 recall=26b7e974adfa
   run wog:full-recall view=322aff222888 recall=306d7cbb0071
   source-anchor metrics:
-    strict-recall@1 = 0.2200 cov=19/19 stories=10 [0.0400, 0.5200] (B=50) receipt=b220fd1420b4
-    strict-recall@3 = 0.4400 cov=19/19 stories=10 [0.2000, 0.8400] (B=50) receipt=3a7e80da9577
-    strict-recall@5 = 0.4400 cov=19/19 stories=10 [0.2000, 0.7200] (B=50) receipt=495e33f8f848
-    strict-recall@10 = 0.8700 cov=19/19 stories=10 [0.7400, 1.0000] (B=50) receipt=78bb185ae8ef
-    ancestor-credit@1 = 0.3300 cov=19/19 stories=10 [0.0600, 0.5600] (B=50) receipt=749303bc9e9e
-    ancestor-credit@3 = 0.3400 cov=19/19 stories=10 [0.1400, 0.7000] (B=50) receipt=72b9ac6284c7
-    ancestor-credit@5 = 0.4500 cov=19/19 stories=10 [0.2000, 0.7500] (B=50) receipt=36c4562609bf
-    ancestor-credit@10 = 0.1300 cov=19/19 stories=10 [0.0000, 0.4000] (B=50) receipt=33ccf7452f64
-    mrr = 0.3627 cov=19/19 stories=10 [0.2380, 0.5840] (B=50) receipt=c0d6ecd23419
-    level-exact = 0.4400 cov=19/19 stories=10 [0.2000, 0.8000] (B=50) receipt=6256736ff618
-    summary-accuracy = 1.0000 cov=2/2 stories=2 [1.0000, 1.0000] (B=50) receipt=3ba41b81fe0c
-    blend-coverage@5 = 0.0000 cov=2/2 stories=2 [0.0000, 0.0000] (B=50) receipt=afc9fddee8cc
-    candidate-burden = 36.1074 cov=21/21 stories=11 [23.7438, 49.2893] (B=50) receipt=d620a9049d40
-    false-gating = 0.0000 cov=12/12 stories=7 [0.0000, 0.0000] (B=50) receipt=6ae59fefde16
-    distortion-anchor-detection@5 = 1.0000 cov=4/4 stories=3 [1.0000, 1.0000] (B=50) receipt=44a0252d4f57
-    distortion-facets-correct = 0.5000 cov=4/4 stories=3 [0.1667, 1.0000] (B=50) receipt=9a9efef0f41e
-    cost:structural-term-coverage = 0.0000 cov=21/21 stories=11 [0.0000, 0.0000] (B=50) receipt=0378270999ca
-    cost:semantic-term-coverage = 1.0000 cov=21/21 stories=11 [1.0000, 1.0000] (B=50) receipt=e29c802923f7
-    route:support-midpoint-direction = 0.8750 cov=8/8 stories=1 receipt=ebdc07cc466d
-    route:revisit-pair-recall = missing(AllMissing) cov=0/0 stories=0 receipt=beb08f0dedf0
-    route:revisit-pair-precision = 0.0000 cov=2/2 stories=1 receipt=bf56a55b5b9d
-    route:gold-level-closeness = 0.8133 cov=19/19 stories=10 [0.7133, 0.9000] (B=50) receipt=1dbfeb175624
-    route:gold-level-signed-bias = 0.1133 cov=19/19 stories=10 [-0.0067, 0.2333] (B=50) receipt=19e6752503ad
-    route:transition-displacement-closeness = 0.8521 cov=8/8 stories=1 receipt=f1266f2c6b3d
+    strict-recall@1 = 0.2200 cov=19/19 stories=10 [0.0400, 0.5200] (B=50) receipt=f5bf8e6e74f8
+    strict-recall@3 = 0.4400 cov=19/19 stories=10 [0.2000, 0.8400] (B=50) receipt=0df63e0556dc
+    strict-recall@5 = 0.4400 cov=19/19 stories=10 [0.2000, 0.7200] (B=50) receipt=94f561103295
+    strict-recall@10 = 0.8700 cov=19/19 stories=10 [0.7400, 1.0000] (B=50) receipt=0cc3c63ba1d5
+    ancestor-credit@1 = 0.3300 cov=19/19 stories=10 [0.0600, 0.5600] (B=50) receipt=db367b276815
+    ancestor-credit@3 = 0.3400 cov=19/19 stories=10 [0.1400, 0.7000] (B=50) receipt=a1d91c136e0a
+    ancestor-credit@5 = 0.4500 cov=19/19 stories=10 [0.2000, 0.7500] (B=50) receipt=d029efb81e31
+    ancestor-credit@10 = 0.1300 cov=19/19 stories=10 [0.0000, 0.4000] (B=50) receipt=3c88fcf130a3
+    mrr = 0.3627 cov=19/19 stories=10 [0.2380, 0.5840] (B=50) receipt=5a216266dc31
+    level-exact = 0.4400 cov=19/19 stories=10 [0.2000, 0.8000] (B=50) receipt=8e68d43f219a
+    summary-accuracy = 1.0000 cov=2/2 stories=2 [1.0000, 1.0000] (B=50) receipt=a9fc866c9472
+    blend-coverage@5 = 0.0000 cov=2/2 stories=2 [0.0000, 0.0000] (B=50) receipt=bda9195830b5
+    candidate-burden = 36.1074 cov=21/21 stories=11 [23.7438, 49.2893] (B=50) receipt=809274332c34
+    false-gating = 0.0000 cov=12/12 stories=7 [0.0000, 0.0000] (B=50) receipt=4aa083b46b36
+    distortion-anchor-detection@5 = 1.0000 cov=4/4 stories=3 [1.0000, 1.0000] (B=50) receipt=d2c199b839c2
+    distortion-facets-correct = 0.5000 cov=4/4 stories=3 [0.1667, 1.0000] (B=50) receipt=4c91e0bba7c1
+    cost:structural-term-coverage = 0.0000 cov=21/21 stories=11 [0.0000, 0.0000] (B=50) receipt=2838a8b34506
+    cost:semantic-term-coverage = 1.0000 cov=21/21 stories=11 [1.0000, 1.0000] (B=50) receipt=8c9a1eeaae63
+    route:support-midpoint-direction = 0.8750 cov=8/8 stories=1 receipt=58d9698f2df6
+    route:revisit-pair-recall = missing(AllMissing) cov=0/0 stories=0 receipt=2be7879d9275
+    route:revisit-pair-precision = 0.0000 cov=2/2 stories=1 receipt=2504d4ecd617
+    route:gold-level-closeness = 0.8133 cov=19/19 stories=10 [0.7133, 0.9000] (B=50) receipt=2045d16c868f
+    route:gold-level-signed-bias = 0.1133 cov=19/19 stories=10 [-0.0067, 0.2333] (B=50) receipt=793476db28a1
+    route:transition-displacement-closeness = 0.8521 cov=8/8 stories=1 receipt=a0023c002177
   open-world metrics (never pooled):
-    open-world:external-over-source = 1.0000 cov=2/2 stories=2 [1.0000, 1.0000] (B=50) receipt=bf3444415e5d
-    open-world:subtype-correct = 1.0000 cov=4/4 stories=3 [1.0000, 1.0000] (B=50) receipt=3db8dca81932
-    open-world:source-consistent-inference-mass = 0.5298 cov=2/2 stories=2 [0.4801, 0.5795] (B=50) receipt=054b3f928376
+    open-world:external-over-source = 1.0000 cov=2/2 stories=2 [1.0000, 1.0000] (B=50) receipt=784cb14edeba
+    open-world:subtype-correct = 1.0000 cov=4/4 stories=3 [1.0000, 1.0000] (B=50) receipt=0586295f35a9
+    open-world:source-consistent-inference-mass = 0.5298 cov=2/2 stories=2 [0.4801, 0.5795] (B=50) receipt=bb3a19bcad6a
   three clocks:
     wog:Precise: discourse=n/a@0.000 world=n/a@0.000 compression=0.230@0.653 backward=n/a@? worldBackward=n/a@?
     wog:Vague: discourse=n/a@0.000 world=n/a@0.000 compression=0.017@0.963 backward=n/a@? worldBackward=n/a@?

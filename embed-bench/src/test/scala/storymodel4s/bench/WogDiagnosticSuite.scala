@@ -143,6 +143,11 @@ class WogDiagnosticSuite extends FunSuite:
     assert(golden.contains("semantic=lexical-baseline:"))
     assert(golden.contains("semantic=neural-encoder:"))
     assert(golden.contains("comparison delta"))
+    assert(
+      golden.linesIterator
+        .find(_.contains("semantic=neural-encoder:"))
+        .exists(_.endsWith("; memorizing]"))
+    )
 
     val supplied = for
       model <- sys.env.get("STORYMODEL4S_ONNX_MODEL")
@@ -164,6 +169,10 @@ class WogDiagnosticSuite extends FunSuite:
             BenchConfig(seed = 11L, resamples = 50)
           )
           .fold(error => fail(error.message), identity)
+        val neural = actual.channelReports
+          .find(_.channel.semanticIdentity.kind == SemanticChannelKind.NeuralEncoder)
+          .getOrElse(fail("missing neural channel"))
+        assertEquals(neural.channel.exposure, ChannelExposure.Memorizing)
         assertEquals(WogDiagnostic.comparisonRendering(actual).trim, golden)
       finally embedder.close()
     }

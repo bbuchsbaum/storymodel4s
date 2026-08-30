@@ -233,7 +233,7 @@ object BenchChannels:
           identity,
           structural._1,
           structural._2,
-          ChannelExposure.NonMemorizing
+          ChannelExposure.Memorizing
         )
       }
 
