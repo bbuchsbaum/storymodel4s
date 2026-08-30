@@ -263,8 +263,8 @@ final case class CostBreakdown private[align] (
       * from `terms` and contributes nothing to the total. An imputed term IS in `terms`, carries
       * its full weight into the price, and rests on a declared constant rather than an observation.
       * Conflating them would make the record internally false, because `terms` and `missingTerms`
-      * are defined as disjoint and the wire enforces it.
-      * That guarantee applies only to values produced through [[AlignWire]]: outside `align`,
+      * are defined as disjoint and the wire enforces it. That guarantee applies only to values
+      * produced through [[AlignWire]]: outside `align`,
       * `summon[Mirror.ProductOf[CostBreakdown]].fromProduct` can reconstruct this case class
       * without the checked door (bd-01M17ZNXY6AS1CMBQJRH3JMNVX).
       *
