@@ -24,15 +24,21 @@ import storymodel4s.recall.RecallGraphStatus.Checked
   *
   * '''DELIBERATELY NOT A CLASSIFICATION OF THE TERMS.''' A four-way `Measured / Absent / Imputed /
   * Ineligible` view per cost term is the eventual artifact and is NOT DERIVABLE from what a cell
-  * carries today. Two gaps, both measured rather than assumed:
+  * carries today. ONE gap, measured rather than assumed:
   *
-  *   - IMPUTED is not recorded. `cost` computes `dSem = semantic.orElse(unit, node,
-  *     missingSemantic)` and inserts `Semantic -> dSem` unconditionally, discarding the provider's
-  *     `MissingReason`, so a measured 0.5 and an abstained 0.5 are observationally identical.
   *   - INELIGIBLE is not recorded and CANNOT be reconstructed as a complement. `EvidenceSuite` pins
   *     a chartless cell whose `missingTerms` is `{Chart, Structural, Sensory}`, while `cost`
   *     excludes Chart and Structural from `eligible` for that same cell. So "absent" and "the cell
   *     never had this dimension" overlap in the published record.
+  *
+  * '''THIS PARAGRAPH ONCE NAMED A SECOND GAP THAT WAS ALREADY CLOSED WHEN IT WAS WRITTEN.''' It
+  * said IMPUTED is not recorded, because `cost` discarded the provider's `MissingReason` and left a
+  * measured 0.5 indistinguishable from an abstained one. That was true until 0ca09c5, which landed
+  * TWELVE HOURS BEFORE this file did: `CostBreakdown.imputedTerms` carries the reason, on the very
+  * breakdown `of` looks up. The conclusion below is unchanged and the evidence for half of it was
+  * fiction, which is the more dangerous of the two states - a closed defect cited as a live
+  * constraint reads exactly like a live one. Imputed IS derivable here today; whether this type
+  * should expose it is a design question, not a capability one.
   *
   * The two sides are asymmetric on purpose. A recall unit carries its own `text`, so the transcript
   * words are here. The source words are not: `align` holds spans into a source text it does not

@@ -141,15 +141,21 @@ class TraceSuite extends FunSuite:
 
   test("the coordinates carry no term status, because the record cannot support one") {
     // A guard on scope. The four-way Measured/Absent/Imputed/Ineligible view is NOT derivable
-    // today: the provider's MissingReason is discarded before the breakdown exists, and eligibility
-    // is computed inside cost() and thrown away.
+    // today, on ONE ground: eligibility is computed inside cost() and thrown away, so Ineligible
+    // cannot be recovered even as a complement.
+    //
+    // THIS COMMENT USED TO GIVE A SECOND GROUND THAT WAS ALREADY FALSE: "the provider's
+    // MissingReason is discarded before the breakdown exists". 0ca09c5 landed imputedTerms twelve
+    // hours before this suite was written. The test still passes and passed for a REASON THAT HAD
+    // EXPIRED, which is worse than failing - a green test citing a closed defect is how the defect
+    // gets re-argued as a constraint later.
     assert(
       scala.compiletime.testing.typeChecks("coords.facets"),
       "probe context cannot see the value"
     )
     assert(
       !scala.compiletime.testing.typeChecks("coords.termStatus(CostTerm.Semantic)"),
-      "a term classifier was added before the imputation and eligibility carriers exist"
+      "a term classifier was added before the eligibility carrier exists"
     )
     // The specific confusion a classifier must not paper over: on a chartless cell Chart is BOTH
     // recorded missing AND excluded from eligibility, so "absent" and "never had this dimension"
