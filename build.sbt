@@ -9,6 +9,8 @@ val munitV = "1.3.4"
 val munitCheckV = "1.3.0"
 val disciplineMunitV = "2.0.0"
 val scalaCheckV = "1.19.0"
+val onnxRuntimeV = "1.29.0"
+val djlV = "0.36.0"
 
 ThisBuild / tlBaseVersion := "0.1"
 ThisBuild / organization := "io.github.canardlapin"
@@ -76,6 +78,7 @@ lazy val root = tlCrossRootProject
     fixtures,
     laws,
     embedGrakern,
+    embedOnnx,
     embedBench
   )
 
@@ -211,6 +214,23 @@ lazy val embedGrakern = project
   .dependsOn(embedCore.jvm, proposition.jvm, align.jvm % "compile->compile;test->test")
   .dependsOn(grakernCoreJVM, grakernStandardJVM, grakernGraph4sAdapterJVM, grakernEngineJVM)
 
+/** JVM-only, local neural sentence embedding channel. Pinned model and tokenizer checksums define
+  * one reviewed geometry; no ONNX or DJL type crosses into portable modules.
+  */
+lazy val embedOnnx = project
+  .in(file("embed-onnx"))
+  .settings(commonSettings)
+  .settings(
+    name := "storymodel4s-embed-onnx",
+    libraryDependencies ++= Seq(
+      "com.microsoft.onnxruntime" % "onnxruntime" % onnxRuntimeV,
+      "ai.djl.huggingface" % "tokenizers" % djlV
+    ),
+    Test / fork := true,
+    Test / envVars += "ORT_DISABLE_TELEMETRY" -> "1"
+  )
+  .dependsOn(embedCore.jvm)
+
 /** JVM-only evaluation harness (M1 W4(10), ADR 0001 §D7): scores gated alignments against
   * adjudicated gold from frozen sets verified by manifest checksum, or against diagnostic material
   * that can never be labelled calibrated. No portable module depends on it.
@@ -218,8 +238,12 @@ lazy val embedGrakern = project
 lazy val embedBench = project
   .in(file("embed-bench"))
   .settings(commonSettings)
-  .settings(name := "storymodel4s-embed-bench")
-  .dependsOn(embedCore.jvm, embedGrakern, align.jvm, fixtures.jvm, laws.jvm % Test)
+  .settings(
+    name := "storymodel4s-embed-bench",
+    Test / fork := true,
+    Test / envVars += "ORT_DISABLE_TELEMETRY" -> "1"
+  )
+  .dependsOn(embedCore.jvm, embedOnnx, embedGrakern, align.jvm, fixtures.jvm, laws.jvm % Test)
 
 /** Portable semantic view artifacts shared by the Narrative Codex and Narrative Atlas. */
 lazy val view = crossProject(JVMPlatform, JSPlatform, NativePlatform)
@@ -298,7 +322,7 @@ val allModules = List(
 )
 val allPlatforms = List("JVM", "JS", "Native")
 
-val jvmOnlyModules = List("embedGrakern", "embedBench")
+val jvmOnlyModules = List("embedGrakern", "embedOnnx", "embedBench")
 
 addCommandAlias(
   "compileAll",

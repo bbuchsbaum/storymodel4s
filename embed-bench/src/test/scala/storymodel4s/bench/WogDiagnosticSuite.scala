@@ -1,10 +1,15 @@
 package storymodel4s.bench
 
+import java.nio.file.Paths
+
+import scala.io.Source
+
 import cats.data.NonEmptyVector
 import munit.FunSuite
 
 import storymodel4s.align.*
 import storymodel4s.features.{Estimate, MissingReason}
+import storymodel4s.embed.onnx.{OnnxSentenceArtifacts, OnnxSentenceEmbedder, OnnxSentenceModel}
 import storymodel4s.fixtures.wog.{WarOfTheGhostsExpectations, WarOfTheGhostsText}
 import storymodel4s.recall.{RecallGraph, RecallRelations}
 
@@ -127,6 +132,41 @@ class WogDiagnosticSuite extends FunSuite:
         assertEquals(ids.size, WogDiagnostic.cases.size)
         assertEquals(channels.size, 2)
       case other => fail(s"expected DiagnosticOrigin, got ${other.label}")
+  }
+
+  test("the committed WOG comparison names lexical controls and the real MiniLM encoder") {
+    val source = Source.fromResource("onnx/wog-minilm-comparison.txt")
+    val golden =
+      try source.mkString.trim
+      finally source.close()
+    assert(golden.startsWith("embed-bench report: DIAGNOSTIC"))
+    assert(golden.contains("semantic=lexical-baseline:"))
+    assert(golden.contains("semantic=neural-encoder:"))
+    assert(golden.contains("comparison delta"))
+
+    val supplied = for
+      model <- sys.env.get("STORYMODEL4S_ONNX_MODEL")
+      tokenizer <- sys.env.get("STORYMODEL4S_ONNX_TOKENIZER")
+    yield (Paths.get(model), Paths.get(tokenizer))
+    supplied.foreach { case (modelPath, tokenizerPath) =>
+      val embedder = OnnxSentenceEmbedder
+        .open(
+          OnnxSentenceModel.AllMiniLmL6V2,
+          OnnxSentenceArtifacts(modelPath, tokenizerPath)
+        )
+        .fold(error => fail(error.message), identity)
+      try
+        val actual = Bench
+          .run(
+            WogDiagnostic.cases,
+            WogDiagnostic.comparisonFactories(embedder, dimension = 256, seed = 7L),
+            ProtocolDocument.pinned,
+            BenchConfig(seed = 11L, resamples = 50)
+          )
+          .fold(error => fail(error.message), identity)
+        assertEquals(WogDiagnostic.comparisonRendering(actual).trim, golden)
+      finally embedder.close()
+    }
   }
 
   test("every case ran through the proof: no failures, fingerprints recorded, metrics observed") {

@@ -1,11 +1,12 @@
 package storymodel4s.bench
 
+import cats.Id
 import cats.data.NonEmptyVector
 
 import storymodel4s.align.*
 import storymodel4s.align.bridge.StorySourceView
 import storymodel4s.core.StorySource
-import storymodel4s.embed.{SensitiveKeyProvider, Sensitivity}
+import storymodel4s.embed.{Embedder, SensitiveKeyProvider, Sensitivity}
 import storymodel4s.embed.grakern.StructuralReceiptContext
 import storymodel4s.fixtures.wog.{WarOfTheGhostsExpectations, WarOfTheGhostsModel}
 import storymodel4s.recall.*
@@ -233,3 +234,47 @@ object WogDiagnostic:
           yield ch
       )
     )
+
+  /** The two lexical controls plus a supplied real encoder, preserving the same WOG cases and
+    * structural evidence on all three sides of the comparison.
+    */
+  def comparisonFactories(
+      embedder: Embedder[Id],
+      dimension: Int = 512,
+      seed: Long = 0L
+  ): Vector[Bench.ChannelFactory] =
+    factories(dimension, seed) :+ Bench.ChannelFactory(
+      "neural-encoder",
+      c =>
+        for
+          receipts <- publicReceipts
+          structural <- BenchChannels.grakern(c.view.nodes, receipts)
+          channel <- BenchChannels.neural(
+            embedder,
+            c.recall.ordered,
+            nodeTexts(c),
+            structural
+          )
+        yield channel
+    )
+
+  /** Render the diagnostic report plus direct neural-minus-control differences for the principal
+    * ranking metrics. Deltas remain diagnostic numbers with their source metric receipts above.
+    */
+  def comparisonRendering(report: BenchReport): String =
+    val metrics =
+      Vector(Metrics.Names.strictRecall(1), Metrics.Names.mrr, Metrics.Names.candidateBurden)
+    val byKind =
+      report.channelReports.map(channel => channel.channel.semanticIdentity.kind -> channel).toMap
+    val neural = byKind.get(SemanticChannelKind.NeuralEncoder)
+    val controls = report.channelReports.filter(
+      _.channel.semanticIdentity.kind == SemanticChannelKind.LexicalBaseline
+    )
+    val deltas = for
+      neuralReport <- neural.toVector
+      control <- controls
+      metric <- metrics
+      neuralValue <- neuralReport.metrics.find(_.name == metric).flatMap(_.value.toOption)
+      controlValue <- control.metrics.find(_.name == metric).flatMap(_.value.toOption)
+    yield f"comparison delta neural-minus-${control.channel.name} $metric = ${neuralValue - controlValue}%.6f"
+    (report.render +: deltas).mkString("\n")
