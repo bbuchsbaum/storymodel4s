@@ -402,6 +402,24 @@ was set by the owner on 2026-08-28 (sticky decision
    and gates the merged tree himself rather than charging the author a rebase,
    and backs the merge out if it is red.
 
+   *A base is stale only if the delta can INFLUENCE the gate — the test is
+   influence, not recency.* Let D be the commits in `main` since the candidate's
+   base. The base is **gate-current** when no commit in D touches either a file the
+   candidate touches or a build input the candidate's gate compiles (a `.scala` file
+   in any gated module, `build.sbt`, `project/`). Commits touching **only** `docs/`,
+   `AGENTS.md`, or `.mote/` are **gate-inert by construction** and never invalidate
+   a gate. If the test were tip-currency instead, no candidate on an active board
+   could ever be simultaneously gated and current: a gate takes minutes, `main`
+   moves during those minutes, and the author rebases into the next gate forever.
+   Measured 2026-08-29: an eight-minute cross-platform gate finished to find `main`
+   two commits ahead, both documentation, one file each — and both authored by the
+   two people reviewing that candidate. A rule letting documentation invalidate
+   someone else's gate evidence charges authors for the reviewers' commit rate.
+   Note the pairing with *Ledger phase is advisory*: there the board reported
+   landed work as pending, here a base's recency reports an inert delta as a
+   hazard. Both are a status that cannot distinguish *something changed that
+   matters* from *something changed*.
+
    *A conflict-free merge is not a working merge.* Textual non-conflict says
    nothing about whether the types still agree. When two candidates touch the
    same file, run the affected module's suite on the **merged** tree before
