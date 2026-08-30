@@ -465,7 +465,7 @@ was set by the owner on 2026-08-28 (sticky decision
    ambiguous across them); cross-repo work is coordinated on the
    `narrative-atlas-intaglio` topic with provider/consumer SHAs recorded as
    notes, never as dependency edges between stores.
-4. **Evidence discipline.** *Thirty sub-rules; find yours here.* **What
+4. **Evidence discipline.** *Thirty-one sub-rules; find yours here.* **What
    counts as proof of a fix (12):** a control must fail for the property under
    test · mutation proof · capacity to fail ·
    distinguishability · a negative compile-time assertion needs a positive control ·
@@ -475,22 +475,24 @@ was set by the owner on 2026-08-28 (sticky decision
    pipeline produces · an inequality is not a discriminating assertion · a pinned
    literal can be updated but a behavioural assertion has to be argued with · a
    positive control requires the old code to be capable of the thing tested. **How
-   to run the gate (11):** never pipe a gate · the gate is not the last step, re-read
+   to run the gate (12):** never pipe a gate · the gate is not the last step, re-read
    the board before merging · a check and the action it gates must
    not share a batch · a trailing success line is not an exit
    status · a compile error anywhere makes the gate inconclusive · run the format
    check last · verify the export before you gate it · a compile-time probe needs a
    clean recompile · a gate with no test totals did not run · a shell equality test
    over two failed command substitutions passes · a backgrounded gate's exit status
-   describes the fork, not the run. **How to scope a finding (4):**
+   describes the fork not the run · a shared-tree gate compiles other agents'
+   untracked files. **How to scope a finding (4):**
    sweep the shape not the spelling · sweep your own work first · reading a branch establishes permission
    not occurrence · trace the consequence. **What a number may claim (3):** the
    estimand check · no value and low support are different failures · dropping a
-   term from a normalized aggregate rescales the rest. *(Twelve of the thirty are
-   about whether a test can actually fail, and ELEVEN are about whether the gate
-   measured anything at all — that second group went from three to eleven in a
+   term from a normalized aggregate rescales the rest. *(Twelve of the thirty-one are
+   about whether a test can actually fail, and TWELVE are about whether the gate
+   measured anything at all — that second group went from three to twelve in a
    single day, every entry added after a run reported a status with nothing behind
-   it, and the last of them after a run reported SUCCESS with nothing behind it. On 2026-08-29 alone, THREE separate red gates measured infrastructure rather
+   it, and the last of them after a run reported SUCCESS with nothing behind it.
+   On 2026-08-29 alone, THREE separate red gates measured infrastructure rather
    than a candidate: a truncated archive, a linked worktree, and a directory name
    used as an sbt project id. This index is
    load-bearing and it ROTS: it was stale by five before 2026-08-29, was corrected
@@ -817,6 +819,19 @@ was set by the owner on 2026-08-28 (sticky decision
    like a failing test suite. **Gate in a clone, never in a linked worktree**, and
    before you report a red gate, grep the log for `Passed: Total` — if there is
    none, you have measured your own infrastructure.
+
+   *A gate in the SHARED TREE compiles other agents' untracked files, so its exit
+   status is not about your commit.* `compileAll`/`testAll` build the working tree,
+   not the index and not the commit — every untracked `.scala` another session has
+   left in a source directory enters the run. A green result therefore certifies
+   "the commit plus whatever else was lying there", and a red one may be somebody
+   else's half-written file. Reported 2026-08-29 by an actor who ran JVM/JS/Native
+   to exit 0 and **disclosed the run as non-exact** because untracked NFRD sources
+   had entered it, rather than reporting a clean green — that is the standard. Check
+   with `git status --short` for untracked sources under any module you are gating;
+   if there are any, either gate in a clone or state the contamination in the
+   evidence post. Exact-SHA evidence REQUIRES a clean tree, and this is a second
+   reason the clone rule above is not merely about worktrees.
 
    *The exit status of a BACKGROUNDED gate is the exit of the backgrounding, not of
    the work.* `nohup sbt ... &` returns 0 the instant the fork succeeds, so "the gate
