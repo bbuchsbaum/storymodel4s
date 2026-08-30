@@ -555,7 +555,7 @@ was set by the owner on 2026-08-28 (sticky decision
    ambiguous across them); cross-repo work is coordinated on the
    `narrative-atlas-intaglio` topic with provider/consumer SHAs recorded as
    notes, never as dependency edges between stores.
-4. **Evidence discipline.** *Thirty-four sub-rules; find yours here.* **What
+4. **Evidence discipline.** *Thirty-five sub-rules; find yours here.* **What
    counts as proof of a fix (12):** a control must fail for the property under
    test · mutation proof · capacity to fail ·
    distinguishability · a negative compile-time assertion needs a positive control ·
@@ -565,9 +565,9 @@ was set by the owner on 2026-08-28 (sticky decision
    pipeline produces · an inequality is not a discriminating assertion · a pinned
    literal can be updated but a behavioural assertion has to be argued with · a
    positive control requires the old code to be capable of the thing tested. **How
-   to run the gate (15):** never pipe a gate · the gate is not the last step, re-read
+   to run the gate (16):** never pipe a gate · the gate is not the last step, re-read
    the board before merging · an author's own gate is LocallyObserved, not
-   verified · a check and the action it gates must
+   verified · never put a message body in an inline double-quoted shell argument · a check and the action it gates must
    not share a batch · a trailing success line is not an exit
    status · a compile error anywhere makes the gate inconclusive · run the format
    check last · verify the export before you gate it · a compile-time probe needs a
@@ -792,6 +792,21 @@ was set by the owner on 2026-08-28 (sticky decision
    the reproducer has proved their own setup: apply the zero-totals test to
    yourself FIRST, and when a reproduction disagrees with the author, say what
    you ran and where before you say what it means.
+
+   *NEVER PUT A MESSAGE BODY IN AN INLINE DOUBLE-QUOTED SHELL ARGUMENT.* Backticks
+   inside double quotes are COMMAND SUBSTITUTION, and every board post we write is
+   full of `identifiers` in backticks. Measured 2026-08-30, by the chief, on a
+   post four actors were notified about: `mote ready` EXECUTED and its output — a
+   list of ready beads — was spliced into the middle of a sentence, while
+   `doing` failed with "command not found" and left THE EMPTY STRING, deleting the
+   word twice. The result still parsed and read as sloppy writing rather than as a
+   machine eating two words. Two hazards, and the second is worse: it ran a
+   command that was never intended to run (harmless here; the mechanism does not
+   care), and its failure mode is DELETION rather than an error, so a corrupted
+   message looks like a clean one. Write the body to a file and pass `--body
+   "$(cat file)"`, the tool's stdin form, or `git commit -F` — the same call whose
+   post was corrupted had a perfectly intact commit message, because that one came
+   from a file.
 
    *A check and the action it gates must not run in the SAME BATCH.* Piping
    destroys the exit status; batching destroys the DECISION. If the format check,
