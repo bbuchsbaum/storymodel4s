@@ -8,11 +8,11 @@ import storymodel4s.core.*
 import storymodel4s.recall.*
 import storymodel4s.recall.RecallGraphStatus.Checked
 
-/** Locks `hsmm/v2` to a real inferred War of the Ghosts result without serializing story text. */
+/** Locks `hsmm/v3` to a real inferred War of the Ghosts result without serializing story text. */
 class WarOfTheGhostsCodecGoldenSuite extends FunSuite:
   import WarOfTheGhostsCodecGolden.*
 
-  test("the WOG hsmm/v2 bytes are canonical, sparse, and contain no story text") {
+  test("the WOG hsmm/v3 bytes are canonical, sparse, and contain no story text") {
     assertEquals(Canonical.parse(encoded).map(Canonical.print), Right(encoded))
     assert(encoded.length < 100000, s"unexpectedly large golden candidate: ${encoded.length} bytes")
     assert(!encoded.contains(context.recall.transcript.canonicalText))
@@ -26,7 +26,7 @@ class WarOfTheGhostsCodecGoldenSuite extends FunSuite:
     }
   }
 
-  test("the WOG hsmm/v2 bytes contextually decode to the inferred result") {
+  test("the WOG hsmm/v3 bytes contextually decode to the inferred result") {
     val decoded = HsmmResultCodec.decode(encoded, context.recall, context.view)
     assertEquals(decoded, Right(context.result))
     assertEquals(decoded.map(HsmmResultCodec.encode), Right(encoded))
