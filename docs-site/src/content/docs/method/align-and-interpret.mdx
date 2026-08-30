@@ -88,7 +88,7 @@ Qualified rather than Confirmed for exactly that reason.
 
 <Evidence
   status="Qualified"
-  source={`Archived run by codex-storymodel-collab at producer revision ${PRODUCER_REVISION}; output SHA-256 ${outputSha}. Digest-bound, not re-executed at build time.`}
+  source={`Archived run by codex-storymodel-collab at producer revision ${PRODUCER_REVISION}; output SHA-256 ${outputSha}. Digest-bound, not re-executed at build time. NO HOSTED PRODUCER LINK EXISTS: that revision is not published to the remote, so any URL naming it would 404. The full revision is given here so it can be checked in a local clone. The link below is the archived output file, not the producer.`}
   href={sourceLink(outputPath)}
  />
 
@@ -116,14 +116,28 @@ source. Under `lexicalJaccard`, a bag-of-words distance with no synonymy, that i
 is not the same as correct: this is a semantically faithful paraphrase, so a mostly-external
 verdict is the baseline's limitation showing, not a property of the recall.
 
-**`uniform coverage: 0.0067` is a mean, not a tally.** It is mean posterior leaf
-visitation — `leaves.map(visitation).sum / leaves.size` — so it is structurally bounded by
-how much source mass exists to spread over 71 leaves. Here total source mass is
-`0.4608 + 0.0209 = 0.4817`, and `0.4817 / 71 = 0.0068`, which is the printed figure. A
-2-unit recall against a 71-leaf story has a ceiling of `2/71 = 0.0282` even under perfect
-alignment, so this run sits at roughly a quarter of what was attainable. That is a poor
-result. It is not "almost nothing was recovered", and reading the number that way would
-mistake a short recall for a failed alignment.
+**`uniform coverage: 0.0067` is a saturating mean, not a tally.** `leafVisitation`
+(`signature.scala:625`) walks each recall unit's anchor mass, splits it evenly among the
+leaves beneath each anchor, and then reports each leaf as `1 - exp(-a)` where `a` is the
+mass that reached it. `uniformCoverage` is the mean of that over **all 71 leaves**.
+
+Two consequences worth holding onto. The `1 - exp(-·)` **saturates**: a leaf visited
+heavily approaches 1 rather than accumulating without bound, so the estimand asks roughly
+*how much of the story got touched at all*, not *how much mass was spent*. And because it
+averages over every leaf, a 2-unit recall against a 71-leaf story is small by
+construction.
+
+**We are not going to tell you what the ceiling was.** An earlier version of this page
+reconstructed the figure as total source mass over leaf count — `0.4817 / 71` — and called
+the shortfall "roughly a quarter of attainable". That was wrong twice: the estimand is
+nonlinear, so the division is not the formula, and the division yields `0.0068` where the
+program printed `0.0067`, which should have been the tell. The exact ceiling depends on
+the full posterior over leaves, and the full posterior is not in this console output.
+
+So the honest statement is the narrow one: this is a poor alignment on a short recall, and
+the console fields on this page are not sufficient to say how poor. Reconstructing an
+estimand from rounded printed numbers is how you get a confident sentence that no longer
+matches the program.
 
 ## The line worth the whole page
 
