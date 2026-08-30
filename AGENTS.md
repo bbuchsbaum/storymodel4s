@@ -266,6 +266,23 @@ Package namespace is flat `storymodel4s.<module>`.
    private` whose three fields stand in a derived proof relation). So: **any new
    public type whose fields encode a relation the constructor is supposed to
    establish must be born unforgeable** — it is not enough to audit what exists.
+   *The non-ambiguous trigger is the CARTESIAN-PRODUCT TEST* (codex-storymodel-collab,
+   2026-08-30): if every combination of individually lawful field values is a lawful
+   value of the type, it is honest product data and a public case class is fine; if
+   some combination is false because validity depends on a relation among fields,
+   provenance, ordering, identity, or external context, it carries a joined claim and
+   must not expose product construction. That replaces "supposed to establish" — which
+   asks about author intent — with a question anyone can answer about the type alone.
+   *And a private constructor is NECESSARY, NOT SUFFICIENT:* the checked factory must
+   accept enough context to PROVE the relation, and a court must kill removal of that
+   check, or you have total construction over the wrong domain behind a prettier door.
+   Courts compile-refuse **four** doors — `apply`, `copy`, the companion's
+   `fromProduct`, and `summon[Mirror.ProductOf[T]].fromProduct` — each needing its own
+   same-shape positive control, because a control for one mechanism does not license a
+   refusal in another. Validated before it was written: stated as a proposal on
+   2026-08-30, it produced three live findings within the hour (`CellCoordinates`,
+   `CachedParserProposal`, and a `CacheHit` admission bypass an author found in their
+   own candidate and self-held).
    Note what was and was not at risk there, because the distinction is the whole
    skill: the *compiled* path was safe, since the compiler recomputed the proof
    rather than trusting the value; the *public preflight contract* was not,
@@ -465,7 +482,7 @@ was set by the owner on 2026-08-28 (sticky decision
    ambiguous across them); cross-repo work is coordinated on the
    `narrative-atlas-intaglio` topic with provider/consumer SHAs recorded as
    notes, never as dependency edges between stores.
-4. **Evidence discipline.** *Thirty-one sub-rules; find yours here.* **What
+4. **Evidence discipline.** *Thirty-two sub-rules; find yours here.* **What
    counts as proof of a fix (12):** a control must fail for the property under
    test · mutation proof · capacity to fail ·
    distinguishability · a negative compile-time assertion needs a positive control ·
@@ -475,7 +492,7 @@ was set by the owner on 2026-08-28 (sticky decision
    pipeline produces · an inequality is not a discriminating assertion · a pinned
    literal can be updated but a behavioural assertion has to be argued with · a
    positive control requires the old code to be capable of the thing tested. **How
-   to run the gate (12):** never pipe a gate · the gate is not the last step, re-read
+   to run the gate (13):** never pipe a gate · the gate is not the last step, re-read
    the board before merging · a check and the action it gates must
    not share a batch · a trailing success line is not an exit
    status · a compile error anywhere makes the gate inconclusive · run the format
@@ -483,13 +500,13 @@ was set by the owner on 2026-08-28 (sticky decision
    clean recompile · a gate with no test totals did not run · a shell equality test
    over two failed command substitutions passes · a backgrounded gate's exit status
    describes the fork not the run · a shared-tree gate compiles other agents'
-   untracked files. **How to scope a finding (4):**
+   untracked files · never head a list whose length is the finding. **How to scope a finding (4):**
    sweep the shape not the spelling · sweep your own work first · reading a branch establishes permission
    not occurrence · trace the consequence. **What a number may claim (3):** the
    estimand check · no value and low support are different failures · dropping a
-   term from a normalized aggregate rescales the rest. *(Twelve of the thirty-one are
-   about whether a test can actually fail, and TWELVE are about whether the gate
-   measured anything at all — that second group went from three to twelve in a
+   term from a normalized aggregate rescales the rest. *(Twelve of the thirty-two are
+   about whether a test can actually fail, and THIRTEEN are about whether the gate
+   measured anything at all — that second group went from three to thirteen in a
    single day, every entry added after a run reported a status with nothing behind
    it, and the last of them after a run reported SUCCESS with nothing behind it.
    On 2026-08-29 alone, THREE separate red gates measured infrastructure rather
@@ -832,6 +849,18 @@ was set by the owner on 2026-08-28 (sticky decision
    if there are any, either gate in a clone or state the contamination in the
    evidence post. Exact-SHA evidence REQUIRES a clean tree, and this is a second
    reason the clone rule above is not merely about worktrees.
+
+   *Never `head` a list whose LENGTH or COMPLETENESS is the finding.* If the question
+   is "how many" or "is X absent", truncation MANUFACTURES the answer — and it
+   manufactures the reassuring one, because what falls off the bottom is by definition
+   what you did not see. Count first (`grep -c`), then display. Measured twice on
+   2026-08-29 by the same person in one session: a contamination incident reported as
+   **9** files under `git show --stat | head -12` when it was **13**, and eight hours
+   later a candidate declared review-satisfied under
+   `mote candidate show … | head -6` when `review_missing` was line **7** — which
+   nearly merged two candidates on a review status never actually read. The second one
+   happened AFTER the first had been written up as a rule, which is the argument for
+   putting the mechanism here rather than trusting the memory of it.
 
    *The exit status of a BACKGROUNDED gate is the exit of the backgrounding, not of
    the work.* `nohup sbt ... &` returns 0 the instant the fork succeeds, so "the gate
