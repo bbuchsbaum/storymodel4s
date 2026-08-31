@@ -16,6 +16,11 @@ package storymodel4s.consumerattack {
     def fromProduct(product: Product): AuthorityProductControl =
       summon[scala.deriving.Mirror.ProductOf[AuthorityProductControl]].fromProduct(product)
 
+  final case class EstablishedRateProductControl(numerator: Int, denominator: Int)
+  object EstablishedRateProductControl:
+    def fromProduct(product: Product): EstablishedRateProductControl =
+      summon[scala.deriving.Mirror.ProductOf[EstablishedRateProductControl]].fromProduct(product)
+
   /** External-package proof that output invariants have no generated construction door. */
   class OutputConstructionProbeSuite extends FunSuite:
     private def refused(errors: List[scala.compiletime.testing.Error], what: String): Unit =
@@ -46,6 +51,31 @@ package storymodel4s.consumerattack {
       )
     }
 
+    test("established-rate same-shape control exposes all four construction mechanisms") {
+      assertEquals(
+        typeCheckErrors("storymodel4s.consumerattack.EstablishedRateProductControl(1, 2)"),
+        Nil
+      )
+      assertEquals(
+        typeCheckErrors(
+          "(x: storymodel4s.consumerattack.EstablishedRateProductControl) => x.copy(numerator = -1)"
+        ),
+        Nil
+      )
+      assertEquals(
+        typeCheckErrors(
+          "storymodel4s.consumerattack.EstablishedRateProductControl.fromProduct((1, 2))"
+        ),
+        Nil
+      )
+      assertEquals(
+        typeCheckErrors(
+          "summon[scala.deriving.Mirror.ProductOf[storymodel4s.consumerattack.EstablishedRateProductControl]]"
+        ),
+        Nil
+      )
+    }
+
     test("evidence-issued authority closes all four product construction doors") {
       refused(
         typeCheckErrors(
@@ -68,6 +98,27 @@ package storymodel4s.consumerattack {
           "summon[scala.deriving.Mirror.ProductOf[storymodel4s.acquire.AcquisitionViewAuthority]]"
         ),
         "AcquisitionViewAuthority Mirror"
+      )
+    }
+
+    test("established rate closes all four product construction doors") {
+      refused(
+        typeCheckErrors("storymodel4s.acquire.EstablishedRate(1, 2)"),
+        "EstablishedRate.apply"
+      )
+      refused(
+        typeCheckErrors("(x: storymodel4s.acquire.EstablishedRate) => x.copy(numerator = -1)"),
+        "EstablishedRate.copy"
+      )
+      refused(
+        typeCheckErrors("storymodel4s.acquire.EstablishedRate.fromProduct((1, 2))"),
+        "EstablishedRate.fromProduct"
+      )
+      refused(
+        typeCheckErrors(
+          "summon[scala.deriving.Mirror.ProductOf[storymodel4s.acquire.EstablishedRate]]"
+        ),
+        "EstablishedRate Mirror"
       )
     }
 
