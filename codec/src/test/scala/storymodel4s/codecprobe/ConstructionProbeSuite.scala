@@ -22,10 +22,19 @@ import munit.FunSuite
   */
 class ConstructionProbeSuite extends FunSuite:
 
+  // Macro snippets are strings, so these real references make Zinc invalidate the court.
+  private val dependsOn: List[Class[?]] = List(
+    classOf[storymodel4s.codec.SidecarBlockRange],
+    classOf[storymodel4s.codec.CheckedSidecarPrelude],
+    classOf[storymodel4s.codec.CheckedSidecarBlock],
+    classOf[storymodel4s.codec.BlockedSidecarLayout]
+  )
+
   private def refused(errors: List[scala.compiletime.testing.Error], what: String): Unit =
     assert(errors.nonEmpty, s"$what must not be constructible outside storymodel4s.codec")
 
   test("positive control: compiletime testing reports a real error") {
+    assert(dependsOn.forall(_ != null))
     val errors = typeCheckErrors("val x: Int = \"not-an-int\"")
     assert(errors.nonEmpty, "positive control must fail or negative assertions are vacuous")
   }
