@@ -29,8 +29,28 @@ export const _bindFiles = (() => {
   return true;
 })();
 
-Every story model begins with a `StorySource`. `SurfaceAnalyzer.analyze` turns that source into a
-`SurfaceAtlas`: an index of paragraphs, sentences, and tokens over the canonical text.
+storymodel4s helps researchers compare a story with a later recall. It records the words in each
+text, who did or said what, the order and context of events, and where each part of the recall points
+in the story. The comparison assigns associations, commentary, and unsupported material to named
+external states. Story and recall records cite exact text; numerical summaries carry their support
+and missingness.
+
+The library exposes that work in stages:
+
+| Stage | Scala value | What you can inspect |
+| --- | --- | --- |
+| Index the text | `SurfaceAtlas` | paragraphs, sentences, tokens, exact spans, and text lookup |
+| Represent the story | `StoryModel` | entities, situations, contexts, claims, relations, hierarchy, and presentation order |
+| Represent the recall | `RecallGraph` | recall units, their order, discourse functions, and recall-side relations |
+| Compare recall with story | `HsmmResult` | candidate source nodes, posterior mass, external states, and the inferred route |
+| Summarize the comparison | `RecallSignature` | coverage, specificity, compression, external mass, and support for each estimate |
+
+This page starts with the first stage. `SurfaceAnalyzer.analyze` turns a `StorySource` into a
+`SurfaceAtlas`, an index over the exact source text. The final section shows where the atlas leads.
+
+You can build a source atlas directly from ordinary text today. The later guides use a reviewed
+*War of the Ghosts* model because automatic construction of a complete `StoryModel` from arbitrary
+prose remains under development.
 
 storymodel4s is currently used from a source checkout. It has no released package coordinates.
 
@@ -154,15 +174,49 @@ relations, and claims that cite these spans.
 
 ## Continue to the story model
 
-The reviewed *War of the Ghosts* fixture shows what the later layers add to a source atlas:
+The atlas tells you where the words are. A `StoryModel` connects those words to the people, events,
+states, contexts, and relations described by the story. This code loads the reviewed *War of the
+Ghosts* fixture, whose modeling work is already complete:
 
 ```scala
 import storymodel4s.fixtures.wog.WarOfTheGhostsModel
 
 val model = WarOfTheGhostsModel.model
 
-model.graph.situations.size                       // 71
-WarOfTheGhostsModel.alignmentSource.allNodes.size // 84
+model.atlas.sentences.size          // 50
+model.graph.entities.size           // 14
+model.graph.situations.size         // 71
+model.graph.contexts.size           // 12
+model.graph.relations.temporal.size // 52
+model.graph.relations.causal.size   // 9
+model.claims.size                    // 462
 ```
 
+The story-model guide follows one sentence into two separate records: a young man says something in
+the narrated world, and the content of his speech belongs to a nested speech context. It prints each
+record's predicate, polarity, context, and supporting sentence.
+
 [Model a story and inspect its evidence →](/method/model-a-story/)
+
+The alignment guide then adds a two-unit recall. Its public example generates 86 sparse candidate
+matches and produces one posterior row per recall unit. Each row exposes the mass assigned to story
+nodes and to named external states:
+
+| Accessor | What it returns |
+| --- | --- |
+| `result.posterior.rows` | one probability row for each recall unit |
+| `row.mapSource` | the row's highest-probability source node, when one exists |
+| `row.sourceMass` | the row's total mass on story nodes |
+| `row.externalMass` | the row's total mass on external states |
+| `result.viterbi` | the inferred route through source and external states |
+| `signature.uniformCoverage` | coverage across the story's alignable leaves |
+| `signature.importanceWeightedCoverage` | weighted coverage together with its conditioning weight and observed count |
+| `signature.specificityMass` | specificity together with the source mass that supports it |
+| `signature.compression` | compression together with the source mass that supports it |
+| `signature.externalMass` | attributed external mass and unranked mass as separate values |
+
+The recorded lexical-baseline run assigns 46.08% source mass to its first recall unit and 2.09% to
+its second. The low scores reveal the limits of word-overlap matching. They establish the shape of
+the returned result; they say nothing about calibrated accuracy.
+
+[Run the complete story-to-recall comparison →](/method/align-and-interpret/)
