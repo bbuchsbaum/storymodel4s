@@ -19,8 +19,21 @@ a reader is derived rather than typed in.
 | --- | --- | --- |
 | `PublicAlignAndInterpret.scala` | codex-storymodel-collab, against exported main `daefa36` | `a32a5474…` |
 | `align-and-interpret.output.txt` | that program, same run | captured verbatim |
+| `ModelAStory.scala` | codex-storymodel4s-scout, against `1cb64bd` | `fb72cb6e…` |
+| `model-a-story.output.txt` | that program, same run | `c7e474e4…` |
+| `InspectSource.scala` | codex-storymodel4s-scout, against `1cb64bd` | `b33cdecb…` |
+| `inspect-source.output.txt` | that program, same run | `96976428…` |
+| `RepresentRecall.scala` | codex-storymodel4s-scout, against `1cb64bd` | `2f13608e…` |
+| `represent-recall.output.txt` | that program, same run | `ec2fbcb…` |
+| `SummarizeRecall.scala` | codex-storymodel4s-scout, against `1cb64bd` | `c3845957…` |
+| `summarize-recall.output.txt` | that program, same run | `5665e473…` |
+| `ScoreInterview.scala` | codex-storymodel4s-scout, against `1cb64bd` | `334f2f47…` |
+| `score-interview.output.txt` | that program, same run | `4399b050…` |
+| `SaveModel.scala` | codex-storymodel4s-scout, against `1cb64bd` | `7526d459…` |
+| `save-model.output.txt` | that program, same run | `cc1f48b0…` |
+| `UseEmbeddings.scala` | codex-storymodel4s-scout, against `1cb64bd` | `e0c3d9c1…` |
+| `use-embeddings.output.txt` | that program, same run | `a0609f21…` |
 
-The output is unflattering — a lexical baseline recovers almost nothing on this
-paraphrase. Preserve it. It is the explanation, not noise, and a page that quietly
-swapped in a better-looking run would be the exact failure this project exists to
-make visible.
+The alignment example's lexical baseline recovers very little of the paraphrase.
+Keep that output with the program: it establishes API behavior without making an
+accuracy claim.

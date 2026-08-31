@@ -1,0 +1,17 @@
+paragraphs: 1
+sentences: 1
+tokens: 8
+sentence text: One night two young men left Egulac.
+sentence span: [0, 36)
+token One [0, 3)
+token night [4, 9)
+token two [10, 13)
+token young [14, 19)
+token men [20, 23)
+token left [24, 28)
+token Egulac [29, 35)
+token . [35, 36)
+token at offset 25: left
+tokens overlapping [20, 28): men, left
+evidence covered length: 36
+evidence unit count: 1

@@ -1,0 +1,18 @@
+story: The War of the Ghosts
+surface: 50 sentences, 517 tokens
+narrative graph: 14 entities, 71 situations, 12 contexts
+typed relations: 52 temporal, 9 causal, 3 goal
+auditable claims: 462
+
+wog:sit:ym1-says-no-arrows: event / say
+  context: NarratedWorld (wog:ctx:world)
+  context parent: none
+  polarity: Positive; modality: Asserted
+  evidence sentence 14: One of the young men said: "I have no arrows."
+  description: one young man says he has no arrows
+wog:sit:lack-arrows: state / have
+  context: Speech(wog:ent:young-man-1) (wog:ctx:speech-ym1-a)
+  context parent: wog:ctx:world
+  polarity: Negative; modality: Asserted
+  evidence sentence 14: One of the young men said: "I have no arrows."
+  description: he has no arrows

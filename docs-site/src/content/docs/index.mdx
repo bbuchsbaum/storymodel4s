@@ -1,16 +1,16 @@
 ---
-title: Evidence-first models of stories and recall
-description: A human guide to storymodel4s, a Scala library that records what a story states, what its characters merely say, and what a person recalled - keeping the three apart and citing the sentence behind each one.
+title: Models of stories and their recall
+description: storymodel4s represents a written story, a person's recall of it, and the mapping between the two.
 template: splash
 hero:
-  tagline: A young man says "I have no arrows." The saying happened; whether he has none is claimed only inside his speech. This library keeps those apart, and measures what a recall does to them.
+  tagline: storymodel4s is a Scala 3 library for representing written stories, human recall of those stories, and the mapping between the two.
   actions:
-    - text: Understand the method
-      link: /method/orientation/
+    - text: Run a complete comparison
+      link: /method/align-and-interpret/
       icon: right-arrow
       variant: primary
-    - text: Inspect one success
-      link: /method/one-honest-success/
+    - text: Inspect the source text
+      link: /scala/getting-started/
       icon: open-book
 ---
 
@@ -23,68 +23,88 @@ import { sourceLink } from '../../lib/provenance';
 
 <div class="route-grid">
   <RouteCard
-    eyebrow="Primary route"
-    title="Understand the method"
-    description="See what the representation preserves, where it abstains, and how a recall maps back to evidence."
-    href="/method/orientation/"
+    eyebrow="Complete example"
+    title="Compare a recall with a story"
+    description="Run the public alignment API, inspect the result, and see where the free lexical baseline falls short."
+    href="/method/align-and-interpret/"
     accent="teal"
   />
   <RouteCard
-    eyebrow="Scala route"
-    title="Use the source library"
-    description="Run the current source tree, inspect its typed boundaries, and avoid promises the pre-release API does not make."
-    href="/scala/getting-started/"
+    eyebrow="Story model"
+    title="See what the model records"
+    description="Follow a sentence into its evidence, contexts, events, states, and relations."
+    href="/method/model-a-story/"
     accent="coral"
   />
   <RouteCard
-    eyebrow="Public, separate"
-    title="Contribute safely"
-    description="Bring a claim, its evidence, and a failure-sensitive check. Learn the public contribution shape without the internal audit trail."
-    href="/collaborate/"
+    eyebrow="Scala basics"
+    title="Inspect a source document"
+    description="Create a source atlas and read its sentences, tokens, and exact text spans."
+    href="/scala/getting-started/"
     accent="gold"
   />
 </div>
 
-<div class="principle-strip">
-  <p>A story model should make uncertainty easier to inspect, not easier to hide.</p>
-  <small>The project in one sentence</small>
-</div>
+## One sentence, two records
 
-## What it does, in one sentence of one story
+*The War of the Ghosts* contains this sentence:
 
-*The War of the Ghosts* contains the line:
+> One of the young men said: “I have no arrows.”
 
-> I have no arrows.
+The story fixture creates two records from it:
 
-A young man says it. From that single sentence the fixture records **two different things**, and
-refuses to merge them:
-
-| Record | Context | Predicate | What it asserts |
+| Record | Context | Predicate | Meaning |
 | --- | --- | --- | --- |
-| `ym1-says-no-arrows` | `world` | `say` | one young man **says** he has no arrows |
-| `lack-arrows` | `speechYm1a` | `have` | he has no arrows |
+| `ym1-says-no-arrows` | narrated world | `say` | a young man says that he has no arrows |
+| `lack-arrows` | the young man's speech | `have`, negative | the young man has no arrows |
 
-The *saying* happened in the narrated world. Whether he actually **has** no arrows is asserted only
-inside his speech, so it lives in the speech context and not in the world. Both records cite
-sentence 13, and you can follow either one back to it.
+The first record describes an act that occurs in the story: the young man speaks. The second records
+the content of his speech. Both records cite the same sentence, numbered 14 for a reader and 13 by
+the fixture's zero-based index.
 
-That distinction is the library. Someone recalling this story may report "he had no arrows" as a
-plain fact — and that is a real, measurable recall phenomenon, not a parsing error to be corrected
-away. A flat list of events cannot tell the two apart, so it cannot notice when a recall promotes
-one into the other.
+This matters when a person recalls the story. A recall such as “He had no arrows” presents the
+reported claim as a fact of the story. Because the story model records the two contexts separately,
+an analysis can identify that change.
 
 <Evidence
   status="Confirmed"
-  source="WarOfTheGhostsModel.scala — both records at span 13, contexts world and speechYm1a"
+  source="WarOfTheGhostsModel.scala — two records supported by the same sentence"
   href={sourceLink('fixtures/src/main/scala/storymodel4s/fixtures/wog/WarOfTheGhostsModel.scala')}
  />
 
-## What exists now
+## A complete comparison
 
-storymodel4s is a Scala 3 source library for representing written stories, recalls of those
-stories, and partial mappings between the two. Its central move is to keep surface evidence,
-narrative structure, recall structure, and uncertainty separate enough that a reader can ask how
-each conclusion was made.
+The public example starts with the reviewed story model and this recall:
+
+> One of the men with him got hit by an arrow and they lifted him into the boat.
+
+It divides the recall into two units, generates 86 candidate matches, runs `GraphHsmm`, and computes
+a `RecallSignature`. The free lexical baseline assigns 46.08% source mass to the first unit and
+2.09% to the second. It assigns the remaining mass to named external states. Importance-weighted
+coverage is unavailable because the run has no conditioning weight for that estimate.
+
+Those are real results from the checked-in program. They also show the limit of word overlap: the
+recall is a faithful paraphrase, while the lexical baseline treats most of it as external material.
+The guide prints the complete program and output and explains each result.
+
+[Run and interpret the comparison →](/method/align-and-interpret/)
+
+## What the source library provides
+
+The current repository provides public Scala APIs for:
+
+- indexing source and recall text by sentence, token, and exact span;
+- representing claims, propositions, entities, situations, contexts, event order, and causal links;
+- representing recall units and their order;
+- aligning recall units with source nodes and named external states;
+- computing research summaries together with their support and missingness;
+- scoring the Autobiographical Interview;
+- generating deterministic embedding features and authorizing sanitized remote requests; and
+- saving canonical JSON and compiling renderer-neutral views.
+
+The code is pre-release and currently runs from a source checkout. The reviewed story fixture is
+hand-authored. Automatic construction of a complete story model from arbitrary prose remains
+programme work.
 
 <Evidence
   status="Confirmed"
@@ -92,31 +112,14 @@ each conclusion was made.
   href={sourceLink('README.md')}
  />
 
-The current repository includes typed narrative and recall models, alignment machinery, a
-researcher-reviewed acceptance fixture, deterministic lexical embedding baselines, and JVM-only
-structural and local ONNX adapters. Embeddings remain feature views: they can retrieve or compare;
-they do not become narrative claims.
+## Where to go next
 
-## What does not exist yet
-
-There is no released library artifact, and APIs may change without notice. A raw story does not yet
-flow unattended into a complete accepted model. The main story fixture is hand-authored, and a
-local encoder's existence is not evidence that it improves recall alignment.
-
-<Evidence
-  status="Intent"
-  source="README.md maturity boundary and ADR 0005"
-  href={sourceLink('README.md')}
- />
-
-That boundary is not fine print. It determines the path through this guide: first understand one
-thing the current representation demonstrably preserves, then learn the concepts, and only then
-inspect the Scala surface.
-
-## Begin with a difficult distinction
-
-In *The War of the Ghosts*, a wound is reported in speech, the wounded state remains a hypothesis,
-and a conflicting bodily state is explicitly negated in the narrated world. A flat event list can
-silently promote the report to fact. The fixture is designed to make that mistake visible.
-
-[Inspect the example →](/method/one-honest-success/)
+- [Model a story](/method/model-a-story/) shows the contents of the reviewed story fixture.
+- [Represent a recall](/method/represent-recall/) turns a transcript into checked recall units.
+- [Align and interpret a recall](/method/align-and-interpret/) runs the main comparison.
+- [Summarize a recall](/method/summarize-recall/) explains each estimate beside its support.
+- [Score an interview](/method/score-interview/) runs the synthetic Birthday Interview fixture.
+- [Inspect a source document](/scala/getting-started/) explains the text index used by every later layer.
+- [Generate embedding features](/scala/use-embeddings/) covers local baselines and remote policy.
+- [Save and verify a model](/scala/save-and-deliver/) covers canonical JSON and checksums.
+- [Evidence and maturity](/method/evidence/) states what the current source establishes and what still needs evidence.

@@ -1,6 +1,6 @@
 ---
-title: Core concepts
-description: The conceptual distinctions storymodel4s keeps separate by construction.
+title: How the model is organized
+description: How storymodel4s records evidence, contexts, time, alignment, fidelity, support, and numerical features.
 sidebar:
   order: 3
 ---
@@ -8,25 +8,25 @@ sidebar:
 import Evidence from '../../../components/Evidence.astro';
 import { sourceLink } from '../../../lib/provenance';
 
-The library's value lies less in a list of types than in the distinctions those types refuse to
-collapse.
+storymodel4s records a story, a recall, and a proposed mapping between them. Its data model gives
+separate fields to facts that researchers may need to compare independently.
 
 ## Surface evidence is the anchor
 
-Source and transcript text live on explicit surface axes. Claims cite exact span sets; an inference
-cites upstream claims. Evidence is not a comment attached after the model is built—it is part of
-the accepted claim.
+Source and transcript text have stable character offsets. An explicit claim cites the exact source
+spans that support it. An inferred claim cites the claims from which it was derived. A researcher
+can therefore trace a result back through the model to the text.
 
-Offsets are UTF-16 because they must round-trip with common text and browser systems. Surface time
-or position is not assumed to be story-world time.
+Offsets use UTF-16 so they agree with common text and browser APIs.
 
-## A context is not optional metadata
+## Context records who presents a claim
 
-Every situation lives in a context. The root is a **NarratedWorld**, not an assertion about
-objective reality. Speech, belief, intention, and nested reports stay within their own frames
-unless evidence licenses a relationship to the root.
+Every situation names a context. `NarratedWorld` holds the narrator's account. `Speech`, `Belief`,
+and `Intention` frames hold content attributed to a speaker, believer, or agent.
 
-This is what prevents “the warriors said he was shot” from silently becoming “he was shot.”
+For example, the sentence “the warriors said he was shot” creates a speaking event in
+`NarratedWorld` and an injury claim in a `Speech` frame. The model records the report without
+treating the quoted injury as a separate claim by the narrator.
 
 <Evidence
   status="Confirmed"
@@ -34,34 +34,33 @@ This is what prevents “the warriors said he was shot” from silently becoming
   href={sourceLink('story/src/main/scala/storymodel4s/story/nodes.scala')}
  />
 
-## Three clocks remain three clocks
+## The model records three orders
 
 - **Discourse order**: where content appears in the telling.
 - **Story-world time**: when represented events occur.
 - **Recall time**: the order in which a person produces recall units.
 
-A retelling can mention an earlier event after a later one. A recall can jump backward or revisit a
-scene. Collapsing these axes makes genuine reorderings disappear.
+A story may describe events out of chronological order. A person may also jump backward while
+recalling it. Separate coordinates let an analysis measure either kind of reordering.
 
-## Partial alignment includes elsewhere
+## A recall can point to the story or beyond it
 
-A recall need not map neatly onto one source event. It may omit, merge, split, reorder, elaborate,
-or add content. Alignment therefore distributes mass over source nodes **and explicit external
-states** such as association or task commentary. External mass is a modeled destination, not error
-residue.
+For each recall unit, the aligner distributes probability mass over source nodes and named external
+categories such as association or task commentary. This representation covers omissions, merged
+events, split events, reordering, elaboration, and added material. The output reports external mass
+by category.
 
-## Fidelity is faceted
+## Fidelity has several parts
 
-An event can be recalled while one aspect is wrong. Actor, object, action, location, context,
-polarity, modality, and role structure can be assessed separately. A role-reversed recall should
-still anchor to the event it distorts; it should not be counted as faithful or discarded as a pure
-intrusion.
+Alignment and fidelity answer different questions. A recall can point to the correct event while
+giving the wrong actor or reversing two roles. The model assesses actor, object, action, location,
+context, polarity, modality, and role structure separately, while retaining the event anchor.
 
-## Missing support stays missing
+## Every estimate reports its support
 
-Coverage travels with estimates. Missing evidence does not silently become zero, one, or a neutral
-constant, and downstream normalization must not redistribute unsupported mass without naming a
-different estimand.
+Conditional estimates carry their supporting mass or numerator and denominator. When an estimate
+has no supported cases, the result is `Missing` and the rendered output says `n/a`. A zero remains
+available for cases where the measured value really is zero.
 
 <Evidence
   status="Confirmed"
@@ -69,12 +68,12 @@ different estimand.
   href={sourceLink('docs/adr/0003-estimand-support-contract.md')}
  />
 
-## Embeddings nominate; they do not decide
+## Embeddings provide candidate features
 
 The portable embedding contract includes deterministic hashed n-gram and TF-IDF baselines. A local
 ONNX sentence-encoder adapter and a structural graph-kernel adapter also exist in JVM-only modules.
-All of them are feature views. No vector participates in model identity, equality, graph structure,
-or claim acceptance.
+These vectors supply feature views for candidate generation and declared costs. Content hashes,
+typed graph records, evidence, and validation rules determine model identity and accepted claims.
 
 <Evidence
   status="Confirmed"
@@ -82,8 +81,7 @@ or claim acceptance.
   href={sourceLink('embed-core/src/main/scala/storymodel4s/embed/contract.scala')}
  />
 
-No public result currently establishes a calibrated production embedding default or a general
-accuracy gain from the local encoder.
+Calibration and production-default selection remain future evaluation work.
 
 <Evidence
   status="Intent"

@@ -1,0 +1,122 @@
+---
+title: Score an Autobiographical Interview
+description: Run the synthetic Birthday Interview through detail extraction, memory addressing, traditional counts, placement resolution, and the multidimensional profile.
+sidebar:
+  order: 1
+---
+
+import InterviewScoreFigure from '../../../components/InterviewScoreFigure.astro';
+import Evidence from '../../../components/Evidence.astro';
+import { sourceLink } from '../../../lib/provenance';
+import { readFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import { resolve } from 'node:path';
+
+export const programPath = 'docs-site/examples/ScoreInterview.scala';
+export const outputPath = 'docs-site/examples/score-interview.output.txt';
+export const PROGRAM_SHA = '334f2f471bb9ab9c4b0769d915d86139b26c6f53475705d24841980f27dd7331';
+export const OUTPUT_SHA = '4399b05090dfff9774341b123880a47a631874618f566768e3eed558d38a276d';
+export const PRODUCER_REVISION = '1cb64bd39f097c32233a52ff6e167f9f93d9d127';
+export const program = readFileSync(resolve(process.cwd(), 'examples/ScoreInterview.scala'), 'utf8');
+export const output = readFileSync(resolve(process.cwd(), 'examples/score-interview.output.txt'), 'utf8');
+export const programSha = createHash('sha256').update(program).digest('hex');
+export const outputSha = createHash('sha256').update(output).digest('hex');
+
+export const _bindFiles = (() => {
+  if (programSha !== PROGRAM_SHA)
+    throw new Error(`program digest ${programSha} does not match the published ${PROGRAM_SHA}`);
+  if (outputSha !== OUTPUT_SHA)
+    throw new Error(`output digest ${outputSha} does not match the published ${OUTPUT_SHA}`);
+  return true;
+})();
+
+The Autobiographical Interview asks a person to describe a specific event. storymodel4s represents
+the transcript as recall units and detail atoms, assigns each detail a probability distribution over
+memory addresses, and derives two reader-facing results:
+
+- traditional internal and external category counts; and
+- a profile of event purity, density, perceptual content, probe gain, and related measures.
+
+The public `BirthdayInterview` fixture is synthetic. Its participant recalls a fortieth-birthday
+dinner, a rainy evening, a habitual family practice, a previous trip, and a cake brought out by a
+waiter. The fixture also includes general and specific probes.
+
+## Run the program
+
+Save this file as `fixtures/src/main/scala/docsprobe/ScoreInterview.scala`:
+
+<pre><code class="language-scala">{program}</code></pre>
+
+Run it with:
+
+```sh
+sbt -Dstorymodel4s.grakern.build=/absolute/path/to/pinned-grakern \
+  "fixturesJVM/runMain docsprobe.scoreInterview"
+```
+
+<Evidence
+  status="Confirmed"
+  source={`docs-site/examples/ScoreInterview.scala — executed against storymodel4s ${PRODUCER_REVISION}; full SHA-256 ${programSha}`}
+  href={sourceLink(programPath)}
+ />
+
+## Output
+
+<pre><code>{output}</code></pre>
+
+The exact program above produced this output against storymodel4s revision `{PRODUCER_REVISION}` on
+Homebrew Java 25.0.1. The documentation build checks the SHA-256 digest of both files. The fixture's
+focused suite also passed 20 tests in the independent receipt that supplied this workflow.
+
+<Evidence
+  status="Confirmed"
+  source="BirthdayInterviewSuite — detail routing, score, interval, support, phase, and determinism checks"
+  href={sourceLink('fixtures/src/test/scala/storymodel4s/fixtures/interview/BirthdayInterviewSuite.scala')}
+ />
+
+## Counts, resolution, and profile
+
+<InterviewScoreFigure />
+
+The model contains 18 participant recall units, 49 details, and 49 assessments.
+
+### Traditional categories
+
+Each category row contains three values:
+
+- `point` is the expected fractional count under the address distribution;
+- the interval's lower bound counts details whose modal address belongs to the category;
+- the interval's upper bound counts details that assign any positive mass to the category; and
+- `hard` is the rounded whole-number count under the standard policy.
+
+The address masses in this fixture are uncalibrated. These intervals bound model-routed expected
+counts; they are not statistical confidence or credible intervals.
+
+### Two kinds of coverage
+
+Observed coverage is `49/49`: every detail has an observed count mass. Placement resolution answers
+a different question. The model resolved `0.6876` of the placement mass and left `0.3124` unresolved.
+It excluded no mass under the scoring policy used here.
+
+The conditional internal ratio is approximately `0.4898`. The resolved fraction clears the policy's
+`0.50` threshold, so the ratio is available. Unresolved mass enters neither the internal numerator
+nor the external denominator.
+
+### The richer profile
+
+Event purity is `0.8750`, and probe gain is `0.4286`. Episodic density is reported per participant
+word and per second. The target-supported perceptual profile contains visual and olfactory detail.
+The mental-state profile is empty. The fixture records embarrassment as a detail, but its placement
+remains unresolved and therefore supplies no target-supported mental channel.
+
+## Scope of the fixture
+
+`BirthdayInterview.model` is a deterministic demonstration entry point. The current induction rules
+operate on this synthetic transcript and use uncalibrated scores. The result characterizes the event
+implied by the account; it establishes no historical truth or genuine re-experiencing.
+
+<Evidence
+  status="Confirmed"
+  source="BirthdayInterview public fixture and scoring contracts"
+  href={sourceLink('fixtures/src/main/scala/storymodel4s/fixtures/interview/BirthdayInterview.scala')}
+ />

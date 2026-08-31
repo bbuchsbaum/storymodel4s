@@ -55,7 +55,9 @@ function build(env = {}) {
 const read = () => readFileSync(indexHtml, "utf8");
 const links = (h) =>
   new Set(h.match(/storymodel4s\/(?:tree|blob)\/[0-9a-f]{8}/g) ?? []).size;
-const claims = (h) => (h.match(/Directly inspectable/g) ?? []).length;
+const claims = (h) =>
+  (h.match(/The cited revision contains the supporting source or receipt\./g) ?? [])
+    .length;
 const unverified = (h) => h.includes("no source revision");
 
 // Refuse to run against a tree that is already dirty: the clean-tree assertions below

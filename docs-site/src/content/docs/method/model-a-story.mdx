@@ -1,0 +1,105 @@
+---
+title: Model a story
+description: Inspect the text, situations, contexts, relations, and claims in the reviewed War of the Ghosts model.
+sidebar:
+  order: 2
+---
+
+import Evidence from '../../../components/Evidence.astro';
+import StoryContextFigure from '../../../components/StoryContextFigure.astro';
+import { sourceLink } from '../../../lib/provenance';
+import { readFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import { resolve } from 'node:path';
+
+export const programPath = 'docs-site/examples/ModelAStory.scala';
+export const outputPath = 'docs-site/examples/model-a-story.output.txt';
+export const PROGRAM_SHA = 'fb72cb6eb6e16c6207d72abf9a7beb9967005dab15515f09194dc170df4fcabf';
+export const OUTPUT_SHA = 'c7e474e487d5cebf00ba3db0d288844e2e87f2fe88282c979348ae120d2b9b61';
+export const PRODUCER_REVISION = '1cb64bd39f097c32233a52ff6e167f9f93d9d127';
+
+export const program = readFileSync(resolve(process.cwd(), 'examples/ModelAStory.scala'), 'utf8');
+export const output = readFileSync(resolve(process.cwd(), 'examples/model-a-story.output.txt'), 'utf8');
+export const programSha = createHash('sha256').update(program).digest('hex');
+export const outputSha = createHash('sha256').update(output).digest('hex');
+
+export const _bindFiles = (() => {
+  if (programSha !== PROGRAM_SHA)
+    throw new Error(`program digest ${programSha} does not match the published ${PROGRAM_SHA}`);
+  if (outputSha !== OUTPUT_SHA)
+    throw new Error(`output digest ${outputSha} does not match the published ${OUTPUT_SHA}`);
+  return true;
+})();
+
+A `StoryModel` joins five parts of a story:
+
+| Field | What you can inspect |
+| --- | --- |
+| `source` | the canonical text, title, language, and checksums |
+| `atlas` | paragraphs, sentences, tokens, and exact spans |
+| `graph` | entities, situations, contexts, and typed relations |
+| `hierarchy` | the scenes and episodes that contain narrative nodes |
+| `trajectory` | the order in which the telling presents those nodes |
+
+The model also exposes its claims, feature references, descriptors, hypotheses, sensory profiles,
+and optional build receipt. This example reads the public *War of the Ghosts* fixture and prints a
+small part of it.
+
+## Run the program
+
+Save the following file as `fixtures/src/main/scala/docsprobe/ModelAStory.scala` in a source checkout.
+
+<pre><code class="language-scala">{program}</code></pre>
+
+Run it with the pinned local `grakern` source:
+
+```sh
+sbt -Dstorymodel4s.grakern.build=/absolute/path/to/pinned-grakern \
+  "fixturesJVM/runMain docsprobe.modelAStory"
+```
+
+<Evidence
+  status="Confirmed"
+  source={`docs-site/examples/ModelAStory.scala — full SHA-256 ${programSha}`}
+  href={sourceLink(programPath)}
+ />
+
+## What it prints
+
+<pre><code>{output}</code></pre>
+
+The program used only public APIs and ran against revision `{PRODUCER_REVISION}` on Homebrew Java
+25.0.1. The site checks the SHA-256 digest of both files at build time. The site does not execute the
+Scala program during its own build.
+
+<Evidence
+  status="Confirmed"
+  source={`Public-API run at producer revision ${PRODUCER_REVISION}; output SHA-256 ${outputSha}`}
+  href={sourceLink(outputPath)}
+ />
+
+## What was computed
+
+The fixture contains 50 sentences and 517 tokens. Its narrative graph contains 14 entities, 71
+situations, and 12 contexts. The relation counts come from the graph itself: 52 temporal links,
+9 causal links, and 3 goal links. `model.claims` gathers 462 claim records from the graph, hierarchy,
+trajectory, descriptors, and hypotheses.
+
+The last two records explain why contexts matter:
+
+<StoryContextFigure />
+
+1. `ym1-says-no-arrows` is a positive `say` event in `NarratedWorld`.
+2. `lack-arrows` is a negative `have` state in the young man's `Speech` context.
+
+Both records cite sentence 14: `One of the young men said: "I have no arrows."` The sentence supports
+the act of speaking and the content of the speech. The context field tells a program which claim the
+narrator presents directly and which claim belongs to the character's words.
+
+## What this example leaves open
+
+`WarOfTheGhostsModel.model` loads a researcher-reviewed fixture. It demonstrates the representation
+after modeling has taken place. Automatic construction of this complete model from raw prose is
+still under development.
+
+Next: [align a recall with this story →](/method/align-and-interpret/)

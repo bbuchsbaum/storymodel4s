@@ -18,7 +18,7 @@ question. In practice it hides several:
 - Was a statement asserted by the narrator, reported by a character, or merely believed?
 
 storymodel4s provides typed structures for keeping those questions apart. It is an experimental
-library, not a finished automatic scoring system.
+library for building and analyzing explicit story and recall models.
 
 ## The path through a model
 
@@ -32,8 +32,8 @@ library, not a finished automatic scoring system.
 5. **Derived summaries** describe coverage, fidelity facets, localizability, compression,
    chronology deformation, and intrusion mass—with support carried alongside results.
 
-This is not a funnel that turns uncertain input into one authoritative number. Each layer retains
-the information needed to challenge the next.
+Each stage preserves its evidence, alternatives, and support. A researcher can inspect how a later
+summary was obtained.
 
 <Evidence
   status="Confirmed"
@@ -41,16 +41,15 @@ the information needed to challenge the next.
   href={sourceLink('align/src/main/scala/storymodel4s/align/signature.scala')}
  />
 
-## What “neurosymbolic” means here
+## Structures and numerical features
 
-Symbolic structure carries the claims: typed propositions, narrative contexts, participant roles,
-temporal and causal relations, and explicit evidence. Numerical feature views may help nominate
-possible matches or contribute declared costs. They never define identity, graph structure, or
-truth.
+Typed records carry propositions, narrative contexts, participant roles, temporal and causal
+relations, and source evidence. Numerical features propose possible matches and contribute declared
+costs. Content hashes and typed records provide identity; validation and evidence support claims.
 
-That boundary matters because two passages can be close under a vector space while disagreeing on
-who did what, polarity, or context. The alignment model may still anchor a distorted recall to the
-right event, but it must not call the match faithful.
+Two passages can have similar vectors while assigning an action to different people or using
+opposite polarity. The aligner can connect such a recall to the relevant event and record the
+disagreement in its fidelity fields.
 
 <Evidence
   status="Confirmed"
@@ -60,13 +59,12 @@ right event, but it must not call the match faithful.
 
 ## Where the method stops today
 
-The repository validates and analyzes models once they exist. It also contains a deterministic
-compiler boundary for accepted proposal evidence. It does not yet supply the unattended providers
-that turn arbitrary raw prose into a complete accepted story model.
+Today the repository validates and analyzes story and recall models. It also compiles accepted
+proposal evidence through a deterministic interface. Providers for unattended construction of a
+complete model from arbitrary prose are still under development.
 
-The most complete story example is therefore a researcher-reviewed acceptance fixture. That makes
-it useful for testing hard representational distinctions; it does not make it evidence of automatic
-acquisition accuracy.
+The guides therefore begin with a researcher-reviewed *War of the Ghosts* fixture. It tests the
+representation after modeling. Automatic acquisition needs a separate evaluation.
 
 <Evidence
   status="Intent"
@@ -76,7 +74,6 @@ acquisition accuracy.
 
 ## Next
 
-Move from the architecture to one concrete success: preserving the difference between a report,
-a hypothesis, and a narrated-world fact.
+See how the fixture records a report, an unresolved hypothesis, and a narrated event.
 
-[Inspect one honest success →](/method/one-honest-success/)
+[Inspect a concrete modeling test →](/method/one-honest-success/)

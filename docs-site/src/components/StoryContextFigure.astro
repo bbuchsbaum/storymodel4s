@@ -1,0 +1,104 @@
+---
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+import { parseStoryContextOutput } from '../lib/story-context-data.mjs';
+
+const raw = readFileSync(resolve(process.cwd(), 'examples/model-a-story.output.txt'), 'utf8');
+const data = parseStoryContextOutput(raw);
+const { root, nested } = data;
+const title = `Sentence ${data.sentence}: one passage, two contexts`;
+const description =
+  `${data.evidence} supports a ${root.predicate} ${root.kind} in ${root.context.label} and ` +
+  `a ${nested.polarity.toLowerCase()} ${nested.predicate} ${nested.kind} in the nested ${nested.context.label} context.`;
+---
+
+<figure class="context-figure" data-example="model-a-story">
+  <svg viewBox="0 0 820 390" role="img" aria-labelledby="context-title context-desc">
+    <title id="context-title">{title}</title>
+    <desc id="context-desc">{description}</desc>
+
+    <text x="28" y="32" class="figure-title">{title}</text>
+    <rect x="28" y="54" width="764" height="58" rx="8" class="evidence-box" />
+    <text x="48" y="78" class="evidence-label">Evidence in the source</text>
+    <text x="48" y="99" class="evidence-text">{data.evidence}</text>
+
+    <path d="M220 112 V146 H207 V170" class="support-line" />
+    <path d="M600 112 V146 H613 V205" class="support-line" />
+    <text x="410" y="140" text-anchor="middle" class="link-label">supports both records</text>
+
+    <g
+      data-record={root.id}
+      data-context={root.context.id}
+      data-parent="none"
+      data-predicate={root.predicate}
+      data-polarity={root.polarity}
+    >
+      <rect x="54" y="170" width="306" height="142" rx="10" class="root-card" />
+      <text x="76" y="198" class="context-label">{root.context.label}</text>
+      <text x="76" y="224" class="record-label">{root.kind}: {root.predicate}</text>
+      <text x="76" y="248" class="record-detail">{root.polarity} · {root.modality}</text>
+      <text x="76" y="278" class="description">{root.description}</text>
+    </g>
+
+    <path d="M360 241 H425" class="parent-line" marker-end="url(#arrow)" />
+    <text x="392" y="229" text-anchor="middle" class="link-label">contains</text>
+
+    <g
+      data-record={nested.id}
+      data-context={nested.context.id}
+      data-parent={nested.context.parent}
+      data-predicate={nested.predicate}
+      data-polarity={nested.polarity}
+    >
+      <rect x="425" y="170" width="340" height="176" rx="10" class="nested-card" />
+      <text x="447" y="198" class="context-label">{nested.context.label}</text>
+      <text x="447" y="224" class="record-label">{nested.kind}: {nested.predicate}</text>
+      <text x="447" y="248" class="record-detail">{nested.polarity} · {nested.modality}</text>
+      <text x="447" y="278" class="description">{nested.description}</text>
+      <text x="447" y="318" class="context-id">parent: {nested.context.parent}</text>
+    </g>
+
+    <defs>
+      <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M 0 0 L 10 5 L 0 10 z" class="arrow-head" />
+      </marker>
+    </defs>
+  </svg>
+  <figcaption>
+    The sentence reports the act of speaking in the narrated world. The claim about having no
+    arrows belongs to the speaker's words. Both records retain the same source sentence as evidence.
+  </figcaption>
+</figure>
+
+<style>
+  .context-figure {
+    margin: 2rem 0;
+    padding: 1rem;
+    overflow-x: auto;
+    border: 1px solid var(--sl-color-gray-5);
+    border-radius: 0.75rem;
+    background: var(--sl-color-gray-7);
+  }
+
+  svg { display: block; width: 100%; min-width: 740px; height: auto; }
+  text { font-family: system-ui, sans-serif; }
+  .figure-title, .context-label { fill: var(--sl-color-white); font-weight: 700; }
+  .figure-title { font-size: 20px; }
+  .context-label { font-size: 16px; }
+  .evidence-label, .record-label { fill: var(--sl-color-gray-1); font-size: 13px; font-weight: 650; }
+  .evidence-text, .record-detail, .description, .context-id, .link-label {
+    fill: var(--sl-color-gray-2);
+    font-size: 12px;
+  }
+  .evidence-box { fill: var(--sl-color-gray-6); stroke: var(--sl-color-gray-4); }
+  .root-card { fill: color-mix(in srgb, #178f8b 18%, var(--sl-color-gray-7)); stroke: #178f8b; stroke-width: 2; }
+  .nested-card {
+    fill: color-mix(in srgb, #d56a4c 14%, var(--sl-color-gray-7));
+    stroke: #d56a4c;
+    stroke-width: 2;
+    stroke-dasharray: 7 4;
+  }
+  .support-line, .parent-line { fill: none; stroke: var(--sl-color-gray-3); stroke-width: 2; }
+  .arrow-head { fill: var(--sl-color-gray-3); }
+  figcaption { margin-top: 0.5rem; color: var(--sl-color-gray-2); font-size: 0.9rem; }
+</style>

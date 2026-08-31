@@ -1,0 +1,101 @@
+---
+title: Save and verify a story model
+description: Encode a story model as canonical JSON, verify its content checksum, revalidate after decoding, and inspect a rejected schema version.
+sidebar:
+  order: 2
+---
+
+import Evidence from '../../../components/Evidence.astro';
+import { sourceLink } from '../../../lib/provenance';
+import { readFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import { resolve } from 'node:path';
+
+export const programPath = 'docs-site/examples/SaveModel.scala';
+export const outputPath = 'docs-site/examples/save-model.output.txt';
+export const PROGRAM_SHA = '7526d4599c05e7afcdff74e784232e1bbc0cede04b478c646ca4b24483aa1bfa';
+export const OUTPUT_SHA = 'cc1f48b09b46f92eaf4b617837b4f343b84ad721cea0e2122048a54ac8217864';
+export const PRODUCER_REVISION = '1cb64bd39f097c32233a52ff6e167f9f93d9d127';
+export const program = readFileSync(resolve(process.cwd(), 'examples/SaveModel.scala'), 'utf8');
+export const output = readFileSync(resolve(process.cwd(), 'examples/save-model.output.txt'), 'utf8');
+export const programSha = createHash('sha256').update(program).digest('hex');
+export const outputSha = createHash('sha256').update(output).digest('hex');
+
+export const _bindFiles = (() => {
+  if (programSha !== PROGRAM_SHA)
+    throw new Error(`program digest ${programSha} does not match the published ${PROGRAM_SHA}`);
+  if (outputSha !== OUTPUT_SHA)
+    throw new Error(`output digest ${outputSha} does not match the published ${OUTPUT_SHA}`);
+  return true;
+})();
+
+`StoryModelCodec` writes a complete story model as canonical JSON. The same model always produces the
+same bytes and content checksum under one schema version. Decoding produces a draft, which the
+consumer validates before using APIs that require a validated model.
+
+## Run the program
+
+Save this file as `fixtures/src/main/scala/docsprobe/SaveModel.scala`:
+
+<pre><code class="language-scala">{program}</code></pre>
+
+Run it with:
+
+```sh
+sbt -Dstorymodel4s.grakern.build=/absolute/path/to/pinned-grakern \
+  "fixturesJVM/runMain docsprobe.saveModel"
+```
+
+<Evidence
+  status="Confirmed"
+  source={`docs-site/examples/SaveModel.scala — executed against storymodel4s ${PRODUCER_REVISION}; full SHA-256 ${programSha}`}
+  href={sourceLink(programPath)}
+ />
+
+## Output
+
+<pre><code>{output}</code></pre>
+
+The exact program above produced this output against storymodel4s revision `{PRODUCER_REVISION}` on
+Homebrew Java 25.0.1. The documentation build checks the SHA-256 digest of both files.
+
+The *War of the Ghosts* model occupies 430,246 UTF-8 bytes in canonical JSON at this revision. Its
+content checksum is the SHA-256 value printed above. The decoded draft passes `StoryValidator`, and
+encoding it again reproduces the same bytes and checksum.
+
+The final two lines show a failed decode. Changing `schemaVersion` from `0.1.0` to `99.0.0` produces
+a typed codec error that names the supported version.
+
+<Evidence
+  status="Confirmed"
+  source="StoryModelCodec round-trip, fixed-point, checksum, tamper, and schema tests"
+  href={sourceLink('codec/src/test/scala/storymodel4s/codec/StoryModelCodecSuite.scala')}
+ />
+
+## What the codec preserves
+
+The JSON contains the source, atlas, narrative graph, hierarchy, discourse trajectory, feature-space
+metadata, sidecar manifests, feature references, descriptors, hypotheses, sensory profiles, and
+optional build receipt. Vector payloads remain in sidecars.
+
+Validation status is a local type witness. It is omitted from the JSON. A receiver therefore decodes
+to `StoryModel[Draft]` and runs `StoryValidator` in its own environment.
+
+## Current delivery boundary
+
+The `view` module can compile a validated model into renderer-neutral `CodexFlow` and
+`NarrativeScene` values. HTML, SVG layout, and the interactive application belong to the separate,
+unpublished `storyatlas4s` project. This repository currently exposes no `CodexHtml` renderer and no
+filesystem-openable HTML bundle command.
+
+The canonical JSON above is therefore the complete portable delivery artifact available from
+storymodel4s today. A future bundle guide should show separate outcomes for model compilation,
+rendering, and file assembly after that public workflow exists.
+
+<Evidence
+  status="Confirmed"
+  source="README.md visualization seam and the current absence of an HTML renderer in the view module"
+  href={sourceLink('README.md')}
+ />
+
+[See the module map →](/scala/modules/)

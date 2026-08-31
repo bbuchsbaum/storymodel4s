@@ -24,16 +24,25 @@ export default defineConfig({
           label: 'Understand the method',
           items: [
             { label: 'Orientation', slug: 'method/orientation' },
-            { label: 'One honest success', slug: 'method/one-honest-success' },
+            { label: 'A concrete modeling test', slug: 'method/one-honest-success' },
+            { label: 'Model a story', slug: 'method/model-a-story' },
+            { label: 'Represent a recall', slug: 'method/represent-recall' },
             { label: 'Align and interpret a recall', slug: 'method/align-and-interpret' },
-            { label: 'Core concepts', slug: 'method/concepts' },
+            { label: 'Summarize a recall', slug: 'method/summarize-recall' },
+            { label: 'How the model is organized', slug: 'method/concepts' },
             { label: 'Evidence and maturity', slug: 'method/evidence' },
           ],
         },
         {
+          label: 'Autobiographical Interview',
+          items: [{ label: 'Score an interview', slug: 'method/score-interview' }],
+        },
+        {
           label: 'Use the Scala library',
           items: [
-            { label: 'Start from source', slug: 'scala/getting-started' },
+            { label: 'Inspect a source document', slug: 'scala/getting-started' },
+            { label: 'Generate embedding features', slug: 'scala/use-embeddings' },
+            { label: 'Save and verify a model', slug: 'scala/save-and-deliver' },
             { label: 'Module map', slug: 'scala/modules' },
           ],
         },

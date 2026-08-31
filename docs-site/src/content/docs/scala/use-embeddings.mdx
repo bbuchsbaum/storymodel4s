@@ -1,0 +1,118 @@
+---
+title: Generate embedding features
+description: Run a deterministic embedding batch, inspect per-item outcomes, and authorize a sanitized remote request under an explicit policy.
+sidebar:
+  order: 2
+---
+
+import Evidence from '../../../components/Evidence.astro';
+import { sourceLink } from '../../../lib/provenance';
+import { readFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import { resolve } from 'node:path';
+
+export const programPath = 'docs-site/examples/UseEmbeddings.scala';
+export const outputPath = 'docs-site/examples/use-embeddings.output.txt';
+export const PROGRAM_SHA = 'e0c3d9c182ea99eb4d7d6fcd2bbd5d86bf81849b7e0e6a84cc5c70d7bfe196be';
+export const OUTPUT_SHA = 'a0609f215741b12fe739a27d25e4b1049ed964caf464abf90bc1726fd61d647c';
+export const PRODUCER_REVISION = '1cb64bd39f097c32233a52ff6e167f9f93d9d127';
+export const program = readFileSync(resolve(process.cwd(), 'examples/UseEmbeddings.scala'), 'utf8');
+export const output = readFileSync(resolve(process.cwd(), 'examples/use-embeddings.output.txt'), 'utf8');
+export const programSha = createHash('sha256').update(program).digest('hex');
+export const outputSha = createHash('sha256').update(output).digest('hex');
+
+export const _bindFiles = (() => {
+  if (programSha !== PROGRAM_SHA)
+    throw new Error(`program digest ${programSha} does not match the published ${PROGRAM_SHA}`);
+  if (outputSha !== OUTPUT_SHA)
+    throw new Error(`output digest ${outputSha} does not match the published ${OUTPUT_SHA}`);
+  return true;
+})();
+
+The `embed-core` module supplies portable embedding contracts and two free local baselines. This
+example covers two jobs:
+
+1. create deterministic hashed n-gram vectors for public text; and
+2. check a sanitized request against a named remote-use policy.
+
+The policy check produces an authorization value. It performs no network call.
+
+## Run the program
+
+Save this file as `embed-core/src/main/scala/docsprobe/UseEmbeddings.scala`:
+
+<pre><code class="language-scala">{program}</code></pre>
+
+Run it with:
+
+```sh
+sbt "embedCoreJVM/runMain docsprobe.useEmbeddings"
+```
+
+<Evidence
+  status="Confirmed"
+  source={`docs-site/examples/UseEmbeddings.scala — executed against storymodel4s ${PRODUCER_REVISION}; full SHA-256 ${programSha}`}
+  href={sourceLink(programPath)}
+ />
+
+## Output
+
+<pre><code>{output}</code></pre>
+
+The exact program above produced this output against storymodel4s revision `{PRODUCER_REVISION}` on
+Homebrew Java 25.0.1. The documentation build checks the SHA-256 digest of both files.
+
+## Read the batch result
+
+`HashedNgramEmbedder` uses a fixed dimension and seed. Those settings appear in the provider and
+geometry identities. Repeating the batch with the same settings and text produces the same vector.
+
+The batch returns one `EmbedOutcome` per request. The story line produced a checked 32-dimensional
+unit vector. The blank line produced `Missing(OutOfVocabulary)`. The missing item remains in the
+batch result beside the successful item. The attempt receipt records one local provider call and a
+plain digest because both inputs were marked `Public`.
+
+This baseline represents character and word overlap. Its deterministic output makes it useful for
+tests and reproducible candidate generation. The example supplies no evidence that it improves
+alignment accuracy or should serve as a production semantic model.
+
+<Evidence
+  status="Confirmed"
+  source="HashedNgramEmbedder, EmbedBatch, per-item outcomes, and attempt receipts"
+  href={sourceLink('embed-core/src/main/scala/storymodel4s/embed/baselines.scala')}
+ />
+
+## Check a remote request
+
+The second half begins with source text containing a synthetic name. A closed whole-word detector
+certifies its span. `PseudonymizedText.checked` verifies the replacement and records a keyed digest.
+`RemotePolicy.evaluate` then checks the payload, provider, model, purpose, detector configuration,
+token budget, and validity window together.
+
+The output shows three decisions:
+
+- a raw sensitive payload is denied;
+- a sanitized payload submitted for an unlisted purpose is denied; and
+- the same sanitized payload is authorized for `candidate-retrieval` with a 12-token budget and an
+  expiry time of `61000`.
+
+The authorized request's public rendering replaces the payload with `<redacted>`. The capability
+carries a keyed payload digest, policy identity, provider and model identities, purpose, budget,
+expiry, and detector identity.
+
+`SensitiveKeyProvider.static` stores one key in memory and is intended for tests and examples.
+Production code supplies a store-local implementation backed by an appropriate secret store.
+
+<Evidence
+  status="Confirmed"
+  source="PseudonymizedText and RemotePolicy public construction paths"
+  href={sourceLink('embed-core/src/main/scala/storymodel4s/embed/privacy.scala')}
+ />
+
+## Provider adapters
+
+JVM-only modules add a local ONNX sentence encoder and a structural graph-kernel adapter. They use
+the same space, batch, outcome, distance, policy, cache, and receipt contracts. Provider evaluation
+and calibration remain separate work; this guide establishes API behavior only.
+
+[See the module map →](/scala/modules/)

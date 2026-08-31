@@ -1,0 +1,137 @@
+---
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+import { parseAlignmentRows } from '../lib/alignment-data.mjs';
+
+const raw = readFileSync(resolve(process.cwd(), 'examples/align-and-interpret.output.txt'), 'utf8');
+const rows = parseAlignmentRows(raw);
+const chartLeft = 150;
+const chartWidth = 560;
+const rowHeight = 86;
+const top = 76;
+const height = top + rows.length * rowHeight + 58;
+---
+
+<figure class="data-figure" data-example="align-and-interpret">
+  <svg
+    viewBox={`0 0 780 ${height}`}
+    role="img"
+    aria-labelledby="alignment-mass-title alignment-mass-desc"
+  >
+    <title id="alignment-mass-title">Source and external mass for each recall unit</title>
+    <desc id="alignment-mass-desc">
+      Unit 0 has 46.08 percent source mass and 53.92 percent external mass. Unit 1 has
+      2.09 percent source mass and 97.91 percent external mass.
+    </desc>
+
+    <text x="0" y="24" class="figure-title">Where each recall unit went</text>
+    <g aria-hidden="true">
+      <rect x="150" y="42" width="18" height="18" rx="3" class="source-swatch" />
+      <text x="176" y="56" class="legend-label">source</text>
+      <rect x="260" y="42" width="18" height="18" rx="3" class="external-swatch" />
+      <text x="286" y="56" class="legend-label">external</text>
+    </g>
+
+    {
+      rows.map((row, index) => {
+        const y = top + index * rowHeight;
+        const sourceWidth = row.source * chartWidth;
+        const externalWidth = row.external * chartWidth;
+        return (
+          <g
+            class="mass-row"
+            data-unit={row.unit}
+            data-source={row.source.toFixed(4)}
+            data-external={row.external.toFixed(4)}
+          >
+            <text x="0" y={y + 22} class="row-label">unit {row.unit}</text>
+            <rect x={chartLeft} y={y} width={chartWidth} height="30" rx="4" class="bar-background" />
+            <rect x={chartLeft} y={y} width={sourceWidth} height="30" rx="4" class="source-bar" />
+            <rect
+              x={chartLeft + sourceWidth}
+              y={y}
+              width={externalWidth}
+              height="30"
+              rx="4"
+              class="external-bar"
+            />
+            <text x={chartLeft} y={y + 52} class="value-label">
+              {(row.source * 100).toFixed(2)}% source · {(row.external * 100).toFixed(2)}% external
+            </text>
+            <text x={chartLeft} y={y + 70} class="anchor-label">MAP anchor: {row.anchor}</text>
+          </g>
+        );
+      })
+    }
+  </svg>
+  <figcaption>
+    Each bar accounts for the full posterior mass printed by the example. The second unit is almost
+    entirely external under the free lexical baseline.
+  </figcaption>
+</figure>
+
+<style>
+  .data-figure {
+    margin: 2rem 0;
+    padding: 1rem;
+    overflow-x: auto;
+    border: 1px solid var(--sl-color-gray-5);
+    border-radius: 0.75rem;
+    background: var(--sl-color-gray-7);
+  }
+
+  svg {
+    display: block;
+    width: 100%;
+    min-width: 720px;
+    height: auto;
+  }
+
+  .figure-title {
+    fill: var(--sl-color-white);
+    font: 700 20px system-ui, sans-serif;
+  }
+
+  .legend-label,
+  .row-label,
+  .value-label,
+  .anchor-label {
+    fill: var(--sl-color-gray-2);
+    font-family: system-ui, sans-serif;
+  }
+
+  .row-label {
+    font-size: 16px;
+    font-weight: 700;
+  }
+
+  .value-label {
+    font-size: 14px;
+    font-weight: 650;
+  }
+
+  .anchor-label,
+  .legend-label {
+    font-size: 12px;
+  }
+
+  .bar-background {
+    fill: var(--sl-color-gray-5);
+  }
+
+  .source-bar,
+  .source-swatch {
+    fill: #178f8b;
+  }
+
+  .external-bar,
+  .external-swatch {
+    fill: #d56a4c;
+  }
+
+  figcaption {
+    margin-top: 0.5rem;
+    color: var(--sl-color-gray-2);
+    font-size: 0.9rem;
+  }
+</style>

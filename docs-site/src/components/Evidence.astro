@@ -19,9 +19,9 @@ const { status, source, href } = Astro.props;
 const effectiveStatus = status === 'Confirmed' && !sourceVerified ? 'Qualified' : status;
 
 const descriptions = {
-  Confirmed: 'Directly inspectable at the cited source revision.',
-  Qualified: 'Observed with stated limits; not independently verified for publication.',
-  Intent: 'A design direction or unfinished capability, not a present result.',
+  Confirmed: 'The cited revision contains the supporting source or receipt.',
+  Qualified: 'Observed under the limits stated here; publication verification remains outstanding.',
+  Intent: 'Planned or under development.',
 };
 
 const downgraded = effectiveStatus !== status;

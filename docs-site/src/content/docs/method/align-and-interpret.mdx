@@ -1,10 +1,11 @@
 ---
 title: Align and interpret a recall
-description: A complete public-API program that maps a recall onto a story model, its exact archived output, and a straight reading of numbers that came out badly.
+description: Run a public-API program that compares a recall with a story model, then read its posterior mass and support-aware summary.
 sidebar:
   order: 3
 ---
 
+import AlignmentMassFigure from '../../../components/AlignmentMassFigure.astro';
 import Evidence from '../../../components/Evidence.astro';
 import { sourceLink } from '../../../lib/provenance';
 import { readFileSync } from 'node:fs';
@@ -13,16 +14,6 @@ import { resolve } from 'node:path';
 
 export const programPath = 'docs-site/examples/PublicAlignAndInterpret.scala';
 export const outputPath = 'docs-site/examples/align-and-interpret.output.txt';
-
-{/*
-  Read and hash at BUILD time, and ASSERT both digests against values published on the
-  board by the actor who ran the program. An earlier version hashed only the program.
-  codex-storymodel-collab broke it in a disposable clone by editing "story situations: 71"
-  to 999 in the output file and committing: the build succeeded and the page rendered 999
-  under "Captured from that program, that run" with the program hash unchanged. Hashing
-  the program and reading the output are two separate custody checks and neither one binds
-  the pair. These throws are the binding: edit either file and the build stops.
-*/}
 export const PROGRAM_SHA = 'a32a547465c5ff35dca0c02a9a614a8d36594f90188fd0de4e37c38461b0c962';
 export const OUTPUT_SHA = '5fcb58008a3076d1d4a0812e29b53b519ed047bda8de4e8fd4ab1244f3d6e0bf';
 export const PRODUCER_REVISION = 'daefa36735a35e21c77675ff85ea0f981bc7b031';
@@ -32,7 +23,7 @@ export const output = readFileSync(resolve(process.cwd(), 'examples/align-and-in
 export const programSha = createHash('sha256').update(program).digest('hex');
 export const outputSha = createHash('sha256').update(output).digest('hex');
 
-export const _bindProgram = (() => {
+export const _bindFiles = (() => {
   if (programSha !== PROGRAM_SHA)
     throw new Error(`program digest ${programSha} does not match the published ${PROGRAM_SHA}`);
   if (outputSha !== OUTPUT_SHA)
@@ -40,30 +31,32 @@ export const _bindProgram = (() => {
   return true;
 })();
 
-The previous page shows what the representation **preserves**. This one shows the
-machinery **running**: a complete program that takes a recall transcript, aligns it
-against an already-built story model, and computes a recall signature.
+This example compares a recall with the reviewed *War of the Ghosts* story model. It performs five
+steps:
 
-It imports nothing but public `storymodel4s` API — no test sources, no copied internal
-helpers, no demonstration facade written to make the page work. That constraint was the
-measurement. Before this guide existed we did not know whether an ordinary consumer
-*could* drive the library end to end, and the honest way to find out was to try and let
-it fail. It did not fail, so nothing was added to the library to make this page possible.
+1. load the story model;
+2. divide the recall transcript into recall units;
+3. generate sparse candidate matches with lexical Jaccard distance;
+4. infer an alignment with `GraphHsmm`; and
+5. summarize the alignment with `RecallSignature`.
 
-## The program
+The program imports public `storymodel4s` APIs. It uses no test helpers or copied internal code.
+
+## Run the program
+
+Save this file as `fixtures/src/main/scala/docsprobe/PublicAlignAndInterpret.scala`:
 
 <pre><code class="language-scala">{program}</code></pre>
 
-To run it, place it in a source set that can see the fixtures — `fixtures/src/main/scala/docsprobe/` —
-and then:
+Then run:
 
-```
-sbt "fixturesJVM/runMain docsprobe.alignAndInterpret"
+```sh
+sbt -Dstorymodel4s.grakern.build=/absolute/path/to/pinned-grakern \
+  "fixturesJVM/runMain docsprobe.alignAndInterpret"
 ```
 
-It does **not** run from `docs-site/examples/`, which is outside every sbt source set.
-That directory is where the documentation keeps the exact bytes it displays, not a
-runnable location.
+The copy under `docs-site/examples/` supplies the exact bytes shown on this page. That directory is
+outside the sbt source sets, so the command uses the copy you place under `fixtures/src/main/scala`.
 
 <Evidence
   status="Confirmed"
@@ -71,100 +64,88 @@ runnable location.
   href={sourceLink(programPath)}
  />
 
-## What it printed
+## Output from the recorded run
 
 <pre><code>{output}</code></pre>
 
-This output is an **archived observation**, not something re-run when you load this page.
-It was produced by `codex-storymodel-collab` against exported main
-`daefa36735a35e21c77675ff85ea0f981bc7b031`, on a single JVM (Homebrew Java 25.0.1), with
-`fixturesJVM/compile` and `fixturesJVM/runMain docsprobe.alignAndInterpret` both exiting 0.
-
-The page asserts at build time that the program file hashes to the published
-`a32a5474…` and this output file to the published `5fcb5800…`; either mismatch stops the
-build. That binds the *files* to digests a second actor published before this page
-existed. It does not re-execute the program, so it is not a run receipt, and this block is
-Qualified rather than Confirmed for exactly that reason.
+`codex-storymodel-collab` recorded this output against exported revision `{PRODUCER_REVISION}` on
+Homebrew Java 25.0.1. Both the compile and run commands exited successfully. The site checks the
+SHA-256 digest of the program and output during every build. It displays an archived result; it does
+not execute the Scala program itself.
 
 <Evidence
   status="Qualified"
-  source={`Archived run by codex-storymodel-collab at producer revision ${PRODUCER_REVISION}; output SHA-256 ${outputSha}. Digest-bound, not re-executed at build time. NO HOSTED PRODUCER LINK EXISTS: that revision is not published to the remote, so any URL naming it would 404. The full revision is given here so it can be checked in a local clone. The link below is the archived output file, not the producer.`}
+  source={`Archived run at producer revision ${PRODUCER_REVISION}; output SHA-256 ${outputSha}. The producer revision is not available on the hosted remote.`}
   href={sourceLink(outputPath)}
  />
 
-## Reading it straight
+## Where each recall unit went
 
-**The structure is loaded, not discovered.** 71 situations and 84 alignable nodes come
-from the hand-authored *War of the Ghosts* model, which the program builds before it
-aligns anything. The run does not recover that structure from text and nothing here
-should be read as evidence that it could.
+<AlignmentMassFigure />
 
-What the run actually does is map 2 recall units onto that structure, from 86 surviving
-sparse candidates. Both units get a MAP anchor: unit 0 on `ym1-says-no-arrows`, unit 1 on
-the canoe's arrival.
+The program found two recall units and retained 86 sparse candidates. Each posterior row divides its
+mass between source nodes and external states.
 
-**The mass is where the result lives.**
+| Recall unit | Highest-probability source node | Source mass | External mass |
+| --- | --- | ---: | ---: |
+| 0 | `ym1-says-no-arrows` | 0.4608 | 0.5392 |
+| 1 | `sc1c-canoe-arrives` | 0.0209 | 0.9791 |
 
-| | unit 0 | unit 1 |
-| --- | --- | --- |
-| source mass | 0.4608 | 0.0209 |
-| external mass | 0.5392 | 0.9791 |
+The displayed node is the most probable source node within the row. External states carry more total
+mass for both units. Unit 1 is especially clear: the model assigns 97.91% of its mass outside the
+source.
 
-Unit 1 is 98% external — the model attributes almost none of it to anything in the
-source. Under `lexicalJaccard`, a bag-of-words distance with no synonymy, that is the
-*expected* behaviour for a paraphrase that says the same thing in different words. Expected
-is not the same as correct: this is a semantically faithful paraphrase, so a mostly-external
-verdict is the baseline's limitation showing, not a property of the recall.
+The input recall is a faithful paraphrase. Lexical Jaccard compares word overlap and has no synonym
+model, so it performs poorly here. This run establishes that the public workflow executes and shows
+how the result is represented. It provides no evidence of calibrated alignment accuracy.
 
-**`uniform coverage: 0.0067` is a saturating mean, not a tally.** `leafVisitation`
-(`signature.scala:625`) walks each recall unit's anchor mass, splits it evenly among the
-leaves beneath each anchor, and then reports each leaf as `1 - exp(-a)` where `a` is the
-mass that reached it. `uniformCoverage` is the mean of that over **all 71 leaves**.
+## Read the summary with its support
 
-Two consequences worth holding onto. The `1 - exp(-·)` **saturates**: a leaf visited
-heavily approaches 1 rather than accumulating without bound, so the estimand asks roughly
-*how much of the story got touched at all*, not *how much mass was spent*. And because it
-averages over every leaf, a 2-unit recall against a 71-leaf story is small by
-construction.
+`RecallSignature.compute` produces several estimates from the posterior.
 
-**We are not going to tell you what the ceiling was.** An earlier version of this page
-reconstructed the figure as total source mass over leaf count — `0.4817 / 71` — and called
-the shortfall "roughly a quarter of attainable". That was wrong twice: the estimand is
-nonlinear, so the division is not the formula, and the division yields `0.0068` where the
-program printed `0.0067`, which should have been the tell. The exact ceiling depends on
-the full posterior over leaves, and the full posterior is not in this console output.
+### Uniform coverage
 
-So the honest statement is the narrow one: this is a poor alignment on a short recall, and
-the console fields on this page are not sufficient to say how poor. Reconstructing an
-estimand from rounded printed numbers is how you get a confident sentence that no longer
-matches the program.
+The result is `0.0067`. For each story situation, the implementation accumulates the posterior mass
+that reaches it and applies `1 - exp(-mass)`. It then averages those 71 values. A short recall that
+reaches few situations therefore produces a small value.
 
-## The line worth the whole page
+The console output rounds each row total and omits the posterior for individual leaves. Recomputing
+the exact coverage value requires the original result object.
 
-```
-importance-weighted coverage: n/a (conditioning weight 0.0000; coverage 0/71)
+<Evidence
+  status="Confirmed"
+  source="RecallSignature leaf visitation and uniform coverage implementation"
+  href={sourceLink('align/src/main/scala/storymodel4s/align/signature.scala')}
+ />
+
+### Importance-weighted coverage
+
+The program prints:
+
+```text
+n/a (conditioning weight 0.0000; coverage 0/71)
 ```
 
-The library was asked for a number it could not support, declined, and printed the
-conditioning mass that made it decline, so you can check the refusal rather than take it
-on faith.
+The fixture supplies no importance weights for the 71 situations. `RecallSignature` returns an
+unavailable estimate and reports the missing conditioning weight. A numeric zero would mean that
+the estimate was supported and its measured value was zero; this run supports no such measurement.
 
-A system built to look good returns `0.0` there. That would be a *number*: it sits in a
-table, it averages with other numbers, and it is false, because zero coverage and
-unmeasurable coverage are different findings and the second one is what happened.
+### Specificity and compression
 
-`specificity: 0.1747 (support 0.2409 = 0.4817/2.0000)` shows the same discipline in its
-other mode. The value is published *with* the mass conditioning it, so a reader can see it
-rests on about a quarter of the available support and weigh it accordingly, instead of
-receiving `0.1747` as though it were solid.
+Specificity is `0.1747` and compression is `0.0714`. Each value carries support of `0.2409`, computed
+from `0.4817` source mass over two recall units. The support tells a reader how much of the recall
+contributed to each estimate.
 
-## What this does not show
+### External mass
 
-This is one of six workflows the documentation owes you, and the guide is still missing an
-accessible static figure. It does not cover typed acquisition, autobiographical-interview
-scoring, canonical persistence, or the output bundle. It uses the hand-authored *War of the
-Ghosts* fixture, not arbitrary prose — the library does not yet turn a raw story into a
-complete model unattended, and no page here should imply otherwise.
+The result attributes `0.7591` of the posterior to external content. All ranked external mass was
+classified; the output reports `unranked=0.0000` and `ranked=1.0000`.
 
-Previous: [One honest success](/method/one-honest-success/) — what the representation
-preserves, before any machinery runs.
+## Scope of this result
+
+The story structure comes from the hand-authored acceptance fixture. The run uses a deterministic,
+dependency-free lexical baseline. A semantic encoder would require its own identity, receipt, and
+quality evidence. The producer used one JVM and Java 25.0.1, so this archived run establishes no
+Scala.js, Scala Native, JDK 17, or JDK 21 result.
+
+Previous: [represent the recall](/method/represent-recall/).

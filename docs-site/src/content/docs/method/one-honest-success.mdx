@@ -1,6 +1,6 @@
 ---
-title: One honest success
-description: How the War of the Ghosts acceptance fixture preserves a report without promoting it to narrated-world fact.
+title: A concrete modeling test
+description: How the War of the Ghosts fixture records a reported injury and an unresolved cause of death.
 sidebar:
   order: 2
 ---
@@ -8,8 +8,8 @@ sidebar:
 import Evidence from '../../../components/Evidence.astro';
 import { sourceLink } from '../../../lib/provenance';
 
-The first useful success is not a leaderboard number. It is a distinction that the representation
-can preserve and a plausible wrong model cannot.
+This fixture tests a specific modeling decision: where to place a reported injury and how to record
+an uncertain cause of death.
 
 ## The difficult passage
 
@@ -17,8 +17,8 @@ In Charles Cultee's *The War of the Ghosts*, warriors say that a young man has b
 does not feel sick, later concludes that his companions are ghosts, returns home, and dies. The
 text does not settle one clean causal account.
 
-A convenient model might turn “he has been shot” into an objective injury and then make the wound
-the cause of death. The acceptance fixture refuses both promotions.
+The fixture places “he has been shot” in the warriors' speech context. It records the later death
+and leaves the cause open among explicit hypotheses.
 
 ## Three claims, three locations
 
@@ -28,8 +28,8 @@ the cause of death. The acceptance fixture refuses both promotions.
 | The man was injured in the narrated world | The root context | An open **hypothesis**, with alternatives retained |
 | The man does not feel sick | The narrated world | An explicit, **negated** state |
 
-The later death is explicit. Its cause is not. Competing causal hypotheses may remain in the
-model, but no explicit or entailed wound-to-death edge is accepted.
+The source states that the man dies. It leaves the cause unsettled. The model therefore keeps
+competing causal hypotheses and creates no accepted wound-to-death edge.
 
 <Evidence
   status="Confirmed"
@@ -37,7 +37,7 @@ model, but no explicit or entailed wound-to-death edge is accepted.
   href={sourceLink('fixtures/src/main/scala/storymodel4s/fixtures/wog/WarOfTheGhostsExpectations.scala')}
  />
 
-## What makes this a test rather than an illustration
+## How the fixture is checked
 
 The fixture carries 12 plain-language expectations. Each expectation names the phenomenon, the
 relevant source sentences, a statement a researcher can read, and mechanical checks over the
@@ -55,8 +55,8 @@ assertEquals(
 assertEquals(WarOfTheGhostsExpectations.all.size, 12)
 ```
 
-The suite also constructs adversarial mutants for prohibited failures. That is important: a test
-that only recognizes the intended fixture may be checking presence, not discrimination.
+The suite also changes the model in ways that should fail and verifies that the checks catch those
+changes. This shows that the assertions distinguish the intended model from specific faulty ones.
 
 <Evidence
   status="Qualified"
@@ -64,16 +64,14 @@ that only recognizes the intended fixture may be checking presence, not discrimi
   href={sourceLink('fixtures/src/test/scala/storymodel4s/fixtures/wog/WarOfTheGhostsSuite.scala')}
  />
 
-## What this does—and does not—show
+## Scope
 
-It shows that the current types, fixture, evaluator, and tests can preserve this epistemic
-distinction on one difficult, hand-authored story model. It does not estimate accuracy on unseen
-stories. It does not show that a provider can recover the same model from raw text. It does not
-calibrate an embedding or select production defaults.
+This test covers one difficult, hand-authored story model. Accuracy on unseen stories, recovery from
+raw text, embedding calibration, and production defaults each require their own evidence.
 
-The story text in the fixture is the public-domain 1901 US Government publication recorded by
-Franz Boas and narrated by Charles Cultee. The model is explicitly a narrative acceptance fixture,
-not hand-authored AMR gold.
+The story text comes from the public-domain 1901 US Government publication recorded by Franz Boas
+and narrated by Charles Cultee. The project uses it as a narrative acceptance fixture. The AMR
+conformance tests use published guideline examples elsewhere in the repository.
 
 <Evidence
   status="Confirmed"
@@ -83,7 +81,7 @@ not hand-authored AMR gold.
 
 ## Next
 
-[Learn the concepts that make the distinction possible →](/method/concepts/)
+[Learn how the model is organized →](/method/concepts/)
 
 Next: [Align and interpret a recall](/method/align-and-interpret/) — the same fixture with
 the alignment machinery actually running, and its exact output.
