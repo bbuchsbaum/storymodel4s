@@ -100,6 +100,10 @@ class OutputSuite extends FunSuite:
     assertEquals(measured.value, Some(0.5))
     assert(universe.rate(-1).isLeft)
     assert(universe.rate(3).isLeft)
+    assertEquals(EstablishedRate.of(1, 2).map(_.value), Right(0.5))
+    assert(EstablishedRate.of(-1, 2).isLeft)
+    assert(EstablishedRate.of(1, 0).isLeft)
+    assert(EstablishedRate.of(3, 2).isLeft)
   }
 
   test("established universes reject duplicate members") {

@@ -709,7 +709,7 @@ class OutputCodecSuite extends FunSuite:
       .flatMap(_.asObject)
       .get
     val failedReceipt = failedDisposition("receipt").flatMap(_.asObject).get
-    val arbitrarySatisfiedReceipt = failedReceipt
+    val fabricatedSatisfiedReceipt = failedReceipt
       .add("decision", Json.obj("status" -> Json.fromString("satisfied")))
       .add(
         "preview",
@@ -724,23 +724,27 @@ class OutputCodecSuite extends FunSuite:
         "courts",
         Json.arr(
           Json.obj(
-            "court" -> Json.fromString("arbitrary-passed"),
+            "court" -> Json.fromString("browser-preview-produced"),
+            "disposition" -> Json.obj("status" -> Json.fromString("passed"))
+          ),
+          Json.obj(
+            "court" -> Json.fromString("direct-file-open"),
             "disposition" -> Json.obj("status" -> Json.fromString("passed"))
           )
         )
       )
-    val arbitrarySatisfiedDisposition = failedDisposition
+    val fabricatedSatisfiedDisposition = failedDisposition
       .add("status", Json.fromString("satisfied"))
-      .add("receipt", Json.fromJsonObject(arbitrarySatisfiedReceipt))
-    val arbitrarySatisfiedProfile = profiles.head.mapObject(
-      _.add("disposition", Json.fromJsonObject(arbitrarySatisfiedDisposition))
+      .add("receipt", Json.fromJsonObject(fabricatedSatisfiedReceipt))
+    val fabricatedSatisfiedProfile = profiles.head.mapObject(
+      _.add("disposition", Json.fromJsonObject(fabricatedSatisfiedDisposition))
     )
-    val arbitrarySatisfied = parsed.mapObject(
-      _.add("profileOutcomes", Json.fromValues(profiles.updated(0, arbitrarySatisfiedProfile)))
+    val fabricatedSatisfied = parsed.mapObject(
+      _.add("profileOutcomes", Json.fromValues(profiles.updated(0, fabricatedSatisfiedProfile)))
     )
     assert(
-      BundleManifestCodec.decode(Canonical.print(arbitrarySatisfied), result).isLeft,
-      "one arbitrary passed court must not fabricate a satisfied local-open profile"
+      BundleManifestCodec.decode(Canonical.print(fabricatedSatisfied), result).isLeft,
+      "the exact passed court labels must not fabricate a satisfied local-open profile"
     )
 
     val retiredBuiltIn = profiles.head.mapObject(

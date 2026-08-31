@@ -175,10 +175,12 @@ final case class ProfileReceipt(
     courts: Vector[ProfileCourtOutcome]
 )
 
-/** A satisfied local-open receipt whose complete court plan has been verified.
+/** A satisfied local-open receipt issued by a governed profile verifier.
   *
-  * [[ProfileReceipt]] remains the wire claim shared by all disposition branches. Only this
-  * non-product proof can enter [[ProfileDisposition.Satisfied]].
+  * [[ProfileReceipt]] remains the wire claim shared by all disposition branches. V1 deliberately
+  * has no issuer: receipt-shaped data cannot establish that a court ran. The type remains in the
+  * disposition vocabulary so a later governed verifier can add issuance without changing the wire
+  * model.
   */
 final class VerifiedProfileReceipt private (val receipt: ProfileReceipt):
   override def equals(other: Any): Boolean = other match
@@ -194,26 +196,14 @@ object VerifiedProfileReceipt:
       ProfileCourtId.unsafe("direct-file-open")
     )
 
-  /** Verify the exact v1 local-open court plan and its evidence-bearing receipt. */
+  /** Refuse data-only promotion until a governed court runner can issue this proof. */
   def localOpen(claim: ProfileReceipt): Either[DomainError, VerifiedProfileReceipt] =
-    val actualCourts = claim.courts.map(_.court)
-    val exactPlan =
-      actualCourts.distinct.size == actualCourts.size &&
-        actualCourts.toSet == LocalOpenRequiredCourts.toSet &&
-        actualCourts.size == LocalOpenRequiredCourts.size
-    val valid =
-      claim.decision == ProfileReceiptDecision.Satisfied &&
-        claim.preview.nonEmpty &&
-        exactPlan &&
-        claim.courts.forall(_.disposition == ProfileCourtDisposition.Passed)
-    if valid then Right(new VerifiedProfileReceipt(claim))
-    else
-      Left(
-        DomainError.InvariantViolation(
-          "output/profile/local-open-verification",
-          "satisfied local-open receipt must bind preview evidence and the exact required passed court plan"
-        )
+    Left(
+      DomainError.InvariantViolation(
+        "output/profile/local-open-verification",
+        s"satisfied local-open issuance is deferred; receipt ${claim.id.value} is an untrusted claim"
       )
+    )
 
 /** Certification result for one requested bundle profile. */
 enum ProfileDisposition:

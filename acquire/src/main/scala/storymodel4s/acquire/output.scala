@@ -412,7 +412,7 @@ final class EstablishedUniverse[Id] private (
         )
       )
     else if members.isEmpty then Right(UniverseRate.NotApplicableEmpty)
-    else Right(UniverseRate.Measured(EstablishedRate.make(numerator, members.size)))
+    else EstablishedRate.of(numerator, members.size).map(UniverseRate.Measured.apply)
 
 object EstablishedUniverse:
   /** Establish a universe while rejecting duplicate member identity. */
@@ -445,8 +445,25 @@ final class EstablishedRate private (
   override def toString: String = s"EstablishedRate($numerator/$denominator)"
 
 object EstablishedRate:
-  private[acquire] def make(numerator: Int, denominator: Int): EstablishedRate =
-    new EstablishedRate(numerator, denominator)
+  /** Construct only from valid established counts. */
+  def of(numerator: Int, denominator: Int): Either[DomainError, EstablishedRate] =
+    if denominator <= 0 then
+      Left(
+        DomainError.InvalidFormat(
+          "EstablishedRate.denominator",
+          denominator.toString,
+          "expected a positive integer"
+        )
+      )
+    else if numerator < 0 || numerator > denominator then
+      Left(
+        DomainError.InvalidFormat(
+          "EstablishedRate.numerator",
+          numerator.toString,
+          s"expected an integer in [0, $denominator]"
+        )
+      )
+    else Right(new EstablishedRate(numerator, denominator))
 
 /** Coverage-like value that cannot encode 0/0 as a percentage. */
 enum UniverseRate:

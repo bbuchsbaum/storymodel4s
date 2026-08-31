@@ -228,4 +228,14 @@ package storymodel4s.acquire.attack {
         "AcquisitionViewAuthority.fixtureReview"
       )
     }
+
+    test("acquire child-package consumers have no unchecked established-rate factory") {
+      refused(
+        typeCheckErrors(
+          "storymodel4s.acquire.EstablishedRate.make(-1, 0)"
+        ),
+        "EstablishedRate.make"
+      )
+      assert(storymodel4s.acquire.EstablishedRate.of(-1, 0).isLeft)
+    }
 }

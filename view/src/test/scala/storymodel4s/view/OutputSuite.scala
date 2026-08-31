@@ -1239,7 +1239,7 @@ class OutputSuite extends FunSuite:
     assert(withoutDraftResult.acquisition.semantic.isInstanceOf[SemanticOutcome.Partial])
   }
 
-  test("profile certification binds exact preview, assets, and court outcomes") {
+  test("profile dispositions refuse fabricated satisfaction and bind honest receipts") {
     val htmlArtifact = ArtifactRef.fromBytes(
       ArtifactId.unsafe("artifact-html"),
       ArtifactRole.BrowserPreview,
@@ -1279,7 +1279,7 @@ class OutputSuite extends FunSuite:
       textPlain,
       textArtifact.checksum
     )
-    val satisfiedClaim = failedProfileReceipt.copy(
+    val fabricatedSatisfiedClaim = failedProfileReceipt.copy(
       id = OutputReceiptId.unsafe("receipt-profile-local-satisfied"),
       decision = ProfileReceiptDecision.Satisfied,
       preview = Some(previewBinding),
@@ -1295,63 +1295,39 @@ class OutputSuite extends FunSuite:
         )
       )
     )
-    val satisfiedReceipt = VerifiedProfileReceipt.localOpen(satisfiedClaim).toOption.get
-    val satisfied = BundleProfileOutcome(
-      BundleProfile.LocalOpen,
-      ProfileDisposition.Satisfied(satisfiedReceipt)
+    assert(
+      VerifiedProfileReceipt.localOpen(fabricatedSatisfiedClaim).isLeft,
+      "receipt-shaped passed labels cannot establish that a profile court ran"
     )
-    assert(BundleManifest.of(produced, Vector(satisfied), entries).isValid)
 
-    val wrongDecision = satisfiedClaim.copy(
-      decision = ProfileReceiptDecision.NotAttempted(NotAttemptedReason.VerificationNotRun)
+    val notAttemptedReason = NotAttemptedReason.VerificationNotRun
+    val notAttemptedReceipt = fabricatedSatisfiedClaim.copy(
+      id = OutputReceiptId.unsafe("receipt-profile-local-not-attempted"),
+      decision = ProfileReceiptDecision.NotAttempted(notAttemptedReason),
+      courts = Vector.empty
     )
-    assert(VerifiedProfileReceipt.localOpen(wrongDecision).isLeft)
+    val notAttempted = BundleProfileOutcome(
+      BundleProfile.LocalOpen,
+      ProfileDisposition.NotAttempted(notAttemptedReason, notAttemptedReceipt)
+    )
+    assert(BundleManifest.of(produced, Vector(notAttempted), entries).isValid)
+
+    val fabricatedDecision = notAttemptedReceipt.copy(
+      decision = ProfileReceiptDecision.Satisfied
+    )
+    val mismatchedNotAttempted = notAttempted.copy(
+      disposition = ProfileDisposition.NotAttempted(notAttemptedReason, fabricatedDecision)
+    )
+    assert(BundleManifest.of(produced, Vector(mismatchedNotAttempted), entries).isInvalid)
 
     val wrongPreviewPath = BundlePath.unsafe("index.html")
-    val movedEntries = entries.map {
-      case entry if entry.role == ArtifactRole.BrowserPreview =>
-        entry.copy(path = wrongPreviewPath)
-      case entry => entry
-    }
-    val movedReceipt = VerifiedProfileReceipt
-      .localOpen(satisfiedClaim.copy(preview = Some(previewBinding.copy(path = wrongPreviewPath))))
-      .toOption
-      .get
-    val movedProfile = satisfied.copy(
-      disposition = ProfileDisposition.Satisfied(movedReceipt)
+    val movedReceipt = notAttemptedReceipt.copy(
+      preview = Some(previewBinding.copy(path = wrongPreviewPath))
     )
-    assert(BundleManifest.of(produced, Vector(movedProfile), movedEntries).isInvalid)
-
-    assert(
-      VerifiedProfileReceipt.localOpen(satisfiedClaim.copy(preview = None)).isLeft,
-      "satisfied profile cannot omit preview evidence"
+    val movedProfile = notAttempted.copy(
+      disposition = ProfileDisposition.NotAttempted(notAttemptedReason, movedReceipt)
     )
-
-    val mutatedAssetReceipt = VerifiedProfileReceipt
-      .localOpen(
-        satisfiedClaim.copy(
-          requiredAssets = Vector(textBinding.copy(checksum = Checksum.ofText("mutant")))
-        )
-      )
-      .toOption
-      .get
-    val mutatedAsset = satisfied.copy(
-      disposition = ProfileDisposition.Satisfied(mutatedAssetReceipt)
-    )
-    assert(BundleManifest.of(produced, Vector(mutatedAsset), entries).isInvalid)
-
-    val arbitraryPassedCourt = satisfiedClaim.copy(
-      courts = Vector(
-        ProfileCourtOutcome(
-          ProfileCourtId.unsafe("arbitrary-passed"),
-          ProfileCourtDisposition.Passed
-        )
-      )
-    )
-    assert(
-      VerifiedProfileReceipt.localOpen(arbitraryPassedCourt).isLeft,
-      "one arbitrary passed court must not fabricate local-open satisfaction"
-    )
+    assert(BundleManifest.of(produced, Vector(movedProfile), entries).isInvalid)
 
     val failedCourt = failedProfileReceipt.copy(
       preview = Some(previewBinding),
