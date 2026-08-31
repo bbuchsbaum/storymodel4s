@@ -2,6 +2,7 @@ package storymodel4s.view
 
 import java.nio.charset.StandardCharsets
 
+import cats.data.NonEmptyVector
 import munit.FunSuite
 import storymodel4s.acquire.*
 import storymodel4s.core.*
@@ -43,11 +44,32 @@ class OutputSuite extends FunSuite:
       evidence: String,
       build: Option[ExtendedBuildReceipt] = Some(buildReceipt)
   ): AcquisitionViewAuthority =
+    val reviewer = Fingerprint.unsafe(s"reviewer:$evidence:v1")
+    val typedEvidence = NonEmptyVector.one(
+      Evidence(
+        EvidenceId.unsafe(s"evidence-$evidence"),
+        Some(SpanSet.one(TextSpan.unsafe(0, identities.canonicalUtf16Length))),
+        Set.empty,
+        reviewer,
+        StageId.unsafe(s"review-$evidence")
+      )
+    )
+    val admitted = AdmittedViewEvidence
+      .fixtureReview(
+        SourceOutcome.Constructed(identities),
+        build,
+        FixtureAdmissionReceiptId.unsafe(evidence),
+        reviewer,
+        typedEvidence,
+        Provenance.human(reviewer.value, "fixture-review/v1")
+      )
+      .toOption
+      .get
     AcquisitionViewAuthority
       .fixtureReview(
         SourceOutcome.Constructed(identities),
         build,
-        evidence.getBytes(StandardCharsets.UTF_8).toVector
+        admitted
       )
       .toOption
       .get
@@ -207,6 +229,62 @@ class OutputSuite extends FunSuite:
       .get
     val admitted = AdmittedViewBasis.fromAcquisition(account).toOption.get
     (account, artifacts, admitted)
+
+  private def providerParamFixture(
+      params: Map[String, String]
+  ): (AcquisitionAccount[String], ScientificArtifactRefs, AdmittedViewBasis) =
+    val stage = StageId.unsafe("provider-param-stage")
+    val output = Checksum.ofText("provider-param-output")
+    val call = ProviderCall(
+      "provider",
+      "model",
+      "v1",
+      None,
+      Checksum.ofText("provider-param-input"),
+      output,
+      params,
+      None,
+      cached = false
+    )
+    val record = StageRecord(
+      stage,
+      StageCacheKey.fromChecksum(Checksum.ofText("provider-param-key")),
+      Vector(call.inputChecksum),
+      Vector(output),
+      Vector(call),
+      cached = false
+    )
+    val receipt = ExtendedBuildReceipt(
+      BuildReceipt(
+        source.id,
+        source.canonicalChecksum,
+        "provider-param-court/v1",
+        Vector(stage -> record.outputChecksum),
+        0L
+      ),
+      Vector(record),
+      Map.empty
+    )
+    val sourceOutcome = SourceOutcome.Constructed(identities)
+    val authority = AcquisitionViewAuthority.validatedBuild(sourceOutcome, receipt).toOption.get
+    val account = AcquisitionAccount
+      .of(
+        InvocationId.unsafe("invocation-provider-param"),
+        sourceOutcome,
+        TargetUniverse.Established(universe),
+        SemanticOutcome.Validated(semanticModelRef),
+        Vector.empty,
+        Vector.empty,
+        Some(receipt),
+        Some(authority)
+      )
+      .toOption
+      .get
+    val artifacts = ScientificArtifactRefs
+      .of(account, Some(originalArtifact), Some(canonicalArtifact), Some(semanticArtifact))
+      .toOption
+      .get
+    (account, artifacts, AdmittedViewBasis.fromAcquisition(account).toOption.get)
 
   test("source-stage refusal closes only artifact references that actually exist") {
     val failure = OutputFailure(
@@ -675,6 +753,123 @@ class OutputSuite extends FunSuite:
       .get
     assertNotEquals(orderedInput, universeReorderedInput)
     assertNotEquals(orderedInput, targetsReorderedInput)
+  }
+
+  test("report identity frames payload coordinates without delimiter collisions") {
+    val checksum = Checksum.ofText("same-known-payload")
+    val left = acquisition(
+      Vector(
+        OutputPayload.Known(
+          KnownPayloadRef(
+            OutputPayloadId.unsafe("a:b"),
+            OutputSchemaId.unsafe("c"),
+            checksum
+          )
+        )
+      )
+    )
+    val right = acquisition(
+      Vector(
+        OutputPayload.Known(
+          KnownPayloadRef(
+            OutputPayloadId.unsafe("a"),
+            OutputSchemaId.unsafe("b:c"),
+            checksum
+          )
+        )
+      )
+    )
+    val leftArtifacts = ScientificArtifactRefs
+      .of(left, Some(originalArtifact), Some(canonicalArtifact), Some(semanticArtifact))
+      .toOption
+      .get
+    val rightArtifacts = ScientificArtifactRefs
+      .of(right, Some(originalArtifact), Some(canonicalArtifact), Some(semanticArtifact))
+      .toOption
+      .get
+    val leftInput = ReportInputIdentity
+      .forReport(
+        left,
+        leftArtifacts,
+        Some(AdmittedViewBasis.fromAcquisition(left).toOption.get),
+        textRequest
+      )
+      .toOption
+      .get
+    val rightInput = ReportInputIdentity
+      .forReport(
+        right,
+        rightArtifacts,
+        Some(AdmittedViewBasis.fromAcquisition(right).toOption.get),
+        textRequest
+      )
+      .toOption
+      .get
+    assertEquals(
+      ReportInputIdentity
+        .forReport(
+          left,
+          leftArtifacts,
+          Some(AdmittedViewBasis.fromAcquisition(left).toOption.get),
+          textRequest
+        )
+        .toOption
+        .get,
+      leftInput,
+      "the same framed payload coordinates must replay identically"
+    )
+    assertNotEquals(
+      leftInput,
+      rightInput,
+      "id=a:b/schema=c and id=a/schema=b:c must remain distinct"
+    )
+    val foreignReceipt = ReportReceipt.issue(
+      OutputReceiptId.unsafe("receipt-payload-delimiter-foreign"),
+      RendererId.unsafe("text-renderer/v1"),
+      OutputSoftwareId.unsafe("storyatlas/test"),
+      rightInput,
+      Checksum.ofText("text-config")
+    )
+    assert(
+      StoryOutputResult
+        .of(
+          left,
+          leftArtifacts,
+          Some(AdmittedViewBasis.fromAcquisition(left).toOption.get),
+          Vector(textRequest),
+          Vector(ReportOutcome.Produced(textId, textArtifact, foreignReceipt)),
+          Vector.empty,
+          Vector.empty
+        )
+        .isInvalid,
+      "a foreign receipt from the formerly colliding payload must refuse"
+    )
+  }
+
+  test("report identity frames provider parameter keys and values independently") {
+    val (left, leftArtifacts, leftBasis) = providerParamFixture(Map("a" -> "b=c"))
+    val (right, rightArtifacts, rightBasis) = providerParamFixture(Map("a=b" -> "c"))
+    val leftInput = ReportInputIdentity
+      .forReport(left, leftArtifacts, Some(leftBasis), textRequest)
+      .toOption
+      .get
+    val rightInput = ReportInputIdentity
+      .forReport(right, rightArtifacts, Some(rightBasis), textRequest)
+      .toOption
+      .get
+    assertEquals(
+      ReportInputIdentity
+        .forReport(left, leftArtifacts, Some(leftBasis), textRequest)
+        .toOption
+        .get,
+      leftInput,
+      "the same provider key/value coordinates must replay identically"
+    )
+    assertNotEquals(
+      leftInput,
+      rightInput,
+      "param a=b=c must not conflate key a/value b=c with key a=b/value c"
+    )
   }
 
   test("collapsing target identity instances and target-only foreign receipts are refused") {

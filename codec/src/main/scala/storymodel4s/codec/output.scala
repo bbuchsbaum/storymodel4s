@@ -798,6 +798,17 @@ object StoryOutputResultCodec:
   def decode[Id: Decoder: OutputTargetIdentity](
       text: String
   ): Either[CodecError, StoryOutputResult[Id]] =
+    decodeWithEvidence(text, Vector.empty)
+
+  /** Decode with out-of-band human or fixture evidence admissions.
+    *
+    * The ordinary decoder deliberately has no such admissions and therefore refuses a serialized
+    * human/fixture authority claim instead of trusting the wire to license itself.
+    */
+  def decodeWithEvidence[Id: Decoder: OutputTargetIdentity](
+      text: String,
+      admittedEvidence: Iterable[AdmittedViewEvidence]
+  ): Either[CodecError, StoryOutputResult[Id]] =
     Canonical.parse(text).flatMap { json =>
       val decoder: Decoder[StoryOutputResult[Id]] = Decoder.instance { c =>
         for
@@ -829,7 +840,8 @@ object StoryOutputResultCodec:
                 claim.buildReceiptChecksum,
                 claim.evidenceChecksum,
                 claim.adjudicationReceipt,
-                claim.fixtureReceipt
+                claim.fixtureReceipt,
+                admittedEvidence
               )
             )
           )

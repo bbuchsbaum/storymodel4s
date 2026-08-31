@@ -673,7 +673,13 @@ object OutputAcquireCodecs:
     )
   }
 
-  given [Id: Decoder]: Decoder[AcquisitionAccount[Id]] = Decoder.instance { c =>
+  given [Id: Decoder]: Decoder[AcquisitionAccount[Id]] =
+    acquisitionAccountDecoder(Vector.empty)
+
+  /** Explicit decoder for accounts carrying out-of-band human or fixture evidence admissions. */
+  def acquisitionAccountDecoder[Id: Decoder](
+      admittedEvidence: Iterable[AdmittedViewEvidence]
+  ): Decoder[AcquisitionAccount[Id]] = Decoder.instance { c =>
     for
       invocation <- field[InvocationId](c, "invocationId")
       source <- field[SourceOutcome](c, "source")
@@ -694,7 +700,8 @@ object OutputAcquireCodecs:
             claim.buildReceiptChecksum,
             claim.evidenceChecksum,
             claim.adjudicationReceipt,
-            claim.fixtureReceipt
+            claim.fixtureReceipt,
+            admittedEvidence
           )
         )
       )

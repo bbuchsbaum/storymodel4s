@@ -514,7 +514,7 @@ object ReportInputIdentity:
   ): Either[DomainError, ReportInputIdentity] =
     validateTargetIdentities(acquisition).map { _ =>
       new ReportInputIdentity(
-        ContentAddress.digest(
+        framedDigest(
           Vector("story-output-report-input/v1", s"invocation=${acquisition.invocationId.value}") ++
             sourceParts(acquisition.source) ++
             universeParts(acquisition.universe) ++
@@ -543,7 +543,8 @@ object ReportInputIdentity:
         s"original-bytes=${value.original.byteLength}",
         s"original-checksum=${value.original.checksum.hex}",
         s"original-media=${value.original.mediaType.value}",
-        s"original-declared-charset=${value.original.declaredCharset.map(_.value).getOrElse("none")}",
+        if value.original.declaredCharset.isDefined then "original-declared-charset.some"
+        else "original-declared-charset.none",
         s"original-selected-charset=${value.original.selectedCharset.value}",
         s"original-bom=${value.original.bom}",
         s"original-intake-receipt=${value.original.intakeReceipt.value}",
@@ -556,6 +557,8 @@ object ReportInputIdentity:
         s"decode-receipt=${value.decodeReceipt.id.value}",
         s"decoder=${value.decodeReceipt.decoder.value}",
         s"canonical-receipt=${value.canonicalizationReceipt.value}"
+      ) ++ value.original.declaredCharset.toVector.map(value =>
+        s"original-declared-charset.value=${value.value}"
       )
     case SourceOutcome.Refused(progress, failure) =>
       Vector("source=refused") ++ refusedProgressParts(progress) ++ failureParts("source", failure)
@@ -579,10 +582,13 @@ object ReportInputIdentity:
       s"$prefix-bytes=${value.byteLength}",
       s"$prefix-checksum=${value.checksum.hex}",
       s"$prefix-media=${value.mediaType.value}",
-      s"$prefix-declared-charset=${value.declaredCharset.map(_.value).getOrElse("none")}",
+      if value.declaredCharset.isDefined then s"$prefix-declared-charset.some"
+      else s"$prefix-declared-charset.none",
       s"$prefix-selected-charset=${value.selectedCharset.value}",
       s"$prefix-bom=${value.bom}",
       s"$prefix-intake-receipt=${value.intakeReceipt.value}"
+    ) ++ value.declaredCharset.toVector.map(charset =>
+      s"$prefix-declared-charset.value=${charset.value}"
     )
 
   private def universeParts[Id: OutputTargetIdentity](
@@ -599,10 +605,11 @@ object ReportInputIdentity:
     case TargetUniverse.Unestablished(failure) =>
       Vector(
         "universe=unestablished",
-        s"universe-reason=${failure.reason}",
+        universeFailureKind(failure.reason)
+      ) ++ universeFailureValues(failure.reason) ++ Vector(
         s"universe-receipt=${failure.receipt.value}",
-        s"universe-stage=${failure.stage.map(_.value).getOrElse("none")}"
-      )
+        if failure.stage.isDefined then "universe-stage.some" else "universe-stage.none"
+      ) ++ failure.stage.toVector.map(stage => s"universe-stage.value=${stage.value}")
 
   private def semanticParts(semantic: SemanticOutcome): Vector[String] = semantic match
     case SemanticOutcome.Validated(model)     => modelParts("validated", model)
@@ -610,10 +617,12 @@ object ReportInputIdentity:
       Vector("semantic=partial") ++
         gaps.toVector.zipWithIndex.flatMap { case (gap, index) =>
           Vector(
-            s"gap[$index].kind=${gap.kind}",
+            resultGapKind(s"gap[$index]", gap.kind),
             s"gap[$index].receipt=${gap.receipt.value}",
-            s"gap[$index].payload=${gap.payload.map(_.value).getOrElse("none")}"
-          )
+            if gap.payload.isDefined then s"gap[$index].payload.some"
+            else s"gap[$index].payload.none"
+          ) ++ resultGapValues(s"gap[$index]", gap.kind) ++
+            gap.payload.toVector.map(value => s"gap[$index].payload.value=${value.value}")
         } ++
         draft.toVector.flatMap(modelParts("draft", _))
     case SemanticOutcome.Refused(errors) =>
@@ -632,20 +641,32 @@ object ReportInputIdentity:
 
   private def payloadParts(payload: OutputPayload): Vector[String] = payload match
     case OutputPayload.Known(ref) =>
-      Vector(s"payload=${ref.id.value}:${ref.schemaId.value}:${ref.checksum.hex}:known")
+      Vector(
+        "payload=known",
+        s"payload.id=${ref.id.value}",
+        s"payload.schema=${ref.schemaId.value}",
+        s"payload.checksum=${ref.checksum.hex}"
+      )
     case OutputPayload.Unsupported(extension) =>
       Vector(
-        s"payload=${extension.id.value}:${extension.namespace.value}:${extension.schemaId.value}:${extension.checksum.hex}:${extension.requirement}"
+        "payload=unsupported",
+        s"payload.id=${extension.id.value}",
+        s"payload.namespace=${extension.namespace.value}",
+        s"payload.schema=${extension.schemaId.value}",
+        s"payload.checksum=${extension.checksum.hex}",
+        s"payload.requirement=${extension.requirement}"
       )
 
   private def failureParts(prefix: String, error: OutputFailure): Vector[String] =
     Vector(
-      s"$prefix-code=${error.code}",
+      failureCodeKind(prefix, error.code),
       s"$prefix-receipt=${error.receipt.value}",
-      s"$prefix-stage=${error.stage.map(_.value).getOrElse("none")}"
-    ) ++ error.evidence.zipWithIndex.map { case (receipt, index) =>
-      s"$prefix-evidence[$index]=${receipt.value}"
-    }
+      if error.stage.isDefined then s"$prefix-stage.some" else s"$prefix-stage.none"
+    ) ++ failureCodeValues(prefix, error.code) ++
+      error.stage.toVector.map(stage => s"$prefix-stage.value=${stage.value}") ++
+      error.evidence.zipWithIndex.map { case (receipt, index) =>
+        s"$prefix-evidence[$index]=${receipt.value}"
+      }
 
   private def buildParts(value: ExtendedBuildReceipt): Vector[String] =
     Vector(
@@ -670,7 +691,7 @@ object ReportInputIdentity:
         providerCallParts(s"stage-record[$index].call[$callIndex]", call)
       }
     } ++ value.layerCoverage.toVector.sortBy(_._1.value).map { case (layer, coverage) =>
-      s"layer-coverage=${layer.value}:$coverage"
+      coordinate("layer-coverage", layer.value, coverage.toString)
     }
 
   private def providerCallParts(prefix: String, call: ProviderCall): Vector[String] =
@@ -678,23 +699,39 @@ object ReportInputIdentity:
       s"$prefix.provider=${call.provider}",
       s"$prefix.model=${call.model}",
       s"$prefix.version=${call.version}",
-      s"$prefix.prompt=${call.promptTemplateVersion.map(_.value).getOrElse("none")}",
+      if call.promptTemplateVersion.isDefined then s"$prefix.prompt.some"
+      else s"$prefix.prompt.none",
       s"$prefix.input=${call.inputChecksum.hex}",
       s"$prefix.output=${call.outputChecksum.hex}",
-      s"$prefix.seed=${call.seed.map(_.toString).getOrElse("none")}",
+      if call.seed.isDefined then s"$prefix.seed.some" else s"$prefix.seed.none",
       s"$prefix.cached=${call.cached}"
-    ) ++ call.params.toVector.sortBy(_._1).map { case (key, value) =>
-      s"$prefix.param=$key=$value"
-    }
+    ) ++ call.promptTemplateVersion.toVector.map(version =>
+      s"$prefix.prompt.value=${version.value}"
+    ) ++ call.seed.toVector.map(seed => s"$prefix.seed.value=$seed") ++
+      call.params.toVector.sortBy(_._1).map { case (key, value) =>
+        coordinate(s"$prefix.param", key, value)
+      }
 
   private def authorityParts(authority: AcquisitionViewAuthority): Vector[String] =
     Vector(
       s"acquisition-authority-kind=${authority.kind}",
       s"acquisition-authority-source=${authority.sourceChecksum.hex}",
-      s"acquisition-authority-build=${authority.buildReceiptChecksum.map(_.hex).getOrElse("none")}",
-      s"acquisition-authority-evidence=${authority.evidenceChecksum.map(_.hex).getOrElse("none")}",
-      s"acquisition-authority-adjudication=${authority.adjudicationReceipt.map(_.value).getOrElse("none")}",
-      s"acquisition-authority-fixture=${authority.fixtureReceipt.map(_.value).getOrElse("none")}"
+      if authority.buildReceiptChecksum.isDefined then "acquisition-authority-build.some"
+      else "acquisition-authority-build.none",
+      if authority.evidenceChecksum.isDefined then "acquisition-authority-evidence.some"
+      else "acquisition-authority-evidence.none",
+      if authority.adjudicationReceipt.isDefined then "acquisition-authority-adjudication.some"
+      else "acquisition-authority-adjudication.none",
+      if authority.fixtureReceipt.isDefined then "acquisition-authority-fixture.some"
+      else "acquisition-authority-fixture.none"
+    ) ++ authority.buildReceiptChecksum.toVector.map(value =>
+      s"acquisition-authority-build.value=${value.hex}"
+    ) ++ authority.evidenceChecksum.toVector.map(value =>
+      s"acquisition-authority-evidence.value=${value.hex}"
+    ) ++ authority.adjudicationReceipt.toVector.map(value =>
+      s"acquisition-authority-adjudication.value=${value.value}"
+    ) ++ authority.fixtureReceipt.toVector.map(value =>
+      s"acquisition-authority-fixture.value=${value.value}"
     )
 
   private def artifactParts(refs: ScientificArtifactRefs): Vector[String] =
@@ -703,29 +740,127 @@ object ReportInputIdentity:
       "canonical" -> refs.canonicalSource,
       "semantic" -> refs.semanticModel
     ).flatMap { case (name, value) =>
-      value.toVector.map(ref =>
-        s"artifact=$name:${ref.id.value}:${ref.role.wireName}:${ref.mediaType.value}:${ref.schemaVersion.map(_.value).getOrElse("none")}:${ref.byteLength}:${ref.checksum.hex}"
-      )
+      value.toVector.flatMap { ref =>
+        Vector(
+          s"artifact.name=$name",
+          s"artifact.id=${ref.id.value}"
+        ) ++ artifactRoleParts("artifact.role", ref.role) ++ Vector(
+          s"artifact.media=${ref.mediaType.value}",
+          if ref.schemaVersion.isDefined then "artifact.schema.some" else "artifact.schema.none",
+          s"artifact.bytes=${ref.byteLength}",
+          s"artifact.checksum=${ref.checksum.hex}"
+        ) ++ ref.schemaVersion.toVector.map(value => s"artifact.schema.value=${value.value}")
+      }
     }
 
   private def basisParts(value: AdmittedViewBasis): Vector[String] =
     Vector(
       s"basis=${value.basis}",
       s"basis-source=${value.sourceChecksum.hex}",
-      s"basis-build=${value.buildReceiptChecksum.map(_.hex).getOrElse("none")}",
-      s"basis-authority=${value.authority}"
-    )
+      if value.buildReceiptChecksum.isDefined then "basis-build.some" else "basis-build.none"
+    ) ++ value.buildReceiptChecksum.toVector.map(checksum =>
+      s"basis-build.value=${checksum.hex}"
+    ) ++
+      basisAuthorityParts(value.authority)
 
   private def reportRequestParts(request: ReportRequest): Vector[String] =
     Vector(
       "target=report",
       s"request=${request.id.value}",
-      s"kind=${request.kind}",
-      s"role=${request.role}",
       s"media-type=${request.mediaType.value}",
-      s"requirement=${request.requirement}",
       s"authority=${request.authority}"
-    ) ++ request.requiredPayloads.toVector.map(_.value).sorted.map(id => s"required-payload=$id")
+    ) ++ reportKindParts(request.kind) ++ artifactRoleParts("role", request.role) ++
+      artifactRequirementParts(request.requirement) ++
+      request.requiredPayloads.toVector.map(_.value).sorted.map(id => s"required-payload=$id")
+
+  private def universeFailureKind(value: UniverseFailureReason): String = value match
+    case UniverseFailureReason.Custom(_, _) => "universe-reason=custom"
+    case other                              => s"universe-reason=$other"
+
+  private def universeFailureValues(value: UniverseFailureReason): Vector[String] = value match
+    case UniverseFailureReason.Custom(namespace, label) =>
+      Vector(
+        s"universe-reason.namespace=${namespace.value}",
+        s"universe-reason.label=${label.value}"
+      )
+    case _ => Vector.empty
+
+  private def resultGapKind(prefix: String, value: ResultGapKind): String = value match
+    case ResultGapKind.Custom(_, _) => s"$prefix.kind=custom"
+    case other                      => s"$prefix.kind=$other"
+
+  private def resultGapValues(prefix: String, value: ResultGapKind): Vector[String] = value match
+    case ResultGapKind.Custom(namespace, label) =>
+      Vector(s"$prefix.kind.namespace=${namespace.value}", s"$prefix.kind.label=${label.value}")
+    case _ => Vector.empty
+
+  private def failureCodeKind(prefix: String, value: OutputFailureCode): String = value match
+    case OutputFailureCode.Custom(_, _) => s"$prefix-code=custom"
+    case other                          => s"$prefix-code=$other"
+
+  private def failureCodeValues(prefix: String, value: OutputFailureCode): Vector[String] =
+    value match
+      case OutputFailureCode.Custom(namespace, label) =>
+        Vector(s"$prefix-code.namespace=${namespace.value}", s"$prefix-code.label=${label.value}")
+      case _ => Vector.empty
+
+  private def artifactRoleParts(prefix: String, role: ArtifactRole): Vector[String] = role match
+    case ArtifactRole.OriginalSource   => Vector(s"$prefix=original_source")
+    case ArtifactRole.CanonicalSource  => Vector(s"$prefix=canonical_source")
+    case ArtifactRole.InvocationResult => Vector(s"$prefix=invocation_result")
+    case ArtifactRole.SemanticModel    => Vector(s"$prefix=semantic_model")
+    case ArtifactRole.BrowserPreview   => Vector(s"$prefix=browser_preview")
+    case ArtifactRole.TextPreview      => Vector(s"$prefix=text_preview")
+    case ArtifactRole.ReportAsset(id)  => Vector(s"$prefix=report_asset", s"$prefix.id=${id.value}")
+    case ArtifactRole.ProjectionPacket(id) =>
+      Vector(s"$prefix=projection_packet", s"$prefix.id=${id.value}")
+    case ArtifactRole.OptionalReport(id) =>
+      Vector(s"$prefix=optional_report", s"$prefix.id=${id.value}")
+    case ArtifactRole.DeclaredLossExport(id) =>
+      Vector(s"$prefix=declared_loss_export", s"$prefix.id=${id.value}")
+    case ArtifactRole.Custom(namespace, label, id) =>
+      Vector(
+        s"$prefix=custom",
+        s"$prefix.namespace=${namespace.value}",
+        s"$prefix.label=${label.value}",
+        s"$prefix.id=${id.value}"
+      )
+
+  private def reportKindParts(kind: ReportKind): Vector[String] = kind match
+    case ReportKind.BrowserPreview           => Vector("kind=browser_preview")
+    case ReportKind.TextPreview              => Vector("kind=text_preview")
+    case ReportKind.Custom(namespace, label) =>
+      Vector("kind=custom", s"kind.namespace=${namespace.value}", s"kind.label=${label.value}")
+
+  private def artifactRequirementParts(value: ArtifactRequirement): Vector[String] = value match
+    case ArtifactRequirement.Required             => Vector("requirement=required")
+    case ArtifactRequirement.Optional             => Vector("requirement=optional")
+    case ArtifactRequirement.Conditional(profile) =>
+      Vector("requirement=conditional", s"requirement.profile=${profile.value}")
+
+  private def basisAuthorityParts(value: BasisAuthority): Vector[String] = value match
+    case BasisAuthority.ValidatedBuild(checksum) =>
+      Vector("basis-authority=validated-build", s"basis-authority.build=${checksum.hex}")
+    case BasisAuthority.HumanAdjudication(receipt) =>
+      Vector("basis-authority=human-adjudication", s"basis-authority.receipt=${receipt.value}")
+    case BasisAuthority.FixtureReview(receipt) =>
+      Vector("basis-authority=fixture-review", s"basis-authority.receipt=${receipt.value}")
+
+  private def coordinate(label: String, values: String*): String =
+    s"coordinate=${framedDigest(label +: values.toVector).hex}"
+
+  private def framedDigest(parts: Vector[String]): Checksum =
+    val bytes = Vector.newBuilder[Byte]
+    parts.foreach { part =>
+      val encoded = part.getBytes(StandardCharsets.UTF_8)
+      val length = encoded.length
+      bytes += ((length >>> 24) & 0xff).toByte
+      bytes += ((length >>> 16) & 0xff).toByte
+      bytes += ((length >>> 8) & 0xff).toByte
+      bytes += (length & 0xff).toByte
+      bytes ++= encoded
+    }
+    Checksum.ofBytes(bytes.result().toArray)
 
 /** Deterministic receipt bound to an unforgeable report-input identity and configuration. */
 final class ReportReceipt private (

@@ -46,6 +46,31 @@ class OutputCodecSuite extends FunSuite:
     .validatedBuild(sourceOutcome, build)
     .toOption
     .get
+  private def fixtureAdmission(
+      label: String,
+      fixtureBuild: Option[ExtendedBuildReceipt] = Some(build)
+  ): AdmittedViewEvidence =
+    val reviewer = Fingerprint.unsafe(s"reviewer:$label:v1")
+    val evidence = NonEmptyVector.one(
+      Evidence(
+        EvidenceId.unsafe(s"evidence-$label"),
+        Some(SpanSet.one(TextSpan.unsafe(0, identities.canonicalUtf16Length))),
+        Set.empty,
+        reviewer,
+        StageId.unsafe(s"review-$label")
+      )
+    )
+    AdmittedViewEvidence
+      .fixtureReview(
+        sourceOutcome,
+        fixtureBuild,
+        FixtureAdmissionReceiptId.unsafe(label),
+        reviewer,
+        evidence,
+        Provenance.human(reviewer.value, "fixture-review/v1")
+      )
+      .toOption
+      .get
   private val extensionId = OutputPayloadId.unsafe("optional-future")
   private val optionalExtension = UnsupportedExtension(
     extensionId,
@@ -316,11 +341,12 @@ class OutputCodecSuite extends FunSuite:
       "the same source cannot be relabelled with fixture authority on the wire"
     )
 
+    val fixtureEvidence = fixtureAdmission("fixture-authority-evidence")
     val fixtureAuthority = AcquisitionViewAuthority
       .fixtureReview(
         sourceOutcome,
         Some(build),
-        "fixture-authority-evidence".getBytes(StandardCharsets.UTF_8).toVector
+        fixtureEvidence
       )
       .toOption
       .get
@@ -360,7 +386,14 @@ class OutputCodecSuite extends FunSuite:
       .toOption
       .get
     val fixtureEncoded = StoryOutputResultCodec.encode[String](fixtureResult)
-    assertEquals(StoryOutputResultCodec.decode[String](fixtureEncoded), Right(fixtureResult))
+    assert(
+      StoryOutputResultCodec.decode[String](fixtureEncoded).isLeft,
+      "wire data alone must not recreate a fixture-review licence"
+    )
+    assertEquals(
+      StoryOutputResultCodec.decodeWithEvidence[String](fixtureEncoded, Vector(fixtureEvidence)),
+      Right(fixtureResult)
+    )
     val fixtureJson = Canonical.parse(fixtureEncoded).toOption.get
     val fixtureAuthorityJson = fixtureJson.hcursor
       .downField("acquisition")
@@ -376,7 +409,9 @@ class OutputCodecSuite extends FunSuite:
       ).add("viewBasis", fixtureBasisJson)
     )
     assert(
-      StoryOutputResultCodec.decode[String](Canonical.print(combinedRelabel)).isLeft,
+      StoryOutputResultCodec
+        .decodeWithEvidence[String](Canonical.print(combinedRelabel), Vector(fixtureEvidence))
+        .isLeft,
       "a coordinated acquisition-authority and basis relabel cannot reuse old report receipts"
     )
 
