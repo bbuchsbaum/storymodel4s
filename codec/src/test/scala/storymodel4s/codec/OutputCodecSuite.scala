@@ -48,7 +48,8 @@ class OutputCodecSuite extends FunSuite:
     .get
   private def fixtureAdmission(
       label: String,
-      fixtureBuild: Option[ExtendedBuildReceipt] = Some(build)
+      fixtureBuild: Option[ExtendedBuildReceipt] = Some(build),
+      issuer: String = "fixture-admitter:codec-tests:v1"
   ): AdmittedViewEvidence =
     val reviewer = Fingerprint.unsafe(s"reviewer:$label:v1")
     val evidence = NonEmptyVector.one(
@@ -60,7 +61,8 @@ class OutputCodecSuite extends FunSuite:
         StageId.unsafe(s"review-$label")
       )
     )
-    AdmittedViewEvidence
+    ViewEvidenceAdmitter
+      .trusted(Fingerprint.unsafe(issuer))
       .fixtureReview(
         sourceOutcome,
         fixtureBuild,
@@ -393,6 +395,17 @@ class OutputCodecSuite extends FunSuite:
     assertEquals(
       StoryOutputResultCodec.decodeWithEvidence[String](fixtureEncoded, Vector(fixtureEvidence)),
       Right(fixtureResult)
+    )
+    val foreignIssuerEvidence = fixtureAdmission(
+      "fixture-authority-evidence",
+      issuer = "fixture-admitter:foreign:v1"
+    )
+    assertNotEquals(foreignIssuerEvidence.evidenceChecksum, fixtureEvidence.evidenceChecksum)
+    assert(
+      StoryOutputResultCodec
+        .decodeWithEvidence[String](fixtureEncoded, Vector(foreignIssuerEvidence))
+        .isLeft,
+      "a second issuer cannot satisfy the first issuer's otherwise matching wire claim"
     )
     val fixtureJson = Canonical.parse(fixtureEncoded).toOption.get
     val fixtureAuthorityJson = fixtureJson.hcursor

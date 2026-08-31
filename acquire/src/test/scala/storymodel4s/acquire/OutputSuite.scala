@@ -250,7 +250,8 @@ class OutputSuite extends FunSuite:
     )
 
     val fixtureInputs = reviewEvidence("fixture-account", identities)
-    val fixtureEvidence = AdmittedViewEvidence
+    val fixtureEvidence = ViewEvidenceAdmitter
+      .trusted(Fingerprint.unsafe("fixture-admitter:account:v1"))
       .fixtureReview(
         sourceOutcome,
         None,
@@ -291,7 +292,8 @@ class OutputSuite extends FunSuite:
     )
     assert(AcquisitionViewAuthority.validatedBuild(sourceOutcome, foreignStoryBuild).isLeft)
     val humanInputs = reviewEvidence("human", identities)
-    val humanEvidence = AdmittedViewEvidence
+    val humanEvidence = ViewEvidenceAdmitter
+      .trusted(Fingerprint.unsafe("human-admitter:v1"))
       .humanAdjudication(
         sourceOutcome,
         buildReceipt,
@@ -338,7 +340,8 @@ class OutputSuite extends FunSuite:
     )
 
     val fixtureInputs = reviewEvidence("fixture", identities)
-    val fixtureEvidence = AdmittedViewEvidence
+    val fixtureEvidence = ViewEvidenceAdmitter
+      .trusted(Fingerprint.unsafe("fixture-admitter:wire:v1"))
       .fixtureReview(
         sourceOutcome,
         None,

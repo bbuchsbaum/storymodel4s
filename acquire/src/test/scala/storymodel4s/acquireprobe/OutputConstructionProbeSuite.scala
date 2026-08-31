@@ -1,4 +1,4 @@
-package storymodel4s.acquireprobe
+package outputprobe
 
 import scala.compiletime.testing.typeCheckErrors
 
@@ -17,8 +17,14 @@ object AuthorityProductControl:
   def fromProduct(product: Product): AuthorityProductControl =
     summon[scala.deriving.Mirror.ProductOf[AuthorityProductControl]].fromProduct(product)
 
+final case class AdmitterProductControl(fingerprint: storymodel4s.core.Fingerprint)
+object AdmitterProductControl:
+  def fromProduct(product: Product): AdmitterProductControl =
+    summon[scala.deriving.Mirror.ProductOf[AdmitterProductControl]].fromProduct(product)
+
 final case class EvidenceProductControl(
     kind: storymodel4s.acquire.AcquisitionViewAuthorityKind,
+    issuer: storymodel4s.core.Fingerprint,
     sourceChecksum: storymodel4s.core.Checksum,
     buildReceiptChecksum: Option[storymodel4s.core.Checksum],
     evidenceChecksum: storymodel4s.core.Checksum,
@@ -34,6 +40,7 @@ object EvidenceProductControl:
 
 object EvidenceProbeValues:
   val kind = storymodel4s.acquire.AcquisitionViewAuthorityKind.FixtureReview
+  val issuer = storymodel4s.core.Fingerprint.unsafe("fixture-admitter:test:v1")
   val source = storymodel4s.core.Checksum.ofText("source")
   val build = Option.empty[storymodel4s.core.Checksum]
   val checksum = storymodel4s.core.Checksum.ofText("evidence")
@@ -59,23 +66,23 @@ class OutputConstructionProbeSuite extends FunSuite:
   test("authority same-shape control exposes all four construction mechanisms") {
     assertEquals(
       typeCheckErrors(
-        "storymodel4s.acquireprobe.AuthorityProductControl(storymodel4s.acquire.AcquisitionViewAuthorityKind.ValidatedBuild, storymodel4s.core.Checksum.ofText(\"source\"), Some(storymodel4s.core.Checksum.ofText(\"build\")), None, None, None, None)"
+        "outputprobe.AuthorityProductControl(storymodel4s.acquire.AcquisitionViewAuthorityKind.ValidatedBuild, storymodel4s.core.Checksum.ofText(\"source\"), Some(storymodel4s.core.Checksum.ofText(\"build\")), None, None, None, None)"
       ),
       Nil
     )
     assertEquals(
-      typeCheckErrors("(x: storymodel4s.acquireprobe.AuthorityProductControl) => x.copy()"),
+      typeCheckErrors("(x: outputprobe.AuthorityProductControl) => x.copy()"),
       Nil
     )
     assertEquals(
       typeCheckErrors(
-        "storymodel4s.acquireprobe.AuthorityProductControl.fromProduct((storymodel4s.acquire.AcquisitionViewAuthorityKind.ValidatedBuild, storymodel4s.core.Checksum.ofText(\"source\"), Some(storymodel4s.core.Checksum.ofText(\"build\")), None, None, None, None))"
+        "outputprobe.AuthorityProductControl.fromProduct((storymodel4s.acquire.AcquisitionViewAuthorityKind.ValidatedBuild, storymodel4s.core.Checksum.ofText(\"source\"), Some(storymodel4s.core.Checksum.ofText(\"build\")), None, None, None, None))"
       ),
       Nil
     )
     assertEquals(
       typeCheckErrors(
-        "summon[scala.deriving.Mirror.ProductOf[storymodel4s.acquireprobe.AuthorityProductControl]]"
+        "summon[scala.deriving.Mirror.ProductOf[outputprobe.AuthorityProductControl]]"
       ),
       Nil
     )
@@ -109,23 +116,23 @@ class OutputConstructionProbeSuite extends FunSuite:
   test("admitted evidence same-shape control exposes all four construction mechanisms") {
     assertEquals(
       typeCheckErrors(
-        "storymodel4s.acquireprobe.EvidenceProductControl(storymodel4s.acquireprobe.EvidenceProbeValues.kind, storymodel4s.acquireprobe.EvidenceProbeValues.source, storymodel4s.acquireprobe.EvidenceProbeValues.build, storymodel4s.acquireprobe.EvidenceProbeValues.checksum, storymodel4s.acquireprobe.EvidenceProbeValues.reviewer, storymodel4s.acquireprobe.EvidenceProbeValues.evidence, storymodel4s.acquireprobe.EvidenceProbeValues.provenance, storymodel4s.acquireprobe.EvidenceProbeValues.adjudication, storymodel4s.acquireprobe.EvidenceProbeValues.fixture)"
+        "outputprobe.EvidenceProductControl(outputprobe.EvidenceProbeValues.kind, outputprobe.EvidenceProbeValues.issuer, outputprobe.EvidenceProbeValues.source, outputprobe.EvidenceProbeValues.build, outputprobe.EvidenceProbeValues.checksum, outputprobe.EvidenceProbeValues.reviewer, outputprobe.EvidenceProbeValues.evidence, outputprobe.EvidenceProbeValues.provenance, outputprobe.EvidenceProbeValues.adjudication, outputprobe.EvidenceProbeValues.fixture)"
       ),
       Nil
     )
     assertEquals(
-      typeCheckErrors("(x: storymodel4s.acquireprobe.EvidenceProductControl) => x.copy()"),
+      typeCheckErrors("(x: outputprobe.EvidenceProductControl) => x.copy()"),
       Nil
     )
     assertEquals(
       typeCheckErrors(
-        "storymodel4s.acquireprobe.EvidenceProductControl.fromProduct((storymodel4s.acquireprobe.EvidenceProbeValues.kind, storymodel4s.acquireprobe.EvidenceProbeValues.source, storymodel4s.acquireprobe.EvidenceProbeValues.build, storymodel4s.acquireprobe.EvidenceProbeValues.checksum, storymodel4s.acquireprobe.EvidenceProbeValues.reviewer, storymodel4s.acquireprobe.EvidenceProbeValues.evidence, storymodel4s.acquireprobe.EvidenceProbeValues.provenance, storymodel4s.acquireprobe.EvidenceProbeValues.adjudication, storymodel4s.acquireprobe.EvidenceProbeValues.fixture))"
+        "outputprobe.EvidenceProductControl.fromProduct((outputprobe.EvidenceProbeValues.kind, outputprobe.EvidenceProbeValues.issuer, outputprobe.EvidenceProbeValues.source, outputprobe.EvidenceProbeValues.build, outputprobe.EvidenceProbeValues.checksum, outputprobe.EvidenceProbeValues.reviewer, outputprobe.EvidenceProbeValues.evidence, outputprobe.EvidenceProbeValues.provenance, outputprobe.EvidenceProbeValues.adjudication, outputprobe.EvidenceProbeValues.fixture))"
       ),
       Nil
     )
     assertEquals(
       typeCheckErrors(
-        "summon[scala.deriving.Mirror.ProductOf[storymodel4s.acquireprobe.EvidenceProductControl]]"
+        "summon[scala.deriving.Mirror.ProductOf[outputprobe.EvidenceProductControl]]"
       ),
       Nil
     )
@@ -134,7 +141,7 @@ class OutputConstructionProbeSuite extends FunSuite:
   test("admitted evidence closes all four product construction doors") {
     refused(
       typeCheckErrors(
-        "storymodel4s.acquire.AdmittedViewEvidence(storymodel4s.acquireprobe.EvidenceProbeValues.kind, storymodel4s.acquireprobe.EvidenceProbeValues.source, storymodel4s.acquireprobe.EvidenceProbeValues.build, storymodel4s.acquireprobe.EvidenceProbeValues.checksum, storymodel4s.acquireprobe.EvidenceProbeValues.reviewer, storymodel4s.acquireprobe.EvidenceProbeValues.evidence, storymodel4s.acquireprobe.EvidenceProbeValues.provenance, storymodel4s.acquireprobe.EvidenceProbeValues.adjudication, storymodel4s.acquireprobe.EvidenceProbeValues.fixture)"
+        "storymodel4s.acquire.AdmittedViewEvidence(outputprobe.EvidenceProbeValues.kind, outputprobe.EvidenceProbeValues.issuer, outputprobe.EvidenceProbeValues.source, outputprobe.EvidenceProbeValues.build, outputprobe.EvidenceProbeValues.checksum, outputprobe.EvidenceProbeValues.reviewer, outputprobe.EvidenceProbeValues.evidence, outputprobe.EvidenceProbeValues.provenance, outputprobe.EvidenceProbeValues.adjudication, outputprobe.EvidenceProbeValues.fixture)"
       ),
       "AdmittedViewEvidence.apply"
     )
@@ -144,7 +151,7 @@ class OutputConstructionProbeSuite extends FunSuite:
     )
     refused(
       typeCheckErrors(
-        "storymodel4s.acquire.AdmittedViewEvidence.fromProduct((storymodel4s.acquireprobe.EvidenceProbeValues.kind, storymodel4s.acquireprobe.EvidenceProbeValues.source, storymodel4s.acquireprobe.EvidenceProbeValues.build, storymodel4s.acquireprobe.EvidenceProbeValues.checksum, storymodel4s.acquireprobe.EvidenceProbeValues.reviewer, storymodel4s.acquireprobe.EvidenceProbeValues.evidence, storymodel4s.acquireprobe.EvidenceProbeValues.provenance, storymodel4s.acquireprobe.EvidenceProbeValues.adjudication, storymodel4s.acquireprobe.EvidenceProbeValues.fixture))"
+        "storymodel4s.acquire.AdmittedViewEvidence.fromProduct((outputprobe.EvidenceProbeValues.kind, outputprobe.EvidenceProbeValues.issuer, outputprobe.EvidenceProbeValues.source, outputprobe.EvidenceProbeValues.build, outputprobe.EvidenceProbeValues.checksum, outputprobe.EvidenceProbeValues.reviewer, outputprobe.EvidenceProbeValues.evidence, outputprobe.EvidenceProbeValues.provenance, outputprobe.EvidenceProbeValues.adjudication, outputprobe.EvidenceProbeValues.fixture))"
       ),
       "AdmittedViewEvidence.fromProduct"
     )
@@ -153,6 +160,69 @@ class OutputConstructionProbeSuite extends FunSuite:
         "summon[scala.deriving.Mirror.ProductOf[storymodel4s.acquire.AdmittedViewEvidence]]"
       ),
       "AdmittedViewEvidence Mirror"
+    )
+  }
+
+  test("admission capability has same-shape controls and closes all construction doors") {
+    assertEquals(
+      typeCheckErrors(
+        "outputprobe.AdmitterProductControl(storymodel4s.core.Fingerprint.unsafe(\"issuer:v1\"))"
+      ),
+      Nil
+    )
+    assertEquals(
+      typeCheckErrors("(x: outputprobe.AdmitterProductControl) => x.copy()"),
+      Nil
+    )
+    assertEquals(
+      typeCheckErrors(
+        "outputprobe.AdmitterProductControl.fromProduct(Tuple1(storymodel4s.core.Fingerprint.unsafe(\"issuer:v1\")))"
+      ),
+      Nil
+    )
+    assertEquals(
+      typeCheckErrors(
+        "summon[scala.deriving.Mirror.ProductOf[outputprobe.AdmitterProductControl]]"
+      ),
+      Nil
+    )
+
+    refused(
+      typeCheckErrors(
+        "storymodel4s.acquire.ViewEvidenceAdmitter(storymodel4s.core.Fingerprint.unsafe(\"issuer:v1\"))"
+      ),
+      "ViewEvidenceAdmitter.apply"
+    )
+    refused(
+      typeCheckErrors("(x: storymodel4s.acquire.ViewEvidenceAdmitter) => x.copy()"),
+      "ViewEvidenceAdmitter.copy"
+    )
+    refused(
+      typeCheckErrors(
+        "storymodel4s.acquire.ViewEvidenceAdmitter.fromProduct(Tuple1(storymodel4s.core.Fingerprint.unsafe(\"issuer:v1\")))"
+      ),
+      "ViewEvidenceAdmitter.fromProduct"
+    )
+    refused(
+      typeCheckErrors(
+        "summon[scala.deriving.Mirror.ProductOf[storymodel4s.acquire.ViewEvidenceAdmitter]]"
+      ),
+      "ViewEvidenceAdmitter Mirror"
+    )
+  }
+
+  test("ordinary consumers cannot register an issuer or self-admit matching evidence") {
+    refused(
+      typeCheckErrors(
+        "storymodel4s.acquire.ViewEvidenceAdmitter.trusted(storymodel4s.core.Fingerprint.unsafe(\"caller:v1\"))"
+      ),
+      "ViewEvidenceAdmitter.trusted"
+    )
+    refused(
+      typeCheckErrors(
+        "storymodel4s.acquire.AdmittedViewEvidence.admit(???, ???, ???, ???, ???, ???, ???, ???, ???)"
+      ),
+      "AdmittedViewEvidence.admit"
     )
   }
 
@@ -205,6 +275,12 @@ class OutputConstructionProbeSuite extends FunSuite:
       ),
       "AdmittedViewEvidence Mirror"
     )
+    refused(
+      typeCheckErrors(
+        "summon[scala.deriving.Mirror.ProductOf[storymodel4s.acquire.ViewEvidenceAdmitter]]"
+      ),
+      "ViewEvidenceAdmitter Mirror"
+    )
   }
 
   test("output validating classes expose no copy door") {
@@ -241,6 +317,10 @@ class OutputConstructionProbeSuite extends FunSuite:
     refused(
       typeCheckErrors("(x: storymodel4s.acquire.AdmittedViewEvidence) => x.copy()"),
       "AdmittedViewEvidence.copy"
+    )
+    refused(
+      typeCheckErrors("(x: storymodel4s.acquire.ViewEvidenceAdmitter) => x.copy()"),
+      "ViewEvidenceAdmitter.copy"
     )
   }
 

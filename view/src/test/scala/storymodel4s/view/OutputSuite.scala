@@ -54,7 +54,8 @@ class OutputSuite extends FunSuite:
         StageId.unsafe(s"review-$evidence")
       )
     )
-    val admitted = AdmittedViewEvidence
+    val admitted = ViewEvidenceAdmitter
+      .trusted(Fingerprint.unsafe("fixture-admitter:view-tests:v1"))
       .fixtureReview(
         SourceOutcome.Constructed(identities),
         build,

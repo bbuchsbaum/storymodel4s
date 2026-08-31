@@ -496,6 +496,65 @@ enum AcquisitionViewAuthorityKind:
   case HumanAdjudication
   case FixtureReview
 
+/** Library admission capability for human and fixture evidence.
+  *
+  * Construction and issuance are package-root restricted: ordinary consumers can retain and pass an
+  * issued witness but cannot turn a caller-assembled record into a licence. The issuer fingerprint
+  * is bound into every witness identity, so a different admitted issuer cannot replay otherwise
+  * identical evidence as its own.
+  */
+final class ViewEvidenceAdmitter private (val fingerprint: Fingerprint):
+  private[storymodel4s] def humanAdjudication(
+      source: SourceOutcome,
+      buildReceipt: ExtendedBuildReceipt,
+      receipt: AdjudicationReceiptId,
+      reviewer: Fingerprint,
+      evidence: NonEmptyVector[Evidence],
+      provenance: Provenance
+  ): Either[DomainError, AdmittedViewEvidence] =
+    AdmittedViewEvidence.admit(
+      source,
+      Some(buildReceipt),
+      AcquisitionViewAuthorityKind.HumanAdjudication,
+      fingerprint,
+      reviewer,
+      evidence,
+      provenance,
+      Some(receipt),
+      None
+    )
+
+  private[storymodel4s] def fixtureReview(
+      source: SourceOutcome,
+      buildReceipt: Option[ExtendedBuildReceipt],
+      receipt: FixtureAdmissionReceiptId,
+      reviewer: Fingerprint,
+      evidence: NonEmptyVector[Evidence],
+      provenance: Provenance
+  ): Either[DomainError, AdmittedViewEvidence] =
+    AdmittedViewEvidence.admit(
+      source,
+      buildReceipt,
+      AcquisitionViewAuthorityKind.FixtureReview,
+      fingerprint,
+      reviewer,
+      evidence,
+      provenance,
+      None,
+      Some(receipt)
+    )
+
+  override def equals(other: Any): Boolean = other match
+    case that: ViewEvidenceAdmitter => fingerprint == that.fingerprint
+    case _                          => false
+  override def hashCode(): Int = fingerprint.hashCode
+  override def toString: String = s"ViewEvidenceAdmitter(${fingerprint.value})"
+
+object ViewEvidenceAdmitter:
+  /** Register a library-owned admission boundary. Not callable by ordinary consumers. */
+  private[storymodel4s] def trusted(fingerprint: Fingerprint): ViewEvidenceAdmitter =
+    new ViewEvidenceAdmitter(fingerprint)
+
 /** Out-of-band evidence admission for a human or fixture authority claim.
   *
   * This value is deliberately not a wire codec. It retains the independently issued receipt,
@@ -505,6 +564,7 @@ enum AcquisitionViewAuthorityKind:
   */
 final class AdmittedViewEvidence private (
     val kind: AcquisitionViewAuthorityKind,
+    val issuer: Fingerprint,
     val sourceChecksum: Checksum,
     val buildReceiptChecksum: Option[Checksum],
     val evidenceChecksum: Checksum,
@@ -517,6 +577,7 @@ final class AdmittedViewEvidence private (
   private def parts =
     (
       kind,
+      issuer,
       sourceChecksum,
       buildReceiptChecksum,
       evidenceChecksum,
@@ -532,53 +593,14 @@ final class AdmittedViewEvidence private (
     case _                          => false
   override def hashCode(): Int = parts.hashCode
   override def toString: String =
-    s"AdmittedViewEvidence($kind, reviewer=${reviewer.value}, evidence=${evidence.length})"
+    s"AdmittedViewEvidence($kind, issuer=${issuer.value}, reviewer=${reviewer.value}, evidence=${evidence.length})"
 
 object AdmittedViewEvidence:
-  /** Admit evidence for a human-adjudicated view under an independently issued receipt. */
-  def humanAdjudication(
-      source: SourceOutcome,
-      buildReceipt: ExtendedBuildReceipt,
-      receipt: AdjudicationReceiptId,
-      reviewer: Fingerprint,
-      evidence: NonEmptyVector[Evidence],
-      provenance: Provenance
-  ): Either[DomainError, AdmittedViewEvidence] =
-    admit(
-      source,
-      Some(buildReceipt),
-      AcquisitionViewAuthorityKind.HumanAdjudication,
-      reviewer,
-      evidence,
-      provenance,
-      Some(receipt),
-      None
-    )
-
-  /** Admit evidence for a researcher-reviewed fixture under an independently issued receipt. */
-  def fixtureReview(
-      source: SourceOutcome,
-      buildReceipt: Option[ExtendedBuildReceipt],
-      receipt: FixtureAdmissionReceiptId,
-      reviewer: Fingerprint,
-      evidence: NonEmptyVector[Evidence],
-      provenance: Provenance
-  ): Either[DomainError, AdmittedViewEvidence] =
-    admit(
-      source,
-      buildReceipt,
-      AcquisitionViewAuthorityKind.FixtureReview,
-      reviewer,
-      evidence,
-      provenance,
-      None,
-      Some(receipt)
-    )
-
-  private def admit(
+  private[acquire] def admit(
       source: SourceOutcome,
       buildReceipt: Option[ExtendedBuildReceipt],
       kind: AcquisitionViewAuthorityKind,
+      issuer: Fingerprint,
       reviewer: Fingerprint,
       evidence: NonEmptyVector[Evidence],
       provenance: Provenance,
@@ -617,7 +639,9 @@ object AdmittedViewEvidence:
       _ <-
         if evidence.forall(item =>
             item.spans.exists(
-              _.refs.forall(ref => ref.span.endExclusive <= identities.canonicalUtf16Length)
+              _.refs.forall(ref =>
+                !ref.span.isEmpty && ref.span.endExclusive <= identities.canonicalUtf16Length
+              )
             )
           )
         then Right(())
@@ -625,7 +649,7 @@ object AdmittedViewEvidence:
           Left(
             DomainError.InvariantViolation(
               "output/acquisition/view-evidence",
-              "every admitted evidence item must cite a span inside the canonical source"
+              "every admitted evidence item must cite a nonempty span inside the canonical source"
             )
           )
       _ <-
@@ -641,6 +665,7 @@ object AdmittedViewEvidence:
         kind,
         joined._1,
         joined._2,
+        issuer,
         reviewer,
         evidence,
         provenance,
@@ -649,6 +674,7 @@ object AdmittedViewEvidence:
       )
     yield new AdmittedViewEvidence(
       kind,
+      issuer,
       joined._1,
       joined._2,
       checksum,
@@ -663,6 +689,7 @@ object AdmittedViewEvidence:
       kind: AcquisitionViewAuthorityKind,
       sourceChecksum: Checksum,
       buildReceiptChecksum: Option[Checksum],
+      issuer: Fingerprint,
       reviewer: Fingerprint,
       evidence: NonEmptyVector[Evidence],
       provenance: Provenance,
@@ -707,7 +734,7 @@ object AdmittedViewEvidence:
         sourceChecksum.hex,
         if buildReceiptChecksum.isDefined then "build.some" else "build.none"
       ) ++ buildReceiptChecksum.toVector.map(_.hex) ++
-        Vector(reviewer.value) ++ evidenceParts ++
+        Vector(issuer.value, reviewer.value) ++ evidenceParts ++
         Vector(provenance.softwareVersion, provenance.configHash.hex) ++ callParts ++
         Vector(
           if adjudicationReceipt.isDefined then "adjudication.some" else "adjudication.none"
