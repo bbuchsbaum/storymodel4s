@@ -9,6 +9,34 @@ import munit.FunSuite
   */
 class ConstructionProbeSuite extends FunSuite:
 
+  // Macro snippets are strings, so these real references make Zinc invalidate the court.
+  private val dependsOn: List[Class[?]] = List(
+    classOf[storymodel4s.embed.ReceiptDigest.Plain],
+    classOf[storymodel4s.embed.ReceiptDigest.Keyed],
+    classOf[storymodel4s.embed.ReceiptDigest.Withheld],
+    classOf[storymodel4s.embed.CacheKey],
+    classOf[storymodel4s.embed.ItemDigest],
+    classOf[storymodel4s.embed.ValidatedVector],
+    classOf[storymodel4s.embed.EmbeddingReceipt],
+    classOf[storymodel4s.embed.SensitiveDigest],
+    classOf[storymodel4s.embed.EmbeddingSpace],
+    classOf[storymodel4s.embed.GeometryPair],
+    classOf[storymodel4s.embed.RemoteCapability],
+    classOf[storymodel4s.embed.AuthorizedRemoteRequest],
+    classOf[storymodel4s.embed.EmbedBatch],
+    classOf[storymodel4s.embed.AttemptReceipt],
+    classOf[storymodel4s.embed.PseudonymizationDetection],
+    classOf[storymodel4s.embed.PseudonymizationDetector],
+    classOf[storymodel4s.embed.DetectorPolicyIdentity],
+    classOf[storymodel4s.embed.PseudonymizedText],
+    classOf[storymodel4s.embed.LatePoolingRecipe],
+    classOf[storymodel4s.embed.InstructionDigest],
+    classOf[storymodel4s.embed.ExecutionFailure.PolicyDenied],
+    classOf[storymodel4s.embed.PolicyDecision.Allowed],
+    classOf[storymodel4s.embed.PolicyDecision.LocalOnly],
+    classOf[storymodel4s.embed.RemotePolicy]
+  )
+
   /** Sweep 3 slice: the Mirror.ProductOf door across embed-core's private-constructor case classes.
     *
     * `case class X private (...)` still derives `Mirror.ProductOf` in Scala 3, so the private
@@ -17,6 +45,7 @@ class ConstructionProbeSuite extends FunSuite:
     * bd-01M183VBPNEAPT5JNQMBMYMKQ9.
     */
   test("sweep 3: Mirror.ProductOf door across embed-core private-constructor case classes") {
+    assert(dependsOn.forall(_ != null))
     assertEquals(
       typeCheckErrors("summon[scala.deriving.Mirror.ProductOf[storymodel4s.core.SurfaceUnit]]"),
       Nil,
