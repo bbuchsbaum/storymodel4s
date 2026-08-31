@@ -11,6 +11,10 @@ import storymodel4s.acquire.{FindingNote, PermittedOperation, PromptPackageManif
   */
 class ConstructionProbeSuite extends FunSuite:
 
+  // CriticFinding otherwise appears only inside macro strings, which gives Zinc no dependency.
+  private val criticFindingDependency: Class[?] =
+    classOf[storymodel4s.acquire.CriticFinding]
+
   private def refused(errors: List[scala.compiletime.testing.Error], what: String): Unit =
     assert(errors.nonEmpty, s"$what must not be constructible outside storymodel4s.acquire")
 
@@ -85,6 +89,7 @@ class ConstructionProbeSuite extends FunSuite:
   }
 
   test("CriticFinding apply cannot admit a raw note") {
+    assert(criticFindingDependency != null)
     refused(
       typeCheckErrors(
         """(f: storymodel4s.acquire.CriticFinding) =>

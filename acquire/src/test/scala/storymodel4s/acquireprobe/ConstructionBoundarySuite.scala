@@ -14,8 +14,7 @@ class ConstructionBoundarySuite extends FunSuite:
     * and the court PASSED; the same mutation under `Test/clean` failed correctly. A guard that does
     * not re-run when the thing it guards changes is not a guard.
     *
-    * These bindings are never used. They exist so that touching resolve.scala invalidates this
-    * suite and forces the macros to be re-evaluated.
+    * The control reads this binding so the dependency is retained without an unused-member warning.
     */
   private val dependsOn: (Class[?], Class[?]) =
     (classOf[storymodel4s.acquire.CandidateLedger[?]], classOf[storymodel4s.acquire.LedgerEntry[?]])
@@ -39,6 +38,7 @@ class ConstructionBoundarySuite extends FunSuite:
     * WOULD THEY BE FIXING A BUG? For `CandidateLedger` the answer is yes; for `LedgerEntry`, no.
     */
   test("probe control detects a case-class fromProduct") {
+    assert(dependsOn._1 != null && dependsOn._2 != null)
     assertEquals(
       typeCheckErrors(
         "storymodel4s.acquire.LedgerEntry.fromProduct(EmptyTuple)"
