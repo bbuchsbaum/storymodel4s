@@ -190,6 +190,12 @@ class OutputSuite extends FunSuite:
 
   test("view authority is admitted only from its matching source and build evidence") {
     val (source, _, identities) = sourceFixture()
+    val sourceOutcome = SourceOutcome.Constructed(identities)
+    val buildReceipt = receipt(source)
+    val validatedAuthority = AcquisitionViewAuthority
+      .validatedBuild(sourceOutcome, buildReceipt)
+      .toOption
+      .get
     val universe = EstablishedUniverse.of(Vector.empty[String], definition).toOption.get
     val gap = ResultGap(
       ResultGapKind.Unresolved,
@@ -202,13 +208,13 @@ class OutputSuite extends FunSuite:
       AcquisitionAccount
         .of(
           InvocationId.unsafe("invocation-view-authority-no-build"),
-          SourceOutcome.Constructed(identities),
+          sourceOutcome,
           TargetUniverse.Established(universe),
           semantic,
           Vector.empty,
           Vector.empty,
           None,
-          Some(AcquisitionViewAuthority.ValidatedBuild)
+          Some(validatedAuthority)
         )
         .isInvalid,
       "validated-build authority cannot be asserted without the admitted build"
@@ -218,35 +224,128 @@ class OutputSuite extends FunSuite:
       AcquisitionAccount
         .of(
           InvocationId.unsafe("invocation-view-authority-build"),
-          SourceOutcome.Constructed(identities),
+          sourceOutcome,
           TargetUniverse.Established(universe),
           semantic,
           Vector.empty,
           Vector.empty,
-          Some(receipt(source)),
-          Some(AcquisitionViewAuthority.ValidatedBuild)
+          Some(buildReceipt),
+          Some(validatedAuthority)
         )
         .isValid
     )
 
+    val fixtureAuthority = AcquisitionViewAuthority
+      .fixtureReview(
+        sourceOutcome,
+        None,
+        "fixture-review-evidence".getBytes(StandardCharsets.UTF_8).toVector
+      )
+      .toOption
+      .get
     assert(
       AcquisitionAccount
         .of(
           InvocationId.unsafe("invocation-view-authority-fixture"),
-          SourceOutcome.Constructed(identities),
+          sourceOutcome,
           TargetUniverse.Established(universe),
           semantic,
           Vector.empty,
           Vector.empty,
           None,
-          Some(
-            AcquisitionViewAuthority.FixtureReview(
-              FixtureAdmissionReceiptId.unsafe("receipt-fixture-review")
-            )
-          )
+          Some(fixtureAuthority)
         )
         .isValid,
       "fixture authority is distinct evidence and does not fabricate a build"
+    )
+  }
+
+  test("human and fixture authority receipts are derived and revalidated from evidence") {
+    val (source, _, identities) = sourceFixture()
+    val sourceOutcome = SourceOutcome.Constructed(identities)
+    val buildReceipt = receipt(source)
+    val foreignStoryBuild = buildReceipt.copy(
+      receipt = buildReceipt.receipt.copy(storyId = StoryId.unsafe("foreign-story"))
+    )
+    assert(AcquisitionViewAuthority.validatedBuild(sourceOutcome, foreignStoryBuild).isLeft)
+    assert(
+      AcquisitionViewAuthority
+        .humanAdjudication(sourceOutcome, buildReceipt, Vector.empty)
+        .isLeft
+    )
+    assert(AcquisitionViewAuthority.fixtureReview(sourceOutcome, None, Vector.empty).isLeft)
+    val human = AcquisitionViewAuthority
+      .humanAdjudication(
+        sourceOutcome,
+        buildReceipt,
+        "human-adjudication-evidence".getBytes(StandardCharsets.UTF_8).toVector
+      )
+      .toOption
+      .get
+    assertEquals(
+      AcquisitionViewAuthority.fromWire(
+        sourceOutcome,
+        Some(buildReceipt),
+        human.kind,
+        human.sourceChecksum,
+        human.buildReceiptChecksum,
+        human.evidenceChecksum,
+        human.adjudicationReceipt,
+        human.fixtureReceipt
+      ),
+      Right(human)
+    )
+    assert(
+      AcquisitionViewAuthority
+        .fromWire(
+          sourceOutcome,
+          Some(buildReceipt),
+          human.kind,
+          human.sourceChecksum,
+          human.buildReceiptChecksum,
+          Some(Checksum.ofText("different-evidence")),
+          human.adjudicationReceipt,
+          human.fixtureReceipt
+        )
+        .isLeft,
+      "an adjudication receipt cannot be reused with different evidence"
+    )
+
+    val fixture = AcquisitionViewAuthority
+      .fixtureReview(
+        sourceOutcome,
+        None,
+        "fixture-review-evidence".getBytes(StandardCharsets.UTF_8).toVector
+      )
+      .toOption
+      .get
+    assertEquals(
+      AcquisitionViewAuthority.fromWire(
+        sourceOutcome,
+        None,
+        fixture.kind,
+        fixture.sourceChecksum,
+        fixture.buildReceiptChecksum,
+        fixture.evidenceChecksum,
+        fixture.adjudicationReceipt,
+        fixture.fixtureReceipt
+      ),
+      Right(fixture)
+    )
+    assert(
+      AcquisitionViewAuthority
+        .fromWire(
+          sourceOutcome,
+          None,
+          fixture.kind,
+          fixture.sourceChecksum,
+          fixture.buildReceiptChecksum,
+          fixture.evidenceChecksum,
+          fixture.adjudicationReceipt,
+          Some(FixtureAdmissionReceiptId.unsafe("caller-minted-fixture-receipt"))
+        )
+        .isLeft,
+      "a caller-selected fixture receipt cannot mint authority"
     )
   }
 

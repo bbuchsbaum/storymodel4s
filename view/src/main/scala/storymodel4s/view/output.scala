@@ -526,12 +526,8 @@ object ReportInputIdentity:
               ) ++ target.payloads.map(payload => s"target[$index].payload=${payload.value}")
             } ++
             acquisition.payloads.flatMap(payloadParts) ++
-            acquisition.buildReceipt.toVector.map(receipt =>
-              s"build=${receipt.receipt.contentChecksum.hex}"
-            ) ++
-            acquisition.viewAuthority.toVector.map(authority =>
-              s"acquisition-authority=$authority"
-            ) ++
+            acquisition.buildReceipt.toVector.flatMap(buildParts) ++
+            acquisition.viewAuthority.toVector.flatMap(authorityParts) ++
             artifactParts(artifacts) ++
             basis.toVector.flatMap(basisParts) ++
             targetParts
@@ -544,14 +540,50 @@ object ReportInputIdentity:
       Vector(
         "source=constructed",
         s"story=${value.storyId.value}",
-        s"original=${value.original.checksum.hex}",
-        s"decoded=${value.decodedChecksum.hex}",
-        s"canonical=${value.canonicalChecksum.hex}",
+        s"original-bytes=${value.original.byteLength}",
+        s"original-checksum=${value.original.checksum.hex}",
+        s"original-media=${value.original.mediaType.value}",
+        s"original-declared-charset=${value.original.declaredCharset.map(_.value).getOrElse("none")}",
+        s"original-selected-charset=${value.original.selectedCharset.value}",
+        s"original-bom=${value.original.bom}",
+        s"original-intake-receipt=${value.original.intakeReceipt.value}",
+        s"decoded-utf16=${value.decodedUtf16Length}",
+        s"decoded-checksum=${value.decodedChecksum.hex}",
+        s"canonical-policy=${value.canonicalPolicy.value}",
+        s"canonical-bytes=${value.canonicalByteLength}",
+        s"canonical-utf16=${value.canonicalUtf16Length}",
+        s"canonical-checksum=${value.canonicalChecksum.hex}",
         s"decode-receipt=${value.decodeReceipt.id.value}",
+        s"decoder=${value.decodeReceipt.decoder.value}",
         s"canonical-receipt=${value.canonicalizationReceipt.value}"
       )
     case SourceOutcome.Refused(progress, failure) =>
-      Vector("source=refused", s"progress=$progress", s"failure=${failure.receipt.value}")
+      Vector("source=refused") ++ refusedProgressParts(progress) ++ failureParts("source", failure)
+
+  private def refusedProgressParts(progress: RefusedSourceProgress): Vector[String] = progress match
+    case RefusedSourceProgress.BeforeIntake       => Vector("source-progress=before-intake")
+    case RefusedSourceProgress.Admitted(original) =>
+      Vector("source-progress=admitted") ++ originalParts("refused-original", original)
+    case RefusedSourceProgress.Decoded(original, decoded) =>
+      Vector("source-progress=decoded") ++
+        originalParts("refused-original", original) ++
+        Vector(
+          s"refused-decoded-utf16=${decoded.utf16Length}",
+          s"refused-decoded-checksum=${decoded.checksum.hex}",
+          s"refused-decode-receipt=${decoded.decodeReceipt.id.value}",
+          s"refused-decoder=${decoded.decodeReceipt.decoder.value}"
+        )
+
+  private def originalParts(prefix: String, value: OriginalSourceIdentity): Vector[String] =
+    Vector(
+      s"$prefix-bytes=${value.byteLength}",
+      s"$prefix-checksum=${value.checksum.hex}",
+      s"$prefix-media=${value.mediaType.value}",
+      s"$prefix-declared-charset=${value.declaredCharset.map(_.value).getOrElse("none")}",
+      s"$prefix-selected-charset=${value.selectedCharset.value}",
+      s"$prefix-bom=${value.bom}",
+      s"$prefix-intake-receipt=${value.intakeReceipt.value}"
+    )
 
   private def universeParts[Id: OutputTargetIdentity](
       universe: TargetUniverse[Id]
@@ -568,19 +600,26 @@ object ReportInputIdentity:
       Vector(
         "universe=unestablished",
         s"universe-reason=${failure.reason}",
-        s"universe-receipt=${failure.receipt.value}"
+        s"universe-receipt=${failure.receipt.value}",
+        s"universe-stage=${failure.stage.map(_.value).getOrElse("none")}"
       )
 
   private def semanticParts(semantic: SemanticOutcome): Vector[String] = semantic match
     case SemanticOutcome.Validated(model)     => modelParts("validated", model)
     case SemanticOutcome.Partial(gaps, draft) =>
       Vector("semantic=partial") ++
-        gaps.toVector.map(gap => s"gap=${gap.kind}:${gap.receipt.value}") ++
+        gaps.toVector.zipWithIndex.flatMap { case (gap, index) =>
+          Vector(
+            s"gap[$index].kind=${gap.kind}",
+            s"gap[$index].receipt=${gap.receipt.value}",
+            s"gap[$index].payload=${gap.payload.map(_.value).getOrElse("none")}"
+          )
+        } ++
         draft.toVector.flatMap(modelParts("draft", _))
     case SemanticOutcome.Refused(errors) =>
-      Vector("semantic=refused") ++ errors.toVector.map(error =>
-        s"semantic-error=${error.code}:${error.receipt.value}"
-      )
+      Vector("semantic=refused") ++ errors.toVector.zipWithIndex.flatMap { case (error, index) =>
+        failureParts(s"semantic-error[$index]", error)
+      }
 
   private def modelParts(prefix: String, model: SemanticModelRef): Vector[String] =
     Vector(
@@ -596,8 +635,67 @@ object ReportInputIdentity:
       Vector(s"payload=${ref.id.value}:${ref.schemaId.value}:${ref.checksum.hex}:known")
     case OutputPayload.Unsupported(extension) =>
       Vector(
-        s"payload=${extension.id.value}:${extension.schemaId.value}:${extension.checksum.hex}:${extension.requirement}"
+        s"payload=${extension.id.value}:${extension.namespace.value}:${extension.schemaId.value}:${extension.checksum.hex}:${extension.requirement}"
       )
+
+  private def failureParts(prefix: String, error: OutputFailure): Vector[String] =
+    Vector(
+      s"$prefix-code=${error.code}",
+      s"$prefix-receipt=${error.receipt.value}",
+      s"$prefix-stage=${error.stage.map(_.value).getOrElse("none")}"
+    ) ++ error.evidence.zipWithIndex.map { case (receipt, index) =>
+      s"$prefix-evidence[$index]=${receipt.value}"
+    }
+
+  private def buildParts(value: ExtendedBuildReceipt): Vector[String] =
+    Vector(
+      s"build-story=${value.receipt.storyId.value}",
+      s"build-source=${value.receipt.sourceChecksum.hex}",
+      s"build-schema=${value.receipt.schemaVersion}"
+    ) ++ value.receipt.stages.zipWithIndex.flatMap { case ((stage, checksum), index) =>
+      Vector(
+        s"build-stage[$index].id=${stage.value}",
+        s"build-stage[$index].checksum=${checksum.hex}"
+      )
+    } ++ value.stages.zipWithIndex.flatMap { case (stage, index) =>
+      Vector(
+        s"stage-record[$index].id=${stage.stage.value}",
+        s"stage-record[$index].key=${stage.key.checksum.hex}",
+        s"stage-record[$index].cached=${stage.cached}"
+      ) ++ stage.inputs.zipWithIndex.map { case (checksum, inputIndex) =>
+        s"stage-record[$index].input[$inputIndex]=${checksum.hex}"
+      } ++ stage.outputs.zipWithIndex.map { case (checksum, outputIndex) =>
+        s"stage-record[$index].output[$outputIndex]=${checksum.hex}"
+      } ++ stage.calls.zipWithIndex.flatMap { case (call, callIndex) =>
+        providerCallParts(s"stage-record[$index].call[$callIndex]", call)
+      }
+    } ++ value.layerCoverage.toVector.sortBy(_._1.value).map { case (layer, coverage) =>
+      s"layer-coverage=${layer.value}:$coverage"
+    }
+
+  private def providerCallParts(prefix: String, call: ProviderCall): Vector[String] =
+    Vector(
+      s"$prefix.provider=${call.provider}",
+      s"$prefix.model=${call.model}",
+      s"$prefix.version=${call.version}",
+      s"$prefix.prompt=${call.promptTemplateVersion.map(_.value).getOrElse("none")}",
+      s"$prefix.input=${call.inputChecksum.hex}",
+      s"$prefix.output=${call.outputChecksum.hex}",
+      s"$prefix.seed=${call.seed.map(_.toString).getOrElse("none")}",
+      s"$prefix.cached=${call.cached}"
+    ) ++ call.params.toVector.sortBy(_._1).map { case (key, value) =>
+      s"$prefix.param=$key=$value"
+    }
+
+  private def authorityParts(authority: AcquisitionViewAuthority): Vector[String] =
+    Vector(
+      s"acquisition-authority-kind=${authority.kind}",
+      s"acquisition-authority-source=${authority.sourceChecksum.hex}",
+      s"acquisition-authority-build=${authority.buildReceiptChecksum.map(_.hex).getOrElse("none")}",
+      s"acquisition-authority-evidence=${authority.evidenceChecksum.map(_.hex).getOrElse("none")}",
+      s"acquisition-authority-adjudication=${authority.adjudicationReceipt.map(_.value).getOrElse("none")}",
+      s"acquisition-authority-fixture=${authority.fixtureReceipt.map(_.value).getOrElse("none")}"
+    )
 
   private def artifactParts(refs: ScientificArtifactRefs): Vector[String] =
     Vector(
@@ -769,8 +867,8 @@ object AdmittedViewBasis:
       case SourceOutcome.Constructed(identities) => Some(identities.canonicalChecksum)
       case SourceOutcome.Refused(_, _)           => None
     val buildChecksum = acquisition.buildReceipt.map(_.receipt.contentChecksum)
-    (sourceChecksum, acquisition.viewAuthority) match
-      case (Some(source), Some(AcquisitionViewAuthority.ValidatedBuild)) =>
+    (sourceChecksum, acquisition.viewAuthority.map(_.kind)) match
+      case (Some(source), Some(AcquisitionViewAuthorityKind.ValidatedBuild)) =>
         buildChecksum
           .map(checksum =>
             new AdmittedViewBasis(
@@ -786,9 +884,9 @@ object AdmittedViewBasis:
               "validated-build authority requires the admitted build receipt"
             )
           )
-      case (Some(source), Some(AcquisitionViewAuthority.HumanAdjudication(receipt))) =>
-        buildChecksum
-          .map(checksum =>
+      case (Some(source), Some(AcquisitionViewAuthorityKind.HumanAdjudication)) =>
+        (buildChecksum, acquisition.viewAuthority.flatMap(_.adjudicationReceipt))
+          .mapN((checksum, receipt) =>
             new AdmittedViewBasis(
               ViewBasis.HumanAdjudicated,
               source,
@@ -799,18 +897,26 @@ object AdmittedViewBasis:
           .toRight(
             DomainError.InvariantViolation(
               "output/view/basis-build",
-              "human-adjudicated authority requires the admitted build receipt"
+              "human-adjudicated authority requires its admitted build and evidence receipt"
             )
           )
-      case (Some(source), Some(AcquisitionViewAuthority.FixtureReview(receipt))) =>
-        Right(
-          new AdmittedViewBasis(
-            ViewBasis.ResearcherReviewedFixture,
-            source,
-            buildChecksum,
-            BasisAuthority.FixtureReview(receipt)
+      case (Some(source), Some(AcquisitionViewAuthorityKind.FixtureReview)) =>
+        acquisition.viewAuthority
+          .flatMap(_.fixtureReceipt)
+          .map(receipt =>
+            new AdmittedViewBasis(
+              ViewBasis.ResearcherReviewedFixture,
+              source,
+              buildChecksum,
+              BasisAuthority.FixtureReview(receipt)
+            )
           )
-        )
+          .toRight(
+            DomainError.InvariantViolation(
+              "output/view/basis-authority",
+              "fixture authority requires its admitted evidence receipt"
+            )
+          )
       case _ =>
         Left(
           DomainError.InvariantViolation(

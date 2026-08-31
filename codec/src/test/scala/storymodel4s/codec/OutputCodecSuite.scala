@@ -41,6 +41,11 @@ class OutputCodecSuite extends FunSuite:
     Vector.empty,
     Map.empty
   )
+  private val sourceOutcome = SourceOutcome.Constructed(identities)
+  private val validatedAuthority = AcquisitionViewAuthority
+    .validatedBuild(sourceOutcome, build)
+    .toOption
+    .get
   private val extensionId = OutputPayloadId.unsafe("optional-future")
   private val optionalExtension = UnsupportedExtension(
     extensionId,
@@ -62,13 +67,13 @@ class OutputCodecSuite extends FunSuite:
   private val acquisition = AcquisitionAccount
     .of(
       InvocationId.unsafe("invocation-codec"),
-      SourceOutcome.Constructed(identities),
+      sourceOutcome,
       TargetUniverse.Established(universe),
       SemanticOutcome.Validated(modelRef),
       Vector.empty,
       Vector(OutputPayload.Unsupported(optionalExtension)),
       Some(build),
-      Some(AcquisitionViewAuthority.ValidatedBuild)
+      Some(validatedAuthority)
     )
     .toOption
     .get
@@ -309,6 +314,90 @@ class OutputCodecSuite extends FunSuite:
     assert(
       StoryOutputResultCodec.decode[String](Canonical.print(relabelledRoot)).isLeft,
       "the same source cannot be relabelled with fixture authority on the wire"
+    )
+
+    val fixtureAuthority = AcquisitionViewAuthority
+      .fixtureReview(
+        sourceOutcome,
+        Some(build),
+        "fixture-authority-evidence".getBytes(StandardCharsets.UTF_8).toVector
+      )
+      .toOption
+      .get
+    val fixtureAccount = AcquisitionAccount
+      .of(
+        acquisition.invocationId,
+        acquisition.source,
+        acquisition.universe,
+        acquisition.semantic,
+        acquisition.targets,
+        acquisition.payloads,
+        acquisition.buildReceipt,
+        Some(fixtureAuthority)
+      )
+      .toOption
+      .get
+    val fixtureArtifacts = ScientificArtifactRefs
+      .of(
+        fixtureAccount,
+        scientificArtifacts.originalSource,
+        scientificArtifacts.canonicalSource,
+        scientificArtifacts.semanticModel
+      )
+      .toOption
+      .get
+    val fixtureBasis = AdmittedViewBasis.fromAcquisition(fixtureAccount).toOption.get
+    val fixtureResult = StoryOutputResult
+      .of(
+        fixtureAccount,
+        fixtureArtifacts,
+        Some(fixtureBasis),
+        Vector.empty,
+        Vector.empty,
+        Vector.empty,
+        Vector.empty
+      )
+      .toOption
+      .get
+    val fixtureEncoded = StoryOutputResultCodec.encode[String](fixtureResult)
+    assertEquals(StoryOutputResultCodec.decode[String](fixtureEncoded), Right(fixtureResult))
+    val fixtureJson = Canonical.parse(fixtureEncoded).toOption.get
+    val fixtureAuthorityJson = fixtureJson.hcursor
+      .downField("acquisition")
+      .downField("viewAuthority")
+      .focus
+      .get
+    val fixtureBasisJson = fixtureJson.hcursor.downField("viewBasis").focus.get
+    val acquisitionObject = parsed.hcursor.downField("acquisition").focus.flatMap(_.asObject).get
+    val combinedRelabel = parsed.mapObject(
+      _.add(
+        "acquisition",
+        Json.fromJsonObject(acquisitionObject.add("viewAuthority", fixtureAuthorityJson))
+      ).add("viewBasis", fixtureBasisJson)
+    )
+    assert(
+      StoryOutputResultCodec.decode[String](Canonical.print(combinedRelabel)).isLeft,
+      "a coordinated acquisition-authority and basis relabel cannot reuse old report receipts"
+    )
+
+    val sourceObject = parsed.hcursor.downField("source").focus.flatMap(_.asObject).get
+    val sourceIdentities = sourceObject("identities").flatMap(_.asObject).get
+    val sourceOriginal = sourceIdentities("original").flatMap(_.asObject).get
+    val foreignOriginal = sourceIdentities.add(
+      "original",
+      Json.fromJsonObject(
+        sourceOriginal.add("intakeReceipt", Json.fromString("receipt-intake-foreign"))
+      )
+    )
+    val foreignIntake = parsed.mapObject(
+      _.add(
+        "source",
+        Json.fromJsonObject(sourceObject.add("identities", Json.fromJsonObject(foreignOriginal)))
+      )
+    )
+    assert(
+      StoryOutputResultCodec.decode[String](Canonical.print(foreignIntake)).isLeft,
+      "changing only the intake receipt must invalidate result-bound report receipts"
     )
 
     val foreignAccount = AcquisitionAccount
@@ -567,7 +656,7 @@ class OutputCodecSuite extends FunSuite:
         Vector.empty,
         Vector.empty,
         Some(build),
-        Some(AcquisitionViewAuthority.ValidatedBuild)
+        Some(validatedAuthority)
       )
       .toOption
       .get

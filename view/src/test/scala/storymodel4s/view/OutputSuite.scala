@@ -35,17 +35,29 @@ class OutputSuite extends FunSuite:
     Vector.empty,
     Map.empty
   )
+  private val validatedAuthority = AcquisitionViewAuthority
+    .validatedBuild(SourceOutcome.Constructed(identities), buildReceipt)
+    .toOption
+    .get
+  private def fixtureAuthority(
+      evidence: String,
+      build: Option[ExtendedBuildReceipt] = Some(buildReceipt)
+  ): AcquisitionViewAuthority =
+    AcquisitionViewAuthority
+      .fixtureReview(
+        SourceOutcome.Constructed(identities),
+        build,
+        evidence.getBytes(StandardCharsets.UTF_8).toVector
+      )
+      .toOption
+      .get
 
   test("v1 refuses mixed view-basis authority instead of choosing a precedence") {
     val acquired = AdmittedViewBasis.fromAcquisition(acquisition()).toOption.get
     val fixture = AdmittedViewBasis
       .fromAcquisition(
         acquisition(
-          authority = Some(
-            AcquisitionViewAuthority.FixtureReview(
-              FixtureAdmissionReceiptId.unsafe("receipt-fixture-basis")
-            )
-          )
+          authority = Some(fixtureAuthority("receipt-fixture-basis"))
         )
       )
       .toOption
@@ -73,11 +85,7 @@ class OutputSuite extends FunSuite:
     )
 
     val fixtureAccount = acquisition(
-      authority = Some(
-        AcquisitionViewAuthority.FixtureReview(
-          FixtureAdmissionReceiptId.unsafe("fixture-authority")
-        )
-      )
+      authority = Some(fixtureAuthority("fixture-authority"))
     )
     val fixture = AdmittedViewBasis.fromAcquisition(fixtureAccount).toOption.get
     assert(
@@ -119,9 +127,7 @@ class OutputSuite extends FunSuite:
   private def acquisition(
       payloads: Vector[OutputPayload] = Vector.empty,
       invocationId: InvocationId = InvocationId.unsafe("invocation-1"),
-      authority: Option[AcquisitionViewAuthority] = Some(
-        AcquisitionViewAuthority.ValidatedBuild
-      )
+      authority: Option[AcquisitionViewAuthority] = Some(validatedAuthority)
   ): AcquisitionAccount[String] =
     AcquisitionAccount
       .of(
@@ -186,7 +192,7 @@ class OutputSuite extends FunSuite:
         targetOrder.map(TargetAccount(_, TargetDisposition.Accepted, Vector.empty)),
         Vector.empty,
         Some(buildReceipt),
-        Some(AcquisitionViewAuthority.ValidatedBuild)
+        Some(validatedAuthority)
       )
       .toOption
       .get
@@ -428,11 +434,7 @@ class OutputSuite extends FunSuite:
     assert(noBasis.isInvalid)
 
     val fixtureAccount = acquisition(
-      authority = Some(
-        AcquisitionViewAuthority.FixtureReview(
-          FixtureAdmissionReceiptId.unsafe("fixture-review")
-        )
-      )
+      authority = Some(fixtureAuthority("fixture-review"))
     )
     val wrongBasis = AdmittedViewBasis.fromAcquisition(fixtureAccount).toOption.get
     assert(
@@ -526,6 +528,104 @@ class OutputSuite extends FunSuite:
         )
         .isInvalid
     )
+  }
+
+  test("report identity binds the intake receipt and refuses a one-field foreign result") {
+    val foreignOriginal = OriginalSourceIdentity.fromBytes(
+      sourceBytes,
+      textPlain,
+      Some(utf8),
+      utf8,
+      BomDisposition.Absent,
+      OutputReceiptId.unsafe("receipt-intake-foreign")
+    )
+    val foreignIdentities = SourceIdentities.fromStorySource(
+      foreignOriginal,
+      source,
+      identities.decodeReceipt,
+      identities.canonicalizationReceipt
+    )
+    val foreignSource = SourceOutcome.Constructed(foreignIdentities)
+    val foreignAuthority = AcquisitionViewAuthority
+      .validatedBuild(foreignSource, buildReceipt)
+      .toOption
+      .get
+    val foreignAccount = AcquisitionAccount
+      .of(
+        acquisition().invocationId,
+        foreignSource,
+        acquisition().universe,
+        acquisition().semantic,
+        acquisition().targets,
+        acquisition().payloads,
+        Some(buildReceipt),
+        Some(foreignAuthority)
+      )
+      .toOption
+      .get
+    val foreignArtifacts = ScientificArtifactRefs
+      .of(
+        foreignAccount,
+        scientificArtifacts.originalSource,
+        scientificArtifacts.canonicalSource,
+        scientificArtifacts.semanticModel
+      )
+      .toOption
+      .get
+    val foreignBasis = AdmittedViewBasis.fromAcquisition(foreignAccount).toOption.get
+    val originalInput = ReportInputIdentity
+      .forReport(acquisition(), scientificArtifacts, Some(basis), textRequest)
+      .toOption
+      .get
+    val foreignInput = ReportInputIdentity
+      .forReport(foreignAccount, foreignArtifacts, Some(foreignBasis), textRequest)
+      .toOption
+      .get
+    assertNotEquals(originalInput, foreignInput)
+
+    val foreignReceipt = ReportReceipt.issue(
+      OutputReceiptId.unsafe("receipt-foreign-intake"),
+      RendererId.unsafe("text-renderer/v1"),
+      OutputSoftwareId.unsafe("storyatlas/test"),
+      foreignInput,
+      Checksum.ofText("text-config")
+    )
+    assert(
+      StoryOutputResult
+        .of(
+          acquisition(),
+          scientificArtifacts,
+          Some(basis),
+          Vector(textRequest),
+          Vector(ReportOutcome.Produced(textId, textArtifact, foreignReceipt)),
+          Vector.empty,
+          Vector.empty
+        )
+        .isInvalid,
+      "a receipt differing only in the original intake receipt must fail"
+    )
+  }
+
+  test("report identity binds acquisition authority even when no view basis is requested") {
+    val fixtureAccount = acquisition(authority = Some(fixtureAuthority("identity-fixture")))
+    val fixtureArtifacts = ScientificArtifactRefs
+      .of(
+        fixtureAccount,
+        scientificArtifacts.originalSource,
+        scientificArtifacts.canonicalSource,
+        scientificArtifacts.semanticModel
+      )
+      .toOption
+      .get
+    val validatedInput = ReportInputIdentity
+      .forReport(acquisition(), scientificArtifacts, None, textRequest)
+      .toOption
+      .get
+    val fixtureInput = ReportInputIdentity
+      .forReport(fixtureAccount, fixtureArtifacts, None, textRequest)
+      .toOption
+      .get
+    assertNotEquals(validatedInput, fixtureInput)
   }
 
   test("report identity binds ordered universe and target identities") {
@@ -816,7 +916,7 @@ class OutputSuite extends FunSuite:
         Vector.empty,
         Vector.empty,
         Some(buildReceipt),
-        Some(AcquisitionViewAuthority.ValidatedBuild)
+        Some(validatedAuthority)
       )
       .toOption
       .get
@@ -963,11 +1063,7 @@ class OutputSuite extends FunSuite:
         Vector.empty,
         Vector.empty,
         None,
-        Some(
-          AcquisitionViewAuthority.FixtureReview(
-            FixtureAdmissionReceiptId.unsafe("receipt-partial-no-draft-fixture")
-          )
-        )
+        Some(fixtureAuthority("receipt-partial-no-draft-fixture", None))
       )
       .toOption
       .get

@@ -814,7 +814,25 @@ object StoryOutputResultCodec:
           targets <- field[Vector[TargetAccount[Id]]](ac, "targets")
           payloads <- field[Vector[OutputPayload]](ac, "payloads")
           receipt <- field[Option[ExtendedBuildReceipt]](ac, "buildReceipt")
-          authority <- field[Option[AcquisitionViewAuthority]](ac, "viewAuthority")
+          authorityClaim <- field[Option[OutputAcquireCodecs.AcquisitionViewAuthorityClaim]](
+            ac,
+            "viewAuthority"
+          )
+          authority <- authorityClaim.traverse(claim =>
+            domain(
+              c,
+              AcquisitionViewAuthority.fromWire(
+                source,
+                receipt,
+                claim.kind,
+                claim.sourceChecksum,
+                claim.buildReceiptChecksum,
+                claim.evidenceChecksum,
+                claim.adjudicationReceipt,
+                claim.fixtureReceipt
+              )
+            )
+          )
           acquisition <- domainValidated(
             c,
             AcquisitionAccount.of(

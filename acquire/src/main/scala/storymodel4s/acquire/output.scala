@@ -490,15 +490,235 @@ enum SemanticOutcome:
   case Partial(gaps: NonEmptyVector[ResultGap], draft: Option[SemanticModelRef])
   case Refused(errors: NonEmptyVector[OutputFailure])
 
-/** The authority actually admitted with an acquisition account.
-  *
-  * A later view derives its basis from this value; it cannot select a different authority label or
-  * substitute a receipt merely because the source checksum happens to match.
-  */
-enum AcquisitionViewAuthority:
+/** Closed classifications for view authority; the classification alone is never an authority. */
+enum AcquisitionViewAuthorityKind:
   case ValidatedBuild
-  case HumanAdjudication(receipt: AdjudicationReceiptId)
-  case FixtureReview(receipt: FixtureAdmissionReceiptId)
+  case HumanAdjudication
+  case FixtureReview
+
+/** Evidence-issued authority joined to the exact source and optional build it licenses.
+  *
+  * The constructor is deliberately not product-shaped. Human and fixture receipt identities are
+  * derived from canonical evidence bytes plus the source/build join; wire claims are admitted only
+  * after the same identity is rederived. A status tag or receipt-shaped caller string therefore
+  * cannot mint authority by itself.
+  */
+final class AcquisitionViewAuthority private (
+    val kind: AcquisitionViewAuthorityKind,
+    val sourceChecksum: Checksum,
+    val buildReceiptChecksum: Option[Checksum],
+    val evidenceChecksum: Option[Checksum],
+    val adjudicationReceipt: Option[AdjudicationReceiptId],
+    val fixtureReceipt: Option[FixtureAdmissionReceiptId]
+):
+  private def parts =
+    (
+      kind,
+      sourceChecksum,
+      buildReceiptChecksum,
+      evidenceChecksum,
+      adjudicationReceipt,
+      fixtureReceipt
+    )
+
+  override def equals(other: Any): Boolean = other match
+    case that: AcquisitionViewAuthority => parts == that.parts
+    case _                              => false
+  override def hashCode(): Int = parts.hashCode
+  override def toString: String = s"AcquisitionViewAuthority($kind)"
+
+object AcquisitionViewAuthority:
+  private val HumanDomain = "story-output-human-view-authority/v1"
+  private val FixtureDomain = "story-output-fixture-view-authority/v1"
+  private val EmptyEvidenceChecksum = Checksum.ofBytes(Array.emptyByteArray)
+
+  /** Issue build authority only when the build receipt belongs to the constructed source. */
+  def validatedBuild(
+      source: SourceOutcome,
+      buildReceipt: ExtendedBuildReceipt
+  ): Either[DomainError, AcquisitionViewAuthority] =
+    joinedSource(source, Some(buildReceipt)).map { case (sourceChecksum, buildChecksum) =>
+      new AcquisitionViewAuthority(
+        AcquisitionViewAuthorityKind.ValidatedBuild,
+        sourceChecksum,
+        buildChecksum,
+        None,
+        None,
+        None
+      )
+    }
+
+  /** Issue human authority from canonical adjudication-evidence bytes and the exact build. */
+  def humanAdjudication(
+      source: SourceOutcome,
+      buildReceipt: ExtendedBuildReceipt,
+      canonicalEvidence: Vector[Byte]
+  ): Either[DomainError, AcquisitionViewAuthority] =
+    evidenceChecksum(canonicalEvidence).flatMap { evidenceChecksum =>
+      joinedSource(source, Some(buildReceipt)).map { case (sourceChecksum, buildChecksum) =>
+        val receipt = AdjudicationReceiptId.unsafe(
+          receiptChecksum(HumanDomain, sourceChecksum, buildChecksum, evidenceChecksum).hex
+        )
+        new AcquisitionViewAuthority(
+          AcquisitionViewAuthorityKind.HumanAdjudication,
+          sourceChecksum,
+          buildChecksum,
+          Some(evidenceChecksum),
+          Some(receipt),
+          None
+        )
+      }
+    }
+
+  /** Issue fixture authority from canonical review-evidence bytes and its exact source/build join.
+    */
+  def fixtureReview(
+      source: SourceOutcome,
+      buildReceipt: Option[ExtendedBuildReceipt],
+      canonicalEvidence: Vector[Byte]
+  ): Either[DomainError, AcquisitionViewAuthority] =
+    evidenceChecksum(canonicalEvidence).flatMap { evidenceChecksum =>
+      joinedSource(source, buildReceipt).map { case (sourceChecksum, buildChecksum) =>
+        val receipt = FixtureAdmissionReceiptId.unsafe(
+          receiptChecksum(FixtureDomain, sourceChecksum, buildChecksum, evidenceChecksum).hex
+        )
+        new AcquisitionViewAuthority(
+          AcquisitionViewAuthorityKind.FixtureReview,
+          sourceChecksum,
+          buildChecksum,
+          Some(evidenceChecksum),
+          None,
+          Some(receipt)
+        )
+      }
+    }
+
+  /** Revalidate an untrusted wire claim against the actual acquisition inputs. */
+  def fromWire(
+      source: SourceOutcome,
+      buildReceipt: Option[ExtendedBuildReceipt],
+      kind: AcquisitionViewAuthorityKind,
+      sourceChecksum: Checksum,
+      buildReceiptChecksum: Option[Checksum],
+      evidenceChecksum: Option[Checksum],
+      adjudicationReceipt: Option[AdjudicationReceiptId],
+      fixtureReceipt: Option[FixtureAdmissionReceiptId]
+  ): Either[DomainError, AcquisitionViewAuthority] =
+    joinedSource(source, buildReceipt).flatMap { case (actualSource, actualBuild) =>
+      val validShape = kind match
+        case AcquisitionViewAuthorityKind.ValidatedBuild =>
+          evidenceChecksum.isEmpty && adjudicationReceipt.isEmpty && fixtureReceipt.isEmpty &&
+          actualBuild.nonEmpty
+        case AcquisitionViewAuthorityKind.HumanAdjudication =>
+          evidenceChecksum
+            .filterNot(_ == EmptyEvidenceChecksum)
+            .exists(checksum =>
+              adjudicationReceipt.contains(
+                AdjudicationReceiptId.unsafe(
+                  receiptChecksum(HumanDomain, actualSource, actualBuild, checksum).hex
+                )
+              )
+            ) && fixtureReceipt.isEmpty && actualBuild.nonEmpty
+        case AcquisitionViewAuthorityKind.FixtureReview =>
+          evidenceChecksum
+            .filterNot(_ == EmptyEvidenceChecksum)
+            .exists(checksum =>
+              fixtureReceipt.contains(
+                FixtureAdmissionReceiptId.unsafe(
+                  receiptChecksum(FixtureDomain, actualSource, actualBuild, checksum).hex
+                )
+              )
+            ) && adjudicationReceipt.isEmpty
+      if sourceChecksum == actualSource && buildReceiptChecksum == actualBuild && validShape then
+        Right(
+          new AcquisitionViewAuthority(
+            kind,
+            actualSource,
+            actualBuild,
+            evidenceChecksum,
+            adjudicationReceipt,
+            fixtureReceipt
+          )
+        )
+      else
+        Left(
+          DomainError.InvariantViolation(
+            "output/acquisition/view-authority",
+            "wire authority receipt does not match its actual source, build, evidence, and authority kind"
+          )
+        )
+    }
+
+  private[acquire] def matches(
+      authority: AcquisitionViewAuthority,
+      source: SourceOutcome,
+      buildReceipt: Option[ExtendedBuildReceipt]
+  ): Boolean =
+    fromWire(
+      source,
+      buildReceipt,
+      authority.kind,
+      authority.sourceChecksum,
+      authority.buildReceiptChecksum,
+      authority.evidenceChecksum,
+      authority.adjudicationReceipt,
+      authority.fixtureReceipt
+    ).contains(authority)
+
+  private def joinedSource(
+      source: SourceOutcome,
+      buildReceipt: Option[ExtendedBuildReceipt]
+  ): Either[DomainError, (Checksum, Option[Checksum])] =
+    source match
+      case SourceOutcome.Refused(_, _) =>
+        Left(
+          DomainError.InvariantViolation(
+            "output/acquisition/view-authority",
+            "view authority requires a constructed source"
+          )
+        )
+      case SourceOutcome.Constructed(identities) =>
+        val buildMatches =
+          buildReceipt.forall(receipt =>
+            receipt.receipt.storyId == identities.storyId &&
+              receipt.receipt.sourceChecksum == identities.canonicalChecksum
+          )
+        if buildMatches then
+          Right(
+            identities.canonicalChecksum -> buildReceipt.map(_.receipt.contentChecksum)
+          )
+        else
+          Left(
+            DomainError.InvariantViolation(
+              "output/acquisition/view-authority",
+              "view authority build receipt does not belong to the constructed source"
+            )
+          )
+
+  private def receiptChecksum(
+      domain: String,
+      sourceChecksum: Checksum,
+      buildReceiptChecksum: Option[Checksum],
+      evidenceChecksum: Checksum
+  ): Checksum =
+    ContentAddress.digest(
+      Vector(
+        domain,
+        sourceChecksum.hex,
+        buildReceiptChecksum.map(_.hex).getOrElse("none"),
+        evidenceChecksum.hex
+      )
+    )
+
+  private def evidenceChecksum(bytes: Vector[Byte]): Either[DomainError, Checksum] =
+    if bytes.nonEmpty then Right(Checksum.ofBytes(bytes.toArray))
+    else
+      Left(
+        DomainError.InvariantViolation(
+          "output/acquisition/view-authority-evidence",
+          "human and fixture authority require nonempty canonical evidence bytes"
+        )
+      )
 
 /** Canonical reference to a payload family known to the current schema. */
 final case class KnownPayloadRef(
@@ -613,17 +833,7 @@ object AcquisitionAccount:
       buildReceipt: Option[ExtendedBuildReceipt],
       authority: Option[AcquisitionViewAuthority]
   ): ValidatedNec[DomainError, Unit] =
-    val sourceChecksum = source match
-      case SourceOutcome.Constructed(identities) => Some(identities.canonicalChecksum)
-      case SourceOutcome.Refused(_, _)           => None
-    val buildMatches =
-      buildReceipt.exists(receipt => sourceChecksum.contains(receipt.receipt.sourceChecksum))
-    val valid = authority.forall {
-      case AcquisitionViewAuthority.ValidatedBuild |
-          AcquisitionViewAuthority.HumanAdjudication(_) =>
-        buildMatches
-      case AcquisitionViewAuthority.FixtureReview(_) => sourceChecksum.nonEmpty
-    }
+    val valid = authority.forall(AcquisitionViewAuthority.matches(_, source, buildReceipt))
     require(
       valid,
       DomainError.InvariantViolation(

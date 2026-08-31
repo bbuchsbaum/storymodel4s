@@ -620,26 +620,44 @@ object OutputAcquireCodecs:
     yield ExtendedBuildReceipt(receipt, stages, pairs.toMap)
   }
 
-  given Encoder[AcquisitionViewAuthority] = Encoder.instance {
-    case AcquisitionViewAuthority.ValidatedBuild =>
-      Json.obj("status" -> "validated_build".asJson)
-    case AcquisitionViewAuthority.HumanAdjudication(receipt) =>
-      Json.obj("status" -> "human_adjudication".asJson, "receipt" -> receipt.asJson)
-    case AcquisitionViewAuthority.FixtureReview(receipt) =>
-      Json.obj("status" -> "fixture_review".asJson, "receipt" -> receipt.asJson)
+  given Encoder[AcquisitionViewAuthority] = Encoder.instance { authority =>
+    CanonicalPrimitives.obj(
+      "status" -> (authority.kind match
+        case AcquisitionViewAuthorityKind.ValidatedBuild    => "validated_build"
+        case AcquisitionViewAuthorityKind.HumanAdjudication => "human_adjudication"
+        case AcquisitionViewAuthorityKind.FixtureReview     => "fixture_review"
+      ).asJson,
+      "sourceChecksum" -> authority.sourceChecksum.asJson,
+      "buildReceiptChecksum" -> authority.buildReceiptChecksum.asJson,
+      "evidenceChecksum" -> authority.evidenceChecksum.asJson,
+      "adjudicationReceipt" -> authority.adjudicationReceipt.asJson,
+      "fixtureReceipt" -> authority.fixtureReceipt.asJson
+    )
   }
 
-  given Decoder[AcquisitionViewAuthority] = Decoder.instance { c =>
-    field[String](c, "status").flatMap {
-      case "validated_build"    => Right(AcquisitionViewAuthority.ValidatedBuild)
-      case "human_adjudication" =>
-        field[AdjudicationReceiptId](c, "receipt")
-          .map(AcquisitionViewAuthority.HumanAdjudication.apply)
-      case "fixture_review" =>
-        field[FixtureAdmissionReceiptId](c, "receipt")
-          .map(AcquisitionViewAuthority.FixtureReview.apply)
-      case other => unknown(c, "AcquisitionViewAuthority", other)
-    }
+  private[codec] final case class AcquisitionViewAuthorityClaim(
+      kind: AcquisitionViewAuthorityKind,
+      sourceChecksum: Checksum,
+      buildReceiptChecksum: Option[Checksum],
+      evidenceChecksum: Option[Checksum],
+      adjudicationReceipt: Option[AdjudicationReceiptId],
+      fixtureReceipt: Option[FixtureAdmissionReceiptId]
+  )
+
+  private[codec] given Decoder[AcquisitionViewAuthorityClaim] = Decoder.instance { c =>
+    for
+      status <- field[String](c, "status")
+      kind <- status match
+        case "validated_build"    => Right(AcquisitionViewAuthorityKind.ValidatedBuild)
+        case "human_adjudication" => Right(AcquisitionViewAuthorityKind.HumanAdjudication)
+        case "fixture_review"     => Right(AcquisitionViewAuthorityKind.FixtureReview)
+        case other                => unknown(c, "AcquisitionViewAuthority", other)
+      source <- field[Checksum](c, "sourceChecksum")
+      build <- field[Option[Checksum]](c, "buildReceiptChecksum")
+      evidence <- field[Option[Checksum]](c, "evidenceChecksum")
+      adjudication <- field[Option[AdjudicationReceiptId]](c, "adjudicationReceipt")
+      fixture <- field[Option[FixtureAdmissionReceiptId]](c, "fixtureReceipt")
+    yield AcquisitionViewAuthorityClaim(kind, source, build, evidence, adjudication, fixture)
   }
 
   given [Id: Encoder]: Encoder[AcquisitionAccount[Id]] = Encoder.instance { account =>
@@ -664,7 +682,22 @@ object OutputAcquireCodecs:
       targets <- field[Vector[TargetAccount[Id]]](c, "targets")
       payloads <- field[Vector[OutputPayload]](c, "payloads")
       receipt <- field[Option[ExtendedBuildReceipt]](c, "buildReceipt")
-      authority <- field[Option[AcquisitionViewAuthority]](c, "viewAuthority")
+      authorityClaim <- field[Option[AcquisitionViewAuthorityClaim]](c, "viewAuthority")
+      authority <- authorityClaim.traverse(claim =>
+        domain(
+          c,
+          AcquisitionViewAuthority.fromWire(
+            source,
+            receipt,
+            claim.kind,
+            claim.sourceChecksum,
+            claim.buildReceiptChecksum,
+            claim.evidenceChecksum,
+            claim.adjudicationReceipt,
+            claim.fixtureReceipt
+          )
+        )
+      )
       value <- domainValidated(
         c,
         AcquisitionAccount.of(
@@ -715,3 +748,6 @@ object OutputAcquireCodecs:
       io.circe
         .DecodingFailure(errors.toNonEmptyList.map(_.message).toList.mkString("; "), c.history)
     )
+
+  private def domain[A](c: HCursor, value: Either[DomainError, A]): Decoder.Result[A] =
+    value.left.map(error => io.circe.DecodingFailure(error.message, c.history))
