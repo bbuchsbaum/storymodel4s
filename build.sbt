@@ -77,6 +77,7 @@ lazy val root = tlCrossRootProject
     codec,
     fixtures,
     laws,
+    providerParser,
     embedGrakern,
     embedOnnx,
     embedBench
@@ -170,6 +171,22 @@ lazy val embedCore = crossProject(JVMPlatform, JSPlatform, NativePlatform)
   .in(file("embed-core"))
   .settings(moduleSettings("embed-core"))
   .dependsOn(core, features, acquire)
+
+/** JVM-only AMR parser-provider contract: atlas-bound inputs, receipted JSON transport,
+  * deterministic admission, cache replay, and failure courts. Model runtimes remain external.
+  */
+lazy val providerParser = project
+  .in(file("provider-parser"))
+  .settings(commonSettings)
+  .settings(
+    name := "storymodel4s-provider-parser",
+    libraryDependencies ++= Seq(
+      "org.typelevel" %% "cats-core" % catsV,
+      "io.circe" %% "circe-core" % circeV,
+      "io.circe" %% "circe-parser" % circeV
+    )
+  )
+  .dependsOn(core.jvm, proposition.jvm, amrInterop.jvm, acquire.jvm)
 
 // grakern (in-house graph-kernel calculus) is consumed as an immutable source pin. grakern has no
 // published artifacts and, at this revision, no git remote: until it is pushed, builds MUST supply
@@ -322,7 +339,7 @@ val allModules = List(
 )
 val allPlatforms = List("JVM", "JS", "Native")
 
-val jvmOnlyModules = List("embedGrakern", "embedOnnx", "embedBench")
+val jvmOnlyModules = List("providerParser", "embedGrakern", "embedOnnx", "embedBench")
 
 addCommandAlias(
   "compileAll",
