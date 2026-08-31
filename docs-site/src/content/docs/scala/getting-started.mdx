@@ -1,23 +1,24 @@
 ---
-title: Inspect a source document
-description: Create a source atlas, then read its sentences, tokens, offsets, and evidence spans.
+title: Getting started
+description: Run one complete story-to-recall comparison and inspect the result.
 sidebar:
   order: 1
 ---
 
+import AlignmentMassFigure from '../../../components/AlignmentMassFigure.astro';
 import Evidence from '../../../components/Evidence.astro';
 import { sourceLink } from '../../../lib/provenance';
 import { readFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { resolve } from 'node:path';
 
-export const programPath = 'docs-site/examples/InspectSource.scala';
-export const outputPath = 'docs-site/examples/inspect-source.output.txt';
-export const PROGRAM_SHA = 'b33cdecb219d433c120104064e852b7e1ca9b59dfba976f0c7ec618f8a0b4317';
-export const OUTPUT_SHA = '969764286a168527ad246984130e77b3eadf6d13ef0c3b8b672aedae82ff4bda';
-export const PRODUCER_REVISION = '1cb64bd39f097c32233a52ff6e167f9f93d9d127';
-export const program = readFileSync(resolve(process.cwd(), 'examples/InspectSource.scala'), 'utf8');
-export const output = readFileSync(resolve(process.cwd(), 'examples/inspect-source.output.txt'), 'utf8');
+export const programPath = 'docs-site/examples/PublicAlignAndInterpret.scala';
+export const outputPath = 'docs-site/examples/align-and-interpret.output.txt';
+export const PROGRAM_SHA = 'a32a547465c5ff35dca0c02a9a614a8d36594f90188fd0de4e37c38461b0c962';
+export const OUTPUT_SHA = '5fcb58008a3076d1d4a0812e29b53b519ed047bda8de4e8fd4ab1244f3d6e0bf';
+export const PRODUCER_REVISION = 'daefa36735a35e21c77675ff85ea0f981bc7b031';
+export const program = readFileSync(resolve(process.cwd(), 'examples/PublicAlignAndInterpret.scala'), 'utf8');
+export const output = readFileSync(resolve(process.cwd(), 'examples/align-and-interpret.output.txt'), 'utf8');
 export const programSha = createHash('sha256').update(program).digest('hex');
 export const outputSha = createHash('sha256').update(output).digest('hex');
 
@@ -29,178 +30,88 @@ export const _bindFiles = (() => {
   return true;
 })();
 
-storymodel4s helps researchers compare a story with a later recall. It records the words in each
-text, who did or said what, the order and context of events, and where each part of the recall points
-in the story. The comparison assigns associations, commentary, and unsupported material to named
-external states. Story and recall records cite exact text; numerical summaries carry their support
-and missingness.
+storymodel4s compares a story with a later recall. A `StoryModel` records the people, events,
+claims, contexts, and order in the story. A `RecallGraph` divides the recall into units. `GraphHsmm`
+assigns each recall unit probability mass over story nodes and named external states such as an
+association or commentary.
 
-The library exposes that work in stages:
+The program returns typed values that you can inspect. You can read every posterior row, the most
+likely route, the mass assigned inside and outside the story, and summaries such as coverage,
+specificity, and compression. Story and recall records cite exact text. Support-aware estimates
+keep their support, and unavailable estimates remain unavailable.
 
-| Stage | Scala value | What you can inspect |
-| --- | --- | --- |
-| Index the text | `SurfaceAtlas` | paragraphs, sentences, tokens, exact spans, and text lookup |
-| Represent the story | `StoryModel` | entities, situations, contexts, claims, relations, hierarchy, and presentation order |
-| Represent the recall | `RecallGraph` | recall units, their order, discourse functions, and recall-side relations |
-| Compare recall with story | `HsmmResult` | candidate source nodes, posterior mass, external states, and the inferred route |
-| Summarize the comparison | `RecallSignature` | coverage, specificity, compression, external mass, and support for each estimate |
+Today the analysis starts from an existing `StoryModel`. The repository includes a reviewed model
+of *The War of the Ghosts*, which the example below uses. The software that builds a complete model
+from arbitrary prose is under development.
 
-This page starts with the first stage. `SurfaceAnalyzer.analyze` turns a `StorySource` into a
-`SurfaceAtlas`, an index over the exact source text. The final section shows where the atlas leads.
+## What this program does
 
-You can build a source atlas directly from ordinary text today. The later guides use a reviewed
-*War of the Ghosts* model because automatic construction of a complete `StoryModel` from arbitrary
-prose remains under development.
+The program follows five steps:
 
-storymodel4s is currently used from a source checkout. It has no released package coordinates.
+1. load a story model with 71 situations and 84 alignable nodes;
+2. divide a short recall into two units;
+3. generate 86 sparse candidate matches with a free word-overlap baseline;
+4. infer a partial alignment with `GraphHsmm`; and
+5. compute a `RecallSignature` with support-aware summaries.
 
-<Evidence
-  status="Confirmed"
-  source="README.md pre-release notice"
-  href={sourceLink('README.md')}
- />
+The input recall says:
 
-## Prerequisites
+> One of the men with him got hit by an arrow and they lifted him into the boat.
 
-- JDK 17 or 21
-- sbt 1.12.14
-- Scala 3.7.4, supplied by the build
-- a local `grakern` checkout for aggregate gates while that dependency remains unpublished
+The comparison returns one probability row for each recall unit. Each row distributes mass across
+story nodes and explicit external states.
 
-Clone the repository and run its JVM tests:
+## Run it
+
+storymodel4s currently runs from a source checkout. You need JDK 17 or 21, sbt 1.12.14, and a local
+checkout of the pinned `grakern` dependency.
 
 ```sh
 git clone https://github.com/bbuchsbaum/storymodel4s.git
 cd storymodel4s
-
-sbt -Dstorymodel4s.grakern.build=/absolute/path/to/grakern testJVM
 ```
 
-## Run the example
-
-Save this program as `core/src/main/scala/docsprobe/InspectSource.scala`:
+Save this exact program as `fixtures/src/main/scala/docsprobe/PublicAlignAndInterpret.scala`:
 
 <pre><code class="language-scala">{program}</code></pre>
 
 Run it with:
 
 ```sh
-sbt "coreJVM/runMain docsprobe.inspectSource"
+sbt -Dstorymodel4s.grakern.build=/absolute/path/to/pinned-grakern \
+  "fixturesJVM/runMain docsprobe.alignAndInterpret"
 ```
 
-`StorySource.fromText` validates the input, normalizes line endings and trailing whitespace, and
-computes stable checksums. It returns an `Either`, which the example handles before calling
-`SurfaceAnalyzer.analyze`.
+The program uses public APIs and no test helpers.
 
 <Evidence
   status="Confirmed"
-  source={`docs-site/examples/InspectSource.scala — executed against storymodel4s ${PRODUCER_REVISION}; full SHA-256 ${programSha}`}
+  source={`docs-site/examples/PublicAlignAndInterpret.scala — full SHA-256 ${programSha}`}
   href={sourceLink(programPath)}
- />
+/>
 
-## What was computed
+## Read the result
+
+The recorded run printed:
 
 <pre><code>{output}</code></pre>
 
-This output came from the exact program above against storymodel4s revision `{PRODUCER_REVISION}` on
-Homebrew Java 25.0.1. The site checks both file digests during its build.
+<AlignmentMassFigure />
 
-The three collections are also available directly:
+The first recall unit assigns 46.08% of its mass to the story. Its strongest source match is the
+event in which a young man says that he has no arrows. The second unit assigns 2.09% to the story
+and 97.91% to external states.
 
-```scala
-atlas.paragraphs.size // 1
-atlas.sentences.size  // 1
-atlas.tokens.size     // 8
+Those results are poor because the free baseline compares word overlap and has no model of
+synonyms. The recall is a faithful paraphrase, yet the baseline sends most of it outside the story.
+This run establishes the public workflow and the shape of its output. Accuracy requires separate
+calibration evidence.
 
-atlas.sentences.map(atlas.text)
-// Vector("One night two young men left Egulac.")
+The summary reports uniform coverage of `0.0067`. Importance-weighted coverage is `n/a`: zero of
+the 71 eligible situations carried an importance weight. Specificity and compression each report a
+value and support of `0.2409`, the source mass that contributed to the estimate.
 
-atlas.tokens.map(atlas.text)
-// Vector("One", "night", "two", "young", "men", "left", "Egulac", ".")
-```
-
-The analyzer keeps the punctuation token because its span is part of the source text.
-
-## Read exact offsets
-
-Each unit carries a zero-based, half-open UTF-16 span. The sentence occupies `[0, 36)`. Its tokens
-occupy these spans:
-
-| Token | Span |
-| --- | --- |
-| `One` | `[0, 3)` |
-| `night` | `[4, 9)` |
-| `two` | `[10, 13)` |
-| `young` | `[14, 19)` |
-| `men` | `[20, 23)` |
-| `left` | `[24, 28)` |
-| `Egulac` | `[29, 35)` |
-| `.` | `[35, 36)` |
-
-The atlas can find the unit at one offset or every unit that overlaps a span:
-
-```scala
-atlas.unitAt(25, SurfaceUnitKind.Token).map(atlas.text)
-// Some("left")
-
-atlas
-  .unitsOverlapping(TextSpan.unsafe(20, 28), SurfaceUnitKind.Token)
-  .map(atlas.text)
-// Vector("men", "left")
-```
-
-## Turn a span into evidence
-
-Claims elsewhere in the library cite a `SpanSet`. An evidence set may contain one span or several
-distant spans.
-
-```scala
-val sentence = atlas.sentences.head
-val evidence = SpanSet.one(SpanRef(Some(sentence.id), sentence.span))
-
-evidence.coveredLength // 36
-evidence.units         // Set(sentence.id)
-atlas.text(sentence)   // "One night two young men left Egulac."
-```
-
-The atlas answers where the words occur. A story model adds entities, events, states, contexts,
-relations, and claims that cite these spans.
-
-<Evidence
-  status="Confirmed"
-  source="SurfaceAtlas public API in core/src/main/scala/storymodel4s/core/atlas.scala"
-  href={sourceLink('core/src/main/scala/storymodel4s/core/atlas.scala')}
- />
-
-## Continue to the story model
-
-The atlas tells you where the words are. A `StoryModel` connects those words to the people, events,
-states, contexts, and relations described by the story. This code loads the reviewed *War of the
-Ghosts* fixture, whose modeling work is already complete:
-
-```scala
-import storymodel4s.fixtures.wog.WarOfTheGhostsModel
-
-val model = WarOfTheGhostsModel.model
-
-model.atlas.sentences.size          // 50
-model.graph.entities.size           // 14
-model.graph.situations.size         // 71
-model.graph.contexts.size           // 12
-model.graph.relations.temporal.size // 52
-model.graph.relations.causal.size   // 9
-model.claims.size                    // 462
-```
-
-The story-model guide follows one sentence into two separate records: a young man says something in
-the narrated world, and the content of his speech belongs to a nested speech context. It prints each
-record's predicate, polarity, context, and supporting sentence.
-
-[Model a story and inspect its evidence →](/method/model-a-story/)
-
-The alignment guide then adds a two-unit recall. Its public example generates 86 sparse candidate
-matches and produces one posterior row per recall unit. Each row exposes the mass assigned to story
-nodes and to named external states:
+## What you can inspect
 
 | Accessor | What it returns |
 | --- | --- |
@@ -209,14 +120,27 @@ nodes and to named external states:
 | `row.sourceMass` | the row's total mass on story nodes |
 | `row.externalMass` | the row's total mass on external states |
 | `result.viterbi` | the inferred route through source and external states |
-| `signature.uniformCoverage` | coverage across the story's alignable leaves |
-| `signature.importanceWeightedCoverage` | weighted coverage together with its conditioning weight and observed count |
-| `signature.specificityMass` | specificity together with the source mass that supports it |
-| `signature.compression` | compression together with the source mass that supports it |
+| `signature.uniformCoverage` | coverage across the story's alignable situations |
+| `signature.importanceWeightedCoverage` | weighted coverage, conditioning weight, and observed count |
+| `signature.specificityMass` | specificity and the source mass that supports it |
+| `signature.compression` | compression and the source mass that supports it |
 | `signature.externalMass` | attributed external mass and unranked mass as separate values |
 
-The recorded lexical-baseline run assigns 46.08% source mass to its first recall unit and 2.09% to
-its second. The low scores reveal the limits of word-overlap matching. They establish the shape of
-the returned result; they say nothing about calibrated accuracy.
+The archived output came from revision <code>{PRODUCER_REVISION}</code> on the JVM. Its program and
+output digests are checked during every site build.
 
-[Run the complete story-to-recall comparison →](/method/align-and-interpret/)
+<Evidence
+  status="Qualified"
+  source={`Archived run at producer revision ${PRODUCER_REVISION}; output SHA-256 ${outputSha}. The producer revision is not available on the hosted remote.`}
+  href={sourceLink(outputPath)}
+/>
+
+## Continue through the library
+
+- [Inspect a source document](/scala/inspect-source/) to work with sentences, tokens, offsets, and evidence spans.
+- [Model a story](/method/model-a-story/) to inspect entities, situations, contexts, claims, and relations.
+- [Represent a recall](/method/represent-recall/) to build checked recall units and recall-side relations.
+- [Align and interpret a recall](/method/align-and-interpret/) for the full explanation of each result above.
+- [Summarize a recall](/method/summarize-recall/) to read every estimate beside its support.
+- [Score an interview](/method/score-interview/) to run the synthetic Autobiographical Interview example.
+- [Save and verify a model](/scala/save-and-deliver/) to write canonical JSON and check its identity.

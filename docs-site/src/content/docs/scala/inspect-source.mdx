@@ -1,0 +1,182 @@
+---
+title: Inspect a source document
+description: Create a source atlas, then read its sentences, tokens, offsets, and evidence spans.
+sidebar:
+  order: 1
+---
+
+import Evidence from '../../../components/Evidence.astro';
+import { sourceLink } from '../../../lib/provenance';
+import { readFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import { resolve } from 'node:path';
+
+export const programPath = 'docs-site/examples/InspectSource.scala';
+export const outputPath = 'docs-site/examples/inspect-source.output.txt';
+export const PROGRAM_SHA = 'b33cdecb219d433c120104064e852b7e1ca9b59dfba976f0c7ec618f8a0b4317';
+export const OUTPUT_SHA = '969764286a168527ad246984130e77b3eadf6d13ef0c3b8b672aedae82ff4bda';
+export const PRODUCER_REVISION = '1cb64bd39f097c32233a52ff6e167f9f93d9d127';
+export const program = readFileSync(resolve(process.cwd(), 'examples/InspectSource.scala'), 'utf8');
+export const output = readFileSync(resolve(process.cwd(), 'examples/inspect-source.output.txt'), 'utf8');
+export const programSha = createHash('sha256').update(program).digest('hex');
+export const outputSha = createHash('sha256').update(output).digest('hex');
+
+export const _bindFiles = (() => {
+  if (programSha !== PROGRAM_SHA)
+    throw new Error(`program digest ${programSha} does not match the published ${PROGRAM_SHA}`);
+  if (outputSha !== OUTPUT_SHA)
+    throw new Error(`output digest ${outputSha} does not match the published ${OUTPUT_SHA}`);
+  return true;
+})();
+
+Every story model begins with a `StorySource`. `SurfaceAnalyzer.analyze` turns that source into a
+`SurfaceAtlas`: an index of paragraphs, sentences, and tokens over the canonical text.
+
+For the complete story-to-recall workflow, begin with [Getting started](/scala/getting-started/).
+
+storymodel4s is currently used from a source checkout. It has no released package coordinates.
+
+<Evidence
+  status="Confirmed"
+  source="README.md pre-release notice"
+  href={sourceLink('README.md')}
+ />
+
+## Prerequisites
+
+- JDK 17 or 21
+- sbt 1.12.14
+- Scala 3.7.4, supplied by the build
+- a local `grakern` checkout for aggregate gates while that dependency remains unpublished
+
+Clone the repository and run its JVM tests:
+
+```sh
+git clone https://github.com/bbuchsbaum/storymodel4s.git
+cd storymodel4s
+
+sbt -Dstorymodel4s.grakern.build=/absolute/path/to/grakern testJVM
+```
+
+## Run the example
+
+Save this program as `core/src/main/scala/docsprobe/InspectSource.scala`:
+
+<pre><code class="language-scala">{program}</code></pre>
+
+Run it with:
+
+```sh
+sbt "coreJVM/runMain docsprobe.inspectSource"
+```
+
+`StorySource.fromText` validates the input, normalizes line endings and trailing whitespace, and
+computes stable checksums. It returns an `Either`, which the example handles before calling
+`SurfaceAnalyzer.analyze`.
+
+<Evidence
+  status="Confirmed"
+  source={`docs-site/examples/InspectSource.scala — executed against storymodel4s ${PRODUCER_REVISION}; full SHA-256 ${programSha}`}
+  href={sourceLink(programPath)}
+ />
+
+## What was computed
+
+<pre><code>{output}</code></pre>
+
+This output came from the exact program above against storymodel4s revision
+<code>{PRODUCER_REVISION}</code> on Homebrew Java 25.0.1. The site checks both file digests during
+its build.
+
+The three collections are also available directly:
+
+```scala
+atlas.paragraphs.size // 1
+atlas.sentences.size  // 1
+atlas.tokens.size     // 8
+
+atlas.sentences.map(atlas.text)
+// Vector("One night two young men left Egulac.")
+
+atlas.tokens.map(atlas.text)
+// Vector("One", "night", "two", "young", "men", "left", "Egulac", ".")
+```
+
+The analyzer keeps the punctuation token because its span is part of the source text.
+
+## Read exact offsets
+
+Each unit carries a zero-based, half-open UTF-16 span. The sentence occupies `[0, 36)`. Its tokens
+occupy these spans:
+
+| Token | Span |
+| --- | --- |
+| `One` | `[0, 3)` |
+| `night` | `[4, 9)` |
+| `two` | `[10, 13)` |
+| `young` | `[14, 19)` |
+| `men` | `[20, 23)` |
+| `left` | `[24, 28)` |
+| `Egulac` | `[29, 35)` |
+| `.` | `[35, 36)` |
+
+The atlas can find the unit at one offset or every unit that overlaps a span:
+
+```scala
+atlas.unitAt(25, SurfaceUnitKind.Token).map(atlas.text)
+// Some("left")
+
+atlas
+  .unitsOverlapping(TextSpan.unsafe(20, 28), SurfaceUnitKind.Token)
+  .map(atlas.text)
+// Vector("men", "left")
+```
+
+## Turn a span into evidence
+
+Claims elsewhere in the library cite a `SpanSet`. An evidence set may contain one span or several
+distant spans.
+
+```scala
+val sentence = atlas.sentences.head
+val evidence = SpanSet.one(SpanRef(Some(sentence.id), sentence.span))
+
+evidence.coveredLength // 36
+evidence.units         // Set(sentence.id)
+atlas.text(sentence)   // "One night two young men left Egulac."
+```
+
+The atlas answers where the words occur. A story model adds entities, events, states, contexts,
+relations, and claims that cite these spans.
+
+<Evidence
+  status="Confirmed"
+  source="SurfaceAtlas public API in core/src/main/scala/storymodel4s/core/atlas.scala"
+  href={sourceLink('core/src/main/scala/storymodel4s/core/atlas.scala')}
+ />
+
+## Continue to the story model
+
+The atlas tells you where the words are. A `StoryModel` connects those words to the people, events,
+states, contexts, and relations described by the story. This code loads the reviewed *War of the
+Ghosts* fixture, whose modeling work is already complete:
+
+```scala
+import storymodel4s.fixtures.wog.WarOfTheGhostsModel
+
+val model = WarOfTheGhostsModel.model
+
+model.atlas.sentences.size          // 50
+model.graph.entities.size           // 14
+model.graph.situations.size         // 71
+model.graph.contexts.size           // 12
+model.graph.relations.temporal.size // 52
+model.graph.relations.causal.size   // 9
+model.claims.size                    // 462
+```
+
+The story-model guide follows one sentence into two separate records: a young man says something in
+the narrated world, and the content of his speech belongs to a nested speech context. It prints each
+record's predicate, polarity, context, and supporting sentence.
+
+[Model a story and inspect its evidence →](/method/model-a-story/)

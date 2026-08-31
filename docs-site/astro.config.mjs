@@ -40,7 +40,8 @@ export default defineConfig({
         {
           label: 'Use the Scala library',
           items: [
-            { label: 'Inspect a source document', slug: 'scala/getting-started' },
+            { label: 'Getting started', slug: 'scala/getting-started' },
+            { label: 'Inspect a source document', slug: 'scala/inspect-source' },
             { label: 'Generate embedding features', slug: 'scala/use-embeddings' },
             { label: 'Save and verify a model', slug: 'scala/save-and-deliver' },
             { label: 'Module map', slug: 'scala/modules' },
