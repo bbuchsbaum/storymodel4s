@@ -46,33 +46,6 @@ class OutputCodecSuite extends FunSuite:
     .validatedBuild(sourceOutcome, build)
     .toOption
     .get
-  private def fixtureAdmission(
-      label: String,
-      fixtureBuild: Option[ExtendedBuildReceipt] = Some(build),
-      issuer: String = "fixture-admitter:codec-tests:v1"
-  ): AdmittedViewEvidence =
-    val reviewer = Fingerprint.unsafe(s"reviewer:$label:v1")
-    val evidence = NonEmptyVector.one(
-      Evidence(
-        EvidenceId.unsafe(s"evidence-$label"),
-        Some(SpanSet.one(TextSpan.unsafe(0, identities.canonicalUtf16Length))),
-        Set.empty,
-        reviewer,
-        StageId.unsafe(s"review-$label")
-      )
-    )
-    ViewEvidenceAdmitter
-      .trusted(Fingerprint.unsafe(issuer))
-      .fixtureReview(
-        sourceOutcome,
-        fixtureBuild,
-        FixtureAdmissionReceiptId.unsafe(label),
-        reviewer,
-        evidence,
-        Provenance.human(reviewer.value, "fixture-review/v1")
-      )
-      .toOption
-      .get
   private val extensionId = OutputPayloadId.unsafe("optional-future")
   private val optionalExtension = UnsupportedExtension(
     extensionId,
@@ -343,89 +316,24 @@ class OutputCodecSuite extends FunSuite:
       "the same source cannot be relabelled with fixture authority on the wire"
     )
 
-    val fixtureEvidence = fixtureAdmission("fixture-authority-evidence")
-    val fixtureAuthority = AcquisitionViewAuthority
-      .fixtureReview(
-        sourceOutcome,
-        Some(build),
-        fixtureEvidence
-      )
-      .toOption
-      .get
-    val fixtureAccount = AcquisitionAccount
-      .of(
-        acquisition.invocationId,
-        acquisition.source,
-        acquisition.universe,
-        acquisition.semantic,
-        acquisition.targets,
-        acquisition.payloads,
-        acquisition.buildReceipt,
-        Some(fixtureAuthority)
-      )
-      .toOption
-      .get
-    val fixtureArtifacts = ScientificArtifactRefs
-      .of(
-        fixtureAccount,
-        scientificArtifacts.originalSource,
-        scientificArtifacts.canonicalSource,
-        scientificArtifacts.semanticModel
-      )
-      .toOption
-      .get
-    val fixtureBasis = AdmittedViewBasis.fromAcquisition(fixtureAccount).toOption.get
-    val fixtureResult = StoryOutputResult
-      .of(
-        fixtureAccount,
-        fixtureArtifacts,
-        Some(fixtureBasis),
-        Vector.empty,
-        Vector.empty,
-        Vector.empty,
-        Vector.empty
-      )
-      .toOption
-      .get
-    val fixtureEncoded = StoryOutputResultCodec.encode[String](fixtureResult)
-    assert(
-      StoryOutputResultCodec.decode[String](fixtureEncoded).isLeft,
-      "wire data alone must not recreate a fixture-review licence"
-    )
-    assertEquals(
-      StoryOutputResultCodec.decodeWithEvidence[String](fixtureEncoded, Vector(fixtureEvidence)),
-      Right(fixtureResult)
-    )
-    val foreignIssuerEvidence = fixtureAdmission(
-      "fixture-authority-evidence",
-      issuer = "fixture-admitter:foreign:v1"
-    )
-    assertNotEquals(foreignIssuerEvidence.evidenceChecksum, fixtureEvidence.evidenceChecksum)
-    assert(
-      StoryOutputResultCodec
-        .decodeWithEvidence[String](fixtureEncoded, Vector(foreignIssuerEvidence))
-        .isLeft,
-      "a second issuer cannot satisfy the first issuer's otherwise matching wire claim"
-    )
-    val fixtureJson = Canonical.parse(fixtureEncoded).toOption.get
-    val fixtureAuthorityJson = fixtureJson.hcursor
-      .downField("acquisition")
-      .downField("viewAuthority")
-      .focus
-      .get
-    val fixtureBasisJson = fixtureJson.hcursor.downField("viewBasis").focus.get
     val acquisitionObject = parsed.hcursor.downField("acquisition").focus.flatMap(_.asObject).get
+    val fixtureAuthorityClaim = Json.obj(
+      "status" -> Json.fromString("fixture_review"),
+      "sourceChecksum" -> Json.fromString(identities.canonicalChecksum.hex),
+      "buildReceiptChecksum" -> Json.fromString(build.receipt.contentChecksum.hex),
+      "evidenceChecksum" -> Json.fromString(Checksum.ofText("caller-evidence").hex),
+      "adjudicationReceipt" -> Json.Null,
+      "fixtureReceipt" -> Json.fromString("caller-fixture")
+    )
     val combinedRelabel = parsed.mapObject(
       _.add(
         "acquisition",
-        Json.fromJsonObject(acquisitionObject.add("viewAuthority", fixtureAuthorityJson))
-      ).add("viewBasis", fixtureBasisJson)
+        Json.fromJsonObject(acquisitionObject.add("viewAuthority", fixtureAuthorityClaim))
+      ).add("viewBasis", Json.fromJsonObject(fixtureRelabel))
     )
     assert(
-      StoryOutputResultCodec
-        .decodeWithEvidence[String](Canonical.print(combinedRelabel), Vector(fixtureEvidence))
-        .isLeft,
-      "a coordinated acquisition-authority and basis relabel cannot reuse old report receipts"
+      StoryOutputResultCodec.decode[String](Canonical.print(combinedRelabel)).isLeft,
+      "a coordinated fixture authority and basis wire claim has no self-issued admission path"
     )
 
     val sourceObject = parsed.hcursor.downField("source").focus.flatMap(_.asObject).get

@@ -48,20 +48,6 @@ class OutputSuite extends FunSuite:
       Checksum.ofText("semantic-artifact")
     )
 
-  private def reviewEvidence(
-      label: String,
-      identities: SourceIdentities
-  ): (Fingerprint, NonEmptyVector[Evidence], Provenance) =
-    val reviewer = Fingerprint.unsafe(s"reviewer:$label:v1")
-    val evidence = Evidence(
-      EvidenceId.unsafe(s"evidence-$label"),
-      Some(SpanSet.one(TextSpan.unsafe(0, identities.canonicalUtf16Length))),
-      Set.empty,
-      reviewer,
-      StageId.unsafe(s"review-$label")
-    )
-    (reviewer, NonEmptyVector.one(evidence), Provenance.human(reviewer.value, "review/v1"))
-
   test("three source identities stay distinct and canonical bytes bind UTF-16 coordinates") {
     val (source, original, identities) = sourceFixture()
     val canonicalBytes = source.canonicalText.getBytes(StandardCharsets.UTF_8)
@@ -249,41 +235,9 @@ class OutputSuite extends FunSuite:
         .isValid
     )
 
-    val fixtureInputs = reviewEvidence("fixture-account", identities)
-    val fixtureEvidence = ViewEvidenceAdmitter
-      .trusted(Fingerprint.unsafe("fixture-admitter:account:v1"))
-      .fixtureReview(
-        sourceOutcome,
-        None,
-        FixtureAdmissionReceiptId.unsafe("fixture-account-receipt"),
-        fixtureInputs._1,
-        fixtureInputs._2,
-        fixtureInputs._3
-      )
-      .toOption
-      .get
-    val fixtureAuthority = AcquisitionViewAuthority
-      .fixtureReview(sourceOutcome, None, fixtureEvidence)
-      .toOption
-      .get
-    assert(
-      AcquisitionAccount
-        .of(
-          InvocationId.unsafe("invocation-view-authority-fixture"),
-          sourceOutcome,
-          TargetUniverse.Established(universe),
-          semantic,
-          Vector.empty,
-          Vector.empty,
-          None,
-          Some(fixtureAuthority)
-        )
-        .isValid,
-      "fixture authority is distinct evidence and does not fabricate a build"
-    )
   }
 
-  test("human and fixture authority receipts are derived and revalidated from evidence") {
+  test("wire authority admits validated builds and refuses ungoverned human or fixture claims") {
     val (source, _, identities) = sourceFixture()
     val sourceOutcome = SourceOutcome.Constructed(identities)
     val buildReceipt = receipt(source)
@@ -291,117 +245,53 @@ class OutputSuite extends FunSuite:
       receipt = buildReceipt.receipt.copy(storyId = StoryId.unsafe("foreign-story"))
     )
     assert(AcquisitionViewAuthority.validatedBuild(sourceOutcome, foreignStoryBuild).isLeft)
-    val humanInputs = reviewEvidence("human", identities)
-    val humanEvidence = ViewEvidenceAdmitter
-      .trusted(Fingerprint.unsafe("human-admitter:v1"))
-      .humanAdjudication(
-        sourceOutcome,
-        buildReceipt,
-        AdjudicationReceiptId.unsafe("human-adjudication-receipt"),
-        humanInputs._1,
-        humanInputs._2,
-        humanInputs._3
-      )
-      .toOption
-      .get
-    val human = AcquisitionViewAuthority
-      .humanAdjudication(sourceOutcome, buildReceipt, humanEvidence)
+    val validated = AcquisitionViewAuthority
+      .validatedBuild(sourceOutcome, buildReceipt)
       .toOption
       .get
     assertEquals(
       AcquisitionViewAuthority.fromWire(
         sourceOutcome,
         Some(buildReceipt),
-        human.kind,
-        human.sourceChecksum,
-        human.buildReceiptChecksum,
-        human.evidenceChecksum,
-        human.adjudicationReceipt,
-        human.fixtureReceipt,
-        Vector(humanEvidence)
+        validated.kind,
+        validated.sourceChecksum,
+        validated.buildReceiptChecksum,
+        validated.evidenceChecksum,
+        validated.adjudicationReceipt,
+        validated.fixtureReceipt
       ),
-      Right(human)
+      Right(validated)
     )
+
     assert(
       AcquisitionViewAuthority
         .fromWire(
           sourceOutcome,
           Some(buildReceipt),
-          human.kind,
-          human.sourceChecksum,
-          human.buildReceiptChecksum,
-          Some(Checksum.ofText("different-evidence")),
-          human.adjudicationReceipt,
-          human.fixtureReceipt,
-          Vector(humanEvidence)
+          AcquisitionViewAuthorityKind.HumanAdjudication,
+          identities.canonicalChecksum,
+          Some(buildReceipt.receipt.contentChecksum),
+          Some(Checksum.ofText("caller-evidence")),
+          Some(AdjudicationReceiptId.unsafe("caller-adjudication")),
+          None
         )
         .isLeft,
-      "an adjudication receipt cannot be reused with different evidence"
-    )
-
-    val fixtureInputs = reviewEvidence("fixture", identities)
-    val fixtureEvidence = ViewEvidenceAdmitter
-      .trusted(Fingerprint.unsafe("fixture-admitter:wire:v1"))
-      .fixtureReview(
-        sourceOutcome,
-        None,
-        FixtureAdmissionReceiptId.unsafe("fixture-review-receipt"),
-        fixtureInputs._1,
-        fixtureInputs._2,
-        fixtureInputs._3
-      )
-      .toOption
-      .get
-    val fixture = AcquisitionViewAuthority
-      .fixtureReview(sourceOutcome, None, fixtureEvidence)
-      .toOption
-      .get
-    assertEquals(
-      AcquisitionViewAuthority.fromWire(
-        sourceOutcome,
-        None,
-        fixture.kind,
-        fixture.sourceChecksum,
-        fixture.buildReceiptChecksum,
-        fixture.evidenceChecksum,
-        fixture.adjudicationReceipt,
-        fixture.fixtureReceipt,
-        Vector(fixtureEvidence)
-      ),
-      Right(fixture)
+      "receipt-shaped human evidence is not an authority issuer"
     )
     assert(
       AcquisitionViewAuthority
         .fromWire(
           sourceOutcome,
           None,
-          fixture.kind,
-          fixture.sourceChecksum,
-          fixture.buildReceiptChecksum,
-          fixture.evidenceChecksum,
-          fixture.adjudicationReceipt,
-          Some(FixtureAdmissionReceiptId.unsafe("caller-minted-fixture-receipt")),
-          Vector(fixtureEvidence)
-        )
-        .isLeft,
-      "a caller-selected fixture receipt cannot mint authority"
-    )
-
-    assert(
-      AcquisitionViewAuthority
-        .fromWire(
-          sourceOutcome,
+          AcquisitionViewAuthorityKind.FixtureReview,
+          identities.canonicalChecksum,
           None,
-          fixture.kind,
-          fixture.sourceChecksum,
-          fixture.buildReceiptChecksum,
-          fixture.evidenceChecksum,
-          fixture.adjudicationReceipt,
-          fixture.fixtureReceipt,
-          Vector.empty
+          Some(Checksum.ofText("caller-evidence")),
+          None,
+          Some(FixtureAdmissionReceiptId.unsafe("caller-fixture"))
         )
         .isLeft,
-      "wire checksums and a receipt cannot recreate fixture admission without the typed witness"
+      "receipt-shaped fixture evidence is not an authority issuer"
     )
   }
 

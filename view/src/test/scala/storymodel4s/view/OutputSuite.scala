@@ -2,7 +2,6 @@ package storymodel4s.view
 
 import java.nio.charset.StandardCharsets
 
-import cats.data.NonEmptyVector
 import munit.FunSuite
 import storymodel4s.acquire.*
 import storymodel4s.core.*
@@ -40,60 +39,16 @@ class OutputSuite extends FunSuite:
     .validatedBuild(SourceOutcome.Constructed(identities), buildReceipt)
     .toOption
     .get
-  private def fixtureAuthority(
-      evidence: String,
-      build: Option[ExtendedBuildReceipt] = Some(buildReceipt)
-  ): AcquisitionViewAuthority =
-    val reviewer = Fingerprint.unsafe(s"reviewer:$evidence:v1")
-    val typedEvidence = NonEmptyVector.one(
-      Evidence(
-        EvidenceId.unsafe(s"evidence-$evidence"),
-        Some(SpanSet.one(TextSpan.unsafe(0, identities.canonicalUtf16Length))),
-        Set.empty,
-        reviewer,
-        StageId.unsafe(s"review-$evidence")
-      )
-    )
-    val admitted = ViewEvidenceAdmitter
-      .trusted(Fingerprint.unsafe("fixture-admitter:view-tests:v1"))
-      .fixtureReview(
-        SourceOutcome.Constructed(identities),
-        build,
-        FixtureAdmissionReceiptId.unsafe(evidence),
-        reviewer,
-        typedEvidence,
-        Provenance.human(reviewer.value, "fixture-review/v1")
-      )
-      .toOption
-      .get
-    AcquisitionViewAuthority
-      .fixtureReview(
-        SourceOutcome.Constructed(identities),
-        build,
-        admitted
-      )
-      .toOption
-      .get
-
-  test("v1 refuses mixed view-basis authority instead of choosing a precedence") {
+  test("v1 combines only a nonempty homogeneous admitted view basis") {
     val acquired = AdmittedViewBasis.fromAcquisition(acquisition()).toOption.get
-    val fixture = AdmittedViewBasis
-      .fromAcquisition(
-        acquisition(
-          authority = Some(fixtureAuthority("receipt-fixture-basis"))
-        )
-      )
-      .toOption
-      .get
     assertEquals(
       AdmittedViewBasis.combineHomogeneous(Vector(acquired, acquired)),
       Right(acquired)
     )
-    assert(AdmittedViewBasis.combineHomogeneous(Vector(acquired, fixture)).isLeft)
-    assert(AdmittedViewBasis.combineHomogeneous(Vector(fixture, acquired)).isLeft)
+    assert(AdmittedViewBasis.combineHomogeneous(Vector.empty).isLeft)
   }
 
-  test("view-basis admission rejects checksum, authority-receipt, and fixture relabel mutations") {
+  test("view-basis admission rejects checksum and unsupported fixture relabel mutations") {
     val admitted = AdmittedViewBasis.fromAcquisition(acquisition()).toOption.get
     assert(
       AdmittedViewBasis
@@ -107,32 +62,16 @@ class OutputSuite extends FunSuite:
         .isLeft
     )
 
-    val fixtureAccount = acquisition(
-      authority = Some(fixtureAuthority("fixture-authority"))
-    )
-    val fixture = AdmittedViewBasis.fromAcquisition(fixtureAccount).toOption.get
     assert(
       AdmittedViewBasis
         .fromWire(
-          fixtureAccount,
-          fixture.basis,
-          fixture.sourceChecksum,
-          fixture.buildReceiptChecksum,
-          BasisAuthority.FixtureReview(FixtureAdmissionReceiptId.unsafe("wrong-fixture-authority"))
+          acquisition(),
+          ViewBasis.ResearcherReviewedFixture,
+          admitted.sourceChecksum,
+          admitted.buildReceiptChecksum,
+          BasisAuthority.FixtureReview(FixtureAdmissionReceiptId.unsafe("caller-fixture"))
         )
         .isLeft
-    )
-    assert(
-      AdmittedViewBasis
-        .fromWire(
-          fixtureAccount,
-          ViewBasis.ValidatedBuild,
-          fixture.sourceChecksum,
-          fixture.buildReceiptChecksum,
-          BasisAuthority.ValidatedBuild(buildReceipt.receipt.contentChecksum)
-        )
-        .isLeft,
-      "the same source cannot be relabelled from fixture review to validated build"
     )
   }
   private val semanticBytes = "semantic-artifact".getBytes(StandardCharsets.UTF_8)
@@ -500,7 +439,7 @@ class OutputSuite extends FunSuite:
     assert(valid.reportOutcomes.exists(_.isInstanceOf[ReportOutcome.Produced]))
   }
 
-  test("a produced scientific report requires source-matching admitted basis") {
+  test("a produced scientific report requires an admitted basis") {
     val noBasis = StoryOutputResult.of(
       acquisition(),
       scientificArtifacts,
@@ -511,24 +450,6 @@ class OutputSuite extends FunSuite:
       Vector.empty
     )
     assert(noBasis.isInvalid)
-
-    val fixtureAccount = acquisition(
-      authority = Some(fixtureAuthority("fixture-review"))
-    )
-    val wrongBasis = AdmittedViewBasis.fromAcquisition(fixtureAccount).toOption.get
-    assert(
-      StoryOutputResult
-        .of(
-          acquisition(),
-          scientificArtifacts,
-          Some(wrongBasis),
-          Vector(textRequest),
-          Vector(ReportOutcome.Produced(textId, textArtifact, textReceipt)),
-          Vector.empty,
-          Vector.empty
-        )
-        .isInvalid
-    )
   }
 
   test("required unsupported extension prevents a produced dependent report") {
@@ -686,10 +607,10 @@ class OutputSuite extends FunSuite:
   }
 
   test("report identity binds acquisition authority even when no view basis is requested") {
-    val fixtureAccount = acquisition(authority = Some(fixtureAuthority("identity-fixture")))
-    val fixtureArtifacts = ScientificArtifactRefs
+    val unlicensedAccount = acquisition(authority = None)
+    val unlicensedArtifacts = ScientificArtifactRefs
       .of(
-        fixtureAccount,
+        unlicensedAccount,
         scientificArtifacts.originalSource,
         scientificArtifacts.canonicalSource,
         scientificArtifacts.semanticModel
@@ -700,11 +621,11 @@ class OutputSuite extends FunSuite:
       .forReport(acquisition(), scientificArtifacts, None, textRequest)
       .toOption
       .get
-    val fixtureInput = ReportInputIdentity
-      .forReport(fixtureAccount, fixtureArtifacts, None, textRequest)
+    val unlicensedInput = ReportInputIdentity
+      .forReport(unlicensedAccount, unlicensedArtifacts, None, textRequest)
       .toOption
       .get
-    assertNotEquals(validatedInput, fixtureInput)
+    assertNotEquals(validatedInput, unlicensedInput)
   }
 
   test("report identity binds ordered universe and target identities") {
@@ -1258,8 +1179,8 @@ class OutputSuite extends FunSuite:
         SemanticOutcome.Partial(cats.data.NonEmptyVector.one(gap), None),
         Vector.empty,
         Vector.empty,
-        None,
-        Some(fixtureAuthority("receipt-partial-no-draft-fixture", None))
+        Some(buildReceipt),
+        Some(validatedAuthority)
       )
       .toOption
       .get
