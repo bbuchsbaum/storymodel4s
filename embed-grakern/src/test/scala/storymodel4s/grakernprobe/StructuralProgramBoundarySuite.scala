@@ -11,6 +11,10 @@ final case class StructuralForgeControl(rounds: Int)
 /** Outside `storymodel4s.embed.grakern`: the WL program exposes identity, not construction. */
 class StructuralProgramBoundarySuite extends FunSuite:
 
+  // StructuralProgram otherwise appears only inside macro strings, which gives Zinc no dependency.
+  private val structuralProgramDependency: Class[?] =
+    classOf[storymodel4s.embed.grakern.StructuralProgram]
+
   test("positive control: a case class Mirror.fromProduct still compiles") {
     val errors = typeCheckErrors(
       """summon[scala.deriving.Mirror.ProductOf[storymodel4s.grakernprobe.StructuralForgeControl]]
@@ -22,6 +26,7 @@ class StructuralProgramBoundarySuite extends FunSuite:
   }
 
   test("StructuralProgram has no Mirror.ProductOf or fromProduct bypass") {
+    assert(structuralProgramDependency != null)
     val mirror = typeCheckErrors(
       "summon[scala.deriving.Mirror.ProductOf[storymodel4s.embed.grakern.StructuralProgram]]"
     )
