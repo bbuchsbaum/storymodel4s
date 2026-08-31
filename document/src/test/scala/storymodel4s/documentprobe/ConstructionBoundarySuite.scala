@@ -7,6 +7,16 @@ import munit.FunSuite
 /** External-package proof that validated document values have no case-class construction bypass. */
 class ConstructionBoundarySuite extends FunSuite:
 
+  // Macro snippets are strings, so these real references make Zinc invalidate the court.
+  private val dependsOn: List[Class[?]] = List(
+    classOf[storymodel4s.document.MentionGraph],
+    classOf[storymodel4s.document.ExactCorefCluster[?]],
+    classOf[storymodel4s.document.CorefPartition[?]],
+    classOf[storymodel4s.document.MentionTable[?]],
+    classOf[storymodel4s.document.MentionForms],
+    classOf[storymodel4s.document.Projection[?]]
+  )
+
   /** Sweep 3 slice: the Mirror.ProductOf door across document's private-constructor case classes.
     *
     * `case class X private (...)` still derives `Mirror.ProductOf` in Scala 3, so the private
@@ -15,6 +25,7 @@ class ConstructionBoundarySuite extends FunSuite:
     * bd-01M183VBPNEAPT5JNQMBMYMKQ9.
     */
   test("sweep 3: Mirror.ProductOf door across document private-constructor case classes") {
+    assert(dependsOn.forall(_ != null))
     assertEquals(
       typeCheckErrors("summon[scala.deriving.Mirror.ProductOf[storymodel4s.core.SurfaceUnit]]"),
       Nil,
