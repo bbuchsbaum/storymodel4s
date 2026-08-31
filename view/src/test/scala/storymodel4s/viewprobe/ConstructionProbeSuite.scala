@@ -7,6 +7,32 @@ import munit.FunSuite
 /** Probes the public surface-support construction boundary from outside `storymodel4s.view`. */
 class ConstructionProbeSuite extends FunSuite:
 
+  // Macro snippets are strings, so these real references make Zinc invalidate the court.
+  private val dependsOn: List[Class[?]] = List(
+    classOf[storymodel4s.view.ViewProvenance],
+    classOf[storymodel4s.view.AuditRecord],
+    classOf[storymodel4s.view.SourceRun],
+    classOf[storymodel4s.view.TextAnnotation],
+    classOf[storymodel4s.view.NavigationIndex],
+    classOf[storymodel4s.view.CodexFlow],
+    classOf[storymodel4s.view.CommonViewState],
+    classOf[storymodel4s.view.ChannelBudget],
+    classOf[storymodel4s.view.LanePolicy],
+    classOf[storymodel4s.view.CodexSpec],
+    classOf[storymodel4s.view.FeatureObservationPlacement],
+    classOf[storymodel4s.view.CodexContract],
+    classOf[storymodel4s.view.LaneAllocation],
+    classOf[storymodel4s.view.ProjectionContract],
+    classOf[storymodel4s.view.VisualIdentity],
+    classOf[storymodel4s.view.Extent],
+    classOf[storymodel4s.view.Anchor],
+    classOf[storymodel4s.view.AtlasSpec],
+    classOf[storymodel4s.view.AtlasFeatureLayer],
+    classOf[storymodel4s.view.NarrativeScene],
+    classOf[storymodel4s.view.SceneNavigation],
+    classOf[storymodel4s.view.SurfaceDetailSupport]
+  )
+
   private def refused(errors: List[scala.compiletime.testing.Error], what: String): Unit =
     assert(errors.nonEmpty, s"$what must not forge a surface-detail support report")
 
@@ -20,6 +46,7 @@ class ConstructionProbeSuite extends FunSuite:
     * `fromProduct` does not license a refusal about `summon`.
     */
   test("sweep 3: no private-constructor case class in view has a Mirror.ProductOf door") {
+    assert(dependsOn.forall(_ != null))
     assertEquals(
       typeCheckErrors("summon[scala.deriving.Mirror.ProductOf[storymodel4s.core.SurfaceUnit]]"),
       Nil,
