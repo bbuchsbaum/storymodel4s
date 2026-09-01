@@ -602,3 +602,60 @@ object SurfaceAnalyzer:
         out += TextSpan.unsafe(i, i + w)
         i += w
     out.result()
+
+/** Checked proposal units and typed support consumed by later compiler slices.
+  *
+  * Why a trait: text keeps [[SurfaceAtlas]] as the exact UTF-16 implementation, while a film
+  * adapter can supply the same compiler-facing surface without changing text constructors.
+  */
+trait NarrativeSourceAtlas:
+  def bundle: SourceBundle
+  def units: Vector[NarrativeProposalUnit]
+  def unit(id: NarrativeProposalUnitId): Option[NarrativeProposalUnit]
+  def supportOf(id: NarrativeProposalUnitId): Option[EvidenceSupport]
+  def surfaceAtlas: Option[SurfaceAtlas]
+
+/** Text conformance adapter. Equality and lookup of the wrapped [[SurfaceAtlas]] are unchanged. */
+final class TextNarrativeAtlas private (
+    val atlas: SurfaceAtlas,
+    val bundle: SourceBundle,
+    val units: Vector[NarrativeProposalUnit]
+) extends NarrativeSourceAtlas:
+  def unit(id: NarrativeProposalUnitId): Option[NarrativeProposalUnit] = units.find(_.id == id)
+  def supportOf(id: NarrativeProposalUnitId): Option[EvidenceSupport] = unit(id).map(_.support)
+  def surfaceAtlas: Option[SurfaceAtlas] = Some(atlas)
+
+  override def equals(other: Any): Boolean = other match
+    case that: TextNarrativeAtlas =>
+      atlas == that.atlas && bundle == that.bundle && units == that.units
+    case _ => false
+  override def hashCode(): Int = (atlas, bundle, units).hashCode()
+  override def toString: String =
+    s"TextNarrativeAtlas(${atlas.source.id.value}, units=${units.size})"
+
+object TextNarrativeAtlas:
+  def of(atlas: SurfaceAtlas): Either[DomainError, TextNarrativeAtlas] =
+    SourceBundle.writtenText(atlas.source).flatMap { bundle =>
+      val stream = bundle.streams.head
+      atlas.units
+        .foldLeft[Either[DomainError, Vector[NarrativeProposalUnit]]](Right(Vector.empty)) {
+          case (acc, unit) =>
+            acc.flatMap { us =>
+              val unitId = NarrativeProposalUnitId.unsafe(
+                ContentAddress.of("npu", atlas.source.id.value, unit.id.value)
+              )
+              EvidenceSupport.text(bundle, stream.id, SpanSet.one(unit.span)).map { support =>
+                us :+ NarrativeProposalUnit.of(unitId, support, Some(unit.id))
+              }
+            }
+        }
+        .map(units => new TextNarrativeAtlas(atlas, bundle, units))
+    }
+
+/** SurfaceAtlas conformance: existing constructors and lookups stay the text implementation. */
+object SurfaceAtlasConformance:
+  def narrativeAtlas(atlas: SurfaceAtlas): Either[DomainError, NarrativeSourceAtlas] =
+    TextNarrativeAtlas.of(atlas)
+
+  def bundleOf(source: StorySource): Either[DomainError, SourceBundle] =
+    SourceBundle.writtenText(source)

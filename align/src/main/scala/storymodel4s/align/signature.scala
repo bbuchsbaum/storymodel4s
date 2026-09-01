@@ -205,6 +205,16 @@ final class MassRatio private (
   override def toString: String = s"MassRatio(${render})"
 
 object MassRatio:
+  /** Slack on `part / whole <= 1` when absorbing a slightly overflowing submass.
+    *
+    * '''INHERITED, NOT DERIVED.''' Same `1e-9` as `HsmmResult.Tolerance`, never computed against
+    * this constructor's own inputs. The phenomenon is a dimensionless float64 ratio of
+    * already-summed masses, so error sits near `1e-16` — six orders below. The value is a round
+    * number, not a bound. Do not tighten from this comment; measure `of`'s inputs first.
+    *
+    * This constant ADMITS a value that is then stored: overflow inside the slack is clamped with
+    * `math.min` before `unsafe`, so the stored pair agrees with the decision that let it through.
+    */
   private val Tolerance = 1e-9
 
   /** Trusted construction from inside `align`, where the sums are computed together. */
@@ -329,6 +339,15 @@ final class ExternalMassReport private (val attributed: Double, val unranked: Do
   override def toString: String = s"ExternalMassReport(${render})"
 
 object ExternalMassReport:
+  /** Slack on `attributed + unranked <= 1` when absorbing a slightly overflowing partition.
+    *
+    * '''INHERITED, NOT DERIVED.''' Copied from `HsmmResult.Tolerance`; never computed against two
+    * float64 additions. Those have error near `1e-16`, seven orders below. The value is a round
+    * number, not a bound. Do not tighten from this comment; measure this constructor first.
+    *
+    * This constant ADMITS a value that is then stored: overflow inside the slack is renormalised so
+    * the stored pair sums to exactly 1.
+    */
   private val Tolerance = 1e-9
 
   /** Trusted construction from inside `align`. */

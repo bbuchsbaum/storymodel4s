@@ -283,11 +283,17 @@ reaches the codec).
 - `admissibility-echo/v1` — tagged like the others: `entries` (count), then per
   `(unit, anchor)` sorted: `unit`, `anchor`, `contradictions` (list, in detection
   order), `faithful`, `facets` (list, sorted).
-- `hsmm/v1` is the canonical JSON object owned by `HsmmResultCodec`. Its top-level
-  fields are exactly `schemaVersion`, `posterior`, `flow`, `viterbi`,
-  `logLikelihood`, `costs`, `candidateAnchors`, `admissibilityEcho`,
-  `viewFingerprint`, `recallChecksum`, and `refinementPasses`. The sparse DTOs
-  are arrays, never maps with composite string keys:
+- `hsmm/v4` is the canonical JSON object owned by `HsmmResultCodec` (the live
+  `SchemaVersion`; v1, v2, and v3 tags are not accepted and have no migration).
+  Its top-level fields are exactly `schemaVersion`, `posterior`, `flow`,
+  `viterbi`, `logLikelihood`, `costs`, `supportBasis`, `candidateAnchors`,
+  `admissibilityEcho`, `viewFingerprint`, `recallChecksum`, and
+  `refinementPasses`. `supportBasis` is one `{term, value}` per `CostTerm`;
+  decode requires exact complete coverage, finite nonnegative weights, then
+  compares the rebuilt `SupportBasis` with an independently supplied expected
+  basis before any cell is rebuilt. The embedded basis proves internal
+  consistency only; it is not an execution receipt. The sparse DTOs are arrays,
+  never maps with composite string keys:
   - each posterior row is `{unit, mass}` and each mass is `{state, mass}`;
   - each flow step is `{from, to, mass}` and each mass is
     `{fromState, toState, mass}`;
@@ -297,26 +303,39 @@ reaches the codec).
 - An alignment state is `{type: Source, ref}`, `{type: Distorted, ref, facets}`,
   or `{type: External, state}`; a source reference is `{type: Situation, id}` or
   `{type: Segment, id}`. A cost is exactly `{terms, mode?, exclusion?, total,
-  missingTerms, sourceChartCoverage?, reductions}`: a term is `{term, value}`;
-  a reduction is `{term, receipt}`; and a receipt is `{reducer, members,
-  excludedMembers, sourceChartCoverage, observedEstimateCoverage}`. Receipt
-  members are `{member, estimate}` and exclusions are `{member,
-  contradictions}`; structural coverage is `{level, membersWithEvidence,
-  members}`. `Estimate` and `Coverage` use their shared codec schemas.
+  missingTerms, sourceChartCoverage?, reductions, support, imputedTerms}`: a
+  term is `{term, value}`; an imputed term is `{term, reason}` (priced from a
+  declared constant, distinct from `missingTerms`); a reduction is `{term,
+  receipt}`; and a receipt is `{reducer, members, excludedMembers,
+  sourceChartCoverage, observedEstimateCoverage}`. Receipt members are `{member,
+  estimate}` and exclusions are `{member, contradictions}`; structural coverage
+  is `{level, membersWithEvidence, members}`. `support` is the required tagged
+  assessment that replaced v2 `supportWeight`: `Assessed` carries
+  `measuredTerms`, `eligibleTerms`, and `eligibleWeights` and accepts neither
+  `share` nor `reason` (share is derived); `Unestablished` carries the same
+  evidence plus `reason` `EmptyEligibility` or `ZeroEligibleWeight` and accepts
+  no `share` (decode recomputes the reason and refuses a mismatch);
+  `NotApplicable` carries only `reason` `ExternalState` or `Unreachable` and
+  rejects measurement fields. A v3 artifact's numeric `supportWeight` cannot
+  reveal which of those three states applied, so inventing one would fabricate
+  evidence. `imputedTerms` (v3) remains required. `Estimate` and `Coverage` use
+  their shared codec schemas.
 - Encoding orders posterior and flow in inference order; Viterbi in recall
   order; state masses by state key; flow masses by `(fromState, toState)` key;
   unit maps by recall-unit id; state costs by state key; terms, missing terms,
-  reductions, facets, and contradictions by enum order; and anchors and receipt
-  members by source-reference key. Duplicate sparse keys or set members are
-  rejected before conversion to `Map`/`Set`. Optional fields are omitted when
-  absent. Checksums are lowercase hexadecimal and every `Double` is the shared
+  reductions, facets, and contradictions by enum order; the result-level
+  support basis by `CostTerm` order; and anchors and receipt members by
+  source-reference key. Duplicate sparse keys or set members are rejected
+  before conversion to `Map`/`Set`. Optional fields are omitted when absent.
+  Checksums are lowercase hexadecimal and every `Double` is the shared
   canonical IEEE-754 rendering. Thus decoding and re-encoding one artifact is
   byte-exact; the schema does not claim that separately rerunning transcendental
   inference on different numeric runtimes produces bit-identical doubles.
 - There is deliberately no context-free `Decoder[HsmmResult]`. Decoding requires
-  the original `RecallGraph` and `SourceView`, rebuilds rows and records through
-  smart constructors and `AlignWire`, calls `HsmmResult.validated`, then requires
-  `AlignWire.matched` for the two contextual digests.
+  the original `RecallGraph`, `SourceView`, and independently admitted
+  `SupportBasis`, rebuilds rows and records through smart constructors and
+  `AlignWire`, calls `HsmmResult.validated`, then requires `AlignWire.matched`
+  for the two contextual digests.
 
 ### D6. Privacy, cache, receipts (P0-3)
 
