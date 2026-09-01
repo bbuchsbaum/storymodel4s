@@ -6,7 +6,8 @@
 
 **Decider:** the owner (single-developer mode, AGENTS.md SD5)
 
-**Plan:** `docs/plans/2026-09-01-story-pipeline-solo-plan.md`, phase 1.1 and decision D1
+**Plan:** the owner's 2026-09-01 story-pipeline solo plan, phase 1.1 and decision D1 (the plan
+document lives in the owner's checkout and is not on this branch)
 
 ## Context
 
@@ -29,7 +30,7 @@ conversion through `AmrCandidates.fromPenman`, and receipts that carry a real `P
    digested over every field, and `weightsPinned` is fixed to `false` with the documented
    meaning *remote weights cannot be pinned; identity is provider, model id, prompt package,
    and SDK*. A sealed `RuntimeIdentity` trait over `PinnedRuntime` and `RemoteRuntime`
-   supplies the five fields the envelope, receipts, and `ParserCacheKey.of` need, so every
+   supplies the fields the envelope, receipts, and `ParserCacheKey.of` need, so every
    existing `PinnedRuntime` call site compiles unchanged and every `match` on
    `ParserRuntime` names `Remote` explicitly. Remote receipts carry
    `promptTemplateVersion = Some(name@version#checksum)`; pinned receipts keep `None`.
@@ -52,34 +53,44 @@ conversion through `AmrCandidates.fromPenman`, and receipts that carry a real `P
    Recording keys are per item.
 6. **Credentials and spend.** The key is read from `STORYMODEL4S_ANTHROPIC_API_KEY`, falling
    back to a nonblank `ANTHROPIC_API_KEY`; a blank variable counts as absent. Live calls
-   additionally require `STORYMODEL4S_AGENT_LIVE=1`. The driver's default mode is `replay`;
-   `record` calls the model and writes recordings. A missing recording in replay is
-   `TransportFailure.Io(recording-missing)` for that exchange. Stdout carries counts,
-   checksums, and ids, never source prose.
+   additionally require `STORYMODEL4S_AGENT_LIVE=1`, and only `LiveAuthorization.from(env)`
+   can mint the proof a client is built from. The driver takes its mode as an explicit
+   argument: `replay` needs nothing and cannot spend; `record` calls the model and writes
+   recordings, and is refused before anything is read or created when the environment has
+   not opted in. A missing recording in replay is `TransportFailure.Io(recording-missing)`
+   for that exchange. Stdout carries counts, checksums, and ids, never source prose.
 7. **Recording store.** `Recordings(dir)`; key = digest over model id, prompt-package
    checksum, prompt-text checksum, the item's text checksum, and the token list (ids,
    starts, ends, texts); never the caller's request id. Each value is one JSON file with
-   the raw model text and a header (model, stop reason, usage tokens, durationMillis). A
-   recording whose header model is not the requested model is refused as corrupt. Replay
-   re-runs the full court on every run.
+   the requested model, the raw model text, the stop reason, and an `origin`: `captured`
+   (the provider-reported model, usage tokens, and duration) or `authored` (hand-written
+   evidence, which must carry no accounting). A recording whose requested model is not the
+   request's model is refused as corrupt. Only captured durations reach a receipt. Replay
+   opens an existing directory and never creates one; replay re-runs the full court on
+   every run.
 8. **Driver output.** `@main def claudeParse(mode, textPath, recordingsDir, outDir)` writes
    per sentence a `.penman` file and a `.chart.txt` with `Canonical.serialization`, plus
-   `receipts.json` and `summary.json` carrying a `StageRecord` and `BuildReceipt` built with
-   `BuildReceiptBuilder`. No `PropositionChart` codec exists in the repository; the chart is
-   published as its canonical serialization only, and a codec is a separate slice.
-9. **Dependency.** The official Anthropic Java SDK (`com.anthropic:anthropic-java:2.34.0`,
-   model id `claude-sonnet-5`), confined to one file. It brings OkHttp and Jackson
-   transitively, acceptable in a JVM-only module under design-contract item 11. No
-   sampling parameters and no thinking configuration are sent. The `providerAgent` project
-   depends on `providerParser`, `core.jvm`, `acquire.jvm`, `amrInterop.jvm`, and
-   `proposition.jvm`, forks its tests, and is part of the root aggregate and of
-   `jvmOnlyModules`.
+   `receipts.json` and `summary.json` carrying the `StageRecord` and `BuildReceipt` built
+   with `BuildReceiptBuilder`. How each reply was served (`replayed-authored`,
+   `replayed-captured`, `captured-live`, `unrecorded`) and the stage's `cached` flag are
+   derived from the store before and after the run, not from the mode argument. No
+   `PropositionChart` codec exists in the repository; the chart is published as its
+   canonical serialization only, and a codec is a separate slice.
+9. **Dependency.** The official Anthropic Java SDK (`com.anthropic:anthropic-java`, version
+   pinned once in `build.sbt` and generated into `AnthropicSdkPin`; model id
+   `claude-sonnet-5`), confined to one file. It brings OkHttp and Jackson transitively,
+   acceptable in a JVM-only module under design-contract item 11. No sampling parameters and
+   no thinking configuration are sent. The `providerAgent` project depends on
+   `providerParser`, `core.jvm`, `acquire.jvm`, `amrInterop.jvm`, and `proposition.jvm`,
+   forks its tests, and is part of the root aggregate and of `jvmOnlyModules`.
 10. **Prompt package.** `prompts/penman-parse.v1.txt` on the classpath, manifested by
     `AgentPromptPackage` under `PromptRole.Custom("provider-agent", "penman-parse")` with
-    nonempty abstention rules, self-checks, and permitted operations. The package checksum
-    and the prompt-text checksum enter `ParserConfig.params`, so they reach the cache key
-    and every receipt. The few-shot examples are not War of the Ghosts sentences: the gold
-    fixture stays the oracle and never the input the model is tuned on.
+    nonempty abstention rules, self-checks, and permitted operations. The transport derives
+    its runtime identity from the prompt package it sends and refuses any request whose
+    config params do not name the same package, prompt text, and token budget, so the
+    package checksum reaches every cache key and receipt and cannot be misnamed. The few-shot
+    examples are not War of the Ghosts sentences: the gold fixture stays the oracle and never
+    the input the model is tuned on.
 
 ## Rejected alternatives
 
@@ -98,6 +109,12 @@ conversion through `AmrCandidates.fromPenman`, and receipts that carry a real `P
   court judges sentences.
 - **Fixing marker indices in the transport** (sorting, deduplicating, clamping). That would
   turn the court's checks into decoration.
+- **Passing the runtime and the prompt to the transport separately.** A caller could then
+  run prompt B under receipts naming prompt A; deriving the runtime from the prompt removes
+  the second source.
+- **An origin field on the result/v2 wire.** It would let a receipt itself say whether a
+  network call stood behind it, but it is a `provider-parser` schema change; recorded here
+  as the next step rather than folded into this slice.
 
 ## Consequences
 
@@ -106,6 +123,9 @@ conversion through `AmrCandidates.fromPenman`, and receipts that carry a real `P
 - A remote receipt and a pinned receipt for the same provider and model strings are
   distinguishable by `promptTemplateVersion` (present versus absent) and by the fingerprint
   prefix (`remote-runtime:` versus `parser-runtime:`).
+- A `ProviderCall` minted under replay attests the transport exchange under that runtime
+  identity; whether a network call stood behind it is evidence in the recording's `origin`
+  and in the driver's ledger, not in the call.
 - The live path is untested in this repository's gates by construction; `LiveSmokeSuite`
   runs only when the environment opts into spend. Everything else is network-free.
 - `provider-parser/README.md` still describes a runtime as `Ready` or `Unavailable`; that

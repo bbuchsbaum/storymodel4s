@@ -32,9 +32,9 @@ class MutationSuite extends FunSuite:
 
   private def attemptWithMutatedJson(mutate: Json => Json): ParserAttempt =
     val recordings = recordingsWith(Map(first -> reply(penman(0))))
-    val honest = ClaudeParserTransport(runtime, prompt, new ModelExchange.Recorded(recordings))
+    val honest = transportOver(new ModelExchange.Recorded(recordings))
     val provider = JsonAmrCandidateProvider[Id](
-      ParserRuntime.Remote(runtime),
+      ParserRuntime.Remote(honest.runtime),
       config,
       StarterLexicon.lexicon,
       new JsonMutatingTransport(honest, mutate)

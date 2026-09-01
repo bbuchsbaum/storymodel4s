@@ -6,13 +6,19 @@ import io.circe.syntax.*
 import java.nio.charset.StandardCharsets
 import java.nio.file.{Files, Path, Paths}
 import scala.util.control.NonFatal
-import storymodel4s.acquire.{BuildReceiptBuilder, StageCacheKey, StageLocalConfig, StageRecord}
+import storymodel4s.acquire.{
+  BuildReceiptBuilder,
+  ExtendedBuildReceipt,
+  StageCacheKey,
+  StageLocalConfig,
+  StageRecord
+}
 import storymodel4s.amr.schema.StarterLexicon
 import storymodel4s.core.*
 import storymodel4s.proposition as p
 import storymodel4s.provider.parser.*
 
-/** Whether the driver may call the model. `Replay` is the default and cannot spend. */
+/** Whether the driver may call the model. `Replay` needs no credentials and cannot spend. */
 enum DriverMode:
   case Replay
   case Record
@@ -30,43 +36,126 @@ object DriverMode:
 /** Why a driver run produced no outputs; every case is reportable without source prose. */
 enum DriverError:
   case UnknownMode(raw: String)
+  case LiveRefused(refusal: LiveRefusal)
+  case RecordingsUnavailable(error: RecordingsError)
   case TextUnreadable(path: String, reasonChecksum: Checksum)
   case SourceInvalid(detail: String)
   case InputInvalid(detail: String)
   case PromptUnavailable(error: PromptPackageLoadError)
-  case RuntimeInvalid(detail: String)
+  case TransportRefused(error: TransportSetupError)
   case ConfigInvalid(detail: String)
-  case RecordingsUnavailable(error: RecordingsError)
-  case LiveRefused(refusal: LiveRefusal)
   case OutputUnwritable(path: String, reasonChecksum: Checksum)
   case ReceiptInvalid(detail: String)
 
   def message: String = this match
     case UnknownMode(raw)             => s"unknown mode '$raw'; expected replay or record"
+    case LiveRefused(refusal)         => refusal.message
+    case RecordingsUnavailable(error) => error.message
     case TextUnreadable(path, reason) => s"cannot read $path (reason ${reason.short()})"
     case SourceInvalid(detail)        => s"story source refused: $detail"
     case InputInvalid(detail)         => s"parser input refused: $detail"
     case PromptUnavailable(error)     => error.message
-    case RuntimeInvalid(detail)       => s"remote runtime refused: $detail"
+    case TransportRefused(error)      => s"transport refused: ${error.message}"
     case ConfigInvalid(detail)        => s"parser config refused: $detail"
-    case RecordingsUnavailable(error) => error.message
-    case LiveRefused(refusal)         => refusal.message
     case OutputUnwritable(path, sum)  => s"cannot write $path (reason ${sum.short()})"
     case ReceiptInvalid(detail)       => s"build receipt refused: $detail"
 
-/** Counts a run publishes; no sentence text, only what the receipts already carry. */
-final case class DriverSummary(
-    mode: DriverMode,
-    storyId: StoryId,
-    sourceChecksum: Checksum,
-    sentences: Int,
-    proposed: Int,
-    failed: Int,
-    abstained: Int,
-    recordingHits: Int,
-    liveCalls: Int,
-    receiptChecksum: Checksum
-)
+/** How one sentence's reply was obtained, derived from the recordings store before and after the
+  * run rather than from the mode argument.
+  */
+enum RecordingService:
+  /** A hand-written recording that existed before the run. */
+  case ReplayedAuthored
+
+  /** A provider-captured recording that existed before the run. */
+  case ReplayedCaptured
+
+  /** No recording before the run; a captured one after it: this run called the provider. */
+  case CapturedLive
+
+  /** No recording after the run: a replay miss, or a live call that produced nothing to keep. */
+  case Unrecorded
+
+  /** An authored recording that appeared during the run; this run cannot have written it. */
+  case Foreign
+
+  def render: String = this match
+    case ReplayedAuthored => "replayed-authored"
+    case ReplayedCaptured => "replayed-captured"
+    case CapturedLive     => "captured-live"
+    case Unrecorded       => "unrecorded"
+    case Foreign          => "foreign"
+
+/** Counts a run publishes. Privately constructed because the counts stand in relation to one
+  * another and to the batch; only `derive` establishes them from a result and a ledger.
+  */
+final class DriverSummary private (
+    val mode: DriverMode,
+    val storyId: StoryId,
+    val sourceChecksum: Checksum,
+    val sentences: Int,
+    val proposed: Int,
+    val failed: Int,
+    val abstained: Int,
+    val transportFailures: Int,
+    val replayedAuthored: Int,
+    val replayedCaptured: Int,
+    val capturedLive: Int,
+    val unrecorded: Int,
+    val foreign: Int,
+    val receiptChecksum: Checksum
+):
+  /** Provider calls this run attempted: zero under replay by construction of `Recorded`. */
+  def liveCalls: Int = mode match
+    case DriverMode.Replay => 0
+    case DriverMode.Record => capturedLive + unrecorded
+
+  override def toString: String =
+    s"DriverSummary(${mode.render}, ${storyId.value}, sentences=$sentences, proposed=$proposed)"
+
+object DriverSummary:
+  private def isAbstained(attempt: ParserAttempt): Boolean = attempt.result match
+    case Left(ParserFailure.ProviderAbstained(_)) => true
+    case _                                        => false
+
+  private def isTransportFailure(attempt: ParserAttempt): Boolean = attempt.result match
+    case Left(
+          ParserFailure.Timeout(_) | ParserFailure.NonZeroExit(_, _) |
+          ParserFailure.MaterializationFailed(_) | ParserFailure.TransportIo(_)
+        ) =>
+      true
+    case _ => false
+
+  private[agent] def status(attempt: ParserAttempt): String =
+    if attempt.result.isRight then "proposed"
+    else if isAbstained(attempt) then "abstained"
+    else "failed"
+
+  private[agent] def derive(
+      mode: DriverMode,
+      storyId: StoryId,
+      sourceChecksum: Checksum,
+      result: ParserBatchResult,
+      services: Vector[RecordingService],
+      receiptChecksum: Checksum
+  ): DriverSummary =
+    val attempts = result.attempts
+    new DriverSummary(
+      mode,
+      storyId,
+      sourceChecksum,
+      sentences = attempts.size,
+      proposed = attempts.count(_.result.isRight),
+      failed = attempts.count(attempt => attempt.result.isLeft && !isAbstained(attempt)),
+      abstained = attempts.count(isAbstained),
+      transportFailures = attempts.count(isTransportFailure),
+      replayedAuthored = services.count(_ == RecordingService.ReplayedAuthored),
+      replayedCaptured = services.count(_ == RecordingService.ReplayedCaptured),
+      capturedLive = services.count(_ == RecordingService.CapturedLive),
+      unrecorded = services.count(_ == RecordingService.Unrecorded),
+      foreign = services.count(_ == RecordingService.Foreign),
+      receiptChecksum
+    )
 
 /** Text to charts through the real admission court, with a content-keyed record/replay store so
   * reruns and tests never touch the network.
@@ -75,56 +164,42 @@ final case class DriverSummary(
   * environment court for spend belongs at the process boundary, not inside a provider.
   */
 object ClaudeParseDriver:
-  val Provider: String = "anthropic"
-  val Model: String = "claude-sonnet-5"
-  val SdkVersion: String = "anthropic-java/2.34.0"
   val StageSchemaVersion: String = "storymodel4s.provider.agent.claude-parse/v1"
   val Stage: StageId = StageId.unsafe("provider-agent/claude-parse")
   val TimeoutMillis: Long = 120000L
   val MaxTokens: Long = ClaudeParserTransport.DefaultMaxTokens
 
-  /** The remote runtime the driver runs under; identity moves with the prompt package and text. */
-  def runtime(prompt: AgentPromptPackage): Either[DriverError, RemoteRuntime] =
-    RemoteRuntime
-      .from(
-        Provider,
-        Model,
-        SdkVersion,
-        prompt.ref,
-        prompt.promptTextChecksum,
-        ParserEnvelope.ResultSchema
-      )
-      .left
-      .map(error => DriverError.RuntimeInvalid(error.message))
-
   /** No seed: live reruns are not fingerprint-identical; replay from recordings is the claim. */
   def config(prompt: AgentPromptPackage): Either[DriverError, ParserConfig] =
     ParserConfig
       .from(
-        Map(
-          "prompt-package" -> prompt.ref.checksum.hex,
-          "prompt-text" -> prompt.promptTextChecksum.hex,
-          "max-tokens" -> MaxTokens.toString
-        ),
+        ClaudeParserTransport.configParams(prompt, MaxTokens),
         seed = None,
         timeoutMillis = TimeoutMillis
       )
       .left
       .map(error => DriverError.ConfigInvalid(error.message))
 
-  /** Build the provider stack for one exchange: court, then per-sentence isolation. */
-  def provider(
-      runtime: RemoteRuntime,
-      config: ParserConfig,
+  def transport(
       prompt: AgentPromptPackage,
       exchange: ModelExchange
+  ): Either[DriverError, ClaudeParserTransport] =
+    ClaudeParserTransport
+      .from(prompt, exchange, MaxTokens)
+      .left
+      .map(DriverError.TransportRefused(_))
+
+  /** Build the provider stack for one exchange: court, then per-sentence isolation. */
+  def provider(
+      transport: ClaudeParserTransport,
+      config: ParserConfig
   ): AmrCandidateProvider[Id] =
     SentenceIsolatingParserProvider[Id](
       JsonAmrCandidateProvider[Id](
-        ParserRuntime.Remote(runtime),
+        ParserRuntime.Remote(transport.runtime),
         config,
         StarterLexicon.lexicon,
-        ClaudeParserTransport(runtime, prompt, exchange, MaxTokens)
+        transport
       )
     )
 
@@ -160,6 +235,14 @@ object ClaudeParseDriver:
       nowEpochMillis: Long
   ): Either[DriverError, DriverSummary] =
     for
+      authorization <- mode match
+        case DriverMode.Replay => Right(None)
+        case DriverMode.Record =>
+          LiveAuthorization.from(env).left.map(DriverError.LiveRefused(_)).map(Some(_))
+      recordings <- (mode match
+        case DriverMode.Replay => Recordings.open(recordingsDir)
+        case DriverMode.Record => Recordings.at(recordingsDir)
+      ).left.map(DriverError.RecordingsUnavailable(_))
       text <- readText(textPath)
       source <- StorySource
         .fromText(text, Some(textPath.getFileName.toString))
@@ -168,52 +251,50 @@ object ClaudeParseDriver:
       atlas = SurfaceAnalyzer.analyze(source)
       batch <- inputs(atlas)
       prompt <- AgentPromptPackage.load().left.map(DriverError.PromptUnavailable(_))
-      remote <- runtime(prompt)
       parserConfig <- config(prompt)
-      recordings <- Recordings.at(recordingsDir).left.map(DriverError.RecordingsUnavailable(_))
-      exchange <- exchangeFor(mode, recordings, env)
-      keys = recordingKeys(remote, prompt, batch)
-      present = keys.count(recordings.contains)
-      result = provider(remote, parserConfig, prompt, exchange).parse(batch)
-      afterwards = keys.count(recordings.contains)
-      _ <- writeOutputs(outDir, batch, result, recordings, keys)
-      receipt <- buildReceipt(source, remote, parserConfig, prompt, result, mode, nowEpochMillis)
-      summary = DriverSummary(
+      exchange = authorization.fold[ModelExchange](new ModelExchange.Recorded(recordings))(
+        admitted => new ModelExchange.RecordingLive(LiveModelClient.from(admitted), recordings)
+      )
+      claude <- transport(prompt, exchange)
+      keys = recordingKeys(claude.runtime, prompt, batch)
+      present = keys.map(recordings.contains)
+      result = provider(claude, parserConfig).parse(batch)
+      services = keys.zip(present).map { (key, wasPresent) =>
+        service(recordings, claude.runtime, key, wasPresent)
+      }
+      _ <- writeOutputs(outDir, batch, result, recordings, claude.runtime, keys, services)
+      receipt <- buildReceipt(
+        source,
+        claude.runtime,
+        parserConfig,
+        prompt,
+        result,
+        cached = present.forall(identity),
+        nowEpochMillis
+      )
+      summary = DriverSummary.derive(
         mode,
         source.id,
         source.canonicalChecksum,
-        batch.size,
-        result.attempts.count(_.result.isRight),
-        result.attempts.count(attempt => isFailed(attempt)),
-        result.attempts.count(attempt => isAbstained(attempt)),
-        present,
-        afterwards - present,
-        receipt.contentChecksum
+        result,
+        services,
+        receipt.receipt.contentChecksum
       )
-      _ <- writeSummary(outDir, summary, remote, prompt, receipt)
+      _ <- writeSummary(outDir, summary, claude.runtime, prompt, receipt)
     yield summary
 
-  private def isAbstained(attempt: ParserAttempt): Boolean = attempt.result match
-    case Left(ParserFailure.ProviderAbstained(_)) => true
-    case _                                        => false
-
-  private def isFailed(attempt: ParserAttempt): Boolean =
-    attempt.result.isLeft && !isAbstained(attempt)
-
-  private def exchangeFor(
-      mode: DriverMode,
+  private def service(
       recordings: Recordings,
-      env: Map[String, String]
-  ): Either[DriverError, ModelExchange] = mode match
-    case DriverMode.Replay => Right(new ModelExchange.Recorded(recordings))
-    case DriverMode.Record =>
-      AgentCredentials
-        .liveAuthorization(env)
-        .left
-        .map(DriverError.LiveRefused(_))
-        .map(authorization =>
-          new ModelExchange.RecordingLive(LiveModelClient.from(authorization), recordings)
-        )
+      runtime: RemoteRuntime,
+      key: RecordingKey,
+      wasPresent: Boolean
+  ): RecordingService =
+    recordings.read(key, runtime.model).toOption.map(_.evidence) match
+      case Some(ReplyEvidence.Authored) if wasPresent          => RecordingService.ReplayedAuthored
+      case Some(ReplyEvidence.Captured(_, _, _)) if wasPresent => RecordingService.ReplayedCaptured
+      case Some(ReplyEvidence.Captured(_, _, _))               => RecordingService.CapturedLive
+      case Some(ReplyEvidence.Authored)                        => RecordingService.Foreign
+      case None                                                => RecordingService.Unrecorded
 
   private def recordingKeys(
       runtime: RemoteRuntime,
@@ -255,22 +336,21 @@ object ClaudeParseDriver:
       batch: ParserBatch,
       result: ParserBatchResult,
       recordings: Recordings,
-      keys: Vector[RecordingKey]
+      runtime: RemoteRuntime,
+      keys: Vector[RecordingKey],
+      services: Vector[RecordingService]
   ): Either[DriverError, Unit] =
-    val perSentence = batch.inputs
-      .zip(result.attempts)
-      .zip(keys)
-      .foldLeft[Either[DriverError, Unit]](
-        Right(())
-      ) { case (acc, ((input, attempt), key)) =>
+    val rows = batch.inputs.zip(result.attempts).zip(keys)
+    val perSentence = rows.foldLeft[Either[DriverError, Unit]](Right(())) {
+      case (acc, ((input, attempt), key)) =>
         acc.flatMap { _ =>
-          val penman = recordings
-            .read(key, Model)
-            .toOption
-            .map(reply => ReplyInterpretation.normalize(reply.text))
-          val penmanWrite = penman.fold[Either[DriverError, Unit]](Right(()))(text =>
-            write(outDir.resolve(s"${input.id.value}.penman"), text + "\n")
-          )
+          val penmanWrite = recordings.read(key, runtime.model) match
+            case Right(reply) =>
+              write(
+                outDir.resolve(s"${input.id.value}.penman"),
+                ReplyInterpretation.normalize(reply.text) + "\n"
+              )
+            case Left(_) => Right(())
           penmanWrite.flatMap { _ =>
             attempt.result match
               case Right(proposal) =>
@@ -282,9 +362,12 @@ object ClaudeParseDriver:
               case Left(_) => Right(())
           }
         }
-      }
+    }
     perSentence.flatMap { _ =>
-      write(outDir.resolve("receipts.json"), receiptsJson(batch, result).spaces2 + "\n")
+      write(
+        outDir.resolve("receipts.json"),
+        receiptsJson(batch, result, keys, services).spaces2 + "\n"
+      )
     }
 
   private def callJson(call: ProviderCall): Json = Json.obj(
@@ -320,25 +403,28 @@ object ClaudeParseDriver:
     case ParserAttemptDecision.ResultRejected(reason) =>
       Json.obj("kind" -> "result-rejected".asJson, "reason" -> reason.render.asJson)
 
-  private def status(attempt: ParserAttempt): String =
-    if attempt.result.isRight then "proposed"
-    else if isAbstained(attempt) then "abstained"
-    else "failed"
-
-  private def receiptsJson(batch: ParserBatch, result: ParserBatchResult): Json =
-    Json.arr(batch.inputs.zip(result.attempts).map { (input, attempt) =>
-      Json.obj(
-        "id" -> input.id.value.asJson,
-        "sentenceId" -> input.sentenceId.value.asJson,
-        "tokens" -> input.tokens.size.asJson,
-        "status" -> status(attempt).asJson,
-        "failure" -> attempt.result.swap.toOption.map(_.render).asJson,
-        "proposalDigest" -> attempt.result.toOption.map(_.canonicalDigest.hex).asJson,
-        "requestChecksum" -> attempt.receipt.requestChecksum.hex.asJson,
-        "receiptDigest" -> attempt.receipt.digest.hex.asJson,
-        "call" -> attempt.receipt.call.map(callJson).asJson,
-        "decisions" -> attempt.receipt.decisions.map(decisionJson).asJson
-      )
+  private def receiptsJson(
+      batch: ParserBatch,
+      result: ParserBatchResult,
+      keys: Vector[RecordingKey],
+      services: Vector[RecordingService]
+  ): Json =
+    Json.arr(batch.inputs.zip(result.attempts).zip(keys.zip(services)).map {
+      case ((input, attempt), (key, service)) =>
+        Json.obj(
+          "id" -> input.id.value.asJson,
+          "sentenceId" -> input.sentenceId.value.asJson,
+          "tokens" -> input.tokens.size.asJson,
+          "recordingKey" -> key.checksum.hex.asJson,
+          "served" -> service.render.asJson,
+          "status" -> DriverSummary.status(attempt).asJson,
+          "failure" -> attempt.result.swap.toOption.map(_.render).asJson,
+          "proposalDigest" -> attempt.result.toOption.map(_.canonicalDigest.hex).asJson,
+          "requestChecksum" -> attempt.receipt.requestChecksum.hex.asJson,
+          "receiptDigest" -> attempt.receipt.digest.hex.asJson,
+          "call" -> attempt.receipt.call.map(callJson).asJson,
+          "decisions" -> attempt.receipt.decisions.map(decisionJson).asJson
+        )
     }*)
 
   private def buildReceipt(
@@ -347,9 +433,9 @@ object ClaudeParseDriver:
       config: ParserConfig,
       prompt: AgentPromptPackage,
       result: ParserBatchResult,
-      mode: DriverMode,
+      cached: Boolean,
       nowEpochMillis: Long
-  ): Either[DriverError, BuildReceipt] =
+  ): Either[DriverError, ExtendedBuildReceipt] =
     val local = StageLocalConfig(Vector(prompt.ref), config.params, config.seed)
     val key = StageCacheKey.of(
       source.canonicalChecksum,
@@ -364,7 +450,7 @@ object ClaudeParseDriver:
       inputs = Vector(source.canonicalChecksum),
       outputs = result.attempts.map(_.receipt.digest),
       calls = result.attempts.flatMap(_.receipt.call),
-      cached = mode == DriverMode.Replay
+      cached = cached
     )
     BuildReceiptBuilder
       .start(source.id, source.canonicalChecksum, StageSchemaVersion)
@@ -372,15 +458,25 @@ object ClaudeParseDriver:
       .buildChecked(nowEpochMillis)
       .left
       .map(error => DriverError.ReceiptInvalid(error.message))
-      .map(_.receipt)
+
+  private def stageJson(record: StageRecord): Json = Json.obj(
+    "stage" -> record.stage.value.asJson,
+    "key" -> record.key.checksum.hex.asJson,
+    "inputs" -> record.inputs.map(_.hex).asJson,
+    "outputs" -> record.outputs.size.asJson,
+    "outputChecksum" -> record.outputChecksum.hex.asJson,
+    "calls" -> record.calls.size.asJson,
+    "cached" -> record.cached.asJson
+  )
 
   private def writeSummary(
       outDir: Path,
       summary: DriverSummary,
       runtime: RemoteRuntime,
       prompt: AgentPromptPackage,
-      receipt: BuildReceipt
+      extended: ExtendedBuildReceipt
   ): Either[DriverError, Unit] =
+    val receipt = extended.receipt
     val json = Json.obj(
       "mode" -> summary.mode.render.asJson,
       "source" -> Json.obj(
@@ -392,7 +488,12 @@ object ClaudeParseDriver:
         "proposed" -> summary.proposed.asJson,
         "failed" -> summary.failed.asJson,
         "abstained" -> summary.abstained.asJson,
-        "recordingHits" -> summary.recordingHits.asJson,
+        "transportFailures" -> summary.transportFailures.asJson,
+        "replayedAuthored" -> summary.replayedAuthored.asJson,
+        "replayedCaptured" -> summary.replayedCaptured.asJson,
+        "capturedLive" -> summary.capturedLive.asJson,
+        "unrecorded" -> summary.unrecorded.asJson,
+        "foreign" -> summary.foreign.asJson,
         "liveCalls" -> summary.liveCalls.asJson
       ),
       "runtime" -> Json.obj(
@@ -408,6 +509,7 @@ object ClaudeParseDriver:
         ),
         "promptTextChecksum" -> prompt.promptTextChecksum.hex.asJson
       ),
+      "stages" -> extended.stages.map(stageJson).asJson,
       "buildReceipt" -> Json.obj(
         "storyId" -> receipt.storyId.value.asJson,
         "sourceChecksum" -> receipt.sourceChecksum.hex.asJson,
@@ -425,10 +527,12 @@ object ClaudeParseDriver:
 
 /** Usage: `claudeParse <replay|record> <text-path> <recordings-dir> <out-dir>`.
   *
-  * `replay` (the default expectation) reads recordings only. `record` needs
+  * `replay` reads an existing recordings directory and never calls the model. `record` needs
   * `STORYMODEL4S_AGENT_LIVE=1` and a nonblank `STORYMODEL4S_ANTHROPIC_API_KEY` (or
   * `ANTHROPIC_API_KEY`), serves any recording already present, and records new replies. Only counts
-  * and checksums are printed; source prose never reaches stdout.
+  * and checksums are printed; source prose never reaches stdout. The exit status is 2 when the run
+  * could not start, 1 when any sentence never reached the admission court (a transport failure such
+  * as a missing recording), and 0 otherwise.
   */
 @main def claudeParse(mode: String, textPath: String, recordingsDir: String, outDir: String): Unit =
   val outcome = DriverMode.parse(mode).flatMap { parsed =>
@@ -450,6 +554,10 @@ object ClaudeParseDriver:
         s"mode=${summary.mode.render} story=${summary.storyId.value} " +
           s"source=${summary.sourceChecksum.short()} sentences=${summary.sentences} " +
           s"proposed=${summary.proposed} failed=${summary.failed} " +
-          s"abstained=${summary.abstained} recordingHits=${summary.recordingHits} " +
-          s"liveCalls=${summary.liveCalls} receipt=${summary.receiptChecksum.short()}"
+          s"abstained=${summary.abstained} transportFailures=${summary.transportFailures} " +
+          s"replayedAuthored=${summary.replayedAuthored} " +
+          s"replayedCaptured=${summary.replayedCaptured} capturedLive=${summary.capturedLive} " +
+          s"unrecorded=${summary.unrecorded} liveCalls=${summary.liveCalls} " +
+          s"receipt=${summary.receiptChecksum.short()}"
       )
+      if summary.transportFailures > 0 then sys.exit(1)

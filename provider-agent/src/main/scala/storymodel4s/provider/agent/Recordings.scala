@@ -41,24 +41,25 @@ type RecordingKey = RecordingKey.RecordingKey
 
 /** Why a recordings directory could not be opened. */
 enum RecordingsError:
+  case Missing(path: String)
   case NotADirectory(path: String)
   case CannotCreate(path: String, reasonChecksum: Checksum)
 
   def message: String = this match
+    case Missing(path)              => s"$path does not exist"
     case NotADirectory(path)        => s"$path exists and is not a directory"
     case CannotCreate(path, reason) => s"cannot create $path (reason ${reason.short()})"
 
 /** A directory of model replies, one JSON file per content key. Replay re-runs the full admission
-  * court on every read, so a recording is evidence, never a cached verdict.
+  * court on every read, so a recording is evidence, never a cached verdict; its header says whether
+  * that evidence was captured from the provider or authored by hand.
   */
 final class Recordings private (val dir: Path):
-  val Schema: String = Recordings.Schema
-
   def path(key: RecordingKey): Path = dir.resolve(s"${key.checksum.hex}.json")
 
   def contains(key: RecordingKey): Boolean = Files.isRegularFile(path(key))
 
-  /** Read one reply; the header model must equal the model the request names. */
+  /** Read one reply; the requested model in the header must equal the model the request names. */
   def read(key: RecordingKey, expectedModel: String): Either[ExchangeFailure, ModelReply] =
     val file = path(key)
     if !Files.isRegularFile(file) then Left(ExchangeFailure.RecordingMissing(key))
@@ -81,7 +82,7 @@ final class Recordings private (val dir: Path):
           case Right(reply) => Right(reply)
       }
 
-  /** Write one reply atomically enough for a single writer: full content, then rename. */
+  /** Write one reply: full content to a sibling file, then an atomic rename. */
   def write(key: RecordingKey, reply: ModelReply): Either[ExchangeFailure, Unit] =
     val file = path(key)
     val temporary = dir.resolve(s"${key.checksum.hex}.json.tmp")
@@ -104,7 +105,13 @@ final class Recordings private (val dir: Path):
 object Recordings:
   val Schema: String = "storymodel4s.provider.agent.recording/v1"
 
-  /** Open or create a recordings directory. */
+  /** Open an existing recordings directory; a missing one is refused, never created. */
+  def open(dir: Path): Either[RecordingsError, Recordings] =
+    if !Files.exists(dir) then Left(RecordingsError.Missing(dir.toString))
+    else if !Files.isDirectory(dir) then Left(RecordingsError.NotADirectory(dir.toString))
+    else Right(new Recordings(dir))
+
+  /** Open or create a recordings directory for a run that may record. */
   def at(dir: Path): Either[RecordingsError, Recordings] =
     if Files.exists(dir) && !Files.isDirectory(dir) then
       Left(RecordingsError.NotADirectory(dir.toString))
@@ -124,18 +131,26 @@ object Recordings:
           )
 
   private[agent] def encode(reply: ModelReply): String =
+    val evidence = reply.evidence match
+      case ReplyEvidence.Captured(reportedModel, usage, durationMillis) =>
+        Vector(
+          "reportedModel" -> reportedModel.asJson,
+          "usage" -> Json.obj(
+            "inputTokens" -> usage.inputTokens.asJson,
+            "outputTokens" -> usage.outputTokens.asJson,
+            "cacheReadInputTokens" -> usage.cacheReadInputTokens.asJson
+          ),
+          "durationMillis" -> durationMillis.asJson
+        )
+      case ReplyEvidence.Authored => Vector.empty
     Json
       .obj(
-        "schema" -> Schema.asJson,
-        "model" -> reply.model.asJson,
-        "stopReason" -> reply.stopReason.wire.asJson,
-        "usage" -> Json.obj(
-          "inputTokens" -> reply.usage.inputTokens.asJson,
-          "outputTokens" -> reply.usage.outputTokens.asJson,
-          "cacheReadInputTokens" -> reply.usage.cacheReadInputTokens.asJson
-        ),
-        "durationMillis" -> reply.durationMillis.asJson,
-        "text" -> reply.text.asJson
+        (Vector(
+          "schema" -> Schema.asJson,
+          "model" -> reply.model.asJson,
+          "origin" -> reply.evidence.wire.asJson,
+          "stopReason" -> reply.stopReason.wire.asJson
+        ) ++ evidence :+ ("text" -> reply.text.asJson))*
       )
       .spaces2
 
@@ -146,12 +161,31 @@ object Recordings:
     for
       input <- field[Long](cursor, "inputTokens")
       output <- field[Long](cursor, "outputTokens")
-      cacheRead <- field[Long](cursor, "cacheReadInputTokens")
+      cacheRead <- field[Option[Long]](cursor, "cacheReadInputTokens")
       _ <-
-        if input >= 0L && output >= 0L && cacheRead >= 0L then Right(())
+        if input >= 0L && output >= 0L && cacheRead.forall(_ >= 0L) then Right(())
         else Left(DecodingFailure("negative token usage", cursor.history))
     yield ModelUsage(input, output, cacheRead)
   }
+
+  private def evidence(cursor: HCursor, origin: String): Decoder.Result[ReplyEvidence] =
+    val accounting = Vector("reportedModel", "usage", "durationMillis")
+    origin match
+      case "captured" =>
+        for
+          reportedModel <- field[Option[String]](cursor, "reportedModel")
+          usage <- field[ModelUsage](cursor, "usage")
+          duration <- field[Long](cursor, "durationMillis")
+          _ <-
+            if duration >= 0L then Right(())
+            else Left(DecodingFailure("negative duration", cursor.history))
+        yield ReplyEvidence.Captured(reportedModel, usage, duration)
+      case "authored" =>
+        accounting.find(name => cursor.downField(name).succeeded) match
+          case Some(name) =>
+            Left(DecodingFailure(s"authored recording carries $name", cursor.history))
+          case None => Right(ReplyEvidence.Authored)
+      case other => Left(DecodingFailure(s"unknown recording origin $other", cursor.history))
 
   private given Decoder[ModelReply] = Decoder.instance { cursor =>
     for
@@ -160,14 +194,11 @@ object Recordings:
         if schema == Schema then Right(())
         else Left(DecodingFailure(s"unknown recording schema $schema", cursor.history))
       model <- field[String](cursor, "model")
+      origin <- field[String](cursor, "origin")
       stop <- field[String](cursor, "stopReason")
-      usage <- field[ModelUsage](cursor, "usage")
-      duration <- field[Long](cursor, "durationMillis")
       text <- field[String](cursor, "text")
-      _ <-
-        if duration >= 0L then Right(())
-        else Left(DecodingFailure("negative duration", cursor.history))
-    yield ModelReply(model, text, ModelStopReason.fromWire(stop), usage, duration)
+      admitted <- evidence(cursor, origin)
+    yield ModelReply(model, text, ModelStopReason.fromWire(stop), admitted)
   }
 
   private[agent] def decode(raw: String): Either[String, ModelReply] =

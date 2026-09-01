@@ -21,12 +21,29 @@ enum LiveRefusal:
     case LiveFlagAbsent(variable, value) => s"live calls need $variable=$value"
     case ApiKeyAbsent(primary, fallback) => s"no nonblank $primary or $fallback in the environment"
 
-/** Proof that the environment opted into spend and supplied a key; only the credentials court mints
-  * one, so a client cannot be built from a key alone.
+/** Proof that the environment opted into spend and supplied a key. Only `LiveAuthorization.from`
+  * mints one, so a client cannot be built from a key alone or from same-package code that skips the
+  * environment court.
   */
-final class LiveAuthorization private[agent] (val apiKey: ApiKey)
+final class LiveAuthorization private (val apiKey: ApiKey)
 
-/** Environment court for live calls: the flag and a nonblank key, with an empty variable absent. */
+object LiveAuthorization:
+  /** A live call needs both the explicit flag and a key; either absence is a typed refusal. */
+  def from(env: Map[String, String]): Either[LiveRefusal, LiveAuthorization] =
+    if !env.get(AgentCredentials.LiveVariable).contains(AgentCredentials.LiveValue) then
+      Left(LiveRefusal.LiveFlagAbsent(AgentCredentials.LiveVariable, AgentCredentials.LiveValue))
+    else
+      AgentCredentials
+        .apiKey(env)
+        .toRight(
+          LiveRefusal.ApiKeyAbsent(
+            AgentCredentials.PrimaryKeyVariable,
+            AgentCredentials.FallbackKeyVariable
+          )
+        )
+        .map(key => new LiveAuthorization(key))
+
+/** Environment court for credentials: the variable names, and the nonblank rule for keys. */
 object AgentCredentials:
   val PrimaryKeyVariable: String = "STORYMODEL4S_ANTHROPIC_API_KEY"
   val FallbackKeyVariable: String = "ANTHROPIC_API_KEY"
@@ -43,11 +60,6 @@ object AgentCredentials:
       .orElse(env.get(FallbackKeyVariable).filter(nonBlank))
       .map(ApiKey.fromNonBlank)
 
-  /** A live call needs both the explicit flag and a key; either absence is a typed refusal. */
+  /** The live-call court; kept here so callers find every credential rule in one place. */
   def liveAuthorization(env: Map[String, String]): Either[LiveRefusal, LiveAuthorization] =
-    if !env.get(LiveVariable).contains(LiveValue) then
-      Left(LiveRefusal.LiveFlagAbsent(LiveVariable, LiveValue))
-    else
-      apiKey(env)
-        .toRight(LiveRefusal.ApiKeyAbsent(PrimaryKeyVariable, FallbackKeyVariable))
-        .map(key => new LiveAuthorization(key))
+    LiveAuthorization.from(env)

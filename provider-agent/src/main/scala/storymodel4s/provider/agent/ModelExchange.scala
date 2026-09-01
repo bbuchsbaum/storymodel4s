@@ -23,16 +23,33 @@ object ModelStopReason:
     case "refusal"    => Refusal
     case other        => Other(other)
 
-/** Token accounting the provider reported, kept per recording so spend stays auditable. */
-final case class ModelUsage(inputTokens: Long, outputTokens: Long, cacheReadInputTokens: Long)
+/** Token accounting the provider reported; the cache-read count is absent when not reported. */
+final case class ModelUsage(
+    inputTokens: Long,
+    outputTokens: Long,
+    cacheReadInputTokens: Option[Long]
+)
 
-/** The raw reply to one request: model, verbatim text, stop reason, usage, and wall time. */
+/** What stands behind a reply. A captured reply carries the provider's own accounting and the model
+  * id it reported; an authored reply (hand-written evidence) carries none, so an invented number
+  * can never masquerade as a measured one.
+  */
+enum ReplyEvidence:
+  case Captured(reportedModel: Option[String], usage: ModelUsage, durationMillis: Long)
+  case Authored
+
+  def wire: String = this match
+    case Captured(_, _, _) => "captured"
+    case Authored          => "authored"
+
+/** The raw reply to one request: the requested model, the verbatim text, the stop reason, and the
+  * evidence behind it. Honest product data: every combination is a lawful reply.
+  */
 final case class ModelReply(
     model: String,
     text: String,
     stopReason: ModelStopReason,
-    usage: ModelUsage,
-    durationMillis: Long
+    evidence: ReplyEvidence
 )
 
 /** One rendered model request. The recording key is derived together with the message so a request

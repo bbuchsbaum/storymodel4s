@@ -8,8 +8,10 @@ import storymodel4s.provider.parser.*
 class LiveSmokeSuite extends FunSuite:
   import AgentFixtures.*
 
-  test("live smoke: one WOG sentence through the model, recorded, and judged by the court") {
-    val authorization = AgentCredentials.liveAuthorization(sys.env)
+  test(
+    "live smoke: one WOG sentence through the model, recorded as captured, judged by the court"
+  ) {
+    val authorization = LiveAuthorization.from(sys.env)
     assume(
       authorization.isRight,
       s"${AgentCredentials.LiveVariable}=1 and a nonblank ${AgentCredentials.PrimaryKeyVariable} " +
@@ -26,7 +28,12 @@ class LiveSmokeSuite extends FunSuite:
     assertEquals(result.total, 1)
     val attempt = result.attempts.head
     assert(attempt.receipt.call.nonEmpty, "no provider call was minted")
-    assert(store.contains(keyFor(sentence)), "the live reply was not recorded")
+    val recorded = store
+      .read(keyFor(sentence), runtime.model)
+      .fold(error => fail(s"the live reply was not recorded: $error"), identity)
+    recorded.evidence match
+      case ReplyEvidence.Captured(_, _, _) => ()
+      case ReplyEvidence.Authored          => fail("a live reply was recorded as authored")
     val replayed = replayProvider(new ModelExchange.Recorded(store)).parse(single)
     val report = ParserDeterminism
       .compare(single, result, replayed)

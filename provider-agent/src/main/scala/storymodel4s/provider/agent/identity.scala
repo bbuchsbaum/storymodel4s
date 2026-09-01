@@ -29,6 +29,7 @@ object AgentFailureCodes:
   val RequestUndecodable: ProviderFailureCode = admitted("request-undecodable")
   val RequestSchemaMismatch: ProviderFailureCode = admitted("request-schema-mismatch")
   val RuntimeFingerprintMismatch: ProviderFailureCode = admitted("runtime-fingerprint-mismatch")
+  val ConfigMismatch: ProviderFailureCode = admitted("config-mismatch")
   val TextChecksumMismatch: ProviderFailureCode = admitted("text-checksum-mismatch")
   val PenmanUnparsable: ProviderFailureCode = admitted("penman-unparsable")
   val MaxTokens: ProviderFailureCode = admitted("max-tokens")
@@ -49,6 +50,7 @@ object AgentFailureCodes:
     RequestUndecodable,
     RequestSchemaMismatch,
     RuntimeFingerprintMismatch,
+    ConfigMismatch,
     TextChecksumMismatch,
     PenmanUnparsable,
     MaxTokens,

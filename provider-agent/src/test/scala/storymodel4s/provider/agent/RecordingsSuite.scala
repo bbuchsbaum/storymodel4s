@@ -41,7 +41,7 @@ class RecordingsSuite extends FunSuite:
     "a missing recording is Io(recording-missing) for the exchange and TransportIo for the attempt"
   ) {
     val empty = recordingsWith(Map.empty)
-    val transport = ClaudeParserTransport(runtime, prompt, new ModelExchange.Recorded(empty))
+    val transport = transportOver(new ModelExchange.Recorded(empty))
     val requestJson = ParserEnvelope.encodeRequest(single, runtime, config)
     assertEquals(
       transport.exchange(requestJson, config.timeoutMillis),
@@ -66,25 +66,56 @@ class RecordingsSuite extends FunSuite:
       case other => fail(s"expected RecordingCorrupt for a foreign model, got $other")
   }
 
-  test("encode and decode round-trip every header field and the verbatim text") {
-    val original = ModelReply(
+  test("a missing recordings directory is refused by open and created by at") {
+    val parent = Files.createTempDirectory("provider-agent-open")
+    val absent = parent.resolve("absent")
+    assertEquals(Recordings.open(absent), Left(RecordingsError.Missing(absent.toString)))
+    assert(!Files.exists(absent))
+    assert(Recordings.at(absent).isRight)
+    assert(Files.isDirectory(absent))
+    val file = Files.createFile(parent.resolve("file"))
+    assertEquals(Recordings.open(file), Left(RecordingsError.NotADirectory(file.toString)))
+    assertEquals(Recordings.at(file), Left(RecordingsError.NotADirectory(file.toString)))
+  }
+
+  test("encode and decode round-trip captured and authored replies without loss") {
+    val capturedReply = ModelReply(
       "claude-sonnet-5",
       "  (x / thing~e.0)\n",
       ModelStopReason.Other("stop_sequence"),
-      ModelUsage(1L, 2L, 3L),
-      4L
+      ReplyEvidence.Captured(Some("claude-sonnet-5-snapshot"), ModelUsage(1L, 2L, None), 4L)
     )
-    assertEquals(Recordings.decode(Recordings.encode(original)), Right(original))
+    assertEquals(Recordings.decode(Recordings.encode(capturedReply)), Right(capturedReply))
+    val authoredReply =
+      ModelReply("claude-sonnet-5", "ABSTAIN", ModelStopReason.EndTurn, ReplyEvidence.Authored)
+    assertEquals(Recordings.decode(Recordings.encode(authoredReply)), Right(authoredReply))
+    assert(!Recordings.encode(authoredReply).contains("durationMillis"))
+    assert(Recordings.encode(authoredReply).contains("\"origin\" : \"authored\""))
     assertEquals(ModelStopReason.fromWire("refusal"), ModelStopReason.Refusal)
     assertEquals(ModelStopReason.fromWire("max_tokens"), ModelStopReason.MaxTokens)
     assertEquals(ModelStopReason.fromWire("end_turn"), ModelStopReason.EndTurn)
   }
 
-  test("a negative duration or token count is refused on read") {
-    val raw = Recordings
+  test("an authored recording that carries accounting is refused, as is negative accounting") {
+    val authoredWithUsage = Recordings
       .encode(reply(penman(0)))
+      .replace(
+        "\"origin\" : \"authored\",",
+        "\"origin\" : \"authored\",\n  \"durationMillis\" : 5,"
+      )
+    assert(Recordings.decode(authoredWithUsage).isLeft, "authored recording kept a duration")
+    val negativeDuration = Recordings
+      .encode(captured(penman(0), 1500L))
       .replace("\"durationMillis\" : 1500", "\"durationMillis\" : -1")
-    assert(Recordings.decode(raw).isLeft)
+    assert(Recordings.decode(negativeDuration).isLeft, "negative duration admitted")
+    val negativeUsage = Recordings
+      .encode(captured(penman(0), 1500L))
+      .replace("\"outputTokens\" : 60", "\"outputTokens\" : -60")
+    assert(Recordings.decode(negativeUsage).isLeft, "negative usage admitted")
+    val unknownOrigin = Recordings
+      .encode(reply(penman(0)))
+      .replace("\"origin\" : \"authored\"", "\"origin\" : \"guessed\"")
+    assert(Recordings.decode(unknownOrigin).isLeft, "unknown origin admitted")
   }
 
   test("a Recorded exchange never writes, whatever it is asked") {
@@ -99,7 +130,7 @@ class RecordingsSuite extends FunSuite:
   }
 
   test("every failure code literal was admitted rather than thrown on") {
-    assertEquals(AgentFailureCodes.all.size, 14)
+    assertEquals(AgentFailureCodes.all.size, 15)
     assert(AgentFailureCodes.all.forall(code => code.value.nonEmpty))
     assertEquals(AgentFailureCodes.serviceError(429).value, "service-error-429")
     assertEquals(ExchangeFailure.Timeout(7L).toTransport, TransportFailure.Timeout(7L))

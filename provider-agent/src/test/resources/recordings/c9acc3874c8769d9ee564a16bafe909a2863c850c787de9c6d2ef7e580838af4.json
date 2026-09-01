@@ -1,12 +1,7 @@
 {
   "schema" : "storymodel4s.provider.agent.recording/v1",
   "model" : "claude-sonnet-5",
+  "origin" : "authored",
   "stopReason" : "end_turn",
-  "usage" : {
-    "inputTokens" : 1040,
-    "outputTokens" : 72,
-    "cacheReadInputTokens" : 900
-  },
-  "durationMillis" : 2345,
   "text" : "(g / go-02~e.5 :ARG0 (m / man~e.4 :quant 2 :mod (y / young~e.3)) :purpose (h / hunt-01~e.7 :ARG0 m :ARG1 (s / seal~e.8)) :time (n / night~e.1 :quant 1))"
 }

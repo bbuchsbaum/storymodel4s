@@ -28,8 +28,8 @@ private[agent] object AgentFixtures:
     .load()
     .fold(error => throw new IllegalArgumentException(error.message), identity)
 
-  val runtime: RemoteRuntime = ClaudeParseDriver
-    .runtime(prompt)
+  val runtime: RemoteRuntime = ClaudeParserTransport
+    .runtimeFor(prompt)
     .fold(error => throw new IllegalArgumentException(error.message), identity)
 
   val config: ParserConfig = ClaudeParseDriver
@@ -68,8 +68,22 @@ private[agent] object AgentFixtures:
       .render(runtime.model, prompt, requestItem(input), ClaudeParseDriver.MaxTokens, 1000L)
       .key
 
+  /** A hand-written reply: no accounting, because none was measured. */
   def reply(text: String, stop: ModelStopReason = ModelStopReason.EndTurn): ModelReply =
-    ModelReply(runtime.model, text, stop, ModelUsage(900L, 60L, 800L), 1500L)
+    ModelReply(runtime.model, text, stop, ReplyEvidence.Authored)
+
+  /** A reply shaped as the live client would record it. */
+  def captured(text: String, durationMillis: Long): ModelReply =
+    ModelReply(
+      runtime.model,
+      text,
+      ModelStopReason.EndTurn,
+      ReplyEvidence.Captured(
+        Some("claude-sonnet-5-snapshot"),
+        ModelUsage(900L, 60L, Some(800L)),
+        durationMillis
+      )
+    )
 
   /** A fresh recordings directory holding one reply per input. */
   def recordingsWith(replies: Map[ParserSentenceInput, ModelReply]): Recordings =
@@ -84,8 +98,13 @@ private[agent] object AgentFixtures:
     }
     store
 
+  def transportOver(exchange: ModelExchange): ClaudeParserTransport =
+    ClaudeParserTransport
+      .from(prompt, exchange)
+      .fold(error => throw new IllegalArgumentException(error.message), identity)
+
   def replayProvider(exchange: ModelExchange): AmrCandidateProvider[cats.Id] =
-    ClaudeParseDriver.provider(runtime, config, prompt, exchange)
+    ClaudeParseDriver.provider(transportOver(exchange), config)
 
   def failureOf(attempt: ParserAttempt): ParserFailure = attempt.result match
     case Left(failure) => failure

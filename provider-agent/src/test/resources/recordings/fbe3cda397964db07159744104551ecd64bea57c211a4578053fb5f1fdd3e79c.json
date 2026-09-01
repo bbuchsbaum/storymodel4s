@@ -1,12 +1,7 @@
 {
   "schema" : "storymodel4s.provider.agent.recording/v1",
   "model" : "claude-sonnet-5",
+  "origin" : "authored",
   "stopReason" : "end_turn",
-  "usage" : {
-    "inputTokens" : 1024,
-    "outputTokens" : 48,
-    "cacheReadInputTokens" : 900
-  },
-  "durationMillis" : 1234,
   "text" : "(b / be-located-at-91~e.1 :ARG1 (p / person~e.2) :ARG2 (c / city~e.4 :name (n / name~e.4 :op1 \"Egulac\")))"
 }

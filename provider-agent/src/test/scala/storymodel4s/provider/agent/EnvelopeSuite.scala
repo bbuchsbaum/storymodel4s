@@ -2,25 +2,28 @@ package storymodel4s.provider.agent
 
 import cats.Id
 import munit.FunSuite
+import storymodel4s.amr.schema.StarterLexicon
 import storymodel4s.provider.parser.*
 
 class EnvelopeSuite extends FunSuite:
   import AgentFixtures.*
 
   private def committed(): Recordings =
-    Recordings.at(committedRecordingsDir).fold(error => fail(error.message), identity)
+    Recordings.open(committedRecordingsDir).fold(error => fail(error.message), identity)
 
   private def transport(): ClaudeParserTransport =
-    ClaudeParserTransport(runtime, prompt, new ModelExchange.Recorded(committed()))
+    transportOver(new ModelExchange.Recorded(committed()))
+
+  private def court(transport: ClaudeParserTransport): JsonAmrCandidateProvider[Id] =
+    JsonAmrCandidateProvider[Id](
+      ParserRuntime.Remote(transport.runtime),
+      config,
+      StarterLexicon.lexicon,
+      transport
+    )
 
   test("the emitted result/v2 JSON decodes through the real court for a three-item batch") {
-    val provider = JsonAmrCandidateProvider[Id](
-      ParserRuntime.Remote(runtime),
-      config,
-      StarterLexiconHolder.lexicon,
-      transport()
-    )
-    val result = provider.parse(batch)
+    val result = court(transport()).parse(batch)
     assertEquals(result.decisions, Vector.empty)
     assertEquals(result.misses, Vector.empty)
     assertEquals(result.covered, 3)
@@ -35,7 +38,7 @@ class EnvelopeSuite extends FunSuite:
     }
 
     val call = result.attempts.head.receipt.call.get
-    assertEquals(call.params.get("duration-millis"), Some("7035"))
+    assertEquals(call.params.get("duration-millis"), Some("0"))
     assertEquals(call.params.get("stderr-bytes"), Some("0"))
     assertEquals(call.params.get("alignment-dialect"), Some("explicit-index-list/v1"))
     assertEquals(call.params.get("result-schema"), Some(ParserEnvelope.ResultSchema))
@@ -52,21 +55,50 @@ class EnvelopeSuite extends FunSuite:
     }
   }
 
+  test("only a captured recording contributes a measured duration to the receipt") {
+    val first = inputs.head
+    val single = ParserBatch.validated(Vector(first)).toOption.get
+    val store = recordingsWith(Map(first -> captured(penman(0), 1234L)))
+    val result = court(transportOver(new ModelExchange.Recorded(store))).parse(single)
+    assertEquals(result.covered, 1)
+    assertEquals(result.attempts.head.receipt.call.get.params.get("duration-millis"), Some("1234"))
+  }
+
   test("the raw envelope names the result schema, the sidecar schema, and the dialect") {
     val requestJson = ParserEnvelope.encodeRequest(batch, runtime, config)
     val raw = transport()
       .exchange(requestJson, config.timeoutMillis)
-      .fold(
-        failure => fail(s"transport failed: ${failure.render}"),
-        identity
-      )
+      .fold(failure => fail(s"transport failed: ${failure.render}"), identity)
     assert(raw.contains("\"schema\":\"storymodel4s.parser.result/v2\""))
     assert(raw.contains("\"alignmentSchema\":\"storymodel4s.parser.marker-sidecar/v1\""))
     assert(raw.contains("\"alignmentDialect\":\"explicit-index-list/v1\""))
     assert(raw.contains(s"\"runtimeFingerprint\":\"${runtime.fingerprint.value}\""))
     assert(raw.contains(s"\"configChecksum\":\"${config.checksum.hex}\""))
     assert(raw.contains("\"modelInput\":\"There were people at Egulac .\""))
-    assert(raw.contains("\"durationMillis\":7035"))
+    assert(raw.contains("\"durationMillis\":0"))
+  }
+
+  test("the transport's runtime is derived from its prompt and the build's SDK pin") {
+    assertEquals(transport().runtime, runtime)
+    assertEquals(runtime.version, s"anthropic-java/${AnthropicSdkPin.version}")
+    assertEquals(runtime.promptPackage, prompt.ref)
+    assertEquals(runtime.promptTextChecksum, prompt.promptTextChecksum)
+    val otherPrompt = AgentPromptPackage
+      .fromText(prompt.systemPrompt + "\nOne more instruction.")
+      .fold(error => fail(error.message), identity)
+    val other = ClaudeParserTransport
+      .from(otherPrompt, new ModelExchange.Recorded(committed()))
+      .fold(error => fail(error.message), identity)
+    assertNotEquals(other.runtime.fingerprint, runtime.fingerprint)
+    assertEquals(
+      ClaudeParserTransport
+        .from(prompt, new ModelExchange.Recorded(committed()), 0L)
+        .left
+        .map(
+          _.message
+        ),
+      Left(TransportSetupError.MaxTokensNotPositive(0L).message)
+    )
   }
 
   test("the transport refuses a request whose runtime fingerprint is not its own") {
@@ -85,6 +117,22 @@ class EnvelopeSuite extends FunSuite:
     assertEquals(
       transport().exchange(requestJson, config.timeoutMillis),
       Left(TransportFailure.Io(AgentFailureCodes.RuntimeFingerprintMismatch))
+    )
+  }
+
+  test("the transport refuses a request whose config does not name its prompt and budget") {
+    val unnamed = ParserConfig.from(Map("beam" -> "1"), None, config.timeoutMillis).toOption.get
+    assertEquals(
+      transport().exchange(ParserEnvelope.encodeRequest(batch, runtime, unnamed), 1000L),
+      Left(TransportFailure.Io(AgentFailureCodes.ConfigMismatch))
+    )
+    val otherBudget = ParserConfig
+      .from(config.params.updated("max-tokens", "8192"), None, config.timeoutMillis)
+      .toOption
+      .get
+    assertEquals(
+      transport().exchange(ParserEnvelope.encodeRequest(batch, runtime, otherBudget), 1000L),
+      Left(TransportFailure.Io(AgentFailureCodes.ConfigMismatch))
     )
   }
 
@@ -111,6 +159,3 @@ class EnvelopeSuite extends FunSuite:
       Left(TransportFailure.Io(AgentFailureCodes.TextChecksumMismatch))
     )
   }
-
-private object StarterLexiconHolder:
-  val lexicon: storymodel4s.amr.schema.FrameLexicon = storymodel4s.amr.schema.StarterLexicon.lexicon
