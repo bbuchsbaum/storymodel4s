@@ -257,7 +257,18 @@ lazy val codec = crossProject(JVMPlatform, JSPlatform, NativePlatform)
   .crossType(CrossType.Pure)
   .in(file("codec"))
   .settings(moduleSettings("codec"))
-  .dependsOn(core, proposition, amrInterop, features, acquire, story, recall, align, interview)
+  .dependsOn(
+    core,
+    proposition,
+    amrInterop,
+    features,
+    acquire,
+    story,
+    recall,
+    align,
+    interview,
+    view
+  )
   .dependsOn(laws % "test->compile")
   .settings(
     libraryDependencies ++= Seq(
