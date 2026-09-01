@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="storymodel4s mark">
+  <path fill="#0e665e" d="M8 11h30a13 13 0 0 1 13 13v29H21A13 13 0 0 1 8 40V11Z"/>
+  <path fill="none" stroke="#f7f2e8" stroke-linecap="round" stroke-width="4" d="M18 23h22M18 32h16M18 41h21"/>
+  <circle cx="49" cy="17" r="9" fill="#e56b4d"/>
+  <circle cx="49" cy="17" r="3" fill="#f7f2e8"/>
+</svg>

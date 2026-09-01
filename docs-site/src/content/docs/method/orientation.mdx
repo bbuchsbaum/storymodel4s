@@ -1,0 +1,79 @@
+---
+title: Orientation
+description: What storymodel4s represents, why the distinctions matter, and where the current method stops.
+sidebar:
+  order: 1
+---
+
+import Evidence from '../../../components/Evidence.astro';
+import { sourceLink } from '../../../lib/provenance';
+
+Suppose a person hears a story and later recalls it. “How accurate was the recall?” sounds like one
+question. In practice it hides several:
+
+- Which parts of the story were recalled at all?
+- Was an event preserved but one participant reversed?
+- Did the person compress several moments into a gist?
+- Did the recall move backward, revisit a scene, or add an association?
+- Was a statement asserted by the narrator, reported by a character, or merely believed?
+
+storymodel4s provides typed structures for keeping those questions apart. It is an experimental
+library for building and analyzing explicit story and recall models.
+
+## The path through a model
+
+1. **Surface evidence** gives every source and recall passage stable offsets.
+2. **Narrative structure** represents entities, situations, contexts, relations, hierarchy, and
+   story-world order.
+3. **Recall structure** represents idea units, discourse function, expressed uncertainty, and
+   recall-side relations.
+4. **Alignment** assigns partial mass from each recall unit to source nodes and explicit external
+   states. It also records transition flow between successive units.
+5. **Derived summaries** describe coverage, fidelity facets, localizability, compression,
+   chronology deformation, and intrusion mass—with support carried alongside results.
+
+Each stage preserves its evidence, alternatives, and support. A researcher can inspect how a later
+summary was obtained.
+
+<Evidence
+  status="Confirmed"
+  source="core, story, recall, and align public source at this revision"
+  href={sourceLink('align/src/main/scala/storymodel4s/align/signature.scala')}
+ />
+
+## Structures and numerical features
+
+Typed records carry propositions, narrative contexts, participant roles, temporal and causal
+relations, and source evidence. Numerical features propose possible matches and contribute declared
+costs. Content hashes and typed records provide identity; validation and evidence support claims.
+
+Two passages can have similar vectors while assigning an action to different people or using
+opposite polarity. The aligner can connect such a recall to the relevant event and record the
+disagreement in its fidelity fields.
+
+<Evidence
+  status="Confirmed"
+  source="ADR 0001, embedding contract and non-bypassable fidelity gate"
+  href={sourceLink('docs/adr/0001-embedding-contract-and-hard-gate.md')}
+ />
+
+## Where the method stops today
+
+Today the repository validates and analyzes story and recall models. It also compiles accepted
+proposal evidence through a deterministic interface. Providers for unattended construction of a
+complete model from arbitrary prose are still under development.
+
+The guides therefore begin with a researcher-reviewed *War of the Ghosts* fixture. It tests the
+representation after modeling. Automatic acquisition needs a separate evaluation.
+
+<Evidence
+  status="Intent"
+  source="README.md and ADR 0005 identify automatic construction as programme work"
+  href={sourceLink('docs/adr/0005-surface-to-narrative-compiler.md')}
+ />
+
+## Next
+
+See how the fixture records a report, an unresolved hypothesis, and a narrated event.
+
+[Inspect a concrete modeling test →](/method/one-honest-success/)

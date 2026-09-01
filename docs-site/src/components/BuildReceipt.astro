@@ -1,0 +1,39 @@
+---
+import { generatedAt, sourceRevision, sourceRevisionShort, sourceStatement, sourceVerified } from '../lib/provenance';
+
+// Only build a URL when the revision was DERIVED and verified. An unverified build
+// (no git metadata, or a dirty tree whose HEAD does not describe the built bytes)
+// gets no link and no revision, because both would assert something unchecked.
+const sourceUrl = sourceRevision
+  ? `https://github.com/bbuchsbaum/storymodel4s/tree/${sourceRevision}`
+  : null;
+const generatedDate = new Intl.DateTimeFormat('en-CA', {
+  dateStyle: 'long',
+  timeZone: 'UTC',
+}).format(new Date(generatedAt));
+---
+
+<aside class="build-receipt" aria-labelledby="build-receipt-title">
+  <div>
+    <p class="receipt-kicker" id="build-receipt-title">Documentation build receipt</p>
+    <p class="receipt-summary">
+      {sourceVerified ? (
+        <>
+          Generated from
+          {sourceUrl
+            ? <a href={sourceUrl}><code>{sourceRevisionShort}</code></a>
+            : <code>{sourceRevisionShort}</code>}
+          on <time datetime={generatedAt}>{generatedDate}</time>.
+        </>
+      ) : (
+        <>
+          Built on <time datetime={generatedAt}>{generatedDate}</time>, but this page
+          states <strong>no source revision</strong>: {sourceStatement}. Source links are
+          suppressed throughout, because a link to a revision that does not describe these
+          bytes would be worse than no link.
+        </>
+      )}
+    </p>
+  </div>
+  <a class="receipt-action" href="/method/evidence/">How claims are graded →</a>
+</aside>

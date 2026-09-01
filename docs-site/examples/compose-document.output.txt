@@ -1,0 +1,11 @@
+sentence charts: 3
+document nodes: 8
+typed entity mentions: 5
+sentence-1 agent preserved: Maya
+maya-1 same as maya-3: true
+boat-1 same as boat-2: true
+maya-1 same as boat-1: false
+cluster maya-1,maya-2,maya-3 -> c-entity:3b5bc65b3163
+cluster boat-1,boat-2 -> c-entity:888165bc8e93
+pair order independent: true
+unknown mention refused: true

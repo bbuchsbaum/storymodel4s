@@ -1,0 +1,130 @@
+---
+title: Compare a story with a person's recall
+description: storymodel4s records the text, the proposed story structure, the recall, and the uncertain mapping between them.
+template: splash
+hero:
+  tagline: Give storymodel4s a story model and a recall transcript. It returns an inspectable mapping from each recall unit to story events and named kinds of outside material.
+  actions:
+    - text: Follow the complete example
+      link: /method/align-and-interpret/
+      icon: right-arrow
+      variant: primary
+    - text: See how the model is built
+      link: /method/build-interpretation/
+      icon: open-book
+---
+
+import BuildReceipt from '../../components/BuildReceipt.astro';
+import Evidence from '../../components/Evidence.astro';
+import RouteCard from '../../components/RouteCard.astro';
+import { sourceLink } from '../../lib/provenance';
+
+<BuildReceipt />
+
+## The job in sixty seconds
+
+A story model records people, events, states, contexts, order, and the words that support each
+claim. A recall graph records a person's retelling in its own sequence. The aligner compares the
+two and returns a probability row for every recall unit.
+
+Each row answers a concrete question: how much of this recall unit points to the story, where in the
+story does it point, and how much belongs to an association, commentary, or another named external
+state? Summary measures report the evidence that contributed to them. An unsupported measure appears
+as unavailable.
+
+The checked-in example follows this route:
+
+| Step | Input | Result |
+| --- | --- | --- |
+| 1. Index the story | *The War of the Ghosts* | sentences, tokens, and exact character spans |
+| 2. Read the reviewed model | the indexed story | 71 situations, 14 entities, 12 contexts, and typed relations |
+| 3. Represent the recall | a 78-character retelling | two checked recall units with exact transcript spans |
+| 4. Align the two | sparse lexical candidates | two posterior rows over story nodes and external states |
+| 5. Summarize the result | the posterior and source model | coverage, fidelity, chronology, compression, and support |
+
+The result stays conditional on the chosen recall segmentation and proposition analysis. A research
+product records the segmentation policy or receipt and retains plausible alternatives.
+
+<div class="route-grid">
+  <RouteCard
+    eyebrow="Complete example"
+    title="Compare a recall with a story"
+    description="Run the public alignment API, inspect its posterior rows, and read each estimate with its support."
+    href="/method/align-and-interpret/"
+    accent="teal"
+  />
+  <RouteCard
+    eyebrow="Construction"
+    title="See how meaning is represented"
+    description="Inspect proposition graphs, proposal outcomes, and document-level identity."
+    href="/method/build-interpretation/"
+    accent="coral"
+  />
+  <RouteCard
+    eyebrow="Scala basics"
+    title="Start from exact text"
+    description="Create a source atlas and read its sentences, tokens, and spans."
+    href="/scala/inspect-source/"
+    accent="gold"
+  />
+</div>
+
+## One sentence, two claims
+
+*The War of the Ghosts* contains this sentence:
+
+> One of the young men said: “I have no arrows.”
+
+The reviewed model records the act of speaking in the narrated world. It records “I have no arrows”
+inside the young man's speech, with negative polarity on `have`. Both claims cite the same sentence.
+
+If a later recall says “He had no arrows,” an analysis can detect that the retelling presents the
+character's words as a story fact. The context field makes that comparison possible.
+
+<Evidence
+  status="Confirmed"
+  source="WarOfTheGhostsModel.scala — two context-linked records supported by sentence 14"
+  href={sourceLink('fixtures/src/main/scala/storymodel4s/fixtures/wog/WarOfTheGhostsModel.scala')}
+/>
+
+## A real alignment result
+
+The complete example uses this recall:
+
+> One of the men with him got hit by an arrow and they lifted him into the boat.
+
+The baseline segmenter produces two units. The free lexical matcher generates 86 sparse candidates,
+and `GraphHsmm` assigns source and external mass to each unit. The first unit receives 46.08% source
+mass. The second receives 2.09%.
+
+The recall is a faithful paraphrase, while word overlap recovers little of it. That poor result
+shows the exact API and output shape. Recall accuracy requires separate calibration evidence.
+
+[Run and interpret the comparison →](/method/align-and-interpret/)
+
+## What works today
+
+The repository contains public Scala APIs for exact text indexing, proposition charts, evidence-backed
+proposal resolution, document identity, story and recall graphs, sparse alignment, support-aware
+summaries, interview scoring, feature tracks, deterministic embeddings, structural graph distance,
+and canonical JSON.
+
+The code is pre-release and runs from a source checkout. The complete *War of the Ghosts* model is a
+researcher-reviewed fixture. Automatic construction of an equally complete model from arbitrary
+prose remains programme work.
+
+<Evidence
+  status="Confirmed"
+  source="README.md, build.sbt, and the 13-example replay manifest"
+  href={sourceLink('README.md')}
+/>
+
+## Continue the journey
+
+- [Model the story](/method/model-a-story/) and inspect its evidence, contexts, and relations.
+- [Represent the recall](/method/represent-recall/) and understand the baseline's scientific scope.
+- [Align and interpret](/method/align-and-interpret/) one recall against the reviewed story.
+- [Read the summary](/method/summarize-recall/) with its support and missingness.
+- [Inspect the construction stages](/method/build-interpretation/) for propositions, alternatives, and identity.
+- [Compute feature windows](/scala/window-features/) and compare missing-value policies.
+- [Save canonical JSON](/scala/save-and-deliver/) and verify the round trip.

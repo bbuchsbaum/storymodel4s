@@ -1,0 +1,164 @@
+---
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+import { interviewFigureLabels, parseInterviewOutput } from '../lib/interview-data.mjs';
+
+const raw = readFileSync(resolve(process.cwd(), 'examples/score-interview.output.txt'), 'utf8');
+const data = parseInterviewOutput(raw);
+const labels = interviewFigureLabels(data);
+const left = 210;
+const width = 470;
+const tickStep = Math.ceil(Math.max(...data.categories.map((row) => row.high)) / 3);
+const max = tickStep * 3;
+const ticks = [0, tickStep, tickStep * 2, max];
+const top = 74;
+const rowHeight = 38;
+const resolutionY = top + data.categories.length * rowHeight + 42;
+const profileY = resolutionY + 102;
+const height = profileY + 148;
+---
+
+<figure class="interview-figure" data-example="score-interview">
+  <svg viewBox={`0 0 800 ${height}`} role="img" aria-labelledby="interview-title interview-desc">
+    <title id="interview-title">{labels.title}</title>
+    <desc id="interview-desc">{labels.description}</desc>
+
+    <text x="0" y="24" class="figure-title">{labels.title}</text>
+    <text x={left} y="52" class="axis-label">expected detail count</text>
+    <line x1={left} y1="58" x2={left + width} y2="58" class="axis" />
+    {ticks.map((tick) => (
+      <g aria-hidden="true">
+        <line x1={left + (tick / max) * width} y1="54" x2={left + (tick / max) * width} y2="62" class="axis" />
+        <text x={left + (tick / max) * width} y="48" text-anchor="middle" class="tick-label">{tick}</text>
+      </g>
+    ))}
+
+    {
+      data.categories.map((row, index) => {
+        const y = top + index * rowHeight;
+        const low = left + (row.low / max) * width;
+        const high = left + (row.high / max) * width;
+        const point = left + (row.point / max) * width;
+        return (
+          <g
+            class="category-row"
+            data-category={row.category}
+            data-point={row.point.toFixed(4)}
+            data-low={row.low.toFixed(4)}
+            data-high={row.high.toFixed(4)}
+            data-hard={row.hard}
+          >
+            <text x="0" y={y + 5} class="row-label">{row.category}</text>
+            <line x1={low} y1={y} x2={high} y2={y} class="interval" />
+            <line x1={low} y1={y - 5} x2={low} y2={y + 5} class="interval-cap" />
+            <line x1={high} y1={y - 5} x2={high} y2={y + 5} class="interval-cap" />
+            <circle cx={point} cy={y} r="5" class="point" />
+            <text x={left + width + 16} y={y + 5} class="hard-label">hard {row.hard}</text>
+          </g>
+        );
+      })
+    }
+
+    <g
+      data-resolution="phase"
+      data-resolved={data.resolution.resolved.toFixed(4)}
+      data-unresolved={data.resolution.unresolved.toFixed(4)}
+      data-excluded={data.resolution.excluded.toFixed(4)}
+    >
+      <text x="0" y={resolutionY - 12} class="section-label">Placement mass</text>
+      <rect x={left} y={resolutionY - 30} width={width} height="24" rx="4" class="bar-background" />
+      <rect
+        x={left}
+        y={resolutionY - 30}
+        width={data.resolution.resolved * width}
+        height="24"
+        rx="4"
+        class="resolved"
+      />
+      <rect
+        x={left + data.resolution.resolved * width}
+        y={resolutionY - 30}
+        width={data.resolution.unresolved * width}
+        height="24"
+        rx="4"
+        class="unresolved"
+      />
+      <text x={left} y={resolutionY + 12} class="detail-label">
+        {labels.resolution}
+      </text>
+      <text x={left} y={resolutionY + 30} class="detail-label">
+        {labels.coverage}
+      </text>
+    </g>
+
+    <g data-profile="birthday">
+      <text x="0" y={profileY - 12} class="section-label">Profile</text>
+      <text x={left} y={profileY - 12} class="profile-line">{labels.profile}</text>
+      <text x={left} y={profileY + 12} class="profile-line">
+        {labels.density}
+      </text>
+      <text x={left} y={profileY + 36} class="profile-line">
+        {labels.perceptual}
+      </text>
+      <text x={left} y={profileY + 60} class="profile-line">{labels.mental}</text>
+    </g>
+  </svg>
+  <figcaption>
+    Intervals bound model-routed expected counts; they are not calibrated confidence intervals.
+    Observed coverage and placement resolution are shown separately.
+  </figcaption>
+</figure>
+
+<style>
+  .interview-figure {
+    margin: 2rem 0;
+    padding: 1rem;
+    overflow-x: auto;
+    border: 1px solid var(--sl-color-gray-5);
+    border-radius: 0.75rem;
+    background: var(--sl-color-gray-7);
+  }
+
+  svg {
+    display: block;
+    width: 100%;
+    min-width: 740px;
+    height: auto;
+  }
+
+  .figure-title,
+  .section-label {
+    fill: var(--sl-color-white);
+    font-family: system-ui, sans-serif;
+    font-weight: 700;
+  }
+
+  .figure-title { font-size: 20px; }
+  .section-label { font-size: 15px; }
+
+  .axis-label,
+  .tick-label,
+  .row-label,
+  .hard-label,
+  .detail-label,
+  .profile-line {
+    fill: var(--sl-color-gray-2);
+    font-family: system-ui, sans-serif;
+  }
+
+  .row-label { font-size: 12px; font-weight: 650; }
+  .hard-label, .detail-label, .profile-line { font-size: 12px; }
+  .axis-label, .tick-label { font-size: 10px; }
+  .axis, .interval, .interval-cap { stroke: var(--sl-color-gray-3); }
+  .interval { stroke-width: 3; }
+  .point { fill: #178f8b; stroke: var(--sl-color-white); stroke-width: 1; }
+  .bar-background { fill: var(--sl-color-gray-5); }
+  .resolved { fill: #178f8b; }
+  .unresolved { fill: #d56a4c; }
+
+  figcaption {
+    margin-top: 0.5rem;
+    color: var(--sl-color-gray-2);
+    font-size: 0.9rem;
+  }
+</style>

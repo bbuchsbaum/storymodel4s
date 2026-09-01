@@ -1,0 +1,9 @@
+surface tokens: 9; lexical tokens: 7
+raw track coverage: 6/9
+window recipe: window(width=4,step=2,basis=LexicalTokens,edge=KeepPartial)
+tokens[0, 4): [Red boats crossed quietly]; coverage=4/4; ignore=Observed(4.80); require75=Observed(4.80)
+tokens[2, 7): [crossed quietly Abstract ideas]; coverage=4/4; ignore=Observed(2.55); require75=Observed(2.55)
+tokens[5, 8): [Abstract ideas remained]; coverage=2/3; ignore=Observed(1.60); require75=Missing(Excluded)
+tokens[7, 8): [remained]; coverage=0/1; ignore=Missing(AllMissing); require75=Missing(Excluded)
+different policies, different derived spaces: true
+derived recipe recorded: true

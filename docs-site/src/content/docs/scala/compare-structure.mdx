@@ -1,0 +1,50 @@
+---
+title: How can two proposition graphs be compared?
+description: Run the JVM-only structural channel and inspect distances and provider receipts.
+---
+
+import Evidence from '../../../components/Evidence.astro';
+import { sourceLink } from '../../../lib/provenance';
+import { readFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import { resolve } from 'node:path';
+
+export const programPath = 'docs-site/examples-grakern/StructuralDistance.scala';
+export const outputPath = 'docs-site/examples-grakern/structural-distance.output.txt';
+export const program = readFileSync(resolve(process.cwd(), 'examples-grakern/StructuralDistance.scala'), 'utf8');
+export const output = readFileSync(resolve(process.cwd(), 'examples-grakern/structural-distance.output.txt'), 'utf8');
+export const programSha = createHash('sha256').update(program).digest('hex');
+export const outputSha = createHash('sha256').update(output).digest('hex');
+
+Word overlap misses relations. “Anna found her brother” and “Her brother found Anna” contain the
+same words, but their agent and patient roles are reversed. The structural channel compares checked
+proposition graphs and makes that difference visible.
+
+<pre><code class="language-scala">{program}</code></pre>
+
+The exact run prints:
+
+<pre><code>{output}</code></pre>
+
+| Pair | Distance | Reading |
+| --- | ---: | --- |
+| Same graph | 0.000000 | same labels and relations |
+| Renamed node IDs, reversed storage order | 0.000000 | identity ignores incidental IDs and order |
+| Agent and patient swapped | 0.600000 | role direction changed |
+| Different predicate and patient | 0.733333 | more of the labelled structure changed |
+| Source outside the prepared dictionary | Missing | no comparison was made |
+
+The adapter runs on the JVM because it uses the pinned grakern source dependency. It memoizes query
+rows and records a provider call with the kernel rounds and exact grakern revision. The distance is a
+feature for candidate generation or a declared cost. Claim acceptance remains the resolver's job.
+
+<Evidence
+  status="Confirmed"
+  source={`Manifested JVM example ${programSha}; byte-matched output ${outputSha}`}
+  href={sourceLink(programPath)}
+/>
+
+These five chart pairs form a diagnostic example. Calibrated thresholds and recall-accuracy gains
+remain open evaluation questions.
+
+Next: [align a recall with sparse candidates →](/method/align-and-interpret/)

@@ -1,0 +1,11 @@
+baseline: hashed-ngram dimension=32 seed=7
+story-line: observed dimension=32 norm=1.0000
+empty-line: missing reason=OutOfVocabulary
+batch receipt: kind=Plain calls=1 outcomes=2
+raw remote request: denied (request payload is not pseudonymized)
+unlisted purpose: denied (purpose not allowed)
+authorized purpose: candidate-retrieval
+authorized expiry: 61000
+authorized budget: 12
+payload digest: Keyed
+safe rendering redacts payload: true

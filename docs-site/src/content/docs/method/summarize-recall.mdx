@@ -1,0 +1,113 @@
+---
+title: Summarize a recall
+description: Compute coverage, fidelity, chronology, causal preservation, and external mass while keeping each estimate beside its support.
+sidebar:
+  order: 5
+---
+
+import RecallSummaryFigure from '../../../components/RecallSummaryFigure.astro';
+import Evidence from '../../../components/Evidence.astro';
+import { sourceLink } from '../../../lib/provenance';
+import { readFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import { resolve } from 'node:path';
+
+export const programPath = 'docs-site/examples/SummarizeRecall.scala';
+export const outputPath = 'docs-site/examples/summarize-recall.output.txt';
+export const PROGRAM_SHA = 'c38459574f60428e4ecd6db905bec822892e584c54027ba74831c29528143b60';
+export const OUTPUT_SHA = '5665e473bf6ef45e3f47754a7493da93be858b229ca6ef6df2b40b42525b5982';
+export const PRODUCER_REVISION = '76c62e738a2579d6598fccf3ac19266c60480e20';
+export const program = readFileSync(resolve(process.cwd(), 'examples/SummarizeRecall.scala'), 'utf8');
+export const output = readFileSync(resolve(process.cwd(), 'examples/summarize-recall.output.txt'), 'utf8');
+export const programSha = createHash('sha256').update(program).digest('hex');
+export const outputSha = createHash('sha256').update(output).digest('hex');
+
+export const _bindFiles = (() => {
+  if (programSha !== PROGRAM_SHA)
+    throw new Error(`program digest ${programSha} does not match the published ${PROGRAM_SHA}`);
+  if (outputSha !== OUTPUT_SHA)
+    throw new Error(`output digest ${outputSha} does not match the published ${OUTPUT_SHA}`);
+  return true;
+})();
+
+`RecallSignature.compute` describes several parts of one alignment. It reports coverage, fidelity,
+specificity, compression, chronology, causal preservation, semantic flow, backward movement,
+distortion, and external mass. Conditional estimates include the mass that supports them.
+
+This program repeats the alignment from the previous guide and prints the full summary.
+
+## Run the program
+
+Save this file as `fixtures/src/main/scala/docsprobe/SummarizeRecall.scala`:
+
+<pre><code class="language-scala">{program}</code></pre>
+
+Run it with:
+
+```sh
+sbt -Dstorymodel4s.grakern.build=/absolute/path/to/pinned-grakern \
+  "fixturesJVM/runMain docsprobe.summarizeRecall"
+```
+
+<Evidence
+  status="Confirmed"
+  source={`docs-site/examples/SummarizeRecall.scala — executed against storymodel4s ${PRODUCER_REVISION}; full SHA-256 ${programSha}`}
+  href={sourceLink(programPath)}
+ />
+
+## Output
+
+<pre><code>{output}</code></pre>
+
+The replay gate compiles this exact program against revision `{PRODUCER_REVISION}`, runs it on the
+JVM, and compares stdout byte-for-byte with the displayed output. Every estimate remains
+conditional on the baseline segmentation used by the program.
+
+## Estimates and support
+
+<RecallSummaryFigure />
+
+The long estimate bar and thin support line answer separate questions. The estimate describes the
+aligned portion of the recall. Support describes how much evidence contributed to that estimate.
+
+### Fidelity
+
+Fidelity is `0.5000`. Its support is `1.0000` because every bit of the run's `0.4817` source mass
+could be assessed for fidelity. That support is conditional on source placement. The alignment guide
+showed that source mass accounts for only about one quarter of the two recall rows, so the fidelity
+estimate describes a small part of the whole recall.
+
+### Chronology
+
+Discourse chronology is `0.2686`, with support `0.0082`. Story-world chronology is `0.1997`, with
+support `0.0047`. Less than one percent of the transition mass could be ordered on either clock.
+These values therefore describe a very small part of the inferred route.
+
+The two clocks answer different questions. Discourse chronology follows the order of presentation in
+the story. Story-world chronology follows the order in which represented events occur.
+
+### Causal preservation
+
+Causal preservation is `n/a`, with support `0.0000/9.0000`. The story model contains nine causal
+links, and this alignment supplies no pair of recalled endpoints that the estimator can assess. The
+figure uses a hatched row and the label `n/a`; it does not draw a zero-valued estimate.
+
+### External mass
+
+Attributed external mass is `0.7591`. Ranked mass is `1.0000`, so every unit of external mass
+received a category. The poor lexical match discussed in the alignment guide drives much of this
+result.
+
+## Interpret the version too
+
+The first line, `recall-signature/v2`, identifies the estimand definitions used by this run. A later
+version may change a formula or conditioning population. Results with different estimand versions
+require a definition-level comparison before a numerical comparison.
+
+<Evidence
+  status="Confirmed"
+  source="RecallSignature fields, support carriers, and derived estimand version"
+  href={sourceLink('align/src/main/scala/storymodel4s/align/signature.scala')}
+ />
+
+Previous: [align and interpret the recall](/method/align-and-interpret/).
