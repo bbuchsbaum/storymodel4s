@@ -9,7 +9,9 @@ class RemoteRuntimeSuite extends FunSuite:
   import TestFixtures.*
 
   private val promptA = PromptPackageRef("penman-parse", "v1", Checksum.ofText("prompt-a"))
-  private val promptB = PromptPackageRef("penman-parse", "v2", Checksum.ofText("prompt-b"))
+
+  /** Same name and version: only the manifest checksum differs, so the digest must carry it. */
+  private val promptB = PromptPackageRef("penman-parse", "v1", Checksum.ofText("prompt-b"))
   private val promptText = Checksum.ofText("system prompt text")
 
   private def remote(
