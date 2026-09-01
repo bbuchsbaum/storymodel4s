@@ -12,7 +12,7 @@
     "verify:layout": "node scripts/verify-mobile-layout.mjs",
     "verify:navigation": "node scripts/verify-navigation.mjs",
     "verify:verbatim": "node scripts/verify-verbatim.mjs",
-    "verify": "npm run verify:examples && npm run check && npm run build && npm run verify:navigation && npm run verify:verbatim && npm run verify:figures && npm run verify:provenance",
+    "verify": "npm run verify:examples && npm run check && npm run build && npm run verify:layout && npm run verify:navigation && npm run verify:verbatim && npm run verify:figures && npm run verify:provenance",
     "verify:provenance": "node scripts/verify-provenance.mjs"
   },
   "dependencies": {
@@ -21,6 +21,7 @@
   },
   "devDependencies": {
     "@astrojs/check": "0.9.10",
+    "@playwright/test": "1.57.0",
     "typescript": "6.0.3"
   }
 }
