@@ -90,7 +90,7 @@ components.
 
 | Key | Family or component | Selection | Rights/access | Role | Operational posture | Realization | Current reason |
 |---|---|---|---|---|---|---|---|
-| `decode.ffmpeg` | FFmpeg | `Nominated` | `Conditional` | `DeterministicTransform` | `LocalRecipe` | `RecipeOnly` | Exact source and LGPL-only policy are paperwork-admitted; fixture-specific decoders and realized runtime remain held |
+| `decode.ffmpeg` | FFmpeg | `Nominated` | `Conditional` | `DeterministicTransform` | `LocalRealized` | `Realized(13d17dfd…, 85c119a5…)` (§6.2, 2026-09-01) | Exact source and LGPL-only policy paperwork-admitted; 9.0.1 built locally from the signature-verified tarball with the F0/F1-selected decoders (rawvideo, h264), static, no GPL/version3/nonfree; reproducible-build, SBOM, OCI, patent and jurisdiction claims still `HoldUnknown` |
 | `boundary.pyscenedetect.content` | PySceneDetect `ContentDetector` | `Nominated` | `Conditional` | `Measurement` + `Proposal` | `LocalRecipe` | `RecipeOnly` | Exact code, raw-metric output, and existence/localization proposal policy are paperwork-admitted; realized runtime remains held |
 | `asr.whisper` | OpenAI Whisper | `CandidateOnly` | `HoldUnknown` | `Proposal` | `Unresolved` | `Unresolved` | Possible later timed-language court; no variant selected |
 | `asr.parakeet` | NVIDIA Parakeet family | `CandidateOnly` | `HoldUnknown` | `Proposal` | `Unresolved` | `Unresolved` | Comparison candidate only; no exact code, checkpoint, tokenizer, runtime, or permission record selected |
@@ -160,10 +160,10 @@ implementation.
 | Distribution | Do not vendor a binary through this documentation bead. A later realized artifact requires digests, notices, exact corresponding source and configuration, relink/compliance posture, and platform-specific records. The project will follow the official [LGPL compliance checklist](https://ffmpeg.org/legal.html); this ledger is engineering policy, not legal advice |
 | Caching and CI | No source archive, binary, shared library, or container is cached or installed by this bead. A future cache key must include exact source digest, configure report, toolchain/platform identity, native closure, and binary/container digests. Ordinary CI may use injected typed receipts and project-authored fixture envelopes; optional integration courts require an already admitted local artifact and may not download or build it silently. Final cache and CI policy remains `HoldUnknown` until realization |
 | Output retention | A future court may retain receipted metadata, packet/sample indexes, hashes, diagnostics, and explicitly admitted derived excerpts. It must not silently copy source streams or preserve decoded media beyond the declared attempt policy. Exact output paths, formats, and deletion/retention rules are `HoldUnknown` until that court is specified |
-| Realization | `RecipeOnly` |
+| Realization | `Realized(13d17dfd…)` for `ffprobe` and `Realized(85c119a5…)` for `ffmpeg` (local static build from the verified 9.0.1 tarball, §6.2); the candidate configure line below remains the recipe, with the §6.2 deviations recorded |
 | Evidence freshness | The peeled commit and content-addressed Git objects are the stable evidence coordinate. The tag-to-object mapping, release/signature page, current security and patch posture, legal guidance, fixture codecs, native closure, and deployment jurisdiction must be revalidated immediately before realization and whenever the selected release or build surface changes. A tag name or mutable project page is never treated as immutable evidence |
 | Rights/access | Source coordinate and LGPL-only build policy: `PaperworkAdmitted`. Fixture-specific codec and patent posture: `HoldUnknown`. Realized runtime: `HoldUnknown` |
-| Court authorization | `Authorized(bd-01M1FDNN3T4SKZ5ZJN1XGXYNY7, local draft realization)` by §6.1 (2026-09-01); the nominated 9.0.1 recipe itself stays `RecipeOnly` and unrealized |
+| Court authorization | `Authorized(bd-01M1FDNN3T4SKZ5ZJN1XGXYNY7, local draft realization)` by §6.1 (2026-09-01); the nominated 9.0.1 recipe is realized locally as recorded in §6.2 and remains unproven as reproducible |
 
 The smallest presently defensible configuration is a **candidate recipe**, not
 a proven configure invocation:
@@ -336,7 +336,29 @@ the owner's workstation, not nominated for any distributed court.
 | Key | Component | Selection | Rights/access | Role | Operational posture | Realization | Reason and limits |
 |---|---|---|---|---|---|---|---|
 | `decode.ffmpeg.local-homebrew-7.1.1` | Homebrew `ffmpeg/7.1.1_3` (`ffprobe` and `ffmpeg` front ends) | `CandidateOnly` | `PaperworkAdmitted` for local execution only; redistribution `Incompatible` with the §4 LGPL-only policy (built `--enable-gpl --enable-version3 --enable-libx264`, network, devices and hardware acceleration enabled: every entry of §4's forbidden-configuration row) | `DeterministicTransform` | `LocalRealized` | `Realized(83f66b74…)` for `ffprobe`, `Realized(14c12cd5…)` for `ffmpeg`; libraries below | Produces the recorded F0/F1 probes and decodes. Every output is `Draft`. Not the nominated 9.0.1 recipe; a probe replayed under 9.0.1 is a different derivation by construction (`ToolRealization` enters every receipt). Invocations pass `-protocol_whitelist file`; stderr is not receipted. |
-| `boundary.pyscenedetect.content.local-venv` | `scenedetect-headless` 0.7.1 from the §5 wheel digest, in a local venv (CPython 3.13.11, numpy 2.5.2, opencv-python-headless 5.0.0), driven by `media/worker/scenedetect_worker.py` | `CandidateOnly` | `PaperworkAdmitted` (BSD-3-Clause wheel, hash-pinned in `media/worker/uv.lock`); transitive native notices `HoldUnknown` | `Measurement` + `Proposal` | `LocalRealized` | `Realized(c5e3300f…)` for the worker script; wheel `0594131c…` | Raw metrics and boundary-existence/localization proposals only, through `process_frame`. No container, no SBOM. `ToolRealization` for the worker covers the script bytes and runtime versions, not the wheel bytes. |
+| `boundary.pyscenedetect.content.local-venv` | `scenedetect-headless` 0.7.1 from the §5 wheel digest, in a local venv (CPython 3.13.11, numpy 2.5.2, opencv-python-headless 5.0.0), driven by `media/worker/scenedetect_worker.py` | `CandidateOnly` | `PaperworkAdmitted` (BSD-3-Clause wheel, hash-pinned in `media/worker/uv.lock`); transitive native notices `HoldUnknown` | `Measurement` + `Proposal` | `LocalRealized` | `Realized(47424d09…)` for the worker script; wheel `0594131c…` | Raw metrics and boundary-existence/localization proposals only, through `process_frame`. No container, no SBOM. `ToolRealization` for the worker covers the script bytes and runtime versions, not the wheel bytes. |
+| `decode.ffmpeg` (the nominated component, realized) | FFmpeg 9.0.1 "Lei" built from `ffmpeg-9.0.1.tar.xz` (sha256 `cf38e0e28c7e5605942c4a77755349b0145804a397af37eb1fb4c77cb237f635`), signature verified in a temporary keyring against the release key fetched from `https://ffmpeg.org/ffmpeg-devel.asc` (primary fingerprint equal to the §4 record), by `media/tools/build_ffmpeg_9.0.1.sh` | `Nominated` | `PaperworkAdmitted` for local use; LGPL-only and free of every §4 forbidden flag, so eligible for the §4 redistribution policy once a corresponding-source bundle exists (`HoldUnknown` until then) | `DeterministicTransform` | `LocalRealized` | `Realized(13d17dfd…)` `ffprobe`, `Realized(85c119a5…)` `ffmpeg` | The recorded realization behind every committed envelope since 2026-09-01 evening. Static, so each digest covers its demuxing and decoding code; dynamic dependencies are Apple system frameworks only (libSystem, CoreFoundation, CoreVideo, CoreMedia). Two builds were made (the first without `--disable-videotoolbox --disable-audiotoolbox`); their bytes differ, so the recipe is not described as reproducible. No SBOM, no OCI image. |
+
+Deviations of the realized 9.0.1 build from the §4 candidate configure line,
+each forced by the F0/F1 manifests and recorded in the build script: the
+`ffmpeg` program is enabled (decode is required, not probe only);
+`--enable-static --disable-shared` replaces `--disable-static --enable-shared`
+(single-binary identity; nothing is redistributed); `--enable-avfilter` and
+`--enable-swscale` replace their disables (the declared colour conversion); and
+the component selection is `protocol file; demuxer mov; decoders rawvideo,
+h264; parser h264; encoder rawvideo; muxer rawvideo; filters scale, format,
+null`. `--disable-gpl --disable-version3 --disable-nonfree
+--disable-autodetect --disable-network --disable-avdevice --disable-hwaccels
+--disable-asm` are unchanged.
+
+Observed under the realized build on 2026-09-01: the F0 and F1 picture packet
+tables and both decoded frame digests are byte-identical to the earlier
+Homebrew 7.1.1 records; the F1 audio stream's last packet is reported with
+duration 1024 (9.0.1) versus 1008 (7.1.1, trimmed under the edit list). That
+difference is the tool's, lives in the tool identity, and is why the live
+courts compare the picture table under any tool and the full table only under
+the recorded binary. The Homebrew rows above remain as the record of the first
+recordings; the committed envelopes now name the 9.0.1 binaries.
 
 Shared libraries loaded by both FFmpeg front ends (`otool -L`, SHA-256 of the
 resolved dylib), recorded because the front-end digest alone does not name

@@ -136,7 +136,10 @@ class F1ExcerptSuite extends FunSuite:
     // makes no claim that the packet at -512 is audience-facing, and no axis is built from it.
     assertNotEquals(f1.probe.stream(1).get.startPts, Some(audio.firstPts))
     assert(audio.contiguous)
-    assertEquals(audio.endExclusive, Some(1440240L))
+    // The recorded probe is the realized FFmpeg 9.0.1 build, which reports the last audio packet's
+    // full 1024-sample duration; Homebrew 7.1.1 trimmed it to 1008 under the edit list. The
+    // difference is the tool's, not the container's, and it lives in the tool identity.
+    assertEquals(audio.endExclusive, Some(1440256L))
     assertEquals(audio.timebase, right(RationalTimebase.of(1L, 48000L)))
     assertEquals(f1.probe.stream(1).get.declared.disposition, StreamDisposition.PacketIndexedOnly)
 
@@ -232,8 +235,14 @@ class F1ExcerptSuite extends FunSuite:
       p.streams.flatMap(s =>
         s.packets.map(k => (s.index, k.pts, k.dts, k.durationReported, k.flags.raw))
       )
-    assertEquals(table(liveProbe), table(f1.probe))
-    if probeTool == f1.probeEnvelope.tool then assertEquals(liveProbe.identity, f1.probe.identity)
+    // The picture packet table is what boundaries stand on; it must reproduce under any admitted
+    // tool. The audio table may differ across tool versions at the edit-list edge (7.1.1 trims the
+    // last packet's duration, 9.0.1 does not), so the full table and the identity are compared only
+    // when the same binary ran.
+    assertEquals(table(liveProbe).filter(_._1 == 0), table(f1.probe).filter(_._1 == 0))
+    if probeTool == f1.probeEnvelope.tool then
+      assertEquals(table(liveProbe), table(f1.probe))
+      assertEquals(liveProbe.identity, f1.probe.identity)
     val dir = Files.createTempDirectory("f1-boundary-")
     try
       val raw = dir.resolve("f1-v1.frames.bgr")
