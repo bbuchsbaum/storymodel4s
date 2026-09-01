@@ -1,0 +1,125 @@
+package storymodel4s.bench.sherlock
+
+import java.nio.charset.StandardCharsets
+
+import munit.FunSuite
+import storymodel4s.acquire.SherlockAnnotations
+import storymodel4s.acquire.SherlockAnnotations.{MediaLocus, MediaManifest, PartIdentity}
+import storymodel4s.align.*
+import storymodel4s.core.{Checksum, StorySource}
+import storymodel4s.recall.RecallSegmenter
+
+/** Courts for the annotation-to-SourceView bridge and the recall CSV reader, plus one end-to-end
+  * smoke on wholly synthetic material: a recall clause about a distinctive annotated event must
+  * anchor to that event's row and resolve to its exact media coordinate.
+  */
+class SherlockRecallMappingSuite extends FunSuite:
+
+  private val header =
+    "Segment Number\tStart Time (s) \tEnd Time (s) \tStart TR\tEnd TR\tScene Segments\t" +
+      "Scene Details - A Level \tSpace-In/Outdoor\tName - All\tName - Focus\tName - Speaking\t" +
+      "Location\tCamera Angle\tMusic Presence \tWords on Screen "
+
+  private val fixtureRows = Vector(
+    "1\t0\t10\t1\t7\t1. Opening\tA man walks alone through heavy rain.\tOutdoor\tMan\tMan\t\tStreet\tLong\tNo\t",
+    "2\t10\t20\t8\t14\t\tThe man finds a red door and knocks twice.\tOutdoor\tMan\t\tMan\tStreet\tMedium\tNo\t",
+    "3\t20\t20\t14\t14\t\tSmash cut to black.\tIndoor\t\t\t\t\tClose\tNo\t",
+    "4\t20\t30\t\t\t\tBlack screen while the projector is switched.\tIndoor\t\t\t\t\tLong\tNo\t",
+    "5\t0\t5\t21\t24\t2. Cartoon\tPeople in costumes parade and sing about popcorn.\tIndoor\tSingers\tSingers\tSingers\tCartoon World\tLong\tYes\t",
+    "6\t5\t12\t25\t29\t\tPopcorn pops in a glass machine.\tIndoor\tSinger\t\tSinger\tCartoon World\tMedium\tYes\t"
+  )
+
+  private def atlas: SherlockAnnotations.Atlas =
+    val bytes = (header +: fixtureRows).mkString("\n").getBytes(StandardCharsets.UTF_8)
+    val manifest = MediaManifest(
+      annotationSha256 = Checksum.ofBytes(bytes),
+      partA = PartIdentity("media-part-a", 1, Checksum.ofText("synthetic-a"), 76000L, 2500L),
+      partB = PartIdentity("media-part-b", 2, Checksum.ofText("synthetic-b"), 30000L, 2500L),
+      totalRows = 6,
+      run1EndRow = 4
+    )
+    SherlockAnnotations
+      .parse(bytes, manifest)
+      .fold(e => throw new IllegalStateException(e.message), identity)
+
+  test("the bridge exposes every microsegment and scene exactly once, with resolvable supports") {
+    val built = SherlockAnnotationView.build(atlas)
+    assertEquals(built.view.leaves.size, 6)
+    assertEquals(built.view.nodes.size, 8)
+    assertEquals(built.view.maxLevel, 1)
+    // every leaf support slices back to its own description on the derived document
+    atlas.rows.foreach { row =>
+      val ref = built.rowByRef.collectFirst { case (r, n) if n == row.row => r }.get
+      val span = built.view.node(ref).get.support.minSpan
+      assertEquals(built.document.substring(span.start, span.endExclusive), row.description)
+    }
+  }
+
+  test("every node carrying media resolves to its crosswalked coordinate") {
+    val built = SherlockAnnotationView.build(atlas)
+    // all six leaves carry media; both scenes are single-part so they carry hulls
+    assertEquals(built.media.size, 8)
+    val row2 = built.rowByRef.collectFirst { case (r, n) if n == 2 => r }.get
+    built.media(row2) match
+      case MediaLocus.Extent(part, iv) =>
+        assertEquals(part, "media-part-a")
+        assertEquals((iv.start, iv.endExclusive), (25000L, 50000L))
+      case other => fail(s"row 2 must carry an extent, got $other")
+    val scene2 = built.sceneByRef.collectFirst { case (r, s) if s.ordinal == 2 => r }.get
+    built.media(scene2) match
+      case MediaLocus.Extent(part, iv) =>
+        assertEquals(part, "media-part-b")
+        assertEquals((iv.start, iv.endExclusive), (0L, 30000L))
+      case other => fail(s"scene 2 must carry a hull extent, got $other")
+  }
+
+  test("world order follows film order across the run boundary") {
+    val built = SherlockAnnotationView.build(atlas)
+    val order = built.view.worldOrder.get
+    val row4 = built.rowByRef.collectFirst { case (r, n) if n == 4 => r }.get
+    val row5 = built.rowByRef.collectFirst { case (r, n) if n == 5 => r }.get
+    assert(order(row4) < order(row5), "run 2 rows must come after run 1 rows in world order")
+  }
+
+  test("the recall CSV reader takes the word column and refuses a foreign header") {
+    val csv = "Words,Onset (sec)\nSo,4.8\nthe,5.1\nman,5.3\nknocked,5.8\n"
+    val words = RecallWordsCsv.parse(csv).fold(e => fail(e), identity)
+    assertEquals(words.map(_.word), Vector("So", "the", "man", "knocked"))
+    assertEquals(words.head.onsetSeconds, Some(4.8))
+    assertEquals(RecallWordsCsv.transcriptText(words), "So the man knocked")
+    assert(RecallWordsCsv.parse("Time,Word\n1,so\n").isLeft)
+    assert(RecallWordsCsv.parse("Words,Onset (sec)\n").isLeft)
+  }
+
+  test("a recall clause about a distinctive annotated event maps to that row's media coordinate") {
+    val built = SherlockAnnotationView.build(atlas)
+    val transcript = StorySource
+      .fromText(
+        "The man knocked on a red door, and then people in costumes were singing about popcorn.",
+        Some("synthetic recall")
+      )
+      .fold(e => throw new IllegalStateException(e.message), identity)
+    val recall = RecallSegmenter.segment(transcript)
+    val semantic = SemanticDistance.lexicalJaccard
+    val candidates =
+      CandidateGenerator(semantic, perLevel = 3, lexicalOverlap = false)
+        .generate(recall.ordered, built.view)
+    val result = GraphHsmm
+      .infer(recall, built.view, candidates, DefaultLocalCostModel(semantic = semantic))
+      .fold(e => throw new IllegalStateException(e.message), identity)
+
+    val doorUnit = recall.ordered
+      .find(_.text.toLowerCase.contains("red door"))
+      .getOrElse(fail("the segmenter must keep the red-door clause"))
+    val row = result.posterior.rows
+      .find(_.unit == doorUnit.id)
+      .getOrElse(fail("the posterior must carry the red-door unit"))
+    val anchor = row.mapSource.getOrElse(fail("the red-door unit must anchor to the source"))
+    val anchoredRow = built.rowByRef.get(anchor)
+    assertEquals(anchoredRow, Some(2), s"expected the red-door row, got ${anchor.key}")
+    built.media(anchor) match
+      case MediaLocus.Extent(part, iv) =>
+        assertEquals(part, "media-part-a")
+        assertEquals((iv.start, iv.endExclusive), (25000L, 50000L))
+      case other => fail(s"the anchored row must carry its exact media extent, got $other")
+  }
