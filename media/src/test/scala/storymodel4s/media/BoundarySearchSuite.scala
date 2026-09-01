@@ -258,9 +258,9 @@ class BoundarySearchSuite extends FunSuite:
       BoundarySearch.join(shiftedFrames, request, outcome, detectorEnvelope.worker),
       "boundary/edit-list"
     )
-    val discardFirst = output.copy(packets =
+    val discardMiddle = output.copy(packets =
       output.packets.map(p =>
-        if p.streamIndex == 0 && p.pts.contains(0L) then
+        if p.streamIndex == 0 && p.pts.contains(2000L) then
           p.copy(flags = right(PacketFlags.parse("KD_")))
         else p
       )
@@ -271,12 +271,29 @@ class BoundarySearchSuite extends FunSuite:
         right(manifest.verify(bytes)),
         probeEnvelope.tool,
         probeEnvelope.args,
-        discardFirst
+        discardMiddle
       )
     )
-    // 44 presented packets: the frame count no longer matches the recorded decode, which is the
-    // earlier, correct refusal; the edit-list guard is reached only with a consistent frame set.
+    // With a middle packet discarded the recorded decode (45 frames) no longer describes the
+    // stream, which refuses first; a decode consistent with the 44 presented packets reaches the
+    // edit-list guard, whose discard clause is the one a real picture edit list would trip.
     refusedAt(frameSetOf(discardProbe), "frames/bytes")
+    val frames44 = right(
+      FrameSet.join(
+        discardProbe,
+        0,
+        framesEnvelope.geometry,
+        framesEnvelope.tool,
+        framesEnvelope.args,
+        framesEnvelope.geometry.frameBytes * 44L,
+        Checksum.ofText("a decode of the 44 presented frames")
+      )
+    )
+    assertEquals(frames44.index.discarded, 1)
+    refusedAt(
+      BoundarySearch.join(frames44, request, outcome, detectorEnvelope.worker),
+      "boundary/edit-list"
+    )
 
   test(
     "a localization proposal carries no morphology and binds its recipe; a claim needs a morphology supplied separately"
@@ -411,15 +428,9 @@ class BoundarySearchSuite extends FunSuite:
       )
       assertEquals(run.exitCode, 0, run.stderr)
       val liveOutcome = right(DetectorOutcome.parse(Files.readString(outPath)))
-      // The worker realization is the script that ran plus the runtime the outcome reports; the
-      // join then checks the outcome's runtime against it, which here is a consistency check only.
-      val worker = right(
-        ToolRealization.of(
-          "scenedetect-worker",
-          liveOutcome.runtimeLine,
-          Checksum.ofBytes(Files.readAllBytes(script.get))
-        )
-      )
+      // The worker realization is observed independently of the outcome (the interpreter is asked
+      // for its versions and the script is hashed), so the join's runtime check compares two sources.
+      val worker = right(WorkerRealization.observe(python.get, script.get))
       val liveResult = right(BoundarySearch.join(live, issued, liveOutcome, worker))
       assertEquals(liveResult.proposals.map(_.at.at), result.proposals.map(_.at.at))
       assertEquals(liveResult.proposals.map(_.score), result.proposals.map(_.score))

@@ -274,13 +274,7 @@ class F1ExcerptSuite extends FunSuite:
       )
       assertEquals(run.exitCode, 0, run.stderr)
       val liveOutcome = right(DetectorOutcome.parse(Files.readString(outPath)))
-      val worker = right(
-        ToolRealization.of(
-          "scenedetect-worker",
-          liveOutcome.runtimeLine,
-          Checksum.ofBytes(Files.readAllBytes(script.get))
-        )
-      )
+      val worker = right(WorkerRealization.observe(python.get, script.get))
       val liveResult = right(BoundarySearch.join(live, issued, liveOutcome, worker))
       // Under decoder drift the frames differ and the proposals are not compared; the court then
       // establishes only that the pipeline joins.
