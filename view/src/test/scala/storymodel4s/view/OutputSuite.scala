@@ -13,9 +13,9 @@ class OutputSuite extends FunSuite:
   private val utf8 = CharsetId.unsafe("UTF-8")
   private val sourceBytes = "A\r\n😀  \t\r\nB".getBytes(StandardCharsets.UTF_8)
   private val admitted = SourceIdentities.admitUtf8(sourceBytes, textPlain, Some(utf8))
-  private val (source, identities) = admitted match
-    case SourceAdmission.Constructed(value, identity) => value -> identity
-    case SourceAdmission.Refused(_, failure)          => fail(s"source fixture refused: $failure")
+  private val (source, identities) = admitted.constructed match
+    case Some(value) => value
+    case None        => fail(s"source fixture refused: ${admitted.outcome}")
   private val original = identities.original
   private val buildReceipt = ExtendedBuildReceipt(
     BuildReceipt(source.id, source.canonicalChecksum, "test/v1", Vector.empty, 0L),
@@ -273,10 +273,11 @@ class OutputSuite extends FunSuite:
 
     val whitespace = " \t\r\n"
     val whitespaceBytes = whitespace.getBytes(StandardCharsets.UTF_8)
-    val (whitespaceProgress, whitespaceFailure) =
-      SourceIdentities.admitUtf8(whitespaceBytes, textPlain, Some(utf8)) match
-        case SourceAdmission.Refused(progress, refusal) => progress -> refusal
-        case SourceAdmission.Constructed(_, _)          => fail("whitespace source was admitted")
+    val whitespaceAdmission =
+      SourceIdentities.admitUtf8(whitespaceBytes, textPlain, Some(utf8))
+    val (whitespaceProgress, whitespaceFailure) = whitespaceAdmission.refusal match
+      case Some(value) => value
+      case None        => fail("whitespace source was admitted")
     assert(StorySource.fromText(whitespace).isLeft)
     val refusedAfterDecode = AcquisitionAccount
       .of(
@@ -514,9 +515,10 @@ class OutputSuite extends FunSuite:
 
   test("report identity binds exact original bytes even when decoded text is equal") {
     val foreignBytes = Array(0xef.toByte, 0xbb.toByte, 0xbf.toByte) ++ sourceBytes
-    val foreignIdentities = SourceIdentities.admitUtf8(foreignBytes, textPlain, Some(utf8)) match
-      case SourceAdmission.Constructed(_, identity) => identity
-      case SourceAdmission.Refused(_, failure)      => fail(s"foreign fixture refused: $failure")
+    val foreignAdmission = SourceIdentities.admitUtf8(foreignBytes, textPlain, Some(utf8))
+    val foreignIdentities = foreignAdmission.constructed match
+      case Some((_, identity)) => identity
+      case None                => fail(s"foreign fixture refused: ${foreignAdmission.outcome}")
     val foreignSource = SourceOutcome.Constructed(foreignIdentities)
     val foreignAuthority = AcquisitionViewAuthority
       .validatedBuild(foreignSource, buildReceipt)

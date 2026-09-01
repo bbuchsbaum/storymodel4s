@@ -17,9 +17,10 @@ class OutputCodecSuite extends FunSuite:
   private val jsonType = MediaTypeId.unsafe("application/json")
   private val utf8 = CharsetId.unsafe("UTF-8")
   private val originalBytes = source.rawText.getBytes(StandardCharsets.UTF_8)
-  private val identities = SourceIdentities.admitUtf8(originalBytes, textPlain, Some(utf8)) match
-    case SourceAdmission.Constructed(_, value) => value
-    case SourceAdmission.Refused(_, failure)   => fail(s"source fixture refused: $failure")
+  private val sourceAdmission = SourceIdentities.admitUtf8(originalBytes, textPlain, Some(utf8))
+  private val identities = sourceAdmission.constructed match
+    case Some((_, value)) => value
+    case None             => fail(s"source fixture refused: ${sourceAdmission.outcome}")
   private val semanticText = StoryModelCodec.encode(model)
   private val semanticBytes = semanticText.getBytes(StandardCharsets.UTF_8)
   private val build = ExtendedBuildReceipt(
@@ -535,9 +536,10 @@ class OutputCodecSuite extends FunSuite:
   test("post-decode source refusal round-trips completed decoded identity and receipt") {
     val whitespace = " \t\r\n"
     val bytes = whitespace.getBytes(StandardCharsets.UTF_8)
-    val (refusedProgress, failure) = SourceIdentities.admitUtf8(bytes, textPlain, Some(utf8)) match
-      case SourceAdmission.Refused(progress, value) => progress -> value
-      case SourceAdmission.Constructed(_, _)        => fail("whitespace source was admitted")
+    val admission = SourceIdentities.admitUtf8(bytes, textPlain, Some(utf8))
+    val (refusedProgress, failure) = admission.refusal match
+      case Some(value) => value
+      case None        => fail("whitespace source was admitted")
     val refused = AcquisitionAccount
       .of[String](
         InvocationId.unsafe("invocation-whitespace-source-refused"),
@@ -623,9 +625,10 @@ class OutputCodecSuite extends FunSuite:
 
   test("strict decode failure round-trips exact bytes and refuses position or byte mutation") {
     val bytes = Array(0x61.toByte, 0xc2.toByte, 0x20.toByte)
-    val sourceRefusal = SourceIdentities.admitUtf8(bytes, textPlain, Some(utf8)) match
-      case SourceAdmission.Refused(progress, failure) => SourceOutcome.Refused(progress, failure)
-      case SourceAdmission.Constructed(_, _)          => fail("invalid UTF-8 was admitted")
+    val admission = SourceIdentities.admitUtf8(bytes, textPlain, Some(utf8))
+    val sourceRefusal = admission.refusal match
+      case Some((progress, failure)) => SourceOutcome.Refused(progress, failure)
+      case None                      => fail("invalid UTF-8 was admitted")
     val account = AcquisitionAccount
       .of[String](
         InvocationId.unsafe("invocation-decode-failure"),

@@ -424,6 +424,26 @@ object SourceIdentities:
   val CurrentCanonicalPolicy: CanonicalizationPolicyId =
     CanonicalizationPolicyId.unsafe("storysource-canonical-text/v1")
 
+  /** Checked admission retains a StorySource only when it matches the published outcome. */
+  final class Admission private[SourceIdentities] (
+      private val source: Option[StorySource],
+      val outcome: SourceOutcome
+  ):
+    def constructed: Option[(StorySource, SourceIdentities)] = (source, outcome) match
+      case (Some(value), SourceOutcome.Constructed(identities)) => Some(value -> identities)
+      case _                                                    => None
+
+    def refusal: Option[(RefusedSourceProgress, OutputFailure)] = (source, outcome) match
+      case (None, SourceOutcome.Refused(progress, failure)) => Some(progress -> failure)
+      case _                                                => None
+
+    private def parts = (source, outcome)
+    override def equals(other: Any): Boolean = other match
+      case that: Admission => parts == that.parts
+      case _               => false
+    override def hashCode(): Int = parts.hashCode
+    override def toString: String = s"SourceAdmission($outcome)"
+
   /** Admit exact bytes through the library-owned decoder and StorySource constructor. */
   def admitUtf8(
       bytes: Array[Byte],
@@ -432,13 +452,16 @@ object SourceIdentities:
       title: Option[String] = None,
       language: LanguageTag = LanguageTag.English,
       metadata: Map[String, String] = Map.empty
-  ): SourceAdmission =
+  ): Admission =
     val original = OriginalSourceIdentity.fromUtf8Bytes(bytes, mediaType, declaredCharset)
     decodeStrictUtf8(bytes) match
       case Left(detail) =>
-        SourceAdmission.Refused(
-          RefusedSourceProgress.Admitted(original),
-          OutputFailure.decode(detail)
+        new Admission(
+          None,
+          SourceOutcome.Refused(
+            RefusedSourceProgress.Admitted(original),
+            OutputFailure.decode(detail)
+          )
         )
       case Right((text, decodeReceipt)) =>
         val decoded = DecodedSourceIdentity.fromText(text, decodeReceipt)
@@ -448,9 +471,12 @@ object SourceIdentities:
               "source-canonicalization-failure/v1",
               Vector(original.checksum.hex, decoded.checksum.hex, error.message)
             )
-            SourceAdmission.Refused(
-              RefusedSourceProgress.Decoded(original, decoded),
-              OutputFailure.canonicalization(failureReceipt)
+            new Admission(
+              None,
+              SourceOutcome.Refused(
+                RefusedSourceProgress.Decoded(original, decoded),
+                OutputFailure.canonicalization(failureReceipt)
+              )
             )
           case Right(source) =>
             val canonicalizationReceipt = derivedReceiptId(
@@ -463,9 +489,11 @@ object SourceIdentities:
                 source.id.value
               )
             )
-            SourceAdmission.Constructed(
-              source,
-              fromAdmitted(original, source, decodeReceipt, canonicalizationReceipt)
+            new Admission(
+              Some(source),
+              SourceOutcome.Constructed(
+                fromAdmitted(original, source, decodeReceipt, canonicalizationReceipt)
+              )
             )
 
   /** Re-run admission and accept wire identities only when every published coordinate agrees. */
@@ -478,21 +506,22 @@ object SourceIdentities:
       metadata: Map[String, String],
       claimed: SourceIdentities
   ): Either[DomainError, (StorySource, SourceIdentities)] =
-    admitUtf8(bytes, mediaType, declaredCharset, title, language, metadata) match
-      case SourceAdmission.Constructed(source, actual) if actual == claimed =>
-        Right(source -> actual)
-      case SourceAdmission.Constructed(_, _) =>
+    val admission = admitUtf8(bytes, mediaType, declaredCharset, title, language, metadata)
+    admission.constructed match
+      case Some((source, actual)) if actual == claimed => Right(source -> actual)
+      case Some(_)                                     =>
         Left(
           DomainError.InvariantViolation(
             "output/source/identities",
             "source identity metadata does not match admission of the supplied bytes"
           )
         )
-      case SourceAdmission.Refused(_, failure) =>
+      case None =>
+        val failureCode = admission.refusal.map(_._2.code).fold("unknown")(_.toString)
         Left(
           DomainError.InvariantViolation(
             "output/source/identities",
-            s"supplied bytes were refused by source admission: ${failure.code}"
+            s"supplied bytes were refused by source admission: $failureCode"
           )
         )
 
@@ -592,6 +621,8 @@ object SourceIdentities:
 
   private def unsigned(value: Byte): Int = value & 0xff
 
+type SourceAdmission = SourceIdentities.Admission
+
 /** Detail required specifically for strict decoding failures. */
 enum OutputFailureDetail:
   case StrictDecode(value: StrictDecodeFailure)
@@ -686,15 +717,6 @@ enum RefusedSourceProgress:
 enum SourceOutcome:
   case Constructed(identities: SourceIdentities)
   case Refused(progress: RefusedSourceProgress, failure: OutputFailure)
-
-/** Checked source admission retains the constructed StorySource only on success. */
-enum SourceAdmission:
-  case Constructed(source: StorySource, identities: SourceIdentities)
-  case Refused(progress: RefusedSourceProgress, failure: OutputFailure)
-
-  def outcome: SourceOutcome = this match
-    case Constructed(_, identities) => SourceOutcome.Constructed(identities)
-    case Refused(progress, failure) => SourceOutcome.Refused(progress, failure)
 
 /** Failure that forbids downstream universe denominators. */
 final case class UniverseFailure(

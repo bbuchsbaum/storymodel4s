@@ -47,6 +47,14 @@ package storymodel4s.consumerattack {
       summon[scala.deriving.Mirror.ProductOf[StrictDecodeFailureProductControl]]
         .fromProduct(product)
 
+  final case class SourceAdmissionProductControl(
+      source: Option[storymodel4s.core.StorySource],
+      outcome: storymodel4s.acquire.SourceOutcome
+  )
+  object SourceAdmissionProductControl:
+    def fromProduct(product: Product): SourceAdmissionProductControl =
+      summon[scala.deriving.Mirror.ProductOf[SourceAdmissionProductControl]].fromProduct(product)
+
   /** External-package proof that output invariants have no generated construction door. */
   class OutputConstructionProbeSuite extends FunSuite:
     private def refused(errors: List[scala.compiletime.testing.Error], what: String): Unit =
@@ -195,6 +203,58 @@ package storymodel4s.consumerattack {
           "summon[scala.deriving.Mirror.ProductOf[storymodel4s.acquire.StrictDecodeFailure]]"
         ),
         "StrictDecodeFailure Mirror"
+      )
+    }
+
+    test("source-admission same-shape control exposes all four construction mechanisms") {
+      assertEquals(
+        typeCheckErrors(
+          "storymodel4s.consumerattack.SourceAdmissionProductControl(None, storymodel4s.acquire.SourceOutcome.Refused(storymodel4s.acquire.RefusedSourceProgress.BeforeIntake, ???))"
+        ),
+        Nil
+      )
+      assertEquals(
+        typeCheckErrors(
+          "(x: storymodel4s.consumerattack.SourceAdmissionProductControl) => x.copy(source = None)"
+        ),
+        Nil
+      )
+      assertEquals(
+        typeCheckErrors(
+          "storymodel4s.consumerattack.SourceAdmissionProductControl.fromProduct((None, storymodel4s.acquire.SourceOutcome.Refused(storymodel4s.acquire.RefusedSourceProgress.BeforeIntake, ???)))"
+        ),
+        Nil
+      )
+      assertEquals(
+        typeCheckErrors(
+          "summon[scala.deriving.Mirror.ProductOf[storymodel4s.consumerattack.SourceAdmissionProductControl]]"
+        ),
+        Nil
+      )
+    }
+
+    test("checked source admission closes all four product construction doors") {
+      refused(
+        typeCheckErrors(
+          "storymodel4s.acquire.SourceAdmission(None, storymodel4s.acquire.SourceOutcome.Refused(storymodel4s.acquire.RefusedSourceProgress.BeforeIntake, ???))"
+        ),
+        "SourceAdmission.apply"
+      )
+      refused(
+        typeCheckErrors("(x: storymodel4s.acquire.SourceAdmission) => x.copy(source = None)"),
+        "SourceAdmission.copy"
+      )
+      refused(
+        typeCheckErrors(
+          "storymodel4s.acquire.SourceAdmission.fromProduct((None, storymodel4s.acquire.SourceOutcome.Refused(storymodel4s.acquire.RefusedSourceProgress.BeforeIntake, ???)))"
+        ),
+        "SourceAdmission.fromProduct"
+      )
+      refused(
+        typeCheckErrors(
+          "summon[scala.deriving.Mirror.ProductOf[storymodel4s.acquire.SourceAdmission]]"
+        ),
+        "SourceAdmission Mirror"
       )
     }
 
@@ -410,5 +470,14 @@ package storymodel4s.acquire.attack {
         "EstablishedRate.make"
       )
       assert(storymodel4s.acquire.EstablishedRate.of(-1, 0).isLeft)
+    }
+
+    test("acquire child-package consumers cannot mint source admissions") {
+      refused(
+        typeCheckErrors(
+          "new storymodel4s.acquire.SourceIdentities.Admission(None, storymodel4s.acquire.SourceOutcome.Refused(storymodel4s.acquire.RefusedSourceProgress.BeforeIntake, ???))"
+        ),
+        "SourceIdentities.Admission constructor"
+      )
     }
 }

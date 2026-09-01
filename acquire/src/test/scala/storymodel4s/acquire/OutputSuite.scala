@@ -15,10 +15,10 @@ class OutputSuite extends FunSuite:
     val raw = "A\r\n😀  \t\r\nB"
     val bom = Array(0xef.toByte, 0xbb.toByte, 0xbf.toByte)
     val originalBytes = bom ++ raw.getBytes(StandardCharsets.UTF_8)
-    SourceIdentities.admitUtf8(originalBytes, mediaType, Some(utf8)) match
-      case SourceAdmission.Constructed(source, identities) =>
-        (source, identities.original, identities)
-      case SourceAdmission.Refused(_, failure) => fail(s"fixture refused: $failure")
+    val admission = SourceIdentities.admitUtf8(originalBytes, mediaType, Some(utf8))
+    admission.constructed match
+      case Some((source, identities)) => (source, identities.original, identities)
+      case None                       => fail(s"fixture refused: ${admission.outcome}")
 
   private def receipt(source: StorySource): ExtendedBuildReceipt =
     ExtendedBuildReceipt(
@@ -53,9 +53,10 @@ class OutputSuite extends FunSuite:
 
   test("equal source digests do not collapse the three typed identity roles") {
     val bytes = "identity text".getBytes(StandardCharsets.UTF_8)
-    val (source, identities) = SourceIdentities.admitUtf8(bytes, mediaType, Some(utf8)) match
-      case SourceAdmission.Constructed(value, identity) => value -> identity
-      case SourceAdmission.Refused(_, failure)          => fail(s"fixture refused: $failure")
+    val admission = SourceIdentities.admitUtf8(bytes, mediaType, Some(utf8))
+    val (source, identities) = admission.constructed match
+      case Some(value) => value
+      case None        => fail(s"fixture refused: ${admission.outcome}")
     val original = identities.original
     assertEquals(original.checksum, identities.decodedChecksum)
     assertEquals(identities.decodedChecksum, identities.canonicalChecksum)
@@ -336,12 +337,14 @@ class OutputSuite extends FunSuite:
   test("strict source admission binds exact bytes, decoded text, and derived receipts") {
     val alphaBytes = "alpha".getBytes(StandardCharsets.UTF_8)
     val betaBytes = "beta".getBytes(StandardCharsets.UTF_8)
-    val alpha = SourceIdentities.admitUtf8(alphaBytes, mediaType, Some(utf8)) match
-      case SourceAdmission.Constructed(source, value) => source -> value
-      case SourceAdmission.Refused(_, failure)        => fail(s"alpha refused: $failure")
-    val beta = SourceIdentities.admitUtf8(betaBytes, mediaType, Some(utf8)) match
-      case SourceAdmission.Constructed(source, value) => source -> value
-      case SourceAdmission.Refused(_, failure)        => fail(s"beta refused: $failure")
+    val alphaAdmission = SourceIdentities.admitUtf8(alphaBytes, mediaType, Some(utf8))
+    val alpha = alphaAdmission.constructed.fold(fail(s"alpha refused: ${alphaAdmission.outcome}"))(
+      identity
+    )
+    val betaAdmission = SourceIdentities.admitUtf8(betaBytes, mediaType, Some(utf8))
+    val beta = betaAdmission.constructed.fold(fail(s"beta refused: ${betaAdmission.outcome}"))(
+      identity
+    )
 
     assertNotEquals(alpha._2.original.checksum, beta._2.original.checksum)
     assertNotEquals(alpha._2.decodeReceipt.id, beta._2.decodeReceipt.id)
@@ -378,12 +381,13 @@ class OutputSuite extends FunSuite:
 
   test("strict decode failure records exact byte position and refuses altered wire claims") {
     val bytes = Array(0x61.toByte, 0xc2.toByte, 0x20.toByte)
-    val detail = SourceIdentities.admitUtf8(bytes, mediaType, Some(utf8)) match
-      case SourceAdmission.Refused(_, failure) =>
+    val admission = SourceIdentities.admitUtf8(bytes, mediaType, Some(utf8))
+    val detail = admission.refusal match
+      case Some((_, failure)) =>
         failure.detail match
           case Some(OutputFailureDetail.StrictDecode(value)) => value
           case other => fail(s"expected strict decode detail, got $other")
-      case SourceAdmission.Constructed(_, _) => fail("invalid UTF-8 was admitted")
+      case None => fail("invalid UTF-8 was admitted")
 
     assertEquals(detail.bytePosition, 2L)
     assertEquals(detail.reason, StrictDecodeFailureReason.InvalidContinuationByte)
