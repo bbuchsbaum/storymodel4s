@@ -1,0 +1,14 @@
+estimand: recall-signature/v2
+uniform coverage: 0.0067
+importance-weighted coverage: n/a (conditioning weight 0.0000; coverage 0/71)
+fidelity: 0.5000 (support 1.0000 = 0.4817/0.4817)
+specificity: 0.1747 (support 0.2409 = 0.4817/2.0000)
+compression: 0.0714 (support 0.2409 = 0.4817/2.0000)
+discourse chronology: 0.2686 (support 0.0082 = 0.0082/1.0000)
+story-world chronology: 0.1997 (support 0.0047 = 0.0047/1.0000)
+causal preservation: n/a (support 0.0000 = 0.0000/9.0000)
+semantic-flow coherence: 0.3474 (support 0.0121 = 0.0121/1.0000)
+backward discourse mass: 0.0060 (over 1/1 comparable steps)
+backward story-world mass: 0.0038 (over 1/1 comparable steps)
+distorted mass: 0.0000
+external mass: external(attributed)=0.7591 unranked=0.0000 ranked=1.0000

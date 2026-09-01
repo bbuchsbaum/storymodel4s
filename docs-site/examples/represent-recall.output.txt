@@ -1,0 +1,18 @@
+transcript: One of the men with him got hit by an arrow and they lifted him into the boat.
+checked recall units: 2
+unit 0 [0, 43): One of the men with him got hit by an arrow
+  function: EpisodicAssertion
+  uncertainty: Unmarked
+  predicate: get
+  participants: Agent:men
+  polarity: Positive; modality: Asserted
+unit 1 [48, 78): they lifted him into the boat.
+  function: EpisodicAssertion
+  uncertainty: Unmarked
+  predicate: lift
+  participants: Agent:they, Patient:him
+  polarity: Positive; modality: Asserted
+temporal relations: 0
+causal relations: 0
+recall entities: men
+coreference links: 1

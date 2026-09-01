@@ -1,0 +1,87 @@
+---
+title: A concrete modeling test
+description: How the War of the Ghosts fixture records a reported injury and an unresolved cause of death.
+sidebar:
+  order: 2
+---
+
+import Evidence from '../../../components/Evidence.astro';
+import { sourceLink } from '../../../lib/provenance';
+
+This fixture tests a specific modeling decision: where to place a reported injury and how to record
+an uncertain cause of death.
+
+## The difficult passage
+
+In Charles Cultee's *The War of the Ghosts*, warriors say that a young man has been shot. The man
+does not feel sick, later concludes that his companions are ghosts, returns home, and dies. The
+text does not settle one clean causal account.
+
+The fixture places “he has been shot” in the warriors' speech context. It records the later death
+and leaves the cause open among explicit hypotheses.
+
+## Three claims, three locations
+
+| Content | Where it lives | What the model may say |
+| --- | --- | --- |
+| The warriors say the man was shot | A speech context | **Reported** content |
+| The man was injured in the narrated world | The root context | An open **hypothesis**, with alternatives retained |
+| The man does not feel sick | The narrated world | An explicit, **negated** state |
+
+The source states that the man dies. It leaves the cause unsettled. The model therefore keeps
+competing causal hypotheses and creates no accepted wound-to-death edge.
+
+<Evidence
+  status="Confirmed"
+  source="WarOfTheGhostsModel.scala and its plain-language expectation ledger"
+  href={sourceLink('fixtures/src/main/scala/storymodel4s/fixtures/wog/WarOfTheGhostsExpectations.scala')}
+ />
+
+## How the fixture is checked
+
+The fixture carries 12 plain-language expectations. Each expectation names the phenomenon, the
+relevant source sentences, a statement a researcher can read, and mechanical checks over the
+model. The acceptance suite fails if any expectation fails.
+
+```scala
+val failures = WarOfTheGhostsExpectations.evaluate(WarOfTheGhostsModel.model)
+
+assertEquals(
+  failures.map((expectation, check, why) =>
+    s"${expectation.phenomenon} / $check: $why"
+  ),
+  Vector.empty
+)
+assertEquals(WarOfTheGhostsExpectations.all.size, 12)
+```
+
+The suite also changes the model in ways that should fail and verifies that the checks catch those
+changes. This shows that the assertions distinguish the intended model from specific faulty ones.
+
+<Evidence
+  status="Qualified"
+  source="Locally reproduced from this documentation candidate with fixturesJVM/test; exact command and digest are recorded in the candidate evidence"
+  href={sourceLink('fixtures/src/test/scala/storymodel4s/fixtures/wog/WarOfTheGhostsSuite.scala')}
+ />
+
+## Scope
+
+This test covers one difficult, hand-authored story model. Accuracy on unseen stories, recovery from
+raw text, embedding calibration, and production defaults each require their own evidence.
+
+The story text comes from the public-domain 1901 US Government publication recorded by Franz Boas
+and narrated by Charles Cultee. The project uses it as a narrative acceptance fixture. The AMR
+conformance tests use published guideline examples elsewhere in the repository.
+
+<Evidence
+  status="Confirmed"
+  source="WarOfTheGhostsText.scala and WarOfTheGhostsModel.scala headers"
+  href={sourceLink('fixtures/src/main/scala/storymodel4s/fixtures/wog/WarOfTheGhostsText.scala')}
+ />
+
+## Next
+
+[Learn how the model is organized →](/method/concepts/)
+
+Next: [Align and interpret a recall](/method/align-and-interpret/) — the same fixture with
+the alignment machinery actually running, and its exact output.

@@ -1,0 +1,147 @@
+---
+title: Getting started
+description: Run one complete story-to-recall comparison and inspect the result.
+sidebar:
+  order: 1
+---
+
+import AlignmentMassFigure from '../../../components/AlignmentMassFigure.astro';
+import Evidence from '../../../components/Evidence.astro';
+import { sourceLink } from '../../../lib/provenance';
+import { readFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import { resolve } from 'node:path';
+
+export const programPath = 'docs-site/examples/PublicAlignAndInterpret.scala';
+export const outputPath = 'docs-site/examples/align-and-interpret.output.txt';
+export const PROGRAM_SHA = 'a32a547465c5ff35dca0c02a9a614a8d36594f90188fd0de4e37c38461b0c962';
+export const OUTPUT_SHA = '5fcb58008a3076d1d4a0812e29b53b519ed047bda8de4e8fd4ab1244f3d6e0bf';
+export const PRODUCER_REVISION = '76c62e738a2579d6598fccf3ac19266c60480e20';
+export const program = readFileSync(resolve(process.cwd(), 'examples/PublicAlignAndInterpret.scala'), 'utf8');
+export const output = readFileSync(resolve(process.cwd(), 'examples/align-and-interpret.output.txt'), 'utf8');
+export const programSha = createHash('sha256').update(program).digest('hex');
+export const outputSha = createHash('sha256').update(output).digest('hex');
+
+export const _bindFiles = (() => {
+  if (programSha !== PROGRAM_SHA)
+    throw new Error(`program digest ${programSha} does not match the published ${PROGRAM_SHA}`);
+  if (outputSha !== OUTPUT_SHA)
+    throw new Error(`output digest ${outputSha} does not match the published ${OUTPUT_SHA}`);
+  return true;
+})();
+
+storymodel4s compares a story with a later recall. A `StoryModel` records the people, events,
+claims, contexts, and order in the story. A `RecallGraph` divides the recall into units. `GraphHsmm`
+assigns each recall unit probability mass over story nodes and named external states such as an
+association or commentary.
+
+The program returns typed values that you can inspect. You can read every posterior row, the most
+likely route, the mass assigned inside and outside the story, and summaries such as coverage,
+specificity, and compression. Story and recall records cite exact text. Support-aware estimates
+keep their support, and unavailable estimates remain unavailable.
+
+Today the analysis starts from an existing `StoryModel`. The repository includes a reviewed model
+of *The War of the Ghosts*, which the example below uses. The software that builds a complete model
+from arbitrary prose is under development.
+
+## What this program does
+
+The program follows five steps:
+
+1. load a story model with 71 situations and 84 alignable nodes;
+2. divide a short recall into two units;
+3. generate 86 sparse candidate matches with a free word-overlap baseline;
+4. infer a partial alignment with `GraphHsmm`; and
+5. compute a `RecallSignature` with support-aware summaries.
+
+The input recall says:
+
+> One of the men with him got hit by an arrow and they lifted him into the boat.
+
+The comparison returns one probability row for each recall unit. Each row distributes mass across
+story nodes and explicit external states.
+
+## Run it
+
+storymodel4s currently runs from a source checkout. You need JDK 17 or 21, sbt 1.12.14, and a local
+checkout of the pinned `grakern` dependency.
+
+```sh
+git clone https://github.com/bbuchsbaum/storymodel4s.git
+cd storymodel4s
+```
+
+Save this exact program as `fixtures/src/main/scala/docsprobe/PublicAlignAndInterpret.scala`:
+
+<pre><code class="language-scala">{program}</code></pre>
+
+Run it with:
+
+```sh
+sbt -Dstorymodel4s.grakern.build=/absolute/path/to/pinned-grakern \
+  "fixturesJVM/runMain docsprobe.alignAndInterpret"
+```
+
+The program uses public APIs and no test helpers.
+
+<Evidence
+  status="Confirmed"
+  source={`docs-site/examples/PublicAlignAndInterpret.scala — full SHA-256 ${programSha}`}
+  href={sourceLink(programPath)}
+/>
+
+## Read the result
+
+The recorded run printed:
+
+<pre><code>{output}</code></pre>
+
+<AlignmentMassFigure />
+
+The first recall unit assigns 46.08% of its mass to the story. Its strongest source match is the
+event in which a young man says that he has no arrows. The second unit assigns 2.09% to the story
+and 97.91% to external states.
+
+Those results are poor because the free baseline compares word overlap and has no model of
+synonyms. The recall is a faithful paraphrase, yet the baseline sends most of it outside the story.
+This run establishes the public workflow and the shape of its output. Accuracy requires separate
+calibration evidence.
+
+The summary reports uniform coverage of `0.0067`. Importance-weighted coverage is `n/a`: zero of
+the 71 eligible situations carried an importance weight. Specificity and compression each report a
+value and support of `0.2409`, the source mass that contributed to the estimate.
+
+## What you can inspect
+
+| Accessor | What it returns |
+| --- | --- |
+| `result.posterior.rows` | one probability row for each recall unit |
+| `row.mapSource` | the row's highest-probability source node, when one exists |
+| `row.sourceMass` | the row's total mass on story nodes |
+| `row.externalMass` | the row's total mass on external states |
+| `result.viterbi` | the inferred route through source and external states |
+| `signature.uniformCoverage` | coverage across the story's alignable situations |
+| `signature.importanceWeightedCoverage` | weighted coverage, conditioning weight, and observed count |
+| `signature.specificityMass` | specificity and the source mass that supports it |
+| `signature.compression` | compression and the source mass that supports it |
+| `signature.externalMass` | attributed external mass and unranked mass as separate values |
+
+The replay gate compiles this exact program against revision <code>{PRODUCER_REVISION}</code>, runs
+it on the JVM, and compares stdout byte-for-byte with the displayed output. The result is
+conditional on the heuristic segmentation used in the program.
+
+<Evidence
+  status="Confirmed"
+  source={`Manifested replay at source revision ${PRODUCER_REVISION}; output SHA-256 ${outputSha}`}
+  href={sourceLink(outputPath)}
+/>
+
+## Continue through the library
+
+- [Inspect a source document](/scala/inspect-source/) to work with sentences, tokens, offsets, and evidence spans.
+- [Model a story](/method/model-a-story/) to inspect entities, situations, contexts, claims, and relations.
+- [Represent a recall](/method/represent-recall/) to build checked recall units and recall-side relations.
+- [Align and interpret a recall](/method/align-and-interpret/) for the full explanation of each result above.
+- [Summarize a recall](/method/summarize-recall/) to read every estimate beside its support.
+- [Score an interview](/method/score-interview/) to run the synthetic Autobiographical Interview example.
+- [Save and verify a model](/scala/save-and-deliver/) to write canonical JSON and check its identity.

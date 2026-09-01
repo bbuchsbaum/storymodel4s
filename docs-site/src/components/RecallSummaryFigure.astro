@@ -1,0 +1,148 @@
+---
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+import { parseSummaryMetrics } from '../lib/summary-data.mjs';
+
+const raw = readFileSync(resolve(process.cwd(), 'examples/summarize-recall.output.txt'), 'utf8');
+const metrics = parseSummaryMetrics(raw);
+const left = 250;
+const width = 430;
+const rowHeight = 72;
+const top = 78;
+const height = top + metrics.length * rowHeight + 44;
+---
+
+<figure class="summary-figure" data-example="summarize-recall">
+  <svg viewBox={`0 0 780 ${height}`} role="img" aria-labelledby="summary-title summary-desc">
+    <title id="summary-title">Recall estimates and their support</title>
+    <desc id="summary-desc">
+      Seven recall measures from the recorded lexical-baseline run. Importance-weighted coverage
+      and causal preservation are unavailable. Chronology values have less than one percent support.
+    </desc>
+    <defs>
+      <pattern id="missing-pattern" width="8" height="8" patternUnits="userSpaceOnUse">
+        <path d="M-2 2 L2 -2 M0 8 L8 0 M6 10 L10 6" class="missing-hatch" />
+      </pattern>
+    </defs>
+
+    <text x="0" y="24" class="figure-title">What the recall summary can support</text>
+    <g aria-hidden="true">
+      <rect x="250" y="42" width="18" height="12" rx="2" class="value-swatch" />
+      <text x="276" y="53" class="legend-label">estimate</text>
+      <rect x="360" y="42" width="18" height="5" rx="2" class="support-swatch" />
+      <text x="386" y="53" class="legend-label">support</text>
+      <rect x="470" y="42" width="18" height="12" rx="2" fill="url(#missing-pattern)" />
+      <text x="496" y="53" class="legend-label">unavailable</text>
+    </g>
+
+    {
+      metrics.map((metric, index) => {
+        const y = top + index * rowHeight;
+        const valueWidth = (metric.value ?? 1) * width;
+        const supportWidth = (metric.support ?? 0) * width;
+        return (
+          <g
+            class="summary-row"
+            data-metric={metric.key}
+            data-value={metric.value === null ? 'n/a' : metric.value.toFixed(4)}
+            data-support={metric.support === null ? 'not-applicable' : metric.support.toFixed(4)}
+          >
+            <text x="0" y={y + 19} class="row-label">{metric.label}</text>
+            <rect x={left} y={y} width={width} height="24" rx="4" class="bar-background" />
+            {metric.value === null ? (
+              <rect x={left} y={y} width={width} height="24" rx="4" fill="url(#missing-pattern)" />
+            ) : (
+              <rect x={left} y={y} width={valueWidth} height="24" rx="4" class="value-bar" />
+            )}
+            <text x={left + width + 12} y={y + 18} class="number-label">
+              {metric.value === null ? 'n/a' : metric.value.toFixed(4)}
+            </text>
+            {metric.support !== null && (
+              <rect x={left} y={y + 31} width={supportWidth} height="6" rx="3" class="support-bar" />
+            )}
+            <text x={left} y={y + 55} class="detail-label">
+              {metric.support === null
+                ? metric.detail
+                : `support ${metric.support.toFixed(4)} · ${metric.detail}`}
+            </text>
+          </g>
+        );
+      })
+    }
+  </svg>
+  <figcaption>
+    The estimate bar and support line answer different questions. Hatched rows are unavailable; the
+    chart gives them no numeric value.
+  </figcaption>
+</figure>
+
+<style>
+  .summary-figure {
+    margin: 2rem 0;
+    padding: 1rem;
+    overflow-x: auto;
+    border: 1px solid var(--sl-color-gray-5);
+    border-radius: 0.75rem;
+    background: var(--sl-color-gray-7);
+  }
+
+  svg {
+    display: block;
+    width: 100%;
+    min-width: 720px;
+    height: auto;
+  }
+
+  .figure-title {
+    fill: var(--sl-color-white);
+    font: 700 20px system-ui, sans-serif;
+  }
+
+  .legend-label,
+  .row-label,
+  .number-label,
+  .detail-label {
+    fill: var(--sl-color-gray-2);
+    font-family: system-ui, sans-serif;
+  }
+
+  .row-label {
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  .number-label {
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  .detail-label,
+  .legend-label {
+    font-size: 11px;
+  }
+
+  .bar-background {
+    fill: var(--sl-color-gray-5);
+  }
+
+  .value-bar,
+  .value-swatch {
+    fill: #178f8b;
+  }
+
+  .support-bar,
+  .support-swatch {
+    fill: #e6b94a;
+  }
+
+  .missing-hatch {
+    stroke: var(--sl-color-gray-3);
+    stroke-width: 2;
+  }
+
+  figcaption {
+    margin-top: 0.5rem;
+    color: var(--sl-color-gray-2);
+    font-size: 0.9rem;
+  }
+</style>

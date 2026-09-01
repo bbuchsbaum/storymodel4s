@@ -1,0 +1,12 @@
+story situations: 71
+alignable nodes: 84 (71 situations)
+recall units: 2
+sparse candidates: 86
+unit 0 -> sit:wog:sit:ym1-says-no-arrows; source=0.4608 external=0.5392
+unit 1 -> seg:wog:seg:sc1c-canoe-arrives; source=0.0209 external=0.9791
+estimand: recall-signature/v2
+uniform coverage: 0.0067
+importance-weighted coverage: n/a (conditioning weight 0.0000; coverage 0/71)
+specificity: 0.1747 (support 0.2409 = 0.4817/2.0000)
+compression: 0.0714 (support 0.2409 = 0.4817/2.0000)
+external mass: external(attributed)=0.7591 unranked=0.0000 ranked=1.0000

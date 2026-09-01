@@ -1,0 +1,17 @@
+recall_units=18 details=49 assessments=49
+InternalEvent              point=4.8103 interval=[4.4503, 7.2103] hard=5
+InternalPlace              point=3.5602 interval=[2.6702, 4.4503] hard=4
+InternalTime               point=1.9001 interval=[1.7801, 2.7001] hard=2
+InternalPerceptual         point=6.2304 interval=[6.2304, 7.1204] hard=6
+InternalThoughtEmotion     point=0.0000 interval=[0.0000, 0.0000] hard=0
+ExternalEvent              point=14.1900 interval=[13.5500, 15.8700] hard=14
+ExternalSemantic           point=1.2000 interval=[1.2000, 1.8400] hard=1
+Repetition                 point=0.0000 interval=[0.0000, 0.0000] hard=0
+Other                      point=1.8000 interval=[1.8000, 1.8000] hard=2
+observed_coverage=49/49 (1.0000)
+placement_resolution=phase: resolved=0.6876 unresolved=0.3124 excluded=0.0000 (threshold 0.50)
+internal_ratio_when_resolved=Some(Some(0.4897738450995111))
+target_mass=16.5009 event_purity=0.8750 probe_gain=0.4286
+episodic_density_per_word=0.0493 episodic_density_per_second=0.1232
+perceptual=Visual=Some(3.0), Olfactory=Some(1.0)
+mental=

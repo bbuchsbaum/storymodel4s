@@ -1,0 +1,52 @@
+---
+title: How do features follow the text?
+description: Attach measurements to tokens, reduce them over windows, and retain coverage and policy.
+---
+
+import Evidence from '../../../components/Evidence.astro';
+import { sourceLink } from '../../../lib/provenance';
+import { readFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import { resolve } from 'node:path';
+
+export const programPath = 'docs-site/examples/WindowFeatures.scala';
+export const outputPath = 'docs-site/examples/window-features.output.txt';
+export const program = readFileSync(resolve(process.cwd(), 'examples/WindowFeatures.scala'), 'utf8');
+export const output = readFileSync(resolve(process.cwd(), 'examples/window-features.output.txt'), 'utf8');
+export const programSha = createHash('sha256').update(program).digest('hex');
+export const outputSha = createHash('sha256').update(output).digest('hex');
+
+A word-level measure becomes useful only when it stays attached to the words it describes. This
+example assigns synthetic imageability ratings to tokens, then computes four-word window means.
+
+<pre><code class="language-scala">{program}</code></pre>
+
+The replay gate records this exact output:
+
+<pre><code>{output}</code></pre>
+
+The first two windows have four observed lexical tokens, so both policies return the same mean. The
+third window has two observations for three eligible words. `IgnoreMissing` reports the mean of the
+two available values; `RequireMinCoverage(0.75)` reports `Missing(Excluded)`. The final window has no
+observed value.
+
+| Window | Coverage | Ignore missing | Require 75% |
+| --- | ---: | ---: | --- |
+| Red boats crossed quietly | 4/4 | 4.80 | 4.80 |
+| crossed quietly Abstract ideas | 4/4 | 2.55 | 2.55 |
+| Abstract ideas remained | 2/3 | 1.60 | Missing |
+| remained | 0/1 | Missing | Missing |
+
+The policy becomes part of the derived feature-space identity. A downstream analysis can therefore
+tell which rule produced a value, and each window keeps its observed and eligible counts.
+
+<Evidence
+  status="Confirmed"
+  source={`Manifested public example ${programSha}; byte-matched output ${outputSha}`}
+  href={sourceLink(programPath)}
+/>
+
+The ratings in this example are synthetic. The evidence covers alignment, reduction, missingness,
+and provenance. An empirical imageability result would require admitted measurements.
+
+Next: [use deterministic embedding features →](/scala/use-embeddings/)

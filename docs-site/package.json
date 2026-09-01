@@ -1,0 +1,27 @@
+{
+  "name": "storymodel4s-docs",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "check": "astro check",
+    "verify:examples": "node scripts/verify-examples.mjs",
+    "verify:figures": "node scripts/verify-figures.mjs",
+    "verify:layout": "node scripts/verify-mobile-layout.mjs",
+    "verify:navigation": "node scripts/verify-navigation.mjs",
+    "verify:verbatim": "node scripts/verify-verbatim.mjs",
+    "verify": "npm run verify:examples && npm run check && npm run build && npm run verify:layout && npm run verify:navigation && npm run verify:verbatim && npm run verify:figures && npm run verify:provenance",
+    "verify:provenance": "node scripts/verify-provenance.mjs"
+  },
+  "dependencies": {
+    "@astrojs/starlight": "0.41.10",
+    "astro": "7.2.9"
+  },
+  "devDependencies": {
+    "@astrojs/check": "0.9.10",
+    "@playwright/test": "1.57.0",
+    "typescript": "6.0.3"
+  }
+}

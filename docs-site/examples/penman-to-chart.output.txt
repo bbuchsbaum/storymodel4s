@@ -1,0 +1,23 @@
+checked AMR nodes: 7
+chart concepts: 7
+chart relations: 8
+focus: and
+concept k0: say; Predicate; say-01; Positive
+concept k1: sick; Predicate; sick-05; Positive
+concept k2: feel; Predicate; feel-01; Negative
+concept k3: they; Entity; unframed; Unknown
+concept k4: hit; Predicate; hit-01; Positive
+concept k5: man; Entity; unframed; Unknown
+concept k6: and; Entity; unframed; Unknown
+relation k0 -ARG0/Agent-> k3
+relation k0 -ARG1/Patient-> k4
+relation k1 -ARG1/Patient-> k5
+relation k2 -ARG0/Agent-> k5
+relation k2 -ARG1/Patient-> k1
+relation k4 -ARG1/Patient-> k5
+relation k6 -op1/unmapped-> k0
+relation k6 -op2/unmapped-> k2
+embedded k4 under k0: Speech
+reentrant concepts: k5
+source digest: dd7fe9aeeb73a21d49c8cd0e76c8e1ed01f1784bcb42b657775ef0280d505922
+chart checksum: de9516a0a42486fd24bc81193de1a314eeb445391ea0a22c2c72f7991aa7f88e

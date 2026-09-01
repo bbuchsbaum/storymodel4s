@@ -1,0 +1,105 @@
+---
+title: Represent a recall
+description: Turn a transcript into checked recall units, proposition sketches, entities, and recall-side relations.
+sidebar:
+  order: 3
+---
+
+import Evidence from '../../../components/Evidence.astro';
+import { sourceLink } from '../../../lib/provenance';
+import { readFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import { resolve } from 'node:path';
+
+export const programPath = 'docs-site/examples/RepresentRecall.scala';
+export const outputPath = 'docs-site/examples/represent-recall.output.txt';
+export const PROGRAM_SHA = '2f13608e36da02baebcf42ab5fd8c6d7d12e37d410f28221fa7432b111c78239';
+export const OUTPUT_SHA = 'ec2fbcb012e17740a0722f9c11d095c5b42009d089711fb841e50805f8f0da7c';
+export const PRODUCER_REVISION = '76c62e738a2579d6598fccf3ac19266c60480e20';
+export const program = readFileSync(resolve(process.cwd(), 'examples/RepresentRecall.scala'), 'utf8');
+export const output = readFileSync(resolve(process.cwd(), 'examples/represent-recall.output.txt'), 'utf8');
+export const programSha = createHash('sha256').update(program).digest('hex');
+export const outputSha = createHash('sha256').update(output).digest('hex');
+
+export const _bindFiles = (() => {
+  if (programSha !== PROGRAM_SHA)
+    throw new Error(`program digest ${programSha} does not match the published ${PROGRAM_SHA}`);
+  if (outputSha !== OUTPUT_SHA)
+    throw new Error(`output digest ${outputSha} does not match the published ${OUTPUT_SHA}`);
+  return true;
+})();
+
+`RecallSegmenter.segment` supplies a reproducible baseline for turning a transcript into a checked
+`RecallGraph`. It chooses unit boundaries with fixed heuristics and creates shallow proposition
+sketches. The graph contains the transcript, its source atlas, ordered units, recalled entities,
+coreference links, and explicit temporal or causal relations.
+
+This guide uses the same recall as the alignment guide:
+
+> One of the men with him got hit by an arrow and they lifted him into the boat.
+
+## Run the program
+
+Save this file as `fixtures/src/main/scala/docsprobe/RepresentRecall.scala`:
+
+<pre><code class="language-scala">{program}</code></pre>
+
+Run it with:
+
+```sh
+sbt -Dstorymodel4s.grakern.build=/absolute/path/to/pinned-grakern \
+  "fixturesJVM/runMain docsprobe.representRecall"
+```
+
+<Evidence
+  status="Confirmed"
+  source={`docs-site/examples/RepresentRecall.scala — executed against storymodel4s ${PRODUCER_REVISION}; full SHA-256 ${programSha}`}
+  href={sourceLink(programPath)}
+ />
+
+## What it prints
+
+<pre><code>{output}</code></pre>
+
+The documentation replay gate compiles this exact file, runs it, and compares stdout byte-for-byte
+with the text below.
+
+## Read this as one analysis
+
+The baseline splits the sentence at the conjunction into two units:
+
+| Unit | Span | Text |
+| --- | --- | --- |
+| 0 | `[0, 43)` | `One of the men with him got hit by an arrow` |
+| 1 | `[48, 78)` | `they lifted him into the boat.` |
+
+Each unit keeps the exact transcript span that supports it. The `Checked` type parameter records
+structural facts: the ordinals, spans, relation endpoints, entity references, and text-at-span checks
+all passed validation. Choosing the best boundaries and proposition analyses remains a separate
+inference.
+
+Both units are episodic assertions with unmarked uncertainty, positive polarity, and asserted
+modality. The first sketch records predicate `get` with agent `men`. The second records predicate
+`lift`, agent `they`, and patient `him`.
+
+The segmenter also creates an entity named `men` and one coreference link. That link connects a later
+pronoun with the earlier plural mention. Recall order remains available through unit ordinals and
+`recall.chain`; the transcript states no explicit temporal or causal connective, so both typed
+relation collections are empty.
+
+## Carry uncertainty into research results
+
+The shallow proposition sketch reads “got hit” as predicate `get` and records only one participant
+for that unit. Another reasonable parser could choose a different predicate or a different boundary.
+
+Treat this graph as a segmentation-conditioned heuristic baseline. A terminal research result needs
+a named segmentation policy or receipt and must retain plausible segmentation and interpretation
+alternatives. This example stops at construction and structural validation.
+
+<Evidence
+  status="Confirmed"
+  source="RecallUnit, RecallGraph, and RecallSegmenter public contracts"
+  href={sourceLink('recall/src/main/scala/storymodel4s/recall/graph.scala')}
+ />
+
+Next: [align these units with the story →](/method/align-and-interpret/)

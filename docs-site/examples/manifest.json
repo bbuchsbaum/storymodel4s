@@ -1,0 +1,96 @@
+{
+  "schemaVersion": 1,
+  "examples": [
+    {
+      "id": "inspect-source",
+      "project": "coreJVM",
+      "source": "examples/InspectSource.scala",
+      "main": "docsprobe.inspectSource",
+      "output": "examples/inspect-source.output.txt"
+    },
+    {
+      "id": "model-a-story",
+      "project": "fixturesJVM",
+      "source": "examples/ModelAStory.scala",
+      "main": "docsprobe.modelAStory",
+      "output": "examples/model-a-story.output.txt"
+    },
+    {
+      "id": "penman-to-chart",
+      "project": "amrInteropJVM",
+      "source": "examples/PenmanToChart.scala",
+      "main": "docsprobe.penmanToChart",
+      "output": "examples/penman-to-chart.output.txt"
+    },
+    {
+      "id": "resolve-acquisition",
+      "project": "acquireJVM",
+      "source": "examples/ResolveAcquisition.scala",
+      "main": "docsprobe.resolveAcquisition",
+      "output": "examples/resolve-acquisition.output.txt"
+    },
+    {
+      "id": "compose-document",
+      "project": "documentJVM",
+      "source": "examples/ComposeDocument.scala",
+      "main": "docsprobe.composeDocument",
+      "output": "examples/compose-document.output.txt"
+    },
+    {
+      "id": "represent-recall",
+      "project": "fixturesJVM",
+      "source": "examples/RepresentRecall.scala",
+      "main": "docsprobe.representRecall",
+      "output": "examples/represent-recall.output.txt"
+    },
+    {
+      "id": "window-features",
+      "project": "featuresJVM",
+      "source": "examples/WindowFeatures.scala",
+      "main": "docsprobe.windowFeatures",
+      "output": "examples/window-features.output.txt"
+    },
+    {
+      "id": "use-embeddings",
+      "project": "embedCoreJVM",
+      "source": "examples/UseEmbeddings.scala",
+      "main": "docsprobe.useEmbeddings",
+      "output": "examples/use-embeddings.output.txt"
+    },
+    {
+      "id": "align-and-interpret",
+      "project": "fixturesJVM",
+      "source": "examples/PublicAlignAndInterpret.scala",
+      "main": "docsprobe.alignAndInterpret",
+      "output": "examples/align-and-interpret.output.txt"
+    },
+    {
+      "id": "summarize-recall",
+      "project": "fixturesJVM",
+      "source": "examples/SummarizeRecall.scala",
+      "main": "docsprobe.summarizeRecall",
+      "output": "examples/summarize-recall.output.txt"
+    },
+    {
+      "id": "score-interview",
+      "project": "fixturesJVM",
+      "source": "examples/ScoreInterview.scala",
+      "main": "docsprobe.scoreInterview",
+      "output": "examples/score-interview.output.txt"
+    },
+    {
+      "id": "save-model",
+      "project": "fixturesJVM",
+      "source": "examples/SaveModel.scala",
+      "main": "docsprobe.saveModel",
+      "output": "examples/save-model.output.txt"
+    },
+    {
+      "id": "structural-distance",
+      "project": "embedGrakern",
+      "source": "examples-grakern/StructuralDistance.scala",
+      "main": "docsprobe.structuralDistance",
+      "output": "examples-grakern/structural-distance.output.txt"
+    }
+  ]
+}

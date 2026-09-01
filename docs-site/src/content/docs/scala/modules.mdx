@@ -1,0 +1,66 @@
+---
+title: Module map
+description: The current source modules, their responsibilities, and the portable/JVM-only boundary.
+sidebar:
+  order: 2
+---
+
+import Evidence from '../../../components/Evidence.astro';
+import { sourceLink } from '../../../lib/provenance';
+
+The current build aggregates 15 cross-platform modules and three JVM-only embedding or benchmark
+projects. Cross-platform modules target JVM, Scala.js, and Scala Native with pure source layout.
+
+<Evidence
+  status="Confirmed"
+  source="build.sbt aggregate and project definitions at this revision"
+  href={sourceLink('build.sbt')}
+ />
+
+## Evidence and representation
+
+| Module | Responsibility |
+| --- | --- |
+| `core` | IDs, text spans, surface atlases, claims, evidence, credence, provenance, hashing |
+| `proposition` | Partial evidence-backed proposition charts and role structure |
+| `amr-interop` | PENMAN/AMR adapter around the local proposition contract |
+| `features` | Aligned feature tracks, coverage, reducers, derivation recipes, sidecar references |
+| `acquire` | Proposal, critique, resolution, patch, and stage-cache protocols |
+| `story` | Entities, situations, contexts, typed relations, hierarchy, and trajectory |
+| `document` | Mention graphs, exact coreference quotient, and narrative compilation |
+| `recall` | Recall units, discourse functions, uncertainty, and recall relations |
+| `align` | Candidate sets, local costs, unbalanced transport, graph-HSMM inference, signatures |
+| `interview` | Autobiographical Interview representation and versioned derived scoring |
+
+## Sidecars, views, and verification
+
+| Module | Responsibility |
+| --- | --- |
+| `embed-core` | Portable embedding identity, validated vectors, receipts, privacy, cache, lexical baselines |
+| `view` | Renderer-neutral Codex and Atlas artifacts |
+| `codec` | Canonical JSON codecs |
+| `fixtures` | Researcher-reviewed acceptance fixtures and public-domain source material |
+| `laws` | Published Discipline laws and generators |
+
+## JVM-only projects
+
+| Project | Responsibility |
+| --- | --- |
+| `embed-grakern` | Structural proposition-chart channel through a pinned graph-kernel source dependency |
+| `embed-onnx` | Local pinned sentence-encoder adapter with checksum and schema validation |
+| `embed-bench` | Diagnostic embedding and alignment measurements; not production defaults |
+
+JVM libraries, model runtimes, HTTP clients, and provider SDKs stay outside portable modules. No
+provider-specific type crosses into `embed-core`.
+
+<Evidence
+  status="Confirmed"
+  source="embed-core/README.md provider-neutral boundary"
+  href={sourceLink('embed-core/README.md')}
+ />
+
+## A dependency map, not a feature checklist
+
+Presence in this table means source code exists. It does not mean the module is published, the API
+is stable, a provider is calibrated, or a complete raw-text workflow exists. Use the evidence notes
+on method pages for those stronger claims.

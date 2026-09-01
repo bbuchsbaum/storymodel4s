@@ -1,0 +1,153 @@
+---
+title: Align and interpret a recall
+description: Run a public-API program that compares a recall with a story model, then read its posterior mass and support-aware summary.
+sidebar:
+  order: 3
+---
+
+import AlignmentMassFigure from '../../../components/AlignmentMassFigure.astro';
+import Evidence from '../../../components/Evidence.astro';
+import { sourceLink } from '../../../lib/provenance';
+import { readFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import { resolve } from 'node:path';
+
+export const programPath = 'docs-site/examples/PublicAlignAndInterpret.scala';
+export const outputPath = 'docs-site/examples/align-and-interpret.output.txt';
+export const PROGRAM_SHA = 'a32a547465c5ff35dca0c02a9a614a8d36594f90188fd0de4e37c38461b0c962';
+export const OUTPUT_SHA = '5fcb58008a3076d1d4a0812e29b53b519ed047bda8de4e8fd4ab1244f3d6e0bf';
+export const PRODUCER_REVISION = '76c62e738a2579d6598fccf3ac19266c60480e20';
+
+export const program = readFileSync(resolve(process.cwd(), 'examples/PublicAlignAndInterpret.scala'), 'utf8');
+export const output = readFileSync(resolve(process.cwd(), 'examples/align-and-interpret.output.txt'), 'utf8');
+export const programSha = createHash('sha256').update(program).digest('hex');
+export const outputSha = createHash('sha256').update(output).digest('hex');
+
+export const _bindFiles = (() => {
+  if (programSha !== PROGRAM_SHA)
+    throw new Error(`program digest ${programSha} does not match the published ${PROGRAM_SHA}`);
+  if (outputSha !== OUTPUT_SHA)
+    throw new Error(`output digest ${outputSha} does not match the published ${OUTPUT_SHA}`);
+  return true;
+})();
+
+This example compares a recall with the reviewed *War of the Ghosts* story model. It performs five
+steps:
+
+1. load the story model;
+2. divide the recall transcript into recall units;
+3. generate sparse candidate matches with lexical Jaccard distance;
+4. infer an alignment with `GraphHsmm`; and
+5. summarize the alignment with `RecallSignature`.
+
+The program imports public `storymodel4s` APIs. It uses no test helpers or copied internal code.
+
+Every value below is conditional on the two units produced by `RecallSegmenter`. That component is
+a heuristic baseline. A terminal research result must name its segmentation policy or receipt and
+retain plausible segmentation and proposition alternatives.
+
+## Run the program
+
+Save this file as `fixtures/src/main/scala/docsprobe/PublicAlignAndInterpret.scala`:
+
+<pre><code class="language-scala">{program}</code></pre>
+
+Then run:
+
+```sh
+sbt -Dstorymodel4s.grakern.build=/absolute/path/to/pinned-grakern \
+  "fixturesJVM/runMain docsprobe.alignAndInterpret"
+```
+
+The copy under `docs-site/examples/` supplies the exact bytes shown on this page. That directory is
+outside the sbt source sets, so the command uses the copy you place under `fixtures/src/main/scala`.
+
+<Evidence
+  status="Confirmed"
+  source={`docs-site/examples/PublicAlignAndInterpret.scala — full SHA-256 ${programSha}`}
+  href={sourceLink(programPath)}
+ />
+
+## Output from the recorded run
+
+<pre><code>{output}</code></pre>
+
+The documentation replay gate compiles this exact program against revision `{PRODUCER_REVISION}`,
+runs it on the JVM, and compares stdout byte-for-byte with the displayed output.
+
+<Evidence
+  status="Confirmed"
+  source={`Manifested replay at source revision ${PRODUCER_REVISION}; output SHA-256 ${outputSha}`}
+  href={sourceLink(outputPath)}
+ />
+
+## Where each recall unit went
+
+<AlignmentMassFigure />
+
+The program found two recall units and retained 86 sparse candidates. Each posterior row divides its
+mass between source nodes and external states.
+
+| Recall unit | Highest-probability source node | Source mass | External mass |
+| --- | --- | ---: | ---: |
+| 0 | `ym1-says-no-arrows` | 0.4608 | 0.5392 |
+| 1 | `sc1c-canoe-arrives` | 0.0209 | 0.9791 |
+
+The displayed node is the most probable source node within the row. External states carry more total
+mass for both units. Unit 1 is especially clear: the model assigns 97.91% of its mass outside the
+source.
+
+The input recall is a faithful paraphrase. Lexical Jaccard compares word overlap and has no synonym
+model, so it performs poorly here. This run establishes that the public workflow executes and shows
+how the result is represented. It provides no evidence of calibrated alignment accuracy.
+
+## Read the summary with its support
+
+`RecallSignature.compute` produces several estimates from the posterior.
+
+### Uniform coverage
+
+The result is `0.0067`. For each story situation, the implementation accumulates the posterior mass
+that reaches it and applies `1 - exp(-mass)`. It then averages those 71 values. A short recall that
+reaches few situations therefore produces a small value.
+
+The console output rounds each row total and omits the posterior for individual leaves. Recomputing
+the exact coverage value requires the original result object.
+
+<Evidence
+  status="Confirmed"
+  source="RecallSignature leaf visitation and uniform coverage implementation"
+  href={sourceLink('align/src/main/scala/storymodel4s/align/signature.scala')}
+ />
+
+### Importance-weighted coverage
+
+The program prints:
+
+```text
+n/a (conditioning weight 0.0000; coverage 0/71)
+```
+
+The fixture supplies no importance weights for the 71 situations. `RecallSignature` returns an
+unavailable estimate and reports the missing conditioning weight. A numeric zero would mean that
+the estimate was supported and its measured value was zero; this run supports no such measurement.
+
+### Specificity and compression
+
+Specificity is `0.1747` and compression is `0.0714`. Each value carries support of `0.2409`, computed
+from `0.4817` source mass over two recall units. The support tells a reader how much of the recall
+contributed to each estimate.
+
+### External mass
+
+The result attributes `0.7591` of the posterior to external content. All ranked external mass was
+classified; the output reports `unranked=0.0000` and `ranked=1.0000`.
+
+## Scope of this result
+
+The story structure comes from the hand-authored acceptance fixture. The run uses a deterministic,
+dependency-free lexical baseline and one heuristic recall segmentation. A semantic encoder would
+require its own identity, receipt, and quality evidence. This replay exercises one JVM; it supplies
+no Scala.js, Scala Native, JDK 17, or JDK 21 result.
+
+Previous: [represent the recall](/method/represent-recall/).

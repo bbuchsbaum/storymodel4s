@@ -1,0 +1,10 @@
+prepared source charts: 3
+identical structure: Observed(0.000000)
+alpha-renamed and reordered: Observed(0.000000)
+ARG0/ARG1 fillers swapped: Observed(0.600000)
+unrelated predicate and patient: Observed(0.733333)
+source not in prepared dictionary: Missing(Excluded)
+memoized provider calls: 1
+receipt provider: grakern
+receipt rounds: 2
+pinned grakern revision: 0329c43c88a0b71e9aa4456723bb16bac2fa3841

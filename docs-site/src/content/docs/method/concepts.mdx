@@ -1,0 +1,90 @@
+---
+title: How the model is organized
+description: How storymodel4s records evidence, contexts, time, alignment, fidelity, support, and numerical features.
+sidebar:
+  order: 3
+---
+
+import Evidence from '../../../components/Evidence.astro';
+import { sourceLink } from '../../../lib/provenance';
+
+storymodel4s records a story, a recall, and a proposed mapping between them. Its data model gives
+separate fields to facts that researchers may need to compare independently.
+
+## Surface evidence is the anchor
+
+Source and transcript text have stable character offsets. An explicit claim cites the exact source
+spans that support it. An inferred claim cites the claims from which it was derived. A researcher
+can therefore trace a result back through the model to the text.
+
+Offsets use UTF-16 so they agree with common text and browser APIs.
+
+## Context records who presents a claim
+
+Every situation names a context. `NarratedWorld` holds the narrator's account. `Speech`, `Belief`,
+and `Intention` frames hold content attributed to a speaker, believer, or agent.
+
+For example, the sentence “the warriors said he was shot” creates a speaking event in
+`NarratedWorld` and an injury claim in a `Speech` frame. The model records the report without
+treating the quoted injury as a separate claim by the narrator.
+
+<Evidence
+  status="Confirmed"
+  source="ContextFrame, ContextKind, and narrative-graph validation source"
+  href={sourceLink('story/src/main/scala/storymodel4s/story/nodes.scala')}
+ />
+
+## The model records three orders
+
+- **Discourse order**: where content appears in the telling.
+- **Story-world time**: when represented events occur.
+- **Recall time**: the order in which a person produces recall units.
+
+A story may describe events out of chronological order. A person may also jump backward while
+recalling it. Separate coordinates let an analysis measure either kind of reordering.
+
+## A recall can point to the story or beyond it
+
+For each recall unit, the aligner distributes probability mass over source nodes and named external
+categories such as association or task commentary. This representation covers omissions, merged
+events, split events, reordering, elaboration, and added material. The output reports external mass
+by category.
+
+## Fidelity has several parts
+
+Alignment and fidelity answer different questions. A recall can point to the correct event while
+giving the wrong actor or reversing two roles. The model assesses actor, object, action, location,
+context, polarity, modality, and role structure separately, while retaining the event anchor.
+
+## Every estimate reports its support
+
+Conditional estimates carry their supporting mass or numerator and denominator. When an estimate
+has no supported cases, the result is `Missing` and the rendered output says `n/a`. A zero remains
+available for cases where the measured value really is zero.
+
+<Evidence
+  status="Confirmed"
+  source="ADR 0003, estimand support contract"
+  href={sourceLink('docs/adr/0003-estimand-support-contract.md')}
+ />
+
+## Embeddings provide candidate features
+
+The portable embedding contract includes deterministic hashed n-gram and TF-IDF baselines. A local
+ONNX sentence-encoder adapter and a structural graph-kernel adapter also exist in JVM-only modules.
+These vectors supply feature views for candidate generation and declared costs. Content hashes,
+typed graph records, evidence, and validation rules determine model identity and accepted claims.
+
+<Evidence
+  status="Confirmed"
+  source="ADR 0001 and embed-core public contracts"
+  href={sourceLink('embed-core/src/main/scala/storymodel4s/embed/contract.scala')}
+ />
+
+Calibration and production-default selection remain future evaluation work.
+
+<Evidence
+  status="Intent"
+  source="Embedding calibration and default selection remain evidence-gated work"
+  href={sourceLink('docs/adr/0001-embedding-contract-and-hard-gate.md')}
+ />

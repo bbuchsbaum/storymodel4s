@@ -1,0 +1,108 @@
+---
+title: How does text become a story graph?
+description: "Inspect three public stages: proposition parsing, proposal resolution, and document identity."
+---
+
+import Evidence from '../../../components/Evidence.astro';
+import { sourceLink } from '../../../lib/provenance';
+import { readFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import { resolve } from 'node:path';
+
+export const penmanPath = 'docs-site/examples/PenmanToChart.scala';
+export const penmanOutputPath = 'docs-site/examples/penman-to-chart.output.txt';
+export const acquirePath = 'docs-site/examples/ResolveAcquisition.scala';
+export const acquireOutputPath = 'docs-site/examples/resolve-acquisition.output.txt';
+export const documentPath = 'docs-site/examples/ComposeDocument.scala';
+export const documentOutputPath = 'docs-site/examples/compose-document.output.txt';
+export const penman = readFileSync(resolve(process.cwd(), 'examples/PenmanToChart.scala'), 'utf8');
+export const penmanOutput = readFileSync(resolve(process.cwd(), 'examples/penman-to-chart.output.txt'), 'utf8');
+export const acquire = readFileSync(resolve(process.cwd(), 'examples/ResolveAcquisition.scala'), 'utf8');
+export const acquireOutput = readFileSync(resolve(process.cwd(), 'examples/resolve-acquisition.output.txt'), 'utf8');
+export const document = readFileSync(resolve(process.cwd(), 'examples/ComposeDocument.scala'), 'utf8');
+export const documentOutput = readFileSync(resolve(process.cwd(), 'examples/compose-document.output.txt'), 'utf8');
+export const sha = (value) => createHash('sha256').update(value).digest('hex');
+
+A complete story model needs more than sentence boundaries. A program must represent what each
+sentence says, keep competing analyses when the evidence does not settle them, and connect mentions
+of the same person or object across sentences.
+
+storymodel4s provides public types for those three stages. The examples below run each stage in
+isolation. The unattended pipeline that joins them for arbitrary prose is still under development.
+
+| Stage | Input | Result you can inspect |
+| --- | --- | --- |
+| Local meaning | checked PENMAN | concepts, roles, polarity, embedded content, reentrancy |
+| Resolution | evidence-backed proposals | accepted value, alternatives, unresolved reason, or rejection |
+| Document identity | sentence-local charts and mention pairs | preserved charts plus deterministic coreference clusters |
+
+## Read one proposition graph
+
+This program parses a small PENMAN graph, validates and canonicalizes its AMR roles, then converts it
+to the library's local `PropositionChart`.
+
+<pre><code class="language-scala">{penman}</code></pre>
+
+It prints:
+
+<pre><code>{penmanOutput}</code></pre>
+
+The result has seven concepts and eight relations. `man` is shared by several roles, so it remains
+one reentrant concept. The negative polarity belongs to `feel`, while the embedded `hit` proposition
+sits under `say` as speech content. The source digest records the imported graph; the chart checksum
+records the canonical local representation.
+
+<Evidence
+  status="Confirmed"
+  source={`Manifested public example ${sha(penman)}; byte-matched output ${sha(penmanOutput)}`}
+  href={sourceLink(penmanPath)}
+/>
+
+## Keep disagreement visible
+
+Parsers and agents submit proposals with evidence and call receipts. A deterministic resolver applies
+the selected acceptance policy.
+
+<pre><code class="language-scala">{acquire}</code></pre>
+
+<pre><code>{acquireOutput}</code></pre>
+
+The same result type carries four scientifically different outcomes:
+
+- two agreeing providers plus a named calibration produce `Accepted`;
+- disagreement produces weighted `Alternatives`;
+- one proposal under the conservative policy produces `Unresolved`;
+- a structural failure produces `Rejected`.
+
+`Unresolved` means the available evidence did not establish one answer. `Rejected` means the proposed
+value failed a rule. Downstream code can distinguish those cases directly.
+
+<Evidence
+  status="Confirmed"
+  source={`Manifested public example ${sha(acquire)}; byte-matched output ${sha(acquireOutput)}`}
+  href={sourceLink(acquirePath)}
+/>
+
+## Connect mentions across sentences
+
+Sentence-local charts retain their own nodes. `MentionTable` gives selected nodes typed mention IDs,
+and `CorefPartition` records exact identity across sentences.
+
+<pre><code class="language-scala">{document}</code></pre>
+
+<pre><code>{documentOutput}</code></pre>
+
+The three charts still contain eight local nodes after coreference resolution. The quotient groups
+three mentions of Maya and two mentions of the boat. Reversing the input pairs gives the same
+partition, and an unknown mention is refused.
+
+<Evidence
+  status="Confirmed"
+  source={`Manifested public example ${sha(document)}; byte-matched output ${sha(documentOutput)}`}
+  href={sourceLink(documentPath)}
+/>
+
+These examples establish the public contracts of the three stages. Their evidence ends there;
+automatic story construction and corpus-level linguistic accuracy remain open work.
+
+Next: [inspect the reviewed story model produced after these stages →](/method/model-a-story/)

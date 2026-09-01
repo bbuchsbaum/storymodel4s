@@ -1,0 +1,69 @@
+---
+title: Evidence and maturity
+description: How this site distinguishes source facts, bounded observations, and design intent.
+sidebar:
+  order: 4
+---
+
+import BuildReceipt from '../../../components/BuildReceipt.astro';
+import Evidence from '../../../components/Evidence.astro';
+
+<BuildReceipt />
+
+This site treats documentation sentences as claims. A module name, a passing local command, and a
+published result do not carry the same evidential weight.
+
+## The three public grades
+
+<div class="status-table">
+
+| Grade | Meaning | Suitable evidence |
+| --- | --- | --- |
+| **Confirmed** | The cited revision contains the supporting source or receipt. | A type, enum case, schema, or other source fact. A behavioral claim needs immutable CI or an independent clean reproduction bound to the exact revision. |
+| **Qualified** | Observed under stated limits. | A local run, author-produced receipt, single fixture, partial platform result, or diagnostic benchmark. |
+| **Intent** | Planned or under development. | An accepted architecture, roadmap direction, or incomplete provider path. |
+
+</div>
+
+<Evidence
+  status="Confirmed"
+  source="This status vocabulary and provenance rule are part of the documentation bead's accepted editorial contract"
+ />
+
+## Use the library from source
+
+The library is currently source-only, and its APIs may change. The guide therefore gives source-tree
+commands and exact revisions. Published dependency coordinates will belong in a later release guide.
+
+A local green command describes that local run. Release, cross-platform, and deployment claims need
+their own recorded checks.
+
+## The documentation is receipted too
+
+The receipt near the top of this page names the exact source revision and generation date. Public
+source links use the same revision. A reader can tell which version of the library the site
+describes.
+
+## Publish generated artifacts byte for byte
+
+Some future scientific outputs will be self-contained HTML artifacts with their own checksums and
+behavior. The documentation framework must not rewrite, sanitize, inline, or inject scripts into
+them. Astro's `public/` path is accepted only because the build verifies byte identity.
+
+<iframe
+  class="artifact-frame"
+  src="/artifacts/verbatim-proof.html"
+  title="Self-contained HTML artifact used by the byte-identity build test"
+></iframe>
+
+The check hashes both `public/artifacts/verbatim-proof.html` and
+`dist/artifacts/verbatim-proof.html`, compares their byte lengths, and fails unless the byte buffers
+are identical. The iframe links the built raw file; it does not inline it into a Starlight page.
+
+```sh
+npm run build
+npm run verify:verbatim
+```
+
+This test covers byte preservation during publication. Scientific validity needs a separate
+receipt for the model and computation that produced the artifact.
