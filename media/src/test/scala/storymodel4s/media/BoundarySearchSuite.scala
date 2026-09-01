@@ -219,6 +219,45 @@ class BoundarySearchSuite extends FunSuite:
       ),
       "frames/stream"
     )
+    refusedAt(
+      FrameSet.join(
+        probe,
+        0,
+        PictureGeometry(64, 36),
+        framesEnvelope.tool,
+        framesEnvelope.args,
+        64L * 36L * 3L * 45L,
+        framesEnvelope.framesSha256
+      ),
+      "frames/geometry"
+    )
+    val indexedOnly = right(
+      FixtureManifest.parse(
+        text("f0-v1.manifest.json")
+          .replaceFirst("\"disposition\": \"Decoded\"", "\"disposition\": \"PacketIndexedOnly\"")
+      )
+    )
+    val probeIndexedOnly = right(
+      MediaProbe.join(
+        indexedOnly,
+        right(indexedOnly.verify(bytes)),
+        probeEnvelope.tool,
+        probeEnvelope.args,
+        right(FfprobeJson.parse(right(probeEnvelope.verifyStdout(resource(probeEnvelope.stdoutFile)))))
+      )
+    )
+    refusedAt(
+      FrameSet.join(
+        probeIndexedOnly,
+        0,
+        framesEnvelope.geometry,
+        framesEnvelope.tool,
+        framesEnvelope.args,
+        framesEnvelope.byteLength,
+        framesEnvelope.framesSha256
+      ),
+      "frames/disposition"
+    )
     val otherTool =
       right(ToolRealization.of("ffmpeg", "ffmpeg version 9.0.1", Checksum.ofText("other")))
     val under = right(
