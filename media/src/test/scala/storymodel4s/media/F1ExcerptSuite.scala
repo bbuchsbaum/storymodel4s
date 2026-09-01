@@ -56,7 +56,7 @@ class F1ExcerptSuite extends FunSuite:
     val probeEnvelope = right(ProbeEnvelope.parse(text(dir, s"$id.ffprobe-envelope.json")))
     val stdout = right(probeEnvelope.verifyStdout(resource(dir, probeEnvelope.stdoutFile)))
     // The bytes are external; the envelope's input identity stands in for them, and the manifest
-    // must agree with it.
+    // must agree with it. Nothing in this replay hashes media bytes.
     assertEquals(probeEnvelope.inputSha256, manifest.sha256)
     val probe = right(
       MediaProbe.join(
@@ -115,6 +115,7 @@ class F1ExcerptSuite extends FunSuite:
     assert(video.contiguous)
     assertEquals(video.firstPts, 0L)
     assertEquals(video.endExclusive, Some(368640L))
+    assertEquals(f1.probe.stream(0).get.startPts, Some(0L))
     assert(
       f1.probe.stream(0).get.packets.forall(p => p.pts == p.dts),
       "no B-frames: PTS equals DTS"
@@ -123,10 +124,17 @@ class F1ExcerptSuite extends FunSuite:
     assert(f1.probe.stream(0).get.packets.forall(!_.flags.corrupt))
     assertEquals(f1.probe.stream(0).get.declared.disposition, StreamDisposition.Decoded)
 
-  test("the audio index starts at a negative PTS, which is lawful, and tiles contiguously"):
+  test(
+    "the container's audio packets start at a negative PTS under an edit list this module does not represent; the packet table is recorded as found"
+  ):
     val audio = right(PacketIndex.of(f1.probe.stream(1).get))
     assertEquals(audio.entries.size, 1407)
     assertEquals(audio.firstPts, -512L)
+    assertEquals(f1.probe.stream(1).get.startPts, Some(0L))
+    // The tool reports the stream start at 0 while the first packet sits at -512: that is the AAC
+    // priming packet under the excerpt's edit list. The index records the container as found; it
+    // makes no claim that the packet at -512 is audience-facing, and no axis is built from it.
+    assertNotEquals(f1.probe.stream(1).get.startPts, Some(audio.firstPts))
     assert(audio.contiguous)
     assertEquals(audio.endExclusive, Some(1440240L))
     assertEquals(audio.timebase, right(RationalTimebase.of(1L, 48000L)))
@@ -152,7 +160,9 @@ class F1ExcerptSuite extends FunSuite:
     assert(f1.result.proposals.forall(_.at.axis == f1.result.axis.id))
     assertEquals((f1.result.examined.start, f1.result.examined.endExclusive), (0L, 368640L))
     assertEquals(f1.result.noCandidate, None)
-    assertEquals(f1.result.resolvedKernelSize, 5)
+    assertEquals(f1.result.applied.kernelSize, 5)
+    assertEquals(f1.result.applied.threshold, 27.0)
+    assertEquals(f1.result.applied.minSceneLen, 15)
 
   test(
     "the excerpt is a derivation with a recorded source, licence, and attribution, and a new identity"
@@ -244,10 +254,6 @@ class F1ExcerptSuite extends FunSuite:
       val sameFrames = live.framesSha256 == f1.framesEnvelope.framesSha256
       if decodeTool == f1.framesEnvelope.tool then
         assert(sameFrames, "same decoder build must decode to the recorded bytes")
-      else if !sameFrames then
-        println(
-          s"[media] live ffmpeg ${decodeTool.versionLine} decodes F1 to ${live.framesSha256.short()}, recorded ${f1.framesEnvelope.framesSha256.short()}: decoder drift"
-        )
       val issued = DetectorRequest.issue(live, f1.request.recipe, f1.request.requestId)
       val reqPath = dir.resolve("request.json")
       val outPath = dir.resolve("outcome.json")
@@ -262,20 +268,16 @@ class F1ExcerptSuite extends FunSuite:
       val worker = right(
         ToolRealization.of(
           "scenedetect-worker",
-          Vector("scenedetect", "python", "numpy", "opencv")
-            .flatMap(k => liveOutcome.runtime.get(k).map(v => s"$k $v"))
-            .mkString(" "),
+          liveOutcome.runtimeLine,
           Checksum.ofBytes(Files.readAllBytes(script.get))
         )
       )
       val liveResult = right(BoundarySearch.join(live, issued, liveOutcome, worker))
+      // Under decoder drift the frames differ and the proposals are not compared; the court then
+      // establishes only that the pipeline joins.
       if sameFrames then
         assertEquals(liveResult.proposals.map(_.at.at), f1.result.proposals.map(_.at.at))
         assertEquals(liveResult.proposals.map(_.score), f1.result.proposals.map(_.score))
-      else
-        println(
-          s"[media] live proposals at ${liveResult.proposals.map(_.at.at)} vs recorded ${f1.result.proposals.map(_.at.at)} (decoder drift; not compared)"
-        )
     finally
       Files
         .walk(dir)

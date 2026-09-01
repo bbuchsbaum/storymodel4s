@@ -1,4 +1,16 @@
 {
+  "applied": {
+    "filterMode": "MERGE",
+    "kernelSize": 5,
+    "minSceneLen": 2,
+    "threshold": 15.0,
+    "weights": {
+      "deltaEdges": 0.0,
+      "deltaHue": 1.0,
+      "deltaLum": 1.0,
+      "deltaSat": 1.0
+    }
+  },
   "coverage": {
     "observed": 45,
     "requested": 45
@@ -13,7 +25,6 @@
     "kernelSize": null,
     "lumaOnly": false,
     "minSceneLen": 2,
-    "resolvedKernelSize": 5,
     "threshold": 15.0,
     "type": "ContentDetector",
     "weights": {

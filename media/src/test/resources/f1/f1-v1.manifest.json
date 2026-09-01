@@ -22,7 +22,7 @@
     "innerSha256": "f78f39603e6774907f2faafabf26a667f4a6fc31769ec304a8a8f7c62d280508",
     "innerByteLength": 64657027,
     "innerStreams": "h264 Constrained Baseline 320x180 yuv420p at 24 fps on timebase 1/24 (14315 frames, 596.458 s); aac LC 48000 Hz stereo",
-    "obtained": "2026-09-01, verified against the archive listing"
+    "obtained": "2026-09-01 from the download URL; the digests are self-computed (Blender publishes no digest), so they identify what was obtained, not what was published"
   },
   "derivation": {
     "script": "media/tools/derive_f1.sh",

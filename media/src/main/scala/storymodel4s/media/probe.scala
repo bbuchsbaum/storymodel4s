@@ -35,11 +35,11 @@ final class ProbedPacket private[media] (
 final class ProbedStream private[media] (
     val declared: DeclaredStream,
     val codecName: String,
+    val startPts: Option[Long],
     val packets: Vector[ProbedPacket]
 ):
   def index: Int = declared.index
   def timebase: RationalTimebase = declared.timebase
-  def records: Vector[CallerRuntimePacketRecord] = packets.map(_.record)
   override def toString: String =
     s"ProbedStream(${declared.index}, $codecName, ${packets.size} packets)"
 
@@ -119,15 +119,10 @@ object PacketIndex:
               s"stream ${stream.index} packet $k has no PTS; a packet-to-PTS index cannot invent one"
             )
           )
-      withPts = presented.collect { case (p, k) =>
-        (
-          p.pts match
-            case TimestampField.Present(v) => v
-            case TimestampField.Missing    => 0L
-          ,
-          k,
-          p
-        )
+      withPts = presented.flatMap { case (p, k) =>
+        p.pts match
+          case TimestampField.Present(v) => Some((v, k, p))
+          case TimestampField.Missing    => None
       }
       ordered = withPts.sortBy(_._1)
       _ <- ordered.iterator.sliding(2).collectFirst {
@@ -339,7 +334,7 @@ object MediaProbe:
           case (acc, (p, k)) =>
             acc.flatMap(v => probedPacket(declared.index, k, p, receipt).map(v :+ _))
         }
-    yield new ProbedStream(declared, raw.codecName, packets)
+    yield new ProbedStream(declared, raw.codecName, raw.startPts, packets)
 
   private def checkKind(declared: DeclaredStream, raw: RawStream): Either[DomainError, Unit] =
     val expected = declared.kind match

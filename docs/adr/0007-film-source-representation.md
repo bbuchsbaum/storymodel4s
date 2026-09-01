@@ -651,13 +651,25 @@ Bead `bd-01M1FEN59CZCCR0SR3B6MZ1KYB` (first acquisition court, landing B) adds t
   outcome or the join refuses (ledger §5: no library default stands in for a recorded value). The
   worker is untrusted (§6 step 1); it echoes request identity, frame digest, count, geometry and
   recipe, and the join checks every echo (§6 step 2).
-- `BoundaryLocalizationProposal` and `BoundarySearchResult` — the typed candidate of §6's output
-  table, row "shot, track, interval, identity, boundary": a boundary-existence and localization
-  proposal on `BoundaryLayer.Shot`, at the instant of the first frame of the new shot, with the
-  window between the two frames and the raw score. It carries no `ShotMorphology` and no extent
-  claim, so it is not a `BoundaryClaim` and offers no method to one (law 8; ledger §5 forbidden
-  authority). Empty detector output yields `BoundarySearchCoverage.ExaminedNoCandidate` on the
+- `AppliedRecipe` — what the library installed, read back from the constructed detector's own
+  state rather than echoed from the request; the join refuses unless it satisfies the recipe, and
+  an automatic kernel size must come back as a positive resolved value. `FrameMetrics` — raw
+  per-frame detector values. The outcome's claimed runtime must render to the worker
+  `ToolRealization`'s version line or the join refuses; the worker's interpreter and wheel bytes
+  are not hashed, only its script.
+- `BoundaryLocalizationProposal`, `BoundarySearch` and `BoundarySearchResult` — the typed
+  candidate of §6's output table, row "shot, track, interval, identity, boundary": a
+  boundary-existence and localization proposal on `BoundaryLayer.Shot`, at the instant of the
+  first frame after a visual discontinuity, with the window between the two frames and the raw
+  score. It carries no `ShotMorphology` and no extent claim, so it is not a `BoundaryClaim` and
+  offers no method to one (law 8; ledger §5 forbidden authority); its `BoundaryId` binds the
+  recipe. Empty detector output yields `BoundarySearchCoverage.ExaminedNoCandidate` on the
   examined extent and can never construct a negative claim (law 10). Authority is `Draft`.
+  The axis is the picture stream's native presentation clock admitted as the edition playback
+  axis under one recorded assumption, named in the receipt: that stream's edit list is the
+  identity. The join checks the evidence it has (the tool's reported stream start equals the
+  first presented PTS and no packet was discarded) and refuses otherwise; a checked
+  `TrackComposition` receipt, and any non-identity edit list, belong to the E0 court.
 
 The worker itself lives at `media/worker/` as a uv-locked Python project pinned to the ledger's
 `scenedetect-headless` 0.7.1 wheel digest; it never opens a container and never computes a

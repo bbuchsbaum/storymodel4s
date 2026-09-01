@@ -1,7 +1,7 @@
 package storymodel4s.media
 
 import java.nio.charset.StandardCharsets
-import java.nio.file.Files
+import java.nio.file.{Files, Path}
 import munit.FunSuite
 import scala.concurrent.duration.*
 import storymodel4s.core.{
@@ -46,8 +46,8 @@ class MediaProbeSuite extends FunSuite:
       case Right(v)    => fail(s"expected InvalidFormat $kind, got $v")
 
   private lazy val bytes: Array[Byte] = resource("f0-v1.mov")
-  private lazy val manifest: FixtureManifest =
-    right(FixtureManifest.parse(text("f0-v1.manifest.json")))
+  private lazy val manifestText: String = text("f0-v1.manifest.json")
+  private lazy val manifest: FixtureManifest = right(FixtureManifest.parse(manifestText))
   private lazy val envelope: ProbeEnvelope =
     right(ProbeEnvelope.parse(text("f0-v1.ffprobe-envelope.json")))
   private lazy val stdout: String = right(envelope.verifyStdout(resource(envelope.stdoutFile)))
@@ -61,6 +61,7 @@ class MediaProbeSuite extends FunSuite:
 
   private def video: ProbedStream = probe.stream(0).get
   private def audio: ProbedStream = probe.stream(1).get
+  private def flags(raw: String): PacketFlags = right(PacketFlags.parse(raw))
 
   /** Edit the video packet at `pts`. */
   private def editVideo(pts: Long)(f: RawPacket => RawPacket): FfprobeOutput =
@@ -99,6 +100,7 @@ class MediaProbeSuite extends FunSuite:
     assert(index.contiguous)
     assertEquals(index.timebase, right(RationalTimebase.of(1L, 24000L)))
     assertEquals(index.endExclusive, Some(48000L))
+    assertEquals(video.startPts, Some(0L))
     assert(video.packets.forall(_.flags.keyframe))
     assert(video.packets.forall(p => p.pts == p.dts), "rawvideo: PTS equals DTS on every packet")
 
@@ -132,7 +134,10 @@ class MediaProbeSuite extends FunSuite:
     val underOtherTool = right(MediaProbe.join(manifest, input, otherTool, envelope.args, output))
     assertNotEquals(underOtherTool.receipt.identity, probe.receipt.identity)
     assertNotEquals(underOtherTool.identity, probe.identity)
-    assertNotEquals(underOtherTool.stream(0).get.records.head.identity, video.records.head.identity)
+    assertNotEquals(
+      underOtherTool.stream(0).get.packets.head.record.identity,
+      video.packets.head.record.identity
+    )
     val underOtherArgs =
       right(
         MediaProbe.join(manifest, input, envelope.tool, envelope.args :+ "-count_frames", output)
@@ -146,17 +151,32 @@ class MediaProbeSuite extends FunSuite:
 
   test("an input that is not the fixture refuses before any packet is read"):
     refusedAt(
-      MediaProbe
-        .join(manifest, Checksum.ofText("not the fixture"), envelope.tool, envelope.args, output),
+      MediaProbe.join(
+        manifest,
+        Checksum.ofText("not the fixture"),
+        envelope.tool,
+        envelope.args,
+        output
+      ),
       "probe/input"
     )
 
   test("an observed stream with no declaration refuses; a declared stream the tool omits refuses"):
-    val extra = RawStream(2, "subtitle", "mov_text", "1/1000", None, None, None, None, None)
+    val extra =
+      RawStream(2, "subtitle", "mov_text", "1/1000", None, None, None, None, None, Some(0L))
     refusedAt(join(output.copy(streams = output.streams :+ extra)), "probe/stream")
     refusedAt(join(output.copy(streams = output.streams.filter(_.index != 1))), "probe/stream")
     val stray = output.packets.head.copy(streamIndex = 7)
     refusedAt(join(output.copy(packets = stray +: output.packets)), "probe/packet")
+
+  test("a manifest that declares one stream index twice, or no stream, is not a manifest"):
+    val twice = manifestText.replaceFirst("\"index\": 1,", "\"index\": 0,")
+    assert(twice != manifestText)
+    FixtureManifest.parse(twice) match
+      case Left(DomainError.DuplicateId(kind, id)) =>
+        assertEquals(kind, "stream index")
+        assertEquals(id, "0")
+      case other => fail(s"expected a duplicate-index refusal, got $other")
 
   test(
     "codec, kind, timebase, picture format and geometry, and audio parameters must agree with the declaration"
@@ -207,11 +227,11 @@ class MediaProbeSuite extends FunSuite:
     "packet flags are typed: a corrupt packet refuses the index, a discarded packet is not presented"
   ):
     invalidFormat(PacketFlags.parse("KDX"), "packets[].flags")
-    val corrupt =
-      right(join(editVideo(2000L)(_.copy(flags = PacketFlags(true, false, true, "K_C")))))
+    assertEquals(flags("K_C").corrupt, true)
+    assertEquals(flags("_D_").discard, true)
+    val corrupt = right(join(editVideo(2000L)(_.copy(flags = flags("K_C")))))
     refusedAt(PacketIndex.of(corrupt.stream(0).get), "index/corrupt")
-    val discard =
-      right(join(editVideo(2000L)(_.copy(flags = PacketFlags(true, true, false, "KD_")))))
+    val discard = right(join(editVideo(2000L)(_.copy(flags = flags("KD_")))))
     val index = right(PacketIndex.of(discard.stream(0).get))
     assertEquals(index.discarded, 1)
     assertEquals(index.entries.size, 44)
@@ -225,7 +245,7 @@ class MediaProbeSuite extends FunSuite:
   test("an Unsupported stream is declared and probed but never indexed"):
     val declaredUnsupported = right(
       FixtureManifest.parse(
-        text("f0-v1.manifest.json").replaceFirst(
+        manifestText.replaceFirst(
           "\"disposition\": \"PacketIndexedOnly\"",
           "\"disposition\": \"Unsupported\""
         )
@@ -238,7 +258,7 @@ class MediaProbeSuite extends FunSuite:
     assertNotEquals(joined.identity, probe.identity, "disposition enters the probe identity")
 
   test("no draft record can become runtime-observed; the receipt binds algorithm, tool, and input"):
-    (video.records ++ audio.records).foreach { p =>
+    (video.packets ++ audio.packets).map(_.record).foreach { p =>
       assertEquals(p.authority, ObservationAuthority.Draft)
       refusedAt(CallerRuntimePacketRecord.promoteToRuntime(p), "observation/authority")
     }
@@ -261,15 +281,11 @@ class MediaProbeSuite extends FunSuite:
     assert(ToolRealization.of("", "v", Checksum.ofText("x")).isLeft)
     assert(ToolRealization.of("ffprobe", "line one\nline two", Checksum.ofText("x")).isLeft)
     invalidFormat(
-      FixtureManifest.parse(
-        text("f0-v1.manifest.json").replaceFirst("fixture-manifest", "other-schema")
-      ),
+      FixtureManifest.parse(manifestText.replaceFirst("fixture-manifest", "other-schema")),
       "schema"
     )
     invalidFormat(
-      FixtureManifest.parse(
-        text("f0-v1.manifest.json").replaceFirst("\"tier\": \"F0\"", "\"tier\": \"F9\"")
-      ),
+      FixtureManifest.parse(manifestText.replaceFirst("\"tier\": \"F0\"", "\"tier\": \"F9\"")),
       "tier"
     )
     refusedAt(
@@ -278,23 +294,15 @@ class MediaProbeSuite extends FunSuite:
     )
 
   test(
-    "a subprocess that exits non-zero, or overruns its timeout, refuses rather than returning output"
+    "a tool that exits non-zero, overruns its timeout, or is absent refuses rather than returning output"
   ):
     val failing = right(Subprocess.run(Vector("sh", "-c", "echo partial; exit 3")))
     assertEquals(failing.exitCode, 3)
-    refusedAt(
-      Subprocess.run(Vector("sh", "-c", "echo partial; exit 3")).flatMap { o =>
-        if o.exitCode == 0 then Right(o.stdout)
-        else Left(DomainError.InvariantViolation("ffprobe/exit", o.stderr))
-      },
-      "ffprobe/exit"
-    )
+    // `sh` invoked as ffprobe rejects the canonical arguments: the invoke path refuses on exit code.
+    refusedAt(Ffprobe.invoke(Path.of("/bin/sh"), Path.of("/dev/null")), "ffprobe/exit")
     refusedAt(Subprocess.run(Vector("sh", "-c", "sleep 5"), 200.millis), "subprocess/timeout")
     refusedAt(Subprocess.run(Vector("/nonexistent/tool-for-this-court")), "subprocess/start")
-    refusedAt(
-      ToolRealization.observe("ffprobe", java.nio.file.Path.of("/nonexistent/ffprobe")),
-      "tool/path"
-    )
+    refusedAt(ToolRealization.observe("ffprobe", Path.of("/nonexistent/ffprobe")), "tool/path")
 
   test("live ffprobe, when this machine has one, reproduces the recorded packet table"):
     val located = Ffprobe.locate()

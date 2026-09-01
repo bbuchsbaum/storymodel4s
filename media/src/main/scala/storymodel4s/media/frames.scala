@@ -19,11 +19,19 @@ object Ffmpeg:
   val InputOptions: Vector[String] =
     Vector("-hide_banner", "-loglevel", "error", "-y", "-protocol_whitelist", "file")
 
+  /** The colour conversion, declared: an untagged YUV source is read as BT.601 limited range and
+    * written full range. Stated in the arguments so no library default stands in for it (ledger
+    * §5); for an RGB source the matrix is unused and the output is unchanged.
+    */
+  val ColourConversion: String = "scale=in_color_matrix=bt601:in_range=tv:out_range=pc"
+
   /** Options placed between the input path and the output path. */
   def outputOptions(streamIndex: Int): Vector[String] =
     Vector(
       "-map",
       s"0:$streamIndex",
+      "-vf",
+      ColourConversion,
       "-f",
       "rawvideo",
       "-pix_fmt",

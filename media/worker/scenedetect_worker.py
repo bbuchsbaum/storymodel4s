@@ -11,6 +11,10 @@ and reports frame ordinals only; the JVM adapter re-anchors ordinals to PTS thro
 packet index. The FrameTimecode it hands the detector is a counter the API requires, at a nominal
 rate the request declares, and is not evidence about time.
 
+The outcome carries two views of the recipe: ``detector`` echoes the request (so the adapter can
+see what was asked), and ``applied`` is read back from the constructed detector's own state (so
+the adapter can check what the library actually installed). The adapter refuses when they differ.
+
 Usage: scenedetect_worker.py REQUEST_JSON OUTCOME_JSON
 """
 
@@ -31,6 +35,7 @@ REQUEST_SCHEMA = "storymodel4s.media.detector-request"
 PIXEL_FORMAT = "bgr24"
 BYTES_PER_PIXEL = 3
 FILTER_MODES = {"MERGE": FlashFilter.Mode.MERGE, "SUPPRESS": FlashFilter.Mode.SUPPRESS}
+FILTER_MODE_NAMES = {v: k for k, v in FILTER_MODES.items()}
 
 
 def fail(reason):
@@ -55,9 +60,33 @@ def build_detector(spec):
     )
 
 
-def resolved_kernel_size(detector):
+def applied_recipe(detector):
+    """What the library installed, read from the detector's own state (scenedetect 0.7.1).
+
+    These are private attributes; the wheel is hash-pinned, so their names are stable for this
+    court. A missing attribute is reported as null and the adapter refuses.
+    """
+    weights = getattr(detector, "_weights", None)
     kernel = getattr(detector, "_kernel", None)
-    return None if kernel is None else int(kernel.shape[0])
+    flash = getattr(detector, "_flash_filter", None)
+    return {
+        "threshold": getattr(detector, "_threshold", None),
+        "weights": None
+        if weights is None
+        else {
+            "deltaHue": float(weights.delta_hue),
+            "deltaSat": float(weights.delta_sat),
+            "deltaLum": float(weights.delta_lum),
+            "deltaEdges": float(weights.delta_edges),
+        },
+        "kernelSize": None if kernel is None else int(kernel.shape[0]),
+        "minSceneLen": None
+        if flash is None
+        else int(getattr(flash, "_filter_length", -1)),
+        "filterMode": None
+        if flash is None
+        else FILTER_MODE_NAMES.get(getattr(flash, "_mode", None)),
+    }
 
 
 def main(argv):
@@ -136,7 +165,8 @@ def main(argv):
             "height": height,
             "pixelFormat": PIXEL_FORMAT,
         },
-        "detector": dict(spec, resolvedKernelSize=resolved_kernel_size(detector)),
+        "detector": dict(spec),
+        "applied": applied_recipe(detector),
         "metricKeys": keys,
         "metrics": metrics,
         "cuts": sorted(set(cuts)),

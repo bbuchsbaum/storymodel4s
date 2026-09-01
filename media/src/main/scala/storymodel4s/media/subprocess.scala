@@ -60,15 +60,19 @@ private[media] object Subprocess:
     val candidate = new java.io.File("/dev/null")
     if candidate.exists() then candidate else new java.io.File("NUL")
 
-  /** First executable named `name` on `PATH`, or the explicit override in `envVar`. */
+  /** The explicit override in `envVar` when set (authoritative: a set but unusable override yields
+    * `None` rather than a silent fallback to another binary), else the first executable named
+    * `name` on `PATH`.
+    */
   def locate(name: String, envVar: String): Option[Path] =
-    val explicit = Option(System.getenv(envVar)).map(_.trim).filter(_.nonEmpty).map(Path.of(_))
-    explicit.filter(p => Files.isExecutable(p)).orElse {
-      val pathEnv = Option(System.getenv("PATH")).getOrElse("")
-      pathEnv
-        .split(java.io.File.pathSeparator)
-        .iterator
-        .filter(_.nonEmpty)
-        .map(dir => Path.of(dir, name))
-        .find(p => Files.isRegularFile(p) && Files.isExecutable(p))
-    }
+    Option(System.getenv(envVar)).map(_.trim).filter(_.nonEmpty) match
+      case Some(explicit) =>
+        Some(Path.of(explicit)).filter(p => Files.isRegularFile(p) && Files.isExecutable(p))
+      case None =>
+        val pathEnv = Option(System.getenv("PATH")).getOrElse("")
+        pathEnv
+          .split(java.io.File.pathSeparator)
+          .iterator
+          .filter(_.nonEmpty)
+          .map(dir => Path.of(dir, name))
+          .find(p => Files.isRegularFile(p) && Files.isExecutable(p))

@@ -12,8 +12,8 @@
     "binarySha256": "14c12cd5dcbc0d75c83085296b27142a4abc61a320a97a5408f7048fa7cbd630",
     "realization": "local Homebrew build (--enable-gpl --enable-version3 --enable-libx264 per -buildconf). Not the nominated FFmpeg 9.0.1 LGPL-only recipe. Output authority: Draft."
   },
-  "args": ["-hide_banner", "-loglevel", "error", "-y", "-protocol_whitelist", "file", "-map", "0:0", "-f", "rawvideo", "-pix_fmt", "bgr24", "-fps_mode", "passthrough"],
-  "preprocessing": "source rgb24 32x18 converted to bgr24 by libswscale; no scaling, no crop, no rotation, no frame duplication or dropping (passthrough); every indexed packet yields exactly one frame",
+  "args": ["-hide_banner", "-loglevel", "error", "-y", "-protocol_whitelist", "file", "-map", "0:0", "-vf", "scale=in_color_matrix=bt601:in_range=tv:out_range=pc", "-f", "rawvideo", "-pix_fmt", "bgr24", "-fps_mode", "passthrough"],
+  "preprocessing": "source rgb24 32x18 converted to bgr24 by libswscale with the matrix and ranges declared in the arguments (bt601, limited in, full out; unused for an RGB source); no scaling, no crop, no rotation, no frame duplication or dropping (passthrough); every indexed packet yields exactly one frame",
   "frames": {
     "count": 45,
     "width": 32,

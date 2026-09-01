@@ -17,13 +17,25 @@ import storymodel4s.core.{
   SourceDerivationReceipt
 }
 
+/** PySceneDetect's flash-filter mode, named so a recipe cannot carry an unnamed integer. */
 enum FlashFilterMode:
   case Merge, Suppress
 
+object FlashFilterMode:
+  def parse(raw: String): Either[DomainError, FlashFilterMode] = raw match
+    case "MERGE"    => Right(FlashFilterMode.Merge)
+    case "SUPPRESS" => Right(FlashFilterMode.Suppress)
+    case other => Left(DomainError.InvalidFormat("detector.filterMode", other, "MERGE or SUPPRESS"))
+
+  def render(mode: FlashFilterMode): String = mode match
+    case FlashFilterMode.Merge    => "MERGE"
+    case FlashFilterMode.Suppress => "SUPPRESS"
+
 /** Every ContentDetector parameter, declared. `kernelSize` of `None` asks the library to resolve it
-  * from the frame size; the resolved value must then come back in the outcome or the join refuses,
-  * because no library default may stand in for a recorded value (ledger §5). `frameCounterFps` is
-  * the rate of the counter the detector API demands; it is not evidence.
+  * from the frame size; the resolved value must then come back in the outcome's applied recipe or
+  * the join refuses, because no library default may stand in for a recorded value (ledger §5).
+  * `frameCounterFps` is the rate of the counter the detector API demands; it is not evidence and
+  * cannot move a cut.
   */
 final case class ContentDetectorRecipe(
     threshold: Double,
@@ -67,9 +79,7 @@ final case class ContentDetectorRecipe(
       ),
       "lumaOnly" -> Json.fromBoolean(lumaOnly),
       "kernelSize" -> kernelSize.fold(Json.Null)(Json.fromInt),
-      "filterMode" -> Json.fromString(filterMode match
-        case FlashFilterMode.Merge    => "MERGE"
-        case FlashFilterMode.Suppress => "SUPPRESS"),
+      "filterMode" -> Json.fromString(FlashFilterMode.render(filterMode)),
       "frameCounterFps" -> Json.fromDoubleOrNull(frameCounterFps)
     )
 
@@ -90,12 +100,9 @@ object ContentDetectorRecipe:
       edges <- MediaJson.double(w.downField("deltaEdges"), "detector.weights.deltaEdges")
       lumaOnly <- MediaJson.boolean(c.downField("lumaOnly"), "detector.lumaOnly")
       kernel <- MediaJson.optionalInt(c.downField("kernelSize"), "detector.kernelSize")
-      mode <- MediaJson.string(c.downField("filterMode"), "detector.filterMode").flatMap {
-        case "MERGE"    => Right(FlashFilterMode.Merge)
-        case "SUPPRESS" => Right(FlashFilterMode.Suppress)
-        case other      =>
-          Left(DomainError.InvalidFormat("detector.filterMode", other, "MERGE or SUPPRESS"))
-      }
+      mode <- MediaJson
+        .string(c.downField("filterMode"), "detector.filterMode")
+        .flatMap(FlashFilterMode.parse)
       fps <- MediaJson.double(c.downField("frameCounterFps"), "detector.frameCounterFps")
     yield ContentDetectorRecipe(
       threshold,
@@ -109,6 +116,47 @@ object ContentDetectorRecipe:
       mode,
       fps
     )
+
+/** What the library installed, read back from the constructed detector's own state rather than
+  * echoed from the request. Why: an echo proves the worker copied the request; this proves what
+  * ran. The join refuses when it does not satisfy the recipe. `kernelSize` is always the resolved
+  * value, so an automatic kernel becomes a recorded one.
+  */
+final case class AppliedRecipe(
+    threshold: Double,
+    minSceneLen: Int,
+    deltaHue: Double,
+    deltaSat: Double,
+    deltaLum: Double,
+    deltaEdges: Double,
+    kernelSize: Int,
+    filterMode: FlashFilterMode
+):
+  /** Equal on every declared field, kernel positive, and equal to the declared kernel when one was
+    * declared.
+    */
+  def satisfies(recipe: ContentDetectorRecipe): Boolean =
+    threshold == recipe.threshold && minSceneLen == recipe.minSceneLen &&
+      deltaHue == recipe.deltaHue && deltaSat == recipe.deltaSat && deltaLum == recipe.deltaLum &&
+      deltaEdges == recipe.deltaEdges && filterMode == recipe.filterMode &&
+      kernelSize > 0 && recipe.kernelSize.forall(_ == kernelSize)
+
+object AppliedRecipe:
+  /** A `null` in any field means the worker could not read that value; parsing refuses. */
+  def parse(c: ACursor): Either[DomainError, AppliedRecipe] =
+    for
+      threshold <- MediaJson.double(c.downField("threshold"), "applied.threshold")
+      minSceneLen <- MediaJson.int(c.downField("minSceneLen"), "applied.minSceneLen")
+      w = c.downField("weights")
+      hue <- MediaJson.double(w.downField("deltaHue"), "applied.weights.deltaHue")
+      sat <- MediaJson.double(w.downField("deltaSat"), "applied.weights.deltaSat")
+      lum <- MediaJson.double(w.downField("deltaLum"), "applied.weights.deltaLum")
+      edges <- MediaJson.double(w.downField("deltaEdges"), "applied.weights.deltaEdges")
+      kernel <- MediaJson.int(c.downField("kernelSize"), "applied.kernelSize")
+      mode <- MediaJson
+        .string(c.downField("filterMode"), "applied.filterMode")
+        .flatMap(FlashFilterMode.parse)
+    yield AppliedRecipe(threshold, minSceneLen, hue, sat, lum, edges, kernel, mode)
 
 /** The request the adapter issues to the worker: which frames (by identity, count, and geometry)
   * and which recipe. The worker echoes all of it back and the join checks the echo.
@@ -210,6 +258,9 @@ object DetectorEnvelope:
         .flatMap(Checksum.from)
     yield DetectorEnvelope(fixtureId, worker, requestFile, outcomeFile, outcomeSha)
 
+/** Raw detector metrics for one frame ordinal. A frame with no values (the first frame has no
+  * predecessor) was observed with nothing to report, which is not the same as unobserved.
+  */
 final case class FrameMetrics(ordinal: Int, values: Map[String, Double])
 
 /** What the worker returned, parsed and nothing more. Believing any of it is the join's job. */
@@ -221,17 +272,24 @@ final case class DetectorOutcome(
     geometry: PictureGeometry,
     pixelFormat: String,
     recipe: ContentDetectorRecipe,
-    resolvedKernelSize: Option[Int],
+    applied: AppliedRecipe,
     metricKeys: Vector[String],
     metrics: Vector[FrameMetrics],
     cuts: Vector[Int],
     coverageRequested: Int,
     coverageObserved: Int
-)
+):
+  /** The runtime the worker claims, in the one form a worker `ToolRealization` version line takes.
+    */
+  def runtimeLine: String = DetectorOutcome.runtimeLine(runtime)
 
 object DetectorOutcome:
   val Schema: String = "storymodel4s.media.detector-outcome"
   val ScoreKey: String = "content_val"
+  val RuntimeKeys: Vector[String] = Vector("scenedetect", "python", "numpy", "opencv")
+
+  def runtimeLine(runtime: Map[String, String]): String =
+    RuntimeKeys.flatMap(k => runtime.get(k).map(v => s"$k $v")).mkString(" ")
 
   def parse(text: String): Either[DomainError, DetectorOutcome] =
     for
@@ -240,18 +298,24 @@ object DetectorOutcome:
       _ <- MediaJson.expectSchema(c, Schema, 1)
       requestId <- MediaJson.string(c.downField("requestId"), "requestId")
       runtime <- MediaJson.stringMap(c.downField("runtime"), "runtime")
+      _ <-
+        if RuntimeKeys.forall(runtime.contains) then Right(())
+        else
+          Left(
+            DomainError.InvalidFormat(
+              "runtime",
+              runtime.keys.toVector.sorted.mkString(","),
+              s"expected ${RuntimeKeys.mkString(", ")}"
+            )
+          )
       f = c.downField("frames")
       sha <- MediaJson.string(f.downField("sha256"), "frames.sha256").flatMap(Checksum.from)
       count <- MediaJson.int(f.downField("count"), "frames.count")
       width <- MediaJson.int(f.downField("width"), "frames.width")
       height <- MediaJson.int(f.downField("height"), "frames.height")
       pix <- MediaJson.string(f.downField("pixelFormat"), "frames.pixelFormat")
-      d = c.downField("detector")
-      recipe <- ContentDetectorRecipe.parse(d)
-      resolved <- MediaJson.optionalInt(
-        d.downField("resolvedKernelSize"),
-        "detector.resolvedKernelSize"
-      )
+      recipe <- ContentDetectorRecipe.parse(c.downField("detector"))
+      applied <- AppliedRecipe.parse(c.downField("applied"))
       keysJson <- MediaJson.array(c.downField("metricKeys"), "metricKeys")
       keys <- MediaJson.traverse(keysJson)(j => MediaJson.string(j.hcursor, "metricKeys[]"))
       rowsJson <- MediaJson.array(c.downField("metrics"), "metrics")
@@ -269,7 +333,7 @@ object DetectorOutcome:
       PictureGeometry(width, height),
       pix,
       recipe,
-      resolved,
+      applied,
       keys,
       rows,
       cuts,
@@ -295,7 +359,8 @@ object DetectorOutcome:
   * discontinuity between two consecutively presented frames, located at the instant the second was
   * presented, with the window between them and the detector's raw score. It carries no transition
   * morphology and no extent claim, so it is not a `BoundaryClaim` and offers no path to one;
-  * morphology is a separate court with separately typed candidates (ledger §5).
+  * morphology is a separate court with separately typed candidates (ledger §5). Its id binds the
+  * recipe, so a proposal under another recipe at the same instant is another proposal.
   */
 final class BoundaryLocalizationProposal private[media] (
     val id: BoundaryId,
@@ -310,6 +375,12 @@ final class BoundaryLocalizationProposal private[media] (
 
 /** One detector search over one frame set, joined. Empty output is `ExaminedNoCandidate` on the
   * examined extent and never a negative-boundary claim. Authority is `Draft`.
+  *
+  * The axis is the picture stream's native presentation clock admitted as the edition playback axis
+  * under one recorded assumption: that stream's edit list is the identity. The join checks the
+  * evidence it has for that (the tool's reported stream start equals the first presented PTS and
+  * nothing was discarded) and refuses otherwise. A checked track-composition receipt is the E0
+  * court's, not this one's.
   */
 final class BoundarySearchResult private[media] (
     val frames: FrameSet,
@@ -319,7 +390,7 @@ final class BoundarySearchResult private[media] (
     val proposals: Vector[BoundaryLocalizationProposal],
     val worker: ToolRealization,
     val recipe: ContentDetectorRecipe,
-    val resolvedKernelSize: Int,
+    val applied: AppliedRecipe,
     val receipt: SourceDerivationReceipt,
     val identity: Checksum
 ):
@@ -333,21 +404,31 @@ final class BoundarySearchResult private[media] (
     s"BoundarySearchResult(${frames.probe.manifest.fixtureId}, ${proposals.size} proposals, draft, ${identity.short()})"
 
 object BoundarySearch:
-  val Algorithm: String = "content-detector-boundary-search/v1"
+  val Algorithm: String = "content-detector-boundary-search/v2"
+  val EditListAssumption: String = "edit-list:identity-assumed"
 
   def parameters(
       worker: ToolRealization,
       recipe: ContentDetectorRecipe,
       requestId: String
   ): String =
-    Vector("worker", worker.identity.hex, "recipe", recipe.identity.hex, "request", requestId)
-      .mkString(" ")
+    Vector(
+      "worker",
+      worker.identity.hex,
+      "recipe",
+      recipe.identity.hex,
+      "request",
+      requestId,
+      EditListAssumption
+    ).mkString(" ")
 
   /** Join the issued request and the worker's outcome to the frame set. Refuses when the request
-    * does not describe these frames; when the outcome answers a different request, different
-    * frames, or a different recipe; when coverage is partial; when an automatic kernel came back
-    * unresolved; when a cut has no preceding frame or is repeated; or when a cut has no score.
-    * Every proposal's instant comes from the packet index.
+    * does not describe these frames; when the outcome answers a different request, other frames, a
+    * different recipe, or claims a runtime other than the worker realization it is joined under;
+    * when what the library applied does not satisfy the recipe; when coverage is partial; when a
+    * cut has no preceding frame or is repeated; when a cut has no score; or when the picture
+    * stream's reported start disagrees with its presented packets. Every proposal's instant comes
+    * from the packet index.
     */
   def join(
       frames: FrameSet,
@@ -357,11 +438,12 @@ object BoundarySearch:
   ): Either[DomainError, BoundarySearchResult] =
     for
       _ <- requestDescribes(frames, request)
-      _ <- outcomeAnswers(frames, request, outcome)
-      resolved <- resolvedKernel(request.recipe, outcome)
+      _ <- outcomeAnswers(frames, request, outcome, worker)
+      _ <- appliedMatches(request.recipe, outcome.applied)
       _ <- coverage(frames, outcome)
       _ <- metricsComplete(frames, outcome)
       _ <- cutsLawful(frames, outcome)
+      _ <- identityEditList(frames)
       endExclusive <- frames.index.endExclusive.toRight(
         DomainError.InvariantViolation(
           "boundary/extent",
@@ -396,7 +478,7 @@ object BoundarySearch:
       proposals,
       worker,
       request.recipe,
-      resolved,
+      outcome.applied,
       receipt,
       ContentAddress.digest(
         Vector("boundary-search", receipt.identity.hex) ++ proposals.map(_.identity.hex)
@@ -421,7 +503,8 @@ object BoundarySearch:
   private def outcomeAnswers(
       frames: FrameSet,
       request: DetectorRequest,
-      outcome: DetectorOutcome
+      outcome: DetectorOutcome,
+      worker: ToolRealization
   ): Either[DomainError, Unit] =
     if outcome.requestId != request.requestId then
       Left(
@@ -443,33 +526,30 @@ object BoundarySearch:
       Left(
         DomainError.InvariantViolation(
           "boundary/recipe",
-          s"outcome ran recipe ${outcome.recipe.identity.short()}, request issued ${request.recipe.identity.short()}"
+          s"outcome echoes recipe ${outcome.recipe.identity.short()}, request issued ${request.recipe.identity.short()}"
+        )
+      )
+    else if outcome.runtimeLine != worker.versionLine then
+      Left(
+        DomainError.InvariantViolation(
+          "boundary/worker",
+          s"outcome claims runtime '${outcome.runtimeLine}', joined under worker '${worker.versionLine}'"
         )
       )
     else Right(())
 
-  private def resolvedKernel(
+  private def appliedMatches(
       recipe: ContentDetectorRecipe,
-      outcome: DetectorOutcome
-  ): Either[DomainError, Int] =
-    (recipe.kernelSize, outcome.resolvedKernelSize) match
-      case (Some(k), Some(r)) if k == r => Right(k)
-      case (Some(k), None)              => Right(k)
-      case (None, Some(r)) if r > 0     => Right(r)
-      case (Some(k), Some(r))           =>
-        Left(
-          DomainError.InvariantViolation(
-            "recipe/resolved",
-            s"recipe declared kernel $k but the worker resolved $r"
-          )
+      applied: AppliedRecipe
+  ): Either[DomainError, Unit] =
+    if applied.satisfies(recipe) then Right(())
+    else
+      Left(
+        DomainError.InvariantViolation(
+          "boundary/applied",
+          s"the library applied $applied, which does not satisfy recipe ${recipe.identity.short()}"
         )
-      case (None, _) =>
-        Left(
-          DomainError.InvariantViolation(
-            "recipe/resolved",
-            "automatic kernel size came back unresolved; a library default may not stand in for a recorded value"
-          )
-        )
+      )
 
   private def coverage(frames: FrameSet, outcome: DetectorOutcome): Either[DomainError, Unit] =
     if outcome.coverageRequested == frames.count && outcome.coverageObserved == frames.count then
@@ -499,8 +579,10 @@ object BoundarySearch:
 
   private def cutsLawful(frames: FrameSet, outcome: DetectorOutcome): Either[DomainError, Unit] =
     val outOfRange = outcome.cuts.find(k => k < 1 || k >= frames.count)
-    val repeated =
-      outcome.cuts.iterator.sliding(2).exists { case Seq(a, b) => b <= a; case _ => false }
+    val repeated = outcome.cuts.iterator.sliding(2).exists {
+      case Seq(a, b) => b <= a
+      case _         => false
+    }
     outOfRange match
       case Some(k) =>
         Left(
@@ -512,6 +594,23 @@ object BoundarySearch:
       case None if repeated =>
         Left(DomainError.InvariantViolation("boundary/cut", "cuts must be strictly increasing"))
       case None => Right(())
+
+  /** The evidence this join has that the picture stream's edit list is the identity: the tool's
+    * reported stream start equals the first presented PTS and nothing was discarded. A stream whose
+    * presentation starts elsewhere needs a track-composition receipt this module does not issue,
+    * and is refused rather than placed on the axis by luck.
+    */
+  private def identityEditList(frames: FrameSet): Either[DomainError, Unit] =
+    val start = frames.probe.stream(frames.streamIndex).flatMap(_.startPts)
+    val presentedFirst = frames.index.firstPts
+    if frames.index.discarded == 0 && start.contains(presentedFirst) then Right(())
+    else
+      Left(
+        DomainError.InvariantViolation(
+          "boundary/edit-list",
+          s"stream ${frames.streamIndex}: reported start ${start.fold("absent")(_.toString)}, first presented PTS $presentedFirst, ${frames.index.discarded} discarded; the native clock is not the edition axis without a composition receipt"
+        )
+      )
 
   private def proposal(
       frames: FrameSet,
@@ -540,7 +639,12 @@ object BoundarySearch:
       at <- PlaybackInstant.on(axis, after)
       window <- PlaybackInterval.on(axis, before, after)
       id <- BoundaryId.from(
-        ContentAddress.of("shot-boundary", frames.probe.manifest.fixtureId, after.toString)
+        ContentAddress.of(
+          "shot-boundary",
+          frames.probe.manifest.fixtureId,
+          after.toString,
+          recipe.identity.hex
+        )
       )
     yield new BoundaryLocalizationProposal(
       id,

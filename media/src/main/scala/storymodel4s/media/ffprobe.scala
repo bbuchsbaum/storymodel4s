@@ -16,18 +16,31 @@ final case class RawStream(
     width: Option[Int],
     height: Option[Int],
     sampleRate: Option[Int],
-    channels: Option[Int]
+    channels: Option[Int],
+    startPts: Option[Long]
 )
 
-/** ffprobe's three packet flags, typed. `raw` keeps the exact string for the identity preimage. */
-final case class PacketFlags(keyframe: Boolean, discard: Boolean, corrupt: Boolean, raw: String)
+/** ffprobe's three packet flags, typed. `raw` keeps the exact string for the identity preimage; the
+  * booleans are derived from it by `parse` and cannot disagree with it.
+  */
+final class PacketFlags private (
+    val keyframe: Boolean,
+    val discard: Boolean,
+    val corrupt: Boolean,
+    val raw: String
+):
+  override def equals(other: Any): Boolean = other match
+    case that: PacketFlags => raw == that.raw
+    case _                 => false
+  override def hashCode(): Int = raw.hashCode
+  override def toString: String = s"PacketFlags($raw)"
 
 object PacketFlags:
   /** ffprobe prints three positions: `K` or `_`, `D` or `_`, `C` or `_`. Anything else refuses. */
   def parse(raw: String): Either[DomainError, PacketFlags] =
     raw.toList match
       case List(k, d, c) if Set('K', '_')(k) && Set('D', '_')(d) && Set('C', '_')(c) =>
-        Right(PacketFlags(k == 'K', d == 'D', c == 'C', raw))
+        Right(new PacketFlags(k == 'K', d == 'D', c == 'C', raw))
       case _ =>
         Left(DomainError.InvalidFormat("packets[].flags", raw, "expected three of K/_ D/_ C/_"))
 
@@ -75,6 +88,7 @@ object FfprobeJson:
       height <- MediaJson.optionalInt(c.downField("height"), "streams[].height")
       sampleRate <- optIntString(c.downField("sample_rate"), "streams[].sample_rate")
       channels <- MediaJson.optionalInt(c.downField("channels"), "streams[].channels")
+      startPts <- timestamp(c.downField("start_pts"), "streams[].start_pts")
     yield RawStream(
       index,
       codecType,
@@ -84,7 +98,8 @@ object FfprobeJson:
       width,
       height,
       sampleRate,
-      channels
+      channels,
+      startPts
     )
 
   private def parsePacket(json: Json): Either[DomainError, RawPacket] =

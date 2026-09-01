@@ -8,6 +8,7 @@ import storymodel4s.core.{
   BoundaryLayer,
   BoundarySearchCoverage,
   Checksum,
+  ContentAddress,
   DomainError,
   ObservationAuthority,
   ShotMorphology
@@ -43,31 +44,31 @@ class BoundarySearchSuite extends FunSuite:
     right(FixtureManifest.parse(text("f0-v1.manifest.json")))
   private lazy val probeEnvelope: ProbeEnvelope =
     right(ProbeEnvelope.parse(text("f0-v1.ffprobe-envelope.json")))
+  private lazy val output: FfprobeOutput =
+    right(FfprobeJson.parse(right(probeEnvelope.verifyStdout(resource(probeEnvelope.stdoutFile)))))
   private lazy val probe: MediaProbe =
-    val stdout = right(probeEnvelope.verifyStdout(resource(probeEnvelope.stdoutFile)))
     right(
       MediaProbe.join(
         manifest,
         right(manifest.verify(bytes)),
         probeEnvelope.tool,
         probeEnvelope.args,
-        right(FfprobeJson.parse(stdout))
+        output
       )
     )
   private lazy val framesEnvelope: FramesEnvelope =
     right(FramesEnvelope.parse(text("f0-v1.frames-envelope.json")))
-  private lazy val frames: FrameSet =
-    right(
-      FrameSet.join(
-        probe,
-        framesEnvelope.streamIndex,
-        framesEnvelope.geometry,
-        framesEnvelope.tool,
-        framesEnvelope.args,
-        framesEnvelope.byteLength,
-        framesEnvelope.framesSha256
-      )
+  private def frameSetOf(p: MediaProbe): Either[DomainError, FrameSet] =
+    FrameSet.join(
+      p,
+      framesEnvelope.streamIndex,
+      framesEnvelope.geometry,
+      framesEnvelope.tool,
+      framesEnvelope.args,
+      framesEnvelope.byteLength,
+      framesEnvelope.framesSha256
     )
+  private lazy val frames: FrameSet = right(frameSetOf(probe))
   private lazy val detectorEnvelope: DetectorEnvelope =
     right(DetectorEnvelope.parse(text("f0-v1.detector-envelope.json")))
   private lazy val request: DetectorRequest =
@@ -93,6 +94,7 @@ class BoundarySearchSuite extends FunSuite:
     assertEquals(result.authority, ObservationAuthority.Draft)
     assertEquals(frames.count, 45)
     assertEquals(frames.framesSha256, framesEnvelope.framesSha256)
+    assertEquals(framesEnvelope.args, Ffmpeg.canonicalArgs(0))
     val declared = manifest.stream(0).flatMap(_.declaredFrames).get
     // Shots two and three begin at generated frames 16 and 32; after the declared drops those are
     // surviving ordinals 14 and 29, whose PTS the packet index gives as 16000 and 32000.
@@ -114,8 +116,9 @@ class BoundarySearchSuite extends FunSuite:
     assert(result.proposals.forall(_.at.axis == result.axis.id))
     assertEquals(result.noCandidate, None)
     assertEquals((result.examined.start, result.examined.endExclusive), (0L, 48000L))
-    assertEquals(result.resolvedKernelSize, 5)
+    assertEquals(result.applied.kernelSize, 5)
     assertEquals(result.recipe.threshold, 15.0)
+    assert(result.receipt.parameters.contains(BoundarySearch.EditListAssumption))
 
   test("replay is identical; another worker realization is another derivation"):
     val again = right(joinWith())
@@ -123,7 +126,7 @@ class BoundarySearchSuite extends FunSuite:
     val otherWorker = right(
       ToolRealization.of(
         "scenedetect-worker",
-        "scenedetect 0.7.2 python 3.13.11",
+        detectorEnvelope.worker.versionLine,
         Checksum.ofText("other script")
       )
     )
@@ -133,6 +136,65 @@ class BoundarySearchSuite extends FunSuite:
     assert(result.receipt.parameters.contains(request.recipe.identity.hex))
     assert(result.receipt.parameters.contains(detectorEnvelope.worker.identity.hex))
     assertEquals(result.receipt.inputChecksums, Vector(frames.framesSha256, frames.identity))
+
+  test("an outcome claiming a runtime other than the worker it is joined under is refused"):
+    val otherRuntime = outcome.copy(runtime = outcome.runtime.updated("scenedetect", "0.7.2"))
+    refusedAt(joinWith(out = otherRuntime), "boundary/worker")
+    val otherVersionLine = right(
+      ToolRealization.of(
+        "scenedetect-worker",
+        "scenedetect 0.7.2 python 3.13.11",
+        Checksum.ofText("x")
+      )
+    )
+    refusedAt(joinWith(worker = otherVersionLine), "boundary/worker")
+    assertEquals(outcome.runtimeLine, detectorEnvelope.worker.versionLine)
+
+  test("what the library applied must satisfy the recipe; an echo alone is not enough"):
+    refusedAt(
+      joinWith(out = outcome.copy(applied = outcome.applied.copy(threshold = 27.0))),
+      "boundary/applied"
+    )
+    refusedAt(
+      joinWith(out = outcome.copy(applied = outcome.applied.copy(minSceneLen = 15))),
+      "boundary/applied"
+    )
+    refusedAt(
+      joinWith(out = outcome.copy(applied = outcome.applied.copy(deltaEdges = 1.0))),
+      "boundary/applied"
+    )
+    refusedAt(
+      joinWith(out = outcome.copy(applied = outcome.applied.copy(kernelSize = 0))),
+      "boundary/applied"
+    )
+    val declaredKernel = request.recipe.copy(kernelSize = Some(5))
+    assert(
+      joinWith(
+        req = request.copy(recipe = declaredKernel),
+        out = outcome.copy(recipe = declaredKernel)
+      ).isRight
+    )
+    val overriddenKernel = request.recipe.copy(kernelSize = Some(7))
+    refusedAt(
+      joinWith(
+        req = request.copy(recipe = overriddenKernel),
+        out = outcome.copy(recipe = overriddenKernel)
+      ),
+      "boundary/applied"
+    )
+    invalidFormatIn(
+      DetectorOutcome.parse(
+        right(detectorEnvelope.verifyOutcome(resource(detectorEnvelope.outcomeFile)))
+          .replaceFirst("\"kernelSize\": 5", "\"kernelSize\": null")
+      ),
+      "applied.kernelSize"
+    )
+
+  private def invalidFormatIn(e: Either[DomainError, Any], kind: String): Unit =
+    e match
+      case Left(DomainError.InvalidFormat(k, _, _)) => assertEquals(k, kind)
+      case Left(other) => fail(s"refused at the wrong place: ${other.message}")
+      case Right(v)    => fail(s"expected InvalidFormat $kind, got $v")
 
   test("an outcome recorded under another recipe, or for another request, is refused"):
     refusedAt(
@@ -167,17 +229,6 @@ class BoundarySearchSuite extends FunSuite:
     assert(BoundarySearchCoverage.negativeFromEmptyDetector(BoundaryLayer.Shot).isLeft)
     assertNotEquals(none.identity, result.identity)
 
-  test("an automatic kernel must come back resolved; a declared kernel must not be overridden"):
-    refusedAt(joinWith(out = outcome.copy(resolvedKernelSize = None)), "recipe/resolved")
-    val declared = request.recipe.copy(kernelSize = Some(5))
-    refusedAt(
-      joinWith(
-        req = request.copy(recipe = declared),
-        out = outcome.copy(recipe = declared, resolvedKernelSize = Some(7))
-      ),
-      "recipe/resolved"
-    )
-
   test("metrics must be one row per frame, and a cut must carry a score"):
     refusedAt(
       joinWith(out = outcome.copy(metrics = outcome.metrics.dropRight(1))),
@@ -187,14 +238,64 @@ class BoundarySearchSuite extends FunSuite:
       outcome.metrics.map(m => if m.ordinal == 14 then m.copy(values = Map.empty) else m)
     refusedAt(joinWith(out = outcome.copy(metrics = scoreless)), "boundary/score")
 
-  test("a localization proposal carries no morphology; a claim needs one supplied separately"):
+  test(
+    "a picture stream whose reported start is not its first presented packet is refused: no edit list is assumed away"
+  ):
+    val shifted = output.copy(streams =
+      output.streams.map(s => if s.index == 0 then s.copy(startPts = Some(1000L)) else s)
+    )
+    val shiftedProbe = right(
+      MediaProbe.join(
+        manifest,
+        right(manifest.verify(bytes)),
+        probeEnvelope.tool,
+        probeEnvelope.args,
+        shifted
+      )
+    )
+    val shiftedFrames = right(frameSetOf(shiftedProbe))
+    refusedAt(
+      BoundarySearch.join(shiftedFrames, request, outcome, detectorEnvelope.worker),
+      "boundary/edit-list"
+    )
+    val discardFirst = output.copy(packets =
+      output.packets.map(p =>
+        if p.streamIndex == 0 && p.pts.contains(0L) then
+          p.copy(flags = right(PacketFlags.parse("KD_")))
+        else p
+      )
+    )
+    val discardProbe = right(
+      MediaProbe.join(
+        manifest,
+        right(manifest.verify(bytes)),
+        probeEnvelope.tool,
+        probeEnvelope.args,
+        discardFirst
+      )
+    )
+    // 44 presented packets: the frame count no longer matches the recorded decode, which is the
+    // earlier, correct refusal; the edit-list guard is reached only with a consistent frame set.
+    refusedAt(frameSetOf(discardProbe), "frames/bytes")
+
+  test(
+    "a localization proposal carries no morphology and binds its recipe; a claim needs a morphology supplied separately"
+  ):
     val proposal = result.proposals.head
     val claim = right(BoundaryClaim.shot(proposal.id, ShotMorphology.hardCut(proposal.at)))
     assert(claim.morphology.isDefined)
     assertEquals(claim.instant.map(_.at), Some(proposal.at.at))
     assertEquals(proposal.recipe, request.recipe.identity)
+    assertEquals(result.proposals.map(_.id).distinct.size, 2)
+    assertNotEquals(
+      proposal.id.value,
+      ContentAddress.of("shot-boundary", "f0-v1", proposal.at.at.toString),
+      "a recipe-blind id would let two recipes share one proposal"
+    )
 
-  test("a frame set is one decoded frame per indexed packet of a picture stream"):
+  test(
+    "a frame set is one decoded frame per presented packet of a Decoded picture stream at the declared geometry"
+  ):
     refusedAt(
       FrameSet.join(
         probe,
@@ -243,23 +344,10 @@ class BoundarySearchSuite extends FunSuite:
         right(indexedOnly.verify(bytes)),
         probeEnvelope.tool,
         probeEnvelope.args,
-        right(
-          FfprobeJson.parse(right(probeEnvelope.verifyStdout(resource(probeEnvelope.stdoutFile))))
-        )
+        output
       )
     )
-    refusedAt(
-      FrameSet.join(
-        probeIndexedOnly,
-        0,
-        framesEnvelope.geometry,
-        framesEnvelope.tool,
-        framesEnvelope.args,
-        framesEnvelope.byteLength,
-        framesEnvelope.framesSha256
-      ),
-      "frames/disposition"
-    )
+    refusedAt(frameSetOf(probeIndexedOnly), "frames/disposition")
     val otherTool =
       right(ToolRealization.of("ffmpeg", "ffmpeg version 9.0.1", Checksum.ofText("other")))
     val under = right(
@@ -274,6 +362,11 @@ class BoundarySearchSuite extends FunSuite:
       )
     )
     assertNotEquals(under.identity, frames.identity)
+    // A decoder that fails refuses on its exit code; `sh` given ffmpeg's arguments exits non-zero.
+    refusedAt(
+      Ffmpeg.extract(Path.of("/bin/sh"), Path.of("/dev/null"), 0, Path.of("/dev/null")),
+      "ffmpeg/exit"
+    )
 
   test("live ffmpeg and worker, when this machine has both, reproduce the recorded proposals"):
     val ffmpeg = Ffmpeg.locate()
@@ -303,12 +396,10 @@ class BoundarySearchSuite extends FunSuite:
           Checksum.ofBytes(decoded)
         )
       )
+      // The same decoder build must decode to the recorded bytes; another build may not, and then
+      // the identities differ by construction.
       if tool == framesEnvelope.tool then
         assertEquals(live.framesSha256, framesEnvelope.framesSha256)
-      else
-        println(
-          s"[media] live ffmpeg ${tool.versionLine} differs from the recorded one; frame digest ${live.framesSha256.short()} vs ${framesEnvelope.framesSha256.short()}"
-        )
       val issued = DetectorRequest.issue(live, request.recipe, request.requestId)
       val reqPath = dir.resolve("request.json")
       val outPath = dir.resolve("outcome.json")
@@ -320,12 +411,12 @@ class BoundarySearchSuite extends FunSuite:
       )
       assertEquals(run.exitCode, 0, run.stderr)
       val liveOutcome = right(DetectorOutcome.parse(Files.readString(outPath)))
+      // The worker realization is the script that ran plus the runtime the outcome reports; the
+      // join then checks the outcome's runtime against it, which here is a consistency check only.
       val worker = right(
         ToolRealization.of(
           "scenedetect-worker",
-          Vector("scenedetect", "python", "numpy", "opencv")
-            .flatMap(k => liveOutcome.runtime.get(k).map(v => s"$k $v"))
-            .mkString(" "),
+          liveOutcome.runtimeLine,
           Checksum.ofBytes(Files.readAllBytes(script.get))
         )
       )
