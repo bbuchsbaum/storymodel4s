@@ -243,7 +243,9 @@ class BoundarySearchSuite extends FunSuite:
         right(indexedOnly.verify(bytes)),
         probeEnvelope.tool,
         probeEnvelope.args,
-        right(FfprobeJson.parse(right(probeEnvelope.verifyStdout(resource(probeEnvelope.stdoutFile)))))
+        right(
+          FfprobeJson.parse(right(probeEnvelope.verifyStdout(resource(probeEnvelope.stdoutFile))))
+        )
       )
     )
     refusedAt(
