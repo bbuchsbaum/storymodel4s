@@ -318,6 +318,27 @@ object OutputAcquireCodecs:
 
   given Decoder[RefusedSourceProgress] = contextualSourceDecoder("RefusedSourceProgress")
 
+  /** Reuse a source failure already checked against exact bytes when semantic refusal cites it. */
+  private[codec] def admitSemanticOutcome(
+      c: HCursor,
+      source: SourceOutcome
+  ): Decoder.Result[SemanticOutcome] =
+    field[String](c, "status").flatMap {
+      case "refused" =>
+        field[Vector[Json]](c, "errors")
+          .flatMap(nonEmpty(c, "errors", _))
+          .flatMap(
+            _.traverse { encoded =>
+              source match
+                case SourceOutcome.Refused(_, failure) if encoded == failure.asJson =>
+                  Right(failure)
+                case _ => encoded.as[OutputFailure]
+            }
+          )
+          .map(SemanticOutcome.Refused.apply)
+      case _ => summon[Decoder[SemanticOutcome]].apply(c)
+    }
+
   given Encoder[SourceOutcome] = Encoder.instance {
     case SourceOutcome.Constructed(identities) =>
       Json.obj("status" -> "constructed".asJson, "identities" -> identities.asJson)

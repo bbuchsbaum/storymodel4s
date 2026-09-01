@@ -723,12 +723,13 @@ class OutputCodecSuite extends FunSuite:
     assert(StoryOutputResultCodec.decode[String](Canonical.print(tampered), bytes).isLeft)
   }
 
-  test("strict decode failure round-trips exact bytes and refuses position or byte mutation") {
+  test("strict decode failure round-trips through source and semantic refusal") {
     val bytes = Array(0x61.toByte, 0xc2.toByte, 0x20.toByte)
     val admission = SourceIdentities.admitUtf8(bytes, textPlain, Some(utf8))
-    val sourceRefusal = admission.refusal match
-      case Some((progress, failure)) => SourceOutcome.Refused(progress, failure)
-      case None                      => fail("invalid UTF-8 was admitted")
+    val (progress, failure) = admission.refusal match
+      case Some(value) => value
+      case None        => fail("invalid UTF-8 was admitted")
+    val sourceRefusal = SourceOutcome.Refused(progress, failure)
     val account = AcquisitionAccount
       .of[String](
         InvocationId.unsafe("invocation-decode-failure"),
@@ -740,7 +741,7 @@ class OutputCodecSuite extends FunSuite:
             None
           )
         ),
-        SemanticOutcome.NotRequested,
+        SemanticOutcome.Refused(NonEmptyVector.one(failure)),
         Vector.empty,
         Vector.empty,
         None
@@ -760,6 +761,10 @@ class OutputCodecSuite extends FunSuite:
       .toOption
       .get
     val encoded = StoryOutputResultCodec.encode[String](refused)
+    assert(
+      StoryOutputResultCodec.decode[String](encoded).isLeft,
+      "a strict decode failure requires exact source bytes"
+    )
     assertEquals(StoryOutputResultCodec.decode[String](encoded, bytes), Right(refused))
 
     val parsed = Canonical.parse(encoded).toOption.get

@@ -834,7 +834,11 @@ object StoryOutputResultCodec:
             .success
             .toRight(io.circe.DecodingFailure("missing acquisition", c.history))
           universe <- field[TargetUniverse[Id]](ac, "universe")
-          semantic <- field[SemanticOutcome](ac, "semantic")
+          semanticCursor <- ac
+            .downField("semantic")
+            .success
+            .toRight(io.circe.DecodingFailure("missing semantic outcome", ac.history))
+          semantic <- OutputAcquireCodecs.admitSemanticOutcome(semanticCursor, source)
           targets <- field[Vector[TargetAccount[Id]]](ac, "targets")
           payloads <- field[Vector[OutputPayload]](ac, "payloads")
           receipt <- field[Option[ExtendedBuildReceipt]](ac, "buildReceipt")
