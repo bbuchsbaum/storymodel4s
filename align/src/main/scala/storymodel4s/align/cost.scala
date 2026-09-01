@@ -30,8 +30,9 @@ enum CostTerm:
     */
   case Structural
 
-/** Nonnegative finite weights over [[CostTerm]]. Not a case class: `fromProduct` would mint a
-  * negative or non-finite weight that [[CostWeights.of]] refuses.
+/** Nonnegative finite weights over [[CostTerm]] whose aggregate is representable. Not a case class:
+  * `fromProduct` would mint a negative, non-finite, or aggregate-overflowing weight vector that
+  * [[CostWeights.of]] refuses.
   */
 final class CostWeights private (
     val semantic: Double,
@@ -79,9 +80,9 @@ final class CostWeights private (
       s"chart=$chart, structural=$structural)"
 
 object CostWeights:
-  /** Weights must be finite and nonnegative. `chart` and `structural` weight the optional
-    * evidence-backed distances (ADR 0001 rev 3 §D4b); they are inert whenever those terms are
-    * `Missing`.
+  /** Weights must be finite and nonnegative, and their aggregate must be representable as a
+    * `Double`. `chart` and `structural` weight the optional evidence-backed distances (ADR 0001 rev
+    * 3 §D4b); they are inert whenever those terms are `Missing`.
     */
   def of(
       semantic: Double,
@@ -104,7 +105,16 @@ object CostWeights:
         chart,
         structural
       )
-    if all.forall(w => w >= 0.0 && !w.isNaN && !w.isInfinite) then
+    if !all.forall(w => w >= 0.0 && !w.isNaN && !w.isInfinite) then
+      Left(AlignError.InvalidConfig("CostWeights", "weights must be finite and nonnegative"))
+    else if !all.sum.isFinite then
+      Left(
+        AlignError.InvalidConfig(
+          "CostWeights",
+          "aggregate weight must be finite and representable"
+        )
+      )
+    else
       Right(
         new CostWeights(
           semantic,
@@ -117,7 +127,6 @@ object CostWeights:
           structural
         )
       )
-    else Left(AlignError.InvalidConfig("CostWeights", "weights must be finite and nonnegative"))
 
   def unsafe(
       semantic: Double,
@@ -793,10 +802,9 @@ object DefaultLocalCostModel:
       eligible: Set[CostTerm] = Set.empty
   ): Double =
     val present = CostTerm.values.toVector.flatMap(t => terms.get(t).map(weights(t) * _)).sum
-    functionPrior + present * scaleToEligible(terms.keySet, eligible, weights)
+    functionPrior + scaleToEligible(present, terms.keySet, eligible, weights)
 
-  /** `W_eligible / W_present` — scales a partially measured cost up to the support it COULD have
-    * had.
+  /** Scales a partially measured weighted cost up to the support it COULD have had.
     *
     * Scaling to ELIGIBLE weight, not to all terms, is the whole point. A term that could never have
     * been measured for this cell — `d_chart` where neither side carries a chart — is not a
@@ -811,6 +819,7 @@ object DefaultLocalCostModel:
     * aligner must produce a posterior — so the refusal is the consumer's to make.
     */
   private[align] def scaleToEligible(
+      presentCost: Double,
       present: Set[CostTerm],
       eligible: Set[CostTerm],
       weights: CostWeights
@@ -819,11 +828,15 @@ object DefaultLocalCostModel:
     // "everything present was everything possible" - factor 1, today's behaviour. Defaulting to ALL
     // terms would silently scale an unaware caller to a support it never claimed, which is the
     // failure that collapsed every row when I scaled over all terms.
-    if eligible.isEmpty then 1.0
+    if eligible.isEmpty || present == eligible then presentCost
     else
       val wPresent = present.toVector.map(weights(_)).sum
       val wEligible = eligible.toVector.map(weights(_)).sum
-      if !(wPresent > 0.0) || !(wEligible > 0.0) then 1.0 else wEligible / wPresent
+      if !(wPresent > 0.0) || !(wEligible > 0.0) then presentCost
+      else
+        val minimumPresentForFiniteRatio = wEligible / Double.MaxValue
+        if wPresent >= minimumPresentForFiniteRatio then presentCost * (wEligible / wPresent)
+        else (presentCost / wPresent) * wEligible
 
   /** Share of the ELIGIBLE term weight that was actually measured; 1.0 when nothing was assumed. */
   private[align] def supportOf(

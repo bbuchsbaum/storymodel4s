@@ -53,6 +53,71 @@ class CostSuite extends FunSuite:
     )
     .fold(e => throw new IllegalStateException(e.message), identity)
 
+  test("CostWeights refuses a finite component vector whose aggregate is not representable") {
+    val result = CostWeights.of(
+      semantic = Double.MaxValue,
+      propositional = Double.MaxValue,
+      entity = 0.0,
+      sensory = 0.0,
+      granularity = 0.0,
+      contradiction = 0.0,
+      chart = 0.0,
+      structural = 0.0
+    )
+
+    result match
+      case Left(AlignError.InvalidConfig(field, detail)) =>
+        assertEquals(field, "CostWeights")
+        assert(detail.contains("aggregate"), s"the refusal did not name the aggregate: $detail")
+      case other => fail(s"non-representable aggregate weights were admitted: $other")
+  }
+
+  test("CostWeights admits an aggregate at the representable boundary") {
+    val result = CostWeights.of(
+      semantic = Double.MaxValue,
+      propositional = Double.MinPositiveValue,
+      entity = 0.0,
+      sensory = 0.0,
+      granularity = 0.0,
+      contradiction = 0.0,
+      chart = 0.0,
+      structural = 0.0
+    )
+
+    val weights = result.fold(e => fail(e.message), identity)
+    assertEquals(weights(CostTerm.Semantic), Double.MaxValue)
+    assertEquals(weights(CostTerm.Propositional), Double.MinPositiveValue)
+  }
+
+  test("checked weight construction refuses aggregate overflow before GraphHsmm probability work") {
+    var probabilityWorkEntered = false
+    val result = CostWeights
+      .of(
+        semantic = Double.MaxValue,
+        propositional = Double.MaxValue,
+        entity = 0.0,
+        sensory = 0.0,
+        granularity = 0.0,
+        contradiction = 0.0,
+        chart = 0.0,
+        structural = 0.0
+      )
+      .flatMap { weights =>
+        probabilityWorkEntered = true
+        GraphHsmm.infer(
+          AnnaFixture.recall,
+          AnnaFixture.view,
+          AnnaFixture.candidates,
+          DefaultLocalCostModel(weights = weights)
+        )
+      }
+
+    assert(!probabilityWorkEntered, "invalid weights reached GraphHsmm probability work")
+    result match
+      case Left(AlignError.InvalidConfig(field, _)) => assertEquals(field, "CostWeights")
+      case other => fail(s"expected a typed CostWeights refusal, obtained $other")
+  }
+
   test("weighted sum: each term is multiplied by its own weight, then summed") {
     // 0.5*1 + 0.25*2 + 0.125*4 = 0.5 + 0.5 + 0.5 = 1.5
     val terms = Map(
@@ -149,10 +214,10 @@ class CostSuite extends FunSuite:
     val scaled = DefaultLocalCostModel.blend(terms, w, 0.3, eligible)
     val unscaled = DefaultLocalCostModel.blend(terms, w, 0.3)
     assertEqualsDouble(
-      DefaultLocalCostModel.scaleToEligible(terms.keySet, eligible, w),
-      1.0,
+      DefaultLocalCostModel.scaleToEligible(1.5, terms.keySet, eligible, w),
+      1.5,
       0.0,
-      "full support must scale by EXACTLY one, not approximately"
+      "full support must preserve the raw weighted cost bit-identically"
     )
     assertEqualsDouble(scaled, unscaled, 0.0, "a fully measured cell must not move at all")
 
@@ -163,6 +228,32 @@ class CostSuite extends FunSuite:
       DefaultLocalCostModel.blend(terms, w, 0.3, wider) > scaled,
       "a cell missing an ELIGIBLE term must scale up; otherwise LAW 1 is vacuous"
     )
+  }
+
+  test("partial support avoids an overflowing weight-ratio intermediate") {
+    val extreme = CostWeights
+      .of(
+        semantic = java.lang.Double.MIN_NORMAL,
+        propositional = 0.0,
+        entity = 0.0,
+        sensory = Double.MaxValue,
+        granularity = 0.0,
+        contradiction = 0.0,
+        chart = 0.0,
+        structural = 0.0
+      )
+      .fold(e => fail(e.message), identity)
+    val present = Map(CostTerm.Semantic -> 0.5)
+    val eligible = Set(CostTerm.Semantic, CostTerm.Sensory)
+
+    val total = DefaultLocalCostModel.blend(present, extreme, 0.0, eligible)
+    assert(total.isFinite, s"representable partial-support cost became $total")
+    assertEquals(total, Double.MaxValue * 0.5)
+
+    // Positive control: the old W_eligible / W_present factor really does overflow on this input.
+    val oldScale =
+      eligible.toVector.map(extreme(_)).sum / present.keySet.toVector.map(extreme(_)).sum
+    assertEquals(oldScale, Double.PositiveInfinity)
   }
 
   test("LAW 2: an INELIGIBLE term is inert - it cannot change the source/external balance") {
