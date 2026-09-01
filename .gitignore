@@ -13,3 +13,11 @@ target/
 # agent git worktrees (never committed)
 .worktrees/
 zz-worktree-local.sbt
+
+# local external datasets and generated manifests (never committed)
+/tmp/
+
+# docs-site build inputs/outputs (never committed)
+docs-site/node_modules/
+docs-site/dist/
+docs-site/.astro/

@@ -26,16 +26,18 @@ Canonical JSON wire seam for storymodel4s artifacts (codec milestone, view-indep
 | `StoryModel[S]` | status is not written; decodes to `Draft`; `StoryModelCodec.contentChecksum` is SHA-256 of the canonical text, identical for Draft/Validated/Adjudicated; the atlas is encoded units-only so the text appears exactly once (in `source`) |
 | `FeatureTrack[FeatureTarget, Double | String]` | inline scalar/categorical; `Estimate.Missing(reason)` is preserved, never `null`/`0`/`NaN`; vectors only via `SidecarManifest` |
 | `SidecarTrack[T, V]` | retains the true `FeatureSpace[V]` while observed values point to compact rows in an `SM4SFT01` binary sidecar; Missing remains explicit and consumes no row |
-| `HsmmResult` | schema `hsmm/v1`; `HsmmResultCodec` writes the sparse posterior, flow, costs, nominated anchors, gate echo, and context fingerprints; decoding requires the original `RecallGraph` and `SourceView`, rebuilds records through `AlignWire`, then calls `HsmmResult.validated` and `AlignWire.matched` |
+| `HsmmResult` | schema `hsmm/v4` (`HsmmResultCodec.SchemaVersion`); v2 added required `supportWeight`, v3 added required `imputedTerms`, v4 replaces `supportWeight` with a required tagged `support` assessment and a required result-level `supportBasis`. There is no migration from earlier tags — a v1/v2/v3 artifact is re-derived, not upgraded. `HsmmResultCodec` writes the sparse posterior, flow, costs, support basis, nominated anchors, gate echo, and context fingerprints; decoding requires the original `RecallGraph`, `SourceView`, and an independently admitted `SupportBasis`, rebuilds records through `AlignWire`, then calls `HsmmResult.validated` and `AlignWire.matched`. The embedded basis proves internal consistency only; it is not an execution receipt. |
 | `PropositionChart` | decodes to `Unchecked` then validates to `Checked` |
 | `RecallGraph`, `TranscriptAtlas` | transcript as plain `StorySource` until the `PseudonymizedText` split lands |
 | `ClaimLedger` | JSON Lines (`JsonLines.claims` / `readClaims`), append-only |
 
-The committed War of the Ghosts `hsmm/v1` golden is the JVM/Scala.js canonical encoding. Scala
-Native inference can differ in low-order `libm` bits; this is not hidden as a false byte-identity
-claim. On every platform, the portable guarantee is contextual decode equivalence: validation and
-fingerprint matching succeed, the decoded result equals that platform's original result, and
-re-encoding it is byte-exact.
+The committed War of the Ghosts `hsmm/v4` golden is the JVM/Scala.js canonical encoding. A v3
+artifact is refused: the old numeric `supportWeight` cannot reveal whether support was assessed,
+unestablished, or not applicable, and inventing any of those meanings would fabricate evidence.
+Scala Native inference can differ in low-order `libm` bits; this is not hidden as a false
+byte-identity claim. On every platform, the portable guarantee is byte-exact decode and re-encode
+of one artifact after contextual validation. The schema does not claim cross-runtime inference
+bit-identity.
 
 ## Numeric sidecars
 

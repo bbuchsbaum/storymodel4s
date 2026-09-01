@@ -63,6 +63,10 @@ object StageCacheKey:
     of(inputChecksum, stageSchemaVersion, configHash, providerFingerprint, StageLocalConfig.empty)
 
   extension (k: StageCacheKey) def checksum: Checksum = k
+
+  /** Reconstruct a cache-key identity already validated as a checksum by the wire codec. */
+  def fromChecksum(checksum: Checksum): StageCacheKey = checksum
+
   given cats.Show[StageCacheKey] = cats.Show.show(_.hex)
   given cats.Order[StageCacheKey] = cats.Order[Checksum]
 type StageCacheKey = StageCacheKey.StageCacheKey

@@ -226,3 +226,33 @@ class QuoteSuite extends munit.FunSuite:
       atlas.sentences.map(atlas.text),
       Vector("\"Go home!\" she shouted.", "He (who was tired. Very tired) left.")
     )
+
+class SurfaceAtlasConformanceSuite extends munit.FunSuite:
+  test("conformance preserves SurfaceAtlas equality, lookup, and constructors"):
+    val src = StorySource.fromText("Alpha beta. Gamma delta.").toOption.get
+    val atlas = SurfaceAnalyzer.analyze(src)
+    val again = SurfaceAnalyzer.analyze(src)
+    assertEquals(atlas, again)
+    assert(SurfaceAtlas.validated(atlas).isRight)
+    assert(SurfaceAtlas.of(src, atlas.units :+ atlas.units.head).isLeft)
+
+    val narrative = SurfaceAtlasConformance.narrativeAtlas(atlas).toOption.get
+    val narrative2 = SurfaceAtlasConformance.narrativeAtlas(again).toOption.get
+    assertEquals(narrative.surfaceAtlas, Some(atlas))
+    assertEquals(narrative.bundle.id, narrative2.bundle.id)
+    assertEquals(narrative.units.size, atlas.units.size)
+    val token = atlas.tokens.head
+    assertEquals(atlas.unitAt(token.span.start, SurfaceUnitKind.Token).map(_.id), Some(token.id))
+    assertEquals(
+      narrative.surfaceAtlas.flatMap(_.unitAt(token.span.start, SurfaceUnitKind.Token)).map(_.id),
+      Some(token.id)
+    )
+    assert(narrative.units.forall(_.support.textSpans.exists(_.coveredLength > 0)))
+    assertEquals(narrative.bundle.sourceKind, SourceKind.WrittenText)
+    assertEquals(narrative.bundle.primaryAxis.kind, AxisKind.TextCharacter)
+
+  test("text constructors remain the only SurfaceAtlas doors"):
+    val src = StorySource.fromText("One sentence.").toOption.get
+    val atlas = SurfaceAnalyzer.analyze(src)
+    assert(SurfaceAtlas.of(src, atlas.units).isRight)
+    assertEquals(SurfaceAtlas.unsafe(src, atlas.units), atlas)

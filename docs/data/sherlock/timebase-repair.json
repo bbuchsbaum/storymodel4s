@@ -1,0 +1,224 @@
+{
+  "schema": "storymodel4s.sherlock.timebase-repair",
+  "schemaVersion": 1,
+  "artifactId": "sherlock-topic-notebook-timebase-repair-v1",
+  "inputAnnotation": {
+    "artifactId": "sherlock-annotation-table-v1",
+    "sha256": "8c205826dcea8c58db24d7a17c71a3f99a9054e9379435e60b1dd0b987c2b296"
+  },
+  "sourceDerivation": {
+    "repository": "https://github.com/ContextLab/sherlock-topic-model-paper",
+    "commit": "81f90b8afa6dd714b780208bd89d1f1a26159ff5",
+    "repositoryPath": "code/notebooks/main/topic_model_analysis.ipynb",
+    "gitBlob": "3dafd5ce1baf5a79b18a53d8a29cf837ec501edf",
+    "byteLength": 22545,
+    "sha256": "16f5b0f24496d29ff02023764c5074a011a1aa6942f89104deb0d852be6e1d48",
+    "publishedOperation": "Remove the two scan-break rows, reset row numbering, and add the last retained first-run end time to every second-run start and end time."
+  },
+  "coordinateSystems": [
+    {
+      "id": "media-part-local-seconds",
+      "kind": "container-presentation-time",
+      "parts": [
+        {
+          "partId": "media-part-a",
+          "startSeconds": 0.0,
+          "endSeconds": 1426.2
+        },
+        {
+          "partId": "media-part-b",
+          "startSeconds": 0.0,
+          "endSeconds": 1554.8
+        }
+      ],
+      "experimentalEditionBinding": "unconfirmed"
+    },
+    {
+      "id": "annotation-run-local-seconds",
+      "kind": "coder-table-interval",
+      "runs": [
+        {
+          "runId": "run-1",
+          "ordinaryRows": "1-480",
+          "ordinaryStartSeconds": 0,
+          "ordinaryEndSeconds": 1419,
+          "scanBreakRows": [
+            481,
+            482
+          ],
+          "rawEndIncludingScanBreakSeconds": 1426
+        },
+        {
+          "runId": "run-2",
+          "rows": "483-1000",
+          "startSeconds": 0,
+          "endSeconds": 1544
+        }
+      ]
+    },
+    {
+      "id": "scanner-tr",
+      "kind": "scanner-index",
+      "secondsPerTr": 1.5,
+      "minimumTr": 1,
+      "maximumTr": 1976,
+      "rowsWithMissingBounds": [
+        481,
+        482
+      ],
+      "missingBoundsImputed": false
+    },
+    {
+      "id": "topic-notebook-repaired-seconds",
+      "kind": "derived-analysis-time",
+      "startSeconds": 0,
+      "endSeconds": 2963,
+      "rowCount": 998,
+      "derivationReceipt": "topic-notebook-repair-replay-v1"
+    },
+    {
+      "id": "recall-princeton-seconds-and-tr",
+      "kind": "recall-export-clock",
+      "sourceCount": 17,
+      "detailsRecord": "recall-lineage.json"
+    },
+    {
+      "id": "recall-openneuro-seconds-and-tr",
+      "kind": "recall-export-clock",
+      "sourceCount": 17,
+      "detailsRecord": "recall-lineage.json"
+    },
+    {
+      "id": "future-edition-playback-axis",
+      "kind": "not-yet-established",
+      "reason": "The exact experimental presentation edition and an alignment from that edition to the annotation are unconfirmed."
+    }
+  ],
+  "repair": {
+    "id": "topic-notebook-repair-replay-v1",
+    "purity": "pure-coordinate-transform",
+    "inputRows": 1000,
+    "dropSourceRows": [
+      481,
+      482
+    ],
+    "retainedRows": 998,
+    "runAssignment": [
+      {
+        "sourceRows": "1-480",
+        "runId": "run-1"
+      },
+      {
+        "sourceRows": "483-1000",
+        "runId": "run-2"
+      }
+    ],
+    "offsetSeconds": {
+      "run-1": 0,
+      "run-2": 1419
+    },
+    "formula": {
+      "repairedStartSeconds": "rawStartSeconds + offsetSeconds(runId)",
+      "repairedEndSeconds": "rawEndSeconds + offsetSeconds(runId)"
+    },
+    "boundaryChecks": [
+      {
+        "sourceRow": 480,
+        "runId": "run-1",
+        "rawStartSeconds": 1417,
+        "rawEndSeconds": 1419,
+        "repairedStartSeconds": 1417,
+        "repairedEndSeconds": 1419,
+        "startTr": 946,
+        "endTr": 946
+      },
+      {
+        "sourceRow": 483,
+        "runId": "run-2",
+        "rawStartSeconds": 0,
+        "rawEndSeconds": 12,
+        "repairedStartSeconds": 1419,
+        "repairedEndSeconds": 1431,
+        "startTr": 947,
+        "endTr": 954
+      },
+      {
+        "sourceRow": 1000,
+        "runId": "run-2",
+        "rawStartSeconds": 1543,
+        "rawEndSeconds": 1544,
+        "repairedStartSeconds": 2962,
+        "repairedEndSeconds": 2963,
+        "startTr": 1976,
+        "endTr": 1976
+      }
+    ],
+    "serializationReceipt": {
+      "recordOrder": "ascending source row",
+      "fields": [
+        "source-row-zero-padded-to-four-digits",
+        "run-id",
+        "raw-start-seconds-base10-integer",
+        "raw-end-seconds-base10-integer",
+        "repaired-start-seconds-base10-integer",
+        "repaired-end-seconds-base10-integer",
+        "start-tr-base10-integer-or-empty",
+        "end-tr-base10-integer-or-empty"
+      ],
+      "fieldSeparator": "TAB",
+      "recordSeparator": "LF",
+      "finalRecordSeparator": true,
+      "recordCount": 998,
+      "sha256": "fbdf68df3eed1b1ccbd8cbcefefc3259e954a2804e2302035330fec75ad2d569"
+    }
+  },
+  "missingnessAndTails": {
+    "scanBreakRows": [
+      {
+        "sourceRow": 481,
+        "startSeconds": 1419,
+        "endSeconds": 1420,
+        "trBounds": "missing"
+      },
+      {
+        "sourceRow": 482,
+        "startSeconds": 1420,
+        "endSeconds": 1426,
+        "trBounds": "missing"
+      }
+    ],
+    "partA": {
+      "mediaEndSeconds": 1426.2,
+      "rawAnnotationEndIncludingBreakSeconds": 1426,
+      "rawAnnotationToMediaTailSeconds": 0.2,
+      "retainedNotebookAnnotationEndSeconds": 1419,
+      "retainedNotebookAnnotationToMediaTailSeconds": 7.2
+    },
+    "partB": {
+      "mediaEndSeconds": 1554.8,
+      "annotationEndSeconds": 1544,
+      "annotationToMediaTailSeconds": 10.8
+    },
+    "tailHandling": "observed-not-trimmed-not-imputed"
+  },
+  "nonEquivalences": [
+    "Part-local media seconds are not annotation-run seconds.",
+    "Raw annotation seconds are not repaired notebook seconds.",
+    "TR indices are not seconds and missing TRs are not zero.",
+    "The Princeton and OpenNeuro recall clocks are distinct export coordinate systems.",
+    "The 2963-second notebook denominator is not the 2981-second concatenated media duration.",
+    "A repaired coordinate does not prove exact experimental-edition alignment."
+  ],
+  "scientificRestrictions": {
+    "clockRepairMayEstablish": [
+      "deterministic-published-analysis-order",
+      "replayable-998-row-derived-axis"
+    ],
+    "clockRepairDoesNotEstablish": [
+      "exact-media-edition",
+      "frame-exact-evidence",
+      "missing-tr-imputation",
+      "accepted-narrative-semantics"
+    ]
+  }
+}

@@ -506,10 +506,14 @@ derivation.
 FilmFestival is an excellent F2 candidate, but its
 [OpenNeuro deposit](https://github.com/OpenNeuroDatasets/ds004042) explicitly omits the ten film
 files for copyright, and its [companion repository](https://github.com/jchenlab-jhu/filmfest) has no
-licence. Sherlock remains a sparse annotation-only diagnostic under the existing
-[source audit](../design/sherlock-source-representation-audit.md); its pinned
-[dataset metadata](https://github.com/OpenNeuroDatasets/ds001132/blob/master/dataset_description.json)
-has a blank licence, its workbook repository has no licence, and the BBC episode is separate.
+licence. Sherlock is the canonical external F2 video-recall target under the existing
+[source audit](../design/sherlock-source-representation-audit.md) and owner decision
+`post-01M1CN0CHHMYSA93R7AZMPZQB2`. Actual episode video files remain local, external to Git, and
+non-redistributable. Media hashes and metadata are shareable; annotations, recall transcripts and
+exports, aliases, transforms and receipts, graphs, features, reports, model outputs, and other
+non-video derivatives may be committed and shared after their ordinary provenance and story-text
+admission checks. The public-source records do not by themselves establish exact local-artifact or
+experimental-edition equality.
 
 [MF2](https://arxiv.org/abs/2506.06275) may supply source-side narrative facts, causal/order
 questions, and matched false alternatives. Its
@@ -530,13 +534,15 @@ The primary-source audit is provisional and **does not close B0**:
 | *Big Buck Bunny* | Admit as F1 after exact file/excerpt hash, CC BY 3.0 attribution, and derivation record; it is not a dialogue fixture |
 | *Sintel* | Conditional second F1 dialogue excerpt under CC BY 3.0; any committed transcript is separately admitted |
 | FilmFestival | Hold as an exact F2 pair until the viewed film editions and participant-content/REB basis are admitted |
-| Sherlock | Hold pending written artifact-level licence clarification; never vendor episode bytes |
+| Sherlock | Canonical external F2 target; raw episode video bytes are external/non-redistributable; non-video artifacts are eligible for ordinary provenance and story-text admission; exact edition, transform, alias, coordinate, semantic, and anti-circularity gates remain open |
 | Brain Treebank | External-only/hold for film-derived material and unlicensed analysis code |
 | MF2 | Exclude from defaults; owner decision required for NC-SA research-only use; independently verify any underlying film and do not inherit subtitle rights |
 
-No exact source-film plus human-recall pair is presently admitted. ADR Stage B therefore cannot
-close while the Sherlock disposition remains unresolved unless ADR authority ratifies a
-replacement; the scientific film-recall vertical also remains blocked on an exact paired edition.
+The Sherlock storage/sharing disposition is resolved, but no exact source-film plus human-recall
+pair is yet scientifically admitted. ADR Stage B now progresses through exact edition binding,
+annotation and recall transforms, the 17-source alias map, typed coordinates, artifact-specific
+story-text admission, semantic authority, and anti-circularity rather than a new Sherlock licence,
+consent, REB, participant-prose, or aggregate-only hold.
 
 The clean first acquisition court, after all ratified entry gates, is project-authored F0 media and
 then a 20–40 second checksummed *Big Buck Bunny* excerpt processed by an exact preferably
@@ -555,12 +561,14 @@ credential, and service-term closure for anything selected.
 
 ### 9.2 Human and committed-text rules
 
-F2 participant content remains caller-supplied and external. No recall bytes, prose, excerpts,
-provider logs, or derived text enter git without an owner-recorded REB and redistribution basis.
-Synthetic or researcher-authored timed text is labelled and passes the story-text admission
-checklist with independent review. Source-bearing tests commit only aggregate outputs permitted by
-the admission record. A human annotation is evidence about a coding act and may be gold after
-adjudication; it does not inherit direct stimulus authority merely because a person wrote it.
+For F2 corpora without a more specific owner disposition, participant content remains
+caller-supplied and external under Constitution IX. Sherlock follows the artifact-specific owner
+decision above: annotations, recall transcripts and exports, aliases, and derived data may enter
+Git and be shared after ordinary provenance and story-text admission, without a new
+Sherlock-specific licence, consent, REB, participant-prose, or aggregate-only hold. Synthetic or
+researcher-authored timed text is labelled and passes the same checklist with independent review.
+A human annotation is evidence about a coding act and may be gold after adjudication; it does not
+inherit direct stimulus authority merely because a person wrote it.
 
 ## 10. Validation and adversarial courts
 
@@ -786,9 +794,9 @@ dependency plan, not concurrent authorization.
 |---|---|---|
 | P0 | Existing compiler seam | **Satisfied** at `e661470`; this proves mechanical reachability only |
 | P1 | Real-transcript Stage 1b vertical | One admitted real transcript reaches an answered research question with exact receipts; **outstanding and blocks movie implementation** |
-| B0 | ADR Stage B admission: exact Sherlock records/rights, two-run timebase repair, aggregate-only fixtures, and the F0/F1/F2 plus component ledger | Exact artifact dispositions and owner actions; no participant prose or episode video enters git; unresolved Sherlock requires clarification or an explicit ADR replacement; documentation-only work may proceed separately but cannot unlock C1 by itself |
+| B0 | ADR Stage B artifact-specific admission: exact Sherlock media identities, annotation/recall records, transforms, 17-source alias map, two-run timebase repair, story-text checks, segmentation/semantic status, and the F0/F1/F2 plus component ledger | Actual episode video contents remain external; non-video artifacts receive their applicable admission outcome; source/edition, coordinate, semantic, uncertainty, feature-use, and anti-circularity courts pass; no superseded Sherlock rights or participant-content hold blocks closure |
 | C1 | ADR Stage C portable contracts: `SourceBundle`, stream/axis/coordinate/interval-set, `EvidenceSupport`, typed boundary layers, and checked atlas plus text and timed-transcript conformance | Begins only after P1 and B0 close; applicable construction/refusal courts and text regressions pass on JVM/JS/Native, including the `AudioSpan` absent/nonempty/legacy-empty fixture, fixture-scoped operation-derived `INT64_MIN` classification with provenance-flip and receipt-substitution refusals, pure exact rescaling, exhaustive checked-construction-door probes, refusal of `PTS < DTS` without field repair, refusal of runtime-observation promotion, and refusal to invent an edition axis; no provider or decoder dependency |
-| D0 | ADR Stage D read-only Sherlock atlas adapter | Exact pinned records, two-run repair, diagnostic feature-use ledger, aggregate-only fixtures, and no episode video, participant prose, decoder, or model dependency; all purported runtime decoder records remain draft through D0 and D1 |
+| D0 | ADR Stage D read-only Sherlock atlas adapter | Exact pinned records, two-run repair, 1,000/50/30 segmentation identities, diagnostic feature-use ledger, artifact-specific admitted fixtures, no committed episode video bytes, decoder, or model dependency; all purported runtime decoder records remain draft through D0 and D1 |
 | D1 | Stage D cross-module seam migration | Compiler atlas annotations, model envelope, alignment seams, claim-family status licensing, media feature targets/support/restriction, codec/version migration, unforgeable validated tracks, joined proposals/findings, strong execution and independence identities, request/output separation, and permutation-invariant resolution all pass |
 | E0 | ADR Stage E minimal film vertical proof | Opens only under a separately authorized decoder/component-realization bead; with only narrowly admitted dependencies, the adapter-owned invocation/result join, generic-codec draft boundary, forged-whole-receipt versus issued-receipt court, all ADR 0007 courts, and project-authored F0 courts pass before downstream use; one exact lawful film source slice and real recall produce a `NarrativeCompilation`; `validated` is present and one predeclared research question is answered reproducibly regardless of sign |
 | G1 | General acquisition worker plus timed-language lattice | Exact replay, checked coverage partition, call/payload/support join, provider-drift refusal, and text/media alternatives with critic findings pass |
@@ -798,8 +806,8 @@ dependency plan, not concurrent authorization.
 | V1 | storymodel4s renderer-neutral view packets/codecs | Packet laws, saved-state refusals, synchronized evidence navigation, and optional scanner mappings pass in this repository |
 | V2 | Sibling StoryAtlas consumer | Separately authorized storyatlas4s bead consumes one SHA-pinned V1 artifact; no reverse dependency |
 
-Unless ADR 0007 is explicitly amended, B0 remains Sherlock admission, D0 remains the narrow
-read-only Sherlock adapter, and E0 precedes broader workers and film-specific visualization. The
+Under the artifact-specific ADR 0007 amendment, B0 remains Sherlock scientific admission, D0
+remains the narrow read-only Sherlock adapter, and E0 precedes broader workers and film-specific visualization. The
 post-E worker sequence should prefer cheap deterministic or high-coverage acquisition before
 expensive interpretation, but no tool tier carries an epistemic status. Model admission follows
 measured capability, licence, calibration, and local courts; named models are candidates, not

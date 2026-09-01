@@ -1,0 +1,137 @@
+{
+  "schema": "storymodel4s.sherlock.annotation-lineage",
+  "schemaVersion": 1,
+  "artifactId": "sherlock-annotation-table-v1",
+  "source": {
+    "repository": "https://github.com/ContextLab/sherlock-topic-model-paper",
+    "commit": "81f90b8afa6dd714b780208bd89d1f1a26159ff5",
+    "repositoryPath": "data/raw/Sherlock_Segments_1000_NN_2017.xlsx",
+    "gitBlob": "2b3c456af349e88b01b87cb8fd0ce4ab4ff016cf",
+    "byteLength": 176658,
+    "sha256": "3ffd57e8d2fc2f7e7c47e86d758f64f158fc406c82f5a37f7d420fc2a929ea95",
+    "sheet": "Segments"
+  },
+  "localRepresentation": {
+    "format": "tsv",
+    "byteLength": 225692,
+    "sha256": "8c205826dcea8c58db24d7a17c71a3f99a9054e9379435e60b1dd0b987c2b296",
+    "rowCount": 1000,
+    "columnCount": 23,
+    "headerRowCount": 1,
+    "lineEndings": "CRLF",
+    "finalRecordSeparator": false,
+    "textContentIncludedInManifest": false
+  },
+  "workbookToTsvTransform": {
+    "classification": "byte-exact-replay",
+    "steps": [
+      "Read the Segments sheet with all 23 columns as text.",
+      "Preserve UTF-8 bytes, header whitespace, cell whitespace, and trailing spaces; do not trim.",
+      "Preserve the 28 explicit single-space Scene Segments cells identified below.",
+      "Replace remaining missing cells with empty strings.",
+      "Emit tab-separated fields without quoting using CRLF record separators.",
+      "Omit the final record separator."
+    ],
+    "singleSpaceSceneSegmentRows": [
+      27,
+      216,
+      277,
+      299,
+      311,
+      338,
+      348,
+      390,
+      434,
+      461,
+      504,
+      546,
+      568,
+      589,
+      617,
+      634,
+      653,
+      685,
+      695,
+      733,
+      763,
+      791,
+      829,
+      896,
+      914,
+      933,
+      955,
+      978
+    ],
+    "readerSpecificCaveat": "readxl converts the listed explicit single-space cells to missing values; a readxl replay must restore them before serialization.",
+    "resultSha256": "8c205826dcea8c58db24d7a17c71a3f99a9054e9379435e60b1dd0b987c2b296",
+    "verifiedByteIdentical": true
+  },
+  "coordinateObservations": {
+    "secondsResetAtSourceRow": 483,
+    "firstRunLastOrdinaryRow": 480,
+    "firstRunLastOrdinaryEndSeconds": 1419,
+    "scanBreakRows": [
+      481,
+      482
+    ],
+    "scanBreakRowsMissingTrCoordinates": [
+      481,
+      482
+    ],
+    "secondRunFirstRow": 483,
+    "secondRunRawStartSeconds": 0,
+    "secondRunRawEndSeconds": 1544,
+    "trBoundsAcrossWorkbook": {
+      "minimum": 1,
+      "maximum": 1976,
+      "durationSecondsPerTr": 1.5
+    },
+    "zeroDurationRows": [
+      13
+    ]
+  },
+  "segmentationPopulations": [
+    {
+      "id": "Microsegment1000",
+      "count": 1000,
+      "origin": "released-human-annotation",
+      "usableAfterPublishedScanBreakRemoval": 998,
+      "scientificRole": "fine-temporal-evidence-and-proposal-input"
+    },
+    {
+      "id": "Scene50",
+      "count": 50,
+      "origin": "released-human-coarse-scene-markers",
+      "scientificRole": "ordering-scaffold",
+      "exactContainmentClaim": false
+    },
+    {
+      "id": "TopicHmmEvent30",
+      "count": 30,
+      "origin": "recall-tuned-derived-model",
+      "scientificRole": "diagnostic-only",
+      "independentGold": false,
+      "featureUseRestriction": "Never train or select with TopicHmmEvent30 and then report agreement with TopicHmmEvent30 as independent validation."
+    }
+  ],
+  "semanticAuthority": {
+    "annotationCanSupport": [
+      "temporal-evidence-atlas",
+      "proposal-generation",
+      "coarse-ordering-scaffold"
+    ],
+    "annotationDoesNotEstablish": [
+      "accepted-propositions",
+      "stable-narrative-entity-identities",
+      "typed-narrative-relations",
+      "frame-exact-media-alignment"
+    ]
+  },
+  "storyTextAdmission": {
+    "textBearingArtifact": true,
+    "proposedForRepositoryContentAdmissionInThisSlice": false,
+    "outcome": "external-content-bound-by-digest",
+    "manifestContainsArtifactProse": false,
+    "futureContentProposal": "Run the ordinary story-text admission checklist for this artifact; apply no Sherlock-wide consent, REB, BBC, or aggregate-only condition."
+  }
+}

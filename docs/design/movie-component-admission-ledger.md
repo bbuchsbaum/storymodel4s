@@ -17,10 +17,13 @@ This ledger answers one bounded question:
 > constraints?
 
 It does not admit a film, participant recall, benchmark annotation, provider
-request, or finished runtime artifact. It does not close overall B0. Sherlock
-source admission, the two-run timebase repair, aggregate-only fixtures, the
-owner's five actions, P1, and implementation authorization remain independent
-gates.
+request, or finished runtime artifact. It does not close overall B0. Sherlock's
+artifact-specific storage disposition is resolved: only actual episode video
+contents remain external and non-redistributable, while non-video artifacts are
+eligible for ordinary admission. Exact source/edition binding, the two-run
+timebase repair, per-artifact provenance and story-text checks, segmentation and
+semantic authority, P1, component realization, and implementation authorization
+remain independent gates.
 
 No gated terms were accepted and no login, credential, source media,
 participant content, model weight, container, package, or executable was
