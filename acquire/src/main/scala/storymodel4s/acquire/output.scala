@@ -81,23 +81,7 @@ enum StrictDecodeFailureReason:
   case CodePointOutOfRange
 
 /** Decode receipt derived from one exact successful strict decoding operation. */
-final class DecodeReceipt private (
-    val id: OutputReceiptId,
-    val decoder: DecoderId,
-    val charset: CharsetId,
-    val policy: DecodePolicyId,
-    val configChecksum: Checksum,
-    val originalChecksum: Checksum,
-    val decodedChecksum: Checksum
-):
-  private def parts =
-    (id, decoder, charset, policy, configChecksum, originalChecksum, decodedChecksum)
-
-  override def equals(other: Any): Boolean = other match
-    case that: DecodeReceipt => parts == that.parts
-    case _                   => false
-  override def hashCode(): Int = parts.hashCode
-  override def toString: String = s"DecodeReceipt(id=${id.value}, decoder=${decoder.value})"
+type DecodeReceipt = SourceIdentities.DecodeReceiptValue
 
 object DecodeReceipt:
   val StrictUtf8Decoder: DecoderId = DecoderId.unsafe("storymodel4s.strict-utf8/v1")
@@ -106,90 +90,10 @@ object DecodeReceipt:
   val StrictUtf8ConfigChecksum: Checksum =
     Checksum.ofText("storymodel4s.strict-utf8/v1\u0000UTF-8\u0000report/v1\u0000consume-utf8-bom")
 
-  private[acquire] def successful(
-      originalChecksum: Checksum,
-      decodedChecksum: Checksum
-  ): DecodeReceipt =
-    val id = derivedReceiptId(
-      "decode-success/v1",
-      Vector(
-        StrictUtf8Decoder.value,
-        Utf8Charset.value,
-        ReportPolicy.value,
-        StrictUtf8ConfigChecksum.hex,
-        originalChecksum.hex,
-        decodedChecksum.hex
-      )
-    )
-    new DecodeReceipt(
-      id,
-      StrictUtf8Decoder,
-      Utf8Charset,
-      ReportPolicy,
-      StrictUtf8ConfigChecksum,
-      originalChecksum,
-      decodedChecksum
-    )
-
 /** Exact typed failure from the library-owned strict decoder. */
-final class StrictDecodeFailure private (
-    val receipt: OutputReceiptId,
-    val decoder: DecoderId,
-    val charset: CharsetId,
-    val policy: DecodePolicyId,
-    val configChecksum: Checksum,
-    val originalChecksum: Checksum,
-    val bytePosition: Long,
-    val reason: StrictDecodeFailureReason
-):
-  private def parts =
-    (
-      receipt,
-      decoder,
-      charset,
-      policy,
-      configChecksum,
-      originalChecksum,
-      bytePosition,
-      reason
-    )
-
-  override def equals(other: Any): Boolean = other match
-    case that: StrictDecodeFailure => parts == that.parts
-    case _                         => false
-  override def hashCode(): Int = parts.hashCode
-  override def toString: String =
-    s"StrictDecodeFailure(byte=$bytePosition, reason=$reason, receipt=${receipt.value})"
+type StrictDecodeFailure = SourceIdentities.StrictDecodeFailureValue
 
 object StrictDecodeFailure:
-  private[acquire] def derived(
-      originalChecksum: Checksum,
-      bytePosition: Int,
-      reason: StrictDecodeFailureReason
-  ): StrictDecodeFailure =
-    val receipt = derivedReceiptId(
-      "decode-failure/v1",
-      Vector(
-        DecodeReceipt.StrictUtf8Decoder.value,
-        DecodeReceipt.Utf8Charset.value,
-        DecodeReceipt.ReportPolicy.value,
-        DecodeReceipt.StrictUtf8ConfigChecksum.hex,
-        originalChecksum.hex,
-        bytePosition.toString,
-        reason.toString
-      )
-    )
-    new StrictDecodeFailure(
-      receipt,
-      DecodeReceipt.StrictUtf8Decoder,
-      DecodeReceipt.Utf8Charset,
-      DecodeReceipt.ReportPolicy,
-      DecodeReceipt.StrictUtf8ConfigChecksum,
-      originalChecksum,
-      bytePosition.toLong,
-      reason
-    )
-
   /** Re-run strict decoding so metadata alone cannot mint a failure detail. */
   def fromWire(
       bytes: Array[Byte],
@@ -358,29 +262,7 @@ object OriginalSourceIdentity:
     )
 
 /** Identity and receipt established by decoding before StorySource construction. */
-final class DecodedSourceIdentity private (
-    val utf16Length: Int,
-    val checksum: Checksum,
-    val decodeReceipt: DecodeReceipt
-):
-  /** Decoder identity derived from the typed receipt rather than a parallel label. */
-  def decoder: DecoderId = decodeReceipt.decoder
-
-  private def parts = (utf16Length, checksum, decodeReceipt)
-
-  override def equals(other: Any): Boolean = other match
-    case that: DecodedSourceIdentity => parts == that.parts
-    case _                           => false
-  override def hashCode(): Int = parts.hashCode
-  override def toString: String =
-    s"DecodedSourceIdentity(utf16=$utf16Length, checksum=${checksum.short()})"
-
-object DecodedSourceIdentity:
-  private[acquire] def fromText(
-      text: String,
-      decodeReceipt: DecodeReceipt
-  ): DecodedSourceIdentity =
-    new DecodedSourceIdentity(text.length, Checksum.ofText(text), decodeReceipt)
+type DecodedSourceIdentity = SourceIdentities.DecodedSourceIdentityValue
 
 /** Three distinct text identities bound to one successfully constructed StorySource. */
 final class SourceIdentities private (
@@ -424,6 +306,73 @@ object SourceIdentities:
   val CurrentCanonicalPolicy: CanonicalizationPolicyId =
     CanonicalizationPolicyId.unsafe("storysource-canonical-text/v1")
 
+  /** Successful receipt whose constructor is available only to the checked decoder below. */
+  final class DecodeReceiptValue private[SourceIdentities] (
+      val id: OutputReceiptId,
+      val decoder: DecoderId,
+      val charset: CharsetId,
+      val policy: DecodePolicyId,
+      val configChecksum: Checksum,
+      val originalChecksum: Checksum,
+      val decodedChecksum: Checksum
+  ):
+    private def parts =
+      (id, decoder, charset, policy, configChecksum, originalChecksum, decodedChecksum)
+
+    override def equals(other: Any): Boolean = other match
+      case that: DecodeReceiptValue => parts == that.parts
+      case _                        => false
+    override def hashCode(): Int = parts.hashCode
+    override def toString: String = s"DecodeReceipt(id=${id.value}, decoder=${decoder.value})"
+
+  /** Failed receipt whose constructor is available only to the checked decoder below. */
+  final class StrictDecodeFailureValue private[SourceIdentities] (
+      val receipt: OutputReceiptId,
+      val decoder: DecoderId,
+      val charset: CharsetId,
+      val policy: DecodePolicyId,
+      val configChecksum: Checksum,
+      val originalChecksum: Checksum,
+      val bytePosition: Long,
+      val reason: StrictDecodeFailureReason
+  ):
+    private def parts =
+      (
+        receipt,
+        decoder,
+        charset,
+        policy,
+        configChecksum,
+        originalChecksum,
+        bytePosition,
+        reason
+      )
+
+    override def equals(other: Any): Boolean = other match
+      case that: StrictDecodeFailureValue => parts == that.parts
+      case _                              => false
+    override def hashCode(): Int = parts.hashCode
+    override def toString: String =
+      s"StrictDecodeFailure(byte=$bytePosition, reason=$reason, receipt=${receipt.value})"
+
+  /** Decoded identity whose constructor shares the checked decoder's closed scope. */
+  final class DecodedSourceIdentityValue private[SourceIdentities] (
+      val utf16Length: Int,
+      val checksum: Checksum,
+      val decodeReceipt: DecodeReceipt
+  ):
+    /** Decoder identity derived from the typed receipt rather than a parallel label. */
+    def decoder: DecoderId = decodeReceipt.decoder
+
+    private def parts = (utf16Length, checksum, decodeReceipt)
+
+    override def equals(other: Any): Boolean = other match
+      case that: DecodedSourceIdentityValue => parts == that.parts
+      case _                                => false
+    override def hashCode(): Int = parts.hashCode
+    override def toString: String =
+      s"DecodedSourceIdentity(utf16=$utf16Length, checksum=${checksum.short()})"
+
   /** Checked admission retains a StorySource only when it matches the published outcome. */
   final class Admission private[SourceIdentities] (
       private val source: Option[StorySource],
@@ -464,7 +413,8 @@ object SourceIdentities:
           )
         )
       case Right((text, decodeReceipt)) =>
-        val decoded = DecodedSourceIdentity.fromText(text, decodeReceipt)
+        val decoded =
+          new DecodedSourceIdentityValue(text.length, decodeReceipt.decodedChecksum, decodeReceipt)
         StorySource.fromText(text, title, language, metadata) match
           case Left(error) =>
             val failureReceipt = derivedReceiptId(
@@ -561,7 +511,30 @@ object SourceIdentities:
     var failure: Option[StrictDecodeFailure] = None
 
     def reject(position: Int, reason: StrictDecodeFailureReason): Unit =
-      failure = Some(StrictDecodeFailure.derived(originalChecksum, position, reason))
+      val receipt = derivedReceiptId(
+        "decode-failure/v1",
+        Vector(
+          DecodeReceipt.StrictUtf8Decoder.value,
+          DecodeReceipt.Utf8Charset.value,
+          DecodeReceipt.ReportPolicy.value,
+          DecodeReceipt.StrictUtf8ConfigChecksum.hex,
+          originalChecksum.hex,
+          position.toString,
+          reason.toString
+        )
+      )
+      failure = Some(
+        new StrictDecodeFailureValue(
+          receipt,
+          DecodeReceipt.StrictUtf8Decoder,
+          DecodeReceipt.Utf8Charset,
+          DecodeReceipt.ReportPolicy,
+          DecodeReceipt.StrictUtf8ConfigChecksum,
+          originalChecksum,
+          position.toLong,
+          reason
+        )
+      )
 
     def continuation(position: Int): Boolean =
       if position >= bytes.length then
@@ -616,7 +589,27 @@ object SourceIdentities:
       case Some(value) => Left(value)
       case None        =>
         val text = out.toString
-        val receipt = DecodeReceipt.successful(originalChecksum, Checksum.ofText(text))
+        val decodedChecksum = Checksum.ofText(text)
+        val receiptId = derivedReceiptId(
+          "decode-success/v1",
+          Vector(
+            DecodeReceipt.StrictUtf8Decoder.value,
+            DecodeReceipt.Utf8Charset.value,
+            DecodeReceipt.ReportPolicy.value,
+            DecodeReceipt.StrictUtf8ConfigChecksum.hex,
+            originalChecksum.hex,
+            decodedChecksum.hex
+          )
+        )
+        val receipt = new DecodeReceiptValue(
+          receiptId,
+          DecodeReceipt.StrictUtf8Decoder,
+          DecodeReceipt.Utf8Charset,
+          DecodeReceipt.ReportPolicy,
+          DecodeReceipt.StrictUtf8ConfigChecksum,
+          originalChecksum,
+          decodedChecksum
+        )
         Right(text -> receipt)
 
   private def unsigned(value: Byte): Int = value & 0xff

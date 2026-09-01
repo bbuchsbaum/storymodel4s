@@ -47,6 +47,29 @@ package storymodel4s.consumerattack {
       summon[scala.deriving.Mirror.ProductOf[StrictDecodeFailureProductControl]]
         .fromProduct(product)
 
+  final case class DecodeReceiptProductControl(
+      id: storymodel4s.acquire.OutputReceiptId,
+      decoder: storymodel4s.acquire.DecoderId,
+      charset: storymodel4s.acquire.CharsetId,
+      policy: storymodel4s.acquire.DecodePolicyId,
+      configChecksum: storymodel4s.core.Checksum,
+      originalChecksum: storymodel4s.core.Checksum,
+      decodedChecksum: storymodel4s.core.Checksum
+  )
+  object DecodeReceiptProductControl:
+    def fromProduct(product: Product): DecodeReceiptProductControl =
+      summon[scala.deriving.Mirror.ProductOf[DecodeReceiptProductControl]].fromProduct(product)
+
+  final case class DecodedSourceIdentityProductControl(
+      utf16Length: Int,
+      checksum: storymodel4s.core.Checksum,
+      decodeReceipt: storymodel4s.acquire.DecodeReceipt
+  )
+  object DecodedSourceIdentityProductControl:
+    def fromProduct(product: Product): DecodedSourceIdentityProductControl =
+      summon[scala.deriving.Mirror.ProductOf[DecodedSourceIdentityProductControl]]
+        .fromProduct(product)
+
   final case class SourceAdmissionProductControl(
       source: Option[storymodel4s.core.StorySource],
       outcome: storymodel4s.acquire.SourceOutcome
@@ -159,6 +182,55 @@ package storymodel4s.consumerattack {
       )
     }
 
+    test("decode success same-shape controls expose all four construction mechanisms") {
+      assertEquals(
+        typeCheckErrors(
+          "storymodel4s.consumerattack.DecodeReceiptProductControl(???, ???, ???, ???, ???, ???, ???)"
+        ),
+        Nil
+      )
+      assertEquals(
+        typeCheckErrors("(x: storymodel4s.consumerattack.DecodeReceiptProductControl) => x.copy()"),
+        Nil
+      )
+      assertEquals(
+        typeCheckErrors(
+          "storymodel4s.consumerattack.DecodeReceiptProductControl.fromProduct((???, ???, ???, ???, ???, ???, ???))"
+        ),
+        Nil
+      )
+      assertEquals(
+        typeCheckErrors(
+          "summon[scala.deriving.Mirror.ProductOf[storymodel4s.consumerattack.DecodeReceiptProductControl]]"
+        ),
+        Nil
+      )
+      assertEquals(
+        typeCheckErrors(
+          "storymodel4s.consumerattack.DecodedSourceIdentityProductControl(0, ???, ???)"
+        ),
+        Nil
+      )
+      assertEquals(
+        typeCheckErrors(
+          "(x: storymodel4s.consumerattack.DecodedSourceIdentityProductControl) => x.copy(utf16Length = -1)"
+        ),
+        Nil
+      )
+      assertEquals(
+        typeCheckErrors(
+          "storymodel4s.consumerattack.DecodedSourceIdentityProductControl.fromProduct((0, ???, ???))"
+        ),
+        Nil
+      )
+      assertEquals(
+        typeCheckErrors(
+          "summon[scala.deriving.Mirror.ProductOf[storymodel4s.consumerattack.DecodedSourceIdentityProductControl]]"
+        ),
+        Nil
+      )
+    }
+
     test("checked failures close all four product construction doors") {
       refused(
         typeCheckErrors(
@@ -255,6 +327,47 @@ package storymodel4s.consumerattack {
           "summon[scala.deriving.Mirror.ProductOf[storymodel4s.acquire.SourceAdmission]]"
         ),
         "SourceAdmission Mirror"
+      )
+    }
+
+    test("checked decode success types close all four product construction doors") {
+      refused(
+        typeCheckErrors("storymodel4s.acquire.DecodeReceipt(???, ???, ???, ???, ???, ???, ???)"),
+        "DecodeReceipt.apply"
+      )
+      refused(
+        typeCheckErrors("(x: storymodel4s.acquire.DecodeReceipt) => x.copy()"),
+        "DecodeReceipt.copy"
+      )
+      refused(
+        typeCheckErrors(
+          "storymodel4s.acquire.DecodeReceipt.fromProduct((???, ???, ???, ???, ???, ???, ???))"
+        ),
+        "DecodeReceipt.fromProduct"
+      )
+      refused(
+        typeCheckErrors(
+          "summon[scala.deriving.Mirror.ProductOf[storymodel4s.acquire.DecodeReceipt]]"
+        ),
+        "DecodeReceipt Mirror"
+      )
+      refused(
+        typeCheckErrors("storymodel4s.acquire.DecodedSourceIdentity(0, ???, ???)"),
+        "DecodedSourceIdentity.apply"
+      )
+      refused(
+        typeCheckErrors("(x: storymodel4s.acquire.DecodedSourceIdentity) => x.copy()"),
+        "DecodedSourceIdentity.copy"
+      )
+      refused(
+        typeCheckErrors("storymodel4s.acquire.DecodedSourceIdentity.fromProduct((0, ???, ???))"),
+        "DecodedSourceIdentity.fromProduct"
+      )
+      refused(
+        typeCheckErrors(
+          "summon[scala.deriving.Mirror.ProductOf[storymodel4s.acquire.DecodedSourceIdentity]]"
+        ),
+        "DecodedSourceIdentity Mirror"
       )
     }
 
@@ -478,6 +591,39 @@ package storymodel4s.acquire.attack {
           "new storymodel4s.acquire.SourceIdentities.Admission(None, storymodel4s.acquire.SourceOutcome.Refused(storymodel4s.acquire.RefusedSourceProgress.BeforeIntake, ???))"
         ),
         "SourceIdentities.Admission constructor"
+      )
+    }
+
+    test("acquire child-package consumers cannot mint strict-decoding receipts") {
+      refused(
+        typeCheckErrors(
+          "storymodel4s.acquire.DecodeReceipt.successful(storymodel4s.core.Checksum.ofText(\"original\"), storymodel4s.core.Checksum.ofText(\"decoded\"))"
+        ),
+        "DecodeReceipt.successful"
+      )
+      refused(
+        typeCheckErrors(
+          "storymodel4s.acquire.StrictDecodeFailure.derived(storymodel4s.core.Checksum.ofText(\"original\"), 0, storymodel4s.acquire.StrictDecodeFailureReason.InvalidLeadingByte)"
+        ),
+        "StrictDecodeFailure.derived"
+      )
+      refused(
+        typeCheckErrors(
+          "new storymodel4s.acquire.SourceIdentities.DecodeReceiptValue(???, ???, ???, ???, ???, ???, ???)"
+        ),
+        "SourceIdentities.DecodeReceiptValue constructor"
+      )
+      refused(
+        typeCheckErrors(
+          "new storymodel4s.acquire.SourceIdentities.StrictDecodeFailureValue(???, ???, ???, ???, ???, ???, 0L, ???)"
+        ),
+        "SourceIdentities.StrictDecodeFailureValue constructor"
+      )
+      refused(
+        typeCheckErrors(
+          "new storymodel4s.acquire.SourceIdentities.DecodedSourceIdentityValue(0, ???, ???)"
+        ),
+        "SourceIdentities.DecodedSourceIdentityValue constructor"
       )
     }
 }
