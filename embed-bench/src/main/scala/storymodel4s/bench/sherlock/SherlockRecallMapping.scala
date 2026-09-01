@@ -9,7 +9,14 @@ import storymodel4s.align.*
 import storymodel4s.bench.BenchChannels
 import storymodel4s.core.{SegmentId, SituationId, SpanSet, StorySource, TextSpan}
 import storymodel4s.embed.onnx.{OnnxSentenceArtifacts, OnnxSentenceEmbedder, OnnxSentenceModel}
-import storymodel4s.recall.{Lexical, ModalityTag, PolarityTag, RecallSegmenter}
+import storymodel4s.recall.{
+  Lexical,
+  ModalityTag,
+  PolarityTag,
+  RecallSegmenter,
+  RecallUnit,
+  RecallUnitId
+}
 
 /** Diagnostic bridge from the checked Sherlock annotation atlas to the aligner's `SourceView`.
   *
@@ -185,6 +192,65 @@ object RecallWordsCsv:
   def transcriptText(words: Vector[RecallWord]): String =
     words.map(_.word).mkString(" ")
 
+/** Recall-audio timing of each unit, derived from the word onsets the CSV measures.
+  *
+  * The transcript the segmenter runs on is the words joined by single spaces, so every word owns a
+  * computable character span. A unit's `onsetSeconds` is the first measured word onset inside its
+  * span, in text order, and `lastWordOnsetSeconds` the last: the CSVs measure onsets only, so no
+  * offset or duration is fabricated, and a unit whose words all lack onsets carries `None`, never a
+  * zero that would read as the start of the session.
+  */
+object RecallTiming:
+
+  final case class UnitTiming(onsetSeconds: Option[Double], lastWordOnsetSeconds: Option[Double])
+
+  /** Character span of each word on the joined transcript; `spans(i)` slices back to `words(i)`. */
+  def wordSpans(words: Vector[RecallWordsCsv.RecallWord]): Vector[TextSpan] =
+    val starts = words.scanLeft(0)((acc, w) => acc + w.word.length + 1).init
+    words.zip(starts).map { case (w, s) => TextSpan.unsafe(s, s + w.word.length) }
+
+  def unitTimings(
+      words: Vector[RecallWordsCsv.RecallWord],
+      units: Vector[RecallUnit]
+  ): Map[RecallUnitId, UnitTiming] =
+    val spans = wordSpans(words)
+    units.map { unit =>
+      val u = unit.minSpan
+      val measured = words.zip(spans).collect {
+        case (w, s)
+            if s.start < u.endExclusive && s.endExclusive > u.start && w.onsetSeconds.nonEmpty =>
+          w.onsetSeconds.get
+      }
+      unit.id -> UnitTiming(measured.headOption, measured.lastOption)
+    }.toMap
+
+/** Raw anchor-concentration quantities of one posterior row.
+  *
+  * All quantities are published raw; no thresholded "confident" boolean exists here, because any
+  * cutoff is the consumer's decision, not a measurement. `localizability` keeps
+  * [[AlignmentRow.localizability]]'s absence contract: `None` when the unit carries no source mass,
+  * never an imputed value.
+  */
+object AnchorConfidence:
+
+  final case class Row(
+      mapAnchorMass: Option[Double],
+      runnerUpAnchor: Option[SourceNodeRef],
+      runnerUpMass: Option[Double],
+      localizability: Option[Double]
+  )
+
+  def of(row: AlignmentRow, sourceNodeCount: Int): Row =
+    val ranked = row.anchorMass.toVector
+      .filter(_._2 > 0.0)
+      .sortBy { case (r, m) => (-m, r.key) }
+    Row(
+      ranked.headOption.map(_._2),
+      ranked.lift(1).map(_._1),
+      ranked.lift(1).map(_._2),
+      row.localizability(sourceNodeCount)
+    )
+
 /** Terminal diagnostic: map one Sherlock recall transcript onto the two media parts.
   *
   * Usage: `sherlockRecallMap <annotation.tsv> <recall.csv> <report.tsv>`. Inputs stay outside Git;
@@ -241,6 +307,7 @@ object RecallWordsCsv:
   val signature = RecallSignature
     .compute(result, recall, built.view)
     .fold(e => throw new IllegalStateException(e.message), identity)
+  val timings = RecallTiming.unitTimings(words, recall.ordered)
 
   def timecode(ticks: Long, tps: Long): String =
     val totalMs = ticks * 1000L / tps
@@ -257,10 +324,16 @@ object RecallWordsCsv:
     "unit",
     "function",
     "recallText",
+    "recallOnsetSeconds",
+    "recallLastWordOnsetSeconds",
     "mapAnchor",
     "mapMode",
     "sourceMass",
     "externalMass",
+    "mapAnchorMass",
+    "runnerUpAnchor",
+    "runnerUpMass",
+    "localizability",
     "mediaPart",
     "startSeconds",
     "endSeconds",
@@ -273,6 +346,8 @@ object RecallWordsCsv:
   val lines = recall.ordered.zip(result.posterior.rows).map { case (unit, row) =>
     val anchor = row.mapSource
     val media = anchor.flatMap(built.media.get)
+    val timing = timings.getOrElse(unit.id, RecallTiming.UnitTiming(None, None))
+    val confidence = AnchorConfidence.of(row, built.view.nodes.size)
     val sceneLabel = anchor
       .flatMap { ref =>
         built.sceneByRef
@@ -290,10 +365,16 @@ object RecallWordsCsv:
       unit.ordinal.toString,
       unit.function.toString,
       clean(unit.text),
+      timing.onsetSeconds.map(_.toString).getOrElse(""),
+      timing.lastWordOnsetSeconds.map(_.toString).getOrElse(""),
       anchor.map(_.key).getOrElse(row.argmax.map(_.key).getOrElse("none")),
       row.mapMode.map(_.toString).getOrElse(""),
       f"${row.sourceMass}%.4f",
       f"${row.externalMass}%.4f",
+      confidence.mapAnchorMass.map(m => f"$m%.4f").getOrElse(""),
+      confidence.runnerUpAnchor.map(_.key).getOrElse(""),
+      confidence.runnerUpMass.map(m => f"$m%.4f").getOrElse(""),
+      confidence.localizability.map(l => f"$l%.4f").getOrElse(""),
       media.map(_.part).getOrElse(""),
       media.map(l => f"${l.startTick.toDouble / tps}%.1f").getOrElse(""),
       media.map(l => f"${l.endTick.toDouble / tps}%.1f").getOrElse(""),
@@ -321,4 +402,13 @@ object RecallWordsCsv:
   println(f"uniform coverage: ${signature.uniformCoverage}%.4f")
   println(s"specificity: ${signature.specificityMass.render}")
   println(s"external mass: ${signature.externalMass.render}")
+  val localizabilities =
+    result.posterior.rows.flatMap(r => AnchorConfidence.of(r, built.view.nodes.size).localizability)
+  if localizabilities.nonEmpty then
+    println(
+      f"localizability: mean ${localizabilities.sum / localizabilities.size}%.4f over " +
+        s"${localizabilities.size}/${result.posterior.rows.size} units with source mass"
+    )
+  val timed = recall.ordered.flatMap(u => timings.get(u.id).flatMap(_.onsetSeconds))
+  println(s"units with a recall-audio onset: ${timed.size} / ${recall.ordered.size}")
   println(s"report: $out ($elapsedMs ms)")
