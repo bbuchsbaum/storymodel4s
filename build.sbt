@@ -265,8 +265,8 @@ lazy val embedBench = project
 
 /** JVM-only media acquisition adapter (ADR 0007 §4, amendment 2026-09-01): exact-byte fixture
   * manifests, an ffprobe packet-index ingest that yields `Draft`-authority records only, and the
-  * first acquisition court over project-authored F0 media. It is the only module allowed to
-  * spawn a process. No portable module depends on it.
+  * first acquisition court over project-authored F0 media. It is the only module allowed to spawn a
+  * process. No portable module depends on it.
   */
 lazy val media = project
   .in(file("media"))
