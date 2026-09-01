@@ -590,3 +590,38 @@ Rejected alternative: qualify the import in the document tests. That leaves two 
 one simple name in sibling modules, which every future `import storymodel4s.core.*` inside `document`
 would trip over again; the rule that names in `core` must not shadow names in modules that depend on
 it is cheaper enforced at the source than remembered at each import.
+
+### 2026-09-01 — `media`: the JVM media-acquisition adapter module
+
+§4 reserves film ingestion for "separately scoped JVM adapters" and says adding one "requires its own
+bead and dependency review". This amendment is that record, for bead `bd-01M1FDNN3T4SKZ5ZJN1XGXYNY7`
+(first acquisition court, landing A; single-developer mode, so the author decides and records).
+
+Decision: a JVM-only module `media` (`storymodel4s-media`, package `storymodel4s.media`), depending on
+`core` and on circe for JSON. It is the only module permitted to spawn a process, and it does so in
+exactly one place (`Subprocess`). No portable module depends on it. Its vocabulary:
+
+- `ToolRealization` — name, `-version` line, and SHA-256 of the executable that ran; its identity
+  enters every derivation receipt so a replay under a different binary is a different derivation.
+- `FixtureManifest`, `DeclaredStream`, `DeclaredFrames`, `StreamDisposition` (`Decoded`,
+  `PacketIndexedOnly`, `Unsupported`) — the exact-byte admitted-input manifest the ledger requires,
+  carrying the generator's declared ground truth for project-authored media.
+- `ProbeEnvelope` — a recorded invocation (tool, exact arguments, stdout digest); the "injected typed
+  receipt" ordinary CI replays instead of executing a tool.
+- `FfprobeJson`, `RawStream`, `RawPacket`, `Ffprobe` — the parser and the one admitted invocation.
+- `MediaProbe`, `ProbedStream`, `PacketIndex` — the adapter-side join of manifest, verified input,
+  tool, arguments and output into `CallerRuntimePacketRecord`s under a `SourceDerivationReceipt`,
+  plus an explicit packet-to-PTS table. Authority is `Draft` and the type offers no promotion.
+
+The join refuses, rather than repairs, on: input identity mismatch; an observed stream with no
+declaration (the ledger forbids ignoring a stream); a declared stream the tool omits; codec, kind,
+or timebase disagreeing with the declaration; a present PTS before a present DTS (core's
+`PacketTimeFields` refusal, message preserved). A missing PTS is a typed absence on the record and
+refuses index construction; it is never invented from a nominal rate.
+
+Rejected alternatives: (1) placing the adapter in `embed-bench`, which already runs the
+recall-to-video pipeline — that module exists to score alignments against gold and drags in ONNX
+and grakern, and an ingest adapter must not depend on either; (2) placing it in `acquire`, which is
+portable and may not spawn a process (§5); (3) a portable pure-Scala demuxer — it would make the
+project the owner of container semantics the ledger deliberately assigns to an exactly identified
+external tool.

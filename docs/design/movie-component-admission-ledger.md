@@ -163,7 +163,7 @@ implementation.
 | Realization | `RecipeOnly` |
 | Evidence freshness | The peeled commit and content-addressed Git objects are the stable evidence coordinate. The tag-to-object mapping, release/signature page, current security and patch posture, legal guidance, fixture codecs, native closure, and deployment jurisdiction must be revalidated immediately before realization and whenever the selected release or build surface changes. A tag name or mutable project page is never treated as immutable evidence |
 | Rights/access | Source coordinate and LGPL-only build policy: `PaperworkAdmitted`. Fixture-specific codec and patent posture: `HoldUnknown`. Realized runtime: `HoldUnknown` |
-| Court authorization | `Held` by §6; no installation, build, or execution follows from this component record |
+| Court authorization | `Authorized(bd-01M1FDNN3T4SKZ5ZJN1XGXYNY7, local draft realization)` by §6.1 (2026-09-01); the nominated 9.0.1 recipe itself stays `RecipeOnly` and unrealized |
 
 The smallest presently defensible configuration is a **candidate recipe**, not
 a proven configure invocation:
@@ -252,7 +252,7 @@ runtime dependency and native-wheel closure is not yet exact.
 | Realization | `RecipeOnly` |
 | Evidence freshness | The full source commit, its commit-pinned files, and recorded artifact digests are the stable evidence coordinates. Revalidate the `v0.7.1` tag-to-commit mapping, PyPI provenance and yanking state, dependency metadata, mutable issue/project pages, embedded notices, and vulnerability state when a runtime lock is proposed, whenever any selected artifact changes, and immediately before implementation authorization. A tag name or mutable project page is never treated as immutable evidence |
 | Rights/access | Code/package: `PaperworkAdmitted`. Runtime closure: `HoldUnknown` |
-| Court authorization | `Held` by §6; no installation, package acquisition, container build, or execution follows from this component record |
+| Court authorization | `Authorized(bd-01M1FDNN3T4SKZ5ZJN1XGXYNY7, local draft realization)` by §6.1 (2026-09-01); a hash-pinned local install of `scenedetect-headless` 0.7.1 is within scope, a project-owned container is not |
 
 ## 6. First-court disposition
 
@@ -268,12 +268,50 @@ The intended acquisition proof remains deliberately narrow:
 5. the court claims nothing about ASR, speaker or character identity, visual
    semantics, narrative structure, or recall alignment.
 
-The first court is `Held`. Independent review may close this documentation
-ledger leg, but cannot open package installation or execution. A later,
-separately authorized implementation bead must first admit the final F0/F1
-manifests, realize the exact fixture-specific artifacts and native closure,
-record their digests, and then run the declared courts. The held court is an
-intentional result, not an incomplete favorable inference.
+The first court was `Held` from 2026-08-29 to 2026-09-01. Independent review
+closed the documentation ledger leg but could not open package installation or
+execution; that required a separately authorized implementation bead. The held
+court was an intentional result, not an incomplete favorable inference.
+
+### 6.1 Authorization record (2026-09-01, single-developer mode)
+
+`Authorized(bd-01M1FDNN3T4SKZ5ZJN1XGXYNY7, local draft realization)`.
+
+Basis: the owner's instruction of 2026-09-01 to pick up the movie plan at this
+court in single-developer mode (AGENTS.md SD5: the written record is the
+requirement, and the owner switches modes). Nothing owner-reserved is touched:
+no gated term is accepted and no weights are approved.
+
+Exact permitted scope:
+
+1. Media: project-authored F0 (`media/src/test/resources/f0/`, manifest
+   `f0-v1.manifest.json`, SHA-256 `0cf05f22…`) and one separately admitted 20–40 s
+   *Big Buck Bunny* excerpt cut by packet copy, never re-encoded.
+2. FFmpeg: deterministic ingest only (`ffprobe` stream and packet listing;
+   demux and packet copy for the excerpt; rawvideo or native decode to BGR24
+   frames for the detector). The realized binary is the local Homebrew build
+   recorded by path, `-version` line, and SHA-256 in the probe envelope; it is
+   general-purpose and GPL-enabled, is not redistributed, and is **not** the
+   nominated 9.0.1 LGPL-only recipe. That recipe stays `RecipeOnly`.
+3. PySceneDetect: `scenedetect-headless` 0.7.1 installed locally from the
+   hash-pinned wheel of §5, `ContentDetector` only, driven through the direct
+   frame interface; raw metrics plus boundary-existence and boundary-localization
+   proposals only.
+4. Authority: every runtime record produced under this authorization is
+   `ObservationAuthority.Draft` (ADR 0007 C1, `CallerRuntimePacketRecord`). No
+   E0 promotion path is opened. Ordinary CI replays recorded envelopes and never
+   obtains a tool; the live courts run only against a binary already present.
+
+Explicitly not authorized, and filed as follow-up work rather than skipped
+silently: the reproducible OCI closure of §4 and §5 (two independent clean
+builds, SBOM, signed build receipt, image digests), the corresponding-source
+bundle, and any patent-posture or deployment-jurisdiction finding. Rejected
+alternative: realizing that closure first. It buys nothing the type system can
+use while every record stays `Draft`; it is the E0 bead's cost, not this one's.
+
+| Local realization | Identity | Recorded in |
+|---|---|---|
+| `ffprobe` 7.1.1 (Homebrew `ffmpeg/7.1.1_3`) | binary SHA-256 `83f66b74c1f0fe3995f762adbaa90c1d32fbd8e1feceedc64fed4261e1a65ebb` | `media/src/test/resources/f0/f0-v1.ffprobe-envelope.json` |
 
 ## 7. Completion gate
 
