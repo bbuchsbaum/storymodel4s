@@ -1,0 +1,417 @@
+{
+  "applied": {
+    "filterMode": "MERGE",
+    "kernelSize": 5,
+    "minSceneLen": 2,
+    "threshold": 15.0,
+    "weights": {
+      "deltaEdges": 0.0,
+      "deltaHue": 1.0,
+      "deltaLum": 1.0,
+      "deltaSat": 1.0
+    }
+  },
+  "coverage": {
+    "observed": 45,
+    "requested": 45
+  },
+  "cuts": [
+    14,
+    29
+  ],
+  "detector": {
+    "filterMode": "MERGE",
+    "frameCounterFps": 24.0,
+    "kernelSize": null,
+    "lumaOnly": false,
+    "minSceneLen": 2,
+    "threshold": 15.0,
+    "type": "ContentDetector",
+    "weights": {
+      "deltaEdges": 0.0,
+      "deltaHue": 1.0,
+      "deltaLum": 1.0,
+      "deltaSat": 1.0
+    }
+  },
+  "frames": {
+    "count": 45,
+    "height": 18,
+    "pixelFormat": "bgr24",
+    "sha256": "bb13ca6a6618982c1e3d840eb04e59b5aa2c52f9e2c118ab70762e2cc67968af",
+    "width": 32
+  },
+  "metricKeys": [
+    "content_val",
+    "delta_hue",
+    "delta_sat",
+    "delta_lum",
+    "delta_edges"
+  ],
+  "metrics": [
+    {
+      "ordinal": 0
+    },
+    {
+      "content_val": 0.0,
+      "delta_edges": 0.0,
+      "delta_hue": 0.0,
+      "delta_lum": 0.0,
+      "delta_sat": 0.0,
+      "ordinal": 1
+    },
+    {
+      "content_val": 0.0,
+      "delta_edges": 0.0,
+      "delta_hue": 0.0,
+      "delta_lum": 0.0,
+      "delta_sat": 0.0,
+      "ordinal": 2
+    },
+    {
+      "content_val": 0.0,
+      "delta_edges": 0.0,
+      "delta_hue": 0.0,
+      "delta_lum": 0.0,
+      "delta_sat": 0.0,
+      "ordinal": 3
+    },
+    {
+      "content_val": 0.0,
+      "delta_edges": 0.0,
+      "delta_hue": 0.0,
+      "delta_lum": 0.0,
+      "delta_sat": 0.0,
+      "ordinal": 4
+    },
+    {
+      "content_val": 0.0,
+      "delta_edges": 0.0,
+      "delta_hue": 0.0,
+      "delta_lum": 0.0,
+      "delta_sat": 0.0,
+      "ordinal": 5
+    },
+    {
+      "content_val": 0.0,
+      "delta_edges": 0.0,
+      "delta_hue": 0.0,
+      "delta_lum": 0.0,
+      "delta_sat": 0.0,
+      "ordinal": 6
+    },
+    {
+      "content_val": 0.0,
+      "delta_edges": 0.0,
+      "delta_hue": 0.0,
+      "delta_lum": 0.0,
+      "delta_sat": 0.0,
+      "ordinal": 7
+    },
+    {
+      "content_val": 0.0,
+      "delta_edges": 0.0,
+      "delta_hue": 0.0,
+      "delta_lum": 0.0,
+      "delta_sat": 0.0,
+      "ordinal": 8
+    },
+    {
+      "content_val": 0.0,
+      "delta_edges": 0.0,
+      "delta_hue": 0.0,
+      "delta_lum": 0.0,
+      "delta_sat": 0.0,
+      "ordinal": 9
+    },
+    {
+      "content_val": 0.0,
+      "delta_edges": 0.0,
+      "delta_hue": 0.0,
+      "delta_lum": 0.0,
+      "delta_sat": 0.0,
+      "ordinal": 10
+    },
+    {
+      "content_val": 0.0,
+      "delta_edges": 0.0,
+      "delta_hue": 0.0,
+      "delta_lum": 0.0,
+      "delta_sat": 0.0,
+      "ordinal": 11
+    },
+    {
+      "content_val": 0.0,
+      "delta_edges": 0.0,
+      "delta_hue": 0.0,
+      "delta_lum": 0.0,
+      "delta_sat": 0.0,
+      "ordinal": 12
+    },
+    {
+      "content_val": 0.0,
+      "delta_edges": 0.0,
+      "delta_hue": 0.0,
+      "delta_lum": 0.0,
+      "delta_sat": 0.0,
+      "ordinal": 13
+    },
+    {
+      "content_val": 20.0,
+      "delta_edges": 0.0,
+      "delta_hue": 60.0,
+      "delta_lum": 0.0,
+      "delta_sat": 0.0,
+      "ordinal": 14
+    },
+    {
+      "content_val": 0.0,
+      "delta_edges": 0.0,
+      "delta_hue": 0.0,
+      "delta_lum": 0.0,
+      "delta_sat": 0.0,
+      "ordinal": 15
+    },
+    {
+      "content_val": 0.0,
+      "delta_edges": 0.0,
+      "delta_hue": 0.0,
+      "delta_lum": 0.0,
+      "delta_sat": 0.0,
+      "ordinal": 16
+    },
+    {
+      "content_val": 0.0,
+      "delta_edges": 0.0,
+      "delta_hue": 0.0,
+      "delta_lum": 0.0,
+      "delta_sat": 0.0,
+      "ordinal": 17
+    },
+    {
+      "content_val": 0.0,
+      "delta_edges": 0.0,
+      "delta_hue": 0.0,
+      "delta_lum": 0.0,
+      "delta_sat": 0.0,
+      "ordinal": 18
+    },
+    {
+      "content_val": 0.0,
+      "delta_edges": 0.0,
+      "delta_hue": 0.0,
+      "delta_lum": 0.0,
+      "delta_sat": 0.0,
+      "ordinal": 19
+    },
+    {
+      "content_val": 0.0,
+      "delta_edges": 0.0,
+      "delta_hue": 0.0,
+      "delta_lum": 0.0,
+      "delta_sat": 0.0,
+      "ordinal": 20
+    },
+    {
+      "content_val": 0.0,
+      "delta_edges": 0.0,
+      "delta_hue": 0.0,
+      "delta_lum": 0.0,
+      "delta_sat": 0.0,
+      "ordinal": 21
+    },
+    {
+      "content_val": 0.0,
+      "delta_edges": 0.0,
+      "delta_hue": 0.0,
+      "delta_lum": 0.0,
+      "delta_sat": 0.0,
+      "ordinal": 22
+    },
+    {
+      "content_val": 0.0,
+      "delta_edges": 0.0,
+      "delta_hue": 0.0,
+      "delta_lum": 0.0,
+      "delta_sat": 0.0,
+      "ordinal": 23
+    },
+    {
+      "content_val": 0.0,
+      "delta_edges": 0.0,
+      "delta_hue": 0.0,
+      "delta_lum": 0.0,
+      "delta_sat": 0.0,
+      "ordinal": 24
+    },
+    {
+      "content_val": 0.0,
+      "delta_edges": 0.0,
+      "delta_hue": 0.0,
+      "delta_lum": 0.0,
+      "delta_sat": 0.0,
+      "ordinal": 25
+    },
+    {
+      "content_val": 0.0,
+      "delta_edges": 0.0,
+      "delta_hue": 0.0,
+      "delta_lum": 0.0,
+      "delta_sat": 0.0,
+      "ordinal": 26
+    },
+    {
+      "content_val": 0.0,
+      "delta_edges": 0.0,
+      "delta_hue": 0.0,
+      "delta_lum": 0.0,
+      "delta_sat": 0.0,
+      "ordinal": 27
+    },
+    {
+      "content_val": 0.0,
+      "delta_edges": 0.0,
+      "delta_hue": 0.0,
+      "delta_lum": 0.0,
+      "delta_sat": 0.0,
+      "ordinal": 28
+    },
+    {
+      "content_val": 20.0,
+      "delta_edges": 0.0,
+      "delta_hue": 60.0,
+      "delta_lum": 0.0,
+      "delta_sat": 0.0,
+      "ordinal": 29
+    },
+    {
+      "content_val": 0.0,
+      "delta_edges": 0.0,
+      "delta_hue": 0.0,
+      "delta_lum": 0.0,
+      "delta_sat": 0.0,
+      "ordinal": 30
+    },
+    {
+      "content_val": 0.0,
+      "delta_edges": 0.0,
+      "delta_hue": 0.0,
+      "delta_lum": 0.0,
+      "delta_sat": 0.0,
+      "ordinal": 31
+    },
+    {
+      "content_val": 0.0,
+      "delta_edges": 0.0,
+      "delta_hue": 0.0,
+      "delta_lum": 0.0,
+      "delta_sat": 0.0,
+      "ordinal": 32
+    },
+    {
+      "content_val": 0.0,
+      "delta_edges": 0.0,
+      "delta_hue": 0.0,
+      "delta_lum": 0.0,
+      "delta_sat": 0.0,
+      "ordinal": 33
+    },
+    {
+      "content_val": 0.0,
+      "delta_edges": 0.0,
+      "delta_hue": 0.0,
+      "delta_lum": 0.0,
+      "delta_sat": 0.0,
+      "ordinal": 34
+    },
+    {
+      "content_val": 0.0,
+      "delta_edges": 0.0,
+      "delta_hue": 0.0,
+      "delta_lum": 0.0,
+      "delta_sat": 0.0,
+      "ordinal": 35
+    },
+    {
+      "content_val": 0.0,
+      "delta_edges": 0.0,
+      "delta_hue": 0.0,
+      "delta_lum": 0.0,
+      "delta_sat": 0.0,
+      "ordinal": 36
+    },
+    {
+      "content_val": 0.0,
+      "delta_edges": 0.0,
+      "delta_hue": 0.0,
+      "delta_lum": 0.0,
+      "delta_sat": 0.0,
+      "ordinal": 37
+    },
+    {
+      "content_val": 0.0,
+      "delta_edges": 0.0,
+      "delta_hue": 0.0,
+      "delta_lum": 0.0,
+      "delta_sat": 0.0,
+      "ordinal": 38
+    },
+    {
+      "content_val": 0.0,
+      "delta_edges": 0.0,
+      "delta_hue": 0.0,
+      "delta_lum": 0.0,
+      "delta_sat": 0.0,
+      "ordinal": 39
+    },
+    {
+      "content_val": 0.0,
+      "delta_edges": 0.0,
+      "delta_hue": 0.0,
+      "delta_lum": 0.0,
+      "delta_sat": 0.0,
+      "ordinal": 40
+    },
+    {
+      "content_val": 0.0,
+      "delta_edges": 0.0,
+      "delta_hue": 0.0,
+      "delta_lum": 0.0,
+      "delta_sat": 0.0,
+      "ordinal": 41
+    },
+    {
+      "content_val": 0.0,
+      "delta_edges": 0.0,
+      "delta_hue": 0.0,
+      "delta_lum": 0.0,
+      "delta_sat": 0.0,
+      "ordinal": 42
+    },
+    {
+      "content_val": 0.0,
+      "delta_edges": 0.0,
+      "delta_hue": 0.0,
+      "delta_lum": 0.0,
+      "delta_sat": 0.0,
+      "ordinal": 43
+    },
+    {
+      "content_val": 0.0,
+      "delta_edges": 0.0,
+      "delta_hue": 0.0,
+      "delta_lum": 0.0,
+      "delta_sat": 0.0,
+      "ordinal": 44
+    }
+  ],
+  "requestId": "f0-v1/content-detector/v1",
+  "runtime": {
+    "numpy": "2.5.2",
+    "opencv": "5.0.0",
+    "python": "3.13.11",
+    "scenedetect": "0.7.1"
+  },
+  "schema": "storymodel4s.media.detector-outcome",
+  "schemaVersion": 1
+}

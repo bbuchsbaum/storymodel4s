@@ -82,7 +82,8 @@ lazy val root = tlCrossRootProject
     providerAgent,
     embedGrakern,
     embedOnnx,
-    embedBench
+    embedBench,
+    media
   )
 
 /** Identity, spans, evidence, claims, credence, provenance, hashing. No I/O. */
@@ -297,6 +298,24 @@ lazy val embedBench = project
   )
   .dependsOn(embedCore.jvm, embedOnnx, embedGrakern, align.jvm, fixtures.jvm, laws.jvm % Test)
 
+/** JVM-only media acquisition adapter (ADR 0007 §4, amendment 2026-09-01): exact-byte fixture
+  * manifests, an ffprobe packet-index ingest that yields `Draft`-authority records only, and the
+  * first acquisition court over project-authored F0 media. It is the only module allowed to spawn a
+  * process. No portable module depends on it.
+  */
+lazy val media = project
+  .in(file("media"))
+  .settings(commonSettings)
+  .settings(
+    name := "storymodel4s-media",
+    libraryDependencies ++= Seq(
+      "io.circe" %% "circe-core" % circeV,
+      "io.circe" %% "circe-parser" % circeV
+    ),
+    Test / fork := true
+  )
+  .dependsOn(core.jvm)
+
 /** Portable semantic view artifacts shared by the Narrative Codex and Narrative Atlas. */
 lazy val view = crossProject(JVMPlatform, JSPlatform, NativePlatform)
   .crossType(CrossType.Pure)
@@ -386,7 +405,7 @@ val allModules = List(
 val allPlatforms = List("JVM", "JS", "Native")
 
 val jvmOnlyModules =
-  List("providerParser", "providerAgent", "embedGrakern", "embedOnnx", "embedBench")
+  List("providerParser", "providerAgent", "embedGrakern", "embedOnnx", "embedBench", "media")
 
 addCommandAlias(
   "compileAll",

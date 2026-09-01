@@ -1,0 +1,27 @@
+{
+  "schema": "storymodel4s.media.frames-envelope",
+  "schemaVersion": 1,
+  "fixtureId": "f1-v1",
+  "inputSha256": "efcdc104cabe4a1f885f5e60fbf9ec0774c792e6fb02e67a85e87e424e8f25a1",
+  "streamIndex": 0,
+  "tool": {
+    "name": "ffmpeg",
+    "invokedPath": "/opt/homebrew/bin/ffmpeg",
+    "resolvedPath": "/opt/homebrew/Cellar/ffmpeg/7.1.1_3/bin/ffmpeg",
+    "versionLine": "ffmpeg version 7.1.1 Copyright (c) 2000-2025 the FFmpeg developers",
+    "binarySha256": "14c12cd5dcbc0d75c83085296b27142a4abc61a320a97a5408f7048fa7cbd630",
+    "realization": "local Homebrew build (--enable-gpl --enable-version3 --enable-libx264 per -buildconf); native libavcodec h264 decoder. Not the nominated FFmpeg 9.0.1 LGPL-only recipe. Output authority: Draft."
+  },
+  "args": ["-hide_banner", "-loglevel", "error", "-y", "-protocol_whitelist", "file", "-map", "0:0", "-vf", "scale=in_color_matrix=bt601:in_range=tv:out_range=pc", "-f", "rawvideo", "-pix_fmt", "bgr24", "-fps_mode", "passthrough"],
+  "preprocessing": "h264 yuv420p 320x180 decoded by libavcodec and converted to bgr24 by libswscale with the matrix and ranges declared in the arguments (BT.601, limited range in, full range out; the source is untagged); no scaling, no crop, no rotation, no frame duplication or dropping (passthrough); every indexed packet yields exactly one frame",
+  "frames": {
+    "count": 720,
+    "width": 320,
+    "height": 180,
+    "pixelFormat": "bgr24",
+    "byteLength": 124416000,
+    "sha256": "e1fcc24398c81b9da928276bcefeef8d0021bf924a0bade931553b4956301b3e"
+  },
+  "recordedAt": "2026-09-01",
+  "note": "Decoded frame bytes (124 MB) are not committed. Decoder output identity is a property of this exact libavcodec build; a different build may decode to different bytes, in which case the live court reports drift rather than failing."
+}

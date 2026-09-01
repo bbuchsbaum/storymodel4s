@@ -1,0 +1,17 @@
+{
+  "schema": "storymodel4s.media.detector-envelope",
+  "schemaVersion": 1,
+  "fixtureId": "f0-v1",
+  "worker": {
+    "name": "scenedetect-worker",
+    "script": "media/worker/scenedetect_worker.py",
+    "scriptSha256": "47424d093c5c2cc51a1764b53b97a1a1282c25561f77eb10e8ffc3d1e44e60f2",
+    "versionLine": "scenedetect 0.7.1 python 3.13.11 numpy 2.5.2 opencv 5.0.0",
+    "realization": "media/worker/uv.lock (scenedetect-headless 0.7.1 wheel sha256 0594131cf2da278ac9f9442e1ce2a8fe6ccb25ab83a0899f349784e688d304c6, the ledger's pinned wheel), installed locally into media/worker/.venv with CPython 3.13.11. Not a project-owned container. Output authority: Draft."
+  },
+  "requestFile": "f0-v1.detector-request.json",
+  "outcomeFile": "f0-v1.detector-outcome.json",
+  "outcomeSha256": "4ae96f93e1fd858d3e28432b74789d4e6bb5f36fcc615e3c59040fcb5ff20631",
+  "recordedAt": "2026-09-01",
+  "note": "Two consecutive worker runs over the same frames produced byte-identical outcomes. Ordinary CI replays this outcome; the live court runs the worker only when media/worker/.venv/bin/python already exists and never installs it."
+}

@@ -590,3 +590,91 @@ Rejected alternative: qualify the import in the document tests. That leaves two 
 one simple name in sibling modules, which every future `import storymodel4s.core.*` inside `document`
 would trip over again; the rule that names in `core` must not shadow names in modules that depend on
 it is cheaper enforced at the source than remembered at each import.
+
+### 2026-09-01 — `media`: the JVM media-acquisition adapter module
+
+§4 reserves film ingestion for "separately scoped JVM adapters" and says adding one "requires its own
+bead and dependency review". This amendment is that record, for bead `bd-01M1FDNN3T4SKZ5ZJN1XGXYNY7`
+(first acquisition court, landing A; single-developer mode, so the author decides and records).
+
+Decision: a JVM-only module `media` (`storymodel4s-media`, package `storymodel4s.media`), depending on
+`core` and on circe for JSON. It is the only module permitted to spawn a process, and it does so in
+exactly one place (`Subprocess`). No portable module depends on it. Its vocabulary:
+
+- `ToolRealization` — name, `-version` line, and SHA-256 of the executable that ran; its identity
+  enters every derivation receipt so a replay under a different binary is a different derivation.
+- `FixtureManifest`, `DeclaredStream`, `DeclaredFrames`, `StreamDisposition` (`Decoded`,
+  `PacketIndexedOnly`, `Unsupported`) — the exact-byte admitted-input manifest the ledger requires,
+  carrying the generator's declared ground truth for project-authored media.
+- `ProbeEnvelope` — a recorded invocation (tool, exact arguments, stdout digest); the "injected typed
+  receipt" ordinary CI replays instead of executing a tool.
+- `FfprobeJson`, `FfprobeOutput`, `RawStream`, `RawPacket`, `PacketFlags`, `Ffprobe` — the parser
+  and the one admitted invocation (with `-protocol_whitelist file`). A literal `INT64_MIN`
+  timestamp in the JSON is refused at parse; only an absent field is the typed missing.
+- `MediaProbe`, `ProbedStream`, `ProbedPacket`, `PacketIndex` (with `PacketIndex.Entry`) — the
+  adapter-side join of manifest, verified input, tool, arguments and output into
+  `CallerRuntimePacketRecord`s under a `SourceDerivationReceipt`, plus an explicit packet-to-PTS
+  table. Each `ProbedPacket` keeps core's `PacketTimeFields` and `MediaDuration` beside the draft
+  record; missingness is read from those typed fields, never from the record's raw `Long`s.
+  Authority is `Draft` and the type offers no promotion.
+- `FixtureTier`, `DeclaredPicture`, `DeclaredAudio` — manifest declarations the join checks against
+  the tool's report (pixel format, geometry, sample rate, channels). `DeclaredFrames` has a checked
+  constructor only.
+
+The join refuses, rather than repairs, on: input identity mismatch; an observed stream with no
+declaration (the ledger forbids ignoring a stream); a declared stream the tool omits; codec, kind,
+timebase, picture format or geometry, or audio parameters disagreeing with the declaration; a
+present PTS before a present DTS (core's `PacketTimeFields` refusal, message preserved); a negative
+duration. A missing PTS is a typed absence on the packet and refuses index construction; it is
+never invented from a nominal rate. The index refuses a corrupt-flagged packet and an `Unsupported`
+stream, does not present a discard-flagged packet, and refuses tick arithmetic that would overflow.
+`StreamDisposition` is law, not label: only a `Decoded` stream may yield frames.
+
+Rejected alternatives: (1) placing the adapter in `embed-bench`, which already runs the
+recall-to-video pipeline — that module exists to score alignments against gold and drags in ONNX
+and grakern, and an ingest adapter must not depend on either; (2) placing it in `acquire`, which is
+portable and may not spawn a process (§5); (3) a portable pure-Scala demuxer — it would make the
+project the owner of container semantics the ledger deliberately assigns to an exactly identified
+external tool.
+
+### 2026-09-01 — `media`: identified frames and boundary-localization proposals
+
+Bead `bd-01M1FEN59CZCCR0SR3B6MZ1KYB` (first acquisition court, landing B) adds to `media`:
+
+- `Ffmpeg`, `PictureGeometry`, `FrameSet`, `FramesEnvelope` — the one admitted decode (one picture
+  stream to raw BGR24 with PTS passthrough, no scaling or cropping) and the join that binds the
+  decoded bytes to the probe's `PacketIndex`. The join refuses unless the byte length is exactly one
+  frame per indexed packet; a frame's PTS is looked up in that index and never computed from a
+  nominal rate (§3.1).
+- `ContentDetectorRecipe`, `DetectorRequest`, `DetectorOutcome`, `DetectorEnvelope`, `FlashFilterMode`
+  — every detector parameter declared; an automatic kernel size must come back resolved in the
+  outcome or the join refuses (ledger §5: no library default stands in for a recorded value). The
+  worker is untrusted (§6 step 1); it echoes request identity, frame digest, count, geometry and
+  recipe, and the join checks every echo (§6 step 2).
+- `AppliedRecipe` — what the library installed, read back from the constructed detector's own
+  state rather than echoed from the request; the join refuses unless it satisfies the recipe, and
+  an automatic kernel size must come back as a positive resolved value. `FrameMetrics` — raw
+  per-frame detector values. The outcome's claimed runtime must render to the worker
+  `ToolRealization`'s version line or the join refuses; the worker's interpreter and wheel bytes
+  are not hashed, only its script.
+- `BoundaryLocalizationProposal`, `BoundarySearch` and `BoundarySearchResult` — the typed
+  candidate of §6's output table, row "shot, track, interval, identity, boundary": a
+  boundary-existence and localization proposal on `BoundaryLayer.Shot`, at the instant of the
+  first frame after a visual discontinuity, with the window between the two frames and the raw
+  score. It carries no `ShotMorphology` and no extent claim, so it is not a `BoundaryClaim` and
+  offers no method to one (law 8; ledger §5 forbidden authority); its `BoundaryId` binds the
+  recipe. Empty detector output yields `BoundarySearchCoverage.ExaminedNoCandidate` on the
+  examined extent and can never construct a negative claim (law 10). Authority is `Draft`.
+  The axis is the picture stream's native presentation clock admitted as the edition playback
+  axis under one recorded assumption, named in the receipt: that stream's edit list is the
+  identity. The join checks the evidence it has (the tool's reported stream start equals the
+  first presented PTS and no packet was discarded) and refuses otherwise; a checked
+  `TrackComposition` receipt, and any non-identity edit list, belong to the E0 court.
+
+The worker itself lives at `media/worker/` as a uv-locked Python project pinned to the ledger's
+`scenedetect-headless` 0.7.1 wheel digest; it never opens a container and never computes a
+timestamp. Rejected alternatives: (1) `scenedetect.detect()` / `open_video()`, which would let the
+library own decoding, frame timing and a nominal frame rate (ledger §5 forbids exactly this); (2)
+emitting `BoundaryClaim.shot(HardCut(instant))` directly, which would assert a morphology the
+detector cannot establish; (3) a JVM-side reimplementation of the detector, which would make the
+project the owner of an algorithm the ledger identifies by exact upstream commit.

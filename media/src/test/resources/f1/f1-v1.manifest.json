@@ -1,0 +1,62 @@
+{
+  "schema": "storymodel4s.media.fixture-manifest",
+  "schemaVersion": 1,
+  "fixtureId": "f1-v1",
+  "tier": "F1",
+  "file": "f1-v1.mp4",
+  "sha256": "efcdc104cabe4a1f885f5e60fbf9ec0774c792e6fb02e67a85e87e424e8f25a1",
+  "byteLength": 3640647,
+  "container": "mp4",
+  "storage": "external-local-only; the excerpt bytes are not committed and are reproducible from the recorded derivation",
+  "source": {
+    "title": "Big Buck Bunny",
+    "rightsHolder": "Blender Foundation",
+    "license": "CC BY 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/3.0/",
+    "attribution": "(c) copyright 2008, Blender Foundation / www.bigbuckbunny.org",
+    "aboutUrl": "https://peach.blender.org/about/",
+    "downloadUrl": "https://download.blender.org/peach/bigbuckbunny_movies/BigBuckBunny_320x180.mp4.zip",
+    "archiveSha256": "109e3ede8790bd633f374ca311d9cc61dce8d7f98f5b0797ca98199c9fbceedf",
+    "archiveByteLength": 64657225,
+    "innerFile": "BigBuckBunny_320x180.mp4",
+    "innerSha256": "f78f39603e6774907f2faafabf26a667f4a6fc31769ec304a8a8f7c62d280508",
+    "innerByteLength": 64657027,
+    "innerStreams": "h264 Constrained Baseline 320x180 yuv420p at 24 fps on timebase 1/24 (14315 frames, 596.458 s); aac LC 48000 Hz stereo",
+    "obtained": "2026-09-01 from the download URL; the digests are self-computed (Blender publishes no digest), so they identify what was obtained, not what was published"
+  },
+  "derivation": {
+    "script": "media/tools/derive_f1.sh",
+    "method": "packet copy of both streams, no re-encode, from the keyframe at 300.000 s (inner video PTS 7200 on 1/24) for 30 s; metadata and chapters dropped; bit-exact muxing",
+    "ffmpegVersionLine": "ffmpeg version 7.1.1 Copyright (c) 2000-2025 the FFmpeg developers",
+    "ffmpegBinarySha256": "14c12cd5dcbc0d75c83085296b27142a4abc61a320a97a5408f7048fa7cbd630",
+    "replayVerified": "2026-09-01: two consecutive derivations produced identical bytes (cmp)",
+    "note": "The muxer rescales the video timebase from 1/24 to 1/12288 (each frame 512 ticks) and the audio keeps 1/48000 with the AAC priming packet at PTS -512 under an edit list. Both are facts of the excerpt's own container, recorded here, and are not repaired."
+  },
+  "streams": [
+    {
+      "index": 0,
+      "kind": "Picture",
+      "codec": "h264",
+      "timebase": "1/12288",
+      "disposition": "Decoded",
+      "pixFmt": "yuv420p",
+      "width": 320,
+      "height": 180
+    },
+    {
+      "index": 1,
+      "kind": "Audio",
+      "codec": "aac",
+      "timebase": "1/48000",
+      "disposition": "PacketIndexedOnly",
+      "sampleRate": 48000,
+      "channels": 2
+    }
+  ],
+  "properties": {
+    "declaredGroundTruth": "none; F1 supports source-side construction only (plan §9). No shot, scene, or narrative annotation is admitted with it.",
+    "timedText": "none"
+  },
+  "authority": "Every runtime record over these bytes is Draft under ADR 0007 C1. The H.264 decoder used locally is the general-purpose Homebrew FFmpeg build; patent posture and deployment jurisdiction remain HoldUnknown (ledger §4).",
+  "rights": "CC BY 3.0 with the attribution above. The excerpt is a derivative distributed only as hashes and recorded probes; no film bytes are committed."
+}
