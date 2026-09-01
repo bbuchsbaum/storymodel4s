@@ -90,6 +90,15 @@ class EnvelopeSuite extends FunSuite:
       .from(otherPrompt, new ModelExchange.Recorded(committed()))
       .fold(error => fail(error.message), identity)
     assertNotEquals(other.runtime.fingerprint, runtime.fingerprint)
+    assertNotEquals(
+      other.runtime.promptTemplateVersion,
+      runtime.promptTemplateVersion,
+      "a changed prompt text must move the receipt's prompt-template version"
+    )
+    assertEquals(
+      runtime.promptTemplateVersion.map(_.value),
+      Some(s"penman-parse@v1#${prompt.ref.checksum.hex}+${prompt.promptTextChecksum.hex}")
+    )
     assertEquals(
       ClaudeParserTransport
         .from(prompt, new ModelExchange.Recorded(committed()), 0L)

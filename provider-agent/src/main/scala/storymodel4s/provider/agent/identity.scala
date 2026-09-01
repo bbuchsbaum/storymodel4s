@@ -32,6 +32,7 @@ object AgentFailureCodes:
   val ConfigMismatch: ProviderFailureCode = admitted("config-mismatch")
   val TextChecksumMismatch: ProviderFailureCode = admitted("text-checksum-mismatch")
   val PenmanUnparsable: ProviderFailureCode = admitted("penman-unparsable")
+  val MarkerNotOnConcept: ProviderFailureCode = admitted("marker-not-on-concept")
   val MaxTokens: ProviderFailureCode = admitted("max-tokens")
   val UnexpectedStop: ProviderFailureCode = admitted("unexpected-stop-reason")
   val Refusal: ProviderFailureCode = admitted("refusal")
@@ -53,6 +54,7 @@ object AgentFailureCodes:
     ConfigMismatch,
     TextChecksumMismatch,
     PenmanUnparsable,
+    MarkerNotOnConcept,
     MaxTokens,
     UnexpectedStop,
     Refusal,

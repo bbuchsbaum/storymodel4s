@@ -50,23 +50,30 @@ private[agent] object AgentFixtures:
     "(c / come-01~e.1 :ARG1 (t / they~e.0) :direction (d / down~e.2) :path (r / river~e.4))"
   )
 
-  def requestItem(input: ParserSentenceInput): RequestItem =
-    RequestItem(
-      input.id.value,
-      input.sentenceId.value,
-      input.sentenceSpan.start,
-      input.sentenceSpan.endExclusive,
-      input.text,
-      input.textChecksum,
-      input.tokens.map(token =>
-        RequestToken(token.id.value, token.span.start, token.span.endExclusive, token.text)
-      )
-    )
+  def requestItem(input: ParserSentenceInput): RequestItem = RequestItem.fromInput(input)
 
   def keyFor(input: ParserSentenceInput): RecordingKey =
     ModelRequest
-      .render(runtime.model, prompt, requestItem(input), ClaudeParseDriver.MaxTokens, 1000L)
+      .render(
+        runtime.model,
+        prompt,
+        requestItem(input),
+        ClaudeParseDriver.MaxTokens,
+        ClaudeParseDriver.TimeoutMillis
+      )
       .key
+
+  /** The environment a record-mode run needs; the key value is never sent by a scripted client. */
+  val recordEnv: Map[String, String] = Map(
+    AgentCredentials.LiveVariable -> AgentCredentials.LiveValue,
+    AgentCredentials.PrimaryKeyVariable -> "scripted-not-a-key"
+  )
+
+  def scripted(
+      replies: Map[RecordingKey, ModelReply],
+      absent: ExchangeFailure = ExchangeFailure.ServiceError(529)
+  ): ExchangeSource.Scripted =
+    ExchangeSource.Scripted(new ScriptedModelClient(replies, absent))
 
   /** A hand-written reply: no accounting, because none was measured. */
   def reply(text: String, stop: ModelStopReason = ModelStopReason.EndTurn): ModelReply =

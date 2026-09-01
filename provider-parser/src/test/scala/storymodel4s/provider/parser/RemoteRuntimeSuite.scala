@@ -61,6 +61,21 @@ class RemoteRuntimeSuite extends FunSuite:
     }
   }
 
+  test("changing the prompt text changes the prompt-template version and the identity") {
+    val base = admitted(remote())
+    val other = admitted(remote(promptTextChecksum = Checksum.ofText("other text")))
+    assertNotEquals(other.promptTemplateVersion, base.promptTemplateVersion)
+    assertNotEquals(other.fingerprint, base.fingerprint)
+    assertEquals(
+      base.promptTemplateVersion.map(_.value),
+      Some(s"penman-parse@v1#${promptA.checksum.hex}+${promptText.hex}")
+    )
+    assertEquals(
+      other.promptTemplateVersion.map(_.value),
+      Some(s"penman-parse@v1#${promptA.checksum.hex}+${Checksum.ofText("other text").hex}")
+    )
+  }
+
   test("blank identity scalars are refused with the typed field named") {
     assertEquals(
       remote(provider = " "),
@@ -122,7 +137,7 @@ class RemoteRuntimeSuite extends FunSuite:
       assertEquals(call.version, "anthropic-java/2.34.0")
       assertEquals(
         call.promptTemplateVersion.map(_.value),
-        Some(s"penman-parse@v1#${promptA.checksum.hex}")
+        Some(s"penman-parse@v1#${promptA.checksum.hex}+${promptText.hex}")
       )
       assertEquals(call.params.get("runtime-fingerprint"), Some(remoteRuntime.fingerprint.value))
     }

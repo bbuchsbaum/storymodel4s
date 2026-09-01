@@ -30,8 +30,16 @@ What it is:
   list (ids, spans, texts). Request ids never participate. Every recording
   says what stands behind it: `captured` (the provider's reported model,
   usage, and wall time) or `authored` (hand-written evidence, which may carry
-  no accounting at all). Only captured durations reach a receipt. Replay
-  re-runs the full court on every read.
+  no accounting at all). Replay re-runs the full court on every read.
+- Duration in receipts: `result/v2` requires a `durationMillis`, so an
+  authored replay publishes `duration-millis=0` and a receipt cannot tell an
+  authored replay from a measured 0 ms call. Provenance of the reply is the
+  recording's `origin` and the driver's ledger, not the receipt. Making the
+  wire duration optional, or adding an origin field, is a `provider-parser`
+  schema change and the next slice.
+- Retries: the SDK keeps its default of two retries on 408/409/429/5xx and
+  connection errors, so one reply, and one receipt, may stand behind up to
+  three HTTP attempts; `timeoutMillis` bounds each attempt.
 - `AgentPromptPackage` loads `prompts/penman-parse.v1.txt` and manifests it
   (`PromptRole.Custom("provider-agent", "penman-parse")`).
 - `claudeParse` is the driver: `sbt "providerAgent/runMain
@@ -41,10 +49,16 @@ What it is:
   attempt outcome, recording key, and how the reply was served) and
   `summary.json` (counts, runtime identity, the `StageRecord`, and the
   `BuildReceipt`). The ledger (`replayed-authored`, `replayed-captured`,
-  `captured-live`, `unrecorded`) is derived from the store before and after
-  the run, not from the mode argument. Stdout carries counts and checksums
-  only. Exit status: 2 when the run could not start, 1 when any sentence
-  never reached the court, 0 otherwise.
+  `captured-live`, `unrecorded`, `corrupt`, `foreign`) is derived from the
+  store before and after the run, not from the mode argument; the stage is
+  `cached` only when every sentence was served from a recording that existed
+  before the run and was admitted on read, and `liveCalls` never counts a
+  corrupt recording (no call is made for it). `ClaudeParseDriver.run` takes
+  an `ExchangeSource`: `Anthropic` (the SDK behind the environment court) or
+  `Scripted` (an offline client with fixed replies), so the record path is
+  tested without spend. Stdout carries counts and checksums only. Exit
+  status: 2 when the run could not start, 1 when any sentence never reached
+  the court, 0 otherwise.
 
 Environment:
 
@@ -57,16 +71,18 @@ Environment:
 Modes: `replay` opens an existing recordings directory (a missing one is
 refused, never created) and never calls the model; a missing recording is
 `TransportFailure.Io(recording-missing)` for that exchange. `record` requires
-the flag and a key before it reads or creates anything, reuses recordings
-already present, and writes new ones. `ParserConfig.seed` is `None`: live
+the flag and a key before it reads anything, reads the text before it may
+create the recordings directory, reuses recordings already present, and
+writes new ones. `ParserConfig.seed` is `None`: live
 reruns are not fingerprint-identical; determinism is claimed for replay from
 recordings and proved by `ParserDeterminism.compare` over two replays.
 
 A `ProviderCall` minted under replay attests that this transport exchanged
 that request under that runtime identity; whether a network call stood behind
 it is recorded in the recording's `origin` and published by the driver, not in
-the call. A wire-level origin field would be a `provider-parser` schema change
-and is left for a later slice.
+the call. The receipt's `promptTemplateVersion` names the manifest checksum and
+the prompt-text checksum (`name@version#manifest+text`), so two prompt texts
+under one manifest never share a receipt identity.
 
 Tests are network-free. The three committed recordings under
 `src/test/resources/recordings/` are authored PENMAN for three admitted War of

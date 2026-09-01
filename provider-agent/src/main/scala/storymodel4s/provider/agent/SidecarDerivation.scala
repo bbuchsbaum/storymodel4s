@@ -9,19 +9,29 @@ private[agent] final case class SidecarRow(
     tokenIndices: Vector[Int]
 )
 
+/** Why a decoded marker set could not become a sidecar: a marker sat somewhere the prompt forbids.
+  */
+private[agent] enum SidecarRefusal:
+  case MarkerNotOnConcept(row: Int, site: MarkerSite)
+
 /** Derive the sidecar the admission court requires from the markers the model wrote inline.
   *
   * Why derivation and not a second model output: two sources of truth for one alignment would let
   * them disagree silently. Rows mirror the markers verbatim in decoder order; indices are neither
-  * sorted, deduplicated, nor range-filtered here, so the court's checks still bite.
+  * sorted, deduplicated, nor range-filtered here, so the court's checks still bite. A marker on a
+  * role or a literal target is refused outright: the prompt forbids it, and the court would
+  * otherwise turn it into relation or attribute evidence the model was never asked for.
   */
 object SidecarDerivation:
-  private[agent] def rows(markers: Vector[TokenMarker]): Vector[SidecarRow] =
-    markers.zipWithIndex.map { (marker, ordinal) =>
-      SidecarRow(ordinal, providerNodeId(marker.site), marker.marker.indices)
-    }
-
-  private def providerNodeId(site: MarkerSite): String = site match
-    case MarkerSite.OnConcept(node) => node.value
-    case MarkerSite.OnRole(edge)    => s"role-$edge"
-    case MarkerSite.OnTarget(edge)  => s"target-$edge"
+  private[agent] def derive(
+      markers: Vector[TokenMarker]
+  ): Either[SidecarRefusal, Vector[SidecarRow]] =
+    markers.zipWithIndex
+      .foldLeft[Either[SidecarRefusal, Vector[SidecarRow]]](Right(Vector.empty)) {
+        case (refused @ Left(_), _)           => refused
+        case (Right(rows), (marker, ordinal)) =>
+          marker.site match
+            case MarkerSite.OnConcept(node) =>
+              Right(rows :+ SidecarRow(ordinal, node.value, marker.marker.indices))
+            case other => Left(SidecarRefusal.MarkerNotOnConcept(ordinal, other))
+      }

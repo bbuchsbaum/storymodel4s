@@ -8,9 +8,9 @@ import java.nio.file.{Files, Path}
 import scala.util.control.NonFatal
 import storymodel4s.core.Checksum
 
-/** Content-derived identity of one model exchange: model id, prompt package, prompt text, the
-  * sentence's text checksum, and the token list. Never the caller's request id, so the same
-  * sentence replays under any batch layout.
+/** Content-derived identity of one model exchange: the user-message template version, model id,
+  * prompt package, prompt text, token budget, the sentence's text checksum, and the token list.
+  * Never the caller's request id, so the same sentence replays under any batch layout.
   */
 object RecordingKey:
   opaque type RecordingKey = Checksum
@@ -19,15 +19,18 @@ object RecordingKey:
       model: String,
       promptPackageChecksum: Checksum,
       promptTextChecksum: Checksum,
+      maxTokens: Long,
       textChecksum: Checksum,
       tokens: Vector[RequestToken]
   ): RecordingKey =
     AgentIdentity.digest(
       "agent-recording/v1",
       Vector(
+        ModelRequest.TemplateVersion,
         model,
         promptPackageChecksum.hex,
         promptTextChecksum.hex,
+        maxTokens.toString,
         textChecksum.hex,
         tokens.size.toString
       ) ++ tokens.flatMap { token =>

@@ -35,6 +35,16 @@ class RecordingsSuite extends FunSuite:
       keyOf(item),
       ModelRequest.render("claude-other", prompt, item, 4096L, 1000L).key
     )
+    assertNotEquals(
+      keyOf(item),
+      ModelRequest.render(runtime.model, prompt, item, 8192L, 1000L).key,
+      "the token budget did not reach the key"
+    )
+    assertEquals(
+      keyOf(item),
+      ModelRequest.render(runtime.model, prompt, item, 4096L, 999999L).key,
+      "the timeout must not reach the key"
+    )
   }
 
   test(
@@ -130,7 +140,7 @@ class RecordingsSuite extends FunSuite:
   }
 
   test("every failure code literal was admitted rather than thrown on") {
-    assertEquals(AgentFailureCodes.all.size, 15)
+    assertEquals(AgentFailureCodes.all.size, 16)
     assert(AgentFailureCodes.all.forall(code => code.value.nonEmpty))
     assertEquals(AgentFailureCodes.serviceError(429).value, "service-error-429")
     assertEquals(ExchangeFailure.Timeout(7L).toTransport, TransportFailure.Timeout(7L))

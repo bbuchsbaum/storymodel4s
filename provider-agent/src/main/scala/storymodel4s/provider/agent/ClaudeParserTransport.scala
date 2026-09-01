@@ -44,7 +44,10 @@ private[agent] object ReplyInterpretation:
         Try(AmrDecoder.fromPenman(text)).toEither.left.map(_ => "decoder threw").flatten match
           case Left(_)        => ItemOutcome.Failed(AgentFailureCodes.PenmanUnparsable)
           case Right(decoded) =>
-            ItemOutcome.Proposed(text, SidecarDerivation.rows(decoded.markers))
+            SidecarDerivation.derive(decoded.markers) match
+              case Left(SidecarRefusal.MarkerNotOnConcept(_, _)) =>
+                ItemOutcome.Failed(AgentFailureCodes.MarkerNotOnConcept)
+              case Right(rows) => ItemOutcome.Proposed(text, rows)
 
   /** Only captured replies carry a measured duration; authored evidence contributes nothing. */
   def measuredDuration(reply: ModelReply): Long = reply.evidence match

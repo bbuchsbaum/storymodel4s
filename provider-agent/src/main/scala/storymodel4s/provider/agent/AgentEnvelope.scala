@@ -27,6 +27,21 @@ private[agent] final case class RequestItem(
   /** The model-observed normalized input the court compares against the atlas tokens. */
   def modelInput: String = tokens.map(_.text).mkString(" ")
 
+private[agent] object RequestItem:
+  /** The item the request encoder will carry for one atlas-bound input; one derivation for all. */
+  def fromInput(input: storymodel4s.provider.parser.ParserSentenceInput): RequestItem =
+    RequestItem(
+      input.id.value,
+      input.sentenceId.value,
+      input.sentenceSpan.start,
+      input.sentenceSpan.endExclusive,
+      input.text,
+      input.textChecksum,
+      input.tokens.map(token =>
+        RequestToken(token.id.value, token.span.start, token.span.endExclusive, token.text)
+      )
+    )
+
 /** The `storymodel4s.parser.request/v1` envelope decoded with this module's own decoder. */
 private[agent] final case class ParserRequest(
     schema: String,

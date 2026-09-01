@@ -94,6 +94,30 @@ class MutationSuite extends FunSuite:
     )
   }
 
+  test("(b'') a duplicated marker index is passed through and fails as DuplicateIndex") {
+    val duplicated = penman(0).replace("city~e.4", "city~e.3,3")
+    assertEquals(
+      failureOf(attemptFor(reply(duplicated))),
+      ParserFailure.AlignmentSidecarInvalid(AlignmentSidecarIssue.DuplicateIndex(2, 3))
+    )
+  }
+
+  test("(f) a marker on a role is refused by the transport as marker-not-on-concept") {
+    val onRole = penman(0).replace(":ARG1 (p", ":ARG1~e.2 (p")
+    assertEquals(
+      failureOf(attemptFor(reply(onRole))),
+      ParserFailure.ProviderFailed(AgentFailureCodes.MarkerNotOnConcept)
+    )
+  }
+
+  test("(f') a marker on a literal target is refused the same way") {
+    val onLiteral = penman(0).replace("\"Egulac\"", "\"Egulac\"~e.4")
+    assertEquals(
+      failureOf(attemptFor(reply(onLiteral))),
+      ParserFailure.ProviderFailed(AgentFailureCodes.MarkerNotOnConcept)
+    )
+  }
+
   test("(c) altering one echoed token text fails as TokenEchoMismatch at that index") {
     val attempt = attemptWithMutatedJson { json =>
       firstItem(json) { item =>

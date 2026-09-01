@@ -53,7 +53,7 @@ final case class ModelReply(
 )
 
 /** One rendered model request. The recording key is derived together with the message so a request
-  * can never carry a key that describes a different sentence.
+  * can never carry a key that describes a different sentence, budget, or template.
   */
 final class ModelRequest private (
     val model: String,
@@ -67,6 +67,9 @@ final class ModelRequest private (
     s"ModelRequest($model, key=${key.checksum.short()}, timeoutMillis=$timeoutMillis)"
 
 object ModelRequest:
+  /** Version of the user-message rendering below; it participates in every recording key. */
+  val TemplateVersion: String = "storymodel4s.provider.agent.user-message/v1"
+
   /** Render the user message from the sentence and its token list, and derive the key. */
   private[agent] def render(
       model: String,
@@ -81,6 +84,7 @@ object ModelRequest:
       model,
       prompt.ref.checksum,
       prompt.promptTextChecksum,
+      maxTokens,
       item.textChecksum,
       item.tokens
     )
@@ -110,6 +114,21 @@ enum ExchangeFailure:
     case Timeout(limit) => TransportFailure.Timeout(limit)
     case other          => TransportFailure.Io(other.code)
 
+/** Something that completes one rendered request. The SDK-backed implementation is
+  * `LiveModelClient`; `ScriptedModelClient` is the offline stand-in that lets the record path be
+  * exercised without spend.
+  */
+trait ModelClient:
+  def complete(request: ModelRequest): Either[ExchangeFailure, ModelReply]
+
+/** An offline client answering from a fixed table by recording key; every unknown key gets the same
+  * typed failure. It holds no credentials and cannot spend, by construction.
+  */
+final class ScriptedModelClient(replies: Map[RecordingKey, ModelReply], absent: ExchangeFailure)
+    extends ModelClient:
+  def complete(request: ModelRequest): Either[ExchangeFailure, ModelReply] =
+    replies.get(request.key).toRight(absent)
+
 /** The single boundary through which model text enters. `Recorded` holds no client, so a replay
   * cannot spend by construction; the model id always comes from the request, never from the
   * exchange, so a receipt's model and the wire's model cannot diverge.
@@ -118,8 +137,8 @@ sealed trait ModelExchange:
   def complete(request: ModelRequest): Either[ExchangeFailure, ModelReply]
 
 object ModelExchange:
-  /** Every request goes to the provider and nothing is written. */
-  final class Live(client: LiveModelClient) extends ModelExchange:
+  /** Every request goes to the client and nothing is written. */
+  final class Live(client: ModelClient) extends ModelExchange:
     def complete(request: ModelRequest): Either[ExchangeFailure, ModelReply] =
       client.complete(request)
 
@@ -128,8 +147,10 @@ object ModelExchange:
     def complete(request: ModelRequest): Either[ExchangeFailure, ModelReply] =
       recordings.read(request.key, request.model)
 
-  /** Serve an existing recording; otherwise call the provider and record its reply. */
-  final class RecordingLive(client: LiveModelClient, recordings: Recordings) extends ModelExchange:
+  /** Serve an existing recording; otherwise call the client and record its reply. A corrupt
+    * recording is refused without a call.
+    */
+  final class RecordingLive(client: ModelClient, recordings: Recordings) extends ModelExchange:
     def complete(request: ModelRequest): Either[ExchangeFailure, ModelReply] =
       recordings.read(request.key, request.model) match
         case Right(reply)                              => Right(reply)

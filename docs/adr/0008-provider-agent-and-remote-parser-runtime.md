@@ -6,8 +6,8 @@
 
 **Decider:** the owner (single-developer mode, AGENTS.md SD5)
 
-**Plan:** the owner's 2026-09-01 story-pipeline solo plan, phase 1.1 and decision D1 (the plan
-document lives in the owner's checkout and is not on this branch)
+**Plan:** `docs/plans/2026-09-01-story-pipeline-solo-plan.md`, phase 1.1 and decision D1 (on this
+branch via 4c37fef3)
 
 ## Context
 
@@ -33,7 +33,9 @@ conversion through `AmrCandidates.fromPenman`, and receipts that carry a real `P
    supplies the fields the envelope, receipts, and `ParserCacheKey.of` need, so every
    existing `PinnedRuntime` call site compiles unchanged and every `match` on
    `ParserRuntime` names `Remote` explicitly. Remote receipts carry
-   `promptTemplateVersion = Some(name@version#checksum)`; pinned receipts keep `None`.
+   `promptTemplateVersion = Some(name@version#manifestChecksum+promptTextChecksum)`, so two
+   prompt texts under one manifest never share a receipt identity; pinned receipts keep
+   `None`.
 2. **Determinism.** `ParserConfig.seed = None`. Live reruns are not fingerprint-identical.
    The determinism claim is replay from recordings, proved by `ParserDeterminism.compare`
    over two replays of the same recordings reporting every sentence unchanged.
@@ -47,8 +49,10 @@ conversion through `AmrCandidates.fromPenman`, and receipts that carry a real `P
    result/v2 encoder with its own circe code; the provider-parser wire types stay private.
    `EnvelopeSuite` proves the emitted JSON is admitted by the real court with pinned literal
    token, concept, relation, and alignment counts.
-5. **Granularity.** One model call per request item inside one `exchange`; `timeoutMillis`
-   bounds each item call. The driver wraps the provider in
+5. **Granularity.** One model call per request item inside one `exchange`. The SDK keeps its
+   default of two retries on 408/409/429/5xx and connection errors, so one item's reply, and
+   the one receipt minted for it, may stand behind up to three HTTP attempts; `timeoutMillis`
+   bounds each attempt, not their sum. The driver wraps the provider in
    `SentenceIsolatingParserProvider`, so one exchange carries one item in practice.
    Recording keys are per item.
 6. **Credentials and spend.** The key is read from `STORYMODEL4S_ANTHROPIC_API_KEY`, falling
@@ -59,23 +63,31 @@ conversion through `AmrCandidates.fromPenman`, and receipts that carry a real `P
    recordings, and is refused before anything is read or created when the environment has
    not opted in. A missing recording in replay is `TransportFailure.Io(recording-missing)`
    for that exchange. Stdout carries counts, checksums, and ids, never source prose.
-7. **Recording store.** `Recordings(dir)`; key = digest over model id, prompt-package
-   checksum, prompt-text checksum, the item's text checksum, and the token list (ids,
-   starts, ends, texts); never the caller's request id. Each value is one JSON file with
-   the requested model, the raw model text, the stop reason, and an `origin`: `captured`
-   (the provider-reported model, usage tokens, and duration) or `authored` (hand-written
-   evidence, which must carry no accounting). A recording whose requested model is not the
-   request's model is refused as corrupt. Only captured durations reach a receipt. Replay
+7. **Recording store.** `Recordings(dir)`; key = digest over the user-message template
+   version, model id, prompt-package checksum, prompt-text checksum, the token budget, the
+   item's text checksum, and the token list (ids, starts, ends, texts); never the caller's
+   request id. Each value is one JSON file with the requested model, the raw model text, the
+   stop reason, and an `origin`: `captured` (the provider-reported model, usage tokens, and
+   duration) or `authored` (hand-written evidence, which must carry no accounting). A
+   recording whose requested model is not the request's model is refused as corrupt. Replay
    opens an existing directory and never creates one; replay re-runs the full court on
-   every run.
+   every run. Known conflation: `result/v2` requires `durationMillis`, so an authored replay
+   publishes `duration-millis=0` in its receipt, indistinguishable there from a measured 0 ms
+   call; the recording's `origin` and the driver's ledger carry the provenance, and an
+   optional wire duration or an origin field is the schema change of the next slice.
 8. **Driver output.** `@main def claudeParse(mode, textPath, recordingsDir, outDir)` writes
    per sentence a `.penman` file and a `.chart.txt` with `Canonical.serialization`, plus
    `receipts.json` and `summary.json` carrying the `StageRecord` and `BuildReceipt` built
    with `BuildReceiptBuilder`. How each reply was served (`replayed-authored`,
-   `replayed-captured`, `captured-live`, `unrecorded`) and the stage's `cached` flag are
-   derived from the store before and after the run, not from the mode argument. No
-   `PropositionChart` codec exists in the repository; the chart is published as its
-   canonical serialization only, and a codec is a separate slice.
+   `replayed-captured`, `captured-live`, `unrecorded`, `corrupt`, `foreign`) is derived from
+   the store before and after the run, not from the mode argument; the stage is `cached`
+   only when every sentence was served from a recording present before the run and admitted
+   on read, and a corrupt recording never counts as a live call. `run` takes an
+   `ExchangeSource` (`Anthropic`, or `Scripted` with fixed replies) so the record path is
+   tested offline; both pass the environment court first, and the text is read before the
+   recordings directory may be created. No `PropositionChart` codec exists in the
+   repository; the chart is published as its canonical serialization only, and a codec is a
+   separate slice.
 9. **Dependency.** The official Anthropic Java SDK (`com.anthropic:anthropic-java:2.34.0`,
    version pinned once in `build.sbt` and generated into `AnthropicSdkPin`; model id
    `claude-sonnet-5`), confined to one file. Resolved transitive set on 2026-09-01:
@@ -94,6 +106,15 @@ conversion through `AmrCandidates.fromPenman`, and receipts that carry a real `P
     package checksum reaches every cache key and receipt and cannot be misnamed. The few-shot
     examples are not War of the Ghosts sentences: the gold fixture stays the oracle and never
     the input the model is tuned on.
+
+## Departures from plan 1.1
+
+- The plan named `java.net.http` with no new dependency; the owner chose the official SDK
+  (decision 9) for typed errors and retries, confined to one file.
+- The plan named `acquire` stage-cache keys "so reruns replay from cache"; here reruns replay
+  from the content-keyed recordings store. A `StageCacheKey` is minted for the build receipt,
+  but no `acquire` cache is consulted or populated; a `ParserCache` implementation would need
+  a `PropositionEvidence` codec that does not exist yet.
 
 ## Rejected alternatives
 

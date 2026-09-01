@@ -692,7 +692,9 @@ object PinnedRuntime:
               )
 
 /** A remote model runtime whose weights cannot be pinned; identity is provider, model id, prompt
-  * package, prompt text, result schema, and SDK version, and every one of them is digested.
+  * package, prompt text, result schema, and SDK version, and every one of them is digested. The
+  * prompt-template version a receipt carries names the manifest checksum and the prompt-text
+  * checksum, so a receipt distinguishes two prompt texts under one manifest.
   *
   * Why a non-case class with a private constructor: the fingerprint is a claim about the other
   * fields, so it must be derived here and never supplied by a caller. `weightsPinned` is fixed to
@@ -767,7 +769,8 @@ object RemoteRuntime:
       case Some(field) => Left(ParserSetupFailure.invalidRuntimeField(field))
       case None        =>
         val rendered =
-          s"${promptPackage.name}@${promptPackage.version}#${promptPackage.checksum.hex}"
+          s"${promptPackage.name}@${promptPackage.version}#${promptPackage.checksum.hex}" +
+            s"+${promptTextChecksum.hex}"
         PromptTemplateVersion
           .from(rendered)
           .left

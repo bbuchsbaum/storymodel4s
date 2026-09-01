@@ -79,12 +79,21 @@ enum RecordingService:
   /** An authored recording that appeared during the run; this run cannot have written it. */
   case Foreign
 
+  /** A recording present but refused on read; no call was made for it. */
+  case Corrupt
+
+  /** True only for a recording that existed before the run and was admitted on read. */
+  def servedFromPresentRecording: Boolean = this match
+    case ReplayedAuthored | ReplayedCaptured           => true
+    case CapturedLive | Unrecorded | Foreign | Corrupt => false
+
   def render: String = this match
     case ReplayedAuthored => "replayed-authored"
     case ReplayedCaptured => "replayed-captured"
     case CapturedLive     => "captured-live"
     case Unrecorded       => "unrecorded"
     case Foreign          => "foreign"
+    case Corrupt          => "corrupt"
 
 /** Counts a run publishes. Privately constructed because the counts stand in relation to one
   * another and to the batch; only `derive` establishes them from a result and a ledger.
@@ -103,9 +112,13 @@ final class DriverSummary private (
     val capturedLive: Int,
     val unrecorded: Int,
     val foreign: Int,
+    val corrupt: Int,
     val receiptChecksum: Checksum
 ):
-  /** Provider calls this run attempted: zero under replay by construction of `Recorded`. */
+  /** Provider calls this run attempted: zero under replay by construction of `Recorded`; under
+    * record, every key that was absent before the run (captured, or attempted and not kept). A
+    * corrupt recording is refused without a call and never counts.
+    */
   def liveCalls: Int = mode match
     case DriverMode.Replay => 0
     case DriverMode.Record => capturedLive + unrecorded
@@ -154,8 +167,22 @@ object DriverSummary:
       capturedLive = services.count(_ == RecordingService.CapturedLive),
       unrecorded = services.count(_ == RecordingService.Unrecorded),
       foreign = services.count(_ == RecordingService.Foreign),
+      corrupt = services.count(_ == RecordingService.Corrupt),
       receiptChecksum
     )
+
+/** Where the driver obtains its client for `record` mode: the SDK behind the environment court, or
+  * an offline scripted client so the record path can be exercised without spend. Both pass the
+  * environment court first; the source decides only what answers once the court has admitted.
+  */
+sealed trait ExchangeSource
+
+object ExchangeSource:
+  /** The Anthropic SDK client, built only from an admitted `LiveAuthorization`. */
+  case object Anthropic extends ExchangeSource
+
+  /** An offline client with fixed replies; for tests and dry runs. */
+  final case class Scripted(client: ScriptedModelClient) extends ExchangeSource
 
 /** Text to charts through the real admission court, with a content-keyed record/replay store so
   * reruns and tests never touch the network.
@@ -226,34 +253,47 @@ object ClaudeParseDriver:
         ParserBatch.validated(all).left.map(error => DriverError.InputInvalid(error.message))
       )
 
+  /** Run one text through the court. Order matters: the environment court for `record` comes before
+    * any read, the text is read before the recordings directory may be created, and `replay` never
+    * creates anything.
+    */
   def run(
       mode: DriverMode,
       textPath: Path,
       recordingsDir: Path,
       outDir: Path,
       env: Map[String, String],
-      nowEpochMillis: Long
+      nowEpochMillis: Long,
+      source: ExchangeSource = ExchangeSource.Anthropic
   ): Either[DriverError, DriverSummary] =
     for
-      authorization <- mode match
+      client <- mode match
         case DriverMode.Replay => Right(None)
         case DriverMode.Record =>
-          LiveAuthorization.from(env).left.map(DriverError.LiveRefused(_)).map(Some(_))
+          LiveAuthorization
+            .from(env)
+            .left
+            .map(DriverError.LiveRefused(_))
+            .map { admitted =>
+              source match
+                case ExchangeSource.Anthropic         => Some(LiveModelClient.from(admitted))
+                case ExchangeSource.Scripted(offline) => Some(offline)
+            }
+      text <- readText(textPath)
+      story <- StorySource
+        .fromText(text, Some(textPath.getFileName.toString))
+        .left
+        .map(error => DriverError.SourceInvalid(error.message))
+      atlas = SurfaceAnalyzer.analyze(story)
+      batch <- inputs(atlas)
+      prompt <- AgentPromptPackage.load().left.map(DriverError.PromptUnavailable(_))
+      parserConfig <- config(prompt)
       recordings <- (mode match
         case DriverMode.Replay => Recordings.open(recordingsDir)
         case DriverMode.Record => Recordings.at(recordingsDir)
       ).left.map(DriverError.RecordingsUnavailable(_))
-      text <- readText(textPath)
-      source <- StorySource
-        .fromText(text, Some(textPath.getFileName.toString))
-        .left
-        .map(error => DriverError.SourceInvalid(error.message))
-      atlas = SurfaceAnalyzer.analyze(source)
-      batch <- inputs(atlas)
-      prompt <- AgentPromptPackage.load().left.map(DriverError.PromptUnavailable(_))
-      parserConfig <- config(prompt)
-      exchange = authorization.fold[ModelExchange](new ModelExchange.Recorded(recordings))(
-        admitted => new ModelExchange.RecordingLive(LiveModelClient.from(admitted), recordings)
+      exchange = client.fold[ModelExchange](new ModelExchange.Recorded(recordings))(admitted =>
+        new ModelExchange.RecordingLive(admitted, recordings)
       )
       claude <- transport(prompt, exchange)
       keys = recordingKeys(claude.runtime, prompt, batch)
@@ -264,18 +304,18 @@ object ClaudeParseDriver:
       }
       _ <- writeOutputs(outDir, batch, result, recordings, claude.runtime, keys, services)
       receipt <- buildReceipt(
-        source,
+        story,
         claude.runtime,
         parserConfig,
         prompt,
         result,
-        cached = present.forall(identity),
+        cached = services.forall(_.servedFromPresentRecording),
         nowEpochMillis
       )
       summary = DriverSummary.derive(
         mode,
-        source.id,
-        source.canonicalChecksum,
+        story.id,
+        story.canonicalChecksum,
         result,
         services,
         receipt.receipt.contentChecksum
@@ -283,34 +323,33 @@ object ClaudeParseDriver:
       _ <- writeSummary(outDir, summary, claude.runtime, prompt, receipt)
     yield summary
 
-  private def service(
+  /** Classify how one key was served from what the store holds before and after the run. */
+  private[agent] def service(
       recordings: Recordings,
       runtime: RemoteRuntime,
       key: RecordingKey,
       wasPresent: Boolean
   ): RecordingService =
-    recordings.read(key, runtime.model).toOption.map(_.evidence) match
-      case Some(ReplyEvidence.Authored) if wasPresent          => RecordingService.ReplayedAuthored
-      case Some(ReplyEvidence.Captured(_, _, _)) if wasPresent => RecordingService.ReplayedCaptured
-      case Some(ReplyEvidence.Captured(_, _, _))               => RecordingService.CapturedLive
-      case Some(ReplyEvidence.Authored)                        => RecordingService.Foreign
-      case None                                                => RecordingService.Unrecorded
+    recordings.read(key, runtime.model) match
+      case Right(reply) =>
+        reply.evidence match
+          case ReplyEvidence.Authored if wasPresent          => RecordingService.ReplayedAuthored
+          case ReplyEvidence.Captured(_, _, _) if wasPresent => RecordingService.ReplayedCaptured
+          case ReplyEvidence.Captured(_, _, _)               => RecordingService.CapturedLive
+          case ReplyEvidence.Authored                        => RecordingService.Foreign
+      case Left(ExchangeFailure.RecordingMissing(_)) => RecordingService.Unrecorded
+      case Left(_)                                   => RecordingService.Corrupt
 
-  private def recordingKeys(
+  /** The keys the transport will use, derived by the same rendering it performs. */
+  private[agent] def recordingKeys(
       runtime: RemoteRuntime,
       prompt: AgentPromptPackage,
       batch: ParserBatch
   ): Vector[RecordingKey] =
     batch.inputs.map { input =>
-      RecordingKey.of(
-        runtime.model,
-        prompt.ref.checksum,
-        prompt.promptTextChecksum,
-        input.textChecksum,
-        input.tokens.map(token =>
-          RequestToken(token.id.value, token.span.start, token.span.endExclusive, token.text)
-        )
-      )
+      ModelRequest
+        .render(runtime.model, prompt, RequestItem.fromInput(input), MaxTokens, TimeoutMillis)
+        .key
     }
 
   private def readText(path: Path): Either[DriverError, String] =
@@ -494,6 +533,7 @@ object ClaudeParseDriver:
         "capturedLive" -> summary.capturedLive.asJson,
         "unrecorded" -> summary.unrecorded.asJson,
         "foreign" -> summary.foreign.asJson,
+        "corrupt" -> summary.corrupt.asJson,
         "liveCalls" -> summary.liveCalls.asJson
       ),
       "runtime" -> Json.obj(
@@ -557,7 +597,8 @@ object ClaudeParseDriver:
           s"abstained=${summary.abstained} transportFailures=${summary.transportFailures} " +
           s"replayedAuthored=${summary.replayedAuthored} " +
           s"replayedCaptured=${summary.replayedCaptured} capturedLive=${summary.capturedLive} " +
-          s"unrecorded=${summary.unrecorded} liveCalls=${summary.liveCalls} " +
+          s"unrecorded=${summary.unrecorded} corrupt=${summary.corrupt} " +
+          s"liveCalls=${summary.liveCalls} " +
           s"receipt=${summary.receiptChecksum.short()}"
       )
       if summary.transportFailures > 0 then sys.exit(1)

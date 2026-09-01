@@ -8,14 +8,17 @@ import com.anthropic.models.messages.{CacheControlEphemeral, MessageCreateParams
 import java.time.Duration
 import scala.jdk.CollectionConverters.*
 import scala.jdk.OptionConverters.*
+import scala.util.control.NonFatal
 import storymodel4s.core.Checksum
 
 /** The only file that touches the Anthropic SDK. It sends exactly what a `ModelRequest` carries:
-  * the model id from the request, a cached system prompt, one user message, and a per-call timeout.
-  * No sampling parameters and no thinking configuration are sent. The reply records the requested
-  * model as its identity and the provider-reported model beside it as evidence.
+  * the model id from the request, a cached system prompt, one user message, and a per-attempt
+  * timeout. No sampling parameters and no thinking configuration are sent. The SDK keeps its
+  * default of two retries on 408/409/429/5xx and connection errors, so one reply (and one receipt)
+  * may stand behind up to three HTTP attempts, each bounded by `timeoutMillis`. The reply records
+  * the requested model as its identity and the provider-reported model beside it as evidence.
   */
-final class LiveModelClient private (client: AnthropicClient):
+final class LiveModelClient private (client: AnthropicClient) extends ModelClient:
   def complete(request: ModelRequest): Either[ExchangeFailure, ModelReply] =
     val params = MessageCreateParams
       .builder()
@@ -41,7 +44,7 @@ final class LiveModelClient private (client: AnthropicClient):
       val message = client.messages().create(params, options)
       val elapsed = (System.nanoTime() - started) / 1000000L
       val text = message.content().asScala.flatMap(block => block.text().toScala).map(_.text())
-      val stop = message.stopReason().toScala.map(_.toString).getOrElse("")
+      val stop = message.stopReason().toScala.map(_.asString()).getOrElse("")
       val usage = message.usage()
       Right(
         ModelReply(
@@ -49,7 +52,7 @@ final class LiveModelClient private (client: AnthropicClient):
           text = text.mkString,
           stopReason = ModelStopReason.fromWire(stop),
           evidence = ReplyEvidence.Captured(
-            reportedModel = Some(message.model().toString),
+            reportedModel = Some(message.model().asString()),
             usage = ModelUsage(
               usage.inputTokens(),
               usage.outputTokens(),
@@ -71,6 +74,8 @@ final class LiveModelClient private (client: AnthropicClient):
         }
         if timedOut then Left(ExchangeFailure.Timeout(request.timeoutMillis))
         else Left(ExchangeFailure.ConnectionFailed(Checksum.ofText(describe(error))))
+      case NonFatal(error) =>
+        Left(ExchangeFailure.ConnectionFailed(Checksum.ofText(describe(error))))
 
   private def describe(error: Throwable): String =
     s"${error.getClass.getName}: ${Option(error.getMessage).getOrElse("")}"
