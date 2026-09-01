@@ -112,6 +112,59 @@ class SinkhornSuite extends ScalaCheckSuite:
     assertEquals(unnamed, Vector.empty)
   }
 
+  test("cost NaN and -Inf are InvalidConfig and name the cell") {
+    val unnamed = SinkhornSuite.costCases.flatMap { case (label, c) =>
+      UnbalancedSinkhorn.solve(c, SinkhornSuite.probeA, SinkhornSuite.probeB) match
+        case Left(AlignError.InvalidConfig("cost", detail)) if detail.contains(label) =>
+          None
+        case other => Some(s"$label -> $other")
+    }
+    assertEquals(unnamed, Vector.empty)
+  }
+
+  test("non-finite or negative marginals are InvalidConfig and name the side") {
+    val unnamed = SinkhornSuite.marginalCases.flatMap { case (label, (a, b)) =>
+      UnbalancedSinkhorn.solve(SinkhornSuite.probeCost, a, b) match
+        case Left(AlignError.InvalidConfig("marginals", detail)) if detail.contains(label) =>
+          None
+        case other => Some(s"$label -> $other")
+    }
+    assertEquals(unnamed, Vector.empty)
+  }
+
+  test("a +Inf cost cell is a forbidden edge with exact zero mass") {
+    val c = Vector(Vector(0.1, Double.PositiveInfinity), Vector(0.8, 0.2))
+    val r = solve(c, Vector(1.0, 1.0), Vector(1.0, 1.0))
+    assertEquals(r.plan(0)(1), 0.0)
+    assert(r.plan(0)(0) > 0.0, r.plan.toString)
+    assert(r.plan.flatten.forall(x => x >= 0.0 && x.isFinite), r.plan.toString)
+  }
+
+  test("an all-+Inf row with positive mass is refused") {
+    val c =
+      Vector(Vector(Double.PositiveInfinity, Double.PositiveInfinity), Vector(0.8, 0.2))
+    UnbalancedSinkhorn.solve(c, Vector(1.0, 1.0), Vector(1.0, 1.0)) match
+      case Left(AlignError.InvalidConfig("cost", detail)) =>
+        assert(detail.contains("row 0"), detail)
+      case other => fail(other.toString)
+  }
+
+  test("an all-+Inf row with zero mass is lawful and stays zero") {
+    val c =
+      Vector(Vector(Double.PositiveInfinity, Double.PositiveInfinity), Vector(0.8, 0.2))
+    val r = solve(c, Vector(0.0, 1.0), Vector(1.0, 1.0))
+    assert(r.plan(0).forall(_ == 0.0), r.plan.toString)
+    assert(r.plan(1).exists(_ > 0.0), r.plan.toString)
+  }
+
+  test("an all-+Inf column with positive mass is refused") {
+    val c = Vector(Vector(0.1, Double.PositiveInfinity), Vector(0.8, Double.PositiveInfinity))
+    UnbalancedSinkhorn.solve(c, Vector(1.0, 1.0), Vector(1.0, 1.0)) match
+      case Left(AlignError.InvalidConfig("cost", detail)) =>
+        assert(detail.contains("column 1"), detail)
+      case other => fail(other.toString)
+  }
+
   test("with a large penalty the transport is nearly balanced") {
     val c = Vector(Vector(0.1, 0.9, 0.5), Vector(0.8, 0.2, 0.6))
     val a = Vector(1.0, 1.0)
@@ -168,6 +221,27 @@ object SinkhornSuite:
       "rhoCols" -> SinkhornConfig(rhoCols = Double.NaN),
       "rhoCols" -> SinkhornConfig(rhoCols = Double.PositiveInfinity),
       "rhoCols" -> SinkhornConfig(rhoCols = -1.0)
+    )
+
+  /** Scout-measured cost siblings. Restoring the pre-input-boundary solve leaves Rights here.
+    */
+  private val costCases: Vector[(String, Vector[Vector[Double]])] =
+    Vector(
+      "(0,0)" -> Vector(Vector(Double.NaN, 0.9), Vector(0.8, 0.2)),
+      "(0,0)" -> Vector(Vector(Double.NegativeInfinity, 0.9), Vector(0.8, 0.2)),
+      "(1,1)" -> Vector(Vector(0.1, 0.9), Vector(0.8, Double.NaN))
+    )
+
+  /** Scout-measured marginal siblings. Zero mass is lawful and is not in this table.
+    */
+  private val marginalCases: Vector[(String, (Vector[Double], Vector[Double]))] =
+    Vector(
+      "a(0)" -> (Vector(Double.NaN, 1.0), Vector(1.0, 1.0)),
+      "a(1)" -> (Vector(1.0, Double.PositiveInfinity), Vector(1.0, 1.0)),
+      "a(0)" -> (Vector(-1.0, 1.0), Vector(1.0, 1.0)),
+      "b(0)" -> (Vector(1.0, 1.0), Vector(Double.NaN, 1.0)),
+      "b(1)" -> (Vector(1.0, 1.0), Vector(1.0, Double.NegativeInfinity)),
+      "b(0)" -> (Vector(1.0, 1.0), Vector(-0.1, 1.0))
     )
 
   /** Scout-measured stopping siblings. The old epsilon/rho guard never mentions these fields.
