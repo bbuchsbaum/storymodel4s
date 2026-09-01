@@ -20,7 +20,7 @@ aliases silently omit one of the 17 recall sources, and three different segmenta
 populations could all have been called simply "events." Without these records, a
 green analysis could still have used the wrong source, clock, alias, or target.
 
-The owner decision in Mote post `post-01M1CR50ZYM6Q8MG03CBTH9JVRP` is binding for
+The owner decision in Mote post `post-01M1CR50ZYM6Q8MG03CBTHZXY8` is binding for
 this intake: only actual Sherlock video bytes are excluded from storage and sharing.
 Non-video artifacts remain eligible under the ordinary artifact-specific workflow.
 This slice does not propose any text-bearing source artifact for Git admission and
