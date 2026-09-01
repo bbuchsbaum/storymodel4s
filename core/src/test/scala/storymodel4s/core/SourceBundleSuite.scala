@@ -208,7 +208,7 @@ class SourceBundleSuite extends FunSuite:
   test("clock repair is required before run-local seconds become PTS"):
     val src = PresentationAxisId.unsafe("run-local")
     val tgt = film.primaryAxis.id
-    val receipt = DerivationReceipt.of("clock-repair", "affine-v1", Vector.empty).toOption.get
+    val receipt = SourceDerivationReceipt.of("clock-repair", "affine-v1", Vector.empty).toOption.get
     assert(ClockRepair.projectRunLocalSeconds(ExactRational.integer(2), src, tgt).isLeft)
     val repair = ClockRepair
       .of(src, tgt, ExactRational.integer(1000), ExactRational.Zero, receipt)

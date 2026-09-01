@@ -449,23 +449,25 @@ object CallerRuntimePacketRecord:
       )
     )
 
-/** Checked derivation receipt. Identity is computed from the preimage, never accepted as a label.
+/** Checked receipt for a source-axis derivation (clock repair, packet records). Identity is
+  * computed from the preimage, never accepted as a label. Named `Source…` so it cannot shadow
+  * `document.DerivationReceipt` under a wildcard import (ADR 0007 amendment 2026-09-01).
   */
-final class DerivationReceipt private (
+final class SourceDerivationReceipt private (
     val algorithm: String,
     val parameters: String,
     val inputChecksums: Vector[Checksum],
     val identity: Checksum
 ):
   override def equals(other: Any): Boolean = other match
-    case that: DerivationReceipt =>
+    case that: SourceDerivationReceipt =>
       algorithm == that.algorithm && parameters == that.parameters &&
       inputChecksums == that.inputChecksums && identity == that.identity
     case _ => false
   override def hashCode(): Int = (algorithm, parameters, inputChecksums, identity).hashCode()
-  override def toString: String = s"DerivationReceipt($algorithm, ${identity.short()})"
+  override def toString: String = s"SourceDerivationReceipt($algorithm, ${identity.short()})"
 
-object DerivationReceipt:
+object SourceDerivationReceipt:
   private def computeIdentity(
       algorithm: String,
       parameters: String,
@@ -479,12 +481,12 @@ object DerivationReceipt:
       algorithm: String,
       parameters: String,
       inputChecksums: Vector[Checksum]
-  ): Either[DomainError, DerivationReceipt] =
+  ): Either[DomainError, SourceDerivationReceipt] =
     if algorithm.trim.isEmpty then
-      Left(SourceCanon.fmt("DerivationReceipt", algorithm, "empty algorithm"))
+      Left(SourceCanon.fmt("SourceDerivationReceipt", algorithm, "empty algorithm"))
     else
       Right(
-        new DerivationReceipt(
+        new SourceDerivationReceipt(
           algorithm,
           parameters,
           inputChecksums,
@@ -497,7 +499,7 @@ object DerivationReceipt:
       parameters: String,
       inputChecksums: Vector[Checksum],
       claimedIdentity: Checksum
-  ): Either[DomainError, DerivationReceipt] =
+  ): Either[DomainError, SourceDerivationReceipt] =
     of(algorithm, parameters, inputChecksums).flatMap { receipt =>
       if receipt.identity == claimedIdentity then Right(receipt)
       else
@@ -1300,14 +1302,14 @@ object MappingRelation:
 sealed trait CheckedMapping:
   def family: MappingFamily
   def axes: Vector[PresentationAxisId]
-  def receipt: DerivationReceipt
+  def receipt: SourceDerivationReceipt
 
 /** Partial monotone exact-rational clock repair for one source. */
 final class ClockRepair private (
     val relation: MappingRelation,
     val scale: ExactRational,
     val offset: ExactRational,
-    val receipt: DerivationReceipt
+    val receipt: SourceDerivationReceipt
 ) extends CheckedMapping:
   def family: MappingFamily = MappingFamily.ClockRepair
   def axes: Vector[PresentationAxisId] = Vector(relation.sourceAxis, relation.targetAxis)
@@ -1325,7 +1327,7 @@ object ClockRepair:
       targetAxis: PresentationAxisId,
       scale: ExactRational,
       offset: ExactRational,
-      receipt: DerivationReceipt
+      receipt: SourceDerivationReceipt
   ): Either[DomainError, ClockRepair] =
     if !scale.isPositive then
       Left(SourceCanon.fmt("ClockRepair", scale.toString, "repair scale must be strictly positive"))
@@ -1383,7 +1385,7 @@ object CompositionSegment:
 final class TrackComposition private (
     val relation: MappingRelation,
     val segments: NonEmptyVector[CompositionSegment],
-    val receipt: DerivationReceipt
+    val receipt: SourceDerivationReceipt
 ) extends CheckedMapping:
   def family: MappingFamily = MappingFamily.TrackComposition
   def axes: Vector[PresentationAxisId] = Vector(relation.sourceAxis, relation.targetAxis)
@@ -1400,7 +1402,7 @@ object TrackComposition:
       sourceAxis: PresentationAxisId,
       targetAxis: PresentationAxisId,
       segments: Vector[CompositionSegment],
-      receipt: DerivationReceipt
+      receipt: SourceDerivationReceipt
   ): Either[DomainError, TrackComposition] =
     NonEmptyVector.fromVector(segments) match
       case None      => Left(SourceCanon.fmt("TrackComposition", "[]", "empty composition"))
@@ -1428,7 +1430,7 @@ final class EditionCorrespondence private (
     val sourceEdition: EditionId,
     val targetEdition: EditionId,
     val pairs: NonEmptyVector[(OccurrenceId, OccurrenceId)],
-    val receipt: DerivationReceipt
+    val receipt: SourceDerivationReceipt
 ) extends CheckedMapping:
   def family: MappingFamily = MappingFamily.EditionCorrespondence
   def axes: Vector[PresentationAxisId] = Vector(relation.sourceAxis, relation.targetAxis)
@@ -1449,7 +1451,7 @@ object EditionCorrespondence:
       sourceEdition: EditionId,
       targetEdition: EditionId,
       pairs: Vector[(OccurrenceId, OccurrenceId)],
-      receipt: DerivationReceipt
+      receipt: SourceDerivationReceipt
   ): Either[DomainError, EditionCorrespondence] =
     if sourceEdition == targetEdition then
       Left(SourceCanon.inv("correspondence/edition", "editions must be distinct"))

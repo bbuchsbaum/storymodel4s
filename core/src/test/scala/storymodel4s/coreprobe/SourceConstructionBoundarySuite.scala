@@ -82,9 +82,9 @@ class SourceConstructionBoundarySuite extends FunSuite:
     )
     refused(
       typeCheckErrors(
-        "summon[scala.deriving.Mirror.ProductOf[storymodel4s.core.DerivationReceipt]]"
+        "summon[scala.deriving.Mirror.ProductOf[storymodel4s.core.SourceDerivationReceipt]]"
       ),
-      "DerivationReceipt"
+      "SourceDerivationReceipt"
     )
     refused(
       typeCheckErrors(
