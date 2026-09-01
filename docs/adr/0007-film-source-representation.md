@@ -625,3 +625,33 @@ and grakern, and an ingest adapter must not depend on either; (2) placing it in 
 portable and may not spawn a process (§5); (3) a portable pure-Scala demuxer — it would make the
 project the owner of container semantics the ledger deliberately assigns to an exactly identified
 external tool.
+
+### 2026-09-01 — `media`: identified frames and boundary-localization proposals
+
+Bead `bd-01M1FEN59CZCCR0SR3B6MZ1KYB` (first acquisition court, landing B) adds to `media`:
+
+- `Ffmpeg`, `PictureGeometry`, `FrameSet`, `FramesEnvelope` — the one admitted decode (one picture
+  stream to raw BGR24 with PTS passthrough, no scaling or cropping) and the join that binds the
+  decoded bytes to the probe's `PacketIndex`. The join refuses unless the byte length is exactly one
+  frame per indexed packet; a frame's PTS is looked up in that index and never computed from a
+  nominal rate (§3.1).
+- `ContentDetectorRecipe`, `DetectorRequest`, `DetectorOutcome`, `DetectorEnvelope`, `FlashFilterMode`
+  — every detector parameter declared; an automatic kernel size must come back resolved in the
+  outcome or the join refuses (ledger §5: no library default stands in for a recorded value). The
+  worker is untrusted (§6 step 1); it echoes request identity, frame digest, count, geometry and
+  recipe, and the join checks every echo (§6 step 2).
+- `BoundaryLocalizationProposal` and `BoundarySearchResult` — the typed candidate of §6's output
+  table, row "shot, track, interval, identity, boundary": a boundary-existence and localization
+  proposal on `BoundaryLayer.Shot`, at the instant of the first frame of the new shot, with the
+  window between the two frames and the raw score. It carries no `ShotMorphology` and no extent
+  claim, so it is not a `BoundaryClaim` and offers no method to one (law 8; ledger §5 forbidden
+  authority). Empty detector output yields `BoundarySearchCoverage.ExaminedNoCandidate` on the
+  examined extent and can never construct a negative claim (law 10). Authority is `Draft`.
+
+The worker itself lives at `media/worker/` as a uv-locked Python project pinned to the ledger's
+`scenedetect-headless` 0.7.1 wheel digest; it never opens a container and never computes a
+timestamp. Rejected alternatives: (1) `scenedetect.detect()` / `open_video()`, which would let the
+library own decoding, frame timing and a nominal frame rate (ledger §5 forbids exactly this); (2)
+emitting `BoundaryClaim.shot(HardCut(instant))` directly, which would assert a morphology the
+detector cannot establish; (3) a JVM-side reimplementation of the detector, which would make the
+project the owner of an algorithm the ledger identifies by exact upstream commit.

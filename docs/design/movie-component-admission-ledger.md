@@ -312,6 +312,14 @@ use while every record stays `Draft`; it is the E0 bead's cost, not this one's.
 | Local realization | Identity | Recorded in |
 |---|---|---|
 | `ffprobe` 7.1.1 (Homebrew `ffmpeg/7.1.1_3`) | binary SHA-256 `83f66b74c1f0fe3995f762adbaa90c1d32fbd8e1feceedc64fed4261e1a65ebb` | `media/src/test/resources/f0/f0-v1.ffprobe-envelope.json` |
+| `ffmpeg` 7.1.1 (Homebrew `ffmpeg/7.1.1_3`; `--enable-gpl --enable-version3 --enable-libx264`) | binary SHA-256 `14c12cd5dcbc0d75c83085296b27142a4abc61a320a97a5408f7048fa7cbd630` | `media/src/test/resources/f0/f0-v1.frames-envelope.json` |
+| `scenedetect-headless` 0.7.1 via `media/worker/uv.lock` (wheel SHA-256 `0594131c…`, the §5 pin) in a local venv on CPython 3.13.11 with numpy 2.5.2 and opencv-python-headless 5.0.0; worker script `media/worker/scenedetect_worker.py` | script SHA-256 `c5e3300f656bbfd1d32a31b166fddcaa3e35232d24e50057c9fb6ce9ccaaf192` | `media/src/test/resources/f0/f0-v1.detector-envelope.json` |
+
+Beads executed under this authorization: `bd-01M1FDNN3T4SKZ5ZJN1XGXYNY7`
+(landing A: F0, `ffprobe` ingest, replay) and `bd-01M1FEN59CZCCR0SR3B6MZ1KYB`
+(landing B: decode to identified frames, `ContentDetector` proposals). The F1
+excerpt is not yet admitted; its manifest, derivation record and attribution
+receipt are the next bead's first deliverable.
 
 ## 7. Completion gate
 
