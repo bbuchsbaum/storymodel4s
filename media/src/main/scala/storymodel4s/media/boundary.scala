@@ -524,10 +524,10 @@ object BoundarySearch:
     for
       after <- frames
         .ptsOf(cut)
-        .toRight(DomainError.InvariantViolation("boundary/cut", s"no frame $cut"))
+        .toRight(DomainError.InvariantViolation("boundary/index", s"no frame $cut"))
       before <- frames
         .ptsOf(cut - 1)
-        .toRight(DomainError.InvariantViolation("boundary/cut", s"no frame ${cut - 1}"))
+        .toRight(DomainError.InvariantViolation("boundary/index", s"no frame ${cut - 1}"))
       score <- outcome.metrics
         .lift(cut)
         .flatMap(_.values.get(DetectorOutcome.ScoreKey))
