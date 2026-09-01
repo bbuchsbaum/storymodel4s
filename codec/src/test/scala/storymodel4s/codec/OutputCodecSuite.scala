@@ -680,6 +680,10 @@ class OutputCodecSuite extends FunSuite:
     val encoded = StoryOutputResultCodec.encode[String](refusedResult)
     assert(encoded.contains("\"status\":\"decoded\""))
     assert(encoded.contains("source-canonicalization"))
+    assert(
+      StoryOutputResultCodec.decode[String](encoded).isLeft,
+      "a decoded refusal still requires exact source bytes"
+    )
     assertEquals(StoryOutputResultCodec.decode[String](encoded, bytes), Right(refusedResult))
 
     val parsed = Canonical.parse(encoded).toOption.get
