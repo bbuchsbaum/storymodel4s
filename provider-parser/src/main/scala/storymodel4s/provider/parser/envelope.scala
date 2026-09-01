@@ -57,7 +57,7 @@ object ParserEnvelope:
   val MarkerSidecarSchema: String = "storymodel4s.parser.marker-sidecar/v1"
 
   /** Encode a deterministic request whose bytes bind the atlas axis, runtime, and config. */
-  def encodeRequest(batch: ParserBatch, runtime: PinnedRuntime, config: ParserConfig): String =
+  def encodeRequest(batch: ParserBatch, runtime: RuntimeIdentity, config: ParserConfig): String =
     val params = config.params.toVector.sortBy(_._1).map { (name, value) =>
       Json.obj("name" -> name.asJson, "value" -> value.asJson)
     }

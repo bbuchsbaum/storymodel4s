@@ -1,0 +1,7 @@
+{
+  "schema" : "storymodel4s.provider.agent.recording/v1",
+  "model" : "claude-sonnet-5",
+  "origin" : "authored",
+  "stopReason" : "end_turn",
+  "text" : "(c / come-01~e.1 :ARG1 (t / they~e.0) :direction (d / down~e.2) :path (r / river~e.4))"
+}

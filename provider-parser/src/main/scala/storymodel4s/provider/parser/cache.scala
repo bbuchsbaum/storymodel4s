@@ -4,13 +4,14 @@ import cats.Monad
 import cats.syntax.all.*
 import storymodel4s.core.*
 
-/** Content-addressed identity of one sentence under one pinned runtime and parser configuration. */
+/** Content-addressed identity of one sentence under one runtime identity and parser configuration.
+  */
 object ParserCacheKey:
   opaque type ParserCacheKey = Checksum
 
   def of(
       input: ParserSentenceInput,
-      runtime: PinnedRuntime,
+      runtime: RuntimeIdentity,
       config: ParserConfig
   ): ParserCacheKey =
     ParserIdentity.digest(
@@ -81,7 +82,7 @@ trait ParserCache[F[_]]:
 /** Cache wrapper that revalidates every hit and calls its delegate only for misses. */
 final class CachingParserProvider[F[_]: Monad] private (
     delegate: AmrCandidateProvider[F],
-    pinned: PinnedRuntime,
+    runtimeIdentity: RuntimeIdentity,
     cache: ParserCache[F]
 ) extends AmrCandidateProvider[F]:
   val runtime: ParserRuntime = delegate.runtime
@@ -90,7 +91,7 @@ final class CachingParserProvider[F[_]: Monad] private (
   def parse(batch: ParserBatch): F[ParserBatchResult] =
     batch.inputs
       .traverse { input =>
-        val key = ParserCacheKey.of(input, pinned, config)
+        val key = ParserCacheKey.of(input, runtimeIdentity, config)
         cache.get(key).map(input -> key -> _)
       }
       .flatMap { lookups =>
@@ -196,11 +197,13 @@ final class CachingParserProvider[F[_]: Monad] private (
           )
 
 object CachingParserProvider:
-  /** Construct only around a ready delegate, deriving cache identity from that delegate. */
+  /** Construct only around an executable delegate, deriving cache identity from that delegate. */
   def from[F[_]: Monad](
       delegate: AmrCandidateProvider[F],
       cache: ParserCache[F]
   ): Either[ParserSetupFailure, CachingParserProvider[F]] = delegate.runtime match
     case ParserRuntime.Ready(pinned) =>
       Right(new CachingParserProvider(delegate, pinned, cache))
+    case ParserRuntime.Remote(remote) =>
+      Right(new CachingParserProvider(delegate, remote, cache))
     case ParserRuntime.Unavailable(reason) => Left(reason)

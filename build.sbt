@@ -11,6 +11,7 @@ val disciplineMunitV = "2.0.0"
 val scalaCheckV = "1.19.0"
 val onnxRuntimeV = "1.29.0"
 val djlV = "0.36.0"
+val anthropicJavaV = "2.34.0"
 
 ThisBuild / tlBaseVersion := "0.1"
 ThisBuild / organization := "io.github.canardlapin"
@@ -78,6 +79,7 @@ lazy val root = tlCrossRootProject
     fixtures,
     laws,
     providerParser,
+    providerAgent,
     embedGrakern,
     embedOnnx,
     embedBench,
@@ -188,6 +190,39 @@ lazy val providerParser = project
     )
   )
   .dependsOn(core.jvm, proposition.jvm, amrInterop.jvm, acquire.jvm)
+
+/** JVM-only remote parser adapter (ADR 0008): the Anthropic Java SDK behind `ParserTransport`, a
+  * content-keyed record/replay store so tests and reruns never touch the network, and a
+  * text-to-charts driver. No portable module depends on it.
+  */
+lazy val providerAgent = project
+  .in(file("provider-agent"))
+  .settings(commonSettings)
+  .settings(
+    name := "storymodel4s-provider-agent",
+    libraryDependencies ++= Seq(
+      "com.anthropic" % "anthropic-java" % anthropicJavaV,
+      "io.circe" %% "circe-core" % circeV,
+      "io.circe" %% "circe-parser" % circeV
+    ),
+    Compile / sourceGenerators += Def.task {
+      val file =
+        (Compile / sourceManaged).value / "storymodel4s" / "provider" / "agent" /
+          "AnthropicSdkPin.scala"
+      IO.write(
+        file,
+        s"""package storymodel4s.provider.agent
+           |
+           |/** The Anthropic Java SDK version this build compiles against (generated from build.sbt). */
+           |object AnthropicSdkPin:
+           |  val version: String = "$anthropicJavaV"
+           |""".stripMargin
+      )
+      Seq(file)
+    }.taskValue,
+    Test / fork := true
+  )
+  .dependsOn(providerParser, core.jvm, acquire.jvm, amrInterop.jvm, proposition.jvm)
 
 // grakern (in-house graph-kernel calculus) is consumed as an immutable source pin. grakern has no
 // published artifacts and, at this revision, no git remote: until it is pushed, builds MUST supply
@@ -369,7 +404,8 @@ val allModules = List(
 )
 val allPlatforms = List("JVM", "JS", "Native")
 
-val jvmOnlyModules = List("providerParser", "embedGrakern", "embedOnnx", "embedBench", "media")
+val jvmOnlyModules =
+  List("providerParser", "providerAgent", "embedGrakern", "embedOnnx", "embedBench", "media")
 
 addCommandAlias(
   "compileAll",

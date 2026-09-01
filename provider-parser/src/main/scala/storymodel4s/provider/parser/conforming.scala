@@ -61,12 +61,15 @@ final class JsonAmrCandidateProvider[F[_]: Applicative] private (
       runtime match
         case ParserRuntime.Unavailable(reason) =>
           Applicative[F].pure(unavailable(batch, reason))
-        case ParserRuntime.Ready(pinned) =>
-          val requestJson = ParserEnvelope.encodeRequest(batch, pinned, config)
-          transport.exchange(requestJson, config.timeoutMillis).map {
-            case Left(failure) => transportFailure(batch, pinned, requestJson, failure)
-            case Right(raw)    => decode(batch, pinned, requestJson, raw)
-          }
+        case ParserRuntime.Ready(pinned)  => execute(batch, pinned)
+        case ParserRuntime.Remote(remote) => execute(batch, remote)
+
+  private def execute(batch: ParserBatch, runtimeIdentity: RuntimeIdentity): F[ParserBatchResult] =
+    val requestJson = ParserEnvelope.encodeRequest(batch, runtimeIdentity, config)
+    transport.exchange(requestJson, config.timeoutMillis).map {
+      case Left(failure) => transportFailure(batch, runtimeIdentity, requestJson, failure)
+      case Right(raw)    => decode(batch, runtimeIdentity, requestJson, raw)
+    }
 
   private def unavailable(
       batch: ParserBatch,
@@ -88,13 +91,13 @@ final class JsonAmrCandidateProvider[F[_]: Applicative] private (
 
   private def transportFailure(
       batch: ParserBatch,
-      pinned: PinnedRuntime,
+      runtimeIdentity: RuntimeIdentity,
       requestJson: String,
       reason: TransportFailure
   ): ParserBatchResult =
     val failure = ParserFailure.fromTransport(reason)
     val call = providerCall(
-      pinned,
+      runtimeIdentity,
       requestJson,
       reason.render,
       Map("transport-outcome" -> reason.render)
@@ -114,7 +117,7 @@ final class JsonAmrCandidateProvider[F[_]: Applicative] private (
 
   private def decode(
       batch: ParserBatch,
-      pinned: PinnedRuntime,
+      runtimeIdentity: RuntimeIdentity,
       requestJson: String,
       raw: String
   ): ParserBatchResult =
@@ -122,7 +125,7 @@ final class JsonAmrCandidateProvider[F[_]: Applicative] private (
       case Left(error) =>
         val errorChecksum = Checksum.ofText(error)
         val failure = ParserFailure.MalformedEnvelope(errorChecksum)
-        val call = providerCall(pinned, requestJson, raw, Map.empty)
+        val call = providerCall(runtimeIdentity, requestJson, raw, Map.empty)
         allFailed(
           batch,
           failure,
@@ -131,32 +134,36 @@ final class JsonAmrCandidateProvider[F[_]: Applicative] private (
         )
       case Right(response) if response.schema != ParserEnvelope.ResultSchema =>
         val failure = ParserFailure.WrongSchema(Checksum.ofText(response.schema))
-        val call = providerCall(pinned, requestJson, raw, diagnosticParams(response.diagnostics))
+        val call =
+          providerCall(runtimeIdentity, requestJson, raw, diagnosticParams(response.diagnostics))
         allFailed(batch, failure, Some(call))
-      case Right(response) if response.runtimeFingerprint != pinned.fingerprint =>
+      case Right(response) if response.runtimeFingerprint != runtimeIdentity.fingerprint =>
         val failure = ParserFailure.RuntimeFingerprintMismatch(
-          pinned.fingerprint,
+          runtimeIdentity.fingerprint,
           response.runtimeFingerprint
         )
-        val call = providerCall(pinned, requestJson, raw, diagnosticParams(response.diagnostics))
+        val call =
+          providerCall(runtimeIdentity, requestJson, raw, diagnosticParams(response.diagnostics))
         allFailed(batch, failure, Some(call))
       case Right(response) if response.configChecksum != config.checksum =>
         val failure = ParserFailure.ConfigChecksumMismatch(
           config.checksum,
           response.configChecksum
         )
-        val call = providerCall(pinned, requestJson, raw, diagnosticParams(response.diagnostics))
+        val call =
+          providerCall(runtimeIdentity, requestJson, raw, diagnosticParams(response.diagnostics))
         allFailed(batch, failure, Some(call))
-      case Right(response) => normalize(batch, pinned, requestJson, raw, response)
+      case Right(response) => normalize(batch, runtimeIdentity, requestJson, raw, response)
 
   private def normalize(
       batch: ParserBatch,
-      pinned: PinnedRuntime,
+      runtimeIdentity: RuntimeIdentity,
       requestJson: String,
       raw: String,
       response: WireResponse
   ): ParserBatchResult =
-    val call = providerCall(pinned, requestJson, raw, diagnosticParams(response.diagnostics))
+    val call =
+      providerCall(runtimeIdentity, requestJson, raw, diagnosticParams(response.diagnostics))
     val expected = batch.ids.zipWithIndex.toMap
     val grouped = response.items.groupBy(_.id)
     val unexpected = grouped.keysIterator
@@ -402,20 +409,20 @@ final class JsonAmrCandidateProvider[F[_]: Applicative] private (
       Option.when(index >= 0)(index)
 
   private def providerCall(
-      pinned: PinnedRuntime,
+      runtimeIdentity: RuntimeIdentity,
       requestJson: String,
       outputMaterial: String,
       extraParams: Map[String, String]
   ): ProviderCall =
     ProviderCall(
-      provider = pinned.provider,
-      model = pinned.model,
-      version = pinned.version,
-      promptTemplateVersion = None,
+      provider = runtimeIdentity.provider,
+      model = runtimeIdentity.model,
+      version = runtimeIdentity.version,
+      promptTemplateVersion = runtimeIdentity.promptTemplateVersion,
       inputChecksum = Checksum.ofText(requestJson),
       outputChecksum = Checksum.ofText(outputMaterial),
       params = config.params ++ Map(
-        "runtime-fingerprint" -> pinned.fingerprint.value,
+        "runtime-fingerprint" -> runtimeIdentity.fingerprint.value,
         "request-schema" -> ParserEnvelope.RequestSchema,
         "result-schema" -> ParserEnvelope.ResultSchema,
         "alignment-schema" -> ParserEnvelope.MarkerSidecarSchema,
