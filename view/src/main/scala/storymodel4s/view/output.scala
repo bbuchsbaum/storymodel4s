@@ -124,6 +124,7 @@ enum SuppressionReason:
 enum SemanticAbsenceReason:
   case SourceNotConstructed
   case SemanticNotValidated
+  case SemanticsNotRequested
   case NotApplicableToOutcome
   case Custom(namespace: OutputNamespace, label: OutputLabel)
 
@@ -417,7 +418,7 @@ object ScientificArtifactRefs:
               ref.checksum == model.artifactChecksum
           )
         )
-      case SemanticOutcome.Refused(_) => artifact.isEmpty
+      case SemanticOutcome.NotRequested | SemanticOutcome.Refused(_) => artifact.isEmpty
     require(
       valid,
       DomainError.InvariantViolation(
@@ -546,6 +547,11 @@ object ReportInputIdentity:
         s"canonical-checksum=${value.canonicalChecksum.hex}",
         s"decode-receipt=${value.decodeReceipt.id.value}",
         s"decoder=${value.decodeReceipt.decoder.value}",
+        s"decode-charset=${value.decodeReceipt.charset.value}",
+        s"decode-policy=${value.decodeReceipt.policy.value}",
+        s"decode-config=${value.decodeReceipt.configChecksum.hex}",
+        s"decode-original=${value.decodeReceipt.originalChecksum.hex}",
+        s"decode-decoded=${value.decodeReceipt.decodedChecksum.hex}",
         s"canonical-receipt=${value.canonicalizationReceipt.value}"
       ) ++ value.original.declaredCharset.toVector.map(value =>
         s"original-declared-charset.value=${value.value}"
@@ -564,7 +570,10 @@ object ReportInputIdentity:
           s"refused-decoded-utf16=${decoded.utf16Length}",
           s"refused-decoded-checksum=${decoded.checksum.hex}",
           s"refused-decode-receipt=${decoded.decodeReceipt.id.value}",
-          s"refused-decoder=${decoded.decodeReceipt.decoder.value}"
+          s"refused-decoder=${decoded.decodeReceipt.decoder.value}",
+          s"refused-decode-charset=${decoded.decodeReceipt.charset.value}",
+          s"refused-decode-policy=${decoded.decodeReceipt.policy.value}",
+          s"refused-decode-config=${decoded.decodeReceipt.configChecksum.hex}"
         )
 
   private def originalParts(prefix: String, value: OriginalSourceIdentity): Vector[String] =
@@ -602,6 +611,7 @@ object ReportInputIdentity:
       ) ++ failure.stage.toVector.map(stage => s"universe-stage.value=${stage.value}")
 
   private def semanticParts(semantic: SemanticOutcome): Vector[String] = semantic match
+    case SemanticOutcome.NotRequested         => Vector("semantic=not-requested")
     case SemanticOutcome.Validated(model)     => modelParts("validated", model)
     case SemanticOutcome.Partial(gaps, draft) =>
       Vector("semantic=partial") ++
@@ -644,6 +654,7 @@ object ReportInputIdentity:
         s"payload.namespace=${extension.namespace.value}",
         s"payload.schema=${extension.schemaId.value}",
         s"payload.checksum=${extension.checksum.hex}",
+        s"payload.byte-length=${extension.byteLength}",
         s"payload.requirement=${extension.requirement}"
       )
 
@@ -656,6 +667,18 @@ object ReportInputIdentity:
       error.stage.toVector.map(stage => s"$prefix-stage.value=${stage.value}") ++
       error.evidence.zipWithIndex.map { case (receipt, index) =>
         s"$prefix-evidence[$index]=${receipt.value}"
+      } ++ error.detail.toVector.flatMap { case OutputFailureDetail.StrictDecode(value) =>
+        Vector(
+          s"$prefix-detail=strict-decode",
+          s"$prefix-detail.receipt=${value.receipt.value}",
+          s"$prefix-detail.decoder=${value.decoder.value}",
+          s"$prefix-detail.charset=${value.charset.value}",
+          s"$prefix-detail.policy=${value.policy.value}",
+          s"$prefix-detail.config=${value.configChecksum.hex}",
+          s"$prefix-detail.original=${value.originalChecksum.hex}",
+          s"$prefix-detail.byte-position=${value.bytePosition}",
+          s"$prefix-detail.reason=${value.reason}"
+        )
       }
 
   private def buildParts(value: ExtendedBuildReceipt): Vector[String] =
@@ -1364,7 +1387,8 @@ final case class ManifestEntry(
     mediaType: MediaTypeId,
     schemaVersion: Option[OutputSchemaId],
     requirement: ArtifactRequirement,
-    disposition: ArtifactDisposition
+    disposition: ArtifactDisposition,
+    payload: Option[OutputPayloadId] = None
 )
 
 /** Produced or explicitly unavailable bytes for one promised role. */
@@ -1421,8 +1445,11 @@ object BundleManifest:
       producedMetadata(entryVector),
       reportEntries(result, entryVector),
       semanticEntry(result, entryVector),
-      sourceEntries(result, entryVector)
-    ).mapN((_, _, _, _, _, _, _, _, _, _, _, _) => new BundleManifest(profileVector, entryVector))
+      sourceEntries(result, entryVector),
+      payloadEntries(result, entryVector)
+    ).mapN((_, _, _, _, _, _, _, _, _, _, _, _, _) =>
+      new BundleManifest(profileVector, entryVector)
+    )
 
   private def profileReceiptConsistency(
       profiles: Vector[BundleProfileOutcome]
@@ -1511,7 +1538,7 @@ object BundleManifest:
   ): Boolean =
     val candidates = expected.fold(entries)(Vector(_))
     candidates.exists {
-      case ManifestEntry(role, path, mediaType, _, _, ArtifactDisposition.Produced(artifact)) =>
+      case ManifestEntry(role, path, mediaType, _, _, ArtifactDisposition.Produced(artifact), _) =>
         role == binding.role &&
         path == binding.path &&
         mediaType == binding.mediaType &&
@@ -1542,7 +1569,7 @@ object BundleManifest:
       entries: Vector[ManifestEntry]
   ): ValidatedNec[DomainError, Unit] =
     val mismatches = entries.collect {
-      case entry @ ManifestEntry(_, _, _, _, _, ArtifactDisposition.Produced(artifact))
+      case entry @ ManifestEntry(_, _, _, _, _, ArtifactDisposition.Produced(artifact), _)
           if entry.role != artifact.role || entry.mediaType != artifact.mediaType ||
             entry.schemaVersion != artifact.schemaVersion =>
         entry.path
@@ -1596,16 +1623,50 @@ object BundleManifest:
       entries: Vector[ManifestEntry]
   ): ValidatedNec[DomainError, Unit] =
     val semantic = entries.filter(_.role == ArtifactRole.SemanticModel)
-    val valid = entryMatchesRef(
-      semantic,
-      result.scientificArtifacts.semanticModel,
-      SemanticAbsenceReason.SemanticNotValidated
-    )
+    val absentReason = result.acquisition.semantic match
+      case SemanticOutcome.NotRequested => SemanticAbsenceReason.SemanticsNotRequested
+      case _                            => SemanticAbsenceReason.SemanticNotValidated
+    val valid = entryMatchesRef(semantic, result.scientificArtifacts.semanticModel, absentReason)
     require(
       valid,
       DomainError.InvariantViolation(
         "output/manifest/semantic-model",
         "semantic_model entry disagrees with semantic outcome"
+      )
+    )
+
+  private def payloadEntries[Id](
+      result: StoryOutputResult[Id],
+      entries: Vector[ManifestEntry]
+  ): ValidatedNec[DomainError, Unit] =
+    val payloads = result.acquisition.payloads.map {
+      case value @ OutputPayload.Known(ref)             => ref.id -> value
+      case value @ OutputPayload.Unsupported(extension) => extension.id -> value
+    }.toMap
+    val bindings = entries.flatMap(entry => entry.payload.map(_ -> entry))
+    val grouped = bindings.groupMap(_._1)(_._2)
+    val exactIds = grouped.keySet == payloads.keySet
+    val oneEach = grouped.values.forall(_.size == 1)
+    val metadataMatches = payloads.forall { case (id, payload) =>
+      grouped.get(id).exists {
+        case Vector(ManifestEntry(_, _, _, schema, _, ArtifactDisposition.Produced(artifact), _)) =>
+          payload match
+            case OutputPayload.Known(ref) =>
+              schema.contains(ref.schemaId) && artifact.schemaVersion.contains(ref.schemaId) &&
+              artifact.checksum == ref.checksum
+            case OutputPayload.Unsupported(extension) =>
+              schema.contains(extension.schemaId) &&
+              artifact.schemaVersion.contains(extension.schemaId) &&
+              artifact.checksum == extension.checksum &&
+              artifact.byteLength == extension.byteLength
+        case _ => false
+      }
+    }
+    require(
+      exactIds && oneEach && metadataMatches,
+      DomainError.InvariantViolation(
+        "output/manifest/payload-binding",
+        "payloads require an exact one-to-one produced artifact binding with matching schema and bytes metadata"
       )
     )
 

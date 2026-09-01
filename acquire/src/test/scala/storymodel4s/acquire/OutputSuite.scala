@@ -9,29 +9,16 @@ import storymodel4s.core.*
 class OutputSuite extends FunSuite:
   private val mediaType = MediaTypeId.unsafe("text/plain")
   private val utf8 = CharsetId.unsafe("UTF-8")
-  private val decoder = DecoderId.unsafe("strict-utf8/v1")
-  private val intake = OutputReceiptId.unsafe("receipt-intake")
-  private val decode = OutputReceiptId.unsafe("receipt-decode")
-  private val decodeReceipt = DecodeReceipt.bind(decode, decoder)
-  private val canonicalize = OutputReceiptId.unsafe("receipt-canonicalize")
   private val definition = UniverseDefinitionId.unsafe("eligible-sentences/v1")
 
   private def sourceFixture(): (StorySource, OriginalSourceIdentity, SourceIdentities) =
     val raw = "A\r\n😀  \t\r\nB"
-    val source = StorySource.fromText(raw).toOption.get
     val bom = Array(0xef.toByte, 0xbb.toByte, 0xbf.toByte)
     val originalBytes = bom ++ raw.getBytes(StandardCharsets.UTF_8)
-    val original = OriginalSourceIdentity.fromBytes(
-      originalBytes,
-      mediaType,
-      declaredCharset = Some(utf8),
-      selectedCharset = utf8,
-      BomDisposition.ConsumedUtf8,
-      intake
-    )
-    val identities =
-      SourceIdentities.fromStorySource(original, source, decodeReceipt, canonicalize)
-    (source, original, identities)
+    SourceIdentities.admitUtf8(originalBytes, mediaType, Some(utf8)) match
+      case SourceAdmission.Constructed(source, identities) =>
+        (source, identities.original, identities)
+      case SourceAdmission.Refused(_, failure) => fail(s"fixture refused: $failure")
 
   private def receipt(source: StorySource): ExtendedBuildReceipt =
     ExtendedBuildReceipt(
@@ -65,22 +52,11 @@ class OutputSuite extends FunSuite:
   }
 
   test("equal source digests do not collapse the three typed identity roles") {
-    val source = StorySource.fromText("identity text").toOption.get
-    val bytes = source.rawText.getBytes(StandardCharsets.UTF_8)
-    val original = OriginalSourceIdentity.fromBytes(
-      bytes,
-      mediaType,
-      Some(utf8),
-      utf8,
-      BomDisposition.Absent,
-      intake
-    )
-    val identities = SourceIdentities.fromStorySource(
-      original,
-      source,
-      decodeReceipt,
-      canonicalize
-    )
+    val bytes = "identity text".getBytes(StandardCharsets.UTF_8)
+    val (source, identities) = SourceIdentities.admitUtf8(bytes, mediaType, Some(utf8)) match
+      case SourceAdmission.Constructed(value, identity) => value -> identity
+      case SourceAdmission.Refused(_, failure)          => fail(s"fixture refused: $failure")
+    val original = identities.original
     assertEquals(original.checksum, identities.decodedChecksum)
     assertEquals(identities.decodedChecksum, identities.canonicalChecksum)
     assertEquals(identities.original, original)
@@ -118,12 +94,15 @@ class OutputSuite extends FunSuite:
     )
     val semantic = SemanticOutcome.Refused(
       NonEmptyVector.one(
-        OutputFailure(
-          OutputFailureCode.PlanningFailed,
-          OutputReceiptId.unsafe("receipt-plan"),
-          None,
-          Vector(OutputReceiptId.unsafe("receipt-plan"))
-        )
+        OutputFailure
+          .general(
+            OutputFailureCode.PlanningFailed,
+            OutputReceiptId.unsafe("receipt-plan"),
+            None,
+            Vector(OutputReceiptId.unsafe("receipt-plan"))
+          )
+          .toOption
+          .get
       )
     )
     val result = AcquisitionAccount.of(
@@ -351,5 +330,149 @@ class OutputSuite extends FunSuite:
         .from(bytes, Checksum.ofText("different"))
         .isLeft,
       "opaque bytes must reject a mismatched supplied checksum"
+    )
+  }
+
+  test("strict source admission binds exact bytes, decoded text, and derived receipts") {
+    val alphaBytes = "alpha".getBytes(StandardCharsets.UTF_8)
+    val betaBytes = "beta".getBytes(StandardCharsets.UTF_8)
+    val alpha = SourceIdentities.admitUtf8(alphaBytes, mediaType, Some(utf8)) match
+      case SourceAdmission.Constructed(source, value) => source -> value
+      case SourceAdmission.Refused(_, failure)        => fail(s"alpha refused: $failure")
+    val beta = SourceIdentities.admitUtf8(betaBytes, mediaType, Some(utf8)) match
+      case SourceAdmission.Constructed(source, value) => source -> value
+      case SourceAdmission.Refused(_, failure)        => fail(s"beta refused: $failure")
+
+    assertNotEquals(alpha._2.original.checksum, beta._2.original.checksum)
+    assertNotEquals(alpha._2.decodeReceipt.id, beta._2.decodeReceipt.id)
+    assertNotEquals(alpha._2.canonicalizationReceipt, beta._2.canonicalizationReceipt)
+    assert(
+      OriginalSourceIdentity
+        .fromWire(
+          betaBytes,
+          alpha._2.original.byteLength,
+          alpha._2.original.checksum,
+          alpha._2.original.mediaType,
+          alpha._2.original.declaredCharset,
+          alpha._2.original.selectedCharset,
+          alpha._2.original.bom,
+          alpha._2.original.intakeReceipt
+        )
+        .isLeft
+    )
+    assert(
+      SourceIdentities
+        .fromWire(
+          betaBytes,
+          mediaType,
+          Some(utf8),
+          None,
+          LanguageTag.English,
+          Map.empty,
+          alpha._2
+        )
+        .isLeft,
+      "a successful receipt cannot be transplanted to different decoded text"
+    )
+  }
+
+  test("strict decode failure records exact byte position and refuses altered wire claims") {
+    val bytes = Array(0x61.toByte, 0xc2.toByte, 0x20.toByte)
+    val detail = SourceIdentities.admitUtf8(bytes, mediaType, Some(utf8)) match
+      case SourceAdmission.Refused(_, failure) =>
+        failure.detail match
+          case Some(OutputFailureDetail.StrictDecode(value)) => value
+          case other => fail(s"expected strict decode detail, got $other")
+      case SourceAdmission.Constructed(_, _) => fail("invalid UTF-8 was admitted")
+
+    assertEquals(detail.bytePosition, 2L)
+    assertEquals(detail.reason, StrictDecodeFailureReason.InvalidContinuationByte)
+    assertEquals(
+      StrictDecodeFailure.fromWire(
+        bytes,
+        detail.receipt,
+        detail.decoder,
+        detail.charset,
+        detail.policy,
+        detail.configChecksum,
+        detail.originalChecksum,
+        detail.bytePosition,
+        detail.reason
+      ),
+      Right(detail)
+    )
+    assert(
+      StrictDecodeFailure
+        .fromWire(
+          bytes,
+          detail.receipt,
+          detail.decoder,
+          CharsetId.unsafe("UTF-16"),
+          detail.policy,
+          detail.configChecksum,
+          detail.originalChecksum,
+          detail.bytePosition,
+          detail.reason
+        )
+        .isLeft
+    )
+    assert(
+      StrictDecodeFailure
+        .fromWire(
+          bytes,
+          detail.receipt,
+          detail.decoder,
+          detail.charset,
+          detail.policy,
+          detail.configChecksum,
+          detail.originalChecksum,
+          -1L,
+          detail.reason
+        )
+        .isLeft
+    )
+  }
+
+  test("not-requested semantics carry no semantic build or view authority") {
+    val (_, _, sourceIdentities) = sourceFixture()
+    val empty = EstablishedUniverse.of(Vector.empty[String], definition).toOption.get
+    val noSemantics = AcquisitionAccount.of(
+      InvocationId.unsafe("invocation-source-only"),
+      SourceOutcome.Constructed(sourceIdentities),
+      TargetUniverse.Established(empty),
+      SemanticOutcome.NotRequested,
+      Vector.empty,
+      Vector.empty,
+      None
+    )
+    assert(noSemantics.isValid)
+    assert(
+      AcquisitionAccount
+        .of(
+          InvocationId.unsafe("invocation-source-only-with-build"),
+          SourceOutcome.Constructed(sourceIdentities),
+          TargetUniverse.Established(empty),
+          SemanticOutcome.NotRequested,
+          Vector.empty,
+          Vector.empty,
+          Some(receipt(sourceFixture()._1))
+        )
+        .isInvalid
+    )
+    assertNotEquals(
+      SemanticOutcome.NotRequested,
+      SemanticOutcome.Refused(
+        NonEmptyVector.one(
+          OutputFailure
+            .general(
+              OutputFailureCode.SourceUnavailable,
+              OutputReceiptId.unsafe("not-requested-foil"),
+              None,
+              Vector.empty
+            )
+            .toOption
+            .get
+        )
+      )
     )
   }

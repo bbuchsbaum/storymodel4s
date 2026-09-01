@@ -12,24 +12,11 @@ class OutputSuite extends FunSuite:
   private val jsonType = MediaTypeId.unsafe("application/json")
   private val utf8 = CharsetId.unsafe("UTF-8")
   private val sourceBytes = "A\r\n😀  \t\r\nB".getBytes(StandardCharsets.UTF_8)
-  private val source = StorySource.fromText("A\r\n😀  \t\r\nB").toOption.get
-  private val original = OriginalSourceIdentity.fromBytes(
-    sourceBytes,
-    textPlain,
-    Some(utf8),
-    utf8,
-    BomDisposition.Absent,
-    OutputReceiptId.unsafe("receipt-intake")
-  )
-  private val identities = SourceIdentities.fromStorySource(
-    original,
-    source,
-    DecodeReceipt.bind(
-      OutputReceiptId.unsafe("receipt-decode"),
-      DecoderId.unsafe("strict-utf8/v1")
-    ),
-    OutputReceiptId.unsafe("receipt-canonical")
-  )
+  private val admitted = SourceIdentities.admitUtf8(sourceBytes, textPlain, Some(utf8))
+  private val (source, identities) = admitted match
+    case SourceAdmission.Constructed(value, identity) => value -> identity
+    case SourceAdmission.Refused(_, failure)          => fail(s"source fixture refused: $failure")
+  private val original = identities.original
   private val buildReceipt = ExtendedBuildReceipt(
     BuildReceipt(source.id, source.canonicalChecksum, "test/v1", Vector.empty, 0L),
     Vector.empty,
@@ -227,12 +214,15 @@ class OutputSuite extends FunSuite:
     (account, artifacts, AdmittedViewBasis.fromAcquisition(account).toOption.get)
 
   test("source-stage refusal closes only artifact references that actually exist") {
-    val failure = OutputFailure(
-      OutputFailureCode.DecodeFailed,
-      OutputReceiptId.unsafe("receipt-source-refusal"),
-      None,
-      Vector(OutputReceiptId.unsafe("receipt-source-refusal"))
-    )
+    val failure = OutputFailure
+      .general(
+        OutputFailureCode.SourceUnavailable,
+        OutputReceiptId.unsafe("receipt-source-refusal"),
+        None,
+        Vector(OutputReceiptId.unsafe("receipt-source-refusal"))
+      )
+      .toOption
+      .get
     val universeFailure = UniverseFailure(
       UniverseFailureReason.UpstreamUnavailable,
       OutputReceiptId.unsafe("receipt-universe-refusal"),
@@ -283,28 +273,17 @@ class OutputSuite extends FunSuite:
 
     val whitespace = " \t\r\n"
     val whitespaceBytes = whitespace.getBytes(StandardCharsets.UTF_8)
-    val whitespaceOriginal = OriginalSourceIdentity.fromBytes(
-      whitespaceBytes,
-      textPlain,
-      Some(utf8),
-      utf8,
-      BomDisposition.Absent,
-      OutputReceiptId.unsafe("receipt-whitespace-intake")
-    )
-    val whitespaceDecoded = DecodedSourceIdentity.fromText(
-      whitespace,
-      DecodeReceipt.bind(
-        OutputReceiptId.unsafe("receipt-whitespace-decode"),
-        DecoderId.unsafe("strict-utf8/v1")
-      )
-    )
+    val (whitespaceProgress, whitespaceFailure) =
+      SourceIdentities.admitUtf8(whitespaceBytes, textPlain, Some(utf8)) match
+        case SourceAdmission.Refused(progress, refusal) => progress -> refusal
+        case SourceAdmission.Constructed(_, _)          => fail("whitespace source was admitted")
     assert(StorySource.fromText(whitespace).isLeft)
     val refusedAfterDecode = AcquisitionAccount
       .of(
         InvocationId.unsafe("invocation-refused-after-decode"),
         SourceOutcome.Refused(
-          RefusedSourceProgress.Decoded(whitespaceOriginal, whitespaceDecoded),
-          failure
+          whitespaceProgress,
+          whitespaceFailure
         ),
         TargetUniverse.Unestablished(universeFailure),
         semanticFailure,
@@ -374,12 +353,15 @@ class OutputSuite extends FunSuite:
     reportReceipt("receipt-html", "html-renderer/v1", "html-config", htmlRequest)
   private val textReceipt =
     reportReceipt("receipt-text", "text-renderer/v1", "text-config", textRequest)
-  private val htmlFailure = OutputFailure(
-    OutputFailureCode.SerializationFailed,
-    htmlReceipt.id,
-    None,
-    Vector(htmlReceipt.id)
-  )
+  private val htmlFailure = OutputFailure
+    .general(
+      OutputFailureCode.SerializationFailed,
+      htmlReceipt.id,
+      None,
+      Vector(htmlReceipt.id)
+    )
+    .toOption
+    .get
   private val failedProfileReceipt = ProfileReceipt(
     OutputReceiptId.unsafe("receipt-profile-local-failed"),
     ProfileSchemaId.unsafe("local-open/v1"),
@@ -530,21 +512,11 @@ class OutputSuite extends FunSuite:
     )
   }
 
-  test("report identity binds the intake receipt and refuses a one-field foreign result") {
-    val foreignOriginal = OriginalSourceIdentity.fromBytes(
-      sourceBytes,
-      textPlain,
-      Some(utf8),
-      utf8,
-      BomDisposition.Absent,
-      OutputReceiptId.unsafe("receipt-intake-foreign")
-    )
-    val foreignIdentities = SourceIdentities.fromStorySource(
-      foreignOriginal,
-      source,
-      identities.decodeReceipt,
-      identities.canonicalizationReceipt
-    )
+  test("report identity binds exact original bytes even when decoded text is equal") {
+    val foreignBytes = Array(0xef.toByte, 0xbb.toByte, 0xbf.toByte) ++ sourceBytes
+    val foreignIdentities = SourceIdentities.admitUtf8(foreignBytes, textPlain, Some(utf8)) match
+      case SourceAdmission.Constructed(_, identity) => identity
+      case SourceAdmission.Refused(_, failure)      => fail(s"foreign fixture refused: $failure")
     val foreignSource = SourceOutcome.Constructed(foreignIdentities)
     val foreignAuthority = AcquisitionViewAuthority
       .validatedBuild(foreignSource, buildReceipt)
@@ -566,7 +538,15 @@ class OutputSuite extends FunSuite:
     val foreignArtifacts = ScientificArtifactRefs
       .of(
         foreignAccount,
-        scientificArtifacts.originalSource,
+        Some(
+          ArtifactRef.fromBytes(
+            ArtifactId.unsafe("artifact-original-foreign"),
+            ArtifactRole.OriginalSource,
+            textPlain,
+            None,
+            foreignBytes
+          )
+        ),
         scientificArtifacts.canonicalSource,
         scientificArtifacts.semanticModel
       )
@@ -1018,6 +998,114 @@ class OutputSuite extends FunSuite:
     )
   }
 
+  test("not-requested semantics have distinct identity and manifest absence authority") {
+    val sourceOnly = AcquisitionAccount
+      .of(
+        InvocationId.unsafe("invocation-source-only"),
+        SourceOutcome.Constructed(identities),
+        TargetUniverse.Established(universe),
+        SemanticOutcome.NotRequested,
+        Vector.empty,
+        Vector.empty,
+        None
+      )
+      .toOption
+      .get
+    val sourceOnlyArtifacts = ScientificArtifactRefs
+      .of(sourceOnly, Some(originalArtifact), Some(canonicalArtifact), None)
+      .toOption
+      .get
+    assert(
+      ScientificArtifactRefs
+        .of(sourceOnly, Some(originalArtifact), Some(canonicalArtifact), Some(semanticArtifact))
+        .isInvalid
+    )
+
+    val refusal = OutputFailure
+      .general(
+        OutputFailureCode.ResolutionFailed,
+        OutputReceiptId.unsafe("receipt-semantic-refused"),
+        None,
+        Vector.empty
+      )
+      .toOption
+      .get
+    val refused = AcquisitionAccount
+      .of(
+        InvocationId.unsafe("invocation-source-only"),
+        SourceOutcome.Constructed(identities),
+        TargetUniverse.Established(universe),
+        SemanticOutcome.Refused(cats.data.NonEmptyVector.one(refusal)),
+        Vector.empty,
+        Vector.empty,
+        None
+      )
+      .toOption
+      .get
+    val refusedArtifacts = ScientificArtifactRefs
+      .of(refused, Some(originalArtifact), Some(canonicalArtifact), None)
+      .toOption
+      .get
+    val sourceOnlyIdentity = ReportInputIdentity
+      .forReport(sourceOnly, sourceOnlyArtifacts, None, textRequest)
+      .toOption
+      .get
+    val refusedIdentity = ReportInputIdentity
+      .forReport(refused, refusedArtifacts, None, textRequest)
+      .toOption
+      .get
+    assertNotEquals(sourceOnlyIdentity, refusedIdentity)
+
+    val result = StoryOutputResult
+      .of[String](
+        sourceOnly,
+        sourceOnlyArtifacts,
+        None,
+        Vector.empty,
+        Vector.empty,
+        Vector.empty,
+        Vector.empty
+      )
+      .toOption
+      .get
+    val base = partialEntries().filter(entry =>
+      Set(
+        ArtifactRole.OriginalSource,
+        ArtifactRole.CanonicalSource,
+        ArtifactRole.InvocationResult,
+        ArtifactRole.BrowserPreview
+      ).contains(entry.role)
+    )
+    val absent = ManifestEntry(
+      ArtifactRole.SemanticModel,
+      BundlePath.unsafe("storymodel.json"),
+      jsonType,
+      Some(OutputSchemaId.unsafe("storymodel/v1")),
+      ArtifactRequirement.Optional,
+      ArtifactDisposition.AbsentBySemanticContract(
+        SemanticAbsenceReason.SemanticsNotRequested
+      )
+    )
+    val localFailed = BundleProfileOutcome(
+      BundleProfile.LocalOpen,
+      ProfileDisposition.Failed(htmlFailure, failedProfileReceipt)
+    )
+    assert(BundleManifest.of(result, Vector(localFailed), base :+ absent).isValid)
+    assert(
+      BundleManifest
+        .of(
+          result,
+          Vector(localFailed),
+          base :+ absent.copy(
+            disposition = ArtifactDisposition.AbsentBySemanticContract(
+              SemanticAbsenceReason.SemanticNotValidated
+            )
+          )
+        )
+        .isInvalid
+    )
+  }
+
   test("partial draft has the same bijective semantic artifact closure as validated output") {
     val gap = ResultGap(
       ResultGapKind.Unresolved,
@@ -1065,10 +1153,10 @@ class OutputSuite extends FunSuite:
       partialArtifacts,
       Some(partialBasis)
     )
-    val partialHtmlFailure = htmlFailure.copy(
-      receipt = partialHtmlReceipt.id,
-      evidence = Vector(partialHtmlReceipt.id)
-    )
+    val partialHtmlFailure = htmlFailure
+      .withReceipt(partialHtmlReceipt.id, Vector(partialHtmlReceipt.id))
+      .toOption
+      .get
     val partialResult = StoryOutputResult
       .of(
         partialAcquisition,
@@ -1215,10 +1303,10 @@ class OutputSuite extends FunSuite:
       withoutDraftArtifacts,
       Some(withoutDraftBasis)
     )
-    val withoutDraftHtmlFailure = htmlFailure.copy(
-      receipt = withoutDraftHtmlReceipt.id,
-      evidence = Vector(withoutDraftHtmlReceipt.id)
-    )
+    val withoutDraftHtmlFailure = htmlFailure
+      .withReceipt(withoutDraftHtmlReceipt.id, Vector(withoutDraftHtmlReceipt.id))
+      .toOption
+      .get
     val withoutDraftResult = StoryOutputResult
       .of(
         withoutDraftAcquisition,
@@ -1368,7 +1456,7 @@ class OutputSuite extends FunSuite:
           ArtifactId.unsafe("artifact-result"),
           ArtifactRole.InvocationResult,
           jsonType,
-          Some(OutputSchemaId.unsafe("story-output-result/v1")),
+          Some(OutputSchemaId.unsafe("story-output-result/v2")),
           "result".getBytes(StandardCharsets.UTF_8)
         ),
         ArtifactRequirement.Required

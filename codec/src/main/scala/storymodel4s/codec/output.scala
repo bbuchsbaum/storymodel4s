@@ -169,6 +169,7 @@ object OutputCodecs:
   given Encoder[SemanticAbsenceReason] = Encoder.instance {
     case SemanticAbsenceReason.SourceNotConstructed     => tagged("source_not_constructed")
     case SemanticAbsenceReason.SemanticNotValidated     => tagged("semantic_not_validated")
+    case SemanticAbsenceReason.SemanticsNotRequested    => tagged("semantics_not_requested")
     case SemanticAbsenceReason.NotApplicableToOutcome   => tagged("not_applicable_to_outcome")
     case SemanticAbsenceReason.Custom(namespace, label) => custom(namespace, label)
   }
@@ -177,6 +178,7 @@ object OutputCodecs:
     field[String](c, "status").flatMap {
       case "source_not_constructed"    => Right(SemanticAbsenceReason.SourceNotConstructed)
       case "semantic_not_validated"    => Right(SemanticAbsenceReason.SemanticNotValidated)
+      case "semantics_not_requested"   => Right(SemanticAbsenceReason.SemanticsNotRequested)
       case "not_applicable_to_outcome" => Right(SemanticAbsenceReason.NotApplicableToOutcome)
       case "custom"                    => decodeCustom(c, SemanticAbsenceReason.Custom.apply)
       case other                       => unknown(c, "SemanticAbsenceReason", other)
@@ -720,7 +722,8 @@ object OutputCodecs:
       "mediaType" -> entry.mediaType.asJson,
       "schemaVersion" -> entry.schemaVersion.asJson,
       "requirement" -> entry.requirement.asJson,
-      "disposition" -> entry.disposition.asJson
+      "disposition" -> entry.disposition.asJson,
+      "payload" -> entry.payload.asJson
     )
   }
 
@@ -732,7 +735,8 @@ object OutputCodecs:
       schema <- field[Option[OutputSchemaId]](c, "schemaVersion")
       requirement <- field[ArtifactRequirement](c, "requirement")
       disposition <- field[ArtifactDisposition](c, "disposition")
-    yield ManifestEntry(role, path, media, schema, requirement, disposition)
+      payload <- field[Option[OutputPayloadId]](c, "payload")
+    yield ManifestEntry(role, path, media, schema, requirement, disposition, payload)
   }
 
   private def tagged(status: String): Json = Json.obj("status" -> status.asJson)
@@ -765,7 +769,7 @@ object OutputCodecs:
 
 /** Versioned canonical codec for the composed story-output result. */
 object StoryOutputResultCodec:
-  val SchemaVersion: String = "story-output-result/v1"
+  val SchemaVersion: String = "story-output-result/v2"
 
   import OutputCodecs.*
   import OutputCodecs.given
@@ -794,9 +798,29 @@ object StoryOutputResultCodec:
     )
     Canonical.print(json)
 
-  /** Decode through every acquisition and composed-result smart constructor. */
+  /** Bare metadata cannot establish source construction; use the byte-context overload. */
   def decode[Id: Decoder: OutputTargetIdentity](
       text: String
+  ): Either[CodecError, StoryOutputResult[Id]] =
+    decodeWith(text, c => field[SourceOutcome](c, "source"))
+
+  /** Decode while re-running source admission against the exact original bytes. */
+  def decode[Id: Decoder: OutputTargetIdentity](
+      text: String,
+      originalBytes: Array[Byte]
+  ): Either[CodecError, StoryOutputResult[Id]] =
+    decodeWith(
+      text,
+      c =>
+        c.downField("source").success match
+          case Some(sourceCursor) =>
+            OutputAcquireCodecs.admitSourceOutcome(sourceCursor, originalBytes)
+          case None => Left(io.circe.DecodingFailure("missing source", c.history))
+    )
+
+  private def decodeWith[Id: Decoder: OutputTargetIdentity](
+      text: String,
+      decodeSource: HCursor => Decoder.Result[SourceOutcome]
   ): Either[CodecError, StoryOutputResult[Id]] =
     Canonical.parse(text).flatMap { json =>
       val decoder: Decoder[StoryOutputResult[Id]] = Decoder.instance { c =>
@@ -804,7 +828,7 @@ object StoryOutputResultCodec:
           version <- field[String](c, "schemaVersion")
           _ <- requireVersion(c, version, SchemaVersion)
           invocation <- field[InvocationId](c, "invocationId")
-          source <- field[SourceOutcome](c, "source")
+          source <- decodeSource(c)
           ac <- c
             .downField("acquisition")
             .success
@@ -1033,7 +1057,7 @@ object StoryOutputResultCodec:
 
 /** Versioned canonical manifest codec whose BundleId is external to its bytes. */
 object BundleManifestCodec:
-  val SchemaVersion: String = "story-output-manifest/v1"
+  val SchemaVersion: String = "story-output-manifest/v2"
 
   import OutputCodecs.given
 
