@@ -90,3 +90,90 @@ Similarly, the three `sherlock-gate` doc variants: `19N7ms` (15:56) and `dpDs9i`
 (16:42) match what the worktree held; `FXQsSA` (16:28) is a superseded
 intermediate. All three carry an older ADR-0001 describing `hsmm/v1`; the
 worktree's `hsmm/v4` version was kept.
+
+---
+
+# Addendum — corrections after a second, complete sweep
+
+The survey above was incomplete. Two gaps were found and closed.
+
+## Gap 1: dangling commits were never swept
+
+The first survey covered branches and `/private/tmp` clones. It never ran
+`git fsck --dangling` on this repository, so it missed commits that no ref
+points to. There were 100 of them; most are stash entries, but two were real
+and both were approved work:
+
+- **`84b6ce8d`** — the approved tip of the story-output bundle
+  (`cand-6D9Z91FK56DE5Q88QGH3XGKXF5`, approved by codex-cli-vertical-slice on
+  2026-09-01 12:50). The first salvage merged `e0ede3e7`, **nine commits
+  earlier**. Those nine commits close both construction bypasses that this
+  salvage had recorded as open findings — see
+  [salvaged-construction-bypass-findings.md](salvaged-construction-bypass-findings.md),
+  which has been corrected.
+- **`73bc9af9`** — the entire `provider-parser` module, 4,638 lines
+  (`cand-13J7K02VCBNBYWQG8354Y9MGZY`, approved by codex-storymodel-collab
+  20:32 and codex-storymodel4s-recall-collab 20:36, **chief authorization
+  granted 23:18**). It had never landed and `main` had no `provider-parser`
+  directory at all.
+
+Both are now merged.
+
+## Gap 2: the `/private/tmp` scan was top-level and name-matched
+
+The first sweep found 32 repositories. A `find -maxdepth 3 -name .git` finds
+**108** — many agents worked in a nested `repo/`, `tree/`, `clone/` or
+`exact/` subdirectory. All 103 non-grakern repositories have now been fetched
+into `refs/salvage2/*` and their working trees snapshotted.
+
+The expanded sweep found no further *lost* commits: every commit in every one
+of them is now either on `main` or on a local branch. It did confirm the
+mutation-clone population is larger than reported above — the
+`storymodel4s-output-*-mutant-*` family adds ten more deliberately mutated
+trees, all correctly excluded.
+
+## Still unlanded, and why
+
+- **`bd50c89f` — `fix: refuse aggregate cost-weight overflow`**
+  (`align/cost.scala` +37/−15, `CostSuite` +97). A real fix; `main` has no
+  overflow guard in `cost.scala`. Proposed as `cand-2J8257JACMEGGE9H4HRK2TN2SV`
+  on 2026-09-01 10:38 and **reviewed by nobody**. Left unmerged: this salvage
+  landed approved work, and merging never-reviewed library changes is a
+  separate decision.
+- **The longer `provider-parser` lineage** (`4393c3d9` → `fce00c84`).
+  `cand-70K5PT8QSX3JPC8X0X7ZHEAWX1` carries an approve *and* a block from
+  codex-storymodel-collab. The separately approved and authorized `73bc9af9`
+  was landed instead.
+- **The Astro docs-site workstream** (`bac401d9` and its lineage). `main` has
+  no `docs-site` source; this lives on `scout/astro-capability-tour-v4` and
+  neighbours, and is unmerged rather than lost.
+- **`recall-lineage.json`**: the 08-31 draft `2c179b99` carries a
+  `binaryDoubleCellDifferences` field per entry (22 entries, two non-zero:
+  19 and 10) that the 09-01 recut on `main` does not. No board post discusses
+  the field, so whether its removal was deliberate is unresolved. Flagged, not
+  decided.
+
+## Audit trail
+
+Candidates whose approved commits are now reachable from `main` were closed
+with `mote candidate reconcile --operator-override`, actor `bbuchsbaum-owner`,
+recording that formal review and authorization did not govern the landing:
+
+- `cand-13J7K02VCBNBYWQG8354Y9MGZY` — provider-parser
+- `cand-6D9Z91FK56DE5Q88QGH3XGKXF5` — story-output bundle
+- `cand-08QSQGY8XMA3FMETGHVR6ZKN1K` — SurfaceAtlas artifact codec
+
+Nine further pending candidates could not be reconciled: `mote` reports they
+do not exist in this store, because their proposal ops were written in clone
+stores whose `store_id` differs. Their content is on `main` regardless.
+
+Note for whoever fixes the tooling: a reconciled `landed_out_of_band` row still
+emits its full pre-transition blocker list, which is exactly the condition
+AGENTS.md §L4 says must not happen. There is a 32-commit branch
+`fix/candidate-target-scope` in `/private/tmp/mote-target-scope-fix-20260901`
+that belongs to the `mote` repository, not this one.
+
+## Gate
+
+`sbt checkAll` on the final tree: exit 0, scalafmt clean, compileAll clean,
+**4,827 tests across JVM/JS/Native, 0 failed, 0 errors**, 49 module test runs.
