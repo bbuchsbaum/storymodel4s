@@ -307,7 +307,7 @@ object SourceIdentities:
     CanonicalizationPolicyId.unsafe("storysource-canonical-text/v1")
 
   /** Successful receipt whose constructor is available only to the checked decoder below. */
-  final class DecodeReceiptValue private[SourceIdentities] (
+  private[acquire] final class DecodeReceiptValue private[SourceIdentities] (
       val id: OutputReceiptId,
       val decoder: DecoderId,
       val charset: CharsetId,
@@ -326,7 +326,7 @@ object SourceIdentities:
     override def toString: String = s"DecodeReceipt(id=${id.value}, decoder=${decoder.value})"
 
   /** Failed receipt whose constructor is available only to the checked decoder below. */
-  final class StrictDecodeFailureValue private[SourceIdentities] (
+  private[acquire] final class StrictDecodeFailureValue private[SourceIdentities] (
       val receipt: OutputReceiptId,
       val decoder: DecoderId,
       val charset: CharsetId,
@@ -356,7 +356,7 @@ object SourceIdentities:
       s"StrictDecodeFailure(byte=$bytePosition, reason=$reason, receipt=${receipt.value})"
 
   /** Decoded identity whose constructor shares the checked decoder's closed scope. */
-  final class DecodedSourceIdentityValue private[SourceIdentities] (
+  private[acquire] final class DecodedSourceIdentityValue private[SourceIdentities] (
       val utf16Length: Int,
       val checksum: Checksum,
       val decodeReceipt: DecodeReceipt
