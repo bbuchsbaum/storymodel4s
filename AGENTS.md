@@ -102,6 +102,143 @@ rather than supplemented. Do not let this section become the thing it was writte
 against.
 
 
+## Single-developer mode
+
+**This project has two modes. Read this section before anything below it and know
+which one you are in.** *Fleet mode* is everything in **Coordination and
+governance**: a chief, named reviewers, the candidate protocol, reservations,
+board check-ins. *Single-developer mode* is the owner plus at most one agent, with
+no chief and no second reviewer. **As of 2026-09-01 this project is in
+single-developer mode.** The owner switches modes; nobody else.
+
+The mode is not a relaxation. Every rule in **Design contract**, **Mechanised
+checks**, **Evidence discipline** (§4) and **Style** applies unchanged — those
+never depended on the fleet. What changes is who authorises a landing and what
+stands in for a reviewer.
+
+### Why this mode exists
+
+The fleet stopped on 2026-09-01 when it ran out of budget. The salvage measured
+what it left behind, and the numbers indict the coordination layer, not the work:
+
+- **170 candidates proposed, 12 landed.** Of the 61 left pending, **4** carried a
+  block on the merits. 24 had approvals and no block. **33 had never been reviewed
+  by anyone.**
+- The story-output bundle was **approved six minutes after it was proposed** and
+  never landed.
+- `provider-parser` — 4,638 lines — had **two approvals and chief authorization**,
+  and `main` had no `provider-parser` directory at all.
+- Both were recovered as **dangling commits** that no branch pointed at.
+- The largest single piece of work in the salvage, the C1 film-source contract
+  (2,283 lines), was sitting **uncommitted in the primary worktree**.
+- **103 terminal candidate rows emitted 3,308 blocking reasons** — 79% of all
+  blocker output — burying the 38 rows a reader could act on.
+
+Nothing there was a disagreement about code. It was a queue nobody could read and
+a landing nobody was named to perform.
+
+### SD1. A mechanism replaces the reviewer, and confidence does not
+
+§4 says *an author's own gate is LocallyObserved, not verified.* That rule assumed
+a second party existed. Here one does not, so **the second party is replaced by a
+control that can fail, never by the author's belief.** Any claim that would have
+needed a reviewer of record needs a runnable falsifier instead.
+
+Mutation is the default and it is cheap. Measured 2026-09-01 on the salvaged
+`bd50c89f` cost-overflow fix, which no one had ever reviewed: deleting the
+aggregate-representability guard failed two named tests ("non-representable
+aggregate weights were admitted", "invalid weights reached GraphHsmm probability
+work"); deleting the stable reassociation failed a third ("representable
+partial-support cost became Infinity"). **Two minutes of mutation settled what
+review never got to,** and settled it harder — an approval says someone read it, a
+dead mutant says the test can fail.
+
+A claim with no mutation behind it is a claim you have not tested, whatever the
+gate says.
+
+### SD2. Land on green. There is no approval to wait for
+
+No candidate rows, no authorization, no lander ladder, no `pending landable`.
+**`sbt checkAll` green on the merge result is the authority to land**, and the
+author lands their own work. "I will not land my own work" is a fleet-mode
+sentence; in this mode it is how a branch rots.
+
+`tools/premerge-check.sh` is a fleet-mode instrument. Four of its eight checks —
+candidate phase and authorization (3), live reservations (4), board re-read (6),
+ungated-landing scan (7) — have nothing to measure here. **Its two substantive
+checks survive and are mandatory:** a clean merge-result tree over the exact
+touched paths, and a gate log carrying **bound TEST TOTALS with command
+receipts**. A run with no test totals did not run (§4).
+
+### SD3. Uncommitted is lost, and unreferenced is invisible
+
+In fleet mode a board row remembered your work. **Nothing remembers it here.** The
+2026-09-01 salvage recovered its single largest piece from an uncommitted working
+tree and two of its best commits from the dangling-object graph, and it found them
+only because someone went looking.
+
+- Commit the moment it compiles, on a branch, even mid-thought. A WIP commit is
+  free; reconstructing 2,283 lines is not.
+- **A commit no ref points at is invisible to every tool you would use to find
+  it.** `git log`, `git branch --contains` and any survey built on them will all
+  miss it. Sweep `git fsck --dangling` before concluding work is gone — the
+  2026-09-01 survey did not, and consequently merged the wrong tip of the output
+  bundle, nine commits behind the one that had been approved.
+- Never let a `/tmp` scratch clone be the only copy of a branch.
+
+### SD4. The board is a notebook, not a protocol
+
+Keep `.mote/` if it helps you think. **Do not run the protocol against yourself:**
+no check-ins, no claims, no reservations, no presence, no candidate rows, no
+authorization. There is no path contention with one worker, and a reservation you
+grant yourself measures nothing. §5 and §7 are suspended.
+
+The audit trail is **git**. A commit message carries what a board row would have:
+what changed, the evidence, and what the evidence does not establish.
+
+### SD5. ADRs still gate vocabulary; you decide them
+
+No new module, dependency, or public vocabulary without an ADR line — unchanged.
+What changes is that you write it and you decide it. **The requirement was always
+the written record, not the approval.** Record the alternative you rejected, in
+the ADR, on the day; there is no dissenting reviewer to record it for you.
+
+### SD6. Read your own work cold, in a separate pass
+
+The one thing the fleet reliably supplied was a reader with no memory of writing
+it. Substitute deliberately: review in a **separate pass with a fresh-context
+agent**, or after enough delay to have forgotten your intent. **Never approve in
+the same breath as authoring.**
+
+But know what this buys and what it does not. Re-reading catches prose and shape;
+it does not catch a wrong number or a wrong object. Two from 2026-09-01, both
+caught by measurement and neither catchable by reading:
+merging `e0ede3e7` when the approved tip was `84b6ce8d`, caught only by comparing
+candidate `commit_oid`s against `main`; and reporting an 18 s uncovered media tail
+computed on the repaired notebook axis when the raw axis gives 11 s — a mistake
+`timebase-repair.json` had already written a non-equivalence against. **Both times
+the record held the answer and the reader did not go and get it.**
+
+### SD7. The failure mode here is different, so watch a different thing
+
+L1-L8 were written against a fleet deadlocking into zero throughput. One developer
+does not deadlock. **The single-developer failures are scope creep, an unlanded
+branch aging against a moving `main`, and a claim that was never falsified.**
+
+L3, L5 and L10 concern blocks, threads and substitute authority between actors;
+they are inert here. L1, L2, L4 and L9 re-point: if a week passes with no landed
+non-`.mote` commit, **the obstacle is the plan, not the queue.** L7 and L8 apply
+unchanged and matter more, not less.
+
+### SD8. Leaving this mode
+
+When a fleet restarts, fleet mode resumes for new work and **this mode's landings
+are not retroactively defective.** Close their audit rows with
+`mote candidate reconcile --operator-override`, which records that formal review
+did not govern the landing — that is the honest entry, and it is the one the
+salvage used.
+
+
 ## Layout
 
 Flat module directories, `CrossType.Pure`, cross-built JVM / Scala.js / Native.
@@ -483,6 +620,12 @@ the check to the script and leave one line here pointing at it.
    semantic on the strength of its identifier.
 
 ## Coordination and governance
+
+> **Fleet mode only. This whole section is suspended as of 2026-09-01** — see
+> **Single-developer mode** above, which says which of these rules survive and
+> what replaces the rest. Items 5 and 7 are suspended outright; items 1 and 3
+> have no one to address; item 2 survives with the owner deciding; items 4 and 6
+> apply unchanged in both modes.
 
 Several agents (Claude and Codex sessions) work in this checkout and its
 worktrees at once. Coordination runs on the package-local mote board
