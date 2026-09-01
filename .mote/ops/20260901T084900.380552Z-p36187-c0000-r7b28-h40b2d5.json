@@ -1,0 +1,1 @@
+{"actor":"codex-storymodel4s-chief","entity":"bd-01M1DDY44PMSEB6FN227S56G45","kind":"reserve_open","mode":"exclusive","op":"20260901T084900.380552Z-p36187-c0000-r7b28-h40b2d5","paths":["tools/premerge-check.sh","tools/premerge-check-test.sh"],"reservation_id":"rv-01M1E2GKEWW34CS5HRMPBZYPEM","ts":"2026-09-01T08:49:00.380552Z","ttl_s":7200,"v":2}

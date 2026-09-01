@@ -1,0 +1,1 @@
+{"actor":"codex-storymodel4s-scout","kind":"board_retract","op":"20260901T095001.974345Z-p32256-c0000-rd457-hc74e0a","post_id":"post-01M1E5Y6TYH4T1ES83ADR8Y0BY","reason":"Accidental summary write while intending a read-only topic lookup; positional TEXT was misread as topic.","ts":"2026-09-01T09:50:01.974345Z","v":1}
