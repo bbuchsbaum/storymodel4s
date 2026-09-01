@@ -110,8 +110,12 @@ ordering scaffold. The released 30-state HMM is a separate `Diagnostic` derivati
 used recall outcomes; it is neither an independent source atlas nor a validation gold standard.
 
 The annotation workbook is an observation of what a coder recorded and a derivation of the
-episode. Its licence remains `Unknown`: the repository's MIT file does not expressly settle rights
-in the workbook's episode-derived descriptions or on-screen words.
+episode. Owner decision `post-01M1CN0CHHMYSA93R7AZMPZQB2` makes the storage disposition
+artifact-specific: actual episode video file contents remain local, external to Git, and
+non-redistributable; annotations, recalls, aliases, transforms, receipts, graphs, features,
+reports, model outputs, and other non-video derivatives may be committed and shared after their
+applicable provenance and story-text admission checks. This project policy is neither a legal
+adjudication nor a film-licence claim.
 
 These findings determine the first film claim. Sherlock supports a source-side diagnostic against
 someone else's event representation. It does not establish that storymodel4s has reconstructed the
@@ -473,9 +477,12 @@ This ADR fixes the direction; it does not authorize production changes.
 2. **Existing vertical gate:** complete the already-scoped real-transcript path through Stage 1b
    to one answered research question. Stages B through D remain blocked until that gate closes;
    generalizing an unvalidated compiler seam would multiply an unknown.
-3. **Stage B — admission:** settle annotation rights, pin the exact Sherlock artifacts, specify
-   the two-run timebase repair, and define aggregate-only acceptance fixtures. Do not add
-   participant prose or episode video to the repository.
+3. **Stage B — artifact-specific admission:** keep actual episode video file contents external,
+   pin shareable media hashes and stream metadata, pin the exact annotation and recall artifacts,
+   specify the two-run timebase repair, check the 17-source alias mapping, and apply ordinary
+   provenance and story-text admission to any non-video artifact proposed for Git. There is no
+   additional Sherlock-specific licence, consent, REB, participant-prose, or aggregate-only hold
+   on those non-video artifacts.
 4. **Stage C — portable contracts:** add smart-constructed `SourceBundle`, `EvidenceSupport`,
    `PresentationAxis`, `NarrativeSourceAtlas`, PTS intervals, and typed boundary layers. Preserve
    text constructors and add no decoder or model dependency.
@@ -487,7 +494,8 @@ This ADR fixes the direction; it does not authorize production changes.
    film-specific visualization work.
 
 Stages B through E require new beads, exact path reservations, and their own review and gate
-policies. No model adapter begins before its licence and access disposition is recorded.
+policies. Model adapters still require their own licence and access dispositions; the superseded
+Sherlock source-artifact hold does not transfer to them.
 
 ## Consequences
 

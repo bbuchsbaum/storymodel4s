@@ -1,0 +1,105 @@
+{
+  "schema": "storymodel4s.sherlock.recall-alias-map",
+  "schemaVersion": 1,
+  "sourceSetId": "sherlock-recall-export-set-v1",
+  "identityRule": "An alias maps to a canonical source only when the complete alias file SHA-256 equals the canonical local CSV SHA-256.",
+  "sourceCount": 17,
+  "aliasCount": 16,
+  "mappings": [
+    {
+      "aliasId": "recall-alias-01",
+      "sourceId": "recall-source-01",
+      "sha256": "a3ef639814ea34f2e7c9ceb0900bbd6e133d27b0d0da0065e4ebc3e92f3c6649"
+    },
+    {
+      "aliasId": "recall-alias-02",
+      "sourceId": "recall-source-02",
+      "sha256": "6389e169c4cc23bcd35bb490417efd60ae8f891e3ecce0772679056357fd6488"
+    },
+    {
+      "aliasId": "recall-alias-03",
+      "sourceId": "recall-source-03",
+      "sha256": "5bfe5e4afa516e86d302912db8f6978f16f80ab00a84cb2a878eb2ed0c15e48e"
+    },
+    {
+      "aliasId": "recall-alias-04",
+      "sourceId": "recall-source-04",
+      "sha256": "0488180df8bc19f9307e2eed1ebc72d01958e35f8fb9ede81ce00cc82fc4c5db"
+    },
+    {
+      "aliasId": "recall-alias-05",
+      "sourceId": "recall-source-06",
+      "sha256": "0f9426b27251f7f0d66b4d6281584438330e682fe236b3730fa9fb456a9235a6"
+    },
+    {
+      "aliasId": "recall-alias-06",
+      "sourceId": "recall-source-07",
+      "sha256": "797fc2996485e4013b2236e4cd54abcb73d47d147c0bf6d5a1809bc582faec04"
+    },
+    {
+      "aliasId": "recall-alias-07",
+      "sourceId": "recall-source-08",
+      "sha256": "51420d0615480b749e2408b52b8d8aceba9284f6fd476b62541df17fad1cfe19"
+    },
+    {
+      "aliasId": "recall-alias-08",
+      "sourceId": "recall-source-09",
+      "sha256": "5ec95404e8531f91b59e45242246fd52846ddc7936b29297c5bf5f203cc3fe17"
+    },
+    {
+      "aliasId": "recall-alias-09",
+      "sourceId": "recall-source-10",
+      "sha256": "f8f0d2371f38057353811dca9c7409b321cc8bb98a043f7798d7dfe03602cf62"
+    },
+    {
+      "aliasId": "recall-alias-10",
+      "sourceId": "recall-source-11",
+      "sha256": "2f0e1c6f7f727efb36ff090f6b740c7cab7c4a487f97ba2387079ae1a9e965bf"
+    },
+    {
+      "aliasId": "recall-alias-11",
+      "sourceId": "recall-source-12",
+      "sha256": "785717e33837aaa83fb8afd40248e27e4222cf93ff53b70bcc2b93d5a24004cc"
+    },
+    {
+      "aliasId": "recall-alias-12",
+      "sourceId": "recall-source-13",
+      "sha256": "18c51ec8a08c1c3ce7f33750f77c8ac709d396f7edbee60e56c5db5c6d9efa83"
+    },
+    {
+      "aliasId": "recall-alias-13",
+      "sourceId": "recall-source-14",
+      "sha256": "f2e9efa9d05347ca0535618df5ff682c28df7d0e71e34fd98bfd067db224a1e6"
+    },
+    {
+      "aliasId": "recall-alias-14",
+      "sourceId": "recall-source-15",
+      "sha256": "9e805df1232634987dda35caccfc171a1da327dc458dd391dbdec0279d5d5ed8"
+    },
+    {
+      "aliasId": "recall-alias-15",
+      "sourceId": "recall-source-16",
+      "sha256": "9b1213d49ccb6412c2ae51b7c0e8aacc037cadc3d9527c812261d082d2f997f5"
+    },
+    {
+      "aliasId": "recall-alias-16",
+      "sourceId": "recall-source-17",
+      "sha256": "dc560db33ff99d502b9ff09daa20f790f068ddea858b20f4ae1e2df6c69d56c2"
+    }
+  ],
+  "omittedSources": [
+    "recall-source-05"
+  ],
+  "shift": {
+    "firstShiftedAlias": "recall-alias-05",
+    "rule": "For aliases 05 through 16, source ordinal equals alias ordinal plus one."
+  },
+  "validation": {
+    "mappingTotalOverAliases": true,
+    "mappingInjectiveOverSources": true,
+    "allAliasBytesEqualMappedSource": true,
+    "duplicateAliases": [],
+    "unmappedAliases": [],
+    "participantFilenamesIncludedInManifest": false
+  }
+}

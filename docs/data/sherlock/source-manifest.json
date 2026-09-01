@@ -1,0 +1,155 @@
+{
+  "schema": "storymodel4s.sherlock.source-manifest",
+  "schemaVersion": 1,
+  "artifactSetId": "sherlock-local-video-recall-pair-v1",
+  "recordedAt": "2026-08-31",
+  "scientificRole": "canonical-development-and-validation-source-set",
+  "contentPolicy": {
+    "ownerDecisionPost": "post-01M1CR50ZYM6Q8MG03CBTH9JVRP",
+    "externalOnlyArtifactClasses": [
+      "actual-episode-video-bytes"
+    ],
+    "participantRecallProsePresent": false,
+    "episodeAnnotationProsePresent": false,
+    "rawVideoPresent": false
+  },
+  "orderedMediaPair": {
+    "order": [
+      "media-part-a",
+      "media-part-b"
+    ],
+    "orderingStatus": "local-intended-order",
+    "exactExperimentalPresentationEdition": {
+      "status": "unconfirmed",
+      "reason": "Publication and local ordering establish scientific relevance but do not prove that these exact media bytes were the presentation encodes used to create every annotation and recall coordinate."
+    },
+    "concatenatedContainerDurationSeconds": 2981.0
+  },
+  "mediaParts": [
+    {
+      "id": "media-part-a",
+      "storage": "external-local-only",
+      "byteLength": 285537456,
+      "sha256": "eb0364748e4bc6f66f43a84ab53e82792ac27dda48e9958bd5ba652c82b3ecca",
+      "container": {
+        "formatNames": [
+          "mov",
+          "mp4",
+          "m4a",
+          "3gp",
+          "3g2",
+          "mj2"
+        ],
+        "startTimeSeconds": 0.0,
+        "durationSeconds": 1426.2
+      },
+      "streams": [
+        {
+          "id": "media-part-a-video-0",
+          "kind": "video",
+          "codec": "h264",
+          "profile": "Constrained Baseline",
+          "width": 640,
+          "height": 360,
+          "frameRate": "25/1",
+          "timeBase": "1/2500",
+          "startTimeSeconds": 0.0,
+          "durationSeconds": 1426.2,
+          "frameCount": 35655,
+          "elementaryStreamFormat": "h264-annex-b",
+          "elementaryStreamSha256": "c0b82345da1bd89f525db611aa1adbe0aba33ede8990d19ddb47a5852c66c01c"
+        },
+        {
+          "id": "media-part-a-audio-0",
+          "kind": "audio",
+          "codec": "aac",
+          "profile": "LC",
+          "sampleRateHz": 44100,
+          "channels": 2,
+          "timeBase": "1/44100",
+          "startTimeSeconds": 0.0,
+          "durationSeconds": 1419.736667,
+          "frameCount": 61143,
+          "elementaryStreamFormat": "adts",
+          "elementaryStreamSha256": "4440f046f817c8c6722115ae37eebb9e031956c6ee64563008755ead3610d1b7"
+        }
+      ]
+    },
+    {
+      "id": "media-part-b",
+      "storage": "external-local-only",
+      "byteLength": 315565018,
+      "sha256": "f6e2c839d355f86709379d74d28f24d89b919e45e0ac43771d197843ae694907",
+      "container": {
+        "formatNames": [
+          "mov",
+          "mp4",
+          "m4a",
+          "3gp",
+          "3g2",
+          "mj2"
+        ],
+        "startTimeSeconds": 0.0,
+        "durationSeconds": 1554.8
+      },
+      "streams": [
+        {
+          "id": "media-part-b-video-0",
+          "kind": "video",
+          "codec": "h264",
+          "profile": "Constrained Baseline",
+          "width": 640,
+          "height": 360,
+          "frameRate": "25/1",
+          "timeBase": "1/2500",
+          "startTimeSeconds": 0.0,
+          "durationSeconds": 1554.8,
+          "frameCount": 38870,
+          "elementaryStreamFormat": "h264-annex-b",
+          "elementaryStreamSha256": "f5202f1e5ab3f32ba5a37e6497380b4feefee6bff27b9e916b380062f4532f8f"
+        },
+        {
+          "id": "media-part-b-audio-0",
+          "kind": "audio",
+          "codec": "aac",
+          "profile": "LC",
+          "sampleRateHz": 44100,
+          "channels": 2,
+          "timeBase": "1/44100",
+          "startTimeSeconds": 0.0,
+          "durationSeconds": 1546.913333,
+          "frameCount": 66620,
+          "elementaryStreamFormat": "adts",
+          "elementaryStreamSha256": "a813b92a195c02554877d9336a9e3636e07311f278c360f1ce6a1760a6260aed"
+        }
+      ]
+    }
+  ],
+  "mediaIdentityReceipt": {
+    "probeTool": "ffprobe 7.1.1",
+    "hashTool": "shasum SHA-256",
+    "streamExtractionTool": "ffmpeg 7.1.1",
+    "videoRecipe": "select stream 0:v:0, copy codec payload, emit h264 Annex-B, hash emitted bytes",
+    "audioRecipe": "select stream 0:a:0, copy codec payload, emit ADTS, hash emitted bytes",
+    "filenamesUsedAsIdentity": false
+  },
+  "boundNonVideoRecords": [
+    {
+      "id": "sherlock-annotation-table-v1",
+      "record": "annotation-lineage.json",
+      "contentStoredInThisSlice": false
+    },
+    {
+      "id": "sherlock-recall-export-set-v1",
+      "record": "recall-lineage.json",
+      "contentStoredInThisSlice": false
+    }
+  ],
+  "nonClaims": [
+    "exact-experimental-presentation-edition",
+    "frame-exact-annotation-alignment",
+    "accepted-narrative-semantics",
+    "alignment-result",
+    "calibration-result"
+  ]
+}

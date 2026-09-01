@@ -2,7 +2,7 @@
 
 **Bead:** `bd-01M17S2SGW2Z7NSR478SHSZRNW`
 
-**Status:** primary-source inspection complete; conditional source-side use only
+**Status:** primary-source inspection complete; non-video artifacts eligible for ordinary admission
 
 **Inspection date:** 2026-08-29
 
@@ -32,13 +32,15 @@ Three qualifications keep the answer conditional:
 2. The released seconds are run-local rather than one monotone clock, and the 50-scene and
    1,000-segment boundaries came from different coders. A source atlas needs an explicit,
    receipt-bearing timebase and boundary reconciliation.
-3. The only detected licence is the analysis repository's root MIT file. It does not expressly
-   identify the annotation workbook or settle rights in episode-derived descriptions and
-   on-screen words. The separately CC0 OpenNeuro dataset does not contain this workbook.
+3. The public records establish the scientific source family but not equality between every local
+   derivative and its upstream artifact. The owner has separately made annotations, recalls, and
+   other non-video Sherlock artifacts eligible for ordinary provenance and story-text admission;
+   only the actual episode video contents remain external and non-redistributable.
 
 The annotations therefore shorten the film path by removing the need to possess or process video
 bytes. They do **not** remove the need for the presentation-axis/evidence work in the film-source
-ADR, the proposition-provider vertical, or an annotation-specific rights decision.
+ADR, the proposition-provider vertical, artifact-specific provenance, or the story-text admission
+checklist.
 
 ## Classification contract
 
@@ -48,7 +50,7 @@ This inventory uses the same three classes as the other external-source inventor
 |---|---|
 | **Observation** | A released artifact fact or a response actually recorded from a coder/rater. It is not automatically a fact about the episode. |
 | **Derivation** | A segmentation, label, description, alignment, aggregation, model output, or other value produced from the episode or upstream annotations. |
-| **Unknown** | The primary records inspected here do not establish the relevant provenance, semantics, or rights. Unknown is never promoted to Observation. |
+| **Unknown** | The primary records inspected here do not establish the relevant provenance or semantics. Unknown is never promoted to Observation. |
 
 An annotation may be an Observation of what a coder entered while remaining a Derivation of the
 episode. The second role is the one that matters when it is used as the source side of a recall
@@ -104,7 +106,7 @@ narrative hierarchy.
 | `Location` | 1,000 | Coder location label; requires ontology resolution before becoming a narrative entity/context. |
 | `Camera Angle` | 994 | Presentation feature; not story-world geometry. |
 | `Music Presence` | 1,000 | Audio-presentation classification; diegetic status is not encoded. |
-| `Words on Screen` | 37 | Coder transcription of visible text; annotation evidence, not a licensed subtitle track. |
+| `Words on Screen` | 37 | Coder transcription of visible text; annotation evidence, not a subtitle track or direct episode evidence. |
 | Four arousal and four valence columns | Seven complete; one valence column has 996 values | Observations of four raters' responses. Any film-affect estimate is a derivation and must retain rater coverage. |
 
 The paper's topic pipeline selects the nine fields from narrative detail through words on screen.
@@ -201,10 +203,10 @@ court for recall performance on the same corpus. A calibrated evaluation would n
 retuning, a separate annotation court, or an explicit limitation plus a feature-use ledger that
 prevents this representation from serving simultaneously as model input and independent truth.
 
-## Licence and redistribution
+## Owner storage and sharing disposition
 
-The licence result is **Unknown for the annotation content**, not because the file is unavailable,
-but because the available licences do not close the component-rights question.
+The primary-source inspection below remains useful as factual lineage. It no longer creates a
+Sherlock-specific storage or sharing hold for annotations, recalls, or derived artifacts.
 
 - The ContextLab repository is public and GitHub detects its root `LICENSE` as MIT. The README
   says the repository contains all data analyzed in the paper.
@@ -218,20 +220,22 @@ but because the available licences do not close the component-rights question.
 - OpenNeuro `ds001132` is distributed through an open-data service, but the current dataset tree
   contains imaging/task files rather than this workbook. Its CC0 status must not be transferred to
   an artifact it does not contain.
-- None of these facts licenses the BBC episode itself. The present route does not require episode
-  bytes, which is a major reduction in exposure, but it does not prove the annotation text may be
-  vendored by this library.
+- None of these facts licenses the BBC episode itself. Owner decision
+  `post-01M1CN0CHHMYSA93R7AZMPZQB2` therefore keeps the actual episode video files local,
+  external to Git, and non-redistributable without turning that video rule into a hold on other
+  Sherlock artifact classes.
 
-Until the owner or data custodian confirms annotation-specific terms, the low-exposure posture is:
+The binding project posture is artifact-specific:
 
-1. keep workbook and annotation text outside git;
-2. commit only locator, commit/blob identity, byte digest, schema, aggregate validation facts, and
-   code that operates on a caller-supplied local file;
-3. do not place annotation descriptions, visible words, participant recall, or episode frames in
-   fixtures, tests, comments, or documentation;
-4. preserve the root-MIT record as evidence without upgrading it into a data-specific licence;
-5. obtain explicit component-rights confirmation before redistribution or publication of derived
-   text excerpts.
+1. actual episode video file contents stay outside Git and are not redistributed;
+2. media hashes, stream metadata, and identity or alignment receipts may be committed and shared;
+3. annotations, recall transcripts and exports, aliases, transformations and receipts, graphs,
+   features, reports, model outputs, and other non-video derivatives may be committed and shared
+   after their applicable provenance and story-text admission checks;
+4. preserve public repository, blob, release, and DOI records as factual lineage without treating
+   them as proof of experimental-edition equality or semantic authority;
+5. no new Sherlock-specific licence, consent, REB, participant-prose, or aggregate-only hold
+   applies to those non-video artifact classes.
 
 This document does not admit a new story text under the binding
 [`story-text-admission-checklist.md`](story-text-admission-checklist.md): it records only source
@@ -244,7 +248,7 @@ reproduced.
 The first implementation should be narrower than a general film platform and stricter than a CSV
 adapter.
 
-1. **External immutable manifest.** Pin repository commit, Git blob, downloaded byte SHA-256,
+1. **Immutable source manifest.** Pin repository commit, Git blob, downloaded byte SHA-256,
    sheet name, schema version, and a canonical parsed-table digest. Do not identify the source by
    filename alone.
 2. **Typed coordinate population.** Keep run-local seconds, TR coordinates, and stitched
@@ -267,9 +271,9 @@ adapter.
 8. **Named segmentation population.** `Microsegment1000`, `Scene50`, and `TopicHmmEvent30` must not
    collapse into one unqualified event ID family. The last is a sidecar derivation with a feature-
    use ledger.
-9. **External-content tests.** Commit synthetic schemas and numeric boundary fixtures only. Run
-   source-bearing integration tests against a local file after the rights gate; never check the
-   workbook or its prose into git.
+9. **Source-bearing tests.** Synthetic schemas and numeric boundary fixtures remain the default.
+   A real annotation or recall fixture may enter Git only through its own provenance and
+   story-text admission record; actual episode video bytes never do.
 10. **Diagnostic-only first result.** The first Sherlock result reports coverage, unresolved
     proposals, and sensitivity to the 50-scene versus 30-HMM partition. It cannot make a calibrated
     performance claim.
@@ -288,14 +292,15 @@ distinction this project is designed to preserve.
 
 Recommended sequence:
 
-1. Record an owner/chief disposition on whether root MIT is sufficient for local scientific use
-   and whether annotation-content redistribution remains prohibited.
+1. Apply the recorded owner policy per artifact: keep actual episode video files external, and
+   route each proposed annotation or recall artifact through ordinary provenance and story-text
+   admission without a new Sherlock-specific rights or participant-content hold.
 2. Use the film-source ADR's presentation-axis analysis to define the smallest annotation-row/time
    evidence contract; do not generalize to frames, tracks, or audio until a real consumer requires
    them.
-3. Build a local-only loader and validator for the pinned workbook with synthetic committed courts
-   for scan breaks, zero-duration rows, boundary mismatch, missing ratings, and byte-versus-table
-   identity.
+3. Build a loader and validator for the pinned workbook with synthetic committed courts for scan
+   breaks, zero-duration rows, boundary mismatch, missing ratings, and byte-versus-table identity.
+   A real workbook fixture is optional and separately admitted rather than structurally forbidden.
 4. Compile the 998 usable microsegment descriptions into proposal artifacts, retaining 50-scene
    membership as an approximate external grouping and keeping the published 30-event HMM channel
    as a separate Diagnostic sidecar.
@@ -305,9 +310,9 @@ Recommended sequence:
 
 ## Final disposition
 
-**Proceed, conditionally.** Sherlock supplies a usable source representation at the level of a
-human-derived temporal annotation atlas. It is richer than an event list and materially shortens
-the film-recall path. It is not the episode, not a canonical narrative graph, and not independent
-gold. Keep the content external, make the time and segmentation derivations explicit, preserve the
-coder model in every result, and close the annotation-specific rights question before any content
-redistribution.
+**Proceed under artifact-specific admission.** Sherlock supplies a usable source representation at
+the level of a human-derived temporal annotation atlas. It is richer than an event list and
+materially shortens the film-recall path. It is not the episode, not a canonical narrative graph,
+and not independent gold. Keep actual episode video files external, apply ordinary provenance and
+story-text admission to non-video artifacts proposed for Git, make the time and segmentation
+derivations explicit, and preserve the coder model in every result.

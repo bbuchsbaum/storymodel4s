@@ -1,0 +1,314 @@
+{
+  "schema": "storymodel4s.sherlock.recall-lineage",
+  "schemaVersion": 1,
+  "artifactSetId": "sherlock-recall-export-set-v1",
+  "publicRelease": {
+    "repository": "https://github.com/jchenlab-jhu/Word-timestamped-transcripts",
+    "commit": "ea87e76fe7e48ad2098731d302ff8f9140f1a16e",
+    "tag": "v1.3",
+    "tagCommit": "ea87e76fe7e48ad2098731d302ff8f9140f1a16e",
+    "zenodoDoi": "10.5281/zenodo.8208709",
+    "trackedSourceFormat": "xlsx",
+    "trackedSourceCount": 17,
+    "csvFilesTrackedByPublicCommit": false
+  },
+  "enumeration": {
+    "sourceRule": "Within the public commit's Sherlock Timestamps directory, sort the 17 tracked XLSX paths by the numeric identifier in the basename and assign recall-source-01 through recall-source-17.",
+    "localRule": "Sort the 17 canonical local CSV exports by the same numeric identifier and assign the corresponding source IDs.",
+    "participantFilenamesIncludedInManifest": false
+  },
+  "columns": [
+    {
+      "id": "word",
+      "kind": "text"
+    },
+    {
+      "id": "princeton-word-onset-seconds",
+      "kind": "decimal-seconds"
+    },
+    {
+      "id": "princeton-tr-number",
+      "kind": "integer-tr"
+    },
+    {
+      "id": "princeton-tr-onset-seconds",
+      "kind": "decimal-seconds"
+    },
+    {
+      "id": "openneuro-word-onset-seconds",
+      "kind": "decimal-seconds"
+    },
+    {
+      "id": "openneuro-tr-number",
+      "kind": "integer-tr"
+    },
+    {
+      "id": "openneuro-tr-onset-seconds",
+      "kind": "decimal-seconds"
+    }
+  ],
+  "sources": [
+    {
+      "id": "recall-source-01",
+      "upstreamGitBlob": "207fca0186d1c96d7e30c721386cc275767ce89a",
+      "upstreamByteLength": 96895,
+      "upstreamSha256": "9bb4575e7c93c13a3846c400dc12fe79da0598a97280d44d3aaebdbd8111bf53",
+      "localCsvByteLength": 58792,
+      "localCsvSha256": "a3ef639814ea34f2e7c9ceb0900bbd6e133d27b0d0da0065e4ebc3e92f3c6649",
+      "recordCount": 1616,
+      "numericMissingCellCount": 0,
+      "storyTextOutcome": "external-content-bound-by-digest"
+    },
+    {
+      "id": "recall-source-02",
+      "upstreamGitBlob": "87125aab7bbffdcad432e374e3f2be209f8478a5",
+      "upstreamByteLength": 127442,
+      "upstreamSha256": "b2ee561c80970c3023b8916341f313e5f580623d74002b274ebf1a558d36dbfa",
+      "localCsvByteLength": 81582,
+      "localCsvSha256": "6389e169c4cc23bcd35bb490417efd60ae8f891e3ecce0772679056357fd6488",
+      "recordCount": 2152,
+      "numericMissingCellCount": 0,
+      "storyTextOutcome": "external-content-bound-by-digest"
+    },
+    {
+      "id": "recall-source-03",
+      "upstreamGitBlob": "913a68adea817ac82e67a507bb0cdaeba919f062",
+      "upstreamByteLength": 142970,
+      "upstreamSha256": "e237386e89ea0294e4ebea0db6b601243645ba0262e5d01260428a787cdcce27",
+      "localCsvByteLength": 91928,
+      "localCsvSha256": "5bfe5e4afa516e86d302912db8f6978f16f80ab00a84cb2a878eb2ed0c15e48e",
+      "recordCount": 2495,
+      "numericMissingCellCount": 0,
+      "storyTextOutcome": "external-content-bound-by-digest"
+    },
+    {
+      "id": "recall-source-04",
+      "upstreamGitBlob": "3be83bac33ea2cdda296584b0890ae5ad83ccf1f",
+      "upstreamByteLength": 100656,
+      "upstreamSha256": "adbcf492d678ea0c7b9b17d7bf1770b6be8cc8c1a0f2934c04f54cbe17669b72",
+      "localCsvByteLength": 61977,
+      "localCsvSha256": "0488180df8bc19f9307e2eed1ebc72d01958e35f8fb9ede81ce00cc82fc4c5db",
+      "recordCount": 1705,
+      "numericMissingCellCount": 0,
+      "storyTextOutcome": "external-content-bound-by-digest"
+    },
+    {
+      "id": "recall-source-05",
+      "upstreamGitBlob": "96dfa2b48608be35cd7dd5116f237b6fd8c468f9",
+      "upstreamByteLength": 90191,
+      "upstreamSha256": "914e0bd8f6412d602ed9ddbc45a1e7fb9acbc63f091d4fa403ed8b4ab305d7e2",
+      "localCsvByteLength": 52939,
+      "localCsvSha256": "a20cc241597b6366496175c6b33706adc01afd25caf50373fe6cd03a510fc7ff",
+      "recordCount": 1450,
+      "numericMissingCellCount": 0,
+      "storyTextOutcome": "external-content-bound-by-digest"
+    },
+    {
+      "id": "recall-source-06",
+      "upstreamGitBlob": "6eb833fa6953cb4bfa188d1106b4367c5d2bbc5f",
+      "upstreamByteLength": 140980,
+      "upstreamSha256": "8f9c1ae6fad8c47bbd04f5e9edc2aa04ade9e23ac1c9ab2f14ebc430ccb79812",
+      "localCsvByteLength": 91641,
+      "localCsvSha256": "0f9426b27251f7f0d66b4d6281584438330e682fe236b3730fa9fb456a9235a6",
+      "recordCount": 2414,
+      "numericMissingCellCount": 0,
+      "storyTextOutcome": "external-content-bound-by-digest"
+    },
+    {
+      "id": "recall-source-07",
+      "upstreamGitBlob": "2fcba21cd6bcb35a8bef09ab49bbb59b1cceb77e",
+      "upstreamByteLength": 119815,
+      "upstreamSha256": "3e45852bbfa61344b471b7ea252b259fd7975bf33b4365f3d82c1d65f1810570",
+      "localCsvByteLength": 73435,
+      "localCsvSha256": "797fc2996485e4013b2236e4cd54abcb73d47d147c0bf6d5a1809bc582faec04",
+      "recordCount": 1994,
+      "numericMissingCellCount": 0,
+      "storyTextOutcome": "external-content-bound-by-digest"
+    },
+    {
+      "id": "recall-source-08",
+      "upstreamGitBlob": "fd04f8b4580b20d8d936fad467203a6034338ab0",
+      "upstreamByteLength": 193602,
+      "upstreamSha256": "fdb66eab4344c3b030747bd1d4627b7288c7c5185d782c9addaf5487937011a8",
+      "localCsvByteLength": 132023,
+      "localCsvSha256": "51420d0615480b749e2408b52b8d8aceba9284f6fd476b62541df17fad1cfe19",
+      "recordCount": 3194,
+      "numericMissingCellCount": 0,
+      "storyTextOutcome": "external-content-bound-by-digest"
+    },
+    {
+      "id": "recall-source-09",
+      "upstreamGitBlob": "1b1081e35c7e493b54a386354025457cc122fe8a",
+      "upstreamByteLength": 103685,
+      "upstreamSha256": "c8cf836ce4b39740b07af342b6717ec47d39cff9441ba3d63c55dfe1662b7758",
+      "localCsvByteLength": 61744,
+      "localCsvSha256": "5ec95404e8531f91b59e45242246fd52846ddc7936b29297c5bf5f203cc3fe17",
+      "recordCount": 1659,
+      "numericMissingCellCount": 0,
+      "storyTextOutcome": "external-content-bound-by-digest"
+    },
+    {
+      "id": "recall-source-10",
+      "upstreamGitBlob": "af6dafaa9754b9648b1747fda62b0e58bd9693de",
+      "upstreamByteLength": 154032,
+      "upstreamSha256": "2286637d6c8140d0452834d0705ba26e18c9b45c3786a0f383dbb700dbcba892",
+      "localCsvByteLength": 97695,
+      "localCsvSha256": "f8f0d2371f38057353811dca9c7409b321cc8bb98a043f7798d7dfe03602cf62",
+      "recordCount": 2604,
+      "numericMissingCellCount": 0,
+      "storyTextOutcome": "external-content-bound-by-digest"
+    },
+    {
+      "id": "recall-source-11",
+      "upstreamGitBlob": "d8668622b4aee86456a6726693c5b44c5bd4de09",
+      "upstreamByteLength": 123967,
+      "upstreamSha256": "bf4dc36bd5e3138ada0d8da9b96bccd96683a3989c1551a3461479199b2cec7d",
+      "localCsvByteLength": 77082,
+      "localCsvSha256": "2f0e1c6f7f727efb36ff090f6b740c7cab7c4a487f97ba2387079ae1a9e965bf",
+      "recordCount": 1949,
+      "numericMissingCellCount": 0,
+      "storyTextOutcome": "external-content-bound-by-digest"
+    },
+    {
+      "id": "recall-source-12",
+      "upstreamGitBlob": "99f56a5f89298c703107f2ff02224b736f0f716b",
+      "upstreamByteLength": 248537,
+      "upstreamSha256": "882e48593e1ee795ad70db1feccdd54864e0a64ca7afeb1097da9efa1cbba6e3",
+      "localCsvByteLength": 175923,
+      "localCsvSha256": "785717e33837aaa83fb8afd40248e27e4222cf93ff53b70bcc2b93d5a24004cc",
+      "recordCount": 4134,
+      "numericMissingCellCount": 0,
+      "storyTextOutcome": "external-content-bound-by-digest"
+    },
+    {
+      "id": "recall-source-13",
+      "upstreamGitBlob": "6de13b377c3b9c2ad98577209496e7047cdd5de5",
+      "upstreamByteLength": 327843,
+      "upstreamSha256": "663b19dafe3d371134910641522c9dd77925dfde71bb58765aae7f95ae9674d8",
+      "localCsvByteLength": 240811,
+      "localCsvSha256": "18c51ec8a08c1c3ce7f33750f77c8ac709d396f7edbee60e56c5db5c6d9efa83",
+      "recordCount": 5899,
+      "numericMissingCellCount": 0,
+      "storyTextOutcome": "external-content-bound-by-digest"
+    },
+    {
+      "id": "recall-source-14",
+      "upstreamGitBlob": "1aa74400aa00ef4710b6e7d1dbf06cc278f97582",
+      "upstreamByteLength": 206062,
+      "upstreamSha256": "5b6598c4c0bd90490a48e950e697a16e464d6dc7c89ad133a0a0ceff8759c67a",
+      "localCsvByteLength": 141827,
+      "localCsvSha256": "f2e9efa9d05347ca0535618df5ff682c28df7d0e71e34fd98bfd067db224a1e6",
+      "recordCount": 3565,
+      "numericMissingCellCount": 0,
+      "storyTextOutcome": "external-content-bound-by-digest"
+    },
+    {
+      "id": "recall-source-15",
+      "upstreamGitBlob": "0d2ca4e0a233125195a9af3ed8ff342aadf54991",
+      "upstreamByteLength": 117953,
+      "upstreamSha256": "5d4afea713c2365a22888183c17f176ef13a21032d2d6baa249dc75c949885a8",
+      "localCsvByteLength": 76364,
+      "localCsvSha256": "9e805df1232634987dda35caccfc171a1da327dc458dd391dbdec0279d5d5ed8",
+      "recordCount": 2008,
+      "numericMissingCellCount": 0,
+      "storyTextOutcome": "external-content-bound-by-digest"
+    },
+    {
+      "id": "recall-source-16",
+      "upstreamGitBlob": "0df49b8d2b5d779556cec72f507e7e7bb18db6f1",
+      "upstreamByteLength": 157490,
+      "upstreamSha256": "0937a3cb95c38d3ec65f493a059560240570dc3668e3aef0058b515c18cbd79d",
+      "localCsvByteLength": 103293,
+      "localCsvSha256": "9b1213d49ccb6412c2ae51b7c0e8aacc037cadc3d9527c812261d082d2f997f5",
+      "recordCount": 2738,
+      "numericMissingCellCount": 0,
+      "storyTextOutcome": "external-content-bound-by-digest"
+    },
+    {
+      "id": "recall-source-17",
+      "upstreamGitBlob": "a5d8122d334713e3719a4cde07e30893e8387720",
+      "upstreamByteLength": 274178,
+      "upstreamSha256": "77f262de2bf36c0bc01966615a3087757254c998c03dd996789cb77aa3c573d3",
+      "localCsvByteLength": 196697,
+      "localCsvSha256": "dc560db33ff99d502b9ff09daa20f790f068ddea858b20f4ae1e2df6c69d56c2",
+      "recordCount": 4952,
+      "numericMissingCellCount": 0,
+      "storyTextOutcome": "external-content-bound-by-digest"
+    }
+  ],
+  "publicReleaseToLocalMapping": {
+    "classification": "checked-reconciliation-not-source-only-generation",
+    "headerBytesEqual": true,
+    "localCsvCopiesMatchCheckoutConversionCopies": {
+      "count": 17,
+      "allByteIdentical": true
+    },
+    "comparisonRecipe": [
+      "Read the workbook cells directly from OOXML with their declared cell types; resolve shared strings by index and do not use a spreadsheet reader's rendered boolean or floating-point values as source identity.",
+      "Compare text-cell source and target SHA-256 values, applying only the four declared patch receipts.",
+      "Parse the six numeric columns from their OOXML and CSV decimal text and compare at nine decimal places.",
+      "Require every row count, column count, missingness count, and target-file SHA-256 to match."
+    ],
+    "numericSerialization": {
+      "roundingScaleDecimalPlaces": 9,
+      "allValuesEqualAtScale": true,
+      "binaryDoubleDiagnosticPublished": false,
+      "reasonBinaryDoubleDiagnosticIsNotPublished": "Exact binary-double discrepancy counts depend on spreadsheet and CSV parser coercion. Decimal-text equality at the declared scale is the portable scientific check.",
+      "scientificValueChange": false
+    },
+    "textPatchCellIndexing": "One-based data row, header excluded; column is word.",
+    "textPatchReceipts": [
+      {
+        "sourceId": "recall-source-05",
+        "row": 803,
+        "operation": "delete-cell",
+        "sourceByteLength": 4,
+        "targetByteLength": 0,
+        "sourceCellSha256": "dc937b59892604f5a86ac96936cd7ff09e25f18ae6b758e8014a24c7fa039e91",
+        "targetCellSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "sourceId": "recall-source-08",
+        "row": 1270,
+        "operation": "external-text-correction",
+        "sourceOoxmlCellType": "boolean",
+        "sourceByteLength": 1,
+        "targetByteLength": 4,
+        "sourceCellSha256": "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b",
+        "targetCellSha256": "3cbc87c7681f34db4617feaa2c8801931bc5e42d8d0f560e756dd4cd92885f18",
+        "targetTextIncludedInManifest": false
+      },
+      {
+        "sourceId": "recall-source-11",
+        "row": 1566,
+        "operation": "external-text-correction",
+        "sourceOoxmlCellType": "boolean",
+        "sourceByteLength": 1,
+        "targetByteLength": 4,
+        "sourceCellSha256": "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b",
+        "targetCellSha256": "3cbc87c7681f34db4617feaa2c8801931bc5e42d8d0f560e756dd4cd92885f18",
+        "targetTextIncludedInManifest": false
+      },
+      {
+        "sourceId": "recall-source-13",
+        "row": 1740,
+        "operation": "external-text-correction",
+        "sourceByteLength": 19,
+        "targetByteLength": 8,
+        "sourceCellSha256": "573d61d88e287bff00897d1042cad579a502af27560c41acff1c57744ea17b75",
+        "targetCellSha256": "d12736eafc5fa10b57bc41e2c84515de39462b641b35c0039c9145fe29410888",
+        "targetTextIncludedInManifest": false
+      }
+    ],
+    "sourceOnlyGenerationPossible": false,
+    "reasonSourceOnlyGenerationIsFalse": "The public XLSX commit does not encode the replacement value for the external text correction. The mapping is reproducibly verified against the digest-bound local CSV; it is not falsely presented as a source-only generator."
+  },
+  "storyTextAdmission": {
+    "artifactCount": 17,
+    "allTextBearing": true,
+    "proposedForRepositoryContentAdmissionInThisSlice": false,
+    "outcomeForEverySource": "external-content-bound-by-digest",
+    "manifestContainsParticipantProse": false,
+    "futureContentProposal": "Run the ordinary story-text admission checklist per proposed artifact; apply no Sherlock-wide consent, REB, BBC, or aggregate-only condition."
+  }
+}
