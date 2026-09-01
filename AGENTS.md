@@ -6,6 +6,102 @@ including the Autobiographical Interview as a latent-source alignment problem.
 The design record is `NARRATIVE_PROCESS_ALIGNMENT_NOTES.md`; the synthesized
 architecture and roadmap are in `docs/plans/`.
 
+## 0. Liveness — read this before anything below it
+
+Everything after this section is a filter. There are roughly 220 of them and each
+was added after a real break, so each is individually correct. Collectively,
+measured on 2026-09-01, they produced this: in eight hours **21 commits landed on
+`main`, 16 of them board bookkeeping by one agent and 5 board bookkeeping by the
+chief. Zero lines of Scala shipped. One bead closed.** Three candidates sat
+`pending landable` with no blockers — one of them `tools/reference-scope.sh`, a
+tool *this file mandates* — because their proposer correctly refused to land his
+own work and nobody was ever named to do it.
+
+Nothing was broken. Everyone was right. That is the failure mode: **a quality rule
+with no liveness counterpart converges on zero throughput, and every step down is
+locally defensible.** The rules below catch bad code landing. None of them fires
+when no code lands. These do, and **they outrank every rule below them.**
+
+**L1. Zero-ship is a P0 defect.** If no commit touching anything outside `.mote/`
+lands on `main` in 24 hours, the merge gate is presumed broken. Diagnosing it
+becomes the chief's first priority, ahead of any review. Report the cause on
+`coordination`, not the symptom.
+
+**L2. A landable candidate has a named lander within one hour.** `pending
+landable` with zero blockers is a promise, not a status. Ladder, in order: the
+chief; any actor who is neither the proposer nor a reviewer of record; the owner.
+**"I will not land my own work" is correct and must never be the end of the
+sentence** — it is followed, in the same post, by naming who will. A proposer who
+cannot name anyone escalates to the owner. Silence is not a fallback, and on
+2026-09-01 it cost three ready candidates a full night.
+
+**L3. A block is priced.** A BLOCK carries one of: (a) a patch, (b) a named owner
+who has accepted the fix, with a deadline, or (c) the words *advisory, not
+blocking*. A block carrying none of the three expires after 4 hours and the
+candidate returns to its previous landability. Correctness is not sufficient
+grounds to block indefinitely — every reviewer in the 2026-09-01 CODE RED thread
+was right on the merits, and the net product was nothing.
+
+**L4. Reap the ledger before reading it.** `superseded`, `abandoned`, `landed` and
+`landed_out_of_band` rows must emit no blocking reasons and must not appear in the
+default queue. Measured 2026-09-01: **93 of 133 candidates were dead or already
+landed and generated 3,737 blocker strings**, burying the 3 rows that mattered. A
+queue you have to filter by hand is a queue nobody reads.
+
+**L5. A design thread must terminate.** Within 50 posts or 24 hours a topic
+produces a landed change, a filed bead with a named owner, or a written *we are
+not doing this*. The CODE RED thread reached 150 posts and a genuinely good PRD in
+seventy minutes and shipped nothing. It should have stopped at its first
+executable court and gone to write it.
+
+**L6. Stop signing disclaimers.** Board posts are advisory by default; claiming
+authority is explicit and rare, which makes the disclaimer redundant. On one topic
+**100 of ~150 posts ended with some form of "no implementation, ADR, vocabulary,
+bead, path, reservation, or authority claimed."** That ritual is evidence that
+taking responsibility feels dangerous here. It should not be. State what you are
+doing and omit what you are not.
+
+**L7. Correct in place, once, then act.** A self-correction that does not change
+what you do next does not need a post. Three sequential reversals of one claim is
+a signal to go and run the thing, not to publish a fourth position on it.
+
+**L8. Prefer the smallest landable slice to the most complete analysis.** When
+both are available, land the slice. Analysis keeps; an unlanded branch rots
+against a moving `main`.
+
+**L10. Substitute authority. No single named actor may be a permanent single point
+of failure.** Agents drop out — sessions end, leases lapse, operators stop prompting.
+A governance object that hard-names one actor and provides no transfer path converts an
+ordinary absence into a permanently dead row. Measured 2026-09-01: the gate-repair
+candidate `cand-2G3GBE7Z` named `authorizer: cursor-grok-4.6`, who went 101 minutes idle;
+`mote` refused every other seat with *"only the named authorizer may authorize a pending
+candidate"*; `mote candidate` offers `amend-reviewers` but **no `amend-authorizer`**. That
+one stale name blocked the repair of the merge gate itself, which blocked every other
+landing. **The blocker was not a disagreement. It was a name.**
+
+  - **Any named role — authorizer, required reviewer, lander, bead assignee — has a
+    substitute ladder, and the ladder is part of the role, not a favour.** In order: the
+    named actor; the chief; any active actor who is neither the proposer nor a reviewer of
+    record; the owner. *Active* means recently acted per `tools/who-is-live.sh`, never a
+    presence lease.
+  - **Staleness is measured, then announced, then substituted.** An actor idle beyond the
+    liveness window is substitutable without their consent and without prejudice; say so on
+    the board, name the substitute, and proceed. Returning actors resume their seat and
+    nothing is held against them.
+  - **A recut whose only purpose is to replace a stale role-holder is bookkeeping, not a
+    new proposal.** It carries the original's reviews, evidence and gate results forward
+    unchanged. It MUST NOT trigger a fresh review round, and treating it as one is how a
+    name becomes a week.
+  - **Tooling that cannot express substitution is a defect, not a constraint.** File it.
+    Until `mote` can transfer a named authorizer in place, recut is the workaround and it
+    must be cheap and immediate.
+
+**L9. These rules are also filters, so they expire.** If L1-L8 have not increased
+landed non-`.mote` commits within a week, they failed and should be replaced
+rather than supplemented. Do not let this section become the thing it was written
+against.
+
+
 ## Layout
 
 Flat module directories, `CrossType.Pure`, cross-built JVM / Scala.js / Native.
@@ -394,8 +490,11 @@ worktrees at once. Coordination runs on the package-local mote board
 was set by the owner on 2026-08-28 (sticky decision
 `post-01M14Y4D3QE7PKRDXTTT1H0PKM` on topic `coordination`):
 
-1. **Chief architect.** `claude-storymodel4s` is the single accountable
-   coordinator. It assigns, scopes (exact paths + test gate), prioritizes, and
+1. **Chief architect.** The single accountable coordinator. The 2026-08-28
+   owner decision named `claude-storymodel4s`; the operating chief since
+   2026-08-31 is `codex-storymodel4s-chief`. **This discrepancy is recorded,
+   not resolved — the owner reassigns, nobody else.** Address rulings to the
+   operating chief and say which one you mean. The role It assigns, scopes (exact paths + test gate), prioritizes, and
    closes beads, and holds ADR authority. Claim only beads assigned or
    explicitly offered to you; propose new work as a bead on `coordination`.
    Closing a bead needs the assignee's evidence post (tests + SHA) and the
@@ -420,7 +519,11 @@ was set by the owner on 2026-08-28 (sticky decision
    delegate and reviewed by dispositions on the board; the chief decides,
    dissent stays on the record. No new module, dependency, or public
    vocabulary without an ADR line or an explicit ok on the board.
-3. **Merge gate.** Nothing lands on `main` — including worktree merges by any
+3. **Merge gate.** *Subject to L1-L4: this gate exists to stop bad landings, not
+   to stop landings. A candidate that is `pending landable` with no blockers has
+   already passed it and needs a hand, not another opinion — see L2 for the
+   ladder when the proposer cannot land their own work.*
+   Nothing lands on `main` — including worktree merges by any
    **The chief must not close a bead holding another actor's live reservations.**
    `mote done` closes and releases together, but the release half is owner-only —
    so it is unavailable to the chief on someone else's holds. `mote close` is
