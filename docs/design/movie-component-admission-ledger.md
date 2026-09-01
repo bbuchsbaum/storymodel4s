@@ -300,7 +300,11 @@ Exact permitted scope:
    hash-pinned wheel of §5, `ContentDetector` only, driven through the direct
    frame interface; raw metrics plus boundary-existence and boundary-localization
    proposals only.
-4. Authority: every runtime record produced under this authorization is
+4. Edit lists: the boundary court admits a picture stream's native clock as the
+   edition axis under a recorded identity-edit-list assumption checked against
+   the tool's reported start and discard flags only; the `elst` is not read and no
+   track-composition receipt is issued (that is the E0 court's).
+5. Authority: every runtime record produced under this authorization is
    `ObservationAuthority.Draft` (ADR 0007 C1, `CallerRuntimePacketRecord`). No
    E0 promotion path is opened. Ordinary CI replays recorded envelopes and never
    obtains a tool; the live courts run only against a binary already present.

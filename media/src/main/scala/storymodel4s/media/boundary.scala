@@ -381,8 +381,7 @@ final class BoundaryLocalizationProposal private[media] (
   * evidence it has for that (the tool's reported stream start equals the first presented PTS and
   * nothing was discarded) and refuses when either signal says otherwise. An edit list the demuxer
   * folds without either signal is not detected: the `elst` itself is never read. A checked
-  * track-composition receipt is the E0
-  * court's, not this one's.
+  * track-composition receipt is the E0 court's, not this one's.
   */
 final class BoundarySearchResult private[media] (
     val frames: FrameSet,

@@ -5,8 +5,8 @@ import storymodel4s.core.{Checksum, DomainError}
 
 /** The boundary worker as a realized tool: the script bytes that will run and the runtime the
   * interpreter reports when asked directly. Why: an outcome's own `runtime` block is the worker's
-  * claim about itself; joining under a realization observed independently of the outcome makes
-  * the join's runtime check a comparison between two sources, not a self-comparison.
+  * claim about itself; joining under a realization observed independently of the outcome makes the
+  * join's runtime check a comparison between two sources, not a self-comparison.
   */
 object WorkerRealization:
   val ToolName: String = "scenedetect-worker"
@@ -26,7 +26,7 @@ object WorkerRealization:
       outcome <- Subprocess.run(Vector(python.toString, "-c", VersionProgram))
       line <- outcome.stdout.linesIterator.find(_.trim.nonEmpty) match
         case Some(l) if outcome.exitCode == 0 => Right(l.trim)
-        case _ =>
+        case _                                =>
           Left(
             DomainError.InvariantViolation(
               "worker/runtime",
