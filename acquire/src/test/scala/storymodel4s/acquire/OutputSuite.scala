@@ -21,11 +21,14 @@ class OutputSuite extends FunSuite:
       case None                       => fail(s"fixture refused: ${admission.outcome}")
 
   private def receipt(source: StorySource): ExtendedBuildReceipt =
-    ExtendedBuildReceipt(
-      BuildReceipt(source.id, source.canonicalChecksum, "story-output-test/v1", Vector.empty, 0L),
-      Vector.empty,
-      Map.empty
-    )
+    ExtendedBuildReceipt
+      .of(
+        BuildReceipt(source.id, source.canonicalChecksum, "story-output-test/v1", Vector.empty, 0L),
+        Vector.empty,
+        Map.empty
+      )
+      .toOption
+      .get
 
   private def modelRef(source: StorySource): SemanticModelRef =
     SemanticModelRef(
@@ -172,14 +175,11 @@ class OutputSuite extends FunSuite:
     )
   }
 
-  test("view authority is admitted only from its matching source and build evidence") {
+  test("receipt matching remains usable metadata but cannot issue view authority") {
     val (source, _, identities) = sourceFixture()
     val sourceOutcome = SourceOutcome.Constructed(identities)
     val buildReceipt = receipt(source)
-    val validatedAuthority = AcquisitionViewAuthority
-      .validatedBuild(sourceOutcome, buildReceipt)
-      .toOption
-      .get
+    assert(AcquisitionViewAuthority.receiptMatches(sourceOutcome, buildReceipt).isRight)
     val universe = EstablishedUniverse.of(Vector.empty[String], definition).toOption.get
     val gap = ResultGap(
       ResultGapKind.Unresolved,
@@ -191,60 +191,109 @@ class OutputSuite extends FunSuite:
     assert(
       AcquisitionAccount
         .of(
-          InvocationId.unsafe("invocation-view-authority-no-build"),
-          sourceOutcome,
-          TargetUniverse.Established(universe),
-          semantic,
-          Vector.empty,
-          Vector.empty,
-          None,
-          Some(validatedAuthority)
-        )
-        .isInvalid,
-      "validated-build authority cannot be asserted without the admitted build"
-    )
-
-    assert(
-      AcquisitionAccount
-        .of(
-          InvocationId.unsafe("invocation-view-authority-build"),
+          InvocationId.unsafe("invocation-receipt-matched-build"),
           sourceOutcome,
           TargetUniverse.Established(universe),
           semantic,
           Vector.empty,
           Vector.empty,
           Some(buildReceipt),
-          Some(validatedAuthority)
+          None
         )
-        .isValid
+        .isValid,
+      "a coherent receipt remains publishable without being promoted to authority"
     )
 
   }
 
-  test("wire authority admits validated builds and refuses ungoverned human or fixture claims") {
+  test("extended build receipts check stage coherence uniqueness and lawful metadata") {
+    val (source, _, identities) = sourceFixture()
+    val stage = StageId.unsafe("checked-stage")
+    val record = StageRecord(
+      stage,
+      StageCacheKey.fromChecksum(Checksum.ofText("checked-stage-key")),
+      Vector(Checksum.ofText("checked-stage-input")),
+      Vector(Checksum.ofText("checked-stage-output")),
+      Vector.empty,
+      cached = false
+    )
+    val receipt = BuildReceipt(
+      source.id,
+      source.canonicalChecksum,
+      "checked-build/v1",
+      Vector(stage -> record.outputChecksum),
+      1L
+    )
+    val layer = LayerId.unsafe("checked-layer")
+    val checked = ExtendedBuildReceipt.of(
+      receipt,
+      Vector(record),
+      Map(layer -> LayerCoverage.Attempted)
+    )
+    assert(checked.isRight)
+    assert(
+      checked
+        .flatMap(value =>
+          AcquisitionViewAuthority.receiptMatches(SourceOutcome.Constructed(identities), value)
+        )
+        .isRight,
+      "structural receipt matching remains available without becoming execution authority"
+    )
+    assert(
+      ExtendedBuildReceipt
+        .of(
+          receipt.copy(stages = Vector(stage -> Checksum.ofText("forged-stage-output"))),
+          Vector(record),
+          Map(layer -> LayerCoverage.Attempted)
+        )
+        .isLeft
+    )
+    assert(
+      ExtendedBuildReceipt
+        .of(
+          receipt.copy(stages = Vector.fill(2)(stage -> record.outputChecksum)),
+          Vector(record, record),
+          Map(layer -> LayerCoverage.Attempted)
+        )
+        .isLeft
+    )
+    assert(
+      ExtendedBuildReceipt
+        .of(receipt.copy(createdAtEpochMillis = -1L), Vector(record), Map.empty)
+        .isLeft
+    )
+    assert(
+      ExtendedBuildReceipt.of(receipt.copy(schemaVersion = "  "), Vector(record), Map.empty).isLeft
+    )
+  }
+
+  test("wire authority refuses receipt-only build, human, and fixture claims") {
     val (source, _, identities) = sourceFixture()
     val sourceOutcome = SourceOutcome.Constructed(identities)
     val buildReceipt = receipt(source)
-    val foreignStoryBuild = buildReceipt.copy(
-      receipt = buildReceipt.receipt.copy(storyId = StoryId.unsafe("foreign-story"))
-    )
-    assert(AcquisitionViewAuthority.validatedBuild(sourceOutcome, foreignStoryBuild).isLeft)
-    val validated = AcquisitionViewAuthority
-      .validatedBuild(sourceOutcome, buildReceipt)
+    val foreignStoryBuild = ExtendedBuildReceipt
+      .of(
+        buildReceipt.receipt.copy(storyId = StoryId.unsafe("foreign-story")),
+        buildReceipt.stages,
+        buildReceipt.layerCoverage
+      )
       .toOption
       .get
-    assertEquals(
-      AcquisitionViewAuthority.fromWire(
-        sourceOutcome,
-        Some(buildReceipt),
-        validated.kind,
-        validated.sourceChecksum,
-        validated.buildReceiptChecksum,
-        validated.evidenceChecksum,
-        validated.adjudicationReceipt,
-        validated.fixtureReceipt
-      ),
-      Right(validated)
+    assert(AcquisitionViewAuthority.receiptMatches(sourceOutcome, foreignStoryBuild).isLeft)
+    assert(
+      AcquisitionViewAuthority
+        .fromWire(
+          sourceOutcome,
+          Some(buildReceipt),
+          AcquisitionViewAuthorityKind.ValidatedBuild,
+          identities.canonicalChecksum,
+          Some(buildReceipt.receipt.contentChecksum),
+          None,
+          None,
+          None
+        )
+        .isLeft,
+      "receipt-shaped build data is not proof that a build ran"
     )
 
     assert(
@@ -277,6 +326,30 @@ class OutputSuite extends FunSuite:
         .isLeft,
       "receipt-shaped fixture evidence is not an authority issuer"
     )
+  }
+
+  test("before-intake refusal cannot claim a completed stage or intake-derived failure") {
+    val staged = OutputFailure
+      .general(
+        OutputFailureCode.SourceUnavailable,
+        OutputReceiptId.unsafe("receipt-before-intake-staged"),
+        Some(StageId.unsafe("stage-that-cannot-have-run")),
+        Vector.empty
+      )
+      .toOption
+      .get
+    val planning = OutputFailure
+      .general(
+        OutputFailureCode.PlanningFailed,
+        OutputReceiptId.unsafe("receipt-before-intake-planning"),
+        None,
+        Vector.empty
+      )
+      .toOption
+      .get
+
+    assert(SourceOutcome.beforeIntake(staged).isLeft)
+    assert(SourceOutcome.beforeIntake(planning).isLeft)
   }
 
   test("partial semantics may preserve a receipted draft without claiming validation") {

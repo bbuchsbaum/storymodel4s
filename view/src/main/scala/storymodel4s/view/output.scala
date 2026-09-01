@@ -1011,67 +1011,12 @@ object AdmittedViewBasis:
   def fromAcquisition[Id](
       acquisition: AcquisitionAccount[Id]
   ): Either[DomainError, AdmittedViewBasis] =
-    val sourceChecksum = acquisition.source match
-      case SourceOutcome.Constructed(identities) => Some(identities.canonicalChecksum)
-      case SourceOutcome.Refused(_, _)           => None
-    val buildChecksum = acquisition.buildReceipt.map(_.receipt.contentChecksum)
-    (sourceChecksum, acquisition.viewAuthority.map(_.kind)) match
-      case (Some(source), Some(AcquisitionViewAuthorityKind.ValidatedBuild)) =>
-        buildChecksum
-          .map(checksum =>
-            new AdmittedViewBasis(
-              ViewBasis.ValidatedBuild,
-              source,
-              Some(checksum),
-              BasisAuthority.ValidatedBuild(checksum)
-            )
-          )
-          .toRight(
-            DomainError.InvariantViolation(
-              "output/view/basis-build",
-              "validated-build authority requires the admitted build receipt"
-            )
-          )
-      case (Some(source), Some(AcquisitionViewAuthorityKind.HumanAdjudication)) =>
-        (buildChecksum, acquisition.viewAuthority.flatMap(_.adjudicationReceipt))
-          .mapN((checksum, receipt) =>
-            new AdmittedViewBasis(
-              ViewBasis.HumanAdjudicated,
-              source,
-              Some(checksum),
-              BasisAuthority.HumanAdjudication(receipt)
-            )
-          )
-          .toRight(
-            DomainError.InvariantViolation(
-              "output/view/basis-build",
-              "human-adjudicated authority requires its admitted build and evidence receipt"
-            )
-          )
-      case (Some(source), Some(AcquisitionViewAuthorityKind.FixtureReview)) =>
-        acquisition.viewAuthority
-          .flatMap(_.fixtureReceipt)
-          .map(receipt =>
-            new AdmittedViewBasis(
-              ViewBasis.ResearcherReviewedFixture,
-              source,
-              buildChecksum,
-              BasisAuthority.FixtureReview(receipt)
-            )
-          )
-          .toRight(
-            DomainError.InvariantViolation(
-              "output/view/basis-authority",
-              "fixture authority requires its admitted evidence receipt"
-            )
-          )
-      case _ =>
-        Left(
-          DomainError.InvariantViolation(
-            "output/view/basis-authority",
-            "a view basis requires constructed source and admitted acquisition authority"
-          )
-        )
+    Left(
+      DomainError.InvariantViolation(
+        "output/view/basis-authority",
+        s"acquisition ${acquisition.invocationId.value} has no runtime-issued view-authority capability"
+      )
+    )
 
   /** Revalidate an untrusted wire claim against the authority admitted by the account. */
   def fromWire[Id](

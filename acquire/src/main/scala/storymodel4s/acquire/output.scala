@@ -711,6 +711,22 @@ enum SourceOutcome:
   case Constructed(identities: SourceIdentities)
   case Refused(progress: RefusedSourceProgress, failure: OutputFailure)
 
+object SourceOutcome:
+  /** Admit metadata-only refusal only when its failure says intake never began. */
+  def beforeIntake(failure: OutputFailure): Either[DomainError, SourceOutcome] =
+    val lawfulCode = failure.code match
+      case OutputFailureCode.SourceUnavailable | OutputFailureCode.UnsupportedCapability => true
+      case _                                                                             => false
+    if lawfulCode && failure.stage.isEmpty && failure.detail.isEmpty then
+      Right(SourceOutcome.Refused(RefusedSourceProgress.BeforeIntake, failure))
+    else
+      Left(
+        DomainError.InvariantViolation(
+          "output/source/before-intake",
+          "before-intake refusal requires a source-unavailable or unsupported-capability failure with no stage or intake-derived detail"
+        )
+      )
+
 /** Failure that forbids downstream universe denominators. */
 final case class UniverseFailure(
     reason: UniverseFailureReason,
@@ -875,21 +891,12 @@ final class AcquisitionViewAuthority private (
   override def toString: String = s"AcquisitionViewAuthority($kind)"
 
 object AcquisitionViewAuthority:
-  /** Issue build authority only when the build receipt belongs to the constructed source. */
-  def validatedBuild(
+  /** Check source/receipt identity without converting that match into execution authority. */
+  def receiptMatches(
       source: SourceOutcome,
       buildReceipt: ExtendedBuildReceipt
-  ): Either[DomainError, AcquisitionViewAuthority] =
-    joinedSource(source, Some(buildReceipt)).map { case (sourceChecksum, buildChecksum) =>
-      new AcquisitionViewAuthority(
-        AcquisitionViewAuthorityKind.ValidatedBuild,
-        sourceChecksum,
-        buildChecksum,
-        None,
-        None,
-        None
-      )
-    }
+  ): Either[DomainError, Unit] =
+    joinedSource(source, Some(buildReceipt)).map(_ => ())
 
   /** Revalidate an untrusted wire claim against the actual acquisition inputs. */
   def fromWire(
@@ -903,13 +910,7 @@ object AcquisitionViewAuthority:
       fixtureReceipt: Option[FixtureAdmissionReceiptId]
   ): Either[DomainError, AcquisitionViewAuthority] =
     joinedSource(source, buildReceipt).flatMap { case (actualSource, actualBuild) =>
-      val validShape = kind match
-        case AcquisitionViewAuthorityKind.ValidatedBuild =>
-          evidenceChecksum.isEmpty && adjudicationReceipt.isEmpty && fixtureReceipt.isEmpty &&
-          actualBuild.nonEmpty
-        case AcquisitionViewAuthorityKind.HumanAdjudication |
-            AcquisitionViewAuthorityKind.FixtureReview =>
-          false
+      val validShape = false
       if sourceChecksum == actualSource && buildReceiptChecksum == actualBuild && validShape then
         Right(
           new AcquisitionViewAuthority(
@@ -1067,13 +1068,14 @@ object AcquisitionAccount:
     (
       targetUniqueness(targetVector),
       universeAccounting(universe, targetVector),
+      sourceProgress(source),
       semanticSource(source, semantic),
       semanticReceipt(semantic, buildReceipt),
       authorityReceipt(source, buildReceipt, viewAuthority),
       semanticAuthority(semantic, buildReceipt, viewAuthority),
       payloadAccounting(targetVector, payloadVector),
       payloadUniqueness(payloadVector)
-    ).mapN((_, _, _, _, _, _, _, _) =>
+    ).mapN((_, _, _, _, _, _, _, _, _) =>
       new AcquisitionAccount(
         invocationId,
         source,
@@ -1085,6 +1087,11 @@ object AcquisitionAccount:
         viewAuthority
       )
     )
+
+  private def sourceProgress(source: SourceOutcome): ValidatedNec[DomainError, Unit] = source match
+    case SourceOutcome.Refused(RefusedSourceProgress.BeforeIntake, failure) =>
+      SourceOutcome.beforeIntake(failure).map(_ => ()).toValidatedNec
+    case _ => valid
 
   private def semanticAuthority(
       semantic: SemanticOutcome,

@@ -329,15 +329,63 @@ object OutputAcquireCodecs:
       )
   }
 
-  given Decoder[SourceOutcome] = contextualSourceDecoder("SourceOutcome")
+  given Decoder[SourceOutcome] = Decoder.instance(decodeBeforeIntake)
+
+  /** Decode the only source outcome that truthfully requires no source-byte context. */
+  private def decodeBeforeIntake(c: HCursor): Decoder.Result[SourceOutcome] =
+    for
+      status <- field[String](c, "status")
+      _ <-
+        if status == "refused" then Right(())
+        else
+          Left(
+            io.circe.DecodingFailure(
+              "constructed source outcomes require exact original bytes",
+              c.history
+            )
+          )
+      progress <- c
+        .downField("progress")
+        .success
+        .toRight(io.circe.DecodingFailure("missing refused source progress", c.history))
+      progressStatus <- field[String](progress, "status")
+      _ <-
+        if progressStatus == "before_intake" then Right(())
+        else
+          Left(
+            io.circe.DecodingFailure(
+              "admitted or decoded source refusal requires exact original bytes",
+              progress.history
+            )
+          )
+      failure <- field[OutputFailure](c, "failure")
+      outcome <- domain(c, SourceOutcome.beforeIntake(failure))
+    yield outcome
 
   /** Re-run source admission against exact bytes and compare the complete untrusted wire claim. */
   private[codec] def admitSourceOutcome(
       c: HCursor,
       bytes: Array[Byte]
   ): Decoder.Result[SourceOutcome] =
+    field[String](c, "status").flatMap {
+      case "refused" =>
+        c.downField("progress").success match
+          case Some(progress) =>
+            field[String](progress, "status").flatMap {
+              case "before_intake" => decodeBeforeIntake(c)
+              case _               => admitBytesDependentSourceOutcome(c, "refused", bytes)
+            }
+          case None => Left(io.circe.DecodingFailure("missing refused source progress", c.history))
+      case "constructed" => admitBytesDependentSourceOutcome(c, "constructed", bytes)
+      case other         => unknown(c, "SourceOutcome", other)
+    }
+
+  private def admitBytesDependentSourceOutcome(
+      c: HCursor,
+      status: String,
+      bytes: Array[Byte]
+  ): Decoder.Result[SourceOutcome] =
     for
-      status <- field[String](c, "status")
       originalCursor <- status match
         case "constructed" =>
           c.downField("identities")
@@ -617,7 +665,8 @@ object OutputAcquireCodecs:
       _ <-
         if pairs.map(_._1).distinct.size == pairs.size then Right(())
         else Left(io.circe.DecodingFailure("duplicate layerCoverage identity", c.history))
-    yield ExtendedBuildReceipt(receipt, stages, pairs.toMap)
+      checked <- domain(c, ExtendedBuildReceipt.of(receipt, stages, pairs.toMap))
+    yield checked
   }
 
   given Encoder[AcquisitionViewAuthority] = Encoder.instance { authority =>

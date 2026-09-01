@@ -23,16 +23,16 @@ class OutputCodecSuite extends FunSuite:
     case None             => fail(s"source fixture refused: ${sourceAdmission.outcome}")
   private val semanticText = StoryModelCodec.encode(model)
   private val semanticBytes = semanticText.getBytes(StandardCharsets.UTF_8)
-  private val build = ExtendedBuildReceipt(
-    BuildReceipt(source.id, source.canonicalChecksum, "output-codec-test/v1", Vector.empty, 0L),
-    Vector.empty,
-    Map.empty
-  )
+  private val build =
+    ExtendedBuildReceipt
+      .of(
+        BuildReceipt(source.id, source.canonicalChecksum, "output-codec-test/v1", Vector.empty, 0L),
+        Vector.empty,
+        Map.empty
+      )
+      .toOption
+      .get
   private val sourceOutcome = SourceOutcome.Constructed(identities)
-  private val validatedAuthority = AcquisitionViewAuthority
-    .validatedBuild(sourceOutcome, build)
-    .toOption
-    .get
   private val extensionId = OutputPayloadId.unsafe("optional-future")
   private val optionalExtension = UnsupportedExtension(
     extensionId,
@@ -60,7 +60,7 @@ class OutputCodecSuite extends FunSuite:
       Vector.empty,
       Vector(OutputPayload.Unsupported(optionalExtension)),
       Some(build),
-      Some(validatedAuthority)
+      None
     )
     .toOption
     .get
@@ -72,7 +72,7 @@ class OutputCodecSuite extends FunSuite:
     ArtifactRole.BrowserPreview,
     htmlType,
     ArtifactRequirement.Required,
-    ReportAuthority.ScientificView,
+    ReportAuthority.InvocationOnly,
     Set.empty
   )
   private val textRequest = ReportRequest(
@@ -81,7 +81,7 @@ class OutputCodecSuite extends FunSuite:
     ArtifactRole.TextPreview,
     textPlain,
     ArtifactRequirement.Required,
-    ReportAuthority.ScientificView,
+    ReportAuthority.InvocationOnly,
     Set.empty
   )
   private def reportReceipt(
@@ -91,7 +91,7 @@ class OutputCodecSuite extends FunSuite:
       request: ReportRequest,
       account: AcquisitionAccount[String] = acquisition,
       artifacts: ScientificArtifactRefs = scientificArtifacts,
-      admittedBasis: Option[AdmittedViewBasis] = Some(basis)
+      admittedBasis: Option[AdmittedViewBasis] = basis
   ): ReportReceipt =
     ReportReceipt.issue(
       OutputReceiptId.unsafe(id),
@@ -174,12 +174,12 @@ class OutputCodecSuite extends FunSuite:
     )
     .toOption
     .get
-  private lazy val basis = AdmittedViewBasis.fromAcquisition(acquisition).toOption.get
+  private lazy val basis: Option[AdmittedViewBasis] = None
   private lazy val result = StoryOutputResult
     .of(
       acquisition,
       scientificArtifacts,
-      Some(basis),
+      basis,
       Vector(htmlRequest, textRequest),
       Vector(
         ReportOutcome.Failed(htmlId, htmlFailure, htmlReceipt),
@@ -316,7 +316,18 @@ class OutputCodecSuite extends FunSuite:
   test("wire admission rejects view-authority and foreign report-receipt mutations") {
     val encoded = StoryOutputResultCodec.encode[String](result)
     val parsed = Canonical.parse(encoded).toOption.get
-    val basisObject = parsed.hcursor.downField("viewBasis").focus.flatMap(_.asObject).get
+    val basisObject = Json
+      .obj(
+        "basis" -> Json.obj("status" -> Json.fromString("validated_build")),
+        "sourceChecksum" -> Json.fromString(identities.canonicalChecksum.hex),
+        "buildReceiptChecksum" -> Json.fromString(build.receipt.contentChecksum.hex),
+        "authority" -> Json.obj(
+          "status" -> Json.fromString("validated_build"),
+          "buildReceiptChecksum" -> Json.fromString(build.receipt.contentChecksum.hex)
+        )
+      )
+      .asObject
+      .get
 
     val wrongBuildBasis = basisObject.add(
       "buildReceiptChecksum",
@@ -360,6 +371,47 @@ class OutputCodecSuite extends FunSuite:
     )
 
     val acquisitionObject = parsed.hcursor.downField("acquisition").focus.flatMap(_.asObject).get
+    val buildObject = acquisitionObject("buildReceipt").flatMap(_.asObject).get
+    val coreReceipt = buildObject("receipt").flatMap(_.asObject).get
+    val negativeTimestampBuild = buildObject.add(
+      "receipt",
+      Json.fromJsonObject(coreReceipt.add("createdAtEpochMillis", Json.fromLong(-1L)))
+    )
+    val negativeTimestampRoot = parsed.mapObject(
+      _.add(
+        "acquisition",
+        Json.fromJsonObject(
+          acquisitionObject.add("buildReceipt", Json.fromJsonObject(negativeTimestampBuild))
+        )
+      )
+    )
+    assert(
+      decodeResult(Canonical.print(negativeTimestampRoot)).isLeft,
+      "negative caller timestamps must fail checked receipt decoding"
+    )
+
+    val changedCoverageBuild = buildObject.add(
+      "layerCoverage",
+      Json.arr(
+        Json.obj(
+          "layer" -> Json.fromString("forged-layer"),
+          "coverage" -> Json.obj("status" -> Json.fromString("attempted"))
+        )
+      )
+    )
+    val changedCoverageRoot = parsed.mapObject(
+      _.add(
+        "acquisition",
+        Json.fromJsonObject(
+          acquisitionObject.add("buildReceipt", Json.fromJsonObject(changedCoverageBuild))
+        )
+      )
+    )
+    assert(
+      decodeResult(Canonical.print(changedCoverageRoot)).isLeft,
+      "changed layer coverage must invalidate result-bound receipt identities"
+    )
+
     val fixtureAuthorityClaim = Json.obj(
       "status" -> Json.fromString("fixture_review"),
       "sourceChecksum" -> Json.fromString(identities.canonicalChecksum.hex),
@@ -421,12 +473,12 @@ class OutputCodecSuite extends FunSuite:
       )
       .toOption
       .get
-    val foreignBasis = AdmittedViewBasis.fromAcquisition(foreignAccount).toOption.get
+    val foreignBasis: Option[AdmittedViewBasis] = None
     val foreignInput = ReportInputIdentity
       .forReport(
         foreignAccount,
         foreignArtifacts,
-        Some(foreignBasis),
+        foreignBasis,
         textRequest
       )
       .toOption
@@ -451,7 +503,7 @@ class OutputCodecSuite extends FunSuite:
 
     def targetedContext(
         targetId: String
-    ): (AcquisitionAccount[String], ScientificArtifactRefs, AdmittedViewBasis) =
+    ): (AcquisitionAccount[String], ScientificArtifactRefs, Option[AdmittedViewBasis]) =
       val targetedUniverse = EstablishedUniverse
         .of(Vector(targetId), UniverseDefinitionId.unsafe("codec-target-identity/v1"))
         .toOption
@@ -478,7 +530,7 @@ class OutputCodecSuite extends FunSuite:
         )
         .toOption
         .get
-      (account, artifacts, AdmittedViewBasis.fromAcquisition(account).toOption.get)
+      (account, artifacts, None)
 
     val (alphaAccount, alphaArtifacts, alphaBasis) = targetedContext("alpha")
     val (betaAccount, betaArtifacts, betaBasis) = targetedContext("beta")
@@ -489,13 +541,13 @@ class OutputCodecSuite extends FunSuite:
       textRequest,
       alphaAccount,
       alphaArtifacts,
-      Some(alphaBasis)
+      alphaBasis
     )
     val alphaResult = StoryOutputResult
       .of(
         alphaAccount,
         alphaArtifacts,
-        Some(alphaBasis),
+        alphaBasis,
         Vector(textRequest),
         Vector(ReportOutcome.Produced(textId, textArtifact, alphaReceipt)),
         Vector.empty,
@@ -504,7 +556,7 @@ class OutputCodecSuite extends FunSuite:
       .toOption
       .get
     val betaInput = ReportInputIdentity
-      .forReport(betaAccount, betaArtifacts, Some(betaBasis), textRequest)
+      .forReport(betaAccount, betaArtifacts, betaBasis, textRequest)
       .toOption
       .get
     val alphaParsed = Canonical
@@ -530,6 +582,50 @@ class OutputCodecSuite extends FunSuite:
     assert(
       decodeResult(Canonical.print(targetOnlyForeignRoot)).isLeft,
       "contextual decoding must rederive target identity instead of trusting the wire receipt"
+    )
+  }
+
+  test("before-intake refusal round-trips with or without source-byte context") {
+    val failure = OutputFailure
+      .general(
+        OutputFailureCode.SourceUnavailable,
+        OutputReceiptId.unsafe("receipt-before-intake"),
+        None,
+        Vector.empty
+      )
+      .toOption
+      .get
+    val beforeIntake = SourceOutcome.beforeIntake(failure).toOption.get
+    val account = AcquisitionAccount
+      .of[String](
+        InvocationId.unsafe("invocation-before-intake"),
+        beforeIntake,
+        TargetUniverse.Unestablished(
+          UniverseFailure(
+            UniverseFailureReason.UpstreamUnavailable,
+            OutputReceiptId.unsafe("receipt-before-intake-universe"),
+            None
+          )
+        ),
+        SemanticOutcome.Refused(NonEmptyVector.one(failure)),
+        Vector.empty,
+        Vector.empty,
+        None,
+        None
+      )
+      .toOption
+      .get
+    val artifacts = ScientificArtifactRefs.of(account, None, None, None).toOption.get
+    val refused = StoryOutputResult
+      .of(account, artifacts, None, Vector.empty, Vector.empty, Vector.empty, Vector.empty)
+      .toOption
+      .get
+    val encoded = StoryOutputResultCodec.encode(refused)
+
+    assertEquals(StoryOutputResultCodec.decode[String](encoded), Right(refused))
+    assertEquals(
+      StoryOutputResultCodec.decode[String](encoded, Array.emptyByteArray),
+      Right(refused)
     )
   }
 
@@ -700,7 +796,7 @@ class OutputCodecSuite extends FunSuite:
         Vector.empty,
         Vector.empty,
         Some(build),
-        Some(validatedAuthority)
+        None
       )
       .toOption
       .get
@@ -713,7 +809,7 @@ class OutputCodecSuite extends FunSuite:
       )
       .toOption
       .get
-    val partialBasis = AdmittedViewBasis.fromAcquisition(partialAcquisition).toOption.get
+    val partialBasis: Option[AdmittedViewBasis] = None
     val partialHtmlReceipt = reportReceipt(
       "receipt-html",
       "html/v1",
@@ -721,7 +817,7 @@ class OutputCodecSuite extends FunSuite:
       htmlRequest,
       partialAcquisition,
       partialArtifacts,
-      Some(partialBasis)
+      partialBasis
     )
     val partialTextReceipt = reportReceipt(
       "receipt-text",
@@ -730,7 +826,7 @@ class OutputCodecSuite extends FunSuite:
       textRequest,
       partialAcquisition,
       partialArtifacts,
-      Some(partialBasis)
+      partialBasis
     )
     val partialHtmlFailure = htmlFailure
       .withReceipt(partialHtmlReceipt.id, Vector(partialHtmlReceipt.id))
@@ -740,7 +836,7 @@ class OutputCodecSuite extends FunSuite:
       .of(
         partialAcquisition,
         partialArtifacts,
-        Some(partialBasis),
+        partialBasis,
         Vector(htmlRequest, textRequest),
         Vector(
           ReportOutcome.Failed(htmlId, partialHtmlFailure, partialHtmlReceipt),
@@ -1012,12 +1108,12 @@ class OutputCodecSuite extends FunSuite:
       )
       .toOption
       .get
-    val foreignBasis = AdmittedViewBasis.fromAcquisition(foreignAccount).toOption.get
+    val foreignBasis: Option[AdmittedViewBasis] = None
     val foreignResult = StoryOutputResult
       .of[String](
         foreignAccount,
         scientificArtifacts,
-        Some(foreignBasis),
+        foreignBasis,
         Vector.empty,
         Vector.empty,
         Vector.empty,

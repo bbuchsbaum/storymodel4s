@@ -78,6 +78,16 @@ package storymodel4s.consumerattack {
     def fromProduct(product: Product): SourceAdmissionProductControl =
       summon[scala.deriving.Mirror.ProductOf[SourceAdmissionProductControl]].fromProduct(product)
 
+  final case class ExtendedBuildReceiptProductControl(
+      receipt: storymodel4s.core.BuildReceipt,
+      stages: Vector[storymodel4s.acquire.StageRecord],
+      layerCoverage: Map[storymodel4s.acquire.LayerId, storymodel4s.acquire.LayerCoverage]
+  )
+  object ExtendedBuildReceiptProductControl:
+    def fromProduct(product: Product): ExtendedBuildReceiptProductControl =
+      summon[scala.deriving.Mirror.ProductOf[ExtendedBuildReceiptProductControl]]
+        .fromProduct(product)
+
   /** External-package proof that output invariants have no generated construction door. */
   class OutputConstructionProbeSuite extends FunSuite:
     private def refused(errors: List[scala.compiletime.testing.Error], what: String): Unit =
@@ -105,6 +115,60 @@ package storymodel4s.consumerattack {
           "summon[scala.deriving.Mirror.ProductOf[storymodel4s.consumerattack.AuthorityProductControl]]"
         ),
         Nil
+      )
+    }
+
+    test("extended-build-receipt control is product data but checked receipt is not") {
+      assertEquals(
+        typeCheckErrors(
+          "storymodel4s.consumerattack.ExtendedBuildReceiptProductControl(???, Vector.empty, Map.empty)"
+        ),
+        Nil
+      )
+      assertEquals(
+        typeCheckErrors(
+          "(x: storymodel4s.consumerattack.ExtendedBuildReceiptProductControl) => x.copy()"
+        ),
+        Nil
+      )
+      assertEquals(
+        typeCheckErrors(
+          "storymodel4s.consumerattack.ExtendedBuildReceiptProductControl.fromProduct((???, Vector.empty, Map.empty))"
+        ),
+        Nil
+      )
+      assertEquals(
+        typeCheckErrors(
+          "summon[scala.deriving.Mirror.ProductOf[storymodel4s.consumerattack.ExtendedBuildReceiptProductControl]]"
+        ),
+        Nil
+      )
+
+      refused(
+        typeCheckErrors("storymodel4s.acquire.ExtendedBuildReceipt(???, Vector.empty, Map.empty)"),
+        "ExtendedBuildReceipt.apply"
+      )
+      refused(
+        typeCheckErrors("(x: storymodel4s.acquire.ExtendedBuildReceipt) => x.copy()"),
+        "ExtendedBuildReceipt.copy"
+      )
+      refused(
+        typeCheckErrors(
+          "storymodel4s.acquire.ExtendedBuildReceipt.fromProduct((???, Vector.empty, Map.empty))"
+        ),
+        "ExtendedBuildReceipt.fromProduct"
+      )
+      refused(
+        typeCheckErrors(
+          "summon[scala.deriving.Mirror.ProductOf[storymodel4s.acquire.ExtendedBuildReceipt]]"
+        ),
+        "ExtendedBuildReceipt Mirror"
+      )
+      refused(
+        typeCheckErrors(
+          "storymodel4s.acquire.AcquisitionViewAuthority.validatedBuild(???, ???)"
+        ),
+        "AcquisitionViewAuthority.validatedBuild"
       )
     }
 
@@ -624,6 +688,21 @@ package storymodel4s.acquire.attack {
           "new storymodel4s.acquire.SourceIdentities.DecodedSourceIdentityValue(0, ???, ???)"
         ),
         "SourceIdentities.DecodedSourceIdentityValue constructor"
+      )
+    }
+
+    test("acquire child-package consumers cannot bypass checked build receipts") {
+      refused(
+        typeCheckErrors(
+          "new storymodel4s.acquire.ExtendedBuildReceipt(???, Vector.empty, Map.empty)"
+        ),
+        "ExtendedBuildReceipt constructor"
+      )
+      refused(
+        typeCheckErrors(
+          "storymodel4s.acquire.AcquisitionViewAuthority.validatedBuild(???, ???)"
+        ),
+        "AcquisitionViewAuthority.validatedBuild"
       )
     }
 }
