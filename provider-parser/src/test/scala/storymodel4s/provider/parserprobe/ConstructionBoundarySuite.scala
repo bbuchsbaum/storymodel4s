@@ -95,6 +95,45 @@ class ConstructionBoundarySuite extends FunSuite:
     assert(oldDecisionErrors.nonEmpty)
   }
 
+  test("external code can derive but cannot mint or copy a remote runtime identity") {
+    assert(
+      typeChecks("""
+        import storymodel4s.provider.parser.*
+        import storymodel4s.acquire.PromptPackageRef
+        import storymodel4s.core.*
+        def build(ref: PromptPackageRef, text: Checksum) =
+          RemoteRuntime.from("anthropic", "claude-sonnet-5", "sdk", ref, text, "schema")
+      """)
+    )
+    val constructorErrors = typeCheckErrors("""
+      import storymodel4s.provider.parser.*
+      import storymodel4s.acquire.PromptPackageRef
+      import storymodel4s.core.*
+      new RemoteRuntime(
+        "anthropic",
+        "claude-sonnet-5",
+        "sdk",
+        PromptPackageRef("p", "v1", Checksum.ofText("p")),
+        Checksum.ofText("t"),
+        "schema",
+        PromptTemplateVersion.unsafe("p@v1#x"),
+        Checksum.ofText("forged"),
+        Fingerprint.unsafe("remote-runtime:forged")
+      )
+    """)
+    val copyErrors = typeCheckErrors("""
+      import storymodel4s.provider.parser.*
+      def forge(runtime: RemoteRuntime) = runtime.copy(model = "claude-other")
+    """)
+    val productErrors = typeCheckErrors("""
+      import storymodel4s.provider.parser.*
+      RemoteRuntime.fromProduct(Tuple0)
+    """)
+    assert(constructorErrors.nonEmpty)
+    assert(copyErrors.nonEmpty)
+    assert(productErrors.nonEmpty)
+  }
+
   test("external code can create only validated runtime-unavailability facts") {
     assert(
       typeChecks("""

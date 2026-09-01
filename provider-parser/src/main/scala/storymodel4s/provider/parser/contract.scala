@@ -1,5 +1,6 @@
 package storymodel4s.provider.parser
 
+import storymodel4s.acquire.PromptPackageRef
 import storymodel4s.core.*
 
 /** Stable identity of one sentence-level parser request inside and across batches. */
@@ -248,6 +249,11 @@ enum ParserRuntimeField:
   case DuplicateComponent(component: RuntimeComponent)
   case TimeoutMillis
   case ParameterKey
+  case SdkVersion
+  case PromptPackageName
+  case PromptPackageVersion
+  case ResultSchema
+  case PromptTemplateVersion
 
   def render: String = this match
     case ArtifactVersion               => "artifact/version"
@@ -260,6 +266,11 @@ enum ParserRuntimeField:
     case DuplicateComponent(component) => s"duplicate/${component.render}"
     case TimeoutMillis                 => "timeoutMillis"
     case ParameterKey                  => "params/key"
+    case SdkVersion                    => "remote/sdk-version"
+    case PromptPackageName             => "remote/prompt-package/name"
+    case PromptPackageVersion          => "remote/prompt-package/version"
+    case ResultSchema                  => "remote/result-schema"
+    case PromptTemplateVersion         => "remote/prompt-template-version"
 
   private[parser] def canonicalParts: Vector[String] = this match
     case ArtifactVersion               => Vector("artifact-version")
@@ -271,8 +282,13 @@ enum ParserRuntimeField:
     case RuntimeVersion                => Vector("runtime-version")
     case DuplicateComponent(component) =>
       Vector("duplicate-component") ++ RuntimeComponent.canonicalParts(component)
-    case TimeoutMillis => Vector("timeout-millis")
-    case ParameterKey  => Vector("parameter-key")
+    case TimeoutMillis         => Vector("timeout-millis")
+    case ParameterKey          => Vector("parameter-key")
+    case SdkVersion            => Vector("sdk-version")
+    case PromptPackageName     => Vector("prompt-package-name")
+    case PromptPackageVersion  => Vector("prompt-package-version")
+    case ResultSchema          => Vector("result-schema")
+    case PromptTemplateVersion => Vector("prompt-template-version")
 
 /** Why a requested runtime-unavailability fact could not be admitted. */
 enum ParserSetupFailureAdmissionError:
@@ -560,6 +576,27 @@ object RuntimeArtifact:
       case None =>
         Right(new RuntimeArtifact(component, version, source, checksum, licenseEvidence))
 
+/** Identity every executable parser runtime publishes, so request envelopes, provider-call
+  * receipts, and cache keys bind to one derived fingerprint whichever kind of runtime answers.
+  *
+  * Why a sealed trait over two private-constructor classes: a locally pinned runtime and a remote
+  * model differ in what can be pinned (checksummed bytes versus a provider-asserted model id), and
+  * that difference must stay visible through `weightsPinned` rather than be laundered into one
+  * shape that implies both were pinned the same way.
+  */
+sealed trait RuntimeIdentity:
+  def provider: String
+  def model: String
+  def version: String
+  def fingerprint: Fingerprint
+  def checksum: Checksum
+
+  /** True only when every weight-bearing artifact was checksummed before execution. */
+  def weightsPinned: Boolean
+
+  /** Present only when the runtime's behaviour is fixed by a prompt package rather than weights. */
+  def promptTemplateVersion: Option[PromptTemplateVersion]
+
 /** A complete, content-addressed parser runtime, including the external wrapper version; no
   * provider can be `Ready` without one.
   */
@@ -570,7 +607,10 @@ final class PinnedRuntime private (
     val artifacts: Vector[RuntimeArtifact],
     val fingerprint: Fingerprint,
     val checksum: Checksum
-):
+) extends RuntimeIdentity:
+  val weightsPinned: Boolean = true
+  val promptTemplateVersion: Option[PromptTemplateVersion] = None
+
   override def equals(other: Any): Boolean = other match
     case that: PinnedRuntime =>
       provider == that.provider && model == that.model && version == that.version &&
@@ -651,11 +691,131 @@ object PinnedRuntime:
                 new PinnedRuntime(provider, model, version, ordered, fingerprint, checksum)
               )
 
+/** A remote model runtime whose weights cannot be pinned; identity is provider, model id, prompt
+  * package, prompt text, result schema, and SDK version, and every one of them is digested. The
+  * prompt-template version a receipt carries names the manifest checksum and the prompt-text
+  * checksum, so a receipt distinguishes two prompt texts under one manifest.
+  *
+  * Why a non-case class with a private constructor: the fingerprint is a claim about the other
+  * fields, so it must be derived here and never supplied by a caller. `weightsPinned` is fixed to
+  * `false` because no checksummed checkpoint exists for a hosted model; a receipt minted under this
+  * runtime therefore never reads as if bytes had been pinned.
+  */
+final class RemoteRuntime private (
+    val provider: String,
+    val model: String,
+    val sdkVersion: String,
+    val promptPackage: PromptPackageRef,
+    val promptTextChecksum: Checksum,
+    val resultSchema: String,
+    val promptVersion: PromptTemplateVersion,
+    val checksum: Checksum,
+    val fingerprint: Fingerprint
+) extends RuntimeIdentity:
+  /** The SDK version stands in for the wrapper version a pinned runtime records. */
+  def version: String = sdkVersion
+
+  /** Remote weights cannot be pinned; identity is provider, model id, prompt package, and SDK. */
+  val weightsPinned: Boolean = false
+
+  val promptTemplateVersion: Option[PromptTemplateVersion] = Some(promptVersion)
+
+  override def equals(other: Any): Boolean = other match
+    case that: RemoteRuntime =>
+      provider == that.provider && model == that.model && sdkVersion == that.sdkVersion &&
+      promptPackage == that.promptPackage && promptTextChecksum == that.promptTextChecksum &&
+      resultSchema == that.resultSchema && promptVersion == that.promptVersion &&
+      checksum == that.checksum && fingerprint == that.fingerprint
+    case _ => false
+
+  override def hashCode(): Int =
+    (
+      provider,
+      model,
+      sdkVersion,
+      promptPackage,
+      promptTextChecksum,
+      resultSchema,
+      promptVersion,
+      checksum,
+      fingerprint
+    ).hashCode
+
+  override def toString: String =
+    s"RemoteRuntime($provider,$model,$sdkVersion,prompt=${promptPackage.name}@" +
+      s"${promptPackage.version},checksum=${checksum.short()})"
+
+object RemoteRuntime:
+  /** Admit a remote runtime only when every identity scalar is nonblank; derive its fingerprint. */
+  def from(
+      provider: String,
+      model: String,
+      sdkVersion: String,
+      promptPackage: PromptPackageRef,
+      promptTextChecksum: Checksum,
+      resultSchema: String
+  ): Either[ParserSetupFailure, RemoteRuntime] =
+    val scalars = Vector(
+      ParserRuntimeField.Provider -> provider,
+      ParserRuntimeField.Model -> model,
+      ParserRuntimeField.SdkVersion -> sdkVersion,
+      ParserRuntimeField.PromptPackageName -> promptPackage.name,
+      ParserRuntimeField.PromptPackageVersion -> promptPackage.version,
+      ParserRuntimeField.ResultSchema -> resultSchema
+    )
+    scalars.collectFirst {
+      case (field, value) if !value.exists(c => !c.isWhitespace) => field
+    } match
+      case Some(field) => Left(ParserSetupFailure.invalidRuntimeField(field))
+      case None        =>
+        val rendered =
+          s"${promptPackage.name}@${promptPackage.version}#${promptPackage.checksum.hex}" +
+            s"+${promptTextChecksum.hex}"
+        PromptTemplateVersion
+          .from(rendered)
+          .left
+          .map(_ =>
+            ParserSetupFailure.invalidRuntimeField(ParserRuntimeField.PromptTemplateVersion)
+          )
+          .map { promptVersion =>
+            val checksum = ParserIdentity.digest(
+              "parser-remote-runtime/v1",
+              Vector(
+                provider,
+                model,
+                sdkVersion,
+                "prompt-package",
+                promptPackage.name,
+                promptPackage.version,
+                promptPackage.checksum.hex,
+                "prompt-text",
+                promptTextChecksum.hex,
+                "result-schema",
+                resultSchema,
+                "weights-pinned",
+                "false"
+              )
+            )
+            val fingerprint = Fingerprint.unsafe(s"remote-runtime:${checksum.hex}")
+            new RemoteRuntime(
+              provider,
+              model,
+              sdkVersion,
+              promptPackage,
+              promptTextChecksum,
+              resultSchema,
+              promptVersion,
+              checksum,
+              fingerprint
+            )
+          }
+
 /** Runtime availability is explicit: no unpinned, missing, incompatible, or oversized runtime can
-  * silently execute.
+  * silently execute, and a remote model is never mistaken for a pinned one.
   */
 enum ParserRuntime:
   case Ready(runtime: PinnedRuntime)
+  case Remote(runtime: RemoteRuntime)
   case Unavailable(reason: ParserSetupFailure)
 
 /** Declared interpretation of alignment indices rendered into provider PENMAN. */
