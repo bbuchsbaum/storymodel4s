@@ -1,12 +1,15 @@
 package storymodel4s.bench.sherlock
 
 import java.nio.charset.StandardCharsets
+import java.nio.file.Paths
 
 import munit.FunSuite
 import storymodel4s.acquire.SherlockAnnotations
 import storymodel4s.acquire.SherlockAnnotations.{MediaLocus, MediaManifest, PartIdentity}
 import storymodel4s.align.*
+import storymodel4s.bench.{BenchChannels, SemanticChannelKind}
 import storymodel4s.core.{Checksum, StorySource}
+import storymodel4s.embed.onnx.{OnnxSentenceArtifacts, OnnxSentenceEmbedder, OnnxSentenceModel}
 import storymodel4s.recall.RecallSegmenter
 
 /** Courts for the annotation-to-SourceView bridge and the recall CSV reader, plus one end-to-end
@@ -122,4 +125,50 @@ class SherlockRecallMappingSuite extends FunSuite:
         assertEquals(part, "media-part-a")
         assertEquals((iv.start, iv.endExclusive), (25000L, 50000L))
       case other => fail(s"the anchored row must carry its exact media extent, got $other")
+  }
+
+  test("the bridge states each node's embedding text: descriptions for leaves, labels for scenes") {
+    val built = SherlockAnnotationView.build(atlas)
+    assertEquals(built.nodeTexts.size, 8)
+    val byRef = built.nodeTexts.toMap
+    atlas.rows.foreach { row =>
+      val ref = built.rowByRef.collectFirst { case (r, n) if n == row.row => r }.get
+      assertEquals(byRef(ref), row.description)
+    }
+    built.sceneByRef.foreach { case (ref, scene) => assertEquals(byRef(ref), scene.label) }
+  }
+
+  // Runs only when the pinned MiniLM artifacts are supplied, like WogDiagnosticSuite's neural leg:
+  // the checksums inside OnnxSentenceModel.AllMiniLmL6V2 refuse any other bytes at open.
+  test("the neural channel puts the red-door unit nearer its row than an unrelated row") {
+    val supplied = for
+      model <- sys.env.get("STORYMODEL4S_ONNX_MODEL")
+      tokenizer <- sys.env.get("STORYMODEL4S_ONNX_TOKENIZER")
+    yield OnnxSentenceArtifacts(Paths.get(model), Paths.get(tokenizer))
+    assume(supplied.nonEmpty, "STORYMODEL4S_ONNX_MODEL / STORYMODEL4S_ONNX_TOKENIZER not set")
+    val built = SherlockAnnotationView.build(atlas)
+    val transcript = StorySource
+      .fromText("The man knocked on a red door.", Some("synthetic recall"))
+      .fold(e => throw new IllegalStateException(e.message), identity)
+    val recall = RecallSegmenter.segment(transcript)
+    val embedder = OnnxSentenceEmbedder
+      .open(OnnxSentenceModel.AllMiniLmL6V2, supplied.get)
+      .fold(e => fail(e.message), identity)
+    try
+      val channel = BenchChannels
+        .neural(embedder, recall.ordered, built.nodeTexts)
+        .fold(e => fail(e.message), identity)
+      assertEquals(channel.semanticIdentity.kind, SemanticChannelKind.NeuralEncoder)
+      val unit = recall.ordered.head
+      def nodeAtRow(n: Int): NodeSummary =
+        val ref = built.rowByRef.collectFirst { case (r, row) if row == n => r }.get
+        built.view.node(ref).get
+      val toDoor = channel.semantic(unit, nodeAtRow(2)).toOption.getOrElse(fail("door abstained"))
+      val toPopcorn =
+        channel.semantic(unit, nodeAtRow(6)).toOption.getOrElse(fail("popcorn abstained"))
+      assert(
+        toDoor + 0.05 < toPopcorn,
+        s"neural distance must separate the rows: door=$toDoor popcorn=$toPopcorn"
+      )
+    finally embedder.close()
   }

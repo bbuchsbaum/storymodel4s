@@ -6,7 +6,9 @@ import java.nio.file.{Files, Path, Paths}
 import storymodel4s.acquire.SherlockAnnotations
 import storymodel4s.acquire.SherlockAnnotations.{Atlas, MediaLocus, Scene}
 import storymodel4s.align.*
+import storymodel4s.bench.BenchChannels
 import storymodel4s.core.{SegmentId, SituationId, SpanSet, StorySource, TextSpan}
+import storymodel4s.embed.onnx.{OnnxSentenceArtifacts, OnnxSentenceEmbedder, OnnxSentenceModel}
 import storymodel4s.recall.{Lexical, ModalityTag, PolarityTag, RecallSegmenter}
 
 /** Diagnostic bridge from the checked Sherlock annotation atlas to the aligner's `SourceView`.
@@ -20,13 +22,19 @@ import storymodel4s.recall.{Lexical, ModalityTag, PolarityTag, RecallSegmenter}
   */
 object SherlockAnnotationView:
 
-  /** The built view plus the media coordinates the view's text axis cannot carry. */
+  /** The built view plus the media coordinates the view's text axis cannot carry.
+    *
+    * `nodeTexts` is the text an embedding channel should encode per node: the row description for a
+    * leaf, the scene label for a scene. The bridge decides this, not the channel, so every semantic
+    * provider sees the same rendering of the same node.
+    */
   final case class Built(
       view: InMemorySourceView,
       media: Map[SourceNodeRef, MediaLocus],
       document: String,
       rowByRef: Map[SourceNodeRef, Int],
-      sceneByRef: Map[SourceNodeRef, Scene]
+      sceneByRef: Map[SourceNodeRef, Scene],
+      nodeTexts: Vector[(SourceNodeRef, String)]
   )
 
   private def leafRef(row: Int): SourceNodeRef =
@@ -134,7 +142,10 @@ object SherlockAnnotationView:
 
     val rowByRef = atlas.rows.map(r => leafRef(r.row) -> r.row).toMap
     val sceneByRef = atlas.scenes.map(s => sceneRef(s.ordinal) -> s).toMap
-    Built(view, leafMedia ++ sceneMedia, document, rowByRef, sceneByRef)
+    val nodeTexts: Vector[(SourceNodeRef, String)] =
+      atlas.rows.map(r => leafRef(r.row) -> r.description) ++
+        atlas.scenes.map(s => sceneRef(s.ordinal) -> s.label)
+    Built(view, leafMedia ++ sceneMedia, document, rowByRef, sceneByRef, nodeTexts)
 
   private def atlasRowOf(n: NodeSummary): Int = n.discoursePosition + 1
 
@@ -195,7 +206,29 @@ object RecallWordsCsv:
     .fold(e => throw new IllegalArgumentException(e.message), identity)
   val recall = RecallSegmenter.segment(transcript)
 
-  val semantic = SemanticDistance.lexicalJaccard
+  // Semantic channel selection is stated, never inferred: with both artifact variables set the
+  // pinned MiniLM encoder runs (checksums verified at open) and the summary prints its identity;
+  // otherwise the free lexical baseline runs and says so. The same distance feeds nomination and
+  // the cost model, so both see one geometry.
+  val neuralArtifacts = for
+    model <- sys.env.get("STORYMODEL4S_ONNX_MODEL")
+    tokenizer <- sys.env.get("STORYMODEL4S_ONNX_TOKENIZER")
+  yield OnnxSentenceArtifacts(Paths.get(model), Paths.get(tokenizer))
+  val (semantic, channelLabel, embedderToClose) = neuralArtifacts match
+    case Some(artifacts) =>
+      val embedder = OnnxSentenceEmbedder
+        .open(OnnxSentenceModel.AllMiniLmL6V2, artifacts)
+        .fold(e => throw new IllegalStateException(e.message), identity)
+      val channel = BenchChannels
+        .neural(embedder, recall.ordered, built.nodeTexts)
+        .fold(e => throw new IllegalStateException(e.message), identity)
+      (channel.semantic, channel.render, Some(embedder))
+    case None =>
+      (
+        SemanticDistance.lexicalJaccard,
+        "lexical-jaccard [semantic=lexical-baseline; free fallback]",
+        None
+      )
   // The lexical-overlap channel is disabled: with 1000 microsegments and recurring character
   // names it nominates hundreds of anchors per unit, which is intractable for the HSMM and adds
   // no ranking information. Top-k semantic nomination per level keeps the state space sparse.
@@ -204,6 +237,7 @@ object RecallWordsCsv:
   val result = GraphHsmm
     .infer(recall, built.view, candidates, DefaultLocalCostModel(semantic = semantic))
     .fold(e => throw new IllegalStateException(e.message), identity)
+  embedderToClose.foreach(_.close())
   val signature = RecallSignature
     .compute(result, recall, built.view)
     .fold(e => throw new IllegalStateException(e.message), identity)
@@ -274,6 +308,7 @@ object RecallWordsCsv:
   Files.write(out, (header +: lines).mkString("\n").getBytes(StandardCharsets.UTF_8))
 
   val elapsedMs = (System.nanoTime() - t0) / 1000000L
+  println(s"semantic channel: $channelLabel")
   println(s"annotation rows: ${atlas.rows.size}; scenes: ${atlas.scenes.size}")
   println(
     s"view nodes: ${built.view.nodes.size} (${built.view.leaves.size} microsegments, " +
