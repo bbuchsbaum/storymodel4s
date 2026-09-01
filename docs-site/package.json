@@ -9,6 +9,7 @@
     "check": "astro check",
     "verify:examples": "node scripts/verify-examples.mjs",
     "verify:figures": "node scripts/verify-figures.mjs",
+    "verify:layout": "node scripts/verify-mobile-layout.mjs",
     "verify:navigation": "node scripts/verify-navigation.mjs",
     "verify:verbatim": "node scripts/verify-verbatim.mjs",
     "verify": "npm run verify:examples && npm run check && npm run build && npm run verify:navigation && npm run verify:verbatim && npm run verify:figures && npm run verify:provenance",

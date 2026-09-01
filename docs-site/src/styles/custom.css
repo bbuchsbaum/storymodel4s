@@ -121,6 +121,15 @@ header.header {
   line-height: 1.78;
 }
 
+.sl-markdown-content {
+  min-width: 0;
+}
+
+.sl-markdown-content pre {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
 .route-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));

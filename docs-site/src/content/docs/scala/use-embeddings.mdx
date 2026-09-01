@@ -111,8 +111,15 @@ Production code supplies a store-local implementation backed by an appropriate s
 
 ## Provider adapters
 
-JVM-only modules add a local ONNX sentence encoder and a structural graph-kernel adapter. They use
-the same space, batch, outcome, distance, policy, cache, and receipt contracts. Provider evaluation
-and calibration remain separate work; this guide establishes API behavior only.
+The JVM-only ONNX sentence encoder implements the `Embedder` interface. It accepts an `EmbedBatch`
+and returns a `BatchResult` with per-item outcomes and embedding receipts.
+
+The grakern adapter has a different job and a different interface. `GrakernStructuralDistance`
+implements `StructuralDistance` over proposition evidence. Its `EmbeddingSpace` names the
+structural channel, and its memoized query rows produce `EmbeddingReceipt` and `ProviderCall`
+records. It does not implement `EmbedBatch`, `RemotePolicy`, or `EmbeddingCache`.
+
+Provider evaluation and calibration remain separate work; this guide establishes API behavior
+only.
 
 [See the module map →](/scala/modules/)

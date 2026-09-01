@@ -82,15 +82,18 @@ The model contains 18 participant recall units, 49 details, and 49 assessments.
 
 ### Traditional categories
 
-Each category row contains three values:
+Each category row contains a point estimate, an interval, and a hard count:
 
-- `point` is the expected fractional count under the address distribution;
-- the interval's lower bound counts details whose modal address belongs to the category;
-- the interval's upper bound counts details that assign any positive mass to the category; and
+- `point` sums each detail's placed weight multiplied by its mass in the category;
+- the interval's lower bound uses that same weighted mass, but only for details whose modal category
+  is this one;
+- the interval's upper bound uses the detail's full placed weight whenever the category has any
+  positive mass; and
 - `hard` is the rounded whole-number count under the standard policy.
 
-The address masses in this fixture are uncalibrated. These intervals bound model-routed expected
-counts; they are not statistical confidence or credible intervals.
+The first three values summarize weighted posterior mass; they are not three ways of counting
+details. The address masses in this fixture are uncalibrated, and the interval is neither a
+confidence interval nor a credible interval.
 
 ### Two kinds of coverage
 
