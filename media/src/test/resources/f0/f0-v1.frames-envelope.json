@@ -1,0 +1,27 @@
+{
+  "schema": "storymodel4s.media.frames-envelope",
+  "schemaVersion": 1,
+  "fixtureId": "f0-v1",
+  "inputSha256": "0cf05f22d1526ea16cc9fa1cd8cf676da065a2ff1f65c8013a4b27c515c45c08",
+  "streamIndex": 0,
+  "tool": {
+    "name": "ffmpeg",
+    "invokedPath": "/opt/homebrew/bin/ffmpeg",
+    "resolvedPath": "/opt/homebrew/Cellar/ffmpeg/7.1.1_3/bin/ffmpeg",
+    "versionLine": "ffmpeg version 7.1.1 Copyright (c) 2000-2025 the FFmpeg developers",
+    "binarySha256": "14c12cd5dcbc0d75c83085296b27142a4abc61a320a97a5408f7048fa7cbd630",
+    "realization": "local Homebrew build (--enable-gpl --enable-version3 --enable-libx264 per -buildconf). Not the nominated FFmpeg 9.0.1 LGPL-only recipe. Output authority: Draft."
+  },
+  "args": ["-hide_banner", "-loglevel", "error", "-y", "-map", "0:0", "-f", "rawvideo", "-pix_fmt", "bgr24", "-fps_mode", "passthrough"],
+  "preprocessing": "source rgb24 32x18 converted to bgr24 by libswscale; no scaling, no crop, no rotation, no frame duplication or dropping (passthrough); every indexed packet yields exactly one frame",
+  "frames": {
+    "count": 45,
+    "width": 32,
+    "height": 18,
+    "pixelFormat": "bgr24",
+    "byteLength": 77760,
+    "sha256": "bb13ca6a6618982c1e3d840eb04e59b5aa2c52f9e2c118ab70762e2cc67968af"
+  },
+  "recordedAt": "2026-09-01",
+  "note": "The decoded frame bytes are not committed; they are 45 flat-colour frames reproducible from the fixture with the recorded tool and arguments. The live court regenerates them and compares this digest."
+}

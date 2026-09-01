@@ -21,3 +21,4 @@ zz-worktree-local.sbt
 docs-site/node_modules/
 docs-site/dist/
 docs-site/.astro/
+media/worker/.venv/

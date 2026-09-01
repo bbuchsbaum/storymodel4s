@@ -291,6 +291,43 @@ private[media] object MediaJson:
   def optionalLong(c: ACursor, field: String): Either[DomainError, Option[Long]] =
     if c.focus.isEmpty then Right(None) else long(c, field).map(Some(_))
 
+  /** Absent or JSON `null` both read as `None`; a present value must be an integer. */
+  def optionalInt(c: ACursor, field: String): Either[DomainError, Option[Int]] =
+    if c.focus.forall(_.isNull) then Right(None) else int(c, field).map(Some(_))
+
+  def double(c: ACursor, field: String): Either[DomainError, Double] =
+    c.as[Double]
+      .left
+      .map(_ =>
+        DomainError.InvalidFormat(
+          field,
+          c.focus.map(_.noSpaces).getOrElse("<absent>"),
+          "expected a number"
+        )
+      )
+
+  def boolean(c: ACursor, field: String): Either[DomainError, Boolean] =
+    c.as[Boolean]
+      .left
+      .map(_ =>
+        DomainError.InvalidFormat(
+          field,
+          c.focus.map(_.noSpaces).getOrElse("<absent>"),
+          "expected a boolean"
+        )
+      )
+
+  def stringMap(c: ACursor, field: String): Either[DomainError, Map[String, String]] =
+    c.as[Map[String, String]]
+      .left
+      .map(_ =>
+        DomainError.InvalidFormat(
+          field,
+          c.focus.map(_.noSpaces).getOrElse("<absent>"),
+          "expected an object of strings"
+        )
+      )
+
   def array(c: ACursor, field: String): Either[DomainError, Vector[Json]] =
     c.as[Vector[Json]]
       .left

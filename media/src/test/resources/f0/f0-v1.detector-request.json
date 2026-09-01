@@ -1,0 +1,23 @@
+{
+  "schema": "storymodel4s.media.detector-request",
+  "schemaVersion": 1,
+  "requestId": "f0-v1/content-detector/v1",
+  "frames": {
+    "file": "f0-v1.frames.bgr",
+    "sha256": "bb13ca6a6618982c1e3d840eb04e59b5aa2c52f9e2c118ab70762e2cc67968af",
+    "count": 45,
+    "width": 32,
+    "height": 18,
+    "pixelFormat": "bgr24"
+  },
+  "detector": {
+    "type": "ContentDetector",
+    "threshold": 15.0,
+    "minSceneLen": 2,
+    "weights": { "deltaHue": 1.0, "deltaSat": 1.0, "deltaLum": 1.0, "deltaEdges": 0.0 },
+    "lumaOnly": false,
+    "kernelSize": null,
+    "filterMode": "MERGE",
+    "frameCounterFps": 24.0
+  }
+}
