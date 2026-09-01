@@ -16,7 +16,7 @@ export const programPath = 'docs-site/examples/PublicAlignAndInterpret.scala';
 export const outputPath = 'docs-site/examples/align-and-interpret.output.txt';
 export const PROGRAM_SHA = 'a32a547465c5ff35dca0c02a9a614a8d36594f90188fd0de4e37c38461b0c962';
 export const OUTPUT_SHA = '5fcb58008a3076d1d4a0812e29b53b519ed047bda8de4e8fd4ab1244f3d6e0bf';
-export const PRODUCER_REVISION = 'daefa36735a35e21c77675ff85ea0f981bc7b031';
+export const PRODUCER_REVISION = '76c62e738a2579d6598fccf3ac19266c60480e20';
 export const program = readFileSync(resolve(process.cwd(), 'examples/PublicAlignAndInterpret.scala'), 'utf8');
 export const output = readFileSync(resolve(process.cwd(), 'examples/align-and-interpret.output.txt'), 'utf8');
 export const programSha = createHash('sha256').update(program).digest('hex');
@@ -126,12 +126,13 @@ value and support of `0.2409`, the source mass that contributed to the estimate.
 | `signature.compression` | compression and the source mass that supports it |
 | `signature.externalMass` | attributed external mass and unranked mass as separate values |
 
-The archived output came from revision <code>{PRODUCER_REVISION}</code> on the JVM. Its program and
-output digests are checked during every site build.
+The replay gate compiles this exact program against revision <code>{PRODUCER_REVISION}</code>, runs
+it on the JVM, and compares stdout byte-for-byte with the displayed output. The result is
+conditional on the heuristic segmentation used in the program.
 
 <Evidence
-  status="Qualified"
-  source={`Archived run at producer revision ${PRODUCER_REVISION}; output SHA-256 ${outputSha}. The producer revision is not available on the hosted remote.`}
+  status="Confirmed"
+  source={`Manifested replay at source revision ${PRODUCER_REVISION}; output SHA-256 ${outputSha}`}
   href={sourceLink(outputPath)}
 />
 

@@ -241,7 +241,15 @@ requireCondition(rejectedMissingCategory, 'missing interview category is rejecte
 function renderInterviewMutation() {
   const courtRoot = mkdtempSync(resolve(root, '.figure-court-'));
   try {
-    for (const path of ['astro.config.mjs', 'package.json', 'tsconfig.json', 'src', 'public', 'examples']) {
+    for (const path of [
+      'astro.config.mjs',
+      'package.json',
+      'tsconfig.json',
+      'src',
+      'public',
+      'examples',
+      'examples-grakern',
+    ]) {
       cpSync(resolve(root, path), resolve(courtRoot, path), { recursive: true });
     }
     symlinkSync(resolve(root, 'node_modules'), resolve(courtRoot, 'node_modules'), 'dir');

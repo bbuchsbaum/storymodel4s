@@ -15,7 +15,7 @@ export const programPath = 'docs-site/examples/UseEmbeddings.scala';
 export const outputPath = 'docs-site/examples/use-embeddings.output.txt';
 export const PROGRAM_SHA = 'e0c3d9c182ea99eb4d7d6fcd2bbd5d86bf81849b7e0e6a84cc5c70d7bfe196be';
 export const OUTPUT_SHA = 'a0609f215741b12fe739a27d25e4b1049ed964caf464abf90bc1726fd61d647c';
-export const PRODUCER_REVISION = '1cb64bd39f097c32233a52ff6e167f9f93d9d127';
+export const PRODUCER_REVISION = '76c62e738a2579d6598fccf3ac19266c60480e20';
 export const program = readFileSync(resolve(process.cwd(), 'examples/UseEmbeddings.scala'), 'utf8');
 export const output = readFileSync(resolve(process.cwd(), 'examples/use-embeddings.output.txt'), 'utf8');
 export const programSha = createHash('sha256').update(program).digest('hex');
@@ -59,8 +59,8 @@ sbt "embedCoreJVM/runMain docsprobe.useEmbeddings"
 
 <pre><code>{output}</code></pre>
 
-The exact program above produced this output against storymodel4s revision `{PRODUCER_REVISION}` on
-Homebrew Java 25.0.1. The documentation build checks the SHA-256 digest of both files.
+The replay gate compiles this exact program against revision `{PRODUCER_REVISION}`, runs it on the
+JVM, and compares stdout byte-for-byte with the displayed output.
 
 ## Read the batch result
 

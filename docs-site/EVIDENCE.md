@@ -44,9 +44,19 @@ Candidate: Starlight on Astro. The guide remains authored under `src/content/doc
 enter only through `public/`. Acceptance command:
 
 ```sh
-npm run build
-npm run verify:verbatim
+STORYMODEL4S_GRAKERN_BUILD=/path/to/grakern npm run verify
 ```
 
-The experiment passes only when source and built byte counts and SHA-256 digests are identical.
-Record the final digest in the Mote evidence post; do not hard-code a pre-build result here.
+The experiment passes only when every manifested Scala program compiles, runs, and byte-matches its
+recorded stdout; Astro checks and builds; figures remain tied to their data; provenance mutation
+checks pass; and the raw artifact reaches the build byte-for-byte. Record the final receipt in Mote.
+
+## API friction ledger
+
+| Workflow | Evidence | Reader expectation | Current cost | Recommendation | Compatibility | Documentation now |
+| --- | --- | --- | --- | --- | --- | --- |
+| Create a complete story model from prose | The site needs `WarOfTheGhostsModel.model`; the public surface/compiler programme is unfinished | Supply text and receive a reviewable draft model | Readers must start from a hand-authored fixture or compose lower-level stages | Finish the evidence-backed acquisition and compilation programme behind a separate design gate | New orchestration API and artifact schema | State the fixture boundary on the landing and story pages |
+| Represent a recall for a terminal analysis | `RecallSegmenter.segment` returns one checked graph without a policy receipt or retained segmentation alternatives | Inspect and compare plausible boundaries and proposition analyses | One heuristic output can look settled after structural validation | Add a typed segmentation proposal/resolution artifact under the Code Red PRD and ADR process | New public vocabulary and codec migration | Call the current segmenter a heuristic segmentation-conditioned baseline |
+| Compute a local embedding | `UseEmbeddings.scala` needs 107 nonblank lines for the full privacy/receipt path; the local batch itself is shorter | Embed public text with a small checked call | Space lookup, batch validation, and outcome handling obscure the first local operation | Audit a lawful local convenience path while retaining explicit remote custody | Additive API if identity and failures remain explicit | Teach the short deterministic path before remote authorization |
+| Compose document identity | `ComposeDocument.scala` manually assembles chart-node and typed mention IDs before quotienting | Connect repeated mentions across sentence charts | Necessary identity concepts arrive before the scientific result | Explore constructors derived from admitted charts and resolver output | Additive API with identity consequences | Show the full current construction and the preserved local charts |
+| Build feature windows | `WindowFeatures.scala` manually creates space, provenance, observations, plan, reducer, and missingness policy | Attach a lexical measure and compare window summaries | Eight public concepts precede the first result | Consider a checked builder for common scalar lexical tracks | Additive API; derived-space identity must stay exact | Explain each layer through the coverage-policy difference |

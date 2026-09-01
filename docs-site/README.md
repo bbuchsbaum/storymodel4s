@@ -10,9 +10,10 @@ npm ci
 npm run verify
 ```
 
-`npm run verify` type-checks the Astro project, builds the static site, and proves that
-`public/artifacts/verbatim-proof.html` reached `dist/` byte-for-byte. The site gates no Scala
-candidate while the repository has no CI.
+Set `STORYMODEL4S_GRAKERN_BUILD` to the pinned local grakern checkout before running the gate.
+`npm run verify` compiles and runs every program in `examples/manifest.json`, compares stdout
+byte-for-byte with its recorded output, type-checks and builds the Astro site, and proves that
+`public/artifacts/verbatim-proof.html` reached `dist/` byte-for-byte.
 
 The visible build receipt uses `git rev-parse HEAD` by default. Reproducible builders may set
 `DOCS_SOURCE_REVISION` and `DOCS_GENERATED_AT` explicitly.

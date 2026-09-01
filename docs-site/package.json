@@ -7,9 +7,11 @@
     "dev": "astro dev",
     "build": "astro build",
     "check": "astro check",
+    "verify:examples": "node scripts/verify-examples.mjs",
     "verify:figures": "node scripts/verify-figures.mjs",
+    "verify:navigation": "node scripts/verify-navigation.mjs",
     "verify:verbatim": "node scripts/verify-verbatim.mjs",
-    "verify": "npm run check && npm run build && npm run verify:verbatim && npm run verify:figures && npm run verify:provenance",
+    "verify": "npm run verify:examples && npm run check && npm run build && npm run verify:navigation && npm run verify:verbatim && npm run verify:figures && npm run verify:provenance",
     "verify:provenance": "node scripts/verify-provenance.mjs"
   },
   "dependencies": {

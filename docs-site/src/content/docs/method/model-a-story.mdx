@@ -16,7 +16,7 @@ export const programPath = 'docs-site/examples/ModelAStory.scala';
 export const outputPath = 'docs-site/examples/model-a-story.output.txt';
 export const PROGRAM_SHA = 'fb72cb6eb6e16c6207d72abf9a7beb9967005dab15515f09194dc170df4fcabf';
 export const OUTPUT_SHA = 'c7e474e487d5cebf00ba3db0d288844e2e87f2fe88282c979348ae120d2b9b61';
-export const PRODUCER_REVISION = '1cb64bd39f097c32233a52ff6e167f9f93d9d127';
+export const PRODUCER_REVISION = '76c62e738a2579d6598fccf3ac19266c60480e20';
 
 export const program = readFileSync(resolve(process.cwd(), 'examples/ModelAStory.scala'), 'utf8');
 export const output = readFileSync(resolve(process.cwd(), 'examples/model-a-story.output.txt'), 'utf8');
@@ -68,13 +68,12 @@ sbt -Dstorymodel4s.grakern.build=/absolute/path/to/pinned-grakern \
 
 <pre><code>{output}</code></pre>
 
-The program used only public APIs and ran against revision `{PRODUCER_REVISION}` on Homebrew Java
-25.0.1. The site checks the SHA-256 digest of both files at build time. The site does not execute the
-Scala program during its own build.
+The replay gate compiles this public-API program against revision `{PRODUCER_REVISION}`, runs it on
+the JVM, and compares stdout byte-for-byte with the displayed output.
 
 <Evidence
   status="Confirmed"
-  source={`Public-API run at producer revision ${PRODUCER_REVISION}; output SHA-256 ${outputSha}`}
+  source={`Manifested replay at source revision ${PRODUCER_REVISION}; output SHA-256 ${outputSha}`}
   href={sourceLink(outputPath)}
  />
 

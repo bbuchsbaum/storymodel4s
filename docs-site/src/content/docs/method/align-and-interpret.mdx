@@ -16,7 +16,7 @@ export const programPath = 'docs-site/examples/PublicAlignAndInterpret.scala';
 export const outputPath = 'docs-site/examples/align-and-interpret.output.txt';
 export const PROGRAM_SHA = 'a32a547465c5ff35dca0c02a9a614a8d36594f90188fd0de4e37c38461b0c962';
 export const OUTPUT_SHA = '5fcb58008a3076d1d4a0812e29b53b519ed047bda8de4e8fd4ab1244f3d6e0bf';
-export const PRODUCER_REVISION = 'daefa36735a35e21c77675ff85ea0f981bc7b031';
+export const PRODUCER_REVISION = '76c62e738a2579d6598fccf3ac19266c60480e20';
 
 export const program = readFileSync(resolve(process.cwd(), 'examples/PublicAlignAndInterpret.scala'), 'utf8');
 export const output = readFileSync(resolve(process.cwd(), 'examples/align-and-interpret.output.txt'), 'utf8');
@@ -41,6 +41,10 @@ steps:
 5. summarize the alignment with `RecallSignature`.
 
 The program imports public `storymodel4s` APIs. It uses no test helpers or copied internal code.
+
+Every value below is conditional on the two units produced by `RecallSegmenter`. That component is
+a heuristic baseline. A terminal research result must name its segmentation policy or receipt and
+retain plausible segmentation and proposition alternatives.
 
 ## Run the program
 
@@ -68,14 +72,12 @@ outside the sbt source sets, so the command uses the copy you place under `fixtu
 
 <pre><code>{output}</code></pre>
 
-`codex-storymodel-collab` recorded this output against exported revision `{PRODUCER_REVISION}` on
-Homebrew Java 25.0.1. Both the compile and run commands exited successfully. The site checks the
-SHA-256 digest of the program and output during every build. It displays an archived result; it does
-not execute the Scala program itself.
+The documentation replay gate compiles this exact program against revision `{PRODUCER_REVISION}`,
+runs it on the JVM, and compares stdout byte-for-byte with the displayed output.
 
 <Evidence
-  status="Qualified"
-  source={`Archived run at producer revision ${PRODUCER_REVISION}; output SHA-256 ${outputSha}. The producer revision is not available on the hosted remote.`}
+  status="Confirmed"
+  source={`Manifested replay at source revision ${PRODUCER_REVISION}; output SHA-256 ${outputSha}`}
   href={sourceLink(outputPath)}
  />
 
@@ -144,8 +146,8 @@ classified; the output reports `unranked=0.0000` and `ranked=1.0000`.
 ## Scope of this result
 
 The story structure comes from the hand-authored acceptance fixture. The run uses a deterministic,
-dependency-free lexical baseline. A semantic encoder would require its own identity, receipt, and
-quality evidence. The producer used one JVM and Java 25.0.1, so this archived run establishes no
-Scala.js, Scala Native, JDK 17, or JDK 21 result.
+dependency-free lexical baseline and one heuristic recall segmentation. A semantic encoder would
+require its own identity, receipt, and quality evidence. This replay exercises one JVM; it supplies
+no Scala.js, Scala Native, JDK 17, or JDK 21 result.
 
 Previous: [represent the recall](/method/represent-recall/).

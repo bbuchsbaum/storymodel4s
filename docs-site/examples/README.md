@@ -5,35 +5,19 @@ Programs the documentation shows, and the exact output they produced.
 These are **documentation examples, not library files**. Nothing in `storymodel4s`
 depends on them and they are not published as API.
 
-Each program here must import only `storymodel4s` public API — no test sources, no
-copied internal helpers, no demonstration facade. That constraint is the point: it
-is what proves the library can be driven by an ordinary consumer, and it was
-established by measurement rather than assumed. See
-`docs-site/src/content/docs/method/align-and-interpret.mdx`.
+Each program here imports only public `storymodel4s` APIs. The manifest names the
+smallest sbt project that supplies its classpath, its main class, and its expected
+output. `npm run verify:examples` rejects an unmanifested Scala file, compiles every
+entry, runs it, and compares stdout byte-for-byte with the named output file.
 
-Pages render these files by READING them at build time and hashing them there, so a
-snippet on the page cannot drift from the file it claims to be, and the SHA shown to
-a reader is derived rather than typed in.
+Pages read these files at build time, so displayed code and output use the same bytes
+that the replay gate verifies.
 
-| File | Produced by | Source SHA-256 |
-| --- | --- | --- |
-| `PublicAlignAndInterpret.scala` | codex-storymodel-collab, against exported main `daefa36` | `a32a5474…` |
-| `align-and-interpret.output.txt` | that program, same run | captured verbatim |
-| `ModelAStory.scala` | codex-storymodel4s-scout, against `1cb64bd` | `fb72cb6e…` |
-| `model-a-story.output.txt` | that program, same run | `c7e474e4…` |
-| `InspectSource.scala` | codex-storymodel4s-scout, against `1cb64bd` | `b33cdecb…` |
-| `inspect-source.output.txt` | that program, same run | `96976428…` |
-| `RepresentRecall.scala` | codex-storymodel4s-scout, against `1cb64bd` | `2f13608e…` |
-| `represent-recall.output.txt` | that program, same run | `ec2fbcb…` |
-| `SummarizeRecall.scala` | codex-storymodel4s-scout, against `1cb64bd` | `c3845957…` |
-| `summarize-recall.output.txt` | that program, same run | `5665e473…` |
-| `ScoreInterview.scala` | codex-storymodel4s-scout, against `1cb64bd` | `334f2f47…` |
-| `score-interview.output.txt` | that program, same run | `4399b050…` |
-| `SaveModel.scala` | codex-storymodel4s-scout, against `1cb64bd` | `7526d459…` |
-| `save-model.output.txt` | that program, same run | `cc1f48b0…` |
-| `UseEmbeddings.scala` | codex-storymodel4s-scout, against `1cb64bd` | `e0c3d9c1…` |
-| `use-embeddings.output.txt` | that program, same run | `a0609f21…` |
+The manifest currently covers thirteen workflows: source inspection, a reviewed story
+model, PENMAN conversion, acquisition resolution, document composition, recall
+construction, feature windows, portable embeddings, recall alignment and summary,
+interview scoring, canonical JSON, and JVM structural distance.
 
-The alignment example's lexical baseline recovers very little of the paraphrase.
-Keep that output with the program: it establishes API behavior without making an
-accuracy claim.
+The alignment example's lexical baseline recovers very little of the paraphrase. Its
+output establishes API behavior and carries no accuracy claim. Its results are also
+conditional on the heuristic segmentation produced by `RecallSegmenter`.

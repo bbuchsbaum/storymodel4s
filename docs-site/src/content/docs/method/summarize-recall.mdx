@@ -16,7 +16,7 @@ export const programPath = 'docs-site/examples/SummarizeRecall.scala';
 export const outputPath = 'docs-site/examples/summarize-recall.output.txt';
 export const PROGRAM_SHA = 'c38459574f60428e4ecd6db905bec822892e584c54027ba74831c29528143b60';
 export const OUTPUT_SHA = '5665e473bf6ef45e3f47754a7493da93be858b229ca6ef6df2b40b42525b5982';
-export const PRODUCER_REVISION = '1cb64bd39f097c32233a52ff6e167f9f93d9d127';
+export const PRODUCER_REVISION = '76c62e738a2579d6598fccf3ac19266c60480e20';
 export const program = readFileSync(resolve(process.cwd(), 'examples/SummarizeRecall.scala'), 'utf8');
 export const output = readFileSync(resolve(process.cwd(), 'examples/summarize-recall.output.txt'), 'utf8');
 export const programSha = createHash('sha256').update(program).digest('hex');
@@ -59,8 +59,9 @@ sbt -Dstorymodel4s.grakern.build=/absolute/path/to/pinned-grakern \
 
 <pre><code>{output}</code></pre>
 
-The exact program above produced this output against storymodel4s revision `{PRODUCER_REVISION}` on
-Homebrew Java 25.0.1. The documentation build checks the SHA-256 digest of both files.
+The replay gate compiles this exact program against revision `{PRODUCER_REVISION}`, runs it on the
+JVM, and compares stdout byte-for-byte with the displayed output. Every estimate remains
+conditional on the baseline segmentation used by the program.
 
 ## Estimates and support
 
