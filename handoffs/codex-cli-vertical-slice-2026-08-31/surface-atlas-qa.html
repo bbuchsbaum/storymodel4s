@@ -1,0 +1,187 @@
+<div id="surface-atlas-qa">
+  <style>
+    #surface-atlas-qa {
+      color: var(--foreground);
+      width: 100%;
+    }
+    #surface-atlas-qa .qa-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem 1rem;
+      color: var(--muted-foreground);
+      margin-block: 0.5rem 1rem;
+    }
+    #surface-atlas-qa .qa-rail {
+      border-block: 1px solid var(--border);
+      padding-block: 1rem;
+      margin-block: 1rem;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+    #surface-atlas-qa .qa-mark {
+      background: color-mix(in srgb, var(--viz-series-1) 18%, transparent);
+      box-shadow: inset 0 -2px 0 var(--viz-series-1);
+    }
+    #surface-atlas-qa .qa-mark.is-selected {
+      background: var(--primary);
+      color: var(--primary-foreground);
+      box-shadow: none;
+    }
+    #surface-atlas-qa .qa-detail {
+      margin-block: 1rem;
+    }
+    #surface-atlas-qa .qa-detail-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+      gap: 0.75rem;
+    }
+    #surface-atlas-qa .qa-detail-grid span {
+      display: block;
+      color: var(--muted-foreground);
+    }
+    #surface-atlas-qa .qa-fragment {
+      white-space: pre-wrap;
+    }
+  </style>
+
+  <h2>Surface atlas visual QA</h2>
+  <div class="qa-meta text-small">
+    <span><code>surface-atlas/v1</code></span>
+    <span><code>story:f2e94efc7f81</code></span>
+    <span>2 paragraphs · 2 sentences · 7 tokens</span>
+  </div>
+
+  <div class="viz-controls" role="group" aria-label="Surface unit level">
+    <button type="button" class="btn" data-kind="Paragraph" aria-pressed="false">Paragraphs</button>
+    <button type="button" class="btn" data-kind="Sentence" aria-pressed="false">Sentences</button>
+    <button type="button" class="btn btn-primary" data-kind="Token" aria-pressed="true">Tokens</button>
+  </div>
+
+  <div class="qa-rail" data-rail aria-label="Canonical source with selected surface spans"></div>
+
+  <div class="card qa-detail" aria-live="polite" data-detail></div>
+
+  <div class="table-responsive">
+    <table class="table table-sm">
+      <thead>
+        <tr>
+          <th scope="col">Unit</th>
+          <th scope="col">Parent</th>
+          <th scope="col" class="text-end">Start</th>
+          <th scope="col" class="text-end">End</th>
+          <th scope="col">Source slice</th>
+        </tr>
+      </thead>
+      <tbody data-rows></tbody>
+    </table>
+  </div>
+
+  <script>
+    (() => {
+      const root = document.getElementById("surface-atlas-qa");
+      const source = "First sentence.\n\nSecond 😀 sentence.";
+      const units = [
+        { id: "story:f2e94efc7f81:p0", kind: "Paragraph", ordinal: 0, start: 0, end: 15, parent: null },
+        { id: "story:f2e94efc7f81:p1", kind: "Paragraph", ordinal: 1, start: 17, end: 36, parent: null },
+        { id: "story:f2e94efc7f81:s0", kind: "Sentence", ordinal: 0, start: 0, end: 15, parent: "story:f2e94efc7f81:p0" },
+        { id: "story:f2e94efc7f81:s1", kind: "Sentence", ordinal: 1, start: 17, end: 36, parent: "story:f2e94efc7f81:p1" },
+        { id: "story:f2e94efc7f81:t0", kind: "Token", ordinal: 0, start: 0, end: 5, parent: "story:f2e94efc7f81:s0" },
+        { id: "story:f2e94efc7f81:t1", kind: "Token", ordinal: 1, start: 6, end: 14, parent: "story:f2e94efc7f81:s0" },
+        { id: "story:f2e94efc7f81:t2", kind: "Token", ordinal: 2, start: 14, end: 15, parent: "story:f2e94efc7f81:s0" },
+        { id: "story:f2e94efc7f81:t3", kind: "Token", ordinal: 3, start: 17, end: 23, parent: "story:f2e94efc7f81:s1" },
+        { id: "story:f2e94efc7f81:t4", kind: "Token", ordinal: 4, start: 24, end: 26, parent: "story:f2e94efc7f81:s1" },
+        { id: "story:f2e94efc7f81:t5", kind: "Token", ordinal: 5, start: 27, end: 35, parent: "story:f2e94efc7f81:s1" },
+        { id: "story:f2e94efc7f81:t6", kind: "Token", ordinal: 6, start: 35, end: 36, parent: "story:f2e94efc7f81:s1" }
+      ];
+      const rail = root.querySelector("[data-rail]");
+      const rows = root.querySelector("[data-rows]");
+      const detail = root.querySelector("[data-detail]");
+      const controls = Array.from(root.querySelectorAll("button[data-kind]"));
+      let kind = "Token";
+      let selectedId = "story:f2e94efc7f81:t4";
+
+      const shortId = id => id ? id.slice(id.lastIndexOf(":") + 1) : "—";
+      const slice = unit => source.slice(unit.start, unit.end);
+
+      function renderRail(current) {
+        rail.replaceChildren();
+        let cursor = 0;
+        current.forEach(unit => {
+          rail.append(document.createTextNode(source.slice(cursor, unit.start)));
+          const mark = document.createElement("span");
+          mark.className = `qa-mark${unit.id === selectedId ? " is-selected" : ""}`;
+          mark.dataset.unitId = unit.id;
+          mark.textContent = slice(unit);
+          rail.append(mark);
+          cursor = unit.end;
+        });
+        rail.append(document.createTextNode(source.slice(cursor)));
+      }
+
+      function select(unit) {
+        selectedId = unit.id;
+        render();
+      }
+
+      function renderRows(current) {
+        rows.replaceChildren();
+        current.forEach(unit => {
+          const row = document.createElement("tr");
+          const unitCell = document.createElement("th");
+          unitCell.scope = "row";
+          const choose = document.createElement("button");
+          choose.type = "button";
+          choose.className = unit.id === selectedId ? "btn btn-primary" : "btn btn-ghost";
+          choose.textContent = shortId(unit.id);
+          choose.setAttribute("aria-pressed", String(unit.id === selectedId));
+          choose.addEventListener("click", () => select(unit));
+          unitCell.append(choose);
+          row.append(unitCell);
+
+          const values = [shortId(unit.parent), unit.start, unit.end, slice(unit)];
+          values.forEach((value, index) => {
+            const cell = document.createElement("td");
+            if (index === 1 || index === 2) cell.className = "text-end";
+            if (index === 3) cell.className = "qa-fragment";
+            cell.textContent = String(value).replaceAll("\n", "↵");
+            row.append(cell);
+          });
+          rows.append(row);
+        });
+      }
+
+      function renderDetail(unit) {
+        detail.innerHTML = `
+          <div class="qa-detail-grid">
+            <div><span>Selected unit</span><code>${shortId(unit.id)}</code></div>
+            <div><span>Kind</span>${unit.kind}</div>
+            <div><span>UTF-16 span</span><span class="tabular-nums">[${unit.start}, ${unit.end})</span></div>
+            <div><span>Parent</span><code>${shortId(unit.parent)}</code></div>
+            <div><span>Source slice</span><span class="qa-fragment">${slice(unit).replaceAll("\n", "↵")}</span></div>
+          </div>`;
+      }
+
+      function render() {
+        const current = units.filter(unit => unit.kind === kind);
+        if (!current.some(unit => unit.id === selectedId)) selectedId = current[0].id;
+        const selected = current.find(unit => unit.id === selectedId);
+        controls.forEach(control => {
+          const active = control.dataset.kind === kind;
+          control.className = active ? "btn btn-primary" : "btn";
+          control.setAttribute("aria-pressed", String(active));
+        });
+        renderRail(current);
+        renderRows(current);
+        renderDetail(selected);
+      }
+
+      controls.forEach(control => {
+        control.addEventListener("click", () => {
+          kind = control.dataset.kind;
+          render();
+        });
+      });
+      render();
+    })();
+  </script>
+</div>
