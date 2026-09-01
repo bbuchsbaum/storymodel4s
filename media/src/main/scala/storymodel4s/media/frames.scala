@@ -1,17 +1,13 @@
 package storymodel4s.media
 
 import java.nio.file.Path
-import storymodel4s.core.{
-  Checksum,
-  ContentAddress,
-  DomainError,
-  SourceDerivationReceipt,
-  StreamKind
-}
+import storymodel4s.core.{Checksum, ContentAddress, DomainError, SourceDerivationReceipt}
 
 /** The one frame-extraction invocation this module admits: decode one picture stream to raw BGR24
   * frames with PTS passthrough (no frame duplication or dropping), no scaling, no cropping. The
   * preprocessing identity is exactly these arguments; nothing is left to a library default.
+  * `-protocol_whitelist file` asserts in the invocation that no media-controlled reference can
+  * widen the input set.
   */
 object Ffmpeg:
   val ToolName: String = "ffmpeg"
@@ -19,15 +15,13 @@ object Ffmpeg:
   val PixelFormat: String = "bgr24"
   val BytesPerPixel: Int = 3
 
-  /** Arguments between the tool and the input path; the input and output paths are appended by
-    * `extract` and never read from the media.
-    */
-  def canonicalArgs(streamIndex: Int): Vector[String] =
+  /** Options placed before the input path. */
+  val InputOptions: Vector[String] =
+    Vector("-hide_banner", "-loglevel", "error", "-y", "-protocol_whitelist", "file")
+
+  /** Options placed between the input path and the output path. */
+  def outputOptions(streamIndex: Int): Vector[String] =
     Vector(
-      "-hide_banner",
-      "-loglevel",
-      "error",
-      "-y",
       "-map",
       s"0:$streamIndex",
       "-f",
@@ -38,15 +32,17 @@ object Ffmpeg:
       "passthrough"
     )
 
+  /** The recorded argument vector: input options then output options, paths excluded. */
+  def canonicalArgs(streamIndex: Int): Vector[String] = InputOptions ++ outputOptions(streamIndex)
+
   /** The ffmpeg on this machine, if any. Never downloads, builds, or installs one. */
   def locate(): Option[Path] = Subprocess.locate(ToolName, EnvOverride)
 
   /** Decode `streamIndex` of `input` into `out`. A non-zero exit refuses with the tool's stderr. */
   def extract(tool: Path, input: Path, streamIndex: Int, out: Path): Either[DomainError, Unit] =
-    val args = canonicalArgs(streamIndex)
     val command =
-      (Vector(tool.toString, args(0), args(1), args(2), args(3), "-i", input.toString) ++
-        args.drop(4)) :+ out.toString
+      (tool.toString +: InputOptions) ++ Vector("-i", input.toString) ++
+        outputOptions(streamIndex) :+ out.toString
     Subprocess.run(command).flatMap { outcome =>
       if outcome.exitCode == 0 then Right(())
       else
@@ -58,7 +54,7 @@ object Ffmpeg:
         )
     }
 
-/** Picture geometry the extraction was declared against. */
+/** Picture geometry in pixels. */
 final case class PictureGeometry(width: Int, height: Int):
   def frameBytes: Long = width.toLong * height.toLong * Ffmpeg.BytesPerPixel.toLong
 
@@ -89,13 +85,7 @@ object FramesEnvelope:
       fixtureId <- MediaJson.string(c.downField("fixtureId"), "fixtureId")
       input <- MediaJson.string(c.downField("inputSha256"), "inputSha256").flatMap(Checksum.from)
       streamIndex <- MediaJson.int(c.downField("streamIndex"), "streamIndex")
-      t = c.downField("tool")
-      name <- MediaJson.string(t.downField("name"), "tool.name")
-      version <- MediaJson.string(t.downField("versionLine"), "tool.versionLine")
-      binary <- MediaJson
-        .string(t.downField("binarySha256"), "tool.binarySha256")
-        .flatMap(Checksum.from)
-      tool <- ToolRealization.of(name, version, binary)
+      tool <- MediaJson.tool(c.downField("tool"))
       argsJson <- MediaJson.array(c.downField("args"), "args")
       args <- MediaJson.traverse(argsJson)(j => MediaJson.string(j.hcursor, "args[]"))
       f = c.downField("frames")
@@ -144,7 +134,7 @@ final class FrameSet private (
     s"FrameSet(${probe.manifest.fixtureId}, $count frames, ${identity.short()})"
 
 object FrameSet:
-  val Algorithm: String = "ffmpeg-bgr24-frames/v1"
+  val Algorithm: String = "ffmpeg-bgr24-frames/v2"
 
   def parameters(tool: ToolRealization, args: Vector[String], geometry: PictureGeometry): String =
     (Vector(
@@ -153,13 +143,14 @@ object FrameSet:
       "geometry",
       s"${geometry.width}x${geometry.height}",
       "args"
-    ) ++ args)
-      .mkString(" ")
+    ) ++
+      args.map(a => s"${a.length}:$a")).mkString(" ")
 
-  /** Join decoded bytes to the probe. Refuses when the stream is not a picture stream, when the
-    * packet index cannot be built, or when the byte length is not exactly one frame per indexed
-    * packet: a decoder that emitted more or fewer frames than the container has packets is not
-    * describing these packets.
+  /** Join decoded bytes to the probe. Refuses when the stream is not a picture stream declared
+    * `Decoded`, when the geometry differs from the manifest's declaration, when the packet index
+    * cannot be built, or when the byte length is not exactly one frame per presented packet: a
+    * decoder that emitted more or fewer frames than the container presents is not describing these
+    * packets.
     */
   def join(
       probe: MediaProbe,
@@ -176,18 +167,30 @@ object FrameSet:
         .toRight(
           DomainError.InvariantViolation("frames/stream", s"probe has no stream $streamIndex")
         )
+      picture <- stream.declared.picture.toRight(
+        DomainError.InvariantViolation(
+          "frames/stream",
+          s"stream $streamIndex is ${stream.declared.kind}, not a picture stream"
+        )
+      )
       _ <-
-        if stream.declared.kind == StreamKind.Picture then Right(())
+        if stream.declared.disposition == StreamDisposition.Decoded then Right(())
         else
           Left(
             DomainError.InvariantViolation(
-              "frames/stream",
-              s"stream $streamIndex is ${stream.declared.kind}, not a picture stream"
+              "frames/disposition",
+              s"stream $streamIndex is declared ${stream.declared.disposition}; only a Decoded stream may yield frames"
             )
           )
       _ <-
-        if geometry.width > 0 && geometry.height > 0 then Right(())
-        else Left(DomainError.InvariantViolation("frames/geometry", "non-positive geometry"))
+        if geometry == picture.geometry then Right(())
+        else
+          Left(
+            DomainError.InvariantViolation(
+              "frames/geometry",
+              s"stream $streamIndex: extraction declares ${geometry.width}x${geometry.height}, manifest declares ${picture.geometry.width}x${picture.geometry.height}"
+            )
+          )
       index <- PacketIndex.of(stream)
       expected = geometry.frameBytes * index.entries.size.toLong
       _ <-
@@ -196,7 +199,7 @@ object FrameSet:
           Left(
             DomainError.InvariantViolation(
               "frames/bytes",
-              s"$byteLength decoded bytes; ${index.entries.size} indexed packets of ${geometry.frameBytes} bytes require $expected"
+              s"$byteLength decoded bytes; ${index.entries.size} presented packets of ${geometry.frameBytes} bytes require $expected"
             )
           )
       receipt <- SourceDerivationReceipt.of(

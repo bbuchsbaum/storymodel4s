@@ -8,7 +8,8 @@ import storymodel4s.core.{
   Checksum,
   DomainError,
   ObservationAuthority,
-  RationalTimebase
+  RationalTimebase,
+  TimestampField
 }
 
 /** The F1 rung of the first acquisition court (ledger §6 item 2): a checksummed *Big Buck Bunny*
@@ -105,7 +106,7 @@ class F1ExcerptSuite extends FunSuite:
     "the excerpt's recorded probe replays: 720 picture packets at 512 ticks on 1/12288, extent [0, 368640)"
   ):
     assertEquals(f1.probe.authority, ObservationAuthority.Draft)
-    assertEquals(f1.manifest.tier, "F1")
+    assertEquals(f1.manifest.tier, FixtureTier.F1)
     val video = right(PacketIndex.of(f1.probe.stream(0).get))
     assertEquals(video.entries.size, 720)
     assertEquals(video.timebase, right(RationalTimebase.of(1L, 12288L)))
@@ -115,9 +116,11 @@ class F1ExcerptSuite extends FunSuite:
     assertEquals(video.firstPts, 0L)
     assertEquals(video.endExclusive, Some(368640L))
     assert(
-      f1.probe.stream(0).get.packets.forall(p => p.rawPts == p.rawDts),
+      f1.probe.stream(0).get.packets.forall(p => p.pts == p.dts),
       "no B-frames: PTS equals DTS"
     )
+    assertEquals(video.discarded, 0)
+    assert(f1.probe.stream(0).get.packets.forall(!_.flags.corrupt))
     assertEquals(f1.probe.stream(0).get.declared.disposition, StreamDisposition.Decoded)
 
   test("the audio index starts at a negative PTS, which is lawful, and tiles contiguously"):
@@ -215,8 +218,10 @@ class F1ExcerptSuite extends FunSuite:
         right(FfprobeJson.parse(right(Ffprobe.invoke(ffprobe.get, excerpt.get))))
       )
     )
-    def table(p: MediaProbe): Vector[(Int, Long, Long, Long)] =
-      p.streams.flatMap(s => s.packets.map(k => (s.index, k.rawPts, k.rawDts, k.durationTicks)))
+    def table(p: MediaProbe): Vector[(Int, TimestampField, TimestampField, Option[Long], String)] =
+      p.streams.flatMap(s =>
+        s.packets.map(k => (s.index, k.pts, k.dts, k.durationReported, k.flags.raw))
+      )
     assertEquals(table(liveProbe), table(f1.probe))
     if probeTool == f1.probeEnvelope.tool then assertEquals(liveProbe.identity, f1.probe.identity)
     val dir = Files.createTempDirectory("f1-boundary-")

@@ -16,9 +16,11 @@ runs on 2026-09-01 produced identical bytes. If the bytes ever change, the manif
 stdout must be re-recorded together and the change explained in the commit.
 
 What this fixture may support: container and stream ingest, exact rational timebase, PTS/DTS
-handling, gaps, variable frame rate, and replay. What it cannot support: anything about speech,
-identity, visual semantics, narrative structure, or recall alignment. It carries no text, no faces,
-no third-party material.
+handling, variable frame rate with holds, and replay. Its dropped frames are holds (the preceding
+packet's duration reaches the next PTS), not presentation gaps; a gap court runs on an edited packet
+table, not on these bytes. What it cannot support: anything about speech, identity, visual
+semantics, narrative structure, or recall alignment. It carries no text, no faces, no third-party
+material. Byte reproducibility of the generator is bound to the exact FFmpeg build it names.
 
 Authority: the generation is project-authored. Every runtime record a tool produces over these
 bytes is `Draft` under ADR 0007 C1, whatever tool produced it, until an authorized E0 adapter

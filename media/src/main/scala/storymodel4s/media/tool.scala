@@ -57,7 +57,7 @@ object ToolRealization:
   def observe(name: String, path: Path): Either[DomainError, ToolRealization] =
     for
       resolved <- readable(path)
-      bytes <- Right(Files.readAllBytes(resolved))
+      bytes <- bytesOf(resolved)
       outcome <- Subprocess.run(Vector(resolved.toString, "-version"))
       line <- outcome.stdout.linesIterator.find(_.trim.nonEmpty) match
         case Some(l) if outcome.exitCode == 0 => Right(l.trim)
@@ -70,6 +70,12 @@ object ToolRealization:
           )
       tool <- of(name, line, Checksum.ofBytes(bytes))
     yield tool
+
+  private def bytesOf(path: Path): Either[DomainError, Array[Byte]] =
+    try Right(Files.readAllBytes(path))
+    catch
+      case e: java.io.IOException =>
+        Left(DomainError.InvariantViolation("tool/path", s"$path: ${e.getMessage}"))
 
   private def readable(path: Path): Either[DomainError, Path] =
     try

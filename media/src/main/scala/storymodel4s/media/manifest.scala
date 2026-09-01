@@ -3,9 +3,14 @@ package storymodel4s.media
 import io.circe.{ACursor, Json}
 import storymodel4s.core.{Checksum, DomainError, RationalTimebase, StreamKind}
 
+/** The fixture ladder of the movie plan (§9). */
+enum FixtureTier:
+  case F0, F1, F2
+
 /** What an admitted input manifest says may happen to a stream. Why: the ledger forbids silently
   * ignoring an unexpected stream, so every probed stream must match a declaration carrying one of
-  * exactly these three dispositions.
+  * exactly these three dispositions. `Decoded` is the only disposition under which frames may be
+  * extracted; `Unsupported` streams are probed and named but never indexed.
   */
 enum StreamDisposition:
   case Decoded, PacketIndexedOnly, Unsupported
@@ -14,10 +19,10 @@ enum StreamDisposition:
   * spacing, and which were dropped with PTS passthrough. From it the expected PTS table follows
   * without consulting any probe; the court compares the two.
   */
-final case class DeclaredFrames(
-    generatedFrames: Int,
-    nominalTicksPerFrame: Long,
-    droppedFrames: Vector[Int]
+final class DeclaredFrames private (
+    val generatedFrames: Int,
+    val nominalTicksPerFrame: Long,
+    val droppedFrames: Vector[Int]
 ):
   def expectedPts: Vector[Long] =
     val dropped = droppedFrames.toSet
@@ -25,9 +30,40 @@ final case class DeclaredFrames(
       .filterNot(dropped.contains)
       .map(n => n.toLong * nominalTicksPerFrame)
       .toVector
+  override def equals(other: Any): Boolean = other match
+    case that: DeclaredFrames =>
+      generatedFrames == that.generatedFrames && nominalTicksPerFrame == that.nominalTicksPerFrame &&
+      droppedFrames == that.droppedFrames
+    case _ => false
+  override def hashCode(): Int = (generatedFrames, nominalTicksPerFrame, droppedFrames).hashCode()
+  override def toString: String =
+    s"DeclaredFrames($generatedFrames x $nominalTicksPerFrame, dropped ${droppedFrames.mkString(",")})"
 
-/** One declared stream of an admitted fixture. `declaredFrames` and `declaredSamples` are generator
-  * ground truth and are present only for project-authored media.
+object DeclaredFrames:
+  def of(
+      generatedFrames: Int,
+      nominalTicksPerFrame: Long,
+      droppedFrames: Vector[Int]
+  ): Either[DomainError, DeclaredFrames] =
+    if generatedFrames <= 0 || nominalTicksPerFrame <= 0L then
+      Left(DomainError.InvariantViolation("fixture/declared", "frames and ticks must be positive"))
+    else if droppedFrames.exists(n => n < 0 || n >= generatedFrames) then
+      Left(
+        DomainError.InvariantViolation("fixture/declared", "dropped frame outside generated range")
+      )
+    else if droppedFrames.distinct.size != droppedFrames.size then
+      Left(DomainError.InvariantViolation("fixture/declared", "dropped frame listed twice"))
+    else Right(new DeclaredFrames(generatedFrames, nominalTicksPerFrame, droppedFrames.sorted))
+
+/** Declared picture parameters the tool must confirm. */
+final case class DeclaredPicture(pixFmt: String, geometry: PictureGeometry)
+
+/** Declared audio parameters the tool must confirm. */
+final case class DeclaredAudio(sampleRate: Int, channels: Int)
+
+/** One declared stream of an admitted fixture. A picture stream carries `picture`, an audio stream
+  * carries `audio`; `declaredFrames` and `declaredSamples` are generator ground truth and are
+  * present only for project-authored media.
   */
 final case class DeclaredStream(
     index: Int,
@@ -35,6 +71,8 @@ final case class DeclaredStream(
     codec: String,
     timebase: RationalTimebase,
     disposition: StreamDisposition,
+    picture: Option[DeclaredPicture],
+    audio: Option[DeclaredAudio],
     declaredFrames: Option[DeclaredFrames],
     declaredSamples: Option[Long]
 )
@@ -44,7 +82,7 @@ final case class DeclaredStream(
   */
 final class FixtureManifest private (
     val fixtureId: String,
-    val tier: String,
+    val tier: FixtureTier,
     val file: String,
     val sha256: Checksum,
     val byteLength: Long,
@@ -84,7 +122,7 @@ object FixtureManifest:
       c = json.hcursor
       _ <- MediaJson.expectSchema(c, Schema, 1)
       fixtureId <- MediaJson.string(c.downField("fixtureId"), "fixtureId")
-      tier <- MediaJson.string(c.downField("tier"), "tier")
+      tier <- MediaJson.string(c.downField("tier"), "tier").flatMap(parseTier)
       file <- MediaJson.string(c.downField("file"), "file")
       sha <- MediaJson.string(c.downField("sha256"), "sha256").flatMap(Checksum.from)
       byteLength <- MediaJson.long(c.downField("byteLength"), "byteLength")
@@ -93,6 +131,12 @@ object FixtureManifest:
       streams <- MediaJson.traverse(streamJson)(parseStream)
       _ <- distinctIndices(streams)
     yield new FixtureManifest(fixtureId, tier, file, sha, byteLength, container, streams)
+
+  private def parseTier(raw: String): Either[DomainError, FixtureTier] = raw match
+    case "F0"  => Right(FixtureTier.F0)
+    case "F1"  => Right(FixtureTier.F1)
+    case "F2"  => Right(FixtureTier.F2)
+    case other => Left(DomainError.InvalidFormat("tier", other, "expected F0, F1, or F2"))
 
   private def distinctIndices(streams: Vector[DeclaredStream]): Either[DomainError, Unit] =
     val dup = streams.groupBy(_.index).collectFirst { case (i, s) if s.size > 1 => i }
@@ -119,10 +163,51 @@ object FixtureManifest:
       disposition <- MediaJson
         .string(c.downField("disposition"), "streams[].disposition")
         .flatMap(parseDisposition)
+      picture <- parsePicture(c, kind)
+      audio <- parseAudio(c, kind)
       declared = c.downField("declared")
       frames <- parseFrames(declared)
       samples <- MediaJson.optionalLong(declared.downField("samples"), "declared.samples")
-    yield DeclaredStream(index, kind, codec, timebase, disposition, frames, samples)
+    yield DeclaredStream(
+      index,
+      kind,
+      codec,
+      timebase,
+      disposition,
+      picture,
+      audio,
+      frames,
+      samples
+    )
+
+  private def parsePicture(
+      c: ACursor,
+      kind: StreamKind
+  ): Either[DomainError, Option[DeclaredPicture]] =
+    kind match
+      case StreamKind.Picture =>
+        for
+          pixFmt <- MediaJson.string(c.downField("pixFmt"), "streams[].pixFmt")
+          width <- MediaJson.int(c.downField("width"), "streams[].width")
+          height <- MediaJson.int(c.downField("height"), "streams[].height")
+          _ <-
+            if width > 0 && height > 0 then Right(())
+            else Left(DomainError.InvariantViolation("fixture/picture", "non-positive geometry"))
+        yield Some(DeclaredPicture(pixFmt, PictureGeometry(width, height)))
+      case _ => Right(None)
+
+  private def parseAudio(c: ACursor, kind: StreamKind): Either[DomainError, Option[DeclaredAudio]] =
+    kind match
+      case StreamKind.Audio =>
+        for
+          rate <- MediaJson.int(c.downField("sampleRate"), "streams[].sampleRate")
+          channels <- MediaJson.int(c.downField("channels"), "streams[].channels")
+          _ <-
+            if rate > 0 && channels > 0 then Right(())
+            else
+              Left(DomainError.InvariantViolation("fixture/audio", "non-positive audio parameters"))
+        yield Some(DeclaredAudio(rate, channels))
+      case _ => Right(None)
 
   private def parseFrames(declared: ACursor): Either[DomainError, Option[DeclaredFrames]] =
     if declared.downField("generatedFrames").focus.isEmpty then Right(None)
@@ -143,19 +228,8 @@ object FixtureManifest:
         dropped <- MediaJson.traverse(droppedJson)(j =>
           MediaJson.int(j.hcursor, "declared.droppedFrames[]")
         )
-        _ <-
-          if generated <= 0 || ticks <= 0L then
-            Left(
-              DomainError
-                .InvariantViolation("fixture/declared", "frames and ticks must be positive")
-            )
-          else if dropped.exists(n => n < 0 || n >= generated) then
-            Left(
-              DomainError
-                .InvariantViolation("fixture/declared", "dropped frame outside generated range")
-            )
-          else Right(())
-      yield Some(DeclaredFrames(generated, ticks, dropped))
+        frames <- DeclaredFrames.of(generated, ticks, dropped)
+      yield Some(frames)
 
   private def parseKind(raw: String): Either[DomainError, StreamKind] = raw match
     case "Picture"  => Right(StreamKind.Picture)
@@ -194,7 +268,8 @@ object FixtureManifest:
 
 /** Recorded invocation of an external tool over an admitted fixture: the tool that ran, the exact
   * arguments, and the digest of the stdout it produced. This is the "injected typed receipt" the
-  * admission ledger lets ordinary CI replay instead of executing the tool.
+  * admission ledger lets ordinary CI replay instead of executing the tool. It is caller-writable on
+  * purpose: a recorded envelope is Draft evidence about a past run, never an observation.
   */
 final case class ProbeEnvelope(
     fixtureId: String,
@@ -226,13 +301,7 @@ object ProbeEnvelope:
       _ <- MediaJson.expectSchema(c, Schema, 1)
       fixtureId <- MediaJson.string(c.downField("fixtureId"), "fixtureId")
       input <- MediaJson.string(c.downField("inputSha256"), "inputSha256").flatMap(Checksum.from)
-      t = c.downField("tool")
-      name <- MediaJson.string(t.downField("name"), "tool.name")
-      version <- MediaJson.string(t.downField("versionLine"), "tool.versionLine")
-      binary <- MediaJson
-        .string(t.downField("binarySha256"), "tool.binarySha256")
-        .flatMap(Checksum.from)
-      tool <- ToolRealization.of(name, version, binary)
+      tool <- MediaJson.tool(c.downField("tool"))
       argsJson <- MediaJson.array(c.downField("args"), "args")
       args <- MediaJson.traverse(argsJson)(j => MediaJson.string(j.hcursor, "args[]"))
       stdoutFile <- MediaJson.string(c.downField("stdoutFile"), "stdoutFile")
@@ -258,35 +327,27 @@ private[media] object MediaJson:
         else Right(())
     yield ()
 
+  /** A recorded tool realization: name, version line, and the digest of the executable. */
+  def tool(t: ACursor): Either[DomainError, ToolRealization] =
+    for
+      name <- string(t.downField("name"), "tool.name")
+      version <- string(t.downField("versionLine"), "tool.versionLine")
+      binary <- string(t.downField("binarySha256"), "tool.binarySha256").flatMap(Checksum.from)
+      tool <- ToolRealization.of(name, version, binary)
+    yield tool
+
+  private def absent(c: ACursor): String = c.focus.map(_.noSpaces).getOrElse("<absent>")
+
   def string(c: ACursor, field: String): Either[DomainError, String] =
-    c.as[String]
-      .left
-      .map(_ =>
-        DomainError
-          .InvalidFormat(field, c.focus.map(_.noSpaces).getOrElse("<absent>"), "expected a string")
-      )
+    c.as[String].left.map(_ => DomainError.InvalidFormat(field, absent(c), "expected a string"))
 
   def int(c: ACursor, field: String): Either[DomainError, Int] =
-    c.as[Int]
-      .left
-      .map(_ =>
-        DomainError.InvalidFormat(
-          field,
-          c.focus.map(_.noSpaces).getOrElse("<absent>"),
-          "expected an integer"
-        )
-      )
+    c.as[Int].left.map(_ => DomainError.InvalidFormat(field, absent(c), "expected an integer"))
 
   def long(c: ACursor, field: String): Either[DomainError, Long] =
     c.as[Long]
       .left
-      .map(_ =>
-        DomainError.InvalidFormat(
-          field,
-          c.focus.map(_.noSpaces).getOrElse("<absent>"),
-          "expected a 64-bit integer"
-        )
-      )
+      .map(_ => DomainError.InvalidFormat(field, absent(c), "expected a 64-bit integer"))
 
   def optionalLong(c: ACursor, field: String): Either[DomainError, Option[Long]] =
     if c.focus.isEmpty then Right(None) else long(c, field).map(Some(_))
@@ -296,49 +357,24 @@ private[media] object MediaJson:
     if c.focus.forall(_.isNull) then Right(None) else int(c, field).map(Some(_))
 
   def double(c: ACursor, field: String): Either[DomainError, Double] =
-    c.as[Double]
-      .left
-      .map(_ =>
-        DomainError.InvalidFormat(
-          field,
-          c.focus.map(_.noSpaces).getOrElse("<absent>"),
-          "expected a number"
-        )
-      )
+    c.as[Double].left.map(_ => DomainError.InvalidFormat(field, absent(c), "expected a number"))
 
   def boolean(c: ACursor, field: String): Either[DomainError, Boolean] =
-    c.as[Boolean]
-      .left
-      .map(_ =>
-        DomainError.InvalidFormat(
-          field,
-          c.focus.map(_.noSpaces).getOrElse("<absent>"),
-          "expected a boolean"
-        )
-      )
+    c.as[Boolean].left.map(_ => DomainError.InvalidFormat(field, absent(c), "expected a boolean"))
 
   def stringMap(c: ACursor, field: String): Either[DomainError, Map[String, String]] =
     c.as[Map[String, String]]
       .left
-      .map(_ =>
-        DomainError.InvalidFormat(
-          field,
-          c.focus.map(_.noSpaces).getOrElse("<absent>"),
-          "expected an object of strings"
-        )
-      )
+      .map(_ => DomainError.InvalidFormat(field, absent(c), "expected an object of strings"))
 
   def array(c: ACursor, field: String): Either[DomainError, Vector[Json]] =
     c.as[Vector[Json]]
       .left
-      .map(_ =>
-        DomainError
-          .InvalidFormat(field, c.focus.map(_.noSpaces).getOrElse("<absent>"), "expected an array")
-      )
+      .map(_ => DomainError.InvalidFormat(field, absent(c), "expected an array"))
 
-  def traverse[A](
-      items: Vector[Json]
-  )(f: Json => Either[DomainError, A]): Either[DomainError, Vector[A]] =
+  def traverse[A](items: Vector[Json])(
+      f: Json => Either[DomainError, A]
+  ): Either[DomainError, Vector[A]] =
     items.foldLeft[Either[DomainError, Vector[A]]](Right(Vector.empty)) { (acc, j) =>
       acc.flatMap(v => f(j).map(v :+ _))
     }

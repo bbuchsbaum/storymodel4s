@@ -19,7 +19,7 @@
       "kind": "Picture",
       "codec": "rawvideo",
       "timebase": "1/24000",
-      "disposition": "PacketIndexedOnly",
+      "disposition": "Decoded",
       "pixFmt": "rgb24",
       "width": 32,
       "height": 18,

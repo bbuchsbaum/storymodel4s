@@ -2,7 +2,7 @@
 
 **Bead:** `bd-01M188P265MZVEKBD5BBN34E6T`
 
-**Court disposition:** `Held`; documentation-only B0 component-ledger leg
+**Court disposition:** `Authorized(bd-01M1FDNN3T4SKZ5ZJN1XGXYNY7, local draft realization)` since 2026-09-01 (§6.1); was `Held` for the documentation-only B0 component-ledger leg of 2026-08-29
 
 **Inspection date:** 2026-08-29
 
@@ -317,9 +317,43 @@ use while every record stays `Draft`; it is the E0 bead's cost, not this one's.
 
 Beads executed under this authorization: `bd-01M1FDNN3T4SKZ5ZJN1XGXYNY7`
 (landing A: F0, `ffprobe` ingest, replay) and `bd-01M1FEN59CZCCR0SR3B6MZ1KYB`
-(landing B: decode to identified frames, `ContentDetector` proposals). The F1
-excerpt is not yet admitted; its manifest, derivation record and attribution
-receipt are the next bead's first deliverable.
+(landing B: decode to identified frames, `ContentDetector` proposals, and the
+F1 excerpt: manifest with archive and inner-file hashes, derivation script,
+CC BY 3.0 attribution, recorded probe, decode and detector run under
+`media/src/test/resources/f1/`).
+
+### 6.2 Local realizations: five-axis records
+
+§1 says only a `Realized(digest)` record may make claims about executable
+bytes. The §4 and §5 records describe the *nominated* recipes and keep
+`RecipeOnly`; the bytes that actually ran are different components and get
+their own rows. They are `CandidateOnly`: admitted for local Draft evidence on
+the owner's workstation, not nominated for any distributed court.
+
+| Key | Component | Selection | Rights/access | Role | Operational posture | Realization | Reason and limits |
+|---|---|---|---|---|---|---|---|
+| `decode.ffmpeg.local-homebrew-7.1.1` | Homebrew `ffmpeg/7.1.1_3` (`ffprobe` and `ffmpeg` front ends) | `CandidateOnly` | `PaperworkAdmitted` for local execution only; redistribution `Incompatible` with the §4 LGPL-only policy (built `--enable-gpl --enable-version3 --enable-libx264`, network, devices and hardware acceleration enabled: every entry of §4's forbidden-configuration row) | `DeterministicTransform` | `LocalRealized` | `Realized(83f66b74…)` for `ffprobe`, `Realized(14c12cd5…)` for `ffmpeg`; libraries below | Produces the recorded F0/F1 probes and decodes. Every output is `Draft`. Not the nominated 9.0.1 recipe; a probe replayed under 9.0.1 is a different derivation by construction (`ToolRealization` enters every receipt). Invocations pass `-protocol_whitelist file`; stderr is not receipted. |
+| `boundary.pyscenedetect.content.local-venv` | `scenedetect-headless` 0.7.1 from the §5 wheel digest, in a local venv (CPython 3.13.11, numpy 2.5.2, opencv-python-headless 5.0.0), driven by `media/worker/scenedetect_worker.py` | `CandidateOnly` | `PaperworkAdmitted` (BSD-3-Clause wheel, hash-pinned in `media/worker/uv.lock`); transitive native notices `HoldUnknown` | `Measurement` + `Proposal` | `LocalRealized` | `Realized(c5e3300f…)` for the worker script; wheel `0594131c…` | Raw metrics and boundary-existence/localization proposals only, through `process_frame`. No container, no SBOM. `ToolRealization` for the worker covers the script bytes and runtime versions, not the wheel bytes. |
+
+Shared libraries loaded by both FFmpeg front ends (`otool -L`, SHA-256 of the
+resolved dylib), recorded because the front-end digest alone does not name
+the code that demuxes and decodes:
+
+| Library | SHA-256 |
+|---|---|
+| `libavformat.61.7.100.dylib` | `ff017d451e8f95392ccd403f168f1588e771327de1f11adbf17193f974fb9771` |
+| `libavcodec.61.19.101.dylib` | `06e1666163b1fa9a0b512cde13c9252b7a0134482bf042ff26cb07e2e2c076cf` |
+| `libavutil.59.39.100.dylib` | `855977ee5cad664532b676d9db64363bc336bb835e7a0dbcb42989cc398f0997` |
+| `libswscale.8.3.100.dylib` | `af6229d7460fb99383e852922d478b2fb38679ab3614016f20978032fac1868b` |
+| `libswresample.5.3.100.dylib` | `369cf4615251e4d137f17afa4f578906649e7d159c216cf6683ac5b44adc445f` |
+| `libavfilter.10.4.100.dylib` | `38873055719b8fd5d909d6d72e5f4b280508bc450d55ddacd48f6d542fab1b51` |
+| `libavdevice.61.3.100.dylib` | `c38bd1d9a029558718832def8c1b62382f489c976548c93ffca4589f0c29f4ab` |
+
+The `ToolRealization` identity in the envelopes hashes the front-end binary
+only. The library digests above are documentation of what those front ends
+loaded on 2026-09-01; they are not bound into the receipts, and a receipt
+therefore cannot distinguish two installs that share a front end and differ in
+a library. That is a known gap of the local realization, not of the contract.
 
 ## 7. Completion gate
 
@@ -333,7 +367,10 @@ This ledger leg is complete only when:
 4. every nominated role states what it cannot establish;
 5. every unresolved selected leaf holds or removes its parent component;
 6. the FFmpeg and PySceneDetect recipes are fully paperwork-admitted for the
-   narrow F0/F1 court, or that court is explicitly held;
+   narrow F0/F1 court, or that court is explicitly held (satisfied on
+   2026-08-29 by holding; superseded on 2026-09-01 by the §6.1 authorization,
+   under which the recipes stay `RecipeOnly` and local realizations are
+   recorded separately in §6.2);
 7. owner-only actions link to the chief's bead and remain unperformed here;
 8. no source media, participant text, weight, package, container, credential,
    gated term, or executable was obtained;
@@ -360,7 +397,9 @@ above and close no source, participant, package, dependency, container, codec,
 model, weight, service-term, runtime, P1, B0, or C1 gate.
 
 This record closes only the independent-review condition for the
-component-ledger documentation leg. The first court remains `Held`. The final
+component-ledger documentation leg. The first court remained `Held` at that
+review; §6.1 records its later authorization, which those reviewers did not
+see and do not endorse. The final
 artifact hash and candidate-level reviews are recorded outside this file to
 avoid making the artifact identify a hash that changes when the record is
 written.

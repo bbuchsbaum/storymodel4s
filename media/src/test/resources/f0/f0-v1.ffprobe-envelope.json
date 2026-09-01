@@ -11,7 +11,7 @@
     "binarySha256": "83f66b74c1f0fe3995f762adbaa90c1d32fbd8e1feceedc64fed4261e1a65ebb",
     "realization": "local Homebrew build (GPL-enabled, general purpose). Not the nominated FFmpeg 9.0.1 LGPL-only probe-only recipe of the admission ledger; that recipe stays RecipeOnly. Output authority: Draft."
   },
-  "args": ["-v", "error", "-hide_banner", "-of", "json", "-show_streams", "-show_packets"],
+  "args": ["-v", "error", "-hide_banner", "-protocol_whitelist", "file", "-of", "json", "-show_streams", "-show_packets"],
   "stdoutFile": "f0-v1.ffprobe-stdout.json",
   "stdoutSha256": "bb92e04f3720df64f74e6b4c155bda6d58998df6f36eeb1e8a9ad4aadcabc8ec",
   "recordedAt": "2026-09-01",

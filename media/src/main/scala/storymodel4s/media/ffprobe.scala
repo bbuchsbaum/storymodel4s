@@ -1,6 +1,6 @@
 package storymodel4s.media
 
-import io.circe.Json
+import io.circe.{ACursor, Json}
 import java.nio.file.Path
 import storymodel4s.core.DomainError
 
@@ -19,9 +19,22 @@ final case class RawStream(
     channels: Option[Int]
 )
 
+/** ffprobe's three packet flags, typed. `raw` keeps the exact string for the identity preimage. */
+final case class PacketFlags(keyframe: Boolean, discard: Boolean, corrupt: Boolean, raw: String)
+
+object PacketFlags:
+  /** ffprobe prints three positions: `K` or `_`, `D` or `_`, `C` or `_`. Anything else refuses. */
+  def parse(raw: String): Either[DomainError, PacketFlags] =
+    raw.toList match
+      case List(k, d, c) if Set('K', '_')(k) && Set('D', '_')(d) && Set('C', '_')(c) =>
+        Right(PacketFlags(k == 'K', d == 'D', c == 'C', raw))
+      case _ =>
+        Left(DomainError.InvalidFormat("packets[].flags", raw, "expected three of K/_ D/_ C/_"))
+
 /** One packet as ffprobe reported it. `pts`, `dts` and `duration` are `None` exactly when the JSON
-  * omitted the field, which is how ffprobe renders `AV_NOPTS_VALUE`. Nothing here decides what a
-  * missing field means; that is the join's job, and it is typed there.
+  * omitted the field, which is how ffprobe renders `AV_NOPTS_VALUE`. A literal `INT64_MIN` in the
+  * JSON is refused at parse: it is neither a present coordinate nor the typed absence, so it cannot
+  * be allowed to become either downstream.
   */
 final case class RawPacket(
     streamIndex: Int,
@@ -29,7 +42,7 @@ final case class RawPacket(
     dts: Option[Long],
     duration: Option[Long],
     size: Long,
-    flags: String
+    flags: PacketFlags
 )
 
 final case class FfprobeOutput(streams: Vector[RawStream], packets: Vector[RawPacket])
@@ -38,6 +51,8 @@ final case class FfprobeOutput(streams: Vector[RawStream], packets: Vector[RawPa
   * JSON numbers are read as 64-bit integers; the ones it prints as strings (`size`) are parsed.
   */
 object FfprobeJson:
+  private val Sentinel: Long = Long.MinValue
+
   def parse(stdout: String): Either[DomainError, FfprobeOutput] =
     for
       json <- MediaJson.parseDocument("ffprobe-json", stdout)
@@ -56,10 +71,10 @@ object FfprobeJson:
       codecName <- MediaJson.string(c.downField("codec_name"), "streams[].codec_name")
       timeBase <- MediaJson.string(c.downField("time_base"), "streams[].time_base")
       pixFmt <- optString(c.downField("pix_fmt"), "streams[].pix_fmt")
-      width <- optInt(c.downField("width"), "streams[].width")
-      height <- optInt(c.downField("height"), "streams[].height")
+      width <- MediaJson.optionalInt(c.downField("width"), "streams[].width")
+      height <- MediaJson.optionalInt(c.downField("height"), "streams[].height")
       sampleRate <- optIntString(c.downField("sample_rate"), "streams[].sample_rate")
-      channels <- optInt(c.downField("channels"), "streams[].channels")
+      channels <- MediaJson.optionalInt(c.downField("channels"), "streams[].channels")
     yield RawStream(
       index,
       codecType,
@@ -76,37 +91,63 @@ object FfprobeJson:
     val c = json.hcursor
     for
       streamIndex <- MediaJson.int(c.downField("stream_index"), "packets[].stream_index")
-      pts <- MediaJson.optionalLong(c.downField("pts"), "packets[].pts")
-      dts <- MediaJson.optionalLong(c.downField("dts"), "packets[].dts")
+      pts <- timestamp(c.downField("pts"), "packets[].pts")
+      dts <- timestamp(c.downField("dts"), "packets[].dts")
       duration <- MediaJson.optionalLong(c.downField("duration"), "packets[].duration")
       size <- MediaJson
         .string(c.downField("size"), "packets[].size")
         .flatMap(parseLong("packets[].size"))
-      flags <- MediaJson.string(c.downField("flags"), "packets[].flags")
+      flags <- MediaJson.string(c.downField("flags"), "packets[].flags").flatMap(PacketFlags.parse)
     yield RawPacket(streamIndex, pts, dts, duration, size, flags)
 
-  private def optString(c: io.circe.ACursor, field: String): Either[DomainError, Option[String]] =
+  private def timestamp(c: ACursor, field: String): Either[DomainError, Option[Long]] =
+    MediaJson.optionalLong(c, field).flatMap {
+      case Some(v) if v == Sentinel =>
+        Left(
+          DomainError.InvalidFormat(
+            field,
+            v.toString,
+            "a literal AV_NOPTS_VALUE is not a present coordinate; absence is the typed missing"
+          )
+        )
+      case other => Right(other)
+    }
+
+  private def optString(c: ACursor, field: String): Either[DomainError, Option[String]] =
     if c.focus.isEmpty then Right(None) else MediaJson.string(c, field).map(Some(_))
 
-  private def optInt(c: io.circe.ACursor, field: String): Either[DomainError, Option[Int]] =
-    if c.focus.isEmpty then Right(None) else MediaJson.int(c, field).map(Some(_))
-
-  private def optIntString(c: io.circe.ACursor, field: String): Either[DomainError, Option[Int]] =
+  private def optIntString(c: ACursor, field: String): Either[DomainError, Option[Int]] =
     if c.focus.isEmpty then Right(None)
-    else MediaJson.string(c, field).flatMap(parseLong(field)).map(l => Some(l.toInt))
+    else
+      MediaJson.string(c, field).flatMap(parseLong(field)).flatMap { l =>
+        if l >= 0L && l <= Int.MaxValue.toLong then Right(Some(l.toInt))
+        else
+          Left(DomainError.InvalidFormat(field, l.toString, "outside the admitted integer range"))
+      }
 
   private def parseLong(field: String)(raw: String): Either[DomainError, Long] =
     raw.toLongOption.toRight(DomainError.InvalidFormat(field, raw, "expected an integer string"))
 
 /** The ffprobe invocation this module admits. The argument vector is fixed so that a recorded
   * envelope and a live run are comparable; the input path is appended last and is never read from
-  * the media.
+  * the media. `-protocol_whitelist file` asserts, in the invocation itself, that no
+  * media-controlled reference can widen the input set (ledger §4 input-security policy).
   */
 object Ffprobe:
   val ToolName: String = "ffprobe"
   val EnvOverride: String = "STORYMODEL4S_FFPROBE"
   val CanonicalArgs: Vector[String] =
-    Vector("-v", "error", "-hide_banner", "-of", "json", "-show_streams", "-show_packets")
+    Vector(
+      "-v",
+      "error",
+      "-hide_banner",
+      "-protocol_whitelist",
+      "file",
+      "-of",
+      "json",
+      "-show_streams",
+      "-show_packets"
+    )
 
   /** The ffprobe on this machine, if any. Never downloads, builds, or installs one. */
   def locate(): Option[Path] = Subprocess.locate(ToolName, EnvOverride)
