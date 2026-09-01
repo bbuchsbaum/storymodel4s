@@ -18,6 +18,10 @@ type UniverseDefinitionId = UniverseDefinitionId.T
 object DecoderId extends OpaqueId("DecoderId")
 type DecoderId = DecoderId.T
 
+/** Stable identity of a decoder error policy. */
+object DecodePolicyId extends OpaqueId("DecodePolicyId")
+type DecodePolicyId = DecodePolicyId.T
+
 /** Stable identity of a canonical-text transformation contract. */
 object CanonicalizationPolicyId extends OpaqueId("CanonicalizationPolicyId")
 type CanonicalizationPolicyId = CanonicalizationPolicyId.T
@@ -41,24 +45,6 @@ type AdjudicationReceiptId = AdjudicationReceiptId.T
 /** Receipt identity issued only by the admitted fixture-review path. */
 object FixtureAdmissionReceiptId extends OpaqueId("FixtureAdmissionReceiptId")
 type FixtureAdmissionReceiptId = FixtureAdmissionReceiptId.T
-
-/** Decode receipt that binds the decoder authority used for admitted text. */
-final class DecodeReceipt private (
-    val id: OutputReceiptId,
-    val decoder: DecoderId
-):
-  private def parts = (id, decoder)
-
-  override def equals(other: Any): Boolean = other match
-    case that: DecodeReceipt => parts == that.parts
-    case _                   => false
-  override def hashCode(): Int = parts.hashCode
-  override def toString: String = s"DecodeReceipt(id=${id.value}, decoder=${decoder.value})"
-
-object DecodeReceipt:
-  /** Bind an issued receipt to the admitted decoder implementation and policy identity. */
-  def bind(id: OutputReceiptId, decoder: DecoderId): DecodeReceipt =
-    new DecodeReceipt(id, decoder)
 
 /** Stable identity of one closed or extension result payload. */
 object OutputPayloadId extends OpaqueId("OutputPayloadId")
@@ -84,6 +70,73 @@ enum BomDisposition:
   case ConsumedUtf16Be
   case Preserved
   case Rejected
+
+/** Closed strict-decoding failure reasons. */
+enum StrictDecodeFailureReason:
+  case InvalidLeadingByte
+  case InvalidContinuationByte
+  case TruncatedSequence
+  case OverlongEncoding
+  case SurrogateCodePoint
+  case CodePointOutOfRange
+
+/** Decode receipt derived from one exact successful strict decoding operation. */
+type DecodeReceipt = SourceIdentities.DecodeReceiptValue
+
+object DecodeReceipt:
+  val StrictUtf8Decoder: DecoderId = DecoderId.unsafe("storymodel4s.strict-utf8/v1")
+  val Utf8Charset: CharsetId = CharsetId.unsafe("UTF-8")
+  val ReportPolicy: DecodePolicyId = DecodePolicyId.unsafe("report/v1")
+  val StrictUtf8ConfigChecksum: Checksum =
+    Checksum.ofText("storymodel4s.strict-utf8/v1\u0000UTF-8\u0000report/v1\u0000consume-utf8-bom")
+
+/** Exact typed failure from the library-owned strict decoder. */
+type StrictDecodeFailure = SourceIdentities.StrictDecodeFailureValue
+
+object StrictDecodeFailure:
+  /** Re-run strict decoding so metadata alone cannot mint a failure detail. */
+  def fromWire(
+      bytes: Array[Byte],
+      receipt: OutputReceiptId,
+      decoder: DecoderId,
+      charset: CharsetId,
+      policy: DecodePolicyId,
+      configChecksum: Checksum,
+      originalChecksum: Checksum,
+      bytePosition: Long,
+      reason: StrictDecodeFailureReason
+  ): Either[DomainError, StrictDecodeFailure] =
+    if bytePosition < 0 || bytePosition > Int.MaxValue.toLong then
+      Left(
+        DomainError.InvalidFormat(
+          "StrictDecodeFailure.bytePosition",
+          bytePosition.toString,
+          "expected a nonnegative Int-sized byte position"
+        )
+      )
+    else
+      SourceIdentities.decodeStrictUtf8(bytes) match
+        case Left(actual)
+            if actual.receipt == receipt && actual.decoder == decoder &&
+              actual.charset == charset && actual.policy == policy &&
+              actual.configChecksum == configChecksum &&
+              actual.originalChecksum == originalChecksum &&
+              actual.bytePosition == bytePosition && actual.reason == reason =>
+          Right(actual)
+        case _ =>
+          Left(
+            DomainError.InvariantViolation(
+              "output/source/decode-failure",
+              "decode failure detail does not match strict decoding of the supplied bytes"
+            )
+          )
+
+private def derivedReceiptId(domain: String, parts: Vector[String]): OutputReceiptId =
+  val framed = parts.map { value =>
+    val bytes = value.getBytes(StandardCharsets.UTF_8)
+    s"${bytes.length}:$value"
+  }.mkString
+  OutputReceiptId.unsafe(s"$domain:${Checksum.ofText(framed).hex}")
 
 /** Says whether an unavailable extension blocks a requested result. */
 enum ExtensionRequirement:
@@ -151,8 +204,9 @@ final class OriginalSourceIdentity private (
     s"OriginalSourceIdentity(bytes=$byteLength, checksum=${checksum.short()})"
 
 object OriginalSourceIdentity:
-  /** Reconstruct admitted byte identity from already verified wire metadata. */
-  def of(
+  /** Recompute untrusted wire metadata against the actual admitted bytes. */
+  def fromWire(
+      bytes: Array[Byte],
       byteLength: Long,
       checksum: Checksum,
       mediaType: MediaTypeId,
@@ -161,87 +215,54 @@ object OriginalSourceIdentity:
       bom: BomDisposition,
       intakeReceipt: OutputReceiptId
   ): Either[DomainError, OriginalSourceIdentity] =
-    if byteLength < 0 then
-      Left(
-        DomainError.InvalidFormat(
-          "OriginalSourceIdentity.byteLength",
-          byteLength.toString,
-          "expected nonnegative"
-        )
-      )
+    val expected = fromUtf8Bytes(bytes, mediaType, declaredCharset)
+    if byteLength == expected.byteLength && checksum == expected.checksum &&
+      selectedCharset == expected.selectedCharset && bom == expected.bom &&
+      intakeReceipt == expected.intakeReceipt
+    then Right(expected)
     else
-      Right(
-        new OriginalSourceIdentity(
-          byteLength,
-          checksum,
-          mediaType,
-          declaredCharset,
-          selectedCharset,
-          bom,
-          intakeReceipt
+      Left(
+        DomainError.InvariantViolation(
+          "output/source/original-identity",
+          "original source metadata does not match the supplied bytes and admission policy"
         )
       )
 
-  /** Bind exact input bytes to the admitted decoding decision. */
-  def fromBytes(
+  /** Bind exact bytes to the library-owned strict UTF-8 admission policy. */
+  def fromUtf8Bytes(
       bytes: Array[Byte],
       mediaType: MediaTypeId,
-      declaredCharset: Option[CharsetId],
-      selectedCharset: CharsetId,
-      bom: BomDisposition,
-      intakeReceipt: OutputReceiptId
+      declaredCharset: Option[CharsetId]
   ): OriginalSourceIdentity =
+    val checksum = Checksum.ofBytes(bytes)
+    val bom =
+      if bytes.length >= 3 && (bytes(0) & 0xff) == 0xef && (bytes(1) & 0xff) == 0xbb &&
+        (bytes(2) & 0xff) == 0xbf
+      then BomDisposition.ConsumedUtf8
+      else BomDisposition.Absent
+    val receipt = derivedReceiptId(
+      "source-intake/v1",
+      Vector(
+        checksum.hex,
+        bytes.length.toString,
+        mediaType.value,
+        declaredCharset.fold("none")(value => s"some:${value.value}"),
+        DecodeReceipt.Utf8Charset.value,
+        bom.toString
+      )
+    )
     new OriginalSourceIdentity(
       bytes.length.toLong,
-      Checksum.ofBytes(bytes),
+      checksum,
       mediaType,
       declaredCharset,
-      selectedCharset,
+      DecodeReceipt.Utf8Charset,
       bom,
-      intakeReceipt
+      receipt
     )
 
 /** Identity and receipt established by decoding before StorySource construction. */
-final class DecodedSourceIdentity private (
-    val utf16Length: Int,
-    val checksum: Checksum,
-    val decodeReceipt: DecodeReceipt
-):
-  /** Decoder identity derived from the typed receipt rather than a parallel label. */
-  def decoder: DecoderId = decodeReceipt.decoder
-
-  private def parts = (utf16Length, checksum, decodeReceipt)
-
-  override def equals(other: Any): Boolean = other match
-    case that: DecodedSourceIdentity => parts == that.parts
-    case _                           => false
-  override def hashCode(): Int = parts.hashCode
-  override def toString: String =
-    s"DecodedSourceIdentity(utf16=$utf16Length, checksum=${checksum.short()})"
-
-object DecodedSourceIdentity:
-  /** Reconstruct already verified decoded-string metadata from the wire. */
-  def of(
-      utf16Length: Int,
-      checksum: Checksum,
-      decodeReceipt: DecodeReceipt
-  ): Either[DomainError, DecodedSourceIdentity] =
-    if utf16Length < 0 then
-      Left(
-        DomainError.InvalidFormat(
-          "DecodedSourceIdentity.utf16Length",
-          utf16Length.toString,
-          "expected nonnegative"
-        )
-      )
-    else Right(new DecodedSourceIdentity(utf16Length, checksum, decodeReceipt))
-
-  /** Bind a successfully decoded string before any StorySource validation. */
-  def fromText(
-      text: String,
-      decodeReceipt: DecodeReceipt
-  ): DecodedSourceIdentity =
-    new DecodedSourceIdentity(text.length, Checksum.ofText(text), decodeReceipt)
+type DecodedSourceIdentity = SourceIdentities.DecodedSourceIdentityValue
 
 /** Three distinct text identities bound to one successfully constructed StorySource. */
 final class SourceIdentities private (
@@ -285,48 +306,176 @@ object SourceIdentities:
   val CurrentCanonicalPolicy: CanonicalizationPolicyId =
     CanonicalizationPolicyId.unsafe("storysource-canonical-text/v1")
 
-  /** Reconstruct identities from wire metadata while enforcing portable lengths and v1 policy. */
-  def of(
-      original: OriginalSourceIdentity,
-      storyId: StoryId,
-      decodedUtf16Length: Int,
-      decodedChecksum: Checksum,
-      canonicalPolicy: CanonicalizationPolicyId,
-      canonicalByteLength: Long,
-      canonicalUtf16Length: Int,
-      canonicalChecksum: Checksum,
-      decodeReceipt: DecodeReceipt,
-      canonicalizationReceipt: OutputReceiptId
-  ): ValidatedNec[DomainError, SourceIdentities] =
-    (
-      requireNonnegative("decodedUtf16Length", decodedUtf16Length.toLong),
-      requireNonnegative("canonicalByteLength", canonicalByteLength),
-      requireNonnegative("canonicalUtf16Length", canonicalUtf16Length.toLong),
-      require(
-        canonicalPolicy == CurrentCanonicalPolicy,
-        DomainError.InvalidFormat(
-          "SourceIdentities.canonicalPolicy",
-          canonicalPolicy.value,
-          s"expected ${CurrentCanonicalPolicy.value}"
-        )
-      )
-    ).mapN((_, _, _, _) =>
-      new SourceIdentities(
-        original,
-        storyId,
-        decodedUtf16Length,
-        decodedChecksum,
-        canonicalPolicy,
-        canonicalByteLength,
-        canonicalUtf16Length,
-        canonicalChecksum,
-        decodeReceipt,
-        canonicalizationReceipt
-      )
-    )
+  /** Successful receipt whose constructor is available only to the checked decoder below. */
+  private[acquire] final class DecodeReceiptValue private[SourceIdentities] (
+      val id: OutputReceiptId,
+      val decoder: DecoderId,
+      val charset: CharsetId,
+      val policy: DecodePolicyId,
+      val configChecksum: Checksum,
+      val originalChecksum: Checksum,
+      val decodedChecksum: Checksum
+  ):
+    private def parts =
+      (id, decoder, charset, policy, configChecksum, originalChecksum, decodedChecksum)
 
-  /** Bind source identities without treating equal contents as equal roles. */
-  def fromStorySource(
+    override def equals(other: Any): Boolean = other match
+      case that: DecodeReceiptValue => parts == that.parts
+      case _                        => false
+    override def hashCode(): Int = parts.hashCode
+    override def toString: String = s"DecodeReceipt(id=${id.value}, decoder=${decoder.value})"
+
+  /** Failed receipt whose constructor is available only to the checked decoder below. */
+  private[acquire] final class StrictDecodeFailureValue private[SourceIdentities] (
+      val receipt: OutputReceiptId,
+      val decoder: DecoderId,
+      val charset: CharsetId,
+      val policy: DecodePolicyId,
+      val configChecksum: Checksum,
+      val originalChecksum: Checksum,
+      val bytePosition: Long,
+      val reason: StrictDecodeFailureReason
+  ):
+    private def parts =
+      (
+        receipt,
+        decoder,
+        charset,
+        policy,
+        configChecksum,
+        originalChecksum,
+        bytePosition,
+        reason
+      )
+
+    override def equals(other: Any): Boolean = other match
+      case that: StrictDecodeFailureValue => parts == that.parts
+      case _                              => false
+    override def hashCode(): Int = parts.hashCode
+    override def toString: String =
+      s"StrictDecodeFailure(byte=$bytePosition, reason=$reason, receipt=${receipt.value})"
+
+  /** Decoded identity whose constructor shares the checked decoder's closed scope. */
+  private[acquire] final class DecodedSourceIdentityValue private[SourceIdentities] (
+      val utf16Length: Int,
+      val checksum: Checksum,
+      val decodeReceipt: DecodeReceipt
+  ):
+    /** Decoder identity derived from the typed receipt rather than a parallel label. */
+    def decoder: DecoderId = decodeReceipt.decoder
+
+    private def parts = (utf16Length, checksum, decodeReceipt)
+
+    override def equals(other: Any): Boolean = other match
+      case that: DecodedSourceIdentityValue => parts == that.parts
+      case _                                => false
+    override def hashCode(): Int = parts.hashCode
+    override def toString: String =
+      s"DecodedSourceIdentity(utf16=$utf16Length, checksum=${checksum.short()})"
+
+  /** Checked admission retains a StorySource only when it matches the published outcome. */
+  final class Admission private[SourceIdentities] (
+      private val source: Option[StorySource],
+      val outcome: SourceOutcome
+  ):
+    def constructed: Option[(StorySource, SourceIdentities)] = (source, outcome) match
+      case (Some(value), SourceOutcome.Constructed(identities)) => Some(value -> identities)
+      case _                                                    => None
+
+    def refusal: Option[(RefusedSourceProgress, OutputFailure)] = (source, outcome) match
+      case (None, SourceOutcome.Refused(progress, failure)) => Some(progress -> failure)
+      case _                                                => None
+
+    private def parts = (source, outcome)
+    override def equals(other: Any): Boolean = other match
+      case that: Admission => parts == that.parts
+      case _               => false
+    override def hashCode(): Int = parts.hashCode
+    override def toString: String = s"SourceAdmission($outcome)"
+
+  /** Admit exact bytes through the library-owned decoder and StorySource constructor. */
+  def admitUtf8(
+      bytes: Array[Byte],
+      mediaType: MediaTypeId,
+      declaredCharset: Option[CharsetId],
+      title: Option[String] = None,
+      language: LanguageTag = LanguageTag.English,
+      metadata: Map[String, String] = Map.empty
+  ): Admission =
+    val original = OriginalSourceIdentity.fromUtf8Bytes(bytes, mediaType, declaredCharset)
+    decodeStrictUtf8(bytes) match
+      case Left(detail) =>
+        new Admission(
+          None,
+          SourceOutcome.Refused(
+            RefusedSourceProgress.Admitted(original),
+            OutputFailure.decode(detail)
+          )
+        )
+      case Right((text, decodeReceipt)) =>
+        val decoded =
+          new DecodedSourceIdentityValue(text.length, decodeReceipt.decodedChecksum, decodeReceipt)
+        StorySource.fromText(text, title, language, metadata) match
+          case Left(error) =>
+            val failureReceipt = derivedReceiptId(
+              "source-canonicalization-failure/v1",
+              Vector(original.checksum.hex, decoded.checksum.hex, error.message)
+            )
+            new Admission(
+              None,
+              SourceOutcome.Refused(
+                RefusedSourceProgress.Decoded(original, decoded),
+                OutputFailure.canonicalization(failureReceipt)
+              )
+            )
+          case Right(source) =>
+            val canonicalizationReceipt = derivedReceiptId(
+              "source-canonicalization/v1",
+              Vector(
+                original.checksum.hex,
+                decoded.checksum.hex,
+                CurrentCanonicalPolicy.value,
+                source.canonicalChecksum.hex,
+                source.id.value
+              )
+            )
+            new Admission(
+              Some(source),
+              SourceOutcome.Constructed(
+                fromAdmitted(original, source, decodeReceipt, canonicalizationReceipt)
+              )
+            )
+
+  /** Re-run admission and accept wire identities only when every published coordinate agrees. */
+  def fromWire(
+      bytes: Array[Byte],
+      mediaType: MediaTypeId,
+      declaredCharset: Option[CharsetId],
+      title: Option[String],
+      language: LanguageTag,
+      metadata: Map[String, String],
+      claimed: SourceIdentities
+  ): Either[DomainError, (StorySource, SourceIdentities)] =
+    val admission = admitUtf8(bytes, mediaType, declaredCharset, title, language, metadata)
+    admission.constructed match
+      case Some((source, actual)) if actual == claimed => Right(source -> actual)
+      case Some(_)                                     =>
+        Left(
+          DomainError.InvariantViolation(
+            "output/source/identities",
+            "source identity metadata does not match admission of the supplied bytes"
+          )
+        )
+      case None =>
+        val failureCode = admission.refusal.map(_._2.code).fold("unknown")(_.toString)
+        Left(
+          DomainError.InvariantViolation(
+            "output/source/identities",
+            s"supplied bytes were refused by source admission: $failureCode"
+          )
+        )
+
+  private def fromAdmitted(
       original: OriginalSourceIdentity,
       source: StorySource,
       decodeReceipt: DecodeReceipt,
@@ -346,28 +495,210 @@ object SourceIdentities:
       canonicalizationReceipt
     )
 
-  private def requireNonnegative(
-      field: String,
-      value: Long
-  ): ValidatedNec[DomainError, Unit] =
-    require(
-      value >= 0,
-      DomainError.InvalidFormat(s"SourceIdentities.$field", value.toString, "expected nonnegative")
+  /** Strict UTF-8 decode with exact original-byte failure positions and no replacement characters.
+    */
+  private[acquire] def decodeStrictUtf8(
+      bytes: Array[Byte]
+  ): Either[StrictDecodeFailure, (String, DecodeReceipt)] =
+    val originalChecksum = Checksum.ofBytes(bytes)
+    val out = new java.lang.StringBuilder(bytes.length)
+    val start =
+      if bytes.length >= 3 && unsigned(bytes(0)) == 0xef && unsigned(bytes(1)) == 0xbb &&
+        unsigned(bytes(2)) == 0xbf
+      then 3
+      else 0
+    var index = start
+    var failure: Option[StrictDecodeFailure] = None
+
+    def reject(position: Int, reason: StrictDecodeFailureReason): Unit =
+      val receipt = derivedReceiptId(
+        "decode-failure/v1",
+        Vector(
+          DecodeReceipt.StrictUtf8Decoder.value,
+          DecodeReceipt.Utf8Charset.value,
+          DecodeReceipt.ReportPolicy.value,
+          DecodeReceipt.StrictUtf8ConfigChecksum.hex,
+          originalChecksum.hex,
+          position.toString,
+          reason.toString
+        )
+      )
+      failure = Some(
+        new StrictDecodeFailureValue(
+          receipt,
+          DecodeReceipt.StrictUtf8Decoder,
+          DecodeReceipt.Utf8Charset,
+          DecodeReceipt.ReportPolicy,
+          DecodeReceipt.StrictUtf8ConfigChecksum,
+          originalChecksum,
+          position.toLong,
+          reason
+        )
+      )
+
+    def continuation(position: Int): Boolean =
+      if position >= bytes.length then
+        reject(bytes.length, StrictDecodeFailureReason.TruncatedSequence)
+        false
+      else if (unsigned(bytes(position)) & 0xc0) != 0x80 then
+        reject(position, StrictDecodeFailureReason.InvalidContinuationByte)
+        false
+      else true
+
+    while index < bytes.length && failure.isEmpty do
+      val first = unsigned(bytes(index))
+      if first <= 0x7f then
+        out.append(first.toChar)
+        index += 1
+      else if first >= 0xc2 && first <= 0xdf then
+        if continuation(index + 1) then
+          val codePoint = ((first & 0x1f) << 6) | (unsigned(bytes(index + 1)) & 0x3f)
+          out.append(codePoint.toChar)
+          index += 2
+      else if first >= 0xe0 && first <= 0xef then
+        if continuation(index + 1) && continuation(index + 2) then
+          val second = unsigned(bytes(index + 1))
+          if first == 0xe0 && second < 0xa0 then
+            reject(index, StrictDecodeFailureReason.OverlongEncoding)
+          else if first == 0xed && second >= 0xa0 then
+            reject(index, StrictDecodeFailureReason.SurrogateCodePoint)
+          else
+            val codePoint =
+              ((first & 0x0f) << 12) | ((second & 0x3f) << 6) |
+                (unsigned(bytes(index + 2)) & 0x3f)
+            out.append(codePoint.toChar)
+            index += 3
+      else if first >= 0xf0 && first <= 0xf4 then
+        if continuation(index + 1) && continuation(index + 2) && continuation(index + 3) then
+          val second = unsigned(bytes(index + 1))
+          if first == 0xf0 && second < 0x90 then
+            reject(index, StrictDecodeFailureReason.OverlongEncoding)
+          else if first == 0xf4 && second > 0x8f then
+            reject(index, StrictDecodeFailureReason.CodePointOutOfRange)
+          else
+            val codePoint =
+              ((first & 0x07) << 18) | ((second & 0x3f) << 12) |
+                ((unsigned(bytes(index + 2)) & 0x3f) << 6) |
+                (unsigned(bytes(index + 3)) & 0x3f)
+            out.append(Character.highSurrogate(codePoint))
+            out.append(Character.lowSurrogate(codePoint))
+            index += 4
+      else reject(index, StrictDecodeFailureReason.InvalidLeadingByte)
+
+    failure match
+      case Some(value) => Left(value)
+      case None        =>
+        val text = out.toString
+        val decodedChecksum = Checksum.ofText(text)
+        val receiptId = derivedReceiptId(
+          "decode-success/v1",
+          Vector(
+            DecodeReceipt.StrictUtf8Decoder.value,
+            DecodeReceipt.Utf8Charset.value,
+            DecodeReceipt.ReportPolicy.value,
+            DecodeReceipt.StrictUtf8ConfigChecksum.hex,
+            originalChecksum.hex,
+            decodedChecksum.hex
+          )
+        )
+        val receipt = new DecodeReceiptValue(
+          receiptId,
+          DecodeReceipt.StrictUtf8Decoder,
+          DecodeReceipt.Utf8Charset,
+          DecodeReceipt.ReportPolicy,
+          DecodeReceipt.StrictUtf8ConfigChecksum,
+          originalChecksum,
+          decodedChecksum
+        )
+        Right(text -> receipt)
+
+  private def unsigned(value: Byte): Int = value & 0xff
+
+type SourceAdmission = SourceIdentities.Admission
+
+/** Detail required specifically for strict decoding failures. */
+enum OutputFailureDetail:
+  case StrictDecode(value: StrictDecodeFailure)
+
+/** Typed output failure whose detail shape is checked against its failure family. */
+final class OutputFailure private (
+    val code: OutputFailureCode,
+    val receipt: OutputReceiptId,
+    val stage: Option[StageId],
+    val evidence: Vector[OutputReceiptId],
+    val detail: Option[OutputFailureDetail]
+):
+  private def parts = (code, receipt, stage, evidence, detail)
+
+  override def equals(other: Any): Boolean = other match
+    case that: OutputFailure => parts == that.parts
+    case _                   => false
+  override def hashCode(): Int = parts.hashCode
+  override def toString: String = s"OutputFailure(code=$code, receipt=${receipt.value})"
+
+  /** Replace generic receipt evidence without weakening the checked detail shape. */
+  def withReceipt(
+      replacement: OutputReceiptId,
+      replacementEvidence: Vector[OutputReceiptId]
+  ): Either[DomainError, OutputFailure] =
+    OutputFailure.fromWire(code, replacement, stage, replacementEvidence, detail)
+
+object OutputFailure:
+  /** Construct a non-decode failure. DecodeFailed requires typed strict-decode detail. */
+  def general(
+      code: OutputFailureCode,
+      receipt: OutputReceiptId,
+      stage: Option[StageId],
+      evidence: Vector[OutputReceiptId]
+  ): Either[DomainError, OutputFailure] =
+    fromWire(code, receipt, stage, evidence, None)
+
+  private[acquire] def canonicalization(receipt: OutputReceiptId): OutputFailure =
+    new OutputFailure(OutputFailureCode.CanonicalizationFailed, receipt, None, Vector.empty, None)
+
+  /** A decode failure derives its receipt from the exact failed operation. */
+  def decode(
+      detail: StrictDecodeFailure,
+      stage: Option[StageId] = None,
+      evidence: Vector[OutputReceiptId] = Vector.empty
+  ): OutputFailure =
+    new OutputFailure(
+      OutputFailureCode.DecodeFailed,
+      detail.receipt,
+      stage,
+      evidence,
+      Some(OutputFailureDetail.StrictDecode(detail))
     )
 
-  private def require(
-      condition: Boolean,
-      error: => DomainError
-  ): ValidatedNec[DomainError, Unit] =
-    if condition then ().validNec else error.invalidNec
+  /** Validate an untrusted failure claim, including code/detail/receipt agreement. */
+  def fromWire(
+      code: OutputFailureCode,
+      receipt: OutputReceiptId,
+      stage: Option[StageId],
+      evidence: Vector[OutputReceiptId],
+      detail: Option[OutputFailureDetail]
+  ): Either[DomainError, OutputFailure] =
+    val detailAgrees = (code, detail) match
+      case (OutputFailureCode.DecodeFailed, Some(OutputFailureDetail.StrictDecode(value))) =>
+        value.receipt == receipt
+      case (OutputFailureCode.DecodeFailed, _) => false
+      case (_, None)                           => true
+      case (_, Some(_))                        => false
+    if !detailAgrees then
+      Left(
+        DomainError.InvariantViolation(
+          "output/failure/detail",
+          "DecodeFailed requires matching strict-decode detail and other failures forbid it"
+        )
+      )
+    else
+      firstDuplicate(evidence) match
+        case Some(duplicate) => Left(DomainError.DuplicateId("OutputFailure.evidence", duplicate))
+        case None            => Right(new OutputFailure(code, receipt, stage, evidence, detail))
 
-/** Typed output failure with a receipt rather than an exception string. */
-final case class OutputFailure(
-    code: OutputFailureCode,
-    receipt: OutputReceiptId,
-    stage: Option[StageId],
-    evidence: Vector[OutputReceiptId]
-)
+  private def firstDuplicate(values: Vector[OutputReceiptId]): Option[String] =
+    val seen = scala.collection.mutable.HashSet.empty[OutputReceiptId]
+    values.find(value => !seen.add(value)).map(_.value)
 
 /** Source construction either establishes all three identities or records refusal. */
 enum RefusedSourceProgress:
@@ -379,6 +710,22 @@ enum RefusedSourceProgress:
 enum SourceOutcome:
   case Constructed(identities: SourceIdentities)
   case Refused(progress: RefusedSourceProgress, failure: OutputFailure)
+
+object SourceOutcome:
+  /** Admit metadata-only refusal only when its failure says intake never began. */
+  def beforeIntake(failure: OutputFailure): Either[DomainError, SourceOutcome] =
+    val lawfulCode = failure.code match
+      case OutputFailureCode.SourceUnavailable | OutputFailureCode.UnsupportedCapability => true
+      case _                                                                             => false
+    if lawfulCode && failure.stage.isEmpty && failure.detail.isEmpty then
+      Right(SourceOutcome.Refused(RefusedSourceProgress.BeforeIntake, failure))
+    else
+      Left(
+        DomainError.InvariantViolation(
+          "output/source/before-intake",
+          "before-intake refusal requires a source-unavailable or unsupported-capability failure with no stage or intake-derived detail"
+        )
+      )
 
 /** Failure that forbids downstream universe denominators. */
 final case class UniverseFailure(
@@ -412,7 +759,7 @@ final class EstablishedUniverse[Id] private (
         )
       )
     else if members.isEmpty then Right(UniverseRate.NotApplicableEmpty)
-    else Right(UniverseRate.Measured(EstablishedRate.make(numerator, members.size)))
+    else EstablishedRate.of(numerator, members.size).map(UniverseRate.Measured.apply)
 
 object EstablishedUniverse:
   /** Establish a universe while rejecting duplicate member identity. */
@@ -445,8 +792,25 @@ final class EstablishedRate private (
   override def toString: String = s"EstablishedRate($numerator/$denominator)"
 
 object EstablishedRate:
-  private[acquire] def make(numerator: Int, denominator: Int): EstablishedRate =
-    new EstablishedRate(numerator, denominator)
+  /** Construct only from valid established counts. */
+  def of(numerator: Int, denominator: Int): Either[DomainError, EstablishedRate] =
+    if denominator <= 0 then
+      Left(
+        DomainError.InvalidFormat(
+          "EstablishedRate.denominator",
+          denominator.toString,
+          "expected a positive integer"
+        )
+      )
+    else if numerator < 0 || numerator > denominator then
+      Left(
+        DomainError.InvalidFormat(
+          "EstablishedRate.numerator",
+          numerator.toString,
+          s"expected an integer in [0, $denominator]"
+        )
+      )
+    else Right(new EstablishedRate(numerator, denominator))
 
 /** Coverage-like value that cannot encode 0/0 as a percentage. */
 enum UniverseRate:
@@ -486,6 +850,7 @@ final case class ResultGap(
 
 /** Semantic completion state independent of report delivery. */
 enum SemanticOutcome:
+  case NotRequested
   case Validated(model: SemanticModelRef)
   case Partial(gaps: NonEmptyVector[ResultGap], draft: Option[SemanticModelRef])
   case Refused(errors: NonEmptyVector[OutputFailure])
@@ -526,21 +891,12 @@ final class AcquisitionViewAuthority private (
   override def toString: String = s"AcquisitionViewAuthority($kind)"
 
 object AcquisitionViewAuthority:
-  /** Issue build authority only when the build receipt belongs to the constructed source. */
-  def validatedBuild(
+  /** Check source/receipt identity without converting that match into execution authority. */
+  def receiptMatches(
       source: SourceOutcome,
       buildReceipt: ExtendedBuildReceipt
-  ): Either[DomainError, AcquisitionViewAuthority] =
-    joinedSource(source, Some(buildReceipt)).map { case (sourceChecksum, buildChecksum) =>
-      new AcquisitionViewAuthority(
-        AcquisitionViewAuthorityKind.ValidatedBuild,
-        sourceChecksum,
-        buildChecksum,
-        None,
-        None,
-        None
-      )
-    }
+  ): Either[DomainError, Unit] =
+    joinedSource(source, Some(buildReceipt)).map(_ => ())
 
   /** Revalidate an untrusted wire claim against the actual acquisition inputs. */
   def fromWire(
@@ -554,13 +910,7 @@ object AcquisitionViewAuthority:
       fixtureReceipt: Option[FixtureAdmissionReceiptId]
   ): Either[DomainError, AcquisitionViewAuthority] =
     joinedSource(source, buildReceipt).flatMap { case (actualSource, actualBuild) =>
-      val validShape = kind match
-        case AcquisitionViewAuthorityKind.ValidatedBuild =>
-          evidenceChecksum.isEmpty && adjudicationReceipt.isEmpty && fixtureReceipt.isEmpty &&
-          actualBuild.nonEmpty
-        case AcquisitionViewAuthorityKind.HumanAdjudication |
-            AcquisitionViewAuthorityKind.FixtureReview =>
-          false
+      val validShape = false
       if sourceChecksum == actualSource && buildReceiptChecksum == actualBuild && validShape then
         Right(
           new AcquisitionViewAuthority(
@@ -672,6 +1022,7 @@ final case class UnsupportedExtension(
     requirement: ExtensionRequirement
 ):
   def checksum: Checksum = payload.checksum
+  def byteLength: Long = payload.bytes.length.toLong
 
 /** Closed or explicitly unsupported acquisition payload. */
 enum OutputPayload:
@@ -717,12 +1068,14 @@ object AcquisitionAccount:
     (
       targetUniqueness(targetVector),
       universeAccounting(universe, targetVector),
+      sourceProgress(source),
       semanticSource(source, semantic),
       semanticReceipt(semantic, buildReceipt),
       authorityReceipt(source, buildReceipt, viewAuthority),
+      semanticAuthority(semantic, buildReceipt, viewAuthority),
       payloadAccounting(targetVector, payloadVector),
       payloadUniqueness(payloadVector)
-    ).mapN((_, _, _, _, _, _, _) =>
+    ).mapN((_, _, _, _, _, _, _, _, _) =>
       new AcquisitionAccount(
         invocationId,
         source,
@@ -732,6 +1085,24 @@ object AcquisitionAccount:
         payloadVector,
         buildReceipt,
         viewAuthority
+      )
+    )
+
+  private def sourceProgress(source: SourceOutcome): ValidatedNec[DomainError, Unit] = source match
+    case SourceOutcome.Refused(RefusedSourceProgress.BeforeIntake, failure) =>
+      SourceOutcome.beforeIntake(failure).map(_ => ()).toValidatedNec
+    case _ => valid
+
+  private def semanticAuthority(
+      semantic: SemanticOutcome,
+      buildReceipt: Option[ExtendedBuildReceipt],
+      authority: Option[AcquisitionViewAuthority]
+  ): ValidatedNec[DomainError, Unit] =
+    require(
+      semantic != SemanticOutcome.NotRequested || (buildReceipt.isEmpty && authority.isEmpty),
+      DomainError.InvariantViolation(
+        "output/semantic/not-requested-authority",
+        "not-requested semantics cannot carry semantic build or view authority"
       )
     )
 
@@ -832,6 +1203,7 @@ object AcquisitionAccount:
     }
 
   private def semanticModel(semantic: SemanticOutcome): Option[SemanticModelRef] = semantic match
+    case SemanticOutcome.NotRequested      => None
     case SemanticOutcome.Validated(model)  => Some(model)
     case SemanticOutcome.Partial(_, draft) => draft
     case SemanticOutcome.Refused(_)        => None

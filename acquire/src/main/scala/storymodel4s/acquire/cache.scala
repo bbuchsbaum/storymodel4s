@@ -92,12 +92,60 @@ enum LayerCoverage:
   case NotAttempted
   case Attempted
 
-/** A core [[storymodel4s.core.BuildReceipt]] extended with per-stage records and layer coverage. */
-final case class ExtendedBuildReceipt(
-    receipt: BuildReceipt,
-    stages: Vector[StageRecord],
-    layerCoverage: Map[LayerId, LayerCoverage]
-)
+/** A structurally checked core [[storymodel4s.core.BuildReceipt]] with its stage records and layer
+  * coverage.
+  *
+  * Structural coherence is not evidence that a build ran. In particular, this value cannot issue
+  * view authority: every input accepted by [[ExtendedBuildReceipt.of]] is still caller data.
+  */
+final class ExtendedBuildReceipt private (
+    val receipt: BuildReceipt,
+    val stages: Vector[StageRecord],
+    val layerCoverage: Map[LayerId, LayerCoverage]
+):
+  private def parts = (receipt, stages, layerCoverage)
+
+  override def equals(other: Any): Boolean = other match
+    case that: ExtendedBuildReceipt => parts == that.parts
+    case _                          => false
+  override def hashCode(): Int = parts.hashCode
+  override def toString: String =
+    s"ExtendedBuildReceipt(story=${receipt.storyId.value}, stages=${stages.size})"
+
+object ExtendedBuildReceipt:
+  /** Check exact ordered stage coherence and the lawful metadata available in this portable model.
+    */
+  def of(
+      receipt: BuildReceipt,
+      stages: Vector[StageRecord],
+      layerCoverage: Map[LayerId, LayerCoverage]
+  ): Either[DomainError, ExtendedBuildReceipt] =
+    val expectedStages = stages.map(stage => stage.stage -> stage.outputChecksum)
+    val stageIds = stages.map(_.stage)
+    if receipt.schemaVersion.trim.isEmpty then
+      Left(
+        DomainError.InvariantViolation(
+          "acquire/build-receipt/schema",
+          "build receipt schema version must be nonempty"
+        )
+      )
+    else if receipt.createdAtEpochMillis < 0L then
+      Left(
+        DomainError.InvariantViolation(
+          "acquire/build-receipt/timestamp",
+          "build receipt timestamp must be nonnegative"
+        )
+      )
+    else if stageIds.distinct.size != stageIds.size then
+      Left(DomainError.DuplicateId("ExtendedBuildReceipt.stage", "stage"))
+    else if receipt.stages != expectedStages then
+      Left(
+        DomainError.InvariantViolation(
+          "acquire/build-receipt/stages",
+          "core receipt stages must exactly equal the ordered stage records and output checksums"
+        )
+      )
+    else Right(new ExtendedBuildReceipt(receipt, stages, layerCoverage))
 
 /** Accumulates stage records into a receipt. Pure; the orchestrator threads it through stages. */
 final case class BuildReceiptBuilder(
@@ -111,7 +159,14 @@ final case class BuildReceiptBuilder(
   def cover(layer: LayerId, coverage: LayerCoverage): BuildReceiptBuilder =
     copy(layerCoverage = layerCoverage.updated(layer, coverage))
   def build(createdAtEpochMillis: Long): ExtendedBuildReceipt =
-    ExtendedBuildReceipt(
+    buildChecked(createdAtEpochMillis).fold(
+      error => throw new IllegalArgumentException(error.message),
+      identity
+    )
+
+  /** Checked builder boundary for callers that need invalid metadata reported as data. */
+  def buildChecked(createdAtEpochMillis: Long): Either[DomainError, ExtendedBuildReceipt] =
+    ExtendedBuildReceipt.of(
       BuildReceipt(
         storyId,
         sourceChecksum,

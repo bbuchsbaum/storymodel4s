@@ -170,6 +170,34 @@ class OutputConstructionProbeSuite extends FunSuite:
     )
   }
 
+  test("external receipt-shaped data cannot mint profile satisfaction") {
+    val preview = storymodel4s.view.ProfileArtifactBinding(
+      storymodel4s.view.ArtifactRole.BrowserPreview,
+      storymodel4s.view.BundlePath.unsafe("preview.html"),
+      storymodel4s.acquire.MediaTypeId.unsafe("text/html"),
+      storymodel4s.core.Checksum.ofText("invented-preview")
+    )
+    val claim = storymodel4s.view.ProfileReceipt(
+      storymodel4s.acquire.OutputReceiptId.unsafe("invented-profile-receipt"),
+      storymodel4s.view.ProfileSchemaId.unsafe("local-open/v1"),
+      storymodel4s.view.ProfileVerifierId.unsafe("invented-verifier"),
+      storymodel4s.acquire.OutputReceiptId.unsafe("invented-execution"),
+      storymodel4s.acquire.OutputSchemaId.unsafe("invented-policy"),
+      storymodel4s.view.ProfileReceiptDecision.Satisfied,
+      Vector.empty,
+      Some(preview),
+      Vector.empty,
+      storymodel4s.view.VerifiedProfileReceipt.LocalOpenRequiredCourts.map(id =>
+        storymodel4s.view.ProfileCourtOutcome(
+          id,
+          storymodel4s.view.ProfileCourtDisposition.Passed
+        )
+      )
+    )
+
+    assert(storymodel4s.view.VerifiedProfileReceipt.localOpen(claim).isLeft)
+  }
+
   test("target identity has an exact String instance and no generic fallback") {
     assertEquals(
       typeCheckErrors(

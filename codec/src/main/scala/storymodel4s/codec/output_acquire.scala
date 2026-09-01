@@ -19,6 +19,8 @@ object OutputAcquireCodecs:
   given Decoder[UniverseDefinitionId] = opaqueDecoder(UniverseDefinitionId)
   given Encoder[DecoderId] = opaqueEncoder(DecoderId)
   given Decoder[DecoderId] = opaqueDecoder(DecoderId)
+  given Encoder[DecodePolicyId] = opaqueEncoder(DecodePolicyId)
+  given Decoder[DecodePolicyId] = opaqueDecoder(DecodePolicyId)
   given Encoder[CanonicalizationPolicyId] = opaqueEncoder(CanonicalizationPolicyId)
   given Decoder[CanonicalizationPolicyId] = opaqueDecoder(CanonicalizationPolicyId)
   given Encoder[CharsetId] = opaqueEncoder(CharsetId)
@@ -45,14 +47,46 @@ object OutputAcquireCodecs:
   given Encoder[DecodeReceipt] = Encoder.instance { receipt =>
     CanonicalPrimitives.obj(
       "id" -> receipt.id.asJson,
-      "decoder" -> receipt.decoder.asJson
+      "decoder" -> receipt.decoder.asJson,
+      "charset" -> receipt.charset.asJson,
+      "policy" -> receipt.policy.asJson,
+      "configChecksum" -> receipt.configChecksum.asJson,
+      "originalChecksum" -> receipt.originalChecksum.asJson,
+      "decodedChecksum" -> receipt.decodedChecksum.asJson
     )
   }
-  given Decoder[DecodeReceipt] = Decoder.instance { c =>
-    for
-      id <- field[OutputReceiptId](c, "id")
-      decoder <- field[DecoderId](c, "decoder")
-    yield DecodeReceipt.bind(id, decoder)
+  given Decoder[DecodeReceipt] = contextualSourceDecoder("DecodeReceipt")
+
+  given Encoder[StrictDecodeFailureReason] = Encoder.encodeString.contramap {
+    case StrictDecodeFailureReason.InvalidLeadingByte      => "invalid_leading_byte"
+    case StrictDecodeFailureReason.InvalidContinuationByte => "invalid_continuation_byte"
+    case StrictDecodeFailureReason.TruncatedSequence       => "truncated_sequence"
+    case StrictDecodeFailureReason.OverlongEncoding        => "overlong_encoding"
+    case StrictDecodeFailureReason.SurrogateCodePoint      => "surrogate_code_point"
+    case StrictDecodeFailureReason.CodePointOutOfRange     => "code_point_out_of_range"
+  }
+
+  given Decoder[StrictDecodeFailureReason] = Decoder.decodeString.emap {
+    case "invalid_leading_byte"      => Right(StrictDecodeFailureReason.InvalidLeadingByte)
+    case "invalid_continuation_byte" => Right(StrictDecodeFailureReason.InvalidContinuationByte)
+    case "truncated_sequence"        => Right(StrictDecodeFailureReason.TruncatedSequence)
+    case "overlong_encoding"         => Right(StrictDecodeFailureReason.OverlongEncoding)
+    case "surrogate_code_point"      => Right(StrictDecodeFailureReason.SurrogateCodePoint)
+    case "code_point_out_of_range"   => Right(StrictDecodeFailureReason.CodePointOutOfRange)
+    case other                       => Left(s"unknown StrictDecodeFailureReason: $other")
+  }
+
+  given Encoder[StrictDecodeFailure] = Encoder.instance { failure =>
+    CanonicalPrimitives.obj(
+      "receipt" -> failure.receipt.asJson,
+      "decoder" -> failure.decoder.asJson,
+      "charset" -> failure.charset.asJson,
+      "policy" -> failure.policy.asJson,
+      "configChecksum" -> failure.configChecksum.asJson,
+      "originalChecksum" -> failure.originalChecksum.asJson,
+      "bytePosition" -> failure.bytePosition.asJson,
+      "reason" -> failure.reason.asJson
+    )
   }
 
   given Encoder[BomDisposition] = Encoder.instance {
@@ -203,21 +237,7 @@ object OutputAcquireCodecs:
     )
   }
 
-  given Decoder[OriginalSourceIdentity] = Decoder.instance { c =>
-    for
-      length <- field[Long](c, "byteLength")
-      checksum <- field[Checksum](c, "checksum")
-      mediaType <- field[MediaTypeId](c, "mediaType")
-      declared <- field[Option[CharsetId]](c, "declaredCharset")
-      selected <- field[CharsetId](c, "selectedCharset")
-      bom <- field[BomDisposition](c, "bom")
-      receipt <- field[OutputReceiptId](c, "intakeReceipt")
-      value <- domain(
-        c,
-        OriginalSourceIdentity.of(length, checksum, mediaType, declared, selected, bom, receipt)
-      )
-    yield value
-  }
+  given Decoder[OriginalSourceIdentity] = contextualSourceDecoder("OriginalSourceIdentity")
 
   given Encoder[DecodedSourceIdentity] = Encoder.instance { source =>
     CanonicalPrimitives.obj(
@@ -228,16 +248,7 @@ object OutputAcquireCodecs:
     )
   }
 
-  given Decoder[DecodedSourceIdentity] = Decoder.instance { c =>
-    for
-      decoder <- field[DecoderId](c, "decoder")
-      length <- field[Int](c, "utf16Length")
-      checksum <- field[Checksum](c, "checksum")
-      receipt <- field[DecodeReceipt](c, "decodeReceipt")
-      _ <- requireDecoderBinding(c, decoder, receipt)
-      value <- domain(c, DecodedSourceIdentity.of(length, checksum, receipt))
-    yield value
-  }
+  given Decoder[DecodedSourceIdentity] = contextualSourceDecoder("DecodedSourceIdentity")
 
   given Encoder[SourceIdentities] = Encoder.instance { source =>
     Json.obj(
@@ -255,58 +266,17 @@ object OutputAcquireCodecs:
     )
   }
 
-  given Decoder[SourceIdentities] = Decoder.instance { c =>
-    for
-      original <- field[OriginalSourceIdentity](c, "original")
-      story <- field[StoryId](c, "storyId")
-      decoder <- field[DecoderId](c, "decoder")
-      decodedLength <- field[Int](c, "decodedUtf16Length")
-      decodedChecksum <- field[Checksum](c, "decodedChecksum")
-      policy <- field[CanonicalizationPolicyId](c, "canonicalPolicy")
-      canonicalByteLength <- field[Long](c, "canonicalByteLength")
-      canonicalUtf16Length <- field[Int](c, "canonicalUtf16Length")
-      canonicalChecksum <- field[Checksum](c, "canonicalChecksum")
-      decodeReceipt <- field[DecodeReceipt](c, "decodeReceipt")
-      _ <- requireDecoderBinding(c, decoder, decodeReceipt)
-      canonicalizationReceipt <- field[OutputReceiptId](c, "canonicalizationReceipt")
-      value <- domainValidated(
-        c,
-        SourceIdentities.of(
-          original,
-          story,
-          decodedLength,
-          decodedChecksum,
-          policy,
-          canonicalByteLength,
-          canonicalUtf16Length,
-          canonicalChecksum,
-          decodeReceipt,
-          canonicalizationReceipt
-        )
-      )
-    yield value
-  }
-
-  private def requireDecoderBinding(
-      c: HCursor,
-      claimed: DecoderId,
-      receipt: DecodeReceipt
-  ): Decoder.Result[Unit] =
-    if claimed == receipt.decoder then Right(())
-    else
-      Left(
-        io.circe.DecodingFailure(
-          "decoder identity disagrees with the typed decode receipt",
-          c.history
-        )
-      )
+  given Decoder[SourceIdentities] = contextualSourceDecoder("SourceIdentities")
 
   given Encoder[OutputFailure] = Encoder.instance { failure =>
     CanonicalPrimitives.obj(
       "code" -> failure.code.asJson,
       "receipt" -> failure.receipt.asJson,
       "stage" -> failure.stage.asJson,
-      "evidence" -> failure.evidence.asJson
+      "evidence" -> failure.evidence.asJson,
+      "detail" -> failure.detail.map { case OutputFailureDetail.StrictDecode(value) =>
+        Json.obj("status" -> "strict_decode".asJson, "value" -> value.asJson)
+      }.asJson
     )
   }
 
@@ -316,10 +286,18 @@ object OutputAcquireCodecs:
       receipt <- field[OutputReceiptId](c, "receipt")
       stage <- field[Option[StageId]](c, "stage")
       evidence <- field[Vector[OutputReceiptId]](c, "evidence")
+      detail <- field[Option[Json]](c, "detail")
       _ <-
-        if evidence.distinct.size == evidence.size then Right(())
-        else Left(io.circe.DecodingFailure("duplicate evidence identity", c.history))
-    yield OutputFailure(code, receipt, stage, evidence)
+        if code == OutputFailureCode.DecodeFailed || detail.nonEmpty then
+          Left(
+            io.circe.DecodingFailure(
+              "decode failure detail requires contextual decoding with original bytes",
+              c.history
+            )
+          )
+        else Right(())
+      value <- domain(c, OutputFailure.general(code, receipt, stage, evidence))
+    yield value
   }
 
   given Encoder[RefusedSourceProgress] = Encoder.instance {
@@ -338,19 +316,28 @@ object OutputAcquireCodecs:
       )
   }
 
-  given Decoder[RefusedSourceProgress] = Decoder.instance { c =>
+  given Decoder[RefusedSourceProgress] = contextualSourceDecoder("RefusedSourceProgress")
+
+  /** Reuse a source failure already checked against exact bytes when semantic refusal cites it. */
+  private[codec] def admitSemanticOutcome(
+      c: HCursor,
+      source: SourceOutcome
+  ): Decoder.Result[SemanticOutcome] =
     field[String](c, "status").flatMap {
-      case "before_intake" => Right(RefusedSourceProgress.BeforeIntake)
-      case "admitted"      =>
-        field[OriginalSourceIdentity](c, "original").map(RefusedSourceProgress.Admitted.apply)
-      case "decoded" =>
-        for
-          original <- field[OriginalSourceIdentity](c, "original")
-          decoded <- field[DecodedSourceIdentity](c, "decoded")
-        yield RefusedSourceProgress.Decoded(original, decoded)
-      case other => unknown(c, "RefusedSourceProgress", other)
+      case "refused" =>
+        field[Vector[Json]](c, "errors")
+          .flatMap(nonEmpty(c, "errors", _))
+          .flatMap(
+            _.traverse { encoded =>
+              source match
+                case SourceOutcome.Refused(_, failure) if encoded == failure.asJson =>
+                  Right(failure)
+                case _ => encoded.as[OutputFailure]
+            }
+          )
+          .map(SemanticOutcome.Refused.apply)
+      case _ => summon[Decoder[SemanticOutcome]].apply(c)
     }
-  }
 
   given Encoder[SourceOutcome] = Encoder.instance {
     case SourceOutcome.Constructed(identities) =>
@@ -363,18 +350,93 @@ object OutputAcquireCodecs:
       )
   }
 
-  given Decoder[SourceOutcome] = Decoder.instance { c =>
+  given Decoder[SourceOutcome] = Decoder.instance(decodeBeforeIntake)
+
+  /** Decode the only source outcome that truthfully requires no source-byte context. */
+  private def decodeBeforeIntake(c: HCursor): Decoder.Result[SourceOutcome] =
+    for
+      status <- field[String](c, "status")
+      _ <-
+        if status == "refused" then Right(())
+        else
+          Left(
+            io.circe.DecodingFailure(
+              "constructed source outcomes require exact original bytes",
+              c.history
+            )
+          )
+      progress <- c
+        .downField("progress")
+        .success
+        .toRight(io.circe.DecodingFailure("missing refused source progress", c.history))
+      progressStatus <- field[String](progress, "status")
+      _ <-
+        if progressStatus == "before_intake" then Right(())
+        else
+          Left(
+            io.circe.DecodingFailure(
+              "admitted or decoded source refusal requires exact original bytes",
+              progress.history
+            )
+          )
+      failure <- field[OutputFailure](c, "failure")
+      outcome <- domain(c, SourceOutcome.beforeIntake(failure))
+    yield outcome
+
+  /** Re-run source admission against exact bytes and compare the complete untrusted wire claim. */
+  private[codec] def admitSourceOutcome(
+      c: HCursor,
+      bytes: Array[Byte]
+  ): Decoder.Result[SourceOutcome] =
     field[String](c, "status").flatMap {
-      case "constructed" =>
-        field[SourceIdentities](c, "identities").map(SourceOutcome.Constructed.apply)
       case "refused" =>
-        for
-          progress <- field[RefusedSourceProgress](c, "progress")
-          failure <- field[OutputFailure](c, "failure")
-        yield SourceOutcome.Refused(progress, failure)
-      case other => unknown(c, "SourceOutcome", other)
+        c.downField("progress").success match
+          case Some(progress) =>
+            field[String](progress, "status").flatMap {
+              case "before_intake" => decodeBeforeIntake(c)
+              case _               => admitBytesDependentSourceOutcome(c, "refused", bytes)
+            }
+          case None => Left(io.circe.DecodingFailure("missing refused source progress", c.history))
+      case "constructed" => admitBytesDependentSourceOutcome(c, "constructed", bytes)
+      case other         => unknown(c, "SourceOutcome", other)
     }
-  }
+
+  private def admitBytesDependentSourceOutcome(
+      c: HCursor,
+      status: String,
+      bytes: Array[Byte]
+  ): Decoder.Result[SourceOutcome] =
+    for
+      originalCursor <- status match
+        case "constructed" =>
+          c.downField("identities")
+            .downField("original")
+            .success
+            .toRight(io.circe.DecodingFailure("missing constructed source identity", c.history))
+        case "refused" =>
+          c.downField("progress")
+            .downField("original")
+            .success
+            .toRight(
+              io.circe.DecodingFailure(
+                "refused source admission requires admitted byte identity",
+                c.history
+              )
+            )
+        case other => unknown(c, "SourceOutcome", other)
+      mediaType <- field[MediaTypeId](originalCursor, "mediaType")
+      declaredCharset <- field[Option[CharsetId]](originalCursor, "declaredCharset")
+      actual = SourceIdentities.admitUtf8(bytes, mediaType, declaredCharset).outcome
+      _ <-
+        if actual.asJson == c.value then Right(())
+        else
+          Left(
+            io.circe.DecodingFailure(
+              "source outcome does not match checked admission of the supplied bytes",
+              c.history
+            )
+          )
+    yield actual
 
   given Encoder[UniverseFailure] = Encoder.instance { failure =>
     CanonicalPrimitives.obj(
@@ -475,6 +537,7 @@ object OutputAcquireCodecs:
   }
 
   given Encoder[SemanticOutcome] = Encoder.instance {
+    case SemanticOutcome.NotRequested     => Json.obj("status" -> "not_requested".asJson)
     case SemanticOutcome.Validated(model) =>
       Json.obj("status" -> "validated".asJson, "model" -> model.asJson)
     case SemanticOutcome.Partial(gaps, draft) =>
@@ -489,6 +552,7 @@ object OutputAcquireCodecs:
 
   given Decoder[SemanticOutcome] = Decoder.instance { c =>
     field[String](c, "status").flatMap {
+      case "not_requested" => Right(SemanticOutcome.NotRequested)
       case "validated" => field[SemanticModelRef](c, "model").map(SemanticOutcome.Validated.apply)
       case "partial"   =>
         for
@@ -525,6 +589,7 @@ object OutputAcquireCodecs:
       "namespace" -> extension.namespace.asJson,
       "schemaId" -> extension.schemaId.asJson,
       "checksum" -> extension.checksum.asJson,
+      "byteLength" -> extension.byteLength.asJson,
       "payloadEncoding" -> "octets/v1".asJson,
       "payloadBytes" -> extension.payload.bytes.map(byte => byte.toInt & 0xff).asJson,
       "requirement" -> extension.requirement.asJson
@@ -537,6 +602,7 @@ object OutputAcquireCodecs:
       namespace <- field[OutputNamespace](c, "namespace")
       schema <- field[OutputSchemaId](c, "schemaId")
       checksum <- field[Checksum](c, "checksum")
+      byteLength <- field[Long](c, "byteLength")
       encoding <- field[String](c, "payloadEncoding")
       _ <-
         if encoding == "octets/v1" then Right(())
@@ -550,6 +616,9 @@ object OutputAcquireCodecs:
         .from(bytes, checksum)
         .left
         .map(error => io.circe.DecodingFailure(error.message, c.history))
+      _ <-
+        if byteLength == bytes.length.toLong then Right(())
+        else Left(io.circe.DecodingFailure("opaque payload byteLength mismatch", c.history))
       requirement <- field[ExtensionRequirement](c, "requirement")
     yield UnsupportedExtension(id, namespace, schema, payload, requirement)
   }
@@ -617,7 +686,8 @@ object OutputAcquireCodecs:
       _ <-
         if pairs.map(_._1).distinct.size == pairs.size then Right(())
         else Left(io.circe.DecodingFailure("duplicate layerCoverage identity", c.history))
-    yield ExtendedBuildReceipt(receipt, stages, pairs.toMap)
+      checked <- domain(c, ExtendedBuildReceipt.of(receipt, stages, pairs.toMap))
+    yield checked
   }
 
   given Encoder[AcquisitionViewAuthority] = Encoder.instance { authority =>
@@ -715,6 +785,15 @@ object OutputAcquireCodecs:
   }
 
   private def tagged(status: String): Json = Json.obj("status" -> status.asJson)
+
+  private def contextualSourceDecoder[A](name: String): Decoder[A] = Decoder.instance { c =>
+    Left(
+      io.circe.DecodingFailure(
+        s"$name requires contextual decoding with the exact original bytes",
+        c.history
+      )
+    )
+  }
 
   private def custom(status: String, namespace: OutputNamespace, label: OutputLabel): Json =
     Json.obj("status" -> status.asJson, "namespace" -> namespace.asJson, "label" -> label.asJson)

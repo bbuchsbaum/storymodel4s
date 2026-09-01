@@ -124,6 +124,7 @@ enum SuppressionReason:
 enum SemanticAbsenceReason:
   case SourceNotConstructed
   case SemanticNotValidated
+  case SemanticsNotRequested
   case NotApplicableToOutcome
   case Custom(namespace: OutputNamespace, label: OutputLabel)
 
@@ -175,10 +176,12 @@ final case class ProfileReceipt(
     courts: Vector[ProfileCourtOutcome]
 )
 
-/** A satisfied local-open receipt whose complete court plan has been verified.
+/** A satisfied local-open receipt issued by a governed profile verifier.
   *
-  * [[ProfileReceipt]] remains the wire claim shared by all disposition branches. Only this
-  * non-product proof can enter [[ProfileDisposition.Satisfied]].
+  * [[ProfileReceipt]] remains the wire claim shared by all disposition branches. V1 deliberately
+  * has no issuer: receipt-shaped data cannot establish that a court ran. The type remains in the
+  * disposition vocabulary so a later governed verifier can add issuance without changing the wire
+  * model.
   */
 final class VerifiedProfileReceipt private (val receipt: ProfileReceipt):
   override def equals(other: Any): Boolean = other match
@@ -194,26 +197,14 @@ object VerifiedProfileReceipt:
       ProfileCourtId.unsafe("direct-file-open")
     )
 
-  /** Verify the exact v1 local-open court plan and its evidence-bearing receipt. */
+  /** Refuse data-only promotion until a governed court runner can issue this proof. */
   def localOpen(claim: ProfileReceipt): Either[DomainError, VerifiedProfileReceipt] =
-    val actualCourts = claim.courts.map(_.court)
-    val exactPlan =
-      actualCourts.distinct.size == actualCourts.size &&
-        actualCourts.toSet == LocalOpenRequiredCourts.toSet &&
-        actualCourts.size == LocalOpenRequiredCourts.size
-    val valid =
-      claim.decision == ProfileReceiptDecision.Satisfied &&
-        claim.preview.nonEmpty &&
-        exactPlan &&
-        claim.courts.forall(_.disposition == ProfileCourtDisposition.Passed)
-    if valid then Right(new VerifiedProfileReceipt(claim))
-    else
-      Left(
-        DomainError.InvariantViolation(
-          "output/profile/local-open-verification",
-          "satisfied local-open receipt must bind preview evidence and the exact required passed court plan"
-        )
+    Left(
+      DomainError.InvariantViolation(
+        "output/profile/local-open-verification",
+        s"satisfied local-open issuance is deferred; receipt ${claim.id.value} is an untrusted claim"
       )
+    )
 
 /** Certification result for one requested bundle profile. */
 enum ProfileDisposition:
@@ -427,7 +418,7 @@ object ScientificArtifactRefs:
               ref.checksum == model.artifactChecksum
           )
         )
-      case SemanticOutcome.Refused(_) => artifact.isEmpty
+      case SemanticOutcome.NotRequested | SemanticOutcome.Refused(_) => artifact.isEmpty
     require(
       valid,
       DomainError.InvariantViolation(
@@ -556,6 +547,11 @@ object ReportInputIdentity:
         s"canonical-checksum=${value.canonicalChecksum.hex}",
         s"decode-receipt=${value.decodeReceipt.id.value}",
         s"decoder=${value.decodeReceipt.decoder.value}",
+        s"decode-charset=${value.decodeReceipt.charset.value}",
+        s"decode-policy=${value.decodeReceipt.policy.value}",
+        s"decode-config=${value.decodeReceipt.configChecksum.hex}",
+        s"decode-original=${value.decodeReceipt.originalChecksum.hex}",
+        s"decode-decoded=${value.decodeReceipt.decodedChecksum.hex}",
         s"canonical-receipt=${value.canonicalizationReceipt.value}"
       ) ++ value.original.declaredCharset.toVector.map(value =>
         s"original-declared-charset.value=${value.value}"
@@ -574,7 +570,10 @@ object ReportInputIdentity:
           s"refused-decoded-utf16=${decoded.utf16Length}",
           s"refused-decoded-checksum=${decoded.checksum.hex}",
           s"refused-decode-receipt=${decoded.decodeReceipt.id.value}",
-          s"refused-decoder=${decoded.decodeReceipt.decoder.value}"
+          s"refused-decoder=${decoded.decodeReceipt.decoder.value}",
+          s"refused-decode-charset=${decoded.decodeReceipt.charset.value}",
+          s"refused-decode-policy=${decoded.decodeReceipt.policy.value}",
+          s"refused-decode-config=${decoded.decodeReceipt.configChecksum.hex}"
         )
 
   private def originalParts(prefix: String, value: OriginalSourceIdentity): Vector[String] =
@@ -612,6 +611,7 @@ object ReportInputIdentity:
       ) ++ failure.stage.toVector.map(stage => s"universe-stage.value=${stage.value}")
 
   private def semanticParts(semantic: SemanticOutcome): Vector[String] = semantic match
+    case SemanticOutcome.NotRequested         => Vector("semantic=not-requested")
     case SemanticOutcome.Validated(model)     => modelParts("validated", model)
     case SemanticOutcome.Partial(gaps, draft) =>
       Vector("semantic=partial") ++
@@ -654,6 +654,7 @@ object ReportInputIdentity:
         s"payload.namespace=${extension.namespace.value}",
         s"payload.schema=${extension.schemaId.value}",
         s"payload.checksum=${extension.checksum.hex}",
+        s"payload.byte-length=${extension.byteLength}",
         s"payload.requirement=${extension.requirement}"
       )
 
@@ -666,6 +667,18 @@ object ReportInputIdentity:
       error.stage.toVector.map(stage => s"$prefix-stage.value=${stage.value}") ++
       error.evidence.zipWithIndex.map { case (receipt, index) =>
         s"$prefix-evidence[$index]=${receipt.value}"
+      } ++ error.detail.toVector.flatMap { case OutputFailureDetail.StrictDecode(value) =>
+        Vector(
+          s"$prefix-detail=strict-decode",
+          s"$prefix-detail.receipt=${value.receipt.value}",
+          s"$prefix-detail.decoder=${value.decoder.value}",
+          s"$prefix-detail.charset=${value.charset.value}",
+          s"$prefix-detail.policy=${value.policy.value}",
+          s"$prefix-detail.config=${value.configChecksum.hex}",
+          s"$prefix-detail.original=${value.originalChecksum.hex}",
+          s"$prefix-detail.byte-position=${value.bytePosition}",
+          s"$prefix-detail.reason=${value.reason}"
+        )
       }
 
   private def buildParts(value: ExtendedBuildReceipt): Vector[String] =
@@ -998,67 +1011,12 @@ object AdmittedViewBasis:
   def fromAcquisition[Id](
       acquisition: AcquisitionAccount[Id]
   ): Either[DomainError, AdmittedViewBasis] =
-    val sourceChecksum = acquisition.source match
-      case SourceOutcome.Constructed(identities) => Some(identities.canonicalChecksum)
-      case SourceOutcome.Refused(_, _)           => None
-    val buildChecksum = acquisition.buildReceipt.map(_.receipt.contentChecksum)
-    (sourceChecksum, acquisition.viewAuthority.map(_.kind)) match
-      case (Some(source), Some(AcquisitionViewAuthorityKind.ValidatedBuild)) =>
-        buildChecksum
-          .map(checksum =>
-            new AdmittedViewBasis(
-              ViewBasis.ValidatedBuild,
-              source,
-              Some(checksum),
-              BasisAuthority.ValidatedBuild(checksum)
-            )
-          )
-          .toRight(
-            DomainError.InvariantViolation(
-              "output/view/basis-build",
-              "validated-build authority requires the admitted build receipt"
-            )
-          )
-      case (Some(source), Some(AcquisitionViewAuthorityKind.HumanAdjudication)) =>
-        (buildChecksum, acquisition.viewAuthority.flatMap(_.adjudicationReceipt))
-          .mapN((checksum, receipt) =>
-            new AdmittedViewBasis(
-              ViewBasis.HumanAdjudicated,
-              source,
-              Some(checksum),
-              BasisAuthority.HumanAdjudication(receipt)
-            )
-          )
-          .toRight(
-            DomainError.InvariantViolation(
-              "output/view/basis-build",
-              "human-adjudicated authority requires its admitted build and evidence receipt"
-            )
-          )
-      case (Some(source), Some(AcquisitionViewAuthorityKind.FixtureReview)) =>
-        acquisition.viewAuthority
-          .flatMap(_.fixtureReceipt)
-          .map(receipt =>
-            new AdmittedViewBasis(
-              ViewBasis.ResearcherReviewedFixture,
-              source,
-              buildChecksum,
-              BasisAuthority.FixtureReview(receipt)
-            )
-          )
-          .toRight(
-            DomainError.InvariantViolation(
-              "output/view/basis-authority",
-              "fixture authority requires its admitted evidence receipt"
-            )
-          )
-      case _ =>
-        Left(
-          DomainError.InvariantViolation(
-            "output/view/basis-authority",
-            "a view basis requires constructed source and admitted acquisition authority"
-          )
-        )
+    Left(
+      DomainError.InvariantViolation(
+        "output/view/basis-authority",
+        s"acquisition ${acquisition.invocationId.value} has no runtime-issued view-authority capability"
+      )
+    )
 
   /** Revalidate an untrusted wire claim against the authority admitted by the account. */
   def fromWire[Id](
@@ -1374,7 +1332,8 @@ final case class ManifestEntry(
     mediaType: MediaTypeId,
     schemaVersion: Option[OutputSchemaId],
     requirement: ArtifactRequirement,
-    disposition: ArtifactDisposition
+    disposition: ArtifactDisposition,
+    payload: Option[OutputPayloadId] = None
 )
 
 /** Produced or explicitly unavailable bytes for one promised role. */
@@ -1431,8 +1390,11 @@ object BundleManifest:
       producedMetadata(entryVector),
       reportEntries(result, entryVector),
       semanticEntry(result, entryVector),
-      sourceEntries(result, entryVector)
-    ).mapN((_, _, _, _, _, _, _, _, _, _, _, _) => new BundleManifest(profileVector, entryVector))
+      sourceEntries(result, entryVector),
+      payloadEntries(result, entryVector)
+    ).mapN((_, _, _, _, _, _, _, _, _, _, _, _, _) =>
+      new BundleManifest(profileVector, entryVector)
+    )
 
   private def profileReceiptConsistency(
       profiles: Vector[BundleProfileOutcome]
@@ -1521,7 +1483,7 @@ object BundleManifest:
   ): Boolean =
     val candidates = expected.fold(entries)(Vector(_))
     candidates.exists {
-      case ManifestEntry(role, path, mediaType, _, _, ArtifactDisposition.Produced(artifact)) =>
+      case ManifestEntry(role, path, mediaType, _, _, ArtifactDisposition.Produced(artifact), _) =>
         role == binding.role &&
         path == binding.path &&
         mediaType == binding.mediaType &&
@@ -1552,7 +1514,7 @@ object BundleManifest:
       entries: Vector[ManifestEntry]
   ): ValidatedNec[DomainError, Unit] =
     val mismatches = entries.collect {
-      case entry @ ManifestEntry(_, _, _, _, _, ArtifactDisposition.Produced(artifact))
+      case entry @ ManifestEntry(_, _, _, _, _, ArtifactDisposition.Produced(artifact), _)
           if entry.role != artifact.role || entry.mediaType != artifact.mediaType ||
             entry.schemaVersion != artifact.schemaVersion =>
         entry.path
@@ -1606,16 +1568,50 @@ object BundleManifest:
       entries: Vector[ManifestEntry]
   ): ValidatedNec[DomainError, Unit] =
     val semantic = entries.filter(_.role == ArtifactRole.SemanticModel)
-    val valid = entryMatchesRef(
-      semantic,
-      result.scientificArtifacts.semanticModel,
-      SemanticAbsenceReason.SemanticNotValidated
-    )
+    val absentReason = result.acquisition.semantic match
+      case SemanticOutcome.NotRequested => SemanticAbsenceReason.SemanticsNotRequested
+      case _                            => SemanticAbsenceReason.SemanticNotValidated
+    val valid = entryMatchesRef(semantic, result.scientificArtifacts.semanticModel, absentReason)
     require(
       valid,
       DomainError.InvariantViolation(
         "output/manifest/semantic-model",
         "semantic_model entry disagrees with semantic outcome"
+      )
+    )
+
+  private def payloadEntries[Id](
+      result: StoryOutputResult[Id],
+      entries: Vector[ManifestEntry]
+  ): ValidatedNec[DomainError, Unit] =
+    val payloads = result.acquisition.payloads.map {
+      case value @ OutputPayload.Known(ref)             => ref.id -> value
+      case value @ OutputPayload.Unsupported(extension) => extension.id -> value
+    }.toMap
+    val bindings = entries.flatMap(entry => entry.payload.map(_ -> entry))
+    val grouped = bindings.groupMap(_._1)(_._2)
+    val exactIds = grouped.keySet == payloads.keySet
+    val oneEach = grouped.values.forall(_.size == 1)
+    val metadataMatches = payloads.forall { case (id, payload) =>
+      grouped.get(id).exists {
+        case Vector(ManifestEntry(_, _, _, schema, _, ArtifactDisposition.Produced(artifact), _)) =>
+          payload match
+            case OutputPayload.Known(ref) =>
+              schema.contains(ref.schemaId) && artifact.schemaVersion.contains(ref.schemaId) &&
+              artifact.checksum == ref.checksum
+            case OutputPayload.Unsupported(extension) =>
+              schema.contains(extension.schemaId) &&
+              artifact.schemaVersion.contains(extension.schemaId) &&
+              artifact.checksum == extension.checksum &&
+              artifact.byteLength == extension.byteLength
+        case _ => false
+      }
+    }
+    require(
+      exactIds && oneEach && metadataMatches,
+      DomainError.InvariantViolation(
+        "output/manifest/payload-binding",
+        "payloads require an exact one-to-one produced artifact binding with matching schema and bytes metadata"
       )
     )
 

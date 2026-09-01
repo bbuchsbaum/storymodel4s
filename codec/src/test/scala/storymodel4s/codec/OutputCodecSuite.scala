@@ -17,35 +17,22 @@ class OutputCodecSuite extends FunSuite:
   private val jsonType = MediaTypeId.unsafe("application/json")
   private val utf8 = CharsetId.unsafe("UTF-8")
   private val originalBytes = source.rawText.getBytes(StandardCharsets.UTF_8)
-  private val original = OriginalSourceIdentity.fromBytes(
-    originalBytes,
-    textPlain,
-    Some(utf8),
-    utf8,
-    BomDisposition.Absent,
-    OutputReceiptId.unsafe("receipt-intake")
-  )
-  private val identities = SourceIdentities.fromStorySource(
-    original,
-    source,
-    DecodeReceipt.bind(
-      OutputReceiptId.unsafe("receipt-decode"),
-      DecoderId.unsafe("strict-utf8/v1")
-    ),
-    OutputReceiptId.unsafe("receipt-canonical")
-  )
+  private val sourceAdmission = SourceIdentities.admitUtf8(originalBytes, textPlain, Some(utf8))
+  private val identities = sourceAdmission.constructed match
+    case Some((_, value)) => value
+    case None             => fail(s"source fixture refused: ${sourceAdmission.outcome}")
   private val semanticText = StoryModelCodec.encode(model)
   private val semanticBytes = semanticText.getBytes(StandardCharsets.UTF_8)
-  private val build = ExtendedBuildReceipt(
-    BuildReceipt(source.id, source.canonicalChecksum, "output-codec-test/v1", Vector.empty, 0L),
-    Vector.empty,
-    Map.empty
-  )
+  private val build =
+    ExtendedBuildReceipt
+      .of(
+        BuildReceipt(source.id, source.canonicalChecksum, "output-codec-test/v1", Vector.empty, 0L),
+        Vector.empty,
+        Map.empty
+      )
+      .toOption
+      .get
   private val sourceOutcome = SourceOutcome.Constructed(identities)
-  private val validatedAuthority = AcquisitionViewAuthority
-    .validatedBuild(sourceOutcome, build)
-    .toOption
-    .get
   private val extensionId = OutputPayloadId.unsafe("optional-future")
   private val optionalExtension = UnsupportedExtension(
     extensionId,
@@ -73,7 +60,7 @@ class OutputCodecSuite extends FunSuite:
       Vector.empty,
       Vector(OutputPayload.Unsupported(optionalExtension)),
       Some(build),
-      Some(validatedAuthority)
+      None
     )
     .toOption
     .get
@@ -85,7 +72,7 @@ class OutputCodecSuite extends FunSuite:
     ArtifactRole.BrowserPreview,
     htmlType,
     ArtifactRequirement.Required,
-    ReportAuthority.ScientificView,
+    ReportAuthority.InvocationOnly,
     Set.empty
   )
   private val textRequest = ReportRequest(
@@ -94,7 +81,7 @@ class OutputCodecSuite extends FunSuite:
     ArtifactRole.TextPreview,
     textPlain,
     ArtifactRequirement.Required,
-    ReportAuthority.ScientificView,
+    ReportAuthority.InvocationOnly,
     Set.empty
   )
   private def reportReceipt(
@@ -104,7 +91,7 @@ class OutputCodecSuite extends FunSuite:
       request: ReportRequest,
       account: AcquisitionAccount[String] = acquisition,
       artifacts: ScientificArtifactRefs = scientificArtifacts,
-      admittedBasis: Option[AdmittedViewBasis] = Some(basis)
+      admittedBasis: Option[AdmittedViewBasis] = basis
   ): ReportReceipt =
     ReportReceipt.issue(
       OutputReceiptId.unsafe(id),
@@ -118,12 +105,18 @@ class OutputCodecSuite extends FunSuite:
     reportReceipt("receipt-html", "html/v1", "html-config", htmlRequest)
   private lazy val textReceipt =
     reportReceipt("receipt-text", "text/v1", "text-config", textRequest)
-  private lazy val htmlFailure = OutputFailure(
-    OutputFailureCode.SerializationFailed,
-    htmlReceipt.id,
-    None,
-    Vector(htmlReceipt.id)
-  )
+  private lazy val htmlFailure = OutputFailure
+    .general(
+      OutputFailureCode.SerializationFailed,
+      htmlReceipt.id,
+      None,
+      Vector(htmlReceipt.id)
+    )
+    .toOption
+    .get
+
+  private def decodeResult(text: String): Either[CodecError, StoryOutputResult[String]] =
+    StoryOutputResultCodec.decode[String](text, originalBytes)
   private lazy val failedProfileReceipt = ProfileReceipt(
     OutputReceiptId.unsafe("receipt-profile-local-failed"),
     ProfileSchemaId.unsafe("local-open/v1"),
@@ -181,12 +174,12 @@ class OutputCodecSuite extends FunSuite:
     )
     .toOption
     .get
-  private lazy val basis = AdmittedViewBasis.fromAcquisition(acquisition).toOption.get
+  private lazy val basis: Option[AdmittedViewBasis] = None
   private lazy val result = StoryOutputResult
     .of(
       acquisition,
       scientificArtifacts,
-      Some(basis),
+      basis,
       Vector(htmlRequest, textRequest),
       Vector(
         ReportOutcome.Failed(htmlId, htmlFailure, htmlReceipt),
@@ -200,11 +193,21 @@ class OutputCodecSuite extends FunSuite:
 
   test("result root is canonical, fixed-point, and retains unsupported optional extensions") {
     val once = StoryOutputResultCodec.encode[String](result)
-    val decoded = StoryOutputResultCodec.decode[String](once)
+    val decoded = decodeResult(once)
     assertEquals(decoded, Right(result))
+    assert(
+      StoryOutputResultCodec.decode[String](once).isLeft,
+      "bare result metadata must not establish a constructed source"
+    )
+    assert(
+      StoryOutputResultCodec
+        .decode[String](once, "beta".getBytes(StandardCharsets.UTF_8))
+        .isLeft,
+      "a successful source receipt cannot be transplanted onto different bytes"
+    )
     assertEquals(decoded.map(StoryOutputResultCodec.encode[String]), Right(once))
     assert(once.startsWith("{\"acquisition\""))
-    assert(once.contains("\"schemaVersion\":\"story-output-result/v1\""))
+    assert(once.contains("\"schemaVersion\":\"story-output-result/v2\""))
     assert(once.contains("\"status\":\"unsupported_extension\""))
     assert(once.contains("\"payloadEncoding\":\"octets/v1\""))
     assert(once.contains("\"payloadBytes\""))
@@ -227,9 +230,34 @@ class OutputCodecSuite extends FunSuite:
       )
     )
     assert(
-      StoryOutputResultCodec.decode[String](Canonical.print(mismatchedConstructedDecoder)).isLeft,
+      decodeResult(Canonical.print(mismatchedConstructedDecoder)).isLeft,
       "constructed identity must derive decoder from the fixed typed decode receipt"
     )
+
+    val decodeReceipt = sourceIdentities("decodeReceipt").flatMap(_.asObject).get
+    Vector(
+      "decoder" -> Json.fromString("different-decoder/v1"),
+      "charset" -> Json.fromString("UTF-16"),
+      "policy" -> Json.fromString("replace/v1"),
+      "configChecksum" -> Json.fromString(Checksum.ofText("wrong-config").hex)
+    ).foreach { case (fieldName, replacement) =>
+      val changedIdentities = sourceIdentities.add(
+        "decodeReceipt",
+        Json.fromJsonObject(decodeReceipt.add(fieldName, replacement))
+      )
+      val changed = parsed.mapObject(
+        _.add(
+          "source",
+          Json.fromJsonObject(
+            sourceObject.add("identities", Json.fromJsonObject(changedIdentities))
+          )
+        )
+      )
+      assert(
+        decodeResult(Canonical.print(changed)).isLeft,
+        s"wire mutation of decode receipt $fieldName must be refused"
+      )
+    }
 
     val acquisition = parsed.hcursor.downField("acquisition").focus.flatMap(_.asObject).get
     val payloads = acquisition("payloads").flatMap(_.asArray).get
@@ -243,8 +271,23 @@ class OutputCodecSuite extends FunSuite:
     )
     val tampered = parsed.mapObject(_.add("acquisition", Json.fromJsonObject(tamperedAcquisition)))
     assert(
-      StoryOutputResultCodec.decode[String](Canonical.print(tampered)).isLeft,
+      decodeResult(Canonical.print(tampered)).isLeft,
       "changing opaque bytes without changing their checksum must fail"
+    )
+    val wrongLengthPayload = firstPayload.add(
+      "extension",
+      Json.fromJsonObject(extension.add("byteLength", Json.fromLong(999L)))
+    )
+    val wrongLengthAcquisition = acquisition.add(
+      "payloads",
+      Json.fromValues(payloads.updated(0, Json.fromJsonObject(wrongLengthPayload)))
+    )
+    val wrongLength = parsed.mapObject(
+      _.add("acquisition", Json.fromJsonObject(wrongLengthAcquisition))
+    )
+    assert(
+      decodeResult(Canonical.print(wrongLength)).isLeft,
+      "unsupported payload byte length must agree with retained exact bytes"
     )
   }
 
@@ -255,7 +298,7 @@ class OutputCodecSuite extends FunSuite:
       .toOption
       .get
       .mapObject(_.add("schemaVersion", Json.fromString("story-output-result/v999")))
-    StoryOutputResultCodec.decode[String](Canonical.print(wrongVersion)) match
+    decodeResult(Canonical.print(wrongVersion)) match
       case Left(CodecError.UnsupportedSchema(found, _)) =>
         assertEquals(found, "story-output-result/v999")
       case other => fail(s"expected unsupported schema, got $other")
@@ -267,13 +310,24 @@ class OutputCodecSuite extends FunSuite:
       outcomes.head.mapObject(_.add("status", Json.fromString("future_core_status")))
     )
     val wrongTag = parsed.mapObject(_.add("reportOutcomes", Json.fromValues(changed)))
-    assert(StoryOutputResultCodec.decode[String](Canonical.print(wrongTag)).isLeft)
+    assert(decodeResult(Canonical.print(wrongTag)).isLeft)
   }
 
   test("wire admission rejects view-authority and foreign report-receipt mutations") {
     val encoded = StoryOutputResultCodec.encode[String](result)
     val parsed = Canonical.parse(encoded).toOption.get
-    val basisObject = parsed.hcursor.downField("viewBasis").focus.flatMap(_.asObject).get
+    val basisObject = Json
+      .obj(
+        "basis" -> Json.obj("status" -> Json.fromString("validated_build")),
+        "sourceChecksum" -> Json.fromString(identities.canonicalChecksum.hex),
+        "buildReceiptChecksum" -> Json.fromString(build.receipt.contentChecksum.hex),
+        "authority" -> Json.obj(
+          "status" -> Json.fromString("validated_build"),
+          "buildReceiptChecksum" -> Json.fromString(build.receipt.contentChecksum.hex)
+        )
+      )
+      .asObject
+      .get
 
     val wrongBuildBasis = basisObject.add(
       "buildReceiptChecksum",
@@ -282,7 +336,7 @@ class OutputCodecSuite extends FunSuite:
     val wrongBuild = parsed.mapObject(
       _.add("viewBasis", Json.fromJsonObject(wrongBuildBasis))
     )
-    assert(StoryOutputResultCodec.decode[String](Canonical.print(wrongBuild)).isLeft)
+    assert(decodeResult(Canonical.print(wrongBuild)).isLeft)
 
     val authority = basisObject("authority").flatMap(_.asObject).get
     val wrongAuthority = basisObject.add(
@@ -297,7 +351,7 @@ class OutputCodecSuite extends FunSuite:
     val wrongAuthorityRoot = parsed.mapObject(
       _.add("viewBasis", Json.fromJsonObject(wrongAuthority))
     )
-    assert(StoryOutputResultCodec.decode[String](Canonical.print(wrongAuthorityRoot)).isLeft)
+    assert(decodeResult(Canonical.print(wrongAuthorityRoot)).isLeft)
 
     val fixtureRelabel = basisObject
       .add("basis", Json.obj("status" -> Json.fromString("researcher_reviewed_fixture")))
@@ -312,11 +366,52 @@ class OutputCodecSuite extends FunSuite:
       _.add("viewBasis", Json.fromJsonObject(fixtureRelabel))
     )
     assert(
-      StoryOutputResultCodec.decode[String](Canonical.print(relabelledRoot)).isLeft,
+      decodeResult(Canonical.print(relabelledRoot)).isLeft,
       "the same source cannot be relabelled with fixture authority on the wire"
     )
 
     val acquisitionObject = parsed.hcursor.downField("acquisition").focus.flatMap(_.asObject).get
+    val buildObject = acquisitionObject("buildReceipt").flatMap(_.asObject).get
+    val coreReceipt = buildObject("receipt").flatMap(_.asObject).get
+    val negativeTimestampBuild = buildObject.add(
+      "receipt",
+      Json.fromJsonObject(coreReceipt.add("createdAtEpochMillis", Json.fromLong(-1L)))
+    )
+    val negativeTimestampRoot = parsed.mapObject(
+      _.add(
+        "acquisition",
+        Json.fromJsonObject(
+          acquisitionObject.add("buildReceipt", Json.fromJsonObject(negativeTimestampBuild))
+        )
+      )
+    )
+    assert(
+      decodeResult(Canonical.print(negativeTimestampRoot)).isLeft,
+      "negative caller timestamps must fail checked receipt decoding"
+    )
+
+    val changedCoverageBuild = buildObject.add(
+      "layerCoverage",
+      Json.arr(
+        Json.obj(
+          "layer" -> Json.fromString("forged-layer"),
+          "coverage" -> Json.obj("status" -> Json.fromString("attempted"))
+        )
+      )
+    )
+    val changedCoverageRoot = parsed.mapObject(
+      _.add(
+        "acquisition",
+        Json.fromJsonObject(
+          acquisitionObject.add("buildReceipt", Json.fromJsonObject(changedCoverageBuild))
+        )
+      )
+    )
+    assert(
+      decodeResult(Canonical.print(changedCoverageRoot)).isLeft,
+      "changed layer coverage must invalidate result-bound receipt identities"
+    )
+
     val fixtureAuthorityClaim = Json.obj(
       "status" -> Json.fromString("fixture_review"),
       "sourceChecksum" -> Json.fromString(identities.canonicalChecksum.hex),
@@ -332,7 +427,7 @@ class OutputCodecSuite extends FunSuite:
       ).add("viewBasis", Json.fromJsonObject(fixtureRelabel))
     )
     assert(
-      StoryOutputResultCodec.decode[String](Canonical.print(combinedRelabel)).isLeft,
+      decodeResult(Canonical.print(combinedRelabel)).isLeft,
       "a coordinated fixture authority and basis wire claim has no self-issued admission path"
     )
 
@@ -352,7 +447,7 @@ class OutputCodecSuite extends FunSuite:
       )
     )
     assert(
-      StoryOutputResultCodec.decode[String](Canonical.print(foreignIntake)).isLeft,
+      decodeResult(Canonical.print(foreignIntake)).isLeft,
       "changing only the intake receipt must invalidate result-bound report receipts"
     )
 
@@ -378,12 +473,12 @@ class OutputCodecSuite extends FunSuite:
       )
       .toOption
       .get
-    val foreignBasis = AdmittedViewBasis.fromAcquisition(foreignAccount).toOption.get
+    val foreignBasis: Option[AdmittedViewBasis] = None
     val foreignInput = ReportInputIdentity
       .forReport(
         foreignAccount,
         foreignArtifacts,
-        Some(foreignBasis),
+        foreignBasis,
         textRequest
       )
       .toOption
@@ -402,13 +497,13 @@ class OutputCodecSuite extends FunSuite:
       _.add("reportOutcomes", Json.fromValues(outcomes.updated(producedIndex, changedOutcome)))
     )
     assert(
-      StoryOutputResultCodec.decode[String](Canonical.print(foreignReceiptRoot)).isLeft,
+      decodeResult(Canonical.print(foreignReceiptRoot)).isLeft,
       "a receipt derived for another result must not survive contextual decoding"
     )
 
     def targetedContext(
         targetId: String
-    ): (AcquisitionAccount[String], ScientificArtifactRefs, AdmittedViewBasis) =
+    ): (AcquisitionAccount[String], ScientificArtifactRefs, Option[AdmittedViewBasis]) =
       val targetedUniverse = EstablishedUniverse
         .of(Vector(targetId), UniverseDefinitionId.unsafe("codec-target-identity/v1"))
         .toOption
@@ -435,7 +530,7 @@ class OutputCodecSuite extends FunSuite:
         )
         .toOption
         .get
-      (account, artifacts, AdmittedViewBasis.fromAcquisition(account).toOption.get)
+      (account, artifacts, None)
 
     val (alphaAccount, alphaArtifacts, alphaBasis) = targetedContext("alpha")
     val (betaAccount, betaArtifacts, betaBasis) = targetedContext("beta")
@@ -446,13 +541,13 @@ class OutputCodecSuite extends FunSuite:
       textRequest,
       alphaAccount,
       alphaArtifacts,
-      Some(alphaBasis)
+      alphaBasis
     )
     val alphaResult = StoryOutputResult
       .of(
         alphaAccount,
         alphaArtifacts,
-        Some(alphaBasis),
+        alphaBasis,
         Vector(textRequest),
         Vector(ReportOutcome.Produced(textId, textArtifact, alphaReceipt)),
         Vector.empty,
@@ -461,7 +556,7 @@ class OutputCodecSuite extends FunSuite:
       .toOption
       .get
     val betaInput = ReportInputIdentity
-      .forReport(betaAccount, betaArtifacts, Some(betaBasis), textRequest)
+      .forReport(betaAccount, betaArtifacts, betaBasis, textRequest)
       .toOption
       .get
     val alphaParsed = Canonical
@@ -485,39 +580,66 @@ class OutputCodecSuite extends FunSuite:
       _.add("reportOutcomes", Json.arr(Json.fromJsonObject(targetOnlyForeign)))
     )
     assert(
-      StoryOutputResultCodec.decode[String](Canonical.print(targetOnlyForeignRoot)).isLeft,
+      decodeResult(Canonical.print(targetOnlyForeignRoot)).isLeft,
       "contextual decoding must rederive target identity instead of trusting the wire receipt"
+    )
+  }
+
+  test("before-intake refusal round-trips with or without source-byte context") {
+    val failure = OutputFailure
+      .general(
+        OutputFailureCode.SourceUnavailable,
+        OutputReceiptId.unsafe("receipt-before-intake"),
+        None,
+        Vector.empty
+      )
+      .toOption
+      .get
+    val beforeIntake = SourceOutcome.beforeIntake(failure).toOption.get
+    val account = AcquisitionAccount
+      .of[String](
+        InvocationId.unsafe("invocation-before-intake"),
+        beforeIntake,
+        TargetUniverse.Unestablished(
+          UniverseFailure(
+            UniverseFailureReason.UpstreamUnavailable,
+            OutputReceiptId.unsafe("receipt-before-intake-universe"),
+            None
+          )
+        ),
+        SemanticOutcome.Refused(NonEmptyVector.one(failure)),
+        Vector.empty,
+        Vector.empty,
+        None,
+        None
+      )
+      .toOption
+      .get
+    val artifacts = ScientificArtifactRefs.of(account, None, None, None).toOption.get
+    val refused = StoryOutputResult
+      .of(account, artifacts, None, Vector.empty, Vector.empty, Vector.empty, Vector.empty)
+      .toOption
+      .get
+    val encoded = StoryOutputResultCodec.encode(refused)
+
+    assertEquals(StoryOutputResultCodec.decode[String](encoded), Right(refused))
+    assertEquals(
+      StoryOutputResultCodec.decode[String](encoded, Array.emptyByteArray),
+      Right(refused)
     )
   }
 
   test("post-decode source refusal round-trips completed decoded identity and receipt") {
     val whitespace = " \t\r\n"
     val bytes = whitespace.getBytes(StandardCharsets.UTF_8)
-    val admitted = OriginalSourceIdentity.fromBytes(
-      bytes,
-      textPlain,
-      Some(utf8),
-      utf8,
-      BomDisposition.Absent,
-      OutputReceiptId.unsafe("receipt-whitespace-intake")
-    )
-    val decoded = DecodedSourceIdentity.fromText(
-      whitespace,
-      DecodeReceipt.bind(
-        OutputReceiptId.unsafe("receipt-whitespace-decode"),
-        DecoderId.unsafe("strict-utf8/v1")
-      )
-    )
-    val failure = OutputFailure(
-      OutputFailureCode.ValidationFailed,
-      OutputReceiptId.unsafe("receipt-whitespace-source-refused"),
-      None,
-      Vector(OutputReceiptId.unsafe("receipt-whitespace-decode"))
-    )
+    val admission = SourceIdentities.admitUtf8(bytes, textPlain, Some(utf8))
+    val (refusedProgress, failure) = admission.refusal match
+      case Some(value) => value
+      case None        => fail("whitespace source was admitted")
     val refused = AcquisitionAccount
       .of[String](
         InvocationId.unsafe("invocation-whitespace-source-refused"),
-        SourceOutcome.Refused(RefusedSourceProgress.Decoded(admitted, decoded), failure),
+        SourceOutcome.Refused(refusedProgress, failure),
         TargetUniverse.Unestablished(
           UniverseFailure(
             UniverseFailureReason.UpstreamUnavailable,
@@ -557,8 +679,12 @@ class OutputCodecSuite extends FunSuite:
       .get
     val encoded = StoryOutputResultCodec.encode[String](refusedResult)
     assert(encoded.contains("\"status\":\"decoded\""))
-    assert(encoded.contains("\"id\":\"receipt-whitespace-decode\""))
-    assertEquals(StoryOutputResultCodec.decode[String](encoded), Right(refusedResult))
+    assert(encoded.contains("source-canonicalization"))
+    assert(
+      StoryOutputResultCodec.decode[String](encoded).isLeft,
+      "a decoded refusal still requires exact source bytes"
+    )
+    assertEquals(StoryOutputResultCodec.decode[String](encoded, bytes), Right(refusedResult))
 
     val parsed = Canonical.parse(encoded).toOption.get
     val sourceObject = parsed.hcursor.downField("source").focus.flatMap(_.asObject).get
@@ -583,7 +709,7 @@ class OutputCodecSuite extends FunSuite:
       )
     )
     assert(
-      StoryOutputResultCodec.decode[String](Canonical.print(mismatchedDecoder)).isLeft,
+      StoryOutputResultCodec.decode[String](Canonical.print(mismatchedDecoder), bytes).isLeft,
       "a free decoder label must not disagree with the fixed typed decode receipt"
     )
 
@@ -594,7 +720,74 @@ class OutputCodecSuite extends FunSuite:
         Json.fromJsonObject(sourceObject.add("progress", Json.fromJsonObject(progress)))
       )
     )
-    assert(StoryOutputResultCodec.decode[String](Canonical.print(tampered)).isLeft)
+    assert(StoryOutputResultCodec.decode[String](Canonical.print(tampered), bytes).isLeft)
+  }
+
+  test("strict decode failure round-trips through source and semantic refusal") {
+    val bytes = Array(0x61.toByte, 0xc2.toByte, 0x20.toByte)
+    val admission = SourceIdentities.admitUtf8(bytes, textPlain, Some(utf8))
+    val (progress, failure) = admission.refusal match
+      case Some(value) => value
+      case None        => fail("invalid UTF-8 was admitted")
+    val sourceRefusal = SourceOutcome.Refused(progress, failure)
+    val account = AcquisitionAccount
+      .of[String](
+        InvocationId.unsafe("invocation-decode-failure"),
+        sourceRefusal,
+        TargetUniverse.Unestablished(
+          UniverseFailure(
+            UniverseFailureReason.UpstreamUnavailable,
+            OutputReceiptId.unsafe("receipt-decode-failure-universe"),
+            None
+          )
+        ),
+        SemanticOutcome.Refused(NonEmptyVector.one(failure)),
+        Vector.empty,
+        Vector.empty,
+        None
+      )
+      .toOption
+      .get
+    val originalArtifact = ArtifactRef.fromBytes(
+      ArtifactId.unsafe("artifact-invalid-source"),
+      ArtifactRole.OriginalSource,
+      textPlain,
+      None,
+      bytes
+    )
+    val refs = ScientificArtifactRefs.of(account, Some(originalArtifact), None, None).toOption.get
+    val refused = StoryOutputResult
+      .of[String](account, refs, None, Vector.empty, Vector.empty, Vector.empty, Vector.empty)
+      .toOption
+      .get
+    val encoded = StoryOutputResultCodec.encode[String](refused)
+    assert(
+      StoryOutputResultCodec.decode[String](encoded).isLeft,
+      "a strict decode failure requires exact source bytes"
+    )
+    assertEquals(StoryOutputResultCodec.decode[String](encoded, bytes), Right(refused))
+
+    val parsed = Canonical.parse(encoded).toOption.get
+    val sourceObject = parsed.hcursor.downField("source").focus.flatMap(_.asObject).get
+    val failureObject = sourceObject("failure").flatMap(_.asObject).get
+    val detailObject = failureObject("detail").flatMap(_.asObject).get
+    val valueObject = detailObject("value").flatMap(_.asObject).get
+    val wrongPosition = detailObject.add(
+      "value",
+      Json.fromJsonObject(valueObject.add("bytePosition", Json.fromLong(1L)))
+    )
+    val tamperedFailure = failureObject.add("detail", Json.fromJsonObject(wrongPosition))
+    val tampered = parsed.mapObject(
+      _.add(
+        "source",
+        Json.fromJsonObject(sourceObject.add("failure", Json.fromJsonObject(tamperedFailure)))
+      )
+    )
+    assert(StoryOutputResultCodec.decode[String](Canonical.print(tampered), bytes).isLeft)
+
+    val changedBytes = bytes.clone()
+    changedBytes(0) = 0x62.toByte
+    assert(StoryOutputResultCodec.decode[String](encoded, changedBytes).isLeft)
   }
 
   test("partial outcome round-trips an optional canonical draft without claiming validation") {
@@ -612,7 +805,7 @@ class OutputCodecSuite extends FunSuite:
         Vector.empty,
         Vector.empty,
         Some(build),
-        Some(validatedAuthority)
+        None
       )
       .toOption
       .get
@@ -625,7 +818,7 @@ class OutputCodecSuite extends FunSuite:
       )
       .toOption
       .get
-    val partialBasis = AdmittedViewBasis.fromAcquisition(partialAcquisition).toOption.get
+    val partialBasis: Option[AdmittedViewBasis] = None
     val partialHtmlReceipt = reportReceipt(
       "receipt-html",
       "html/v1",
@@ -633,7 +826,7 @@ class OutputCodecSuite extends FunSuite:
       htmlRequest,
       partialAcquisition,
       partialArtifacts,
-      Some(partialBasis)
+      partialBasis
     )
     val partialTextReceipt = reportReceipt(
       "receipt-text",
@@ -642,17 +835,17 @@ class OutputCodecSuite extends FunSuite:
       textRequest,
       partialAcquisition,
       partialArtifacts,
-      Some(partialBasis)
+      partialBasis
     )
-    val partialHtmlFailure = htmlFailure.copy(
-      receipt = partialHtmlReceipt.id,
-      evidence = Vector(partialHtmlReceipt.id)
-    )
+    val partialHtmlFailure = htmlFailure
+      .withReceipt(partialHtmlReceipt.id, Vector(partialHtmlReceipt.id))
+      .toOption
+      .get
     val partialResult = StoryOutputResult
       .of(
         partialAcquisition,
         partialArtifacts,
-        Some(partialBasis),
+        partialBasis,
         Vector(htmlRequest, textRequest),
         Vector(
           ReportOutcome.Failed(htmlId, partialHtmlFailure, partialHtmlReceipt),
@@ -666,7 +859,7 @@ class OutputCodecSuite extends FunSuite:
     val encoded = StoryOutputResultCodec.encode[String](partialResult)
     assert(encoded.contains("\"status\":\"partial\""))
     assert(encoded.contains("\"draft\""))
-    assertEquals(StoryOutputResultCodec.decode[String](encoded), Right(partialResult))
+    assertEquals(decodeResult(encoded), Right(partialResult))
   }
 
   test("manifest round-trips, has external BundleId, and preserves partial delivery") {
@@ -709,7 +902,7 @@ class OutputCodecSuite extends FunSuite:
       .flatMap(_.asObject)
       .get
     val failedReceipt = failedDisposition("receipt").flatMap(_.asObject).get
-    val arbitrarySatisfiedReceipt = failedReceipt
+    val fabricatedSatisfiedReceipt = failedReceipt
       .add("decision", Json.obj("status" -> Json.fromString("satisfied")))
       .add(
         "preview",
@@ -724,23 +917,27 @@ class OutputCodecSuite extends FunSuite:
         "courts",
         Json.arr(
           Json.obj(
-            "court" -> Json.fromString("arbitrary-passed"),
+            "court" -> Json.fromString("browser-preview-produced"),
+            "disposition" -> Json.obj("status" -> Json.fromString("passed"))
+          ),
+          Json.obj(
+            "court" -> Json.fromString("direct-file-open"),
             "disposition" -> Json.obj("status" -> Json.fromString("passed"))
           )
         )
       )
-    val arbitrarySatisfiedDisposition = failedDisposition
+    val fabricatedSatisfiedDisposition = failedDisposition
       .add("status", Json.fromString("satisfied"))
-      .add("receipt", Json.fromJsonObject(arbitrarySatisfiedReceipt))
-    val arbitrarySatisfiedProfile = profiles.head.mapObject(
-      _.add("disposition", Json.fromJsonObject(arbitrarySatisfiedDisposition))
+      .add("receipt", Json.fromJsonObject(fabricatedSatisfiedReceipt))
+    val fabricatedSatisfiedProfile = profiles.head.mapObject(
+      _.add("disposition", Json.fromJsonObject(fabricatedSatisfiedDisposition))
     )
-    val arbitrarySatisfied = parsed.mapObject(
-      _.add("profileOutcomes", Json.fromValues(profiles.updated(0, arbitrarySatisfiedProfile)))
+    val fabricatedSatisfied = parsed.mapObject(
+      _.add("profileOutcomes", Json.fromValues(profiles.updated(0, fabricatedSatisfiedProfile)))
     )
     assert(
-      BundleManifestCodec.decode(Canonical.print(arbitrarySatisfied), result).isLeft,
-      "one arbitrary passed court must not fabricate a satisfied local-open profile"
+      BundleManifestCodec.decode(Canonical.print(fabricatedSatisfied), result).isLeft,
+      "the exact passed court labels must not fabricate a satisfied local-open profile"
     )
 
     val retiredBuiltIn = profiles.head.mapObject(
@@ -792,6 +989,150 @@ class OutputCodecSuite extends FunSuite:
       case other => fail(s"expected produced semantic model, got $other")
   }
 
+  test("manifest payload bindings are produced, bijective, and result-specific") {
+    val resultText = StoryOutputResultCodec.encode[String](result)
+    val entries = manifestEntries(resultText)
+    val profile = Vector(
+      BundleProfileOutcome(
+        BundleProfile.LocalOpen,
+        ProfileDisposition.Failed(htmlFailure, failedProfileReceipt)
+      )
+    )
+    val payloadEntry = entries.find(_.payload.contains(extensionId)).get
+    assert(BundleManifest.of(result, profile, entries).isValid)
+    assert(BundleManifest.of(result, profile, entries.filterNot(_ == payloadEntry)).isInvalid)
+
+    val duplicateArtifact = ArtifactRef.fromBytes(
+      ArtifactId.unsafe("artifact-extension-duplicate"),
+      ArtifactRole.Custom(
+        optionalExtension.namespace,
+        OutputLabel.unsafe("opaque-payload-duplicate"),
+        ArtifactId.unsafe("artifact-extension-duplicate")
+      ),
+      payloadEntry.mediaType,
+      payloadEntry.schemaVersion,
+      optionalExtension.payload.bytes.toArray
+    )
+    val duplicate = payloadEntry.copy(
+      role = duplicateArtifact.role,
+      path = BundlePath.unsafe("payloads/optional-future-duplicate.bin"),
+      disposition = ArtifactDisposition.Produced(duplicateArtifact)
+    )
+    assert(BundleManifest.of(result, profile, entries :+ duplicate).isInvalid)
+    assert(
+      BundleManifest
+        .of(
+          result,
+          profile,
+          entries.updated(
+            entries.indexOf(payloadEntry),
+            payloadEntry.copy(payload = Some(OutputPayloadId.unsafe("extra-payload")))
+          )
+        )
+        .isInvalid
+    )
+
+    val wrongSchema = OutputSchemaId.unsafe("future/wrong")
+    val payloadArtifact = payloadEntry.disposition match
+      case ArtifactDisposition.Produced(artifact) => artifact
+      case other                                  => fail(s"expected produced payload, got $other")
+    val wrongSchemaArtifact = ArtifactRef.fromBytes(
+      payloadArtifact.id,
+      payloadEntry.role,
+      payloadEntry.mediaType,
+      Some(wrongSchema),
+      optionalExtension.payload.bytes.toArray
+    )
+    assert(
+      BundleManifest
+        .of(
+          result,
+          profile,
+          entries.updated(
+            entries.indexOf(payloadEntry),
+            payloadEntry.copy(
+              schemaVersion = Some(wrongSchema),
+              disposition = ArtifactDisposition.Produced(wrongSchemaArtifact)
+            )
+          )
+        )
+        .isInvalid
+    )
+
+    val wrongChecksumArtifact = ArtifactRef.fromBytes(
+      ArtifactId.unsafe("artifact-extension-wrong-checksum"),
+      payloadEntry.role,
+      payloadEntry.mediaType,
+      payloadEntry.schemaVersion,
+      optionalExtension.payload.bytes
+        .updated(
+          0,
+          (optionalExtension.payload.bytes.head ^ 0x01).toByte
+        )
+        .toArray
+    )
+    assert(
+      BundleManifest
+        .of(
+          result,
+          profile,
+          entries.updated(
+            entries.indexOf(payloadEntry),
+            payloadEntry.copy(disposition = ArtifactDisposition.Produced(wrongChecksumArtifact))
+          )
+        )
+        .isInvalid
+    )
+    assert(
+      BundleManifest
+        .of(
+          result,
+          profile,
+          entries.updated(
+            entries.indexOf(payloadEntry),
+            payloadEntry.copy(
+              disposition = ArtifactDisposition.NotAttempted(
+                NotAttemptedReason.DependencyUnsupported,
+                None
+              )
+            )
+          )
+        )
+        .isInvalid
+    )
+
+    val foreignPayload = OutputPayload.Known(
+      KnownPayloadRef(extensionId, optionalExtension.schemaId, Checksum.ofText("foreign-payload"))
+    )
+    val foreignAccount = AcquisitionAccount
+      .of(
+        acquisition.invocationId,
+        acquisition.source,
+        acquisition.universe,
+        acquisition.semantic,
+        acquisition.targets,
+        Vector(foreignPayload),
+        acquisition.buildReceipt,
+        acquisition.viewAuthority
+      )
+      .toOption
+      .get
+    val foreignBasis: Option[AdmittedViewBasis] = None
+    val foreignResult = StoryOutputResult
+      .of[String](
+        foreignAccount,
+        scientificArtifacts,
+        foreignBasis,
+        Vector.empty,
+        Vector.empty,
+        Vector.empty,
+        Vector.empty
+      )
+      .toOption
+      .get
+    assert(BundleManifest.of(foreignResult, profile, entries).isInvalid)
+  }
+
   private def manifestEntries(resultText: String): Vector[ManifestEntry] =
     Vector(
       produced(
@@ -826,6 +1167,19 @@ class OutputCodecSuite extends FunSuite:
         semanticBytes,
         "artifact-semantic"
       ),
+      produced(
+        ArtifactRole.Custom(
+          optionalExtension.namespace,
+          OutputLabel.unsafe("opaque-payload"),
+          ArtifactId.unsafe("artifact-extension")
+        ),
+        "payloads/optional-future.bin",
+        MediaTypeId.unsafe("application/octet-stream"),
+        Some(optionalExtension.schemaId),
+        optionalExtension.payload.bytes.toArray,
+        "artifact-extension",
+        Some(extensionId)
+      ),
       ManifestEntry(
         ArtifactRole.BrowserPreview,
         BundlePath.unsafe("preview.html"),
@@ -850,7 +1204,8 @@ class OutputCodecSuite extends FunSuite:
       mediaType: MediaTypeId,
       schemaVersion: Option[OutputSchemaId],
       bytes: Array[Byte],
-      id: String
+      id: String,
+      payload: Option[OutputPayloadId] = None
   ): ManifestEntry =
     val artifact = ArtifactRef.fromBytes(
       ArtifactId.unsafe(id),
@@ -865,5 +1220,6 @@ class OutputCodecSuite extends FunSuite:
       mediaType,
       schemaVersion,
       ArtifactRequirement.Required,
-      ArtifactDisposition.Produced(artifact)
+      ArtifactDisposition.Produced(artifact),
+      payload
     )

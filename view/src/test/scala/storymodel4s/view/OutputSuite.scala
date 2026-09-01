@@ -12,52 +12,34 @@ class OutputSuite extends FunSuite:
   private val jsonType = MediaTypeId.unsafe("application/json")
   private val utf8 = CharsetId.unsafe("UTF-8")
   private val sourceBytes = "A\r\n😀  \t\r\nB".getBytes(StandardCharsets.UTF_8)
-  private val source = StorySource.fromText("A\r\n😀  \t\r\nB").toOption.get
-  private val original = OriginalSourceIdentity.fromBytes(
-    sourceBytes,
-    textPlain,
-    Some(utf8),
-    utf8,
-    BomDisposition.Absent,
-    OutputReceiptId.unsafe("receipt-intake")
-  )
-  private val identities = SourceIdentities.fromStorySource(
-    original,
-    source,
-    DecodeReceipt.bind(
-      OutputReceiptId.unsafe("receipt-decode"),
-      DecoderId.unsafe("strict-utf8/v1")
-    ),
-    OutputReceiptId.unsafe("receipt-canonical")
-  )
-  private val buildReceipt = ExtendedBuildReceipt(
-    BuildReceipt(source.id, source.canonicalChecksum, "test/v1", Vector.empty, 0L),
-    Vector.empty,
-    Map.empty
-  )
-  private val validatedAuthority = AcquisitionViewAuthority
-    .validatedBuild(SourceOutcome.Constructed(identities), buildReceipt)
-    .toOption
-    .get
-  test("v1 combines only a nonempty homogeneous admitted view basis") {
-    val acquired = AdmittedViewBasis.fromAcquisition(acquisition()).toOption.get
-    assertEquals(
-      AdmittedViewBasis.combineHomogeneous(Vector(acquired, acquired)),
-      Right(acquired)
-    )
+  private val admitted = SourceIdentities.admitUtf8(sourceBytes, textPlain, Some(utf8))
+  private val (source, identities) = admitted.constructed match
+    case Some(value) => value
+    case None        => fail(s"source fixture refused: ${admitted.outcome}")
+  private val original = identities.original
+  private val buildReceipt =
+    ExtendedBuildReceipt
+      .of(
+        BuildReceipt(source.id, source.canonicalChecksum, "test/v1", Vector.empty, 0L),
+        Vector.empty,
+        Map.empty
+      )
+      .toOption
+      .get
+  test("v1 refuses a view basis when no runtime issuer established authority") {
+    assert(AdmittedViewBasis.fromAcquisition(acquisition()).isLeft)
     assert(AdmittedViewBasis.combineHomogeneous(Vector.empty).isLeft)
   }
 
-  test("view-basis admission rejects checksum and unsupported fixture relabel mutations") {
-    val admitted = AdmittedViewBasis.fromAcquisition(acquisition()).toOption.get
+  test("view-basis admission rejects receipt-only build and fixture claims") {
     assert(
       AdmittedViewBasis
         .fromWire(
           acquisition(),
-          admitted.basis,
-          admitted.sourceChecksum,
+          ViewBasis.ValidatedBuild,
+          identities.canonicalChecksum,
           Some(Checksum.ofText("wrong-build")),
-          admitted.authority
+          BasisAuthority.ValidatedBuild(Checksum.ofText("wrong-build"))
         )
         .isLeft
     )
@@ -67,8 +49,8 @@ class OutputSuite extends FunSuite:
         .fromWire(
           acquisition(),
           ViewBasis.ResearcherReviewedFixture,
-          admitted.sourceChecksum,
-          admitted.buildReceiptChecksum,
+          identities.canonicalChecksum,
+          Some(buildReceipt.receipt.contentChecksum),
           BasisAuthority.FixtureReview(FixtureAdmissionReceiptId.unsafe("caller-fixture"))
         )
         .isLeft
@@ -89,7 +71,7 @@ class OutputSuite extends FunSuite:
   private def acquisition(
       payloads: Vector[OutputPayload] = Vector.empty,
       invocationId: InvocationId = InvocationId.unsafe("invocation-1"),
-      authority: Option[AcquisitionViewAuthority] = Some(validatedAuthority)
+      authority: Option[AcquisitionViewAuthority] = None
   ): AcquisitionAccount[String] =
     AcquisitionAccount
       .of(
@@ -135,12 +117,12 @@ class OutputSuite extends FunSuite:
     )
     .toOption
     .get
-  private val basis = AdmittedViewBasis.fromAcquisition(acquisition()).toOption.get
+  private val basis: Option[AdmittedViewBasis] = None
 
   private def targetFixture[Id](
       universeMembers: Vector[Id],
       targetOrder: Vector[Id]
-  ): (AcquisitionAccount[Id], ScientificArtifactRefs, AdmittedViewBasis) =
+  ): (AcquisitionAccount[Id], ScientificArtifactRefs, Option[AdmittedViewBasis]) =
     val targetUniverse = EstablishedUniverse
       .of(universeMembers, UniverseDefinitionId.unsafe("target-identity-court/v1"))
       .toOption
@@ -154,7 +136,7 @@ class OutputSuite extends FunSuite:
         targetOrder.map(TargetAccount(_, TargetDisposition.Accepted, Vector.empty)),
         Vector.empty,
         Some(buildReceipt),
-        Some(validatedAuthority)
+        None
       )
       .toOption
       .get
@@ -167,12 +149,11 @@ class OutputSuite extends FunSuite:
       )
       .toOption
       .get
-    val admitted = AdmittedViewBasis.fromAcquisition(account).toOption.get
-    (account, artifacts, admitted)
+    (account, artifacts, None)
 
   private def providerParamFixture(
       params: Map[String, String]
-  ): (AcquisitionAccount[String], ScientificArtifactRefs, AdmittedViewBasis) =
+  ): (AcquisitionAccount[String], ScientificArtifactRefs, Option[AdmittedViewBasis]) =
     val stage = StageId.unsafe("provider-param-stage")
     val output = Checksum.ofText("provider-param-output")
     val call = ProviderCall(
@@ -194,19 +175,23 @@ class OutputSuite extends FunSuite:
       Vector(call),
       cached = false
     )
-    val receipt = ExtendedBuildReceipt(
-      BuildReceipt(
-        source.id,
-        source.canonicalChecksum,
-        "provider-param-court/v1",
-        Vector(stage -> record.outputChecksum),
-        0L
-      ),
-      Vector(record),
-      Map.empty
-    )
+    val receipt =
+      ExtendedBuildReceipt
+        .of(
+          BuildReceipt(
+            source.id,
+            source.canonicalChecksum,
+            "provider-param-court/v1",
+            Vector(stage -> record.outputChecksum),
+            0L
+          ),
+          Vector(record),
+          Map.empty
+        )
+        .toOption
+        .get
     val sourceOutcome = SourceOutcome.Constructed(identities)
-    val authority = AcquisitionViewAuthority.validatedBuild(sourceOutcome, receipt).toOption.get
+    assert(AcquisitionViewAuthority.receiptMatches(sourceOutcome, receipt).isRight)
     val account = AcquisitionAccount
       .of(
         InvocationId.unsafe("invocation-provider-param"),
@@ -216,7 +201,7 @@ class OutputSuite extends FunSuite:
         Vector.empty,
         Vector.empty,
         Some(receipt),
-        Some(authority)
+        None
       )
       .toOption
       .get
@@ -224,15 +209,18 @@ class OutputSuite extends FunSuite:
       .of(account, Some(originalArtifact), Some(canonicalArtifact), Some(semanticArtifact))
       .toOption
       .get
-    (account, artifacts, AdmittedViewBasis.fromAcquisition(account).toOption.get)
+    (account, artifacts, None)
 
   test("source-stage refusal closes only artifact references that actually exist") {
-    val failure = OutputFailure(
-      OutputFailureCode.DecodeFailed,
-      OutputReceiptId.unsafe("receipt-source-refusal"),
-      None,
-      Vector(OutputReceiptId.unsafe("receipt-source-refusal"))
-    )
+    val failure = OutputFailure
+      .general(
+        OutputFailureCode.SourceUnavailable,
+        OutputReceiptId.unsafe("receipt-source-refusal"),
+        None,
+        Vector(OutputReceiptId.unsafe("receipt-source-refusal"))
+      )
+      .toOption
+      .get
     val universeFailure = UniverseFailure(
       UniverseFailureReason.UpstreamUnavailable,
       OutputReceiptId.unsafe("receipt-universe-refusal"),
@@ -283,28 +271,18 @@ class OutputSuite extends FunSuite:
 
     val whitespace = " \t\r\n"
     val whitespaceBytes = whitespace.getBytes(StandardCharsets.UTF_8)
-    val whitespaceOriginal = OriginalSourceIdentity.fromBytes(
-      whitespaceBytes,
-      textPlain,
-      Some(utf8),
-      utf8,
-      BomDisposition.Absent,
-      OutputReceiptId.unsafe("receipt-whitespace-intake")
-    )
-    val whitespaceDecoded = DecodedSourceIdentity.fromText(
-      whitespace,
-      DecodeReceipt.bind(
-        OutputReceiptId.unsafe("receipt-whitespace-decode"),
-        DecoderId.unsafe("strict-utf8/v1")
-      )
-    )
+    val whitespaceAdmission =
+      SourceIdentities.admitUtf8(whitespaceBytes, textPlain, Some(utf8))
+    val (whitespaceProgress, whitespaceFailure) = whitespaceAdmission.refusal match
+      case Some(value) => value
+      case None        => fail("whitespace source was admitted")
     assert(StorySource.fromText(whitespace).isLeft)
     val refusedAfterDecode = AcquisitionAccount
       .of(
         InvocationId.unsafe("invocation-refused-after-decode"),
         SourceOutcome.Refused(
-          RefusedSourceProgress.Decoded(whitespaceOriginal, whitespaceDecoded),
-          failure
+          whitespaceProgress,
+          whitespaceFailure
         ),
         TargetUniverse.Unestablished(universeFailure),
         semanticFailure,
@@ -341,7 +319,7 @@ class OutputSuite extends FunSuite:
     ArtifactRole.BrowserPreview,
     htmlType,
     ArtifactRequirement.Required,
-    ReportAuthority.ScientificView,
+    ReportAuthority.InvocationOnly,
     Set.empty
   )
   private val textRequest = ReportRequest(
@@ -350,7 +328,7 @@ class OutputSuite extends FunSuite:
     ArtifactRole.TextPreview,
     textPlain,
     ArtifactRequirement.Required,
-    ReportAuthority.ScientificView,
+    ReportAuthority.InvocationOnly,
     Set.empty
   )
   private def reportReceipt(
@@ -360,7 +338,7 @@ class OutputSuite extends FunSuite:
       request: ReportRequest,
       account: AcquisitionAccount[String] = acquisition(),
       artifacts: ScientificArtifactRefs = scientificArtifacts,
-      admittedBasis: Option[AdmittedViewBasis] = Some(basis)
+      admittedBasis: Option[AdmittedViewBasis] = basis
   ): ReportReceipt =
     ReportReceipt.issue(
       OutputReceiptId.unsafe(id),
@@ -374,12 +352,15 @@ class OutputSuite extends FunSuite:
     reportReceipt("receipt-html", "html-renderer/v1", "html-config", htmlRequest)
   private val textReceipt =
     reportReceipt("receipt-text", "text-renderer/v1", "text-config", textRequest)
-  private val htmlFailure = OutputFailure(
-    OutputFailureCode.SerializationFailed,
-    htmlReceipt.id,
-    None,
-    Vector(htmlReceipt.id)
-  )
+  private val htmlFailure = OutputFailure
+    .general(
+      OutputFailureCode.SerializationFailed,
+      htmlReceipt.id,
+      None,
+      Vector(htmlReceipt.id)
+    )
+    .toOption
+    .get
   private val failedProfileReceipt = ProfileReceipt(
     OutputReceiptId.unsafe("receipt-profile-local-failed"),
     ProfileSchemaId.unsafe("local-open/v1"),
@@ -409,7 +390,7 @@ class OutputSuite extends FunSuite:
       .of(
         acquisition(),
         scientificArtifacts,
-        Some(basis),
+        basis,
         Vector(htmlRequest, textRequest),
         Vector(
           ReportOutcome.Failed(htmlId, htmlFailure, htmlReceipt),
@@ -425,7 +406,7 @@ class OutputSuite extends FunSuite:
     val missing = StoryOutputResult.of(
       acquisition(),
       scientificArtifacts,
-      Some(basis),
+      basis,
       Vector(htmlRequest, textRequest),
       Vector(ReportOutcome.Failed(htmlId, htmlFailure, htmlReceipt)),
       Vector.empty,
@@ -440,12 +421,20 @@ class OutputSuite extends FunSuite:
   }
 
   test("a produced scientific report requires an admitted basis") {
+    val scientificRequest = textRequest.copy(authority = ReportAuthority.ScientificView)
+    val scientificReceipt = reportReceipt(
+      "receipt-scientific-text",
+      "text-renderer/v1",
+      "text-config",
+      scientificRequest,
+      admittedBasis = None
+    )
     val noBasis = StoryOutputResult.of(
       acquisition(),
       scientificArtifacts,
       None,
-      Vector(textRequest),
-      Vector(ReportOutcome.Produced(textId, textArtifact, textReceipt)),
+      Vector(scientificRequest),
+      Vector(ReportOutcome.Produced(textId, textArtifact, scientificReceipt)),
       Vector.empty,
       Vector.empty
     )
@@ -472,7 +461,7 @@ class OutputSuite extends FunSuite:
       )
       .toOption
       .get
-    val extensionBasis = AdmittedViewBasis.fromAcquisition(extensionAccount).toOption.get
+    val extensionBasis: Option[AdmittedViewBasis] = None
     val extensionReceipt = reportReceipt(
       "receipt-extension-text",
       "text-renderer/v1",
@@ -480,12 +469,12 @@ class OutputSuite extends FunSuite:
       request,
       extensionAccount,
       extensionArtifacts,
-      Some(extensionBasis)
+      extensionBasis
     )
     val result = StoryOutputResult.of(
       extensionAccount,
       extensionArtifacts,
-      Some(extensionBasis),
+      extensionBasis,
       Vector(request),
       Vector(ReportOutcome.Produced(textId, textArtifact, extensionReceipt)),
       Vector.empty,
@@ -505,7 +494,7 @@ class OutputSuite extends FunSuite:
       )
       .toOption
       .get
-    val foreignBasis = AdmittedViewBasis.fromAcquisition(foreignAccount).toOption.get
+    val foreignBasis: Option[AdmittedViewBasis] = None
     val foreignReceipt = reportReceipt(
       "receipt-foreign-text",
       "text-renderer/v1",
@@ -513,14 +502,14 @@ class OutputSuite extends FunSuite:
       textRequest,
       foreignAccount,
       foreignArtifacts,
-      Some(foreignBasis)
+      foreignBasis
     )
     assert(
       StoryOutputResult
         .of(
           acquisition(),
           scientificArtifacts,
-          Some(basis),
+          basis,
           Vector(textRequest),
           Vector(ReportOutcome.Produced(textId, textArtifact, foreignReceipt)),
           Vector.empty,
@@ -530,26 +519,14 @@ class OutputSuite extends FunSuite:
     )
   }
 
-  test("report identity binds the intake receipt and refuses a one-field foreign result") {
-    val foreignOriginal = OriginalSourceIdentity.fromBytes(
-      sourceBytes,
-      textPlain,
-      Some(utf8),
-      utf8,
-      BomDisposition.Absent,
-      OutputReceiptId.unsafe("receipt-intake-foreign")
-    )
-    val foreignIdentities = SourceIdentities.fromStorySource(
-      foreignOriginal,
-      source,
-      identities.decodeReceipt,
-      identities.canonicalizationReceipt
-    )
+  test("report identity binds exact original bytes even when decoded text is equal") {
+    val foreignBytes = Array(0xef.toByte, 0xbb.toByte, 0xbf.toByte) ++ sourceBytes
+    val foreignAdmission = SourceIdentities.admitUtf8(foreignBytes, textPlain, Some(utf8))
+    val foreignIdentities = foreignAdmission.constructed match
+      case Some((_, identity)) => identity
+      case None                => fail(s"foreign fixture refused: ${foreignAdmission.outcome}")
     val foreignSource = SourceOutcome.Constructed(foreignIdentities)
-    val foreignAuthority = AcquisitionViewAuthority
-      .validatedBuild(foreignSource, buildReceipt)
-      .toOption
-      .get
+    assert(AcquisitionViewAuthority.receiptMatches(foreignSource, buildReceipt).isRight)
     val foreignAccount = AcquisitionAccount
       .of(
         acquisition().invocationId,
@@ -559,26 +536,34 @@ class OutputSuite extends FunSuite:
         acquisition().targets,
         acquisition().payloads,
         Some(buildReceipt),
-        Some(foreignAuthority)
+        None
       )
       .toOption
       .get
     val foreignArtifacts = ScientificArtifactRefs
       .of(
         foreignAccount,
-        scientificArtifacts.originalSource,
+        Some(
+          ArtifactRef.fromBytes(
+            ArtifactId.unsafe("artifact-original-foreign"),
+            ArtifactRole.OriginalSource,
+            textPlain,
+            None,
+            foreignBytes
+          )
+        ),
         scientificArtifacts.canonicalSource,
         scientificArtifacts.semanticModel
       )
       .toOption
       .get
-    val foreignBasis = AdmittedViewBasis.fromAcquisition(foreignAccount).toOption.get
+    val foreignBasis: Option[AdmittedViewBasis] = None
     val originalInput = ReportInputIdentity
-      .forReport(acquisition(), scientificArtifacts, Some(basis), textRequest)
+      .forReport(acquisition(), scientificArtifacts, basis, textRequest)
       .toOption
       .get
     val foreignInput = ReportInputIdentity
-      .forReport(foreignAccount, foreignArtifacts, Some(foreignBasis), textRequest)
+      .forReport(foreignAccount, foreignArtifacts, foreignBasis, textRequest)
       .toOption
       .get
     assertNotEquals(originalInput, foreignInput)
@@ -595,7 +580,7 @@ class OutputSuite extends FunSuite:
         .of(
           acquisition(),
           scientificArtifacts,
-          Some(basis),
+          basis,
           Vector(textRequest),
           Vector(ReportOutcome.Produced(textId, textArtifact, foreignReceipt)),
           Vector.empty,
@@ -606,7 +591,7 @@ class OutputSuite extends FunSuite:
     )
   }
 
-  test("report identity binds acquisition authority even when no view basis is requested") {
+  test("report identity replays when both acquisition and view basis carry no authority") {
     val unlicensedAccount = acquisition(authority = None)
     val unlicensedArtifacts = ScientificArtifactRefs
       .of(
@@ -625,18 +610,18 @@ class OutputSuite extends FunSuite:
       .forReport(unlicensedAccount, unlicensedArtifacts, None, textRequest)
       .toOption
       .get
-    assertNotEquals(validatedInput, unlicensedInput)
+    assertEquals(validatedInput, unlicensedInput)
   }
 
   test("report identity binds ordered universe and target identities") {
     val (alpha, alphaArtifacts, alphaBasis) = targetFixture(Vector("alpha"), Vector("alpha"))
     val (beta, betaArtifacts, betaBasis) = targetFixture(Vector("beta"), Vector("beta"))
     val alphaInput = ReportInputIdentity
-      .forReport(alpha, alphaArtifacts, Some(alphaBasis), textRequest)
+      .forReport(alpha, alphaArtifacts, alphaBasis, textRequest)
       .toOption
       .get
     val betaInput = ReportInputIdentity
-      .forReport(beta, betaArtifacts, Some(betaBasis), textRequest)
+      .forReport(beta, betaArtifacts, betaBasis, textRequest)
       .toOption
       .get
     assertNotEquals(
@@ -652,14 +637,14 @@ class OutputSuite extends FunSuite:
     val (targetsReordered, targetsReorderedArtifacts, targetsReorderedBasis) =
       targetFixture(Vector("alpha", "beta"), Vector("beta", "alpha"))
     val orderedInput = ReportInputIdentity
-      .forReport(ordered, orderedArtifacts, Some(orderedBasis), textRequest)
+      .forReport(ordered, orderedArtifacts, orderedBasis, textRequest)
       .toOption
       .get
     val universeReorderedInput = ReportInputIdentity
       .forReport(
         universeReordered,
         universeReorderedArtifacts,
-        Some(universeReorderedBasis),
+        universeReorderedBasis,
         textRequest
       )
       .toOption
@@ -668,7 +653,7 @@ class OutputSuite extends FunSuite:
       .forReport(
         targetsReordered,
         targetsReorderedArtifacts,
-        Some(targetsReorderedBasis),
+        targetsReorderedBasis,
         textRequest
       )
       .toOption
@@ -713,7 +698,7 @@ class OutputSuite extends FunSuite:
       .forReport(
         left,
         leftArtifacts,
-        Some(AdmittedViewBasis.fromAcquisition(left).toOption.get),
+        None,
         textRequest
       )
       .toOption
@@ -722,7 +707,7 @@ class OutputSuite extends FunSuite:
       .forReport(
         right,
         rightArtifacts,
-        Some(AdmittedViewBasis.fromAcquisition(right).toOption.get),
+        None,
         textRequest
       )
       .toOption
@@ -732,7 +717,7 @@ class OutputSuite extends FunSuite:
         .forReport(
           left,
           leftArtifacts,
-          Some(AdmittedViewBasis.fromAcquisition(left).toOption.get),
+          None,
           textRequest
         )
         .toOption
@@ -757,7 +742,7 @@ class OutputSuite extends FunSuite:
         .of(
           left,
           leftArtifacts,
-          Some(AdmittedViewBasis.fromAcquisition(left).toOption.get),
+          None,
           Vector(textRequest),
           Vector(ReportOutcome.Produced(textId, textArtifact, foreignReceipt)),
           Vector.empty,
@@ -772,16 +757,16 @@ class OutputSuite extends FunSuite:
     val (left, leftArtifacts, leftBasis) = providerParamFixture(Map("a" -> "b=c"))
     val (right, rightArtifacts, rightBasis) = providerParamFixture(Map("a=b" -> "c"))
     val leftInput = ReportInputIdentity
-      .forReport(left, leftArtifacts, Some(leftBasis), textRequest)
+      .forReport(left, leftArtifacts, leftBasis, textRequest)
       .toOption
       .get
     val rightInput = ReportInputIdentity
-      .forReport(right, rightArtifacts, Some(rightBasis), textRequest)
+      .forReport(right, rightArtifacts, rightBasis, textRequest)
       .toOption
       .get
     assertEquals(
       ReportInputIdentity
-        .forReport(left, leftArtifacts, Some(leftBasis), textRequest)
+        .forReport(left, leftArtifacts, leftBasis, textRequest)
         .toOption
         .get,
       leftInput,
@@ -805,7 +790,7 @@ class OutputSuite extends FunSuite:
     )
     assert(
       ReportInputIdentity
-        .forReport(colliding, collidingArtifacts, Some(collidingBasis), textRequest)
+        .forReport(colliding, collidingArtifacts, collidingBasis, textRequest)
         .isLeft
     )
     assert(
@@ -813,7 +798,7 @@ class OutputSuite extends FunSuite:
         .of(
           colliding,
           collidingArtifacts,
-          Some(collidingBasis),
+          collidingBasis,
           Vector.empty,
           Vector.empty,
           Vector.empty,
@@ -831,14 +816,14 @@ class OutputSuite extends FunSuite:
       textRequest,
       beta,
       betaArtifacts,
-      Some(betaBasis)
+      betaBasis
     )
     assert(
       StoryOutputResult
         .of(
           alpha,
           alphaArtifacts,
-          Some(alphaBasis),
+          alphaBasis,
           Vector(textRequest),
           Vector(ReportOutcome.Produced(textId, textArtifact, betaReceipt)),
           Vector.empty,
@@ -857,7 +842,7 @@ class OutputSuite extends FunSuite:
       RendererId.unsafe("projection-renderer/v1"),
       OutputSoftwareId.unsafe("storyatlas/test"),
       ReportInputIdentity
-        .forProjection(acquisition(), scientificArtifacts, Some(basis), request)
+        .forProjection(acquisition(), scientificArtifacts, basis, request)
         .toOption
         .get,
       Checksum.ofText("projection-config")
@@ -868,7 +853,7 @@ class OutputSuite extends FunSuite:
         .of(
           acquisition(),
           scientificArtifacts,
-          Some(basis),
+          basis,
           Vector.empty,
           Vector.empty,
           Vector(request),
@@ -881,7 +866,7 @@ class OutputSuite extends FunSuite:
         .of(
           acquisition(),
           scientificArtifacts,
-          Some(basis),
+          basis,
           Vector.empty,
           Vector.empty,
           Vector(request),
@@ -912,7 +897,7 @@ class OutputSuite extends FunSuite:
       )
       .toOption
       .get
-    val extensionBasis = AdmittedViewBasis.fromAcquisition(extensionAccount).toOption.get
+    val extensionBasis: Option[AdmittedViewBasis] = None
     val projectionReceipt = ReportReceipt.issue(
       OutputReceiptId.unsafe("receipt-projection-future"),
       RendererId.unsafe("projection-renderer/v1"),
@@ -921,7 +906,7 @@ class OutputSuite extends FunSuite:
         .forProjection(
           extensionAccount,
           extensionArtifacts,
-          Some(extensionBasis),
+          extensionBasis,
           request
         )
         .toOption
@@ -937,7 +922,7 @@ class OutputSuite extends FunSuite:
         .of(
           extensionAccount,
           extensionArtifacts,
-          Some(extensionBasis),
+          extensionBasis,
           Vector.empty,
           Vector.empty,
           Vector(request),
@@ -1018,6 +1003,114 @@ class OutputSuite extends FunSuite:
     )
   }
 
+  test("not-requested semantics have distinct identity and manifest absence authority") {
+    val sourceOnly = AcquisitionAccount
+      .of(
+        InvocationId.unsafe("invocation-source-only"),
+        SourceOutcome.Constructed(identities),
+        TargetUniverse.Established(universe),
+        SemanticOutcome.NotRequested,
+        Vector.empty,
+        Vector.empty,
+        None
+      )
+      .toOption
+      .get
+    val sourceOnlyArtifacts = ScientificArtifactRefs
+      .of(sourceOnly, Some(originalArtifact), Some(canonicalArtifact), None)
+      .toOption
+      .get
+    assert(
+      ScientificArtifactRefs
+        .of(sourceOnly, Some(originalArtifact), Some(canonicalArtifact), Some(semanticArtifact))
+        .isInvalid
+    )
+
+    val refusal = OutputFailure
+      .general(
+        OutputFailureCode.ResolutionFailed,
+        OutputReceiptId.unsafe("receipt-semantic-refused"),
+        None,
+        Vector.empty
+      )
+      .toOption
+      .get
+    val refused = AcquisitionAccount
+      .of(
+        InvocationId.unsafe("invocation-source-only"),
+        SourceOutcome.Constructed(identities),
+        TargetUniverse.Established(universe),
+        SemanticOutcome.Refused(cats.data.NonEmptyVector.one(refusal)),
+        Vector.empty,
+        Vector.empty,
+        None
+      )
+      .toOption
+      .get
+    val refusedArtifacts = ScientificArtifactRefs
+      .of(refused, Some(originalArtifact), Some(canonicalArtifact), None)
+      .toOption
+      .get
+    val sourceOnlyIdentity = ReportInputIdentity
+      .forReport(sourceOnly, sourceOnlyArtifacts, None, textRequest)
+      .toOption
+      .get
+    val refusedIdentity = ReportInputIdentity
+      .forReport(refused, refusedArtifacts, None, textRequest)
+      .toOption
+      .get
+    assertNotEquals(sourceOnlyIdentity, refusedIdentity)
+
+    val result = StoryOutputResult
+      .of[String](
+        sourceOnly,
+        sourceOnlyArtifacts,
+        None,
+        Vector.empty,
+        Vector.empty,
+        Vector.empty,
+        Vector.empty
+      )
+      .toOption
+      .get
+    val base = partialEntries().filter(entry =>
+      Set(
+        ArtifactRole.OriginalSource,
+        ArtifactRole.CanonicalSource,
+        ArtifactRole.InvocationResult,
+        ArtifactRole.BrowserPreview
+      ).contains(entry.role)
+    )
+    val absent = ManifestEntry(
+      ArtifactRole.SemanticModel,
+      BundlePath.unsafe("storymodel.json"),
+      jsonType,
+      Some(OutputSchemaId.unsafe("storymodel/v1")),
+      ArtifactRequirement.Optional,
+      ArtifactDisposition.AbsentBySemanticContract(
+        SemanticAbsenceReason.SemanticsNotRequested
+      )
+    )
+    val localFailed = BundleProfileOutcome(
+      BundleProfile.LocalOpen,
+      ProfileDisposition.Failed(htmlFailure, failedProfileReceipt)
+    )
+    assert(BundleManifest.of(result, Vector(localFailed), base :+ absent).isValid)
+    assert(
+      BundleManifest
+        .of(
+          result,
+          Vector(localFailed),
+          base :+ absent.copy(
+            disposition = ArtifactDisposition.AbsentBySemanticContract(
+              SemanticAbsenceReason.SemanticNotValidated
+            )
+          )
+        )
+        .isInvalid
+    )
+  }
+
   test("partial draft has the same bijective semantic artifact closure as validated output") {
     val gap = ResultGap(
       ResultGapKind.Unresolved,
@@ -1033,7 +1126,7 @@ class OutputSuite extends FunSuite:
         Vector.empty,
         Vector.empty,
         Some(buildReceipt),
-        Some(validatedAuthority)
+        None
       )
       .toOption
       .get
@@ -1046,7 +1139,7 @@ class OutputSuite extends FunSuite:
       )
       .toOption
       .get
-    val partialBasis = AdmittedViewBasis.fromAcquisition(partialAcquisition).toOption.get
+    val partialBasis: Option[AdmittedViewBasis] = None
     val partialHtmlReceipt = reportReceipt(
       "receipt-html",
       "html-renderer/v1",
@@ -1054,7 +1147,7 @@ class OutputSuite extends FunSuite:
       htmlRequest,
       partialAcquisition,
       partialArtifacts,
-      Some(partialBasis)
+      partialBasis
     )
     val partialTextReceipt = reportReceipt(
       "receipt-text",
@@ -1063,17 +1156,17 @@ class OutputSuite extends FunSuite:
       textRequest,
       partialAcquisition,
       partialArtifacts,
-      Some(partialBasis)
+      partialBasis
     )
-    val partialHtmlFailure = htmlFailure.copy(
-      receipt = partialHtmlReceipt.id,
-      evidence = Vector(partialHtmlReceipt.id)
-    )
+    val partialHtmlFailure = htmlFailure
+      .withReceipt(partialHtmlReceipt.id, Vector(partialHtmlReceipt.id))
+      .toOption
+      .get
     val partialResult = StoryOutputResult
       .of(
         partialAcquisition,
         partialArtifacts,
-        Some(partialBasis),
+        partialBasis,
         Vector(htmlRequest, textRequest),
         Vector(
           ReportOutcome.Failed(htmlId, partialHtmlFailure, partialHtmlReceipt),
@@ -1145,7 +1238,7 @@ class OutputSuite extends FunSuite:
               .of(
                 partialAcquisition,
                 mutantRefs,
-                Some(basis),
+                basis,
                 Vector(htmlRequest, textRequest),
                 Vector(
                   ReportOutcome.Failed(htmlId, htmlFailure, htmlReceipt),
@@ -1180,7 +1273,7 @@ class OutputSuite extends FunSuite:
         Vector.empty,
         Vector.empty,
         Some(buildReceipt),
-        Some(validatedAuthority)
+        None
       )
       .toOption
       .get
@@ -1193,10 +1286,7 @@ class OutputSuite extends FunSuite:
       )
       .toOption
       .get
-    val withoutDraftBasis = AdmittedViewBasis
-      .fromAcquisition(withoutDraftAcquisition)
-      .toOption
-      .get
+    val withoutDraftBasis: Option[AdmittedViewBasis] = None
     val withoutDraftHtmlReceipt = reportReceipt(
       "receipt-html",
       "html-renderer/v1",
@@ -1204,7 +1294,7 @@ class OutputSuite extends FunSuite:
       htmlRequest,
       withoutDraftAcquisition,
       withoutDraftArtifacts,
-      Some(withoutDraftBasis)
+      withoutDraftBasis
     )
     val withoutDraftTextReceipt = reportReceipt(
       "receipt-text",
@@ -1213,17 +1303,17 @@ class OutputSuite extends FunSuite:
       textRequest,
       withoutDraftAcquisition,
       withoutDraftArtifacts,
-      Some(withoutDraftBasis)
+      withoutDraftBasis
     )
-    val withoutDraftHtmlFailure = htmlFailure.copy(
-      receipt = withoutDraftHtmlReceipt.id,
-      evidence = Vector(withoutDraftHtmlReceipt.id)
-    )
+    val withoutDraftHtmlFailure = htmlFailure
+      .withReceipt(withoutDraftHtmlReceipt.id, Vector(withoutDraftHtmlReceipt.id))
+      .toOption
+      .get
     val withoutDraftResult = StoryOutputResult
       .of(
         withoutDraftAcquisition,
         withoutDraftArtifacts,
-        Some(withoutDraftBasis),
+        withoutDraftBasis,
         Vector(htmlRequest, textRequest),
         Vector(
           ReportOutcome.Failed(htmlId, withoutDraftHtmlFailure, withoutDraftHtmlReceipt),
@@ -1239,7 +1329,7 @@ class OutputSuite extends FunSuite:
     assert(withoutDraftResult.acquisition.semantic.isInstanceOf[SemanticOutcome.Partial])
   }
 
-  test("profile certification binds exact preview, assets, and court outcomes") {
+  test("profile dispositions refuse fabricated satisfaction and bind honest receipts") {
     val htmlArtifact = ArtifactRef.fromBytes(
       ArtifactId.unsafe("artifact-html"),
       ArtifactRole.BrowserPreview,
@@ -1251,7 +1341,7 @@ class OutputSuite extends FunSuite:
       .of(
         acquisition(),
         scientificArtifacts,
-        Some(basis),
+        basis,
         Vector(htmlRequest, textRequest),
         Vector(
           ReportOutcome.Produced(htmlId, htmlArtifact, htmlReceipt),
@@ -1279,7 +1369,7 @@ class OutputSuite extends FunSuite:
       textPlain,
       textArtifact.checksum
     )
-    val satisfiedClaim = failedProfileReceipt.copy(
+    val fabricatedSatisfiedClaim = failedProfileReceipt.copy(
       id = OutputReceiptId.unsafe("receipt-profile-local-satisfied"),
       decision = ProfileReceiptDecision.Satisfied,
       preview = Some(previewBinding),
@@ -1295,63 +1385,39 @@ class OutputSuite extends FunSuite:
         )
       )
     )
-    val satisfiedReceipt = VerifiedProfileReceipt.localOpen(satisfiedClaim).toOption.get
-    val satisfied = BundleProfileOutcome(
-      BundleProfile.LocalOpen,
-      ProfileDisposition.Satisfied(satisfiedReceipt)
+    assert(
+      VerifiedProfileReceipt.localOpen(fabricatedSatisfiedClaim).isLeft,
+      "receipt-shaped passed labels cannot establish that a profile court ran"
     )
-    assert(BundleManifest.of(produced, Vector(satisfied), entries).isValid)
 
-    val wrongDecision = satisfiedClaim.copy(
-      decision = ProfileReceiptDecision.NotAttempted(NotAttemptedReason.VerificationNotRun)
+    val notAttemptedReason = NotAttemptedReason.VerificationNotRun
+    val notAttemptedReceipt = fabricatedSatisfiedClaim.copy(
+      id = OutputReceiptId.unsafe("receipt-profile-local-not-attempted"),
+      decision = ProfileReceiptDecision.NotAttempted(notAttemptedReason),
+      courts = Vector.empty
     )
-    assert(VerifiedProfileReceipt.localOpen(wrongDecision).isLeft)
+    val notAttempted = BundleProfileOutcome(
+      BundleProfile.LocalOpen,
+      ProfileDisposition.NotAttempted(notAttemptedReason, notAttemptedReceipt)
+    )
+    assert(BundleManifest.of(produced, Vector(notAttempted), entries).isValid)
+
+    val fabricatedDecision = notAttemptedReceipt.copy(
+      decision = ProfileReceiptDecision.Satisfied
+    )
+    val mismatchedNotAttempted = notAttempted.copy(
+      disposition = ProfileDisposition.NotAttempted(notAttemptedReason, fabricatedDecision)
+    )
+    assert(BundleManifest.of(produced, Vector(mismatchedNotAttempted), entries).isInvalid)
 
     val wrongPreviewPath = BundlePath.unsafe("index.html")
-    val movedEntries = entries.map {
-      case entry if entry.role == ArtifactRole.BrowserPreview =>
-        entry.copy(path = wrongPreviewPath)
-      case entry => entry
-    }
-    val movedReceipt = VerifiedProfileReceipt
-      .localOpen(satisfiedClaim.copy(preview = Some(previewBinding.copy(path = wrongPreviewPath))))
-      .toOption
-      .get
-    val movedProfile = satisfied.copy(
-      disposition = ProfileDisposition.Satisfied(movedReceipt)
+    val movedReceipt = notAttemptedReceipt.copy(
+      preview = Some(previewBinding.copy(path = wrongPreviewPath))
     )
-    assert(BundleManifest.of(produced, Vector(movedProfile), movedEntries).isInvalid)
-
-    assert(
-      VerifiedProfileReceipt.localOpen(satisfiedClaim.copy(preview = None)).isLeft,
-      "satisfied profile cannot omit preview evidence"
+    val movedProfile = notAttempted.copy(
+      disposition = ProfileDisposition.NotAttempted(notAttemptedReason, movedReceipt)
     )
-
-    val mutatedAssetReceipt = VerifiedProfileReceipt
-      .localOpen(
-        satisfiedClaim.copy(
-          requiredAssets = Vector(textBinding.copy(checksum = Checksum.ofText("mutant")))
-        )
-      )
-      .toOption
-      .get
-    val mutatedAsset = satisfied.copy(
-      disposition = ProfileDisposition.Satisfied(mutatedAssetReceipt)
-    )
-    assert(BundleManifest.of(produced, Vector(mutatedAsset), entries).isInvalid)
-
-    val arbitraryPassedCourt = satisfiedClaim.copy(
-      courts = Vector(
-        ProfileCourtOutcome(
-          ProfileCourtId.unsafe("arbitrary-passed"),
-          ProfileCourtDisposition.Passed
-        )
-      )
-    )
-    assert(
-      VerifiedProfileReceipt.localOpen(arbitraryPassedCourt).isLeft,
-      "one arbitrary passed court must not fabricate local-open satisfaction"
-    )
+    assert(BundleManifest.of(produced, Vector(movedProfile), entries).isInvalid)
 
     val failedCourt = failedProfileReceipt.copy(
       preview = Some(previewBinding),
@@ -1392,7 +1458,7 @@ class OutputSuite extends FunSuite:
           ArtifactId.unsafe("artifact-result"),
           ArtifactRole.InvocationResult,
           jsonType,
-          Some(OutputSchemaId.unsafe("story-output-result/v1")),
+          Some(OutputSchemaId.unsafe("story-output-result/v2")),
           "result".getBytes(StandardCharsets.UTF_8)
         ),
         ArtifactRequirement.Required
