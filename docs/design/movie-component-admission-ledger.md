@@ -317,10 +317,10 @@ use while every record stays `Draft`; it is the E0 bead's cost, not this one's.
 
 Beads executed under this authorization: `bd-01M1FDNN3T4SKZ5ZJN1XGXYNY7`
 (landing A: F0, `ffprobe` ingest, replay) and `bd-01M1FEN59CZCCR0SR3B6MZ1KYB`
-(landing B: decode to identified frames, `ContentDetector` proposals, and the
-F1 excerpt: manifest with archive and inner-file hashes, derivation script,
-CC BY 3.0 attribution, recorded probe, decode and detector run under
-`media/src/test/resources/f1/`).
+(landing B: decode to identified frames, `ContentDetector` proposals) and
+`bd-01M1FFZ7ETCP3WHNA5NHAESQ6Q` (F1: the *Big Buck Bunny* excerpt admitted with
+archive and inner-file hashes, derivation script, CC BY 3.0 attribution, and
+recorded probe, decode and detector run under `media/src/test/resources/f1/`).
 
 ### 6.2 Local realizations: five-axis records
 

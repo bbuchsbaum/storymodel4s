@@ -608,16 +608,27 @@ exactly one place (`Subprocess`). No portable module depends on it. Its vocabula
   carrying the generator's declared ground truth for project-authored media.
 - `ProbeEnvelope` — a recorded invocation (tool, exact arguments, stdout digest); the "injected typed
   receipt" ordinary CI replays instead of executing a tool.
-- `FfprobeJson`, `RawStream`, `RawPacket`, `Ffprobe` — the parser and the one admitted invocation.
-- `MediaProbe`, `ProbedStream`, `PacketIndex` — the adapter-side join of manifest, verified input,
-  tool, arguments and output into `CallerRuntimePacketRecord`s under a `SourceDerivationReceipt`,
-  plus an explicit packet-to-PTS table. Authority is `Draft` and the type offers no promotion.
+- `FfprobeJson`, `FfprobeOutput`, `RawStream`, `RawPacket`, `PacketFlags`, `Ffprobe` — the parser
+  and the one admitted invocation (with `-protocol_whitelist file`). A literal `INT64_MIN`
+  timestamp in the JSON is refused at parse; only an absent field is the typed missing.
+- `MediaProbe`, `ProbedStream`, `ProbedPacket`, `PacketIndex` (with `PacketIndex.Entry`) — the
+  adapter-side join of manifest, verified input, tool, arguments and output into
+  `CallerRuntimePacketRecord`s under a `SourceDerivationReceipt`, plus an explicit packet-to-PTS
+  table. Each `ProbedPacket` keeps core's `PacketTimeFields` and `MediaDuration` beside the draft
+  record; missingness is read from those typed fields, never from the record's raw `Long`s.
+  Authority is `Draft` and the type offers no promotion.
+- `FixtureTier`, `DeclaredPicture`, `DeclaredAudio` — manifest declarations the join checks against
+  the tool's report (pixel format, geometry, sample rate, channels). `DeclaredFrames` has a checked
+  constructor only.
 
 The join refuses, rather than repairs, on: input identity mismatch; an observed stream with no
 declaration (the ledger forbids ignoring a stream); a declared stream the tool omits; codec, kind,
-or timebase disagreeing with the declaration; a present PTS before a present DTS (core's
-`PacketTimeFields` refusal, message preserved). A missing PTS is a typed absence on the record and
-refuses index construction; it is never invented from a nominal rate.
+timebase, picture format or geometry, or audio parameters disagreeing with the declaration; a
+present PTS before a present DTS (core's `PacketTimeFields` refusal, message preserved); a negative
+duration. A missing PTS is a typed absence on the packet and refuses index construction; it is
+never invented from a nominal rate. The index refuses a corrupt-flagged packet and an `Unsupported`
+stream, does not present a discard-flagged packet, and refuses tick arithmetic that would overflow.
+`StreamDisposition` is law, not label: only a `Decoded` stream may yield frames.
 
 Rejected alternatives: (1) placing the adapter in `embed-bench`, which already runs the
 recall-to-video pipeline — that module exists to score alignments against gold and drags in ONNX
