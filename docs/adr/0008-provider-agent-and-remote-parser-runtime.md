@@ -76,11 +76,14 @@ conversion through `AmrCandidates.fromPenman`, and receipts that carry a real `P
    derived from the store before and after the run, not from the mode argument. No
    `PropositionChart` codec exists in the repository; the chart is published as its
    canonical serialization only, and a codec is a separate slice.
-9. **Dependency.** The official Anthropic Java SDK (`com.anthropic:anthropic-java`, version
-   pinned once in `build.sbt` and generated into `AnthropicSdkPin`; model id
-   `claude-sonnet-5`), confined to one file. It brings OkHttp and Jackson transitively,
-   acceptable in a JVM-only module under design-contract item 11. No sampling parameters and
-   no thinking configuration are sent. The `providerAgent` project depends on
+9. **Dependency.** The official Anthropic Java SDK (`com.anthropic:anthropic-java:2.34.0`,
+   version pinned once in `build.sbt` and generated into `AnthropicSdkPin`; model id
+   `claude-sonnet-5`), confined to one file. Resolved transitive set on 2026-09-01:
+   `anthropic-java-core` and `anthropic-java-client-okhttp` 2.34.0, `okhttp` 4.12.0, `okio`
+   3.6.0, Jackson 2.18.2 (`annotations`, `core`, `databind`, `datatype-jdk8`,
+   `datatype-jsr310`, `module-kotlin`), and `kotlin-stdlib` 1.9.10; acceptable in a JVM-only
+   module under design-contract item 11, and nothing portable depends on it. No sampling
+   parameters and no thinking configuration are sent. The `providerAgent` project depends on
    `providerParser`, `core.jvm`, `acquire.jvm`, `amrInterop.jvm`, and `proposition.jvm`,
    forks its tests, and is part of the root aggregate and of `jvmOnlyModules`.
 10. **Prompt package.** `prompts/penman-parse.v1.txt` on the classpath, manifested by

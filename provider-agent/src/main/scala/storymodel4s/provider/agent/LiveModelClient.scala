@@ -11,9 +11,9 @@ import scala.jdk.OptionConverters.*
 import storymodel4s.core.Checksum
 
 /** The only file that touches the Anthropic SDK. It sends exactly what a `ModelRequest` carries:
-  * the model id from the request, a cached system prompt, one user message, and a per-call
-  * timeout. No sampling parameters and no thinking configuration are sent. The reply records the
-  * requested model as its identity and the provider-reported model beside it as evidence.
+  * the model id from the request, a cached system prompt, one user message, and a per-call timeout.
+  * No sampling parameters and no thinking configuration are sent. The reply records the requested
+  * model as its identity and the provider-reported model beside it as evidence.
   */
 final class LiveModelClient private (client: AnthropicClient):
   def complete(request: ModelRequest): Either[ExchangeFailure, ModelReply] =
