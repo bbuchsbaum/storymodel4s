@@ -1,0 +1,58 @@
+{
+  "schema": "storymodel4s.media.fixture-manifest",
+  "schemaVersion": 1,
+  "fixtureId": "f0-v1",
+  "tier": "F0",
+  "file": "f0-v1.mov",
+  "sha256": "0cf05f22d1526ea16cc9fa1cd8cf676da065a2ff1f65c8013a4b27c515c45c08",
+  "byteLength": 111250,
+  "container": "mov",
+  "generator": {
+    "script": "media/tools/generate_f0.sh",
+    "frames": "media/tools/f0_frames.py",
+    "ffmpegVersionLine": "ffmpeg version 7.1.1 Copyright (c) 2000-2025 the FFmpeg developers",
+    "replayVerified": "2026-09-01: two consecutive runs produced identical bytes (cmp)"
+  },
+  "streams": [
+    {
+      "index": 0,
+      "kind": "Picture",
+      "codec": "rawvideo",
+      "timebase": "1/24000",
+      "disposition": "PacketIndexedOnly",
+      "pixFmt": "rgb24",
+      "width": 32,
+      "height": 18,
+      "declared": {
+        "generatedFrames": 48,
+        "nominalTicksPerFrame": 1000,
+        "droppedFrames": [5, 6, 20],
+        "shots": [
+          { "firstFrame": 0, "lastFrame": 15, "rgb": [200, 30, 30] },
+          { "firstFrame": 16, "lastFrame": 31, "rgb": [30, 200, 30] },
+          { "firstFrame": 32, "lastFrame": 47, "rgb": [30, 30, 200] }
+        ]
+      }
+    },
+    {
+      "index": 1,
+      "kind": "Audio",
+      "codec": "pcm_s16le",
+      "timebase": "1/8000",
+      "disposition": "PacketIndexedOnly",
+      "sampleRate": 8000,
+      "channels": 1,
+      "declared": {
+        "samples": 16000,
+        "toneHz": 440
+      }
+    }
+  ],
+  "properties": {
+    "variableFrameRate": true,
+    "ptsEqualsDts": true,
+    "timedText": "none; timed-text cues are deferred to the timed-language court and would need text admission"
+  },
+  "authority": "Generation is project-authored (FixtureScoped by construction). Every runtime probe record over these bytes is Draft under ADR 0007 C1 until an authorized E0 adapter exists.",
+  "rights": "Project-authored arithmetic content; no third-party material; no text; no faces."
+}
