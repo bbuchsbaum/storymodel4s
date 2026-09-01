@@ -22,15 +22,7 @@ object SurfaceAtlasArtifactCodec:
 
   /** Encode canonical UTF-8 JSON text without duplicating source text. */
   def encode(atlas: SurfaceAtlas): String =
-    Canonical.print(
-      Json.obj(
-        "schemaVersion" -> Json.fromString(SchemaVersion),
-        "storyId" -> summon[io.circe.Encoder[StoryId]](atlas.source.id),
-        "canonicalSourceChecksum" ->
-          summon[io.circe.Encoder[Checksum]](atlas.source.canonicalChecksum),
-        "units" -> summon[io.circe.Encoder[Vector[SurfaceUnit]]](canonicalUnits(atlas.units))
-      )
-    )
+    Canonical.print(artifactJson(atlas))
 
   /** Decode canonical artifact text against the source that owns its UTF-16 coordinate axis. */
   def decode(source: StorySource, text: String): Either[CodecError, SurfaceAtlas] =
@@ -72,7 +64,21 @@ object SurfaceAtlasArtifactCodec:
         "units are not in canonical kind-ordinal then unit-ordinal order"
       )
       atlas <- SurfaceAtlas.of(source, units).left.map(CodecError.Domain.apply)
+      _ <- requireField(
+        json == artifactJson(atlas),
+        "$",
+        "artifact contains unknown or noncanonical data fields"
+      )
     yield atlas
+
+  private def artifactJson(atlas: SurfaceAtlas): Json =
+    Json.obj(
+      "schemaVersion" -> Json.fromString(SchemaVersion),
+      "storyId" -> summon[io.circe.Encoder[StoryId]](atlas.source.id),
+      "canonicalSourceChecksum" ->
+        summon[io.circe.Encoder[Checksum]](atlas.source.canonicalChecksum),
+      "units" -> summon[io.circe.Encoder[Vector[SurfaceUnit]]](canonicalUnits(atlas.units))
+    )
 
   private def canonicalUnits(units: Vector[SurfaceUnit]): Vector[SurfaceUnit] =
     units.sortBy(unit => (unit.kind.ordinal, unit.ordinal))

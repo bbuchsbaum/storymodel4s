@@ -157,6 +157,38 @@ class SurfaceAtlasArtifactCodecSuite extends FunSuite:
     assert(!encoded.contains(marker), encoded)
   }
 
+  test("decode rejects unknown root and nested data but accepts presentation differences") {
+    val src = source("Canonical shape only.")
+    val atlas = SurfaceAnalyzer.analyze(src)
+    val encoded = SurfaceAtlasArtifactCodec.encode(atlas)
+    val root = Canonical.parse(encoded).toOption.flatMap(_.asObject).get
+
+    val extraRoot = Canonical.print(
+      Json.fromJsonObject(root.add("canonicalText", Json.fromString(src.canonicalText)))
+    )
+    assert(SurfaceAtlasArtifactCodec.decode(src, extraRoot).isLeft)
+
+    val units = root("units").flatMap(_.asArray).get
+    val firstUnit = units.head.asObject.get.add("text", Json.fromString("smuggled source text"))
+    val extraNested = Canonical.print(
+      Json.fromJsonObject(
+        root.add("units", Json.fromValues(Json.fromJsonObject(firstUnit) +: units.tail))
+      )
+    )
+    assert(SurfaceAtlasArtifactCodec.decode(src, extraNested).isLeft)
+
+    val reordered = Json.obj(
+      "units" -> root("units").get,
+      "canonicalSourceChecksum" -> root("canonicalSourceChecksum").get,
+      "storyId" -> root("storyId").get,
+      "schemaVersion" -> root("schemaVersion").get
+    )
+    val presentationOnly = io.circe.Printer.spaces2.print(reordered)
+    assertNotEquals(presentationOnly, encoded)
+    val decoded = SurfaceAtlasArtifactCodec.decode(src, presentationOnly).toOption.get
+    assertEquals(SurfaceAtlasArtifactCodec.encode(decoded), encoded)
+  }
+
   test("raw-different canonical-same sources lawfully share one surface artifact") {
     val rawA = "Hello\r\n\r\n\r\nworld  \n"
     val rawB = "Hello\n\nworld"
