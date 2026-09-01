@@ -1,6 +1,6 @@
 {
   "schema": "storymodel4s.sherlock.timebase-repair",
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "artifactId": "sherlock-topic-notebook-timebase-repair-v1",
   "inputAnnotation": {
     "artifactId": "sherlock-annotation-table-v1",
@@ -31,7 +31,8 @@
           "endSeconds": 1554.8
         }
       ],
-      "experimentalEditionBinding": "unconfirmed"
+      "experimentalEditionBinding": "owner-declared-and-byte-identified",
+      "experimentalEditionReceipt": "presentation-edition-identity-v1"
     },
     {
       "id": "annotation-run-local-seconds",
@@ -89,9 +90,32 @@
       "detailsRecord": "recall-lineage.json"
     },
     {
-      "id": "future-edition-playback-axis",
-      "kind": "not-yet-established",
-      "reason": "The exact experimental presentation edition and an alignment from that edition to the annotation are unconfirmed."
+      "id": "media-part-a-playback-ticks",
+      "kind": "edition-playback-time",
+      "status": "established",
+      "partId": "media-part-a",
+      "editionReceipt": "presentation-edition-identity-v1",
+      "timeBase": "1/2500",
+      "ticksPerSecond": 2500,
+      "ticksPerFrame": 100,
+      "startPts": 0,
+      "durationTicks": 3565500,
+      "durationSeconds": 1426.2,
+      "frameCount": 35655
+    },
+    {
+      "id": "media-part-b-playback-ticks",
+      "kind": "edition-playback-time",
+      "status": "established",
+      "partId": "media-part-b",
+      "editionReceipt": "presentation-edition-identity-v1",
+      "timeBase": "1/2500",
+      "ticksPerSecond": 2500,
+      "ticksPerFrame": 100,
+      "startPts": 0,
+      "durationTicks": 3887000,
+      "durationSeconds": 1554.8,
+      "frameCount": 38870
     }
   ],
   "repair": {
@@ -207,7 +231,11 @@
     "TR indices are not seconds and missing TRs are not zero.",
     "The Princeton and OpenNeuro recall clocks are distinct export coordinate systems.",
     "The 2963-second notebook denominator is not the 2981-second concatenated media duration.",
-    "A repaired coordinate does not prove exact experimental-edition alignment."
+    "A repaired coordinate does not prove exact experimental-edition alignment.",
+    "The repaired notebook axis is not a media axis and must never be used for the playback crosswalk.",
+    "Part-A playback ticks are not part-B playback ticks; the two parts have separate axes and are not concatenated.",
+    "An audio stream extent is not a presentation axis; the video stream is the declared primary stream.",
+    "Owner declaration plus byte identity establishes which edition was presented; it does not establish frame-exact narrative semantics."
   ],
   "scientificRestrictions": {
     "clockRepairMayEstablish": [
@@ -219,6 +247,164 @@
       "frame-exact-evidence",
       "missing-tr-imputation",
       "accepted-narrative-semantics"
+    ],
+    "editionIdentityEstablishes": [
+      "declared-presentation-edition",
+      "per-part-playback-axis",
+      "exact-annotation-to-playback-crosswalk"
+    ],
+    "editionIdentityDoesNotEstablish": [
+      "accepted-narrative-semantics",
+      "recall-to-playback-alignment",
+      "media-reachability-at-any-later-time"
     ]
+  },
+  "presentationEditionIdentity": {
+    "id": "presentation-edition-identity-v1",
+    "declaredBy": "owner",
+    "declaration": "The owner states that these two local iMovie parts are the edition presented to participants, in the order part 1 then part 2.",
+    "authority": "owner-declaration-plus-byte-identity",
+    "bytesDisposition": "external-to-git-and-not-redistributed",
+    "observedWith": "ffprobe version 7.1.1 Copyright (c) 2007-2025 the FFmpeg developers",
+    "parts": [
+      {
+        "partId": "media-part-a",
+        "presentationOrdinal": 1,
+        "sha256": "eb0364748e4bc6f66f43a84ab53e82792ac27dda48e9958bd5ba652c82b3ecca",
+        "byteLength": 285537456,
+        "container": {
+          "formatName": "mov,mp4,m4a,3gp,3g2,mj2",
+          "majorBrand": "M4V ",
+          "compatibleBrands": "M4V M4A mp42isom"
+        },
+        "primaryStream": "video",
+        "video": {
+          "codecName": "h264",
+          "profile": "Constrained Baseline",
+          "level": 30,
+          "width": 640,
+          "height": 360,
+          "pixelFormat": "yuv420p",
+          "frameRate": "25/1",
+          "constantFrameRate": true,
+          "timeBase": "1/2500",
+          "ticksPerSecond": 2500,
+          "ticksPerFrame": 100,
+          "startPts": 0,
+          "durationTicks": 3565500,
+          "durationSeconds": 1426.2,
+          "frameCount": 35655
+        },
+        "audio": {
+          "codecName": "aac",
+          "sampleRateHz": 44100,
+          "channels": 2,
+          "channelLayout": "stereo",
+          "timeBase": "1/44100",
+          "startPts": 0,
+          "durationTicks": 62610387,
+          "durationSeconds": 1419.7366666666667,
+          "frameCount": 61143
+        },
+        "streamExtentNote": "The audio stream is shorter than the video stream. The video stream is the declared primary presentation stream; the audio extent is recorded as an observed fact and is not an axis."
+      },
+      {
+        "partId": "media-part-b",
+        "presentationOrdinal": 2,
+        "sha256": "f6e2c839d355f86709379d74d28f24d89b919e45e0ac43771d197843ae694907",
+        "byteLength": 315565018,
+        "container": {
+          "formatName": "mov,mp4,m4a,3gp,3g2,mj2",
+          "majorBrand": "M4V ",
+          "compatibleBrands": "M4V M4A mp42isom"
+        },
+        "primaryStream": "video",
+        "video": {
+          "codecName": "h264",
+          "profile": "Constrained Baseline",
+          "level": 30,
+          "width": 640,
+          "height": 360,
+          "pixelFormat": "yuv420p",
+          "frameRate": "25/1",
+          "constantFrameRate": true,
+          "timeBase": "1/2500",
+          "ticksPerSecond": 2500,
+          "ticksPerFrame": 100,
+          "startPts": 0,
+          "durationTicks": 3887000,
+          "durationSeconds": 1554.8,
+          "frameCount": 38870
+        },
+        "audio": {
+          "codecName": "aac",
+          "sampleRateHz": 44100,
+          "channels": 2,
+          "channelLayout": "stereo",
+          "timeBase": "1/44100",
+          "startPts": 0,
+          "durationTicks": 68218878,
+          "durationSeconds": 1546.9133333333334,
+          "frameCount": 66620
+        },
+        "streamExtentNote": "The audio stream is shorter than the video stream. The video stream is the declared primary presentation stream; the audio extent is recorded as an observed fact and is not an axis."
+      }
+    ],
+    "filenamesUsedAsIdentity": false,
+    "pathsRecorded": false
+  },
+  "annotationToPlaybackCrosswalk": {
+    "id": "annotation-raw-to-part-playback-v1",
+    "status": "established",
+    "editionReceipt": "presentation-edition-identity-v1",
+    "certifies": "coordinate-mapping-only",
+    "doesNotCertify": "media-reachability",
+    "sourceCoordinate": "annotation-run-local-seconds (raw)",
+    "explicitlyNotUsed": "topic-notebook-repaired-seconds",
+    "whyNotRepaired": "The repaired 0-2963 s clock deletes source rows 481-482 and adds a 1419 s run-2 offset to build a continuous scanner/TR analysis axis. Those two operations are correct for that axis and wrong for media: they would place run-1's end at 1419 s, hiding 7 s of annotated part-A footage, and would map run-2 onto a concatenated timeline that no single media part has.",
+    "runs": [
+      {
+        "runId": "run-1",
+        "partId": "media-part-a",
+        "axisId": "media-part-a-playback-ticks",
+        "sourceCoordinate": "annotation-run-local-seconds (raw)",
+        "mapping": "identity",
+        "formula": "playbackTicks = rawAnnotationSeconds * ticksPerSecond",
+        "annotationRows": "1-482",
+        "annotationStartSeconds": 0,
+        "annotationEndSeconds": 1426,
+        "playbackStartTicks": 0,
+        "playbackEndTicks": 3565000,
+        "playbackEndFrame": 35650,
+        "uncoveredTailTicks": 500,
+        "uncoveredTailSeconds": 0.2,
+        "uncoveredTailFrames": 5
+      },
+      {
+        "runId": "run-2",
+        "partId": "media-part-b",
+        "axisId": "media-part-b-playback-ticks",
+        "sourceCoordinate": "annotation-run-local-seconds (raw)",
+        "mapping": "identity",
+        "formula": "playbackTicks = rawAnnotationSeconds * ticksPerSecond",
+        "annotationRows": "483-1000",
+        "annotationStartSeconds": 0,
+        "annotationEndSeconds": 1544,
+        "playbackStartTicks": 0,
+        "playbackEndTicks": 3860000,
+        "playbackEndFrame": 38600,
+        "uncoveredTailTicks": 27000,
+        "uncoveredTailSeconds": 10.8,
+        "uncoveredTailFrames": 270
+      }
+    ],
+    "exactness": {
+      "annotationTimeValues": 2000,
+      "nonIntegerValues": 0,
+      "valuesOffFrameBoundary": 0,
+      "valuesOffPtsTick": 0,
+      "conclusion": "Every annotation bound lands on an exact frame boundary and an exact presentation tick in both parts. The crosswalk needs no rounding, interpolation, or extrapolation."
+    },
+    "tailHandling": "observed-not-trimmed-not-imputed"
   }
 }

@@ -26,6 +26,15 @@ Non-video artifacts remain eligible under the ordinary artifact-specific workflo
 This slice does not propose any text-bearing source artifact for Git admission and
 contains no participant recall prose or episode annotation prose.
 
+On 2026-09-01 the owner declared the two local iMovie parts to be the edition
+presented to participants, in the order part 1 then part 2. `timebase-repair.json`
+records that declaration together with each part's SHA-256, byte length and stream
+metadata, and both parts' measured durations reproduce the extents that manifest
+already carried. That closes the edition binding, which had stood as `unconfirmed`,
+and replaces the placeholder `future-edition-playback-axis` with one established
+playback axis per part. Video bytes remain external to Git and are not
+redistributed; no filename or path is recorded.
+
 ## Records
 
 | Record | Contract |
@@ -34,7 +43,7 @@ contains no participant recall prose or episode annotation prose.
 | `annotation-lineage.json` | Public workbook identity, exact workbook-to-TSV replay, missingness, and distinct segmentation populations |
 | `recall-lineage.json` | Exact 17-source public release, local CSV identities, content-free reconciliation receipts, and per-source story-text disposition |
 | `alias-map.json` | Total one-to-one mapping of 16 convenience aliases, including the omitted fifth source and shifted numbering |
-| `timebase-repair.json` | Separate raw, scanner, media, recall, and repaired clocks plus the published two-run repair replay |
+| `timebase-repair.json` | Separate raw, scanner, media, recall, and repaired clocks; the published two-run repair replay; the owner-declared presentation edition with its per-part byte and stream identity; and the exact annotation-to-playback crosswalk |
 
 The JSON files are data, not prose conventions. Gates parse every file, canonicalize
 it with `jq -S -c`, and publish SHA-256 digests. Referenced local hashes are checked
