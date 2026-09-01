@@ -571,3 +571,22 @@ layers. The smallest coherent future API must therefore make three separations v
 
 Until those APIs exist and pass the courts above, documentation must describe film as approved
 architecture and a measured Sherlock source opportunity, not as a supported library workflow.
+
+## Amendments
+
+### 2026-09-01 — `core.DerivationReceipt` renamed to `SourceDerivationReceipt`
+
+The Stage C source contracts (salvaged in 12f15173) introduced `storymodel4s.core.DerivationReceipt`,
+the checked receipt on `CallerRuntimePacketRecord` and the axis-repair records. The name collides
+with the older `storymodel4s.document.DerivationReceipt` of ADR 0005: inside package
+`storymodel4s.document`, a wildcard `import storymodel4s.core.*` outranks a package member defined in
+another file, so `document` test sources resolved the core type and failed to compile on `main`.
+
+Decision: the core type is `SourceDerivationReceipt`. Its identity computation and constructor
+discipline are unchanged; only the name moves. The document compiler's `DerivationReceipt` keeps its
+name because it predates the collision and ADR 0005 names it.
+
+Rejected alternative: qualify the import in the document tests. That leaves two public types with
+one simple name in sibling modules, which every future `import storymodel4s.core.*` inside `document`
+would trip over again; the rule that names in `core` must not shadow names in modules that depend on
+it is cheaper enforced at the source than remembered at each import.
