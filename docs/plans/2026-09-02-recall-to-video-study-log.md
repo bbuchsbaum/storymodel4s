@@ -430,3 +430,54 @@ The three findings likely to outlast the numbers are mechanisms rather than effe
    matched-length coder text at the same node for all 11 participants, and added nothing once the
    coder descriptions were indexed. The captioning court earns its place on films whose annotation
    is sparse, which is the ordinary case and the reason to keep it.
+
+## Diagnosis 4: the sequential prior can be judged after all, and it is earned
+
+The study had deferred all transition-model work on the ground that Kendall tau cannot judge a
+sequential prior without circularity. That reasoning was right about tau and wrong about the
+conclusion, because tau is not the only outcome available.
+
+**The shuffle control, and two ways it failed.** The first plan was to permute the recall and treat
+`tau(real) - tau(shuffled)` as ordering attributable to content. Recorded because the failures are
+instructive:
+
+1. A sentence-level shuffle returned tau identical to four decimal places in both arms. That null
+   was too clean to be real, and it was not: these transcripts come from word-level CSVs and carry
+   no punctuation at all, so the sentence splitter found one sentence and permuted nothing. A null
+   result should always be checked for having run.
+2. Shuffling recall units and re-segmenting the joined text collapsed 172 units into 88, because
+   `StorySource` canonicalisation drops the punctuation used to rejoin them. Comparing arms with
+   half the units and twice the text per unit would measure segmentation, not ordering.
+
+Preserving the segmentation exactly needs the recall graph rebuilt from permuted units, which is
+more machinery than the question required, because a cheaper design answers it outright.
+
+**Scaling the prior to zero answers it directly.** `STORYMODEL4S_PRIOR_SCALE` multiplies the four
+transitions that encode the direction of time — `DiscourseSuccessor`, `WorldTimeSuccessor`,
+`Backward`, `LongJump` — leaving hierarchy, entity-thread and external moves alone so the state space
+is unchanged. At zero there is no ordering prior, so tau cannot be inflated by one.
+
+Turning the shipped prior on, against no prior, with the chosen channel:
+
+| Outcome | Difference | Improved | Circular with the prior? |
+|---|---|---|---|
+| Sequential coherence | +0.1037 | 11 of 11 | **yes, cannot judge** |
+| Concentration | +0.0123 | 11 of 11 | no |
+| Source mass | +0.0135 | 11 of 11 | no |
+| Localizability | +0.0057 | 11 of 11 | no |
+
+**The prior is earned, not manufactured.** A prior marching forward regardless of evidence would
+raise tau while flattening the posterior, since it would be overriding content. This one concentrates
+the posterior, attributes more mass to the film and lowers source entropy, for every participant on
+every measure. The unblended channel gives the same picture (+0.0822, +0.0133, +0.0142, +0.0055, all
+11 of 11).
+
+**This is the methodological unlock.** Transition-model work was blocked because its only judge
+looked circular. Three non-circular judges are now demonstrated to move with it, so the provisional
+weights can be tuned against those, with tau reported but never decisive.
+
+**And it re-validates the blend independently.** With the ordering prior removed entirely, the blend
+still improves ordering by +0.0508 with 10 of 11 participants and the interval excluding zero, and
+source mass by +0.0039 with 9 of 11. The blend's gain is content-driven; it was never an interaction
+with the prior. The two are complementary rather than substitutes, since the prior contributes more
+with the blend on (+0.1037) than off (+0.0822).
