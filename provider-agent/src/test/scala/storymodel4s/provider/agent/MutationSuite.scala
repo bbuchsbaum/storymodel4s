@@ -4,6 +4,7 @@ import cats.Id
 import io.circe.Json
 import io.circe.parser.parse
 import munit.FunSuite
+import storymodel4s.amr.graph.Decoder as AmrDecoder
 import storymodel4s.amr.schema.StarterLexicon
 import storymodel4s.provider.parser.*
 
@@ -102,20 +103,43 @@ class MutationSuite extends FunSuite:
     )
   }
 
-  test("(f) a marker on a role is refused by the transport as marker-not-on-concept") {
+  test("(f) a marker on a role is admitted, as relation evidence rather than a refusal") {
+    // A role marker says which token carried the relation. AmrCandidates represents it as a
+    // relation alignment, so refusing it here would discard evidence the chart can hold; measured
+    // against the fifty captured replies, that refusal cost seven whole sentences.
     val onRole = penman(0).replace(":ARG1 (p", ":ARG1~e.2 (p")
-    assertEquals(
-      failureOf(attemptFor(reply(onRole))),
-      ParserFailure.ProviderFailed(AgentFailureCodes.MarkerNotOnConcept)
+    val attempt = attemptFor(reply(onRole))
+    assert(attempt.result.isRight, s"a role marker was refused: ${attempt.result}")
+    val rows = SidecarDerivation.derive(
+      AmrDecoder.fromPenman(onRole).fold(e => fail(e.toString), identity).markers
+    )
+    assert(
+      rows.exists(_.providerNodeId.startsWith("role:")),
+      s"no role row in ${rows.map(_.providerNodeId)}"
     )
   }
 
-  test("(f') a marker on a literal target is refused the same way") {
+  test("(f') a marker on a literal target is admitted the same way, as attribute evidence") {
     val onLiteral = penman(0).replace("\"Egulac\"", "\"Egulac\"~e.4")
-    assertEquals(
-      failureOf(attemptFor(reply(onLiteral))),
-      ParserFailure.ProviderFailed(AgentFailureCodes.MarkerNotOnConcept)
+    val attempt = attemptFor(reply(onLiteral))
+    assert(attempt.result.isRight, s"a literal-target marker was refused: ${attempt.result}")
+    val rows = SidecarDerivation.derive(
+      AmrDecoder.fromPenman(onLiteral).fold(e => fail(e.toString), identity).markers
     )
+    assert(
+      rows.exists(_.providerNodeId.startsWith("target:")),
+      s"no target row in ${rows.map(_.providerNodeId)}"
+    )
+  }
+
+  test("every decoded marker becomes exactly one sidecar row, in decoder order") {
+    // The court requires one row per marker; mirroring is total, so a site kind cannot silently
+    // drop a row and leave the counts to disagree downstream.
+    val decoded = AmrDecoder.fromPenman(penman(0)).fold(e => fail(e.toString), identity)
+    val rows = SidecarDerivation.derive(decoded.markers)
+    assertEquals(rows.size, decoded.markers.size)
+    assertEquals(rows.map(_.ordinal), decoded.markers.indices.toVector)
+    assertEquals(rows.map(_.tokenIndices), decoded.markers.map(_.marker.indices))
   }
 
   test("(c) altering one echoed token text fails as TokenEchoMismatch at that index") {
