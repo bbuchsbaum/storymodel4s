@@ -15,8 +15,15 @@ import storymodel4s.story.*
   * this suite reads the WOG fixture model.
   */
 class CompiledAtlasSuite extends FunSuite:
+  // `titled` and not `fromText(..., Some(...))`: since the title rule landed, a title with no
+  // recorded provenance is not established, the summary family abstains, no story segment exists,
+  // and the model does not promote to validated. This suite's whole point is a validated model, so
+  // it has to state the basis for its title the way a caller does.
   private val source = StorySource
-    .fromText("The man went. The man saw. The man returned.", Some("Three steps"))
+    .titled(
+      "The man went. The man saw. The man returned.",
+      StoryTitle.callerSupplied("Three steps").fold(e => fail(e.message), identity)
+    )
     .fold(e => fail(e.message), identity)
   private val atlas = SurfaceAnalyzer.analyze(source)
   private val sentences = atlas.sentences
