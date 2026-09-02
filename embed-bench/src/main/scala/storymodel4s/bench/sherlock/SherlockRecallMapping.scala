@@ -51,6 +51,16 @@ object SherlockAnnotationView:
   def sourceTextPolicy: String =
     sys.env.get("STORYMODEL4S_SOURCE_TEXT").map(_.trim).filter(_.nonEmpty).getOrElse("bare")
 
+  /** Leaf and scene enrichment are separate effects and must be separable arms: measured on the
+    * development recalls, enriching both at once was strictly worse than bare on concentration and
+    * source mass, and a bundled arm cannot say which half caused it. `enriched` keeps the bundled
+    * meaning for the record of that run; `enriched-leaf` and `enriched-scene` isolate the halves.
+    */
+  private def enrichLeaves: Boolean =
+    sourceTextPolicy == "enriched" || sourceTextPolicy == "enriched-leaf"
+  private def enrichScenes: Boolean =
+    sourceTextPolicy == "enriched" || sourceTextPolicy == "enriched-scene"
+
   private def enriched(row: SherlockAnnotations.Row): String =
     val where = row.location.map(_.trim).filter(_.nonEmpty)
     val who = row.namesAll.map(_.trim).filter(_.nonEmpty).distinct
@@ -73,7 +83,6 @@ object SherlockAnnotationView:
     parts.mkString(". ")
 
   def segments(atlas: Atlas): Vector[TimedSegment] =
-    val policy = sourceTextPolicy
     atlas.rows.map { row =>
       TimedSegment(
         ordinal = row.row,
@@ -85,13 +94,13 @@ object SherlockAnnotationView:
             TimedSegment.Group(
               s.ordinal,
               s.label,
-              if policy == "enriched" then Some(enrichedGroup(atlas, s.ordinal, s.label)) else None
+              if enrichScenes then Some(enrichedGroup(atlas, s.ordinal, s.label)) else None
             )
           ),
         extraLemmas = stemsOf(row.namesAll) ++ stemsOf(row.namesSpeaking) ++
           row.location.map(Lexical.stems(_).toSet).getOrElse(Set.empty),
         locations = row.location.map(Lexical.words).getOrElse(Vector.empty),
-        embedText = if policy == "enriched" then Some(enriched(row)) else None
+        embedText = if enrichLeaves then Some(enriched(row)) else None
       )
     }
 
