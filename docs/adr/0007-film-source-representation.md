@@ -677,7 +677,41 @@ Bead `bd-01M1FEN59CZCCR0SR3B6MZ1KYB` (first acquisition court, landing B) adds t
 
 The worker itself lives at `media/worker/` as a uv-locked Python project pinned to the ledger's
 `scenedetect-headless` 0.7.1 wheel digest; it never opens a container and never computes a
-timestamp. Rejected alternatives: (1) `scenedetect.detect()` / `open_video()`, which would let the
+timestamp.
+
+### 2026-09-02 — `media`: timed visual descriptions as proposals (captioning lane)
+
+Under the captioning admission record (`docs/design/vlm-captioning-admission-record.md`, ledger
+§6.3; owner decisions of 2026-09-01 and 2026-09-02), `media` gains the G1 timed-language entry
+for machine descriptions:
+
+- `ModelPin` (repository, revision, every weight shard's digest), `CaptionRecipe` (fixed prompt by
+  digest, pixel limits, token budget, seed; frames always supplied explicitly as an image sequence;
+  greedy decoding only), `CaptionExtent` (a nonempty, strictly increasing list of frame ordinals),
+  `CaptionRequest`, `CaptionOutcome`, `AppliedCaptionRecipe` (what the processor applied, read
+  back), `CaptionResult`, `ModelEcho`, `CaptionEnvelope`.
+- `CaptionProposal` — one described extent: the text, the frames shown, and the playback interval
+  those frames span on the picture stream's axis, closed on the last frame's known duration from
+  the packet index; plus the recipe and model identities. It is a `Proposal` with `Draft`
+  authority (§6 output table, row "ASR text or visual description"): it says what a model wrote
+  about these frames. It is not a `TimedSegment`, offers no conversion to one, and cannot enter
+  the recall-to-video pipeline without a receipt-carrying adapter that does not yet exist.
+- `CaptionSearch` / `CaptionSearchResult` — the join, which refuses when the request does not
+  describe the frames, when the outcome answers another request, other frames, another recipe,
+  another model or an unverified one, or another runtime than the worker it is joined under; when
+  the applied recipe does not satisfy the declared one; when coverage is partial or a result does
+  not answer its extent; or when an extent cannot be closed on the axis. It reuses the boundary
+  court's identity-edit-list guard and names the same assumption in its receipt.
+- `WorkerRealization.observeCaption` — the captioning worker observed independently of its
+  outcome (interpreter versions plus script digest), as for the boundary worker.
+
+The worker lives at `media/worker-vlm/` (uv-locked: `mlx-vlm` 0.6.17 and `mlx` 0.32.2, MIT) and
+verifies the local model directory against the request's shard digests before loading it; it runs
+offline. Rejected alternatives: (1) letting the model see a video clip and its own frame timing,
+which would let the library own sampling and time (ledger §5 pattern; the adapter supplies frames
+by ordinal instead); (2) emitting `TimedSegment`s directly, which would put a proposal where the
+recall-to-video pipeline expects trusted source text; (3) a remote captioning API, rejected in the
+admission record on rights and privacy grounds. Rejected alternatives: (1) `scenedetect.detect()` / `open_video()`, which would let the
 library own decoding, frame timing and a nominal frame rate (ledger §5 forbids exactly this); (2)
 emitting `BoundaryClaim.shot(HardCut(instant))` directly, which would assert a morphology the
 detector cannot establish; (3) a JVM-side reimplementation of the detector, which would make the

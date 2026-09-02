@@ -1,0 +1,167 @@
+{
+  "applied": {
+    "greedy": true,
+    "imageMean": [
+      0.5,
+      0.5,
+      0.5
+    ],
+    "imageStd": [
+      0.5,
+      0.5,
+      0.5
+    ],
+    "maxNewTokens": 96,
+    "maxPixels": 1048576,
+    "mergeSize": 2,
+    "minPixels": 65536,
+    "patchSize": 16,
+    "presentation": "image-sequence",
+    "promptSha256": "5b2c6f12a2b37c81226f7f620800bd0a73cd3a46ccb02b46985b6642458bd3f5",
+    "size": null,
+    "temperature": 0.0,
+    "temporalPatchSize": 2
+  },
+  "coverage": {
+    "observed": 3,
+    "requested": 3
+  },
+  "extents": [
+    {
+      "generatedTokens": 23,
+      "id": "shot-1",
+      "imageGridThw": [
+        [
+          1,
+          12,
+          22
+        ],
+        [
+          1,
+          12,
+          22
+        ],
+        [
+          1,
+          12,
+          22
+        ],
+        [
+          1,
+          12,
+          22
+        ]
+      ],
+      "ordinals": [
+        0,
+        4,
+        9,
+        13
+      ],
+      "promptTokens": 319,
+      "text": "The images show a single, solid red screen with no visible objects, movement, or changes across the frames."
+    },
+    {
+      "generatedTokens": 23,
+      "id": "shot-2",
+      "imageGridThw": [
+        [
+          1,
+          12,
+          22
+        ],
+        [
+          1,
+          12,
+          22
+        ],
+        [
+          1,
+          12,
+          22
+        ],
+        [
+          1,
+          12,
+          22
+        ]
+      ],
+      "ordinals": [
+        14,
+        19,
+        24,
+        28
+      ],
+      "promptTokens": 319,
+      "text": "The images show a single, solid green screen with no objects, movement, or changes visible across the frames."
+    },
+    {
+      "generatedTokens": 26,
+      "id": "shot-3",
+      "imageGridThw": [
+        [
+          1,
+          12,
+          22
+        ],
+        [
+          1,
+          12,
+          22
+        ],
+        [
+          1,
+          12,
+          22
+        ],
+        [
+          1,
+          12,
+          22
+        ]
+      ],
+      "ordinals": [
+        29,
+        34,
+        39,
+        44
+      ],
+      "promptTokens": 319,
+      "text": "The images show a single, solid, deep blue screen with no variation in color, texture, or detail across all frames."
+    }
+  ],
+  "frames": {
+    "count": 45,
+    "height": 18,
+    "pixelFormat": "bgr24",
+    "sha256": "bb13ca6a6618982c1e3d840eb04e59b5aa2c52f9e2c118ab70762e2cc67968af",
+    "width": 32
+  },
+  "model": {
+    "architectures": [
+      "Qwen3VLForConditionalGeneration"
+    ],
+    "configSha256": "edac7703329133edfc53e46ac0081835144c99d7eebf28b71c732694d435224d",
+    "modelType": "qwen3_vl",
+    "repo": "Qwen/Qwen3-VL-4B-Instruct",
+    "revision": "ebb281ec70b0",
+    "shardsVerified": true
+  },
+  "recipe": {
+    "greedy": true,
+    "maxNewTokens": 96,
+    "maxPixels": 1048576,
+    "minPixels": 65536,
+    "presentation": "image-sequence",
+    "prompt": "These images are consecutive frames from one shot of a video. Describe in one or two plain sentences what is visible. Do not name characters, guess a story, or mention that these are frames.",
+    "seed": 0
+  },
+  "requestId": "f0-v1/caption/qwen3vl-4b/v1",
+  "runtime": {
+    "mlx": "0.32.2",
+    "mlx_vlm": "0.6.17",
+    "python": "3.13.11"
+  },
+  "schema": "storymodel4s.media.caption-outcome",
+  "schemaVersion": 1
+}

@@ -601,7 +601,7 @@ object BoundarySearch:
     * presentation starts elsewhere needs a track-composition receipt this module does not issue,
     * and is refused rather than placed on the axis by luck.
     */
-  private def identityEditList(frames: FrameSet): Either[DomainError, Unit] =
+  private[media] def identityEditList(frames: FrameSet): Either[DomainError, Unit] =
     val start = frames.probe.stream(frames.streamIndex).flatMap(_.startPts)
     val presentedFirst = frames.index.firstPts
     if frames.index.discarded == 0 && start.contains(presentedFirst) then Right(())
