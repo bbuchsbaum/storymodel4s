@@ -16,7 +16,10 @@ import storymodel4s.story.{Polarity as StoryPolarity, *}
   */
 class TrajectoryCompilerSuite extends FunSuite:
   private val source = StorySource
-    .fromText("The man went. The man saw. The man returned.", Some("Three steps"))
+    .titled(
+      "The man went. The man saw. The man returned.",
+      StoryTitle.callerSupplied("Three steps").fold(e => fail(e.message), identity)
+    )
     .fold(e => fail(e.message), identity)
   private val atlas = SurfaceAnalyzer.analyze(source)
   private val sentences = atlas.sentences
@@ -276,6 +279,7 @@ class TrajectoryCompilerSuite extends FunSuite:
       mentions,
       participants,
       coverage,
+      Vector.empty,
       temporal,
       AcceptancePolicy.Conservative,
       receipt,

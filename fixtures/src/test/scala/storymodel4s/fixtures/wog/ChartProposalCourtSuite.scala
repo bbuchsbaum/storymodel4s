@@ -20,9 +20,9 @@ import storymodel4s.story.{Polarity as StoryPolarity, *}
   */
 class ChartProposalCourtSuite extends FunSuite:
   private val source = StorySource
-    .fromText(
+    .titled(
       WarOfTheGhostsText.text,
-      Some(WarOfTheGhostsText.title),
+      WarOfTheGhostsModel.title,
       metadata = Map("source" -> WarOfTheGhostsText.provenance)
     )
     .fold(e => fail(e.message), identity)
@@ -210,10 +210,19 @@ class ChartProposalCourtSuite extends FunSuite:
 
     assertEquals(proposals.counts, CoverageCounts(4, 0, 2, 1, 43))
     assertEquals(proposals.coverage.size, 50)
-    assertEquals(proposals.summaryCoverage, SummaryCoverage.Proposed("The War of the Ghosts"))
+    assertEquals(
+      proposals.summaryCoverage,
+      SummaryCoverage.Proposed("The War of the Ghosts", TitleProvenance.CallerSupplied)
+    )
     val rows = proposals.coverage.map(row => row.sentence -> row).toMap
-    assertEquals(rows(sEgulac.id), SentenceCoverage.Proposed(ref(sEgulac, c0), 0, 2))
-    assertEquals(rows(sHunt.id), SentenceCoverage.Proposed(ref(sHunt, c0), 1, 0))
+    assertEquals(
+      rows(sEgulac.id),
+      SentenceCoverage.Proposed(ref(sEgulac, c0), FillerCounts(0, 0, 0, 2))
+    )
+    assertEquals(
+      rows(sHunt.id),
+      SentenceCoverage.Proposed(ref(sHunt, c0), FillerCounts(1, 0, 0, 0))
+    )
     assertEquals(
       rows(sRiver.id),
       SentenceCoverage.Abstained(
@@ -221,13 +230,16 @@ class ChartProposalCourtSuite extends FunSuite:
         AbstentionReason.FocusNotPredicate(ConceptKind.Entity)
       )
     )
-    assertEquals(rows(sFog.id), SentenceCoverage.Proposed(ref(sFog, c0), 0, 0))
+    assertEquals(rows(sFog.id), SentenceCoverage.Proposed(ref(sFog, c0), FillerCounts.empty))
     assertEquals(rows(sPaddle.id), SentenceCoverage.EmptyChart(sPaddle.id))
     assertEquals(
       rows(sThought.id),
       SentenceCoverage.Abstained(ref(sThought, c1), AbstentionReason.FocusEmbedded)
     )
-    assertEquals(rows(sArrows.id), SentenceCoverage.Proposed(ref(sArrows, c0), 0, 2))
+    assertEquals(
+      rows(sArrows.id),
+      SentenceCoverage.Proposed(ref(sArrows, c0), FillerCounts(0, 0, 0, 2))
+    )
     assertEquals(proposals.situations.size, 6)
     assertEquals(proposals.participantCoverage.size, 6)
     assertEquals(

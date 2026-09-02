@@ -89,9 +89,16 @@ object Referentiality:
     * destination, and location. `Location` is on it because a place is a referent — a canoe, a
     * shore, a named village — and no chart signal distinguishes "a place" from "an entity used as
     * one"; asserting that distinction from a word list would be exactly the world knowledge this
-    * layer refuses. `Cause` and `Result` relate eventualities. `Custom` is refused whatever its
-    * namespace, including this provider's own `amr:domain`, which says which concept a property is
-    * predicated of and therefore describes rather than participates.
+    * layer refuses. `Cause` and `Result` relate eventualities.
+    *
+    * `Custom` is refused with one named exception. `amr:domain` is this provider's own role, minted
+    * by `ChartProposalProvider.NamedRoles` for the predicative shape `(d / dead :domain (h / he))`,
+    * where the filler is the concept the property is predicated of. That filler is a referent — the
+    * state holds of it — and the reason `:domain` is a `Custom` at all is that it names no
+    * *thematic* role, which is a different question from whether it takes a referent. Refusing it
+    * would drop a real cast member to keep a tidy rule. Every other `Custom` role, `amr:purpose`
+    * included, is refused: nothing has established what its filler is, and the fail-closed answer
+    * is the truthful one.
     */
   def licence(role: ParticipantRole): RoleLicence = role match
     case ParticipantRole.Agent | ParticipantRole.Patient | ParticipantRole.Theme |
@@ -99,11 +106,18 @@ object Referentiality:
         ParticipantRole.Beneficiary | ParticipantRole.Source | ParticipantRole.Destination |
         ParticipantRole.Location =>
       RoleLicence.Referent
-    case ParticipantRole.Time         => RoleLicence.Circumstance(CircumstanceKind.Time)
-    case ParticipantRole.Manner       => RoleLicence.Circumstance(CircumstanceKind.Manner)
-    case ParticipantRole.Cause        => RoleLicence.Eventuality
-    case ParticipantRole.Result       => RoleLicence.Eventuality
-    case ParticipantRole.Custom(_, _) => RoleLicence.Unestablished
+    case ParticipantRole.Time               => RoleLicence.Circumstance(CircumstanceKind.Time)
+    case ParticipantRole.Manner             => RoleLicence.Circumstance(CircumstanceKind.Manner)
+    case ParticipantRole.Cause              => RoleLicence.Eventuality
+    case ParticipantRole.Result             => RoleLicence.Eventuality
+    case role if role == PredicationSubject => RoleLicence.Referent
+    case ParticipantRole.Custom(_, _)       => RoleLicence.Unestablished
+
+  /** The provider's own `:domain` role: the concept a predicative state is predicated of. Named
+    * here rather than spelled inline so the exception has one definition and one place to read
+    * about it.
+    */
+  val PredicationSubject: ParticipantRole = ParticipantRole.Custom("amr", "domain")
 
   /** Whether a concept of this kind can denote a referent at all.
     *

@@ -9,11 +9,9 @@ import storymodel4s.story.{Polarity as StoryPolarity, *}
 
 /** Court for [[ChartProposalProvider]]: hand-built checked charts in, compiler input out. */
 class ChartProposalProviderSuite extends FunSuite:
+  private val title = StoryTitle.callerSupplied("Tiny story").fold(e => fail(e.message), identity)
   private val source = StorySource
-    .fromText(
-      "Anna entered the room. She did not rest. The lamp was on the table.",
-      Some("Tiny story")
-    )
+    .titled("Anna entered the room. She did not rest. The lamp was on the table.", title)
     .fold(e => fail(e.message), identity)
   private val atlas = SurfaceAnalyzer.analyze(source)
   private val sentences = atlas.sentences
@@ -222,13 +220,16 @@ class ChartProposalProviderSuite extends FunSuite:
     assertEquals(
       proposals.coverage,
       Vector(
-        SentenceCoverage.Proposed(root, 0, 2),
+        SentenceCoverage.Proposed(root, FillerCounts(0, 0, 0, 2)),
         SentenceCoverage.NoChart(s1.id),
         SentenceCoverage.NoChart(s2.id)
       )
     )
     assertEquals(proposals.counts, CoverageCounts(1, 0, 0, 0, 2))
-    assertEquals(proposals.summaryCoverage, SummaryCoverage.Proposed("Tiny story"))
+    assertEquals(
+      proposals.summaryCoverage,
+      SummaryCoverage.Proposed("Tiny story", TitleProvenance.CallerSupplied)
+    )
   }
 
   test("situation support is the union of chart alignment spans, never the sentence text") {
@@ -285,7 +286,10 @@ class ChartProposalProviderSuite extends FunSuite:
     assertEquals(byRef(ref(s2, c0)).predicate.frame, Some("propbank:be-located-at-91"))
     assertEquals(byRef(ref(s2, c0)).description, "be-located-at lamp table")
     assertEquals(byRef(ref(s0, c0)).kind, SituationKind.Event)
-    assertEquals(proposals.coverage(2), SentenceCoverage.Proposed(ref(s2, c0), 0, 2))
+    assertEquals(
+      proposals.coverage(2),
+      SentenceCoverage.Proposed(ref(s2, c0), FillerCounts(0, 0, 0, 2))
+    )
 
     val compiled = compile(Vector(s2.id -> lampChart))
     val model = compiled.validated.getOrElse(fail(compiled.validation.report.render))
@@ -426,7 +430,7 @@ class ChartProposalProviderSuite extends FunSuite:
       proposals.coverage,
       Vector(
         SentenceCoverage.EmptyChart(s0.id),
-        SentenceCoverage.Proposed(ref(s1, c0), 0, 0),
+        SentenceCoverage.Proposed(ref(s1, c0), FillerCounts(0, 0, 0, 0)),
         SentenceCoverage.NoChart(s2.id)
       )
     )
@@ -485,7 +489,10 @@ class ChartProposalProviderSuite extends FunSuite:
     val root = ref(s0, c0)
     val anna = ref(s0, c1)
 
-    assertEquals(proposals.coverage.head, SentenceCoverage.Proposed(root, 1, 1))
+    assertEquals(
+      proposals.coverage.head,
+      SentenceCoverage.Proposed(root, FillerCounts(1, 0, 0, 1))
+    )
     assertEquals(proposals.participants.map(a => (a.situation, a.filler)), Vector((root, anna)))
     assertEquals(
       proposals.participants.head.bundle.proposals.head.value,
@@ -525,7 +532,7 @@ class ChartProposalProviderSuite extends FunSuite:
   }
 
   test(
-    "named time and location roles map as the AMR adapter maps them; the unaligned filler cites the root"
+    "a named time role becomes a circumstance and a named location role a participant"
   ) {
     val chart = checked(
       s0,
@@ -547,14 +554,31 @@ class ChartProposalProviderSuite extends FunSuite:
       .map(a => a.filler -> a.bundle.proposals.head.value.getOrElse(fail("no role")))
       .toMap
 
-    assertEquals(proposals.coverage.head, SentenceCoverage.Proposed(ref(s0, c0), 2, 0))
-    assertEquals(byFiller(ref(s0, c1)), ParticipantRole.Time)
+    assertEquals(
+      proposals.coverage.head,
+      SentenceCoverage.Proposed(ref(s0, c0), FillerCounts(1, 1, 0, 0))
+    )
+    assertEquals(byFiller.keySet, Set(ref(s0, c2)))
     assertEquals(byFiller(ref(s0, c2)), ParticipantRole.Location)
+    assertEquals(proposals.entityMentions.map(_.mention), Vector(ref(s0, c2)))
+    assertEquals(
+      proposals.circumstances.map(a => (a.situation, a.filler)),
+      Vector((ref(s0, c0), ref(s0, c1)))
+    )
+    assertEquals(
+      proposals.circumstances.head.bundle.proposals.head.value,
+      Some(CircumstanceProposal(CircumstanceKind.Time, "night"))
+    )
     val mentionSources = proposals.calls
       .filter(_.params.get("rule").contains("entity-filler-mention-rule"))
       .map(c => c.params("filler") -> spanSourceOf(c))
       .toMap
-    assertEquals(mentionSources, Map("c1" -> "root-support", "c2" -> "filler-alignments"))
+    assertEquals(mentionSources, Map("c2" -> "filler-alignments"))
+    val circumstanceSources = proposals.calls
+      .filter(_.params.get("rule").contains("situation-circumstance-rule"))
+      .map(c => c.params("filler") -> spanSourceOf(c))
+      .toMap
+    assertEquals(circumstanceSources, Map("c1" -> "root-support"))
   }
 
   test("a filler reached by two different licensed roles is unlicensed, not a guess") {
@@ -571,7 +595,10 @@ class ChartProposalProviderSuite extends FunSuite:
     )
     val proposals = propose(Vector(s0.id -> chart))
 
-    assertEquals(proposals.coverage.head, SentenceCoverage.Proposed(ref(s0, c0), 0, 1))
+    assertEquals(
+      proposals.coverage.head,
+      SentenceCoverage.Proposed(ref(s0, c0), FillerCounts(0, 0, 0, 1))
+    )
     assertEquals(proposals.participants, Vector.empty)
     assertEquals(proposals.entityMentions, Vector.empty)
   }
@@ -613,7 +640,7 @@ class ChartProposalProviderSuite extends FunSuite:
   test("the rules text is pinned by its checksum, so a rule change is a visible change") {
     assertEquals(
       ChartProposalProvider.Prompt.checksum.hex,
-      "70333fc4c70a3631edbffcb825990174046c09b4ae02489d8015c7b0827b8142"
+      "d1c144cffe9f4563ef30669116232d511f2d5e82da2a00a4bec296015b1de1ea"
     )
     val rules = ChartProposalProvider.RulesText
     assert(rules.contains("Never Before or Meets"))
@@ -625,6 +652,21 @@ class ChartProposalProviderSuite extends FunSuite:
     assert(rules.contains(":location (e / egulac)"), "the existential rule is not stated")
     assert(rules.contains("span-source=branch-alignments"), "branch support is not stated")
     assert(rules.contains("domain=Custom(amr,domain)"), "the domain role is not in the table")
+    // Slice 1.7's referentiality rule is stated here for the same reason: deleting a clause moves
+    // the checksum, and with it the prompt-package checksum and the provenance config hash.
+    assert(rules.contains("role-referentiality-rule"), "the referentiality rule is not named")
+    assert(
+      rules.contains(
+        "Agent, Beneficiary, Destination, Experiencer, Instrument, Location, Patient, Source, " +
+          "Stimulus, Theme"
+      ),
+      "the referential role set is not stated"
+    )
+    assert(rules.contains("Time and Manner name circumstances"), "circumstances are not stated")
+    assert(
+      rules.contains("concept kinds that denote a referent are Entity and Name"),
+      "the referential concept kinds are not stated"
+    )
   }
 
   test("chart order and alignment order do not change the proposals or the fingerprint") {
@@ -677,7 +719,7 @@ class ChartProposalProviderSuite extends FunSuite:
       input.receipt.stages.map(_._2.hex),
       Vector(
         "ca098dfba74c48f09213cfea0c48e4de6bc211b67231ae64e8c684bd05420c90",
-        "84eabe6fc497fe56d1e5d473efc5f1eaa4a8395a2209adb60acad67dfd7a3bfb"
+        "6ebdd345a78a035d7e78f7e6f01ec49c59b58664cd71d67faa07b6574bd36274"
       )
     )
     assertEquals(input.receipt.createdAtEpochMillis, 7L)

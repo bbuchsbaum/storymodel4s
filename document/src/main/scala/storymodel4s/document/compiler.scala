@@ -1986,6 +1986,7 @@ object NarrativeCompiler:
         mentionRecords.map(r => (r.target, ClaimFamily.EntityMention, r.state)) ++
         participantRecords.map(r => (r.target, ClaimFamily.ParticipantRole, r.state)) ++
         coverageRecords.map(r => (r.target, ClaimFamily.ParticipantCoverage, r.state)) ++
+        circumstanceRecords.map(r => (r.target, ClaimFamily.SituationCircumstance, r.state)) ++
         temporalRecords.map(r => (r.target, ClaimFamily.TemporalRelation, r.state))
     val gapByTarget = gapVec.groupBy(_.target)
     val resolvedAttempts = allRecords.sortBy(_._1).map { (target, family, state) =>

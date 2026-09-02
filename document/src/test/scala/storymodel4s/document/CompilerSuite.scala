@@ -9,7 +9,10 @@ import storymodel4s.story.{Polarity as StoryPolarity, *}
 
 class CompilerSuite extends FunSuite:
   private val source = StorySource
-    .fromText("Anna entered the room. She rested.", Some("Tiny story"))
+    .titled(
+      "Anna entered the room. She rested.",
+      StoryTitle.callerSupplied("Tiny story").fold(e => fail(e.message), identity)
+    )
     .fold(e => fail(e.message), identity)
   private val atlas = SurfaceAnalyzer.analyze(source)
   private val sentences = atlas.sentences
@@ -194,6 +197,7 @@ class CompilerSuite extends FunSuite:
       Vector.empty,
       Vector.empty,
       coverageAttempts.getOrElse(situationAttempts.map(a => coverageAttempt(a.source))),
+      Vector.empty,
       temporal,
       AcceptancePolicy.Conservative,
       receipt,
@@ -649,6 +653,7 @@ class CompilerSuite extends FunSuite:
           Vector.empty
         )
       ),
+      Vector.empty,
       Vector.empty,
       Vector.empty,
       Vector.empty,

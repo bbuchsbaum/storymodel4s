@@ -509,10 +509,12 @@ object ChartProposalProvider:
        |  referent and no chart signal separates "a place" from "an entity standing in for one",
        |  and asserting that separation from a word list would be world knowledge this layer does
        |  not have. Time and Manner name circumstances (below). Cause and Result relate
-       |  eventualities. Every Custom role is refused, this provider's own amr:domain included,
-       |  because :domain says which concept a property is predicated of and therefore describes
-       |  rather than participates, and because an extension role's referentiality is not something
-       |  anyone established. The concept kinds that denote a referent are Entity and Name; a
+       |  eventualities. Custom roles are refused with one named exception: this provider's own
+       |  ${renderRole(Referentiality.PredicationSubject)}, the concept a predicative state is
+       |  predicated of, takes a referent — the state holds of it — and is a Custom only because it
+       |  names no thematic role, which is a different question. Every other Custom role,
+       |  amr:purpose included, is refused, because nothing established what its filler is. The
+       |  concept kinds that denote a referent are Entity and Name; a
        |  Quantity measures a referent without being one, and Property, Predicate, Special and
        |  Unknown are not referents either. A filler the rule turns away is counted nonReferential
        |  on the coverage row and carries a receipt naming whether the role or the concept kind
