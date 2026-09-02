@@ -370,3 +370,63 @@ The chosen configuration is frozen and the untouched participants are unsealed o
 - **A stronger sentence embedder**: measured and demoted, see diagnosis 3. It is a real but small
   effect once the lexical blend is in place, and the admission court it would need is not justified
   by +0.013.
+
+## The untouched six, unsealed once
+
+The configuration was frozen and landed as the default *before* this was run, so the estimate below
+is not selected on the data it is measured against. The comparison is the chosen configuration
+against the unblended channel, over the 6 participants and 833 units held out since the partition was
+drawn. They chose nothing, then or now.
+
+| Outcome | Held-out difference | Improved | Development, for contrast |
+|---|---|---|---|
+| Sequential coherence | **+0.0251, CI [−0.0362, +0.0879], includes zero** | 3 of 6 | +0.0723, excludes zero |
+| Concentration | +0.0027, CI excludes zero | 5 of 6 | +0.0000, includes zero |
+| Source mass | +0.0049, CI excludes zero | 5 of 6 | +0.0033, includes zero |
+| Localizability | −0.0041, CI excludes zero | 0 of 6 | −0.0032, excludes zero |
+
+Under the granularity check the picture is unchanged: ordering +0.0271 and still including zero, and
+the anchor mix barely moves, 95 scene anchors against 98.
+
+**What may and may not be claimed.**
+
+- The primary outcome does **not** replicate as a significant result. The point estimate is positive
+  and in the same direction, but at roughly a third of the development magnitude and with an
+  interval spanning zero. Anyone reading only the development number would overstate this change.
+- Two secondary outcomes do improve out of sample with intervals excluding zero, and 5 of 6
+  participants improve on each. Development showed both as neutral, so this is not development's
+  result repeating; it is a modest, independent gain.
+- The localizability cost replicates exactly, −0.0041 against −0.0032, with no participant improving
+  in either set. It is the most reliably estimated quantity in the study, and it is a cost.
+
+**Why the shrinkage was expected, and why it is not evidence of a mistake.** The blend weight and the
+field policy were both selected on development, so the development estimate is optimistic by
+construction. The between-participant spread is essentially identical in the two sets, 0.082 against
+0.088, so nothing about the held-out participants is unusual; the difference is selection, not
+sampling.
+
+**The binding constraint is the corpus, not the method.** At an out-of-sample mean of +0.025 and a
+between-participant standard deviation of 0.088, excluding zero would take roughly **47
+participants**. This corpus has 17. No amount of further iteration on this dataset can establish an
+ordering effect of this size, and iterating harder against 11 development participants would mostly
+manufacture more of the optimism seen above. This is the study design's real limit, and it should be
+stated wherever the result is.
+
+## Where this leaves the research question
+
+Something real was found and it is smaller than the development set advertised. The best supported
+statement is that a rarity-weighted lexical channel blended into the semantic one gives a modest,
+out-of-sample improvement in how much of the posterior lands on the source and how concentrated it
+is, a positive but unestablished improvement in ordering, and a small reliable cost in localizability.
+
+The three findings likely to outlast the numbers are mechanisms rather than effects:
+
+1. **Routing beats enrichment.** The identical metadata that made every outcome worse as embedded
+   text produced the largest development gain once a channel that prices rarity indexed it, and
+   added nothing once that channel already held the same information.
+2. **A stronger encoder is a substitute for the lexical channel, not a complement**, and the smaller
+   of the two moves. That was measured before any admission court was opened for it.
+3. **The visual channel is informative but redundant against a complete human annotation.** It beat
+   matched-length coder text at the same node for all 11 participants, and added nothing once the
+   coder descriptions were indexed. The captioning court earns its place on films whose annotation
+   is sparse, which is the ordinary case and the reason to keep it.
