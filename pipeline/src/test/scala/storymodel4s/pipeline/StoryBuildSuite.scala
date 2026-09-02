@@ -15,7 +15,8 @@ import storymodel4s.document.{
   ChartProposalProvider,
   CoverageCounts,
   NarrativeCompiler,
-  NarrativeCompilerError
+  NarrativeCompilerError,
+  Referentiality
 }
 import storymodel4s.fixtures.wog.WarOfTheGhostsText
 import storymodel4s.provider.agent.*
@@ -459,20 +460,20 @@ class StoryBuildSuite extends FunSuite:
         case "coordinated" => rows(row, "branches").filter(b => kindOf(b) == "admitted")
         case _             => Vector.empty
     }
-    val ledger = fillerClasses
+    val byClass = fillerClasses
       .map(name => name -> admitted.map(row => intField(row, name)).sum)
       .toMap
-    assertEquals(ledger("fillers"), 57)
-    assertEquals(ledger("circumstances"), 11)
-    assertEquals(ledger("eventualities"), 0)
-    assertEquals(ledger("nonReferential"), 0)
-    assertEquals(ledger("unlicensed"), 51)
-    assertEquals(ledger("ambiguous"), 0)
+    assertEquals(byClass("fillers"), 57)
+    assertEquals(byClass("circumstances"), 11)
+    assertEquals(byClass("eventualities"), 0)
+    assertEquals(byClass("nonReferential"), 0)
+    assertEquals(byClass("unlicensed"), 51)
+    assertEquals(byClass("ambiguous"), 0)
     val seen = admitted.map(row => intField(row, "seen")).sum
-    assertEquals(fillerClasses.map(ledger).sum, seen, "the six classes do not sum to seen")
+    assertEquals(fillerClasses.map(byClass).sum, seen, "the six classes do not sum to seen")
     assertEquals(seen, 119)
     val refusals = rows(json(files.receipts), "calls")
-      .filter(call => param(call, "rule").contains(ChartProposalProvider.Referentiality.RuleName))
+      .filter(call => param(call, "rule").contains(Referentiality.RuleName))
     assertEquals(refusals.size, 51, "a refused filler left the provider without a receipt")
     assert(
       refusals.forall(call =>
