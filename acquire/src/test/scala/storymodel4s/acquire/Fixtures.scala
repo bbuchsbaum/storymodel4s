@@ -133,6 +133,7 @@ object Fixtures:
         ClaimFamily.EntityCoreference,
         ClaimFamily.SituationMention,
         ClaimFamily.ParticipantRole,
+        ClaimFamily.ParticipantCoverage,
         ClaimFamily.Modality,
         ClaimFamily.ContextAssignment,
         ClaimFamily.TemporalRelation,

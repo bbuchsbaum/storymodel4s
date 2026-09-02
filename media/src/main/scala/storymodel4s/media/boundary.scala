@@ -35,7 +35,8 @@ object FlashFilterMode:
   * from the frame size; the resolved value must then come back in the outcome's applied recipe or
   * the join refuses, because no library default may stand in for a recorded value (ledger §5).
   * `frameCounterFps` is the rate of the counter the detector API demands; it is not evidence and
-  * cannot move a cut.
+  * cannot move a cut. Every double here is finite (the wire reader refuses infinities) and is
+  * canonicalised before it enters the identity, so two recipes that are equal have one identity.
   */
 final case class ContentDetectorRecipe(
     threshold: Double,
@@ -53,16 +54,16 @@ final case class ContentDetectorRecipe(
     ContentAddress.digest(
       Vector(
         "content-detector-recipe",
-        threshold.toString,
+        MediaJson.canonicalDouble(threshold).toString,
         minSceneLen.toString,
-        deltaHue.toString,
-        deltaSat.toString,
-        deltaLum.toString,
-        deltaEdges.toString,
+        MediaJson.canonicalDouble(deltaHue).toString,
+        MediaJson.canonicalDouble(deltaSat).toString,
+        MediaJson.canonicalDouble(deltaLum).toString,
+        MediaJson.canonicalDouble(deltaEdges).toString,
         lumaOnly.toString,
         kernelSize.fold("auto")(_.toString),
         filterMode.toString,
-        frameCounterFps.toString
+        MediaJson.canonicalDouble(frameCounterFps).toString
       )
     )
 
@@ -601,7 +602,7 @@ object BoundarySearch:
     * presentation starts elsewhere needs a track-composition receipt this module does not issue,
     * and is refused rather than placed on the axis by luck.
     */
-  private def identityEditList(frames: FrameSet): Either[DomainError, Unit] =
+  private[media] def identityEditList(frames: FrameSet): Either[DomainError, Unit] =
     val start = frames.probe.stream(frames.streamIndex).flatMap(_.startPts)
     val presentedFirst = frames.index.firstPts
     if frames.index.discarded == 0 && start.contains(presentedFirst) then Right(())
@@ -637,6 +638,15 @@ object BoundarySearch:
             s"cut at ordinal $cut carries no ${DetectorOutcome.ScoreKey}"
           )
         )
+      _ <-
+        if score.isFinite then Right(())
+        else
+          Left(
+            DomainError.InvariantViolation(
+              "boundary/score",
+              s"cut at ordinal $cut carries a non-finite ${DetectorOutcome.ScoreKey} ($score)"
+            )
+          )
       at <- PlaybackInstant.on(axis, after)
       window <- PlaybackInterval.on(axis, before, after)
       id <- BoundaryId.from(
@@ -661,7 +671,7 @@ object BoundarySearch:
           id.value,
           before.toString,
           after.toString,
-          score.toString
+          MediaJson.canonicalDouble(score).toString
         )
       )
     )
