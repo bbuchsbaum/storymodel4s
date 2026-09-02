@@ -106,7 +106,9 @@ components.
 | `feature.audio` | CLAP, OpenBEATs | `CandidateOnly` | `HoldUnknown` | `Measurement` | `Unresolved` | `Unresolved` | Later audio-feature court only; exact artifact and preprocessing not selected |
 | `feature.audiovisual` | PE-AV and related shared AV spaces | `CandidateOnly` | `HoldUnknown` | `Measurement` | `Unresolved` | `Unresolved` | Later joint-feature court only; exact artifact, modality coverage, and preprocessing not selected |
 | `audio.separation` | SAM Audio and related source-separation models | `Deferred` | `HoldUnknown` | `Proposal` | `Unresolved` | `Unresolved` | Optional derived-evidence tool only; no exact code, weights, prompts, runtime, or stem-retention policy selected |
-| `interpret.multimodal` | Qwen-family vision or omni models, Vid2Seq, ActionFormer/TriDet | `Deferred` | `HoldUnknown` | `Unresolved` | `Unresolved` | `Unresolved` | Bounded proposal/critique only; no exact variant, role, runtime, or service selected |
+| `interpret.multimodal` | Qwen-family vision or omni models, Vid2Seq, ActionFormer/TriDet | `Deferred` | `HoldUnknown` | `Unresolved` | `Unresolved` | `Unresolved` | Bounded proposal/critique only; no exact variant, role, runtime, or service selected — superseded for the captioning court by the two `caption.qwen3vl.*` rows below (record: `docs/design/vlm-captioning-admission-record.md`, 2026-09-01) |
+| `caption.qwen3vl.8b` | `Qwen/Qwen3-VL-8B-Instruct` @ `0c351dd01ed8` | `Nominated` (captioning court; §10.4 visual-only and late-fusion arms) | `Conditional`: card licence `apache-2.0`, ungated; weights-licence leaf `HoldUnknown` (no LICENSE file at the revision; owner decision) | `Proposal` | `LocalRecipe` | `RecipeOnly` | Timed visual descriptions as proposals over frames the `media` module identified; cannot own time or self-accept; see the admission record §4 |
+| `caption.qwen3vl.4b` | `Qwen/Qwen3-VL-4B-Instruct` @ `ebb281ec70b0` | `Nominated` (local adapter court only) | as above | `Proposal` | `LocalRecipe` | `RecipeOnly` | Proves the adapter, receipts, preprocessing identity and replay before the 8B arm runs |
 | `diarization.sortformer` | Sortformer family | `Deferred` | `HoldUnknown` | `Proposal` | `Unresolved` | `Unresolved` | Research menu only; no exact artifact selected |
 
 `Big Buck Bunny`, Sintel, FilmFestival, Sherlock, Brain Treebank, MF2, and the
@@ -328,6 +330,25 @@ Beads executed under this authorization: `bd-01M1FDNN3T4SKZ5ZJN1XGXYNY7`
 `bd-01M1FFZ7ETCP3WHNA5NHAESQ6Q` (F1: the *Big Buck Bunny* excerpt admitted with
 archive and inner-file hashes, derivation script, CC BY 3.0 attribution, and
 recorded probe, decode and detector run under `media/src/test/resources/f1/`).
+
+### 6.3 Captioning lane authorization (2026-09-01, single-developer mode)
+
+Owner instruction of 2026-09-01: "proceed with Qwen3 but we'll be flexible".
+Scope, in the form of §6.1:
+
+1. Components: `caption.qwen3vl.4b` first (local adapter court), then
+   `caption.qwen3vl.8b` (calibration arm), both at the pinned revisions of
+   `docs/design/vlm-captioning-admission-record.md`; a further model may join on
+   the same terms as an additional comparison arm, never by substitution mid
+   comparison.
+2. Inputs: frames the `media` module has identified by PTS (F0, F1; Sherlock
+   only under the §10.4 predeclared design), never a media file or URL.
+3. Outputs: `Proposal` only, `Draft` authority, re-anchored to PTS by the adapter;
+   no caption becomes a `TimedSegment` without a receipt-carrying adapter.
+4. Realization gate: the weights-licence leaf of the record's §3 is an owner
+   decision (`unknown is not admitted`); until it is recorded, the lane is
+   `Nominated`/`RecipeOnly` and no weights are fetched. Nothing gated is touched;
+   no remote service is used.
 
 ### 6.2 Local realizations: five-axis records
 
