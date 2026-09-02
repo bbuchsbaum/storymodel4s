@@ -1,0 +1,14 @@
+{
+  "schema" : "storymodel4s.provider.agent.recording/v1",
+  "model" : "claude-sonnet-5",
+  "origin" : "captured",
+  "stopReason" : "end_turn",
+  "reportedModel" : "claude-sonnet-5",
+  "usage" : {
+    "inputTokens" : 78,
+    "outputTokens" : 928,
+    "cacheReadInputTokens" : 1275
+  },
+  "durationMillis" : 10963,
+  "text" : "(m / multi-sentence\n   :snt1 (d / do-02~e.2\n             :ARG0 (w / we~e.1)\n             :ARG1 (t / thing~e.7\n                       :mod (a / and~e.4\n                                :op1 (s1 / such~e.3)\n                                :op2 (s2 / such~e.5))))\n   :snt2 (f / fight-01~e.10\n             :ARG0 (w2 / we~e.9)))"
+}

@@ -1,0 +1,14 @@
+{
+  "schema" : "storymodel4s.provider.agent.recording/v1",
+  "model" : "claude-sonnet-5",
+  "origin" : "captured",
+  "stopReason" : "end_turn",
+  "reportedModel" : "claude-sonnet-5",
+  "usage" : {
+    "inputTokens" : 118,
+    "outputTokens" : 1003,
+    "cacheReadInputTokens" : 1275
+  },
+  "durationMillis" : 10690,
+  "text" : "(a2 / and~e.12\n   :op1 (s / say-01~e.1\n        :ARG0 (h / he~e.0)\n        :ARG1 (m / multi-sentence\n              :snt1 (b / behold-01~e.4)\n              :snt2 (ac / accompany-01~e.7\n                    :ARG0 (i / i~e.6)\n                    :ARG1 (g / ghost~e.9))))\n   :op2 (t / tell-01~e.14\n        :ARG0 h\n        :ARG1 (e / everything~e.15)))"
+}

@@ -1,0 +1,14 @@
+{
+  "schema" : "storymodel4s.provider.agent.recording/v1",
+  "model" : "claude-sonnet-5",
+  "origin" : "captured",
+  "stopReason" : "end_turn",
+  "reportedModel" : "claude-sonnet-5",
+  "usage" : {
+    "inputTokens" : 81,
+    "outputTokens" : 283,
+    "cacheReadInputTokens" : 1275
+  },
+  "durationMillis" : 4208,
+  "text" : "(a / and~e.7\n   :op1 (g / go-02~e.2\n            :ARG0 (p / people~e.1)\n            :direction (d / down~e.3)\n            :destination (w / water~e.6))\n   :op2 (b / begin-01~e.9\n            :ARG0 (t / they~e.8)\n            :ARG1 (f / fight-01~e.11\n                     :ARG0 t)))"
+}

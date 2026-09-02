@@ -113,6 +113,28 @@ class RecordedReplaySuite extends FunSuite:
     assert(summaryJson.contains(summary.receiptChecksum.hex))
   }
 
+  test("a refused build receipt comes after the court and before any write") {
+    val work = Files.createTempDirectory("provider-agent-receipt-refused")
+    val textPath = work.resolve("three.txt")
+    Files.write(textPath, text.getBytes(StandardCharsets.UTF_8))
+    val outDir = work.resolve("out")
+    val before = listing(committedRecordingsDir)
+    // A negative timestamp is the one receipt refusal a caller can reach; it is judged only once
+    // the court has run, so anything written before it would survive the refusal.
+    val outcome = ClaudeParseDriver
+      .run(DriverMode.Replay, textPath, committedRecordingsDir, outDir, Map.empty, -1L)
+    outcome match
+      case Left(DriverError.ReceiptInvalid(detail)) =>
+        assertEquals(
+          detail,
+          "invariant violated at acquire/build-receipt/timestamp: " +
+            "build receipt timestamp must be nonnegative"
+        )
+      case other => fail(s"expected ReceiptInvalid, got $other")
+    assert(!Files.exists(outDir), "outputs were written before the receipt was refused")
+    assertEquals(listing(committedRecordingsDir), before, "the refusal touched the recordings")
+  }
+
   test("a replay against a missing recordings directory is refused and creates nothing") {
     val work = Files.createTempDirectory("provider-agent-driver-missing")
     val textPath = work.resolve("three.txt")

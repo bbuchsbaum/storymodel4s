@@ -261,6 +261,10 @@ Package namespace is flat `storymodel4s.<module>`.
 | `codec`     | `storymodel4s.codec`      | Canonical circe JSON codecs |
 | `fixtures`  | `storymodel4s.fixtures`   | Hand-authored *War of the Ghosts* model, recall paraphrases, interview example |
 | `laws`      | `storymodel4s.laws`       | Published Discipline law suites and ScalaCheck generators |
+| `provider-parser` | `storymodel4s.provider.parser` | **JVM-only** AMR parser-provider contract: atlas-bound sentence inputs, receipted JSON transport, `PinnedRuntime`/`RemoteRuntime` readiness, deterministic admission court (token echo, `explicit-index-list/v1` sidecar, strict PENMAN conversion), cache replay, typed failure courts. Model runtimes stay external |
+| `provider-agent` | `storymodel4s.provider.agent` | **JVM-only** remote parser adapter (ADR 0008): Anthropic Java SDK behind `ParserTransport`, content-keyed record/replay `Recordings` store, environment court for spend, `ClaudeParseDriver.parse`/`run` (text to charts with a served-from ledger and an `ExtendedBuildReceipt`), `claudeParse` main |
+| `media`     | `storymodel4s.media`      | **JVM-only** media acquisition adapter (ADR 0007 §4): exact-byte fixture manifests, ffprobe packet-index ingest yielding `Draft`-authority records; the only module allowed to spawn a process |
+| `pipeline`  | `storymodel4s.pipeline`   | **JVM-only** story-build orchestrator (ADR 0009): `storyBuild` main runs text → `provider-agent` charts → `ChartProposalProvider` → `NarrativeCompiler` → `storymodel.json`, `compilation-report.json`, `receipts.json`. Owns I/O, receipt composition, file layout, exit status; no semantics |
 
 ## Build and test
 

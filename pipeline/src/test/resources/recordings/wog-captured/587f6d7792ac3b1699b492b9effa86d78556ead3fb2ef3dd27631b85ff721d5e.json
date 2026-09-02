@@ -1,0 +1,14 @@
+{
+  "schema" : "storymodel4s.provider.agent.recording/v1",
+  "model" : "claude-sonnet-5",
+  "origin" : "captured",
+  "stopReason" : "end_turn",
+  "reportedModel" : "claude-sonnet-5",
+  "usage" : {
+    "inputTokens" : 70,
+    "outputTokens" : 105,
+    "cacheReadInputTokens" : 1275
+  },
+  "durationMillis" : 2249,
+  "text" : "(k / know-01~e.4\n   :polarity -\n   :ARG0 (r / relative~e.1 :poss (i / i~e.0))\n   :ARG1 (g / go-02~e.8\n            :ARG0 (i2 / i~e.6)\n            :location (a / amr-unknown~e.5)))"
+}

@@ -123,6 +123,30 @@ final class DriverSummary private (
     case DriverMode.Replay => 0
     case DriverMode.Record => capturedLive + unrecorded
 
+  private def parts = (
+    mode,
+    storyId,
+    sourceChecksum,
+    sentences,
+    proposed,
+    failed,
+    abstained,
+    transportFailures,
+    replayedAuthored,
+    replayedCaptured,
+    capturedLive,
+    unrecorded,
+    foreign,
+    corrupt,
+    receiptChecksum
+  )
+
+  override def equals(other: Any): Boolean = other match
+    case that: DriverSummary => parts == that.parts
+    case _                   => false
+
+  override def hashCode(): Int = parts.hashCode
+
   override def toString: String =
     s"DriverSummary(${mode.render}, ${storyId.value}, sentences=$sentences, proposed=$proposed)"
 
@@ -183,6 +207,99 @@ object ExchangeSource:
 
   /** An offline client with fixed replies; for tests and dry runs. */
   final case class Scripted(client: ScriptedModelClient) extends ExchangeSource
+
+/** Everything one text-to-charts run established, before any file is written.
+  *
+  * Why a separate value from [[DriverSummary]]: a downstream orchestrator (the `pipeline` module)
+  * needs the story, atlas, admitted charts, and receipt to feed the narrative compiler, while the
+  * summary is the reportable count set. The constructor is private because the fields stand in
+  * relation (one attempt and one service per batch input, a receipt whose stage names this driver);
+  * only [[ClaudeParseDriver.parse]] establishes them.
+  */
+final class ParseOutcome private (
+    val mode: DriverMode,
+    val story: StorySource,
+    val atlas: SurfaceAtlas,
+    val batch: ParserBatch,
+    val result: ParserBatchResult,
+    val services: Vector[RecordingService],
+    val recordingKeys: Vector[RecordingKey],
+    val receipt: ExtendedBuildReceipt,
+    val parserStage: (StageId, Checksum),
+    val summary: DriverSummary,
+    private[agent] val recordings: Recordings,
+    private[agent] val runtime: RemoteRuntime,
+    private[agent] val prompt: AgentPromptPackage
+):
+  /** Admitted charts in atlas sentence order: exactly the covered attempts, keyed by the atlas
+    * sentence each input was cut from. A failed or abstained sentence has no entry, so a consumer
+    * counting charts against `atlas.sentences` sees the shortfall rather than a placeholder.
+    */
+  def charts: Vector[(SurfaceUnitId, p.PropositionEvidence)] =
+    batch.inputs.zip(result.attempts).flatMap { (input, attempt) =>
+      attempt.result.toOption.map(proposal => input.sentenceId -> proposal.evidence)
+    }
+
+  private def parts = (
+    mode,
+    story,
+    atlas,
+    batch,
+    result,
+    services,
+    recordingKeys,
+    receipt,
+    parserStage,
+    summary,
+    recordings.dir,
+    runtime,
+    prompt
+  )
+
+  override def equals(other: Any): Boolean = other match
+    case that: ParseOutcome => parts == that.parts
+    case _                  => false
+
+  override def hashCode(): Int = parts.hashCode
+
+  override def toString: String =
+    s"ParseOutcome(${mode.render}, ${story.id.value}, covered=${result.covered}/${result.total})"
+
+object ParseOutcome:
+  private[agent] def derive(
+      mode: DriverMode,
+      story: StorySource,
+      atlas: SurfaceAtlas,
+      batch: ParserBatch,
+      result: ParserBatchResult,
+      services: Vector[RecordingService],
+      recordingKeys: Vector[RecordingKey],
+      receipt: ExtendedBuildReceipt,
+      summary: DriverSummary,
+      recordings: Recordings,
+      runtime: RemoteRuntime,
+      prompt: AgentPromptPackage
+  ): Either[DriverError, ParseOutcome] =
+    receipt.receipt.stages
+      .find(_._1 == ClaudeParseDriver.Stage)
+      .toRight(DriverError.ReceiptInvalid(s"receipt lacks stage ${ClaudeParseDriver.Stage.value}"))
+      .map { stage =>
+        new ParseOutcome(
+          mode,
+          story,
+          atlas,
+          batch,
+          result,
+          services,
+          recordingKeys,
+          receipt,
+          stage,
+          summary,
+          recordings,
+          runtime,
+          prompt
+        )
+      }
 
 /** Text to charts through the real admission court, with a content-keyed record/replay store so
   * reruns and tests never touch the network.
@@ -253,9 +370,9 @@ object ClaudeParseDriver:
         ParserBatch.validated(all).left.map(error => DriverError.InputInvalid(error.message))
       )
 
-  /** Run one text through the court. Order matters: the environment court for `record` comes before
-    * any read, the text is read before the recordings directory may be created, and `replay` never
-    * creates anything.
+  /** Run one text through the court and write the per-sentence artifacts, ledger, and summary. The
+    * ordering guarantees of [[parse]] hold; the receipt is established before the first write, so a
+    * refused receipt leaves `outDir` untouched.
     */
   def run(
       mode: DriverMode,
@@ -266,6 +383,32 @@ object ClaudeParseDriver:
       nowEpochMillis: Long,
       source: ExchangeSource = ExchangeSource.Anthropic
   ): Either[DriverError, DriverSummary] =
+    for
+      outcome <- parse(mode, textPath, recordingsDir, env, nowEpochMillis, source)
+      _ <- writeOutputs(
+        outDir,
+        outcome.batch,
+        outcome.result,
+        outcome.recordings,
+        outcome.runtime,
+        outcome.recordingKeys,
+        outcome.services
+      )
+      _ <- writeSummary(outDir, outcome.summary, outcome.runtime, outcome.prompt, outcome.receipt)
+    yield outcome.summary
+
+  /** Run one text through the court without writing anything. Order matters: the environment court
+    * for `record` comes before any read, the text is read before the recordings directory may be
+    * created, and `replay` never creates anything.
+    */
+  def parse(
+      mode: DriverMode,
+      textPath: Path,
+      recordingsDir: Path,
+      env: Map[String, String],
+      nowEpochMillis: Long,
+      source: ExchangeSource = ExchangeSource.Anthropic
+  ): Either[DriverError, ParseOutcome] =
     for
       client <- mode match
         case DriverMode.Replay => Right(None)
@@ -302,7 +445,6 @@ object ClaudeParseDriver:
       services = keys.zip(present).map { (key, wasPresent) =>
         service(recordings, claude.runtime, key, wasPresent)
       }
-      _ <- writeOutputs(outDir, batch, result, recordings, claude.runtime, keys, services)
       receipt <- buildReceipt(
         story,
         claude.runtime,
@@ -320,8 +462,21 @@ object ClaudeParseDriver:
         services,
         receipt.receipt.contentChecksum
       )
-      _ <- writeSummary(outDir, summary, claude.runtime, prompt, receipt)
-    yield summary
+      outcome <- ParseOutcome.derive(
+        mode,
+        story,
+        atlas,
+        batch,
+        result,
+        services,
+        keys,
+        receipt,
+        summary,
+        recordings,
+        claude.runtime,
+        prompt
+      )
+    yield outcome
 
   /** Classify how one key was served from what the store holds before and after the run. */
   private[agent] def service(

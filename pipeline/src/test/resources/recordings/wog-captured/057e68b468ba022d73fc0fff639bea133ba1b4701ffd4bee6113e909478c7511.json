@@ -1,0 +1,14 @@
+{
+  "schema" : "storymodel4s.provider.agent.recording/v1",
+  "model" : "claude-sonnet-5",
+  "origin" : "captured",
+  "stopReason" : "end_turn",
+  "reportedModel" : "claude-sonnet-5",
+  "usage" : {
+    "inputTokens" : 127,
+    "outputTokens" : 1005,
+    "cacheReadInputTokens" : 1275
+  },
+  "durationMillis" : 11572,
+  "text" : "(a / and~e.14\n  :op1 (c / carry-01~e.9\n        :ARG0 (t / they~e.8)\n        :ARG1 (h / he~e.10)\n        :destination (c2 / canoe~e.13)\n        :time (s / shoot-01~e.6\n              :ARG1 (p / person~e.1\n                    :part-of (f / fellow~e.4\n                          :poss (h2 / he~e.3)))))\n  :op2 (p2 / put-01~e.15\n        :ARG0 t\n        :ARG1 h\n        :location (t2 / there~e.18)))"
+}

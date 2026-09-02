@@ -1,0 +1,14 @@
+{
+  "schema" : "storymodel4s.provider.agent.recording/v1",
+  "model" : "claude-sonnet-5",
+  "origin" : "captured",
+  "stopReason" : "end_turn",
+  "reportedModel" : "claude-sonnet-5",
+  "usage" : {
+    "inputTokens" : 105,
+    "outputTokens" : 768,
+    "cacheReadInputTokens" : 1275
+  },
+  "durationMillis" : 8687,
+  "text" : "(s / see-01~e.7\n   :ARG0 (t / they~e.6)\n   :ARG1 (c / canoe~e.9\n            :quant 1~e.8\n            :ARG0-of (c2 / come-01~e.10\n                         :direction (u / up~e.11)\n                         :destination t))\n   :time (c3 / come-01~e.3\n             :ARG1 (c4 / canoe~e.2)\n             :location (t2 / they~e.5)\n             :manner (o / opposite~e.4)))"
+}

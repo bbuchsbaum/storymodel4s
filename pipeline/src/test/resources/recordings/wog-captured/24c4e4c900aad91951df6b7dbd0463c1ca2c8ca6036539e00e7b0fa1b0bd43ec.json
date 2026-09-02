@@ -1,0 +1,14 @@
+{
+  "schema" : "storymodel4s.provider.agent.recording/v1",
+  "model" : "claude-sonnet-5",
+  "origin" : "captured",
+  "stopReason" : "end_turn",
+  "reportedModel" : "claude-sonnet-5",
+  "usage" : {
+    "inputTokens" : 49,
+    "outputTokens" : 67,
+    "cacheReadInputTokens" : 1275
+  },
+  "durationMillis" : 2642,
+  "text" : "(a / arrive-01~e.1\n   :ARG1 (t / they~e.0)\n   :destination (c / city~e.3 :name (n / name~e.3 :op1 \"Egulac\")))"
+}

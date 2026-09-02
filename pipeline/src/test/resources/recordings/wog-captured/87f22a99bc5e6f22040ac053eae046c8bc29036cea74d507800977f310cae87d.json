@@ -1,0 +1,14 @@
+{
+  "schema" : "storymodel4s.provider.agent.recording/v1",
+  "model" : "claude-sonnet-5",
+  "origin" : "captured",
+  "stopReason" : "end_turn",
+  "reportedModel" : "claude-sonnet-5",
+  "usage" : {
+    "inputTokens" : 101,
+    "outputTokens" : 589,
+    "cacheReadInputTokens" : 1275
+  },
+  "durationMillis" : 7743,
+  "text" : "(g1 / go-02~e.1\n    :ARG0 (h / he~e.0)\n    :purpose (a / accompany-01~e.3\n                 :ARG0 h\n                 :ARG1 (w / warrior~e.5\n                           :ARG0-of (g2 / go-02~e.7\n                                        :direction (u / up~e.8)\n                                        :path (r / river~e.10)\n                                        :purpose (m / make-01~e.12\n                                                     :ARG0 w\n                                                     :ARG1 (w2 / war~e.13))))))"
+}

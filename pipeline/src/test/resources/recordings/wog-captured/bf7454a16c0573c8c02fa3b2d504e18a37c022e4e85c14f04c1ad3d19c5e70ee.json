@@ -1,0 +1,14 @@
+{
+  "schema" : "storymodel4s.provider.agent.recording/v1",
+  "model" : "claude-sonnet-5",
+  "origin" : "captured",
+  "stopReason" : "end_turn",
+  "reportedModel" : "claude-sonnet-5",
+  "usage" : {
+    "inputTokens" : 66,
+    "outputTokens" : 78,
+    "cacheReadInputTokens" : 1275
+  },
+  "durationMillis" : 3044,
+  "text" : "(f / fall-01~e.6\n   :ARG1 (h / he~e.5)\n   :direction (d / down~e.7)\n   :time (r / rise-01~e.3\n      :ARG1 (s / sun~e.2)))"
+}

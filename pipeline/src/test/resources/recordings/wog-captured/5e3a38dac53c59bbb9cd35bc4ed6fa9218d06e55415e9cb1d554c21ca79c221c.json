@@ -1,0 +1,14 @@
+{
+  "schema" : "storymodel4s.provider.agent.recording/v1",
+  "model" : "claude-sonnet-5",
+  "origin" : "captured",
+  "stopReason" : "end_turn",
+  "reportedModel" : "claude-sonnet-5",
+  "usage" : {
+    "inputTokens" : 61,
+    "outputTokens" : 73,
+    "cacheReadInputTokens" : 1275
+  },
+  "durationMillis" : 1916,
+  "text" : "(s / speak-01~e.2\n   :manner (t / thus~e.0)\n   :ARG0 (h / he~e.1)\n   :ARG2 (f / fellow~e.5 :poss h~e.4))"
+}
