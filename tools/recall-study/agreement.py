@@ -100,6 +100,32 @@ def pairs_for(texts_a, texts_b, idf):
     return [(i, j) for i, j in best_ab.items() if best_ba.get(j) == i]
 
 
+def wilcoxon_p(d):
+    """Two-sided Wilcoxon signed-rank, normal approximation with tie correction."""
+    d = [x for x in d if x != 0]
+    n = len(d)
+    if n < 10:
+        return 1.0
+    order = sorted(range(n), key=lambda i: abs(d[i]))
+    ranks = [0.0] * n
+    i = 0
+    while i < n:
+        j = i
+        while j + 1 < n and abs(d[order[j + 1]]) == abs(d[order[i]]):
+            j += 1
+        avg = (i + j) / 2.0 + 1.0
+        for k in range(i, j + 1):
+            ranks[order[k]] = avg
+        i = j + 1
+    wplus = sum(ranks[i] for i in range(n) if d[i] > 0)
+    mean = n * (n + 1) / 4.0
+    sd = math.sqrt(n * (n + 1) * (2 * n + 1) / 24.0)
+    if sd == 0:
+        return 1.0
+    z = (wplus - mean) / sd
+    return math.erfc(abs(z) / math.sqrt(2))
+
+
 def binom_p(k, n, p=0.5):
     """Two-sided exact sign test."""
     if n == 0:
@@ -155,29 +181,43 @@ def main(argv):
               f"95% CI [{lo:.1f}, {hi:.1f}]  within 60s: {within60:5.1f}%  n={len(gaps)}")
         per_arm[label] = gaps
 
-    # Paired over the identical pair set, which is far more powerful than comparing two medians:
-    # the same cross-participant comparison is scored under both arms and only the arm differs.
+    # Paired over the identical pair set. Three statistics, because the first one tried was a bad
+    # choice: the median of the per-pair differences is 0 whenever most anchors are unchanged
+    # between arms, which is the usual case here, so it reported nulls for effects that are plainly
+    # visible in the medians themselves. What matters is whether the *distribution* of gaps improved,
+    # so the paired bootstrap resamples pair indices once and scores both arms on that same resample.
     ref_label = arms[0][0]
     if ref_label in per_arm:
-        print(f"\n== paired against {ref_label}, same {len(per_arm[ref_label])} pairs, "
-              f"negative means anchors agree more closely ==")
         base = per_arm[ref_label]
+        n = len(base)
+        print(f"\n== paired against {ref_label}, same {n} pairs, resampled together ==")
+        print("   negative change means the two participants' anchors agree more closely")
         for label, _ in arms[1:]:
-            if label not in per_arm or len(per_arm[label]) != len(base):
+            cur = per_arm.get(label)
+            if cur is None or len(cur) != n:
                 continue
-            d = [x - y for x, y in zip(per_arm[label], base)]
-            moved = [x for x in d if x != 0.0]
             r = random.Random(20260902)
-            meds = sorted(statistics.median(r.choices(d, k=len(d))) for _ in range(2000))
-            lo2, hi2 = meds[50], meds[1949]
-            excl = "excludes zero" if (lo2 > 0 or hi2 < 0) else "includes zero"
-            closer = sum(1 for x in d if x < 0)
-            farther = sum(1 for x in d if x > 0)
-            # Sign test over the pairs the arm actually moved: unchanged pairs carry no evidence.
-            p = binom_p(closer, len(moved)) if moved else 1.0
-            print(f"   {label:22s} median change {statistics.median(d):+7.1f}s  "
-                  f"95% CI [{lo2:+.1f}, {hi2:+.1f}] {excl}   "
-                  f"closer {closer} / farther {farther} of {len(moved)} moved  sign p={p:.4f}")
+            dmed, dw60 = [], []
+            for _ in range(4000):
+                idx = [r.randrange(n) for _ in range(n)]
+                dmed.append(statistics.median([cur[i] for i in idx])
+                            - statistics.median([base[i] for i in idx]))
+                dw60.append(100.0 * (sum(1 for i in idx if cur[i] <= 60)
+                                     - sum(1 for i in idx if base[i] <= 60)) / n)
+            dmed.sort()
+            dw60.sort()
+            mlo, mhi = dmed[100], dmed[3899]
+            wlo, whi = dw60[100], dw60[3899]
+            mex = "excludes zero" if (mlo > 0 or mhi < 0) else "includes zero"
+            wex = "excludes zero" if (wlo > 0 or whi < 0) else "includes zero"
+            obs_m = statistics.median(cur) - statistics.median(base)
+            obs_w = 100.0 * (sum(1 for x in cur if x <= 60) - sum(1 for x in base if x <= 60)) / n
+            # Wilcoxon signed-rank over the pairs that moved, which uses magnitude rather than
+            # only the sign, normal approximation with tie-corrected ranks.
+            d = [c - b for c, b in zip(cur, base) if c != b]
+            p = wilcoxon_p(d)
+            print(f"   {label:22s} median gap {obs_m:+7.1f}s [{mlo:+.1f}, {mhi:+.1f}] {mex}   "
+                  f"within60 {obs_w:+5.1f}pp [{wlo:+.1f}, {whi:+.1f}] {wex}   signed-rank p={p:.4f}")
 
 
 main(sys.argv)

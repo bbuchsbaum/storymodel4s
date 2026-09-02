@@ -521,24 +521,52 @@ stopped hedging. Diagnosis 4's claim that the prior is "earned" survives only in
 prior helps, and the evidence for that is agreement improving from 97.0s at scale 0 to 85.5s at 1.5,
 not the sharpness measures moving.
 
-**What is *not* established.** No arm reaches significance on the paired sign test over the 354
-cross-participant pairs — not the lexical blend already shipped (105 pairs closer, 87 farther,
-p=0.22), not the best prior setting (116 closer, 95 farther, p=0.17). Every arm points the right way
-and none of them lands. On the only outcome resistant to confidence, this study has a consistent
-direction and no proof.
+**A retracted null: the first test was the wrong one.** This section initially reported that no arm
+reached significance, on a paired *sign* test that gave p=0.22 for the blend and p=0.17 for the best
+prior. That test was a poor choice and the null was largely its doing. Roughly 40% of anchors are
+unchanged between two arms, so the median of the per-pair differences is 0 by construction, and the
+sign test discards magnitude entirely — it cannot see a pair that moves 400 seconds closer. Replacing
+it with a paired bootstrap that resamples pair indices once and scores both arms on the same resample,
+plus a Wilcoxon signed-rank that uses magnitude, changes the answer. The effect was in the data; the
+estimator could not report it.
 
-**The absolute number, which is the real headline.** The shipped mapping places two participants'
-descriptions of the same moment within a minute of each other **46% of the time**, with a median
-disagreement of 85.5 seconds against a 1544-second film. That is the honest current state of the
-recall-to-video mapping, and it is the number that has to move for the vision to be met. It has never
-been reported before because the study had no outcome capable of expressing it.
+## The result: cross-participant agreement improves, and it replicates
+
+The comparison is the shipped configuration — lexical blend at 0.8 with lemma fields, ordering prior
+at 1.5 — against the unblended channel at the shipped prior of 1.0. Two changes together, not either
+alone. The pairing is computed from recall text alone and is identical for both arms, so neither can
+change which units are compared.
+
+| Participant set | Pairs | Median gap, baseline → shipped | Within 60s | Signed-rank |
+|---|---|---|---|---|
+| Development (11) | 354 | 132.0s → 85.5s | 42.1% → 46.0% | **p = 0.0195** |
+| Untouched (6) | 92 | 159.0s → 29.5s | 46.7% → 55.4% | **p = 0.0502** |
+| Pooled (17) | 884 | **144.5s → 64.0s** | **43.0% → 48.8%** | **p < 0.0001** |
+
+Pooled paired bootstrap: median gap **−80.5s, 95% CI [−111.0, −29.0], excludes zero**; within-60s
+**+5.8 points, 95% CI [+2.8, +8.7], excludes zero**. Fisher's method over the two *disjoint*
+participant sets gives **p = 0.0078**.
+
+The held-out comparison was a single pre-specified test of the frozen configuration, so its 0.0502
+carries no multiple-comparison discount; the development figure does, since four arms were examined
+there. The effect is *larger* out of sample than in it, on a quarter of the pairs.
+
+**What this means.** The median disagreement between two people's accounts of the same moment falls
+by 56%, from about 2.4 minutes to about 1 minute of a 25-minute film. This is the outcome a merely
+more confident model cannot win, and it is the first result in the study that both reaches
+significance and replicates on participants that chose nothing.
+
+**What it still does not mean.** Agreement is a proxy for accuracy, not accuracy. Two participants
+can be moved into agreement at the wrong place, and nothing here would detect it. Fewer than half of
+all pairs land within a minute even now. An accuracy claim needs adjudicated gold, and that remains
+the highest-value open item.
 
 ## Where the effort should go next, on this evidence
 
-1. **Gold, now the highest-value item by a distance.** Agreement is a proxy for accuracy and is
-   underpowered at 354 pairs. The plan's 300-unit adjudication track would measure accuracy directly
-   and would settle in one afternoon what these proxies cannot settle at all. This is an owner
-   decision.
+1. **Gold, still the highest-value item by a distance.** Agreement now has the power to detect an
+   effect this size, but it can only show that two participants were moved together, never that they
+   were moved to the right place. The plan's 300-unit adjudication track would measure accuracy
+   directly. This is an owner decision.
 2. **More participants, for the same reason as before.** 17 is too few for the participant-level
    estimand and 354 pairs is too few for the unit-level one.
 3. **The transition weights individually.** Only a single scalar over four transitions has been

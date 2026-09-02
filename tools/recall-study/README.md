@@ -19,6 +19,23 @@ weight it ranks by the semantic distance itself and the re-ranking is the identi
 is run as a guard before the sweep. It is worth more than a unit test here: it exercises the whole
 path, including table construction, abstention handling and the remapping, against a known answer.
 
+## The primary outcome is cross-participant agreement
+
+`agreement.py A DIR_A B DIR_B` is the judge of record. Seventeen people watched the same film, so
+when two of them describe the same moment a correct mapping puts both descriptions in the same
+place. Units are paired *across* participants by mutual-best IDF overlap of the recall text alone, so
+the pairing is identical for every arm and no arm can change which comparisons it is scored on.
+
+**Concentration and localizability are demoted to diagnostics and may no longer choose an arm.**
+Both measure how peaked the posterior is, so any stronger prior improves them whether or not it is
+right. Measured: as the ordering prior strengthens they rise monotonically and unanimously all the
+way to scale 8, while agreement peaks at 1.5 and by scale 8 is *worse than doing nothing*. A model
+can top both while getting further from the truth.
+
+**Use the paired bootstrap and the signed-rank, not a sign test.** About 40% of anchors are unchanged
+between any two arms, so the median of per-pair differences is 0 by construction and a sign test
+throws away magnitude. Using one produced a false null that stood until it was replaced.
+
 ## Which levers may be judged by which outcome
 
 This is the discipline that keeps the iteration honest, and it is not symmetric.
