@@ -398,3 +398,74 @@ alignment. The same ruling requires non-derivable relations to stay absent with 
 derivation receipt and makes absence-erasing derivation a review category. Those architectural
 decisions are frozen. Public names and the smallest executable slice remain subject to
 implementation review and the end-to-end acceptance court.
+
+## Amendments
+
+### 2026-09-01: chart-driven proposal provider (solo plan phase 1.3)
+
+The first slice's only provider was the one-sentence lexical fixture in
+`NarrativeCompilerVerticalSuite`. This amendment adds `ChartProposalProvider` in `document`
+(`document/propose.scala`): a deterministic, receipted provider that reads one checked
+`PropositionEvidence` per sentence and emits, for every sentence of a story, the situation,
+context-assignment, and segment-membership attempts plus one title summary attempt, with typed
+abstention wherever a chart has no admissible root and a per-sentence coverage ledger. It does not
+touch `NarrativeCompiler`; phase 1.4 does. Decisions taken, with the alternative rejected:
+
+1. **Placement in `document`, not `acquire` or a JVM module.** The proposal ADTs live in
+   `document`, and `acquire` cannot name them without depending on `story`. The cost is that the
+   compiler's `private[document]` factories (`DerivationReceipt.of`, `NarrativeCompilation.of`)
+   are in scope for the provider. A static court (`ChartProposalStaticCourtSuite`, JVM-only
+   because it reads source files) refuses those names and every other `private[document]` member
+   in the provider source, with a positive control that the scan finds a planted name. Rejected:
+   a `provider` sub-package with its own privacy boundary, which would have moved the ADTs out of
+   the compiler file for no gain in this slice.
+2. **Root = the chart focus, and nothing else.** A situation is proposed only when the focus is a
+   `Predicate`-kind concept held by no embedding, which is exactly what the compiler accepts at
+   emission. Rejected: falling back to another predicate of the chart when the focus is
+   inadmissible. That would propose a situation the chart did not put at its root, which is
+   fabrication, not extraction.
+3. **Abstention is an emitted attempt, not silence.** An inadmissible root yields one
+   `AgentProposal.abstained` attempt per family at the anchor (the focus, else the lowest concept
+   id), so the input binding checks hold and the compiler records `Unresolved(NoProposal)` gaps
+   that a reader can count. An empty chart or a sentence with no chart yields a coverage row and
+   no attempt; the coverage denominator is `atlas.sentences.size`. Rejected: omitting the sentence,
+   which would make "not proposed" indistinguishable from "not run" (design contract rule 7).
+4. **Kind: `State` only for the closed set of AMR `-91` reification frames, else `Event`.** The
+   set is enumerated in `ChartProposalProvider.StateFrames` and printed into the rules text.
+   Lexical statives without such a frame (`become`, `be`) are `Event` in this version; that is a
+   recorded limitation, not a classification. Rejected: a lexical stative list, which no chart
+   field licenses.
+5. **Description and support come from the chart, never the sentence text.** The description is
+   `Gloss.predicate` at the root; support is the union of alignment spans of every alignment that
+   names a non-embedded concept, recorded on the receipt as `span-source=chart-alignments`. Only a
+   chart with no such alignment falls back to the sentence span, recorded as
+   `span-source=sentence`, so the two cannot be confused downstream.
+6. **The summary is the source title with evidence spanning the whole canonical text**, so
+   `hierarchy.member-within-parent` holds for every emitted situation; no title yields an
+   abstained summary attempt and a `NoTitle` row.
+7. **No causal attempts.** Absent pairs are "not evaluated", per §6 of this ADR.
+8. **Policy: `AcceptancePolicy.Conservative`, except `ContextAssignment` and
+   `SegmentMembership` at `requireAgreement = 1`.** The resolver counts agreement by provider
+   identity, and one deterministic program is one provider; the fixture's trick of naming two
+   rules as two providers was a workaround, not a policy. The relaxation is stated in the rules
+   text, so it is in every config hash.
+9. **Receipts.** One `ProviderCall("chart-proposal-provider", "chart-rules", "1")` per rule
+   application, input checksum = the source's canonical checksum, output checksum = a
+   NUL-separated render of what was emitted, params naming the sentence, chart checksum, rule,
+   and span source. The prompt-package checksum and the provenance config hash are both
+   `Checksum.ofText(RulesText)`, so a rule change changes every receipt. Provenance calls include
+   every chart's own receipts. The build receipt carries the optional parser stage and this
+   provider's stage digest over its call outputs.
+10. **Order independence.** Every emitted vector is sorted by content key; chart order and
+    alignment order do not change the proposals or the compilation fingerprint (tested).
+
+Two shapes deviate from the phase brief, on purpose. `AbstentionReason` carries only the three
+root reasons; an empty chart is its own `SentenceCoverage.EmptyChart` row because an abstention
+row names an anchor and an empty chart has none, and the summary has its own `SummaryCoverage`
+because it is not a sentence. `ChartProposals` is a final non-case class with a
+`private[document]` factory, per the cartesian-product test in the design contract.
+
+Evidence: `ChartProposalProviderSuite` (document, all three platforms) and
+`ChartProposalCourtSuite` (fixtures) drive the WOG source through the analyzer, supply seven
+hand-built silver charts, and pin the ledger counts, the nine recorded gaps, and
+`validated == None` for the multi-situation compilation.
