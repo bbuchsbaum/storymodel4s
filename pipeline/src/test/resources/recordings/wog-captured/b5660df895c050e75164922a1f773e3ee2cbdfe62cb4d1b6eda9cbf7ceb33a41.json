@@ -1,0 +1,14 @@
+{
+  "schema" : "storymodel4s.provider.agent.recording/v1",
+  "model" : "claude-sonnet-5",
+  "origin" : "captured",
+  "stopReason" : "end_turn",
+  "reportedModel" : "claude-sonnet-5",
+  "usage" : {
+    "inputTokens" : 50,
+    "outputTokens" : 57,
+    "cacheReadInputTokens" : 0
+  },
+  "durationMillis" : 3510,
+  "text" : "(p / person~e.2\n   :quant many~e.2\n   :location (e / egulac~e.4 :name (n / name~e.4 :op1 \"Egulac\")))"
+}

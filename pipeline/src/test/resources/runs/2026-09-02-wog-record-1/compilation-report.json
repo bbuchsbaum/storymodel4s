@@ -1,0 +1,1451 @@
+{
+  "schemaVersion" : "storymodel4s.pipeline.compilation-report/v1",
+  "mode" : "record",
+  "source" : {
+    "storyId" : "story:e4b036101a7a",
+    "checksum" : "36c52efe94a95da4b1b6ba1df479f53bf51a74b751acfa75d2d84dea5924d93e",
+    "sentences" : 50
+  },
+  "parser" : {
+    "stage" : "provider-agent/claude-parse",
+    "checksum" : "cea5b1c2bc7991e165d2ef8eaa041ff9a3ad39d111da38bc36a6b018267d0c4e",
+    "proposed" : 43,
+    "failed" : 7,
+    "abstained" : 0,
+    "transportFailures" : 0,
+    "served" : {
+      "replayedAuthored" : 0,
+      "replayedCaptured" : 0,
+      "capturedLive" : 50,
+      "unrecorded" : 0,
+      "foreign" : 0,
+      "corrupt" : 0
+    },
+    "liveCalls" : 50
+  },
+  "coverage" : {
+    "counts" : {
+      "proposed" : 26,
+      "abstained" : 17,
+      "emptyCharts" : 0,
+      "noCharts" : 7,
+      "sentences" : 50
+    },
+    "summary" : {
+      "kind" : "proposed"
+    },
+    "rows" : [
+      {
+        "sentence" : "story:e4b036101a7a:s0",
+        "ordinal" : 0,
+        "kind" : "no-chart"
+      },
+      {
+        "sentence" : "story:e4b036101a7a:s1",
+        "ordinal" : 1,
+        "kind" : "no-chart"
+      },
+      {
+        "sentence" : "story:e4b036101a7a:s2",
+        "ordinal" : 2,
+        "kind" : "proposed",
+        "root" : "story:e4b036101a7a:s2#c"
+      },
+      {
+        "sentence" : "story:e4b036101a7a:s3",
+        "ordinal" : 3,
+        "kind" : "proposed",
+        "root" : "story:e4b036101a7a:s3#b"
+      },
+      {
+        "sentence" : "story:e4b036101a7a:s4",
+        "ordinal" : 4,
+        "kind" : "proposed",
+        "root" : "story:e4b036101a7a:s4#h"
+      },
+      {
+        "sentence" : "story:e4b036101a7a:s5",
+        "ordinal" : 5,
+        "kind" : "proposed",
+        "root" : "story:e4b036101a7a:s5#t"
+      },
+      {
+        "sentence" : "story:e4b036101a7a:s6",
+        "ordinal" : 6,
+        "kind" : "abstained",
+        "anchor" : "story:e4b036101a7a:s6#a",
+        "reason" : "focus-not-predicate:Entity"
+      },
+      {
+        "sentence" : "story:e4b036101a7a:s7",
+        "ordinal" : 7,
+        "kind" : "abstained",
+        "anchor" : "story:e4b036101a7a:s7#a",
+        "reason" : "focus-not-predicate:Entity"
+      },
+      {
+        "sentence" : "story:e4b036101a7a:s8",
+        "ordinal" : 8,
+        "kind" : "no-chart"
+      },
+      {
+        "sentence" : "story:e4b036101a7a:s9",
+        "ordinal" : 9,
+        "kind" : "no-chart"
+      },
+      {
+        "sentence" : "story:e4b036101a7a:s10",
+        "ordinal" : 10,
+        "kind" : "proposed",
+        "root" : "story:e4b036101a7a:s10#s"
+      },
+      {
+        "sentence" : "story:e4b036101a7a:s11",
+        "ordinal" : 11,
+        "kind" : "proposed",
+        "root" : "story:e4b036101a7a:s11#w"
+      },
+      {
+        "sentence" : "story:e4b036101a7a:s12",
+        "ordinal" : 12,
+        "kind" : "proposed",
+        "root" : "story:e4b036101a7a:s12#g"
+      },
+      {
+        "sentence" : "story:e4b036101a7a:s13",
+        "ordinal" : 13,
+        "kind" : "proposed",
+        "root" : "story:e4b036101a7a:s13#s"
+      },
+      {
+        "sentence" : "story:e4b036101a7a:s14",
+        "ordinal" : 14,
+        "kind" : "abstained",
+        "anchor" : "story:e4b036101a7a:s14#b",
+        "reason" : "focus-not-predicate:Special"
+      },
+      {
+        "sentence" : "story:e4b036101a7a:s15",
+        "ordinal" : 15,
+        "kind" : "proposed",
+        "root" : "story:e4b036101a7a:s15#s"
+      },
+      {
+        "sentence" : "story:e4b036101a7a:s16",
+        "ordinal" : 16,
+        "kind" : "proposed",
+        "root" : "story:e4b036101a7a:s16#k"
+      },
+      {
+        "sentence" : "story:e4b036101a7a:s17",
+        "ordinal" : 17,
+        "kind" : "proposed",
+        "root" : "story:e4b036101a7a:s17#g"
+      },
+      {
+        "sentence" : "story:e4b036101a7a:s18",
+        "ordinal" : 18,
+        "kind" : "no-chart"
+      },
+      {
+        "sentence" : "story:e4b036101a7a:s19",
+        "ordinal" : 19,
+        "kind" : "proposed",
+        "root" : "story:e4b036101a7a:s19#a"
+      },
+      {
+        "sentence" : "story:e4b036101a7a:s20",
+        "ordinal" : 20,
+        "kind" : "abstained",
+        "anchor" : "story:e4b036101a7a:s20#a",
+        "reason" : "focus-not-predicate:Entity"
+      },
+      {
+        "sentence" : "story:e4b036101a7a:s21",
+        "ordinal" : 21,
+        "kind" : "abstained",
+        "anchor" : "story:e4b036101a7a:s21#a",
+        "reason" : "focus-not-predicate:Entity"
+      },
+      {
+        "sentence" : "story:e4b036101a7a:s22",
+        "ordinal" : 22,
+        "kind" : "proposed",
+        "root" : "story:e4b036101a7a:s22#g1"
+      },
+      {
+        "sentence" : "story:e4b036101a7a:s23",
+        "ordinal" : 23,
+        "kind" : "proposed",
+        "root" : "story:e4b036101a7a:s23#g"
+      },
+      {
+        "sentence" : "story:e4b036101a7a:s24",
+        "ordinal" : 24,
+        "kind" : "proposed",
+        "root" : "story:e4b036101a7a:s24#t"
+      },
+      {
+        "sentence" : "story:e4b036101a7a:s25",
+        "ordinal" : 25,
+        "kind" : "proposed",
+        "root" : "story:e4b036101a7a:s25#c"
+      },
+      {
+        "sentence" : "story:e4b036101a7a:s26",
+        "ordinal" : 26,
+        "kind" : "abstained",
+        "anchor" : "story:e4b036101a7a:s26#a",
+        "reason" : "focus-not-predicate:Entity"
+      },
+      {
+        "sentence" : "story:e4b036101a7a:s27",
+        "ordinal" : 27,
+        "kind" : "proposed",
+        "root" : "story:e4b036101a7a:s27#t"
+      },
+      {
+        "sentence" : "story:e4b036101a7a:s28",
+        "ordinal" : 28,
+        "kind" : "abstained",
+        "anchor" : "story:e4b036101a7a:s28#a",
+        "reason" : "focus-not-predicate:Entity"
+      },
+      {
+        "sentence" : "story:e4b036101a7a:s29",
+        "ordinal" : 29,
+        "kind" : "proposed",
+        "root" : "story:e4b036101a7a:s29#c"
+      },
+      {
+        "sentence" : "story:e4b036101a7a:s30",
+        "ordinal" : 30,
+        "kind" : "proposed",
+        "root" : "story:e4b036101a7a:s30#s"
+      },
+      {
+        "sentence" : "story:e4b036101a7a:s31",
+        "ordinal" : 31,
+        "kind" : "proposed",
+        "root" : "story:e4b036101a7a:s31#t"
+      },
+      {
+        "sentence" : "story:e4b036101a7a:s32",
+        "ordinal" : 32,
+        "kind" : "abstained",
+        "anchor" : "story:e4b036101a7a:s32#a",
+        "reason" : "focus-not-predicate:Entity"
+      },
+      {
+        "sentence" : "story:e4b036101a7a:s33",
+        "ordinal" : 33,
+        "kind" : "proposed",
+        "root" : "story:e4b036101a7a:s33#g"
+      },
+      {
+        "sentence" : "story:e4b036101a7a:s34",
+        "ordinal" : 34,
+        "kind" : "proposed",
+        "root" : "story:e4b036101a7a:s34#a"
+      },
+      {
+        "sentence" : "story:e4b036101a7a:s35",
+        "ordinal" : 35,
+        "kind" : "no-chart"
+      },
+      {
+        "sentence" : "story:e4b036101a7a:s36",
+        "ordinal" : 36,
+        "kind" : "proposed",
+        "root" : "story:e4b036101a7a:s36#g"
+      },
+      {
+        "sentence" : "story:e4b036101a7a:s37",
+        "ordinal" : 37,
+        "kind" : "abstained",
+        "anchor" : "story:e4b036101a7a:s37#a",
+        "reason" : "focus-not-predicate:Entity"
+      },
+      {
+        "sentence" : "story:e4b036101a7a:s38",
+        "ordinal" : 38,
+        "kind" : "abstained",
+        "anchor" : "story:e4b036101a7a:s38#a2",
+        "reason" : "focus-not-predicate:Entity"
+      },
+      {
+        "sentence" : "story:e4b036101a7a:s39",
+        "ordinal" : 39,
+        "kind" : "abstained",
+        "anchor" : "story:e4b036101a7a:s39#m",
+        "reason" : "focus-not-predicate:Special"
+      },
+      {
+        "sentence" : "story:e4b036101a7a:s40",
+        "ordinal" : 40,
+        "kind" : "abstained",
+        "anchor" : "story:e4b036101a7a:s40#a",
+        "reason" : "focus-not-predicate:Entity"
+      },
+      {
+        "sentence" : "story:e4b036101a7a:s41",
+        "ordinal" : 41,
+        "kind" : "no-chart"
+      },
+      {
+        "sentence" : "story:e4b036101a7a:s42",
+        "ordinal" : 42,
+        "kind" : "abstained",
+        "anchor" : "story:e4b036101a7a:s42#a",
+        "reason" : "focus-not-predicate:Entity"
+      },
+      {
+        "sentence" : "story:e4b036101a7a:s43",
+        "ordinal" : 43,
+        "kind" : "abstained",
+        "anchor" : "story:e4b036101a7a:s43#d",
+        "reason" : "focus-not-predicate:Entity"
+      },
+      {
+        "sentence" : "story:e4b036101a7a:s44",
+        "ordinal" : 44,
+        "kind" : "proposed",
+        "root" : "story:e4b036101a7a:s44#f"
+      },
+      {
+        "sentence" : "story:e4b036101a7a:s45",
+        "ordinal" : 45,
+        "kind" : "abstained",
+        "anchor" : "story:e4b036101a7a:s45#a",
+        "reason" : "focus-not-predicate:Entity"
+      },
+      {
+        "sentence" : "story:e4b036101a7a:s46",
+        "ordinal" : 46,
+        "kind" : "proposed",
+        "root" : "story:e4b036101a7a:s46#c"
+      },
+      {
+        "sentence" : "story:e4b036101a7a:s47",
+        "ordinal" : 47,
+        "kind" : "abstained",
+        "anchor" : "story:e4b036101a7a:s47#d",
+        "reason" : "focus-not-predicate:Property"
+      },
+      {
+        "sentence" : "story:e4b036101a7a:s48",
+        "ordinal" : 48,
+        "kind" : "abstained",
+        "anchor" : "story:e4b036101a7a:s48#a",
+        "reason" : "focus-not-predicate:Entity"
+      },
+      {
+        "sentence" : "story:e4b036101a7a:s49",
+        "ordinal" : 49,
+        "kind" : "proposed",
+        "root" : "story:e4b036101a7a:s49#r"
+      }
+    ]
+  },
+  "gaps" : [
+    {
+      "stage" : "narrative-compile",
+      "family" : "ContextAssignment",
+      "target" : "context-assignment:story:e4b036101a7a:s14#b",
+      "reason" : "unresolved:NoProposal",
+      "upstreamClaims" : 0,
+      "evidence" : 0
+    },
+    {
+      "stage" : "narrative-compile",
+      "family" : "ContextAssignment",
+      "target" : "context-assignment:story:e4b036101a7a:s20#a",
+      "reason" : "unresolved:NoProposal",
+      "upstreamClaims" : 0,
+      "evidence" : 0
+    },
+    {
+      "stage" : "narrative-compile",
+      "family" : "ContextAssignment",
+      "target" : "context-assignment:story:e4b036101a7a:s21#a",
+      "reason" : "unresolved:NoProposal",
+      "upstreamClaims" : 0,
+      "evidence" : 0
+    },
+    {
+      "stage" : "narrative-compile",
+      "family" : "ContextAssignment",
+      "target" : "context-assignment:story:e4b036101a7a:s26#a",
+      "reason" : "unresolved:NoProposal",
+      "upstreamClaims" : 0,
+      "evidence" : 0
+    },
+    {
+      "stage" : "narrative-compile",
+      "family" : "ContextAssignment",
+      "target" : "context-assignment:story:e4b036101a7a:s28#a",
+      "reason" : "unresolved:NoProposal",
+      "upstreamClaims" : 0,
+      "evidence" : 0
+    },
+    {
+      "stage" : "narrative-compile",
+      "family" : "ContextAssignment",
+      "target" : "context-assignment:story:e4b036101a7a:s32#a",
+      "reason" : "unresolved:NoProposal",
+      "upstreamClaims" : 0,
+      "evidence" : 0
+    },
+    {
+      "stage" : "narrative-compile",
+      "family" : "ContextAssignment",
+      "target" : "context-assignment:story:e4b036101a7a:s37#a",
+      "reason" : "unresolved:NoProposal",
+      "upstreamClaims" : 0,
+      "evidence" : 0
+    },
+    {
+      "stage" : "narrative-compile",
+      "family" : "ContextAssignment",
+      "target" : "context-assignment:story:e4b036101a7a:s38#a2",
+      "reason" : "unresolved:NoProposal",
+      "upstreamClaims" : 0,
+      "evidence" : 0
+    },
+    {
+      "stage" : "narrative-compile",
+      "family" : "ContextAssignment",
+      "target" : "context-assignment:story:e4b036101a7a:s39#m",
+      "reason" : "unresolved:NoProposal",
+      "upstreamClaims" : 0,
+      "evidence" : 0
+    },
+    {
+      "stage" : "narrative-compile",
+      "family" : "ContextAssignment",
+      "target" : "context-assignment:story:e4b036101a7a:s40#a",
+      "reason" : "unresolved:NoProposal",
+      "upstreamClaims" : 0,
+      "evidence" : 0
+    },
+    {
+      "stage" : "narrative-compile",
+      "family" : "ContextAssignment",
+      "target" : "context-assignment:story:e4b036101a7a:s42#a",
+      "reason" : "unresolved:NoProposal",
+      "upstreamClaims" : 0,
+      "evidence" : 0
+    },
+    {
+      "stage" : "narrative-compile",
+      "family" : "ContextAssignment",
+      "target" : "context-assignment:story:e4b036101a7a:s43#d",
+      "reason" : "unresolved:NoProposal",
+      "upstreamClaims" : 0,
+      "evidence" : 0
+    },
+    {
+      "stage" : "narrative-compile",
+      "family" : "ContextAssignment",
+      "target" : "context-assignment:story:e4b036101a7a:s45#a",
+      "reason" : "unresolved:NoProposal",
+      "upstreamClaims" : 0,
+      "evidence" : 0
+    },
+    {
+      "stage" : "narrative-compile",
+      "family" : "ContextAssignment",
+      "target" : "context-assignment:story:e4b036101a7a:s47#d",
+      "reason" : "unresolved:NoProposal",
+      "upstreamClaims" : 0,
+      "evidence" : 0
+    },
+    {
+      "stage" : "narrative-compile",
+      "family" : "ContextAssignment",
+      "target" : "context-assignment:story:e4b036101a7a:s48#a",
+      "reason" : "unresolved:NoProposal",
+      "upstreamClaims" : 0,
+      "evidence" : 0
+    },
+    {
+      "stage" : "narrative-compile",
+      "family" : "ContextAssignment",
+      "target" : "context-assignment:story:e4b036101a7a:s6#a",
+      "reason" : "unresolved:NoProposal",
+      "upstreamClaims" : 0,
+      "evidence" : 0
+    },
+    {
+      "stage" : "narrative-compile",
+      "family" : "ContextAssignment",
+      "target" : "context-assignment:story:e4b036101a7a:s7#a",
+      "reason" : "unresolved:NoProposal",
+      "upstreamClaims" : 0,
+      "evidence" : 0
+    },
+    {
+      "stage" : "narrative-compile",
+      "family" : "SegmentMembership",
+      "target" : "segment-membership:story:e4b036101a7a:story:e4b036101a7a:s14#b",
+      "reason" : "unresolved:NoProposal",
+      "upstreamClaims" : 0,
+      "evidence" : 0
+    },
+    {
+      "stage" : "narrative-compile",
+      "family" : "SegmentMembership",
+      "target" : "segment-membership:story:e4b036101a7a:story:e4b036101a7a:s20#a",
+      "reason" : "unresolved:NoProposal",
+      "upstreamClaims" : 0,
+      "evidence" : 0
+    },
+    {
+      "stage" : "narrative-compile",
+      "family" : "SegmentMembership",
+      "target" : "segment-membership:story:e4b036101a7a:story:e4b036101a7a:s21#a",
+      "reason" : "unresolved:NoProposal",
+      "upstreamClaims" : 0,
+      "evidence" : 0
+    },
+    {
+      "stage" : "narrative-compile",
+      "family" : "SegmentMembership",
+      "target" : "segment-membership:story:e4b036101a7a:story:e4b036101a7a:s26#a",
+      "reason" : "unresolved:NoProposal",
+      "upstreamClaims" : 0,
+      "evidence" : 0
+    },
+    {
+      "stage" : "narrative-compile",
+      "family" : "SegmentMembership",
+      "target" : "segment-membership:story:e4b036101a7a:story:e4b036101a7a:s28#a",
+      "reason" : "unresolved:NoProposal",
+      "upstreamClaims" : 0,
+      "evidence" : 0
+    },
+    {
+      "stage" : "narrative-compile",
+      "family" : "SegmentMembership",
+      "target" : "segment-membership:story:e4b036101a7a:story:e4b036101a7a:s32#a",
+      "reason" : "unresolved:NoProposal",
+      "upstreamClaims" : 0,
+      "evidence" : 0
+    },
+    {
+      "stage" : "narrative-compile",
+      "family" : "SegmentMembership",
+      "target" : "segment-membership:story:e4b036101a7a:story:e4b036101a7a:s37#a",
+      "reason" : "unresolved:NoProposal",
+      "upstreamClaims" : 0,
+      "evidence" : 0
+    },
+    {
+      "stage" : "narrative-compile",
+      "family" : "SegmentMembership",
+      "target" : "segment-membership:story:e4b036101a7a:story:e4b036101a7a:s38#a2",
+      "reason" : "unresolved:NoProposal",
+      "upstreamClaims" : 0,
+      "evidence" : 0
+    },
+    {
+      "stage" : "narrative-compile",
+      "family" : "SegmentMembership",
+      "target" : "segment-membership:story:e4b036101a7a:story:e4b036101a7a:s39#m",
+      "reason" : "unresolved:NoProposal",
+      "upstreamClaims" : 0,
+      "evidence" : 0
+    },
+    {
+      "stage" : "narrative-compile",
+      "family" : "SegmentMembership",
+      "target" : "segment-membership:story:e4b036101a7a:story:e4b036101a7a:s40#a",
+      "reason" : "unresolved:NoProposal",
+      "upstreamClaims" : 0,
+      "evidence" : 0
+    },
+    {
+      "stage" : "narrative-compile",
+      "family" : "SegmentMembership",
+      "target" : "segment-membership:story:e4b036101a7a:story:e4b036101a7a:s42#a",
+      "reason" : "unresolved:NoProposal",
+      "upstreamClaims" : 0,
+      "evidence" : 0
+    },
+    {
+      "stage" : "narrative-compile",
+      "family" : "SegmentMembership",
+      "target" : "segment-membership:story:e4b036101a7a:story:e4b036101a7a:s43#d",
+      "reason" : "unresolved:NoProposal",
+      "upstreamClaims" : 0,
+      "evidence" : 0
+    },
+    {
+      "stage" : "narrative-compile",
+      "family" : "SegmentMembership",
+      "target" : "segment-membership:story:e4b036101a7a:story:e4b036101a7a:s45#a",
+      "reason" : "unresolved:NoProposal",
+      "upstreamClaims" : 0,
+      "evidence" : 0
+    },
+    {
+      "stage" : "narrative-compile",
+      "family" : "SegmentMembership",
+      "target" : "segment-membership:story:e4b036101a7a:story:e4b036101a7a:s47#d",
+      "reason" : "unresolved:NoProposal",
+      "upstreamClaims" : 0,
+      "evidence" : 0
+    },
+    {
+      "stage" : "narrative-compile",
+      "family" : "SegmentMembership",
+      "target" : "segment-membership:story:e4b036101a7a:story:e4b036101a7a:s48#a",
+      "reason" : "unresolved:NoProposal",
+      "upstreamClaims" : 0,
+      "evidence" : 0
+    },
+    {
+      "stage" : "narrative-compile",
+      "family" : "SegmentMembership",
+      "target" : "segment-membership:story:e4b036101a7a:story:e4b036101a7a:s6#a",
+      "reason" : "unresolved:NoProposal",
+      "upstreamClaims" : 0,
+      "evidence" : 0
+    },
+    {
+      "stage" : "narrative-compile",
+      "family" : "SegmentMembership",
+      "target" : "segment-membership:story:e4b036101a7a:story:e4b036101a7a:s7#a",
+      "reason" : "unresolved:NoProposal",
+      "upstreamClaims" : 0,
+      "evidence" : 0
+    },
+    {
+      "stage" : "narrative-compile",
+      "family" : "SituationMention",
+      "target" : "situation:story:e4b036101a7a:s14#b",
+      "reason" : "unresolved:NoProposal",
+      "upstreamClaims" : 0,
+      "evidence" : 0
+    },
+    {
+      "stage" : "narrative-compile",
+      "family" : "SituationMention",
+      "target" : "situation:story:e4b036101a7a:s20#a",
+      "reason" : "unresolved:NoProposal",
+      "upstreamClaims" : 0,
+      "evidence" : 0
+    },
+    {
+      "stage" : "narrative-compile",
+      "family" : "SituationMention",
+      "target" : "situation:story:e4b036101a7a:s21#a",
+      "reason" : "unresolved:NoProposal",
+      "upstreamClaims" : 0,
+      "evidence" : 0
+    },
+    {
+      "stage" : "narrative-compile",
+      "family" : "SituationMention",
+      "target" : "situation:story:e4b036101a7a:s26#a",
+      "reason" : "unresolved:NoProposal",
+      "upstreamClaims" : 0,
+      "evidence" : 0
+    },
+    {
+      "stage" : "narrative-compile",
+      "family" : "SituationMention",
+      "target" : "situation:story:e4b036101a7a:s28#a",
+      "reason" : "unresolved:NoProposal",
+      "upstreamClaims" : 0,
+      "evidence" : 0
+    },
+    {
+      "stage" : "narrative-compile",
+      "family" : "SituationMention",
+      "target" : "situation:story:e4b036101a7a:s32#a",
+      "reason" : "unresolved:NoProposal",
+      "upstreamClaims" : 0,
+      "evidence" : 0
+    },
+    {
+      "stage" : "narrative-compile",
+      "family" : "SituationMention",
+      "target" : "situation:story:e4b036101a7a:s37#a",
+      "reason" : "unresolved:NoProposal",
+      "upstreamClaims" : 0,
+      "evidence" : 0
+    },
+    {
+      "stage" : "narrative-compile",
+      "family" : "SituationMention",
+      "target" : "situation:story:e4b036101a7a:s38#a2",
+      "reason" : "unresolved:NoProposal",
+      "upstreamClaims" : 0,
+      "evidence" : 0
+    },
+    {
+      "stage" : "narrative-compile",
+      "family" : "SituationMention",
+      "target" : "situation:story:e4b036101a7a:s39#m",
+      "reason" : "unresolved:NoProposal",
+      "upstreamClaims" : 0,
+      "evidence" : 0
+    },
+    {
+      "stage" : "narrative-compile",
+      "family" : "SituationMention",
+      "target" : "situation:story:e4b036101a7a:s40#a",
+      "reason" : "unresolved:NoProposal",
+      "upstreamClaims" : 0,
+      "evidence" : 0
+    },
+    {
+      "stage" : "narrative-compile",
+      "family" : "SituationMention",
+      "target" : "situation:story:e4b036101a7a:s42#a",
+      "reason" : "unresolved:NoProposal",
+      "upstreamClaims" : 0,
+      "evidence" : 0
+    },
+    {
+      "stage" : "narrative-compile",
+      "family" : "SituationMention",
+      "target" : "situation:story:e4b036101a7a:s43#d",
+      "reason" : "unresolved:NoProposal",
+      "upstreamClaims" : 0,
+      "evidence" : 0
+    },
+    {
+      "stage" : "narrative-compile",
+      "family" : "SituationMention",
+      "target" : "situation:story:e4b036101a7a:s45#a",
+      "reason" : "unresolved:NoProposal",
+      "upstreamClaims" : 0,
+      "evidence" : 0
+    },
+    {
+      "stage" : "narrative-compile",
+      "family" : "SituationMention",
+      "target" : "situation:story:e4b036101a7a:s47#d",
+      "reason" : "unresolved:NoProposal",
+      "upstreamClaims" : 0,
+      "evidence" : 0
+    },
+    {
+      "stage" : "narrative-compile",
+      "family" : "SituationMention",
+      "target" : "situation:story:e4b036101a7a:s48#a",
+      "reason" : "unresolved:NoProposal",
+      "upstreamClaims" : 0,
+      "evidence" : 0
+    },
+    {
+      "stage" : "narrative-compile",
+      "family" : "SituationMention",
+      "target" : "situation:story:e4b036101a7a:s6#a",
+      "reason" : "unresolved:NoProposal",
+      "upstreamClaims" : 0,
+      "evidence" : 0
+    },
+    {
+      "stage" : "narrative-compile",
+      "family" : "SituationMention",
+      "target" : "situation:story:e4b036101a7a:s7#a",
+      "reason" : "unresolved:NoProposal",
+      "upstreamClaims" : 0,
+      "evidence" : 0
+    },
+    {
+      "stage" : "narrative-compile",
+      "family" : "DiscourseTrajectory",
+      "target" : "trajectory:story:e4b036101a7a:s10#s->story:e4b036101a7a:s11#w",
+      "reason" : "trajectory-inputs-unsupported:ParticipantRole,TemporalRelation",
+      "upstreamClaims" : 2,
+      "evidence" : 2
+    },
+    {
+      "stage" : "narrative-compile",
+      "family" : "DiscourseTrajectory",
+      "target" : "trajectory:story:e4b036101a7a:s11#w->story:e4b036101a7a:s12#g",
+      "reason" : "trajectory-inputs-unsupported:ParticipantRole,TemporalRelation",
+      "upstreamClaims" : 2,
+      "evidence" : 2
+    },
+    {
+      "stage" : "narrative-compile",
+      "family" : "DiscourseTrajectory",
+      "target" : "trajectory:story:e4b036101a7a:s12#g->story:e4b036101a7a:s13#s",
+      "reason" : "trajectory-inputs-unsupported:ParticipantRole,TemporalRelation",
+      "upstreamClaims" : 2,
+      "evidence" : 2
+    },
+    {
+      "stage" : "narrative-compile",
+      "family" : "DiscourseTrajectory",
+      "target" : "trajectory:story:e4b036101a7a:s13#s->story:e4b036101a7a:s15#s",
+      "reason" : "trajectory-inputs-unsupported:ParticipantRole,TemporalRelation",
+      "upstreamClaims" : 2,
+      "evidence" : 2
+    },
+    {
+      "stage" : "narrative-compile",
+      "family" : "DiscourseTrajectory",
+      "target" : "trajectory:story:e4b036101a7a:s15#s->story:e4b036101a7a:s16#k",
+      "reason" : "trajectory-inputs-unsupported:ParticipantRole,TemporalRelation",
+      "upstreamClaims" : 2,
+      "evidence" : 2
+    },
+    {
+      "stage" : "narrative-compile",
+      "family" : "DiscourseTrajectory",
+      "target" : "trajectory:story:e4b036101a7a:s16#k->story:e4b036101a7a:s17#g",
+      "reason" : "trajectory-inputs-unsupported:ParticipantRole,TemporalRelation",
+      "upstreamClaims" : 2,
+      "evidence" : 2
+    },
+    {
+      "stage" : "narrative-compile",
+      "family" : "DiscourseTrajectory",
+      "target" : "trajectory:story:e4b036101a7a:s17#g->story:e4b036101a7a:s19#a",
+      "reason" : "trajectory-inputs-unsupported:ParticipantRole,TemporalRelation",
+      "upstreamClaims" : 2,
+      "evidence" : 2
+    },
+    {
+      "stage" : "narrative-compile",
+      "family" : "DiscourseTrajectory",
+      "target" : "trajectory:story:e4b036101a7a:s19#a->story:e4b036101a7a:s22#g1",
+      "reason" : "trajectory-inputs-unsupported:ParticipantRole,TemporalRelation",
+      "upstreamClaims" : 2,
+      "evidence" : 2
+    },
+    {
+      "stage" : "narrative-compile",
+      "family" : "DiscourseTrajectory",
+      "target" : "trajectory:story:e4b036101a7a:s2#c->story:e4b036101a7a:s3#b",
+      "reason" : "trajectory-inputs-unsupported:ParticipantRole,TemporalRelation",
+      "upstreamClaims" : 2,
+      "evidence" : 2
+    },
+    {
+      "stage" : "narrative-compile",
+      "family" : "DiscourseTrajectory",
+      "target" : "trajectory:story:e4b036101a7a:s22#g1->story:e4b036101a7a:s23#g",
+      "reason" : "trajectory-inputs-unsupported:ParticipantRole,TemporalRelation",
+      "upstreamClaims" : 2,
+      "evidence" : 2
+    },
+    {
+      "stage" : "narrative-compile",
+      "family" : "DiscourseTrajectory",
+      "target" : "trajectory:story:e4b036101a7a:s23#g->story:e4b036101a7a:s24#t",
+      "reason" : "trajectory-inputs-unsupported:ParticipantRole,TemporalRelation",
+      "upstreamClaims" : 2,
+      "evidence" : 2
+    },
+    {
+      "stage" : "narrative-compile",
+      "family" : "DiscourseTrajectory",
+      "target" : "trajectory:story:e4b036101a7a:s24#t->story:e4b036101a7a:s25#c",
+      "reason" : "trajectory-inputs-unsupported:ParticipantRole,TemporalRelation",
+      "upstreamClaims" : 2,
+      "evidence" : 2
+    },
+    {
+      "stage" : "narrative-compile",
+      "family" : "DiscourseTrajectory",
+      "target" : "trajectory:story:e4b036101a7a:s25#c->story:e4b036101a7a:s27#t",
+      "reason" : "trajectory-inputs-unsupported:ParticipantRole,TemporalRelation",
+      "upstreamClaims" : 2,
+      "evidence" : 2
+    },
+    {
+      "stage" : "narrative-compile",
+      "family" : "DiscourseTrajectory",
+      "target" : "trajectory:story:e4b036101a7a:s27#t->story:e4b036101a7a:s29#c",
+      "reason" : "trajectory-inputs-unsupported:ParticipantRole,TemporalRelation",
+      "upstreamClaims" : 2,
+      "evidence" : 2
+    },
+    {
+      "stage" : "narrative-compile",
+      "family" : "DiscourseTrajectory",
+      "target" : "trajectory:story:e4b036101a7a:s29#c->story:e4b036101a7a:s30#s",
+      "reason" : "trajectory-inputs-unsupported:ParticipantRole,TemporalRelation",
+      "upstreamClaims" : 2,
+      "evidence" : 2
+    },
+    {
+      "stage" : "narrative-compile",
+      "family" : "DiscourseTrajectory",
+      "target" : "trajectory:story:e4b036101a7a:s3#b->story:e4b036101a7a:s4#h",
+      "reason" : "trajectory-inputs-unsupported:ParticipantRole,TemporalRelation",
+      "upstreamClaims" : 2,
+      "evidence" : 2
+    },
+    {
+      "stage" : "narrative-compile",
+      "family" : "DiscourseTrajectory",
+      "target" : "trajectory:story:e4b036101a7a:s30#s->story:e4b036101a7a:s31#t",
+      "reason" : "trajectory-inputs-unsupported:ParticipantRole,TemporalRelation",
+      "upstreamClaims" : 2,
+      "evidence" : 2
+    },
+    {
+      "stage" : "narrative-compile",
+      "family" : "DiscourseTrajectory",
+      "target" : "trajectory:story:e4b036101a7a:s31#t->story:e4b036101a7a:s33#g",
+      "reason" : "trajectory-inputs-unsupported:ParticipantRole,TemporalRelation",
+      "upstreamClaims" : 2,
+      "evidence" : 2
+    },
+    {
+      "stage" : "narrative-compile",
+      "family" : "DiscourseTrajectory",
+      "target" : "trajectory:story:e4b036101a7a:s33#g->story:e4b036101a7a:s34#a",
+      "reason" : "trajectory-inputs-unsupported:ParticipantRole,TemporalRelation",
+      "upstreamClaims" : 2,
+      "evidence" : 2
+    },
+    {
+      "stage" : "narrative-compile",
+      "family" : "DiscourseTrajectory",
+      "target" : "trajectory:story:e4b036101a7a:s34#a->story:e4b036101a7a:s36#g",
+      "reason" : "trajectory-inputs-unsupported:ParticipantRole,TemporalRelation",
+      "upstreamClaims" : 2,
+      "evidence" : 2
+    },
+    {
+      "stage" : "narrative-compile",
+      "family" : "DiscourseTrajectory",
+      "target" : "trajectory:story:e4b036101a7a:s36#g->story:e4b036101a7a:s44#f",
+      "reason" : "trajectory-inputs-unsupported:ParticipantRole,TemporalRelation",
+      "upstreamClaims" : 2,
+      "evidence" : 2
+    },
+    {
+      "stage" : "narrative-compile",
+      "family" : "DiscourseTrajectory",
+      "target" : "trajectory:story:e4b036101a7a:s4#h->story:e4b036101a7a:s5#t",
+      "reason" : "trajectory-inputs-unsupported:ParticipantRole,TemporalRelation",
+      "upstreamClaims" : 2,
+      "evidence" : 2
+    },
+    {
+      "stage" : "narrative-compile",
+      "family" : "DiscourseTrajectory",
+      "target" : "trajectory:story:e4b036101a7a:s44#f->story:e4b036101a7a:s46#c",
+      "reason" : "trajectory-inputs-unsupported:ParticipantRole,TemporalRelation",
+      "upstreamClaims" : 2,
+      "evidence" : 2
+    },
+    {
+      "stage" : "narrative-compile",
+      "family" : "DiscourseTrajectory",
+      "target" : "trajectory:story:e4b036101a7a:s46#c->story:e4b036101a7a:s49#r",
+      "reason" : "trajectory-inputs-unsupported:ParticipantRole,TemporalRelation",
+      "upstreamClaims" : 2,
+      "evidence" : 2
+    },
+    {
+      "stage" : "narrative-compile",
+      "family" : "DiscourseTrajectory",
+      "target" : "trajectory:story:e4b036101a7a:s5#t->story:e4b036101a7a:s10#s",
+      "reason" : "trajectory-inputs-unsupported:ParticipantRole,TemporalRelation",
+      "upstreamClaims" : 2,
+      "evidence" : 2
+    }
+  ],
+  "validation" : {
+    "validated" : false,
+    "errors" : 77,
+    "warnings" : 0,
+    "violations" : [
+      {
+        "law" : "compiler.required-derivation",
+        "severity" : "error",
+        "path" : "context-assignment:story:e4b036101a7a:s14#b",
+        "reason" : "unresolved:NoProposal"
+      },
+      {
+        "law" : "compiler.required-derivation",
+        "severity" : "error",
+        "path" : "context-assignment:story:e4b036101a7a:s20#a",
+        "reason" : "unresolved:NoProposal"
+      },
+      {
+        "law" : "compiler.required-derivation",
+        "severity" : "error",
+        "path" : "context-assignment:story:e4b036101a7a:s21#a",
+        "reason" : "unresolved:NoProposal"
+      },
+      {
+        "law" : "compiler.required-derivation",
+        "severity" : "error",
+        "path" : "context-assignment:story:e4b036101a7a:s26#a",
+        "reason" : "unresolved:NoProposal"
+      },
+      {
+        "law" : "compiler.required-derivation",
+        "severity" : "error",
+        "path" : "context-assignment:story:e4b036101a7a:s28#a",
+        "reason" : "unresolved:NoProposal"
+      },
+      {
+        "law" : "compiler.required-derivation",
+        "severity" : "error",
+        "path" : "context-assignment:story:e4b036101a7a:s32#a",
+        "reason" : "unresolved:NoProposal"
+      },
+      {
+        "law" : "compiler.required-derivation",
+        "severity" : "error",
+        "path" : "context-assignment:story:e4b036101a7a:s37#a",
+        "reason" : "unresolved:NoProposal"
+      },
+      {
+        "law" : "compiler.required-derivation",
+        "severity" : "error",
+        "path" : "context-assignment:story:e4b036101a7a:s38#a2",
+        "reason" : "unresolved:NoProposal"
+      },
+      {
+        "law" : "compiler.required-derivation",
+        "severity" : "error",
+        "path" : "context-assignment:story:e4b036101a7a:s39#m",
+        "reason" : "unresolved:NoProposal"
+      },
+      {
+        "law" : "compiler.required-derivation",
+        "severity" : "error",
+        "path" : "context-assignment:story:e4b036101a7a:s40#a",
+        "reason" : "unresolved:NoProposal"
+      },
+      {
+        "law" : "compiler.required-derivation",
+        "severity" : "error",
+        "path" : "context-assignment:story:e4b036101a7a:s42#a",
+        "reason" : "unresolved:NoProposal"
+      },
+      {
+        "law" : "compiler.required-derivation",
+        "severity" : "error",
+        "path" : "context-assignment:story:e4b036101a7a:s43#d",
+        "reason" : "unresolved:NoProposal"
+      },
+      {
+        "law" : "compiler.required-derivation",
+        "severity" : "error",
+        "path" : "context-assignment:story:e4b036101a7a:s45#a",
+        "reason" : "unresolved:NoProposal"
+      },
+      {
+        "law" : "compiler.required-derivation",
+        "severity" : "error",
+        "path" : "context-assignment:story:e4b036101a7a:s47#d",
+        "reason" : "unresolved:NoProposal"
+      },
+      {
+        "law" : "compiler.required-derivation",
+        "severity" : "error",
+        "path" : "context-assignment:story:e4b036101a7a:s48#a",
+        "reason" : "unresolved:NoProposal"
+      },
+      {
+        "law" : "compiler.required-derivation",
+        "severity" : "error",
+        "path" : "context-assignment:story:e4b036101a7a:s6#a",
+        "reason" : "unresolved:NoProposal"
+      },
+      {
+        "law" : "compiler.required-derivation",
+        "severity" : "error",
+        "path" : "context-assignment:story:e4b036101a7a:s7#a",
+        "reason" : "unresolved:NoProposal"
+      },
+      {
+        "law" : "compiler.required-derivation",
+        "severity" : "error",
+        "path" : "segment-membership:story:e4b036101a7a:story:e4b036101a7a:s14#b",
+        "reason" : "unresolved:NoProposal"
+      },
+      {
+        "law" : "compiler.required-derivation",
+        "severity" : "error",
+        "path" : "segment-membership:story:e4b036101a7a:story:e4b036101a7a:s20#a",
+        "reason" : "unresolved:NoProposal"
+      },
+      {
+        "law" : "compiler.required-derivation",
+        "severity" : "error",
+        "path" : "segment-membership:story:e4b036101a7a:story:e4b036101a7a:s21#a",
+        "reason" : "unresolved:NoProposal"
+      },
+      {
+        "law" : "compiler.required-derivation",
+        "severity" : "error",
+        "path" : "segment-membership:story:e4b036101a7a:story:e4b036101a7a:s26#a",
+        "reason" : "unresolved:NoProposal"
+      },
+      {
+        "law" : "compiler.required-derivation",
+        "severity" : "error",
+        "path" : "segment-membership:story:e4b036101a7a:story:e4b036101a7a:s28#a",
+        "reason" : "unresolved:NoProposal"
+      },
+      {
+        "law" : "compiler.required-derivation",
+        "severity" : "error",
+        "path" : "segment-membership:story:e4b036101a7a:story:e4b036101a7a:s32#a",
+        "reason" : "unresolved:NoProposal"
+      },
+      {
+        "law" : "compiler.required-derivation",
+        "severity" : "error",
+        "path" : "segment-membership:story:e4b036101a7a:story:e4b036101a7a:s37#a",
+        "reason" : "unresolved:NoProposal"
+      },
+      {
+        "law" : "compiler.required-derivation",
+        "severity" : "error",
+        "path" : "segment-membership:story:e4b036101a7a:story:e4b036101a7a:s38#a2",
+        "reason" : "unresolved:NoProposal"
+      },
+      {
+        "law" : "compiler.required-derivation",
+        "severity" : "error",
+        "path" : "segment-membership:story:e4b036101a7a:story:e4b036101a7a:s39#m",
+        "reason" : "unresolved:NoProposal"
+      },
+      {
+        "law" : "compiler.required-derivation",
+        "severity" : "error",
+        "path" : "segment-membership:story:e4b036101a7a:story:e4b036101a7a:s40#a",
+        "reason" : "unresolved:NoProposal"
+      },
+      {
+        "law" : "compiler.required-derivation",
+        "severity" : "error",
+        "path" : "segment-membership:story:e4b036101a7a:story:e4b036101a7a:s42#a",
+        "reason" : "unresolved:NoProposal"
+      },
+      {
+        "law" : "compiler.required-derivation",
+        "severity" : "error",
+        "path" : "segment-membership:story:e4b036101a7a:story:e4b036101a7a:s43#d",
+        "reason" : "unresolved:NoProposal"
+      },
+      {
+        "law" : "compiler.required-derivation",
+        "severity" : "error",
+        "path" : "segment-membership:story:e4b036101a7a:story:e4b036101a7a:s45#a",
+        "reason" : "unresolved:NoProposal"
+      },
+      {
+        "law" : "compiler.required-derivation",
+        "severity" : "error",
+        "path" : "segment-membership:story:e4b036101a7a:story:e4b036101a7a:s47#d",
+        "reason" : "unresolved:NoProposal"
+      },
+      {
+        "law" : "compiler.required-derivation",
+        "severity" : "error",
+        "path" : "segment-membership:story:e4b036101a7a:story:e4b036101a7a:s48#a",
+        "reason" : "unresolved:NoProposal"
+      },
+      {
+        "law" : "compiler.required-derivation",
+        "severity" : "error",
+        "path" : "segment-membership:story:e4b036101a7a:story:e4b036101a7a:s6#a",
+        "reason" : "unresolved:NoProposal"
+      },
+      {
+        "law" : "compiler.required-derivation",
+        "severity" : "error",
+        "path" : "segment-membership:story:e4b036101a7a:story:e4b036101a7a:s7#a",
+        "reason" : "unresolved:NoProposal"
+      },
+      {
+        "law" : "compiler.required-derivation",
+        "severity" : "error",
+        "path" : "situation:story:e4b036101a7a:s14#b",
+        "reason" : "unresolved:NoProposal"
+      },
+      {
+        "law" : "compiler.required-derivation",
+        "severity" : "error",
+        "path" : "situation:story:e4b036101a7a:s20#a",
+        "reason" : "unresolved:NoProposal"
+      },
+      {
+        "law" : "compiler.required-derivation",
+        "severity" : "error",
+        "path" : "situation:story:e4b036101a7a:s21#a",
+        "reason" : "unresolved:NoProposal"
+      },
+      {
+        "law" : "compiler.required-derivation",
+        "severity" : "error",
+        "path" : "situation:story:e4b036101a7a:s26#a",
+        "reason" : "unresolved:NoProposal"
+      },
+      {
+        "law" : "compiler.required-derivation",
+        "severity" : "error",
+        "path" : "situation:story:e4b036101a7a:s28#a",
+        "reason" : "unresolved:NoProposal"
+      },
+      {
+        "law" : "compiler.required-derivation",
+        "severity" : "error",
+        "path" : "situation:story:e4b036101a7a:s32#a",
+        "reason" : "unresolved:NoProposal"
+      },
+      {
+        "law" : "compiler.required-derivation",
+        "severity" : "error",
+        "path" : "situation:story:e4b036101a7a:s37#a",
+        "reason" : "unresolved:NoProposal"
+      },
+      {
+        "law" : "compiler.required-derivation",
+        "severity" : "error",
+        "path" : "situation:story:e4b036101a7a:s38#a2",
+        "reason" : "unresolved:NoProposal"
+      },
+      {
+        "law" : "compiler.required-derivation",
+        "severity" : "error",
+        "path" : "situation:story:e4b036101a7a:s39#m",
+        "reason" : "unresolved:NoProposal"
+      },
+      {
+        "law" : "compiler.required-derivation",
+        "severity" : "error",
+        "path" : "situation:story:e4b036101a7a:s40#a",
+        "reason" : "unresolved:NoProposal"
+      },
+      {
+        "law" : "compiler.required-derivation",
+        "severity" : "error",
+        "path" : "situation:story:e4b036101a7a:s42#a",
+        "reason" : "unresolved:NoProposal"
+      },
+      {
+        "law" : "compiler.required-derivation",
+        "severity" : "error",
+        "path" : "situation:story:e4b036101a7a:s43#d",
+        "reason" : "unresolved:NoProposal"
+      },
+      {
+        "law" : "compiler.required-derivation",
+        "severity" : "error",
+        "path" : "situation:story:e4b036101a7a:s45#a",
+        "reason" : "unresolved:NoProposal"
+      },
+      {
+        "law" : "compiler.required-derivation",
+        "severity" : "error",
+        "path" : "situation:story:e4b036101a7a:s47#d",
+        "reason" : "unresolved:NoProposal"
+      },
+      {
+        "law" : "compiler.required-derivation",
+        "severity" : "error",
+        "path" : "situation:story:e4b036101a7a:s48#a",
+        "reason" : "unresolved:NoProposal"
+      },
+      {
+        "law" : "compiler.required-derivation",
+        "severity" : "error",
+        "path" : "situation:story:e4b036101a7a:s6#a",
+        "reason" : "unresolved:NoProposal"
+      },
+      {
+        "law" : "compiler.required-derivation",
+        "severity" : "error",
+        "path" : "situation:story:e4b036101a7a:s7#a",
+        "reason" : "unresolved:NoProposal"
+      },
+      {
+        "law" : "compiler.required-derivation",
+        "severity" : "error",
+        "path" : "trajectory:story:e4b036101a7a:s10#s->story:e4b036101a7a:s11#w",
+        "reason" : "trajectory-inputs-unsupported:ParticipantRole,TemporalRelation"
+      },
+      {
+        "law" : "compiler.required-derivation",
+        "severity" : "error",
+        "path" : "trajectory:story:e4b036101a7a:s11#w->story:e4b036101a7a:s12#g",
+        "reason" : "trajectory-inputs-unsupported:ParticipantRole,TemporalRelation"
+      },
+      {
+        "law" : "compiler.required-derivation",
+        "severity" : "error",
+        "path" : "trajectory:story:e4b036101a7a:s12#g->story:e4b036101a7a:s13#s",
+        "reason" : "trajectory-inputs-unsupported:ParticipantRole,TemporalRelation"
+      },
+      {
+        "law" : "compiler.required-derivation",
+        "severity" : "error",
+        "path" : "trajectory:story:e4b036101a7a:s13#s->story:e4b036101a7a:s15#s",
+        "reason" : "trajectory-inputs-unsupported:ParticipantRole,TemporalRelation"
+      },
+      {
+        "law" : "compiler.required-derivation",
+        "severity" : "error",
+        "path" : "trajectory:story:e4b036101a7a:s15#s->story:e4b036101a7a:s16#k",
+        "reason" : "trajectory-inputs-unsupported:ParticipantRole,TemporalRelation"
+      },
+      {
+        "law" : "compiler.required-derivation",
+        "severity" : "error",
+        "path" : "trajectory:story:e4b036101a7a:s16#k->story:e4b036101a7a:s17#g",
+        "reason" : "trajectory-inputs-unsupported:ParticipantRole,TemporalRelation"
+      },
+      {
+        "law" : "compiler.required-derivation",
+        "severity" : "error",
+        "path" : "trajectory:story:e4b036101a7a:s17#g->story:e4b036101a7a:s19#a",
+        "reason" : "trajectory-inputs-unsupported:ParticipantRole,TemporalRelation"
+      },
+      {
+        "law" : "compiler.required-derivation",
+        "severity" : "error",
+        "path" : "trajectory:story:e4b036101a7a:s19#a->story:e4b036101a7a:s22#g1",
+        "reason" : "trajectory-inputs-unsupported:ParticipantRole,TemporalRelation"
+      },
+      {
+        "law" : "compiler.required-derivation",
+        "severity" : "error",
+        "path" : "trajectory:story:e4b036101a7a:s2#c->story:e4b036101a7a:s3#b",
+        "reason" : "trajectory-inputs-unsupported:ParticipantRole,TemporalRelation"
+      },
+      {
+        "law" : "compiler.required-derivation",
+        "severity" : "error",
+        "path" : "trajectory:story:e4b036101a7a:s22#g1->story:e4b036101a7a:s23#g",
+        "reason" : "trajectory-inputs-unsupported:ParticipantRole,TemporalRelation"
+      },
+      {
+        "law" : "compiler.required-derivation",
+        "severity" : "error",
+        "path" : "trajectory:story:e4b036101a7a:s23#g->story:e4b036101a7a:s24#t",
+        "reason" : "trajectory-inputs-unsupported:ParticipantRole,TemporalRelation"
+      },
+      {
+        "law" : "compiler.required-derivation",
+        "severity" : "error",
+        "path" : "trajectory:story:e4b036101a7a:s24#t->story:e4b036101a7a:s25#c",
+        "reason" : "trajectory-inputs-unsupported:ParticipantRole,TemporalRelation"
+      },
+      {
+        "law" : "compiler.required-derivation",
+        "severity" : "error",
+        "path" : "trajectory:story:e4b036101a7a:s25#c->story:e4b036101a7a:s27#t",
+        "reason" : "trajectory-inputs-unsupported:ParticipantRole,TemporalRelation"
+      },
+      {
+        "law" : "compiler.required-derivation",
+        "severity" : "error",
+        "path" : "trajectory:story:e4b036101a7a:s27#t->story:e4b036101a7a:s29#c",
+        "reason" : "trajectory-inputs-unsupported:ParticipantRole,TemporalRelation"
+      },
+      {
+        "law" : "compiler.required-derivation",
+        "severity" : "error",
+        "path" : "trajectory:story:e4b036101a7a:s29#c->story:e4b036101a7a:s30#s",
+        "reason" : "trajectory-inputs-unsupported:ParticipantRole,TemporalRelation"
+      },
+      {
+        "law" : "compiler.required-derivation",
+        "severity" : "error",
+        "path" : "trajectory:story:e4b036101a7a:s3#b->story:e4b036101a7a:s4#h",
+        "reason" : "trajectory-inputs-unsupported:ParticipantRole,TemporalRelation"
+      },
+      {
+        "law" : "compiler.required-derivation",
+        "severity" : "error",
+        "path" : "trajectory:story:e4b036101a7a:s30#s->story:e4b036101a7a:s31#t",
+        "reason" : "trajectory-inputs-unsupported:ParticipantRole,TemporalRelation"
+      },
+      {
+        "law" : "compiler.required-derivation",
+        "severity" : "error",
+        "path" : "trajectory:story:e4b036101a7a:s31#t->story:e4b036101a7a:s33#g",
+        "reason" : "trajectory-inputs-unsupported:ParticipantRole,TemporalRelation"
+      },
+      {
+        "law" : "compiler.required-derivation",
+        "severity" : "error",
+        "path" : "trajectory:story:e4b036101a7a:s33#g->story:e4b036101a7a:s34#a",
+        "reason" : "trajectory-inputs-unsupported:ParticipantRole,TemporalRelation"
+      },
+      {
+        "law" : "compiler.required-derivation",
+        "severity" : "error",
+        "path" : "trajectory:story:e4b036101a7a:s34#a->story:e4b036101a7a:s36#g",
+        "reason" : "trajectory-inputs-unsupported:ParticipantRole,TemporalRelation"
+      },
+      {
+        "law" : "compiler.required-derivation",
+        "severity" : "error",
+        "path" : "trajectory:story:e4b036101a7a:s36#g->story:e4b036101a7a:s44#f",
+        "reason" : "trajectory-inputs-unsupported:ParticipantRole,TemporalRelation"
+      },
+      {
+        "law" : "compiler.required-derivation",
+        "severity" : "error",
+        "path" : "trajectory:story:e4b036101a7a:s4#h->story:e4b036101a7a:s5#t",
+        "reason" : "trajectory-inputs-unsupported:ParticipantRole,TemporalRelation"
+      },
+      {
+        "law" : "compiler.required-derivation",
+        "severity" : "error",
+        "path" : "trajectory:story:e4b036101a7a:s44#f->story:e4b036101a7a:s46#c",
+        "reason" : "trajectory-inputs-unsupported:ParticipantRole,TemporalRelation"
+      },
+      {
+        "law" : "compiler.required-derivation",
+        "severity" : "error",
+        "path" : "trajectory:story:e4b036101a7a:s46#c->story:e4b036101a7a:s49#r",
+        "reason" : "trajectory-inputs-unsupported:ParticipantRole,TemporalRelation"
+      },
+      {
+        "law" : "compiler.required-derivation",
+        "severity" : "error",
+        "path" : "trajectory:story:e4b036101a7a:s5#t->story:e4b036101a7a:s10#s",
+        "reason" : "trajectory-inputs-unsupported:ParticipantRole,TemporalRelation"
+      },
+      {
+        "law" : "trajectory.complete",
+        "severity" : "error",
+        "path" : "trajectory",
+        "reason" : "0 steps do not match the 25 adjacent discourse pairs"
+      }
+    ]
+  },
+  "compilation" : {
+    "fingerprint" : "e75869cc80ca21cc8329126e21094e88e17a80cafe0ff77aea17cede39430171",
+    "candidateSet" : "f8c44ba8f2526be88cdc0fc18bb59f1327cf8080c0a96fe10b123d3a735c5200",
+    "attempts" : 155,
+    "emittedClaims" : 80,
+    "gaps" : 76,
+    "partial" : true
+  },
+  "model" : {
+    "file" : "storymodel.json",
+    "encodingDigest" : {
+      "checksum" : "d5fa93f91ca96f9374903a5d5128de8fe14ce3fa684a787b72b9ebdf76747940",
+      "timestampBearing" : true,
+      "bears" : "receipt.createdAtEpochMillis"
+    },
+    "schemaVersion" : "0.1.0",
+    "entities" : 0,
+    "situations" : 26,
+    "segments" : 1,
+    "contexts" : 1,
+    "claims" : 54
+  }
+}

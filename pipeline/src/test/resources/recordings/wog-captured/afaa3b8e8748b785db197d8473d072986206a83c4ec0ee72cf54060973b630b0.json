@@ -1,0 +1,14 @@
+{
+  "schema" : "storymodel4s.provider.agent.recording/v1",
+  "model" : "claude-sonnet-5",
+  "origin" : "captured",
+  "stopReason" : "end_turn",
+  "reportedModel" : "claude-sonnet-5",
+  "usage" : {
+    "inputTokens" : 81,
+    "outputTokens" : 99,
+    "cacheReadInputTokens" : 1275
+  },
+  "durationMillis" : 4159,
+  "text" : "(a / and~e.5\n   :op1 (e / escape-01~e.1\n           :ARG0 (t / they~e.0)\n           :direction (s / shore~e.4))\n   :op2 (h / hide-01~e.6\n           :ARG0 t\n           :location (l / log~e.9)))"
+}

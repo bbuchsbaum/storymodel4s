@@ -1,0 +1,14 @@
+{
+  "schema" : "storymodel4s.provider.agent.recording/v1",
+  "model" : "claude-sonnet-5",
+  "origin" : "captured",
+  "stopReason" : "end_turn",
+  "reportedModel" : "claude-sonnet-5",
+  "usage" : {
+    "inputTokens" : 99,
+    "outputTokens" : 183,
+    "cacheReadInputTokens" : 1275
+  },
+  "durationMillis" : 3538,
+  "text" : "(a / and~e.7\n   :op1 (c / come-out-01~e.2,3,4\n           :ARG1 (s / something~e.0 :mod (b / black~e.1))\n           :source (m / mouth~e.6 :poss (h / he~e.5)))\n   :op2 (c2 / come-out-01~e.9,10,11\n            :ARG1 (b2 / blood~e.8)\n            :source (a2 / anus~e.13 :poss (h2 / he~e.12))))"
+}

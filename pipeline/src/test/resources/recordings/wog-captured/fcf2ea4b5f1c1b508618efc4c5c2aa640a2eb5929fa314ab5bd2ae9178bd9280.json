@@ -1,0 +1,14 @@
+{
+  "schema" : "storymodel4s.provider.agent.recording/v1",
+  "model" : "claude-sonnet-5",
+  "origin" : "captured",
+  "stopReason" : "end_turn",
+  "reportedModel" : "claude-sonnet-5",
+  "usage" : {
+    "inputTokens" : 45,
+    "outputTokens" : 44,
+    "cacheReadInputTokens" : 1275
+  },
+  "durationMillis" : 1892,
+  "text" : "(g / go-02~e.3\n   :ARG0 (w / warrior~e.2)\n   :time (t / then~e.0))"
+}

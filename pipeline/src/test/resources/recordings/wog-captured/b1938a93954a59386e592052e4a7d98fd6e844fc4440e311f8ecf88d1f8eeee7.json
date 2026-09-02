@@ -1,0 +1,14 @@
+{
+  "schema" : "storymodel4s.provider.agent.recording/v1",
+  "model" : "claude-sonnet-5",
+  "origin" : "captured",
+  "stopReason" : "end_turn",
+  "reportedModel" : "claude-sonnet-5",
+  "usage" : {
+    "inputTokens" : 45,
+    "outputTokens" : 48,
+    "cacheReadInputTokens" : 1275
+  },
+  "durationMillis" : 1498,
+  "text" : "(a / accompany-01~e.2\n   :ARG0 (o / one~e.1)\n   :ARG1 (t / they~e.3))"
+}

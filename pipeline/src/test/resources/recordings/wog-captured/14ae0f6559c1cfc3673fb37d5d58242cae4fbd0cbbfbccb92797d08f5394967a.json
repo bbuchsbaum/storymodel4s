@@ -1,0 +1,14 @@
+{
+  "schema" : "storymodel4s.provider.agent.recording/v1",
+  "model" : "claude-sonnet-5",
+  "origin" : "captured",
+  "stopReason" : "end_turn",
+  "reportedModel" : "claude-sonnet-5",
+  "usage" : {
+    "inputTokens" : 36,
+    "outputTokens" : 24,
+    "cacheReadInputTokens" : 1275
+  },
+  "durationMillis" : 1406,
+  "text" : "(d / dead~e.2 :domain (h / he~e.0))"
+}

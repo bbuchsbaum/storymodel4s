@@ -1,0 +1,14 @@
+{
+  "schema" : "storymodel4s.provider.agent.recording/v1",
+  "model" : "claude-sonnet-5",
+  "origin" : "captured",
+  "stopReason" : "end_turn",
+  "reportedModel" : "claude-sonnet-5",
+  "usage" : {
+    "inputTokens" : 102,
+    "outputTokens" : 1589,
+    "cacheReadInputTokens" : 1275
+  },
+  "durationMillis" : 18994,
+  "text" : "(s / say-01~e.3\n   :ARG0 (o / one~e.0 :part-of (t / they~e.2))\n   :ARG1 (g / go-02~e.9\n             :polarity -\n             :ARG0 (i / i~e.6)\n             :manner (a / along~e.10)\n             :cause (p / possible-01~e.13\n                        :ARG1 (k / kill-01~e.15\n                                  :ARG1 i))))"
+}

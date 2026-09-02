@@ -1,0 +1,14 @@
+{
+  "schema" : "storymodel4s.provider.agent.recording/v1",
+  "model" : "claude-sonnet-5",
+  "origin" : "captured",
+  "stopReason" : "end_turn",
+  "reportedModel" : "claude-sonnet-5",
+  "usage" : {
+    "inputTokens" : 60,
+    "outputTokens" : 60,
+    "cacheReadInputTokens" : 1275
+  },
+  "durationMillis" : 3213,
+  "text" : "(t / talk-01~e.5\n   :ARG0 (p / person~e.1\n      :location (c / canoe~e.4))\n   :manner (t2 / together~e.6))"
+}

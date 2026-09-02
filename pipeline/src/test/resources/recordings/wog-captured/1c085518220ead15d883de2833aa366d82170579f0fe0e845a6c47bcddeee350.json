@@ -1,0 +1,14 @@
+{
+  "schema" : "storymodel4s.provider.agent.recording/v1",
+  "model" : "claude-sonnet-5",
+  "origin" : "captured",
+  "stopReason" : "end_turn",
+  "reportedModel" : "claude-sonnet-5",
+  "usage" : {
+    "inputTokens" : 66,
+    "outputTokens" : 99,
+    "cacheReadInputTokens" : 1275
+  },
+  "durationMillis" : 3231,
+  "text" : "(h / hear-01~e.5\n   :ARG0 (t / they~e.4)\n   :ARG1 (c / cry-01~e.6\n           :manner (w / war~e.6))\n   :time (p / paddle-01~e.3\n           :ARG0 (t2 / they~e.1)))"
+}
