@@ -481,3 +481,68 @@ still improves ordering by +0.0508 with 10 of 11 participants and the interval e
 source mass by +0.0039 with 9 of 11. The blend's gain is content-driven; it was never an interaction
 with the prior. The two are complementary rather than substitutes, since the prior contributes more
 with the blend on (+0.1037) than off (+0.0822).
+
+## Diagnosis 5: an outcome that confidence cannot win, and what it says about the rest
+
+Every outcome used until now can be inflated by making the model more certain. Tau rises with a
+sequential prior because tau *is* sequentiality. Concentration and localizability are measures of how
+peaked the posterior is, so any stronger prior sharpens them whether or not it is right. Diagnosis 4
+leaned on those last two as "non-circular" judges. That was too generous, and the correction is
+below.
+
+**The proxy.** Seventeen people watched the *same* film. When two of them recall the same moment, a
+correct mapping puts both descriptions in the same place. `tools/recall-study/agreement.py` pairs
+recall units *across* participants by mutual-best IDF overlap of the recall text alone, so the
+pairing is identical for every arm and no arm can change which units are compared, and reports the
+gap in film seconds between the paired anchors. A model that became more confident without becoming
+more accurate moves both anchors and closes nothing.
+
+**The prior sweep on both kinds of outcome, and they disagree.**
+
+| Prior scale | Concentration vs 1.0 | Localizability vs 1.0 | Cross-participant median gap | Within 60s |
+|---|---|---|---|---|
+| unblended baseline | — | — | 132.0s | 42.1% |
+| 0.0 | −0.0123 | −0.0057 | 97.0s | 46.0% |
+| 1.0 (shipped) | reference | reference | 99.0s | 44.6% |
+| **1.5** | +0.0083, 11 of 11 | +0.0041, 11 of 11 | **85.5s** | **46.0%** |
+| 2.0 | +0.0152, 11 of 11 | +0.0087, 11 of 11 | 99.0s | 43.5% |
+| 3.0 | +0.0274, 11 of 11 | +0.0151, 11 of 11 | 98.0s | 44.1% |
+| 5.0 | — | — | 135.0s | 42.9% |
+| 8.0 | — | — | 165.0s | 40.1% |
+
+Concentration and localizability rise **monotonically** and unanimously as the prior strengthens.
+Agreement traces an **inverted U** peaking at 1.5, and by scale 8 the mapping is *worse than the
+unblended baseline* at putting two people's account of the same moment in the same place.
+
+**So the two sharpness measures are confidence, not correctness, and this is now shown rather than
+argued.** At scale 8 the model is at its most concentrated and least accurate simultaneously. Any
+future arm judged by concentration or localizability alone can be won by a model that has merely
+stopped hedging. Diagnosis 4's claim that the prior is "earned" survives only in its weak form: the
+prior helps, and the evidence for that is agreement improving from 97.0s at scale 0 to 85.5s at 1.5,
+not the sharpness measures moving.
+
+**What is *not* established.** No arm reaches significance on the paired sign test over the 354
+cross-participant pairs — not the lexical blend already shipped (105 pairs closer, 87 farther,
+p=0.22), not the best prior setting (116 closer, 95 farther, p=0.17). Every arm points the right way
+and none of them lands. On the only outcome resistant to confidence, this study has a consistent
+direction and no proof.
+
+**The absolute number, which is the real headline.** The shipped mapping places two participants'
+descriptions of the same moment within a minute of each other **46% of the time**, with a median
+disagreement of 85.5 seconds against a 1544-second film. That is the honest current state of the
+recall-to-video mapping, and it is the number that has to move for the vision to be met. It has never
+been reported before because the study had no outcome capable of expressing it.
+
+## Where the effort should go next, on this evidence
+
+1. **Gold, now the highest-value item by a distance.** Agreement is a proxy for accuracy and is
+   underpowered at 354 pairs. The plan's 300-unit adjudication track would measure accuracy directly
+   and would settle in one afternoon what these proxies cannot settle at all. This is an owner
+   decision.
+2. **More participants, for the same reason as before.** 17 is too few for the participant-level
+   estimand and 354 pairs is too few for the unit-level one.
+3. **The transition weights individually.** Only a single scalar over four transitions has been
+   tried; the twelve weights have never been fitted, and agreement is now a judge that can fit them
+   without circularity.
+4. **Retire concentration and localizability as primary outcomes.** They should be reported as
+   diagnostics of confidence, never used to choose an arm.

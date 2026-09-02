@@ -38,8 +38,9 @@ object RecallOrderControl:
     *
     * Units rather than sentences: these transcripts are produced from word-level CSVs and carry no
     * punctuation at all, so a sentence splitter finds exactly one sentence and permutes nothing. An
-    * earlier version of this control did precisely that and reported a null so clean — tau identical
-    * to four decimals in both arms — that the null itself was the evidence it had never run.
+    * earlier version of this control did precisely that and reported a null so clean — tau
+    * identical to four decimals in both arms — that the null itself was the evidence it had never
+    * run.
     *
     * Units are the right granularity regardless: they are what the aligner anchors and what the
     * report's row order is, so permuting them is exactly the manipulation the sequential prior
