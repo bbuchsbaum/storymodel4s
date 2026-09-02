@@ -235,7 +235,7 @@ class CredentialsSuite extends FunSuite:
       .fold(refusal => fail(refusal.message), identity)
     assertEquals(
       ClaudeParseDriver.clientFor(ExchangeSource.OpenAiCompatible, anthropic).swap.toOption,
-      Some(DriverError.BackendMismatch("openai-compatible:", "anthropic"))
+      Some(DriverError.BackendMismatch("openai-compatible", "anthropic"))
     )
     assertEquals(
       ClaudeParseDriver.clientFor(ExchangeSource.Anthropic, openAi).swap.toOption,

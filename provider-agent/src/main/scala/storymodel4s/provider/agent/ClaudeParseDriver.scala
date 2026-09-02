@@ -227,7 +227,7 @@ object ExchangeSource:
 
   /** Insist the court admitted an OpenAI-compatible backend, and take the HTTP client. */
   case object OpenAiCompatible extends ExchangeSource:
-    def render: String = ModelBackend.OpenAiCompatibleProviderPrefix
+    def render: String = ModelBackend.OpenAiCompatibleProviderPrefix.stripSuffix(":")
 
   /** An offline client with fixed replies; for tests and dry runs. */
   final case class Scripted(client: ScriptedModelClient) extends ExchangeSource:

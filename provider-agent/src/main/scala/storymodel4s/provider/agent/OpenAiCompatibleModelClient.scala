@@ -56,20 +56,34 @@ final class OpenAiCompatibleModelClient private (
     attemptOnce(body, timeoutMillis) match
       case Right(payload)                                              => Right(payload)
       case Left(failure) if attempt < MaxRetries && retryable(failure) =>
-        Thread.sleep(BackoffMillis(attempt))
-        send(body, timeoutMillis, attempt + 1)
+        if waited(attempt) then send(body, timeoutMillis, attempt + 1) else Left(failure)
       case Left(failure) => Left(failure)
 
-  private def attemptOnce(body: String, timeoutMillis: Long): Either[ExchangeFailure, String] =
-    val base = HttpRequest
-      .newBuilder(chatCompletions)
-      .timeout(Duration.ofMillis(timeoutMillis))
-      .header("content-type", "application/json")
-      .header("accept", "application/json")
-      .POST(HttpRequest.BodyPublishers.ofString(body, StandardCharsets.UTF_8))
-    val prepared =
-      apiKey.fold(base)(key => base.header("authorization", s"Bearer ${key.secret}")).build()
+  /** Back off before the next attempt; an interrupted wait abandons the retry rather than
+    * swallowing the interrupt, and keeps the recursive call in tail position.
+    */
+  private def waited(attempt: Int): Boolean =
     try
+      Thread.sleep(BackoffMillis(attempt))
+      true
+    catch
+      case _: InterruptedException =>
+        Thread.currentThread().interrupt()
+        false
+
+  /** Why the builder is inside the `try`: `HttpRequest.newBuilder` validates the URI and can throw,
+    * and an exception escaping this method would leave the exchange with no typed failure at all.
+    */
+  private def attemptOnce(body: String, timeoutMillis: Long): Either[ExchangeFailure, String] =
+    try
+      val base = HttpRequest
+        .newBuilder(chatCompletions)
+        .timeout(Duration.ofMillis(timeoutMillis))
+        .header("content-type", "application/json")
+        .header("accept", "application/json")
+        .POST(HttpRequest.BodyPublishers.ofString(body, StandardCharsets.UTF_8))
+      val prepared =
+        apiKey.fold(base)(key => base.header("authorization", s"Bearer ${key.secret}")).build()
       val response = http.send(prepared, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8))
       val status = response.statusCode()
       if status >= 200 && status < 300 then Right(response.body())
