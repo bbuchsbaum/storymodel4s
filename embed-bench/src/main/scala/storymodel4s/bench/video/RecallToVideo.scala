@@ -69,12 +69,29 @@ final case class TimedSegment(
     locus: Option[MediaLocus],
     group: Option[TimedSegment.Group] = None,
     extraLemmas: Set[String] = Set.empty,
-    locations: Vector[String] = Vector.empty
+    locations: Vector[String] = Vector.empty,
+    embedText: Option[String] = None,
+    lexicalText: Option[String] = None
 )
 
 object TimedSegment:
   /** Coarse grouping of segments (a scene, a chapter). Ordinals are 1-based in video order. */
-  final case class Group(ordinal: Int, label: String)
+  /** Coarse grouping of segments. `embedText` is the rendering an embedding channel sees; a bare
+    * scene label carries almost no content, so an adapter that can say more about a scene should.
+    */
+  /** `lexicalText` is appended for the lexical index only and is never seen by the encoder.
+    *
+    * The two channels fail on opposite inputs, which the study measured rather than assumed. A
+    * mean-pooled embedding is diluted by vocabulary that recurs across the episode, while a
+    * rarity-weighted lexical index prices exactly that vocabulary correctly. So a signal that is
+    * long, or that repeats across neighbouring nodes, belongs here rather than in `embedText`.
+    */
+  final case class Group(
+      ordinal: Int,
+      label: String,
+      embedText: Option[String] = None,
+      lexicalText: Option[String] = None
+  )
 
 /** Builds the aligner's `SourceView` from timed segments: the general recipe extracted from the
   * Sherlock bridge. The view's text axis is a derived document (segment texts joined by newlines),
@@ -93,9 +110,10 @@ object TimedSourceView:
 
   /** The built view plus everything the view's text axis cannot carry.
     *
-    * `nodeTexts` is the text an embedding channel should encode per node: the segment text for a
-    * leaf, the group label for a group. The builder decides this, not the channel, so every
-    * semantic provider sees the same rendering of the same node.
+    * `nodeTexts` is the text an embedding channel should encode per node: the segment's `embedText`
+    * when the adapter supplies one, else its `text`; the group label for a group. The builder
+    * decides this, not the channel, so every semantic provider sees the same rendering of the same
+    * node.
     */
   final case class Built(
       view: InMemorySourceView,
@@ -103,7 +121,8 @@ object TimedSourceView:
       document: String,
       segmentByRef: Map[SourceNodeRef, TimedSegment],
       groupByRef: Map[SourceNodeRef, TimedSegment.Group],
-      nodeTexts: Vector[(SourceNodeRef, String)]
+      nodeTexts: Vector[(SourceNodeRef, String)],
+      lexicalTexts: Vector[(SourceNodeRef, String)]
   )
 
   def build(
@@ -205,10 +224,31 @@ object TimedSourceView:
 
     val segmentByRef = segments.map(s => leafRef(s.ordinal) -> s).toMap
     val groupByRef = groupsInOrder.map(g => groupRef(g.ordinal) -> g).toMap
+    // The builder decides the embedded rendering, not the channel. An adapter may supply a richer
+    // one than the human-readable `text` when the source carries structured fields the prose omits;
+    // `text` still drives the document and the report, so the two never drift apart.
     val nodeTexts: Vector[(SourceNodeRef, String)] =
-      segments.map(s => leafRef(s.ordinal) -> s.text) ++
-        groupsInOrder.map(g => groupRef(g.ordinal) -> g.label)
-    Built(view, leafMedia ++ groupMedia, document, segmentByRef, groupByRef, nodeTexts)
+      segments.map(s => leafRef(s.ordinal) -> s.embedText.getOrElse(s.text)) ++
+        groupsInOrder.map(g => groupRef(g.ordinal) -> g.embedText.getOrElse(g.label))
+    // What the lexical index reads: the embedded rendering plus anything routed to this channel
+    // alone. Equal to `nodeTexts` unless an adapter supplies a lexical-only rendering.
+    val lexicalTexts: Vector[(SourceNodeRef, String)] =
+      segments.map { s =>
+        val base = s.embedText.getOrElse(s.text)
+        leafRef(s.ordinal) -> s.lexicalText.fold(base)(extra => s"$base. $extra")
+      } ++ groupsInOrder.map { g =>
+        val base = g.embedText.getOrElse(g.label)
+        groupRef(g.ordinal) -> g.lexicalText.fold(base)(extra => s"$base. $extra")
+      }
+    Built(
+      view,
+      leafMedia ++ groupMedia,
+      document,
+      segmentByRef,
+      groupByRef,
+      nodeTexts,
+      lexicalTexts
+    )
 
 /** Word-column reader for timestamped recall transcripts (`Words` plus onset columns). */
 object RecallWordsCsv:
@@ -317,7 +357,7 @@ object RecallToVideo:
       model <- sys.env.get("STORYMODEL4S_ONNX_MODEL")
       tokenizer <- sys.env.get("STORYMODEL4S_ONNX_TOKENIZER")
     yield OnnxSentenceArtifacts(Paths.get(model), Paths.get(tokenizer))
-    val (semantic, channelLabel, embedderToClose) = neuralArtifacts match
+    val (baseSemantic, baseChannelLabel, embedderToClose) = neuralArtifacts match
       case Some(artifacts) =>
         val embedder = OnnxSentenceEmbedder
           .open(OnnxSentenceModel.AllMiniLmL6V2, artifacts)
@@ -332,11 +372,57 @@ object RecallToVideo:
           "lexical-jaccard [semantic=lexical-baseline; free fallback]",
           None
         )
-    // The lexical-overlap channel is disabled: with fine-grained segments and recurring names it
-    // nominates hundreds of anchors per unit, which is intractable for the HSMM and adds no
-    // ranking information. Top-k semantic nomination per level keeps the state space sparse.
-    val candidates = CandidateGenerator(semantic, perLevel = 8, lexicalOverlap = false)
-      .generate(recall.ordered, built.view)
+    // Lexical re-ranking of that channel, on by default at the weight development data chose.
+    //
+    // Why it is the default rather than a knob: measured over 11 development participants it is the
+    // largest improvement found, +0.0723 Kendall tau against the unblended channel with 9 of 11
+    // participants improving, and it survives restriction to units whose anchor granularity did not
+    // change, which is where the scene-caption arm's apparent gain went. Concentration is unmoved,
+    // as the permutation design requires. The weight is on the semantic side; 0.8 is the interior
+    // peak of a broad plateau, and both 0.7 and 0.9 also improve on the unblended channel, so the
+    // value is not a knife edge. `STORYMODEL4S_LEXICAL_BLEND=1.0` restores the unblended channel
+    // exactly and is checked to reproduce it byte-for-byte.
+    val blendAlpha = sys.env
+      .get("STORYMODEL4S_LEXICAL_BLEND")
+      .map(_.trim)
+      .match
+        case Some("off") | Some("none") => None
+        case Some(raw)                  => raw.toDoubleOption.filter(a => a > 0.0 && a <= 1.0)
+        case None                       => Some(0.8)
+    val lexicalFields = LexicalBlend.LexicalFields.parse(sys.env.get("STORYMODEL4S_LEXICAL_FIELDS"))
+
+    val (semantic, channelLabel) = blendAlpha match
+      case Some(alpha) =>
+        (
+          LexicalBlend.blended(
+            baseSemantic,
+            recall.ordered,
+            built.view,
+            built.lexicalTexts,
+            alpha,
+            lexicalFields
+          ),
+          s"$baseChannelLabel + lexical-blend:bm25 alpha=$alpha fields=$lexicalFields"
+        )
+      case None => (baseSemantic, baseChannelLabel)
+
+    // Candidate nomination. The defaults are the historical values and are what runs unless a
+    // caller overrides them: top-8 semantic nominations per hierarchy level, lexical overlap off.
+    // The lexical-overlap channel was disabled because with fine-grained segments and recurring
+    // names it nominates hundreds of anchors per unit, which is costly for the HSMM; whether it
+    // adds ranking information is an empirical question, so it is a knob rather than a constant.
+    // Overrides exist for study sweeps on development data and change the report's identity: a
+    // different candidate policy is a different derivation, not a tuning of the same one.
+    val perLevel = sys.env.get("STORYMODEL4S_CANDIDATES_PER_LEVEL").flatMap(_.toIntOption) match
+      case Some(n) if n > 0 => n
+      case _                => 8
+    val lexicalOverlap = sys.env.get("STORYMODEL4S_CANDIDATES_LEXICAL_OVERLAP").map(_.trim) match
+      case Some("true")  => true
+      case Some("false") => false
+      case _             => false
+    val candidates =
+      CandidateGenerator(semantic, perLevel = perLevel, lexicalOverlap = lexicalOverlap)
+        .generate(recall.ordered, built.view)
     val result = GraphHsmm
       .infer(recall, built.view, candidates, DefaultLocalCostModel(semantic = semantic))
       .fold(e => throw new IllegalStateException(e.message), identity)
@@ -434,6 +520,7 @@ object RecallToVideo:
     val leafCount = built.view.leaves.size
     val groupCount = built.view.nodes.size - leafCount
     println(s"semantic channel: $channelLabel")
+    println(s"candidate policy: perLevel=$perLevel lexicalOverlap=$lexicalOverlap")
     println(s"source segments: $leafCount; groups: $groupCount")
     println(s"recall words: ${words.size}; recall units: ${recall.ordered.size}")
     println(s"sparse candidates: ${candidates.totalSize}")
