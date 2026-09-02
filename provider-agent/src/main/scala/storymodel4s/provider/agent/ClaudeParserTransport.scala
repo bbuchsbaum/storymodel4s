@@ -7,6 +7,7 @@ import storymodel4s.amr.graph.{Decoder as AmrDecoder}
 import storymodel4s.core.Checksum
 import storymodel4s.provider.parser.{
   ParserEnvelope,
+  ParserRuntimeField,
   ParserSetupFailure,
   ParserTransport,
   RemoteRuntime,
@@ -140,14 +141,21 @@ object ClaudeParserTransport:
       prompt: AgentPromptPackage,
       backend: ModelBackend = DefaultBackend
   ): Either[ParserSetupFailure, RemoteRuntime] =
-    RemoteRuntime.from(
-      backend.provider,
-      backend.model,
-      backend.sdkVersion,
-      prompt.ref,
-      prompt.promptTextChecksum,
-      ParserEnvelope.ResultSchema
-    )
+    if !ModelBackend.identityScalarIsSafe(backend.model) then
+      Left(ParserSetupFailure.invalidRuntimeField(ParserRuntimeField.Model))
+    else if !ModelBackend.identityScalarIsSafe(backend.provider) then
+      Left(ParserSetupFailure.invalidRuntimeField(ParserRuntimeField.Provider))
+    else if !ModelBackend.identityScalarIsSafe(backend.sdkVersion) then
+      Left(ParserSetupFailure.invalidRuntimeField(ParserRuntimeField.SdkVersion))
+    else
+      RemoteRuntime.from(
+        backend.provider,
+        backend.model,
+        backend.sdkVersion,
+        prompt.ref,
+        prompt.promptTextChecksum,
+        ParserEnvelope.ResultSchema
+      )
 
   /** The parser-config params a request must carry so its identity names this prompt. */
   def configParams(prompt: AgentPromptPackage, maxTokens: Long): Map[String, String] =

@@ -39,8 +39,29 @@ object ModelBackend:
   /** The model id the Anthropic backend uses when nothing configures one. */
   val DefaultAnthropicModel: String = "claude-sonnet-5"
 
-  /** The wrapper version an OpenAI-compatible run records: there is no SDK, only the JDK client. */
-  val HttpClientVersion: String = s"java.net.http jdk-${java.lang.Runtime.version().feature()}"
+  /** The wrapper version an OpenAI-compatible run records: there is no SDK, only the JDK client.
+    *
+    * Why no space in `java.net.http/jdk-N`: downstream this scalar is concatenated into a
+    * `Fingerprint`, whose lexical rules reject whitespace, and that refusal arrives as a thrown
+    * `IllegalArgumentException` rather than a typed failure. Measured 2026-09-02: the first draft
+    * read `java.net.http jdk-25` and a replay through this backend died in `AmrCandidates`.
+    */
+  val HttpClientVersion: String = s"java.net.http/jdk-${java.lang.Runtime.version().feature()}"
 
   /** What a run resolves to when the environment names no backend. */
   val default: ModelBackend = Anthropic(DefaultAnthropicModel)
+
+  /** Whether a scalar can survive the identifier rules every downstream fingerprint applies.
+    *
+    * Why here and not only at the environment court: `AmrCandidates` builds a `Fingerprint` from
+    * `provider:model:sdkVersion` with the unchecked constructor, so a model id carrying a space --
+    * `STORYMODEL4S_OPENAI_MODEL="my model"` is one keystroke away -- would reach a `throw` in the
+    * middle of a parse rather than a refusal before it. Both the court and the transport ask this,
+    * so no path to a runtime identity skips it.
+    */
+  def identityScalarIsSafe(value: String): Boolean =
+    value.nonEmpty && value.length <= MaxIdentityScalarLength &&
+      !value.exists(character => character.isWhitespace || character.isControl)
+
+  /** Leaves room for `provider:model:sdkVersion` inside the 256-character identifier limit. */
+  val MaxIdentityScalarLength: Int = 80

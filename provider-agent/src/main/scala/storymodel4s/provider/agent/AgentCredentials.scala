@@ -31,6 +31,10 @@ enum BackendRefusal:
   case BaseUrlNotHttp(variable: String)
   case ModelAbsent(variable: String)
 
+  /** The model id cannot become part of a runtime identity; see `ModelBackend.identityScalarIsSafe`.
+    */
+  case ModelNotIdentitySafe(variable: String, maxLength: Int)
+
   def message: String = this match
     case UnknownBackend(variable, raw, admitted) =>
       s"$variable=$raw is not one of ${admitted.mkString(", ")}"
@@ -38,6 +42,8 @@ enum BackendRefusal:
     case BaseUrlNotHttp(variable) =>
       s"$variable must be an absolute http or https URL naming a host"
     case ModelAbsent(variable) => s"the openai backend needs a nonblank $variable"
+    case ModelNotIdentitySafe(variable, maxLength) =>
+      s"$variable must be at most $maxLength characters with no whitespace or control characters"
 
 /** Why a live model call is refused: the environment names no usable backend, did not opt into
   * spend, or has no key where the chosen backend requires one.
@@ -221,11 +227,19 @@ object AgentCredentials:
             .filter(nonBlank)
             .toRight(BackendRefusal.BaseUrlAbsent(OpenAiBaseUrlVariable))
           endpoint <- chatCompletions(rawBase)
-          model <- env
+          raw <- env
             .get(OpenAiModelVariable)
             .map(_.trim)
             .filter(nonBlank)
             .toRight(BackendRefusal.ModelAbsent(OpenAiModelVariable))
+          model <- Either.cond(
+            ModelBackend.identityScalarIsSafe(raw),
+            raw,
+            BackendRefusal.ModelNotIdentitySafe(
+              OpenAiModelVariable,
+              ModelBackend.MaxIdentityScalarLength
+            )
+          )
         yield BackendChoice.OpenAiCompatible(endpoint, model)
       case Some(other) =>
         Left(BackendRefusal.UnknownBackend(BackendVariable, other, AdmittedBackends))
