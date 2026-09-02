@@ -208,7 +208,7 @@ class ChartProposalCourtSuite extends FunSuite:
     val proposals =
       ChartProposalProvider.propose(source, atlas, charts).fold(e => fail(e.message), identity)
 
-    assertEquals(proposals.counts, CoverageCounts(4, 2, 1, 43))
+    assertEquals(proposals.counts, CoverageCounts(4, 0, 2, 1, 43))
     assertEquals(proposals.coverage.size, 50)
     assertEquals(proposals.summaryCoverage, SummaryCoverage.Proposed("The War of the Ghosts"))
     val rows = proposals.coverage.map(row => row.sentence -> row).toMap

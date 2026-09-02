@@ -4,7 +4,14 @@ import cats.data.{NonEmptySet, NonEmptyVector}
 import storymodel4s.acquire.*
 import storymodel4s.core.*
 import storymodel4s.core.NarrativeKind.{EntityK, SituationK}
-import storymodel4s.proposition.{Concept, ConceptKind, PropositionEvidence}
+import storymodel4s.proposition.{
+  Checked,
+  Concept,
+  ConceptId,
+  ConceptKind,
+  PropositionChart,
+  PropositionEvidence
+}
 import storymodel4s.story.{Polarity as StoryPolarity, *}
 
 /** Whether an accepted proposition denotes an event or a state.
@@ -1224,9 +1231,7 @@ object NarrativeCompiler:
                   ClaimFamily.SituationMention,
                   DerivationGapReason.UnsupportedEmbeddedContext(source)
                 )
-              case Some(chart)
-                  if chart.focus.contains(source.concept) &&
-                    chart.concept(source.concept).exists(situationRoot) =>
+              case Some(chart) if admissibleSituationSource(chart, source.concept) =>
                 materialize(
                   input,
                   ClaimFamily.SituationMention,
@@ -1290,7 +1295,10 @@ object NarrativeCompiler:
                   DerivationGapReason.InvalidAccepted(
                     DomainError.InvariantViolation(
                       s"compiler/situations/${source.key}",
-                      "source must be the chart focus: a predicate or a framed special roleset"
+                      "source must be the chart focus, or a direct :op/:snt branch of a " +
+                        "coordinating focus (and, or, multi-sentence), and must be a situation " +
+                        "root: a predicate, a framed special roleset, a concept predicated of a " +
+                        ":domain filler, or an entity placed by a :location filler"
                     )
                   )
                 )
@@ -1992,13 +2000,40 @@ object NarrativeCompiler:
       .left
       .map(NarrativeCompilerError.CompilationConstruction.apply)
 
-  /** Concepts that may anchor a situation: a predicate, or a Special concept that carries a frame
-    * (the AMR adapter classifies every `-91` roleset as Special with its frame; a frameless Special
-    * such as `date-entity` is not a situation). Which framed specials are states is the provider's
-    * rule; the compiler only refuses what cannot be a situation at all.
+  /** Concepts that may anchor a situation: a predicate; a Special concept that carries a frame (the
+    * AMR adapter classifies every `-91` roleset as Special with its frame; a frameless Special such
+    * as `date-entity` is not a situation); a frameless concept predicated of a `:domain` filler; or
+    * a frameless entity placed by a `:location` filler. Which framed specials are states, and which
+    * of the last two shapes a provider will actually propose, is the provider's rule; the compiler
+    * only refuses what cannot be a situation at all.
     */
-  private def situationRoot(concept: Concept): Boolean =
-    concept.isPredicate || (concept.kind == ConceptKind.Special && concept.frame.nonEmpty)
+  private def situationRoot(
+      chart: PropositionChart[Checked],
+      id: ConceptId,
+      concept: Concept
+  ): Boolean =
+    concept.isPredicate || (concept.kind == ConceptKind.Special && concept.frame.nonEmpty) ||
+      ChartRoots.isPredicative(chart, id, concept) ||
+      ChartRoots.isExistential(chart, id, concept)
+
+  /** Whether a situation attempt's source is a root this chart can anchor a situation at.
+    *
+    * The source is the chart focus, or — and only then — a direct coordination branch of a
+    * coordinating focus: an `:opN` or `:sntN` child of a focus whose lemma is in
+    * [[ChartRoots.CoordinationLemmas]]. `(a / and :op1 (l / land-01 ...) :op2 (g / go-02 ...))` is
+    * two events in one sentence and the focus is neither of them, so refusing every non-focus
+    * source would lose both. No other non-focus source is admissible: a predicate reached by any
+    * other role is an argument of something, not an assertion of the sentence.
+    */
+  private def admissibleSituationSource(
+      chart: PropositionChart[Checked],
+      id: ConceptId
+  ): Boolean =
+    chart.concept(id).exists(situationRoot(chart, id, _)) &&
+      (chart.focus.contains(id) || chart.focus.exists(focus =>
+        chart.concept(focus).exists(ChartRoots.isCoordinator) &&
+          ChartRoots.isBranchOf(chart, focus, id)
+      ))
 
   private def materialize[A](
       input: NarrativeCompilerInput,

@@ -33,18 +33,58 @@ import storymodel4s.story.{
 
 /** Why a chart with concepts yielded no situation attempt at its anchor.
   *
-  * Why typed: the compiler refuses every root that is not the chart focus, not a predicate, or
-  * embedded; recording which of those held keeps "no proposal" distinguishable from "not run".
+  * Why typed: the compiler refuses every root that is not the chart focus (or a branch of a
+  * coordinating focus), not a situation shape, or embedded; recording which of those held keeps "no
+  * proposal" distinguishable from "not run".
   */
 enum AbstentionReason:
   case NoFocus
   case FocusNotPredicate(kind: ConceptKind)
   case FocusEmbedded
 
+  /** A coordinating focus with no `:opN` or `:sntN` branch to descend into. */
+  case NoCoordinationBranch
+
+  /** A branch of a coordinating focus that is itself a coordinator. The provider does not descend:
+    * see [[ChartProposalProvider.RulesText]].
+    */
+  case NestedCoordination
+
+  /** A branch of a coordinating focus that is not an admissible situation root. */
+  case BranchNotAdmissible(kind: ConceptKind)
+
+  /** A branch of a coordinating focus that some embedding of the chart holds. */
+  case BranchEmbedded
+
   def render: String = this match
-    case NoFocus                 => "no-focus"
-    case FocusNotPredicate(kind) => s"focus-not-predicate:$kind"
-    case FocusEmbedded           => "focus-embedded"
+    case NoFocus                   => "no-focus"
+    case FocusNotPredicate(kind)   => s"focus-not-predicate:$kind"
+    case FocusEmbedded             => "focus-embedded"
+    case NoCoordinationBranch      => "no-coordination-branch"
+    case NestedCoordination        => "coordination-branch-nested"
+    case BranchNotAdmissible(kind) => s"coordination-branch-not-admissible:$kind"
+    case BranchEmbedded            => "coordination-branch-embedded"
+
+/** One branch of a coordinating focus, and what the provider did with it.
+  *
+  * Why the abstained branches are carried and not dropped: a sentence whose focus coordinates three
+  * clauses of which two are predicates has one silent clause, and a ledger that listed only the two
+  * admitted roots would read as complete coverage of the sentence.
+  */
+enum CoordinatedBranch:
+  /** `fillers` and `unlicensed` count exactly as they do on [[SentenceCoverage.Proposed]]. */
+  case Admitted(root: ChartNodeRef, role: SourceRole, fillers: Int, unlicensed: Int)
+  case Abstained(root: ChartNodeRef, role: SourceRole, reason: AbstentionReason)
+
+  /** The branch root, whichever way the branch went. */
+  def branchRoot: ChartNodeRef = this match
+    case Admitted(root, _, _, _) => root
+    case Abstained(root, _, _)   => root
+
+  /** The role that attached the branch to its coordinator. */
+  def branchRole: SourceRole = this match
+    case Admitted(_, role, _, _) => role
+    case Abstained(_, role, _)   => role
 
 /** One ledger row per atlas sentence: what the provider did with it.
   *
@@ -59,25 +99,55 @@ enum SentenceCoverage:
     * structure the participant layer carries. The sentence is the root's own.
     */
   case Proposed(root: ChartNodeRef, fillers: Int, unlicensed: Int)
+
+  /** A sentence whose focus coordinates several roots, with one entry per branch in discourse
+    * order. Why one row and not several `Proposed` rows: the branches are siblings inside one
+    * sentence, and emitting a row apiece would make the ledger claim more sentences than the atlas
+    * has. A row with no admitted branch is a lawful value: it says the focus was a coordinator and
+    * names why each branch abstained.
+    */
+  case Coordinated(coordinator: ChartNodeRef, branches: Vector[CoordinatedBranch])
   case Abstained(anchor: ChartNodeRef, reason: AbstentionReason)
   case EmptyChart(unit: SurfaceUnitId)
   case NoChart(unit: SurfaceUnitId)
 
   /** The sentence the row is about: derived from the chart node for rows that carry one. */
   def sentence: SurfaceUnitId = this match
-    case Proposed(root, _, _) => root.sentence
-    case Abstained(anchor, _) => anchor.sentence
-    case EmptyChart(unit)     => unit
-    case NoChart(unit)        => unit
+    case Proposed(root, _, _)   => root.sentence
+    case Coordinated(anchor, _) => anchor.sentence
+    case Abstained(anchor, _)   => anchor.sentence
+    case EmptyChart(unit)       => unit
+    case NoChart(unit)          => unit
+
+  /** The roots this sentence actually produced, in discourse order; empty when it produced none. */
+  def admittedRoots: Vector[ChartNodeRef] = this match
+    case Proposed(root, _, _) => Vector(root)
+    case Coordinated(_, bs)   =>
+      bs.collect { case CoordinatedBranch.Admitted(root, _, _, _) =>
+        root
+      }
+    case Abstained(_, _) => Vector.empty
+    case EmptyChart(_)   => Vector.empty
+    case NoChart(_)      => Vector.empty
 
 /** Whether a story-summary proposal was emitted; the title is the only summary source here. */
 enum SummaryCoverage:
   case Proposed(title: String)
   case NoTitle
 
-/** Coverage counts over the sentence ledger. Honest product data: every combination is lawful. */
-final case class CoverageCounts(proposed: Int, abstained: Int, emptyCharts: Int, noCharts: Int):
-  def sentences: Int = proposed + abstained + emptyCharts + noCharts
+/** Coverage counts over the sentence ledger. Honest product data: every combination is lawful.
+  *
+  * `coordinated` counts sentences, not roots: one coordinating focus is one sentence however many
+  * branches it admitted, so [[sentences]] still equals the number of atlas sentences.
+  */
+final case class CoverageCounts(
+    proposed: Int,
+    coordinated: Int,
+    abstained: Int,
+    emptyCharts: Int,
+    noCharts: Int
+):
+  def sentences: Int = proposed + coordinated + abstained + emptyCharts + noCharts
 
 /** Everything [[ChartProposalProvider.propose]] emitted for one story, in canonical order.
   *
@@ -102,9 +172,10 @@ final class ChartProposals private (
     val summaryCoverage: SummaryCoverage
 ):
   def counts: CoverageCounts =
-    coverage.foldLeft(CoverageCounts(0, 0, 0, 0)) { (acc, row) =>
+    coverage.foldLeft(CoverageCounts(0, 0, 0, 0, 0)) { (acc, row) =>
       row match
         case SentenceCoverage.Proposed(_, _, _) => acc.copy(proposed = acc.proposed + 1)
+        case SentenceCoverage.Coordinated(_, _) => acc.copy(coordinated = acc.coordinated + 1)
         case SentenceCoverage.Abstained(_, _)   => acc.copy(abstained = acc.abstained + 1)
         case SentenceCoverage.EmptyChart(_)     => acc.copy(emptyCharts = acc.emptyCharts + 1)
         case SentenceCoverage.NoChart(_)        => acc.copy(noCharts = acc.noCharts + 1)
@@ -146,9 +217,9 @@ final class ChartProposals private (
 
   override def toString: String =
     val c = counts
-    s"ChartProposals(proposed=${c.proposed}, abstained=${c.abstained}, " +
-      s"empty=${c.emptyCharts}, noChart=${c.noCharts}, participants=${participants.size}, " +
-      s"temporal=${temporal.size}, calls=${calls.size})"
+    s"ChartProposals(proposed=${c.proposed}, coordinated=${c.coordinated}, " +
+      s"abstained=${c.abstained}, empty=${c.emptyCharts}, noChart=${c.noCharts}, " +
+      s"participants=${participants.size}, temporal=${temporal.size}, calls=${calls.size})"
 
 object ChartProposals:
   private[document] def derived(
@@ -251,11 +322,17 @@ object ChartProposalProvider:
     "include-91"
   )
 
-  /** Named (non-core) chart roles whose participant reading is stable across frames, as the AMR
-    * adapter's standard-role table reads them. Numbered arguments never appear here: their meaning
-    * is frame-specific and only a lexicon-licensed normalization on the chart itself counts.
+  /** Named (non-core) chart roles whose participant reading is stable across frames. Every entry
+    * but `domain` is the AMR adapter's standard-role table verbatim; `domain` is this provider's
+    * own, because the adapter's table does not normalize it and the predicative root rule needs the
+    * concept a property is predicated of to reach the participant layer. It is `Custom("amr",
+    * "domain")` and not `Theme` or `Patient`: `:domain` says which concept the head is predicated
+    * of and nothing about how that concept participates, so naming a thematic role would assert
+    * what the chart did not. Numbered arguments never appear here: their meaning is frame-specific
+    * and only a lexicon-licensed normalization on the chart itself counts.
     */
   val NamedRoles: Map[String, ParticipantRole] = Map(
+    "domain" -> ParticipantRole.Custom("amr", "domain"),
     "location" -> ParticipantRole.Location,
     "time" -> ParticipantRole.Time,
     "manner" -> ParticipantRole.Manner,
@@ -288,16 +365,48 @@ object ChartProposalProvider:
   val RulesText: String =
     s"""chart-proposal-provider rules, version 1
        |
-       |root: the situation root of a sentence is the chart focus and nothing else. There is no
-       |  fallback to another predicate; a chart whose focus is inadmissible is abstained.
-       |admissible: the focus concept is not held by any embedding and has kind Predicate, or
-       |  kind Special with a state frame (below). The AMR adapter classifies every -91 roleset
-       |  as Special, so the state rule is reachable only through that clause; any other Special
-       |  focus (a frameless AMR special such as date-entity, or a -91 frame outside the closed
-       |  set) abstains with focus-not-predicate:Special.
+       |root: the situation roots of a sentence are the chart focus when it is admissible, and
+       |  otherwise the direct branches of the focus when the focus is a coordinator (below).
+       |  There is no fallback to any other predicate; a chart whose focus is neither admissible
+       |  nor a coordinator is abstained.
+       |admissible: the concept is not held by any embedding and is one of four closed shapes.
+       |  (1) predicate: kind Predicate. (2) state roleset: kind Special with a state frame
+       |  (below); the AMR adapter classifies every -91 roleset as Special, so the state rule is
+       |  reachable only through that clause, and any other Special focus (a frameless AMR special
+       |  such as date-entity, or a -91 frame outside the closed set) abstains with
+       |  focus-not-predicate:Special. (3) predicative: a frameless concept of kind Property or
+       |  Entity whose ${ChartRoots.PredicationRole} role reaches a concept of the chart, as in
+       |  (d / dead :${ChartRoots.PredicationRole} (h / he)); the property is the predicate and the
+       |  ${ChartRoots.PredicationRole} filler is what it is predicated of. (4) existential: a
+       |  frameless concept of kind Entity whose ${ChartRoots.ExistenceRole} role reaches a concept
+       |  of the chart, as in (p / person :${ChartRoots.ExistenceRole} (e / egulac)); the sentence
+       |  asserts that the entity is at that place. Shapes 3 and 4 require the role to reach a
+       |  concept: a role reaching a literal, an unknown, or nothing is not the shape, because a
+       |  predication with no subject and a location with no place are not what the chart said. No
+       |  frame is invented for either: the predicate frame is the concept's own, which for a
+       |  frameless root is none.
        |kind: State when the focus concept carries a frame in namespace $StateFrameNamespace whose
-       |  id is in the closed set {${StateFrames.toVector.sorted.mkString(", ")}}; otherwise
-       |  Event. Lexical statives without such a frame are Event in this version.
+       |  id is in the closed set {${StateFrames.toVector.sorted.mkString(", ")}}, and State for
+       |  the predicative and existential shapes, which assert how something is and not that
+       |  something happened; otherwise Event. Lexical statives without such a frame are Event in
+       |  this version.
+       |coordination: a focus concept is a coordinator when it carries no frame and its lemma is in
+       |  the closed set {${ChartRoots.CoordinationLemmas.toVector.sorted.mkString(", ")}}. No
+       |  concept kind separates a coordinator from an ordinary entity, so the lemma names the set.
+       |  Each direct branch of a coordinating focus — a relation under opN (and, or) or sntN
+       |  (multi-sentence) whose target is a concept of this chart — is evaluated as a root in its
+       |  own right, in branch order: operands before sentences, then by index. An admitted branch
+       |  yields its own situation, context, membership and participant-coverage attempts, with
+       |  support drawn from its own subtree, its description from its own gloss, and its polarity
+       |  from its own chart polarity. A branch that is itself a coordinator is not descended into
+       |  and abstains with coordination-branch-nested: one level is what the branch order licenses,
+       |  and a deeper order is not something a single opN index states. A branch that is embedded
+       |  abstains with coordination-branch-embedded, and any other inadmissible branch abstains
+       |  with coordination-branch-not-admissible:kind. A coordinator with no branch at all
+       |  abstains at the coordinator with no-coordination-branch. Coordinated branches are
+       |  siblings of one sentence, never separate sentences: the coverage ledger records them in
+       |  one row, and their story-world relation stays Unclear, because and asserts conjunction
+       |  and not sequence.
        |predicate: lemma = the concept lemma; frame = "namespace:id" of the concept frame when
        |  present; gloss = the concept gloss when present, else the lemma.
        |description: Gloss.predicate over the chart at the root, so every word is a chart lemma
@@ -306,11 +415,15 @@ object ChartProposalProvider:
        |modality: Asserted. aspect: none.
        |context: NarratedWorld, one attempt per admissible root, anchored at the root.
        |membership: PrimaryStoryMember, one attempt per admissible root, anchored at the root.
-       |support: the union of the alignment spans of every alignment naming at least one
-       |  non-embedded concept, recorded as span-source=chart-alignments; when that union is empty
-       |  the sentence span is used, recorded as span-source=sentence. Every alignment span of a
-       |  chart must lie inside the chart's own sentence unit, whatever surface unit the span
-       |  names; a chart violating this is refused, not repaired.
+       |support: for a focus root, the union of the alignment spans of every alignment naming at
+       |  least one non-embedded concept, recorded as span-source=chart-alignments. For a
+       |  coordinated branch, the same union restricted to the concepts the branch reaches (the
+       |  branch itself and everything under it, never through the coordinator), recorded as
+       |  span-source=branch-alignments, so two branches of one sentence are supported by different
+       |  words. When either union is empty the sentence span is used, recorded as
+       |  span-source=sentence. Every alignment span of a chart must lie inside the chart's own
+       |  sentence unit, whatever surface unit the span names; a chart violating this is refused,
+       |  not repaired.
        |raw score: the minimum alignment credence among the alignments that supply a proposal's
        |  support; chart credence propagates only as this uncalibrated raw score and never as a
        |  probability. A sentence-fallback support has no alignment credence and carries 1.0,
@@ -323,7 +436,10 @@ object ChartProposalProvider:
        |receipts: every evidence id is the content address of its scope, chart checksum, and
        |  rendered span set; every call render names the evidence id it cites; the chart receipts
        |  bind the source by their input checksum (the canonical text or the sentence text); the
-       |  chart origin is a receipt parameter.
+       |  chart origin is a receipt parameter, and root-rule names which of the four admissible
+       |  shapes admitted the root. The scope of a focus root's situation, context, membership and
+       |  coverage task is its sentence, which identifies it; the scope of a coordinated branch's
+       |  is the branch root key, because its sentence does not.
        |summary: the source title with evidence spanning the whole canonical text; no title or a
        |  blank title yields an abstained summary attempt.
        |participants: for each admissible root, every relation from the root whose filler is a
@@ -338,19 +454,26 @@ object ChartProposalProvider:
        |mentions: one entity-mention attempt per proposed filler with label = the concept lemma
        |  and type = Custom("chart", concept kind lowercased); evidence = the filler's alignment
        |  spans (span-source=filler-alignments), else the root support (span-source=root-support).
+       |  A filler that several coordination branches license is mentioned once, by the first
+       |  branch in branch order that licenses it, and is a participant of every branch that
+       |  licenses it. Reentrancy is one occurrence of a word: mentioning it once per branch would
+       |  make several claims that it occurs out of one occurrence.
        |coverage: one participant-coverage attempt per admissible root listing exactly the
        |  proposed fillers, possibly none, with the root's evidence. An empty coverage is a value:
        |  it says the chart reaches no licensed participant from the root, never that participants
        |  were not evaluated.
-       |temporal: one attempt per consecutive pair of admissible roots in sentence order, valued
-       |  Unclear, with evidence spanning both roots' support. Never Before or Meets: a time
-       |  filler in a sentence chart is a concept of that chart, not a preceding root, so nothing in
-       |  a chart licenses strict precedence between roots; and StrictPrecedence is a high-impact
-       |  family whose conservative policy this single provider could not satisfy alone.
+       |temporal: one attempt per consecutive pair of admissible roots in sentence order and, within
+       |  a sentence, in branch order, valued Unclear, with evidence spanning both roots' support.
+       |  Never Before or Meets: a time filler in a sentence chart is a concept of that chart, not a
+       |  preceding root, so nothing in a chart licenses strict precedence between roots; and
+       |  StrictPrecedence is a high-impact family whose conservative policy this single provider
+       |  could not satisfy alone. Coordinated siblings are no exception: conjunction is not
+       |  sequence.
        |abstention: an inadmissible root yields one abstained attempt in each of the situation,
        |  context, membership, and participant-coverage families at the anchor (the focus when
-       |  present, else the lowest concept id). An empty chart or a sentence without a chart yields
-       |  no attempt and a coverage row only.
+       |  present, else the lowest concept id), and an inadmissible coordination branch yields the
+       |  same four at the branch root. An empty chart or a sentence without a chart yields no
+       |  attempt and a coverage row only.
        |causal: no causal attempt is emitted; absent pairs are not evaluated.
        |bundles: one proposed value per attempt with the raw score above, source support 1.0
        |  over the evidence spans, agreement 1.0, and one calibration at probability 1.0 under the
@@ -417,18 +540,72 @@ object ChartProposalProvider:
       role: ParticipantRole
   )
 
-  private final case class SentenceOutcome(
-      coverage: SentenceCoverage,
-      proposedRoot: Option[ProposedRoot],
+  /** Which closed admissibility shape admitted a root, and what kind of situation it makes.
+    *
+    * Why the shape is carried rather than recomputed: the situation kind and the receipt's
+    * `root-rule` parameter both come from it, and deriving them twice from the chart is two places
+    * to disagree.
+    */
+  private enum RootRule(val kind: SituationKind, val label: String):
+    case Predicate extends RootRule(SituationKind.Event, "predicate")
+    case StateRoleset extends RootRule(SituationKind.State, "state-roleset")
+    case Predicative extends RootRule(SituationKind.State, "predicative")
+    case Existential extends RootRule(SituationKind.State, "existential")
+
+  /** Everything one admitted root contributed. */
+  private final case class RootOutcome(
+      proposedRoot: ProposedRoot,
+      fillers: Int,
+      unlicensed: Int,
       evidence: Vector[Evidence],
-      situation: Option[SituationAttempt],
-      context: Option[ContextAssignmentAttempt],
-      membership: Option[SegmentMembershipAttempt],
-      participantCoverage: Option[ParticipantCoverageAttempt],
+      situation: SituationAttempt,
+      context: ContextAssignmentAttempt,
+      membership: SegmentMembershipAttempt,
+      participantCoverage: ParticipantCoverageAttempt,
       entityMentions: Vector[EntityMentionAttempt],
       participants: Vector[ParticipantAttempt],
       calls: Vector[ProviderCall]
   )
+
+  /** The four families every root — admitted or not — is accounted for in. */
+  private final case class RootAttempts(
+      situation: SituationAttempt,
+      context: ContextAssignmentAttempt,
+      membership: SegmentMembershipAttempt,
+      participantCoverage: ParticipantCoverageAttempt,
+      calls: Vector[ProviderCall]
+  )
+
+  private final case class SentenceOutcome(
+      coverage: SentenceCoverage,
+      proposedRoots: Vector[ProposedRoot],
+      evidence: Vector[Evidence],
+      situations: Vector[SituationAttempt],
+      contexts: Vector[ContextAssignmentAttempt],
+      memberships: Vector[SegmentMembershipAttempt],
+      participantCoverage: Vector[ParticipantCoverageAttempt],
+      entityMentions: Vector[EntityMentionAttempt],
+      participants: Vector[ParticipantAttempt],
+      calls: Vector[ProviderCall]
+  )
+
+  private object SentenceOutcome:
+    /** A sentence that produced no attempt at all: an empty chart or one the atlas has no chart
+      * for.
+      */
+    def bare(coverage: SentenceCoverage): SentenceOutcome =
+      SentenceOutcome(
+        coverage,
+        Vector.empty,
+        Vector.empty,
+        Vector.empty,
+        Vector.empty,
+        Vector.empty,
+        Vector.empty,
+        Vector.empty,
+        Vector.empty,
+        Vector.empty
+      )
 
   private final case class SummaryOutcome(
       attempt: StorySummaryAttempt,
@@ -456,17 +633,18 @@ object ChartProposalProvider:
       val coverage = inOrder.map(unit =>
         byUnit.get(unit.id).map(_.coverage).getOrElse(SentenceCoverage.NoChart(unit.id))
       )
-      val proposedRoots = inOrder.flatMap(unit => byUnit.get(unit.id).flatMap(_.proposedRoot))
+      val proposedRoots =
+        inOrder.flatMap(unit => byUnit.get(unit.id).toVector.flatMap(_.proposedRoots))
       val temporal = proposedRoots
         .zip(proposedRoots.drop(1))
         .map((prev, next) => temporalOutcome(source, prev, next))
       ChartProposals.derived(
         (outcomes.flatMap(_.evidence) ++ temporal.map(_._2) ++ summary.evidence.toVector)
           .sortBy(_.id),
-        outcomes.flatMap(_.situation).sortBy(_.source.key),
-        outcomes.flatMap(_.context).sortBy(_.source.key),
+        outcomes.flatMap(_.situations).sortBy(_.source.key),
+        outcomes.flatMap(_.contexts).sortBy(_.source.key),
         summary.attempt,
-        outcomes.flatMap(_.membership).sortBy(_.member.key),
+        outcomes.flatMap(_.memberships).sortBy(_.member.key),
         outcomes.flatMap(_.entityMentions).sortBy(_.mention.key),
         outcomes.flatMap(_.participants).sortBy(a => (a.situation.key, a.filler.key)),
         outcomes.flatMap(_.participantCoverage).sortBy(_.situation.key),
@@ -685,26 +863,12 @@ object ChartProposalProvider:
     val chart = ev.chart
     val origin = ev.provenance.origin
     val checksum = Canonical.checksum(chart)
-    if chart.isEmpty then
-      Right(
-        SentenceOutcome(
-          SentenceCoverage.EmptyChart(unit.id),
-          None,
-          Vector.empty,
-          None,
-          None,
-          None,
-          None,
-          Vector.empty,
-          Vector.empty,
-          Vector.empty
-        )
-      )
+    if chart.isEmpty then Right(SentenceOutcome.bare(SentenceCoverage.EmptyChart(unit.id)))
     else
       chart.focus match
         case None =>
           val anchor = ChartNodeRef(unit.id, chart.conceptIds.head)
-          Right(abstain(source, unit, origin, checksum, anchor, AbstentionReason.NoFocus))
+          Right(abstainSentence(source, unit, origin, checksum, anchor, AbstentionReason.NoFocus))
         case Some(focus) =>
           val root = ChartNodeRef(unit.id, focus)
           chart.concept(focus) match
@@ -715,21 +879,199 @@ object ChartProposalProvider:
                   s"${unit.id.value}: focus ${focus.value} is not a concept of the chart"
                 )
               )
-            case Some(concept) if !admissibleFocus(concept) =>
-              Right(
-                abstain(
-                  source,
-                  unit,
-                  origin,
-                  checksum,
-                  root,
-                  AbstentionReason.FocusNotPredicate(concept.kind)
+            case Some(concept) =>
+              val rule = admissibleRoot(chart, focus, concept)
+              val coordinator = ChartRoots.isCoordinator(concept)
+              if rule.isEmpty && !coordinator then
+                Right(
+                  abstainSentence(
+                    source,
+                    unit,
+                    origin,
+                    checksum,
+                    root,
+                    AbstentionReason.FocusNotPredicate(concept.kind)
+                  )
+                )
+              else if chart.isEmbedded(focus) then
+                Right(
+                  abstainSentence(
+                    source,
+                    unit,
+                    origin,
+                    checksum,
+                    root,
+                    AbstentionReason.FocusEmbedded
+                  )
+                )
+              else
+                rule match
+                  case Some(admitted) =>
+                    proposeRoot(
+                      source,
+                      unit,
+                      chart,
+                      origin,
+                      checksum,
+                      root,
+                      concept,
+                      admitted,
+                      supportSpans(unit, chart),
+                      unit.id.value
+                    ).map(outcome =>
+                      SentenceOutcome(
+                        SentenceCoverage
+                          .Proposed(root, outcome.fillers, outcome.unlicensed),
+                        Vector(outcome.proposedRoot),
+                        outcome.evidence,
+                        Vector(outcome.situation),
+                        Vector(outcome.context),
+                        Vector(outcome.membership),
+                        Vector(outcome.participantCoverage),
+                        outcome.entityMentions,
+                        outcome.participants,
+                        outcome.calls
+                      )
+                    )
+                  case None =>
+                    coordinatedOutcome(source, unit, chart, origin, checksum, root)
+
+  /** One situation per admitted branch of a coordinating focus, in branch order.
+    *
+    * Every branch is accounted for: an admitted one contributes exactly what a focus root would,
+    * and an inadmissible one contributes the same four abstained attempts a focus root would, at
+    * the branch. A coordinator with no branch at all abstains at the coordinator itself, because
+    * there is nothing under it to be about.
+    *
+    * Reentrancy makes one filler the participant of several branches (`:op1 (c / carry :ARG0 (t /
+    * they)) :op2 (p / put :ARG0 t)`). That is two participant edges and one entity: the first
+    * branch in branch order that licenses the filler mentions it, and the later branches take it as
+    * a participant without mentioning it again. Mentioning it twice would be two claims that the
+    * word occurs, from one occurrence.
+    */
+  private def coordinatedOutcome(
+      source: StorySource,
+      unit: SurfaceUnit,
+      chart: PropositionChart[Checked],
+      origin: ChartOrigin,
+      checksum: Checksum,
+      coordinator: ChartNodeRef
+  ): Either[DomainError, SentenceOutcome] =
+    val branches = ChartRoots.branches(chart, coordinator.concept)
+    if branches.isEmpty then
+      Right(
+        abstainSentence(
+          source,
+          unit,
+          origin,
+          checksum,
+          coordinator,
+          AbstentionReason.NoCoordinationBranch
+        )
+      )
+    else
+      val admitted = branches.flatMap(branch =>
+        chart
+          .concept(branch.concept)
+          .filterNot(ChartRoots.isCoordinator)
+          .filterNot(_ => chart.isEmbedded(branch.concept))
+          .flatMap(concept => admissibleRoot(chart, branch.concept, concept))
+          .map(_ => branch.concept)
+      )
+      val mentionOwner: Map[ConceptId, ConceptId] = admitted
+        .flatMap(root => scanFillers(chart, root)._1.map(filler => filler.concept -> root))
+        .foldLeft(Map.empty[ConceptId, ConceptId]) { (owners, entry) =>
+          if owners.contains(entry._1) then owners else owners + entry
+        }
+      branches
+        .traverse(branch =>
+          branchOutcome(source, unit, chart, origin, checksum, coordinator, branch, mentionOwner)
+        )
+        .map(outcomes =>
+          SentenceOutcome(
+            SentenceCoverage.Coordinated(coordinator, outcomes.map(_._1)),
+            outcomes.flatMap(_._2.toVector.map(_.proposedRoot)),
+            outcomes.flatMap(_._2.toVector.flatMap(_.evidence)),
+            outcomes.map(_._3.situation),
+            outcomes.map(_._3.context),
+            outcomes.map(_._3.membership),
+            outcomes.map(_._3.participantCoverage),
+            outcomes.flatMap(_._2.toVector.flatMap(_.entityMentions)),
+            outcomes.flatMap(_._2.toVector.flatMap(_.participants)),
+            outcomes.flatMap(_._3.calls)
+          )
+        )
+
+  /** One branch: its ledger entry, what it produced if admitted, and its four attempts. */
+  private def branchOutcome(
+      source: StorySource,
+      unit: SurfaceUnit,
+      chart: PropositionChart[Checked],
+      origin: ChartOrigin,
+      checksum: Checksum,
+      coordinator: ChartNodeRef,
+      branch: ChartRoots.Branch,
+      mentionOwner: Map[ConceptId, ConceptId]
+  ): Either[DomainError, (CoordinatedBranch, Option[RootOutcome], RootAttempts)] =
+    val root = ChartNodeRef(unit.id, branch.concept)
+    def refuse(reason: AbstentionReason) =
+      Right(
+        (
+          CoordinatedBranch.Abstained(root, branch.role, reason),
+          None,
+          abstainAttempts(source, unit, origin, checksum, root, reason, root.key)
+        )
+      )
+    chart.concept(branch.concept) match
+      case None =>
+        Left(
+          DomainError.InvariantViolation(
+            ChartPath,
+            s"${unit.id.value}: coordination branch ${branch.concept.value} of " +
+              s"${coordinator.concept.value} is not a concept of the chart"
+          )
+        )
+      case Some(concept) if ChartRoots.isCoordinator(concept) =>
+        refuse(AbstentionReason.NestedCoordination)
+      case Some(_) if chart.isEmbedded(branch.concept) =>
+        refuse(AbstentionReason.BranchEmbedded)
+      case Some(concept) =>
+        admissibleRoot(chart, branch.concept, concept) match
+          case None       => refuse(AbstentionReason.BranchNotAdmissible(concept.kind))
+          case Some(rule) =>
+            proposeRoot(
+              source,
+              unit,
+              chart,
+              origin,
+              checksum,
+              root,
+              concept,
+              rule,
+              branchSupport(unit, chart, coordinator.concept, branch.concept),
+              root.key,
+              filler => mentionOwner.get(filler).contains(branch.concept)
+            ).map(outcome =>
+              (
+                CoordinatedBranch.Admitted(root, branch.role, outcome.fillers, outcome.unlicensed),
+                Some(outcome),
+                RootAttempts(
+                  outcome.situation,
+                  outcome.context,
+                  outcome.membership,
+                  outcome.participantCoverage,
+                  outcome.calls
                 )
               )
-            case Some(_) if chart.isEmbedded(focus) =>
-              Right(abstain(source, unit, origin, checksum, root, AbstentionReason.FocusEmbedded))
-            case Some(concept) => proposeRoot(source, unit, chart, origin, checksum, root, concept)
+            )
 
+  /** Every attempt one admitted root contributes, whether it is a focus or a coordinated branch.
+    *
+    * Three things differ between the two: a focus root is supported by the whole chart, scoped by
+    * its sentence, and mentions every filler it licenses, while a branch is supported by its own
+    * subtree, scoped by its own root key, and mentions only the fillers `mentions` gives it (see
+    * [[coordinatedOutcome]]). A filler it does not mention is still its participant.
+    */
   private def proposeRoot(
       source: StorySource,
       unit: SurfaceUnit,
@@ -737,21 +1079,24 @@ object ChartProposalProvider:
       origin: ChartOrigin,
       checksum: Checksum,
       root: ChartNodeRef,
-      concept: Concept
-  ): Either[DomainError, SentenceOutcome] =
+      concept: Concept,
+      rule: RootRule,
+      support: Support,
+      scope: String,
+      mentions: ConceptId => Boolean = _ => true
+  ): Either[DomainError, RootOutcome] =
     Gloss.predicate(chart, root.concept) match
       case None =>
         Left(
           DomainError.InvariantViolation(
             ChartPath,
-            s"${unit.id.value}: focus ${root.concept.value} has no gloss"
+            s"${unit.id.value}: root ${root.concept.value} has no gloss"
           )
         )
       case Some(description) =>
-        val support = supportSpans(unit, chart)
         val spans = support.spans
-        val evidence = evidenceRecord(unit.id.value, checksum, spans)
-        val kind = if stateFrame(concept) then SituationKind.State else SituationKind.Event
+        val evidence = evidenceRecord(scope, checksum, spans)
+        val kind = rule.kind
         val lemma = concept.lemma.value
         val value = SituationProposal(
           kind,
@@ -765,11 +1110,12 @@ object ChartProposalProvider:
           Modality.Asserted,
           None
         )
-        val params = chartParams(unit, checksum, origin) + ("span-source" -> support.source)
+        val params = chartParams(unit, checksum, origin) +
+          ("span-source" -> support.source) + ("root-rule" -> rule.label)
         val (situation, situationCall) = proposed(
           source,
           SituationRule,
-          unit.id.value,
+          scope,
           checksum,
           value,
           evidence,
@@ -789,7 +1135,7 @@ object ChartProposalProvider:
         val (context, contextCall) = proposed(
           source,
           ContextRule,
-          unit.id.value,
+          scope,
           checksum,
           ContextAssignmentProposal.NarratedWorld,
           evidence,
@@ -801,7 +1147,7 @@ object ChartProposalProvider:
         val (membership, membershipCall) = proposed(
           source,
           MembershipRule,
-          unit.id.value,
+          scope,
           checksum,
           SegmentMembershipProposal.PrimaryStoryMember,
           evidence,
@@ -812,14 +1158,24 @@ object ChartProposalProvider:
         )
         val (licensed, unlicensed) = scanFillers(chart, root.concept)
         val fillerOutcomes = licensed.map(filler =>
-          fillerOutcome(source, unit, chart, checksum, root, support, filler, params)
+          fillerOutcome(
+            source,
+            unit,
+            chart,
+            checksum,
+            root,
+            support,
+            filler,
+            params,
+            mentions(filler.concept)
+          )
         )
         val coverageValue =
           ParticipantCoverage.of(licensed.map(f => ChartNodeRef(unit.id, f.concept)))
         val (coverage, coverageCall) = proposed(
           source,
           CoverageRule,
-          unit.id.value,
+          scope,
           checksum,
           coverageValue,
           evidence,
@@ -829,24 +1185,28 @@ object ChartProposalProvider:
           params + ("fillers" -> licensed.size.toString) + ("unlicensed" -> unlicensed.toString)
         )
         Right(
-          SentenceOutcome(
-            SentenceCoverage.Proposed(root, licensed.size, unlicensed),
-            Some(ProposedRoot(unit, root, checksum, spans, support.raw)),
+          RootOutcome(
+            ProposedRoot(unit, root, checksum, spans, support.raw),
+            licensed.size,
+            unlicensed,
             evidence +: fillerOutcomes.flatMap(_.evidence),
-            Some(SituationAttempt(root, situation)),
-            Some(ContextAssignmentAttempt(root, context)),
-            Some(SegmentMembershipAttempt(root, membership)),
-            Some(ParticipantCoverageAttempt(root, coverage)),
-            fillerOutcomes.map(_.mention),
+            SituationAttempt(root, situation),
+            ContextAssignmentAttempt(root, context),
+            SegmentMembershipAttempt(root, membership),
+            ParticipantCoverageAttempt(root, coverage),
+            fillerOutcomes.flatMap(_.mention),
             fillerOutcomes.map(_.participant),
             Vector(situationCall, contextCall, membershipCall, coverageCall) ++
               fillerOutcomes.flatMap(_.calls)
           )
         )
 
+  /** `mention` is absent when an earlier coordination branch already mentioned this filler; the
+    * participant edge is emitted either way.
+    */
   private final case class FillerOutcome(
       evidence: Vector[Evidence],
-      mention: EntityMentionAttempt,
+      mention: Option[EntityMentionAttempt],
       participant: ParticipantAttempt,
       calls: Vector[ProviderCall]
   )
@@ -895,7 +1255,8 @@ object ChartProposalProvider:
       root: ChartNodeRef,
       rootSupport: Support,
       filler: LicensedFiller,
-      params: Map[String, String]
+      params: Map[String, String],
+      mentioned: Boolean
   ): FillerOutcome =
     val fillerRef = ChartNodeRef(unit.id, filler.concept)
     val fillerAlignments = chart.alignments.filter(_.target.conceptIds.contains(filler.concept))
@@ -915,17 +1276,24 @@ object ChartProposalProvider:
       EntityType.Custom("chart", foldCase(filler.kind.toString))
     )
     val fillerParams = params + ("filler" -> filler.concept.value)
-    val (mention, mentionCall) = proposed(
-      source,
-      MentionRule,
-      fillerRef.key,
-      checksum,
-      mentionValue,
-      mentionEvidence,
-      mentionRaw,
-      CalibrationModel,
-      Vector("entity-mention", fillerRef.key, mentionValue.label, mentionValue.entityType.toString),
-      fillerParams + ("span-source" -> mentionSource)
+    val mentionOutcome = Option.when(mentioned)(
+      proposed(
+        source,
+        MentionRule,
+        fillerRef.key,
+        checksum,
+        mentionValue,
+        mentionEvidence,
+        mentionRaw,
+        CalibrationModel,
+        Vector(
+          "entity-mention",
+          fillerRef.key,
+          mentionValue.label,
+          mentionValue.entityType.toString
+        ),
+        fillerParams + ("span-source" -> mentionSource)
+      )
     )
     val (participant, participantCall) = proposed(
       source,
@@ -940,10 +1308,10 @@ object ChartProposalProvider:
       fillerParams + ("role" -> renderRole(filler.role))
     )
     FillerOutcome(
-      Vector(mentionEvidence, participantEvidence),
-      EntityMentionAttempt(fillerRef, mention),
+      mentionOutcome.map(_ => mentionEvidence).toVector :+ participantEvidence,
+      mentionOutcome.map((bundle, _) => EntityMentionAttempt(fillerRef, bundle)),
       ParticipantAttempt(root, fillerRef, participant),
-      Vector(mentionCall, participantCall)
+      mentionOutcome.map(_._2).toVector :+ participantCall
     )
 
   /** One `Unclear` temporal attempt between two consecutive proposed roots. */
@@ -979,30 +1347,25 @@ object ChartProposalProvider:
     case ParticipantRole.Custom(namespace, label) => s"Custom($namespace,$label)"
     case other                                    => other.toString
 
-  private def abstain(
+  /** The four abstained attempts an inadmissible root leaves behind, at `anchor` under `scope`. */
+  private def abstainAttempts(
       source: StorySource,
       unit: SurfaceUnit,
       origin: ChartOrigin,
       checksum: Checksum,
       anchor: ChartNodeRef,
-      reason: AbstentionReason
-  ): SentenceOutcome =
+      reason: AbstentionReason,
+      scope: String
+  ): RootAttempts =
     val params = chartParams(unit, checksum, origin) + ("reason" -> reason.render)
     val render = Vector("abstain", anchor.key, reason.render)
     val (situation, situationCall) =
-      abstained[SituationProposal](
-        source,
-        AbstainSituationRule,
-        unit.id.value,
-        checksum,
-        render,
-        params
-      )
+      abstained[SituationProposal](source, AbstainSituationRule, scope, checksum, render, params)
     val (context, contextCall) =
       abstained[ContextAssignmentProposal](
         source,
         AbstainContextRule,
-        unit.id.value,
+        scope,
         checksum,
         render,
         params
@@ -1011,31 +1374,42 @@ object ChartProposalProvider:
       abstained[SegmentMembershipProposal](
         source,
         AbstainMembershipRule,
-        unit.id.value,
+        scope,
         checksum,
         render,
         params
       )
     val (coverage, coverageCall) =
-      abstained[ParticipantCoverage](
-        source,
-        AbstainCoverageRule,
-        unit.id.value,
-        checksum,
-        render,
-        params
-      )
+      abstained[ParticipantCoverage](source, AbstainCoverageRule, scope, checksum, render, params)
+    RootAttempts(
+      SituationAttempt(anchor, situation),
+      ContextAssignmentAttempt(anchor, context),
+      SegmentMembershipAttempt(anchor, membership),
+      ParticipantCoverageAttempt(anchor, coverage),
+      Vector(situationCall, contextCall, membershipCall, coverageCall)
+    )
+
+  /** A whole sentence abstaining at one anchor: no root, one ledger row, four attempts. */
+  private def abstainSentence(
+      source: StorySource,
+      unit: SurfaceUnit,
+      origin: ChartOrigin,
+      checksum: Checksum,
+      anchor: ChartNodeRef,
+      reason: AbstentionReason
+  ): SentenceOutcome =
+    val attempts = abstainAttempts(source, unit, origin, checksum, anchor, reason, unit.id.value)
     SentenceOutcome(
       SentenceCoverage.Abstained(anchor, reason),
-      None,
-      Vector.empty,
-      Some(SituationAttempt(anchor, situation)),
-      Some(ContextAssignmentAttempt(anchor, context)),
-      Some(SegmentMembershipAttempt(anchor, membership)),
-      Some(ParticipantCoverageAttempt(anchor, coverage)),
       Vector.empty,
       Vector.empty,
-      Vector(situationCall, contextCall, membershipCall, coverageCall)
+      Vector(attempts.situation),
+      Vector(attempts.context),
+      Vector(attempts.membership),
+      Vector(attempts.participantCoverage),
+      Vector.empty,
+      Vector.empty,
+      attempts.calls
     )
 
   private def summaryOutcome(source: StorySource): Either[DomainError, SummaryOutcome] =
@@ -1082,12 +1456,23 @@ object ChartProposalProvider:
   private def stateFrame(concept: Concept): Boolean =
     concept.frame.exists(f => f.namespace == StateFrameNamespace && StateFrames(f.id))
 
-  /** A predicate, or a Special concept carrying a state frame. Any other Special focus abstains: a
-    * frameless AMR special is not a situation, and a `-91` frame outside the closed set has no
-    * state reading this provider can license.
+  /** The closed shape that admits `concept` as a situation root, or nothing.
+    *
+    * The four shapes are stated in [[RulesText]]: a predicate, a Special concept carrying a state
+    * frame, a frameless predicative concept with a `:domain` filler, and a frameless entity with a
+    * `:location` filler. Any other concept — a frameless AMR special, a `-91` frame outside the
+    * closed set, a bare entity — abstains. Nothing here reads the sentence text or invents a frame.
     */
-  private def admissibleFocus(concept: Concept): Boolean =
-    concept.isPredicate || (concept.kind == ConceptKind.Special && stateFrame(concept))
+  private def admissibleRoot(
+      chart: PropositionChart[Checked],
+      id: ConceptId,
+      concept: Concept
+  ): Option[RootRule] =
+    if concept.isPredicate || (concept.kind == ConceptKind.Special && stateFrame(concept)) then
+      Some(if stateFrame(concept) then RootRule.StateRoleset else RootRule.Predicate)
+    else if ChartRoots.isPredicative(chart, id, concept) then Some(RootRule.Predicative)
+    else if ChartRoots.isExistential(chart, id, concept) then Some(RootRule.Existential)
+    else None
 
   /** Alignment spans of every alignment naming a non-embedded concept, with their minimum credence;
     * the sentence with raw score 1.0 otherwise (recorded as span-source=sentence).
@@ -1098,6 +1483,45 @@ object ChartProposalProvider:
     SpanSet.of(supporting.flatMap(_.spans.refs.toVector)) match
       case Some(set) => Support(set, "chart-alignments", minCredence(supporting))
       case None      => Support(SpanSet.one(SpanRef(Some(unit.id), unit.span)), "sentence", 1.0)
+
+  /** [[supportSpans]] restricted to one coordination branch: the alignments naming a non-embedded
+    * concept the branch reaches. Two branches of one sentence are then evidenced by different
+    * words, which is what makes them two situations and not one asserted twice.
+    */
+  private def branchSupport(
+      unit: SurfaceUnit,
+      chart: PropositionChart[Checked],
+      coordinator: ConceptId,
+      branch: ConceptId
+  ): Support =
+    val within = reachable(chart, coordinator, branch)
+    val supporting = chart.alignments.filter(
+      _.target.conceptIds.exists(id => within(id) && !chart.isEmbedded(id))
+    )
+    SpanSet.of(supporting.flatMap(_.spans.refs.toVector)) match
+      case Some(set) => Support(set, "branch-alignments", minCredence(supporting))
+      case None      => Support(SpanSet.one(SpanRef(Some(unit.id), unit.span)), "sentence", 1.0)
+
+  /** Every concept `from` reaches, never through `stop`. Reentrancy is a shared node, so a concept
+    * two branches both reach is in both; the traversal keeps a visited set, so a cycle terminates.
+    */
+  private def reachable(
+      chart: PropositionChart[Checked],
+      stop: ConceptId,
+      from: ConceptId
+  ): Set[ConceptId] =
+    @annotation.tailrec
+    def walk(pending: List[ConceptId], seen: Set[ConceptId]): Set[ConceptId] = pending match
+      case Nil        => seen
+      case id :: rest =>
+        val next = chart
+          .relationsFrom(id)
+          .flatMap(_.to.nodeId)
+          .filter(chart.concepts.contains)
+          .filterNot(seen)
+          .filter(_ != stop)
+        walk(next.toList ++ rest, seen ++ next)
+    if from == stop then Set.empty else walk(List(from), Set(from))
 
   /** Minimum raw credence of the given alignments; 1.0 for none, which callers only reach with a
     * fallback support whose span-source says so.

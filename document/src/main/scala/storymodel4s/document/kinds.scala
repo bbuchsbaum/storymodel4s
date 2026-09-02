@@ -2,7 +2,7 @@ package storymodel4s.document
 
 import storymodel4s.core.*
 import storymodel4s.core.NarrativeKind.{EntityK, SituationK}
-import storymodel4s.proposition.ConceptKind
+import storymodel4s.proposition.{CheckState, Concept, ConceptId, ConceptKind, PropositionChart}
 
 /** Runtime evidence for a narrative kind: its content-address tag and which chart concepts may
   * stand as mentions of it.
@@ -15,8 +15,23 @@ sealed trait KindWitness[K <: NarrativeKind]:
   /** Stable tag used in content addresses (`c-entity:…`, `c-situation:…`). */
   def tag: String
 
-  /** Whether a chart concept of this kind may be a mention of `K`. */
+  /** Whether a chart concept of this kind may be a mention of `K` on its kind alone. */
   def accepts(kind: ConceptKind): Boolean
+
+  /** Whether the concept `id` of `chart` may be a mention of `K`.
+    *
+    * Why a second question: for most kinds the concept kind settles it, but one shape does not.
+    * `(p / person :location (e / egulac))` is an entity-kind concept that the chart nonetheless
+    * places, and a placed entity is a state of existence. Kind alone cannot see the `:location`, so
+    * the witness is asked about the node in its chart and not only about its kind. This is still a
+    * necessary condition and never a sufficient one: which sources actually become situations is
+    * [[NarrativeCompiler]]'s rule.
+    */
+  def acceptsAt[C <: CheckState](
+      chart: PropositionChart[C],
+      id: ConceptId,
+      concept: Concept
+  ): Boolean = accepts(concept.kind)
 
 object KindWitness:
   def apply[K <: NarrativeKind](using w: KindWitness[K]): KindWitness[K] = w
@@ -28,13 +43,20 @@ object KindWitness:
       case _                                                            => false
 
   /** `Special` covers AMR `-91` rolesets (`be-located-at-91`, `have-org-role-91`), which are
-    * predicates; `Unknown` is never accepted as a situation mention.
+    * predicates; `Unknown` is never accepted as a situation mention. `Entity` is accepted only
+    * where the chart places the concept ([[ChartRoots.isExistential]]), never on kind alone.
     */
   given situation: KindWitness[SituationK] with
     val tag: String = "situation"
     def accepts(kind: ConceptKind): Boolean = kind match
       case ConceptKind.Predicate | ConceptKind.Property | ConceptKind.Special => true
       case _                                                                  => false
+
+    override def acceptsAt[C <: CheckState](
+        chart: PropositionChart[C],
+        id: ConceptId,
+        concept: Concept
+    ): Boolean = accepts(concept.kind) || ChartRoots.isExistential(chart, id, concept)
 
 /** Typed errors of document composition. */
 enum DocumentError:
@@ -96,10 +118,11 @@ object MentionTable:
           .foldLeft[Either[DocumentError, Map[MentionId[K], ChartNodeRef]]](Right(Map.empty)) {
             case (Left(e), _)            => Left(e)
             case (Right(acc), (m, node)) =>
-              graph.concept(node) match
-                case None    => Left(DocumentError.MentionNotInGraph(m.value, node, "MentionTable"))
-                case Some(c) =>
-                  if w.accepts(c.kind) then Right(acc.updated(m, node))
+              (graph.chart(node.sentence), graph.concept(node)) match
+                case (Some(chart), Some(c)) =>
+                  if w.acceptsAt(chart, node.concept, c) then Right(acc.updated(m, node))
                   else Left(DocumentError.KindMismatch(m.value, node, c.kind, w.tag))
+                case _ =>
+                  Left(DocumentError.MentionNotInGraph(m.value, node, "MentionTable"))
           }
           .map(new MentionTable(_))

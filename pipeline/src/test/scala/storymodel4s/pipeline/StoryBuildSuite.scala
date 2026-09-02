@@ -22,9 +22,9 @@ import storymodel4s.provider.agent.*
 
 /** The replay-mode War of the Ghosts court for the story-build orchestrator (ADR 0009).
   *
-  * Every run here is `replay`, so `liveCalls == 0` by construction. Two recording sets live under
-  * this module's test resources, both hand-written (`origin: authored`) and both carrying the same
-  * three PENMAN replies `provider-agent` commits:
+  * Every run here is `replay`, so `liveCalls == 0` by construction. Three recording sets live under
+  * this module's test resources. Two are hand-written (`origin: authored`) and carry the same three
+  * PENMAN replies `provider-agent` commits:
   *
   *   - `recordings/three/`: byte-for-byte copies of `provider-agent/src/test/resources/recordings`,
   *     keyed to the three-sentence text those replies were written for;
@@ -33,10 +33,19 @@ import storymodel4s.provider.agent.*
   *     recorded for the three-sentence story cannot serve the fifty-sentence one; the re-keyed copy
   *     is what lets the full text replay its first three sentences without a model call.
   *
-  * The text is the admitted fixture text written to a temp file; the pipeline reads it as-is. The
-  * suite pins counts, ids, and checksums as literals: they are what the three replies cover under
-  * the 1.3 provider's rules, and a change in the recordings, the provider, the compiler, or the
-  * rules text must move them.
+  * The third is captured, not authored:
+  *
+  *   - `recordings/wog-captured/`: fifty replies from the first live run, one per sentence of the
+  *     whole fixture story. It is the only record this repository has of what real machine charts
+  *     look like at story scale, and the fifty-sentence court below is what reads it.
+  *
+  * Every run here replays `WarOfTheGhostsText.text`, the 50-sentence fixture literal, written to a
+  * temp file; the pipeline reads it as-is. That is not the admitted text on disk
+  * (`docs/design/war-of-the-ghosts-boas1901.txt`, which carries a provenance header and cuts into
+  * 58 sentences); the two are different strings with different story ids, and every committed
+  * recording is keyed against the literal (ADR 0008). The suite pins counts, ids, and checksums as
+  * literals, and a change in the recordings, the provider, the compiler, or the rules text must
+  * move them.
   */
 class StoryBuildSuite extends FunSuite:
   private val Now = 1700000000000L
@@ -50,13 +59,16 @@ class StoryBuildSuite extends FunSuite:
 
   /** `Checksum.ofText(ChartProposalProvider.RulesText)`; a rules change must move this literal. */
   private val RulesChecksum =
-    "05cdb836a9768d9891368abb41cff1b7ec92ab3b042d3a8cf23bfc05de822d1b"
+    "70333fc4c70a3631edbffcb825990174046c09b4ae02489d8015c7b0827b8142"
 
   private val wogRecordings: Path = Paths.get(getClass.getResource("/recordings/wog").toURI)
-  private val threeRecordings: Path = Paths.get(getClass.getResource("/recordings/three").toURI)
 
+  /** The fifty captured replies for the full fixture text: one per sentence, `origin: captured`.
+    * Replaying them is the only court that measures what the provider does with a whole real story.
+    */
   private val capturedRecordings: Path =
     Paths.get(getClass.getResource("/recordings/wog-captured").toURI)
+  private val threeRecordings: Path = Paths.get(getClass.getResource("/recordings/three").toURI)
 
   private val threeText: String =
     "There were people at Egulac. One night two young men went to hunt seals. " +
@@ -133,16 +145,36 @@ class StoryBuildSuite extends FunSuite:
 
   private def kindOf(row: Json): String = field(row, "kind")
 
+  private def intField(value: Json, path: String*): Int =
+    path
+      .foldLeft(value.hcursor: io.circe.ACursor)((cursor, name) => cursor.downField(name))
+      .as[Int]
+      .fold(e => fail(s"${path.mkString(".")}: ${e.message}"), identity)
+
+  /** One `params` entry of a rendered provider call, absent when the call does not carry it. */
+  private def param(call: Json, name: String): Option[String] =
+    call.hcursor.downField("params").downField(name).as[String].toOption
+
+  /** How many members a JSON collection has, whether the codec wrote it as an array or a map. */
+  private def size(cursor: io.circe.ACursor, field: String): Int =
+    cursor.downField(field).focus match
+      case Some(value) if value.isArray  => value.asArray.fold(0)(_.size)
+      case Some(value) if value.isObject => value.asObject.fold(0)(_.keys.size)
+      case other => fail(s"$field is neither an array nor an object: $other")
+
   private def copyRecordings(from: Path, into: Path): Path =
     Files.createDirectories(into)
     entries(from).foreach(source => Files.copy(source, into.resolve(source.getFileName.toString)))
     into
 
-  /** The fifty captured replies from the first live run are committed but no court reads them, so
-    * nothing else here would notice if one were named by a key this driver does not derive. That
-    * matters now: the key schema moved to `agent-recording/v2` and all fifty were renamed. The set
-    * equality below is the falsifier for that rename -- a single wrong name fails it, in either
-    * direction, and no assertion about their content is made.
+  /** The fifty captured replies are named by their recording keys, and the key schema moved to
+    * `agent-recording/v2`, which renamed all fifty. The set equality below is the falsifier for
+    * that rename -- a single wrong name fails it, in either direction, and no assertion about their
+    * content is made.
+    *
+    * Why this stays separate from the fifty-sentence court: that court fails if a recording is
+    * misnamed too, but it fails as a coverage number and would send a reader looking at the
+    * provider. This one fails as a name, which is where the fault is.
     */
   test("the fifty captured replies are named by exactly the keys the driver derives") {
     val dir = work("captured")
@@ -179,6 +211,167 @@ class StoryBuildSuite extends FunSuite:
     }
   }
 
+  /** The fifty-sentence replay court: what fifty real machine charts produce.
+    *
+    * Why it exists: `recordings/wog-captured` holds one captured reply per sentence of the whole
+    * fixture story, and until this court nothing replayed them. A green pipeline suite therefore
+    * said only that three authored replies still work; it said nothing about what the transport,
+    * the provider, and the compiler do with fifty charts a model actually wrote. Replay mode means
+    * `liveCalls == 0` by construction, so the court costs no spend and no new text.
+    *
+    * Which text: two War of the Ghosts strings live in this repository and they are not the same
+    * string (ADR 0008). The admitted text on disk, `docs/design/war-of-the-ghosts-boas1901.txt`,
+    * carries a provenance header and cuts into 58 sentences under `story:2c4b62fd655f`; the fixture
+    * literal `WarOfTheGhostsText.text` cuts into 50 under `story:e4b036101a7a`, and every committed
+    * recording is keyed against the literal. This court replays the literal, and pins the story id
+    * and the sentence count, so a court that quietly changed texts fails here rather than silently
+    * finding no recordings.
+    *
+    * What is deliberately not pinned: any recording's content — no reply text, no usage, no
+    * duration. A content pin would make the fixture its own expectation and would go on passing
+    * over a corrupted one. What is pinned is what the fifty replies *produce*: the served-from
+    * ledger, the coverage ledger with its abstention reasons, the closed rule that admitted each
+    * root, the gaps, the violations, and the shape of the draft that was built. The last of those
+    * is what stops a run that regressed to proposing nothing from passing on zeroes.
+    *
+    * These are the numbers of the combined state, not of any intermediate one. Four mechanical
+    * classes were closed together: markers on non-concepts (the transport now mirrors every decoded
+    * marker into the sidecar), coordinated predicates, predicative roots, and existential roots.
+    * Pinning an intermediate state would pin a pipeline that never ran.
+    */
+  test("the fifty-sentence captured court: 50 charts, 65 situations, one named abstention") {
+    val dir = work("wog-captured")
+    val outDir = dir.resolve("out")
+    val summary = build(wogText(dir), capturedRecordings, outDir)
+
+    // The text this court used, stated and pinned: the 50-sentence fixture literal.
+    assertEquals(summary.storyId.value, WogStory)
+    assertEquals(summary.sentences, 50)
+
+    // The served-from ledger: every sentence was answered from a committed captured recording,
+    // and nothing was authored, live, unrecorded, foreign, or corrupt.
+    assertEquals(summary.parser.sentences, 50)
+    assertEquals(summary.parser.replayedCaptured, 50)
+    assertEquals(summary.parser.replayedAuthored, 0)
+    assertEquals(summary.parser.capturedLive, 0)
+    assertEquals(summary.parser.unrecorded, 0)
+    assertEquals(summary.parser.foreign, 0)
+    assertEquals(summary.parser.corrupt, 0)
+    assertEquals(summary.parser.transportFailures, 0)
+    assertEquals(summary.liveCalls, 0)
+
+    // Every reply now yields a chart. Seven did not until the transport stopped refusing a marker
+    // that sits on a role, a reentrancy, or a constant (`:quant many~e.2`, `:poss h~e.4`) and
+    // began mirroring every decoded marker into the sidecar instead.
+    assertEquals(summary.parser.proposed, 50)
+    assertEquals(summary.parser.failed, 0)
+    assertEquals(summary.parser.abstained, 0)
+    assertEquals(summary.charts, 50)
+    assertEquals(summary.coverage, CoverageCounts(33, 16, 1, 0, 0))
+    assertEquals(summary.coverage.sentences, 50)
+
+    val files = StoryPipeline.files(outDir)
+    val report = json(files.report)
+    val ledger = coverageRows(report)
+    assertEquals(ledger.size, 50)
+    assertEquals(
+      ledger.groupBy(kindOf).view.mapValues(_.size).toMap,
+      Map("proposed" -> 33, "coordinated" -> 16, "abstained" -> 1)
+    )
+
+    // The abstention-reason histogram, at sentence grain and at branch grain. One sentence
+    // abstains, and it names a class we chose not to admit rather than one we failed to notice:
+    // "It was nearly daylight when he became quiet" focuses `daylight`, an entity with a
+    // `:degree` and a `:time` and no place, so no existential reading is licensed.
+    val reasons = ledger.filter(row => kindOf(row) == "abstained").map(row => field(row, "reason"))
+    assertEquals(
+      reasons.groupBy(identity).view.mapValues(_.size).toMap,
+      Map("focus-not-predicate:Entity" -> 1)
+    )
+    val coordinated = ledger.filter(row => kindOf(row) == "coordinated")
+    assertEquals(coordinated.size, 16)
+    // Every coordinating focus in this story is a two-branch one and every branch is a predicate,
+    // so no branch reason appears. A branch that stopped being admitted would show up here.
+    assertEquals(coordinated.map(row => intField(row, "admitted")), Vector.fill(16)(2))
+    val branches = coordinated.flatMap(row => rows(row, "branches"))
+    assertEquals(branches.size, 32)
+    assertEquals(branches.groupBy(kindOf).view.mapValues(_.size).toMap, Map("admitted" -> 32))
+    assertEquals(branches.flatMap(_.hcursor.downField("reason").as[String].toOption), Vector.empty)
+    assertEquals(
+      branches.map(row => field(row, "role")).groupBy(identity).view.mapValues(_.size).toMap,
+      Map("op1" -> 15, "op2" -> 15, "snt1" -> 1, "snt2" -> 1)
+    )
+
+    // The four gaps and the three errors are the one abstained anchor and nothing else: the
+    // situation, context, membership, and coverage families have no proposal there, and the first
+    // three of those are required derivations.
+    assertEquals(summary.gaps, 4)
+    assertEquals(
+      rows(report, "gaps").map(row => field(row, "family") -> field(row, "reason")).sorted,
+      Vector(
+        "ContextAssignment" -> "unresolved:NoProposal",
+        "ParticipantCoverage" -> "unresolved:NoProposal",
+        "SegmentMembership" -> "unresolved:NoProposal",
+        "SituationMention" -> "unresolved:NoProposal"
+      )
+    )
+    assertEquals(summary.errors, 3)
+    assertEquals(summary.warnings, 0)
+    assertEquals(summary.validated, false)
+    assertEquals(
+      rows(report, "validation", "violations")
+        .map(row => field(row, "law") -> field(row, "severity"))
+        .groupBy(identity)
+        .view
+        .mapValues(_.size)
+        .toMap,
+      Map(("compiler.required-derivation", "error") -> 3)
+    )
+    // Complete, not Incomplete: the exit status reports whether every sentence reached the court,
+    // and every one of the fifty did. That the draft does not validate is what `validated` and the
+    // three required-derivation errors say.
+    assertEquals(ExitStatus.of(Right(summary)), ExitStatus.Complete)
+
+    // Which closed admission rule produced each root. This is the one assertion that names the
+    // rules rather than counting their effects: 32 of the predicates are coordination branches,
+    // and the single predicative root ("He was dead") and the two existential roots ("There were
+    // people at Egulac", "There were five men in the canoe") are the whole of what the predicative
+    // and existential rules add to this story. Deleting either rule moves a named number here.
+    val rootRules = rows(json(files.receipts), "calls")
+      .filter(call => param(call, "rule").contains(ChartProposalProvider.SituationRule))
+      .map(call => param(call, "root-rule").getOrElse(fail("a situation call has no root-rule")))
+    assertEquals(rootRules.size, 65)
+    assertEquals(
+      rootRules.groupBy(identity).view.mapValues(_.size).toMap,
+      Map("predicate" -> 61, "state-roleset" -> 1, "predicative" -> 1, "existential" -> 2)
+    )
+
+    // What the fifty charts actually built. 33 focus roots and 32 coordination branches are 65
+    // situations; each is a segment member and sits in the one narrated-world context; the
+    // temporal rule pairs the 65 roots into 64 adjacent `Unclear` values, and the trajectory has
+    // one step per pair. A run that regressed to proposing nothing would still satisfy every
+    // count above that only reads a ledger, and would fail here.
+    val built = json(files.model)
+    val graph = built.hcursor.downField("graph")
+    assertEquals(size(graph, "situations"), 65)
+    assertEquals(size(graph, "entities"), 35)
+    assertEquals(size(graph, "contexts"), 1)
+    assertEquals(size(graph, "segments"), 1)
+    val relations = graph.downField("relations")
+    assertEquals(size(relations, "participants"), 68)
+    assertEquals(size(relations, "temporal"), 64)
+    assertEquals(size(relations, "causal"), 0)
+    assertEquals(size(built.hcursor.downField("trajectory"), "steps"), 64)
+    assertEquals(size(built.hcursor.downField("hierarchy"), "containment"), 65)
+    assertEquals(intField(report, "model", "situations"), 65)
+    assertEquals(intField(report, "model", "entities"), 35)
+    assertEquals(intField(report, "model", "claims"), 398)
+
+    // The bundle still carries no source prose, on a fifty-sentence run as on a three.
+    assert(!read(files.report).contains("Egulac"), "the report carries source prose")
+    assert(!read(files.receipts).contains("Egulac"), "the receipts carry source prose")
+  }
+
   test("the WOG replay court: 50 sentences, three charts, two situations, a partial draft") {
     val dir = work("wog")
     val outDir = dir.resolve("out")
@@ -207,7 +400,7 @@ class StoryBuildSuite extends FunSuite:
     // its StateFrames set names that frame (the 1.3 court's hand chart gave it Predicate kind and
     // never met the adapter's classification). The other 47 sentences have no chart. The 1.3
     // court's 4/2/1/43 came from seven hand charts and does not transfer.
-    assertEquals(summary.coverage, CoverageCounts(3, 0, 0, 47))
+    assertEquals(summary.coverage, CoverageCounts(3, 0, 0, 0, 47))
     // Gaps: three NoProposal gaps at the abstained anchor (situation, context, membership) and one
     // trajectory step between the two emitted situations that lacks participant and temporal
     // inputs until phase 1.4 lands.
@@ -292,11 +485,6 @@ class StoryBuildSuite extends FunSuite:
     // trajectory step per pair. A draft that validated on nothing would show zeroes here.
     val built = json(files.model)
     val graph = built.hcursor.downField("graph")
-    def size(cursor: io.circe.ACursor, field: String): Int =
-      cursor.downField(field).focus match
-        case Some(value) if value.isArray  => value.asArray.fold(0)(_.size)
-        case Some(value) if value.isObject => value.asObject.fold(0)(_.keys.size)
-        case other => fail(s"$field is neither an array nor an object: $other")
     assertEquals(size(graph, "situations"), 3)
     assertEquals(size(graph, "entities"), 3)
     val relations = graph.downField("relations")
@@ -399,7 +587,7 @@ class StoryBuildSuite extends FunSuite:
     Files.delete(store.path(riverKey))
 
     val mutated = build(textPath, copy, dir.resolve("mutated"))
-    assertEquals(mutated.coverage, CoverageCounts(2, 0, 0, 48))
+    assertEquals(mutated.coverage, CoverageCounts(2, 0, 0, 0, 48))
     assertEquals(mutated.charts, 2)
     assertEquals(mutated.parser.replayedAuthored, 2)
     assertEquals(mutated.parser.unrecorded, 48)
@@ -623,12 +811,12 @@ class StoryBuildSuite extends FunSuite:
     assertEquals(summary.charts, 3)
     assertEquals(summary.parser.transportFailures, 0)
     assertEquals(summary.parser.replayedAuthored, 3)
-    assertEquals(summary.coverage, CoverageCounts(3, 0, 0, 0))
+    assertEquals(summary.coverage, CoverageCounts(3, 0, 0, 0, 0))
     assertEquals(summary.gaps, 0)
     assertEquals(summary.validated, true)
     assertEquals(ExitStatus.of(Right(summary)), ExitStatus.Complete)
     val line = StoryPipeline.render(summary, outDir)
-    assert(line.contains("sentences=3 charts=3 proposed=3 abstained=0"), line)
+    assert(line.contains("sentences=3 charts=3 proposed=3 coordinated=0 abstained=0"), line)
     assert(line.contains("transportFailures=0"), line)
     assert(line.contains("liveCalls=0"), line)
     assert(line.contains("encodingDigest(timestamp-bearing)="), line)

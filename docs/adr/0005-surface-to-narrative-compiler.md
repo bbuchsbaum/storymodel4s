@@ -609,3 +609,94 @@ attempts, three `Unclear` pairs, eight gaps, `validated == None` while two sente
 `CompiledAtlasSuite` (view) compiles the three-sentence silver model through `AtlasCompiler` on
 the `ValidatedBuild` basis. Mutation ledger: see the landing commit.
 
+
+### 2026-09-02: coordinated, predicative and existential roots (solo plan slice 1.5, classes B, C, D)
+
+Measured on `main` over the fifty captured War of the Ghosts replies
+(`pipeline/src/test/resources/recordings/wog-captured`), 43 sentences reached the provider and 27
+became situations. The sixteen abstentions were not diffuse: fourteen were a coordinating focus,
+one was a property with a `:domain`, and one was an entity with neither a place nor a frame. That
+is a defect in the root rule, not in the model's output: `(a / and :op1 (l / land-01 ...) :op2
+(g / go-02 ...))` is two events in one sentence, and refusing it because the focus is not a
+predicate loses a true reading of the sentence to fit our compiler.
+
+1. **A coordinating focus's branches are the roots.** `ChartRoots` (new, `document`) names the
+   closed set `{and, or, multi-sentence}` by *lemma*, on a concept carrying no frame. No concept
+   kind separates a coordinator from an ordinary entity: the AMR adapter makes `and` and `or`
+   `Entity` and `multi-sentence` `Special`. Each direct branch — a relation under `:opN` (`and`,
+   `or`) or `:sntN` (`multi-sentence`) whose target is a concept of the chart — is evaluated as a
+   root in its own right, in branch order (operands before sentences, then by index). An admitted
+   branch yields its own situation, context, membership and participant-coverage attempts, its
+   support drawn from its own subtree, its description from its own gloss, and its polarity from
+   its own chart polarity.
+   - *Rejected: descending into a nested coordinator.* An `and` under an `and` abstains with
+     `coordination-branch-nested`. One `:op` index states an order among siblings and nothing
+     about an order across levels, and inventing one would be an ordering the chart does not
+     carry. The predicates under the inner coordinator are therefore not roots, and the ledger
+     says so rather than losing them silently.
+   - *Rejected: emitting one `Proposed` coverage row per branch.* `CoverageCounts` must sum to the
+     number of atlas sentences; several rows would claim the story had more sentences than it has.
+     `SentenceCoverage.Coordinated` is one row carrying every branch, admitted or abstained with
+     its reason, and `CoverageCounts` gains a `coordinated` counter that counts sentences.
+   - *Rejected: `Before` between siblings.* `and` asserts conjunction, not sequence. Coordinated
+     siblings get the same `Unclear` temporal attempt any adjacent pair of roots gets. Their
+     discourse order is their branch index; that is a discourse fact and not a story-world one.
+   - **Reentrancy is one mention.** `:op1 (c / carry :ARG0 (t / they)) :op2 (p / put :ARG0 t)`
+     licenses `they` from both branches. The first branch in branch order mentions it; every
+     branch that licenses it takes it as a participant. Two mention attempts at one chart node
+     are two claims that a word occurs out of one occurrence, and the compiler refuses them as
+     duplicates — which is how this was found.
+2. **The compiler accepts a non-focus source only as a coordination branch.**
+   `NarrativeCompiler.admissibleSituationSource` admits the chart focus, or a direct `:op`/`:snt`
+   branch of a focus that `ChartRoots.isCoordinator` accepts, and nothing else. The refusal
+   message states the rule. *Rejected: admitting any non-embedded predicate of the chart.* A
+   predicate reached by `:time` or `:ARG1` is an argument of something, not an assertion of the
+   sentence; the guard test drives exactly that case through the compiler.
+3. **A predicative root is a State.** A frameless concept of kind `Property` or `Entity` whose
+   `:domain` reaches a concept of the chart — `(d / dead :domain (h / he))` — is a State whose
+   predicate is the property lemma, with no frame, and whose `:domain` filler is a participant.
+   `ChartProposalProvider.NamedRoles` gains `domain -> Custom("amr", "domain")`; the AMR adapter's
+   standard-role table does not normalize `:domain`, and this is the only entry in that table that
+   is not the adapter's verbatim. *Rejected: `Theme` or `Patient` for `:domain`.* `:domain` says
+   which concept the head is predicated of and nothing about how that concept participates, so a
+   thematic name would assert what the chart did not.
+4. **An existential root is a State.** A frameless concept of kind `Entity` whose `:location`
+   reaches a concept of the chart — `(p / person :quant many :location (e / egulac))` — is a State
+   of existence at that place, with the locative filler a participant at `Location`. *Rejected:
+   requiring the existential quantifier.* `:quant many` and `:quant 5` are literals in these
+   charts and the reading is the locative one; requiring the quantifier would fit two examples
+   rather than state a rule. *Rejected: inventing an `exist` predicate.* The predicate lemma is
+   the concept's own, because no other lemma is in the chart.
+   - `KindWitness.situation` gains `acceptsAt`: an `Entity` concept may be a situation mention
+     exactly where the chart places it. The kind-only answer is unchanged, so this licenses one
+     shape and not every entity, and which sources actually become situations remains the
+     compiler's rule.
+5. **Rules 3 and 4 need a compiler change beyond rule 2.** `situationRoot` previously admitted a
+   predicate or a framed `Special`, so a frameless `Property` or `Entity` root would have been
+   refused after the provider proposed it. It now also admits the two shapes above, structurally,
+   from the chart. The compiler stays looser than the provider by design: it refuses what cannot
+   be a situation at all, and the provider decides what it will propose.
+6. **What moved, measured on the fifty captured replies.** These three rules were written and
+   first measured while class A (a marker on a role, a reentrancy, or a constant made the
+   transport refuse the whole reply) still cost the story seven charts. At that point coverage
+   went from `proposed 27 / abstained 16 / noChart 7` to `proposed 28 / coordinated 14 /
+   abstained 1 / noChart 7`, and **the existential rule moved nothing**: both of the story's
+   existential sentences ("There were people at Egulac", "There were five men in the canoe") were
+   among the seven the transport refused, so the rule was provable only against hand-built charts.
+   With class A landed the transport mirrors every decoded marker into the sidecar, all fifty
+   replies yield charts, and the combined state is `proposed 33 / coordinated 16 / abstained 1 /
+   noChart 0`: gaps 64 → 4, required-derivation errors 48 → 3, situations 27 → 65. The rule that
+   admitted each of the 65 roots is on its receipt and pinned: 61 predicate (32 of them
+   coordination branches), 1 state roleset, 1 predicative, **2 existential** — the two sentences
+   above, which is the delta this ADR could not measure when it was written.
+
+   The one remaining abstention is "It was nearly daylight when he became quiet", whose focus
+   `daylight` is an entity with a `:degree` and a `:time` and no place: a class we decided not to
+   admit, not one we failed to notice.
+
+Evidence: `CoordinatedRootSuite` (document) is the court for all three shapes and their negative
+cases — branches that are not roots, a nested coordinator, a coordinator with no branch, an
+embedded branch, a `:domain` reaching a literal or nothing, an entity with no `:location`, and a
+lexical entity outside the coordination set. `CompilerSuite` drives the non-branch source through
+the compiler. `StoryBuildSuite`'s captured court pins the fifty-sentence ledger. Mutation ledger:
+see the landing commit.

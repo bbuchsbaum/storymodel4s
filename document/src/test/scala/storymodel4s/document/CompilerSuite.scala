@@ -895,3 +895,97 @@ class CompilerSuite extends FunSuite:
       case Left(other) => fail(other.message)
       case Right(_)    => fail("a coverage naming an unattempted filler reached the compiler")
   }
+
+  /** `(a / and :op1 (l / land) :time (r / rest))` on sentence 0: one branch and one predicate the
+    * coordinator merely takes as a time filler.
+    */
+  private val coordinatedChart: PropositionEvidence =
+    val and = ConceptId.unsafe("and")
+    val branch = ConceptId.unsafe("branch")
+    val filler = ConceptId.unsafe("filler")
+    val unchecked = PropositionChart.unchecked(
+      Some(and),
+      Map(
+        and -> Concept.entity("and"),
+        branch -> Concept.predicate("land"),
+        filler -> Concept.predicate("rest")
+      ),
+      Vector(
+        PropositionRelation(
+          and,
+          RoleAssignment(SourceRole.Operand(1), None),
+          ConceptTarget.Node(branch)
+        ),
+        PropositionRelation(and, RoleAssignment.named("time"), ConceptTarget.Node(filler))
+      ),
+      polarity = Map(branch -> Polarity.Positive, filler -> Polarity.Positive),
+      provenance = ChartProvenance(
+        ChartOrigin.Agent(extractor),
+        Vector(call("chart-agent", "coord")),
+        Vector.empty
+      ),
+      sentence = Some(sentences(0).id)
+    )
+    PropositionEvidence.of(ChartValidator.check(unchecked).fold(v => fail(v.toString), identity))
+
+  private val coordinatedBranch = ChartNodeRef(sentences(0).id, ConceptId.unsafe("branch"))
+  private val coordinatedFiller = ChartNodeRef(sentences(0).id, ConceptId.unsafe("filler"))
+
+  test("a situation source is the chart focus, or a direct branch of a coordinating focus") {
+    def context(ref: ChartNodeRef) = ContextAssignmentAttempt(
+      ref,
+      bundle(
+        ContextAssignmentProposal.NarratedWorld,
+        ev0,
+        "context-agent-a",
+        s"coord-context:${ref.key}",
+        additionalProviders = Vector("context-agent-b")
+      )
+    )
+    def membership(ref: ChartNodeRef) = SegmentMembershipAttempt(
+      ref,
+      bundle(
+        SegmentMembershipProposal.PrimaryStoryMember,
+        ev0,
+        "membership-agent-a",
+        s"coord-membership:${ref.key}",
+        additionalProviders = Vector("membership-agent-b")
+      )
+    )
+    def coverage(ref: ChartNodeRef) = ParticipantCoverageAttempt(
+      ref,
+      bundle(ParticipantCoverage.empty, ev0, "coverage-agent", s"coord-coverage:${ref.key}")
+    )
+    val refs = Vector(coordinatedBranch, coordinatedFiller)
+    val result = compile(
+      input(
+        situationAttempts = Vector(
+          SituationAttempt(
+            coordinatedBranch,
+            bundle(situation0, ev0, "situation-agent", "coord-op1")
+          ),
+          SituationAttempt(
+            coordinatedFiller,
+            bundle(situation1, ev0, "situation-agent", "coord-time")
+          )
+        ),
+        chartOrder = Vector(sentences(0).id -> coordinatedChart),
+        contextAttempts = Some(refs.map(context)),
+        membershipAttempts = Some(refs.map(membership)),
+        coverageAttempts = Some(refs.map(coverage))
+      )
+    )
+
+    assertEquals(result.draft.graph.situations.size, 1)
+    assertEquals(
+      result.draft.graph.situations.values.map(_.predicate.lemma).toVector,
+      Vector("enter")
+    )
+    val refused = result.derivation.gaps
+      .find(_.target == NarrativeCandidateAddress.Situation(coordinatedFiller))
+      .getOrElse(fail("the non-branch predicate was not refused"))
+    assert(
+      refused.reason.render.contains(":op/:snt branch of a coordinating focus"),
+      refused.reason.render
+    )
+  }

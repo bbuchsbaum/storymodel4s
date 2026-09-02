@@ -227,7 +227,7 @@ class ChartProposalProviderSuite extends FunSuite:
         SentenceCoverage.NoChart(s2.id)
       )
     )
-    assertEquals(proposals.counts, CoverageCounts(1, 0, 0, 2))
+    assertEquals(proposals.counts, CoverageCounts(1, 0, 0, 0, 2))
     assertEquals(proposals.summaryCoverage, SummaryCoverage.Proposed("Tiny story"))
   }
 
@@ -370,7 +370,7 @@ class ChartProposalProviderSuite extends FunSuite:
     cases.foreach { (chart, anchor, reason) =>
       val proposals = propose(Vector(s0.id -> chart))
       assertEquals(proposals.coverage.head, SentenceCoverage.Abstained(anchor, reason))
-      assertEquals(proposals.counts, CoverageCounts(0, 1, 0, 2))
+      assertEquals(proposals.counts, CoverageCounts(0, 0, 1, 0, 2))
       assertEquals(proposals.situations.map(_.source), Vector(anchor))
       assertEquals(proposals.contexts.map(_.source), Vector(anchor))
       assertEquals(proposals.memberships.map(_.member), Vector(anchor))
@@ -430,7 +430,7 @@ class ChartProposalProviderSuite extends FunSuite:
         SentenceCoverage.NoChart(s2.id)
       )
     )
-    assertEquals(proposals.counts, CoverageCounts(1, 0, 1, 1))
+    assertEquals(proposals.counts, CoverageCounts(1, 0, 0, 1, 1))
     assertEquals(proposals.situations.size, 1)
 
     val compiled = compile(charts)
@@ -613,10 +613,18 @@ class ChartProposalProviderSuite extends FunSuite:
   test("the rules text is pinned by its checksum, so a rule change is a visible change") {
     assertEquals(
       ChartProposalProvider.Prompt.checksum.hex,
-      "05cdb836a9768d9891368abb41cff1b7ec92ab3b042d3a8cf23bfc05de822d1b"
+      "70333fc4c70a3631edbffcb825990174046c09b4ae02489d8015c7b0827b8142"
     )
-    assert(ChartProposalProvider.RulesText.contains("Never Before or Meets"))
-    assert(ChartProposalProvider.RulesText.contains("time=Time"))
+    val rules = ChartProposalProvider.RulesText
+    assert(rules.contains("Never Before or Meets"))
+    assert(rules.contains("time=Time"))
+    // Slice 1.5's three admissions are stated here, so deleting one moves the checksum above and
+    // the prompt-package checksum and provenance config hash with it.
+    assert(rules.contains("{and, multi-sentence, or}"), "the coordination set is not stated")
+    assert(rules.contains(":domain (h / he)"), "the predicative rule is not stated")
+    assert(rules.contains(":location (e / egulac)"), "the existential rule is not stated")
+    assert(rules.contains("span-source=branch-alignments"), "branch support is not stated")
+    assert(rules.contains("domain=Custom(amr,domain)"), "the domain role is not in the table")
   }
 
   test("chart order and alignment order do not change the proposals or the fingerprint") {
@@ -965,7 +973,7 @@ class ChartProposalProviderSuite extends FunSuite:
         SentenceCoverage.NoChart(s2.id)
       )
     )
-    assertEquals(proposals.counts, CoverageCounts(0, 0, 0, 3))
+    assertEquals(proposals.counts, CoverageCounts(0, 0, 0, 0, 3))
     assertEquals(proposals.situations, Vector.empty)
     val compiled = compile(Vector.empty)
     assertEquals(compiled.draft.graph.situations, Map.empty)
