@@ -318,8 +318,8 @@ lazy val media = project
   .dependsOn(core.jvm)
 
 /** JVM-only story-build orchestrator (ADR 0009): text through `provider-agent` charts, the
-  * `ChartProposalProvider`, and `NarrativeCompiler` to a three-file pre-bundle on disk. It owns I/O,
-  * receipt composition, and file layout, and no semantics. No portable module depends on it.
+  * `ChartProposalProvider`, and `NarrativeCompiler` to a three-file pre-bundle on disk. It owns
+  * I/O, receipt composition, and file layout, and no semantics. No portable module depends on it.
   */
 lazy val pipeline = project
   .in(file("pipeline"))

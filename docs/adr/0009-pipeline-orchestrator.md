@@ -159,7 +159,20 @@ the environment opt-in refused with neither directory created; byte-identical fi
 runs; `StoryModelCodec.decode` round-trip to the same content checksum; the exit-status table;
 the three-sentence complete run at exit 0.
 
-Mutation ledger (delete guard → named test red → restore), recorded in the landing commit.
+Mutation ledger, 2026-09-02 (apply mutant → run the project's tests → named test red → restore;
+`git status` clean after every step; logs `mutant-*.log` in the session scratchpad):
+
+| mutant | what was changed | tests that went red |
+|---|---|---|
+| m1 | `ExitStatus.of`: delete the `transportFailures > 0 => Incomplete` case | "the WOG replay court: 50 sentences, three charts, two situations, a partial draft" (1 of 9) |
+| m2 | `StoryPipeline.run`: create `outDir` before `parse` | "a missing recordings directory is refused before any file is written", "record mode without the environment opt-in is refused before touching disk" (2 of 9) |
+| m3 | `BuildSummary.derive`: `validated = compilation.validated.isEmpty` | the WOG court, "removing one recording makes exactly that sentence NoChart and moves nothing else", "a run whose every sentence reached the court exits 0" (3 of 9) |
+| m4 | `BundleJson.coverageRow`: render `NoChart` as `proposed` | the WOG court, the sentence-isolation test (2 of 9) |
+| m5 | `ClaudeParseDriver.run`: drop the `writeSummary` step after `parse` | five `RecordedReplaySuite` tests in provider-agent, first "the driver replays end to end: per-sentence artifacts, a derived ledger, no prose" (5 of 52) |
+
+What this evidence does not establish: the record path against the real SDK (network-free by
+construction; `LiveSmokeSuite` stays skipped), the bundle wrapper of phase 2.2, and the WOG
+numbers once phase 1.4 lands, which the owner has said will land first and will move the pins.
 
 ## Consequences
 
