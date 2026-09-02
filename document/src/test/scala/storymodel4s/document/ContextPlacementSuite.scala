@@ -41,6 +41,42 @@ class ContextPlacementSuite extends FunSuite:
       cached = false
     )
 
+  private def spanIn(at: SurfaceAtlas, unit: SurfaceUnit, word: String): SpanRef =
+    val body = at.text(unit)
+    val place = body.indexOf(word)
+    assert(place >= 0, s"'$word' is not in '$body'")
+    SpanRef(
+      Some(unit.id),
+      TextSpan.unsafe(unit.span.start + place, unit.span.start + place + word.length)
+    )
+
+  private def alignIn(
+      at: SurfaceAtlas,
+      unit: SurfaceUnit,
+      word: String,
+      concept: String
+  ): PropositionAlignment =
+    val spans = SpanSet.one(spanIn(at, unit, word))
+    val evidence = Evidence(
+      EvidenceId.unsafe(s"ev:align:${unit.id.value}:$word"),
+      Some(spans),
+      Set.empty,
+      parser,
+      parserStage
+    )
+    PropositionAlignment(
+      AlignmentTarget.Concepts(NonEmptySet.one(id(concept))),
+      spans,
+      Credence.unsafeRaw(1.0),
+      ClaimMeta.unsafe(
+        ClaimId.unsafe(s"claim:align:${unit.id.value}:$word"),
+        EpistemicStatus.SurfaceExplicit,
+        Credence.unsafeRaw(1.0),
+        NonEmptyVector.one(evidence),
+        Provenance.deterministic("test", Checksum.ofText("test-parser"))
+      )
+    )
+
   private def spanOf(unit: SurfaceUnit, word: String): SpanRef =
     val body = atlas.text(unit)
     val at = body.indexOf(word)
@@ -107,11 +143,18 @@ class ContextPlacementSuite extends FunSuite:
   private val theme =
     RoleAssignment(SourceRole.Numbered(1), Some((ParticipantRole.Theme, Credence.unsafeRaw(0.9))))
 
-  private def compile(charts: Vector[(SurfaceUnitId, PropositionEvidence)]): NarrativeCompilation =
+  private def compileWith(
+      src: StorySource,
+      atl: SurfaceAtlas,
+      charts: Vector[(SurfaceUnitId, PropositionEvidence)]
+  ): NarrativeCompilation =
     val input = ChartProposalProvider
-      .input(source, atlas, charts, None, 0L)
+      .input(src, atl, charts, None, 0L)
       .fold(e => fail(e.message), identity)
     NarrativeCompiler.compile(input).fold(e => fail(e.message), identity)
+
+  private def compile(charts: Vector[(SurfaceUnitId, PropositionEvidence)]): NarrativeCompilation =
+    compileWith(source, atlas, charts)
 
   /** `He said: "I accompanied the ghosts."` — say-01 with its content embedded under ARG1. */
   private def saidChart: PropositionEvidence =
@@ -351,6 +394,157 @@ class ContextPlacementSuite extends FunSuite:
     val read = ContextPlacement.read(far, farAtlas, Vector(saidUnit.id -> chart.chart))
     val last = read.quotations.last
     assertEquals(read.speakers(last), HolderCandidate.Missing(HolderGap.NoCandidate))
+  }
+
+  test("two candidate speakers abstain rather than picking one") {
+    val two = StorySource
+      .titled(
+        "He said and she replied: \"hello.\" \"Nobody knows.\"",
+        StoryTitle.callerSupplied("Two speakers").fold(e => fail(e.message), identity)
+      )
+      .fold(e => fail(e.message), identity)
+    val twoAtlas = SurfaceAnalyzer.analyze(two)
+    val unit = twoAtlas.sentences(0)
+    val chart = PropositionEvidence.of(
+      ChartValidator
+        .check(
+          PropositionChart.unchecked(
+            Some(id("a")),
+            Map(
+              id("a") -> Concept.entity("and"),
+              id("s") -> Concept.predicate("say", frame("say-01")),
+              id("r") -> Concept.predicate("reply", frame("say-01")),
+              id("h") -> Concept.entity("he"),
+              id("w") -> Concept.entity("she"),
+              id("g") -> Concept.predicate("greet", frame("greet-01")),
+              id("g2") -> Concept.predicate("greet", frame("greet-01"))
+            ),
+            Vector(
+              PropositionRelation(
+                id("a"),
+                RoleAssignment(SourceRole.Operand(1), None),
+                ConceptTarget.Node(id("s"))
+              ),
+              PropositionRelation(
+                id("a"),
+                RoleAssignment(SourceRole.Operand(2), None),
+                ConceptTarget.Node(id("r"))
+              ),
+              rel("s", agent, "h"),
+              rel("s", theme, "g"),
+              rel("r", agent, "w"),
+              rel("r", theme, "g2")
+            ),
+            Map(id("s") -> ChartPolarity.Positive, id("r") -> ChartPolarity.Positive),
+            Vector(
+              EmbeddedProposition(id("s"), EmbeddingKind.Speech, id("g")),
+              EmbeddedProposition(id("r"), EmbeddingKind.Speech, id("g2"))
+            ),
+            Vector(
+              alignIn(twoAtlas, unit, "said", "s"),
+              alignIn(twoAtlas, unit, "replied", "r"),
+              alignIn(twoAtlas, unit, "He", "h"),
+              alignIn(twoAtlas, unit, "she", "w"),
+              alignIn(twoAtlas, unit, "hello", "g")
+            ),
+            ChartProvenance(ChartOrigin.Parser(parser), Vector(chartCall("two")), Vector.empty),
+            Some(unit.id)
+          )
+        )
+        .fold(v => fail(v.toString), identity)
+    )
+    // The second quotation is a sentence of its own, so its speaker is looked for one sentence
+    // back and both reporting predicates answer. Two speakers is not one speaker.
+    val second = twoAtlas.sentences(1)
+    val knowsChart = PropositionEvidence.of(
+      ChartValidator
+        .check(
+          PropositionChart.unchecked(
+            Some(id("k")),
+            Map(
+              id("k") -> Concept.predicate("know", frame("know-01")),
+              id("n") -> Concept.entity("nobody")
+            ),
+            Vector(rel("k", agent, "n")),
+            Map(id("k") -> ChartPolarity.Positive),
+            Vector.empty,
+            Vector(
+              alignIn(twoAtlas, second, "knows", "k"),
+              alignIn(twoAtlas, second, "Nobody", "n")
+            ),
+            ChartProvenance(ChartOrigin.Parser(parser), Vector(chartCall("knows")), Vector.empty),
+            Some(second.id)
+          )
+        )
+        .fold(v => fail(v.toString), identity)
+    )
+    val read = ContextPlacement.read(
+      two,
+      twoAtlas,
+      Vector(unit.id -> chart.chart, second.id -> knowsChart.chart)
+    )
+    read.speakers(read.quotations(1)) match
+      case HolderCandidate.Fillers(refs) => assertEquals(refs.length, 2)
+      case other => fail(s"expected two offered speakers, got ${other.render}")
+
+    val model =
+      compileWith(two, twoAtlas, Vector(unit.id -> chart, second.id -> knowsChart))
+    val knows = model.draft.graph.situations.values.find(_.predicate.lemma == "know").get
+    assertEquals(
+      model.draft.graph.contexts(knows.context).kind,
+      ContextKind.Speech(ContextHolder.Unattributed(HolderGap.SeveralCandidates))
+    )
+  }
+
+  test("dialogue attributes to the speaker of its own sentence, not the previous one") {
+    val dialogue = StorySource
+      .titled(
+        "He said: \"one.\" She said: \"two.\"",
+        StoryTitle.callerSupplied("Dialogue").fold(e => fail(e.message), identity)
+      )
+      .fold(e => fail(e.message), identity)
+    val dialogueAtlas = SurfaceAnalyzer.analyze(dialogue)
+    def speechChart(unit: SurfaceUnit, who: String, salt: String): PropositionEvidence =
+      PropositionEvidence.of(
+        ChartValidator
+          .check(
+            PropositionChart.unchecked(
+              Some(id("s")),
+              Map(
+                id("s") -> Concept.predicate("say", frame("say-01")),
+                id("h") -> Concept.entity(who),
+                id("c") -> Concept.predicate("count", frame("count-01"))
+              ),
+              Vector(rel("s", agent, "h"), rel("s", theme, "c")),
+              Map(id("s") -> ChartPolarity.Positive),
+              Vector(EmbeddedProposition(id("s"), EmbeddingKind.Speech, id("c"))),
+              Vector(
+                alignIn(dialogueAtlas, unit, "said", "s"),
+                alignIn(dialogueAtlas, unit, who.capitalize, "h")
+              ),
+              ChartProvenance(ChartOrigin.Parser(parser), Vector(chartCall(salt)), Vector.empty),
+              Some(unit.id)
+            )
+          )
+          .fold(v => fail(v.toString), identity)
+      )
+    val first = speechChart(dialogueAtlas.sentences(0), "he", "d0")
+    val second = speechChart(dialogueAtlas.sentences(1), "she", "d1")
+    val read = ContextPlacement.read(
+      dialogue,
+      dialogueAtlas,
+      Vector(
+        dialogueAtlas.sentences(0).id -> first.chart,
+        dialogueAtlas.sentences(1).id -> second.chart
+      )
+    )
+    assertEquals(read.quotations.size, 2)
+    assertEquals(
+      read.speakers(read.quotations(1)),
+      HolderCandidate.Fillers(
+        NonEmptyVector.one(ChartNodeRef(dialogueAtlas.sentences(1).id, id("h")))
+      )
+    )
   }
 
   // ---- nesting ------------------------------------------------------------------------------

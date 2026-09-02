@@ -277,17 +277,34 @@ object ContextPlacement:
       case EmbeddingKind.Counterfactual => Right(StepKind.Counterfactual)
       case EmbeddingKind.Unknown        => Left(PlacementRefusal.UnknownEmbeddingKind(container))
 
+  /** The speech containers of one sentence whose own words end at or before `before`. */
+  private def containersBefore(
+      unit: SurfaceUnit,
+      before: Int,
+      chartOf: SurfaceUnitId => Option[PropositionChart[Checked]]
+  ): Vector[(PropositionChart[Checked], SurfaceUnit, ConceptId)] =
+    chartOf(unit.id).toVector.flatMap { chart =>
+      chart.embedded
+        .filter(_.kind == EmbeddingKind.Speech)
+        .map(_.container)
+        .distinct
+        .sorted
+        .filter(c => anchorOf(chart, c, unit).endExclusive <= before)
+        .map(c => (chart, unit, c))
+    }
+
   /** The speaker offered for one quotation, or the reason none is.
     *
-    * The lookback is exactly one sentence and it is stated rather than tuned: candidates are the
-    * speech containers of the sentence the opening mark falls in and of the sentence before it,
-    * whose own words end at or before that mark. A reporting predicate further back than that is
-    * not evidence about this quotation, and searching until something is found would attribute
-    * every quotation of a story to whoever last spoke.
+    * The lookback is one sentence and it is stated rather than tuned. Candidates are the speech
+    * containers of the sentence the opening mark falls in, whose own words end at or before that
+    * mark; only when that sentence offers none does the sentence before it answer. Reaching past
+    * that would attribute every quotation of a story to whoever last spoke, and asking both
+    * sentences at once would make ordinary dialogue ambiguous — `He said: "one." She said: "two."`
+    * has one speaker for the second quotation and the containing sentence names it.
     *
     * The rule offers chart nodes; the compiler decides by entity. Two containers in one sentence
-    * pointing at the same word are one speaker, which is why "he said ... and he told ..." can
-    * still attribute.
+    * pointing at the same word are one speaker, which is why `he said ... and he told ...` can
+    * still attribute; two pointing at different words abstain rather than pick.
     */
   def speakerOf(
       quotation: TextSpan,
@@ -295,19 +312,13 @@ object ContextPlacement:
       chartOf: SurfaceUnitId => Option[PropositionChart[Checked]]
   ): HolderCandidate =
     val opening = atlas.unitAt(quotation.start, SurfaceUnitKind.Sentence)
-    val units = opening.toVector.flatMap { u =>
-      Vector(Some(u), atlas.sentences.find(_.ordinal == u.ordinal - 1)).flatten
-    }
-    val rows = units.flatMap { u =>
-      chartOf(u.id).toVector.flatMap { chart =>
-        chart.embedded
-          .filter(_.kind == EmbeddingKind.Speech)
-          .map(_.container)
-          .distinct
-          .filter(c => anchorOf(chart, c, u).endExclusive <= quotation.start)
-          .map(c => (chart, u, c))
-      }
-    }
+    val own = opening.toVector.flatMap(u => containersBefore(u, quotation.start, chartOf))
+    val rows =
+      if own.nonEmpty then own
+      else
+        opening.toVector
+          .flatMap(u => atlas.sentences.find(_.ordinal == u.ordinal - 1))
+          .flatMap(u => containersBefore(u, quotation.start, chartOf))
     val refs = rows
       .flatMap((chart, u, container) =>
         holderCandidate(chart, container, u) match
