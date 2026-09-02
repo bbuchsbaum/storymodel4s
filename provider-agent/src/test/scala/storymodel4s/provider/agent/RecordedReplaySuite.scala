@@ -207,7 +207,7 @@ class RecordedReplaySuite extends FunSuite:
     val work = Files.createTempDirectory("provider-agent-replay-captured")
     val (textPath, one) = oneSentenceBatch(work, "one.txt", "They came down the river.")
     val store = Recordings.at(work.resolve("rec")).fold(e => fail(e.message), identity)
-    val key = ClaudeParseDriver.recordingKeys(runtime, prompt, one).head
+    val key = ClaudeParseDriver.recordingKeys(backend, prompt, one).head
     store.write(key, captured(penman(2), 777L)).fold(e => fail(e.toString), identity)
     val outDir = work.resolve("out")
     val summary = ClaudeParseDriver
@@ -226,7 +226,7 @@ class RecordedReplaySuite extends FunSuite:
   test("record mode with a scripted client captures once, then replays it as captured") {
     val work = Files.createTempDirectory("provider-agent-record-scripted")
     val (textPath, one) = oneSentenceBatch(work, "one.txt", "They came down the river.")
-    val key = ClaudeParseDriver.recordingKeys(runtime, prompt, one).head
+    val key = ClaudeParseDriver.recordingKeys(backend, prompt, one).head
     val recordingsDir = work.resolve("rec")
     val source = scripted(Map(key -> captured(penman(2), 555L)))
     val first = ClaudeParseDriver
@@ -253,7 +253,7 @@ class RecordedReplaySuite extends FunSuite:
     val work = Files.createTempDirectory("provider-agent-record-corrupt")
     val (textPath, two) =
       oneSentenceBatch(work, "two.txt", "They came down the river. There were people at Egulac.")
-    val keys = ClaudeParseDriver.recordingKeys(runtime, prompt, two)
+    val keys = ClaudeParseDriver.recordingKeys(backend, prompt, two)
     assertEquals(keys.size, 2)
     val store = Recordings.at(work.resolve("rec")).fold(e => fail(e.message), identity)
     Files.write(store.path(keys(0)), "{ not json".getBytes(StandardCharsets.UTF_8))

@@ -8,15 +8,21 @@ import java.nio.file.{Files, Path}
 import scala.util.control.NonFatal
 import storymodel4s.core.Checksum
 
-/** Content-derived identity of one model exchange: the user-message template version, model id,
-  * prompt package, prompt text, token budget, the sentence's text checksum, and the token list.
-  * Never the caller's request id, so the same sentence replays under any batch layout.
+/** Content-derived identity of one model exchange: the user-message template version, the provider
+  * label and model id, prompt package, prompt text, token budget, the sentence's text checksum, and
+  * the token list. Never the caller's request id, so the same sentence replays under any batch
+  * layout.
+  *
+  * Why the provider label joined the key material in `v2` (2026-09-02): a hosted model and a local
+  * OpenAI-compatible server can advertise the same model id, and under `v1` their replies would
+  * have shared one file. The domain moved from `v1` to `v2` in the same change, because a key
+  * schema that did not move when a field was added would let two incompatible framings share a tag.
   */
 object RecordingKey:
   opaque type RecordingKey = Checksum
 
   private[agent] def of(
-      model: String,
+      backend: ModelBackend,
       promptPackageChecksum: Checksum,
       promptTextChecksum: Checksum,
       maxTokens: Long,
@@ -24,10 +30,11 @@ object RecordingKey:
       tokens: Vector[RequestToken]
   ): RecordingKey =
     AgentIdentity.digest(
-      "agent-recording/v1",
+      "agent-recording/v2",
       Vector(
         ModelRequest.TemplateVersion,
-        model,
+        backend.provider,
+        backend.model,
         promptPackageChecksum.hex,
         promptTextChecksum.hex,
         maxTokens.toString,

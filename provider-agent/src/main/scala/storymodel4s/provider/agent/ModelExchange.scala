@@ -70,9 +70,14 @@ object ModelRequest:
   /** Version of the user-message rendering below; it participates in every recording key. */
   val TemplateVersion: String = "storymodel4s.provider.agent.user-message/v1"
 
-  /** Render the user message from the sentence and its token list, and derive the key. */
+  /** Render the user message from the sentence and its token list, and derive the key.
+    *
+    * Why the whole backend and not a model id: the provider label and the model id are one identity
+    * and must move together, so passing them separately would let a caller key an Anthropic request
+    * under an OpenAI-compatible label.
+    */
   private[agent] def render(
-      model: String,
+      backend: ModelBackend,
       prompt: AgentPromptPackage,
       item: RequestItem,
       maxTokens: Long,
@@ -81,14 +86,21 @@ object ModelRequest:
     val tokenLines = item.tokens.zipWithIndex.map { (token, index) => s"$index: ${token.text}" }
     val userMessage = (Vector(s"Sentence: ${item.text}", "Tokens:") ++ tokenLines).mkString("\n")
     val key = RecordingKey.of(
-      model,
+      backend,
       prompt.ref.checksum,
       prompt.promptTextChecksum,
       maxTokens,
       item.textChecksum,
       item.tokens
     )
-    new ModelRequest(model, prompt.systemPrompt, userMessage, maxTokens, timeoutMillis, key)
+    new ModelRequest(
+      backend.model,
+      prompt.systemPrompt,
+      userMessage,
+      maxTokens,
+      timeoutMillis,
+      key
+    )
 
 /** Why an exchange produced no reply; every case maps to one sanitized transport failure. */
 enum ExchangeFailure:
@@ -100,6 +112,11 @@ enum ExchangeFailure:
   case ConnectionFailed(reasonChecksum: Checksum)
   case Timeout(limitMillis: Long)
 
+  /** The provider answered with 2xx and a body this module could not read as one reply. Distinct
+    * from a service error, because the call was made and may have been billed.
+    */
+  case ReplyUndecodable(reasonChecksum: Checksum)
+
   def code: ProviderFailureCode = this match
     case RecordingMissing(_)       => AgentFailureCodes.RecordingMissing
     case RecordingCorrupt(_, _)    => AgentFailureCodes.RecordingCorrupt
@@ -108,18 +125,32 @@ enum ExchangeFailure:
     case ServiceError(status)      => AgentFailureCodes.serviceError(status)
     case ConnectionFailed(_)       => AgentFailureCodes.ConnectionFailed
     case Timeout(_)                => AgentFailureCodes.ConnectionFailed
+    case ReplyUndecodable(_)       => AgentFailureCodes.ReplyUndecodable
 
   /** A timeout keeps its limit; every other failure is an I/O code with no provider prose. */
   def toTransport: TransportFailure = this match
     case Timeout(limit) => TransportFailure.Timeout(limit)
     case other          => TransportFailure.Io(other.code)
 
-/** Something that completes one rendered request. The SDK-backed implementation is
-  * `LiveModelClient`; `ScriptedModelClient` is the offline stand-in that lets the record path be
-  * exercised without spend.
+/** Something that completes one rendered request. Three implementations exist and no more is
+  * intended: `LiveModelClient` (the Anthropic SDK), `OpenAiCompatibleModelClient` (any
+  * chat-completions server), and `ScriptedModelClient`, the offline stand-in that lets the record
+  * path be exercised without spend.
+  *
+  * Why one method taking one value rather than a function parameter anywhere: a factory that
+  * accepted `ModelRequest => ...` would let a caller supply behaviour the credential court never
+  * admitted, and nothing in a receipt would say so.
   */
 trait ModelClient:
   def complete(request: ModelRequest): Either[ExchangeFailure, ModelReply]
+
+object ModelClient:
+  /** The live client an admitted authorization implies. The backend is decided by the environment
+    * court that minted the authorization, so no call site chooses a provider.
+    */
+  def live(authorization: LiveAuthorization): ModelClient = authorization match
+    case anthropic: LiveAuthorization.Anthropic => LiveModelClient.from(anthropic)
+    case openAi: LiveAuthorization.OpenAiCompatible => OpenAiCompatibleModelClient.from(openAi)
 
 /** An offline client answering from a fixed table by recording key; every unknown key gets the same
   * typed failure. It holds no credentials and cannot spend, by construction.

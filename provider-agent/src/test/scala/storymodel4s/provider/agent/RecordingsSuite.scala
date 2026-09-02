@@ -14,7 +14,7 @@ class RecordingsSuite extends FunSuite:
   private val single = ParserBatch.validated(Vector(first)).toOption.get
 
   private def keyOf(item: RequestItem, promptPackage: AgentPromptPackage = prompt): RecordingKey =
-    ModelRequest.render(runtime.model, promptPackage, item, 4096L, 1000L).key
+    ModelRequest.render(backend, promptPackage, item, 4096L, 1000L).key
 
   test("the recording key is content-derived: request ids do not participate") {
     val item = requestItem(first)
@@ -33,16 +33,16 @@ class RecordingsSuite extends FunSuite:
     assertNotEquals(keyOf(item), keyOf(item, otherPrompt))
     assertNotEquals(
       keyOf(item),
-      ModelRequest.render("claude-other", prompt, item, 4096L, 1000L).key
+      ModelRequest.render(ModelBackend.Anthropic("claude-other"), prompt, item, 4096L, 1000L).key
     )
     assertNotEquals(
       keyOf(item),
-      ModelRequest.render(runtime.model, prompt, item, 8192L, 1000L).key,
+      ModelRequest.render(backend, prompt, item, 8192L, 1000L).key,
       "the token budget did not reach the key"
     )
     assertEquals(
       keyOf(item),
-      ModelRequest.render(runtime.model, prompt, item, 4096L, 999999L).key,
+      ModelRequest.render(backend, prompt, item, 4096L, 999999L).key,
       "the timeout must not reach the key"
     )
   }

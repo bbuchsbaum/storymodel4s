@@ -231,7 +231,7 @@ object StoryPipeline:
       outDir: Path,
       env: Map[String, String],
       nowEpochMillis: Long,
-      source: ExchangeSource = ExchangeSource.Anthropic
+      source: ExchangeSource = ExchangeSource.Court
   ): Either[PipelineError, BuildSummary] =
     for
       parsed <- ClaudeParseDriver

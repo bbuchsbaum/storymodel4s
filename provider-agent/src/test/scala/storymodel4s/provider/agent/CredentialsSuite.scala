@@ -46,7 +46,11 @@ class CredentialsSuite extends FunSuite:
       Left(LiveRefusal.ApiKeyAbsent(PrimaryKeyVariable, FallbackKeyVariable))
     )
     val admitted = liveAuthorization(Map(LiveVariable -> "1", FallbackKeyVariable -> "value"))
-    assertEquals(admitted.map(_.apiKey.secret), Right("value"))
+    admitted match
+      case Right(anthropic: LiveAuthorization.Anthropic) =>
+        assertEquals(anthropic.apiKey.secret, "value")
+        assertEquals(anthropic.backend, ModelBackend.Anthropic("claude-sonnet-5"))
+      case other => fail(s"expected an admitted anthropic authorization, got $other")
   }
 
   test("the driver mode court accepts only replay and record") {
