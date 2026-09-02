@@ -17,13 +17,32 @@ object WorkerRealization:
       "print('scenedetect ' + scenedetect.__version__ + ' python ' + platform.python_version() + " +
       "' numpy ' + numpy.__version__ + ' opencv ' + cv2.__version__)"
 
-  /** Observe the worker: hash the script and ask `python` for its runtime line. Refuses when the
-    * script is unreadable or the interpreter does not answer cleanly with one line.
+  val CaptionToolName: String = "caption-worker"
+
+  /** The captioning worker's runtime line: mlx-vlm and mlx versions plus the interpreter. */
+  private val CaptionVersionProgram: String =
+    "import platform, mlx_vlm, mlx.core as mx; " +
+      "print('mlx_vlm ' + mlx_vlm.__version__ + ' mlx ' + mx.__version__ + ' python ' + platform.python_version())"
+
+  /** Observe the boundary worker: hash the script and ask `python` for its runtime line. Refuses
+    * when the script is unreadable or the interpreter does not answer cleanly with one line.
     */
   def observe(python: Path, script: Path): Either[DomainError, ToolRealization] =
+    observe(python, script, ToolName, VersionProgram)
+
+  /** Observe the captioning worker the same way, under its own runtime line. */
+  def observeCaption(python: Path, script: Path): Either[DomainError, ToolRealization] =
+    observe(python, script, CaptionToolName, CaptionVersionProgram)
+
+  private def observe(
+      python: Path,
+      script: Path,
+      name: String,
+      program: String
+  ): Either[DomainError, ToolRealization] =
     for
       bytes <- scriptBytes(script)
-      outcome <- Subprocess.run(Vector(python.toString, "-c", VersionProgram))
+      outcome <- Subprocess.run(Vector(python.toString, "-c", program))
       line <- outcome.stdout.linesIterator.find(_.trim.nonEmpty) match
         case Some(l) if outcome.exitCode == 0 => Right(l.trim)
         case _                                =>
@@ -33,7 +52,7 @@ object WorkerRealization:
               s"interpreter exited ${outcome.exitCode} without a runtime line: ${outcome.stderr.trim.take(200)}"
             )
           )
-      tool <- ToolRealization.of(ToolName, line, Checksum.ofBytes(bytes))
+      tool <- ToolRealization.of(name, line, Checksum.ofBytes(bytes))
     yield tool
 
   private def scriptBytes(script: Path): Either[DomainError, Array[Byte]] =

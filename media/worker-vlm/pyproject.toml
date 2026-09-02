@@ -1,0 +1,16 @@
+[project]
+name = "storymodel4s-media-worker-vlm"
+version = "0.1.0"
+description = "Untrusted captioning worker for the storymodel4s media court: runs a pinned Qwen3-VL-Instruct revision over frame extents the JVM adapter identified, returns timed visual descriptions as proposals. Owns no source evidence, never opens a media file, never computes a timestamp."
+requires-python = ">=3.13,<3.14"
+dependencies = [
+  "mlx-vlm==0.6.17",
+  "mlx==0.32.2",
+  "huggingface-hub",
+  "numpy",
+  "pillow",
+  "jinja2",
+]
+
+[tool.uv]
+package = false

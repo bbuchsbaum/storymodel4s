@@ -1,0 +1,14 @@
+{
+  "schema" : "storymodel4s.provider.agent.recording/v1",
+  "model" : "claude-sonnet-5",
+  "origin" : "captured",
+  "stopReason" : "end_turn",
+  "reportedModel" : "claude-sonnet-5",
+  "usage" : {
+    "inputTokens" : 91,
+    "outputTokens" : 343,
+    "cacheReadInputTokens" : 1275
+  },
+  "durationMillis" : 5173,
+  "text" : "(a / and~e.6\n   :op1 (f / feel-01~e.3 :polarity - :ARG0 (h / he~e.0) :ARG1 (s / sick~e.4))\n   :op2 (s2 / say-01~e.8\n            :ARG0 (t / they~e.7)\n            :ARG1 (h2 / hit-01~e.12 :ARG1 (h3 / he~e.9))))"
+}

@@ -1,0 +1,14 @@
+{
+  "schema" : "storymodel4s.provider.agent.recording/v1",
+  "model" : "claude-sonnet-5",
+  "origin" : "captured",
+  "stopReason" : "end_turn",
+  "reportedModel" : "claude-sonnet-5",
+  "usage" : {
+    "inputTokens" : 70,
+    "outputTokens" : 120,
+    "cacheReadInputTokens" : 1275
+  },
+  "durationMillis" : 4044,
+  "text" : "(g / go-02~e.5\n   :ARG0 (m / man~e.4 :quant 2~e.2 :mod (y / young~e.3))\n   :time (n / night~e.1 :quant 1~e.0)\n   :purpose (h / hunt-01~e.7\n       :ARG0 m\n       :ARG1 (s / seal~e.8)))"
+}

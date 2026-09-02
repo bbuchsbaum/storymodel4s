@@ -1,0 +1,14 @@
+{
+  "schema" : "storymodel4s.provider.agent.recording/v1",
+  "model" : "claude-sonnet-5",
+  "origin" : "captured",
+  "stopReason" : "end_turn",
+  "reportedModel" : "claude-sonnet-5",
+  "usage" : {
+    "inputTokens" : 44,
+    "outputTokens" : 56,
+    "cacheReadInputTokens" : 1275
+  },
+  "durationMillis" : 1711,
+  "text" : "(c / come-01~e.1\n   :ARG1 (t / they~e.0)\n   :path (r / river~e.4)\n   :direction (d / down~e.2))"
+}

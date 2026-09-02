@@ -296,6 +296,33 @@ class BoundarySearchSuite extends FunSuite:
     )
 
   test(
+    "a double that reaches an identity is finite and canonical: equal recipes have one identity"
+  ):
+    // Measured 2026-09-02: `-0.0` is reachable from JSON, `-0.0 == 0.0` is true, and the two render
+    // differently, so an identity built from the raw value would give two identities for one value.
+    val negativeZero = request.recipe.copy(deltaEdges = -0.0)
+    assertEquals(negativeZero, request.recipe, "the two recipes are equal")
+    assertEquals(negativeZero.identity, request.recipe.identity, "so they must have one identity")
+    // A JSON literal outside the double range parses to an infinity; the wire reader refuses it.
+    val requestText = text(detectorEnvelope.requestFile)
+    val infinite = requestText.replaceFirst("\"threshold\": 15.0", "\"threshold\": 1e400")
+    assert(infinite != requestText)
+    DetectorRequest.parse(infinite) match
+      case Left(DomainError.InvalidFormat(k, _, r)) =>
+        assertEquals(k, "detector.threshold")
+        assert(r.contains("finite"), r)
+      case other => fail(s"expected a finite-number refusal, got $other")
+    // A non-finite score cannot reach a proposal identity either.
+    val infScore = outcome.copy(metrics =
+      outcome.metrics.map(m =>
+        if m.ordinal == 14 then
+          m.copy(values = m.values.updated(DetectorOutcome.ScoreKey, Double.PositiveInfinity))
+        else m
+      )
+    )
+    refusedAt(joinWith(out = infScore), "boundary/score")
+
+  test(
     "a localization proposal carries no morphology and binds its recipe; a claim needs a morphology supplied separately"
   ):
     val proposal = result.proposals.head

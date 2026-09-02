@@ -1,0 +1,14 @@
+{
+  "schema" : "storymodel4s.provider.agent.recording/v1",
+  "model" : "claude-sonnet-5",
+  "origin" : "captured",
+  "stopReason" : "end_turn",
+  "reportedModel" : "claude-sonnet-5",
+  "usage" : {
+    "inputTokens" : 46,
+    "outputTokens" : 62,
+    "cacheReadInputTokens" : 1275
+  },
+  "durationMillis" : 1520,
+  "text" : "(g / go-02~e.3\n   :ARG0 (p / person~e.2 :quant plural)\n   :destination (h / home~e.4)\n   :time (t / then~e.0))"
+}

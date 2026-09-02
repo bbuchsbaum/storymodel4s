@@ -1,0 +1,14 @@
+{
+  "schema" : "storymodel4s.provider.agent.recording/v1",
+  "model" : "claude-sonnet-5",
+  "origin" : "captured",
+  "stopReason" : "end_turn",
+  "reportedModel" : "claude-sonnet-5",
+  "usage" : {
+    "inputTokens" : 58,
+    "outputTokens" : 34,
+    "cacheReadInputTokens" : 1275
+  },
+  "durationMillis" : 1649,
+  "text" : "(m / man~e.3 :quant 5~e.2 :location (c / canoe~e.6))"
+}

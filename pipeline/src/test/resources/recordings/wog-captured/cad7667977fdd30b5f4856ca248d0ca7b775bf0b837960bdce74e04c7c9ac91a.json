@@ -1,0 +1,14 @@
+{
+  "schema" : "storymodel4s.provider.agent.recording/v1",
+  "model" : "claude-sonnet-5",
+  "origin" : "captured",
+  "stopReason" : "end_turn",
+  "reportedModel" : "claude-sonnet-5",
+  "usage" : {
+    "inputTokens" : 88,
+    "outputTokens" : 278,
+    "cacheReadInputTokens" : 1275
+  },
+  "durationMillis" : 4356,
+  "text" : "(t / think-01~e.2\n   :ARG0 (h / he~e.1)\n   :ARG1 (g / ghost~e.9\n            :domain (t2 / they~e.7)\n            :expressive (o / oh~e.5))\n   :time (n / now~e.0))"
+}

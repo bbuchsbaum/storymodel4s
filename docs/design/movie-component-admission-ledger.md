@@ -106,7 +106,9 @@ components.
 | `feature.audio` | CLAP, OpenBEATs | `CandidateOnly` | `HoldUnknown` | `Measurement` | `Unresolved` | `Unresolved` | Later audio-feature court only; exact artifact and preprocessing not selected |
 | `feature.audiovisual` | PE-AV and related shared AV spaces | `CandidateOnly` | `HoldUnknown` | `Measurement` | `Unresolved` | `Unresolved` | Later joint-feature court only; exact artifact, modality coverage, and preprocessing not selected |
 | `audio.separation` | SAM Audio and related source-separation models | `Deferred` | `HoldUnknown` | `Proposal` | `Unresolved` | `Unresolved` | Optional derived-evidence tool only; no exact code, weights, prompts, runtime, or stem-retention policy selected |
-| `interpret.multimodal` | Qwen-family vision or omni models, Vid2Seq, ActionFormer/TriDet | `Deferred` | `HoldUnknown` | `Unresolved` | `Unresolved` | `Unresolved` | Bounded proposal/critique only; no exact variant, role, runtime, or service selected |
+| `interpret.multimodal` | Qwen-family vision or omni models, Vid2Seq, ActionFormer/TriDet | `Deferred` | `HoldUnknown` | `Unresolved` | `Unresolved` | `Unresolved` | Bounded proposal/critique only; no exact variant, role, runtime, or service selected — superseded for the captioning court by the two `caption.qwen3vl.*` rows below (record: `docs/design/vlm-captioning-admission-record.md`, 2026-09-01) |
+| `caption.qwen3vl.8b` | `Qwen/Qwen3-VL-8B-Instruct` @ `0c351dd01ed8` | `Nominated` (captioning court; §10.4 visual-only and late-fusion arms) | `PaperworkAdmitted` for local research use (card `apache-2.0`, ungated; owner decision 2026-09-02); redistribution `HoldUnknown` | `Proposal` | `LocalRecipe` | `RecipeOnly` | Timed visual descriptions as proposals over frames the `media` module identified; cannot own time or self-accept; see the admission record §4 |
+| `caption.qwen3vl.4b` | `Qwen/Qwen3-VL-4B-Instruct` @ `ebb281ec70b0` | `Nominated` (local adapter court only) | as above | `Proposal` | `LocalRealized` | `Realized(30a01a05…, 046296a2…)` (2026-09-02; record §10) | Adapter, receipts, preprocessing identity and replay proven on F0; the 8B arm is not realized |
 | `diarization.sortformer` | Sortformer family | `Deferred` | `HoldUnknown` | `Proposal` | `Unresolved` | `Unresolved` | Research menu only; no exact artifact selected |
 
 `Big Buck Bunny`, Sintel, FilmFestival, Sherlock, Brain Treebank, MF2, and the
@@ -329,6 +331,28 @@ Beads executed under this authorization: `bd-01M1FDNN3T4SKZ5ZJN1XGXYNY7`
 archive and inner-file hashes, derivation script, CC BY 3.0 attribution, and
 recorded probe, decode and detector run under `media/src/test/resources/f1/`).
 
+### 6.3 Captioning lane authorization (2026-09-01, single-developer mode)
+
+Owner instruction of 2026-09-01: "proceed with Qwen3 but we'll be flexible".
+Scope, in the form of §6.1:
+
+1. Components: `caption.qwen3vl.4b` first (local adapter court), then
+   `caption.qwen3vl.8b` (calibration arm), both at the pinned revisions of
+   `docs/design/vlm-captioning-admission-record.md`; a further model may join on
+   the same terms as an additional comparison arm, never by substitution mid
+   comparison.
+2. Inputs: frames the `media` module has identified by PTS (F0, F1; Sherlock
+   only under the §10.4 predeclared design), never a media file or URL.
+3. Outputs: `Proposal` only, `Draft` authority, re-anchored to PTS by the adapter;
+   no caption becomes a `TimedSegment` without a receipt-carrying adapter.
+4. Realization gate: the weights-licence leaf of the record's §3 was an owner
+   decision (`unknown is not admitted`). Decided 2026-09-02 ("this is research,
+   let's not sweat the license for now"): the card's `apache-2.0` declaration is
+   the licence of record for local research use; redistribution stays
+   `HoldUnknown`. Weights may be fetched at the pinned revisions and verified
+   against the repository's LFS digests. Nothing gated is touched; no remote
+   service is used.
+
 ### 6.2 Local realizations: five-axis records
 
 §1 says only a `Realized(digest)` record may make claims about executable
@@ -341,6 +365,8 @@ the owner's workstation, not nominated for any distributed court.
 |---|---|---|---|---|---|---|---|
 | `decode.ffmpeg.local-homebrew-7.1.1` | Homebrew `ffmpeg/7.1.1_3` (`ffprobe` and `ffmpeg` front ends) | `CandidateOnly` | `PaperworkAdmitted` for local execution only; redistribution `Incompatible` with the §4 LGPL-only policy (built `--enable-gpl --enable-version3 --enable-libx264`, network, devices and hardware acceleration enabled: every entry of §4's forbidden-configuration row) | `DeterministicTransform` | `LocalRealized` | `Realized(83f66b74…)` for `ffprobe`, `Realized(14c12cd5…)` for `ffmpeg`; libraries below | Produces the recorded F0/F1 probes and decodes. Every output is `Draft`. Not the nominated 9.0.1 recipe; a probe replayed under 9.0.1 is a different derivation by construction (`ToolRealization` enters every receipt). Invocations pass `-protocol_whitelist file`; stderr is not receipted. |
 | `boundary.pyscenedetect.content.local-venv` | `scenedetect-headless` 0.7.1 from the §5 wheel digest, in a local venv (CPython 3.13.11, numpy 2.5.2, opencv-python-headless 5.0.0), driven by `media/worker/scenedetect_worker.py` | `CandidateOnly` | `PaperworkAdmitted` (BSD-3-Clause wheel, hash-pinned in `media/worker/uv.lock`); transitive native notices `HoldUnknown` | `Measurement` + `Proposal` | `LocalRealized` | `Realized(47424d09…)` for the worker script; wheel `0594131c…` | Raw metrics and boundary-existence/localization proposals only, through `process_frame`. No container, no SBOM. `ToolRealization` for the worker covers the script bytes and runtime versions, not the wheel bytes. |
+| `caption.qwen3vl.4b` (realized) | `Qwen/Qwen3-VL-4B-Instruct` @ `ebb281ec70b0`, two safetensors shards fetched 2026-09-02 and verified against the repository's LFS digests; `config.json` `edac7703…` | `Nominated` | `PaperworkAdmitted` for local research use (owner decision 2026-09-02); redistribution `HoldUnknown` | `Proposal` | `LocalRealized` | `Realized(30a01a05…, 046296a2…)` | Loaded only by the worker below after re-verifying the shards. Not committed (ignored `tmp/models/`). |
+| `caption.worker.local-venv` | `media/worker-vlm/caption_worker.py` on `mlx-vlm` 0.6.17 / `mlx` 0.32.2 (MIT), CPython 3.13.11, hash-pinned in `media/worker-vlm/uv.lock` | `Nominated` | `PaperworkAdmitted` (MIT wheels); transitive native notices `HoldUnknown` | runtime for `Proposal` | `LocalRealized` | `Realized(22e9d20a…)` for the script; wheel bytes unhashed | Offline (switches forced on and reported); verifies every pinned model file and refuses unlisted weights; presents frames as an image sequence; the processor grids evidence the applied pixel limits; two F0 runs byte-identical. No container, no SBOM. |
 | `decode.ffmpeg` (the nominated component, realized) | FFmpeg 9.0.1 "Lei" built from `ffmpeg-9.0.1.tar.xz` (sha256 `cf38e0e28c7e5605942c4a77755349b0145804a397af37eb1fb4c77cb237f635`), signature verified in a temporary keyring against the release key fetched from `https://ffmpeg.org/ffmpeg-devel.asc` (primary fingerprint equal to the §4 record), by `media/tools/build_ffmpeg_9.0.1.sh` | `Nominated` | `PaperworkAdmitted` for local use; LGPL-only and free of every §4 forbidden flag, so eligible for the §4 redistribution policy once a corresponding-source bundle exists (`HoldUnknown` until then) | `DeterministicTransform` | `LocalRealized` | `Realized(13d17dfd…)` `ffprobe`, `Realized(85c119a5…)` `ffmpeg` | The recorded realization behind every committed envelope since 2026-09-01 evening. Static, so each digest covers its demuxing and decoding code; dynamic dependencies are Apple system frameworks only (libSystem, CoreFoundation, CoreVideo, CoreMedia). Two builds were made (the first without `--disable-videotoolbox --disable-audiotoolbox`); their bytes differ, so the recipe is not described as reproducible. No SBOM, no OCI image. |
 
 Deviations of the realized 9.0.1 build from the §4 candidate configure line,
@@ -363,6 +389,7 @@ difference is the tool's, lives in the tool identity, and is why the live
 courts compare the picture table under any tool and the full table only under
 the recorded binary. The Homebrew rows above remain as the record of the first
 recordings; the committed envelopes now name the 9.0.1 binaries.
+
 
 Shared libraries loaded by both FFmpeg front ends (`otool -L`, SHA-256 of the
 resolved dylib), recorded because the front-end digest alone does not name

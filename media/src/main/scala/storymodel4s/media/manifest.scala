@@ -356,8 +356,23 @@ private[media] object MediaJson:
   def optionalInt(c: ACursor, field: String): Either[DomainError, Option[Int]] =
     if c.focus.forall(_.isNull) then Right(None) else int(c, field).map(Some(_))
 
+  /** A finite double. Why finite: a JSON literal outside the double range parses to an infinity,
+    * and an infinity or NaN in a recipe would enter a checksum preimage and, for NaN, break the
+    * type's own equality. Both are refused at the wire rather than carried.
+    */
   def double(c: ACursor, field: String): Either[DomainError, Double] =
-    c.as[Double].left.map(_ => DomainError.InvalidFormat(field, absent(c), "expected a number"))
+    c.as[Double]
+      .left
+      .map(_ => DomainError.InvalidFormat(field, absent(c), "expected a number"))
+      .flatMap { d =>
+        if d.isFinite then Right(canonicalDouble(d))
+        else Left(DomainError.InvalidFormat(field, d.toString, "expected a finite number"))
+      }
+
+  /** `-0.0` and `0.0` are `==` but render differently, so a preimage built from either would give
+    * two identities for one value. Every double that reaches an identity passes through here.
+    */
+  def canonicalDouble(d: Double): Double = if d == 0.0 then 0.0 else d
 
   def boolean(c: ACursor, field: String): Either[DomainError, Boolean] =
     c.as[Boolean].left.map(_ => DomainError.InvalidFormat(field, absent(c), "expected a boolean"))

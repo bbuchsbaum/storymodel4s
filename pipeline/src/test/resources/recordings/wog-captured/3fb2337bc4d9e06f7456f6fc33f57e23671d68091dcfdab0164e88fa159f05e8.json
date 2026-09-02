@@ -1,0 +1,14 @@
+{
+  "schema" : "storymodel4s.provider.agent.recording/v1",
+  "model" : "claude-sonnet-5",
+  "origin" : "captured",
+  "stopReason" : "end_turn",
+  "reportedModel" : "claude-sonnet-5",
+  "usage" : {
+    "inputTokens" : 132,
+    "outputTokens" : 1431,
+    "cacheReadInputTokens" : 1275
+  },
+  "durationMillis" : 14670,
+  "text" : "(s / say-01~e.4\n   :ARG0 (p / person~e.1 :ARG1-of (i / include-91~e.2 :ARG2 (t / they~e.3)))\n   :ARG1 (m / multi-sentence\n        :snt1 (g / go-02~e.11 :ARG0 (w / we~e.10) :destination (h / home~e.12) :manner (q / quick~e.7))\n        :snt2 (s2 / shoot-01~e.18 :ARG1 (i2 / indian~e.15 :mod (t2 / that~e.14))))\n   :time (n / now~e.0))"
+}

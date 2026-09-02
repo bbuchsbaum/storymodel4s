@@ -158,8 +158,13 @@ final class BuildSummary private (
       s"validated=$validated, fingerprint=${fingerprint.short()})"
 
 object BuildSummary:
-  /** Refuse a compilation whose receipt does not carry this parse: its stage list must contain the
-    * parser stage `parse` established, and its source checksum must be the parsed story's.
+  /** Refuse a compilation whose receipt does not carry this parse: its stage list must name the
+    * parser stage `parse` established, carrying the digest of exactly the charts that were
+    * compiled, and its source checksum must be the parsed story's.
+    *
+    * Why the digest is re-derived here rather than compared to the driver's: since the provider
+    * derives the parser stage's digest from the charts themselves, comparing the driver's own
+    * receipt digest would compare two different things. Re-deriving keeps the check load-bearing.
     */
   private[pipeline] def derive(
       parsed: ParseOutcome,
@@ -169,11 +174,13 @@ object BuildSummary:
   ): Either[PipelineError, BuildSummary] =
     val receipt = compilation.receipt
     val report = compilation.validation.report
-    if !receipt.stages.contains(parsed.parserStage) then
+    val expectedParserStage =
+      (parsed.parserStage._1, ChartProposalProvider.chartsDigest(parsed.charts))
+    if !receipt.stages.contains(expectedParserStage) then
       Left(
         PipelineError.ReceiptMismatch(
-          s"receipt lacks parser stage ${parsed.parserStage._1.value}=" +
-            parsed.parserStage._2.short()
+          s"receipt lacks parser stage ${expectedParserStage._1.value}=" +
+            expectedParserStage._2.short()
         )
       )
     else if receipt.sourceChecksum != parsed.story.canonicalChecksum then
@@ -244,7 +251,7 @@ object StoryPipeline:
         .left
         .map(PipelineError.ProposalRefused(_))
       input <- ChartProposalProvider
-        .input(parsed.story, parsed.atlas, charts, Some(parsed.parserStage), nowEpochMillis)
+        .input(parsed.story, parsed.atlas, charts, Some(parsed.parserStage._1), nowEpochMillis)
         .left
         .map(PipelineError.InputRefused(_))
       compilation <- NarrativeCompiler.compile(input).left.map(PipelineError.CompileRefused(_))

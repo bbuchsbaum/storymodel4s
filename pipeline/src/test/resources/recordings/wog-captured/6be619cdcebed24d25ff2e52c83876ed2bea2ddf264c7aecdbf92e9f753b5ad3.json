@@ -1,0 +1,14 @@
+{
+  "schema" : "storymodel4s.provider.agent.recording/v1",
+  "model" : "claude-sonnet-5",
+  "origin" : "captured",
+  "stopReason" : "end_turn",
+  "reportedModel" : "claude-sonnet-5",
+  "usage" : {
+    "inputTokens" : 51,
+    "outputTokens" : 92,
+    "cacheReadInputTokens" : 1275
+  },
+  "durationMillis" : 4004,
+  "text" : "(w / wish-01~e.1\n   :ARG0 (w2 / we~e.0)\n   :ARG1 (t / take-01~e.3\n            :ARG0 w2\n            :ARG1 (y / you~e.4)\n            :direction (a / along~e.5)))"
+}

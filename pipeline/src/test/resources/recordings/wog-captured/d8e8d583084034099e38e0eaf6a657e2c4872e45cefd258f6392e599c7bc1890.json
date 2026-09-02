@@ -1,0 +1,14 @@
+{
+  "schema" : "storymodel4s.provider.agent.recording/v1",
+  "model" : "claude-sonnet-5",
+  "origin" : "captured",
+  "stopReason" : "end_turn",
+  "reportedModel" : "claude-sonnet-5",
+  "usage" : {
+    "inputTokens" : 114,
+    "outputTokens" : 445,
+    "cacheReadInputTokens" : 1275
+  },
+  "durationMillis" : 5063,
+  "text" : "(a / and~e.7\n   :op1 (k1 / kill-01~e.5\n         :ARG1 (f / fellow~e.3\n               :quant (m1 / many~e.0)\n               :poss (w / we~e.2)))\n   :op2 (k2 / kill-01~e.15\n         :ARG1 (p / person~e.10\n               :quant (m2 / many~e.8)\n               :ARG1-of (a2 / attack-01~e.13))))"
+}

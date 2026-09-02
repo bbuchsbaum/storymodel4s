@@ -1,0 +1,14 @@
+{
+  "schema" : "storymodel4s.provider.agent.recording/v1",
+  "model" : "claude-sonnet-5",
+  "origin" : "captured",
+  "stopReason" : "end_turn",
+  "reportedModel" : "claude-sonnet-5",
+  "usage" : {
+    "inputTokens" : 80,
+    "outputTokens" : 461,
+    "cacheReadInputTokens" : 1275
+  },
+  "durationMillis" : 5251,
+  "text" : "(c / come-01~e.1\n   :ARG0 (t / they~e.0)\n   :destination (p / place~e.4\n       :location (s / side~e.8\n           :mod (o / other~e.7)\n           :part-of (k / city~e.10\n               :name (n / name~e.10 :op1 \"Kalama\")))))"
+}
