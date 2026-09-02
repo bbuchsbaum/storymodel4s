@@ -166,8 +166,8 @@ object ClaudeParserTransport:
     )
 
   /** Build a transport whose runtime identity is derived from the prompt it will send and the
-    * backend that will send it. The backend also keys the recordings, so one value decides both
-    * and they cannot disagree.
+    * backend that will send it. The backend also keys the recordings, so one value decides both and
+    * they cannot disagree.
     */
   def from(
       prompt: AgentPromptPackage,

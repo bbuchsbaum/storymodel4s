@@ -149,7 +149,7 @@ object ModelClient:
     * court that minted the authorization, so no call site chooses a provider.
     */
   def live(authorization: LiveAuthorization): ModelClient = authorization match
-    case anthropic: LiveAuthorization.Anthropic => LiveModelClient.from(anthropic)
+    case anthropic: LiveAuthorization.Anthropic     => LiveModelClient.from(anthropic)
     case openAi: LiveAuthorization.OpenAiCompatible => OpenAiCompatibleModelClient.from(openAi)
 
 /** An offline client answering from a fixed table by recording key; every unknown key gets the same

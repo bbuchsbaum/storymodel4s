@@ -116,7 +116,10 @@ private[agent] object AgentFixtures:
     }
     store
 
-  def transportOver(exchange: ModelExchange, chosen: ModelBackend = backend): ClaudeParserTransport =
+  def transportOver(
+      exchange: ModelExchange,
+      chosen: ModelBackend = backend
+  ): ClaudeParserTransport =
     ClaudeParserTransport
       .from(prompt, exchange, ClaudeParserTransport.DefaultMaxTokens, chosen)
       .fold(error => throw new IllegalArgumentException(error.message), identity)

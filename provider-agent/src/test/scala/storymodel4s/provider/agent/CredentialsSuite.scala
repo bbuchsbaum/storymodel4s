@@ -75,7 +75,10 @@ class CredentialsSuite extends FunSuite:
 
   test("an absent backend variable is the anthropic backend, and a blank one is too") {
     assertEquals(backend(Map.empty), Right(ModelBackend.Anthropic("claude-sonnet-5")))
-    assertEquals(backend(Map(BackendVariable -> "  ")), Right(ModelBackend.Anthropic("claude-sonnet-5")))
+    assertEquals(
+      backend(Map(BackendVariable -> "  ")),
+      Right(ModelBackend.Anthropic("claude-sonnet-5"))
+    )
     assertEquals(
       backend(Map(BackendVariable -> AnthropicBackend)),
       Right(ModelBackend.Anthropic("claude-sonnet-5"))
@@ -172,13 +175,13 @@ class CredentialsSuite extends FunSuite:
   }
 
   test("a blank openai key is admitted for a loopback host and refused for any other") {
-    Vector("http://127.0.0.1:11434/v1", "http://localhost:1234/v1", "http://[::1]:8000/v1").foreach {
-      base =>
+    Vector("http://127.0.0.1:11434/v1", "http://localhost:1234/v1", "http://[::1]:8000/v1")
+      .foreach { base =>
         liveAuthorization(openAiEnv(base)) match
           case Right(admitted: LiveAuthorization.OpenAiCompatible) =>
             assertEquals(admitted.apiKey.map(_.secret), None)
           case other => fail(s"$base was refused without a key: $other")
-    }
+      }
     assertEquals(
       liveAuthorization(openAiEnv(RemoteBase)),
       Left(LiveRefusal.ApiKeyAbsentForRemoteHost(OpenAiKeyVariable, "openrouter.ai"))
@@ -190,7 +193,10 @@ class CredentialsSuite extends FunSuite:
     liveAuthorization(openAiEnv(RemoteBase, OpenAiKeyVariable -> "sk-test")) match
       case Right(admitted: LiveAuthorization.OpenAiCompatible) =>
         assertEquals(admitted.apiKey.map(_.secret), Some("sk-test"))
-        assertEquals(admitted.chatCompletions.toString, "https://openrouter.ai/api/v1/chat/completions")
+        assertEquals(
+          admitted.chatCompletions.toString,
+          "https://openrouter.ai/api/v1/chat/completions"
+        )
       case other => fail(s"an admitted remote key was refused: $other")
   }
 

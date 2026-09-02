@@ -154,3 +154,85 @@ conversion through `AmrCandidates.fromPenman`, and receipts that carry a real `P
   runs only when the environment opts into spend. Everything else is network-free.
 - `provider-parser/README.md` still describes a runtime as `Ready` or `Unavailable`; that
   sentence is now incomplete and is left for the owner's documentation pass.
+
+## Amendment, 2026-09-02: a second, OpenAI-compatible backend
+
+Status: accepted (single-developer mode, SD5: written by the author, decided by the
+author, with the rejected alternatives recorded on the day).
+
+The original decision put one hosted provider behind `ParserTransport`. That makes the
+whole adapter unusable to anyone without an Anthropic key, including a run against a
+model on the same machine. This amendment adds a second backend and, more importantly,
+stops the provider identity being a constant.
+
+- **`ModelBackend` is the new vocabulary.** A sealed `Anthropic(modelId)` |
+  `OpenAiCompatible(endpointHost, modelId)` whose `provider`, `model`, and `sdkVersion`
+  are computed from it. `ClaudeParserTransport.runtimeFor` takes a backend and derives the
+  `RemoteRuntime` from it, so nothing in this module writes a provider label by hand.
+  This is AGENTS.md's rule that an identity must be derived from what it describes: with a
+  constant `"anthropic"`, a receipt from a local vLLM serving `claude-sonnet-5` would have
+  been indistinguishable from a hosted call, and nothing would have caught it.
+- **The endpoint host carries its port.** `127.0.0.1:8000` and `127.0.0.1:8001` routinely
+  serve different weights under one model id; a label that dropped the port would give
+  those two runs one identity, which is the defect the design contract is mostly about.
+- **`OpenAiCompatibleModelClient` uses `java.net.http` and circe.** One POST with four
+  fields and a reply read from three; no SDK.
+- **The recording key takes the provider label and moves to `agent-recording/v2`.** Two
+  backends serving the same model id must not share a recording. The domain version moved
+  with the added field, so the two framings cannot share a tag. This re-keyed the nine
+  committed recordings in `provider-agent` and `pipeline` test resources; the bodies are
+  unchanged and both suites read their keys from the driver, so the rename was the whole
+  change on the test side.
+- **A blank OpenAI key is admitted only for a loopback host** (`127.0.0.1`, `localhost`,
+  `::1`). A remote server reached with no key is a configuration error, not a free call.
+- **The identity scalars must survive the identifier rules.** `AmrCandidates` builds a
+  `Fingerprint` from `provider:model:sdkVersion` with the unchecked constructor, so a
+  scalar carrying whitespace reaches a `throw` in the middle of a parse rather than a
+  typed refusal. Measured 2026-09-02: the first draft's `java.net.http jdk-25` did exactly
+  that. One predicate, `ModelBackend.identityScalarIsSafe`, is now asked at the environment
+  court and again at `runtimeFor`, so no path to a runtime identity skips it.
+- **The prompt package is unchanged (v1).** Per-backend quality is a measured coverage
+  number for a given corpus, never a claim; this amendment asserts nothing about how well
+  any particular server parses the prompt package.
+
+## Rejected alternatives, 2026-09-02
+
+- **Adding an OpenAI SDK.** It would buy typed errors this module already produces from
+  status codes and a retry policy this module already states, at the cost of a dependency
+  in a JVM-only adapter whose whole point is to be replaceable. `java.net.http` is in the
+  JDK and the client is one file.
+- **A constant provider label of `"openai"`.** It would make every OpenAI-compatible
+  server one provider in every receipt, so OpenRouter and a laptop Ollama would be
+  indistinguishable in the audit trail and would collide in the recordings.
+- **Sending temperature, top_p, or a seed.** A sampling knob nobody set is a difference
+  between two runs that no receipt would record. Nothing but `model`, `max_tokens`, and
+  the two messages is sent.
+- **Defaulting `usage` to zeros when a server omits it.** That is the fabricated-license
+  defect: an unmeasured count identical to a measured one. The reply is refused instead.
+- **Defaulting `finish_reason` to `stop` when absent.** It would make a truncated reply
+  indistinguishable from a complete one. The reply is refused.
+- **Retrying a timeout.** The budget the caller set is for the exchange; retrying after a
+  stall would silently spend three times the stated bound. Only 429 and 5xx are retried,
+  at most twice.
+- **Following redirects.** A followed redirect repeats the `Authorization` header to a
+  host the court never admitted.
+- **Making `ModelClient` sealed.** Sealing it would require every implementation in one
+  file, which would put the Anthropic SDK imports into `ModelExchange.scala` and destroy
+  the property that `LiveModelClient.scala` is the only file touching the SDK. The trait
+  keeps one method and no function-typed parameters, which is what the sealing was for;
+  `ModelBackend` and `LiveAuthorization` are sealed instead, and those are the types
+  exhaustiveness actually protects.
+- **Letting a caller name the backend positionally.** `ExchangeSource.Anthropic` is an
+  expectation checked against the environment court, not a selection: a disagreement is
+  `DriverError.BackendMismatch`. Coercing to either side would publish receipts naming a
+  provider nobody chose.
+
+## Consequences, 2026-09-02
+
+- A run with no Anthropic key can parse text through OpenRouter, Ollama, vLLM, or
+  LM Studio, and its receipts say which.
+- `v1` recordings do not replay under `v2`; there is no migration path and none is
+  wanted, since the `v1` key could not distinguish two backends.
+- `RemoteRuntime.from` still admits any nonblank scalar, and the `Fingerprint` built
+  downstream from it can still throw for a scalar this module did not mint. That gap is
+  `provider-parser`'s and is left open here rather than widened into this slice.

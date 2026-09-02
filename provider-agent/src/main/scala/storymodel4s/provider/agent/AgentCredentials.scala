@@ -19,8 +19,8 @@ type ApiKey = ApiKey.ApiKey
   *
   * Why this is separate from [[LiveRefusal]]: a replay needs a backend too -- it names the runtime
   * in every receipt and keys every recording -- while it needs no key and no live flag. These
-  * refusals therefore fire in a mode that cannot spend, and a caller that folded them into the
-  * live refusals would report "live calls need a key" for a run that was never going to call.
+  * refusals therefore fire in a mode that cannot spend, and a caller that folded them into the live
+  * refusals would report "live calls need a key" for a run that was never going to call.
   *
   * Why the base URL is never echoed: an http(s) URL may carry `user:password@` userinfo, so its
   * text is treated as credential-bearing even though the host alone is not.
@@ -31,7 +31,8 @@ enum BackendRefusal:
   case BaseUrlNotHttp(variable: String)
   case ModelAbsent(variable: String)
 
-  /** The model id cannot become part of a runtime identity; see `ModelBackend.identityScalarIsSafe`.
+  /** The model id cannot become part of a runtime identity; see
+    * `ModelBackend.identityScalarIsSafe`.
     */
   case ModelNotIdentitySafe(variable: String, maxLength: Int)
 
@@ -72,7 +73,7 @@ private[agent] enum BackendChoice:
 
   /** The identity this choice implies; the same derivation the live authorization publishes. */
   def backend: ModelBackend = this match
-    case Anthropic(modelId) => ModelBackend.Anthropic(modelId)
+    case Anthropic(modelId)                         => ModelBackend.Anthropic(modelId)
     case OpenAiCompatible(chatCompletions, modelId) =>
       ModelBackend.OpenAiCompatible(AgentCredentials.identityHost(chatCompletions), modelId)
 
@@ -216,7 +217,9 @@ object AgentCredentials:
       .toRight(BackendRefusal.BaseUrlNotHttp(OpenAiBaseUrlVariable))
 
   /** The backend the environment names, with the endpoint the clients need. */
-  private[agent] def backendChoice(env: Map[String, String]): Either[BackendRefusal, BackendChoice] =
+  private[agent] def backendChoice(
+      env: Map[String, String]
+  ): Either[BackendRefusal, BackendChoice] =
     env.get(BackendVariable).map(_.trim).filter(nonBlank) match
       case None | Some(`AnthropicBackend`) =>
         Right(BackendChoice.Anthropic(ModelBackend.DefaultAnthropicModel))

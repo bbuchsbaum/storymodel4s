@@ -56,19 +56,19 @@ enum DriverError:
   case ReceiptInvalid(detail: String)
 
   def message: String = this match
-    case UnknownMode(raw)     => s"unknown mode '$raw'; expected replay or record"
-    case LiveRefused(refusal) => refusal.message
-    case BackendRefused(refusal)                => refusal.message
-    case BackendMismatch(requested, admitted)   => s"$requested was asked for, $admitted admitted"
-    case RecordingsUnavailable(error)           => error.message
-    case TextUnreadable(path, reason) => s"cannot read $path (reason ${reason.short()})"
-    case SourceInvalid(detail)        => s"story source refused: $detail"
-    case InputInvalid(detail)         => s"parser input refused: $detail"
-    case PromptUnavailable(error)     => error.message
-    case TransportRefused(error)      => s"transport refused: ${error.message}"
-    case ConfigInvalid(detail)        => s"parser config refused: $detail"
-    case OutputUnwritable(path, sum)  => s"cannot write $path (reason ${sum.short()})"
-    case ReceiptInvalid(detail)       => s"build receipt refused: $detail"
+    case UnknownMode(raw)                     => s"unknown mode '$raw'; expected replay or record"
+    case LiveRefused(refusal)                 => refusal.message
+    case BackendRefused(refusal)              => refusal.message
+    case BackendMismatch(requested, admitted) => s"$requested was asked for, $admitted admitted"
+    case RecordingsUnavailable(error)         => error.message
+    case TextUnreadable(path, reason)         => s"cannot read $path (reason ${reason.short()})"
+    case SourceInvalid(detail)                => s"story source refused: $detail"
+    case InputInvalid(detail)                 => s"parser input refused: $detail"
+    case PromptUnavailable(error)             => error.message
+    case TransportRefused(error)              => s"transport refused: ${error.message}"
+    case ConfigInvalid(detail)                => s"parser config refused: $detail"
+    case OutputUnwritable(path, sum)          => s"cannot write $path (reason ${sum.short()})"
+    case ReceiptInvalid(detail)               => s"build receipt refused: $detail"
 
 /** How one sentence's reply was obtained, derived from the recordings store before and after the
   * run rather than from the mode argument.

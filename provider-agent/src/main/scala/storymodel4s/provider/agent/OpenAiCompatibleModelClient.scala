@@ -15,8 +15,8 @@ import storymodel4s.core.Checksum
   * Ollama, vLLM, LM Studio), reached with the JDK's own HTTP client and circe.
   *
   * Why no SDK: the request this module sends is one POST with four fields and the reply is read
-  * from three, so an added dependency would buy typed errors this file already produces and a
-  * retry policy this file already states. ADR 0008 (2026-09-02 amendment) records the choice.
+  * from three, so an added dependency would buy typed errors this file already produces and a retry
+  * policy this file already states. ADR 0008 (2026-09-02 amendment) records the choice.
   *
   * What is sent, and nothing else: the model id from the request, the token budget, and exactly two
   * messages (the cached-by-Anthropic system prompt as `system`, the rendered sentence as `user`).
@@ -54,7 +54,7 @@ final class OpenAiCompatibleModelClient private (
       attempt: Int
   ): Either[ExchangeFailure, String] =
     attemptOnce(body, timeoutMillis) match
-      case Right(payload) => Right(payload)
+      case Right(payload)                                              => Right(payload)
       case Left(failure) if attempt < MaxRetries && retryable(failure) =>
         Thread.sleep(BackoffMillis(attempt))
         send(body, timeoutMillis, attempt + 1)
@@ -78,7 +78,7 @@ final class OpenAiCompatibleModelClient private (
     catch
       case _: HttpTimeoutException            => Left(ExchangeFailure.Timeout(timeoutMillis))
       case _: java.net.SocketTimeoutException => Left(ExchangeFailure.Timeout(timeoutMillis))
-      case error: InterruptedException =>
+      case error: InterruptedException        =>
         Thread.currentThread().interrupt()
         Left(ExchangeFailure.ConnectionFailed(Checksum.ofText(describe(error))))
       case NonFatal(error) =>
@@ -165,7 +165,11 @@ object OpenAiCompatibleModelClient:
       choices <- cursor.downField("choices").as[Vector[Json]].left.map(_ => "no choices array")
       first <- choices.headOption.toRight("the choices array is empty")
       content <- contentOf(first.hcursor.downField("message"))
-      finish <- first.hcursor.downField("finish_reason").as[String].left.map(_ => "no finish_reason")
+      finish <- first.hcursor
+        .downField("finish_reason")
+        .as[String]
+        .left
+        .map(_ => "no finish_reason")
       usage <- usageOf(cursor.downField("usage"))
     yield ModelReply(
       model,
