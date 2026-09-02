@@ -59,7 +59,7 @@ class StoryBuildSuite extends FunSuite:
 
   /** `Checksum.ofText(ChartProposalProvider.RulesText)`; a rules change must move this literal. */
   private val RulesChecksum =
-    "d1c144cffe9f4563ef30669116232d511f2d5e82da2a00a4bec296015b1de1ea"
+    "b7244c9ea078c1c5d32488374bc33545e73edcafdd6c2ab1dd70dfe95592763e"
 
   private val wogRecordings: Path = Paths.get(getClass.getResource("/recordings/wog").toURI)
 
@@ -438,6 +438,50 @@ class StoryBuildSuite extends FunSuite:
         ("Manner", "together") -> 1
       )
     )
+    // The coverage ledger balances over the whole story: every one of the 119 entity-kind fillers
+    // the provider saw is in exactly one of the six named classes, and every filler the rule
+    // turned away also carries its own receipt. The audit of 2026-09-02 found 51 of these leaving
+    // as an anonymous increment, in no layer, no gap and no alternatives list; they are the
+    // `unlicensed` column, and each now names its concept, word, kind, source roles and reason so
+    // the frame-lexicon slice can find them.
+    val fillerClasses =
+      Vector(
+        "fillers",
+        "circumstances",
+        "eventualities",
+        "nonReferential",
+        "unlicensed",
+        "ambiguous"
+      )
+    val admitted = coverageRows(report).flatMap { row =>
+      kindOf(row) match
+        case "proposed"    => Vector(row)
+        case "coordinated" => rows(row, "branches").filter(b => kindOf(b) == "admitted")
+        case _             => Vector.empty
+    }
+    val ledger = fillerClasses
+      .map(name => name -> admitted.map(row => intField(row, name)).sum)
+      .toMap
+    assertEquals(ledger("fillers"), 57)
+    assertEquals(ledger("circumstances"), 11)
+    assertEquals(ledger("eventualities"), 0)
+    assertEquals(ledger("nonReferential"), 0)
+    assertEquals(ledger("unlicensed"), 51)
+    assertEquals(ledger("ambiguous"), 0)
+    val seen = admitted.map(row => intField(row, "seen")).sum
+    assertEquals(fillerClasses.map(ledger).sum, seen, "the six classes do not sum to seen")
+    assertEquals(seen, 119)
+    val refusals = rows(json(files.receipts), "calls")
+      .filter(call => param(call, "rule").contains(ChartProposalProvider.Referentiality.RuleName))
+    assertEquals(refusals.size, 51, "a refused filler left the provider without a receipt")
+    assert(
+      refusals.forall(call =>
+        Vector("filler", "lemma", "concept-kind", "source-roles", "reason")
+          .forall(key => param(call, key).exists(_.nonEmpty))
+      ),
+      "a refusal receipt does not say what was refused or why"
+    )
+
     // Every circumstance carries its own words, never the whole situation by default.
     assert(
       circumstances.forall(row => rows(row, "support").nonEmpty),
@@ -611,8 +655,10 @@ class StoryBuildSuite extends FunSuite:
         // `seen`: a filler cannot leave the provider without a row saying where it went.
         "fillers" -> Json.fromInt(0),
         "circumstances" -> Json.fromInt(0),
+        "eventualities" -> Json.fromInt(0),
         "nonReferential" -> Json.fromInt(0),
         "unlicensed" -> Json.fromInt(2),
+        "ambiguous" -> Json.fromInt(0),
         "seen" -> Json.fromInt(2)
       )
     )
@@ -625,8 +671,10 @@ class StoryBuildSuite extends FunSuite:
         "root" -> Json.fromString(s"$WogStory:s1#g"),
         "fillers" -> Json.fromInt(1),
         "circumstances" -> Json.fromInt(1),
+        "eventualities" -> Json.fromInt(0),
         "nonReferential" -> Json.fromInt(0),
         "unlicensed" -> Json.fromInt(0),
+        "ambiguous" -> Json.fromInt(0),
         "seen" -> Json.fromInt(2)
       )
     )

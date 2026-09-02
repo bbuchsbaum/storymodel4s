@@ -176,8 +176,8 @@ class CoordinatedRootSuite extends FunSuite:
     assertEquals(
       branches(proposals.coverage.head),
       Vector(
-        CoordinatedBranch.Admitted(land, SourceRole.Operand(1), FillerCounts(1, 0, 0, 0)),
-        CoordinatedBranch.Admitted(go, SourceRole.Operand(2), FillerCounts(2, 0, 0, 0))
+        CoordinatedBranch.Admitted(land, SourceRole.Operand(1), FillerCounts(1, 0, 0, 0, 0, 0)),
+        CoordinatedBranch.Admitted(go, SourceRole.Operand(2), FillerCounts(2, 0, 0, 0, 0, 0))
       )
     )
     assertEquals(proposals.counts, CoverageCounts(0, 1, 0, 0, 2))
@@ -456,7 +456,7 @@ class CoordinatedRootSuite extends FunSuite:
 
     assertEquals(
       proposals.coverage(1),
-      SentenceCoverage.Proposed(root, FillerCounts(1, 0, 0, 0))
+      SentenceCoverage.Proposed(root, FillerCounts(1, 0, 0, 0, 0, 0))
     )
     val situation = value(proposals.situations.head.bundle)
     assertEquals(situation.kind, SituationKind.State)
@@ -533,7 +533,7 @@ class CoordinatedRootSuite extends FunSuite:
 
     assertEquals(
       proposals.coverage(2),
-      SentenceCoverage.Proposed(root, FillerCounts(1, 0, 0, 0))
+      SentenceCoverage.Proposed(root, FillerCounts(1, 0, 0, 0, 0, 0))
     )
     val situation = value(proposals.situations.head.bundle)
     assertEquals(situation.kind, SituationKind.State)

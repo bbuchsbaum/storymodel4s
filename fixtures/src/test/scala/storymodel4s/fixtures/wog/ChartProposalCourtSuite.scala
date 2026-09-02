@@ -217,11 +217,11 @@ class ChartProposalCourtSuite extends FunSuite:
     val rows = proposals.coverage.map(row => row.sentence -> row).toMap
     assertEquals(
       rows(sEgulac.id),
-      SentenceCoverage.Proposed(ref(sEgulac, c0), FillerCounts(0, 0, 0, 2))
+      SentenceCoverage.Proposed(ref(sEgulac, c0), FillerCounts(0, 0, 0, 0, 2, 0))
     )
     assertEquals(
       rows(sHunt.id),
-      SentenceCoverage.Proposed(ref(sHunt, c0), FillerCounts(1, 0, 0, 0))
+      SentenceCoverage.Proposed(ref(sHunt, c0), FillerCounts(1, 0, 0, 0, 0, 0))
     )
     assertEquals(
       rows(sRiver.id),
@@ -238,7 +238,7 @@ class ChartProposalCourtSuite extends FunSuite:
     )
     assertEquals(
       rows(sArrows.id),
-      SentenceCoverage.Proposed(ref(sArrows, c0), FillerCounts(0, 0, 0, 2))
+      SentenceCoverage.Proposed(ref(sArrows, c0), FillerCounts(0, 0, 0, 0, 2, 0))
     )
     assertEquals(proposals.situations.size, 6)
     assertEquals(proposals.participantCoverage.size, 6)
@@ -255,7 +255,9 @@ class ChartProposalCourtSuite extends FunSuite:
         (ref(sFog, c0), ref(sArrows, c0))
       )
     )
-    assertEquals(proposals.calls.size, 30)
+    // 34, not 30: the four fillers these seven charts reach by no licensed role now carry a
+    // refusal receipt each, so a filler cannot leave the provider unrecorded.
+    assertEquals(proposals.calls.size, 34)
 
     val values = proposals.situations
       .flatMap(a => a.bundle.proposals.flatMap(_.value).map(a.source -> _))
@@ -318,7 +320,7 @@ class ChartProposalCourtSuite extends FunSuite:
     assertEquals(compiled.derivation.gaps.map(g => g.target -> g.reason).toSet, expectedGaps)
 
     assertEquals(compiled.provenance.configHash, Checksum.ofText(ChartProposalProvider.RulesText))
-    assertEquals(compiled.provenance.calls.size, 30)
+    assertEquals(compiled.provenance.calls.size, 34)
     assert(compiled.provenance.calls.forall(_.params.get("chart-origin").forall(_ == "hand")))
     assertEquals(compiled.receipt.stages.head._2, ChartProposalProvider.chartsDigest(charts))
     assertEquals(

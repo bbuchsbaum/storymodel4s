@@ -18,8 +18,12 @@ enum RoleLicence:
   /** The role names a circumstance of the situation rather than a participant in it. */
   case Circumstance(kind: CircumstanceKind)
 
-  /** The role relates the situation to an eventuality. A filler standing here is a proposition or
-    * an event, and an entity-kind concept under it is a shape this provider does not read.
+  /** The role relates the situation to another **situation**, not to a thing. `:cause` and
+    * `:result` take an eventuality, and what they describe belongs to the causal layer, which is
+    * empty today. A filler here is not a participant and it is not a circumstance either: it is a
+    * claim about how two situations stand to one another, and this provider has no family for that
+    * yet. It is counted and receipted under its own name so the slice that builds the causal layer
+    * can find every one of them rather than starting from the text again.
     */
   case Eventuality
 
@@ -134,3 +138,47 @@ object Referentiality:
 
   /** Why a concept kind was refused a referent reading, for the receipt. */
   def kindReason(kind: ConceptKind): String = s"concept-kind-not-referential:$kind"
+
+  /** A role as it is rendered on a receipt and in the rules text. One rendering, so a reader
+    * comparing the two is comparing the same string.
+    */
+  def renderRole(role: ParticipantRole): String = role match
+    case ParticipantRole.Custom(namespace, label) => s"Custom($namespace,$label)"
+    case other                                    => other.toString
+
+/** Why the referentiality rule turned a filler away, as a closed set.
+  *
+  * Why typed and why five cases: before this existed, a turned-away filler was a bare increment on
+  * one counter, and the audit of 2026-09-02 found 51 of 119 argument fillers leaving the provider
+  * that way — in no layer, no gap, and no alternatives list, with nothing recording that they had
+  * been seen at all. Each case here needs a different fix by a different slice: a `:cause` filler
+  * is work for the causal layer, an unlicensed numbered argument is work for the frame lexicon, a
+  * filler reached by two roles is a chart the provider will not guess about. One number could not
+  * tell them apart, so no one could act on any of them.
+  */
+enum FillerRefusal:
+  /** The role relates situations; the filler is the causal layer's business. */
+  case RoleTakesSituation(role: ParticipantRole)
+
+  /** An extension role whose referentiality nobody has established. Fails closed. */
+  case RoleUnestablished(role: ParticipantRole)
+
+  /** The role takes a referent but the concept cannot denote one. */
+  case ConceptNotReferential(kind: ConceptKind)
+
+  /** No single normalized participant role reached the filler: a numbered argument the frame
+    * lexicon did not license, an operand, or an extension role outside the standard table.
+    */
+  case NoLicensedRole
+
+  /** Two or more different licensed roles reached the filler. The chart says both, so the provider
+    * proposes neither rather than picking one.
+    */
+  case SeveralLicensedRoles
+
+  def render: String = this match
+    case RoleTakesSituation(role) => s"role-takes-situation:${Referentiality.renderRole(role)}"
+    case RoleUnestablished(role)  => s"role-unestablished:${Referentiality.renderRole(role)}"
+    case ConceptNotReferential(k) => Referentiality.kindReason(k)
+    case NoLicensedRole           => "no-licensed-role"
+    case SeveralLicensedRoles     => "several-licensed-roles"

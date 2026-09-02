@@ -98,20 +98,56 @@ enum CoordinatedBranch:
   *
   *   - `referents` became participant edges and entity mentions;
   *   - `circumstances` became time or manner values on the situation;
-  *   - `nonReferential` were refused by role or by concept kind, each with a receipt naming which;
-  *   - `unlicensed` were reached by no single normalized role, and were never evaluated further.
+  *   - `eventualities` stood under `:cause` or `:result`, which relate situations rather than
+  *     things; they are the causal layer's work and are named separately so that slice can find
+  *     every one of them;
+  *   - `nonReferential` were refused by an unestablished extension role or by a concept kind that
+  *     cannot denote a referent;
+  *   - `unlicensed` were reached by no single normalized role — a numbered argument the frame
+  *     lexicon did not license, an operand, an extension role — which is the frame lexicon's work;
+  *   - `ambiguous` were reached by two or more different licensed roles, which is a chart the
+  *     provider will not guess about.
+  *
+  * The last three were one counter until 2026-09-02, when an audit found 51 of this story's 119
+  * argument fillers leaving the provider as a single anonymous increment. Every one of the six
+  * classes needs a different fix by a different slice, and one number could not name any of them.
   */
 final case class FillerCounts(
     referents: Int,
     circumstances: Int,
+    eventualities: Int,
     nonReferential: Int,
-    unlicensed: Int
+    unlicensed: Int,
+    ambiguous: Int
 ):
-  /** Every filler the scan saw. Equal to the size of the scanned population, by construction. */
-  def seen: Int = referents + circumstances + nonReferential + unlicensed
+  /** Every filler the scan saw. Equal to the size of the scanned population, by construction, and
+    * the reason a filler cannot leave the provider unaccounted for.
+    */
+  def seen: Int =
+    referents + circumstances + eventualities + nonReferential + unlicensed + ambiguous
 
 object FillerCounts:
-  val empty: FillerCounts = FillerCounts(0, 0, 0, 0)
+  val empty: FillerCounts = FillerCounts(0, 0, 0, 0, 0, 0)
+
+  /** The counts of one refused filler, so the ledger is derived from the refusals rather than
+    * incremented alongside them.
+    */
+  private[document] def of(refusal: FillerRefusal): FillerCounts = refusal match
+    case FillerRefusal.RoleTakesSituation(_)    => FillerCounts(0, 0, 1, 0, 0, 0)
+    case FillerRefusal.RoleUnestablished(_)     => FillerCounts(0, 0, 0, 1, 0, 0)
+    case FillerRefusal.ConceptNotReferential(_) => FillerCounts(0, 0, 0, 1, 0, 0)
+    case FillerRefusal.NoLicensedRole           => FillerCounts(0, 0, 0, 0, 1, 0)
+    case FillerRefusal.SeveralLicensedRoles     => FillerCounts(0, 0, 0, 0, 0, 1)
+
+  private[document] def plus(a: FillerCounts, b: FillerCounts): FillerCounts =
+    FillerCounts(
+      a.referents + b.referents,
+      a.circumstances + b.circumstances,
+      a.eventualities + b.eventualities,
+      a.nonReferential + b.nonReferential,
+      a.unlicensed + b.unlicensed,
+      a.ambiguous + b.ambiguous
+    )
 
 /** One ledger row per atlas sentence: what the provider did with it.
   *
@@ -508,8 +544,13 @@ object ChartProposalProvider:
        |  the closed set {${referentialRolesText}}; Location is among them because a place is a
        |  referent and no chart signal separates "a place" from "an entity standing in for one",
        |  and asserting that separation from a word list would be world knowledge this layer does
-       |  not have. Time and Manner name circumstances (below). Cause and Result relate
-       |  eventualities. Custom roles are refused with one named exception: this provider's own
+       |  not have. Time and Manner name circumstances (below). Cause and Result relate one
+       |  SITUATION to another rather than a situation to a thing, so a filler under either is
+       |  neither a participant nor a circumstance: what it describes belongs to the causal layer,
+       |  which this version does not build. Such a filler is counted eventualities on the coverage
+       |  row and carries a receipt naming its role, so the slice that builds that layer finds every
+       |  one of them rather than starting from the text again. Custom roles are refused with one
+       |  named exception: this provider's own
        |  ${renderRole(Referentiality.PredicationSubject)}, the concept a predicative state is
        |  predicated of, takes a referent — the state holds of it — and is a Custom only because it
        |  names no thematic role, which is a different question. Every other Custom role,
@@ -548,9 +589,16 @@ object ChartProposalProvider:
        |coverage: one participant-coverage attempt per admissible root listing exactly the
        |  proposed fillers, possibly none, with the root's evidence. An empty coverage is a value:
        |  it says the chart reaches no licensed participant from the root, never that participants
-       |  were not evaluated. The ledger row divides every entity-kind filler the scan saw into
-       |  referents, circumstances, nonReferential, and unlicensed, and those four sum to the
-       |  fillers seen, so no filler leaves the provider unaccounted for.
+       |  were not evaluated. The ledger row divides every entity-kind filler the scan saw into six
+       |  named classes — referents, circumstances, eventualities, nonReferential, unlicensed and
+       |  ambiguous — which sum to seen, and EVERY filler the rule turned away also carries its own
+       |  receipt under ${Referentiality.RuleName} naming the concept, its lemma, its concept kind,
+       |  the source roles that reached it and the reason. So no filler leaves this provider
+       |  unaccounted for, and each class names the slice that owns it: eventualities the causal
+       |  layer, unlicensed the frame lexicon (a numbered argument no lexicon licensed, an operand,
+       |  an extension role), ambiguous a chart that gave one filler two licensed roles and which
+       |  this provider will not guess about, nonReferential an unestablished extension role or a
+       |  concept kind that cannot denote a referent.
        |temporal: one attempt per consecutive pair of admissible roots in sentence order and, within
        |  a sentence, in branch order, valued Unclear, with evidence spanning both roots' support.
        |  Never Before or Meets: a time filler in a sentence chart is a concept of that chart, not a
@@ -648,15 +696,18 @@ object ChartProposalProvider:
       role: ParticipantRole
   )
 
-  /** A filler the referentiality rule turned away, with the reason it goes on the receipt. Kept
-    * rather than counted anonymously: `then` refused for its role and `5` refused for its concept
-    * kind are different findings, and a bare count cannot tell a reader which happened.
+  /** A filler the referentiality rule turned away, with everything a later slice needs to act on
+    * it: which concept, what word, what kind, which source roles reached it, and why it was
+    * refused. Kept rather than counted anonymously — `then` refused for its role, `5` refused for
+    * its concept kind, and an `:ARG3` no lexicon licensed are three different findings for three
+    * different slices, and a bare count names none of them.
     */
   private final case class RefusedFiller(
       concept: ConceptId,
+      kind: ConceptKind,
       lemma: String,
-      role: ParticipantRole,
-      reason: String
+      sourceRoles: Vector[SourceRole],
+      refusal: FillerRefusal
   )
 
   /** Which closed admissibility shape admitted a root, and what kind of situation it makes.
@@ -1340,13 +1391,19 @@ object ChartProposalProvider:
         val circumstanceOutcomes = scanned.circumstances.map(filler =>
           circumstanceOutcome(source, unit, chart, checksum, root, support, filler, params)
         )
-        val refusalCalls = scanned.nonReferential.map(filler =>
+        // One receipt per filler the rule turned away, whatever the reason. Before this every
+        // unlicensed filler left the provider as an anonymous increment; now each names the
+        // concept, the word, its kind, the source roles that reached it, and why it was refused,
+        // so the slice that owns each class can find its own work.
+        val refusalCalls = scanned.refused.map(filler =>
           providerCall(
             source,
             Referentiality.RuleName,
-            Vector("non-referential", root.key, filler.concept.value, filler.reason),
+            Vector("refused", root.key, filler.concept.value, filler.refusal.render),
             params + ("filler" -> filler.concept.value) + ("lemma" -> filler.lemma) +
-              ("role" -> renderRole(filler.role)) + ("reason" -> filler.reason)
+              ("concept-kind" -> filler.kind.toString) +
+              ("source-roles" -> filler.sourceRoles.map(_.render).sorted.mkString(",")) +
+              ("reason" -> filler.refusal.render)
           )
         )
         val coverageValue =
@@ -1361,10 +1418,13 @@ object ChartProposalProvider:
           support.raw,
           CalibrationModel,
           "participant-coverage" +: root.key +: coverageValue.fillers.map(_.key),
-          params + ("fillers" -> scanned.referents.size.toString) +
-            ("circumstances" -> scanned.circumstances.size.toString) +
-            ("nonReferential" -> scanned.nonReferential.size.toString) +
-            ("unlicensed" -> scanned.unlicensed.toString)
+          params + ("fillers" -> scanned.counts.referents.toString) +
+            ("circumstances" -> scanned.counts.circumstances.toString) +
+            ("eventualities" -> scanned.counts.eventualities.toString) +
+            ("nonReferential" -> scanned.counts.nonReferential.toString) +
+            ("unlicensed" -> scanned.counts.unlicensed.toString) +
+            ("ambiguous" -> scanned.counts.ambiguous.toString) +
+            ("seen" -> scanned.counts.seen.toString)
         )
         Right(
           RootOutcome(
@@ -1403,11 +1463,15 @@ object ChartProposalProvider:
   private final case class ScannedFillers(
       referents: Vector[LicensedFiller],
       circumstances: Vector[CircumstanceFiller],
-      nonReferential: Vector[RefusedFiller],
-      unlicensed: Int
+      refused: Vector[RefusedFiller]
   ):
+    /** Derived from the three vectors, never incremented alongside them: a counter a caller can
+      * forget to bump is how a filler goes missing.
+      */
     def counts: FillerCounts =
-      FillerCounts(referents.size, circumstances.size, nonReferential.size, unlicensed)
+      refused
+        .map(f => FillerCounts.of(f.refusal))
+        .foldLeft(FillerCounts(referents.size, circumstances.size, 0, 0, 0, 0))(FillerCounts.plus)
 
   /** Entity-kind fillers of `root` sorted by the referentiality rule.
     *
@@ -1433,30 +1497,30 @@ object ChartProposalProvider:
       .groupBy(_._1)
       .toVector
       .sortBy(_._1)
-    byFiller.foldLeft(ScannedFillers(Vector.empty, Vector.empty, Vector.empty, 0)) {
+    byFiller.foldLeft(ScannedFillers(Vector.empty, Vector.empty, Vector.empty)) {
       case (acc, (id, rows)) =>
         val concept = rows.head._2
         val lemma = concept.lemma.value
+        val sourceRoles = rows.map(_._3.source).distinct
+        def refuse(refusal: FillerRefusal): ScannedFillers =
+          acc.copy(refused =
+            acc.refused :+ RefusedFiller(id, concept.kind, lemma, sourceRoles, refusal)
+          )
         rows.map(_._3).flatMap(licensedRole).distinct match
           case Vector(role) =>
             Referentiality.licence(role) match
               case RoleLicence.Referent if Referentiality.denotesReferent(concept.kind) =>
                 acc.copy(referents = acc.referents :+ LicensedFiller(id, concept.kind, lemma, role))
               case RoleLicence.Referent =>
-                acc.copy(nonReferential =
-                  acc.nonReferential :+
-                    RefusedFiller(id, lemma, role, Referentiality.kindReason(concept.kind))
-                )
+                refuse(FillerRefusal.ConceptNotReferential(concept.kind))
               case RoleLicence.Circumstance(kind) =>
                 acc.copy(circumstances =
                   acc.circumstances :+ CircumstanceFiller(id, kind, lemma, role)
                 )
-              case refused =>
-                acc.copy(nonReferential =
-                  acc.nonReferential :+
-                    RefusedFiller(id, lemma, role, s"role-not-referential:${refused.render}")
-                )
-          case _ => acc.copy(unlicensed = acc.unlicensed + 1)
+              case RoleLicence.Eventuality   => refuse(FillerRefusal.RoleTakesSituation(role))
+              case RoleLicence.Unestablished => refuse(FillerRefusal.RoleUnestablished(role))
+          case Vector() => refuse(FillerRefusal.NoLicensedRole)
+          case _        => refuse(FillerRefusal.SeveralLicensedRoles)
     }
 
   /** The chart's own normalized role when present; a standard named role otherwise; nothing for a
@@ -1563,9 +1627,7 @@ object ChartProposalProvider:
     )
     (TemporalAttempt(prev.root, next.root, bundle), evidence, call)
 
-  private def renderRole(role: ParticipantRole): String = role match
-    case ParticipantRole.Custom(namespace, label) => s"Custom($namespace,$label)"
-    case other                                    => other.toString
+  private def renderRole(role: ParticipantRole): String = Referentiality.renderRole(role)
 
   /** The four abstained attempts an inadmissible root leaves behind, at `anchor` under `scope`. */
   private def abstainAttempts(

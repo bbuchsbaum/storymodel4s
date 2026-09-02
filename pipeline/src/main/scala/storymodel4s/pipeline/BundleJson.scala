@@ -40,14 +40,17 @@ private[pipeline] object BundleJson:
   )
 
   /** Where a root's entity-kind fillers went. `fillers` keeps its old name and meaning — the
-    * fillers that became participants — and the three new counters say where the rest went, so the
-    * four sum to every filler the provider saw.
+    * fillers that became participants — and the five other counters say where the rest went, so the
+    * six sum to `seen`, every filler the provider saw. Each class names the slice that owns it, so
+    * a reader can act on a number instead of only noticing it.
     */
   private def fillerFields(counts: FillerCounts): Vector[(String, Json)] = Vector(
     "fillers" -> counts.referents.asJson,
     "circumstances" -> counts.circumstances.asJson,
+    "eventualities" -> counts.eventualities.asJson,
     "nonReferential" -> counts.nonReferential.asJson,
     "unlicensed" -> counts.unlicensed.asJson,
+    "ambiguous" -> counts.ambiguous.asJson,
     "seen" -> counts.seen.asJson
   )
 
