@@ -7,6 +7,7 @@ import storymodel4s.codec.OutputAcquireCodecs.given
 import storymodel4s.core.*
 import storymodel4s.document.{
   ChartProposals,
+  CoordinatedBranch,
   CoverageCounts,
   DerivationGap,
   NarrativeCompilation,
@@ -30,11 +31,32 @@ private[pipeline] object BundleJson:
 
   private def counts(c: CoverageCounts): Json = Json.obj(
     "proposed" -> c.proposed.asJson,
+    "coordinated" -> c.coordinated.asJson,
     "abstained" -> c.abstained.asJson,
     "emptyCharts" -> c.emptyCharts.asJson,
     "noCharts" -> c.noCharts.asJson,
     "sentences" -> c.sentences.asJson
   )
+
+  /** One branch of a coordinated row. Every branch appears, admitted or not, so a reader can see
+    * how much of a coordinating sentence became situations and why the rest did not.
+    */
+  private def branchRow(branch: CoordinatedBranch): Json = branch match
+    case CoordinatedBranch.Admitted(root, role, fillers, unlicensed) =>
+      Json.obj(
+        "kind" -> "admitted".asJson,
+        "root" -> root.key.asJson,
+        "role" -> role.render.asJson,
+        "fillers" -> fillers.asJson,
+        "unlicensed" -> unlicensed.asJson
+      )
+    case CoordinatedBranch.Abstained(root, role, reason) =>
+      Json.obj(
+        "kind" -> "abstained".asJson,
+        "root" -> root.key.asJson,
+        "role" -> role.render.asJson,
+        "reason" -> reason.render.asJson
+      )
 
   private def coverageRow(ordinals: Map[SurfaceUnitId, Int])(row: SentenceCoverage): Json =
     val base = Vector(
@@ -48,6 +70,13 @@ private[pipeline] object BundleJson:
           "root" -> root.key.asJson,
           "fillers" -> fillers.asJson,
           "unlicensed" -> unlicensed.asJson
+        )
+      case SentenceCoverage.Coordinated(coordinator, branches) =>
+        Vector(
+          "kind" -> "coordinated".asJson,
+          "coordinator" -> coordinator.key.asJson,
+          "admitted" -> branches.count(_.isInstanceOf[CoordinatedBranch.Admitted]).asJson,
+          "branches" -> branches.map(branchRow).asJson
         )
       case SentenceCoverage.Abstained(anchor, reason) =>
         Vector(
