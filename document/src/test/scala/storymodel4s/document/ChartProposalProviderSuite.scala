@@ -109,7 +109,11 @@ class ChartProposalProviderSuite extends FunSuite:
     ChartNodeRef(unit.id, concept)
 
   private val enterFrame = FrameRef("propbank", "enter-01", None)
-  private val locatedFrame = FrameRef("amr", "be-located-at-91", None)
+  private val locatedFrame = FrameRef("propbank", "be-located-at-91", None)
+
+  /** The adapter's classification of a `-91` roleset: kind Special, frame under `propbank`. */
+  private def special(lemma: String, frame: Option[FrameRef]): Concept =
+    Concept(Lemma.unsafe(lemma), None, frame, ConceptKind.Special)
 
   private val enterRelations = Vector(
     PropositionRelation(c0, RoleAssignment.arg(0), ConceptTarget.Node(c1)),
@@ -150,7 +154,7 @@ class ChartProposalProviderSuite extends FunSuite:
     s2,
     Some(c0),
     Map(
-      c0 -> Concept.predicate("be-located-at", Some(locatedFrame)),
+      c0 -> special("be-located-at", Some(locatedFrame)),
       c1 -> Concept.entity("lamp"),
       c2 -> Concept.entity("table")
     ),
@@ -270,30 +274,72 @@ class ChartProposalProviderSuite extends FunSuite:
     assertEquals(byRef(ref(s2, c0)).polarity, StoryPolarity.Unknown)
   }
 
-  test("a -91 reification focus is a state only in the amr namespace; other foci are events") {
+  test("a Special focus with a propbank -91 frame is a State root; other Special foci abstain") {
     val proposals = propose(Vector(s0.id -> enterChart(), s2.id -> lampChart))
     val byRef = proposals.situations
       .map(a => a.source -> a.bundle.proposals.head.value.getOrElse(fail("no value")))
       .toMap
 
+    assertEquals(lampChart.chart.concept(c0).map(_.kind), Some(ConceptKind.Special))
     assertEquals(byRef(ref(s2, c0)).kind, SituationKind.State)
-    assertEquals(byRef(ref(s2, c0)).predicate.frame, Some("amr:be-located-at-91"))
+    assertEquals(byRef(ref(s2, c0)).predicate.frame, Some("propbank:be-located-at-91"))
     assertEquals(byRef(ref(s2, c0)).description, "be-located-at lamp table")
     assertEquals(byRef(ref(s0, c0)).kind, SituationKind.Event)
+    assertEquals(proposals.coverage(2), SentenceCoverage.Proposed(ref(s2, c0), 0, 2))
 
-    val foreignNamespace = checked(
-      s2,
-      Some(c0),
-      Map(
-        c0 -> Concept
-          .predicate("be-located-at", Some(FrameRef("propbank", "be-located-at-91", None)))
-      ),
-      salt = "foreign-namespace"
-    )
-    val foreign = propose(Vector(s2.id -> foreignNamespace))
+    val compiled = compile(Vector(s2.id -> lampChart))
+    val model = compiled.validated.getOrElse(fail(compiled.validation.report.render))
+    val stateNodes = model.graph.situations.values.collect { case SituationNode.State(node) =>
+      node
+    }
+    assertEquals(stateNodes.map(_.predicate.lemma).toVector, Vector("be-located-at"))
+    assertEquals(model.graph.situations.size, 1)
+
+    def focusOnly(concept: Concept, salt: String): PropositionEvidence =
+      checked(s2, Some(c0), Map(c0 -> concept), salt = salt)
+    val predicateWithFrame = focusOnly(Concept.predicate("be-located-at", Some(locatedFrame)), "pf")
     assertEquals(
-      foreign.situations.head.bundle.proposals.head.value.map(_.kind),
+      propose(Vector(s2.id -> predicateWithFrame)).situations.head.bundle.proposals.head.value
+        .map(_.kind),
+      Some(SituationKind.State)
+    )
+    val foreignNamespace =
+      focusOnly(
+        Concept.predicate("be-located-at", Some(FrameRef("custom", "be-located-at-91", None))),
+        "fn"
+      )
+    assertEquals(
+      propose(Vector(s2.id -> foreignNamespace)).situations.head.bundle.proposals.head.value
+        .map(_.kind),
       Some(SituationKind.Event)
+    )
+    val frameless = focusOnly(special("date-entity", None), "frameless")
+    assertEquals(
+      propose(Vector(s2.id -> frameless)).coverage(2),
+      SentenceCoverage.Abstained(
+        ref(s2, c0),
+        AbstentionReason.FocusNotPredicate(ConceptKind.Special)
+      )
+    )
+    val outsideSet =
+      focusOnly(
+        special("be-located-at", Some(FrameRef("propbank", "be-located-at-92", None))),
+        "os"
+      )
+    assertEquals(
+      propose(Vector(s2.id -> outsideSet)).coverage(2),
+      SentenceCoverage.Abstained(
+        ref(s2, c0),
+        AbstentionReason.FocusNotPredicate(ConceptKind.Special)
+      )
+    )
+    val orgRole = focusOnly(
+      special("have-org-role", Some(FrameRef("propbank", "have-org-role-91", None))),
+      "org"
+    )
+    assertEquals(
+      propose(Vector(s2.id -> orgRole)).situations.head.bundle.proposals.head.value.map(_.kind),
+      Some(SituationKind.State)
     )
   }
   test("an inadmissible root is absent and recorded") {
@@ -567,7 +613,7 @@ class ChartProposalProviderSuite extends FunSuite:
   test("the rules text is pinned by its checksum, so a rule change is a visible change") {
     assertEquals(
       ChartProposalProvider.Prompt.checksum.hex,
-      "452a06e3ebdc29f9a745ace9c1501f36690d38bbe9c5bf1e5ec30899b0f8deed"
+      "05cdb836a9768d9891368abb41cff1b7ec92ab3b042d3a8cf23bfc05de822d1b"
     )
     assert(ChartProposalProvider.RulesText.contains("Never Before or Meets"))
     assert(ChartProposalProvider.RulesText.contains("time=Time"))

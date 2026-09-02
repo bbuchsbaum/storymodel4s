@@ -216,8 +216,11 @@ object ChartProposalProvider:
   /** Calibration model of the title-summary rule, which reads no chart. */
   val SummaryCalibrationModel: String = "title-rule-v1"
 
-  /** Frame namespace of the `-91` reification set; an id in another namespace is not a state. */
-  val StateFrameNamespace: String = "amr"
+  /** Frame namespace of the `-91` reification set: the AMR adapter records every frame under its
+    * `InteropTables.FrameNamespace`, which `ChartProposalCourtSuite` pins equal to this value
+    * (`document` cannot depend on `amr-interop`). An id in another namespace is not a state.
+    */
+  val StateFrameNamespace: String = "propbank"
 
   /** The closed set of AMR `-91` reification frames whose focus denotes a state, not an event. */
   val StateFrames: Set[String] = Set(
@@ -286,7 +289,11 @@ object ChartProposalProvider:
        |
        |root: the situation root of a sentence is the chart focus and nothing else. There is no
        |  fallback to another predicate; a chart whose focus is inadmissible is abstained.
-       |admissible: the focus concept has kind Predicate and is not held by any embedding.
+       |admissible: the focus concept is not held by any embedding and has kind Predicate, or
+       |  kind Special with a state frame (below). The AMR adapter classifies every -91 roleset
+       |  as Special, so the state rule is reachable only through that clause; any other Special
+       |  focus (a frameless AMR special such as date-entity, or a -91 frame outside the closed
+       |  set) abstains with focus-not-predicate:Special.
        |kind: State when the focus concept carries a frame in namespace $StateFrameNamespace whose
        |  id is in the closed set {${StateFrames.toVector.sorted.mkString(", ")}}; otherwise
        |  Event. Lexical statives without such a frame are Event in this version.
@@ -697,7 +704,7 @@ object ChartProposalProvider:
                   s"${unit.id.value}: focus ${focus.value} is not a concept of the chart"
                 )
               )
-            case Some(concept) if !concept.isPredicate =>
+            case Some(concept) if !admissibleFocus(concept) =>
               Right(
                 abstain(
                   source,
@@ -733,10 +740,7 @@ object ChartProposalProvider:
         val support = supportSpans(unit, chart)
         val spans = support.spans
         val evidence = evidenceRecord(unit.id.value, checksum, spans)
-        val kind =
-          if concept.frame.exists(f => f.namespace == StateFrameNamespace && StateFrames(f.id))
-          then SituationKind.State
-          else SituationKind.Event
+        val kind = if stateFrame(concept) then SituationKind.State else SituationKind.Event
         val lemma = concept.lemma.value
         val value = SituationProposal(
           kind,
@@ -1062,6 +1066,17 @@ object ChartProposalProvider:
             call
           )
         }
+
+  /** A `-91` reification frame in the adapter's namespace: the only frames that make a State. */
+  private def stateFrame(concept: Concept): Boolean =
+    concept.frame.exists(f => f.namespace == StateFrameNamespace && StateFrames(f.id))
+
+  /** A predicate, or a Special concept carrying a state frame. Any other Special focus abstains: a
+    * frameless AMR special is not a situation, and a `-91` frame outside the closed set has no
+    * state reading this provider can license.
+    */
+  private def admissibleFocus(concept: Concept): Boolean =
+    concept.isPredicate || (concept.kind == ConceptKind.Special && stateFrame(concept))
 
   /** Alignment spans of every alignment naming a non-embedded concept, with their minimum credence;
     * the sentence with raw score 1.0 otherwise (recorded as span-source=sentence).

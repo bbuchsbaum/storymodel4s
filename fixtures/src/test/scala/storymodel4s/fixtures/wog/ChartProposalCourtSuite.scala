@@ -3,6 +3,8 @@ package storymodel4s.fixtures.wog
 import cats.data.{NonEmptySet, NonEmptyVector}
 import munit.FunSuite
 import storymodel4s.acquire.*
+import storymodel4s.amr.graph.FrameId
+import storymodel4s.amr.interop.InteropTables
 import storymodel4s.core.*
 import storymodel4s.document.*
 import storymodel4s.proposition.{Polarity as ChartPolarity, *}
@@ -118,7 +120,13 @@ class ChartProposalCourtSuite extends FunSuite:
     sEgulac,
     Some(c0),
     Map(
-      c0 -> Concept.predicate("be-located-at", Some(FrameRef("amr", "be-located-at-91", None))),
+      // As the AMR adapter classifies it: kind Special, frame under its propbank namespace.
+      c0 -> Concept(
+        Lemma.unsafe("be-located-at"),
+        None,
+        Some(FrameRef(InteropTables.FrameNamespace, "be-located-at-91", None)),
+        ConceptKind.Special
+      ),
       c1 -> Concept.entity("people"),
       c2 -> Concept.name("Egulac")
     ),
@@ -241,6 +249,7 @@ class ChartProposalCourtSuite extends FunSuite:
       .flatMap(a => a.bundle.proposals.flatMap(_.value).map(a.source -> _))
       .toMap
     assertEquals(values(ref(sEgulac, c0)).kind, SituationKind.State)
+    assertEquals(values(ref(sEgulac, c0)).predicate.frame, Some("propbank:be-located-at-91"))
     assertEquals(values(ref(sEgulac, c0)).description, "be-located-at people Egulac")
     assertEquals(values(ref(sHunt, c0)).kind, SituationKind.Event)
     assertEquals(values(ref(sHunt, c0)).description, "go man (purpose: hunt)")
@@ -304,6 +313,15 @@ class ChartProposalCourtSuite extends FunSuite:
       compiled.receipt.stages.map(_._1),
       Vector(parserStage, ChartProposalProvider.Stage)
     )
+  }
+
+  test("the provider's state-frame rule is keyed the way the AMR adapter classifies frames") {
+    assertEquals(ChartProposalProvider.StateFrameNamespace, InteropTables.FrameNamespace)
+    ChartProposalProvider.StateFrames.foreach { id =>
+      val frame = FrameId.from(id).fold(e => fail(e.message), identity)
+      assert(InteropTables.isSpecialFrame(frame), s"$id is not a Special frame to the adapter")
+    }
+    assertEquals(ChartProposalProvider.StateFrames.size, 24)
   }
 
   test("replaying the charts in another order reproduces the compilation fingerprint") {

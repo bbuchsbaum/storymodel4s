@@ -585,6 +585,18 @@ files:
     the input: a sentence with a situation attempt whose bundle has a proposed value is
     `Proposed`, one whose attempt is abstained is `Abstained`, a chart with no concepts is
     `EmptyChart`, and an atlas sentence with no chart is `NoChart`.
+12. **`-91` reification roots arrive as `ConceptKind.Special`.** The AMR adapter classifies every
+    `-91` roleset as `Special` under its `propbank` frame namespace, so the 1.3 state rule (which
+    required a `Predicate` focus and, as first amended here, an `amr` namespace) was unreachable
+    from real charts: "There were people at Egulac" abstained with
+    `focus-not-predicate:Special`. A focus of kind `Special` whose frame is in the closed state
+    set under `propbank` is now an admissible State root under the same evidence rules; any other
+    `Special` focus (a frameless AMR special such as `date-entity`, or a `-91` frame outside the
+    set) still abstains with the typed reason. The compiler admits a `Special` focus only when it
+    carries a frame. `ChartProposalCourtSuite` pins the namespace equal to
+    `InteropTables.FrameNamespace` and every state frame as `isSpecialFrame` to the adapter, and
+    the WOG Egulac chart now mirrors the adapter's classification. Rejected: treating every
+    `Special` focus as a situation, which would make `date-entity` a state.
 
 Evidence: `TrajectoryCompilerSuite` (document, all three platforms) is the court: three hand-built
 sentences each with a licensed `ARG0 → man` compile into one entity with three mentions, three

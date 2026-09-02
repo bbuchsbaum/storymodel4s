@@ -4,7 +4,7 @@ import cats.data.{NonEmptySet, NonEmptyVector}
 import storymodel4s.acquire.*
 import storymodel4s.core.*
 import storymodel4s.core.NarrativeKind.{EntityK, SituationK}
-import storymodel4s.proposition.{ConceptKind, PropositionEvidence}
+import storymodel4s.proposition.{Concept, ConceptKind, PropositionEvidence}
 import storymodel4s.story.{Polarity as StoryPolarity, *}
 
 /** Whether an accepted proposition denotes an event or a state.
@@ -1226,7 +1226,7 @@ object NarrativeCompiler:
                 )
               case Some(chart)
                   if chart.focus.contains(source.concept) &&
-                    chart.concept(source.concept).exists(_.kind == ConceptKind.Predicate) =>
+                    chart.concept(source.concept).exists(situationRoot) =>
                 materialize(
                   input,
                   ClaimFamily.SituationMention,
@@ -1290,7 +1290,7 @@ object NarrativeCompiler:
                   DerivationGapReason.InvalidAccepted(
                     DomainError.InvariantViolation(
                       s"compiler/situations/${source.key}",
-                      "source must be the chart focus predicate"
+                      "source must be the chart focus: a predicate or a framed special roleset"
                     )
                   )
                 )
@@ -1991,6 +1991,14 @@ object NarrativeCompiler:
       )
       .left
       .map(NarrativeCompilerError.CompilationConstruction.apply)
+
+  /** Concepts that may anchor a situation: a predicate, or a Special concept that carries a frame
+    * (the AMR adapter classifies every `-91` roleset as Special with its frame; a frameless Special
+    * such as `date-entity` is not a situation). Which framed specials are states is the provider's
+    * rule; the compiler only refuses what cannot be a situation at all.
+    */
+  private def situationRoot(concept: Concept): Boolean =
+    concept.isPredicate || (concept.kind == ConceptKind.Special && concept.frame.nonEmpty)
 
   private def materialize[A](
       input: NarrativeCompilerInput,
