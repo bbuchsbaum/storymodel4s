@@ -7,6 +7,7 @@ import storymodel4s.amr.graph.{Decoder as AmrDecoder}
 import storymodel4s.core.Checksum
 import storymodel4s.provider.parser.{
   ParserEnvelope,
+  ParserRuntimeField,
   ParserSetupFailure,
   ParserTransport,
   RemoteRuntime,
@@ -79,7 +80,8 @@ final class ClaudeParserTransport private (
     val runtime: RemoteRuntime,
     prompt: AgentPromptPackage,
     model: ModelExchange,
-    maxTokens: Long
+    maxTokens: Long,
+    backend: ModelBackend
 ) extends ParserTransport[Id]:
   private val requiredParams = ClaudeParserTransport.configParams(prompt, maxTokens)
 
@@ -109,7 +111,7 @@ final class ClaudeParserTransport private (
     if Checksum.ofText(item.text) != item.textChecksum then
       Left(TransportFailure.Io(AgentFailureCodes.TextChecksumMismatch))
     else
-      val request = ModelRequest.render(runtime.model, prompt, item, maxTokens, timeoutMillis)
+      val request = ModelRequest.render(backend, prompt, item, maxTokens, timeoutMillis)
       model
         .complete(request)
         .left
@@ -120,24 +122,40 @@ final class ClaudeParserTransport private (
         )
 
 object ClaudeParserTransport:
-  val Provider: String = "anthropic"
-  val Model: String = "claude-sonnet-5"
   val DefaultMaxTokens: Long = 4096L
 
-  /** The wrapper version a receipt records, taken from the build's single pinned SDK version. */
-  val SdkVersion: String = s"anthropic-java/${AnthropicSdkPin.version}"
+  /** The backend a run takes when the environment names none: the hosted Anthropic model. */
+  val DefaultBackend: ModelBackend = ModelBackend.default
 
-  /** The remote runtime one prompt package implies; the only way to name this adapter's identity.
+  val Provider: String = DefaultBackend.provider
+  val Model: String = DefaultBackend.model
+
+  /** The wrapper version a receipt records, taken from the build's single pinned SDK version. */
+  val SdkVersion: String = DefaultBackend.sdkVersion
+
+  /** The remote runtime one prompt package and one backend imply; the only way to name this
+    * adapter's identity. Every scalar comes from the backend the environment court admitted, so a
+    * receipt naming `openai-compatible:127.0.0.1:11434` was produced by a run configured that way.
     */
-  def runtimeFor(prompt: AgentPromptPackage): Either[ParserSetupFailure, RemoteRuntime] =
-    RemoteRuntime.from(
-      Provider,
-      Model,
-      SdkVersion,
-      prompt.ref,
-      prompt.promptTextChecksum,
-      ParserEnvelope.ResultSchema
-    )
+  def runtimeFor(
+      prompt: AgentPromptPackage,
+      backend: ModelBackend = DefaultBackend
+  ): Either[ParserSetupFailure, RemoteRuntime] =
+    if !ModelBackend.identityScalarIsSafe(backend.model) then
+      Left(ParserSetupFailure.invalidRuntimeField(ParserRuntimeField.Model))
+    else if !ModelBackend.identityScalarIsSafe(backend.provider) then
+      Left(ParserSetupFailure.invalidRuntimeField(ParserRuntimeField.Provider))
+    else if !ModelBackend.identityScalarIsSafe(backend.sdkVersion) then
+      Left(ParserSetupFailure.invalidRuntimeField(ParserRuntimeField.SdkVersion))
+    else
+      RemoteRuntime.from(
+        backend.provider,
+        backend.model,
+        backend.sdkVersion,
+        prompt.ref,
+        prompt.promptTextChecksum,
+        ParserEnvelope.ResultSchema
+      )
 
   /** The parser-config params a request must carry so its identity names this prompt. */
   def configParams(prompt: AgentPromptPackage, maxTokens: Long): Map[String, String] =
@@ -147,14 +165,18 @@ object ClaudeParserTransport:
       "max-tokens" -> maxTokens.toString
     )
 
-  /** Build a transport whose runtime identity is derived from the prompt it will send. */
+  /** Build a transport whose runtime identity is derived from the prompt it will send and the
+    * backend that will send it. The backend also keys the recordings, so one value decides both and
+    * they cannot disagree.
+    */
   def from(
       prompt: AgentPromptPackage,
       model: ModelExchange,
-      maxTokens: Long = DefaultMaxTokens
+      maxTokens: Long = DefaultMaxTokens,
+      backend: ModelBackend = DefaultBackend
   ): Either[TransportSetupError, ClaudeParserTransport] =
     if maxTokens <= 0L then Left(TransportSetupError.MaxTokensNotPositive(maxTokens))
     else
-      runtimeFor(prompt).left
+      runtimeFor(prompt, backend).left
         .map(TransportSetupError.RuntimeRefused(_))
-        .map(runtime => new ClaudeParserTransport(runtime, prompt, model, maxTokens))
+        .map(runtime => new ClaudeParserTransport(runtime, prompt, model, maxTokens, backend))

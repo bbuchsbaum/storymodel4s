@@ -26,6 +26,7 @@ object AgentFailureCodes:
   val RecordingUnwritable: ProviderFailureCode = admitted("recording-unwritable")
   val RateLimited: ProviderFailureCode = admitted("rate-limited")
   val ConnectionFailed: ProviderFailureCode = admitted("connection-failed")
+  val ReplyUndecodable: ProviderFailureCode = admitted("reply-undecodable")
   val RequestUndecodable: ProviderFailureCode = admitted("request-undecodable")
   val RequestSchemaMismatch: ProviderFailureCode = admitted("request-schema-mismatch")
   val RuntimeFingerprintMismatch: ProviderFailureCode = admitted("runtime-fingerprint-mismatch")
@@ -48,6 +49,7 @@ object AgentFailureCodes:
     RecordingUnwritable,
     RateLimited,
     ConnectionFailed,
+    ReplyUndecodable,
     RequestUndecodable,
     RequestSchemaMismatch,
     RuntimeFingerprintMismatch,

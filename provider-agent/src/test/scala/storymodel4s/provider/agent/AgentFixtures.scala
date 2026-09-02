@@ -28,8 +28,13 @@ private[agent] object AgentFixtures:
     .load()
     .fold(error => throw new IllegalArgumentException(error.message), identity)
 
-  val runtime: RemoteRuntime = ClaudeParserTransport
-    .runtimeFor(prompt)
+  /** The backend every suite here uses unless it names another one. */
+  val backend: ModelBackend = ClaudeParserTransport.DefaultBackend
+
+  val runtime: RemoteRuntime = runtimeFor(backend)
+
+  def runtimeFor(chosen: ModelBackend): RemoteRuntime = ClaudeParserTransport
+    .runtimeFor(prompt, chosen)
     .fold(error => throw new IllegalArgumentException(error.message), identity)
 
   val config: ParserConfig = ClaudeParseDriver
@@ -52,10 +57,10 @@ private[agent] object AgentFixtures:
 
   def requestItem(input: ParserSentenceInput): RequestItem = RequestItem.fromInput(input)
 
-  def keyFor(input: ParserSentenceInput): RecordingKey =
+  def keyFor(input: ParserSentenceInput, chosen: ModelBackend = backend): RecordingKey =
     ModelRequest
       .render(
-        runtime.model,
+        chosen,
         prompt,
         requestItem(input),
         ClaudeParseDriver.MaxTokens,
@@ -76,8 +81,11 @@ private[agent] object AgentFixtures:
     ExchangeSource.Scripted(new ScriptedModelClient(replies, absent))
 
   /** A hand-written reply: no accounting, because none was measured. */
-  def reply(text: String, stop: ModelStopReason = ModelStopReason.EndTurn): ModelReply =
-    ModelReply(runtime.model, text, stop, ReplyEvidence.Authored)
+  def reply(
+      text: String,
+      stop: ModelStopReason = ModelStopReason.EndTurn,
+      chosen: ModelBackend = backend
+  ): ModelReply = ModelReply(chosen.model, text, stop, ReplyEvidence.Authored)
 
   /** A reply shaped as the live client would record it. */
   def captured(text: String, durationMillis: Long): ModelReply =
@@ -92,26 +100,35 @@ private[agent] object AgentFixtures:
       )
     )
 
-  /** A fresh recordings directory holding one reply per input. */
-  def recordingsWith(replies: Map[ParserSentenceInput, ModelReply]): Recordings =
+  /** A fresh recordings directory holding one reply per input, keyed to the chosen backend. */
+  def recordingsWith(
+      replies: Map[ParserSentenceInput, ModelReply],
+      chosen: ModelBackend = backend
+  ): Recordings =
     val dir = Files.createTempDirectory("provider-agent-recordings")
     val store = Recordings
       .at(dir)
       .fold(error => throw new IllegalArgumentException(error.message), identity)
     replies.foreach { (input, reply) =>
       store
-        .write(keyFor(input), reply)
+        .write(keyFor(input, chosen), reply)
         .fold(error => throw new IllegalArgumentException(error.toString), identity)
     }
     store
 
-  def transportOver(exchange: ModelExchange): ClaudeParserTransport =
+  def transportOver(
+      exchange: ModelExchange,
+      chosen: ModelBackend = backend
+  ): ClaudeParserTransport =
     ClaudeParserTransport
-      .from(prompt, exchange)
+      .from(prompt, exchange, ClaudeParserTransport.DefaultMaxTokens, chosen)
       .fold(error => throw new IllegalArgumentException(error.message), identity)
 
-  def replayProvider(exchange: ModelExchange): AmrCandidateProvider[cats.Id] =
-    ClaudeParseDriver.provider(transportOver(exchange), config)
+  def replayProvider(
+      exchange: ModelExchange,
+      chosen: ModelBackend = backend
+  ): AmrCandidateProvider[cats.Id] =
+    ClaudeParseDriver.provider(transportOver(exchange, chosen), config)
 
   def failureOf(attempt: ParserAttempt): ParserFailure = attempt.result match
     case Left(failure) => failure

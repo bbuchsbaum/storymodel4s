@@ -81,8 +81,11 @@ final class LiveModelClient private (client: AnthropicClient) extends ModelClien
     s"${error.getClass.getName}: ${Option(error.getMessage).getOrElse("")}"
 
 object LiveModelClient:
-  /** A client exists only behind an admitted live authorization; the key never leaves it. */
-  def from(authorization: LiveAuthorization): LiveModelClient =
+  /** A client exists only behind an admitted Anthropic authorization; the key never leaves it. The
+    * parameter type is the Anthropic case, so an OpenAI-compatible configuration cannot reach the
+    * SDK at all.
+    */
+  def from(authorization: LiveAuthorization.Anthropic): LiveModelClient =
     new LiveModelClient(
       AnthropicOkHttpClient.builder().apiKey(authorization.apiKey.secret).build()
     )
