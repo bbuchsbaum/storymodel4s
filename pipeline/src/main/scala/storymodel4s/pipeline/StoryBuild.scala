@@ -283,8 +283,8 @@ object StoryPipeline:
     val p = summary.parser
     s"mode=${summary.mode.render} story=${summary.storyId.value} " +
       s"source=${summary.sourceChecksum.short()} sentences=${summary.sentences} " +
-      s"charts=${summary.charts} proposed=${c.proposed} abstained=${c.abstained} " +
-      s"emptyCharts=${c.emptyCharts} noCharts=${c.noCharts} " +
+      s"charts=${summary.charts} proposed=${c.proposed} coordinated=${c.coordinated} " +
+      s"abstained=${c.abstained} emptyCharts=${c.emptyCharts} noCharts=${c.noCharts} " +
       s"transportFailures=${p.transportFailures} replayedAuthored=${p.replayedAuthored} " +
       s"replayedCaptured=${p.replayedCaptured} capturedLive=${p.capturedLive} " +
       s"unrecorded=${p.unrecorded} corrupt=${p.corrupt} liveCalls=${summary.liveCalls} " +
