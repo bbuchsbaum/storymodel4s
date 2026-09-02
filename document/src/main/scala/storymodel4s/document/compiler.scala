@@ -218,10 +218,10 @@ enum DerivationGapReason:
   case MissingSpanEvidence
   case MissingUpstream(addresses: Vector[NarrativeCandidateAddress])
 
-  /** Two endpoints whose contexts are neither equal nor one within the other. No frame can hold
-    * the relation: scoping it at the narrated world would order reported content as world fact,
-    * and scoping it in either endpoint's context would claim a situation the other frame cannot
-    * see. The relation is recorded as missing rather than placed somewhere it does not belong.
+  /** Two endpoints whose contexts are neither equal nor one within the other. No frame can hold the
+    * relation: scoping it at the narrated world would order reported content as world fact, and
+    * scoping it in either endpoint's context would claim a situation the other frame cannot see.
+    * The relation is recorded as missing rather than placed somewhere it does not belong.
     */
   case UnscopableRelation(from: ChartNodeRef, to: ChartNodeRef)
   case InvalidAccepted(error: DomainError)
@@ -235,7 +235,7 @@ enum DerivationGapReason:
     case MissingUpstream(addresses) =>
       s"missing-upstream:${addresses.map(_.render).sorted.mkString(",")}"
     case UnscopableRelation(from, to) => s"unscopable-relation:${from.key}->${to.key}"
-    case InvalidAccepted(error)             => s"invalid-accepted:${error.message}"
+    case InvalidAccepted(error)       => s"invalid-accepted:${error.message}"
 
 /** One missing derivation, retained in the compiled artifact rather than replaced by a value. */
 final case class DerivationGap(
@@ -2669,7 +2669,8 @@ object NarrativeCompiler:
     */
   private def contextIdOf(story: StoryId, prefix: Vector[ContextStep]): ContextId =
     if prefix.isEmpty then rootContextId(story)
-    else ContextId.unsafe(ContentAddress.of("context", (story.value +: prefix.map(_.placementKey))*))
+    else
+      ContextId.unsafe(ContentAddress.of("context", (story.value +: prefix.map(_.placementKey))*))
 
   private def rootSegmentId(story: StoryId, situations: Vector[SituationId]): SegmentId =
     SegmentId.unsafe(

@@ -359,6 +359,34 @@ class ChartProposalProviderSuite extends FunSuite:
       Some(SituationKind.State)
     )
   }
+  test("an embedded focus is placed under its holder, not abstained and not asserted at root") {
+    val embeddedFocus = checked(
+      s0,
+      Some(c1),
+      Map(c0 -> Concept.predicate("think"), c1 -> Concept.predicate("enter")),
+      embedded = Vector(EmbeddedProposition(c0, EmbeddingKind.Belief, c1)),
+      polarity = Map(c1 -> ChartPolarity.Positive),
+      alignments = Vector(align(s0, "Anna", c0), align(s0, "entered", c1)),
+      salt = "embedded-focus"
+    )
+    val root = ref(s0, c1)
+    val proposals = propose(Vector(s0.id -> embeddedFocus))
+    assertEquals(proposals.coverage.head.sentence, s0.id)
+    assertEquals(proposals.contexts.map(_.source), Vector(root))
+    assertEquals(
+      dispositions(proposals.contexts.head.bundle),
+      Vector(ProposalDisposition.Proposed)
+    )
+
+    val model = compile(Vector(s0.id -> embeddedFocus)).draft
+    val situation = model.graph.situations.values.head
+    val frame = model.graph.contexts(situation.context)
+    assertNotEquals(frame.kind, ContextKind.NarratedWorld: ContextKind)
+    assertEquals(frame.kind, ContextKind.Belief(ContextHolder.Unattributed(HolderGap.NoCandidate)))
+    assertEquals(frame.parent.map(model.graph.contexts(_).kind), Some(ContextKind.NarratedWorld))
+    assertEquals(model.graph.contexts.size, 2)
+  }
+
   test("an inadmissible root is absent and recorded") {
     val noFocus = checked(
       s0,
@@ -372,17 +400,9 @@ class ChartProposalProviderSuite extends FunSuite:
       Map(c0 -> Concept.predicate("enter"), c1 -> Concept.name("Anna")),
       salt = "entity-focus"
     )
-    val embeddedFocus = checked(
-      s0,
-      Some(c1),
-      Map(c0 -> Concept.predicate("think"), c1 -> Concept.predicate("enter")),
-      embedded = Vector(EmbeddedProposition(c0, EmbeddingKind.Belief, c1)),
-      salt = "embedded-focus"
-    )
     val cases = Vector(
       (noFocus, ref(s0, c0), AbstentionReason.NoFocus),
-      (entityFocus, ref(s0, c1), AbstentionReason.FocusNotPredicate(ConceptKind.Name)),
-      (embeddedFocus, ref(s0, c1), AbstentionReason.FocusEmbedded)
+      (entityFocus, ref(s0, c1), AbstentionReason.FocusNotPredicate(ConceptKind.Name))
     )
     cases.foreach { (chart, anchor, reason) =>
       val proposals = propose(Vector(s0.id -> chart))
@@ -738,7 +758,7 @@ class ChartProposalProviderSuite extends FunSuite:
   test("the rules text is pinned by its checksum, so a rule change is a visible change") {
     assertEquals(
       ChartProposalProvider.Prompt.checksum.hex,
-      "b7244c9ea078c1c5d32488374bc33545e73edcafdd6c2ab1dd70dfe95592763e"
+      "7190c9591e8b1d3a3ba962c131ca8ae27bf27ab942e6c05dc1f8bbf09f69129b"
     )
     val rules = ChartProposalProvider.RulesText
     assert(rules.contains("Never Before or Meets"))
@@ -748,6 +768,11 @@ class ChartProposalProviderSuite extends FunSuite:
     assert(rules.contains("{and, multi-sentence, or}"), "the coordination set is not stated")
     assert(rules.contains(":domain (h / he)"), "the predicative rule is not stated")
     assert(rules.contains(":location (e / egulac)"), "the existential rule is not stated")
+    // D0's context rule is stated here too, so deleting either half of the positive root-world
+    // reading, or the one-sentence speaker lookback, moves the checksum above.
+    assert(rules.contains("A root is in the NARRATED WORLD exactly when both"), "root rule absent")
+    assert(rules.contains(QuotationScan.RuleName), "the quotation rule is not named")
+    assert(rules.contains("Attribution is a separate question"), "attribution is not stated")
     assert(rules.contains("span-source=branch-alignments"), "branch support is not stated")
     assert(rules.contains("domain=Custom(amr,domain)"), "the domain role is not in the table")
     // Slice 1.7's referentiality rule is stated here for the same reason: deleting a clause moves
@@ -828,7 +853,7 @@ class ChartProposalProviderSuite extends FunSuite:
       input.receipt.stages.map(_._2.hex),
       Vector(
         "ca098dfba74c48f09213cfea0c48e4de6bc211b67231ae64e8c684bd05420c90",
-        "ecae73d231003d3ff5e17f280129b20f75a6fba690743920467e75280ff085f8"
+        "9855eaf8e4dc1cb80351f31da1c6c04dd03733dc99185b39b9d1a7bf0d4734d6"
       )
     )
     assertEquals(input.receipt.createdAtEpochMillis, 7L)
@@ -955,7 +980,7 @@ class ChartProposalProviderSuite extends FunSuite:
     )
     assertEquals(raw(proposals.temporal.head.bundle), Some(0.6))
     assertEquals(model(bySource(ref(s0, c0))), Vector("chart-rule-v1"))
-    assertEquals(model(proposals.contexts.head.bundle), Vector("narrated-world-default-v1"))
+    assertEquals(model(proposals.contexts.head.bundle), Vector("context-placement-v1"))
     assertEquals(model(proposals.memberships.head.bundle), Vector("chart-rule-v1"))
     assertEquals(model(proposals.summary.bundle), Vector("title-rule-v1"))
     assertEquals(raw(proposals.summary.bundle), Some(1.0))

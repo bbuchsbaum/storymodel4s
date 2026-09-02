@@ -60,7 +60,7 @@ class StoryBuildSuite extends FunSuite:
 
   /** `Checksum.ofText(ChartProposalProvider.RulesText)`; a rules change must move this literal. */
   private val RulesChecksum =
-    "b7244c9ea078c1c5d32488374bc33545e73edcafdd6c2ab1dd70dfe95592763e"
+    "7190c9591e8b1d3a3ba962c131ca8ae27bf27ab942e6c05dc1f8bbf09f69129b"
 
   private val wogRecordings: Path = Paths.get(getClass.getResource("/recordings/wog").toURI)
 
@@ -272,6 +272,135 @@ class StoryBuildSuite extends FunSuite:
     * marker into the sidecar), coordinated predicates, predicative roots, and existential roots.
     * Pinning an intermediate state would pin a pipeline that never ran.
     */
+  /** The offsets of the retelling's three quoted sentences in the fixture text, measured once: `"We
+    * did such and such a thing: we fought. Many of our fellows were killed, and many of those who
+    * were attacked were killed. They said that I was shot, and I did not feel sick."` The opening
+    * mark is at 1724 and the closing mark ends at 1900.
+    */
+  private val RetellingQuotation: (Int, Int) = (1724, 1900)
+
+  /** Every situation of a built model as (least evidence offset, description, context id). */
+  private def placedSituations(model: Json): Vector[(Int, String, String)] =
+    model.hcursor
+      .downField("graph")
+      .downField("situations")
+      .focus
+      .flatMap(_.asObject)
+      .getOrElse(fail("no situations object"))
+      .values
+      .toVector
+      .map { wrapped =>
+        val node = wrapped.hcursor.downField("node")
+        val offsets = node
+          .downField("meta")
+          .downField("evidence")
+          .as[Vector[Json]]
+          .fold(e => fail(e.message), identity)
+          .flatMap(ev => rows(ev, "spans"))
+          .map(span => intField(span, "span", "start"))
+        (
+          offsets.minOption.getOrElse(fail("a situation carries no evidence span")),
+          node.downField("description").as[String].fold(e => fail(e.message), identity),
+          node.downField("context").as[String].fold(e => fail(e.message), identity)
+        )
+      }
+
+  test("the retelling is reported: the quoted sentences leave the narrated world") {
+    val dir = work("wog-retelling")
+    val outDir = dir.resolve("out")
+    buildTitled(wogText(dir), capturedRecordings, outDir)
+    val built = json(StoryPipeline.files(outDir).model)
+    val contexts = built.hcursor
+      .downField("graph")
+      .downField("contexts")
+      .focus
+      .flatMap(_.asObject)
+      .getOrElse(fail("no contexts object"))
+    val roots =
+      contexts.values.toVector.filter(_.hcursor.downField("parent").focus.forall(_.isNull))
+    assertEquals(roots.size, 1)
+    assertEquals(roots.head.hcursor.downField("kind").as[String], Right("NarratedWorld"))
+    val rootId = stringAt(roots.head, "id")
+
+    // Twelve situations left the narrated world, and six of them are the second battle the model
+    // used to assert: the man's retelling was parsed one sentence at a time, lost its quotation
+    // marks, and became story-world fact after he reached home and lit his fire. Every one of the
+    // six now sits inside the quotation that the text closes at offset 1900, in one speech context.
+    val placed = placedSituations(built)
+    assertEquals(placed.size, 65)
+    val (openAt, closeAt) = RetellingQuotation
+    val retelling = placed.filter((at, _, _) => at >= openAt && at < closeAt).sortBy(_._1)
+    assertEquals(
+      retelling.map(_._2),
+      Vector(
+        "do we thing",
+        "fight we",
+        "kill fellow",
+        "kill person",
+        "say they shoot",
+        "not feel i sick"
+      )
+    )
+    assert(
+      retelling.forall((_, _, ctx) => ctx != rootId),
+      "a retold situation is in the root world"
+    )
+    assertEquals(retelling.map(_._3).distinct.size, 1)
+
+    // The narration around it stays narration: the two speech acts that report the retelling are
+    // world events, and so is the man becoming quiet afterwards.
+    val narrated =
+      placed.filter((_, d, _) => Set("tell he everything", "become he quiet (time: then)")(d))
+    assertEquals(narrated.size, 2)
+    assert(narrated.forall((_, _, ctx) => ctx == rootId), "the narration lost the root world")
+
+    // The trajectory no longer runs a story-world chain from the telling into the fighting. The
+    // step out of `tell he everything` crosses a context boundary and says so, and no step joins
+    // two narrated-world situations across the quotation.
+    val byId = placed.map((_, d, ctx) => d -> ctx).toMap
+    val idOf = built.hcursor
+      .downField("graph")
+      .downField("situations")
+      .focus
+      .flatMap(_.asObject)
+      .getOrElse(fail("no situations object"))
+      .toMap
+      .map((key, wrapped) =>
+        key -> stringAt(wrapped.hcursor.downField("node").focus.get, "description")
+      )
+    val steps = rows(built, "trajectory", "steps")
+    val crossing = steps.filter { step =>
+      val from = idOf(stringAt(step, "from"))
+      val to = idOf(stringAt(step, "to"))
+      byId(from) != byId(to)
+    }
+    assertEquals(crossing.size, 10)
+    assert(
+      crossing.forall(step => step.hcursor.downField("contextChange").as[Boolean] == Right(true)),
+      "a context-crossing step does not record the crossing"
+    )
+    val telling = steps.filter(step => idOf(stringAt(step, "from")) == "tell he everything")
+    assertEquals(telling.size, 1)
+    assertEquals(idOf(stringAt(telling.head, "to")), "do we thing")
+    assertEquals(telling.head.hcursor.downField("contextChange").as[Boolean], Right(true))
+    assert(
+      steps.forall { step =>
+        val from = idOf(stringAt(step, "from"))
+        val to = idOf(stringAt(step, "to"))
+        !(byId(from) == rootId && byId(to) == rootId &&
+          retelling.map(_._2).contains(to))
+      },
+      "a narrated-world step still enters the retelling"
+    )
+
+    // And the temporal layer stops asserting narrated-world chronology across the boundary: the
+    // seventeen edges whose endpoints are not both in the root world are scoped in the context
+    // that can see both, never at the narrated world.
+    val temporal = rows(built, "graph", "relations", "temporal")
+    assertEquals(temporal.size, 64)
+    assertEquals(temporal.count(edge => stringAt(edge, "context") != rootId), 17)
+  }
+
   test("the fifty-sentence captured court: 50 charts, 65 situations, one named abstention") {
     val dir = work("wog-captured")
     val outDir = dir.resolve("out")
@@ -388,7 +517,7 @@ class StoryBuildSuite extends FunSuite:
     val graph = built.hcursor.downField("graph")
     assertEquals(size(graph, "situations"), 65)
     assertEquals(size(graph, "entities"), 29)
-    assertEquals(size(graph, "contexts"), 1)
+    assertEquals(size(graph, "contexts"), 6)
     assertEquals(size(graph, "segments"), 1)
     val relations = graph.downField("relations")
     assertEquals(size(relations, "participants"), 57)
@@ -399,7 +528,9 @@ class StoryBuildSuite extends FunSuite:
     assertEquals(size(built.hcursor.downField("hierarchy"), "containment"), 65)
     assertEquals(intField(report, "model", "situations"), 65)
     assertEquals(intField(report, "model", "entities"), 29)
-    assertEquals(intField(report, "model", "claims"), 386)
+    // 386 claims became 391: the five child context frames the placement rule derives are five
+    // structurally-derived claims, each citing the quotation span that licensed it.
+    assertEquals(intField(report, "model", "claims"), 391)
 
     // Slice 1.7's referentiality rule, measured on the same fifty charts. 35 entities and 68
     // participant edges became 29 and 57: the eleven fillers that moved are the nine `:time` and

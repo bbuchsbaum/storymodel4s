@@ -94,8 +94,8 @@ enum ContextStep:
     * attribution does.
     */
   def placementKey: String = this match
-    case Quoted(q, _)          => s"quotation:${q.start}:${q.endExclusive}"
-    case Embedded(c, _, kind)  => s"embedded:${c.key}:${kind.familyName}"
+    case Quoted(q, _)         => s"quotation:${q.start}:${q.endExclusive}"
+    case Embedded(c, _, kind) => s"embedded:${c.key}:${kind.familyName}"
 
   /** The words that evidence this step. */
   def support: SpanRef = this match
@@ -145,10 +145,10 @@ enum PlacementRefusal:
   * text B would place situations against evidence that does not describe them. Non-case with a
   * private constructor for the same reason.
   *
-  * Why the quotation defect is carried rather than thrown away: a text whose marks do not pair is
-  * a text whose reported content cannot be found, and every situation in it must gap rather than
-  * fall to the narrated world. Holding the defect lets [[ContextPlacement.place]] refuse each root
-  * by name instead of the whole build refusing once.
+  * Why the quotation defect is carried rather than thrown away: a text whose marks do not pair is a
+  * text whose reported content cannot be found, and every situation in it must gap rather than fall
+  * to the narrated world. Holding the defect lets [[ContextPlacement.place]] refuse each root by
+  * name instead of the whole build refusing once.
   */
 final class TextPlacement private[document] (
     val scanned: Either[QuotationDefect, QuotationScan],
@@ -316,7 +316,7 @@ object ContextPlacement:
       )
       .distinct
     NonEmptyVector.fromVector(refs) match
-      case Some(nev) => HolderCandidate.Fillers(nev)
+      case Some(nev)             => HolderCandidate.Fillers(nev)
       case None if rows.nonEmpty => HolderCandidate.Missing(HolderGap.UnresolvedCandidate)
       case None                  => HolderCandidate.Missing(HolderGap.NoCandidate)
 

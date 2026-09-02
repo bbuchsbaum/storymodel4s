@@ -1242,7 +1242,9 @@ object ChartProposalProvider:
       coordinator: ChartNodeRef,
       branch: ChartRoots.Branch,
       mentionOwner: Map[ConceptId, ConceptId]
-  )(using text: TextPlacement): Either[DomainError, (CoordinatedBranch, Option[RootOutcome], RootAttempts)] =
+  )(using
+      text: TextPlacement
+  ): Either[DomainError, (CoordinatedBranch, Option[RootOutcome], RootAttempts)] =
     val root = ChartNodeRef(unit.id, branch.concept)
     def refuse(reason: AbstentionReason) =
       Right(

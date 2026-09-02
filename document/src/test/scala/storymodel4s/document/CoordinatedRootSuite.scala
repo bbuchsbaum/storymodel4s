@@ -410,7 +410,7 @@ class CoordinatedRootSuite extends FunSuite:
     assertEquals(branches(propose(Vector(s0.id -> disjunction)).coverage.head).size, 2)
   }
 
-  test("an embedded coordination branch abstains: a held proposition is not asserted") {
+  test("an embedded coordination branch is admitted and held, never asserted at the root") {
     val chart = checked(
       s0,
       "a",
@@ -430,13 +430,17 @@ class CoordinatedRootSuite extends FunSuite:
       branches(propose(Vector(s0.id -> chart)).coverage.head),
       Vector(
         CoordinatedBranch.Admitted(ref(s0, "s"), SourceRole.Operand(1), FillerCounts.empty),
-        CoordinatedBranch.Abstained(
-          ref(s0, "b"),
-          SourceRole.Operand(2),
-          AbstentionReason.BranchEmbedded
-        )
+        CoordinatedBranch.Admitted(ref(s0, "b"), SourceRole.Operand(2), FillerCounts.empty)
       )
     )
+
+    val model = compile(Vector(s0.id -> chart)).draft
+    val byLemma = model.graph.situations.values.map(s => s.predicate.lemma -> s).toMap
+    val container = model.graph.contexts(byLemma("say").context)
+    val held = model.graph.contexts(byLemma("go").context)
+    assertEquals(container.kind, ContextKind.NarratedWorld)
+    assertEquals(held.kind, ContextKind.Speech(ContextHolder.Unattributed(HolderGap.NoCandidate)))
+    assertEquals(held.parent, Some(container.id))
   }
 
   /** `He was dead.`: `(d / dead :domain (h / he))`. */
