@@ -332,12 +332,14 @@ The first slice is deliberately smaller than the full M1 provider stack. It adds
 
 This slice proves the transformation and its failure semantics. Live provider adapters, CLI
 commands, long-document scheduling, and calibration quality remain later slices with separate
-evidence. The slice deliberately refuses to promote a multi-situation compilation: its input does
-not yet represent participant and temporal proposals, so calling `DiscourseTrajectory.derive`
-would turn missing participant support into zero turnover and missing temporal support into an
-ordinary resolved value. A single-situation story has no adjacent trajectory step and can lawfully
-exercise the full vertical path; multi-situation support is a subsequent compiler extension, not a
-default-filled shortcut in this one.
+evidence. Multi-situation compilation is supported since the 2026-09-02 amendment below, under one
+rule: a trajectory step between adjacent emitted situations is derived only when both endpoints
+carry an accepted, complete participant coverage and the pair carries an accepted temporal
+relation (`Unclear` included). Otherwise the trajectory stays empty and each blocked pair is a
+typed `MissingUpstream` gap. `DiscourseTrajectory.derive` is never called on absent inputs, so
+"no participants evaluated" can never read as zero turnover and "no temporal claim" can never read
+as an ordinary unresolved transition. A single-situation story has no adjacent pair and exercises
+the vertical path exactly as before.
 
 ## Rejected alternatives
 
@@ -469,3 +471,91 @@ Evidence: `ChartProposalProviderSuite` (document, all three platforms) and
 `ChartProposalCourtSuite` (fixtures) drive the WOG source through the analyzer, supply seven
 hand-built silver charts, and pin the ledger counts, the nine recorded gaps, and
 `validated == None` for the multi-situation compilation.
+
+### 2026-09-02: compiler extension for multi-situation drafts (solo plan phase 1.4)
+
+The first slice refused to promote any compilation with two or more situations because its input
+carried no participant or temporal proposals. This amendment extends `NarrativeCompilerInput`,
+`NarrativeCompiler`, and `ChartProposalProvider` so that a multi-sentence draft validates on
+evidence, never on defaults. The slice's refusal paragraph above is replaced by the supported rule.
+Decisions, with the alternative rejected:
+
+1. **Four new attempt families, one new claim family.** `EntityMentionAttempt(mention, bundle)`
+   with `EntityMentionProposal(label, entityType)`; `ParticipantAttempt(situation, filler, bundle)`
+   valued in `ParticipantRole`; `ParticipantCoverageAttempt(situation, bundle)` valued in
+   `ParticipantCoverage` (the sorted, deduplicated filler set a provider evaluated, possibly
+   empty); and `TemporalAttempt(from, to, bundle)` valued in `TemporalRelation`. `acquire` gains
+   `ClaimFamily.ParticipantCoverage` (ordinary policy). Each family has its own
+   `NarrativeCandidateAddress` case and its own resolution record, so the receipt names every
+   nominated candidate. Rejected: deriving participants inside the compiler from chart roles
+   without an attempt. A role the provider never proposed would then become an edge with no
+   provider receipt, which is exactly the fabricated licence §7 of the design contract names.
+2. **Coverage is a value, not the absence of participants.** `DiscourseTrajectory.derive` computes
+   entity turnover from participant sets, and an empty set yields 0.0. Without a coverage claim,
+   "no participants evaluated" and "evaluated and found none" produce the same number. An accepted
+   empty coverage is the evidenced statement that the chart reaches no licensed participant from
+   the root (the root's own support is its evidence); it yields turnover 0.0 legitimately. An
+   unresolved coverage blocks every step touching the situation. The input binding requires exactly
+   one coverage attempt per situation attempt, every coverage filler to have a participant attempt,
+   and every participant attempt to be named by a coverage candidate. Rejected: inferring coverage
+   from the participant attempts present. A provider that proposed two of three fillers would then
+   read as complete.
+3. **The step gate.** For each adjacent pair of emitted situations in discourse order the compiler
+   requires an emitted coverage claim at both endpoints (a coverage claim is emitted only when
+   every filler it names has an emitted participant edge) and an emitted temporal claim for the
+   pair. If every pair passes, the whole trajectory is derived and each step's flow claim is the
+   `Emitted` disposition of its `TrajectoryStep` candidate; if any pair fails, the trajectory is
+   empty, each failing pair is `MissingUpstream(coverage or temporal addresses)`, and each passing
+   pair is `MissingUpstream(the failing steps)`, because `trajectory.complete` is all-or-nothing.
+   `DerivationGapReason.UnsupportedTrajectoryInputs` is removed; nothing else referenced it.
+   Rejected: deriving steps for the passing pairs only, which the validator would refuse and which
+   would leave a partially derived trajectory in the draft.
+4. **Exact coreference by case-folded label and type.** Accepted mentions are grouped by
+   `(TextNorm.lower(label), entityType)`; the `EntityId` is
+   `ExactCorefCluster.canonicalFor[EntityK]` over the sorted member mention ids, so no provider can
+   mint one. The node claim and the label claim are separate `StructurallyDerived` claims with the
+   member mention claims upstream (the model ledger is keyed by claim id). The label is the earliest
+   member's spelling; other spellings are alternatives on the `Resolved` label. Mention claims are
+   `SurfaceExplicit`, by the same argument as situation mentions: the compiler verifies the chart
+   node is an entity, name, or quantity concept and the claim cites its spans. Participant,
+   coverage, and temporal claims are `Hypothesized`, the conservative floor. Rejected: grouping by
+   exact label. "Man" and "man" are one lemma in every chart this repository produces, and the
+   fold is locale-independent.
+5. **Provider rules.** For each admissible root, every relation from the root to an entity-kind
+   concept with exactly one licensed participant role yields one participant attempt and one
+   entity-mention attempt (label = lemma, type = `Custom("chart", kind lowercased)`). A numbered
+   argument is licensed only by a normalized role already on the chart (the lexicon's); a named
+   role is licensed by the chart's own normalized role, else by the standard table mirrored from
+   the AMR adapter (`location`, `time`, `manner`, `cause`, `purpose`, `instrument`,
+   `beneficiary`, `source`, `destination`). A filler reached by no licensed role, or by two
+   different ones, is counted `unlicensed` on `SentenceCoverage.Proposed(sentence, root, fillers,
+   unlicensed)` and never proposed. One coverage attempt per admissible root lists exactly the
+   proposed fillers; an abstained root yields an abstained coverage attempt. One `Unclear` temporal
+   attempt per consecutive pair of admissible roots in sentence order. Never `Before` or `Meets`:
+   a `:time` filler is a concept of its own chart, not a preceding root, so nothing in a chart
+   licenses strict precedence between roots; and `StrictPrecedence` is a high-impact family whose
+   conservative policy this single provider could not satisfy alone. Both facts are in
+   `RulesText`, so they are in every receipt. Rejected: proposing `Before` from sentence order.
+   Discourse order is not story-world order (design contract rule 5).
+6. **Evidence.** Mention evidence is the filler's alignment spans (`span-source=filler-alignments`),
+   else the root support (`span-source=root-support`), so an entity's support is the words that
+   mention it rather than the whole sentence; this deviates from the phase brief, which unioned
+   filler and root spans for both, because the entity support is what the Atlas draws. Participant
+   evidence is the union of the filler's alignment spans and the root support. Temporal evidence
+   spans both roots' support.
+7. **Identity.** The candidate-set tag is `narrative-candidates/v4` and the compilation tag
+   `narrative-compilation/v3`; the fingerprint now covers entity nodes, participant and temporal
+   edges, and flow steps (turnover, transition, context). The rules checksum moved to
+   `d8b5d676af644421f022b6fc8650f8ceb7d5b1ff65ce0c634c09e0bb25f47bde` and is pinned as a literal.
+
+Evidence: `TrajectoryCompilerSuite` (document, all three platforms) is the court: three hand-built
+sentences each with a licensed `ARG0 → man` compile into one entity with three mentions, three
+participant edges, two `Unclear` temporal edges, and two steps with `Unresolved` world time and
+turnover 0.0, and validate; withholding one coverage, one participant, or one mention yields the
+named gaps and no step; `After` is refused at the input; the case fold and the zero-turnover court
+are pinned. `ChartProposalProviderSuite` pins the provider counts and the rules checksum;
+`ChartProposalCourtSuite` (fixtures) pins the WOG ledger (one licensed filler, six coverage
+attempts, three `Unclear` pairs, eight gaps, `validated == None` while two sentences abstain);
+`CompiledAtlasSuite` (view) compiles the three-sentence silver model through `AtlasCompiler` on
+the `ValidatedBuild` basis. Mutation ledger: see the landing commit.
+
