@@ -227,7 +227,7 @@ class ChartProposalProviderSuite extends FunSuite:
         SentenceCoverage.NoChart(s2.id)
       )
     )
-    assertEquals(proposals.counts, CoverageCounts(1, 0, 0, 2))
+    assertEquals(proposals.counts, CoverageCounts(1, 0, 0, 0, 2))
     assertEquals(proposals.summaryCoverage, SummaryCoverage.Proposed("Tiny story"))
   }
 
@@ -370,7 +370,7 @@ class ChartProposalProviderSuite extends FunSuite:
     cases.foreach { (chart, anchor, reason) =>
       val proposals = propose(Vector(s0.id -> chart))
       assertEquals(proposals.coverage.head, SentenceCoverage.Abstained(anchor, reason))
-      assertEquals(proposals.counts, CoverageCounts(0, 1, 0, 2))
+      assertEquals(proposals.counts, CoverageCounts(0, 0, 1, 0, 2))
       assertEquals(proposals.situations.map(_.source), Vector(anchor))
       assertEquals(proposals.contexts.map(_.source), Vector(anchor))
       assertEquals(proposals.memberships.map(_.member), Vector(anchor))
@@ -430,7 +430,7 @@ class ChartProposalProviderSuite extends FunSuite:
         SentenceCoverage.NoChart(s2.id)
       )
     )
-    assertEquals(proposals.counts, CoverageCounts(1, 0, 1, 1))
+    assertEquals(proposals.counts, CoverageCounts(1, 0, 0, 1, 1))
     assertEquals(proposals.situations.size, 1)
 
     val compiled = compile(charts)
@@ -965,7 +965,7 @@ class ChartProposalProviderSuite extends FunSuite:
         SentenceCoverage.NoChart(s2.id)
       )
     )
-    assertEquals(proposals.counts, CoverageCounts(0, 0, 0, 3))
+    assertEquals(proposals.counts, CoverageCounts(0, 0, 0, 0, 3))
     assertEquals(proposals.situations, Vector.empty)
     val compiled = compile(Vector.empty)
     assertEquals(compiled.draft.graph.situations, Map.empty)

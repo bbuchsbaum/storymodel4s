@@ -61,9 +61,9 @@ object Projection:
         else
           graph.flatMap { g =>
             sources.toSortedSet.toVector.iterator
-              .flatMap(n => g.concept(n).map(n -> _))
+              .flatMap(n => g.chart(n.sentence).zip(g.concept(n)).map((chart, c) => (n, chart, c)))
               .collectFirst {
-                case (n, c) if !w.accepts(c.kind) =>
+                case (n, chart, c) if !w.acceptsAt(chart, n.concept, c) =>
                   DocumentError.SourceKindMismatch(n, c.kind, w.tag, path)
               }
           }
