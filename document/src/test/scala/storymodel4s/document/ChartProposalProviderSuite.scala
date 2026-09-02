@@ -581,6 +581,35 @@ class ChartProposalProviderSuite extends FunSuite:
     assertEquals(circumstanceSources, Map("c1" -> "root-support"))
   }
 
+  test("a quantity under a referential role is not a referent and mints no entity") {
+    val chart = checked(
+      s0,
+      Some(c0),
+      Map(
+        c0 -> Concept.predicate("enter", Some(enterFrame)),
+        c1 -> Concept(Lemma.unsafe("5"), None, None, ConceptKind.Quantity)
+      ),
+      Vector(PropositionRelation(c0, licensedAgent, ConceptTarget.Node(c1))),
+      alignments = Vector(align(s0, "entered", c0), align(s0, "room", c1)),
+      salt = "quantity-filler"
+    )
+    val proposals = propose(Vector(s0.id -> chart))
+
+    // The role takes a referent; the concept cannot be one. Both coordinates have to hold, and the
+    // receipt says which of them refused.
+    assertEquals(
+      proposals.coverage.head,
+      SentenceCoverage.Proposed(ref(s0, c0), FillerCounts(0, 0, 1, 0))
+    )
+    assertEquals(proposals.participants, Vector.empty)
+    assertEquals(proposals.entityMentions, Vector.empty)
+    assertEquals(proposals.circumstances, Vector.empty)
+    val refusals = proposals.calls
+      .filter(_.params.get("rule").contains(Referentiality.RuleName))
+      .map(call => call.params("filler") -> call.params("reason"))
+    assertEquals(refusals, Vector("c1" -> "concept-kind-not-referential:Quantity"))
+  }
+
   test("a filler reached by two different licensed roles is unlicensed, not a guess") {
     val chart = checked(
       s0,
