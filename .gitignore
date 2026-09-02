@@ -23,3 +23,7 @@ docs-site/dist/
 docs-site/.astro/
 media/worker/.venv/
 media/worker-vlm/.venv/
+
+# local secrets (API keys); never committed
+.env
+.env.*
