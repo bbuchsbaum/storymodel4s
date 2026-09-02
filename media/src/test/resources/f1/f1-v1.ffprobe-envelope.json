@@ -5,15 +5,25 @@
   "inputSha256": "efcdc104cabe4a1f885f5e60fbf9ec0774c792e6fb02e67a85e87e424e8f25a1",
   "tool": {
     "name": "ffprobe",
-    "invokedPath": "/opt/homebrew/bin/ffprobe",
-    "resolvedPath": "/opt/homebrew/Cellar/ffmpeg/7.1.1_3/bin/ffprobe",
-    "versionLine": "ffprobe version 7.1.1 Copyright (c) 2007-2025 the FFmpeg developers",
-    "binarySha256": "83f66b74c1f0fe3995f762adbaa90c1d32fbd8e1feceedc64fed4261e1a65ebb",
-    "realization": "local Homebrew build (GPL-enabled, general purpose). Not the nominated FFmpeg 9.0.1 LGPL-only probe-only recipe; that recipe stays RecipeOnly. Output authority: Draft."
+    "invokedPath": "/Users/bbuchsbaum/code/scala/storymodel4s/.worktrees/perception-first-court/tmp/ffmpeg-9.0.1/install2/bin/ffprobe",
+    "resolvedPath": "/Users/bbuchsbaum/code/scala/storymodel4s/.worktrees/perception-first-court/tmp/ffmpeg-9.0.1/install2/bin/ffprobe",
+    "versionLine": "ffprobe version 9.0.1 Copyright (c) 2007-2026 the FFmpeg developers",
+    "binarySha256": "13d17dfdd7f25e2038075784b734a4ea60ee97292ed1adcd742412185313e66e",
+    "realization": "FFmpeg 9.0.1 \"Lei\" built locally from the signature-verified release tarball (sha256 cf38e0e2...) by media/tools/build_ffmpeg_9.0.1.sh: LGPL-only (--disable-gpl --disable-version3 --disable-nonfree), everything disabled except protocol file, demuxer mov, decoders rawvideo and h264, parser h264, encoder and muxer rawvideo, swscale and filters scale/format/null; static linking so this digest covers the demuxing and decoding code; only Apple system frameworks are dynamically linked (ledger 6.2). Output authority: Draft."
   },
-  "args": ["-v", "error", "-hide_banner", "-protocol_whitelist", "file", "-of", "json", "-show_streams", "-show_packets"],
+  "args": [
+    "-v",
+    "error",
+    "-hide_banner",
+    "-protocol_whitelist",
+    "file",
+    "-of",
+    "json",
+    "-show_streams",
+    "-show_packets"
+  ],
   "stdoutFile": "f1-v1.ffprobe-stdout.json",
-  "stdoutSha256": "93d3c1652e841aea7f0d150c551e41202d833cd35b2c33c58c8aaf45ac10c342",
+  "stdoutSha256": "334e8cd8b32a7233cac7254232229f0824ce6bb2a076059e825074f1f9753e2b",
   "recordedAt": "2026-09-01",
-  "note": "Ordinary CI replays this recorded envelope. The live court re-invokes the tool only when both ffprobe and the locally derived excerpt (tmp/f1/f1-v1.mp4, or STORYMODEL4S_F1_EXCERPT) are present; it never downloads the film."
+  "note": "Ordinary CI replays this recorded envelope. The live court re-invokes whichever ffprobe is on PATH or in STORYMODEL4S_FFPROBE and compares the picture packet table; identities are compared only when the same binary ran. It never downloads or builds a tool."
 }

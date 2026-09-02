@@ -379,8 +379,9 @@ final class BoundaryLocalizationProposal private[media] (
   * The axis is the picture stream's native presentation clock admitted as the edition playback axis
   * under one recorded assumption: that stream's edit list is the identity. The join checks the
   * evidence it has for that (the tool's reported stream start equals the first presented PTS and
-  * nothing was discarded) and refuses otherwise. A checked track-composition receipt is the E0
-  * court's, not this one's.
+  * nothing was discarded) and refuses when either signal says otherwise. An edit list the demuxer
+  * folds without either signal is not detected: the `elst` itself is never read. A checked
+  * track-composition receipt is the E0 court's, not this one's.
   */
 final class BoundarySearchResult private[media] (
     val frames: FrameSet,
@@ -437,13 +438,13 @@ object BoundarySearch:
       worker: ToolRealization
   ): Either[DomainError, BoundarySearchResult] =
     for
+      _ <- identityEditList(frames)
       _ <- requestDescribes(frames, request)
       _ <- outcomeAnswers(frames, request, outcome, worker)
       _ <- appliedMatches(request.recipe, outcome.applied)
       _ <- coverage(frames, outcome)
       _ <- metricsComplete(frames, outcome)
       _ <- cutsLawful(frames, outcome)
-      _ <- identityEditList(frames)
       endExclusive <- frames.index.endExclusive.toRight(
         DomainError.InvariantViolation(
           "boundary/extent",

@@ -1,6 +1,6 @@
 # ADR 0007 — Represent film through typed evidence and a presentation axis
 
-**Status:** Proposed architecture; document-only Stage A
+**Status:** Accepted. Stage C portable contracts landed (C1, salvaged 2026-09-01); the first acquisition court is executed locally under the 2026-09-01 amendments below, with `Draft` authority throughout; Stages D and E remain open
 
 **Date:** 2026-08-29
 
@@ -655,8 +655,10 @@ Bead `bd-01M1FEN59CZCCR0SR3B6MZ1KYB` (first acquisition court, landing B) adds t
   state rather than echoed from the request; the join refuses unless it satisfies the recipe, and
   an automatic kernel size must come back as a positive resolved value. `FrameMetrics` — raw
   per-frame detector values. The outcome's claimed runtime must render to the worker
-  `ToolRealization`'s version line or the join refuses; the worker's interpreter and wheel bytes
-  are not hashed, only its script.
+  `ToolRealization`'s version line or the join refuses; `WorkerRealization.observe` builds that
+  realization by asking the interpreter for its versions and hashing the script, independently of
+  the outcome, so the live courts compare two sources rather than the outcome with itself. The
+  worker's interpreter and wheel bytes are not hashed, only its script.
 - `BoundaryLocalizationProposal`, `BoundarySearch` and `BoundarySearchResult` — the typed
   candidate of §6's output table, row "shot, track, interval, identity, boundary": a
   boundary-existence and localization proposal on `BoundaryLayer.Shot`, at the instant of the
@@ -668,7 +670,9 @@ Bead `bd-01M1FEN59CZCCR0SR3B6MZ1KYB` (first acquisition court, landing B) adds t
   The axis is the picture stream's native presentation clock admitted as the edition playback
   axis under one recorded assumption, named in the receipt: that stream's edit list is the
   identity. The join checks the evidence it has (the tool's reported stream start equals the
-  first presented PTS and no packet was discarded) and refuses otherwise; a checked
+  first presented PTS and no packet was discarded) and refuses when either signal says otherwise;
+  an edit list the demuxer folds without either signal is not detected, since the `elst` itself is
+  never read; a checked
   `TrackComposition` receipt, and any non-identity edit list, belong to the E0 court.
 
 The worker itself lives at `media/worker/` as a uv-locked Python project pinned to the ledger's

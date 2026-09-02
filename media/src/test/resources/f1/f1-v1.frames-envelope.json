@@ -6,13 +6,30 @@
   "streamIndex": 0,
   "tool": {
     "name": "ffmpeg",
-    "invokedPath": "/opt/homebrew/bin/ffmpeg",
-    "resolvedPath": "/opt/homebrew/Cellar/ffmpeg/7.1.1_3/bin/ffmpeg",
-    "versionLine": "ffmpeg version 7.1.1 Copyright (c) 2000-2025 the FFmpeg developers",
-    "binarySha256": "14c12cd5dcbc0d75c83085296b27142a4abc61a320a97a5408f7048fa7cbd630",
-    "realization": "local Homebrew build (--enable-gpl --enable-version3 --enable-libx264 per -buildconf); native libavcodec h264 decoder. Not the nominated FFmpeg 9.0.1 LGPL-only recipe. Output authority: Draft."
+    "invokedPath": "/Users/bbuchsbaum/code/scala/storymodel4s/.worktrees/perception-first-court/tmp/ffmpeg-9.0.1/install2/bin/ffmpeg",
+    "resolvedPath": "/Users/bbuchsbaum/code/scala/storymodel4s/.worktrees/perception-first-court/tmp/ffmpeg-9.0.1/install2/bin/ffmpeg",
+    "versionLine": "ffmpeg version 9.0.1 Copyright (c) 2000-2026 the FFmpeg developers",
+    "binarySha256": "85c119a501f50732cbe2e1698a6247d461dd23e01aab85a55743a8fe8a9d86d4",
+    "realization": "FFmpeg 9.0.1 \"Lei\" built locally from the signature-verified release tarball (sha256 cf38e0e2...) by media/tools/build_ffmpeg_9.0.1.sh: LGPL-only (--disable-gpl --disable-version3 --disable-nonfree), everything disabled except protocol file, demuxer mov, decoders rawvideo and h264, parser h264, encoder and muxer rawvideo, swscale and filters scale/format/null; static linking so this digest covers the demuxing and decoding code; only Apple system frameworks are dynamically linked (ledger 6.2). Output authority: Draft."
   },
-  "args": ["-hide_banner", "-loglevel", "error", "-y", "-protocol_whitelist", "file", "-map", "0:0", "-vf", "scale=in_color_matrix=bt601:in_range=tv:out_range=pc", "-f", "rawvideo", "-pix_fmt", "bgr24", "-fps_mode", "passthrough"],
+  "args": [
+    "-hide_banner",
+    "-loglevel",
+    "error",
+    "-y",
+    "-protocol_whitelist",
+    "file",
+    "-map",
+    "0:0",
+    "-vf",
+    "scale=in_color_matrix=bt601:in_range=tv:out_range=pc",
+    "-f",
+    "rawvideo",
+    "-pix_fmt",
+    "bgr24",
+    "-fps_mode",
+    "passthrough"
+  ],
   "preprocessing": "h264 yuv420p 320x180 decoded by libavcodec and converted to bgr24 by libswscale with the matrix and ranges declared in the arguments (BT.601, limited range in, full range out; the source is untagged); no scaling, no crop, no rotation, no frame duplication or dropping (passthrough); every indexed packet yields exactly one frame",
   "frames": {
     "count": 720,
@@ -23,5 +40,5 @@
     "sha256": "e1fcc24398c81b9da928276bcefeef8d0021bf924a0bade931553b4956301b3e"
   },
   "recordedAt": "2026-09-01",
-  "note": "Decoded frame bytes (124 MB) are not committed. Decoder output identity is a property of this exact libavcodec build; a different build may decode to different bytes, in which case the live court reports drift rather than failing."
+  "note": "Decoded frame bytes (124 MB) are not committed. Decoder output identity is a property of this exact libavcodec build; a different build may decode to different bytes, in which case the live court reports drift rather than failing. Re-recorded under the realized 9.0.1 build on 2026-09-01: the decoded bytes are identical to the earlier Homebrew 7.1.1 decode."
 }
