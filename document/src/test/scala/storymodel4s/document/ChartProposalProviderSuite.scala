@@ -179,6 +179,14 @@ class ChartProposalProviderSuite extends FunSuite:
     assertEquals(proposals.contexts.map(_.source), Vector(root))
     assertEquals(proposals.memberships.map(_.member), Vector(root))
     assertEquals(proposals.causal, Vector.empty)
+    assertEquals(proposals.participantCoverage.map(_.situation), Vector(root))
+    assertEquals(
+      proposals.participantCoverage.head.bundle.proposals.head.value,
+      Some(ParticipantCoverage.empty)
+    )
+    assertEquals(proposals.participants, Vector.empty)
+    assertEquals(proposals.entityMentions, Vector.empty)
+    assertEquals(proposals.temporal, Vector.empty)
     val situation = proposals.situations.head.bundle
     assertEquals(dispositions(situation), Vector(ProposalDisposition.Proposed))
     assertEquals(
@@ -201,7 +209,7 @@ class ChartProposalProviderSuite extends FunSuite:
     assertEquals(
       proposals.coverage,
       Vector(
-        SentenceCoverage.Proposed(s0.id, root),
+        SentenceCoverage.Proposed(s0.id, root, 0, 2),
         SentenceCoverage.NoChart(s1.id),
         SentenceCoverage.NoChart(s2.id)
       )
@@ -224,7 +232,7 @@ class ChartProposalProviderSuite extends FunSuite:
       SpanSet.of(Vector(spanOf(s0, "Anna"), spanOf(s0, "entered"), spanOf(s0, "room")))
     )
     val situationCalls = proposals.calls.filter(_.params.get("sentence").contains(s0.id.value))
-    assertEquals(situationCalls.size, 3)
+    assertEquals(situationCalls.size, 4)
     assertEquals(situationCalls.map(spanSourceOf).toSet, Set("chart-alignments"))
   }
 
@@ -312,6 +320,11 @@ class ChartProposalProviderSuite extends FunSuite:
         Vector(ProposalDisposition.Abstained)
       )
       assertEquals(proposals.situations.head.bundle.calibrations, Vector.empty)
+      assertEquals(proposals.participantCoverage.map(_.situation), Vector(anchor))
+      assertEquals(
+        dispositions(proposals.participantCoverage.head.bundle),
+        Vector(ProposalDisposition.Abstained)
+      )
       assertEquals(proposals.evidence.map(_.id), Vector(summaryEvidenceId))
 
       val compiled = compile(Vector(s0.id -> chart))
@@ -321,7 +334,8 @@ class ChartProposalProviderSuite extends FunSuite:
       assertEquals(gapsByFamily(ClaimFamily.SituationMention), noProposal)
       assertEquals(gapsByFamily(ClaimFamily.ContextAssignment), noProposal)
       assertEquals(gapsByFamily(ClaimFamily.SegmentMembership), noProposal)
-      assertEquals(compiled.derivation.gaps.size, 4)
+      assertEquals(gapsByFamily(ClaimFamily.ParticipantCoverage), noProposal)
+      assertEquals(compiled.derivation.gaps.size, 5)
       assertEquals(compiled.validated, None)
     }
   }
@@ -340,7 +354,7 @@ class ChartProposalProviderSuite extends FunSuite:
       proposals.coverage,
       Vector(
         SentenceCoverage.EmptyChart(s0.id),
-        SentenceCoverage.Proposed(s1.id, ref(s1, c0)),
+        SentenceCoverage.Proposed(s1.id, ref(s1, c0), 0, 0),
         SentenceCoverage.NoChart(s2.id)
       )
     )
@@ -373,11 +387,164 @@ class ChartProposalProviderSuite extends FunSuite:
     assertEquals(compiled.draft.graph.situations.size, 3)
     assertEquals(compiled.draft.hierarchy.primary.size, 3)
     assert(!compiled.validation.report.byLaw.contains("hierarchy.member-within-parent"))
+    assertEquals(compiled.derivation.gaps, Vector.empty)
+    val model = compiled.validated.getOrElse(fail(compiled.validation.report.render))
+    assertEquals(model.trajectory.steps.map(_.entityTurnover), Vector(0.0, 0.0))
     assertEquals(
-      compiled.derivation.gaps.map(_.family),
-      Vector(ClaimFamily.DiscourseTrajectory, ClaimFamily.DiscourseTrajectory)
+      model.trajectory.steps.map(_.worldTime.value).toSet,
+      Set(WorldTimeTransition.Unresolved(Vector.empty))
     )
-    assertEquals(compiled.validated, None)
+    assertEquals(model.graph.entities, Map.empty)
+  }
+
+  private val licensedAgent = RoleAssignment(
+    SourceRole.Numbered(0),
+    Some((ParticipantRole.Agent, Credence.unsafeRaw(0.5)))
+  )
+
+  test("a licensed numbered role yields a participant, a mention, and a coverage naming it") {
+    val licensed = enterChart(relations =
+      Vector(
+        PropositionRelation(c0, licensedAgent, ConceptTarget.Node(c1)),
+        PropositionRelation(c0, RoleAssignment.arg(1), ConceptTarget.Node(c2))
+      )
+    )
+    val proposals = propose(Vector(s0.id -> licensed))
+    val root = ref(s0, c0)
+    val anna = ref(s0, c1)
+
+    assertEquals(proposals.coverage.head, SentenceCoverage.Proposed(s0.id, root, 1, 1))
+    assertEquals(proposals.participants.map(a => (a.situation, a.filler)), Vector((root, anna)))
+    assertEquals(
+      proposals.participants.head.bundle.proposals.head.value,
+      Some(ParticipantRole.Agent)
+    )
+    assertEquals(proposals.entityMentions.map(_.mention), Vector(anna))
+    assertEquals(
+      proposals.entityMentions.head.bundle.proposals.head.value,
+      Some(EntityMentionProposal("Anna", EntityType.Custom("chart", "name")))
+    )
+    assertEquals(
+      proposals.participantCoverage.head.bundle.proposals.head.value,
+      Some(ParticipantCoverage.of(Vector(anna)))
+    )
+    val rootSpans =
+      SpanSet.of(Vector(spanOf(s0, "Anna"), spanOf(s0, "entered"), spanOf(s0, "room")))
+    def inlineEvidence(bundle: EvidenceBundle[?]): Evidence =
+      bundle.proposals.head.evidence.head match
+        case EvidenceRef.Inline(ev) => ev
+        case other                  => fail(s"not inline: $other")
+    assertEquals(
+      inlineEvidence(proposals.entityMentions.head.bundle).spans,
+      Some(SpanSet.one(spanOf(s0, "Anna")))
+    )
+    assertEquals(inlineEvidence(proposals.participants.head.bundle).spans, rootSpans)
+    val mentionCall =
+      proposals.calls.find(_.params.get("rule").contains("entity-filler-mention-rule"))
+    assertEquals(mentionCall.map(spanSourceOf), Some("filler-alignments"))
+    assertEquals(mentionCall.flatMap(_.params.get("filler")), Some("c1"))
+
+    val compiled = compile(Vector(s0.id -> licensed))
+    val model = compiled.validated.getOrElse(fail(compiled.validation.report.render))
+    assertEquals(model.graph.entities.size, 1)
+    assertEquals(model.graph.entities.values.head.label.value, "Anna")
+    assertEquals(model.graph.relations.participants.map(_.role), Vector(ParticipantRole.Agent))
+    assertEquals(compiled.derivation.gaps, Vector.empty)
+  }
+
+  test(
+    "named time and location roles map as the AMR adapter maps them; the unaligned filler cites the root"
+  ) {
+    val chart = checked(
+      s0,
+      Some(c0),
+      Map(
+        c0 -> Concept.predicate("enter", Some(enterFrame)),
+        c1 -> Concept.entity("night"),
+        c2 -> Concept.entity("room")
+      ),
+      Vector(
+        PropositionRelation(c0, RoleAssignment.named("time"), ConceptTarget.Node(c1)),
+        PropositionRelation(c0, RoleAssignment.named("location"), ConceptTarget.Node(c2))
+      ),
+      alignments = Vector(align(s0, "entered", c0), align(s0, "room", c2)),
+      salt = "named-roles"
+    )
+    val proposals = propose(Vector(s0.id -> chart))
+    val byFiller = proposals.participants
+      .map(a => a.filler -> a.bundle.proposals.head.value.getOrElse(fail("no role")))
+      .toMap
+
+    assertEquals(proposals.coverage.head, SentenceCoverage.Proposed(s0.id, ref(s0, c0), 2, 0))
+    assertEquals(byFiller(ref(s0, c1)), ParticipantRole.Time)
+    assertEquals(byFiller(ref(s0, c2)), ParticipantRole.Location)
+    val mentionSources = proposals.calls
+      .filter(_.params.get("rule").contains("entity-filler-mention-rule"))
+      .map(c => c.params("filler") -> spanSourceOf(c))
+      .toMap
+    assertEquals(mentionSources, Map("c1" -> "root-support", "c2" -> "filler-alignments"))
+  }
+
+  test("a filler reached by two different licensed roles is unlicensed, not a guess") {
+    val chart = checked(
+      s0,
+      Some(c0),
+      Map(c0 -> Concept.predicate("enter", Some(enterFrame)), c1 -> Concept.name("Anna")),
+      Vector(
+        PropositionRelation(c0, licensedAgent, ConceptTarget.Node(c1)),
+        PropositionRelation(c0, RoleAssignment.named("location"), ConceptTarget.Node(c1))
+      ),
+      alignments = Vector(align(s0, "entered", c0), align(s0, "Anna", c1)),
+      salt = "two-roles"
+    )
+    val proposals = propose(Vector(s0.id -> chart))
+
+    assertEquals(proposals.coverage.head, SentenceCoverage.Proposed(s0.id, ref(s0, c0), 0, 1))
+    assertEquals(proposals.participants, Vector.empty)
+    assertEquals(proposals.entityMentions, Vector.empty)
+  }
+
+  test("Unclear temporal attempts follow atlas order and skip sentences without a proposed root") {
+    val entityFocus = checked(
+      s1,
+      Some(c1),
+      Map(c0 -> Concept.predicate("rest"), c1 -> Concept.name("She")),
+      salt = "s1-entity-focus"
+    )
+    val skipping = propose(Vector(s0.id -> enterChart(), s1.id -> entityFocus, s2.id -> lampChart))
+    assertEquals(
+      skipping.temporal.map(a => (a.from, a.to)),
+      Vector((ref(s0, c0), ref(s2, c0)))
+    )
+    assertEquals(
+      skipping.temporal.head.bundle.proposals.head.value,
+      Some(TemporalRelation.Unclear)
+    )
+
+    val full = propose(Vector(s2.id -> lampChart, s0.id -> enterChart(), s1.id -> restChart()))
+    assertEquals(
+      full.temporal.map(a => (a.from, a.to)),
+      Vector((ref(s0, c0), ref(s1, c0)), (ref(s1, c0), ref(s2, c0)))
+    )
+    val pairEvidence = full.temporal.head.bundle.proposals.head.evidence.head match
+      case EvidenceRef.Inline(ev) => ev
+      case other                  => fail(s"not inline: $other")
+    assertEquals(
+      pairEvidence.spans,
+      SpanSet.of(
+        Vector(spanOf(s0, "Anna"), spanOf(s0, "entered"), spanOf(s0, "room"), spanOf(s1, "rest"))
+      )
+    )
+    assert(full.temporal.forall(_.bundle.proposals.head.value.contains(TemporalRelation.Unclear)))
+  }
+
+  test("the rules text is pinned by its checksum, so a rule change is a visible change") {
+    assertEquals(
+      ChartProposalProvider.Prompt.checksum.hex,
+      "d8b5d676af644421f022b6fc8650f8ceb7d5b1ff65ce0c634c09e0bb25f47bde"
+    )
+    assert(ChartProposalProvider.RulesText.contains("Never Before or Meets"))
+    assert(ChartProposalProvider.RulesText.contains("time=Time"))
   }
 
   test("chart order and alignment order do not change the proposals or the fingerprint") {
@@ -412,7 +579,7 @@ class ChartProposalProviderSuite extends FunSuite:
     assertEquals(input.provenance.softwareVersion, StoryModel.SchemaVersion)
     assert(proposals.calls.forall(_.inputChecksum == source.canonicalChecksum))
     assert(proposals.calls.forall(_.provider == "chart-proposal-provider"))
-    assertEquals(proposals.calls.size, 7)
+    assertEquals(proposals.calls.size, 10)
     assertEquals(
       input.receipt.stages,
       Vector(
@@ -443,6 +610,11 @@ class ChartProposalProviderSuite extends FunSuite:
     assertEquals(policy.forFamily(ClaimFamily.CausalEdge), FamilyPolicy.Conservative)
     assertEquals(policy.forFamily(ClaimFamily.SituationMention), FamilyPolicy.Ordinary)
     assertEquals(policy.forFamily(ClaimFamily.Summary), FamilyPolicy.Ordinary)
+    assertEquals(policy.forFamily(ClaimFamily.EntityMention), FamilyPolicy.Ordinary)
+    assertEquals(policy.forFamily(ClaimFamily.ParticipantRole), FamilyPolicy.Ordinary)
+    assertEquals(policy.forFamily(ClaimFamily.ParticipantCoverage), FamilyPolicy.Ordinary)
+    assertEquals(policy.forFamily(ClaimFamily.TemporalRelation), FamilyPolicy.Ordinary)
+    assertEquals(policy.forFamily(ClaimFamily.StrictPrecedence), FamilyPolicy.Conservative)
     assert(ChartProposalProvider.RulesText.contains("requireAgreement = 1"))
   }
 

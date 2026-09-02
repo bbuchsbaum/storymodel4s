@@ -119,6 +119,14 @@ class ChartProposalCourtSuite extends FunSuite:
   private def arg(from: ConceptId, index: Int, to: ConceptId): PropositionRelation =
     PropositionRelation(from, RoleAssignment.arg(index), ConceptTarget.Node(to))
 
+  /** `go-02` ARG0 with a lexicon-style licence to Agent: the one filler the participant layer may
+    * carry in this court. Every other numbered argument here is unlicensed on purpose.
+    */
+  private val licensedAgent = RoleAssignment(
+    SourceRole.Numbered(0),
+    Some((ParticipantRole.Agent, Credence.unsafeRaw(0.5)))
+  )
+
   private val egulac = checked(
     sEgulac,
     Some(c0),
@@ -142,7 +150,7 @@ class ChartProposalCourtSuite extends FunSuite:
       c3 -> Concept.entity("seal")
     ),
     Vector(
-      arg(c0, 0, c1),
+      PropositionRelation(c0, licensedAgent, ConceptTarget.Node(c1)),
       PropositionRelation(c0, RoleAssignment.named("purpose"), ConceptTarget.Node(c2)),
       arg(c2, 1, c3)
     ),
@@ -209,8 +217,8 @@ class ChartProposalCourtSuite extends FunSuite:
     assertEquals(proposals.coverage.size, 50)
     assertEquals(proposals.summaryCoverage, SummaryCoverage.Proposed("The War of the Ghosts"))
     val rows = proposals.coverage.map(row => row.sentence -> row).toMap
-    assertEquals(rows(sEgulac.id), SentenceCoverage.Proposed(sEgulac.id, ref(sEgulac, c0)))
-    assertEquals(rows(sHunt.id), SentenceCoverage.Proposed(sHunt.id, ref(sHunt, c0)))
+    assertEquals(rows(sEgulac.id), SentenceCoverage.Proposed(sEgulac.id, ref(sEgulac, c0), 0, 2))
+    assertEquals(rows(sHunt.id), SentenceCoverage.Proposed(sHunt.id, ref(sHunt, c0), 1, 0))
     assertEquals(
       rows(sRiver.id),
       SentenceCoverage.Abstained(
@@ -219,15 +227,29 @@ class ChartProposalCourtSuite extends FunSuite:
         AbstentionReason.FocusNotPredicate(ConceptKind.Entity)
       )
     )
-    assertEquals(rows(sFog.id), SentenceCoverage.Proposed(sFog.id, ref(sFog, c0)))
+    assertEquals(rows(sFog.id), SentenceCoverage.Proposed(sFog.id, ref(sFog, c0), 0, 0))
     assertEquals(rows(sPaddle.id), SentenceCoverage.EmptyChart(sPaddle.id))
     assertEquals(
       rows(sThought.id),
       SentenceCoverage.Abstained(sThought.id, ref(sThought, c1), AbstentionReason.FocusEmbedded)
     )
-    assertEquals(rows(sArrows.id), SentenceCoverage.Proposed(sArrows.id, ref(sArrows, c0)))
+    assertEquals(rows(sArrows.id), SentenceCoverage.Proposed(sArrows.id, ref(sArrows, c0), 0, 2))
     assertEquals(proposals.situations.size, 6)
-    assertEquals(proposals.calls.size, 19)
+    assertEquals(proposals.participantCoverage.size, 6)
+    assertEquals(
+      proposals.participants.map(a => (a.situation, a.filler)),
+      Vector((ref(sHunt, c0), ref(sHunt, c1)))
+    )
+    assertEquals(proposals.entityMentions.map(_.mention), Vector(ref(sHunt, c1)))
+    assertEquals(
+      proposals.temporal.map(a => (a.from, a.to)),
+      Vector(
+        (ref(sEgulac, c0), ref(sHunt, c0)),
+        (ref(sHunt, c0), ref(sFog, c0)),
+        (ref(sFog, c0), ref(sArrows, c0))
+      )
+    )
+    assertEquals(proposals.calls.size, 30)
 
     val values = proposals.situations
       .flatMap(a => a.bundle.proposals.flatMap(_.value).map(a.source -> _))
@@ -247,35 +269,49 @@ class ChartProposalCourtSuite extends FunSuite:
       .fold(e => fail(e.message), identity)
     val compiled = NarrativeCompiler.compile(input).fold(e => fail(e.message), identity)
 
+    // Two sentences abstain, so their situation gaps block promotion; the trajectory itself is
+    // now derived on evidence: every proposed root carries an accepted coverage and every adjacent
+    // pair an accepted Unclear relation.
     assertEquals(compiled.validated, None)
     assert(compiled.isPartial)
     assertEquals(compiled.draft.graph.situations.size, 4)
     assertEquals(compiled.draft.hierarchy.primary.size, 4)
     assertEquals(compiled.draft.graph.segments.size, 1)
     assert(!compiled.validation.report.byLaw.contains("hierarchy.member-within-parent"))
+    assert(!compiled.validation.report.byLaw.contains("trajectory.complete"))
+    assertEquals(compiled.draft.graph.entities.size, 1)
+    assertEquals(compiled.draft.graph.entities.values.head.label.value, "man")
+    assertEquals(
+      compiled.draft.graph.relations.participants.map(_.role),
+      Vector(ParticipantRole.Agent)
+    )
+    assertEquals(
+      compiled.draft.graph.relations.temporal.map(_.relation),
+      Vector(TemporalRelation.Unclear, TemporalRelation.Unclear, TemporalRelation.Unclear)
+    )
+    assertEquals(compiled.draft.trajectory.steps.size, 3)
+    assertEquals(compiled.draft.trajectory.steps.map(_.entityTurnover), Vector(1.0, 1.0, 0.0))
+    assertEquals(
+      compiled.draft.trajectory.steps.map(_.worldTime.value).toSet,
+      Set(WorldTimeTransition.Unresolved(Vector.empty))
+    )
 
     val noProposal = DerivationGapReason.Unresolved(ResolutionFailure.NoProposal)
-    val trajectory = DerivationGapReason.UnsupportedTrajectoryInputs(
-      Vector(ClaimFamily.ParticipantRole, ClaimFamily.TemporalRelation)
-    )
     val story = source.id
     val expectedGaps: Set[(NarrativeCandidateAddress, DerivationGapReason)] =
       Vector(ref(sRiver, c1), ref(sThought, c1)).flatMap { anchor =>
         Vector(
           NarrativeCandidateAddress.Situation(anchor) -> noProposal,
           NarrativeCandidateAddress.ContextAssignment(anchor) -> noProposal,
-          NarrativeCandidateAddress.SegmentMembership(story, anchor) -> noProposal
+          NarrativeCandidateAddress.SegmentMembership(story, anchor) -> noProposal,
+          NarrativeCandidateAddress.ParticipantCoverage(anchor) -> noProposal
         )
-      }.toSet ++ Set(
-        NarrativeCandidateAddress.TrajectoryStep(ref(sEgulac, c0), ref(sHunt, c0)) -> trajectory,
-        NarrativeCandidateAddress.TrajectoryStep(ref(sHunt, c0), ref(sFog, c0)) -> trajectory,
-        NarrativeCandidateAddress.TrajectoryStep(ref(sFog, c0), ref(sArrows, c0)) -> trajectory
-      )
-    assertEquals(compiled.derivation.gaps.size, 9)
+      }.toSet
+    assertEquals(compiled.derivation.gaps.size, 8)
     assertEquals(compiled.derivation.gaps.map(g => g.target -> g.reason).toSet, expectedGaps)
 
     assertEquals(compiled.provenance.configHash, Checksum.ofText(ChartProposalProvider.RulesText))
-    assertEquals(compiled.provenance.calls.size, 26)
+    assertEquals(compiled.provenance.calls.size, 37)
     assertEquals(
       compiled.receipt.stages.map(_._1),
       Vector(parserStage, ChartProposalProvider.Stage)

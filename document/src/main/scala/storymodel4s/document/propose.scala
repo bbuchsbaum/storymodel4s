@@ -4,6 +4,7 @@ import cats.data.NonEmptyVector
 import cats.syntax.all.*
 import storymodel4s.acquire.*
 import storymodel4s.core.*
+import storymodel4s.core.TextNorm.lower as foldCase
 import storymodel4s.proposition.{
   Canonical,
   Checked,
@@ -51,8 +52,8 @@ enum AbstentionReason:
 enum SentenceCoverage:
   /** `fillers` counts the entity-kind fillers proposed as participants of the root; `unlicensed`
     * counts the entity-kind fillers the chart reaches from the root by no single normalized
-    * participant role, which are never proposed. Together they say how much of the root's
-    * argument structure the participant layer carries.
+    * participant role, which are never proposed. Together they say how much of the root's argument
+    * structure the participant layer carries.
     */
   case Proposed(sentence: SurfaceUnitId, root: ChartNodeRef, fillers: Int, unlicensed: Int)
   case Abstained(sentence: SurfaceUnitId, anchor: ChartNodeRef, reason: AbstentionReason)
@@ -96,9 +97,9 @@ final class ChartProposals private (
     coverage.foldLeft(CoverageCounts(0, 0, 0, 0)) { (acc, row) =>
       row match
         case SentenceCoverage.Proposed(_, _, _, _) => acc.copy(proposed = acc.proposed + 1)
-        case SentenceCoverage.Abstained(_, _, _) => acc.copy(abstained = acc.abstained + 1)
-        case SentenceCoverage.EmptyChart(_)      => acc.copy(emptyCharts = acc.emptyCharts + 1)
-        case SentenceCoverage.NoChart(_)         => acc.copy(noCharts = acc.noCharts + 1)
+        case SentenceCoverage.Abstained(_, _, _)   => acc.copy(abstained = acc.abstained + 1)
+        case SentenceCoverage.EmptyChart(_)        => acc.copy(emptyCharts = acc.emptyCharts + 1)
+        case SentenceCoverage.NoChart(_)           => acc.copy(noCharts = acc.noCharts + 1)
     }
 
   override def equals(other: Any): Boolean = other match
@@ -313,7 +314,10 @@ object ChartProposalProvider:
 
   /** The named-role table as printed into [[RulesText]]. */
   private def namedRolesText: String =
-    NamedRoles.toVector.sortBy(_._1).map((name, role) => s"$name=${renderRole(role)}").mkString(", ")
+    NamedRoles.toVector
+      .sortBy(_._1)
+      .map((name, role) => s"$name=${renderRole(role)}")
+      .mkString(", ")
 
   val Prompt: PromptPackageRef =
     PromptPackageRef("chart-rules", Version, Checksum.ofText(RulesText))
@@ -796,7 +800,7 @@ object ChartProposalProvider:
     )
     val mentionValue = EntityMentionProposal(
       filler.lemma,
-      EntityType.Custom("chart", TextNorm.lower(filler.kind.toString))
+      EntityType.Custom("chart", foldCase(filler.kind.toString))
     )
     val fillerParams = params + ("filler" -> filler.concept.value)
     val (mention, mentionCall) = proposed(

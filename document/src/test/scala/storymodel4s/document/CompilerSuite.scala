@@ -148,6 +148,16 @@ class CompilerSuite extends FunSuite:
       )
     )
 
+  /** Every situation attempt carries an accepted, empty participant coverage unless a test says
+    * otherwise: the two-sentence fixture has no entity charts, and "no licensed participant" is the
+    * evidenced value the compiler needs before it may derive a step.
+    */
+  private def coverageAttempt(ref: ChartNodeRef): ParticipantCoverageAttempt =
+    ParticipantCoverageAttempt(
+      ref,
+      bundle(ParticipantCoverage.empty, evidenceFor(ref), "coverage-agent", s"coverage:${ref.key}")
+    )
+
   private def attemptedInput(
       situationAttempts: Vector[SituationAttempt],
       chartOrder: Vector[(SurfaceUnitId, PropositionEvidence)] = Vector(
@@ -160,7 +170,9 @@ class CompilerSuite extends FunSuite:
         bundle(summary, evSummary, "summary-agent", "summary")
       ),
       membershipAttempts: Option[Vector[SegmentMembershipAttempt]] = None,
-      provenanceCalls: Vector[ProviderCall] = Vector.empty
+      provenanceCalls: Vector[ProviderCall] = Vector.empty,
+      coverageAttempts: Option[Vector[ParticipantCoverageAttempt]] = None,
+      temporal: Vector[TemporalAttempt] = Vector.empty
   ): Either[NarrativeCompilerError, NarrativeCompilerInput] =
     val receipt = BuildReceipt(
       source.id,
@@ -179,6 +191,10 @@ class CompilerSuite extends FunSuite:
       summaryAttempt,
       membershipAttempts.getOrElse(situationAttempts.map(a => membershipAttempt(a.source))),
       causal,
+      Vector.empty,
+      Vector.empty,
+      coverageAttempts.getOrElse(situationAttempts.map(a => coverageAttempt(a.source))),
+      temporal,
       AcceptancePolicy.Conservative,
       receipt,
       Provenance(provenanceCalls, StoryModel.SchemaVersion, Checksum.ofText("compiler-test"))
@@ -199,7 +215,9 @@ class CompilerSuite extends FunSuite:
         bundle(summary, evSummary, "summary-agent", "summary")
       ),
       membershipAttempts: Option[Vector[SegmentMembershipAttempt]] = None,
-      provenanceCalls: Vector[ProviderCall] = Vector.empty
+      provenanceCalls: Vector[ProviderCall] = Vector.empty,
+      coverageAttempts: Option[Vector[ParticipantCoverageAttempt]] = None,
+      temporal: Vector[TemporalAttempt] = Vector.empty
   ): NarrativeCompilerInput =
     attemptedInput(
       situationAttempts,
@@ -208,7 +226,9 @@ class CompilerSuite extends FunSuite:
       causal,
       summaryAttempt,
       membershipAttempts,
-      provenanceCalls
+      provenanceCalls,
+      coverageAttempts,
+      temporal
     )
       .fold(e => fail(e.message), identity)
 
@@ -556,6 +576,7 @@ class CompilerSuite extends FunSuite:
       changedDerivation,
       result.draft.graph,
       result.draft.hierarchy,
+      result.draft.trajectory,
       result.validation
     )
 
@@ -628,6 +649,10 @@ class CompilerSuite extends FunSuite:
           Vector.empty
         )
       ),
+      Vector.empty,
+      Vector.empty,
+      Vector.empty,
+      Vector.empty,
       Vector.empty,
       Vector.empty,
       AcceptancePolicy.Conservative,
@@ -768,18 +793,70 @@ class CompilerSuite extends FunSuite:
     )
   }
 
-  test("multi-situation compilation refuses absence-erasing trajectory derivation") {
+  test("a multi-situation compilation without a temporal claim yields no trajectory step") {
     val result = compile(input())
 
     assertEquals(result.draft.trajectory, DiscourseTrajectory.empty)
     assertEquals(result.validated, None)
-    assert(
-      result.derivation.gaps.exists(g =>
-        g.family == ClaimFamily.DiscourseTrajectory &&
-          g.reason == DerivationGapReason.UnsupportedTrajectoryInputs(
-            Vector(ClaimFamily.ParticipantRole, ClaimFamily.TemporalRelation)
+    val stepGaps = result.derivation.gaps.filter(_.family == ClaimFamily.DiscourseTrajectory)
+    assertEquals(
+      stepGaps.map(g => g.target -> g.reason),
+      Vector(
+        NarrativeCandidateAddress.TrajectoryStep(ref0, ref1) ->
+          DerivationGapReason.MissingUpstream(
+            Vector(NarrativeCandidateAddress.Temporal(ref0, ref1))
           )
       )
     )
     assert(result.validation.report.byLaw.contains("trajectory.complete"))
+  }
+
+  test("an accepted Unclear temporal claim between evidenced situations completes the trajectory") {
+    val result = compile(
+      input(temporal =
+        Vector(
+          TemporalAttempt(
+            ref0,
+            ref1,
+            bundle(TemporalRelation.Unclear, evSummary, "temporal-agent", "t01")
+          )
+        )
+      )
+    )
+    val model = result.validated.getOrElse(fail(result.validation.report.render))
+
+    assertEquals(model.trajectory.steps.size, 1)
+    val step = model.trajectory.steps.head
+    assertEquals(step.worldTime.value, WorldTimeTransition.Unresolved(Vector.empty))
+    assertEquals(step.entityTurnover, 0.0)
+    assertEquals(step.worldTimeContext, model.graph.rootContext)
+    assertEquals(model.graph.relations.temporal.map(_.relation), Vector(TemporalRelation.Unclear))
+    assertEquals(model.graph.relations.temporal.head.meta.status, EpistemicStatus.Hypothesized)
+    assertEquals(result.derivation.gaps, Vector.empty)
+    assert(!result.isPartial)
+  }
+
+  test("a coverage that lists no situation participant and a lone participant are both refused") {
+    val stray = ParticipantCoverageAttempt(
+      ref0,
+      bundle(
+        ParticipantCoverage.of(Vector(ref1)),
+        ev0,
+        "coverage-agent",
+        "stray-coverage"
+      )
+    )
+    val attempted = attemptedInput(
+      situationAttempts = Vector(
+        SituationAttempt(ref0, bundle(situation0, ev0, "situation-agent", "s0")),
+        SituationAttempt(ref1, bundle(situation1, ev1, "situation-agent", "s1"))
+      ),
+      coverageAttempts = Some(Vector(stray, coverageAttempt(ref1)))
+    )
+
+    attempted match
+      case Left(NarrativeCompilerError.InvalidInput(errors)) =>
+        assert(errors.exists(_.message.contains("without a participant attempt")))
+      case Left(other) => fail(other.message)
+      case Right(_)    => fail("a coverage naming an unattempted filler reached the compiler")
   }

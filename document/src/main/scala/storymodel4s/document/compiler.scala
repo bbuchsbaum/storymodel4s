@@ -73,8 +73,8 @@ final case class CausalAttempt(
 /** Provider-proposed entity mention at one chart node: a surface label and a coarse type.
   *
   * Why a label and a type only: identity is never proposed. The compiler groups accepted mentions
-  * by case-folded label and type into one canonical entity, so a provider cannot mint an
-  * `EntityId` or join two mentions it did not describe identically.
+  * by case-folded label and type into one canonical entity, so a provider cannot mint an `EntityId`
+  * or join two mentions it did not describe identically.
   */
 final case class EntityMentionProposal(label: String, entityType: EntityType)
 
@@ -97,11 +97,11 @@ final case class ParticipantAttempt(
   *
   * Why a value rather than an absence: `DiscourseTrajectory.derive` computes entity turnover from
   * participant sets, and an empty set yields turnover 0.0. Without this receipt a situation whose
-  * participants were never evaluated is indistinguishable from one evaluated and found to have
-  * none (design contract rule 7). An accepted empty coverage is the evidenced statement "this
-  * situation has no licensed participant"; an unresolved coverage blocks every trajectory step
-  * touching the situation. Built only through [[ParticipantCoverage.of]], which sorts and
-  * deduplicates, so equal filler sets are equal candidate values.
+  * participants were never evaluated is indistinguishable from one evaluated and found to have none
+  * (design contract rule 7). An accepted empty coverage is the evidenced statement "this situation
+  * has no licensed participant"; an unresolved coverage blocks every trajectory step touching the
+  * situation. Built only through [[ParticipantCoverage.of]], which sorts and deduplicates, so equal
+  * filler sets are equal candidate values.
   */
 final class ParticipantCoverage private (val fillers: Vector[ChartNodeRef]):
   def isEmpty: Boolean = fillers.isEmpty
@@ -553,7 +553,14 @@ object NarrativeCompilerInput:
           "compiler/entity-mentions",
           s"${attempt.mention.key} is not an entity, name, or quantity concept"
         )
-      validateBundle(attempt.bundle, evidenceMap, source, atlas, "compiler/entity-mentions", invalid)
+      validateBundle(
+        attempt.bundle,
+        evidenceMap,
+        source,
+        atlas,
+        "compiler/entity-mentions",
+        invalid
+      )
       candidateValues(attempt.bundle).foreach { value =>
         if value.label.trim.isEmpty then
           invalid("compiler/entity-mentions", "entity label must be nonblank")
@@ -1277,7 +1284,9 @@ object NarrativeCompiler:
       .groupBy(m => (TextNorm.lower(m.value.label), m.value.entityType))
       .values
       .toVector
-      .flatMap(group => NonEmptyVector.fromVector(group.sortBy(m => (m.support.minSpan, m.mention))))
+      .flatMap(group =>
+        NonEmptyVector.fromVector(group.sortBy(m => (m.support.minSpan, m.mention)))
+      )
     val entityBuild = entityGroups.foldLeft[Either[DomainError, Vector[EmittedEntity]]](
       Right(Vector.empty)
     ) { (acc, group) =>
@@ -1657,8 +1666,9 @@ object NarrativeCompiler:
       )
       ((a, b), required.filterNot(emittedByAddress.contains))
     }
-    val blockedSteps = pairMissing.collect { case ((a, b), missing) if missing.nonEmpty =>
-      NarrativeCandidateAddress.TrajectoryStep(a.source, b.source)
+    val blockedSteps = pairMissing.collect {
+      case ((a, b), missing) if missing.nonEmpty =>
+        NarrativeCandidateAddress.TrajectoryStep(a.source, b.source)
     }
     val trajectory =
       if blockedSteps.isEmpty then
@@ -2216,7 +2226,8 @@ object NarrativeCompiler:
 
   /** One canonical entity per exact-coreference group: the id is the content address of the sorted
     * member mentions, the label is the earliest member's surface label with the other spellings
-    * kept as alternatives, and the claim is derived from every member's mention claim.
+    * kept as alternatives, and both the node claim and the label claim are derived from every
+    * member's mention claim (two claims, because the model's claim ledger is keyed by id).
     */
   private def buildEntity(
       input: NarrativeCompilerInput,
@@ -2230,27 +2241,23 @@ object NarrativeCompiler:
       .map(m => m.value.label -> m.meta.credence)
       .filterNot(_._1 == label)
       .distinctBy(_._1)
-    derivedMeta(
-      input,
-      "entity",
-      Vector(canonical.value),
-      support,
-      members.toVector.map(_.meta.id).toSet
-    ).map { meta =>
-      EmittedEntity(
-        members,
-        canonical,
-        EntityNode(
-          EntityId.unsafe(canonical.value),
-          Resolved(label, meta, alternatives),
-          members.head.value.entityType,
-          mentionIds,
-          Vector.empty,
-          support,
-          meta
-        )
+    val upstream = members.toVector.map(_.meta.id).toSet
+    for
+      meta <- derivedMeta(input, "entity", Vector(canonical.value), support, upstream)
+      labelMeta <- derivedMeta(input, "entity-label", Vector(canonical.value), support, upstream)
+    yield EmittedEntity(
+      members,
+      canonical,
+      EntityNode(
+        EntityId.unsafe(canonical.value),
+        Resolved(label, labelMeta, alternatives),
+        members.head.value.entityType,
+        mentionIds,
+        Vector.empty,
+        support,
+        meta
       )
-    }
+    )
 
   private def entityMentionId(
       story: StoryId,

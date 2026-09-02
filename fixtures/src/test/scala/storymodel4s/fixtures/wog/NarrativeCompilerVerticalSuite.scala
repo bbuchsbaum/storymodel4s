@@ -43,6 +43,7 @@ class NarrativeCompilerVerticalSuite extends FunSuite:
         context: ContextAssignmentAttempt,
         summary: StorySummaryAttempt,
         membership: SegmentMembershipAttempt,
+        coverage: ParticipantCoverageAttempt,
         calls: Vector[ProviderCall]
     )
 
@@ -135,6 +136,14 @@ class NarrativeCompilerVerticalSuite extends FunSuite:
               val membershipBundle = membershipA.copy(
                 proposals = membershipA.proposals ++ membershipB.proposals
               )
+              // The lexical chart has no entity concept, so the evidenced participant set is
+              // empty: a value the compiler may derive turnover from, not an absence.
+              val (coverage, coverageCalls) = attempt(
+                "no-entity-concept-coverage-rule",
+                ParticipantCoverage.empty,
+                evidence,
+                render = s"coverage:none:${sentence.id.value}"
+              )
               Output(
                 chart,
                 ref,
@@ -143,9 +152,10 @@ class NarrativeCompilerVerticalSuite extends FunSuite:
                 ContextAssignmentAttempt(ref, contextBundle),
                 StorySummaryAttempt(summary),
                 SegmentMembershipAttempt(ref, membershipBundle),
+                ParticipantCoverageAttempt(ref, coverage),
                 Vector(chartCall) ++ situationCalls ++ contextCallsA ++ contextCallsB ++
                   summaryCalls ++
-                  membershipCallsA ++ membershipCallsB
+                  membershipCallsA ++ membershipCallsB ++ coverageCalls
               )
             }
         }
@@ -214,6 +224,10 @@ class NarrativeCompilerVerticalSuite extends FunSuite:
         Vector(generated.context),
         generated.summary,
         Vector(generated.membership),
+        Vector.empty,
+        Vector.empty,
+        Vector.empty,
+        Vector(generated.coverage),
         Vector.empty,
         AcceptancePolicy.Conservative,
         receipt,
