@@ -636,8 +636,10 @@ class ChartProposalProviderSuite extends FunSuite:
   }
 
   test("scores that compare equal have one identity: negative zero digests as zero") {
-    val positiveZero = Vector(s0.id -> enterChart(alignments = Vector(align(s0, "entered", c0, 0.0))))
-    val negativeZero = Vector(s0.id -> enterChart(alignments = Vector(align(s0, "entered", c0, -0.0))))
+    val positiveZero =
+      Vector(s0.id -> enterChart(alignments = Vector(align(s0, "entered", c0, 0.0))))
+    val negativeZero =
+      Vector(s0.id -> enterChart(alignments = Vector(align(s0, "entered", c0, -0.0))))
     assert(0.0 == -0.0, "the two scores must compare equal for this court to mean anything")
     assertNotEquals(
       java.lang.Double.doubleToLongBits(0.0),

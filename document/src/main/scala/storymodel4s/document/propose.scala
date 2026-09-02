@@ -1107,9 +1107,9 @@ object ChartProposalProvider:
       Stage
     )
 
-  /** A score as it enters an identity preimage: IEEE-754 bits, with negative zero folded onto
-    * zero. `Credence` already refuses non-finite scores, so the only way two scores could compare
-    * equal yet digest differently is `-0.0`; equality must imply one identity.
+  /** A score as it enters an identity preimage: IEEE-754 bits, with negative zero folded onto zero.
+    * `Credence` already refuses non-finite scores, so the only way two scores could compare equal
+    * yet digest differently is `-0.0`; equality must imply one identity.
     */
   private def canonicalScore(score: Double): String =
     CanonicalDouble.render(if score == 0.0 then 0.0 else score)
