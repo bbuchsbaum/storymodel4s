@@ -70,7 +70,8 @@ final case class TimedSegment(
     group: Option[TimedSegment.Group] = None,
     extraLemmas: Set[String] = Set.empty,
     locations: Vector[String] = Vector.empty,
-    embedText: Option[String] = None
+    embedText: Option[String] = None,
+    lexicalText: Option[String] = None
 )
 
 object TimedSegment:
@@ -78,7 +79,19 @@ object TimedSegment:
   /** Coarse grouping of segments. `embedText` is the rendering an embedding channel sees; a bare
     * scene label carries almost no content, so an adapter that can say more about a scene should.
     */
-  final case class Group(ordinal: Int, label: String, embedText: Option[String] = None)
+  /** `lexicalText` is appended for the lexical index only and is never seen by the encoder.
+    *
+    * The two channels fail on opposite inputs, which the study measured rather than assumed. A
+    * mean-pooled embedding is diluted by vocabulary that recurs across the episode, while a
+    * rarity-weighted lexical index prices exactly that vocabulary correctly. So a signal that is
+    * long, or that repeats across neighbouring nodes, belongs here rather than in `embedText`.
+    */
+  final case class Group(
+      ordinal: Int,
+      label: String,
+      embedText: Option[String] = None,
+      lexicalText: Option[String] = None
+  )
 
 /** Builds the aligner's `SourceView` from timed segments: the general recipe extracted from the
   * Sherlock bridge. The view's text axis is a derived document (segment texts joined by newlines),
@@ -108,7 +121,8 @@ object TimedSourceView:
       document: String,
       segmentByRef: Map[SourceNodeRef, TimedSegment],
       groupByRef: Map[SourceNodeRef, TimedSegment.Group],
-      nodeTexts: Vector[(SourceNodeRef, String)]
+      nodeTexts: Vector[(SourceNodeRef, String)],
+      lexicalTexts: Vector[(SourceNodeRef, String)]
   )
 
   def build(
@@ -216,7 +230,25 @@ object TimedSourceView:
     val nodeTexts: Vector[(SourceNodeRef, String)] =
       segments.map(s => leafRef(s.ordinal) -> s.embedText.getOrElse(s.text)) ++
         groupsInOrder.map(g => groupRef(g.ordinal) -> g.embedText.getOrElse(g.label))
-    Built(view, leafMedia ++ groupMedia, document, segmentByRef, groupByRef, nodeTexts)
+    // What the lexical index reads: the embedded rendering plus anything routed to this channel
+    // alone. Equal to `nodeTexts` unless an adapter supplies a lexical-only rendering.
+    val lexicalTexts: Vector[(SourceNodeRef, String)] =
+      segments.map { s =>
+        val base = s.embedText.getOrElse(s.text)
+        leafRef(s.ordinal) -> s.lexicalText.fold(base)(extra => s"$base. $extra")
+      } ++ groupsInOrder.map { g =>
+        val base = g.embedText.getOrElse(g.label)
+        groupRef(g.ordinal) -> g.lexicalText.fold(base)(extra => s"$base. $extra")
+      }
+    Built(
+      view,
+      leafMedia ++ groupMedia,
+      document,
+      segmentByRef,
+      groupByRef,
+      nodeTexts,
+      lexicalTexts
+    )
 
 /** Word-column reader for timestamped recall transcripts (`Words` plus onset columns). */
 object RecallWordsCsv:
@@ -340,15 +372,25 @@ object RecallToVideo:
           "lexical-jaccard [semantic=lexical-baseline; free fallback]",
           None
         )
-    // Optional lexical re-ranking of that channel. Off unless asked for, so the default derivation
-    // is untouched. The weight is on the semantic side and 1.0 reproduces the unblended channel
-    // exactly, which makes the no-op case checkable rather than merely intended. Like the candidate
-    // policy this changes the report's identity: a re-ranked channel is a different derivation.
+    // Lexical re-ranking of that channel, on by default at the weight development data chose.
+    //
+    // Why it is the default rather than a knob: measured over 11 development participants it is the
+    // largest improvement found, +0.0723 Kendall tau against the unblended channel with 9 of 11
+    // participants improving, and it survives restriction to units whose anchor granularity did not
+    // change, which is where the scene-caption arm's apparent gain went. Concentration is unmoved,
+    // as the permutation design requires. The weight is on the semantic side; 0.8 is the interior
+    // peak of a broad plateau, and both 0.7 and 0.9 also improve on the unblended channel, so the
+    // value is not a knife edge. `STORYMODEL4S_LEXICAL_BLEND=1.0` restores the unblended channel
+    // exactly and is checked to reproduce it byte-for-byte.
     val blendAlpha = sys.env
       .get("STORYMODEL4S_LEXICAL_BLEND")
-      .flatMap(_.trim.toDoubleOption)
-      .filter(a => a > 0.0 && a <= 1.0)
+      .map(_.trim)
+      .match
+        case Some("off") | Some("none") => None
+        case Some(raw)                  => raw.toDoubleOption.filter(a => a > 0.0 && a <= 1.0)
+        case None                       => Some(0.8)
     val lexicalFields = LexicalBlend.LexicalFields.parse(sys.env.get("STORYMODEL4S_LEXICAL_FIELDS"))
+
     val (semantic, channelLabel) = blendAlpha match
       case Some(alpha) =>
         (
@@ -356,7 +398,7 @@ object RecallToVideo:
             baseSemantic,
             recall.ordered,
             built.view,
-            built.nodeTexts,
+            built.lexicalTexts,
             alpha,
             lexicalFields
           ),

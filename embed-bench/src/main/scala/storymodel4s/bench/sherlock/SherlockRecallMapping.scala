@@ -80,6 +80,19 @@ object SherlockAnnotationView:
             throw new IllegalArgumentException(s"scene captions at $path have no captions object")
           )
 
+  /** Which channel a scene caption is routed to.
+    *
+    * Captions were first given to the encoder and measurably hurt localisation, in the same way and
+    * for the same reason that location and cast metadata did: length and recurring vocabulary
+    * dilute a mean-pooled vector. That metadata then produced the study's largest gain once it was
+    * routed to the lexical index instead. A caption is the same shape of signal, so it gets the
+    * same test rather than an assumption.
+    */
+  def captionChannel: String =
+    sys.env.get("STORYMODEL4S_CAPTION_CHANNEL").map(_.trim.toLowerCase) match
+      case Some("lexical") => "lexical"
+      case _               => "embed"
+
   private def enrichLeaves: Boolean =
     sourceTextPolicy == "enriched" || sourceTextPolicy == "enriched-leaf"
 
@@ -152,12 +165,14 @@ object SherlockAnnotationView:
               s.label,
               sceneCaptions
                 .get(s.ordinal)
+                .filter(_ => captionChannel == "embed")
                 .map(c => s"${s.label}. $c")
                 .orElse(
                   if enrichScenes then Some(enrichedGroup(atlas, s.ordinal, s.label))
                   else if digestScenes then Some(digestGroup(atlas, s.ordinal, s.label))
                   else None
-                )
+                ),
+              sceneCaptions.get(s.ordinal).filter(_ => captionChannel == "lexical")
             )
           ),
         extraLemmas = stemsOf(row.namesAll) ++ stemsOf(row.namesSpeaking) ++
@@ -190,7 +205,10 @@ object SherlockAnnotationView:
   val built = SherlockAnnotationView.build(atlas)
   println(s"annotation rows: ${atlas.rows.size}; scenes: ${atlas.scenes.size}")
   println(s"source text policy: ${SherlockAnnotationView.sourceTextPolicy}")
-  println(s"scene captions: ${SherlockAnnotationView.sceneCaptions.size}")
+  println(
+    s"scene captions: ${SherlockAnnotationView.sceneCaptions.size}" +
+      s" channel=${SherlockAnnotationView.captionChannel}"
+  )
 
   val csv = new String(Files.readAllBytes(Paths.get(recallCsv)), StandardCharsets.UTF_8)
   val words = RecallWordsCsv.parse(csv).fold(e => throw new IllegalArgumentException(e), identity)

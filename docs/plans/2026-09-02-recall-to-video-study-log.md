@@ -296,6 +296,55 @@ new encoder is a substantial court, and it is now costed at roughly a fifth of w
 change delivers. It should not be the next thing done. The standing claim that it was the largest
 lever is withdrawn.
 
+## Arms 7 and 8: two levers closed on top of the best configuration
+
+Both were run against `blend080-lemmas` rather than against baseline, because a lever that only
+repeats a gain already banked is not worth keeping.
+
+**Scene captions as embedded text, on top of the blend.** Ordering +0.0110 against the best arm with
+the interval including zero; concentration −0.0057 and localizability −0.0088, both excluding zero
+with 0 of 11 improving; scene anchors back up from 216 to 245. This is the same result the digest
+control produced in isolation, reproduced in a different context: the damage is not about what the
+caption says, it is about making a node compete with its own leaves.
+
+**Wider candidate nomination**, sixteen per level instead of eight. Ordering −0.0209 against the best
+arm, excluding zero, with 1 of 11 improving. Concentration and localizability fall far more, but
+those two may not judge this lever at all: admitting twice the states spreads posterior mass and
+raises entropy arithmetically. Ordering is the outcome allowed to judge it, and ordering says no.
+The historical default of eight stands, now on evidence rather than inheritance.
+
+## Arm 9: captions routed to the lexical index — a null, and a useful one
+
+The arm 1 reversal made this the obvious test: the same signal that hurt as embedded text produced
+the study's largest gain once a rarity-weighted channel priced it, and a caption has the shape that
+dilutes a mean-pooled vector. `Group.lexicalText` routes a rendering to the lexical index alone,
+where the encoder never sees it.
+
+Against the best configuration, every outcome's interval includes zero: ordering −0.0052, 4 of 11;
+concentration −0.0004; source mass +0.0008; localizability +0.0004. It neither helps nor harms.
+
+**Why the reversal did not repeat, which sharpens the rule.** Locations and cast were vocabulary the
+lexical index did not already hold, so indexing them added discriminative terms. A caption is a
+paraphrase of the same events the coder description already states, and that description is already
+indexed. BM25 gains come from *new* discriminative vocabulary, not from more words about the same
+thing. The revised rule is therefore narrower and more useful than "route a signal to a channel that
+can price it": route a signal to a channel that can price it, **and only if that channel does not
+already hold the same information**.
+
+**What this says about the film, and it is worth saying.** The visual channel is genuinely
+informative — against matched-length coder text at the same node it improved both localisation
+measures for all 11 participants — yet it adds nothing once the coder descriptions are indexed. For
+this corpus the human annotation already captures what the model sees. That is a finding about the
+Sherlock annotation being unusually complete, not a failure of the captioner.
+
+**Consequence for leaf-level captioning.** That was the expensive lever still open: caption all 1000
+segments rather than 50 scenes, at roughly twenty times the inference. Its prior is now poor for the
+same reason. Leaf descriptions are the corpus's most distinctive field, 992 distinct values across
+1000 segments, so a caption there is competing against even better annotation than at the scene
+level. It should not be run on this corpus without a reason beyond hope. On a film with sparse or
+absent human annotation the argument reverses completely, and that is where the captioning court
+earns its place.
+
 ## The standing cost, stated plainly
 
 Every arm in the study, including the two that work, loses a little localizability: −0.0032 for the
@@ -305,7 +354,8 @@ improved localizability against baseline at all.
 
 ## Arms in flight
 
-None. The two levers under test both returned, and the results are above.
+None. Every cheap lever has returned, and the expensive one has had its prior lowered by arm 9.
+The chosen configuration is frozen and the untouched participants are unsealed once, below.
 
 ## Not yet attempted, with the reason
 

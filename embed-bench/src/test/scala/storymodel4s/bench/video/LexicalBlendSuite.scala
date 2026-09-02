@@ -103,7 +103,7 @@ class LexicalBlendSuite extends FunSuite:
       )
     }
 
-  test("lemma fields widen the index without touching the encoder's text"):
+  test("the two field policies are distinguishable, and both stay permutations"):
     val withLemmas = LexicalBlend.blended(
       base,
       recall.ordered,
@@ -112,8 +112,14 @@ class LexicalBlendSuite extends FunSuite:
       alpha = 0.5,
       fields = LexicalBlend.LexicalFields.WithLemmas
     )
-    val textOnly =
-      LexicalBlend.blended(base, recall.ordered, built.view, built.nodeTexts, alpha = 0.5)
+    val textOnly = LexicalBlend.blended(
+      base,
+      recall.ordered,
+      built.view,
+      built.nodeTexts,
+      alpha = 0.5,
+      fields = LexicalBlend.LexicalFields.TextOnly
+    )
     // Both remain permutations of the same per-unit distances; only the ordering may differ.
     val a = distances(withLemmas)
     val b = distances(textOnly)

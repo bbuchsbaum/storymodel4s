@@ -102,9 +102,12 @@ object LexicalBlend:
     case WithLemmas
 
   object LexicalFields:
+    /** `WithLemmas` is the default: it is what the development set chose, at +0.0723 Kendall tau
+      * against the unblended channel versus +0.0433 for the node text alone.
+      */
     def parse(raw: Option[String]): LexicalFields = raw.map(_.trim.toLowerCase) match
-      case Some("lemmas") | Some("with-lemmas") => WithLemmas
-      case _                                    => TextOnly
+      case Some("text") | Some("text-only") => TextOnly
+      case _                                => WithLemmas
 
   /** The blended channel. `alpha` is the weight on the semantic side, in `(0, 1]`. */
   def blended(
@@ -113,7 +116,7 @@ object LexicalBlend:
       view: SourceView,
       nodeTexts: Vector[(SourceNodeRef, String)],
       alpha: Double,
-      fields: LexicalFields = LexicalFields.TextOnly
+      fields: LexicalFields = LexicalFields.WithLemmas
   ): SemanticDistance =
     val nodes: Vector[NodeSummary] = view.nodes
     val textByRef = nodeTexts.toMap
