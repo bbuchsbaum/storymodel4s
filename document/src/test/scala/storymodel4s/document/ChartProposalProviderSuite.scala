@@ -962,6 +962,37 @@ class ChartProposalProviderSuite extends FunSuite:
     assertEquals(policy.forFamily(ClaimFamily.ParticipantCoverage), FamilyPolicy.Ordinary)
     assertEquals(policy.forFamily(ClaimFamily.TemporalRelation), FamilyPolicy.Ordinary)
   }
+  test("a title whose provenance the source does not record is not established and abstains") {
+    // The exact defect this closes: a caller put the input file's name in `title` and the summary
+    // rule published it at credence 1.0. The string is still there; what is missing is any basis
+    // for carrying it, and the two abstentions are told apart by their reason.
+    val unestablished = StorySource
+      .fromText(source.rawText, Some("wog.txt"))
+      .fold(e => fail(e.message), identity)
+    assertEquals(unestablished.titleProvenance, None)
+    assertEquals(unestablished.establishedTitle, None)
+
+    val atlas2 = SurfaceAnalyzer.analyze(unestablished)
+    val u0 = atlas2.sentences(0)
+    val chart = checked(u0, Some(c0), Map(c0 -> Concept.predicate("enter")), salt = "unestablished")
+    val proposals = ChartProposalProvider
+      .propose(unestablished, atlas2, Vector(u0.id -> chart))
+      .fold(e => fail(e.message), identity)
+
+    assertEquals(proposals.summaryCoverage, SummaryCoverage.TitleUnestablished)
+    assertEquals(dispositions(proposals.summary.bundle), Vector(ProposalDisposition.Abstained))
+    val summaryCall = proposals.calls
+      .filter(_.params.get("rule").contains(ChartProposalProvider.AbstainSummaryRule))
+    assertEquals(
+      summaryCall.map(_.params("reason")),
+      Vector(ChartProposalProvider.UnestablishedTitleReason)
+    )
+    assert(
+      proposals.calls.forall(call => !call.params.values.exists(_.contains("wog.txt"))),
+      "the unestablished title reached a receipt"
+    )
+  }
+
   test("a missing title yields an abstained summary and a NoTitle row") {
     val untitled = StorySource
       .fromText(source.rawText, None)
