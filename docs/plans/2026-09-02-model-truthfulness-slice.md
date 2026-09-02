@@ -1,110 +1,153 @@
-# Slice 1.7: four falsehoods in the built model
+# Slice 1.7: the model must stop asserting what it did not derive
 
-- **Date:** 2026-09-02
+- **Date:** 2026-09-02, revised the same day after an adversarial audit of the built model.
 - **Standard:** `vision.md`. "Success is a system that makes its interpretation falsifiable and
-  examinable." A model that asserts what it did not derive fails that test even when every test is
-  green. AGENTS.md design contract item 7 and rule 4: model uncertainty must never be rendered as a
-  substantive finding, and a default epistemic status is a fabricated license.
-- **Measured on:** the model the pipeline built from the fifty captured War of the Ghosts replies.
-  Every fix below is verified by replaying those, so the slice costs no API spend.
+  examinable." AGENTS.md contract 4 (reported content never becomes root-world fact by default),
+  contract 7 (indistinguishable values; a default epistemic status is a fabricated license), the
+  identity ruling (derived, never asserted), and rule 4 (model uncertainty must never be rendered
+  as a substantive finding).
+- **Measured on:** the model built from the fifty captured War of the Ghosts replies. Every fix is
+  verified by replaying those, so the slice costs no API spend.
 
-These are not absences. Absences (no causal layer, no episodes, no features) are the next slice and
-are honest today because the model reports them as empty. These four are things the model **says**
-that are not true.
+**Absences are not in this slice.** No causal layer, no episodes, no features: the model reports
+those as empty and that is honest. What follows are things the model **says** that are false.
 
-## D1. Entity turnover reads 1.0 on 53 of 64 trajectory steps
+## D0. Reported speech is asserted as world fact, and the model invents a second battle
 
-`DiscourseTrajectory.derive` computes turnover as one minus the Jaccard overlap of the two
-situations' expanded entity sets, and yields `0.0` when the union is empty. Both branches produce a
-number under conditions where turnover is not defined:
+The story's climax is a man's retelling: *He said: "Behold, I accompanied the ghosts," and he told
+everything. "We did such and such a thing: we fought. Many of our fellows were killed... They said
+that I was shot, and I did not feel sick."*
 
-- with the entity layer of D2 and D3, adjacent situations almost never share a resolved referent, so
-  the model reports total cast replacement between nearly every pair of adjacent events;
-- when neither situation has a resolved participant, the model reports zero turnover, which reads as
-  perfect continuity.
+Only the first of those sentences contains a speech verb. The other three lie wholly inside the
+quotation and are parsed alone, so each becomes a root-world situation. The trajectory therefore
+runs `tell he everything` -> `do we thing` -> `fight we` -> `kill fellow` -> `kill person` ->
+`become he quiet`: the model states that a second battle happened, in story-world time, after the
+man reached home and lit his fire. The ghosts' recruiting speech, the question "What do you think?",
+and all three `think` situations are asserted the same way. All 65 situations sit in one
+`NarratedWorld` context under a calibration model named `narrated-world-default-v1`, which is
+contract 7's fabricated license written out in a field name.
 
-Our own uncertainty is being published as a measurement, in both directions. This is precisely the
-class AGENTS.md rule 4 was written for.
+**The evidence for the fix is in the surface text.** Quotation marks are observations, and the
+vision names the exact surface text as the observational coordinate system. Two mechanisms:
 
-**Fix.** `FlowStep.entityTurnover` stops being a bare `Double` and becomes an estimate that carries
-its own resolution coverage: a value only where both endpoints have resolved participants, and an
-explicit unresolved state with a reason otherwise. `derive` computes turnover only over resolved
-referents and records the coverage it had. No step reports a turnover it could not measure.
+1. **Quotation spans.** The surface analyzer gains quotation-span detection over the canonical text.
+   A situation whose support lies inside an open quotation is placed in a child `Speech` context
+   rather than the root, with the quotation span as its evidence. Attribution is separate and may
+   fail: the speaker is the agent of the nearest preceding speech verb when exactly one is
+   available, and otherwise the context is unattributed. An unattributed speech context is correct;
+   a root-world assertion is not.
+2. **Within-sentence embedding.** `PropositionChart` already carries `EmbeddedProposition(container,
+   kind, content)` and `Interop.embeddings` already maps say/tell/think/believe/know/want/wish/
+   hope/intend/plan/try/possible/likely/remember/recall/imagine/dream to Speech, Belief, Desire,
+   Intention, Hypothetical, Memory and Imagination. The compiler currently refuses an embedded
+   source with `UnsupportedEmbeddedContext`. It should instead emit a child `ContextFrame` of the
+   mapped kind and place the content there.
 
-Touches `story` (the `FlowStep` type), `document`, `view`, `codec`, `laws`. It is a public signature
-change and needs an ADR line.
+Nothing here is new capability: both the embedding table and the context vocabulary exist and are
+unused.
 
-## D2. Coreference is asserted by lemma
+## D1. Entity identity is lemma grouping presented as coreference
 
-`compiler.scala:1382` groups entity mentions by `(lowercased label, entityType)`. Every "he" in the
-story becomes one entity with eleven mentions; every "they" becomes one with ten. The story has
-several male referents and at least two distinct groups. Nothing evidenced that merge: it is an
-identity claim produced by string equality, which the contract's identity ruling forbids
-("if the caller lied here, what would catch it?" — nothing does).
+`compiler.scala:1382` groups mentions by `(lowercased label, entityType)`. Consequences the audit
+verified against the model's own evidence offsets:
 
-`document/mentionform.scala` already defines the vocabulary to refuse it: `MentionForm` with
-`Name`, `Nominal`, `Pronominal`, `Other`, an `isIntroducing` predicate whose Scaladoc says a pronoun
-"carries no introducing power, so it may resolve only to referents already introduced at or before
-its discourse position", and `MentionForms.resolvableAt` implementing exactly that. **No main source
-references any of it.** The right rule was written and never wired in.
+- `he`, eleven mentions, merges the man who refused and went home with the man who accompanied the
+  ghosts and died. The model asserts they are one person, erasing the story's central fact.
+- `they`, ten mentions, merges the two young men with the ghost war party.
+- `we` merges the ghosts' "We wish to take you along" with the protagonist's "we fought".
+- "Two young men" becomes one entity with no cardinality; Egulac becomes two entities.
+- Absent as entities: ghost, arrow, seal, river, shore, sun. The story's title referent is not in
+  the entity layer.
 
-**Fix.**
-1. The provider classifies each filler's mention form from the chart: a `:name` construction is a
-   `Name`, a closed list of pronoun lemmas is `Pronominal`, everything else is `Nominal`. The form
-   is part of the mention proposal and therefore evidenced and receipted.
-2. The compiler clusters **only introducing forms** by exact label match. That keeps exact
-   coreference where it is defensible and stops it where it is not.
-3. A pronominal mention resolves to an already-introduced referent only when `resolvableAt` yields
-   exactly one candidate; otherwise the mention stays **unresolved**, and the model says so.
-4. A participant edge whose filler is unresolved still exists, because the situation does have an
-   agent, but its referent endpoint is explicitly unresolved. It must not mint an entity node, since
-   an unresolved referent that counts as an entity is D1's error in a different place.
+`document/mentionform.scala` defines `MentionForm`, `isIntroducing` and `MentionForms.resolvableAt`,
+whose Scaladoc states the correct rule and whose implementation refuses forward resolution. **No
+main source references any of it.** The rule was written and never wired in.
 
-## D3. Non-referents are entities
+**Fix.** Mention form is classified by the provider from the chart and carried as evidence. Only
+introducing forms cluster by exact label. A pronominal resolves only when `resolvableAt` yields
+exactly one candidate; otherwise it is explicitly unresolved and mints no entity node. Cardinality
+is carried, and a name is not merged with its type node.
 
-`then`, `now`, `midnight`, `thus`, `together` hold participant roles today, and `sick` and `other`
-are entity nodes. A time is not a participant and a property is not a referent. They arrive because
-`scanFillers` admits any filler whose concept kind passes `KindWitness.entity` and whose role has
-exactly one normalized role, and `Time` and `Manner` are normalized roles.
+## D2. Non-referents are entities
 
-**Fix.** Referentiality is decided by the role and the concept together, under a closed named rule
-in `RulesText`: only roles that take a referent (agent, patient, theme, recipient, beneficiary,
-source, destination, and location when its filler is a place) admit an entity mention. A `:time` or
-`:manner` filler is not discarded silently: it is recorded on the situation as a typed temporal or
-manner value with its own span, so the evidence survives where the model can hold it, and the
-coverage row counts it. Property-kind fillers reached through `:domain` or `:mod` are attributes,
-not entities.
+`then`, `now`, `midnight`, `night`, `thus`, `together`, `sick`, `other`, `it`, `everything` hold
+participant roles. Referentiality is decided by the role and the concept together under a closed
+rule in `RulesText`: the referential roles are Agent, Patient, Theme, Experiencer, Stimulus,
+Instrument, Beneficiary, Source, Destination and Location; `Time` and `Manner` take values, not
+participants; `Cause` and `Result` take situations and belong to the causal layer, not the entity
+layer; `Custom` fails closed. A time or manner filler is recorded on the situation as a typed value
+with its own span, so the evidence survives where the model can hold it.
 
-## D4. The story is titled `wog.txt`
+## D3. The story is titled `wog.txt`
 
-The pipeline passes the input file's name to `StorySource.fromText` as the title. The provider's
-summary rule then proposes that string as the story summary, and the compiler accepts it at credence
-1.0 under a calibration model named `title-rule-v1`. The model therefore contains a claim, carried
-with full confidence and a receipt, that this narrative is called `wog.txt`. It is the smallest
-defect here and the most embarrassing, because it is a fabricated claim about the work itself.
+The pipeline passes the input filename as the title; the provider proposes it as the summary; the
+compiler accepts it at credence 1.0 under `title-rule-v1`. A filename is not a title. The pipeline
+stops deriving one; a title is caller-supplied and recorded as such, or absent, in which case the
+summary abstains and the model carries a gap. Accept the consequence: a model built from a bare text
+file does not promote to validated, and the fix for that is a real summary rule, not a filename.
 
-**Fix.** A filename is not a title. The pipeline stops deriving one; a title is either supplied
-explicitly by the caller, and then recorded as caller-supplied provenance rather than derived, or
-absent. When absent the provider takes its existing `NoTitle` abstention path and the model carries
-a summary gap, which is true. Note the consequence and accept it: without a title the summary family
-is unresolved, so a model built from a bare text file does not promote to validated. That is the
-honest outcome, and the fix for it is a real summary rule, not a filename.
+## D4. Credence is the constant 1.0 on all 398 claims
 
-## Order and dependency
+262 claims carry `chart-rule-v1` calibrated 1.0; one carries `title-rule-v1`; **135 carry rawScore
+1.0 with no calibration model at all**, which contract 3 forbids outright. There is zero variance in
+the model. Meanwhile `InteropTables` already computes `StandardRoleRawScore = 0.9` and
+`LexiconRawScore = 0.5`, documented as uncalibrated, and those graded values never reach the model.
 
-D4 is independent and small. D3 is the root of the entity noise and must precede D2, because
-clustering rules are pointless while non-referents are in the population. D2 must precede D1,
-because turnover cannot be measured against an entity layer that is wrong. So: **D4, D3, D2, D1.**
+The deeper error: the calibration records certainty that a rule fired, and lands in a field a reader
+reads as certainty about the claim. Contract 7's indistinguishability test fails: the certainty of a
+total function is stored identically to the certainty of a coreference judgement.
+
+**Fix.** Propagate the interop raw scores. Stop writing a calibrated probability for rules whose
+determinism concerns the mapping rather than the claim. Every claim that carries a raw score without
+a calibration model is either given one or stops claiming to be a probability.
+
+## D5. Provenance identifies nothing, and costs 100 MB
+
+All 65 situations carry a byte-identical list of 564 provider calls: the run's entire call set,
+copied onto every claim. The provenance of `carry they he` cannot be distinguished from that of
+`person (location: egulac)`, and neither names the call that produced it. That is a field with the
+authority of a receipt recording nothing, and it is why `storymodel.json` is 100 MB.
+
+**Fix.** A claim carries the calls that produced it.
+
+## D6. Turnover cannot tell an empty cast from an unrecorded one
+
+53 of 64 steps read 1.0. Fourteen of 65 situations have no participant edges at all, so a step
+scores 1.0 when its neighbour recorded no cast, and 0.0 when neither side did. The same condition
+produces opposite extremes depending on context, and the denominator counts adverbs as entities.
+
+**Fix.** `FlowStep.entityTurnover` carries its resolution coverage: a value only where both
+endpoints have resolved participants, an explicit unresolved state otherwise. Depends on D1 and D2.
+
+## D7. Typed modality and polarity are constants while the description says otherwise
+
+All 65 situations carry modality `Asserted`. `go you (accompanier: they) (mod: possible)` holds the
+modality in its description string and `Asserted` in its typed field, so a permission is typed as a
+statement of fact. "I will not go along" yields polarity Positive. "I have no arrows" yields
+Positive. The refusal that drives the plot is negated nowhere in the model. The four State
+situations carry polarity `Unknown`, which here means "never computed" and is stored identically to
+"genuinely unclear".
+
+## D8. The temporal layer is discourse order relabelled as time
+
+All 64 temporal edges are `Unclear` at calibrated credence 1.0, over exactly the 64 adjacent pairs.
+The layer adds nothing beyond reading order while occupying the name "temporal", and the text
+licenses real relations throughout: "One night", "While they were paddling", "When the canoes came
+opposite", "At midnight", "When the sun rose". Certainty 1.0 on "Unclear" is certainty about not
+knowing.
+
+## Order
+
+D0 first: it removes a fabricated event sequence and nothing else in the model can be read honestly
+until reported content leaves the root world. Then D2 (the entity population), then D1 (identity
+over that population), then D6 (turnover, which needs both). D3, D4 and D5 are independent and small
+enough to travel with whichever slice touches their code. D7 and D8 follow.
 
 ## Acceptance
 
-Replaying the fifty captured recordings:
-
-- no entity whose label is a temporal or manner adverb, and no entity that is a property word;
-- no entity that merges mentions of a pronoun by lemma; every pronominal mention is either resolved
-  to a referent introduced earlier or explicitly unresolved, and the counts of each are reported;
-- every trajectory step either carries a turnover with its coverage or says it could not measure
-  one; no step reports 1.0 or 0.0 by default;
-- no claim in the model names a filename;
-- the coverage ledger accounts for every filler the provider saw, admitted or not, with a reason;
-- each rule carries a mutation proof, and the captured court pins the new counts as literals.
+Replaying the fifty captured recordings: no situation drawn from inside a quotation sits in the root
+context; no trajectory step asserts a story-world sequence across a speech boundary; no entity is an
+adverb or a property; no pronoun merges by lemma; every credence either carries a calibration model
+or does not claim to be a probability; a claim's provenance names its own calls; every step either
+measures turnover or says it could not; and every count is pinned as a literal with a mutation proof
+behind each new rule.
