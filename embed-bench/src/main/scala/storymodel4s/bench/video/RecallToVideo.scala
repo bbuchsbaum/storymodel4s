@@ -69,7 +69,8 @@ final case class TimedSegment(
     locus: Option[MediaLocus],
     group: Option[TimedSegment.Group] = None,
     extraLemmas: Set[String] = Set.empty,
-    locations: Vector[String] = Vector.empty
+    locations: Vector[String] = Vector.empty,
+    embedText: Option[String] = None
 )
 
 object TimedSegment:
@@ -93,9 +94,10 @@ object TimedSourceView:
 
   /** The built view plus everything the view's text axis cannot carry.
     *
-    * `nodeTexts` is the text an embedding channel should encode per node: the segment text for a
-    * leaf, the group label for a group. The builder decides this, not the channel, so every
-    * semantic provider sees the same rendering of the same node.
+    * `nodeTexts` is the text an embedding channel should encode per node: the segment's `embedText`
+    * when the adapter supplies one, else its `text`; the group label for a group. The builder
+    * decides this, not the channel, so every semantic provider sees the same rendering of the same
+    * node.
     */
   final case class Built(
       view: InMemorySourceView,
@@ -205,8 +207,11 @@ object TimedSourceView:
 
     val segmentByRef = segments.map(s => leafRef(s.ordinal) -> s).toMap
     val groupByRef = groupsInOrder.map(g => groupRef(g.ordinal) -> g).toMap
+    // The builder decides the embedded rendering, not the channel. An adapter may supply a richer
+    // one than the human-readable `text` when the source carries structured fields the prose omits;
+    // `text` still drives the document and the report, so the two never drift apart.
     val nodeTexts: Vector[(SourceNodeRef, String)] =
-      segments.map(s => leafRef(s.ordinal) -> s.text) ++
+      segments.map(s => leafRef(s.ordinal) -> s.embedText.getOrElse(s.text)) ++
         groupsInOrder.map(g => groupRef(g.ordinal) -> g.label)
     Built(view, leafMedia ++ groupMedia, document, segmentByRef, groupByRef, nodeTexts)
 
@@ -332,11 +337,23 @@ object RecallToVideo:
           "lexical-jaccard [semantic=lexical-baseline; free fallback]",
           None
         )
-    // The lexical-overlap channel is disabled: with fine-grained segments and recurring names it
-    // nominates hundreds of anchors per unit, which is intractable for the HSMM and adds no
-    // ranking information. Top-k semantic nomination per level keeps the state space sparse.
-    val candidates = CandidateGenerator(semantic, perLevel = 8, lexicalOverlap = false)
-      .generate(recall.ordered, built.view)
+    // Candidate nomination. The defaults are the historical values and are what runs unless a
+    // caller overrides them: top-8 semantic nominations per hierarchy level, lexical overlap off.
+    // The lexical-overlap channel was disabled because with fine-grained segments and recurring
+    // names it nominates hundreds of anchors per unit, which is costly for the HSMM; whether it
+    // adds ranking information is an empirical question, so it is a knob rather than a constant.
+    // Overrides exist for study sweeps on development data and change the report's identity: a
+    // different candidate policy is a different derivation, not a tuning of the same one.
+    val perLevel = sys.env.get("STORYMODEL4S_CANDIDATES_PER_LEVEL").flatMap(_.toIntOption) match
+      case Some(n) if n > 0 => n
+      case _                => 8
+    val lexicalOverlap = sys.env.get("STORYMODEL4S_CANDIDATES_LEXICAL_OVERLAP").map(_.trim) match
+      case Some("true")  => true
+      case Some("false") => false
+      case _             => false
+    val candidates =
+      CandidateGenerator(semantic, perLevel = perLevel, lexicalOverlap = lexicalOverlap)
+        .generate(recall.ordered, built.view)
     val result = GraphHsmm
       .infer(recall, built.view, candidates, DefaultLocalCostModel(semantic = semantic))
       .fold(e => throw new IllegalStateException(e.message), identity)
@@ -434,6 +451,7 @@ object RecallToVideo:
     val leafCount = built.view.leaves.size
     val groupCount = built.view.nodes.size - leafCount
     println(s"semantic channel: $channelLabel")
+    println(s"candidate policy: perLevel=$perLevel lexicalOverlap=$lexicalOverlap")
     println(s"source segments: $leafCount; groups: $groupCount")
     println(s"recall words: ${words.size}; recall units: ${recall.ordered.size}")
     println(s"sparse candidates: ${candidates.totalSize}")

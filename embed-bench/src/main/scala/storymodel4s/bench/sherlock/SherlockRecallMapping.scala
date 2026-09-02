@@ -37,7 +37,29 @@ object SherlockAnnotationView:
     case SherlockAnnotations.MediaLocus.Extent(p, iv)  => MediaLocus.Extent(p, iv)
     case SherlockAnnotations.MediaLocus.Instant(p, at) => MediaLocus.Instant(p, at)
 
+  /** Source-text policy for the embedded rendering.
+    *
+    *   - `bare` (default, the historical behaviour): the coder's description alone.
+    *   - `enriched`: location and the characters present, then the description.
+    *
+    * The annotation table carries location and character columns that the description prose usually
+    * omits, and until now they reached only the lexical-overlap channel, which the pipeline
+    * disables. Distant confusions measured on development recalls are dominated by segments whose
+    * descriptions read alike but whose place and cast differ, so the fields are worth their own
+    * arm. The policy changes what is embedded, never the human-readable text or the report.
+    */
+  def sourceTextPolicy: String =
+    sys.env.get("STORYMODEL4S_SOURCE_TEXT").map(_.trim).filter(_.nonEmpty).getOrElse("bare")
+
+  private def enriched(row: SherlockAnnotations.Row): String =
+    val where = row.location.map(_.trim).filter(_.nonEmpty)
+    val who = row.namesAll.map(_.trim).filter(_.nonEmpty).distinct
+    val prefix =
+      (where.toVector ++ (if who.isEmpty then Vector.empty else Vector(who.mkString(", "))))
+    if prefix.isEmpty then row.description else prefix.mkString(". ") + ". " + row.description
+
   def segments(atlas: Atlas): Vector[TimedSegment] =
+    val policy = sourceTextPolicy
     atlas.rows.map { row =>
       TimedSegment(
         ordinal = row.row,
@@ -46,7 +68,8 @@ object SherlockAnnotationView:
         group = atlas.sceneOf(row.row).map(s => TimedSegment.Group(s.ordinal, s.label)),
         extraLemmas = stemsOf(row.namesAll) ++ stemsOf(row.namesSpeaking) ++
           row.location.map(Lexical.stems(_).toSet).getOrElse(Set.empty),
-        locations = row.location.map(Lexical.words).getOrElse(Vector.empty)
+        locations = row.location.map(Lexical.words).getOrElse(Vector.empty),
+        embedText = if policy == "enriched" then Some(enriched(row)) else None
       )
     }
 
@@ -72,6 +95,7 @@ object SherlockAnnotationView:
     .fold(e => throw new IllegalArgumentException(e.message), identity)
   val built = SherlockAnnotationView.build(atlas)
   println(s"annotation rows: ${atlas.rows.size}; scenes: ${atlas.scenes.size}")
+  println(s"source text policy: ${SherlockAnnotationView.sourceTextPolicy}")
 
   val csv = new String(Files.readAllBytes(Paths.get(recallCsv)), StandardCharsets.UTF_8)
   val words = RecallWordsCsv.parse(csv).fold(e => throw new IllegalArgumentException(e), identity)

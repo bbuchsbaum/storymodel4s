@@ -295,7 +295,13 @@ lazy val embedBench = project
   .settings(
     name := "storymodel4s-embed-bench",
     Test / fork := true,
-    Test / envVars += "ORT_DISABLE_TELEMETRY" -> "1"
+    Test / envVars += "ORT_DISABLE_TELEMETRY" -> "1",
+    // `run` needs the same guarantee as `Test`: the ONNX runtime refuses to start unless the
+    // telemetry switch is set before the JVM does, and a reused sbt server would otherwise carry a
+    // stale environment into every terminal diagnostic.
+    run / fork := true,
+    run / envVars += "ORT_DISABLE_TELEMETRY" -> "1",
+    run / connectInput := true
   )
   .dependsOn(embedCore.jvm, embedOnnx, embedGrakern, align.jvm, fixtures.jvm, laws.jvm % Test)
 
