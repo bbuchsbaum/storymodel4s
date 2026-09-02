@@ -50,7 +50,7 @@ class StoryBuildSuite extends FunSuite:
 
   /** `Checksum.ofText(ChartProposalProvider.RulesText)`; a rules change must move this literal. */
   private val RulesChecksum =
-    "c3857314c18728678557862eac29b7653b946e19c1e795bba9cdc7cd485f042f"
+    "05cdb836a9768d9891368abb41cff1b7ec92ab3b042d3a8cf23bfc05de822d1b"
 
   private val wogRecordings: Path = Paths.get(getClass.getResource("/recordings/wog").toURI)
   private val threeRecordings: Path = Paths.get(getClass.getResource("/recordings/three").toURI)
@@ -185,14 +185,14 @@ class StoryBuildSuite extends FunSuite:
     // its StateFrames set names that frame (the 1.3 court's hand chart gave it Predicate kind and
     // never met the adapter's classification). The other 47 sentences have no chart. The 1.3
     // court's 4/2/1/43 came from seven hand charts and does not transfer.
-    assertEquals(summary.coverage, CoverageCounts(2, 1, 0, 47))
+    assertEquals(summary.coverage, CoverageCounts(3, 0, 0, 47))
     // Gaps: three NoProposal gaps at the abstained anchor (situation, context, membership) and one
     // trajectory step between the two emitted situations that lacks participant and temporal
     // inputs until phase 1.4 lands.
-    assertEquals(summary.gaps, 4)
-    assertEquals(summary.errors, 5)
+    assertEquals(summary.gaps, 0)
+    assertEquals(summary.errors, 0)
     assertEquals(summary.warnings, 0)
-    assertEquals(summary.validated, false)
+    assertEquals(summary.validated, true)
     assertEquals(ExitStatus.of(Right(summary)), ExitStatus.Incomplete)
 
     val files = StoryPipeline.files(outDir)
@@ -244,17 +244,15 @@ class StoryBuildSuite extends FunSuite:
 
     val cursor = report.hcursor
     assertEquals(cursor.downField("source").downField("storyId").as[String], Right(WogStory))
-    assertEquals(cursor.downField("validation").downField("validated").as[Boolean], Right(false))
-    assertEquals(cursor.downField("validation").downField("errors").as[Int], Right(5))
+    assertEquals(cursor.downField("validation").downField("validated").as[Boolean], Right(true))
+    assertEquals(cursor.downField("validation").downField("errors").as[Int], Right(0))
     assertEquals(cursor.downField("validation").downField("warnings").as[Int], Right(0))
     val laws =
       rows(report, "validation", "violations").map(v => field(v, "law") -> field(v, "severity"))
-    assertEquals(
-      laws.sorted,
-      Vector.fill(4)(
-        "compiler.required-derivation" -> "error"
-      ) :+ ("trajectory.complete" -> "error")
-    )
+    // Since phase 1.4 every one of the three charted sentences is proposed (the be-located-at-91
+    // root is admitted as a State), so no family is left unresolved and the trajectory is derived
+    // from accepted participant coverage and temporal values: nothing blocks promotion.
+    assertEquals(laws.sorted, Vector.empty[(String, String)])
     assertEquals(
       cursor.downField("coverage").downField("counts").downField("noCharts").as[Int],
       Right(47)
@@ -265,27 +263,24 @@ class StoryBuildSuite extends FunSuite:
       Right(3)
     )
     val gaps = rows(report, "gaps")
-    assertEquals(gaps.size, 4)
-    assertEquals(
-      gaps.map(g => field(g, "reason")).sorted,
-      Vector(
-        "trajectory-inputs-unsupported:ParticipantRole,TemporalRelation",
-        "unresolved:NoProposal",
-        "unresolved:NoProposal",
-        "unresolved:NoProposal"
-      )
-    )
-    assertEquals(
-      gaps.head,
-      Json.obj(
-        "stage" -> Json.fromString("narrative-compile"),
-        "family" -> Json.fromString("ContextAssignment"),
-        "target" -> Json.fromString(s"context-assignment:$WogStory:s0#b"),
-        "reason" -> Json.fromString("unresolved:NoProposal"),
-        "upstreamClaims" -> Json.fromInt(0),
-        "evidence" -> Json.fromInt(0)
-      )
-    )
+    assertEquals(gaps.size, 0)
+
+    // What the three charted sentences actually built: one situation each, the entities their
+    // roles filled, a participant edge per filler, a temporal value per adjacent pair, and a
+    // trajectory step per pair. A draft that validated on nothing would show zeroes here.
+    val built = json(files.model)
+    val graph = built.hcursor.downField("graph")
+    def size(cursor: io.circe.ACursor, field: String): Int =
+      cursor.downField(field).focus match
+        case Some(value) if value.isArray  => value.asArray.fold(0)(_.size)
+        case Some(value) if value.isObject => value.asObject.fold(0)(_.keys.size)
+        case other => fail(s"$field is neither an array nor an object: $other")
+    assertEquals(size(graph, "situations"), 3)
+    assertEquals(size(graph, "entities"), 3)
+    val relations = graph.downField("relations")
+    assertEquals(size(relations, "participants"), 3)
+    assertEquals(size(relations, "temporal"), 2)
+    assertEquals(size(built.hcursor.downField("trajectory"), "steps"), 2)
     assertEquals(
       cursor.downField("compilation").downField("fingerprint").as[String],
       Right(summary.fingerprint.hex)
@@ -306,7 +301,7 @@ class StoryBuildSuite extends FunSuite:
         .as[Boolean],
       Right(true)
     )
-    assertEquals(cursor.downField("model").downField("situations").as[Int], Right(2))
+    assertEquals(cursor.downField("model").downField("situations").as[Int], Right(3))
     assertEquals(cursor.downField("model").downField("segments").as[Int], Right(1))
 
     val coverage = coverageRows(report)
@@ -316,9 +311,13 @@ class StoryBuildSuite extends FunSuite:
       Json.obj(
         "sentence" -> Json.fromString(s"$WogStory:s0"),
         "ordinal" -> Json.fromInt(0),
-        "kind" -> Json.fromString("abstained"),
-        "anchor" -> Json.fromString(s"$WogStory:s0#b"),
-        "reason" -> Json.fromString("focus-not-predicate:Special")
+        // Since phase 1.4 a -91 reification root is admitted as a State even though the AMR
+        // adapter classes it ConceptKind.Special. Its two roles carry no normalized participant
+        // role, so they are counted unlicensed rather than proposed as participants.
+        "kind" -> Json.fromString("proposed"),
+        "root" -> Json.fromString(s"$WogStory:s0#b"),
+        "fillers" -> Json.fromInt(0),
+        "unlicensed" -> Json.fromInt(2)
       )
     )
     assertEquals(
@@ -327,7 +326,9 @@ class StoryBuildSuite extends FunSuite:
         "sentence" -> Json.fromString(s"$WogStory:s1"),
         "ordinal" -> Json.fromInt(1),
         "kind" -> Json.fromString("proposed"),
-        "root" -> Json.fromString(s"$WogStory:s1#g")
+        "root" -> Json.fromString(s"$WogStory:s1#g"),
+        "fillers" -> Json.fromInt(2),
+        "unlicensed" -> Json.fromInt(0)
       )
     )
     assertEquals(kindOf(coverage(2)), "proposed")
@@ -376,15 +377,15 @@ class StoryBuildSuite extends FunSuite:
     Files.delete(store.path(riverKey))
 
     val mutated = build(textPath, copy, dir.resolve("mutated"))
-    assertEquals(mutated.coverage, CoverageCounts(1, 1, 0, 48))
+    assertEquals(mutated.coverage, CoverageCounts(2, 0, 0, 48))
     assertEquals(mutated.charts, 2)
     assertEquals(mutated.parser.replayedAuthored, 2)
     assertEquals(mutated.parser.unrecorded, 48)
     assertEquals(mutated.parser.transportFailures, 48)
     assertEquals(mutated.liveCalls, 0)
     // The abstained anchor's three gaps survive; the trajectory gap needed two situations.
-    assertEquals(mutated.gaps, 3)
-    assertEquals(mutated.validated, false)
+    assertEquals(mutated.gaps, 0)
+    assertEquals(mutated.validated, true)
 
     val mutatedRows = coverageRows(json(mutated.files.report))
     assertEquals(mutatedRows.size, 50)
@@ -470,7 +471,7 @@ class StoryBuildSuite extends FunSuite:
     val proposals = ChartProposalProvider
       .propose(wog.story, wog.atlas, wog.charts)
       .fold(e => fail(e.message), identity)
-    def compile(outcome: ParseOutcome, parserStage: Option[(StageId, Checksum)]) =
+    def compile(outcome: ParseOutcome, parserStage: Option[StageId]) =
       ChartProposalProvider
         .input(outcome.story, outcome.atlas, outcome.charts, parserStage, Now)
         .flatMap(NarrativeCompiler.compile)
@@ -486,15 +487,20 @@ class StoryBuildSuite extends FunSuite:
     val otherSource = BuildSummary.derive(
       wog,
       proposals,
-      compile(three, Some(wog.parserStage)),
+      compile(three, Some(wog.parserStage._1)),
       files
     )
+    // A compilation of another story is refused, but by the stage check rather than the source
+    // check: the parser stage now carries the digest of the charts that were compiled, and those
+    // charts name their sentences, which name their story. The source-checksum branch below it is
+    // defence in depth and is no longer reachable through this path.
     otherSource match
       case Left(PipelineError.ReceiptMismatch(detail)) =>
-        assert(detail.contains("is not the parsed source"), detail)
-      case other => fail(s"expected a source mismatch, got $other")
+        assert(detail.startsWith("receipt lacks parser stage"), detail)
+      case other => fail(s"expected a receipt mismatch, got $other")
 
-    val matching = BuildSummary.derive(wog, proposals, compile(wog, Some(wog.parserStage)), files)
+    val matching =
+      BuildSummary.derive(wog, proposals, compile(wog, Some(wog.parserStage._1)), files)
     assert(matching.isRight, matching.toString)
     assert(!Files.exists(dir.resolve("out")), "derive wrote something")
   }
@@ -548,7 +554,7 @@ class StoryBuildSuite extends FunSuite:
       .decode(read(summary.files.model))
       .fold(error => fail(error.toString), identity)
     assertEquals(StoryModelCodec.contentChecksum(decoded), summary.encodingDigest)
-    assertEquals(decoded.graph.situations.size, 2)
+    assertEquals(decoded.graph.situations.size, 3)
     assertEquals(decoded.receipt.map(_.contentChecksum), Some(summary.receiptChecksum))
     assertEquals(decoded.receipt.map(_.createdAtEpochMillis), Some(Now))
   }
@@ -595,12 +601,12 @@ class StoryBuildSuite extends FunSuite:
     assertEquals(summary.charts, 3)
     assertEquals(summary.parser.transportFailures, 0)
     assertEquals(summary.parser.replayedAuthored, 3)
-    assertEquals(summary.coverage, CoverageCounts(2, 1, 0, 0))
-    assertEquals(summary.gaps, 4)
-    assertEquals(summary.validated, false)
+    assertEquals(summary.coverage, CoverageCounts(3, 0, 0, 0))
+    assertEquals(summary.gaps, 0)
+    assertEquals(summary.validated, true)
     assertEquals(ExitStatus.of(Right(summary)), ExitStatus.Complete)
     val line = StoryPipeline.render(summary, outDir)
-    assert(line.contains("sentences=3 charts=3 proposed=2 abstained=1"), line)
+    assert(line.contains("sentences=3 charts=3 proposed=3 abstained=0"), line)
     assert(line.contains("transportFailures=0"), line)
     assert(line.contains("liveCalls=0"), line)
     assert(line.contains("encodingDigest(timestamp-bearing)="), line)
