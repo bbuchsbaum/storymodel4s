@@ -29,6 +29,12 @@ enum BackendRefusal:
   case UnknownBackend(variable: String, raw: String, admitted: Vector[String])
   case BaseUrlAbsent(variable: String)
   case BaseUrlNotHttp(variable: String)
+
+  /** The base URL carries `user:password@` userinfo. Refused rather than stripped: a credential in
+    * a URL reaches a log or an error render eventually, the host is all the identity needs, and
+    * this module already has one place for a key.
+    */
+  case BaseUrlCarriesCredentials(variable: String, keyVariable: String)
   case ModelAbsent(variable: String)
 
   /** The model id cannot become part of a runtime identity; see
@@ -42,6 +48,8 @@ enum BackendRefusal:
     case BaseUrlAbsent(variable)  => s"the openai backend needs a nonblank $variable"
     case BaseUrlNotHttp(variable) =>
       s"$variable must be an absolute http or https URL naming a host"
+    case BaseUrlCarriesCredentials(variable, keyVariable) =>
+      s"$variable must carry no user:password@ userinfo; put the key in $keyVariable"
     case ModelAbsent(variable) => s"the openai backend needs a nonblank $variable"
     case ModelNotIdentitySafe(variable, maxLength) =>
       s"$variable must be at most $maxLength characters with no whitespace or control characters"
@@ -207,14 +215,28 @@ object AgentCredentials:
     val host = Option(uri.getHost).getOrElse("").stripPrefix("[").stripSuffix("]").toLowerCase
     LoopbackHosts.contains(host)
 
-  /** Resolve `{base}/chat/completions`; the base must be absolute, http(s), and name a host. */
+  /** Resolve `{base}/chat/completions`; the base must be absolute, http(s), name a host, and carry
+    * no userinfo. Neither refusal echoes the value, because the thing that makes a URL unusable
+    * here is exactly the thing that must not be reproduced in a message.
+    */
   private def chatCompletions(raw: String): Either[BackendRefusal, URI] =
     val trimmed = raw.trim.reverse.dropWhile(_ == '/').reverse
-    Try(new URI(trimmed)).toOption
+    val parsed = Try(new URI(trimmed)).toOption
       .filter(uri => Option(uri.getScheme).map(_.toLowerCase).exists(HttpSchemes.contains))
       .filter(uri => Option(uri.getHost).exists(nonBlank))
-      .flatMap(_ => Try(new URI(trimmed + ChatCompletionsPath)).toOption)
       .toRight(BackendRefusal.BaseUrlNotHttp(OpenAiBaseUrlVariable))
+    parsed
+      .flatMap(uri =>
+        if Option(uri.getRawUserInfo).isDefined then
+          Left(
+            BackendRefusal.BaseUrlCarriesCredentials(OpenAiBaseUrlVariable, OpenAiKeyVariable)
+          )
+        else Right(uri)
+      )
+      .flatMap(_ =>
+        Try(new URI(trimmed + ChatCompletionsPath)).toOption
+          .toRight(BackendRefusal.BaseUrlNotHttp(OpenAiBaseUrlVariable))
+      )
 
   /** The backend the environment names, with the endpoint the clients need. */
   private[agent] def backendChoice(

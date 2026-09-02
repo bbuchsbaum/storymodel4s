@@ -1,5 +1,7 @@
 package storymodel4s.provider.agent
 
+import storymodel4s.provider.parser.RuntimeIdentityScalar
+
 /** Which model service a run talks to, together with the identity that service implies.
   *
   * Why the identity is derived here and never written as a constant: an OpenAI-compatible server
@@ -53,15 +55,13 @@ object ModelBackend:
 
   /** Whether a scalar can survive the identifier rules every downstream fingerprint applies.
     *
-    * Why here and not only at the environment court: `AmrCandidates` builds a `Fingerprint` from
-    * `provider:model:sdkVersion` with the unchecked constructor, so a model id carrying a space --
-    * `STORYMODEL4S_OPENAI_MODEL="my model"` is one keystroke away -- would reach a `throw` in the
-    * middle of a parse rather than a refusal before it. Both the court and the transport ask this,
-    * so no path to a runtime identity skips it.
+    * The rule itself lives in `provider-parser`, which owns the admission that `RemoteRuntime.from`
+    * and `PinnedRuntime.from` now enforce. This delegates rather than restating it, so there is one
+    * rule with two enforcement points and no way for them to drift apart. Asking it here as well is
+    * defence in depth: it turns `STORYMODEL4S_OPENAI_MODEL="my model"` into a refusal at the
+    * environment court, naming the variable, instead of a refused transport further along.
     */
-  def identityScalarIsSafe(value: String): Boolean =
-    value.nonEmpty && value.length <= MaxIdentityScalarLength &&
-      !value.exists(character => character.isWhitespace || character.isControl)
+  def identityScalarIsSafe(value: String): Boolean = RuntimeIdentityScalar.isSafe(value)
 
   /** Leaves room for `provider:model:sdkVersion` inside the 256-character identifier limit. */
-  val MaxIdentityScalarLength: Int = 80
+  val MaxIdentityScalarLength: Int = RuntimeIdentityScalar.MaxLength

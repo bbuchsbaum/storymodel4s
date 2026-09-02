@@ -120,14 +120,33 @@ class CredentialsSuite extends FunSuite:
   }
 
   test("a model id that cannot become a runtime identity is refused before any call") {
-    Vector("my model", "model\tname", "a" * 81).foreach { bad =>
+    Vector("my model", "model\tname", "a" * 85).foreach { bad =>
       assertEquals(
         backend(openAiEnv(LocalBase) + (OpenAiModelVariable -> bad)),
-        Left(BackendRefusal.ModelNotIdentitySafe(OpenAiModelVariable, 80)),
+        Left(BackendRefusal.ModelNotIdentitySafe(OpenAiModelVariable, 84)),
         s"'$bad' was admitted as a model id"
       )
     }
-    assert(backend(openAiEnv(LocalBase) + (OpenAiModelVariable -> ("a" * 80))).isRight)
+    assert(backend(openAiEnv(LocalBase) + (OpenAiModelVariable -> ("a" * 84))).isRight)
+  }
+
+  test("a base URL carrying userinfo is refused, and the refusal never repeats it") {
+    val secret = "someone:hunter2correct"
+    val refusal = backend(openAiEnv(s"https://$secret@openrouter.ai/api/v1")).swap.toOption
+    assertEquals(
+      refusal,
+      Some(BackendRefusal.BaseUrlCarriesCredentials(OpenAiBaseUrlVariable, OpenAiKeyVariable))
+    )
+    val rendered = refusal.map(_.message).getOrElse(fail("no refusal to render"))
+    assert(!rendered.contains(secret), "the refusal repeated the URL's credentials")
+    assert(!rendered.contains("hunter2correct"), "the refusal repeated the URL's password")
+    assert(!rendered.contains("openrouter.ai"), "the refusal repeated the rejected URL")
+    assertEquals(
+      backend(openAiEnv("http://user@127.0.0.1:11434/v1")).swap.toOption,
+      Some(BackendRefusal.BaseUrlCarriesCredentials(OpenAiBaseUrlVariable, OpenAiKeyVariable)),
+      "a bare username is still a credential in a URL"
+    )
+    assert(backend(openAiEnv(RemoteBase)).isRight, "a URL with no userinfo was refused")
   }
 
   test("the transport refuses an identity scalar the downstream fingerprint cannot represent") {
@@ -169,8 +188,8 @@ class CredentialsSuite extends FunSuite:
       Right("openai-compatible:127.0.0.1:11434")
     )
     assertEquals(
-      backend(openAiEnv("https://someone:secret@openrouter.ai/api/v1")).map(_.provider),
-      Right("openai-compatible:openrouter.ai")
+      backend(openAiEnv("https://openrouter.ai:8443/api/v1")).map(_.provider),
+      Right("openai-compatible:openrouter.ai:8443")
     )
   }
 
