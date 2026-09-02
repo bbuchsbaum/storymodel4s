@@ -40,6 +40,9 @@ enum PipelineError:
   /** The compiler refused the checked input. */
   case CompileRefused(error: NarrativeCompilerError)
 
+  /** The compilation's receipt does not carry the parse it was fed (stage or source checksum). */
+  case ReceiptMismatch(detail: String)
+
   /** A bundle file could not be written; the reason is digested, never echoed. */
   case OutputUnwritable(path: String, reasonChecksum: Checksum)
 
@@ -48,6 +51,7 @@ enum PipelineError:
     case ProposalRefused(error)   => s"proposal provider refused: ${error.message}"
     case InputRefused(error)      => s"compiler input refused: ${error.message}"
     case CompileRefused(error)    => s"compiler refused: ${error.message}"
+    case ReceiptMismatch(detail)  => s"compilation receipt refused: $detail"
     case OutputUnwritable(p, sum) => s"cannot write $p (reason ${sum.short()})"
 
 /** The process exit status of a story build, as a closed set with its numeric code attached.
@@ -63,29 +67,46 @@ enum ExitStatus(val code: Int):
   case Complete extends ExitStatus(0)
 
   /** The court ran but the bundle is not complete: a sentence never reached the parser court, the
-    * compiler refused the input, or a file could not be written.
+    * parser's build receipt was refused after the court, the compiler refused the input, or a file
+    * could not be written.
     */
   case Incomplete extends ExitStatus(1)
 
-  /** Nothing ran: unknown mode, refused credentials, unreadable text, missing recordings. */
+  /** The parser court never convened: unknown mode, refused credentials, unreadable text, refused
+    * source, missing recordings, unavailable prompt package, refused transport or config.
+    */
   case CouldNotStart extends ExitStatus(2)
 
 object ExitStatus:
   /** Derive the status from the typed outcome; a run with a transport failure is incomplete even
-    * though it wrote every file, because a sentence is missing from the court record.
+    * though it wrote every file, because a sentence is missing from the court record. A refused
+    * build receipt is incomplete, not could-not-start: in record mode it fires after the live calls
+    * were made and their recordings kept.
     */
   def of(outcome: Either[PipelineError, BuildSummary]): ExitStatus = outcome match
-    case Left(PipelineError.NotStarted(_))                      => CouldNotStart
-    case Left(_)                                                => Incomplete
-    case Right(summary) if summary.parser.transportFailures > 0 => Incomplete
-    case Right(_)                                               => Complete
+    case Left(PipelineError.NotStarted(DriverError.ReceiptInvalid(_))) => Incomplete
+    case Left(PipelineError.NotStarted(_))                             => CouldNotStart
+    case Left(_)                                                       => Incomplete
+    case Right(summary) if summary.parser.transportFailures > 0        => Incomplete
+    case Right(_)                                                      => Complete
 
-/** The bundle files a build writes, in write order. */
+/** The bundle files a build writes, in write order.
+  *
+  * Why a value and not three strings: the layout is one decision (ADR 0009) that the writer, the
+  * summary, and every test address by role, so a renamed file cannot drift between them.
+  */
 final case class BundleFiles(model: Path, report: Path, receipts: Path):
   def all: Vector[Path] = Vector(model, report, receipts)
 
 /** Counts and checksums a build publishes. Privately constructed because every field is derived
-  * from one parse outcome and one compilation; only [[BuildSummary.derive]] establishes them.
+  * from one parse outcome and one compilation that [[BuildSummary.derive]] has checked belong
+  * together (the compilation's receipt carries the parser stage and the source checksum of the
+  * parse it was fed).
+  *
+  * Three identities, two of them stable: `fingerprint` (the compiler's content fingerprint) and
+  * `receiptChecksum` (`BuildReceipt.contentChecksum`, which excludes the timestamp) are equal
+  * across runs over the same inputs at any time; `encodingDigest` digests the canonical model
+  * encoding, which carries `receipt.createdAtEpochMillis`, so it moves with the clock.
   */
 final class BuildSummary private (
     val mode: DriverMode,
@@ -101,42 +122,88 @@ final class BuildSummary private (
     val validated: Boolean,
     val fingerprint: Checksum,
     val candidateSet: Checksum,
-    val modelChecksum: Checksum,
+    val encodingDigest: Checksum,
     val receiptChecksum: Checksum,
     val files: BundleFiles
 ):
   def liveCalls: Int = parser.liveCalls
+
+  private def parts = (
+    mode,
+    storyId,
+    sourceChecksum,
+    sentences,
+    charts,
+    parser,
+    coverage,
+    gaps,
+    errors,
+    warnings,
+    validated,
+    fingerprint,
+    candidateSet,
+    encodingDigest,
+    receiptChecksum,
+    files
+  )
+
+  override def equals(other: Any): Boolean = other match
+    case that: BuildSummary => parts == that.parts
+    case _                  => false
+
+  override def hashCode(): Int = parts.hashCode
 
   override def toString: String =
     s"BuildSummary(${mode.render}, ${storyId.value}, sentences=$sentences, charts=$charts, " +
       s"validated=$validated, fingerprint=${fingerprint.short()})"
 
 object BuildSummary:
+  /** Refuse a compilation whose receipt does not carry this parse: its stage list must contain the
+    * parser stage `parse` established, and its source checksum must be the parsed story's.
+    */
   private[pipeline] def derive(
       parsed: ParseOutcome,
       proposals: ChartProposals,
       compilation: NarrativeCompilation,
       files: BundleFiles
-  ): BuildSummary =
+  ): Either[PipelineError, BuildSummary] =
+    val receipt = compilation.receipt
     val report = compilation.validation.report
-    new BuildSummary(
-      parsed.mode,
-      parsed.story.id,
-      parsed.story.canonicalChecksum,
-      sentences = parsed.atlas.sentences.size,
-      charts = parsed.charts.size,
-      parser = parsed.summary,
-      coverage = proposals.counts,
-      gaps = compilation.derivation.gaps.size,
-      errors = report.errors.size,
-      warnings = report.warnings.size,
-      validated = compilation.validated.isDefined,
-      fingerprint = compilation.fingerprint,
-      candidateSet = compilation.derivation.candidateSet,
-      modelChecksum = StoryModelCodec.contentChecksum(compilation.draft),
-      receiptChecksum = compilation.receipt.contentChecksum,
-      files
-    )
+    if !receipt.stages.contains(parsed.parserStage) then
+      Left(
+        PipelineError.ReceiptMismatch(
+          s"receipt lacks parser stage ${parsed.parserStage._1.value}=" +
+            parsed.parserStage._2.short()
+        )
+      )
+    else if receipt.sourceChecksum != parsed.story.canonicalChecksum then
+      Left(
+        PipelineError.ReceiptMismatch(
+          s"receipt source ${receipt.sourceChecksum.short()} is not the parsed source " +
+            parsed.story.canonicalChecksum.short()
+        )
+      )
+    else
+      Right(
+        new BuildSummary(
+          parsed.mode,
+          parsed.story.id,
+          parsed.story.canonicalChecksum,
+          sentences = parsed.atlas.sentences.size,
+          charts = parsed.charts.size,
+          parser = parsed.summary,
+          coverage = proposals.counts,
+          gaps = compilation.derivation.gaps.size,
+          errors = report.errors.size,
+          warnings = report.warnings.size,
+          validated = compilation.validated.isDefined,
+          fingerprint = compilation.fingerprint,
+          candidateSet = compilation.derivation.candidateSet,
+          encodingDigest = StoryModelCodec.contentChecksum(compilation.draft),
+          receiptChecksum = receipt.contentChecksum,
+          files
+        )
+      )
 
 /** Text to a three-file pre-bundle: charts through `provider-agent`, proposals through
   * `ChartProposalProvider`, a draft through `NarrativeCompiler`, and the model, report, and
@@ -182,7 +249,7 @@ object StoryPipeline:
         .map(PipelineError.InputRefused(_))
       compilation <- NarrativeCompiler.compile(input).left.map(PipelineError.CompileRefused(_))
       bundle = files(outDir)
-      summary = BuildSummary.derive(parsed, proposals, compilation, bundle)
+      summary <- BuildSummary.derive(parsed, proposals, compilation, bundle)
       model = StoryModelCodec.encode(compilation.draft)
       report = BundleJson.report(parsed, proposals, compilation, summary).spaces2 + "\n"
       receipts = BundleJson.receipts(parsed, compilation, summary).spaces2 + "\n"
@@ -216,7 +283,8 @@ object StoryPipeline:
       s"unrecorded=${p.unrecorded} corrupt=${p.corrupt} liveCalls=${summary.liveCalls} " +
       s"gaps=${summary.gaps} errors=${summary.errors} warnings=${summary.warnings} " +
       s"validated=${summary.validated} fingerprint=${summary.fingerprint.short()} " +
-      s"model=${summary.modelChecksum.short()} receipt=${summary.receiptChecksum.short()} " +
+      s"encodingDigest(timestamp-bearing)=${summary.encodingDigest.short()} " +
+      s"receipt=${summary.receiptChecksum.short()} " +
       s"out=$outDir"
 
 /** Usage: `storyBuild <replay|record> <text-path> <recordings-dir> <out-dir>`.

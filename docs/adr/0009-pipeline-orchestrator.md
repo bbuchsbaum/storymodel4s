@@ -39,7 +39,9 @@ partial outcome, and keeps validation status beside it rather than inside it.
    followed by the existing writes, with one deliberate change: the build receipt is established
    before the first write, so a refused receipt (`ReceiptInvalid`) leaves the output directory
    untouched where it previously left per-sentence files behind. No provider-agent test pinned
-   the old order; all 42 stay green unchanged.
+   the old order; all 52 stay green unchanged, and a new one pins the new order: a negative
+   timestamp (the one receipt refusal a caller can reach) yields `ReceiptInvalid` with no
+   output directory, in both `run` and `StoryPipeline.run`.
 3. **Flow and files.** `parse` → `ChartProposalProvider.propose` (for the coverage ledger) →
    `ChartProposalProvider.input(story, atlas, charts, Some(parserStage), now)` →
    `NarrativeCompiler.compile` → three files under `outDir`:
@@ -68,20 +70,36 @@ partial outcome, and keeps validation status beside it rather than inside it.
    Everything is computed before the first write. A refusal at any stage writes nothing.
    The trio is a **pre-bundle**: `result.json` and `manifest.json` through `StoryOutputResult`
    (`view/output.scala`) are phase 2.2 and out of scope here.
+
+   The report's `model` block carries three identities and says which are stable: the
+   compilation `fingerprint` and the `BuildReceipt` content checksum (timestamp excluded) are
+   equal across runs over the same inputs at any clock; `encodingDigest` is
+   `StoryModelCodec.contentChecksum(draft)`, which digests the canonical encoding including
+   `receipt.createdAtEpochMillis`, and is labelled timestamp-bearing in the report and on
+   stdout so nobody reads it as a content identity.
+
+   `BuildSummary.derive` refuses (typed `ReceiptMismatch`) a compilation whose receipt does not
+   contain the parser stage `parse` established, or whose source checksum is not the parsed
+   story's, so the summary can only be built from a parse and a compilation that belong
+   together.
 4. **Modes and exit status.** `DriverMode` is reused: `replay` cannot spend and refuses a
    missing recordings directory; `record` passes `LiveAuthorization.from(env)` before any read
    or write, exactly as the parse driver does. `ExitStatus` is an enum with the code attached:
-   `CouldNotStart` (2) for every `PipelineError.NotStarted` (mode, credentials, text,
-   recordings, prompt, transport, receipt); `Incomplete` (1) when any sentence never reached the
-   parser court (`transportFailures > 0`), when the proposal provider, the input court, or the
-   compiler refused, or when a file could not be written; `Complete` (0) otherwise. A partial
-   draft is a complete bundle: validation status is reported, not exited on. Only counts,
-   checksums, and paths are printed.
+   `CouldNotStart` (2) when the parser court never convened: every `PipelineError.NotStarted`
+   except a refused build receipt (mode, credentials, text, source, recordings, prompt,
+   transport, config); `Incomplete` (1) when any sentence never reached the parser court
+   (`transportFailures > 0`), when the build receipt was refused after the court (in record
+   mode that is after the live calls were made and kept), when the proposal provider, the input
+   court, the compiler, or the summary's receipt check refused, or when a file could not be
+   written; `Complete` (0) otherwise. A partial draft is a complete bundle: validation status
+   is reported, not exited on. Only counts, checksums, and paths are printed.
 5. **Determinism.** Two replay runs over the same inputs and the same `nowEpochMillis` produce
    byte-identical `storymodel.json`, `compilation-report.json`, and `receipts.json`, and equal
    compilation fingerprints (tested). The timestamp is an input: it sits in the `BuildReceipt`
    inside the draft, so the `@main` passes `System.currentTimeMillis()` and two CLI runs differ
-   there and only there.
+   in the receipt's `createdAtEpochMillis`, therefore in the `storymodel.json` bytes and the
+   encoding digest; the compilation fingerprint, the candidate-set checksum, and the receipt
+   content checksum are equal across them (tested with two clocks).
 6. **The report encoder lives in `pipeline`.** `BundleJson` renders the report and receipts
    with circe, reusing `codec`'s `ProviderCall`, `BuildReceipt`, `StageRecord`, and
    `ExtendedBuildReceipt` encoders so every receipt keeps its interchange shape.
@@ -94,7 +112,8 @@ partial outcome, and keeps validation status beside it rather than inside it.
 8. **`tools/reference-scope.sh` joins `build.sbt` onto one line before reading
    `jvmOnlyModules`.** The list now exceeds 100 columns and scalafmt wraps it. Measured
    2026-09-02: the two-line form already on `main` matched nothing, so the tool would have
-   emitted `providerAgentJVM/test`, a project that does not exist.
+   emitted `providerAgentJVM/test`, a project that does not exist. An empty extraction now
+   exits 3 (the same guard `module_dirs` has) instead of silently suffixing `JVM` everywhere.
 
 ## The War of the Ghosts court, as pinned
 
@@ -151,13 +170,18 @@ no transport failure, exit 0.
 
 ## Evidence
 
-`StoryBuildSuite` (pipeline, JVM): nine tests, replay only, `liveCalls == 0` by construction:
+`StoryBuildSuite` (pipeline, JVM): twelve tests, replay only, `liveCalls == 0` by construction:
 the two recording sets pinned to their sources; the fifty-sentence court above with every
-literal; sentence isolation (delete one recording, exactly that row moves to `no-chart`, every
-other row byte-equal); missing recordings refused with no output directory; record mode without
-the environment opt-in refused with neither directory created; byte-identical files across two
-runs; `StoryModelCodec.decode` round-trip to the same content checksum; the exit-status table;
-the three-sentence complete run at exit 0.
+literal (story id, coverage rows 0 and 1 in full, gap 0 in full, the violation law multiset,
+the rules-text config hash); sentence isolation (delete one recording, exactly that row moves
+to `no-chart`, every other row byte-equal); missing recordings refused with no output
+directory; record mode without the environment opt-in refused with neither directory created;
+a refused build receipt (negative timestamp) after the court and before any write, mirrored in
+`provider-agent`'s `RecordedReplaySuite`; the summary's receipt check refusing a compilation
+without the parser stage and one over another source; byte-identical files across two runs; the
+clock moving only the receipt timestamp, the model bytes, and the encoding digest;
+`StoryModelCodec.decode` round-trip to the encoding digest and the receipt; the exit-status
+table; the three-sentence complete run at exit 0.
 
 Mutation ledger, 2026-09-02 (apply mutant → run the project's tests → named test red → restore;
 `git status` clean after every step; logs `mutant-*.log` in the session scratchpad):
@@ -173,6 +197,10 @@ Mutation ledger, 2026-09-02 (apply mutant → run the project's tests → named 
 What this evidence does not establish: the record path against the real SDK (network-free by
 construction; `LiveSmokeSuite` stays skipped), the bundle wrapper of phase 2.2, and the WOG
 numbers once phase 1.4 lands, which the owner has said will land first and will move the pins.
+Several report fields have only a zero or `false` reading here and no positive control:
+`validated`, `warnings`, `emptyCharts`, and the served-from counts `replayedCaptured`,
+`capturedLive`, `foreign`, and `corrupt` (provider-agent courts the last four at the driver
+level; this suite never exercises them through the pipeline).
 
 ## Consequences
 

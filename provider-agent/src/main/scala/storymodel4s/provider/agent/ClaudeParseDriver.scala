@@ -123,6 +123,30 @@ final class DriverSummary private (
     case DriverMode.Replay => 0
     case DriverMode.Record => capturedLive + unrecorded
 
+  private def parts = (
+    mode,
+    storyId,
+    sourceChecksum,
+    sentences,
+    proposed,
+    failed,
+    abstained,
+    transportFailures,
+    replayedAuthored,
+    replayedCaptured,
+    capturedLive,
+    unrecorded,
+    foreign,
+    corrupt,
+    receiptChecksum
+  )
+
+  override def equals(other: Any): Boolean = other match
+    case that: DriverSummary => parts == that.parts
+    case _                   => false
+
+  override def hashCode(): Int = parts.hashCode
+
   override def toString: String =
     s"DriverSummary(${mode.render}, ${storyId.value}, sentences=$sentences, proposed=$proposed)"
 
@@ -215,6 +239,28 @@ final class ParseOutcome private (
     batch.inputs.zip(result.attempts).flatMap { (input, attempt) =>
       attempt.result.toOption.map(proposal => input.sentenceId -> proposal.evidence)
     }
+
+  private def parts = (
+    mode,
+    story,
+    atlas,
+    batch,
+    result,
+    services,
+    recordingKeys,
+    receipt,
+    parserStage,
+    summary,
+    recordings.dir,
+    runtime,
+    prompt
+  )
+
+  override def equals(other: Any): Boolean = other match
+    case that: ParseOutcome => parts == that.parts
+    case _                  => false
+
+  override def hashCode(): Int = parts.hashCode
 
   override def toString: String =
     s"ParseOutcome(${mode.render}, ${story.id.value}, covered=${result.covered}/${result.total})"

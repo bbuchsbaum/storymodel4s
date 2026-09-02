@@ -292,6 +292,13 @@ jvm_only_ids="$(
     | sed 's/[[:space:]\"]//g; /^$/d'
 )"
 
+# Same guard as module_dirs above: an empty extraction would silently append JVM to
+# every module and emit gate commands for projects that do not exist.
+if [ -z "$jvm_only_ids" ]; then
+  echo "could not derive jvmOnlyModules from $HEAD_REF:build.sbt" >&2
+  exit 3
+fi
+
 camel_id() {
   echo "$1" | awk -F- '{p=$1; for(i=2;i<=NF;i++) p=p toupper(substr($i,1,1)) substr($i,2); print p}'
 }

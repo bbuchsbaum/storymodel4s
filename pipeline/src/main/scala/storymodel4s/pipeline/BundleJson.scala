@@ -142,7 +142,11 @@ private[pipeline] object BundleJson:
       ),
       "model" -> Json.obj(
         "file" -> StoryPipeline.ModelFile.asJson,
-        "contentChecksum" -> summary.modelChecksum.hex.asJson,
+        "encodingDigest" -> Json.obj(
+          "checksum" -> summary.encodingDigest.hex.asJson,
+          "timestampBearing" -> true.asJson,
+          "bears" -> "receipt.createdAtEpochMillis".asJson
+        ),
         "schemaVersion" -> draft.schemaVersion.asJson,
         "entities" -> draft.graph.entities.size.asJson,
         "situations" -> draft.graph.situations.size.asJson,
