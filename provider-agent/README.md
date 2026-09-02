@@ -119,6 +119,14 @@ only when the base URL's host is `127.0.0.1`, `localhost`, or `::1`. A remote
 server reached with no key is a configuration error, not a free call, so it is
 refused before anything is read.
 
+The base URL must carry no `user:password@` userinfo. Put the key in
+`STORYMODEL4S_OPENAI_API_KEY`, which is the one place this module keeps it. A URL
+that names a credential is refused, and neither URL refusal repeats the value it
+rejected. The model id must also be at most 84 characters with no whitespace or
+control characters, because it becomes part of the runtime identity every receipt
+publishes; a name that could not survive that is refused here rather than
+throwing later.
+
 What is sent and what is read: one POST to `{base}/chat/completions` carrying
 `model`, `max_tokens`, and exactly two messages (`system` = the prompt package,
 `user` = the rendered sentence). No temperature, top_p, seed, or streaming flag.

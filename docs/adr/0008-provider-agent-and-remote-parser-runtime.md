@@ -185,12 +185,23 @@ stops the provider identity being a constant.
   change on the test side.
 - **A blank OpenAI key is admitted only for a loopback host** (`127.0.0.1`, `localhost`,
   `::1`). A remote server reached with no key is a configuration error, not a free call.
-- **The identity scalars must survive the identifier rules.** `AmrCandidates` builds a
-  `Fingerprint` from `provider:model:sdkVersion` with the unchecked constructor, so a
-  scalar carrying whitespace reaches a `throw` in the middle of a parse rather than a
-  typed refusal. Measured 2026-09-02: the first draft's `java.net.http jdk-25` did exactly
-  that. One predicate, `ModelBackend.identityScalarIsSafe`, is now asked at the environment
-  court and again at `runtimeFor`, so no path to a runtime identity skips it.
+- **The identity scalars must survive the identifier rules, and the rule lives in
+  `provider-parser`.** `AmrCandidates` builds a `Fingerprint` from `provider:model:version`
+  with the unchecked constructor, so a scalar carrying whitespace reaches a `throw` in the
+  middle of a parse rather than a typed refusal. Measured 2026-09-02: the first draft's
+  `java.net.http jdk-25` did exactly that. `RuntimeIdentityScalar` now owns the rule and
+  **both** `RemoteRuntime.from` and `PinnedRuntime.from` enforce it; the pinned admission had
+  the identical gap and feeds the same `providerCall` path, so fixing only the remote one
+  would have left the throw reachable and looked done. The cap is 84 characters because three
+  scalars plus two separators must fit the 256-character identifier limit. The prompt package
+  name and version keep the nonblank rule: they reach a `PromptTemplateVersion` through a
+  checked constructor that already refuses typed. `ModelBackend.identityScalarIsSafe`
+  delegates to the same object rather than restating it, so the environment court and the
+  runtime admission cannot drift apart.
+- **A base URL carrying `user:password@` userinfo is refused.** A credential in a URL reaches
+  a log or an error render eventually, the host is all the identity needs, and this module
+  already has one place for a key. Neither URL refusal echoes the rejected value, since what
+  makes such a URL unusable is exactly what must not be reproduced in a message.
 - **The prompt package is unchanged (v1).** Per-backend quality is a measured coverage
   number for a given corpus, never a claim; this amendment asserts nothing about how well
   any particular server parses the prompt package.
@@ -222,6 +233,13 @@ stops the provider identity being a constant.
   keeps one method and no function-typed parameters, which is what the sealing was for;
   `ModelBackend` and `LiveAuthorization` are sealed instead, and those are the types
   exhaustiveness actually protects.
+- **Refusing a URL-embedded credential rather than stripping it.** Stripping would silently
+  discard something the operator deliberately typed and leave them guessing why auth failed;
+  refusing says where the key belongs.
+- **Guarding only `RemoteRuntime.from`.** `PinnedRuntime.from` had the identical gap and
+  feeds the same `providerCall` path, so a one-sided fix would have left the throw reachable
+  through the pinned runtime while looking done. A mutation reverting only the pinned side
+  turns a named test red, which is the proof that the second half was load-bearing.
 - **Letting a caller name the backend positionally.** `ExchangeSource.Anthropic` is an
   expectation checked against the environment court, not a selection: a disagreement is
   `DriverError.BackendMismatch`. Coercing to either side would publish receipts naming a
@@ -233,6 +251,7 @@ stops the provider identity being a constant.
   LM Studio, and its receipts say which.
 - `v1` recordings do not replay under `v2`; there is no migration path and none is
   wanted, since the `v1` key could not distinguish two backends.
-- `RemoteRuntime.from` still admits any nonblank scalar, and the `Fingerprint` built
-  downstream from it can still throw for a scalar this module did not mint. That gap is
-  `provider-parser`'s and is left open here rather than widened into this slice.
+- `RemoteRuntime.from` and `PinnedRuntime.from` now refuse an identity scalar the downstream
+  `Fingerprint` could not represent, so the gap this amendment first left open is closed at
+  the admission rather than at one caller. Other unchecked `Fingerprint` constructions remain
+  in the repository; only the runtime-identity preimage is bound here.
