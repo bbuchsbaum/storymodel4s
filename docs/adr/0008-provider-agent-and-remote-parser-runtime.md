@@ -179,10 +179,19 @@ stops the provider identity being a constant.
   fields and a reply read from three; no SDK.
 - **The recording key takes the provider label and moves to `agent-recording/v2`.** Two
   backends serving the same model id must not share a recording. The domain version moved
-  with the added field, so the two framings cannot share a tag. This re-keyed the nine
+  with the added field, so the two framings cannot share a tag. This re-keyed fifty-nine
   committed recordings in `provider-agent` and `pipeline` test resources; the bodies are
-  unchanged and both suites read their keys from the driver, so the rename was the whole
+  unchanged and every suite reads its keys from the driver, so the rename was the whole
   change on the test side.
+
+  **Two War of the Ghosts texts exist in this repository and they are not the same string:**
+  the admitted text on disk (`docs/design/war-of-the-ghosts-boas1901.txt`, which carries a
+  provenance header and cuts into 58 sentences) and the fixture literal
+  (`WarOfTheGhostsText.text`, 50 sentences), which is the one every committed recording is
+  keyed against. Anything keyed by content must say which text it used, and must prove it
+  rather than assume it: deriving the old keys and comparing them against the file names
+  *before* renaming anything is what caught the wrong text here, and a rename done on the
+  wrong one would have produced fifty plausible file names that no test then read.
 - **A blank OpenAI key is admitted only for a loopback host** (`127.0.0.1`, `localhost`,
   `::1`). A remote server reached with no key is a configuration error, not a free call.
 - **The identity scalars must survive the identifier rules, and the rule lives in
