@@ -121,6 +121,13 @@ after.
 
 ## 6. Predeclaration, to be frozen before any arm is scored
 
+This section **refines an already-frozen question and does not replace it.** The captioning
+admission record §5 predeclared, before any Sherlock frame was shown: "does the visual-only arm
+change recall alignment on held-out recalls relative to transcript-only, measured by the existing
+HSMM courts; 'no' is an admissible answer", with recipes frozen before scoring and no model swapped
+mid-comparison. That question stands. What follows names the specific quantities "the existing HSMM
+courts" will be read through, and those names must themselves be frozen before scoring.
+
 Written into a content-addressed record and hashed before scoring, per the external-floor court's
 freeze rule.
 
@@ -145,10 +152,17 @@ must first be reconciled against `docs/data/sherlock/recall-lineage.json`, which
 sources while 33 local exports are present; the discrepancy is resolved and recorded before the split
 is drawn.
 
-**Decision rule.** For each primary outcome: the visual arm is said to differ from transcript-only
-when the paired per-participant difference on the untouched set excludes zero at the predeclared
-interval, and the direction is reported as found. Superiority is claimed only if it survives the
-length-matched and scrambled controls. **A null is a complete answer and will be published as one.**
+**Decision rule, with an explicit honest null.** For each primary outcome: the visual arm is said to
+differ from transcript-only when the paired per-participant difference on the untouched set excludes
+zero at the predeclared interval, and the direction is reported as found. Superiority is claimed only
+if it survives the length-matched and scrambled controls.
+
+Following the external-floor court's structure, the result is **unestablished** rather than null
+whenever any of these fails: both directions of the effect remain observable in the corpus; the
+difference survives every leave-one-participant-out refit; no identity, support, coverage or roster
+check failed; and the controls behaved as required. "Unestablished" and "no difference" are different
+findings and are reported as different findings. **A null is a complete answer and will be published
+as one.**
 
 **Stopping rule.** If Phase 1 fails its gate, the study stops there and the negative is recorded;
 Phases 2 and 3 are not attempted.
