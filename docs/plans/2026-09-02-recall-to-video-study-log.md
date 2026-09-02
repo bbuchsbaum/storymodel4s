@@ -8,14 +8,23 @@ the untouched six are unsealed once, at the end, and choose nothing.
 - Harness: `tools/recall-study/`. Outcomes are participant-macro means with a seeded percentile
   bootstrap over participants; a participant missing any required column is missing, not dropped.
 
-## Data integrity finding, before anything was run
+## Participant count: an error of mine that the repository had already prevented
 
-The local corpus has 33 recall exports but **17 distinct participants**. Every `sub-NN` file is a
-byte-identical recall to an `NN` file (16 exact matches on a 30-word fingerprint; NN05 has no `sub`
-counterpart), matching the 17 sources the lineage manifest enumerates. An earlier baseline computed
-over all 33 double-counted 16 people. Worse, splitting on 33 would have placed the same participant
-in both partitions, which the external-floor court forbids outright. Only the `NN` enumeration is
-used.
+The local corpus has 33 recall exports and **17 distinct participants**. My first baseline was
+computed over all 33 and double-counted 16 people; splitting on 33 would have placed the same
+participant in both partitions, which the external-floor court forbids outright. Only the `NN`
+enumeration is used.
+
+**This was not a discovery.** `docs/data/sherlock/alias-map.json` already records it precisely, and
+better than I did: 17 sources, 16 aliases, an identity rule requiring the complete file SHA-256 to
+match, the shift ("for aliases 05 through 16, source ordinal equals alias ordinal plus one"), the
+single omitted source (`recall-source-05`), and a validation block asserting that every alias's
+bytes equal its mapped source. My independent fingerprint matching reproduced that mapping exactly,
+including the off-by-one from the fifth alias onward.
+
+The lesson is procedural and mine: the corpus had a manifest describing its own identity structure,
+and I counted files instead of reading it. Every landed document states 17 correctly, so nothing
+shipped on the wrong number.
 
 ## Baseline (human coder descriptions, MiniLM channel, top-8 per level, lexical overlap off)
 
