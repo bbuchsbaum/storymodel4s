@@ -56,8 +56,7 @@ object LexicalBlend:
       }
       out.toVector
 
-  private def index(texts: Vector[String]): Bm25 =
-    val docs = texts.map(Lexical.stems)
+  private def index(docs: Vector[Vector[String]]): Bm25 =
     val termFreq = docs.map(_.groupBy(identity).view.mapValues(_.size).toMap)
     val lengths = docs.map(_.size.toDouble)
     val n = docs.size.toDouble
@@ -83,17 +82,47 @@ object LexicalBlend:
       val sd = math.sqrt(variance)
       if sd <= 1e-12 then xs.map(_ => 0.0) else xs.map(x => (x - mean) / sd)
 
+  /** What the lexical index reads, which is deliberately not what the encoder reads.
+    *
+    * Arm 1 of the study prefixed each segment's embedded text with its location and cast and was
+    * strictly worse on everything that moved: inside a mean-pooled embedding, vocabulary that
+    * recurs across the episode dilutes the one discriminative field. A BM25 index has the opposite
+    * response to the same input. It weights a term by rarity, so a name that appears in four
+    * segments counts heavily and one that appears in four hundred counts for almost nothing, and no
+    * term can crowd out another. `WithLemmas` therefore routes exactly the metadata that failed as
+    * embedded text to the only channel that can price it, and the encoder never sees it.
+    */
+  enum LexicalFields:
+    /** The node's embedded rendering alone. */
+    case TextOnly
+
+    /** That rendering, plus each of the node's content lemmas that it does not already contain.
+      * Added once each, so a name contributes its rarity rather than its repetition count.
+      */
+    case WithLemmas
+
+  object LexicalFields:
+    def parse(raw: Option[String]): LexicalFields = raw.map(_.trim.toLowerCase) match
+      case Some("lemmas") | Some("with-lemmas") => WithLemmas
+      case _                                    => TextOnly
+
   /** The blended channel. `alpha` is the weight on the semantic side, in `(0, 1]`. */
   def blended(
       base: SemanticDistance,
       units: Vector[RecallUnit],
       view: SourceView,
       nodeTexts: Vector[(SourceNodeRef, String)],
-      alpha: Double
+      alpha: Double,
+      fields: LexicalFields = LexicalFields.TextOnly
   ): SemanticDistance =
     val nodes: Vector[NodeSummary] = view.nodes
     val textByRef = nodeTexts.toMap
-    val bm25 = index(nodes.map(n => textByRef.getOrElse(n.ref, "")))
+    val bm25 = index(nodes.map { n =>
+      val stems = Lexical.stems(textByRef.getOrElse(n.ref, ""))
+      fields match
+        case LexicalFields.TextOnly   => stems
+        case LexicalFields.WithLemmas => stems ++ (n.lemmas -- stems.toSet).toVector.sorted
+    })
     val table = units.flatMap { unit =>
       val scored = nodes.zipWithIndex.flatMap { case (node, i) =>
         base(unit, node).toOption.map(d => (i, node.ref, d))

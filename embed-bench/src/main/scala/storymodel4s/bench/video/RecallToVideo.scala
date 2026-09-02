@@ -348,11 +348,19 @@ object RecallToVideo:
       .get("STORYMODEL4S_LEXICAL_BLEND")
       .flatMap(_.trim.toDoubleOption)
       .filter(a => a > 0.0 && a <= 1.0)
+    val lexicalFields = LexicalBlend.LexicalFields.parse(sys.env.get("STORYMODEL4S_LEXICAL_FIELDS"))
     val (semantic, channelLabel) = blendAlpha match
       case Some(alpha) =>
         (
-          LexicalBlend.blended(baseSemantic, recall.ordered, built.view, built.nodeTexts, alpha),
-          s"$baseChannelLabel + lexical-blend:bm25 alpha=$alpha"
+          LexicalBlend.blended(
+            baseSemantic,
+            recall.ordered,
+            built.view,
+            built.nodeTexts,
+            alpha,
+            lexicalFields
+          ),
+          s"$baseChannelLabel + lexical-blend:bm25 alpha=$alpha fields=$lexicalFields"
         )
       case None => (baseSemantic, baseChannelLabel)
 
