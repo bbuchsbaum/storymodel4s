@@ -217,6 +217,13 @@ enum DerivationGapReason:
   case MissingRawScore
   case MissingSpanEvidence
   case MissingUpstream(addresses: Vector[NarrativeCandidateAddress])
+
+  /** Two endpoints whose contexts are neither equal nor one within the other. No frame can hold
+    * the relation: scoping it at the narrated world would order reported content as world fact,
+    * and scoping it in either endpoint's context would claim a situation the other frame cannot
+    * see. The relation is recorded as missing rather than placed somewhere it does not belong.
+    */
+  case UnscopableRelation(from: ChartNodeRef, to: ChartNodeRef)
   case InvalidAccepted(error: DomainError)
 
   def render: String = this match
@@ -227,6 +234,7 @@ enum DerivationGapReason:
     case MissingSpanEvidence        => "missing-span-evidence"
     case MissingUpstream(addresses) =>
       s"missing-upstream:${addresses.map(_.render).sorted.mkString(",")}"
+    case UnscopableRelation(from, to) => s"unscopable-relation:${from.key}->${to.key}"
     case InvalidAccepted(error)             => s"invalid-accepted:${error.message}"
 
 /** One missing derivation, retained in the compiled artifact rather than replaced by a value. */
@@ -1740,14 +1748,31 @@ object NarrativeCompiler:
               case Left(reason) =>
                 gaps += gap(record.target, record.bundle, ClaimFamily.TemporalRelation, reason)
               case Right(material) =>
-                temporalEdges += TemporalEdge(
-                  emittedBySource(from).node.id,
-                  material.value,
-                  emittedBySource(to).node.id,
-                  rootContextId(input.source.id),
-                  material.meta
-                )
-                emittedByAddress.update(record.target, material.meta.id)
+                // The edge is scoped at the deeper of its endpoints' contexts, which is the only
+                // frame that can see both. Pinning every edge at the narrated world was how
+                // discourse adjacency between a narrated event and a quoted one became
+                // narrated-world chronology, and `temporal.context-scope` refuses it.
+                temporalScope(
+                  contexts,
+                  emittedBySource(from).node.context,
+                  emittedBySource(to).node.context
+                ) match
+                  case None =>
+                    gaps += gap(
+                      record.target,
+                      record.bundle,
+                      ClaimFamily.TemporalRelation,
+                      DerivationGapReason.UnscopableRelation(from, to)
+                    )
+                  case Some(scope) =>
+                    temporalEdges += TemporalEdge(
+                      emittedBySource(from).node.id,
+                      material.value,
+                      emittedBySource(to).node.id,
+                      scope,
+                      material.meta
+                    )
+                    emittedByAddress.update(record.target, material.meta.id)
         case state =>
           gaps += gap(record.target, record.bundle, ClaimFamily.TemporalRelation, gapReason(state))
     }
@@ -2610,6 +2635,27 @@ object NarrativeCompiler:
         support.refs.toVector.map(r => s"${r.span.start}:${r.span.endExclusive}").mkString(",")
       )
     )
+
+  /** The context that can hold a relation between two situations, or nothing.
+    *
+    * `temporal.context-scope` requires an edge's frame to be within both endpoints' frames. When
+    * one context is an ancestor of the other that is the deeper one; when neither contains the
+    * other — two different speeches, say — no frame satisfies both and the relation has no scope.
+    */
+  private def temporalScope(
+      frames: Map[ContextId, ContextFrame],
+      from: ContextId,
+      to: ContextId
+  ): Option[ContextId] =
+    @annotation.tailrec
+    def chain(id: ContextId, acc: Vector[ContextId]): Vector[ContextId] =
+      frames.get(id).flatMap(_.parent) match
+        case Some(parent) if !acc.contains(parent) => chain(parent, acc :+ parent)
+        case _                                     => acc
+    if from == to then Some(from)
+    else if chain(from, Vector(from)).contains(to) then Some(from)
+    else if chain(to, Vector(to)).contains(from) then Some(to)
+    else None
 
   private def rootContextId(story: StoryId): ContextId =
     ContextId.unsafe(ContentAddress.of("context-root", story.value))
