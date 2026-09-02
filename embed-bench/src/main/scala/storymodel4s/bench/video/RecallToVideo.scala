@@ -75,7 +75,10 @@ final case class TimedSegment(
 
 object TimedSegment:
   /** Coarse grouping of segments (a scene, a chapter). Ordinals are 1-based in video order. */
-  final case class Group(ordinal: Int, label: String)
+  /** Coarse grouping of segments. `embedText` is the rendering an embedding channel sees; a bare
+    * scene label carries almost no content, so an adapter that can say more about a scene should.
+    */
+  final case class Group(ordinal: Int, label: String, embedText: Option[String] = None)
 
 /** Builds the aligner's `SourceView` from timed segments: the general recipe extracted from the
   * Sherlock bridge. The view's text axis is a derived document (segment texts joined by newlines),
@@ -212,7 +215,7 @@ object TimedSourceView:
     // `text` still drives the document and the report, so the two never drift apart.
     val nodeTexts: Vector[(SourceNodeRef, String)] =
       segments.map(s => leafRef(s.ordinal) -> s.embedText.getOrElse(s.text)) ++
-        groupsInOrder.map(g => groupRef(g.ordinal) -> g.label)
+        groupsInOrder.map(g => groupRef(g.ordinal) -> g.embedText.getOrElse(g.label))
     Built(view, leafMedia ++ groupMedia, document, segmentByRef, groupByRef, nodeTexts)
 
 /** Word-column reader for timestamped recall transcripts (`Words` plus onset columns). */

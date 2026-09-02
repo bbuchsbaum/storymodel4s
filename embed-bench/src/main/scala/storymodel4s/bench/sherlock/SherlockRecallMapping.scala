@@ -58,6 +58,20 @@ object SherlockAnnotationView:
       (where.toVector ++ (if who.isEmpty then Vector.empty else Vector(who.mkString(", "))))
     if prefix.isEmpty then row.description else prefix.mkString(". ") + ". " + row.description
 
+  /** A scene's embedded rendering under the enriched policy: its label, then the places and cast
+    * that occur in it. The bare label ("2. War Scene") is nearly contentless, and three quarters of
+    * the distant confusions measured on development recalls cross a scene boundary, so the scene
+    * level is where discrimination is worth adding first.
+    */
+  private def enrichedGroup(atlas: Atlas, ordinal: Int, label: String): String =
+    val rows = atlas.rows.filter(r => atlas.sceneOf(r.row).exists(_.ordinal == ordinal))
+    val places = rows.flatMap(_.location).map(_.trim).filter(_.nonEmpty).distinct
+    val cast = rows.flatMap(_.namesAll).map(_.trim).filter(_.nonEmpty).distinct
+    val parts = Vector(label) ++
+      (if places.isEmpty then Vector.empty else Vector(places.mkString(", "))) ++
+      (if cast.isEmpty then Vector.empty else Vector(cast.mkString(", ")))
+    parts.mkString(". ")
+
   def segments(atlas: Atlas): Vector[TimedSegment] =
     val policy = sourceTextPolicy
     atlas.rows.map { row =>
@@ -65,7 +79,15 @@ object SherlockAnnotationView:
         ordinal = row.row,
         text = row.description,
         locus = atlas.mediaByRow.get(row.row).map(convert),
-        group = atlas.sceneOf(row.row).map(s => TimedSegment.Group(s.ordinal, s.label)),
+        group = atlas
+          .sceneOf(row.row)
+          .map(s =>
+            TimedSegment.Group(
+              s.ordinal,
+              s.label,
+              if policy == "enriched" then Some(enrichedGroup(atlas, s.ordinal, s.label)) else None
+            )
+          ),
         extraLemmas = stemsOf(row.namesAll) ++ stemsOf(row.namesSpeaking) ++
           row.location.map(Lexical.stems(_).toSet).getOrElse(Set.empty),
         locations = row.location.map(Lexical.words).getOrElse(Vector.empty),
