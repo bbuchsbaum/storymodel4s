@@ -201,10 +201,111 @@ sequentiality, so unlike the transition model this change cannot inflate the met
 And because the blend is applied as a permutation that preserves each unit's own multiset of
 distances, concentration is not mechanically inflated either. Both outcomes remain legitimate judges.
 
+## Arm 5: the lexical blend — the first change that improves the mapping
+
+BM25 over the same node texts, blended with the semantic channel and applied as a permutation: the
+blended ranking is mapped back onto each unit's own multiset of semantic distances, so every unit
+keeps the exact distance values it had and only their assignment to nodes changes. Nothing is
+rescaled, so no threshold shifts and the arm cannot win by inflating confidence.
+
+**The no-op is checked, not asserted.** At weight 1.0 the blend ranks by the semantic distance
+itself and the permutation is the identity, so it must reproduce the baseline report byte-for-byte.
+It does, before and after a later refactor. That one check exercises table construction, abstention
+handling and the remapping against a known answer.
+
+Weight on the semantic side, against baseline, full development set and then the granularity check:
+
+| Weight | Ordering, full set | Ordering, leaf-anchored in both | Concentration | Scene anchors |
+|---|---|---|---|---|
+| 0.70 | +0.0334, includes zero | +0.0440, includes zero | −0.0026 | 212 → 246 |
+| **0.80** | **+0.0433, excludes zero** | **+0.0601, excludes zero**, 8 of 11 | −0.0016, includes zero | 212 → 242 |
+| 0.90 | +0.0256, includes zero | +0.0307, excludes zero | −0.0007, includes zero | 212 → 224 |
+
+The in-pipeline peak at 0.80 matches the probe's plateau, which is mild evidence that the probe
+measures the same thing the harness does.
+
+Unlike the caption arm, this one **grows** under the granularity check rather than dissolving:
++0.0433 becomes +0.0601 when restricted to units anchored at the leaf level in both arms. The gain is
+re-ranking, not coarser anchors. Concentration is untouched at every weight, which is what the
+permutation design predicts and is the reason both outcomes remain legitimate judges here.
+
+## Arm 6: the same metadata that failed in arm 1, given to the lexical index instead
+
+`LexicalFields.WithLemmas` adds each of a node's content lemmas that its text does not already
+contain — the locations and cast of arm 1 — to the BM25 index only. The encoder never sees them.
+
+| Outcome | Full set | Leaf-anchored in both | Improved |
+|---|---|---|---|
+| Sequential coherence | **+0.0723, CI [+0.0305, +0.1204], excludes zero** | **+0.0709, excludes zero** | 9 of 11 |
+| Concentration | +0.0000, includes zero | +0.0002, includes zero | 4 of 11 |
+| Source mass | +0.0033, includes zero | — | 8 of 11 |
+| Localizability | −0.0032, excludes zero | −0.0030, excludes zero | 0 of 11 |
+
+Scene anchors barely move, 212 to 216, the smallest shift of any arm, so almost none of this is
+granularity. It is the largest ordering gain in the study, 1.7 times the text-only blend and about
+ten times the scene-caption arm's honest effect.
+
+**This is the arm 1 mechanism confirmed by reversal, which is stronger evidence than the original
+failure.** The identical annotation columns that made every outcome worse when prefixed to embedded
+text — concentration −0.030, source mass −0.102, no participant improving on three of four measures —
+produce the study's best result when routed to a lexical index. Nothing about the information
+changed; only how it is priced. A mean-pooled embedding spends a fixed budget across a sentence, so
+adding recurring boilerplate to a thousand distinctive descriptions dilutes them. BM25 weights a term
+by rarity, so a name in four segments counts heavily, a name in four hundred counts for almost
+nothing, and no term crowds out another.
+
+**The general lesson, revised.** The earlier statement — more distinctive text, not more text — was
+right but incomplete. The full statement is that a signal must be routed to a channel that can price
+it. Low-cardinality metadata is not useless; it was in the wrong channel.
+
+Sweeping the weight with the lexical side carrying more content leaves the peak where it was:
+
+| Weight | Ordering, full set | Ordering, leaf-anchored | Localizability | Scene anchors |
+|---|---|---|---|---|
+| 0.70 | +0.0678, excludes zero | +0.0633, excludes zero | −0.0050 | 212 → 226 |
+| **0.80** | **+0.0723, excludes zero** | **+0.0709, excludes zero** | −0.0032 | 212 → 216 |
+| 0.90 | +0.0506, excludes zero | +0.0497, excludes zero | −0.0011 | 212 → 209 |
+
+Weight 0.90 is worth noting for a different reason than its ordering: it does the least damage to
+localizability and moves the anchor mix not at all. If localizability is later promoted over
+ordering, that is the configuration to revisit.
+
+## Diagnosis 3: the encoder is not the largest lever, which was the standing assumption
+
+This log recorded that a stronger sentence embedder was "likely the largest single lever" and needed
+an ADR 0001 admission record before it could be tried. That was a guess, and it is now measured. The
+same sequential-model-free probe, over three stronger open encoders against the pinned MiniLM-L6-v2,
+with each model's own pooling and retrieval prefix. Nothing was admitted, pinned, or wired in;
+measuring an encoder is not adopting it.
+
+| Encoder | Alone | Against MiniLM alone | Blended with BM25 at 0.80 |
+|---|---|---|---|
+| MiniLM-L6-v2 (pinned) | +0.3530 | reference | **+0.4202** |
+| bge-base-en-v1.5 | +0.3963 | +0.0434, excludes zero, 10 of 11 | +0.4331 |
+| gte-base | +0.3809 | +0.0280, includes zero | +0.4078 |
+| all-mpnet-base-v2 | +0.3668 | +0.0138, includes zero | +0.4166 |
+
+**The blend is worth more than a four-times-larger encoder, and most of the encoder's advantage is
+redundant with it.** Upgrading to the best alternative buys +0.043 alone; blending BM25 into the
+encoder already pinned buys +0.067. Doing both buys +0.080, so the second move adds only about
++0.013 once the first is in place. The two are substitutes, not complements, which makes sense: a
+better encoder and a rarity-weighted lexical score are both ways of not losing the distinctive words.
+
+**Consequence for the plan.** Writing an ADR 0001 admission record, realizing weights and pinning a
+new encoder is a substantial court, and it is now costed at roughly a fifth of what the already-landed
+change delivers. It should not be the next thing done. The standing claim that it was the largest
+lever is withdrawn.
+
+## The standing cost, stated plainly
+
+Every arm in the study, including the two that work, loses a little localizability: −0.0032 for the
+best one, 0 of 11 participants improving. That is a consistent, small, real cost paid for a larger
+ordering gain, and it should not be rounded to zero when this is written up. No arm so far has
+improved localizability against baseline at all.
+
 ## Arms in flight
 
-- `blend080`: the lexical re-ranking at weight 0.80 on the semantic side, measured by the real
-  harness rather than the probe.
+None. The two levers under test both returned, and the results are above.
 
 ## Not yet attempted, with the reason
 
@@ -216,6 +317,6 @@ distances, concentration is not mechanically inflated either. Both outcomes rema
 - **Transition model**: deliberately not tuned. The HSMM already carries a sequential prior, and
   tuning a sequential prior to maximise a sequentiality metric measures nothing. It waits for
   adjudicated gold.
-- **A stronger sentence embedder**: MiniLM-L6-v2 is the retrieval engine and is weak by current
-  standards. This is likely the largest single lever, and it needs an admission record under
-  ADR 0001 before it can be run.
+- **A stronger sentence embedder**: measured and demoted, see diagnosis 3. It is a real but small
+  effect once the lexical blend is in place, and the admission court it would need is not justified
+  by +0.013.

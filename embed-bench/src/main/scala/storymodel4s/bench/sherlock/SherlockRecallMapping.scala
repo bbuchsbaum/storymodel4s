@@ -70,7 +70,7 @@ object SherlockAnnotationView:
     */
   lazy val sceneCaptions: Map[Int, String] =
     sys.env.get("STORYMODEL4S_SCENE_CAPTIONS").map(_.trim).filter(_.nonEmpty) match
-      case None => Map.empty
+      case None       => Map.empty
       case Some(path) =>
         val text = new String(Files.readAllBytes(Paths.get(path)), StandardCharsets.UTF_8)
         parseJson(text).toOption
@@ -82,6 +82,7 @@ object SherlockAnnotationView:
 
   private def enrichLeaves: Boolean =
     sourceTextPolicy == "enriched" || sourceTextPolicy == "enriched-leaf"
+
   /** Samples per scene and word budget for the digest control, chosen to match what the captioner
     * saw and produced: eight evenly spaced frames, and a median caption of 85 words.
     */
