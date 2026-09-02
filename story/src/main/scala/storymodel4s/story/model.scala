@@ -141,7 +141,14 @@ final class StoryModel[S <: ModelStatus] private[story] (
     s"StoryModel(schemaVersion=$schemaVersion, situations=${graph.situations.size})"
 
 object StoryModel:
-  val SchemaVersion: String = "0.1.0"
+  /** Moved 0.1.0 -> 0.2.0 when `RelationLayers.circumstances` became a required encoded field. A
+    * version that stayed put would have let two incompatible shapes share one tag, and worse: a
+    * 0.1.0 model has no circumstance layer because the rule that fills it did not exist, so reading
+    * one as "circumstances: []" would publish "evaluated and found none" for a model that never
+    * evaluated. There is no migration step for that reason; a 0.1.0 artifact is refused and
+    * rebuilt.
+    */
+  val SchemaVersion: String = "0.2.0"
 
   def draft(
       source: StorySource,

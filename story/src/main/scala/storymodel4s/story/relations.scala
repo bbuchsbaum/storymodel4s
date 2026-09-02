@@ -12,6 +12,39 @@ final case class ParticipantEdge(
     meta: ClaimMeta
 )
 
+/** What a circumstance says about the situation it is attached to.
+  *
+  * Closed and small on purpose: these are the role families this project's role vocabulary marks as
+  * circumstantial rather than referential. A `Time` says when the situation held, a `Manner` how it
+  * was done; neither names anything that participates in it.
+  */
+enum CircumstanceKind:
+  case Time, Manner
+
+  def render: String = this match
+    case Time   => "time"
+    case Manner => "manner"
+
+/** A time or manner the source attached to a situation, with the words that state it.
+  *
+  * Why this exists rather than a participant edge: a time is not a referent. Admitting `midnight`
+  * or `then` as an entity made the model publish cast members it never observed, and every
+  * measurement over the entity layer — turnover above all — counted them. Why it exists rather than
+  * nothing: the words are evidence the source really carries, and dropping them would trade one
+  * falsehood for a silence.
+  *
+  * `label` is the source's own word for the circumstance and is never normalized to a date, a
+  * duration, or an interval. Placing this on a timeline is a separate claim with a separate
+  * licence; this edge asserts only that the situation's own words said this much.
+  */
+final case class CircumstanceEdge(
+    situation: SituationId,
+    kind: CircumstanceKind,
+    label: String,
+    support: SpanSet,
+    meta: ClaimMeta
+)
+
 /** Allen-style interval relations.
   *
   * Only the canonical forms (`Before`, `Meets`, `Overlaps`, `During`, `Contains`, `Starts`,
@@ -172,15 +205,18 @@ final case class RelationLayers(
     goals: Vector[GoalEdge],
     stateChanges: Vector[StateChangeEdge],
     references: Vector[ReferenceEdge],
-    entityRelations: Vector[EntityEdge] = Vector.empty
+    entityRelations: Vector[EntityEdge] = Vector.empty,
+    circumstances: Vector[CircumstanceEdge] = Vector.empty
 ):
   def allMeta: Vector[ClaimMeta] =
     participants.map(_.meta) ++ temporal.map(_.meta) ++ causal.map(_.meta) ++ goals.map(_.meta) ++
-      stateChanges.map(_.meta) ++ references.map(_.meta) ++ entityRelations.map(_.meta)
+      stateChanges.map(_.meta) ++ references.map(_.meta) ++ entityRelations.map(_.meta) ++
+      circumstances.map(_.meta)
 
 object RelationLayers:
   val empty: RelationLayers =
     RelationLayers(
+      Vector.empty,
       Vector.empty,
       Vector.empty,
       Vector.empty,

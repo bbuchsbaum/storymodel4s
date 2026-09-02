@@ -10,6 +10,7 @@ import storymodel4s.document.{
   CoordinatedBranch,
   CoverageCounts,
   DerivationGap,
+  FillerCounts,
   NarrativeCompilation,
   SentenceCoverage,
   SummaryCoverage
@@ -38,17 +39,29 @@ private[pipeline] object BundleJson:
     "sentences" -> c.sentences.asJson
   )
 
+  /** Where a root's entity-kind fillers went. `fillers` keeps its old name and meaning — the
+    * fillers that became participants — and the three new counters say where the rest went, so the
+    * four sum to every filler the provider saw.
+    */
+  private def fillerFields(counts: FillerCounts): Vector[(String, Json)] = Vector(
+    "fillers" -> counts.referents.asJson,
+    "circumstances" -> counts.circumstances.asJson,
+    "nonReferential" -> counts.nonReferential.asJson,
+    "unlicensed" -> counts.unlicensed.asJson,
+    "seen" -> counts.seen.asJson
+  )
+
   /** One branch of a coordinated row. Every branch appears, admitted or not, so a reader can see
     * how much of a coordinating sentence became situations and why the rest did not.
     */
   private def branchRow(branch: CoordinatedBranch): Json = branch match
-    case CoordinatedBranch.Admitted(root, role, fillers, unlicensed) =>
+    case CoordinatedBranch.Admitted(root, role, counts) =>
       Json.obj(
-        "kind" -> "admitted".asJson,
-        "root" -> root.key.asJson,
-        "role" -> role.render.asJson,
-        "fillers" -> fillers.asJson,
-        "unlicensed" -> unlicensed.asJson
+        Vector(
+          "kind" -> "admitted".asJson,
+          "root" -> root.key.asJson,
+          "role" -> role.render.asJson
+        ) ++ fillerFields(counts)*
       )
     case CoordinatedBranch.Abstained(root, role, reason) =>
       Json.obj(
@@ -64,13 +77,8 @@ private[pipeline] object BundleJson:
       "ordinal" -> ordinals.get(row.sentence).asJson
     )
     val rest = row match
-      case SentenceCoverage.Proposed(root, fillers, unlicensed) =>
-        Vector(
-          "kind" -> "proposed".asJson,
-          "root" -> root.key.asJson,
-          "fillers" -> fillers.asJson,
-          "unlicensed" -> unlicensed.asJson
-        )
+      case SentenceCoverage.Proposed(root, counts) =>
+        Vector("kind" -> "proposed".asJson, "root" -> root.key.asJson) ++ fillerFields(counts)
       case SentenceCoverage.Coordinated(coordinator, branches) =>
         Vector(
           "kind" -> "coordinated".asJson,

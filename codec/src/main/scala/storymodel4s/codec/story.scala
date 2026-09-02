@@ -472,6 +472,32 @@ object StoryCodecs:
     yield EntityEdge(a, r, b, m)
   }
 
+  given Encoder[CircumstanceKind] = Encoder.instance(_.toString.asJson)
+  given Decoder[CircumstanceKind] = Decoder.decodeString.emap(raw =>
+    Vector(CircumstanceKind.Time, CircumstanceKind.Manner)
+      .find(_.toString == raw)
+      .toRight(s"unknown CircumstanceKind $raw")
+  )
+
+  given Encoder[CircumstanceEdge] = Encoder.instance { e =>
+    Json.obj(
+      "situation" -> e.situation.asJson,
+      "kind" -> e.kind.asJson,
+      "label" -> e.label.asJson,
+      "support" -> e.support.asJson,
+      "meta" -> e.meta.asJson
+    )
+  }
+  given Decoder[CircumstanceEdge] = Decoder.instance { c =>
+    for
+      s <- field[SituationId](c, "situation")
+      k <- field[CircumstanceKind](c, "kind")
+      l <- field[String](c, "label")
+      sp <- field[SpanSet](c, "support")
+      m <- field[ClaimMeta](c, "meta")
+    yield CircumstanceEdge(s, k, l, sp, m)
+  }
+
   given Encoder[RelationLayers] = Encoder.instance { r =>
     Json.obj(
       "participants" -> r.participants.asJson,
@@ -480,7 +506,8 @@ object StoryCodecs:
       "goals" -> r.goals.asJson,
       "stateChanges" -> r.stateChanges.asJson,
       "references" -> r.references.asJson,
-      "entityRelations" -> r.entityRelations.asJson
+      "entityRelations" -> r.entityRelations.asJson,
+      "circumstances" -> r.circumstances.asJson
     )
   }
   given Decoder[RelationLayers] = Decoder.instance { c =>
@@ -492,7 +519,8 @@ object StoryCodecs:
       s <- field[Vector[StateChangeEdge]](c, "stateChanges")
       r <- field[Vector[ReferenceEdge]](c, "references")
       e <- field[Vector[EntityEdge]](c, "entityRelations")
-    yield RelationLayers(p, t, ca, g, s, r, e)
+      ci <- field[Vector[CircumstanceEdge]](c, "circumstances")
+    yield RelationLayers(p, t, ca, g, s, r, e, ci)
   }
 
   given Encoder[NarrativeGraph] = Encoder.instance { g =>

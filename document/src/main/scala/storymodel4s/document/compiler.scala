@@ -135,6 +135,25 @@ final case class ParticipantCoverageAttempt(
     bundle: EvidenceBundle[ParticipantCoverage]
 )
 
+/** A time or manner a chart attached to a situation, as the source's own word for it.
+  *
+  * Why a label and not a normalized time: `midnight`, `then` and `now` are what the source says,
+  * and turning them into an instant or an interval is a claim about the story world that this
+  * layer's evidence — a role and an alignment span — does not license. The claim here is only that
+  * the situation's own words said this much about when or how.
+  */
+final case class CircumstanceProposal(kind: CircumstanceKind, label: String)
+
+/** Sparse circumstance candidate: the `filler` states a time or manner of `situation`. Pairs absent
+  * from the input were not evaluated. Unlike a participant, the filler mints no entity: that is the
+  * whole point of the family.
+  */
+final case class SituationCircumstanceAttempt(
+    situation: ChartNodeRef,
+    filler: ChartNodeRef,
+    bundle: EvidenceBundle[CircumstanceProposal]
+)
+
 /** Sparse story-world temporal candidate between two situation sources, scoped to the narrated
   * world. Only canonical relations are admissible; a converse form is refused at the input.
   */
@@ -155,6 +174,7 @@ enum NarrativeCandidateAddress:
   case EntityMention(mention: ChartNodeRef)
   case Participant(situation: ChartNodeRef, filler: ChartNodeRef)
   case ParticipantCoverage(situation: ChartNodeRef)
+  case Circumstance(situation: ChartNodeRef, filler: ChartNodeRef)
   case Temporal(from: ChartNodeRef, to: ChartNodeRef)
 
   def render: String = this match
@@ -168,7 +188,8 @@ enum NarrativeCandidateAddress:
     case Participant(situation, f)     => s"participant:${situation.key}->${f.key}"
     case NarrativeCandidateAddress.ParticipantCoverage(source) =>
       s"participant-coverage:${source.key}"
-    case Temporal(from, to) => s"temporal:${from.key}->${to.key}"
+    case Circumstance(situation, filler) => s"circumstance:${situation.key}~${filler.key}"
+    case Temporal(from, to)              => s"temporal:${from.key}->${to.key}"
 
 object NarrativeCandidateAddress:
   given Ordering[NarrativeCandidateAddress] = Ordering.by(_.render)
@@ -344,6 +365,16 @@ final case class ParticipantCoverageResolution(
   def target: NarrativeCandidateAddress =
     NarrativeCandidateAddress.ParticipantCoverage(situation)
 
+/** Resolver state for one sparse circumstance candidate. */
+final case class SituationCircumstanceResolution(
+    situation: ChartNodeRef,
+    filler: ChartNodeRef,
+    bundle: EvidenceBundle[CircumstanceProposal],
+    state: ResolutionState[CircumstanceProposal]
+):
+  def target: NarrativeCandidateAddress =
+    NarrativeCandidateAddress.Circumstance(situation, filler)
+
 /** Resolver state for one sparse temporal candidate. */
 final case class TemporalResolution(
     from: ChartNodeRef,
@@ -363,6 +394,7 @@ final case class NarrativeResolutions(
     entityMentions: Vector[EntityMentionResolution],
     participants: Vector[ParticipantResolution],
     participantCoverage: Vector[ParticipantCoverageResolution],
+    circumstances: Vector[SituationCircumstanceResolution],
     temporal: Vector[TemporalResolution]
 )
 
@@ -407,6 +439,7 @@ final class NarrativeCompilerInput private (
     val entityMentions: Vector[EntityMentionAttempt],
     val participants: Vector[ParticipantAttempt],
     val participantCoverage: Vector[ParticipantCoverageAttempt],
+    val circumstances: Vector[SituationCircumstanceAttempt],
     val temporal: Vector[TemporalAttempt],
     val policy: AcceptancePolicy,
     val receipt: BuildReceipt,
@@ -428,6 +461,7 @@ object NarrativeCompilerInput:
       entityMentions: Iterable[EntityMentionAttempt],
       participants: Iterable[ParticipantAttempt],
       participantCoverage: Iterable[ParticipantCoverageAttempt],
+      circumstances: Iterable[SituationCircumstanceAttempt],
       temporal: Iterable[TemporalAttempt],
       policy: AcceptancePolicy,
       receipt: BuildReceipt,
@@ -442,6 +476,7 @@ object NarrativeCompilerInput:
     val mentionVec = entityMentions.toVector.sortBy(_.mention.key)
     val participantVec = participants.toVector.sortBy(a => (a.situation.key, a.filler.key))
     val coverageVec = participantCoverage.toVector.sortBy(_.situation.key)
+    val circumstanceVec = circumstances.toVector.sortBy(a => (a.situation.key, a.filler.key))
     val temporalVec = temporal.toVector.sortBy(a => (a.from.key, a.to.key))
     val errors = Vector.newBuilder[DomainError]
     def invalid(path: String, reason: String): Unit =
@@ -708,6 +743,46 @@ object NarrativeCompilerInput:
         )
     }
 
+    val duplicateCircumstance = circumstanceVec
+      .groupBy(a => (a.situation, a.filler))
+      .toVector
+      .sortBy((pair, _) => (pair._1.key, pair._2.key))
+      .collectFirst { case ((situation, filler), xs) if xs.size > 1 => (situation, filler) }
+    duplicateCircumstance.foreach((situation, filler) =>
+      invalid("compiler/circumstances", s"duplicate ${situation.key}~${filler.key}")
+    )
+    circumstanceVec.foreach { attempt =>
+      if !situationSources(attempt.situation) then
+        invalid("compiler/circumstances", s"unknown situation endpoint ${attempt.situation.key}")
+      if !known(attempt.filler) then
+        invalid("compiler/circumstances", s"unknown chart node ${attempt.filler.key}")
+      if attempt.filler.sentence != attempt.situation.sentence then
+        invalid(
+          "compiler/circumstances",
+          s"filler ${attempt.filler.key} is not in the situation's sentence " +
+            attempt.situation.sentence.value
+        )
+      if participantPairs((attempt.situation, attempt.filler)) then
+        invalid(
+          "compiler/circumstances",
+          s"${attempt.filler.key} is both a participant and a circumstance of " +
+            attempt.situation.key
+        )
+      validateBundle(
+        attempt.bundle,
+        evidenceMap,
+        source,
+        atlas,
+        "compiler/circumstances",
+        invalid,
+        within(attempt.situation)
+      )
+      candidateValues(attempt.bundle).foreach { value =>
+        if value.label.trim.isEmpty then
+          invalid("compiler/circumstances", "circumstance label must be nonblank")
+      }
+    }
+
     val duplicateTemporal = temporalVec
       .groupBy(a => (a.from, a.to))
       .toVector
@@ -743,7 +818,8 @@ object NarrativeCompilerInput:
     val allBundles: Vector[EvidenceBundle[?]] =
       situationVec.map(_.bundle) ++ contextVec.map(_.bundle) ++ Vector(summary.bundle) ++
         membershipVec.map(_.bundle) ++ causalVec.map(_.bundle) ++ mentionVec.map(_.bundle) ++
-        participantVec.map(_.bundle) ++ coverageVec.map(_.bundle) ++ temporalVec.map(_.bundle)
+        participantVec.map(_.bundle) ++ coverageVec.map(_.bundle) ++
+        circumstanceVec.map(_.bundle) ++ temporalVec.map(_.bundle)
     val declaredTasks = allBundles.flatMap(_.proposals.map(_.taskId)).toSet
     val chartNodes = charts.flatMap { (sentence, chart) =>
       chart.chart.concepts.keys.map(concept => ChartNodeRef(sentence, concept).key)
@@ -805,6 +881,7 @@ object NarrativeCompilerInput:
                 mentionVec,
                 participantVec,
                 coverageVec,
+                circumstanceVec,
                 temporalVec,
                 policy,
                 receipt,
@@ -1009,6 +1086,7 @@ object NarrativeCompilation:
         resolutions.entityMentions.map(_.target) ++
         resolutions.participants.map(_.target) ++
         resolutions.participantCoverage.map(_.target) ++
+        resolutions.circumstances.map(_.target) ++
         resolutions.temporal.map(_.target)
     val attemptedTargets = derivation.attempts.map(_.target).toSet
     val draftClaims = draft.claims.map(meta => meta.id -> meta).toMap
@@ -1161,6 +1239,15 @@ object NarrativeCompiler:
         Resolver.resolve(ClaimFamily.ParticipantCoverage, bundle, input.policy)
       )
     }
+    val circumstanceRecords = input.circumstances.map { attempt =>
+      val bundle = canonicalBundle(attempt.bundle, renderCircumstance)
+      SituationCircumstanceResolution(
+        attempt.situation,
+        attempt.filler,
+        bundle,
+        Resolver.resolve(ClaimFamily.SituationCircumstance, bundle, input.policy)
+      )
+    }
     val temporalRecords = input.temporal.map { attempt =>
       val bundle = canonicalBundle(attempt.bundle, renderTemporalRelation)
       TemporalResolution(
@@ -1179,6 +1266,7 @@ object NarrativeCompiler:
       mentionRecords,
       participantRecords,
       coverageRecords,
+      circumstanceRecords,
       temporalRecords
     )
 
@@ -1505,6 +1593,53 @@ object NarrativeCompiler:
           )
     }
 
+    // A circumstance depends only on its situation: it mints no entity, which is the point of the
+    // family. `Hypothesized` and not `SurfaceExplicit`, on the same ground as a participant edge —
+    // the chart's role assignment is a provider's reading of the sentence, and nothing here
+    // establishes that the surface entails it.
+    val circumstanceEdges = Vector.newBuilder[CircumstanceEdge]
+    circumstanceRecords.foreach { record =>
+      val situationAddress = NarrativeCandidateAddress.Situation(record.situation)
+      record.state match
+        case accepted @ ResolutionState.Accepted(_, _, _) =>
+          if !emittedBySource.contains(record.situation) then
+            gaps += gap(
+              record.target,
+              record.bundle,
+              ClaimFamily.SituationCircumstance,
+              DerivationGapReason.MissingUpstream(Vector(situationAddress)),
+              Vector(situationAddress).flatMap(emittedByAddress.get).toSet
+            )
+          else
+            materialize(
+              input,
+              ClaimFamily.SituationCircumstance,
+              record.target,
+              record.bundle,
+              accepted,
+              renderCircumstance,
+              _ => EpistemicStatus.Hypothesized
+            ) match
+              case Left(reason) =>
+                gaps += gap(record.target, record.bundle, ClaimFamily.SituationCircumstance, reason)
+              case Right(material) =>
+                circumstanceEdges += CircumstanceEdge(
+                  emittedBySource(record.situation).node.id,
+                  material.value.kind,
+                  material.value.label,
+                  material.support,
+                  material.meta
+                )
+                emittedByAddress.update(record.target, material.meta.id)
+        case state =>
+          gaps += gap(
+            record.target,
+            record.bundle,
+            ClaimFamily.SituationCircumstance,
+            gapReason(state)
+          )
+    }
+
     val temporalEdges = Vector.newBuilder[TemporalEdge]
     temporalRecords.foreach { record =>
       val (from, to) = (record.from, record.to)
@@ -1698,7 +1833,8 @@ object NarrativeCompiler:
       RelationLayers.empty.copy(
         participants = participantEdges.result(),
         temporal = temporalEdges.result(),
-        causal = causalEdges.result()
+        causal = causalEdges.result(),
+        circumstances = circumstanceEdges.result()
       )
     )
     val projectionResult = emitted.foldLeft[
@@ -2456,6 +2592,9 @@ object NarrativeCompiler:
 
   private def renderParticipantCoverage(value: ParticipantCoverage): String =
     renderFields("participant-coverage/v1", value.fillers.map(_.key))
+
+  private def renderCircumstance(value: CircumstanceProposal): String =
+    renderFields("situation-circumstance/v1", Vector(value.kind.render, value.label))
 
   private def renderTemporalRelation(value: TemporalRelation): String =
     renderFields("temporal-relation/v1", Vector(value.toString))

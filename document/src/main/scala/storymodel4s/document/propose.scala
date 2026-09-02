@@ -22,6 +22,7 @@ import storymodel4s.proposition.{
   SourceRole
 }
 import storymodel4s.story.{
+  CircumstanceKind,
   EntityType,
   Modality,
   ParticipantRole,
@@ -72,19 +73,45 @@ enum AbstentionReason:
   * admitted roots would read as complete coverage of the sentence.
   */
 enum CoordinatedBranch:
-  /** `fillers` and `unlicensed` count exactly as they do on [[SentenceCoverage.Proposed]]. */
-  case Admitted(root: ChartNodeRef, role: SourceRole, fillers: Int, unlicensed: Int)
+  /** `counts` divides the branch's fillers exactly as it does on [[SentenceCoverage.Proposed]]. */
+  case Admitted(root: ChartNodeRef, role: SourceRole, counts: FillerCounts)
   case Abstained(root: ChartNodeRef, role: SourceRole, reason: AbstentionReason)
 
   /** The branch root, whichever way the branch went. */
   def branchRoot: ChartNodeRef = this match
-    case Admitted(root, _, _, _) => root
-    case Abstained(root, _, _)   => root
+    case Admitted(root, _, _)  => root
+    case Abstained(root, _, _) => root
 
   /** The role that attached the branch to its coordinator. */
   def branchRole: SourceRole = this match
-    case Admitted(_, role, _, _) => role
-    case Abstained(_, role, _)   => role
+    case Admitted(_, role, _)  => role
+    case Abstained(_, role, _) => role
+
+/** How the entity-kind fillers the chart reaches from one root divided under the referentiality
+  * rule. Honest product data: every combination of counts is a lawful state of some chart.
+  *
+  * Why four counters and not one: "the chart reached no participant here" is a different fact from
+  * "it reached a time", from "it reached a role nothing licenses as referential", and from "no
+  * single normalized role reached the filler at all". A ledger that summed them would let the
+  * entity layer shrink with nothing saying where the fillers went, which is the shape of every
+  * silent-drop defect this project has had.
+  *
+  *   - `referents` became participant edges and entity mentions;
+  *   - `circumstances` became time or manner values on the situation;
+  *   - `nonReferential` were refused by role or by concept kind, each with a receipt naming which;
+  *   - `unlicensed` were reached by no single normalized role, and were never evaluated further.
+  */
+final case class FillerCounts(
+    referents: Int,
+    circumstances: Int,
+    nonReferential: Int,
+    unlicensed: Int
+):
+  /** Every filler the scan saw. Equal to the size of the scanned population, by construction. */
+  def seen: Int = referents + circumstances + nonReferential + unlicensed
+
+object FillerCounts:
+  val empty: FillerCounts = FillerCounts(0, 0, 0, 0)
 
 /** One ledger row per atlas sentence: what the provider did with it.
   *
@@ -93,12 +120,10 @@ enum CoordinatedBranch:
   * partial run read as a complete one.
   */
 enum SentenceCoverage:
-  /** `fillers` counts the entity-kind fillers proposed as participants of the root; `unlicensed`
-    * counts the entity-kind fillers the chart reaches from the root by no single normalized
-    * participant role, which are never proposed. Together they say how much of the root's argument
-    * structure the participant layer carries. The sentence is the root's own.
+  /** `counts` divides every entity-kind filler the chart reaches from the root; the sentence is the
+    * root's own.
     */
-  case Proposed(root: ChartNodeRef, fillers: Int, unlicensed: Int)
+  case Proposed(root: ChartNodeRef, counts: FillerCounts)
 
   /** A sentence whose focus coordinates several roots, with one entry per branch in discourse
     * order. Why one row and not several `Proposed` rows: the branches are siblings inside one
@@ -113,7 +138,7 @@ enum SentenceCoverage:
 
   /** The sentence the row is about: derived from the chart node for rows that carry one. */
   def sentence: SurfaceUnitId = this match
-    case Proposed(root, _, _)   => root.sentence
+    case Proposed(root, _)      => root.sentence
     case Coordinated(anchor, _) => anchor.sentence
     case Abstained(anchor, _)   => anchor.sentence
     case EmptyChart(unit)       => unit
@@ -121,9 +146,9 @@ enum SentenceCoverage:
 
   /** The roots this sentence actually produced, in discourse order; empty when it produced none. */
   def admittedRoots: Vector[ChartNodeRef] = this match
-    case Proposed(root, _, _) => Vector(root)
-    case Coordinated(_, bs)   =>
-      bs.collect { case CoordinatedBranch.Admitted(root, _, _, _) =>
+    case Proposed(root, _)  => Vector(root)
+    case Coordinated(_, bs) =>
+      bs.collect { case CoordinatedBranch.Admitted(root, _, _) =>
         root
       }
     case Abstained(_, _) => Vector.empty
@@ -179,6 +204,7 @@ final class ChartProposals private (
     val entityMentions: Vector[EntityMentionAttempt],
     val participants: Vector[ParticipantAttempt],
     val participantCoverage: Vector[ParticipantCoverageAttempt],
+    val circumstances: Vector[SituationCircumstanceAttempt],
     val temporal: Vector[TemporalAttempt],
     val calls: Vector[ProviderCall],
     val coverage: Vector[SentenceCoverage],
@@ -187,7 +213,7 @@ final class ChartProposals private (
   def counts: CoverageCounts =
     coverage.foldLeft(CoverageCounts(0, 0, 0, 0, 0)) { (acc, row) =>
       row match
-        case SentenceCoverage.Proposed(_, _, _) => acc.copy(proposed = acc.proposed + 1)
+        case SentenceCoverage.Proposed(_, _)    => acc.copy(proposed = acc.proposed + 1)
         case SentenceCoverage.Coordinated(_, _) => acc.copy(coordinated = acc.coordinated + 1)
         case SentenceCoverage.Abstained(_, _)   => acc.copy(abstained = acc.abstained + 1)
         case SentenceCoverage.EmptyChart(_)     => acc.copy(emptyCharts = acc.emptyCharts + 1)
@@ -205,6 +231,7 @@ final class ChartProposals private (
       entityMentions == that.entityMentions &&
       participants == that.participants &&
       participantCoverage == that.participantCoverage &&
+      circumstances == that.circumstances &&
       temporal == that.temporal &&
       calls == that.calls &&
       coverage == that.coverage &&
@@ -222,6 +249,7 @@ final class ChartProposals private (
       entityMentions,
       participants,
       participantCoverage,
+      circumstances,
       temporal,
       calls,
       coverage,
@@ -232,7 +260,8 @@ final class ChartProposals private (
     val c = counts
     s"ChartProposals(proposed=${c.proposed}, coordinated=${c.coordinated}, " +
       s"abstained=${c.abstained}, empty=${c.emptyCharts}, noChart=${c.noCharts}, " +
-      s"participants=${participants.size}, temporal=${temporal.size}, calls=${calls.size})"
+      s"participants=${participants.size}, circumstances=${circumstances.size}, " +
+      s"temporal=${temporal.size}, calls=${calls.size})"
 
 object ChartProposals:
   private[document] def derived(
@@ -244,6 +273,7 @@ object ChartProposals:
       entityMentions: Vector[EntityMentionAttempt],
       participants: Vector[ParticipantAttempt],
       participantCoverage: Vector[ParticipantCoverageAttempt],
+      circumstances: Vector[SituationCircumstanceAttempt],
       temporal: Vector[TemporalAttempt],
       calls: Vector[ProviderCall],
       coverage: Vector[SentenceCoverage],
@@ -259,6 +289,7 @@ object ChartProposals:
       entityMentions,
       participants,
       participantCoverage,
+      circumstances,
       temporal,
       calls,
       coverage,
@@ -364,6 +395,7 @@ object ChartProposalProvider:
   val ParticipantRule: String = "licensed-role-participant-rule"
   val MentionRule: String = "entity-filler-mention-rule"
   val CoverageRule: String = "participant-coverage-rule"
+  val CircumstanceRule: String = "situation-circumstance-rule"
   val TemporalRule: String = "adjacent-root-unclear-rule"
   val SummaryRule: String = "title-summary-rule"
   val AbstainSituationRule: String = "abstain-situation-rule"
@@ -470,10 +502,35 @@ object ChartProposalProvider:
        |  $UnestablishedTitleReason. Nothing derives a title from anything that is not the work: a
        |  path, a filename, or a request identifier is not a title, and a model built from a bare
        |  text file carries a summary gap instead, which is true.
+       |referentiality: reaching exactly one normalized role does not make a filler a participant.
+       |  A filler is a referent of the root only when the ROLE takes a referent and the CONCEPT
+       |  can denote one, decided by ${Referentiality.RuleName}. The roles that take a referent are
+       |  the closed set {${referentialRolesText}}; Location is among them because a place is a
+       |  referent and no chart signal separates "a place" from "an entity standing in for one",
+       |  and asserting that separation from a word list would be world knowledge this layer does
+       |  not have. Time and Manner name circumstances (below). Cause and Result relate
+       |  eventualities. Every Custom role is refused, this provider's own amr:domain included,
+       |  because :domain says which concept a property is predicated of and therefore describes
+       |  rather than participates, and because an extension role's referentiality is not something
+       |  anyone established. The concept kinds that denote a referent are Entity and Name; a
+       |  Quantity measures a referent without being one, and Property, Predicate, Special and
+       |  Unknown are not referents either. A filler the rule turns away is counted nonReferential
+       |  on the coverage row and carries a receipt naming whether the role or the concept kind
+       |  refused it. It never becomes an entity: a time or a property admitted as an entity is a
+       |  cast member the model never observed, and every measurement over the entity layer counts
+       |  it.
+       |circumstances: a filler under Time or Manner yields one circumstance attempt (situation =
+       |  root, filler = the concept) valued at that kind and the concept lemma, with evidence the
+       |  filler's own alignment spans (span-source=filler-alignments), else the root support
+       |  (span-source=root-support). The lemma is the source's own word and is never normalized to
+       |  a date, a duration, or an interval: placing a circumstance on a timeline is a different
+       |  claim under a different licence. Circumstances are counted on the coverage row and are
+       |  never participants and never entities.
        |participants: for each admissible root, every relation from the root whose filler is a
-       |  chart concept of kind Entity, Name, or Quantity and whose role carries exactly one
-       |  normalized participant role yields one participant attempt (situation = root, filler =
-       |  the concept) valued at that role. A numbered argument carries a normalized role only when
+       |  chart concept of kind Entity, Name, or Quantity, whose role carries exactly one
+       |  normalized participant role, and which the referentiality rule admits as a referent
+       |  yields one participant attempt (situation = root, filler = the concept) valued at that
+       |  role. A numbered argument carries a normalized role only when
        |  the chart's frame lexicon licensed one; a named role carries the chart's own normalized
        |  role, else the standard table {$namedRolesText}. A filler reached by no licensed role, or
        |  by two different licensed roles, is counted unlicensed on the coverage row and never
@@ -489,7 +546,9 @@ object ChartProposalProvider:
        |coverage: one participant-coverage attempt per admissible root listing exactly the
        |  proposed fillers, possibly none, with the root's evidence. An empty coverage is a value:
        |  it says the chart reaches no licensed participant from the root, never that participants
-       |  were not evaluated.
+       |  were not evaluated. The ledger row divides every entity-kind filler the scan saw into
+       |  referents, circumstances, nonReferential, and unlicensed, and those four sum to the
+       |  fillers seen, so no filler leaves the provider unaccounted for.
        |temporal: one attempt per consecutive pair of admissible roots in sentence order and, within
        |  a sentence, in branch order, valued Unclear, with evidence spanning both roots' support.
        |  Never Before or Meets: a time filler in a sentence chart is a concept of that chart, not a
@@ -509,8 +568,16 @@ object ChartProposalProvider:
        |  no calibration.
        |policy: AcceptancePolicy.Conservative, except ContextAssignment and SegmentMembership at
        |  requireAgreement = 1, because one deterministic program is one provider; EntityMention,
-       |  ParticipantRole, ParticipantCoverage, and TemporalRelation are FamilyPolicy.Ordinary.
+       |  ParticipantRole, ParticipantCoverage, SituationCircumstance, and TemporalRelation are
+       |  FamilyPolicy.Ordinary.
        |""".stripMargin
+
+  /** The closed referential-role set as printed into [[RulesText]], derived from
+    * [[Referentiality.licence]] over every non-`Custom` case of `ParticipantRole` rather than typed
+    * out beside it: a list a reader could disagree with the code about is not a rule.
+    */
+  private def referentialRolesText: String =
+    Referentiality.referentialRoles.map(_.toString).sorted.mkString(", ")
 
   /** The named-role table as printed into [[RulesText]]. */
   private def namedRolesText: String =
@@ -541,6 +608,7 @@ object ChartProposalProvider:
         ClaimFamily.EntityMention -> FamilyPolicy.Ordinary,
         ClaimFamily.ParticipantRole -> FamilyPolicy.Ordinary,
         ClaimFamily.ParticipantCoverage -> FamilyPolicy.Ordinary,
+        ClaimFamily.SituationCircumstance -> FamilyPolicy.Ordinary,
         ClaimFamily.TemporalRelation -> FamilyPolicy.Ordinary
       )
     )
@@ -560,12 +628,33 @@ object ChartProposalProvider:
   /** Support spans, where they came from, and the minimum alignment credence behind them. */
   private final case class Support(spans: SpanSet, source: String, raw: Double)
 
-  /** An entity-kind filler of the root reached by exactly one licensed participant role. */
+  /** An entity-kind filler of the root reached by exactly one licensed participant role, whose role
+    * takes a referent and whose concept can denote one.
+    */
   private final case class LicensedFiller(
       concept: ConceptId,
       kind: ConceptKind,
       lemma: String,
       role: ParticipantRole
+  )
+
+  /** A filler whose role names a circumstance of the situation rather than a participant in it. */
+  private final case class CircumstanceFiller(
+      concept: ConceptId,
+      kind: CircumstanceKind,
+      lemma: String,
+      role: ParticipantRole
+  )
+
+  /** A filler the referentiality rule turned away, with the reason it goes on the receipt. Kept
+    * rather than counted anonymously: `then` refused for its role and `5` refused for its concept
+    * kind are different findings, and a bare count cannot tell a reader which happened.
+    */
+  private final case class RefusedFiller(
+      concept: ConceptId,
+      lemma: String,
+      role: ParticipantRole,
+      reason: String
   )
 
   /** Which closed admissibility shape admitted a root, and what kind of situation it makes.
@@ -583,8 +672,7 @@ object ChartProposalProvider:
   /** Everything one admitted root contributed. */
   private final case class RootOutcome(
       proposedRoot: ProposedRoot,
-      fillers: Int,
-      unlicensed: Int,
+      counts: FillerCounts,
       evidence: Vector[Evidence],
       situation: SituationAttempt,
       context: ContextAssignmentAttempt,
@@ -592,8 +680,52 @@ object ChartProposalProvider:
       participantCoverage: ParticipantCoverageAttempt,
       entityMentions: Vector[EntityMentionAttempt],
       participants: Vector[ParticipantAttempt],
+      circumstances: Vector[SituationCircumstanceAttempt],
       calls: Vector[ProviderCall]
   )
+
+  /** What one circumstance filler contributed: its span evidence, its attempt, and its receipt. */
+  private final case class CircumstanceOutcome(
+      evidence: Evidence,
+      attempt: SituationCircumstanceAttempt,
+      call: ProviderCall
+  )
+
+  /** A circumstance attempt carrying the filler's own alignment spans, so the words that state the
+    * time or the manner stay attached to the claim rather than to the situation as a whole.
+    */
+  private def circumstanceOutcome(
+      source: StorySource,
+      unit: SurfaceUnit,
+      chart: PropositionChart[Checked],
+      checksum: Checksum,
+      root: ChartNodeRef,
+      rootSupport: Support,
+      filler: CircumstanceFiller,
+      params: Map[String, String]
+  ): CircumstanceOutcome =
+    val fillerRef = ChartNodeRef(unit.id, filler.concept)
+    val fillerAlignments = chart.alignments.filter(_.target.conceptIds.contains(filler.concept))
+    val fillerSpans = SpanSet.of(fillerAlignments.flatMap(_.spans.refs.toVector))
+    val (spans, spanSource, raw) = fillerSpans match
+      case Some(own) => (own, "filler-alignments", minCredence(fillerAlignments))
+      case None      => (rootSupport.spans, "root-support", rootSupport.raw)
+    val evidence = evidenceRecord(s"${root.key}~${fillerRef.key}", checksum, spans)
+    val value = CircumstanceProposal(filler.kind, filler.lemma)
+    val (bundle, call) = proposed(
+      source,
+      CircumstanceRule,
+      s"${root.key}~${fillerRef.key}",
+      checksum,
+      value,
+      evidence,
+      math.min(raw, rootSupport.raw),
+      CalibrationModel,
+      Vector("circumstance", root.key, fillerRef.key, filler.kind.render, filler.lemma),
+      params + ("filler" -> filler.concept.value) + ("role" -> renderRole(filler.role)) +
+        ("circumstance" -> filler.kind.render) + ("span-source" -> spanSource)
+    )
+    CircumstanceOutcome(evidence, SituationCircumstanceAttempt(root, fillerRef, bundle), call)
 
   /** The four families every root — admitted or not — is accounted for in. */
   private final case class RootAttempts(
@@ -614,6 +746,7 @@ object ChartProposalProvider:
       participantCoverage: Vector[ParticipantCoverageAttempt],
       entityMentions: Vector[EntityMentionAttempt],
       participants: Vector[ParticipantAttempt],
+      circumstances: Vector[SituationCircumstanceAttempt],
       calls: Vector[ProviderCall]
   )
 
@@ -624,6 +757,7 @@ object ChartProposalProvider:
     def bare(coverage: SentenceCoverage): SentenceOutcome =
       SentenceOutcome(
         coverage,
+        Vector.empty,
         Vector.empty,
         Vector.empty,
         Vector.empty,
@@ -676,6 +810,7 @@ object ChartProposalProvider:
         outcomes.flatMap(_.entityMentions).sortBy(_.mention.key),
         outcomes.flatMap(_.participants).sortBy(a => (a.situation.key, a.filler.key)),
         outcomes.flatMap(_.participantCoverage).sortBy(_.situation.key),
+        outcomes.flatMap(_.circumstances).sortBy(a => (a.situation.key, a.filler.key)),
         temporal.map(_._1).sortBy(a => (a.from.key, a.to.key)),
         (outcomes.flatMap(_.calls) ++ temporal.map(_._3) :+ summary.call).sortBy(renderCall),
         coverage,
@@ -724,6 +859,7 @@ object ChartProposalProvider:
           proposals.entityMentions,
           proposals.participants,
           proposals.participantCoverage,
+          proposals.circumstances,
           proposals.temporal,
           Policy,
           receipt,
@@ -948,8 +1084,7 @@ object ChartProposalProvider:
                       unit.id.value
                     ).map(outcome =>
                       SentenceOutcome(
-                        SentenceCoverage
-                          .Proposed(root, outcome.fillers, outcome.unlicensed),
+                        SentenceCoverage.Proposed(root, outcome.counts),
                         Vector(outcome.proposedRoot),
                         outcome.evidence,
                         Vector(outcome.situation),
@@ -958,6 +1093,7 @@ object ChartProposalProvider:
                         Vector(outcome.participantCoverage),
                         outcome.entityMentions,
                         outcome.participants,
+                        outcome.circumstances,
                         outcome.calls
                       )
                     )
@@ -1007,7 +1143,7 @@ object ChartProposalProvider:
           .map(_ => branch.concept)
       )
       val mentionOwner: Map[ConceptId, ConceptId] = admitted
-        .flatMap(root => scanFillers(chart, root)._1.map(filler => filler.concept -> root))
+        .flatMap(root => scanFillers(chart, root).referents.map(filler => filler.concept -> root))
         .foldLeft(Map.empty[ConceptId, ConceptId]) { (owners, entry) =>
           if owners.contains(entry._1) then owners else owners + entry
         }
@@ -1026,6 +1162,7 @@ object ChartProposalProvider:
             outcomes.map(_._3.participantCoverage),
             outcomes.flatMap(_._2.toVector.flatMap(_.entityMentions)),
             outcomes.flatMap(_._2.toVector.flatMap(_.participants)),
+            outcomes.flatMap(_._2.toVector.flatMap(_.circumstances)),
             outcomes.flatMap(_._3.calls)
           )
         )
@@ -1081,7 +1218,7 @@ object ChartProposalProvider:
               filler => mentionOwner.get(filler).contains(branch.concept)
             ).map(outcome =>
               (
-                CoordinatedBranch.Admitted(root, branch.role, outcome.fillers, outcome.unlicensed),
+                CoordinatedBranch.Admitted(root, branch.role, outcome.counts),
                 Some(outcome),
                 RootAttempts(
                   outcome.situation,
@@ -1184,8 +1321,8 @@ object ChartProposalProvider:
           Vector("primary-story-member", root.key),
           params
         )
-        val (licensed, unlicensed) = scanFillers(chart, root.concept)
-        val fillerOutcomes = licensed.map(filler =>
+        val scanned = scanFillers(chart, root.concept)
+        val fillerOutcomes = scanned.referents.map(filler =>
           fillerOutcome(
             source,
             unit,
@@ -1198,8 +1335,20 @@ object ChartProposalProvider:
             mentions(filler.concept)
           )
         )
+        val circumstanceOutcomes = scanned.circumstances.map(filler =>
+          circumstanceOutcome(source, unit, chart, checksum, root, support, filler, params)
+        )
+        val refusalCalls = scanned.nonReferential.map(filler =>
+          providerCall(
+            source,
+            Referentiality.RuleName,
+            Vector("non-referential", root.key, filler.concept.value, filler.reason),
+            params + ("filler" -> filler.concept.value) + ("lemma" -> filler.lemma) +
+              ("role" -> renderRole(filler.role)) + ("reason" -> filler.reason)
+          )
+        )
         val coverageValue =
-          ParticipantCoverage.of(licensed.map(f => ChartNodeRef(unit.id, f.concept)))
+          ParticipantCoverage.of(scanned.referents.map(f => ChartNodeRef(unit.id, f.concept)))
         val (coverage, coverageCall) = proposed(
           source,
           CoverageRule,
@@ -1210,22 +1359,26 @@ object ChartProposalProvider:
           support.raw,
           CalibrationModel,
           "participant-coverage" +: root.key +: coverageValue.fillers.map(_.key),
-          params + ("fillers" -> licensed.size.toString) + ("unlicensed" -> unlicensed.toString)
+          params + ("fillers" -> scanned.referents.size.toString) +
+            ("circumstances" -> scanned.circumstances.size.toString) +
+            ("nonReferential" -> scanned.nonReferential.size.toString) +
+            ("unlicensed" -> scanned.unlicensed.toString)
         )
         Right(
           RootOutcome(
             ProposedRoot(unit, root, checksum, spans, support.raw),
-            licensed.size,
-            unlicensed,
-            evidence +: fillerOutcomes.flatMap(_.evidence),
+            scanned.counts,
+            evidence +: (fillerOutcomes.flatMap(_.evidence) ++
+              circumstanceOutcomes.map(_.evidence)),
             SituationAttempt(root, situation),
             ContextAssignmentAttempt(root, context),
             SegmentMembershipAttempt(root, membership),
             ParticipantCoverageAttempt(root, coverage),
             fillerOutcomes.flatMap(_.mention),
             fillerOutcomes.map(_.participant),
+            circumstanceOutcomes.map(_.attempt),
             Vector(situationCall, contextCall, membershipCall, coverageCall) ++
-              fillerOutcomes.flatMap(_.calls)
+              fillerOutcomes.flatMap(_.calls) ++ circumstanceOutcomes.map(_.call) ++ refusalCalls
           )
         )
 
@@ -1239,13 +1392,33 @@ object ChartProposalProvider:
       calls: Vector[ProviderCall]
   )
 
-  /** Entity-kind fillers of `root` with exactly one licensed role, in concept order, and the count
-    * of entity-kind fillers reached by none or by several.
+  /** How `root`'s entity-kind fillers divide under the referentiality rule, in concept order.
+    *
+    * Every filler the scan saw lands in exactly one of the four: a referent, a circumstance, a
+    * non-referent that named its reason, or one no single role reached. The counts are what the
+    * coverage row publishes, so a filler cannot leave the provider unaccounted for.
+    */
+  private final case class ScannedFillers(
+      referents: Vector[LicensedFiller],
+      circumstances: Vector[CircumstanceFiller],
+      nonReferential: Vector[RefusedFiller],
+      unlicensed: Int
+  ):
+    def counts: FillerCounts =
+      FillerCounts(referents.size, circumstances.size, nonReferential.size, unlicensed)
+
+  /** Entity-kind fillers of `root` sorted by the referentiality rule.
+    *
+    * `unlicensed` counts, as before, the fillers no single normalized role reached. What changed is
+    * that reaching a role is no longer enough: the role must take a referent and the concept must
+    * be able to denote one. A `:time` or `:manner` filler becomes a circumstance instead of a
+    * participant, and everything else the rule turns away is carried with its reason rather than
+    * dropped.
     */
   private def scanFillers(
       chart: PropositionChart[Checked],
       root: ConceptId
-  ): (Vector[LicensedFiller], Int) =
+  ): ScannedFillers =
     val byFiller = chart
       .relationsFrom(root)
       .flatMap(r => r.to.nodeId.map(id => id -> r.role))
@@ -1258,13 +1431,30 @@ object ChartProposalProvider:
       .groupBy(_._1)
       .toVector
       .sortBy(_._1)
-    byFiller.foldLeft((Vector.empty[LicensedFiller], 0)) {
-      case ((licensed, unlicensed), (id, rows)) =>
+    byFiller.foldLeft(ScannedFillers(Vector.empty, Vector.empty, Vector.empty, 0)) {
+      case (acc, (id, rows)) =>
         val concept = rows.head._2
+        val lemma = concept.lemma.value
         rows.map(_._3).flatMap(licensedRole).distinct match
           case Vector(role) =>
-            (licensed :+ LicensedFiller(id, concept.kind, concept.lemma.value, role), unlicensed)
-          case _ => (licensed, unlicensed + 1)
+            Referentiality.licence(role) match
+              case RoleLicence.Referent if Referentiality.denotesReferent(concept.kind) =>
+                acc.copy(referents = acc.referents :+ LicensedFiller(id, concept.kind, lemma, role))
+              case RoleLicence.Referent =>
+                acc.copy(nonReferential =
+                  acc.nonReferential :+
+                    RefusedFiller(id, lemma, role, Referentiality.kindReason(concept.kind))
+                )
+              case RoleLicence.Circumstance(kind) =>
+                acc.copy(circumstances =
+                  acc.circumstances :+ CircumstanceFiller(id, kind, lemma, role)
+                )
+              case refused =>
+                acc.copy(nonReferential =
+                  acc.nonReferential :+
+                    RefusedFiller(id, lemma, role, s"role-not-referential:${refused.render}")
+                )
+          case _ => acc.copy(unlicensed = acc.unlicensed + 1)
     }
 
   /** The chart's own normalized role when present; a standard named role otherwise; nothing for a
@@ -1435,6 +1625,7 @@ object ChartProposalProvider:
       Vector(attempts.context),
       Vector(attempts.membership),
       Vector(attempts.participantCoverage),
+      Vector.empty,
       Vector.empty,
       Vector.empty,
       attempts.calls
