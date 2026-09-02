@@ -62,8 +62,8 @@ object ChartRoots:
     * A branch is a relation from the coordinator under `:opN` (`and`, `or`) or `:sntN`
     * (`multi-sentence`) whose target is a concept of this chart. Order is operands before
     * sentences, then by index, then by concept id, so the order is total whatever a chart mixes;
-    * within one coordinator only one family occurs in practice. A concept attached twice is
-    * listed once, under its first role, because it is one branch however many ways it is named.
+    * within one coordinator only one family occurs in practice. A concept attached twice is listed
+    * once, under its first role, because it is one branch however many ways it is named.
     */
   def branches[C <: CheckState](
       chart: PropositionChart[C],

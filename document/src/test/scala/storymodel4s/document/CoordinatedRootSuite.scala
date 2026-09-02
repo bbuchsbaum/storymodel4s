@@ -93,7 +93,11 @@ class CoordinatedRootSuite extends FunSuite:
       polarity.map((name, value) => id(name) -> value),
       embedded,
       alignments,
-      ChartProvenance(ChartOrigin.Parser(parser), Vector(chartCall(s"${unit.id.value}$salt")), Vector.empty),
+      ChartProvenance(
+        ChartOrigin.Parser(parser),
+        Vector(chartCall(s"${unit.id.value}$salt")),
+        Vector.empty
+      ),
       Some(unit.id)
     )
     PropositionEvidence.of(ChartValidator.check(unchecked).fold(v => fail(v.toString), identity))
@@ -116,7 +120,9 @@ class CoordinatedRootSuite extends FunSuite:
 
   private def compile(charts: Vector[(SurfaceUnitId, PropositionEvidence)]): NarrativeCompilation =
     val input =
-      ChartProposalProvider.input(source, atlas, charts, None, 0L).fold(e => fail(e.message), identity)
+      ChartProposalProvider
+        .input(source, atlas, charts, None, 0L)
+        .fold(e => fail(e.message), identity)
     NarrativeCompiler.compile(input).fold(e => fail(e.message), identity)
 
   private def value[A](bundle: EvidenceBundle[A]): A =
@@ -252,7 +258,10 @@ class CoordinatedRootSuite extends FunSuite:
 
     val compiled = compile(Vector(s0.id -> landedAndWent))
     val model = compiled.validated.getOrElse(fail(compiled.validation.report.render))
-    assertEquals(model.graph.entities.values.map(_.label.value).toVector.sorted, Vector("home", "they"))
+    assertEquals(
+      model.graph.entities.values.map(_.label.value).toVector.sorted,
+      Vector("home", "they")
+    )
     assertEquals(model.graph.relations.participants.size, 3)
   }
 
@@ -306,7 +315,12 @@ class CoordinatedRootSuite extends FunSuite:
         "g" -> Concept.predicate("go", frame("go-02")),
         "r" -> Concept.predicate("rest", frame("rest-01"))
       ),
-      Vector(rel("a", op(1), "l"), rel("a", op(2), "b"), rel("b", op(1), "g"), rel("b", op(2), "r")),
+      Vector(
+        rel("a", op(1), "l"),
+        rel("a", op(2), "b"),
+        rel("b", op(1), "g"),
+        rel("b", op(2), "r")
+      ),
       polarity = Map(
         "l" -> ChartPolarity.Positive,
         "g" -> ChartPolarity.Positive,
@@ -585,7 +599,10 @@ class CoordinatedRootSuite extends FunSuite:
 
     assertEquals(
       propose(Vector(s0.id -> chart)).coverage.head,
-      SentenceCoverage.Abstained(ref(s0, "a"), AbstentionReason.FocusNotPredicate(ConceptKind.Entity))
+      SentenceCoverage.Abstained(
+        ref(s0, "a"),
+        AbstentionReason.FocusNotPredicate(ConceptKind.Entity)
+      )
     )
     assertEquals(ChartRoots.CoordinationLemmas, Set("and", "or", "multi-sentence"))
   }

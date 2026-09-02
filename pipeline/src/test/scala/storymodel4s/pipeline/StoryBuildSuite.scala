@@ -50,9 +50,15 @@ class StoryBuildSuite extends FunSuite:
 
   /** `Checksum.ofText(ChartProposalProvider.RulesText)`; a rules change must move this literal. */
   private val RulesChecksum =
-    "05cdb836a9768d9891368abb41cff1b7ec92ab3b042d3a8cf23bfc05de822d1b"
+    "70333fc4c70a3631edbffcb825990174046c09b4ae02489d8015c7b0827b8142"
 
   private val wogRecordings: Path = Paths.get(getClass.getResource("/recordings/wog").toURI)
+
+  /** The fifty captured replies for the full fixture text: one per sentence, `origin: captured`.
+    * Replaying them is the only court that measures what the provider does with a whole real story.
+    */
+  private val capturedRecordings: Path =
+    Paths.get(getClass.getResource("/recordings/wog-captured").toURI)
   private val threeRecordings: Path = Paths.get(getClass.getResource("/recordings/three").toURI)
 
   private val threeText: String =
@@ -157,6 +163,52 @@ class StoryBuildSuite extends FunSuite:
     }
   }
 
+  test("the captured WOG court: 43 charts, 28 focus roots, 14 coordinated sentences") {
+    val dir = work("wog-captured")
+    val outDir = dir.resolve("out")
+    val summary = build(wogText(dir), capturedRecordings, outDir)
+
+    assertEquals(summary.storyId.value, WogStory)
+    assertEquals(summary.sentences, 50)
+    assertEquals(summary.parser.replayedCaptured, 50)
+    assertEquals(summary.liveCalls, 0)
+    // Seven sentences yield no chart: their replies put an alignment marker on a role, a
+    // reentrancy, or a constant (`:quant many~e.2`, `:poss h~e.4`), which the transport refuses.
+    // That is class A of the slice-1.5 plan and is not addressed here; both of the story's
+    // existential roots ("There were people at Egulac", "There were five men in the canoe") are
+    // among the seven, which is why admitting existential roots moves no number in this court.
+    assertEquals(summary.charts, 43)
+    assertEquals(summary.coverage, CoverageCounts(28, 14, 1, 0, 7))
+    assertEquals(summary.coverage.sentences, 50)
+
+    val report = json(StoryPipeline.files(outDir).report)
+    val ledger = coverageRows(report)
+    assertEquals(ledger.size, 50)
+    val coordinated = ledger.filter(row => kindOf(row) == "coordinated")
+    assertEquals(coordinated.size, 14)
+    // Every coordinating focus in this story is a two-branch one, and every branch is a predicate.
+    val admitted = coordinated.map(row =>
+      row.hcursor.downField("admitted").as[Int].fold(e => fail(e.message), identity)
+    )
+    assertEquals(admitted, Vector.fill(14)(2))
+    val branchKinds = coordinated.flatMap(row => rows(row, "branches")).map(kindOf)
+    assertEquals(branchKinds.size, 28)
+    assertEquals(branchKinds.toSet, Set("admitted"))
+    // One sentence still abstains, and it names a class we chose not to admit rather than one we
+    // failed to notice: "It was nearly daylight when he became quiet" focuses `daylight`, an
+    // entity with a `:degree` and a `:time` and no place, so no existential reading is licensed.
+    val abstained = ledger.filter(row => kindOf(row) == "abstained")
+    assertEquals(abstained.map(row => field(row, "reason")), Vector("focus-not-predicate:Entity"))
+    assertEquals(summary.gaps, 4)
+    assertEquals(summary.errors, 3)
+    assertEquals(summary.warnings, 0)
+    assertEquals(summary.validated, false)
+    // Complete, not Incomplete: the exit status reports whether every sentence reached the court,
+    // and every one of the fifty did. That the draft does not validate is what `validated` and the
+    // three required-derivation errors say.
+    assertEquals(ExitStatus.of(Right(summary)), ExitStatus.Complete)
+  }
+
   test("the WOG replay court: 50 sentences, three charts, two situations, a partial draft") {
     val dir = work("wog")
     val outDir = dir.resolve("out")
@@ -185,7 +237,7 @@ class StoryBuildSuite extends FunSuite:
     // its StateFrames set names that frame (the 1.3 court's hand chart gave it Predicate kind and
     // never met the adapter's classification). The other 47 sentences have no chart. The 1.3
     // court's 4/2/1/43 came from seven hand charts and does not transfer.
-    assertEquals(summary.coverage, CoverageCounts(3, 0, 0, 47))
+    assertEquals(summary.coverage, CoverageCounts(3, 0, 0, 0, 47))
     // Gaps: three NoProposal gaps at the abstained anchor (situation, context, membership) and one
     // trajectory step between the two emitted situations that lacks participant and temporal
     // inputs until phase 1.4 lands.
@@ -377,7 +429,7 @@ class StoryBuildSuite extends FunSuite:
     Files.delete(store.path(riverKey))
 
     val mutated = build(textPath, copy, dir.resolve("mutated"))
-    assertEquals(mutated.coverage, CoverageCounts(2, 0, 0, 48))
+    assertEquals(mutated.coverage, CoverageCounts(2, 0, 0, 0, 48))
     assertEquals(mutated.charts, 2)
     assertEquals(mutated.parser.replayedAuthored, 2)
     assertEquals(mutated.parser.unrecorded, 48)
@@ -601,12 +653,12 @@ class StoryBuildSuite extends FunSuite:
     assertEquals(summary.charts, 3)
     assertEquals(summary.parser.transportFailures, 0)
     assertEquals(summary.parser.replayedAuthored, 3)
-    assertEquals(summary.coverage, CoverageCounts(3, 0, 0, 0))
+    assertEquals(summary.coverage, CoverageCounts(3, 0, 0, 0, 0))
     assertEquals(summary.gaps, 0)
     assertEquals(summary.validated, true)
     assertEquals(ExitStatus.of(Right(summary)), ExitStatus.Complete)
     val line = StoryPipeline.render(summary, outDir)
-    assert(line.contains("sentences=3 charts=3 proposed=3 abstained=0"), line)
+    assert(line.contains("sentences=3 charts=3 proposed=3 coordinated=0 abstained=0"), line)
     assert(line.contains("transportFailures=0"), line)
     assert(line.contains("liveCalls=0"), line)
     assert(line.contains("encodingDigest(timestamp-bearing)="), line)

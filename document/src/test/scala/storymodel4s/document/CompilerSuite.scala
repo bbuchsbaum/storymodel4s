@@ -911,11 +911,19 @@ class CompilerSuite extends FunSuite:
         filler -> Concept.predicate("rest")
       ),
       Vector(
-        PropositionRelation(and, RoleAssignment(SourceRole.Operand(1), None), ConceptTarget.Node(branch)),
+        PropositionRelation(
+          and,
+          RoleAssignment(SourceRole.Operand(1), None),
+          ConceptTarget.Node(branch)
+        ),
         PropositionRelation(and, RoleAssignment.named("time"), ConceptTarget.Node(filler))
       ),
       polarity = Map(branch -> Polarity.Positive, filler -> Polarity.Positive),
-      provenance = ChartProvenance(ChartOrigin.Agent(extractor), Vector(call("chart-agent", "coord")), Vector.empty),
+      provenance = ChartProvenance(
+        ChartOrigin.Agent(extractor),
+        Vector(call("chart-agent", "coord")),
+        Vector.empty
+      ),
       sentence = Some(sentences(0).id)
     )
     PropositionEvidence.of(ChartValidator.check(unchecked).fold(v => fail(v.toString), identity))
@@ -952,8 +960,14 @@ class CompilerSuite extends FunSuite:
     val result = compile(
       input(
         situationAttempts = Vector(
-          SituationAttempt(coordinatedBranch, bundle(situation0, ev0, "situation-agent", "coord-op1")),
-          SituationAttempt(coordinatedFiller, bundle(situation1, ev0, "situation-agent", "coord-time"))
+          SituationAttempt(
+            coordinatedBranch,
+            bundle(situation0, ev0, "situation-agent", "coord-op1")
+          ),
+          SituationAttempt(
+            coordinatedFiller,
+            bundle(situation1, ev0, "situation-agent", "coord-time")
+          )
         ),
         chartOrder = Vector(sentences(0).id -> coordinatedChart),
         contextAttempts = Some(refs.map(context)),

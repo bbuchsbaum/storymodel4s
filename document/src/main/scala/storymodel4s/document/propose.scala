@@ -34,8 +34,8 @@ import storymodel4s.story.{
 /** Why a chart with concepts yielded no situation attempt at its anchor.
   *
   * Why typed: the compiler refuses every root that is not the chart focus (or a branch of a
-  * coordinating focus), not a situation shape, or embedded; recording which of those held keeps
-  * "no proposal" distinguishable from "not run".
+  * coordinating focus), not a situation shape, or embedded; recording which of those held keeps "no
+  * proposal" distinguishable from "not run".
   */
 enum AbstentionReason:
   case NoFocus
@@ -57,13 +57,13 @@ enum AbstentionReason:
   case BranchEmbedded
 
   def render: String = this match
-    case NoFocus                  => "no-focus"
-    case FocusNotPredicate(kind)  => s"focus-not-predicate:$kind"
-    case FocusEmbedded            => "focus-embedded"
-    case NoCoordinationBranch     => "no-coordination-branch"
-    case NestedCoordination       => "coordination-branch-nested"
+    case NoFocus                   => "no-focus"
+    case FocusNotPredicate(kind)   => s"focus-not-predicate:$kind"
+    case FocusEmbedded             => "focus-embedded"
+    case NoCoordinationBranch      => "no-coordination-branch"
+    case NestedCoordination        => "coordination-branch-nested"
     case BranchNotAdmissible(kind) => s"coordination-branch-not-admissible:$kind"
-    case BranchEmbedded           => "coordination-branch-embedded"
+    case BranchEmbedded            => "coordination-branch-embedded"
 
 /** One branch of a coordinating focus, and what the provider did with it.
   *
@@ -113,21 +113,22 @@ enum SentenceCoverage:
 
   /** The sentence the row is about: derived from the chart node for rows that carry one. */
   def sentence: SurfaceUnitId = this match
-    case Proposed(root, _, _)      => root.sentence
-    case Coordinated(anchor, _)    => anchor.sentence
-    case Abstained(anchor, _)      => anchor.sentence
-    case EmptyChart(unit)          => unit
-    case NoChart(unit)             => unit
+    case Proposed(root, _, _)   => root.sentence
+    case Coordinated(anchor, _) => anchor.sentence
+    case Abstained(anchor, _)   => anchor.sentence
+    case EmptyChart(unit)       => unit
+    case NoChart(unit)          => unit
 
   /** The roots this sentence actually produced, in discourse order; empty when it produced none. */
   def admittedRoots: Vector[ChartNodeRef] = this match
-    case Proposed(root, _, _)   => Vector(root)
-    case Coordinated(_, bs)     => bs.collect { case CoordinatedBranch.Admitted(root, _, _, _) =>
+    case Proposed(root, _, _) => Vector(root)
+    case Coordinated(_, bs)   =>
+      bs.collect { case CoordinatedBranch.Admitted(root, _, _, _) =>
         root
       }
-    case Abstained(_, _)        => Vector.empty
-    case EmptyChart(_)          => Vector.empty
-    case NoChart(_)             => Vector.empty
+    case Abstained(_, _) => Vector.empty
+    case EmptyChart(_)   => Vector.empty
+    case NoChart(_)      => Vector.empty
 
 /** Whether a story-summary proposal was emitted; the title is the only summary source here. */
 enum SummaryCoverage:
@@ -894,7 +895,14 @@ object ChartProposalProvider:
                 )
               else if chart.isEmbedded(focus) then
                 Right(
-                  abstainSentence(source, unit, origin, checksum, root, AbstentionReason.FocusEmbedded)
+                  abstainSentence(
+                    source,
+                    unit,
+                    origin,
+                    checksum,
+                    root,
+                    AbstentionReason.FocusEmbedded
+                  )
                 )
               else
                 rule match
@@ -1029,7 +1037,7 @@ object ChartProposalProvider:
         refuse(AbstentionReason.BranchEmbedded)
       case Some(concept) =>
         admissibleRoot(chart, branch.concept, concept) match
-          case None => refuse(AbstentionReason.BranchNotAdmissible(concept.kind))
+          case None       => refuse(AbstentionReason.BranchNotAdmissible(concept.kind))
           case Some(rule) =>
             proposeRoot(
               source,
@@ -1504,8 +1512,8 @@ object ChartProposalProvider:
   ): Set[ConceptId] =
     @annotation.tailrec
     def walk(pending: List[ConceptId], seen: Set[ConceptId]): Set[ConceptId] = pending match
-      case Nil          => seen
-      case id :: rest   =>
+      case Nil        => seen
+      case id :: rest =>
         val next = chart
           .relationsFrom(id)
           .flatMap(_.to.nodeId)
