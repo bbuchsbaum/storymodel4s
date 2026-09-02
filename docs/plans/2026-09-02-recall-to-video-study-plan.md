@@ -37,11 +37,18 @@ One representative run also reports `unranked = 0.000`: every unit receives cand
 so the diffuseness is not a nomination failure. Human microsegment annotations run a median of 14
 words ("Shot of London", "John opens up his laptop"); recall units run a median of 11.
 
-**The pattern.** The aligner is fairly confident that a recall unit is about the film and largely
-unable to say *where* in the film. Posterior mass spreads across many candidate segments, and the
-resulting recall-to-time map is only weakly ordered. That is a localisation failure, and the natural
-explanation is that one-line human annotations are mutually confusable: many segments are described
-in nearly the same words.
+**The pattern, stated precisely.** The candidate generator nominates the top eight segments per
+hierarchy level with lexical overlap disabled (`RecallToVideo.scala:338`), so the posterior is spread
+over roughly eight to sixteen admitted states, not over all thousand segments. The MAP anchor holding
+0.115 therefore means the mass is close to uniform across the shortlist: the aligner is fairly
+confident a unit is about the film, and close to indifferent among the handful of segments it
+shortlisted. The resulting recall-to-time map is only weakly ordered.
+
+Two distinct failures could produce that, and the study can tell them apart. Either the right segment
+is not reaching the shortlist, which is a retrieval failure that `strict-recall@k` and `mrr` measure
+directly once gold exists, or it reaches the shortlist and cannot be distinguished within it, which
+the concentration and ordering measures see. The natural explanation for both is the same: one-line
+human annotations are mutually confusable, with many segments described in nearly the same words.
 
 **The hypothesis this licenses.** Machine descriptions of the picture carry discriminating detail the
 coder's one-liners omit (who is present, where, what action, what is on screen), so they should
