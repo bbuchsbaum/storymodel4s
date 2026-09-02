@@ -750,6 +750,20 @@ and its filler is the concept the state holds of. `:domain` is a `Custom` becaus
 named, `Referentiality.PredicationSubject`, and every other `Custom` — `amr:purpose` included —
 stays refused, fail-closed.
 
+### 7a. `Cause` and `Result` are refused for a different reason, and named for it
+
+`:cause` and `:result` relate one **situation** to another rather than a situation to a thing, so a
+filler under either is neither a participant nor a circumstance. What it describes belongs to the
+causal layer, which this version does not build. `RoleLicence.Eventuality` is its own case, it is
+counted under its own `eventualities` column, and its receipt names the role.
+
+*Rejected: folding them in with `Time` and `Manner`.* Both are "not a participant", and there the
+resemblance ends: a time is evidence this model can hold today, and a `:cause` filler is work for a
+layer that does not exist. Sharing a counter would hide the second behind the first.
+
+*Rejected: building the causal layer here.* Out of the slice. What this slice owes that layer is a
+way to find its inputs, which is the counter and the receipt.
+
 ### 8. A `:time` or `:manner` filler is recorded, not discarded
 
 `situation-circumstance-rule`, `ClaimFamily.SituationCircumstance`, ordinary policy. The filler
@@ -768,10 +782,35 @@ licence, and this edge asserts only that the situation's own words said this muc
 `story` type change proved too wide. It did not: `RelationLayers` gains one defaulted field, and
 the family follows the participant family's existing shape end to end.
 
-`SentenceCoverage.Proposed` and `CoordinatedBranch.Admitted` now carry `FillerCounts(referents,
-circumstances, nonReferential, unlicensed)`, whose four counters sum to every filler the scan saw.
-*Rejected: one "not proposed" counter.* Four states with one number is the defect this file is
-mostly about.
+### 8a. Every filler the provider saw is accounted for, with a reason
+
+The 2026-09-02 audit found **51 of this story's 119 argument fillers** dropped as "unlicensed" and
+appearing in no layer, no gap, and no alternatives list. One anonymous counter was covering four
+findings owned by four different slices.
+
+`SentenceCoverage.Proposed` and `CoordinatedBranch.Admitted` carry `FillerCounts(referents,
+circumstances, eventualities, nonReferential, unlicensed, ambiguous)`, which sum to `seen`. The
+counts are **derived** from the refusals, never incremented beside them: a counter a caller can
+forget to bump is how a filler goes missing in the first place. Every filler the rule turns away
+also carries its own receipt under `role-referentiality-rule`, naming the concept, its lemma, its
+concept kind, the source roles that reached it, and a typed `FillerRefusal`.
+
+Each class names the slice that owns it: `eventualities` the causal layer, `unlicensed` the frame
+lexicon, `ambiguous` a chart that gave one filler two licensed roles, `nonReferential` an
+unestablished extension role or a concept kind that cannot denote a referent.
+
+*Rejected: one "not proposed" counter.* Six states with one number is the defect this file is
+mostly about, and it is what let 51 fillers leave silently.
+
+*Rejected: keeping `unlicensed` as one number covering both "no role reached it" and "two roles
+did".* The first is work for the frame lexicon and the second is a chart the provider will not
+guess about. Measured on this story: all 51 are the first, and 37 of those are numbered arguments
+(ARG0 15, ARG1 14, ARG2 6, ARG4 2) with the other 14 named roles outside the standard table
+(`direction` 10, `path` 3, `accompanier` 1). None of that was visible before.
+
+*Not closed:* these fillers are recorded, not resolved. They still produce no gap and no
+alternatives entry, because that needs a compiler family this slice does not add. What changed is
+that they can now be found.
 
 ### 9. A filename is not a title
 
@@ -821,6 +860,12 @@ With the story's title stated by the caller, so the measurement isolates the ent
 | participant edges | 68 | 57 |
 | circumstance edges | 0 | 11 |
 | claims | 398 | 386 |
+
+Coverage ledger, which now balances: 119 fillers seen = 57 referents + 11 circumstances + 0
+eventualities + 0 nonReferential + 51 unlicensed + 0 ambiguous, with a receipt behind each of the
+51. The two zeroes are honest zeroes for this story: no chart of it puts an entity-kind concept
+under `:cause`, `:result`, or two licensed roles at once. Both paths are courted on built charts
+instead.
 
 The six entities that left are `then`, `now`, `midnight`, `night`, `thus`, `together`. Nothing was
 discarded: the eleven fillers behind them are the nine `:time` and two `:manner` ones, all recorded
