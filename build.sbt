@@ -83,7 +83,8 @@ lazy val root = tlCrossRootProject
     embedGrakern,
     embedOnnx,
     embedBench,
-    media
+    media,
+    pipeline
   )
 
 /** Identity, spans, evidence, claims, credence, provenance, hashing. No I/O. */
@@ -316,6 +317,33 @@ lazy val media = project
   )
   .dependsOn(core.jvm)
 
+/** JVM-only story-build orchestrator (ADR 0009): text through `provider-agent` charts, the
+  * `ChartProposalProvider`, and `NarrativeCompiler` to a three-file pre-bundle on disk. It owns I/O,
+  * receipt composition, and file layout, and no semantics. No portable module depends on it.
+  */
+lazy val pipeline = project
+  .in(file("pipeline"))
+  .settings(commonSettings)
+  .settings(
+    name := "storymodel4s-pipeline",
+    libraryDependencies ++= Seq(
+      "io.circe" %% "circe-core" % circeV,
+      "io.circe" %% "circe-parser" % circeV
+    ),
+    Test / fork := true
+  )
+  .dependsOn(
+    providerAgent,
+    providerParser,
+    core.jvm,
+    proposition.jvm,
+    acquire.jvm,
+    document.jvm,
+    story.jvm,
+    codec.jvm,
+    fixtures.jvm % Test
+  )
+
 /** Portable semantic view artifacts shared by the Narrative Codex and Narrative Atlas. */
 lazy val view = crossProject(JVMPlatform, JSPlatform, NativePlatform)
   .crossType(CrossType.Pure)
@@ -404,8 +432,15 @@ val allModules = List(
 )
 val allPlatforms = List("JVM", "JS", "Native")
 
-val jvmOnlyModules =
-  List("providerParser", "providerAgent", "embedGrakern", "embedOnnx", "embedBench", "media")
+val jvmOnlyModules = List(
+  "providerParser",
+  "providerAgent",
+  "embedGrakern",
+  "embedOnnx",
+  "embedBench",
+  "media",
+  "pipeline"
+)
 
 addCommandAlias(
   "compileAll",

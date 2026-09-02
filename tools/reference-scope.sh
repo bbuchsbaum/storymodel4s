@@ -278,8 +278,15 @@ while IFS= read -r module_name; do printf '  %s\n' "$module_name"; done <<< "$mo
 # prints THEIR projects too -- including colliding `coreJVM`, `lawsJVM` and `rootJVM`.
 # Scraping that output without first cutting to this build's own block silently
 # resolves a module to a sibling repo's project.
+#
+# The list is joined onto one line before the sed, because scalafmt wraps it once it
+# passes 100 columns and sed matches per line. Measured 2026-09-02: the two-line form
+# `val jvmOnlyModules =\n  List(...)` on main matched NOTHING, so this tool emitted
+# `providerAgentJVM/test` for a provider-agent change -- a gate command for a project
+# that does not exist, the exact failure the paragraph above was written against.
 jvm_only_ids="$(
   printf '%s\n' "$build_sbt" \
+    | tr '\n' ' ' \
     | sed -n 's/.*jvmOnlyModules[[:space:]]*=[[:space:]]*List(\([^)]*\)).*/\1/p' \
     | tr ',' '\n' \
     | sed 's/[[:space:]\"]//g; /^$/d'
