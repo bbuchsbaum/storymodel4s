@@ -151,6 +151,10 @@ class StoryBuildSuite extends FunSuite:
       .as[Int]
       .fold(e => fail(s"${path.mkString(".")}: ${e.message}"), identity)
 
+  /** One `params` entry of a rendered provider call, absent when the call does not carry it. */
+  private def param(call: Json, name: String): Option[String] =
+    call.hcursor.downField("params").downField(name).as[String].toOption
+
   /** How many members a JSON collection has, whether the codec wrote it as an array or a map. */
   private def size(cursor: io.circe.ACursor, field: String): Int =
     cursor.downField(field).focus match
@@ -226,11 +230,16 @@ class StoryBuildSuite extends FunSuite:
     * What is deliberately not pinned: any recording's content — no reply text, no usage, no
     * duration. A content pin would make the fixture its own expectation and would go on passing
     * over a corrupted one. What is pinned is what the fifty replies *produce*: the served-from
-    * ledger, the coverage ledger with its abstention reasons, the gaps, the violations, and the
-    * shape of the draft that was built. The last of those is what stops a run that regressed to
-    * proposing nothing from passing on zeroes.
+    * ledger, the coverage ledger with its abstention reasons, the closed rule that admitted each
+    * root, the gaps, the violations, and the shape of the draft that was built. The last of those
+    * is what stops a run that regressed to proposing nothing from passing on zeroes.
+    *
+    * These are the numbers of the combined state, not of any intermediate one. Four mechanical
+    * classes were closed together: markers on non-concepts (the transport now mirrors every decoded
+    * marker into the sidecar), coordinated predicates, predicative roots, and existential roots.
+    * Pinning an intermediate state would pin a pipeline that never ran.
     */
-  test("the fifty-sentence captured court: 43 charts, 56 situations, one named abstention") {
+  test("the fifty-sentence captured court: 50 charts, 65 situations, one named abstention") {
     val dir = work("wog-captured")
     val outDir = dir.resolve("out")
     val summary = build(wogText(dir), capturedRecordings, outDir)
@@ -250,17 +259,15 @@ class StoryBuildSuite extends FunSuite:
     assertEquals(summary.parser.corrupt, 0)
     assertEquals(summary.parser.transportFailures, 0)
     assertEquals(summary.liveCalls, 0)
-    assertEquals(summary.parser.proposed, 43)
-    assertEquals(summary.parser.failed, 7)
-    assertEquals(summary.parser.abstained, 0)
 
-    // Seven sentences yield no chart: their replies put an alignment marker on a role, a
-    // reentrancy, or a constant (`:quant many~e.2`, `:poss h~e.4`), which the transport refuses.
-    // That is class A of the slice-1.5 plan and is not addressed here; both of the story's
-    // existential roots ("There were people at Egulac", "There were five men in the canoe") are
-    // among the seven, which is why admitting existential roots moves no number in this court.
-    assertEquals(summary.charts, 43)
-    assertEquals(summary.coverage, CoverageCounts(28, 14, 1, 0, 7))
+    // Every reply now yields a chart. Seven did not until the transport stopped refusing a marker
+    // that sits on a role, a reentrancy, or a constant (`:quant many~e.2`, `:poss h~e.4`) and
+    // began mirroring every decoded marker into the sidecar instead.
+    assertEquals(summary.parser.proposed, 50)
+    assertEquals(summary.parser.failed, 0)
+    assertEquals(summary.parser.abstained, 0)
+    assertEquals(summary.charts, 50)
+    assertEquals(summary.coverage, CoverageCounts(33, 16, 1, 0, 0))
     assertEquals(summary.coverage.sentences, 50)
 
     val files = StoryPipeline.files(outDir)
@@ -269,7 +276,7 @@ class StoryBuildSuite extends FunSuite:
     assertEquals(ledger.size, 50)
     assertEquals(
       ledger.groupBy(kindOf).view.mapValues(_.size).toMap,
-      Map("proposed" -> 28, "coordinated" -> 14, "abstained" -> 1, "no-chart" -> 7)
+      Map("proposed" -> 33, "coordinated" -> 16, "abstained" -> 1)
     )
 
     // The abstention-reason histogram, at sentence grain and at branch grain. One sentence
@@ -282,17 +289,17 @@ class StoryBuildSuite extends FunSuite:
       Map("focus-not-predicate:Entity" -> 1)
     )
     val coordinated = ledger.filter(row => kindOf(row) == "coordinated")
-    assertEquals(coordinated.size, 14)
+    assertEquals(coordinated.size, 16)
     // Every coordinating focus in this story is a two-branch one and every branch is a predicate,
     // so no branch reason appears. A branch that stopped being admitted would show up here.
-    assertEquals(coordinated.map(row => intField(row, "admitted")), Vector.fill(14)(2))
+    assertEquals(coordinated.map(row => intField(row, "admitted")), Vector.fill(16)(2))
     val branches = coordinated.flatMap(row => rows(row, "branches"))
-    assertEquals(branches.size, 28)
-    assertEquals(branches.groupBy(kindOf).view.mapValues(_.size).toMap, Map("admitted" -> 28))
+    assertEquals(branches.size, 32)
+    assertEquals(branches.groupBy(kindOf).view.mapValues(_.size).toMap, Map("admitted" -> 32))
     assertEquals(branches.flatMap(_.hcursor.downField("reason").as[String].toOption), Vector.empty)
     assertEquals(
       branches.map(row => field(row, "role")).groupBy(identity).view.mapValues(_.size).toMap,
-      Map("op1" -> 13, "op2" -> 13, "snt1" -> 1, "snt2" -> 1)
+      Map("op1" -> 15, "op2" -> 15, "snt1" -> 1, "snt2" -> 1)
     )
 
     // The four gaps and the three errors are the one abstained anchor and nothing else: the
@@ -325,26 +332,40 @@ class StoryBuildSuite extends FunSuite:
     // three required-derivation errors say.
     assertEquals(ExitStatus.of(Right(summary)), ExitStatus.Complete)
 
-    // What the fifty charts actually built. 28 focus roots and 28 coordination branches are 56
+    // Which closed admission rule produced each root. This is the one assertion that names the
+    // rules rather than counting their effects: 32 of the predicates are coordination branches,
+    // and the single predicative root ("He was dead") and the two existential roots ("There were
+    // people at Egulac", "There were five men in the canoe") are the whole of what the predicative
+    // and existential rules add to this story. Deleting either rule moves a named number here.
+    val rootRules = rows(json(files.receipts), "calls")
+      .filter(call => param(call, "rule").contains(ChartProposalProvider.SituationRule))
+      .map(call => param(call, "root-rule").getOrElse(fail("a situation call has no root-rule")))
+    assertEquals(rootRules.size, 65)
+    assertEquals(
+      rootRules.groupBy(identity).view.mapValues(_.size).toMap,
+      Map("predicate" -> 61, "state-roleset" -> 1, "predicative" -> 1, "existential" -> 2)
+    )
+
+    // What the fifty charts actually built. 33 focus roots and 32 coordination branches are 65
     // situations; each is a segment member and sits in the one narrated-world context; the
-    // temporal rule pairs the 56 roots into 55 adjacent `Unclear` values, and the trajectory has
+    // temporal rule pairs the 65 roots into 64 adjacent `Unclear` values, and the trajectory has
     // one step per pair. A run that regressed to proposing nothing would still satisfy every
     // count above that only reads a ledger, and would fail here.
     val built = json(files.model)
     val graph = built.hcursor.downField("graph")
-    assertEquals(size(graph, "situations"), 56)
-    assertEquals(size(graph, "entities"), 30)
+    assertEquals(size(graph, "situations"), 65)
+    assertEquals(size(graph, "entities"), 35)
     assertEquals(size(graph, "contexts"), 1)
     assertEquals(size(graph, "segments"), 1)
     val relations = graph.downField("relations")
-    assertEquals(size(relations, "participants"), 59)
-    assertEquals(size(relations, "temporal"), 55)
+    assertEquals(size(relations, "participants"), 68)
+    assertEquals(size(relations, "temporal"), 64)
     assertEquals(size(relations, "causal"), 0)
-    assertEquals(size(built.hcursor.downField("trajectory"), "steps"), 55)
-    assertEquals(size(built.hcursor.downField("hierarchy"), "containment"), 56)
-    assertEquals(intField(report, "model", "situations"), 56)
-    assertEquals(intField(report, "model", "entities"), 30)
-    assertEquals(intField(report, "model", "claims"), 343)
+    assertEquals(size(built.hcursor.downField("trajectory"), "steps"), 64)
+    assertEquals(size(built.hcursor.downField("hierarchy"), "containment"), 65)
+    assertEquals(intField(report, "model", "situations"), 65)
+    assertEquals(intField(report, "model", "entities"), 35)
+    assertEquals(intField(report, "model", "claims"), 398)
 
     // The bundle still carries no source prose, on a fifty-sentence run as on a three.
     assert(!read(files.report).contains("Egulac"), "the report carries source prose")

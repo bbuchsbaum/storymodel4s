@@ -676,15 +676,23 @@ predicate loses a true reading of the sentence to fit our compiler.
    refused after the provider proposed it. It now also admits the two shapes above, structurally,
    from the chart. The compiler stays looser than the provider by design: it refuses what cannot
    be a situation at all, and the provider decides what it will propose.
-6. **What did not move, and why.** Replaying the fifty captured replies, coverage goes from
-   `proposed 27 / abstained 16 / noChart 7` to `proposed 28 / coordinated 14 / abstained 1 /
-   noChart 7`; gaps 64 → 4, required-derivation errors 48 → 3. The existential rule moves nothing
-   in that court: both of the story's existential sentences ("There were people at Egulac", "There
-   were five men in the canoe") are among the seven whose replies put an alignment marker on a
-   constant (`:quant many~e.2`, `:quant 5~e.2`), which the transport refuses. That is class A of
-   the slice plan and is not addressed here. The one remaining abstention is "It was nearly
-   daylight when he became quiet", whose focus `daylight` is an entity with a `:degree` and a
-   `:time` and no place: a class we decided not to admit, not one we failed to notice.
+6. **What moved, measured on the fifty captured replies.** These three rules were written and
+   first measured while class A (a marker on a role, a reentrancy, or a constant made the
+   transport refuse the whole reply) still cost the story seven charts. At that point coverage
+   went from `proposed 27 / abstained 16 / noChart 7` to `proposed 28 / coordinated 14 /
+   abstained 1 / noChart 7`, and **the existential rule moved nothing**: both of the story's
+   existential sentences ("There were people at Egulac", "There were five men in the canoe") were
+   among the seven the transport refused, so the rule was provable only against hand-built charts.
+   With class A landed the transport mirrors every decoded marker into the sidecar, all fifty
+   replies yield charts, and the combined state is `proposed 33 / coordinated 16 / abstained 1 /
+   noChart 0`: gaps 64 → 4, required-derivation errors 48 → 3, situations 27 → 65. The rule that
+   admitted each of the 65 roots is on its receipt and pinned: 61 predicate (32 of them
+   coordination branches), 1 state roleset, 1 predicative, **2 existential** — the two sentences
+   above, which is the delta this ADR could not measure when it was written.
+
+   The one remaining abstention is "It was nearly daylight when he became quiet", whose focus
+   `daylight` is an entity with a `:degree` and a `:time` and no place: a class we decided not to
+   admit, not one we failed to notice.
 
 Evidence: `CoordinatedRootSuite` (document) is the court for all three shapes and their negative
 cases — branches that are not roots, a nested coordinator, a coordinator with no branch, an
