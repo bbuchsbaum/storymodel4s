@@ -41,9 +41,24 @@ final case class StorySummaryProposal(text: String)
   */
 final case class CausalProposal(relation: CausalRelation)
 
-/** Restricted first-slice context proposal; providers cannot mint arbitrary context or status. */
+/** Where a provider read a situation as sitting, as a path and never as an identity.
+  *
+  * Providers still cannot mint a context: they describe the holders they read off the chart and the
+  * text, and only the compiler turns a path into `ContextId`s and `ContextFrame`s. `NarratedWorld`
+  * is a positive reading — the anchor lies outside every quotation and the chart holds the concept
+  * under no embedding — and not the branch that fires when nothing else matched. A root the rule
+  * cannot read yields no proposal at all, so the claim gaps.
+  */
 enum ContextAssignmentProposal:
   case NarratedWorld
+
+  /** Holders between the narrated world and the situation, outermost first. */
+  case Held(path: NonEmptyVector[ContextStep])
+
+  /** The path from the narrated world, empty for a root-world situation. */
+  def steps: Vector[ContextStep] = this match
+    case NarratedWorld => Vector.empty
+    case Held(path)    => path.toVector
 
 /** Restricted first-slice hierarchy proposal; acceptance denotes weight-one primary membership. */
 enum SegmentMembershipProposal:
@@ -202,7 +217,6 @@ enum DerivationGapReason:
   case MissingRawScore
   case MissingSpanEvidence
   case MissingUpstream(addresses: Vector[NarrativeCandidateAddress])
-  case UnsupportedEmbeddedContext(source: ChartNodeRef)
   case InvalidAccepted(error: DomainError)
 
   def render: String = this match
@@ -213,7 +227,6 @@ enum DerivationGapReason:
     case MissingSpanEvidence        => "missing-span-evidence"
     case MissingUpstream(addresses) =>
       s"missing-upstream:${addresses.map(_.render).sorted.mkString(",")}"
-    case UnsupportedEmbeddedContext(source) => s"embedded-context-unsupported:${source.key}"
     case InvalidAccepted(error)             => s"invalid-accepted:${error.message}"
 
 /** One missing derivation, retained in the compiled artifact rather than replaced by a value. */
@@ -1312,13 +1325,6 @@ object NarrativeCompiler:
             )
           else
             input.mentionGraph.chart(source.sentence) match
-              case Some(chart) if chart.isEmbedded(source.concept) =>
-                gaps += gap(
-                  record.target,
-                  record.bundle,
-                  ClaimFamily.SituationMention,
-                  DerivationGapReason.UnsupportedEmbeddedContext(source)
-                )
               case Some(chart) if admissibleSituationSource(chart, source.concept) =>
                 materialize(
                   input,
@@ -1336,7 +1342,10 @@ object NarrativeCompiler:
                     val canonical =
                       ExactCorefCluster.canonicalFor[SituationK](input.source.id, Vector(mention))
                     val id = SituationId.unsafe(canonical.value)
-                    val root = rootContextId(input.source.id)
+                    val root = contextIdOf(
+                      input.source.id,
+                      acceptedContextBySource(source).value.steps
+                    )
                     val node = material.value.kind match
                       case SituationKind.Event =>
                         SituationNode.Event(
@@ -1405,7 +1414,7 @@ object NarrativeCompiler:
     val situationMap = emitted.map(s => s.node.id -> s.node).toMap
     val acceptedContexts =
       contextRecords.flatMap(record => acceptedContextBySource.get(record.source))
-    val contexts = NonEmptyVector.fromVector(acceptedContexts) match
+    val rootFrames = NonEmptyVector.fromVector(acceptedContexts) match
       case None           => Map.empty[ContextId, ContextFrame]
       case Some(accepted) =>
         val support = unionSupports(accepted.map(_.support))
@@ -1509,6 +1518,65 @@ object NarrativeCompiler:
     val entityBySource: Map[ChartNodeRef, EntityId] =
       entities.flatMap(e => e.members.toVector.map(m => m.source -> e.node.id)).toMap
     val entityMap = entities.map(e => e.node.id -> e.node).toMap
+
+    // Child context frames are built here, after the mention layer, and not beside the root frame:
+    // a holder is an entity and entities do not exist until mentions have been clustered. Nothing
+    // above needed them, because a context's identity is derived from its placement alone, so the
+    // situations already placed in these frames were addressed correctly before the holder was
+    // known.
+    def holderOf(candidate: HolderCandidate): ContextHolder = candidate match
+      case HolderCandidate.Missing(gap)  => ContextHolder.Unattributed(gap)
+      case HolderCandidate.Fillers(refs) =>
+        refs.toVector.flatMap(entityBySource.get).distinct match
+          case Vector(one) => ContextHolder.Named(one)
+          case Vector()    => ContextHolder.Unattributed(HolderGap.UnresolvedCandidate)
+          case _           => ContextHolder.Unattributed(HolderGap.SeveralCandidates)
+
+    def kindOf(step: ContextStep): ContextKind = step match
+      case ContextStep.Quoted(_, who)     => ContextKind.Speech(holderOf(who))
+      case ContextStep.Embedded(_, _, kd) =>
+        kd match
+          case StepKind.Speech(c)      => ContextKind.Speech(holderOf(c))
+          case StepKind.Belief(c)      => ContextKind.Belief(holderOf(c))
+          case StepKind.Desire(c)      => ContextKind.Desire(holderOf(c))
+          case StepKind.Intention(c)   => ContextKind.Intention(holderOf(c))
+          case StepKind.Memory(c)      => ContextKind.Memory(holderOf(c))
+          case StepKind.Imagination(c) => ContextKind.Imagination(holderOf(c))
+          case StepKind.Hypothetical   => ContextKind.Hypothetical
+          case StepKind.Counterfactual => ContextKind.Counterfactual
+
+    val prefixes = acceptedContexts
+      .map(_.value.steps)
+      .flatMap(path => (1 to path.size).map(path.take))
+      .distinct
+      .sortBy(p => (p.size, p.map(_.placementKey).mkString("/")))
+    val childBuild = prefixes
+      .foldLeft[Either[DomainError, Map[ContextId, ContextFrame]]](Right(Map.empty)) {
+        (acc, prefix) =>
+          acc.flatMap { built =>
+            val id = contextIdOf(input.source.id, prefix)
+            if built.contains(id) then Right(built)
+            else
+              val support = SpanSet.one(prefix.last.support)
+              val upstream = acceptedContexts
+                .filter(_.value.steps.startsWith(prefix))
+                .map(_.meta.id)
+                .toSet
+              derivedMeta(input, "context-frame", prefix.map(_.placementKey), support, upstream)
+                .map(meta =>
+                  built + (id -> ContextFrame(
+                    id,
+                    Some(contextIdOf(input.source.id, prefix.dropRight(1))),
+                    kindOf(prefix.last),
+                    support,
+                    meta
+                  ))
+                )
+          }
+      }
+    val contexts = childBuild match
+      case Left(error)  => return Left(NarrativeCompilerError.ClaimConstruction(error))
+      case Right(built) => rootFrames ++ built
 
     val participantEdges = Vector.newBuilder[ParticipantEdge]
     participantRecords.foreach { record =>
@@ -2546,6 +2614,17 @@ object NarrativeCompiler:
   private def rootContextId(story: StoryId): ContextId =
     ContextId.unsafe(ContentAddress.of("context-root", story.value))
 
+  /** Identity of the context a placement path names, derived from the placement alone.
+    *
+    * Why the holder is not in the address: a quotation is one context however its speaker resolves,
+    * so an attribution that later succeeds must not split a context in two. Why the whole prefix
+    * and not the last step: nesting is part of what a context is, and two identical holders reached
+    * by different paths are different contexts.
+    */
+  private def contextIdOf(story: StoryId, prefix: Vector[ContextStep]): ContextId =
+    if prefix.isEmpty then rootContextId(story)
+    else ContextId.unsafe(ContentAddress.of("context", (story.value +: prefix.map(_.placementKey))*))
+
   private def rootSegmentId(story: StoryId, situations: Vector[SituationId]): SegmentId =
     SegmentId.unsafe(
       ContentAddress.of("segment-root", (story.value +: situations.map(_.value).sorted)*)
@@ -2575,8 +2654,23 @@ object NarrativeCompiler:
   private def renderCausal(value: CausalProposal): String =
     renderFields("causal/v1", Vector(value.relation.toString))
 
+  /** Renders the placement and its holder candidates, so two proposals that differ in either are
+    * different candidate values to the resolver.
+    */
   private def renderContextAssignment(value: ContextAssignmentProposal): String =
-    renderFields("context-assignment/v1", Vector(value.toString))
+    val rendered = value match
+      case ContextAssignmentProposal.NarratedWorld => Vector("narrated-world")
+      case ContextAssignmentProposal.Held(path)    =>
+        path.toVector.flatMap(step =>
+          Vector(
+            step.placementKey,
+            step match
+              case ContextStep.Quoted(_, who)     => who.render
+              case ContextStep.Embedded(_, _, kd) =>
+                kd.holderCandidate.fold("no-holder")(_.render)
+          )
+        )
+    renderFields("context-assignment/v2", rendered)
 
   private def renderEntityMention(value: EntityMentionProposal): String =
     renderFields("entity-mention/v1", Vector(value.label, renderEntityType(value.entityType)))

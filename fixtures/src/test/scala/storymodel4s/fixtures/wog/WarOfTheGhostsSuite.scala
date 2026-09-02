@@ -80,13 +80,16 @@ class WarOfTheGhostsSuite extends munit.FunSuite:
       g.referencesOut(S.weFought)
         .exists(r => r.to == S.battle && r.mode == NarrativeReference.Retrospective)
     )
-    assertEquals(g.contexts(g.situations(S.weFought).context).kind, ContextKind.Speech(E.ym2))
+    assertEquals(
+      g.contexts(g.situations(S.weFought).context).kind,
+      ContextKind.Speech(ContextHolder.Named(E.ym2))
+    )
   }
 
   test("the announced battle is a prospective reference, not an occurrence") {
     val a = g.situations(S.announcedWar)
     assertEquals(a.modality, Modality.Intended)
-    assertEquals(g.contexts(a.context).kind, ContextKind.Speech(E.warriors))
+    assertEquals(g.contexts(a.context).kind, ContextKind.Speech(ContextHolder.Named(E.warriors)))
     assert(
       g.referencesOut(S.announcedWar)
         .exists(r => r.to == S.battle && r.mode == NarrativeReference.Prospective)
@@ -97,7 +100,7 @@ class WarOfTheGhostsSuite extends munit.FunSuite:
     // the belief content is belief-scoped and its theme is the one warriors entity
     assertEquals(
       g.contexts(g.situations(S.warriorsAreGhosts).context).kind,
-      ContextKind.Belief(E.ym2)
+      ContextKind.Belief(ContextHolder.Named(E.ym2))
     )
     assert(g.participantsOf(S.warriorsAreGhosts).contains((ParticipantRole.Theme, E.warriors)))
     // no narrated-world state has the warriors as theme with a belief-only predicate
@@ -124,7 +127,10 @@ class WarOfTheGhostsSuite extends munit.FunSuite:
       g.entities(E.warriors).attributes.map(a => (g.contexts(a.context).kind, a.value)).toSet
     assertEquals(
       kinds,
-      Set((ContextKind.Belief(E.ym2), "people"), (ContextKind.Belief(E.ym2), "ghosts"))
+      Set(
+        (ContextKind.Belief(ContextHolder.Named(E.ym2)), "people"),
+        (ContextKind.Belief(ContextHolder.Named(E.ym2)), "ghosts")
+      )
     )
     // the belief change is a state transition, not a coreference between contradictory contents
     assert(
@@ -140,7 +146,7 @@ class WarOfTheGhostsSuite extends munit.FunSuite:
   test("the reported wound is speech-scoped; its narrated-world truth is an open hypothesis") {
     val r = g.situations(S.reportedShot)
     assertEquals(r.modality, Modality.Reported)
-    assertEquals(g.contexts(r.context).kind, ContextKind.Speech(E.warriors))
+    assertEquals(g.contexts(r.context).kind, ContextKind.Speech(ContextHolder.Named(E.warriors)))
     // no asserted narrated-world shooting of the young man
     val assertedRootShotOfYm2 = g.situations.values.filter(s =>
       g.rootContext.contains(s.context) && s.predicate.lemma == "shoot" &&
@@ -231,9 +237,15 @@ class WarOfTheGhostsSuite extends munit.FunSuite:
   test("asserted vs reported vs believed are distinguishable through the API") {
     assertEquals(src.contextOf(sit(S.battle)), Some(ContextKind.NarratedWorld))
     assertEquals(src.modalityOf(sit(S.battle)), Some(Modality.Asserted))
-    assertEquals(src.contextOf(sit(S.reportedShot)), Some(ContextKind.Speech(E.warriors)))
+    assertEquals(
+      src.contextOf(sit(S.reportedShot)),
+      Some(ContextKind.Speech(ContextHolder.Named(E.warriors)))
+    )
     assertEquals(src.modalityOf(sit(S.reportedShot)), Some(Modality.Reported))
-    assertEquals(src.contextOf(sit(S.warriorsAreGhosts)), Some(ContextKind.Belief(E.ym2)))
+    assertEquals(
+      src.contextOf(sit(S.warriorsAreGhosts)),
+      Some(ContextKind.Belief(ContextHolder.Named(E.ym2)))
+    )
   }
 
   test("same event vs prospective vs retrospective") {
@@ -258,7 +270,7 @@ class WarOfTheGhostsSuite extends munit.FunSuite:
   test("nested speech: the warriors' words inside the young man's retelling") {
     val inner = g.contexts(C.speechYm2Inner)
     assertEquals(inner.parent, Some(C.speechYm2))
-    assertEquals(inner.kind, ContextKind.Speech(E.warriors))
+    assertEquals(inner.kind, ContextKind.Speech(ContextHolder.Named(E.warriors)))
     assertEquals(g.situations(S.iWasShot).context, C.speechYm2Inner)
     assert(g.contextWithin(C.speechYm2Inner, C.world))
   }

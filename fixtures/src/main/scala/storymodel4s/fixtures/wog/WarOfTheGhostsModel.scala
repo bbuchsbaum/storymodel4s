@@ -388,17 +388,30 @@ object WarOfTheGhostsModel:
 
   val contexts: Vector[ContextFrame] = Vector(
     context(world, None, ContextKind.NarratedWorld, (0 to 49)*),
-    context(thoughtWarParty, Some(world), ContextKind.Belief(youngMen), 5),
-    context(speechWarriors1, Some(world), ContextKind.Speech(warriors), 10, 11, 12),
-    context(speechYm1a, Some(world), ContextKind.Speech(ym1), 13),
-    context(speechWarriors2, Some(world), ContextKind.Speech(warriors), 14),
-    context(speechYm1b, Some(world), ContextKind.Speech(ym1), 15, 16, 17),
-    context(speechYm1c, Some(world), ContextKind.Speech(ym1), 21, 22),
-    context(beliefPeople, Some(world), ContextKind.Belief(ym2), 27),
-    context(speechWarriors3, Some(world), ContextKind.Speech(warriors), 30, 32),
-    context(beliefGhosts, Some(world), ContextKind.Belief(ym2), 31),
-    context(speechYm2, Some(world), ContextKind.Speech(ym2), 38, 39, 40, 41),
-    context(speechYm2Inner, Some(speechYm2), ContextKind.Speech(warriors), 41)
+    context(thoughtWarParty, Some(world), ContextKind.Belief(ContextHolder.Named(youngMen)), 5),
+    context(
+      speechWarriors1,
+      Some(world),
+      ContextKind.Speech(ContextHolder.Named(warriors)),
+      10,
+      11,
+      12
+    ),
+    context(speechYm1a, Some(world), ContextKind.Speech(ContextHolder.Named(ym1)), 13),
+    context(speechWarriors2, Some(world), ContextKind.Speech(ContextHolder.Named(warriors)), 14),
+    context(speechYm1b, Some(world), ContextKind.Speech(ContextHolder.Named(ym1)), 15, 16, 17),
+    context(speechYm1c, Some(world), ContextKind.Speech(ContextHolder.Named(ym1)), 21, 22),
+    context(beliefPeople, Some(world), ContextKind.Belief(ContextHolder.Named(ym2)), 27),
+    context(
+      speechWarriors3,
+      Some(world),
+      ContextKind.Speech(ContextHolder.Named(warriors)),
+      30,
+      32
+    ),
+    context(beliefGhosts, Some(world), ContextKind.Belief(ContextHolder.Named(ym2)), 31),
+    context(speechYm2, Some(world), ContextKind.Speech(ContextHolder.Named(ym2)), 38, 39, 40, 41),
+    context(speechYm2Inner, Some(speechYm2), ContextKind.Speech(ContextHolder.Named(warriors)), 41)
   )
 
   import Polarity.Negative

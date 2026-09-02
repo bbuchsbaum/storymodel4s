@@ -75,7 +75,7 @@ object WarOfTheGhostsExpectations:
       Vector(12),
       "the announced war is an intended future event inside the warriors' speech, not a narrated occurrence",
       Vector(
-        InContext(S.announcedWar, ContextKind.Speech(E.warriors)),
+        InContext(S.announcedWar, ContextKind.Speech(ContextHolder.Named(E.warriors))),
         HasModality(S.announcedWar, Modality.Intended),
         Reference(S.announcedWar, NarrativeReference.Prospective, S.battle)
       )
@@ -95,7 +95,7 @@ object WarOfTheGhostsExpectations:
       Vector(30, 32),
       "the injury is reported inside the warriors' speech; its narrated-world truth is an open hypothesis with both readings retained, never an explicit fact",
       Vector(
-        InContext(S.reportedShot, ContextKind.Speech(E.warriors)),
+        InContext(S.reportedShot, ContextKind.Speech(ContextHolder.Named(E.warriors))),
         HasModality(S.reportedShot, Modality.Reported),
         InContext(S.ym2Injured, ContextKind.NarratedWorld),
         HasStatus(S.ym2Injured, EpistemicStatus.Hypothesized),
@@ -119,10 +119,15 @@ object WarOfTheGhostsExpectations:
       Vector(31),
       "'ghosts' is a belief-scoped attribute of the one warriors entity, not a narrated-world fact and not a second entity",
       Vector(
-        InContext(S.warriorsAreGhosts, ContextKind.Belief(E.ym2)),
+        InContext(S.warriorsAreGhosts, ContextKind.Belief(ContextHolder.Named(E.ym2))),
         Participant(S.warriorsAreGhosts, ParticipantRole.Theme, E.warriors),
         Participant(S.warriorsArePeople, ParticipantRole.Theme, E.warriors),
-        EntityAttributeIn(E.warriors, "kind", "ghosts", ContextKind.Belief(E.ym2)),
+        EntityAttributeIn(
+          E.warriors,
+          "kind",
+          "ghosts",
+          ContextKind.Belief(ContextHolder.Named(E.ym2))
+        ),
         NoEntityAttributeAtRoot(E.warriors, "kind", "ghosts")
       )
     ),
@@ -133,7 +138,7 @@ object WarOfTheGhostsExpectations:
       Vector(
         InContext(S.recounting, ContextKind.NarratedWorld),
         Participant(S.recounting, ParticipantRole.Agent, E.ym2),
-        InContext(S.weFought, ContextKind.Speech(E.ym2)),
+        InContext(S.weFought, ContextKind.Speech(ContextHolder.Named(E.ym2))),
         Reference(S.weFought, NarrativeReference.Retrospective, S.battle),
         Reference(S.recounting, NarrativeReference.Summary, S.battle),
         OnlyAssertedRootEventWithLemma("fight", S.battle)
@@ -183,7 +188,7 @@ object WarOfTheGhostsExpectations:
       Vector(41),
       "the warriors' words as retold are speech within speech; the retold injury refers to the original report, not to a new event",
       Vector(
-        InContext(S.iWasShot, ContextKind.Speech(E.warriors)),
+        InContext(S.iWasShot, ContextKind.Speech(ContextHolder.Named(E.warriors))),
         HasModality(S.iWasShot, Modality.Reported),
         Reference(S.iWasShot, NarrativeReference.Retrospective, S.reportedShot)
       )

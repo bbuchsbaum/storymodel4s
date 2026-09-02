@@ -258,7 +258,9 @@ object InvalidStoryGens:
         "context.holder-exists",
         true,
         b =>
-          val c = b.graph.contexts(speech(b)).copy(kind = ContextKind.Speech(missingEnt))
+          val c = b.graph
+            .contexts(speech(b))
+            .copy(kind = ContextKind.Speech(ContextHolder.Named(missingEnt)))
           b.draft(graph = b.graph.copy(contexts = b.graph.contexts.updated(speech(b), c)))
       ),
       (

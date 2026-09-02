@@ -212,9 +212,35 @@ object StoryCodecs:
     yield SegmentNode(id, k, l, s, su)
   }
 
+  given Encoder[HolderGap] = Encoder.instance(_.render.asJson)
+  given Decoder[HolderGap] = Decoder[String].emap {
+    case "no-candidate"         => Right(HolderGap.NoCandidate)
+    case "several-candidates"   => Right(HolderGap.SeveralCandidates)
+    case "unresolved-candidate" => Right(HolderGap.UnresolvedCandidate)
+    case o                      => Left(s"unknown HolderGap $o")
+  }
+
+  /** Why an unattributed holder is a tagged object and not an absent field: a missing `holder` and
+    * a holder the compiler could not derive must not share a wire shape, or every reader downstream
+    * inherits the conflation the type was introduced to remove.
+    */
+  given Encoder[ContextHolder] = Encoder.instance {
+    case ContextHolder.Named(e) =>
+      Json.obj("holder" -> "named".asJson, "entity" -> e.asJson)
+    case ContextHolder.Unattributed(gap) =>
+      Json.obj("holder" -> "unattributed".asJson, "gap" -> gap.asJson)
+  }
+  given Decoder[ContextHolder] = Decoder.instance { c =>
+    field[String](c, "holder").flatMap {
+      case "named"        => field[EntityId](c, "entity").map(ContextHolder.Named(_))
+      case "unattributed" => field[HolderGap](c, "gap").map(ContextHolder.Unattributed(_))
+      case o              => Left(DecodingFailure(s"unknown ContextHolder $o", c.history))
+    }
+  }
+
   given Encoder[ContextKind] = Encoder.instance { k =>
-    k.holderEntity match
-      case Some(e) => Json.obj("type" -> k.productPrefix.asJson, "entity" -> e.asJson)
+    k.heldBy match
+      case Some(h) => Json.obj("type" -> k.productPrefix.asJson, "holder" -> h.asJson)
       case None    => k.toString.asJson
   }
   given Decoder[ContextKind] = Decoder.instance { c =>
@@ -226,14 +252,14 @@ object StoryCodecs:
       case None                   =>
         for
           t <- field[String](c, "type")
-          e <- field[EntityId](c, "entity")
+          h <- field[ContextHolder](c, "holder")
           k <- t match
-            case "Speech"      => Right(ContextKind.Speech(e))
-            case "Belief"      => Right(ContextKind.Belief(e))
-            case "Desire"      => Right(ContextKind.Desire(e))
-            case "Intention"   => Right(ContextKind.Intention(e))
-            case "Memory"      => Right(ContextKind.Memory(e))
-            case "Imagination" => Right(ContextKind.Imagination(e))
+            case "Speech"      => Right(ContextKind.Speech(h))
+            case "Belief"      => Right(ContextKind.Belief(h))
+            case "Desire"      => Right(ContextKind.Desire(h))
+            case "Intention"   => Right(ContextKind.Intention(h))
+            case "Memory"      => Right(ContextKind.Memory(h))
+            case "Imagination" => Right(ContextKind.Imagination(h))
             case o             => Left(DecodingFailure(s"unknown ContextKind $o", c.history))
         yield k
   }

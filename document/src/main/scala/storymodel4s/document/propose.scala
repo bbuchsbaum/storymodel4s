@@ -41,7 +41,6 @@ import storymodel4s.story.{
 enum AbstentionReason:
   case NoFocus
   case FocusNotPredicate(kind: ConceptKind)
-  case FocusEmbedded
 
   /** A coordinating focus with no `:opN` or `:sntN` branch to descend into. */
   case NoCoordinationBranch
@@ -54,17 +53,12 @@ enum AbstentionReason:
   /** A branch of a coordinating focus that is not an admissible situation root. */
   case BranchNotAdmissible(kind: ConceptKind)
 
-  /** A branch of a coordinating focus that some embedding of the chart holds. */
-  case BranchEmbedded
-
   def render: String = this match
     case NoFocus                   => "no-focus"
     case FocusNotPredicate(kind)   => s"focus-not-predicate:$kind"
-    case FocusEmbedded             => "focus-embedded"
     case NoCoordinationBranch      => "no-coordination-branch"
     case NestedCoordination        => "coordination-branch-nested"
     case BranchNotAdmissible(kind) => s"coordination-branch-not-admissible:$kind"
-    case BranchEmbedded            => "coordination-branch-embedded"
 
 /** One branch of a coordinating focus, and what the provider did with it.
   *
@@ -359,11 +353,15 @@ object ChartProposalProvider:
     */
   val CalibrationModel: String = "chart-rule-v1"
 
-  /** Calibration model of the context rule. `NarratedWorld` is the absence-of-embedding default at
-    * sentence grain (the focus is held by no embedding, so the sentence asserts it at root), not a
-    * context the chart licenses positively; the name keeps that visible on every receipt.
+  /** Calibration model of the context rule, from [[ContextPlacement.CalibrationModel]].
+    *
+    * It replaced `narrated-world-default-v1`, whose name recorded that the narrated world was the
+    * branch the rule fell back to when nothing else matched. It no longer is: root placement is the
+    * positive reading that the root's own words lie outside every quotation of the canonical text
+    * *and* that its concept is held by no embedding of its chart, and a root that reading cannot be
+    * taken for abstains under $AbstainContextRule instead.
     */
-  val ContextCalibrationModel: String = "narrated-world-default-v1"
+  val ContextCalibrationModel: String = ContextPlacement.CalibrationModel
 
   /** Calibration model of the title-summary rule, which reads no chart. */
   val SummaryCalibrationModel: String = "title-rule-v1"
@@ -426,7 +424,7 @@ object ChartProposalProvider:
 
   /** Rule names recorded on receipts. */
   val SituationRule: String = "focus-situation-rule"
-  val ContextRule: String = "narrated-world-context-rule"
+  val ContextRule: String = ContextPlacement.RuleName
   val MembershipRule: String = "primary-story-membership-rule"
   val ParticipantRule: String = "licensed-role-participant-rule"
   val MentionRule: String = "entity-filler-mention-rule"
@@ -502,7 +500,32 @@ object ChartProposalProvider:
        |  or literal; the sentence text is never copied.
        |polarity: the chart polarity of the root, mapped one-to-one (Positive, Negative, Unknown).
        |modality: Asserted. aspect: none.
-       |context: NarratedWorld, one attempt per admissible root, anchored at the root.
+       |context: one attempt per admissible root, anchored at the root, valued by
+       |  ${ContextPlacement.RuleName}. A root is in the NARRATED WORLD exactly when both readings
+       |  come back empty: the words that anchor it (its own alignment spans, the spans of every
+       |  alignment naming it otherwise, the sentence when the chart aligns it nowhere) lie wholly
+       |  outside every quotation of the canonical text, AND its concept is held by no embedding of
+       |  its chart. That is a reading of two recorded observations and not the branch that fires
+       |  when nothing else matched. Otherwise the root is HELD, and the attempt carries the path
+       |  from the narrated world outward-in: one step per quotation wholly containing the anchor,
+       |  outermost first, then one step per embedding of the chain that holds the concept,
+       |  outermost first. A quotation the chart already accounts for is dropped, which is the case
+       |  where a reporting predicate of the same sentence sits outside the quotation it opens; what
+       |  survives is reporting that began in an earlier sentence, which no single chart can see.
+       |  Quotation marks are read by ${QuotationScan.RuleName} over the canonical text: the closed
+       |  set { U+0022, U+201C, U+201D }, never a single quotation mark, because an apostrophe and
+       |  an opening single quote are the same character. Attribution is a separate question and is
+       |  allowed to fail: the speakers offered for a quotation are the fillers, under a role
+       |  normalized to Agent or Experiencer, of the speech containers in the sentence the opening
+       |  mark falls in and the one before it whose own words end at or before that mark; the
+       |  compiler names the holder only when exactly one entity survives, and records
+       |  no-candidate, several-candidates or unresolved-candidate otherwise. An unattributed
+       |  reported context is correct; a root-world assertion in its place is not.
+       |context abstention: a root the placement rule cannot read abstains under
+       |  $AbstainContextRule with the refusal named on the receipt — the text's marks do not pair,
+       |  the root's words straddle a mark, the chart holds one concept several ways or in a loop,
+       |  or the chart says a concept is held without saying how. Its situation then gaps for a
+       |  missing context rather than being asserted at root, which is the whole point of the rule.
        |membership: PrimaryStoryMember, one attempt per admissible root, anchored at the root.
        |support: for a focus root, the union of the alignment spans of every alignment naming at
        |  least one non-embedded concept, recorded as span-source=chart-alignments. For a
@@ -519,9 +542,9 @@ object ChartProposalProvider:
        |  which span-source=sentence distinguishes from a measured 1.0.
        |calibration: probability 1.0 under $CalibrationModel for every rule that is a total
        |  function of the chart (situation, membership, coverage, participant, mention, temporal);
-       |  the context rule under $ContextCalibrationModel, because NarratedWorld is the
-       |  absence-of-embedding default at sentence grain; the summary rule under
-       |  $SummaryCalibrationModel.
+       |  the context rule under $ContextCalibrationModel, which is a total function of the
+       |  chart's embedding relation and the canonical text's quotation spans; the summary rule
+       |  under $SummaryCalibrationModel.
        |receipts: every evidence id is the content address of its scope, chart checksum, and
        |  rendered span set; every call render names the evidence id it cites; the chart receipts
        |  bind the source by their input checksum (the canonical text or the sentence text); the
@@ -840,7 +863,8 @@ object ChartProposalProvider:
       _ <- checkSourceIsContentAddressed(source)
       ordered <- checkCharts(source, atlas, charts)
       _ <- ordered.traverse_((unit, ev) => checkAlignments(source, atlas, unit, ev.chart))
-      outcomes <- ordered.traverse((unit, ev) => sentenceOutcome(source, unit, ev))
+      placement = ContextPlacement.read(source, atlas, ordered.map((u, ev) => u.id -> ev.chart))
+      outcomes <- ordered.traverse((unit, ev) => sentenceOutcome(source, unit, ev)(using placement))
       summary <- summaryOutcome(source)
     yield
       val byUnit = outcomes.map(o => o.coverage.sentence -> o).toMap
@@ -1076,7 +1100,7 @@ object ChartProposalProvider:
       source: StorySource,
       unit: SurfaceUnit,
       ev: PropositionEvidence
-  ): Either[DomainError, SentenceOutcome] =
+  )(using text: TextPlacement): Either[DomainError, SentenceOutcome] =
     val chart = ev.chart
     val origin = ev.provenance.origin
     val checksum = Canonical.checksum(chart)
@@ -1108,17 +1132,6 @@ object ChartProposalProvider:
                     checksum,
                     root,
                     AbstentionReason.FocusNotPredicate(concept.kind)
-                  )
-                )
-              else if chart.isEmbedded(focus) then
-                Right(
-                  abstainSentence(
-                    source,
-                    unit,
-                    origin,
-                    checksum,
-                    root,
-                    AbstentionReason.FocusEmbedded
                   )
                 )
               else
@@ -1173,7 +1186,7 @@ object ChartProposalProvider:
       origin: ChartOrigin,
       checksum: Checksum,
       coordinator: ChartNodeRef
-  ): Either[DomainError, SentenceOutcome] =
+  )(using text: TextPlacement): Either[DomainError, SentenceOutcome] =
     val branches = ChartRoots.branches(chart, coordinator.concept)
     if branches.isEmpty then
       Right(
@@ -1191,7 +1204,6 @@ object ChartProposalProvider:
         chart
           .concept(branch.concept)
           .filterNot(ChartRoots.isCoordinator)
-          .filterNot(_ => chart.isEmbedded(branch.concept))
           .flatMap(concept => admissibleRoot(chart, branch.concept, concept))
           .map(_ => branch.concept)
       )
@@ -1230,7 +1242,7 @@ object ChartProposalProvider:
       coordinator: ChartNodeRef,
       branch: ChartRoots.Branch,
       mentionOwner: Map[ConceptId, ConceptId]
-  ): Either[DomainError, (CoordinatedBranch, Option[RootOutcome], RootAttempts)] =
+  )(using text: TextPlacement): Either[DomainError, (CoordinatedBranch, Option[RootOutcome], RootAttempts)] =
     val root = ChartNodeRef(unit.id, branch.concept)
     def refuse(reason: AbstentionReason) =
       Right(
@@ -1251,8 +1263,6 @@ object ChartProposalProvider:
         )
       case Some(concept) if ChartRoots.isCoordinator(concept) =>
         refuse(AbstentionReason.NestedCoordination)
-      case Some(_) if chart.isEmbedded(branch.concept) =>
-        refuse(AbstentionReason.BranchEmbedded)
       case Some(concept) =>
         admissibleRoot(chart, branch.concept, concept) match
           case None       => refuse(AbstentionReason.BranchNotAdmissible(concept.kind))
@@ -1302,7 +1312,7 @@ object ChartProposalProvider:
       support: Support,
       scope: String,
       mentions: ConceptId => Boolean = _ => true
-  ): Either[DomainError, RootOutcome] =
+  )(using text: TextPlacement): Either[DomainError, RootOutcome] =
     Gloss.predicate(chart, root.concept) match
       case None =>
         Left(
@@ -1350,18 +1360,29 @@ object ChartProposalProvider:
           ),
           params
         )
-        val (context, contextCall) = proposed(
-          source,
-          ContextRule,
-          scope,
-          checksum,
-          ContextAssignmentProposal.NarratedWorld,
-          evidence,
-          support.raw,
-          ContextCalibrationModel,
-          Vector("narrated-world", root.key),
-          params
-        )
+        val (context, contextCall) = ContextPlacement.place(chart, root.concept, unit, text) match
+          case Right(placed) =>
+            proposed(
+              source,
+              ContextRule,
+              scope,
+              checksum,
+              placed,
+              evidence,
+              support.raw,
+              ContextCalibrationModel,
+              renderPlacement(placed) :+ root.key,
+              params + ("placement" -> renderPlacement(placed).mkString("/"))
+            )
+          case Left(refusal) =>
+            abstained[ContextAssignmentProposal](
+              source,
+              AbstainContextRule,
+              scope,
+              checksum,
+              Vector("abstain-context", root.key, refusal.render),
+              params + ("reason" -> refusal.render)
+            )
         val (membership, membershipCall) = proposed(
           source,
           MembershipRule,
@@ -1749,6 +1770,17 @@ object ChartProposalProvider:
             call
           )
         }
+
+  /** The placement as receipt text: the path outermost-first, or the positive root-world reading.
+    *
+    * Holder candidates are deliberately absent: two roots under one quotation are in one context
+    * however their speaker resolves, and a render that moved with attribution would make the
+    * receipt disagree with the identity the compiler derives from the same path.
+    */
+  private def renderPlacement(value: ContextAssignmentProposal): Vector[String] =
+    value.steps match
+      case Vector() => Vector("narrated-world")
+      case steps    => steps.map(_.placementKey)
 
   /** A `-91` reification frame in the adapter's namespace: the only frames that make a State. */
   private def stateFrame(concept: Concept): Boolean =

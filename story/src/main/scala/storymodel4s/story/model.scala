@@ -147,8 +147,15 @@ object StoryModel:
     * one as "circumstances: []" would publish "evaluated and found none" for a model that never
     * evaluated. There is no migration step for that reason; a 0.1.0 artifact is refused and
     * rebuilt.
+    *
+    * Moved 0.2.0 -> 0.3.0 when a holder-bearing [[ContextKind]] began carrying a [[ContextHolder]]
+    * instead of a bare `EntityId`, changing the encoded shape from `{"entity": ...}` to
+    * `{"holder": ...}`. Again no migration step: a 0.2.0 model's speech contexts all name an
+    * entity, but nothing in that artifact records whether an *absent* speech context was absent
+    * because the text held no speech or because the compiler had no vocabulary for an unattributed
+    * one, so a mechanical lift would invent the distinction it is supposed to preserve.
     */
-  val SchemaVersion: String = "0.2.0"
+  val SchemaVersion: String = "0.3.0"
 
   def draft(
       source: StorySource,
