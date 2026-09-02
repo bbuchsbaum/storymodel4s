@@ -445,6 +445,7 @@ object ChartProposalProvider:
   ): Either[DomainError, ChartProposals] =
     for
       _ <- checkAtlas(source, atlas)
+      _ <- checkSourceIsContentAddressed(source)
       ordered <- checkCharts(source, atlas, charts)
       _ <- ordered.traverse_((unit, ev) => checkAlignments(source, atlas, unit, ev.chart))
       outcomes <- ordered.traverse((unit, ev) => sentenceOutcome(source, unit, ev))
@@ -582,21 +583,30 @@ object ChartProposalProvider:
                   s"chart sentence does not equal ${id.value}"
                 )
               )
-            case Some(unit) =>
-              // A chart receipt binds the source by what it hashed: the canonical text or this
-              // sentence's text. A receipt hashing anything else was made over other input.
-              val bound = Set(source.canonicalChecksum, Checksum.ofText(atlas.text(unit)))
-              ev.provenance.receipts.find(call => !bound(call.inputChecksum)) match
-                case Some(call) =>
-                  Left(
-                    DomainError.InvariantViolation(
-                      ChartPath,
-                      s"${id.value}: chart receipt ${call.provider}/${call.model} hashed " +
-                        s"${call.inputChecksum.hex}, neither the source nor the sentence"
-                    )
-                  )
-                case None => Right(unit -> ev)
+            case Some(unit) => Right(unit -> ev)
         }
+
+  /** A chart names the sentence it came from, and a sentence id is minted as
+    * `<story id>:s<ordinal>`, so a chart can only belong to this text if the story id is itself
+    * derived from that text. `StorySource.fromText` admits a caller-supplied `explicitId`, which
+    * would break that chain, so a source whose id is not its own content address is refused here:
+    * with an asserted id, no id-based binding proves anything.
+    *
+    * Why the chart receipts are not inspected: a receipt's `inputChecksum` names the provider's own
+    * input, which for a remote parser is the request envelope, not the story text. Requiring it to
+    * equal the source or the sentence refused every honestly receipted machine chart.
+    */
+  private def checkSourceIsContentAddressed(source: StorySource): Either[DomainError, Unit] =
+    val derived = StoryId.unsafe(ContentAddress.of("story", source.canonicalChecksum.hex))
+    if source.id == derived then Right(())
+    else
+      Left(
+        DomainError.InvariantViolation(
+          ChartPath,
+          s"story ${source.id.value} is not the content address of its text " +
+            s"(${derived.value}); chart-to-sentence binding cannot be trusted"
+        )
+      )
 
   private def checkAlignments(
       source: StorySource,

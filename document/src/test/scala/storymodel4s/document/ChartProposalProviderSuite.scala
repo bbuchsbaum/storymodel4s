@@ -823,25 +823,35 @@ class ChartProposalProviderSuite extends FunSuite:
     assertEquals(proposals.situations.head.bundle.proposals.head.rawScore.map(_.value), Some(0.7))
   }
 
-  test("a chart receipt that hashed neither the source nor the sentence is refused") {
-    val foreignInput = enterChart().copy(provenance =
+  test("a receipt hashing the provider's own input is accepted; an asserted story id is refused") {
+    // A remote parser's receipt hashes the request envelope it sent, not the story text. Requiring
+    // it to equal the source or the sentence refused every honestly receipted machine chart, so the
+    // binding rests on the sentence id instead.
+    val envelopeBound = enterChart().copy(provenance =
       ChartProvenance(
         ChartOrigin.Parser(parser),
-        Vector(chartCall("foreign", Checksum.ofText("something else"))),
+        Vector(chartCall("envelope", Checksum.ofText("""{"schema":"parser.request/v1"}"""))),
         Vector.empty
       )
     )
-    val refused = ChartProposalProvider.propose(source, atlas, Vector(s0.id -> foreignInput))
-    assert(refused.left.exists(_.message.contains("neither the source nor the sentence")))
+    assert(ChartProposalProvider.propose(source, atlas, Vector(s0.id -> envelopeBound)).isRight)
 
-    val sentenceBound = enterChart().copy(provenance =
-      ChartProvenance(
-        ChartOrigin.Parser(parser),
-        Vector(chartCall("sentence", Checksum.ofText(atlas.text(s0)))),
-        Vector.empty
-      )
+    // The sentence id only binds a chart to this text while the story id is the text's own content
+    // address; an asserted id breaks that chain and must be refused rather than trusted.
+    val asserted = StorySource
+      .fromText(source.rawText, explicitId = Some(StoryId.unsafe("story:asserted")))
+      .fold(e => fail(e.message), identity)
+    val assertedAtlas = SurfaceAnalyzer.analyze(asserted)
+    val assertedSentence = assertedAtlas.sentences.head
+    val refused = ChartProposalProvider.propose(
+      asserted,
+      assertedAtlas,
+      Vector(assertedSentence.id -> enterChart())
     )
-    assert(ChartProposalProvider.propose(source, atlas, Vector(s0.id -> sentenceBound)).isRight)
+    assert(
+      refused.left.exists(_.message.contains("is not the content address of its text")),
+      s"expected a content-address refusal, got $refused"
+    )
   }
 
   test("receipts record the chart origin") {

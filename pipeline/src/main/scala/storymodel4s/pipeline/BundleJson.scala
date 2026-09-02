@@ -42,9 +42,14 @@ private[pipeline] object BundleJson:
       "ordinal" -> ordinals.get(row.sentence).asJson
     )
     val rest = row match
-      case SentenceCoverage.Proposed(_, root) =>
-        Vector("kind" -> "proposed".asJson, "root" -> root.key.asJson)
-      case SentenceCoverage.Abstained(_, anchor, reason) =>
+      case SentenceCoverage.Proposed(root, fillers, unlicensed) =>
+        Vector(
+          "kind" -> "proposed".asJson,
+          "root" -> root.key.asJson,
+          "fillers" -> fillers.asJson,
+          "unlicensed" -> unlicensed.asJson
+        )
+      case SentenceCoverage.Abstained(anchor, reason) =>
         Vector(
           "kind" -> "abstained".asJson,
           "anchor" -> anchor.key.asJson,
