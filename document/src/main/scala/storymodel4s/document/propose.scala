@@ -5,6 +5,7 @@ import cats.syntax.all.*
 import storymodel4s.acquire.*
 import storymodel4s.core.*
 import storymodel4s.core.TextNorm.lower as foldCase
+import storymodel4s.features.CanonicalDouble
 import storymodel4s.proposition.{
   Canonical,
   ChartOrigin,
@@ -1106,6 +1107,13 @@ object ChartProposalProvider:
       Stage
     )
 
+  /** A score as it enters an identity preimage: IEEE-754 bits, with negative zero folded onto
+    * zero. `Credence` already refuses non-finite scores, so the only way two scores could compare
+    * equal yet digest differently is `-0.0`; equality must imply one identity.
+    */
+  private def canonicalScore(score: Double): String =
+    CanonicalDouble.render(if score == 0.0 then 0.0 else score)
+
   private def renderSpans(spans: SpanSet): String =
     spans.refs.toVector
       .map(r => s"${r.unit.fold("-")(_.value)}:${r.span.start}:${r.span.endExclusive}")
@@ -1115,7 +1123,7 @@ object ChartProposalProvider:
     chart.alignments
       .map(a =>
         s"${a.target.conceptIds.toVector.sorted.map(_.value).mkString("+")}=" +
-          s"${renderSpans(a.spans)}@${a.credence.rawScore}"
+          s"${renderSpans(a.spans)}@${canonicalScore(a.credence.rawScore)}"
       )
       .sorted
       .mkString(";")
@@ -1237,4 +1245,4 @@ object ChartProposalProvider:
       call.outputChecksum.hex,
       call.seed.fold("")(_.toString),
       call.cached.toString
-    ) ++ call.params.toVector.sorted.map((k, v) => s"$k=$v")).mkString(" ")
+    ) ++ call.params.toVector.sorted.map((k, v) => s"$k=$v")).mkString("\u0000")

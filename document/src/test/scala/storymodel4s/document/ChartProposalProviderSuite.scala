@@ -635,6 +635,21 @@ class ChartProposalProviderSuite extends FunSuite:
     )
   }
 
+  test("scores that compare equal have one identity: negative zero digests as zero") {
+    val positiveZero = Vector(s0.id -> enterChart(alignments = Vector(align(s0, "entered", c0, 0.0))))
+    val negativeZero = Vector(s0.id -> enterChart(alignments = Vector(align(s0, "entered", c0, -0.0))))
+    assert(0.0 == -0.0, "the two scores must compare equal for this court to mean anything")
+    assertNotEquals(
+      java.lang.Double.doubleToLongBits(0.0),
+      java.lang.Double.doubleToLongBits(-0.0),
+      "and their bit patterns must differ, or the fold is untested"
+    )
+    assertEquals(
+      ChartProposalProvider.chartsDigest(negativeZero),
+      ChartProposalProvider.chartsDigest(positiveZero)
+    )
+  }
+
   test("receipts bind the source checksum, the rules checksum, and the chart receipts") {
     val charts = Vector(s0.id -> enterChart(), s1.id -> restChart())
     val proposals = propose(charts)
@@ -651,7 +666,7 @@ class ChartProposalProviderSuite extends FunSuite:
     assertEquals(
       input.receipt.stages.map(_._2.hex),
       Vector(
-        "3124df03ab44d13d6ecba704f33302495d89f541c247136691883d5a08c8fb47",
+        "ca098dfba74c48f09213cfea0c48e4de6bc211b67231ae64e8c684bd05420c90",
         "84eabe6fc497fe56d1e5d473efc5f1eaa4a8395a2209adb60acad67dfd7a3bfb"
       )
     )
