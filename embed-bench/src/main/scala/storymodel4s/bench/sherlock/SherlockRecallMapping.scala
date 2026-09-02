@@ -3,6 +3,8 @@ package storymodel4s.bench.sherlock
 import java.nio.charset.StandardCharsets
 import java.nio.file.{Files, Paths}
 
+import io.circe.parser.parse as parseJson
+
 import storymodel4s.acquire.SherlockAnnotations
 import storymodel4s.acquire.SherlockAnnotations.Atlas
 import storymodel4s.bench.video.{
@@ -56,6 +58,28 @@ object SherlockAnnotationView:
     * source mass, and a bundled arm cannot say which half caused it. `enriched` keeps the bundled
     * meaning for the record of that run; `enriched-leaf` and `enriched-scene` isolate the halves.
     */
+  /** Machine scene descriptions, keyed by atlas scene ordinal, from a study run of the `media`
+    * captioning court. Supplied by path, never fetched: the file is a recorded outcome whose model
+    * pin and frame digest live beside it.
+    *
+    * Why the scene level: three quarters of the distant recall-anchor confusions measured on the
+    * development recalls cross a scene boundary, and a scene node's text is otherwise a
+    * near-contentless label such as "2. War Scene". Unlike the location-and-cast enrichment, whose
+    * vocabulary recurs across the episode and measurably spread mass rather than concentrating it,
+    * a caption is high-cardinality: it describes what is distinctively in view.
+    */
+  lazy val sceneCaptions: Map[Int, String] =
+    sys.env.get("STORYMODEL4S_SCENE_CAPTIONS").map(_.trim).filter(_.nonEmpty) match
+      case None => Map.empty
+      case Some(path) =>
+        val text = new String(Files.readAllBytes(Paths.get(path)), StandardCharsets.UTF_8)
+        parseJson(text).toOption
+          .flatMap(_.hcursor.downField("captions").as[Map[String, String]].toOption)
+          .map(_.flatMap { case (k, v) => k.toIntOption.map(_ -> v) })
+          .getOrElse(
+            throw new IllegalArgumentException(s"scene captions at $path have no captions object")
+          )
+
   private def enrichLeaves: Boolean =
     sourceTextPolicy == "enriched" || sourceTextPolicy == "enriched-leaf"
   private def enrichScenes: Boolean =
@@ -94,7 +118,12 @@ object SherlockAnnotationView:
             TimedSegment.Group(
               s.ordinal,
               s.label,
-              if enrichScenes then Some(enrichedGroup(atlas, s.ordinal, s.label)) else None
+              sceneCaptions
+                .get(s.ordinal)
+                .map(c => s"${s.label}. $c")
+                .orElse(
+                  if enrichScenes then Some(enrichedGroup(atlas, s.ordinal, s.label)) else None
+                )
             )
           ),
         extraLemmas = stemsOf(row.namesAll) ++ stemsOf(row.namesSpeaking) ++
@@ -127,6 +156,7 @@ object SherlockAnnotationView:
   val built = SherlockAnnotationView.build(atlas)
   println(s"annotation rows: ${atlas.rows.size}; scenes: ${atlas.scenes.size}")
   println(s"source text policy: ${SherlockAnnotationView.sourceTextPolicy}")
+  println(s"scene captions: ${SherlockAnnotationView.sceneCaptions.size}")
 
   val csv = new String(Files.readAllBytes(Paths.get(recallCsv)), StandardCharsets.UTF_8)
   val words = RecallWordsCsv.parse(csv).fold(e => throw new IllegalArgumentException(e), identity)
