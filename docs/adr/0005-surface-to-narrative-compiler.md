@@ -700,3 +700,145 @@ embedded branch, a `:domain` reaching a literal or nothing, an entity with no `:
 lexical entity outside the coordination set. `CompilerSuite` drives the non-branch source through
 the compiler. `StoryBuildSuite`'s captured court pins the fifty-sentence ledger. Mutation ledger:
 see the landing commit.
+
+## Amendment, 2026-09-02 — slice 1.7: referentiality, and a title is not a filename
+
+**Decider:** `claude-storymodel4s` (single-developer mode, SD5: the author writes and decides the
+ADR, and records the rejected alternative on the day).
+
+Two things the built model **said** that were not true. Both are closed by rules with names, both
+rules are written into `ChartProposalProvider.RulesText` so the prompt-package checksum and the
+provenance config hash move with them, and both carry a mutation proof.
+
+### 7. Referentiality is decided by the role and the concept together
+
+`role-referentiality-rule`. A chart filler is a referent of its root — and so mints an entity
+mention and a participant edge — only when **both** hold:
+
+- the **role takes a referent**: `Agent`, `Patient`, `Theme`, `Experiencer`, `Stimulus`,
+  `Instrument`, `Beneficiary`, `Source`, `Destination`, `Location`, plus this provider's own
+  `Custom("amr", "domain")` (below);
+- the **concept can denote one**: `ConceptKind.Entity` or `ConceptKind.Name`.
+
+`Time` and `Manner` license a **circumstance**, not a participant. `Cause` and `Result` relate
+eventualities. Every other `Custom` role is `Unestablished` and licenses nothing.
+
+*Why the rule was needed.* `scanFillers` admitted any entity-kind filler whose role normalized to
+exactly one `ParticipantRole`, and `Time` and `Manner` normalize like any other role. So the model
+carried `then`, `now`, `midnight`, `night`, `thus` and `together` as entities holding participant
+roles. A time is not a participant and an adverb is not a cast member, and every measurement over
+the entity layer — turnover above all — was counting them.
+
+*Rejected: deciding referentiality from the role alone.* That is the rule that produced the defect.
+It also lets a `Quantity` filler into the cast, where a measure of a referent would be published as
+one.
+
+*Rejected: deciding it from the concept kind alone.* `KindWitness.entity` already does exactly that
+and admits `Entity | Name | Quantity`; kind cannot see that `:time (n / night)` is a time.
+
+*Rejected: `Location` admits an entity only when the filler "is a place".* This is what the slice
+plan asked for, and it is not derivable. No chart signal separates a place from an entity standing
+in for one, and a word list deciding it would be world knowledge asserted by the layer that exists
+to refuse world knowledge. `Location` is therefore referential on the same footing as the others: a
+canoe, a log and a named village are referents. The cost is that the deictic `there` stays an
+entity, which is stated here rather than hidden.
+
+*Rejected: refusing every `Custom` role, `amr:domain` included.* Tried, and it dropped a real
+referent. `:domain` is minted by `NamedRoles` for the predicative shape `(d / dead :domain (h / he))`
+and its filler is the concept the state holds of. `:domain` is a `Custom` because it names no
+*thematic* role, which is a different question from whether it takes a referent. The exception is
+named, `Referentiality.PredicationSubject`, and every other `Custom` — `amr:purpose` included —
+stays refused, fail-closed.
+
+### 8. A `:time` or `:manner` filler is recorded, not discarded
+
+`situation-circumstance-rule`, `ClaimFamily.SituationCircumstance`, ordinary policy. The filler
+becomes a `story.CircumstanceEdge` on its situation, carrying `CircumstanceKind` (`Time`/`Manner`),
+the **source's own word**, its own `SpanSet` from the filler's alignments, and a `ClaimMeta`. The
+input court refuses a filler proposed as both a participant and a circumstance of one situation.
+
+*Rejected: dropping the filler.* Trades one falsehood for a silence; the words are evidence the
+source really carries.
+
+*Rejected: normalizing the label to an instant, a date or an interval.* `midnight` and `then` are
+what the source said. Placing a circumstance on a timeline is a different claim with a different
+licence, and this edge asserts only that the situation's own words said this much.
+
+*Rejected: recording it only in the coverage ledger and the receipts.* That was the fallback if a
+`story` type change proved too wide. It did not: `RelationLayers` gains one defaulted field, and
+the family follows the participant family's existing shape end to end.
+
+`SentenceCoverage.Proposed` and `CoordinatedBranch.Admitted` now carry `FillerCounts(referents,
+circumstances, nonReferential, unlicensed)`, whose four counters sum to every filler the scan saw.
+*Rejected: one "not proposed" counter.* Four states with one number is the defect this file is
+mostly about.
+
+### 9. A filename is not a title
+
+`title-summary-rule` publishes a summary only from `StorySource.establishedTitle`, which returns a
+title **and** the recorded basis for carrying it. `TitleProvenance` has one case, `CallerSupplied`,
+because a caller stating it is the only basis this project has ever established. `StoryTitle` is a
+checked non-case type; `StorySource.titled` is the only way to record value and provenance
+together. The pipeline no longer reads `textPath.getFileName`; `storyBuild` and `claudeParse` take
+an optional trailing title argument.
+
+*Why.* The pipeline passed the input file's name as the title, the provider proposed it as the
+story summary, and the compiler accepted it at credence 1.0 under calibration model
+`title-rule-v1`. The model asserted, with a receipt, that the narrative is called `wog.txt`.
+
+*Rejected: deriving a title from the file and marking it low-confidence.* A default epistemic
+status is a fabricated license (design contract item 7). The problem is not the weight; it is that
+nothing entitles the claim.
+
+*Rejected: a vararg-free `title: String = ""`.* An absent title and an empty one are different
+facts about what the caller said, and one `String` cannot carry both.
+
+*Rejected: making `StorySource.title` itself a `StoryTitle`.* Wider than the slice, and it would
+give one field a provenance the others do not have. The provenance lives in `metadata` under
+`TitleProvenance.MetadataKey`, so a source built before this rule reads back as a title with **no
+recorded provenance** — which is what it is — rather than one silently promoted.
+
+**Consequence, accepted.** With no title the summary family is unresolved, there is no story
+segment, no situation sits under a primary root, and the model does not promote to validated. That
+is the honest outcome for a bare text file. The fix for it is a real summary rule that reads the
+story, not a better filename.
+
+### Schema
+
+`StoryModel.SchemaVersion` and `codec.SchemaVersions.Current` move `0.1.0` → `0.2.0`, because
+`circumstances` is a required encoded field. **`Migration.steps` deliberately has no step for
+0.1.0**: a 0.1.0 model has no circumstance layer because the rule that fills it did not exist, so
+reading one as `circumstances: []` would publish "evaluated and found none" for a model that never
+evaluated. A 0.1.0 artifact is refused with a typed `UnsupportedSchema` and rebuilt from its source.
+
+### What moved, measured by replaying the fifty captured replies
+
+With the story's title stated by the caller, so the measurement isolates the entity rule:
+
+| | before | after |
+|---|---|---|
+| entities | 35 | 29 |
+| participant edges | 68 | 57 |
+| circumstance edges | 0 | 11 |
+| claims | 398 | 386 |
+
+The six entities that left are `then`, `now`, `midnight`, `night`, `thus`, `together`. Nothing was
+discarded: the eleven fillers behind them are the nine `:time` and two `:manner` ones, all recorded
+as circumstances with their own spans.
+
+**Not closed, and stated rather than hidden.** Two entities the slice plan names as defects survive,
+because the charts do not support removing them. `other` ("the other went home") is a nominal
+referent under `Agent` and is correctly an entity. `sick` ("He did not feel sick") arrives as
+`ConceptKind.Entity` under `:ARG1` in the one recording that produced it, while another recording
+writes the same word as `sick :domain i2`, which `ToChart` classifies `Property` and the entity
+witness already excludes. The disagreement is in the charts, not in this rule; the fix belongs to
+the parser prompt or `ToChart`'s kind rule and is a different defect.
+
+Evidence: `ReferentialitySuite` (document) proves the closed role list complete against
+`ParticipantRole`'s own mirror and pins every licence. `ChartProposalProviderSuite` courts the time
+filler becoming a circumstance, the quantity filler refused by the concept coordinate with its
+reason on the receipt, and the unestablished title abstaining under its own reason.
+`TrajectoryCompilerSuite` courts the circumstance edge, the both-roles refusal, and the unknown
+endpoint. `StoryBuildSuite` pins the fifty-sentence entity count, the entity label set, the
+circumstance histogram, the no-title consequence, and that no bundle file names the input file.
+Mutation ledger: see the landing commits.
