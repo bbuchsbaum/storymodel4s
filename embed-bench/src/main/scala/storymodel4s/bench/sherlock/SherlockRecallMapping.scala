@@ -82,6 +82,14 @@ object SherlockAnnotationView:
 
   private def enrichLeaves: Boolean =
     sourceTextPolicy == "enriched" || sourceTextPolicy == "enriched-leaf"
+  /** Samples per scene and word budget for the digest control, chosen to match what the captioner
+    * saw and produced: eight evenly spaced frames, and a median caption of 85 words.
+    */
+  private val DigestSamples = 8
+  private val DigestWords = 85
+
+  private def digestScenes: Boolean = sourceTextPolicy == "digest-scene"
+
   private def enrichScenes: Boolean =
     sourceTextPolicy == "enriched" || sourceTextPolicy == "enriched-scene"
 
@@ -106,6 +114,29 @@ object SherlockAnnotationView:
       (if cast.isEmpty then Vector.empty else Vector(cast.mkString(", ")))
     parts.mkString(". ")
 
+  /** The control the caption arm needs: a scene's own coder descriptions, sampled the way the
+    * frames were sampled.
+    *
+    * A caption arm moves two things at once against baseline. The scene node gains content, and
+    * that content is visual. This control gives the scene node content of the same shape and length
+    * with nothing visual in it, so the gap between the two arms is what the camera contributed
+    * beyond what a human coder had already written down. Eight descriptions are taken at evenly
+    * spaced midpoints across the scene, mirroring the captioner's eight evenly spaced frames, and
+    * the text is truncated to the captions' median length so that length is not the difference
+    * being measured.
+    */
+  private def digestGroup(atlas: Atlas, ordinal: Int, label: String): String =
+    val rows = atlas.rows.filter(r => atlas.sceneOf(r.row).exists(_.ordinal == ordinal))
+    val picks =
+      if rows.size <= DigestSamples then rows
+      else
+        Vector
+          .tabulate(DigestSamples)(k => rows((k * 2 + 1) * rows.size / (DigestSamples * 2)))
+          .distinct
+    val words =
+      picks.map(_.description.trim).filter(_.nonEmpty).mkString(" ").split("\\s+").toVector
+    (Vector(label + ".") ++ words.take(DigestWords)).mkString(" ")
+
   def segments(atlas: Atlas): Vector[TimedSegment] =
     atlas.rows.map { row =>
       TimedSegment(
@@ -122,7 +153,9 @@ object SherlockAnnotationView:
                 .get(s.ordinal)
                 .map(c => s"${s.label}. $c")
                 .orElse(
-                  if enrichScenes then Some(enrichedGroup(atlas, s.ordinal, s.label)) else None
+                  if enrichScenes then Some(enrichedGroup(atlas, s.ordinal, s.label))
+                  else if digestScenes then Some(digestGroup(atlas, s.ordinal, s.label))
+                  else None
                 )
             )
           ),

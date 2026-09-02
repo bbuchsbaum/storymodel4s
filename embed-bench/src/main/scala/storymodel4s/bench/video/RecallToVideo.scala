@@ -325,7 +325,7 @@ object RecallToVideo:
       model <- sys.env.get("STORYMODEL4S_ONNX_MODEL")
       tokenizer <- sys.env.get("STORYMODEL4S_ONNX_TOKENIZER")
     yield OnnxSentenceArtifacts(Paths.get(model), Paths.get(tokenizer))
-    val (semantic, channelLabel, embedderToClose) = neuralArtifacts match
+    val (baseSemantic, baseChannelLabel, embedderToClose) = neuralArtifacts match
       case Some(artifacts) =>
         val embedder = OnnxSentenceEmbedder
           .open(OnnxSentenceModel.AllMiniLmL6V2, artifacts)
@@ -340,6 +340,22 @@ object RecallToVideo:
           "lexical-jaccard [semantic=lexical-baseline; free fallback]",
           None
         )
+    // Optional lexical re-ranking of that channel. Off unless asked for, so the default derivation
+    // is untouched. The weight is on the semantic side and 1.0 reproduces the unblended channel
+    // exactly, which makes the no-op case checkable rather than merely intended. Like the candidate
+    // policy this changes the report's identity: a re-ranked channel is a different derivation.
+    val blendAlpha = sys.env
+      .get("STORYMODEL4S_LEXICAL_BLEND")
+      .flatMap(_.trim.toDoubleOption)
+      .filter(a => a > 0.0 && a <= 1.0)
+    val (semantic, channelLabel) = blendAlpha match
+      case Some(alpha) =>
+        (
+          LexicalBlend.blended(baseSemantic, recall.ordered, built.view, built.nodeTexts, alpha),
+          s"$baseChannelLabel + lexical-blend:bm25 alpha=$alpha"
+        )
+      case None => (baseSemantic, baseChannelLabel)
+
     // Candidate nomination. The defaults are the historical values and are what runs unless a
     // caller overrides them: top-8 semantic nominations per hierarchy level, lexical overlap off.
     // The lexical-overlap channel was disabled because with fine-grained segments and recurring
