@@ -141,6 +141,25 @@ class StoryBuildSuite extends FunSuite:
     entries(from).foreach(source => Files.copy(source, into.resolve(source.getFileName.toString)))
     into
 
+  /** The fifty captured replies from the first live run are committed but no court reads them, so
+    * nothing else here would notice if one were named by a key this driver does not derive. That
+    * matters now: the key schema moved to `agent-recording/v2` and all fifty were renamed. The set
+    * equality below is the falsifier for that rename -- a single wrong name fails it, in either
+    * direction, and no assertion about their content is made.
+    */
+  test("the fifty captured replies are named by exactly the keys the driver derives") {
+    val dir = work("captured")
+    val outcome = parsed(wogText(dir), capturedRecordings)
+    val derived = outcome.recordingKeys.map(_.checksum.hex).toSet
+    val onDisk = entries(capturedRecordings)
+      .map(_.getFileName.toString.stripSuffix(".json"))
+      .toSet
+    assertEquals(outcome.recordingKeys.size, 50)
+    assertEquals(derived.size, 50, "two sentences derived the same recording key")
+    assertEquals(onDisk.size, 50)
+    assertEquals(onDisk, derived)
+  }
+
   test("both recording sets are the three authored replies, keyed to their own source") {
     val dir = work("recordings")
     val cases = Vector(

@@ -54,9 +54,11 @@ What it is:
   `cached` only when every sentence was served from a recording that existed
   before the run and was admitted on read, and `liveCalls` never counts a
   corrupt recording (no call is made for it). `ClaudeParseDriver.run` takes
-  an `ExchangeSource`: `Anthropic` (the SDK behind the environment court) or
-  `Scripted` (an offline client with fixed replies), so the record path is
-  tested without spend. Stdout carries counts and checksums only. Exit
+  an `ExchangeSource`: `Court` (the client the environment court's backend
+  implies, and the default), `Anthropic` or `OpenAiCompatible` (the same, with
+  the court checked against that expectation; a disagreement is refused, never
+  coerced), or `Scripted` (an offline client with fixed replies), so the record
+  path is tested without spend. Stdout carries counts and checksums only. Exit
   status: 2 when the run could not start, 1 when any sentence never reached
   the court, 0 otherwise.
 
@@ -64,9 +66,88 @@ Environment:
 
 | variable | meaning |
 |---|---|
-| `STORYMODEL4S_ANTHROPIC_API_KEY` | preferred key; a blank value counts as absent |
-| `ANTHROPIC_API_KEY` | fallback key; a blank value counts as absent |
-| `STORYMODEL4S_AGENT_LIVE=1` | required in addition to a key before any live call |
+| `STORYMODEL4S_AGENT_BACKEND` | `anthropic` (the default when absent) or `openai`; any other value is refused |
+| `STORYMODEL4S_ANTHROPIC_API_KEY` | preferred Anthropic key; a blank value counts as absent |
+| `ANTHROPIC_API_KEY` | fallback Anthropic key; a blank value counts as absent |
+| `STORYMODEL4S_OPENAI_BASE_URL` | required for `openai`; an absolute http(s) URL, version prefix included |
+| `STORYMODEL4S_OPENAI_MODEL` | required for `openai`; the model id the server serves |
+| `STORYMODEL4S_OPENAI_API_KEY` | the `openai` key; may be blank only for a loopback host |
+| `STORYMODEL4S_AGENT_LIVE=1` | required in addition to the above before any live call |
+
+## Backends
+
+Two model backends exist, and the identity a run publishes is derived from the
+one the environment names, never written as a constant. `anthropic` reaches the
+hosted model through the Java SDK; `openai` reaches any server speaking the
+OpenAI chat-completions shape through `java.net.http` and circe, with no added
+dependency. A run publishes `provider = anthropic` or
+`provider = openai-compatible:<host>[:<port>]`, `model` = the configured model
+id, and `sdkVersion` = `anthropic-java/<pin>` or `java.net.http/jdk-<N>`.
+
+OpenRouter:
+
+```
+export STORYMODEL4S_AGENT_BACKEND=openai
+export STORYMODEL4S_OPENAI_BASE_URL=https://openrouter.ai/api/v1
+export STORYMODEL4S_OPENAI_MODEL=meta-llama/llama-3.1-70b-instruct
+export STORYMODEL4S_OPENAI_API_KEY=...        # required: the host is not loopback
+export STORYMODEL4S_AGENT_LIVE=1
+```
+
+Ollama:
+
+```
+export STORYMODEL4S_AGENT_BACKEND=openai
+export STORYMODEL4S_OPENAI_BASE_URL=http://127.0.0.1:11434/v1
+export STORYMODEL4S_OPENAI_MODEL=llama3.1:8b
+export STORYMODEL4S_AGENT_LIVE=1              # no key: the host is loopback
+```
+
+vLLM:
+
+```
+export STORYMODEL4S_AGENT_BACKEND=openai
+export STORYMODEL4S_OPENAI_BASE_URL=http://127.0.0.1:8000/v1
+export STORYMODEL4S_OPENAI_MODEL=meta-llama/Meta-Llama-3.1-8B-Instruct
+export STORYMODEL4S_AGENT_LIVE=1
+```
+
+LM Studio is the same shape on `http://127.0.0.1:1234/v1`.
+
+The loopback rule: a blank or absent `STORYMODEL4S_OPENAI_API_KEY` is admitted
+only when the base URL's host is `127.0.0.1`, `localhost`, or `::1`. A remote
+server reached with no key is a configuration error, not a free call, so it is
+refused before anything is read.
+
+The base URL must carry no `user:password@` userinfo. Put the key in
+`STORYMODEL4S_OPENAI_API_KEY`, which is the one place this module keeps it. A URL
+that names a credential is refused, and neither URL refusal repeats the value it
+rejected. The model id must also be at most 84 characters with no whitespace or
+control characters, because it becomes part of the runtime identity every receipt
+publishes; a name that could not survive that is refused here rather than
+throwing later.
+
+What is sent and what is read: one POST to `{base}/chat/completions` carrying
+`model`, `max_tokens`, and exactly two messages (`system` = the prompt package,
+`user` = the rendered sentence). No temperature, top_p, seed, or streaming flag.
+The reply must carry `choices[0].message.content`, a `finish_reason`
+(`stop`/`length`/`content_filter` map to the three known stop reasons and
+anything else is kept verbatim as an unexpected stop), and a `usage` block; a
+reply with no usage is refused rather than recorded with zeros, because an
+unmeasured count must not be indistinguishable from a measured one. Cache reads
+are absent, not zero, since this wire shape does not report them. Retries: at
+most two, only on 429 or 5xx, backing off 200 ms then 400 ms, so one reply may
+stand behind up to three attempts, each bounded by the request's `timeoutMillis`.
+The key is written into the `Authorization` header and nowhere else; redirects
+are never followed, so it cannot be replayed to a host the court never admitted.
+
+Per-backend quality is a measured coverage number for a given corpus, not a
+property of this adapter. Nothing here claims that a local 8B model parses the
+prompt package as well as a hosted one; run the corpus and read the counts.
+
+The recording key carries the provider label alongside the model id, so a hosted
+model and a local server advertising the same model id cannot share a recording.
+The key schema is `agent-recording/v2`; `v1` recordings do not replay under it.
 
 Modes: `replay` opens an existing recordings directory (a missing one is
 refused, never created) and never calls the model; a missing recording is

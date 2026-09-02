@@ -17,7 +17,7 @@ class LiveSmokeSuite extends FunSuite:
       s"${AgentCredentials.LiveVariable}=1 and a nonblank ${AgentCredentials.PrimaryKeyVariable} " +
         s"(or ${AgentCredentials.FallbackKeyVariable}) are required"
     )
-    val client = LiveModelClient.from(authorization.toOption.get)
+    val client = ModelClient.live(authorization.toOption.get)
     val store = Recordings
       .at(Files.createTempDirectory("provider-agent-live-smoke"))
       .fold(error => fail(error.message), identity)

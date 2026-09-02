@@ -103,6 +103,63 @@ class RemoteRuntimeSuite extends FunSuite:
     )
   }
 
+  /** The three fingerprint-bearing scalars are copied onto every `ProviderCall`, and a consumer
+    * concatenates them into a `Fingerprint` with the unchecked constructor. Anything the identifier
+    * rules would reject there has to be refused here, or it throws mid-parse instead.
+    */
+  test("an identity scalar the runtime fingerprint cannot represent is refused, not admitted") {
+    val unusable = Vector("java.net.http jdk-25", "claude sonnet 5", "model\tname", "a" * 85)
+    unusable.foreach { bad =>
+      assertEquals(
+        remote(provider = bad),
+        Left(ParserSetupFailure.invalidRuntimeField(ParserRuntimeField.Provider)),
+        s"'$bad' was admitted as a provider"
+      )
+      assertEquals(
+        remote(model = bad),
+        Left(ParserSetupFailure.invalidRuntimeField(ParserRuntimeField.Model)),
+        s"'$bad' was admitted as a model"
+      )
+      assertEquals(
+        remote(sdkVersion = bad),
+        Left(ParserSetupFailure.invalidRuntimeField(ParserRuntimeField.SdkVersion)),
+        s"'$bad' was admitted as an sdk version"
+      )
+    }
+    assert(remote(model = "a" * 84).isRight, "the longest representable model id was refused")
+  }
+
+  test("every admitted remote identity survives the fingerprint its consumers build") {
+    val runtime = admitted(remote())
+    val preimage = s"${runtime.provider}:${runtime.model}:${runtime.version}"
+    assertEquals(Fingerprint.from(preimage).isRight, true)
+    assertEquals(
+      3 * RuntimeIdentityScalar.MaxLength + 2 <= IdRules.MaxLength,
+      true,
+      "three capped scalars plus two separators no longer fit the identifier limit"
+    )
+  }
+
+  test("a pinned runtime refuses the same unrepresentable identity scalars") {
+    Vector("amrlib 0.7", "b" * 85).foreach { bad =>
+      assertEquals(
+        PinnedRuntime.from(bad, "model", "1", Vector.empty).swap.toOption.map(_.message),
+        Some(ParserSetupFailure.invalidRuntimeField(ParserRuntimeField.Provider).message),
+        s"'$bad' was admitted as a pinned provider"
+      )
+      assertEquals(
+        PinnedRuntime.from("provider", bad, "1", Vector.empty).swap.toOption.map(_.message),
+        Some(ParserSetupFailure.invalidRuntimeField(ParserRuntimeField.Model).message),
+        s"'$bad' was admitted as a pinned model"
+      )
+      assertEquals(
+        PinnedRuntime.from("provider", "model", bad, Vector.empty).swap.toOption.map(_.message),
+        Some(ParserSetupFailure.invalidRuntimeField(ParserRuntimeField.RuntimeVersion).message),
+        s"'$bad' was admitted as a pinned version"
+      )
+    }
+  }
+
   test("the cache key differs across prompt packages under one model") {
     val first = admitted(remote(promptPackage = promptA))
     val second = admitted(remote(promptPackage = promptB))

@@ -584,6 +584,39 @@ object RuntimeArtifact:
   * that difference must stay visible through `weightsPinned` rather than be laundered into one
   * shape that implies both were pinned the same way.
   */
+/** The lexical rule the three fingerprint-bearing identity scalars must satisfy.
+  *
+  * Why it exists here and not only at each caller: `provider`, `model`, and `version` are copied
+  * onto every `ProviderCall`, and a consumer concatenates them as `provider:model:version` into a
+  * `Fingerprint` built with the UNCHECKED constructor, whose lexical rules reject whitespace,
+  * control characters, and anything over 256 characters. An admission that only required nonblank
+  * therefore handed downstream code a value that throws `IllegalArgumentException` in the middle of
+  * a parse, where a typed refusal belongs. Measured 2026-09-02 with an OpenAI-compatible wrapper
+  * version of `java.net.http jdk-25`: `AmrCandidates.markerAlignment` threw and no court saw it.
+  *
+  * Why the length cap is 84 and not 256: three scalars plus two separators must fit inside the
+  * 256-character identifier limit, and `84 * 3 + 2 = 254`. Capping the parts is what makes the
+  * whole representable, so no caller has to reason about the join.
+  *
+  * Only these three are bound. The prompt package name and version reach a `PromptTemplateVersion`
+  * through a checked constructor whose refusal is already typed, so they keep the nonblank rule.
+  */
+object RuntimeIdentityScalar:
+  /** Longest a single identity scalar may be so that `provider:model:version` stays representable.
+    */
+  val MaxLength: Int = 84
+
+  /** Whether this value can be concatenated into a runtime fingerprint without throwing. */
+  def isSafe(value: String): Boolean =
+    value.nonEmpty && value.length <= MaxLength &&
+      !value.exists(character => character.isWhitespace || character.isControl)
+
+  /** The first field whose value cannot become part of a runtime identity, if any. */
+  private[parser] def firstUnsafe(
+      scalars: Vector[(ParserRuntimeField, String)]
+  ): Option[ParserRuntimeField] =
+    scalars.collectFirst { case (field, value) if !isSafe(value) => field }
+
 sealed trait RuntimeIdentity:
   def provider: String
   def model: String
@@ -644,9 +677,7 @@ object PinnedRuntime:
       ParserRuntimeField.Model -> model,
       ParserRuntimeField.RuntimeVersion -> version
     )
-    scalars.collectFirst {
-      case (field, value) if !value.exists(c => !c.isWhitespace) => field
-    } match
+    RuntimeIdentityScalar.firstUnsafe(scalars) match
       case Some(field) => Left(ParserSetupFailure.invalidRuntimeField(field))
       case None if additionalRequired.exists(component => !RuntimeComponent.isValid(component)) =>
         Left(ParserSetupFailure.invalidRuntimeField(ParserRuntimeField.DependencyName))
@@ -746,7 +777,9 @@ final class RemoteRuntime private (
       s"${promptPackage.version},checksum=${checksum.short()})"
 
 object RemoteRuntime:
-  /** Admit a remote runtime only when every identity scalar is nonblank; derive its fingerprint. */
+  /** Admit a remote runtime only when the three fingerprint-bearing scalars satisfy
+    * [[RuntimeIdentityScalar]] and the remaining ones are nonblank; derive its fingerprint.
+    */
   def from(
       provider: String,
       model: String,
@@ -755,17 +788,21 @@ object RemoteRuntime:
       promptTextChecksum: Checksum,
       resultSchema: String
   ): Either[ParserSetupFailure, RemoteRuntime] =
-    val scalars = Vector(
+    val identity = Vector(
       ParserRuntimeField.Provider -> provider,
       ParserRuntimeField.Model -> model,
-      ParserRuntimeField.SdkVersion -> sdkVersion,
+      ParserRuntimeField.SdkVersion -> sdkVersion
+    )
+    val nonblank = Vector(
       ParserRuntimeField.PromptPackageName -> promptPackage.name,
       ParserRuntimeField.PromptPackageVersion -> promptPackage.version,
       ParserRuntimeField.ResultSchema -> resultSchema
     )
-    scalars.collectFirst {
-      case (field, value) if !value.exists(c => !c.isWhitespace) => field
-    } match
+    RuntimeIdentityScalar
+      .firstUnsafe(identity)
+      .orElse(nonblank.collectFirst {
+        case (field, value) if !value.exists(c => !c.isWhitespace) => field
+      }) match
       case Some(field) => Left(ParserSetupFailure.invalidRuntimeField(field))
       case None        =>
         val rendered =

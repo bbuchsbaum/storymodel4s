@@ -37,6 +37,14 @@ object DriverMode:
 enum DriverError:
   case UnknownMode(raw: String)
   case LiveRefused(refusal: LiveRefusal)
+
+  /** The environment names no usable backend; fires in `replay` too, where nothing can spend. */
+  case BackendRefused(refusal: BackendRefusal)
+
+  /** The caller named a backend and the environment court admitted a different one. Refused rather
+    * than coerced: either answer would be a provenance nobody chose.
+    */
+  case BackendMismatch(requested: String, admitted: String)
   case RecordingsUnavailable(error: RecordingsError)
   case TextUnreadable(path: String, reasonChecksum: Checksum)
   case SourceInvalid(detail: String)
@@ -48,17 +56,19 @@ enum DriverError:
   case ReceiptInvalid(detail: String)
 
   def message: String = this match
-    case UnknownMode(raw)             => s"unknown mode '$raw'; expected replay or record"
-    case LiveRefused(refusal)         => refusal.message
-    case RecordingsUnavailable(error) => error.message
-    case TextUnreadable(path, reason) => s"cannot read $path (reason ${reason.short()})"
-    case SourceInvalid(detail)        => s"story source refused: $detail"
-    case InputInvalid(detail)         => s"parser input refused: $detail"
-    case PromptUnavailable(error)     => error.message
-    case TransportRefused(error)      => s"transport refused: ${error.message}"
-    case ConfigInvalid(detail)        => s"parser config refused: $detail"
-    case OutputUnwritable(path, sum)  => s"cannot write $path (reason ${sum.short()})"
-    case ReceiptInvalid(detail)       => s"build receipt refused: $detail"
+    case UnknownMode(raw)                     => s"unknown mode '$raw'; expected replay or record"
+    case LiveRefused(refusal)                 => refusal.message
+    case BackendRefused(refusal)              => refusal.message
+    case BackendMismatch(requested, admitted) => s"$requested was asked for, $admitted admitted"
+    case RecordingsUnavailable(error)         => error.message
+    case TextUnreadable(path, reason)         => s"cannot read $path (reason ${reason.short()})"
+    case SourceInvalid(detail)                => s"story source refused: $detail"
+    case InputInvalid(detail)                 => s"parser input refused: $detail"
+    case PromptUnavailable(error)             => error.message
+    case TransportRefused(error)              => s"transport refused: ${error.message}"
+    case ConfigInvalid(detail)                => s"parser config refused: $detail"
+    case OutputUnwritable(path, sum)          => s"cannot write $path (reason ${sum.short()})"
+    case ReceiptInvalid(detail)               => s"build receipt refused: $detail"
 
 /** How one sentence's reply was obtained, derived from the recordings store before and after the
   * run rather than from the mode argument.
@@ -195,18 +205,33 @@ object DriverSummary:
       receiptChecksum
     )
 
-/** Where the driver obtains its client for `record` mode: the SDK behind the environment court, or
-  * an offline scripted client so the record path can be exercised without spend. Both pass the
-  * environment court first; the source decides only what answers once the court has admitted.
+/** Where the driver obtains its client for `record` mode. Every case passes the environment court
+  * first; the source decides only what answers once the court has admitted.
+  *
+  * Why the default is [[ExchangeSource.Court]] and not a named provider: the backend is decided by
+  * configuration, so a call site that named one would be asserting a provenance the environment
+  * owns. The two named cases exist for a caller that wants the court checked against an
+  * expectation; a disagreement is [[DriverError.BackendMismatch]], never a silent coercion.
   */
-sealed trait ExchangeSource
+sealed trait ExchangeSource:
+  def render: String
 
 object ExchangeSource:
-  /** The Anthropic SDK client, built only from an admitted `LiveAuthorization`. */
-  case object Anthropic extends ExchangeSource
+  /** Whatever backend the environment court admitted; the default, so no call site names one. */
+  case object Court extends ExchangeSource:
+    def render: String = "court"
+
+  /** Insist the court admitted the Anthropic backend, and take the SDK client. */
+  case object Anthropic extends ExchangeSource:
+    def render: String = ModelBackend.AnthropicProvider
+
+  /** Insist the court admitted an OpenAI-compatible backend, and take the HTTP client. */
+  case object OpenAiCompatible extends ExchangeSource:
+    def render: String = ModelBackend.OpenAiCompatibleProviderPrefix.stripSuffix(":")
 
   /** An offline client with fixed replies; for tests and dry runs. */
-  final case class Scripted(client: ScriptedModelClient) extends ExchangeSource
+  final case class Scripted(client: ScriptedModelClient) extends ExchangeSource:
+    def render: String = "scripted"
 
 /** Everything one text-to-charts run established, before any file is written.
   *
@@ -326,12 +351,32 @@ object ClaudeParseDriver:
 
   def transport(
       prompt: AgentPromptPackage,
-      exchange: ModelExchange
+      exchange: ModelExchange,
+      backend: ModelBackend = ClaudeParserTransport.DefaultBackend
   ): Either[DriverError, ClaudeParserTransport] =
     ClaudeParserTransport
-      .from(prompt, exchange, MaxTokens)
+      .from(prompt, exchange, MaxTokens, backend)
       .left
       .map(DriverError.TransportRefused(_))
+
+  /** The live client one admitted authorization implies, checked against what the caller expected.
+    *
+    * Why a check and not a coercion: [[ExchangeSource.Anthropic]] is an expectation about the
+    * environment, and an expectation the environment contradicts is a configuration error. Taking
+    * either side silently would publish receipts naming a provider nobody chose.
+    */
+  private[agent] def clientFor(
+      source: ExchangeSource,
+      admitted: LiveAuthorization
+  ): Either[DriverError, ModelClient] = (source, admitted) match
+    case (ExchangeSource.Court, _)             => Right(ModelClient.live(admitted))
+    case (ExchangeSource.Scripted(offline), _) => Right(offline)
+    case (ExchangeSource.Anthropic, anthropic: LiveAuthorization.Anthropic) =>
+      Right(LiveModelClient.from(anthropic))
+    case (ExchangeSource.OpenAiCompatible, openAi: LiveAuthorization.OpenAiCompatible) =>
+      Right(OpenAiCompatibleModelClient.from(openAi))
+    case (named, _) =>
+      Left(DriverError.BackendMismatch(named.render, admitted.backend.provider))
 
   /** Build the provider stack for one exchange: court, then per-sentence isolation. */
   def provider(
@@ -381,7 +426,7 @@ object ClaudeParseDriver:
       outDir: Path,
       env: Map[String, String],
       nowEpochMillis: Long,
-      source: ExchangeSource = ExchangeSource.Anthropic
+      source: ExchangeSource = ExchangeSource.Court
   ): Either[DriverError, DriverSummary] =
     for
       outcome <- parse(mode, textPath, recordingsDir, env, nowEpochMillis, source)
@@ -407,9 +452,10 @@ object ClaudeParseDriver:
       recordingsDir: Path,
       env: Map[String, String],
       nowEpochMillis: Long,
-      source: ExchangeSource = ExchangeSource.Anthropic
+      source: ExchangeSource = ExchangeSource.Court
   ): Either[DriverError, ParseOutcome] =
     for
+      backend <- AgentCredentials.backend(env).left.map(DriverError.BackendRefused(_))
       client <- mode match
         case DriverMode.Replay => Right(None)
         case DriverMode.Record =>
@@ -417,11 +463,7 @@ object ClaudeParseDriver:
             .from(env)
             .left
             .map(DriverError.LiveRefused(_))
-            .map { admitted =>
-              source match
-                case ExchangeSource.Anthropic         => Some(LiveModelClient.from(admitted))
-                case ExchangeSource.Scripted(offline) => Some(offline)
-            }
+            .flatMap(admitted => clientFor(source, admitted).map(Some(_)))
       text <- readText(textPath)
       story <- StorySource
         .fromText(text, Some(textPath.getFileName.toString))
@@ -438,8 +480,8 @@ object ClaudeParseDriver:
       exchange = client.fold[ModelExchange](new ModelExchange.Recorded(recordings))(admitted =>
         new ModelExchange.RecordingLive(admitted, recordings)
       )
-      claude <- transport(prompt, exchange)
-      keys = recordingKeys(claude.runtime, prompt, batch)
+      claude <- transport(prompt, exchange, backend)
+      keys = recordingKeys(backend, prompt, batch)
       present = keys.map(recordings.contains)
       result = provider(claude, parserConfig).parse(batch)
       services = keys.zip(present).map { (key, wasPresent) =>
@@ -497,13 +539,13 @@ object ClaudeParseDriver:
 
   /** The keys the transport will use, derived by the same rendering it performs. */
   private[agent] def recordingKeys(
-      runtime: RemoteRuntime,
+      backend: ModelBackend,
       prompt: AgentPromptPackage,
       batch: ParserBatch
   ): Vector[RecordingKey] =
     batch.inputs.map { input =>
       ModelRequest
-        .render(runtime.model, prompt, RequestItem.fromInput(input), MaxTokens, TimeoutMillis)
+        .render(backend, prompt, RequestItem.fromInput(input), MaxTokens, TimeoutMillis)
         .key
     }
 
