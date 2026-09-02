@@ -80,6 +80,12 @@ enum ClaimFamily:
   case EntityCoreference
   case SituationMention
   case ParticipantRole
+
+  /** The complete filler set a provider evaluated for one situation, possibly empty. Ordinary: it
+    * is a receipt over the situation's own evidence, and its acceptance is what licenses a
+    * trajectory step's entity turnover as a measured value rather than a default.
+    */
+  case ParticipantCoverage
   case Modality
   case ContextAssignment
   case TemporalRelation

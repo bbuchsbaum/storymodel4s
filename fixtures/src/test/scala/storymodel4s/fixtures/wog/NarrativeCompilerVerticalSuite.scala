@@ -1,22 +1,22 @@
 package storymodel4s.fixtures.wog
 
-import cats.data.NonEmptyVector
+import cats.data.{NonEmptySet, NonEmptyVector}
 import munit.FunSuite
-import storymodel4s.acquire.*
 import storymodel4s.align.*
 import storymodel4s.align.bridge.StorySourceView
 import storymodel4s.core.*
 import storymodel4s.document.*
 import storymodel4s.proposition.*
 import storymodel4s.recall.RecallSegmenter
-import storymodel4s.story.{Polarity as StoryPolarity, *}
+import storymodel4s.story.*
 
 /** The raw-source-to-signature court for ADR 0005.
   *
   * It uses the public-domain WOG source and a raw recall-style transcript, but never imports the
-  * hand-authored WOG narrative model. A deterministic fixture provider actually derives one
-  * sentence chart and the first-slice proposals and records the exact outputs it emitted. This is a
-  * mechanical reachability court, not a claim of WOG narrative coverage or scientific accuracy.
+  * hand-authored WOG narrative model. One hand-built checked chart for one sentence stands in for a
+  * parser; [[ChartProposalProvider]] derives every proposal from it and records exactly what it
+  * emitted. This is a mechanical reachability court, not a claim of WOG narrative coverage or
+  * scientific accuracy.
   */
 class NarrativeCompilerVerticalSuite extends FunSuite:
   private val source = StorySource
@@ -28,201 +28,74 @@ class NarrativeCompilerVerticalSuite extends FunSuite:
     .fold(e => fail(e.message), identity)
   private val atlas = SurfaceAnalyzer.analyze(source)
   private val selected = atlas.sentences(3)
+  private val chartStage = StageId.unsafe("wog-hand-chart")
+  private val aligner = Fingerprint.unsafe("wog:hand-chart:1")
 
-  private object DeterministicFixtureProvider:
-    val stage: StageId = StageId.unsafe("wog-deterministic-fixture-provider")
-    val fingerprint: Fingerprint = Fingerprint.unsafe("fixture:wog-lexical-rule:1")
-    val prompt: PromptPackageRef =
-      PromptPackageRef("deterministic-fixture-rule", "1", Checksum.ofText("no-prompt-rule-v1"))
+  private val c0 = ConceptId.unsafe("c0")
+  private val c1 = ConceptId.unsafe("c1")
+  private val c2 = ConceptId.unsafe("c2")
 
-    final case class Output(
-        chart: PropositionEvidence,
-        ref: ChartNodeRef,
-        evidence: Evidence,
-        situation: SituationAttempt,
-        context: ContextAssignmentAttempt,
-        summary: StorySummaryAttempt,
-        membership: SegmentMembershipAttempt,
-        calls: Vector[ProviderCall]
+  private def spanOf(unit: SurfaceUnit, word: String): SpanRef =
+    val text = atlas.text(unit)
+    val at = text.indexOf(word)
+    assert(at >= 0, s"'$word' is not in '$text'")
+    SpanRef(
+      Some(unit.id),
+      TextSpan.unsafe(unit.span.start + at, unit.span.start + at + word.length)
     )
 
-    def run(sentence: SurfaceUnit): Either[DomainError, Output] =
-      val text = atlas.text(sentence)
-      val lowercase = text.toLowerCase
-      val lexical = Vector("became" -> "become").find((surface, _) => lowercase.contains(surface))
-      lexical
-        .toRight(
-          DomainError.InvalidFormat("fixture-provider", text, "no deterministic predicate rule")
-        )
-        .flatMap { (_, lemma) =>
-          val evidence = Evidence(
-            EvidenceId.unsafe(ContentAddress.of("wog-fixture-evidence", sentence.id.value)),
-            Some(SpanSet.one(SpanRef(Some(sentence.id), sentence.span))),
-            Set.empty,
-            fingerprint,
-            stage
-          )
-          val chartCall = providerCall(
-            "lexical-chart-rule",
-            s"sentence=${sentence.id.value};predicate=$lemma"
-          )
-          val concept =
-            ConceptId.unsafe(ContentAddress.of("wog-fixture-concept", sentence.id.value))
-          val unchecked = PropositionChart.unchecked(
-            Some(concept),
-            Map(concept -> Concept.predicate(lemma)),
-            Vector.empty,
-            provenance =
-              ChartProvenance(ChartOrigin.Parser(fingerprint), Vector(chartCall), Vector.empty),
-            sentence = Some(sentence.id)
-          )
-          ChartValidator
-            .check(unchecked)
-            .left
-            .map(violations =>
-              DomainError.InvariantViolation("fixture-provider/chart", violations.toString)
-            )
-            .map(PropositionEvidence.of)
-            .map { chart =>
-              val ref = ChartNodeRef(sentence.id, concept)
-              val situationValue = SituationProposal(
-                SituationKind.State,
-                Predicate(lemma, None, lemma),
-                text,
-                StoryPolarity.Positive,
-                Modality.Asserted,
-                None
-              )
-              val (situation, situationCalls) = attempt(
-                "lexical-situation-rule",
-                situationValue,
-                evidence,
-                render = s"state:$lemma:$text"
-              )
-              val (contextA, contextCallsA) = attempt(
-                "unquoted-sentence-context-rule",
-                ContextAssignmentProposal.NarratedWorld,
-                evidence,
-                render = s"NarratedWorld:${sentence.id.value}"
-              )
-              val (contextB, contextCallsB) = attempt(
-                "no-reporting-marker-context-rule",
-                ContextAssignmentProposal.NarratedWorld,
-                evidence,
-                render = s"root-assertion:${sentence.id.value}"
-              )
-              val contextBundle = contextA.copy(
-                proposals = contextA.proposals ++ contextB.proposals
-              )
-              val (summary, summaryCalls) = attempt(
-                "extractive-summary-rule",
-                StorySummaryProposal(text),
-                evidence,
-                render = text
-              )
-              val (membershipA, membershipCallsA) = attempt(
-                "selected-sentence-membership-rule",
-                SegmentMembershipProposal.PrimaryStoryMember,
-                evidence,
-                render = s"primary:${sentence.id.value}"
-              )
-              val (membershipB, membershipCallsB) = attempt(
-                "single-unit-coverage-rule",
-                SegmentMembershipProposal.PrimaryStoryMember,
-                evidence,
-                render = s"only-unit:${sentence.id.value}"
-              )
-              val membershipBundle = membershipA.copy(
-                proposals = membershipA.proposals ++ membershipB.proposals
-              )
-              Output(
-                chart,
-                ref,
-                evidence,
-                SituationAttempt(ref, situation),
-                ContextAssignmentAttempt(ref, contextBundle),
-                StorySummaryAttempt(summary),
-                SegmentMembershipAttempt(ref, membershipBundle),
-                Vector(chartCall) ++ situationCalls ++ contextCallsA ++ contextCallsB ++
-                  summaryCalls ++
-                  membershipCallsA ++ membershipCallsB
-              )
-            }
-        }
+  private def align(unit: SurfaceUnit, word: String, concept: ConceptId): PropositionAlignment =
+    val spans = SpanSet.one(spanOf(unit, word))
+    val evidence = Evidence(
+      EvidenceId.unsafe(s"ev:align:${unit.id.value}:$word"),
+      Some(spans),
+      Set.empty,
+      aligner,
+      chartStage
+    )
+    PropositionAlignment(
+      AlignmentTarget.Concepts(NonEmptySet.one(concept)),
+      spans,
+      Credence.unsafeRaw(1.0),
+      ClaimMeta.unsafe(
+        ClaimId.unsafe(s"claim:align:${unit.id.value}:$word"),
+        EpistemicStatus.SurfaceExplicit,
+        Credence.unsafeRaw(1.0),
+        NonEmptyVector.one(evidence),
+        Provenance.deterministic("test", Checksum.ofText("wog-hand-chart"))
+      )
+    )
 
-    private def attempt[A](
-        rule: String,
-        value: A,
-        evidence: Evidence,
-        render: String
-    ): (EvidenceBundle[A], Vector[ProviderCall]) =
-      val task = TaskId.unsafe(ContentAddress.of("wog-fixture-task", rule, evidence.id.value))
-      val call = providerCall(rule, render)
-      val proposal = AgentProposal.proposed(
-        task,
-        value,
-        NonEmptyVector.one(EvidenceRef.Inline(evidence)),
-        Some(RawScore.unsafe(1.0)),
-        Vector.empty,
-        AgentCallReceipt(call, prompt, task)
-      )
-      (
-        EvidenceBundle(
-          Vector(proposal),
-          Vector.empty,
-          StructuralValidity.Valid,
-          SourceSupport(1.0, evidence.spans),
-          agreementScore = 1.0,
-          Vector(CandidateCalibration(value, Probability.unsafe(1.0), "fixture-rule-v1"))
-        ),
-        Vector(call)
-      )
-
-    private def providerCall(rule: String, output: String): ProviderCall =
-      ProviderCall(
-        s"deterministic-fixture-$rule",
-        "pure-scala-rule",
-        "1",
-        None,
-        source.canonicalChecksum,
-        Checksum.ofText(output),
-        Map("court" -> "wog-one-sentence-reachability"),
-        None,
-        cached = false
-      )
+  /** "It became foggy and calm." as a hand chart: the focus predicate and its two properties. */
+  private val chart: PropositionEvidence =
+    val unchecked = PropositionChart.unchecked(
+      Some(c0),
+      Map(
+        c0 -> Concept.predicate("become"),
+        c1 -> Concept.property("foggy"),
+        c2 -> Concept.property("calm")
+      ),
+      Vector(
+        PropositionRelation(c0, RoleAssignment.arg(1), ConceptTarget.Node(c1)),
+        PropositionRelation(c0, RoleAssignment.arg(1), ConceptTarget.Node(c2))
+      ),
+      Map.empty,
+      Vector.empty,
+      Vector(
+        align(selected, "became", c0),
+        align(selected, "foggy", c1),
+        align(selected, "calm", c2)
+      ),
+      ChartProvenance.hand,
+      Some(selected.id)
+    )
+    PropositionEvidence.hand(
+      ChartValidator.check(unchecked).fold(v => fail(v.toString), identity)
+    )
 
   private def compilation: NarrativeCompilation =
-    val generated = DeterministicFixtureProvider.run(selected).fold(e => fail(e.message), identity)
-    val receipt = BuildReceipt(
-      source.id,
-      source.canonicalChecksum,
-      StoryModel.SchemaVersion,
-      Vector(
-        DeterministicFixtureProvider.stage -> ContentAddress.digest(
-          generated.calls.map(_.outputChecksum.hex)
-        )
-      ),
-      0L
-    )
-    val input = NarrativeCompilerInput
-      .of(
-        source,
-        atlas,
-        Vector(selected.id -> generated.chart),
-        Vector(generated.evidence),
-        Vector(generated.situation),
-        Vector(generated.context),
-        generated.summary,
-        Vector(generated.membership),
-        Vector.empty,
-        AcceptancePolicy.Conservative,
-        receipt,
-        Provenance(
-          generated.calls,
-          StoryModel.SchemaVersion,
-          Checksum.ofText("wog-deterministic-fixture-provider-v1")
-        )
-      )
+    val input = ChartProposalProvider
+      .input(source, atlas, Vector(selected.id -> chart), Some(chartStage), 0L)
       .fold(e => fail(e.message), identity)
     NarrativeCompiler.compile(input).fold(e => fail(e.message), identity)
 
@@ -246,7 +119,14 @@ class NarrativeCompilerVerticalSuite extends FunSuite:
     val signature =
       RecallSignature.compute(result, recall, view).fold(e => fail(e.message), identity)
 
+    assertEquals(atlas.text(selected), "It became foggy and calm.")
     assertEquals(compiled.derivation.gaps, Vector.empty)
+    assertEquals(model.graph.situations.size, 1)
+    assertEquals(
+      model.graph.situations.values.head.predicate,
+      Predicate("become", None, "become")
+    )
+    assertEquals(compiled.receipt.stages.map(_._1), Vector(chartStage, ChartProposalProvider.Stage))
     assertEquals(view.leaves.size, 1)
     assert(recall.ordered.nonEmpty)
     assert(candidates.totalSize > 0)

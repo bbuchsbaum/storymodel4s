@@ -35,6 +35,15 @@ class ChartProposalStaticCourtSuite extends FunSuite:
     "new NarrativeCompilation"
   )
 
+  /** Shapes that reach the same doors without spelling them: an import of the companion's members
+    * (`import NarrativeCompilation.*`, `.{of => build}`, `._`) or a member selection through
+    * whitespace or a selector block.
+    */
+  private val forbiddenShapes: Vector[scala.util.matching.Regex] = Vector(
+    """import\s+(?:[\w.]+\.)?(?:DerivationReceipt|NarrativeCompilation)\s*\.""".r,
+    """(?:DerivationReceipt|NarrativeCompilation)\s*\.\s*(?:\{|\*|_|of\b)""".r
+  )
+
   private val privateMember = """private\[document\] (?:def|val) (\w+)""".r
 
   /** Every `private[document]` member name declared in the module outside the provider. */
@@ -51,7 +60,9 @@ class ChartProposalStaticCourtSuite extends FunSuite:
       .distinct
       .sorted
 
-  private def qualifiedHits(text: String): Vector[String] = forbiddenQualified.filter(text.contains)
+  private def qualifiedHits(text: String): Vector[String] =
+    forbiddenQualified.filter(text.contains) ++
+      forbiddenShapes.flatMap(_.findAllMatchIn(text).map(_.matched).toVector)
 
   /** Unqualified `.name(` references to private members whose name is not the overloaded `of`. */
   private def memberHits(text: String, names: Vector[String]): Vector[String] =
@@ -76,8 +87,21 @@ class ChartProposalStaticCourtSuite extends FunSuite:
 
   test("the scan finds a planted factory name (positive control)") {
     val planted = "val receipt = DerivationReceipt.of(candidateSet, attempts, emitted, gaps)"
-    assertEquals(qualifiedHits(planted), Vector("DerivationReceipt.of"))
-    assertEquals(qualifiedHits("NarrativeCompilation.of(x)"), Vector("NarrativeCompilation.of"))
+    assertEquals(qualifiedHits(planted), Vector("DerivationReceipt.of", "DerivationReceipt.of"))
+    assertEquals(
+      qualifiedHits("NarrativeCompilation.of(x)"),
+      Vector("NarrativeCompilation.of", "NarrativeCompilation.of")
+    )
+    assertEquals(
+      qualifiedHits("import storymodel4s.document.NarrativeCompilation.*"),
+      Vector("import storymodel4s.document.NarrativeCompilation.", "NarrativeCompilation.*")
+    )
+    assertEquals(
+      qualifiedHits("import NarrativeCompilation.{of => build}"),
+      Vector("import NarrativeCompilation.", "NarrativeCompilation.{")
+    )
+    assertEquals(qualifiedHits("DerivationReceipt . of(x)"), Vector("DerivationReceipt . of"))
+    assertEquals(qualifiedHits("DerivationReceipt._"), Vector("DerivationReceipt._"))
     assertEquals(
       memberHits("NarrativeCompiler.renderProviderCall(call)", Vector("renderProviderCall", "of")),
       Vector("renderProviderCall")
