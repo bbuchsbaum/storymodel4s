@@ -194,6 +194,16 @@ Mutation ledger, 2026-09-02 (apply mutant → run the project's tests → named 
 | m4 | `BundleJson.coverageRow`: render `NoChart` as `proposed` | the WOG court, the sentence-isolation test (2 of 9) |
 | m5 | `ClaudeParseDriver.run`: drop the `writeSummary` step after `parse` | five `RecordedReplaySuite` tests in provider-agent, first "the driver replays end to end: per-sentence artifacts, a derived ledger, no prose" (5 of 52) |
 
+Fix-pass ledger, 2026-09-02 (same procedure, after the cold review of e0f14489):
+
+| mutant | what was changed | tests that went red |
+|---|---|---|
+| m6 | `StoryPipeline.run`: hoist a write (`receipts.json`) above the parse court | "a refused build receipt comes after the court and before any write", the missing-recordings test, the record-without-opt-in test (3 of 12) |
+| m7 | `ClaudeParseDriver.run`: hoist a write (`summary.json`) above `parse` | "a refused build receipt comes after the court and before any write" and three earlier refusal tests in `RecordedReplaySuite` (4 of 53) |
+| m8 | `ExitStatus.of`: delete the `ReceiptInvalid => Incomplete` case | the refused-receipt test, the exit-status table (2 of 12) |
+| m9 | `BuildSummary.derive`: drop the parser-stage check | "the summary refuses a compilation whose receipt does not carry the parse it was fed" (1 of 12) |
+| m10 | `BuildSummary.derive`: drop the source-checksum check | the same test (1 of 12) |
+
 What this evidence does not establish: the record path against the real SDK (network-free by
 construction; `LiveSmokeSuite` stays skipped), the bundle wrapper of phase 2.2, and the WOG
 numbers once phase 1.4 lands, which the owner has said will land first and will move the pins.
