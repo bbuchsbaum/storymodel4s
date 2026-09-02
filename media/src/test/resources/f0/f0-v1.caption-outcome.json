@@ -12,13 +12,12 @@
       0.5
     ],
     "maxNewTokens": 96,
-    "maxPixels": 1048576,
+    "maxPixels": 65536,
     "mergeSize": 2,
-    "minPixels": 65536,
+    "minPixels": 16384,
     "patchSize": 16,
     "presentation": "image-sequence",
-    "promptSha256": "5b2c6f12a2b37c81226f7f620800bd0a73cd3a46ccb02b46985b6642458bd3f5",
-    "size": null,
+    "promptSha256": "19becde3b50123011d65bd2625cc10fb43d57086f7cdd0926b29d37c858480fd",
     "temperature": 0.0,
     "temporalPatchSize": 2
   },
@@ -28,28 +27,28 @@
   },
   "extents": [
     {
-      "generatedTokens": 23,
+      "generatedTokens": 20,
       "id": "shot-1",
       "imageGridThw": [
         [
           1,
-          12,
-          22
+          6,
+          12
         ],
         [
           1,
-          12,
-          22
+          6,
+          12
         ],
         [
           1,
-          12,
-          22
+          6,
+          12
         ],
         [
           1,
-          12,
-          22
+          6,
+          12
         ]
       ],
       "ordinals": [
@@ -58,32 +57,32 @@
         9,
         13
       ],
-      "promptTokens": 319,
-      "text": "The images show a single, solid red screen with no visible objects, movement, or changes across the frames."
+      "promptTokens": 129,
+      "text": "The frames show a static, solid red background with no visible objects, actions, or changes."
     },
     {
-      "generatedTokens": 23,
+      "generatedTokens": 20,
       "id": "shot-2",
       "imageGridThw": [
         [
           1,
-          12,
-          22
+          6,
+          12
         ],
         [
           1,
-          12,
-          22
+          6,
+          12
         ],
         [
           1,
-          12,
-          22
+          6,
+          12
         ],
         [
           1,
-          12,
-          22
+          6,
+          12
         ]
       ],
       "ordinals": [
@@ -92,32 +91,32 @@
         24,
         28
       ],
-      "promptTokens": 319,
-      "text": "The images show a single, solid green screen with no objects, movement, or changes visible across the frames."
+      "promptTokens": 129,
+      "text": "The frames show a static, solid green screen with no changes or movement visible across the sequence."
     },
     {
-      "generatedTokens": 26,
+      "generatedTokens": 24,
       "id": "shot-3",
       "imageGridThw": [
         [
           1,
-          12,
-          22
+          6,
+          12
         ],
         [
           1,
-          12,
-          22
+          6,
+          12
         ],
         [
           1,
-          12,
-          22
+          6,
+          12
         ],
         [
           1,
-          12,
-          22
+          6,
+          12
         ]
       ],
       "ordinals": [
@@ -126,8 +125,8 @@
         39,
         44
       ],
-      "promptTokens": 319,
-      "text": "The images show a single, solid, deep blue screen with no variation in color, texture, or detail across all frames."
+      "promptTokens": 129,
+      "text": "The frames show a solid, uniform blue color with no discernible objects, patterns, or changes across the sequence."
     }
   ],
   "frames": {
@@ -142,21 +141,38 @@
       "Qwen3VLForConditionalGeneration"
     ],
     "configSha256": "edac7703329133edfc53e46ac0081835144c99d7eebf28b71c732694d435224d",
+    "filesVerified": [
+      "chat_template.json",
+      "config.json",
+      "generation_config.json",
+      "merges.txt",
+      "model-00001-of-00002.safetensors",
+      "model-00002-of-00002.safetensors",
+      "model.safetensors.index.json",
+      "preprocessor_config.json",
+      "tokenizer.json",
+      "tokenizer_config.json",
+      "video_preprocessor_config.json",
+      "vocab.json"
+    ],
     "modelType": "qwen3_vl",
     "repo": "Qwen/Qwen3-VL-4B-Instruct",
-    "revision": "ebb281ec70b0",
-    "shardsVerified": true
+    "revision": "ebb281ec70b0"
+  },
+  "offline": {
+    "HF_HUB_OFFLINE": "1",
+    "TRANSFORMERS_OFFLINE": "1"
   },
   "recipe": {
     "greedy": true,
     "maxNewTokens": 96,
-    "maxPixels": 1048576,
-    "minPixels": 65536,
+    "maxPixels": 65536,
+    "minPixels": 16384,
     "presentation": "image-sequence",
-    "prompt": "These images are consecutive frames from one shot of a video. Describe in one or two plain sentences what is visible. Do not name characters, guess a story, or mention that these are frames.",
+    "prompt": "These images are frames sampled in order from one segment of a video. Describe in one or two plain sentences what is visible. Do not name characters, guess a story, or mention that these are frames.",
     "seed": 0
   },
-  "requestId": "f0-v1/caption/qwen3vl-4b/v1",
+  "requestId": "f0-v1/caption/qwen3vl-4b/v2",
   "runtime": {
     "mlx": "0.32.2",
     "mlx_vlm": "0.6.17",

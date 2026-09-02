@@ -9,9 +9,10 @@ import storymodel4s.core.{Checksum, DomainError, ObservationAuthority}
   * revision, driven by the untrusted worker over frames the media module identified, joined into
   * timed visual-description proposals. F0's flat colours are the only ground truth and they test
   * the plumbing, not the model: no test says what the text must be, only that it is bound to the
-  * right frames, interval, model, recipe, and worker, and that nothing here is more than `Draft`.
-  * The recorded outcome replays in ordinary CI; the live court at the end needs the local worker
-  * environment and the verified weights and obtains neither.
+  * right frames, interval, model, recipe, and worker, that the declared pixel limits demonstrably
+  * bound (the processor's grids sit inside them and differ from the model's defaults), and that
+  * nothing here is more than `Draft`. The recorded outcome replays in ordinary CI; the live court
+  * at the end needs the local worker environment and the verified weights and obtains neither.
   */
 class CaptionSearchSuite extends FunSuite:
 
@@ -101,8 +102,24 @@ class CaptionSearchSuite extends FunSuite:
     assert(result.receipt.parameters.contains(BoundarySearch.EditListAssumption))
     assert(result.receipt.parameters.contains(request.model.identity.hex))
     assertEquals(outcome.model.revision, "ebb281ec70b0")
-    assert(outcome.model.shardsVerified)
+    assertEquals(outcome.model.configSha256, request.model.configSha256)
+    assertEquals(outcome.model.filesVerified.toSet, request.model.files.keySet)
+    assert(outcome.offline)
     assertEquals(outcome.runtimeLine, envelope.worker.versionLine)
+
+  test(
+    "the declared pixel limits demonstrably bound: every grid lies inside them and differs from the model default"
+  ):
+    val patch = outcome.applied.patchSize
+    val pixelCounts = outcome.extents.flatMap(_.grids.map(_.pixels(patch)))
+    assertEquals(pixelCounts.size, 12, "one grid per frame shown")
+    assert(
+      pixelCounts.forall(px => px >= request.recipe.minPixels && px <= request.recipe.maxPixels)
+    )
+    // The model's preprocessor default (65536 min pixels) turns a 32x18 frame into a 12x22 grid; the
+    // declared limits give a smaller one, so the applied limits are visible in the record.
+    assert(outcome.extents.forall(_.grids.forall(g => g.h * g.w < 12 * 22)))
+    assertNotEquals(request.recipe.minPixels, 65536)
 
   test("replay is identical; another worker, recipe, or model is another derivation"):
     val again = right(joinWith())
@@ -129,6 +146,7 @@ class CaptionSearchSuite extends FunSuite:
       joinWith(out = outcome.copy(framesSha256 = Checksum.ofText("other frames"))),
       "caption/frames"
     )
+    refusedAt(joinWith(out = outcome.copy(framesCount = 44)), "caption/frames")
     refusedAt(
       joinWith(req = request.copy(recipe = request.recipe.copy(maxNewTokens = 8))),
       "caption/recipe"
@@ -138,20 +156,44 @@ class CaptionSearchSuite extends FunSuite:
       "caption/model"
     )
     refusedAt(
-      joinWith(out = outcome.copy(model = outcome.model.copy(shardsVerified = false))),
+      joinWith(out = outcome.copy(model = outcome.model.copy(repo = "Someone/Else"))),
+      "caption/model"
+    )
+    refusedAt(
+      joinWith(out =
+        outcome.copy(model = outcome.model.copy(configSha256 = Checksum.ofText("other config")))
+      ),
+      "caption/model"
+    )
+    refusedAt(
+      joinWith(out =
+        outcome.copy(model =
+          outcome.model.copy(filesVerified = outcome.model.filesVerified.dropRight(1))
+        )
+      ),
       "caption/model"
     )
     refusedAt(
       joinWith(out = outcome.copy(runtime = outcome.runtime.updated("mlx_vlm", "0.0.0"))),
       "caption/worker"
     )
+    refusedAt(joinWith(out = outcome.copy(offline = false)), "caption/offline")
     refusedAt(joinWith(req = request.copy(framesSha256 = Checksum.ofText("x"))), "caption/request")
+    refusedAt(joinWith(req = request.copy(count = 44)), "caption/request")
 
   test(
-    "what the library applied must satisfy the recipe; coverage and extents must answer the request"
+    "what the library applied must satisfy the recipe, and the grids must sit inside the declared limits"
   ):
     refusedAt(
       joinWith(out = outcome.copy(applied = outcome.applied.copy(maxPixels = 4096))),
+      "caption/applied"
+    )
+    refusedAt(
+      joinWith(out = outcome.copy(applied = outcome.applied.copy(maxNewTokens = 8))),
+      "caption/applied"
+    )
+    refusedAt(
+      joinWith(out = outcome.copy(applied = outcome.applied.copy(greedy = false))),
       "caption/applied"
     )
     refusedAt(
@@ -160,7 +202,27 @@ class CaptionSearchSuite extends FunSuite:
       ),
       "caption/applied"
     )
+    // A grid the processor could only have produced by ignoring the limits: 12x22 patches of 16 px.
+    val tooLarge = outcome.copy(extents =
+      outcome.extents.map(e =>
+        if e.id == "shot-1" then e.copy(grids = e.grids.map(_ => ImageGrid(1, 12, 22))) else e
+      )
+    )
+    refusedAt(joinWith(out = tooLarge), "caption/applied-grid")
+    val tooSmall = outcome.copy(extents =
+      outcome.extents.map(e =>
+        if e.id == "shot-3" then e.copy(grids = e.grids.map(_ => ImageGrid(1, 2, 4))) else e
+      )
+    )
+    refusedAt(joinWith(out = tooSmall), "caption/applied-grid")
+    val missingGrid = outcome.copy(extents =
+      outcome.extents.map(e => if e.id == "shot-2" then e.copy(grids = e.grids.drop(1)) else e)
+    )
+    refusedAt(joinWith(out = missingGrid), "caption/applied-grid")
+
+  test("coverage and extents must answer the request"):
     refusedAt(joinWith(out = outcome.copy(coverageObserved = 2)), "caption/coverage")
+    refusedAt(joinWith(out = outcome.copy(coverageRequested = 4)), "caption/coverage")
     refusedAt(
       joinWith(out = outcome.copy(extents = outcome.extents.dropRight(1))),
       "caption/coverage"
@@ -169,9 +231,13 @@ class CaptionSearchSuite extends FunSuite:
       outcome.extents.map(e => if e.id == "shot-2" then e.copy(ordinals = Vector(14, 20)) else e)
     )
     refusedAt(joinWith(out = swapped), "caption/extent")
+    val renamed = outcome.copy(extents =
+      outcome.extents.map(e => if e.id == "shot-2" then e.copy(id = "shot-x") else e)
+    )
+    refusedAt(joinWith(out = renamed), "caption/extent")
 
   test(
-    "an extent must name frames of the set, in increasing order, and cannot be issued otherwise"
+    "an extent must name frames of the set, in increasing order; a pin must name config and a shard; a recipe must be greedy"
   ):
     assert(CaptionExtent.of("x", Vector.empty).isLeft)
     assert(CaptionExtent.of("x", Vector(3, 3)).isLeft)
@@ -184,29 +250,30 @@ class CaptionSearchSuite extends FunSuite:
     val dup =
       Vector(right(CaptionExtent.of("a", Vector(0))), right(CaptionExtent.of("a", Vector(1))))
     refusedAt(CaptionRequest.issue(frames, dup, request.model, request.recipe, "r"), "extent/id")
-    assert(
-      CaptionRecipe
-        .parse(
-          io.circe.parser
-            .parse(
-              request.recipe.json
-                .deepMerge(io.circe.Json.obj("greedy" -> io.circe.Json.fromBoolean(false)))
-                .noSpaces
-            )
-            .toOption
-            .get
-            .hcursor
-        )
-        .isLeft
+    refusedAt(
+      ModelPin.of("r", "v", Map("model-00001-of-00002.safetensors" -> Checksum.ofText("s"))),
+      "model/pin"
     )
+    refusedAt(ModelPin.of("r", "v", Map("config.json" -> Checksum.ofText("c"))), "model/pin")
+    val sampled = io.circe.parser
+      .parse(
+        request.recipe.json
+          .deepMerge(io.circe.Json.obj("greedy" -> io.circe.Json.fromBoolean(false)))
+          .noSpaces
+      )
+      .toOption
+      .get
+      .hcursor
+    assert(CaptionRecipe.parse(sampled).isLeft)
 
   test("a caption proposal is not a timed segment and offers no promotion"):
     // Type-level: CaptionProposal has no conversion to TimedSegment or to any accepted claim; the
     // only path is a receipt-carrying adapter that does not exist yet. What can be asserted here:
-    // the proposal carries its provenance and the search stays Draft.
+    // the proposal carries its provenance and the frames it saw, and the search stays Draft.
     val p = result.proposals.head
     assertEquals(p.recipe, request.recipe.identity)
     assertEquals(p.model, request.model.identity)
+    assertEquals(p.frames, Vector(0, 4, 9, 13))
     assertEquals(result.authority, ObservationAuthority.Draft)
 
   test("live worker and weights, when this machine has them, reproduce the recorded proposals"):
@@ -266,16 +333,18 @@ class CaptionSearchSuite extends FunSuite:
       )
       assertEquals(run.exitCode, 0, run.stderr.takeRight(400))
       val liveOutcome = right(CaptionOutcome.parse(Files.readString(outPath)))
+      // The worker realization is observed from the interpreter and the script, not taken from the
+      // outcome; the join then compares the outcome's claim against it.
       val worker = right(WorkerRealization.observeCaption(python.get, script.get))
       val liveResult = right(CaptionSearch.join(live, issued, liveOutcome, worker))
       assertEquals(
         liveResult.proposals.map(p => (p.support.start, p.support.endExclusive)),
         result.proposals.map(p => (p.support.start, p.support.endExclusive))
       )
-      // Greedy decoding on the same weights and frames: the same text is expected, and a difference
-      // is reported as drift rather than hidden.
-      if worker == envelope.worker then
-        assertEquals(liveResult.proposals.map(_.text), result.proposals.map(_.text))
+      assertEquals(liveOutcome.extents.map(_.grids), outcome.extents.map(_.grids))
+      // Greedy decoding on the same weights, frames and worker: the same text. Under another worker
+      // realization the texts are still compared, so drift is reported, not hidden.
+      assertEquals(liveResult.proposals.map(_.text), result.proposals.map(_.text))
     finally
       Files
         .walk(dir)

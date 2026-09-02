@@ -4,13 +4,15 @@
 Reads a request JSON naming a raw BGR24 frame file that the JVM adapter produced and identified,
 a list of extents (frame ordinals) to describe, a pinned local model directory, and a recipe; runs
 the model once per extent with the frames presented as an image sequence; writes an outcome JSON
-with the text, token counts, and what the library actually applied (prompt digest, pixel limits,
-processor grid, normalization), read back from the processor rather than echoed.
+with the text, token counts, and what the library actually applied, read back from the processor
+rather than echoed: the image grid it produced for every frame is the evidence that the declared
+pixel limits were applied.
 
 What this worker owns: nothing. It never opens a media container, never computes a timestamp, and
 reports frame ordinals only; the JVM adapter re-anchors extents to PTS through its own packet
-index. It runs offline: the model directory is verified against the request's declared shard
-digests before anything is loaded, and no network access is attempted.
+index. It runs offline (the Hugging Face offline switches are forced on, not defaulted) and
+verifies every file the request pins, refusing a model directory that carries an unlisted weight
+file or whose weight index names one.
 
 Usage: caption_worker.py REQUEST_JSON OUTCOME_JSON
 """
@@ -21,8 +23,9 @@ import os
 import platform
 import sys
 
-os.environ.setdefault("HF_HUB_OFFLINE", "1")
-os.environ.setdefault("TRANSFORMERS_OFFLINE", "1")
+os.environ["HF_HUB_OFFLINE"] = "1"
+os.environ["TRANSFORMERS_OFFLINE"] = "1"
+os.environ["HF_HUB_DISABLE_TELEMETRY"] = "1"
 
 import numpy as np
 from PIL import Image
@@ -51,17 +54,31 @@ def sha256_text(text):
 
 
 def verify_model_dir(model):
-    """The request declares the shard digests; the directory must match before it is loaded."""
+    """Every pinned file must hash as declared; no unlisted weight file may exist; the weight index
+    may name only pinned shards. Returns the digest of config.json and the parsed config."""
     path = model["localPath"]
-    for name, expected in model["shardsSha256"].items():
+    files = model["filesSha256"]
+    for name, expected in files.items():
         p = os.path.join(path, name)
         if not os.path.isfile(p):
-            fail(f"model shard missing: {name}")
+            fail(f"pinned model file missing: {name}")
         got = sha256_file(p)
         if got != expected:
             fail(
-                f"model shard {name} hashes to {got[:16]}, request declares {expected[:16]}"
+                f"model file {name} hashes to {got[:16]}, request declares {expected[:16]}"
             )
+    for name in sorted(os.listdir(path)):
+        if name.endswith(".safetensors") and name not in files:
+            fail(f"unlisted weight file present in the model directory: {name}")
+    index_name = "model.safetensors.index.json"
+    if index_name in files:
+        with open(os.path.join(path, index_name), "r", encoding="utf-8") as f:
+            index = json.load(f)
+        for shard in sorted(set(index.get("weight_map", {}).values())):
+            if shard not in files:
+                fail(f"weight index names an unpinned shard: {shard}")
+    if "config.json" not in files:
+        fail("the model pin must include config.json")
     with open(os.path.join(path, "config.json"), "r", encoding="utf-8") as f:
         config_text = f.read()
     return sha256_text(config_text), json.loads(config_text)
@@ -127,10 +144,15 @@ def main(argv):
     loaded_model, processor = load(model["localPath"], trust_remote_code=False)
     model_config = load_config(model["localPath"])
     image_processor = getattr(processor, "image_processor", processor)
-    if hasattr(image_processor, "min_pixels"):
-        image_processor.min_pixels = int(recipe["minPixels"])
-    if hasattr(image_processor, "max_pixels"):
-        image_processor.max_pixels = int(recipe["maxPixels"])
+    if not (
+        hasattr(image_processor, "min_pixels")
+        and hasattr(image_processor, "max_pixels")
+    ):
+        fail(
+            "the image processor exposes no min_pixels/max_pixels; the pixel limits cannot be applied"
+        )
+    image_processor.min_pixels = int(recipe["minPixels"])
+    image_processor.max_pixels = int(recipe["maxPixels"])
     if hasattr(image_processor, "size") and isinstance(image_processor.size, dict):
         image_processor.size = {
             "shortest_edge": int(recipe["minPixels"]),
@@ -145,16 +167,15 @@ def main(argv):
         formatted = apply_chat_template(
             processor, model_config, prompt_text, num_images=len(images)
         )
-        # Read back what the processor applies to these images (grid in patches), independently of
-        # generation, so the outcome records the library's own preprocessing rather than an echo.
-        grid = None
-        try:
-            encoded = processor(text=[formatted], images=images, return_tensors="np")
-            g = encoded.get("image_grid_thw")
-            if g is not None:
-                grid = [[int(x) for x in row] for row in np.asarray(g).tolist()]
-        except Exception as e:  # noqa: BLE001 - recorded, not hidden
-            grid = {"error": str(e)[:200]}
+        # The processor's own grid for these images, obtained independently of generation. It is
+        # the evidence that the pixel limits were applied; the adapter checks it against them.
+        encoded = processor(text=[formatted], images=images, return_tensors="np")
+        g = encoded.get("image_grid_thw")
+        if g is None:
+            fail(f"the processor returned no image_grid_thw for extent {extent['id']}")
+        grid = [[int(x) for x in row] for row in np.asarray(g).tolist()]
+        if len(grid) != len(images):
+            fail(f"extent {extent['id']}: {len(grid)} grids for {len(images)} images")
         out = generate(
             loaded_model,
             processor,
@@ -183,9 +204,8 @@ def main(argv):
 
     applied = {
         "promptSha256": sha256_text(prompt_text),
-        "minPixels": getattr(image_processor, "min_pixels", None),
-        "maxPixels": getattr(image_processor, "max_pixels", None),
-        "size": getattr(image_processor, "size", None),
+        "minPixels": int(image_processor.min_pixels),
+        "maxPixels": int(image_processor.max_pixels),
         "patchSize": getattr(image_processor, "patch_size", None),
         "temporalPatchSize": getattr(image_processor, "temporal_patch_size", None),
         "mergeSize": getattr(image_processor, "merge_size", None),
@@ -206,13 +226,17 @@ def main(argv):
             "mlx_vlm": mlx_vlm.__version__,
             "mlx": mx.__version__,
         },
+        "offline": {
+            "HF_HUB_OFFLINE": os.environ.get("HF_HUB_OFFLINE"),
+            "TRANSFORMERS_OFFLINE": os.environ.get("TRANSFORMERS_OFFLINE"),
+        },
         "model": {
             "repo": model["repo"],
             "revision": model["revision"],
             "configSha256": config_sha256,
             "modelType": config.get("model_type"),
             "architectures": config.get("architectures"),
-            "shardsVerified": True,
+            "filesVerified": sorted(model["filesSha256"].keys()),
         },
         "frames": {
             "count": count,

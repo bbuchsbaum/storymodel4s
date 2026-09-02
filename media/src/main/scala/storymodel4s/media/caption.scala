@@ -14,13 +14,16 @@ import storymodel4s.core.{
 }
 
 /** The exact model a caption request is issued against: repository, revision, and the digest of
-  * every weight shard. The worker verifies the local directory against these before loading and
-  * echoes them; the join refuses an outcome that names anything else.
+  * every file the worker will read (weight shards, the weight index, config, tokenizer, chat
+  * template, preprocessor and generation configs). The worker verifies each file, refuses an
+  * unlisted weight file or an index naming one, and echoes the config digest; the join compares
+  * that echo with the pin.
   */
-final case class ModelPin(repo: String, revision: String, shards: Map[String, Checksum]):
+final case class ModelPin(repo: String, revision: String, files: Map[String, Checksum]):
+  def configSha256: Checksum = files(ModelPin.ConfigFile)
   def identity: Checksum =
     ContentAddress.digest(
-      Vector("model-pin", repo, revision) ++ shards.toVector.sortBy(_._1).flatMap { case (n, c) =>
+      Vector("model-pin", repo, revision) ++ files.toVector.sortBy(_._1).flatMap { case (n, c) =>
         Vector(n, c.hex)
       }
     )
@@ -28,35 +31,47 @@ final case class ModelPin(repo: String, revision: String, shards: Map[String, Ch
     Json.obj(
       "repo" -> Json.fromString(repo),
       "revision" -> Json.fromString(revision),
-      "shardsSha256" -> Json.obj(shards.toVector.sortBy(_._1).map { case (n, c) =>
+      "filesSha256" -> Json.obj(files.toVector.sortBy(_._1).map { case (n, c) =>
         n -> Json.fromString(c.hex)
       }*)
     )
 
 object ModelPin:
+  val ConfigFile: String = "config.json"
+
+  def of(
+      repo: String,
+      revision: String,
+      files: Map[String, Checksum]
+  ): Either[DomainError, ModelPin] =
+    if repo.trim.isEmpty || revision.trim.isEmpty then
+      Left(DomainError.InvariantViolation("model/pin", "empty repository or revision"))
+    else if !files.contains(ConfigFile) then
+      Left(DomainError.InvariantViolation("model/pin", s"a model pin must include $ConfigFile"))
+    else if !files.keys.exists(_.endsWith(".safetensors")) then
+      Left(
+        DomainError.InvariantViolation("model/pin", "a model pin names at least one weight shard")
+      )
+    else Right(ModelPin(repo, revision, files))
+
   def parse(c: ACursor): Either[DomainError, ModelPin] =
     for
       repo <- MediaJson.string(c.downField("repo"), "model.repo")
       revision <- MediaJson.string(c.downField("revision"), "model.revision")
-      shardsJson <- c
-        .downField("shardsSha256")
+      filesJson <- c
+        .downField("filesSha256")
         .as[Map[String, String]]
         .left
         .map(_ =>
-          DomainError.InvalidFormat("model.shardsSha256", "<object>", "expected name -> sha256")
+          DomainError.InvalidFormat("model.filesSha256", "<object>", "expected name -> sha256")
         )
-      shards <- shardsJson.toVector.foldLeft[Either[DomainError, Map[String, Checksum]]](
+      files <- filesJson.toVector.foldLeft[Either[DomainError, Map[String, Checksum]]](
         Right(Map.empty)
       ) { case (acc, (n, hex)) =>
         acc.flatMap(m => Checksum.from(hex).map(c => m.updated(n, c)))
       }
-      _ <-
-        if shards.nonEmpty then Right(())
-        else
-          Left(
-            DomainError.InvariantViolation("model/shards", "a model pin names at least one shard")
-          )
-    yield ModelPin(repo, revision, shards)
+      pin <- of(repo, revision, files)
+    yield pin
 
 /** Every captioning parameter, declared. Frames are always supplied explicitly as an image
   * sequence; decoding is greedy; the prompt is one fixed text whose digest enters every receipt.
@@ -246,20 +261,24 @@ object CaptionRequest:
       recipe
     )
 
-/** What the library applied, read back from the processor rather than echoed. */
+/** What the library applied, as far as it can be read back from the processor: the limits it holds
+  * after assignment, its patch geometry, and the prompt digest. The evidence that the limits were
+  * applied is not here but in each result's image grid, which the join checks against them.
+  */
 final case class AppliedCaptionRecipe(
     promptSha256: Checksum,
     minPixels: Int,
     maxPixels: Int,
     maxNewTokens: Int,
     greedy: Boolean,
-    patchSize: Option[Int],
-    temporalPatchSize: Option[Int],
-    mergeSize: Option[Int]
+    patchSize: Int,
+    temporalPatchSize: Int,
+    mergeSize: Int
 ):
   def satisfies(recipe: CaptionRecipe): Boolean =
     promptSha256 == recipe.promptSha256 && minPixels == recipe.minPixels &&
-      maxPixels == recipe.maxPixels && maxNewTokens == recipe.maxNewTokens && greedy
+      maxPixels == recipe.maxPixels && maxNewTokens == recipe.maxNewTokens && greedy &&
+      patchSize > 0 && temporalPatchSize > 0 && mergeSize > 0
 
 object AppliedCaptionRecipe:
   def parse(c: ACursor): Either[DomainError, AppliedCaptionRecipe] =
@@ -271,12 +290,9 @@ object AppliedCaptionRecipe:
       maxPixels <- MediaJson.int(c.downField("maxPixels"), "applied.maxPixels")
       maxNewTokens <- MediaJson.int(c.downField("maxNewTokens"), "applied.maxNewTokens")
       greedy <- MediaJson.boolean(c.downField("greedy"), "applied.greedy")
-      patch <- MediaJson.optionalInt(c.downField("patchSize"), "applied.patchSize")
-      temporal <- MediaJson.optionalInt(
-        c.downField("temporalPatchSize"),
-        "applied.temporalPatchSize"
-      )
-      merge <- MediaJson.optionalInt(c.downField("mergeSize"), "applied.mergeSize")
+      patch <- MediaJson.int(c.downField("patchSize"), "applied.patchSize")
+      temporal <- MediaJson.int(c.downField("temporalPatchSize"), "applied.temporalPatchSize")
+      merge <- MediaJson.int(c.downField("mergeSize"), "applied.mergeSize")
     yield AppliedCaptionRecipe(
       prompt,
       minPixels,
@@ -288,13 +304,19 @@ object AppliedCaptionRecipe:
       merge
     )
 
-/** One described extent as the worker returned it. */
+/** The processor's grid for one image: temporal slots, patch rows, patch columns. */
+final case class ImageGrid(t: Int, h: Int, w: Int):
+  /** Pixels the processor resized the image to, given the patch size. */
+  def pixels(patchSize: Int): Long = h.toLong * patchSize * w.toLong * patchSize
+
+/** One described extent as the worker returned it, with the processor's grid per image. */
 final case class CaptionResult(
     id: String,
     ordinals: Vector[Int],
     text: String,
     promptTokens: Option[Int],
-    generatedTokens: Option[Int]
+    generatedTokens: Option[Int],
+    grids: Vector[ImageGrid]
 )
 
 /** The model as the outcome names it. */
@@ -302,13 +324,14 @@ final case class ModelEcho(
     repo: String,
     revision: String,
     configSha256: Checksum,
-    shardsVerified: Boolean
+    filesVerified: Vector[String]
 )
 
 /** What the captioning worker returned, parsed and nothing more. */
 final case class CaptionOutcome(
     requestId: String,
     runtime: Map[String, String],
+    offline: Boolean,
     model: ModelEcho,
     framesSha256: Checksum,
     framesCount: Int,
@@ -346,13 +369,20 @@ object CaptionOutcome:
               s"expected ${RuntimeKeys.mkString(", ")}"
             )
           )
+      off <- MediaJson.stringMap(c.downField("offline"), "offline")
+      offline = off.get("HF_HUB_OFFLINE").contains("1") && off
+        .get("TRANSFORMERS_OFFLINE")
+        .contains("1")
       m = c.downField("model")
       repo <- MediaJson.string(m.downField("repo"), "model.repo")
       revision <- MediaJson.string(m.downField("revision"), "model.revision")
       configSha <- MediaJson
         .string(m.downField("configSha256"), "model.configSha256")
         .flatMap(Checksum.from)
-      verified <- MediaJson.boolean(m.downField("shardsVerified"), "model.shardsVerified")
+      verifiedJson <- MediaJson.array(m.downField("filesVerified"), "model.filesVerified")
+      verified <- MediaJson.traverse(verifiedJson)(j =>
+        MediaJson.string(j.hcursor, "model.filesVerified[]")
+      )
       f = c.downField("frames")
       sha <- MediaJson.string(f.downField("sha256"), "frames.sha256").flatMap(Checksum.from)
       count <- MediaJson.int(f.downField("count"), "frames.count")
@@ -369,6 +399,7 @@ object CaptionOutcome:
     yield CaptionOutcome(
       requestId,
       runtime,
+      offline,
       ModelEcho(repo, revision, configSha, verified),
       sha,
       count,
@@ -393,10 +424,29 @@ object CaptionOutcome:
         c.downField("generatedTokens"),
         "extents[].generatedTokens"
       )
-    yield CaptionResult(id, ordinals, text, promptTokens, generated)
+      gridsJson <- MediaJson.array(c.downField("imageGridThw"), "extents[].imageGridThw")
+      grids <- MediaJson.traverse(gridsJson)(parseGrid)
+    yield CaptionResult(id, ordinals, text, promptTokens, generated, grids)
 
-/** Recorded captioning run: the worker realization, the model pin, the request it answered, and the
-  * digest of the outcome it wrote.
+  private def parseGrid(json: Json): Either[DomainError, ImageGrid] =
+    MediaJson.array(json.hcursor, "extents[].imageGridThw[]").flatMap { parts =>
+      MediaJson
+        .traverse(parts)(j => MediaJson.int(j.hcursor, "extents[].imageGridThw[][]"))
+        .flatMap {
+          case Vector(t, h, w) if t > 0 && h > 0 && w > 0 => Right(ImageGrid(t, h, w))
+          case other                                      =>
+            Left(
+              DomainError.InvalidFormat(
+                "extents[].imageGridThw[]",
+                other.mkString(","),
+                "expected three positive integers t, h, w"
+              )
+            )
+        }
+    }
+
+/** Recorded captioning run: the worker realization, the request it answered, and the digest of the
+  * outcome it wrote. The model pin lives in the request.
   */
 final case class CaptionEnvelope(
     fixtureId: String,
@@ -441,8 +491,9 @@ object CaptionEnvelope:
 
 /** A timed visual description proposed by the model for one extent: the text, the frames shown, the
   * playback interval those frames span on the picture stream's axis, and the identities that
-  * produced it. It is a `Proposal` with `Draft` authority: it says what a model wrote about these
-  * frames, not what happened in the film, and it is not a `TimedSegment`.
+  * produced it. It is a proposal with `Draft` authority: it says what a model wrote about these
+  * frames, not what happened in the film, and it is not a `TimedSegment`. The support is the hull
+  * of the frames shown; `frames` says which they were.
   */
 final class CaptionProposal private[media] (
     val extentId: String,
@@ -478,7 +529,7 @@ final class CaptionSearchResult private[media] (
     s"CaptionSearchResult(${frames.probe.manifest.fixtureId}, ${proposals.size} proposals, draft, ${identity.short()})"
 
 object CaptionSearch:
-  val Algorithm: String = "vlm-caption-proposals/v1"
+  val Algorithm: String = "vlm-caption-proposals/v2"
 
   def parameters(
       worker: ToolRealization,
@@ -500,10 +551,12 @@ object CaptionSearch:
 
   /** Join the issued request and the worker's outcome to the frame set. Refuses when the request
     * does not describe these frames; when the outcome answers another request, other frames,
-    * another recipe, another model, or claims a runtime other than the worker it is joined under;
-    * when the worker did not verify the shards; when what the library applied does not satisfy the
-    * recipe; when coverage is partial or a result does not match its extent; or when an extent's
-    * frames cannot be closed on the axis. Every interval comes from the packet index.
+    * another recipe, another model (repository, revision, config digest, or a pinned file left
+    * unverified), or claims a runtime other than the worker it is joined under, or did not run
+    * offline; when what the library applied does not satisfy the recipe, or a result's image grids
+    * fall outside the declared pixel limits (the one piece of evidence that the limits bound); when
+    * coverage is partial or a result does not answer its extent; or when an extent cannot be closed
+    * on the axis. Every interval comes from the packet index.
     */
   def join(
       frames: FrameSet,
@@ -541,7 +594,9 @@ object CaptionSearch:
         .zip(outcome.extents)
         .foldLeft[Either[DomainError, Vector[CaptionProposal]]](Right(Vector.empty)) {
           case (acc, (extent, result)) =>
-            acc.flatMap(v => proposal(frames, axis, request, receipt, extent, result).map(v :+ _))
+            acc.flatMap(v =>
+              proposal(frames, axis, request, outcome.applied, receipt, extent, result).map(v :+ _)
+            )
         }
     yield new CaptionSearchResult(
       frames,
@@ -605,12 +660,13 @@ object CaptionSearch:
         )
       )
     else if outcome.model.repo != request.model.repo || outcome.model.revision != request.model.revision ||
-      !outcome.model.shardsVerified
+      outcome.model.configSha256 != request.model.configSha256 ||
+      outcome.model.filesVerified.toSet != request.model.files.keySet
     then
       Left(
         DomainError.InvariantViolation(
           "caption/model",
-          s"outcome names ${outcome.model.repo}@${outcome.model.revision} (verified ${outcome.model.shardsVerified}), request pinned ${request.model.repo}@${request.model.revision}"
+          s"outcome names ${outcome.model.repo}@${outcome.model.revision} config ${outcome.model.configSha256.short()} with ${outcome.model.filesVerified.size} verified files; request pinned ${request.model.repo}@${request.model.revision} config ${request.model.configSha256.short()} with ${request.model.files.size} files"
         )
       )
     else if outcome.runtimeLine != worker.versionLine then
@@ -619,6 +675,11 @@ object CaptionSearch:
           "caption/worker",
           s"outcome claims runtime '${outcome.runtimeLine}', joined under worker '${worker.versionLine}'"
         )
+      )
+    else if !outcome.offline then
+      Left(
+        DomainError
+          .InvariantViolation("caption/offline", "the worker did not report running offline")
       )
     else Right(())
 
@@ -650,10 +711,42 @@ object CaptionSearch:
         )
       )
 
+  /** The grids are the evidence that the pixel limits were applied: every image the processor
+    * produced must have a pixel count inside the declared limits, and there must be one grid per
+    * frame shown.
+    */
+  private def gridsWithinLimits(
+      recipe: CaptionRecipe,
+      applied: AppliedCaptionRecipe,
+      extent: CaptionExtent,
+      result: CaptionResult
+  ): Either[DomainError, Unit] =
+    if result.grids.size != extent.ordinals.size then
+      Left(
+        DomainError.InvariantViolation(
+          "caption/applied-grid",
+          s"extent ${extent.id}: ${result.grids.size} image grids for ${extent.ordinals.size} frames"
+        )
+      )
+    else
+      result.grids.find { g =>
+        val px = g.pixels(applied.patchSize)
+        px < recipe.minPixels.toLong || px > recipe.maxPixels.toLong
+      } match
+        case Some(g) =>
+          Left(
+            DomainError.InvariantViolation(
+              "caption/applied-grid",
+              s"extent ${extent.id}: a ${g.h}x${g.w}-patch grid is ${g.pixels(applied.patchSize)} pixels, outside [${recipe.minPixels}, ${recipe.maxPixels}]; the declared limits were not applied"
+            )
+          )
+        case None => Right(())
+
   private def proposal(
       frames: FrameSet,
       axis: PresentationAxis,
       request: CaptionRequest,
+      applied: AppliedCaptionRecipe,
       receipt: SourceDerivationReceipt,
       extent: CaptionExtent,
       result: CaptionResult
@@ -668,16 +761,9 @@ object CaptionSearch:
               s"result ${result.id} ${result.ordinals.mkString(",")} does not answer extent ${extent.id} ${extent.ordinals.mkString(",")}"
             )
           )
-      first <- frames
-        .ptsOf(extent.ordinals.head)
-        .toRight(
-          DomainError.InvariantViolation("caption/index", s"no frame ${extent.ordinals.head}")
-        )
-      lastEntry <- frames.index.entries
-        .lift(extent.ordinals.last)
-        .toRight(
-          DomainError.InvariantViolation("caption/index", s"no frame ${extent.ordinals.last}")
-        )
+      _ <- gridsWithinLimits(request.recipe, applied, extent, result)
+      firstEntry = frames.index.entries(extent.ordinals.head)
+      lastEntry = frames.index.entries(extent.ordinals.last)
       end <- lastEntry.durationTicks
         .map(d => lastEntry.pts + d)
         .toRight(
@@ -686,7 +772,7 @@ object CaptionSearch:
             s"frame ${extent.ordinals.last} has unknown duration; the extent cannot be closed"
           )
         )
-      support <- PlaybackInterval.on(axis, first, end)
+      support <- PlaybackInterval.on(axis, firstEntry.pts, end)
     yield new CaptionProposal(
       extent.id,
       support,
@@ -700,7 +786,7 @@ object CaptionSearch:
           "caption-proposal",
           receipt.identity.hex,
           extent.id,
-          first.toString,
+          firstEntry.pts.toString,
           end.toString,
           Checksum.ofText(result.text).hex
         )
