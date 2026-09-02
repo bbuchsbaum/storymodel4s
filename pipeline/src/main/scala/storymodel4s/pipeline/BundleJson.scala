@@ -88,9 +88,15 @@ private[pipeline] object BundleJson:
       case SentenceCoverage.NoChart(_)    => Vector("kind" -> "no-chart".asJson)
     Json.obj((base ++ rest)*)
 
+  /** The provenance is written alongside the kind: a proposed summary that does not say what
+    * entitled it is the shape this row exists to make impossible to publish quietly.
+    */
   private def summaryRow(coverage: SummaryCoverage): Json = coverage match
-    case SummaryCoverage.Proposed(_) => Json.obj("kind" -> "proposed".asJson)
-    case SummaryCoverage.NoTitle     => Json.obj("kind" -> "no-title".asJson)
+    case SummaryCoverage.Proposed(_, provenance) =>
+      Json.obj("kind" -> "proposed".asJson, "titleProvenance" -> provenance.render.asJson)
+    case SummaryCoverage.NoTitle            => Json.obj("kind" -> "no-title".asJson)
+    case SummaryCoverage.TitleUnestablished =>
+      Json.obj("kind" -> "title-provenance-unrecorded".asJson)
 
   private def gapRow(gap: DerivationGap): Json = Json.obj(
     "stage" -> gap.stage.value.asJson,

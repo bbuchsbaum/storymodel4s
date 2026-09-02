@@ -130,10 +130,23 @@ enum SentenceCoverage:
     case EmptyChart(_)   => Vector.empty
     case NoChart(_)      => Vector.empty
 
-/** Whether a story-summary proposal was emitted; the title is the only summary source here. */
+/** Whether a story-summary proposal was emitted; the title is the only summary source here.
+  *
+  * Why three cases and not two: a source with no title and a source carrying a title nobody
+  * established are different states of the world, and the provider abstains in both. Folding them
+  * together would hide the one that needs a caller's attention — a title is sitting right there and
+  * the model refuses to publish it — behind the one that needs a new rule.
+  */
 enum SummaryCoverage:
-  case Proposed(title: String)
+  case Proposed(title: String, provenance: TitleProvenance)
+
+  /** The source carries no title at all. */
   case NoTitle
+
+  /** The source carries a title whose provenance it does not record, so nothing entitles the model
+    * to publish it. A filename put there by a tool is the case this exists for.
+    */
+  case TitleUnestablished
 
 /** Coverage counts over the sentence ledger. Honest product data: every combination is lawful.
   *
@@ -359,6 +372,14 @@ object ChartProposalProvider:
   val AbstainCoverageRule: String = "abstain-coverage-rule"
   val AbstainSummaryRule: String = "abstain-summary-rule"
 
+  /** Abstention reason when the source carries no title. */
+  val NoTitleReason: String = "no-title"
+
+  /** Abstention reason when the source carries a title but records no provenance for it. Named
+    * separately from [[NoTitleReason]] so a receipt says which of the two happened.
+    */
+  val UnestablishedTitleReason: String = "title-provenance-unrecorded"
+
   /** The mapping rules, verbatim. Its checksum is the prompt-package checksum and the provenance
     * config hash.
     */
@@ -440,8 +461,15 @@ object ChartProposalProvider:
        |  shapes admitted the root. The scope of a focus root's situation, context, membership and
        |  coverage task is its sentence, which identifies it; the scope of a coordinated branch's
        |  is the branch root key, because its sentence does not.
-       |summary: the source title with evidence spanning the whole canonical text; no title or a
-       |  blank title yields an abstained summary attempt.
+       |summary: the source title with evidence spanning the whole canonical text, and only when
+       |  the source records how that title was established. A title is a claim about the work, so
+       |  this rule publishes one only on a basis the source names; the sole basis this version
+       |  knows is that a caller stated it, recorded as title-provenance=caller-supplied on the
+       |  receipt. A source with no title, or a blank one, abstains with $NoTitleReason; a source
+       |  carrying a title whose provenance it does not record abstains with
+       |  $UnestablishedTitleReason. Nothing derives a title from anything that is not the work: a
+       |  path, a filename, or a request identifier is not a title, and a model built from a bare
+       |  text file carries a summary gap instead, which is true.
        |participants: for each admissible root, every relation from the root whose filler is a
        |  chart concept of kind Entity, Name, or Quantity and whose role carries exactly one
        |  normalized participant role yields one participant attempt (situation = root, filler =
@@ -1412,41 +1440,56 @@ object ChartProposalProvider:
       attempts.calls
     )
 
+  /** Why `establishedTitle` and not `title`: the title alone says a caller put a string there, and
+    * the string that used to be there was the input file's name. The provenance is what entitles
+    * this rule to publish it as the story's summary, so a title with none abstains under its own
+    * reason rather than sharing `no-title` with a source that has no title at all — two different
+    * facts about the same field, and a reader must be able to tell them apart.
+    */
   private def summaryOutcome(source: StorySource): Either[DomainError, SummaryOutcome] =
     val scope = "story"
     val scopeChecksum = source.canonicalChecksum
-    source.title.filter(_.trim.nonEmpty) match
+    def abstain(reason: String, coverage: SummaryCoverage): SummaryOutcome =
+      val params = Map("scope" -> scope, "rule" -> AbstainSummaryRule, "reason" -> reason)
+      val (bundle, call) = abstained[StorySummaryProposal](
+        source,
+        AbstainSummaryRule,
+        scope,
+        scopeChecksum,
+        Vector("abstain", scope, reason),
+        params
+      )
+      SummaryOutcome(StorySummaryAttempt(bundle), coverage, None, call)
+
+    source.establishedTitle match
+      case None if source.title.exists(_.trim.nonEmpty) =>
+        Right(abstain(UnestablishedTitleReason, SummaryCoverage.TitleUnestablished))
       case None =>
-        val params = Map("scope" -> scope, "rule" -> AbstainSummaryRule, "reason" -> "no-title")
-        val (bundle, call) = abstained[StorySummaryProposal](
-          source,
-          AbstainSummaryRule,
-          scope,
-          scopeChecksum,
-          Vector("abstain", scope, "no-title"),
-          params
-        )
-        Right(SummaryOutcome(StorySummaryAttempt(bundle), SummaryCoverage.NoTitle, None, call))
+        Right(abstain(NoTitleReason, SummaryCoverage.NoTitle))
       case Some(title) =>
         TextSpan.of(0, source.canonicalText.length).map { whole =>
           val evidence = evidenceRecord(scope, scopeChecksum, SpanSet.one(SpanRef(None, whole)))
-          val params =
-            Map("scope" -> scope, "rule" -> SummaryRule, "span-source" -> "canonical-text")
+          val params = Map(
+            "scope" -> scope,
+            "rule" -> SummaryRule,
+            "span-source" -> "canonical-text",
+            "title-provenance" -> title.provenance.render
+          )
           val (bundle, call) = proposed(
             source,
             SummaryRule,
             scope,
             scopeChecksum,
-            StorySummaryProposal(title),
+            StorySummaryProposal(title.value),
             evidence,
             1.0,
             SummaryCalibrationModel,
-            Vector("summary", title),
+            Vector("summary", title.value, title.provenance.render),
             params
           )
           SummaryOutcome(
             StorySummaryAttempt(bundle),
-            SummaryCoverage.Proposed(title),
+            SummaryCoverage.Proposed(title.value, title.provenance),
             Some(evidence),
             call
           )

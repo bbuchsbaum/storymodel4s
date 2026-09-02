@@ -26,9 +26,18 @@ private def cid(k: String): ContextId = ContextId.unsafe(s"wog:ctx:$k")
   */
 object WarOfTheGhostsModel:
 
+  /** The title is caller-supplied: the fixture's author states it, from the published source the
+    * text came from. It is not derived from the file the text lives in, and the source records that
+    * basis so the summary rule may carry it.
+    */
+  val title: StoryTitle =
+    StoryTitle
+      .callerSupplied(WarOfTheGhostsText.title)
+      .fold(e => throw new IllegalStateException(e.message), identity)
+
   val source: StorySource =
     StorySource
-      .fromText(WarOfTheGhostsText.text, Some(WarOfTheGhostsText.title))
+      .titled(WarOfTheGhostsText.text, title)
       .fold(e => throw new IllegalStateException(e.message), identity)
 
   val atlas: SurfaceAtlas = SurfaceAnalyzer.analyze(source)

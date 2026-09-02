@@ -64,6 +64,78 @@ object TextNorm:
       else true
     }
 
+/** How a story's title came to be known.
+  *
+  * Why typed and why only one case: a title is a claim about the work, and the only basis this
+  * project has ever been able to establish for one is that a caller stated it. A title a tool
+  * derived from something that is not the work — a filename, a directory, a request id — is not on
+  * this list, so there is no case to record it under and no way to publish it as established. The
+  * enum widens when a real derivation exists (a title line the text itself carries, say), and each
+  * new case names the basis rather than sharing an unlabelled default with the others.
+  */
+enum TitleProvenance:
+  /** A caller stated this title. The claim is the caller's, and the model records it as theirs. */
+  case CallerSupplied
+
+  def render: String = this match
+    case CallerSupplied => TitleProvenance.CallerSuppliedTag
+
+object TitleProvenance:
+  private[core] val CallerSuppliedTag: String = "caller-supplied"
+
+  /** Key under which [[StorySource.metadata]] carries the provenance of `title`. Metadata and not a
+    * constructor field so that a source built before this rule existed reads back as a title with
+    * *no recorded provenance*, which is exactly what it is — not as one silently promoted to
+    * caller-supplied.
+    */
+  val MetadataKey: String = "title.provenance"
+
+  def parse(raw: String): Option[TitleProvenance] =
+    if raw == CallerSuppliedTag then Some(CallerSupplied) else None
+
+/** A story title together with the provenance that entitles the model to carry it.
+  *
+  * Why a checked type rather than a `String`: the defect this closes is a pipeline that handed
+  * `StorySource` the input file's name and got a summary claim at credence 1.0 asserting the
+  * narrative was called `wog.txt`. A bare `String` cannot tell a title someone stated from a string
+  * some caller happened to have; this type can only be obtained by naming the basis.
+  *
+  * Non-case so neither `copy` nor `fromProduct` can pair a value with a provenance it did not pass
+  * the constructor with.
+  */
+final class StoryTitle private (val value: String, val provenance: TitleProvenance):
+  /** The metadata entry that records this title's provenance on a [[StorySource]]. */
+  def metadataEntry: (String, String) = TitleProvenance.MetadataKey -> provenance.render
+
+  override def equals(other: Any): Boolean = other match
+    case that: StoryTitle => value == that.value && provenance == that.provenance
+    case _                => false
+
+  override def hashCode(): Int = (value, provenance).hashCode()
+
+  override def toString: String = s"StoryTitle($value, ${provenance.render})"
+
+object StoryTitle:
+  /** Longest title this project will carry. A title is a name, not a paragraph; a caller passing
+    * prose has passed the wrong thing and gets told so rather than having it published.
+    */
+  val MaxLength: Int = 200
+
+  /** A title a caller states, as their claim. Refused when blank, when it spans lines, when it
+    * carries a control character, when it is longer than [[MaxLength]], or when it holds a path
+    * separator — the last because a path is the shape of the defect this type exists to close, and
+    * a caller who means it can state the name without the directory.
+    */
+  def callerSupplied(raw: String): Either[DomainError, StoryTitle] =
+    val trimmed = raw.trim
+    def refuse(why: String) = Left(DomainError.InvalidFormat("StoryTitle", raw, why))
+    if trimmed.isEmpty then refuse("blank title")
+    else if trimmed.length > MaxLength then refuse(s"title longer than $MaxLength characters")
+    else if trimmed.exists(c => c.isControl) then refuse("title contains a control character")
+    else if trimmed.exists(c => c == '/' || c == '\\') then
+      refuse("title contains a path separator")
+    else Right(new StoryTitle(trimmed, TitleProvenance.CallerSupplied))
+
 /** The immutable source text of a story with raw and canonical forms and their checksums.
   *
   * All offsets in the model are interpreted against `canonicalText` only. Non-case so `fromProduct`
@@ -97,6 +169,22 @@ final class StorySource private (
 
   override def toString: String =
     s"StorySource(${id.value}, title=$title, lang=${language.value}, rawChars=${rawText.length})"
+
+  /** The recorded provenance of `title`, or nothing when the source records none. */
+  def titleProvenance: Option[TitleProvenance] =
+    metadata.get(TitleProvenance.MetadataKey).flatMap(TitleProvenance.parse)
+
+  /** The title *and* the basis for carrying it, or nothing.
+    *
+    * Why consumers must read this and not `title`: `title` is whatever a caller put there, and a
+    * caller with no basis is exactly how `wog.txt` became a summary claim. A title whose provenance
+    * the source does not record is not established, and this method is the difference between the
+    * two — visibly, at every call site, rather than in a comment.
+    */
+  def establishedTitle: Option[StoryTitle] =
+    titleProvenance.flatMap { case TitleProvenance.CallerSupplied =>
+      title.flatMap(raw => StoryTitle.callerSupplied(raw).toOption)
+    }
 
 object StorySource:
   /** Line endings to `\n`, trailing whitespace stripped per line, runs of more than two newlines
@@ -132,6 +220,19 @@ object StorySource:
           metadata
         )
       )
+
+  /** A source whose title is established: the value and its provenance are recorded together, so
+    * [[StorySource.establishedTitle]] can return it. The only way to build one, and the reason a
+    * caller cannot get an established title by writing the metadata key by hand and hoping.
+    */
+  def titled(
+      rawText: String,
+      title: StoryTitle,
+      language: LanguageTag = LanguageTag.English,
+      metadata: Map[String, String] = Map.empty,
+      explicitId: Option[StoryId] = None
+  ): Either[DomainError, StorySource] =
+    fromText(rawText, Some(title.value), language, metadata + title.metadataEntry, explicitId)
 
 /** Kinds of deterministic surface units. `Clause` is an extraction anchor produced by later stages,
   * never by the surface analyzer.
