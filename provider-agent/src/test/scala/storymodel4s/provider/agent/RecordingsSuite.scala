@@ -140,7 +140,7 @@ class RecordingsSuite extends FunSuite:
   }
 
   test("every failure code literal was admitted rather than thrown on") {
-    assertEquals(AgentFailureCodes.all.size, 16)
+    assertEquals(AgentFailureCodes.all.size, 17)
     assert(AgentFailureCodes.all.forall(code => code.value.nonEmpty))
     assertEquals(AgentFailureCodes.serviceError(429).value, "service-error-429")
     assertEquals(ExchangeFailure.Timeout(7L).toTransport, TransportFailure.Timeout(7L))
