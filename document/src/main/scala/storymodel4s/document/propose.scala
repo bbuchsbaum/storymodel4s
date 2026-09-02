@@ -7,12 +7,14 @@ import storymodel4s.core.*
 import storymodel4s.core.TextNorm.lower as foldCase
 import storymodel4s.proposition.{
   Canonical,
+  ChartOrigin,
   Checked,
   Concept,
   ConceptId,
   ConceptKind,
   Gloss,
   Polarity as ChartPolarity,
+  PropositionAlignment,
   PropositionChart,
   PropositionEvidence,
   RoleAssignment,
@@ -53,14 +55,19 @@ enum SentenceCoverage:
   /** `fillers` counts the entity-kind fillers proposed as participants of the root; `unlicensed`
     * counts the entity-kind fillers the chart reaches from the root by no single normalized
     * participant role, which are never proposed. Together they say how much of the root's argument
-    * structure the participant layer carries.
+    * structure the participant layer carries. The sentence is the root's own.
     */
-  case Proposed(sentence: SurfaceUnitId, root: ChartNodeRef, fillers: Int, unlicensed: Int)
-  case Abstained(sentence: SurfaceUnitId, anchor: ChartNodeRef, reason: AbstentionReason)
-  case EmptyChart(sentence: SurfaceUnitId)
-  case NoChart(sentence: SurfaceUnitId)
+  case Proposed(root: ChartNodeRef, fillers: Int, unlicensed: Int)
+  case Abstained(anchor: ChartNodeRef, reason: AbstentionReason)
+  case EmptyChart(unit: SurfaceUnitId)
+  case NoChart(unit: SurfaceUnitId)
 
-  def sentence: SurfaceUnitId
+  /** The sentence the row is about: derived from the chart node for rows that carry one. */
+  def sentence: SurfaceUnitId = this match
+    case Proposed(root, _, _) => root.sentence
+    case Abstained(anchor, _) => anchor.sentence
+    case EmptyChart(unit)     => unit
+    case NoChart(unit)        => unit
 
 /** Whether a story-summary proposal was emitted; the title is the only summary source here. */
 enum SummaryCoverage:
@@ -96,10 +103,10 @@ final class ChartProposals private (
   def counts: CoverageCounts =
     coverage.foldLeft(CoverageCounts(0, 0, 0, 0)) { (acc, row) =>
       row match
-        case SentenceCoverage.Proposed(_, _, _, _) => acc.copy(proposed = acc.proposed + 1)
-        case SentenceCoverage.Abstained(_, _, _)   => acc.copy(abstained = acc.abstained + 1)
-        case SentenceCoverage.EmptyChart(_)        => acc.copy(emptyCharts = acc.emptyCharts + 1)
-        case SentenceCoverage.NoChart(_)           => acc.copy(noCharts = acc.noCharts + 1)
+        case SentenceCoverage.Proposed(_, _, _) => acc.copy(proposed = acc.proposed + 1)
+        case SentenceCoverage.Abstained(_, _)   => acc.copy(abstained = acc.abstained + 1)
+        case SentenceCoverage.EmptyChart(_)     => acc.copy(emptyCharts = acc.emptyCharts + 1)
+        case SentenceCoverage.NoChart(_)        => acc.copy(noCharts = acc.noCharts + 1)
     }
 
   override def equals(other: Any): Boolean = other match
@@ -185,14 +192,32 @@ object ChartProposals:
   */
 object ChartProposalProvider:
   val Stage: StageId = StageId.unsafe("chart-proposal-provider")
-  val Fingerprint: storymodel4s.core.Fingerprint =
-    storymodel4s.core.Fingerprint.unsafe("storymodel4s:chart-proposal-provider:0.1")
+
+  /** Extractor identity on every evidence record this provider writes. */
+  val ProviderFingerprint: Fingerprint =
+    Fingerprint.unsafe("storymodel4s:chart-proposal-provider:0.1")
 
   /** Provider identity on every receipt; the resolver counts agreement by this triple. */
   val ProviderName: String = "chart-proposal-provider"
   val ModelName: String = "chart-rules"
   val Version: String = "1"
+
+  /** Calibration model of every rule that is a total function of the chart: the value cannot
+    * disagree with what the chart says, so probability 1.0 is honest.
+    */
   val CalibrationModel: String = "chart-rule-v1"
+
+  /** Calibration model of the context rule. `NarratedWorld` is the absence-of-embedding default at
+    * sentence grain (the focus is held by no embedding, so the sentence asserts it at root), not a
+    * context the chart licenses positively; the name keeps that visible on every receipt.
+    */
+  val ContextCalibrationModel: String = "narrated-world-default-v1"
+
+  /** Calibration model of the title-summary rule, which reads no chart. */
+  val SummaryCalibrationModel: String = "title-rule-v1"
+
+  /** Frame namespace of the `-91` reification set; an id in another namespace is not a state. */
+  val StateFrameNamespace: String = "amr"
 
   /** The closed set of AMR `-91` reification frames whose focus denotes a state, not an event. */
   val StateFrames: Set[String] = Set(
@@ -262,9 +287,9 @@ object ChartProposalProvider:
        |root: the situation root of a sentence is the chart focus and nothing else. There is no
        |  fallback to another predicate; a chart whose focus is inadmissible is abstained.
        |admissible: the focus concept has kind Predicate and is not held by any embedding.
-       |kind: State when the focus concept carries a frame whose id is in the closed set
-       |  {${StateFrames.toVector.sorted.mkString(", ")}}; otherwise Event. Lexical statives
-       |  without such a frame are Event in this version.
+       |kind: State when the focus concept carries a frame in namespace $StateFrameNamespace whose
+       |  id is in the closed set {${StateFrames.toVector.sorted.mkString(", ")}}; otherwise
+       |  Event. Lexical statives without such a frame are Event in this version.
        |predicate: lemma = the concept lemma; frame = "namespace:id" of the concept frame when
        |  present; gloss = the concept gloss when present, else the lemma.
        |description: Gloss.predicate over the chart at the root, so every word is a chart lemma
@@ -275,7 +300,22 @@ object ChartProposalProvider:
        |membership: PrimaryStoryMember, one attempt per admissible root, anchored at the root.
        |support: the union of the alignment spans of every alignment naming at least one
        |  non-embedded concept, recorded as span-source=chart-alignments; when that union is empty
-       |  the sentence span is used, recorded as span-source=sentence.
+       |  the sentence span is used, recorded as span-source=sentence. Every alignment span of a
+       |  chart must lie inside the chart's own sentence unit, whatever surface unit the span
+       |  names; a chart violating this is refused, not repaired.
+       |raw score: the minimum alignment credence among the alignments that supply a proposal's
+       |  support; chart credence propagates only as this uncalibrated raw score and never as a
+       |  probability. A sentence-fallback support has no alignment credence and carries 1.0,
+       |  which span-source=sentence distinguishes from a measured 1.0.
+       |calibration: probability 1.0 under $CalibrationModel for every rule that is a total
+       |  function of the chart (situation, membership, coverage, participant, mention, temporal);
+       |  the context rule under $ContextCalibrationModel, because NarratedWorld is the
+       |  absence-of-embedding default at sentence grain; the summary rule under
+       |  $SummaryCalibrationModel.
+       |receipts: every evidence id is the content address of its scope, chart checksum, and
+       |  rendered span set; every call render names the evidence id it cites; the chart receipts
+       |  bind the source by their input checksum (the canonical text or the sentence text); the
+       |  chart origin is a receipt parameter.
        |summary: the source title with evidence spanning the whole canonical text; no title or a
        |  blank title yields an abstained summary attempt.
        |participants: for each admissible root, every relation from the root whose filler is a
@@ -304,9 +344,10 @@ object ChartProposalProvider:
        |  present, else the lowest concept id). An empty chart or a sentence without a chart yields
        |  no attempt and a coverage row only.
        |causal: no causal attempt is emitted; absent pairs are not evaluated.
-       |bundles: one proposed value per attempt with raw score 1.0, source support 1.0 over the
-       |  evidence spans, agreement 1.0, and calibration $CalibrationModel at probability 1.0;
-       |  abstained attempts carry no value, support 0.0, no spans, agreement 0.0, no calibration.
+       |bundles: one proposed value per attempt with the raw score above, source support 1.0
+       |  over the evidence spans, agreement 1.0, and one calibration at probability 1.0 under the
+       |  rule's model; abstained attempts carry no value, support 0.0, no spans, agreement 0.0,
+       |  no calibration.
        |policy: AcceptancePolicy.Conservative, except ContextAssignment and SegmentMembership at
        |  requireAgreement = 1, because one deterministic program is one provider; EntityMention,
        |  ParticipantRole, ParticipantCoverage, and TemporalRelation are FamilyPolicy.Ordinary.
@@ -326,9 +367,13 @@ object ChartProposalProvider:
     * alone lowered to one agreeing provider. Recorded in [[RulesText]], so in every config hash.
     */
   val Policy: AcceptancePolicy =
+    // The literal arguments satisfy FamilyPolicy.of; if a future edit broke that, the family
+    // would stay at Conservative (two providers, never satisfiable here) and the policy court
+    // pins requireAgreement = 1, so the failure is closed and visible rather than a thrown
+    // initializer.
     val single = FamilyPolicy
       .of(Probability.unsafe(0.9), Probability.unsafe(0.5), 1, true, true, true)
-      .fold(e => throw new IllegalArgumentException(e.message), identity)
+      .getOrElse(FamilyPolicy.Conservative)
     val base = AcceptancePolicy.Conservative
     base.copy(perFamily =
       base.perFamily ++ Map(
@@ -349,8 +394,12 @@ object ChartProposalProvider:
       unit: SurfaceUnit,
       root: ChartNodeRef,
       checksum: Checksum,
-      spans: SpanSet
+      spans: SpanSet,
+      raw: Double
   )
+
+  /** Support spans, where they came from, and the minimum alignment credence behind them. */
+  private final case class Support(spans: SpanSet, source: String, raw: Double)
 
   /** An entity-kind filler of the root reached by exactly one licensed participant role. */
   private final case class LicensedFiller(
@@ -388,9 +437,9 @@ object ChartProposalProvider:
   ): Either[DomainError, ChartProposals] =
     for
       _ <- checkAtlas(source, atlas)
-      ordered <- checkCharts(atlas, charts)
+      ordered <- checkCharts(source, atlas, charts)
       _ <- ordered.traverse_((unit, ev) => checkAlignments(source, atlas, unit, ev.chart))
-      outcomes <- ordered.traverse((unit, ev) => sentenceOutcome(source, unit, ev.chart))
+      outcomes <- ordered.traverse((unit, ev) => sentenceOutcome(source, unit, ev))
       summary <- summaryOutcome(source)
     yield
       val byUnit = outcomes.map(o => o.coverage.sentence -> o).toMap
@@ -418,12 +467,16 @@ object ChartProposalProvider:
         summary.coverage
       )
 
-  /** [[propose]] and bind the result into checked compiler input with this provider's receipt. */
+  /** [[propose]] and bind the result into checked compiler input with this provider's receipt.
+    *
+    * `parserStage` names the stage that produced the charts; its digest is derived here from the
+    * charts themselves ([[chartsDigest]]), never typed by the caller.
+    */
   def input(
       source: StorySource,
       atlas: SurfaceAtlas,
       charts: Vector[(SurfaceUnitId, PropositionEvidence)],
-      parserStage: Option[(StageId, Checksum)],
+      parserStage: Option[StageId],
       createdAtEpochMillis: Long
   ): Either[NarrativeCompilerError, NarrativeCompilerInput] =
     propose(source, atlas, charts).left
@@ -434,7 +487,7 @@ object ChartProposalProvider:
           source.id,
           source.canonicalChecksum,
           StoryModel.SchemaVersion,
-          parserStage.toVector :+ (Stage -> stageDigest),
+          parserStage.map(_ -> chartsDigest(charts)).toVector :+ (Stage -> stageDigest),
           createdAtEpochMillis
         )
         val chartReceipts = charts.flatMap(_._2.provenance.receipts)
@@ -474,12 +527,33 @@ object ChartProposalProvider:
       )
     else Right(())
 
+  /** Digest of the charts a build consumed: each sentence, its canonical chart checksum, its
+    * rendered alignment spans, and its receipts' output checksums. This is the parser stage's
+    * digest on the build receipt.
+    */
+  def chartsDigest(charts: Vector[(SurfaceUnitId, PropositionEvidence)]): Checksum =
+    ContentAddress.digest(
+      charts
+        .sortBy(_._1)
+        .flatMap((unit, ev) =>
+          Vector(
+            "chart/v1",
+            unit.value,
+            Canonical.checksum(ev.chart).hex,
+            renderAlignments(ev.chart)
+          ) ++ ev.provenance.receipts.map(_.outputChecksum.hex)
+        )
+    )
+
   private def checkCharts(
+      source: StorySource,
       atlas: SurfaceAtlas,
       charts: Vector[(SurfaceUnitId, PropositionEvidence)]
   ): Either[DomainError, Vector[(SurfaceUnit, PropositionEvidence)]] =
     val sorted = charts.sortBy(_._1)
-    val duplicate = sorted.groupBy(_._1).collectFirst { case (id, xs) if xs.size > 1 => id }
+    val duplicate = sorted.map(_._1).zip(sorted.map(_._1).drop(1)).collectFirst {
+      case (a, b) if a == b => a
+    }
     duplicate match
       case Some(id) =>
         Left(DomainError.InvariantViolation(ChartPath, s"duplicate chart ${id.value}"))
@@ -500,7 +574,20 @@ object ChartProposalProvider:
                   s"chart sentence does not equal ${id.value}"
                 )
               )
-            case Some(unit) => Right(unit -> ev)
+            case Some(unit) =>
+              // A chart receipt binds the source by what it hashed: the canonical text or this
+              // sentence's text. A receipt hashing anything else was made over other input.
+              val bound = Set(source.canonicalChecksum, Checksum.ofText(atlas.text(unit)))
+              ev.provenance.receipts.find(call => !bound(call.inputChecksum)) match
+                case Some(call) =>
+                  Left(
+                    DomainError.InvariantViolation(
+                      ChartPath,
+                      s"${id.value}: chart receipt ${call.provider}/${call.model} hashed " +
+                        s"${call.inputChecksum.hex}, neither the source nor the sentence"
+                    )
+                  )
+                case None => Right(unit -> ev)
         }
 
   private def checkAlignments(
@@ -528,6 +615,14 @@ object ChartProposalProvider:
             s"${unit.id.value}: span $span cuts a UTF-16 surrogate pair"
           )
         )
+      else if !unit.span.contains(span) then
+        // Whatever unit the ref names, a chart's alignment is evidence about its own sentence.
+        Left(
+          DomainError.InvariantViolation(
+            AlignmentPath,
+            s"${unit.id.value}: span $span lies outside the chart's sentence ${unit.span}"
+          )
+        )
       else
         ref.unit match
           case None        => Right(())
@@ -547,6 +642,14 @@ object ChartProposalProvider:
                     s"${unit.id.value}: span $span escapes surface unit ${named.value}"
                   )
                 )
+              case Some(holder) if !unit.span.contains(holder.span) =>
+                Left(
+                  DomainError.InvariantViolation(
+                    AlignmentPath,
+                    s"${unit.id.value}: span names surface unit ${named.value}, which is not " +
+                      "the chart's sentence or a unit inside it"
+                  )
+                )
               case Some(_) => Right(())
     }
 
@@ -559,8 +662,10 @@ object ChartProposalProvider:
   private def sentenceOutcome(
       source: StorySource,
       unit: SurfaceUnit,
-      chart: PropositionChart[Checked]
+      ev: PropositionEvidence
   ): Either[DomainError, SentenceOutcome] =
+    val chart = ev.chart
+    val origin = ev.provenance.origin
     val checksum = Canonical.checksum(chart)
     if chart.isEmpty then
       Right(
@@ -581,7 +686,7 @@ object ChartProposalProvider:
       chart.focus match
         case None =>
           val anchor = ChartNodeRef(unit.id, chart.conceptIds.head)
-          Right(abstain(source, unit, checksum, anchor, AbstentionReason.NoFocus))
+          Right(abstain(source, unit, origin, checksum, anchor, AbstentionReason.NoFocus))
         case Some(focus) =>
           val root = ChartNodeRef(unit.id, focus)
           chart.concept(focus) match
@@ -597,19 +702,21 @@ object ChartProposalProvider:
                 abstain(
                   source,
                   unit,
+                  origin,
                   checksum,
                   root,
                   AbstentionReason.FocusNotPredicate(concept.kind)
                 )
               )
             case Some(_) if chart.isEmbedded(focus) =>
-              Right(abstain(source, unit, checksum, root, AbstentionReason.FocusEmbedded))
-            case Some(concept) => proposeRoot(source, unit, chart, checksum, root, concept)
+              Right(abstain(source, unit, origin, checksum, root, AbstentionReason.FocusEmbedded))
+            case Some(concept) => proposeRoot(source, unit, chart, origin, checksum, root, concept)
 
   private def proposeRoot(
       source: StorySource,
       unit: SurfaceUnit,
       chart: PropositionChart[Checked],
+      origin: ChartOrigin,
       checksum: Checksum,
       root: ChartNodeRef,
       concept: Concept
@@ -623,18 +730,12 @@ object ChartProposalProvider:
           )
         )
       case Some(description) =>
-        val (spans, spanSource) = supportSpans(unit, chart)
-        val evidence = Evidence(
-          EvidenceId.unsafe(
-            ContentAddress.of("chart-proposal-evidence", unit.id.value, checksum.hex)
-          ),
-          Some(spans),
-          Set.empty,
-          Fingerprint,
-          Stage
-        )
+        val support = supportSpans(unit, chart)
+        val spans = support.spans
+        val evidence = evidenceRecord(unit.id.value, checksum, spans)
         val kind =
-          if concept.frame.exists(f => StateFrames(f.id)) then SituationKind.State
+          if concept.frame.exists(f => f.namespace == StateFrameNamespace && StateFrames(f.id))
+          then SituationKind.State
           else SituationKind.Event
         val lemma = concept.lemma.value
         val value = SituationProposal(
@@ -649,7 +750,7 @@ object ChartProposalProvider:
           Modality.Asserted,
           None
         )
-        val params = chartParams(unit, checksum) + ("span-source" -> spanSource)
+        val params = chartParams(unit, checksum, origin) + ("span-source" -> support.source)
         val (situation, situationCall) = proposed(
           source,
           SituationRule,
@@ -657,6 +758,8 @@ object ChartProposalProvider:
           checksum,
           value,
           evidence,
+          support.raw,
+          CalibrationModel,
           Vector(
             "situation",
             kind.toString,
@@ -675,6 +778,8 @@ object ChartProposalProvider:
           checksum,
           ContextAssignmentProposal.NarratedWorld,
           evidence,
+          support.raw,
+          ContextCalibrationModel,
           Vector("narrated-world", root.key),
           params
         )
@@ -685,12 +790,14 @@ object ChartProposalProvider:
           checksum,
           SegmentMembershipProposal.PrimaryStoryMember,
           evidence,
+          support.raw,
+          CalibrationModel,
           Vector("primary-story-member", root.key),
           params
         )
         val (licensed, unlicensed) = scanFillers(chart, root.concept)
         val fillerOutcomes = licensed.map(filler =>
-          fillerOutcome(source, unit, chart, checksum, root, spans, filler, params)
+          fillerOutcome(source, unit, chart, checksum, root, support, filler, params)
         )
         val coverageValue =
           ParticipantCoverage.of(licensed.map(f => ChartNodeRef(unit.id, f.concept)))
@@ -701,13 +808,15 @@ object ChartProposalProvider:
           checksum,
           coverageValue,
           evidence,
+          support.raw,
+          CalibrationModel,
           "participant-coverage" +: root.key +: coverageValue.fillers.map(_.key),
           params + ("fillers" -> licensed.size.toString) + ("unlicensed" -> unlicensed.toString)
         )
         Right(
           SentenceOutcome(
-            SentenceCoverage.Proposed(unit.id, root, licensed.size, unlicensed),
-            Some(ProposedRoot(unit, root, checksum, spans)),
+            SentenceCoverage.Proposed(root, licensed.size, unlicensed),
+            Some(ProposedRoot(unit, root, checksum, spans, support.raw)),
             evidence +: fillerOutcomes.flatMap(_.evidence),
             Some(SituationAttempt(root, situation)),
             Some(ContextAssignmentAttempt(root, context)),
@@ -769,35 +878,23 @@ object ChartProposalProvider:
       chart: PropositionChart[Checked],
       checksum: Checksum,
       root: ChartNodeRef,
-      rootSpans: SpanSet,
+      rootSupport: Support,
       filler: LicensedFiller,
       params: Map[String, String]
   ): FillerOutcome =
     val fillerRef = ChartNodeRef(unit.id, filler.concept)
-    val fillerSpans = SpanSet.of(
-      chart.alignments
-        .filter(_.target.conceptIds.contains(filler.concept))
-        .flatMap(_.spans.refs.toVector)
+    val fillerAlignments = chart.alignments.filter(_.target.conceptIds.contains(filler.concept))
+    val fillerSpans = SpanSet.of(fillerAlignments.flatMap(_.spans.refs.toVector))
+    val (mentionSpans, mentionSource, mentionRaw) = fillerSpans match
+      case Some(spans) => (spans, "filler-alignments", minCredence(fillerAlignments))
+      case None        => (rootSupport.spans, "root-support", rootSupport.raw)
+    val mentionEvidence = evidenceRecord(fillerRef.key, checksum, mentionSpans)
+    val participantEvidence = evidenceRecord(
+      s"${root.key}->${fillerRef.key}",
+      checksum,
+      fillerSpans.fold(rootSupport.spans)(_ ++ rootSupport.spans)
     )
-    val (mentionSpans, mentionSource) = fillerSpans match
-      case Some(spans) => (spans, "filler-alignments")
-      case None        => (rootSpans, "root-support")
-    val mentionEvidence = Evidence(
-      EvidenceId.unsafe(ContentAddress.of("chart-proposal-evidence", fillerRef.key, checksum.hex)),
-      Some(mentionSpans),
-      Set.empty,
-      Fingerprint,
-      Stage
-    )
-    val participantEvidence = Evidence(
-      EvidenceId.unsafe(
-        ContentAddress.of("chart-proposal-evidence", s"${root.key}->${fillerRef.key}", checksum.hex)
-      ),
-      Some(fillerSpans.fold(rootSpans)(_ ++ rootSpans)),
-      Set.empty,
-      Fingerprint,
-      Stage
-    )
+    val participantRaw = math.min(mentionRaw, rootSupport.raw)
     val mentionValue = EntityMentionProposal(
       filler.lemma,
       EntityType.Custom("chart", foldCase(filler.kind.toString))
@@ -810,6 +907,8 @@ object ChartProposalProvider:
       checksum,
       mentionValue,
       mentionEvidence,
+      mentionRaw,
+      CalibrationModel,
       Vector("entity-mention", fillerRef.key, mentionValue.label, mentionValue.entityType.toString),
       fillerParams + ("span-source" -> mentionSource)
     )
@@ -820,6 +919,8 @@ object ChartProposalProvider:
       checksum,
       filler.role,
       participantEvidence,
+      participantRaw,
+      CalibrationModel,
       Vector("participant", root.key, fillerRef.key, renderRole(filler.role)),
       fillerParams + ("role" -> renderRole(filler.role))
     )
@@ -838,13 +939,7 @@ object ChartProposalProvider:
   ): (TemporalAttempt, Evidence, ProviderCall) =
     val scope = s"${prev.unit.id.value}->${next.unit.id.value}"
     val checksum = ContentAddress.digest(Vector(prev.checksum.hex, next.checksum.hex))
-    val evidence = Evidence(
-      EvidenceId.unsafe(ContentAddress.of("chart-proposal-evidence", scope, checksum.hex)),
-      Some(prev.spans ++ next.spans),
-      Set.empty,
-      Fingerprint,
-      Stage
-    )
+    val evidence = evidenceRecord(scope, checksum, prev.spans ++ next.spans)
     val params = Map(
       "from" -> prev.unit.id.value,
       "to" -> next.unit.id.value,
@@ -858,6 +953,8 @@ object ChartProposalProvider:
       checksum,
       TemporalRelation.Unclear,
       evidence,
+      math.min(prev.raw, next.raw),
+      CalibrationModel,
       Vector("temporal", prev.root.key, next.root.key, TemporalRelation.Unclear.toString),
       params
     )
@@ -870,11 +967,12 @@ object ChartProposalProvider:
   private def abstain(
       source: StorySource,
       unit: SurfaceUnit,
+      origin: ChartOrigin,
       checksum: Checksum,
       anchor: ChartNodeRef,
       reason: AbstentionReason
   ): SentenceOutcome =
-    val params = chartParams(unit, checksum) + ("reason" -> reason.render)
+    val params = chartParams(unit, checksum, origin) + ("reason" -> reason.render)
     val render = Vector("abstain", anchor.key, reason.render)
     val (situation, situationCall) =
       abstained[SituationProposal](
@@ -913,7 +1011,7 @@ object ChartProposalProvider:
         params
       )
     SentenceOutcome(
-      SentenceCoverage.Abstained(unit.id, anchor, reason),
+      SentenceCoverage.Abstained(anchor, reason),
       None,
       Vector.empty,
       Some(SituationAttempt(anchor, situation)),
@@ -942,14 +1040,7 @@ object ChartProposalProvider:
         Right(SummaryOutcome(StorySummaryAttempt(bundle), SummaryCoverage.NoTitle, None, call))
       case Some(title) =>
         TextSpan.of(0, source.canonicalText.length).map { whole =>
-          val evidence = Evidence(
-            EvidenceId
-              .unsafe(ContentAddress.of("chart-proposal-evidence", scope, scopeChecksum.hex)),
-            Some(SpanSet.one(SpanRef(None, whole))),
-            Set.empty,
-            Fingerprint,
-            Stage
-          )
+          val evidence = evidenceRecord(scope, scopeChecksum, SpanSet.one(SpanRef(None, whole)))
           val params =
             Map("scope" -> scope, "rule" -> SummaryRule, "span-source" -> "canonical-text")
           val (bundle, call) = proposed(
@@ -959,6 +1050,8 @@ object ChartProposalProvider:
             scopeChecksum,
             StorySummaryProposal(title),
             evidence,
+            1.0,
+            SummaryCalibrationModel,
             Vector("summary", title),
             params
           )
@@ -970,22 +1063,71 @@ object ChartProposalProvider:
           )
         }
 
-  /** Alignment spans of every alignment naming a non-embedded concept; the sentence otherwise. */
-  private def supportSpans(unit: SurfaceUnit, chart: PropositionChart[Checked]): (SpanSet, String) =
-    val refs = chart.alignments
-      .filter(_.target.conceptIds.exists(id => !chart.isEmbedded(id)))
-      .flatMap(_.spans.refs.toVector)
-    SpanSet.of(refs) match
-      case Some(set) => (set, "chart-alignments")
-      case None      => (SpanSet.one(SpanRef(Some(unit.id), unit.span)), "sentence")
+  /** Alignment spans of every alignment naming a non-embedded concept, with their minimum credence;
+    * the sentence with raw score 1.0 otherwise (recorded as span-source=sentence).
+    */
+  private def supportSpans(unit: SurfaceUnit, chart: PropositionChart[Checked]): Support =
+    val supporting =
+      chart.alignments.filter(_.target.conceptIds.exists(id => !chart.isEmbedded(id)))
+    SpanSet.of(supporting.flatMap(_.spans.refs.toVector)) match
+      case Some(set) => Support(set, "chart-alignments", minCredence(supporting))
+      case None      => Support(SpanSet.one(SpanRef(Some(unit.id), unit.span)), "sentence", 1.0)
+
+  /** Minimum raw credence of the given alignments; 1.0 for none, which callers only reach with a
+    * fallback support whose span-source says so.
+    */
+  private def minCredence(alignments: Vector[PropositionAlignment]): Double =
+    alignments.map(_.credence.rawScore).minOption.getOrElse(1.0)
+
+  /** Content-addressed evidence over its scope, chart checksum, and rendered span set. */
+  private def evidenceRecord(scope: String, checksum: Checksum, spans: SpanSet): Evidence =
+    Evidence(
+      EvidenceId.unsafe(
+        ContentAddress.of("chart-proposal-evidence/v2", scope, checksum.hex, renderSpans(spans))
+      ),
+      Some(spans),
+      Set.empty,
+      ProviderFingerprint,
+      Stage
+    )
+
+  private def renderSpans(spans: SpanSet): String =
+    spans.refs.toVector
+      .map(r => s"${r.unit.fold("-")(_.value)}:${r.span.start}:${r.span.endExclusive}")
+      .mkString(",")
+
+  private def renderAlignments(chart: PropositionChart[Checked]): String =
+    chart.alignments
+      .map(a =>
+        s"${a.target.conceptIds.toVector.sorted.map(_.value).mkString("+")}=" +
+          s"${renderSpans(a.spans)}@${a.credence.rawScore}"
+      )
+      .sorted
+      .mkString(";")
+
+  private def renderOrigin(origin: ChartOrigin): String = origin match
+    case ChartOrigin.Hand               => "hand"
+    case ChartOrigin.Parser(f)          => s"parser:${f.value}"
+    case ChartOrigin.Agent(f)           => s"agent:${f.value}"
+    case ChartOrigin.Converted(from, f) => s"converted:$from:${f.value}"
+    case ChartOrigin.Resolved           => "resolved"
 
   private def polarity(value: ChartPolarity): StoryPolarity = value match
     case ChartPolarity.Positive => StoryPolarity.Positive
     case ChartPolarity.Negative => StoryPolarity.Negative
     case ChartPolarity.Unknown  => StoryPolarity.Unknown
 
-  private def chartParams(unit: SurfaceUnit, checksum: Checksum): Map[String, String] =
-    Map("sentence" -> unit.id.value, "chart" -> checksum.hex)
+  /** The origin comes from the evidence's provenance, the same record the binding rule reads. */
+  private def chartParams(
+      unit: SurfaceUnit,
+      checksum: Checksum,
+      origin: ChartOrigin
+  ): Map[String, String] =
+    Map(
+      "sentence" -> unit.id.value,
+      "chart" -> checksum.hex,
+      "chart-origin" -> renderOrigin(origin)
+    )
 
   private def taskId(rule: String, scope: String, checksum: Checksum): TaskId =
     TaskId.unsafe(ContentAddress.of("chart-proposal-task", rule, scope, checksum.hex))
@@ -1008,6 +1150,9 @@ object ChartProposalProvider:
       cached = false
     )
 
+  /** One proposed value with its evidence; the call render always ends with the evidence id, so a
+    * receipt identifies the exact spans it was made over.
+    */
   private def proposed[A](
       source: StorySource,
       rule: String,
@@ -1015,16 +1160,18 @@ object ChartProposalProvider:
       checksum: Checksum,
       value: A,
       evidence: Evidence,
+      rawScore: Double,
+      calibrationModel: String,
       render: Vector[String],
       params: Map[String, String]
   ): (EvidenceBundle[A], ProviderCall) =
     val task = taskId(rule, scope, checksum)
-    val call = providerCall(source, rule, render, params)
+    val call = providerCall(source, rule, render :+ evidence.id.value, params)
     val proposal = AgentProposal.proposed(
       task,
       value,
       NonEmptyVector.one(EvidenceRef.Inline(evidence)),
-      Some(RawScore.unsafe(1.0)),
+      Some(RawScore.unsafe(rawScore)),
       Vector.empty,
       AgentCallReceipt(call, Prompt, task)
     )
@@ -1035,7 +1182,7 @@ object ChartProposalProvider:
         StructuralValidity.Valid,
         SourceSupport(1.0, evidence.spans),
         agreementScore = 1.0,
-        Vector(CandidateCalibration(value, Probability.One, CalibrationModel))
+        Vector(CandidateCalibration(value, Probability.One, calibrationModel))
       ),
       call
     )

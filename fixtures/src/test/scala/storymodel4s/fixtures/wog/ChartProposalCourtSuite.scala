@@ -76,19 +76,6 @@ class ChartProposalCourtSuite extends FunSuite:
       )
     )
 
-  private def chartCall(unit: SurfaceUnit): ProviderCall =
-    ProviderCall(
-      "wog-test-chart-parser",
-      "hand-built-silver",
-      "1",
-      None,
-      source.canonicalChecksum,
-      Checksum.ofText(s"chart:${unit.id.value}"),
-      Map("sentence" -> unit.id.value),
-      None,
-      cached = false
-    )
-
   private def checked(
       unit: SurfaceUnit,
       focus: Option[ConceptId],
@@ -105,10 +92,10 @@ class ChartProposalCourtSuite extends FunSuite:
       polarity,
       embedded,
       alignments,
-      ChartProvenance(ChartOrigin.Parser(parser), Vector(chartCall(unit)), Vector.empty),
+      ChartProvenance.hand,
       Some(unit.id)
     )
-    unit.id -> PropositionEvidence.of(
+    unit.id -> PropositionEvidence.hand(
       ChartValidator.check(unchecked).fold(v => fail(v.toString), identity)
     )
 
@@ -217,23 +204,22 @@ class ChartProposalCourtSuite extends FunSuite:
     assertEquals(proposals.coverage.size, 50)
     assertEquals(proposals.summaryCoverage, SummaryCoverage.Proposed("The War of the Ghosts"))
     val rows = proposals.coverage.map(row => row.sentence -> row).toMap
-    assertEquals(rows(sEgulac.id), SentenceCoverage.Proposed(sEgulac.id, ref(sEgulac, c0), 0, 2))
-    assertEquals(rows(sHunt.id), SentenceCoverage.Proposed(sHunt.id, ref(sHunt, c0), 1, 0))
+    assertEquals(rows(sEgulac.id), SentenceCoverage.Proposed(ref(sEgulac, c0), 0, 2))
+    assertEquals(rows(sHunt.id), SentenceCoverage.Proposed(ref(sHunt, c0), 1, 0))
     assertEquals(
       rows(sRiver.id),
       SentenceCoverage.Abstained(
-        sRiver.id,
         ref(sRiver, c1),
         AbstentionReason.FocusNotPredicate(ConceptKind.Entity)
       )
     )
-    assertEquals(rows(sFog.id), SentenceCoverage.Proposed(sFog.id, ref(sFog, c0), 0, 0))
+    assertEquals(rows(sFog.id), SentenceCoverage.Proposed(ref(sFog, c0), 0, 0))
     assertEquals(rows(sPaddle.id), SentenceCoverage.EmptyChart(sPaddle.id))
     assertEquals(
       rows(sThought.id),
-      SentenceCoverage.Abstained(sThought.id, ref(sThought, c1), AbstentionReason.FocusEmbedded)
+      SentenceCoverage.Abstained(ref(sThought, c1), AbstentionReason.FocusEmbedded)
     )
-    assertEquals(rows(sArrows.id), SentenceCoverage.Proposed(sArrows.id, ref(sArrows, c0), 0, 2))
+    assertEquals(rows(sArrows.id), SentenceCoverage.Proposed(ref(sArrows, c0), 0, 2))
     assertEquals(proposals.situations.size, 6)
     assertEquals(proposals.participantCoverage.size, 6)
     assertEquals(
@@ -265,7 +251,7 @@ class ChartProposalCourtSuite extends FunSuite:
     assertEquals(values(ref(sArrows, c0)).description, "not have i arrow")
 
     val input = ChartProposalProvider
-      .input(source, atlas, charts, Some(parserStage -> Checksum.ofText("wog-silver-charts")), 0L)
+      .input(source, atlas, charts, Some(parserStage), 0L)
       .fold(e => fail(e.message), identity)
     val compiled = NarrativeCompiler.compile(input).fold(e => fail(e.message), identity)
 
@@ -311,21 +297,24 @@ class ChartProposalCourtSuite extends FunSuite:
     assertEquals(compiled.derivation.gaps.map(g => g.target -> g.reason).toSet, expectedGaps)
 
     assertEquals(compiled.provenance.configHash, Checksum.ofText(ChartProposalProvider.RulesText))
-    assertEquals(compiled.provenance.calls.size, 37)
+    assertEquals(compiled.provenance.calls.size, 30)
+    assert(compiled.provenance.calls.forall(_.params.get("chart-origin").forall(_ == "hand")))
+    assertEquals(compiled.receipt.stages.head._2, ChartProposalProvider.chartsDigest(charts))
     assertEquals(
       compiled.receipt.stages.map(_._1),
       Vector(parserStage, ChartProposalProvider.Stage)
     )
   }
 
-  test("replaying the same charts reproduces the compilation fingerprint") {
-    def run: NarrativeCompilation =
+  test("replaying the charts in another order reproduces the compilation fingerprint") {
+    def run(order: Vector[(SurfaceUnitId, PropositionEvidence)]): NarrativeCompilation =
       val input = ChartProposalProvider
-        .input(source, atlas, charts.reverse, None, 0L)
+        .input(source, atlas, order, None, 0L)
         .fold(e => fail(e.message), identity)
       NarrativeCompiler.compile(input).fold(e => fail(e.message), identity)
-    val first = run
-    val second = run
-    assertEquals(second.fingerprint, first.fingerprint)
-    assertEquals(second, first)
+    val ordinary = run(charts)
+    val permuted = run(charts.reverse)
+    assertNotEquals(charts, charts.reverse)
+    assertEquals(permuted.fingerprint, ordinary.fingerprint)
+    assertEquals(permuted, ordinary)
   }

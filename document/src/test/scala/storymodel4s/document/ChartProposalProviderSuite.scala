@@ -23,13 +23,13 @@ class ChartProposalProviderSuite extends FunSuite:
   private val parser = Fingerprint.unsafe("test:chart-parser:1")
   private val parserStage = StageId.unsafe("test-chart-parser")
 
-  private def chartCall(salt: String): ProviderCall =
+  private def chartCall(salt: String, input: Checksum = source.canonicalChecksum): ProviderCall =
     ProviderCall(
       "test-parser",
       "test-model",
       "1",
       None,
-      source.canonicalChecksum,
+      input,
       Checksum.ofText(s"chart:$salt"),
       Map("salt" -> salt),
       None,
@@ -45,8 +45,14 @@ class ChartProposalProviderSuite extends FunSuite:
       TextSpan.unsafe(unit.span.start + at, unit.span.start + at + word.length)
     )
 
-  private def align(unit: SurfaceUnit, word: String, concept: ConceptId): PropositionAlignment =
-    val spans = SpanSet.one(spanOf(unit, word))
+  private def align(
+      unit: SurfaceUnit,
+      word: String,
+      concept: ConceptId,
+      credence: Double = 1.0,
+      ref: Option[SpanRef] = None
+  ): PropositionAlignment =
+    val spans = SpanSet.one(ref.getOrElse(spanOf(unit, word)))
     val evidence = Evidence(
       EvidenceId.unsafe(s"ev:align:${unit.id.value}:$word"),
       Some(spans),
@@ -57,7 +63,7 @@ class ChartProposalProviderSuite extends FunSuite:
     PropositionAlignment(
       AlignmentTarget.Concepts(NonEmptySet.one(concept)),
       spans,
-      Credence.unsafeRaw(1.0),
+      Credence.unsafeRaw(credence),
       ClaimMeta.unsafe(
         ClaimId.unsafe(s"claim:align:${unit.id.value}:$word"),
         EpistemicStatus.SurfaceExplicit,
@@ -75,7 +81,8 @@ class ChartProposalProviderSuite extends FunSuite:
       polarity: Map[ConceptId, ChartPolarity] = Map.empty,
       embedded: Vector[EmbeddedProposition] = Vector.empty,
       alignments: Vector[PropositionAlignment] = Vector.empty,
-      salt: String = ""
+      salt: String = "",
+      provenance: Option[ChartProvenance] = None
   ): PropositionEvidence =
     val unchecked = PropositionChart.unchecked(
       focus,
@@ -84,10 +91,12 @@ class ChartProposalProviderSuite extends FunSuite:
       polarity,
       embedded,
       alignments,
-      ChartProvenance(
-        ChartOrigin.Parser(parser),
-        Vector(chartCall(s"${unit.id.value}$salt")),
-        Vector.empty
+      provenance.getOrElse(
+        ChartProvenance(
+          ChartOrigin.Parser(parser),
+          Vector(chartCall(s"${unit.id.value}$salt")),
+          Vector.empty
+        )
       ),
       Some(unit.id)
     )
@@ -209,7 +218,7 @@ class ChartProposalProviderSuite extends FunSuite:
     assertEquals(
       proposals.coverage,
       Vector(
-        SentenceCoverage.Proposed(s0.id, root, 0, 2),
+        SentenceCoverage.Proposed(root, 0, 2),
         SentenceCoverage.NoChart(s1.id),
         SentenceCoverage.NoChart(s2.id)
       )
@@ -261,7 +270,7 @@ class ChartProposalProviderSuite extends FunSuite:
     assertEquals(byRef(ref(s2, c0)).polarity, StoryPolarity.Unknown)
   }
 
-  test("a -91 reification focus is a state; every other predicate focus is an event") {
+  test("a -91 reification focus is a state only in the amr namespace; other foci are events") {
     val proposals = propose(Vector(s0.id -> enterChart(), s2.id -> lampChart))
     val byRef = proposals.situations
       .map(a => a.source -> a.bundle.proposals.head.value.getOrElse(fail("no value")))
@@ -271,10 +280,22 @@ class ChartProposalProviderSuite extends FunSuite:
     assertEquals(byRef(ref(s2, c0)).predicate.frame, Some("amr:be-located-at-91"))
     assertEquals(byRef(ref(s2, c0)).description, "be-located-at lamp table")
     assertEquals(byRef(ref(s0, c0)).kind, SituationKind.Event)
-    assert(ChartProposalProvider.StateFrames("be-located-at-91"))
-    assert(!ChartProposalProvider.StateFrames("enter-01"))
-  }
 
+    val foreignNamespace = checked(
+      s2,
+      Some(c0),
+      Map(
+        c0 -> Concept
+          .predicate("be-located-at", Some(FrameRef("propbank", "be-located-at-91", None)))
+      ),
+      salt = "foreign-namespace"
+    )
+    val foreign = propose(Vector(s2.id -> foreignNamespace))
+    assertEquals(
+      foreign.situations.head.bundle.proposals.head.value.map(_.kind),
+      Some(SituationKind.Event)
+    )
+  }
   test("an inadmissible root is absent and recorded") {
     val noFocus = checked(
       s0,
@@ -302,7 +323,7 @@ class ChartProposalProviderSuite extends FunSuite:
     )
     cases.foreach { (chart, anchor, reason) =>
       val proposals = propose(Vector(s0.id -> chart))
-      assertEquals(proposals.coverage.head, SentenceCoverage.Abstained(s0.id, anchor, reason))
+      assertEquals(proposals.coverage.head, SentenceCoverage.Abstained(anchor, reason))
       assertEquals(proposals.counts, CoverageCounts(0, 1, 0, 2))
       assertEquals(proposals.situations.map(_.source), Vector(anchor))
       assertEquals(proposals.contexts.map(_.source), Vector(anchor))
@@ -342,7 +363,12 @@ class ChartProposalProviderSuite extends FunSuite:
 
   private val summaryEvidenceId: EvidenceId =
     EvidenceId.unsafe(
-      ContentAddress.of("chart-proposal-evidence", "story", source.canonicalChecksum.hex)
+      ContentAddress.of(
+        "chart-proposal-evidence/v2",
+        "story",
+        source.canonicalChecksum.hex,
+        s"-:0:${source.canonicalText.length}"
+      )
     )
 
   test("an empty chart and a missing chart are ledger rows, and the input still compiles") {
@@ -354,7 +380,7 @@ class ChartProposalProviderSuite extends FunSuite:
       proposals.coverage,
       Vector(
         SentenceCoverage.EmptyChart(s0.id),
-        SentenceCoverage.Proposed(s1.id, ref(s1, c0), 0, 0),
+        SentenceCoverage.Proposed(ref(s1, c0), 0, 0),
         SentenceCoverage.NoChart(s2.id)
       )
     )
@@ -413,7 +439,7 @@ class ChartProposalProviderSuite extends FunSuite:
     val root = ref(s0, c0)
     val anna = ref(s0, c1)
 
-    assertEquals(proposals.coverage.head, SentenceCoverage.Proposed(s0.id, root, 1, 1))
+    assertEquals(proposals.coverage.head, SentenceCoverage.Proposed(root, 1, 1))
     assertEquals(proposals.participants.map(a => (a.situation, a.filler)), Vector((root, anna)))
     assertEquals(
       proposals.participants.head.bundle.proposals.head.value,
@@ -475,7 +501,7 @@ class ChartProposalProviderSuite extends FunSuite:
       .map(a => a.filler -> a.bundle.proposals.head.value.getOrElse(fail("no role")))
       .toMap
 
-    assertEquals(proposals.coverage.head, SentenceCoverage.Proposed(s0.id, ref(s0, c0), 2, 0))
+    assertEquals(proposals.coverage.head, SentenceCoverage.Proposed(ref(s0, c0), 2, 0))
     assertEquals(byFiller(ref(s0, c1)), ParticipantRole.Time)
     assertEquals(byFiller(ref(s0, c2)), ParticipantRole.Location)
     val mentionSources = proposals.calls
@@ -499,7 +525,7 @@ class ChartProposalProviderSuite extends FunSuite:
     )
     val proposals = propose(Vector(s0.id -> chart))
 
-    assertEquals(proposals.coverage.head, SentenceCoverage.Proposed(s0.id, ref(s0, c0), 0, 1))
+    assertEquals(proposals.coverage.head, SentenceCoverage.Proposed(ref(s0, c0), 0, 1))
     assertEquals(proposals.participants, Vector.empty)
     assertEquals(proposals.entityMentions, Vector.empty)
   }
@@ -541,7 +567,7 @@ class ChartProposalProviderSuite extends FunSuite:
   test("the rules text is pinned by its checksum, so a rule change is a visible change") {
     assertEquals(
       ChartProposalProvider.Prompt.checksum.hex,
-      "d8b5d676af644421f022b6fc8650f8ceb7d5b1ff65ce0c634c09e0bb25f47bde"
+      "452a06e3ebdc29f9a745ace9c1501f36690d38bbe9c5bf1e5ec30899b0f8deed"
     )
     assert(ChartProposalProvider.RulesText.contains("Never Before or Meets"))
     assert(ChartProposalProvider.RulesText.contains("time=Time"))
@@ -566,27 +592,21 @@ class ChartProposalProviderSuite extends FunSuite:
   test("receipts bind the source checksum, the rules checksum, and the chart receipts") {
     val charts = Vector(s0.id -> enterChart(), s1.id -> restChart())
     val proposals = propose(charts)
-    val parserDigest = Checksum.ofText("parser-stage")
     val input = ChartProposalProvider
-      .input(source, atlas, charts, Some(parserStage -> parserDigest), 7L)
+      .input(source, atlas, charts, Some(parserStage), 7L)
       .fold(e => fail(e.message), identity)
 
-    assertEquals(
-      ChartProposalProvider.Prompt.checksum,
-      Checksum.ofText(ChartProposalProvider.RulesText)
-    )
-    assertEquals(input.provenance.configHash, Checksum.ofText(ChartProposalProvider.RulesText))
+    assertEquals(input.provenance.configHash, ChartProposalProvider.Prompt.checksum)
     assertEquals(input.provenance.softwareVersion, StoryModel.SchemaVersion)
     assert(proposals.calls.forall(_.inputChecksum == source.canonicalChecksum))
     assert(proposals.calls.forall(_.provider == "chart-proposal-provider"))
     assertEquals(proposals.calls.size, 10)
+    assertEquals(input.receipt.stages.map(_._1), Vector(parserStage, ChartProposalProvider.Stage))
     assertEquals(
-      input.receipt.stages,
+      input.receipt.stages.map(_._2.hex),
       Vector(
-        parserStage -> parserDigest,
-        ChartProposalProvider.Stage -> ContentAddress.digest(
-          proposals.calls.map(_.outputChecksum.hex)
-        )
+        "3124df03ab44d13d6ecba704f33302495d89f541c247136691883d5a08c8fb47",
+        "84eabe6fc497fe56d1e5d473efc5f1eaa4a8395a2209adb60acad67dfd7a3bfb"
       )
     )
     assertEquals(input.receipt.createdAtEpochMillis, 7L)
@@ -602,22 +622,194 @@ class ChartProposalProviderSuite extends FunSuite:
     }
   }
 
+  test(
+    "two charts differing only in alignment spans have different evidence, receipts, and digests"
+  ) {
+    val full = enterChart()
+    val fewer = enterChart(alignments = Vector(align(s0, "entered", c0), align(s0, "Anna", c1)))
+    assertEquals(Canonical.checksum(full.chart), Canonical.checksum(fewer.chart))
+
+    val a = propose(Vector(s0.id -> full))
+    val b = propose(Vector(s0.id -> fewer))
+    def situationEvidence(p: ChartProposals): EvidenceId =
+      p.situations.head.bundle.proposals.head.evidence.head.evidenceId
+    assertNotEquals(situationEvidence(a), situationEvidence(b))
+    val situationCall = (p: ChartProposals) =>
+      p.calls.find(_.params.get("rule").contains(ChartProposalProvider.SituationRule)).get
+    assertNotEquals(situationCall(a).outputChecksum, situationCall(b).outputChecksum)
+    assert(
+      situationCall(a).outputChecksum == ContentAddress.digest(
+        ChartProposalProvider.SituationRule +: Vector(
+          "situation",
+          "Event",
+          "enter",
+          "propbank:enter-01",
+          "enter",
+          "enter Anna room",
+          "Positive",
+          situationEvidence(a).value
+        )
+      )
+    )
+
+    def stages(ev: PropositionEvidence): Vector[Checksum] =
+      ChartProposalProvider
+        .input(source, atlas, Vector(s0.id -> ev), Some(parserStage), 0L)
+        .fold(e => fail(e.message), identity)
+        .receipt
+        .stages
+        .map(_._2)
+    val Vector(parserA, providerA) = stages(full): @unchecked
+    val Vector(parserB, providerB) = stages(fewer): @unchecked
+    assertNotEquals(parserA, parserB)
+    assertNotEquals(providerA, providerB)
+  }
+
+  test("an alignment span outside the chart's own sentence is refused whatever unit it names") {
+    val restSpan = spanOf(s1, "rest")
+    val unnamedOutside = enterChart(alignments =
+      Vector(
+        align(s0, "entered", c0),
+        align(s1, "rest", c1, ref = Some(restSpan.copy(unit = None)))
+      )
+    )
+    val namedOtherSentence = enterChart(alignments =
+      Vector(align(s0, "entered", c0), align(s1, "rest", c1, ref = Some(restSpan)))
+    )
+    val paragraph = atlas.byId.values
+      .find(u => u.kind == SurfaceUnitKind.Paragraph && u.span.contains(s0.span))
+      .getOrElse(fail("the atlas has no paragraph holding s0"))
+    val namedParagraph = enterChart(alignments =
+      Vector(
+        align(s0, "entered", c0, ref = Some(spanOf(s0, "entered").copy(unit = Some(paragraph.id))))
+      )
+    )
+
+    val refusedUnnamed =
+      ChartProposalProvider.propose(source, atlas, Vector(s0.id -> unnamedOutside))
+    assert(refusedUnnamed.left.exists(_.message.contains("lies outside the chart's sentence")))
+    val refusedNamed =
+      ChartProposalProvider.propose(source, atlas, Vector(s0.id -> namedOtherSentence))
+    assert(refusedNamed.left.exists(_.message.contains("lies outside the chart's sentence")))
+    val refusedParagraph =
+      ChartProposalProvider.propose(source, atlas, Vector(s0.id -> namedParagraph))
+    assert(
+      refusedParagraph.left.exists(
+        _.message.contains("not the chart's sentence or a unit inside it")
+      )
+    )
+    val token = atlas.tokens.find(t => s0.span.contains(t.span)).getOrElse(fail("no token in s0"))
+    val namedToken = enterChart(alignments =
+      Vector(align(s0, "entered", c0, ref = Some(SpanRef(Some(token.id), token.span))))
+    )
+    assert(ChartProposalProvider.propose(source, atlas, Vector(s0.id -> namedToken)).isRight)
+  }
+
+  test("raw scores carry the minimum alignment credence and calibration names the rule's model") {
+    val graded = enterChart(
+      relations = Vector(
+        PropositionRelation(c0, licensedAgent, ConceptTarget.Node(c1)),
+        PropositionRelation(c0, RoleAssignment.arg(1), ConceptTarget.Node(c2))
+      ),
+      alignments = Vector(
+        align(s0, "entered", c0, credence = 0.9),
+        align(s0, "Anna", c1, credence = 0.6),
+        align(s0, "room", c2, credence = 0.8)
+      )
+    )
+    val proposals = propose(Vector(s0.id -> graded, s1.id -> restChart(alignments = Vector.empty)))
+    def raw(bundle: EvidenceBundle[?]): Option[Double] =
+      bundle.proposals.head.rawScore.map(_.value)
+    def model(bundle: EvidenceBundle[?]): Vector[String] = bundle.calibrations.map(_.model)
+    val bySource = proposals.situations.map(a => a.source -> a.bundle).toMap
+
+    assertEquals(raw(bySource(ref(s0, c0))), Some(0.6))
+    assertEquals(raw(bySource(ref(s1, c0))), Some(1.0))
+    assertEquals(raw(proposals.entityMentions.head.bundle), Some(0.6))
+    assertEquals(raw(proposals.participants.head.bundle), Some(0.6))
+    assertEquals(
+      proposals.participantCoverage.map(a => a.situation -> raw(a.bundle)).toMap,
+      Map(ref(s0, c0) -> Some(0.6), ref(s1, c0) -> Some(1.0))
+    )
+    assertEquals(raw(proposals.temporal.head.bundle), Some(0.6))
+    assertEquals(model(bySource(ref(s0, c0))), Vector("chart-rule-v1"))
+    assertEquals(model(proposals.contexts.head.bundle), Vector("narrated-world-default-v1"))
+    assertEquals(model(proposals.memberships.head.bundle), Vector("chart-rule-v1"))
+    assertEquals(model(proposals.summary.bundle), Vector("title-rule-v1"))
+    assertEquals(raw(proposals.summary.bundle), Some(1.0))
+    val restCalls = proposals.calls.filter(_.params.get("sentence").contains(s1.id.value))
+    assertEquals(restCalls.map(spanSourceOf).toSet, Set("sentence"))
+  }
+
+  test("the situation support excludes alignments that name only embedded concepts") {
+    val believed = checked(
+      s0,
+      Some(c0),
+      Map(c0 -> Concept.predicate("enter"), c1 -> Concept.predicate("rest")),
+      embedded = Vector(EmbeddedProposition(c0, EmbeddingKind.Belief, c1)),
+      alignments =
+        Vector(align(s0, "entered", c0, credence = 0.7), align(s0, "room", c1, credence = 0.2)),
+      salt = "believed"
+    )
+    val proposals = propose(Vector(s0.id -> believed))
+    val record = proposals.evidence.filterNot(_.id == summaryEvidenceId) match
+      case Vector(one) => one
+      case other       => fail(s"expected one sentence evidence record, found $other")
+
+    assertEquals(record.spans, Some(SpanSet.one(spanOf(s0, "entered"))))
+    assertEquals(proposals.situations.head.bundle.proposals.head.rawScore.map(_.value), Some(0.7))
+  }
+
+  test("a chart receipt that hashed neither the source nor the sentence is refused") {
+    val foreignInput = enterChart().copy(provenance =
+      ChartProvenance(
+        ChartOrigin.Parser(parser),
+        Vector(chartCall("foreign", Checksum.ofText("something else"))),
+        Vector.empty
+      )
+    )
+    val refused = ChartProposalProvider.propose(source, atlas, Vector(s0.id -> foreignInput))
+    assert(refused.left.exists(_.message.contains("neither the source nor the sentence")))
+
+    val sentenceBound = enterChart().copy(provenance =
+      ChartProvenance(
+        ChartOrigin.Parser(parser),
+        Vector(chartCall("sentence", Checksum.ofText(atlas.text(s0)))),
+        Vector.empty
+      )
+    )
+    assert(ChartProposalProvider.propose(source, atlas, Vector(s0.id -> sentenceBound)).isRight)
+  }
+
+  test("receipts record the chart origin") {
+    val parsed = propose(Vector(s0.id -> enterChart()))
+    val hand = propose(Vector(s0.id -> enterChart().copy(provenance = ChartProvenance.hand)))
+    def origins(p: ChartProposals): Set[String] =
+      p.calls.flatMap(_.params.get("chart-origin")).toSet
+    assertEquals(origins(parsed), Set("parser:test:chart-parser:1"))
+    assertEquals(origins(hand), Set("hand"))
+  }
   test("the policy is conservative except that one program counts as one provider") {
     val policy = ChartProposalProvider.Policy
-    assertEquals(policy.forFamily(ClaimFamily.ContextAssignment).requireAgreement, 1)
-    assertEquals(policy.forFamily(ClaimFamily.SegmentMembership).requireAgreement, 1)
-    assert(policy.forFamily(ClaimFamily.ContextAssignment).conservative)
+    Vector(ClaimFamily.ContextAssignment, ClaimFamily.SegmentMembership).foreach { family =>
+      val single = policy.forFamily(family)
+      assertEquals(single.acceptThreshold.value, 0.9)
+      assertEquals(single.reviewBand.value, 0.5)
+      assertEquals(single.requireAgreement, 1)
+      assertEquals(single.requireCalibration, true)
+      assertEquals(single.conservative, true)
+      assertEquals(single.requireSpanEvidence, true)
+      assertEquals(single.criticBlockThreshold, 0.5)
+    }
     assertEquals(policy.forFamily(ClaimFamily.CausalEdge), FamilyPolicy.Conservative)
+    assertEquals(policy.forFamily(ClaimFamily.StrictPrecedence), FamilyPolicy.Conservative)
     assertEquals(policy.forFamily(ClaimFamily.SituationMention), FamilyPolicy.Ordinary)
     assertEquals(policy.forFamily(ClaimFamily.Summary), FamilyPolicy.Ordinary)
     assertEquals(policy.forFamily(ClaimFamily.EntityMention), FamilyPolicy.Ordinary)
     assertEquals(policy.forFamily(ClaimFamily.ParticipantRole), FamilyPolicy.Ordinary)
     assertEquals(policy.forFamily(ClaimFamily.ParticipantCoverage), FamilyPolicy.Ordinary)
     assertEquals(policy.forFamily(ClaimFamily.TemporalRelation), FamilyPolicy.Ordinary)
-    assertEquals(policy.forFamily(ClaimFamily.StrictPrecedence), FamilyPolicy.Conservative)
-    assert(ChartProposalProvider.RulesText.contains("requireAgreement = 1"))
   }
-
   test("a missing title yields an abstained summary and a NoTitle row") {
     val untitled = StorySource
       .fromText(source.rawText, None)
@@ -687,7 +879,7 @@ class ChartProposalProviderSuite extends FunSuite:
       )
     )
     val refusedSpan = ChartProposalProvider.propose(source, atlas, Vector(s0.id -> escaping))
-    assert(refusedSpan.left.exists(_.message.contains("escapes surface unit")))
+    assert(refusedSpan.left.exists(_.message.contains("lies outside the chart's sentence")))
   }
 
   test("a story with no charts at all still yields a full ledger and a compilable input") {

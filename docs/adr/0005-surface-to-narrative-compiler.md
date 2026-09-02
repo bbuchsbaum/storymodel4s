@@ -467,10 +467,10 @@ row names an anchor and an empty chart has none, and the summary has its own `Su
 because it is not a sentence. `ChartProposals` is a final non-case class with a
 `private[document]` factory, per the cartesian-product test in the design contract.
 
-Evidence: `ChartProposalProviderSuite` (document, all three platforms) and
-`ChartProposalCourtSuite` (fixtures) drive the WOG source through the analyzer, supply seven
-hand-built silver charts, and pin the ledger counts, the nine recorded gaps, and
-`validated == None` for the multi-situation compilation.
+Evidence: `ChartProposalProviderSuite` (document, all three platforms) courts the provider on a
+three-sentence text; `ChartProposalCourtSuite` (fixtures) drives the WOG source through the
+analyzer, supplies seven hand-built silver charts, and pins the ledger counts, the recorded gaps,
+and `validated == None` for the multi-situation compilation.
 
 ### 2026-09-02: compiler extension for multi-situation drafts (solo plan phase 1.4)
 
@@ -545,8 +545,46 @@ Decisions, with the alternative rejected:
    spans both roots' support.
 7. **Identity.** The candidate-set tag is `narrative-candidates/v4` and the compilation tag
    `narrative-compilation/v3`; the fingerprint now covers entity nodes, participant and temporal
-   edges, and flow steps (turnover, transition, context). The rules checksum moved to
-   `d8b5d676af644421f022b6fc8650f8ceb7d5b1ff65ce0c634c09e0bb25f47bde` and is pinned as a literal.
+   edges, and flow steps (turnover, transition, context). The rules checksum is pinned as a
+   literal in `ChartProposalProviderSuite`.
+
+The 1.3 cold review's findings are closed in the same slice, because they live in the same
+files:
+
+8. **Alignment spans lie inside the chart's own sentence, on both sides.** The provider refuses a
+   chart whose alignment span lies outside its sentence unit whatever surface unit the span
+   names (`None`, another sentence, or a holder that is not the sentence or a unit inside it),
+   and the compiler refuses evidence cited by a chart-anchored attempt (situation, context,
+   membership, mention, participant, coverage) that lies outside the attempt's sentence, and by
+   a pair attempt (temporal, causal) that lies outside both endpoint sentences. The summary and
+   the shared ledger are unrestricted. A participant's filler must be in its situation's sentence.
+   Rejected: repairing the span to the sentence, which would make a mislocated alignment look
+   like a measured one.
+9. **Receipts identify their output.** Every evidence id is
+   `chart-proposal-evidence/v2(scope, chart checksum, rendered span set)`, so two charts that
+   differ only in spans (invisible to `Canonical.checksum`) have different evidence, and every
+   call render ends with the evidence id it cites, so their receipts and the provider-stage
+   digest differ too. The parser stage's digest on the build receipt is
+   `ChartProposalProvider.chartsDigest` (sentence, canonical checksum, rendered alignments with
+   credence, chart receipt outputs), never typed by the caller; `input` takes the stage id only.
+   Every chart receipt must have hashed the canonical text or its sentence's text, else the
+   chart is refused; the chart origin is a receipt parameter (`hand`, `parser:<fingerprint>`,
+   ...). State frames match namespace and id (`amr:be-located-at-91`), not the id alone.
+10. **Chart credence propagates only as the raw score.** Each proposal's raw score is the minimum
+    alignment credence among the alignments that supply its support (a sentence-fallback support
+    carries 1.0, which `span-source=sentence` distinguishes from a measured value); calibration
+    is probability 1.0 under `chart-rule-v1` for the rules that are total functions of the chart,
+    under `narrated-world-default-v1` for the context rule, and under `title-rule-v1` for the
+    summary. Recorded limitation: `NarratedWorld` is the absence-of-embedding default at sentence
+    grain (the focus is held by no embedding, so the sentence is taken to assert it at root); the
+    chart licenses no context positively, and chart credence reaches no probability.
+11. **The vertical suite's fixture provider is retired.** `NarrativeCompilerVerticalSuite` now
+    builds one hand chart for its sentence and drives `ChartProposalProvider`; the two-rules-as-
+    two-providers agreement fiction is gone with it. The coverage ledger
+    (`ChartProposals.coverage`) is not carried into `NarrativeCompilerInput`; it is derivable from
+    the input: a sentence with a situation attempt whose bundle has a proposed value is
+    `Proposed`, one whose attempt is abstained is `Abstained`, a chart with no concepts is
+    `EmptyChart`, and an atlas sentence with no chart is `NoChart`.
 
 Evidence: `TrajectoryCompilerSuite` (document, all three platforms) is the court: three hand-built
 sentences each with a licensed `ARG0 → man` compile into one entity with three mentions, three

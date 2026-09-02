@@ -76,23 +76,7 @@ class CompiledAtlasSuite extends FunSuite:
       Map(predicate -> ChartPolarity.Positive),
       Vector.empty,
       Vector(align(unit, word, predicate), align(unit, "man", filler)),
-      ChartProvenance(
-        ChartOrigin.Parser(parser),
-        Vector(
-          ProviderCall(
-            "test-atlas-chart-parser",
-            "hand-built",
-            "1",
-            None,
-            source.canonicalChecksum,
-            Checksum.ofText(s"chart:$index"),
-            Map("sentence" -> unit.id.value),
-            None,
-            cached = false
-          )
-        ),
-        Vector.empty
-      ),
+      ChartProvenance.hand,
       Some(unit.id)
     )
     unit.id -> PropositionEvidence.of(
@@ -103,7 +87,7 @@ class CompiledAtlasSuite extends FunSuite:
 
   test("a validated chart-driven compilation compiles into a Discourse Atlas scene") {
     val input = ChartProposalProvider
-      .input(source, atlas, charts, Some(parserStage -> Checksum.ofText("hand-built-charts")), 0L)
+      .input(source, atlas, charts, Some(parserStage), 0L)
       .fold(e => fail(e.message), identity)
     val compiled = NarrativeCompiler.compile(input).fold(e => fail(e.message), identity)
     val model = compiled.validated.getOrElse(fail(compiled.validation.report.render))

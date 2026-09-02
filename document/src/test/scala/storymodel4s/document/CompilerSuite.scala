@@ -836,6 +836,41 @@ class CompilerSuite extends FunSuite:
     assert(!result.isPartial)
   }
 
+  test("input refuses evidence spans outside the attempt's sentence, whatever unit they name") {
+    val outside = SpanRef(None, sentences(1).span)
+    val named = SpanRef(Some(sentences(1).id), sentences(1).span)
+    def attemptedWith(ref: SpanRef): Either[NarrativeCompilerError, NarrativeCompilerInput] =
+      val stray = evidence("ev:stray", SpanSet.one(ref))
+      attemptedInput(
+        situationAttempts = Vector(
+          SituationAttempt(ref0, bundle(situation0, stray, "situation-agent", "stray"))
+        )
+      )
+    Vector(outside, named).foreach { ref =>
+      attemptedWith(ref) match
+        case Left(NarrativeCompilerError.InvalidInput(errors)) =>
+          assert(errors.exists(_.message.contains("lies outside the attempt's sentence")))
+        case Left(other) => fail(other.message)
+        case Right(_)    => fail(s"a span outside the sentence reached the compiler via $ref")
+    }
+  }
+
+  test("input requires exactly one participant-coverage attempt per situation attempt") {
+    val attempted = attemptedInput(
+      situationAttempts = Vector(
+        SituationAttempt(ref0, bundle(situation0, ev0, "situation-agent", "s0")),
+        SituationAttempt(ref1, bundle(situation1, ev1, "situation-agent", "s1"))
+      ),
+      coverageAttempts = Some(Vector(coverageAttempt(ref0)))
+    )
+
+    attempted match
+      case Left(NarrativeCompilerError.InvalidInput(errors)) =>
+        assert(errors.exists(_.message.contains("exactly one participant-coverage attempt")))
+      case Left(other) => fail(other.message)
+      case Right(_)    => fail("a situation without a coverage attempt reached the compiler")
+  }
+
   test("a coverage that lists no situation participant and a lone participant are both refused") {
     val stray = ParticipantCoverageAttempt(
       ref0,

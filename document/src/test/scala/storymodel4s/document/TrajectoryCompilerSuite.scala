@@ -92,11 +92,7 @@ class TrajectoryCompilerSuite extends FunSuite:
       Map(predicate -> ChartPolarity.Positive),
       Vector.empty,
       Vector(align(unit, word, predicate), align(unit, "man", filler)),
-      ChartProvenance(
-        ChartOrigin.Parser(parser),
-        Vector(call("chart-parser", s"chart:$index:$fillerKind")),
-        Vector.empty
-      ),
+      ChartProvenance.hand,
       Some(unit.id)
     )
     PropositionEvidence.of(ChartValidator.check(unchecked).fold(v => fail(v.toString), identity))
@@ -448,6 +444,27 @@ class TrajectoryCompilerSuite extends FunSuite:
     assertEquals(result.draft.graph.entities.values.head.mentions.length, 2)
     assertEquals(result.draft.graph.relations.participants.size, 2)
     assertEquals(result.draft.trajectory, DiscourseTrajectory.empty)
+  }
+
+  test("a participant whose filler lies in another sentence is refused at the input") {
+    val attempted = attemptedInput(
+      participants = Vector(
+        participantAttempt(0, at = Some(m(1))),
+        participantAttempt(1),
+        participantAttempt(2)
+      ),
+      coverage = Vector(
+        coverageAttempt(0, Vector(m(1))),
+        coverageAttempt(1, Vector(m(1))),
+        coverageAttempt(2, Vector(m(2)))
+      )
+    )
+
+    attempted match
+      case Left(NarrativeCompilerError.InvalidInput(errors)) =>
+        assert(errors.exists(_.message.contains("is not in the situation's sentence")))
+      case Left(other) => fail(other.message)
+      case Right(_)    => fail("a cross-sentence participant reached the compiler")
   }
 
   test("a converse temporal relation is refused at the input boundary") {

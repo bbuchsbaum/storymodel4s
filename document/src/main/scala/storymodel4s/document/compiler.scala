@@ -476,11 +476,23 @@ object NarrativeCompilerInput:
       chartMap(ref.sentence) && charts
         .find(_._1 == ref.sentence)
         .exists(_._2.chart.concept(ref.concept).nonEmpty)
+    // Evidence cited for a chart-anchored attempt must lie inside the attempt's own sentence(s),
+    // whatever surface unit a span names; unknown anchors are already invalid and add nothing.
+    def within(refs: ChartNodeRef*): Vector[TextSpan] =
+      refs.toVector.flatMap(ref => atlas.byId.get(ref.sentence).map(_.span))
 
     situationVec.foreach { attempt =>
       if !known(attempt.source) then
         invalid("compiler/situations", s"unknown chart node ${attempt.source.key}")
-      validateBundle(attempt.bundle, evidenceMap, source, atlas, "compiler/situations", invalid)
+      validateBundle(
+        attempt.bundle,
+        evidenceMap,
+        source,
+        atlas,
+        "compiler/situations",
+        invalid,
+        within(attempt.source)
+      )
       candidateValues(attempt.bundle).foreach(validateSituation(_, "compiler/situations", invalid))
     }
 
@@ -491,7 +503,15 @@ object NarrativeCompilerInput:
     contextVec.foreach { attempt =>
       if !known(attempt.source) then
         invalid("compiler/contexts", s"unknown chart node ${attempt.source.key}")
-      validateBundle(attempt.bundle, evidenceMap, source, atlas, "compiler/contexts", invalid)
+      validateBundle(
+        attempt.bundle,
+        evidenceMap,
+        source,
+        atlas,
+        "compiler/contexts",
+        invalid,
+        within(attempt.source)
+      )
     }
 
     val duplicateMembership = membershipVec
@@ -503,7 +523,15 @@ object NarrativeCompilerInput:
     membershipVec.foreach { attempt =>
       if !known(attempt.member) then
         invalid("compiler/memberships", s"unknown chart node ${attempt.member.key}")
-      validateBundle(attempt.bundle, evidenceMap, source, atlas, "compiler/memberships", invalid)
+      validateBundle(
+        attempt.bundle,
+        evidenceMap,
+        source,
+        atlas,
+        "compiler/memberships",
+        invalid,
+        within(attempt.member)
+      )
     }
 
     val situationSources = situationVec.map(_.source).toSet
@@ -515,7 +543,15 @@ object NarrativeCompilerInput:
         "exactly one segment-membership attempt is required per situation attempt"
       )
 
-    validateBundle(summary.bundle, evidenceMap, source, atlas, "compiler/summary", invalid)
+    validateBundle(
+      summary.bundle,
+      evidenceMap,
+      source,
+      atlas,
+      "compiler/summary",
+      invalid,
+      Vector.empty
+    )
     candidateValues(summary.bundle).foreach { value =>
       if value.text.trim.isEmpty then invalid("compiler/summary", "summary text must be nonblank")
     }
@@ -532,7 +568,15 @@ object NarrativeCompilerInput:
         invalid("compiler/causal", s"unknown source endpoint ${attempt.from.key}")
       if !situationSources(attempt.to) then
         invalid("compiler/causal", s"unknown target endpoint ${attempt.to.key}")
-      validateBundle(attempt.bundle, evidenceMap, source, atlas, "compiler/causal", invalid)
+      validateBundle(
+        attempt.bundle,
+        evidenceMap,
+        source,
+        atlas,
+        "compiler/causal",
+        invalid,
+        within(attempt.from, attempt.to)
+      )
     }
 
     def entityConcept(ref: ChartNodeRef): Boolean =
@@ -543,6 +587,8 @@ object NarrativeCompilerInput:
 
     val duplicateMention = mentionVec
       .groupBy(_.mention)
+      .toVector
+      .sortBy(_._1.key)
       .collectFirst { case (mention, xs) if xs.size > 1 => mention }
     duplicateMention.foreach(m => invalid("compiler/entity-mentions", s"duplicate ${m.key}"))
     mentionVec.foreach { attempt =>
@@ -559,7 +605,8 @@ object NarrativeCompilerInput:
         source,
         atlas,
         "compiler/entity-mentions",
-        invalid
+        invalid,
+        within(attempt.mention)
       )
       candidateValues(attempt.bundle).foreach { value =>
         if value.label.trim.isEmpty then
@@ -570,6 +617,8 @@ object NarrativeCompilerInput:
 
     val duplicateParticipant = participantVec
       .groupBy(a => (a.situation, a.filler))
+      .toVector
+      .sortBy((pair, _) => (pair._1.key, pair._2.key))
       .collectFirst { case ((situation, filler), xs) if xs.size > 1 => (situation, filler) }
     duplicateParticipant.foreach((situation, filler) =>
       invalid("compiler/participants", s"duplicate ${situation.key}->${filler.key}")
@@ -589,12 +638,28 @@ object NarrativeCompilerInput:
           "compiler/participants",
           s"filler ${attempt.filler.key} has no entity-mention attempt"
         )
-      validateBundle(attempt.bundle, evidenceMap, source, atlas, "compiler/participants", invalid)
+      if attempt.filler.sentence != attempt.situation.sentence then
+        invalid(
+          "compiler/participants",
+          s"filler ${attempt.filler.key} is not in the situation's sentence " +
+            attempt.situation.sentence.value
+        )
+      validateBundle(
+        attempt.bundle,
+        evidenceMap,
+        source,
+        atlas,
+        "compiler/participants",
+        invalid,
+        within(attempt.situation)
+      )
     }
     val participantPairs = participantVec.map(a => (a.situation, a.filler)).toSet
 
     val duplicateCoverage = coverageVec
       .groupBy(_.situation)
+      .toVector
+      .sortBy(_._1.key)
       .collectFirst { case (situation, xs) if xs.size > 1 => situation }
     duplicateCoverage.foreach(situation =>
       invalid("compiler/participant-coverage", s"duplicate ${situation.key}")
@@ -606,7 +671,8 @@ object NarrativeCompilerInput:
         source,
         atlas,
         "compiler/participant-coverage",
-        invalid
+        invalid,
+        within(attempt.situation)
       )
       candidateValues(attempt.bundle).foreach { coverage =>
         coverage.fillers.foreach { filler =>
@@ -637,6 +703,8 @@ object NarrativeCompilerInput:
 
     val duplicateTemporal = temporalVec
       .groupBy(a => (a.from, a.to))
+      .toVector
+      .sortBy((pair, _) => (pair._1.key, pair._2.key))
       .collectFirst { case ((from, to), xs) if xs.size > 1 => (from, to) }
     duplicateTemporal.foreach((from, to) =>
       invalid("compiler/temporal", s"duplicate ${from.key}->${to.key}")
@@ -647,7 +715,15 @@ object NarrativeCompilerInput:
         invalid("compiler/temporal", s"unknown source endpoint ${attempt.from.key}")
       if !situationSources(attempt.to) then
         invalid("compiler/temporal", s"unknown target endpoint ${attempt.to.key}")
-      validateBundle(attempt.bundle, evidenceMap, source, atlas, "compiler/temporal", invalid)
+      validateBundle(
+        attempt.bundle,
+        evidenceMap,
+        source,
+        atlas,
+        "compiler/temporal",
+        invalid,
+        within(attempt.from, attempt.to)
+      )
       candidateValues(attempt.bundle).foreach { relation =>
         if !relation.isCanonical then
           invalid(
@@ -729,13 +805,18 @@ object NarrativeCompilerInput:
               )
             )
 
+  /** `within` lists the surface spans a cited span may lie in; empty means unrestricted (the story
+    * summary, the shared evidence ledger). Mirrors the provider's alignment rule so that a span
+    * outside the attempt's own sentence is refused whichever side produced it.
+    */
   private def validateBundle[A](
       bundle: EvidenceBundle[A],
       evidence: Map[EvidenceId, Evidence],
       source: StorySource,
       atlas: SurfaceAtlas,
       path: String,
-      invalid: (String, String) => Unit
+      invalid: (String, String) => Unit,
+      within: Vector[TextSpan]
   ): Unit =
     def unitInterval(value: Double, field: String): Unit =
       if !value.isFinite || value < 0.0 || value > 1.0 then
@@ -764,10 +845,13 @@ object NarrativeCompilerInput:
           if recorded != ev then
             invalid(path, s"inline evidence ${ev.id.value} conflicts with ledger")
         }
-        validateSpans(ev.spans, source, atlas, path, invalid)
-      case _ => ()
+        validateSpans(ev.spans, source, atlas, path, invalid, within)
+      case EvidenceRef.ById(id) =>
+        evidence
+          .get(id)
+          .foreach(recorded => validateSpans(recorded.spans, source, atlas, path, invalid, within))
     }
-    validateSpans(bundle.sourceSupport.spans, source, atlas, path, invalid)
+    validateSpans(bundle.sourceSupport.spans, source, atlas, path, invalid, within)
     bundle.proposals.foreach { proposal =>
       if proposal.taskId != proposal.receipt.taskId then
         invalid(path, s"proposal task ${proposal.taskId.value} disagrees with its receipt")
@@ -798,12 +882,18 @@ object NarrativeCompilerInput:
       source: StorySource,
       atlas: SurfaceAtlas,
       path: String,
-      invalid: (String, String) => Unit
+      invalid: (String, String) => Unit,
+      within: Vector[TextSpan] = Vector.empty
   ): Unit =
     spans.toVector.flatMap(_.refs.toVector).foreach { ref =>
       val span = ref.span
       if span.endExclusive > source.canonicalText.length then
         invalid(path, s"span $span exceeds source length ${source.canonicalText.length}")
+      if within.nonEmpty && !within.exists(_.contains(span)) then
+        invalid(
+          path,
+          s"span $span lies outside the attempt's sentence(s) ${within.mkString(", ")}"
+        )
       if !isCodePointBoundary(source.canonicalText, span.start) ||
         !isCodePointBoundary(source.canonicalText, span.endExclusive)
       then invalid(path, s"span $span cuts a UTF-16 surrogate pair")
