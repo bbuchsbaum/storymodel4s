@@ -8,13 +8,24 @@ import storymodel4s.proposition.{
   Canonical,
   Checked,
   Concept,
+  ConceptId,
   ConceptKind,
   Gloss,
   Polarity as ChartPolarity,
   PropositionChart,
-  PropositionEvidence
+  PropositionEvidence,
+  RoleAssignment,
+  SourceRole
 }
-import storymodel4s.story.{Modality, Polarity as StoryPolarity, Predicate, StoryModel}
+import storymodel4s.story.{
+  EntityType,
+  Modality,
+  ParticipantRole,
+  Polarity as StoryPolarity,
+  Predicate,
+  StoryModel,
+  TemporalRelation
+}
 
 /** Why a chart with concepts yielded no situation attempt at its anchor.
   *
@@ -38,7 +49,12 @@ enum AbstentionReason:
   * partial run read as a complete one.
   */
 enum SentenceCoverage:
-  case Proposed(sentence: SurfaceUnitId, root: ChartNodeRef)
+  /** `fillers` counts the entity-kind fillers proposed as participants of the root; `unlicensed`
+    * counts the entity-kind fillers the chart reaches from the root by no single normalized
+    * participant role, which are never proposed. Together they say how much of the root's
+    * argument structure the participant layer carries.
+    */
+  case Proposed(sentence: SurfaceUnitId, root: ChartNodeRef, fillers: Int, unlicensed: Int)
   case Abstained(sentence: SurfaceUnitId, anchor: ChartNodeRef, reason: AbstentionReason)
   case EmptyChart(sentence: SurfaceUnitId)
   case NoChart(sentence: SurfaceUnitId)
@@ -57,9 +73,9 @@ final case class CoverageCounts(proposed: Int, abstained: Int, emptyCharts: Int,
 /** Everything [[ChartProposalProvider.propose]] emitted for one story, in canonical order.
   *
   * Why a non-case class with a package-private factory: the attempt vectors stand in a relation
-  * (one context and one membership attempt per situation attempt, one evidence record per proposal,
-  * one coverage row per sentence) that only the provider establishes. There is no `copy` or
-  * `fromProduct` door.
+  * (one context, one membership, and one participant-coverage attempt per situation attempt, one
+  * entity-mention attempt per participant filler, one evidence record per proposal, one coverage
+  * row per sentence) that only the provider establishes. There is no `copy` or `fromProduct` door.
   */
 final class ChartProposals private (
     val evidence: Vector[Evidence],
@@ -68,6 +84,10 @@ final class ChartProposals private (
     val summary: StorySummaryAttempt,
     val memberships: Vector[SegmentMembershipAttempt],
     val causal: Vector[CausalAttempt],
+    val entityMentions: Vector[EntityMentionAttempt],
+    val participants: Vector[ParticipantAttempt],
+    val participantCoverage: Vector[ParticipantCoverageAttempt],
+    val temporal: Vector[TemporalAttempt],
     val calls: Vector[ProviderCall],
     val coverage: Vector[SentenceCoverage],
     val summaryCoverage: SummaryCoverage
@@ -75,7 +95,7 @@ final class ChartProposals private (
   def counts: CoverageCounts =
     coverage.foldLeft(CoverageCounts(0, 0, 0, 0)) { (acc, row) =>
       row match
-        case SentenceCoverage.Proposed(_, _)     => acc.copy(proposed = acc.proposed + 1)
+        case SentenceCoverage.Proposed(_, _, _, _) => acc.copy(proposed = acc.proposed + 1)
         case SentenceCoverage.Abstained(_, _, _) => acc.copy(abstained = acc.abstained + 1)
         case SentenceCoverage.EmptyChart(_)      => acc.copy(emptyCharts = acc.emptyCharts + 1)
         case SentenceCoverage.NoChart(_)         => acc.copy(noCharts = acc.noCharts + 1)
@@ -89,6 +109,10 @@ final class ChartProposals private (
       summary == that.summary &&
       memberships == that.memberships &&
       causal == that.causal &&
+      entityMentions == that.entityMentions &&
+      participants == that.participants &&
+      participantCoverage == that.participantCoverage &&
+      temporal == that.temporal &&
       calls == that.calls &&
       coverage == that.coverage &&
       summaryCoverage == that.summaryCoverage
@@ -102,6 +126,10 @@ final class ChartProposals private (
       summary,
       memberships,
       causal,
+      entityMentions,
+      participants,
+      participantCoverage,
+      temporal,
       calls,
       coverage,
       summaryCoverage
@@ -110,7 +138,8 @@ final class ChartProposals private (
   override def toString: String =
     val c = counts
     s"ChartProposals(proposed=${c.proposed}, abstained=${c.abstained}, " +
-      s"empty=${c.emptyCharts}, noChart=${c.noCharts}, calls=${calls.size})"
+      s"empty=${c.emptyCharts}, noChart=${c.noCharts}, participants=${participants.size}, " +
+      s"temporal=${temporal.size}, calls=${calls.size})"
 
 object ChartProposals:
   private[document] def derived(
@@ -119,6 +148,10 @@ object ChartProposals:
       contexts: Vector[ContextAssignmentAttempt],
       summary: StorySummaryAttempt,
       memberships: Vector[SegmentMembershipAttempt],
+      entityMentions: Vector[EntityMentionAttempt],
+      participants: Vector[ParticipantAttempt],
+      participantCoverage: Vector[ParticipantCoverageAttempt],
+      temporal: Vector[TemporalAttempt],
       calls: Vector[ProviderCall],
       coverage: Vector[SentenceCoverage],
       summaryCoverage: SummaryCoverage
@@ -130,6 +163,10 @@ object ChartProposals:
       summary,
       memberships,
       Vector.empty,
+      entityMentions,
+      participants,
+      participantCoverage,
+      temporal,
       calls,
       coverage,
       summaryCoverage
@@ -139,11 +176,11 @@ object ChartProposals:
   *
   * Why it exists: ADR 0005's compiler consumes typed proposals, and until now the only provider was
   * a one-sentence lexical fixture. This provider reads every chart of a story and emits the
-  * situation, context-assignment, segment-membership, and summary attempts the compiler needs, with
-  * typed abstention wherever a chart has no admissible root. It never reads the sentence text for
-  * content: every content word comes from the chart. Its rules are [[RulesText]], whose checksum is
-  * the prompt-package checksum and the provenance config hash, so a rule change changes every
-  * receipt.
+  * situation, context-assignment, segment-membership, participant, entity-mention,
+  * participant-coverage, temporal, and summary attempts the compiler needs, with typed abstention
+  * wherever a chart has no admissible root. It never reads the sentence text for content: every
+  * content word comes from the chart. Its rules are [[RulesText]], whose checksum is the
+  * prompt-package checksum and the provenance config hash, so a rule change changes every receipt.
   */
 object ChartProposalProvider:
   val Stage: StageId = StageId.unsafe("chart-proposal-provider")
@@ -184,14 +221,35 @@ object ChartProposalProvider:
     "include-91"
   )
 
+  /** Named (non-core) chart roles whose participant reading is stable across frames, as the AMR
+    * adapter's standard-role table reads them. Numbered arguments never appear here: their meaning
+    * is frame-specific and only a lexicon-licensed normalization on the chart itself counts.
+    */
+  val NamedRoles: Map[String, ParticipantRole] = Map(
+    "location" -> ParticipantRole.Location,
+    "time" -> ParticipantRole.Time,
+    "manner" -> ParticipantRole.Manner,
+    "cause" -> ParticipantRole.Cause,
+    "purpose" -> ParticipantRole.Custom("amr", "purpose"),
+    "instrument" -> ParticipantRole.Instrument,
+    "beneficiary" -> ParticipantRole.Beneficiary,
+    "source" -> ParticipantRole.Source,
+    "destination" -> ParticipantRole.Destination
+  )
+
   /** Rule names recorded on receipts. */
   val SituationRule: String = "focus-situation-rule"
   val ContextRule: String = "narrated-world-context-rule"
   val MembershipRule: String = "primary-story-membership-rule"
+  val ParticipantRule: String = "licensed-role-participant-rule"
+  val MentionRule: String = "entity-filler-mention-rule"
+  val CoverageRule: String = "participant-coverage-rule"
+  val TemporalRule: String = "adjacent-root-unclear-rule"
   val SummaryRule: String = "title-summary-rule"
   val AbstainSituationRule: String = "abstain-situation-rule"
   val AbstainContextRule: String = "abstain-context-rule"
   val AbstainMembershipRule: String = "abstain-membership-rule"
+  val AbstainCoverageRule: String = "abstain-coverage-rule"
   val AbstainSummaryRule: String = "abstain-summary-rule"
 
   /** The mapping rules, verbatim. Its checksum is the prompt-package checksum and the provenance
@@ -219,17 +277,43 @@ object ChartProposalProvider:
        |  the sentence span is used, recorded as span-source=sentence.
        |summary: the source title with evidence spanning the whole canonical text; no title or a
        |  blank title yields an abstained summary attempt.
+       |participants: for each admissible root, every relation from the root whose filler is a
+       |  chart concept of kind Entity, Name, or Quantity and whose role carries exactly one
+       |  normalized participant role yields one participant attempt (situation = root, filler =
+       |  the concept) valued at that role. A numbered argument carries a normalized role only when
+       |  the chart's frame lexicon licensed one; a named role carries the chart's own normalized
+       |  role, else the standard table {$namedRolesText}. A filler reached by no licensed role, or
+       |  by two different licensed roles, is counted unlicensed on the coverage row and never
+       |  proposed; literal and unknown fillers are not counted. Participant evidence is the union
+       |  of the filler's alignment spans and the root support.
+       |mentions: one entity-mention attempt per proposed filler with label = the concept lemma
+       |  and type = Custom("chart", concept kind lowercased); evidence = the filler's alignment
+       |  spans (span-source=filler-alignments), else the root support (span-source=root-support).
+       |coverage: one participant-coverage attempt per admissible root listing exactly the
+       |  proposed fillers, possibly none, with the root's evidence. An empty coverage is a value:
+       |  it says the chart reaches no licensed participant from the root, never that participants
+       |  were not evaluated.
+       |temporal: one attempt per consecutive pair of admissible roots in sentence order, valued
+       |  Unclear, with evidence spanning both roots' support. Never Before or Meets: a time
+       |  filler in a sentence chart is a concept of that chart, not a preceding root, so nothing in
+       |  a chart licenses strict precedence between roots; and StrictPrecedence is a high-impact
+       |  family whose conservative policy this single provider could not satisfy alone.
        |abstention: an inadmissible root yields one abstained attempt in each of the situation,
-       |  context, and membership families at the anchor (the focus when present, else the lowest
-       |  concept id). An empty chart or a sentence without a chart yields no attempt and a
-       |  coverage row only.
+       |  context, membership, and participant-coverage families at the anchor (the focus when
+       |  present, else the lowest concept id). An empty chart or a sentence without a chart yields
+       |  no attempt and a coverage row only.
        |causal: no causal attempt is emitted; absent pairs are not evaluated.
        |bundles: one proposed value per attempt with raw score 1.0, source support 1.0 over the
        |  evidence spans, agreement 1.0, and calibration $CalibrationModel at probability 1.0;
        |  abstained attempts carry no value, support 0.0, no spans, agreement 0.0, no calibration.
        |policy: AcceptancePolicy.Conservative, except ContextAssignment and SegmentMembership at
-       |  requireAgreement = 1, because one deterministic program is one provider.
+       |  requireAgreement = 1, because one deterministic program is one provider; EntityMention,
+       |  ParticipantRole, ParticipantCoverage, and TemporalRelation are FamilyPolicy.Ordinary.
        |""".stripMargin
+
+  /** The named-role table as printed into [[RulesText]]. */
+  private def namedRolesText: String =
+    NamedRoles.toVector.sortBy(_._1).map((name, role) => s"$name=${renderRole(role)}").mkString(", ")
 
   val Prompt: PromptPackageRef =
     PromptPackageRef("chart-rules", Version, Checksum.ofText(RulesText))
@@ -245,19 +329,43 @@ object ChartProposalProvider:
     base.copy(perFamily =
       base.perFamily ++ Map(
         ClaimFamily.ContextAssignment -> single,
-        ClaimFamily.SegmentMembership -> single
+        ClaimFamily.SegmentMembership -> single,
+        ClaimFamily.EntityMention -> FamilyPolicy.Ordinary,
+        ClaimFamily.ParticipantRole -> FamilyPolicy.Ordinary,
+        ClaimFamily.ParticipantCoverage -> FamilyPolicy.Ordinary,
+        ClaimFamily.TemporalRelation -> FamilyPolicy.Ordinary
       )
     )
 
   private val ChartPath = "chart-proposal-provider/charts"
   private val AlignmentPath = "chart-proposal-provider/alignments"
 
+  /** A proposed root together with what the temporal rule needs from it. */
+  private final case class ProposedRoot(
+      unit: SurfaceUnit,
+      root: ChartNodeRef,
+      checksum: Checksum,
+      spans: SpanSet
+  )
+
+  /** An entity-kind filler of the root reached by exactly one licensed participant role. */
+  private final case class LicensedFiller(
+      concept: ConceptId,
+      kind: ConceptKind,
+      lemma: String,
+      role: ParticipantRole
+  )
+
   private final case class SentenceOutcome(
       coverage: SentenceCoverage,
-      evidence: Option[Evidence],
+      proposedRoot: Option[ProposedRoot],
+      evidence: Vector[Evidence],
       situation: Option[SituationAttempt],
       context: Option[ContextAssignmentAttempt],
       membership: Option[SegmentMembershipAttempt],
+      participantCoverage: Option[ParticipantCoverageAttempt],
+      entityMentions: Vector[EntityMentionAttempt],
+      participants: Vector[ParticipantAttempt],
       calls: Vector[ProviderCall]
   )
 
@@ -282,18 +390,26 @@ object ChartProposalProvider:
       summary <- summaryOutcome(source)
     yield
       val byUnit = outcomes.map(o => o.coverage.sentence -> o).toMap
-      val coverage = atlas.sentences
-        .sortBy(_.ordinal)
-        .map(unit =>
-          byUnit.get(unit.id).map(_.coverage).getOrElse(SentenceCoverage.NoChart(unit.id))
-        )
+      val inOrder = atlas.sentences.sortBy(_.ordinal)
+      val coverage = inOrder.map(unit =>
+        byUnit.get(unit.id).map(_.coverage).getOrElse(SentenceCoverage.NoChart(unit.id))
+      )
+      val proposedRoots = inOrder.flatMap(unit => byUnit.get(unit.id).flatMap(_.proposedRoot))
+      val temporal = proposedRoots
+        .zip(proposedRoots.drop(1))
+        .map((prev, next) => temporalOutcome(source, prev, next))
       ChartProposals.derived(
-        (outcomes.flatMap(_.evidence) ++ summary.evidence.toVector).sortBy(_.id),
+        (outcomes.flatMap(_.evidence) ++ temporal.map(_._2) ++ summary.evidence.toVector)
+          .sortBy(_.id),
         outcomes.flatMap(_.situation).sortBy(_.source.key),
         outcomes.flatMap(_.context).sortBy(_.source.key),
         summary.attempt,
         outcomes.flatMap(_.membership).sortBy(_.member.key),
-        (outcomes.flatMap(_.calls) :+ summary.call).sortBy(renderCall),
+        outcomes.flatMap(_.entityMentions).sortBy(_.mention.key),
+        outcomes.flatMap(_.participants).sortBy(a => (a.situation.key, a.filler.key)),
+        outcomes.flatMap(_.participantCoverage).sortBy(_.situation.key),
+        temporal.map(_._1).sortBy(a => (a.from.key, a.to.key)),
+        (outcomes.flatMap(_.calls) ++ temporal.map(_._3) :+ summary.call).sortBy(renderCall),
         coverage,
         summary.coverage
       )
@@ -333,6 +449,10 @@ object ChartProposalProvider:
           proposals.summary,
           proposals.memberships,
           proposals.causal,
+          proposals.entityMentions,
+          proposals.participants,
+          proposals.participantCoverage,
+          proposals.temporal,
           Policy,
           receipt,
           provenance
@@ -440,7 +560,18 @@ object ChartProposalProvider:
     val checksum = Canonical.checksum(chart)
     if chart.isEmpty then
       Right(
-        SentenceOutcome(SentenceCoverage.EmptyChart(unit.id), None, None, None, None, Vector.empty)
+        SentenceOutcome(
+          SentenceCoverage.EmptyChart(unit.id),
+          None,
+          Vector.empty,
+          None,
+          None,
+          None,
+          None,
+          Vector.empty,
+          Vector.empty,
+          Vector.empty
+        )
       )
     else
       chart.focus match
@@ -553,16 +684,184 @@ object ChartProposalProvider:
           Vector("primary-story-member", root.key),
           params
         )
+        val (licensed, unlicensed) = scanFillers(chart, root.concept)
+        val fillerOutcomes = licensed.map(filler =>
+          fillerOutcome(source, unit, chart, checksum, root, spans, filler, params)
+        )
+        val coverageValue =
+          ParticipantCoverage.of(licensed.map(f => ChartNodeRef(unit.id, f.concept)))
+        val (coverage, coverageCall) = proposed(
+          source,
+          CoverageRule,
+          unit.id.value,
+          checksum,
+          coverageValue,
+          evidence,
+          "participant-coverage" +: root.key +: coverageValue.fillers.map(_.key),
+          params + ("fillers" -> licensed.size.toString) + ("unlicensed" -> unlicensed.toString)
+        )
         Right(
           SentenceOutcome(
-            SentenceCoverage.Proposed(unit.id, root),
-            Some(evidence),
+            SentenceCoverage.Proposed(unit.id, root, licensed.size, unlicensed),
+            Some(ProposedRoot(unit, root, checksum, spans)),
+            evidence +: fillerOutcomes.flatMap(_.evidence),
             Some(SituationAttempt(root, situation)),
             Some(ContextAssignmentAttempt(root, context)),
             Some(SegmentMembershipAttempt(root, membership)),
-            Vector(situationCall, contextCall, membershipCall)
+            Some(ParticipantCoverageAttempt(root, coverage)),
+            fillerOutcomes.map(_.mention),
+            fillerOutcomes.map(_.participant),
+            Vector(situationCall, contextCall, membershipCall, coverageCall) ++
+              fillerOutcomes.flatMap(_.calls)
           )
         )
+
+  private final case class FillerOutcome(
+      evidence: Vector[Evidence],
+      mention: EntityMentionAttempt,
+      participant: ParticipantAttempt,
+      calls: Vector[ProviderCall]
+  )
+
+  /** Entity-kind fillers of `root` with exactly one licensed role, in concept order, and the count
+    * of entity-kind fillers reached by none or by several.
+    */
+  private def scanFillers(
+      chart: PropositionChart[Checked],
+      root: ConceptId
+  ): (Vector[LicensedFiller], Int) =
+    val byFiller = chart
+      .relationsFrom(root)
+      .flatMap(r => r.to.nodeId.map(id => id -> r.role))
+      .flatMap((id, role) =>
+        chart
+          .concept(id)
+          .filter(c => KindWitness.entity.accepts(c.kind))
+          .map(concept => (id, concept, role))
+      )
+      .groupBy(_._1)
+      .toVector
+      .sortBy(_._1)
+    byFiller.foldLeft((Vector.empty[LicensedFiller], 0)) {
+      case ((licensed, unlicensed), (id, rows)) =>
+        val concept = rows.head._2
+        rows.map(_._3).flatMap(licensedRole).distinct match
+          case Vector(role) =>
+            (licensed :+ LicensedFiller(id, concept.kind, concept.lemma.value, role), unlicensed)
+          case _ => (licensed, unlicensed + 1)
+    }
+
+  /** The chart's own normalized role when present; a standard named role otherwise; nothing for a
+    * numbered argument without a lexicon licence, an operand, or an extension role.
+    */
+  private def licensedRole(role: RoleAssignment): Option[ParticipantRole] =
+    role.normalizedRole.orElse(role.source match
+      case SourceRole.Named(name) => NamedRoles.get(name)
+      case _                      => None)
+
+  private def fillerOutcome(
+      source: StorySource,
+      unit: SurfaceUnit,
+      chart: PropositionChart[Checked],
+      checksum: Checksum,
+      root: ChartNodeRef,
+      rootSpans: SpanSet,
+      filler: LicensedFiller,
+      params: Map[String, String]
+  ): FillerOutcome =
+    val fillerRef = ChartNodeRef(unit.id, filler.concept)
+    val fillerSpans = SpanSet.of(
+      chart.alignments
+        .filter(_.target.conceptIds.contains(filler.concept))
+        .flatMap(_.spans.refs.toVector)
+    )
+    val (mentionSpans, mentionSource) = fillerSpans match
+      case Some(spans) => (spans, "filler-alignments")
+      case None        => (rootSpans, "root-support")
+    val mentionEvidence = Evidence(
+      EvidenceId.unsafe(ContentAddress.of("chart-proposal-evidence", fillerRef.key, checksum.hex)),
+      Some(mentionSpans),
+      Set.empty,
+      Fingerprint,
+      Stage
+    )
+    val participantEvidence = Evidence(
+      EvidenceId.unsafe(
+        ContentAddress.of("chart-proposal-evidence", s"${root.key}->${fillerRef.key}", checksum.hex)
+      ),
+      Some(fillerSpans.fold(rootSpans)(_ ++ rootSpans)),
+      Set.empty,
+      Fingerprint,
+      Stage
+    )
+    val mentionValue = EntityMentionProposal(
+      filler.lemma,
+      EntityType.Custom("chart", TextNorm.lower(filler.kind.toString))
+    )
+    val fillerParams = params + ("filler" -> filler.concept.value)
+    val (mention, mentionCall) = proposed(
+      source,
+      MentionRule,
+      fillerRef.key,
+      checksum,
+      mentionValue,
+      mentionEvidence,
+      Vector("entity-mention", fillerRef.key, mentionValue.label, mentionValue.entityType.toString),
+      fillerParams + ("span-source" -> mentionSource)
+    )
+    val (participant, participantCall) = proposed(
+      source,
+      ParticipantRule,
+      s"${root.key}->${fillerRef.key}",
+      checksum,
+      filler.role,
+      participantEvidence,
+      Vector("participant", root.key, fillerRef.key, renderRole(filler.role)),
+      fillerParams + ("role" -> renderRole(filler.role))
+    )
+    FillerOutcome(
+      Vector(mentionEvidence, participantEvidence),
+      EntityMentionAttempt(fillerRef, mention),
+      ParticipantAttempt(root, fillerRef, participant),
+      Vector(mentionCall, participantCall)
+    )
+
+  /** One `Unclear` temporal attempt between two consecutive proposed roots. */
+  private def temporalOutcome(
+      source: StorySource,
+      prev: ProposedRoot,
+      next: ProposedRoot
+  ): (TemporalAttempt, Evidence, ProviderCall) =
+    val scope = s"${prev.unit.id.value}->${next.unit.id.value}"
+    val checksum = ContentAddress.digest(Vector(prev.checksum.hex, next.checksum.hex))
+    val evidence = Evidence(
+      EvidenceId.unsafe(ContentAddress.of("chart-proposal-evidence", scope, checksum.hex)),
+      Some(prev.spans ++ next.spans),
+      Set.empty,
+      Fingerprint,
+      Stage
+    )
+    val params = Map(
+      "from" -> prev.unit.id.value,
+      "to" -> next.unit.id.value,
+      "chart" -> checksum.hex,
+      "span-source" -> "root-supports"
+    )
+    val (bundle, call) = proposed(
+      source,
+      TemporalRule,
+      scope,
+      checksum,
+      TemporalRelation.Unclear,
+      evidence,
+      Vector("temporal", prev.root.key, next.root.key, TemporalRelation.Unclear.toString),
+      params
+    )
+    (TemporalAttempt(prev.root, next.root, bundle), evidence, call)
+
+  private def renderRole(role: ParticipantRole): String = role match
+    case ParticipantRole.Custom(namespace, label) => s"Custom($namespace,$label)"
+    case other                                    => other.toString
 
   private def abstain(
       source: StorySource,
@@ -600,13 +899,26 @@ object ChartProposalProvider:
         render,
         params
       )
+    val (coverage, coverageCall) =
+      abstained[ParticipantCoverage](
+        source,
+        AbstainCoverageRule,
+        unit.id.value,
+        checksum,
+        render,
+        params
+      )
     SentenceOutcome(
       SentenceCoverage.Abstained(unit.id, anchor, reason),
       None,
+      Vector.empty,
       Some(SituationAttempt(anchor, situation)),
       Some(ContextAssignmentAttempt(anchor, context)),
       Some(SegmentMembershipAttempt(anchor, membership)),
-      Vector(situationCall, contextCall, membershipCall)
+      Some(ParticipantCoverageAttempt(anchor, coverage)),
+      Vector.empty,
+      Vector.empty,
+      Vector(situationCall, contextCall, membershipCall, coverageCall)
     )
 
   private def summaryOutcome(source: StorySource): Either[DomainError, SummaryOutcome] =
