@@ -453,6 +453,10 @@ object ChartProposalProvider:
        |mentions: one entity-mention attempt per proposed filler with label = the concept lemma
        |  and type = Custom("chart", concept kind lowercased); evidence = the filler's alignment
        |  spans (span-source=filler-alignments), else the root support (span-source=root-support).
+       |  A filler that several coordination branches license is mentioned once, by the first
+       |  branch in branch order that licenses it, and is a participant of every branch that
+       |  licenses it. Reentrancy is one occurrence of a word: mentioning it once per branch would
+       |  make several claims that it occurs out of one occurrence.
        |coverage: one participant-coverage attempt per admissible root listing exactly the
        |  proposed fillers, possibly none, with the root's evidence. An empty coverage is a value:
        |  it says the chart reaches no licensed participant from the root, never that participants
@@ -930,6 +934,12 @@ object ChartProposalProvider:
     * and an inadmissible one contributes the same four abstained attempts a focus root would, at
     * the branch. A coordinator with no branch at all abstains at the coordinator itself, because
     * there is nothing under it to be about.
+    *
+    * Reentrancy makes one filler the participant of several branches (`:op1 (c / carry :ARG0 (t /
+    * they)) :op2 (p / put :ARG0 t)`). That is two participant edges and one entity: the first
+    * branch in branch order that licenses the filler mentions it, and the later branches take it as
+    * a participant without mentioning it again. Mentioning it twice would be two claims that the
+    * word occurs, from one occurrence.
     */
   private def coordinatedOutcome(
       source: StorySource,
@@ -952,9 +962,22 @@ object ChartProposalProvider:
         )
       )
     else
+      val admitted = branches.flatMap(branch =>
+        chart
+          .concept(branch.concept)
+          .filterNot(ChartRoots.isCoordinator)
+          .filterNot(_ => chart.isEmbedded(branch.concept))
+          .flatMap(concept => admissibleRoot(chart, branch.concept, concept))
+          .map(_ => branch.concept)
+      )
+      val mentionOwner: Map[ConceptId, ConceptId] = admitted
+        .flatMap(root => scanFillers(chart, root)._1.map(filler => filler.concept -> root))
+        .foldLeft(Map.empty[ConceptId, ConceptId]) { (owners, entry) =>
+          if owners.contains(entry._1) then owners else owners + entry
+        }
       branches
         .traverse(branch =>
-          branchOutcome(source, unit, chart, origin, checksum, coordinator, branch)
+          branchOutcome(source, unit, chart, origin, checksum, coordinator, branch, mentionOwner)
         )
         .map(outcomes =>
           SentenceOutcome(
@@ -979,7 +1002,8 @@ object ChartProposalProvider:
       origin: ChartOrigin,
       checksum: Checksum,
       coordinator: ChartNodeRef,
-      branch: ChartRoots.Branch
+      branch: ChartRoots.Branch,
+      mentionOwner: Map[ConceptId, ConceptId]
   ): Either[DomainError, (CoordinatedBranch, Option[RootOutcome], RootAttempts)] =
     val root = ChartNodeRef(unit.id, branch.concept)
     def refuse(reason: AbstentionReason) =
@@ -1017,7 +1041,8 @@ object ChartProposalProvider:
               concept,
               rule,
               branchSupport(unit, chart, coordinator.concept, branch.concept),
-              root.key
+              root.key,
+              filler => mentionOwner.get(filler).contains(branch.concept)
             ).map(outcome =>
               (
                 CoordinatedBranch.Admitted(root, branch.role, outcome.fillers, outcome.unlicensed),
@@ -1034,9 +1059,10 @@ object ChartProposalProvider:
 
   /** Every attempt one admitted root contributes, whether it is a focus or a coordinated branch.
     *
-    * `support` and `scope` are the only things that differ between the two: a focus root is
-    * supported by the whole chart and scoped by its sentence, a branch by its own subtree and by
-    * its own root key.
+    * Three things differ between the two: a focus root is supported by the whole chart, scoped by
+    * its sentence, and mentions every filler it licenses, while a branch is supported by its own
+    * subtree, scoped by its own root key, and mentions only the fillers `mentions` gives it (see
+    * [[coordinatedOutcome]]). A filler it does not mention is still its participant.
     */
   private def proposeRoot(
       source: StorySource,
@@ -1048,7 +1074,8 @@ object ChartProposalProvider:
       concept: Concept,
       rule: RootRule,
       support: Support,
-      scope: String
+      scope: String,
+      mentions: ConceptId => Boolean = _ => true
   ): Either[DomainError, RootOutcome] =
     Gloss.predicate(chart, root.concept) match
       case None =>
@@ -1123,7 +1150,17 @@ object ChartProposalProvider:
         )
         val (licensed, unlicensed) = scanFillers(chart, root.concept)
         val fillerOutcomes = licensed.map(filler =>
-          fillerOutcome(source, unit, chart, checksum, root, support, filler, params)
+          fillerOutcome(
+            source,
+            unit,
+            chart,
+            checksum,
+            root,
+            support,
+            filler,
+            params,
+            mentions(filler.concept)
+          )
         )
         val coverageValue =
           ParticipantCoverage.of(licensed.map(f => ChartNodeRef(unit.id, f.concept)))
@@ -1149,16 +1186,19 @@ object ChartProposalProvider:
             ContextAssignmentAttempt(root, context),
             SegmentMembershipAttempt(root, membership),
             ParticipantCoverageAttempt(root, coverage),
-            fillerOutcomes.map(_.mention),
+            fillerOutcomes.flatMap(_.mention),
             fillerOutcomes.map(_.participant),
             Vector(situationCall, contextCall, membershipCall, coverageCall) ++
               fillerOutcomes.flatMap(_.calls)
           )
         )
 
+  /** `mention` is absent when an earlier coordination branch already mentioned this filler; the
+    * participant edge is emitted either way.
+    */
   private final case class FillerOutcome(
       evidence: Vector[Evidence],
-      mention: EntityMentionAttempt,
+      mention: Option[EntityMentionAttempt],
       participant: ParticipantAttempt,
       calls: Vector[ProviderCall]
   )
@@ -1207,7 +1247,8 @@ object ChartProposalProvider:
       root: ChartNodeRef,
       rootSupport: Support,
       filler: LicensedFiller,
-      params: Map[String, String]
+      params: Map[String, String],
+      mentioned: Boolean
   ): FillerOutcome =
     val fillerRef = ChartNodeRef(unit.id, filler.concept)
     val fillerAlignments = chart.alignments.filter(_.target.conceptIds.contains(filler.concept))
@@ -1227,17 +1268,24 @@ object ChartProposalProvider:
       EntityType.Custom("chart", foldCase(filler.kind.toString))
     )
     val fillerParams = params + ("filler" -> filler.concept.value)
-    val (mention, mentionCall) = proposed(
-      source,
-      MentionRule,
-      fillerRef.key,
-      checksum,
-      mentionValue,
-      mentionEvidence,
-      mentionRaw,
-      CalibrationModel,
-      Vector("entity-mention", fillerRef.key, mentionValue.label, mentionValue.entityType.toString),
-      fillerParams + ("span-source" -> mentionSource)
+    val mentionOutcome = Option.when(mentioned)(
+      proposed(
+        source,
+        MentionRule,
+        fillerRef.key,
+        checksum,
+        mentionValue,
+        mentionEvidence,
+        mentionRaw,
+        CalibrationModel,
+        Vector(
+          "entity-mention",
+          fillerRef.key,
+          mentionValue.label,
+          mentionValue.entityType.toString
+        ),
+        fillerParams + ("span-source" -> mentionSource)
+      )
     )
     val (participant, participantCall) = proposed(
       source,
@@ -1252,10 +1300,10 @@ object ChartProposalProvider:
       fillerParams + ("role" -> renderRole(filler.role))
     )
     FillerOutcome(
-      Vector(mentionEvidence, participantEvidence),
-      EntityMentionAttempt(fillerRef, mention),
+      mentionOutcome.map(_ => mentionEvidence).toVector :+ participantEvidence,
+      mentionOutcome.map((bundle, _) => EntityMentionAttempt(fillerRef, bundle)),
       ParticipantAttempt(root, fillerRef, participant),
-      Vector(mentionCall, participantCall)
+      mentionOutcome.map(_._2).toVector :+ participantCall
     )
 
   /** One `Unclear` temporal attempt between two consecutive proposed roots. */
