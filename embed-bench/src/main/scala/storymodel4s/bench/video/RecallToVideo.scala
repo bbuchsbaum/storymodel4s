@@ -525,10 +525,10 @@ object RecallToVideo:
             .sortBy { case (ref, d) => (d, ref.key) }
             .headOption
             .map(_._1)
-    val monotoneAnchors =
-      if MonotoneScene.enabled then
-        MonotoneScene.decide(built, result.posterior.rows, fill).map(_.anchor)
+    val decisions =
+      if MonotoneScene.enabled then MonotoneScene.decide(built, result.posterior.rows, fill)
       else Vector.empty
+    val monotoneAnchors = decisions.map(_.anchor)
     val lines =
       recall.ordered.zip(result.posterior.rows).zipWithIndex.map { case ((unit, row), unitIndex) =>
         val anchor =
@@ -573,6 +573,23 @@ object RecallToVideo:
       }
 
     Files.write(outPath, (header +: lines).mkString("\n").getBytes(StandardCharsets.UTF_8))
+
+    // The posterior beside the report, content-free: see [[PosteriorSidecar]] for why the report's
+    // own mass columns cannot carry it.
+    val chosenAnchors = result.posterior.rows.zipWithIndex.map { case (row, i) =>
+      if monotoneAnchors.isEmpty then row.mapSource else monotoneAnchors(i)
+    }
+    val sidecar = PosteriorSidecar.render(
+      built,
+      recall.ordered.map(_.ordinal),
+      result.posterior.rows,
+      decisions,
+      chosenAnchors
+    )
+    Files.write(
+      Paths.get(outPath.toString + ".posterior.json"),
+      sidecar.getBytes(StandardCharsets.UTF_8)
+    )
 
     val elapsedMs = (System.nanoTime() - t0) / 1000000L
     val leafCount = built.view.leaves.size
