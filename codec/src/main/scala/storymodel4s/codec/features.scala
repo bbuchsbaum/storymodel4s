@@ -231,6 +231,7 @@ object FeatureCodecs:
           MissingReason.ProviderAbstained,
           MissingReason.Excluded,
           MissingReason.AllMissing,
+          MissingReason.InputUnresolved,
           MissingReason.Unknown
         )
           .find(v => v.toString == s)
@@ -586,10 +587,13 @@ object FeatureCodecs:
   * that a rule-determined value, an unmeasured one, and a calibrated one no longer share a
   * representation (ADR 0010); 0.3.0 is unsupported for the same reason as its predecessors: a 0.3.0
   * model wrote every determined value as a calibrated `1.0`, and the lift would have to decide
-  * which of those were fitted, which none were.
+  * which of those were fitted, which none were. 0.5.0 makes a flow step\'s `entityTurnover` an
+  * `Estimate` (ADR 0012): a step between situations whose casts are not both resolved carries
+  * `Missing(InputUnresolved)` where 0.4.0 could only write a number, so a 0.4.0 model\'s turnovers
+  * cannot be told from measured ones and 0.4.0 is unsupported.
   */
 object SchemaVersions:
-  val Current: String = "0.4.0"
+  val Current: String = "0.5.0"
   val Supported: Vector[String] = Vector(Current)
 
   def check(c: io.circe.HCursor): Decoder.Result[String] =

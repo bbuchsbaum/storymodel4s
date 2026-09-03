@@ -121,7 +121,9 @@ class MentionFormSuite extends ScalaCheckSuite:
         graph
       )
       .fold(e => fail(e.message), identity)
-    val forms = MentionForms.infer(table, graph, _ => None).fold(e => fail(e.message), identity)
+    val forms = MentionForms
+      .infer(table, graph, _ => None, MentionForms.sentenceRank(graph.sentences))
+      .fold(e => fail(e.message), identity)
     (graph, table, forms)
 
   test("accessors partition mentions by form and keep discourse order") {
@@ -148,7 +150,9 @@ class MentionFormSuite extends ScalaCheckSuite:
     val table = MentionTable
       .of[EntityK]((0 to 3).map(i => mid(s"m$i") -> ChartNodeRef(sentence(i), cid("a"))), graph)
       .fold(e => fail(e.message), identity)
-    val forms = MentionForms.infer(table, graph, _ => None).fold(e => fail(e.message), identity)
+    val forms = MentionForms
+      .infer(table, graph, _ => None, MentionForms.sentenceRank(graph.sentences))
+      .fold(e => fail(e.message), identity)
     val all = NonEmptySet.fromSetUnsafe(SortedSet((0 to 3).map(i => mid(s"m$i"))*))
     val cluster = ExactCorefCluster.of(story, all, table).fold(e => fail(e.message), identity)
     assertEquals(forms.firstNamedMention(cluster), Some(mid("m2")))
@@ -173,13 +177,22 @@ class MentionFormSuite extends ScalaCheckSuite:
 
   test("MentionForms.of rejects a missing form and a form for an unknown mention") {
     val (graph, table, _) = doc(Vector("man", "he"))
-    assert(MentionForms.of(table, Map(mid("m0") -> MentionForm.Name), graph).isLeft)
+    assert(
+      MentionForms
+        .of(
+          table,
+          Map(mid("m0") -> MentionForm.Name),
+          graph,
+          MentionForms.sentenceRank(graph.sentences)
+        )
+        .isLeft
+    )
     val bogus = Map(
       mid("m0") -> MentionForm.Name,
       mid("m1") -> MentionForm.Name,
       mid("zz") -> MentionForm.Name
     )
-    assert(MentionForms.of(table, bogus, graph).isLeft)
+    assert(MentionForms.of(table, bogus, graph, MentionForms.sentenceRank(graph.sentences)).isLeft)
   }
 
   /** Generated documents: a sequence of lemmas drawn from names, nouns, and pronouns. */

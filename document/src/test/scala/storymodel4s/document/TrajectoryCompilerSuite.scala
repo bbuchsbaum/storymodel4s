@@ -4,6 +4,7 @@ import cats.data.{NonEmptySet, NonEmptyVector}
 import munit.FunSuite
 import storymodel4s.acquire.*
 import storymodel4s.core.*
+import storymodel4s.features.{Estimate, MissingReason}
 import storymodel4s.proposition.{Polarity as ChartPolarity, *}
 import storymodel4s.story.{Polarity as StoryPolarity, *}
 
@@ -373,7 +374,7 @@ class TrajectoryCompilerSuite extends FunSuite:
 
     assertEquals(model.trajectory.steps.size, 2)
     model.trajectory.steps.foreach { step =>
-      assertEquals(step.entityTurnover, 0.0)
+      assertEquals(step.entityTurnover, Estimate.observed(0.0))
       assertEquals(step.worldTime.value, WorldTimeTransition.Unresolved(Vector.empty))
       assertEquals(step.worldTimeContext, model.graph.rootContext)
       assert(!step.contextChange)
@@ -386,7 +387,12 @@ class TrajectoryCompilerSuite extends FunSuite:
     assert(!result.isPartial)
   }
 
-  test("a pair without accepted participant coverage yields no trajectory step") {
+  /** Before ADR 0012 a pair without accepted coverage at either end blocked the whole trajectory,
+    * because a flow step's turnover was a bare number that would have read the unresolved cast as
+    * zero. The turnover is now an estimate: the steps exist, and the ones touching the unresolved
+    * situation say their turnover is unmeasured rather than saying nothing about the route.
+    */
+  test("a pair without accepted participant coverage yields a step with unmeasured turnover") {
     val result = compile(coverage =
       Vector(
         coverageAttempt(0, Vector(m(0))),
@@ -396,27 +402,28 @@ class TrajectoryCompilerSuite extends FunSuite:
     )
     val gaps = gapsOf(result)
 
-    assertEquals(result.draft.trajectory, DiscourseTrajectory.empty)
-    assertEquals(result.validated, None)
+    assertEquals(result.draft.trajectory.steps.size, 2)
+    assertEquals(
+      result.draft.trajectory.steps.map(_.entityTurnover),
+      Vector(
+        Estimate.Missing(MissingReason.InputUnresolved),
+        Estimate.Missing(MissingReason.InputUnresolved)
+      )
+    )
     assertEquals(
       gaps(coverageTarget(1)),
       DerivationGapReason.Unresolved(ResolutionFailure.Uncalibrated)
     )
-    assertEquals(
-      gaps(stepTarget(0, 1)),
-      DerivationGapReason.MissingUpstream(Vector(coverageTarget(1)))
-    )
-    assertEquals(
-      gaps(stepTarget(1, 2)),
-      DerivationGapReason.MissingUpstream(Vector(coverageTarget(1)))
-    )
-    assertEquals(gaps.size, 3)
+    assert(!gaps.contains(stepTarget(0, 1)) && !gaps.contains(stepTarget(1, 2)))
+    assertEquals(gaps.size, 1)
     assertEquals(result.draft.graph.relations.participants.size, 3)
     assertEquals(result.draft.graph.entities.values.head.mentions.length, 3)
-    assert(result.validation.report.byLaw.contains("trajectory.complete"))
+    assert(!result.validation.report.byLaw.contains("trajectory.complete"))
   }
 
-  test("a coverage naming a filler whose participant claim is unresolved is a gap, not a step") {
+  test(
+    "a coverage naming a filler whose participant claim is unresolved is a gap, and the steps around it are unmeasured"
+  ) {
     val result = compile(participants =
       Vector(
         participantAttempt(0),
@@ -426,7 +433,13 @@ class TrajectoryCompilerSuite extends FunSuite:
     )
     val gaps = gapsOf(result)
 
-    assertEquals(result.draft.trajectory, DiscourseTrajectory.empty)
+    assertEquals(
+      result.draft.trajectory.steps.map(_.entityTurnover),
+      Vector(
+        Estimate.Missing(MissingReason.InputUnresolved),
+        Estimate.Missing(MissingReason.InputUnresolved)
+      )
+    )
     assertEquals(
       gaps(NarrativeCandidateAddress.Participant(s(1), m(1))),
       DerivationGapReason.Unresolved(ResolutionFailure.Uncalibrated)
@@ -435,17 +448,9 @@ class TrajectoryCompilerSuite extends FunSuite:
       gaps(coverageTarget(1)),
       DerivationGapReason.MissingUpstream(Vector(NarrativeCandidateAddress.Participant(s(1), m(1))))
     )
-    assertEquals(
-      gaps(stepTarget(0, 1)),
-      DerivationGapReason.MissingUpstream(Vector(coverageTarget(1)))
-    )
-    assertEquals(
-      gaps(stepTarget(1, 2)),
-      DerivationGapReason.MissingUpstream(Vector(coverageTarget(1)))
-    )
-    assertEquals(gaps.size, 4)
+    assert(!gaps.contains(stepTarget(0, 1)) && !gaps.contains(stepTarget(1, 2)))
+    assertEquals(gaps.size, 2)
     assertEquals(result.draft.graph.relations.participants.size, 2)
-    assertEquals(result.validated, None)
   }
 
   test("a participant whose filler mention is unresolved is a gap, never a default edge") {
@@ -472,7 +477,13 @@ class TrajectoryCompilerSuite extends FunSuite:
     )
     assertEquals(result.draft.graph.entities.values.head.mentions.length, 2)
     assertEquals(result.draft.graph.relations.participants.size, 2)
-    assertEquals(result.draft.trajectory, DiscourseTrajectory.empty)
+    assertEquals(
+      result.draft.trajectory.steps.map(_.entityTurnover),
+      Vector(
+        Estimate.Missing(MissingReason.InputUnresolved),
+        Estimate.Missing(MissingReason.InputUnresolved)
+      )
+    )
   }
 
   test("a participant whose filler lies in another sentence is refused at the input") {
@@ -534,7 +545,10 @@ class TrajectoryCompilerSuite extends FunSuite:
     assertEquals(splitModel.graph.entities.size, 2)
     assertEquals(splitModel.graph.entities.values.map(_.label.value).toSet, Set("man", "dog"))
     assertEquals(splitModel.graph.relations.participants.size, 3)
-    assertEquals(splitModel.trajectory.steps.map(_.entityTurnover), Vector(0.0, 1.0))
+    assertEquals(
+      splitModel.trajectory.steps.map(_.entityTurnover),
+      Vector(Estimate.observed(0.0), Estimate.observed(1.0))
+    )
     assertEquals(split.entityPartition.size, 1)
   }
 
@@ -559,7 +573,10 @@ class TrajectoryCompilerSuite extends FunSuite:
       compile(mentions = Vector.empty, participants = Vector.empty, coverage = emptyCoverage)
     val model = stepped.validated.getOrElse(fail(stepped.validation.report.render))
     assertEquals(model.graph.entities, Map.empty)
-    assertEquals(model.trajectory.steps.map(_.entityTurnover), Vector(0.0, 0.0))
+    assertEquals(
+      model.trajectory.steps.map(_.entityTurnover),
+      Vector(Estimate.observed(0.0), Estimate.observed(0.0))
+    )
     assertEquals(stepped.derivation.gaps, Vector.empty)
 
     val withheld = compile(
@@ -572,16 +589,15 @@ class TrajectoryCompilerSuite extends FunSuite:
       )
     )
     val gaps = gapsOf(withheld)
-    assertEquals(withheld.draft.trajectory, DiscourseTrajectory.empty)
     assertEquals(
-      gaps(stepTarget(0, 1)),
-      DerivationGapReason.MissingUpstream(Vector(coverageTarget(1)))
+      withheld.draft.trajectory.steps.map(_.entityTurnover),
+      Vector(
+        Estimate.Missing(MissingReason.InputUnresolved),
+        Estimate.Missing(MissingReason.InputUnresolved)
+      )
     )
-    assertEquals(
-      gaps(stepTarget(1, 2)),
-      DerivationGapReason.MissingUpstream(Vector(coverageTarget(1)))
-    )
-    assertEquals(withheld.validated, None)
+    assert(!gaps.contains(stepTarget(0, 1)) && !gaps.contains(stepTarget(1, 2)))
+    assertEquals(gaps.keySet, Set(coverageTarget(1)))
     assertNotEquals(withheld.fingerprint, stepped.fingerprint)
   }
 

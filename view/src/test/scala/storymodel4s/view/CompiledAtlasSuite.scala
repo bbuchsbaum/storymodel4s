@@ -3,6 +3,7 @@ package storymodel4s.view
 import cats.data.{NonEmptySet, NonEmptyVector}
 import munit.FunSuite
 import storymodel4s.core.*
+import storymodel4s.features.Estimate
 import storymodel4s.document.*
 import storymodel4s.proposition.{Polarity as ChartPolarity, *}
 import storymodel4s.story.*
@@ -102,7 +103,10 @@ class CompiledAtlasSuite extends FunSuite:
     assertEquals(model.graph.situations.size, 3)
     assertEquals(model.graph.entities.size, 1)
     assertEquals(model.graph.relations.participants.size, 3)
-    assertEquals(model.trajectory.steps.map(_.entityTurnover), Vector(0.0, 0.0))
+    assertEquals(
+      model.trajectory.steps.map(_.entityTurnover),
+      Vector(Estimate.observed(0.0), Estimate.observed(0.0))
+    )
 
     val receipt = model.receipt.getOrElse(fail("a compiled model carries its build receipt"))
     val state = CommonViewState.empty

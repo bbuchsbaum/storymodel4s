@@ -480,17 +480,52 @@ class StoryBuildSuite extends FunSuite:
       Map("op1" -> 15, "op2" -> 15, "snt1" -> 1, "snt2" -> 1)
     )
 
-    // The four gaps and the three errors are the one abstained anchor and nothing else: the
-    // situation, context, membership, and coverage families have no proposal there, and the first
-    // three of those are required derivations.
-    assertEquals(summary.gaps, 4)
+    // The three errors are the one abstained anchor and nothing else: the situation, context and
+    // membership families have no proposal there and are required derivations. The gaps are
+    // those four plus the open references of ADR 0012: 26 pronouns that no rule could tie to one
+    // entity (22 with several candidates, 4 first- or second-person), the 27 participant edges
+    // they would have filled, and the 26 situation coverages those edges belong to.
+    assertEquals(summary.gaps, 83)
     assertEquals(
-      rows(report, "gaps").map(row => field(row, "family") -> field(row, "reason")).sorted,
-      Vector(
-        "ContextAssignment" -> "unresolved:NoProposal",
-        "ParticipantCoverage" -> "unresolved:NoProposal",
-        "SegmentMembership" -> "unresolved:NoProposal",
-        "SituationMention" -> "unresolved:NoProposal"
+      rows(report, "gaps")
+        .map(row => field(row, "family") -> field(row, "reason"))
+        .groupBy(identity)
+        .view
+        .mapValues(_.size)
+        .toMap,
+      Map(
+        ("ContextAssignment", "unresolved:NoProposal") -> 1,
+        ("ParticipantCoverage", "unresolved:NoProposal") -> 1,
+        ("SegmentMembership", "unresolved:NoProposal") -> 1,
+        ("SituationMention", "unresolved:NoProposal") -> 1,
+        ("EntityCoreference", "open-reference:several-antecedents") -> 22,
+        ("EntityCoreference", "open-reference:needs-speech-holder:first") -> 3,
+        ("EntityCoreference", "open-reference:needs-speech-holder:second") -> 1
+      ) ++ rows(report, "gaps")
+        .map(row => field(row, "family") -> field(row, "reason"))
+        .filter((family, reason) =>
+          (family == "ParticipantRole" || family == "ParticipantCoverage") &&
+            reason.startsWith("missing-upstream:")
+        )
+        .groupBy(identity)
+        .view
+        .mapValues(_.size)
+        .toMap
+    )
+    assertEquals(
+      rows(report, "gaps")
+        .map(row => field(row, "family"))
+        .groupBy(identity)
+        .view
+        .mapValues(_.size)
+        .toMap,
+      Map(
+        "ContextAssignment" -> 1,
+        "SegmentMembership" -> 1,
+        "SituationMention" -> 1,
+        "EntityCoreference" -> 26,
+        "ParticipantRole" -> 27,
+        "ParticipantCoverage" -> 27
       )
     )
     assertEquals(summary.errors, 3)
@@ -532,21 +567,22 @@ class StoryBuildSuite extends FunSuite:
     val built = json(files.model)
     val graph = built.hcursor.downField("graph")
     assertEquals(size(graph, "situations"), 65)
-    assertEquals(size(graph, "entities"), 29)
+    assertEquals(size(graph, "entities"), 23)
     assertEquals(size(graph, "contexts"), 6)
     assertEquals(size(graph, "segments"), 1)
     val relations = graph.downField("relations")
-    assertEquals(size(relations, "participants"), 57)
+    assertEquals(size(relations, "participants"), 30)
     assertEquals(size(relations, "circumstances"), 11)
     assertEquals(size(relations, "temporal"), 64)
     assertEquals(size(relations, "causal"), 0)
     assertEquals(size(built.hcursor.downField("trajectory"), "steps"), 64)
     assertEquals(size(built.hcursor.downField("hierarchy"), "containment"), 65)
     assertEquals(intField(report, "model", "situations"), 65)
-    assertEquals(intField(report, "model", "entities"), 29)
-    // 386 claims became 391: the five child context frames the placement rule derives are five
-    // structurally-derived claims, each citing the quotation span that licensed it.
-    assertEquals(intField(report, "model", "claims"), 391)
+    assertEquals(intField(report, "model", "entities"), 23)
+    // 386 claims became 391 when the five child context frames arrived, and 352 when ADR 0012
+    // opened the pronouns: six pronoun "entities" (twelve claims) and the 27 participant edges
+    // they filled are now recorded gaps, not claims.
+    assertEquals(intField(report, "model", "claims"), 352)
 
     // Slice 1.7's referentiality rule, measured on the same fifty charts. 35 entities and 68
     // participant edges became 29 and 57: the eleven fillers that moved are the nine `:time` and
@@ -564,9 +600,17 @@ class StoryBuildSuite extends FunSuite:
       )
       .getOrElse(fail("no entities object"))
       .sorted
-    assertEquals(entityLabels.size, 29)
+    assertEquals(entityLabels.size, 23)
     assertEquals(
       entityLabels.toSet.intersect(Set("then", "now", "midnight", "night", "thus", "together")),
+      Set.empty[String]
+    )
+    // ADR 0012: no pronoun is an entity. Before it, "he" was one entity with eleven mentions
+    // spanning several men, and "they", "we", "it", "you", "I" were entities beside it.
+    assertEquals(
+      entityLabels.toSet.intersect(
+        Set("he", "him", "his", "they", "them", "their", "we", "us", "it", "you", "i")
+      ),
       Set.empty[String]
     )
     val circumstances = rows(built, "graph", "relations", "circumstances")
@@ -755,10 +799,11 @@ class StoryBuildSuite extends FunSuite:
     val built = json(files.model)
     val graph = built.hcursor.downField("graph")
     assertEquals(size(graph, "situations"), 3)
-    // Two entities and two participant edges, not three: the third filler of these authored charts
-    // is a `:time`, which slice 1.7's referentiality rule records as a circumstance rather than
-    // minting an entity for it.
-    assertEquals(size(graph, "entities"), 2)
+    // One entity and two participant edges: of the authored charts' three fillers, one is a
+    // `:time` recorded as a circumstance (slice 1.7), and one is the pronoun "He", which has
+    // exactly one introducing referent before it and so resolves to it under ADR 0012's unique-
+    // antecedent rule rather than minting a second entity.
+    assertEquals(size(graph, "entities"), 1)
     val relations = graph.downField("relations")
     assertEquals(size(relations, "participants"), 2)
     assertEquals(size(relations, "circumstances"), 1)
@@ -1096,18 +1141,38 @@ class StoryBuildSuite extends FunSuite:
       DerivationRecord.Reported(compilation.derivation.gaps, proposals.coverage)
     )
 
-    // The numbers the handoff measured, pinned: 70 gaps over 50 sentences, and every gap names
-    // its own upstream targets and evidence rather than a count of them.
-    assertEquals(record.gaps.size, 70)
+    // The numbers measured, pinned: 149 gaps over 50 sentences (70 before ADR 0012 opened the
+    // pronouns), and every gap names its own upstream targets and evidence rather than a count.
+    assertEquals(record.gaps.size, 149)
     assertEquals(record.gaps.size, summary.gaps)
     assertEquals(record.coverage.size, 50)
     assertEquals(record.attempts.size, compilation.derivation.attempts.size)
     val missingUpstream = record.gaps.collect {
       case DerivationGap(_, _, _, DerivationGapReason.MissingUpstream(addresses), _, _) => addresses
     }
-    assertEquals(missingUpstream.size, 65)
+    assertEquals(missingUpstream.size, 118)
     assert(missingUpstream.forall(_.nonEmpty), "a missing-upstream gap named no upstream address")
     assertEquals(record.summaryCoverage, SummaryCoverage.NoTitle)
+
+    // An open pronoun's candidates are exactly the referents introduced before it in discourse
+    // order (ADR 0012). "They came down the river." is the third sentence (s2): before it the
+    // text introduced Egulac and the two young men, and nothing else. A rank taken from sorted
+    // sentence ids would put s10 and s11 before s2 and offer their referents too.
+    val labelOfClaim = model.graph.entities.values.map(e => e.meta.id -> e.label.value).toMap
+    val theyCameDown = record.gaps
+      .find(g =>
+        g.family == storymodel4s.acquire.ClaimFamily.EntityCoreference &&
+          g.target.render.contains(":s2#")
+      )
+      .getOrElse(fail("no open reference in sentence s2"))
+    assertEquals(
+      theyCameDown.reason,
+      DerivationGapReason.OpenReference(storymodel4s.document.OpenReference.SeveralAntecedents)
+    )
+    assertEquals(
+      theyCameDown.upstreamClaims.toVector.flatMap(labelOfClaim.get).sorted,
+      Vector("egulac", "man")
+    )
 
     // Every gap is an attempted target whose disposition is NotEmitted with the same reason: the
     // record's constructor refuses any other pairing, so a decoded record cannot carry a gap the
@@ -1312,7 +1377,7 @@ class StoryBuildSuite extends FunSuite:
       .decode(read(summary.files.model))
       .fold(error => fail(error.toString), identity)
     val claims = model.claims.toVector
-    assertEquals(claims.size, 325)
+    assertEquals(claims.size, 286)
 
     // 1. Not one calibrated probability, and not one claim without a basis: every claim in this
     // model is determined by a named rule, because nothing in the build fits a calibration.
@@ -1321,9 +1386,9 @@ class StoryBuildSuite extends FunSuite:
     assertEquals(
       claims.groupBy(_.credence.basis.render).view.mapValues(_.size).toMap,
       Map(
-        "determined:chart-rule-v1" -> 197,
-        "determined:compiler-derived:entity/v1" -> 29,
-        "determined:compiler-derived:entity-label/v1" -> 29,
+        "determined:chart-rule-v1" -> 170,
+        "determined:compiler-derived:entity/v1" -> 23,
+        "determined:compiler-derived:entity-label/v1" -> 23,
         "determined:compiler-derived:context-frame/v1" -> 5,
         "determined:compiler-derived:root-context/v1" -> 1,
         "determined:trajectory-derive/v1" -> 64
@@ -1336,8 +1401,8 @@ class StoryBuildSuite extends FunSuite:
     assertEquals(
       claims.groupBy(_.credence.score.render).view.mapValues(_.size).toMap,
       Map(
-        "unmeasured" -> 269,
-        s"raw:interop-tables/v1:lexicon-argument=${Score.hexBits(0.5)}" -> 44,
+        "unmeasured" -> 256,
+        s"raw:interop-tables/v1:lexicon-argument=${Score.hexBits(0.5)}" -> 18,
         s"raw:interop-tables/v1:standard-role=${Score.hexBits(0.9)}" -> 12
       )
     )
@@ -1348,7 +1413,7 @@ class StoryBuildSuite extends FunSuite:
     // sentence.
     val (derived, accepted) =
       claims.partition(_.status == EpistemicStatus.StructurallyDerived)
-    assertEquals(derived.size, 128)
+    assertEquals(derived.size, 116)
     assert(derived.forall(_.provenance.calls.isEmpty), "a derived claim carries provider calls")
     accepted.foreach { meta =>
       val sentences = meta.evidence.toVector
@@ -1365,7 +1430,7 @@ class StoryBuildSuite extends FunSuite:
     }
     assertEquals(
       accepted.map(_.provenance.calls.size).groupBy(identity).view.mapValues(_.size).toMap,
-      Map(3 -> 149, 5 -> 48)
+      Map(3 -> 122, 5 -> 48)
     )
 
     // 4. The file: under one megabyte where it was ninety.

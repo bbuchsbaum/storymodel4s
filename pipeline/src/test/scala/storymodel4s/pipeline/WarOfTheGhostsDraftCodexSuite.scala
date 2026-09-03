@@ -138,11 +138,11 @@ class WarOfTheGhostsDraftCodexSuite extends FunSuite:
     assertEquals(compilation.draft.source.id.value, WogStory)
     assertEquals(compilation.draft.atlas.sentences.size, 50)
     assertEquals(compilation.draft.graph.situations.size, 65)
-    assertEquals(compilation.draft.graph.entities.size, 29)
+    assertEquals(compilation.draft.graph.entities.size, 23)
     assertEquals(compilation.draft.graph.contexts.size, 6)
     assertEquals(compilation.draft.graph.segments.size, 0)
     assertEquals(compilation.validated, None)
-    assertEquals(compilation.derivation.gaps.size, 70)
+    assertEquals(compilation.derivation.gaps.size, 149)
     assertEquals(compilation.validation.report.violations.size, 135)
   }
 
@@ -150,7 +150,7 @@ class WarOfTheGhostsDraftCodexSuite extends FunSuite:
     val promotion = flow.provenance.draft.getOrElse(fail("a draft flow carries a promotion"))
     assertEquals(flow.provenance.basis, ViewBasis.DraftBuild)
     assertEquals(promotion.promoted, false)
-    assertEquals(promotion.gapCount, Some(70))
+    assertEquals(promotion.gapCount, Some(149))
     assertEquals(promotion.violationCount, 135)
     assertEquals(
       flow.provenance.modelReceiptChecksum,
@@ -158,19 +158,19 @@ class WarOfTheGhostsDraftCodexSuite extends FunSuite:
     )
   }
 
-  test("the annotation census: 235 marks on the words, of which 135 are failures") {
+  test("the annotation census: 308 marks on the words, of which 214 are failures") {
     assertEquals(
       census(flow),
       Vector(
         ("abstention", 1),
         ("claim", 65),
         ("context", 6),
-        ("entity", 29),
-        ("gap", 69),
+        ("entity", 23),
+        ("gap", 148),
         ("unsatisfied-law", 65)
       )
     )
-    assertEquals(flow.annotations.size, 235)
+    assertEquals(flow.annotations.size, 308)
 
     // The hierarchy and relation channels are declared and empty: no title was stated, so no
     // segment was derived, so there is nothing hierarchical to draw. A declared empty channel says
@@ -181,7 +181,7 @@ class WarOfTheGhostsDraftCodexSuite extends FunSuite:
     assertEquals(census(flow).map(_._1).toSet.intersect(Set("hierarchy", "relation")), Set.empty)
 
     // Every absence carries its own record, and no ordinary annotation carries one.
-    assertEquals(marks(flow).size, 135)
+    assertEquals(marks(flow).size, 214)
     assert(marks(flow).forall(mark => mark.absence.exists(_.kind == mark.kind)))
     assert(flow.annotations.filterNot(_.kind.marksAbsence).forall(_.absence.isEmpty))
   }
@@ -193,7 +193,7 @@ class WarOfTheGhostsDraftCodexSuite extends FunSuite:
         compilation.validation.report.violations.size
     assertEquals(draft.absences.size, expected)
     assertEquals(ledger.total, expected)
-    assertEquals(ledger.total, 206)
+    assertEquals(ledger.total, 285)
     assertEquals(ledger.marked, marks(flow).map(_.id).sorted)
 
     // Seventy-one absences concern no words and say so, rather than being dropped from the reading
@@ -222,7 +222,7 @@ class WarOfTheGhostsDraftCodexSuite extends FunSuite:
   test("every failure that names words names the exact sentence it concerns") {
     val byId = compilation.draft.atlas.byId
     val placed = marks(flow).filterNot(_.kind == AnnotationKind.UnsatisfiedLaw)
-    assertEquals(placed.size, 70)
+    assertEquals(placed.size, 149)
     placed.foreach { mark =>
       mark.support.refs.toVector.foreach { ref =>
         val unit = ref.unit.flatMap(byId.get).getOrElse(fail(s"no unit under ${mark.id.value}"))
@@ -258,8 +258,9 @@ class WarOfTheGhostsDraftCodexSuite extends FunSuite:
         .sorted,
       Vector(
         ("abstention/Missing/OpenHatch", 1),
-        ("gap/Missing/OpenHatch", 65),
-        ("gap/Unresolved/Placeholder", 4),
+        ("gap/Alternatives/Fan", 22),
+        ("gap/Missing/OpenHatch", 118),
+        ("gap/Unresolved/Placeholder", 8),
         ("unsatisfied-law/-/Bracket", 65)
       )
     )
@@ -375,7 +376,7 @@ class WarOfTheGhostsDraftCodexSuite extends FunSuite:
     val twin = flow.textualTwin
     assert(twin.startsWith("Narrative Codex\n"), twin.take(120))
     assert(twin.contains("Basis: draft build\n"), "the twin states the basis")
-    assert(twin.contains("promotable: false; derivation gaps: 70; violations: 135\n"))
+    assert(twin.contains("promotable: false; derivation gaps: 149; violations: 135\n"))
     assert(twin.contains("  - compiler.required-derivation Error x69\n"))
     assert(twin.contains("  - hierarchy.single-primary-root Error x1\n"))
     assert(twin.contains("  - hierarchy.situation-root-reachable Error x65\n"))
@@ -387,7 +388,7 @@ class WarOfTheGhostsDraftCodexSuite extends FunSuite:
 
     def lines(prefix: String): Vector[String] =
       twin.linesIterator.filter(_.startsWith(prefix)).toVector
-    assertEquals(lines("  absence=unresolved-family").size, 69)
+    assertEquals(lines("  absence=unresolved-family").size, 148)
     assertEquals(lines("  absence=abstained-sentence").size, 1)
     assertEquals(lines("  absence=unsatisfied-law").size, 65)
     assert(lines("  absence=").forall(_.contains("channel=")))
@@ -430,16 +431,16 @@ class WarOfTheGhostsDraftCodexSuite extends FunSuite:
 
     assertEquals(
       census(aloneFlow),
-      Vector(("claim", 65), ("context", 6), ("entity", 29), ("unsatisfied-law", 65))
+      Vector(("claim", 65), ("context", 6), ("entity", 23), ("unsatisfied-law", 65))
     )
     assertEquals(ledgerOf(aloneFlow).total, 66)
     assertEquals(ledgerOf(aloneFlow).unplaced.size, 1)
 
     // And the receipt says which it is: "record not supplied" is not "0 gaps".
     assertEquals(alone.promotion.gapCount, None)
-    assertEquals(flow.provenance.draft.flatMap(_.gapCount), Some(70))
+    assertEquals(flow.provenance.draft.flatMap(_.gapCount), Some(149))
     assert(aloneFlow.textualTwin.contains("derivation gaps: record not supplied"))
-    assert(flow.textualTwin.contains("derivation gaps: 70"))
+    assert(flow.textualTwin.contains("derivation gaps: 149"))
 
     // The two receipts are different statements, so neither flow can be compiled under the other.
     val crossed = CodexCompiler(

@@ -4,6 +4,7 @@ import cats.data.{NonEmptySet, NonEmptyVector}
 import munit.FunSuite
 import storymodel4s.acquire.*
 import storymodel4s.core.*
+import storymodel4s.features.Estimate
 import storymodel4s.proposition.{Polarity as ChartPolarity, *}
 import storymodel4s.story.{Polarity as StoryPolarity, *}
 
@@ -500,7 +501,10 @@ class ChartProposalProviderSuite extends FunSuite:
     assert(!compiled.validation.report.byLaw.contains("hierarchy.member-within-parent"))
     assertEquals(compiled.derivation.gaps, Vector.empty)
     val model = compiled.validated.getOrElse(fail(compiled.validation.report.render))
-    assertEquals(model.trajectory.steps.map(_.entityTurnover), Vector(0.0, 0.0))
+    assertEquals(
+      model.trajectory.steps.map(_.entityTurnover),
+      Vector(Estimate.observed(0.0), Estimate.observed(0.0))
+    )
     assertEquals(
       model.trajectory.steps.map(_.worldTime.value).toSet,
       Set(WorldTimeTransition.Unresolved(Vector.empty))

@@ -155,7 +155,7 @@ object StoryModel:
     * because the text held no speech or because the compiler had no vocabulary for an unattributed
     * one, so a mechanical lift would invent the distinction it is supposed to preserve.
     */
-  val SchemaVersion: String = "0.4.0"
+  val SchemaVersion: String = "0.5.0"
 
   def draft(
       source: StorySource,

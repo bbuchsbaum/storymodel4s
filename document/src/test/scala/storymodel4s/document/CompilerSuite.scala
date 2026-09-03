@@ -4,6 +4,7 @@ import cats.data.NonEmptyVector
 import munit.FunSuite
 import storymodel4s.acquire.*
 import storymodel4s.core.*
+import storymodel4s.features.Estimate
 import storymodel4s.proposition.*
 import storymodel4s.story.{Polarity as StoryPolarity, *}
 
@@ -840,7 +841,7 @@ class CompilerSuite extends FunSuite:
     assertEquals(model.trajectory.steps.size, 1)
     val step = model.trajectory.steps.head
     assertEquals(step.worldTime.value, WorldTimeTransition.Unresolved(Vector.empty))
-    assertEquals(step.entityTurnover, 0.0)
+    assertEquals(step.entityTurnover, Estimate.observed(0.0))
     assertEquals(step.worldTimeContext, model.graph.rootContext)
     assertEquals(model.graph.relations.temporal.map(_.relation), Vector(TemporalRelation.Unclear))
     assertEquals(model.graph.relations.temporal.head.meta.status, EpistemicStatus.Hypothesized)

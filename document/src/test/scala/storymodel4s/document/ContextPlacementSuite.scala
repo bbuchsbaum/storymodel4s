@@ -183,6 +183,27 @@ class ContextPlacementSuite extends FunSuite:
       salt = "said"
     )
 
+  /** `saidChart` with a nominal speaker: the same words, the concept `man` instead of `he`. */
+  private def manSaidChart: PropositionEvidence =
+    checked(
+      atlas.sentences(0),
+      "s",
+      Map(
+        "s" -> Concept.predicate("say", frame("say-01")),
+        "h" -> Concept.entity("man"),
+        "a" -> Concept.predicate("accompany", frame("accompany-01"))
+      ),
+      Vector(rel("s", agent, "h"), rel("s", theme, "a")),
+      polarity = Map("s" -> ChartPolarity.Positive),
+      embedded = Vector(EmbeddedProposition(id("s"), EmbeddingKind.Speech, id("a"))),
+      alignments = Vector(
+        align(atlas.sentences(0), "said", "s"),
+        align(atlas.sentences(0), "He", "h"),
+        align(atlas.sentences(0), "accompanied", "a")
+      ),
+      salt = "man-said"
+    )
+
   /** `"We fought.` — a whole sentence inside a quotation that no chart of its own can see. */
   private def foughtChart: PropositionEvidence =
     checked(
@@ -311,20 +332,42 @@ class ContextPlacementSuite extends FunSuite:
 
   // ---- attribution -------------------------------------------------------------------------
 
-  test("a quotation with one candidate speaker names it; the compiler resolves it to an entity") {
-    val model = compile(
+  /** The speaker of `saidChart` is the pronoun "He" with nothing before it. Under ADR 0012 it mints
+    * no entity, so the quotation is a speech context whose holder is unresolved; the same sentence
+    * with a nominal speaker attributes. Both are the truth of their chart, and neither places the
+    * quoted content in the narrated world.
+    */
+  test(
+    "a quotation's speaker attributes it when it names an entity, and stays unresolved when it is an open pronoun"
+  ) {
+    val pronoun = compile(
       Vector(
         atlas.sentences(0).id -> saidChart,
         atlas.sentences(1).id -> foughtChart
       )
     ).draft
-    val fought = model.graph.situations.values.find(_.predicate.lemma == "fight").get
-    val frameOf = model.graph.contexts(fought.context)
-    frameOf.kind match
+    val fought = pronoun.graph.situations.values.find(_.predicate.lemma == "fight").get
+    val frameOf = pronoun.graph.contexts(fought.context)
+    assertEquals(
+      frameOf.kind,
+      ContextKind.Speech(ContextHolder.Unattributed(HolderGap.UnresolvedCandidate))
+    )
+    assertEquals(
+      frameOf.parent.map(pronoun.graph.contexts(_).kind),
+      Some(ContextKind.NarratedWorld)
+    )
+
+    val nominal = compile(
+      Vector(
+        atlas.sentences(0).id -> manSaidChart,
+        atlas.sentences(1).id -> foughtChart
+      )
+    ).draft
+    val fought2 = nominal.graph.situations.values.find(_.predicate.lemma == "fight").get
+    nominal.graph.contexts(fought2.context).kind match
       case ContextKind.Speech(ContextHolder.Named(entity)) =>
-        assertEquals(model.graph.entities(entity).label.value, "he")
+        assertEquals(nominal.graph.entities(entity).label.value, "man")
       case other => fail(s"expected an attributed speech context, got ${other.label}")
-    assertEquals(frameOf.parent.map(model.graph.contexts(_).kind), Some(ContextKind.NarratedWorld))
   }
 
   test("a quotation with no speech verb before it is unattributed, and still not root world") {
@@ -402,7 +445,12 @@ class ContextPlacementSuite extends FunSuite:
     assertEquals(read.speakers(last), HolderCandidate.Missing(HolderGap.NoCandidate))
   }
 
-  test("two candidate speakers abstain rather than picking one") {
+  /** Both offered speakers here are pronouns with nothing before them, so under ADR 0012 neither
+    * minted an entity and the holder is unresolved: naming either would attribute the content on
+    * the strength of the other being unreadable. (Two *named* speakers would be
+    * `SeveralCandidates`; see the entity identity court for what resolves.)
+    */
+  test("two pronoun speakers with no antecedent leave the holder unresolved, not picked") {
     val two = StorySource
       .titled(
         "He said and she replied: \"hello.\" \"Nobody knows.\"",
@@ -498,7 +546,111 @@ class ContextPlacementSuite extends FunSuite:
     val knows = model.draft.graph.situations.values.find(_.predicate.lemma == "know").get
     assertEquals(
       model.draft.graph.contexts(knows.context).kind,
-      ContextKind.Speech(ContextHolder.Unattributed(HolderGap.SeveralCandidates))
+      ContextKind.Speech(ContextHolder.Unattributed(HolderGap.UnresolvedCandidate))
+    )
+  }
+
+  /** One offered speaker is a nominal that mints an entity and the other an open pronoun. The
+    * holder is still unresolved: naming the woman would attribute the content on the strength of
+    * "he" being unreadable, which is the out-claiming the identity rule exists to prevent.
+    */
+  test("a nominal speaker beside an open pronoun speaker leaves the holder unresolved") {
+    val two = StorySource
+      .titled(
+        "He said and the woman replied: \"hello.\" \"Nobody knows.\"",
+        StoryTitle.callerSupplied("Mixed speakers").fold(e => fail(e.message), identity)
+      )
+      .fold(e => fail(e.message), identity)
+    val twoAtlas = SurfaceAnalyzer.analyze(two)
+    val unit = twoAtlas.sentences(0)
+    val chart = PropositionEvidence.of(
+      ChartValidator
+        .check(
+          PropositionChart.unchecked(
+            Some(id("a")),
+            Map(
+              id("a") -> Concept.entity("and"),
+              id("s") -> Concept.predicate("say", frame("say-01")),
+              id("r") -> Concept.predicate("reply", frame("say-01")),
+              id("h") -> Concept.entity("he"),
+              id("w") -> Concept.entity("woman"),
+              id("g") -> Concept.predicate("greet", frame("greet-01")),
+              id("g2") -> Concept.predicate("greet", frame("greet-01"))
+            ),
+            Vector(
+              PropositionRelation(
+                id("a"),
+                RoleAssignment(SourceRole.Operand(1), None),
+                ConceptTarget.Node(id("s"))
+              ),
+              PropositionRelation(
+                id("a"),
+                RoleAssignment(SourceRole.Operand(2), None),
+                ConceptTarget.Node(id("r"))
+              ),
+              rel("s", agent, "h"),
+              rel("s", theme, "g"),
+              rel("r", agent, "w"),
+              rel("r", theme, "g2")
+            ),
+            Map(id("s") -> ChartPolarity.Positive, id("r") -> ChartPolarity.Positive),
+            Vector(
+              EmbeddedProposition(id("s"), EmbeddingKind.Speech, id("g")),
+              EmbeddedProposition(id("r"), EmbeddingKind.Speech, id("g2"))
+            ),
+            Vector(
+              alignIn(twoAtlas, unit, "said", "s"),
+              alignIn(twoAtlas, unit, "replied", "r"),
+              alignIn(twoAtlas, unit, "He", "h"),
+              alignIn(twoAtlas, unit, "woman", "w"),
+              alignIn(twoAtlas, unit, "hello", "g")
+            ),
+            ChartProvenance(ChartOrigin.Parser(parser), Vector(chartCall("two")), Vector.empty),
+            Some(unit.id)
+          )
+        )
+        .fold(v => fail(v.toString), identity)
+    )
+    // The second quotation is a sentence of its own, so its speaker is looked for one sentence
+    // back and both reporting predicates answer. Two speakers is not one speaker.
+    val second = twoAtlas.sentences(1)
+    val knowsChart = PropositionEvidence.of(
+      ChartValidator
+        .check(
+          PropositionChart.unchecked(
+            Some(id("k")),
+            Map(
+              id("k") -> Concept.predicate("know", frame("know-01")),
+              id("n") -> Concept.entity("nobody")
+            ),
+            Vector(rel("k", agent, "n")),
+            Map(id("k") -> ChartPolarity.Positive),
+            Vector.empty,
+            Vector(
+              alignIn(twoAtlas, second, "knows", "k"),
+              alignIn(twoAtlas, second, "Nobody", "n")
+            ),
+            ChartProvenance(ChartOrigin.Parser(parser), Vector(chartCall("knows")), Vector.empty),
+            Some(second.id)
+          )
+        )
+        .fold(v => fail(v.toString), identity)
+    )
+    val read = ContextPlacement.read(
+      two,
+      twoAtlas,
+      Vector(unit.id -> chart.chart, second.id -> knowsChart.chart)
+    )
+    read.speakers(read.quotations(1)) match
+      case HolderCandidate.Fillers(refs) => assertEquals(refs.length, 2)
+      case other => fail(s"expected two offered speakers, got ${other.render}")
+
+    val model =
+      compileWith(two, twoAtlas, Vector(unit.id -> chart, second.id -> knowsChart))
+    val knows = model.draft.graph.situations.values.find(_.predicate.lemma == "know").get
+    assertEquals(
+      model.draft.graph.contexts(knows.context).kind,
+      ContextKind.Speech(ContextHolder.Unattributed(HolderGap.UnresolvedCandidate))
     )
   }
 

@@ -21,7 +21,7 @@ class StoryModelCodecSuite extends FunSuite:
     * field with a `holder` object that can also say the holder was not derived. The fixture's
     * speech context is the only claim that moved.
     */
-  val GoldenChecksum: String = "9b52dee0591a9e644bd24f141c115f270b0532deaf9fb6868998e7cc1604196d"
+  val GoldenChecksum: String = "66b56d277e0ad85e0ff855e705a82ca3e409c5d03ead0bd3c6e32957a3a40937"
 
   test("fixture validates") {
     assert(validated.claims.nonEmpty)

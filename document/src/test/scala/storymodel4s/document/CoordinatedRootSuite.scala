@@ -204,7 +204,22 @@ class CoordinatedRootSuite extends FunSuite:
       model.graph.discourseOrder.flatMap(model.graph.situations.get).map(_.predicate.lemma),
       Vector("land", "go")
     )
-    assertEquals(compiled.derivation.gaps, Vector.empty)
+    // "They" opens the text with no antecedent (ADR 0012), so its reference, the two participant
+    // edges it would fill, and both coverages are recorded gaps; the coordination itself has none.
+    assertEquals(
+      compiled.derivation.gaps.map(_.family).toSet,
+      Set(
+        ClaimFamily.EntityCoreference,
+        ClaimFamily.ParticipantRole,
+        ClaimFamily.ParticipantCoverage
+      )
+    )
+    assertEquals(
+      compiled.derivation.gaps.collect {
+        case g if g.family == ClaimFamily.EntityCoreference => g.reason
+      },
+      Vector(DerivationGapReason.OpenReference(OpenReference.NoAntecedent))
+    )
   }
 
   test("each branch is supported by its own words, never by the whole chart") {
@@ -261,11 +276,17 @@ class CoordinatedRootSuite extends FunSuite:
 
     val compiled = compile(Vector(s0.id -> landedAndWent))
     val model = compiled.validated.getOrElse(fail(compiled.validation.report.render))
+    // The pronoun mints no entity (ADR 0012): the model's cast is "home", the two edges from
+    // "they" are recorded gaps naming the open reference, and one edge stands.
     assertEquals(
       model.graph.entities.values.map(_.label.value).toVector.sorted,
-      Vector("home", "they")
+      Vector("home")
     )
-    assertEquals(model.graph.relations.participants.size, 3)
+    assertEquals(model.graph.relations.participants.size, 1)
+    assertEquals(
+      compiled.derivation.gaps.count(_.family == ClaimFamily.ParticipantRole),
+      2
+    )
   }
 
   test("a coordinator whose branches are not roots admits none and names why for each") {
@@ -490,7 +511,15 @@ class CoordinatedRootSuite extends FunSuite:
       }.toVector,
       Vector("dead")
     )
-    assertEquals(compiled.derivation.gaps, Vector.empty)
+    // "he" with nothing before it is an open reference; the state's participant follows it.
+    assertEquals(
+      compiled.derivation.gaps.map(_.family).toSet,
+      Set(
+        ClaimFamily.EntityCoreference,
+        ClaimFamily.ParticipantRole,
+        ClaimFamily.ParticipantCoverage
+      )
+    )
   }
 
   test("a :domain reaching no concept is not a predicative root") {

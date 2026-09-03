@@ -3,6 +3,7 @@ package storymodel4s.story
 import munit.ScalaCheckSuite
 import org.scalacheck.Prop.forAll
 import storymodel4s.core.*
+import storymodel4s.features.Estimate
 import Gens.given
 
 /** Index consistency, alignment-source consistency, trajectory derivation, renderer determinism. */
@@ -56,7 +57,7 @@ class GraphSuite extends ScalaCheckSuite:
       val n = b.graph.situations.size
       t.steps.size == math.max(0, n - 1) &&
       t.steps.forall(_.worldTime.meta.status == EpistemicStatus.StructurallyDerived) &&
-      t.steps.forall(s => s.entityTurnover >= 0.0 && s.entityTurnover <= 1.0) &&
+      t.steps.forall(s => s.entityTurnover.toOption.forall(v => v >= 0.0 && v <= 1.0)) &&
       t.steps.forall(s =>
         if b.graph.relations.temporal.exists(e => e.from == s.from && e.to == s.to) then
           s.worldTime.value == WorldTimeTransition.JumpForward(None)
@@ -68,9 +69,9 @@ class GraphSuite extends ScalaCheckSuite:
   test("entity turnover is 1 − Jaccard of participant sets") {
     val b = Small.build(3, 3)
     // situation i has agent entity i % 3 → disjoint sets → turnover 1.0
-    b.draft().trajectory.steps.foreach(s => assertEquals(s.entityTurnover, 1.0))
+    b.draft().trajectory.steps.foreach(s => assertEquals(s.entityTurnover, Estimate.observed(1.0)))
     val b2 = Small.build(3, 1)
-    b2.draft().trajectory.steps.foreach(s => assertEquals(s.entityTurnover, 0.0))
+    b2.draft().trajectory.steps.foreach(s => assertEquals(s.entityTurnover, Estimate.observed(0.0)))
   }
 
   property("renderer output is deterministic and lists every situation and entity") {

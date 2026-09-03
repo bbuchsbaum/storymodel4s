@@ -137,7 +137,10 @@ enum HolderGap:
   /** Several distinct entities could hold the content and the evidence decides between none. */
   case SeveralCandidates
 
-  /** Exactly one candidate was named and it minted no entity, so there is nothing to point at. */
+  /** A named candidate minted no entity (an open pronoun, say), so there is nothing to point at;
+    * this holds even when another candidate did resolve, since naming that one would attribute the
+    * content on the strength of the other being unreadable.
+    */
   case UnresolvedCandidate
 
   def render: String = this match

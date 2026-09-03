@@ -52,6 +52,13 @@ enum MissingReason:
   /** The support had observed samples but the operation is undefined on them. */
   case Undefined(reason: UndefinedReason)
 
+  /** An input the estimate needed is itself unresolved: the value is not computable until that
+    * input is, and reading it as zero or as any number would state a measurement nobody made
+    * (design contract 7). An entity turnover between two situations one of whose casts holds an
+    * open pronoun is the first instance.
+    */
+  case InputUnresolved
+
   /** A namespaced domain reason that does not belong in the portable closed vocabulary. */
   case Custom(namespace: String, label: String)
 

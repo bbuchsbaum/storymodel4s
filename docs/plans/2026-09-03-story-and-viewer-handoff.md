@@ -126,17 +126,17 @@ Do not start a new projection (Chronology Loom, Recall Voyage, causal) before th
 exists. Building a projection the model cannot feed produces an empty picture, which is worse than
 no picture, and the recovery plan §V3 names each one's blocker.
 
-## 6. Update, 2026-09-03 afternoon: three of the four slices landed
+## 6. Update, 2026-09-03: all four slices landed
 
-Everything above §5 was true at `328021b2`. Three landings later the picture is:
+Everything above §5 was true at `328021b2`. Four landings later the picture is:
 
 | | state |
 |---|---|
-| storymodel4s `main` | the merge that lands this section (derivation record `46d4a6a5`, credence and provenance `9d71e87c`, feature tracks: the merge containing this file), all pushed, each on a `checkAll` gate of the merge result |
-| model wire schema | **0.4.0**: a claim's credence is `{"score", "basis"}`; 0.3.0 files are refused, no migration (ADR 0010) |
+| storymodel4s `main` | derivation record `46d4a6a5`, credence and provenance `9d71e87c`, feature tracks `8307316d`, entity identity by referring form: the merge containing this section |
+| model wire schema | **0.5.0**: a claim's credence is `{"score", "basis"}` (0.4.0, ADR 0010) and a flow step's turnover is an estimate (0.5.0, ADR 0012); older files are refused, no migration |
 | `storymodel.json`, fifty-sentence replay | **0.8 MB**, was 89.8 MB |
 | bundle files | `storymodel.json`, `compilation-report.json`, `receipts.json`, **`derivation.json`** (`derivation-record/v1`), **`features.json`** (`features-record/v1`), **`features/<manifest checksum>.sidecar`** per measured space |
-| still not validated | 70 gaps, 135 violations, unchanged: the summary family is still unresolved without a caller's title, and nothing here touched the hierarchy |
+| still not validated | 149 gaps, 135 violations: the summary family is still unresolved without a caller's title; the 79 new gaps are the open pronouns of ADR 0012 and the participant edges and coverages behind them |
 
 ### What is now true of the model
 
@@ -157,13 +157,20 @@ Everything above §5 was true at `328021b2`. Three landings later the picture is
    `--feature lexicon=<path>`: raw token tracks with typed missingness, and mean reductions per
    sentence and per situation with coverage and exact support, materialized as SM4SFT02 sidecars
    plus `features.json`. Any word→value table is a measure (ADR 0011); no norms ship here.
+5. **No pronoun is an entity.** Identity is decided by referring form (ADR 0012): names and
+   nominals cluster by exact label; a third-person pronoun resolves only to a unique
+   number-compatible antecedent that precedes it, else it is an open reference with its
+   candidates recorded (22 with several candidates, 4 first- or second-person awaiting a
+   speech-holder rule, 0 resolved on this story); a holder offered an open pronoun is unresolved.
+   Entities 29 → 23, participant edges 57 → 30. A flow step's turnover is `Missing(InputUnresolved)`
+   where a cast holds an open pronoun (43 of 64 steps) instead of a number nobody measured.
 
 ### What is still false or absent
 
-- Items 4–8 of §2 stand: causal/goal/state-change/reference/entity-relation layers empty; the
+- Items 4–7 of §2 stand: causal/goal/state-change/reference/entity-relation layers empty; the
   hierarchy is one segment with zero boundary beliefs; the temporal layer is discourse order;
-  51 fillers unlicensed; **coreference is still lemma-grouped** (§5 item 4 is the one slice not
-  done, and `MentionForms.resolvableAt` is still unused).
+  51 fillers unlicensed. Item 8 is closed as far as the evidence allows: pronouns are open, not
+  merged, and nothing chooses among candidates until a calibrated policy exists.
 - No claim is calibrated: `align`'s calibrators are siblings of `document` and unreachable; a fit
   needs adjudicated data. `story.StatusWeight.of(meta)` still falls back to a constant per status
   off the story-build path (ADR 0010 records it).
@@ -188,11 +195,9 @@ its pin and gate). A record for another build is refused, never paired; no file 
 
 ### What I would do next, in order
 
-1. **Pronoun coreference** (§5 item 4): wire `MentionForms.resolvableAt`; the antecedent rule the
-   recall lane already has (`recall/segmenter.scala:748-842`, nearest preceding nominal of
-   compatible number) is the prior art; `MentionPosition` orders within a sentence by concept id,
-   so the rule works at sentence grain or the position type gains an offset. Entity ids, the two
-   29-entity pins, and the fingerprint all move.
+1. **Speech-holder resolution for first- and second-person pronouns** (`NeedsSpeechHolder`
+   marks every site): the holder of the speech frame a pronoun sits in is its referent, and the
+   frame's holder is often itself an open pronoun now, so this needs the chain closed carefully.
 2. **The viewer reads `features.json`** and draws Token/Sentence/Situation tracks (it already
    admits those targets; `FeatureChannelState.SidecarRequired` is the seam).
 3. **A summary rule that reads the story**, so a bare text can validate without a caller's title.
