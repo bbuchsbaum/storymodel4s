@@ -574,3 +574,53 @@ the highest-value open item.
    without circularity.
 4. **Retire concentration and localizability as primary outcomes.** They should be reported as
    diagnostics of confidence, never used to choose an arm.
+
+## The gold arrives, and the study can finally say "correct"
+
+The plan's §5 proposed buying 300 adjudicated units with about 2.5 hours of owner time. That was
+unnecessary at scene granularity: `Sherlock_Recall_Scene_n50_Onsets.csv` sits in the same onsets
+folder as the annotation already in use and records, per participant, the recall interval during
+which they were describing each scene. It supersedes the proposal with labels for *every* unit of 15
+participants rather than a 300-unit sample. Provenance, clock, participant mapping, the two
+exclusions, the labelling rule and the single pre-specified comparison were fixed in
+`2026-09-02-gold-scene-preregistration.md` and committed **before** anything was scored.
+
+Coverage: 2,134 of 2,408 units, 88.6%, fall inside a coded interval. The remaining 11.4% have no
+gold and are missing rather than wrong — the participant was not describing a codeable scene, which
+is a fact about the recall, not an error by the aligner.
+
+**Scene-level accuracy, shipped configuration against the unblended channel.** One comparison, both
+configurations frozen and landed before the gold was obtained.
+
+| Set | Participants | scene-exact, baseline → shipped | Paired change | Improved |
+|---|---|---|---|---|
+| Development | 10 | 35.9% → 37.9% | +2.30 points, CI [+0.92, +3.65], excludes zero | 8 of 10 |
+| Untouched | 5 | 27.4% → 31.7% | +2.82 points, CI [−2.31, +7.25], includes zero | 4 of 5 |
+| **Pooled** | **15** | **33.4% → 36.0%** | **+2.48 points, CI [+0.51, +4.37], excludes zero** | **12 of 15** |
+
+Within one scene: 42.0% → 45.8% pooled, +3.90 points, CI [+0.76, +6.60], excludes zero, 12 of 15.
+Median scene distance falls from 3 to 2.
+
+**It agrees with the gold-free proxy rather than contradicting it**, which pre-registration rule 4
+required be checked either way. Cross-participant agreement said the shipped configuration puts two
+people's account of the same moment closer together; gold says it puts more of them on the right
+scene. Two different measurements, same direction, and the second is not a proxy.
+
+**The honest absolute level.** The shipped mapping puts **36.0%** of recall units on exactly the
+right scene of 50, and 45.8% within one scene. Chance is about 2%, so the mapping is doing real work,
+and it is also wrong about the scene nearly two thirds of the time. That is the state of the recall-
+to-video mapping as of today, measured against human labels rather than against itself.
+
+**What the improvement is worth, stated plainly.** +2.5 points of scene accuracy, about 7% relative.
+Real, pre-specified, and modest. The untouched five point the same way and slightly larger, but with
+five participants their interval includes zero and they cannot carry the claim alone.
+
+**The selection caveat that survives.** Both the blend weight and the prior scale were chosen on
+development using gold-free proxies, so the development column inherits that selection even though
+the gold did not inform it. The pooled result is the fair summary; the untouched five are the only
+column selected on nothing at all, and they are underpowered.
+
+**What gold still cannot do here.** Fifty scenes bound the granularity: nothing above measures
+within-scene precision, and the 1000-segment localisation the report actually emits is unscored. An
+adjudication track remains the only route to that, and is now a much smaller and better-targeted ask
+than 300 units chosen blind — it would only need to resolve units the scene gold already places.
