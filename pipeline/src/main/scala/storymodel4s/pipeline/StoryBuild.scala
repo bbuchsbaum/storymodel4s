@@ -3,7 +3,7 @@ package storymodel4s.pipeline
 import java.nio.charset.StandardCharsets
 import java.nio.file.{Files, Path, Paths}
 import scala.util.control.NonFatal
-import storymodel4s.codec.StoryModelCodec
+import storymodel4s.codec.{DerivationArtifact, DerivationRecordCodec, StoryModelCodec}
 import storymodel4s.core.*
 import storymodel4s.document.{
   ChartProposalProvider,
@@ -43,6 +43,9 @@ enum PipelineError:
   /** The compilation's receipt does not carry the parse it was fed (stage or source checksum). */
   case ReceiptMismatch(detail: String)
 
+  /** The derivation record refused the compilation's own attempts, gaps, and coverage. */
+  case RecordRefused(error: DomainError)
+
   /** A bundle file could not be written; the reason is digested, never echoed. */
   case OutputUnwritable(path: String, reasonChecksum: Checksum)
 
@@ -52,6 +55,7 @@ enum PipelineError:
     case InputRefused(error)      => s"compiler input refused: ${error.message}"
     case CompileRefused(error)    => s"compiler refused: ${error.message}"
     case ReceiptMismatch(detail)  => s"compilation receipt refused: $detail"
+    case RecordRefused(error)     => s"derivation record refused: ${error.message}"
     case OutputUnwritable(p, sum) => s"cannot write $p (reason ${sum.short()})"
 
 /** The process exit status of a story build, as a closed set with its numeric code attached.
@@ -61,7 +65,7 @@ enum PipelineError:
   * enum cannot confuse a code with a count.
   */
 enum ExitStatus(val code: Int):
-  /** Every sentence reached the parser court, the compiler accepted the input, and the three files
+  /** Every sentence reached the parser court, the compiler accepted the input, and the four files
     * were written. Says nothing about validation: a partial draft is a complete bundle.
     */
   case Complete extends ExitStatus(0)
@@ -95,8 +99,8 @@ object ExitStatus:
   * Why a value and not three strings: the layout is one decision (ADR 0009) that the writer, the
   * summary, and every test address by role, so a renamed file cannot drift between them.
   */
-final case class BundleFiles(model: Path, report: Path, receipts: Path):
-  def all: Vector[Path] = Vector(model, report, receipts)
+final case class BundleFiles(model: Path, report: Path, receipts: Path, derivation: Path):
+  def all: Vector[Path] = Vector(model, report, receipts, derivation)
 
 /** Counts and checksums a build publishes. Privately constructed because every field is derived
   * from one parse outcome and one compilation that [[BuildSummary.derive]] has checked belong
@@ -212,9 +216,9 @@ object BuildSummary:
         )
       )
 
-/** Text to a three-file pre-bundle: charts through `provider-agent`, proposals through
-  * `ChartProposalProvider`, a draft through `NarrativeCompiler`, and the model, report, and
-  * receipts on disk.
+/** Text to a four-file pre-bundle: charts through `provider-agent`, proposals through
+  * `ChartProposalProvider`, a draft through `NarrativeCompiler`, and the model, report, receipts,
+  * and derivation record on disk.
   *
   * Why a separate module: every stage it calls is pure or already courted; this object owns only
   * I/O, receipt composition, and file layout (ADR 0009). Everything is computed before the first
@@ -225,8 +229,20 @@ object StoryPipeline:
   val ReportFile: String = "compilation-report.json"
   val ReceiptsFile: String = "receipts.json"
 
+  /** The typed derivation record (`derivation-record/v1`): every attempt, gap, and coverage row the
+    * compilation produced, bound to `storymodel.json` by the checksum of its bytes. It is what
+    * `compilation-report.json` is not: readable back. The report keeps its counts and renders for a
+    * person; a viewer reads this.
+    */
+  val DerivationFile: String = "derivation.json"
+
   def files(outDir: Path): BundleFiles =
-    BundleFiles(outDir.resolve(ModelFile), outDir.resolve(ReportFile), outDir.resolve(ReceiptsFile))
+    BundleFiles(
+      outDir.resolve(ModelFile),
+      outDir.resolve(ReportFile),
+      outDir.resolve(ReceiptsFile),
+      outDir.resolve(DerivationFile)
+    )
 
   /** Build one text. `replay` never calls the model and refuses a missing recordings directory;
     * `record` passes the same environment court as the parse driver before any read or write.
@@ -261,14 +277,20 @@ object StoryPipeline:
         .left
         .map(PipelineError.InputRefused(_))
       compilation <- NarrativeCompiler.compile(input).left.map(PipelineError.CompileRefused(_))
+      record <- DerivationArtifact
+        .from(compilation, proposals)
+        .left
+        .map(PipelineError.RecordRefused(_))
       bundle = files(outDir)
       summary <- BuildSummary.derive(parsed, proposals, compilation, bundle)
       model = StoryModelCodec.encode(compilation.draft)
       report = BundleJson.report(parsed, proposals, compilation, summary).spaces2 + "\n"
       receipts = BundleJson.receipts(parsed, compilation, summary).spaces2 + "\n"
+      derivation = DerivationRecordCodec.encode(record)
       _ <- write(bundle.model, model)
       _ <- write(bundle.report, report)
       _ <- write(bundle.receipts, receipts)
+      _ <- write(bundle.derivation, derivation)
     yield summary
 
   private def describe(error: Throwable): String =
@@ -305,9 +327,9 @@ object StoryPipeline:
   * `replay` reads an existing recordings directory and never calls the model. `record` needs
   * `STORYMODEL4S_AGENT_LIVE=1` and a nonblank `STORYMODEL4S_ANTHROPIC_API_KEY` (or
   * `ANTHROPIC_API_KEY`), exactly as `claudeParse` does. Writes `storymodel.json`,
-  * `compilation-report.json`, and `receipts.json` under `<out-dir>`. Only counts, checksums, and
-  * paths are printed. Exit status: 2 when the run could not start, 1 when any sentence never
-  * reached the parser court or the compiler refused the input, 0 otherwise.
+  * `compilation-report.json`, `receipts.json`, and `derivation.json` under `<out-dir>`. Only
+  * counts, checksums, and paths are printed. Exit status: 2 when the run could not start, 1 when
+  * any sentence never reached the parser court or the compiler refused the input, 0 otherwise.
   *
   * The fifth argument, when given, is the story's title as the *caller's* claim, recorded with
   * caller-supplied provenance. Omit it and the story has no title, the summary family resolves to a

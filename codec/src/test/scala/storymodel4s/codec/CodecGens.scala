@@ -2,7 +2,15 @@ package storymodel4s.codec
 
 import cats.data.NonEmptyVector
 import org.scalacheck.{Arbitrary, Gen}
+import storymodel4s.acquire.{
+  ClaimFamily,
+  EvidenceRef,
+  FindingCode,
+  RejectionReason,
+  ResolutionFailure
+}
 import storymodel4s.core.*
+import storymodel4s.document.*
 import storymodel4s.core.NarrativeKind.{EntityK, SituationK}
 import storymodel4s.features.*
 import storymodel4s.proposition.*
@@ -218,6 +226,258 @@ object CodecGens:
       .check(PropositionChart.unchecked(Some(focus), concepts, rels, polarity, embedded))
       .fold(vs => throw new IllegalStateException(vs.map(_.message).mkString("; ")), identity)
 
+  // ---- derivation record (document / acquire vocabulary) ----------------------------------
+  val surfaceUnitId: Gen[SurfaceUnitId] = ident.map(s => SurfaceUnitId.unsafe("u:" + s))
+  val conceptId: Gen[ConceptId] = ident.map(ConceptId.unsafe)
+  val chartNodeRef: Gen[ChartNodeRef] = for
+    unit <- surfaceUnitId
+    concept <- conceptId
+  yield ChartNodeRef(unit, concept)
+  val claimId: Gen[ClaimId] = ident.map(i => ClaimId.unsafe("c:" + i))
+  val storyId: Gen[StoryId] = ident.map(i => StoryId.unsafe("story:" + i))
+  val checksum: Gen[Checksum] = ident.map(Checksum.ofText)
+  val conceptKind: Gen[ConceptKind] = Gen.oneOf(ConceptKind.values.toSeq)
+  val findingCode: Gen[FindingCode] = Gen.oneOf(FindingCode.values.toSeq)
+
+  val claimFamily: Gen[ClaimFamily] = Gen.frequency(
+    9 -> Gen.oneOf(
+      ClaimFamily.ReportedToRootPromotion,
+      ClaimFamily.EventCoreference,
+      ClaimFamily.RoleReversal,
+      ClaimFamily.Polarity,
+      ClaimFamily.StrictPrecedence,
+      ClaimFamily.CausalEdge,
+      ClaimFamily.TargetEpisodeMembership,
+      ClaimFamily.EntityMention,
+      ClaimFamily.EntityCoreference,
+      ClaimFamily.SituationMention,
+      ClaimFamily.ParticipantRole,
+      ClaimFamily.ParticipantCoverage,
+      ClaimFamily.SituationCircumstance,
+      ClaimFamily.Modality,
+      ClaimFamily.ContextAssignment,
+      ClaimFamily.TemporalRelation,
+      ClaimFamily.GoalRelation,
+      ClaimFamily.StateChange,
+      ClaimFamily.Reference,
+      ClaimFamily.Boundary,
+      ClaimFamily.SegmentMembership,
+      ClaimFamily.DiscourseTrajectory,
+      ClaimFamily.Summary,
+      ClaimFamily.DetailAtom
+    ),
+    1 -> (for
+      ns <- ident
+      name <- ident
+    yield ClaimFamily.Custom(ns, name))
+  )
+
+  val resolutionFailure: Gen[ResolutionFailure] = Gen.oneOf(
+    Gen.const(ResolutionFailure.NoProposal),
+    Gen.const(ResolutionFailure.Uncalibrated),
+    Gen.const(ResolutionFailure.NoSpanEvidence),
+    for
+      have <- Gen.choose(0, 5)
+      need <- Gen.choose(1, 5)
+    yield ResolutionFailure.InsufficientAgreement(have, need),
+    finiteDouble.map(ResolutionFailure.InsufficientSupport.apply),
+    Gen.listOf(findingCode).map(cs => ResolutionFailure.BlockingFinding(cs.toVector))
+  )
+
+  val rejectionReason: Gen[RejectionReason] = Gen.oneOf(
+    Gen.const(RejectionReason.NoSourceSupport),
+    Gen.listOf(ident).map(vs => RejectionReason.StructurallyInvalid(vs.toVector)),
+    Gen.listOf(findingCode).map(cs => RejectionReason.BlockingFinding(cs.toVector)),
+    for
+      p <- probability
+      band <- probability
+    yield RejectionReason.BelowRejectBand(p, band)
+  )
+
+  val domainError: Gen[DomainError] = Gen.oneOf(
+    for
+      s <- Gen.choose(-3, 10)
+      e <- Gen.choose(-3, 10)
+      r <- ident
+    yield DomainError.InvalidSpan(s, e, r),
+    for
+      k <- ident
+      raw <- ident
+      r <- ident
+    yield DomainError.InvalidId(k, raw, r),
+    finiteDouble.map(DomainError.InvalidProbability.apply),
+    for
+      p <- ident
+      r <- ident
+    yield DomainError.InvariantViolation(p, r),
+    for
+      k <- ident
+      id <- ident
+    yield DomainError.DuplicateId(k, id),
+    for
+      k <- ident
+      raw <- ident
+      r <- ident
+    yield DomainError.InvalidFormat(k, raw, r)
+  )
+
+  val candidateAddress: Gen[NarrativeCandidateAddress] = Gen.oneOf(
+    chartNodeRef.map(NarrativeCandidateAddress.Situation.apply),
+    chartNodeRef.map(NarrativeCandidateAddress.ContextAssignment.apply),
+    storyId.map(NarrativeCandidateAddress.StorySummary.apply),
+    for
+      s <- storyId
+      m <- chartNodeRef
+    yield NarrativeCandidateAddress.SegmentMembership(s, m),
+    for
+      a <- chartNodeRef
+      b <- chartNodeRef
+    yield NarrativeCandidateAddress.Causal(a, b),
+    for
+      a <- chartNodeRef
+      b <- chartNodeRef
+    yield NarrativeCandidateAddress.TrajectoryStep(a, b),
+    chartNodeRef.map(NarrativeCandidateAddress.EntityMention.apply),
+    for
+      a <- chartNodeRef
+      b <- chartNodeRef
+    yield NarrativeCandidateAddress.Participant(a, b),
+    chartNodeRef.map(NarrativeCandidateAddress.ParticipantCoverage.apply),
+    for
+      a <- chartNodeRef
+      b <- chartNodeRef
+    yield NarrativeCandidateAddress.Circumstance(a, b),
+    for
+      a <- chartNodeRef
+      b <- chartNodeRef
+    yield NarrativeCandidateAddress.Temporal(a, b)
+  )
+
+  val gapReason: Gen[DerivationGapReason] = Gen.oneOf(
+    Gen.const(DerivationGapReason.Alternatives),
+    Gen.const(DerivationGapReason.MissingRawScore),
+    Gen.const(DerivationGapReason.MissingSpanEvidence),
+    resolutionFailure.map(DerivationGapReason.Unresolved.apply),
+    rejectionReason.map(DerivationGapReason.Rejected.apply),
+    Gen.listOf(candidateAddress).map(as => DerivationGapReason.MissingUpstream(as.toVector)),
+    for
+      a <- chartNodeRef
+      b <- chartNodeRef
+    yield DerivationGapReason.UnscopableRelation(a, b),
+    domainError.map(DerivationGapReason.InvalidAccepted.apply)
+  )
+
+  val evidenceRef: Gen[EvidenceRef] = Gen.oneOf(
+    ident.map(i => EvidenceRef.ById(EvidenceId.unsafe("e:" + i))),
+    evidence(withSpans = false).map(EvidenceRef.Inline.apply)
+  )
+
+  val derivationGap: Gen[DerivationGap] = for
+    family <- claimFamily
+    target <- candidateAddress
+    reason <- gapReason
+    upstream <- Gen.listOf(claimId)
+    refs <- Gen.listOf(evidenceRef)
+  yield DerivationGap(stage, family, target, reason, upstream.toSet, refs.toVector)
+
+  val derivationAttempt: Gen[DerivationAttempt] = for
+    family <- claimFamily
+    target <- candidateAddress
+    disposition <- Gen.oneOf(
+      claimId.map(DerivationDisposition.Emitted.apply),
+      gapReason.map(DerivationDisposition.NotEmitted.apply)
+    )
+  yield DerivationAttempt(target, family, disposition)
+
+  val abstentionReason: Gen[AbstentionReason] = Gen.oneOf(
+    Gen.const(AbstentionReason.NoFocus),
+    Gen.const(AbstentionReason.NoCoordinationBranch),
+    Gen.const(AbstentionReason.NestedCoordination),
+    conceptKind.map(AbstentionReason.FocusNotPredicate.apply),
+    conceptKind.map(AbstentionReason.BranchNotAdmissible.apply)
+  )
+
+  val fillerCounts: Gen[FillerCounts] = for
+    a <- Gen.choose(0, 4)
+    b <- Gen.choose(0, 4)
+    c <- Gen.choose(0, 4)
+    d <- Gen.choose(0, 4)
+    e <- Gen.choose(0, 4)
+    f <- Gen.choose(0, 4)
+  yield FillerCounts(a, b, c, d, e, f)
+
+  val sourceRole: Gen[SourceRole] = Gen.oneOf(
+    Gen.choose(0, 5).map(SourceRole.Numbered.apply),
+    ident.map(SourceRole.Named.apply),
+    Gen.choose(1, 5).map(SourceRole.Operand.apply),
+    for
+      ns <- ident
+      n <- ident
+    yield SourceRole.Extension(ns, n)
+  )
+
+  val coordinatedBranch: Gen[CoordinatedBranch] = Gen.oneOf(
+    for
+      root <- chartNodeRef
+      role <- sourceRole
+      counts <- fillerCounts
+    yield CoordinatedBranch.Admitted(root, role, counts),
+    for
+      root <- chartNodeRef
+      role <- sourceRole
+      reason <- abstentionReason
+    yield CoordinatedBranch.Abstained(root, role, reason)
+  )
+
+  val sentenceCoverage: Gen[SentenceCoverage] = Gen.oneOf(
+    for
+      root <- chartNodeRef
+      counts <- fillerCounts
+    yield SentenceCoverage.Proposed(root, counts),
+    for
+      anchor <- chartNodeRef
+      branches <- Gen.listOf(coordinatedBranch)
+    yield SentenceCoverage.Coordinated(anchor, branches.toVector),
+    for
+      anchor <- chartNodeRef
+      reason <- abstentionReason
+    yield SentenceCoverage.Abstained(anchor, reason),
+    surfaceUnitId.map(SentenceCoverage.EmptyChart.apply),
+    surfaceUnitId.map(SentenceCoverage.NoChart.apply)
+  )
+
+  val summaryCoverage: Gen[SummaryCoverage] = Gen.oneOf(
+    Gen.const(SummaryCoverage.NoTitle),
+    Gen.const(SummaryCoverage.TitleUnestablished),
+    ident.map(t => SummaryCoverage.Proposed(t, TitleProvenance.CallerSupplied))
+  )
+
+  /** A lawful record: attempts with distinct targets, gaps drawn from the `NotEmitted` attempts
+    * with their own reasons, and one coverage row per sentence.
+    */
+  val derivationArtifact: Gen[DerivationArtifact] = for
+    story <- storyId
+    source <- checksum
+    model <- checksum
+    fingerprint <- checksum
+    candidates <- checksum
+    attempts <- Gen.listOf(derivationAttempt).map(_.distinctBy(_.target).toVector)
+    gapped <- Gen.someOf(attempts.collect {
+      case DerivationAttempt(target, family, DerivationDisposition.NotEmitted(reason)) =>
+        (target, family, reason)
+    })
+    upstreams <- Gen.listOfN(gapped.size, Gen.listOf(claimId))
+    refs <- Gen.listOfN(gapped.size, Gen.listOf(evidenceRef))
+    coverage <- Gen.listOf(sentenceCoverage).map(_.distinctBy(_.sentence).toVector)
+    summary <- summaryCoverage
+  yield
+    val gaps = gapped.toVector.zip(upstreams).zip(refs).map { case (((t, f, r), up), ev) =>
+      DerivationGap(stage, f, t, r, up.toSet, ev.toVector)
+    }
+    DerivationArtifact
+      .of(story, source, model, fingerprint, candidates, attempts, gaps, coverage, summary)
+      .fold(e => throw new IllegalStateException(e.message), identity)
+
   given Arbitrary[TextSpan] = Arbitrary(span)
   given Arbitrary[SpanSet] = Arbitrary(spanSet)
   given Arbitrary[Credence] = Arbitrary(credence)
@@ -226,6 +486,11 @@ object CodecGens:
   given Arbitrary[Estimate[Double]] = Arbitrary(scoreEstimate)
   given Arbitrary[WorldTimeTransition] = Arbitrary(worldTime)
   given Arbitrary[PropositionChart[Checked]] = Arbitrary(chart)
+  given Arbitrary[DerivationGap] = Arbitrary(derivationGap)
+  given Arbitrary[DerivationAttempt] = Arbitrary(derivationAttempt)
+  given Arbitrary[SentenceCoverage] = Arbitrary(sentenceCoverage)
+  given Arbitrary[SummaryCoverage] = Arbitrary(summaryCoverage)
+  given Arbitrary[DerivationArtifact] = Arbitrary(derivationArtifact)
   given scalarTrackArb: Arbitrary[FeatureTrack[FeatureTarget, Double]] = Arbitrary(scalarTrack)
   given categoricalTrackArb: Arbitrary[FeatureTrack[FeatureTarget, String]] = Arbitrary(
     categoricalTrack
