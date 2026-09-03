@@ -48,8 +48,8 @@ and `<report>.voyage.json`, the typed Recall Voyage document (ADR 0002 §14) tha
 renders. Read `mapAnchorMass` in the TSV as the posterior argmax's mass: the decode moves 57% of
 anchors, and for those the report's anchor and its mass column belong to different nodes.
 
-storyatlas4s renders the voyage document natively (branch `solo/recall-voyage`, tip `bbf3dd9`,
-gated green against storymodel4s `dd40d95f` and intaglio `97511a1`; it lands as soon as
+storyatlas4s renders the voyage document natively (branch `solo/recall-voyage`, tip `b605679`,
+gated green against storymodel4s `dd40d95f` and intaglio `4eb566d`; it lands as soon as
 intaglio's main is pushed to GitHub, which is the owner's call in the intaglio session):
 `sbt <overrides> "cli/run voyage --document <report>.voyage.json --out <dir>"` writes the static
 plate (`voyage.svg`, every mark titled and classed through intaglio `GrobMeta`), its textual twin,
