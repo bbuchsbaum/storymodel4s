@@ -1,5 +1,6 @@
 package storymodel4s.view
 
+import cats.data.NonEmptyVector
 import munit.FunSuite
 import storymodel4s.acquire.{ClaimFamily, ResolutionFailure}
 import storymodel4s.core.*
@@ -34,11 +35,38 @@ class DraftAtlasSuite extends FunSuite:
   private val atlas = SurfaceAnalyzer.analyze(source)
   private val sentences = atlas.sentences
 
+  /** One narrated-world frame, because a graph with no root context can never promote and the
+    * receipt-routing court below needs a model that does.
+    */
+  private val rootContext: ContextFrame =
+    val spans = SpanSet.one(SpanRef(Some(sentences(0).id), sentences(0).span))
+    ContextFrame(
+      ContextId.unsafe("context-root:test"),
+      None,
+      ContextKind.NarratedWorld,
+      spans,
+      ClaimMeta.unsafe(
+        ClaimId.unsafe("claim:context-root"),
+        EpistemicStatus.LinguisticallyEntailed,
+        Credence.unsafeRaw(1.0),
+        NonEmptyVector.one(
+          Evidence(
+            EvidenceId.unsafe("ev:context-root"),
+            Some(spans),
+            Set.empty,
+            Fingerprint.unsafe("test:draft-atlas-suite:1"),
+            StageId.unsafe("test-draft-atlas")
+          )
+        ),
+        Provenance.deterministic("draft-atlas-suite", Checksum.ofText("draft-atlas-suite"))
+      )
+    )
+
   private val model: StoryModel[ModelStatus.Draft] =
     StoryModel.draft(
       source,
       atlas,
-      NarrativeGraph.empty,
+      NarrativeGraph.empty.copy(contexts = Map(rootContext.id -> rootContext)),
       NarrativeHierarchy(Vector.empty, Vector.empty),
       DiscourseTrajectory.empty
     )
@@ -102,9 +130,16 @@ class DraftAtlasSuite extends FunSuite:
     assert(wrongBasis.isLeft, "a fixture receipt must not produce a draft scene")
     assert(wrongBasis.left.exists(_.message.contains("draft build")))
 
-    // And the validated entry point refuses a draft receipt, so a draft scene cannot be minted
-    // through the path whose receipt says the model was promoted.
+    // And the validated entry point refuses a draft receipt, so no scene can be compiled from a
+    // promoted model while carrying a receipt that describes an unpromoted one.
     assertEquals(draftProvenance.basis, ViewBasis.DraftBuild)
+    val promoted = StoryValidator
+      .validate(model)
+      .validated
+      .getOrElse(fail(StoryValidator.validate(model).report.render))
+    val wrongPath = AtlasCompiler(draftProvenance).compile(promoted, state, spec)
+    assert(wrongPath.isLeft, "a validated model must not be compiled under a draft receipt")
+    assert(wrongPath.left.exists(_.message.contains("use compileDraft")))
 
   test("a promotion record must describe the bundle it travels with"):
     val quiet = draftOf()
