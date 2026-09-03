@@ -7,8 +7,8 @@ adjudicator labels the unit; the prediction is joined at scoring from any arm's 
 
 Usage:
   within_scene.py packet   ARM_DIR OUT_DIR [--seed N] [--per-a N] [--per-b N]
-  within_scene.py extract  PACKET_MD ANSWERS_TSV          # pull filled answer lines out of a packet
-  within_scene.py score    KEY_DIR ANSWERS_TSV LABEL ARM_DIR [--machine MACHINE_TSV]
+  within_scene.py extract  PACKET_MD... ANSWERS_TSV --lane human|machine [--strip-notes]
+  within_scene.py score    KEY_DIR ANSWERS_TSV LABEL ARM_DIR [--other OTHER_LANE_TSV]
   within_scene.py diagnose LABEL ARM_DIR                  # gold-free within-scene diagnostics
 
 Data root: $STORYMODEL4S_DATA or <main checkout>/data (tools/data-root.sh). The annotation, the gold
@@ -314,8 +314,18 @@ def cmd_extract(args):
     under docs/data/sherlock/.
     """
     strip = "--strip-notes" in args
-    args = [a for a in args if a != "--strip-notes"]
+    opts = parse_opts(args)
+    lane = opts.get("--lane")
+    if lane not in LANES:
+        sys.exit(
+            "extract needs --lane human or --lane machine (pre-registration §5, label status)"
+        )
+    args = [a for a in args if a not in ("--strip-notes", "--lane", lane)]
     packets, out = args[:-1], args[-1]
+    if lane not in os.path.basename(out):
+        sys.exit(
+            f"the answers file name must carry its lane: {out} does not say {lane}"
+        )
     rows = [r for p in packets for r in read_answers(p)]
     seen = set()
     for r in rows:
@@ -325,11 +335,31 @@ def cmd_extract(args):
         seen.add(k)
     cols = ["nn", "unit", "first", "last", "sure"] + ([] if strip else ["note"])
     with open(out, "w", encoding="utf-8", newline="") as fh:
+        fh.write(f"# lane: {lane}\n")
         w = csv.writer(fh, delimiter="\t")
         w.writerow(cols)
         for r in sorted(rows, key=lambda r: (r["nn"], r["unit"])):
             w.writerow([r[c] for c in cols])
-    print(f"{len(rows)} answers from {len(packets)} packet(s) -> {out}")
+    print(f"{len(rows)} answers from {len(packets)} packet(s) -> {out} (lane: {lane})")
+
+
+LANES = ("human", "machine")
+
+
+def lane_of(path):
+    """The lane an answers file declares, in its name and its header; both must agree."""
+    base = os.path.basename(path)
+    named = [ln for ln in LANES if ln in base]
+    header = None
+    with open(path, encoding="utf-8") as fh:
+        first = fh.readline()
+    if first.startswith("# lane:"):
+        header = first.split(":", 1)[1].strip()
+    if len(named) != 1 or header != named[0]:
+        sys.exit(
+            f"{path}: lane must be named once in the file name and match its '# lane:' header (name {named}, header {header})"
+        )
+    return named[0]
 
 
 def read_answers(path):
@@ -355,7 +385,8 @@ def read_answers(path):
             )
     else:
         with open(path, newline="", encoding="utf-8") as fh:
-            for r in csv.DictReader(fh, delimiter="\t"):
+            body = [ln for ln in fh if not ln.startswith("#")]
+            for r in csv.DictReader(body, delimiter="\t"):
                 if not r["first"] or r["first"] == "__":
                     continue
                 rows.append(
@@ -372,15 +403,23 @@ def read_answers(path):
 
 
 def normalise(rows, ann, key):
-    """Validate answers against the key and the annotation; return {(nn, unit): (a, b) or None}."""
+    """Validate answers against the key and the annotation.
+
+    Returns {(nn, unit): dict(range=(a, b) or None, sure=bool)}. A `sure` value other than y or n
+    is reported and read as n, the conservative direction for the sure-only robustness read.
+    """
     out, problems = {}, []
     for r in rows:
         k = (r["nn"], r["unit"])
         if k not in key:
             problems.append(f"{k}: not in key")
             continue
+        sure = r["sure"].strip().lower()
+        if sure not in ("y", "n"):
+            problems.append(f"{k}: sure is {r['sure']!r}, read as n")
+            sure = "n"
         if r["first"].lower() == "none":
-            out[k] = None
+            out[k] = dict(range=None, sure=sure == "y")
             continue
         try:
             a, b = int(r["first"]), int(r["last"])
@@ -395,7 +434,7 @@ def normalise(rows, ann, key):
                 f"{k}: range {a}..{b} outside gold scene {key[k]['goldScene']} ({segs[0]}..{segs[-1]})"
             )
             continue
-        out[k] = (a, b)
+        out[k] = dict(range=(a, b), sure=sure == "y")
     for p in problems:
         print("   problem:", p)
     return out
@@ -472,7 +511,8 @@ def load_key(key_dir):
 def join(key, answers, ann, arm):
     """Per adjudicated unit: everything the outcomes need, from the key, the answer, and the arm."""
     units = []
-    for (nn, u), rng in answers.items():
+    for (nn, u), ans in answers.items():
+        rng = ans["range"]
         k = key[(nn, u)]
         rows = arm.get(k["participant"])
         if rows is None:
@@ -490,6 +530,7 @@ def join(key, answers, ann, arm):
                 gold=g,
                 stratum=k["stratum"],
                 range=rng,
+                sure=ans["sure"],
                 grain=grain_of(rng, segs),
                 leaf=leaf_of(r["mapAnchor"]),
                 runner=leaf_of(r.get("runnerUpAnchor")),
@@ -617,6 +658,26 @@ def score_lane(label, units, ann, arm_label, frame_total=None):
                     f"   confidence Q{qi+1}: hit {pct([1.0 if hit(x['leaf'], x['range']) else 0.0 for x in sel]):5.1f}%  n {len(sel)}"
                 )
 
+    # robustness: the primary comparison on sure units alone
+    sure_prim = [x for x in prim if x["sure"]]
+    if sure_prim and len(sure_prim) < len(prim):
+        sp = per(sure_prim)
+        diff = {
+            k: [
+                (1.0 if hit(x["leaf"], x["range"]) else 0.0)
+                - (1.0 if hit(x["mid"], x["range"]) else 0.0)
+                for x in v
+            ]
+            for k, v in sp.items()
+        }
+        lo, hi = cluster_boot(diff, pct)
+        m = pct([1.0 if hit(x["leaf"], x["range"]) else 0.0 for x in sure_prim])
+        n = pct([1.0 if hit(x["mid"], x["range"]) else 0.0 for x in sure_prim])
+        print(
+            f"   sure-only ({len(sure_prim)} units): hit model {m:5.1f}%  midpoint null {n:5.1f}%  "
+            f"difference {pct(sum(diff.values(), [])):+5.1f} points  {ci_str(lo, hi)}"
+        )
+
     # 6. abstention concordance
     a_units = [x for x in covered if x["stratum"] == "A" and x["scene_correct"]]
     leaf_u = [x for x in a_units if x["leaf"] is not None]
@@ -714,21 +775,15 @@ def cmd_score(args):
     print(
         f"key {key_dir}  packet sha256 {manifest['outputs']['packet.md'][:16]}…  arm {arm_label}"
     )
-    human = join(key, normalise(read_answers(answers_path), ann, key), ann, arm)
-    score_lane("human", human, ann, arm_label, manifest["frameTotal"])
-    if "--machine" in opts:
-        machine = join(
-            key, normalise(read_answers(opts["--machine"]), ann, key), ann, arm
-        )
-        score_lane(
-            "machine (diagnostic, never gold)",
-            machine,
-            ann,
-            arm_label,
-            manifest["frameTotal"],
-        )
-        if human:
-            reliability(human, machine, ann)
+    lanes = {}
+    for path in [answers_path] + ([opts["--other"]] if "--other" in opts else []):
+        lane = lane_of(path)
+        units = join(key, normalise(read_answers(path), ann, key), ann, arm)
+        title = "human" if lane == "human" else "machine (diagnostic, never gold)"
+        score_lane(title, units, ann, arm_label, manifest["frameTotal"])
+        lanes[lane] = units
+    if "human" in lanes and "machine" in lanes:
+        reliability(lanes["human"], lanes["machine"], ann)
 
 
 # ---------------------------------------------------------------- diagnostics (gold-free)

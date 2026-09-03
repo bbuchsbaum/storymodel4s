@@ -689,10 +689,17 @@ globally, which was measured to hurt — is the obvious next lever.
 
 ## Comparisons scored against gold so far, per pre-registration rule 3
 
-Four. One pre-specified (shipped against baseline), two on development for the monotone decode
-(design and in-pipeline validation), one confirmation on the untouched five. A reader discounting for
-multiplicity should know that the untouched five have now been read twice: once for the lexical blend
-on a gold-free outcome, once here.
+Four at the time this section was written. One pre-specified (shipped against baseline), two on
+development for the monotone decode (design and in-pipeline validation), one confirmation on the
+untouched five. A reader discounting for multiplicity should know that the untouched five have now
+been read twice: once for the lexical blend on a gold-free outcome, once here.
+
+*Restated on 2026-09-03, because the sections below this one kept scoring and this ledger did not
+keep counting.* The fill added a development read and an untouched read; the forward-skip penalty
+null added a development read; the content-free ramp floor added a development read and an
+untouched read. **Nine scene-gold comparisons in all**, five on development and four on the
+untouched five, which have therefore been read four times against gold and once on a gold-free
+outcome. The within-scene ledger opened on 2026-09-03 is separate and is kept in that section.
 
 ## Filling the escape hatch, and two nulls that stopped further work
 
@@ -746,3 +753,74 @@ scene. Gross displacement is solved; what remains is boundary precision.
    the untouched five have now been read three times. A second corpus would be worth more than any
    further parameter on this one — and the captioning lane, redundant here against an unusually
    complete annotation, is exactly what such a corpus would need.
+
+## Within-scene precision: the apparatus, a machine read, and the human read still owed
+
+*2026-09-03.* Item 1 above. The pre-registration is
+`2026-09-03-within-scene-precision-preregistration.md`, written before the packet was generated and
+committed before any lane was scored; the apparatus is `tools/recall-study/within_scene.py`. The
+study record moved from `tmp/` to `data/study/recall-to-video/` the same day (`data/README.md`); the
+default configuration's run is `all17-monofill` there, and a bare-environment rerun of NN03
+reproduced it byte-for-byte before anything below was drawn.
+
+**A gold-free diagnostic first.** Within a predicted scene the decode leaves the segment anchor free,
+so consecutive units placed in the same scene can be read for order. Under the default configuration
+1,686 such pairs split 54.1% forward, 13.2% tied, 32.7% backward; the baseline's 563 pairs split
+57.4 / 24.7 / 17.9. Chance is symmetric, so the leaf anchors carry order, and not much of it. This
+is a diagnostic in the README's sense and chooses nothing.
+
+**The packet.** Frame: the ten development participants with gold, 1,499 units, of which 978 sit in
+the gold scene under the default (stratum A) and 521 do not (stratum B). Sample: 15 + 5 per
+participant, 200 units in 39 scene groups, seed 20260903. Digests, recorded here before any answer
+existed: `packet.md` sha256 `b7dd6338…045d52`, `key.tsv` sha256 `e0d06c04…0a90ab`, and every input
+in `manifest.json`. The packet shows the unit, its neighbours, and the gold scene's segments; it
+shows no anchor, posterior, runner-up or arm.
+
+**The machine lane, run first as the pre-registration allows.** Eight fresh-context language-model
+adjudicators each received one chunk of the packet, carrying the rubric verbatim, and nothing else:
+no key, no report, no repository. All 200 lines came back filled, 149 marked sure. Under M1 Law I1
+this lane is *diagnostic*: it may not select an arm and its numbers are never called gold. It is
+reported because it answers, provisionally, the question nobody could answer yesterday, and because
+its agreement with the human lane will itself be a finding.
+
+| Outcome, default configuration | Model | Scene-midpoint null | Uniform null |
+|---|---|---|---|
+| Primary set: stratum A, leaf-anchored, point or span grain | 124 units | | |
+| `hit`, anchor inside the adjudicated range | **66.1%** [55.6, 77.7] | 25.0% | 19.4% |
+| paired, model minus midpoint null | **+41.1 points** [+30.3, +53.0], 10 of 10 participants | | |
+| `hit` on sure units only (99) | 73.7% | 23.2% | +50.5 [+38.8, +60.6] |
+| `hit ±1` / `hit ±2` segments | 73.4% / 76.6% | 34.7% / 39.5% | |
+| time gap, median / 75th percentile | **0 s / 3 s** | 8 s / 20 s | mean 21 s |
+| temporal error, all units, stratum-weighted, median / p75 | 6 s / 52 s | 19 s / 70 s | |
+
+Grain, stratum A: point 46%, span 47%, whole 3%, none 5%. Stratum B: point 18%, span 46%, whole
+8%, **none 28%**. Runner-up rescue: 4 of 42 misses. Confidence quartiles of anchor mass: 58.1, 67.7,
+74.2, 64.5% — informative at the bottom, not monotone. Abstention concordance cannot be read on 16
+scene-anchored units.
+
+**What this says, provisionally.** When the scene is right, the fine anchor is right two-thirds of the
+time and within one segment three-quarters of the time, against a quarter for the best content-free
+guess; the median unit is placed inside the span the adjudicator marked. The anchor inside a correct
+scene is not worthless. It also says the scene gold has edges: 28% of the units the default places in
+a different scene describe, on this reading, nothing in their gold scene at all, which is exactly the
+boundary noise the scene pre-registration's `within-1` outcome was written for and is worth the
+owner's eye when the human lane runs.
+
+**What it does not establish.** Nothing here is gold. A language model read the packet, and a
+different reader can move every number; the pre-registration's reliability bar (median range
+Jaccard ≥ 0.5 against the human lane) decides whether the machine lane's estimates may be quoted at
+all. No arm was or may be selected on this lane. One film, ten participants, 124 primary units.
+
+**Ledgers.** Within-scene, human lane: 0 comparisons. Machine lane: 1, the default configuration.
+
+**The human read, which is now a short task.** Open `data/study/recall-to-video/within-scene/packet.md`,
+fill the 200 answer lines in place (a scene's segments are read once per group; an hour to ninety
+minutes), and do not open `answers-machine-lane.tsv` until done. Then:
+
+```
+python3 tools/recall-study/within_scene.py extract --lane human packet.md answers-human-lane.tsv
+python3 tools/recall-study/within_scene.py score within-scene answers-human-lane.tsv all17-monofill all17-monofill --other answers-machine-lane.tsv
+```
+
+with paths under the study record. That scoring is the first human-lane comparison and is counted
+here when it happens.

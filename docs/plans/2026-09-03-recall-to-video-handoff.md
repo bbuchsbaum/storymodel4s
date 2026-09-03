@@ -89,12 +89,15 @@ theoretical. Report them as diagnostics only.
 
 ## 5. What is actually left, ranked
 
-**1. Within-scene precision — the largest blind spot, and it needs the owner.**
-Gold resolves 50 scenes; the pipeline emits 1000 segments. Nobody knows whether the fine anchor
-inside a correct scene is good or worthless, and no gold-free proxy can tell you. The plan's
-adjudication track is now a much smaller ask than the original 300 blind units: it only needs to
-resolve segments *within* units the scene gold already places correctly. Owner decision, and the
-highest-value item on this list.
+**1. Within-scene precision — apparatus landed 2026-09-03; the human read is a ninety-minute task.**
+Gold resolves 50 scenes; the pipeline emits 1000 segments. The pre-registration
+(`2026-09-03-within-scene-precision-preregistration.md`), the blind packet, the sealed key and the
+scorer (`tools/recall-study/within_scene.py`) exist, and a *diagnostic* machine lane has read the
+packet: on 124 primary units the leaf anchor lands inside the adjudicated span 66.1% of the time
+against 25.0% for the scene midpoint, median time gap 0 s. Provisional, never gold, selects nothing.
+What remains is the human lane: fill the 200 answer lines in
+`data/study/recall-to-video/within-scene/packet.md`, then `extract --lane human` and `score` as the
+study log's last section spells out. Do not open the machine answers first.
 
 **2. Emission sharpness, which is the binding constraint on scene accuracy.**
 Errors are now boundary errors: 70.8% within two scenes, only 4.0% beyond ten. The runner-up holds
@@ -123,6 +126,6 @@ already refuted: the content-free ramp at 9.7% *is* that prior in pure form.
 
 ## 6. Owner decisions still open
 
-- The adjudication track for within-scene precision (item 1).
-- Whether to bring in a second corpus, and which (item 3).
+- The human lane of the within-scene adjudication (item 1): ninety minutes, packet ready.
+- Whether to bring in a second corpus, and which (item 3). A scouting brief is in progress.
 - Whether a diagnostic-only ceiling from one film is worth further investment at all.
