@@ -187,6 +187,15 @@ class VoyageSuite extends FunSuite:
       IndependentCoding("coding", Checksum.ofText("coding"), Vector(CodedInterval(span(0, 4), 1)))
     val scene = ok(VoyageCompiler.compile(ok(input(coding = Some(coding))), Set.empty, provenance))
     assertEquals(scene.coding.map(_.intervals.size), Some(1))
+    assertEquals(scene.codedGroupAt(secs(1.0)), Some(1))
+    assertEquals(scene.codedGroupAt(secs(9.0)), None)
+    assertEquals(scene.summary, VoyageSummary(3, 1, 1, 1, 1, 0, 0, 0, Some((1, 1))))
+    assert(
+      scene.textualTwin.contains(
+        "Summary: 3 units, 1 anchored (1 argmax, 0 decode-bound, 0 decode-filled), 1 unanchored, " +
+          "1 untimed, 0 external-dominant; coded group agreement 1/1"
+      )
+    )
     val bad =
       IndependentCoding("coding", Checksum.ofText("coding"), Vector(CodedInterval(span(0, 4), 7)))
     assert(input(coding = Some(bad)).isLeft)

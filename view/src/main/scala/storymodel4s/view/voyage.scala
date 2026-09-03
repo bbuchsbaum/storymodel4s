@@ -336,20 +336,47 @@ object VoyageNavigation:
           )
         )
 
+/** Counts a renderer may print without computing anything itself: how the units were placed, and
+  * how often the drawn anchor's group is the group an independent coding names for that moment.
+  * `codedAgreement` is `None` when there is no coding; it is a count against a coding, never an
+  * accuracy claim about the model.
+  */
+final case class VoyageSummary(
+    units: Int,
+    anchored: Int,
+    unanchored: Int,
+    untimed: Int,
+    posteriorArgmax: Int,
+    decodeBound: Int,
+    decodeFilled: Int,
+    externalDominant: Int,
+    codedAgreement: Option[(Int, Int)]
+)
+
 /** The compiled voyage: marks under a contract, the timeline they are drawn on, the coding beside
-  * them, selection placements, and provenance.
+  * them, selection placements, the units the marks describe, a summary, and provenance.
   */
 final case class VoyageScene private[view] (
     contract: ProjectionContract,
     recallLength: Seconds,
     timeline: SourceTimeline,
+    units: Vector[VoyageUnit],
     marks: Vector[VoyageMark],
     navigation: VoyageNavigation,
     selectionPlacements: Map[Address, SelectionPlacement[MarkId]],
     coding: Option[IndependentCoding],
+    summary: VoyageSummary,
     provenance: ViewProvenance
 ):
   def textualTwin: String = VoyageTextualTwin.render(this)
+
+  /** The coded group at a recall second, when the coding has one there. */
+  def codedGroupAt(t: Seconds): Option[Int] =
+    coding.flatMap(
+      _.intervals
+        .find(iv => iv.recall.start.value <= t.value && t.value <= iv.recall.end.value)
+        .map(_.group)
+    )
 
 object ProjectionContractVoyage:
   /** The Recall Voyage contract: both axes are clocks, area is anchor mass, distance means nothing,
@@ -486,11 +513,37 @@ object VoyageCompiler:
       ProjectionContractVoyage.recallVoyage,
       input.recallLength,
       input.timeline,
+      input.units,
       marks,
       navigation,
       placements(selection, navigation),
       input.coding,
+      summary(input, marks),
       provenance
+    )
+
+  private def summary(input: RecallVoyageInput, marks: Vector[VoyageMark]): VoyageSummary =
+    val anchors = marks.collect { case m: VoyageMark.UnitAnchor => m }
+    def codedAt(t: Seconds): Option[Int] =
+      input.coding.flatMap(
+        _.intervals
+          .find(iv => iv.recall.start.value <= t.value && t.value <= iv.recall.end.value)
+          .map(_.group)
+      )
+    val coded = input.coding.map { _ =>
+      val judged = anchors.flatMap(m => codedAt(m.at).map(g => m.group.contains(g)))
+      (judged.count(b => b), judged.size)
+    }
+    VoyageSummary(
+      units = input.units.size,
+      anchored = anchors.size,
+      unanchored = marks.count { case _: VoyageMark.Unanchored => true; case _ => false },
+      untimed = marks.count { case _: VoyageMark.Untimed => true; case _ => false },
+      posteriorArgmax = anchors.count(_.origin == AnchorOrigin.PosteriorArgmax),
+      decodeBound = anchors.count(_.origin == AnchorOrigin.DecodeBound),
+      decodeFilled = anchors.count(_.origin == AnchorOrigin.DecodeFilled),
+      externalDominant = anchors.count(_.externalMass > 0.5),
+      codedAgreement = coded
     )
 
   /** V-L2: a selected address is on its marks, or honestly off this projection. */
@@ -592,6 +645,29 @@ object VoyageTextualTwin:
           .append(", ")
           .append(c.intervals.size)
           .append(" intervals\n")
+    val s = scene.summary
+    out
+      .append("Summary: ")
+      .append(s.units)
+      .append(" units, ")
+      .append(s.anchored)
+      .append(" anchored (")
+      .append(s.posteriorArgmax)
+      .append(" argmax, ")
+      .append(s.decodeBound)
+      .append(" decode-bound, ")
+      .append(s.decodeFilled)
+      .append(" decode-filled), ")
+      .append(s.unanchored)
+      .append(" unanchored, ")
+      .append(s.untimed)
+      .append(" untimed, ")
+      .append(s.externalDominant)
+      .append(" external-dominant")
+    s.codedAgreement.foreach { case (agree, total) =>
+      out.append("; coded group agreement ").append(agree).append('/').append(total)
+    }
+    out.append('\n')
     out.append("Marks\n")
     scene.marks.foreach {
       case VoyageMark.UnitAnchor(
