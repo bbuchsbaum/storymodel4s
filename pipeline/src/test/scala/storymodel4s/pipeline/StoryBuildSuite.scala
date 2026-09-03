@@ -65,7 +65,7 @@ class StoryBuildSuite extends FunSuite:
 
   /** `Checksum.ofText(ChartProposalProvider.RulesText)`; a rules change must move this literal. */
   private val RulesChecksum =
-    "7190c9591e8b1d3a3ba962c131ca8ae27bf27ab942e6c05dc1f8bbf09f69129b"
+    "2b01824390025610be3ccd4efb2ef77332f2d53cfdb719ac398e645f7254f7a9"
 
   private val wogRecordings: Path = Paths.get(getClass.getResource("/recordings/wog").toURI)
 
@@ -1139,6 +1139,81 @@ class StoryBuildSuite extends FunSuite:
     assertEquals(decoded.graph.situations.size, 3)
     assertEquals(decoded.receipt.map(_.contentChecksum), Some(summary.receiptChecksum))
     assertEquals(decoded.receipt.map(_.createdAtEpochMillis), Some(Now))
+  }
+
+  /** The credence court (ADR 0010). Before it, every one of these 325 claims carried credence
+    * `1.0`: 197 as a calibrated probability under `chart-rule-v1`, a rule whose certainty is about
+    * its mapping and not the world, and 128 as a raw score with no model at all. Each claim's
+    * provenance was the run's whole 604-call log, so `storymodel.json` was 89.8 MB and no receipt
+    * named its own claim. Every literal below is a measurement of the rebuilt model; a rule change
+    * moves it.
+    */
+  test("no claim asserts a probability nobody derived, and each provenance names its own calls") {
+    val dir = work("credence")
+    val summary = build(wogText(dir), capturedRecordings, dir.resolve("out"))
+    val model = StoryModelCodec
+      .decode(read(summary.files.model))
+      .fold(error => fail(error.toString), identity)
+    val claims = model.claims.toVector
+    assertEquals(claims.size, 325)
+
+    // 1. Not one calibrated probability, and not one claim without a basis: every claim in this
+    // model is determined by a named rule, because nothing in the build fits a calibration.
+    assert(claims.forall(_.credence.calibrated.isEmpty), "a claim carries a calibrated probability")
+    assert(claims.forall(_.credence.isDetermined), "a claim carries no determining rule")
+    assertEquals(
+      claims.groupBy(_.credence.basis.render).view.mapValues(_.size).toMap,
+      Map(
+        "determined:chart-rule-v1" -> 197,
+        "determined:compiler-derived:entity/v1" -> 29,
+        "determined:compiler-derived:entity-label/v1" -> 29,
+        "determined:compiler-derived:context-frame/v1" -> 5,
+        "determined:compiler-derived:root-context/v1" -> 1,
+        "determined:trajectory-derive/v1" -> 64
+      )
+    )
+
+    // 2. The score coordinate is unmeasured wherever the parser reported nothing, and carries
+    // the role table's own grades, under the table's scorer, on the participant claims the table
+    // normalized. Nothing reads 1.0.
+    assertEquals(
+      claims.groupBy(_.credence.score.render).view.mapValues(_.size).toMap,
+      Map(
+        "unmeasured" -> 269,
+        s"raw:interop-tables/v1:lexicon-argument=${Score.hexBits(0.5)}" -> 44,
+        s"raw:interop-tables/v1:standard-role=${Score.hexBits(0.9)}" -> 12
+      )
+    )
+    assert(claims.flatMap(_.credence.rawScore).forall(_ < 1.0), "a raw score of 1.0 survives")
+
+    // 3. A derived claim carries no provider call; an accepted claim carries exactly its rule call
+    // and the parse receipts of the sentences its evidence lies in, and no call from any other
+    // sentence.
+    val (derived, accepted) =
+      claims.partition(_.status == EpistemicStatus.StructurallyDerived)
+    assertEquals(derived.size, 128)
+    assert(derived.forall(_.provenance.calls.isEmpty), "a derived claim carries provider calls")
+    accepted.foreach { meta =>
+      val sentences = meta.evidence.toVector
+        .flatMap(_.spans.toVector.flatMap(_.refs.toVector))
+        .flatMap(ref => model.atlas.unitAt(ref.span.start, SurfaceUnitKind.Sentence))
+        .map(_.id.value)
+        .toSet
+      val calls = meta.provenance.calls
+      assertEquals(calls.count(_.params.contains("rule")), 1, s"${meta.id.value} rule calls")
+      calls.flatMap(_.params.get("sentence")).foreach { named =>
+        assert(sentences.contains(named), s"${meta.id.value} cites a call for sentence $named")
+      }
+      assertEquals(calls.size, 1 + 2 * sentences.size, s"${meta.id.value} call count")
+    }
+    assertEquals(
+      accepted.map(_.provenance.calls.size).groupBy(identity).view.mapValues(_.size).toMap,
+      Map(3 -> 149, 5 -> 48)
+    )
+
+    // 4. The file: under one megabyte where it was ninety.
+    val bytes = Files.size(summary.files.model)
+    assert(bytes < 1_000_000L, s"storymodel.json is $bytes bytes")
   }
 
   /** The title court. Before slice 1.7 the pipeline handed `StorySource` the input file's name, so

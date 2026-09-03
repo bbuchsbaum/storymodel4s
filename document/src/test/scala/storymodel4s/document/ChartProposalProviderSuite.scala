@@ -54,7 +54,8 @@ class ChartProposalProviderSuite extends FunSuite:
       word: String,
       concept: ConceptId,
       credence: Double = 1.0,
-      ref: Option[SpanRef] = None
+      ref: Option[SpanRef] = None,
+      unmeasured: Boolean = false
   ): PropositionAlignment =
     val spans = SpanSet.one(ref.getOrElse(spanOf(unit, word)))
     val evidence = Evidence(
@@ -67,11 +68,12 @@ class ChartProposalProviderSuite extends FunSuite:
     PropositionAlignment(
       AlignmentTarget.Concepts(NonEmptySet.one(concept)),
       spans,
-      Credence.unsafeRaw(credence),
+      if unmeasured then Credence.unmeasured
+      else Credence.unsafeRaw(credence, ScorerId.unsafe("test-scorer")),
       ClaimMeta.unsafe(
         ClaimId.unsafe(s"claim:align:${unit.id.value}:$word"),
         EpistemicStatus.SurfaceExplicit,
-        Credence.unsafeRaw(1.0),
+        Credence.unsafeRaw(1.0, ScorerId.unsafe("test-scorer")),
         NonEmptyVector.one(evidence),
         Provenance.deterministic("test", Checksum.ofText("test-parser"))
       )
@@ -220,8 +222,8 @@ class ChartProposalProviderSuite extends FunSuite:
       )
     )
     assertEquals(
-      situation.calibrations.map(c => (c.probability, c.model)),
-      Vector((Probability.One, "chart-rule-v1"))
+      situation.bases.map(_.basis),
+      Vector(AcceptanceBasis.Determined(RuleId.unsafe("chart-rule-v1")))
     )
     assertEquals(
       proposals.coverage,
@@ -423,7 +425,7 @@ class ChartProposalProviderSuite extends FunSuite:
         dispositions(proposals.memberships.head.bundle),
         Vector(ProposalDisposition.Abstained)
       )
-      assertEquals(proposals.situations.head.bundle.calibrations, Vector.empty)
+      assertEquals(proposals.situations.head.bundle.bases, Vector.empty)
       assertEquals(proposals.participantCoverage.map(_.situation), Vector(anchor))
       assertEquals(
         dispositions(proposals.participantCoverage.head.bundle),
@@ -508,7 +510,7 @@ class ChartProposalProviderSuite extends FunSuite:
 
   private val licensedAgent = RoleAssignment(
     SourceRole.Numbered(0),
-    Some((ParticipantRole.Agent, Credence.unsafeRaw(0.5)))
+    Some((ParticipantRole.Agent, Credence.unsafeRaw(0.5, ScorerId.unsafe("test-scorer"))))
   )
 
   test("a licensed numbered role yields a participant, a mention, and a coverage naming it") {
@@ -758,7 +760,7 @@ class ChartProposalProviderSuite extends FunSuite:
   test("the rules text is pinned by its checksum, so a rule change is a visible change") {
     assertEquals(
       ChartProposalProvider.Prompt.checksum.hex,
-      "7190c9591e8b1d3a3ba962c131ca8ae27bf27ab942e6c05dc1f8bbf09f69129b"
+      "2b01824390025610be3ccd4efb2ef77332f2d53cfdb719ac398e645f7254f7a9"
     )
     val rules = ChartProposalProvider.RulesText
     assert(rules.contains("Never Before or Meets"))
@@ -852,7 +854,7 @@ class ChartProposalProviderSuite extends FunSuite:
     assertEquals(
       input.receipt.stages.map(_._2.hex),
       Vector(
-        "ca098dfba74c48f09213cfea0c48e4de6bc211b67231ae64e8c684bd05420c90",
+        "ef43b46db1be4f4ad1c4b53c61361354036c4713ce372b86ef561cd016f9fc9d",
         "9855eaf8e4dc1cb80351f31da1c6c04dd03733dc99185b39b9d1a7bf0d4734d6"
       )
     )
@@ -952,7 +954,58 @@ class ChartProposalProviderSuite extends FunSuite:
     assert(ChartProposalProvider.propose(source, atlas, Vector(s0.id -> namedToken)).isRight)
   }
 
-  test("raw scores carry the minimum alignment credence and calibration names the rule's model") {
+  /** A support whose alignments are not all measured has no minimum: the number a minimum over the
+    * measured members alone would give is a fact about a subset presented as a fact about the
+    * support (design contract 7). The parser that produced these charts measures nothing, so this
+    * is the case every real chart is in today, with one measured alignment mixed in to show the
+    * rule is about the set and not about emptiness.
+    */
+  test("one unmeasured alignment in a support leaves the proposal's score absent") {
+    val licensedPatient = RoleAssignment(
+      SourceRole.Numbered(1),
+      Some((ParticipantRole.Patient, Credence.unsafeRaw(0.5, ScorerId.unsafe("test-scorer"))))
+    )
+    val mixed = enterChart(
+      relations = Vector(
+        PropositionRelation(c0, licensedAgent, ConceptTarget.Node(c1)),
+        PropositionRelation(c0, licensedPatient, ConceptTarget.Node(c2))
+      ),
+      alignments = Vector(
+        align(s0, "entered", c0, credence = 0.9),
+        align(s0, "Anna", c1, unmeasured = true),
+        align(s0, "room", c2, credence = 0.8)
+      )
+    )
+    val proposals = propose(Vector(s0.id -> mixed, s1.id -> restChart()))
+    val situation = proposals.situations.find(_.source == ref(s0, c0)).get.bundle
+    assertEquals(situation.proposals.head.rawScore, None)
+    assertEquals(
+      proposals.participantCoverage
+        .find(_.situation == ref(s0, c0))
+        .get
+        .bundle
+        .proposals
+        .head
+        .rawScore,
+      None
+    )
+    // The mention of the one measured filler still carries its own alignment's number.
+    val roomMention = proposals.entityMentions.find(_.mention == ref(s0, c2)).get.bundle
+    assertEquals(roomMention.proposals.head.rawScore.map(_.value), Some(0.8))
+    val annaMention = proposals.entityMentions.find(_.mention == ref(s0, c1)).get.bundle
+    assertEquals(annaMention.proposals.head.rawScore, None)
+  }
+
+  /** Scores and bases after ADR 0010. A chart-reading proposal's score is the minimum measured
+    * alignment score over its support, and nothing when any alignment is unmeasured (the s1 chart
+    * has no alignments, so its situation and coverage carry no score rather than an imputed 1.0). A
+    * participant's score is the role table's own grade of the normalization, under the table's
+    * scorer, not the alignment minimum. No proposal is calibrated: every basis names the rule that
+    * determined the value.
+    */
+  test(
+    "scores are measured or absent, participants carry the role table's grade, bases are rules"
+  ) {
     val graded = enterChart(
       relations = Vector(
         PropositionRelation(c0, licensedAgent, ConceptTarget.Node(c1)),
@@ -967,23 +1020,34 @@ class ChartProposalProviderSuite extends FunSuite:
     val proposals = propose(Vector(s0.id -> graded, s1.id -> restChart(alignments = Vector.empty)))
     def raw(bundle: EvidenceBundle[?]): Option[Double] =
       bundle.proposals.head.rawScore.map(_.value)
-    def model(bundle: EvidenceBundle[?]): Vector[String] = bundle.calibrations.map(_.model)
+    def basis(bundle: EvidenceBundle[?]): Vector[String] = bundle.bases.map(_.basis.render)
     val bySource = proposals.situations.map(a => a.source -> a.bundle).toMap
 
     assertEquals(raw(bySource(ref(s0, c0))), Some(0.6))
-    assertEquals(raw(bySource(ref(s1, c0))), Some(1.0))
+    assertEquals(raw(bySource(ref(s1, c0))), None)
     assertEquals(raw(proposals.entityMentions.head.bundle), Some(0.6))
-    assertEquals(raw(proposals.participants.head.bundle), Some(0.6))
+    assertEquals(raw(proposals.participants.head.bundle), Some(0.5))
+    assertEquals(
+      proposals.participants.head.bundle.proposals.head.rawScore.map(_.scorer),
+      Some(ScorerId.unsafe("test-scorer"))
+    )
+    assertEquals(
+      bySource(ref(s0, c0)).proposals.head.rawScore.map(_.scorer),
+      Some(ChartProposalProvider.MinAlignmentScorer)
+    )
     assertEquals(
       proposals.participantCoverage.map(a => a.situation -> raw(a.bundle)).toMap,
-      Map(ref(s0, c0) -> Some(0.6), ref(s1, c0) -> Some(1.0))
+      Map(ref(s0, c0) -> Some(0.6), ref(s1, c0) -> None)
     )
-    assertEquals(raw(proposals.temporal.head.bundle), Some(0.6))
-    assertEquals(model(bySource(ref(s0, c0))), Vector("chart-rule-v1"))
-    assertEquals(model(proposals.contexts.head.bundle), Vector("context-placement-v1"))
-    assertEquals(model(proposals.memberships.head.bundle), Vector("chart-rule-v1"))
-    assertEquals(model(proposals.summary.bundle), Vector("title-rule-v1"))
-    assertEquals(raw(proposals.summary.bundle), Some(1.0))
+    // The temporal pair spans s0 (scored 0.6) and s1 (unscored): a minimum over a set with an
+    // unmeasured member is unmeasured, not the measured member's number.
+    assertEquals(raw(proposals.temporal.head.bundle), None)
+    assertEquals(basis(bySource(ref(s0, c0))), Vector("determined:chart-rule-v1"))
+    assertEquals(basis(proposals.contexts.head.bundle), Vector("determined:context-placement-v1"))
+    assertEquals(basis(proposals.memberships.head.bundle), Vector("determined:chart-rule-v1"))
+    assertEquals(basis(proposals.summary.bundle), Vector("determined:title-rule-v1"))
+    // The title rule reads no chart and measures nothing: it is determined by the caller's claim.
+    assertEquals(raw(proposals.summary.bundle), None)
     val restCalls = proposals.calls.filter(_.params.get("sentence").contains(s1.id.value))
     assertEquals(restCalls.map(spanSourceOf).toSet, Set("sentence"))
   }

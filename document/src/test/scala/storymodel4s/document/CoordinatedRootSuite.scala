@@ -66,11 +66,11 @@ class CoordinatedRootSuite extends FunSuite:
     PropositionAlignment(
       AlignmentTarget.Concepts(NonEmptySet.one(id(concept))),
       spans,
-      Credence.unsafeRaw(1.0),
+      Credence.unsafeRaw(1.0, ScorerId.unsafe("test-scorer")),
       ClaimMeta.unsafe(
         ClaimId.unsafe(s"claim:align:${unit.id.value}:$word"),
         EpistemicStatus.SurfaceExplicit,
-        Credence.unsafeRaw(1.0),
+        Credence.unsafeRaw(1.0, ScorerId.unsafe("test-scorer")),
         NonEmptyVector.one(evidence),
         Provenance.deterministic("test", Checksum.ofText("test-parser"))
       )
@@ -111,7 +111,10 @@ class CoordinatedRootSuite extends FunSuite:
   private def op(index: Int): RoleAssignment = RoleAssignment(SourceRole.Operand(index), None)
   private def snt(index: Int): RoleAssignment = RoleAssignment.named(s"snt$index")
   private val agent =
-    RoleAssignment(SourceRole.Numbered(0), Some((ParticipantRole.Agent, Credence.unsafeRaw(0.5))))
+    RoleAssignment(
+      SourceRole.Numbered(0),
+      Some((ParticipantRole.Agent, Credence.unsafeRaw(0.5, ScorerId.unsafe("test-scorer"))))
+    )
 
   private def frame(name: String): Option[FrameRef] = Some(FrameRef("propbank", name, None))
 

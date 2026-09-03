@@ -169,7 +169,8 @@ class FeaturesIntegrationSuite extends FunSuite:
   }
 
   test("importance preserves lawful credence and missing reasons without conflating zero") {
-    val credence = Credence.raw(0.7).fold(e => fail(e.message), identity)
+    val credence =
+      Credence.raw(0.7, ScorerId.unsafe("test-scorer")).fold(e => fail(e.message), identity)
     val measured = Estimate.Observed(0.0, Some(credence))
     assertEquals(
       ImportanceWeight.from(measured).map(_.estimate),

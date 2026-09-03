@@ -16,7 +16,7 @@ class ClaimSuite extends FunSuite:
     ClaimMeta.of(
       ClaimId.unsafe(id),
       status,
-      Credence.unsafeRaw(0.9),
+      Credence.unsafeRaw(0.9, Gens.scorer),
       NonEmptyVector.fromVectorUnsafe(ev.toVector),
       prov
     )
@@ -30,7 +30,7 @@ class ClaimSuite extends FunSuite:
       ClaimMeta.unsafe(
         ClaimId.unsafe("c1"),
         EpistemicStatus.SurfaceExplicit,
-        Credence.unsafeRaw(0.9),
+        Credence.unsafeRaw(0.9, Gens.scorer),
         NonEmptyVector.one(evidence("e1", None)),
         prov
       )
@@ -55,7 +55,10 @@ class ClaimSuite extends FunSuite:
         evidence("e4", Some(SpanSet.one(TextSpan.unsafe(0, 1))))
       )
     assert(explicit.withEvidence(NonEmptyVector.one(evidence("e5", None))).isLeft)
-    assertEquals(explicit.withCredence(Credence.unsafeRaw(0.1)).credence.rawScore, 0.1)
+    assertEquals(
+      explicit.withCredence(Credence.unsafeRaw(0.1, Gens.scorer)).credence.rawScore,
+      Some(0.1)
+    )
 
   test("inferred claims may cite only upstream claims"):
     assert(metaE("c3", EpistemicStatus.WorldKnowledgeInferred, evidence("e3", None)).isRight)
@@ -72,7 +75,7 @@ class ClaimSuite extends FunSuite:
 
   test("Resolved is a functor over value and alternatives"):
     val m = meta("r", EpistemicStatus.Hypothesized, evidence("e", None))
-    val r = Resolved(1, m, Vector((2, Credence.unsafeRaw(0.2))))
+    val r = Resolved(1, m, Vector((2, Credence.unsafeRaw(0.2, Gens.scorer))))
     val mapped = r.map(_ * 10)
     assertEquals(mapped.value, 10)
     assertEquals(mapped.alternatives.map(_._1), Vector(20))

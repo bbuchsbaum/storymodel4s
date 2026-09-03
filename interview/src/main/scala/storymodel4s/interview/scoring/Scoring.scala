@@ -203,7 +203,7 @@ object TraditionalScoring:
     math.max(0.0, 1.0 - unplaced)
 
   private def calibrationOf(as: Vector[DetailAssessment]): Option[String] =
-    val models = as.map(_.meta.credence.calibrationModel).distinct
+    val models = as.map(_.meta.credence.calibrationModel.map(_.value)).distinct
     models match
       case Vector(Some(m)) => Some(m)
       case _               => None

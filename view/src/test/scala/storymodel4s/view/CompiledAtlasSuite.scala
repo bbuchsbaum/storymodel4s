@@ -56,11 +56,11 @@ class CompiledAtlasSuite extends FunSuite:
     PropositionAlignment(
       AlignmentTarget.Concepts(NonEmptySet.one(concept)),
       spans,
-      Credence.unsafeRaw(1.0),
+      Credence.unsafeRaw(1.0, ScorerId.unsafe("test-scorer")),
       ClaimMeta.unsafe(
         ClaimId.unsafe(s"claim:align:${unit.id.value}:$word"),
         EpistemicStatus.SurfaceExplicit,
-        Credence.unsafeRaw(1.0),
+        Credence.unsafeRaw(1.0, ScorerId.unsafe("test-scorer")),
         NonEmptyVector.one(evidence),
         Provenance.deterministic("test", Checksum.ofText("test-atlas-chart-parser"))
       )
@@ -71,7 +71,7 @@ class CompiledAtlasSuite extends FunSuite:
     val (lemma, frame, word) = words(index)
     val licensedAgent = RoleAssignment(
       SourceRole.Numbered(0),
-      Some((ParticipantRole.Agent, Credence.unsafeRaw(0.5)))
+      Some((ParticipantRole.Agent, Credence.unsafeRaw(0.5, ScorerId.unsafe("test-scorer"))))
     )
     val unchecked = PropositionChart.unchecked(
       Some(predicate),

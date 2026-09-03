@@ -266,8 +266,14 @@ class StructureSuite extends ScalaCheckSuite:
   test("world-time transitions carry uncertainty instead of manufactured precision") {
     val unresolved = WorldTimeTransition.Unresolved(
       Vector(
-        TemporalHypothesis(TemporalRelationTag.Before, Credence.unsafeRaw(0.4)),
-        TemporalHypothesis(TemporalRelationTag.Overlaps, Credence.unsafeRaw(0.3))
+        TemporalHypothesis(
+          TemporalRelationTag.Before,
+          Credence.unsafeRaw(0.4, ScorerId.unsafe("test-scorer"))
+        ),
+        TemporalHypothesis(
+          TemporalRelationTag.Overlaps,
+          Credence.unsafeRaw(0.3, ScorerId.unsafe("test-scorer"))
+        )
       )
     )
     assert(!unresolved.isBackward)

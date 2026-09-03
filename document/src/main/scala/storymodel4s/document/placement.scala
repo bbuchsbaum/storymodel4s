@@ -181,7 +181,7 @@ object ContextPlacement:
     * probability is about that mapping and not about whether the placement is true of the world; a
     * reader wanting the second must look at the context frame and its evidence.
     */
-  val CalibrationModel: String = "context-placement-v1"
+  val Rule: RuleId = RuleId.unsafe("context-placement-v1")
 
   /** Roles whose filler is the one doing the saying, thinking, or wanting.
     *

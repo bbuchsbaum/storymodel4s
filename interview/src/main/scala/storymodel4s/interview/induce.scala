@@ -134,6 +134,11 @@ final case class InductionResult(
   * episode identity.
   */
 object TargetInduction:
+  /** Scorer of a detail's address credence: the modal mass of its memory-address distribution. A
+    * raw score, not a probability; the distribution is the measurement and this is its summary.
+    */
+  val TopMassScorer: ScorerId = ScorerId.unsafe("interview-induce/v1:top-mass")
+
   private[interview] enum UnitClass:
     case Episodic, Summary, OtherEpisode, Habitual, GeneralFact, Metacognitive, Evaluative,
       Repair, TaskCommentary, Association, Inference, Uninterpretable
@@ -609,7 +614,7 @@ object TargetInduction:
           ClaimMeta.unsafe(
             ClaimId.unsafe(s"claim:${d.id.value}"),
             EpistemicStatus.Hypothesized,
-            Credence.unsafeRaw(topMass),
+            Credence.unsafeRaw(topMass, TargetInduction.TopMassScorer),
             NonEmptyVector.one(
               Evidence(
                 EvidenceId.unsafe(s"ev:${d.id.value}"),

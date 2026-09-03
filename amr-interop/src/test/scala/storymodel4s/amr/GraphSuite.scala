@@ -324,7 +324,7 @@ class GraphSuite extends ScalaCheckSuite:
     ClaimMeta.unsafe(
       ClaimId.unsafe(id),
       EpistemicStatus.SurfaceExplicit,
-      Credence.unsafeRaw(1.0),
+      Credence.unsafeRaw(1.0, ScorerId.unsafe("test-scorer")),
       NonEmptyVector.one(
         Evidence(EvidenceId.unsafe(id + "-ev"), Some(spans), Set.empty, fp, stage)
       ),
@@ -341,7 +341,7 @@ class GraphSuite extends ScalaCheckSuite:
         SubgraphAlignment(
           NonEmptySet.one(NodeId.unsafe("b")),
           spanBoy,
-          Credence.unsafeRaw(1.0),
+          Credence.unsafeRaw(1.0, ScorerId.unsafe("test-scorer")),
           meta("c1", spanBoy)
         )
       ),
@@ -349,7 +349,7 @@ class GraphSuite extends ScalaCheckSuite:
         SubgraphAlignment(
           NonEmptySet.of(NodeId.unsafe("w"), NodeId.unsafe("g")),
           spanWant,
-          Credence.unsafeRaw(0.9),
+          Credence.unsafeRaw(0.9, ScorerId.unsafe("test-scorer")),
           meta("c2", spanWant)
         )
       ),
@@ -358,7 +358,7 @@ class GraphSuite extends ScalaCheckSuite:
           NodeId.unsafe("b"),
           Edge("g", "ARG0", "b"),
           spanBoy,
-          Credence.unsafeRaw(0.8),
+          Credence.unsafeRaw(0.8, ScorerId.unsafe("test-scorer")),
           meta("c3", spanBoy)
         )
       )
@@ -372,7 +372,7 @@ class GraphSuite extends ScalaCheckSuite:
         SubgraphAlignment(
           NonEmptySet.one(NodeId.unsafe("zz")),
           spanBoy,
-          Credence.unsafeRaw(1.0),
+          Credence.unsafeRaw(1.0, ScorerId.unsafe("test-scorer")),
           meta("c4", spanBoy)
         )
       )

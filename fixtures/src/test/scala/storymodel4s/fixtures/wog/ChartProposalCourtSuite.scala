@@ -68,11 +68,11 @@ class ChartProposalCourtSuite extends FunSuite:
     PropositionAlignment(
       AlignmentTarget.Concepts(NonEmptySet.one(concept)),
       spans,
-      Credence.unsafeRaw(1.0),
+      Credence.unsafeRaw(1.0, ScorerId.unsafe("test-scorer")),
       ClaimMeta.unsafe(
         ClaimId.unsafe(s"claim:align:${unit.id.value}:$word"),
         EpistemicStatus.SurfaceExplicit,
-        Credence.unsafeRaw(1.0),
+        Credence.unsafeRaw(1.0, ScorerId.unsafe("test-scorer")),
         NonEmptyVector.one(evidence),
         Provenance.deterministic("test", Checksum.ofText("wog-test-chart-parser"))
       )
@@ -113,7 +113,7 @@ class ChartProposalCourtSuite extends FunSuite:
     */
   private val licensedAgent = RoleAssignment(
     SourceRole.Numbered(0),
-    Some((ParticipantRole.Agent, Credence.unsafeRaw(0.5)))
+    Some((ParticipantRole.Agent, Credence.unsafeRaw(0.5, ScorerId.unsafe("test-scorer"))))
   )
 
   private val egulac = checked(

@@ -1,6 +1,7 @@
 package storymodel4s.embed
 
 import cats.Id
+import storymodel4s.core.ScorerId
 import munit.ScalaCheckSuite
 import org.scalacheck.Gen
 import org.scalacheck.Prop.{forAll, forAllNoShrink}
@@ -440,16 +441,28 @@ class ContractSuite extends ScalaCheckSuite:
 
   test("L6 shape: a credence from a distance is raw unless a calibration model is named") {
     val dist = 0.3
-    val raw = storymodel4s.core.Credence.from(dist, None, None)
+    val raw = storymodel4s.core.Credence.raw(dist, ScorerId.unsafe("test-scorer"))
     assert(raw.exists(_.calibrated.isEmpty))
     assert(
       storymodel4s.core.Credence
-        .from(dist, Some(storymodel4s.core.Probability.unsafe(0.7)), None)
+        .of(
+          storymodel4s.core.Score.Unmeasured,
+          storymodel4s.core.CredenceBasis
+            .Calibrated(
+              storymodel4s.core.Probability.unsafe(0.7),
+              storymodel4s.core.CalibrationModelId.unsafe("iso-v1")
+            )
+        )
         .isLeft
     )
     assert(
       storymodel4s.core.Credence
-        .from(dist, Some(storymodel4s.core.Probability.unsafe(0.7)), Some("iso-v1"))
+        .calibrated(
+          dist,
+          ScorerId.unsafe("test-scorer"),
+          storymodel4s.core.Probability.unsafe(0.7),
+          storymodel4s.core.CalibrationModelId.unsafe("iso-v1")
+        )
         .isRight
     )
   }

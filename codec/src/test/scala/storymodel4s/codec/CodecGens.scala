@@ -54,12 +54,15 @@ object CodecGens:
   val probability: Gen[Probability] = Gen.choose(0.0, 1.0).map(Probability.unsafe)
 
   val credence: Gen[Credence] = Gen.oneOf(
-    finiteDouble.map(Credence.unsafeRaw),
+    finiteDouble.map(Credence.unsafeRaw(_, ScorerId.unsafe("test-scorer"))),
     for
       s <- finiteDouble
       p <- probability
       m <- ident
-    yield Credence.calibrated(s, p, m).toOption.get
+    yield Credence
+      .calibrated(s, ScorerId.unsafe("test-scorer"), p, CalibrationModelId.unsafe(m))
+      .toOption
+      .get
   )
 
   val status: Gen[EpistemicStatus] = Gen.oneOf(EpistemicStatus.values.toSeq)
@@ -513,7 +516,7 @@ object CodecFixture:
     ClaimMeta.unsafe(
       ClaimId.unsafe("c:" + id),
       st,
-      Credence.unsafeRaw(0.9),
+      Credence.unsafeRaw(0.9, ScorerId.unsafe("test-scorer")),
       NonEmptyVector.one(
         Evidence(EvidenceId.unsafe("e:" + id), spans, Set.empty, fingerprint, stage)
       ),
@@ -539,7 +542,7 @@ object CodecFixture:
         Resolved(
           "Anna",
           meta("anna:label", EpistemicStatus.SurfaceExplicit, Some(sp(0))),
-          Vector(("Ann", Credence.unsafeRaw(0.2)))
+          Vector(("Ann", Credence.unsafeRaw(0.2, ScorerId.unsafe("test-scorer"))))
         ),
         EntityType.Person,
         NonEmptyVector
@@ -810,7 +813,9 @@ object CodecFixture:
           Resolved(
             "the house was quiet",
             meta("hyp0", EpistemicStatus.Hypothesized, None),
-            Vector(("the house was not quiet", Credence.unsafeRaw(0.3)))
+            Vector(
+              ("the house was not quiet", Credence.unsafeRaw(0.3, ScorerId.unsafe("test-scorer")))
+            )
           )
         )
       ),

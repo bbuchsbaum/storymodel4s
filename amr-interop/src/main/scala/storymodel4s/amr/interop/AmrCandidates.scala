@@ -49,7 +49,7 @@ object AmrCandidates:
       profile: ValidationProfile = ValidationProfile.default,
       tokens: Option[TokenSpans] = None,
       markers: MarkerPolicy = MarkerPolicy.Strict,
-      markerScore: Credence = Credence.unsafeRaw(1.0)
+      markerScore: Credence = Credence.unmeasured
   ): Candidate =
     val decoded: Either[InteropError, Decoded] =
       scala.util.Try(Decoder.fromPenman(text)) match

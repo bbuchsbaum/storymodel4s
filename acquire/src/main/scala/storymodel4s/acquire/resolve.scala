@@ -48,7 +48,7 @@ enum RejectionReason:
   * accept a claim on a raw score, on another candidate's probability, or without evidence.
   */
 enum ResolutionState[+A]:
-  case Accepted(value: A, probability: Probability, evidence: NonEmptyVector[EvidenceRef])
+  case Accepted(value: A, basis: AcceptanceBasis, evidence: NonEmptyVector[EvidenceRef])
   case Alternatives(values: NonEmptyVector[Weighted[A]])
   case Unresolved(reason: ResolutionFailure)
   case Rejected(reason: RejectionReason)
@@ -253,11 +253,30 @@ object StructuralValidity:
 /** Degree to which the source text supports the claim, in `[0, 1]`, with the spans found. */
 final case class SourceSupport(score: Double, spans: Option[SpanSet])
 
-/** A calibrated probability for one specific candidate value, produced offline by the named
-  * family-specific calibration model. Calibration is attached to the value it calibrates, never to
-  * the bundle as a whole (review finding #15).
+/** What licenses acceptance of one candidate value. Two cases and no third: a probability from a
+  * named fitted calibration model, or determination by a named rule whose value is a total function
+  * of the candidate's evidence. A raw score licenses nothing, so there is no uncalibrated case, and
+  * the resolver cannot accept on one.
+  *
+  * Why `Determined` is not `Calibrated(1.0)`: a rule that cannot disagree with its input is certain
+  * about the mapping, not about the world, and recording that certainty as a probability put it in
+  * the field a reader takes for a claim's truth (design contract 7). The accepted claim carries the
+  * rule as its [[storymodel4s.core.CredenceBasis.Determined]] coordinate instead.
   */
-final case class CandidateCalibration[A](value: A, probability: Probability, model: String)
+enum AcceptanceBasis:
+  case Calibrated(probability: Probability, model: CalibrationModelId)
+  case Determined(rule: RuleId)
+
+  def credenceBasis: CredenceBasis = this match
+    case Calibrated(p, model) => CredenceBasis.Calibrated(p, model)
+    case Determined(rule)     => CredenceBasis.Determined(rule)
+
+  def render: String = credenceBasis.render
+
+/** The acceptance basis for one specific candidate value, attached to the value it licenses, never
+  * to the bundle as a whole (review finding #15).
+  */
+final case class CandidateBasis[A](value: A, basis: AcceptanceBasis)
 
 /** Everything the resolver may look at for one claim. The resolver never derives a probability from
   * raw scores.
@@ -268,10 +287,10 @@ final case class EvidenceBundle[A](
     structural: StructuralValidity,
     sourceSupport: SourceSupport,
     agreementScore: Double,
-    calibrations: Vector[CandidateCalibration[A]]
+    bases: Vector[CandidateBasis[A]]
 ):
-  def calibrationFor(value: A): Option[CandidateCalibration[A]] =
-    calibrations.find(_.value == value)
+  def basisFor(value: A): Option[AcceptanceBasis] =
+    bases.find(_.value == value).map(_.basis)
 
 /** Deterministic resolution (design record §94). Not a vote: provider agreement gates acceptance
   * via `requireAgreement`, but the decision is made on structural validity, blocking findings, span
@@ -309,26 +328,41 @@ object Resolver:
           if fp.conservative && bundle.sourceSupport.score <= 0.0 then
             ResolutionState.Rejected(RejectionReason.NoSourceSupport)
           else
-            bundle.calibrationFor(leading.value) match
+            bundle.basisFor(leading.value) match
               case None =>
                 if fp.requireCalibration && cs.length == 1 then
                   ResolutionState.Unresolved(ResolutionFailure.Uncalibrated)
                 else alternatives(cs)
-              case Some(cal) =>
-                val p = cal.probability
+              case Some(basis) =>
                 if leading.providers < fp.requireAgreement then
                   ResolutionState.Unresolved(
                     ResolutionFailure.InsufficientAgreement(leading.providers, fp.requireAgreement)
                   )
-                else if p.value >= fp.acceptThreshold.value then
-                  if fp.requireSpanEvidence && !hasSpans(bundle, leading) then
-                    ResolutionState.Unresolved(ResolutionFailure.NoSpanEvidence)
-                  else
-                    NonEmptyVector.fromVector(leading.evidence) match
-                      case Some(ev) => ResolutionState.Accepted(leading.value, p, ev)
-                      case None     => ResolutionState.Unresolved(ResolutionFailure.NoSpanEvidence)
-                else if p.value >= fp.reviewBand.value then alternatives(cs)
-                else ResolutionState.Rejected(RejectionReason.BelowRejectBand(p, fp.reviewBand))
+                else
+                  basis match
+                    case AcceptanceBasis.Calibrated(p, _) =>
+                      if p.value >= fp.acceptThreshold.value then accept(fp, bundle, leading, basis)
+                      else if p.value >= fp.reviewBand.value then alternatives(cs)
+                      else
+                        ResolutionState.Rejected(RejectionReason.BelowRejectBand(p, fp.reviewBand))
+                    case AcceptanceBasis.Determined(_) =>
+                      // A determined value has no probability to threshold: it is accepted on
+                      // agreement and span evidence alone, or not at all.
+                      accept(fp, bundle, leading, basis)
+
+  /** Acceptance once the basis has licensed it: span evidence per policy, then the evidence set. */
+  private def accept[A](
+      fp: FamilyPolicy,
+      bundle: EvidenceBundle[A],
+      leading: Candidate[A],
+      basis: AcceptanceBasis
+  ): ResolutionState[A] =
+    if fp.requireSpanEvidence && !hasSpans(bundle, leading) then
+      ResolutionState.Unresolved(ResolutionFailure.NoSpanEvidence)
+    else
+      NonEmptyVector.fromVector(leading.evidence) match
+        case Some(ev) => ResolutionState.Accepted(leading.value, basis, ev)
+        case None     => ResolutionState.Unresolved(ResolutionFailure.NoSpanEvidence)
 
   private def hasSpans[A](bundle: EvidenceBundle[A], c: Candidate[A]): Boolean =
     bundle.sourceSupport.spans.nonEmpty || c.evidence.exists(_.spans.nonEmpty)

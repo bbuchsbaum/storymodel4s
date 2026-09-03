@@ -30,7 +30,7 @@ class ValidateSuite extends ScalaCheckSuite:
           c(0),
           RoleAssignment(
             SourceRole.Numbered(0),
-            Some((ParticipantRole.Agent, Credence.unsafeRaw(1)))
+            Some((ParticipantRole.Agent, Credence.unsafeRaw(1, ScorerId.unsafe("test-scorer"))))
           ),
           ConceptTarget.Node(c(1))
         )
@@ -50,7 +50,7 @@ class ValidateSuite extends ScalaCheckSuite:
           c(0),
           RoleAssignment(
             SourceRole.Numbered(0),
-            Some((ParticipantRole.Agent, Credence.unsafeRaw(1)))
+            Some((ParticipantRole.Agent, Credence.unsafeRaw(1, ScorerId.unsafe("test-scorer"))))
           ),
           ConceptTarget.Node(c(1))
         )

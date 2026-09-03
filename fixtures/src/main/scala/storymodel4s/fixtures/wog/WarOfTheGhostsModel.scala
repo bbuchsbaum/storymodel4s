@@ -25,6 +25,8 @@ private def cid(k: String): ContextId = ContextId.unsafe(s"wog:ctx:$k")
   * Situations are described in the fixture's own words; sentences are cited by ordinal.
   */
 object WarOfTheGhostsModel:
+  /** Scorer of every hand-authored credence in this fixture: a person graded it, no model did. */
+  val HandScorer: ScorerId = ScorerId.unsafe("fixture:hand")
 
   /** The title is caller-supplied: the fixture's author states it, from the published source the
     * text came from. It is not derived from the file the text lives in, and the source records that
@@ -90,7 +92,7 @@ object WarOfTheGhostsModel:
     ClaimMeta.unsafe(
       ClaimId.unsafe(s"wog:claim:$key"),
       status,
-      Credence.unsafeRaw(raw),
+      Credence.unsafeRaw(raw, HandScorer),
       NonEmptyVector.one(
         Evidence(EvidenceId.unsafe(s"wog:ev:$key"), spans, upstream, Annotator, Stage)
       ),
@@ -1326,7 +1328,9 @@ object WarOfTheGhostsModel:
       Resolved(
         "the young man was in fact wounded in the fight",
         meta("hyp:ym2-injured", EpistemicStatus.Hypothesized, Some(sp(30, 32)), 0.5),
-        Vector(("no ordinary injury occurred; he felt nothing", Credence.unsafeRaw(0.5)))
+        Vector(
+          ("no ordinary injury occurred; he felt nothing", Credence.unsafeRaw(0.5, HandScorer))
+        )
       )
     )
   )

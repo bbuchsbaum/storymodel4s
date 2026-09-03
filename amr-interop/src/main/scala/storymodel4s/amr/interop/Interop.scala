@@ -2,6 +2,7 @@ package storymodel4s.amr.interop
 
 import cats.data.NonEmptyVector
 import storymodel4s.amr.graph.*
+import storymodel4s.core.ScorerId
 import storymodel4s.amr.schema.FunctionalTag
 import storymodel4s.proposition as p
 
@@ -65,6 +66,12 @@ object InteropTables:
     * evidence, never a probability.
     */
   val LexiconRawScore = 0.5
+
+  /** Scorers named on the two raw scores above, so a table constant can never be mistaken for a
+    * measurement: the score coordinate says `0.9`, the scorer coordinate says a table said so.
+    */
+  val StandardRoleScorer: ScorerId = ScorerId.unsafe("interop-tables/v1:standard-role")
+  val LexiconScorer: ScorerId = ScorerId.unsafe("interop-tables/v1:lexicon-argument")
 
   /** PropBank functional tags → normalized roles. Tags without a stable participant reading (and
     * `Custom` tags) become `Custom("propbank", tag)`.

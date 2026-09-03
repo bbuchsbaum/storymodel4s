@@ -188,14 +188,23 @@ object ToChart:
               .flatMap(_.arguments.get(i))
               .flatMap(_.functionalTag)
               .map(tag =>
-                (InteropTables.tagRole(tag), Credence.unsafeRaw(InteropTables.LexiconRawScore))
+                (
+                  InteropTables.tagRole(tag),
+                  Credence.unsafeRaw(InteropTables.LexiconRawScore, InteropTables.LexiconScorer)
+                )
               )
           case _ => None
         p.RoleAssignment(p.SourceRole.Numbered(i.value), licensed)
       case Role.Standard(n) =>
         val normalized = InteropTables.standardRoles
           .get(n.value)
-          .map(r => (r, Credence.unsafeRaw(InteropTables.StandardRoleRawScore)))
+          .map(r =>
+            (
+              r,
+              Credence
+                .unsafeRaw(InteropTables.StandardRoleRawScore, InteropTables.StandardRoleScorer)
+            )
+          )
         p.RoleAssignment(p.SourceRole.Named(n.value), normalized)
       case Role.Operand(i)       => p.RoleAssignment(p.SourceRole.Operand(i.value), None)
       case Role.Sentence(i)      => p.RoleAssignment(p.SourceRole.Named(s"snt${i.value}"), None)

@@ -48,7 +48,7 @@ class DraftAtlasSuite extends FunSuite:
       ClaimMeta.unsafe(
         ClaimId.unsafe("claim:context-root"),
         EpistemicStatus.LinguisticallyEntailed,
-        Credence.unsafeRaw(1.0),
+        Credence.unsafeRaw(1.0, ScorerId.unsafe("test-scorer")),
         NonEmptyVector.one(
           Evidence(
             EvidenceId.unsafe("ev:context-root"),

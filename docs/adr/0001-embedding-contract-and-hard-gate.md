@@ -267,8 +267,10 @@ reaches the codec).
   start, end), `predicate`, `participants` (in order: role, label, aliases sorted
   with count), `context`, `polarity`, `modality`, `locations` (in order),
   `lemmas` (sorted), `outcome`, `cause`, `importance` (the full `Estimate`
-  variant: observed value + credence raw score / calibrated probability /
-  model, or the missing reason), `evidence` (chart checksum or empty); then per
+  variant: observed value + credence raw score / scorer / calibrated
+  probability / calibration model / determining rule, each empty when absent
+  (ADR 0010 coordinates, since 2026-09-03), or the missing reason), `evidence`
+  (chart checksum or empty); then per
   `RelationLayer` in enum order the sorted `(from, to, weight)` entries with
   weight > 0 (IEEE-754 rendered); then `worldOrder` (sorted) and `textLength`.
 - `recall-checksum/v1` — the transcript's canonical checksum; then per unit in

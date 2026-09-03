@@ -261,7 +261,7 @@ class ReviewFixesSuite extends ScalaCheckSuite:
       Resolved(
         "it happened",
         Small.meta("h", EpistemicStatus.Hypothesized, None),
-        Vector(("it did not happen", Credence.unsafeRaw(0.4)))
+        Vector(("it did not happen", Credence.unsafeRaw(0.4, ScorerId.unsafe("test-scorer"))))
       )
     )
     val draft = StoryModel.draft(

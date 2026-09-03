@@ -67,11 +67,11 @@ class ContextPlacementSuite extends FunSuite:
     PropositionAlignment(
       AlignmentTarget.Concepts(NonEmptySet.one(id(concept))),
       spans,
-      Credence.unsafeRaw(1.0),
+      Credence.unsafeRaw(1.0, ScorerId.unsafe("test-scorer")),
       ClaimMeta.unsafe(
         ClaimId.unsafe(s"claim:align:${unit.id.value}:$word"),
         EpistemicStatus.SurfaceExplicit,
-        Credence.unsafeRaw(1.0),
+        Credence.unsafeRaw(1.0, ScorerId.unsafe("test-scorer")),
         NonEmptyVector.one(evidence),
         Provenance.deterministic("test", Checksum.ofText("test-parser"))
       )
@@ -98,11 +98,11 @@ class ContextPlacementSuite extends FunSuite:
     PropositionAlignment(
       AlignmentTarget.Concepts(NonEmptySet.one(id(concept))),
       spans,
-      Credence.unsafeRaw(1.0),
+      Credence.unsafeRaw(1.0, ScorerId.unsafe("test-scorer")),
       ClaimMeta.unsafe(
         ClaimId.unsafe(s"claim:align:${unit.id.value}:$word"),
         EpistemicStatus.SurfaceExplicit,
-        Credence.unsafeRaw(1.0),
+        Credence.unsafeRaw(1.0, ScorerId.unsafe("test-scorer")),
         NonEmptyVector.one(evidence),
         Provenance.deterministic("test", Checksum.ofText("test-parser"))
       )
@@ -139,9 +139,15 @@ class ContextPlacementSuite extends FunSuite:
 
   private def frame(name: String): Option[FrameRef] = Some(FrameRef("propbank", name, None))
   private val agent =
-    RoleAssignment(SourceRole.Numbered(0), Some((ParticipantRole.Agent, Credence.unsafeRaw(0.9))))
+    RoleAssignment(
+      SourceRole.Numbered(0),
+      Some((ParticipantRole.Agent, Credence.unsafeRaw(0.9, ScorerId.unsafe("test-scorer"))))
+    )
   private val theme =
-    RoleAssignment(SourceRole.Numbered(1), Some((ParticipantRole.Theme, Credence.unsafeRaw(0.9))))
+    RoleAssignment(
+      SourceRole.Numbered(1),
+      Some((ParticipantRole.Theme, Credence.unsafeRaw(0.9, ScorerId.unsafe("test-scorer"))))
+    )
 
   private def compileWith(
       src: StorySource,

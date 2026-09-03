@@ -37,7 +37,7 @@ object ChartGens:
   val frameRef: Gen[FrameRef] = for
     l <- lemma
     n <- Gen.chooseNum(1, 3)
-    c <- Gen.option(Gen.chooseNum(-3.0, 3.0).map(Credence.unsafeRaw))
+    c <- Gen.option(Gen.chooseNum(-3.0, 3.0).map(Credence.unsafeRaw(_, CoreGens.scorer)))
   yield FrameRef("propbank", f"$l-$n%02d", c)
 
   val concept: Gen[Concept] = Gen.frequency(
@@ -73,7 +73,7 @@ object ChartGens:
       case _                                   =>
         Gen.option(for
           r <- participantRole
-          c <- Gen.chooseNum(-2.0, 2.0).map(Credence.unsafeRaw)
+          c <- Gen.chooseNum(-2.0, 2.0).map(Credence.unsafeRaw(_, CoreGens.scorer))
         yield (r, c))
   yield RoleAssignment(s, norm)
 
@@ -89,7 +89,7 @@ object ChartGens:
   yield ClaimMeta.unsafe(
     ClaimId.unsafe(s"claim:$id"),
     EpistemicStatus.SurfaceExplicit,
-    Credence.unsafeRaw(1.0),
+    Credence.unsafeRaw(1.0, CoreGens.scorer),
     NonEmptyVector.one(
       Evidence(
         EvidenceId.unsafe(s"ev:$id"),
@@ -144,7 +144,7 @@ object ChartGens:
       for
         i <- Gen.chooseNum(0, n - 1)
         span <- CoreGens.spanSet
-        c <- Gen.chooseNum(0.0, 1.0).map(Credence.unsafeRaw)
+        c <- Gen.chooseNum(0.0, 1.0).map(Credence.unsafeRaw(_, CoreGens.scorer))
         m <- claimMeta
       yield PropositionAlignment(AlignmentTarget.Concepts(NonEmptySet.one(id(i))), span, c, m)
     aligns <- Gen.listOf(alignment).map(_.toVector.take(3))

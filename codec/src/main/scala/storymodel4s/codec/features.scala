@@ -581,10 +581,15 @@ object FeatureCodecs:
   * either, deliberately: a 0.1.0 model has no circumstance layer because the rule that fills it did
   * not exist, and a 0.2.0 model has no vocabulary for an unattributed context, so in both cases the
   * lift would have to invent the very distinction the new field exists to record. Refusing is the
-  * truthful read; the artifact is rebuilt from its source.
+  * truthful read; the artifact is rebuilt from its source. 0.4.0 replaces a claim's credence
+  * (`rawScore`, `calibrated`, `calibrationModel`) with two coordinates, `score` and `basis`, so
+  * that a rule-determined value, an unmeasured one, and a calibrated one no longer share a
+  * representation (ADR 0010); 0.3.0 is unsupported for the same reason as its predecessors: a 0.3.0
+  * model wrote every determined value as a calibrated `1.0`, and the lift would have to decide
+  * which of those were fitted, which none were.
   */
 object SchemaVersions:
-  val Current: String = "0.3.0"
+  val Current: String = "0.4.0"
   val Supported: Vector[String] = Vector(Current)
 
   def check(c: io.circe.HCursor): Decoder.Result[String] =

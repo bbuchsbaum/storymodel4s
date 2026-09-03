@@ -60,7 +60,9 @@ class ConstructionProbeSuite extends FunSuite:
 
   test("Credence has no derived fromProduct bypass") {
     refused(
-      typeCheckErrors("""storymodel4s.core.Credence.fromProduct((0.9, None, None))"""),
+      typeCheckErrors(
+        """storymodel4s.core.Credence.fromProduct((storymodel4s.core.Score.Unmeasured, storymodel4s.core.CredenceBasis.Uncalibrated))"""
+      ),
       "Credence.fromProduct"
     )
   }
@@ -68,7 +70,7 @@ class ConstructionProbeSuite extends FunSuite:
   test("Credence has no copy door") {
     refused(
       typeCheckErrors(
-        """(c: storymodel4s.core.Credence) => c.copy(calibrated = Some(storymodel4s.core.Probability.unsafe(0.99)))"""
+        """(c: storymodel4s.core.Credence) => c.copy(basis = storymodel4s.core.CredenceBasis.Uncalibrated)"""
       ),
       "Credence.copy"
     )
@@ -77,23 +79,31 @@ class ConstructionProbeSuite extends FunSuite:
   test("Credence retains public read access") {
     assert(
       typeCheckErrors(
-        """(c: storymodel4s.core.Credence) => (c.rawScore, c.calibrated, c.calibrationModel)"""
+        """(c: storymodel4s.core.Credence) => (c.score, c.basis, c.rawScore, c.calibrated, c.calibrationModel)"""
       ).isEmpty
     )
   }
 
   test("the checked factories remain the public path") {
-    assert(typeCheckErrors("""storymodel4s.core.Credence.raw(0.2)""").isEmpty)
     assert(
       typeCheckErrors(
-        """storymodel4s.core.Credence.calibrated(0.2, storymodel4s.core.Probability.unsafe(0.5), "isotonic-v1")"""
+        """storymodel4s.core.Credence.raw(0.2, storymodel4s.core.ScorerId.unsafe("probe"))"""
+      ).isEmpty
+    )
+    assert(
+      typeCheckErrors(
+        """storymodel4s.core.Credence.calibrated(0.2, storymodel4s.core.ScorerId.unsafe("probe"), storymodel4s.core.Probability.unsafe(0.5), storymodel4s.core.CalibrationModelId.unsafe("isotonic-v1"))"""
       ).isEmpty
     )
     val p = Probability.unsafe(0.5)
-    assert(Credence.from(0.1, Some(p), None).isLeft)
-    assert(Credence.from(0.1, None, Some("m")).isLeft)
-    assert(Credence.from(0.1, Some(p), Some("m")).isRight)
-    assert(Credence.raw(0.1).exists(c => c.calibrated.isEmpty && c.calibrationModel.isEmpty))
+    val model = CalibrationModelId.unsafe("m")
+    val scorer = ScorerId.unsafe("probe")
+    assert(Credence.of(Score.Unmeasured, CredenceBasis.Calibrated(p, model)).isLeft)
+    assert(Credence.of(Score.Raw(0.1, scorer), CredenceBasis.Calibrated(p, model)).isRight)
+    assert(Credence.of(Score.Raw(Double.NaN, scorer), CredenceBasis.Uncalibrated).isLeft)
+    assert(
+      Credence.raw(0.1, scorer).exists(c => c.calibrated.isEmpty && c.calibrationModel.isEmpty)
+    )
   }
 
   test("ProviderCall apply cannot admit a raw prompt-template version") {
@@ -277,7 +287,7 @@ class ConstructionProbeSuite extends FunSuite:
     val left = ClaimMeta.of(
       ClaimId.unsafe("c-probe"),
       EpistemicStatus.SurfaceExplicit,
-      Credence.unsafeRaw(0.9),
+      Credence.unsafeRaw(0.9, ScorerId.unsafe("probe")),
       NonEmptyVector.one(ev),
       Provenance.deterministic("0.1.0", Checksum.ofText("cfg"))
     )

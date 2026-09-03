@@ -15,7 +15,7 @@ object Small:
     ClaimMeta.unsafe(
       ClaimId.unsafe(s"c:$key"),
       status,
-      Credence.unsafeRaw(1.0),
+      Credence.unsafeRaw(1.0, ScorerId.unsafe("test-scorer")),
       NonEmptyVector.one(Evidence(EvidenceId.unsafe(s"e:$key"), spans, Set.empty, fp, stage)),
       prov
     )
@@ -306,7 +306,11 @@ object Mutations:
   def selfAlternative(b: Small.Built): StoryModel[ModelStatus.Draft] =
     val e = b.graph.entities(b.entities(0))
     val bad =
-      e.copy(label = e.label.copy(alternatives = Vector((e.label.value, Credence.unsafeRaw(0.5)))))
+      e.copy(label =
+        e.label.copy(alternatives =
+          Vector((e.label.value, Credence.unsafeRaw(0.5, ScorerId.unsafe("test-scorer"))))
+        )
+      )
     b.draft(graph = b.graph.copy(entities = b.graph.entities.updated(e.id, bad)))
 
   /** A trajectory with a step missing. */

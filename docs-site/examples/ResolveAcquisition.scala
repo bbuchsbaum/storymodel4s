@@ -40,7 +40,7 @@ import storymodel4s.proposition.Polarity
       task,
       value,
       NonEmptyVector.one(EvidenceRef.Inline(evidence)),
-      Some(RawScore.unsafe(score)),
+      Some(RawScore.unsafe(score, ScorerId.unsafe("test-scorer"))),
       Vector.empty,
       receipt(provider, value.toString)
     )
@@ -63,7 +63,7 @@ import storymodel4s.proposition.Polarity
   val agentNegative = proposal(Polarity.Negative, "agent", 0.87)
   val agentPositive = proposal(Polarity.Positive, "agent", 0.71)
   val calibratedNegative = Vector(
-    CandidateCalibration(Polarity.Negative, Probability.unsafe(0.96), "polarity-calibration-v1")
+    CandidateBasis(Polarity.Negative, AcceptanceBasis.Calibrated(Probability.unsafe(0.96), CalibrationModelId.unsafe("polarity-calibration-v1")))
   )
 
   val cases = Vector(

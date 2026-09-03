@@ -695,7 +695,7 @@ class InterviewSuite extends ScalaCheckSuite:
     ClaimMeta.unsafe(
       ClaimId.unsafe(s"c:${d.id.value}"),
       EpistemicStatus.Hypothesized,
-      Credence.unsafeRaw(raw),
+      Credence.unsafeRaw(raw, ScorerId.unsafe("test-scorer")),
       NonEmptyVector.one(
         Evidence(
           EvidenceId.unsafe(s"e:${d.id.value}"),

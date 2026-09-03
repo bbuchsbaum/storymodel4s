@@ -87,7 +87,11 @@ class InteropLossSuite extends ScalaCheckSuite:
       base,
       concepts = base.concepts.updated(
         w,
-        want.copy(frame = want.frame.map(_.copy(senseCredence = Some(Credence.unsafeRaw(0.4)))))
+        want.copy(frame =
+          want.frame.map(
+            _.copy(senseCredence = Some(Credence.unsafeRaw(0.4, ScorerId.unsafe("test-scorer"))))
+          )
+        )
       )
     )
     val foreign = rebuild(
@@ -102,7 +106,7 @@ class InteropLossSuite extends ScalaCheckSuite:
     val meta = ClaimMeta.unsafe(
       ClaimId.unsafe("a1"),
       EpistemicStatus.SurfaceExplicit,
-      Credence.unsafeRaw(1.0),
+      Credence.unsafeRaw(1.0, ScorerId.unsafe("test-scorer")),
       NonEmptyVector.one(
         Evidence(
           EvidenceId.unsafe("a1-ev"),
@@ -120,7 +124,7 @@ class InteropLossSuite extends ScalaCheckSuite:
         p.PropositionAlignment(
           p.AlignmentTarget.Concepts(NonEmptySet.one(w)),
           span,
-          Credence.unsafeRaw(1.0),
+          Credence.unsafeRaw(1.0, ScorerId.unsafe("test-scorer")),
           meta
         )
       )
@@ -138,7 +142,9 @@ class InteropLossSuite extends ScalaCheckSuite:
     val agentRole = base.relations.map { r =>
       if r.role.source == p.SourceRole.Numbered(0) && r.from == z then
         r.copy(role =
-          r.role.copy(normalized = Some((p.ParticipantRole.Agent, Credence.unsafeRaw(0.7))))
+          r.role.copy(normalized =
+            Some((p.ParticipantRole.Agent, Credence.unsafeRaw(0.7, ScorerId.unsafe("test-scorer"))))
+          )
         )
       else r
     }
