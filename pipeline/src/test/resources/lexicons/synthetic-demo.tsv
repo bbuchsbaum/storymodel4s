@@ -1,0 +1,21 @@
+# A synthetic word-level table for the feature-track court. The values are invented for the
+# test and are NOT published norms of anything; the court measures the mechanism (loading,
+# identity, coverage, missingness), not the words.
+word	value
+canoe	6.5
+river	6.1
+arrow	6.0
+arrows	6.0
+ghost	3.2
+ghosts	3.2
+war	4.1
+people	4.8
+young	3.0
+men	5.2
+man	5.4
+night	4.9
+fire	6.3
+sun	6.6
+dead	3.9
+black	5.0
+mouth	5.9

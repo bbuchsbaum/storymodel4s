@@ -9,7 +9,13 @@ import munit.FunSuite
 import scala.collection.mutable.ListBuffer
 import scala.jdk.CollectionConverters.*
 import scala.util.Using
-import storymodel4s.codec.{DerivationRecordCodec, StoryModelCodec}
+import storymodel4s.codec.{
+  DerivationRecordCodec,
+  FeaturesRecordCodec,
+  SidecarCodec,
+  StoryModelCodec
+}
+import storymodel4s.features.{Estimate, MissingReason}
 import storymodel4s.core.*
 import storymodel4s.document.{
   ChartProposalProvider,
@@ -966,19 +972,16 @@ class StoryBuildSuite extends FunSuite:
         .flatMap(NarrativeCompiler.compile)
         .fold(e => fail(e.message), identity)
 
-    val noStage = BuildSummary.derive(wog, proposals, compile(wog, None), files)
+    val unstaged = compile(wog, None)
+    val noStage = BuildSummary.derive(wog, proposals, unstaged, unstaged.draft, files)
     noStage match
       case Left(PipelineError.ReceiptMismatch(detail)) =>
         assert(detail.startsWith("receipt lacks parser stage provider-agent/claude-parse="), detail)
       case other => fail(s"expected a stage mismatch, got $other")
 
     val three = parsed(writeText(dir, "three.txt", threeText), threeRecordings)
-    val otherSource = BuildSummary.derive(
-      wog,
-      proposals,
-      compile(three, Some(wog.parserStage._1)),
-      files
-    )
+    val foreign = compile(three, Some(wog.parserStage._1))
+    val otherSource = BuildSummary.derive(wog, proposals, foreign, foreign.draft, files)
     // A compilation of another story is refused, but by the stage check rather than the source
     // check: the parser stage now carries the digest of the charts that were compiled, and those
     // charts name their sentences, which name their story. The source-checksum branch below it is
@@ -989,7 +992,8 @@ class StoryBuildSuite extends FunSuite:
       case other => fail(s"expected a receipt mismatch, got $other")
 
     val matching =
-      BuildSummary.derive(wog, proposals, compile(wog, Some(wog.parserStage._1)), files)
+      val staged = compile(wog, Some(wog.parserStage._1))
+      BuildSummary.derive(wog, proposals, staged, staged.draft, files)
     assert(matching.isRight, matching.toString)
     assert(!Files.exists(dir.resolve("out")), "derive wrote something")
   }
@@ -1139,6 +1143,159 @@ class StoryBuildSuite extends FunSuite:
     assertEquals(decoded.graph.situations.size, 3)
     assertEquals(decoded.receipt.map(_.contentChecksum), Some(summary.receiptChecksum))
     assertEquals(decoded.receipt.map(_.createdAtEpochMillis), Some(Now))
+  }
+
+  /** The feature court (ADR 0011). Before it, no feature measured the story: `featureSpaces`,
+    * `sidecars` and `featureRefs` were empty on every built model. This build asks for the two
+    * computed measures and the synthetic test lexicon (17 invented values, norms of nothing) and
+    * pins what a measured, materialized, bound feature record looks like on the real model.
+    */
+  test("features are measured over the text, reduced to declared grains, and bound to the model") {
+    val dir = work("features")
+    val textPath = wogText(dir)
+    val lexicon = Paths.get(getClass.getResource("/lexicons/synthetic-demo.tsv").toURI)
+    val requests = Vector(
+      FeatureRequest.TokenLength,
+      FeatureRequest.TypeFrequency,
+      FeatureRequest.Lexicon(lexicon, "synthetic-demo")
+    )
+    val summary = StoryPipeline
+      .run(
+        DriverMode.Replay,
+        textPath,
+        capturedRecordings,
+        dir.resolve("out"),
+        Map.empty,
+        Now,
+        features = requests
+      )
+      .fold(error => fail(error.message), identity)
+    val files = summary.files
+    assertEquals(files.sidecars.size, 9, "three measures at three grains")
+    files.all.foreach(path => assert(Files.isRegularFile(path), s"$path was not written"))
+    val model = StoryModelCodec
+      .decode(read(files.model))
+      .fold(error => fail(error.toString), identity)
+
+    // 1. The record binds to the written model, as derivation.json does, and describes it.
+    val record = FeaturesRecordCodec
+      .decode(model, read(files.features))
+      .fold(error => fail(error.message), identity)
+    assert(record.describes(model))
+    assertEquals(record.tracks.size, 9)
+    assertEquals(derivation(summary).modelChecksum, StoryModelCodec.contentChecksum(model))
+    assertEquals(record.modelChecksum, summary.encodingDigest)
+
+    // 2. The model carries the spaces, manifests and compact refs; the compiler's own identity
+    // did not move, and the receipt names the stage.
+    assertEquals(model.featureSpaces.size, 9)
+    assertEquals(model.sidecars.size, 9)
+    assertEquals(model.featureRefs.size, record.tracks.map(_.track.manifest.rowCount).sum)
+    // Each measure is a family of three tracks: its raw token track and the two reductions that
+    // name it as their input. The computed measures cover every lexical token, sentence and
+    // situation; the lexicon covers what its 17 words reach.
+    def family(rawId: String): Vector[Int] =
+      val raw = record.tracks.map(_.track).find(_.space.id.value == rawId).get
+      val reductions = record.tracks
+        .map(_.track)
+        .filter(_.derivation.exists(_.inputs.toVector.contains(raw.space.id)))
+      (raw +: reductions).map(_.manifest.rowCount)
+    assertEquals(family("measure:token-length/v1").sorted, Vector(50, 65, 425))
+    assertEquals(family("measure:type-frequency/v1").sorted, Vector(50, 65, 425))
+    val lexiconId =
+      record.tracks.map(_.track.space.id.value).find(_.startsWith("lexicon:synthetic-demo:")).get
+    val lexiconFamily = family(lexiconId)
+    assertEquals(lexiconFamily.size, 3)
+    assert(lexiconFamily.forall(_ > 0) && lexiconFamily.max < 425, lexiconFamily.toString)
+    assertEquals(
+      summary.fingerprint,
+      build(wogText(work("plain")), capturedRecordings, work("plain-out")).fingerprint
+    )
+    assertEquals(
+      model.receipt.map(_.stages.map(_._1.value)),
+      Some(Vector("provider-agent/claude-parse", "chart-proposal-provider", "features"))
+    )
+
+    // 3. Each grain, measured: the raw token tracks cover exactly the lexical tokens and exclude
+    // the rest; the sentence and situation reductions are one observation per unit.
+    val byId = record.tracks.map(e => e.track.space.id.value -> e.track).toMap
+    val length = byId("measure:token-length/v1")
+    assertEquals(length.observations.size, 517)
+    assertEquals(length.manifest.rowCount, 425)
+    assertEquals(
+      length.observations.count(_.estimate == Estimate.Missing(MissingReason.Excluded)),
+      92
+    )
+    assert(length.derivation.isEmpty)
+    val derived = record.tracks.map(_.track).filter(_.derivation.nonEmpty)
+    assertEquals(derived.size, 6)
+    assertEquals(derived.map(_.observations.size).sorted, Vector(50, 50, 50, 65, 65, 65))
+    assert(
+      derived.forall(_.observations.forall(_.coverage.nonEmpty)),
+      "a reduction without coverage"
+    )
+    assert(derived.forall(_.observations.forall(_.support.nonEmpty)), "a reduction without support")
+
+    // 4. The lexicon: partial coverage, every uncovered word NotInLexicon, its identity in the
+    // space name and in its provenance.
+    val lexiconTrack =
+      record.tracks.map(_.track).find(_.space.id.value.startsWith("lexicon:synthetic-demo:")).get
+    val notIn =
+      lexiconTrack.observations.count(_.estimate == Estimate.Missing(MissingReason.NotInLexicon))
+    assert(
+      lexiconTrack.manifest.rowCount > 0 && notIn > 0,
+      s"rows ${lexiconTrack.manifest.rowCount}, missing $notIn"
+    )
+    assertEquals(lexiconTrack.manifest.rowCount + notIn + 92, 517)
+    val table = LexiconFile.load(lexicon, "synthetic-demo").fold(e => fail(e.message), identity)
+    assertEquals(lexiconTrack.provenance.provenance.configHash, table.identity)
+    assertEquals(lexiconTrack.provenance.storyChecksum, Some(model.source.canonicalChecksum))
+
+    // 5. The sidecar bytes verify against their manifests and decode to the rows.
+    record.tracks.foreach { entry =>
+      val bytes = Files.readAllBytes(dir.resolve("out").resolve(entry.file))
+      assertEquals(Checksum.ofBytes(bytes), entry.track.manifest.checksum, entry.file)
+      val rows =
+        SidecarCodec.decodeRows(entry.track.manifest, bytes).fold(e => fail(e.message), identity)
+      assertEquals(rows.size, entry.track.manifest.rowCount)
+    }
+
+    // 6. Determinism and the no-feature case: two runs write identical records; a build with no
+    // request writes a record with no tracks, not no record.
+    val again = StoryPipeline
+      .run(
+        DriverMode.Replay,
+        textPath,
+        capturedRecordings,
+        dir.resolve("again"),
+        Map.empty,
+        Now,
+        features = requests
+      )
+      .fold(error => fail(error.message), identity)
+    assertEquals(read(again.files.features), read(files.features))
+    assertEquals(read(again.files.model), read(files.model))
+    val plain = build(textPath, capturedRecordings, dir.resolve("plain"))
+    val none =
+      FeaturesRecordCodec.decode(read(plain.files.features)).fold(e => fail(e.message), identity)
+    assertEquals(none.tracks, Vector.empty)
+    assertEquals(plain.files.sidecars, Vector.empty)
+    assert(!read(files.features).contains("Egulac"), "the feature record carries source prose")
+
+    // 7. Two requests for one space are refused before anything is written.
+    StoryPipeline.run(
+      DriverMode.Replay,
+      textPath,
+      capturedRecordings,
+      dir.resolve("twice"),
+      Map.empty,
+      Now,
+      features = Vector(FeatureRequest.TokenLength, FeatureRequest.TokenLength)
+    ) match
+      case Left(PipelineError.FeatureRefused(detail)) =>
+        assert(detail.contains("same space"), detail)
+        assert(!Files.exists(dir.resolve("twice")), "a refused feature request wrote files")
+      case other => fail(s"two requests for one space were accepted: $other")
   }
 
   /** The credence court (ADR 0010). Before it, every one of these 325 claims carried credence
