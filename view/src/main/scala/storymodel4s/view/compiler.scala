@@ -343,17 +343,26 @@ final case class CodexContract private (
 )
 
 object CodexContract:
+  /** `absenceKinds` are declared beside the requested channels and never inside them.
+    *
+    * They deliberately do not consume [[ChannelBudget.maxAnnotationKinds]]: that budget bounds how
+    * many lenses a caller may switch on at once, and a caller who could spend a draft's disclosure
+    * out of the budget could compile a machine-built story as unmarked prose. What a draft
+    * discloses about itself follows from its basis, which the receipt already states, not from view
+    * policy.
+    */
   private[view] def compiled(
       state: CommonViewState,
       spec: CodexSpec,
-      feature: FeatureChannelState
+      feature: FeatureChannelState,
+      absenceKinds: Set[AnnotationKind] = Set.empty
   ): CodexContract =
     new CodexContract(
       state.selection,
       state.focus,
       state.horizon,
       spec.scale,
-      spec.activeKinds,
+      spec.activeKinds ++ absenceKinds,
       state.relationLayers,
       feature,
       spec.channelBudget,
@@ -497,6 +506,63 @@ final class CodexCompiler private (provenance: ViewProvenance):
       state: CommonViewState,
       spec: CodexSpec
   ): Either[DomainError, CodexFlow] =
+    if provenance.basis == ViewBasis.DraftBuild then
+      Left(
+        DomainError.InvariantViolation(
+          "view/codex/provenance/draft-basis",
+          "a validated model may not be compiled under a draft-build receipt; " +
+            "use compileDraft, whose receipt names the promotion state it renders"
+        )
+      )
+    else run(model, None, state, spec)
+
+  /** Compile a draft's words together with the exact evidence of its own incompleteness.
+    *
+    * Why the reading view needs this and not only the Atlas: the Codex is where the words are, and
+    * a researcher looking at a machine-built story reads the story's prose there. A draft edition
+    * that shipped an Atlas and no Codex would leave the most important surface in `vision.md`
+    * unavailable for every model the pipeline actually builds; a draft edition that shipped a Codex
+    * compiled as though the model were validated would show unmarked prose, which reads as prose
+    * the model understood. So the failures are drawn on the words they concern:
+    * [[AnnotationKind.Gap]], [[AnnotationKind.Abstention]] and [[AnnotationKind.UnsatisfiedLaw]],
+    * each carrying the producer's own record of what went wrong.
+    *
+    * The flow cannot be mistaken for a validated one: its receipt carries [[ViewBasis.DraftBuild]]
+    * and a [[DraftPromotion]] derived from this exact bundle, it carries a [[DraftAbsenceLedger]]
+    * that no other basis may carry, and [[compile]] refuses that receipt.
+    */
+  def compileDraft(
+      draft: DraftModel,
+      state: CommonViewState,
+      spec: CodexSpec
+  ): Either[DomainError, CodexFlow] =
+    if provenance.basis != ViewBasis.DraftBuild then
+      Left(
+        DomainError.InvariantViolation(
+          "view/codex/provenance/draft-basis",
+          s"a draft flow requires a ${ViewBasis.DraftBuild.label} receipt, " +
+            s"and this one declares ${provenance.basis.label}"
+        )
+      )
+    else if !provenance.draft.contains(draft.promotion) then
+      Left(
+        DomainError.InvariantViolation(
+          "view/codex/provenance/draft-promotion",
+          s"receipt promotion ${provenance.draft.fold("none")(_.label)} " +
+            s"does not describe this draft (${draft.promotion.label})"
+        )
+      )
+    else run(draft.model, Some(draft), state, spec)
+
+  // `StoryModel[?]`: nothing this compiler reads is guarded by the promotion phantom, and the
+  // draft path must get the same annotations from the same rules as the validated one. What
+  // separates the two is the receipt, the absence channels and the ledger, not a second compiler.
+  private def run(
+      model: StoryModel[?],
+      draft: Option[DraftModel],
+      state: CommonViewState,
+      spec: CodexSpec
+  ): Either[DomainError, CodexFlow] =
     for
       _ <- EvidenceVisibility.validateHorizon(model.source.canonicalText, state.horizon)
       _ <- validateRelationBudget(state, spec)
@@ -515,8 +581,17 @@ final class CodexCompiler private (provenance: ViewProvenance):
         }
         .sequence
       feature <- compileFeature(model, state, spec)
-      annotations <- TextAnnotation.coalesce(proposals.flatten ++ feature.annotations)
-      contract = CodexContract.compiled(state, spec, feature.state)
+      absences <- compileAbsences(model, draft, state.horizon)
+      annotations <- TextAnnotation.coalesce(
+        proposals.flatten ++ feature.annotations ++ absences.annotations
+      )
+      disclosure <- discloseAbsences(draft, absences, annotations)
+      contract = CodexContract.compiled(
+        state,
+        spec,
+        feature.state,
+        draft.fold(Set.empty[AnnotationKind])(_ => AnnotationKind.absence)
+      )
       ancestors = visibleAncestorChains(model, visibleClaims, state.horizon)
       flow <- CodexFlow.compiledExact(
         model.source,
@@ -524,12 +599,86 @@ final class CodexCompiler private (provenance: ViewProvenance):
         spec.lanePolicy,
         contract,
         ancestors,
-        provenance
+        provenance,
+        disclosure
       )
     yield flow
 
+  /** Every absence the draft carries, split into the ones that name words and the ones that cannot.
+    *
+    * The placement rule is [[AbsencePlacement]], the same one the Atlas draws its marks with, so a
+    * failure claims the same words in both projections or is unplaced in both.
+    */
+  private def compileAbsences(
+      model: StoryModel[?],
+      draft: Option[DraftModel],
+      horizon: EpistemicHorizon
+  ): Either[DomainError, CodexCompiler.AbsenceCompilation] =
+    def clip(support: SpanSet): Option[SpanSet] =
+      EvidenceVisibility.clipSupport(support, horizon)
+    draft.fold(Right(CodexCompiler.AbsenceCompilation(Vector.empty, Vector.empty))) { bundle =>
+      bundle.absences
+        .traverse { absence =>
+          val subject = absence.subject(model.source.id)
+          AbsencePlacement.of(model, absence, clip) match
+            case EpistemicPlacement.NoDiscoursePosition(reason) =>
+              Right(Left(UnplacedAbsence(absence, subject, reason)))
+            case EpistemicPlacement.AtSpans(spans) =>
+              TextAnnotation
+                .of(
+                  subject,
+                  spans,
+                  absence.kind,
+                  CodexCompiler.AbsencePriority,
+                  AuditRecord.deterministic(
+                    provenance.compilerVersion,
+                    provenance.configChecksum,
+                    absence.upstream
+                  ),
+                  Some(absence)
+                )
+                .map(Right(_))
+        }
+        .map { placed =>
+          CodexCompiler.AbsenceCompilation(
+            placed.collect { case Right(annotation) => annotation },
+            placed.collect { case Left(unplaced) => unplaced }
+          )
+        }
+    }
+
+  /** Absence is annotated, not omitted: the ledger must account for every absence the draft has. */
+  private def discloseAbsences(
+      draft: Option[DraftModel],
+      absences: CodexCompiler.AbsenceCompilation,
+      annotations: Vector[TextAnnotation]
+  ): Either[DomainError, Option[DraftAbsenceLedger]] = draft match
+    case None         => Right(None)
+    case Some(bundle) =>
+      val ledger = DraftAbsenceLedger(absences.annotations.map(_.id), absences.unplaced)
+      val survived = annotations.count(_.absence.isDefined)
+      if ledger.total != bundle.absences.size then
+        Left(
+          DomainError.InvariantViolation(
+            "view/codex/draft/absence-census",
+            s"the draft carries ${bundle.absences.size} absences and the flow accounts " +
+              s"for ${ledger.total}"
+          )
+        )
+      else if survived != absences.annotations.size then
+        Left(
+          DomainError.InvariantViolation(
+            "view/codex/draft/absence-coalescing",
+            s"${absences.annotations.size} absence annotations coalesced to $survived"
+          )
+        )
+      else Right(Some(ledger))
+
+  // `StoryModel[?]`: the ancestor chains read the hierarchy and the claim ledger, neither of which
+  // the promotion phantom guards, and a draft's reading view needs the same navigation a validated
+  // one gets.
   private def visibleAncestorChains(
-      model: StoryModel[ModelStatus.Validated],
+      model: StoryModel[?],
       visibleClaims: Option[Set[ClaimId]],
       horizon: EpistemicHorizon
   ): Map[Address, Vector[Address]] =
@@ -565,7 +714,7 @@ final class CodexCompiler private (provenance: ViewProvenance):
     (situations ++ segments).toMap
 
   private def proposal(
-      model: StoryModel[ModelStatus.Validated],
+      model: StoryModel[?],
       visibleClaims: Option[Set[ClaimId]],
       horizon: EpistemicHorizon,
       candidate: Candidate,
@@ -610,7 +759,7 @@ final class CodexCompiler private (provenance: ViewProvenance):
     else Right(())
 
   private def validateProvenance(
-      model: StoryModel[ModelStatus.Validated],
+      model: StoryModel[?],
       state: CommonViewState,
       spec: CodexSpec
   ): Either[DomainError, Unit] =
@@ -635,18 +784,20 @@ final class CodexCompiler private (provenance: ViewProvenance):
           )
         case None
             if provenance.modelReceiptChecksum.isEmpty &&
-              provenance.basis == ViewBasis.ResearcherReviewedFixture =>
+              (provenance.basis == ViewBasis.ResearcherReviewedFixture ||
+                provenance.basis == ViewBasis.DraftBuild) =>
           Right(())
         case None =>
           Left(
             DomainError.InvariantViolation(
               "view/codex/provenance/model-receipt",
-              "a receipt-free model must be labelled as a researcher-reviewed fixture"
+              "a receipt-free model must be labelled as a researcher-reviewed fixture or a " +
+                "draft build"
             )
           )
 
   private def compileFeature(
-      model: StoryModel[ModelStatus.Validated],
+      model: StoryModel[?],
       state: CommonViewState,
       spec: CodexSpec
   ): Either[DomainError, CodexCompiler.FeatureCompilation] =
@@ -872,9 +1023,25 @@ private[view] object ViewConfigurationRendering:
       .toString
 
 object CodexCompiler:
+  /** The priority every draft disclosure channel carries.
+    *
+    * Why one fixed value and not a caller's choice: [[AnnotationPriority]] is view policy that a
+    * caller states per requested channel, and no caller requests these — a draft discloses its own
+    * failures whether or not anyone asked. One value for all three also means no absence outranks
+    * another, which would be a claim about which failure matters more that nothing in the model
+    * supports.
+    */
+  private[view] val AbsencePriority: AnnotationPriority =
+    AnnotationPriority.unsafe(AnnotationPriority.Maximum)
+
   private final case class FeatureCompilation(
       state: FeatureChannelState,
       annotations: Vector[TextAnnotation]
+  )
+
+  private final case class AbsenceCompilation(
+      annotations: Vector[TextAnnotation],
+      unplaced: Vector[UnplacedAbsence]
   )
 
   private final case class Candidate(
@@ -930,7 +1097,10 @@ object CodexCompiler:
       "lanes.maxPerKind" -> spec.lanePolicy.maxLanesPerKind.toString
     )
 
-  private def candidates(model: StoryModel[ModelStatus.Validated]): Vector[Candidate] =
+  // `StoryModel[?]`: the candidate enumeration reads the graph and the hierarchy, neither of which
+  // the promotion phantom guards. A draft's words get exactly the annotations a validated model's
+  // words would get from the same claims.
+  private def candidates(model: StoryModel[?]): Vector[Candidate] =
     val graph = model.graph
     val nodes =
       graph.situations.valuesIterator

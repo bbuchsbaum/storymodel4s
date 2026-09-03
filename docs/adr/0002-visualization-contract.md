@@ -713,3 +713,177 @@ transport or the provider.
 The remaining half of plan §V0 — storyatlas4s reading `storymodel.json` through
 a `codec` dependency, and the pin bump — is untouched. Nothing here changes the
 validated path, the Codex compiler, or any existing mark.
+
+## 12. Amendment — V0: the draft Codex path (2026-09-03)
+
+Decided by the owner's agent in single-developer mode (AGENTS.md SD5). Completes
+the compiler half of `docs/plans/2026-09-03-visualization-recovery-plan.md` §V0:
+§11 gave the Atlas a draft path, this gives the reading view one.
+
+### B1 The Codex compiles a draft, under the same receipt rules as the Atlas
+
+**The problem.** After §11, `AtlasCompiler` rendered a machine-built model and
+`CodexCompiler.compile` still took `StoryModel[Validated]`. A draft edition
+therefore wrote atlases and **no HTML at all**, because an empty Codex would
+claim the reading view had been compiled and had nothing to say. The Codex is
+where the words are, so that left the surface `vision.md` names first —
+"move between the words of a transcript, the propositions expressed by those
+words, the events and states that make up a story" — unavailable for every model
+the pipeline actually builds.
+
+**Decision.** `CodexCompiler.compileDraft(draft: DraftModel, state, spec)`,
+mirroring `AtlasCompiler.compileDraft` and reusing its vocabulary: the same
+`DraftModel`, `DerivationRecord`, `DraftPromotion`, `UncertaintyState`,
+`EpistemicChannel`, `EpistemicPlacement` and `NoPositionReason`. `compile`
+refuses a `DraftBuild` receipt, `compileDraft` refuses any other and refuses a
+receipt whose promotion does not describe the bundle in hand. The Codex's
+receipt-free-model rule gains `DraftBuild` beside the researcher-reviewed
+fixture, exactly as the Atlas's did.
+
+Nothing on the validated path changes. `candidates`, `proposal`,
+`visibleAncestorChains`, `compileFeature` and `validateProvenance` now take
+`StoryModel[?]` because none of what they read is guarded by the promotion
+phantom, and a draft's words deserve the same annotations from the same rules.
+What separates the two paths is the receipt, the disclosure channels and the
+ledger — not a second compiler.
+
+### B2 Absence is an annotation of its own kind, and the annotation carries the record
+
+`AnnotationKind` gains three cases in the closed enum — `Gap` (`"gap"`),
+`Abstention` (`"abstention"`), `UnsatisfiedLaw` (`"unsatisfied-law"`) — rather
+than being smuggled through a free-form tag. A channel nothing can enumerate is
+a channel a renderer can silently omit, and omitting it puts unmarked prose back
+in front of a reader who will take it for prose the model understood.
+
+**A kind alone is not enough, because annotation identity would coalesce two
+failures into one.** `AnnotationId` is the content address of
+`(target, kind, support)`, and `TextAnnotation.coalesce` is required to merge
+repeats of that triple. Two claim families failing at one chart node over one
+sentence agree on all three. So `TextAnnotation` gains
+`absence: Option[DraftAbsence]`, which participates in the content address:
+
+```scala
+enum AbsenceContent:
+  case UnresolvedFamily(gap: DerivationGap)
+  case AbstainedSentence(unit: SurfaceUnitId, reason: SentenceAbstention)
+  case UnsatisfiedLaw(violation: Violation)
+
+final case class DraftAbsence private (content: AbsenceContent, occurrence: Int)
+```
+
+Each case carries its producer's record whole; the view restates none of it.
+`occurrence` is part of the identity because a validator may state one violation
+twice, and a reading view showing one mark where the model recorded two absences
+reports less than the model knows — the same defect as reporting more, pointed
+the other way. `absence` and `kind` are one statement: `Some` **exactly when**
+the kind marks an absence, so a bare `"gap"` annotation naming no family cannot
+be minted and a failure cannot be dressed as a finding on the claim channel.
+The absence key is **appended** to the content address and never interleaved, so
+no validated flow's annotation identities move.
+
+**An annotation cannot carry `NoDiscoursePosition`, so the unplaced absences get
+a ledger.** An Atlas mark may claim no text and still be drawn; a
+`TextAnnotation`'s support is a nonempty `SpanSet` by construction, because an
+annotation over no words is not an annotation. Dropping those absences would
+make the reading view quietly smaller than the model, so `CodexFlow` gains
+`draft: Option[DraftAbsenceLedger]` holding `marked: Vector[AnnotationId]` and
+`unplaced: Vector[UnplacedAbsence]`. The compiler refuses to build a flow unless
+`marked.size + unplaced.size` equals `DraftModel.absences.size`; that check is
+the mechanised form of "absence is annotated, not omitted" (plan §2.3). The
+ledger is present **exactly when** the basis is `DraftBuild`, and its `marked`
+ids are exactly the flow's absence-bearing annotations — the same biconditional
+shape `ViewProvenance` uses for the promotion record, so a validated flow cannot
+carry a disclosure and a draft flow cannot omit one.
+
+Which words an absence concerns is decided once, in `AbsencePlacement`, and both
+projections call it. Two implementations of that rule would eventually disagree,
+at which point one of the two pictures would be lying about the other's subject.
+
+### B3 Context in the reading view is an annotation kind — the one that already exists
+
+The model has six contexts, five of them speech frames, and a reader must be
+able to see that the survivor's retelling at `[1724,1900)` is reported speech
+rather than narration. Three shapes were available.
+
+**Chosen: an annotation of kind `Context`, which the validated path already
+emits.** A context frame is a model object with a claim, evidence and exact
+support, and the Codex's channel for "these words are the support of this model
+object" is a `TextAnnotation`. Nothing new is needed, and minting a parallel
+representation would give one model object two, which is how two pictures start
+to disagree. The frame's *kind* is not restated on the annotation: the target
+address resolves through `NavigationIndex` to the frame, where the model states
+it. That is the no-inference law (D4) applied to a label — the view points at
+the model's statement instead of copying it, so a corrected frame corrects the
+reading view with no view-side change.
+
+**Rejected: a lane.** A lane is `LaneAllocation`'s deterministic output, a
+rendering resource bounded by `LanePolicy`. Making context a lane would make the
+meaning of a mark depend on how many other marks competed for gutters, and
+`LaneSlot.Overflow` would erase the speech/narration distinction exactly when a
+page is busiest.
+
+**Rejected: a property of the run.** `SourceRun`s tile the canonical text
+contiguously and exhaustively; they are the pagination-neutral segmentation of
+the *source* and deliberately carry no claims. Frames nest — `ContextFrame` has
+a `parent`, and every speech frame here sits under the narrated root — and a
+flat tiling cannot represent a frame inside a frame. Worse, the narrated world's
+support is 281 separate runs, so run boundaries would have to encode a scope
+claim the runs exist to stay clear of.
+
+### B4 The disclosure channels are entailed by the basis, not chosen by the caller
+
+A draft flow declares all three absence kinds in its contract whether or not it
+has anything to put in one: a declared empty channel says "no sentence was
+abstained on", while an undeclared one says nothing and is indistinguishable
+from a renderer that dropped it — the same distinction `NotSupplied` draws
+against a count of zero.
+
+They do **not** consume `ChannelBudget.maxAnnotationKinds`. That budget bounds
+how many lenses a caller may switch on at once, and a caller who could spend a
+draft's disclosure out of the budget could compile a machine-built story as
+unmarked prose. For the same reason their `AnnotationPriority` is fixed by the
+compiler at `Maximum`, one value for all three, so no absence outranks another —
+a ranking nothing in the model supports.
+
+`configurationRendering` stays at `codex-compiler-config/v2`. It commits to the
+caller's requested policy; what a draft discloses about itself follows from the
+basis, which the receipt already states.
+
+### B5 Measured on the real model
+
+Replaying the fifty captured War of the Ghosts recordings (no model call, no
+spend) under `CodexLens.Overview` and `ChannelBudget.All`:
+
+| channel | annotations |
+|---|---|
+| `claim` | 65 |
+| `entity` | 29 |
+| `context` | 6 |
+| `gap` | 69 |
+| `unsatisfied-law` | 65 |
+| `abstention` | 1 |
+| `hierarchy`, `relation` | declared, empty |
+
+235 annotations, 135 of them failures. The ledger accounts for all **206**
+absences the compilation and the validator recorded: 135 on exact sentence
+spans, 71 that honestly claim no words (the story summary, and the 70
+`compiler.required-derivation` violations whose candidate the validator cannot
+resolve to an address). The retelling's sentences carry the speech frame's
+annotation and no other frame's; no sentence outside a quotation carries any
+speech annotation.
+
+**One thing found and not fixed here.** The narrated-world frame's support is
+word-level, and 63 of its 281 runs lie inside a speech frame — 22 of them inside
+this retelling, the content words of the quoted passage. So both frames annotate
+those words. That belongs to the frame's scope evidence in `document`, not to
+the view, and the view may neither add it nor hide it. It is pinned in
+`WarOfTheGhostsDraftCodexSuite` so a fix upstream arrives as a visible change to
+that court rather than a silent one.
+
+### B6 What this amendment does not do
+
+No module dependency is added. The validated path's behaviour and annotation
+identities are unchanged, which a court pins. The remaining half of plan §V0 —
+storyatlas4s reading `storymodel.json` through `codec`, and the pin bump — is
+still untouched, and no renderer is written here: this is the compiler and its
+textual twin, which is the audit surface a renderer will be checked against.
