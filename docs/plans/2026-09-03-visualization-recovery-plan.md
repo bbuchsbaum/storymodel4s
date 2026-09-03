@@ -57,6 +57,23 @@ screen, each in under a minute, and can click from every answer to the words tha
 Question 4 is the one that separates an instrument from a demo, and it is the one nothing in the
 repository can answer today.
 
+## 3a. The two bars
+
+The work is judged blind against two references, and must win both.
+
+- **Bar A, exactness:** `storyatlas4s/mockups/v2/review/*.png`, the frozen v2 design package. Same
+  subject, same information model, so the comparison is exact and cannot be hallucinated. Its
+  brief's anti-pattern list (§15) is part of the bar: no synthetic material presented as genuine, no
+  inferred arc stated as fact, no unlabelled numeric track, no faded-as-ambiguous, no layout called
+  chronological without a defined temporal axis.
+- **Bar B, craft:** a named piece of narrative data journalism, *The Structure of Stand-Up Comedy*
+  (pudding.cool/2018/02/stand-up/), screenshotted live at matched viewports. It is an essay and ours
+  is an instrument, so only the transferable dimensions count: does the visual make a text's shape
+  legible to someone who has not read the text, is every mark and axis meaningful, and is the result
+  alive rather than a dashboard.
+
+Bar A alone would cap the work at our own design. Bar B is what stops that.
+
 ## 4. Phases
 
 Each phase is gated by what the model can support. Building a projection the model cannot feed
