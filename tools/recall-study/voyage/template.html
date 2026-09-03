@@ -71,6 +71,11 @@ svg .unit { fill: var(--model); stroke: var(--surface); stroke-width: 1.2; curso
 svg .unit.ext { fill: none; stroke: var(--external); stroke-width: 1.6; }
 svg .unit.sceneanchor { fill: var(--model); opacity: 0.55; stroke: none; rx: 2.5; }
 svg .unit.sel { stroke: var(--ink); stroke-width: 2; }
+svg .unit.filled { fill: none; stroke: var(--model); stroke-width: 1.4; stroke-dasharray: 2 1.5; }
+svg .unit.filled.sel { stroke: var(--ink); stroke-width: 2; }
+table.alts { border-collapse: collapse; font-size: 12px; width: 100%; }
+table.alts th { text-align: left; font-weight: 500; color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; padding: 2px 8px 4px 0; }
+table.alts td { padding: 2px 8px 2px 0; border-top: 1px solid var(--hair-2); vertical-align: top; }
 svg .ru { fill: none; stroke: var(--model); stroke-width: 1.2; stroke-dasharray: 2 2; }
 svg .ru-link { stroke: var(--model); stroke-width: 0.8; opacity: 0.7; }
 svg .ghost { fill: var(--raw); }
@@ -125,10 +130,9 @@ footer.prov p { margin: 4px 0; }
       <div class="seg" role="group" aria-label="Which placement to show">
         <button id="arm-fill" aria-pressed="true">Decoded</button>
         <button id="arm-mono" aria-pressed="false">Decoded, no fill</button>
-        <button id="arm-base" aria-pressed="false">Raw emission</button>
       </div>
-      <label><input type="checkbox" id="showRu"> runner-up</label>
-      <label><input type="checkbox" id="showGhost"> raw ghost</label>
+      <label><input type="checkbox" id="showRu"> posterior columns</label>
+      <label><input type="checkbox" id="showGhost"> argmax ghost</label>
     </div>
   </header>
 
@@ -164,7 +168,12 @@ footer.prov p { margin: 4px 0; }
   const mmss = t => { if (t == null) return '—'; const m = Math.floor(t / 60), s = Math.round(t - m * 60); return `${m}:${String(s).padStart(2, '0')}`; };
   const filmLabel = t => (t < D.partAEnd ? `A ${mmss(t)}` : `B ${mmss(t - D.partAEnd)}`);
   const pct = (a, b) => (b ? (100 * a / b).toFixed(1) + '%' : '—');
-  const placement = (u) => state.arm === 'fill' ? { anchor: u.anchor, scene: u.scene, mass: u.mass } : (state.arm === 'mono' ? u.mono : u.base);
+  const originOf = (u, pl) => {
+    if (pl.anchor.kind === 'none') return null;
+    if (u.raw.anchor.kind !== 'none' && pl.anchor.kind === u.raw.anchor.kind && pl.anchor.n === u.raw.anchor.n) return 'argmax';
+    return pl.mass === 0 ? 'filled' : 'bound';
+  };
+  const placement = (u) => state.arm === 'fill' ? { anchor: u.anchor, scene: u.scene, mass: u.mass, origin: u.origin } : { anchor: u.mono.anchor, scene: u.mono.scene, mass: u.mono.mass, origin: originOf(u, u.mono) };
   const filmMid = (a) => a.kind === 'segment' ? (seg.get(a.n).start + seg.get(a.n).end) / 2 : (a.kind === 'scene' ? (scene.get(a.n).start + scene.get(a.n).end) / 2 : null);
   const el = (tag, attrs, parent) => { const e = document.createElementNS('http://www.w3.org/2000/svg', tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; };
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -179,10 +188,10 @@ footer.prov p { margin: 4px 0; }
   }
   pp.value = 'NN03';
   pp.addEventListener('change', () => { state.pid = pp.value; state.sel = null; render(); });
-  for (const [id, arm] of [['arm-fill', 'fill'], ['arm-mono', 'mono'], ['arm-base', 'base']]) {
+  for (const [id, arm] of [['arm-fill', 'fill'], ['arm-mono', 'mono']]) {
     document.getElementById(id).addEventListener('click', () => {
       state.arm = arm;
-      for (const [i2, a2] of [['arm-fill', 'fill'], ['arm-mono', 'mono'], ['arm-base', 'base']]) document.getElementById(i2).setAttribute('aria-pressed', String(a2 === arm));
+      for (const [i2, a2] of [['arm-fill', 'fill'], ['arm-mono', 'mono']]) document.getElementById(i2).setAttribute('aria-pressed', String(a2 === arm));
       render();
     });
   }
@@ -205,11 +214,14 @@ footer.prov p { margin: 4px 0; }
     const w1 = wg.filter(u => placement(u).scene != null && Math.abs(placement(u).scene - u.gold) <= 1).length;
     const ext = P.units.filter(u => u.ext > 0.5).length;
     const abst = P.units.filter(u => placement(u).anchor.kind === 'scene').length;
-    const armName = { fill: 'decoded', mono: 'decoded, no fill', base: 'raw emission' }[state.arm];
+    const moved = P.units.filter(u => { const o = placement(u).origin; return o === 'bound' || o === 'filled'; }).length;
+    const filled = P.units.filter(u => placement(u).origin === 'filled').length;
+    const armName = { fill: 'decoded', mono: 'decoded, no fill' }[state.arm];
     const cells = [
       ['scene-exact', wg.length ? pct(exact, wg.length) : '—', wg.length ? `${exact} of ${wg.length} units with gold · ${armName}` : (P.excluded ? 'gold coding does not match this transcript' : 'no released gold for this participant')],
       ['within one scene', wg.length ? pct(w1, wg.length) : '—', wg.length ? `${w1} of ${wg.length}` : '—'],
       ['recall units', P.units.length, `${mmss(P.duration)} of speech · ${P.partition} participant`],
+      ['moved by the decode', moved, `${filled} of them filled outside the posterior (mass zero)`],
       ['scene-level anchors', abst, 'model localises to a scene, not a segment'],
       ['likely external', ext, 'external mass above one half'],
     ];
@@ -274,26 +286,42 @@ footer.prov p { margin: 4px 0; }
       const pl = placement(u);
       const a = pl.anchor; if (a.kind === 'none') continue;
       const x = X(u.t0);
-      if (state.showGhost && state.arm !== 'base') {
-        const ga = u.base.anchor; const gy = filmMid(ga);
+      if (state.showGhost && pl.origin && pl.origin !== 'argmax') {
+        const ga = u.raw.anchor; const gy = filmMid(ga);
         if (gy != null) {
           el('line', { x1: x, x2: x, y1: Y(gy), y2: Y(filmMid(a)), class: 'ghost-link' }, gl);
           el('circle', { cx: x, cy: Y(gy), r: 2.2, class: 'ghost' }, gl);
         }
       }
-      if (state.showRu && u.ru.kind !== 'none' && state.arm === 'fill') {
-        const ry = filmMid(u.ru);
-        el('line', { x1: x, x2: x, y1: Y(ry), y2: Y(filmMid(a)), class: 'ru-link' }, gl);
-        el('circle', { cx: x, cy: Y(ry), r: 3 + 6 * Math.sqrt(u.ruMass || 0), class: 'ru' }, gl);
+      if (state.showRu || state.sel === u.u) {
+        // the posterior as a column: every other admitted anchor, area by its mass
+        for (const alt of u.anchors) {
+          if (alt.anchor.kind === a.kind && alt.anchor.n === a.n) continue;
+          const ry = filmMid(alt.anchor); if (ry == null) continue;
+          el('line', { x1: x, x2: x, y1: Y(ry), y2: Y(filmMid(a)), class: 'ru-link' }, gl);
+          el('circle', { cx: x, cy: Y(ry), r: 2 + 7 * Math.sqrt(alt.mass), class: 'ru' }, gl);
+        }
       }
       let mark;
+      const sel = state.sel === u.u ? ' sel' : '';
       if (a.kind === 'scene') {
         const s = scene.get(a.n);
-        mark = el('rect', { x: x - 2.5, width: 5, y: Y(s.end), height: Math.max(3, Y(s.start) - Y(s.end)), class: 'unit sceneanchor' + (state.sel === u.u ? ' sel' : '') }, gm);
+        mark = el('rect', { x: x - 2.5, width: 5, y: Y(s.end), height: Math.max(3, Y(s.start) - Y(s.end)), class: 'unit sceneanchor' + sel }, gm);
+      } else if (pl.origin === 'filled') {
+        // the decode looked outside the posterior: an absence of evidence, never a small amount of it
+        const cy = Y(filmMid(a)), d = 4.5;
+        mark = el('path', { d: `M${x} ${cy - d} L${x + d} ${cy} L${x} ${cy + d} L${x - d} ${cy} Z`, class: 'unit filled' + sel }, gm);
       } else {
         const m = pl.mass == null ? 0.1 : pl.mass;
-        const r = 2.6 + 8 * Math.sqrt(m);
-        mark = el('circle', { cx: x, cy: Y(filmMid(a)), r, class: 'unit' + (u.ext > 0.5 ? ' ext' : '') + (state.sel === u.u ? ' sel' : ''), opacity: u.ext > 0.5 ? 0.9 : (0.45 + 0.55 * u.src).toFixed(2) }, gm);
+        const r = 2.6 + 8 * Math.sqrt(m), cy = Y(filmMid(a));
+        const op = u.ext > 0.5 ? 0.9 : (0.45 + 0.55 * u.src).toFixed(2);
+        if (pl.origin === 'bound') {
+          // decode-bound: a diamond of the same area as the circle would have
+          const d = r * 1.2533;
+          mark = el('path', { d: `M${x} ${cy - d} L${x + d} ${cy} L${x} ${cy + d} L${x - d} ${cy} Z`, class: 'unit bound' + (u.ext > 0.5 ? ' ext' : '') + sel, opacity: op }, gm);
+        } else {
+          mark = el('circle', { cx: x, cy, r, class: 'unit' + (u.ext > 0.5 ? ' ext' : '') + sel, opacity: op }, gm);
+        }
       }
       mark.dataset.u = u.u;
       mark.addEventListener('mouseenter', ev => showTip(P, u, ev));
@@ -308,7 +336,7 @@ footer.prov p { margin: 4px 0; }
     const tr = el('g', {}, svg);
     el('line', { x1: M.l, x2: M.l, y1: T0, y2: T0 + trackH, class: 'axis' }, tr).setAttribute('stroke', 'var(--hair)');
     for (const s of [1, 10, 20, 30, 40, 50]) { const t = el('text', { x: M.l - 7, y: TY(s) + 3.5, 'text-anchor': 'end' }, tr); t.textContent = 'sc ' + s; }
-    const tl2 = el('text', { x: M.l + 6, y: T0 + 10 }, tr); tl2.textContent = 'scene index · gold coding (amber) · this placement (blue)' + (state.showGhost && state.arm !== 'base' ? ' · raw emission (grey, dashed)' : '');
+    const tl2 = el('text', { x: M.l + 6, y: T0 + 10 }, tr); tl2.textContent = 'scene index · gold coding (amber) · this placement (blue)' + (state.showGhost ? ' · posterior argmax (grey, dashed)' : '');
     for (const iv of P.goldIntervals) el('line', { x1: X(iv.t0), x2: X(iv.t1), y1: TY(iv.scene), y2: TY(iv.scene), class: 'track-gold' }, tr);
     const stepPath = (getScene, cls) => {
       let d = '';
@@ -319,7 +347,7 @@ footer.prov p { margin: 4px 0; }
       }
       el('path', { d, fill: 'none', class: cls }, tr);
     };
-    if (state.showGhost && state.arm !== 'base') stepPath(u => u.base.scene, 'track-raw');
+    if (state.showGhost) stepPath(u => u.raw.scene, 'track-raw');
     stepPath(u => placement(u).scene, 'track-model');
     if (state.sel != null) { const u = units.find(x => x.u === state.sel); if (u) el('line', { x1: X(u.t0), x2: X(u.t0), y1: M.t, y2: T0 + trackH, stroke: 'var(--ink)', 'stroke-width': 0.6, 'stroke-dasharray': '2 3' }, svg); }
   }
@@ -349,8 +377,11 @@ footer.prov p { margin: 4px 0; }
     const pl = placement(u); const a = pl.anchor;
     const gs = u.gold != null ? scene.get(u.gold) : null;
     const anchorScene = a.kind === 'segment' ? scene.get(seg.get(a.n).scene) : (a.kind === 'scene' ? scene.get(a.n) : null);
-    const map = pl.mass == null ? 0 : pl.mass, ru = u.ruMass || 0, other = Math.max(0, u.src - map - ru), ext = u.ext;
-    const parts = [['anchor', map, 'var(--model)'], ['runner-up', ru, 'var(--model-soft)'], ['other source', other, 'var(--hair)'], ['external', ext, 'var(--external)']];
+    const map = pl.mass == null ? 0 : pl.mass;
+    const alts = u.anchors.filter(x => !(x.anchor.kind === a.kind && x.anchor.n === a.n));
+    const ru = alts.length ? alts[0].mass : 0, other = Math.max(0, u.src - map - ru), ext = u.ext;
+    const parts = [['anchor', map, 'var(--model)'], ['best alternative', ru, 'var(--model-soft)'], ['other source', other, 'var(--hair)'], ['external', ext, 'var(--external)']];
+    const altRows = alts.map(x => `<tr><td class="num">${x.mass.toFixed(3)}</td><td>${x.anchor.kind === 'segment' ? `segment ${x.anchor.n}` : `scene ${x.anchor.n} (scene-level)`}</td><td>${x.scene != null && scene.get(x.scene) ? esc(scene.get(x.scene).title) : ''}</td></tr>`).join('');
     const bar = parts.map(([k, v, c]) => `<span style="width:${(100 * v).toFixed(1)}%;background:${c}" title="${k} ${v.toFixed(3)}"></span>`).join('');
     const leg = parts.map(([k, v, c]) => `<span><i style="background:${c}"></i>${k} <span class="num">${v.toFixed(2)}</span></span>`).join('');
     let placeRows = '';
@@ -362,9 +393,12 @@ footer.prov p { margin: 4px 0; }
     } else placeRows = `<div class="k">placed at</div><div class="v">nowhere in the film</div>`;
     const goldRow = u.gold == null ? `<div class="k">gold</div><div class="v">no coded scene at this moment</div>`
       : `<div class="k">gold</div><div class="v">scene ${esc(gs.title)} ${pl.scene === u.gold ? '· <b>same scene</b>' : (pl.scene != null && Math.abs(pl.scene - u.gold) === 1 ? '· off by one scene' : `· off by ${pl.scene == null ? '—' : Math.abs(pl.scene - u.gold)} scenes`)}</div>`;
-    const armRow = state.arm === 'fill' ? `<div class="k">raw emission</div><div class="v">${u.base.anchor.kind === 'segment' ? `segment ${u.base.anchor.n} in scene ${u.base.scene}` : (u.base.anchor.kind === 'scene' ? `scene ${u.base.scene} (scene-level)` : '—')}${u.base.scene !== pl.scene ? ' · <b>moved by the decode</b>' : ' · unchanged by the decode'}</div>` : '';
+    const originText = { argmax: 'the posterior argmax; the decode kept it', bound: '<b>decode-bound</b>: the decode assigned the scene and took the row’s best anchor inside it', filled: '<b>decode-filled</b>: the posterior had no mass in the assigned scene; the anchor was re-scored and carries mass zero' }[pl.origin] || '—';
+    const armRow = `<div class="k">origin</div><div class="v">${originText}</div><div class="k">posterior argmax</div><div class="v">${u.raw.anchor.kind === 'segment' ? `segment ${u.raw.anchor.n} in scene ${u.raw.scene}` : (u.raw.anchor.kind === 'scene' ? `scene ${u.raw.scene} (scene-level)` : '—')} · mass <span class="num">${u.raw.mass == null ? '—' : u.raw.mass.toFixed(2)}</span></div>`;
     const segText = a.kind === 'segment' ? `<p class="segtext"><span class="lab">annotation at the anchor</span>${esc(seg.get(a.n).text)}</p>` : '';
-    const ruText = (u.ru.kind === 'segment' && state.arm === 'fill') ? `<p class="segtext ru"><span class="lab">runner-up · segment ${u.ru.n} · scene ${seg.get(u.ru.n).scene} · mass ${(u.ruMass || 0).toFixed(2)}</span>${esc(seg.get(u.ru.n).text)}</p>` : (u.ru.kind === 'scene' && state.arm === 'fill' ? `<p class="segtext ru"><span class="lab">runner-up · scene ${esc(scene.get(u.ru.n).title)} · mass ${(u.ruMass || 0).toFixed(2)}</span>the whole scene</p>` : '');
+    const best = alts[0];
+    const ruText = !best ? '' : (best.anchor.kind === 'segment' ? `<p class="segtext ru"><span class="lab">best alternative · segment ${best.anchor.n} · scene ${seg.get(best.anchor.n).scene} · mass ${best.mass.toFixed(2)}</span>${esc(seg.get(best.anchor.n).text)}</p>` : `<p class="segtext ru"><span class="lab">best alternative · scene ${esc(scene.get(best.anchor.n).title)} · mass ${best.mass.toFixed(2)}</span>the whole scene</p>`);
+    const altTable = alts.length ? `<div class="post"><h2>The posterior, ranked</h2><table class="alts"><thead><tr><th>mass</th><th>anchor</th><th>scene</th></tr></thead><tbody><tr><td class="num">${map.toFixed(3)}</td><td><b>${a.kind === 'segment' ? `segment ${a.n}` : `scene ${a.n} (scene-level)`}</b> · drawn</td><td>${anchorScene ? esc(anchorScene.title) : ''}</td></tr>${altRows}</tbody></table></div>` : '';
     let adj = '';
     if (u.adj) {
       const inside = a.kind === 'segment' && u.adj.first !== 'none' && a.n >= +u.adj.first && a.n <= +u.adj.last;
@@ -376,7 +410,7 @@ footer.prov p { margin: 4px 0; }
       <div class="kv">${placeRows}${goldRow}${armRow}
         <div class="k">mode</div><div class="v">${esc(u.mode)} · localizability <span class="num">${u.loc == null ? '—' : u.loc.toFixed(2)}</span></div></div>
       <div class="post"><h2>Posterior mass</h2><div class="bar">${bar}</div><div class="legend">${leg}</div></div>
-      ${segText}${ruText}
+      ${segText}${ruText}${altTable}
       <div class="strip" id="strip"></div>
       ${adj}`;
     renderStrip(u, pl, anchorScene, gs);
@@ -393,8 +427,10 @@ footer.prov p { margin: 4px 0; }
       const a = seg.get(+u.adj.first), b = seg.get(+u.adj.last);
       svg += `<rect x="${x(a.start).toFixed(1)}" y="10" width="${(x(b.end) - x(a.start)).toFixed(1)}" height="24" fill="var(--adj-band)" stroke="var(--adj)" stroke-width="0.8"><title>adjudicated span (machine lane, diagnostic)</title></rect>`;
     }
-    if (u.ru.kind === 'segment' && state.arm === 'fill' && seg.get(u.ru.n).scene === S.n) {
-      const s = seg.get(u.ru.n); svg += `<circle cx="${x((s.start + s.end) / 2).toFixed(1)}" cy="22" r="5" fill="none" stroke="var(--model)" stroke-dasharray="2 2" stroke-width="1.2"><title>runner-up</title></circle>`;
+    for (const alt of u.anchors) {
+      if (alt.anchor.kind !== 'segment' || seg.get(alt.anchor.n).scene !== S.n) continue;
+      if (pl.anchor.kind === 'segment' && alt.anchor.n === pl.anchor.n) continue;
+      const s = seg.get(alt.anchor.n); svg += `<circle cx="${x((s.start + s.end) / 2).toFixed(1)}" cy="22" r="${(2 + 6 * Math.sqrt(alt.mass)).toFixed(1)}" fill="none" stroke="var(--model)" stroke-dasharray="2 2" stroke-width="1.2"><title>alternative, mass ${alt.mass.toFixed(3)}</title></circle>`;
     }
     const a = pl.anchor;
     if (a.kind === 'segment' && seg.get(a.n).scene === S.n) { const s = seg.get(a.n); svg += `<circle cx="${x((s.start + s.end) / 2).toFixed(1)}" cy="22" r="6" fill="var(--model)" stroke="var(--surface)" stroke-width="1.2"><title>anchor</title></circle>`; }
@@ -408,11 +444,13 @@ footer.prov p { margin: 4px 0; }
     `<span><svg viewBox="0 0 26 16"><circle cx="8" cy="8" r="4" fill="var(--model)"/><circle cx="19" cy="8" r="6.5" fill="var(--model)"/></svg>anchor; area grows with posterior mass on the chosen segment</span>`,
     `<span><svg viewBox="0 0 26 16"><rect x="10" y="1" width="5" height="14" rx="2.5" fill="var(--model)" opacity="0.55"/></svg>scene-level anchor: the model stops at the scene</span>`,
     `<span><svg viewBox="0 0 26 16"><circle cx="13" cy="8" r="5" fill="none" stroke="var(--external)" stroke-width="1.6"/></svg>hollow: more mass outside the film than in it</span>`,
-    `<span><svg viewBox="0 0 26 16"><circle cx="13" cy="8" r="5" fill="none" stroke="var(--model)" stroke-width="1.2" stroke-dasharray="2 2"/></svg>runner-up, joined to its anchor</span>`,
+    `<span><svg viewBox="0 0 26 16"><path d="M13 2 L19 8 L13 14 L7 8 Z" fill="var(--model)"/></svg>diamond: decode-bound, the scene decode chose it, with posterior mass</span>`,
+    `<span><svg viewBox="0 0 26 16"><path d="M13 3 L18 8 L13 13 L8 8 Z" fill="none" stroke="var(--model)" stroke-width="1.4" stroke-dasharray="2 1.5"/></svg>hollow diamond: decode-filled, mass zero, outside the posterior</span>`,
+    `<span><svg viewBox="0 0 26 16"><circle cx="13" cy="8" r="5" fill="none" stroke="var(--model)" stroke-width="1.2" stroke-dasharray="2 2"/></svg>the posterior column: every other admitted anchor, area by mass</span>`,
     `<span><svg viewBox="0 0 26 16"><rect x="1" y="2" width="24" height="12" fill="var(--gold-band)"/></svg>human scene coding (gold) · the band is the scene's film span over the recall interval coded to it</span>`,
-    `<span><svg viewBox="0 0 26 16"><circle cx="13" cy="8" r="2.2" fill="var(--raw)"/><line x1="13" y1="8" x2="13" y2="1" stroke="var(--raw)"/></svg>raw emission argmax before the scene-monotone decode</span>`,
+    `<span><svg viewBox="0 0 26 16"><circle cx="13" cy="8" r="2.2" fill="var(--raw)"/><line x1="13" y1="8" x2="13" y2="1" stroke="var(--raw)"/></svg>ghost: the posterior argmax the decode moved away from</span>`,
   ].join('');
-  document.getElementById('prov').innerHTML = `<p>Placements are the default configuration's run (${esc(D.arm)}): lexical blend 0.8 over the sentence encoder, ordering prior 1.5, scene-monotone decode with fill. “Raw emission” is the same evidence without the decode; “no fill” is the decode without the in-scene fill. Gold is the released 50-scene coding of each recall (Chen lab), a scene-level truth: it says which scene, never which segment. Segment-level spans shown in the inspector come from a machine adjudication lane and are diagnostic, never gold (packet sha256 ${D.machineLane.packetSha256.slice(0, 12)}…).</p><p>Film time runs on one clock across the two presentation parts; part B begins at ${mmss(D.partAEnd)}. Recall time is the Princeton word-onset clock. Data generated ${D.generated}; recall text is from the public Zenodo release and this page is private.</p>`;
+  document.getElementById('prov').innerHTML = `<p>Placements are the default configuration's run (${esc(D.arm)}): lexical blend 0.8 over the sentence encoder, ordering prior 1.5, scene-monotone decode with fill. Mark area is the posterior mass on the drawn anchor itself, read from the run's posterior sidecar, not the report's argmax column; “no fill” is the decode without the in-scene fill. Gold is the released 50-scene coding of each recall (Chen lab), a scene-level truth: it says which scene, never which segment. Segment-level spans shown in the inspector come from a machine adjudication lane and are diagnostic, never gold (packet sha256 ${D.machineLane.packetSha256.slice(0, 12)}…).</p><p>Film time runs on one clock across the two presentation parts; part B begins at ${mmss(D.partAEnd)}. Recall time is the Princeton word-onset clock. Data generated ${D.generated}; recall text is from the public Zenodo release and this page is private.</p>`;
 
   function render() { const P = current(); if (state.sel == null) { const us = P.units.filter(u => u.t0 != null && u.gold != null); if (us.length) state.sel = us[Math.floor(us.length / 3)].u; } renderStats(P); renderVoyage(P); renderInspector(P); }
   state.pid = pp.value; render();

@@ -13,7 +13,11 @@ here = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(here, ".."))
 import within_scene as ws  # noqa: E402
 
-ARMS = {"all17-monofill": None, "all17-baseline": "base", "all17-monotone": "mono"}
+ARMS = {"all17-monofill": None, "all17-monotone": "mono"}
+POSTERIOR_ARM = (
+    "all17-monofill-posterior"  # same reports, plus the per-unit posterior sidecar
+)
+TOP_ANCHORS = 8
 
 
 def anchor_of(a):
@@ -81,11 +85,37 @@ def assemble(data_root):
     for name in sorted(arms["all17-monofill"]):
         nn = int(name[2:4])
         gs = ws.gold_subject_of(nn)
+        # The posterior sidecar: the decoded anchor's own mass, the argmax, every admitted anchor.
+        side_path = os.path.join(
+            study, POSTERIOR_ARM, f"recall-map-{name}.tsv.posterior.json"
+        )
+        sidecar = json.load(open(side_path))["units"]
+        assert len(sidecar) == len(arms["all17-monofill"][name]), name
         units = []
         for i, r in enumerate(arms["all17-monofill"][name]):
             u = int(r["unit"])
+            post = sidecar[i]
+            assert post["unit"] == u, (name, u)
             on = fnum(r["recallOnsetSeconds"])
             g = ws.scene_at(gold[gs], on) if (gs in gold and on is not None) else None
+            decoded, argmax = post["decoded"], post["argmax"]
+            by_ref = {a["ref"]: a for a in post["anchors"]}
+            origin = None
+            if decoded:
+                origin = (
+                    "argmax"
+                    if argmax and decoded["ref"] == argmax["ref"]
+                    else ("filled" if decoded["mass"] == 0.0 else "bound")
+                )
+            anchors = [
+                dict(
+                    anchor=anchor_of(a["ref"]),
+                    scene=a["scene"],
+                    level=a["level"],
+                    mass=a["mass"],
+                )
+                for a in post["anchors"][:TOP_ANCHORS]
+            ]
             rec = dict(
                 u=u,
                 fn=r["function"],
@@ -94,24 +124,33 @@ def assemble(data_root):
                 t1=fnum(r["recallLastWordOnsetSeconds"]),
                 anchor=anchor_of(r["mapAnchor"]),
                 mode=r["mapMode"],
-                src=float(r["sourceMass"]),
-                ext=float(r["externalMass"]),
-                mass=fnum(r["mapAnchorMass"]),
-                ru=anchor_of(r.get("runnerUpAnchor")),
-                ruMass=fnum(r.get("runnerUpMass")),
-                loc=fnum(r.get("localizability")),
+                src=post["sourceMass"],
+                ext=post["externalMass"],
+                mass=decoded["mass"] if decoded else None,
+                origin=origin,
+                loc=post["localizability"],
                 scene=ws.predicted_scene(r),
                 gold=g,
+                raw=dict(
+                    anchor=anchor_of(argmax["ref"]) if argmax else dict(kind="none"),
+                    scene=by_ref[argmax["ref"]]["scene"] if argmax else None,
+                    mass=argmax["mass"] if argmax else None,
+                ),
+                anchors=anchors,
             )
             for arm, short_name in ARMS.items():
                 if short_name is None:
                     continue
                 rr = arms[arm][name][i]
                 assert int(rr["unit"]) == u, (arm, name, u)
+                # The posterior is the same channel in every arm; only the decode differs, so an
+                # arm's anchor takes its own mass from the sidecar, zero when the decode looked
+                # outside the posterior.
+                arm_anchor = rr["mapAnchor"]
                 rec[short_name] = dict(
-                    anchor=anchor_of(rr["mapAnchor"]),
+                    anchor=anchor_of(arm_anchor),
                     scene=ws.predicted_scene(rr),
-                    mass=fnum(rr["mapAnchorMass"]),
+                    mass=by_ref[arm_anchor]["mass"] if arm_anchor in by_ref else 0.0,
                 )
             k = (name[:4], u)
             if k in machine:
