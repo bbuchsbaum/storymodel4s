@@ -1,6 +1,6 @@
 package storymodel4s.align
 
-import storymodel4s.core.{Checksum, ContentAddress, SpanRef}
+import storymodel4s.core.{Checksum, ContentAddress, Score, SpanRef}
 import storymodel4s.features.{CanonicalDouble, Coverage, Estimate, MissingReason}
 import storymodel4s.proposition.Canonical
 import storymodel4s.recall.{ExpressedUncertainty, RecallGraph, RecallUnitId}
@@ -50,9 +50,14 @@ private[align] object Render:
     case Estimate.Observed(v, credence) =>
       val c = credence.toVector.flatMap { c =>
         Vector(
-          CanonicalDouble.render(c.rawScore),
+          c.rawScore.map(CanonicalDouble.render).getOrElse(""),
+          c.score match
+            case Score.Raw(_, scorer) => scorer.value
+            case Score.Unmeasured     => ""
+          ,
           c.calibrated.map(p => CanonicalDouble.render(p.value)).getOrElse(""),
-          c.calibrationModel.getOrElse("")
+          c.calibrationModel.map(_.value).getOrElse(""),
+          c.basis.determiningRule.map(_.value).getOrElse("")
         )
       }
       composite(Vector("observed", CanonicalDouble.render(v)) ++ c)

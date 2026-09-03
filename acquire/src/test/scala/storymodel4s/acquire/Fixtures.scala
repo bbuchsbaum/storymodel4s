@@ -1,6 +1,7 @@
 package storymodel4s.acquire
 
 import cats.data.NonEmptyVector
+import storymodel4s.acquire.{AcceptanceBasis, CandidateBasis}
 import org.scalacheck.{Arbitrary, Gen}
 import storymodel4s.core.*
 
@@ -67,7 +68,7 @@ object Fixtures:
       task,
       v,
       NonEmptyVector.one(ev(id)),
-      Some(RawScore.unsafe(score)),
+      Some(RawScore.unsafe(score, ScorerId.unsafe("test-scorer"))),
       Vector.empty,
       receiptFor(provider)
     )
@@ -85,7 +86,7 @@ object Fixtures:
       task,
       v,
       NonEmptyVector.one(ev("alt")),
-      Some(RawScore.unsafe(score)),
+      Some(RawScore.unsafe(score, ScorerId.unsafe("test-scorer"))),
       Vector.empty,
       receipt
     )
@@ -95,7 +96,15 @@ object Fixtures:
       family: CriticFamily = CriticFamily.FrameRole,
       score: Option[Double] = None
   ): CriticFinding =
-    CriticFinding(task, family, code, Vector.empty, Vector.empty, score.map(RawScore.unsafe), None)
+    CriticFinding(
+      task,
+      family,
+      code,
+      Vector.empty,
+      Vector.empty,
+      score.map(RawScore.unsafe(_, ScorerId.unsafe("test-scorer"))),
+      None
+    )
 
   /** A bundle whose calibration, when given, is attached to every proposed value. */
   def bundle[A](
@@ -114,7 +123,15 @@ object Fixtures:
       SourceSupport(support, spans),
       agreementScore = 1.0,
       calibrated.toVector.flatMap(p =>
-        values.map(v => CandidateCalibration(v, Probability.unsafe(p), "test-calibration"))
+        values.map(v =>
+          CandidateBasis(
+            v,
+            AcceptanceBasis.Calibrated(
+              Probability.unsafe(p),
+              CalibrationModelId.unsafe("test-calibration")
+            )
+          )
+        )
       )
     )
 
@@ -147,7 +164,8 @@ object Fixtures:
     )
   val foilKind: Gen[FoilKind] = Gen.oneOf(FoilKind.values.toSeq)
   val probability: Gen[Probability] = Gen.chooseNum(0.0, 1.0).map(Probability.unsafe)
-  val rawScore: Gen[RawScore] = Gen.chooseNum(-5.0, 5.0).map(RawScore.unsafe)
+  val rawScore: Gen[RawScore] =
+    Gen.chooseNum(-5.0, 5.0).map(RawScore.unsafe(_, ScorerId.unsafe("test-scorer")))
   val provider: Gen[String] = Gen.oneOf("parser", "agent", "critic")
 
   val proposal: Gen[AgentProposal[Int]] = for

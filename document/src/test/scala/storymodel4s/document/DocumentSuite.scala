@@ -39,7 +39,7 @@ class DocumentSuite extends ScalaCheckSuite:
     ClaimMeta.unsafe(
       ClaimId.unsafe("claim:doc"),
       EpistemicStatus.StructurallyDerived,
-      Credence.unsafeRaw(1.0),
+      Credence.unsafeRaw(1.0, ScorerId.unsafe("test-scorer")),
       NonEmptyVector.one(ev),
       Provenance.deterministic("test", Checksum.ofText("doc"))
     )

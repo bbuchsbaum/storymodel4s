@@ -4,23 +4,31 @@ import cats.Functor
 import cats.data.NonEmptyVector
 import storymodel4s.core.*
 
-/** An uncalibrated score reported by a provider. Deliberately a distinct type from
-  * [[storymodel4s.core.Probability]]: no code path can pass a raw score where a probability is
-  * required.
+/** An uncalibrated score reported by a provider, with the scorer that produced it. Deliberately a
+  * distinct type from [[storymodel4s.core.Probability]]: no code path can pass a raw score where a
+  * probability is required. The scorer travels with the number so that a table constant, a parser's
+  * marker confidence, and a critic's grade cannot share a representation (design contract 7); it
+  * becomes the [[storymodel4s.core.Score.Raw]] coordinate of the accepted claim.
+  *
+  * A non-case class: `fromProduct` would mint a non-finite score.
   */
+final class RawScore private (val value: Double, val scorer: ScorerId):
+  override def equals(other: Any): Boolean = other match
+    case that: RawScore => value == that.value && scorer == that.scorer
+    case _              => false
+  override def hashCode(): Int = (value, scorer).##
+  override def toString: String = s"RawScore($value by ${scorer.value})"
+
 object RawScore:
-  opaque type RawScore = Double
-  def from(v: Double): Either[DomainError, RawScore] =
+  def from(v: Double, scorer: ScorerId): Either[DomainError, RawScore] =
     if v.isNaN || v.isInfinite then
       Left(DomainError.InvalidFormat("RawScore", v.toString, "non-finite"))
-    else Right(v)
-  def unsafe(v: Double): RawScore =
-    from(v).fold(e => throw new IllegalArgumentException(e.message), identity)
-  extension (s: RawScore) def value: Double = s
-  given cats.Order[RawScore] = cats.Order[Double]
-  given Ordering[RawScore] = Ordering.Double.TotalOrdering
+    else Right(new RawScore(if v == 0.0 then 0.0 else v, scorer))
+  def unsafe(v: Double, scorer: ScorerId): RawScore =
+    from(v, scorer).fold(e => throw new IllegalArgumentException(e.message), identity)
+  given cats.Order[RawScore] = cats.Order.by(s => (s.value, s.scorer.value))
+  given Ordering[RawScore] = cats.Order[RawScore].toOrdering
   given cats.Show[RawScore] = cats.Show.show(_.toString)
-type RawScore = RawScore.RawScore
 
 /** What an agent did with its task. */
 enum ProposalDisposition:

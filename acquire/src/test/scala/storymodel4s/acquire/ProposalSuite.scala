@@ -78,9 +78,9 @@ class ProposalSuite extends ScalaCheckSuite:
     )
 
   test("raw scores reject non-finite values"):
-    assert(RawScore.from(Double.NaN).isLeft)
-    assert(RawScore.from(Double.PositiveInfinity).isLeft)
-    assert(RawScore.from(-3.5).isRight)
+    assert(RawScore.from(Double.NaN, ScorerId.unsafe("test-scorer")).isLeft)
+    assert(RawScore.from(Double.PositiveInfinity, ScorerId.unsafe("test-scorer")).isLeft)
+    assert(RawScore.from(-3.5, ScorerId.unsafe("test-scorer")).isRight)
 
   property("smart constructors always satisfy the disposition invariants"):
     forAll { (p: AgentProposal[Int]) =>

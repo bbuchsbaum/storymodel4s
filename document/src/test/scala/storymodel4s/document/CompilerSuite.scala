@@ -90,7 +90,7 @@ class CompilerSuite extends FunSuite:
         task,
         value,
         NonEmptyVector.one(evidenceRef.getOrElse(EvidenceRef.Inline(ev))),
-        Some(RawScore.unsafe(0.91)),
+        Some(RawScore.unsafe(0.91, ScorerId.unsafe("test-scorer"))),
         Vector.empty,
         receipt
       )
@@ -101,8 +101,15 @@ class CompilerSuite extends FunSuite:
       StructuralValidity.Valid,
       SourceSupport(1.0, ev.spans),
       agreementScore = 1.0,
-      calibrations =
-        if calibrated then Vector(CandidateCalibration(value, Probability.unsafe(0.97), "test-v1"))
+      bases =
+        if calibrated then
+          Vector(
+            CandidateBasis(
+              value,
+              AcceptanceBasis
+                .Calibrated(Probability.unsafe(0.97), CalibrationModelId.unsafe("test-v1"))
+            )
+          )
         else Vector.empty
     )
 

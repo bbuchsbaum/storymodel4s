@@ -194,19 +194,71 @@ object CoreCodecs:
   given Decoder[EpistemicStatus] =
     enumDecoder("EpistemicStatus", EpistemicStatus.values, _.toString)
 
+  given Encoder[ScorerId] = opaqueEncoder(ScorerId)
+  given Decoder[ScorerId] = opaqueDecoder(ScorerId)
+  given Encoder[RuleId] = opaqueEncoder(RuleId)
+  given Decoder[RuleId] = opaqueDecoder(RuleId)
+  given Encoder[CalibrationModelId] = opaqueEncoder(CalibrationModelId)
+  given Decoder[CalibrationModelId] = opaqueDecoder(CalibrationModelId)
+
+  /** `Unmeasured` is its name; a raw score is an object naming its scorer. */
+  given Encoder[Score] = Encoder.instance {
+    case Score.Unmeasured         => "Unmeasured".asJson
+    case Score.Raw(value, scorer) =>
+      Json.obj("type" -> "Raw".asJson, "value" -> value.asJson, "scorer" -> scorer.asJson)
+  }
+  given Decoder[Score] = Decoder.instance { c =>
+    c.value.asString match
+      case Some("Unmeasured") => Right(Score.Unmeasured)
+      case Some(other)        => Left(DecodingFailure(s"unknown Score $other", c.history))
+      case None               =>
+        field[String](c, "type").flatMap {
+          case "Raw" =>
+            for
+              value <- field[Double](c, "value")
+              scorer <- field[ScorerId](c, "scorer")
+              score <- domain(c, Score.raw(value, scorer))
+            yield score
+          case other => Left(DecodingFailure(s"unknown Score type $other", c.history))
+        }
+  }
+
+  given Encoder[CredenceBasis] = Encoder.instance {
+    case CredenceBasis.Uncalibrated         => "Uncalibrated".asJson
+    case CredenceBasis.Calibrated(p, model) =>
+      Json.obj("type" -> "Calibrated".asJson, "probability" -> p.asJson, "model" -> model.asJson)
+    case CredenceBasis.Determined(rule) =>
+      Json.obj("type" -> "Determined".asJson, "rule" -> rule.asJson)
+  }
+  given Decoder[CredenceBasis] = Decoder.instance { c =>
+    c.value.asString match
+      case Some("Uncalibrated") => Right(CredenceBasis.Uncalibrated)
+      case Some(other)          => Left(DecodingFailure(s"unknown CredenceBasis $other", c.history))
+      case None                 =>
+        field[String](c, "type").flatMap {
+          case "Calibrated" =>
+            for
+              p <- field[Probability](c, "probability")
+              model <- field[CalibrationModelId](c, "model")
+            yield CredenceBasis.Calibrated(p, model)
+          case "Determined" => field[RuleId](c, "rule").map(CredenceBasis.Determined.apply)
+          case other        =>
+            Left(DecodingFailure(s"unknown CredenceBasis type $other", c.history))
+        }
+  }
+
+  /** Two coordinates, both always present: what was measured and what licenses a probability.
+    * Decoding goes through `Credence.of`, so a calibrated basis over an unmeasured score is refused
+    * on the wire as it is in memory.
+    */
   given Encoder[Credence] = Encoder.instance { cr =>
-    obj(
-      "rawScore" -> cr.rawScore.asJson,
-      "calibrated" -> opt(cr.calibrated),
-      "calibrationModel" -> opt(cr.calibrationModel)
-    )
+    Json.obj("score" -> cr.score.asJson, "basis" -> cr.basis.asJson)
   }
   given Decoder[Credence] = Decoder.instance { c =>
     for
-      raw <- field[Double](c, "rawScore")
-      cal <- field[Option[Probability]](c, "calibrated")
-      m <- field[Option[String]](c, "calibrationModel")
-      cr <- domain(c, Credence.from(raw, cal, m))
+      score <- field[Score](c, "score")
+      basis <- field[CredenceBasis](c, "basis")
+      cr <- domain(c, Credence.of(score, basis))
     yield cr
   }
 

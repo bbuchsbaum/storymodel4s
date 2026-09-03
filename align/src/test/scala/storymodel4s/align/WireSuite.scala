@@ -1,7 +1,7 @@
 package storymodel4s.align
 
 import munit.FunSuite
-import storymodel4s.core.{SpanRef, SpanSet, TextSpan}
+import storymodel4s.core.{ScorerId, SpanRef, SpanSet, TextSpan}
 import storymodel4s.features.{Coverage, Estimate, MissingReason}
 import storymodel4s.proposition.*
 import storymodel4s.proposition.CheckState.Checked
@@ -551,9 +551,14 @@ class WireSuite extends FunSuite:
         view.worldOrder,
         view.textLength
       ).contentFingerprint
-    val raw = storymodel4s.core.Credence.raw(0.7).toOption.get
+    val raw = storymodel4s.core.Credence.raw(0.7, ScorerId.unsafe("test-scorer")).toOption.get
     val calibrated = storymodel4s.core.Credence
-      .calibrated(0.7, storymodel4s.core.Probability.unsafe(0.6), "m")
+      .calibrated(
+        0.7,
+        storymodel4s.core.ScorerId.unsafe("test-scorer"),
+        storymodel4s.core.Probability.unsafe(0.6),
+        storymodel4s.core.CalibrationModelId.unsafe("m")
+      )
       .toOption
       .get
     val fps = Vector(

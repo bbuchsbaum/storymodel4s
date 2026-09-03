@@ -1,6 +1,7 @@
 package storymodel4s.acquire
 
 import munit.ScalaCheckSuite
+import storymodel4s.acquire.{AcceptanceBasis, CandidateBasis}
 import org.scalacheck.Prop.*
 import storymodel4s.core.*
 
@@ -71,8 +72,16 @@ class ResolveSuite extends ScalaCheckSuite:
     val b = bundle(
       Vector(proposed(1, 0.5, "e1", "parser"), proposed(1, 0.4, "e2", "agent"), proposed(2, 0.9)),
       calibrated = None
-    ).copy(calibrations =
-      Vector(CandidateCalibration(2, Probability.unsafe(0.95), "test-calibration"))
+    ).copy(bases =
+      Vector(
+        CandidateBasis(
+          2,
+          AcceptanceBasis.Calibrated(
+            Probability.unsafe(0.95),
+            CalibrationModelId.unsafe("test-calibration")
+          )
+        )
+      )
     )
     val r = Resolver.resolve(ordinary, b, policy)
     assert(!r.isAccepted, s"unexpected $r")
@@ -89,8 +98,8 @@ class ResolveSuite extends ScalaCheckSuite:
       case other                                                     => fail(s"unexpected $other")
     val two = bundle(Vector(proposed(1, 0.9, "e1", "parser"), proposed(1, 0.8, "e2", "agent")))
     Resolver.resolve(highImpact, two, policy) match
-      case Accepted(1, p, ev) =>
-        assertEquals(p, Probability.unsafe(0.95))
+      case Accepted(1, basis, ev) =>
+        assertEquals(basis.credenceBasis.calibratedProbability, Some(Probability.unsafe(0.95)))
         assertEquals(ev.toVector.map(_.evidenceId.value).sorted, Vector("e1", "e2"))
       case other => fail(s"unexpected $other")
 
@@ -111,7 +120,7 @@ class ResolveSuite extends ScalaCheckSuite:
       task,
       1,
       cats.data.NonEmptyVector.one(evWithSpans("s")),
-      Some(RawScore.unsafe(0.9)),
+      Some(RawScore.unsafe(0.9, ScorerId.unsafe("test-scorer"))),
       Vector.empty,
       receipt
     )
@@ -162,11 +171,11 @@ class ResolveSuite extends ScalaCheckSuite:
       FamilyPolicy.of(Probability.unsafe(0.5), Probability.unsafe(0.4), 1, true, false).isRight
     )
 
-  property("Accepted carries the calibrated probability of the accepted value"):
+  property("Accepted carries exactly the basis attached to the accepted value"):
     forAll { (f: ClaimFamily, b: EvidenceBundle[Int]) =>
       Resolver.resolve(f, b, policy) match
-        case Accepted(v, p, _) => b.calibrationFor(v).exists(_.probability == p)
-        case _                 => true
+        case Accepted(v, basis, _) => b.basisFor(v).contains(basis)
+        case _                     => true
     }
 
   property("Accepted always carries evidence, with spans somewhere unless waived"):

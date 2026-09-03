@@ -38,7 +38,7 @@ class SidecarSuite extends ScalaCheckSuite:
         target(0),
         Estimate.Observed(
           Vector(1.0, -0.0, Float.MinPositiveValue.toDouble),
-          Some(Credence.unsafeRaw(0.5))
+          Some(Credence.unsafeRaw(0.5, ScorerId.unsafe("test-scorer")))
         ),
         Some(SpanSet.one(TextSpan.unsafe(0, 2))),
         Some(Coverage.unsafe(3, 3))

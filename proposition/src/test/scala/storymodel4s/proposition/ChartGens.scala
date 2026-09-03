@@ -34,7 +34,9 @@ object ChartGens:
   val frameRef: Gen[FrameRef] = for
     l <- lemma
     n <- Gen.chooseNum(1, 3)
-    c <- Gen.option(Gen.chooseNum(-3.0, 3.0).map(Credence.unsafeRaw))
+    c <- Gen.option(
+      Gen.chooseNum(-3.0, 3.0).map(Credence.unsafeRaw(_, ScorerId.unsafe("test-scorer")))
+    )
   yield FrameRef("propbank", f"$l-$n%02d", c)
 
   val concept: Gen[Concept] = Gen.frequency(
@@ -69,7 +71,7 @@ object ChartGens:
       case _                                   =>
         Gen.option(for
           r <- participantRole
-          c <- Gen.chooseNum(-2.0, 2.0).map(Credence.unsafeRaw)
+          c <- Gen.chooseNum(-2.0, 2.0).map(Credence.unsafeRaw(_, ScorerId.unsafe("test-scorer")))
         yield (r, c))
   yield RoleAssignment(s, norm)
 
@@ -93,7 +95,7 @@ object ChartGens:
   yield ClaimMeta.unsafe(
     ClaimId.unsafe(s"claim:$id"),
     EpistemicStatus.SurfaceExplicit,
-    Credence.unsafeRaw(1.0),
+    Credence.unsafeRaw(1.0, ScorerId.unsafe("test-scorer")),
     NonEmptyVector.one(
       Evidence(
         EvidenceId.unsafe(s"ev:$id"),
@@ -154,7 +156,7 @@ object ChartGens:
       for
         i <- Gen.chooseNum(0, n - 1)
         span <- spanSet
-        c <- Gen.chooseNum(0.0, 1.0).map(Credence.unsafeRaw)
+        c <- Gen.chooseNum(0.0, 1.0).map(Credence.unsafeRaw(_, ScorerId.unsafe("test-scorer")))
         m <- claimMeta
       yield PropositionAlignment(AlignmentTarget.Concepts(NonEmptySet.one(id(i))), span, c, m)
     aligns <- Gen.listOf(alignment).map(_.toVector.take(3))
@@ -245,7 +247,12 @@ object ChartGens:
                   f,
                   RoleAssignment(
                     SourceRole.Numbered(0),
-                    Some((ParticipantRole.Agent, Credence.unsafeRaw(1.0)))
+                    Some(
+                      (
+                        ParticipantRole.Agent,
+                        Credence.unsafeRaw(1.0, ScorerId.unsafe("test-scorer"))
+                      )
+                    )
                   ),
                   ConceptTarget.Unknown
                 )
@@ -271,7 +278,7 @@ object ChartGens:
               u.alignments :+ PropositionAlignment(
                 AlignmentTarget.Concepts(NonEmptySet.one(ghost)),
                 SpanSet.one(TextSpan.unsafe(0, 1)),
-                Credence.unsafeRaw(1.0),
+                Credence.unsafeRaw(1.0, ScorerId.unsafe("test-scorer")),
                 claimMeta.sample.get
               )
             ),

@@ -19,7 +19,7 @@ class VisibilitySuite extends FunSuite:
     ClaimMeta.unsafe(
       ClaimId.unsafe(id),
       status,
-      Credence.unsafeRaw(1.0),
+      Credence.unsafeRaw(1.0, ScorerId.unsafe("test-scorer")),
       NonEmptyVector.one(Evidence(EvidenceId.unsafe(s"e:$id"), spans, upstream, fp, stage)),
       prov
     )

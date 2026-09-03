@@ -6,7 +6,9 @@ import storymodel4s.core.*
 /** Role-shape and embedding laws added after review. */
 class ValidateRolesSuite extends FunSuite:
   private def c(i: Int) = ConceptId.unsafe(s"c$i")
-  private val agent = Some((ParticipantRole.Agent, Credence.unsafeRaw(1.0)))
+  private val agent = Some(
+    (ParticipantRole.Agent, Credence.unsafeRaw(1.0, ScorerId.unsafe("test-scorer")))
+  )
 
   private def one(role: RoleAssignment, frame: Option[FrameRef] = None) =
     PropositionChart.unchecked(

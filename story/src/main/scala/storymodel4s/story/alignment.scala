@@ -76,6 +76,9 @@ trait AlignmentSource:
   def entityLabel(id: EntityId): Option[String]
 
 object AlignmentSource:
+  /** The rule that determines every derived-view claim from the model it reads. */
+  val DerivedViewRule: RuleId = RuleId.unsafe("derived-view/v1")
+
   def apply(model: StoryModel[ModelStatus.Validated]): AlignmentSource =
     new StoryAlignmentSource(model)
 
@@ -113,7 +116,7 @@ private[story] final class StoryAlignmentSource(model: StoryModel[?]) extends Al
     ClaimMeta.unsafe(
       ClaimId.unsafe(ContentAddress.of("derived-view", model.source.canonicalChecksum.hex)),
       EpistemicStatus.StructurallyDerived,
-      Credence.unsafeRaw(1.0),
+      Credence.unsafeDetermined(AlignmentSource.DerivedViewRule),
       cats.data.NonEmptyVector.one(
         Evidence(
           EvidenceId.unsafe(

@@ -67,11 +67,11 @@ class TrajectoryCompilerSuite extends FunSuite:
     PropositionAlignment(
       AlignmentTarget.Concepts(NonEmptySet.one(concept)),
       spans,
-      Credence.unsafeRaw(1.0),
+      Credence.unsafeRaw(1.0, ScorerId.unsafe("test-scorer")),
       ClaimMeta.unsafe(
         ClaimId.unsafe(s"claim:align:${unit.id.value}:$word"),
         EpistemicStatus.SurfaceExplicit,
-        Credence.unsafeRaw(1.0),
+        Credence.unsafeRaw(1.0, ScorerId.unsafe("test-scorer")),
         NonEmptyVector.one(evidence),
         Provenance.deterministic("test", Checksum.ofText("test-parser"))
       )
@@ -79,7 +79,7 @@ class TrajectoryCompilerSuite extends FunSuite:
 
   private val licensedAgent = RoleAssignment(
     SourceRole.Numbered(0),
-    Some((ParticipantRole.Agent, Credence.unsafeRaw(0.5)))
+    Some((ParticipantRole.Agent, Credence.unsafeRaw(0.5, ScorerId.unsafe("test-scorer"))))
   )
 
   private def chart(index: Int, fillerKind: ConceptKind = ConceptKind.Entity): PropositionEvidence =
@@ -139,7 +139,7 @@ class TrajectoryCompilerSuite extends FunSuite:
         task,
         value,
         NonEmptyVector.one(EvidenceRef.Inline(ev)),
-        Some(RawScore.unsafe(0.91)),
+        Some(RawScore.unsafe(0.91, ScorerId.unsafe("test-scorer"))),
         Vector.empty,
         AgentCallReceipt(call(name, s"$salt:$index"), prompt, task)
       )
@@ -150,8 +150,15 @@ class TrajectoryCompilerSuite extends FunSuite:
       StructuralValidity.Valid,
       SourceSupport(1.0, ev.spans),
       agreementScore = 1.0,
-      calibrations =
-        if calibrated then Vector(CandidateCalibration(value, Probability.unsafe(0.97), "test-v1"))
+      bases =
+        if calibrated then
+          Vector(
+            CandidateBasis(
+              value,
+              AcceptanceBasis
+                .Calibrated(Probability.unsafe(0.97), CalibrationModelId.unsafe("test-v1"))
+            )
+          )
         else Vector.empty
     )
 

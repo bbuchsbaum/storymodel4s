@@ -25,12 +25,21 @@ object CoreGens:
 
   val probability: Gen[Probability] = Gen.chooseNum(0.0, 1.0).map(Probability.unsafe)
 
+  val scorer: ScorerId = ScorerId.unsafe("laws:test-scorer")
+  val rule: RuleId = RuleId.unsafe("laws:test-rule")
+
   val credence: Gen[Credence] = Gen.oneOf(
-    Gen.chooseNum(-10.0, 10.0).map(Credence.unsafeRaw),
+    Gen.const(Credence.unmeasured),
+    Gen.chooseNum(-10.0, 10.0).map(Credence.unsafeRaw(_, scorer)),
     for
       s <- Gen.chooseNum(-10.0, 10.0)
       p <- probability
-    yield Credence.calibrated(s, p, "isotonic-v1").toOption.get
+    yield Credence
+      .calibrated(s, scorer, p, CalibrationModelId.unsafe("isotonic-v1"))
+      .toOption
+      .get,
+    Gen.const(Credence.unsafeDetermined(rule)),
+    Gen.chooseNum(-10.0, 10.0).map(s => Credence.unsafeDetermined(rule, Score.Raw(s, scorer)))
   )
 
   val paragraphText: Gen[String] =

@@ -51,15 +51,31 @@ class IdsSuite extends ScalaCheckSuite:
     assert(Probability.from(-0.0000001).isLeft)
     assertEquals(Probability.unsafe(0.25).complement.value, 0.75)
 
-  test("credence: calibrated value requires a calibration model"):
+  test("credence: a calibrated probability rests on a measured raw score"):
     val p = Probability.unsafe(0.5)
-    assert(Credence.from(0.1, Some(p), None).isLeft)
-    assert(Credence.from(0.1, None, Some("m")).isLeft)
-    assert(Credence.from(0.1, Some(p), Some("m")).isRight)
-    assert(Credence.from(0.1, None, None).isRight)
-    assert(Credence.calibrated(0.1, p, "  ").isLeft)
-    assert(Credence.raw(Double.NaN).isLeft)
-    assert(Credence.raw(Double.PositiveInfinity).isLeft)
+    val scorer = ScorerId.unsafe("test-scorer")
+    val model = CalibrationModelId.unsafe("m")
+    assert(Credence.of(Score.Unmeasured, CredenceBasis.Calibrated(p, model)).isLeft)
+    assert(Credence.of(Score.Raw(0.1, scorer), CredenceBasis.Calibrated(p, model)).isRight)
+    assert(Credence.of(Score.Unmeasured, CredenceBasis.Uncalibrated).isRight)
+    assert(Credence.of(Score.Unmeasured, CredenceBasis.Determined(RuleId.unsafe("r"))).isRight)
+    assert(CalibrationModelId.from("  ").isLeft)
+    assert(Credence.raw(Double.NaN, scorer).isLeft)
+    assert(Credence.raw(Double.PositiveInfinity, scorer).isLeft)
+    assert(Credence.of(Score.Raw(Double.NaN, scorer), CredenceBasis.Uncalibrated).isLeft)
+
+  test("credence: negative zero folds onto zero so equal scores have one identity"):
+    val scorer = ScorerId.unsafe("test-scorer")
+    assertEquals(Credence.raw(-0.0, scorer), Credence.raw(0.0, scorer))
+    assertEquals(Credence.raw(-0.0, scorer).map(_.score), Right(Score.Raw(0.0, scorer)))
+    assert(
+      Credence.raw(-0.0, scorer).toOption.get.score match
+        case Score.Raw(v, _) => java.lang.Double.doubleToLongBits(v) == 0L
+        case _               => false
+    )
 
   property("credence law holds for all generated values"):
-    forAll(Gens.credence) { c => c.calibrated.nonEmpty == c.calibrationModel.nonEmpty }
+    forAll(Gens.credence) { c =>
+      (c.calibrated.nonEmpty == c.calibrationModel.nonEmpty) &&
+      (c.calibrated.isEmpty || c.rawScore.nonEmpty)
+    }

@@ -133,69 +133,170 @@ object Probability:
   given Ordering[Probability] = Ordering.Double.TotalOrdering
 type Probability = Probability.Probability
 
-/** Strength of belief in a claim, keeping the uncalibrated score distinct from any calibrated
-  * probability.
-  *
-  * Invariant: a calibrated value is present only if the calibration model that produced it is
-  * named. This is a non-case class so `fromProduct` cannot mint a calibrated probability without
-  * that name (design-contract rule 3).
+/** Who produced a number or a licence in a [[Credence]]. Three identifier kinds, not one: a scorer
+  * emits a raw number, a rule determines a value from its inputs, and a calibration model maps a
+  * raw number to a probability. They are different roles, and a type per role keeps a reader from
+  * taking the name of a table lookup for the name of a fitted model.
   */
-final class Credence private (
-    val rawScore: Double,
-    val calibrated: Option[Probability],
-    val calibrationModel: Option[String]
-):
+object ScorerId extends OpaqueId("ScorerId")
+type ScorerId = ScorerId.T
+
+object RuleId extends OpaqueId("RuleId")
+type RuleId = RuleId.T
+
+object CalibrationModelId extends OpaqueId("CalibrationModelId")
+type CalibrationModelId = CalibrationModelId.T
+
+/** What was measured about a claim's strength, if anything.
+  *
+  * `Unmeasured` is a first-class state: a parser that reports no per-node confidence, a rule that
+  * reads no number, and a claim nobody has scored all stop here rather than at `1.0`. A raw number
+  * names the scorer that produced it, so an imputed table constant and a fitted model's output
+  * cannot share a representation (design contract 7).
+  */
+enum Score:
+  case Unmeasured
+  case Raw(value: Double, scorer: ScorerId)
+
+  def measured: Option[Double] = this match
+    case Unmeasured    => None
+    case Raw(value, _) => Some(value)
+
+  def render: String = this match
+    case Unmeasured         => "unmeasured"
+    case Raw(value, scorer) => s"raw:${scorer.value}=${Score.hexBits(value)}"
+
+object Score:
+  /** IEEE-754 bits as sixteen lowercase hex digits: the same text on JVM, Scala.js, and Native,
+    * where `Double.toString` is not.
+    */
+  def hexBits(value: Double): String =
+    val hex = java.lang.Long.toHexString(java.lang.Double.doubleToLongBits(value))
+    "0x" + ("0" * (16 - hex.length)) + hex
+
+  /** A finite raw score from a named scorer; negative zero folds onto zero so equal values have one
+    * identity on every platform.
+    */
+  def raw(value: Double, scorer: ScorerId): Either[DomainError, Score] =
+    if value.isNaN || value.isInfinite then
+      Left(DomainError.InvalidFormat("Score", value.toString, "non-finite raw score"))
+    else Right(Raw(if value == 0.0 then 0.0 else value, scorer))
+
+  given Order[Score] = Order.by {
+    case Unmeasured         => (0, 0.0, "")
+    case Raw(value, scorer) => (1, value, scorer.value)
+  }
+  given Ordering[Score] = Order[Score].toOrdering
+
+/** What entitles a reader to a probability for a claim. Three states that must never share a
+  * representation:
+  *
+  *   - `Uncalibrated`: a probability would be the right question and no model has answered it;
+  *   - `Calibrated`: a named fitted model mapped the claim's raw score to a probability;
+  *   - `Determined`: the claim's value is a total function of its evidence and upstream claims
+  *     under a named rule. It has no probability of its own; its certainty is exactly that of its
+  *     inputs. Recording it as a calibrated `1.0` put the certainty of a total function in the
+  *     field a reader takes for certainty about the world, which is design contract 7's
+  *     indistinguishability test failing.
+  */
+enum CredenceBasis:
+  case Uncalibrated
+  case Calibrated(probability: Probability, model: CalibrationModelId)
+  case Determined(rule: RuleId)
+
+  def calibratedProbability: Option[Probability] = this match
+    case Calibrated(p, _) => Some(p)
+    case _                => None
+
+  def calibrationModel: Option[CalibrationModelId] = this match
+    case Calibrated(_, m) => Some(m)
+    case _                => None
+
+  def determiningRule: Option[RuleId] = this match
+    case Determined(r) => Some(r)
+    case _             => None
+
+  def render: String = this match
+    case Uncalibrated         => "uncalibrated"
+    case Calibrated(p, model) => s"calibrated:${model.value}=${p.value}"
+    case Determined(rule)     => s"determined:${rule.value}"
+
+object CredenceBasis:
+  given Order[CredenceBasis] = Order.by {
+    case Uncalibrated         => (0, 0.0, "")
+    case Calibrated(p, model) => (1, p.value, model.value)
+    case Determined(rule)     => (2, 0.0, rule.value)
+  }
+  given Ordering[CredenceBasis] = Order[CredenceBasis].toOrdering
+
+/** Strength of belief in a claim, as two coordinates: the [[Score]] someone measured, and the
+  * [[CredenceBasis]] that entitles a reader to a probability.
+  *
+  * Invariant: a calibrated probability rests on a raw score, because a calibration model maps a
+  * number and there is nothing to map from `Unmeasured`. This is a non-case class so `fromProduct`
+  * cannot mint a calibrated probability without that score (design-contract rule 3).
+  */
+final class Credence private (val score: Score, val basis: CredenceBasis):
+  /** The raw number, when one was measured. Never a probability. */
+  def rawScore: Option[Double] = score.measured
+
+  /** The calibrated probability, when a named model produced one. */
+  def calibrated: Option[Probability] = basis.calibratedProbability
+
+  def calibrationModel: Option[CalibrationModelId] = basis.calibrationModel
+
+  def isDetermined: Boolean = basis.determiningRule.isDefined
+
   override def equals(other: Any): Boolean = other match
-    case that: Credence =>
-      rawScore == that.rawScore &&
-      calibrated == that.calibrated &&
-      calibrationModel == that.calibrationModel
-    case _ => false
+    case that: Credence => score == that.score && basis == that.basis
+    case _              => false
 
-  override def hashCode(): Int = (rawScore, calibrated, calibrationModel).hashCode()
+  override def hashCode(): Int = (score, basis).hashCode()
 
-  override def toString: String = (calibrated, calibrationModel) match
-    case (Some(p), Some(m)) => s"Credence(raw=$rawScore, p=${p.value}, model=$m)"
-    case _                  => s"Credence(raw=$rawScore)"
+  override def toString: String = s"Credence(${score.render}, ${basis.render})"
 
 object Credence:
-  def raw(score: Double): Either[DomainError, Credence] =
-    if score.isNaN || score.isInfinite then
-      Left(DomainError.InvalidFormat("Credence", score.toString, "non-finite raw score"))
-    else Right(new Credence(score, None, None))
+  /** Nothing measured, nothing fitted, nothing determined: the honest value for a claim whose
+    * producer reported no confidence and whose value follows from no rule.
+    */
+  val unmeasured: Credence = new Credence(Score.Unmeasured, CredenceBasis.Uncalibrated)
 
-  def calibrated(
-      score: Double,
-      probability: Probability,
-      model: String
-  ): Either[DomainError, Credence] =
-    if model.trim.isEmpty then
-      Left(DomainError.InvalidFormat("Credence", model, "empty calibration model"))
-    else raw(score).map(_ => new Credence(score, Some(probability), Some(model)))
-
-  def from(
-      score: Double,
-      calibrated: Option[Probability],
-      model: Option[String]
-  ): Either[DomainError, Credence] =
-    (calibrated, model) match
-      case (None, None)       => raw(score)
-      case (Some(p), Some(m)) => Credence.calibrated(score, p, m)
-      case (Some(_), None)    =>
-        Left(
-          DomainError.InvariantViolation(
-            "credence",
-            "calibrated probability without calibration model"
+  def of(score: Score, basis: CredenceBasis): Either[DomainError, Credence] =
+    val checked = score match
+      case Score.Raw(value, scorer) => Score.raw(value, scorer)
+      case Score.Unmeasured         => Right(Score.Unmeasured)
+    checked.flatMap { s =>
+      (s, basis) match
+        case (Score.Unmeasured, CredenceBasis.Calibrated(_, _)) =>
+          Left(
+            DomainError.InvariantViolation("credence", "calibrated probability without a raw score")
           )
-        )
-      case (None, Some(_)) =>
-        Left(DomainError.InvariantViolation("credence", "calibration model without probability"))
+        case _ => Right(new Credence(s, basis))
+    }
 
-  def unsafeRaw(score: Double): Credence =
-    raw(score).fold(e => throw new IllegalArgumentException(e.message), identity)
+  /** A raw score from a named scorer, with no probability. */
+  def raw(value: Double, scorer: ScorerId): Either[DomainError, Credence] =
+    Score.raw(value, scorer).map(new Credence(_, CredenceBasis.Uncalibrated))
 
-  given Show[Credence] = Show.show { c =>
-    (c.calibrated, c.calibrationModel) match
-      case (Some(p), Some(m)) => s"Credence(raw=${c.rawScore}, p=${p.value}, model=$m)"
-      case _                  => s"Credence(raw=${c.rawScore})"
-  }
+  /** A raw score mapped to a probability by a named calibration model. */
+  def calibrated(
+      value: Double,
+      scorer: ScorerId,
+      probability: Probability,
+      model: CalibrationModelId
+  ): Either[DomainError, Credence] =
+    Score.raw(value, scorer).map(new Credence(_, CredenceBasis.Calibrated(probability, model)))
+
+  /** A value determined by a named rule from its inputs, with or without a measured score. */
+  def determined(rule: RuleId, score: Score = Score.Unmeasured): Either[DomainError, Credence] =
+    of(score, CredenceBasis.Determined(rule))
+
+  def unsafeRaw(value: Double, scorer: ScorerId): Credence =
+    raw(value, scorer).fold(e => throw new IllegalArgumentException(e.message), identity)
+
+  def unsafeDetermined(rule: RuleId, score: Score = Score.Unmeasured): Credence =
+    determined(rule, score).fold(e => throw new IllegalArgumentException(e.message), identity)
+
+  given Show[Credence] = Show.show(_.toString)
+  given Order[Credence] = Order.by(c => (c.score, c.basis))
+  given Ordering[Credence] = Order[Credence].toOrdering

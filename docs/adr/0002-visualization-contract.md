@@ -131,8 +131,10 @@ coproduct where every module is visible. Concrete wire encoding is an explicit
 checkpoint (§9) until the codec round-trip is demonstrated.
 
 ### D9 Uncertainty is five typed states, never one "fog"
-`Estimate.Missing(reason)` · `Credence(raw, calibrated = None)` · calibrated
-`Probability` · `Resolved.alternatives` / `ResolutionState.Alternatives` ·
+`Estimate.Missing(reason)` · `Credence` with an uncalibrated or unmeasured
+score (ADR 0010: `score = Unmeasured | Raw(v, scorer)`, `basis = Uncalibrated |
+Determined(rule)`) · calibrated `Probability` (`basis = Calibrated(p, model)`) ·
+`Resolved.alternatives` / `ResolutionState.Alternatives` ·
 `ResolutionState.Unresolved`; plus align `Exclusion`. Each has its own mark
 (§5, V-U laws). Raw scores never share a visual scale with probabilities.
 `EpistemicStatus` has six values and each is distinguishable by a non-colour
@@ -648,8 +650,8 @@ established, so lane 0 would draw it in the narrated world.
 | D9 state | status | mark | non-colour channel |
 |---|---|---|---|
 | `Estimate.Missing(reason)` | **implemented** | `Gap`, `Abstention` | `OpenHatch` |
-| `Credence(raw, calibrated = None)` | **not implemented** | — | — |
-| calibrated `Probability` | **not implemented** | — | — |
+| `Credence` unmeasured or raw-scored, basis uncalibrated or rule-determined (ADR 0010) | **not implemented** | — | — |
+| calibrated `Probability` (`CredenceBasis.Calibrated`) | **not implemented** | — | — |
 | `Resolved.alternatives` / `ResolutionState.Alternatives` | **implemented** | `Gap` | `Fan` (V-U3) |
 | `ResolutionState.Unresolved` | **implemented** | `Gap` | `Placeholder` (V-U3) |
 | align `Exclusion` | **not implemented** | — | — |

@@ -348,12 +348,14 @@ object ChartProposalProvider:
   val ModelName: String = "chart-rules"
   val Version: String = "1"
 
-  /** Calibration model of every rule that is a total function of the chart: the value cannot
-    * disagree with what the chart says, so probability 1.0 is honest.
+  /** The rule every chart-reading proposal is determined by: its value is a total function of the
+    * chart, so it cannot disagree with what the chart says. That is certainty about the mapping,
+    * not about the world, and it is recorded as the claim's determining rule rather than as a
+    * calibrated probability of 1.0 (design contract 7; ADR 0010).
     */
-  val CalibrationModel: String = "chart-rule-v1"
+  val ChartRuleId: RuleId = RuleId.unsafe("chart-rule-v1")
 
-  /** Calibration model of the context rule, from [[ContextPlacement.CalibrationModel]].
+  /** The context rule, from [[ContextPlacement.Rule]].
     *
     * It replaced `narrated-world-default-v1`, whose name recorded that the narrated world was the
     * branch the rule fell back to when nothing else matched. It no longer is: root placement is the
@@ -361,10 +363,16 @@ object ChartProposalProvider:
     * *and* that its concept is held by no embedding of its chart, and a root that reading cannot be
     * taken for abstains under $AbstainContextRule instead.
     */
-  val ContextCalibrationModel: String = ContextPlacement.CalibrationModel
+  val ContextRuleId: RuleId = ContextPlacement.Rule
 
-  /** Calibration model of the title-summary rule, which reads no chart. */
-  val SummaryCalibrationModel: String = "title-rule-v1"
+  /** The title-summary rule, which reads no chart. */
+  val SummaryRuleId: RuleId = RuleId.unsafe("title-rule-v1")
+
+  /** Scorer of the one number the provider derives itself: the minimum of a chart's alignment
+    * scores over the spans a proposal rests on. Absent whenever any of those alignments carries no
+    * measured score, which is every alignment a parser that reports no marker confidence produced.
+    */
+  val MinAlignmentScorer: ScorerId = ScorerId.unsafe("chart-proposal/v1:min-alignment")
 
   /** Frame namespace of the `-91` reification set: the AMR adapter records every frame under its
     * `InteropTables.FrameNamespace`, which `ChartProposalCourtSuite` pins equal to this value
@@ -536,15 +544,19 @@ object ChartProposalProvider:
        |  span-source=sentence. Every alignment span of a chart must lie inside the chart's own
        |  sentence unit, whatever surface unit the span names; a chart violating this is refused,
        |  not repaired.
-       |raw score: the minimum alignment credence among the alignments that supply a proposal's
-       |  support; chart credence propagates only as this uncalibrated raw score and never as a
-       |  probability. A sentence-fallback support has no alignment credence and carries 1.0,
-       |  which span-source=sentence distinguishes from a measured 1.0.
-       |calibration: probability 1.0 under $CalibrationModel for every rule that is a total
-       |  function of the chart (situation, membership, coverage, participant, mention, temporal);
-       |  the context rule under $ContextCalibrationModel, which is a total function of the
-       |  chart's embedding relation and the canonical text's quotation spans; the summary rule
-       |  under $SummaryCalibrationModel.
+       |raw score: a proposal's score is the minimum measured alignment score among the alignments
+       |  that supply its support, under scorer ${MinAlignmentScorer.value}, and is absent when
+       |  there are no such alignments or any of them carries no measured score; a participant
+       |  proposal's score is instead the raw score the chart attached to the role normalization
+       |  (a role table's grade of its own mapping, under the table's scorer), absent when the
+       |  chart attached none. A sentence-fallback support carries no score. A raw score is never a
+       |  probability, and no score is ever imputed as 1.0.
+       |basis: every proposal is DETERMINED by its rule, never calibrated: the value is a total
+       |  function of the chart under ${ChartRuleId.value} (situation, membership, coverage,
+       |  participant, mention, temporal, circumstance), of the chart's embedding relation and the
+       |  canonical text's quotation spans under ${ContextRuleId.value}, and of the caller's title
+       |  under ${SummaryRuleId.value}. A determined basis carries no probability: certainty that a
+       |  total function fired is not certainty that the chart is true of the world.
        |receipts: every evidence id is the content address of its scope, chart checksum, and
        |  rendered span set; every call render names the evidence id it cites; the chart receipts
        |  bind the source by their input checksum (the canonical text or the sentence text); the
@@ -695,11 +707,11 @@ object ChartProposalProvider:
       root: ChartNodeRef,
       checksum: Checksum,
       spans: SpanSet,
-      raw: Double
+      raw: Option[RawScore]
   )
 
   /** Support spans, where they came from, and the minimum alignment credence behind them. */
-  private final case class Support(spans: SpanSet, source: String, raw: Double)
+  private final case class Support(spans: SpanSet, source: String, raw: Option[RawScore])
 
   /** An entity-kind filler of the root reached by exactly one licensed participant role, whose role
     * takes a referent and whose concept can denote one.
@@ -708,7 +720,8 @@ object ChartProposalProvider:
       concept: ConceptId,
       kind: ConceptKind,
       lemma: String,
-      role: ParticipantRole
+      role: ParticipantRole,
+      roleScore: Option[RawScore]
   )
 
   /** A filler whose role names a circumstance of the situation rather than a participant in it. */
@@ -784,7 +797,7 @@ object ChartProposalProvider:
     val fillerAlignments = chart.alignments.filter(_.target.conceptIds.contains(filler.concept))
     val fillerSpans = SpanSet.of(fillerAlignments.flatMap(_.spans.refs.toVector))
     val (spans, spanSource, raw) = fillerSpans match
-      case Some(own) => (own, "filler-alignments", minCredence(fillerAlignments))
+      case Some(own) => (own, "filler-alignments", minScore(fillerAlignments))
       case None      => (rootSupport.spans, "root-support", rootSupport.raw)
     val evidence = evidenceRecord(s"${root.key}~${fillerRef.key}", checksum, spans)
     val value = CircumstanceProposal(filler.kind, filler.lemma)
@@ -795,8 +808,8 @@ object ChartProposalProvider:
       checksum,
       value,
       evidence,
-      math.min(raw, rootSupport.raw),
-      CalibrationModel,
+      lesser(raw, rootSupport.raw),
+      ChartRuleId,
       Vector("circumstance", root.key, fillerRef.key, filler.kind.render, filler.lemma),
       params + ("filler" -> filler.concept.value) + ("role" -> renderRole(filler.role)) +
         ("circumstance" -> filler.kind.render) + ("span-source" -> spanSource)
@@ -1350,7 +1363,7 @@ object ChartProposalProvider:
           value,
           evidence,
           support.raw,
-          CalibrationModel,
+          ChartRuleId,
           Vector(
             "situation",
             kind.toString,
@@ -1372,7 +1385,7 @@ object ChartProposalProvider:
               placed,
               evidence,
               support.raw,
-              ContextCalibrationModel,
+              ContextRuleId,
               renderPlacement(placed) :+ root.key,
               params + ("placement" -> renderPlacement(placed).mkString("/"))
             )
@@ -1393,7 +1406,7 @@ object ChartProposalProvider:
           SegmentMembershipProposal.PrimaryStoryMember,
           evidence,
           support.raw,
-          CalibrationModel,
+          ChartRuleId,
           Vector("primary-story-member", root.key),
           params
         )
@@ -1439,7 +1452,7 @@ object ChartProposalProvider:
           coverageValue,
           evidence,
           support.raw,
-          CalibrationModel,
+          ChartRuleId,
           "participant-coverage" +: root.key +: coverageValue.fillers.map(_.key),
           params + ("fillers" -> scanned.counts.referents.toString) +
             ("circumstances" -> scanned.counts.circumstances.toString) +
@@ -1529,11 +1542,15 @@ object ChartProposalProvider:
           acc.copy(refused =
             acc.refused :+ RefusedFiller(id, concept.kind, lemma, sourceRoles, refusal)
           )
-        rows.map(_._3).flatMap(licensedRole).distinct match
+        val licensed = rows.map(_._3).flatMap(licensedRole)
+        licensed.map(_._1).distinct match
           case Vector(role) =>
+            val roleScore = licensed.collectFirst { case (r, Some(score)) if r == role => score }
             Referentiality.licence(role) match
               case RoleLicence.Referent if Referentiality.denotesReferent(concept.kind) =>
-                acc.copy(referents = acc.referents :+ LicensedFiller(id, concept.kind, lemma, role))
+                acc.copy(referents =
+                  acc.referents :+ LicensedFiller(id, concept.kind, lemma, role, roleScore)
+                )
               case RoleLicence.Referent =>
                 refuse(FillerRefusal.ConceptNotReferential(concept.kind))
               case RoleLicence.Circumstance(kind) =>
@@ -1546,13 +1563,25 @@ object ChartProposalProvider:
           case _        => refuse(FillerRefusal.SeveralLicensedRoles)
     }
 
-  /** The chart's own normalized role when present; a standard named role otherwise; nothing for a
-    * numbered argument without a lexicon licence, an operand, or an extension role.
+  /** The chart's own normalized role when present, with the raw score the chart attached to that
+    * normalization (a role table's grade of its own mapping, under the table's scorer); a standard
+    * named role otherwise, unscored; nothing for a numbered argument without a lexicon licence, an
+    * operand, or an extension role.
+    *
+    * Why the score now survives: before 2026-09-03 it was dropped here, the only place it could
+    * have been, and every participant claim then carried the alignment minimum instead.
     */
-  private def licensedRole(role: RoleAssignment): Option[ParticipantRole] =
-    role.normalizedRole.orElse(role.source match
-      case SourceRole.Named(name) => NamedRoles.get(name)
-      case _                      => None)
+  private def licensedRole(role: RoleAssignment): Option[(ParticipantRole, Option[RawScore])] =
+    role.normalized
+      .map((r, credence) =>
+        val score = credence.score match
+          case Score.Raw(value, scorer) => RawScore.from(value, scorer).toOption
+          case Score.Unmeasured         => None
+        (r, score)
+      )
+      .orElse(role.source match
+        case SourceRole.Named(name) => NamedRoles.get(name).map(r => (r, None))
+        case _                      => None)
 
   private def fillerOutcome(
       source: StorySource,
@@ -1569,7 +1598,7 @@ object ChartProposalProvider:
     val fillerAlignments = chart.alignments.filter(_.target.conceptIds.contains(filler.concept))
     val fillerSpans = SpanSet.of(fillerAlignments.flatMap(_.spans.refs.toVector))
     val (mentionSpans, mentionSource, mentionRaw) = fillerSpans match
-      case Some(spans) => (spans, "filler-alignments", minCredence(fillerAlignments))
+      case Some(spans) => (spans, "filler-alignments", minScore(fillerAlignments))
       case None        => (rootSupport.spans, "root-support", rootSupport.raw)
     val mentionEvidence = evidenceRecord(fillerRef.key, checksum, mentionSpans)
     val participantEvidence = evidenceRecord(
@@ -1577,7 +1606,10 @@ object ChartProposalProvider:
       checksum,
       fillerSpans.fold(rootSupport.spans)(_ ++ rootSupport.spans)
     )
-    val participantRaw = math.min(mentionRaw, rootSupport.raw)
+    // The participant's own number is the role table's grade of its mapping, when the chart
+    // carried one; the mention's number is the alignment minimum. They come from different scorers
+    // and are not combined.
+    val participantRaw = filler.roleScore
     val mentionValue = EntityMentionProposal(
       filler.lemma,
       EntityType.Custom("chart", foldCase(filler.kind.toString))
@@ -1592,7 +1624,7 @@ object ChartProposalProvider:
         mentionValue,
         mentionEvidence,
         mentionRaw,
-        CalibrationModel,
+        ChartRuleId,
         Vector(
           "entity-mention",
           fillerRef.key,
@@ -1610,7 +1642,7 @@ object ChartProposalProvider:
       filler.role,
       participantEvidence,
       participantRaw,
-      CalibrationModel,
+      ChartRuleId,
       Vector("participant", root.key, fillerRef.key, renderRole(filler.role)),
       fillerParams + ("role" -> renderRole(filler.role))
     )
@@ -1643,8 +1675,8 @@ object ChartProposalProvider:
       checksum,
       TemporalRelation.Unclear,
       evidence,
-      math.min(prev.raw, next.raw),
-      CalibrationModel,
+      lesser(prev.raw, next.raw),
+      ChartRuleId,
       Vector("temporal", prev.root.key, next.root.key, TemporalRelation.Unclear.toString),
       params
     )
@@ -1760,8 +1792,8 @@ object ChartProposalProvider:
             scopeChecksum,
             StorySummaryProposal(title.value),
             evidence,
-            1.0,
-            SummaryCalibrationModel,
+            None,
+            SummaryRuleId,
             Vector("summary", title.value, title.provenance.render),
             params
           )
@@ -1813,8 +1845,8 @@ object ChartProposalProvider:
     val supporting =
       chart.alignments.filter(_.target.conceptIds.exists(id => !chart.isEmbedded(id)))
     SpanSet.of(supporting.flatMap(_.spans.refs.toVector)) match
-      case Some(set) => Support(set, "chart-alignments", minCredence(supporting))
-      case None      => Support(SpanSet.one(SpanRef(Some(unit.id), unit.span)), "sentence", 1.0)
+      case Some(set) => Support(set, "chart-alignments", minScore(supporting))
+      case None      => Support(SpanSet.one(SpanRef(Some(unit.id), unit.span)), "sentence", None)
 
   /** [[supportSpans]] restricted to one coordination branch: the alignments naming a non-embedded
     * concept the branch reaches. Two branches of one sentence are then evidenced by different
@@ -1831,8 +1863,8 @@ object ChartProposalProvider:
       _.target.conceptIds.exists(id => within(id) && !chart.isEmbedded(id))
     )
     SpanSet.of(supporting.flatMap(_.spans.refs.toVector)) match
-      case Some(set) => Support(set, "branch-alignments", minCredence(supporting))
-      case None      => Support(SpanSet.one(SpanRef(Some(unit.id), unit.span)), "sentence", 1.0)
+      case Some(set) => Support(set, "branch-alignments", minScore(supporting))
+      case None      => Support(SpanSet.one(SpanRef(Some(unit.id), unit.span)), "sentence", None)
 
   /** Every concept `from` reaches, never through `stop`. Reentrancy is a shared node, so a concept
     * two branches both reach is in both; the traversal keeps a visited set, so a cycle terminates.
@@ -1855,11 +1887,23 @@ object ChartProposalProvider:
         walk(next.toList ++ rest, seen ++ next)
     if from == stop then Set.empty else walk(List(from), Set(from))
 
-  /** Minimum raw credence of the given alignments; 1.0 for none, which callers only reach with a
-    * fallback support whose span-source says so.
+  /** The minimum measured alignment score over `alignments`, under [[MinAlignmentScorer]]; nothing
+    * when there are no alignments or any of them carries no measured score. A minimum over a set
+    * with an unmeasured member would be a number about a subset presented as a number about the
+    * whole (design contract 7).
     */
-  private def minCredence(alignments: Vector[PropositionAlignment]): Double =
-    alignments.map(_.credence.rawScore).minOption.getOrElse(1.0)
+  private def minScore(alignments: Vector[PropositionAlignment]): Option[RawScore] =
+    val scores = alignments.map(_.credence.rawScore)
+    if scores.isEmpty || scores.exists(_.isEmpty) then None
+    else RawScore.from(scores.flatten.min, MinAlignmentScorer).toOption
+
+  /** The lesser of two optional scores, or nothing when either is unmeasured; the two are only ever
+    * from the same scorer here.
+    */
+  private def lesser(a: Option[RawScore], b: Option[RawScore]): Option[RawScore] =
+    (a, b) match
+      case (Some(x), Some(y)) => Some(if y.value < x.value then y else x)
+      case _                  => None
 
   /** Content-addressed evidence over its scope, chart checksum, and rendered span set. */
   private def evidenceRecord(scope: String, checksum: Checksum, spans: SpanSet): Evidence =
@@ -1880,6 +1924,13 @@ object ChartProposalProvider:
   private def canonicalScore(score: Double): String =
     CanonicalDouble.render(if score == 0.0 then 0.0 else score)
 
+  /** Both credence coordinates, platform-stably: the score's bits and scorer, and the basis. */
+  private def renderCredence(credence: Credence): String =
+    val score = credence.score match
+      case Score.Unmeasured         => "unmeasured"
+      case Score.Raw(value, scorer) => s"${canonicalScore(value)}/${scorer.value}"
+    s"$score/${credence.basis.render}"
+
   private def renderSpans(spans: SpanSet): String =
     spans.refs.toVector
       .map(r => s"${r.unit.fold("-")(_.value)}:${r.span.start}:${r.span.endExclusive}")
@@ -1889,7 +1940,7 @@ object ChartProposalProvider:
     chart.alignments
       .map(a =>
         s"${a.target.conceptIds.toVector.sorted.map(_.value).mkString("+")}=" +
-          s"${renderSpans(a.spans)}@${canonicalScore(a.credence.rawScore)}"
+          s"${renderSpans(a.spans)}@${renderCredence(a.credence)}"
       )
       .sorted
       .mkString(";")
@@ -1949,8 +2000,8 @@ object ChartProposalProvider:
       checksum: Checksum,
       value: A,
       evidence: Evidence,
-      rawScore: Double,
-      calibrationModel: String,
+      rawScore: Option[RawScore],
+      determinedBy: RuleId,
       render: Vector[String],
       params: Map[String, String]
   ): (EvidenceBundle[A], ProviderCall) =
@@ -1960,7 +2011,7 @@ object ChartProposalProvider:
       task,
       value,
       NonEmptyVector.one(EvidenceRef.Inline(evidence)),
-      Some(RawScore.unsafe(rawScore)),
+      rawScore,
       Vector.empty,
       AgentCallReceipt(call, Prompt, task)
     )
@@ -1971,7 +2022,7 @@ object ChartProposalProvider:
         StructuralValidity.Valid,
         SourceSupport(1.0, evidence.spans),
         agreementScore = 1.0,
-        Vector(CandidateCalibration(value, Probability.One, calibrationModel))
+        Vector(CandidateBasis(value, AcceptanceBasis.Determined(determinedBy)))
       ),
       call
     )

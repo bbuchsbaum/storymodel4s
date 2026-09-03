@@ -37,6 +37,15 @@ object DiscourseTrajectory:
   val empty: DiscourseTrajectory = DiscourseTrajectory(Vector.empty)
 
   val DeriveFingerprint: Fingerprint = Fingerprint.unsafe("storymodel4s:trajectory:derive:0.1")
+
+  /** The rule every flow step is determined by: discourse order over the graph's situations and
+    *
+    * the temporal edges scoped to their common context. A step has no probability of its own;
+    *
+    * whether a temporal edge licensed its transition is stated by `transition`, not by a score.
+    */
+
+  val DeriveRule: RuleId = RuleId.unsafe("trajectory-derive/v1")
   val DeriveStage: StageId = StageId.unsafe("trajectory-derive")
 
   /** Deterministically derive graph-available views: entity turnover (1 − Jaccard of expanded
@@ -88,7 +97,7 @@ object DiscourseTrajectory:
       val meta = ClaimMeta.unsafe(
         claimId,
         EpistemicStatus.StructurallyDerived,
-        Credence.unsafeRaw(if forward.orElse(backward).isDefined then 1.0 else 0.0),
+        Credence.unsafeDetermined(DeriveRule),
         NonEmptyVector.one(evidence),
         provenance
       )

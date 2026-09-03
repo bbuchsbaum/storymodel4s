@@ -220,7 +220,7 @@ class CodexCompilerSuite extends FunSuite:
         .of(
           ClaimId.unsafe(id),
           status,
-          Credence.unsafeRaw(1.0),
+          Credence.unsafeRaw(1.0, ScorerId.unsafe("test-scorer")),
           NonEmptyVector.one(item),
           provenance
         )

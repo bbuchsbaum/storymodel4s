@@ -2,6 +2,7 @@ package storymodel4s.document
 
 import cats.data.{NonEmptySet, NonEmptyVector}
 import storymodel4s.acquire.*
+import storymodel4s.features.CanonicalDouble
 import storymodel4s.core.*
 import storymodel4s.core.NarrativeKind.{EntityK, SituationK}
 import storymodel4s.proposition.{
@@ -931,13 +932,10 @@ object NarrativeCompilerInput:
     unitInterval(bundle.agreementScore, "agreement score")
     if bundle.structural.valid && bundle.structural.violations.nonEmpty then
       invalid(path, "structurally valid bundle must not carry violations")
-    val duplicateCalibration = bundle.calibrations
+    val duplicateBasis = bundle.bases
       .groupBy(_.value)
       .collectFirst { case (_, values) if values.size > 1 => values.head }
-    duplicateCalibration.foreach(_ => invalid(path, "candidate has more than one calibration"))
-    bundle.calibrations.foreach { calibration =>
-      if calibration.model.trim.isEmpty then invalid(path, "calibration model must be nonblank")
-    }
+    duplicateBasis.foreach(_ => invalid(path, "candidate has more than one acceptance basis"))
 
     val refs = bundle.proposals.flatMap(_.evidence) ++ bundle.findings.flatMap(_.evidence)
     refs.foreach {
@@ -965,7 +963,7 @@ object NarrativeCompilerInput:
     }
 
   private def candidateValues[A](bundle: EvidenceBundle[A]): Vector[A] =
-    (bundle.proposals.flatMap(_.value) ++ bundle.calibrations.map(_.value)).distinct
+    (bundle.proposals.flatMap(_.value) ++ bundle.bases.map(_.value)).distinct
 
   private def validateSituation(
       value: SituationProposal,
@@ -2276,18 +2274,25 @@ object NarrativeCompiler:
   ): Either[DerivationGapReason, Material[A]] =
     val value = accepted.value
     val proposals = bundle.proposals.filter(_.value.contains(value))
-    val raw = proposals.flatMap(_.rawScore).maxOption.map(_.value)
-    val calibration = bundle.calibrationFor(value)
+    // The score coordinate: the best raw score any proposal of this value reported, under its own
+    // scorer; unmeasured when none reported one. A calibrated basis needs a number to have been
+    // calibrated from, and a determined basis needs none (ADR 0010).
+    val score: Score = proposals
+      .flatMap(_.rawScore)
+      .maxByOption(_.value)
+      .fold(Score.Unmeasured)(raw => Score.Raw(raw.value, raw.scorer))
+    val basis = accepted.basis
     val evidence = accepted.evidence.toVector.flatMap(resolveEvidence(input, _))
     val support = NonEmptyVector
       .fromVector(evidence.flatMap(_.spans) ++ bundle.sourceSupport.spans.toVector)
       .map(unionSupports)
-    (raw, calibration, NonEmptyVector.fromVector(evidence), support) match
-      case (None, _, _, _) => Left(DerivationGapReason.MissingRawScore)
-      case (_, _, None, _) => Left(DerivationGapReason.MissingSpanEvidence)
-      case (_, _, _, None) => Left(DerivationGapReason.MissingSpanEvidence)
-      case (Some(score), Some(cal), Some(evs), Some(spans)) =>
-        Credence.calibrated(score, cal.probability, cal.model) match
+    (score, basis, NonEmptyVector.fromVector(evidence), support) match
+      case (Score.Unmeasured, AcceptanceBasis.Calibrated(_, _), _, _) =>
+        Left(DerivationGapReason.MissingRawScore)
+      case (_, _, None, _)                => Left(DerivationGapReason.MissingSpanEvidence)
+      case (_, _, _, None)                => Left(DerivationGapReason.MissingSpanEvidence)
+      case (_, _, Some(evs), Some(spans)) =>
+        Credence.of(score, basis.credenceBasis) match
           case Left(e)         => Left(DerivationGapReason.InvalidAccepted(e))
           case Right(credence) =>
             val claimId = ClaimId.unsafe(
@@ -2300,22 +2305,39 @@ object NarrativeCompiler:
                 ContentAddress.digest(evs.toVector.map(_.id.value).sorted).hex
               )
             )
-            val calls = proposals.map(_.receipt.call)
-            val provenance = input.provenance.copy(
-              calls = (input.provenance.calls ++ calls).distinct.sortBy(renderProviderCall)
-            )
-            ClaimMeta.of(claimId, status(value), credence, evs, provenance) match
+            ClaimMeta.of(
+              claimId,
+              status(value),
+              credence,
+              evs,
+              claimProvenance(input, proposals, evs)
+            ) match
               case Left(e)     => Left(DerivationGapReason.InvalidAccepted(e))
               case Right(meta) => Right(Material(value, meta, spans))
-      case (_, None, _, _) =>
-        Left(
-          DerivationGapReason.InvalidAccepted(
-            DomainError.InvariantViolation(
-              s"compiler/materialize/${target.render}",
-              "accepted candidate has no calibration"
-            )
-          )
-        )
+
+  /** The calls that produced one claim, and no others: the calls of the proposals that proposed the
+    * accepted value, and the parse call of every sentence the claim's evidence lies in. The run's
+    * whole call log stays on the compilation and in the receipts file; a claim that carried it
+    * (every claim did, before 2026-09-03) identified nothing and cost 196,300 call records for 604
+    * distinct calls.
+    */
+  private def claimProvenance[A](
+      input: NarrativeCompilerInput,
+      proposals: Vector[AgentProposal[A]],
+      evidence: NonEmptyVector[Evidence]
+  ): Provenance =
+    // Alignment spans name token units; the sentence a span lies in is found by offset, so a
+    // span naming a token, a sentence, or nothing at all resolves the same way.
+    val sentences = evidence.toVector
+      .flatMap(_.spans.toVector.flatMap(_.refs.toVector))
+      .flatMap(ref => input.atlas.unitAt(ref.span.start, SurfaceUnitKind.Sentence))
+      .map(_.id)
+      .distinct
+    val parseCalls = input.localCharts.collect {
+      case (unit, chart) if sentences.contains(unit) => chart.provenance.receipts
+    }.flatten
+    val own = proposals.map(_.receipt.call)
+    input.provenance.copy(calls = (own ++ parseCalls).distinct.sortBy(renderProviderCall))
 
   private def resolveEvidence(
       input: NarrativeCompilerInput,
@@ -2339,15 +2361,18 @@ object NarrativeCompiler:
       Fingerprint,
       Stage
     )
+    // A derived claim is a total function of the claims it cites: its basis is the deriving rule,
+    // it measures nothing, and its provenance is the compiler's own, with no provider call. The
+    // upstream claims carry the calls.
     Credence
-      .raw(1.0)
+      .determined(RuleId.unsafe(s"compiler-derived:$kind/v1"))
       .flatMap(credence =>
         ClaimMeta.of(
           id,
           EpistemicStatus.StructurallyDerived,
           credence,
           NonEmptyVector.one(evidence),
-          input.provenance
+          Provenance.deterministic(input.provenance.softwareVersion, input.provenance.configHash)
         )
       )
 
@@ -2381,8 +2406,7 @@ object NarrativeCompiler:
       proposals = bundle.proposals.sortBy(renderProposal(_, render)),
       findings = bundle.findings.sortBy(renderFinding),
       structural = bundle.structural.copy(violations = bundle.structural.violations.sorted),
-      calibrations =
-        bundle.calibrations.sortBy(c => (render(c.value), c.model, c.probability.value))
+      bases = bundle.bases.sortBy(c => (render(c.value), c.basis.render))
     )
 
   private def renderBundle[A](bundle: EvidenceBundle[A], render: A => String): Vector[String] =
@@ -2405,12 +2429,7 @@ object NarrativeCompiler:
         ),
         renderFields("agreement/v1", Vector(bundle.agreementScore.toString))
       ) ++
-      bundle.calibrations.map(c =>
-        renderFields(
-          "calibration/v1",
-          Vector(render(c.value), c.probability.value.toString, c.model)
-        )
-      )
+      bundle.bases.map(c => renderFields("basis/v1", Vector(render(c.value), c.basis.render)))
 
   private def renderProposal[A](proposal: AgentProposal[A], render: A => String): String =
     val evidence = renderFields("evidence-list/v1", proposal.evidence.map(renderEvidenceRef).sorted)
@@ -2503,13 +2522,15 @@ object NarrativeCompiler:
 
   private def renderClaimMeta(meta: ClaimMeta): String =
     renderFields(
-      "claim-meta/v2",
+      "claim-meta/v3",
       Vector(
         meta.id.value,
         meta.status.toString,
-        meta.credence.rawScore.toString,
-        renderOption(meta.credence.calibrated)(_.value.toString),
-        renderOption(meta.credence.calibrationModel)(value => value),
+        meta.credence.score match
+          case Score.Unmeasured         => "unmeasured"
+          case Score.Raw(value, scorer) => s"raw:${CanonicalDouble.render(value)}:${scorer.value}"
+        ,
+        meta.credence.basis.render,
         renderFields("claim-evidence/v1", meta.evidence.toVector.map(renderEvidence)),
         renderProvenance(meta.provenance)
       )
@@ -2517,7 +2538,7 @@ object NarrativeCompiler:
 
   private def renderProvenance(provenance: Provenance): String =
     renderFields(
-      "provenance/v1",
+      "provenance/v2",
       Vector(
         provenance.softwareVersion,
         provenance.configHash.hex,
@@ -2570,7 +2591,8 @@ object NarrativeCompiler:
       .toVector
       .sortBy((value, _) => render(value))
       .flatMap { (value, scores) =>
-        Credence.raw(scores.map(_._2.value).max).toOption.map(value -> _)
+        val best = scores.map(_._2).maxBy(_.value)
+        Credence.raw(best.value, best.scorer).toOption.map(value -> _)
       }
 
   private def situationMentionId(

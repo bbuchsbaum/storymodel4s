@@ -132,7 +132,11 @@ class InteropSuite extends ScalaCheckSuite:
     val roles = ch.relations.map(r => r.role.source.render -> r.role.normalized).toMap
     assertEquals(roles("ARG0").map(_._1), Some(p.ParticipantRole.Agent))
     assertEquals(roles("ARG1").map(_._1), Some(p.ParticipantRole.Patient))
-    assertEquals(roles("ARG0").map(_._2.rawScore), Some(InteropTables.LexiconRawScore))
+    assertEquals(roles("ARG0").flatMap(_._2.rawScore), Some(InteropTables.LexiconRawScore))
+    assertEquals(
+      roles("ARG0").map(_._2.score),
+      Some(Score.Raw(InteropTables.LexiconRawScore, InteropTables.LexiconScorer))
+    )
     assert(
       roles("ARG0").exists(_._2.calibrated.isEmpty),
       "lexicon credence is raw, never calibrated"
@@ -145,7 +149,14 @@ class InteropSuite extends ScalaCheckSuite:
     val roles = ch.relations.map(r => r.role.source.render -> r.role.normalized).toMap
     assertEquals(roles("location").map(_._1), Some(p.ParticipantRole.Location))
     assertEquals(roles("time").map(_._1), Some(p.ParticipantRole.Time))
-    assertEquals(roles("location").map(_._2.rawScore), Some(InteropTables.StandardRoleRawScore))
+    assertEquals(
+      roles("location").flatMap(_._2.rawScore),
+      Some(InteropTables.StandardRoleRawScore)
+    )
+    assertEquals(
+      roles("location").map(_._2.score),
+      Some(Score.Raw(InteropTables.StandardRoleRawScore, InteropTables.StandardRoleScorer))
+    )
     assertEquals(roles("mod"), None)
   }
 
@@ -223,7 +234,7 @@ class InteropSuite extends ScalaCheckSuite:
     val meta = ClaimMeta.unsafe(
       ClaimId.unsafe("c1"),
       EpistemicStatus.SurfaceExplicit,
-      Credence.unsafeRaw(1.0),
+      Credence.unsafeRaw(1.0, ScorerId.unsafe("test-scorer")),
       NonEmptyVector.one(
         Evidence(
           EvidenceId.unsafe("e1"),
@@ -235,7 +246,7 @@ class InteropSuite extends ScalaCheckSuite:
       ),
       Provenance.human("test", "0")
     )
-    val cred = Credence.unsafeRaw(0.8)
+    val cred = Credence.unsafeRaw(0.8, ScorerId.unsafe("test-scorer"))
     val seeEdge = g.edges.find(e => e.role.base.render == "ARG1").get
     val polEdge = g.edges.find(e => e.role.base == Role.polarity).get
     val alignment = AmrAlignment(

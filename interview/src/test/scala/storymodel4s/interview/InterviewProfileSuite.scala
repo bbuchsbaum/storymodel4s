@@ -28,7 +28,7 @@ class InterviewProfileSuite extends FunSuite:
     ClaimMeta.unsafe(
       ClaimId.unsafe(s"c:${d.id.value}"),
       EpistemicStatus.Hypothesized,
-      Credence.unsafeRaw(0.5),
+      Credence.unsafeRaw(0.5, ScorerId.unsafe("test-scorer")),
       NonEmptyVector.one(
         Evidence(
           EvidenceId.unsafe(s"e:${d.id.value}"),

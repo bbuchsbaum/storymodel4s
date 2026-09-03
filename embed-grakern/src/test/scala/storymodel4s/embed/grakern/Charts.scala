@@ -1,6 +1,7 @@
 package storymodel4s.embed.grakern
 
 import storymodel4s.core.Credence
+import storymodel4s.core.ScorerId
 import storymodel4s.proposition.*
 import storymodel4s.proposition.CheckState.Checked
 
@@ -89,4 +90,4 @@ object Charts:
       )
     )
 
-  val rawCredence: Credence = Credence.unsafeRaw(0.5)
+  val rawCredence: Credence = Credence.unsafeRaw(0.5, ScorerId.unsafe("test-scorer"))
