@@ -29,21 +29,25 @@ object VoyageCodecs:
   /** Encode a document in the canonical form the pipeline writes. */
   def encode(document: RecallVoyageDocument): String = Canonical.encode(document)
 
-  /** Decode a pipeline-written document, refusing a text that is not the canonical rendering of
-    * what it decodes to: an unknown key, a non-canonical number, or a reordered object would
-    * otherwise be accepted silently, and the checksum of the text as read would name a document the
-    * decoder never saw. The same guard the surface-atlas and derivation artifacts apply.
+  /** Decode a pipeline-written document, refusing a text whose parsed JSON, canonically printed, is
+    * not the canonical rendering of what it decodes to: an unknown key or a non-canonical value
+    * would otherwise be accepted silently, and a checksum of the text would name a document the
+    * decoder never saw. The comparison is made after parsing, so string escapes and key order are
+    * normalised (a page that embeds the document with `<` escaped is the same document), while an
+    * extra field or a plain-number value is not. The same guard the surface-atlas and derivation
+    * artifacts apply.
     */
   def decode(text: String): Either[CodecError, RecallVoyageDocument] =
     for
-      document <- Canonical.decode[RecallVoyageDocument](text)
+      json <- Canonical.parse(text)
+      document <- Canonical.decodeJson[RecallVoyageDocument](json)
       _ <- Either.cond(
-        encode(document) == text,
+        Canonical.print(json) == encode(document),
         (),
         CodecError.Decode(
           "$",
           "the text is not the canonical rendering of the document it decodes to " +
-            "(unknown field, non-canonical value, or reordered key)"
+            "(an unknown field or a non-canonical value)"
         )
       )
     yield document

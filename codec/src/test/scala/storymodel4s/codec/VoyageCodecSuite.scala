@@ -128,4 +128,10 @@ class VoyageCodecSuite extends FunSuite:
     val reordered = text
       .replaceFirst("\"schema\":\"storymodel4s.view.recall-voyage\",", "")
       .replaceFirst("\\}$", ",\"schema\":\"storymodel4s.view.recall-voyage\"}")
-    assert(VoyageCodecs.decode(reordered).isLeft, "a reordered key is not the canonical text")
+    assert(VoyageCodecs.decode(reordered).isRight, "key order is not content")
+    val escaped = text.replace("<", "\\u003c").replace("o", "\\u006f")
+    assert(VoyageCodecs.decode(escaped).isRight, "string escapes are not content")
+    val plainNumber =
+      text.replaceFirst("\"recallLength\":\"0x[0-9a-f]{16}\"", "\"recallLength\":30")
+    assert(plainNumber != text)
+    assert(VoyageCodecs.decode(plainNumber).isLeft, "a plain number is not the canonical form")
