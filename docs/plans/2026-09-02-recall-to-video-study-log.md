@@ -624,3 +624,72 @@ column selected on nothing at all, and they are underpowered.
 within-scene precision, and the 1000-segment localisation the report actually emits is unscored. An
 adjudication track remains the only route to that, and is now a much smaller and better-targeted ask
 than 300 units chosen blind — it would only need to resolve units the scene gold already places.
+
+## The largest result in the study: recall walks forwards and the aligner did not
+
+With gold in hand the 64% of wrong units could finally be decomposed, and the decomposition pointed
+at one thing.
+
+**Error structure.** Of the 1,365 wrong units, only 27% are within two scenes; **38.8% are more than
+ten scenes away**. The failures are not fuzziness, they are gross displacement.
+
+**The signal that had been sitting unused.** In the released scene coding, consecutive recall units
+are non-decreasing in scene **97.9%** of the time on development participants and 98.4% on the
+untouched. The pipeline's own output was non-decreasing **69.5%** of the time. Free recall of a
+narrative walks forwards through it; this aligner wandered, and the gap was pure loss.
+
+This is the claim the study previously could not make. Sequentiality had been off limits because
+Kendall tau cannot judge a sequential prior without circularity. Gold breaks that: 97.9% is measured
+against human labels, not against the model's own notion of order.
+
+**Other decompositions, recorded because they bound what else is worth doing.**
+
+- Confidence is informative: accuracy runs 21.4% / 29.6% / 35.8% / 57.2% across quartiles of MAP
+  anchor mass. The model knows when it is guessing, which makes selective prediction viable.
+- Unit length matters at the bottom only: the shortest quartile, median six words, scores 27.4%
+  against roughly 39% for every other quartile.
+- No scene is never predicted; over- and under-prediction are mild.
+
+## `MonotoneScene`: decode the whole recall at once, forwards only
+
+Each unit is scored for every scene by summing the posterior mass of its candidates in that scene. A
+dynamic program picks the non-decreasing scene sequence maximising total mass, and each unit's anchor
+becomes the heaviest candidate inside its assigned scene. Nothing is re-inferred and no evidence is
+invented; this only changes which of the model's own candidates is believed, using ordering evidence
+the per-unit argmax discards.
+
+**A first attempt that was the wrong tool**, recorded because it nearly buried the result: isotonic
+regression on the predicted scene indices *averages* pooled violators, treating "scene 12" as a
+continuous quantity. It produced 7.3% accuracy, a 30-point collapse, and it was the estimator's fault
+rather than the hypothesis's. Scene identity is categorical; the right form is a decode over discrete
+candidates, not a projection.
+
+| Set | Participants | scene-exact, shipped → monotone | Paired change | Improved |
+|---|---|---|---|---|
+| Development | 10 | 37.9% → 57.9% | +18.33 points, CI [+15.24, +21.26] | **10 of 10** |
+| Untouched | 5 | 31.7% → 50.7% | +16.35 points, CI [+3.83, +23.81] | 4 of 5 |
+| **Pooled** | **15** | **36.0% → 55.8%** | **+17.67 points, CI [+13.12, +21.24]** | **14 of 15** |
+
+Within one scene: 45.8% → 71.6% pooled, +24.01 points, **15 of 15**. Median error distance 2 → 0.
+
+Designed and validated on development, then confirmed once on the untouched five, which had no part
+in its design. It is on by default; `STORYMODEL4S_MONOTONE_SCENE=off` recovers the per-unit argmax.
+
+**The escape hatch, stated because it is load-bearing.** The assigned scene sequence is non-decreasing
+by construction, but a unit may have no candidate inside its assigned scene, which happens when
+monotonicity forbids the only place that unit put mass. Such a unit keeps the model's unconstrained
+anchor, so emitted scenes are non-decreasing 84.7% of the time rather than 100%, against 69.4% before.
+The alternative, emitting no anchor, would be worse than it looks: an unanchored unit drops out of
+scoring entirely, so the arm would raise its own score by discarding the units it finds hardest.
+
+**Where the remaining headroom is.** Gold says 97.9% monotone; the decode achieves 84.7%. The 15.3%
+gap is entirely the escape hatch, and it fires because the candidate shortlist is too narrow to offer
+the assigned scene. Widening nomination *specifically to satisfy the constraint* — rather than
+globally, which was measured to hurt — is the obvious next lever.
+
+## Comparisons scored against gold so far, per pre-registration rule 3
+
+Four. One pre-specified (shipped against baseline), two on development for the monotone decode
+(design and in-pipeline validation), one confirmation on the untouched five. A reader discounting for
+multiplicity should know that the untouched five have now been read twice: once for the lexical blend
+on a gold-free outcome, once here.

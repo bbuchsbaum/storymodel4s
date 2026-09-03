@@ -504,46 +504,53 @@ object RecallToVideo:
       "sourceSegmentText"
     ).mkString("\t")
 
-    val lines = recall.ordered.zip(result.posterior.rows).map { case (unit, row) =>
-      val anchor = row.mapSource
-      val media = anchor.flatMap(built.media.get)
-      val timing = timings.getOrElse(unit.id, RecallTiming.UnitTiming(None, None))
-      val confidence = AnchorConfidence.of(row, built.view.nodes.size)
-      val groupLabel = anchor
-        .flatMap { ref =>
-          built.groupByRef
-            .get(ref)
-            .map(_.label)
-            .orElse(built.segmentByRef.get(ref).flatMap(_.group).map(_.label))
-        }
-        .getOrElse("")
-      val description = anchor
-        .flatMap(built.segmentByRef.get)
-        .map(s => clean(s.text))
-        .getOrElse("")
-      Vector(
-        unit.ordinal.toString,
-        unit.function.toString,
-        clean(unit.text),
-        timing.onsetSeconds.map(_.toString).getOrElse(""),
-        timing.lastWordOnsetSeconds.map(_.toString).getOrElse(""),
-        anchor.map(_.key).getOrElse(row.argmax.map(_.key).getOrElse("none")),
-        row.mapMode.map(_.toString).getOrElse(""),
-        f"${row.sourceMass}%.4f",
-        f"${row.externalMass}%.4f",
-        confidence.mapAnchorMass.map(m => f"$m%.4f").getOrElse(""),
-        confidence.runnerUpAnchor.map(_.key).getOrElse(""),
-        confidence.runnerUpMass.map(m => f"$m%.4f").getOrElse(""),
-        confidence.localizability.map(l => f"$l%.4f").getOrElse(""),
-        media.map(_.part).getOrElse(""),
-        media.flatMap(l => seconds(l.part, l.startTick)).map(s => f"$s%.1f").getOrElse(""),
-        media.flatMap(l => seconds(l.part, l.endTick)).map(s => f"$s%.1f").getOrElse(""),
-        media.flatMap(l => timecode(l.part, l.startTick)).getOrElse(""),
-        media.flatMap(l => timecode(l.part, l.endTick)).getOrElse(""),
-        clean(groupLabel),
-        description
-      ).mkString("\t")
-    }
+    // Scene-monotone decoding, when asked for: the per-unit argmax discards the fact that recall
+    // walks forwards through the story, which the released scene coding puts at 97.9%.
+    val monotoneAnchors =
+      if MonotoneScene.enabled then MonotoneScene.anchors(built, result.posterior.rows)
+      else Vector.empty
+    val lines =
+      recall.ordered.zip(result.posterior.rows).zipWithIndex.map { case ((unit, row), unitIndex) =>
+        val anchor =
+          if monotoneAnchors.isEmpty then row.mapSource else monotoneAnchors(unitIndex)
+        val media = anchor.flatMap(built.media.get)
+        val timing = timings.getOrElse(unit.id, RecallTiming.UnitTiming(None, None))
+        val confidence = AnchorConfidence.of(row, built.view.nodes.size)
+        val groupLabel = anchor
+          .flatMap { ref =>
+            built.groupByRef
+              .get(ref)
+              .map(_.label)
+              .orElse(built.segmentByRef.get(ref).flatMap(_.group).map(_.label))
+          }
+          .getOrElse("")
+        val description = anchor
+          .flatMap(built.segmentByRef.get)
+          .map(s => clean(s.text))
+          .getOrElse("")
+        Vector(
+          unit.ordinal.toString,
+          unit.function.toString,
+          clean(unit.text),
+          timing.onsetSeconds.map(_.toString).getOrElse(""),
+          timing.lastWordOnsetSeconds.map(_.toString).getOrElse(""),
+          anchor.map(_.key).getOrElse(row.argmax.map(_.key).getOrElse("none")),
+          row.mapMode.map(_.toString).getOrElse(""),
+          f"${row.sourceMass}%.4f",
+          f"${row.externalMass}%.4f",
+          confidence.mapAnchorMass.map(m => f"$m%.4f").getOrElse(""),
+          confidence.runnerUpAnchor.map(_.key).getOrElse(""),
+          confidence.runnerUpMass.map(m => f"$m%.4f").getOrElse(""),
+          confidence.localizability.map(l => f"$l%.4f").getOrElse(""),
+          media.map(_.part).getOrElse(""),
+          media.flatMap(l => seconds(l.part, l.startTick)).map(s => f"$s%.1f").getOrElse(""),
+          media.flatMap(l => seconds(l.part, l.endTick)).map(s => f"$s%.1f").getOrElse(""),
+          media.flatMap(l => timecode(l.part, l.startTick)).getOrElse(""),
+          media.flatMap(l => timecode(l.part, l.endTick)).getOrElse(""),
+          clean(groupLabel),
+          description
+        ).mkString("\t")
+      }
 
     Files.write(outPath, (header +: lines).mkString("\n").getBytes(StandardCharsets.UTF_8))
 
