@@ -79,8 +79,8 @@ enum ViewBasis:
   *
   * `draft` and `basis` are one statement, not two: construction admits a [[DraftPromotion]] only
   * under [[ViewBasis.DraftBuild]] and requires one there, so no receipt can read "validated build"
-  * beside a promotion record, and none can read "draft build" while staying silent about which
-  * laws went unsatisfied.
+  * beside a promotion record, and none can read "draft build" while staying silent about which laws
+  * went unsatisfied.
   */
 final case class ViewProvenance private (
     sourceChecksum: Checksum,

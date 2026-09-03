@@ -19,12 +19,12 @@ import storymodel4s.story.*
 
 /** Contract courts for the draft Atlas path: what a partial model may and may not claim.
   *
-  * Fixture-free by design; the machine-built War of the Ghosts model is compiled in
-  * `pipeline`'s `WarOfTheGhostsDraftAtlasSuite`, which is the only place a real fifty-sentence
-  * compilation exists. What is pinned here is the seam: that a draft receipt and a validated
-  * receipt cannot be swapped, that a promotion record must describe the bundle it travels with,
-  * that every recorded absence becomes exactly one mark, and that the evidence law (V-E3) refuses a
-  * mark sitting on text the model does not support.
+  * Fixture-free by design; the machine-built War of the Ghosts model is compiled in `pipeline`'s
+  * `WarOfTheGhostsDraftAtlasSuite`, which is the only place a real fifty-sentence compilation
+  * exists. What is pinned here is the seam: that a draft receipt and a validated receipt cannot be
+  * swapped, that a promotion record must describe the bundle it travels with, that every recorded
+  * absence becomes exactly one mark, and that the evidence law (V-E3) refuses a mark sitting on
+  * text the model does not support.
   */
 class DraftAtlasSuite extends FunSuite:
   private val text = "There were people at Egulac. One night two young men went to hunt seals."
@@ -108,10 +108,14 @@ class DraftAtlasSuite extends FunSuite:
 
   test("a promotion record must describe the bundle it travels with"):
     val quiet = draftOf()
-    val noisy = draftOf(gaps = Vector(gapAt(
-      NarrativeCandidateAddress.ContextAssignment(node(0, "d")),
-      DerivationGapReason.Unresolved(unresolved)
-    )))
+    val noisy = draftOf(gaps =
+      Vector(
+        gapAt(
+          NarrativeCandidateAddress.ContextAssignment(node(0, "d")),
+          DerivationGapReason.Unresolved(unresolved)
+        )
+      )
+    )
     val quietReceipt = provenanceFor(quiet)
 
     val mismatched = AtlasCompiler(quietReceipt).compileDraft(noisy, state, spec)
@@ -146,11 +150,16 @@ class DraftAtlasSuite extends FunSuite:
       Violation("compiler.required-derivation", Severity.Error, "a", "unresolved:NoProposal"),
       Violation("compiler.required-derivation", Severity.Error, "b", "unresolved:NoProposal")
     )
-    val promotion = DraftPromotion.from(outcomeOf(violations), Vector(gapAt(
-      NarrativeCandidateAddress.StorySummary(source.id),
-      DerivationGapReason.Unresolved(unresolved),
-      ClaimFamily.Summary
-    )))
+    val promotion = DraftPromotion.from(
+      outcomeOf(violations),
+      Vector(
+        gapAt(
+          NarrativeCandidateAddress.StorySummary(source.id),
+          DerivationGapReason.Unresolved(unresolved),
+          ClaimFamily.Summary
+        )
+      )
+    )
     assertEquals(promotion.promoted, false)
     assertEquals(promotion.gapCount, 1)
     assertEquals(promotion.violationCount, 3)
@@ -268,7 +277,10 @@ class DraftAtlasSuite extends FunSuite:
   test("only a coverage row that admitted no root becomes an abstention"):
     val proposed = SentenceCoverage.Proposed(node(0, "p"), FillerCounts(1, 0, 0, 0, 0, 0))
     val abstained =
-      SentenceCoverage.Abstained(node(1, "d"), AbstentionReason.FocusNotPredicate(ConceptKind.Entity))
+      SentenceCoverage.Abstained(
+        node(1, "d"),
+        AbstentionReason.FocusNotPredicate(ConceptKind.Entity)
+      )
     val scene = sceneOf(draftOf(coverage = Vector(proposed, abstained)))
     val marks = scene.marks.collect { case a: VisualPrimitive.Abstention => a }
     assertEquals(marks.size, 1)
@@ -286,7 +298,8 @@ class DraftAtlasSuite extends FunSuite:
 
   test("a coordinating focus that admitted nothing keeps every branch's own refusal"):
     val branches = Vector(
-      CoordinatedBranch.Abstained(node(0, "a"), SourceRole.Operand(1), AbstentionReason.NestedCoordination),
+      CoordinatedBranch
+        .Abstained(node(0, "a"), SourceRole.Operand(1), AbstentionReason.NestedCoordination),
       CoordinatedBranch.Abstained(node(0, "b"), SourceRole.Operand(1), AbstentionReason.NoFocus)
     )
     val row = SentenceCoverage.Coordinated(node(0, "c"), branches)
@@ -298,10 +311,14 @@ class DraftAtlasSuite extends FunSuite:
         )
       )
     )
-    assertEquals(SentenceAbstention.from(SentenceCoverage.EmptyChart(sentences(0).id)),
-      Some(SentenceAbstention.EmptyChart))
-    assertEquals(SentenceAbstention.from(SentenceCoverage.NoChart(sentences(0).id)),
-      Some(SentenceAbstention.NoChart))
+    assertEquals(
+      SentenceAbstention.from(SentenceCoverage.EmptyChart(sentences(0).id)),
+      Some(SentenceAbstention.EmptyChart)
+    )
+    assertEquals(
+      SentenceAbstention.from(SentenceCoverage.NoChart(sentences(0).id)),
+      Some(SentenceAbstention.NoChart)
+    )
 
   test("every promotion violation becomes one mark, and an unresolvable subject claims no text"):
     val violations = Vector(
@@ -382,7 +399,10 @@ class DraftAtlasSuite extends FunSuite:
       DerivationGapReason.Unresolved(unresolved)
     )
     val abstained =
-      SentenceCoverage.Abstained(node(0, "d"), AbstentionReason.FocusNotPredicate(ConceptKind.Entity))
+      SentenceCoverage.Abstained(
+        node(0, "d"),
+        AbstentionReason.FocusNotPredicate(ConceptKind.Entity)
+      )
     val violation =
       Violation("hierarchy.single-primary-root", Severity.Error, "segments", "no segments")
     val twin = sceneOf(

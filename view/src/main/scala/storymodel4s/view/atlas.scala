@@ -438,9 +438,9 @@ enum VisualPrimitive:
     * channel, through [[epistemicChannel]].
     */
   def uncertainty: Option[UncertaintyState] = this match
-    case Gap(_, _, _, _, state, _)  => Some(state)
-    case Abstention(_, _, _, _)     => Some(UncertaintyState.Missing)
-    case _                          => None
+    case Gap(_, _, _, _, state, _) => Some(state)
+    case Abstention(_, _, _, _)    => Some(UncertaintyState.Missing)
+    case _                         => None
 
   /** The non-colour channel this mark is drawn in; `None` for every ordinary mark (V-U5). */
   def epistemicChannel: Option[EpistemicChannel] = this match
@@ -965,7 +965,9 @@ final class AtlasCompiler private (provenance: ViewProvenance):
             EpistemicPlacement.NoDiscoursePosition(NoPositionReason.UnitAbsentFromAtlas(absent))
           case None =>
             val refs =
-              distinct.flatMap(unit => model.atlas.byId.get(unit).map(u => SpanRef(Some(u.id), u.span)))
+              distinct.flatMap(unit =>
+                model.atlas.byId.get(unit).map(u => SpanRef(Some(u.id), u.span))
+              )
             SpanSet
               .of(refs)
               .flatMap(clipped)
@@ -1189,8 +1191,8 @@ final class AtlasCompiler private (provenance: ViewProvenance):
               ) == parent
             }
           case _ => false
-      case VisualPrimitive.Gap(_, _, _, _, _, placement)  => onExactUnits(placement)
-      case VisualPrimitive.Abstention(_, _, _, placement) => onExactUnits(placement)
+      case VisualPrimitive.Gap(_, _, _, _, _, placement)           => onExactUnits(placement)
+      case VisualPrimitive.Abstention(_, _, _, placement)          => onExactUnits(placement)
       case VisualPrimitive.UnsatisfiedLaw(_, violation, placement) =>
         placement match
           case EpistemicPlacement.NoDiscoursePosition(_) => true

@@ -123,8 +123,8 @@ object DraftModel:
   *
   * Why four cases and not one "abstained": a focus the provider refused, a coordinating focus whose
   * every branch was refused, a chart with no concepts, and a sentence with no chart at all are four
-  * different states of the world, and folding them together would hide the ones a caller can act
-  * on behind the ones they cannot.
+  * different states of the world, and folding them together would hide the ones a caller can act on
+  * behind the ones they cannot.
   */
 enum SentenceAbstention:
   /** The chart had a focus and the provider refused it for a stated reason. */
@@ -140,8 +140,8 @@ enum SentenceAbstention:
   case NoChart
 
   def render: String = this match
-    case ProviderAbstained(reason)          => s"provider-abstained:${reason.render}"
-    case CoordinationAdmittedNothing(rs)    =>
+    case ProviderAbstained(reason)       => s"provider-abstained:${reason.render}"
+    case CoordinationAdmittedNothing(rs) =>
       s"coordination-admitted-nothing:${rs.map(_.render).sorted.mkString(",")}"
     case EmptyChart => "empty-chart"
     case NoChart    => "no-chart"
@@ -152,9 +152,9 @@ object SentenceAbstention:
     if row.admittedRoots.nonEmpty then None
     else
       row match
-        case SentenceCoverage.Proposed(_, _)            => None
-        case SentenceCoverage.Abstained(_, reason)      => Some(ProviderAbstained(reason))
-        case SentenceCoverage.Coordinated(_, branches)  =>
+        case SentenceCoverage.Proposed(_, _)           => None
+        case SentenceCoverage.Abstained(_, reason)     => Some(ProviderAbstained(reason))
+        case SentenceCoverage.Coordinated(_, branches) =>
           Some(
             CoordinationAdmittedNothing(
               branches.collect { case CoordinatedBranch.Abstained(_, _, reason) => reason }
@@ -191,10 +191,10 @@ enum UncertaintyState:
 object UncertaintyState:
   /** Classify one derivation gap by its own reason; the reason itself stays on the mark. */
   def of(reason: DerivationGapReason): UncertaintyState = reason match
-    case DerivationGapReason.Alternatives      => Alternatives
-    case DerivationGapReason.Unresolved(_)     => Unresolved
-    case DerivationGapReason.Rejected(_)       => Missing
-    case DerivationGapReason.MissingRawScore   => Missing
+    case DerivationGapReason.Alternatives             => Alternatives
+    case DerivationGapReason.Unresolved(_)            => Unresolved
+    case DerivationGapReason.Rejected(_)              => Missing
+    case DerivationGapReason.MissingRawScore          => Missing
     case DerivationGapReason.MissingSpanEvidence      => Missing
     case DerivationGapReason.MissingUpstream(_)       => Missing
     case DerivationGapReason.UnscopableRelation(_, _) => Missing
@@ -264,8 +264,8 @@ enum EpistemicPlacement:
 
   /** Exact spans when the mark has any; empty otherwise. */
   def spanSet: Option[SpanSet] = this match
-    case AtSpans(spans)          => Some(spans)
-    case NoDiscoursePosition(_)  => None
+    case AtSpans(spans)         => Some(spans)
+    case NoDiscoursePosition(_) => None
 
   def render: String = this match
     case AtSpans(spans) =>
@@ -284,13 +284,13 @@ enum EpistemicPlacement:
 private[view] object GapTarget:
   /** Every chart node the candidate names, in the order the candidate names them. */
   def chartNodes(target: NarrativeCandidateAddress): Vector[ChartNodeRef] = target match
-    case NarrativeCandidateAddress.Situation(source)            => Vector(source)
-    case NarrativeCandidateAddress.ContextAssignment(source)    => Vector(source)
-    case NarrativeCandidateAddress.StorySummary(_)              => Vector.empty
-    case NarrativeCandidateAddress.SegmentMembership(_, member) => Vector(member)
-    case NarrativeCandidateAddress.Causal(from, to)             => Vector(from, to)
-    case NarrativeCandidateAddress.TrajectoryStep(from, to)     => Vector(from, to)
-    case NarrativeCandidateAddress.EntityMention(mention)       => Vector(mention)
+    case NarrativeCandidateAddress.Situation(source)               => Vector(source)
+    case NarrativeCandidateAddress.ContextAssignment(source)       => Vector(source)
+    case NarrativeCandidateAddress.StorySummary(_)                 => Vector.empty
+    case NarrativeCandidateAddress.SegmentMembership(_, member)    => Vector(member)
+    case NarrativeCandidateAddress.Causal(from, to)                => Vector(from, to)
+    case NarrativeCandidateAddress.TrajectoryStep(from, to)        => Vector(from, to)
+    case NarrativeCandidateAddress.EntityMention(mention)          => Vector(mention)
     case NarrativeCandidateAddress.Participant(situation, filler)  => Vector(situation, filler)
     case NarrativeCandidateAddress.ParticipantCoverage(situation)  => Vector(situation)
     case NarrativeCandidateAddress.Circumstance(situation, filler) => Vector(situation, filler)
