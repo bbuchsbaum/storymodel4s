@@ -887,3 +887,64 @@ identities are unchanged, which a court pins. The remaining half of plan §V0 �
 storyatlas4s reading `storymodel.json` through `codec`, and the pin bump — is
 still untouched, and no renderer is written here: this is the compiler and its
 textual twin, which is the audit surface a renderer will be checked against.
+
+## 13. Amendment — the landmark carries its own claim status (2026-09-03)
+
+Decided by the owner's agent in single-developer mode (AGENTS.md SD5).
+
+### C1 A situation's mark states how the situation is licensed
+
+**The problem.** §11 A3 gave `Landmark` a `context` so a renderer could stop
+drawing the survivor's retelling as narration. It left a second uniformity in
+place: every one of the sixty-five War of the Ghosts situation marks carried
+identity, anchor, label, kind and context and **no epistemic status**, so a
+reader could not tell an event the text states from one the compiler derived.
+`VisualPrimitive.Route` directly below it has carried `status: EpistemicStatus`
+since checkpoint 1 for exactly this reason, and the model has always held the
+answer — `SituationNode.meta.status` — which the compiler already reads for
+contexts and edges in the same file. D9 requires that `EpistemicStatus` has six
+values and each is distinguishable by a non-colour channel; that is
+undeliverable for situations while the mark omits the field.
+
+**Decision.** `VisualPrimitive.Landmark` gains `status: EpistemicStatus`, read
+from the situation node's own `ClaimMeta`. There is no default and no fallback.
+The compiler's existing `g.situations.get(id)` is the typed absence: a situation
+the graph does not hold produces **no landmark**, rather than a landmark whose
+status was filled in because nothing else was known. A mark that said
+`SurfaceExplicit` for want of an answer would be the one lie this whole layer
+exists to prevent.
+
+One construction site serves both compile paths, because `compile` and
+`compileDraft` share a single `build`. `AtlasTextualTwin` renders `status=` on
+every landmark line, since the twin is the audit surface (D12). No module
+dependency is added, no existing mark changes, and V-E3 is untouched: this is an
+addition to what a mark says about its own claim, not a change to what evidence
+a mark may name.
+
+### C2 Measured on both models
+
+| model | landmarks | statuses |
+|---|---|---|
+| WOG acceptance fixture (validated path) | 71 | 70 `SurfaceExplicit`, 1 `Hypothesized` |
+| WOG machine-built draft (replay of the 50 captured recordings) | 65 | 65 `SurfaceExplicit` |
+
+**The real machine-built model is uniform, and the field is still required.**
+Every situation this provider proposed is `SurfaceExplicit`, so one status is
+the honest picture of this model today. That is a fact the viewer can only
+report because the mark now carries the claim; without the field a uniform model
+and a mixed one draw identically, and the day a `StructurallyDerived` situation
+arrives nothing would notice. The fixture, which a researcher curated and which
+already holds one `Hypothesized` situation, is the court where a defaulted field
+goes red — it is the discriminating evidence for both paths, since both compile
+through the same construction.
+
+### C3 What this amendment does not do
+
+It does not mint the non-colour channel assignment for `EpistemicStatus`. D9's
+channel requirement is now *deliverable* for situations and is not yet
+*delivered*: `Landmark` and `Route` both carry the status and neither declares a
+channel for it, and `PrimitiveChannel`-style vocabulary is deliberately not
+invented here for the same reason A2 refused to mint raw credence and calibrated
+probability — a channel enum with no renderer reading it looks exactly like a
+shipped feature (D14a). The six-way assignment arrives with the renderer that
+draws it, and adding it is additive.
