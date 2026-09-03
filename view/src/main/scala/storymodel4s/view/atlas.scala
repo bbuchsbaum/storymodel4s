@@ -1168,7 +1168,7 @@ final class AtlasCompiler private (provenance: ViewProvenance):
     * unit the atlas contains, and an unsatisfied law may only sit on spans its subject's own claim
     * cites. An absence with no discourse position claims no text and so cannot lie about any.
     */
-  private def checkEvidence(
+  private[view] def checkEvidence(
       model: StoryModel[?],
       mark: VisualPrimitive
   ): Either[DomainError, Unit] =
