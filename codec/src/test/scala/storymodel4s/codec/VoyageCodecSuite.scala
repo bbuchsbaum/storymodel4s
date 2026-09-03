@@ -117,3 +117,15 @@ class VoyageCodecSuite extends FunSuite:
     assert(refused.left.exists(_.message.contains("decisions")))
     val badSchema = json.hcursor.downField("schema").set(io.circe.Json.fromString("x")).top.get
     assert(Canonical.decodeJson[RecallVoyageDocument](badSchema).isLeft)
+
+  test("the artifact decoder refuses a text that is not the canonical rendering"):
+    val text = VoyageCodecs.encode(document)
+    assert(VoyageCodecs.decode(text).isRight)
+    val withExtra = text.replaceFirst("\\{", "{\"marks\":[],")
+    val refused = VoyageCodecs.decode(withExtra)
+    assert(refused.isLeft, "an unknown key must not be accepted silently")
+    assert(refused.left.exists(_.message.contains("canonical")))
+    val reordered = text
+      .replaceFirst("\"schema\":\"storymodel4s.view.recall-voyage\",", "")
+      .replaceFirst("\\}$", ",\"schema\":\"storymodel4s.view.recall-voyage\"}")
+    assert(VoyageCodecs.decode(reordered).isLeft, "a reordered key is not the canonical text")

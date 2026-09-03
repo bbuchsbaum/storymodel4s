@@ -31,6 +31,24 @@ class ConstructionProbeSuite extends FunSuite:
         typeCheckErrors("summon[scala.deriving.Mirror.ProductOf[storymodel4s.view.ViewProvenance]]")
       ),
       (
+        "Seconds",
+        typeCheckErrors("summon[scala.deriving.Mirror.ProductOf[storymodel4s.view.Seconds]]")
+      ),
+      (
+        "ClockSpan",
+        typeCheckErrors("summon[scala.deriving.Mirror.ProductOf[storymodel4s.view.ClockSpan]]")
+      ),
+      (
+        "VoyageScene",
+        typeCheckErrors("summon[scala.deriving.Mirror.ProductOf[storymodel4s.view.VoyageScene]]")
+      ),
+      (
+        "VoyageNavigation",
+        typeCheckErrors(
+          "summon[scala.deriving.Mirror.ProductOf[storymodel4s.view.VoyageNavigation]]"
+        )
+      ),
+      (
         "AuditRecord",
         typeCheckErrors("summon[scala.deriving.Mirror.ProductOf[storymodel4s.view.AuditRecord]]")
       ),

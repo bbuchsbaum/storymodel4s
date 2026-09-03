@@ -116,8 +116,11 @@ object VoyageExport:
         else if anchor.exists(ref => row.anchorMass.getOrElse(ref, 0.0) == 0.0) then
           AnchorOrigin.DecodeFilled
         else AnchorOrigin.DecodeBound
-      val group =
-        decoded.lift(i).map(_.scene).orElse(anchor.flatMap(MonotoneScene.sceneOf(built, _)))
+      // The drawn anchor's own group is the group; a decode's scene matters only when it assigned
+      // one and nothing was drawn (the fill declined), and `Int.MinValue` is decide's "no scene".
+      val group = anchor
+        .flatMap(MonotoneScene.sceneOf(built, _))
+        .orElse(decoded.lift(i).map(_.scene).filter(_ >= 0))
       VoyageDecision(row.unit, anchor, group, origin)
     }
 

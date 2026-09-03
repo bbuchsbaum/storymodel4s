@@ -57,8 +57,12 @@ object SherlockSceneCoding:
                 span <- ClockSpan.of(onset * trSeconds, offset * trSeconds)
               yield got :+ CodedInterval(span, scene)
             }
+            // A mapped participant the file does not code has no coding, not an empty one: an
+            // empty coding would report an agreement of 0/0 as if it had been measured.
             intervals.map(iv =>
-              Some(IndependentCoding(csv.getFileName.toString, Checksum.ofBytes(bytes), iv))
+              Option.when(iv.nonEmpty)(
+                IndependentCoding(csv.getFileName.toString, Checksum.ofBytes(bytes), iv)
+              )
             )
           case other =>
             Left(

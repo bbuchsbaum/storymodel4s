@@ -214,3 +214,78 @@ class VoyageSuite extends FunSuite:
     assert(twin.contains("voyage/none/u2 unit 1 at 5.0 unanchored, external 1.0000"))
     assert(twin.contains("voyage/untimed/u3 unit 2 untimed"))
     assert(!twin.contains("first") && !twin.contains("second"))
+
+  test("court: the law reads every field, not only the masses"):
+    val in = ok(input())
+    val scene = ok(VoyageCompiler.compile(in, Set.empty, provenance))
+    val genuine = scene.marks.collectFirst {
+      case m: VoyageMark.UnitAnchor if m.unit == u1 => m
+    }.get
+    assert(VoyageCompiler.checkEvidence(in, genuine.copy(at = secs(50.0))).isLeft, "at")
+    assert(VoyageCompiler.checkEvidence(in, genuine.copy(unitOrdinal = 9)).isLeft, "ordinal")
+    assert(VoyageCompiler.checkEvidence(in, genuine.copy(externalDominant = true)).isLeft, "hollow")
+    assert(VoyageCompiler.checkEvidence(in, genuine.copy(argmax = Some(b))).isLeft, "argmax")
+    val alt = scene.marks.collectFirst { case m: VoyageMark.Alternative if m.unit == u1 => m }.get
+    assert(VoyageCompiler.checkEvidence(in, alt.copy(rank = 7)).isLeft, "rank")
+    assert(VoyageCompiler.checkEvidence(in, alt.copy(mass = -1.0)).isLeft, "sentinel")
+    assert(
+      VoyageCompiler
+        .checkEvidence(in, alt.copy(anchor = c, span = span(20, 30), group = Some(2)))
+        .isLeft,
+      "massless ref"
+    )
+    val none = scene.marks.collectFirst { case m: VoyageMark.Unanchored => m }.get
+    assert(VoyageCompiler.checkEvidence(in, none.copy(at = secs(6.0))).isLeft, "unanchored at")
+    val untimed = scene.marks.collectFirst { case m: VoyageMark.Untimed => m }.get
+    assert(
+      VoyageCompiler.checkEvidence(in, untimed.copy(unitOrdinal = 5)).isLeft,
+      "untimed ordinal"
+    )
+
+  test("the join refuses what the origin law, the coding and the clocks cannot hold"):
+    val boundIsArgmax = VoyageDecision(u1, Some(a), Some(1), AnchorOrigin.DecodeBound)
+    assert(input(boundIsArgmax).isLeft, "a bound anchor equal to the argmax is the argmax")
+    val wrongGroup = VoyageDecision(u1, Some(a), Some(2), AnchorOrigin.PosteriorArgmax)
+    assert(input(wrongGroup).isLeft, "the decided group must be the anchor's")
+    val overlap = IndependentCoding(
+      "coding",
+      Checksum.ofText("coding"),
+      Vector(CodedInterval(span(0, 4), 1), CodedInterval(span(3, 6), 2))
+    )
+    assert(input(coding = Some(overlap)).isLeft, "overlapping coded intervals")
+    val late =
+      IndependentCoding("coding", Checksum.ofText("coding"), Vector(CodedInterval(span(0, 61), 1)))
+    assert(input(coding = Some(late)).isLeft, "a coded interval past the recall's end")
+    val reversed = units.updated(0, units(0).copy(lastWordOnset = Some(secs(0.5))))
+    assert(
+      RecallVoyageInput.of(reversed, rows, timeline, decisions(argmaxFirst), None, secs(60)).isLeft
+    )
+    val disordered = units.updated(1, units(1).copy(ordinal = 0))
+    assert(
+      RecallVoyageInput
+        .of(disordered, rows, timeline, decisions(argmaxFirst), None, secs(60))
+        .isLeft
+    )
+
+  test("an external-dominant unit is a fact about the row's two sums, carried on the mark"):
+    val heavy = okA(
+      AlignmentMatrix.of(
+        Vector(
+          okA(
+            AlignmentRow.of(
+              u1,
+              Map(AlignState.Source(a) -> 0.2, AlignState.External(ExternalState.Intrusion) -> 0.8)
+            )
+          ),
+          rows.rows(1),
+          rows.rows(2)
+        )
+      )
+    )
+    val in =
+      ok(RecallVoyageInput.of(units, heavy, timeline, decisions(argmaxFirst), None, secs(60)))
+    val scene = ok(VoyageCompiler.compile(in, Set.empty, provenance))
+    val first = scene.marks.collectFirst { case m: VoyageMark.UnitAnchor if m.unit == u1 => m }.get
+    assert(first.externalDominant)
+    assertEquals(scene.summary.externalDominant, 1)
+    assert(scene.textualTwin.contains("external-dominant posterior argmax"))

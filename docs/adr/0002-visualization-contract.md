@@ -970,10 +970,16 @@ missing was a consumer, and this amendment is that consumer.
   a promoted model nor a draft of one, and a view of it must say so. It needs no
   model receipt and carries no `BasisAuthority`; on the wire it is
   `alignment_run`.
-- `view/voyage.scala`: `Seconds`, `ClockSpan`, `AnchorOrigin`, `SourceTimeline`,
-  `VoyageUnit`, `VoyageDecision`, `IndependentCoding`, the proven join
-  `RecallVoyageInput`, the marks `VoyageMark` (`UnitAnchor`, `Alternative`,
-  `Unanchored`, `Untimed`), `VoyageScene`, `VoyageCompiler`, `VoyageTextualTwin`.
+- `view/voyage.scala`: `Seconds`, `ClockSpan`, `AnchorOrigin`, `SourceTimeline`
+  with `SourceTimelineNode` and `SourceTimelineGroup`, `VoyageUnit`,
+  `VoyageDecision`, `CodedInterval` and `IndependentCoding`, the proven join
+  `RecallVoyageInput`, `RecallVoyageDocument` (input plus provenance, the unit a
+  renderer loads), the marks `VoyageMark` (`UnitAnchor`, `Alternative`,
+  `Unanchored`, `Untimed`), `VoyageNavigation`, `VoyageSummary`, `VoyageScene`,
+  `ProjectionContractVoyage.recallVoyage`, `VoyageCompiler`, `VoyageTextualTwin`.
+  `UnitAnchor.externalDominant` is the row's external mass exceeding its source
+  mass, carried on the mark and checked by the law, so no renderer chooses a
+  threshold.
 - No new `VisualChannel`. The voyage declares meanings for eight existing
   channels, so the Discourse Atlas legend is untouched.
 

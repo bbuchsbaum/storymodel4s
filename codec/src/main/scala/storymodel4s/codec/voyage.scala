@@ -26,6 +26,28 @@ object VoyageCodecs:
   val schema: String = "storymodel4s.view.recall-voyage"
   val schemaVersion: Int = 1
 
+  /** Encode a document in the canonical form the pipeline writes. */
+  def encode(document: RecallVoyageDocument): String = Canonical.encode(document)
+
+  /** Decode a pipeline-written document, refusing a text that is not the canonical rendering of
+    * what it decodes to: an unknown key, a non-canonical number, or a reordered object would
+    * otherwise be accepted silently, and the checksum of the text as read would name a document the
+    * decoder never saw. The same guard the surface-atlas and derivation artifacts apply.
+    */
+  def decode(text: String): Either[CodecError, RecallVoyageDocument] =
+    for
+      document <- Canonical.decode[RecallVoyageDocument](text)
+      _ <- Either.cond(
+        encode(document) == text,
+        (),
+        CodecError.Decode(
+          "$",
+          "the text is not the canonical rendering of the document it decodes to " +
+            "(unknown field, non-canonical value, or reordered key)"
+        )
+      )
+    yield document
+
   private def fail[A](c: HCursor, message: String): Decoder.Result[A] =
     Left(DecodingFailure(message, c.history))
 

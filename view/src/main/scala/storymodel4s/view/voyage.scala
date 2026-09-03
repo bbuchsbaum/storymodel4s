@@ -165,7 +165,14 @@ final case class IndependentCoding(
     name: String,
     checksum: Checksum,
     intervals: Vector[CodedInterval]
-)
+):
+  /** The coded group at a recall second, when the coding has one there. Intervals are disjoint
+    * (proven by [[RecallVoyageInput.of]]), so the first match is the only match.
+    */
+  def groupAt(t: Seconds): Option[Int] =
+    intervals
+      .find(iv => iv.recall.start.value <= t.value && t.value <= iv.recall.end.value)
+      .map(_.group)
 
 /** The proven join the compiler reads: units in recall order, one posterior row per unit, a
   * timeline every referenced node resolves in, one decision per unit, and an optional coding.
@@ -183,9 +190,12 @@ final class RecallVoyageInput private (
     val recallLength: Seconds
 ):
   lazy val decisionOf: Map[RecallUnitId, VoyageDecision] = decisions.map(d => d.unit -> d).toMap
+  lazy val unitOf: Map[RecallUnitId, VoyageUnit] = units.map(u => u.id -> u).toMap
 
 object RecallVoyageInput:
-  /** Prove the join or say exactly which strand failed. */
+  /** Prove the join or say exactly which strand failed. Each check names the strand it guards; the
+    * first that fails is the answer, so a caller learns one thing to fix at a time.
+    */
   def of(
       units: Vector[VoyageUnit],
       matrix: AlignmentMatrix,
@@ -194,67 +204,103 @@ object RecallVoyageInput:
       coding: Option[IndependentCoding],
       recallLength: Seconds
   ): Either[DomainError, RecallVoyageInput] =
-    def violation(path: String, reason: String) =
-      Left(DomainError.InvariantViolation(s"view/voyage/input/$path", reason))
-    val rowIds = matrix.rows.map(_.unit)
+    def violation(path: String, reason: String): Option[DomainError] =
+      Some(DomainError.InvariantViolation(s"view/voyage/input/$path", reason))
     val unitIds = units.map(_.id)
-    if rowIds != unitIds then
-      violation("rows", "the posterior rows must be the units, in recall order")
-    else if decisions.map(_.unit) != unitIds then
-      violation("decisions", "one decision per unit, in recall order")
-    else
-      val unresolved = matrix.rows.iterator
+    lazy val checks: LazyList[Option[DomainError]] = LazyList(
+      Option
+        .when(matrix.rows.map(_.unit) != unitIds)(())
+        .flatMap(_ => violation("rows", "the posterior rows must be the units, in recall order")),
+      Option
+        .when(decisions.map(_.unit) != unitIds)(())
+        .flatMap(_ => violation("decisions", "one decision per unit, in recall order")),
+      units
+        .sliding(2)
+        .collectFirst {
+          case Seq(a, b) if b.ordinal <= a.ordinal => b
+        }
+        .flatMap(u =>
+          violation(s"units/${u.id.value}", "unit ordinals must increase in recall order")
+        ),
+      units
+        .find(u =>
+          u.onset.exists(_.value > recallLength.value) ||
+            u.lastWordOnset.exists(_.value > recallLength.value)
+        )
+        .flatMap(u => violation(s"units/${u.id.value}", "timed after the recall's end")),
+      units
+        .find(u =>
+          (u.onset, u.lastWordOnset) match
+            case (Some(a), Some(b)) => b.value < a.value
+            case (None, Some(_))    => true
+            case _                  => false
+        )
+        .flatMap(u =>
+          violation(
+            s"units/${u.id.value}",
+            "last-word onset precedes the onset, or exists without one"
+          )
+        ),
+      matrix.rows.iterator
         .flatMap(_.mass.keysIterator)
         .flatMap(_.anchor)
         .find(ref => timeline.node(ref).isEmpty)
-      unresolved match
-        case Some(ref) =>
+        .flatMap(ref =>
           violation("timeline", s"${ref.key} carries mass but is not on the timeline")
-        case None =>
-          decisions.find(d => d.anchor.exists(ref => timeline.node(ref).isEmpty)) match
-            case Some(d) =>
-              violation(s"decisions/${d.unit.value}", "the decided anchor is not on the timeline")
-            case None =>
-              decisions.find(d => d.group.exists(g => !timeline.byGroup.contains(g))) match
-                case Some(d) =>
-                  violation(s"decisions/${d.unit.value}", "the decided group is not declared")
-                case None =>
-                  val badOrigin = decisions.find { d =>
-                    val row = matrix.byUnit(d.unit)
-                    d.origin match
-                      case AnchorOrigin.PosteriorArgmax => d.anchor != row.mapSource
-                      case AnchorOrigin.DecodeBound     =>
-                        !d.anchor.exists(ref => row.anchorMass.getOrElse(ref, 0.0) > 0.0)
-                      case AnchorOrigin.DecodeFilled =>
-                        !d.anchor.exists(ref => row.anchorMass.getOrElse(ref, 0.0) == 0.0)
-                  }
-                  badOrigin match
-                    case Some(d) =>
-                      violation(
-                        s"decisions/${d.unit.value}",
-                        s"origin ${d.origin.label} does not describe the row"
-                      )
-                    case None =>
-                      coding.flatMap(c =>
-                        c.intervals.find(i => !timeline.byGroup.contains(i.group))
-                      ) match
-                        case Some(i) =>
-                          violation("coding", s"coded group ${i.group} is not declared")
-                        case None =>
-                          units.find(u => u.onset.exists(_.value > recallLength.value)) match
-                            case Some(u) =>
-                              violation(s"units/${u.id.value}", "onset after the recall's end")
-                            case None =>
-                              Right(
-                                new RecallVoyageInput(
-                                  units,
-                                  matrix,
-                                  timeline,
-                                  decisions,
-                                  coding,
-                                  recallLength
-                                )
-                              )
+        ),
+      decisions
+        .find(d => d.anchor.exists(ref => timeline.node(ref).isEmpty))
+        .flatMap(d =>
+          violation(s"decisions/${d.unit.value}", "the decided anchor is not on the timeline")
+        ),
+      decisions
+        .find(d => d.group.exists(g => !timeline.byGroup.contains(g)))
+        .flatMap(d => violation(s"decisions/${d.unit.value}", "the decided group is not declared")),
+      decisions
+        .find(d => d.anchor.exists(ref => timeline.byRef(ref).group != d.group))
+        .flatMap(d =>
+          violation(s"decisions/${d.unit.value}", "the decided group is not the anchor's group")
+        ),
+      decisions
+        .find { d =>
+          val row = matrix.byUnit(d.unit)
+          d.origin match
+            case AnchorOrigin.PosteriorArgmax => d.anchor != row.mapSource
+            case AnchorOrigin.DecodeBound     =>
+              d.anchor == row.mapSource ||
+              !d.anchor.exists(ref => row.anchorMass.getOrElse(ref, 0.0) > 0.0)
+            case AnchorOrigin.DecodeFilled =>
+              !d.anchor.exists(ref => row.anchorMass.getOrElse(ref, 0.0) == 0.0)
+        }
+        .flatMap(d =>
+          violation(
+            s"decisions/${d.unit.value}",
+            s"origin ${d.origin.label} does not describe the row"
+          )
+        ),
+      coding
+        .flatMap(c => c.intervals.find(i => !timeline.byGroup.contains(i.group)))
+        .flatMap(i => violation("coding", s"coded group ${i.group} is not declared")),
+      coding
+        .flatMap(c => c.intervals.find(i => i.recall.end.value > recallLength.value))
+        .flatMap(i =>
+          violation("coding", s"a coded interval for group ${i.group} ends after the recall's end")
+        ),
+      coding
+        .flatMap { c =>
+          val sorted = c.intervals.sortBy(i => (i.recall.start.value, i.recall.end.value))
+          sorted.sliding(2).collectFirst {
+            case Seq(a, b) if b.recall.start.value < a.recall.end.value => (a, b)
+          }
+        }
+        .flatMap { case (a, b) =>
+          violation("coding", s"coded intervals for groups ${a.group} and ${b.group} overlap")
+        }
+    )
+    checks.flatten.headOption match
+      case Some(err) => Left(err)
+      case None      =>
+        Right(new RecallVoyageInput(units, matrix, timeline, decisions, coding, recallLength))
 
 /** What a renderer loads: the proven input and the provenance the scene will carry. A viewer
   * compiles the scene itself from this, so the evidence law runs wherever the marks are drawn and
@@ -279,6 +325,10 @@ enum VoyageMark:
       mass: Double,
       sourceMass: Double,
       externalMass: Double,
+      /** The row puts more mass outside the source than in it; drawn hollow (V-U5), a fact about
+        * the row's two sums and never a threshold a renderer chooses.
+        */
+      externalDominant: Boolean,
       localizability: Option[Double],
       origin: AnchorOrigin,
       argmax: Option[SourceNodeRef]
@@ -371,12 +421,7 @@ final case class VoyageScene private[view] (
   def textualTwin: String = VoyageTextualTwin.render(this)
 
   /** The coded group at a recall second, when the coding has one there. */
-  def codedGroupAt(t: Seconds): Option[Int] =
-    coding.flatMap(
-      _.intervals
-        .find(iv => iv.recall.start.value <= t.value && t.value <= iv.recall.end.value)
-        .map(_.group)
-    )
+  def codedGroupAt(t: Seconds): Option[Int] = coding.flatMap(_.groupAt(t))
 
 object ProjectionContractVoyage:
   /** The Recall Voyage contract: both axes are clocks, area is anchor mass, distance means nothing,
@@ -411,7 +456,8 @@ object ProjectionContractVoyage:
       ChannelMeaning(VisualChannel.Absence, "a unit anchored nowhere in the source, or untimed"),
       ChannelMeaning(
         VisualChannel.Epistemic,
-        "mark shape: posterior argmax, decode-bound, decode-filled (mass zero), external-dominant"
+        "mark shape: posterior argmax, decode-bound, decode-filled (mass zero); hollow when the " +
+          "row's external mass exceeds its source mass"
       )
     ),
     Set(
@@ -484,6 +530,7 @@ object VoyageCompiler:
                 row.anchorMass.getOrElse(ref, 0.0),
                 row.sourceMass,
                 row.externalMass,
+                row.externalMass > row.sourceMass,
                 row.localizability(nodeCount),
                 decision.origin,
                 row.mapSource
@@ -524,14 +571,8 @@ object VoyageCompiler:
 
   private def summary(input: RecallVoyageInput, marks: Vector[VoyageMark]): VoyageSummary =
     val anchors = marks.collect { case m: VoyageMark.UnitAnchor => m }
-    def codedAt(t: Seconds): Option[Int] =
-      input.coding.flatMap(
-        _.intervals
-          .find(iv => iv.recall.start.value <= t.value && t.value <= iv.recall.end.value)
-          .map(_.group)
-      )
-    val coded = input.coding.map { _ =>
-      val judged = anchors.flatMap(m => codedAt(m.at).map(g => m.group.contains(g)))
+    val coded = input.coding.map { c =>
+      val judged = anchors.flatMap(m => c.groupAt(m.at).map(g => m.group.contains(g)))
       (judged.count(b => b), judged.size)
     }
     VoyageSummary(
@@ -542,7 +583,7 @@ object VoyageCompiler:
       posteriorArgmax = anchors.count(_.origin == AnchorOrigin.PosteriorArgmax),
       decodeBound = anchors.count(_.origin == AnchorOrigin.DecodeBound),
       decodeFilled = anchors.count(_.origin == AnchorOrigin.DecodeFilled),
-      externalDominant = anchors.count(_.externalMass > 0.5),
+      externalDominant = anchors.count(_.externalDominant),
       codedAgreement = coded
     )
 
@@ -570,12 +611,18 @@ object VoyageCompiler:
   ): Either[DomainError, Unit] =
     val row = input.matrix.byUnit(mark.unit)
     val decision = input.decisionOf(mark.unit)
+    val unit = input.unitOf.get(mark.unit)
+    def onTimeline(ref: SourceNodeRef, level: Int, group: Option[Int], span: ClockSpan): Boolean =
+      input.timeline.node(ref).exists(n => n.level == level && n.group == group && n.span == span)
+    def isUnit(ordinal: Int, at: Option[Seconds]): Boolean =
+      unit.exists(u => u.ordinal == ordinal && u.onset == at) &&
+        mark.address == unitAddress(mark.unit)
     val supported = mark match
       case VoyageMark.UnitAnchor(
             _,
             _,
-            _,
-            _,
+            ordinal,
+            at,
             ref,
             level,
             group,
@@ -583,26 +630,27 @@ object VoyageCompiler:
             mass,
             src,
             ext,
+            dominant,
             loc,
             origin,
             argmax
           ) =>
-        input.timeline
-          .node(ref)
-          .exists(n => n.level == level && n.group == group && n.span == span) &&
+        isUnit(ordinal, Some(at)) && onTimeline(ref, level, group, span) &&
         decision.anchor.contains(ref) && decision.origin == origin &&
         mass == row.anchorMass.getOrElse(ref, 0.0) && src == row.sourceMass &&
-        ext == row.externalMass && loc == row.localizability(input.timeline.nodes.size) &&
-        argmax == row.mapSource
+        ext == row.externalMass && dominant == (row.externalMass > row.sourceMass) &&
+        loc == row.localizability(input.timeline.nodes.size) && argmax == row.mapSource
       case VoyageMark.Alternative(_, _, rank, ref, level, group, span, mass) =>
-        input.timeline
-          .node(ref)
-          .exists(n => n.level == level && n.group == group && n.span == span) &&
-        !decision.anchor.contains(ref) && rank >= 1 && mass == row.anchorMass.getOrElse(ref, -1.0)
-      case VoyageMark.Unanchored(_, _, _, _, ext) =>
-        decision.anchor.isEmpty && ext == row.externalMass
-      case VoyageMark.Untimed(_, id, _) =>
-        input.units.exists(u => u.id == id && u.onset.isEmpty)
+        val ranked = decision.anchor.toVector.flatMap(chosen =>
+          rankedAnchors(row).filter(_._1 != chosen).map(_._1)
+        )
+        decision.anchor.isDefined && onTimeline(ref, level, group, span) &&
+        ranked.lift(rank - 1).contains(ref) && row.anchorMass.get(ref).contains(mass) &&
+        mark.address == cellAddress(mark.unit, ref)
+      case VoyageMark.Unanchored(_, _, ordinal, at, ext) =>
+        isUnit(ordinal, Some(at)) && decision.anchor.isEmpty && ext == row.externalMass
+      case VoyageMark.Untimed(_, _, ordinal) =>
+        isUnit(ordinal, None)
     if supported then Right(())
     else
       Left(
@@ -682,6 +730,7 @@ object VoyageTextualTwin:
             mass,
             src,
             ext,
+            dominant,
             loc,
             origin,
             argmax
@@ -711,6 +760,7 @@ object VoyageTextualTwin:
           .append(num(ext))
           .append(" localizability ")
           .append(loc.fold("-")(num))
+          .append(if dominant then " external-dominant" else "")
           .append(' ')
           .append(origin.label)
           .append(" argmax ")
