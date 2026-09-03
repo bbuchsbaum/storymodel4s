@@ -48,6 +48,19 @@ and `<report>.voyage.json`, the typed Recall Voyage document (ADR 0002 §14) tha
 renders. Read `mapAnchorMass` in the TSV as the posterior argmax's mass: the decode moves 57% of
 anchors, and for those the report's anchor and its mass column belong to different nodes.
 
+storyatlas4s renders the voyage document natively (branch `solo/recall-voyage`, tip `bbf3dd9`,
+gated green against storymodel4s `dd40d95f` and intaglio `97511a1`; it lands as soon as
+intaglio's main is pushed to GitHub, which is the owner's call in the intaglio session):
+`sbt <overrides> "cli/run voyage --document <report>.voyage.json --out <dir>"` writes the static
+plate (`voyage.svg`, every mark titled and classed through intaglio `GrobMeta`), its textual twin,
+`voyage-receipt.json`, and `voyage.html`, which with `app.js` beside it mounts the interactive pane
+(hover card, click and arrow-key walk, posterior column, ghost and all-columns toggles, a plate
+fitted to its panel, the within-group strip). The NN03 pane is published as a private artifact for
+the owner (`Storyatlas Recall Voyage`). Five intaglio upgrades were filed as motes and implemented
+for it: `PointShape.Diamond` (circle-area parity), `Grob.annotated`/`GrobMeta` (title, class,
+data-*), rect corner radius, step lines, and the classes a stylesheet needs. Trap: intaglio's point
+`size` is the device radius, not a diameter.
+
 `STORYMODEL4S_ONNX_MODEL` and `..._TOKENIZER` must point at `data/models/onnx/` or the pipeline
 silently falls back to a free lexical baseline and the run is not comparable to anything.
 `run-arm.sh` sets them from the data root (`tools/data-root.sh`; layout in `data/README.md`).
