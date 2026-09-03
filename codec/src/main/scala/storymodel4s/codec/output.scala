@@ -622,6 +622,7 @@ object OutputCodecs:
     case ViewBasis.HumanAdjudicated          => tagged("human_adjudicated")
     case ViewBasis.ResearcherReviewedFixture => tagged("researcher_reviewed_fixture")
     case ViewBasis.DraftBuild                => tagged("draft_build")
+    case ViewBasis.AlignmentRun              => tagged("alignment_run")
   }
   given Decoder[ViewBasis] = Decoder.instance { c =>
     field[String](c, "status").flatMap {
@@ -629,6 +630,7 @@ object OutputCodecs:
       case "human_adjudicated"           => Right(ViewBasis.HumanAdjudicated)
       case "researcher_reviewed_fixture" => Right(ViewBasis.ResearcherReviewedFixture)
       case "draft_build"                 => Right(ViewBasis.DraftBuild)
+      case "alignment_run"               => Right(ViewBasis.AlignmentRun)
       case other                         => unknown(c, "ViewBasis", other)
     }
   }

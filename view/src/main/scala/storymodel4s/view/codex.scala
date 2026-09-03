@@ -103,11 +103,21 @@ enum ViewBasis:
     */
   case DraftBuild
 
+  /** An aligner's posterior over a source view, drawn as the raw quantity it is (M1 L6 `raw`).
+    *
+    * Why a basis of its own: a recall alignment is neither a promoted story model nor a draft of
+    * one; it is a second process scored against a source, and nothing in it is a claim about the
+    * story. A view of it must not read "validated build", and reading "draft build" would promise a
+    * promotion record no aligner produces. It carries no [[BasisAuthority]].
+    */
+  case AlignmentRun
+
   def label: String = this match
     case ValidatedBuild            => "validated build"
     case HumanAdjudicated          => "human-adjudicated model"
     case ResearcherReviewedFixture => "researcher-reviewed narrative acceptance fixture"
     case DraftBuild                => "draft build"
+    case AlignmentRun              => "aligner run, raw posterior"
 
 /** Reproducibility record for a view without pretending a source checksum hashes the full model.
   *
@@ -161,8 +171,9 @@ object ViewProvenance:
       )
     else
       basis match
-        case ViewBasis.ResearcherReviewedFixture | ViewBasis.DraftBuild => Right(built())
-        case ViewBasis.ValidatedBuild | ViewBasis.HumanAdjudicated      =>
+        case ViewBasis.ResearcherReviewedFixture | ViewBasis.DraftBuild | ViewBasis.AlignmentRun =>
+          Right(built())
+        case ViewBasis.ValidatedBuild | ViewBasis.HumanAdjudicated =>
           modelReceiptChecksum match
             case Some(_) => Right(built())
             case None    =>

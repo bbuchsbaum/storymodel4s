@@ -18,6 +18,9 @@ import storymodel4s.story.*
 enum ProjectionKind:
   case DiscourseAtlas
 
+  /** One recall against its source on two clocks: where each unit landed and how surely (§14). */
+  case RecallVoyage
+
 /** Visual channels a contract may give meaning to. */
 enum VisualChannel:
   case X, Y, SurfaceUnit, RegionExtent, LandmarkPosition, Thread, Portal, Route, Distance, Area
@@ -39,6 +42,14 @@ enum AxisMeaning:
   /** A discrete lane chosen for legibility; vertical distance carries no meaning. */
   case ContextLane
 
+  /** Seconds into a recall's own audio, from word onsets: the recall's observational axis. */
+  case RecallClock
+
+  /** Seconds into a timed source's presentation, the source's own observational axis when it is a
+    * film or a recording rather than a text.
+    */
+  case SourceClock
+
 /** Meaning of Euclidean distance in a projection. */
 enum DistanceMeaning:
   case NoMeaning
@@ -47,6 +58,11 @@ enum DistanceMeaning:
 enum MeasureMeaning:
   /** Reserved for projections whose 2-D area encodes a measure; the Discourse Atlas has none. */
   case SourceLength
+
+  /** Posterior mass on the drawn anchor, `AlignmentRow.anchorMass` (V-R1): a named aligner
+    * quantity, never a calibrated probability.
+    */
+  case AnchorMass
 
 /** One declared meaning of one channel. */
 final case class ChannelMeaning(channel: VisualChannel, meaning: String)

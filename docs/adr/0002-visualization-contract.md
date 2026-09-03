@@ -950,3 +950,79 @@ invented here for the same reason A2 refused to mint raw credence and calibrated
 probability — a channel enum with no renderer reading it looks exactly like a
 shipped feature (D14a). The six-way assignment arrives with the renderer that
 draws it, and adding it is additive.
+
+## 14. Amendment — the Recall Voyage (2026-09-03)
+
+The owner asked for the recall-to-video mapping, with its uncertainty, in the
+visualization module. The plan had sequenced a Recall Voyage under V3 behind an
+"align lowering"; the blocker was narrower than it read. D4 row 12 permits a
+per-recall `AlignmentMatrix` view and forbids only the population map, and the
+aligner's typed result already carries everything a voyage draws. What was
+missing was a consumer, and this amendment is that consumer.
+
+### D1 New vocabulary, all additive
+
+- `ProjectionKind.RecallVoyage`; `AxisMeaning.RecallClock` (seconds into the
+  recall's own audio) and `AxisMeaning.SourceClock` (seconds into a timed
+  source's presentation); `MeasureMeaning.AnchorMass` (area encodes
+  `AlignmentRow.anchorMass` on the drawn anchor, a named aligner quantity).
+- `ViewBasis.AlignmentRun`: an aligner's posterior over a source view is neither
+  a promoted model nor a draft of one, and a view of it must say so. It needs no
+  model receipt and carries no `BasisAuthority`; on the wire it is
+  `alignment_run`.
+- `view/voyage.scala`: `Seconds`, `ClockSpan`, `AnchorOrigin`, `SourceTimeline`,
+  `VoyageUnit`, `VoyageDecision`, `IndependentCoding`, the proven join
+  `RecallVoyageInput`, the marks `VoyageMark` (`UnitAnchor`, `Alternative`,
+  `Unanchored`, `Untimed`), `VoyageScene`, `VoyageCompiler`, `VoyageTextualTwin`.
+- No new `VisualChannel`. The voyage declares meanings for eight existing
+  channels, so the Discourse Atlas legend is untouched.
+
+### D2 What the marks are, and the law that holds them
+
+Every visual category is an `AlignState` case or a named derived quantity
+(V-R1): the drawn anchor and its `anchorMass`; every other admitted anchor with
+its mass, ranked (the posterior as a list, which is the honest picture of
+uncertainty and the only one this ADR mints); `sourceMass` and `externalMass`;
+`localizability`; the posterior argmax kept beside a decode-moved anchor. The
+one new epistemic category, `AnchorOrigin`, names a fact about the aligner's
+procedure — argmax, decode-bound, decode-filled — and is drawn as shape, never
+colour (V-U5). A decode-filled anchor is drawn with mass exactly zero: the decode
+went outside the posterior, and a mark that showed a small amount of evidence
+there would be the lie this layer exists to prevent. Measured on the Sherlock
+default run: the decode moves 57% of anchors and fills 19%.
+
+The evidence law is `VoyageCompiler.checkEvidence`: every number on a mark is
+recomputed from the row it claims to draw, every span from the timeline, every
+origin against the decision; a forged mark is refused at compile time, and the
+law is `private[view]` so a court can hand it one.
+
+`RecallVoyageInput` is the proven join (rows ↔ units ↔ timeline ↔ decisions ↔
+coding); its constructor is private and `of` refuses any strand that does not
+hold, including an origin that does not describe its row. Reading `HsmmResult`
+directly was rejected: it carries costs, admissibility and likelihoods a view
+must not draw, and would let a renderer reach past the posterior.
+
+### D3 What it does not do
+
+No reader horizon: `HorizonShared` is not declared, and no horizon is
+re-derived either. No population voyage (§9 checkpoint 4 stands). No credence
+axis, no calibrated probability, no "blur" (§11 A2 stands): the spread of the
+alternatives *is* the uncertainty shown. An independent human coding rides
+beside the marks with its name and checksum and never becomes a model address.
+The twin lists marks and never recall prose.
+
+### D4 Consequences for storyatlas4s
+
+It owns no science, so it lowers `VoyageScene` and renders it: a static lowering
+for the edition, and an app pane whose hover, selection and keyboard walk are
+DOM behaviour over `data-name = MarkId`. Recall prose reaches the inspector from
+`VoyageUnit.text` through the scene, never through intaglio (D6). The pin moves
+with this change in the same slice.
+
+Rejected alternatives, recorded the same day: reusing `NarrativeScene` and
+`VisualPrimitive` (they require a zoom, a feature layer and a discourse axis the
+voyage does not have, and `Landmark` carries a claim status no alignment has);
+adding columns to the study TSV (it would change the identity of every landed
+run; the sidecar and the scene leave it byte-identical); a Laminar-only page in
+storyatlas4s (it would draw numbers the model never compiled, which is the one
+thing that repository's contract forbids).
