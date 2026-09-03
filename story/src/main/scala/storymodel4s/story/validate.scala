@@ -603,8 +603,10 @@ object StoryValidator:
     m.trajectory.steps.zipWithIndex.foreach { (s, i) =>
       sit("trajectory.endpoints", s"trajectory/$i", s.from)
       sit("trajectory.endpoints", s"trajectory/$i", s.to)
-      if s.entityTurnover.isNaN || s.entityTurnover < 0.0 || s.entityTurnover > 1.0 then
-        err("trajectory.turnover-in-unit", s"trajectory/$i", s"turnover ${s.entityTurnover}")
+      s.entityTurnover.toOption.foreach { v =>
+        if v.isNaN || v < 0.0 || v > 1.0 then
+          err("trajectory.turnover-in-unit", s"trajectory/$i", s"turnover $v")
+      }
       s.worldTimeContext.foreach(c => ctx("trajectory.context-exists", s"trajectory/$i", c))
     }
 

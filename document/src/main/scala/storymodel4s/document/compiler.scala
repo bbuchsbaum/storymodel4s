@@ -2,7 +2,7 @@ package storymodel4s.document
 
 import cats.data.{NonEmptySet, NonEmptyVector}
 import storymodel4s.acquire.*
-import storymodel4s.features.CanonicalDouble
+import storymodel4s.features.{CanonicalDouble, Estimate}
 import storymodel4s.core.*
 import storymodel4s.core.NarrativeKind.{EntityK, SituationK}
 import storymodel4s.proposition.{
@@ -193,6 +193,9 @@ enum NarrativeCandidateAddress:
   case Circumstance(situation: ChartNodeRef, filler: ChartNodeRef)
   case Temporal(from: ChartNodeRef, to: ChartNodeRef)
 
+  /** The identity of a non-introducing mention (a pronoun): which entity, if any, it refers to. */
+  case EntityReference(mention: ChartNodeRef)
+
   def render: String = this match
     case Situation(source)             => s"situation:${source.key}"
     case ContextAssignment(source)     => s"context-assignment:${source.key}"
@@ -206,6 +209,7 @@ enum NarrativeCandidateAddress:
       s"participant-coverage:${source.key}"
     case Circumstance(situation, filler) => s"circumstance:${situation.key}~${filler.key}"
     case Temporal(from, to)              => s"temporal:${from.key}->${to.key}"
+    case EntityReference(mention)        => s"entity-reference:${mention.key}"
 
 object NarrativeCandidateAddress:
   given Ordering[NarrativeCandidateAddress] = Ordering.by(_.render)
@@ -227,6 +231,11 @@ enum DerivationGapReason:
   case UnscopableRelation(from: ChartNodeRef, to: ChartNodeRef)
   case InvalidAccepted(error: DomainError)
 
+  /** A mention that names no entity, and why (ADR 0012). The candidates it could have named are the
+    * gap's upstream claims.
+    */
+  case OpenReference(reason: storymodel4s.document.OpenReference)
+
   def render: String = this match
     case Alternatives               => "alternatives"
     case Unresolved(reason)         => s"unresolved:$reason"
@@ -237,6 +246,7 @@ enum DerivationGapReason:
       s"missing-upstream:${addresses.map(_.render).sorted.mkString(",")}"
     case UnscopableRelation(from, to) => s"unscopable-relation:${from.key}->${to.key}"
     case InvalidAccepted(error)       => s"invalid-accepted:${error.message}"
+    case OpenReference(reason)        => s"open-reference:${reason.render}"
 
 /** One missing derivation, retained in the compiled artifact rather than replaced by a value. */
 final case class DerivationGap(
@@ -1481,13 +1491,47 @@ object NarrativeCompiler:
           gaps += gap(record.target, record.bundle, ClaimFamily.EntityMention, gapReason(state))
     }
     val mentions = emittedMentions.result().sortBy(m => (m.support.minSpan, m.mention))
-    val entityGroups = mentions
-      .groupBy(m => (TextNorm.lower(m.value.label), m.value.entityType))
-      .values
-      .toVector
-      .flatMap(group =>
-        NonEmptyVector.fromVector(group.sortBy(m => (m.support.minSpan, m.mention)))
+    val entityTable = MentionTable.of[EntityK](
+      mentions.map(m => m.mention -> m.source),
+      input.mentionGraph
+    ) match
+      case Left(e)      => return Left(NarrativeCompilerError.MentionConstruction(e))
+      case Right(table) => table
+    // Identity by referring form (ADR 0012): the surface text and offset of each mention come
+    // from its own support, so a pronoun's antecedents are those introduced before it in the text.
+    val byMention = mentions.map(m => m.mention -> m).toMap
+    val bySourceMention = mentions.map(m => m.source -> m).toMap
+    val text = input.source.canonicalText
+    val surfaceOf: ChartNodeRef => Option[String] = ref =>
+      bySourceMention.get(ref).map { m =>
+        val span = m.support.minSpan
+        text.substring(span.start, span.endExclusive)
+      }
+    val offsetOf: ChartNodeRef => Int = ref =>
+      bySourceMention.get(ref).map(_.support.minSpan.start).getOrElse(0)
+    val rank = MentionForms.sentenceRank(input.atlas.sentences.map(_.id))
+    val forms =
+      MentionForms.infer(entityTable, input.mentionGraph, surfaceOf, rank, offsetOf) match
+        case Left(e)      => return Left(NarrativeCompilerError.MentionConstruction(e))
+        case Right(value) => value
+    val identity = EntityIdentity.resolve(
+      input.source.id,
+      entityTable,
+      forms,
+      m => (byMention(m).value.label, byMention(m).value.entityType),
+      ref =>
+        input.mentionGraph
+          .chart(ref.sentence)
+          .map(ChartNumber.of(_, ref.concept))
+          .getOrElse(Number.Unknown)
+    ) match
+      case Left(e)      => return Left(NarrativeCompilerError.MentionConstruction(e))
+      case Right(value) => value
+    val entityGroups = identity.clusters.map(c =>
+      NonEmptyVector.fromVectorUnsafe(
+        c.members.toVector.map(byMention).sortBy(m => (m.support.minSpan, m.mention))
       )
+    )
     val entityBuild = entityGroups.foldLeft[Either[DomainError, Vector[EmittedEntity]]](
       Right(Vector.empty)
     ) { (acc, group) =>
@@ -1499,12 +1543,47 @@ object NarrativeCompiler:
     val entities = entityBuild match
       case Left(error)  => return Left(NarrativeCompilerError.ClaimConstruction(error))
       case Right(value) => value.sortBy(_.node.id)
-    val entityTable = MentionTable.of[EntityK](
-      mentions.map(m => m.mention -> m.source),
-      input.mentionGraph
-    ) match
-      case Left(e)      => return Left(NarrativeCompilerError.MentionConstruction(e))
-      case Right(table) => table
+    // Every non-introducing mention is a coreference attempt: emitted when a rule tied it to one
+    // entity, a gap naming its candidates otherwise.
+    val entityByMention: Map[MentionId[EntityK], EmittedEntity] =
+      entities.flatMap(e => e.members.toVector.map(m => m.mention -> e)).toMap
+    val mentionRecordBySource = mentionRecords.map(r => r.mention -> r).toMap
+    val referenceRecords: Vector[(NarrativeCandidateAddress, ClaimFamily, ResolutionState[?])] =
+      identity.identities.toVector.sortBy(_._1).flatMap { (m, decided) =>
+        val emitted = byMention(m)
+        val target = NarrativeCandidateAddress.EntityReference(emitted.source)
+        val record = mentionRecordBySource(emitted.source)
+        decided match
+          case MentionIdentity.Introducing    => None
+          case MentionIdentity.Resolved(rule) =>
+            val entity = entityByMention(m)
+            emittedByAddress.update(target, entity.node.meta.id)
+            val evidence = record.bundle.proposals.flatMap(_.evidence)
+            NonEmptyVector.fromVector(evidence).map { ev =>
+              val value: CanonicalId[EntityK] = entity.canonical
+              (
+                target,
+                ClaimFamily.EntityCoreference,
+                ResolutionState.Accepted(value, AcceptanceBasis.Determined(rule), ev)
+              )
+            }
+          case MentionIdentity.Open(reason, candidates) =>
+            val upstream = candidates.flatMap(entityByMention.get).map(_.node.meta.id).toSet
+            gaps += gap(
+              target,
+              record.bundle,
+              ClaimFamily.EntityCoreference,
+              DerivationGapReason.OpenReference(reason),
+              upstream
+            )
+            val state: ResolutionState[MentionId[EntityK]] = reason match
+              case OpenReference.SeveralAntecedents =>
+                NonEmptyVector.fromVector(candidates.map(c => Weighted(c, 1, 1, None))) match
+                  case Some(vs) => ResolutionState.Alternatives(vs)
+                  case None     => ResolutionState.Unresolved(ResolutionFailure.NoProposal)
+              case _ => ResolutionState.Unresolved(ResolutionFailure.NoProposal)
+            Some((target, ClaimFamily.EntityCoreference, state))
+      }
     val clusterBuild = entities
       .filter(_.members.length > 1)
       .foldLeft[Either[DocumentError, Vector[ExactCorefCluster[EntityK]]]](Right(Vector.empty)) {
@@ -1530,13 +1609,19 @@ object NarrativeCompiler:
     // above needed them, because a context's identity is derived from its placement alone, so the
     // situations already placed in these frames were addressed correctly before the holder was
     // known.
+    // A candidate holder that minted no entity (an open pronoun, ADR 0012) leaves the holder
+    // unresolved even beside a candidate that did: naming the one that resolved would attribute
+    // the content on the strength of the other being unreadable.
     def holderOf(candidate: HolderCandidate): ContextHolder = candidate match
       case HolderCandidate.Missing(gap)  => ContextHolder.Unattributed(gap)
       case HolderCandidate.Fillers(refs) =>
-        refs.toVector.flatMap(entityBySource.get).distinct match
-          case Vector(one) => ContextHolder.Named(one)
-          case Vector()    => ContextHolder.Unattributed(HolderGap.UnresolvedCandidate)
-          case _           => ContextHolder.Unattributed(HolderGap.SeveralCandidates)
+        val named = refs.toVector.map(entityBySource.get)
+        if named.exists(_.isEmpty) then ContextHolder.Unattributed(HolderGap.UnresolvedCandidate)
+        else
+          named.flatten.distinct match
+            case Vector(one) => ContextHolder.Named(one)
+            case Vector()    => ContextHolder.Unattributed(HolderGap.UnresolvedCandidate)
+            case _           => ContextHolder.Unattributed(HolderGap.SeveralCandidates)
 
     def kindOf(step: ContextStep): ContextKind = step match
       case ContextStep.Quoted(_, who)     => ContextKind.Speech(holderOf(who))
@@ -1979,16 +2064,13 @@ object NarrativeCompiler:
     val emittedById = emitted.map(s => s.node.id -> s).toMap
     val orderedEmitted = graph.discourseOrder.flatMap(emittedById.get)
     val pairs = orderedEmitted.zip(orderedEmitted.drop(1))
-    // A step is derived only when both endpoints carry an accepted, complete participant coverage
-    // and the pair carries an accepted temporal relation (`Unclear` included). Otherwise
-    // `DiscourseTrajectory.derive` would read absent participants as zero turnover and an absent
-    // edge as an ordinary unresolved transition: the same values, without the evidence.
+    // A step is derived only when the pair carries an accepted temporal relation (`Unclear`
+    // included); otherwise `DiscourseTrajectory.derive` would read an absent edge as an ordinary
+    // unresolved transition, the same value without the evidence. A missing participant coverage
+    // no longer blocks the step: the turnover of such a step is derived as `Missing`, since the
+    // cast it would count is not resolved (ADR 0012, truthfulness plan D6).
     val pairMissing = pairs.map { (a, b) =>
-      val required = Vector(
-        NarrativeCandidateAddress.ParticipantCoverage(a.source),
-        NarrativeCandidateAddress.ParticipantCoverage(b.source),
-        NarrativeCandidateAddress.Temporal(a.source, b.source)
-      )
+      val required = Vector(NarrativeCandidateAddress.Temporal(a.source, b.source))
       ((a, b), required.filterNot(emittedByAddress.contains))
     }
     val blockedSteps = pairMissing.collect {
@@ -1997,7 +2079,19 @@ object NarrativeCompiler:
     }
     val trajectory =
       if blockedSteps.isEmpty then
-        DiscourseTrajectory.derive(graph, hierarchy, input.atlas, input.provenance.softwareVersion)
+        val coverageResolved: SituationId => Boolean = id =>
+          emittedById
+            .get(id)
+            .exists(s =>
+              emittedByAddress.contains(NarrativeCandidateAddress.ParticipantCoverage(s.source))
+            )
+        DiscourseTrajectory.derive(
+          graph,
+          hierarchy,
+          input.atlas,
+          input.provenance.softwareVersion,
+          coverageResolved
+        )
       else DiscourseTrajectory.empty
     trajectory.steps.foreach { step =>
       (emittedById.get(step.from), emittedById.get(step.to)) match
@@ -2075,6 +2169,7 @@ object NarrativeCompiler:
         membershipRecords.map(r => (r.target, ClaimFamily.SegmentMembership, r.state)) ++
         causalRecords.map(r => (r.target, ClaimFamily.CausalEdge, r.state)) ++
         mentionRecords.map(r => (r.target, ClaimFamily.EntityMention, r.state)) ++
+        referenceRecords ++
         participantRecords.map(r => (r.target, ClaimFamily.ParticipantRole, r.state)) ++
         coverageRecords.map(r => (r.target, ClaimFamily.ParticipantCoverage, r.state)) ++
         circumstanceRecords.map(r => (r.target, ClaimFamily.SituationCircumstance, r.state)) ++
@@ -2854,11 +2949,14 @@ object NarrativeCompiler:
         )
     val steps = trajectory.steps.map(step =>
       renderFields(
-        "flow-step/v1",
+        "flow-step/v2",
         Vector(
           step.from.value,
           step.to.value,
-          step.entityTurnover.toString,
+          step.entityTurnover match
+            case Estimate.Observed(v, _)  => s"observed:${CanonicalDouble.render(v)}"
+            case Estimate.Missing(reason) => s"missing:$reason"
+          ,
           step.contextChange.toString,
           step.worldTime.value.toString,
           renderOption(step.worldTimeContext)(_.value),

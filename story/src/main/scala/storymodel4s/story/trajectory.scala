@@ -2,6 +2,7 @@ package storymodel4s.story
 
 import cats.data.NonEmptyVector
 import storymodel4s.core.*
+import storymodel4s.features.{Estimate, MissingReason}
 
 /** Change between two adjacent atomic units in discourse order. `featureChanges` holds
   * view-specific discontinuities keyed by the declared feature space that produced them; a missing
@@ -16,7 +17,7 @@ final case class FlowStep(
     from: SituationId,
     to: SituationId,
     featureChanges: Map[FeatureSpaceId, ScoreEstimate],
-    entityTurnover: Double,
+    entityTurnover: ScoreEstimate,
     locationChange: Option[Boolean],
     contextChange: Boolean,
     worldTime: Resolved[WorldTimeTransition],
@@ -58,11 +59,18 @@ object DiscourseTrajectory:
     * edge in that context → `Unresolved` with no alternatives. Each derived value is a
     * `StructurallyDerived` claim citing both situations' supports.
     */
+  /** `castResolved` says whether a situation's participant set is complete and every member
+    * resolved to an entity; a step between two situations either of whose casts is not is derived
+    * with its turnover `Missing(InputUnresolved)` rather than with a number computed over the
+    * members that happened to resolve (truthfulness plan D6). The default resolves everything,
+    * which is right only for a caller that has checked.
+    */
   def derive(
       graph: NarrativeGraph,
       hierarchy: NarrativeHierarchy,
       atlas: SurfaceAtlas,
-      softwareVersion: String = StoryModel.SchemaVersion
+      softwareVersion: String = StoryModel.SchemaVersion,
+      castResolved: SituationId => Boolean = _ => true
   ): DiscourseTrajectory =
     val order = graph.discourseOrder
     val provenance = Provenance.deterministic(softwareVersion, Checksum.ofText("trajectory-derive"))
@@ -72,8 +80,11 @@ object DiscourseTrajectory:
       val ea = graph.expandedEntitiesOf(a)
       val eb = graph.expandedEntitiesOf(b)
       val union = ea.union(eb)
-      val turnover =
-        if union.isEmpty then 0.0 else 1.0 - ea.intersect(eb).size.toDouble / union.size
+      val turnover: ScoreEstimate =
+        if !(castResolved(a) && castResolved(b)) then
+          Estimate.Missing(MissingReason.InputUnresolved)
+        else if union.isEmpty then Estimate.observed(0.0)
+        else Estimate.observed(1.0 - ea.intersect(eb).size.toDouble / union.size)
       val ctxChange = sa.context != sb.context
       val scope = graph.commonContext(sa.context, sb.context)
       val scoped = scope.map(graph.temporalEdgesIn).getOrElse(Vector.empty)

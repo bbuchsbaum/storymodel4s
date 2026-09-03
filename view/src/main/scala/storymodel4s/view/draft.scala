@@ -10,6 +10,7 @@ import storymodel4s.document.{
   DerivationGapReason,
   DocRef,
   NarrativeCandidateAddress,
+  OpenReference,
   SentenceCoverage
 }
 import storymodel4s.story.{
@@ -269,6 +270,10 @@ object UncertaintyState:
     case DerivationGapReason.MissingUpstream(_)       => Missing
     case DerivationGapReason.UnscopableRelation(_, _) => Missing
     case DerivationGapReason.InvalidAccepted(_)       => Missing
+    // An open pronoun with several candidates is a split reading; with none, resolution ran and
+    // reached nothing.
+    case DerivationGapReason.OpenReference(OpenReference.SeveralAntecedents) => Alternatives
+    case DerivationGapReason.OpenReference(_)                                => Unresolved
 
 /** A non-colour visual channel carrying an epistemic distinction (ADR 0002 D9, V-U5).
   *
@@ -365,6 +370,7 @@ private[view] object GapTarget:
     case NarrativeCandidateAddress.ParticipantCoverage(situation)  => Vector(situation)
     case NarrativeCandidateAddress.Circumstance(situation, filler) => Vector(situation, filler)
     case NarrativeCandidateAddress.Temporal(from, to)              => Vector(from, to)
+    case NarrativeCandidateAddress.EntityReference(mention)        => Vector(mention)
 
   /** The address the gap is about: its anchoring chart node, or the work when it names none.
     *

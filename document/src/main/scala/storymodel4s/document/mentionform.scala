@@ -166,21 +166,22 @@ object MentionFormInference:
             case None         => MentionForm.Nominal(definitenessOf(surface))
 
 /** Discourse position of a mention: rank of its sentence in the mention graph's sentence order,
-  * then its concept id. The tie-break within a sentence is concept-id order because charts do not
-  * carry token offsets for concepts; two mentions in one sentence are therefore ordered
-  * deterministically but not by surface position.
+  * then the surface offset of its support when the caller supplies one, then its concept id. Charts
+  * do not carry token offsets for concepts, so a caller with alignment spans passes them; without
+  * them two mentions in one sentence are ordered deterministically but not by surface position, and
+  * "precedes" is only decided across sentences.
   */
-final case class MentionPosition(sentenceRank: Int, concept: ConceptId)
+final case class MentionPosition(sentenceRank: Int, offset: Int, concept: ConceptId)
 
 object MentionPosition:
-  given Order[MentionPosition] = Order.by(p => (p.sentenceRank, p.concept))
+  given Order[MentionPosition] = Order.by(p => (p.sentenceRank, p.offset, p.concept))
   given Ordering[MentionPosition] = Order[MentionPosition].toOrdering
 
 /** Referring forms for the entity mentions of one mention table, with reader-time accessors.
   *
   * Every mention in the table has exactly one form (validated at construction), so `formOf` is
-  * total over the table. Positions come from the mention graph's sentence order (see
-  * [[MentionPosition]]); `MentionForms.of` fails if a mention's node is absent from the graph.
+  * total over the table. Positions come from the sentence order the caller supplies (see
+  * [[MentionPosition]]); `MentionForms.of` fails if a mention's node has no rank there.
   */
 final class MentionForms private (
     val forms: Map[MentionId[EntityK], MentionForm],
@@ -250,10 +251,19 @@ final class MentionForms private (
 object MentionForms:
   /** Build from explicit forms; every table mention needs a form and every form a table mention.
     */
+  /** Discourse rank of every sentence, in the order the caller states. The mention graph's own
+    * `sentences` are sorted by id, which is not discourse order once a story has ten sentences
+    * (`s10` sorts before `s2`), so the atlas order must be passed by anyone who means "precedes".
+    */
+  def sentenceRank(order: Vector[SurfaceUnitId]): SurfaceUnitId => Option[Int] =
+    order.zipWithIndex.toMap.get
+
   def of(
       table: MentionTable[EntityK],
       forms: Map[MentionId[EntityK], MentionForm],
-      graph: MentionGraph
+      graph: MentionGraph,
+      rank: SurfaceUnitId => Option[Int],
+      offsetOf: ChartNodeRef => Int = _ => 0
   ): Either[DocumentError, MentionForms] =
     val missingForm = table.mentions.find(m => !forms.contains(m))
     val unknown = forms.keys.toVector.sorted.find(m => !table.contains(m))
@@ -261,7 +271,6 @@ object MentionForms:
       case (Some(m), _) => Left(DocumentError.UnknownMention(m.value, "MentionForms.form"))
       case (_, Some(m)) => Left(DocumentError.UnknownMention(m.value, "MentionForms.table"))
       case _            =>
-        val rank = graph.sentences.zipWithIndex.toMap
         val positioned =
           table.mentions.foldLeft[Either[DocumentError, Map[MentionId[EntityK], MentionPosition]]](
             Right(Map.empty)
@@ -269,9 +278,10 @@ object MentionForms:
             case (Left(e), _)    => Left(e)
             case (Right(acc), m) =>
               val node = table.node(m).get
-              rank.get(node.sentence) match
+              rank(node.sentence) match
                 case None    => Left(DocumentError.MentionNotInGraph(m.value, node, "MentionForms"))
-                case Some(r) => Right(acc.updated(m, MentionPosition(r, node.concept)))
+                case Some(r) =>
+                  Right(acc.updated(m, MentionPosition(r, offsetOf(node), node.concept)))
           }
         positioned.map(new MentionForms(forms, _))
 
@@ -279,7 +289,9 @@ object MentionForms:
   def infer(
       table: MentionTable[EntityK],
       graph: MentionGraph,
-      surfaceOf: ChartNodeRef => Option[String]
+      surfaceOf: ChartNodeRef => Option[String],
+      rank: SurfaceUnitId => Option[Int],
+      offsetOf: ChartNodeRef => Int = _ => 0
   ): Either[DocumentError, MentionForms] =
     val forms = table.mentions.flatMap { m =>
       table.node(m).flatMap { node =>
@@ -288,4 +300,4 @@ object MentionForms:
         }
       }
     }.toMap
-    of(table, forms, graph)
+    of(table, forms, graph, rank, offsetOf)

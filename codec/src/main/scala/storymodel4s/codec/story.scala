@@ -617,7 +617,7 @@ object StoryCodecs:
       f <- field[SituationId](c, "from")
       t <- field[SituationId](c, "to")
       fc <- field[Map[FeatureSpaceId, Estimate[Double]]](c, "featureChanges")
-      et <- field[Double](c, "entityTurnover")
+      et <- field[Estimate[Double]](c, "entityTurnover")
       lc <- field[Option[Boolean]](c, "locationChange")
       cc <- field[Boolean](c, "contextChange")
       wt <- field[Resolved[WorldTimeTransition]](c, "worldTime")

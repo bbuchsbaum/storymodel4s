@@ -420,6 +420,8 @@ object DerivationCodecs:
       )
     case NarrativeCandidateAddress.Temporal(from, to) =>
       Json.obj("type" -> "Temporal".asJson, "from" -> from.asJson, "to" -> to.asJson)
+    case NarrativeCandidateAddress.EntityReference(mention) =>
+      Json.obj("type" -> "EntityReference".asJson, "mention" -> mention.asJson)
   }
   given Decoder[NarrativeCandidateAddress] = Decoder.instance { c =>
     def node(name: String) = field[ChartNodeRef](c, name)
@@ -462,7 +464,34 @@ object DerivationCodecs:
           from <- node("from")
           to <- node("to")
         yield NarrativeCandidateAddress.Temporal(from, to)
+      case "EntityReference" =>
+        node("mention").map(NarrativeCandidateAddress.EntityReference.apply)
     }
+  }
+
+  given Encoder[Person] = enumEncoder(_.toString)
+  given Decoder[Person] = enumDecoder("Person", Person.values, _.toString)
+
+  given Encoder[OpenReference] = Encoder.instance {
+    case OpenReference.NeedsSpeechHolder(person) =>
+      Json.obj("type" -> "NeedsSpeechHolder".asJson, "person" -> person.asJson)
+    case OpenReference.UnrecognizedForm(label) =>
+      Json.obj("type" -> "UnrecognizedForm".asJson, "label" -> label.asJson)
+    case reason => reason.toString.asJson
+  }
+  given Decoder[OpenReference] = Decoder.instance { c =>
+    c.value.asString match
+      case Some("NoAntecedent")       => Right(OpenReference.NoAntecedent)
+      case Some("SeveralAntecedents") => Right(OpenReference.SeveralAntecedents)
+      case Some(other)                =>
+        Left(DecodingFailure(s"unknown OpenReference $other", c.history))
+      case None =>
+        tagged(c) {
+          case "NeedsSpeechHolder" =>
+            field[Person](c, "person").map(OpenReference.NeedsSpeechHolder.apply)
+          case "UnrecognizedForm" =>
+            field[String](c, "label").map(OpenReference.UnrecognizedForm.apply)
+        }
   }
 
   given Encoder[DerivationGapReason] = Encoder.instance {
@@ -476,6 +505,8 @@ object DerivationCodecs:
       Json.obj("type" -> "UnscopableRelation".asJson, "from" -> from.asJson, "to" -> to.asJson)
     case DerivationGapReason.InvalidAccepted(error) =>
       Json.obj("type" -> "InvalidAccepted".asJson, "error" -> error.asJson)
+    case DerivationGapReason.OpenReference(reason) =>
+      Json.obj("type" -> "OpenReference".asJson, "reason" -> reason.asJson)
     case reason => reason.toString.asJson
   }
   given Decoder[DerivationGapReason] = Decoder.instance { c =>
@@ -501,6 +532,8 @@ object DerivationCodecs:
             yield DerivationGapReason.UnscopableRelation(from, to)
           case "InvalidAccepted" =>
             field[DomainError](c, "error").map(DerivationGapReason.InvalidAccepted.apply)
+          case "OpenReference" =>
+            field[OpenReference](c, "reason").map(DerivationGapReason.OpenReference.apply)
         }
   }
 

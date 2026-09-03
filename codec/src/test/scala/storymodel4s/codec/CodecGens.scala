@@ -112,6 +112,7 @@ object CodecGens:
     Gen.const(MissingReason.ProviderAbstained),
     Gen.const(MissingReason.Excluded),
     Gen.const(MissingReason.AllMissing),
+    Gen.const(MissingReason.InputUnresolved),
     Gen.const(MissingReason.Unknown),
     Gen.zip(ident, ident).map(MissingReason.Custom.apply),
     malformedReason.map(MissingReason.Malformed.apply),
@@ -353,7 +354,15 @@ object CodecGens:
     for
       a <- chartNodeRef
       b <- chartNodeRef
-    yield NarrativeCandidateAddress.Temporal(a, b)
+    yield NarrativeCandidateAddress.Temporal(a, b),
+    chartNodeRef.map(NarrativeCandidateAddress.EntityReference.apply)
+  )
+
+  val openReference: Gen[OpenReference] = Gen.oneOf(
+    Gen.const(OpenReference.NoAntecedent),
+    Gen.const(OpenReference.SeveralAntecedents),
+    Gen.oneOf(Person.values.toSeq).map(OpenReference.NeedsSpeechHolder.apply),
+    ident.map(OpenReference.UnrecognizedForm.apply)
   )
 
   val gapReason: Gen[DerivationGapReason] = Gen.oneOf(
@@ -367,7 +376,8 @@ object CodecGens:
       a <- chartNodeRef
       b <- chartNodeRef
     yield DerivationGapReason.UnscopableRelation(a, b),
-    domainError.map(DerivationGapReason.InvalidAccepted.apply)
+    domainError.map(DerivationGapReason.InvalidAccepted.apply),
+    openReference.map(DerivationGapReason.OpenReference.apply)
   )
 
   val evidenceRef: Gen[EvidenceRef] = Gen.oneOf(

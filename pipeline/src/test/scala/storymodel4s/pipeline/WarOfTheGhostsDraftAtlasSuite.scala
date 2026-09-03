@@ -148,13 +148,13 @@ class WarOfTheGhostsDraftAtlasSuite extends FunSuite:
     assertEquals(compilation.draft.source.id.value, WogStory)
     assertEquals(compilation.draft.atlas.sentences.size, 50)
     assertEquals(compilation.draft.graph.situations.size, 65)
-    assertEquals(compilation.draft.graph.entities.size, 29)
+    assertEquals(compilation.draft.graph.entities.size, 23)
     assertEquals(compilation.draft.graph.contexts.size, 6)
 
     // No story segment, because nobody stated a title and the summary family therefore abstained.
     assertEquals(compilation.draft.graph.segments.size, 0)
     assertEquals(compilation.validated, None)
-    assertEquals(compilation.derivation.gaps.size, 70)
+    assertEquals(compilation.derivation.gaps.size, 149)
     assertEquals(compilation.validation.report.violations.size, 135)
   }
 
@@ -162,7 +162,7 @@ class WarOfTheGhostsDraftAtlasSuite extends FunSuite:
     val promotion = scene.provenance.draft.getOrElse(fail("a draft scene carries a promotion"))
     assertEquals(scene.provenance.basis, ViewBasis.DraftBuild)
     assertEquals(promotion.promoted, false)
-    assertEquals(promotion.gapCount, Some(70))
+    assertEquals(promotion.gapCount, Some(149))
     assertEquals(promotion.violationCount, 135)
     assertEquals(
       promotion.unsatisfiedLaws.map(law => (law.law, law.severity, law.count.value)),
@@ -178,23 +178,23 @@ class WarOfTheGhostsDraftAtlasSuite extends FunSuite:
     )
   }
 
-  test("the mark census: 277 marks, and every absence the compilation recorded is one of them") {
+  test("the mark census: 356 marks, and every absence the compilation recorded is one of them") {
     assertEquals(
       census(scene).toVector.sorted,
       Vector(
         ("abstention", 1),
         ("context-band", 6),
-        ("gap", 70),
+        ("gap", 149),
         ("landmark", 65),
         ("unsatisfied-law", 135)
       )
     )
-    assertEquals(scene.marks.size, 277)
+    assertEquals(scene.marks.size, 356)
 
     // The identity the acceptance criterion asks for: the gap marks number what the compilation
     // reports, and each names a distinct gap.
     assertEquals(gaps(scene).size, compilation.derivation.gaps.size)
-    assertEquals(gaps(scene).map(_.identity.mark).distinct.size, 70)
+    assertEquals(gaps(scene).map(_.identity.mark).distinct.size, 149)
     assertEquals(
       gaps(scene).map(_.target).toSet,
       compilation.derivation.gaps.map(_.target).toSet
@@ -210,7 +210,7 @@ class WarOfTheGhostsDraftAtlasSuite extends FunSuite:
         .view
         .mapValues(_.size)
         .toMap,
-      Map("at-spans" -> 69, "whole-work" -> 1)
+      Map("at-spans" -> 148, "whole-work" -> 1)
     )
 
     // The one gap with no discourse position is the story summary: it concerns the whole work, so
@@ -248,9 +248,14 @@ class WarOfTheGhostsDraftAtlasSuite extends FunSuite:
         .view
         .mapValues(_.size)
         .toMap,
+      // 118 missing: 65 memberships, 27 participant roles and 26 coverages behind open pronouns;
+      // 9 unresolved: the five abstained-anchor families and four first- or second-person
+      // pronouns awaiting a speech-holder rule; 22 fans: pronouns with several candidates
+      // (ADR 0012).
       Map[(UncertaintyState, Option[EpistemicChannel]), Int](
-        (UncertaintyState.Missing, Some(EpistemicChannel.OpenHatch)) -> 65,
-        (UncertaintyState.Unresolved, Some(EpistemicChannel.Placeholder)) -> 5
+        (UncertaintyState.Missing, Some(EpistemicChannel.OpenHatch)) -> 118,
+        (UncertaintyState.Unresolved, Some(EpistemicChannel.Placeholder)) -> 9,
+        (UncertaintyState.Alternatives, Some(EpistemicChannel.Fan)) -> 22
       )
     )
     assert(gaps(scene).forall(_.epistemicChannel.isDefined))
@@ -403,14 +408,14 @@ class WarOfTheGhostsDraftAtlasSuite extends FunSuite:
     val twin = scene.textualTwin
     assert(twin.startsWith("Narrative Atlas — DiscourseAtlas\n"), twin.take(120))
     assert(twin.contains("Basis: draft build\n"), "the twin states the basis")
-    assert(twin.contains("promotable: false; derivation gaps: 70; violations: 135\n"))
+    assert(twin.contains("promotable: false; derivation gaps: 149; violations: 135\n"))
     assert(twin.contains("  - compiler.required-derivation Error x69\n"))
     assert(twin.contains("  - hierarchy.single-primary-root Error x1\n"))
     assert(twin.contains("  - hierarchy.situation-root-reachable Error x65\n"))
 
     def lines(prefix: String): Vector[String] =
       twin.linesIterator.filter(_.startsWith(prefix)).toVector
-    assertEquals(lines("  gap ").size, 70)
+    assertEquals(lines("  gap ").size, 149)
     assertEquals(lines("  abstention ").size, 1)
     assertEquals(lines("  unsatisfied-law ").size, 135)
     assertEquals(lines("  context-band ").size, 6)
@@ -442,10 +447,10 @@ class WarOfTheGhostsDraftAtlasSuite extends FunSuite:
       Vector(
         ("abstention", 1),
         ("context-band", 6),
-        ("gap", 70),
+        ("gap", 149),
         ("landmark", 65),
         ("surface-unit", 50),
-        ("thread", 6),
+        ("thread", 3),
         ("unsatisfied-law", 135)
       )
     )
@@ -483,13 +488,13 @@ class WarOfTheGhostsDraftAtlasSuite extends FunSuite:
     // And the receipt says which it is. `record not supplied` is not `0 gaps`: the first says
     // nobody told the view anything, the second would say the compiler derived everything.
     assertEquals(alone.promotion.gapCount, None)
-    assertEquals(scene.provenance.draft.flatMap(_.gapCount), Some(70))
+    assertEquals(scene.provenance.draft.flatMap(_.gapCount), Some(149))
     assertNotEquals(alone.promotion, draft.promotion)
     assert(
       aloneScene.textualTwin.contains("derivation gaps: record not supplied"),
       "twin is silent"
     )
-    assert(scene.textualTwin.contains("derivation gaps: 70"))
+    assert(scene.textualTwin.contains("derivation gaps: 149"))
 
     // The two receipts are different statements, so neither scene can be compiled under the other.
     val crossed = AtlasCompiler(
