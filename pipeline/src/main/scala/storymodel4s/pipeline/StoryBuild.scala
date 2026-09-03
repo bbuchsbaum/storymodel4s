@@ -3,7 +3,13 @@ package storymodel4s.pipeline
 import java.nio.charset.StandardCharsets
 import java.nio.file.{Files, Path, Paths}
 import scala.util.control.NonFatal
-import storymodel4s.codec.{DerivationArtifact, DerivationRecordCodec, StoryModelCodec}
+import storymodel4s.codec.{
+  DerivationArtifact,
+  DerivationRecordCodec,
+  FeaturesRecordCodec,
+  StoryModelCodec
+}
+import storymodel4s.story.{ModelStatus, StoryModel}
 import storymodel4s.core.*
 import storymodel4s.document.{
   ChartProposalProvider,
@@ -46,6 +52,9 @@ enum PipelineError:
   /** The derivation record refused the compilation's own attempts, gaps, and coverage. */
   case RecordRefused(error: DomainError)
 
+  /** A feature request could not be measured or materialized; the detail names no source prose. */
+  case FeatureRefused(detail: String)
+
   /** A bundle file could not be written; the reason is digested, never echoed. */
   case OutputUnwritable(path: String, reasonChecksum: Checksum)
 
@@ -56,6 +65,7 @@ enum PipelineError:
     case CompileRefused(error)    => s"compiler refused: ${error.message}"
     case ReceiptMismatch(detail)  => s"compilation receipt refused: $detail"
     case RecordRefused(error)     => s"derivation record refused: ${error.message}"
+    case FeatureRefused(detail)   => s"feature refused: $detail"
     case OutputUnwritable(p, sum) => s"cannot write $p (reason ${sum.short()})"
 
 /** The process exit status of a story build, as a closed set with its numeric code attached.
@@ -99,8 +109,15 @@ object ExitStatus:
   * Why a value and not three strings: the layout is one decision (ADR 0009) that the writer, the
   * summary, and every test address by role, so a renamed file cannot drift between them.
   */
-final case class BundleFiles(model: Path, report: Path, receipts: Path, derivation: Path):
-  def all: Vector[Path] = Vector(model, report, receipts, derivation)
+final case class BundleFiles(
+    model: Path,
+    report: Path,
+    receipts: Path,
+    derivation: Path,
+    features: Path,
+    sidecars: Vector[Path]
+):
+  def all: Vector[Path] = Vector(model, report, receipts, derivation, features) ++ sidecars
 
 /** Counts and checksums a build publishes. Privately constructed because every field is derived
   * from one parse outcome and one compilation that [[BuildSummary.derive]] has checked belong
@@ -174,9 +191,10 @@ object BuildSummary:
       parsed: ParseOutcome,
       proposals: ChartProposals,
       compilation: NarrativeCompilation,
+      written: StoryModel[ModelStatus.Draft],
       files: BundleFiles
   ): Either[PipelineError, BuildSummary] =
-    val receipt = compilation.receipt
+    val receipt = written.receipt.getOrElse(compilation.receipt)
     val report = compilation.validation.report
     val expectedParserStage =
       (parsed.parserStage._1, ChartProposalProvider.chartsDigest(parsed.charts))
@@ -210,7 +228,7 @@ object BuildSummary:
           validated = compilation.validated.isDefined,
           fingerprint = compilation.fingerprint,
           candidateSet = compilation.derivation.candidateSet,
-          encodingDigest = StoryModelCodec.contentChecksum(compilation.draft),
+          encodingDigest = StoryModelCodec.contentChecksum(written),
           receiptChecksum = receipt.contentChecksum,
           files
         )
@@ -236,12 +254,21 @@ object StoryPipeline:
     */
   val DerivationFile: String = "derivation.json"
 
-  def files(outDir: Path): BundleFiles =
+  /** The feature record (`features-record/v1`): every measured track in its sidecar-backed form,
+    * bound to `storymodel.json` by its checksum; the sidecar bytes sit under `features/`, each
+    * named by its manifest checksum. Written on every build, with no tracks when none were asked
+    * for, so "nothing measured" is a record and not a missing file.
+    */
+  val FeaturesFile: String = "features.json"
+
+  def files(outDir: Path, sidecars: Vector[String] = Vector.empty): BundleFiles =
     BundleFiles(
       outDir.resolve(ModelFile),
       outDir.resolve(ReportFile),
       outDir.resolve(ReceiptsFile),
-      outDir.resolve(DerivationFile)
+      outDir.resolve(DerivationFile),
+      outDir.resolve(FeaturesFile),
+      sidecars.map(outDir.resolve)
     )
 
   /** Build one text. `replay` never calls the model and refuses a missing recordings directory;
@@ -260,7 +287,8 @@ object StoryPipeline:
       env: Map[String, String],
       nowEpochMillis: Long,
       source: ExchangeSource = ExchangeSource.Court,
-      title: Option[StoryTitle] = None
+      title: Option[StoryTitle] = None,
+      features: Vector[FeatureRequest] = Vector.empty
   ): Either[PipelineError, BuildSummary] =
     for
       parsed <- ClaudeParseDriver
@@ -277,29 +305,42 @@ object StoryPipeline:
         .left
         .map(PipelineError.InputRefused(_))
       compilation <- NarrativeCompiler.compile(input).left.map(PipelineError.CompileRefused(_))
+      measured <- FeatureStage.build(compilation.draft, features)
+      written = measured.model
       record <- DerivationArtifact
-        .from(compilation, proposals)
+        .from(compilation, proposals, written)
         .left
         .map(PipelineError.RecordRefused(_))
-      bundle = files(outDir)
-      summary <- BuildSummary.derive(parsed, proposals, compilation, bundle)
-      model = StoryModelCodec.encode(compilation.draft)
+      bundle = files(outDir, measured.artifact.tracks.map(_.file))
+      summary <- BuildSummary.derive(parsed, proposals, compilation, written, bundle)
+      model = StoryModelCodec.encode(written)
       report = BundleJson.report(parsed, proposals, compilation, summary).spaces2 + "\n"
       receipts = BundleJson.receipts(parsed, compilation, summary).spaces2 + "\n"
       derivation = DerivationRecordCodec.encode(record)
+      featureRecord = FeaturesRecordCodec.encode(measured.artifact)
       _ <- write(bundle.model, model)
       _ <- write(bundle.report, report)
       _ <- write(bundle.receipts, receipts)
       _ <- write(bundle.derivation, derivation)
+      _ <- write(bundle.features, featureRecord)
+      _ <- measured.artifact.tracks.foldLeft[Either[PipelineError, Unit]](Right(())) {
+        (acc, entry) =>
+          acc.flatMap(_ =>
+            writeBytes(outDir.resolve(entry.file), measured.sidecars(entry.track.space.id))
+          )
+      }
     yield summary
 
   private def describe(error: Throwable): String =
     s"${error.getClass.getName}: ${Option(error.getMessage).getOrElse("")}"
 
   private def write(path: Path, content: String): Either[PipelineError, Unit] =
+    writeBytes(path, content.getBytes(StandardCharsets.UTF_8))
+
+  private def writeBytes(path: Path, bytes: Array[Byte]): Either[PipelineError, Unit] =
     try
       Option(path.getParent).foreach(parent => Files.createDirectories(parent))
-      Files.write(path, content.getBytes(StandardCharsets.UTF_8))
+      Files.write(path, bytes)
       Right(())
     catch
       case NonFatal(error) =>
@@ -346,7 +387,9 @@ object StoryPipeline:
   val out = Paths.get(outDir)
   val outcome = for
     parsed <- DriverMode.parse(mode).left.map(PipelineError.NotStarted(_))
-    supplied <- ClaudeParseDriver.titleArgument(title).left.map(PipelineError.NotStarted(_))
+    split <- FeatureRequest.fromArgs(title)
+    (features, rest) = split
+    supplied <- ClaudeParseDriver.titleArgument(rest).left.map(PipelineError.NotStarted(_))
     summary <- StoryPipeline.run(
       parsed,
       Paths.get(textPath),
@@ -354,7 +397,8 @@ object StoryPipeline:
       out,
       sys.env,
       System.currentTimeMillis(),
-      title = supplied
+      title = supplied,
+      features = features
     )
   yield summary
   outcome match

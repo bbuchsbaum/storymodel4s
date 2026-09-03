@@ -125,3 +125,76 @@ an unresolved referent may not look resolved; a partial model renders as visibly
 Do not start a new projection (Chronology Loom, Recall Voyage, causal) before the layer it reads
 exists. Building a projection the model cannot feed produces an empty picture, which is worse than
 no picture, and the recovery plan §V3 names each one's blocker.
+
+## 6. Update, 2026-09-03 afternoon: three of the four slices landed
+
+Everything above §5 was true at `328021b2`. Three landings later the picture is:
+
+| | state |
+|---|---|
+| storymodel4s `main` | the merge that lands this section (derivation record `46d4a6a5`, credence and provenance `9d71e87c`, feature tracks: the merge containing this file), all pushed, each on a `checkAll` gate of the merge result |
+| model wire schema | **0.4.0**: a claim's credence is `{"score", "basis"}`; 0.3.0 files are refused, no migration (ADR 0010) |
+| `storymodel.json`, fifty-sentence replay | **0.8 MB**, was 89.8 MB |
+| bundle files | `storymodel.json`, `compilation-report.json`, `receipts.json`, **`derivation.json`** (`derivation-record/v1`), **`features.json`** (`features-record/v1`), **`features/<manifest checksum>.sidecar`** per measured space |
+| still not validated | 70 gaps, 135 violations, unchanged: the summary family is still unresolved without a caller's title, and nothing here touched the hierarchy |
+
+### What is now true of the model
+
+1. **Credence says what entitles it.** `Credence(score, basis)`: `Score.Unmeasured | Raw(value,
+   scorer)`, `CredenceBasis.Uncalibrated | Calibrated(p, model) | Determined(rule)`. On the replay:
+   0 calibrated probabilities (was 197 fabricated `1.0`s), 0 claims without a basis (was 128),
+   269 `Unmeasured + Determined`, 56 `Raw + Determined` carrying the interop role table's grades
+   under the table's own scorer. Nothing reads `1.0` anywhere. A parser that reports confidence
+   passes it into `AmrCandidates.fromPenman`; the current one reports none, and the model says so.
+2. **A claim's provenance is its own calls.** An accepted claim carries its rule call and the parse
+   receipts of the sentences its evidence lies in (3, or 5 across two sentences); a derived claim
+   carries none and cites upstream claims. The run log stays in `receipts.json`.
+3. **The derivation record is readable.** `derivation.json` carries every attempt, gap (with its
+   upstream claim ids and evidence refs), coverage row and the summary coverage, bound to the
+   model by story id, source checksum and the SHA-256 of the exact `storymodel.json` bytes.
+   `DerivationRecordCodec.decode(model, text)` refuses a record for another build.
+4. **Features measure the story.** `--feature token-length`, `--feature type-frequency`,
+   `--feature lexicon=<path>`: raw token tracks with typed missingness, and mean reductions per
+   sentence and per situation with coverage and exact support, materialized as SM4SFT02 sidecars
+   plus `features.json`. Any word→value table is a measure (ADR 0011); no norms ship here.
+
+### What is still false or absent
+
+- Items 4–8 of §2 stand: causal/goal/state-change/reference/entity-relation layers empty; the
+  hierarchy is one segment with zero boundary beliefs; the temporal layer is discourse order;
+  51 fillers unlicensed; **coreference is still lemma-grouped** (§5 item 4 is the one slice not
+  done, and `MentionForms.resolvableAt` is still unused).
+- No claim is calibrated: `align`'s calibrators are siblings of `document` and unreachable; a fit
+  needs adjudicated data. `story.StatusWeight.of(meta)` still falls back to a constant per status
+  off the story-build path (ADR 0010 records it).
+- Features infer no boundaries (ADR 0004's `level` question is open) and the viewer does not yet
+  read `features.json`.
+
+### The viewer
+
+storyatlas4s reads `derivation.json` beside the model through the model-bound decoder (branch
+`solo/derivation-record` in its `.worktrees/derivation-record`; see the storyatlas4s commit for
+its pin and gate). A record for another build is refused, never paired; no file means
+`NotSupplied`, still distinct from zero gaps.
+
+### New traps
+
+- **sbt-git in a linked worktree cannot load a detached HEAD** (`MissingObjectException`, then the
+  retry prompt hangs a `-batch` gate forever with zero totals). Gate a merge result on a branch.
+- **The Coursier cache was wiped mid-session** (something freed ~80 GB); a gate then dies at
+  `<module>JS / update` with `NoSuchFileException`. Infrastructure: rerun with network up.
+- **`rm -rf` on the scratchpad and heredoc-written shell scripts are denied** to the agent; use
+  fresh output directories and the Write tool.
+
+### What I would do next, in order
+
+1. **Pronoun coreference** (§5 item 4): wire `MentionForms.resolvableAt`; the antecedent rule the
+   recall lane already has (`recall/segmenter.scala:748-842`, nearest preceding nominal of
+   compatible number) is the prior art; `MentionPosition` orders within a sentence by concept id,
+   so the rule works at sentence grain or the position type gains an offset. Entity ids, the two
+   29-entity pins, and the fingerprint all move.
+2. **The viewer reads `features.json`** and draws Token/Sentence/Situation tracks (it already
+   admits those targets; `FeatureChannelState.SidecarRequired` is the seam).
+3. **A summary rule that reads the story**, so a bare text can validate without a caller's title.
+4. **Calibration**: a `CalibrationModelId`-typed fit over adjudicated roles, leave-story-out, the
+   first `Calibrated` basis in the story path.

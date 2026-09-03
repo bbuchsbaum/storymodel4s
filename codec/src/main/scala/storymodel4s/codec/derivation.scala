@@ -98,10 +98,20 @@ object DerivationArtifact:
       compilation: NarrativeCompilation,
       proposals: ChartProposals
   ): Either[DomainError, DerivationArtifact] =
+    from(compilation, proposals, compilation.draft)
+
+  /** The record bound to `written`, the draft actually put on disk, which may carry feature tracks
+    * the compiler's own draft does not.
+    */
+  def from(
+      compilation: NarrativeCompilation,
+      proposals: ChartProposals,
+      written: StoryModel[ModelStatus.Draft]
+  ): Either[DomainError, DerivationArtifact] =
     of(
-      compilation.draft.source.id,
-      compilation.draft.source.canonicalChecksum,
-      StoryModelCodec.contentChecksum(compilation.draft),
+      written.source.id,
+      written.source.canonicalChecksum,
+      StoryModelCodec.contentChecksum(written),
       compilation.fingerprint,
       compilation.derivation.candidateSet,
       compilation.derivation.attempts,
