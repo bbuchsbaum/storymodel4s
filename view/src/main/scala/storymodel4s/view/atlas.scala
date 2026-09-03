@@ -368,13 +368,21 @@ enum VisualPrimitive:
 
   /** `context` is the situation's own frame, so a renderer can band without reopening the model.
     * Its lane is `at.lane`, which is layout; the frame identity is the claim.
+    *
+    * `status` is the situation's own [[ClaimMeta.status]], carried so that a reader can tell an
+    * explicitly stated event from a structurally derived one without reopening the model. It is
+    * read from the node, never defaulted: a landmark that could not be tied to its claim is not
+    * drawn at all (see the compiler's `landmarks`), because a mark that said `SurfaceExplicit`
+    * because nothing else was known would be the one lie this whole layer exists to prevent.
+    * [[VisualPrimitive.Route]] already carries the same field for the same reason.
     */
   case Landmark(
       identity: VisualIdentity,
       at: Anchor,
       label: String,
       kind: LandmarkKind,
-      context: ContextId
+      context: ContextId,
+      status: EpistemicStatus
   )
   case Thread(identity: VisualIdentity, label: String, points: Vector[Anchor])
   case Portal(identity: VisualIdentity, from: Anchor, to: Anchor, mode: NarrativeReference)
@@ -777,7 +785,11 @@ final class AtlasCompiler private (provenance: ViewProvenance):
               anchor,
               node.description,
               kind,
-              node.context
+              node.context,
+              // Derived, never asserted: the situation's own claim status. The enclosing
+              // `g.situations.get(id).map` is the typed absence — a situation the graph does not
+              // hold produces no landmark rather than a landmark with a guessed status.
+              node.meta.status
             )
           }
         }
@@ -1332,10 +1344,10 @@ object AtlasTextualTwin:
         out.append(
           s"  region ${id.mark.value} ${id.address.render} x=[${e.x0},${e.x1Exclusive}) lanes=[${e.lane0},${e.lane1}] parent=${parent.fold("-")(_.render)} \"$label\"\n"
         )
-      case VisualPrimitive.Landmark(id, a, label, kind, context) =>
+      case VisualPrimitive.Landmark(id, a, label, kind, context, status) =>
         out.append(
           s"  landmark ${id.mark.value} ${id.address.render} x=${a.x} lane=${a.lane} $kind " +
-            s"context=${context.value} \"$label\"\n"
+            s"context=${context.value} status=$status \"$label\"\n"
         )
       case VisualPrimitive.ContextBand(id, kind, lane, extents, parent, basis) =>
         val ranges = extents.toVector.map(e => s"[${e.x0},${e.x1Exclusive})").mkString(",")

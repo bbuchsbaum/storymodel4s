@@ -368,6 +368,37 @@ class WarOfTheGhostsDraftAtlasSuite extends FunSuite:
     assert(byNarration._1.forall(_.at.lane == 0))
   }
 
+  test("every landmark carries its situation's own claim status, and none is invented") {
+    val nodes = compilation.draft.graph.situations
+    assertEquals(landmarks(scene).size, 65)
+
+    // Derived, never asserted: every mark's status is the one its own node records. This is the
+    // whole test — a defaulted field would still be a total function of the marks and would still
+    // produce a tidy census, and only the node-by-node identity catches it.
+    landmarks(scene).foreach { mark =>
+      val id = Addressable[StoryRef]
+        .parse(mark.address)
+        .collect { case StoryRef.Situation(value) => value }
+        .getOrElse(fail(s"a landmark names a situation: ${mark.address.render}"))
+      val node = nodes.getOrElse(id, fail(s"no situation node for ${id.value}"))
+      assertEquals(mark.status, node.meta.status)
+    }
+
+    // The census on the real machine-built model. Every one of the sixty-five situations this
+    // provider proposed is SurfaceExplicit, so the honest picture is currently one status, not
+    // six. That is a fact about this model, not a reason to omit the field: the viewer can only
+    // report the uniformity because the mark now carries the claim, and the day a structurally
+    // derived situation arrives this line is what will notice.
+    assertEquals(
+      landmarks(scene).groupBy(_.status).view.mapValues(_.size).toVector.sortBy(_._1.ordinal),
+      Vector((EpistemicStatus.SurfaceExplicit, 65))
+    )
+    assertEquals(
+      nodes.values.toVector.map(_.meta.status).distinct,
+      Vector(EpistemicStatus.SurfaceExplicit)
+    )
+  }
+
   test("the textual twin is the audit surface for everything above") {
     val twin = scene.textualTwin
     assert(twin.startsWith("Narrative Atlas — DiscourseAtlas\n"), twin.take(120))
@@ -392,6 +423,9 @@ class WarOfTheGhostsDraftAtlasSuite extends FunSuite:
     assert(lines("  abstention ").head.contains("reason=provider-abstained:focus-not-predicate"))
     assert(lines("  unsatisfied-law ").forall(_.contains("channel=Bracket")))
     assert(lines("  landmark ").forall(_.contains("context=")))
+    // The claim status is on the audit surface, not only in the mark: a reader of the twin can
+    // count how many of the sixty-five situations the text actually states.
+    assertEquals(lines("  landmark ").count(_.contains("status=SurfaceExplicit")), 65)
     assert(lines("  context-band ").forall(_.contains("basis=ExactScopeEvidence")))
     assert(lines("  context-band ").exists(_.contains("x=[1724,1900)")))
   }
