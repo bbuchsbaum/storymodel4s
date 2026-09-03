@@ -81,6 +81,24 @@ object MonotoneScene:
       case Some("hard") | None => None
       case Some(raw)           => raw.toDoubleOption.filter(_ >= 0.0)
 
+  /** Cost of skipping forward, per scene skipped beyond the first.
+    *
+    * The decode's prior is currently asymmetric in a way nothing justified: a backward step is
+    * forbidden outright while a leap twenty scenes forward is free. With gross displacement now
+    * solved the remaining errors are boundary errors, median distance one scene, which is what an
+    * unpenalised forward jump produces when it advances early.
+    *
+    * It must stay gentle. Skipping is legitimate here: participants recall between 24 and 55 of the
+    * 50 scenes, so most of them genuinely pass over scenes they do not remember, and a heavy cost
+    * would force the path to crawl through material the recall never mentions.
+    */
+  def forwardPenalty: Double =
+    sys.env
+      .get("STORYMODEL4S_FORWARD_PENALTY")
+      .flatMap(_.trim.toDoubleOption)
+      .filter(_ >= 0.0)
+      .getOrElse(0.0)
+
   /** Whether an unbound unit may be filled from its assigned scene. On by default.
     *
     * Validated on development: scene accuracy 57.9% to 65.2%, +5.77 points with 8 of 10
@@ -130,16 +148,36 @@ object MonotoneScene:
           case None =>
             // Forward only. A running maximum over earlier scene indices keeps the sweep linear in
             // the number of scenes rather than quadratic.
-            var runBest = Double.NegativeInfinity
-            var runArg = 0
-            j = 0
-            while j < s do
-              if best(i - 1)(j) > runBest then
-                runBest = best(i - 1)(j)
-                runArg = j
-              best(i)(j) = runBest + massByScene(i).getOrElse(scenes(j), 0.0)
-              back(i)(j) = runArg
-              j += 1
+            val fwd = forwardPenalty
+            if fwd <= 0.0 then
+              var runBest = Double.NegativeInfinity
+              var runArg = 0
+              j = 0
+              while j < s do
+                if best(i - 1)(j) > runBest then
+                  runBest = best(i - 1)(j)
+                  runArg = j
+                best(i)(j) = runBest + massByScene(i).getOrElse(scenes(j), 0.0)
+                back(i)(j) = runArg
+                j += 1
+            else
+              j = 0
+              while j < s do
+                var bestVal = Double.NegativeInfinity
+                var bestArg = 0
+                var k = 0
+                while k <= j do
+                  // Skipping is free for the first scene advanced and priced after that, so an
+                  // ordinary step forward costs nothing and only leaps are discouraged.
+                  val skipped = math.max(0, scenes(j) - scenes(k) - 1)
+                  val step = best(i - 1)(k) - fwd * skipped
+                  if step > bestVal then
+                    bestVal = step
+                    bestArg = k
+                  k += 1
+                best(i)(j) = bestVal + massByScene(i).getOrElse(scenes(j), 0.0)
+                back(i)(j) = bestArg
+                j += 1
           case Some(lambda) =>
             // Backward steps allowed at a price, so strong evidence can buy one. Quadratic in the
             // number of scenes, which is fifty here.
