@@ -565,15 +565,45 @@ partial model *and* see where it is partial.
 a `StoryModel[Draft]` bound to the exact evidence of its own incompleteness:
 
 ```scala
-final class DraftModel private (model, promotion, gaps, violations, coverage)
+enum DerivationRecord:
+  case Reported(gaps: Vector[DerivationGap], coverage: Vector[SentenceCoverage])
+  case NotSupplied
+
+final class DraftModel private (model, promotion, derivation, violations)
 object DraftModel:
   def of(model: StoryModel[Draft], outcome: ValidationOutcome,
-         gaps: Vector[DerivationGap], coverage: Vector[SentenceCoverage]): DraftModel
+         derivation: DerivationRecord): DraftModel
+  def withoutDerivationRecord(model: StoryModel[Draft], outcome: ValidationOutcome): DraftModel
 ```
 
-All three evidence vectors travel together because any one alone reports a
-smaller absence than the model has. `of` sorts each of them, so a scene stays a
-pure function of its inputs (V-D1) whatever order a caller assembled them in.
+`of` sorts every vector, so a scene stays a pure function of its inputs (V-D1)
+whatever order a caller assembled them in.
+
+**The model does not carry its own gaps, and must not.** A derivation gap is a
+statement about the *derivation*, not about the story; a `StoryModel` that
+recorded claims about its own construction would be the wrong shape. The
+narrative compiler writes the gaps and the coverage ledger to the sibling
+`compilation-report.json`, and the view is entitled to consume both artifacts.
+That is why `DraftModel` binds a model to a record rather than reading one out
+of the model.
+
+**`NotSupplied` is not an empty `Reported`.** A consumer holding only a decoded
+`storymodel.json` — the storyatlas4s case — has no derivation record at all.
+Without the distinction its receipt reads "0 derivation gaps", which says the
+compiler derived everything, when the truth is that nobody told the view
+anything. `DraftPromotion.gapCount` is therefore `Option[Int]` in which `None`
+is never `Some(0)`, and the textual twin prints "derivation gaps: record not
+supplied".
+
+**The two inputs give different, both-honest violation sets, and the receipt
+names the laws rather than labelling the source.** Measured on the real model:
+the compilation's own outcome has 135 violations across three laws; re-validating
+the same draft on its own has 66, all hierarchy laws, because the 69
+`compiler.required-derivation` violations only the narrative compiler can raise.
+A field naming *which validator ran* was considered and rejected: `ValidationOutcome`
+carries no provenance, so that field could only be caller-asserted, which is the
+fabricated-license defect. The named laws in the receipt are derived and make the
+difference visible in the data.
 
 The statement that a scene is a draft lives in the receipt, not in a flag.
 `ViewBasis` gains `DraftBuild`, and `ViewProvenance` gains
