@@ -156,13 +156,13 @@ object HsmmResultCodec:
   /** Encoder-only instance: reconstructing the proof always requires explicit context. */
   given Encoder[HsmmResult] = Encoder.instance(toJson)
 
-  private given Encoder[SourceNodeRef] = Encoder.instance {
+  private[codec] given Encoder[SourceNodeRef] = Encoder.instance {
     case SourceNodeRef.Situation(id) =>
       Json.obj("type" -> "Situation".asJson, "id" -> id.asJson)
     case SourceNodeRef.Segment(id) =>
       Json.obj("type" -> "Segment".asJson, "id" -> id.asJson)
   }
-  private given Decoder[SourceNodeRef] = Decoder.instance { c =>
+  private[codec] given Decoder[SourceNodeRef] = Decoder.instance { c =>
     field[String](c, "type").flatMap {
       case "Situation" => field[SituationId](c, "id").map(SourceNodeRef.Situation.apply)
       case "Segment"   => field[SegmentId](c, "id").map(SourceNodeRef.Segment.apply)
@@ -210,7 +210,7 @@ object HsmmResultCodec:
   private given Decoder[ExternalState] =
     enumDecoder("ExternalState", ExternalState.values, _.toString)
 
-  private given Encoder[AlignState] = Encoder.instance {
+  private[codec] given Encoder[AlignState] = Encoder.instance {
     case AlignState.Source(ref) =>
       Json.obj("type" -> "Source".asJson, "ref" -> ref.asJson)
     case AlignState.Distorted(ref, facets) =>
@@ -222,7 +222,7 @@ object HsmmResultCodec:
     case AlignState.External(state) =>
       Json.obj("type" -> "External".asJson, "state" -> state.asJson)
   }
-  private given Decoder[AlignState] = Decoder.instance { c =>
+  private[codec] given Decoder[AlignState] = Decoder.instance { c =>
     field[String](c, "type").flatMap {
       case "Source"    => field[SourceNodeRef](c, "ref").map(AlignState.Source.apply)
       case "Distorted" =>

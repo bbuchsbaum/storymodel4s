@@ -256,6 +256,14 @@ object RecallVoyageInput:
                                 )
                               )
 
+/** What a renderer loads: the proven input and the provenance the scene will carry. A viewer
+  * compiles the scene itself from this, so the evidence law runs wherever the marks are drawn and
+  * no renderer ever receives numbers it cannot re-derive.
+  */
+final case class RecallVoyageDocument(input: RecallVoyageInput, provenance: ViewProvenance):
+  def compile(selection: Set[Address]): Either[DomainError, VoyageScene] =
+    VoyageCompiler.compile(input, selection, provenance)
+
 /** Renderer-neutral marks of a voyage. Every field is read from the input; none is computed. */
 enum VoyageMark:
   /** Where a unit landed and how surely. `mass` is `AlignmentRow.anchorMass(anchor)`. */
