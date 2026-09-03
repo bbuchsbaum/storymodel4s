@@ -5,6 +5,7 @@ import munit.ScalaCheckSuite
 import org.scalacheck.Gen
 import org.scalacheck.Prop.forAll
 import storymodel4s.core.*
+import storymodel4s.document.*
 import storymodel4s.features.*
 import storymodel4s.laws.AddressGens
 import storymodel4s.proposition.{Checked, PropositionChart}
@@ -13,6 +14,8 @@ import CodecGens.given
 import CanonicalPrimitives.given
 import CoreCodecs.given
 import FeatureCodecs.given
+import DerivationCodecs.given
+import DerivationRecordCodec.given
 import PropositionCodecs.given
 
 class CodecSuite extends ScalaCheckSuite:
@@ -73,6 +76,11 @@ class CodecSuite extends ScalaCheckSuite:
   lawsFor[WorldTimeTransition]("WorldTimeTransition")
   lawsFor[FeatureTrack[FeatureTarget, Double]]("FeatureTrack[Double]")
   lawsFor[FeatureTrack[FeatureTarget, String]]("FeatureTrack[String]")
+  lawsFor[DerivationGap]("DerivationGap")
+  lawsFor[DerivationAttempt]("DerivationAttempt")
+  lawsFor[SentenceCoverage]("SentenceCoverage")
+  lawsFor[SummaryCoverage]("SummaryCoverage")
+  lawsFor[DerivationArtifact]("DerivationArtifact")
 
   property("PropositionChart: decode(encode(x)) is structurally equal and Checked") {
     forAll { (ch: PropositionChart[Checked]) =>

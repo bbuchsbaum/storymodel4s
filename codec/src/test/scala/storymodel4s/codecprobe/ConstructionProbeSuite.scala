@@ -70,6 +70,51 @@ class ConstructionProbeSuite extends FunSuite:
     assert(reads.forall(_.isEmpty), reads.flatten.mkString("\n"))
   }
 
+  test("positive control: DerivationArtifact.of and its observations remain visible") {
+    assert(
+      typeCheckErrors(
+        """(
+             compilation: storymodel4s.document.NarrativeCompilation,
+             proposals: storymodel4s.document.ChartProposals
+           ) => storymodel4s.codec.DerivationArtifact.from(compilation, proposals)"""
+      ).isEmpty
+    )
+    assert(
+      typeCheckErrors(
+        """(artifact: storymodel4s.codec.DerivationArtifact) =>
+             (artifact.storyId, artifact.modelChecksum, artifact.attempts, artifact.gaps,
+              artifact.coverage, artifact.summaryCoverage, artifact.record)"""
+      ).isEmpty
+    )
+  }
+
+  test("DerivationArtifact has no public apply, copy, or fromProduct") {
+    refused(
+      typeCheckErrors(
+        """storymodel4s.codec.DerivationArtifact.fromProduct(EmptyTuple)"""
+      ),
+      "DerivationArtifact.fromProduct"
+    )
+    refused(
+      typeCheckErrors(
+        """(
+             id: storymodel4s.core.StoryId,
+             sum: storymodel4s.core.Checksum,
+             summary: storymodel4s.document.SummaryCoverage
+           ) => storymodel4s.codec.DerivationArtifact(
+             id, sum, sum, sum, sum, Vector.empty, Vector.empty, Vector.empty, summary)"""
+      ),
+      "DerivationArtifact.apply"
+    )
+    refused(
+      typeCheckErrors(
+        """(artifact: storymodel4s.codec.DerivationArtifact) =>
+             artifact.copy(gaps = Vector.empty)"""
+      ),
+      "DerivationArtifact.copy"
+    )
+  }
+
   test("SidecarBlockRange has no derived fromProduct bypass") {
     refused(
       typeCheckErrors(

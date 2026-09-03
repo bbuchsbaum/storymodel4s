@@ -9,15 +9,20 @@ import munit.FunSuite
 import scala.collection.mutable.ListBuffer
 import scala.jdk.CollectionConverters.*
 import scala.util.Using
-import storymodel4s.codec.StoryModelCodec
+import storymodel4s.codec.{DerivationRecordCodec, StoryModelCodec}
 import storymodel4s.core.*
 import storymodel4s.document.{
   ChartProposalProvider,
   CoverageCounts,
+  DerivationDisposition,
+  DerivationGap,
+  DerivationGapReason,
   NarrativeCompiler,
   NarrativeCompilerError,
-  Referentiality
+  Referentiality,
+  SummaryCoverage
 }
+import storymodel4s.view.DerivationRecord
 import storymodel4s.fixtures.wog.WarOfTheGhostsText
 import storymodel4s.provider.agent.*
 
@@ -155,6 +160,11 @@ class StoryBuildSuite extends FunSuite:
       .fold(error => fail(error.message), identity)
 
   private def json(path: Path): Json = parse(read(path)).fold(e => fail(e.message), identity)
+
+  private def derivation(summary: BuildSummary): storymodel4s.codec.DerivationArtifact =
+    DerivationRecordCodec
+      .decode(read(summary.files.derivation))
+      .fold(error => fail(error.message), identity)
 
   private def keys(value: Json): Set[String] =
     value.asObject.map(_.keys.toSet).getOrElse(fail("not a JSON object"))
@@ -1001,6 +1011,7 @@ class StoryBuildSuite extends FunSuite:
     )
     assertEquals(read(second.files.report), read(first.files.report))
     assertEquals(read(second.files.receipts), read(first.files.receipts))
+    assertEquals(read(second.files.derivation), read(first.files.derivation))
   }
 
   test("the clock moves only the receipt timestamp, the model bytes, and the encoding digest") {
@@ -1024,6 +1035,98 @@ class StoryBuildSuite extends FunSuite:
       .decode(read(later.files.model))
       .fold(error => fail(error.toString), identity)
     assertEquals(decoded.receipt.map(_.createdAtEpochMillis), Some(Now + 1L))
+
+    // The derivation record binds to the model's bytes, so it moves with them; everything it
+    // says about the derivation itself (fingerprint, candidate set, attempts, gaps, coverage) is
+    // the same record.
+    val firstRecord = derivation(first)
+    val laterRecord = derivation(later)
+    assertNotEquals(laterRecord.modelChecksum, firstRecord.modelChecksum)
+    assertEquals(laterRecord.compilationFingerprint, firstRecord.compilationFingerprint)
+    assertEquals(laterRecord.candidateSet, firstRecord.candidateSet)
+    assertEquals(laterRecord.attempts, firstRecord.attempts)
+    assertEquals(laterRecord.gaps, firstRecord.gaps)
+    assertEquals(laterRecord.coverage, firstRecord.coverage)
+    assertEquals(laterRecord.summaryCoverage, firstRecord.summaryCoverage)
+  }
+
+  /** The derivation record court. `compilation-report.json` writes gaps with upstream and evidence
+    * *counts* and one-way renders, so a viewer holding it and `storymodel.json` could reconstruct
+    * neither the gap channel nor the abstention channel and had to declare them channels it could
+    * not compile (66 law marks where the record has 206 absences). This court reads
+    * `derivation.json` back through the codec and checks it is the compilation's own record.
+    */
+  test("derivation.json reads back as the compilation's own attempts, gaps, and coverage") {
+    val dir = work("derivation")
+    val textPath = wogText(dir)
+    val summary = build(textPath, capturedRecordings, dir.resolve("out"))
+    val model = StoryModelCodec
+      .decode(read(summary.files.model))
+      .fold(error => fail(error.toString), identity)
+
+    // Bound decode: the record is refused unless it was written for exactly this model.
+    val record = DerivationRecordCodec
+      .decode(model, read(summary.files.derivation))
+      .fold(error => fail(error.message), identity)
+    assert(record.describes(model))
+    assertEquals(record.storyId.value, WogStory)
+    assertEquals(record.compilationFingerprint, summary.fingerprint)
+    assertEquals(record.candidateSet, summary.candidateSet)
+    assertEquals(record.modelChecksum, summary.encodingDigest)
+
+    // The record equals the in-memory derivation this same replay produces.
+    val outcome = parsed(textPath, capturedRecordings)
+    val proposals = ChartProposalProvider
+      .propose(outcome.story, outcome.atlas, outcome.charts)
+      .fold(error => fail(error.message), identity)
+    val compilation = ChartProposalProvider
+      .input(outcome.story, outcome.atlas, outcome.charts, Some(outcome.parserStage._1), Now)
+      .flatMap(NarrativeCompiler.compile)
+      .fold(error => fail(error.message), identity)
+    assertEquals(record.attempts, compilation.derivation.attempts)
+    assertEquals(record.gaps, compilation.derivation.gaps)
+    assertEquals(record.coverage, proposals.coverage)
+    assertEquals(record.summaryCoverage, proposals.summaryCoverage)
+    assertEquals(
+      record.record,
+      DerivationRecord.Reported(compilation.derivation.gaps, proposals.coverage)
+    )
+
+    // The numbers the handoff measured, pinned: 70 gaps over 50 sentences, and every gap names
+    // its own upstream targets and evidence rather than a count of them.
+    assertEquals(record.gaps.size, 70)
+    assertEquals(record.gaps.size, summary.gaps)
+    assertEquals(record.coverage.size, 50)
+    assertEquals(record.attempts.size, compilation.derivation.attempts.size)
+    val missingUpstream = record.gaps.collect {
+      case DerivationGap(_, _, _, DerivationGapReason.MissingUpstream(addresses), _, _) => addresses
+    }
+    assertEquals(missingUpstream.size, 65)
+    assert(missingUpstream.forall(_.nonEmpty), "a missing-upstream gap named no upstream address")
+    assertEquals(record.summaryCoverage, SummaryCoverage.NoTitle)
+
+    // Every gap is an attempted target whose disposition is NotEmitted with the same reason: the
+    // record's constructor refuses any other pairing, so a decoded record cannot carry a gap the
+    // compiler never attempted.
+    val byTarget = record.attempts.map(a => a.target -> a).toMap
+    record.gaps.foreach { gap =>
+      assertEquals(byTarget(gap.target).disposition, DerivationDisposition.NotEmitted(gap.reason))
+    }
+
+    // Binding: the same record is refused against a model built at another clock, whose bytes
+    // differ, and the unbound decode still accepts it.
+    val other = buildAt(textPath, capturedRecordings, dir.resolve("other"), Now + 1L)
+    val otherModel = StoryModelCodec
+      .decode(read(other.files.model))
+      .fold(error => fail(error.toString), identity)
+    DerivationRecordCodec.decode(otherModel, read(summary.files.derivation)) match
+      case Left(storymodel4s.codec.CodecError.Decode(path, _)) =>
+        assertEquals(path, "$.modelChecksum")
+      case result => fail(s"a record for another build was accepted: $result")
+    assert(DerivationRecordCodec.decode(read(summary.files.derivation)).isRight)
+
+    // No source prose, as for every other bundle file.
+    assert(!read(summary.files.derivation).contains("Egulac"), "the record carries source prose")
   }
 
   test("the written storymodel.json decodes to the encoding digest and the receipt") {

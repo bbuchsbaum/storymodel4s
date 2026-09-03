@@ -212,6 +212,61 @@ Several report fields have only a zero or `false` reading here and no positive c
 `capturedLive`, `foreign`, and `corrupt` (provider-agent courts the last four at the driver
 level; this suite never exercises them through the pipeline).
 
+## Amendment 2026-09-03: a fourth file, `derivation.json`, and a codec for it
+
+**Status:** Accepted 2026-09-03, single-developer mode.
+
+The rejected alternative "a `CompilationReportCodec` in `codec`" rested on two premises, and
+both stopped holding: `view.DerivationRecord` became a consumer of the gaps and coverage ledger
+(ADR 0002 §11 A1, the draft Atlas and Codex paths), and `codec` already depends on `document`
+transitively through `view`, so no dependency edge widens. The consequence of leaving the
+decision as written was measured on the viewer: reading `storymodel.json` alone it could
+reconstruct neither the gap channel nor the abstention channel, because
+`compilation-report.json` writes `upstreamClaims` and `evidence` as counts and every target and
+reason as a one-way render, and it drew 66 law marks where the record holds 206 absences.
+
+Decisions:
+
+1. **`compilation-report.json` is unchanged.** It stays the orchestrator's human-readable account,
+   pretty-printed, counts and renders, no source prose. Its schema tag, key set, and every pin in
+   `StoryBuildSuite` are untouched. Making it round-trippable would have meant carrying both the
+   count and the contents of the same field, and forcing a document written for a person into
+   canonical-JSON discipline.
+2. **A fourth file, `derivation.json`, tagged `derivation-record/v1`,** written by
+   `StoryPipeline.run` after the receipts, through `DerivationRecordCodec` in `codec`. It is the
+   typed record: the candidate-set checksum, every `DerivationAttempt` with its disposition, every
+   `DerivationGap` with its upstream claim ids and evidence references, every `SentenceCoverage`
+   row, and the `SummaryCoverage`. Canonical printing; `decode(encode(x)) == x` is a ScalaCheck law
+   in `CodecSuite` for the gap, the attempt, the coverage row, the summary row, and the whole
+   artifact. The decoder also rejects a text that re-encodes differently, so an unknown field
+   cannot ride along silently.
+3. **The record binds to the model three ways.** Story id, canonical source checksum, and
+   `modelChecksum`, which is `StoryModelCodec.contentChecksum(draft)`: the SHA-256 of the exact
+   `storymodel.json` bytes. `DerivationRecordCodec.decode(model, text)` refuses a record whose
+   binding does not match, naming the field; the unbound `decode(text)` remains for a consumer
+   that will check `DerivationArtifact.describes(model)` itself. Because the model's bytes carry
+   the receipt timestamp, the record moves with the clock exactly as the model does, while its
+   compilation fingerprint, candidate set, attempts, gaps, and coverage do not (tested with two
+   clocks).
+4. **The artifact type is `codec.DerivationArtifact`, privately constructed.** `DerivationArtifact.of`
+   refuses the pairings `DerivationReceipt.of` refuses (duplicate targets, a gap at an unattempted
+   target, two gaps at one target) and two it does not: a gap whose reason or family disagrees
+   with its attempt's `NotEmitted` disposition, and a coverage ledger naming a sentence twice. The
+   receipt's own factory stays `private[document]`; the artifact carries what the view consumes
+   and nothing the model already carries (`emittedClaims` are in the model's own claim metadata).
+5. **`BundleFiles` has four members** and the exact-directory test moves with it. Determinism
+   (decision 5) now covers four files.
+
+Rejected: putting the record inside `compilation-report.json` under a new key (one artifact with
+two disciplines, and every report pin moves); putting the gaps in `storymodel.json` (ADR 0002 §11
+A1 forbids it: a gap is a statement about the derivation, not the story); a `DerivationReceipt`
+codec (its factory is package-private by court, and widening `document`'s surface is not this
+module's decision).
+
+Consumers: `storyatlas4s` reads `derivation.json` beside `storymodel.json` and builds
+`DerivationRecord.Reported` from it; a directory with no `derivation.json` stays `NotSupplied`,
+never `Reported(empty, empty)`.
+
 ## Consequences
 
 - The plan's phase 1.2 exists under the name `pipeline`; `storyBuild replay <text> <recordings>
