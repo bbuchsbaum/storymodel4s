@@ -58,18 +58,37 @@ enum ViewBasis:
   case HumanAdjudicated
   case ResearcherReviewedFixture
 
+  /** A `StoryModel[Draft]` rendered with its own gaps, abstentions and unsatisfied promotion laws.
+    *
+    * Why a basis and not a flag on the scene: a draft view differs from a validated one in what it
+    * is entitled to claim, and that entitlement is exactly what a basis records. A flag would sit
+    * beside a basis that still said "validated build", which is the shape of every defect this
+    * project has been correcting. A draft build has no [[BasisAuthority]] and therefore cannot
+    * become an [[AdmittedViewBasis]]: it is legible, cited and reproducible, and it is not
+    * admissible as the basis of a scientific output.
+    */
+  case DraftBuild
+
   def label: String = this match
     case ValidatedBuild            => "validated build"
     case HumanAdjudicated          => "human-adjudicated model"
     case ResearcherReviewedFixture => "researcher-reviewed narrative acceptance fixture"
+    case DraftBuild                => "draft build"
 
-/** Reproducibility record for a view without pretending a source checksum hashes the full model. */
+/** Reproducibility record for a view without pretending a source checksum hashes the full model.
+  *
+  * `draft` and `basis` are one statement, not two: construction admits a [[DraftPromotion]] only
+  * under [[ViewBasis.DraftBuild]] and requires one there, so no receipt can read "validated build"
+  * beside a promotion record, and none can read "draft build" while staying silent about which laws
+  * went unsatisfied.
+  */
 final case class ViewProvenance private (
     sourceChecksum: Checksum,
     modelReceiptChecksum: Option[Checksum],
     basis: ViewBasis,
     compilerVersion: String,
-    configChecksum: Checksum
+    configChecksum: Checksum,
+    draft: Option[DraftPromotion]
 )
 
 object ViewProvenance:
@@ -78,8 +97,18 @@ object ViewProvenance:
       modelReceiptChecksum: Option[Checksum],
       basis: ViewBasis,
       compilerVersion: String,
-      configChecksum: Checksum
+      configChecksum: Checksum,
+      draft: Option[DraftPromotion] = None
   ): Either[DomainError, ViewProvenance] =
+    def built(): ViewProvenance =
+      new ViewProvenance(
+        sourceChecksum,
+        modelReceiptChecksum,
+        basis,
+        compilerVersion,
+        configChecksum,
+        draft
+      )
     if compilerVersion.trim.isEmpty then
       Left(
         DomainError.InvalidFormat(
@@ -88,31 +117,21 @@ object ViewProvenance:
           "empty"
         )
       )
+    else if draft.isDefined != (basis == ViewBasis.DraftBuild) then
+      Left(
+        DomainError.InvariantViolation(
+          "view/provenance/draft-basis",
+          s"a draft promotion record and ${ViewBasis.DraftBuild.label} accompany each other; " +
+            s"${basis.label} was given ${if draft.isDefined then "one" else "none"}"
+        )
+      )
     else
       basis match
-        case ViewBasis.ResearcherReviewedFixture =>
-          Right(
-            new ViewProvenance(
-              sourceChecksum,
-              modelReceiptChecksum,
-              basis,
-              compilerVersion,
-              configChecksum
-            )
-          )
-        case ViewBasis.ValidatedBuild | ViewBasis.HumanAdjudicated =>
+        case ViewBasis.ResearcherReviewedFixture | ViewBasis.DraftBuild => Right(built())
+        case ViewBasis.ValidatedBuild | ViewBasis.HumanAdjudicated      =>
           modelReceiptChecksum match
-            case Some(_) =>
-              Right(
-                new ViewProvenance(
-                  sourceChecksum,
-                  modelReceiptChecksum,
-                  basis,
-                  compilerVersion,
-                  configChecksum
-                )
-              )
-            case None =>
+            case Some(_) => Right(built())
+            case None    =>
               Left(
                 DomainError.InvariantViolation(
                   "view/provenance/model-receipt",
@@ -131,6 +150,26 @@ object ViewProvenance:
       ViewBasis.ResearcherReviewedFixture,
       compilerVersion,
       configChecksum
+    )
+
+  /** Bind a draft view to the promotion state of the exact bundle it will render.
+    *
+    * Why derived from the bundle: the promotion record is a claim about that draft's own outcome,
+    * and a caller who could type it separately could publish a scene declaring a clean promotion
+    * over a model that has none.
+    */
+  def draftBuild(
+      draft: DraftModel,
+      compilerVersion: String,
+      configChecksum: Checksum
+  ): Either[DomainError, ViewProvenance] =
+    of(
+      draft.model.source.canonicalChecksum,
+      draft.model.receipt.map(_.contentChecksum),
+      ViewBasis.DraftBuild,
+      compilerVersion,
+      configChecksum,
+      Some(draft.promotion)
     )
 
 /** Canonical audit dependencies and provenance for one annotation. */

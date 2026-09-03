@@ -316,8 +316,8 @@ final case class ZoomLevel(narrative: NarrativeLevel, surface: SurfaceDetail)   
 ```
 
 Checkpoint-1 compilers accept `StoryModel[Validated]`; an adjudicated entry
-point remains a later, explicitly typed extension. Draft/unresolved material is
-rendered only in an explicit diagnostic mode with visible status chrome.
+point remains a later, explicitly typed extension. The Atlas gained a second,
+explicitly typed entry point in the V0 amendment below; the Codex has none yet.
 Evidence law for compiled annotations (V-E3):
 `annotation.support == horizonRestrict(model.supporting(target), horizon)` for
 narrative-object targets (`horizonRestrict` is the identity when omniscient and
@@ -539,3 +539,177 @@ sidecars and `HsmmResult`; encode `Address`, `CommonViewState`, specs,
   a `LayoutReceipt`, on the JVM, without a browser.
 - Three stringly-typed addressing schemes collapse into one.
 - Nothing spectacular is rendered that the ledger cannot defend.
+
+## 11. Amendment — V0: the draft Atlas path (2026-09-02)
+
+Decided by the owner's agent in single-developer mode (AGENTS.md SD5: the
+requirement was always the written record, not the approval). Implements the
+first half of `docs/plans/2026-09-03-visualization-recovery-plan.md` §V0.
+
+### A1 The Atlas compiles a draft, and a draft scene cannot pass for a validated one
+
+**The problem.** `AtlasCompiler.compile` took `StoryModel[Validated]`. The model
+the pipeline actually builds from real text does not validate: replaying the
+fifty captured War of the Ghosts recordings with no caller-supplied title
+produces 70 derivation gaps and 135 violations, because with no established
+title the `Summary` family abstains, no story segment is derived, and 65 segment
+memberships lose their upstream. So the viewer had never rendered a
+machine-built model and could not.
+
+**The alternative rejected.** Relaxing the title or summary rule so the model
+promotes. That moves the falsehood out of the picture and into the artifact,
+which is the exact defect the 2026-09 slice removed. A researcher needs to see a
+partial model *and* see where it is partial.
+
+**Decision.** `AtlasCompiler.compileDraft(draft: DraftModel, state, spec)` takes
+a `StoryModel[Draft]` bound to the exact evidence of its own incompleteness:
+
+```scala
+enum DerivationRecord:
+  case Reported(gaps: Vector[DerivationGap], coverage: Vector[SentenceCoverage])
+  case NotSupplied
+
+final class DraftModel private (model, promotion, derivation, violations)
+object DraftModel:
+  def of(model: StoryModel[Draft], outcome: ValidationOutcome,
+         derivation: DerivationRecord): DraftModel
+  def withoutDerivationRecord(model: StoryModel[Draft], outcome: ValidationOutcome): DraftModel
+```
+
+`of` sorts every vector, so a scene stays a pure function of its inputs (V-D1)
+whatever order a caller assembled them in.
+
+**The model does not carry its own gaps, and must not.** A derivation gap is a
+statement about the *derivation*, not about the story; a `StoryModel` that
+recorded claims about its own construction would be the wrong shape. The
+narrative compiler writes the gaps and the coverage ledger to the sibling
+`compilation-report.json`, and the view is entitled to consume both artifacts.
+That is why `DraftModel` binds a model to a record rather than reading one out
+of the model.
+
+**`NotSupplied` is not an empty `Reported`.** A consumer holding only a decoded
+`storymodel.json` — the storyatlas4s case — has no derivation record at all.
+Without the distinction its receipt reads "0 derivation gaps", which says the
+compiler derived everything, when the truth is that nobody told the view
+anything. `DraftPromotion.gapCount` is therefore `Option[Int]` in which `None`
+is never `Some(0)`, and the textual twin prints "derivation gaps: record not
+supplied".
+
+**The two inputs give different, both-honest violation sets, and the receipt
+names the laws rather than labelling the source.** Measured on the real model:
+the compilation's own outcome has 135 violations across three laws; re-validating
+the same draft on its own has 66, all hierarchy laws, because the 69
+`compiler.required-derivation` violations only the narrative compiler can raise.
+A field naming *which validator ran* was considered and rejected: `ValidationOutcome`
+carries no provenance, so that field could only be caller-asserted, which is the
+fabricated-license defect. The named laws in the receipt are derived and make the
+difference visible in the data.
+
+The statement that a scene is a draft lives in the receipt, not in a flag.
+`ViewBasis` gains `DraftBuild`, and `ViewProvenance` gains
+`draft: Option[DraftPromotion]` under a biconditional its constructor enforces:
+a promotion record is admitted **exactly when** the basis is `DraftBuild`, and
+required there. No receipt can therefore read "validated build" beside a
+promotion record, and none can read "draft build" while staying silent about
+which laws went unsatisfied. `DraftPromotion` is a `final` non-case class whose
+`promoted`, `unsatisfiedLaws` and `gapCount` are **derived** from the outcome by
+`DraftPromotion.from`; a caller who could state them could publish a scene
+declaring a clean promotion over a model with none.
+
+`compile` refuses a `DraftBuild` receipt and `compileDraft` refuses any other,
+so the two paths cannot be swapped; `compileDraft` also refuses a receipt whose
+promotion does not describe the bundle in hand.
+
+A draft build has **no `BasisAuthority`** and so can never become an
+`AdmittedViewBasis`: it is legible, cited and reproducible, and it is not
+admissible as the basis of a scientific output. The codec round-trips the tag
+(`draft_build`) rather than dropping it, so an untrusted wire claim naming it is
+refused downstream by re-derivation against the acquisition account, not made
+unreadable here.
+
+### A2 Absence is a mark, and D9's states carry a non-colour channel
+
+Three new `VisualPrimitive` cases, one per kind of recorded absence:
+`Gap` (a derivation the compiler attempted and could not make, carrying the
+typed `ClaimFamily`, `NarrativeCandidateAddress` and `DerivationGapReason`),
+`Abstention` (a sentence that admitted no situation root, carrying the
+provider's own reason), and `UnsatisfiedLaw` (carrying the validator's own
+`story.Violation`).
+
+Every one carries an `EpistemicPlacement`, which is either `AtSpans` — exact
+spans, never a hull — or `NoDiscoursePosition` with one of four typed reasons
+(`WholeWork`, `UnitAbsentFromAtlas`, `SubjectCitesNoSpans`, `BeyondHorizon`). An
+absence carries **no lane**: the vertical axis is the context lane, and an
+unresolved context assignment is precisely a candidate whose context is not
+established, so lane 0 would draw it in the narrated world.
+
+**Which of D9's five uncertainty states are implemented.**
+
+| D9 state | status | mark | non-colour channel |
+|---|---|---|---|
+| `Estimate.Missing(reason)` | **implemented** | `Gap`, `Abstention` | `OpenHatch` |
+| `Credence(raw, calibrated = None)` | **not implemented** | — | — |
+| calibrated `Probability` | **not implemented** | — | — |
+| `Resolved.alternatives` / `ResolutionState.Alternatives` | **implemented** | `Gap` | `Fan` (V-U3) |
+| `ResolutionState.Unresolved` | **implemented** | `Gap` | `Placeholder` (V-U3) |
+| align `Exclusion` | **not implemented** | — | — |
+
+Raw credence and calibrated probability are properties of a mark that carries a
+*value*, and no mark carries one until the D11 feature layer materializes
+numeric sidecars (`featureSpaces` and `sidecars` are empty). Their vocabulary is
+deliberately **not** minted: D14a records what happens when an axis is receipted
+but semantically inert — it looks exactly like a shipped feature. They arrive
+with the marks that can bear them, and adding them is additive.
+
+An unsatisfied promotion law is **not** a D9 state — D9 classifies uncertainty
+about a value and a violated law is a structural defect of the build — so it is
+excluded from `UncertaintyState` and carries its own channel, `Bracket`. The
+state-to-channel assignment is total and injective and a court kills any
+collision. Two new `VisualInvariant`s declare this on the contract:
+`AbsenceIsMarked` and `EpistemicChannelIsNonColour`.
+
+**V-E3 extends unchanged to the new marks.** An absence that names words must
+name words the model records: a `Gap` or `Abstention` may sit only on the exact
+span of a surface unit the atlas contains, and an `UnsatisfiedLaw` only on spans
+its subject's own claim cites. `AtlasCompiler.checkEvidence` is `private[view]`
+so a court can hand it a forged mark; a check no test can make fail is
+decoration.
+
+`AtlasTextualTwin` renders the draft receipt (promotion state, gap count,
+violation count, and each unsatisfied law with its occurrence count) and every
+new mark with its channel, because the twin is the audit surface (D12).
+
+### A3 A situation's context is reachable from its own mark
+
+`VisualPrimitive.Landmark` gains `context: ContextId`, derived from the
+situation's own node. Without it a renderer cannot band by context and draws all
+sixty-five War of the Ghosts situations the same way, putting the survivor's
+retelling back into the narrated world.
+
+A new `ContextBand` mark draws a frame's scope: **one extent per span of the
+frame's own support**, never a hull, on the frame's lane, tagged
+`ContextBandBasis.ExactScopeEvidence`. D4 row 6 names three band classes;
+only exact scope evidence is compiled. Contextual membership and inferred
+continuation need claims the model does not yet make, and a band standing in for
+them would draw a continuous speech frame across text nobody attributed to a
+speaker. The one-case enum states which class the band is, so adding the other
+two is additive rather than silent.
+
+Measured on the real model: the narrated world's band carries **281** separate
+extents; a hull would be one, and would swallow the five speech frames inside
+it. The survivor's retelling bands at `[1724,1900)`, the offsets
+`StoryBuildSuite` measured independently, holding six situations.
+
+### A4 Module dependency
+
+None added. `view` already `dependsOn(document)`, and `pipeline` already sees
+`view` transitively through `codec`, which D14 put there. The real-model court
+lives in `pipeline` because the only fifty-sentence compilation this repository
+has is the one `recordings/wog-captured` replays, and `view` cannot see the
+transport or the provider.
+
+### A5 What this amendment does not do
+
+The remaining half of plan §V0 — storyatlas4s reading `storymodel.json` through
+a `codec` dependency, and the pin bump — is untouched. Nothing here changes the
+validated path, the Codex compiler, or any existing mark.

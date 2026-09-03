@@ -613,16 +613,22 @@ object OutputCodecs:
     yield ProjectionOutcomeClaim(id, disposition)
   }
 
+  // `draft_build` round-trips like any other basis and is refused downstream, not here: an
+  // untrusted wire claim is re-derived against the admitted acquisition account, and a draft build
+  // has no BasisAuthority to admit. A decoder that silently dropped the tag would turn a refusable
+  // claim into an unreadable one.
   given Encoder[ViewBasis] = Encoder.instance {
     case ViewBasis.ValidatedBuild            => tagged("validated_build")
     case ViewBasis.HumanAdjudicated          => tagged("human_adjudicated")
     case ViewBasis.ResearcherReviewedFixture => tagged("researcher_reviewed_fixture")
+    case ViewBasis.DraftBuild                => tagged("draft_build")
   }
   given Decoder[ViewBasis] = Decoder.instance { c =>
     field[String](c, "status").flatMap {
       case "validated_build"             => Right(ViewBasis.ValidatedBuild)
       case "human_adjudicated"           => Right(ViewBasis.HumanAdjudicated)
       case "researcher_reviewed_fixture" => Right(ViewBasis.ResearcherReviewedFixture)
+      case "draft_build"                 => Right(ViewBasis.DraftBuild)
       case other                         => unknown(c, "ViewBasis", other)
     }
   }

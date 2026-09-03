@@ -2,7 +2,9 @@ package storymodel4s.view
 
 import cats.data.NonEmptyVector
 import cats.syntax.all.*
+import storymodel4s.acquire.ClaimFamily
 import storymodel4s.core.*
+import storymodel4s.document.{DerivationGapReason, NarrativeCandidateAddress}
 import storymodel4s.story.*
 
 /** The Atlas sibling of [[CodexFlow]] (ADR 0002 D2): placed geometric marks under a declared
@@ -19,6 +21,15 @@ enum ProjectionKind:
 /** Visual channels a contract may give meaning to. */
 enum VisualChannel:
   case X, Y, SurfaceUnit, RegionExtent, LandmarkPosition, Thread, Portal, Route, Distance, Area
+
+  /** The exact discontinuous scope of one context frame over the discourse axis. */
+  case ContextBand
+
+  /** A recorded absence: a derivation gap, an abstained sentence, an unsatisfied promotion law. */
+  case Absence
+
+  /** The non-colour channel that separates one epistemic state from another (ADR 0002 D9). */
+  case Epistemic
 
 /** Meanings permitted for a declared projection axis. */
 enum AxisMeaning:
@@ -49,6 +60,13 @@ enum VisualInvariant:
   case SelectionPreserved // V-L2
   case HorizonShared // D4 row 7: EvidenceVisibility is the only horizon
   case Deterministic // V-D1
+
+  /** Every absence the bound draft records has exactly one mark; a partial model draws as partial.
+    */
+  case AbsenceIsMarked // D9, plan §2.3
+
+  /** Every epistemic mark declares a non-colour channel, and no two states share one. */
+  case EpistemicChannelIsNonColour // V-U5
 
 /** What the geometry of a scene means. Declared data, never documentation (ADR 0002 §2). */
 final case class ProjectionContract private (
@@ -114,6 +132,22 @@ object ProjectionContract:
         VisualChannel.Route,
         "a stored relation edge of an active relation layer; carries the edge's epistemic status"
       ),
+      ChannelMeaning(
+        VisualChannel.ContextBand,
+        "one x-range per span of the context frame's own exact support, on the frame's lane; " +
+          "never a hull over the gaps between them, and never an inferred continuation"
+      ),
+      ChannelMeaning(
+        VisualChannel.Absence,
+        "a recorded absence — a derivation gap, an abstained sentence, or an unsatisfied " +
+          "promotion law — placed on the exact spans it concerns and on no lane, since an " +
+          "unresolved candidate has no established context"
+      ),
+      ChannelMeaning(
+        VisualChannel.Epistemic,
+        "the non-colour channel of an absence: hatch, fan, placeholder, or bracket; " +
+          "assignment is total and injective over the epistemic states"
+      ),
       ChannelMeaning(VisualChannel.Distance, "no semantic interpretation"),
       ChannelMeaning(VisualChannel.Area, "no semantic interpretation")
     ),
@@ -124,7 +158,9 @@ object ProjectionContract:
       VisualInvariant.EvidenceBacked,
       VisualInvariant.SelectionPreserved,
       VisualInvariant.HorizonShared,
-      VisualInvariant.Deterministic
+      VisualInvariant.Deterministic,
+      VisualInvariant.AbsenceIsMarked,
+      VisualInvariant.EpistemicChannelIsNonColour
     )
   )
 
@@ -293,15 +329,31 @@ enum LandmarkKind:
 
 /** Closed content-address salt for each renderer-neutral mark family. */
 private[view] enum AtlasMarkKind:
-  case SurfaceUnit, Region, Landmark, Thread, Portal, Route
+  case SurfaceUnit, Region, Landmark, Thread, Portal, Route, ContextBand, Gap, Abstention,
+    UnsatisfiedLaw
 
   def salt: String = this match
-    case SurfaceUnit => "surface-unit"
-    case Region      => "region"
-    case Landmark    => "landmark"
-    case Thread      => "thread"
-    case Portal      => "portal"
-    case Route       => "route"
+    case SurfaceUnit    => "surface-unit"
+    case Region         => "region"
+    case Landmark       => "landmark"
+    case Thread         => "thread"
+    case Portal         => "portal"
+    case Route          => "route"
+    case ContextBand    => "context-band"
+    case Gap            => "gap"
+    case Abstention     => "abstention"
+    case UnsatisfiedLaw => "unsatisfied-law"
+
+/** What evidence a context band is drawn from (ADR 0002 D4, row 6).
+  *
+  * D4 requires bands to distinguish exact scope evidence, contextual membership and inferred
+  * continuation. Only the first is compiled today: the frame's own `support` spans, one x-range
+  * apiece. The other two need claims the model does not yet make, and a band that quietly stood in
+  * for them would draw a continuous speech frame across text nobody attributed to a speaker.
+  */
+enum ContextBandBasis:
+  /** Every x-range is one span of the frame's own recorded support. */
+  case ExactScopeEvidence
 
 /** Closed renderer-neutral marks emitted by the first Discourse Atlas compiler. */
 enum VisualPrimitive:
@@ -313,7 +365,17 @@ enum VisualPrimitive:
       parent: Option[Address]
   )
   case Region(identity: VisualIdentity, extent: Extent, label: String, parent: Option[Address])
-  case Landmark(identity: VisualIdentity, at: Anchor, label: String, kind: LandmarkKind)
+
+  /** `context` is the situation's own frame, so a renderer can band without reopening the model.
+    * Its lane is `at.lane`, which is layout; the frame identity is the claim.
+    */
+  case Landmark(
+      identity: VisualIdentity,
+      at: Anchor,
+      label: String,
+      kind: LandmarkKind,
+      context: ContextId
+  )
   case Thread(identity: VisualIdentity, label: String, points: Vector[Anchor])
   case Portal(identity: VisualIdentity, from: Anchor, to: Anchor, mode: NarrativeReference)
   case Route(
@@ -324,8 +386,66 @@ enum VisualPrimitive:
       status: EpistemicStatus
   )
 
+  /** One context frame drawn over the discourse axis: one extent per support span, never a hull. */
+  case ContextBand(
+      identity: VisualIdentity,
+      kind: ContextKind,
+      lane: Int,
+      extents: NonEmptyVector[Extent],
+      parent: Option[Address],
+      basis: ContextBandBasis
+  )
+
+  /** A derivation the compiler attempted and could not make, kept as a mark rather than a hole. */
+  case Gap(
+      identity: VisualIdentity,
+      family: ClaimFamily,
+      target: NarrativeCandidateAddress,
+      reason: DerivationGapReason,
+      state: UncertaintyState,
+      placement: EpistemicPlacement
+  )
+
+  /** A sentence that produced no situation root at all, with the provider's own stated reason. */
+  case Abstention(
+      identity: VisualIdentity,
+      unit: SurfaceUnitId,
+      reason: SentenceAbstention,
+      placement: EpistemicPlacement
+  )
+
+  /** One promotion law this model does not satisfy, carrying the validator's own violation. */
+  case UnsatisfiedLaw(
+      identity: VisualIdentity,
+      violation: Violation,
+      placement: EpistemicPlacement
+  )
+
   def identity: VisualIdentity
   def address: Address = identity.address
+
+  /** The exact material an epistemic mark concerns; `None` for every ordinary mark. */
+  def epistemicPlacement: Option[EpistemicPlacement] = this match
+    case Gap(_, _, _, _, _, where)   => Some(where)
+    case Abstention(_, _, _, where)  => Some(where)
+    case UnsatisfiedLaw(_, _, where) => Some(where)
+    case _                           => None
+
+  /** The D9 uncertainty state a mark carries; `None` when the mark states no uncertainty.
+    *
+    * An unsatisfied promotion law is deliberately not a D9 state: D9 classifies uncertainty about a
+    * value, and a violated law is a structural defect of the build. It still carries a non-colour
+    * channel, through [[epistemicChannel]].
+    */
+  def uncertainty: Option[UncertaintyState] = this match
+    case Gap(_, _, _, _, state, _) => Some(state)
+    case Abstention(_, _, _, _)    => Some(UncertaintyState.Missing)
+    case _                         => None
+
+  /** The non-colour channel this mark is drawn in; `None` for every ordinary mark (V-U5). */
+  def epistemicChannel: Option[EpistemicChannel] = this match
+    case UnsatisfiedLaw(_, _, _) => Some(EpistemicChannel.Bracket)
+    case other                   => other.uncertainty.map(_.channel)
 
 /** Bounded policy for selecting entity-continuity threads. */
 enum ThreadPolicy:
@@ -423,6 +543,61 @@ final class AtlasCompiler private (provenance: ViewProvenance):
       state: CommonViewState,
       spec: AtlasSpec
   ): Either[AtlasCompileError, NarrativeScene] =
+    if provenance.basis == ViewBasis.DraftBuild then
+      Left(
+        AtlasCompileError.Domain(
+          DomainError.InvariantViolation(
+            "view/atlas/provenance/draft-basis",
+            "a validated model may not be compiled under a draft-build receipt; " +
+              "use compileDraft, whose receipt names the promotion state it renders"
+          )
+        )
+      )
+    else run(model, None, state, spec)
+
+  /** Compile a draft together with the exact evidence of its own incompleteness.
+    *
+    * Why this exists rather than a rule change that would let the machine-built model validate:
+    * making a model promote in order to satisfy a renderer moves the falsehood from the picture
+    * into the artifact. A researcher needs to see a partial model *and* see exactly where it is
+    * partial, which is what the [[VisualPrimitive.Gap]], [[VisualPrimitive.Abstention]] and
+    * [[VisualPrimitive.UnsatisfiedLaw]] marks are for. The scene cannot be mistaken for a validated
+    * one: its receipt carries [[ViewBasis.DraftBuild]] and a [[DraftPromotion]] derived from this
+    * exact bundle, and [[compile]] refuses that receipt.
+    */
+  def compileDraft(
+      draft: DraftModel,
+      state: CommonViewState,
+      spec: AtlasSpec
+  ): Either[AtlasCompileError, NarrativeScene] =
+    if provenance.basis != ViewBasis.DraftBuild then
+      Left(
+        AtlasCompileError.Domain(
+          DomainError.InvariantViolation(
+            "view/atlas/provenance/draft-basis",
+            s"a draft scene requires a ${ViewBasis.DraftBuild.label} receipt, " +
+              s"and this one declares ${provenance.basis.label}"
+          )
+        )
+      )
+    else if !provenance.draft.contains(draft.promotion) then
+      Left(
+        AtlasCompileError.Domain(
+          DomainError.InvariantViolation(
+            "view/atlas/provenance/draft-promotion",
+            s"receipt promotion ${provenance.draft.fold("none")(_.label)} " +
+              s"does not describe this draft (${draft.promotion.label})"
+          )
+        )
+      )
+    else run(draft.model, Some(draft), state, spec)
+
+  private def run(
+      model: StoryModel[?],
+      draft: Option[DraftModel],
+      state: CommonViewState,
+      spec: AtlasSpec
+  ): Either[AtlasCompileError, NarrativeScene] =
     def domain[A](result: Either[DomainError, A]): Either[AtlasCompileError, A] =
       result.leftMap(AtlasCompileError.Domain.apply)
     val surfaceSupport = SurfaceDetailSupport.inspect(model.atlas)
@@ -443,6 +618,7 @@ final class AtlasCompiler private (provenance: ViewProvenance):
       scene <- domain(
         build(
           model,
+          draft,
           ledger,
           state,
           spec,
@@ -452,7 +628,8 @@ final class AtlasCompiler private (provenance: ViewProvenance):
     yield scene
 
   private def build(
-      model: StoryModel[ModelStatus.Validated],
+      model: StoryModel[?],
+      draft: Option[DraftModel],
       ledger: ClaimLedger,
       state: CommonViewState,
       spec: AtlasSpec,
@@ -554,6 +731,14 @@ final class AtlasCompiler private (provenance: ViewProvenance):
 
     def markId(address: Address, kind: AtlasMarkKind): MarkId =
       MarkId.unsafe(ContentAddress.of("mark", address.render, kind.salt, level.toString))
+    // Several absences can share one anchor (a context assignment and a participant coverage at
+    // the same chart node), so an epistemic mark's identity carries a content key of its own.
+    def epistemicIdentity(address: Address, kind: AtlasMarkKind, key: String): VisualIdentity =
+      VisualIdentity.of(
+        address,
+        level,
+        MarkId.unsafe(ContentAddress.of("mark", address.render, kind.salt, level.toString, key))
+      )
     def identity(ref: StoryRef, kind: AtlasMarkKind): VisualIdentity =
       val a = storyRef.address(ref)
       VisualIdentity.of(a, level, markId(a, kind))
@@ -591,10 +776,44 @@ final class AtlasCompiler private (provenance: ViewProvenance):
               identity(StoryRef.Situation(id), AtlasMarkKind.Landmark),
               anchor,
               node.description,
-              kind
+              kind,
+              node.context
             )
           }
         }
+
+    // D4 row 6: one extent per span of the frame's own support. A hull would draw a speech frame
+    // continuously across the narration between its parts, which is the claim the model refuses.
+    val contextBands: Either[DomainError, Vector[VisualPrimitive]] =
+      g.contexts.keys.toVector.sorted
+        .flatMap(id => g.contexts.get(id))
+        .filter(frame => claimVisible(frame.meta))
+        .traverse { frame =>
+          val lane = lanes.getOrElse(frame.id, 0)
+          clipped(frame.support) match
+            case None          => Right(Vector.empty[VisualPrimitive])
+            case Some(support) =>
+              support.refs.toVector
+                .traverse(ref => Extent.of(ref.span.start, ref.span.endExclusive, lane, lane))
+                .map(extents =>
+                  NonEmptyVector
+                    .fromVector(extents)
+                    .map(nev =>
+                      VisualPrimitive.ContextBand(
+                        identity(StoryRef.Context(frame.id), AtlasMarkKind.ContextBand),
+                        frame.kind,
+                        lane,
+                        nev,
+                        frame.parent
+                          .filter(parent => lanes.contains(parent))
+                          .map(parent => storyRef.address(StoryRef.Context(parent))),
+                        ContextBandBasis.ExactScopeEvidence
+                      )
+                    )
+                    .toVector
+                )
+        }
+        .map(_.flatten)
 
     val visibleMemberOf: Map[EntityId, Vector[EntityId]] =
       g.relations.entityRelations
@@ -730,8 +949,87 @@ final class AtlasCompiler private (provenance: ViewProvenance):
         )
       }
 
+    val bands = contextBands match
+      case Right(value) => value
+      case Left(error)  => return Left(error)
+
+    // Absence marks. Every one is placed on exact surface material or says in its own type why it
+    // has no discourse position; none of them claims a lane, because a candidate whose context was
+    // never resolved has no context to be drawn in.
+    def surfaceSpans(units: Vector[SurfaceUnitId]): EpistemicPlacement =
+      val distinct = units.distinct.sorted
+      if distinct.isEmpty then EpistemicPlacement.NoDiscoursePosition(NoPositionReason.WholeWork)
+      else
+        distinct.find(unit => model.atlas.byId.get(unit).isEmpty) match
+          case Some(absent) =>
+            EpistemicPlacement.NoDiscoursePosition(NoPositionReason.UnitAbsentFromAtlas(absent))
+          case None =>
+            val refs =
+              distinct.flatMap(unit =>
+                model.atlas.byId.get(unit).map(u => SpanRef(Some(u.id), u.span))
+              )
+            SpanSet
+              .of(refs)
+              .flatMap(clipped)
+              .fold(EpistemicPlacement.NoDiscoursePosition(NoPositionReason.BeyondHorizon))(
+                EpistemicPlacement.AtSpans.apply
+              )
+
+    val gapMarks: Vector[VisualPrimitive] = draft.toVector.flatMap(_.gaps).map { gap =>
+      val at = GapTarget.address(gap.target, model.source.id)
+      VisualPrimitive.Gap(
+        epistemicIdentity(at, AtlasMarkKind.Gap, GapTarget.markKey(gap)),
+        gap.family,
+        gap.target,
+        gap.reason,
+        UncertaintyState.of(gap.reason),
+        surfaceSpans(GapTarget.chartNodes(gap.target).map(_.sentence))
+      )
+    }
+
+    val abstentionMarks: Vector[VisualPrimitive] =
+      draft.toVector.flatMap(_.abstentions).map { (unit, reason) =>
+        val at = coreRef.address(CoreRef.SurfaceUnit(unit))
+        VisualPrimitive.Abstention(
+          epistemicIdentity(at, AtlasMarkKind.Abstention, reason.render),
+          unit,
+          reason,
+          surfaceSpans(Vector(unit))
+        )
+      }
+
+    // The occurrence index, not the position in the vector: a validator may state one violation
+    // twice, and keying on the global position would move every other law mark's identity when an
+    // unrelated violation appears or goes away.
+    val lawMarks: Vector[VisualPrimitive] =
+      val seen = scala.collection.mutable.Map.empty[Violation, Int]
+      draft.toVector.flatMap(_.violations).map { violation =>
+        val occurrence = seen.getOrElse(violation, 0)
+        seen.update(violation, occurrence + 1)
+        val subject = violation.address
+        val placement = subject match
+          case None    => EpistemicPlacement.NoDiscoursePosition(NoPositionReason.WholeWork)
+          case Some(a) =>
+            storyRef.parse(a).flatMap(model.supporting) match
+              case None =>
+                EpistemicPlacement.NoDiscoursePosition(NoPositionReason.SubjectCitesNoSpans(a))
+              case Some(support) =>
+                clipped(support).fold(
+                  EpistemicPlacement.NoDiscoursePosition(NoPositionReason.BeyondHorizon)
+                )(EpistemicPlacement.AtSpans.apply)
+        val at = subject.getOrElse(coreRef.address(CoreRef.Story(model.source.id)))
+        val key = s"${violation.law}|${violation.severity}|${violation.path}|" +
+          s"${violation.reason}|${subject.fold("-")(_.render)}|$occurrence"
+        VisualPrimitive.UnsatisfiedLaw(
+          epistemicIdentity(at, AtlasMarkKind.UnsatisfiedLaw, key),
+          violation,
+          placement
+        )
+      }
+
     val marks =
-      (surfaceMarks ++ regions ++ landmarks ++ threads ++ portals ++ routes)
+      (surfaceMarks ++ regions ++ landmarks ++ bands ++ threads ++ portals ++ routes ++
+        gapMarks ++ abstentionMarks ++ lawMarks)
         .sortBy(_.identity.mark)
 
     // V-L2: selection and focus identity survive every projection. A missing ordinary mark uses a
@@ -821,7 +1119,7 @@ final class AtlasCompiler private (provenance: ViewProvenance):
 
   /** Provenance binds source, model build, and this exact view configuration. */
   private def validateProvenance(
-      model: StoryModel[ModelStatus.Validated],
+      model: StoryModel[?],
       state: CommonViewState,
       spec: AtlasSpec
   ): Either[DomainError, Unit] =
@@ -853,21 +1151,35 @@ final class AtlasCompiler private (provenance: ViewProvenance):
           )
         case None
             if provenance.modelReceiptChecksum.isEmpty &&
-              provenance.basis == ViewBasis.ResearcherReviewedFixture =>
+              (provenance.basis == ViewBasis.ResearcherReviewedFixture ||
+                provenance.basis == ViewBasis.DraftBuild) =>
           Right(())
         case None =>
           Left(
             DomainError.InvariantViolation(
               "view/atlas/provenance/model-receipt",
-              "model has no build receipt; only the researcher-reviewed fixture basis may omit one"
+              "model has no build receipt; only the researcher-reviewed fixture and draft-build " +
+                "bases may omit one"
             )
           )
 
-  /** V-E1/V-E3: every mark resolves to exact narrative evidence or an exact surface unit. */
-  private def checkEvidence(
+  /** V-E1/V-E3: every mark resolves to exact narrative evidence or an exact surface unit.
+    *
+    * The law extends unchanged to the absence marks: an absence that names words must name words
+    * the model actually records. A gap or an abstention may only sit on the exact span of a surface
+    * unit the atlas contains, and an unsatisfied law may only sit on spans its subject's own claim
+    * cites. An absence with no discourse position claims no text and so cannot lie about any.
+    */
+  private[view] def checkEvidence(
       model: StoryModel[?],
       mark: VisualPrimitive
   ): Either[DomainError, Unit] =
+    def onExactUnits(placement: EpistemicPlacement): Boolean = placement match
+      case EpistemicPlacement.NoDiscoursePosition(_) => true
+      case EpistemicPlacement.AtSpans(spans)         =>
+        spans.refs.toVector.forall(ref =>
+          ref.unit.flatMap(model.atlas.byId.get).exists(_.span == ref.span)
+        )
     val supported = mark match
       case VisualPrimitive.SurfaceUnit(_, span, kind, unitOrdinal, parent) =>
         Addressable[CoreRef].parse(mark.address) match
@@ -879,6 +1191,16 @@ final class AtlasCompiler private (provenance: ViewProvenance):
               ) == parent
             }
           case _ => false
+      case VisualPrimitive.Gap(_, _, _, _, _, placement)           => onExactUnits(placement)
+      case VisualPrimitive.Abstention(_, _, _, placement)          => onExactUnits(placement)
+      case VisualPrimitive.UnsatisfiedLaw(_, violation, placement) =>
+        placement match
+          case EpistemicPlacement.NoDiscoursePosition(_) => true
+          case EpistemicPlacement.AtSpans(spans)         =>
+            violation.address
+              .flatMap(Addressable[StoryRef].parse)
+              .flatMap(model.supporting)
+              .exists(support => spans.refs.toVector.forall(support.refs.toVector.contains))
       case _ => Addressable[StoryRef].parse(mark.address).flatMap(model.supporting).nonEmpty
     if supported then Right(())
     else
@@ -949,6 +1271,30 @@ object AtlasTextualTwin:
     out.append("Zoom: ").append(scene.zoom.narrative).append(" / ").append(scene.zoom.surface)
     out.append('\n')
     out.append("Basis: ").append(p.basis.label).append('\n')
+    p.draft.foreach { promotion =>
+      out.append("Draft promotion\n")
+      out
+        .append("  promotable: ")
+        .append(promotion.promoted)
+        .append("; derivation gaps: ")
+        .append(promotion.gapCount.fold("record not supplied")(_.toString))
+        .append("; violations: ")
+        .append(promotion.violationCount)
+        .append('\n')
+      if promotion.unsatisfiedLaws.isEmpty then out.append("  unsatisfied laws: (none)\n")
+      else
+        out.append("  unsatisfied laws\n")
+        promotion.unsatisfiedLaws.foreach(law =>
+          out
+            .append("  - ")
+            .append(law.law)
+            .append(' ')
+            .append(law.severity)
+            .append(" x")
+            .append(law.count.value)
+            .append('\n')
+        )
+    }
     out.append("Source checksum: ").append(p.sourceChecksum.hex).append('\n')
     out.append("Model receipt checksum: ")
     out.append(p.modelReceiptChecksum.fold("not available")(_.hex)).append('\n')
@@ -1011,9 +1357,35 @@ object AtlasTextualTwin:
         out.append(
           s"  region ${id.mark.value} ${id.address.render} x=[${e.x0},${e.x1Exclusive}) lanes=[${e.lane0},${e.lane1}] parent=${parent.fold("-")(_.render)} \"$label\"\n"
         )
-      case VisualPrimitive.Landmark(id, a, label, kind) =>
+      case VisualPrimitive.Landmark(id, a, label, kind, context) =>
         out.append(
-          s"  landmark ${id.mark.value} ${id.address.render} x=${a.x} lane=${a.lane} $kind \"$label\"\n"
+          s"  landmark ${id.mark.value} ${id.address.render} x=${a.x} lane=${a.lane} $kind " +
+            s"context=${context.value} \"$label\"\n"
+        )
+      case VisualPrimitive.ContextBand(id, kind, lane, extents, parent, basis) =>
+        val ranges = extents.toVector.map(e => s"[${e.x0},${e.x1Exclusive})").mkString(",")
+        out.append(
+          s"  context-band ${id.mark.value} ${id.address.render} lane=$lane x=$ranges " +
+            s"parent=${parent.fold("-")(_.render)} basis=$basis ${kind.label}\n"
+        )
+      case VisualPrimitive.Gap(id, family, target, reason, state, placement) =>
+        out.append(
+          s"  gap ${id.mark.value} ${id.address.render} family=${GapTarget.familyName(family)} " +
+            s"target=${target.render} reason=${reason.render} state=$state " +
+            s"channel=${state.channel} at=${placement.render}\n"
+        )
+      case VisualPrimitive.Abstention(id, unit, reason, placement) =>
+        out.append(
+          s"  abstention ${id.mark.value} ${id.address.render} unit=${unit.value} " +
+            s"reason=${reason.render} state=${UncertaintyState.Missing} " +
+            s"channel=${EpistemicChannel.OpenHatch} at=${placement.render}\n"
+        )
+      case VisualPrimitive.UnsatisfiedLaw(id, violation, placement) =>
+        out.append(
+          s"  unsatisfied-law ${id.mark.value} ${id.address.render} law=${violation.law} " +
+            s"severity=${violation.severity} path=${violation.path} " +
+            s"reason=${violation.reason} subject=${violation.address.fold("-")(_.render)} " +
+            s"channel=${EpistemicChannel.Bracket} at=${placement.render}\n"
         )
       case VisualPrimitive.Thread(id, label, pts) =>
         out.append(
