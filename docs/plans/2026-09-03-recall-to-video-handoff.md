@@ -127,5 +127,7 @@ already refuted: the content-free ramp at 9.7% *is* that prior in pure form.
 ## 6. Owner decisions still open
 
 - The human lane of the within-scene adjudication (item 1): ninety minutes, packet ready.
-- Whether to bring in a second corpus, and which (item 3). A scouting brief is in progress.
+- Whether to bring in a second corpus, and which (item 3). `2026-09-03-second-corpus-scouting.md`
+  ranks eight candidates and recommends the Chen lab's Film Festival release; the first question is
+  its licence.
 - Whether a diagnostic-only ceiling from one film is worth further investment at all.
