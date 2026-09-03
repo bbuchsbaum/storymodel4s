@@ -8,7 +8,7 @@ Free-text notes and every word of recall or annotation stay outside Git, in the 
 
 | File | Lane | Status | Produced | Digest |
 |---|---|---|---|---|
-| `answers-machine-lane.content-free.tsv` | machine | **diagnostic, never gold** (M1 Law I1) | 2026-09-03, eight fresh-context language-model adjudicators, one packet chunk each, rubric verbatim, no key | sha256 `59cf49dced91deee72d141ff1b20fababb4a47a12f41390eefdbbc1c8aa320bb` |
+| `answers-machine-lane.content-free.tsv` | machine | **diagnostic, never gold** (M1 Law I1) | 2026-09-03, eight fresh-context language-model adjudicators (claude-fable-5-1), one packet chunk each, rubric verbatim, no key; chunks, filled copies and `lane-manifest.json` retained in the study record | sha256 `59cf49dced91deee72d141ff1b20fababb4a47a12f41390eefdbbc1c8aa320bb` |
 | `answers-human-lane.content-free.tsv` | human | adjudicated; the measurement of record | not yet run | |
 
 The packet these files answer is `packet.md` sha256

@@ -697,9 +697,11 @@ been read twice: once for the lexical blend on a gold-free outcome, once here.
 *Restated on 2026-09-03, because the sections below this one kept scoring and this ledger did not
 keep counting.* The fill added a development read and an untouched read; the forward-skip penalty
 null added a development read; the content-free ramp floor added a development read and an
-untouched read. **Nine scene-gold comparisons in all**, five on development and four on the
-untouched five, which have therefore been read four times against gold and once on a gold-free
-outcome. The within-scene ledger opened on 2026-09-03 is separate and is kept in that section.
+untouched read. **Nine scene-gold comparisons in all**: one pooled (the pre-specified read spans
+both sets), five on development, three on the untouched five alone. Counting the pooled read on
+both sides, development has been read six times against gold and the untouched five four times,
+plus once on a gold-free outcome. The within-scene ledger opened on 2026-09-03 is separate and is
+kept in that section.
 
 ## Filling the escape hatch, and two nulls that stopped further work
 
@@ -750,7 +752,8 @@ scene. Gross displacement is solved; what remains is boundary precision.
 4. **Confidence remains usable but flatter**: accuracy runs 59.4% to 72.5% across quartiles of MAP
    mass, against 21.4% to 57.2% before the decode. Enough for selective prediction, not for accuracy.
 5. **Generalisation, not tuning, is the credibility bottleneck.** One film, 15 gold participants, and
-   the untouched five have now been read three times. A second corpus would be worth more than any
+   the untouched five have now been read three times *(four, counting the ramp floor above; the
+   restated ledger has the count)*. A second corpus would be worth more than any
    further parameter on this one — and the captioning lane, redundant here against an unusually
    complete annotation, is exactly what such a corpus would need.
 
@@ -778,7 +781,10 @@ shows no anchor, posterior, runner-up or arm.
 
 **The machine lane, run first as the pre-registration allows.** Eight fresh-context language-model
 adjudicators each received one chunk of the packet, carrying the rubric verbatim, and nothing else:
-no key, no report, no repository. All 200 lines came back filled, 149 marked sure. Under M1 Law I1
+no key, no report, no repository. All 200 lines came back filled, 149 marked sure. The eight chunks
+and the eight filled copies are retained beside the packet under `within-scene/machine-lane/` with
+`lane-manifest.json`: digests, the scene groups each chunk carried, the model (claude-fable-5-1),
+and a check that every chunk is the packet's rubric plus whole scene groups verbatim. Under M1 Law I1
 this lane is *diagnostic*: it may not select an arm and its numbers are never called gold. It is
 reported because it answers, provisionally, the question nobody could answer yesterday, and because
 its agreement with the human lane will itself be a finding.
@@ -788,10 +794,14 @@ its agreement with the human lane will itself be a finding.
 | Primary set: stratum A, leaf-anchored, point or span grain | 124 units | | |
 | `hit`, anchor inside the adjudicated range | **66.1%** [55.6, 77.7] | 25.0% | 19.4% |
 | paired, model minus midpoint null | **+41.1 points** [+30.3, +53.0], 10 of 10 participants | | |
-| `hit` on sure units only (99) | 73.7% | 23.2% | +50.5 [+38.8, +60.6] |
+| `hit` on sure units only (99) | 73.7% [61.6, 85.9] | 23.2% | +50.5 [+38.8, +60.6], 10 of 10 |
 | `hit ±1` / `hit ±2` segments | 73.4% / 76.6% | 34.7% / 39.5% | |
 | time gap, median / 75th percentile | **0 s / 3 s** | 8 s / 20 s | mean 21 s |
-| temporal error, all units, stratum-weighted, median / p75 | 6 s / 52 s | 19 s / 70 s | |
+| temporal error, all units, stratum-weighted, median / p75 | 0 s / 40 s | 17 s / 48 s | |
+
+*The last row was first published as 6 s / 52 s against 19 s / 70 s. A fresh-context review found
+the scorer weighting each stratum by frame size over its adjudicated count, not over its sample
+size as pre-registered; corrected the same day, the row is as above. Direction unchanged.*
 
 Grain, stratum A: point 46%, span 47%, whole 3%, none 5%. Stratum B: point 18%, span 46%, whole
 8%, **none 28%**. Runner-up rescue: 4 of 42 misses. Confidence quartiles of anchor mass: 58.1, 67.7,

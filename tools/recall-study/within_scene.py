@@ -427,6 +427,7 @@ def normalise(rows, ann, key):
             problems.append(f"{k}: unreadable range {r['first']}..{r['last']}")
             continue
         if a > b:
+            problems.append(f"{k}: range given as {a}..{b}, read as {b}..{a}")
             a, b = b, a
         segs = ann.scene_segs[key[k]["goldScene"]]
         if a not in segs or b not in segs:
@@ -510,15 +511,18 @@ def load_key(key_dir):
 
 def join(key, answers, ann, arm):
     """Per adjudicated unit: everything the outcomes need, from the key, the answer, and the arm."""
-    units = []
+    units, dropped = [], []
     for (nn, u), ans in answers.items():
         rng = ans["range"]
         k = key[(nn, u)]
         rows = arm.get(k["participant"])
-        if rows is None:
-            continue
-        r = next((x for x in rows if int(x["unit"]) == u), None)
+        r = (
+            next((x for x in rows if int(x["unit"]) == u), None)
+            if rows is not None
+            else None
+        )
         if r is None:
+            dropped.append((nn, u))
             continue
         g = k["goldScene"]
         segs = ann.scene_segs[g]
@@ -546,6 +550,10 @@ def join(key, answers, ann, arm):
                 else None,
             )
         )
+    if dropped:
+        print(
+            f"   dropped {len(dropped)} answered unit(s) absent from this arm's reports: {dropped[:5]}{'…' if len(dropped) > 5 else ''}"
+        )
     return units
 
 
@@ -556,7 +564,72 @@ def hit(p, rng, tol=0):
     return a - tol <= p <= b + tol
 
 
-def score_lane(label, units, ann, arm_label, frame_total=None):
+def primary_outcomes(prim, ann, per):
+    """Outcomes 1–4, 7 and 9 of §5 on one primary set; called again on the sure-only subset."""
+    pp = per(prim)
+    model = {
+        k: [1.0 if hit(x["leaf"], x["range"]) else 0.0 for x in v]
+        for k, v in pp.items()
+    }
+    null = {
+        k: [1.0 if hit(x["mid"], x["range"]) else 0.0 for x in v] for k, v in pp.items()
+    }
+    unif = {
+        k: [(x["range"][1] - x["range"][0] + 1) / x["scene_len"] for x in v]
+        for k, v in pp.items()
+    }
+    diff = {k: [a - b for a, b in zip(model[k], null[k])] for k in pp}
+    lo, hi = cluster_boot(model, pct)
+    print(
+        f"   hit            model {pct(sum(model.values(), [])):5.1f}%  {ci_str(lo, hi, '{:.1f}')}"
+    )
+    print(
+        f"   hit            scene-midpoint null {pct(sum(null.values(), [])):5.1f}%   uniform null {pct(sum(unif.values(), [])):5.1f}%"
+    )
+    lo, hi = cluster_boot(diff, pct)
+    better = sum(1 for k in pp if mean(model[k]) > mean(null[k]))
+    print(
+        f"   PRIMARY  model minus midpoint null {pct(sum(diff.values(), [])):+5.1f} points  {ci_str(lo, hi)}  "
+        f"participants improved {better}/{len(pp)}"
+    )
+    for tol in (1, 2):
+        m = pct([1.0 if hit(x["leaf"], x["range"], tol) else 0.0 for x in prim])
+        n = pct([1.0 if hit(x["mid"], x["range"], tol) else 0.0 for x in prim])
+        print(f"   hit ±{tol}          model {m:5.1f}%   midpoint null {n:5.1f}%")
+    gm = [ann.gap_seconds(x["leaf"], *x["range"]) for x in prim]
+    gn = [ann.gap_seconds(x["mid"], *x["range"]) for x in prim]
+    gu = [
+        mean([ann.gap_seconds(q, *x["range"]) for q in ann.scene_segs[x["gold"]]])
+        for x in prim
+    ]
+    print(
+        f"   time gap s     model median {statistics.median(gm):5.1f}  p75 {sorted(gm)[int(0.75*len(gm))]:5.1f}   "
+        f"midpoint null median {statistics.median(gn):5.1f}  p75 {sorted(gn)[int(0.75*len(gn))]:5.1f}   uniform mean {mean(gu):5.1f}"
+    )
+    misses = [x for x in prim if not hit(x["leaf"], x["range"])]
+    resc = sum(1 for x in misses if hit(x["runner"], x["range"]))
+    print(
+        f"   runner-up rescue: {resc}/{len(misses)} misses"
+        if misses
+        else "   runner-up rescue: no misses"
+    )
+    qs = sorted(x["mass"] for x in prim)
+    cuts = [qs[int(len(qs) * f)] for f in (0.25, 0.5, 0.75)]
+    for qi in range(4):
+        lo_c = cuts[qi - 1] if qi > 0 else -1
+        hi_c = cuts[qi] if qi < 3 else 2
+        sel = (
+            [x for x in prim if lo_c <= x["mass"] < hi_c]
+            if qi < 3
+            else [x for x in prim if x["mass"] >= lo_c]
+        )
+        if sel:
+            print(
+                f"   confidence Q{qi+1}: hit {pct([1.0 if hit(x['leaf'], x['range']) else 0.0 for x in sel]):5.1f}%  n {len(sel)}"
+            )
+
+
+def score_lane(label, units, ann, arm_label, frame_total=None, sample_total=None):
     per = lambda sel: {
         k: [x for x in sel if x["nn"] == k] for k in sorted({x["nn"] for x in sel})
     }
@@ -595,88 +668,21 @@ def score_lane(label, units, ann, arm_label, frame_total=None):
         f"\n   primary set (A, scene-correct under this arm, leaf-anchored, point/span): {len(prim)} units"
     )
     if prim:
-        pp = per(prim)
-        model = {
-            k: [1.0 if hit(x["leaf"], x["range"]) else 0.0 for x in v]
-            for k, v in pp.items()
-        }
-        null = {
-            k: [1.0 if hit(x["mid"], x["range"]) else 0.0 for x in v]
-            for k, v in pp.items()
-        }
-        unif = {
-            k: [(x["range"][1] - x["range"][0] + 1) / x["scene_len"] for x in v]
-            for k, v in pp.items()
-        }
-        diff = {k: [a - b for a, b in zip(model[k], null[k])] for k in pp}
-        lo, hi = cluster_boot(model, pct)
-        print(
-            f"   hit            model {pct(sum(model.values(), [])):5.1f}%  {ci_str(lo, hi, '{:.1f}')}"
-        )
-        print(
-            f"   hit            scene-midpoint null {pct(sum(null.values(), [])):5.1f}%   uniform null {pct(sum(unif.values(), [])):5.1f}%"
-        )
-        lo, hi = cluster_boot(diff, pct)
-        better = sum(1 for k in pp if mean(model[k]) > mean(null[k]))
-        print(
-            f"   PRIMARY  model minus midpoint null {pct(sum(diff.values(), [])):+5.1f} points  {ci_str(lo, hi)}  "
-            f"participants improved {better}/{len(pp)}"
-        )
-        for tol in (1, 2):
-            m = pct([1.0 if hit(x["leaf"], x["range"], tol) else 0.0 for x in prim])
-            n = pct([1.0 if hit(x["mid"], x["range"], tol) else 0.0 for x in prim])
-            print(f"   hit ±{tol}          model {m:5.1f}%   midpoint null {n:5.1f}%")
-        gm = [ann.gap_seconds(x["leaf"], *x["range"]) for x in prim]
-        gn = [ann.gap_seconds(x["mid"], *x["range"]) for x in prim]
-        gu = [
-            mean([ann.gap_seconds(q, *x["range"]) for q in ann.scene_segs[x["gold"]]])
-            for x in prim
-        ]
-        print(
-            f"   time gap s     model median {statistics.median(gm):5.1f}  p75 {sorted(gm)[int(0.75*len(gm))]:5.1f}   "
-            f"midpoint null median {statistics.median(gn):5.1f}  p75 {sorted(gn)[int(0.75*len(gn))]:5.1f}   uniform mean {mean(gu):5.1f}"
-        )
-        misses = [x for x in prim if not hit(x["leaf"], x["range"])]
-        resc = sum(1 for x in misses if hit(x["runner"], x["range"]))
-        print(
-            f"   runner-up rescue: {resc}/{len(misses)} misses"
-            if misses
-            else "   runner-up rescue: no misses"
-        )
-        qs = sorted(x["mass"] for x in prim)
-        cuts = [qs[int(len(qs) * f)] for f in (0.25, 0.5, 0.75)]
-        for qi in range(4):
-            lo_c = cuts[qi - 1] if qi > 0 else -1
-            hi_c = cuts[qi] if qi < 3 else 2
-            sel = (
-                [x for x in prim if lo_c <= x["mass"] < hi_c]
-                if qi < 3
-                else [x for x in prim if x["mass"] >= lo_c]
-            )
-            if sel:
-                print(
-                    f"   confidence Q{qi+1}: hit {pct([1.0 if hit(x['leaf'], x['range']) else 0.0 for x in sel]):5.1f}%  n {len(sel)}"
-                )
+        primary_outcomes(prim, ann, per)
 
-    # robustness: the primary comparison on sure units alone
+    # robustness (§5): every primary and secondary outcome repeated on sure units alone
     sure_prim = [x for x in prim if x["sure"]]
-    if sure_prim and len(sure_prim) < len(prim):
-        sp = per(sure_prim)
-        diff = {
-            k: [
-                (1.0 if hit(x["leaf"], x["range"]) else 0.0)
-                - (1.0 if hit(x["mid"], x["range"]) else 0.0)
-                for x in v
-            ]
-            for k, v in sp.items()
-        }
-        lo, hi = cluster_boot(diff, pct)
-        m = pct([1.0 if hit(x["leaf"], x["range"]) else 0.0 for x in sure_prim])
-        n = pct([1.0 if hit(x["mid"], x["range"]) else 0.0 for x in sure_prim])
+    if prim and not sure_prim:
+        print("   sure-only: no primary unit is marked sure")
+    elif prim and len(sure_prim) == len(prim):
         print(
-            f"   sure-only ({len(sure_prim)} units): hit model {m:5.1f}%  midpoint null {n:5.1f}%  "
-            f"difference {pct(sum(diff.values(), [])):+5.1f} points  {ci_str(lo, hi)}"
+            "   sure-only: every primary unit is marked sure, so the read above is the sure-only read"
         )
+    elif sure_prim:
+        print(
+            f"\n   sure-only repeat, {len(sure_prim)} of {len(prim)} primary units marked sure:"
+        )
+        primary_outcomes(sure_prim, ann, per)
 
     # 6. abstention concordance
     a_units = [x for x in covered if x["stratum"] == "A" and x["scene_correct"]]
@@ -698,10 +704,13 @@ def score_lane(label, units, ann, arm_label, frame_total=None):
             f"among leaf-anchored {w_leaf:5.1f}% (n {len(leaf_u)})"
         )
 
-    # 8. temporal error over all units, stratum-weighted
-    if frame_total:
-        n_s = {s: sum(1 for x in covered if x["stratum"] == s) for s in ("A", "B")}
-        wt = {s: (frame_total[s] / n_s[s]) if n_s[s] else 0.0 for s in ("A", "B")}
+    # 8. temporal error over all units, stratum-weighted by frame size over SAMPLE size (§5 item 8);
+    # a scene-anchored unit's position is the predicted scene's midpoint, so it equals the null there
+    if frame_total and sample_total:
+        wt = {
+            s: (frame_total[s] / sample_total[s]) if sample_total[s] else 0.0
+            for s in ("A", "B")
+        }
         pairs_m, pairs_n = [], []
         for x in covered:
             p = (
@@ -771,16 +780,42 @@ def cmd_score(args):
     )
     key = load_key(key_dir)
     manifest = json.load(open(os.path.join(key_dir, "manifest.json")))
+    key_digest = sha256(os.path.join(key_dir, "key.tsv"))
+    if key_digest != manifest["outputs"]["key.tsv"]:
+        sys.exit(
+            f"key.tsv digest {key_digest[:16]}… does not match the manifest; the key was edited"
+        )
     arm = load_arm(arm_dir)
+    if arm_label == manifest["arm"]:
+        changed = [
+            nn
+            for nn, d in manifest["armReports"].items()
+            if any(
+                short(name) == nn
+                and sha256(os.path.join(arm_dir, f"recall-map-{name}.tsv")) != d
+                for name in arm
+            )
+        ]
+        if changed:
+            sys.exit(
+                f"arm {arm_label} reports differ from the manifest's for {changed}; the frame was drawn from other reports"
+            )
     print(
-        f"key {key_dir}  packet sha256 {manifest['outputs']['packet.md'][:16]}…  arm {arm_label}"
+        f"key {key_dir}  packet sha256 {manifest['outputs']['packet.md'][:16]}…  key verified  arm {arm_label}"
+        + (
+            "  (the packet's own arm, reports verified)"
+            if arm_label == manifest["arm"]
+            else ""
+        )
     )
     lanes = {}
     for path in [answers_path] + ([opts["--other"]] if "--other" in opts else []):
         lane = lane_of(path)
         units = join(key, normalise(read_answers(path), ann, key), ann, arm)
         title = "human" if lane == "human" else "machine (diagnostic, never gold)"
-        score_lane(title, units, ann, arm_label, manifest["frameTotal"])
+        score_lane(
+            title, units, ann, arm_label, manifest["frameTotal"], manifest["sample"]
+        )
         lanes[lane] = units
     if "human" in lanes and "machine" in lanes:
         reliability(lanes["human"], lanes["machine"], ann)
@@ -845,10 +880,17 @@ def cmd_diagnose(args):
 # ---------------------------------------------------------------- main
 
 
+FLAGS = {"--strip-notes"}
+
+
 def parse_opts(argv):
+    """--name value pairs, except the boolean FLAGS, which take no value."""
     opts, i = {}, 0
     while i < len(argv):
-        if argv[i].startswith("--") and i + 1 < len(argv):
+        if argv[i] in FLAGS:
+            opts[argv[i]] = True
+            i += 1
+        elif argv[i].startswith("--") and i + 1 < len(argv):
             opts[argv[i]] = argv[i + 1]
             i += 2
         else:

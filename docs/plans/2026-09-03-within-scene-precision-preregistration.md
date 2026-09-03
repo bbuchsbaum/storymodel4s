@@ -41,7 +41,10 @@ the same adjudication scores every present and future arm.
 - **Packet order**: units grouped by gold scene so the adjudicator reads a scene's segments once;
   scene groups and units within a group are shuffled by the same seed. Because the order is random,
   an incompletely adjudicated packet is a random subsample: the analysis uses every adjudicated unit
-  and reports the count. Nothing is chosen after seeing which units are done.
+  and reports the count. A prefix of the packet is a cluster sample by scene group, so each unit's
+  inclusion probability is the same but the A:B and per-participant balance hold only in
+  expectation; the participant-clustered bootstrap remains valid. Nothing is chosen after seeing
+  which units are done.
 
 ## 3. The packet and the sealed key
 
@@ -51,9 +54,10 @@ like every artefact carrying recall prose:
 - `packet.md` — the blind packet: per scene group, the segment list (number, film-part clock,
   annotated description, location, cast), then each unit with the previous and next unit greyed
   as context and an answer line to fill in place.
-- `key.tsv` — per sampled unit: participant, unit index, gold scene, stratum, and nothing else
-  that the adjudicator needs. The prediction is not in the key either; it is read from the arm's
-  report at scoring, so the key is arm-neutral.
+- `key.tsv` — per sampled unit: participant, unit index, gold scene, stratum. The stratum is one
+  bit of the default run's output (its scene decision), and the adjudicator never sees the key. The
+  prediction itself is not in the key; it is read from the arm's report at scoring, so the same key
+  scores any arm.
 - `manifest.json` — seed, frame counts per stratum and participant, the SHA-256 of `packet.md`
   and `key.tsv`, and the SHA-256 of every input file.
 
@@ -71,7 +75,9 @@ For each unit the adjudicator marks, on its answer line:
 - `sure` — `y` or `n`. Free-text `note` optional.
 
 Grain is **derived**, never marked: `point` (range of one or two segments), `span` (three or more,
-narrower than the scene), `whole` (the full scene), `none`.
+narrower than the scene), `whole` (the full scene), `none`. `whole` takes precedence: in a scene of
+one or two segments the full range is `whole`, not `point`, which is the conservative reading since
+such a unit leaves the primary set rather than scoring as a trivial hit.
 
 The adjudicator of record is a human (M1 adjudication protocol, Law I4). A second, **machine**
 adjudication of the same packet by a language model that never sees the key is permitted as a
@@ -110,7 +116,11 @@ segment holding the scene's temporal midpoint is `m`.
 7. **Runner-up rescue** — among primary-set misses, share whose runner-up leaf hits.
 8. **Temporal error over all units** — time gap pooled over strata A and B, each unit weighted by
    its stratum's frame size over its sample size, reported as a weighted median and 75th percentile,
-   model against the midpoint of the *predicted* scene.
+   model against the midpoint of the *predicted* scene. A scene-anchored unit has no leaf, so its
+   position is that same midpoint and it contributes equally to both sides. *(Both sentences after
+   the first were added on 2026-09-03 after the machine lane was scored, when a review found the
+   scorer had used the adjudicated count instead of the sample size and the abstention case unwritten;
+   the scorer was corrected to the pre-registered weight and the log's row re-derived.)*
 9. **Confidence** — `hit` by quartile of `mapAnchorMass`. Diagnostic.
 
 **Where the uncertainty goes.** A unit the adjudicator cannot narrow is labelled `whole` and leaves
