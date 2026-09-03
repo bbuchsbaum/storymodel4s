@@ -389,9 +389,9 @@ private[view] object GapTarget:
   *
   * Why three cases and not one "unknown": a claim family the narrative compiler nominated and could
   * not derive, a sentence the provider refused, and a promotion law the validator found unsatisfied
-  * come from three different stages and are actionable in three different ways. A reader who is told
-  * only that *something* failed at these words learns nothing they can act on, and the draft path
-  * exists precisely so that they can.
+  * come from three different stages and are actionable in three different ways. A reader who is
+  * told only that *something* failed at these words learns nothing they can act on, and the draft
+  * path exists precisely so that they can.
   *
   * Every case carries its producer's record whole and restates none of it, so a mark can never say
   * more about a failure than the stage that recorded it did.
@@ -509,7 +509,9 @@ private[view] object AbsencePlacement:
           EpistemicPlacement.NoDiscoursePosition(NoPositionReason.UnitAbsentFromAtlas(absent))
         case None =>
           val refs =
-            distinct.flatMap(unit => model.atlas.byId.get(unit).map(u => SpanRef(Some(u.id), u.span)))
+            distinct.flatMap(unit =>
+              model.atlas.byId.get(unit).map(u => SpanRef(Some(u.id), u.span))
+            )
           SpanSet
             .of(refs)
             .flatMap(clip)

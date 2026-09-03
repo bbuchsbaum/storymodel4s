@@ -347,8 +347,9 @@ object CodexContract:
     *
     * They deliberately do not consume [[ChannelBudget.maxAnnotationKinds]]: that budget bounds how
     * many lenses a caller may switch on at once, and a caller who could spend a draft's disclosure
-    * out of the budget could compile a machine-built story as unmarked prose. What a draft discloses
-    * about itself follows from its basis, which the receipt already states, not from view policy.
+    * out of the budget could compile a machine-built story as unmarked prose. What a draft
+    * discloses about itself follows from its basis, which the receipt already states, not from view
+    * policy.
     */
   private[view] def compiled(
       state: CommonViewState,
@@ -521,8 +522,8 @@ final class CodexCompiler private (provenance: ViewProvenance):
     * a researcher looking at a machine-built story reads the story's prose there. A draft edition
     * that shipped an Atlas and no Codex would leave the most important surface in `vision.md`
     * unavailable for every model the pipeline actually builds; a draft edition that shipped a Codex
-    * compiled as though the model were validated would show unmarked prose, which reads as prose the
-    * model understood. So the failures are drawn on the words they concern:
+    * compiled as though the model were validated would show unmarked prose, which reads as prose
+    * the model understood. So the failures are drawn on the words they concern:
     * [[AnnotationKind.Gap]], [[AnnotationKind.Abstention]] and [[AnnotationKind.UnsatisfiedLaw]],
     * each carrying the producer's own record of what went wrong.
     *
@@ -652,7 +653,7 @@ final class CodexCompiler private (provenance: ViewProvenance):
       absences: CodexCompiler.AbsenceCompilation,
       annotations: Vector[TextAnnotation]
   ): Either[DomainError, Option[DraftAbsenceLedger]] = draft match
-    case None       => Right(None)
+    case None         => Right(None)
     case Some(bundle) =>
       val ledger = DraftAbsenceLedger(absences.annotations.map(_.id), absences.unplaced)
       val survived = annotations.count(_.absence.isDefined)

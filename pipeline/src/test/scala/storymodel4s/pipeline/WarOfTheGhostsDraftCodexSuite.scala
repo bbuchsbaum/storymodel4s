@@ -19,10 +19,10 @@ import storymodel4s.view.*
 
 /** The reading view of a machine-built story: its words, with the model's own failures on them.
   *
-  * Companion to `WarOfTheGhostsDraftAtlasSuite`, over the same replayed compilation. The Atlas shows
-  * where the model is partial on a discourse axis; this shows it on the prose, which is the surface
-  * `vision.md` puts first and the one a draft edition could not produce at all until the Codex
-  * learned a draft path. Replay mode means no model call and no spend.
+  * Companion to `WarOfTheGhostsDraftAtlasSuite`, over the same replayed compilation. The Atlas
+  * shows where the model is partial on a discourse axis; this shows it on the prose, which is the
+  * surface `vision.md` puts first and the one a draft edition could not produce at all until the
+  * Codex learned a draft path. Replay mode means no model call and no spend.
   *
   * What is pinned: the annotation census by channel, the identity between the absences the
   * compilation reports and the ones the flow accounts for, that the survivor's retelling is marked
@@ -36,9 +36,9 @@ class WarOfTheGhostsDraftCodexSuite extends FunSuite:
     */
   private val WogStory = "story:e4b036101a7a"
 
-  /** The offsets of the survivor's retelling, measured independently by `StoryBuildSuite`. The whole
-    * reason the context channel matters here: these words are quoted speech, and a reading view that
-    * left them unmarked would show the fabricated battle as narrated prose.
+  /** The offsets of the survivor's retelling, measured independently by `StoryBuildSuite`. The
+    * whole reason the context channel matters here: these words are quoted speech, and a reading
+    * view that left them unmarked would show the fabricated battle as narrated prose.
     */
   private val RetellingQuotation: (Int, Int) = (1724, 1900)
 
@@ -60,7 +60,8 @@ class WarOfTheGhostsDraftCodexSuite extends FunSuite:
     workDirs += dir
     dir
 
-  /** The whole replay, run once: parse, propose, compile, and bind the draft to its own evidence. */
+  /** The whole replay, run once: parse, propose, compile, and bind the draft to its own evidence.
+    */
   private lazy val compiled: (NarrativeCompilation, DraftModel) =
     val dir = work("wog-draft-codex")
     val textPath = dir.resolve("war-of-the-ghosts.txt")
@@ -127,7 +128,10 @@ class WarOfTheGhostsDraftCodexSuite extends FunSuite:
       .flatMap(compilation.draft.graph.contexts.get)
       .getOrElse(fail(s"${annotation.target.render} is not a context frame"))
 
-  private def covering(annotations: Vector[TextAnnotation], span: TextSpan): Vector[TextAnnotation] =
+  private def covering(
+      annotations: Vector[TextAnnotation],
+      span: TextSpan
+  ): Vector[TextAnnotation] =
     annotations.filter(_.support.spans.toVector.exists(_.overlaps(span)))
 
   test("the machine-built model is the same partial one the draft Atlas court renders") {
@@ -332,9 +336,8 @@ class WarOfTheGhostsDraftCodexSuite extends FunSuite:
     inside.foreach(sentence =>
       assertEquals(covering(speech, sentence.span).map(_.id), Vector(retelling.id))
     )
-    val narrated = compilation.draft.atlas.sentences.filter(sentence =>
-      covering(speech, sentence.span).isEmpty
-    )
+    val narrated =
+      compilation.draft.atlas.sentences.filter(sentence => covering(speech, sentence.span).isEmpty)
     assert(narrated.nonEmpty)
     narrated.foreach(sentence =>
       assert(
@@ -377,7 +380,9 @@ class WarOfTheGhostsDraftCodexSuite extends FunSuite:
     assert(twin.contains("  - hierarchy.single-primary-root Error x1\n"))
     assert(twin.contains("  - hierarchy.situation-root-reachable Error x65\n"))
     assert(
-      twin.contains("Channels: abstention,claim,context,entity,gap,hierarchy,relation,unsatisfied-law\n")
+      twin.contains(
+        "Channels: abstention,claim,context,entity,gap,hierarchy,relation,unsatisfied-law\n"
+      )
     )
 
     def lines(prefix: String): Vector[String] =
@@ -390,7 +395,9 @@ class WarOfTheGhostsDraftCodexSuite extends FunSuite:
     assert(lines("  absence=").exists(_.contains("state=Missing channel=OpenHatch")))
     assert(lines("  absence=unsatisfied-law").forall(_.contains("state=- channel=Bracket")))
     assert(
-      lines("  absence=abstained-sentence").head.contains("reason=provider-abstained:focus-not-predicate")
+      lines("  absence=abstained-sentence").head.contains(
+        "reason=provider-abstained:focus-not-predicate"
+      )
     )
 
     // Every absence with no discourse position is listed too, so the twin accounts for all 206.
@@ -446,4 +453,3 @@ class WarOfTheGhostsDraftCodexSuite extends FunSuite:
     ).compileDraft(draft, state, spec)
     assert(crossed.isLeft, "a receipt saying nothing about derivation must not render 70 gaps")
   }
-

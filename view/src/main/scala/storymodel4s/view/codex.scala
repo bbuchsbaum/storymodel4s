@@ -45,7 +45,7 @@ enum AnnotationKind(val wireName: String):
     * author deciding, here, which side of the line it falls on.
     */
   def marksAbsence: Boolean = this match
-    case Gap | Abstention | UnsatisfiedLaw                                 => true
+    case Gap | Abstention | UnsatisfiedLaw                                  => true
     case Feature | Hierarchy | Entity | Relation | Context | Claim | Recall => false
 
 object AnnotationKind:
@@ -901,7 +901,8 @@ object CodexTextualTwin:
         )
     }
 
-  /** The absences that concern no words, listed so the twin accounts for every one the draft has. */
+  /** The absences that concern no words, listed so the twin accounts for every one the draft has.
+    */
   private def renderUnplaced(flow: CodexFlow, out: StringBuilder): Unit =
     flow.draft.foreach { ledger =>
       out.append("\nUnplaced absences\n")

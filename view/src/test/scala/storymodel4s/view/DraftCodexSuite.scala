@@ -81,9 +81,7 @@ class DraftCodexSuite extends FunSuite:
     StoryModel.draft(
       source,
       atlas,
-      NarrativeGraph.empty.copy(contexts =
-        Map(narrated.id -> narrated, reported.id -> reported)
-      ),
+      NarrativeGraph.empty.copy(contexts = Map(narrated.id -> narrated, reported.id -> reported)),
       NarrativeHierarchy(Vector.empty, Vector.empty),
       DiscourseTrajectory.empty
     )
@@ -271,7 +269,11 @@ class DraftCodexSuite extends FunSuite:
       AbstentionReason.FocusNotPredicate(ConceptKind.Entity)
     )
     val draft =
-      draftOf(gaps = Vector(summary, placed), violations = Vector(law), coverage = Vector(abstained))
+      draftOf(
+        gaps = Vector(summary, placed),
+        violations = Vector(law),
+        coverage = Vector(abstained)
+      )
     val flow = flowOf(draft)
     val ledger = ledgerOf(flow)
 
