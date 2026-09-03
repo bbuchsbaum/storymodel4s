@@ -1011,6 +1011,17 @@ alternatives *is* the uncertainty shown. An independent human coding rides
 beside the marks with its name and checksum and never becomes a model address.
 The twin lists marks and never recall prose.
 
+### D3a The document, and where it is written
+
+`RecallVoyageDocument` is the proven input plus provenance; the `codec` module
+encodes exactly that and never the compiled marks, so a viewer that loads it
+compiles the scene itself and the evidence law runs wherever marks are drawn.
+`embed-bench` gains `view` and `codec` as dependencies to write
+`<report>.voyage.json` beside every recall-to-video report, from the run's own
+`HsmmResult`, decisions and media loci; the released scene coding rides along as
+an `IndependentCoding` when the run names it. Nothing in `view` or `codec` knows
+Sherlock.
+
 ### D4 Consequences for storyatlas4s
 
 It owns no science, so it lowers `VoyageScene` and renders it: a static lowering

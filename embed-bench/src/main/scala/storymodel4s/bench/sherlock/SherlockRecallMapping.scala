@@ -213,10 +213,22 @@ object SherlockAnnotationView:
 
   val csv = new String(Files.readAllBytes(Paths.get(recallCsv)), StandardCharsets.UTF_8)
   val words = RecallWordsCsv.parse(csv).fold(e => throw new IllegalArgumentException(e), identity)
+  // The released scene coding rides beside the voyage when the run names it; the participant is
+  // read from the recall file name under the pre-registered mapping.
+  val coding = sys.env.get("STORYMODEL4S_SCENE_CODING").flatMap { path =>
+    SherlockSceneCoding.participantOf(Paths.get(recallCsv).getFileName.toString) match
+      case None    => println(s"scene coding: recall file name carries no NNxx participant"); None
+      case Some(n) =>
+        SherlockSceneCoding
+          .load(Paths.get(path), n)
+          .fold(e => throw new IllegalArgumentException(e.message), identity)
+  }
+  println(s"scene coding: ${coding.fold("none")(c => s"${c.name} ${c.intervals.size} intervals")}")
   RecallToVideo.run(
     built,
     words,
     SherlockAnnotationView.axes(atlas),
     "sherlock-recall",
-    Paths.get(outPath)
+    Paths.get(outPath),
+    coding
   )

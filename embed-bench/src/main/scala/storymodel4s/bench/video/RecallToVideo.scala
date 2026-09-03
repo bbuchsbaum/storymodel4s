@@ -341,7 +341,8 @@ object RecallToVideo:
       words: Vector[RecallWordsCsv.RecallWord],
       axes: Map[String, PresentationAxis],
       transcriptLabel: String,
-      outPath: Path
+      outPath: Path,
+      coding: Option[storymodel4s.view.IndependentCoding] = None
   ): Unit =
     val t0 = System.nanoTime()
     // The shuffle control. With a seed set, the recall's sentences are permuted before segmentation
@@ -590,6 +591,29 @@ object RecallToVideo:
       Paths.get(outPath.toString + ".posterior.json"),
       sidecar.getBytes(StandardCharsets.UTF_8)
     )
+
+    // The Recall Voyage document (ADR 0002 §14): the proven join a viewer compiles itself.
+    val configRendering =
+      s"channel=$channelLabel perLevel=$perLevel lexicalOverlap=$lexicalOverlap " +
+        s"priorScale=${priorScale.getOrElse(1.0)} monotone=${MonotoneScene.enabled} " +
+        s"fill=${MonotoneScene.fillEnabled} backward=${MonotoneScene.backwardPenalty} " +
+        s"forward=${MonotoneScene.forwardPenalty}"
+    VoyageExport
+      .document(
+        built,
+        recall.ordered,
+        timings,
+        result,
+        chosenAnchors,
+        decisions,
+        seconds,
+        coding,
+        configRendering
+      )
+      .fold(
+        e => println(s"voyage document not written: ${e.message}"),
+        doc => println(s"voyage: ${VoyageExport.write(outPath, doc)}")
+      )
 
     val elapsedMs = (System.nanoTime() - t0) / 1000000L
     val leafCount = built.view.leaves.size

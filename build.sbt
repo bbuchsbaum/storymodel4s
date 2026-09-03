@@ -303,7 +303,16 @@ lazy val embedBench = project
     run / envVars += "ORT_DISABLE_TELEMETRY" -> "1",
     run / connectInput := true
   )
-  .dependsOn(embedCore.jvm, embedOnnx, embedGrakern, align.jvm, fixtures.jvm, laws.jvm % Test)
+  .dependsOn(
+    embedCore.jvm,
+    embedOnnx,
+    embedGrakern,
+    align.jvm,
+    view.jvm,
+    codec.jvm,
+    fixtures.jvm,
+    laws.jvm % Test
+  )
 
 /** JVM-only media acquisition adapter (ADR 0007 §4, amendment 2026-09-01): exact-byte fixture
   * manifests, an ffprobe packet-index ingest that yields `Draft`-authority records only, and the
