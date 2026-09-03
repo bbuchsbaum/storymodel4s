@@ -370,6 +370,197 @@ class ContextPlacementSuite extends FunSuite:
       case other => fail(s"expected an attributed speech context, got ${other.label}")
   }
 
+  /** ADR 0012 §speech holder. "We" in a quotation attributed to the man is a group he belongs to,
+    * which is neither him nor anyone else the text names: an open reference with him as its
+    * candidate, no entity minted for it, and no participant edge from the fighting.
+    */
+  test(
+    "a first-person plural in an attributed quotation stays open with the speaker as candidate"
+  ) {
+    val model = compile(
+      Vector(
+        atlas.sentences(0).id -> manSaidChart,
+        atlas.sentences(1).id -> foughtChart
+      )
+    )
+    val graph = model.draft.graph
+    assertEquals(graph.entities.values.map(_.label.value).toVector, Vector("man"))
+    val man = graph.entities.values.head
+    val fought = graph.situations.values.find(_.predicate.lemma == "fight").get
+    assertEquals(graph.relations.participants.filter(_.situation == fought.id), Vector.empty)
+    val open = model.derivation.gaps.collect {
+      case DerivationGap(_, _, _, DerivationGapReason.OpenReference(reason), upstream, _) =>
+        reason -> upstream
+    }
+    assertEquals(open, Vector(OpenReference.SpeakerGroup -> Set(man.meta.id)))
+  }
+
+  /** "I" in a quotation attributed to the man is the man: one entity with two mentions, and the
+    * fighting is his. The quotation is a sentence of its own, so this is the quoted path, not the
+    * embedded one; the man is found one sentence back through the reporting predicate.
+    */
+  test("a first-person singular in an attributed quotation names the speaker") {
+    val src = StorySource
+      .titled(
+        """The man said: "Hello." "I fought." """.trim,
+        StoryTitle.callerSupplied("Speaker").fold(e => fail(e.message), identity)
+      )
+      .fold(e => fail(e.message), identity)
+    val atl = SurfaceAnalyzer.analyze(src)
+    val said = PropositionEvidence.of(
+      ChartValidator
+        .check(
+          PropositionChart.unchecked(
+            Some(id("s")),
+            Map(
+              id("s") -> Concept.predicate("say", frame("say-01")),
+              id("h") -> Concept.entity("man"),
+              id("g") -> Concept.predicate("greet", frame("greet-01"))
+            ),
+            Vector(rel("s", agent, "h"), rel("s", theme, "g")),
+            Map(id("s") -> ChartPolarity.Positive),
+            Vector(EmbeddedProposition(id("s"), EmbeddingKind.Speech, id("g"))),
+            Vector(
+              alignIn(atl, atl.sentences(0), "said", "s"),
+              alignIn(atl, atl.sentences(0), "man", "h"),
+              alignIn(atl, atl.sentences(0), "Hello", "g")
+            ),
+            ChartProvenance(
+              ChartOrigin.Parser(parser),
+              Vector(chartCall("man-said")),
+              Vector.empty
+            ),
+            Some(atl.sentences(0).id)
+          )
+        )
+        .fold(v => fail(v.toString), identity)
+    )
+    val iFought = PropositionEvidence.of(
+      ChartValidator
+        .check(
+          PropositionChart.unchecked(
+            Some(id("f")),
+            Map(
+              id("f") -> Concept.predicate("fight", frame("fight-01")),
+              id("i") -> Concept.entity("i")
+            ),
+            Vector(rel("f", agent, "i")),
+            Map(id("f") -> ChartPolarity.Positive),
+            Vector.empty,
+            Vector(
+              alignIn(atl, atl.sentences(1), "fought", "f"),
+              alignIn(atl, atl.sentences(1), "I", "i")
+            ),
+            ChartProvenance(
+              ChartOrigin.Parser(parser),
+              Vector(chartCall("i-fought")),
+              Vector.empty
+            ),
+            Some(atl.sentences(1).id)
+          )
+        )
+        .fold(v => fail(v.toString), identity)
+    )
+    val model =
+      compileWith(src, atl, Vector(atl.sentences(0).id -> said, atl.sentences(1).id -> iFought))
+    val graph = model.draft.graph
+    assertEquals(graph.entities.values.map(_.label.value).toVector, Vector("man"))
+    val man = graph.entities.values.head
+    assertEquals(man.mentions.length, 2)
+    val fought = graph.situations.values.find(_.predicate.lemma == "fight").get
+    assertEquals(
+      graph.relations.participants.filter(_.situation == fought.id).map(_.entity),
+      Vector(man.id)
+    )
+    graph.contexts(fought.context).kind match
+      case ContextKind.Speech(ContextHolder.Named(holder)) => assertEquals(holder, man.id)
+      case other => fail(s"expected the man's speech context, got ${other.label}")
+    assertEquals(
+      model.derivation.gaps.collect {
+        case DerivationGap(_, _, _, DerivationGapReason.OpenReference(reason), _, _) => reason
+      },
+      Vector.empty
+    )
+  }
+
+  /** A quotation with no reporting predicate is a held frame whose holder is a gap. "I" inside it
+    * needs a speech holder; it is not outside speech, which is what a narrator's "I" would be.
+    */
+  test(
+    "a first-person pronoun in an unattributed quotation needs a holder, is not outside speech"
+  ) {
+    val src = StorySource
+      .titled(
+        """The man became quiet. "I fought." """.trim,
+        StoryTitle.callerSupplied("Unattributed speaker").fold(e => fail(e.message), identity)
+      )
+      .fold(e => fail(e.message), identity)
+    val atl = SurfaceAnalyzer.analyze(src)
+    val quiet = PropositionEvidence.of(
+      ChartValidator
+        .check(
+          PropositionChart.unchecked(
+            Some(id("b")),
+            Map(
+              id("b") -> Concept.predicate("become", frame("become-01")),
+              id("h") -> Concept.entity("man"),
+              id("q") -> Concept.entity("quiet")
+            ),
+            Vector(rel("b", agent, "h"), rel("b", theme, "q")),
+            Map(id("b") -> ChartPolarity.Positive),
+            Vector.empty,
+            Vector(
+              alignIn(atl, atl.sentences(0), "became", "b"),
+              alignIn(atl, atl.sentences(0), "man", "h"),
+              alignIn(atl, atl.sentences(0), "quiet", "q")
+            ),
+            ChartProvenance(ChartOrigin.Parser(parser), Vector(chartCall("quiet")), Vector.empty),
+            Some(atl.sentences(0).id)
+          )
+        )
+        .fold(v => fail(v.toString), identity)
+    )
+    val iFought = PropositionEvidence.of(
+      ChartValidator
+        .check(
+          PropositionChart.unchecked(
+            Some(id("f")),
+            Map(
+              id("f") -> Concept.predicate("fight", frame("fight-01")),
+              id("i") -> Concept.entity("i")
+            ),
+            Vector(rel("f", agent, "i")),
+            Map(id("f") -> ChartPolarity.Positive),
+            Vector.empty,
+            Vector(
+              alignIn(atl, atl.sentences(1), "fought", "f"),
+              alignIn(atl, atl.sentences(1), "I", "i")
+            ),
+            ChartProvenance(
+              ChartOrigin.Parser(parser),
+              Vector(chartCall("i-fought-2")),
+              Vector.empty
+            ),
+            Some(atl.sentences(1).id)
+          )
+        )
+        .fold(v => fail(v.toString), identity)
+    )
+    val model =
+      compileWith(src, atl, Vector(atl.sentences(0).id -> quiet, atl.sentences(1).id -> iFought))
+    val fought = model.draft.graph.situations.values.find(_.predicate.lemma == "fight").get
+    model.draft.graph.contexts(fought.context).kind match
+      case ContextKind.Speech(ContextHolder.Unattributed(_)) => ()
+      case other => fail(s"expected an unattributed speech context, got ${other.label}")
+    assertEquals(
+      model.derivation.gaps.collect {
+        case DerivationGap(_, _, _, DerivationGapReason.OpenReference(reason), upstream, _) =>
+          reason -> upstream
+      },
+      Vector(OpenReference.NeedsSpeechHolder(Person.First) -> Set.empty)
+    )
+  }
+
   test("a quotation with no speech verb before it is unattributed, and still not root world") {
     val quoted = StorySource
       .titled(

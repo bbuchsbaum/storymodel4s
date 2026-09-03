@@ -42,9 +42,9 @@ mention table, the surface text of each mention's support, and the atlas's sente
   recorded as a set on the gap's upstream claims. The rule ranks nothing: choosing the nearest
   would be an inference with an error rate nobody has measured here, so it is recorded as the
   alternative it is and not accepted (design contract 3, 7).
-- a **first- or second-person pronoun** refers to the speaker or addressee of the speech frame it
-  sits in, which is a fact about the context, not about any antecedent. It is open with
-  `NeedsSpeechHolder(person)` until a rule reads the holder.
+- a **first- or second-person pronoun** refers to the speaker or addressee of the held frame it
+  sits in, which is a fact about the context, not about any antecedent. Decision 3 (amendment of
+  2026-09-03) reads that holder.
 - any other form is open as `UnrecognizedForm`.
 
 An **open mention mints no entity**. Consequences follow the existing gap machinery: a
@@ -70,6 +70,42 @@ number. The compiler no longer blocks a pair on missing coverage, only on a miss
 relation. Model wire schema `0.4.0 → 0.5.0`; `flow-step/v1 → v2` in the fingerprint render;
 `trajectory.turnover-in-unit` checks observed values only.
 
+### 3. First- and second-person pronouns read the frame's holder (amendment, 2026-09-03)
+
+`EntityIdentity.resolve` takes a `holderOf` function that the compiler builds from the accepted
+context placements: for a mention, the holder candidate of the innermost held step (a `Quoted`
+quotation, or an `Embedded` step whose kind carries a holder: speech, belief, desire, intention,
+memory, imagination) on the placement path of the situation the mention fills, or nothing when
+that situation sits in no held frame. A mention filling several situations reads the first in
+discourse order.
+
+The rule runs in two passes. Pass one decides introducing mentions and third-person pronouns
+(decision 1). Pass two reads each first- or second-person pronoun against the holder, where the
+holder is *one cluster of pass one*: every chart node the frame offered as holder is a mention
+that pass one placed, and all of them lie in the same cluster. A holder that is itself a
+resolved pronoun ("the man ... he said: 'I ...'") therefore carries its antecedent through; a
+holder that is an open pronoun carries nothing.
+
+| pronoun | frame | decision |
+|---|---|---|
+| first singular | holder is one cluster | `Resolved(speech-holder/v1)`, attached to that cluster |
+| first plural | holder is one cluster | open `SpeakerGroup`, holder recorded as the candidate |
+| second | holder is one cluster | open `NeedsAddressee`, holder recorded as the candidate |
+| first or second | holder offered but not one cluster (open pronoun, two speakers, no candidate) | open `NeedsSpeechHolder(person)` |
+| first or second | no held frame | open `OutsideSpeech(person)` |
+
+Three distinctions the marks keep apart, because they are different facts: a group that includes
+the speaker is not the speaker (so "we" is never the man, and never a second entity invented for
+the group); the addressee is someone the model has no node for (so "you" names nobody, and the
+speaker is recorded only as the frame it sits in); a narrator's "I" outside any held frame is a
+fact about the discourse the model has no vocabulary for, and is not the same gap as a quotation
+whose speaker went unread. `OutsideSpeech` is also what a caller gets who passes no holders at
+all, which is the honest reading of "no context was consulted".
+
+The embedded content of a same-sentence quotation is not a situation under the chart proposal
+rule (one root per chart), so an "I" inside it is not a candidate at all today; the rule closes
+the quoted path, which is where every first-person pronoun of the fifty-sentence replay sits.
+
 ## Measured on the fifty-sentence replay
 
 | quantity | before | after |
@@ -84,7 +120,15 @@ relation. Model wire schema `0.4.0 → 0.5.0`; `flow-step/v1 → v2` in the fing
 
 No pronoun in this story resolves, because every `he` and `they` has several preceding referents
 whose number the chart does not fix, and every `I`/`we`/`you` sits in a speech frame. That is the
-honest reading of what the chart evidence licenses today. The candidates are all recorded, and the
+honest reading of what the chart evidence licenses today.
+
+After decision 3 (2026-09-03) the counts are the same and one mark moved: the `you` of "You may
+go with them" sits under a named speaker and is `NeedsAddressee` with that speaker as its
+candidate; the three first-person sites ("We are going up the river", "we fought", "I did not
+feel sick") sit under "They said", whose `they` is itself open with several antecedents, so they
+stay `NeedsSpeechHolder(First)`. Nothing resolves on this story until a third-person pronoun does;
+on the authored court "The man said: 'Hello.' 'I fought.'" the `I` is the man and the fighting is
+his participant edge. The candidates are all recorded, and the
 viewer's D9 vocabulary draws an open reference with several candidates as a fan and one with none
 as a placeholder.
 
@@ -93,9 +137,9 @@ as a placeholder.
 - It does not choose antecedents. A recency or salience policy would be a calibrated model's job
   (contract 3); when one is fitted its acceptances arrive as `Calibrated` bases and the
   `Alternatives` gaps become claims, nothing else changes.
-- It does not read speech holders for first- and second-person pronouns. That rule needs the
-  context frame's holder, which is itself often an open pronoun now; it is the next slice, and
-  the `NeedsSpeechHolder` reason marks every site it will close.
+- It does not represent addressees or speaker groups, so "you" and "we" stay open even under a
+  named speaker (decision 3). A group node whose members are "the speaker and others" would be a
+  claim about cardinality and membership the text does not make.
 - It does not fix the referentiality of `everything`, `there`, `sick`, `home` as entities (D2's
   remainder): those are introducing nominals under the current admission rule.
 

@@ -477,12 +477,16 @@ object DerivationCodecs:
       Json.obj("type" -> "NeedsSpeechHolder".asJson, "person" -> person.asJson)
     case OpenReference.UnrecognizedForm(label) =>
       Json.obj("type" -> "UnrecognizedForm".asJson, "label" -> label.asJson)
+    case OpenReference.OutsideSpeech(person) =>
+      Json.obj("type" -> "OutsideSpeech".asJson, "person" -> person.asJson)
     case reason => reason.toString.asJson
   }
   given Decoder[OpenReference] = Decoder.instance { c =>
     c.value.asString match
       case Some("NoAntecedent")       => Right(OpenReference.NoAntecedent)
       case Some("SeveralAntecedents") => Right(OpenReference.SeveralAntecedents)
+      case Some("SpeakerGroup")       => Right(OpenReference.SpeakerGroup)
+      case Some("NeedsAddressee")     => Right(OpenReference.NeedsAddressee)
       case Some(other)                =>
         Left(DecodingFailure(s"unknown OpenReference $other", c.history))
       case None =>
@@ -491,6 +495,8 @@ object DerivationCodecs:
             field[Person](c, "person").map(OpenReference.NeedsSpeechHolder.apply)
           case "UnrecognizedForm" =>
             field[String](c, "label").map(OpenReference.UnrecognizedForm.apply)
+          case "OutsideSpeech" =>
+            field[Person](c, "person").map(OpenReference.OutsideSpeech.apply)
         }
   }
 

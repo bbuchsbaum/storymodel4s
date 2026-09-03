@@ -1514,6 +1514,28 @@ object NarrativeCompiler:
       MentionForms.infer(entityTable, input.mentionGraph, surfaceOf, rank, offsetOf) match
         case Left(e)      => return Left(NarrativeCompilerError.MentionConstruction(e))
         case Right(value) => value
+    // The holder a first- or second-person pronoun would refer to: the innermost held step of the
+    // accepted placement of the situation the pronoun fills (ADR 0012 §amendment). A mention
+    // filling several situations takes the first in discourse order; one filling none, or one
+    // whose situation was placed in the narrated world, has no holder.
+    val situationsOfFiller: Map[ChartNodeRef, Vector[ChartNodeRef]] =
+      participantRecords.groupMap(_.filler)(_.situation).view.mapValues(_.sorted).toMap
+    val speechHolderOf: MentionId[EntityK] => Option[HolderCandidate] = m =>
+      byMention.get(m).flatMap { emitted =>
+        situationsOfFiller
+          .getOrElse(emitted.source, Vector.empty)
+          .iterator
+          .flatMap(s => acceptedContextBySource.get(s).map(_.value.steps))
+          .flatMap(steps =>
+            steps.reverseIterator
+              .flatMap {
+                case ContextStep.Quoted(_, candidate) => Some(candidate)
+                case ContextStep.Embedded(_, _, kind) => kind.holderCandidate
+              }
+              .take(1)
+          )
+          .nextOption()
+      }
     val identity = EntityIdentity.resolve(
       input.source.id,
       entityTable,
@@ -1523,7 +1545,8 @@ object NarrativeCompiler:
         input.mentionGraph
           .chart(ref.sentence)
           .map(ChartNumber.of(_, ref.concept))
-          .getOrElse(Number.Unknown)
+          .getOrElse(Number.Unknown),
+      speechHolderOf
     ) match
       case Left(e)      => return Left(NarrativeCompilerError.MentionConstruction(e))
       case Right(value) => value
