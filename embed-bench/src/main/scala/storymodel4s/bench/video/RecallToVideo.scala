@@ -506,8 +506,28 @@ object RecallToVideo:
 
     // Scene-monotone decoding, when asked for: the per-unit argmax discards the fact that recall
     // walks forwards through the story, which the released scene coding puts at 97.9%.
+    // Leaves only, so filling a unit never coarsens its anchor to a whole scene: anchoring at the
+    // group level was measured earlier to raise ordering metrics for free without localising better.
+    lazy val leavesByScene: Map[Int, Vector[SourceNodeRef]] =
+      built.segmentByRef.keys.toVector
+        .flatMap(ref => MonotoneScene.sceneOf(built, ref).map(_ -> ref))
+        .groupMap(_._1)(_._2)
+    val fill: (Int, Int) => Option[SourceNodeRef] =
+      if !MonotoneScene.fillEnabled then (_, _) => None
+      else
+        (unitIndex, scene) =>
+          val unit = recall.ordered(unitIndex)
+          leavesByScene
+            .getOrElse(scene, Vector.empty)
+            .flatMap { ref =>
+              built.view.node(ref).flatMap(n => semantic(unit, n).toOption.map(d => ref -> d))
+            }
+            .sortBy { case (ref, d) => (d, ref.key) }
+            .headOption
+            .map(_._1)
     val monotoneAnchors =
-      if MonotoneScene.enabled then MonotoneScene.anchors(built, result.posterior.rows)
+      if MonotoneScene.enabled then
+        MonotoneScene.decide(built, result.posterior.rows, fill).map(_.anchor)
       else Vector.empty
     val lines =
       recall.ordered.zip(result.posterior.rows).zipWithIndex.map { case ((unit, row), unitIndex) =>

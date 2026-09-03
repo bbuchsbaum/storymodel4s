@@ -693,3 +693,56 @@ Four. One pre-specified (shipped against baseline), two on development for the m
 (design and in-pipeline validation), one confirmation on the untouched five. A reader discounting for
 multiplicity should know that the untouched five have now been read twice: once for the lexical blend
 on a gold-free outcome, once here.
+
+## Filling the escape hatch, and two nulls that stopped further work
+
+**`MonotoneScene` fill.** A unit with no candidate in its assigned scene now takes the closest leaf
+in that scene under the emission channel the model already uses — a wider search, not new evidence.
+A filler that declines reproduces the previous decisions exactly, which is tested.
+
+| Set | Participants | scene-exact | Change | Improved |
+|---|---|---|---|---|
+| Development | 10 | 57.9% → 65.2% | +5.77 points | 8 of 10 |
+| Untouched | 5 | 50.7% → 60.5% | +8.94 points | **5 of 5** |
+| **Pooled** | **15** | **55.8% → 63.8%** | **+6.83 points** | **13 of 15** |
+
+Within one scene 71.6% → 83.0%, 14 of 15. Emitted scenes are now 100% non-decreasing.
+
+**Null 1: the forward-skip penalty.** The decode's prior was asymmetric with nothing to justify it —
+a backward step forbidden, a leap twenty scenes forward free. With gross displacement solved and the
+remaining errors at a median of one scene, pricing forward skips looked indicated. It is a null:
++0.31 points of scene accuracy at the best setting with the interval spanning zero and 3 of 10
+participants improving. The parameter stays, defaulted off, because the asymmetry may matter on a
+corpus that skips differently.
+
+**Null 2: the rate prior, refused before it was built.** Gold scene is near-linear in recall time,
+median Pearson r = 0.986 across development participants, which looked like a strong case for a
+diagonal prior on scene position. Testing the assumption first killed it: a **content-free linear
+ramp** using recall time alone and no content at all scores **9.7%** on development and 13.9% on the
+untouched. The correlation is about *ordering*, not placement — participants dwell on scenes very
+unevenly — so a rate prior would add almost nothing that monotonicity has not already taken.
+
+That ramp is also the honest floor for everything above: at 9.7% against the pipeline's 65.2%, the
+result is overwhelmingly content-driven and not an artefact of recall timing.
+
+## What is left, on this evidence
+
+The error profile inverted. Before the decode, 38.8% of errors were more than ten scenes away; now
+70.8% of errors are within two scenes and only 4.0% beyond ten, with 82.7% of all units within one
+scene. Gross displacement is solved; what remains is boundary precision.
+
+1. **Within-scene precision is entirely unmeasured, and is now the largest blind spot.** The pipeline
+   localises to one of 1000 segments; this gold resolves 50 scenes. Whether the fine anchor inside a
+   correct scene is good or worthless is simply unknown. The adjudication track is now a far smaller
+   ask than the original 300 blind units: it need only resolve units the scene gold already places.
+2. **Emission sharpness is the binding constraint on scene accuracy.** The runner-up holds the gold
+   scene for only 9.8% of wrong units, so the right scene is usually not second either. The decode is
+   placing the path well; the per-unit evidence is not sharp enough to nail the boundary.
+3. **Unit straddling is a small ceiling.** Only 8.5% of units have their first and last word in
+   different gold scenes, so re-segmenting long units caps out well below that.
+4. **Confidence remains usable but flatter**: accuracy runs 59.4% to 72.5% across quartiles of MAP
+   mass, against 21.4% to 57.2% before the decode. Enough for selective prediction, not for accuracy.
+5. **Generalisation, not tuning, is the credibility bottleneck.** One film, 15 gold participants, and
+   the untouched five have now been read three times. A second corpus would be worth more than any
+   further parameter on this one — and the captioning lane, redundant here against an unusually
+   complete annotation, is exactly what such a corpus would need.

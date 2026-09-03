@@ -87,6 +87,22 @@ class MonotoneSceneSuite extends FunSuite:
       }
     }
 
+  test("a filler binds a unit the constraint would otherwise leave loose"):
+    val loose = MonotoneScene.decide(built, rows).count(d => !d.constrained)
+    val filled = MonotoneScene
+      .decide(built, rows, (_, scene) => built.segmentByRef.keys.find(sceneOf(_).contains(scene)))
+      .count(d => !d.constrained)
+    assert(loose >= filled, "filling should never leave more units unbound")
+    MonotoneScene
+      .decide(built, rows, (_, scene) => built.segmentByRef.keys.find(sceneOf(_).contains(scene)))
+      .foreach(d => assertEquals(d.anchor.flatMap(sceneOf), Some(d.scene)))
+
+  test("a filler that declines restores the unfilled decisions exactly"):
+    assertEquals(
+      MonotoneScene.decide(built, rows, (_, _) => None),
+      MonotoneScene.decide(built, rows)
+    )
+
   test("a unit with no source mass keeps its original absent anchor"):
     val empty = rows.map(r => row(r.unit, Map.empty))
     assertEquals(MonotoneScene.anchors(built, empty).flatten, Vector.empty)
