@@ -976,10 +976,14 @@ about which of three reasons produced the absence, so an auditor cannot tell an 
 from an answered one.
 
 The speakers offered for a quotation are the fillers, under a role normalized to `Agent` or
-`Experiencer`, of the speech containers in the sentence the opening mark falls in and the one before
-it, whose own words end at or before that mark. The lookback is **one sentence and stated**: a
-reporting predicate further back is not evidence about this quotation, and searching until something
-is found would attribute every quotation of a story to whoever last spoke. The provider offers chart
+`Experiencer`, of the speech containers in the sentence the opening mark falls in, whose own words
+end at or before that mark; **only when that sentence offers none** does the sentence before it
+answer. The lookback is **one sentence and stated**: reaching further back would attribute every
+quotation of a story to whoever last spoke, and asking both sentences at once makes ordinary
+dialogue ambiguous — `He said: "one." She said: "two."` has one speaker for the second quotation and
+the containing sentence names it. That preference was found by a surviving mutant: replacing "one
+entity or abstain" with "take the first" left every test green, because no court had two candidate
+speakers, and writing one showed the rule was also wrong. The provider offers chart
 nodes and the compiler decides by entity, so two containers pointing at one word ("he said ... and he
 told ...") are one speaker. Zero, several, or a candidate that mints no entity all abstain. Nothing
 invents a speaker.
@@ -1009,6 +1013,17 @@ seventeen discourse adjacencies into narrated-world chronology across a speech b
 own `temporal.context-scope` law caught it. An edge is now scoped at the **deeper** of its endpoints'
 contexts, the only frame that can see both. Two contexts where neither contains the other have no such
 frame, and the relation gaps with the new typed `DerivationGapReason.UnscopableRelation`.
+
+### What an unplaceable root costs, recorded rather than smoothed over
+
+`ChartProposalCourtSuite`'s seven hand charts contain the fail-closed branch on real text.
+`They thought: "Maybe there is a war party."` aligns only `thought`, so its root's anchor falls back
+to the whole sentence, which starts outside the quotation and ends inside it. The rule refuses,
+the context abstains, and the situation gaps. Because that root stands between two others in
+discourse order, both temporal pairs touching it gap, and this compiler's existing all-or-nothing
+rule empties the trajectory: `trajectory.complete` fires and there are no steps. Gaps go 8 → 13.
+That is the honest record — a trajectory that bridged `fog` straight to `arrows` across a root the
+model could not place would assert an adjacency the text does not have.
 
 ### Schema
 
