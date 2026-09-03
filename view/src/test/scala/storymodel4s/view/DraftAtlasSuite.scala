@@ -103,7 +103,7 @@ class DraftAtlasSuite extends FunSuite:
       violations: Vector[Violation] = Vector.empty,
       coverage: Vector[SentenceCoverage] = Vector.empty
   ): DraftModel =
-    DraftModel.of(model, outcomeOf(violations), gaps, coverage)
+    DraftModel.of(model, outcomeOf(violations), DerivationRecord.Reported(gaps, coverage))
 
   private def provenanceFor(draft: DraftModel): ViewProvenance =
     ViewProvenance
@@ -156,10 +156,10 @@ class DraftAtlasSuite extends FunSuite:
     val mismatched = AtlasCompiler(quietReceipt).compileDraft(noisy, state, spec)
     assert(mismatched.isLeft, "a receipt reporting no gaps must not render a model with one")
     assert(mismatched.left.exists(_.message.contains("does not describe this draft")))
-    assertEquals(sceneOf(noisy).provenance.draft.map(_.gapCount), Some(1))
+    assertEquals(sceneOf(noisy).provenance.draft.flatMap(_.gapCount), Some(1))
 
   test("a provenance carries a promotion record exactly when it declares a draft build"):
-    val promotion = DraftPromotion.from(outcomeOf(Vector.empty), Vector.empty)
+    val promotion = DraftPromotion.from(outcomeOf(Vector.empty), DerivationRecord.NotSupplied)
     val draftWithout = ViewProvenance.of(
       source.canonicalChecksum,
       None,
@@ -187,21 +187,49 @@ class DraftAtlasSuite extends FunSuite:
     )
     val promotion = DraftPromotion.from(
       outcomeOf(violations),
-      Vector(
-        gapAt(
-          NarrativeCandidateAddress.StorySummary(source.id),
-          DerivationGapReason.Unresolved(unresolved),
-          ClaimFamily.Summary
-        )
+      DerivationRecord.Reported(
+        Vector(
+          gapAt(
+            NarrativeCandidateAddress.StorySummary(source.id),
+            DerivationGapReason.Unresolved(unresolved),
+            ClaimFamily.Summary
+          )
+        ),
+        Vector.empty
       )
     )
     assertEquals(promotion.promoted, false)
-    assertEquals(promotion.gapCount, 1)
+    assertEquals(promotion.gapCount, Some(1))
     assertEquals(promotion.violationCount, 3)
     assertEquals(
       promotion.unsatisfiedLaws.map(law => (law.law, law.count.value)),
       Vector(("compiler.required-derivation", 2), ("hierarchy.single-primary-root", 1))
     )
+
+  test("a supplied record reporting nothing is not the absence of a record"):
+    // The defect this closes: the derivation gaps live in the sibling compilation report, not in
+    // `StoryModel`, so a consumer reading only a decoded `storymodel.json` has none. Without the
+    // distinction its receipt would read "0 derivation gaps", which claims the compiler derived
+    // everything, when the truth is that nobody told the view anything.
+    val outcome = outcomeOf(Vector.empty)
+    val reported =
+      DraftModel.of(model, outcome, DerivationRecord.Reported(Vector.empty, Vector.empty))
+    val absent = DraftModel.withoutDerivationRecord(model, outcome)
+
+    assertEquals(reported.promotion.gapCount, Some(0))
+    assertEquals(absent.promotion.gapCount, None)
+    assertNotEquals(reported.promotion, absent.promotion)
+    assert(reported.promotion.label.contains("0 derivation gaps"))
+    assert(absent.promotion.label.contains("derivation record not supplied"))
+
+    // Two different statements, so a receipt for one cannot render the other.
+    val reportedReceipt = provenanceFor(reported)
+    val crossed = AtlasCompiler(reportedReceipt).compileDraft(absent, state, spec)
+    assert(crossed.isLeft, "a receipt claiming a record must not render a bundle with none")
+
+    val twin = sceneOf(absent).textualTwin
+    assert(twin.contains("derivation gaps: record not supplied"), twin)
+    assert(sceneOf(reported).textualTwin.contains("derivation gaps: 0"))
 
   test("every uncertainty state has its own non-colour channel"):
     val states = UncertaintyState.values.toVector

@@ -1277,7 +1277,7 @@ object AtlasTextualTwin:
         .append("  promotable: ")
         .append(promotion.promoted)
         .append("; derivation gaps: ")
-        .append(promotion.gapCount)
+        .append(promotion.gapCount.fold("record not supplied")(_.toString))
         .append("; violations: ")
         .append(promotion.violationCount)
         .append('\n')

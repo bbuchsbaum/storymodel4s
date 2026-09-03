@@ -85,8 +85,7 @@ class WarOfTheGhostsDraftAtlasSuite extends FunSuite:
     val draft = DraftModel.of(
       compilation.draft,
       compilation.validation,
-      compilation.derivation.gaps,
-      proposals.coverage
+      DerivationRecord.Reported(compilation.derivation.gaps, proposals.coverage)
     )
     (compilation, draft)
 
@@ -97,17 +96,20 @@ class WarOfTheGhostsDraftAtlasSuite extends FunSuite:
   private val spec =
     AtlasSpec(ZoomLevel(NarrativeLevel.Scene, SurfaceDetail.Hidden), ThreadPolicy.Selected)
 
-  private def sceneUnder(specification: AtlasSpec): NarrativeScene =
+  private def sceneFrom(bundle: DraftModel, specification: AtlasSpec): NarrativeScene =
     val provenance = ViewProvenance
       .draftBuild(
-        draft,
+        bundle,
         "wog-draft-atlas-suite",
         AtlasCompiler.configurationChecksum(state, specification)
       )
       .fold(error => fail(error.message), identity)
     AtlasCompiler(provenance)
-      .compileDraft(draft, state, specification)
+      .compileDraft(bundle, state, specification)
       .fold(error => fail(error.message), identity)
+
+  private def sceneUnder(specification: AtlasSpec): NarrativeScene =
+    sceneFrom(draft, specification)
 
   private lazy val scene: NarrativeScene = sceneUnder(spec)
 
@@ -160,7 +162,7 @@ class WarOfTheGhostsDraftAtlasSuite extends FunSuite:
     val promotion = scene.provenance.draft.getOrElse(fail("a draft scene carries a promotion"))
     assertEquals(scene.provenance.basis, ViewBasis.DraftBuild)
     assertEquals(promotion.promoted, false)
-    assertEquals(promotion.gapCount, 70)
+    assertEquals(promotion.gapCount, Some(70))
     assertEquals(promotion.violationCount, 135)
     assertEquals(
       promotion.unsatisfiedLaws.map(law => (law.law, law.severity, law.count.value)),
@@ -413,4 +415,57 @@ class WarOfTheGhostsDraftAtlasSuite extends FunSuite:
         ("unsatisfied-law", 135)
       )
     )
+  }
+
+  test("a model that arrives without its derivation record says so, and draws a smaller truth") {
+    // A derivation gap is a statement about the derivation, not about the story, so `StoryModel`
+    // records none: the gaps and the coverage ledger are written to the sibling
+    // `compilation-report.json`. A consumer holding only a decoded `storymodel.json` therefore has
+    // neither, and re-validating the model independently finds a different, smaller set of
+    // violations: 66, all hierarchy laws, from the one root cause that no summary was derived, so
+    // there are no segments, so all 65 situations are unreachable from a primary root.
+    val revalidated = StoryValidator.validate(compilation.draft)
+    assertEquals(revalidated.report.violations.size, 66)
+    assertEquals(
+      revalidated.report.violations.groupBy(_.law).view.mapValues(_.size).toVector.sorted,
+      Vector(("hierarchy.single-primary-root", 1), ("hierarchy.situation-root-reachable", 65))
+    )
+    // The 69 the compilation additionally raised are `compiler.required-derivation`, which only the
+    // narrative compiler can raise and which no re-validation of the model can recover.
+    assert(!revalidated.report.violations.exists(_.law == "compiler.required-derivation"))
+
+    val alone = DraftModel.withoutDerivationRecord(compilation.draft, revalidated)
+    val aloneScene = sceneFrom(alone, spec)
+
+    // The smaller picture is still honest: the same 65 situations and 6 context frames, the 66
+    // laws the model itself violates, and no gap or abstention mark at all, because nothing told
+    // this scene about derivation.
+    assertEquals(
+      census(aloneScene).toVector.sorted,
+      Vector(("context-band", 6), ("landmark", 65), ("unsatisfied-law", 66))
+    )
+    assertEquals(gaps(aloneScene), Vector.empty)
+
+    // And the receipt says which it is. `record not supplied` is not `0 gaps`: the first says
+    // nobody told the view anything, the second would say the compiler derived everything.
+    assertEquals(alone.promotion.gapCount, None)
+    assertEquals(scene.provenance.draft.flatMap(_.gapCount), Some(70))
+    assertNotEquals(alone.promotion, draft.promotion)
+    assert(
+      aloneScene.textualTwin.contains("derivation gaps: record not supplied"),
+      "twin is silent"
+    )
+    assert(scene.textualTwin.contains("derivation gaps: 70"))
+
+    // The two receipts are different statements, so neither scene can be compiled under the other.
+    val crossed = AtlasCompiler(
+      ViewProvenance
+        .draftBuild(
+          alone,
+          "wog-draft-atlas-suite",
+          AtlasCompiler.configurationChecksum(state, spec)
+        )
+        .fold(error => fail(error.message), identity)
+    ).compileDraft(draft, state, spec)
+    assert(crossed.isLeft, "a receipt saying nothing about derivation must not render 70 gaps")
   }

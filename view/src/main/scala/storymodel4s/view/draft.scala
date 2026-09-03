@@ -24,28 +24,56 @@ import storymodel4s.story.{ModelStatus, Severity, StoryModel, ValidationOutcome,
   */
 final case class UnsatisfiedLaw(law: String, severity: Severity, count: PositiveInt)
 
+/** What a draft's own compilation reported about itself, or the fact that nobody supplied it.
+  *
+  * Why this is a type and not two empty vectors: **a derivation gap is a statement about the
+  * derivation, not about the story, so `StoryModel` does not record one.** The gaps and the
+  * coverage ledger are written to the sibling `compilation-report.json`, and a consumer holding
+  * only a decoded `storymodel.json` has neither. Without this distinction such a consumer compiles
+  * a scene whose receipt reads "0 derivation gaps" — which says the compiler derived everything,
+  * when the truth is that nobody told the view anything. Those two states must never share a
+  * fingerprint.
+  */
+enum DerivationRecord:
+  /** The compilation's own record: the derivations it could not make, and its coverage ledger. */
+  case Reported(gaps: Vector[DerivationGap], coverage: Vector[SentenceCoverage])
+
+  /** No record accompanied the model, so this scene can say nothing about derivation at all. */
+  case NotSupplied
+
+  /** `Some(n)` when a record was supplied and reported `n` gaps; `None` when none was. */
+  def gapCount: Option[Int] = this match
+    case Reported(gaps, _) => Some(gaps.size)
+    case NotSupplied       => None
+
+  def render: String = gapCount.fold("not supplied")(count => s"$count gaps")
+
 /** The exact promotion state of a draft model, derived from its own validation outcome.
   *
   * Why unforgeable rather than a product: `promoted`, `unsatisfiedLaws` and `gapCount` stand in a
-  * derived relation to one [[ValidationOutcome]] and one gap vector, so most combinations of
-  * individually lawful field values are false. A caller who could state them independently could
+  * derived relation to one [[ValidationOutcome]] and one [[DerivationRecord]], so most combinations
+  * of individually lawful field values are false. A caller who could state them independently could
   * mint a receipt reading "promoted, no unsatisfied laws" over a model with a hundred and
   * thirty-five of them, and that receipt would survive every audit downstream. An identity is
   * derived from what it describes, never asserted by the caller.
+  *
+  * `gapCount` is deliberately an `Option`, and `None` is not `Some(0)`: see [[DerivationRecord]].
   */
 final class DraftPromotion private (
     val promoted: Boolean,
     val unsatisfiedLaws: Vector[UnsatisfiedLaw],
-    val gapCount: Int
+    val gapCount: Option[Int]
 ):
   /** Total violations behind [[unsatisfiedLaws]], counting each occurrence once. */
   def violationCount: Int = unsatisfiedLaws.map(_.count.value).sum
 
-  /** One line naming the promotion state, the laws left unsatisfied and the derivation gaps. */
+  /** One line naming the promotion state, the laws left unsatisfied and the derivation record. */
   def label: String =
     val promotion = if promoted then "promotable" else "not promotable"
+    val derivation =
+      gapCount.fold("derivation record not supplied")(count => s"$count derivation gaps")
     s"$promotion; ${unsatisfiedLaws.size} unsatisfied laws " +
-      s"($violationCount violations); $gapCount derivation gaps"
+      s"($violationCount violations); $derivation"
 
   override def equals(other: Any): Boolean = other match
     case that: DraftPromotion =>
@@ -58,8 +86,9 @@ final class DraftPromotion private (
   override def toString: String = s"DraftPromotion(${label})"
 
 object DraftPromotion:
-  /** Derive the promotion state from the validator's own outcome and the compiler's own gaps. */
-  def from(outcome: ValidationOutcome, gaps: Vector[DerivationGap]): DraftPromotion =
+  /** Derive the promotion state from the validator's own outcome and the compilation's own record.
+    */
+  def from(outcome: ValidationOutcome, derivation: DerivationRecord): DraftPromotion =
     val laws = outcome.report.violations
       .groupBy(violation => (violation.law, violation.severity))
       .toVector
@@ -67,57 +96,83 @@ object DraftPromotion:
         PositiveInt.from(violations.size).toOption.map(UnsatisfiedLaw(law, severity, _))
       }
       .sortBy(entry => (entry.law, entry.severity.toString))
-    new DraftPromotion(outcome.validated.isDefined, laws, gaps.size)
+    new DraftPromotion(outcome.validated.isDefined, laws, derivation.gapCount)
 
 /** A draft story model bound to the exact evidence of its own incompleteness.
   *
-  * Why the three inputs travel together: a draft is legible as partial only when the reader can see
-  * what the compiler could not derive (`gaps`), what promotion still requires (`violations`), and
-  * which sentences produced nothing at all (`coverage`). Any one of them alone reports a different,
-  * smaller absence than the model actually has. Construction sorts every vector so that a compiled
-  * scene is a pure function of its inputs (ADR 0002 V-D1) whatever order a caller assembled them
-  * in, and derives [[promotion]] rather than accepting it.
+  * Why the model and its derivation record travel together rather than one carrying the other: a
+  * gap is a fact about how the model was built, and a model that recorded claims about its own
+  * construction would be the wrong shape. The compilation writes them to a sibling artifact, and
+  * the view is entitled to consume both — which also means it must be able to say when it received
+  * only one, hence [[DerivationRecord.NotSupplied]].
+  *
+  * Construction sorts every vector so that a compiled scene is a pure function of its inputs (ADR
+  * 0002 V-D1) whatever order a caller assembled them in, and derives [[promotion]] rather than
+  * accepting it.
   */
 final class DraftModel private (
     val model: StoryModel[ModelStatus.Draft],
     val promotion: DraftPromotion,
-    val gaps: Vector[DerivationGap],
-    val violations: Vector[Violation],
-    val coverage: Vector[SentenceCoverage]
+    val derivation: DerivationRecord,
+    val violations: Vector[Violation]
 ):
+  /** The derivations the compilation could not make; empty when it supplied no record. */
+  def gaps: Vector[DerivationGap] = derivation match
+    case DerivationRecord.Reported(gaps, _) => gaps
+    case DerivationRecord.NotSupplied       => Vector.empty
+
+  /** The provider's coverage ledger; empty when the compilation supplied no record. */
+  def coverage: Vector[SentenceCoverage] = derivation match
+    case DerivationRecord.Reported(_, coverage) => coverage
+    case DerivationRecord.NotSupplied           => Vector.empty
+
   /** Every coverage row that admitted no situation root, with the row's own typed reason. */
   def abstentions: Vector[(SurfaceUnitId, SentenceAbstention)] =
     coverage.flatMap(row => SentenceAbstention.from(row).map(row.sentence -> _))
 
   override def equals(other: Any): Boolean = other match
     case that: DraftModel =>
-      model == that.model && promotion == that.promotion && gaps == that.gaps &&
-      violations == that.violations && coverage == that.coverage
+      model == that.model && promotion == that.promotion && derivation == that.derivation &&
+      violations == that.violations
     case _ => false
 
   override def hashCode(): Int =
-    (model, promotion, gaps, violations, coverage).hashCode()
+    (model, promotion, derivation, violations).hashCode()
 
   override def toString: String =
     s"DraftModel(${model.source.id.value}, ${promotion.label}, " +
-      s"coverage=${coverage.size} rows)"
+      s"derivation=${derivation.render})"
 
 object DraftModel:
-  /** Bind a draft to its validation outcome, its derivation gaps and its provider coverage ledger.
-    */
+  /** Bind a draft to its validation outcome and to whatever derivation record accompanied it. */
   def of(
       model: StoryModel[ModelStatus.Draft],
       outcome: ValidationOutcome,
-      gaps: Vector[DerivationGap],
-      coverage: Vector[SentenceCoverage]
+      derivation: DerivationRecord
   ): DraftModel =
+    val sorted = derivation match
+      case DerivationRecord.NotSupplied              => DerivationRecord.NotSupplied
+      case DerivationRecord.Reported(gaps, coverage) =>
+        DerivationRecord.Reported(
+          gaps.sortBy(gap => (gap.family.toString, gap.target.render, gap.reason.render)),
+          coverage.sortBy(row => row.sentence.value)
+        )
     new DraftModel(
       model,
-      DraftPromotion.from(outcome, gaps),
-      gaps.sortBy(gap => (gap.family.toString, gap.target.render, gap.reason.render)),
-      outcome.report.violations.sortBy(v => (v.law, v.severity.toString, v.path, v.reason)),
-      coverage.sortBy(row => row.sentence.value)
+      DraftPromotion.from(outcome, sorted),
+      sorted,
+      outcome.report.violations.sortBy(v => (v.law, v.severity.toString, v.path, v.reason))
     )
+
+  /** Bind a draft that arrived on its own — a decoded `storymodel.json` with no sibling report.
+    *
+    * The scene is then honest about a smaller thing: it draws the promotion laws the model itself
+    * violates and states that it was told nothing about derivation.
+    */
+  def withoutDerivationRecord(
+      model: StoryModel[ModelStatus.Draft],
+      outcome: ValidationOutcome
+  ): DraftModel = of(model, outcome, DerivationRecord.NotSupplied)
 
 /** Why a sentence yielded no situation root, derived from the provider's own coverage row.
   *
