@@ -676,8 +676,10 @@ final class CodexCompiler private (provenance: ViewProvenance):
 
 /** One pure feature planner shared by every canonical view compiler. */
 private[view] object FeaturePlanner:
+  // `StoryModel[?]`: a feature plan reads `featureRefs` and the atlas, neither of which the
+  // promotion phantom guards, and the draft path needs the same plan the validated path gets.
   def plan(
-      model: StoryModel[ModelStatus.Validated],
+      model: StoryModel[?],
       selection: Option[FeatureSelection],
       scale: FeatureScale,
       horizon: EpistemicHorizon,
@@ -763,7 +765,7 @@ private[view] object FeaturePlanner:
       )
 
   private def supportResolver(
-      model: StoryModel[ModelStatus.Validated]
+      model: StoryModel[?]
   ): SupportResolver =
     SupportResolver(
       SurfaceSequence(model.atlas),
@@ -805,7 +807,7 @@ private[view] object FeaturePlanner:
           case None => Right(refs)
 
   private[view] def atScale(
-      model: StoryModel[ModelStatus.Validated],
+      model: StoryModel[?],
       scale: FeatureScale,
       target: FeatureTarget
   ): Boolean = scale match
