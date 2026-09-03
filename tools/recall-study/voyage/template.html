@@ -1,0 +1,421 @@
+<title>Sherlock Recall Voyage</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;1,8..60,400&display=swap">
+<style>
+:root {
+  --ground: #F4F5F3; --surface: #FFFFFF; --surface-2: #EDEFEC; --ink: #1B2126; --ink-2: #4B565F; --muted: #7A858F;
+  --hair: #D5DAD8; --hair-2: #E6E9E6;
+  --model: #1B7FA3; --model-soft: rgba(27,127,163,0.16); --gold: #C9922E; --gold-band: rgba(201,146,46,0.17); --gold-line: rgba(201,146,46,0.55);
+  --adj: #6B4FBB; --adj-band: rgba(107,79,187,0.22); --external: #8A939D; --raw: #9AA3AB;
+  --focus: #1B7FA3;
+  --sans: "IBM Plex Sans", "Helvetica Neue", Arial, sans-serif;
+  --mono: "IBM Plex Mono", "SFMono-Regular", Menlo, Consolas, monospace;
+  --serif: "Source Serif 4", Georgia, "Times New Roman", serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground: #14181C; --surface: #1B2026; --surface-2: #232930; --ink: #E6E9EC; --ink-2: #B4BCC4; --muted: #8B959E;
+    --hair: #303840; --hair-2: #262D34;
+    --model: #2E93BB; --model-soft: rgba(46,147,187,0.22); --gold: #B08229; --gold-band: rgba(176,130,41,0.22); --gold-line: rgba(176,130,41,0.65);
+    --adj: #967FE0; --adj-band: rgba(150,127,224,0.26); --external: #8A939D; --raw: #6F7981; --focus: #2E93BB;
+  }
+}
+:root[data-theme="dark"] {
+  --ground: #14181C; --surface: #1B2026; --surface-2: #232930; --ink: #E6E9EC; --ink-2: #B4BCC4; --muted: #8B959E;
+  --hair: #303840; --hair-2: #262D34;
+  --model: #2E93BB; --model-soft: rgba(46,147,187,0.22); --gold: #B08229; --gold-band: rgba(176,130,41,0.22); --gold-line: rgba(176,130,41,0.65);
+  --adj: #967FE0; --adj-band: rgba(150,127,224,0.26); --external: #8A939D; --raw: #6F7981; --focus: #2E93BB;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--ground); color: var(--ink); font: 14px/1.45 var(--sans); }
+h1, h2, h3 { margin: 0; text-wrap: balance; }
+h1 { font-size: 22px; font-weight: 600; letter-spacing: -0.01em; }
+h2 { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-2); }
+.num { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+a { color: var(--model); }
+button, select, input { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+
+.page { max-width: 1480px; margin: 0 auto; padding: 20px 24px 40px; display: grid; gap: 16px; }
+header.top { display: grid; grid-template-columns: 1fr auto; gap: 16px 32px; align-items: end; }
+.masthead p { margin: 4px 0 0; color: var(--ink-2); max-width: 64ch; }
+.masthead .eyebrow { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 6px; }
+.controls { display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; justify-content: flex-end; }
+.controls label { display: inline-flex; align-items: center; gap: 6px; color: var(--ink-2); }
+.controls select { background: var(--surface); border: 1px solid var(--hair); border-radius: 6px; padding: 5px 8px; }
+.seg { display: inline-flex; border: 1px solid var(--hair); border-radius: 6px; overflow: hidden; background: var(--surface); }
+.seg button { border: 0; background: transparent; padding: 5px 10px; cursor: pointer; color: var(--ink-2); }
+.seg button[aria-pressed="true"] { background: var(--model); color: #fff; }
+.seg button + button { border-left: 1px solid var(--hair); }
+
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+.stat { background: var(--surface); border: 1px solid var(--hair); border-radius: 8px; padding: 10px 12px; display: grid; gap: 2px; }
+.stat .k { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
+.stat .v { font-family: var(--mono); font-size: 20px; font-variant-numeric: tabular-nums; }
+.stat .s { font-size: 12px; color: var(--ink-2); }
+.pill { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: 11px; letter-spacing: 0.04em; border: 1px solid var(--hair); color: var(--ink-2); background: var(--surface-2); }
+
+.panes { display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: 16px; align-items: start; }
+@media (max-width: 1100px) { .panes { grid-template-columns: 1fr; } }
+.panel { background: var(--surface); border: 1px solid var(--hair); border-radius: 10px; }
+.panel > .head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 12px 16px 8px; }
+.panel > .head .hint { color: var(--muted); font-size: 12px; }
+.scroller { overflow-x: auto; overflow-y: hidden; position: relative; padding: 0 0 8px; }
+svg { display: block; }
+svg text { font-family: var(--mono); font-size: 10.5px; fill: var(--ink-2); }
+svg .axis line, svg .axis path { stroke: var(--hair); }
+svg .grid line { stroke: var(--hair-2); }
+svg .scene-line { stroke: var(--gold-line); stroke-width: 0.6; }
+svg .band { fill: var(--gold-band); }
+svg .band.hi { fill: rgba(201,146,46,0.34); }
+svg .unit { fill: var(--model); stroke: var(--surface); stroke-width: 1.2; cursor: pointer; }
+svg .unit.ext { fill: none; stroke: var(--external); stroke-width: 1.6; }
+svg .unit.sceneanchor { fill: var(--model); opacity: 0.55; stroke: none; rx: 2.5; }
+svg .unit.sel { stroke: var(--ink); stroke-width: 2; }
+svg .ru { fill: none; stroke: var(--model); stroke-width: 1.2; stroke-dasharray: 2 2; }
+svg .ru-link { stroke: var(--model); stroke-width: 0.8; opacity: 0.7; }
+svg .ghost { fill: var(--raw); }
+svg .ghost-link { stroke: var(--raw); stroke-width: 0.8; }
+svg .track-gold { stroke: var(--gold); stroke-width: 2.5; stroke-linecap: butt; }
+svg .track-model { stroke: var(--model); stroke-width: 1.8; }
+svg .track-raw { stroke: var(--raw); stroke-width: 1.2; stroke-dasharray: 3 2; }
+svg .part-line { stroke: var(--ink-2); stroke-width: 0.8; stroke-dasharray: 4 3; }
+svg .hit { fill: transparent; cursor: pointer; }
+.tip { position: absolute; pointer-events: none; background: var(--ink); color: var(--ground); padding: 6px 9px; border-radius: 6px; font-size: 12px; max-width: 320px; line-height: 1.35; display: none; z-index: 2; }
+.tip .q { font-family: var(--serif); font-size: 13px; }
+.tip .m { font-family: var(--mono); font-size: 11px; opacity: 0.85; }
+
+.inspector { display: grid; gap: 14px; padding: 12px 16px 16px; }
+.inspector .where { color: var(--muted); font-size: 12px; }
+.quote { font-family: var(--serif); font-size: 17px; line-height: 1.45; margin: 0; }
+.kv { display: grid; grid-template-columns: max-content 1fr; gap: 4px 12px; font-size: 13px; }
+.kv .k { color: var(--muted); }
+.kv .v.num { font-size: 13px; }
+.segtext { font-size: 13px; color: var(--ink-2); border-left: 3px solid var(--model-soft); padding: 2px 0 2px 10px; margin: 0; }
+.segtext.ru { border-left-color: var(--hair); }
+.segtext .lab { display: block; font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 2px; }
+.post { display: grid; gap: 6px; }
+.post .bar { display: flex; height: 14px; border-radius: 4px; overflow: hidden; gap: 2px; background: var(--surface-2); }
+.post .bar span { display: block; height: 100%; }
+.post .legend { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 12px; color: var(--ink-2); }
+.post .legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; vertical-align: -1px; margin-right: 5px; }
+.strip { display: grid; gap: 4px; }
+.strip .lab { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
+.strip svg { width: 100%; height: 44px; }
+.note { font-size: 12px; color: var(--ink-2); margin: 0; }
+.tag-diag { color: var(--adj); font-weight: 500; }
+.empty { color: var(--muted); font-size: 13px; }
+
+.legend-row { display: flex; flex-wrap: wrap; gap: 8px 22px; font-size: 12px; color: var(--ink-2); padding: 8px 16px 12px; border-top: 1px solid var(--hair-2); }
+.legend-row svg { width: 26px; height: 16px; vertical-align: middle; margin-right: 6px; }
+footer.prov { font-size: 12px; color: var(--muted); max-width: 90ch; line-height: 1.5; }
+footer.prov p { margin: 4px 0; }
+.kbd { font-family: var(--mono); font-size: 11px; border: 1px solid var(--hair); border-radius: 4px; padding: 0 5px; background: var(--surface-2); }
+@media (prefers-reduced-motion: no-preference) { svg .unit { transition: r 120ms ease; } }
+</style>
+
+<div class="page">
+  <header class="top">
+    <div class="masthead">
+      <div class="eyebrow">storymodel4s · recall-to-video · default configuration</div>
+      <h1>Sherlock Recall Voyage</h1>
+      <p>Each spoken recall unit is placed on the film's clock. The mark carries how sure the model is, the alternative it weighed, and where the human coding puts the same moment.</p>
+    </div>
+    <div class="controls">
+      <label>Participant <select id="pp" aria-label="Participant"></select></label>
+      <div class="seg" role="group" aria-label="Which placement to show">
+        <button id="arm-fill" aria-pressed="true">Decoded</button>
+        <button id="arm-mono" aria-pressed="false">Decoded, no fill</button>
+        <button id="arm-base" aria-pressed="false">Raw emission</button>
+      </div>
+      <label><input type="checkbox" id="showRu"> runner-up</label>
+      <label><input type="checkbox" id="showGhost"> raw ghost</label>
+    </div>
+  </header>
+
+  <section class="stats" id="stats" aria-live="polite"></section>
+
+  <div class="panes">
+    <section class="panel" aria-label="Recall to film map">
+      <div class="head"><h2>Recall time against film time</h2><span class="hint">hover a mark · click to inspect · <span class="kbd">←</span> <span class="kbd">→</span> walk the recall</span></div>
+      <div class="scroller" id="scroller">
+        <svg id="voyage" role="img" aria-label="Scatter of recall units: x is seconds into the recall, y is seconds into the film; amber bands are the human scene coding"></svg>
+        <div class="tip" id="tip"></div>
+      </div>
+      <div class="legend-row" id="legend"></div>
+    </section>
+
+    <aside class="panel inspector" id="inspector" aria-live="polite">
+      <div class="empty">Click a mark to inspect a unit.</div>
+    </aside>
+  </div>
+
+  <footer class="prov" id="prov"></footer>
+</div>
+
+<script id="data" type="application/json">/*__DATA__*/</script>
+<script>
+(function () {
+  const D = JSON.parse(document.getElementById('data').textContent);
+  const seg = new Map(D.segments.map(s => [s.n, s]));
+  const scene = new Map(D.scenes.map(s => [s.n, s]));
+  const state = { pid: null, arm: 'fill', showRu: false, showGhost: false, sel: null };
+
+  // ---------- helpers
+  const mmss = t => { if (t == null) return '—'; const m = Math.floor(t / 60), s = Math.round(t - m * 60); return `${m}:${String(s).padStart(2, '0')}`; };
+  const filmLabel = t => (t < D.partAEnd ? `A ${mmss(t)}` : `B ${mmss(t - D.partAEnd)}`);
+  const pct = (a, b) => (b ? (100 * a / b).toFixed(1) + '%' : '—');
+  const placement = (u) => state.arm === 'fill' ? { anchor: u.anchor, scene: u.scene, mass: u.mass } : (state.arm === 'mono' ? u.mono : u.base);
+  const filmMid = (a) => a.kind === 'segment' ? (seg.get(a.n).start + seg.get(a.n).end) / 2 : (a.kind === 'scene' ? (scene.get(a.n).start + scene.get(a.n).end) / 2 : null);
+  const el = (tag, attrs, parent) => { const e = document.createElementNS('http://www.w3.org/2000/svg', tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; };
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+  // ---------- participant picker
+  const pp = document.getElementById('pp');
+  for (const p of D.participants) {
+    const o = document.createElement('option');
+    o.value = p.id;
+    o.textContent = `${p.id} · ${p.partition}${p.excluded ? ' · no gold match' : (p.accuracy ? '' : ' · no gold')}`;
+    pp.appendChild(o);
+  }
+  pp.value = 'NN03';
+  pp.addEventListener('change', () => { state.pid = pp.value; state.sel = null; render(); });
+  for (const [id, arm] of [['arm-fill', 'fill'], ['arm-mono', 'mono'], ['arm-base', 'base']]) {
+    document.getElementById(id).addEventListener('click', () => {
+      state.arm = arm;
+      for (const [i2, a2] of [['arm-fill', 'fill'], ['arm-mono', 'mono'], ['arm-base', 'base']]) document.getElementById(i2).setAttribute('aria-pressed', String(a2 === arm));
+      render();
+    });
+  }
+  document.getElementById('showRu').addEventListener('change', e => { state.showRu = e.target.checked; render(); });
+  document.getElementById('showGhost').addEventListener('change', e => { state.showGhost = e.target.checked; render(); });
+  document.addEventListener('keydown', e => {
+    if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+    const P = current(); const units = P.units.filter(u => u.t0 != null);
+    if (!units.length) return;
+    let i = state.sel == null ? -1 : units.findIndex(u => u.u === state.sel);
+    i = e.key === 'ArrowRight' ? Math.min(units.length - 1, i + 1) : Math.max(0, i - 1);
+    state.sel = units[i].u; e.preventDefault(); render();
+  });
+  const current = () => D.participants.find(p => p.id === state.pid);
+
+  // ---------- stats
+  function renderStats(P) {
+    const wg = P.units.filter(u => u.gold != null);
+    const exact = wg.filter(u => placement(u).scene === u.gold).length;
+    const w1 = wg.filter(u => placement(u).scene != null && Math.abs(placement(u).scene - u.gold) <= 1).length;
+    const ext = P.units.filter(u => u.ext > 0.5).length;
+    const abst = P.units.filter(u => placement(u).anchor.kind === 'scene').length;
+    const armName = { fill: 'decoded', mono: 'decoded, no fill', base: 'raw emission' }[state.arm];
+    const cells = [
+      ['scene-exact', wg.length ? pct(exact, wg.length) : '—', wg.length ? `${exact} of ${wg.length} units with gold · ${armName}` : (P.excluded ? 'gold coding does not match this transcript' : 'no released gold for this participant')],
+      ['within one scene', wg.length ? pct(w1, wg.length) : '—', wg.length ? `${w1} of ${wg.length}` : '—'],
+      ['recall units', P.units.length, `${mmss(P.duration)} of speech · ${P.partition} participant`],
+      ['scene-level anchors', abst, 'model localises to a scene, not a segment'],
+      ['likely external', ext, 'external mass above one half'],
+    ];
+    document.getElementById('stats').innerHTML = cells.map(([k, v, s]) => `<div class="stat"><span class="k">${k}</span><span class="v">${v}</span><span class="s">${s}</span></div>`).join('');
+  }
+
+  // ---------- main chart
+  function renderVoyage(P) {
+    const svg = document.getElementById('voyage');
+    svg.innerHTML = '';
+    const M = { l: 62, r: 132, t: 14, b: 28 };
+    const H = 540, trackH = 110, gap = 26;
+    const avail = Math.max(600, document.getElementById('scroller').clientWidth - M.l - M.r - 2);
+    const pps = Math.max(0.55, avail / Math.max(1, P.duration));
+    const W = M.l + Math.ceil(P.duration * pps) + M.r;
+    const X = t => M.l + t * pps;
+    const Y = f => M.t + H - (f / D.filmEnd) * H;
+    const totalH = M.t + H + gap + trackH + M.b;
+    svg.setAttribute('width', W); svg.setAttribute('height', totalH); svg.setAttribute('viewBox', `0 0 ${W} ${totalH}`);
+
+    // scene boundaries and labels (film axis)
+    const g0 = el('g', { class: 'grid' }, svg);
+    for (const s of D.scenes) {
+      el('line', { x1: M.l, x2: W - M.r, y1: Y(s.start), y2: Y(s.start), class: 'scene-line' }, g0);
+      if (Y(s.start) - Y(s.end) >= 11) {
+        const t = el('text', { x: W - M.r + 6, y: Y((s.start + s.end) / 2) + 3.5 }, g0);
+        t.textContent = s.title.length > 19 ? s.title.slice(0, 18) + '…' : s.title;
+      }
+    }
+    // part break
+    el('line', { x1: M.l, x2: W - M.r, y1: Y(D.partAEnd), y2: Y(D.partAEnd), class: 'part-line' }, svg);
+    const pb = el('text', { x: M.l + 4, y: Y(D.partAEnd) - 4 }, svg); pb.textContent = 'part B begins';
+
+    // axes
+    const ax = el('g', { class: 'axis' }, svg);
+    el('line', { x1: M.l, x2: M.l, y1: M.t, y2: M.t + H }, ax);
+    for (let f = 0; f <= D.filmEnd; f += 300) {
+      el('line', { x1: M.l - 4, x2: M.l, y1: Y(f), y2: Y(f) }, ax);
+      const t = el('text', { x: M.l - 7, y: Y(f) + 3.5, 'text-anchor': 'end' }, ax); t.textContent = filmLabel(f);
+    }
+    const yl = el('text', { x: 12, y: M.t + 10, 'text-anchor': 'start' }, ax); yl.textContent = 'film';
+    el('line', { x1: M.l, x2: W - M.r, y1: M.t + H, y2: M.t + H }, ax);
+    const xt = el('g', { class: 'axis' }, svg);
+    for (let t = 0; t <= P.duration; t += 60) {
+      el('line', { x1: X(t), x2: X(t), y1: M.t + H, y2: M.t + H + 4 }, xt);
+      if (t % 300 === 0) { const l = el('text', { x: X(t), y: M.t + H + 16, 'text-anchor': 'middle' }, xt); l.textContent = mmss(t); }
+    }
+    const xl = el('text', { x: W - M.r, y: M.t + H + 16, 'text-anchor': 'end' }, xt); xl.textContent = 'recall time';
+
+    // gold bands
+    const gb = el('g', {}, svg);
+    for (const iv of P.goldIntervals) {
+      const s = scene.get(iv.scene); if (!s) continue;
+      const r = el('rect', { x: X(iv.t0), width: Math.max(1, X(iv.t1) - X(iv.t0)), y: Y(s.end), height: Math.max(1, Y(s.start) - Y(s.end)), class: 'band' + (state.sel != null && selUnitGold(P) === iv.scene ? ' hi' : '') }, gb);
+      r.appendChild(el('title', {})).textContent = `Gold: scene ${s.title}, recall ${mmss(iv.t0)}–${mmss(iv.t1)}`;
+    }
+
+    // marks
+    const gl = el('g', {}, svg), gm = el('g', {}, svg);
+    const units = P.units.filter(u => u.t0 != null);
+    for (const u of units) {
+      const pl = placement(u);
+      const a = pl.anchor; if (a.kind === 'none') continue;
+      const x = X(u.t0);
+      if (state.showGhost && state.arm !== 'base') {
+        const ga = u.base.anchor; const gy = filmMid(ga);
+        if (gy != null) {
+          el('line', { x1: x, x2: x, y1: Y(gy), y2: Y(filmMid(a)), class: 'ghost-link' }, gl);
+          el('circle', { cx: x, cy: Y(gy), r: 2.2, class: 'ghost' }, gl);
+        }
+      }
+      if (state.showRu && u.ru.kind !== 'none' && state.arm === 'fill') {
+        const ry = filmMid(u.ru);
+        el('line', { x1: x, x2: x, y1: Y(ry), y2: Y(filmMid(a)), class: 'ru-link' }, gl);
+        el('circle', { cx: x, cy: Y(ry), r: 3 + 6 * Math.sqrt(u.ruMass || 0), class: 'ru' }, gl);
+      }
+      let mark;
+      if (a.kind === 'scene') {
+        const s = scene.get(a.n);
+        mark = el('rect', { x: x - 2.5, width: 5, y: Y(s.end), height: Math.max(3, Y(s.start) - Y(s.end)), class: 'unit sceneanchor' + (state.sel === u.u ? ' sel' : '') }, gm);
+      } else {
+        const m = pl.mass == null ? 0.1 : pl.mass;
+        const r = 2.6 + 8 * Math.sqrt(m);
+        mark = el('circle', { cx: x, cy: Y(filmMid(a)), r, class: 'unit' + (u.ext > 0.5 ? ' ext' : '') + (state.sel === u.u ? ' sel' : ''), opacity: u.ext > 0.5 ? 0.9 : (0.45 + 0.55 * u.src).toFixed(2) }, gm);
+      }
+      mark.dataset.u = u.u;
+      mark.addEventListener('mouseenter', ev => showTip(P, u, ev));
+      mark.addEventListener('mousemove', ev => moveTip(ev));
+      mark.addEventListener('mouseleave', hideTip);
+      mark.addEventListener('click', () => { state.sel = u.u; render(); });
+    }
+
+    // scene-index track
+    const T0 = M.t + H + gap;
+    const TY = s => T0 + trackH - ((s - 0.5) / 50) * trackH;
+    const tr = el('g', {}, svg);
+    el('line', { x1: M.l, x2: M.l, y1: T0, y2: T0 + trackH, class: 'axis' }, tr).setAttribute('stroke', 'var(--hair)');
+    for (const s of [1, 10, 20, 30, 40, 50]) { const t = el('text', { x: M.l - 7, y: TY(s) + 3.5, 'text-anchor': 'end' }, tr); t.textContent = 'sc ' + s; }
+    const tl2 = el('text', { x: M.l + 6, y: T0 + 10 }, tr); tl2.textContent = 'scene index · gold coding (amber) · this placement (blue)' + (state.showGhost && state.arm !== 'base' ? ' · raw emission (grey, dashed)' : '');
+    for (const iv of P.goldIntervals) el('line', { x1: X(iv.t0), x2: X(iv.t1), y1: TY(iv.scene), y2: TY(iv.scene), class: 'track-gold' }, tr);
+    const stepPath = (getScene, cls) => {
+      let d = '';
+      for (let i = 0; i < units.length; i++) {
+        const s = getScene(units[i]); if (s == null) continue;
+        const x0 = X(units[i].t0), x1 = X(i + 1 < units.length ? units[i + 1].t0 : Math.min(P.duration, units[i].t0 + 8));
+        d += `M${x0.toFixed(1)} ${TY(s).toFixed(1)} H${x1.toFixed(1)} `;
+      }
+      el('path', { d, fill: 'none', class: cls }, tr);
+    };
+    if (state.showGhost && state.arm !== 'base') stepPath(u => u.base.scene, 'track-raw');
+    stepPath(u => placement(u).scene, 'track-model');
+    if (state.sel != null) { const u = units.find(x => x.u === state.sel); if (u) el('line', { x1: X(u.t0), x2: X(u.t0), y1: M.t, y2: T0 + trackH, stroke: 'var(--ink)', 'stroke-width': 0.6, 'stroke-dasharray': '2 3' }, svg); }
+  }
+  const selUnitGold = P => { const u = P.units.find(x => x.u === state.sel); return u ? u.gold : null; };
+
+  // ---------- tooltip
+  const tip = document.getElementById('tip'), scroller = document.getElementById('scroller');
+  function showTip(P, u, ev) {
+    const pl = placement(u); const a = pl.anchor;
+    const where = a.kind === 'segment' ? `segment ${a.n} · ${filmLabel(seg.get(a.n).start)} · ${scene.get(seg.get(a.n).scene).title}` : `scene ${scene.get(a.n).title} (scene-level)`;
+    tip.innerHTML = `<div class="q">${esc(u.text)}</div><div class="m">${mmss(u.t0)} into recall → ${esc(where)}</div><div class="m">anchor mass ${pl.mass == null ? '—' : pl.mass.toFixed(2)} · source ${u.src.toFixed(2)} · external ${u.ext.toFixed(2)}${u.gold != null ? ` · gold scene ${u.gold}${pl.scene === u.gold ? ' ✓' : ''}` : ''}</div>`;
+    tip.style.display = 'block'; moveTip(ev);
+  }
+  function moveTip(ev) {
+    const r = scroller.getBoundingClientRect();
+    let x = ev.clientX - r.left + scroller.scrollLeft + 14, y = ev.clientY - r.top + 14;
+    if (x + 330 > scroller.scrollLeft + scroller.clientWidth) x = ev.clientX - r.left + scroller.scrollLeft - 330;
+    tip.style.left = x + 'px'; tip.style.top = y + 'px';
+  }
+  function hideTip() { tip.style.display = 'none'; }
+
+  // ---------- inspector
+  function renderInspector(P) {
+    const box = document.getElementById('inspector');
+    const u = P.units.find(x => x.u === state.sel);
+    if (!u) { box.innerHTML = '<div class="empty">Click a mark to inspect a unit.</div>'; return; }
+    const pl = placement(u); const a = pl.anchor;
+    const gs = u.gold != null ? scene.get(u.gold) : null;
+    const anchorScene = a.kind === 'segment' ? scene.get(seg.get(a.n).scene) : (a.kind === 'scene' ? scene.get(a.n) : null);
+    const map = pl.mass == null ? 0 : pl.mass, ru = u.ruMass || 0, other = Math.max(0, u.src - map - ru), ext = u.ext;
+    const parts = [['anchor', map, 'var(--model)'], ['runner-up', ru, 'var(--model-soft)'], ['other source', other, 'var(--hair)'], ['external', ext, 'var(--external)']];
+    const bar = parts.map(([k, v, c]) => `<span style="width:${(100 * v).toFixed(1)}%;background:${c}" title="${k} ${v.toFixed(3)}"></span>`).join('');
+    const leg = parts.map(([k, v, c]) => `<span><i style="background:${c}"></i>${k} <span class="num">${v.toFixed(2)}</span></span>`).join('');
+    let placeRows = '';
+    if (a.kind === 'segment') {
+      const s = seg.get(a.n);
+      placeRows = `<div class="k">placed at</div><div class="v">segment ${a.n} · <span class="num">${filmLabel(s.start)}–${filmLabel(s.end).slice(2)}</span> · ${esc(s.scene + '')}. ${esc(anchorScene.title.replace(/^\d+\.\s*/, ''))}</div>`;
+    } else if (a.kind === 'scene') {
+      placeRows = `<div class="k">placed at</div><div class="v">the whole of scene ${esc(anchorScene.title)} · <span class="num">${filmLabel(anchorScene.start)}–${filmLabel(anchorScene.end).slice(2)}</span> (no segment chosen)</div>`;
+    } else placeRows = `<div class="k">placed at</div><div class="v">nowhere in the film</div>`;
+    const goldRow = u.gold == null ? `<div class="k">gold</div><div class="v">no coded scene at this moment</div>`
+      : `<div class="k">gold</div><div class="v">scene ${esc(gs.title)} ${pl.scene === u.gold ? '· <b>same scene</b>' : (pl.scene != null && Math.abs(pl.scene - u.gold) === 1 ? '· off by one scene' : `· off by ${pl.scene == null ? '—' : Math.abs(pl.scene - u.gold)} scenes`)}</div>`;
+    const armRow = state.arm === 'fill' ? `<div class="k">raw emission</div><div class="v">${u.base.anchor.kind === 'segment' ? `segment ${u.base.anchor.n} in scene ${u.base.scene}` : (u.base.anchor.kind === 'scene' ? `scene ${u.base.scene} (scene-level)` : '—')}${u.base.scene !== pl.scene ? ' · <b>moved by the decode</b>' : ' · unchanged by the decode'}</div>` : '';
+    const segText = a.kind === 'segment' ? `<p class="segtext"><span class="lab">annotation at the anchor</span>${esc(seg.get(a.n).text)}</p>` : '';
+    const ruText = (u.ru.kind === 'segment' && state.arm === 'fill') ? `<p class="segtext ru"><span class="lab">runner-up · segment ${u.ru.n} · scene ${seg.get(u.ru.n).scene} · mass ${(u.ruMass || 0).toFixed(2)}</span>${esc(seg.get(u.ru.n).text)}</p>` : (u.ru.kind === 'scene' && state.arm === 'fill' ? `<p class="segtext ru"><span class="lab">runner-up · scene ${esc(scene.get(u.ru.n).title)} · mass ${(u.ruMass || 0).toFixed(2)}</span>the whole scene</p>` : '');
+    let adj = '';
+    if (u.adj) {
+      const inside = a.kind === 'segment' && u.adj.first !== 'none' && a.n >= +u.adj.first && a.n <= +u.adj.last;
+      adj = `<p class="note"><span class="tag-diag">Within-scene adjudication (machine lane, diagnostic, never gold):</span> ${u.adj.first === 'none' ? 'describes nothing in the gold scene' : `segments ${u.adj.first}–${u.adj.last}${u.adj.sure === 'y' ? '' : ', unsure'}`}${u.adj.first !== 'none' ? (inside ? ' · anchor <b>inside</b> the span' : (a.kind === 'segment' ? ' · anchor outside the span' : ' · scene-level anchor')) : ''}.</p>`;
+    }
+    box.innerHTML = `
+      <div><div class="where">Unit ${u.u} · <span class="num">${mmss(u.t0)}</span>${u.t1 != null ? `–<span class="num">${mmss(u.t1)}</span>` : ''} into the recall · ${esc(u.fn.replace(/([a-z])([A-Z])/g, '$1 $2').toLowerCase())}</div>
+      <p class="quote">“${esc(u.text)}”</p></div>
+      <div class="kv">${placeRows}${goldRow}${armRow}
+        <div class="k">mode</div><div class="v">${esc(u.mode)} · localizability <span class="num">${u.loc == null ? '—' : u.loc.toFixed(2)}</span></div></div>
+      <div class="post"><h2>Posterior mass</h2><div class="bar">${bar}</div><div class="legend">${leg}</div></div>
+      ${segText}${ruText}
+      <div class="strip" id="strip"></div>
+      ${adj}`;
+    renderStrip(u, pl, anchorScene, gs);
+  }
+  function renderStrip(u, pl, anchorScene, gs) {
+    const box = document.getElementById('strip');
+    const S = anchorScene || gs; if (!S) { box.innerHTML = ''; return; }
+    const segs = D.segments.filter(s => s.scene === S.n);
+    const W = 340, H = 44, pad = 2;
+    const x = t => pad + (W - 2 * pad) * (t - S.start) / (S.end - S.start);
+    let svg = `<span class="lab">inside scene ${esc(S.title)} · ${segs.length} segments · <span class="num">${mmss(S.end - S.start)}</span></span><svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" role="img" aria-label="Segments of the scene with the anchor and runner-up marked">`;
+    for (const s of segs) svg += `<rect x="${x(s.start).toFixed(1)}" y="14" width="${Math.max(0.5, x(s.end) - x(s.start) - 1).toFixed(1)}" height="16" fill="var(--surface-2)" stroke="var(--hair)" stroke-width="0.5"><title>${esc(`segment ${s.n}: ${s.text}`)}</title></rect>`;
+    if (u.adj && u.adj.first !== 'none' && gs && gs.n === S.n) {
+      const a = seg.get(+u.adj.first), b = seg.get(+u.adj.last);
+      svg += `<rect x="${x(a.start).toFixed(1)}" y="10" width="${(x(b.end) - x(a.start)).toFixed(1)}" height="24" fill="var(--adj-band)" stroke="var(--adj)" stroke-width="0.8"><title>adjudicated span (machine lane, diagnostic)</title></rect>`;
+    }
+    if (u.ru.kind === 'segment' && state.arm === 'fill' && seg.get(u.ru.n).scene === S.n) {
+      const s = seg.get(u.ru.n); svg += `<circle cx="${x((s.start + s.end) / 2).toFixed(1)}" cy="22" r="5" fill="none" stroke="var(--model)" stroke-dasharray="2 2" stroke-width="1.2"><title>runner-up</title></circle>`;
+    }
+    const a = pl.anchor;
+    if (a.kind === 'segment' && seg.get(a.n).scene === S.n) { const s = seg.get(a.n); svg += `<circle cx="${x((s.start + s.end) / 2).toFixed(1)}" cy="22" r="6" fill="var(--model)" stroke="var(--surface)" stroke-width="1.2"><title>anchor</title></circle>`; }
+    else if (a.kind === 'scene' && a.n === S.n) svg += `<rect x="${pad}" y="8" width="${W - 2 * pad}" height="28" fill="var(--model-soft)" stroke="var(--model)" stroke-width="0.8"><title>scene-level anchor</title></rect>`;
+    svg += '</svg>';
+    box.innerHTML = svg;
+  }
+
+  // ---------- legend and provenance
+  document.getElementById('legend').innerHTML = [
+    `<span><svg viewBox="0 0 26 16"><circle cx="8" cy="8" r="4" fill="var(--model)"/><circle cx="19" cy="8" r="6.5" fill="var(--model)"/></svg>anchor; area grows with posterior mass on the chosen segment</span>`,
+    `<span><svg viewBox="0 0 26 16"><rect x="10" y="1" width="5" height="14" rx="2.5" fill="var(--model)" opacity="0.55"/></svg>scene-level anchor: the model stops at the scene</span>`,
+    `<span><svg viewBox="0 0 26 16"><circle cx="13" cy="8" r="5" fill="none" stroke="var(--external)" stroke-width="1.6"/></svg>hollow: more mass outside the film than in it</span>`,
+    `<span><svg viewBox="0 0 26 16"><circle cx="13" cy="8" r="5" fill="none" stroke="var(--model)" stroke-width="1.2" stroke-dasharray="2 2"/></svg>runner-up, joined to its anchor</span>`,
+    `<span><svg viewBox="0 0 26 16"><rect x="1" y="2" width="24" height="12" fill="var(--gold-band)"/></svg>human scene coding (gold) · the band is the scene's film span over the recall interval coded to it</span>`,
+    `<span><svg viewBox="0 0 26 16"><circle cx="13" cy="8" r="2.2" fill="var(--raw)"/><line x1="13" y1="8" x2="13" y2="1" stroke="var(--raw)"/></svg>raw emission argmax before the scene-monotone decode</span>`,
+  ].join('');
+  document.getElementById('prov').innerHTML = `<p>Placements are the default configuration's run (${esc(D.arm)}): lexical blend 0.8 over the sentence encoder, ordering prior 1.5, scene-monotone decode with fill. “Raw emission” is the same evidence without the decode; “no fill” is the decode without the in-scene fill. Gold is the released 50-scene coding of each recall (Chen lab), a scene-level truth: it says which scene, never which segment. Segment-level spans shown in the inspector come from a machine adjudication lane and are diagnostic, never gold (packet sha256 ${D.machineLane.packetSha256.slice(0, 12)}…).</p><p>Film time runs on one clock across the two presentation parts; part B begins at ${mmss(D.partAEnd)}. Recall time is the Princeton word-onset clock. Data generated ${D.generated}; recall text is from the public Zenodo release and this page is private.</p>`;
+
+  function render() { const P = current(); if (state.sel == null) { const us = P.units.filter(u => u.t0 != null && u.gold != null); if (us.length) state.sel = us[Math.floor(us.length / 3)].u; } renderStats(P); renderVoyage(P); renderInspector(P); }
+  state.pid = pp.value; render();
+  window.addEventListener('resize', () => renderVoyage(current()));
+})();
+</script>

@@ -14,6 +14,11 @@ one copy shared by every worktree; the study record is `data/study/recall-to-vid
   `docs/plans/2026-09-03-within-scene-precision-preregistration.md`: `packet` writes the blind
   packet and sealed key, `extract` pulls answers out of a filled packet, `score` joins answers to any
   arm's report, and `diagnose` reports gold-free within-scene diagnostics.
+- `voyage/build.py` assembles the Sherlock Recall Voyage page, a self-contained HTML instrument
+  (`voyage/template.html` plus one embedded JSON document) showing every participant's recall units
+  on the film clock with posterior mass, runner-up, the raw-emission ghost, the gold scene bands and
+  a per-unit inspector. It reads the default, monotone and baseline arms from the study record and
+  writes beside them; the page carries recall prose and stays outside Git.
 - `score.py` reports the gold-free outcomes with a seeded participant bootstrap, and
   `score.py --compare` gives paired per-participant differences.
 - `matched.py A DIR_A B DIR_B` repeats that comparison on the units whose anchor stayed at the leaf
