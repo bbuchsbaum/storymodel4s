@@ -281,11 +281,10 @@ object RecallVoyageInput:
       coding
         .flatMap(c => c.intervals.find(i => !timeline.byGroup.contains(i.group)))
         .flatMap(i => violation("coding", s"coded group ${i.group} is not declared")),
-      coding
-        .flatMap(c => c.intervals.find(i => i.recall.end.value > recallLength.value))
-        .flatMap(i =>
-          violation("coding", s"a coded interval for group ${i.group} ends after the recall's end")
-        ),
+      // A coding may run past the last word: the Sherlock coding's offsets land up to eleven
+      // seconds after the final word onset (scene pre-registration §2), because a coder hears the
+      // recording end and a transcript stops at its last word. That is the coding's own clock,
+      // not a defect, so it is not refused here; a renderer clips to the plot.
       coding
         .flatMap { c =>
           val sorted = c.intervals.sortBy(i => (i.recall.start.value, i.recall.end.value))

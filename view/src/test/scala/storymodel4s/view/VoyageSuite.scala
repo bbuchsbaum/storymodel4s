@@ -255,7 +255,10 @@ class VoyageSuite extends FunSuite:
     assert(input(coding = Some(overlap)).isLeft, "overlapping coded intervals")
     val late =
       IndependentCoding("coding", Checksum.ofText("coding"), Vector(CodedInterval(span(0, 61), 1)))
-    assert(input(coding = Some(late)).isLeft, "a coded interval past the recall's end")
+    assert(
+      input(coding = Some(late)).isRight,
+      "a coding may run past the last word; renderers clip"
+    )
     val reversed = units.updated(0, units(0).copy(lastWordOnset = Some(secs(0.5))))
     assert(
       RecallVoyageInput.of(reversed, rows, timeline, decisions(argmaxFirst), None, secs(60)).isLeft
