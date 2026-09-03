@@ -957,23 +957,7 @@ final class AtlasCompiler private (provenance: ViewProvenance):
     // has no discourse position; none of them claims a lane, because a candidate whose context was
     // never resolved has no context to be drawn in.
     def surfaceSpans(units: Vector[SurfaceUnitId]): EpistemicPlacement =
-      val distinct = units.distinct.sorted
-      if distinct.isEmpty then EpistemicPlacement.NoDiscoursePosition(NoPositionReason.WholeWork)
-      else
-        distinct.find(unit => model.atlas.byId.get(unit).isEmpty) match
-          case Some(absent) =>
-            EpistemicPlacement.NoDiscoursePosition(NoPositionReason.UnitAbsentFromAtlas(absent))
-          case None =>
-            val refs =
-              distinct.flatMap(unit =>
-                model.atlas.byId.get(unit).map(u => SpanRef(Some(u.id), u.span))
-              )
-            SpanSet
-              .of(refs)
-              .flatMap(clipped)
-              .fold(EpistemicPlacement.NoDiscoursePosition(NoPositionReason.BeyondHorizon))(
-                EpistemicPlacement.AtSpans.apply
-              )
+      AbsencePlacement.onUnits(model, units, clipped)
 
     val gapMarks: Vector[VisualPrimitive] = draft.toVector.flatMap(_.gaps).map { gap =>
       val at = GapTarget.address(gap.target, model.source.id)
@@ -1007,16 +991,7 @@ final class AtlasCompiler private (provenance: ViewProvenance):
         val occurrence = seen.getOrElse(violation, 0)
         seen.update(violation, occurrence + 1)
         val subject = violation.address
-        val placement = subject match
-          case None    => EpistemicPlacement.NoDiscoursePosition(NoPositionReason.WholeWork)
-          case Some(a) =>
-            storyRef.parse(a).flatMap(model.supporting) match
-              case None =>
-                EpistemicPlacement.NoDiscoursePosition(NoPositionReason.SubjectCitesNoSpans(a))
-              case Some(support) =>
-                clipped(support).fold(
-                  EpistemicPlacement.NoDiscoursePosition(NoPositionReason.BeyondHorizon)
-                )(EpistemicPlacement.AtSpans.apply)
+        val placement = AbsencePlacement.forLaw(model, violation, clipped)
         val at = subject.getOrElse(coreRef.address(CoreRef.Story(model.source.id)))
         val key = s"${violation.law}|${violation.severity}|${violation.path}|" +
           s"${violation.reason}|${subject.fold("-")(_.render)}|$occurrence"

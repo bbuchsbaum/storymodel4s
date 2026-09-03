@@ -12,7 +12,14 @@ import storymodel4s.document.{
   NarrativeCandidateAddress,
   SentenceCoverage
 }
-import storymodel4s.story.{ModelStatus, Severity, StoryModel, ValidationOutcome, Violation}
+import storymodel4s.story.{
+  ModelStatus,
+  Severity,
+  StoryModel,
+  StoryRef,
+  ValidationOutcome,
+  Violation
+}
 
 /** One promotion law a draft did not satisfy, with how many times it failed.
   *
@@ -129,6 +136,14 @@ final class DraftModel private (
   /** Every coverage row that admitted no situation root, with the row's own typed reason. */
   def abstentions: Vector[(SurfaceUnitId, SentenceAbstention)] =
     coverage.flatMap(row => SentenceAbstention.from(row).map(row.sentence -> _))
+
+  /** Every absence this draft carries, in one order, each separated from its own restatements.
+    *
+    * The order is the order the three producers wrote them in: the compilation's gaps, then its
+    * coverage abstentions, then the validator's violations. It is stable because [[DraftModel.of]]
+    * sorts all three at construction.
+    */
+  def absences: Vector[DraftAbsence] = DraftAbsence.enumerate(this)
 
   override def equals(other: Any): Boolean = other match
     case that: DraftModel =>
@@ -369,3 +384,190 @@ private[view] object GapTarget:
   def familyName(family: ClaimFamily): String = family match
     case ClaimFamily.Custom(namespace, name) => s"custom:$namespace:$name"
     case other                               => other.toString
+
+/** What one of a draft's own absences says, in the exact record its producer wrote.
+  *
+  * Why three cases and not one "unknown": a claim family the narrative compiler nominated and could
+  * not derive, a sentence the provider refused, and a promotion law the validator found unsatisfied
+  * come from three different stages and are actionable in three different ways. A reader who is told
+  * only that *something* failed at these words learns nothing they can act on, and the draft path
+  * exists precisely so that they can.
+  *
+  * Every case carries its producer's record whole and restates none of it, so a mark can never say
+  * more about a failure than the stage that recorded it did.
+  */
+enum AbsenceContent:
+  /** A claim family nominated at a chart node that the compiler could not derive. */
+  case UnresolvedFamily(gap: DerivationGap)
+
+  /** A sentence that admitted no situation root, with the coverage row's own typed reason. */
+  case AbstainedSentence(unit: SurfaceUnitId, reason: SentenceAbstention)
+
+  /** A promotion law this model does not satisfy, exactly as the validator stated it. */
+  case UnsatisfiedLaw(violation: Violation)
+
+/** One absence a draft carries, separated from an identical restatement of itself.
+  *
+  * Why `occurrence` is part of the identity: a validator may state one violation twice, and in the
+  * reading view two absences that agree on target, support, kind and content would content-address
+  * to a single [[AnnotationId]] and be coalesced into one annotation. A reading view showing one
+  * mark where the model recorded two absences reports less than the model knows, which is the same
+  * defect as reporting more, pointed the other way.
+  */
+final case class DraftAbsence private (content: AbsenceContent, occurrence: Int):
+  /** The reading-view channel this absence is drawn in; one kind per case, injectively. */
+  def kind: AnnotationKind = content match
+    case AbsenceContent.UnresolvedFamily(_)     => AnnotationKind.Gap
+    case AbsenceContent.AbstainedSentence(_, _) => AnnotationKind.Abstention
+    case AbsenceContent.UnsatisfiedLaw(_)       => AnnotationKind.UnsatisfiedLaw
+
+  /** The D9 state this absence is in, or `None` for a law, which is a structural defect of the
+    * build rather than uncertainty about a value (the same distinction [[EpistemicChannel]] draws).
+    */
+  def uncertainty: Option[UncertaintyState] = content match
+    case AbsenceContent.UnresolvedFamily(gap)   => Some(UncertaintyState.of(gap.reason))
+    case AbsenceContent.AbstainedSentence(_, _) => Some(UncertaintyState.Missing)
+    case AbsenceContent.UnsatisfiedLaw(_)       => None
+
+  /** The non-colour channel this absence is drawn in (ADR 0002 D9, V-U5). Total, never a colour. */
+  def channel: EpistemicChannel = uncertainty.fold(EpistemicChannel.Bracket)(_.channel)
+
+  /** The address the absence is about, resolved identically to the Atlas's own anchor. */
+  def subject(story: StoryId): Address = content match
+    case AbsenceContent.UnresolvedFamily(gap)      => GapTarget.address(gap.target, story)
+    case AbsenceContent.AbstainedSentence(unit, _) =>
+      Addressable[CoreRef].address(CoreRef.SurfaceUnit(unit))
+    case AbsenceContent.UnsatisfiedLaw(violation) =>
+      violation.address.getOrElse(Addressable[CoreRef].address(CoreRef.Story(story)))
+
+  /** Claims and evidence the producer named as the absence's own upstream; empty when it named
+    * none. A law and an abstention name none: their subject is already the annotation's target.
+    */
+  def upstream: Vector[Address] = content match
+    case AbsenceContent.UnresolvedFamily(gap) =>
+      val coreRef = Addressable[CoreRef]
+      gap.upstreamClaims.toVector.sorted.map(id => coreRef.address(CoreRef.Claim(id))) ++
+        gap.evidence.map(evidence => coreRef.address(CoreRef.Evidence(evidence.evidenceId)))
+    case AbsenceContent.AbstainedSentence(_, _) => Vector.empty
+    case AbsenceContent.UnsatisfiedLaw(_)       => Vector.empty
+
+  /** A content key that separates two absences sharing one subject, support and channel. */
+  def key: String = content match
+    case AbsenceContent.UnresolvedFamily(gap) =>
+      s"unresolved-family|${gap.stage.value}|${GapTarget.familyName(gap.family)}|" +
+        s"${gap.target.render}|${gap.reason.render}|$occurrence"
+    case AbsenceContent.AbstainedSentence(unit, reason) =>
+      s"abstained-sentence|${unit.value}|${reason.render}|$occurrence"
+    case AbsenceContent.UnsatisfiedLaw(violation) =>
+      s"unsatisfied-law|${violation.law}|${violation.severity}|${violation.path}|" +
+        s"${violation.reason}|${violation.address.fold("-")(_.render)}|$occurrence"
+
+  /** One deterministic line naming the failure, for the textual twin. */
+  def render: String = content match
+    case AbsenceContent.UnresolvedFamily(gap) =>
+      s"unresolved-family family=${GapTarget.familyName(gap.family)} stage=${gap.stage.value} " +
+        s"target=${gap.target.render} reason=${gap.reason.render} occurrence=$occurrence"
+    case AbsenceContent.AbstainedSentence(unit, reason) =>
+      s"abstained-sentence unit=${unit.value} reason=${reason.render} occurrence=$occurrence"
+    case AbsenceContent.UnsatisfiedLaw(violation) =>
+      s"unsatisfied-law law=${violation.law} severity=${violation.severity} " +
+        s"path=${violation.path} reason=${violation.reason} occurrence=$occurrence"
+
+object DraftAbsence:
+  /** Every absence a draft carries, in producer order, with occurrence indices assigned. */
+  def enumerate(draft: DraftModel): Vector[DraftAbsence] =
+    val contents =
+      draft.gaps.map(AbsenceContent.UnresolvedFamily.apply) ++
+        draft.abstentions.map((unit, reason) => AbsenceContent.AbstainedSentence(unit, reason)) ++
+        draft.violations.map(AbsenceContent.UnsatisfiedLaw.apply)
+    val seen = scala.collection.mutable.Map.empty[AbsenceContent, Int]
+    contents.map { content =>
+      val occurrence = seen.getOrElse(content, 0)
+      seen.update(content, occurrence + 1)
+      new DraftAbsence(content, occurrence)
+    }
+
+/** Where one absence sits on the surface material it concerns, decided once for every projection.
+  *
+  * Why one object rather than a rule per compiler: the Atlas and the Codex place the same absences
+  * over the same words, and two implementations of "which words does this failure concern" would
+  * eventually disagree, at which point one of the two pictures would be lying about the other's
+  * subject. The rule lives here and both compilers call it.
+  */
+private[view] object AbsencePlacement:
+  /** Exact spans of the surface units an absence names, or the typed reason it has no position. */
+  def onUnits(
+      model: StoryModel[?],
+      units: Vector[SurfaceUnitId],
+      clip: SpanSet => Option[SpanSet]
+  ): EpistemicPlacement =
+    val distinct = units.distinct.sorted
+    if distinct.isEmpty then EpistemicPlacement.NoDiscoursePosition(NoPositionReason.WholeWork)
+    else
+      distinct.find(unit => model.atlas.byId.get(unit).isEmpty) match
+        case Some(absent) =>
+          EpistemicPlacement.NoDiscoursePosition(NoPositionReason.UnitAbsentFromAtlas(absent))
+        case None =>
+          val refs =
+            distinct.flatMap(unit => model.atlas.byId.get(unit).map(u => SpanRef(Some(u.id), u.span)))
+          SpanSet
+            .of(refs)
+            .flatMap(clip)
+            .fold(EpistemicPlacement.NoDiscoursePosition(NoPositionReason.BeyondHorizon))(
+              EpistemicPlacement.AtSpans.apply
+            )
+
+  /** A law claims its subject's own cited words, or none at all; never a guessed position. */
+  def forLaw(
+      model: StoryModel[?],
+      violation: Violation,
+      clip: SpanSet => Option[SpanSet]
+  ): EpistemicPlacement = violation.address match
+    case None    => EpistemicPlacement.NoDiscoursePosition(NoPositionReason.WholeWork)
+    case Some(a) =>
+      Addressable[StoryRef].parse(a).flatMap(model.supporting) match
+        case None =>
+          EpistemicPlacement.NoDiscoursePosition(NoPositionReason.SubjectCitesNoSpans(a))
+        case Some(support) =>
+          clip(support).fold(
+            EpistemicPlacement.NoDiscoursePosition(NoPositionReason.BeyondHorizon)
+          )(EpistemicPlacement.AtSpans.apply)
+
+  /** The placement of any absence, dispatched on its own typed content. */
+  def of(
+      model: StoryModel[?],
+      absence: DraftAbsence,
+      clip: SpanSet => Option[SpanSet]
+  ): EpistemicPlacement = absence.content match
+    case AbsenceContent.UnresolvedFamily(gap) =>
+      onUnits(model, GapTarget.chartNodes(gap.target).map(_.sentence), clip)
+    case AbsenceContent.AbstainedSentence(unit, _) => onUnits(model, Vector(unit), clip)
+    case AbsenceContent.UnsatisfiedLaw(violation)  => forLaw(model, violation, clip)
+
+/** One absence a draft reading view could not put on any words, with the reason it could not.
+  *
+  * Why this exists at all: an Atlas mark may carry [[EpistemicPlacement.NoDiscoursePosition]] and
+  * still be drawn, because a scene has room for a mark that claims no text. A [[TextAnnotation]]
+  * cannot: its support is a nonempty [[SpanSet]] by construction, since an annotation over no words
+  * is not an annotation. Dropping those absences would make the reading view quietly smaller than
+  * the model, so they are kept here instead, out of the flowing text and in the audit surface.
+  */
+final case class UnplacedAbsence(
+    absence: DraftAbsence,
+    subject: Address,
+    reason: NoPositionReason
+)
+
+/** The complete disclosure a draft reading view makes about its own incompleteness.
+  *
+  * `marked` and `unplaced` partition every absence the draft carries, and the Codex compiler checks
+  * that partition against [[DraftModel.absences]] before a flow is built. That check is the
+  * mechanised form of "absence is annotated, not omitted": a compiler that silently dropped an
+  * absence produces a ledger that does not add up and no flow at all.
+  */
+final case class DraftAbsenceLedger private[view] (
+    marked: Vector[AnnotationId],
+    unplaced: Vector[UnplacedAbsence]
+):
+  /** How many absences this flow accounts for, placed and unplaced together. */
+  def total: Int = marked.size + unplaced.size

@@ -13,7 +13,14 @@ import storymodel4s.core.*
 object AnnotationId extends OpaqueId("AnnotationId")
 type AnnotationId = AnnotationId.T
 
-/** Annotation families allocate and style independent visual channels. */
+/** Annotation families allocate and style independent visual channels.
+  *
+  * The last three are the draft build's disclosure channels. They are in this closed enum rather
+  * than smuggled through a free-form tag because a reader must be able to tell a failure from a
+  * finding at a glance and because a channel nothing can enumerate is a channel a renderer can
+  * silently omit — which would put the unmarked prose back, and with it the reader's assumption
+  * that the model understood it.
+  */
 enum AnnotationKind(val wireName: String):
   case Feature extends AnnotationKind("feature")
   case Hierarchy extends AnnotationKind("hierarchy")
@@ -22,6 +29,33 @@ enum AnnotationKind(val wireName: String):
   case Context extends AnnotationKind("context")
   case Claim extends AnnotationKind("claim")
   case Recall extends AnnotationKind("recall")
+
+  /** A claim family the compiler nominated at a chart node and could not derive. */
+  case Gap extends AnnotationKind("gap")
+
+  /** A sentence the provider abstained on, so no situation was read out of these words. */
+  case Abstention extends AnnotationKind("abstention")
+
+  /** A promotion law this model does not satisfy, drawn on the words its subject cites. */
+  case UnsatisfiedLaw extends AnnotationKind("unsatisfied-law")
+
+  /** True for the three channels that exist only to disclose a draft's own incompleteness.
+    *
+    * Total by construction rather than a set literal, so a new kind cannot be added without the
+    * author deciding, here, which side of the line it falls on.
+    */
+  def marksAbsence: Boolean = this match
+    case Gap | Abstention | UnsatisfiedLaw                                 => true
+    case Feature | Hierarchy | Entity | Relation | Context | Claim | Recall => false
+
+object AnnotationKind:
+  /** The channels every draft reading view declares, whether or not it has anything to put in one.
+    *
+    * A declared empty channel says "no sentence was abstained on"; an undeclared one says nothing,
+    * and a reader cannot tell the second from a renderer that dropped it. That is the same
+    * distinction [[DerivationRecord.NotSupplied]] draws against a count of zero.
+    */
+  val absence: Set[AnnotationKind] = values.iterator.filter(_.marksAbsence).toSet
 
 /** Nonnegative priority used to resolve annotation-channel pressure deterministically. */
 object AnnotationPriority:
@@ -201,14 +235,22 @@ object SourceRun:
   def unsafe(span: TextSpan): SourceRun =
     of(span).fold(error => throw new IllegalArgumentException(error.message), identity)
 
-/** One semantic annotation over exact support, independent of pages and rendered marks. */
+/** One semantic annotation over exact support, independent of pages and rendered marks.
+  *
+  * `absence` and `kind` are one statement, not two: it is `Some` exactly when the kind is one of
+  * the draft disclosure channels, and it then carries the producer's own record of the failure. So
+  * a bare "gap" annotation that names no family cannot be minted, and a claim annotation cannot be
+  * dressed as a failure. It also separates two failures that concern the same words, which a
+  * target/kind/support content address alone would coalesce into one mark.
+  */
 final case class TextAnnotation private (
     id: AnnotationId,
     target: Address,
     support: SpanSet,
     kind: AnnotationKind,
     priority: AnnotationPriority,
-    audit: AuditRecord
+    audit: AuditRecord,
+    absence: Option[DraftAbsence]
 )
 
 object TextAnnotation:
@@ -217,10 +259,27 @@ object TextAnnotation:
       support: SpanSet,
       kind: AnnotationKind,
       priority: AnnotationPriority,
-      audit: AuditRecord
+      audit: AuditRecord,
+      absence: Option[DraftAbsence] = None
   ): Either[DomainError, TextAnnotation] =
+    for
+      _ <- checkTarget(target)
+      _ <- checkAbsence(kind, absence)
+      _ <- checkSupport(support)
+    yield new TextAnnotation(
+      expectedId(target, support, kind, absence),
+      target,
+      support,
+      kind,
+      priority,
+      audit,
+      absence
+    )
+
+  private def checkTarget(target: Address): Either[DomainError, Unit] =
     ViewRef.parse(target) match
-      case None =>
+      case Some(_) => Right(())
+      case None    =>
         Left(
           DomainError.InvalidFormat(
             "TextAnnotation.target",
@@ -228,27 +287,38 @@ object TextAnnotation:
             "not a recognized typed view reference"
           )
         )
-      case Some(_) =>
-        support.refs.toVector.find(_.span.isEmpty) match
-          case Some(ref) =>
-            Left(
-              DomainError.InvalidSpan(
-                ref.span.start,
-                ref.span.endExclusive,
-                "annotation support is empty"
-              )
-            )
-          case None =>
-            Right(
-              new TextAnnotation(
-                expectedId(target, support, kind),
-                target,
-                support,
-                kind,
-                priority,
-                audit
-              )
-            )
+
+  private def checkSupport(support: SpanSet): Either[DomainError, Unit] =
+    support.refs.toVector.find(_.span.isEmpty) match
+      case None      => Right(())
+      case Some(ref) =>
+        Left(
+          DomainError.InvalidSpan(
+            ref.span.start,
+            ref.span.endExclusive,
+            "annotation support is empty"
+          )
+        )
+
+  private def checkAbsence(
+      kind: AnnotationKind,
+      absence: Option[DraftAbsence]
+  ): Either[DomainError, Unit] = absence match
+    case Some(detail) if detail.kind != kind =>
+      Left(
+        DomainError.InvariantViolation(
+          "view/codex/annotations/absence-kind",
+          s"a ${detail.kind.wireName} absence cannot be drawn on the ${kind.wireName} channel"
+        )
+      )
+    case None if kind.marksAbsence =>
+      Left(
+        DomainError.InvariantViolation(
+          "view/codex/annotations/absence-content",
+          s"the ${kind.wireName} channel draws a failure and must carry the record of one"
+        )
+      )
+    case _ => Right(())
 
   def validated(
       id: AnnotationId,
@@ -256,9 +326,10 @@ object TextAnnotation:
       support: SpanSet,
       kind: AnnotationKind,
       priority: AnnotationPriority,
-      audit: AuditRecord
+      audit: AuditRecord,
+      absence: Option[DraftAbsence] = None
   ): Either[DomainError, TextAnnotation] =
-    of(target, support, kind, priority, audit).flatMap { annotation =>
+    of(target, support, kind, priority, audit, absence).flatMap { annotation =>
       if annotation.id == id then Right(annotation)
       else
         Left(
@@ -284,7 +355,7 @@ object TextAnnotation:
             val head = group.head
             val sameSemanticIdentity = group.forall(annotation =>
               annotation.target == head.target && annotation.support == head.support &&
-                annotation.kind == head.kind
+                annotation.kind == head.kind && annotation.absence == head.absence
             )
             val provenances = group.map(_.audit.provenance).distinct
             if !sameSemanticIdentity then
@@ -309,15 +380,20 @@ object TextAnnotation:
                 head.support,
                 head.kind,
                 priority,
-                AuditRecord.of(upstream, provenances.head)
+                AuditRecord.of(upstream, provenances.head),
+                head.absence
               ).map(result :+ _)
           }
       }
 
+  /** The absence key is appended, never interleaved, so an ordinary annotation's content address is
+    * exactly what it was before the draft channels existed and no validated flow's identities move.
+    */
   private def expectedId(
       target: Address,
       support: SpanSet,
-      kind: AnnotationKind
+      kind: AnnotationKind,
+      absence: Option[DraftAbsence]
   ): AnnotationId =
     val supportParts = support.refs.toVector.flatMap { ref =>
       Vector(
@@ -326,8 +402,12 @@ object TextAnnotation:
         ref.span.endExclusive.toString
       )
     }
+    val absenceParts = absence.toVector.map(detail => s"absence:${detail.key}")
     AnnotationId.unsafe(
-      ContentAddress.of("annotation", (Vector(target.render, kind.wireName) ++ supportParts)*)
+      ContentAddress.of(
+        "annotation",
+        (Vector(target.render, kind.wireName) ++ supportParts ++ absenceParts)*
+      )
     )
 
 /** Bidirectional semantic navigation that never uses page or renderer identifiers. */
@@ -396,7 +476,13 @@ object NavigationIndex:
         }
         Right(new NavigationIndex(byTarget, reverse, ancestors))
 
-/** Reflow-independent Narrative Codex source flow compiled from exact spans and addresses. */
+/** Reflow-independent Narrative Codex source flow compiled from exact spans and addresses.
+  *
+  * `draft` is `Some` exactly when the receipt declares [[ViewBasis.DraftBuild]], and its `marked`
+  * ids are exactly the flow's absence-bearing annotations. A validated flow therefore cannot carry
+  * a disclosure and a draft flow cannot omit one, which is the same biconditional
+  * [[ViewProvenance]] already enforces between the basis and the promotion record.
+  */
 final case class CodexFlow private (
     source: StorySource,
     runs: Vector[SourceRun],
@@ -405,7 +491,8 @@ final case class CodexFlow private (
     navigation: NavigationIndex,
     selectionPlacements: Map[Address, SelectionPlacement[AnnotationId]],
     contract: CodexContract,
-    provenance: ViewProvenance
+    provenance: ViewProvenance,
+    draft: Option[DraftAbsenceLedger]
 ):
   def text(run: SourceRun): Either[DomainError, String] =
     CodexFlow
@@ -450,7 +537,8 @@ object CodexFlow:
       lanePolicy,
       contract,
       Map.empty,
-      provenance
+      provenance,
+      draft = None
     )
 
   private def compiled(
@@ -460,12 +548,14 @@ object CodexFlow:
       lanePolicy: LanePolicy,
       contract: CodexContract,
       ancestorsByTarget: Map[Address, Vector[Address]],
-      provenance: ViewProvenance
+      provenance: ViewProvenance,
+      draft: Option[DraftAbsenceLedger]
   ): Either[DomainError, CodexFlow] =
     val orderedRuns = runs.sortBy(_.span)
     val orderedAnnotations = annotations.sortBy(annotationSortKey)
     for
       _ <- validateProvenance(source, provenance)
+      _ <- validateDraft(provenance, draft, orderedAnnotations)
       _ <- validateRuns(source.canonicalText, orderedRuns)
       _ <- validateAnnotations(source.canonicalText, orderedAnnotations)
       _ <- validateContract(orderedAnnotations, lanePolicy, contract)
@@ -483,7 +573,8 @@ object CodexFlow:
       navigation,
       placements,
       contract,
-      provenance
+      provenance,
+      draft.map(ledger => ledger.copy(marked = ledger.marked.sorted))
     )
 
   def exact(
@@ -519,7 +610,8 @@ object CodexFlow:
       lanePolicy: LanePolicy,
       contract: CodexContract,
       ancestorsByTarget: Map[Address, Vector[Address]],
-      provenance: ViewProvenance
+      provenance: ViewProvenance,
+      draft: Option[DraftAbsenceLedger] = None
   ): Either[DomainError, CodexFlow] =
     for
       span <- TextSpan.of(0, source.canonicalText.length)
@@ -531,7 +623,8 @@ object CodexFlow:
         lanePolicy,
         contract,
         ancestorsByTarget,
-        provenance
+        provenance,
+        draft
       )
     yield flow
 
@@ -559,6 +652,39 @@ object CodexFlow:
           s"${provenance.sourceChecksum.hex} does not match ${source.canonicalChecksum.hex}"
         )
       )
+
+  /** A draft flow discloses every absence it carries; no other flow may carry one at all. */
+  private def validateDraft(
+      provenance: ViewProvenance,
+      draft: Option[DraftAbsenceLedger],
+      annotations: Vector[TextAnnotation]
+  ): Either[DomainError, Unit] =
+    val marks = annotations.filter(_.absence.isDefined).map(_.id).sorted
+    if draft.isDefined != (provenance.basis == ViewBasis.DraftBuild) then
+      Left(
+        DomainError.InvariantViolation(
+          "view/codex/draft/basis",
+          s"an absence ledger and ${ViewBasis.DraftBuild.label} accompany each other; " +
+            s"${provenance.basis.label} was given ${if draft.isDefined then "one" else "none"}"
+        )
+      )
+    else
+      draft match
+        case None if marks.nonEmpty =>
+          Left(
+            DomainError.InvariantViolation(
+              "view/codex/draft/absence-annotations",
+              s"${marks.size} absence annotations under ${provenance.basis.label}"
+            )
+          )
+        case Some(ledger) if ledger.marked.sorted != marks =>
+          Left(
+            DomainError.InvariantViolation(
+              "view/codex/draft/ledger",
+              s"the ledger marks ${ledger.marked.size} absences and the flow carries ${marks.size}"
+            )
+          )
+        case _ => Right(())
 
   private def validateContract(
       annotations: Vector[TextAnnotation],
@@ -682,6 +808,7 @@ object CodexTextualTwin:
     out.append("Narrative Codex\n")
     out.append("Story: ").append(flow.source.title.getOrElse(flow.source.id.value)).append('\n')
     out.append("Basis: ").append(flow.provenance.basis.label).append('\n')
+    renderPromotion(flow, out)
     out.append("Source checksum: ").append(flow.provenance.sourceChecksum.hex).append('\n')
     out
       .append("Model receipt checksum: ")
@@ -744,7 +871,55 @@ object CodexTextualTwin:
     out.append("Annotations\n")
     if flow.annotations.isEmpty then out.append("(none)\n")
     else flow.annotations.foreach(annotation => renderAnnotation(annotation, flow.lanes, out))
+    renderUnplaced(flow, out)
     out.result()
+
+  /** The promotion block a draft carries, word for word the one the Atlas twin prints. */
+  private def renderPromotion(flow: CodexFlow, out: StringBuilder): Unit =
+    flow.provenance.draft.foreach { promotion =>
+      out.append("Draft promotion\n")
+      out
+        .append("  promotable: ")
+        .append(promotion.promoted)
+        .append("; derivation gaps: ")
+        .append(promotion.gapCount.fold("record not supplied")(_.toString))
+        .append("; violations: ")
+        .append(promotion.violationCount)
+        .append('\n')
+      if promotion.unsatisfiedLaws.isEmpty then out.append("  unsatisfied laws: (none)\n")
+      else
+        out.append("  unsatisfied laws\n")
+        promotion.unsatisfiedLaws.foreach(law =>
+          out
+            .append("  - ")
+            .append(law.law)
+            .append(' ')
+            .append(law.severity)
+            .append(" x")
+            .append(law.count.value)
+            .append('\n')
+        )
+    }
+
+  /** The absences that concern no words, listed so the twin accounts for every one the draft has. */
+  private def renderUnplaced(flow: CodexFlow, out: StringBuilder): Unit =
+    flow.draft.foreach { ledger =>
+      out.append("\nUnplaced absences\n")
+      if ledger.unplaced.isEmpty then out.append("(none)\n")
+      else
+        ledger.unplaced.foreach { entry =>
+          out
+            .append("- ")
+            .append(entry.subject.render)
+            .append(' ')
+            .append(entry.absence.render)
+            .append(" channel=")
+            .append(entry.absence.channel)
+            .append(" at=unplaced:")
+            .append(entry.reason.render)
+            .append('\n')
+        }
+    }
 
   private def renderFeatureSelection(state: FeatureChannelState): String =
     state.selectedFeature.fold("none")(_.canonicalString)
@@ -774,6 +949,16 @@ object CodexTextualTwin:
       .append(" lane=")
       .append(renderLane(lanes.slotOf(annotation.id)))
       .append('\n')
+    annotation.absence.foreach { absence =>
+      out
+        .append("  absence=")
+        .append(absence.render)
+        .append(" state=")
+        .append(absence.uncertainty.fold("-")(_.toString))
+        .append(" channel=")
+        .append(absence.channel)
+        .append('\n')
+    }
     out
       .append("  upstream=")
       .append(annotation.audit.upstream.map(_.render).mkString(","))
