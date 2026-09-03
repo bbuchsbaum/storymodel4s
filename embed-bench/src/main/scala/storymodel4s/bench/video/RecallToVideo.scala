@@ -344,10 +344,24 @@ object RecallToVideo:
       outPath: Path
   ): Unit =
     val t0 = System.nanoTime()
-    val transcript = StorySource
-      .fromText(RecallWordsCsv.transcriptText(words), Some(transcriptLabel))
+    // The shuffle control. With a seed set, the recall's sentences are permuted before segmentation
+    // and the run measures how much ordering the pipeline produces from a scrambled transcript.
+    // Whatever survives was the prior talking, not the recall.
+    val rawTranscript = RecallWordsCsv.transcriptText(words)
+    val shuffleSeed = sys.env.get("STORYMODEL4S_SHUFFLE_RECALL").flatMap(_.trim.toLongOption)
+    def sourceOf(text: String) = StorySource
+      .fromText(text, Some(transcriptLabel))
       .fold(e => throw new IllegalArgumentException(e.message), identity)
-    val recall = RecallSegmenter.segment(transcript)
+    val transcript = sourceOf(rawTranscript)
+    // Under the control the transcript is segmented once, its units permuted, and the result
+    // re-segmented, because the units are what the aligner anchors and what the report's rows are.
+    val recall = shuffleSeed match
+      case None       => RecallSegmenter.segment(transcript)
+      case Some(seed) =>
+        val asRecalled = RecallSegmenter.segment(transcript)
+        RecallSegmenter.segment(
+          sourceOf(RecallOrderControl.shuffleUnits(asRecalled.ordered.map(_.text), seed))
+        )
 
     // Semantic channel selection is stated, never inferred: with both artifact variables set the
     // pinned MiniLM encoder runs (checksums verified at open) and the summary prints its
@@ -423,8 +437,25 @@ object RecallToVideo:
     val candidates =
       CandidateGenerator(semantic, perLevel = perLevel, lexicalOverlap = lexicalOverlap)
         .generate(recall.ordered, built.view)
+    // Strength of the ordering prior, over weights the transition model still marks provisional.
+    //
+    // 1.5 rather than the shipped 1.0, chosen on development against cross-participant agreement,
+    // which is the one outcome a merely more confident model cannot win: two people describing the
+    // same moment should be mapped to the same place in the film, and the pairing is computed from
+    // recall text alone so no setting can change which units are compared. Agreement traces an
+    // inverted U with its peak here, median gap 85.5s against 99.0s at 1.0 and 132.0s unblended,
+    // and it is *worse than doing nothing* by scale 8. Concentration and localizability meanwhile
+    // rise monotonically all the way out, which is precisely why they could not be trusted to
+    // choose this: they measure how peaked the posterior is, not whether it is right.
+    //
+    // Honest status: development-only. The untouched participants were already spent confirming the
+    // lexical blend, so this value has not been checked out of sample, and the sign test that most
+    // resists confidence is suggestive rather than significant (116 pairs closer, 95 farther).
+    val priorScale =
+      sys.env.get("STORYMODEL4S_PRIOR_SCALE").flatMap(_.trim.toDoubleOption).filter(_ >= 0.0)
+    val hsmmConfig = RecallOrderControl.scaledConfig(priorScale.getOrElse(1.5))
     val result = GraphHsmm
-      .infer(recall, built.view, candidates, DefaultLocalCostModel(semantic = semantic))
+      .infer(recall, built.view, candidates, DefaultLocalCostModel(semantic = semantic), hsmmConfig)
       .fold(e => throw new IllegalStateException(e.message), identity)
     embedderToClose.foreach(_.close())
     val signature = RecallSignature
@@ -521,6 +552,8 @@ object RecallToVideo:
     val groupCount = built.view.nodes.size - leafCount
     println(s"semantic channel: $channelLabel")
     println(s"candidate policy: perLevel=$perLevel lexicalOverlap=$lexicalOverlap")
+    println(s"recall order: ${shuffleSeed.fold("as recalled")(s => s"shuffled seed=$s")}")
+    println(s"ordering prior scale: ${priorScale.getOrElse(1.0)}")
     println(s"source segments: $leafCount; groups: $groupCount")
     println(s"recall words: ${words.size}; recall units: ${recall.ordered.size}")
     println(s"sparse candidates: ${candidates.totalSize}")

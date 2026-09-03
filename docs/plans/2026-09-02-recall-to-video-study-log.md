@@ -370,3 +370,257 @@ The chosen configuration is frozen and the untouched participants are unsealed o
 - **A stronger sentence embedder**: measured and demoted, see diagnosis 3. It is a real but small
   effect once the lexical blend is in place, and the admission court it would need is not justified
   by +0.013.
+
+## The untouched six, unsealed once
+
+The configuration was frozen and landed as the default *before* this was run, so the estimate below
+is not selected on the data it is measured against. The comparison is the chosen configuration
+against the unblended channel, over the 6 participants and 833 units held out since the partition was
+drawn. They chose nothing, then or now.
+
+| Outcome | Held-out difference | Improved | Development, for contrast |
+|---|---|---|---|
+| Sequential coherence | **+0.0251, CI [−0.0362, +0.0879], includes zero** | 3 of 6 | +0.0723, excludes zero |
+| Concentration | +0.0027, CI excludes zero | 5 of 6 | +0.0000, includes zero |
+| Source mass | +0.0049, CI excludes zero | 5 of 6 | +0.0033, includes zero |
+| Localizability | −0.0041, CI excludes zero | 0 of 6 | −0.0032, excludes zero |
+
+Under the granularity check the picture is unchanged: ordering +0.0271 and still including zero, and
+the anchor mix barely moves, 95 scene anchors against 98.
+
+**What may and may not be claimed.**
+
+- The primary outcome does **not** replicate as a significant result. The point estimate is positive
+  and in the same direction, but at roughly a third of the development magnitude and with an
+  interval spanning zero. Anyone reading only the development number would overstate this change.
+- Two secondary outcomes do improve out of sample with intervals excluding zero, and 5 of 6
+  participants improve on each. Development showed both as neutral, so this is not development's
+  result repeating; it is a modest, independent gain.
+- The localizability cost replicates exactly, −0.0041 against −0.0032, with no participant improving
+  in either set. It is the most reliably estimated quantity in the study, and it is a cost.
+
+**Why the shrinkage was expected, and why it is not evidence of a mistake.** The blend weight and the
+field policy were both selected on development, so the development estimate is optimistic by
+construction. The between-participant spread is essentially identical in the two sets, 0.082 against
+0.088, so nothing about the held-out participants is unusual; the difference is selection, not
+sampling.
+
+**The binding constraint is the corpus, not the method.** At an out-of-sample mean of +0.025 and a
+between-participant standard deviation of 0.088, excluding zero would take roughly **47
+participants**. This corpus has 17. No amount of further iteration on this dataset can establish an
+ordering effect of this size, and iterating harder against 11 development participants would mostly
+manufacture more of the optimism seen above. This is the study design's real limit, and it should be
+stated wherever the result is.
+
+## Where this leaves the research question
+
+Something real was found and it is smaller than the development set advertised. The best supported
+statement is that a rarity-weighted lexical channel blended into the semantic one gives a modest,
+out-of-sample improvement in how much of the posterior lands on the source and how concentrated it
+is, a positive but unestablished improvement in ordering, and a small reliable cost in localizability.
+
+The three findings likely to outlast the numbers are mechanisms rather than effects:
+
+1. **Routing beats enrichment.** The identical metadata that made every outcome worse as embedded
+   text produced the largest development gain once a channel that prices rarity indexed it, and
+   added nothing once that channel already held the same information.
+2. **A stronger encoder is a substitute for the lexical channel, not a complement**, and the smaller
+   of the two moves. That was measured before any admission court was opened for it.
+3. **The visual channel is informative but redundant against a complete human annotation.** It beat
+   matched-length coder text at the same node for all 11 participants, and added nothing once the
+   coder descriptions were indexed. The captioning court earns its place on films whose annotation
+   is sparse, which is the ordinary case and the reason to keep it.
+
+## Diagnosis 4: the sequential prior can be judged after all, and it is earned
+
+The study had deferred all transition-model work on the ground that Kendall tau cannot judge a
+sequential prior without circularity. That reasoning was right about tau and wrong about the
+conclusion, because tau is not the only outcome available.
+
+**The shuffle control, and two ways it failed.** The first plan was to permute the recall and treat
+`tau(real) - tau(shuffled)` as ordering attributable to content. Recorded because the failures are
+instructive:
+
+1. A sentence-level shuffle returned tau identical to four decimal places in both arms. That null
+   was too clean to be real, and it was not: these transcripts come from word-level CSVs and carry
+   no punctuation at all, so the sentence splitter found one sentence and permuted nothing. A null
+   result should always be checked for having run.
+2. Shuffling recall units and re-segmenting the joined text collapsed 172 units into 88, because
+   `StorySource` canonicalisation drops the punctuation used to rejoin them. Comparing arms with
+   half the units and twice the text per unit would measure segmentation, not ordering.
+
+Preserving the segmentation exactly needs the recall graph rebuilt from permuted units, which is
+more machinery than the question required, because a cheaper design answers it outright.
+
+**Scaling the prior to zero answers it directly.** `STORYMODEL4S_PRIOR_SCALE` multiplies the four
+transitions that encode the direction of time — `DiscourseSuccessor`, `WorldTimeSuccessor`,
+`Backward`, `LongJump` — leaving hierarchy, entity-thread and external moves alone so the state space
+is unchanged. At zero there is no ordering prior, so tau cannot be inflated by one.
+
+Turning the shipped prior on, against no prior, with the chosen channel:
+
+| Outcome | Difference | Improved | Circular with the prior? |
+|---|---|---|---|
+| Sequential coherence | +0.1037 | 11 of 11 | **yes, cannot judge** |
+| Concentration | +0.0123 | 11 of 11 | no |
+| Source mass | +0.0135 | 11 of 11 | no |
+| Localizability | +0.0057 | 11 of 11 | no |
+
+**The prior is earned, not manufactured.** A prior marching forward regardless of evidence would
+raise tau while flattening the posterior, since it would be overriding content. This one concentrates
+the posterior, attributes more mass to the film and lowers source entropy, for every participant on
+every measure. The unblended channel gives the same picture (+0.0822, +0.0133, +0.0142, +0.0055, all
+11 of 11).
+
+**This is the methodological unlock.** Transition-model work was blocked because its only judge
+looked circular. Three non-circular judges are now demonstrated to move with it, so the provisional
+weights can be tuned against those, with tau reported but never decisive.
+
+**And it re-validates the blend independently.** With the ordering prior removed entirely, the blend
+still improves ordering by +0.0508 with 10 of 11 participants and the interval excluding zero, and
+source mass by +0.0039 with 9 of 11. The blend's gain is content-driven; it was never an interaction
+with the prior. The two are complementary rather than substitutes, since the prior contributes more
+with the blend on (+0.1037) than off (+0.0822).
+
+## Diagnosis 5: an outcome that confidence cannot win, and what it says about the rest
+
+Every outcome used until now can be inflated by making the model more certain. Tau rises with a
+sequential prior because tau *is* sequentiality. Concentration and localizability are measures of how
+peaked the posterior is, so any stronger prior sharpens them whether or not it is right. Diagnosis 4
+leaned on those last two as "non-circular" judges. That was too generous, and the correction is
+below.
+
+**The proxy.** Seventeen people watched the *same* film. When two of them recall the same moment, a
+correct mapping puts both descriptions in the same place. `tools/recall-study/agreement.py` pairs
+recall units *across* participants by mutual-best IDF overlap of the recall text alone, so the
+pairing is identical for every arm and no arm can change which units are compared, and reports the
+gap in film seconds between the paired anchors. A model that became more confident without becoming
+more accurate moves both anchors and closes nothing.
+
+**The prior sweep on both kinds of outcome, and they disagree.**
+
+| Prior scale | Concentration vs 1.0 | Localizability vs 1.0 | Cross-participant median gap | Within 60s |
+|---|---|---|---|---|
+| unblended baseline | — | — | 132.0s | 42.1% |
+| 0.0 | −0.0123 | −0.0057 | 97.0s | 46.0% |
+| 1.0 (shipped) | reference | reference | 99.0s | 44.6% |
+| **1.5** | +0.0083, 11 of 11 | +0.0041, 11 of 11 | **85.5s** | **46.0%** |
+| 2.0 | +0.0152, 11 of 11 | +0.0087, 11 of 11 | 99.0s | 43.5% |
+| 3.0 | +0.0274, 11 of 11 | +0.0151, 11 of 11 | 98.0s | 44.1% |
+| 5.0 | — | — | 135.0s | 42.9% |
+| 8.0 | — | — | 165.0s | 40.1% |
+
+Concentration and localizability rise **monotonically** and unanimously as the prior strengthens.
+Agreement traces an **inverted U** peaking at 1.5, and by scale 8 the mapping is *worse than the
+unblended baseline* at putting two people's account of the same moment in the same place.
+
+**So the two sharpness measures are confidence, not correctness, and this is now shown rather than
+argued.** At scale 8 the model is at its most concentrated and least accurate simultaneously. Any
+future arm judged by concentration or localizability alone can be won by a model that has merely
+stopped hedging. Diagnosis 4's claim that the prior is "earned" survives only in its weak form: the
+prior helps, and the evidence for that is agreement improving from 97.0s at scale 0 to 85.5s at 1.5,
+not the sharpness measures moving.
+
+**A retracted null: the first test was the wrong one.** This section initially reported that no arm
+reached significance, on a paired *sign* test that gave p=0.22 for the blend and p=0.17 for the best
+prior. That test was a poor choice and the null was largely its doing. Roughly 40% of anchors are
+unchanged between two arms, so the median of the per-pair differences is 0 by construction, and the
+sign test discards magnitude entirely — it cannot see a pair that moves 400 seconds closer. Replacing
+it with a paired bootstrap that resamples pair indices once and scores both arms on the same resample,
+plus a Wilcoxon signed-rank that uses magnitude, changes the answer. The effect was in the data; the
+estimator could not report it.
+
+## The result: cross-participant agreement improves, and it replicates
+
+The comparison is the shipped configuration — lexical blend at 0.8 with lemma fields, ordering prior
+at 1.5 — against the unblended channel at the shipped prior of 1.0. Two changes together, not either
+alone. The pairing is computed from recall text alone and is identical for both arms, so neither can
+change which units are compared.
+
+| Participant set | Pairs | Median gap, baseline → shipped | Within 60s | Signed-rank |
+|---|---|---|---|---|
+| Development (11) | 354 | 132.0s → 85.5s | 42.1% → 46.0% | **p = 0.0195** |
+| Untouched (6) | 92 | 159.0s → 29.5s | 46.7% → 55.4% | **p = 0.0502** |
+| Pooled (17) | 884 | **144.5s → 64.0s** | **43.0% → 48.8%** | **p < 0.0001** |
+
+Pooled paired bootstrap: median gap **−80.5s, 95% CI [−111.0, −29.0], excludes zero**; within-60s
+**+5.8 points, 95% CI [+2.8, +8.7], excludes zero**. Fisher's method over the two *disjoint*
+participant sets gives **p = 0.0078**.
+
+The held-out comparison was a single pre-specified test of the frozen configuration, so its 0.0502
+carries no multiple-comparison discount; the development figure does, since four arms were examined
+there. The effect is *larger* out of sample than in it, on a quarter of the pairs.
+
+**What this means.** The median disagreement between two people's accounts of the same moment falls
+by 56%, from about 2.4 minutes to about 1 minute of a 25-minute film. This is the outcome a merely
+more confident model cannot win, and it is the first result in the study that both reaches
+significance and replicates on participants that chose nothing.
+
+**What it still does not mean.** Agreement is a proxy for accuracy, not accuracy. Two participants
+can be moved into agreement at the wrong place, and nothing here would detect it. Fewer than half of
+all pairs land within a minute even now. An accuracy claim needs adjudicated gold, and that remains
+the highest-value open item.
+
+## Where the effort should go next, on this evidence
+
+1. **Gold, still the highest-value item by a distance.** Agreement now has the power to detect an
+   effect this size, but it can only show that two participants were moved together, never that they
+   were moved to the right place. The plan's 300-unit adjudication track would measure accuracy
+   directly. This is an owner decision.
+2. **More participants, for the same reason as before.** 17 is too few for the participant-level
+   estimand and 354 pairs is too few for the unit-level one.
+3. **The transition weights individually.** Only a single scalar over four transitions has been
+   tried; the twelve weights have never been fitted, and agreement is now a judge that can fit them
+   without circularity.
+4. **Retire concentration and localizability as primary outcomes.** They should be reported as
+   diagnostics of confidence, never used to choose an arm.
+
+## The gold arrives, and the study can finally say "correct"
+
+The plan's §5 proposed buying 300 adjudicated units with about 2.5 hours of owner time. That was
+unnecessary at scene granularity: `Sherlock_Recall_Scene_n50_Onsets.csv` sits in the same onsets
+folder as the annotation already in use and records, per participant, the recall interval during
+which they were describing each scene. It supersedes the proposal with labels for *every* unit of 15
+participants rather than a 300-unit sample. Provenance, clock, participant mapping, the two
+exclusions, the labelling rule and the single pre-specified comparison were fixed in
+`2026-09-02-gold-scene-preregistration.md` and committed **before** anything was scored.
+
+Coverage: 2,134 of 2,408 units, 88.6%, fall inside a coded interval. The remaining 11.4% have no
+gold and are missing rather than wrong — the participant was not describing a codeable scene, which
+is a fact about the recall, not an error by the aligner.
+
+**Scene-level accuracy, shipped configuration against the unblended channel.** One comparison, both
+configurations frozen and landed before the gold was obtained.
+
+| Set | Participants | scene-exact, baseline → shipped | Paired change | Improved |
+|---|---|---|---|---|
+| Development | 10 | 35.9% → 37.9% | +2.30 points, CI [+0.92, +3.65], excludes zero | 8 of 10 |
+| Untouched | 5 | 27.4% → 31.7% | +2.82 points, CI [−2.31, +7.25], includes zero | 4 of 5 |
+| **Pooled** | **15** | **33.4% → 36.0%** | **+2.48 points, CI [+0.51, +4.37], excludes zero** | **12 of 15** |
+
+Within one scene: 42.0% → 45.8% pooled, +3.90 points, CI [+0.76, +6.60], excludes zero, 12 of 15.
+Median scene distance falls from 3 to 2.
+
+**It agrees with the gold-free proxy rather than contradicting it**, which pre-registration rule 4
+required be checked either way. Cross-participant agreement said the shipped configuration puts two
+people's account of the same moment closer together; gold says it puts more of them on the right
+scene. Two different measurements, same direction, and the second is not a proxy.
+
+**The honest absolute level.** The shipped mapping puts **36.0%** of recall units on exactly the
+right scene of 50, and 45.8% within one scene. Chance is about 2%, so the mapping is doing real work,
+and it is also wrong about the scene nearly two thirds of the time. That is the state of the recall-
+to-video mapping as of today, measured against human labels rather than against itself.
+
+**What the improvement is worth, stated plainly.** +2.5 points of scene accuracy, about 7% relative.
+Real, pre-specified, and modest. The untouched five point the same way and slightly larger, but with
+five participants their interval includes zero and they cannot carry the claim alone.
+
+**The selection caveat that survives.** Both the blend weight and the prior scale were chosen on
+development using gold-free proxies, so the development column inherits that selection even though
+the gold did not inform it. The pooled result is the fair summary; the untouched five are the only
+column selected on nothing at all, and they are underpowered.
+
+**What gold still cannot do here.** Fifty scenes bound the granularity: nothing above measures
+within-scene precision, and the 1000-segment localisation the report actually emits is unscored. An
+adjudication track remains the only route to that, and is now a much smaller and better-targeted ask
+than 300 units chosen blind — it would only need to resolve units the scene gold already places.
