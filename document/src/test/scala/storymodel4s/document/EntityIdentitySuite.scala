@@ -5,7 +5,7 @@ import munit.FunSuite
 import storymodel4s.core.*
 import storymodel4s.core.NarrativeKind.EntityK
 import storymodel4s.proposition.*
-import storymodel4s.story.EntityType
+import storymodel4s.story.{EntityType, HolderGap}
 
 /** Entity identity by referring form (ADR 0012): introducing mentions cluster by exact label, a
   * pronoun resolves only to a unique compatible antecedent, and everything else is open with its
@@ -39,10 +39,13 @@ class EntityIdentitySuite extends FunSuite:
       .check(PropositionChart.unchecked(Some(p), concepts, rels))
       .fold(v => fail(v.mkString(",")), identity)
 
-  /** One mention per sentence, in the given order; labels are the lemmas. */
+  /** One mention per sentence, in the given order; labels are the lemmas. `holders` gives, per
+    * mention index, the indices of the mentions offered as holder of the frame it sits in.
+    */
   private def resolve(
       lemmas: Vector[(String, Option[Int])],
-      order: Vector[Int] = Vector.empty
+      order: Vector[Int] = Vector.empty,
+      holders: Map[Int, Vector[Int]] = Map.empty
   ): EntityIdentityResult =
     val charts = lemmas.zipWithIndex.map { case ((l, q), i) => sentence(i) -> chart(l, q) }
     val graph = MentionGraph.of(charts).fold(e => fail(e.message), identity)
@@ -59,7 +62,13 @@ class EntityIdentitySuite extends FunSuite:
         forms,
         m => (lemmas(m.value.drop(1).toInt)._1, custom),
         ref =>
-          graph.chart(ref.sentence).map(ChartNumber.of(_, ref.concept)).getOrElse(Number.Unknown)
+          graph.chart(ref.sentence).map(ChartNumber.of(_, ref.concept)).getOrElse(Number.Unknown),
+        m =>
+          holders.get(m.value.drop(1).toInt).map { is =>
+            NonEmptyVector
+              .fromVector(is.map(i => entries(i)._2))
+              .fold(HolderCandidate.Missing(HolderGap.NoCandidate))(HolderCandidate.Fillers.apply)
+          }
       )
       .fold(e => fail(e.message), identity)
 
@@ -121,21 +130,85 @@ class EntityIdentitySuite extends FunSuite:
       case _                                                         => false)
   }
 
-  test("first- and second-person pronouns are open until a speech holder rule reads them") {
+  test("first- and second-person pronouns in no held frame are open as outside speech") {
     val r = resolve(Vector(n("man"), n("I"), n("you"), n("we")))
+    assertEquals(
+      r.identities(mid(1)),
+      MentionIdentity.Open(OpenReference.OutsideSpeech(Person.First), Vector.empty)
+    )
+    assertEquals(
+      r.identities(mid(2)),
+      MentionIdentity.Open(OpenReference.OutsideSpeech(Person.Second), Vector.empty)
+    )
+    assertEquals(
+      r.identities(mid(3)),
+      MentionIdentity.Open(OpenReference.OutsideSpeech(Person.First), Vector.empty)
+    )
+    assertEquals(r.clusters.map(_.members.length), Vector(1))
+  }
+
+  test("a first-person singular pronoun names the holder of its frame and joins that cluster") {
+    val r = resolve(Vector(n("man"), n("I")), holders = Map(1 -> Vector(0)))
+    assertEquals(r.identities(mid(1)), MentionIdentity.Resolved(EntityIdentity.SpeechHolderRule))
+    assertEquals(r.clusters.map(_.members.toVector), Vector(Vector(mid(0), mid(1))))
+  }
+
+  test("a first-person plural is a group that includes the holder: open, holder as candidate") {
+    val r = resolve(Vector(n("man"), n("we")), holders = Map(1 -> Vector(0)))
+    assertEquals(
+      r.identities(mid(1)),
+      MentionIdentity.Open(OpenReference.SpeakerGroup, Vector(mid(0)))
+    )
+    assertEquals(r.clusters.map(_.members.length), Vector(1))
+  }
+
+  test("a second-person pronoun is the addressee the model does not represent: open") {
+    val r = resolve(Vector(n("man"), n("you")), holders = Map(1 -> Vector(0)))
+    assertEquals(
+      r.identities(mid(1)),
+      MentionIdentity.Open(OpenReference.NeedsAddressee, Vector(mid(0)))
+    )
+    assertEquals(r.clusters.map(_.members.length), Vector(1))
+  }
+
+  /** The holder is read after third-person pronouns resolve, so "the man ... he said: 'I ...'"
+    * carries the man through "he" to "I"; a holder that is itself open carries nothing.
+    */
+  test("a holder that is a resolved pronoun carries its antecedent; an open holder carries none") {
+    val through = resolve(Vector(n("man"), n("he"), n("I")), holders = Map(2 -> Vector(1)))
+    assertEquals(
+      through.identities(mid(2)),
+      MentionIdentity.Resolved(EntityIdentity.SpeechHolderRule)
+    )
+    assertEquals(through.clusters.map(_.members.toVector), Vector(Vector(mid(0), mid(1), mid(2))))
+    val open = resolve(
+      Vector(n("man"), n("woman"), n("he"), n("I")),
+      holders = Map(3 -> Vector(2))
+    )
+    assertEquals(
+      open.identities(mid(3)),
+      MentionIdentity.Open(OpenReference.NeedsSpeechHolder(Person.First), Vector.empty)
+    )
+    assertEquals(open.clusters.map(_.members.length), Vector(1, 1))
+  }
+
+  test(
+    "a held frame whose holder is a gap leaves the pronoun needing a speech holder, not outside"
+  ) {
+    val r = resolve(Vector(n("man"), n("I")), holders = Map(1 -> Vector.empty))
     assertEquals(
       r.identities(mid(1)),
       MentionIdentity.Open(OpenReference.NeedsSpeechHolder(Person.First), Vector.empty)
     )
+  }
+
+  test("holder nodes in two clusters name no one holder: open, needing a speech holder") {
+    val r = resolve(Vector(n("man"), n("woman"), n("I")), holders = Map(2 -> Vector(0, 1)))
     assertEquals(
       r.identities(mid(2)),
-      MentionIdentity.Open(OpenReference.NeedsSpeechHolder(Person.Second), Vector.empty)
-    )
-    assertEquals(
-      r.identities(mid(3)),
       MentionIdentity.Open(OpenReference.NeedsSpeechHolder(Person.First), Vector.empty)
     )
-    assertEquals(r.clusters.map(_.members.length), Vector(1))
+    assertEquals(r.clusters.map(_.members.length), Vector(1, 1))
   }
 
   /** The mention graph sorts sentences by id, and `s10` sorts before `s2`. Discourse rank must come

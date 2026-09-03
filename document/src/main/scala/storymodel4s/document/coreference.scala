@@ -36,21 +36,35 @@ object ChartNumber:
   def compatible(a: Number, b: Number): Boolean =
     a == Number.Unknown || b == Number.Unknown || a == b
 
-/** Why a non-introducing mention names no entity. Four states that must not share a mark: no
-  * referent precedes the pronoun; several do and nothing in the text chooses; the pronoun is first
-  * or second person, whose referent is the speaker or addressee of a speech frame rather than any
-  * antecedent; the mention's form is not one the rule reads.
+/** Why a non-introducing mention names no entity. Seven states that must not share a mark:
+  *
+  *   - no referent precedes a third-person pronoun; several do and nothing in the text chooses;
+  *   - a first- or second-person pronoun sits in a held frame (speech, belief, desire, intention,
+  *     memory, imagination) whose holder the entity layer could not name as one cluster;
+  *   - a first-person plural pronoun sits in a frame whose holder is named: its referent is a group
+  *     that includes the holder, which is neither the holder nor any single entity;
+  *   - a second-person pronoun sits in a frame whose holder is named: its referent is the
+  *     addressee, whom the model does not represent;
+  *   - a first- or second-person pronoun sits in no held frame at all (a narrator's "I", a reader's
+  *     "you"), which is a fact about the discourse the model has no vocabulary for;
+  *   - the mention's form is not one the rule reads.
   */
 enum OpenReference:
   case NoAntecedent
   case SeveralAntecedents
   case NeedsSpeechHolder(person: Person)
+  case SpeakerGroup
+  case NeedsAddressee
+  case OutsideSpeech(person: Person)
   case UnrecognizedForm(label: String)
 
   def render: String = this match
     case NoAntecedent            => "no-antecedent"
     case SeveralAntecedents      => "several-antecedents"
     case NeedsSpeechHolder(p)    => s"needs-speech-holder:${MentionForm.lower(p.toString)}"
+    case SpeakerGroup            => "speaker-group"
+    case NeedsAddressee          => "needs-addressee"
+    case OutsideSpeech(p)        => s"outside-speech:${MentionForm.lower(p.toString)}"
     case UnrecognizedForm(label) => s"unrecognized-form:$label"
 
 /** What the identity rule decided about one mention. */
@@ -106,9 +120,15 @@ final class EntityIdentityResult private[document] (
   *     it is open with those candidates recorded as a set. Choosing the nearest would be an
   *     inference with an error rate nobody has measured here, so the alternatives are recorded and
   *     none is accepted (design contract 3, 7);
-  *   - a **first- or second-person pronoun** refers to the speaker or addressee of the speech frame
-  *     it sits in, which is a fact about the context and not about any antecedent; it is open until
-  *     a rule reads the holder;
+  *   - a **first-person singular pronoun** refers to the holder of the innermost held frame it sits
+  *     in (the speaker of a quotation, the thinker of a belief), under `speech-holder/v1`, when the
+  *     frame's offered holder nodes all lie in exactly one cluster of the first pass (introducing
+  *     mentions and resolved third-person pronouns); a first-person plural refers to a group that
+  *     includes the holder and is open as `SpeakerGroup` with the holder recorded as its candidate;
+  *     a second-person pronoun refers to the addressee, whom the model does not represent, and is
+  *     open as `NeedsAddressee` with the holder as candidate; either person in a frame whose holder
+  *     is not one cluster is open as `NeedsSpeechHolder`, and in no held frame at all as
+  *     `OutsideSpeech`;
   *   - any other form is open as unrecognized.
   *
   * An open mention mints no entity. That is the truthful consequence: a participant edge whose
@@ -118,13 +138,21 @@ final class EntityIdentityResult private[document] (
 object EntityIdentity:
   val IntroducingLabelRule: RuleId = RuleId.unsafe("introducing-label/v1")
   val UniqueAntecedentRule: RuleId = RuleId.unsafe("pronoun-unique-antecedent/v1")
+  val SpeechHolderRule: RuleId = RuleId.unsafe("speech-holder/v1")
 
+  /** `holderOf` gives, for a mention, the holder candidate of the innermost held frame the
+    * mention's situation sits in (the chart nodes offered as its holder, or the gap that says why
+    * none was), or nothing when that situation is in no held frame. The compiler reads it off the
+    * accepted context placements; a caller without contexts passes nothing, and every first- or
+    * second-person pronoun is then `OutsideSpeech`.
+    */
   def resolve(
       story: StoryId,
       table: MentionTable[EntityK],
       forms: MentionForms,
       labelOf: MentionId[EntityK] => (String, EntityType),
-      numberOf: ChartNodeRef => Number
+      numberOf: ChartNodeRef => Number,
+      holderOf: MentionId[EntityK] => Option[HolderCandidate] = _ => None
   ): Either[DocumentError, EntityIdentityResult] =
     val introducing = forms.introducingMentions
     val groups: Vector[Vector[MentionId[EntityK]]] = introducing
@@ -152,11 +180,45 @@ object EntityIdentity:
       cs <- clusters
       partition <- CorefPartition.of(story, cs)
     yield
-      val byCanonical = cs.map(c => c.canonical -> c).toMap
       val groupOf: Map[CanonicalId[EntityK], Vector[MentionId[EntityK]]] =
         groups.map(g => partition.canonical(g.head) -> g).toMap
       def numberOfCluster(canonical: CanonicalId[EntityK]): Number =
         groupOf(canonical).headOption.flatMap(table.node).map(numberOf).getOrElse(Number.Unknown)
+      val mentionAt: Map[ChartNodeRef, MentionId[EntityK]] =
+        table.mentions.flatMap(m => table.node(m).map(_ -> m)).toMap
+      // Pass one: introducing mentions and third-person pronouns, which need no holder. A
+      // third-person pronoun with exactly one number-compatible preceding cluster names it.
+      def antecedentOf(m: MentionId[EntityK], number: Number): Option[CanonicalId[EntityK]] =
+        forms
+          .resolvableAt(m, partition)
+          .filter(c => ChartNumber.compatible(number, numberOfCluster(c))) match
+          case Vector(one) => Some(one)
+          case _           => None
+      val passOne: Map[MentionId[EntityK], CanonicalId[EntityK]] = forms.mentions.flatMap { m =>
+        forms.formOf(m) match
+          case Some(f) if f.isIntroducing => Some(m -> partition.canonical(m))
+          case Some(MentionForm.Pronominal(Person.Third, number)) =>
+            antecedentOf(m, number).map(m -> _)
+          case _ => None
+      }.toMap
+      // Pass two reads holders off pass one, so a speaker that is itself a resolved pronoun ("he
+      // said") still names the frame's holder. The holder is one cluster or it is nothing.
+      def holderClusterOf(m: MentionId[EntityK]): Either[OpenReference, CanonicalId[EntityK]] =
+        holderOf(m) match
+          case None                             => Left(OpenReference.OutsideSpeech(personOf(m)))
+          case Some(HolderCandidate.Missing(_)) =>
+            Left(OpenReference.NeedsSpeechHolder(personOf(m)))
+          case Some(HolderCandidate.Fillers(refs)) =>
+            val clusters = refs.toVector.map(ref => mentionAt.get(ref).flatMap(passOne.get))
+            if clusters.exists(_.isEmpty) then Left(OpenReference.NeedsSpeechHolder(personOf(m)))
+            else
+              clusters.flatten.distinct match
+                case Vector(one) => Right(one)
+                case _           => Left(OpenReference.NeedsSpeechHolder(personOf(m)))
+      def personOf(m: MentionId[EntityK]): Person =
+        forms.formOf(m) match
+          case Some(MentionForm.Pronominal(person, _)) => person
+          case _                                       => Person.Third
       val decisions: Map[MentionId[EntityK], MentionIdentity] = forms.mentions.map { m =>
         forms.formOf(m) match
           case Some(f) if f.isIntroducing => m -> MentionIdentity.Introducing
@@ -174,8 +236,18 @@ object EntityIdentity:
                   OpenReference.SeveralAntecedents,
                   several.map(c => groupOf(c).head).sorted
                 )
-          case Some(MentionForm.Pronominal(person, _)) =>
-            m -> MentionIdentity.Open(OpenReference.NeedsSpeechHolder(person), Vector.empty)
+          case Some(MentionForm.Pronominal(person, number)) =>
+            (person, number, holderClusterOf(m)) match
+              case (_, _, Left(reason)) => m -> MentionIdentity.Open(reason, Vector.empty)
+              case (Person.First, Number.Plural, Right(holder)) =>
+                m -> MentionIdentity.Open(OpenReference.SpeakerGroup, Vector(groupOf(holder).head))
+              case (Person.First, _, Right(_)) =>
+                m -> MentionIdentity.Resolved(SpeechHolderRule)
+              case (_, _, Right(holder)) =>
+                m -> MentionIdentity.Open(
+                  OpenReference.NeedsAddressee,
+                  Vector(groupOf(holder).head)
+                )
           case Some(MentionForm.Other(label)) =>
             m -> MentionIdentity.Open(OpenReference.UnrecognizedForm(label), Vector.empty)
           case Some(other) =>
@@ -183,22 +255,14 @@ object EntityIdentity:
           case None =>
             m -> MentionIdentity.Open(OpenReference.UnrecognizedForm("missing"), Vector.empty)
       }.toMap
-      // Attach each resolved pronoun to its one candidate's group.
+      // Attach each resolved pronoun to its one cluster: the unique antecedent, or the holder.
       val attached: Map[CanonicalId[EntityK], Vector[MentionId[EntityK]]] = forms.mentions
         .flatMap { m =>
           decisions(m) match
-            case MentionIdentity.Resolved(_) =>
-              forms
-                .formOf(m)
-                .collect { case MentionForm.Pronominal(_, number) =>
-                  forms
-                    .resolvableAt(m, partition)
-                    .filter(c => ChartNumber.compatible(number, numberOfCluster(c)))
-                    .headOption
-                    .map(_ -> m)
-                }
-                .flatten
-            case _ => None
+            case MentionIdentity.Resolved(rule) if rule == SpeechHolderRule =>
+              holderClusterOf(m).toOption.map(_ -> m)
+            case MentionIdentity.Resolved(_) => passOne.get(m).map(_ -> m)
+            case _                           => None
         }
         .groupMap(_._1)(_._2)
       val finalClusters = groups.map { g =>

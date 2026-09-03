@@ -160,8 +160,10 @@ Everything above §5 was true at `328021b2`. Four landings later the picture is:
 5. **No pronoun is an entity.** Identity is decided by referring form (ADR 0012): names and
    nominals cluster by exact label; a third-person pronoun resolves only to a unique
    number-compatible antecedent that precedes it, else it is an open reference with its
-   candidates recorded (22 with several candidates, 4 first- or second-person awaiting a
-   speech-holder rule, 0 resolved on this story); a holder offered an open pronoun is unresolved.
+   candidates recorded (22 with several candidates, 3 first-person under an open speaker, 1
+   addressee, 0 resolved on this story); a holder offered an open pronoun is unresolved. A
+   first-person singular under a named speaker is that speaker (`speech-holder/v1`, ADR 0012 §3);
+   "we" and "you" stay open as `SpeakerGroup` / `NeedsAddressee` with the speaker as candidate.
    Entities 29 → 23, participant edges 57 → 30. A flow step's turnover is `Missing(InputUnresolved)`
    where a cast holds an open pronoun (43 of 64 steps) instead of a number nobody measured.
 
@@ -195,9 +197,9 @@ its pin and gate). A record for another build is refused, never paired; no file 
 
 ### What I would do next, in order
 
-1. **Speech-holder resolution for first- and second-person pronouns** (`NeedsSpeechHolder`
-   marks every site): the holder of the speech frame a pronoun sits in is its referent, and the
-   frame's holder is often itself an open pronoun now, so this needs the chain closed carefully.
+1. ~~Speech-holder resolution for first- and second-person pronouns~~ Done (ADR 0012 §3). What
+   remains open on this story is the chain: the speaker is "they", and "they" is open. Closing
+   that is the calibrated antecedent policy of item 4, not another rule.
 2. **The viewer reads `features.json`** and draws Token/Sentence/Situation tracks (it already
    admits those targets; `FeatureChannelState.SidecarRequired` is the seam).
 3. **A summary rule that reads the story**, so a bare text can validate without a caller's title.

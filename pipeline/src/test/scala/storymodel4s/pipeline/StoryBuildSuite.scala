@@ -499,8 +499,10 @@ class StoryBuildSuite extends FunSuite:
         ("SegmentMembership", "unresolved:NoProposal") -> 1,
         ("SituationMention", "unresolved:NoProposal") -> 1,
         ("EntityCoreference", "open-reference:several-antecedents") -> 22,
+        // The three first-person sites sit under "They said", a speaker that is itself open;
+        // the one "you" sits under a named speaker and is the addressee (ADR 0012 §3).
         ("EntityCoreference", "open-reference:needs-speech-holder:first") -> 3,
-        ("EntityCoreference", "open-reference:needs-speech-holder:second") -> 1
+        ("EntityCoreference", "open-reference:needs-addressee") -> 1
       ) ++ rows(report, "gaps")
         .map(row => field(row, "family") -> field(row, "reason"))
         .filter((family, reason) =>

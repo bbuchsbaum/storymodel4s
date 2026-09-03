@@ -362,6 +362,9 @@ object CodecGens:
     Gen.const(OpenReference.NoAntecedent),
     Gen.const(OpenReference.SeveralAntecedents),
     Gen.oneOf(Person.values.toSeq).map(OpenReference.NeedsSpeechHolder.apply),
+    Gen.const(OpenReference.SpeakerGroup),
+    Gen.const(OpenReference.NeedsAddressee),
+    Gen.oneOf(Person.values.toSeq).map(OpenReference.OutsideSpeech.apply),
     ident.map(OpenReference.UnrecognizedForm.apply)
   )
 
