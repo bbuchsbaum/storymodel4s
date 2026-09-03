@@ -43,7 +43,8 @@ object MonotoneScene:
       case Some("off") | Some("false") => false
       case _                           => true
 
-  private def sceneOf(built: TimedSourceView.Built, ref: SourceNodeRef): Option[Int] =
+  /** The scene a node belongs to: a scene node is its own scene, a segment its parent's. */
+  def sceneOf(built: TimedSourceView.Built, ref: SourceNodeRef): Option[Int] =
     built.groupByRef
       .get(ref)
       .map(_.ordinal)
@@ -60,10 +61,50 @@ object MonotoneScene:
       rows: Vector[AlignmentRow]
   ): Vector[Option[SourceNodeRef]] = decide(built, rows).map(_.anchor)
 
-  /** The full decision per unit. `scene` is non-decreasing across the returned vector. */
+  /** Cost of stepping backwards a scene, in units of posterior mass. `None` forbids it outright.
+    *
+    * **This default is fitted to this corpus and should not travel unexamined.** Recall of a single
+    * linear television episode runs forwards: the human coding is 97.9% non-decreasing, and on
+    * development a permissive penalty of 0.05 cost 8.91 points of scene accuracy and helped none of
+    * the ten participants, while 0.15 and 0.40 were indistinguishable from forbidding backward
+    * steps outright. Forbidding them is therefore best-or-tied *here*, and knowingly wrong about
+    * the remaining 2.1%.
+    *
+    * A corpus with genuine reminiscence, a non-linear narrative, an interviewer prompting revisits,
+    * or recall of several stories at once would not look like this, and the constraint would then
+    * be doing real damage rather than 2.1% of it. That is why this stays a parameter with a sweep
+    * behind it rather than becoming a hard-coded property of recall: refit it per corpus, on
+    * development participants, before trusting it.
+    */
+  def backwardPenalty: Option[Double] =
+    sys.env.get("STORYMODEL4S_BACKWARD_PENALTY").map(_.trim.toLowerCase) match
+      case Some("hard") | None => None
+      case Some(raw)           => raw.toDoubleOption.filter(_ >= 0.0)
+
+  /** Whether an unbound unit may be filled from its assigned scene. On by default.
+    *
+    * Validated on development: scene accuracy 57.9% to 65.2%, +5.77 points with 8 of 10
+    * participants improving, and emitted scenes go from 84.9% non-decreasing to 100%, since filling
+    * is exactly what closes the escape hatch.
+    */
+  def fillEnabled: Boolean =
+    sys.env.get("STORYMODEL4S_MONOTONE_FILL").map(_.trim.toLowerCase) match
+      case Some("off") | Some("false") => false
+      case _                           => true
+
+  /** The full decision per unit. `scene` is non-decreasing across the returned vector.
+    *
+    * `fill` is consulted only for a unit the constraint would otherwise leave unbound — one whose
+    * candidates carry no mass in its assigned scene, which is the escape hatch and the whole of the
+    * remaining gap to the 97.9% the human coding shows. Given the unit's index and its assigned
+    * scene it may name a node inside that scene. This applies the emission channel the model
+    * already uses to a node the shortlist happened to omit; it is a wider search, not new evidence,
+    * and a filler returning `None` restores the previous behaviour exactly.
+    */
   def decide(
       built: TimedSourceView.Built,
-      rows: Vector[AlignmentRow]
+      rows: Vector[AlignmentRow],
+      fill: (Int, Int) => Option[SourceNodeRef] = (_, _) => None
   ): Vector[Decision] =
     val massByScene: Vector[Map[Int, Double]] = rows.map { r =>
       r.anchorMass.toVector
@@ -82,20 +123,40 @@ object MonotoneScene:
       while j < s do
         best(0)(j) = massByScene(0).getOrElse(scenes(j), 0.0)
         j += 1
+      val penalty = backwardPenalty
       var i = 1
       while i < n do
-        // Running maximum over every earlier scene index, which is what makes the sweep linear in
-        // the number of scenes rather than quadratic.
-        var runBest = Double.NegativeInfinity
-        var runArg = 0
-        j = 0
-        while j < s do
-          if best(i - 1)(j) > runBest then
-            runBest = best(i - 1)(j)
-            runArg = j
-          best(i)(j) = runBest + massByScene(i).getOrElse(scenes(j), 0.0)
-          back(i)(j) = runArg
-          j += 1
+        penalty match
+          case None =>
+            // Forward only. A running maximum over earlier scene indices keeps the sweep linear in
+            // the number of scenes rather than quadratic.
+            var runBest = Double.NegativeInfinity
+            var runArg = 0
+            j = 0
+            while j < s do
+              if best(i - 1)(j) > runBest then
+                runBest = best(i - 1)(j)
+                runArg = j
+              best(i)(j) = runBest + massByScene(i).getOrElse(scenes(j), 0.0)
+              back(i)(j) = runArg
+              j += 1
+          case Some(lambda) =>
+            // Backward steps allowed at a price, so strong evidence can buy one. Quadratic in the
+            // number of scenes, which is fifty here.
+            j = 0
+            while j < s do
+              var bestVal = Double.NegativeInfinity
+              var bestArg = 0
+              var k = 0
+              while k < s do
+                val step = best(i - 1)(k) - (if k > j then lambda * (k - j) else 0.0)
+                if step > bestVal then
+                  bestVal = step
+                  bestArg = k
+                k += 1
+              best(i)(j) = bestVal + massByScene(i).getOrElse(scenes(j), 0.0)
+              back(i)(j) = bestArg
+              j += 1
         i += 1
       var cur = 0
       j = 1
@@ -113,7 +174,10 @@ object MonotoneScene:
         val inScene = row.anchorMass.toVector.filter { case (ref, m) =>
           m > 0.0 && sceneOf(built, ref).contains(scene)
         }
-        if inScene.isEmpty then Decision(row.mapSource, scene, constrained = false)
+        if inScene.isEmpty then
+          fill(idx, scene) match
+            case Some(ref) => Decision(Some(ref), scene, constrained = true)
+            case None      => Decision(row.mapSource, scene, constrained = false)
         else
           Decision(
             Some(inScene.sortBy { case (ref, m) => (-m, ref.key) }.head._1),
