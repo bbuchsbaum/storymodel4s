@@ -834,3 +834,34 @@ python3 tools/recall-study/within_scene.py score within-scene answers-human-lane
 
 with paths under the study record. That scoring is the first human-lane comparison and is counted
 here when it happens.
+
+## The mapping made visible: the Recall Voyage
+
+*2026-09-03.* The owner asked to see the mapping itself, with its uncertainty, first as a page and
+then in the visualization module. Two things came out of building it that belong in this record.
+
+**The report's mass column belongs to the argmax, not to the drawn anchor.** `mapAnchorMass`,
+`runnerUpAnchor` and `localizability` are computed from the untouched posterior row, while
+`mapAnchor` is the scene-monotone decode's choice. Over all 17 participants under the default
+configuration the decode moves **1,462 of 2,577 anchors (57%)**, and **492 (19%)** are fills whose
+anchor carries no posterior mass at all (the decode assigned a scene the row had no mass in, and the
+fill re-scored that scene's leaves). Nothing above this section is affected: every scene-accuracy
+number reads `mapAnchor` only, and the confidence-quartile diagnostic explicitly ranks by the
+argmax's mass. But a reader sizing anything by the mass column would be sizing 57% of units by a
+different node's mass. The run now writes `<report>.posterior.json` beside every report, content-
+free, with the decoded anchor's own mass and its origin (argmax / decode-bound / decode-filled);
+the TSV is byte-identical, verified over all 17.
+
+**The typed export.** `<report>.voyage.json` is a `RecallVoyageDocument` (ADR 0002 §14): units with
+their word timings, the posterior rows, every segment and scene on one source clock, one decision
+per unit with its origin, and the released scene coding as an independent coding when
+`STORYMODEL4S_SCENE_CODING` names it. storymodel4s `view` compiles it to a scene whose every
+number is re-derived from the row (a forged mark is refused), and storyatlas4s draws it:
+`storyatlas4s voyage --document <report>.voyage.json --out <dir>`, and the same pane in the
+browser shell. The Python page under `tools/recall-study/voyage/` remains as the study's own
+reference rendering and reads the sidecar; it is not the durable path.
+
+**A gold-free diagnostic the voyage exposes.** Under the default configuration, of the units whose
+anchor the decode moved, the fill accounts for a third. Whether a filled anchor is better or worse
+than the argmax it replaced is exactly what the within-scene human lane can say, and the machine
+lane's 124 primary units can be split by origin the day the human lane is scored.

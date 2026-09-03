@@ -39,6 +39,15 @@ what a bare run does.
 | `STORYMODEL4S_SCENE_CAPTIONS` | unset | Path to VLM scene captions. Measured null on this corpus. |
 | `STORYMODEL4S_SHUFFLE_RECALL` | unset | Control: permutes recall units. See trap 3. |
 
+| `STORYMODEL4S_SCENE_CODING` | unset | Path to the released scene coding CSV. When set, the run's Recall Voyage document carries it as an independent coding, with the participant read from the recall file name under the pre-registered mapping. Changes nothing in the report. |
+
+Every run also writes two content-bearing companions beside the report, neither of which changes
+the TSV: `<report>.posterior.json`, the per-unit posterior (every admitted anchor with mass, the
+argmax, the decoded anchor with *its own* mass, the decode's scene and whether it bound the unit),
+and `<report>.voyage.json`, the typed Recall Voyage document (ADR 0002 §14) that storyatlas4s
+renders. Read `mapAnchorMass` in the TSV as the posterior argmax's mass: the decode moves 57% of
+anchors, and for those the report's anchor and its mass column belong to different nodes.
+
 `STORYMODEL4S_ONNX_MODEL` and `..._TOKENIZER` must point at `data/models/onnx/` or the pipeline
 silently falls back to a free lexical baseline and the run is not comparable to anything.
 `run-arm.sh` sets them from the data root (`tools/data-root.sh`; layout in `data/README.md`).
