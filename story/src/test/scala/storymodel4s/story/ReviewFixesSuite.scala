@@ -27,7 +27,7 @@ class ReviewFixesSuite extends ScalaCheckSuite:
     val frame = ContextFrame(
       belief,
       Some(b.world),
-      ContextKind.Belief(b.entities(0)),
+      ContextKind.Belief(ContextHolder.Named(b.entities(0))),
       sp(b, 0),
       Small.meta("ctx:b", EpistemicStatus.SurfaceExplicit, Some(sp(b, 0)))
     )
@@ -63,7 +63,7 @@ class ReviewFixesSuite extends ScalaCheckSuite:
     val frame = ContextFrame(
       belief,
       Some(b.world),
-      ContextKind.Belief(b.entities(0)),
+      ContextKind.Belief(ContextHolder.Named(b.entities(0))),
       sp(b, 0),
       Small.meta("ctx:b", EpistemicStatus.SurfaceExplicit, Some(sp(b, 0)))
     )

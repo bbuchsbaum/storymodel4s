@@ -10,6 +10,7 @@ import storymodel4s.document.{
   CoordinatedBranch,
   CoverageCounts,
   DerivationGap,
+  FillerCounts,
   NarrativeCompilation,
   SentenceCoverage,
   SummaryCoverage
@@ -38,17 +39,32 @@ private[pipeline] object BundleJson:
     "sentences" -> c.sentences.asJson
   )
 
+  /** Where a root's entity-kind fillers went. `fillers` keeps its old name and meaning — the
+    * fillers that became participants — and the five other counters say where the rest went, so the
+    * six sum to `seen`, every filler the provider saw. Each class names the slice that owns it, so
+    * a reader can act on a number instead of only noticing it.
+    */
+  private def fillerFields(counts: FillerCounts): Vector[(String, Json)] = Vector(
+    "fillers" -> counts.referents.asJson,
+    "circumstances" -> counts.circumstances.asJson,
+    "eventualities" -> counts.eventualities.asJson,
+    "nonReferential" -> counts.nonReferential.asJson,
+    "unlicensed" -> counts.unlicensed.asJson,
+    "ambiguous" -> counts.ambiguous.asJson,
+    "seen" -> counts.seen.asJson
+  )
+
   /** One branch of a coordinated row. Every branch appears, admitted or not, so a reader can see
     * how much of a coordinating sentence became situations and why the rest did not.
     */
   private def branchRow(branch: CoordinatedBranch): Json = branch match
-    case CoordinatedBranch.Admitted(root, role, fillers, unlicensed) =>
+    case CoordinatedBranch.Admitted(root, role, counts) =>
       Json.obj(
-        "kind" -> "admitted".asJson,
-        "root" -> root.key.asJson,
-        "role" -> role.render.asJson,
-        "fillers" -> fillers.asJson,
-        "unlicensed" -> unlicensed.asJson
+        Vector(
+          "kind" -> "admitted".asJson,
+          "root" -> root.key.asJson,
+          "role" -> role.render.asJson
+        ) ++ fillerFields(counts)*
       )
     case CoordinatedBranch.Abstained(root, role, reason) =>
       Json.obj(
@@ -64,13 +80,8 @@ private[pipeline] object BundleJson:
       "ordinal" -> ordinals.get(row.sentence).asJson
     )
     val rest = row match
-      case SentenceCoverage.Proposed(root, fillers, unlicensed) =>
-        Vector(
-          "kind" -> "proposed".asJson,
-          "root" -> root.key.asJson,
-          "fillers" -> fillers.asJson,
-          "unlicensed" -> unlicensed.asJson
-        )
+      case SentenceCoverage.Proposed(root, counts) =>
+        Vector("kind" -> "proposed".asJson, "root" -> root.key.asJson) ++ fillerFields(counts)
       case SentenceCoverage.Coordinated(coordinator, branches) =>
         Vector(
           "kind" -> "coordinated".asJson,
@@ -88,9 +99,15 @@ private[pipeline] object BundleJson:
       case SentenceCoverage.NoChart(_)    => Vector("kind" -> "no-chart".asJson)
     Json.obj((base ++ rest)*)
 
+  /** The provenance is written alongside the kind: a proposed summary that does not say what
+    * entitled it is the shape this row exists to make impossible to publish quietly.
+    */
   private def summaryRow(coverage: SummaryCoverage): Json = coverage match
-    case SummaryCoverage.Proposed(_) => Json.obj("kind" -> "proposed".asJson)
-    case SummaryCoverage.NoTitle     => Json.obj("kind" -> "no-title".asJson)
+    case SummaryCoverage.Proposed(_, provenance) =>
+      Json.obj("kind" -> "proposed".asJson, "titleProvenance" -> provenance.render.asJson)
+    case SummaryCoverage.NoTitle            => Json.obj("kind" -> "no-title".asJson)
+    case SummaryCoverage.TitleUnestablished =>
+      Json.obj("kind" -> "title-provenance-unrecorded".asJson)
 
   private def gapRow(gap: DerivationGap): Json = Json.obj(
     "stage" -> gap.stage.value.asJson,

@@ -41,9 +41,24 @@ final case class StorySummaryProposal(text: String)
   */
 final case class CausalProposal(relation: CausalRelation)
 
-/** Restricted first-slice context proposal; providers cannot mint arbitrary context or status. */
+/** Where a provider read a situation as sitting, as a path and never as an identity.
+  *
+  * Providers still cannot mint a context: they describe the holders they read off the chart and the
+  * text, and only the compiler turns a path into `ContextId`s and `ContextFrame`s. `NarratedWorld`
+  * is a positive reading — the anchor lies outside every quotation and the chart holds the concept
+  * under no embedding — and not the branch that fires when nothing else matched. A root the rule
+  * cannot read yields no proposal at all, so the claim gaps.
+  */
 enum ContextAssignmentProposal:
   case NarratedWorld
+
+  /** Holders between the narrated world and the situation, outermost first. */
+  case Held(path: NonEmptyVector[ContextStep])
+
+  /** The path from the narrated world, empty for a root-world situation. */
+  def steps: Vector[ContextStep] = this match
+    case NarratedWorld => Vector.empty
+    case Held(path)    => path.toVector
 
 /** Restricted first-slice hierarchy proposal; acceptance denotes weight-one primary membership. */
 enum SegmentMembershipProposal:
@@ -135,6 +150,25 @@ final case class ParticipantCoverageAttempt(
     bundle: EvidenceBundle[ParticipantCoverage]
 )
 
+/** A time or manner a chart attached to a situation, as the source's own word for it.
+  *
+  * Why a label and not a normalized time: `midnight`, `then` and `now` are what the source says,
+  * and turning them into an instant or an interval is a claim about the story world that this
+  * layer's evidence — a role and an alignment span — does not license. The claim here is only that
+  * the situation's own words said this much about when or how.
+  */
+final case class CircumstanceProposal(kind: CircumstanceKind, label: String)
+
+/** Sparse circumstance candidate: the `filler` states a time or manner of `situation`. Pairs absent
+  * from the input were not evaluated. Unlike a participant, the filler mints no entity: that is the
+  * whole point of the family.
+  */
+final case class SituationCircumstanceAttempt(
+    situation: ChartNodeRef,
+    filler: ChartNodeRef,
+    bundle: EvidenceBundle[CircumstanceProposal]
+)
+
 /** Sparse story-world temporal candidate between two situation sources, scoped to the narrated
   * world. Only canonical relations are admissible; a converse form is refused at the input.
   */
@@ -155,6 +189,7 @@ enum NarrativeCandidateAddress:
   case EntityMention(mention: ChartNodeRef)
   case Participant(situation: ChartNodeRef, filler: ChartNodeRef)
   case ParticipantCoverage(situation: ChartNodeRef)
+  case Circumstance(situation: ChartNodeRef, filler: ChartNodeRef)
   case Temporal(from: ChartNodeRef, to: ChartNodeRef)
 
   def render: String = this match
@@ -168,7 +203,8 @@ enum NarrativeCandidateAddress:
     case Participant(situation, f)     => s"participant:${situation.key}->${f.key}"
     case NarrativeCandidateAddress.ParticipantCoverage(source) =>
       s"participant-coverage:${source.key}"
-    case Temporal(from, to) => s"temporal:${from.key}->${to.key}"
+    case Circumstance(situation, filler) => s"circumstance:${situation.key}~${filler.key}"
+    case Temporal(from, to)              => s"temporal:${from.key}->${to.key}"
 
 object NarrativeCandidateAddress:
   given Ordering[NarrativeCandidateAddress] = Ordering.by(_.render)
@@ -181,7 +217,13 @@ enum DerivationGapReason:
   case MissingRawScore
   case MissingSpanEvidence
   case MissingUpstream(addresses: Vector[NarrativeCandidateAddress])
-  case UnsupportedEmbeddedContext(source: ChartNodeRef)
+
+  /** Two endpoints whose contexts are neither equal nor one within the other. No frame can hold the
+    * relation: scoping it at the narrated world would order reported content as world fact, and
+    * scoping it in either endpoint's context would claim a situation the other frame cannot see.
+    * The relation is recorded as missing rather than placed somewhere it does not belong.
+    */
+  case UnscopableRelation(from: ChartNodeRef, to: ChartNodeRef)
   case InvalidAccepted(error: DomainError)
 
   def render: String = this match
@@ -192,8 +234,8 @@ enum DerivationGapReason:
     case MissingSpanEvidence        => "missing-span-evidence"
     case MissingUpstream(addresses) =>
       s"missing-upstream:${addresses.map(_.render).sorted.mkString(",")}"
-    case UnsupportedEmbeddedContext(source) => s"embedded-context-unsupported:${source.key}"
-    case InvalidAccepted(error)             => s"invalid-accepted:${error.message}"
+    case UnscopableRelation(from, to) => s"unscopable-relation:${from.key}->${to.key}"
+    case InvalidAccepted(error)       => s"invalid-accepted:${error.message}"
 
 /** One missing derivation, retained in the compiled artifact rather than replaced by a value. */
 final case class DerivationGap(
@@ -344,6 +386,16 @@ final case class ParticipantCoverageResolution(
   def target: NarrativeCandidateAddress =
     NarrativeCandidateAddress.ParticipantCoverage(situation)
 
+/** Resolver state for one sparse circumstance candidate. */
+final case class SituationCircumstanceResolution(
+    situation: ChartNodeRef,
+    filler: ChartNodeRef,
+    bundle: EvidenceBundle[CircumstanceProposal],
+    state: ResolutionState[CircumstanceProposal]
+):
+  def target: NarrativeCandidateAddress =
+    NarrativeCandidateAddress.Circumstance(situation, filler)
+
 /** Resolver state for one sparse temporal candidate. */
 final case class TemporalResolution(
     from: ChartNodeRef,
@@ -363,6 +415,7 @@ final case class NarrativeResolutions(
     entityMentions: Vector[EntityMentionResolution],
     participants: Vector[ParticipantResolution],
     participantCoverage: Vector[ParticipantCoverageResolution],
+    circumstances: Vector[SituationCircumstanceResolution],
     temporal: Vector[TemporalResolution]
 )
 
@@ -407,6 +460,7 @@ final class NarrativeCompilerInput private (
     val entityMentions: Vector[EntityMentionAttempt],
     val participants: Vector[ParticipantAttempt],
     val participantCoverage: Vector[ParticipantCoverageAttempt],
+    val circumstances: Vector[SituationCircumstanceAttempt],
     val temporal: Vector[TemporalAttempt],
     val policy: AcceptancePolicy,
     val receipt: BuildReceipt,
@@ -428,6 +482,7 @@ object NarrativeCompilerInput:
       entityMentions: Iterable[EntityMentionAttempt],
       participants: Iterable[ParticipantAttempt],
       participantCoverage: Iterable[ParticipantCoverageAttempt],
+      circumstances: Iterable[SituationCircumstanceAttempt],
       temporal: Iterable[TemporalAttempt],
       policy: AcceptancePolicy,
       receipt: BuildReceipt,
@@ -442,6 +497,7 @@ object NarrativeCompilerInput:
     val mentionVec = entityMentions.toVector.sortBy(_.mention.key)
     val participantVec = participants.toVector.sortBy(a => (a.situation.key, a.filler.key))
     val coverageVec = participantCoverage.toVector.sortBy(_.situation.key)
+    val circumstanceVec = circumstances.toVector.sortBy(a => (a.situation.key, a.filler.key))
     val temporalVec = temporal.toVector.sortBy(a => (a.from.key, a.to.key))
     val errors = Vector.newBuilder[DomainError]
     def invalid(path: String, reason: String): Unit =
@@ -708,6 +764,46 @@ object NarrativeCompilerInput:
         )
     }
 
+    val duplicateCircumstance = circumstanceVec
+      .groupBy(a => (a.situation, a.filler))
+      .toVector
+      .sortBy((pair, _) => (pair._1.key, pair._2.key))
+      .collectFirst { case ((situation, filler), xs) if xs.size > 1 => (situation, filler) }
+    duplicateCircumstance.foreach((situation, filler) =>
+      invalid("compiler/circumstances", s"duplicate ${situation.key}~${filler.key}")
+    )
+    circumstanceVec.foreach { attempt =>
+      if !situationSources(attempt.situation) then
+        invalid("compiler/circumstances", s"unknown situation endpoint ${attempt.situation.key}")
+      if !known(attempt.filler) then
+        invalid("compiler/circumstances", s"unknown chart node ${attempt.filler.key}")
+      if attempt.filler.sentence != attempt.situation.sentence then
+        invalid(
+          "compiler/circumstances",
+          s"filler ${attempt.filler.key} is not in the situation's sentence " +
+            attempt.situation.sentence.value
+        )
+      if participantPairs((attempt.situation, attempt.filler)) then
+        invalid(
+          "compiler/circumstances",
+          s"${attempt.filler.key} is both a participant and a circumstance of " +
+            attempt.situation.key
+        )
+      validateBundle(
+        attempt.bundle,
+        evidenceMap,
+        source,
+        atlas,
+        "compiler/circumstances",
+        invalid,
+        within(attempt.situation)
+      )
+      candidateValues(attempt.bundle).foreach { value =>
+        if value.label.trim.isEmpty then
+          invalid("compiler/circumstances", "circumstance label must be nonblank")
+      }
+    }
+
     val duplicateTemporal = temporalVec
       .groupBy(a => (a.from, a.to))
       .toVector
@@ -743,7 +839,8 @@ object NarrativeCompilerInput:
     val allBundles: Vector[EvidenceBundle[?]] =
       situationVec.map(_.bundle) ++ contextVec.map(_.bundle) ++ Vector(summary.bundle) ++
         membershipVec.map(_.bundle) ++ causalVec.map(_.bundle) ++ mentionVec.map(_.bundle) ++
-        participantVec.map(_.bundle) ++ coverageVec.map(_.bundle) ++ temporalVec.map(_.bundle)
+        participantVec.map(_.bundle) ++ coverageVec.map(_.bundle) ++
+        circumstanceVec.map(_.bundle) ++ temporalVec.map(_.bundle)
     val declaredTasks = allBundles.flatMap(_.proposals.map(_.taskId)).toSet
     val chartNodes = charts.flatMap { (sentence, chart) =>
       chart.chart.concepts.keys.map(concept => ChartNodeRef(sentence, concept).key)
@@ -805,6 +902,7 @@ object NarrativeCompilerInput:
                 mentionVec,
                 participantVec,
                 coverageVec,
+                circumstanceVec,
                 temporalVec,
                 policy,
                 receipt,
@@ -1009,6 +1107,7 @@ object NarrativeCompilation:
         resolutions.entityMentions.map(_.target) ++
         resolutions.participants.map(_.target) ++
         resolutions.participantCoverage.map(_.target) ++
+        resolutions.circumstances.map(_.target) ++
         resolutions.temporal.map(_.target)
     val attemptedTargets = derivation.attempts.map(_.target).toSet
     val draftClaims = draft.claims.map(meta => meta.id -> meta).toMap
@@ -1161,6 +1260,15 @@ object NarrativeCompiler:
         Resolver.resolve(ClaimFamily.ParticipantCoverage, bundle, input.policy)
       )
     }
+    val circumstanceRecords = input.circumstances.map { attempt =>
+      val bundle = canonicalBundle(attempt.bundle, renderCircumstance)
+      SituationCircumstanceResolution(
+        attempt.situation,
+        attempt.filler,
+        bundle,
+        Resolver.resolve(ClaimFamily.SituationCircumstance, bundle, input.policy)
+      )
+    }
     val temporalRecords = input.temporal.map { attempt =>
       val bundle = canonicalBundle(attempt.bundle, renderTemporalRelation)
       TemporalResolution(
@@ -1179,6 +1287,7 @@ object NarrativeCompiler:
       mentionRecords,
       participantRecords,
       coverageRecords,
+      circumstanceRecords,
       temporalRecords
     )
 
@@ -1224,13 +1333,6 @@ object NarrativeCompiler:
             )
           else
             input.mentionGraph.chart(source.sentence) match
-              case Some(chart) if chart.isEmbedded(source.concept) =>
-                gaps += gap(
-                  record.target,
-                  record.bundle,
-                  ClaimFamily.SituationMention,
-                  DerivationGapReason.UnsupportedEmbeddedContext(source)
-                )
               case Some(chart) if admissibleSituationSource(chart, source.concept) =>
                 materialize(
                   input,
@@ -1248,7 +1350,10 @@ object NarrativeCompiler:
                     val canonical =
                       ExactCorefCluster.canonicalFor[SituationK](input.source.id, Vector(mention))
                     val id = SituationId.unsafe(canonical.value)
-                    val root = rootContextId(input.source.id)
+                    val root = contextIdOf(
+                      input.source.id,
+                      acceptedContextBySource(source).value.steps
+                    )
                     val node = material.value.kind match
                       case SituationKind.Event =>
                         SituationNode.Event(
@@ -1317,7 +1422,7 @@ object NarrativeCompiler:
     val situationMap = emitted.map(s => s.node.id -> s.node).toMap
     val acceptedContexts =
       contextRecords.flatMap(record => acceptedContextBySource.get(record.source))
-    val contexts = NonEmptyVector.fromVector(acceptedContexts) match
+    val rootFrames = NonEmptyVector.fromVector(acceptedContexts) match
       case None           => Map.empty[ContextId, ContextFrame]
       case Some(accepted) =>
         val support = unionSupports(accepted.map(_.support))
@@ -1422,6 +1527,65 @@ object NarrativeCompiler:
       entities.flatMap(e => e.members.toVector.map(m => m.source -> e.node.id)).toMap
     val entityMap = entities.map(e => e.node.id -> e.node).toMap
 
+    // Child context frames are built here, after the mention layer, and not beside the root frame:
+    // a holder is an entity and entities do not exist until mentions have been clustered. Nothing
+    // above needed them, because a context's identity is derived from its placement alone, so the
+    // situations already placed in these frames were addressed correctly before the holder was
+    // known.
+    def holderOf(candidate: HolderCandidate): ContextHolder = candidate match
+      case HolderCandidate.Missing(gap)  => ContextHolder.Unattributed(gap)
+      case HolderCandidate.Fillers(refs) =>
+        refs.toVector.flatMap(entityBySource.get).distinct match
+          case Vector(one) => ContextHolder.Named(one)
+          case Vector()    => ContextHolder.Unattributed(HolderGap.UnresolvedCandidate)
+          case _           => ContextHolder.Unattributed(HolderGap.SeveralCandidates)
+
+    def kindOf(step: ContextStep): ContextKind = step match
+      case ContextStep.Quoted(_, who)     => ContextKind.Speech(holderOf(who))
+      case ContextStep.Embedded(_, _, kd) =>
+        kd match
+          case StepKind.Speech(c)      => ContextKind.Speech(holderOf(c))
+          case StepKind.Belief(c)      => ContextKind.Belief(holderOf(c))
+          case StepKind.Desire(c)      => ContextKind.Desire(holderOf(c))
+          case StepKind.Intention(c)   => ContextKind.Intention(holderOf(c))
+          case StepKind.Memory(c)      => ContextKind.Memory(holderOf(c))
+          case StepKind.Imagination(c) => ContextKind.Imagination(holderOf(c))
+          case StepKind.Hypothetical   => ContextKind.Hypothetical
+          case StepKind.Counterfactual => ContextKind.Counterfactual
+
+    val prefixes = acceptedContexts
+      .map(_.value.steps)
+      .flatMap(path => (1 to path.size).map(path.take))
+      .distinct
+      .sortBy(p => (p.size, p.map(_.placementKey).mkString("/")))
+    val childBuild = prefixes
+      .foldLeft[Either[DomainError, Map[ContextId, ContextFrame]]](Right(Map.empty)) {
+        (acc, prefix) =>
+          acc.flatMap { built =>
+            val id = contextIdOf(input.source.id, prefix)
+            if built.contains(id) then Right(built)
+            else
+              val support = SpanSet.one(prefix.last.support)
+              val upstream = acceptedContexts
+                .filter(_.value.steps.startsWith(prefix))
+                .map(_.meta.id)
+                .toSet
+              derivedMeta(input, "context-frame", prefix.map(_.placementKey), support, upstream)
+                .map(meta =>
+                  built + (id -> ContextFrame(
+                    id,
+                    Some(contextIdOf(input.source.id, prefix.dropRight(1))),
+                    kindOf(prefix.last),
+                    support,
+                    meta
+                  ))
+                )
+          }
+      }
+    val contexts = childBuild match
+      case Left(error)  => return Left(NarrativeCompilerError.ClaimConstruction(error))
+      case Right(built) => rootFrames ++ built
+
     val participantEdges = Vector.newBuilder[ParticipantEdge]
     participantRecords.foreach { record =>
       val endpoints = Vector(
@@ -1505,6 +1669,53 @@ object NarrativeCompiler:
           )
     }
 
+    // A circumstance depends only on its situation: it mints no entity, which is the point of the
+    // family. `Hypothesized` and not `SurfaceExplicit`, on the same ground as a participant edge —
+    // the chart's role assignment is a provider's reading of the sentence, and nothing here
+    // establishes that the surface entails it.
+    val circumstanceEdges = Vector.newBuilder[CircumstanceEdge]
+    circumstanceRecords.foreach { record =>
+      val situationAddress = NarrativeCandidateAddress.Situation(record.situation)
+      record.state match
+        case accepted @ ResolutionState.Accepted(_, _, _) =>
+          if !emittedBySource.contains(record.situation) then
+            gaps += gap(
+              record.target,
+              record.bundle,
+              ClaimFamily.SituationCircumstance,
+              DerivationGapReason.MissingUpstream(Vector(situationAddress)),
+              Vector(situationAddress).flatMap(emittedByAddress.get).toSet
+            )
+          else
+            materialize(
+              input,
+              ClaimFamily.SituationCircumstance,
+              record.target,
+              record.bundle,
+              accepted,
+              renderCircumstance,
+              _ => EpistemicStatus.Hypothesized
+            ) match
+              case Left(reason) =>
+                gaps += gap(record.target, record.bundle, ClaimFamily.SituationCircumstance, reason)
+              case Right(material) =>
+                circumstanceEdges += CircumstanceEdge(
+                  emittedBySource(record.situation).node.id,
+                  material.value.kind,
+                  material.value.label,
+                  material.support,
+                  material.meta
+                )
+                emittedByAddress.update(record.target, material.meta.id)
+        case state =>
+          gaps += gap(
+            record.target,
+            record.bundle,
+            ClaimFamily.SituationCircumstance,
+            gapReason(state)
+          )
+    }
+
     val temporalEdges = Vector.newBuilder[TemporalEdge]
     temporalRecords.foreach { record =>
       val (from, to) = (record.from, record.to)
@@ -1537,14 +1748,31 @@ object NarrativeCompiler:
               case Left(reason) =>
                 gaps += gap(record.target, record.bundle, ClaimFamily.TemporalRelation, reason)
               case Right(material) =>
-                temporalEdges += TemporalEdge(
-                  emittedBySource(from).node.id,
-                  material.value,
-                  emittedBySource(to).node.id,
-                  rootContextId(input.source.id),
-                  material.meta
-                )
-                emittedByAddress.update(record.target, material.meta.id)
+                // The edge is scoped at the deeper of its endpoints' contexts, which is the only
+                // frame that can see both. Pinning every edge at the narrated world was how
+                // discourse adjacency between a narrated event and a quoted one became
+                // narrated-world chronology, and `temporal.context-scope` refuses it.
+                temporalScope(
+                  contexts,
+                  emittedBySource(from).node.context,
+                  emittedBySource(to).node.context
+                ) match
+                  case None =>
+                    gaps += gap(
+                      record.target,
+                      record.bundle,
+                      ClaimFamily.TemporalRelation,
+                      DerivationGapReason.UnscopableRelation(from, to)
+                    )
+                  case Some(scope) =>
+                    temporalEdges += TemporalEdge(
+                      emittedBySource(from).node.id,
+                      material.value,
+                      emittedBySource(to).node.id,
+                      scope,
+                      material.meta
+                    )
+                    emittedByAddress.update(record.target, material.meta.id)
         case state =>
           gaps += gap(record.target, record.bundle, ClaimFamily.TemporalRelation, gapReason(state))
     }
@@ -1698,7 +1926,8 @@ object NarrativeCompiler:
       RelationLayers.empty.copy(
         participants = participantEdges.result(),
         temporal = temporalEdges.result(),
-        causal = causalEdges.result()
+        causal = causalEdges.result(),
+        circumstances = circumstanceEdges.result()
       )
     )
     val projectionResult = emitted.foldLeft[
@@ -1850,6 +2079,7 @@ object NarrativeCompiler:
         mentionRecords.map(r => (r.target, ClaimFamily.EntityMention, r.state)) ++
         participantRecords.map(r => (r.target, ClaimFamily.ParticipantRole, r.state)) ++
         coverageRecords.map(r => (r.target, ClaimFamily.ParticipantCoverage, r.state)) ++
+        circumstanceRecords.map(r => (r.target, ClaimFamily.SituationCircumstance, r.state)) ++
         temporalRecords.map(r => (r.target, ClaimFamily.TemporalRelation, r.state))
     val gapByTarget = gapVec.groupBy(_.target)
     val resolvedAttempts = allRecords.sortBy(_._1).map { (target, family, state) =>
@@ -2406,8 +2636,41 @@ object NarrativeCompiler:
       )
     )
 
+  /** The context that can hold a relation between two situations, or nothing.
+    *
+    * `temporal.context-scope` requires an edge's frame to be within both endpoints' frames. When
+    * one context is an ancestor of the other that is the deeper one; when neither contains the
+    * other — two different speeches, say — no frame satisfies both and the relation has no scope.
+    */
+  private def temporalScope(
+      frames: Map[ContextId, ContextFrame],
+      from: ContextId,
+      to: ContextId
+  ): Option[ContextId] =
+    @annotation.tailrec
+    def chain(id: ContextId, acc: Vector[ContextId]): Vector[ContextId] =
+      frames.get(id).flatMap(_.parent) match
+        case Some(parent) if !acc.contains(parent) => chain(parent, acc :+ parent)
+        case _                                     => acc
+    if from == to then Some(from)
+    else if chain(from, Vector(from)).contains(to) then Some(from)
+    else if chain(to, Vector(to)).contains(from) then Some(to)
+    else None
+
   private def rootContextId(story: StoryId): ContextId =
     ContextId.unsafe(ContentAddress.of("context-root", story.value))
+
+  /** Identity of the context a placement path names, derived from the placement alone.
+    *
+    * Why the holder is not in the address: a quotation is one context however its speaker resolves,
+    * so an attribution that later succeeds must not split a context in two. Why the whole prefix
+    * and not the last step: nesting is part of what a context is, and two identical holders reached
+    * by different paths are different contexts.
+    */
+  private def contextIdOf(story: StoryId, prefix: Vector[ContextStep]): ContextId =
+    if prefix.isEmpty then rootContextId(story)
+    else
+      ContextId.unsafe(ContentAddress.of("context", (story.value +: prefix.map(_.placementKey))*))
 
   private def rootSegmentId(story: StoryId, situations: Vector[SituationId]): SegmentId =
     SegmentId.unsafe(
@@ -2438,8 +2701,23 @@ object NarrativeCompiler:
   private def renderCausal(value: CausalProposal): String =
     renderFields("causal/v1", Vector(value.relation.toString))
 
+  /** Renders the placement and its holder candidates, so two proposals that differ in either are
+    * different candidate values to the resolver.
+    */
   private def renderContextAssignment(value: ContextAssignmentProposal): String =
-    renderFields("context-assignment/v1", Vector(value.toString))
+    val rendered = value match
+      case ContextAssignmentProposal.NarratedWorld => Vector("narrated-world")
+      case ContextAssignmentProposal.Held(path)    =>
+        path.toVector.flatMap(step =>
+          Vector(
+            step.placementKey,
+            step match
+              case ContextStep.Quoted(_, who)     => who.render
+              case ContextStep.Embedded(_, _, kd) =>
+                kd.holderCandidate.fold("no-holder")(_.render)
+          )
+        )
+    renderFields("context-assignment/v2", rendered)
 
   private def renderEntityMention(value: EntityMentionProposal): String =
     renderFields("entity-mention/v1", Vector(value.label, renderEntityType(value.entityType)))
@@ -2456,6 +2734,9 @@ object NarrativeCompiler:
 
   private def renderParticipantCoverage(value: ParticipantCoverage): String =
     renderFields("participant-coverage/v1", value.fillers.map(_.key))
+
+  private def renderCircumstance(value: CircumstanceProposal): String =
+    renderFields("situation-circumstance/v1", Vector(value.kind.render, value.label))
 
   private def renderTemporalRelation(value: TemporalRelation): String =
     renderFields("temporal-relation/v1", Vector(value.toString))

@@ -116,8 +116,20 @@ class GraphSuite extends ScalaCheckSuite:
     val m = Small.meta("x", EpistemicStatus.SurfaceExplicit, Some(sp))
     val g = b.graph.copy(contexts =
       b.graph.contexts ++ Map(
-        speech -> ContextFrame(speech, Some(b.world), ContextKind.Speech(b.entities(0)), sp, m),
-        inner -> ContextFrame(inner, Some(speech), ContextKind.Belief(b.entities(0)), sp, m)
+        speech -> ContextFrame(
+          speech,
+          Some(b.world),
+          ContextKind.Speech(ContextHolder.Named(b.entities(0))),
+          sp,
+          m
+        ),
+        inner -> ContextFrame(
+          inner,
+          Some(speech),
+          ContextKind.Belief(ContextHolder.Named(b.entities(0))),
+          sp,
+          m
+        )
       )
     )
     assertEquals(g.contextAncestors(inner), Vector(speech, b.world))

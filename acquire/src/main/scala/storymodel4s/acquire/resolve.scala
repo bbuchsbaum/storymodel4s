@@ -86,6 +86,12 @@ enum ClaimFamily:
     * trajectory step's entity turnover as a measured value rather than a default.
     */
   case ParticipantCoverage
+
+  /** A time or manner a source attached to a situation. Ordinary, not high-impact: the claim is
+    * that the source's own words said this much about when or how, which the alignment spans
+    * settle. Placing it on a timeline would be a different family with a different licence.
+    */
+  case SituationCircumstance
   case Modality
   case ContextAssignment
   case TemporalRelation

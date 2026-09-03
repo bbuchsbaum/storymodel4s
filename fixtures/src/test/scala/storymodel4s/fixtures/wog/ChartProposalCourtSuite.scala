@@ -20,9 +20,9 @@ import storymodel4s.story.{Polarity as StoryPolarity, *}
   */
 class ChartProposalCourtSuite extends FunSuite:
   private val source = StorySource
-    .fromText(
+    .titled(
       WarOfTheGhostsText.text,
-      Some(WarOfTheGhostsText.title),
+      WarOfTheGhostsModel.title,
       metadata = Map("source" -> WarOfTheGhostsText.provenance)
     )
     .fold(e => fail(e.message), identity)
@@ -208,12 +208,23 @@ class ChartProposalCourtSuite extends FunSuite:
     val proposals =
       ChartProposalProvider.propose(source, atlas, charts).fold(e => fail(e.message), identity)
 
-    assertEquals(proposals.counts, CoverageCounts(4, 0, 2, 1, 43))
+    // 4 proposed and 2 abstained became 5 and 1: `They thought: "..."` has an embedded focus, and
+    // an embedded focus is now placed under its holder rather than abstained.
+    assertEquals(proposals.counts, CoverageCounts(5, 0, 1, 1, 43))
     assertEquals(proposals.coverage.size, 50)
-    assertEquals(proposals.summaryCoverage, SummaryCoverage.Proposed("The War of the Ghosts"))
+    assertEquals(
+      proposals.summaryCoverage,
+      SummaryCoverage.Proposed("The War of the Ghosts", TitleProvenance.CallerSupplied)
+    )
     val rows = proposals.coverage.map(row => row.sentence -> row).toMap
-    assertEquals(rows(sEgulac.id), SentenceCoverage.Proposed(ref(sEgulac, c0), 0, 2))
-    assertEquals(rows(sHunt.id), SentenceCoverage.Proposed(ref(sHunt, c0), 1, 0))
+    assertEquals(
+      rows(sEgulac.id),
+      SentenceCoverage.Proposed(ref(sEgulac, c0), FillerCounts(0, 0, 0, 0, 2, 0))
+    )
+    assertEquals(
+      rows(sHunt.id),
+      SentenceCoverage.Proposed(ref(sHunt, c0), FillerCounts(1, 0, 0, 0, 0, 0))
+    )
     assertEquals(
       rows(sRiver.id),
       SentenceCoverage.Abstained(
@@ -221,13 +232,16 @@ class ChartProposalCourtSuite extends FunSuite:
         AbstentionReason.FocusNotPredicate(ConceptKind.Entity)
       )
     )
-    assertEquals(rows(sFog.id), SentenceCoverage.Proposed(ref(sFog, c0), 0, 0))
+    assertEquals(rows(sFog.id), SentenceCoverage.Proposed(ref(sFog, c0), FillerCounts.empty))
     assertEquals(rows(sPaddle.id), SentenceCoverage.EmptyChart(sPaddle.id))
     assertEquals(
       rows(sThought.id),
-      SentenceCoverage.Abstained(ref(sThought, c1), AbstentionReason.FocusEmbedded)
+      SentenceCoverage.Proposed(ref(sThought, c1), FillerCounts.empty)
     )
-    assertEquals(rows(sArrows.id), SentenceCoverage.Proposed(ref(sArrows, c0), 0, 2))
+    assertEquals(
+      rows(sArrows.id),
+      SentenceCoverage.Proposed(ref(sArrows, c0), FillerCounts(0, 0, 0, 0, 2, 0))
+    )
     assertEquals(proposals.situations.size, 6)
     assertEquals(proposals.participantCoverage.size, 6)
     assertEquals(
@@ -240,10 +254,14 @@ class ChartProposalCourtSuite extends FunSuite:
       Vector(
         (ref(sEgulac, c0), ref(sHunt, c0)),
         (ref(sHunt, c0), ref(sFog, c0)),
-        (ref(sFog, c0), ref(sArrows, c0))
+        (ref(sFog, c0), ref(sThought, c1)),
+        (ref(sThought, c1), ref(sArrows, c0))
       )
     )
-    assertEquals(proposals.calls.size, 30)
+    // 35, not 30: the four fillers these seven charts reach by no licensed role carry a refusal
+    // receipt each, so a filler cannot leave the provider unrecorded, and the embedded focus that
+    // used to abstain now proposes a temporal pair as well.
+    assertEquals(proposals.calls.size, 35)
 
     val values = proposals.situations
       .flatMap(a => a.bundle.proposals.flatMap(_.value).map(a.source -> _))
@@ -264,37 +282,64 @@ class ChartProposalCourtSuite extends FunSuite:
       .fold(e => fail(e.message), identity)
     val compiled = NarrativeCompiler.compile(input).fold(e => fail(e.message), identity)
 
-    // Two sentences abstain, so their situation gaps block promotion; the trajectory itself is
-    // now derived on evidence: every proposed root carries an accepted coverage and every adjacent
+    // Two roots reach no situation, so their gaps block promotion; the trajectory itself is
+    // derived on evidence: every emitted root carries an accepted coverage and every adjacent
     // pair an accepted Unclear relation.
+    //
+    // The second of those two is the fail-closed branch of the placement rule, on real text.
+    // `They thought: "Maybe there is a war party."` has an embedded focus, which the provider no
+    // longer abstains on, but this hand chart aligns only `thought`, so the root's anchor falls
+    // back to the whole sentence -- which starts outside the quotation and ends inside it. The
+    // rule refuses rather than calling it narration, the context abstains, and the situation gaps.
+    // Placing it at the root because the anchor could not be decided is exactly the fabricated
+    // license this rule exists to remove.
     assertEquals(compiled.validated, None)
     assert(compiled.isPartial)
     assertEquals(compiled.draft.graph.situations.size, 4)
     assertEquals(compiled.draft.hierarchy.primary.size, 4)
+    // Two contexts, not one. `"I have no arrows."` is a whole quoted sentence, and its root's own
+    // alignment lies inside the quotation the text opens at 579, so the situation the model does
+    // emit for it sits in a speech context rather than in the narrated world. Its speaker is the
+    // sayer of the preceding sentence, which this seven-chart court does not chart, so the context
+    // is honestly unattributed rather than guessed.
+    assertEquals(compiled.draft.graph.contexts.size, 2)
+    assertEquals(
+      compiled.draft.graph.contexts.values.map(_.kind).toSet,
+      Set(
+        ContextKind.NarratedWorld,
+        ContextKind.Speech(ContextHolder.Unattributed(HolderGap.NoCandidate))
+      )
+    )
     assertEquals(compiled.draft.graph.segments.size, 1)
     assert(!compiled.validation.report.byLaw.contains("hierarchy.member-within-parent"))
-    assert(!compiled.validation.report.byLaw.contains("trajectory.complete"))
+    // `trajectory.complete` now fires, and truthfully. The embedded focus sits between `fog` and
+    // `arrows` in discourse order, so the temporal rule pairs it on both sides; its situation was
+    // never emitted because its context could not be read, so both pairs gap and the trajectory
+    // has a hole where a root the model could not place used to be silently skipped. A complete
+    // trajectory over a story with an unplaceable root would be the false claim.
+    assert(compiled.validation.report.byLaw.contains("trajectory.complete"))
     assertEquals(compiled.draft.graph.entities.size, 1)
     assertEquals(compiled.draft.graph.entities.values.head.label.value, "man")
     assertEquals(
       compiled.draft.graph.relations.participants.map(_.role),
       Vector(ParticipantRole.Agent)
     )
+    // Two temporal edges and two steps, not three: the pairs that touch the unplaceable root gap
+    // rather than joining `fog` straight to `arrows` across it. Skipping a root the model could
+    // not place would have produced an adjacency the text does not have.
     assertEquals(
       compiled.draft.graph.relations.temporal.map(_.relation),
-      Vector(TemporalRelation.Unclear, TemporalRelation.Unclear, TemporalRelation.Unclear)
+      Vector(TemporalRelation.Unclear, TemporalRelation.Unclear)
     )
-    assertEquals(compiled.draft.trajectory.steps.size, 3)
-    assertEquals(compiled.draft.trajectory.steps.map(_.entityTurnover), Vector(1.0, 1.0, 0.0))
-    assertEquals(
-      compiled.draft.trajectory.steps.map(_.worldTime.value).toSet,
-      Set(WorldTimeTransition.Unresolved(Vector.empty))
-    )
+    // No steps at all, which is this compiler's existing all-or-nothing rule for the trajectory:
+    // one blocked pair empties it, because a trajectory missing a step it never says is missing
+    // would read as the whole discourse path. The three blocked pairs carry their own gaps below.
+    assertEquals(compiled.draft.trajectory.steps.size, 0)
 
     val noProposal = DerivationGapReason.Unresolved(ResolutionFailure.NoProposal)
     val story = source.id
     val expectedGaps: Set[(NarrativeCandidateAddress, DerivationGapReason)] =
-      Vector(ref(sRiver, c1), ref(sThought, c1)).flatMap { anchor =>
+      Vector(ref(sRiver, c1)).flatMap { anchor =>
         Vector(
           NarrativeCandidateAddress.Situation(anchor) -> noProposal,
           NarrativeCandidateAddress.ContextAssignment(anchor) -> noProposal,
@@ -302,11 +347,46 @@ class ChartProposalCourtSuite extends FunSuite:
           NarrativeCandidateAddress.ParticipantCoverage(anchor) -> noProposal
         )
       }.toSet
-    assertEquals(compiled.derivation.gaps.size, 8)
-    assertEquals(compiled.derivation.gaps.map(g => g.target -> g.reason).toSet, expectedGaps)
+    // The embedded focus gaps too, and for a different reason worth naming: its context could not
+    // be read, so nothing downstream of the context could be either. Six gaps name it -- its four
+    // families and the two temporal pairs it stands between.
+    val thoughtGaps =
+      compiled.derivation.gaps.filter(_.target.render.contains(sThought.id.value))
+    assertEquals(thoughtGaps.size, 6)
+    assertEquals(
+      thoughtGaps
+        .find(_.target == NarrativeCandidateAddress.ContextAssignment(ref(sThought, c1)))
+        .map(_.reason),
+      Some(noProposal)
+    )
+    assertEquals(
+      thoughtGaps
+        .find(_.target == NarrativeCandidateAddress.Situation(ref(sThought, c1)))
+        .map(_.reason),
+      Some(
+        DerivationGapReason.MissingUpstream(
+          Vector(NarrativeCandidateAddress.ContextAssignment(ref(sThought, c1)))
+        )
+      )
+    )
+    // And the refusal is named on the provider's own receipt, not merely implied by an absence.
+    assertEquals(
+      proposals.calls
+        .filter(_.params.get("rule").contains(ChartProposalProvider.AbstainContextRule))
+        .flatMap(_.params.get("reason")),
+      Vector("focus-not-predicate:Entity", "undecidable-quotation:186:215")
+    )
+
+    // 8 became 13: the abstained sentence's four, the unplaceable root's four, the two temporal
+    // pairs it stands between, and the three trajectory steps the blocked pairs empty.
+    assertEquals(compiled.derivation.gaps.size, 13)
+    assert(
+      expectedGaps.subsetOf(compiled.derivation.gaps.map(g => g.target -> g.reason).toSet),
+      "the abstained sentence's four gaps are no longer all present"
+    )
 
     assertEquals(compiled.provenance.configHash, Checksum.ofText(ChartProposalProvider.RulesText))
-    assertEquals(compiled.provenance.calls.size, 30)
+    assertEquals(compiled.provenance.calls.size, 35)
     assert(compiled.provenance.calls.forall(_.params.get("chart-origin").forall(_ == "hand")))
     assertEquals(compiled.receipt.stages.head._2, ChartProposalProvider.chartsDigest(charts))
     assertEquals(

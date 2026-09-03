@@ -16,9 +16,9 @@ import storymodel4s.story.{Polarity as StoryPolarity, *}
   */
 class CoordinatedRootSuite extends FunSuite:
   private val source = StorySource
-    .fromText(
+    .titled(
       "They landed and went home. He was dead. There were people at Egulac.",
-      Some("Coordination court")
+      StoryTitle.callerSupplied("Coordination court").fold(e => fail(e.message), identity)
     )
     .fold(e => fail(e.message), identity)
   private val atlas = SurfaceAnalyzer.analyze(source)
@@ -176,8 +176,8 @@ class CoordinatedRootSuite extends FunSuite:
     assertEquals(
       branches(proposals.coverage.head),
       Vector(
-        CoordinatedBranch.Admitted(land, SourceRole.Operand(1), 1, 0),
-        CoordinatedBranch.Admitted(go, SourceRole.Operand(2), 2, 0)
+        CoordinatedBranch.Admitted(land, SourceRole.Operand(1), FillerCounts(1, 0, 0, 0, 0, 0)),
+        CoordinatedBranch.Admitted(go, SourceRole.Operand(2), FillerCounts(2, 0, 0, 0, 0, 0))
       )
     )
     assertEquals(proposals.counts, CoverageCounts(0, 1, 0, 0, 2))
@@ -334,7 +334,7 @@ class CoordinatedRootSuite extends FunSuite:
     assertEquals(
       branches(proposals.coverage.head),
       Vector(
-        CoordinatedBranch.Admitted(ref(s0, "l"), SourceRole.Operand(1), 0, 0),
+        CoordinatedBranch.Admitted(ref(s0, "l"), SourceRole.Operand(1), FillerCounts.empty),
         CoordinatedBranch.Abstained(
           ref(s0, "b"),
           SourceRole.Operand(2),
@@ -384,11 +384,11 @@ class CoordinatedRootSuite extends FunSuite:
       branches(propose(Vector(s0.id -> multi)).coverage.head).map(b => (b, b.branchRole)),
       Vector(
         (
-          CoordinatedBranch.Admitted(ref(s0, "l"), SourceRole.Named("snt1"), 0, 0),
+          CoordinatedBranch.Admitted(ref(s0, "l"), SourceRole.Named("snt1"), FillerCounts.empty),
           SourceRole.Named("snt1")
         ),
         (
-          CoordinatedBranch.Admitted(ref(s0, "g"), SourceRole.Named("snt2"), 0, 0),
+          CoordinatedBranch.Admitted(ref(s0, "g"), SourceRole.Named("snt2"), FillerCounts.empty),
           SourceRole.Named("snt2")
         )
       )
@@ -410,7 +410,7 @@ class CoordinatedRootSuite extends FunSuite:
     assertEquals(branches(propose(Vector(s0.id -> disjunction)).coverage.head).size, 2)
   }
 
-  test("an embedded coordination branch abstains: a held proposition is not asserted") {
+  test("an embedded coordination branch is admitted and held, never asserted at the root") {
     val chart = checked(
       s0,
       "a",
@@ -429,14 +429,18 @@ class CoordinatedRootSuite extends FunSuite:
     assertEquals(
       branches(propose(Vector(s0.id -> chart)).coverage.head),
       Vector(
-        CoordinatedBranch.Admitted(ref(s0, "s"), SourceRole.Operand(1), 0, 0),
-        CoordinatedBranch.Abstained(
-          ref(s0, "b"),
-          SourceRole.Operand(2),
-          AbstentionReason.BranchEmbedded
-        )
+        CoordinatedBranch.Admitted(ref(s0, "s"), SourceRole.Operand(1), FillerCounts.empty),
+        CoordinatedBranch.Admitted(ref(s0, "b"), SourceRole.Operand(2), FillerCounts.empty)
       )
     )
+
+    val model = compile(Vector(s0.id -> chart)).draft
+    val byLemma = model.graph.situations.values.map(s => s.predicate.lemma -> s).toMap
+    val container = model.graph.contexts(byLemma("say").context)
+    val held = model.graph.contexts(byLemma("go").context)
+    assertEquals(container.kind, ContextKind.NarratedWorld)
+    assertEquals(held.kind, ContextKind.Speech(ContextHolder.Unattributed(HolderGap.NoCandidate)))
+    assertEquals(held.parent, Some(container.id))
   }
 
   /** `He was dead.`: `(d / dead :domain (h / he))`. */
@@ -454,7 +458,10 @@ class CoordinatedRootSuite extends FunSuite:
     val proposals = propose(Vector(s1.id -> deadDomainHe))
     val root = ref(s1, "d")
 
-    assertEquals(proposals.coverage(1), SentenceCoverage.Proposed(root, 1, 0))
+    assertEquals(
+      proposals.coverage(1),
+      SentenceCoverage.Proposed(root, FillerCounts(1, 0, 0, 0, 0, 0))
+    )
     val situation = value(proposals.situations.head.bundle)
     assertEquals(situation.kind, SituationKind.State)
     assertEquals(situation.predicate, Predicate("dead", None, "dead"))
@@ -528,7 +535,10 @@ class CoordinatedRootSuite extends FunSuite:
     val proposals = propose(Vector(s2.id -> peopleAtEgulac))
     val root = ref(s2, "p")
 
-    assertEquals(proposals.coverage(2), SentenceCoverage.Proposed(root, 1, 0))
+    assertEquals(
+      proposals.coverage(2),
+      SentenceCoverage.Proposed(root, FillerCounts(1, 0, 0, 0, 0, 0))
+    )
     val situation = value(proposals.situations.head.bundle)
     assertEquals(situation.kind, SituationKind.State)
     // No frame is invented: the chart carries none, so the predicate carries none.

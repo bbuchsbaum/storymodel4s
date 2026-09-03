@@ -56,8 +56,8 @@ class RelationsSuite extends ScalaCheckSuite:
     val e = EntityId.unsafe("e")
     assertEquals(ContextKind.NarratedWorld.holderEntity, None)
     assertEquals(ContextKind.Hypothetical.holderEntity, None)
-    assertEquals(ContextKind.Speech(e).holderEntity, Some(e))
-    assertEquals(ContextKind.Imagination(e).holderEntity, Some(e))
+    assertEquals(ContextKind.Speech(ContextHolder.Named(e)).holderEntity, Some(e))
+    assertEquals(ContextKind.Imagination(ContextHolder.Named(e)).holderEntity, Some(e))
   }
 
   test("ParticipantRole.render distinguishes custom roles") {

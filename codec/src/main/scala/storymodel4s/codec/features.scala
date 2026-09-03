@@ -573,9 +573,18 @@ object FeatureCodecs:
     yield BoundaryEvidence(t, ss.toMap, is.toMap, l, cl)
   }
 
-/** Schema versions this codec can read; the current version is written on every artifact. */
+/** Schema versions this codec can read; the current version is written on every artifact.
+  *
+  * 0.2.0 adds the required `circumstances` layer to an encoded `RelationLayers`. 0.3.0 replaces a
+  * holder-bearing context kind's `entity` field with a `holder` object that can also say the holder
+  * was not derived. Neither 0.1.0 nor 0.2.0 is supported and [[Migration.steps]] has no step for
+  * either, deliberately: a 0.1.0 model has no circumstance layer because the rule that fills it did
+  * not exist, and a 0.2.0 model has no vocabulary for an unattributed context, so in both cases the
+  * lift would have to invent the very distinction the new field exists to record. Refusing is the
+  * truthful read; the artifact is rebuilt from its source.
+  */
 object SchemaVersions:
-  val Current: String = "0.1.0"
+  val Current: String = "0.3.0"
   val Supported: Vector[String] = Vector(Current)
 
   def check(c: io.circe.HCursor): Decoder.Result[String] =

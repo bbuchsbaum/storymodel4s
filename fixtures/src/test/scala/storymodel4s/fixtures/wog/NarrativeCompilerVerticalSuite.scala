@@ -20,9 +20,9 @@ import storymodel4s.story.*
   */
 class NarrativeCompilerVerticalSuite extends FunSuite:
   private val source = StorySource
-    .fromText(
+    .titled(
       WarOfTheGhostsText.text,
-      Some(WarOfTheGhostsText.title),
+      WarOfTheGhostsModel.title,
       metadata = Map("source" -> WarOfTheGhostsText.provenance)
     )
     .fold(e => fail(e.message), identity)

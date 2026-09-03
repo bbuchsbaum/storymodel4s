@@ -22,6 +22,7 @@ import storymodel4s.proposition.{
   SourceRole
 }
 import storymodel4s.story.{
+  CircumstanceKind,
   EntityType,
   Modality,
   ParticipantRole,
@@ -40,7 +41,6 @@ import storymodel4s.story.{
 enum AbstentionReason:
   case NoFocus
   case FocusNotPredicate(kind: ConceptKind)
-  case FocusEmbedded
 
   /** A coordinating focus with no `:opN` or `:sntN` branch to descend into. */
   case NoCoordinationBranch
@@ -53,17 +53,12 @@ enum AbstentionReason:
   /** A branch of a coordinating focus that is not an admissible situation root. */
   case BranchNotAdmissible(kind: ConceptKind)
 
-  /** A branch of a coordinating focus that some embedding of the chart holds. */
-  case BranchEmbedded
-
   def render: String = this match
     case NoFocus                   => "no-focus"
     case FocusNotPredicate(kind)   => s"focus-not-predicate:$kind"
-    case FocusEmbedded             => "focus-embedded"
     case NoCoordinationBranch      => "no-coordination-branch"
     case NestedCoordination        => "coordination-branch-nested"
     case BranchNotAdmissible(kind) => s"coordination-branch-not-admissible:$kind"
-    case BranchEmbedded            => "coordination-branch-embedded"
 
 /** One branch of a coordinating focus, and what the provider did with it.
   *
@@ -72,19 +67,81 @@ enum AbstentionReason:
   * admitted roots would read as complete coverage of the sentence.
   */
 enum CoordinatedBranch:
-  /** `fillers` and `unlicensed` count exactly as they do on [[SentenceCoverage.Proposed]]. */
-  case Admitted(root: ChartNodeRef, role: SourceRole, fillers: Int, unlicensed: Int)
+  /** `counts` divides the branch's fillers exactly as it does on [[SentenceCoverage.Proposed]]. */
+  case Admitted(root: ChartNodeRef, role: SourceRole, counts: FillerCounts)
   case Abstained(root: ChartNodeRef, role: SourceRole, reason: AbstentionReason)
 
   /** The branch root, whichever way the branch went. */
   def branchRoot: ChartNodeRef = this match
-    case Admitted(root, _, _, _) => root
-    case Abstained(root, _, _)   => root
+    case Admitted(root, _, _)  => root
+    case Abstained(root, _, _) => root
 
   /** The role that attached the branch to its coordinator. */
   def branchRole: SourceRole = this match
-    case Admitted(_, role, _, _) => role
-    case Abstained(_, role, _)   => role
+    case Admitted(_, role, _)  => role
+    case Abstained(_, role, _) => role
+
+/** How the entity-kind fillers the chart reaches from one root divided under the referentiality
+  * rule. Honest product data: every combination of counts is a lawful state of some chart.
+  *
+  * Why four counters and not one: "the chart reached no participant here" is a different fact from
+  * "it reached a time", from "it reached a role nothing licenses as referential", and from "no
+  * single normalized role reached the filler at all". A ledger that summed them would let the
+  * entity layer shrink with nothing saying where the fillers went, which is the shape of every
+  * silent-drop defect this project has had.
+  *
+  *   - `referents` became participant edges and entity mentions;
+  *   - `circumstances` became time or manner values on the situation;
+  *   - `eventualities` stood under `:cause` or `:result`, which relate situations rather than
+  *     things; they are the causal layer's work and are named separately so that slice can find
+  *     every one of them;
+  *   - `nonReferential` were refused by an unestablished extension role or by a concept kind that
+  *     cannot denote a referent;
+  *   - `unlicensed` were reached by no single normalized role — a numbered argument the frame
+  *     lexicon did not license, an operand, an extension role — which is the frame lexicon's work;
+  *   - `ambiguous` were reached by two or more different licensed roles, which is a chart the
+  *     provider will not guess about.
+  *
+  * The last three were one counter until 2026-09-02, when an audit found 51 of this story's 119
+  * argument fillers leaving the provider as a single anonymous increment. Every one of the six
+  * classes needs a different fix by a different slice, and one number could not name any of them.
+  */
+final case class FillerCounts(
+    referents: Int,
+    circumstances: Int,
+    eventualities: Int,
+    nonReferential: Int,
+    unlicensed: Int,
+    ambiguous: Int
+):
+  /** Every filler the scan saw. Equal to the size of the scanned population, by construction, and
+    * the reason a filler cannot leave the provider unaccounted for.
+    */
+  def seen: Int =
+    referents + circumstances + eventualities + nonReferential + unlicensed + ambiguous
+
+object FillerCounts:
+  val empty: FillerCounts = FillerCounts(0, 0, 0, 0, 0, 0)
+
+  /** The counts of one refused filler, so the ledger is derived from the refusals rather than
+    * incremented alongside them.
+    */
+  private[document] def of(refusal: FillerRefusal): FillerCounts = refusal match
+    case FillerRefusal.RoleTakesSituation(_)    => FillerCounts(0, 0, 1, 0, 0, 0)
+    case FillerRefusal.RoleUnestablished(_)     => FillerCounts(0, 0, 0, 1, 0, 0)
+    case FillerRefusal.ConceptNotReferential(_) => FillerCounts(0, 0, 0, 1, 0, 0)
+    case FillerRefusal.NoLicensedRole           => FillerCounts(0, 0, 0, 0, 1, 0)
+    case FillerRefusal.SeveralLicensedRoles     => FillerCounts(0, 0, 0, 0, 0, 1)
+
+  private[document] def plus(a: FillerCounts, b: FillerCounts): FillerCounts =
+    FillerCounts(
+      a.referents + b.referents,
+      a.circumstances + b.circumstances,
+      a.eventualities + b.eventualities,
+      a.nonReferential + b.nonReferential,
+      a.unlicensed + b.unlicensed,
+      a.ambiguous + b.ambiguous
+    )
 
 /** One ledger row per atlas sentence: what the provider did with it.
   *
@@ -93,12 +150,10 @@ enum CoordinatedBranch:
   * partial run read as a complete one.
   */
 enum SentenceCoverage:
-  /** `fillers` counts the entity-kind fillers proposed as participants of the root; `unlicensed`
-    * counts the entity-kind fillers the chart reaches from the root by no single normalized
-    * participant role, which are never proposed. Together they say how much of the root's argument
-    * structure the participant layer carries. The sentence is the root's own.
+  /** `counts` divides every entity-kind filler the chart reaches from the root; the sentence is the
+    * root's own.
     */
-  case Proposed(root: ChartNodeRef, fillers: Int, unlicensed: Int)
+  case Proposed(root: ChartNodeRef, counts: FillerCounts)
 
   /** A sentence whose focus coordinates several roots, with one entry per branch in discourse
     * order. Why one row and not several `Proposed` rows: the branches are siblings inside one
@@ -113,7 +168,7 @@ enum SentenceCoverage:
 
   /** The sentence the row is about: derived from the chart node for rows that carry one. */
   def sentence: SurfaceUnitId = this match
-    case Proposed(root, _, _)   => root.sentence
+    case Proposed(root, _)      => root.sentence
     case Coordinated(anchor, _) => anchor.sentence
     case Abstained(anchor, _)   => anchor.sentence
     case EmptyChart(unit)       => unit
@@ -121,19 +176,32 @@ enum SentenceCoverage:
 
   /** The roots this sentence actually produced, in discourse order; empty when it produced none. */
   def admittedRoots: Vector[ChartNodeRef] = this match
-    case Proposed(root, _, _) => Vector(root)
-    case Coordinated(_, bs)   =>
-      bs.collect { case CoordinatedBranch.Admitted(root, _, _, _) =>
+    case Proposed(root, _)  => Vector(root)
+    case Coordinated(_, bs) =>
+      bs.collect { case CoordinatedBranch.Admitted(root, _, _) =>
         root
       }
     case Abstained(_, _) => Vector.empty
     case EmptyChart(_)   => Vector.empty
     case NoChart(_)      => Vector.empty
 
-/** Whether a story-summary proposal was emitted; the title is the only summary source here. */
+/** Whether a story-summary proposal was emitted; the title is the only summary source here.
+  *
+  * Why three cases and not two: a source with no title and a source carrying a title nobody
+  * established are different states of the world, and the provider abstains in both. Folding them
+  * together would hide the one that needs a caller's attention — a title is sitting right there and
+  * the model refuses to publish it — behind the one that needs a new rule.
+  */
 enum SummaryCoverage:
-  case Proposed(title: String)
+  case Proposed(title: String, provenance: TitleProvenance)
+
+  /** The source carries no title at all. */
   case NoTitle
+
+  /** The source carries a title whose provenance it does not record, so nothing entitles the model
+    * to publish it. A filename put there by a tool is the case this exists for.
+    */
+  case TitleUnestablished
 
 /** Coverage counts over the sentence ledger. Honest product data: every combination is lawful.
   *
@@ -166,6 +234,7 @@ final class ChartProposals private (
     val entityMentions: Vector[EntityMentionAttempt],
     val participants: Vector[ParticipantAttempt],
     val participantCoverage: Vector[ParticipantCoverageAttempt],
+    val circumstances: Vector[SituationCircumstanceAttempt],
     val temporal: Vector[TemporalAttempt],
     val calls: Vector[ProviderCall],
     val coverage: Vector[SentenceCoverage],
@@ -174,7 +243,7 @@ final class ChartProposals private (
   def counts: CoverageCounts =
     coverage.foldLeft(CoverageCounts(0, 0, 0, 0, 0)) { (acc, row) =>
       row match
-        case SentenceCoverage.Proposed(_, _, _) => acc.copy(proposed = acc.proposed + 1)
+        case SentenceCoverage.Proposed(_, _)    => acc.copy(proposed = acc.proposed + 1)
         case SentenceCoverage.Coordinated(_, _) => acc.copy(coordinated = acc.coordinated + 1)
         case SentenceCoverage.Abstained(_, _)   => acc.copy(abstained = acc.abstained + 1)
         case SentenceCoverage.EmptyChart(_)     => acc.copy(emptyCharts = acc.emptyCharts + 1)
@@ -192,6 +261,7 @@ final class ChartProposals private (
       entityMentions == that.entityMentions &&
       participants == that.participants &&
       participantCoverage == that.participantCoverage &&
+      circumstances == that.circumstances &&
       temporal == that.temporal &&
       calls == that.calls &&
       coverage == that.coverage &&
@@ -209,6 +279,7 @@ final class ChartProposals private (
       entityMentions,
       participants,
       participantCoverage,
+      circumstances,
       temporal,
       calls,
       coverage,
@@ -219,7 +290,8 @@ final class ChartProposals private (
     val c = counts
     s"ChartProposals(proposed=${c.proposed}, coordinated=${c.coordinated}, " +
       s"abstained=${c.abstained}, empty=${c.emptyCharts}, noChart=${c.noCharts}, " +
-      s"participants=${participants.size}, temporal=${temporal.size}, calls=${calls.size})"
+      s"participants=${participants.size}, circumstances=${circumstances.size}, " +
+      s"temporal=${temporal.size}, calls=${calls.size})"
 
 object ChartProposals:
   private[document] def derived(
@@ -231,6 +303,7 @@ object ChartProposals:
       entityMentions: Vector[EntityMentionAttempt],
       participants: Vector[ParticipantAttempt],
       participantCoverage: Vector[ParticipantCoverageAttempt],
+      circumstances: Vector[SituationCircumstanceAttempt],
       temporal: Vector[TemporalAttempt],
       calls: Vector[ProviderCall],
       coverage: Vector[SentenceCoverage],
@@ -246,6 +319,7 @@ object ChartProposals:
       entityMentions,
       participants,
       participantCoverage,
+      circumstances,
       temporal,
       calls,
       coverage,
@@ -279,11 +353,15 @@ object ChartProposalProvider:
     */
   val CalibrationModel: String = "chart-rule-v1"
 
-  /** Calibration model of the context rule. `NarratedWorld` is the absence-of-embedding default at
-    * sentence grain (the focus is held by no embedding, so the sentence asserts it at root), not a
-    * context the chart licenses positively; the name keeps that visible on every receipt.
+  /** Calibration model of the context rule, from [[ContextPlacement.CalibrationModel]].
+    *
+    * It replaced `narrated-world-default-v1`, whose name recorded that the narrated world was the
+    * branch the rule fell back to when nothing else matched. It no longer is: root placement is the
+    * positive reading that the root's own words lie outside every quotation of the canonical text
+    * *and* that its concept is held by no embedding of its chart, and a root that reading cannot be
+    * taken for abstains under $AbstainContextRule instead.
     */
-  val ContextCalibrationModel: String = "narrated-world-default-v1"
+  val ContextCalibrationModel: String = ContextPlacement.CalibrationModel
 
   /** Calibration model of the title-summary rule, which reads no chart. */
   val SummaryCalibrationModel: String = "title-rule-v1"
@@ -346,11 +424,12 @@ object ChartProposalProvider:
 
   /** Rule names recorded on receipts. */
   val SituationRule: String = "focus-situation-rule"
-  val ContextRule: String = "narrated-world-context-rule"
+  val ContextRule: String = ContextPlacement.RuleName
   val MembershipRule: String = "primary-story-membership-rule"
   val ParticipantRule: String = "licensed-role-participant-rule"
   val MentionRule: String = "entity-filler-mention-rule"
   val CoverageRule: String = "participant-coverage-rule"
+  val CircumstanceRule: String = "situation-circumstance-rule"
   val TemporalRule: String = "adjacent-root-unclear-rule"
   val SummaryRule: String = "title-summary-rule"
   val AbstainSituationRule: String = "abstain-situation-rule"
@@ -358,6 +437,14 @@ object ChartProposalProvider:
   val AbstainMembershipRule: String = "abstain-membership-rule"
   val AbstainCoverageRule: String = "abstain-coverage-rule"
   val AbstainSummaryRule: String = "abstain-summary-rule"
+
+  /** Abstention reason when the source carries no title. */
+  val NoTitleReason: String = "no-title"
+
+  /** Abstention reason when the source carries a title but records no provenance for it. Named
+    * separately from [[NoTitleReason]] so a receipt says which of the two happened.
+    */
+  val UnestablishedTitleReason: String = "title-provenance-unrecorded"
 
   /** The mapping rules, verbatim. Its checksum is the prompt-package checksum and the provenance
     * config hash.
@@ -413,7 +500,32 @@ object ChartProposalProvider:
        |  or literal; the sentence text is never copied.
        |polarity: the chart polarity of the root, mapped one-to-one (Positive, Negative, Unknown).
        |modality: Asserted. aspect: none.
-       |context: NarratedWorld, one attempt per admissible root, anchored at the root.
+       |context: one attempt per admissible root, anchored at the root, valued by
+       |  ${ContextPlacement.RuleName}. A root is in the NARRATED WORLD exactly when both readings
+       |  come back empty: the words that anchor it (its own alignment spans, the spans of every
+       |  alignment naming it otherwise, the sentence when the chart aligns it nowhere) lie wholly
+       |  outside every quotation of the canonical text, AND its concept is held by no embedding of
+       |  its chart. That is a reading of two recorded observations and not the branch that fires
+       |  when nothing else matched. Otherwise the root is HELD, and the attempt carries the path
+       |  from the narrated world outward-in: one step per quotation wholly containing the anchor,
+       |  outermost first, then one step per embedding of the chain that holds the concept,
+       |  outermost first. A quotation the chart already accounts for is dropped, which is the case
+       |  where a reporting predicate of the same sentence sits outside the quotation it opens; what
+       |  survives is reporting that began in an earlier sentence, which no single chart can see.
+       |  Quotation marks are read by ${QuotationScan.RuleName} over the canonical text: the closed
+       |  set { U+0022, U+201C, U+201D }, never a single quotation mark, because an apostrophe and
+       |  an opening single quote are the same character. Attribution is a separate question and is
+       |  allowed to fail: the speakers offered for a quotation are the fillers, under a role
+       |  normalized to Agent or Experiencer, of the speech containers in the sentence the opening
+       |  mark falls in and the one before it whose own words end at or before that mark; the
+       |  compiler names the holder only when exactly one entity survives, and records
+       |  no-candidate, several-candidates or unresolved-candidate otherwise. An unattributed
+       |  reported context is correct; a root-world assertion in its place is not.
+       |context abstention: a root the placement rule cannot read abstains under
+       |  $AbstainContextRule with the refusal named on the receipt — the text's marks do not pair,
+       |  the root's words straddle a mark, the chart holds one concept several ways or in a loop,
+       |  or the chart says a concept is held without saying how. Its situation then gaps for a
+       |  missing context rather than being asserted at root, which is the whole point of the rule.
        |membership: PrimaryStoryMember, one attempt per admissible root, anchored at the root.
        |support: for a focus root, the union of the alignment spans of every alignment naming at
        |  least one non-embedded concept, recorded as span-source=chart-alignments. For a
@@ -430,9 +542,9 @@ object ChartProposalProvider:
        |  which span-source=sentence distinguishes from a measured 1.0.
        |calibration: probability 1.0 under $CalibrationModel for every rule that is a total
        |  function of the chart (situation, membership, coverage, participant, mention, temporal);
-       |  the context rule under $ContextCalibrationModel, because NarratedWorld is the
-       |  absence-of-embedding default at sentence grain; the summary rule under
-       |  $SummaryCalibrationModel.
+       |  the context rule under $ContextCalibrationModel, which is a total function of the
+       |  chart's embedding relation and the canonical text's quotation spans; the summary rule
+       |  under $SummaryCalibrationModel.
        |receipts: every evidence id is the content address of its scope, chart checksum, and
        |  rendered span set; every call render names the evidence id it cites; the chart receipts
        |  bind the source by their input checksum (the canonical text or the sentence text); the
@@ -440,12 +552,51 @@ object ChartProposalProvider:
        |  shapes admitted the root. The scope of a focus root's situation, context, membership and
        |  coverage task is its sentence, which identifies it; the scope of a coordinated branch's
        |  is the branch root key, because its sentence does not.
-       |summary: the source title with evidence spanning the whole canonical text; no title or a
-       |  blank title yields an abstained summary attempt.
+       |summary: the source title with evidence spanning the whole canonical text, and only when
+       |  the source records how that title was established. A title is a claim about the work, so
+       |  this rule publishes one only on a basis the source names; the sole basis this version
+       |  knows is that a caller stated it, recorded as title-provenance=caller-supplied on the
+       |  receipt. A source with no title, or a blank one, abstains with $NoTitleReason; a source
+       |  carrying a title whose provenance it does not record abstains with
+       |  $UnestablishedTitleReason. Nothing derives a title from anything that is not the work: a
+       |  path, a filename, or a request identifier is not a title, and a model built from a bare
+       |  text file carries a summary gap instead, which is true.
+       |referentiality: reaching exactly one normalized role does not make a filler a participant.
+       |  A filler is a referent of the root only when the ROLE takes a referent and the CONCEPT
+       |  can denote one, decided by ${Referentiality.RuleName}. The roles that take a referent are
+       |  the closed set {${referentialRolesText}}; Location is among them because a place is a
+       |  referent and no chart signal separates "a place" from "an entity standing in for one",
+       |  and asserting that separation from a word list would be world knowledge this layer does
+       |  not have. Time and Manner name circumstances (below). Cause and Result relate one
+       |  SITUATION to another rather than a situation to a thing, so a filler under either is
+       |  neither a participant nor a circumstance: what it describes belongs to the causal layer,
+       |  which this version does not build. Such a filler is counted eventualities on the coverage
+       |  row and carries a receipt naming its role, so the slice that builds that layer finds every
+       |  one of them rather than starting from the text again. Custom roles are refused with one
+       |  named exception: this provider's own
+       |  ${renderRole(Referentiality.PredicationSubject)}, the concept a predicative state is
+       |  predicated of, takes a referent — the state holds of it — and is a Custom only because it
+       |  names no thematic role, which is a different question. Every other Custom role,
+       |  amr:purpose included, is refused, because nothing established what its filler is. The
+       |  concept kinds that denote a referent are Entity and Name; a
+       |  Quantity measures a referent without being one, and Property, Predicate, Special and
+       |  Unknown are not referents either. A filler the rule turns away is counted nonReferential
+       |  on the coverage row and carries a receipt naming whether the role or the concept kind
+       |  refused it. It never becomes an entity: a time or a property admitted as an entity is a
+       |  cast member the model never observed, and every measurement over the entity layer counts
+       |  it.
+       |circumstances: a filler under Time or Manner yields one circumstance attempt (situation =
+       |  root, filler = the concept) valued at that kind and the concept lemma, with evidence the
+       |  filler's own alignment spans (span-source=filler-alignments), else the root support
+       |  (span-source=root-support). The lemma is the source's own word and is never normalized to
+       |  a date, a duration, or an interval: placing a circumstance on a timeline is a different
+       |  claim under a different licence. Circumstances are counted on the coverage row and are
+       |  never participants and never entities.
        |participants: for each admissible root, every relation from the root whose filler is a
-       |  chart concept of kind Entity, Name, or Quantity and whose role carries exactly one
-       |  normalized participant role yields one participant attempt (situation = root, filler =
-       |  the concept) valued at that role. A numbered argument carries a normalized role only when
+       |  chart concept of kind Entity, Name, or Quantity, whose role carries exactly one
+       |  normalized participant role, and which the referentiality rule admits as a referent
+       |  yields one participant attempt (situation = root, filler = the concept) valued at that
+       |  role. A numbered argument carries a normalized role only when
        |  the chart's frame lexicon licensed one; a named role carries the chart's own normalized
        |  role, else the standard table {$namedRolesText}. A filler reached by no licensed role, or
        |  by two different licensed roles, is counted unlicensed on the coverage row and never
@@ -461,7 +612,16 @@ object ChartProposalProvider:
        |coverage: one participant-coverage attempt per admissible root listing exactly the
        |  proposed fillers, possibly none, with the root's evidence. An empty coverage is a value:
        |  it says the chart reaches no licensed participant from the root, never that participants
-       |  were not evaluated.
+       |  were not evaluated. The ledger row divides every entity-kind filler the scan saw into six
+       |  named classes — referents, circumstances, eventualities, nonReferential, unlicensed and
+       |  ambiguous — which sum to seen, and EVERY filler the rule turned away also carries its own
+       |  receipt under ${Referentiality.RuleName} naming the concept, its lemma, its concept kind,
+       |  the source roles that reached it and the reason. So no filler leaves this provider
+       |  unaccounted for, and each class names the slice that owns it: eventualities the causal
+       |  layer, unlicensed the frame lexicon (a numbered argument no lexicon licensed, an operand,
+       |  an extension role), ambiguous a chart that gave one filler two licensed roles and which
+       |  this provider will not guess about, nonReferential an unestablished extension role or a
+       |  concept kind that cannot denote a referent.
        |temporal: one attempt per consecutive pair of admissible roots in sentence order and, within
        |  a sentence, in branch order, valued Unclear, with evidence spanning both roots' support.
        |  Never Before or Meets: a time filler in a sentence chart is a concept of that chart, not a
@@ -481,8 +641,16 @@ object ChartProposalProvider:
        |  no calibration.
        |policy: AcceptancePolicy.Conservative, except ContextAssignment and SegmentMembership at
        |  requireAgreement = 1, because one deterministic program is one provider; EntityMention,
-       |  ParticipantRole, ParticipantCoverage, and TemporalRelation are FamilyPolicy.Ordinary.
+       |  ParticipantRole, ParticipantCoverage, SituationCircumstance, and TemporalRelation are
+       |  FamilyPolicy.Ordinary.
        |""".stripMargin
+
+  /** The closed referential-role set as printed into [[RulesText]], derived from
+    * [[Referentiality.licence]] over every non-`Custom` case of `ParticipantRole` rather than typed
+    * out beside it: a list a reader could disagree with the code about is not a rule.
+    */
+  private def referentialRolesText: String =
+    Referentiality.referentialRoles.map(_.toString).sorted.mkString(", ")
 
   /** The named-role table as printed into [[RulesText]]. */
   private def namedRolesText: String =
@@ -513,6 +681,7 @@ object ChartProposalProvider:
         ClaimFamily.EntityMention -> FamilyPolicy.Ordinary,
         ClaimFamily.ParticipantRole -> FamilyPolicy.Ordinary,
         ClaimFamily.ParticipantCoverage -> FamilyPolicy.Ordinary,
+        ClaimFamily.SituationCircumstance -> FamilyPolicy.Ordinary,
         ClaimFamily.TemporalRelation -> FamilyPolicy.Ordinary
       )
     )
@@ -532,12 +701,36 @@ object ChartProposalProvider:
   /** Support spans, where they came from, and the minimum alignment credence behind them. */
   private final case class Support(spans: SpanSet, source: String, raw: Double)
 
-  /** An entity-kind filler of the root reached by exactly one licensed participant role. */
+  /** An entity-kind filler of the root reached by exactly one licensed participant role, whose role
+    * takes a referent and whose concept can denote one.
+    */
   private final case class LicensedFiller(
       concept: ConceptId,
       kind: ConceptKind,
       lemma: String,
       role: ParticipantRole
+  )
+
+  /** A filler whose role names a circumstance of the situation rather than a participant in it. */
+  private final case class CircumstanceFiller(
+      concept: ConceptId,
+      kind: CircumstanceKind,
+      lemma: String,
+      role: ParticipantRole
+  )
+
+  /** A filler the referentiality rule turned away, with everything a later slice needs to act on
+    * it: which concept, what word, what kind, which source roles reached it, and why it was
+    * refused. Kept rather than counted anonymously — `then` refused for its role, `5` refused for
+    * its concept kind, and an `:ARG3` no lexicon licensed are three different findings for three
+    * different slices, and a bare count names none of them.
+    */
+  private final case class RefusedFiller(
+      concept: ConceptId,
+      kind: ConceptKind,
+      lemma: String,
+      sourceRoles: Vector[SourceRole],
+      refusal: FillerRefusal
   )
 
   /** Which closed admissibility shape admitted a root, and what kind of situation it makes.
@@ -555,8 +748,7 @@ object ChartProposalProvider:
   /** Everything one admitted root contributed. */
   private final case class RootOutcome(
       proposedRoot: ProposedRoot,
-      fillers: Int,
-      unlicensed: Int,
+      counts: FillerCounts,
       evidence: Vector[Evidence],
       situation: SituationAttempt,
       context: ContextAssignmentAttempt,
@@ -564,8 +756,52 @@ object ChartProposalProvider:
       participantCoverage: ParticipantCoverageAttempt,
       entityMentions: Vector[EntityMentionAttempt],
       participants: Vector[ParticipantAttempt],
+      circumstances: Vector[SituationCircumstanceAttempt],
       calls: Vector[ProviderCall]
   )
+
+  /** What one circumstance filler contributed: its span evidence, its attempt, and its receipt. */
+  private final case class CircumstanceOutcome(
+      evidence: Evidence,
+      attempt: SituationCircumstanceAttempt,
+      call: ProviderCall
+  )
+
+  /** A circumstance attempt carrying the filler's own alignment spans, so the words that state the
+    * time or the manner stay attached to the claim rather than to the situation as a whole.
+    */
+  private def circumstanceOutcome(
+      source: StorySource,
+      unit: SurfaceUnit,
+      chart: PropositionChart[Checked],
+      checksum: Checksum,
+      root: ChartNodeRef,
+      rootSupport: Support,
+      filler: CircumstanceFiller,
+      params: Map[String, String]
+  ): CircumstanceOutcome =
+    val fillerRef = ChartNodeRef(unit.id, filler.concept)
+    val fillerAlignments = chart.alignments.filter(_.target.conceptIds.contains(filler.concept))
+    val fillerSpans = SpanSet.of(fillerAlignments.flatMap(_.spans.refs.toVector))
+    val (spans, spanSource, raw) = fillerSpans match
+      case Some(own) => (own, "filler-alignments", minCredence(fillerAlignments))
+      case None      => (rootSupport.spans, "root-support", rootSupport.raw)
+    val evidence = evidenceRecord(s"${root.key}~${fillerRef.key}", checksum, spans)
+    val value = CircumstanceProposal(filler.kind, filler.lemma)
+    val (bundle, call) = proposed(
+      source,
+      CircumstanceRule,
+      s"${root.key}~${fillerRef.key}",
+      checksum,
+      value,
+      evidence,
+      math.min(raw, rootSupport.raw),
+      CalibrationModel,
+      Vector("circumstance", root.key, fillerRef.key, filler.kind.render, filler.lemma),
+      params + ("filler" -> filler.concept.value) + ("role" -> renderRole(filler.role)) +
+        ("circumstance" -> filler.kind.render) + ("span-source" -> spanSource)
+    )
+    CircumstanceOutcome(evidence, SituationCircumstanceAttempt(root, fillerRef, bundle), call)
 
   /** The four families every root — admitted or not — is accounted for in. */
   private final case class RootAttempts(
@@ -586,6 +822,7 @@ object ChartProposalProvider:
       participantCoverage: Vector[ParticipantCoverageAttempt],
       entityMentions: Vector[EntityMentionAttempt],
       participants: Vector[ParticipantAttempt],
+      circumstances: Vector[SituationCircumstanceAttempt],
       calls: Vector[ProviderCall]
   )
 
@@ -596,6 +833,7 @@ object ChartProposalProvider:
     def bare(coverage: SentenceCoverage): SentenceOutcome =
       SentenceOutcome(
         coverage,
+        Vector.empty,
         Vector.empty,
         Vector.empty,
         Vector.empty,
@@ -625,7 +863,8 @@ object ChartProposalProvider:
       _ <- checkSourceIsContentAddressed(source)
       ordered <- checkCharts(source, atlas, charts)
       _ <- ordered.traverse_((unit, ev) => checkAlignments(source, atlas, unit, ev.chart))
-      outcomes <- ordered.traverse((unit, ev) => sentenceOutcome(source, unit, ev))
+      placement = ContextPlacement.read(source, atlas, ordered.map((u, ev) => u.id -> ev.chart))
+      outcomes <- ordered.traverse((unit, ev) => sentenceOutcome(source, unit, ev)(using placement))
       summary <- summaryOutcome(source)
     yield
       val byUnit = outcomes.map(o => o.coverage.sentence -> o).toMap
@@ -648,6 +887,7 @@ object ChartProposalProvider:
         outcomes.flatMap(_.entityMentions).sortBy(_.mention.key),
         outcomes.flatMap(_.participants).sortBy(a => (a.situation.key, a.filler.key)),
         outcomes.flatMap(_.participantCoverage).sortBy(_.situation.key),
+        outcomes.flatMap(_.circumstances).sortBy(a => (a.situation.key, a.filler.key)),
         temporal.map(_._1).sortBy(a => (a.from.key, a.to.key)),
         (outcomes.flatMap(_.calls) ++ temporal.map(_._3) :+ summary.call).sortBy(renderCall),
         coverage,
@@ -696,6 +936,7 @@ object ChartProposalProvider:
           proposals.entityMentions,
           proposals.participants,
           proposals.participantCoverage,
+          proposals.circumstances,
           proposals.temporal,
           Policy,
           receipt,
@@ -859,7 +1100,7 @@ object ChartProposalProvider:
       source: StorySource,
       unit: SurfaceUnit,
       ev: PropositionEvidence
-  ): Either[DomainError, SentenceOutcome] =
+  )(using text: TextPlacement): Either[DomainError, SentenceOutcome] =
     val chart = ev.chart
     val origin = ev.provenance.origin
     val checksum = Canonical.checksum(chart)
@@ -893,17 +1134,6 @@ object ChartProposalProvider:
                     AbstentionReason.FocusNotPredicate(concept.kind)
                   )
                 )
-              else if chart.isEmbedded(focus) then
-                Right(
-                  abstainSentence(
-                    source,
-                    unit,
-                    origin,
-                    checksum,
-                    root,
-                    AbstentionReason.FocusEmbedded
-                  )
-                )
               else
                 rule match
                   case Some(admitted) =>
@@ -920,8 +1150,7 @@ object ChartProposalProvider:
                       unit.id.value
                     ).map(outcome =>
                       SentenceOutcome(
-                        SentenceCoverage
-                          .Proposed(root, outcome.fillers, outcome.unlicensed),
+                        SentenceCoverage.Proposed(root, outcome.counts),
                         Vector(outcome.proposedRoot),
                         outcome.evidence,
                         Vector(outcome.situation),
@@ -930,6 +1159,7 @@ object ChartProposalProvider:
                         Vector(outcome.participantCoverage),
                         outcome.entityMentions,
                         outcome.participants,
+                        outcome.circumstances,
                         outcome.calls
                       )
                     )
@@ -956,7 +1186,7 @@ object ChartProposalProvider:
       origin: ChartOrigin,
       checksum: Checksum,
       coordinator: ChartNodeRef
-  ): Either[DomainError, SentenceOutcome] =
+  )(using text: TextPlacement): Either[DomainError, SentenceOutcome] =
     val branches = ChartRoots.branches(chart, coordinator.concept)
     if branches.isEmpty then
       Right(
@@ -974,12 +1204,11 @@ object ChartProposalProvider:
         chart
           .concept(branch.concept)
           .filterNot(ChartRoots.isCoordinator)
-          .filterNot(_ => chart.isEmbedded(branch.concept))
           .flatMap(concept => admissibleRoot(chart, branch.concept, concept))
           .map(_ => branch.concept)
       )
       val mentionOwner: Map[ConceptId, ConceptId] = admitted
-        .flatMap(root => scanFillers(chart, root)._1.map(filler => filler.concept -> root))
+        .flatMap(root => scanFillers(chart, root).referents.map(filler => filler.concept -> root))
         .foldLeft(Map.empty[ConceptId, ConceptId]) { (owners, entry) =>
           if owners.contains(entry._1) then owners else owners + entry
         }
@@ -998,6 +1227,7 @@ object ChartProposalProvider:
             outcomes.map(_._3.participantCoverage),
             outcomes.flatMap(_._2.toVector.flatMap(_.entityMentions)),
             outcomes.flatMap(_._2.toVector.flatMap(_.participants)),
+            outcomes.flatMap(_._2.toVector.flatMap(_.circumstances)),
             outcomes.flatMap(_._3.calls)
           )
         )
@@ -1012,6 +1242,8 @@ object ChartProposalProvider:
       coordinator: ChartNodeRef,
       branch: ChartRoots.Branch,
       mentionOwner: Map[ConceptId, ConceptId]
+  )(using
+      text: TextPlacement
   ): Either[DomainError, (CoordinatedBranch, Option[RootOutcome], RootAttempts)] =
     val root = ChartNodeRef(unit.id, branch.concept)
     def refuse(reason: AbstentionReason) =
@@ -1033,8 +1265,6 @@ object ChartProposalProvider:
         )
       case Some(concept) if ChartRoots.isCoordinator(concept) =>
         refuse(AbstentionReason.NestedCoordination)
-      case Some(_) if chart.isEmbedded(branch.concept) =>
-        refuse(AbstentionReason.BranchEmbedded)
       case Some(concept) =>
         admissibleRoot(chart, branch.concept, concept) match
           case None       => refuse(AbstentionReason.BranchNotAdmissible(concept.kind))
@@ -1053,7 +1283,7 @@ object ChartProposalProvider:
               filler => mentionOwner.get(filler).contains(branch.concept)
             ).map(outcome =>
               (
-                CoordinatedBranch.Admitted(root, branch.role, outcome.fillers, outcome.unlicensed),
+                CoordinatedBranch.Admitted(root, branch.role, outcome.counts),
                 Some(outcome),
                 RootAttempts(
                   outcome.situation,
@@ -1084,7 +1314,7 @@ object ChartProposalProvider:
       support: Support,
       scope: String,
       mentions: ConceptId => Boolean = _ => true
-  ): Either[DomainError, RootOutcome] =
+  )(using text: TextPlacement): Either[DomainError, RootOutcome] =
     Gloss.predicate(chart, root.concept) match
       case None =>
         Left(
@@ -1132,18 +1362,29 @@ object ChartProposalProvider:
           ),
           params
         )
-        val (context, contextCall) = proposed(
-          source,
-          ContextRule,
-          scope,
-          checksum,
-          ContextAssignmentProposal.NarratedWorld,
-          evidence,
-          support.raw,
-          ContextCalibrationModel,
-          Vector("narrated-world", root.key),
-          params
-        )
+        val (context, contextCall) = ContextPlacement.place(chart, root.concept, unit, text) match
+          case Right(placed) =>
+            proposed(
+              source,
+              ContextRule,
+              scope,
+              checksum,
+              placed,
+              evidence,
+              support.raw,
+              ContextCalibrationModel,
+              renderPlacement(placed) :+ root.key,
+              params + ("placement" -> renderPlacement(placed).mkString("/"))
+            )
+          case Left(refusal) =>
+            abstained[ContextAssignmentProposal](
+              source,
+              AbstainContextRule,
+              scope,
+              checksum,
+              Vector("abstain-context", root.key, refusal.render),
+              params + ("reason" -> refusal.render)
+            )
         val (membership, membershipCall) = proposed(
           source,
           MembershipRule,
@@ -1156,8 +1397,8 @@ object ChartProposalProvider:
           Vector("primary-story-member", root.key),
           params
         )
-        val (licensed, unlicensed) = scanFillers(chart, root.concept)
-        val fillerOutcomes = licensed.map(filler =>
+        val scanned = scanFillers(chart, root.concept)
+        val fillerOutcomes = scanned.referents.map(filler =>
           fillerOutcome(
             source,
             unit,
@@ -1170,8 +1411,26 @@ object ChartProposalProvider:
             mentions(filler.concept)
           )
         )
+        val circumstanceOutcomes = scanned.circumstances.map(filler =>
+          circumstanceOutcome(source, unit, chart, checksum, root, support, filler, params)
+        )
+        // One receipt per filler the rule turned away, whatever the reason. Before this every
+        // unlicensed filler left the provider as an anonymous increment; now each names the
+        // concept, the word, its kind, the source roles that reached it, and why it was refused,
+        // so the slice that owns each class can find its own work.
+        val refusalCalls = scanned.refused.map(filler =>
+          providerCall(
+            source,
+            Referentiality.RuleName,
+            Vector("refused", root.key, filler.concept.value, filler.refusal.render),
+            params + ("filler" -> filler.concept.value) + ("lemma" -> filler.lemma) +
+              ("concept-kind" -> filler.kind.toString) +
+              ("source-roles" -> filler.sourceRoles.map(_.render).sorted.mkString(",")) +
+              ("reason" -> filler.refusal.render)
+          )
+        )
         val coverageValue =
-          ParticipantCoverage.of(licensed.map(f => ChartNodeRef(unit.id, f.concept)))
+          ParticipantCoverage.of(scanned.referents.map(f => ChartNodeRef(unit.id, f.concept)))
         val (coverage, coverageCall) = proposed(
           source,
           CoverageRule,
@@ -1182,22 +1441,29 @@ object ChartProposalProvider:
           support.raw,
           CalibrationModel,
           "participant-coverage" +: root.key +: coverageValue.fillers.map(_.key),
-          params + ("fillers" -> licensed.size.toString) + ("unlicensed" -> unlicensed.toString)
+          params + ("fillers" -> scanned.counts.referents.toString) +
+            ("circumstances" -> scanned.counts.circumstances.toString) +
+            ("eventualities" -> scanned.counts.eventualities.toString) +
+            ("nonReferential" -> scanned.counts.nonReferential.toString) +
+            ("unlicensed" -> scanned.counts.unlicensed.toString) +
+            ("ambiguous" -> scanned.counts.ambiguous.toString) +
+            ("seen" -> scanned.counts.seen.toString)
         )
         Right(
           RootOutcome(
             ProposedRoot(unit, root, checksum, spans, support.raw),
-            licensed.size,
-            unlicensed,
-            evidence +: fillerOutcomes.flatMap(_.evidence),
+            scanned.counts,
+            evidence +: (fillerOutcomes.flatMap(_.evidence) ++
+              circumstanceOutcomes.map(_.evidence)),
             SituationAttempt(root, situation),
             ContextAssignmentAttempt(root, context),
             SegmentMembershipAttempt(root, membership),
             ParticipantCoverageAttempt(root, coverage),
             fillerOutcomes.flatMap(_.mention),
             fillerOutcomes.map(_.participant),
+            circumstanceOutcomes.map(_.attempt),
             Vector(situationCall, contextCall, membershipCall, coverageCall) ++
-              fillerOutcomes.flatMap(_.calls)
+              fillerOutcomes.flatMap(_.calls) ++ circumstanceOutcomes.map(_.call) ++ refusalCalls
           )
         )
 
@@ -1211,13 +1477,37 @@ object ChartProposalProvider:
       calls: Vector[ProviderCall]
   )
 
-  /** Entity-kind fillers of `root` with exactly one licensed role, in concept order, and the count
-    * of entity-kind fillers reached by none or by several.
+  /** How `root`'s entity-kind fillers divide under the referentiality rule, in concept order.
+    *
+    * Every filler the scan saw lands in exactly one of the four: a referent, a circumstance, a
+    * non-referent that named its reason, or one no single role reached. The counts are what the
+    * coverage row publishes, so a filler cannot leave the provider unaccounted for.
+    */
+  private final case class ScannedFillers(
+      referents: Vector[LicensedFiller],
+      circumstances: Vector[CircumstanceFiller],
+      refused: Vector[RefusedFiller]
+  ):
+    /** Derived from the three vectors, never incremented alongside them: a counter a caller can
+      * forget to bump is how a filler goes missing.
+      */
+    def counts: FillerCounts =
+      refused
+        .map(f => FillerCounts.of(f.refusal))
+        .foldLeft(FillerCounts(referents.size, circumstances.size, 0, 0, 0, 0))(FillerCounts.plus)
+
+  /** Entity-kind fillers of `root` sorted by the referentiality rule.
+    *
+    * `unlicensed` counts, as before, the fillers no single normalized role reached. What changed is
+    * that reaching a role is no longer enough: the role must take a referent and the concept must
+    * be able to denote one. A `:time` or `:manner` filler becomes a circumstance instead of a
+    * participant, and everything else the rule turns away is carried with its reason rather than
+    * dropped.
     */
   private def scanFillers(
       chart: PropositionChart[Checked],
       root: ConceptId
-  ): (Vector[LicensedFiller], Int) =
+  ): ScannedFillers =
     val byFiller = chart
       .relationsFrom(root)
       .flatMap(r => r.to.nodeId.map(id => id -> r.role))
@@ -1230,13 +1520,30 @@ object ChartProposalProvider:
       .groupBy(_._1)
       .toVector
       .sortBy(_._1)
-    byFiller.foldLeft((Vector.empty[LicensedFiller], 0)) {
-      case ((licensed, unlicensed), (id, rows)) =>
+    byFiller.foldLeft(ScannedFillers(Vector.empty, Vector.empty, Vector.empty)) {
+      case (acc, (id, rows)) =>
         val concept = rows.head._2
+        val lemma = concept.lemma.value
+        val sourceRoles = rows.map(_._3.source).distinct
+        def refuse(refusal: FillerRefusal): ScannedFillers =
+          acc.copy(refused =
+            acc.refused :+ RefusedFiller(id, concept.kind, lemma, sourceRoles, refusal)
+          )
         rows.map(_._3).flatMap(licensedRole).distinct match
           case Vector(role) =>
-            (licensed :+ LicensedFiller(id, concept.kind, concept.lemma.value, role), unlicensed)
-          case _ => (licensed, unlicensed + 1)
+            Referentiality.licence(role) match
+              case RoleLicence.Referent if Referentiality.denotesReferent(concept.kind) =>
+                acc.copy(referents = acc.referents :+ LicensedFiller(id, concept.kind, lemma, role))
+              case RoleLicence.Referent =>
+                refuse(FillerRefusal.ConceptNotReferential(concept.kind))
+              case RoleLicence.Circumstance(kind) =>
+                acc.copy(circumstances =
+                  acc.circumstances :+ CircumstanceFiller(id, kind, lemma, role)
+                )
+              case RoleLicence.Eventuality   => refuse(FillerRefusal.RoleTakesSituation(role))
+              case RoleLicence.Unestablished => refuse(FillerRefusal.RoleUnestablished(role))
+          case Vector() => refuse(FillerRefusal.NoLicensedRole)
+          case _        => refuse(FillerRefusal.SeveralLicensedRoles)
     }
 
   /** The chart's own normalized role when present; a standard named role otherwise; nothing for a
@@ -1343,9 +1650,7 @@ object ChartProposalProvider:
     )
     (TemporalAttempt(prev.root, next.root, bundle), evidence, call)
 
-  private def renderRole(role: ParticipantRole): String = role match
-    case ParticipantRole.Custom(namespace, label) => s"Custom($namespace,$label)"
-    case other                                    => other.toString
+  private def renderRole(role: ParticipantRole): String = Referentiality.renderRole(role)
 
   /** The four abstained attempts an inadmissible root leaves behind, at `anchor` under `scope`. */
   private def abstainAttempts(
@@ -1409,48 +1714,75 @@ object ChartProposalProvider:
       Vector(attempts.participantCoverage),
       Vector.empty,
       Vector.empty,
+      Vector.empty,
       attempts.calls
     )
 
+  /** Why `establishedTitle` and not `title`: the title alone says a caller put a string there, and
+    * the string that used to be there was the input file's name. The provenance is what entitles
+    * this rule to publish it as the story's summary, so a title with none abstains under its own
+    * reason rather than sharing `no-title` with a source that has no title at all — two different
+    * facts about the same field, and a reader must be able to tell them apart.
+    */
   private def summaryOutcome(source: StorySource): Either[DomainError, SummaryOutcome] =
     val scope = "story"
     val scopeChecksum = source.canonicalChecksum
-    source.title.filter(_.trim.nonEmpty) match
+    def abstain(reason: String, coverage: SummaryCoverage): SummaryOutcome =
+      val params = Map("scope" -> scope, "rule" -> AbstainSummaryRule, "reason" -> reason)
+      val (bundle, call) = abstained[StorySummaryProposal](
+        source,
+        AbstainSummaryRule,
+        scope,
+        scopeChecksum,
+        Vector("abstain", scope, reason),
+        params
+      )
+      SummaryOutcome(StorySummaryAttempt(bundle), coverage, None, call)
+
+    source.establishedTitle match
+      case None if source.title.exists(_.trim.nonEmpty) =>
+        Right(abstain(UnestablishedTitleReason, SummaryCoverage.TitleUnestablished))
       case None =>
-        val params = Map("scope" -> scope, "rule" -> AbstainSummaryRule, "reason" -> "no-title")
-        val (bundle, call) = abstained[StorySummaryProposal](
-          source,
-          AbstainSummaryRule,
-          scope,
-          scopeChecksum,
-          Vector("abstain", scope, "no-title"),
-          params
-        )
-        Right(SummaryOutcome(StorySummaryAttempt(bundle), SummaryCoverage.NoTitle, None, call))
+        Right(abstain(NoTitleReason, SummaryCoverage.NoTitle))
       case Some(title) =>
         TextSpan.of(0, source.canonicalText.length).map { whole =>
           val evidence = evidenceRecord(scope, scopeChecksum, SpanSet.one(SpanRef(None, whole)))
-          val params =
-            Map("scope" -> scope, "rule" -> SummaryRule, "span-source" -> "canonical-text")
+          val params = Map(
+            "scope" -> scope,
+            "rule" -> SummaryRule,
+            "span-source" -> "canonical-text",
+            "title-provenance" -> title.provenance.render
+          )
           val (bundle, call) = proposed(
             source,
             SummaryRule,
             scope,
             scopeChecksum,
-            StorySummaryProposal(title),
+            StorySummaryProposal(title.value),
             evidence,
             1.0,
             SummaryCalibrationModel,
-            Vector("summary", title),
+            Vector("summary", title.value, title.provenance.render),
             params
           )
           SummaryOutcome(
             StorySummaryAttempt(bundle),
-            SummaryCoverage.Proposed(title),
+            SummaryCoverage.Proposed(title.value, title.provenance),
             Some(evidence),
             call
           )
         }
+
+  /** The placement as receipt text: the path outermost-first, or the positive root-world reading.
+    *
+    * Holder candidates are deliberately absent: two roots under one quotation are in one context
+    * however their speaker resolves, and a render that moved with attribution would make the
+    * receipt disagree with the identity the compiler derives from the same path.
+    */
+  private def renderPlacement(value: ContextAssignmentProposal): Vector[String] =
+    value.steps match
+      case Vector() => Vector("narrated-world")
+      case steps    => steps.map(_.placementKey)
 
   /** A `-91` reification frame in the adapter's namespace: the only frames that make a State. */
   private def stateFrame(concept: Concept): Boolean =

@@ -9,11 +9,9 @@ import storymodel4s.story.{Polarity as StoryPolarity, *}
 
 /** Court for [[ChartProposalProvider]]: hand-built checked charts in, compiler input out. */
 class ChartProposalProviderSuite extends FunSuite:
+  private val title = StoryTitle.callerSupplied("Tiny story").fold(e => fail(e.message), identity)
   private val source = StorySource
-    .fromText(
-      "Anna entered the room. She did not rest. The lamp was on the table.",
-      Some("Tiny story")
-    )
+    .titled("Anna entered the room. She did not rest. The lamp was on the table.", title)
     .fold(e => fail(e.message), identity)
   private val atlas = SurfaceAnalyzer.analyze(source)
   private val sentences = atlas.sentences
@@ -35,6 +33,12 @@ class ChartProposalProviderSuite extends FunSuite:
       None,
       cached = false
     )
+
+  /** Every filler the referentiality rule turned away, as (concept, reason), in call order. */
+  private def refusalReasons(proposals: ChartProposals): Vector[(String, String)] =
+    proposals.calls
+      .filter(_.params.get("rule").contains(Referentiality.RuleName))
+      .map(call => call.params("filler") -> call.params("reason"))
 
   private def spanOf(unit: SurfaceUnit, word: String): SpanRef =
     val text = atlas.text(unit)
@@ -222,13 +226,16 @@ class ChartProposalProviderSuite extends FunSuite:
     assertEquals(
       proposals.coverage,
       Vector(
-        SentenceCoverage.Proposed(root, 0, 2),
+        SentenceCoverage.Proposed(root, FillerCounts(0, 0, 0, 0, 2, 0)),
         SentenceCoverage.NoChart(s1.id),
         SentenceCoverage.NoChart(s2.id)
       )
     )
     assertEquals(proposals.counts, CoverageCounts(1, 0, 0, 0, 2))
-    assertEquals(proposals.summaryCoverage, SummaryCoverage.Proposed("Tiny story"))
+    assertEquals(
+      proposals.summaryCoverage,
+      SummaryCoverage.Proposed("Tiny story", TitleProvenance.CallerSupplied)
+    )
   }
 
   test("situation support is the union of chart alignment spans, never the sentence text") {
@@ -244,9 +251,16 @@ class ChartProposalProviderSuite extends FunSuite:
       record.spans,
       SpanSet.of(Vector(spanOf(s0, "Anna"), spanOf(s0, "entered"), spanOf(s0, "room")))
     )
-    val situationCalls = proposals.calls.filter(_.params.get("sentence").contains(s0.id.value))
+    // Six calls, not four: since slice 1.7 each of this chart's two fillers - both reached by a
+    // numbered argument no lexicon licensed - carries its own refusal receipt, which the four
+    // proposal calls did not previously record anywhere. A refusal cites no spans of its own, so
+    // only the proposal calls carry a span-source.
+    val sentenceCalls = proposals.calls.filter(_.params.get("sentence").contains(s0.id.value))
+    assertEquals(sentenceCalls.size, 6)
+    val situationCalls = sentenceCalls.filterNot(_.params.contains("reason"))
     assertEquals(situationCalls.size, 4)
     assertEquals(situationCalls.map(spanSourceOf).toSet, Set("chart-alignments"))
+    assertEquals(refusalReasons(proposals).map(_._2).toSet, Set("no-licensed-role"))
   }
 
   test("a chart without alignments falls back to the sentence span and says so") {
@@ -285,7 +299,10 @@ class ChartProposalProviderSuite extends FunSuite:
     assertEquals(byRef(ref(s2, c0)).predicate.frame, Some("propbank:be-located-at-91"))
     assertEquals(byRef(ref(s2, c0)).description, "be-located-at lamp table")
     assertEquals(byRef(ref(s0, c0)).kind, SituationKind.Event)
-    assertEquals(proposals.coverage(2), SentenceCoverage.Proposed(ref(s2, c0), 0, 2))
+    assertEquals(
+      proposals.coverage(2),
+      SentenceCoverage.Proposed(ref(s2, c0), FillerCounts(0, 0, 0, 0, 2, 0))
+    )
 
     val compiled = compile(Vector(s2.id -> lampChart))
     val model = compiled.validated.getOrElse(fail(compiled.validation.report.render))
@@ -342,6 +359,34 @@ class ChartProposalProviderSuite extends FunSuite:
       Some(SituationKind.State)
     )
   }
+  test("an embedded focus is placed under its holder, not abstained and not asserted at root") {
+    val embeddedFocus = checked(
+      s0,
+      Some(c1),
+      Map(c0 -> Concept.predicate("think"), c1 -> Concept.predicate("enter")),
+      embedded = Vector(EmbeddedProposition(c0, EmbeddingKind.Belief, c1)),
+      polarity = Map(c1 -> ChartPolarity.Positive),
+      alignments = Vector(align(s0, "Anna", c0), align(s0, "entered", c1)),
+      salt = "embedded-focus"
+    )
+    val root = ref(s0, c1)
+    val proposals = propose(Vector(s0.id -> embeddedFocus))
+    assertEquals(proposals.coverage.head.sentence, s0.id)
+    assertEquals(proposals.contexts.map(_.source), Vector(root))
+    assertEquals(
+      dispositions(proposals.contexts.head.bundle),
+      Vector(ProposalDisposition.Proposed)
+    )
+
+    val model = compile(Vector(s0.id -> embeddedFocus)).draft
+    val situation = model.graph.situations.values.head
+    val frame = model.graph.contexts(situation.context)
+    assertNotEquals(frame.kind, ContextKind.NarratedWorld: ContextKind)
+    assertEquals(frame.kind, ContextKind.Belief(ContextHolder.Unattributed(HolderGap.NoCandidate)))
+    assertEquals(frame.parent.map(model.graph.contexts(_).kind), Some(ContextKind.NarratedWorld))
+    assertEquals(model.graph.contexts.size, 2)
+  }
+
   test("an inadmissible root is absent and recorded") {
     val noFocus = checked(
       s0,
@@ -355,17 +400,9 @@ class ChartProposalProviderSuite extends FunSuite:
       Map(c0 -> Concept.predicate("enter"), c1 -> Concept.name("Anna")),
       salt = "entity-focus"
     )
-    val embeddedFocus = checked(
-      s0,
-      Some(c1),
-      Map(c0 -> Concept.predicate("think"), c1 -> Concept.predicate("enter")),
-      embedded = Vector(EmbeddedProposition(c0, EmbeddingKind.Belief, c1)),
-      salt = "embedded-focus"
-    )
     val cases = Vector(
       (noFocus, ref(s0, c0), AbstentionReason.NoFocus),
-      (entityFocus, ref(s0, c1), AbstentionReason.FocusNotPredicate(ConceptKind.Name)),
-      (embeddedFocus, ref(s0, c1), AbstentionReason.FocusEmbedded)
+      (entityFocus, ref(s0, c1), AbstentionReason.FocusNotPredicate(ConceptKind.Name))
     )
     cases.foreach { (chart, anchor, reason) =>
       val proposals = propose(Vector(s0.id -> chart))
@@ -426,7 +463,7 @@ class ChartProposalProviderSuite extends FunSuite:
       proposals.coverage,
       Vector(
         SentenceCoverage.EmptyChart(s0.id),
-        SentenceCoverage.Proposed(ref(s1, c0), 0, 0),
+        SentenceCoverage.Proposed(ref(s1, c0), FillerCounts(0, 0, 0, 0, 0, 0)),
         SentenceCoverage.NoChart(s2.id)
       )
     )
@@ -485,7 +522,10 @@ class ChartProposalProviderSuite extends FunSuite:
     val root = ref(s0, c0)
     val anna = ref(s0, c1)
 
-    assertEquals(proposals.coverage.head, SentenceCoverage.Proposed(root, 1, 1))
+    assertEquals(
+      proposals.coverage.head,
+      SentenceCoverage.Proposed(root, FillerCounts(1, 0, 0, 0, 1, 0))
+    )
     assertEquals(proposals.participants.map(a => (a.situation, a.filler)), Vector((root, anna)))
     assertEquals(
       proposals.participants.head.bundle.proposals.head.value,
@@ -525,7 +565,7 @@ class ChartProposalProviderSuite extends FunSuite:
   }
 
   test(
-    "named time and location roles map as the AMR adapter maps them; the unaligned filler cites the root"
+    "a named time role becomes a circumstance and a named location role a participant"
   ) {
     val chart = checked(
       s0,
@@ -547,14 +587,60 @@ class ChartProposalProviderSuite extends FunSuite:
       .map(a => a.filler -> a.bundle.proposals.head.value.getOrElse(fail("no role")))
       .toMap
 
-    assertEquals(proposals.coverage.head, SentenceCoverage.Proposed(ref(s0, c0), 2, 0))
-    assertEquals(byFiller(ref(s0, c1)), ParticipantRole.Time)
+    assertEquals(
+      proposals.coverage.head,
+      SentenceCoverage.Proposed(ref(s0, c0), FillerCounts(1, 1, 0, 0, 0, 0))
+    )
+    assertEquals(byFiller.keySet, Set(ref(s0, c2)))
     assertEquals(byFiller(ref(s0, c2)), ParticipantRole.Location)
+    assertEquals(proposals.entityMentions.map(_.mention), Vector(ref(s0, c2)))
+    assertEquals(
+      proposals.circumstances.map(a => (a.situation, a.filler)),
+      Vector((ref(s0, c0), ref(s0, c1)))
+    )
+    assertEquals(
+      proposals.circumstances.head.bundle.proposals.head.value,
+      Some(CircumstanceProposal(CircumstanceKind.Time, "night"))
+    )
     val mentionSources = proposals.calls
       .filter(_.params.get("rule").contains("entity-filler-mention-rule"))
       .map(c => c.params("filler") -> spanSourceOf(c))
       .toMap
-    assertEquals(mentionSources, Map("c1" -> "root-support", "c2" -> "filler-alignments"))
+    assertEquals(mentionSources, Map("c2" -> "filler-alignments"))
+    val circumstanceSources = proposals.calls
+      .filter(_.params.get("rule").contains("situation-circumstance-rule"))
+      .map(c => c.params("filler") -> spanSourceOf(c))
+      .toMap
+    assertEquals(circumstanceSources, Map("c1" -> "root-support"))
+  }
+
+  test("a quantity under a referential role is not a referent and mints no entity") {
+    val chart = checked(
+      s0,
+      Some(c0),
+      Map(
+        c0 -> Concept.predicate("enter", Some(enterFrame)),
+        c1 -> Concept(Lemma.unsafe("5"), None, None, ConceptKind.Quantity)
+      ),
+      Vector(PropositionRelation(c0, licensedAgent, ConceptTarget.Node(c1))),
+      alignments = Vector(align(s0, "entered", c0), align(s0, "room", c1)),
+      salt = "quantity-filler"
+    )
+    val proposals = propose(Vector(s0.id -> chart))
+
+    // The role takes a referent; the concept cannot be one. Both coordinates have to hold, and the
+    // receipt says which of them refused.
+    assertEquals(
+      proposals.coverage.head,
+      SentenceCoverage.Proposed(ref(s0, c0), FillerCounts(0, 0, 0, 1, 0, 0))
+    )
+    assertEquals(proposals.participants, Vector.empty)
+    assertEquals(proposals.entityMentions, Vector.empty)
+    assertEquals(proposals.circumstances, Vector.empty)
+    val refusals = proposals.calls
+      .filter(_.params.get("rule").contains(Referentiality.RuleName))
+      .map(call => call.params("filler") -> call.params("reason"))
+    assertEquals(refusals, Vector("c1" -> "concept-kind-not-referential:Quantity"))
   }
 
   test("a filler reached by two different licensed roles is unlicensed, not a guess") {
@@ -571,9 +657,68 @@ class ChartProposalProviderSuite extends FunSuite:
     )
     val proposals = propose(Vector(s0.id -> chart))
 
-    assertEquals(proposals.coverage.head, SentenceCoverage.Proposed(ref(s0, c0), 0, 1))
+    // Ambiguous, not unlicensed: the chart named two licensed roles for one filler, which is a
+    // different finding from a filler no role reached, and the two counters keep them apart.
+    assertEquals(
+      proposals.coverage.head,
+      SentenceCoverage.Proposed(ref(s0, c0), FillerCounts(0, 0, 0, 0, 0, 1))
+    )
     assertEquals(proposals.participants, Vector.empty)
     assertEquals(proposals.entityMentions, Vector.empty)
+    assertEquals(refusalReasons(proposals), Vector("c1" -> "several-licensed-roles"))
+  }
+
+  test("every filler the rule turns away carries a receipt naming its reason") {
+    // The audit of 2026-09-02 found 51 of this story's 119 argument fillers leaving the provider
+    // as an anonymous increment, in no layer, no gap and no alternatives list. A filler no role
+    // reached is now receipted with its concept, its word, its kind, the source roles that reached
+    // it, and the reason, so the frame-lexicon slice can find its own work.
+    val chart = checked(
+      s0,
+      Some(c0),
+      Map(c0 -> Concept.predicate("enter", Some(enterFrame)), c1 -> Concept.name("Anna")),
+      Vector(PropositionRelation(c0, RoleAssignment.arg(3), ConceptTarget.Node(c1))),
+      alignments = Vector(align(s0, "entered", c0), align(s0, "Anna", c1)),
+      salt = "unlicensed-arg"
+    )
+    val proposals = propose(Vector(s0.id -> chart))
+
+    assertEquals(
+      proposals.coverage.head,
+      SentenceCoverage.Proposed(ref(s0, c0), FillerCounts(0, 0, 0, 0, 1, 0))
+    )
+    val call = proposals.calls
+      .find(_.params.get("rule").contains(Referentiality.RuleName))
+      .getOrElse(fail("the refused filler carries no receipt"))
+    assertEquals(call.params("filler"), "c1")
+    assertEquals(call.params("lemma"), "Anna")
+    assertEquals(call.params("concept-kind"), "Name")
+    assertEquals(call.params("source-roles"), "ARG3")
+    assertEquals(call.params("reason"), "no-licensed-role")
+  }
+
+  test("a :cause filler is neither a participant nor a circumstance; it is the causal layer's") {
+    val chart = checked(
+      s0,
+      Some(c0),
+      Map(c0 -> Concept.predicate("enter", Some(enterFrame)), c1 -> Concept.entity("fog")),
+      Vector(PropositionRelation(c0, RoleAssignment.named("cause"), ConceptTarget.Node(c1))),
+      alignments = Vector(align(s0, "entered", c0), align(s0, "room", c1)),
+      salt = "cause-filler"
+    )
+    val proposals = propose(Vector(s0.id -> chart))
+
+    // Counted under its own name, not lumped with a time or a manner: `:cause` relates one
+    // situation to another, and what it describes belongs to the causal layer this version does
+    // not build. The receipt names the role so that slice can find every one of them.
+    assertEquals(
+      proposals.coverage.head,
+      SentenceCoverage.Proposed(ref(s0, c0), FillerCounts(0, 0, 1, 0, 0, 0))
+    )
+    assertEquals(proposals.participants, Vector.empty)
+    assertEquals(proposals.entityMentions, Vector.empty)
+    assertEquals(proposals.circumstances, Vector.empty)
+    assertEquals(refusalReasons(proposals), Vector("c1" -> "role-takes-situation:Cause"))
   }
 
   test("Unclear temporal attempts follow atlas order and skip sentences without a proposed root") {
@@ -613,7 +758,7 @@ class ChartProposalProviderSuite extends FunSuite:
   test("the rules text is pinned by its checksum, so a rule change is a visible change") {
     assertEquals(
       ChartProposalProvider.Prompt.checksum.hex,
-      "70333fc4c70a3631edbffcb825990174046c09b4ae02489d8015c7b0827b8142"
+      "7190c9591e8b1d3a3ba962c131ca8ae27bf27ab942e6c05dc1f8bbf09f69129b"
     )
     val rules = ChartProposalProvider.RulesText
     assert(rules.contains("Never Before or Meets"))
@@ -623,8 +768,38 @@ class ChartProposalProviderSuite extends FunSuite:
     assert(rules.contains("{and, multi-sentence, or}"), "the coordination set is not stated")
     assert(rules.contains(":domain (h / he)"), "the predicative rule is not stated")
     assert(rules.contains(":location (e / egulac)"), "the existential rule is not stated")
+    // D0's context rule is stated here too, so deleting either half of the positive root-world
+    // reading, or the one-sentence speaker lookback, moves the checksum above.
+    assert(rules.contains("A root is in the NARRATED WORLD exactly when both"), "root rule absent")
+    assert(rules.contains(QuotationScan.RuleName), "the quotation rule is not named")
+    assert(rules.contains("Attribution is a separate question"), "attribution is not stated")
     assert(rules.contains("span-source=branch-alignments"), "branch support is not stated")
     assert(rules.contains("domain=Custom(amr,domain)"), "the domain role is not in the table")
+    // Slice 1.7's referentiality rule is stated here for the same reason: deleting a clause moves
+    // the checksum, and with it the prompt-package checksum and the provenance config hash.
+    assert(rules.contains("role-referentiality-rule"), "the referentiality rule is not named")
+    assert(
+      rules.contains(
+        "Agent, Beneficiary, Destination, Experiencer, Instrument, Location, Patient, Source, " +
+          "Stimulus, Theme"
+      ),
+      "the referential role set is not stated"
+    )
+    assert(rules.contains("Time and Manner name circumstances"), "circumstances are not stated")
+    assert(
+      rules.contains("concept kinds that denote a referent are Entity and Name"),
+      "the referential concept kinds are not stated"
+    )
+    assert(
+      rules.contains("Cause and Result relate one"),
+      "the causal-layer exclusion is not stated"
+    )
+    assert(
+      rules.contains(
+        "referents, circumstances, eventualities, nonReferential, unlicensed and\n  ambiguous"
+      ),
+      "the six coverage classes are not stated"
+    )
   }
 
   test("chart order and alignment order do not change the proposals or the fingerprint") {
@@ -671,13 +846,14 @@ class ChartProposalProviderSuite extends FunSuite:
     assertEquals(input.provenance.softwareVersion, StoryModel.SchemaVersion)
     assert(proposals.calls.forall(_.inputChecksum == source.canonicalChecksum))
     assert(proposals.calls.forall(_.provider == "chart-proposal-provider"))
-    assertEquals(proposals.calls.size, 10)
+    // Twelve, not ten: the two charts' four unlicensed fillers each carry a refusal receipt now.
+    assertEquals(proposals.calls.size, 12)
     assertEquals(input.receipt.stages.map(_._1), Vector(parserStage, ChartProposalProvider.Stage))
     assertEquals(
       input.receipt.stages.map(_._2.hex),
       Vector(
         "ca098dfba74c48f09213cfea0c48e4de6bc211b67231ae64e8c684bd05420c90",
-        "84eabe6fc497fe56d1e5d473efc5f1eaa4a8395a2209adb60acad67dfd7a3bfb"
+        "9855eaf8e4dc1cb80351f31da1c6c04dd03733dc99185b39b9d1a7bf0d4734d6"
       )
     )
     assertEquals(input.receipt.createdAtEpochMillis, 7L)
@@ -804,7 +980,7 @@ class ChartProposalProviderSuite extends FunSuite:
     )
     assertEquals(raw(proposals.temporal.head.bundle), Some(0.6))
     assertEquals(model(bySource(ref(s0, c0))), Vector("chart-rule-v1"))
-    assertEquals(model(proposals.contexts.head.bundle), Vector("narrated-world-default-v1"))
+    assertEquals(model(proposals.contexts.head.bundle), Vector("context-placement-v1"))
     assertEquals(model(proposals.memberships.head.bundle), Vector("chart-rule-v1"))
     assertEquals(model(proposals.summary.bundle), Vector("title-rule-v1"))
     assertEquals(raw(proposals.summary.bundle), Some(1.0))
@@ -891,6 +1067,37 @@ class ChartProposalProviderSuite extends FunSuite:
     assertEquals(policy.forFamily(ClaimFamily.ParticipantCoverage), FamilyPolicy.Ordinary)
     assertEquals(policy.forFamily(ClaimFamily.TemporalRelation), FamilyPolicy.Ordinary)
   }
+  test("a title whose provenance the source does not record is not established and abstains") {
+    // The exact defect this closes: a caller put the input file's name in `title` and the summary
+    // rule published it at credence 1.0. The string is still there; what is missing is any basis
+    // for carrying it, and the two abstentions are told apart by their reason.
+    val unestablished = StorySource
+      .fromText(source.rawText, Some("wog.txt"))
+      .fold(e => fail(e.message), identity)
+    assertEquals(unestablished.titleProvenance, None)
+    assertEquals(unestablished.establishedTitle, None)
+
+    val atlas2 = SurfaceAnalyzer.analyze(unestablished)
+    val u0 = atlas2.sentences(0)
+    val chart = checked(u0, Some(c0), Map(c0 -> Concept.predicate("enter")), salt = "unestablished")
+    val proposals = ChartProposalProvider
+      .propose(unestablished, atlas2, Vector(u0.id -> chart))
+      .fold(e => fail(e.message), identity)
+
+    assertEquals(proposals.summaryCoverage, SummaryCoverage.TitleUnestablished)
+    assertEquals(dispositions(proposals.summary.bundle), Vector(ProposalDisposition.Abstained))
+    val summaryCall = proposals.calls
+      .filter(_.params.get("rule").contains(ChartProposalProvider.AbstainSummaryRule))
+    assertEquals(
+      summaryCall.map(_.params("reason")),
+      Vector(ChartProposalProvider.UnestablishedTitleReason)
+    )
+    assert(
+      proposals.calls.forall(call => !call.params.values.exists(_.contains("wog.txt"))),
+      "the unestablished title reached a receipt"
+    )
+  }
+
   test("a missing title yields an abstained summary and a NoTitle row") {
     val untitled = StorySource
       .fromText(source.rawText, None)

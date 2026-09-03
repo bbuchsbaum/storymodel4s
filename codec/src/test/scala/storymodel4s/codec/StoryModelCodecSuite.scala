@@ -16,8 +16,12 @@ class StoryModelCodecSuite extends FunSuite:
   /** Golden content checksum of the fixture model, computed on the JVM and asserted on every
     * platform: this is the cross-platform stability law for the canonical form. Update only when
     * the wire format deliberately changes.
+    *
+    * Moved once, deliberately, when schema 0.3.0 replaced a holder-bearing context kind's `entity`
+    * field with a `holder` object that can also say the holder was not derived. The fixture's
+    * speech context is the only claim that moved.
     */
-  val GoldenChecksum: String = "ecd3f4a05e8e3b1f22429f34ce0c943f5bd78d4e82b490b7f4e0fc71a91c3fb5"
+  val GoldenChecksum: String = "df204722d8e232c6e29fa54e334fb36ca6bba55b124d8f72b0a4db7207dc2bc4"
 
   test("fixture validates") {
     assert(validated.claims.nonEmpty)

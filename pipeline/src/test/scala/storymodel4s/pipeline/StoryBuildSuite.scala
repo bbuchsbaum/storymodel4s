@@ -15,7 +15,8 @@ import storymodel4s.document.{
   ChartProposalProvider,
   CoverageCounts,
   NarrativeCompiler,
-  NarrativeCompilerError
+  NarrativeCompilerError,
+  Referentiality
 }
 import storymodel4s.fixtures.wog.WarOfTheGhostsText
 import storymodel4s.provider.agent.*
@@ -59,7 +60,7 @@ class StoryBuildSuite extends FunSuite:
 
   /** `Checksum.ofText(ChartProposalProvider.RulesText)`; a rules change must move this literal. */
   private val RulesChecksum =
-    "70333fc4c70a3631edbffcb825990174046c09b4ae02489d8015c7b0827b8142"
+    "7190c9591e8b1d3a3ba962c131ca8ae27bf27ab942e6c05dc1f8bbf09f69129b"
 
   private val wogRecordings: Path = Paths.get(getClass.getResource("/recordings/wog").toURI)
 
@@ -114,13 +115,39 @@ class StoryBuildSuite extends FunSuite:
   private def entries(dir: Path): Vector[Path] =
     Using.resource(Files.list(dir))(stream => stream.iterator().asScala.toVector.sortBy(_.toString))
 
-  private def buildAt(textPath: Path, recordings: Path, outDir: Path, now: Long): BuildSummary =
+  /** The title a caller states for the fixture story. Not derived from anything: the pipeline no
+    * longer reads the input file's name, and this is the only way a title reaches a build.
+    */
+  private val wogTitle: StoryTitle =
+    StoryTitle.callerSupplied(WarOfTheGhostsText.title).fold(e => fail(e.message), identity)
+
+  private def buildAt(
+      textPath: Path,
+      recordings: Path,
+      outDir: Path,
+      now: Long,
+      title: Option[StoryTitle] = None
+  ): BuildSummary =
     StoryPipeline
-      .run(DriverMode.Replay, textPath, recordings, outDir, Map.empty, now)
+      .run(DriverMode.Replay, textPath, recordings, outDir, Map.empty, now, title = title)
       .fold(error => fail(error.message), identity)
 
+  /** A build with no title: what the command line does when a caller states none. */
   private def build(textPath: Path, recordings: Path, outDir: Path): BuildSummary =
     buildAt(textPath, recordings, outDir, Now)
+
+  /** A build whose title a caller stated. Every court below whose subject is the compilation uses
+    * this: before slice 1.7 those courts were green on a title derived from the input file's name,
+    * so `validated == true` there rested on the model asserting the story was called
+    * `war-of-the-ghosts.txt`. The title is now the caller's, which is a claim someone made.
+    */
+  private def buildTitled(
+      textPath: Path,
+      recordings: Path,
+      outDir: Path,
+      title: StoryTitle = wogTitle
+  ): BuildSummary =
+    buildAt(textPath, recordings, outDir, Now, Some(title))
 
   private def parsed(textPath: Path, recordings: Path): ParseOutcome =
     ClaudeParseDriver
@@ -144,6 +171,12 @@ class StoryBuildSuite extends FunSuite:
     row.hcursor.downField(name).as[String].fold(e => fail(s"$name: ${e.message}"), identity)
 
   private def kindOf(row: Json): String = field(row, "kind")
+
+  private def stringAt(value: Json, path: String*): String =
+    path
+      .foldLeft(value.hcursor: io.circe.ACursor)((cursor, name) => cursor.downField(name))
+      .as[String]
+      .fold(e => fail(s"${path.mkString(".")}: ${e.message}"), identity)
 
   private def intField(value: Json, path: String*): Int =
     path
@@ -239,10 +272,139 @@ class StoryBuildSuite extends FunSuite:
     * marker into the sidecar), coordinated predicates, predicative roots, and existential roots.
     * Pinning an intermediate state would pin a pipeline that never ran.
     */
+  /** The offsets of the retelling's three quoted sentences in the fixture text, measured once: `"We
+    * did such and such a thing: we fought. Many of our fellows were killed, and many of those who
+    * were attacked were killed. They said that I was shot, and I did not feel sick."` The opening
+    * mark is at 1724 and the closing mark ends at 1900.
+    */
+  private val RetellingQuotation: (Int, Int) = (1724, 1900)
+
+  /** Every situation of a built model as (least evidence offset, description, context id). */
+  private def placedSituations(model: Json): Vector[(Int, String, String)] =
+    model.hcursor
+      .downField("graph")
+      .downField("situations")
+      .focus
+      .flatMap(_.asObject)
+      .getOrElse(fail("no situations object"))
+      .values
+      .toVector
+      .map { wrapped =>
+        val node = wrapped.hcursor.downField("node")
+        val offsets = node
+          .downField("meta")
+          .downField("evidence")
+          .as[Vector[Json]]
+          .fold(e => fail(e.message), identity)
+          .flatMap(ev => rows(ev, "spans"))
+          .map(span => intField(span, "span", "start"))
+        (
+          offsets.minOption.getOrElse(fail("a situation carries no evidence span")),
+          node.downField("description").as[String].fold(e => fail(e.message), identity),
+          node.downField("context").as[String].fold(e => fail(e.message), identity)
+        )
+      }
+
+  test("the retelling is reported: the quoted sentences leave the narrated world") {
+    val dir = work("wog-retelling")
+    val outDir = dir.resolve("out")
+    buildTitled(wogText(dir), capturedRecordings, outDir)
+    val built = json(StoryPipeline.files(outDir).model)
+    val contexts = built.hcursor
+      .downField("graph")
+      .downField("contexts")
+      .focus
+      .flatMap(_.asObject)
+      .getOrElse(fail("no contexts object"))
+    val roots =
+      contexts.values.toVector.filter(_.hcursor.downField("parent").focus.forall(_.isNull))
+    assertEquals(roots.size, 1)
+    assertEquals(roots.head.hcursor.downField("kind").as[String], Right("NarratedWorld"))
+    val rootId = stringAt(roots.head, "id")
+
+    // Twelve situations left the narrated world, and six of them are the second battle the model
+    // used to assert: the man's retelling was parsed one sentence at a time, lost its quotation
+    // marks, and became story-world fact after he reached home and lit his fire. Every one of the
+    // six now sits inside the quotation that the text closes at offset 1900, in one speech context.
+    val placed = placedSituations(built)
+    assertEquals(placed.size, 65)
+    val (openAt, closeAt) = RetellingQuotation
+    val retelling = placed.filter((at, _, _) => at >= openAt && at < closeAt).sortBy(_._1)
+    assertEquals(
+      retelling.map(_._2),
+      Vector(
+        "do we thing",
+        "fight we",
+        "kill fellow",
+        "kill person",
+        "say they shoot",
+        "not feel i sick"
+      )
+    )
+    assert(
+      retelling.forall((_, _, ctx) => ctx != rootId),
+      "a retold situation is in the root world"
+    )
+    assertEquals(retelling.map(_._3).distinct.size, 1)
+
+    // The narration around it stays narration: the two speech acts that report the retelling are
+    // world events, and so is the man becoming quiet afterwards.
+    val narrated =
+      placed.filter((_, d, _) => Set("tell he everything", "become he quiet (time: then)")(d))
+    assertEquals(narrated.size, 2)
+    assert(narrated.forall((_, _, ctx) => ctx == rootId), "the narration lost the root world")
+
+    // The trajectory no longer runs a story-world chain from the telling into the fighting. The
+    // step out of `tell he everything` crosses a context boundary and says so, and no step joins
+    // two narrated-world situations across the quotation.
+    val byId = placed.map((_, d, ctx) => d -> ctx).toMap
+    val idOf = built.hcursor
+      .downField("graph")
+      .downField("situations")
+      .focus
+      .flatMap(_.asObject)
+      .getOrElse(fail("no situations object"))
+      .toMap
+      .map((key, wrapped) =>
+        key -> stringAt(wrapped.hcursor.downField("node").focus.get, "description")
+      )
+    val steps = rows(built, "trajectory", "steps")
+    val crossing = steps.filter { step =>
+      val from = idOf(stringAt(step, "from"))
+      val to = idOf(stringAt(step, "to"))
+      byId(from) != byId(to)
+    }
+    assertEquals(crossing.size, 10)
+    assert(
+      crossing.forall(step => step.hcursor.downField("contextChange").as[Boolean] == Right(true)),
+      "a context-crossing step does not record the crossing"
+    )
+    val telling = steps.filter(step => idOf(stringAt(step, "from")) == "tell he everything")
+    assertEquals(telling.size, 1)
+    assertEquals(idOf(stringAt(telling.head, "to")), "do we thing")
+    assertEquals(telling.head.hcursor.downField("contextChange").as[Boolean], Right(true))
+    assert(
+      steps.forall { step =>
+        val from = idOf(stringAt(step, "from"))
+        val to = idOf(stringAt(step, "to"))
+        !(byId(from) == rootId && byId(to) == rootId &&
+          retelling.map(_._2).contains(to))
+      },
+      "a narrated-world step still enters the retelling"
+    )
+
+    // And the temporal layer stops asserting narrated-world chronology across the boundary: the
+    // seventeen edges whose endpoints are not both in the root world are scoped in the context
+    // that can see both, never at the narrated world.
+    val temporal = rows(built, "graph", "relations", "temporal")
+    assertEquals(temporal.size, 64)
+    assertEquals(temporal.count(edge => stringAt(edge, "context") != rootId), 17)
+  }
+
   test("the fifty-sentence captured court: 50 charts, 65 situations, one named abstention") {
     val dir = work("wog-captured")
     val outDir = dir.resolve("out")
-    val summary = build(wogText(dir), capturedRecordings, outDir)
+    val summary = buildTitled(wogText(dir), capturedRecordings, outDir)
 
     // The text this court used, stated and pinned: the 50-sentence fixture literal.
     assertEquals(summary.storyId.value, WogStory)
@@ -354,18 +516,109 @@ class StoryBuildSuite extends FunSuite:
     val built = json(files.model)
     val graph = built.hcursor.downField("graph")
     assertEquals(size(graph, "situations"), 65)
-    assertEquals(size(graph, "entities"), 35)
-    assertEquals(size(graph, "contexts"), 1)
+    assertEquals(size(graph, "entities"), 29)
+    assertEquals(size(graph, "contexts"), 6)
     assertEquals(size(graph, "segments"), 1)
     val relations = graph.downField("relations")
-    assertEquals(size(relations, "participants"), 68)
+    assertEquals(size(relations, "participants"), 57)
+    assertEquals(size(relations, "circumstances"), 11)
     assertEquals(size(relations, "temporal"), 64)
     assertEquals(size(relations, "causal"), 0)
     assertEquals(size(built.hcursor.downField("trajectory"), "steps"), 64)
     assertEquals(size(built.hcursor.downField("hierarchy"), "containment"), 65)
     assertEquals(intField(report, "model", "situations"), 65)
-    assertEquals(intField(report, "model", "entities"), 35)
-    assertEquals(intField(report, "model", "claims"), 398)
+    assertEquals(intField(report, "model", "entities"), 29)
+    // 386 claims became 391: the five child context frames the placement rule derives are five
+    // structurally-derived claims, each citing the quotation span that licensed it.
+    assertEquals(intField(report, "model", "claims"), 391)
+
+    // Slice 1.7's referentiality rule, measured on the same fifty charts. 35 entities and 68
+    // participant edges became 29 and 57: the eleven fillers that moved are the nine `:time` and
+    // two `:manner` ones, and the six entities that went with them are `then`, `now`, `midnight`,
+    // `night`, `thus` and `together` - a time is not a participant and an adverb is not a cast
+    // member. Nothing was discarded to get there: the circumstance layer holds all eleven with
+    // their own spans, and no entity that names a referent left the model.
+    val entityLabels = graph
+      .downField("entities")
+      .focus
+      .flatMap(_.asObject)
+      .map(
+        _.values.toVector
+          .flatMap(_.hcursor.downField("label").downField("value").as[String].toOption)
+      )
+      .getOrElse(fail("no entities object"))
+      .sorted
+    assertEquals(entityLabels.size, 29)
+    assertEquals(
+      entityLabels.toSet.intersect(Set("then", "now", "midnight", "night", "thus", "together")),
+      Set.empty[String]
+    )
+    val circumstances = rows(built, "graph", "relations", "circumstances")
+    assertEquals(
+      circumstances
+        .map(row => field(row, "kind") -> field(row, "label"))
+        .groupBy(identity)
+        .view
+        .mapValues(_.size)
+        .toMap,
+      Map(
+        ("Time", "then") -> 4,
+        ("Time", "now") -> 3,
+        ("Time", "midnight") -> 1,
+        ("Time", "night") -> 1,
+        ("Manner", "thus") -> 1,
+        ("Manner", "together") -> 1
+      )
+    )
+    // The coverage ledger balances over the whole story: every one of the 119 entity-kind fillers
+    // the provider saw is in exactly one of the six named classes, and every filler the rule
+    // turned away also carries its own receipt. The audit of 2026-09-02 found 51 of these leaving
+    // as an anonymous increment, in no layer, no gap and no alternatives list; they are the
+    // `unlicensed` column, and each now names its concept, word, kind, source roles and reason so
+    // the frame-lexicon slice can find them.
+    val fillerClasses =
+      Vector(
+        "fillers",
+        "circumstances",
+        "eventualities",
+        "nonReferential",
+        "unlicensed",
+        "ambiguous"
+      )
+    val admitted = coverageRows(report).flatMap { row =>
+      kindOf(row) match
+        case "proposed"    => Vector(row)
+        case "coordinated" => rows(row, "branches").filter(b => kindOf(b) == "admitted")
+        case _             => Vector.empty
+    }
+    val byClass = fillerClasses
+      .map(name => name -> admitted.map(row => intField(row, name)).sum)
+      .toMap
+    assertEquals(byClass("fillers"), 57)
+    assertEquals(byClass("circumstances"), 11)
+    assertEquals(byClass("eventualities"), 0)
+    assertEquals(byClass("nonReferential"), 0)
+    assertEquals(byClass("unlicensed"), 51)
+    assertEquals(byClass("ambiguous"), 0)
+    val seen = admitted.map(row => intField(row, "seen")).sum
+    assertEquals(fillerClasses.map(byClass).sum, seen, "the six classes do not sum to seen")
+    assertEquals(seen, 119)
+    val refusals = rows(json(files.receipts), "calls")
+      .filter(call => param(call, "rule").contains(Referentiality.RuleName))
+    assertEquals(refusals.size, 51, "a refused filler left the provider without a receipt")
+    assert(
+      refusals.forall(call =>
+        Vector("filler", "lemma", "concept-kind", "source-roles", "reason")
+          .forall(key => param(call, key).exists(_.nonEmpty))
+      ),
+      "a refusal receipt does not say what was refused or why"
+    )
+
+    // Every circumstance carries its own words, never the whole situation by default.
+    assert(
+      circumstances.forall(row => rows(row, "support").nonEmpty),
+      "a circumstance was recorded with no span"
+    )
 
     // The bundle still carries no source prose, on a fifty-sentence run as on a three.
     assert(!read(files.report).contains("Egulac"), "the report carries source prose")
@@ -375,7 +628,7 @@ class StoryBuildSuite extends FunSuite:
   test("the WOG replay court: 50 sentences, three charts, two situations, a partial draft") {
     val dir = work("wog")
     val outDir = dir.resolve("out")
-    val summary = build(wogText(dir), wogRecordings, outDir)
+    val summary = buildTitled(wogText(dir), wogRecordings, outDir)
 
     assertEquals(summary.storyId.value, WogStory)
     assertEquals(summary.sentences, 50)
@@ -486,9 +739,13 @@ class StoryBuildSuite extends FunSuite:
     val built = json(files.model)
     val graph = built.hcursor.downField("graph")
     assertEquals(size(graph, "situations"), 3)
-    assertEquals(size(graph, "entities"), 3)
+    // Two entities and two participant edges, not three: the third filler of these authored charts
+    // is a `:time`, which slice 1.7's referentiality rule records as a circumstance rather than
+    // minting an entity for it.
+    assertEquals(size(graph, "entities"), 2)
     val relations = graph.downField("relations")
-    assertEquals(size(relations, "participants"), 3)
+    assertEquals(size(relations, "participants"), 2)
+    assertEquals(size(relations, "circumstances"), 1)
     assertEquals(size(relations, "temporal"), 2)
     assertEquals(size(built.hcursor.downField("trajectory"), "steps"), 2)
     assertEquals(
@@ -526,8 +783,15 @@ class StoryBuildSuite extends FunSuite:
         // role, so they are counted unlicensed rather than proposed as participants.
         "kind" -> Json.fromString("proposed"),
         "root" -> Json.fromString(s"$WogStory:s0#b"),
+        // Since slice 1.7 the row divides every filler the scan saw, and the four counters sum to
+        // `seen`: a filler cannot leave the provider without a row saying where it went.
         "fillers" -> Json.fromInt(0),
-        "unlicensed" -> Json.fromInt(2)
+        "circumstances" -> Json.fromInt(0),
+        "eventualities" -> Json.fromInt(0),
+        "nonReferential" -> Json.fromInt(0),
+        "unlicensed" -> Json.fromInt(2),
+        "ambiguous" -> Json.fromInt(0),
+        "seen" -> Json.fromInt(2)
       )
     )
     assertEquals(
@@ -537,8 +801,13 @@ class StoryBuildSuite extends FunSuite:
         "ordinal" -> Json.fromInt(1),
         "kind" -> Json.fromString("proposed"),
         "root" -> Json.fromString(s"$WogStory:s1#g"),
-        "fillers" -> Json.fromInt(2),
-        "unlicensed" -> Json.fromInt(0)
+        "fillers" -> Json.fromInt(1),
+        "circumstances" -> Json.fromInt(1),
+        "eventualities" -> Json.fromInt(0),
+        "nonReferential" -> Json.fromInt(0),
+        "unlicensed" -> Json.fromInt(0),
+        "ambiguous" -> Json.fromInt(0),
+        "seen" -> Json.fromInt(2)
       )
     )
     assertEquals(kindOf(coverage(2)), "proposed")
@@ -572,7 +841,7 @@ class StoryBuildSuite extends FunSuite:
   test("removing one recording makes exactly that sentence NoChart and moves nothing else") {
     val dir = work("isolation")
     val textPath = wogText(dir)
-    val full = build(textPath, wogRecordings, dir.resolve("full"))
+    val full = buildTitled(textPath, wogRecordings, dir.resolve("full"))
     val fullRows = coverageRows(json(full.files.report))
 
     val outcome = parsed(textPath, wogRecordings)
@@ -586,7 +855,7 @@ class StoryBuildSuite extends FunSuite:
     assert(store.contains(riverKey), "the third recording is not the river sentence's")
     Files.delete(store.path(riverKey))
 
-    val mutated = build(textPath, copy, dir.resolve("mutated"))
+    val mutated = buildTitled(textPath, copy, dir.resolve("mutated"))
     assertEquals(mutated.coverage, CoverageCounts(2, 0, 0, 0, 48))
     assertEquals(mutated.charts, 2)
     assertEquals(mutated.parser.replayedAuthored, 2)
@@ -769,6 +1038,76 @@ class StoryBuildSuite extends FunSuite:
     assertEquals(decoded.receipt.map(_.createdAtEpochMillis), Some(Now))
   }
 
+  /** The title court. Before slice 1.7 the pipeline handed `StorySource` the input file's name, so
+    * this same build published a summary claim at credence 1.0, under calibration model
+    * `title-rule-v1`, asserting the narrative was called `war-of-the-ghosts.txt`. A filename is not
+    * a title, and the fix is to stop deriving one, not to derive a better one.
+    */
+  test("with no title the summary is a gap and no claim in the model names the input file") {
+    val dir = work("untitled")
+    val textPath = wogText(dir)
+    val summary = build(textPath, capturedRecordings, dir.resolve("out"))
+    val report = json(summary.files.report)
+
+    assertEquals(stringAt(report, "coverage", "summary", "kind"), "no-title")
+    assertEquals(
+      rows(report, "gaps").map(row => field(row, "family")).count(_ == "Summary"),
+      1
+    )
+    // The accepted consequence, stated rather than worked around: with no summary there is no
+    // story segment, so no situation is under a primary root and the draft does not promote. That
+    // is true of a model built from a bare text file, and the fix for it is a summary rule that
+    // reads the story.
+    assertEquals(summary.validated, false)
+    assert(summary.errors > 0, "an unresolved summary left no violation")
+
+    // The filename reaches no artifact. `war-of-the-ghosts` is the stem of the file this court
+    // wrote, and nothing the pipeline publishes may carry it.
+    val fileStem = textPath.getFileName.toString
+    summary.files.all.foreach { path =>
+      assert(!read(path).contains(fileStem), s"${path.getFileName} names the input file")
+    }
+  }
+
+  test("a caller-supplied title is carried as the caller's claim, with its provenance recorded") {
+    val dir = work("titled")
+    val summary = buildTitled(wogText(dir), capturedRecordings, dir.resolve("out"))
+    val report = json(summary.files.report)
+
+    assertEquals(stringAt(report, "coverage", "summary", "kind"), "proposed")
+    assertEquals(stringAt(report, "coverage", "summary", "titleProvenance"), "caller-supplied")
+    assertEquals(
+      rows(report, "gaps").map(row => field(row, "family")).count(_ == "Summary"),
+      0
+    )
+    val decoded = StoryModelCodec
+      .decode(read(summary.files.model))
+      .fold(error => fail(error.toString), identity)
+    assertEquals(decoded.source.title, Some(WarOfTheGhostsText.title))
+    assertEquals(decoded.source.titleProvenance, Some(TitleProvenance.CallerSupplied))
+    assertEquals(decoded.source.establishedTitle.map(_.value), Some(WarOfTheGhostsText.title))
+  }
+
+  test("a title the title court refuses stops the run before it convenes") {
+    assertEquals(
+      ClaudeParseDriver.titleArgument(Vector.empty),
+      Right(None)
+    )
+    assert(ClaudeParseDriver.titleArgument(Vector("  ")).isLeft, "a blank title was admitted")
+    assert(
+      ClaudeParseDriver.titleArgument(Vector("stories/wog.txt")).isLeft,
+      "a path was admitted as a title"
+    )
+    assert(
+      ClaudeParseDriver.titleArgument(Vector("one", "two")).isLeft,
+      "two titles were admitted"
+    )
+    assertEquals(
+      ClaudeParseDriver.titleArgument(Vector("The War of the Ghosts")).map(_.map(_.value)),
+      Right(Some("The War of the Ghosts"))
+    )
+  }
+
   test("exit status: a court that never convened is 2, every other refusal is 1, a clean run 0") {
     assertEquals(ExitStatus.CouldNotStart.code, 2)
     assertEquals(ExitStatus.Incomplete.code, 1)
@@ -806,7 +1145,7 @@ class StoryBuildSuite extends FunSuite:
     val dir = work("complete")
     val textPath = writeText(dir, "three.txt", threeText)
     val outDir = dir.resolve("out")
-    val summary = build(textPath, threeRecordings, outDir)
+    val summary = buildTitled(textPath, threeRecordings, outDir)
     assertEquals(summary.sentences, 3)
     assertEquals(summary.charts, 3)
     assertEquals(summary.parser.transportFailures, 0)

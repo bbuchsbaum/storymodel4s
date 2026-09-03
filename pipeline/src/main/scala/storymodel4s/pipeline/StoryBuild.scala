@@ -230,6 +230,11 @@ object StoryPipeline:
 
   /** Build one text. `replay` never calls the model and refuses a missing recordings directory;
     * `record` passes the same environment court as the parse driver before any read or write.
+    *
+    * `title` is the caller's claim about the work, or nothing. Nothing is the honest default for a
+    * bare text file: the pipeline no longer derives a title from the input file's name, so with no
+    * title the summary family is unresolved and the model carries a summary gap rather than an
+    * assertion that the narrative is called after its file.
     */
   def run(
       mode: DriverMode,
@@ -238,11 +243,12 @@ object StoryPipeline:
       outDir: Path,
       env: Map[String, String],
       nowEpochMillis: Long,
-      source: ExchangeSource = ExchangeSource.Court
+      source: ExchangeSource = ExchangeSource.Court,
+      title: Option[StoryTitle] = None
   ): Either[PipelineError, BuildSummary] =
     for
       parsed <- ClaudeParseDriver
-        .parse(mode, textPath, recordingsDir, env, nowEpochMillis, source)
+        .parse(mode, textPath, recordingsDir, env, nowEpochMillis, source, title)
         .left
         .map(PipelineError.NotStarted(_))
       charts = parsed.charts
@@ -294,7 +300,7 @@ object StoryPipeline:
       s"receipt=${summary.receiptChecksum.short()} " +
       s"out=$outDir"
 
-/** Usage: `storyBuild <replay|record> <text-path> <recordings-dir> <out-dir>`.
+/** Usage: `storyBuild <replay|record> <text-path> <recordings-dir> <out-dir> [title]`.
   *
   * `replay` reads an existing recordings directory and never calls the model. `record` needs
   * `STORYMODEL4S_AGENT_LIVE=1` and a nonblank `STORYMODEL4S_ANTHROPIC_API_KEY` (or
@@ -302,23 +308,33 @@ object StoryPipeline:
   * `compilation-report.json`, and `receipts.json` under `<out-dir>`. Only counts, checksums, and
   * paths are printed. Exit status: 2 when the run could not start, 1 when any sentence never
   * reached the parser court or the compiler refused the input, 0 otherwise.
+  *
+  * The fifth argument, when given, is the story's title as the *caller's* claim, recorded with
+  * caller-supplied provenance. Omit it and the story has no title, the summary family resolves to a
+  * gap, and the model does not promote to validated. That is the honest outcome for a bare text
+  * file: the fix for it is a summary rule that reads the story, not the input file's name.
   */
-@main def storyBuild(mode: String, textPath: String, recordingsDir: String, outDir: String): Unit =
+@main def storyBuild(
+    mode: String,
+    textPath: String,
+    recordingsDir: String,
+    outDir: String,
+    title: String*
+): Unit =
   val out = Paths.get(outDir)
-  val outcome = DriverMode
-    .parse(mode)
-    .left
-    .map(PipelineError.NotStarted(_))
-    .flatMap { parsed =>
-      StoryPipeline.run(
-        parsed,
-        Paths.get(textPath),
-        Paths.get(recordingsDir),
-        out,
-        sys.env,
-        System.currentTimeMillis()
-      )
-    }
+  val outcome = for
+    parsed <- DriverMode.parse(mode).left.map(PipelineError.NotStarted(_))
+    supplied <- ClaudeParseDriver.titleArgument(title).left.map(PipelineError.NotStarted(_))
+    summary <- StoryPipeline.run(
+      parsed,
+      Paths.get(textPath),
+      Paths.get(recordingsDir),
+      out,
+      sys.env,
+      System.currentTimeMillis(),
+      title = supplied
+    )
+  yield summary
   outcome match
     case Left(error)    => System.err.println(s"storyBuild: ${error.message}")
     case Right(summary) => println(StoryPipeline.render(summary, out))

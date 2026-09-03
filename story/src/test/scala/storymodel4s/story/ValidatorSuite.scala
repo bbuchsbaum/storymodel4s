@@ -162,7 +162,7 @@ class ValidatorSuite extends ScalaCheckSuite:
     val frame = ContextFrame(
       speech,
       Some(b.world),
-      ContextKind.Speech(b.entities(0)),
+      ContextKind.Speech(ContextHolder.Named(b.entities(0))),
       sp(b, 0),
       Small.meta("ctx:speech", EpistemicStatus.SurfaceExplicit, Some(sp(b, 0)))
     )
@@ -259,7 +259,7 @@ class ValidatorSuite extends ScalaCheckSuite:
     val frame = ContextFrame(
       belief,
       Some(b.world),
-      ContextKind.Belief(b.entities(0)),
+      ContextKind.Belief(ContextHolder.Named(b.entities(0))),
       sp(b, 0),
       Small.meta("ctx:b", EpistemicStatus.SurfaceExplicit, Some(sp(b, 0)))
     )
@@ -392,7 +392,7 @@ class ValidatorSuite extends ScalaCheckSuite:
       a -> ContextFrame(
         a,
         Some(c),
-        ContextKind.Speech(EntityId.unsafe("nobody")),
+        ContextKind.Speech(ContextHolder.Named(EntityId.unsafe("nobody"))),
         sp(b, 0),
         Small.meta("a", EpistemicStatus.SurfaceExplicit, Some(sp(b, 0)))
       ),

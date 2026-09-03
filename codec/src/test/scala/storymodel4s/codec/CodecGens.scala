@@ -374,7 +374,7 @@ object CodecFixture:
       speech -> ContextFrame(
         speech,
         Some(world),
-        ContextKind.Speech(anna),
+        ContextKind.Speech(ContextHolder.Named(anna)),
         sp(1),
         meta("ctx:speech", EpistemicStatus.SurfaceExplicit, Some(sp(1)))
       )

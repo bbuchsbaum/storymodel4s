@@ -16,7 +16,10 @@ import storymodel4s.story.{Polarity as StoryPolarity, *}
   */
 class TrajectoryCompilerSuite extends FunSuite:
   private val source = StorySource
-    .fromText("The man went. The man saw. The man returned.", Some("Three steps"))
+    .titled(
+      "The man went. The man saw. The man returned.",
+      StoryTitle.callerSupplied("Three steps").fold(e => fail(e.message), identity)
+    )
     .fold(e => fail(e.message), identity)
   private val atlas = SurfaceAnalyzer.analyze(source)
   private val sentences = atlas.sentences
@@ -249,10 +252,27 @@ class TrajectoryCompilerSuite extends FunSuite:
   private val defaultCoverage = Vector(0, 1, 2).map(i => coverageAttempt(i, Vector(m(i))))
   private val defaultTemporal = Vector(temporalAttempt(0, 1), temporalAttempt(1, 2))
 
+  private def circumstanceAttempt(
+      i: Int,
+      label: String = "then",
+      at: Option[ChartNodeRef] = None
+  ): SituationCircumstanceAttempt =
+    SituationCircumstanceAttempt(
+      s(i),
+      at.getOrElse(m(i)),
+      bundle(
+        CircumstanceProposal(CircumstanceKind.Time, label),
+        ev(i),
+        "circumstance-agent",
+        s"x$i"
+      )
+    )
+
   private def attemptedInput(
       mentions: Vector[EntityMentionAttempt] = defaultMentions,
       participants: Vector[ParticipantAttempt] = defaultParticipants,
       coverage: Vector[ParticipantCoverageAttempt] = defaultCoverage,
+      circumstances: Vector[SituationCircumstanceAttempt] = Vector.empty,
       temporal: Vector[TemporalAttempt] = defaultTemporal,
       chartOrder: Vector[(SurfaceUnitId, PropositionEvidence)] = charts
   ): Either[NarrativeCompilerError, NarrativeCompilerInput] =
@@ -276,6 +296,7 @@ class TrajectoryCompilerSuite extends FunSuite:
       mentions,
       participants,
       coverage,
+      circumstances,
       temporal,
       AcceptancePolicy.Conservative,
       receipt,
@@ -289,8 +310,9 @@ class TrajectoryCompilerSuite extends FunSuite:
       temporal: Vector[TemporalAttempt] = defaultTemporal,
       chartOrder: Vector[(SurfaceUnitId, PropositionEvidence)] = charts
   ): NarrativeCompilation =
-    val input = attemptedInput(mentions, participants, coverage, temporal, chartOrder)
-      .fold(e => fail(e.message), identity)
+    val input =
+      attemptedInput(mentions, participants, coverage, temporal = temporal, chartOrder = chartOrder)
+        .fold(e => fail(e.message), identity)
     NarrativeCompiler.compile(input).fold(e => fail(e.message), identity)
 
   private def gapsOf(
@@ -587,4 +609,68 @@ class TrajectoryCompilerSuite extends FunSuite:
         assert(errors.exists(_.message.contains("is not an entity, name, or quantity concept")))
       case Left(other) => fail(other.message)
       case Right(_)    => fail("a predicate filler reached the compiler")
+  }
+
+  test("a circumstance becomes an edge on its situation and mints no entity") {
+    // Sentence 0's filler stands as a circumstance rather than a participant, which is what the
+    // referentiality rule does to a `:time`: the situation keeps the evidence and the entity layer
+    // does not grow.
+    def compiled(circumstances: Vector[SituationCircumstanceAttempt]) =
+      NarrativeCompiler
+        .compile(
+          attemptedInput(
+            mentions = Vector(1, 2).map(i => mentionAttempt(i)),
+            participants = Vector(1, 2).map(i => participantAttempt(i)),
+            coverage = Vector(
+              coverageAttempt(0, Vector.empty),
+              coverageAttempt(1, Vector(m(1))),
+              coverageAttempt(2, Vector(m(2)))
+            ),
+            circumstances = circumstances
+          ).fold(e => fail(e.message), identity)
+        )
+        .fold(e => fail(e.message), identity)
+
+    val without = compiled(Vector.empty)
+    val with_ = compiled(Vector(circumstanceAttempt(0)))
+    val circumstances = with_.draft.graph.relations.circumstances
+    assertEquals(without.draft.graph.relations.circumstances, Vector.empty)
+    assertEquals(circumstances.size, 1)
+    assertEquals(circumstances.head.kind, CircumstanceKind.Time)
+    assertEquals(circumstances.head.label, "then")
+    // The circumstance carries its own words, and the entity layer is exactly the size it is
+    // without it: recording a time never adds a referent.
+    assert(circumstances.head.support.refs.toVector.nonEmpty)
+    assertEquals(with_.draft.graph.entities.size, without.draft.graph.entities.size)
+    assertEquals(with_.draft.graph.relations.participants.size, 2)
+  }
+
+  test("input refuses a filler proposed as both a participant and a circumstance") {
+    // Without this the same word could be a cast member and a time of one situation, and the model
+    // would carry both claims with no way to tell which the source supported.
+    val both = attemptedInput(circumstances = Vector(circumstanceAttempt(0)))
+    both match
+      case Left(NarrativeCompilerError.InvalidInput(errors)) =>
+        assert(
+          errors.exists(_.message.contains("is both a participant and a circumstance")),
+          errors.toVector.map(_.message).mkString("; ")
+        )
+      case Left(other) => fail(other.message)
+      case Right(_)    => fail("a filler was admitted as participant and circumstance at once")
+  }
+
+  test("input refuses a circumstance whose situation endpoint is not a situation attempt") {
+    val stray = SituationCircumstanceAttempt(
+      m(0),
+      m(1),
+      bundle(CircumstanceProposal(CircumstanceKind.Manner, "thus"), ev(0), "circ-agent", "stray")
+    )
+    attemptedInput(circumstances = Vector(stray)) match
+      case Left(NarrativeCompilerError.InvalidInput(errors)) =>
+        assert(
+          errors.exists(_.message.contains("unknown situation endpoint")),
+          errors.toVector.map(_.message).mkString("; ")
+        )
+      case Left(other) => fail(other.message)
+      case Right(_)    => fail("a circumstance with no situation reached the compiler")
   }

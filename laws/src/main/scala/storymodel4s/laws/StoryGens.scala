@@ -321,7 +321,7 @@ object StorySmall:
       c -> ContextFrame(
         c,
         Some(world),
-        ContextKind.Speech(ents(0)),
+        ContextKind.Speech(ContextHolder.Named(ents(0))),
         spanOf((0 until n).filter(i => contextOf(i) == c)),
         meta("ctx:speech", EpistemicStatus.SurfaceExplicit, Some(sp(0)))
       )

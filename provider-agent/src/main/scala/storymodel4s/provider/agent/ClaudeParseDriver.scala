@@ -55,6 +55,11 @@ enum DriverError:
   case OutputUnwritable(path: String, reasonChecksum: Checksum)
   case ReceiptInvalid(detail: String)
 
+  /** The caller stated a title the title court refused, or stated more than one. Refused and never
+    * repaired: a title nobody can state cleanly is not one the model should publish.
+    */
+  case TitleRefused(detail: String)
+
   def message: String = this match
     case UnknownMode(raw)                     => s"unknown mode '$raw'; expected replay or record"
     case LiveRefused(refusal)                 => refusal.message
@@ -69,6 +74,7 @@ enum DriverError:
     case ConfigInvalid(detail)                => s"parser config refused: $detail"
     case OutputUnwritable(path, sum)          => s"cannot write $path (reason ${sum.short()})"
     case ReceiptInvalid(detail)               => s"build receipt refused: $detail"
+    case TitleRefused(detail)                 => s"story title refused: $detail"
 
 /** How one sentence's reply was obtained, derived from the recordings store before and after the
   * run rather than from the mode argument.
@@ -415,6 +421,25 @@ object ClaudeParseDriver:
         ParserBatch.validated(all).left.map(error => DriverError.InputInvalid(error.message))
       )
 
+  /** The optional trailing title of a command line, as the caller's stated claim.
+    *
+    * Why a sequence and not a defaulted `String`: "no title was given" and "an empty title was
+    * given" are different facts about what the caller said, and one `String` cannot carry both. An
+    * empty sequence is the first; anything present goes through [[StoryTitle.callerSupplied]] and
+    * is refused rather than trimmed into shape. More than one is a refusal, not a choice.
+    */
+  def titleArgument(raw: Seq[String]): Either[DriverError, Option[StoryTitle]] =
+    raw.toVector match
+      case Vector()    => Right(None)
+      case Vector(one) =>
+        StoryTitle
+          .callerSupplied(one)
+          .left
+          .map(error => DriverError.TitleRefused(error.message))
+          .map(Some(_))
+      case more =>
+        Left(DriverError.TitleRefused(s"${more.size} titles were given; at most one is a title"))
+
   /** Run one text through the court and write the per-sentence artifacts, ledger, and summary. The
     * ordering guarantees of [[parse]] hold; the receipt is established before the first write, so a
     * refused receipt leaves `outDir` untouched.
@@ -426,10 +451,11 @@ object ClaudeParseDriver:
       outDir: Path,
       env: Map[String, String],
       nowEpochMillis: Long,
-      source: ExchangeSource = ExchangeSource.Court
+      source: ExchangeSource = ExchangeSource.Court,
+      title: Option[StoryTitle] = None
   ): Either[DriverError, DriverSummary] =
     for
-      outcome <- parse(mode, textPath, recordingsDir, env, nowEpochMillis, source)
+      outcome <- parse(mode, textPath, recordingsDir, env, nowEpochMillis, source, title)
       _ <- writeOutputs(
         outDir,
         outcome.batch,
@@ -445,6 +471,9 @@ object ClaudeParseDriver:
   /** Run one text through the court without writing anything. Order matters: the environment court
     * for `record` comes before any read, the text is read before the recordings directory may be
     * created, and `replay` never creates anything.
+    *
+    * `title` is the caller's, or nothing. The path is read for its *bytes* and never for its name:
+    * a file called `wog.txt` is not a story called "wog.txt", and the driver used to say it was.
     */
   def parse(
       mode: DriverMode,
@@ -452,7 +481,8 @@ object ClaudeParseDriver:
       recordingsDir: Path,
       env: Map[String, String],
       nowEpochMillis: Long,
-      source: ExchangeSource = ExchangeSource.Court
+      source: ExchangeSource = ExchangeSource.Court,
+      title: Option[StoryTitle] = None
   ): Either[DriverError, ParseOutcome] =
     for
       backend <- AgentCredentials.backend(env).left.map(DriverError.BackendRefused(_))
@@ -465,8 +495,8 @@ object ClaudeParseDriver:
             .map(DriverError.LiveRefused(_))
             .flatMap(admitted => clientFor(source, admitted).map(Some(_)))
       text <- readText(textPath)
-      story <- StorySource
-        .fromText(text, Some(textPath.getFileName.toString))
+      story <- title
+        .fold(StorySource.fromText(text))(supplied => StorySource.titled(text, supplied))
         .left
         .map(error => DriverError.SourceInvalid(error.message))
       atlas = SurfaceAnalyzer.analyze(story)
@@ -762,7 +792,7 @@ object ClaudeParseDriver:
     )
     write(outDir.resolve("summary.json"), json.spaces2 + "\n")
 
-/** Usage: `claudeParse <replay|record> <text-path> <recordings-dir> <out-dir>`.
+/** Usage: `claudeParse <replay|record> <text-path> <recordings-dir> <out-dir> [title]`.
   *
   * `replay` reads an existing recordings directory and never calls the model. `record` needs
   * `STORYMODEL4S_AGENT_LIVE=1` and a nonblank `STORYMODEL4S_ANTHROPIC_API_KEY` (or
@@ -770,18 +800,30 @@ object ClaudeParseDriver:
   * and checksums are printed; source prose never reaches stdout. The exit status is 2 when the run
   * could not start, 1 when any sentence never reached the admission court (a transport failure such
   * as a missing recording), and 0 otherwise.
+  *
+  * The fifth argument, when given, is the story's title as the *caller's* claim. Omit it and the
+  * story has no title: the file's name is not one, and nothing else here can supply one.
   */
-@main def claudeParse(mode: String, textPath: String, recordingsDir: String, outDir: String): Unit =
-  val outcome = DriverMode.parse(mode).flatMap { parsed =>
-    ClaudeParseDriver.run(
+@main def claudeParse(
+    mode: String,
+    textPath: String,
+    recordingsDir: String,
+    outDir: String,
+    title: String*
+): Unit =
+  val outcome = for
+    parsed <- DriverMode.parse(mode)
+    supplied <- ClaudeParseDriver.titleArgument(title)
+    summary <- ClaudeParseDriver.run(
       parsed,
       Paths.get(textPath),
       Paths.get(recordingsDir),
       Paths.get(outDir),
       sys.env,
-      System.currentTimeMillis()
+      System.currentTimeMillis(),
+      title = supplied
     )
-  }
+  yield summary
   outcome match
     case Left(error) =>
       System.err.println(s"claudeParse: ${error.message}")
