@@ -195,7 +195,8 @@ object SherlockAnnotationView:
   *
   * Usage: `sherlockRecallMap <annotation.tsv> <recall.csv> <report.tsv>`. Inputs stay outside Git;
   * the report contains recall text and is therefore local-sensitive (fixture policy 14(d)): it is
-  * written wherever the caller points, normally the ignored `tmp/` directory.
+  * written wherever the caller points, normally the study record under the local data root
+  * (`tools/data-root.sh`, `data/README.md`).
   */
 @main def sherlockRecallMap(annotationTsv: String, recallCsv: String, outPath: String): Unit =
   val bytes = Files.readAllBytes(Paths.get(annotationTsv))

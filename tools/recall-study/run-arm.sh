@@ -2,32 +2,36 @@
 # Run one configuration of the recall-to-video mapping over one partition of participants.
 #
 # Usage: run-arm.sh ARM_LABEL PARTITION   with PARTITION in {development, untouchedTest}
-# Environment overrides passed through to the runner (each changes the report identity):
-#   STORYMODEL4S_CANDIDATES_PER_LEVEL, STORYMODEL4S_CANDIDATES_LEXICAL_OVERLAP
+# Every STORYMODEL4S_* variable in the environment passes through to the runner and changes the
+# report identity; the handoff brief lists them with their defaults.
 #
-# Outputs land in tmp/study/<ARM_LABEL>/ and are scored by tools/recall-study/score.py.
-# Inputs stay outside Git. The untouched partition is unsealed once; running it is a deliberate act.
+# Inputs come from the data root (tools/data-root.sh; see data/README.md) and stay outside Git.
+# Outputs land in <data>/study/recall-to-video/<ARM_LABEL>/ and are scored by the scripts beside
+# this one. The untouched partition is unsealed once; running it is a deliberate act.
 set -euo pipefail
 here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 root="$here/../.."
+data="$(bash "$root/tools/data-root.sh")"
+study="$data/study/recall-to-video"
 arm="${1:?arm label}"
 partition="${2:?development or untouchedTest}"
 
-out="$root/tmp/study/$arm"
+out="$study/$arm"
 mkdir -p "$out"
 names=$(python3 -c "
 import json,sys
-p=json.load(open('$root/tmp/study/partition.json'))
+p=json.load(open('$study/partition.json'))
 print('\n'.join(p['$partition']))")
 
 export ORT_DISABLE_TELEMETRY=1
-export STORYMODEL4S_ONNX_MODEL="${STORYMODEL4S_ONNX_MODEL:-$root/tmp/onnx/model.onnx}"
-export STORYMODEL4S_ONNX_TOKENIZER="${STORYMODEL4S_ONNX_TOKENIZER:-$root/tmp/onnx/tokenizer.json}"
-annotation="$root/tmp/Sherlock_Segments_1000_NN_2017.tsv"
+export STORYMODEL4S_ONNX_MODEL="${STORYMODEL4S_ONNX_MODEL:-$data/models/onnx/model.onnx}"
+export STORYMODEL4S_ONNX_TOKENIZER="${STORYMODEL4S_ONNX_TOKENIZER:-$data/models/onnx/tokenizer.json}"
+annotation="$data/sherlock/Sherlock_Segments_1000_NN_2017.tsv"
 
-echo "arm=$arm partition=$partition perLevel=${STORYMODEL4S_CANDIDATES_PER_LEVEL:-8} lexicalOverlap=${STORYMODEL4S_CANDIDATES_LEXICAL_OVERLAP:-false}"
+echo "arm=$arm partition=$partition data=$data"
+env | grep '^STORYMODEL4S_' | grep -v '_ONNX_' | sed 's/^/  /' || true
 for n in $names; do
-  recall="$root/tmp/recall_zenodo/$n.csv"
+  recall="$data/sherlock/recall/$n.csv"
   report="$out/recall-map-$n.tsv"
   if [ -f "$report" ]; then echo "  $n: present, skipping"; continue; fi
   echo "  $n ..."

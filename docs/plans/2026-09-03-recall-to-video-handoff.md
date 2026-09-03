@@ -39,12 +39,15 @@ what a bare run does.
 | `STORYMODEL4S_SCENE_CAPTIONS` | unset | Path to VLM scene captions. Measured null on this corpus. |
 | `STORYMODEL4S_SHUFFLE_RECALL` | unset | Control: permutes recall units. See trap 3. |
 
-`STORYMODEL4S_ONNX_MODEL` and `..._TOKENIZER` must point at `tmp/onnx/` or the pipeline silently
-falls back to a free lexical baseline and the run is not comparable to anything.
+`STORYMODEL4S_ONNX_MODEL` and `..._TOKENIZER` must point at `data/models/onnx/` or the pipeline
+silently falls back to a free lexical baseline and the run is not comparable to anything.
+`run-arm.sh` sets them from the data root (`tools/data-root.sh`; layout in `data/README.md`).
+Everything that used to live under `tmp/` — sources, model, the study record — now lives under
+`data/`, one copy shared by every worktree.
 
 ## 3. The evaluation apparatus
 
-- **Gold**: `tmp/Sherlock_Recall_Scene_n50_Onsets.csv`, sha256 `68cc307c…3753`, from
+- **Gold**: `data/sherlock/Sherlock_Recall_Scene_n50_Onsets.csv`, sha256 `68cc307c…3753`, from
   <https://gin.g-node.org/ljchang/Sherlock>. Kept outside Git like every other external source.
   Onsets are **TRs at 1.5 s** against the Princeton clock, which is the clock the pipeline reads.
 - **Participant mapping**: gold subject *N* ↔ `NN0N` for N ≤ 4, ↔ `NN0(N+1)` for N ≥ 5. `NN05` has no

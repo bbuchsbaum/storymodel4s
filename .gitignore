@@ -17,12 +17,17 @@ zz-worktree-local.sbt
 # local external datasets and generated manifests (never committed)
 /tmp/
 
+# local data root: sources, model weights, study run record (never committed; see data/README.md)
+/data/*
+!/data/README.md
+
 # docs-site build inputs/outputs (never committed)
 docs-site/node_modules/
 docs-site/dist/
 docs-site/.astro/
 media/worker/.venv/
 media/worker-vlm/.venv/
+__pycache__/
 
 # local secrets (API keys); never committed
 .env

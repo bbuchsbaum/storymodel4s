@@ -3,9 +3,17 @@
 Development-only iteration on the recall-to-video mapping, under the study plan
 (`docs/plans/2026-09-02-recall-to-video-study-plan.md`).
 
-- `partition.json` (in the ignored `tmp/study/`) freezes the 11 development and 6 untouched-test
+Inputs and outputs live under the local data root (`tools/data-root.sh`; layout in `data/README.md`),
+one copy shared by every worktree; the study record is `data/study/recall-to-video/`.
+
+- `partition.json` (in the study record) freezes the 11 development and 6 untouched-test
   participants, drawn by seed 20260902 before any arm was compared.
 - `run-arm.sh ARM PARTITION` runs one configuration over one partition.
+- `gold_scene.py` scores arms against the scene-level gold under its pre-registration.
+- `within_scene.py` is the within-scene precision apparatus under
+  `docs/plans/2026-09-03-within-scene-precision-preregistration.md`: `packet` writes the blind
+  packet and sealed key, `extract` pulls answers out of a filled packet, `score` joins answers to any
+  arm's report, and `diagnose` reports gold-free within-scene diagnostics.
 - `score.py` reports the gold-free outcomes with a seeded participant bootstrap, and
   `score.py --compare` gives paired per-participant differences.
 - `matched.py A DIR_A B DIR_B` repeats that comparison on the units whose anchor stayed at the leaf

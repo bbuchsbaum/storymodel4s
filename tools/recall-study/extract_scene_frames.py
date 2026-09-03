@@ -23,12 +23,27 @@ import os
 import subprocess
 import sys
 
-ANNOTATION = (
-    "/Users/bbuchsbaum/code/scala/storymodel4s/tmp/Sherlock_Segments_1000_NN_2017.tsv"
-)
+
+def data_root():
+    """$STORYMODEL4S_DATA, else <main checkout>/data; the same rule as tools/data-root.sh."""
+    env = os.environ.get("STORYMODEL4S_DATA")
+    if env:
+        return env
+    common = subprocess.check_output(
+        ["git", "rev-parse", "--git-common-dir"], text=True
+    ).strip()
+    return os.path.normpath(os.path.join(common, "..", "data"))
+
+
+DATA = data_root()
+ANNOTATION = os.path.join(DATA, "sherlock", "Sherlock_Segments_1000_NN_2017.tsv")
 PARTS = {
-    "media-part-a": "/Users/bbuchsbaum/code/scala/storymodel4s/tmp/Sherlock_part1_imovie.m4v",
-    "media-part-b": "/Users/bbuchsbaum/code/scala/storymodel4s/tmp/Sherlock_part2_imovie.m4v",
+    "media-part-a": os.path.join(
+        DATA, "sherlock", "media", "Sherlock_part1_imovie.m4v"
+    ),
+    "media-part-b": os.path.join(
+        DATA, "sherlock", "media", "Sherlock_part2_imovie.m4v"
+    ),
 }
 PART_A_LAST_ROW = 481
 REALIZED_FFMPEG = (
@@ -78,23 +93,46 @@ def grab(binary, src, seconds, width, height, scratch):
     `file` protocol, so `pipe:` is unavailable to it by construction.
     """
     cmd = [
-        binary, "-hide_banner", "-loglevel", "error", "-y",
-        "-protocol_whitelist", "file",
-        "-ss", f"{seconds:.3f}", "-i", src, "-frames:v", "1",
-        "-vf", f"scale={width}:{height}:in_color_matrix=bt601:in_range=tv:out_range=pc",
-        "-f", "rawvideo", "-pix_fmt", "bgr24", scratch,
+        binary,
+        "-hide_banner",
+        "-loglevel",
+        "error",
+        "-y",
+        "-protocol_whitelist",
+        "file",
+        "-ss",
+        f"{seconds:.3f}",
+        "-i",
+        src,
+        "-frames:v",
+        "1",
+        "-vf",
+        f"scale={width}:{height}:in_color_matrix=bt601:in_range=tv:out_range=pc",
+        "-f",
+        "rawvideo",
+        "-pix_fmt",
+        "bgr24",
+        scratch,
     ]
     r = subprocess.run(cmd, capture_output=True)
     if r.returncode != 0:
-        raise RuntimeError(f"frame at {seconds:.1f}s: rc={r.returncode} {r.stderr[:200]!r}")
+        raise RuntimeError(
+            f"frame at {seconds:.1f}s: rc={r.returncode} {r.stderr[:200]!r}"
+        )
     data = open(scratch, "rb").read()
     if len(data) != width * height * 3:
-        raise RuntimeError(f"frame at {seconds:.1f}s: {len(data)} bytes, expected {width*height*3}")
+        raise RuntimeError(
+            f"frame at {seconds:.1f}s: {len(data)} bytes, expected {width*height*3}"
+        )
     return data
 
 
 def main(argv):
-    out_dir = argv[1] if len(argv) > 1 else "tmp/study/scene-frames"
+    out_dir = (
+        argv[1]
+        if len(argv) > 1
+        else os.path.join(DATA, "study", "recall-to-video", "scene-frames")
+    )
     per = int(argv[2]) if len(argv) > 2 else 8
     width = int(argv[3]) if len(argv) > 3 else 384
     height = int(argv[4]) if len(argv) > 4 else 216
