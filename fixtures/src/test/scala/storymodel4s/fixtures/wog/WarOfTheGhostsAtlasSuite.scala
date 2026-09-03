@@ -451,6 +451,55 @@ class WarOfTheGhostsAtlasSuite extends FunSuite:
       assertEquals(landmark.at.lane, contextLanes.getOrElse(context, 0))
     }
 
+  test("a landmark carries its own situation's claim status, read and not defaulted"):
+    val s = scene(NarrativeLevel.Scene)
+    assert(landmarks(s).nonEmpty)
+    def situationOf(l: VisualPrimitive.Landmark): SituationId =
+      ev.parse(l.address)
+        .collect { case StoryRef.Situation(value) => value }
+        .getOrElse(fail(s"a landmark names a situation: ${l.address.render}"))
+    landmarks(s).foreach { l =>
+      assertEquals(l.status, model.graph.situations(situationOf(l)).meta.status)
+    }
+
+    // The acceptance fixture states every situation explicitly, so the identity above cannot on
+    // its own distinguish a field read from the node from a constant written into the compiler.
+    // Re-status one situation, keeping its claim id, evidence and support untouched, and the only
+    // thing that may move is that one mark.
+    val target = Wog.S.huntSeals
+    val node = model.graph.situations(target)
+    assertEquals(node.meta.status, EpistemicStatus.SurfaceExplicit)
+    val derived = node.meta
+      .withStatus(EpistemicStatus.StructurallyDerived)
+      .fold(e => fail(e.message), identity)
+    val retyped = node match
+      case SituationNode.Event(n) => SituationNode.Event(n.copy(meta = derived))
+      case SituationNode.State(n) => SituationNode.State(n.copy(meta = derived))
+    val moved = scene(
+      NarrativeLevel.Scene,
+      sourceModel = rebuilt(graph =
+        model.graph.copy(situations = model.graph.situations.updated(target, retyped))
+      )
+    )
+    val (changed, untouched) = landmarks(moved).partition(situationOf(_) == target)
+    assertEquals(changed.map(_.status), Vector(EpistemicStatus.StructurallyDerived))
+    assert(untouched.nonEmpty)
+    untouched.foreach { l =>
+      assertEquals(l.status, model.graph.situations(situationOf(l)).meta.status)
+    }
+    // The unperturbed fixture is already two statuses, not one: seventy situations the text
+    // states and one the researcher marked a conjecture. A defaulted field would flatten those
+    // into the same dot, which is precisely the failure this mark exists to prevent.
+    assertEquals(
+      landmarks(s).groupBy(_.status).view.mapValues(_.size).toVector.sortBy(_._1.ordinal),
+      Vector((EpistemicStatus.SurfaceExplicit, 70), (EpistemicStatus.Hypothesized, 1))
+    )
+
+    // D12: the twin is the audit surface, so the same fact must be readable there.
+    val twinLines = moved.textualTwin.linesIterator.filter(_.startsWith("  landmark ")).toVector
+    assertEquals(twinLines.count(_.contains("status=StructurallyDerived")), 1)
+    assertEquals(twinLines.size, landmarks(moved).size)
+
   test("reader regions exclude a segment whose summary claim is still beyond the horizon"):
     val hierarchy = groundedHierarchy()
     val sourceModel = rebuilt(hierarchy = hierarchy)
