@@ -176,8 +176,9 @@ Everything above §5 was true at `328021b2`. Four landings later the picture is:
 - No claim is calibrated: `align`'s calibrators are siblings of `document` and unreachable; a fit
   needs adjudicated data. `story.StatusWeight.of(meta)` still falls back to a constant per status
   off the story-build path (ADR 0010 records it).
-- Features infer no boundaries (ADR 0004's `level` question is open) and the viewer does not yet
-  read `features.json`.
+- Features infer no boundaries (ADR 0004's `level` question is open). The viewer reads
+  `features.json` (storyatlas4s `f7e825d`) but draws nothing from it yet: the value-bearing mark of
+  ADR 0002 D11 is not minted.
 
 ### The viewer
 
@@ -185,6 +186,25 @@ storyatlas4s reads `derivation.json` beside the model through the model-bound de
 `solo/derivation-record` in its `.worktrees/derivation-record`; see the storyatlas4s commit for
 its pin and gate). A record for another build is refused, never paired; no file means
 `NotSupplied`, still distinct from zero gaps.
+
+Since 2026-09-04 (storyatlas4s `80de6d7` pins storymodel4s `a0b2bf4f`; `f7e825d` on top) it also
+reads `features.json` the same way: `FeaturesRecordCodec.decode(draft, text)` binds the record,
+every sidecar the record names is read from `features/` and verified block by block against the
+manifest the model carries (`SidecarCodec.materializeScalarTrack`), and a track under a manifest
+the model does not carry is refused. `FeatureRecord` on `ReadModel` and `Edition` is `NotSupplied`
+or `Supplied(artifact, tracks)`; a supplied record with no tracks is the pipeline saying nothing
+was measured and never shares a receipt line with "not supplied". The values reach the receipt
+and nothing else. The drawing half needs, in order: a value-bearing `VisualPrimitive` in `view`
+(D11: word underlay, sentence step-wash, situation field over its `SpanSet`; coverage and
+missingness as separate masks, V-U1/V-U7; circularity status on every aggregate, V-U8), an ADR
+0002 amendment for it, `CommonViewState.feature` set in storyatlas4s `Edition` so `FeaturePlanner`
+moves from `NotRequested` to `SidecarRequired`, and a sixth `AtlasLowering.Layer` with geometry in
+`AtlasPlate`. The lowering cannot see `codec`, so the resolver stays in `cli`/`app` and hands
+values to the lowering through a `view` type (ADR 0002 §9 checkpoint 7). Two things to verify
+first: `FeatureSelection.Derived(derivation, Some(basisId))` fails closed as `Unresolved`, so a
+derived track must be selected with `None`, and `resolveSpace` then mints `derived:<hash32>`,
+which must equal the record's space id; and two measures on one plate need separate scales
+(V-U2: `codepoints` vs `occurrences`).
 
 ### New traps
 
@@ -194,14 +214,21 @@ its pin and gate). A record for another build is refused, never paired; no file 
   `<module>JS / update` with `NoSuchFileException`. Infrastructure: rerun with network up.
 - **`rm -rf` on the scratchpad and heredoc-written shell scripts are denied** to the agent; use
   fresh output directories and the Write tool.
+- **A fresh storyatlas4s linked worktree needs `zz-worktree-local.sbt` copied in** from a sibling
+  worktree (sbt-git otherwise fails with "Bare Repository has neither a working tree, nor an
+  index"); the file is not gitignored there, so add files by name, never `git add -A`.
+- **Read a sibling's pin from the branch you are gating**, not from whichever checkout is handy:
+  the intaglio pin differed between storyatlas4s `0518d31` and `48d462a`, and a gate against the
+  wrong clone fails compiling `VoyageLowering` with `CssClass`/`PointShape.Diamond` not found.
 
 ### What I would do next, in order
 
 1. ~~Speech-holder resolution for first- and second-person pronouns~~ Done (ADR 0012 §3). What
    remains open on this story is the chain: the speaker is "they", and "they" is open. Closing
    that is the calibrated antecedent policy of item 4, not another rule.
-2. **The viewer reads `features.json`** and draws Token/Sentence/Situation tracks (it already
-   admits those targets; `FeatureChannelState.SidecarRequired` is the seam).
+2. **The viewer draws Token/Sentence/Situation tracks.** Reading `features.json` is done
+   (storyatlas4s `f7e825d`, see "The viewer"); the picture waits on the D11 primitive listed
+   there (`FeatureChannelState.SidecarRequired` is still the seam).
 3. ~~A root segment that validates without a story summary~~ Done (ADR 0005 §10, schema 0.6.0):
    the segment carries its own claim and a typed summary absence; the untitled fifty-sentence
    build goes 149 → 84 gaps and 135 → 3 violations, the same 3 as the titled build (one abstained
