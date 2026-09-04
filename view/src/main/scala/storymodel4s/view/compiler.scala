@@ -3,7 +3,7 @@ package storymodel4s.view
 import cats.data.NonEmptyVector
 import cats.syntax.all.*
 import storymodel4s.core.*
-import storymodel4s.features.{FeatureAddress, FeatureTargetKey, SupportResolver}
+import storymodel4s.features.{BasisId, FeatureAddress, FeatureDerivation, FeatureTargetKey, SupportResolver}
 import storymodel4s.story.*
 
 /** Evidence horizon used to distinguish an omniscient model view from a reader-time view. */
@@ -26,9 +26,8 @@ enum FeatureResolutionIssue:
 
 /** One requested feature view, preserving raw-space identity versus a derived recipe identity.
   *
-  * `basisId` is the typed migration slot for basis-aware derivations. Until `features.BasisId`
-  * lands, a populated slot fails closed as [[FeatureChannelState.Unresolved]] rather than aliasing
-  * the legacy no-basis output space.
+  * `basisId` is the recorded checksum of the ordered derivation basis. Resolution uses the same
+  * identity function as the producer; omitting a basis selects only a legacy no-basis output.
   */
 enum FeatureSelection:
   case Raw(space: FeatureSpaceId)
@@ -41,12 +40,8 @@ enum FeatureSelection:
 
   private[view] def resolveSpace: Either[FeatureResolutionIssue, FeatureSpaceId] = this match
     case Raw(space)                => Right(space)
-    case Derived(derivation, None) =>
-      FeatureSpaceId
-        .from("derived:" + derivation.short(32))
-        .leftMap(_ => FeatureResolutionIssue.InvalidDerivedOutputSpace(derivation))
-    case Derived(_, Some(basisId)) =>
-      Left(FeatureResolutionIssue.BasisIdentityUnavailable(basisId))
+    case Derived(derivation, basis) =>
+      Right(FeatureDerivation.outputSpaceId(derivation, basis.map(BasisId.fromChecksum)))
 
 /** The narrative-unit axis a portable feature scale may select. */
 enum NarrativeUnitBasis:
@@ -272,6 +267,9 @@ object CodexSpec:
 enum FeatureChannelState:
   case NotRequested
 
+  /** All recorded outcomes at this scale have been compiled, including missing observations. */
+  case Materialized(selection: FeatureSelection, resolvedSpace: FeatureSpaceId, outcomeCount: Int)
+
   /** A typed selection whose output space cannot yet be derived without changing its identity. */
   case Unresolved(selection: FeatureSelection, issue: FeatureResolutionIssue)
 
@@ -287,12 +285,14 @@ enum FeatureChannelState:
   )
 
   def resolvedSpaceId: Option[FeatureSpaceId] = this match
+    case Materialized(_, space, _)      => Some(space)
     case Missing(_, space)               => Some(space)
     case SidecarRequired(_, space, _)    => Some(space)
     case NotRequested | Unresolved(_, _) => None
 
   /** Selected feature identity, if this channel was requested. */
   def selectedFeature: Option[FeatureSelection] = this match
+    case Materialized(selected, _, _)   => Some(selected)
     case NotRequested                    => None
     case Unresolved(selected, _)         => Some(selected)
     case Missing(selected, _)            => Some(selected)
@@ -300,6 +300,7 @@ enum FeatureChannelState:
 
   /** Stable textual-twin rendering of materialization state, distinct from magnitude. */
   def canonicalString: String = this match
+    case Materialized(_, _, count)      => s"materialized:outcomes=$count"
     case NotRequested                    => "not-requested"
     case Unresolved(_, issue)            => s"unresolved:${issue.canonicalString}"
     case Missing(_, _)                   => "missing"

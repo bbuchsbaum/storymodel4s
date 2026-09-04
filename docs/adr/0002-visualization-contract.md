@@ -1071,3 +1071,52 @@ is still drawn, with no words and the reason in its label.
 they must read `RegionLabel` and draw no text for `Unsummarized`, carrying the gap into the mark's
 description. The pin moves with this change (recovery plan §5).
 
+
+
+## 16. Amendment — measured scalar features reach the picture (2026-09-04)
+
+Accepted in single-developer mode. D11 now crosses the numeric seam through
+`AtlasCompiler.compileFeatures` and `compileDraftFeatures`. Their input is a
+`FeatureTrack[FeatureTarget, Double]` materialized by the caller's checked codec resolver;
+the view owns no bytes or I/O. The compiler checks source, feature-space, recorded basis identity,
+observed target/row and exact-support joins. Byte integrity remains the resolver's duty,
+not a claim made by accepting arbitrary scalar data at the portable API.
+
+`FeatureDerivation.outputSpaceId(recipe, basis)` is the one identity calculation for
+producer and selector. `FeatureSelection.Derived` retains the existing wire/configuration
+shape; a supplied basis now resolves the basis-dependent space. The obsolete unresolved
+case remains source-compatible, but the resolver no longer emits it.
+
+A `VisualPrimitive.Feature` carries a compiler-owned `FeatureValue`: the original estimate
+(including credence or missing reason), units, exact support, coverage, recipe, provenance,
+and circularity status. Full track outcomes, not the model's observed-only references,
+are compiled. `FeatureChannelState.Materialized` counts outcomes including absence.
+A domain is computed per selected space and grain; incompatible quantities never share one.
+Constant values use a centred display fraction, explicitly a rendering convention, not a
+scientific midpoint. Missing values have no numeric fraction. Coverage and missingness
+remain separate masks. `NotAggregate` differs from `NotAssessed`: features-record/v1
+contains no feature-use ledger, so every aggregate truthfully reports the latter.
+No absence of a supplied ledger is interpreted as evidence of independence.
+
+The initial value-bearing path requires `EpistemicHorizon.Omniscient`. Whole-text frequency
+uses future words; clipping its paint would not remove that information. Prefix-safe
+measurement needs its own declared recipe before this path accepts a reader horizon.
+No smoothing, boundary inference or implicit imputation is introduced.
+
+StoryAtlas renders one selected measure and grain per plate, with links between plates.
+A sixth layer carries the values and distinct absence/coverage marks. A source reading
+surface uses these same compiled marks as word underlays, sentence washes or separate
+situation fields over each exact span; overlapping situations never alpha-stack into a
+new scalar. Every mark has an inspector description and the scene's textual twin. The
+static edition exports raw Token and aggregate Sentence/Situation tracks already supplied
+by the pipeline, retaining draft disclosure and independent scales.
+
+Rejected alternatives: select aggregates by recipe alone (aliases different ordered bases);
+attach values only to existing placements (drops missing outcomes); recover measurements
+inside the renderer (crosses D4); treat no ledger as no circularity (fabricates an audit);
+clip whole-story values at a reader horizon (leaks future information); normalize unlike
+measures on one scale (erases units).
+
+Basis order is retained as a checksum, not reconstructed from target-sorted observations.
+The view checks the recorded identity against the selected output space; it cannot re-prove
+the original caller order from a representation that no longer carries that order.
