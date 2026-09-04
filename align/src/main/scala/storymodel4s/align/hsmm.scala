@@ -9,10 +9,20 @@ import storymodel4s.recall.RecallGraphStatus.Checked
   * and `ExternalStay` are logits of leaving / remaining outside the source, mixed in *before* that
   * normalization so the chance of going external does not depend on how many attractive source
   * moves exist. Features are computed on anchors, so a distorted state moves like its anchor.
+  *
+  * `CausalNeighbor` is the symmetrized causal feature every landed number was produced under: it
+  * fires when a causal edge joins the two states in either direction, so a move from a cause to its
+  * effect and a move from an effect back to its cause are one feature with one weight.
+  * `CauseToEffect` and `EffectToCause` keep the two apart (ADR 0014). They are appended after every
+  * older case because [[TransitionFeatures.score]] sums in declaration order, and they carry no
+  * weight in [[TransitionModel.default]], so the shipped score is unchanged until a study weights
+  * them. On a reciprocal causal pair (legal: only self-edges are refused) the OR fires once while
+  * both directed features fire, so a directed model is not a re-weighting of the symmetrized one.
   */
 enum TransitionKind:
   case Stay, DiscourseSuccessor, WorldTimeSuccessor, CausalNeighbor, HierarchyUp, HierarchyDown,
-    SameEntityThread, SemanticNeighbor, Backward, LongJump, ExternalIn, ExternalStay
+    SameEntityThread, SemanticNeighbor, Backward, LongJump, ExternalIn, ExternalStay,
+    CauseToEffect, EffectToCause
 
 final case class TransitionModel(theta: Map[TransitionKind, Double]):
   def apply(k: TransitionKind): Double = theta.getOrElse(k, 0.0)
@@ -26,7 +36,11 @@ final case class TransitionModel(theta: Map[TransitionKind, Double]):
 object TransitionModel:
   /** Provisional defaults: forward-in-discourse and hierarchy moves are cheap, long backward jumps
     * are penalized but permitted, external excursions are entered with probability σ(−1.5) ≈ 0.18
-    * and left with probability 1 − σ(−0.85) ≈ 0.7.
+    * and left with probability 1 − σ(−0.85) ≈ 0.7. The directed causal kinds are deliberately
+    * absent, which [[TransitionModel.apply]] reads as weight 0.0: these constants were set under
+    * the symmetrized feature, and a direction added here would move every landed number silently. A
+    * study that wants direction supplies its own model, zeroing `CausalNeighbor` and weighting
+    * `CauseToEffect` and `EffectToCause`.
     */
   val default: TransitionModel = TransitionModel(
     Map(
@@ -75,6 +89,8 @@ object TransitionFeatures:
         TransitionKind.CausalNeighbor -> ind(
           view.hasEdge(RelationLayer.Causal, s, t) || view.hasEdge(RelationLayer.Causal, t, s)
         ),
+        TransitionKind.CauseToEffect -> ind(view.hasEdge(RelationLayer.Causal, s, t)),
+        TransitionKind.EffectToCause -> ind(view.hasEdge(RelationLayer.Causal, t, s)),
         TransitionKind.HierarchyUp -> ind(view.isAncestor(t, s)),
         TransitionKind.HierarchyDown -> ind(view.isAncestor(s, t)),
         TransitionKind.SameEntityThread -> ind(
