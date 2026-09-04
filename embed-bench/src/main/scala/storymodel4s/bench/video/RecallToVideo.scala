@@ -122,14 +122,26 @@ object TimedSourceView:
       segmentByRef: Map[SourceNodeRef, TimedSegment],
       groupByRef: Map[SourceNodeRef, TimedSegment.Group],
       nodeTexts: Vector[(SourceNodeRef, String)],
-      lexicalTexts: Vector[(SourceNodeRef, String)]
+      lexicalTexts: Vector[(SourceNodeRef, String)],
+      worldOrder: WorldOrderInput
   )
 
+  /** The world-time layer and world order a declaration yields: both present or both absent. */
+  private final case class WorldClock(
+      edges: Option[Vector[(SourceNodeRef, SourceNodeRef, Double)]],
+      order: Option[Map[SourceNodeRef, Int]]
+  )
+
+  /** Build the view. `worldOrder` is required: the world clock is whatever the caller declares,
+    * never the discourse clock by default (ADR 0013). `Left` only for an `Explicit` rank that does
+    * not cover exactly the segments' ordinals.
+    */
   def build(
       segments: Vector[TimedSegment],
+      worldOrder: WorldOrderInput,
       axes: Map[String, PresentationAxis] = Map.empty,
       naming: Naming = Naming.default
-  ): Built =
+  ): Either[WorldOrderRefusal, Built] =
     val texts = segments.map(_.text)
     val offsets = texts.scanLeft(0)((acc, t) => acc + t.length + 1).init
     val document = texts.mkString("\n")
@@ -182,25 +194,25 @@ object TimedSourceView:
     val succession =
       leaves.sliding(2).collect { case Vector(a, b) => (a.ref, b.ref, 1.0) }.toVector ++
         groupNodes.sliding(2).collect { case Vector(a, b) => (a.ref, b.ref, 1.0) }.toVector
-    val edges = Map(
-      RelationLayer.DiscourseSuccession -> succession,
-      RelationLayer.WorldTime -> succession
-    )
-    val worldOrder: Map[SourceNodeRef, Int] =
-      leaves.map(n => n.ref -> n.discoursePosition).toMap ++
-        groupsInOrder.map { g =>
-          val firstMember = segLeaf.collectFirst {
-            case (s, n) if s.group.contains(g) => n.discoursePosition
-          }
-          groupRef(g.ordinal) -> firstMember.getOrElse(0)
-        }.toMap
-
-    val view = InMemorySourceView(
-      nodes = leaves ++ groupNodes,
-      edges = edges,
-      worldOrder = Some(worldOrder),
-      textLength = document.length
-    )
+    // The world clock is what the caller declared. Under `SameAsPresentation` the two clocks
+    // coincide by declaration and the WorldTime layer is the discourse succession, exactly as the
+    // builder used to assume silently; under `Unknown` the layer and the order are both absent,
+    // which every consumer already reads as absence rather than zero; under `Explicit` both come
+    // from the supplied rank and from nothing else.
+    val worldClock: Either[WorldOrderRefusal, WorldClock] = worldOrder match
+      case WorldOrderInput.SameAsPresentation(_) =>
+        val presentation: Map[SourceNodeRef, Int] =
+          leaves.map(n => n.ref -> n.discoursePosition).toMap ++
+            groupsInOrder.map { g =>
+              val firstMember = segLeaf.collectFirst {
+                case (s, n) if s.group.contains(g) => n.discoursePosition
+              }
+              groupRef(g.ordinal) -> firstMember.getOrElse(0)
+            }.toMap
+        Right(WorldClock(Some(succession), Some(presentation)))
+      case WorldOrderInput.Unknown(_)             => Right(WorldClock(None, None))
+      case WorldOrderInput.Explicit(byOrdinal, _) =>
+        explicitClock(byOrdinal, segLeaf, groupsInOrder, groupRef)
 
     val leafMedia: Map[SourceNodeRef, MediaLocus] =
       segments.flatMap(s => s.locus.map(leafRef(s.ordinal) -> _)).toMap
@@ -240,15 +252,74 @@ object TimedSourceView:
         val base = g.embedText.getOrElse(g.label)
         groupRef(g.ordinal) -> g.lexicalText.fold(base)(extra => s"$base. $extra")
       }
-    Built(
-      view,
-      leafMedia ++ groupMedia,
-      document,
-      segmentByRef,
-      groupByRef,
-      nodeTexts,
-      lexicalTexts
-    )
+    worldClock.map { clock =>
+      val edges =
+        Map(RelationLayer.DiscourseSuccession -> succession) ++
+          clock.edges.map(RelationLayer.WorldTime -> _)
+      val view = InMemorySourceView(
+        nodes = leaves ++ groupNodes,
+        edges = edges,
+        worldOrder = clock.order,
+        textLength = document.length
+      )
+      Built(
+        view,
+        leafMedia ++ groupMedia,
+        document,
+        segmentByRef,
+        groupByRef,
+        nodeTexts,
+        lexicalTexts,
+        worldOrder
+      )
+    }
+
+  /** The world clock an explicit rank yields. Every leaf must be ranked and every ranked ordinal
+    * must be a leaf; a group sits at its earliest member's rank (the minimum, not the first
+    * presented member, so a group whose opening shot is a flash-forward is not dated by it).
+    */
+  private def explicitClock(
+      byOrdinal: Map[Int, Int],
+      segLeaf: Vector[(TimedSegment, NodeSummary)],
+      groupsInOrder: Vector[TimedSegment.Group],
+      groupRef: Int => SourceNodeRef
+  ): Either[WorldOrderRefusal, WorldClock] =
+    val ordinals = segLeaf.map(_._1.ordinal)
+    val missing = ordinals.filterNot(byOrdinal.contains)
+    val unknown = byOrdinal.keys.toVector.filterNot(ordinals.toSet).sorted
+    if byOrdinal.isEmpty then Left(WorldOrderRefusal.EmptyRank)
+    else if missing.nonEmpty then Left(WorldOrderRefusal.RankMissingLeaves(missing))
+    else if unknown.nonEmpty then Left(WorldOrderRefusal.RankNamesUnknownLeaves(unknown))
+    else
+      val leafRank: Map[SourceNodeRef, Int] =
+        segLeaf.map((s, n) => n.ref -> byOrdinal(s.ordinal)).toMap
+      val groupRank: Map[SourceNodeRef, Int] = groupsInOrder.map { g =>
+        val members = segLeaf.collect { case (s, _) if s.group.contains(g) => byOrdinal(s.ordinal) }
+        groupRef(g.ordinal) -> members.min
+      }.toMap
+      Right(
+        WorldClock(
+          Some(rankSuccession(leafRank) ++ rankSuccession(groupRank)),
+          Some(leafRank ++ groupRank)
+        )
+      )
+
+  /** Succession over distinct ranks: every node at one rank precedes every node at the next. A tie
+    * is a tie; it is never broken by presentation order.
+    */
+  private def rankSuccession(
+      rank: Map[SourceNodeRef, Int]
+  ): Vector[(SourceNodeRef, SourceNodeRef, Double)] =
+    val tiers = rank
+      .groupMap(_._2)(_._1)
+      .toVector
+      .sortBy(_._1)
+      .map((_, refs) => refs.toVector.sortBy(_.key))
+    tiers
+      .sliding(2)
+      .collect { case Vector(a, b) => for x <- a; y <- b yield (x, y, 1.0) }
+      .flatten
+      .toVector
 
 /** Word-column reader for timestamped recall transcripts (`Words` plus onset columns). */
 object RecallWordsCsv:
@@ -335,6 +406,24 @@ object AnchorConfidence:
   * playback seconds, anchor confidence beside each anchor.
   */
 object RecallToVideo:
+
+  /** The run configuration as rendered into voyage provenance (hashed into `ViewProvenance` by
+    * [[VoyageExport.document]]). The world-order declaration is part of it: a run under `Unknown`
+    * and a run under `SameAsPresentation` are different derivations even when every number
+    * coincides, and the declaration is provenance, not view content, so the view fingerprint does
+    * not carry it.
+    */
+  def provenanceConfig(
+      channelLabel: String,
+      perLevel: Int,
+      lexicalOverlap: Boolean,
+      priorScale: Option[Double],
+      worldOrder: WorldOrderInput
+  ): String =
+    s"channel=$channelLabel perLevel=$perLevel lexicalOverlap=$lexicalOverlap " +
+      s"priorScale=${priorScale.getOrElse(1.0)} monotone=${MonotoneScene.enabled} " +
+      s"fill=${MonotoneScene.fillEnabled} backward=${MonotoneScene.backwardPenalty} " +
+      s"forward=${MonotoneScene.forwardPenalty} worldOrder=${worldOrder.render}"
 
   def run(
       built: TimedSourceView.Built,
@@ -594,10 +683,7 @@ object RecallToVideo:
 
     // The Recall Voyage document (ADR 0002 §14): the proven join a viewer compiles itself.
     val configRendering =
-      s"channel=$channelLabel perLevel=$perLevel lexicalOverlap=$lexicalOverlap " +
-        s"priorScale=${priorScale.getOrElse(1.0)} monotone=${MonotoneScene.enabled} " +
-        s"fill=${MonotoneScene.fillEnabled} backward=${MonotoneScene.backwardPenalty} " +
-        s"forward=${MonotoneScene.forwardPenalty}"
+      provenanceConfig(channelLabel, perLevel, lexicalOverlap, priorScale, built.worldOrder)
     VoyageExport
       .document(
         built,

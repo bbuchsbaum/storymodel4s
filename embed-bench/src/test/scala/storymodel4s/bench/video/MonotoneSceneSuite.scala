@@ -21,7 +21,9 @@ class MonotoneSceneSuite extends FunSuite:
       group = Some(TimedSegment.Group(i / 3 + 1, s"${i / 3 + 1}. Scene ${i / 3 + 1}"))
     )
   }
-  private val built = TimedSourceView.build(segments)
+  private val built = TimedSourceView
+    .build(segments, WorldOrderFixtures.syntheticLinear)
+    .fold(e => throw new IllegalStateException(e.message), identity)
 
   private val recall = RecallSegmenter.segment(
     StorySource
