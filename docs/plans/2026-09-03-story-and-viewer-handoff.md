@@ -235,3 +235,40 @@ which must equal the record's space id; and two measures on one plate need separ
    sentence). A summary rule that reads the story is still owed for the summary itself.
 4. **Calibration**: a `CalibrationModelId`-typed fit over adjudicated roles, leave-story-out, the
    first `Calibrated` basis in the story path.
+
+
+## 7. Feature drawing continuation — 2026-09-04
+
+The drawing half is implemented on `solo/feature-values` in both repositories.
+The portable contract is ADR 0002 §16: `VisualPrimitive.Feature` carries the
+actual scalar outcome, exact support, coverage, recipe, basis, provenance and
+sidecar checksum. `FeatureChannelState.Materialized` distinguishes these values
+from a manifest that still needs a resolver. Derived selection now resolves the
+producer's recorded basis, including aggregate tracks; the earlier advice to
+select those with `None` is obsolete. No wire schema changed.
+
+storyatlas4s adds the sixth lowering layer and `features.html`, with a reading
+page, SVG and textual twin for each Token/Sentence/Situation track. Each grain
+uses its own measured display range. Situation supports remain separate pieces,
+missing values stay visible, and coverage has a separate channel. Whole-story
+measurements require an omniscient horizon. Aggregate circularity is explicitly
+unassessed: `features-record/v1` does not carry a feature-use ledger.
+
+The replay check exposed a separate input-boundary trap. Its compilation report
+records three `compiler.required-derivation` errors, but a fresh structural
+`StoryValidator` run promotes the remaining graph. That does not establish that
+the derivation was complete. The viewer retains its draft route whenever the
+bound derivation record reports gaps or abstentions; local validation remains
+separately reported and the original compiler policy is not reconstructed.
+
+Verification is executable: `tools/feature-mutation-check.py` in this repository,
+and `e2e/static/features.cjs` plus `feature-mutations.py` in storyatlas4s. The
+captured War of the Ghosts replay supplies 9 tracks with 1,896 outcomes, including
+195 discontinuous situation supports. The tiny partial lexicon used for this
+check contains synthetic test values, not scientific norms. Full landing gate
+receipts belong to the continuation's git history and the viewer's feature
+rendering evidence note.
+
+Next after this slice: the calibration work already listed above, beginning
+with adjudicated roles and a leave-story-out evaluation design. Feature shading
+does not establish a calibrated confidence, a boundary, or causal structure.

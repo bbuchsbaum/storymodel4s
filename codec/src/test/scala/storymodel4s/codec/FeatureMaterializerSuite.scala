@@ -181,7 +181,12 @@ class FeatureMaterializerSuite extends FunSuite:
       values.exists(_.estimate == Estimate.Missing(MissingReason.Excluded)),
       "excluded punctuation disappeared"
     )
-    assert(scene.textualTwin.contains("value=0.0"))
+    // JVM and JS differ on the decimal spelling of integer-valued doubles (0.0 vs 0).
+    assert(
+      """value=([^ ]+) credence=""".r
+        .findAllMatchIn(scene.textualTwin)
+        .exists(_.group(1).toDoubleOption.contains(0.0))
+    )
     assert(scene.textualTwin.contains("missing=NotInLexicon"))
     assert(scene.textualTwin.contains("missing=Excluded"))
   }
