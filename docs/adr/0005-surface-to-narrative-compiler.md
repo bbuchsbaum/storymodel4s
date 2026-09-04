@@ -184,7 +184,9 @@ separate design and is not inferred in this slice.
 Some unresolved claims prevent only a field or edge from being emitted. Others prevent a usable
 draft or its promotion. For example, an unresolved causal relation can remain absent with its
 resolution record retained, while an unresolved context assignment, primary membership, situation,
-summary, or required trajectory input prevents a validated model. The compiler reports that
+or required trajectory input prevents a validated model (the summary was in this list until §10,
+2026-09-03: an undescribed root is recorded on the segment, not treated as unusable structure). The
+compiler reports that
 distinction through typed stage outcomes and an augmented `ValidationReport`; it does not treat
 every unresolved claim as a process crash.
 
@@ -444,7 +446,9 @@ touch `NarrativeCompiler`; phase 1.4 does. Decisions taken, with the alternative
    `span-source=sentence`, so the two cannot be confused downstream.
 6. **The summary is the source title with evidence spanning the whole canonical text**, so
    `hierarchy.member-within-parent` holds for every emitted situation; no title yields an
-   abstained summary attempt and a `NoTitle` row.
+   abstained summary attempt and a `NoTitle` row. Since §10 the root segment no longer waits for
+   it: the segment spans the canonical text on its own claim, and an abstained summary is a typed
+   absence on the segment.
 7. **No causal attempts.** Absent pairs are "not evaluated", per §6 of this ADR.
 8. **Policy: `AcceptancePolicy.Conservative`, except `ContextAssignment` and
    `SegmentMembership` at `requireAgreement = 1`.** The resolver counts agreement by provider
@@ -1067,3 +1071,82 @@ Evidence: `QuotationSuite` (core, 15) courts the mark set, the three refusals, t
 containment and the retelling span. `ContextPlacementSuite` (document) courts one rule per test.
 `StoryBuildSuite` pins the retelling verdict on the fifty replies by name. Mutation ledger: see the
 landing commits.
+
+## Amendment, 2026-09-03 — §10: the root segment does not wait for its summary
+
+### 10. A segment is a structural claim; its summary is a second claim about the same unit
+
+`SegmentNode` carries its own `meta: ClaimMeta` and a `summary: SegmentSummary`, which is
+`Stated(Resolved[String])` when a summary was derived and `Unsummarized(gap: SummaryGap)` when it
+was not, with `SummaryGap` one of `NotProposed` (nothing offered a summary: no established title
+and no rule reads one), `NotAccepted` (candidates were offered and none won), `NotEmitted` (an
+accepted candidate could not be materialized). The compiler builds the root segment whenever at
+least one situation was emitted: its extent is the whole canonical text, its claim is
+`compiler-derived:segment-root/v1` (`StructurallyDerived`, `Determined`, evidence spanning the text,
+upstream = the member situations' claims), and primary membership no longer lists the story
+summary among its upstream needs. `ClaimFamily.Summary` leaves the set of promotion-blocking
+families.
+
+*Why.* Before this amendment the summary's claim stood in for the segment's: `SegmentNode.summary`
+was a total `Resolved[String]`, the compiler built the segment only once a summary materialized,
+and each membership listed `StorySummary` as an upstream it could not do without. So a text with
+no established title (§9) lost its whole hierarchy to an unrelated abstention: 65 memberships
+gapped `MissingUpstream(StorySummary)`, the validator raised `hierarchy.single-primary-root` and
+65 `hierarchy.situation-root-reachable`, and the viewer drew no region. None of those 131 marks
+was about the hierarchy. The segmentation of a story into one root with its situations as members
+is derived from the situations; a description of that root is a different fact, and a unit nobody
+has described is still a unit (design contract 7: as many coordinates as meanings).
+
+*What §9 accepted, and still holds.* No title is derived from a filename, no summary is invented,
+and the summary attempt is still recorded as the gap it is (`Unresolved(NoProposal)`, `NoTitle`).
+The "real summary rule that reads the story" is still the fix for the missing summary. What this
+amendment retracts is only the consequence §9 drew from it, that the structure must wait: that
+was a defect of the node type, not an honest reading of the evidence.
+
+*Why the root spans the canonical text.* The extent of the work is a fact of the source; the root
+of a primary segmentation covers the work by definition, which is the same reason §6 gave the
+summary's evidence that span. `hierarchy.member-within-parent` therefore holds for every member.
+
+*Why the root exists only with a member.* With no situation emitted there is no segmentation to
+claim; minting a root over nothing would raise `hierarchy.no-empty-primary-segment` and would be
+right to. `segments` is empty exactly when `situations` is.
+
+*Why the summary stops blocking promotion.* The blocking families are the ones without which the
+draft's structure is unusable: a situation, its context, its membership, the discourse route. A
+missing description of the root makes nothing unusable; it is recorded on the node, where a reader
+sees it as `unsummarized:not-proposed` rather than as 66 violations that name other laws.
+
+*Rejected: `Option[Resolved[String]]`.* An absence with no reason cannot be told from a writer's
+omission; the three reasons are three states of the derivation.
+
+*Rejected: a placeholder summary string.* It would publish a description nobody derived.
+
+*Rejected: keeping the summary on the blocking list "until the summary rule exists".* That keeps
+131 marks that say nothing true about the hierarchy in every untitled model, to hold a place for
+a rule whose absence the segment now records by itself.
+
+### Schema
+
+`StoryModel.SchemaVersion` and `codec.SchemaVersions.Current` move `0.5.0` → `0.6.0`. A segment
+encodes `meta` and a tagged `summary` (`{"summary":"stated","value":{…}}` or
+`{"summary":"unsummarized","gap":"not-proposed"}`), on the same reasoning as `ContextHolder`: a
+summary the compiler could not derive and a summary a writer left out must not share a wire shape.
+No migration step: a 0.5.0 model has a segment only where it has a summary, so a lift could mint
+the segment's claim but could not say what an absent summary was absent for, and a 0.5.0 model
+with no segments cannot be told from one whose text had no situations.
+
+### What moved, measured by replaying the fifty captured replies
+
+| quantity (untitled build) | before | after |
+|---|---|---|
+| derivation gaps | 149 | 84 (−65 `SegmentMembership` `MissingUpstream(StorySummary)`) |
+| validation violations | 135 | 3 |
+| segments / primary containment edges | 0 / 0 | 1 / 65 |
+| root summary | (no segment) | `unsummarized:not-proposed` |
+| `validated` | false | false |
+
+The three remaining violations are the one abstained sentence's situation, context and membership
+(`unresolved:NoProposal`), which is exactly what the titled build reports (83 gaps, 3 errors): an
+untitled text and a titled one now fail for the same reason, and a text with no abstention
+validates without a title. The `Summary` gap is still one of the 84.
+

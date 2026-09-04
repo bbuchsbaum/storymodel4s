@@ -372,6 +372,27 @@ enum ContextBandBasis:
   case ExactScopeEvidence
 
 /** Closed renderer-neutral marks emitted by the first Discourse Atlas compiler. */
+/** A region's label: the segment's summary when the model stated one, or the typed absence the
+  * model recorded. A region with no summary is drawn with its extent and no words; any words the
+  * viewer put there would be the viewer out-claiming the model (ADR 0002 §14).
+  */
+enum RegionLabel:
+  case Summary(summary: String)
+  case Unsummarized(gap: SummaryGap)
+
+  def text: Option[String] = this match
+    case Summary(t)      => Some(t)
+    case Unsummarized(_) => None
+
+  def render: String = this match
+    case Summary(t)        => t
+    case Unsummarized(gap) => s"unsummarized:${gap.render}"
+
+object RegionLabel:
+  def of(summary: SegmentSummary): RegionLabel = summary match
+    case SegmentSummary.Stated(r)         => Summary(r.value)
+    case SegmentSummary.Unsummarized(gap) => Unsummarized(gap)
+
 enum VisualPrimitive:
   case SurfaceUnit(
       identity: VisualIdentity,
@@ -380,7 +401,12 @@ enum VisualPrimitive:
       unitOrdinal: Int,
       parent: Option[Address]
   )
-  case Region(identity: VisualIdentity, extent: Extent, label: String, parent: Option[Address])
+  case Region(
+      identity: VisualIdentity,
+      extent: Extent,
+      label: RegionLabel,
+      parent: Option[Address]
+  )
 
   /** `context` is the situation's own frame, so a renderer can band without reopening the model.
     * Its lane is `at.lane`, which is layout; the frame identity is the claim.
@@ -772,7 +798,7 @@ final class AtlasCompiler private (provenance: ViewProvenance):
 
     val regions: Vector[VisualPrimitive] =
       g.segments.values.toVector
-        .filter(s => level.visibleSegments.contains(s.kind) && claimVisible(s.summary.meta))
+        .filter(s => level.visibleSegments.contains(s.kind) && claimVisible(s.meta))
         .sortBy(_.id)
         .flatMap { s =>
           segmentExtent.get(s.id).map { ext =>
@@ -784,7 +810,7 @@ final class AtlasCompiler private (provenance: ViewProvenance):
             VisualPrimitive.Region(
               identity(StoryRef.Segment(s.id), AtlasMarkKind.Region),
               ext,
-              s.summary.value,
+              RegionLabel.of(s.summary),
               parent
             )
           }
@@ -1045,9 +1071,7 @@ final class AtlasCompiler private (provenance: ViewProvenance):
       case StoryRef.Segment(id)   =>
         g.segments
           .get(id)
-          .exists(segment =>
-            claimVisible(segment.summary.meta) && clipped(segment.support).nonEmpty
-          )
+          .exists(segment => claimVisible(segment.meta) && clipped(segment.support).nonEmpty)
       case _ => false
     def visibleAncestor(ref: StoryRef): Option[Address] =
       val start: Option[NarrativeMember] = ref match
@@ -1057,9 +1081,7 @@ final class AtlasCompiler private (provenance: ViewProvenance):
       def segmentVisible(id: SegmentId): Boolean =
         g.segments
           .get(id)
-          .exists(segment =>
-            claimVisible(segment.summary.meta) && clipped(segment.support).nonEmpty
-          )
+          .exists(segment => claimVisible(segment.meta) && clipped(segment.support).nonEmpty)
       start
         .flatMap(member =>
           VisibleAncestorChain.from(member, primaryParent, segmentVisible).find(marked.contains)
@@ -1358,7 +1380,7 @@ object AtlasTextualTwin:
         )
       case VisualPrimitive.Region(id, e, label, parent) =>
         out.append(
-          s"  region ${id.mark.value} ${id.address.render} x=[${e.x0},${e.x1Exclusive}) lanes=[${e.lane0},${e.lane1}] parent=${parent.fold("-")(_.render)} \"$label\"\n"
+          s"  region ${id.mark.value} ${id.address.render} x=[${e.x0},${e.x1Exclusive}) lanes=[${e.lane0},${e.lane1}] parent=${parent.fold("-")(_.render)} \"${label.render}\"\n"
         )
       case VisualPrimitive.Landmark(id, a, label, kind, context, status) =>
         out.append(

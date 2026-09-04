@@ -301,7 +301,10 @@ class ValidatorSuite extends ScalaCheckSuite:
       extra,
       SegmentKind.Scene,
       1,
-      Resolved("x", Small.meta("x", EpistemicStatus.Hypothesized, None), Vector.empty),
+      Small.meta("x:claim", EpistemicStatus.Hypothesized, None),
+      SegmentSummary.Stated(
+        Resolved("x", Small.meta("x", EpistemicStatus.Hypothesized, None), Vector.empty)
+      ),
       sp(b, 0)
     )
     val g = b.graph.copy(segments = b.graph.segments + (extra -> node))

@@ -331,7 +331,10 @@ object StorySmall:
         root,
         SegmentKind.Story,
         3,
-        Resolved("root", meta("seg:root", EpistemicStatus.HumanAdjudicated, None), Vector.empty),
+        meta("seg:root:claim", EpistemicStatus.HumanAdjudicated, Some(spanOf(0 until n))),
+        SegmentSummary.Stated(
+          Resolved("root", meta("seg:root", EpistemicStatus.HumanAdjudicated, None), Vector.empty)
+        ),
         spanOf(0 until n)
       )
     ) ++ episodes.zipWithIndex.map { (id, e) =>
@@ -340,10 +343,13 @@ object StorySmall:
         id,
         SegmentKind.Episode,
         2,
-        Resolved(
-          s"episode $e",
-          meta(s"seg:ep:$e", EpistemicStatus.HumanAdjudicated, None),
-          Vector.empty
+        meta(s"seg:ep:$e:claim", EpistemicStatus.HumanAdjudicated, Some(spanOf(members))),
+        SegmentSummary.Stated(
+          Resolved(
+            s"episode $e",
+            meta(s"seg:ep:$e", EpistemicStatus.HumanAdjudicated, None),
+            Vector.empty
+          )
         ),
         spanOf(members)
       )
@@ -352,11 +358,22 @@ object StorySmall:
         id,
         SegmentKind.Scene,
         1,
-        Resolved(
-          s"scene $s",
-          meta(s"seg:scene:$s", EpistemicStatus.HumanAdjudicated, None),
-          Vector.empty
+        meta(
+          s"seg:scene:$s:claim",
+          EpistemicStatus.HumanAdjudicated,
+          Some(spanOf(sceneMembers(s)))
         ),
+        // Scenes alternate between a stated summary and a typed absence, so the generated models
+        // exercise both shapes of the summary coordinate (ADR 0005 §10).
+        if s % 2 == 0 then
+          SegmentSummary.Stated(
+            Resolved(
+              s"scene $s",
+              meta(s"seg:scene:$s", EpistemicStatus.HumanAdjudicated, None),
+              Vector.empty
+            )
+          )
+        else SegmentSummary.Unsummarized(SummaryGap.NotProposed),
         spanOf(sceneMembers(s))
       )
     }

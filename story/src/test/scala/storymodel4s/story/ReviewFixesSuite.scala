@@ -176,7 +176,9 @@ class ReviewFixesSuite extends ScalaCheckSuite:
     forAll { (b: Small.Built) =>
       val ids = b.draft().claims.map(_.id).toSet
       b.graph.entities.values.forall(e => ids.contains(e.label.meta.id)) &&
-      b.graph.segments.values.forall(s => ids.contains(s.summary.meta.id))
+      b.graph.segments.values.forall(s =>
+        ids.contains(s.meta.id) && s.summary.stated.forall(r => ids.contains(r.meta.id))
+      )
     }
   }
 

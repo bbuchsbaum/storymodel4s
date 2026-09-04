@@ -166,7 +166,9 @@ object StoryValidator:
       if alts.contains(r.value) then
         err("claims.alternatives-distinct", path, "selected value repeated as an alternative")
     g.entities.values.foreach(e => alternativesLaw(s"entities/${e.id.value}/label", e.label))
-    g.segments.values.foreach(s => alternativesLaw(s"segments/${s.id.value}/summary", s.summary))
+    g.segments.values.foreach(s =>
+      s.summary.stated.foreach(r => alternativesLaw(s"segments/${s.id.value}/summary", r))
+    )
     m.trajectory.steps.zipWithIndex.foreach((s, i) =>
       alternativesLaw(s"trajectory/$i/worldTime", s.worldTime)
     )

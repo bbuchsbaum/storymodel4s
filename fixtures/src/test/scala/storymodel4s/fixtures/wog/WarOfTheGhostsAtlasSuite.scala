@@ -277,6 +277,38 @@ class WarOfTheGhostsAtlasSuite extends FunSuite:
     assertEquals(s.contract.area, None)
     assert(s.contract.invariants.contains(VisualInvariant.HorizonShared))
 
+  test(
+    "an unsummarized episode is still a region, drawn with its extent and no words (ADR 0002 §15)"
+  ):
+    // The region's visibility is the segment's own claim, not its summary's: replace ep1's stated
+    // summary with a typed absence and the story level still draws three regions, ep1's labelled
+    // with the absence and its reason rather than dropped or captioned with an invented word.
+    val ep1 = model.graph.segments(Wog.G.ep1)
+    val unsummarized = ep1.copy(summary = SegmentSummary.Unsummarized(SummaryGap.NotAccepted))
+    val s = scene(
+      NarrativeLevel.Story,
+      sourceModel = rebuilt(graph =
+        model.graph.copy(segments = model.graph.segments.updated(Wog.G.ep1, unsummarized))
+      )
+    )
+    val byAddress = regions(s).map(r => r.address -> r).toMap
+    assertEquals(
+      byAddress.keySet,
+      Set(Wog.G.ep1, Wog.G.ep2, Wog.G.ep3).map(g => ev.address(StoryRef.Segment(g)))
+    )
+    val ep1Region = byAddress(ev.address(StoryRef.Segment(Wog.G.ep1)))
+    assertEquals(ep1Region.label, RegionLabel.Unsummarized(SummaryGap.NotAccepted))
+    assertEquals(ep1Region.label.text, None)
+    assertEquals(ep1Region.label.render, "unsummarized:not-accepted")
+    assertEquals(
+      ep1Region.extent,
+      regions(scene(NarrativeLevel.Story)).find(_.address == ep1Region.address).map(_.extent).get
+    )
+    Set(Wog.G.ep2, Wog.G.ep3).foreach { g =>
+      val stated = model.graph.segments(g).summary.stated.map(_.value)
+      assertEquals(byAddress(ev.address(StoryRef.Segment(g))).label.text, stated)
+    }
+
   test("V-P1: landmarks are ordered by exact discourse offset consistent with discourse order"):
     val s = scene(NarrativeLevel.Scene)
     val xs = model.graph.discourseOrder.map(id =>
@@ -518,7 +550,7 @@ class WarOfTheGhostsAtlasSuite extends FunSuite:
 
     assert(visible.contains(firstSituation.meta.id))
     assert(visible.contains(firstContainment.meta.id))
-    assert(!visible.contains(target.summary.meta.id))
+    assert(!visible.contains(target.meta.id))
     assert(landmarks(s).exists(_.address == ev.address(StoryRef.Situation(firstSituation.id))))
     assert(!regions(s).exists(_.address == ev.address(StoryRef.Segment(target.id))))
 
@@ -528,7 +560,7 @@ class WarOfTheGhostsAtlasSuite extends FunSuite:
     val s = scene(NarrativeLevel.Scene, st)
     val visible = EvidenceVisibility.visibleClaims(offset, model.ledger.toOption.get)
 
-    assert(visible.contains(model.graph.segments(Wog.G.sc1a).summary.meta.id))
+    assert(visible.contains(model.graph.segments(Wog.G.sc1a).meta.id))
     assert(model.hierarchy.primary.forall(edge => !visible.contains(edge.meta.id)))
     assert(landmarks(s).nonEmpty)
     assertEquals(regions(s), Vector.empty)

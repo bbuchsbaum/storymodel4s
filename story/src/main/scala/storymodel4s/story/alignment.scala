@@ -268,6 +268,6 @@ private[story] final class StoryAlignmentSource(model: StoryModel[?]) extends Al
 
   def descriptionOf(target: NarrativeNodeId): Option[String] = target match
     case NarrativeNodeId.Situation(id) => g.situations.get(id).map(_.description)
-    case NarrativeNodeId.Segment(id)   => g.segments.get(id).map(_.summary.value)
+    case NarrativeNodeId.Segment(id)   => g.segments.get(id).flatMap(_.summary.text)
 
   def entityLabel(id: EntityId): Option[String] = g.entities.get(id).map(_.label.value)

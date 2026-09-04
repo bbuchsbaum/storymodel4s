@@ -373,7 +373,7 @@ class WarOfTheGhostsCodexCompilerSuite extends ScalaCheckSuite:
     val graph = model.graph.copy(
       segments = model.graph.segments.updated(
         hiddenParentId,
-        hiddenParent.copy(summary = hiddenParent.summary.copy(meta = hiddenMeta))
+        hiddenParent.copy(meta = hiddenMeta)
       )
     )
     val sourceModel = rebuilt(graph, groundedHierarchy())

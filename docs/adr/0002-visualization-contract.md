@@ -1043,3 +1043,31 @@ adding columns to the study TSV (it would change the identity of every landed
 run; the sidecar and the scene leave it byte-identical); a Laminar-only page in
 storyatlas4s (it would draw numbers the model never compiled, which is the one
 thing that repository's contract forbids).
+
+## 15. Amendment — a region carries its own claim, and its label may be a typed absence (2026-09-03)
+
+ADR 0005 §10 gave a segment its own claim and made its summary `Stated` or `Unsummarized(gap)`.
+The view follows: region visibility (`AtlasCompiler` regions, `objectVisible`, `visibleAncestor`)
+and the Codex hierarchy annotation gate on the segment's own `meta`, not on the summary's claim,
+and `VisualPrimitive.Region.label` is a `RegionLabel`, `Summary(text)` or `Unsummarized(gap)`.
+
+*Why a typed label and not an empty string.* An empty label would let "the model has no
+description" and "the model's description is the empty string" share a mark, and a placeholder
+would put words in the picture the model did not say. A region with `Unsummarized` is drawn with
+its extent and no words; the reason is available to the lowering and to any legend.
+
+*What this answers in §11 A1.* The rejected alternative there was relaxing the title or summary
+rule so the model promotes. Neither rule is relaxed: the summary is still a gap in the record and
+no title is derived. What changed is that the hierarchy is no longer collateral damage of that gap,
+so the draft of an untitled text now has its root segment and 65 containment edges, and the
+hierarchy channel of its Codex is no longer declared-and-empty (§11 B5's census moves: the "story
+summary" absence is now the root's own label, not the reason there is no root). A `Story`-kind root
+is not itself a region at any `NarrativeLevel` (its extent is the whole canvas; `visibleSegments`
+names episodes and scenes), so the label reaches the Atlas through episode and scene regions, and
+the court for it replaces an episode's stated summary with a typed absence and checks the region
+is still drawn, with no words and the reason in its label.
+
+*Consequence for storyatlas4s.* `AtlasLowering` and `AtlasPlate` read `Region.label` as text;
+they must read `RegionLabel` and draw no text for `Unsummarized`, carrying the gap into the mark's
+description. The pin moves with this change (recovery plan §5).
+

@@ -277,7 +277,8 @@ object StoryPipeline:
     * `title` is the caller's claim about the work, or nothing. Nothing is the honest default for a
     * bare text file: the pipeline no longer derives a title from the input file's name, so with no
     * title the summary family is unresolved and the model carries a summary gap rather than an
-    * assertion that the narrative is called after its file.
+    * assertion that the narrative is called after its file. The root segment does not wait for the
+    * summary (ADR 0005 §10): it records the absence as `unsummarized:not-proposed`.
     */
   def run(
       mode: DriverMode,
@@ -373,9 +374,10 @@ object StoryPipeline:
   * any sentence never reached the parser court or the compiler refused the input, 0 otherwise.
   *
   * The fifth argument, when given, is the story's title as the *caller's* claim, recorded with
-  * caller-supplied provenance. Omit it and the story has no title, the summary family resolves to a
-  * gap, and the model does not promote to validated. That is the honest outcome for a bare text
-  * file: the fix for it is a summary rule that reads the story, not the input file's name.
+  * caller-supplied provenance. Omit it and the story has no title and the summary family resolves
+  * to a gap, which the root segment records as a typed absence (ADR 0005 §10); whether the model
+  * promotes then depends on the same things it depends on with a title. A summary rule that reads
+  * the story, not the input file's name, is still the fix for the missing summary.
   */
 @main def storyBuild(
     mode: String,
