@@ -25,7 +25,9 @@ class RecallToVideoSuite extends FunSuite:
       TimedSegment(2, "He finds a red door.", None),
       TimedSegment(3, "The door opens.", None)
     )
-    val built = TimedSourceView.build(segments)
+    val built = TimedSourceView
+      .build(segments, WorldOrderFixtures.syntheticLinear)
+      .fold(e => fail(e.message), identity)
     assertEquals(built.view.leaves.size, 3)
     assertEquals(built.view.nodes.size, 3)
     assertEquals(built.view.maxLevel, 0)
@@ -58,7 +60,9 @@ class RecallToVideoSuite extends FunSuite:
       TimedSegment(2, "He finds a red door.", Some(extent(3000L, 4000L)), Some(group))
     )
 
-    val withAxis = TimedSourceView.build(segments, axes = Map("part-x" -> axis))
+    val withAxis = TimedSourceView
+      .build(segments, WorldOrderFixtures.syntheticLinear, axes = Map("part-x" -> axis))
+      .fold(e => fail(e.message), identity)
     assertEquals(withAxis.view.nodes.size, 3)
     val groupRef = withAxis.groupByRef.keys.head
     withAxis.media(groupRef) match
@@ -67,7 +71,9 @@ class RecallToVideoSuite extends FunSuite:
         assertEquals((iv.start, iv.endExclusive), (1000L, 4000L))
       case other => fail(s"the group must carry a hull extent, got $other")
 
-    val withoutAxis = TimedSourceView.build(segments)
+    val withoutAxis = TimedSourceView
+      .build(segments, WorldOrderFixtures.syntheticLinear)
+      .fold(e => fail(e.message), identity)
     val bareGroupRef = withoutAxis.groupByRef.keys.head
     assertEquals(withoutAxis.media.get(bareGroupRef), None)
     // the leaves keep their exact loci either way

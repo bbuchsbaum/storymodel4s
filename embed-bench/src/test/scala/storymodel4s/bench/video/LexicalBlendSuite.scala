@@ -25,7 +25,9 @@ class LexicalBlendSuite extends FunSuite:
     TimedSegment(4, "A taxi pulls away from the kerb at night.", None)
   )
 
-  private val built = TimedSourceView.build(segments)
+  private val built = TimedSourceView
+    .build(segments, WorldOrderFixtures.syntheticLinear)
+    .fold(e => throw new IllegalStateException(e.message), identity)
 
   private val recall = RecallSegmenter.segment(
     StorySource

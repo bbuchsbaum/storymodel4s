@@ -2,6 +2,7 @@ package storymodel4s.bench.sherlock
 
 import java.nio.charset.StandardCharsets
 import java.nio.file.{Files, Paths}
+import java.time.LocalDate
 
 import io.circe.parser.parse as parseJson
 
@@ -12,7 +13,10 @@ import storymodel4s.bench.video.{
   RecallToVideo,
   RecallWordsCsv,
   TimedSegment,
-  TimedSourceView
+  TimedSourceView,
+  WorldOrderInput,
+  WorldOrderRefusal,
+  WorldOrderWitness
 }
 import storymodel4s.core.PresentationAxis
 import storymodel4s.recall.Lexical
@@ -188,8 +192,36 @@ object SherlockAnnotationView:
       atlas.manifest.partB.partId -> atlas.partBBundle.primaryAxis
     )
 
-  def build(atlas: Atlas): TimedSourceView.Built =
-    TimedSourceView.build(segments(atlas), axes(atlas), naming)
+  /** The world clock this edition is built under (ADR 0013). A Study in Pink is read as presented:
+    * the 50-scene annotation follows the broadcast cut and this declaration treats that cut as
+    * story-world order. That is a claim with known exceptions, recorded in the basis rather than
+    * hidden: the annotation marks the opening Afghanistan nightmare at rows 8-18 (named at row 21)
+    * and flashback inserts at rows 390-402, interleaved with present-tense rows (Sherlock's
+    * deduction replays the laboratory meeting), and at 953-954 (the search for the case). Under
+    * this declaration they sit where they are shown, not when they happened. An `Explicit` rank
+    * that moves them to story time is available and has not been run.
+    */
+  val worldOrder: WorldOrderInput = WorldOrderInput.SameAsPresentation(
+    WorldOrderWitness(
+      assertedBy = "study owner",
+      basis =
+        "A Study in Pink read as presented: the broadcast cut is taken as story-world order; " +
+          "the opening Afghanistan nightmare at annotation rows 8-18 (named at row 21) and the " +
+          "flashback inserts interleaved within rows 390-402 and at rows 953-954 " +
+          "are placed where shown",
+      asserted = LocalDate.of(2026, 9, 4)
+    )
+  )
+
+  def build(atlas: Atlas): Either[WorldOrderRefusal, TimedSourceView.Built] =
+    buildWith(atlas, worldOrder)
+
+  /** Build under another declaration. The diagnostic uses [[worldOrder]] and nothing else. */
+  def buildWith(
+      atlas: Atlas,
+      declared: WorldOrderInput
+  ): Either[WorldOrderRefusal, TimedSourceView.Built] =
+    TimedSourceView.build(segments(atlas), declared, axes(atlas), naming)
 
 /** Terminal diagnostic: map one Sherlock recall transcript onto the two media parts.
   *
@@ -203,8 +235,11 @@ object SherlockAnnotationView:
   val atlas = SherlockAnnotations
     .parse(bytes)
     .fold(e => throw new IllegalArgumentException(e.message), identity)
-  val built = SherlockAnnotationView.build(atlas)
+  val built = SherlockAnnotationView
+    .build(atlas)
+    .fold(e => throw new IllegalArgumentException(e.message), identity)
   println(s"annotation rows: ${atlas.rows.size}; scenes: ${atlas.scenes.size}")
+  println(s"world order: ${built.worldOrder.render}")
   println(s"source text policy: ${SherlockAnnotationView.sourceTextPolicy}")
   println(
     s"scene captions: ${SherlockAnnotationView.sceneCaptions.size}" +

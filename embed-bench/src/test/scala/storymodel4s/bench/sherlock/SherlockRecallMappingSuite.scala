@@ -7,7 +7,13 @@ import munit.FunSuite
 import storymodel4s.acquire.SherlockAnnotations
 import storymodel4s.acquire.SherlockAnnotations.{MediaManifest, PartIdentity}
 import storymodel4s.align.*
-import storymodel4s.bench.video.{MediaLocus, RecallWordsCsv, TimedSourceView}
+import storymodel4s.bench.video.{
+  MediaLocus,
+  RecallWordsCsv,
+  TimedSourceView,
+  WorldOrderAbsence,
+  WorldOrderInput
+}
 import storymodel4s.bench.{BenchChannels, SemanticChannelKind}
 import storymodel4s.core.{Checksum, StorySource}
 import storymodel4s.embed.onnx.{OnnxSentenceArtifacts, OnnxSentenceEmbedder, OnnxSentenceModel}
@@ -50,8 +56,17 @@ class SherlockRecallMappingSuite extends FunSuite:
   private def refOfRow(built: TimedSourceView.Built, row: Int): SourceNodeRef =
     built.segmentByRef.collectFirst { case (r, s) if s.ordinal == row => r }.get
 
+  private def view(atlas: SherlockAnnotations.Atlas): TimedSourceView.Built =
+    SherlockAnnotationView.build(atlas).fold(e => fail(e.message), identity)
+
+  /** `ViewFingerprint.of` on the fixture atlas at origin/main 913f3a8e, before the world-order
+    * declaration existed. Declaring what the builder used to assume must not move one identity.
+    */
+  private val fingerprintBeforeDeclaration =
+    "0ffa14649aff8382f718478d89a84496d9de5d89d5e72f188acc3320b8fb2c54"
+
   test("the bridge exposes every microsegment and scene exactly once, with resolvable supports") {
-    val built = SherlockAnnotationView.build(atlas)
+    val built = view(atlas)
     assertEquals(built.view.leaves.size, 6)
     assertEquals(built.view.nodes.size, 8)
     assertEquals(built.view.maxLevel, 1)
@@ -63,7 +78,7 @@ class SherlockRecallMappingSuite extends FunSuite:
   }
 
   test("every node carrying media resolves to its crosswalked coordinate") {
-    val built = SherlockAnnotationView.build(atlas)
+    val built = view(atlas)
     // all six leaves carry media; both scenes are single-part so they carry hulls
     assertEquals(built.media.size, 8)
     built.media(refOfRow(built, 2)) match
@@ -79,12 +94,33 @@ class SherlockRecallMappingSuite extends FunSuite:
       case other => fail(s"scene 2 must carry a hull extent, got $other")
   }
 
-  test("world order follows film order across the run boundary") {
-    val built = SherlockAnnotationView.build(atlas)
-    val order = built.view.worldOrder.get
+  test(
+    "under the declared SameAsPresentation clock, world order follows film order across the run boundary"
+  ) {
+    val built = view(atlas)
+    assertEquals(built.worldOrder, SherlockAnnotationView.worldOrder)
+    val order = built.view.worldOrder
+      .getOrElse(fail("a SameAsPresentation declaration must yield a world order"))
     val row4 = refOfRow(built, 4)
     val row5 = refOfRow(built, 5)
     assert(order(row4) < order(row5), "run 2 rows must come after run 1 rows in world order")
+    assertEquals(ViewFingerprint.of(built.view).toString, fingerprintBeforeDeclaration)
+  }
+
+  test("an Unknown clock drops the world-time layer and the world order from the Sherlock view") {
+    val built = SherlockAnnotationView
+      .buildWith(atlas, WorldOrderInput.Unknown(WorldOrderAbsence.EditionNonlinear))
+      .fold(e => fail(e.message), identity)
+    assertEquals(built.view.worldOrder, None)
+    assertEquals(
+      built.view.adjacency(RelationLayer.WorldTime),
+      Map.empty[SourceNodeRef, Map[SourceNodeRef, Double]]
+    )
+    assert(
+      built.view.adjacency(RelationLayer.DiscourseSuccession).exists(_._2.nonEmpty),
+      "the discourse clock is not the one declared unknown"
+    )
+    assertNotEquals(ViewFingerprint.of(built.view).toString, fingerprintBeforeDeclaration)
   }
 
   test("the recall CSV reader takes the word column and refuses a foreign header") {
@@ -98,7 +134,7 @@ class SherlockRecallMappingSuite extends FunSuite:
   }
 
   test("the bridge states each node's embedding text: descriptions for leaves, labels for scenes") {
-    val built = SherlockAnnotationView.build(atlas)
+    val built = view(atlas)
     assertEquals(built.nodeTexts.size, 8)
     val byRef = built.nodeTexts.toMap
     atlas.rows.foreach { row =>
@@ -108,7 +144,7 @@ class SherlockRecallMappingSuite extends FunSuite:
   }
 
   test("a recall clause about a distinctive annotated event maps to that row's media coordinate") {
-    val built = SherlockAnnotationView.build(atlas)
+    val built = view(atlas)
     val transcript = StorySource
       .fromText(
         "The man knocked on a red door, and then people in costumes were singing about popcorn.",
@@ -151,7 +187,7 @@ class SherlockRecallMappingSuite extends FunSuite:
       tokenizer <- sys.env.get("STORYMODEL4S_ONNX_TOKENIZER")
     yield OnnxSentenceArtifacts(Paths.get(model), Paths.get(tokenizer))
     assume(supplied.nonEmpty, "STORYMODEL4S_ONNX_MODEL / STORYMODEL4S_ONNX_TOKENIZER not set")
-    val built = SherlockAnnotationView.build(atlas)
+    val built = view(atlas)
     val transcript = StorySource
       .fromText("The man knocked on a red door.", Some("synthetic recall"))
       .fold(e => throw new IllegalStateException(e.message), identity)
