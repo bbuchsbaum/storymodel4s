@@ -481,6 +481,99 @@ object CodecGens:
       .of(story, source, model, fingerprint, candidates, attempts, gaps, coverage, summary)
       .fold(e => throw new IllegalStateException(e.message), identity)
 
+  /** Evidence draws both provenance shapes, because they can differ: `of` takes the chart's own
+    * origin while `hand` overrides it, so a codec that wrote only the chart would round-trip one
+    * and silently relabel the other.
+    */
+  val propositionEvidence: Gen[PropositionEvidence] =
+    for
+      ch <- chart
+      ev <- Gen.oneOf(PropositionEvidence.of(ch), PropositionEvidence.hand(ch))
+    yield ev
+
+  val sketchParticipant: Gen[SketchParticipant] =
+    for
+      role <- Gen.oneOf[SketchRole](
+        SketchRole.Agent,
+        SketchRole.Patient,
+        SketchRole.Theme,
+        SketchRole.Other("topic")
+      )
+      entity <- Gen.option(Gen.oneOf("re:a", "re:b").map(RecallEntityId.unsafe))
+      label <- Gen.oneOf("a woman", "the man", "she", "the door")
+      specified <- Gen.oneOf(true, false)
+      aliases <- Gen.oneOf(Set.empty[String], Set("woman"), Set("man", "fellow"))
+      head <- Gen.oneOf("", "woman", "man")
+      modifiers <- Gen.oneOf(Vector.empty[String], Vector("young"), Vector("old", "tall"))
+      determiner <- Gen.option(Gen.oneOf(Determiner.values.toSeq))
+      number <- Gen.option(Gen.oneOf(MentionNumber.values.toSeq))
+    yield SketchParticipant(
+      role,
+      entity,
+      label,
+      specified,
+      aliases,
+      head,
+      modifiers,
+      determiner,
+      number
+    )
+
+  val propositionSketch: Gen[PropositionSketch] =
+    for
+      predicate <- Gen.option(Gen.oneOf("go", "sleep", "open"))
+      participants <- Gen.chooseNum(0, 2).flatMap(Gen.listOfN(_, sketchParticipant)).map(_.toVector)
+      polarity <- Gen.oneOf(PolarityTag.values.toSeq)
+      modality <- Gen.oneOf(ModalityTag.values.toSeq)
+      locations <- Gen.oneOf(Vector.empty[String], Vector("home"))
+      times <- Gen.oneOf(Vector.empty[String], Vector("then"))
+      sensory <- Gen.oneOf(Vector.empty[String], Vector("loud"))
+      lemmas <- Gen.oneOf(Set.empty[String], Set("go", "home"))
+      outcome <- Gen.option(Gen.oneOf("reached", "failed"))
+      cause <- Gen.option(Gen.oneOf("storm", "fear"))
+    yield PropositionSketch(
+      predicate,
+      participants,
+      polarity,
+      modality,
+      locations,
+      times,
+      sensory,
+      lemmas,
+      outcome,
+      cause
+    )
+
+  /** `evidence` is `Some` on three draws in four. It was `None` on every draw for four schema
+    * versions because no generator produced it and no law covered it, which is exactly how the
+    * codec came to drop the field unnoticed.
+    */
+  val recallUnit: Gen[RecallUnit] =
+    for
+      ordinal <- Gen.chooseNum(0, 99)
+      support <- spanSet
+      text <- Gen.oneOf("A woman went home.", "Then she slept.", "The door opened.")
+      function <- Gen.oneOf(DiscourseFunction.values.toSeq)
+      pick <- Gen.chooseNum(0, 2)
+      cues <- spanSet
+      sketch <- propositionSketch
+      grounding <- Gen.option(Gen.chooseNum(0.0, 1.0).map(Probability.unsafe))
+      evidence <- Gen.frequency(1 -> Gen.const(None), 3 -> propositionEvidence.map(Some(_)))
+    yield RecallUnit(
+      RecallUnitId.unsafe(s"ru:$ordinal"),
+      ordinal,
+      support,
+      text,
+      function,
+      pick match
+        case 0 => ExpressedUncertainty.Unmarked
+        case 1 => ExpressedUncertainty.Hedged(cues)
+        case _ => ExpressedUncertainty.Explicit(cues),
+      sketch,
+      grounding,
+      evidence
+    )
+
   given Arbitrary[TextSpan] = Arbitrary(span)
   given Arbitrary[SpanSet] = Arbitrary(spanSet)
   given Arbitrary[Credence] = Arbitrary(credence)
@@ -489,6 +582,8 @@ object CodecGens:
   given Arbitrary[Estimate[Double]] = Arbitrary(scoreEstimate)
   given Arbitrary[WorldTimeTransition] = Arbitrary(worldTime)
   given Arbitrary[PropositionChart[Checked]] = Arbitrary(chart)
+  given Arbitrary[PropositionEvidence] = Arbitrary(propositionEvidence)
+  given Arbitrary[RecallUnit] = Arbitrary(recallUnit)
   given Arbitrary[DerivationGap] = Arbitrary(derivationGap)
   given Arbitrary[DerivationAttempt] = Arbitrary(derivationAttempt)
   given Arbitrary[SentenceCoverage] = Arbitrary(sentenceCoverage)

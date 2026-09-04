@@ -154,8 +154,14 @@ object StoryModel:
     * entity, but nothing in that artifact records whether an *absent* speech context was absent
     * because the text held no speech or because the compiler had no vocabulary for an unattributed
     * one, so a mechanical lift would invent the distinction it is supposed to preserve.
+    *
+    * This value and `codec.SchemaVersions.Current` must be equal: the encoder writes the model's
+    * own stamp and the decoder checks the codec's supported list, so a model stamped with one and
+    * read against the other cannot round trip. `CodecSuite` asserts the equality, because nothing
+    * else did and the two constants sat one module apart carrying separate histories of the same
+    * number. See that object for why each version is unsupported rather than lifted.
     */
-  val SchemaVersion: String = "0.4.0"
+  val SchemaVersion: String = "0.5.0"
 
   def draft(
       source: StorySource,

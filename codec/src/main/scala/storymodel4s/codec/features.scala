@@ -587,9 +587,19 @@ object FeatureCodecs:
   * representation (ADR 0010); 0.3.0 is unsupported for the same reason as its predecessors: a 0.3.0
   * model wrote every determined value as a calibrated `1.0`, and the lift would have to decide
   * which of those were fitted, which none were.
+  *
+  * 0.5.0 writes `RecallUnit.evidence`, which every earlier version silently dropped: the encoder
+  * emitted eight keys and the decoder read eight and let the ninth take its default, so a chart
+  * attached to a unit did not survive one round trip and no round-trip law covered the hole. 0.4.0
+  * is unsupported rather than lifted for the usual reason: a 0.4.0 artifact cannot distinguish a
+  * unit that genuinely carried no chart from one whose chart the defective encoder discarded, so
+  * reading it as `None` would assert an absence nobody observed.
+  *
+  * Note for whoever merges second: `solo/root-segment` independently took 0.5.0 and 0.6.0. The
+  * numbering collides and the merge renumbers; the reasoning above travels with the change.
   */
 object SchemaVersions:
-  val Current: String = "0.4.0"
+  val Current: String = "0.5.0"
   val Supported: Vector[String] = Vector(Current)
 
   def check(c: io.circe.HCursor): Decoder.Result[String] =
