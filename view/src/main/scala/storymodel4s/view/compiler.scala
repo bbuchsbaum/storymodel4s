@@ -3,7 +3,13 @@ package storymodel4s.view
 import cats.data.NonEmptyVector
 import cats.syntax.all.*
 import storymodel4s.core.*
-import storymodel4s.features.{BasisId, FeatureAddress, FeatureDerivation, FeatureTargetKey, SupportResolver}
+import storymodel4s.features.{
+  BasisId,
+  FeatureAddress,
+  FeatureDerivation,
+  FeatureTargetKey,
+  SupportResolver
+}
 import storymodel4s.story.*
 
 /** Evidence horizon used to distinguish an omniscient model view from a reader-time view. */
@@ -39,7 +45,7 @@ enum FeatureSelection:
       s"derived:${derivation.hex}:basis:${basisId.fold("none")(_.hex)}"
 
   private[view] def resolveSpace: Either[FeatureResolutionIssue, FeatureSpaceId] = this match
-    case Raw(space)                => Right(space)
+    case Raw(space)                 => Right(space)
     case Derived(derivation, basis) =>
       Right(FeatureDerivation.outputSpaceId(derivation, basis.map(BasisId.fromChecksum)))
 
@@ -285,14 +291,14 @@ enum FeatureChannelState:
   )
 
   def resolvedSpaceId: Option[FeatureSpaceId] = this match
-    case Materialized(_, space, _)      => Some(space)
+    case Materialized(_, space, _)       => Some(space)
     case Missing(_, space)               => Some(space)
     case SidecarRequired(_, space, _)    => Some(space)
     case NotRequested | Unresolved(_, _) => None
 
   /** Selected feature identity, if this channel was requested. */
   def selectedFeature: Option[FeatureSelection] = this match
-    case Materialized(selected, _, _)   => Some(selected)
+    case Materialized(selected, _, _)    => Some(selected)
     case NotRequested                    => None
     case Unresolved(selected, _)         => Some(selected)
     case Missing(selected, _)            => Some(selected)
@@ -300,7 +306,7 @@ enum FeatureChannelState:
 
   /** Stable textual-twin rendering of materialization state, distinct from magnitude. */
   def canonicalString: String = this match
-    case Materialized(_, _, count)      => s"materialized:outcomes=$count"
+    case Materialized(_, _, count)       => s"materialized:outcomes=$count"
     case NotRequested                    => "not-requested"
     case Unresolved(_, issue)            => s"unresolved:${issue.canonicalString}"
     case Missing(_, _)                   => "missing"

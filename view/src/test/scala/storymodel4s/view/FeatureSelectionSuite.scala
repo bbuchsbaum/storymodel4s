@@ -20,4 +20,16 @@ class FeatureSelectionSuite extends FunSuite:
     )
 
   test("raw spaces retain their exact identity"):
-    assertEquals(FeatureSelection.Raw(TokenLength.space.id).resolveSpace, Right(TokenLength.space.id))
+    assertEquals(
+      FeatureSelection.Raw(TokenLength.space.id).resolveSpace,
+      Right(TokenLength.space.id)
+    )
+
+  test("display domains keep finite endpoint fractions for subnormal and overflowing ranges"):
+    Vector((0.0, Double.MinPositiveValue), (-Double.MaxValue, Double.MaxValue), (-3.0, 7.0))
+      .foreach { (lo, hi) =>
+        val domain = new FeatureDomain(lo, hi)
+        assertEquals(domain.fraction(lo), 0.0)
+        assertEquals(domain.fraction(hi), 1.0)
+      }
+    assertEquals(new FeatureDomain(0.0, 0.0).fraction(0.0), 0.5)
