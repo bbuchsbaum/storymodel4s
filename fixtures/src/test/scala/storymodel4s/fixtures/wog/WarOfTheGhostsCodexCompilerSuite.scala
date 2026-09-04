@@ -429,7 +429,7 @@ class WarOfTheGhostsCodexCompilerSuite extends ScalaCheckSuite:
     assertEquals(atlas.featureLayer.observations, Vector.empty)
     assert(!flow.annotations.exists(_.kind == AnnotationKind.Feature))
 
-  test("a basis-aware derived selection fails closed until BasisId resolution lands"):
+  test("a basis-aware selection resolves its exact space and reports absent data"):
     val derivation = Checksum.ofText("feature:derived")
     val basis = Checksum.ofText("feature:ordered-basis")
     val selection = FeatureSelection.Derived(derivation, Some(basis))
@@ -451,16 +451,17 @@ class WarOfTheGhostsCodexCompilerSuite extends ScalaCheckSuite:
 
     assertEquals(
       flow.contract.feature,
-      FeatureChannelState.Unresolved(
+      FeatureChannelState.Missing(
         selection,
-        FeatureResolutionIssue.BasisIdentityUnavailable(basis)
+        storymodel4s.features.FeatureDerivation
+          .outputSpaceId(derivation, Some(storymodel4s.features.BasisId.fromChecksum(basis)))
       )
     )
     assertEquals(atlas.featureLayer.state, flow.contract.feature)
     assertEquals(atlas.featureLayer.observations, Vector.empty)
     assert(!flow.annotations.exists(_.kind == AnnotationKind.Feature))
-    assert(flow.textualTwin.contains("Resolved feature space: none"))
-    assert(flow.textualTwin.contains("basis-identity-unavailable:" + basis.hex))
+    assert(flow.textualTwin.contains("Resolved feature space: derived:"))
+    assert(!flow.textualTwin.contains("basis-identity-unavailable:"))
 
   test("the scale selects exact feature targets and places them through ordinary lanes"):
     val selection = FeatureSelection.Raw(featureSpaceId)

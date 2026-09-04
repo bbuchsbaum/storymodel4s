@@ -181,13 +181,11 @@ final class FeatureDerivation private (
     * inputs. A content address rather than a path so chains of derivations never grow the id.
     */
   def outputSpaceId: FeatureSpaceId =
-    FeatureSpaceId.unsafe("derived:" + derivationId.short(32))
+    FeatureDerivation.outputSpaceId(derivationId, None)
 
   /** Output identity when this recipe ran on a caller-supplied ordered basis. */
   def outputSpaceId(basis: BasisId): FeatureSpaceId =
-    FeatureSpaceId.unsafe(
-      "derived:" + Checksum.ofText(derivationId.hex + "|" + basis.checksum.hex).short(32)
-    )
+    FeatureDerivation.outputSpaceId(derivationId, Some(basis))
 
   override def equals(other: Any): Boolean = other match
     case that: FeatureDerivation =>
@@ -216,6 +214,11 @@ final class FeatureDerivation private (
 
 object FeatureDerivation:
   private val path = "features/derivation"
+
+  /** Resolve a recorded recipe and optional ordered basis by the producer's identity rule. */
+  def outputSpaceId(derivation: Checksum, basis: Option[BasisId]): FeatureSpaceId =
+    val digest = basis.fold(derivation)(b => Checksum.ofText(derivation.hex + "|" + b.checksum.hex))
+    FeatureSpaceId.unsafe("derived:" + digest.short(32))
 
   /** Checked constructor: rejects a recipe carrying both a surface and a narrative window. */
   def of(

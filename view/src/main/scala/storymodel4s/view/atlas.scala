@@ -23,6 +23,8 @@ enum ProjectionKind:
 
 /** Visual channels a contract may give meaning to. */
 enum VisualChannel:
+  /** Magnitude, exact support, missingness and coverage of a selected scalar measurement. */
+  case Feature
   case X, Y, SurfaceUnit, RegionExtent, LandmarkPosition, Thread, Portal, Route, Distance, Area
 
   /** The exact discontinuous scope of one context frame over the discourse axis. */
@@ -114,6 +116,12 @@ object ProjectionContract:
     DistanceMeaning.NoMeaning,
     area = None,
     Vector(
+      ChannelMeaning(
+        VisualChannel.Feature,
+        "one selected space and grain; scalar magnitude has its own domain and units; missingness " +
+          "and coverage are separate masks over exact support; feature-row y is layout-only, " +
+          "not a context lane or a semantic distance; aggregate circularity is explicit"
+      ),
       ChannelMeaning(
         VisualChannel.X,
         "exact discourse offset (UTF-16 code units of the canonical text)"
@@ -394,6 +402,8 @@ object RegionLabel:
     case SegmentSummary.Unsummarized(gap) => Unsummarized(gap)
 
 enum VisualPrimitive:
+  /** A measured scalar or its recorded absence, compiled over exact source support (D11). */
+  case Feature(identity: VisualIdentity, value: FeatureValue)
   case SurfaceUnit(
       identity: VisualIdentity,
       span: TextSpan,
@@ -586,6 +596,29 @@ object SceneNavigation:
 
 /** Compiles the Discourse Atlas. Pure and deterministic in `(model, state, spec)`. */
 final class AtlasCompiler private (provenance: ViewProvenance):
+  /** Compile a checked, materialized track beside a validated model; byte verification belongs to
+    * the resolver. The view checks its model, space, target, basis and support joins.
+    */
+  def compileFeatures(
+      model: StoryModel[ModelStatus.Validated],
+      state: CommonViewState,
+      spec: AtlasSpec,
+      track: storymodel4s.features.FeatureTrack[FeatureTarget, Double]
+  ): Either[AtlasCompileError, NarrativeScene] =
+    compile(model, state, spec).flatMap(scene =>
+      FeatureRendering.attach(model, scene, track).leftMap(AtlasCompileError.Domain.apply)
+    )
+
+  /** A draft's measured features retain the same draft disclosure as its narrative marks. */
+  def compileDraftFeatures(
+      draft: DraftModel,
+      state: CommonViewState,
+      spec: AtlasSpec,
+      track: storymodel4s.features.FeatureTrack[FeatureTarget, Double]
+  ): Either[AtlasCompileError, NarrativeScene] =
+    compileDraft(draft, state, spec).flatMap(scene =>
+      FeatureRendering.attach(draft.model, scene, track).leftMap(AtlasCompileError.Domain.apply)
+    )
 
   /** Compile a validated story into an evidence-backed scene under the exact supplied receipt. */
   def compile(
@@ -1206,6 +1239,13 @@ final class AtlasCompiler private (provenance: ViewProvenance):
           ref.unit.flatMap(model.atlas.byId.get).exists(_.span == ref.span)
         )
     val supported = mark match
+      case VisualPrimitive.Feature(_, value) =>
+        val resolver = storymodel4s.features.SupportResolver(
+          SurfaceSequence(model.atlas),
+          situation = id => model.graph.situations.get(id).map(_.support),
+          segment = id => model.graph.segments.get(id).map(_.support)
+        )
+        mark.address == value.address && resolver.support(value.target).contains(value.support)
       case VisualPrimitive.SurfaceUnit(_, span, kind, unitOrdinal, parent) =>
         Addressable[CoreRef].parse(mark.address) match
           case Some(CoreRef.SurfaceUnit(id)) =>
@@ -1374,6 +1414,8 @@ object AtlasTextualTwin:
     out.append("Marks\n")
     if scene.marks.isEmpty then out.append("  (none)\n")
     scene.marks.foreach {
+      case VisualPrimitive.Feature(id, value) =>
+        out.append(s"  feature ${id.mark.value} ${id.address.render} ${value.description}\n")
       case VisualPrimitive.SurfaceUnit(id, span, kind, unitOrdinal, parent) =>
         out.append(
           s"  surface-unit ${id.mark.value} ${id.address.render} kind=$kind span=[${span.start},${span.endExclusive}) ordinal=$unitOrdinal parent=${parent.fold("-")(_.render)}\n"
