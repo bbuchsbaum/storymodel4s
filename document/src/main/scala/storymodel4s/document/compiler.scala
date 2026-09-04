@@ -1971,8 +1971,9 @@ object NarrativeCompiler:
     membershipRecords.foreach { record =>
       record.state match
         case accepted @ ResolutionState.Accepted(_, _, _) =>
+          // A membership needs its member emitted; it does not need the story summary, which is
+          // a description of the root and not a precondition of it (ADR 0005 §10).
           val missing = Vector(
-            Option.when(summaryMaterial.isEmpty)(summaryRecord.target),
             Option.when(!emittedBySource.contains(record.member))(
               NarrativeCandidateAddress.Situation(record.member)
             )
@@ -2010,18 +2011,37 @@ object NarrativeCompiler:
           gaps += gap(record.target, record.bundle, ClaimFamily.SegmentMembership, gapReason(state))
     }
 
-    val segments = summaryMaterial match
+    // The root segment is derived from its members, not from its summary (ADR 0005 §10): it
+    // exists whenever a situation was emitted, spans the canonical text, and carries its own
+    // claim citing the members. The summary is a second claim about the same unit: stated when one
+    // was derived, otherwise a typed absence naming what stopped it.
+    val summaryGap: SummaryGap = summaryRecord.state match
+      case ResolutionState.Accepted(_, _, _)                        => SummaryGap.NotEmitted
+      case ResolutionState.Unresolved(ResolutionFailure.NoProposal) => SummaryGap.NotProposed
+      case _                                                        => SummaryGap.NotAccepted
+    val segments = emittedNev match
       case None          => Map.empty[SegmentId, SegmentNode]
-      case Some(summary) =>
-        val alternatives = alternativesFor(summaryRecord.bundle, summary.value, renderSummary)
-        val segment = SegmentNode(
-          rootSegment,
-          SegmentKind.Story,
-          1,
-          Resolved(summary.value.text, summary.meta, alternatives.map((a, c) => a.text -> c)),
-          summary.support
-        )
-        Map(rootSegment -> segment)
+      case Some(members) =>
+        val whole = TextSpan.of(0, input.source.canonicalText.length) match
+          case Left(error) => return Left(NarrativeCompilerError.ClaimConstruction(error))
+          case Right(span) => SpanSet.one(SpanRef(None, span))
+        val meta = derivedMeta(
+          input,
+          "segment-root",
+          Vector(rootSegment.value),
+          whole,
+          members.toVector.map(_.node.meta.id).toSet
+        ) match
+          case Left(error)  => return Left(NarrativeCompilerError.ClaimConstruction(error))
+          case Right(value) => value
+        val summary = summaryMaterial match
+          case None    => SegmentSummary.Unsummarized(summaryGap)
+          case Some(s) =>
+            val alternatives = alternativesFor(summaryRecord.bundle, s.value, renderSummary)
+            SegmentSummary.Stated(
+              Resolved(s.value.text, s.meta, alternatives.map((a, c) => a.text -> c))
+            )
+        Map(rootSegment -> SegmentNode(rootSegment, SegmentKind.Story, 1, meta, summary, whole))
     val hierarchy = NarrativeHierarchy(membershipEdges.result(), Vector.empty)
 
     val graph = NarrativeGraph(
@@ -2158,12 +2178,13 @@ object NarrativeCompiler:
     )
     val gapVec = gaps.result().sortBy(g => (g.target.render, g.reason.render))
     val structuralValidation = StoryValidator.validate(draft)
+    // The summary is not here (ADR 0005 §10): a model with no description of its root is partial
+    // in a way the segment records, not in a way that makes its structure unusable.
     val promotionBlockingFamilies = Set(
       ClaimFamily.SituationMention,
       ClaimFamily.ContextAssignment,
       ClaimFamily.SegmentMembership,
-      ClaimFamily.DiscourseTrajectory,
-      ClaimFamily.Summary
+      ClaimFamily.DiscourseTrajectory
     )
     val compilerViolations = gapVec.collect {
       case gap if promotionBlockingFamilies(gap.family) =>

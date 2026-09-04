@@ -377,7 +377,8 @@ object InvalidStoryGens:
             id,
             SegmentKind.Scene,
             1,
-            Resolved("empty", inferredMeta("mut:empty"), Vector.empty),
+            inferredMeta("mut:empty:claim"),
+            SegmentSummary.Stated(Resolved("empty", inferredMeta("mut:empty"), Vector.empty)),
             b.span(0)
           )
           val e = ContainmentEdge(

@@ -9,6 +9,7 @@ import storymodel4s.document.*
 import storymodel4s.features.*
 import storymodel4s.laws.AddressGens
 import storymodel4s.proposition.{Checked, PropositionChart}
+import storymodel4s.story.{SegmentSummary, SummaryGap}
 import AddressGens.given
 import CodecGens.given
 import CanonicalPrimitives.given
@@ -17,6 +18,7 @@ import FeatureCodecs.given
 import DerivationCodecs.given
 import DerivationRecordCodec.given
 import PropositionCodecs.given
+import StoryCodecs.given
 
 class CodecSuite extends ScalaCheckSuite:
 
@@ -72,6 +74,7 @@ class CodecSuite extends ScalaCheckSuite:
   lawsFor[Credence]("Credence")
   lawsFor[ClaimMeta]("ClaimMeta")
   lawsFor[Resolved[String]]("Resolved")
+  lawsFor[SegmentSummary]("SegmentSummary")
   lawsFor[Estimate[Double]]("Estimate[Double]")
   lawsFor[WorldTimeTransition]("WorldTimeTransition")
   lawsFor[FeatureTrack[FeatureTarget, Double]]("FeatureTrack[Double]")
@@ -88,6 +91,21 @@ class CodecSuite extends ScalaCheckSuite:
       assertEquals(back.map(_.unchecked), Right(ch.unchecked))
       assert(Canonical.isFixedPoint(ch))
     }
+  }
+
+  property("SegmentSummary: Unsummarized(gap) survives the round trip as Unsummarized(gap)") {
+    forAll(CodecGens.summaryGap) { gap =>
+      val s: SegmentSummary = SegmentSummary.Unsummarized(gap)
+      val text = Canonical.encode(s)
+      assert(text.contains(s""""gap":"${gap.render}""""), text)
+      assertEquals(Canonical.decode[SegmentSummary](text), Right(s))
+    }
+  }
+
+  test("SegmentSummary: an unknown gap, a missing gap, or an unknown tag is rejected on decode") {
+    assert(Canonical.decode[SegmentSummary]("""{"gap":"lost","summary":"unsummarized"}""").isLeft)
+    assert(Canonical.decode[SegmentSummary]("""{"summary":"unsummarized"}""").isLeft)
+    assert(Canonical.decode[SegmentSummary]("""{"summary":"absent"}""").isLeft)
   }
 
   property("Missingness: Missing(reason) survives the round trip as Missing(reason)") {

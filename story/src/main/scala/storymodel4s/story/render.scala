@@ -84,7 +84,7 @@ object Renderer:
     def renderSeg(id: SegmentId, depth: Int): Unit =
       g.segments.get(id).foreach { s =>
         sb.append("  " * depth)
-          .append(s"- ${s.id.value} [${s.kind} L${s.level}] ${s.summary.value}\n")
+          .append(s"- ${s.id.value} [${s.kind} L${s.level}] ${s.summary.render}\n")
         h.childrenOf.getOrElse(id, Vector.empty).foreach {
           case NarrativeMember.Segment(c)   => renderSeg(c, depth + 1)
           case NarrativeMember.Situation(c) =>
@@ -118,7 +118,7 @@ object Renderer:
       g.segments.get(id).foreach { s =>
         val pad = "  " * (depth + 1)
         sb.append(pad).append(s"subgraph ${q("cluster_" + s.id.value)} {\n")
-        sb.append(pad).append(s"  label=${q(s"${s.kind} ${s.id.value}: ${s.summary.value}")};\n")
+        sb.append(pad).append(s"  label=${q(s"${s.kind} ${s.id.value}: ${s.summary.render}")};\n")
         h.childrenOf.getOrElse(id, Vector.empty).foreach {
           case NarrativeMember.Segment(c)   => cluster(c, depth + 1)
           case NarrativeMember.Situation(c) =>

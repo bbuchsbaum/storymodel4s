@@ -694,7 +694,7 @@ final class CodexCompiler private (provenance: ViewProvenance):
     def segmentVisible(id: SegmentId): Boolean =
       graph.segments
         .get(id)
-        .exists(node => claimVisible(node.summary.meta) && supportVisible(StoryRef.Segment(id)))
+        .exists(node => claimVisible(node.meta) && supportVisible(StoryRef.Segment(id)))
 
     val primaryParent = model.hierarchy.primary
       .filter(edge => claimVisible(edge.meta))
@@ -1108,7 +1108,7 @@ object CodexCompiler:
         .toVector ++
         graph.segments.valuesIterator
           .map(node =>
-            Candidate(StoryRef.Segment(node.id), node.summary.meta, AnnotationKind.Hierarchy, None)
+            Candidate(StoryRef.Segment(node.id), node.meta, AnnotationKind.Hierarchy, None)
           )
           .toVector ++
         graph.entities.valuesIterator

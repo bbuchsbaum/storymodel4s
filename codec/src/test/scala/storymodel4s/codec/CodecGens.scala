@@ -87,6 +87,15 @@ object CodecGens:
     provenance
   )
 
+  /** Every summary state the wire may carry (ADR 0005 §10): a stated summary and each of the three
+    * typed absences, so a decoder that reads the tag and forgets the gap is caught.
+    */
+  val summaryGap: Gen[SummaryGap] = Gen.oneOf(SummaryGap.values.toSeq)
+  lazy val segmentSummary: Gen[SegmentSummary] = Gen.oneOf(
+    resolvedString.map(SegmentSummary.Stated(_)),
+    summaryGap.map(SegmentSummary.Unsummarized(_))
+  )
+
   val resolvedString: Gen[Resolved[String]] = for
     v <- ident
     m <- claimMeta
@@ -499,6 +508,7 @@ object CodecGens:
   given Arbitrary[Credence] = Arbitrary(credence)
   given Arbitrary[ClaimMeta] = Arbitrary(claimMeta)
   given Arbitrary[Resolved[String]] = Arbitrary(resolvedString)
+  given Arbitrary[SegmentSummary] = Arbitrary(segmentSummary)
   given Arbitrary[Estimate[Double]] = Arbitrary(scoreEstimate)
   given Arbitrary[WorldTimeTransition] = Arbitrary(worldTime)
   given Arbitrary[PropositionChart[Checked]] = Arbitrary(chart)
@@ -633,14 +643,18 @@ object CodecFixture:
         root,
         SegmentKind.Story,
         3,
-        Resolved("whole", meta("root:sum", EpistemicStatus.Hypothesized, None), Vector.empty),
+        meta("root:seg", EpistemicStatus.Hypothesized, Some(whole)),
+        SegmentSummary.Stated(
+          Resolved("whole", meta("root:sum", EpistemicStatus.Hypothesized, None), Vector.empty)
+        ),
         whole
       ),
       scene -> SegmentNode(
         scene,
         SegmentKind.Scene,
         1,
-        Resolved("home", meta("scene:sum", EpistemicStatus.Hypothesized, None), Vector.empty),
+        meta("scene:seg", EpistemicStatus.Hypothesized, Some(whole)),
+        SegmentSummary.Unsummarized(SummaryGap.NotProposed),
         whole
       )
     )

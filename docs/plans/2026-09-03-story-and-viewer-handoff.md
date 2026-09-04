@@ -133,10 +133,10 @@ Everything above §5 was true at `328021b2`. Four landings later the picture is:
 | | state |
 |---|---|
 | storymodel4s `main` | derivation record `46d4a6a5`, credence and provenance `9d71e87c`, feature tracks `8307316d`, entity identity by referring form: the merge containing this section |
-| model wire schema | **0.5.0**: a claim's credence is `{"score", "basis"}` (0.4.0, ADR 0010) and a flow step's turnover is an estimate (0.5.0, ADR 0012); older files are refused, no migration |
+| model wire schema | **0.6.0**: a claim's credence is `{"score", "basis"}` (0.4.0, ADR 0010), a flow step's turnover is an estimate (0.5.0, ADR 0012), and a segment carries its own `meta` and a tagged `summary`, stated or `unsummarized` with a reason (0.6.0, ADR 0005 §10); older files are refused, no migration |
 | `storymodel.json`, fifty-sentence replay | **0.8 MB**, was 89.8 MB |
 | bundle files | `storymodel.json`, `compilation-report.json`, `receipts.json`, **`derivation.json`** (`derivation-record/v1`), **`features.json`** (`features-record/v1`), **`features/<manifest checksum>.sidecar`** per measured space |
-| still not validated | 149 gaps, 135 violations: the summary family is still unresolved without a caller's title; the 79 new gaps are the open pronouns of ADR 0012 and the participant edges and coverages behind them |
+| still not validated | 84 gaps, 3 violations (was 149 / 135 before ADR 0005 §10 gave the root segment its own claim): the summary family is still unresolved without a caller's title and is now a typed absence on the root segment; the 3 violations are the one abstained sentence's situation, context and membership, the same 3 the titled build reports; the open pronouns of ADR 0012 and the participant edges and coverages behind them are the other 79 gaps |
 
 ### What is now true of the model
 
@@ -202,6 +202,9 @@ its pin and gate). A record for another build is refused, never paired; no file 
    that is the calibrated antecedent policy of item 4, not another rule.
 2. **The viewer reads `features.json`** and draws Token/Sentence/Situation tracks (it already
    admits those targets; `FeatureChannelState.SidecarRequired` is the seam).
-3. **A summary rule that reads the story**, so a bare text can validate without a caller's title.
+3. ~~A root segment that validates without a story summary~~ Done (ADR 0005 §10, schema 0.6.0):
+   the segment carries its own claim and a typed summary absence; the untitled fifty-sentence
+   build goes 149 → 84 gaps and 135 → 3 violations, the same 3 as the titled build (one abstained
+   sentence). A summary rule that reads the story is still owed for the summary itself.
 4. **Calibration**: a `CalibrationModelId`-typed fit over adjudicated roles, leave-story-out, the
    first `Calibrated` basis in the story path.

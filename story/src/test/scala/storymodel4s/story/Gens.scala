@@ -150,14 +150,20 @@ object Small:
         root,
         SegmentKind.Story,
         2,
-        Resolved("root", meta("seg:root", EpistemicStatus.HumanAdjudicated, None), Vector.empty),
+        meta("seg:root:claim", EpistemicStatus.HumanAdjudicated, Some(allSpan)),
+        SegmentSummary.Stated(
+          Resolved("root", meta("seg:root", EpistemicStatus.HumanAdjudicated, None), Vector.empty)
+        ),
         allSpan
       ),
       scene -> SegmentNode(
         scene,
         SegmentKind.Scene,
         1,
-        Resolved("scene", meta("seg:scene", EpistemicStatus.HumanAdjudicated, None), Vector.empty),
+        meta("seg:scene:claim", EpistemicStatus.HumanAdjudicated, Some(allSpan)),
+        SegmentSummary.Stated(
+          Resolved("scene", meta("seg:scene", EpistemicStatus.HumanAdjudicated, None), Vector.empty)
+        ),
         allSpan
       )
     )

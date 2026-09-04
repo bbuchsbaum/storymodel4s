@@ -590,10 +590,13 @@ object FeatureCodecs:
   * which of those were fitted, which none were. 0.5.0 makes a flow step\'s `entityTurnover` an
   * `Estimate` (ADR 0012): a step between situations whose casts are not both resolved carries
   * `Missing(InputUnresolved)` where 0.4.0 could only write a number, so a 0.4.0 model\'s turnovers
-  * cannot be told from measured ones and 0.4.0 is unsupported.
+  * cannot be told from measured ones and 0.4.0 is unsupported. 0.6.0 gives a segment its own claim
+  * and makes its summary a tagged value, stated or a typed absence (ADR 0005 §10): a 0.5.0 model
+  * has a segment only where it has a summary, and the lift could not say what an absent summary was
+  * absent for, so 0.5.0 is unsupported.
   */
 object SchemaVersions:
-  val Current: String = "0.5.0"
+  val Current: String = "0.6.0"
   val Supported: Vector[String] = Vector(Current)
 
   def check(c: io.circe.HCursor): Decoder.Result[String] =

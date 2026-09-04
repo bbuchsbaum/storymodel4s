@@ -140,25 +140,32 @@ class WarOfTheGhostsDraftCodexSuite extends FunSuite:
     assertEquals(compilation.draft.graph.situations.size, 65)
     assertEquals(compilation.draft.graph.entities.size, 23)
     assertEquals(compilation.draft.graph.contexts.size, 6)
-    assertEquals(compilation.draft.graph.segments.size, 0)
+    // The root segment, derived from its members and unsummarized because no title was stated
+    // (ADR 0005 §10); 84 gaps, one of them the summary; the abstained sentence's 3 violations.
+    assertEquals(compilation.draft.graph.segments.size, 1)
+    assertEquals(
+      compilation.draft.graph.segments.values.map(_.summary).toVector,
+      Vector(SegmentSummary.Unsummarized(SummaryGap.NotProposed))
+    )
+    assertEquals(compilation.draft.hierarchy.containment.size, 65)
     assertEquals(compilation.validated, None)
-    assertEquals(compilation.derivation.gaps.size, 149)
-    assertEquals(compilation.validation.report.violations.size, 135)
+    assertEquals(compilation.derivation.gaps.size, 84)
+    assertEquals(compilation.validation.report.violations.size, 3)
   }
 
   test("the receipt states the promotion the reading view renders, and refuses the other path") {
     val promotion = flow.provenance.draft.getOrElse(fail("a draft flow carries a promotion"))
     assertEquals(flow.provenance.basis, ViewBasis.DraftBuild)
     assertEquals(promotion.promoted, false)
-    assertEquals(promotion.gapCount, Some(149))
-    assertEquals(promotion.violationCount, 135)
+    assertEquals(promotion.gapCount, Some(84))
+    assertEquals(promotion.violationCount, 3)
     assertEquals(
       flow.provenance.modelReceiptChecksum,
       compilation.draft.receipt.map(_.contentChecksum)
     )
   }
 
-  test("the annotation census: 308 marks on the words, of which 214 are failures") {
+  test("the annotation census: 244 marks on the words, of which 84 are failures") {
     assertEquals(
       census(flow),
       Vector(
@@ -166,22 +173,47 @@ class WarOfTheGhostsDraftCodexSuite extends FunSuite:
         ("claim", 65),
         ("context", 6),
         ("entity", 23),
-        ("gap", 148),
-        ("unsatisfied-law", 65)
+        ("gap", 83),
+        ("hierarchy", 66)
       )
     )
-    assertEquals(flow.annotations.size, 308)
+    assertEquals(flow.annotations.size, 244)
 
-    // The hierarchy and relation channels are declared and empty: no title was stated, so no
-    // segment was derived, so there is nothing hierarchical to draw. A declared empty channel says
-    // that; an undeclared one would be indistinguishable from a renderer that dropped it.
+    // The hierarchy channel carries the root segment and its sixty-five memberships: since ADR
+    // 0005 §10 the segment is derived from its members, so an untitled build has a hierarchy to
+    // draw. The relation channel is declared and empty because this view state selects no
+    // relation layer. A declared empty channel says that; an undeclared one would be
+    // indistinguishable from a renderer that dropped it.
     assert(flow.contract.activeKinds.contains(AnnotationKind.Hierarchy))
     assert(flow.contract.activeKinds.contains(AnnotationKind.Relation))
     assert(AnnotationKind.absence.subsetOf(flow.contract.activeKinds))
-    assertEquals(census(flow).map(_._1).toSet.intersect(Set("hierarchy", "relation")), Set.empty)
+    assertEquals(
+      census(flow).map(_._1).toSet.intersect(Set("hierarchy", "relation")),
+      Set("hierarchy")
+    )
+    val hierarchy = flow.annotations.filter(_.kind == AnnotationKind.Hierarchy)
+    assertEquals(
+      hierarchy.count(annotation =>
+        Addressable[StoryRef].parse(annotation.target).exists {
+          case StoryRef.Segment(_) => true
+          case _                   => false
+        }
+      ),
+      1
+    )
+    assertEquals(
+      hierarchy.count(annotation =>
+        Addressable[StoryRef].parse(annotation.target).exists {
+          case StoryRef.Containment(_, _, _) => true
+          case _                             => false
+        }
+      ),
+      65
+    )
 
-    // Every absence carries its own record, and no ordinary annotation carries one.
-    assertEquals(marks(flow).size, 214)
+    // Every absence carries its own record, and no ordinary annotation carries one. The 84 are
+    // the 83 placed gaps and the abstention; no unsatisfied law names words since ADR 0005 §10.
+    assertEquals(marks(flow).size, 84)
     assert(marks(flow).forall(mark => mark.absence.exists(_.kind == mark.kind)))
     assert(flow.annotations.filterNot(_.kind.marksAbsence).forall(_.absence.isEmpty))
   }
@@ -193,12 +225,12 @@ class WarOfTheGhostsDraftCodexSuite extends FunSuite:
         compilation.validation.report.violations.size
     assertEquals(draft.absences.size, expected)
     assertEquals(ledger.total, expected)
-    assertEquals(ledger.total, 285)
+    assertEquals(ledger.total, 88)
     assertEquals(ledger.marked, marks(flow).map(_.id).sorted)
 
-    // Seventy-one absences concern no words and say so, rather than being dropped from the reading
-    // view or borrowing a sentence they do not describe.
-    assertEquals(ledger.unplaced.size, 71)
+    // Four absences concern no words and say so, rather than being dropped from the reading view
+    // or borrowing a sentence they do not describe: the summary gap and the three derivation laws.
+    assertEquals(ledger.unplaced.size, 4)
     assertEquals(
       ledger.unplaced
         .groupBy(entry => (entry.absence.kind.wireName, entry.reason.render))
@@ -206,7 +238,7 @@ class WarOfTheGhostsDraftCodexSuite extends FunSuite:
         .mapValues(_.size)
         .toVector
         .sorted,
-      Vector((("gap", "whole-work"), 1), (("unsatisfied-law", "whole-work"), 70))
+      Vector((("gap", "whole-work"), 1), (("unsatisfied-law", "whole-work"), 3))
     )
 
     // The one unplaced gap is the story summary: it concerns the whole work, so borrowing the first
@@ -222,7 +254,7 @@ class WarOfTheGhostsDraftCodexSuite extends FunSuite:
   test("every failure that names words names the exact sentence it concerns") {
     val byId = compilation.draft.atlas.byId
     val placed = marks(flow).filterNot(_.kind == AnnotationKind.UnsatisfiedLaw)
-    assertEquals(placed.size, 149)
+    assertEquals(placed.size, 84)
     placed.foreach { mark =>
       mark.support.refs.toVector.foreach { ref =>
         val unit = ref.unit.flatMap(byId.get).getOrElse(fail(s"no unit under ${mark.id.value}"))
@@ -231,17 +263,14 @@ class WarOfTheGhostsDraftCodexSuite extends FunSuite:
       }
     }
 
-    // The sixty-five placed laws name a situation, so they cite that situation's own support and
-    // never a wider span.
-    val laws = marks(flow).filter(_.kind == AnnotationKind.UnsatisfiedLaw)
-    assertEquals(laws.size, 65)
-    laws.foreach { mark =>
-      val support = Addressable[StoryRef]
-        .parse(mark.target)
-        .flatMap(compilation.draft.supporting)
-        .getOrElse(fail(s"no support for ${mark.target.render}"))
-      assert(mark.support.refs.toVector.forall(support.refs.toVector.contains))
-    }
+    // No law is placed: the three remaining violations name a chart candidate with no address,
+    // and the sixty-five reachability laws that used to cite their situation's own words were the
+    // cost of a root segment waiting on its summary, retired by ADR 0005 §10.
+    assertEquals(marks(flow).filter(_.kind == AnnotationKind.UnsatisfiedLaw), Vector.empty)
+    assertEquals(
+      ledgerOf(flow).unplaced.count(_.absence.kind == AnnotationKind.UnsatisfiedLaw),
+      compilation.validation.report.violations.size
+    )
   }
 
   test("every failure declares a non-colour channel, and the states are the ones D9 names") {
@@ -259,14 +288,14 @@ class WarOfTheGhostsDraftCodexSuite extends FunSuite:
       Vector(
         ("abstention/Missing/OpenHatch", 1),
         ("gap/Alternatives/Fan", 22),
-        ("gap/Missing/OpenHatch", 118),
-        ("gap/Unresolved/Placeholder", 8),
-        ("unsatisfied-law/-/Bracket", 65)
+        ("gap/Missing/OpenHatch", 53),
+        ("gap/Unresolved/Placeholder", 8)
       )
     )
 
-    // The Atlas counts 65 Missing and 5 Unresolved over all seventy gaps. The fifth Unresolved is
-    // the story summary, which concerns the whole work and so has no words to sit on here.
+    // The Atlas counts 53 Missing, 9 Unresolved and 22 Alternatives over all 84 gaps. The ninth
+    // Unresolved is the story summary, which concerns the whole work and so has no words to sit
+    // on here.
     assertEquals(
       ledgerOf(flow).unplaced
         .filter(_.absence.kind == AnnotationKind.Gap)
@@ -376,10 +405,9 @@ class WarOfTheGhostsDraftCodexSuite extends FunSuite:
     val twin = flow.textualTwin
     assert(twin.startsWith("Narrative Codex\n"), twin.take(120))
     assert(twin.contains("Basis: draft build\n"), "the twin states the basis")
-    assert(twin.contains("promotable: false; derivation gaps: 149; violations: 135\n"))
-    assert(twin.contains("  - compiler.required-derivation Error x69\n"))
-    assert(twin.contains("  - hierarchy.single-primary-root Error x1\n"))
-    assert(twin.contains("  - hierarchy.situation-root-reachable Error x65\n"))
+    assert(twin.contains("promotable: false; derivation gaps: 84; violations: 3\n"))
+    assert(twin.contains("  - compiler.required-derivation Error x3\n"))
+    assert(!twin.contains("hierarchy."), "no hierarchy law is unsatisfied since ADR 0005 §10")
     assert(
       twin.contains(
         "Channels: abstention,claim,context,entity,gap,hierarchy,relation,unsatisfied-law\n"
@@ -388,22 +416,23 @@ class WarOfTheGhostsDraftCodexSuite extends FunSuite:
 
     def lines(prefix: String): Vector[String] =
       twin.linesIterator.filter(_.startsWith(prefix)).toVector
-    assertEquals(lines("  absence=unresolved-family").size, 148)
+    assertEquals(lines("  absence=unresolved-family").size, 83)
     assertEquals(lines("  absence=abstained-sentence").size, 1)
-    assertEquals(lines("  absence=unsatisfied-law").size, 65)
+    assertEquals(lines("  absence=unsatisfied-law").size, 0)
     assert(lines("  absence=").forall(_.contains("channel=")))
     assert(lines("  absence=").exists(_.contains("state=Unresolved channel=Placeholder")))
     assert(lines("  absence=").exists(_.contains("state=Missing channel=OpenHatch")))
-    assert(lines("  absence=unsatisfied-law").forall(_.contains("state=- channel=Bracket")))
     assert(
       lines("  absence=abstained-sentence").head.contains(
         "reason=provider-abstained:focus-not-predicate"
       )
     )
 
-    // Every absence with no discourse position is listed too, so the twin accounts for all 206.
+    // Every absence with no discourse position is listed too, so the twin accounts for all 88:
+    // the summary gap and the three derivation laws, which sit on no words.
     assert(twin.contains("Unplaced absences\n"))
-    assertEquals(lines("- ").count(_.contains("at=unplaced:whole-work")), 71)
+    assertEquals(lines("- ").count(_.contains("at=unplaced:whole-work")), 4)
+    assertEquals(lines("- ").count(_.contains("unsatisfied-law")), 3)
   }
 
   test("the draft flow is deterministic, and relation layers add no absence and lose none") {
@@ -422,25 +451,26 @@ class WarOfTheGhostsDraftCodexSuite extends FunSuite:
 
   test("a model that arrives without its derivation record draws a smaller, still honest view") {
     // A derivation gap is a statement about the derivation, not about the story, so a consumer
-    // holding only a decoded `storymodel.json` has none. Re-validating independently finds 66
-    // violations from the one root cause: no summary, so no segments, so 65 unreachable situations.
+    // holding only a decoded `storymodel.json` has none. Re-validating independently finds no
+    // violation: the root segment exists and every situation is under it (ADR 0005 §10), and the
+    // three `compiler.required-derivation` errors only the compiler can raise.
     val revalidated = StoryValidator.validate(compilation.draft)
-    assertEquals(revalidated.report.violations.size, 66)
+    assertEquals(revalidated.report.violations, Vector.empty)
     val alone = DraftModel.withoutDerivationRecord(compilation.draft, revalidated)
     val aloneFlow = flowFrom(alone, state, spec)
 
     assertEquals(
       census(aloneFlow),
-      Vector(("claim", 65), ("context", 6), ("entity", 23), ("unsatisfied-law", 65))
+      Vector(("claim", 65), ("context", 6), ("entity", 23), ("hierarchy", 66))
     )
-    assertEquals(ledgerOf(aloneFlow).total, 66)
-    assertEquals(ledgerOf(aloneFlow).unplaced.size, 1)
+    assertEquals(ledgerOf(aloneFlow).total, 0)
+    assertEquals(ledgerOf(aloneFlow).unplaced.size, 0)
 
     // And the receipt says which it is: "record not supplied" is not "0 gaps".
     assertEquals(alone.promotion.gapCount, None)
-    assertEquals(flow.provenance.draft.flatMap(_.gapCount), Some(149))
+    assertEquals(flow.provenance.draft.flatMap(_.gapCount), Some(84))
     assert(aloneFlow.textualTwin.contains("derivation gaps: record not supplied"))
-    assert(flow.textualTwin.contains("derivation gaps: 149"))
+    assert(flow.textualTwin.contains("derivation gaps: 84"))
 
     // The two receipts are different statements, so neither flow can be compiled under the other.
     val crossed = CodexCompiler(
@@ -452,5 +482,5 @@ class WarOfTheGhostsDraftCodexSuite extends FunSuite:
         )
         .fold(error => fail(error.message), identity)
     ).compileDraft(draft, state, spec)
-    assert(crossed.isLeft, "a receipt saying nothing about derivation must not render 70 gaps")
+    assert(crossed.isLeft, "a receipt saying nothing about derivation must not render 84 gaps")
   }

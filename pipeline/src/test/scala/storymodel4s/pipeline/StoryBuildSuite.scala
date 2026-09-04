@@ -581,10 +581,11 @@ class StoryBuildSuite extends FunSuite:
     assertEquals(size(built.hcursor.downField("hierarchy"), "containment"), 65)
     assertEquals(intField(report, "model", "situations"), 65)
     assertEquals(intField(report, "model", "entities"), 23)
-    // 386 claims became 391 when the five child context frames arrived, and 352 when ADR 0012
-    // opened the pronouns: six pronoun "entities" (twelve claims) and the 27 participant edges
-    // they filled are now recorded gaps, not claims.
-    assertEquals(intField(report, "model", "claims"), 352)
+    // 386 claims became 391 when the five child context frames arrived, 352 when ADR 0012
+    // opened the pronouns (six pronoun "entities", twelve claims, and the 27 participant edges
+    // they filled are now recorded gaps, not claims), and 353 when ADR 0005 §10 gave the root
+    // segment a claim of its own beside its summary's.
+    assertEquals(intField(report, "model", "claims"), 353)
 
     // Slice 1.7's referentiality rule, measured on the same fifty charts. 35 entities and 68
     // participant edges became 29 and 57: the eleven fillers that moved are the nine `:time` and
@@ -1143,16 +1144,26 @@ class StoryBuildSuite extends FunSuite:
       DerivationRecord.Reported(compilation.derivation.gaps, proposals.coverage)
     )
 
-    // The numbers measured, pinned: 149 gaps over 50 sentences (70 before ADR 0012 opened the
-    // pronouns), and every gap names its own upstream targets and evidence rather than a count.
-    assertEquals(record.gaps.size, 149)
+    // The numbers measured, pinned: 84 gaps over 50 sentences (70 before ADR 0012 opened the
+    // pronouns, 149 while the 65 memberships waited on the summary that ADR 0005 §10 freed them
+    // from), and every gap names its own upstream targets and evidence rather than a count.
+    assertEquals(record.gaps.size, 84)
     assertEquals(record.gaps.size, summary.gaps)
     assertEquals(record.coverage.size, 50)
     assertEquals(record.attempts.size, compilation.derivation.attempts.size)
+    // The 53 missing-upstream gaps are the 27 participant roles and 26 coverages behind open
+    // pronouns. The one membership gap is the abstained sentence's own; no membership waits on
+    // the story summary any more.
     val missingUpstream = record.gaps.collect {
       case DerivationGap(_, _, _, DerivationGapReason.MissingUpstream(addresses), _, _) => addresses
     }
-    assertEquals(missingUpstream.size, 118)
+    assertEquals(missingUpstream.size, 53)
+    assertEquals(
+      record.gaps
+        .filter(_.family == storymodel4s.acquire.ClaimFamily.SegmentMembership)
+        .map(_.reason.render),
+      Vector("unresolved:NoProposal")
+    )
     assert(missingUpstream.forall(_.nonEmpty), "a missing-upstream gap named no upstream address")
     assertEquals(record.summaryCoverage, SummaryCoverage.NoTitle)
 
@@ -1379,7 +1390,9 @@ class StoryBuildSuite extends FunSuite:
       .decode(read(summary.files.model))
       .fold(error => fail(error.toString), identity)
     val claims = model.claims.toVector
-    assertEquals(claims.size, 286)
+    // 352 since ADR 0005 §10: the 65 primary memberships are chart-rule claims once more, and the
+    // root segment carries its own derived claim; before it this untitled build had 286.
+    assertEquals(claims.size, 352)
 
     // 1. Not one calibrated probability, and not one claim without a basis: every claim in this
     // model is determined by a named rule, because nothing in the build fits a calibration.
@@ -1388,11 +1401,12 @@ class StoryBuildSuite extends FunSuite:
     assertEquals(
       claims.groupBy(_.credence.basis.render).view.mapValues(_.size).toMap,
       Map(
-        "determined:chart-rule-v1" -> 170,
+        "determined:chart-rule-v1" -> 235,
         "determined:compiler-derived:entity/v1" -> 23,
         "determined:compiler-derived:entity-label/v1" -> 23,
         "determined:compiler-derived:context-frame/v1" -> 5,
         "determined:compiler-derived:root-context/v1" -> 1,
+        "determined:compiler-derived:segment-root/v1" -> 1,
         "determined:trajectory-derive/v1" -> 64
       )
     )
@@ -1403,7 +1417,7 @@ class StoryBuildSuite extends FunSuite:
     assertEquals(
       claims.groupBy(_.credence.score.render).view.mapValues(_.size).toMap,
       Map(
-        "unmeasured" -> 256,
+        "unmeasured" -> 322,
         s"raw:interop-tables/v1:lexicon-argument=${Score.hexBits(0.5)}" -> 18,
         s"raw:interop-tables/v1:standard-role=${Score.hexBits(0.9)}" -> 12
       )
@@ -1415,7 +1429,8 @@ class StoryBuildSuite extends FunSuite:
     // sentence.
     val (derived, accepted) =
       claims.partition(_.status == EpistemicStatus.StructurallyDerived)
-    assertEquals(derived.size, 116)
+    // 117: the 116 of before and the root segment's own claim (ADR 0005 §10).
+    assertEquals(derived.size, 117)
     assert(derived.forall(_.provenance.calls.isEmpty), "a derived claim carries provider calls")
     accepted.foreach { meta =>
       val sentences = meta.evidence.toVector
@@ -1430,9 +1445,10 @@ class StoryBuildSuite extends FunSuite:
       }
       assertEquals(calls.size, 1 + 2 * sentences.size, s"${meta.id.value} call count")
     }
+    // Each of the 65 memberships cites its rule call and its one sentence's two parse receipts.
     assertEquals(
       accepted.map(_.provenance.calls.size).groupBy(identity).view.mapValues(_.size).toMap,
-      Map(3 -> 122, 5 -> 48)
+      Map(3 -> 187, 5 -> 48)
     )
 
     // 4. The file: under one megabyte where it was ninety.
@@ -1456,12 +1472,20 @@ class StoryBuildSuite extends FunSuite:
       rows(report, "gaps").map(row => field(row, "family")).count(_ == "Summary"),
       1
     )
-    // The accepted consequence, stated rather than worked around: with no summary there is no
-    // story segment, so no situation is under a primary root and the draft does not promote. That
-    // is true of a model built from a bare text file, and the fix for it is a summary rule that
-    // reads the story.
+    // The summary's absence is recorded where it belongs, on the root segment (ADR 0005 §10):
+    // the segment is derived from its members and does not wait for a description. So the
+    // untitled build fails to promote for the same three errors as the titled one, the abstained
+    // sentence's, and none of them is about the summary. The fix for the gap itself is still a
+    // summary rule that reads the story.
     assertEquals(summary.validated, false)
-    assert(summary.errors > 0, "an unresolved summary left no violation")
+    assertEquals(summary.errors, 3)
+    val decoded = StoryModelCodec
+      .decode(read(summary.files.model))
+      .fold(error => fail(error.toString), identity)
+    assertEquals(
+      decoded.graph.segments.values.map(_.summary.render).toVector,
+      Vector("unsummarized:not-proposed")
+    )
 
     // The filename reaches no artifact. `war-of-the-ghosts` is the stem of the file this court
     // wrote, and nothing the pipeline publishes may carry it.

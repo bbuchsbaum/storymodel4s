@@ -52,7 +52,10 @@ class WarOfTheGhostsSuite extends munit.FunSuite:
     assertEquals(m.model.ledger.toOption.get.size, m.model.claims.size)
     val ids = m.model.claims.map(_.id).toSet
     g.entities.values.foreach(e => assert(ids.contains(e.label.meta.id)))
-    g.segments.values.foreach(s => assert(ids.contains(s.summary.meta.id)))
+    g.segments.values.foreach { s =>
+      assert(ids.contains(s.meta.id))
+      s.summary.stated.foreach(r => assert(ids.contains(r.meta.id)))
+    }
     m.hypotheses.foreach(h => assert(ids.contains(h.meta.id)))
   }
 

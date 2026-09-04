@@ -1346,7 +1346,14 @@ object WarOfTheGhostsModel:
       to: Int
   ): SegmentNode =
     val support = sp((from to to)*)
-    SegmentNode(id, kind, level, resolved(s"seg:${id.value}:summary", summary, support), support)
+    SegmentNode(
+      id,
+      kind,
+      level,
+      explicit(s"seg:${id.value}", support),
+      SegmentSummary.Stated(resolved(s"seg:${id.value}:summary", summary, support)),
+      support
+    )
 
   val segments: Vector[SegmentNode] = Vector(
     segment(

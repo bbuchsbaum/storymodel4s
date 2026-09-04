@@ -36,7 +36,7 @@ class AtlasSuite extends FunSuite:
   test("scene navigation rejects duplicate mark ids"):
     val addr = Addressable[CoreRef].address(CoreRef.Claim(ClaimId.unsafe("c1")))
     val id = VisualIdentity.of(addr, NarrativeLevel.Story, MarkId.unsafe("m1"))
-    val r = VisualPrimitive.Region(id, extent(0, 1, 0, 0), "x", None)
+    val r = VisualPrimitive.Region(id, extent(0, 1, 0, 0), RegionLabel.Summary("x"), None)
     assert(SceneNavigation.from(Vector(r, r)).isLeft)
     assertEquals(SceneNavigation.from(Vector(r)).map(_.marksFor(addr)), Right(Vector(id.mark)))
 

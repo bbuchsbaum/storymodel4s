@@ -112,14 +112,68 @@ enum SituationNode:
 enum SegmentKind:
   case Scene, Episode, Story, Arc
 
+/** Why a segment carries no summary. Three states of the derivation that must not share a mark:
+  * nothing offered a summary; candidates were offered and none was accepted; an accepted candidate
+  * could not be emitted. A reader auditing an unlabeled region must be able to tell "no rule reads
+  * a summary here yet" from "the candidates disagreed" (design contract 7).
+  */
+enum SummaryGap:
+  /** No source proposed a summary: the text carries no established title and no rule reads one. */
+  case NotProposed
+
+  /** Candidates were proposed and none was accepted. */
+  case NotAccepted
+
+  /** An accepted candidate could not be materialized as a claim. */
+  case NotEmitted
+
+  def render: String = this match
+    case NotProposed => "not-proposed"
+    case NotAccepted => "not-accepted"
+    case NotEmitted  => "not-emitted"
+
+/** A segment's summary when the model derived one, or the reason it did not.
+  *
+  * Why not `Option[Resolved[String]]`: an absent summary is a fact about the derivation with a
+  * reason, and a reader who cannot see the reason cannot tell an unread text from a contested one.
+  * Why not a placeholder string: the model would then assert a description nobody derived.
+  */
+enum SegmentSummary:
+  /** A summary was derived; the claim carries its evidence and rivals. */
+  case Stated(summary: Resolved[String])
+
+  /** No summary was derived; `gap` says what stopped the derivation. */
+  case Unsummarized(gap: SummaryGap)
+
+  def stated: Option[Resolved[String]] = this match
+    case Stated(r)       => Some(r)
+    case Unsummarized(_) => None
+
+  def text: Option[String] = stated.map(_.value)
+
+  def gapReason: Option[SummaryGap] = this match
+    case Stated(_)         => None
+    case Unsummarized(why) => Some(why)
+
+  def render: String = this match
+    case Stated(r)         => r.value
+    case Unsummarized(why) => s"unsummarized:${why.render}"
+
 /** A composite narrative unit. `level` is 1 for scenes, 2 for episodes, 3 for the story root; arcs
   * use the level of the primary segment they most resemble.
+  *
+  * `meta` is the segment's own claim: that this unit exists with this extent, derived from its
+  * primary members. `summary` is a second claim about the same unit, a description of it, which the
+  * model may not have. They are separate coordinates because a segment nobody has described is
+  * still a segment: before ADR 0005 §10 the summary's claim stood in for the segment's, and a text
+  * with no established title lost its whole hierarchy to an unrelated abstention.
   */
 final case class SegmentNode(
     id: SegmentId,
     kind: SegmentKind,
     level: Int,
-    summary: Resolved[String],
+    meta: ClaimMeta,
+    summary: SegmentSummary,
     support: SpanSet
 )
 

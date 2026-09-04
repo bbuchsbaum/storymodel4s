@@ -1181,19 +1181,42 @@ class ChartProposalProviderSuite extends FunSuite:
     assertEquals(dispositions(proposals.summary.bundle), Vector(ProposalDisposition.Abstained))
     assertEquals(proposals.summary.bundle.sourceSupport, SourceSupport(0.0, None))
 
+    // ADR 0005 §10: the summary is still a gap, and nothing else waits for it. The root segment is
+    // derived from its one member, spans the canonical text, cites the member's claim, and records
+    // the summary's absence with its reason; the membership is emitted; the bare text validates.
     val compiled = compile(Vector(u0.id -> chart), untitled, untitledAtlas)
     val byFamily = compiled.derivation.gaps.map(g => g.family -> g.reason).toMap
     assertEquals(
       byFamily(ClaimFamily.Summary),
       DerivationGapReason.Unresolved(ResolutionFailure.NoProposal)
     )
+    assert(!byFamily.contains(ClaimFamily.SegmentMembership), byFamily.toString)
+    val graph = compiled.draft.graph
+    val root = graph.segments.values.toVector match
+      case Vector(one) => one
+      case other       => fail(s"expected one root segment, got ${other.size}")
+    assertEquals(root.kind, SegmentKind.Story)
+    assertEquals(root.summary, SegmentSummary.Unsummarized(SummaryGap.NotProposed))
+    assertEquals(root.support.minSpan, TextSpan.of(0, untitled.canonicalText.length).toOption.get)
+    assertEquals(root.meta.evidence.head.upstream, graph.situations.values.map(_.meta.id).toSet)
     assertEquals(
-      byFamily(ClaimFamily.SegmentMembership),
-      DerivationGapReason.MissingUpstream(
-        Vector(NarrativeCandidateAddress.StorySummary(untitled.id))
-      )
+      compiled.draft.hierarchy.primary.map(e => (e.member, e.parent)),
+      graph.situations.keys.toVector.map(id => (NarrativeMember.Situation(id), root.id))
     )
-    assertEquals(compiled.validated, None)
+    assert(compiled.validated.isDefined, compiled.validation.report.violations.toString)
+  }
+
+  test("a stated summary is the root's second claim, beside the segment's own") {
+    val chart = checked(s0, Some(c0), Map(c0 -> Concept.predicate("enter")), salt = "stated")
+    val compiled = compile(Vector(s0.id -> chart))
+    val root = compiled.draft.graph.segments.values.head
+    root.summary match
+      case SegmentSummary.Stated(r) =>
+        assertEquals(r.value, source.title.getOrElse(fail("the fixture source has a title")))
+        assertNotEquals(r.meta.id, root.meta.id)
+        assert(compiled.draft.claims.exists(_.id == root.meta.id))
+        assert(compiled.draft.claims.exists(_.id == r.meta.id))
+      case other => fail(s"expected a stated summary, got $other")
   }
 
   test("a chart on a non-sentence unit, a duplicate sentence, or a foreign atlas is refused") {

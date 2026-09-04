@@ -154,8 +154,14 @@ object StoryModel:
     * entity, but nothing in that artifact records whether an *absent* speech context was absent
     * because the text held no speech or because the compiler had no vocabulary for an unattributed
     * one, so a mechanical lift would invent the distinction it is supposed to preserve.
+    *
+    * Moved 0.5.0 -> 0.6.0 when a [[SegmentNode]] gained its own `meta` and its `summary` became a
+    * [[SegmentSummary]], stated or a typed absence (ADR 0005 §10). No migration step: a 0.5.0 model
+    * has a segment only where it has a summary, so a lift could mint the segment's claim but not
+    * say what the summary's absence was absent for, and a 0.5.0 model with no segments cannot be
+    * told from one whose text had no situations.
     */
-  val SchemaVersion: String = "0.5.0"
+  val SchemaVersion: String = "0.6.0"
 
   def draft(
       source: StorySource,

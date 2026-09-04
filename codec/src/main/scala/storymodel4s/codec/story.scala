@@ -193,11 +193,38 @@ object StoryCodecs:
   given Encoder[SegmentKind] = enumEncoder(_.toString)
   given Decoder[SegmentKind] = enumDecoder("SegmentKind", SegmentKind.values, _.toString)
 
+  given Encoder[SummaryGap] = Encoder.instance(_.render.asJson)
+  given Decoder[SummaryGap] = Decoder[String].emap {
+    case "not-proposed" => Right(SummaryGap.NotProposed)
+    case "not-accepted" => Right(SummaryGap.NotAccepted)
+    case "not-emitted"  => Right(SummaryGap.NotEmitted)
+    case o              => Left(s"unknown SummaryGap $o")
+  }
+
+  /** Why an absent summary is a tagged object and not an absent field: as with [[ContextHolder]], a
+    * summary the compiler could not derive and a summary a writer left out must not share a wire
+    * shape.
+    */
+  given Encoder[SegmentSummary] = Encoder.instance {
+    case SegmentSummary.Stated(r) =>
+      Json.obj("summary" -> "stated".asJson, "value" -> r.asJson)
+    case SegmentSummary.Unsummarized(gap) =>
+      Json.obj("summary" -> "unsummarized".asJson, "gap" -> gap.asJson)
+  }
+  given Decoder[SegmentSummary] = Decoder.instance { c =>
+    field[String](c, "summary").flatMap {
+      case "stated"       => field[Resolved[String]](c, "value").map(SegmentSummary.Stated(_))
+      case "unsummarized" => field[SummaryGap](c, "gap").map(SegmentSummary.Unsummarized(_))
+      case o              => Left(DecodingFailure(s"unknown SegmentSummary tag $o", c.history))
+    }
+  }
+
   given Encoder[SegmentNode] = Encoder.instance { s =>
     Json.obj(
       "id" -> s.id.asJson,
       "kind" -> s.kind.asJson,
       "level" -> s.level.asJson,
+      "meta" -> s.meta.asJson,
       "summary" -> s.summary.asJson,
       "support" -> s.support.asJson
     )
@@ -207,9 +234,10 @@ object StoryCodecs:
       id <- field[SegmentId](c, "id")
       k <- field[SegmentKind](c, "kind")
       l <- field[Int](c, "level")
-      s <- field[Resolved[String]](c, "summary")
+      m <- field[ClaimMeta](c, "meta")
+      s <- field[SegmentSummary](c, "summary")
       su <- field[SpanSet](c, "support")
-    yield SegmentNode(id, k, l, s, su)
+    yield SegmentNode(id, k, l, m, s, su)
   }
 
   given Encoder[HolderGap] = Encoder.instance(_.render.asJson)

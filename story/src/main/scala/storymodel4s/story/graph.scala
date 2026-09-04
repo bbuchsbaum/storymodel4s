@@ -158,7 +158,7 @@ final case class NarrativeGraph(
   def allMeta: Vector[ClaimMeta] =
     entities.values.toVector.flatMap(e => e.meta +: e.label.meta +: e.attributes.map(_.meta)) ++
       situations.values.toVector.map(_.meta) ++
-      segments.values.toVector.map(_.summary.meta) ++
+      segments.values.toVector.flatMap(s => s.meta +: s.summary.stated.map(_.meta).toVector) ++
       contexts.values.toVector.map(_.meta) ++
       relations.allMeta
 
