@@ -152,7 +152,8 @@ final class LayerUse private (
   /** Canonical one-line rendering for provenance; sorted, so independent of set iteration. */
   def render: String =
     def names[A](xs: Set[A]): String = xs.toVector.map(_.toString).sorted.mkString(",")
-    def prob(p: Double): String = String.format(java.util.Locale.ROOT, "%.4f", p)
+    def prob(p: Double): String =
+      BigDecimal(p).setScale(4, BigDecimal.RoundingMode.HALF_UP).bigDecimal.toPlainString
     s"layers=[${names(layersRead)}] positions=$positionsRead " +
       s"weighted=[${names(weighted)}] withheld=[${names(withheld)}] " +
       s"external=[pIn=${prob(externalIn)},pStay=${prob(externalStay)}]"
