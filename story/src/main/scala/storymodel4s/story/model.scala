@@ -160,8 +160,18 @@ object StoryModel:
     * has a segment only where it has a summary, so a lift could mint the segment's claim but not
     * say what the summary's absence was absent for, and a 0.5.0 model with no segments cannot be
     * told from one whose text had no situations.
+    *
+    * Moved 0.6.0 -> 0.7.0 when `RecallUnit.evidence` began to be written at all. No migration step:
+    * a 0.6.0 artifact cannot distinguish a unit that genuinely carried no chart from one whose
+    * chart the encoder discarded, so reading it as `None` would assert an absence nobody observed.
+    *
+    * This value and `codec.SchemaVersions.Current` must be equal: the encoder writes the model's
+    * own stamp and the decoder checks the codec's supported list, so a model stamped with one and
+    * read against the other cannot round trip. `CodecSuite` asserts the equality, because nothing
+    * else did and the two constants sat one module apart carrying separate histories of the same
+    * number.
     */
-  val SchemaVersion: String = "0.6.0"
+  val SchemaVersion: String = "0.7.0"
 
   def draft(
       source: StorySource,

@@ -587,16 +587,23 @@ object FeatureCodecs:
   * that a rule-determined value, an unmeasured one, and a calibrated one no longer share a
   * representation (ADR 0010); 0.3.0 is unsupported for the same reason as its predecessors: a 0.3.0
   * model wrote every determined value as a calibrated `1.0`, and the lift would have to decide
-  * which of those were fitted, which none were. 0.5.0 makes a flow step\'s `entityTurnover` an
+  * which of those were fitted, which none were. 0.5.0 makes a flow step's `entityTurnover` an
   * `Estimate` (ADR 0012): a step between situations whose casts are not both resolved carries
-  * `Missing(InputUnresolved)` where 0.4.0 could only write a number, so a 0.4.0 model\'s turnovers
+  * `Missing(InputUnresolved)` where 0.4.0 could only write a number, so a 0.4.0 model's turnovers
   * cannot be told from measured ones and 0.4.0 is unsupported. 0.6.0 gives a segment its own claim
   * and makes its summary a tagged value, stated or a typed absence (ADR 0005 §10): a 0.5.0 model
   * has a segment only where it has a summary, and the lift could not say what an absent summary was
   * absent for, so 0.5.0 is unsupported.
+  *
+  * 0.7.0 writes `RecallUnit.evidence`, which every earlier version silently dropped: the encoder
+  * emitted eight keys and the decoder read eight and let the ninth take its default, so a chart
+  * attached to a unit did not survive one round trip and no round-trip law covered the hole. 0.6.0
+  * is unsupported rather than lifted for the usual reason: a 0.6.0 artifact cannot distinguish a
+  * unit that genuinely carried no chart from one whose chart the defective encoder discarded, so
+  * reading it as `None` would assert an absence nobody observed.
   */
 object SchemaVersions:
-  val Current: String = "0.6.0"
+  val Current: String = "0.7.0"
   val Supported: Vector[String] = Vector(Current)
 
   def check(c: io.circe.HCursor): Decoder.Result[String] =
