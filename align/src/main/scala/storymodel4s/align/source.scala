@@ -269,7 +269,8 @@ final class NodeSummary private (
       outcome,
       cause,
       importance,
-      evidence
+      evidence,
+      propositional
     )
 
   override def equals(other: Any): Boolean = other match

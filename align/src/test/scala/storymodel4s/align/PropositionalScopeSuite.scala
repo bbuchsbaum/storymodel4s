@@ -65,6 +65,29 @@ class PropositionalScopeSuite extends FunSuite:
   private val propositional =
     Set(Facet.Actor, Facet.Action, Facet.Object, Facet.Outcome, Facet.Cause, Facet.Context)
 
+  test("node equality preserves scope when the same content has different fidelity verdicts") {
+    val declared = node(PropositionalScope.Declared)
+    val undeclared = declared.copy(propositional = PropositionalScope.unstated)
+    assertNotEquals(
+      FidelityFacets.assess(sketch, declared),
+      FidelityFacets.assess(sketch, undeclared)
+    )
+    assertNotEquals(declared, undeclared)
+    assertEquals(Set(declared, undeclared).size, 2)
+    assertEquals(undeclared.copy(), undeclared)
+    assertEquals(undeclared.copy().hashCode(), undeclared.hashCode())
+  }
+
+  test("node equality preserves the reason for undeclared propositional scope") {
+    val abstained = node(PropositionalScope.unstated)
+    val missing = abstained.copy(
+      propositional = PropositionalScope.Undeclared(MissingReason.AllMissing)
+    )
+    assertEquals(FidelityFacets.assess(sketch, abstained), FidelityFacets.assess(sketch, missing))
+    assertNotEquals(abstained, missing)
+    assertEquals(Set(abstained, missing).size, 2)
+  }
+
   test("an undeclared view scores no verdict on the facets it cannot support") {
     val report = FidelityFacets.assess(
       sketch,
