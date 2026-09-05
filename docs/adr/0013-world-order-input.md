@@ -110,7 +110,7 @@ changes what is read only through the edges and order it yields.
   as the study declares; the type makes that choice a written one.
 - The collinearity on *Sherlock* is now a declared fact rather than a fabricated one. The double
   weight on a coincident edge is a θ question, not a data question, and belongs to the layer-use
-  ledger and θ provenance slice (ADR 0015, planned).
+  ledger and θ provenance slice (ADR 0016, planned).
 - `provenanceConfig` inherited an existing defect it does not fix: it renders `priorScale=1.0` when
   the environment variable is unset while the run uses `scaledConfig(1.5)`. Recorded for the θ
   provenance slice rather than changed here, so this slice moves no provenance checksum for a

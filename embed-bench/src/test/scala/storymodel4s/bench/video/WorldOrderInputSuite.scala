@@ -154,8 +154,11 @@ class WorldOrderInputSuite extends FunSuite:
   test("the run provenance carries the declaration, so two clocks are two derivations") {
     val declared = built(WorldOrderFixtures.syntheticLinear)
     val unknown = built(WorldOrderInput.Unknown(WorldOrderAbsence.NotSupplied))
-    val a = RecallToVideo.provenanceConfig("lexical", 8, false, None, declared.worldOrder)
-    val b = RecallToVideo.provenanceConfig("lexical", 8, false, None, unknown.worldOrder)
+    val run = RecallOrderControl.LadderRun
+      .of(RecallOrderControl.Ladder.full, 1.5)
+      .fold(e => fail(e), identity)
+    val a = RecallToVideo.provenanceConfig("lexical", 8, false, run, declared.worldOrder)
+    val b = RecallToVideo.provenanceConfig("lexical", 8, false, run, unknown.worldOrder)
     assert(a.contains(s"worldOrder=${declared.worldOrder.render}"), a)
     assert(b.contains("worldOrder=unknown(NotSupplied)"), b)
     assertNotEquals(a, b)
