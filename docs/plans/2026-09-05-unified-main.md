@@ -23,6 +23,15 @@ The pre-unification primary workspace is preserved exactly on
 Festival versions, the mission/vision drafts, and a historical navigation audit. Those drafts
 are preserved for later review; they have not replaced newer code or results on main.
 
-The final full-gate and landing receipts will be attached after validation. Raw logs and study
-outputs remain under `data/study/main-unification-20260905/`. This is local scientific and build
-evidence; it does not complete the pending independent Film Festival annotations/correspondence.
+The clean implementation at `6747bbd3` passed `sbt checkAll`: **5,966 passed, five skipped, zero
+failures or errors**, across 52 test-task totals. All 38 Python tests and the separate final
+`scalafmtCheckAll scalafmtSbtCheck` passed. Receipts are in
+[the evidence directory](../data/sherlock/navigation-ladder-20260905/). The full build used the
+permitted local grakern override at `d736dc565d97f617726bad0a9d1ba2fdeae58dd2`; its unrelated
+README edit remains outside this consolidation. This does not establish a build against the
+remote grakern pin or hosted CI.
+
+The following receipts/tracker commit changes no implementation, test or build input. Incoming
+navigation handoff records and its peer notice are preserved as exact Mote operations. Raw logs
+and study outputs remain under `data/study/main-unification-20260905/`. This does not complete
+the pending independent Film Festival annotations/correspondence.

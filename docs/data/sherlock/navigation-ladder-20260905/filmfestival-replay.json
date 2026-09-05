@@ -1,0 +1,27 @@
+{
+  "elapsedSeconds": 2.9599659999948926,
+  "eligibleUnitsByArm": {
+    "jl-all": 3751,
+    "jl-no-cartoons": 3751
+  },
+  "implementation": {
+    "filmfest_diagnostics.py": "730fe58f093a8b1fe59851ba6fb33fd073368d294872cecf75be224d32122273",
+    "filmfest_gold_film.py": "f5f22a9613069f7762e386bf7917f7ba4a5f3112563bd71c94421ad7c3e3370f",
+    "filmfest_replay.py": "42310029a764a5cd857076319c93699019bbf25f1d0928bb72a59cd617bb6508"
+  },
+  "inputsVerified": 124,
+  "manifestSha256": "8075ce8c93d87e7abfb75851eee115fe711b1f6ab2f85003b87243fc66dd5417",
+  "schema": "storymodel4s.filmfestival.replay-receipt/v1",
+  "tests": {
+    "command": [
+      "/opt/homebrew/opt/python@3.14/bin/python3.14",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "/Users/bbuchsbaum/code/scala/storymodel4s/.worktrees/filmfestival-evaluation/tools/recall-study/tests",
+      "-v"
+    ],
+    "exit": 0
+  }
+}

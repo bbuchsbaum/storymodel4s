@@ -1,0 +1,14 @@
+{
+  "revision": "6747bbd3043f628c41ddb5b55e6388007761ec2a",
+  "command": [
+    "sbt",
+    "-batch",
+    "-J-XX:ActiveProcessorCount=3",
+    "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+    "scalafmtCheckAll",
+    "scalafmtSbtCheck"
+  ],
+  "exitCode": 0,
+  "logSha256": "c405b7cb1eecd4a5a633268a1a1557fd17fde935c51309c37147c161e0b91529",
+  "endingStatus": ""
+}
