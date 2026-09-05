@@ -1,0 +1,46 @@
+{
+  "evidence_class": "LocallyObserved",
+  "gate": {
+    "head": "680ef6e652632fdd22f3410fb3b5e7caa7c80809",
+    "tree": "4fea02e484a89a944ed9113786ff97e56ef6f68a",
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/storymodel4s/.worktrees/feature-grakern-ref",
+      "checkAll"
+    ],
+    "exit": 0,
+    "module_runs": 52,
+    "tests": 5894,
+    "failed": 0,
+    "log_sha256": "3f85b401ea038873ea4f948771285542751f98bee8043f56224abab786c2dadf"
+  },
+  "grakern_revision": "d736dc565d97f617726bad0a9d1ba2fdeae58dd2",
+  "focused_tests": {
+    "unique": 27,
+    "platforms": [
+      "JVM",
+      "Scala.js",
+      "Scala Native"
+    ]
+  },
+  "mutation_ledger": "docs/calibration/2026-09-04-mutations.json",
+  "compiling_mutants_killed": 10,
+  "prior_gate_failure": {
+    "head": "680ef6e652632fdd22f3410fb3b5e7caa7c80809",
+    "tree": "4fea02e484a89a944ed9113786ff97e56ef6f68a",
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/storymodel4s/.worktrees/feature-grakern-ref",
+      "checkAll"
+    ],
+    "exit": 1,
+    "module_runs": 9,
+    "tests": 942,
+    "failed": 1,
+    "log_sha256": "89d431987161fa1e8577db3efb2e56690418455ff8b8d53aac7b0ee9dda8b831"
+  },
+  "recheck": "Unchanged amrInteropNative/testOnly *CanonicalFormSuite passed all 7 tests in 9.374 seconds; full checkAll then passed on the same commit. No assertions or timeouts were relaxed.",
+  "limits": "Synthetic mechanics only. No independent frozen role corpus, empirical calibration result, or production acceptance default is supplied."
+}
