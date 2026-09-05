@@ -1,0 +1,13 @@
+{
+  "command": [
+    "sbt",
+    "-batch",
+    "-J-XX:ActiveProcessorCount=3",
+    "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+    "alignJVM/testOnly storymodel4s.align.DirectedCausalSuite"
+  ],
+  "mutation": "omit CauseToEffect from features",
+  "exitCode": 1,
+  "logSha256": "432d7db10411741203d8a5c6d4b40a3d7450a21e55ddcb28ad950d0c7be43c24",
+  "originalSourceSha256": "d770aa384c3f1ec3d01620da0f70d60087827c203707aeaf0004abd257e9da2e"
+}

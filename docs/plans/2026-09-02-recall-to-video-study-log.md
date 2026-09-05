@@ -865,3 +865,72 @@ reference rendering and reads the sidecar; it is not the durable path.
 anchor the decode moved, the fill accounts for a third. Whether a filled anchor is better or worse
 than the argmax it replaced is exactly what the within-scene human lane can say, and the machine
 lane's 124 primary units can be split by origin the day the human lane is scored.
+
+
+## Navigation ladder readout, 2026-09-05
+
+The handoff `bd-01M1RZB6Z6ZMRMCPXSEFFEE35N` is assessed against saved outputs from the six
+completed arms. The [fixed readout protocol](2026-09-05-navigation-ladder-readout.md) was committed
+before this gold read. All arms contain the same 11 development participants and 1,744 ordered
+recall units. The existing gold rules retain ten participants and 1,499 units, identically in every
+arm. No untouched participant was scored. Inference was reported at `f4ee65b4`; observed logs bind
+the rung, theta fingerprint and scale 1.5. The full control matches **all 11** `monofill-dev` reports
+byte-for-byte, extending the handoff's single-participant check.
+
+| Arm | Scene-exact | Within one | Paired scene-exact change versus full, pp [95% CI] |
+| --- | ---: | ---: | --- |
+| `ladder-full` | 65.24% | 82.66% | reference |
+| `ladder-content` | 65.64% | 83.72% | +0.55 [-1.28, +2.55] |
+| `ladder-hierarchy` | 65.64% | 83.72% | +0.55 [-1.28, +2.55] |
+| `ladder-order` | 65.24% | 82.66% | +0.00 [+0.00, +0.00] |
+| `ladder-causality` | 65.24% | 82.66% | +0.00 [+0.00, +0.00] |
+| `ladder-similarity` | 65.24% | 82.66% | +0.00 [+0.00, +0.00] |
+| `chosen-shuffled-dev` | 38.36% | 47.50% | -23.61 [-28.11, -18.70] |
+| `prior0-chosen-dev` | 35.22% | 44.23% | -26.72 [-31.40, -21.70] |
+
+Accuracy is pooled over eligible units. Paired changes are participant-macro differences, with
+2,000 participant bootstrap draws, seed 20260902; they are not differences between pooled rates.
+The complete per-participant values and pooled-accuracy intervals are in the
+[bound readout](../data/sherlock/navigation-ladder-20260905/results.json). A separate raw-CSV
+Decimal interval oracle agrees with every legacy gold label and denominator.
+
+**The ladder does not establish a gain from the added transition features on this source.**
+Content and hierarchy have the same scene scores, despite different posterior summaries; their
++0.55-point paired difference from full has an interval spanning zero. Order, causality, similarity
+and full have byte-identical reports for all eleven participants. Similarity and full also share
+the same theta fingerprint: that pair is a duplicate-configuration check. The timed source has no
+causal, entity-continuity or semantic adjacency, and the directed causal weights are zero. These
+nulls do not test the value of those relations when supplied by a semantic source.
+
+Every rung retains the existing scene-monotone decoder and fill, including content. Thus the
+content rung is not an end-to-end order-free baseline. External logits remain at their shipped
+values throughout; +external and +sensory are still named gaps. No default is changed or selected.
+
+**The historical controls are descriptive baselines.** `chosen-shuffled-dev` retains every recall
+unit in its original order and is byte-identical to the unshuffled `blend080-lemmas-dev` reports.
+Its shuffle did not operate. `prior0-chosen-dev` predates scene-monotone decoding and fill; its
+contrast against the current full arm changes multiple components and cannot isolate the prior.
+The large historical contrasts in the table therefore do not establish gains from the ladder.
+
+**Gold-free outcomes were read first.** Full has mean participant Kendall tau 0.9555, median-mass
+concentration 0.1250, source mass 0.6843 and localizability 0.6635. Content gives 0.9541, 0.1038,
+0.6653 and 0.6538; hierarchy gives 0.9539, 0.1036, 0.6642 and 0.6534. The larger posterior
+concentration under full does not translate to better scene accuracy here. On 354 fixed
+cross-participant text pairs, content/hierarchy have median localization gap 69.5 s versus full's
+92.0 s. The [agreement output](../data/sherlock/navigation-ladder-20260905/agreement.txt) retains
+its warning: pair-resampled intervals are descriptive, and a constant anchor attains zero gap.
+This is not independent evidence of localization accuracy.
+
+**Gold ledger:** seven additional exploratory development contrasts were fixed before this read,
+including the identical arms and the two descriptive historical baselines. This brings the nine
+scene-gold contrasts recorded above to **16**. The separate
+[risk–coverage readout](2026-09-04-risk-coverage-results.md) records one additional analysis of
+its own; it is not silently absorbed into this scene-contrast count. No new confirmation read.
+
+**Reproduction:** `python3 tools/recall-study/score_ladder.py DATA_ROOT NEW_OUTPUT_DIRECTORY`.
+The receipt binds 332 inputs, four scoring implementations and the agreement output. The feature
+pin now excludes exactly the two external logits from the declared enum; omitting CauseToEffect
+kills its named assertion while the three sibling tests pass. The same integration corrected
+NodeSummary equality to retain propositional scope and replaced the ledger's unsupported
+Scala.js locale formatter without changing its pinned four-decimal output. Full consolidation
+evidence is recorded in [the unification report](2026-09-05-unified-main.md).

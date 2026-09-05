@@ -1,0 +1,1843 @@
+{
+  "agreementLogSha256": "a701c7c881ee659c3880590120c0ee6f67d1555b8c90707c97ae7631a2bc273d",
+  "commands": [
+    [
+      "/opt/homebrew/opt/python@3.14/bin/python3.14",
+      "/Users/bbuchsbaum/code/scala/storymodel4s/.worktrees/filmfestival-evaluation/tools/recall-study/agreement.py",
+      "ladder-full",
+      "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/recall-to-video/ladder-full",
+      "ladder-content",
+      "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/recall-to-video/ladder-content",
+      "ladder-hierarchy",
+      "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/recall-to-video/ladder-hierarchy",
+      "ladder-order",
+      "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/recall-to-video/ladder-order",
+      "ladder-causality",
+      "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/recall-to-video/ladder-causality",
+      "ladder-similarity",
+      "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/recall-to-video/ladder-similarity",
+      "chosen-shuffled-dev",
+      "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/recall-to-video/chosen-shuffled-dev",
+      "prior0-chosen-dev",
+      "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/recall-to-video/prior0-chosen-dev"
+    ]
+  ],
+  "contrastsVersusFull": {
+    "chosen-shuffled-dev": {
+      "sceneExact": {
+        "ci95": [
+          -28.10596120875265,
+          -18.698260367053514
+        ],
+        "meanChangePP": -23.614503950296246,
+        "perParticipantChangePP": {
+          "NN03_ANT_202231_final": -25.641025641025635,
+          "NN04_ATE_163931_final": -10.465116279069768,
+          "NN06_SQT_213031_final": -19.0,
+          "NN07_SKS_213031_final": -15.555555555555557,
+          "NN08_OLZ_224031_final": -23.376623376623378,
+          "NN11_NMA_233131_final": -20.161290322580644,
+          "NN13_DII_241731_final": -33.333333333333336,
+          "NN15_DBF_242231_final": -26.25,
+          "NN16_DBN_242731_final": -26.582278481012658,
+          "NN17_DBE_242331_final": -35.779816513761475
+        }
+      },
+      "withinOne": {
+        "ci95": [
+          -36.66348843033099,
+          -26.138167412097257
+        ],
+        "meanChangePP": -31.866309361433117,
+        "perParticipantChangePP": {
+          "NN03_ANT_202231_final": -39.743589743589745,
+          "NN04_ATE_163931_final": -23.25581395348837,
+          "NN06_SQT_213031_final": -31.0,
+          "NN07_SKS_213031_final": -13.333333333333336,
+          "NN08_OLZ_224031_final": -33.76623376623377,
+          "NN11_NMA_233131_final": -35.48387096774193,
+          "NN13_DII_241731_final": -37.95379537953796,
+          "NN15_DBF_242231_final": -28.75,
+          "NN16_DBN_242731_final": -31.64556962025317,
+          "NN17_DBE_242331_final": -43.7308868501529
+        }
+      }
+    },
+    "ladder-causality": {
+      "sceneExact": {
+        "ci95": [
+          0.0,
+          0.0
+        ],
+        "meanChangePP": 0.0,
+        "perParticipantChangePP": {
+          "NN03_ANT_202231_final": 0.0,
+          "NN04_ATE_163931_final": 0.0,
+          "NN06_SQT_213031_final": 0.0,
+          "NN07_SKS_213031_final": 0.0,
+          "NN08_OLZ_224031_final": 0.0,
+          "NN11_NMA_233131_final": 0.0,
+          "NN13_DII_241731_final": 0.0,
+          "NN15_DBF_242231_final": 0.0,
+          "NN16_DBN_242731_final": 0.0,
+          "NN17_DBE_242331_final": 0.0
+        }
+      },
+      "withinOne": {
+        "ci95": [
+          0.0,
+          0.0
+        ],
+        "meanChangePP": 0.0,
+        "perParticipantChangePP": {
+          "NN03_ANT_202231_final": 0.0,
+          "NN04_ATE_163931_final": 0.0,
+          "NN06_SQT_213031_final": 0.0,
+          "NN07_SKS_213031_final": 0.0,
+          "NN08_OLZ_224031_final": 0.0,
+          "NN11_NMA_233131_final": 0.0,
+          "NN13_DII_241731_final": 0.0,
+          "NN15_DBF_242231_final": 0.0,
+          "NN16_DBN_242731_final": 0.0,
+          "NN17_DBE_242331_final": 0.0
+        }
+      }
+    },
+    "ladder-content": {
+      "sceneExact": {
+        "ci95": [
+          -1.2829441010041536,
+          2.5460539992318965
+        ],
+        "meanChangePP": 0.5534135642138786,
+        "perParticipantChangePP": {
+          "NN03_ANT_202231_final": 1.923076923076927,
+          "NN04_ATE_163931_final": -1.1627906976744171,
+          "NN06_SQT_213031_final": -2.0,
+          "NN07_SKS_213031_final": 2.2222222222222214,
+          "NN08_OLZ_224031_final": 5.844155844155836,
+          "NN11_NMA_233131_final": 4.838709677419359,
+          "NN13_DII_241731_final": 1.3201320132013166,
+          "NN15_DBF_242231_final": -1.25,
+          "NN16_DBN_242731_final": -2.5316455696202524,
+          "NN17_DBE_242331_final": -3.6697247706422047
+        }
+      },
+      "withinOne": {
+        "ci95": [
+          0.09454720331459185,
+          3.281528417818741
+        ],
+        "meanChangePP": 1.490970751636874,
+        "perParticipantChangePP": {
+          "NN03_ANT_202231_final": 0.0,
+          "NN04_ATE_163931_final": 0.0,
+          "NN06_SQT_213031_final": -1.0,
+          "NN07_SKS_213031_final": 5.555555555555557,
+          "NN08_OLZ_224031_final": 7.142857142857139,
+          "NN11_NMA_233131_final": 1.6129032258064626,
+          "NN13_DII_241731_final": 0.0,
+          "NN15_DBF_242231_final": 1.25,
+          "NN16_DBN_242731_final": 1.2658227848101262,
+          "NN17_DBE_242331_final": -0.9174311926605441
+        }
+      }
+    },
+    "ladder-hierarchy": {
+      "sceneExact": {
+        "ci95": [
+          -1.2829441010041536,
+          2.5460539992318965
+        ],
+        "meanChangePP": 0.5534135642138786,
+        "perParticipantChangePP": {
+          "NN03_ANT_202231_final": 1.923076923076927,
+          "NN04_ATE_163931_final": -1.1627906976744171,
+          "NN06_SQT_213031_final": -2.0,
+          "NN07_SKS_213031_final": 2.2222222222222214,
+          "NN08_OLZ_224031_final": 5.844155844155836,
+          "NN11_NMA_233131_final": 4.838709677419359,
+          "NN13_DII_241731_final": 1.3201320132013166,
+          "NN15_DBF_242231_final": -1.25,
+          "NN16_DBN_242731_final": -2.5316455696202524,
+          "NN17_DBE_242331_final": -3.6697247706422047
+        }
+      },
+      "withinOne": {
+        "ci95": [
+          0.09454720331459185,
+          3.281528417818741
+        ],
+        "meanChangePP": 1.490970751636874,
+        "perParticipantChangePP": {
+          "NN03_ANT_202231_final": 0.0,
+          "NN04_ATE_163931_final": 0.0,
+          "NN06_SQT_213031_final": -1.0,
+          "NN07_SKS_213031_final": 5.555555555555557,
+          "NN08_OLZ_224031_final": 7.142857142857139,
+          "NN11_NMA_233131_final": 1.6129032258064626,
+          "NN13_DII_241731_final": 0.0,
+          "NN15_DBF_242231_final": 1.25,
+          "NN16_DBN_242731_final": 1.2658227848101262,
+          "NN17_DBE_242331_final": -0.9174311926605441
+        }
+      }
+    },
+    "ladder-order": {
+      "sceneExact": {
+        "ci95": [
+          0.0,
+          0.0
+        ],
+        "meanChangePP": 0.0,
+        "perParticipantChangePP": {
+          "NN03_ANT_202231_final": 0.0,
+          "NN04_ATE_163931_final": 0.0,
+          "NN06_SQT_213031_final": 0.0,
+          "NN07_SKS_213031_final": 0.0,
+          "NN08_OLZ_224031_final": 0.0,
+          "NN11_NMA_233131_final": 0.0,
+          "NN13_DII_241731_final": 0.0,
+          "NN15_DBF_242231_final": 0.0,
+          "NN16_DBN_242731_final": 0.0,
+          "NN17_DBE_242331_final": 0.0
+        }
+      },
+      "withinOne": {
+        "ci95": [
+          0.0,
+          0.0
+        ],
+        "meanChangePP": 0.0,
+        "perParticipantChangePP": {
+          "NN03_ANT_202231_final": 0.0,
+          "NN04_ATE_163931_final": 0.0,
+          "NN06_SQT_213031_final": 0.0,
+          "NN07_SKS_213031_final": 0.0,
+          "NN08_OLZ_224031_final": 0.0,
+          "NN11_NMA_233131_final": 0.0,
+          "NN13_DII_241731_final": 0.0,
+          "NN15_DBF_242231_final": 0.0,
+          "NN16_DBN_242731_final": 0.0,
+          "NN17_DBE_242331_final": 0.0
+        }
+      }
+    },
+    "ladder-similarity": {
+      "sceneExact": {
+        "ci95": [
+          0.0,
+          0.0
+        ],
+        "meanChangePP": 0.0,
+        "perParticipantChangePP": {
+          "NN03_ANT_202231_final": 0.0,
+          "NN04_ATE_163931_final": 0.0,
+          "NN06_SQT_213031_final": 0.0,
+          "NN07_SKS_213031_final": 0.0,
+          "NN08_OLZ_224031_final": 0.0,
+          "NN11_NMA_233131_final": 0.0,
+          "NN13_DII_241731_final": 0.0,
+          "NN15_DBF_242231_final": 0.0,
+          "NN16_DBN_242731_final": 0.0,
+          "NN17_DBE_242331_final": 0.0
+        }
+      },
+      "withinOne": {
+        "ci95": [
+          0.0,
+          0.0
+        ],
+        "meanChangePP": 0.0,
+        "perParticipantChangePP": {
+          "NN03_ANT_202231_final": 0.0,
+          "NN04_ATE_163931_final": 0.0,
+          "NN06_SQT_213031_final": 0.0,
+          "NN07_SKS_213031_final": 0.0,
+          "NN08_OLZ_224031_final": 0.0,
+          "NN11_NMA_233131_final": 0.0,
+          "NN13_DII_241731_final": 0.0,
+          "NN15_DBF_242231_final": 0.0,
+          "NN16_DBN_242731_final": 0.0,
+          "NN17_DBE_242331_final": 0.0
+        }
+      }
+    },
+    "prior0-chosen-dev": {
+      "sceneExact": {
+        "ci95": [
+          -31.40165216672637,
+          -21.700341369746106
+        ],
+        "meanChangePP": -26.722767637983765,
+        "perParticipantChangePP": {
+          "NN03_ANT_202231_final": -25.0,
+          "NN04_ATE_163931_final": -12.790697674418603,
+          "NN06_SQT_213031_final": -28.0,
+          "NN07_SKS_213031_final": -15.555555555555557,
+          "NN08_OLZ_224031_final": -27.272727272727273,
+          "NN11_NMA_233131_final": -25.0,
+          "NN13_DII_241731_final": -35.973597359735976,
+          "NN15_DBF_242231_final": -27.5,
+          "NN16_DBN_242731_final": -30.379746835443036,
+          "NN17_DBE_242331_final": -39.755351681957194
+        }
+      },
+      "withinOne": {
+        "ci95": [
+          -40.03771930623466,
+          -29.649497460998912
+        ],
+        "meanChangePP": -35.45690019889135,
+        "perParticipantChangePP": {
+          "NN03_ANT_202231_final": -39.743589743589745,
+          "NN04_ATE_163931_final": -25.581395348837205,
+          "NN06_SQT_213031_final": -39.0,
+          "NN07_SKS_213031_final": -16.666666666666664,
+          "NN08_OLZ_224031_final": -34.41558441558442,
+          "NN11_NMA_233131_final": -38.70967741935483,
+          "NN13_DII_241731_final": -42.24422442244225,
+          "NN15_DBF_242231_final": -33.75,
+          "NN16_DBN_242731_final": -37.9746835443038,
+          "NN17_DBE_242331_final": -46.48318042813455
+        }
+      }
+    }
+  },
+  "development": [
+    "NN03_ANT_202231_final",
+    "NN04_ATE_163931_final",
+    "NN05_MUN_151631_final",
+    "NN06_SQT_213031_final",
+    "NN07_SKS_213031_final",
+    "NN08_OLZ_224031_final",
+    "NN11_NMA_233131_final",
+    "NN13_DII_241731_final",
+    "NN15_DBF_242231_final",
+    "NN16_DBN_242731_final",
+    "NN17_DBE_242331_final"
+  ],
+  "implementationSha256": {
+    "agreement.py": "9e9e1254d367975add6fa44a26a4b0ae3db9a86447cd04f8e150e174709db791",
+    "gold_scene.py": "d166c7904755a78dac531fbc3c5a707e3a21a7c57f92d2c7a2f9e448fdd5a38d",
+    "score.py": "d0de615d47b54f321e9a6e41f668f9440e0e969972332e980d34de89eafd3b85",
+    "score_ladder.py": "38446d98c2137d71029a702f841e853f95958115a7751e56e40600c91707b351"
+  },
+  "inputsSha256": {
+    "sherlock/Sherlock_Recall_Scene_n50_Onsets.csv": "68cc307c19cfd429a3bd0eda84ee18d0152c87444d33a79246a7cd64d3763753",
+    "study/recall-to-video/blend080-lemmas-dev/recall-map-NN03_ANT_202231_final.tsv": "e6d6b33d011932a11f881a4ce5b9a205b6ca4563c774b0dfec182f3beda98684",
+    "study/recall-to-video/blend080-lemmas-dev/recall-map-NN04_ATE_163931_final.tsv": "420128aa3f72c7f73dd431fd826d295310d34f8faa0b66c7fc3d7f11bdd12d92",
+    "study/recall-to-video/blend080-lemmas-dev/recall-map-NN05_MUN_151631_final.tsv": "497688b0800a5f6858b11304a7fc45d719fe70277ddd7ce6c220d84722339b48",
+    "study/recall-to-video/blend080-lemmas-dev/recall-map-NN06_SQT_213031_final.tsv": "f5cd7fe1be9ed8a1d08135611a7bc0830de0e522fec6e2bcd99c4f7dda420d6e",
+    "study/recall-to-video/blend080-lemmas-dev/recall-map-NN07_SKS_213031_final.tsv": "adef7c1564bcbf094895343e953227f6f98e9af7e39431c159372e1d13ffbfd9",
+    "study/recall-to-video/blend080-lemmas-dev/recall-map-NN08_OLZ_224031_final.tsv": "e4ec9fe3469f7fb4fe5347711c113a8ed168c1f3552217f34bc7a8761acc858f",
+    "study/recall-to-video/blend080-lemmas-dev/recall-map-NN11_NMA_233131_final.tsv": "bb14eff47cbe5213416193f8ec64344f026de6b1e4178901ce1f035fe6763848",
+    "study/recall-to-video/blend080-lemmas-dev/recall-map-NN13_DII_241731_final.tsv": "eadd8a2f272e82af2065ec5e81fd8f9534d722b1e7d987c61a628b12f0b83372",
+    "study/recall-to-video/blend080-lemmas-dev/recall-map-NN15_DBF_242231_final.tsv": "fddff458c34fe20c702b1a1903ca27d0fb3f388120f385749f9cda299463471c",
+    "study/recall-to-video/blend080-lemmas-dev/recall-map-NN16_DBN_242731_final.tsv": "2eca978ed90aa06f63a1be58e17d04751cf9883445ab9c18bdb2be9879c22095",
+    "study/recall-to-video/blend080-lemmas-dev/recall-map-NN17_DBE_242331_final.tsv": "88527124323b67aaab5da6d37b326ad4070c3850951557176184a60c34afcaa7",
+    "study/recall-to-video/chosen-shuffled-dev/NN03_ANT_202231_final.log": "7e1cce12104d85bb13d2bb5cd9ac79daa57e2cb907df4598b1995c07b9bde7d6",
+    "study/recall-to-video/chosen-shuffled-dev/NN04_ATE_163931_final.log": "c6e54f29583791932a63ce284d5a24c67cc65488f84491e71225bc99fb7f9ef0",
+    "study/recall-to-video/chosen-shuffled-dev/NN05_MUN_151631_final.log": "c5ec13c96cc2668a9f95e4a0ceb79ac9d9845a38bb3484008c6882e2b9da2201",
+    "study/recall-to-video/chosen-shuffled-dev/NN06_SQT_213031_final.log": "00b6b46f50bc90a76f8bb43f323e208ade04190731d608bc8592e0f2d37dc756",
+    "study/recall-to-video/chosen-shuffled-dev/NN07_SKS_213031_final.log": "adbf062f3d908c6f01d58ec0268fbe7c681c3659a56efbbd74b444229a722810",
+    "study/recall-to-video/chosen-shuffled-dev/NN08_OLZ_224031_final.log": "9245463c1513cd9a7693ff9e5bbf2512548a25dbb3d8765b42b35e4304f40792",
+    "study/recall-to-video/chosen-shuffled-dev/NN11_NMA_233131_final.log": "b9fa7552c5f9f82dcacf7c7962b64d1b6968444b46d1f89cd114cac594db8a08",
+    "study/recall-to-video/chosen-shuffled-dev/NN13_DII_241731_final.log": "10b6c04fd4b8ad7bb6a39c91feecdcdad655cad5dca08b6dcd97ad08e3305ce6",
+    "study/recall-to-video/chosen-shuffled-dev/NN15_DBF_242231_final.log": "f8984899a270d4c517b32f66963330ce175d244ff8d39303609ed948da14f0a6",
+    "study/recall-to-video/chosen-shuffled-dev/NN16_DBN_242731_final.log": "ea26da5e8146e3e9451f393ad5be1ed409a42f59f82726bc6e79b13d738897e6",
+    "study/recall-to-video/chosen-shuffled-dev/NN17_DBE_242331_final.log": "93a233e92d77885d556ebc25733acc23d25827f609089943be9243bc92adfe3f",
+    "study/recall-to-video/chosen-shuffled-dev/recall-map-NN03_ANT_202231_final.tsv": "e6d6b33d011932a11f881a4ce5b9a205b6ca4563c774b0dfec182f3beda98684",
+    "study/recall-to-video/chosen-shuffled-dev/recall-map-NN04_ATE_163931_final.tsv": "420128aa3f72c7f73dd431fd826d295310d34f8faa0b66c7fc3d7f11bdd12d92",
+    "study/recall-to-video/chosen-shuffled-dev/recall-map-NN05_MUN_151631_final.tsv": "497688b0800a5f6858b11304a7fc45d719fe70277ddd7ce6c220d84722339b48",
+    "study/recall-to-video/chosen-shuffled-dev/recall-map-NN06_SQT_213031_final.tsv": "f5cd7fe1be9ed8a1d08135611a7bc0830de0e522fec6e2bcd99c4f7dda420d6e",
+    "study/recall-to-video/chosen-shuffled-dev/recall-map-NN07_SKS_213031_final.tsv": "adef7c1564bcbf094895343e953227f6f98e9af7e39431c159372e1d13ffbfd9",
+    "study/recall-to-video/chosen-shuffled-dev/recall-map-NN08_OLZ_224031_final.tsv": "e4ec9fe3469f7fb4fe5347711c113a8ed168c1f3552217f34bc7a8761acc858f",
+    "study/recall-to-video/chosen-shuffled-dev/recall-map-NN11_NMA_233131_final.tsv": "bb14eff47cbe5213416193f8ec64344f026de6b1e4178901ce1f035fe6763848",
+    "study/recall-to-video/chosen-shuffled-dev/recall-map-NN13_DII_241731_final.tsv": "eadd8a2f272e82af2065ec5e81fd8f9534d722b1e7d987c61a628b12f0b83372",
+    "study/recall-to-video/chosen-shuffled-dev/recall-map-NN15_DBF_242231_final.tsv": "fddff458c34fe20c702b1a1903ca27d0fb3f388120f385749f9cda299463471c",
+    "study/recall-to-video/chosen-shuffled-dev/recall-map-NN16_DBN_242731_final.tsv": "2eca978ed90aa06f63a1be58e17d04751cf9883445ab9c18bdb2be9879c22095",
+    "study/recall-to-video/chosen-shuffled-dev/recall-map-NN17_DBE_242331_final.tsv": "88527124323b67aaab5da6d37b326ad4070c3850951557176184a60c34afcaa7",
+    "study/recall-to-video/ladder-causality/NN03_ANT_202231_final.log": "dac07323fcb42ba3cc361f6beaa4f026a51597fcab81fb07e7cea2c2423b081a",
+    "study/recall-to-video/ladder-causality/NN04_ATE_163931_final.log": "13f9bcd5f312694f0b0b3f9f756ec795fd319bee8cf70de76bf399c713d31d61",
+    "study/recall-to-video/ladder-causality/NN05_MUN_151631_final.log": "7ffa90b4e82422a29617400234bb56e638833b7a1442232cb867b21ec8d08f2a",
+    "study/recall-to-video/ladder-causality/NN06_SQT_213031_final.log": "db5458ed7fb718ae0784cba6a1c2835defb07bb11ed4fcbb3b27eb749585ea8a",
+    "study/recall-to-video/ladder-causality/NN07_SKS_213031_final.log": "8b7aaa825cb5b3b151b06709f0278590eb3b1a75b22f3f808b826d98949408d5",
+    "study/recall-to-video/ladder-causality/NN08_OLZ_224031_final.log": "e4bbef433949687f855de84ba34ee134a2e268f1547c258c9e78fef5db482ab2",
+    "study/recall-to-video/ladder-causality/NN11_NMA_233131_final.log": "07c15ccf64319b376bf28ba53ce533601a169d68611db394dfa7f45621e001d9",
+    "study/recall-to-video/ladder-causality/NN13_DII_241731_final.log": "4008cc45bfefe1e99b33a656f6d56e1709bf0037e477203f8d8e4d463535ed08",
+    "study/recall-to-video/ladder-causality/NN15_DBF_242231_final.log": "807a1cce0f5ef6320029e12e88df2839557ed1c3e0023ebb766d199ce9e6aa7c",
+    "study/recall-to-video/ladder-causality/NN16_DBN_242731_final.log": "61135ad46cc23a59d2c9d34588707e192097253ed79ca12d2cd0f88d531c16df",
+    "study/recall-to-video/ladder-causality/NN17_DBE_242331_final.log": "c360838cc03c41389866f896f2d1f277ece9acc62bfd8fc61e33ba9931c10fc1",
+    "study/recall-to-video/ladder-causality/recall-map-NN03_ANT_202231_final.tsv": "528ceb1b1e84ddca9f0ef3395b1047929d60cc1bccac22fb0dcc3c67273aafc7",
+    "study/recall-to-video/ladder-causality/recall-map-NN03_ANT_202231_final.tsv.posterior.json": "cc26b5607c5bf60489786330f6478b417481e2fb84eba551acfc03cce1d7fcee",
+    "study/recall-to-video/ladder-causality/recall-map-NN03_ANT_202231_final.tsv.voyage.json": "39f6a0e7eb6eb1752eda88d7e81c15d3bd5d47ce01ca21cf24786dcaab494ef3",
+    "study/recall-to-video/ladder-causality/recall-map-NN04_ATE_163931_final.tsv": "62ae132895d22258a082e59fad5b416a2ad4964e33336c656218c752dff30b3d",
+    "study/recall-to-video/ladder-causality/recall-map-NN04_ATE_163931_final.tsv.posterior.json": "0dcb9b1d9e60e8981a3827db66578440babfadc6251c4c82b6380893d5594454",
+    "study/recall-to-video/ladder-causality/recall-map-NN04_ATE_163931_final.tsv.voyage.json": "fe652542896daf924fb0d8ffd0307efd7922caac1ca16fe048ff5ff23246d855",
+    "study/recall-to-video/ladder-causality/recall-map-NN05_MUN_151631_final.tsv": "624c9a485aa9a432a248496ba252107828799000e0b17de121381f0b8d3fa991",
+    "study/recall-to-video/ladder-causality/recall-map-NN05_MUN_151631_final.tsv.posterior.json": "73a51228d81e4cac8f300d809e6dcd69213a1b57df173ae602c60ed149ed3aca",
+    "study/recall-to-video/ladder-causality/recall-map-NN05_MUN_151631_final.tsv.voyage.json": "3f0dd1b83b92feb98ee487d6c640d8b31cdd85574e0b31e40c59fb7e9d7648b7",
+    "study/recall-to-video/ladder-causality/recall-map-NN06_SQT_213031_final.tsv": "f492d3fc50a00db8982b117b81847e6ca8a48d1b69b8e59706a4576dcc178b20",
+    "study/recall-to-video/ladder-causality/recall-map-NN06_SQT_213031_final.tsv.posterior.json": "5d04fe142119901bafeff09927466a6c8a51982df1cff07540da153f350d043e",
+    "study/recall-to-video/ladder-causality/recall-map-NN06_SQT_213031_final.tsv.voyage.json": "ea032d482d8e6822ee9d7784a16b5e52a7b03df9873b4e7d791fae7f3fca3524",
+    "study/recall-to-video/ladder-causality/recall-map-NN07_SKS_213031_final.tsv": "1021559fda33eb74c3056b5180e1e039b5e68c9e5b3d67bc36764ccbe3fd6b40",
+    "study/recall-to-video/ladder-causality/recall-map-NN07_SKS_213031_final.tsv.posterior.json": "9dc22a1254ad3ad2cad4768fbb60d2a1fac9f08388bed75cc807e7a4fb0215e8",
+    "study/recall-to-video/ladder-causality/recall-map-NN07_SKS_213031_final.tsv.voyage.json": "3b3ae8058056265d3e04a73016d4d76548d6a46af3f51e27686b7ee3e2f08614",
+    "study/recall-to-video/ladder-causality/recall-map-NN08_OLZ_224031_final.tsv": "bed8711b5bf7d748e8d457a1da7e5c005e935b6034ab4d7e0a520a8dfcccab1e",
+    "study/recall-to-video/ladder-causality/recall-map-NN08_OLZ_224031_final.tsv.posterior.json": "de495276f95b93bb9d4db7d909c804a682b71d55ca3d0d2c2b44f4b9e18432c1",
+    "study/recall-to-video/ladder-causality/recall-map-NN08_OLZ_224031_final.tsv.voyage.json": "9880b3a9326e8dffad44374dbe980347d3f71ed5c047f41a3103737ad0eeb5ed",
+    "study/recall-to-video/ladder-causality/recall-map-NN11_NMA_233131_final.tsv": "5baa44ff49666c7da813dfcb526c8b28cf0d232ed4f18252da0749e2fe89b7e6",
+    "study/recall-to-video/ladder-causality/recall-map-NN11_NMA_233131_final.tsv.posterior.json": "efa1c50ab7863c28c454ff00e521038d9c5930e3c86ddaac0e6b1f2ee41e7d2b",
+    "study/recall-to-video/ladder-causality/recall-map-NN11_NMA_233131_final.tsv.voyage.json": "021077646f16b109c9b001cd574e08657eab1b1e1c4cff1927199b38119094fc",
+    "study/recall-to-video/ladder-causality/recall-map-NN13_DII_241731_final.tsv": "12f3a99ac87710edab1146f275df2ee546c1050ebaac205df3edc298884dfee7",
+    "study/recall-to-video/ladder-causality/recall-map-NN13_DII_241731_final.tsv.posterior.json": "6fc9a5c1e97b029936fb0e56f5d4310ba14094173d249a8b9db1d48860176581",
+    "study/recall-to-video/ladder-causality/recall-map-NN13_DII_241731_final.tsv.voyage.json": "5016123daaf5fb60b48b671c2615ae91aaf1e4a5e01577a1def6561e7e35b6e2",
+    "study/recall-to-video/ladder-causality/recall-map-NN15_DBF_242231_final.tsv": "48c8d400b8d2a64815e62d4a849357462c1f249777931d55e86ff0cf57c2dc98",
+    "study/recall-to-video/ladder-causality/recall-map-NN15_DBF_242231_final.tsv.posterior.json": "2a15575efadc853d554da0e4e194cb1132e46a38abbd4ac94bf73a2148498250",
+    "study/recall-to-video/ladder-causality/recall-map-NN15_DBF_242231_final.tsv.voyage.json": "0b4e5bb5a1452243d92719e11317f19f6241f7fd4536095028003ace8a780251",
+    "study/recall-to-video/ladder-causality/recall-map-NN16_DBN_242731_final.tsv": "3651b3ff48926917603c78c559c20db2da6c68ab19f4d7d2f7971383c5deede3",
+    "study/recall-to-video/ladder-causality/recall-map-NN16_DBN_242731_final.tsv.posterior.json": "0e62ef0dfa23de2bbcdafc379754a77b7491e6d153d017fddb332b77f0abd15a",
+    "study/recall-to-video/ladder-causality/recall-map-NN16_DBN_242731_final.tsv.voyage.json": "407ca0309f923843022752f624b481dee07b6828bce8f4f44a3c97bd40808543",
+    "study/recall-to-video/ladder-causality/recall-map-NN17_DBE_242331_final.tsv": "da27a50661dbb7d9d0a52b2c943070cbf905beca92451e163f51c10b0db63bd0",
+    "study/recall-to-video/ladder-causality/recall-map-NN17_DBE_242331_final.tsv.posterior.json": "6e4d01594dc2d3d7940bba9a4bfb8c5c54bafe5d5a70ff81ae9c8db5cbd61126",
+    "study/recall-to-video/ladder-causality/recall-map-NN17_DBE_242331_final.tsv.voyage.json": "7cfd13f987b2a6176bb577615279b3bd93c4d50a75c341497b64b45c08abf423",
+    "study/recall-to-video/ladder-content/NN03_ANT_202231_final.log": "9b09394d7bcd87a0ac2ac79ff1bb03bbe8616692b89c18e564978db7a9b9c602",
+    "study/recall-to-video/ladder-content/NN04_ATE_163931_final.log": "be049c962121bf7ead4922e79d7aa6319821426e74a78acdb03c06c5cc67343b",
+    "study/recall-to-video/ladder-content/NN05_MUN_151631_final.log": "f05ab83071b9c2f5472c988f79b9a3a15fc410b17287c7ce9f7b0af78bf5ce03",
+    "study/recall-to-video/ladder-content/NN06_SQT_213031_final.log": "b7c18bae3fd0b0a974df40e3e817cc99ea88b8317a7290740d3d3eaec9112f99",
+    "study/recall-to-video/ladder-content/NN07_SKS_213031_final.log": "fac09184e610760049b4a8e1ef2e3778a4485383d4be1190da6c5475bf97dfa2",
+    "study/recall-to-video/ladder-content/NN08_OLZ_224031_final.log": "db77801054c17a1deed265433ba9233aa4e04633c5709456c10d1bb323b74181",
+    "study/recall-to-video/ladder-content/NN11_NMA_233131_final.log": "9f3fcf415d93e6b8bf6dd07e25c5eed803d6a21cec5914fa9f30f104e8d0042e",
+    "study/recall-to-video/ladder-content/NN13_DII_241731_final.log": "2244b3c051956f46dfc9969793d47c200360d5f7c1cc264bc66966e33378353f",
+    "study/recall-to-video/ladder-content/NN15_DBF_242231_final.log": "dadf690ddc35c87e8f5a2f2a90385e16dfb59bfce30a1872a4de300d96e1f0e5",
+    "study/recall-to-video/ladder-content/NN16_DBN_242731_final.log": "6c6d70139f5c2c2bf3dca8e372488f702ff743050de0711370d7ed5f6a7ea601",
+    "study/recall-to-video/ladder-content/NN17_DBE_242331_final.log": "508db7edcc901754dad75da9ab754bba9a579f2dc25dd36441916acbd553c230",
+    "study/recall-to-video/ladder-content/recall-map-NN03_ANT_202231_final.tsv": "fdebbafbab9b991754d920e21e9b104854b560b182d7e87d67b231605c669ba4",
+    "study/recall-to-video/ladder-content/recall-map-NN03_ANT_202231_final.tsv.posterior.json": "7543b49f18fe7b3d23c14d19f00b8b264c9f97105283bbf6b3c397d80f744c3d",
+    "study/recall-to-video/ladder-content/recall-map-NN03_ANT_202231_final.tsv.voyage.json": "f11351f280616d9a4376ba56161c4f1dfd3572041c8a7a4ef03257849d287c37",
+    "study/recall-to-video/ladder-content/recall-map-NN04_ATE_163931_final.tsv": "2255cec37a3dcb3f56b51f9d255da3d520eaa7d11c4ea07944b84b22129ca9b2",
+    "study/recall-to-video/ladder-content/recall-map-NN04_ATE_163931_final.tsv.posterior.json": "f1f972b23e372d2e8739754a8f1df75230d9996c4380967266965ad728231d88",
+    "study/recall-to-video/ladder-content/recall-map-NN04_ATE_163931_final.tsv.voyage.json": "729177cffed51b9a81853e810b7d7278ceef308cdca2a7089330ee5cd7368d02",
+    "study/recall-to-video/ladder-content/recall-map-NN05_MUN_151631_final.tsv": "c170c39d986e6845c1a72ad2254e9ff4d735f5a074f0b0e0a72be4a19caaa4cf",
+    "study/recall-to-video/ladder-content/recall-map-NN05_MUN_151631_final.tsv.posterior.json": "a17ab091741eed21b5f19ea9061a2281ef015afca08a7a871b2ef08db92fb82e",
+    "study/recall-to-video/ladder-content/recall-map-NN05_MUN_151631_final.tsv.voyage.json": "7dd993257b2de2416903a8927252b3e6128082be7e2ab7ead265bc725f1d978d",
+    "study/recall-to-video/ladder-content/recall-map-NN06_SQT_213031_final.tsv": "a23d4b125c64adb7f1bd6fa8824753daf4fcb192010af52fcb489dfbabba96db",
+    "study/recall-to-video/ladder-content/recall-map-NN06_SQT_213031_final.tsv.posterior.json": "d3fa191ec2e4f528f3e157a4033081014926ea69765c9aeece1c99835e506d02",
+    "study/recall-to-video/ladder-content/recall-map-NN06_SQT_213031_final.tsv.voyage.json": "f4ea4ecb1565842c7b2fe7e260016c0b0bf4255182b9a1bc279841a4d9c54896",
+    "study/recall-to-video/ladder-content/recall-map-NN07_SKS_213031_final.tsv": "4527a4ffa0dce0ab0714902219e6444e97a00a98be528539cd143b5d64063ddb",
+    "study/recall-to-video/ladder-content/recall-map-NN07_SKS_213031_final.tsv.posterior.json": "d80461bf49ace78e71a6e9af84578959477b2ab8512c02c132b8efe1dfca12bf",
+    "study/recall-to-video/ladder-content/recall-map-NN07_SKS_213031_final.tsv.voyage.json": "f09dcc1493dee6e960c7d9edf67f30cb97a29fd4e6183d6a5f02df71a50437cd",
+    "study/recall-to-video/ladder-content/recall-map-NN08_OLZ_224031_final.tsv": "d06bf89605dcdf6b9ce16649918d52eb65d51733d57c4008b7be09ff5abd5b9b",
+    "study/recall-to-video/ladder-content/recall-map-NN08_OLZ_224031_final.tsv.posterior.json": "8f212a05d14fcf99d5b23ea12c18ee0e4a4ed74c9ff3d252edde121e79ec0ce8",
+    "study/recall-to-video/ladder-content/recall-map-NN08_OLZ_224031_final.tsv.voyage.json": "b50c0bb19595381b6fa7688fb2c9638bf343d7e78a18f314a7324adbeb3945b6",
+    "study/recall-to-video/ladder-content/recall-map-NN11_NMA_233131_final.tsv": "a2cd91ab9a42be355f89d0b09520dd30b15003d55621cab7bf146ad3ee4a13cd",
+    "study/recall-to-video/ladder-content/recall-map-NN11_NMA_233131_final.tsv.posterior.json": "35968dd7c37c4740d11d28cee29d8071e011f2610f4d8722c06f5dc0696b2582",
+    "study/recall-to-video/ladder-content/recall-map-NN11_NMA_233131_final.tsv.voyage.json": "02d1dec87a67b13f014ceeb8f090b480843395e24857e38d60525b7dd6af98dc",
+    "study/recall-to-video/ladder-content/recall-map-NN13_DII_241731_final.tsv": "df4d2217b632e7192bd8c029b0607bfe14b32ece18340db1b80b6bf20e412eef",
+    "study/recall-to-video/ladder-content/recall-map-NN13_DII_241731_final.tsv.posterior.json": "1d71da93c0c486b112f07d73e02b820a5ba18259826f533f254090a4f27cc5a8",
+    "study/recall-to-video/ladder-content/recall-map-NN13_DII_241731_final.tsv.voyage.json": "90420b0d1a732d4d4ac74ef4aa78af941fbcc35616d67fe836b490964f02aa80",
+    "study/recall-to-video/ladder-content/recall-map-NN15_DBF_242231_final.tsv": "67b1acf2bdd21bb48a2f3c4f4231584a3a992aff4d79a894a08949029ca1e15b",
+    "study/recall-to-video/ladder-content/recall-map-NN15_DBF_242231_final.tsv.posterior.json": "6accb8c7823a281323bb0697a93f0ead072fe85dc6f5ea2cbc63a3151286228e",
+    "study/recall-to-video/ladder-content/recall-map-NN15_DBF_242231_final.tsv.voyage.json": "f30adb253fce3087e2bf8c9c8c2395de148cd50a78ae92471935c67516b509f9",
+    "study/recall-to-video/ladder-content/recall-map-NN16_DBN_242731_final.tsv": "1e60cc2480b6310b59201dcbeb5cc60c0a8bf9f30021af2a10384661828fcf71",
+    "study/recall-to-video/ladder-content/recall-map-NN16_DBN_242731_final.tsv.posterior.json": "c89f574f824426e76192b52817896d567fbdd75ee5d79b2a016c1863c110f2e2",
+    "study/recall-to-video/ladder-content/recall-map-NN16_DBN_242731_final.tsv.voyage.json": "0d33c1982ede9fbf44fe81c88625d5e21b7925fd37cfdf9d7292f18137d08540",
+    "study/recall-to-video/ladder-content/recall-map-NN17_DBE_242331_final.tsv": "315e070e657387cfec7f75f605c3f8c43bae36038e428791d197e4160b64180a",
+    "study/recall-to-video/ladder-content/recall-map-NN17_DBE_242331_final.tsv.posterior.json": "8b440cd601ca16aaddccc6bb93b7e475ccafb2471504ca4f07edce191ff28e7d",
+    "study/recall-to-video/ladder-content/recall-map-NN17_DBE_242331_final.tsv.voyage.json": "8330f6595561a8d4b93eee5f778c3a2599f45af2f0997887957b84551cf87a5c",
+    "study/recall-to-video/ladder-full/NN03_ANT_202231_final.log": "0668a8bb5ec560ca2a51117d8561047668f8da6bd418520f6386444bbd047787",
+    "study/recall-to-video/ladder-full/NN04_ATE_163931_final.log": "3bbc832affcc98c365770b5eed2a7790af22a7e4715b0b156e5ec3542a588456",
+    "study/recall-to-video/ladder-full/NN05_MUN_151631_final.log": "0139a963df425b8e851732a67cc4cf718aaf0f1241aeac458f3aa9bbb2d72524",
+    "study/recall-to-video/ladder-full/NN06_SQT_213031_final.log": "731189a7a9497c2804b5264de98da74deb17e24b3dd11111a978f064b09ce83b",
+    "study/recall-to-video/ladder-full/NN07_SKS_213031_final.log": "cd8273ea0679394173d78bafe8131f2cdcd416ff2981b8184a83284935ad0d8c",
+    "study/recall-to-video/ladder-full/NN08_OLZ_224031_final.log": "c9ab6f1b4aa31efbbbc33385b8567d2d98399f2185fc46ff28ee30db83842211",
+    "study/recall-to-video/ladder-full/NN11_NMA_233131_final.log": "bde72402087463f9b16c62e3af10da1d8e1dacab3397f4f1943454fd7918219e",
+    "study/recall-to-video/ladder-full/NN13_DII_241731_final.log": "947e73a523c3ec27336ff394c736f30b6379fe12f41504d5986aa3d85e892211",
+    "study/recall-to-video/ladder-full/NN15_DBF_242231_final.log": "3ca76d452da4c73e12dc65c0077fdfeca5eddfee00eb23064c366aec3a2d6ccf",
+    "study/recall-to-video/ladder-full/NN16_DBN_242731_final.log": "c46c9d21cbdf09c431c66366c912d0d31381488f40c2a9593281a57d418ef16f",
+    "study/recall-to-video/ladder-full/NN17_DBE_242331_final.log": "7e052b3ae13b7b1caad2d7c9977d47cc4c02588c402916650f9c99e0e7883072",
+    "study/recall-to-video/ladder-full/recall-map-NN03_ANT_202231_final.tsv": "528ceb1b1e84ddca9f0ef3395b1047929d60cc1bccac22fb0dcc3c67273aafc7",
+    "study/recall-to-video/ladder-full/recall-map-NN03_ANT_202231_final.tsv.posterior.json": "cc26b5607c5bf60489786330f6478b417481e2fb84eba551acfc03cce1d7fcee",
+    "study/recall-to-video/ladder-full/recall-map-NN03_ANT_202231_final.tsv.voyage.json": "d2eeb592cf9ac562d174e2430aedff0d157afa36d5e7a1f505f13588d51cb2aa",
+    "study/recall-to-video/ladder-full/recall-map-NN04_ATE_163931_final.tsv": "62ae132895d22258a082e59fad5b416a2ad4964e33336c656218c752dff30b3d",
+    "study/recall-to-video/ladder-full/recall-map-NN04_ATE_163931_final.tsv.posterior.json": "0dcb9b1d9e60e8981a3827db66578440babfadc6251c4c82b6380893d5594454",
+    "study/recall-to-video/ladder-full/recall-map-NN04_ATE_163931_final.tsv.voyage.json": "19f13c3404d7dcaf17a797d23a69105d3fbb2586b192021350988e57faa46188",
+    "study/recall-to-video/ladder-full/recall-map-NN05_MUN_151631_final.tsv": "624c9a485aa9a432a248496ba252107828799000e0b17de121381f0b8d3fa991",
+    "study/recall-to-video/ladder-full/recall-map-NN05_MUN_151631_final.tsv.posterior.json": "73a51228d81e4cac8f300d809e6dcd69213a1b57df173ae602c60ed149ed3aca",
+    "study/recall-to-video/ladder-full/recall-map-NN05_MUN_151631_final.tsv.voyage.json": "466ecc1453d72944b6a071b9a99c2aa79fc4f3d08ac740532d4dad648deec69f",
+    "study/recall-to-video/ladder-full/recall-map-NN06_SQT_213031_final.tsv": "f492d3fc50a00db8982b117b81847e6ca8a48d1b69b8e59706a4576dcc178b20",
+    "study/recall-to-video/ladder-full/recall-map-NN06_SQT_213031_final.tsv.posterior.json": "5d04fe142119901bafeff09927466a6c8a51982df1cff07540da153f350d043e",
+    "study/recall-to-video/ladder-full/recall-map-NN06_SQT_213031_final.tsv.voyage.json": "4b50e68820c2c693887a40ecf6369bae49fc4db14e71b9e5c0e9f5f7fe905ba9",
+    "study/recall-to-video/ladder-full/recall-map-NN07_SKS_213031_final.tsv": "1021559fda33eb74c3056b5180e1e039b5e68c9e5b3d67bc36764ccbe3fd6b40",
+    "study/recall-to-video/ladder-full/recall-map-NN07_SKS_213031_final.tsv.posterior.json": "9dc22a1254ad3ad2cad4768fbb60d2a1fac9f08388bed75cc807e7a4fb0215e8",
+    "study/recall-to-video/ladder-full/recall-map-NN07_SKS_213031_final.tsv.voyage.json": "ed0ef85dddae9d40e87c8fb092912a14ea0289d59c8f36db1215a24929089288",
+    "study/recall-to-video/ladder-full/recall-map-NN08_OLZ_224031_final.tsv": "bed8711b5bf7d748e8d457a1da7e5c005e935b6034ab4d7e0a520a8dfcccab1e",
+    "study/recall-to-video/ladder-full/recall-map-NN08_OLZ_224031_final.tsv.posterior.json": "de495276f95b93bb9d4db7d909c804a682b71d55ca3d0d2c2b44f4b9e18432c1",
+    "study/recall-to-video/ladder-full/recall-map-NN08_OLZ_224031_final.tsv.voyage.json": "bce4ba5ebf5429d6b081aa219dd0cafaa3238a256c546e5c05ce4ef68c5c1211",
+    "study/recall-to-video/ladder-full/recall-map-NN11_NMA_233131_final.tsv": "5baa44ff49666c7da813dfcb526c8b28cf0d232ed4f18252da0749e2fe89b7e6",
+    "study/recall-to-video/ladder-full/recall-map-NN11_NMA_233131_final.tsv.posterior.json": "efa1c50ab7863c28c454ff00e521038d9c5930e3c86ddaac0e6b1f2ee41e7d2b",
+    "study/recall-to-video/ladder-full/recall-map-NN11_NMA_233131_final.tsv.voyage.json": "1a4b7f1d08897f3b7f483ed70aefdf12a7b08edc73b7e5880b6f010021090fbe",
+    "study/recall-to-video/ladder-full/recall-map-NN13_DII_241731_final.tsv": "12f3a99ac87710edab1146f275df2ee546c1050ebaac205df3edc298884dfee7",
+    "study/recall-to-video/ladder-full/recall-map-NN13_DII_241731_final.tsv.posterior.json": "6fc9a5c1e97b029936fb0e56f5d4310ba14094173d249a8b9db1d48860176581",
+    "study/recall-to-video/ladder-full/recall-map-NN13_DII_241731_final.tsv.voyage.json": "a585f648a5c1a6f21f06b02c235c257f7c60c06a73769b2db28366824df8bf04",
+    "study/recall-to-video/ladder-full/recall-map-NN15_DBF_242231_final.tsv": "48c8d400b8d2a64815e62d4a849357462c1f249777931d55e86ff0cf57c2dc98",
+    "study/recall-to-video/ladder-full/recall-map-NN15_DBF_242231_final.tsv.posterior.json": "2a15575efadc853d554da0e4e194cb1132e46a38abbd4ac94bf73a2148498250",
+    "study/recall-to-video/ladder-full/recall-map-NN15_DBF_242231_final.tsv.voyage.json": "7e1666097201851080106b82dd5160965f0df6a6ee3d6977612cbbe4ff097e64",
+    "study/recall-to-video/ladder-full/recall-map-NN16_DBN_242731_final.tsv": "3651b3ff48926917603c78c559c20db2da6c68ab19f4d7d2f7971383c5deede3",
+    "study/recall-to-video/ladder-full/recall-map-NN16_DBN_242731_final.tsv.posterior.json": "0e62ef0dfa23de2bbcdafc379754a77b7491e6d153d017fddb332b77f0abd15a",
+    "study/recall-to-video/ladder-full/recall-map-NN16_DBN_242731_final.tsv.voyage.json": "aabe2fbc0c0d229db597288b3bc1af00ba7f45c94a1b9ecf6ae67fd871fd7085",
+    "study/recall-to-video/ladder-full/recall-map-NN17_DBE_242331_final.tsv": "da27a50661dbb7d9d0a52b2c943070cbf905beca92451e163f51c10b0db63bd0",
+    "study/recall-to-video/ladder-full/recall-map-NN17_DBE_242331_final.tsv.posterior.json": "6e4d01594dc2d3d7940bba9a4bfb8c5c54bafe5d5a70ff81ae9c8db5cbd61126",
+    "study/recall-to-video/ladder-full/recall-map-NN17_DBE_242331_final.tsv.voyage.json": "0be789613b6d754fbff71d78d420034c056e354e2888bf1ff608c90b39b46518",
+    "study/recall-to-video/ladder-hierarchy/NN03_ANT_202231_final.log": "b51baa9414a45fb26a9284bf413194addef2b72d6220d1690966a3975c60bfe2",
+    "study/recall-to-video/ladder-hierarchy/NN04_ATE_163931_final.log": "bce52285dc7a8ea46c0956d373200b51be0d08e9dfbd91d5533edae4694c5c74",
+    "study/recall-to-video/ladder-hierarchy/NN05_MUN_151631_final.log": "388700fcbdca954796854fda629b9e270f2e20f952bf0d0269fa61f6d851bf76",
+    "study/recall-to-video/ladder-hierarchy/NN06_SQT_213031_final.log": "f74009db2b4961646c23e717d237a9448e5fb0b1954680baa9b3fdcf8dbf2cb4",
+    "study/recall-to-video/ladder-hierarchy/NN07_SKS_213031_final.log": "fb691b0392478a26d4b139ad7d7eb01fbea04663008629e3da594cf501e1c6c9",
+    "study/recall-to-video/ladder-hierarchy/NN08_OLZ_224031_final.log": "a29f118fd201eba28028ffce429c1e87cbb5e6171a8babf6049467e1ca0252db",
+    "study/recall-to-video/ladder-hierarchy/NN11_NMA_233131_final.log": "7497ab84a75b2341c4a70272beef2b828377542c98662e36dd63bfa8e3b33099",
+    "study/recall-to-video/ladder-hierarchy/NN13_DII_241731_final.log": "9a3d464776049355f0d8e83fbad633a66eb17aa84c5e9c59c09bf924c4950f44",
+    "study/recall-to-video/ladder-hierarchy/NN15_DBF_242231_final.log": "de7e7de7d35b01cf1af1af52ed5d45c7866f077a6e11f06237faf24f587a7e92",
+    "study/recall-to-video/ladder-hierarchy/NN16_DBN_242731_final.log": "bceb62e7563efcfae6de916bee07eb9683daa7f14c1374c21cd1b45285e264f1",
+    "study/recall-to-video/ladder-hierarchy/NN17_DBE_242331_final.log": "5d6aeecd3fd3c417a4d8efd8018757be9664f97a2118b28121a67b6ecae9d709",
+    "study/recall-to-video/ladder-hierarchy/recall-map-NN03_ANT_202231_final.tsv": "6b891ddc789fd82afad36787effed9583f577f3efc32c7469ec919c86d8066ae",
+    "study/recall-to-video/ladder-hierarchy/recall-map-NN03_ANT_202231_final.tsv.posterior.json": "c2753ba1c05d2d0dbf6b4a5eebef2254110394221373059bf9e95ca3a96236c8",
+    "study/recall-to-video/ladder-hierarchy/recall-map-NN03_ANT_202231_final.tsv.voyage.json": "4fdb5e3567d107337c7f77608b6d973c838da3dedb798fbb1d5747012db5bcd1",
+    "study/recall-to-video/ladder-hierarchy/recall-map-NN04_ATE_163931_final.tsv": "9a50da30979e99d3a616226260ae29d845178fae4bf17ad20a713796cf36219d",
+    "study/recall-to-video/ladder-hierarchy/recall-map-NN04_ATE_163931_final.tsv.posterior.json": "9b8b0496a1c445bc257249d5b102f818c8957335f10607ba6e7316aeb72747f7",
+    "study/recall-to-video/ladder-hierarchy/recall-map-NN04_ATE_163931_final.tsv.voyage.json": "ba8e6648433e752b75e9d6ce802538d7fb577db7938f80892aec5149be962062",
+    "study/recall-to-video/ladder-hierarchy/recall-map-NN05_MUN_151631_final.tsv": "255f7f703163fd1683ca89eaa0cf30c75d8071c769a1dbbf0b139c356d0df0d2",
+    "study/recall-to-video/ladder-hierarchy/recall-map-NN05_MUN_151631_final.tsv.posterior.json": "85e636754db114e076e5f664be35dde79acd7610b71dfd91df01650ee77b61ad",
+    "study/recall-to-video/ladder-hierarchy/recall-map-NN05_MUN_151631_final.tsv.voyage.json": "71e50dfeb7d3e5f60a3fe579f74198d52ac4d5508e864b99af045300c83965d7",
+    "study/recall-to-video/ladder-hierarchy/recall-map-NN06_SQT_213031_final.tsv": "38d727461c704c882729aae5c37d1c63af783d4aea904d856352d19dead2417b",
+    "study/recall-to-video/ladder-hierarchy/recall-map-NN06_SQT_213031_final.tsv.posterior.json": "ffb1dcda49b126566fae11fba382ac63e44ad0ba91007738ded2cc933cb3ad84",
+    "study/recall-to-video/ladder-hierarchy/recall-map-NN06_SQT_213031_final.tsv.voyage.json": "7d4d4f48509f16af0affd7523c102035c55c98556faf13ea03143ebf28a56aae",
+    "study/recall-to-video/ladder-hierarchy/recall-map-NN07_SKS_213031_final.tsv": "0a7bd51f74580df2c7f34f0fbb719aa2eae26baa28552c46b01721714e4a3cd6",
+    "study/recall-to-video/ladder-hierarchy/recall-map-NN07_SKS_213031_final.tsv.posterior.json": "6db9138feb9967cc80e6698d9d1e0c28325a11b235a52e89d5bcc82a754eb8d7",
+    "study/recall-to-video/ladder-hierarchy/recall-map-NN07_SKS_213031_final.tsv.voyage.json": "05e088307a3bc878423fbd544c226a70fcd3f4180dafdc7928568d3c68eaf765",
+    "study/recall-to-video/ladder-hierarchy/recall-map-NN08_OLZ_224031_final.tsv": "5da4d55a194bdff2b1517cfc073ad28064bc3c5ead7fac37204aa2edafddae51",
+    "study/recall-to-video/ladder-hierarchy/recall-map-NN08_OLZ_224031_final.tsv.posterior.json": "94cb60ff21effc980ee2f17dc34cf69dd17deec1f25b402746d78daf70329917",
+    "study/recall-to-video/ladder-hierarchy/recall-map-NN08_OLZ_224031_final.tsv.voyage.json": "2f702dfb571e4cfa37223b74369519fb10727f6709408cd379f5eb32d14ffb0e",
+    "study/recall-to-video/ladder-hierarchy/recall-map-NN11_NMA_233131_final.tsv": "9e3b388ab0e15d27e1249be45031e2e41ae2473917fc2d55c82bd059e1f71c39",
+    "study/recall-to-video/ladder-hierarchy/recall-map-NN11_NMA_233131_final.tsv.posterior.json": "c7abb6eeabe988fd1031a483e045774a40a08def6637a32cc8491b63241ddf99",
+    "study/recall-to-video/ladder-hierarchy/recall-map-NN11_NMA_233131_final.tsv.voyage.json": "eb00fe259216624d47c435a94f74677e29c72ae50f156e7e980cb312816c196e",
+    "study/recall-to-video/ladder-hierarchy/recall-map-NN13_DII_241731_final.tsv": "08025c95d90fc62a29dfff1982ab48590a8f23f739508611362ed7d5aaf65b24",
+    "study/recall-to-video/ladder-hierarchy/recall-map-NN13_DII_241731_final.tsv.posterior.json": "a622d222022c313fd434dd6aca4b5577837f859fd402d0d1846c3d64851ea407",
+    "study/recall-to-video/ladder-hierarchy/recall-map-NN13_DII_241731_final.tsv.voyage.json": "afe751c78817f09008db5e9918cdb92e281c3e9ae24d2adb17fff0b649d9f2c8",
+    "study/recall-to-video/ladder-hierarchy/recall-map-NN15_DBF_242231_final.tsv": "2c944421e11164acbf0e93b6033741c563d018d8740727eeb77f3d89ca15395f",
+    "study/recall-to-video/ladder-hierarchy/recall-map-NN15_DBF_242231_final.tsv.posterior.json": "f9ea1e10594bad30191c0b3459b6d6386a9802196c0abca6b562626eb11a3d43",
+    "study/recall-to-video/ladder-hierarchy/recall-map-NN15_DBF_242231_final.tsv.voyage.json": "1a5d222eedeef84f6253e066964a8f2a1e256159d1209cec91a545f8e9557c77",
+    "study/recall-to-video/ladder-hierarchy/recall-map-NN16_DBN_242731_final.tsv": "5bf3fa201f9e2fa0780bddb3e05346a657d52425c265496bdf5710e36b2c04da",
+    "study/recall-to-video/ladder-hierarchy/recall-map-NN16_DBN_242731_final.tsv.posterior.json": "10350d031f6a859d67cab8407c4f71477ebaf6296a13222c5ba94707f7be14a9",
+    "study/recall-to-video/ladder-hierarchy/recall-map-NN16_DBN_242731_final.tsv.voyage.json": "91e276d3f369a3c09a3420a9d0edeaa02d4b970297d4f38fc51fb807fd7ea3cc",
+    "study/recall-to-video/ladder-hierarchy/recall-map-NN17_DBE_242331_final.tsv": "e45d53f28d740b3eb4e726a3579792b7e407a3d77553281b26f26118c210e25a",
+    "study/recall-to-video/ladder-hierarchy/recall-map-NN17_DBE_242331_final.tsv.posterior.json": "e159a689641a3c98d8633688603645ff7509000b381e27a6e982527769db4a81",
+    "study/recall-to-video/ladder-hierarchy/recall-map-NN17_DBE_242331_final.tsv.voyage.json": "4376f2913c83917b5331b16f7e34b6db2b913b5eaed69b5f435be70593265193",
+    "study/recall-to-video/ladder-order/NN03_ANT_202231_final.log": "a8c111dcef3069ac71e6ab3b1112a1c120b303805cbdc569fb344b3edd0d4015",
+    "study/recall-to-video/ladder-order/NN04_ATE_163931_final.log": "26f259f71ff5c5c80378ce01a55ebfad25b334ded79dbba31174002bb47b6a8b",
+    "study/recall-to-video/ladder-order/NN05_MUN_151631_final.log": "aa5ef0bad08e341c2553912ef00ec1274043fb8a3aab476a5c3df25d4f606e1b",
+    "study/recall-to-video/ladder-order/NN06_SQT_213031_final.log": "2ea9cc271070b58c2e206c7c694d20836b49e9f2e9323b589b972ba90a95311b",
+    "study/recall-to-video/ladder-order/NN07_SKS_213031_final.log": "75b603f26f76a32ebe826f0622f2fbff64651f0ef6e31b4b72a4d3bb8e04aef3",
+    "study/recall-to-video/ladder-order/NN08_OLZ_224031_final.log": "f89f690603541fdf04c4da8911af4c1cba1470aa718d094d71cebdd3e9eddbd7",
+    "study/recall-to-video/ladder-order/NN11_NMA_233131_final.log": "2673592789f44322f205179c94c293644898d57bbacde06c06af6ee2fa035118",
+    "study/recall-to-video/ladder-order/NN13_DII_241731_final.log": "3c8dd2b6368b3fb77a2c39c562e64a70114de069bf81255069be670b3648e52f",
+    "study/recall-to-video/ladder-order/NN15_DBF_242231_final.log": "984d8468ef903d91ca7906d9c44d49f3e1ac7002d3d5047bcbdda2a6eba9783d",
+    "study/recall-to-video/ladder-order/NN16_DBN_242731_final.log": "de5a1dd0d74714e500d92bdd09cc1424915e0dbf793f956094009383ebba27c7",
+    "study/recall-to-video/ladder-order/NN17_DBE_242331_final.log": "4c99904dbc743764bc22921d1f16964bd37760e94c40eeedc9b71556ed5e56d3",
+    "study/recall-to-video/ladder-order/recall-map-NN03_ANT_202231_final.tsv": "528ceb1b1e84ddca9f0ef3395b1047929d60cc1bccac22fb0dcc3c67273aafc7",
+    "study/recall-to-video/ladder-order/recall-map-NN03_ANT_202231_final.tsv.posterior.json": "cc26b5607c5bf60489786330f6478b417481e2fb84eba551acfc03cce1d7fcee",
+    "study/recall-to-video/ladder-order/recall-map-NN03_ANT_202231_final.tsv.voyage.json": "15dad572f659b17b20ff5b7e77a763916fb073ee8bbca602d06f73ae479c7b54",
+    "study/recall-to-video/ladder-order/recall-map-NN04_ATE_163931_final.tsv": "62ae132895d22258a082e59fad5b416a2ad4964e33336c656218c752dff30b3d",
+    "study/recall-to-video/ladder-order/recall-map-NN04_ATE_163931_final.tsv.posterior.json": "0dcb9b1d9e60e8981a3827db66578440babfadc6251c4c82b6380893d5594454",
+    "study/recall-to-video/ladder-order/recall-map-NN04_ATE_163931_final.tsv.voyage.json": "8711803c4e799b0f49d50c88b906d8e1eb1b2431b512b5d6b39cbeebaebf9d3c",
+    "study/recall-to-video/ladder-order/recall-map-NN05_MUN_151631_final.tsv": "624c9a485aa9a432a248496ba252107828799000e0b17de121381f0b8d3fa991",
+    "study/recall-to-video/ladder-order/recall-map-NN05_MUN_151631_final.tsv.posterior.json": "73a51228d81e4cac8f300d809e6dcd69213a1b57df173ae602c60ed149ed3aca",
+    "study/recall-to-video/ladder-order/recall-map-NN05_MUN_151631_final.tsv.voyage.json": "73c33063f9b390007554a02f13b6ab9c1e54487528505d398d3dbc1be565a737",
+    "study/recall-to-video/ladder-order/recall-map-NN06_SQT_213031_final.tsv": "f492d3fc50a00db8982b117b81847e6ca8a48d1b69b8e59706a4576dcc178b20",
+    "study/recall-to-video/ladder-order/recall-map-NN06_SQT_213031_final.tsv.posterior.json": "5d04fe142119901bafeff09927466a6c8a51982df1cff07540da153f350d043e",
+    "study/recall-to-video/ladder-order/recall-map-NN06_SQT_213031_final.tsv.voyage.json": "bf9fa7fea5130f3b8c29ca8ac66aafc1c2f1f6435ab6e4a2f0347697dbe92c9c",
+    "study/recall-to-video/ladder-order/recall-map-NN07_SKS_213031_final.tsv": "1021559fda33eb74c3056b5180e1e039b5e68c9e5b3d67bc36764ccbe3fd6b40",
+    "study/recall-to-video/ladder-order/recall-map-NN07_SKS_213031_final.tsv.posterior.json": "9dc22a1254ad3ad2cad4768fbb60d2a1fac9f08388bed75cc807e7a4fb0215e8",
+    "study/recall-to-video/ladder-order/recall-map-NN07_SKS_213031_final.tsv.voyage.json": "78b4c5520b6fd243b41c121171f0f386ca58cb032ed5bc1d521ebb7149a3e7d7",
+    "study/recall-to-video/ladder-order/recall-map-NN08_OLZ_224031_final.tsv": "bed8711b5bf7d748e8d457a1da7e5c005e935b6034ab4d7e0a520a8dfcccab1e",
+    "study/recall-to-video/ladder-order/recall-map-NN08_OLZ_224031_final.tsv.posterior.json": "de495276f95b93bb9d4db7d909c804a682b71d55ca3d0d2c2b44f4b9e18432c1",
+    "study/recall-to-video/ladder-order/recall-map-NN08_OLZ_224031_final.tsv.voyage.json": "e75f545fa72b045ec02add1babb72c5eb104a1aef6e4ee5811922c22b3b93de1",
+    "study/recall-to-video/ladder-order/recall-map-NN11_NMA_233131_final.tsv": "5baa44ff49666c7da813dfcb526c8b28cf0d232ed4f18252da0749e2fe89b7e6",
+    "study/recall-to-video/ladder-order/recall-map-NN11_NMA_233131_final.tsv.posterior.json": "efa1c50ab7863c28c454ff00e521038d9c5930e3c86ddaac0e6b1f2ee41e7d2b",
+    "study/recall-to-video/ladder-order/recall-map-NN11_NMA_233131_final.tsv.voyage.json": "7a7dfae615ea86960bfbab45caa6c14ea3ea711ee31d87cdee6e11c10c49c6a1",
+    "study/recall-to-video/ladder-order/recall-map-NN13_DII_241731_final.tsv": "12f3a99ac87710edab1146f275df2ee546c1050ebaac205df3edc298884dfee7",
+    "study/recall-to-video/ladder-order/recall-map-NN13_DII_241731_final.tsv.posterior.json": "6fc9a5c1e97b029936fb0e56f5d4310ba14094173d249a8b9db1d48860176581",
+    "study/recall-to-video/ladder-order/recall-map-NN13_DII_241731_final.tsv.voyage.json": "15ca0342a747667a48d3221854b7d053d6a15b16468a597ea2d6afc5c652c359",
+    "study/recall-to-video/ladder-order/recall-map-NN15_DBF_242231_final.tsv": "48c8d400b8d2a64815e62d4a849357462c1f249777931d55e86ff0cf57c2dc98",
+    "study/recall-to-video/ladder-order/recall-map-NN15_DBF_242231_final.tsv.posterior.json": "2a15575efadc853d554da0e4e194cb1132e46a38abbd4ac94bf73a2148498250",
+    "study/recall-to-video/ladder-order/recall-map-NN15_DBF_242231_final.tsv.voyage.json": "277ec728ba86a632fc71a104346005f8ac6f17876a734bb53dd2a9d82fd8c24d",
+    "study/recall-to-video/ladder-order/recall-map-NN16_DBN_242731_final.tsv": "3651b3ff48926917603c78c559c20db2da6c68ab19f4d7d2f7971383c5deede3",
+    "study/recall-to-video/ladder-order/recall-map-NN16_DBN_242731_final.tsv.posterior.json": "0e62ef0dfa23de2bbcdafc379754a77b7491e6d153d017fddb332b77f0abd15a",
+    "study/recall-to-video/ladder-order/recall-map-NN16_DBN_242731_final.tsv.voyage.json": "5721b96528576467362e081d11943d0c1ac537039c2fcd4ce7eedf84bd522b09",
+    "study/recall-to-video/ladder-order/recall-map-NN17_DBE_242331_final.tsv": "da27a50661dbb7d9d0a52b2c943070cbf905beca92451e163f51c10b0db63bd0",
+    "study/recall-to-video/ladder-order/recall-map-NN17_DBE_242331_final.tsv.posterior.json": "6e4d01594dc2d3d7940bba9a4bfb8c5c54bafe5d5a70ff81ae9c8db5cbd61126",
+    "study/recall-to-video/ladder-order/recall-map-NN17_DBE_242331_final.tsv.voyage.json": "29487be05dc1f92dbc64b7bd33eec0ab1cb272e0db794f120c2aa1e74c6c0e7d",
+    "study/recall-to-video/ladder-similarity/NN03_ANT_202231_final.log": "34861de34467cdeb13480856db5012e4bcf3f1d4c06e8d58c8a89c77a08693f1",
+    "study/recall-to-video/ladder-similarity/NN04_ATE_163931_final.log": "3fbf4ccc9656ffe637d8702317bc4df901e9d03d2a49b31e4f4194619a34c0f8",
+    "study/recall-to-video/ladder-similarity/NN05_MUN_151631_final.log": "5b53ef220e6497b89459c891ac6485c864379aad44d48d863c8dbe90b7fff0cf",
+    "study/recall-to-video/ladder-similarity/NN06_SQT_213031_final.log": "f3d079333fa06455227b4f9f9fbcd3c630288d74a77f8d3ca7f9c717643bd143",
+    "study/recall-to-video/ladder-similarity/NN07_SKS_213031_final.log": "69d4425597e2c905b243af5fabda0b16bf1d1391a01f40af219c763fec6b587d",
+    "study/recall-to-video/ladder-similarity/NN08_OLZ_224031_final.log": "525e4e1e2384943a7f92e5905282586a16d809a381d702a9759e8ec1f5aeec5f",
+    "study/recall-to-video/ladder-similarity/NN11_NMA_233131_final.log": "bf969f9bede3f11d1df9e07f16c03732958ad8619b2e5e2fe75b01a04469ed5b",
+    "study/recall-to-video/ladder-similarity/NN13_DII_241731_final.log": "bed7f0bcdd4c6d7f62286043586d13fc7fba0b03adc3716820d54b9e6e56c094",
+    "study/recall-to-video/ladder-similarity/NN15_DBF_242231_final.log": "bffb98c93b7c13a381e5ea0e61f20a49b19de1b1f7ef3a5a29be56a1cda85ac9",
+    "study/recall-to-video/ladder-similarity/NN16_DBN_242731_final.log": "cb2a2bd34eb4852d7a6930e210c9d725bf5090b15898cc2fec623f9aeb2814ed",
+    "study/recall-to-video/ladder-similarity/NN17_DBE_242331_final.log": "cd9a2471b7fe6c07517ebb6e5c31b201b970ab093669817a485e8d003c74a3a6",
+    "study/recall-to-video/ladder-similarity/recall-map-NN03_ANT_202231_final.tsv": "528ceb1b1e84ddca9f0ef3395b1047929d60cc1bccac22fb0dcc3c67273aafc7",
+    "study/recall-to-video/ladder-similarity/recall-map-NN03_ANT_202231_final.tsv.posterior.json": "cc26b5607c5bf60489786330f6478b417481e2fb84eba551acfc03cce1d7fcee",
+    "study/recall-to-video/ladder-similarity/recall-map-NN03_ANT_202231_final.tsv.voyage.json": "758606e3409803dd6abd06d49b7fd42b4331b8dc2c56de8f2502331adf68e9af",
+    "study/recall-to-video/ladder-similarity/recall-map-NN04_ATE_163931_final.tsv": "62ae132895d22258a082e59fad5b416a2ad4964e33336c656218c752dff30b3d",
+    "study/recall-to-video/ladder-similarity/recall-map-NN04_ATE_163931_final.tsv.posterior.json": "0dcb9b1d9e60e8981a3827db66578440babfadc6251c4c82b6380893d5594454",
+    "study/recall-to-video/ladder-similarity/recall-map-NN04_ATE_163931_final.tsv.voyage.json": "7a2d8e360048108843ae598ef9bbc921dd47ea1122207bef61a75a631f8f8c33",
+    "study/recall-to-video/ladder-similarity/recall-map-NN05_MUN_151631_final.tsv": "624c9a485aa9a432a248496ba252107828799000e0b17de121381f0b8d3fa991",
+    "study/recall-to-video/ladder-similarity/recall-map-NN05_MUN_151631_final.tsv.posterior.json": "73a51228d81e4cac8f300d809e6dcd69213a1b57df173ae602c60ed149ed3aca",
+    "study/recall-to-video/ladder-similarity/recall-map-NN05_MUN_151631_final.tsv.voyage.json": "b4f7389d9aa53a11c162c28d71814d4db77b6ae8081e26f867298b903b4e215f",
+    "study/recall-to-video/ladder-similarity/recall-map-NN06_SQT_213031_final.tsv": "f492d3fc50a00db8982b117b81847e6ca8a48d1b69b8e59706a4576dcc178b20",
+    "study/recall-to-video/ladder-similarity/recall-map-NN06_SQT_213031_final.tsv.posterior.json": "5d04fe142119901bafeff09927466a6c8a51982df1cff07540da153f350d043e",
+    "study/recall-to-video/ladder-similarity/recall-map-NN06_SQT_213031_final.tsv.voyage.json": "f69f0d82ae6bbd5656c3cbff552e388ab8e080af223cb14bb8c97ce2eb0d4c9e",
+    "study/recall-to-video/ladder-similarity/recall-map-NN07_SKS_213031_final.tsv": "1021559fda33eb74c3056b5180e1e039b5e68c9e5b3d67bc36764ccbe3fd6b40",
+    "study/recall-to-video/ladder-similarity/recall-map-NN07_SKS_213031_final.tsv.posterior.json": "9dc22a1254ad3ad2cad4768fbb60d2a1fac9f08388bed75cc807e7a4fb0215e8",
+    "study/recall-to-video/ladder-similarity/recall-map-NN07_SKS_213031_final.tsv.voyage.json": "0d2f79649e0fda137034caaab08853cccb67bab5c5a12d65f88ce848219993ec",
+    "study/recall-to-video/ladder-similarity/recall-map-NN08_OLZ_224031_final.tsv": "bed8711b5bf7d748e8d457a1da7e5c005e935b6034ab4d7e0a520a8dfcccab1e",
+    "study/recall-to-video/ladder-similarity/recall-map-NN08_OLZ_224031_final.tsv.posterior.json": "de495276f95b93bb9d4db7d909c804a682b71d55ca3d0d2c2b44f4b9e18432c1",
+    "study/recall-to-video/ladder-similarity/recall-map-NN08_OLZ_224031_final.tsv.voyage.json": "4032bb3aea1bf146a1d09a7b11173ecd5d9b293bd958d2b57d28fc4019ad0bc4",
+    "study/recall-to-video/ladder-similarity/recall-map-NN11_NMA_233131_final.tsv": "5baa44ff49666c7da813dfcb526c8b28cf0d232ed4f18252da0749e2fe89b7e6",
+    "study/recall-to-video/ladder-similarity/recall-map-NN11_NMA_233131_final.tsv.posterior.json": "efa1c50ab7863c28c454ff00e521038d9c5930e3c86ddaac0e6b1f2ee41e7d2b",
+    "study/recall-to-video/ladder-similarity/recall-map-NN11_NMA_233131_final.tsv.voyage.json": "98716ed9ee36e6106fadfa9650df0a8ad094ed5bc493996f38383ce5282e2d76",
+    "study/recall-to-video/ladder-similarity/recall-map-NN13_DII_241731_final.tsv": "12f3a99ac87710edab1146f275df2ee546c1050ebaac205df3edc298884dfee7",
+    "study/recall-to-video/ladder-similarity/recall-map-NN13_DII_241731_final.tsv.posterior.json": "6fc9a5c1e97b029936fb0e56f5d4310ba14094173d249a8b9db1d48860176581",
+    "study/recall-to-video/ladder-similarity/recall-map-NN13_DII_241731_final.tsv.voyage.json": "b5816c01bc9209fe5d22b03305914ab4acd03964466089582708d797409a50dd",
+    "study/recall-to-video/ladder-similarity/recall-map-NN15_DBF_242231_final.tsv": "48c8d400b8d2a64815e62d4a849357462c1f249777931d55e86ff0cf57c2dc98",
+    "study/recall-to-video/ladder-similarity/recall-map-NN15_DBF_242231_final.tsv.posterior.json": "2a15575efadc853d554da0e4e194cb1132e46a38abbd4ac94bf73a2148498250",
+    "study/recall-to-video/ladder-similarity/recall-map-NN15_DBF_242231_final.tsv.voyage.json": "abd920947545c670b8dca2ec40f9cd7dcaedb4cb00d977ea8f53bc39b5ae6601",
+    "study/recall-to-video/ladder-similarity/recall-map-NN16_DBN_242731_final.tsv": "3651b3ff48926917603c78c559c20db2da6c68ab19f4d7d2f7971383c5deede3",
+    "study/recall-to-video/ladder-similarity/recall-map-NN16_DBN_242731_final.tsv.posterior.json": "0e62ef0dfa23de2bbcdafc379754a77b7491e6d153d017fddb332b77f0abd15a",
+    "study/recall-to-video/ladder-similarity/recall-map-NN16_DBN_242731_final.tsv.voyage.json": "41570dd086349544824ed0ecc436d5242ad9b86f7040678df06e6d9ef0173511",
+    "study/recall-to-video/ladder-similarity/recall-map-NN17_DBE_242331_final.tsv": "da27a50661dbb7d9d0a52b2c943070cbf905beca92451e163f51c10b0db63bd0",
+    "study/recall-to-video/ladder-similarity/recall-map-NN17_DBE_242331_final.tsv.posterior.json": "6e4d01594dc2d3d7940bba9a4bfb8c5c54bafe5d5a70ff81ae9c8db5cbd61126",
+    "study/recall-to-video/ladder-similarity/recall-map-NN17_DBE_242331_final.tsv.voyage.json": "d93b1c50006057d6ce900ddf0f09b5fc8d7176d1bb1b105619ea5a3411fc3d66",
+    "study/recall-to-video/monofill-dev/recall-map-NN03_ANT_202231_final.tsv": "528ceb1b1e84ddca9f0ef3395b1047929d60cc1bccac22fb0dcc3c67273aafc7",
+    "study/recall-to-video/monofill-dev/recall-map-NN04_ATE_163931_final.tsv": "62ae132895d22258a082e59fad5b416a2ad4964e33336c656218c752dff30b3d",
+    "study/recall-to-video/monofill-dev/recall-map-NN05_MUN_151631_final.tsv": "624c9a485aa9a432a248496ba252107828799000e0b17de121381f0b8d3fa991",
+    "study/recall-to-video/monofill-dev/recall-map-NN06_SQT_213031_final.tsv": "f492d3fc50a00db8982b117b81847e6ca8a48d1b69b8e59706a4576dcc178b20",
+    "study/recall-to-video/monofill-dev/recall-map-NN07_SKS_213031_final.tsv": "1021559fda33eb74c3056b5180e1e039b5e68c9e5b3d67bc36764ccbe3fd6b40",
+    "study/recall-to-video/monofill-dev/recall-map-NN08_OLZ_224031_final.tsv": "bed8711b5bf7d748e8d457a1da7e5c005e935b6034ab4d7e0a520a8dfcccab1e",
+    "study/recall-to-video/monofill-dev/recall-map-NN11_NMA_233131_final.tsv": "5baa44ff49666c7da813dfcb526c8b28cf0d232ed4f18252da0749e2fe89b7e6",
+    "study/recall-to-video/monofill-dev/recall-map-NN13_DII_241731_final.tsv": "12f3a99ac87710edab1146f275df2ee546c1050ebaac205df3edc298884dfee7",
+    "study/recall-to-video/monofill-dev/recall-map-NN15_DBF_242231_final.tsv": "48c8d400b8d2a64815e62d4a849357462c1f249777931d55e86ff0cf57c2dc98",
+    "study/recall-to-video/monofill-dev/recall-map-NN16_DBN_242731_final.tsv": "3651b3ff48926917603c78c559c20db2da6c68ab19f4d7d2f7971383c5deede3",
+    "study/recall-to-video/monofill-dev/recall-map-NN17_DBE_242331_final.tsv": "da27a50661dbb7d9d0a52b2c943070cbf905beca92451e163f51c10b0db63bd0",
+    "study/recall-to-video/partition.json": "cc9958bf6d1cc6d07fde508ef7951dc90b3a85ca8744cedf5900ca60acea365f",
+    "study/recall-to-video/prior0-chosen-dev/NN03_ANT_202231_final.log": "e15c60f7ed86e83dc1bb434c1cc329fb8a203fad8add9156b9a9ecae6bdc011a",
+    "study/recall-to-video/prior0-chosen-dev/NN04_ATE_163931_final.log": "4ce098f58b38ba31bc2733f830fbc701410a4d5624fbc52afa6d1e1dbad73722",
+    "study/recall-to-video/prior0-chosen-dev/NN05_MUN_151631_final.log": "070cf4537425ddf4c0e7a1c37dbcdbe882aa3f57115c9250c8b3f431a89afe84",
+    "study/recall-to-video/prior0-chosen-dev/NN06_SQT_213031_final.log": "901f9ecf7e3ad3bd778f7b4599f6ed50284e5422bb9dca463083e8d85bc0a42b",
+    "study/recall-to-video/prior0-chosen-dev/NN07_SKS_213031_final.log": "4872395ba509bd78a842972ff03723d52fdfdbb59f943b0e373b7379f1b10a88",
+    "study/recall-to-video/prior0-chosen-dev/NN08_OLZ_224031_final.log": "e1aa4033bf2f45fd4f83860f948375b132fbe777aa4fb8bf25980acde14623e7",
+    "study/recall-to-video/prior0-chosen-dev/NN11_NMA_233131_final.log": "56e07a96eedd99deb5e58d9afe8da1d50ac0e9528639b7321a54b7b423b24d42",
+    "study/recall-to-video/prior0-chosen-dev/NN13_DII_241731_final.log": "4c17dd45d9031d040b99bd455ede57aaaada1300c849e36e4edd964fac924a9a",
+    "study/recall-to-video/prior0-chosen-dev/NN15_DBF_242231_final.log": "0f2924fe3679cd3e7ccdffda2cc6d8e1f08e7fe8050868409bbe7b35d879be84",
+    "study/recall-to-video/prior0-chosen-dev/NN16_DBN_242731_final.log": "48bea4ce4c0f25e9f58c9234fb00510d9e93ec67492c0e7594804e7c9bdc7fa6",
+    "study/recall-to-video/prior0-chosen-dev/NN17_DBE_242331_final.log": "af3580d574208dec8ef1957d8a6806f7feadf292d72224b8710695cf06db0247",
+    "study/recall-to-video/prior0-chosen-dev/recall-map-NN03_ANT_202231_final.tsv": "281e727ef17bcf4c40182a912b01d126eb7e0f87ef915262116943f44c348263",
+    "study/recall-to-video/prior0-chosen-dev/recall-map-NN04_ATE_163931_final.tsv": "f128ee9e18241b0efaf85c594b21a93a23f3fd19e0600c38d7f4ef5f4df87980",
+    "study/recall-to-video/prior0-chosen-dev/recall-map-NN05_MUN_151631_final.tsv": "67f8ad4333d4a38b07e20a114588641f6d3c84cabd6abec0657b977af97a3939",
+    "study/recall-to-video/prior0-chosen-dev/recall-map-NN06_SQT_213031_final.tsv": "d348a0249a220092512e5c8347f1c5c0d3f8d9cd6512030f024658061b4fc50c",
+    "study/recall-to-video/prior0-chosen-dev/recall-map-NN07_SKS_213031_final.tsv": "1f04825e1bcaae5caf53766b81b8ce7258d8aee7114cc904684024421b39c775",
+    "study/recall-to-video/prior0-chosen-dev/recall-map-NN08_OLZ_224031_final.tsv": "aae72f30dd359f5d51b3012c137287c20e8624ee767177e0a80738627f86f667",
+    "study/recall-to-video/prior0-chosen-dev/recall-map-NN11_NMA_233131_final.tsv": "07e7d02d6d1a659854876e1232d25d50ef8db5a405aea8365d55c78575d33b65",
+    "study/recall-to-video/prior0-chosen-dev/recall-map-NN13_DII_241731_final.tsv": "ea8568e708123e668aa5651840bb2e954f48178ac1d30ceaa8ac6316f94475bf",
+    "study/recall-to-video/prior0-chosen-dev/recall-map-NN15_DBF_242231_final.tsv": "24901efc4a76339883023967fafef4aaadfed34270fe312e6c0c1e6ceac0143b",
+    "study/recall-to-video/prior0-chosen-dev/recall-map-NN16_DBN_242731_final.tsv": "b59e397f68c881f7160b8467e91a2c1edae8bcfc07f9d4e0eabb1f870c367281",
+    "study/recall-to-video/prior0-chosen-dev/recall-map-NN17_DBE_242331_final.tsv": "bed2983fb380464747070f007975b0693232921f50bdb8e16ffec66ee732525a"
+  },
+  "inventory": {
+    "chosen-shuffled-dev": {
+      "byteIdenticalToFull": 0,
+      "byteIdenticalToReference": 11,
+      "historicalReference": "blend080-lemmas-dev",
+      "reports": 11,
+      "units": 1744
+    },
+    "ladder-causality": {
+      "byteIdenticalToFull": 11,
+      "layerUse": "layers=[Causal,DiscourseSuccession,Hierarchy,WorldTime] positions=true weighted=[Backward,CausalNeighbor,DiscourseSuccessor,HierarchyDown,HierarchyUp,LongJump,Stay,WorldTimeSuccessor] withheld=[CauseToEffect,EffectToCause,SameEntityThread,SemanticNeighbor] external=[pIn=0.1824,pStay=0.2994]",
+      "priorScale": 1.5,
+      "reports": 11,
+      "rung": "+causality; theta=db179b0c501897b96afbaccd1d60184391f453efd28fdaa07dcd55f8af040a67",
+      "units": 1744
+    },
+    "ladder-content": {
+      "byteIdenticalToFull": 0,
+      "layerUse": "layers=[] positions=false weighted=[] withheld=[Backward,CausalNeighbor,CauseToEffect,DiscourseSuccessor,EffectToCause,HierarchyDown,HierarchyUp,LongJump,SameEntityThread,SemanticNeighbor,Stay,WorldTimeSuccessor] external=[pIn=0.1824,pStay=0.2994]",
+      "priorScale": 1.5,
+      "reports": 11,
+      "rung": "content; theta=8134a87e1ad1e2d5b33e67c5d96737e03c50e09379bede68a4d3d947de58d6d5",
+      "units": 1744
+    },
+    "ladder-full": {
+      "byteIdenticalToFull": 11,
+      "byteIdenticalToReference": 11,
+      "historicalReference": "monofill-dev",
+      "layerUse": "layers=[Causal,DiscourseSuccession,EntityContinuity,Hierarchy,Semantic,WorldTime] positions=true weighted=[Backward,CausalNeighbor,DiscourseSuccessor,HierarchyDown,HierarchyUp,LongJump,SameEntityThread,SemanticNeighbor,Stay,WorldTimeSuccessor] withheld=[CauseToEffect,EffectToCause] external=[pIn=0.1824,pStay=0.2994]",
+      "priorScale": 1.5,
+      "reports": 11,
+      "rung": "full; theta=4d354586addaa516ba7eb7a12245da95bf3eb1e59eec81955cfb7b12875ddcbd",
+      "units": 1744
+    },
+    "ladder-hierarchy": {
+      "byteIdenticalToFull": 0,
+      "layerUse": "layers=[Hierarchy] positions=false weighted=[HierarchyDown,HierarchyUp] withheld=[Backward,CausalNeighbor,CauseToEffect,DiscourseSuccessor,EffectToCause,LongJump,SameEntityThread,SemanticNeighbor,Stay,WorldTimeSuccessor] external=[pIn=0.1824,pStay=0.2994]",
+      "priorScale": 1.5,
+      "reports": 11,
+      "rung": "+hierarchy; theta=009abde2e4b31fce84b7dc401179d76949f7ba73f048d0db1c197fd419966543",
+      "units": 1744
+    },
+    "ladder-order": {
+      "byteIdenticalToFull": 11,
+      "layerUse": "layers=[DiscourseSuccession,Hierarchy,WorldTime] positions=true weighted=[Backward,DiscourseSuccessor,HierarchyDown,HierarchyUp,LongJump,Stay,WorldTimeSuccessor] withheld=[CausalNeighbor,CauseToEffect,EffectToCause,SameEntityThread,SemanticNeighbor] external=[pIn=0.1824,pStay=0.2994]",
+      "priorScale": 1.5,
+      "reports": 11,
+      "rung": "+order; theta=a202076d41ebfe7c63a6cd33581fe1ee21b4d891bf4da8b707df034508e704b7",
+      "units": 1744
+    },
+    "ladder-similarity": {
+      "byteIdenticalToFull": 11,
+      "layerUse": "layers=[Causal,DiscourseSuccession,EntityContinuity,Hierarchy,Semantic,WorldTime] positions=true weighted=[Backward,CausalNeighbor,DiscourseSuccessor,HierarchyDown,HierarchyUp,LongJump,SameEntityThread,SemanticNeighbor,Stay,WorldTimeSuccessor] withheld=[CauseToEffect,EffectToCause] external=[pIn=0.1824,pStay=0.2994]",
+      "priorScale": 1.5,
+      "reports": 11,
+      "rung": "+similarity; theta=4d354586addaa516ba7eb7a12245da95bf3eb1e59eec81955cfb7b12875ddcbd",
+      "units": 1744
+    },
+    "prior0-chosen-dev": {
+      "byteIdenticalToFull": 0,
+      "reports": 11,
+      "units": 1744
+    }
+  },
+  "ladderReportedInferenceRevision": "f4ee65b4c87a1ed0e48b873885de36a4056eb53d",
+  "limitations": [
+    "Historical shuffle preserves order and is an ineffective manipulation.",
+    "Historical prior-zero predates scene decode and fill; its contrast is confounded.",
+    "Every ladder rung retains scene-monotone decode and the shipped external prior.",
+    "Similarity and full are the same theta configuration.",
+    "Inference revision is recorded by the handoff; per-run logs bind observed settings."
+  ],
+  "newExploratoryGoldContrasts": 7,
+  "outcomes": {
+    "chosen-shuffled-dev": {
+      "goldFree": {
+        "concentration": {
+          "ci95": [
+            0.1140590909090909,
+            0.11904545454545454
+          ],
+          "mean": 0.11671363636363637,
+          "median": 0.1172,
+          "n": 11
+        },
+        "localizability": {
+          "ci95": [
+            0.6574727272727273,
+            0.6612181818181818
+          ],
+          "mean": 0.6593363636363636,
+          "median": 0.6599,
+          "n": 11
+        },
+        "sequentialCoherence": {
+          "ci95": [
+            0.44200142210100946,
+            0.5670897358129007
+          ],
+          "mean": 0.5028656905280071,
+          "median": 0.4829004693971235,
+          "n": 11
+        },
+        "sourceMass": {
+          "ci95": [
+            0.6553636363636364,
+            0.7031818181818182
+          ],
+          "mean": 0.6784545454545454,
+          "median": 0.67345,
+          "n": 11
+        }
+      },
+      "goldFreePerParticipant": {
+        "NN03_ANT_202231_final": {
+          "anchored": 173,
+          "concentration": 0.1111,
+          "localizability": 0.655,
+          "sequentialCoherence": 0.36920872775200086,
+          "sourceMass": 0.6545,
+          "units": 173
+        },
+        "NN04_ATE_163931_final": {
+          "anchored": 96,
+          "concentration": 0.12279999999999999,
+          "localizability": 0.6632,
+          "sequentialCoherence": 0.640590342251702,
+          "sourceMass": 0.7034499999999999,
+          "units": 96
+        },
+        "NN05_MUN_151631_final": {
+          "anchored": 68,
+          "concentration": 0.1172,
+          "localizability": 0.6601,
+          "sequentialCoherence": 0.3948907221418919,
+          "sourceMass": 0.6613500000000001,
+          "units": 68
+        },
+        "NN06_SQT_213031_final": {
+          "anchored": 104,
+          "concentration": 0.121,
+          "localizability": 0.6607000000000001,
+          "sequentialCoherence": 0.6127809115278371,
+          "sourceMass": 0.71975,
+          "units": 104
+        },
+        "NN07_SKS_213031_final": {
+          "anchored": 98,
+          "concentration": 0.11449999999999999,
+          "localizability": 0.6591,
+          "sequentialCoherence": 0.32292868682115305,
+          "sourceMass": 0.6345000000000001,
+          "units": 98
+        },
+        "NN08_OLZ_224031_final": {
+          "anchored": 181,
+          "concentration": 0.1201,
+          "localizability": 0.6566,
+          "sequentialCoherence": 0.46651807715703153,
+          "sourceMass": 0.7144,
+          "units": 181
+        },
+        "NN11_NMA_233131_final": {
+          "anchored": 148,
+          "concentration": 0.11665,
+          "localizability": 0.6549,
+          "sequentialCoherence": 0.4829004693971235,
+          "sourceMass": 0.6791,
+          "units": 148
+        },
+        "NN13_DII_241731_final": {
+          "anchored": 338,
+          "concentration": 0.11865,
+          "localizability": 0.6621,
+          "sequentialCoherence": 0.5169829279570844,
+          "sourceMass": 0.67345,
+          "units": 338
+        },
+        "NN15_DBF_242231_final": {
+          "anchored": 97,
+          "concentration": 0.1206,
+          "localizability": 0.6565,
+          "sequentialCoherence": 0.6679680209886784,
+          "sourceMass": 0.7633,
+          "units": 97
+        },
+        "NN16_DBN_242731_final": {
+          "anchored": 89,
+          "concentration": 0.1096,
+          "localizability": 0.6599,
+          "sequentialCoherence": 0.5935585924901763,
+          "sourceMass": 0.6198,
+          "units": 89
+        },
+        "NN17_DBE_242331_final": {
+          "anchored": 352,
+          "concentration": 0.11165,
+          "localizability": 0.6646000000000001,
+          "sequentialCoherence": 0.4631951173233993,
+          "sourceMass": 0.6394,
+          "units": 352
+        }
+      },
+      "goldParticipants": 10,
+      "goldUnits": 1499,
+      "sceneExact": 38.358905937291524,
+      "sceneExactCI95": [
+        33.763094278807415,
+        43.403769274700174
+      ],
+      "withinOne": 47.498332221480986
+    },
+    "ladder-causality": {
+      "goldFree": {
+        "concentration": {
+          "ci95": [
+            0.12097727272727272,
+            0.12904545454545455
+          ],
+          "mean": 0.12502727272727274,
+          "median": 0.12475,
+          "n": 11
+        },
+        "localizability": {
+          "ci95": [
+            0.6616909090909091,
+            0.6653227272727272
+          ],
+          "mean": 0.6634681818181818,
+          "median": 0.6629,
+          "n": 11
+        },
+        "sequentialCoherence": {
+          "ci95": [
+            0.9437444879380039,
+            0.9653301591542455
+          ],
+          "mean": 0.9554934230993303,
+          "median": 0.9627413519200904,
+          "n": 11
+        },
+        "sourceMass": {
+          "ci95": [
+            0.6614409090909091,
+            0.7085772727272728
+          ],
+          "mean": 0.6843090909090909,
+          "median": 0.67815,
+          "n": 11
+        }
+      },
+      "goldFreePerParticipant": {
+        "NN03_ANT_202231_final": {
+          "anchored": 173,
+          "concentration": 0.1129,
+          "localizability": 0.6626,
+          "sequentialCoherence": 0.9627413519200904,
+          "sourceMass": 0.6571,
+          "units": 173
+        },
+        "NN04_ATE_163931_final": {
+          "anchored": 96,
+          "concentration": 0.13065,
+          "localizability": 0.6656,
+          "sequentialCoherence": 0.9681147990265873,
+          "sourceMass": 0.70625,
+          "units": 96
+        },
+        "NN05_MUN_151631_final": {
+          "anchored": 68,
+          "concentration": 0.1236,
+          "localizability": 0.663,
+          "sequentialCoherence": 0.9551089643035182,
+          "sourceMass": 0.6745,
+          "units": 68
+        },
+        "NN06_SQT_213031_final": {
+          "anchored": 104,
+          "concentration": 0.13269999999999998,
+          "localizability": 0.66465,
+          "sequentialCoherence": 0.9153599140937583,
+          "sourceMass": 0.72695,
+          "units": 104
+        },
+        "NN07_SKS_213031_final": {
+          "anchored": 98,
+          "concentration": 0.12115000000000001,
+          "localizability": 0.66225,
+          "sequentialCoherence": 0.9215343928828262,
+          "sourceMass": 0.64045,
+          "units": 98
+        },
+        "NN08_OLZ_224031_final": {
+          "anchored": 181,
+          "concentration": 0.1262,
+          "localizability": 0.6595,
+          "sequentialCoherence": 0.9634490727022039,
+          "sourceMass": 0.7244,
+          "units": 181
+        },
+        "NN11_NMA_233131_final": {
+          "anchored": 148,
+          "concentration": 0.12475,
+          "localizability": 0.65995,
+          "sequentialCoherence": 0.954761585859098,
+          "sourceMass": 0.67815,
+          "units": 148
+        },
+        "NN13_DII_241731_final": {
+          "anchored": 338,
+          "concentration": 0.13490000000000002,
+          "localizability": 0.66885,
+          "sequentialCoherence": 0.972939373352151,
+          "sourceMass": 0.6824,
+          "units": 338
+        },
+        "NN15_DBF_242231_final": {
+          "anchored": 97,
+          "concentration": 0.1335,
+          "localizability": 0.6606,
+          "sequentialCoherence": 0.9530418182407826,
+          "sourceMass": 0.7655,
+          "units": 97
+        },
+        "NN16_DBN_242731_final": {
+          "anchored": 89,
+          "concentration": 0.1145,
+          "localizability": 0.6629,
+          "sequentialCoherence": 0.9745690800469086,
+          "sourceMass": 0.6287,
+          "units": 89
+        },
+        "NN17_DBE_242331_final": {
+          "anchored": 352,
+          "concentration": 0.12045,
+          "localizability": 0.66825,
+          "sequentialCoherence": 0.9688073016647082,
+          "sourceMass": 0.643,
+          "units": 352
+        }
+      },
+      "goldParticipants": 10,
+      "goldUnits": 1499,
+      "sceneExact": 65.24349566377585,
+      "sceneExactCI95": [
+        55.27240773286467,
+        72.483537158984
+      ],
+      "withinOne": 82.65510340226818
+    },
+    "ladder-content": {
+      "goldFree": {
+        "concentration": {
+          "ci95": [
+            0.1001909090909091,
+            0.10715909090909091
+          ],
+          "mean": 0.10383636363636364,
+          "median": 0.1055,
+          "n": 11
+        },
+        "localizability": {
+          "ci95": [
+            0.6520727272727272,
+            0.6555590909090909
+          ],
+          "mean": 0.6538181818181819,
+          "median": 0.65445,
+          "n": 11
+        },
+        "sequentialCoherence": {
+          "ci95": [
+            0.9412831224818162,
+            0.9647677699782189
+          ],
+          "mean": 0.9540817163731621,
+          "median": 0.9623466014126294,
+          "n": 11
+        },
+        "sourceMass": {
+          "ci95": [
+            0.64335,
+            0.6901681818181818
+          ],
+          "mean": 0.6652863636363636,
+          "median": 0.6627000000000001,
+          "n": 11
+        }
+      },
+      "goldFreePerParticipant": {
+        "NN03_ANT_202231_final": {
+          "anchored": 173,
+          "concentration": 0.0989,
+          "localizability": 0.6508,
+          "sequentialCoherence": 0.9623466014126294,
+          "sourceMass": 0.6405,
+          "units": 173
+        },
+        "NN04_ATE_163931_final": {
+          "anchored": 96,
+          "concentration": 0.11205000000000001,
+          "localizability": 0.6568,
+          "sequentialCoherence": 0.9681147990265873,
+          "sourceMass": 0.67645,
+          "units": 96
+        },
+        "NN05_MUN_151631_final": {
+          "anchored": 68,
+          "concentration": 0.09995000000000001,
+          "localizability": 0.6515500000000001,
+          "sequentialCoherence": 0.9520480579156956,
+          "sourceMass": 0.6474,
+          "units": 68
+        },
+        "NN06_SQT_213031_final": {
+          "anchored": 104,
+          "concentration": 0.10650000000000001,
+          "localizability": 0.65875,
+          "sequentialCoherence": 0.9114808848667149,
+          "sourceMass": 0.71165,
+          "units": 104
+        },
+        "NN07_SKS_213031_final": {
+          "anchored": 98,
+          "concentration": 0.10114999999999999,
+          "localizability": 0.65445,
+          "sequentialCoherence": 0.9141029099785346,
+          "sourceMass": 0.62295,
+          "units": 98
+        },
+        "NN08_OLZ_224031_final": {
+          "anchored": 181,
+          "concentration": 0.1101,
+          "localizability": 0.6513,
+          "sequentialCoherence": 0.9639773391292065,
+          "sourceMass": 0.6907,
+          "units": 181
+        },
+        "NN11_NMA_233131_final": {
+          "anchored": 148,
+          "concentration": 0.1101,
+          "localizability": 0.6498,
+          "sequentialCoherence": 0.9616144518910351,
+          "sourceMass": 0.6723,
+          "units": 148
+        },
+        "NN13_DII_241731_final": {
+          "anchored": 338,
+          "concentration": 0.1055,
+          "localizability": 0.6557,
+          "sequentialCoherence": 0.9755041103016587,
+          "sourceMass": 0.6627000000000001,
+          "units": 338
+        },
+        "NN15_DBF_242231_final": {
+          "anchored": 97,
+          "concentration": 0.1062,
+          "localizability": 0.6508,
+          "sequentialCoherence": 0.9517688966691552,
+          "sourceMass": 0.7536,
+          "units": 97
+        },
+        "NN16_DBN_242731_final": {
+          "anchored": 89,
+          "concentration": 0.0925,
+          "localizability": 0.655,
+          "sequentialCoherence": 0.968039655833777,
+          "sourceMass": 0.6134,
+          "units": 89
+        },
+        "NN17_DBE_242331_final": {
+          "anchored": 352,
+          "concentration": 0.09925,
+          "localizability": 0.65705,
+          "sequentialCoherence": 0.9659011730797886,
+          "sourceMass": 0.6265000000000001,
+          "units": 352
+        }
+      },
+      "goldParticipants": 10,
+      "goldUnits": 1499,
+      "sceneExact": 65.6437625083389,
+      "sceneExactCI95": [
+        56.205128205128204,
+        73.2824427480916
+      ],
+      "withinOne": 83.7224816544363
+    },
+    "ladder-full": {
+      "goldFree": {
+        "concentration": {
+          "ci95": [
+            0.12097727272727272,
+            0.12904545454545455
+          ],
+          "mean": 0.12502727272727274,
+          "median": 0.12475,
+          "n": 11
+        },
+        "localizability": {
+          "ci95": [
+            0.6616909090909091,
+            0.6653227272727272
+          ],
+          "mean": 0.6634681818181818,
+          "median": 0.6629,
+          "n": 11
+        },
+        "sequentialCoherence": {
+          "ci95": [
+            0.9437444879380039,
+            0.9653301591542455
+          ],
+          "mean": 0.9554934230993303,
+          "median": 0.9627413519200904,
+          "n": 11
+        },
+        "sourceMass": {
+          "ci95": [
+            0.6614409090909091,
+            0.7085772727272728
+          ],
+          "mean": 0.6843090909090909,
+          "median": 0.67815,
+          "n": 11
+        }
+      },
+      "goldFreePerParticipant": {
+        "NN03_ANT_202231_final": {
+          "anchored": 173,
+          "concentration": 0.1129,
+          "localizability": 0.6626,
+          "sequentialCoherence": 0.9627413519200904,
+          "sourceMass": 0.6571,
+          "units": 173
+        },
+        "NN04_ATE_163931_final": {
+          "anchored": 96,
+          "concentration": 0.13065,
+          "localizability": 0.6656,
+          "sequentialCoherence": 0.9681147990265873,
+          "sourceMass": 0.70625,
+          "units": 96
+        },
+        "NN05_MUN_151631_final": {
+          "anchored": 68,
+          "concentration": 0.1236,
+          "localizability": 0.663,
+          "sequentialCoherence": 0.9551089643035182,
+          "sourceMass": 0.6745,
+          "units": 68
+        },
+        "NN06_SQT_213031_final": {
+          "anchored": 104,
+          "concentration": 0.13269999999999998,
+          "localizability": 0.66465,
+          "sequentialCoherence": 0.9153599140937583,
+          "sourceMass": 0.72695,
+          "units": 104
+        },
+        "NN07_SKS_213031_final": {
+          "anchored": 98,
+          "concentration": 0.12115000000000001,
+          "localizability": 0.66225,
+          "sequentialCoherence": 0.9215343928828262,
+          "sourceMass": 0.64045,
+          "units": 98
+        },
+        "NN08_OLZ_224031_final": {
+          "anchored": 181,
+          "concentration": 0.1262,
+          "localizability": 0.6595,
+          "sequentialCoherence": 0.9634490727022039,
+          "sourceMass": 0.7244,
+          "units": 181
+        },
+        "NN11_NMA_233131_final": {
+          "anchored": 148,
+          "concentration": 0.12475,
+          "localizability": 0.65995,
+          "sequentialCoherence": 0.954761585859098,
+          "sourceMass": 0.67815,
+          "units": 148
+        },
+        "NN13_DII_241731_final": {
+          "anchored": 338,
+          "concentration": 0.13490000000000002,
+          "localizability": 0.66885,
+          "sequentialCoherence": 0.972939373352151,
+          "sourceMass": 0.6824,
+          "units": 338
+        },
+        "NN15_DBF_242231_final": {
+          "anchored": 97,
+          "concentration": 0.1335,
+          "localizability": 0.6606,
+          "sequentialCoherence": 0.9530418182407826,
+          "sourceMass": 0.7655,
+          "units": 97
+        },
+        "NN16_DBN_242731_final": {
+          "anchored": 89,
+          "concentration": 0.1145,
+          "localizability": 0.6629,
+          "sequentialCoherence": 0.9745690800469086,
+          "sourceMass": 0.6287,
+          "units": 89
+        },
+        "NN17_DBE_242331_final": {
+          "anchored": 352,
+          "concentration": 0.12045,
+          "localizability": 0.66825,
+          "sequentialCoherence": 0.9688073016647082,
+          "sourceMass": 0.643,
+          "units": 352
+        }
+      },
+      "goldParticipants": 10,
+      "goldUnits": 1499,
+      "sceneExact": 65.24349566377585,
+      "sceneExactCI95": [
+        55.27240773286467,
+        72.483537158984
+      ],
+      "withinOne": 82.65510340226818
+    },
+    "ladder-hierarchy": {
+      "goldFree": {
+        "concentration": {
+          "ci95": [
+            0.10001818181818183,
+            0.10680909090909091
+          ],
+          "mean": 0.10357272727272727,
+          "median": 0.10519999999999999,
+          "n": 11
+        },
+        "localizability": {
+          "ci95": [
+            0.6517227272727273,
+            0.6550545454545454
+          ],
+          "mean": 0.6533818181818182,
+          "median": 0.6543,
+          "n": 11
+        },
+        "sequentialCoherence": {
+          "ci95": [
+            0.9411278895346853,
+            0.964669590607459
+          ],
+          "mean": 0.953941754273853,
+          "median": 0.9623466014126294,
+          "n": 11
+        },
+        "sourceMass": {
+          "ci95": [
+            0.6414590909090909,
+            0.6899545454545455
+          ],
+          "mean": 0.664209090909091,
+          "median": 0.66095,
+          "n": 11
+        }
+      },
+      "goldFreePerParticipant": {
+        "NN03_ANT_202231_final": {
+          "anchored": 173,
+          "concentration": 0.0985,
+          "localizability": 0.6499,
+          "sequentialCoherence": 0.9623466014126294,
+          "sourceMass": 0.6383,
+          "units": 173
+        },
+        "NN04_ATE_163931_final": {
+          "anchored": 96,
+          "concentration": 0.11165,
+          "localizability": 0.6561,
+          "sequentialCoherence": 0.9681147990265873,
+          "sourceMass": 0.6731,
+          "units": 96
+        },
+        "NN05_MUN_151631_final": {
+          "anchored": 68,
+          "concentration": 0.0997,
+          "localizability": 0.6516500000000001,
+          "sequentialCoherence": 0.9500577880203149,
+          "sourceMass": 0.6452,
+          "units": 68
+        },
+        "NN06_SQT_213031_final": {
+          "anchored": 104,
+          "concentration": 0.1061,
+          "localizability": 0.65765,
+          "sequentialCoherence": 0.9114808848667149,
+          "sourceMass": 0.71145,
+          "units": 104
+        },
+        "NN07_SKS_213031_final": {
+          "anchored": 98,
+          "concentration": 0.10245,
+          "localizability": 0.6543,
+          "sequentialCoherence": 0.9141029099785346,
+          "sourceMass": 0.62295,
+          "units": 98
+        },
+        "NN08_OLZ_224031_final": {
+          "anchored": 181,
+          "concentration": 0.11,
+          "localizability": 0.6506,
+          "sequentialCoherence": 0.9639773391292065,
+          "sourceMass": 0.6933,
+          "units": 181
+        },
+        "NN11_NMA_233131_final": {
+          "anchored": 148,
+          "concentration": 0.10905000000000001,
+          "localizability": 0.64985,
+          "sequentialCoherence": 0.9616144518910351,
+          "sourceMass": 0.67135,
+          "units": 148
+        },
+        "NN13_DII_241731_final": {
+          "anchored": 338,
+          "concentration": 0.10519999999999999,
+          "localizability": 0.65485,
+          "sequentialCoherence": 0.9753184959975202,
+          "sourceMass": 0.66095,
+          "units": 338
+        },
+        "NN15_DBF_242231_final": {
+          "anchored": 97,
+          "concentration": 0.1059,
+          "localizability": 0.6506,
+          "sequentialCoherence": 0.952405197776274,
+          "sourceMass": 0.7552,
+          "units": 97
+        },
+        "NN16_DBN_242731_final": {
+          "anchored": 89,
+          "concentration": 0.0921,
+          "localizability": 0.6547,
+          "sequentialCoherence": 0.968039655833777,
+          "sourceMass": 0.6099,
+          "units": 89
+        },
+        "NN17_DBE_242331_final": {
+          "anchored": 352,
+          "concentration": 0.09865,
+          "localizability": 0.657,
+          "sequentialCoherence": 0.9659011730797886,
+          "sourceMass": 0.6246,
+          "units": 352
+        }
+      },
+      "goldParticipants": 10,
+      "goldUnits": 1499,
+      "sceneExact": 65.6437625083389,
+      "sceneExactCI95": [
+        56.205128205128204,
+        73.2824427480916
+      ],
+      "withinOne": 83.7224816544363
+    },
+    "ladder-order": {
+      "goldFree": {
+        "concentration": {
+          "ci95": [
+            0.12097727272727272,
+            0.12904545454545455
+          ],
+          "mean": 0.12502727272727274,
+          "median": 0.12475,
+          "n": 11
+        },
+        "localizability": {
+          "ci95": [
+            0.6616909090909091,
+            0.6653227272727272
+          ],
+          "mean": 0.6634681818181818,
+          "median": 0.6629,
+          "n": 11
+        },
+        "sequentialCoherence": {
+          "ci95": [
+            0.9437444879380039,
+            0.9653301591542455
+          ],
+          "mean": 0.9554934230993303,
+          "median": 0.9627413519200904,
+          "n": 11
+        },
+        "sourceMass": {
+          "ci95": [
+            0.6614409090909091,
+            0.7085772727272728
+          ],
+          "mean": 0.6843090909090909,
+          "median": 0.67815,
+          "n": 11
+        }
+      },
+      "goldFreePerParticipant": {
+        "NN03_ANT_202231_final": {
+          "anchored": 173,
+          "concentration": 0.1129,
+          "localizability": 0.6626,
+          "sequentialCoherence": 0.9627413519200904,
+          "sourceMass": 0.6571,
+          "units": 173
+        },
+        "NN04_ATE_163931_final": {
+          "anchored": 96,
+          "concentration": 0.13065,
+          "localizability": 0.6656,
+          "sequentialCoherence": 0.9681147990265873,
+          "sourceMass": 0.70625,
+          "units": 96
+        },
+        "NN05_MUN_151631_final": {
+          "anchored": 68,
+          "concentration": 0.1236,
+          "localizability": 0.663,
+          "sequentialCoherence": 0.9551089643035182,
+          "sourceMass": 0.6745,
+          "units": 68
+        },
+        "NN06_SQT_213031_final": {
+          "anchored": 104,
+          "concentration": 0.13269999999999998,
+          "localizability": 0.66465,
+          "sequentialCoherence": 0.9153599140937583,
+          "sourceMass": 0.72695,
+          "units": 104
+        },
+        "NN07_SKS_213031_final": {
+          "anchored": 98,
+          "concentration": 0.12115000000000001,
+          "localizability": 0.66225,
+          "sequentialCoherence": 0.9215343928828262,
+          "sourceMass": 0.64045,
+          "units": 98
+        },
+        "NN08_OLZ_224031_final": {
+          "anchored": 181,
+          "concentration": 0.1262,
+          "localizability": 0.6595,
+          "sequentialCoherence": 0.9634490727022039,
+          "sourceMass": 0.7244,
+          "units": 181
+        },
+        "NN11_NMA_233131_final": {
+          "anchored": 148,
+          "concentration": 0.12475,
+          "localizability": 0.65995,
+          "sequentialCoherence": 0.954761585859098,
+          "sourceMass": 0.67815,
+          "units": 148
+        },
+        "NN13_DII_241731_final": {
+          "anchored": 338,
+          "concentration": 0.13490000000000002,
+          "localizability": 0.66885,
+          "sequentialCoherence": 0.972939373352151,
+          "sourceMass": 0.6824,
+          "units": 338
+        },
+        "NN15_DBF_242231_final": {
+          "anchored": 97,
+          "concentration": 0.1335,
+          "localizability": 0.6606,
+          "sequentialCoherence": 0.9530418182407826,
+          "sourceMass": 0.7655,
+          "units": 97
+        },
+        "NN16_DBN_242731_final": {
+          "anchored": 89,
+          "concentration": 0.1145,
+          "localizability": 0.6629,
+          "sequentialCoherence": 0.9745690800469086,
+          "sourceMass": 0.6287,
+          "units": 89
+        },
+        "NN17_DBE_242331_final": {
+          "anchored": 352,
+          "concentration": 0.12045,
+          "localizability": 0.66825,
+          "sequentialCoherence": 0.9688073016647082,
+          "sourceMass": 0.643,
+          "units": 352
+        }
+      },
+      "goldParticipants": 10,
+      "goldUnits": 1499,
+      "sceneExact": 65.24349566377585,
+      "sceneExactCI95": [
+        55.27240773286467,
+        72.483537158984
+      ],
+      "withinOne": 82.65510340226818
+    },
+    "ladder-similarity": {
+      "goldFree": {
+        "concentration": {
+          "ci95": [
+            0.12097727272727272,
+            0.12904545454545455
+          ],
+          "mean": 0.12502727272727274,
+          "median": 0.12475,
+          "n": 11
+        },
+        "localizability": {
+          "ci95": [
+            0.6616909090909091,
+            0.6653227272727272
+          ],
+          "mean": 0.6634681818181818,
+          "median": 0.6629,
+          "n": 11
+        },
+        "sequentialCoherence": {
+          "ci95": [
+            0.9437444879380039,
+            0.9653301591542455
+          ],
+          "mean": 0.9554934230993303,
+          "median": 0.9627413519200904,
+          "n": 11
+        },
+        "sourceMass": {
+          "ci95": [
+            0.6614409090909091,
+            0.7085772727272728
+          ],
+          "mean": 0.6843090909090909,
+          "median": 0.67815,
+          "n": 11
+        }
+      },
+      "goldFreePerParticipant": {
+        "NN03_ANT_202231_final": {
+          "anchored": 173,
+          "concentration": 0.1129,
+          "localizability": 0.6626,
+          "sequentialCoherence": 0.9627413519200904,
+          "sourceMass": 0.6571,
+          "units": 173
+        },
+        "NN04_ATE_163931_final": {
+          "anchored": 96,
+          "concentration": 0.13065,
+          "localizability": 0.6656,
+          "sequentialCoherence": 0.9681147990265873,
+          "sourceMass": 0.70625,
+          "units": 96
+        },
+        "NN05_MUN_151631_final": {
+          "anchored": 68,
+          "concentration": 0.1236,
+          "localizability": 0.663,
+          "sequentialCoherence": 0.9551089643035182,
+          "sourceMass": 0.6745,
+          "units": 68
+        },
+        "NN06_SQT_213031_final": {
+          "anchored": 104,
+          "concentration": 0.13269999999999998,
+          "localizability": 0.66465,
+          "sequentialCoherence": 0.9153599140937583,
+          "sourceMass": 0.72695,
+          "units": 104
+        },
+        "NN07_SKS_213031_final": {
+          "anchored": 98,
+          "concentration": 0.12115000000000001,
+          "localizability": 0.66225,
+          "sequentialCoherence": 0.9215343928828262,
+          "sourceMass": 0.64045,
+          "units": 98
+        },
+        "NN08_OLZ_224031_final": {
+          "anchored": 181,
+          "concentration": 0.1262,
+          "localizability": 0.6595,
+          "sequentialCoherence": 0.9634490727022039,
+          "sourceMass": 0.7244,
+          "units": 181
+        },
+        "NN11_NMA_233131_final": {
+          "anchored": 148,
+          "concentration": 0.12475,
+          "localizability": 0.65995,
+          "sequentialCoherence": 0.954761585859098,
+          "sourceMass": 0.67815,
+          "units": 148
+        },
+        "NN13_DII_241731_final": {
+          "anchored": 338,
+          "concentration": 0.13490000000000002,
+          "localizability": 0.66885,
+          "sequentialCoherence": 0.972939373352151,
+          "sourceMass": 0.6824,
+          "units": 338
+        },
+        "NN15_DBF_242231_final": {
+          "anchored": 97,
+          "concentration": 0.1335,
+          "localizability": 0.6606,
+          "sequentialCoherence": 0.9530418182407826,
+          "sourceMass": 0.7655,
+          "units": 97
+        },
+        "NN16_DBN_242731_final": {
+          "anchored": 89,
+          "concentration": 0.1145,
+          "localizability": 0.6629,
+          "sequentialCoherence": 0.9745690800469086,
+          "sourceMass": 0.6287,
+          "units": 89
+        },
+        "NN17_DBE_242331_final": {
+          "anchored": 352,
+          "concentration": 0.12045,
+          "localizability": 0.66825,
+          "sequentialCoherence": 0.9688073016647082,
+          "sourceMass": 0.643,
+          "units": 352
+        }
+      },
+      "goldParticipants": 10,
+      "goldUnits": 1499,
+      "sceneExact": 65.24349566377585,
+      "sceneExactCI95": [
+        55.27240773286467,
+        72.483537158984
+      ],
+      "withinOne": 82.65510340226818
+    },
+    "prior0-chosen-dev": {
+      "goldFree": {
+        "concentration": {
+          "ci95": [
+            0.10110454545454546,
+            0.10746363636363636
+          ],
+          "mean": 0.10444545454545455,
+          "median": 0.1054,
+          "n": 11
+        },
+        "localizability": {
+          "ci95": [
+            0.652,
+            0.6553636363636364
+          ],
+          "mean": 0.6536818181818181,
+          "median": 0.65435,
+          "n": 11
+        },
+        "sequentialCoherence": {
+          "ci95": [
+            0.35626507322871315,
+            0.44322815563617046
+          ],
+          "mean": 0.39913894868580757,
+          "median": 0.3978144522735314,
+          "n": 11
+        },
+        "sourceMass": {
+          "ci95": [
+            0.6424818181818182,
+            0.6903318181818182
+          ],
+          "mean": 0.6649545454545455,
+          "median": 0.6625,
+          "n": 11
+        }
+      },
+      "goldFreePerParticipant": {
+        "NN03_ANT_202231_final": {
+          "anchored": 173,
+          "concentration": 0.0998,
+          "localizability": 0.6501,
+          "sequentialCoherence": 0.3315492956077635,
+          "sourceMass": 0.6397,
+          "units": 173
+        },
+        "NN04_ATE_163931_final": {
+          "anchored": 96,
+          "concentration": 0.1118,
+          "localizability": 0.6567000000000001,
+          "sequentialCoherence": 0.528029681821874,
+          "sourceMass": 0.6773,
+          "units": 96
+        },
+        "NN05_MUN_151631_final": {
+          "anchored": 68,
+          "concentration": 0.101,
+          "localizability": 0.6517,
+          "sequentialCoherence": 0.37728527790824223,
+          "sourceMass": 0.6476500000000001,
+          "units": 68
+        },
+        "NN06_SQT_213031_final": {
+          "anchored": 104,
+          "concentration": 0.10745,
+          "localizability": 0.6582,
+          "sequentialCoherence": 0.37958157652296376,
+          "sourceMass": 0.71145,
+          "units": 104
+        },
+        "NN07_SKS_213031_final": {
+          "anchored": 98,
+          "concentration": 0.10325000000000001,
+          "localizability": 0.65435,
+          "sequentialCoherence": 0.26406781472266083,
+          "sourceMass": 0.6226499999999999,
+          "units": 98
+        },
+        "NN08_OLZ_224031_final": {
+          "anchored": 181,
+          "concentration": 0.111,
+          "localizability": 0.6513,
+          "sequentialCoherence": 0.4452103512437827,
+          "sourceMass": 0.6923,
+          "units": 181
+        },
+        "NN11_NMA_233131_final": {
+          "anchored": 148,
+          "concentration": 0.10925,
+          "localizability": 0.6499,
+          "sequentialCoherence": 0.3069347335017385,
+          "sourceMass": 0.67115,
+          "units": 148
+        },
+        "NN13_DII_241731_final": {
+          "anchored": 338,
+          "concentration": 0.1054,
+          "localizability": 0.6555,
+          "sequentialCoherence": 0.43939769961461556,
+          "sourceMass": 0.6625,
+          "units": 338
+        },
+        "NN15_DBF_242231_final": {
+          "anchored": 97,
+          "concentration": 0.1063,
+          "localizability": 0.651,
+          "sequentialCoherence": 0.47800272248459696,
+          "sourceMass": 0.7545,
+          "units": 97
+        },
+        "NN16_DBN_242731_final": {
+          "anchored": 89,
+          "concentration": 0.0935,
+          "localizability": 0.6548,
+          "sequentialCoherence": 0.4426548298421139,
+          "sourceMass": 0.6096,
+          "units": 89
+        },
+        "NN17_DBE_242331_final": {
+          "anchored": 352,
+          "concentration": 0.10014999999999999,
+          "localizability": 0.65695,
+          "sequentialCoherence": 0.3978144522735314,
+          "sourceMass": 0.6257,
+          "units": 352
+        }
+      },
+      "goldParticipants": 10,
+      "goldUnits": 1499,
+      "sceneExact": 35.2234823215477,
+      "sceneExactCI95": [
+        30.113636363636363,
+        40.825688073394495
+      ],
+      "withinOne": 44.22948632421615
+    }
+  },
+  "resamples": 2000,
+  "schema": "storymodel4s.navigation-ladder.readout/v1",
+  "scoringRevision": "e26d3091694c0fa1c40fa6aa4add1978fee42e4c",
+  "seed": 20260902
+}

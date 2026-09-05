@@ -1,0 +1,15 @@
+{
+  "revision": "c0f602a03ac161ea8aac0acde78dc6a3a599791f",
+  "command": [
+    "sbt",
+    "-batch",
+    "-J-XX:ActiveProcessorCount=3",
+    "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+    "scalafmtAll",
+    "alignJVM/testOnly storymodel4s.align.PropositionalScopeSuite"
+  ],
+  "exitCode": 0,
+  "elapsedSeconds": 17.597443103790283,
+  "logSha256": "c5742435f3ed5a697f10ddc9042000fc868ea72a14a0caf9481828c5b4c2a5d1",
+  "diffSha256": "db7e5dcccc6e8da9026540c1c0678bb2bae0dc13238454a401fda88303e2bb6c"
+}

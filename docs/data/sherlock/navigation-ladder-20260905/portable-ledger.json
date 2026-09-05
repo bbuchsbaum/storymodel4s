@@ -1,0 +1,15 @@
+{
+  "command": [
+    "sbt",
+    "-batch",
+    "-J-XX:ActiveProcessorCount=3",
+    "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+    "alignJVM/testOnly storymodel4s.align.LayerUseSuite",
+    "alignJS/testOnly storymodel4s.align.LayerUseSuite",
+    "alignNative/testOnly storymodel4s.align.LayerUseSuite"
+  ],
+  "exitCode": 0,
+  "elapsedSeconds": 53.703688859939575,
+  "logSha256": "c0a60c635808ddf086e582beb5054fd189cddf9002967fa88aea5e93dc5787ca",
+  "diffSha256": "e3f08e709771bfa60d2532ad5f4d8d2ef279e1d795a689e0808c679c3102a6c0"
+}

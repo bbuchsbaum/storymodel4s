@@ -1,0 +1,22 @@
+SUPPORTING DIAGNOSTIC: constant-anchor collapse obtains 0 s gap; this is not accuracy.
+pairing: 354 mutual-best cross-participant unit pairs over 11 participants, fixed across arms
+constant-anchor control: median gap 0.0s; within 60s 100.0%; n=354
+Legacy pair-resampled intervals below are descriptive, not participant-generalization intervals.
+   ladder-full            median gap     92.0s  95% CI [59.0, 128.0]  within 60s:  45.5%  n=354
+   ladder-content         median gap     69.5s  95% CI [45.0, 105.0]  within 60s:  47.5%  n=354
+   ladder-hierarchy       median gap     69.5s  95% CI [45.0, 105.0]  within 60s:  47.5%  n=354
+   ladder-order           median gap     92.0s  95% CI [59.0, 128.0]  within 60s:  45.5%  n=354
+   ladder-causality       median gap     92.0s  95% CI [59.0, 128.0]  within 60s:  45.5%  n=354
+   ladder-similarity      median gap     92.0s  95% CI [59.0, 128.0]  within 60s:  45.5%  n=354
+   chosen-shuffled-dev    median gap     99.0s  95% CI [61.0, 177.0]  within 60s:  44.6%  n=354
+   prior0-chosen-dev      median gap     97.0s  95% CI [40.0, 176.0]  within 60s:  46.0%  n=354
+
+== paired against ladder-full, same 354 pairs, resampled together ==
+   negative change means the two participants' anchors agree more closely
+   ladder-content         median gap   -22.5s [-35.0, -2.0] excludes zero   within60  +2.0pp [+0.6, +3.7] excludes zero   signed-rank p=0.0013
+   ladder-hierarchy       median gap   -22.5s [-35.0, -2.0] excludes zero   within60  +2.0pp [+0.6, +3.7] excludes zero   signed-rank p=0.0022
+   ladder-order           median gap    +0.0s [+0.0, +0.0] includes zero   within60  +0.0pp [+0.0, +0.0] includes zero   signed-rank p=1.0000
+   ladder-causality       median gap    +0.0s [+0.0, +0.0] includes zero   within60  +0.0pp [+0.0, +0.0] includes zero   signed-rank p=1.0000
+   ladder-similarity      median gap    +0.0s [+0.0, +0.0] includes zero   within60  +0.0pp [+0.0, +0.0] includes zero   signed-rank p=1.0000
+   chosen-shuffled-dev    median gap    +7.0s [-34.0, +85.5] includes zero   within60  -0.8pp [-6.2, +4.5] includes zero   signed-rank p=0.0839
+   prior0-chosen-dev      median gap    +5.0s [-44.0, +76.5] includes zero   within60  +0.6pp [-4.8, +5.9] includes zero   signed-rank p=0.0704
