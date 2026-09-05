@@ -49,6 +49,12 @@ uncertainty. Missing corpus offsets, nonfinite times and changed recall populati
 The Film Festival CLI requests ONNX by default and refuses missing artifacts. Lexical runs require
 an explicit argument and absent ONNX variables. Existing Sherlock defaults are preserved.
 
+The runner fixes the historical defaults explicitly: ONNX MiniLM, lexical blend 0.8, eight
+candidates per level, lexical nomination off, prior scale 1, monotone decode and fill on, hard
+backward penalty, zero forward penalty. The historical reports have no backward scene steps in
+the inspected participants; no new prior setting is selected. The film-identity indices have no
+scene groups, so scene decoding has no scene assignment to constrain there.
+
 Film Festival supplies `WorldOrderInput.Unknown(NotSupplied)`: independent films share no declared
 story-world clock. Annotation axes remain placeholders. This integration does not repair or use
 source-empty fidelity facets; those remain outside the scoreboard.
