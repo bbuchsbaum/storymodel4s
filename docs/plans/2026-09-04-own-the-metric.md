@@ -128,10 +128,10 @@ to a defensible public claim, and every later workstream is measured on what it 
    supply them**, so the mode gate's refusals and the facet verdicts are absent rather than fabricated.
    Typed missingness is the project's own rule and this is the place it is being violated. Mutation
    witness: restore the empty source view and show the named facet test fails.
-   **Collision:** `solo/world-order-input` (ADR 0013, worktree `.worktrees/worldorder`) already
-   changes `TimedSourceView.build` to return `Either[WorldOrderRefusal, Built]`. Rebase 0(b) onto it
-   rather than editing the same function in parallel.
-   *(a) landed on this branch at `a7e395ab`; (b) is open.*
+   *Resolved:* `solo/world-order-input` landed, so 0(b) edited `TimedSourceView` in one place. The
+   fix is `PropositionalScope` — a view says whether it describes predicates, participants and
+   context, and one that does not scores no facet over them.
+   *Both (a) and (b) have landed on this branch; see the commits for their mutation witnesses.*
 
 1. **Two more corpora through the existing aligner.** FilmFestival and Memento each emit
    `TimedSegment`s directly (`embed-bench/.../RecallToVideo.scala:66-75`) and reuse the aligner
@@ -198,7 +198,7 @@ and pronoun coreference is wired into the compiler in `solo/root-segment` (ADR 0
    *Check:* `codec/ledger.scala` `Migration.steps` is empty, so each bump lands with **no migration**.
    Audit committed artifacts at the older schemas — recordings, study exports, fixtures — and either
    re-emit or declare them unreadable, once, rather than per bump.
-2. **ADR 0014 — re-ratify the stage order (owner decision, SD5).** The ratified order is
+2. **ADR 0016 — re-ratify the stage order (owner decision, SD5).** The ratified order is
    `P1 → B0 → C1 → D0/D1 → E0` with C1 "begins only after P1 and B0 close"
    (`docs/plans/2026-08-29-movie-narrative-architecture.md:798,827`). But **C1 is already built** —
    `core/source.scala` carries `SourceBundle`, stream/axis/coordinate/interval-set, `EvidenceSupport`,
@@ -217,7 +217,7 @@ and pronoun coreference is wired into the compiler in `solo/root-segment` (ADR 0
    eligibility is "Passed as policy" — the annotation TSV and recall CSVs are usable; only the episode
    video stays external. B0's open legs are the source-binding, coordinate, semantic, and comparison
    courts (`:60,78`), which is where W1's independence ablation lands.
-3. **ADR 0014 also declares the two evidence tiers**, in existing vocabulary rather than new:
+3. **ADR 0016 also declares the two evidence tiers**, in existing vocabulary rather than new:
    **Diagnostic** = `FamilyPolicy.Development` (`acquire/.../resolve.scala:133-235`) — Draft
    authority, no mutation witness required, *may never select an arm and may never become gold*;
    **Scientific** = `Ordinary`/`Conservative`. The within-scene machine lane already works this way.
