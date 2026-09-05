@@ -151,6 +151,22 @@ class WorkedExampleSuite extends FunSuite:
       .ablationUngated(negated.recall, allFind, cands, DefaultLocalCostModel(semantic = sem))
       .fold(e => fail(e.message), identity)
     assert(abl.massOn(negated.unit.id, AlignState.Source(e5)) > 0.0)
+    // and it carries the ledger of what its configuration read, derived from that configuration
+    assertEquals(abl.layerUse, HsmmConfig.default.layerUse)
+    val withoutCausal = HsmmConfig.unsafe(transitions =
+      TransitionModel(TransitionModel.default.theta ++ Map(TransitionKind.CausalNeighbor -> 0.0))
+    )
+    val ablWithout = GraphHsmm
+      .ablationUngated(
+        negated.recall,
+        allFind,
+        cands,
+        DefaultLocalCostModel(semantic = sem),
+        withoutCausal
+      )
+      .fold(e => fail(e.message), identity)
+    assert(ablWithout.layerUse.withheld.contains(TransitionKind.CausalNeighbor))
+    assert(!ablWithout.layerUse.layersRead.contains(RelationLayer.Causal))
   }
 
   test("a scene is a gist target unless every engaged leaf under it is contradicted") {

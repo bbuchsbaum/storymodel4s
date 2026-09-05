@@ -72,7 +72,7 @@ say which graph it ran on.
   No fingerprint changes either, but only because θ is fingerprinted nowhere: `ViewFingerprint`
   hashes node fields, adjacency, world order and text length, and the run's provenance string
   carries `priorScale` but not the model. An identity check would not have caught a θ change
-  before this slice and does not after it; that gap is ADR 0015's (planned).
+  before this slice and does not after it; that gap is ADR 0016's (planned).
   `RecallOrderControl.orderingKinds` is unchanged.
 - The declaration order of all fourteen kinds is pinned in full by `DirectedCausalSuite`, so a
   later reordering or mid-enum insertion fails a test rather than moving the last bits of every
@@ -81,7 +81,7 @@ say which graph it ran on.
   against the twelve older kinds summed in their declared order.
 - The circularity the assessment names — a reported "recall followed causal structure" computed
   under `CausalNeighbor -> 0.8` — is untouched here; it belongs to the layer-use ledger and θ
-  provenance slice (ADR 0015, planned).
+  provenance slice (ADR 0016, planned).
 
 ## Rejected
 
