@@ -119,3 +119,14 @@ These remain development analyses on previously inspected participants. A newly 
 cannot retroactively make them untouched. Human reliability, actual film acquisition/admission,
 independently supported clocks and an independent confirmation sample remain open work; no REB/IRB
 or redistribution basis is inferred from this exercise.
+
+## Source attribution and reuse
+
+Data and source identities are recorded in the [Film Festival provenance record](../data/filmfestival/README.md):
+Lee, Chen & Hasson (2023), OpenNeuro `ds004042` v1.0.1; the `jchenlab-jhu/filmfest` annotation and
+recall-gold release at `0ffad622`; and `jchenlab-jhu/filmfest-textdata` at `bf22326d`.
+
+Derived from openly released research data. Where the upstream release carries no explicit
+licence, it is used here for non-commercial academic research under an open-science reading, with
+attribution to the original authors. No source bytes are redistributed. The original authors have
+not reviewed or endorsed this use.
