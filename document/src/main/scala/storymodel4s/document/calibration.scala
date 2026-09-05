@@ -15,7 +15,7 @@ import storymodel4s.proposition.{
 import storymodel4s.story.ParticipantRole
 
 /** Source-bound participant reliability studies; fitting is not a certificate of generalization.
-  * See ADR 0014 for the semantic target and the curator's story-group obligation.
+  * See ADR 0015 for the semantic target and the curator's story-group obligation.
   */
 object ParticipantCalibration:
   val EstimatorVersion: String = "participant-role-cell-beta11/v1"

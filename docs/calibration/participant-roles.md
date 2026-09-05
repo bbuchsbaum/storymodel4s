@@ -5,7 +5,7 @@ by its exact source. It does not score a person's recall or collapse narrative
 alignment into correct/incorrect labels. Role reliability is one uncertainty
 coordinate underneath that larger model.
 
-The implementation is `document.ParticipantCalibration` (ADR 0014). Its numerical
+The implementation is `document.ParticipantCalibration` (ADR 0015). Its numerical
 and compiler tests use synthetic labels. No human-adjudicated role corpus or
 production fit is supplied with this implementation.
 

@@ -276,7 +276,7 @@ does not establish a calibrated confidence, a boundary, or causal structure.
 ## 8. Calibration instrument — 2026-09-04
 
 `document.ParticipantCalibration` implements the role-study mechanics under
-ADR 0014. It extracts exact candidates from checked compiler inputs, binds final
+ADR 0015. It extracts exact candidates from checked compiler inputs, binds final
 judgments to source/acquisition identities, estimates separate role/scorer/score
 cells with a declared Beta(1,1) prior, and refits leave-story-out folds. Source
 aliases, story-group reuse, incompatible producers, unseen cells and cells with

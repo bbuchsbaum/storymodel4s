@@ -1,4 +1,4 @@
-# ADR 0014 — Participant-role calibration studies
+# ADR 0015 — Participant-role calibration studies
 
 Accepted 2026-09-04, single-developer mode. Implements the calibration handoff
 without manufacturing the adjudications it requires.
