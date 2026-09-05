@@ -1,6 +1,7 @@
-# ADR 0016: opt-in bench stage diagnostics
+# ADR 0017: opt-in bench stage diagnostics
 
 Accepted 2026-09-05 in single-developer mode, for the owner's five-step Film Festival evaluation.
+Renumbered from 0016 during main unification: the published layer-use ledger owns 0016.
 
 `STORYMODEL4S_STAGE_TRACE=on` writes `storymodel4s.bench.stage-trace/v1` beside a recall report.
 It records nomination ranks within level, actual admissible local costs, independent normalized

@@ -4,6 +4,11 @@
 owner decisions it records are all from 2026-09-03. Each workstream executes task-by-task with
 verification at each step.*
 
+The baseline and branch-state descriptions below are historical. On 2026-09-05, main unification
+incorporated W1 item 0 from `solo/own-the-metric-w1b`, the layer-use ledger (ADR 0016), and
+[Film Festival diagnostics](2026-09-05-filmfestival-diagnostic-results.md) (ADR 0017).
+The proposed stage-order ADR in W2 remains unwritten and has no reserved number.
+
 ## Context
 
 `vision.md` claims one object seen through three kinds of evidence — text, film, autobiographical
@@ -198,7 +203,7 @@ and pronoun coreference is wired into the compiler in `solo/root-segment` (ADR 0
    *Check:* `codec/ledger.scala` `Migration.steps` is empty, so each bump lands with **no migration**.
    Audit committed artifacts at the older schemas — recordings, study exports, fixtures — and either
    re-emit or declare them unreadable, once, rather than per bump.
-2. **ADR 0016 — re-ratify the stage order (owner decision, SD5).** The ratified order is
+2. **A separate ADR must re-ratify the stage order (owner decision, SD5).** The ratified order is
    `P1 → B0 → C1 → D0/D1 → E0` with C1 "begins only after P1 and B0 close"
    (`docs/plans/2026-08-29-movie-narrative-architecture.md:798,827`). But **C1 is already built** —
    `core/source.scala` carries `SourceBundle`, stream/axis/coordinate/interval-set, `EvidenceSupport`,
@@ -217,7 +222,7 @@ and pronoun coreference is wired into the compiler in `solo/root-segment` (ADR 0
    eligibility is "Passed as policy" — the annotation TSV and recall CSVs are usable; only the episode
    video stays external. B0's open legs are the source-binding, coordinate, semantic, and comparison
    courts (`:60,78`), which is where W1's independence ablation lands.
-3. **ADR 0016 also declares the two evidence tiers**, in existing vocabulary rather than new:
+3. **That ADR must also declare the two evidence tiers**, in existing vocabulary rather than new:
    **Diagnostic** = `FamilyPolicy.Development` (`acquire/.../resolve.scala:133-235`) — Draft
    authority, no mutation witness required, *may never select an arm and may never become gold*;
    **Scientific** = `Ordinary`/`Conservative`. The within-scene machine lane already works this way.
