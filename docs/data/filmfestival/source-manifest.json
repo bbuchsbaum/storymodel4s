@@ -1,0 +1,282 @@
+{
+  "schema": "storymodel4s.filmfestival.source-manifest",
+  "schemaVersion": 1,
+  "artifactSetId": "filmfestival-shortfilm-recall-source-set-v1",
+  "recordedAt": "2026-09-03",
+  "scientificRole": "candidate-second-corpus-recommended-by-scouting-brief",
+  "admissionStatus": {
+    "state": "proposed",
+    "courtOpened": false,
+    "blocking": [
+      "owner decision to open an acquisition court",
+      "story-text-admission-checklist section 3 REB/IRB basis, required before any participant recall prose is committed"
+    ],
+    "licenceDecision": {
+      "decidedBy": "owner",
+      "decidedAt": "2026-09-04",
+      "decision": "open-science-research-use",
+      "statement": "These are open-science releases. Local research use is accepted without waiting on an explicit licence grant, on the conditions below.",
+      "conditions": [
+        "no upstream bytes are redistributed; sources stay in the git-ignored data root",
+        "every release and its accompanying article is cited wherever results are reported",
+        "a disclaimer accompanies any publication or artifact derived from a source whose upstream carries no LICENSE file",
+        "this decision covers licence only; it does not address human-subject provenance, which section 3 of the story-text admission checklist governs separately"
+      ],
+      "disclaimer": "Derived from openly released research data. Where the upstream release carries no explicit licence, it is used here for non-commercial academic research under an open-science reading, with attribution to the original authors. No source bytes are redistributed. The original authors have not reviewed or endorsed this use."
+    }
+  },
+  "upstreamSources": [
+    {
+      "id": "ds004042",
+      "kind": "openneuro-dataset",
+      "accession": "ds004042",
+      "snapshot": "1.0.1",
+      "doi": "doi:10.18112/openneuro.ds004042.v1.0.1",
+      "license": "CC0",
+      "fullSnapshotBytes": 41720874631,
+      "fullSnapshotFiles": 179,
+      "mirrorRepository": "https://github.com/OpenNeuroDatasets/ds004042",
+      "mirrorCommit": "5fd7a56500b6d89a54d005d6fe0216006c2a87f1",
+      "stagedFileCount": 32,
+      "videoBytesPresent": false,
+      "videoWithheldByRelease": "Due to copyright issues, we are not uploading the movie video files."
+    },
+    {
+      "id": "filmfest-repo",
+      "kind": "github",
+      "repository": "https://github.com/jchenlab-jhu/filmfest",
+      "commit": "0ffad622cba677484890d47082d1bc351b38bfe1",
+      "commitDate": "2022-06-30T02:28:48Z",
+      "zenodoDoi": "10.5281/zenodo.6574792",
+      "zenodoTitle": "jchenlab-jhu/filmfest: v1.0.0",
+      "zenodoLicense": "other-open",
+      "licenseFilePresent": false,
+      "stagedFileCount": 25,
+      "discovery": "cited only in the Nature Communications data-availability statement; the dataset README names no repository"
+    },
+    {
+      "id": "filmfest-textdata",
+      "kind": "github",
+      "repository": "https://github.com/jchenlab-jhu/filmfest-textdata",
+      "commit": "bf22326d8b9ba1586a3c6d111b4e96e591c3e690",
+      "commitDate": "2025-10-22T21:18:26Z",
+      "licenseFilePresent": false,
+      "citedInAnyPublication": false,
+      "stagedFileCount": 44,
+      "notStaged": "approximately 500 .npy sentence embeddings and the analysis notebooks"
+    },
+    {
+      "id": "natcomm-source-data",
+      "kind": "publisher-supplementary",
+      "article": "Lee, H. & Chen, J. (2022). Predicting memory from the network structure of naturalistic events. Nature Communications, 13, 4235.",
+      "doi": "10.1038/s41467-022-31965-2",
+      "license": "CC BY 4.0",
+      "file": "41467_2022_31965_MOESM4_ESM.zip",
+      "stagedFileCount": 1
+    },
+    {
+      "id": "word-timestamps",
+      "kind": "github",
+      "repository": "https://github.com/jchenlab-jhu/Word-timestamped-transcripts",
+      "commit": "ea87e76fe7e48ad2098731d302ff8f9140f1a16e",
+      "tag": "v1.3",
+      "zenodoDoi": "10.5281/zenodo.8208709",
+      "license": "other-open",
+      "stagedInThisSlice": false,
+      "note": "The Film Festival half (25 xlsx, 20 participants) is already present on disk inside the Sherlock clone at data/sherlock/recall/Word-timestamped-transcripts/. Same release, already identified by docs/data/sherlock/recall-lineage.json."
+    }
+  ],
+  "contentPolicy": {
+    "participantRecallProsePresent": true,
+    "participantRecallProseLocation": "data root only, git-ignored; never committed",
+    "annotationProsePresent": true,
+    "rawVideoPresent": false,
+    "externalOnlyArtifactClasses": [
+      "participant-recall-prose",
+      "film-annotation-prose",
+      "actual-film-video-bytes",
+      "film-subtitle-text"
+    ]
+  },
+  "verification": {
+    "method": "every upstream-sourced staged file re-hashed with git hash-object and compared to the upstream tree blob at the recorded commit",
+    "verifiedFileCount": 101,
+    "mismatchCount": 0,
+    "notVerifiableByBlob": [
+      {
+        "id": "derived/NatComm2022_SourceData.xlsx",
+        "reason": "publisher zip, no upstream git blob",
+        "byteLength": 140026,
+        "sha256": "e1350ba6c98aeafbab0fda427482b000b0caa95eba75daed9fd8c2ef2a3b021e"
+      },
+      {
+        "id": "subtitles/high_maintenance_the_boyfriend_en_manual.srt",
+        "reason": "extracted from a YouTube manual caption track; no stable upstream identity",
+        "byteLength": 5174,
+        "sha256": "b5c4392cfae8cd3b23335c8faf1f8ca9e2f2bab9319d7766936219e89f32e390",
+        "provenance": "YouTube video id _AF7ils5JCE, track kind MANUAL, pulled with yt-dlp"
+      },
+      {
+        "id": "FILMS.md",
+        "reason": "project-authored",
+        "byteLength": 5340,
+        "sha256": "596e70fc4f93f3408e13a438c6b6d36f4da4158e1e31e58d85ac9a48cb35218c"
+      }
+    ],
+    "stagedFileCount": 104,
+    "artifactGroupFileCountTotal": 104
+  },
+  "artifactGroups": [
+    {
+      "id": "recall_events",
+      "upstreamSource": "ds004042",
+      "role": "participant-recall-utterances-with-onset-and-duration",
+      "fileCount": 25,
+      "storage": "external-local-only",
+      "contentStoredInGit": false,
+      "byteLengthTotal": 490764,
+      "allBytesVerifiedAgainstUpstreamBlobs": true,
+      "notes": {
+        "participants": 20,
+        "utteranceRows": 4005,
+        "grain": "utterance"
+      }
+    },
+    {
+      "id": "annotations",
+      "upstreamSource": "filmfest-repo",
+      "role": "stimulus-annotation-three-independent-coders",
+      "fileCount": 4,
+      "storage": "external-local-only",
+      "contentStoredInGit": false,
+      "byteLengthTotal": 146152,
+      "allBytesVerifiedAgainstUpstreamBlobs": true,
+      "notes": {
+        "coders": [
+          "JL",
+          "KM",
+          "RC"
+        ],
+        "coarseSegments": 216,
+        "fineRowsByCoder": {
+          "JL": 628,
+          "KM": 485,
+          "RC": 489
+        },
+        "timebase": "run-relative, min.sec decimal",
+        "runTwoSegmentOffset": 106,
+        "includesUpstreamReadme": true
+      }
+    },
+    {
+      "id": "recall_scenematched",
+      "upstreamSource": "filmfest-repo",
+      "role": "recall-to-scene-gold",
+      "fileCount": 20,
+      "storage": "external-local-only",
+      "contentStoredInGit": false,
+      "byteLengthTotal": 391397,
+      "allBytesVerifiedAgainstUpstreamBlobs": true,
+      "notes": {
+        "participants": 15,
+        "files": 19,
+        "labelledUtterances": 3226,
+        "distinctScenesReferenced": 204,
+        "sceneIdSpace": "1-216 global"
+      }
+    },
+    {
+      "id": "textdata",
+      "upstreamSource": "filmfest-textdata",
+      "role": "crowd-sourced-segment-descriptions-and-predictions",
+      "fileCount": 44,
+      "storage": "external-local-only",
+      "contentStoredInGit": false,
+      "byteLengthTotal": 9660435,
+      "allBytesVerifiedAgainstUpstreamBlobs": true,
+      "notes": {
+        "films": 6,
+        "descriptionRows": 7099,
+        "predictionRows": 11526,
+        "mappedToFmriTimeline": true,
+        "caveat": "cmiyc_long is a longer cut than the 346 s presented in the scanner"
+      }
+    },
+    {
+      "id": "derived",
+      "upstreamSource": "mixed",
+      "role": "per-event-network-metrics-and-online-recall-corpus",
+      "fileCount": 2,
+      "storage": "external-local-only",
+      "contentStoredInGit": false,
+      "byteLengthTotal": 534823,
+      "allBytesVerifiedAgainstUpstreamBlobs": true,
+      "notes": {
+        "natCommEvents": 202,
+        "onlineExperimentParticipants": 492
+      }
+    },
+    {
+      "id": "subtitles",
+      "upstreamSource": "youtube-manual-caption-track",
+      "role": "film-dialogue-transcript",
+      "fileCount": 1,
+      "storage": "external-local-only",
+      "contentStoredInGit": false,
+      "byteLengthTotal": 5174,
+      "allBytesVerifiedAgainstUpstreamBlobs": true,
+      "notes": {
+        "films": 1,
+        "note": "the only genuine caption track located across all ten stimuli"
+      }
+    },
+    {
+      "id": "bids-metadata",
+      "upstreamSource": "ds004042",
+      "role": "stimulus-presentation-schedule",
+      "fileCount": 7,
+      "storage": "external-local-only",
+      "contentStoredInGit": false,
+      "byteLengthTotal": 4653,
+      "allBytesVerifiedAgainstUpstreamBlobs": true,
+      "notes": {
+        "films": 10,
+        "cartoonIntroPerRun": true
+      },
+      "files": [
+        "README",
+        "dataset_description.json",
+        "participants.tsv",
+        "task-movie_bold.json",
+        "task-recall_bold.json",
+        "task-movie_run-01_events.tsv",
+        "task-movie_run-02_events.tsv"
+      ]
+    },
+    {
+      "id": "project-authored",
+      "upstreamSource": "project-authored",
+      "role": "codename-to-film mapping, per-film sources, timebase gotchas",
+      "fileCount": 1,
+      "byteLengthTotal": 5340,
+      "storage": "external-local-only",
+      "contentStoredInGit": false,
+      "allBytesVerifiedAgainstUpstreamBlobs": false,
+      "notes": {
+        "file": "FILMS.md",
+        "warning": "names commercial works and public copies; not for Git admission"
+      }
+    }
+  ],
+  "nonClaims": [
+    "acquisition-court-opened",
+    "ethical-basis-for-redistribution-of-recall-prose",
+    "reference-annotator-selected",
+    "exact-experimental-presentation-edition",
+    "frame-exact-annotation-alignment",
+    "accepted-narrative-semantics",
+    "alignment-result",
+    "annotation-to-events-tsv-clock-offset-resolved",
+    "upstream-authors-have-reviewed-or-endorsed-this-use"
+  ]
+}

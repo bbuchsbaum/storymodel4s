@@ -20,12 +20,27 @@ is better, and it is bounded below by genuine disagreement about what the recall
 
 Usage: agreement.py LABEL DIR [LABEL DIR ...]
 """
-import csv, glob, math, os, random, statistics, sys
+import csv, glob, json, math, os, random, statistics, sys
 
 # A continuous film timeline in real seconds. Part A runs to 1426s in the annotation, so part B is
 # offset by that rather than by a large sentinel: with a sentinel offset a pair split across the two
 # parts contributes a gap of tens of thousands of seconds and dominates any mean.
 PART = {"media-part-a": 0.0, "media-part-b": 1426.0}
+
+
+def part_offsets(d):
+    """Per-corpus part offsets, defaulting to Sherlock's two media parts.
+
+    A corpus whose parts are not Sherlock's writes `parts.json` beside its reports, mapping each
+    `mediaPart` id to the seconds at which that part begins on one continuous timeline. Film
+    Festival's two scanning runs are such a corpus. Sherlock arms carry no such file and are
+    unaffected.
+    """
+    path = os.path.join(d, "parts.json")
+    if not os.path.exists(path):
+        return PART
+    with open(path, encoding="utf-8") as fh:
+        return {k: float(v) for k, v in json.load(fh).items()}
 MIN_OVERLAP = 0.22
 MIN_TOKENS = 4
 STOP = set(
@@ -43,13 +58,16 @@ def toks(s):
 
 
 def load(d):
+    parts = part_offsets(d)
     out = {}
     for p in sorted(glob.glob(os.path.join(d, "recall-map-*.tsv"))):
         name = os.path.basename(p).replace("recall-map-", "").replace(".tsv", "")
         rows = []
         for r in csv.DictReader(open(p, newline="", encoding="utf-8"), delimiter="\t"):
-            if r.get("mediaPart") in PART and r.get("startSeconds"):
-                rows.append((r.get("recallText") or "", PART[r["mediaPart"]] + float(r["startSeconds"])))
+            if r.get("mediaPart") in parts and r.get("startSeconds"):
+                rows.append(
+                    (r.get("recallText") or "", parts[r["mediaPart"]] + float(r["startSeconds"]))
+                )
         out[name] = rows
     return out
 

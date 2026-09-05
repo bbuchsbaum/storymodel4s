@@ -1,0 +1,257 @@
+{
+  "schema": "storymodel4s.memento.source-manifest",
+  "schemaVersion": 1,
+  "artifactSetId": "memento-nonlinear-recall-source-set-v1",
+  "recordedAt": "2026-09-03",
+  "scientificRole": "candidate-third-corpus-presentation-versus-story-order-probe",
+  "admissionStatus": {
+    "state": "proposed",
+    "courtOpened": false,
+    "blocking": [
+      "owner decision to open an acquisition court",
+      "story-text-admission-checklist section 3 REB/IRB basis, required before any participant recall prose is committed"
+    ],
+    "licenceDecision": {
+      "decidedBy": "owner",
+      "decidedAt": "2026-09-04",
+      "decision": "open-science-research-use",
+      "statement": "These are open-science releases. Local research use is accepted without waiting on an explicit licence grant, on the conditions below.",
+      "conditions": [
+        "no upstream bytes are redistributed; sources stay in the git-ignored data root",
+        "every release and its accompanying article is cited wherever results are reported",
+        "a disclaimer accompanies any publication or artifact derived from a source whose upstream carries no LICENSE file",
+        "this decision covers licence only; it does not address human-subject provenance, which section 3 of the story-text admission checklist governs separately"
+      ],
+      "disclaimer": "Derived from openly released research data. Where the upstream release carries no explicit licence, it is used here for non-commercial academic research under an open-science reading, with attribution to the original authors. No source bytes are redistributed. The original authors have not reviewed or endorsed this use."
+    }
+  },
+  "publicRelease": {
+    "repository": "https://github.com/JamesWardAntony/memento",
+    "commit": "bb8f1b859c01a8e33a772887b5892692c374bfed",
+    "commitDate": "2024-06-21T19:01:14Z",
+    "licenseFilePresent": false,
+    "relatedArticle": {
+      "citation": "Antony, J. W., Lozano, A., Dhoat, P., Chen, J., & Bennion, K. (2024). Causal and Chronological Relationships Predict Memory Organization for Nonlinear Narratives. Journal of Cognitive Neuroscience, 36(11), 2368-2385.",
+      "doi": "10.1162/jocn_a_02216",
+      "pmcid": "PMC11887591",
+      "openAccess": false
+    },
+    "stimulus": {
+      "work": "Memento (2000, Christopher Nolan)",
+      "runtimeMinutes": 113,
+      "bytesPresent": false,
+      "reason": "commercial feature; no video is stored or redistributed"
+    }
+  },
+  "contentPolicy": {
+    "participantRecallProsePresent": true,
+    "participantRecallProseLocation": "data root only, git-ignored; never committed",
+    "annotationProsePresent": true,
+    "rawVideoPresent": false,
+    "externalOnlyArtifactClasses": [
+      "participant-recall-prose",
+      "film-screenplay-derived-scene-prose",
+      "actual-film-video-bytes"
+    ]
+  },
+  "verification": {
+    "method": "every staged file re-hashed with git hash-object and compared to the upstream tree blob at the recorded commit",
+    "allStagedBytesMatchUpstreamBlobs": true,
+    "notStaged": [
+      "memento.ipynb",
+      "memento_5_28_24.ipynb"
+    ],
+    "notStagedReason": "analysis notebooks, not source data"
+  },
+  "artifacts": [
+    {
+      "id": "MementoStoryBoard.xlsx",
+      "role": "stimulus-annotation-and-consensus-ratings",
+      "upstreamGitBlob": "3939fbde3089e71bba1e440bca9020c2932c0d40",
+      "byteLength": 319443,
+      "sha256": "220100a339b92315cfcbbd6ae3d241a6e198946960a6ea8a96bf51c208785ba2",
+      "storage": "external-local-only",
+      "contentStoredInGit": false,
+      "notes": {
+        "sheets": [
+          "storyBoard",
+          "dialogueScript",
+          "fullScript",
+          "broadSceneDescriptions",
+          "CausalityRatings",
+          "ImportanceRatings",
+          "visSim",
+          "blacktowhite",
+          "Sheet1"
+        ],
+        "subsceneRows": 129,
+        "broadScenes": 44,
+        "narrativePartCounts": {
+          "Backward": 82,
+          "Forward": 26,
+          "FlashbackWithinBackward": 10,
+          "FlashbackWithinForward": 10,
+          "None": 1
+        },
+        "storyOrderPermutationDistinctValues": 44,
+        "namedCharacters": 17,
+        "places": 20,
+        "lastSubsceneTimecode": "01:50:27",
+        "clippedVersionSubscenes": 42,
+        "dialogueScriptRows": 1207,
+        "fullScriptRows": 2709
+      }
+    },
+    {
+      "id": "Subjects.xlsx",
+      "role": "participant-recall-transcripts-and-scene-gold",
+      "upstreamGitBlob": "55c553ce459f5d4ee6038bc27b945540d8c845a8",
+      "byteLength": 4188342,
+      "sha256": "5ab22bfe404422aa423b8b42db8f389a4c351ee7c63154470ea5a0bb698ea8b2",
+      "storage": "external-local-only",
+      "contentStoredInGit": false,
+      "notes": {
+        "recallSheets": 133,
+        "subsIndexRows": 134,
+        "conditionCounts": {
+          "1": 31,
+          "2": 33,
+          "3": 34,
+          "4": 36
+        },
+        "totalRows": 39415,
+        "rowsWithTranscriptText": 21854,
+        "rowsWithBroadSceneNum": 13545,
+        "rowsFlaggedFalseMemory": 150,
+        "recallTypeCounts": {
+          "non-integer": 7,
+          "1": 11762,
+          "2": 4964,
+          "4": 1423,
+          "5": 896,
+          "3": 582,
+          "22": 2,
+          "45": 1
+        },
+        "headerLayoutVariants": 12,
+        "samplingGrid": "five-second segments"
+      }
+    },
+    {
+      "id": "ratings/r1.xlsx",
+      "role": "independent-rater-causal-and-importance-matrix",
+      "upstreamGitBlob": "215806a74bc27a4480735f86597bc0ac3fd66061",
+      "byteLength": 139357,
+      "sha256": "7fd0f2d74de1aa99147097e3adc2d0d9e689fed1076b70bc6d14e83922c96d03",
+      "storage": "external-local-only",
+      "contentStoredInGit": false
+    },
+    {
+      "id": "ratings/r2.xlsx",
+      "role": "independent-rater-causal-and-importance-matrix",
+      "upstreamGitBlob": "e040afdfea00122bc508aa6731d572d164574695",
+      "byteLength": 111033,
+      "sha256": "26fbce85927f3b83bc36816acc13e5553ee78062781aa04c5149a37d33d8a638",
+      "storage": "external-local-only",
+      "contentStoredInGit": false
+    },
+    {
+      "id": "ratings/r3.xlsx",
+      "role": "independent-rater-causal-and-importance-matrix",
+      "upstreamGitBlob": "dd4f877af3131b59a3e1038db1e20bf035351a69",
+      "byteLength": 145522,
+      "sha256": "bb3e791e39b5beda51ebbf1805617e46e42584ad6585a427cba455175d83a7bc",
+      "storage": "external-local-only",
+      "contentStoredInGit": false
+    },
+    {
+      "id": "ratings/r4.xlsx",
+      "role": "independent-rater-causal-and-importance-matrix",
+      "upstreamGitBlob": "2885ea1d43dc345e988b54ea948ed4479648b844",
+      "byteLength": 137097,
+      "sha256": "1b10e9300b759cbb54a23ef0b3610e40316c0ba11d49ab44dd365bb1369b7d9b",
+      "storage": "external-local-only",
+      "contentStoredInGit": false
+    },
+    {
+      "id": "ratings/r5.xlsx",
+      "role": "independent-rater-causal-and-importance-matrix",
+      "upstreamGitBlob": "ed3e720b4d1a176d81333efa001ef67fff2a8936",
+      "byteLength": 137872,
+      "sha256": "08e02e6d065d7eb6a9d1803e48013a99fb03c9e8c0ce00261d164b16488b928d",
+      "storage": "external-local-only",
+      "contentStoredInGit": false
+    },
+    {
+      "id": "ratings/r6.xlsx",
+      "role": "independent-rater-causal-and-importance-matrix",
+      "upstreamGitBlob": "a152b308d574b60d6bb2d7676eb63068a5b0d24f",
+      "byteLength": 141281,
+      "sha256": "636d4b398f7b994849f7517b7f608441149600720cfd072cd9f1867c35d3a31e",
+      "storage": "external-local-only",
+      "contentStoredInGit": false
+    },
+    {
+      "id": "ratings/r7.xlsx",
+      "role": "independent-rater-causal-and-importance-matrix",
+      "upstreamGitBlob": "419ddc448b616e3216f2c91e541e6c2b5c1f9592",
+      "byteLength": 145404,
+      "sha256": "810c904a3822384f68c74cab9d512aa4044561cc8d9acf3b7153cecdb383b3a0",
+      "storage": "external-local-only",
+      "contentStoredInGit": false
+    },
+    {
+      "id": "README.md",
+      "role": "upstream-readme",
+      "upstreamGitBlob": "8b09e181a5ce7a84457bd155bb7183c7c9d899f2",
+      "byteLength": 103,
+      "sha256": "7a4df547dcb7d5e9795d536ad621c9883dbc625a5ab1deef21d0a12483ddabc4",
+      "storage": "external-local-only",
+      "contentStoredInGit": false
+    }
+  ],
+  "codeBooks": {
+    "recallType": {
+      "source": "article p. 2372",
+      "1": "veridical recall, with sufficient specific details to be identified as a particular event",
+      "2": "gist-based, summary of recall that is temporally imprecise but nonetheless accurate",
+      "3": "inaccurate detail that is nonetheless about the movie",
+      "4": "irrelevant commentary about the movie",
+      "5": "words not related to recall"
+    },
+    "detail": {
+      "source": "article p. 2372",
+      "1": "bare minimum while still being able to identify the scene",
+      "2": "anything beyond the bare minimum, including something about the characters or general conversation",
+      "3": "some specific details about the setting, including some specific jokes or nearly verbatim dialogue",
+      "4": "very high level of specific details, including a back-and-forth in the conversation and/or a lot of visual details of the scene"
+    },
+    "causality": {
+      "scale": "0 = no relationship to 10 = strong, direct causal relationship",
+      "raters": 7,
+      "matrix": "44x44 directed, self-diagonal blacked out",
+      "interraterReliabilityLeaveOneOut": {
+        "min": 0.1,
+        "max": 0.7,
+        "mean": 0.48,
+        "median": 0.52
+      },
+      "splitHalfReliability": 0.64,
+      "articleAggregation": "matrices averaged across raters, not thresholded"
+    },
+    "importance": {
+      "scale": "1 = unimportant to 10 = extremely important",
+      "valuesPerScene": 1
+    }
+  },
+  "nonClaims": [
+    "acquisition-court-opened",
+    "ethical-basis-for-redistribution-of-recall-prose",
+    "exact-experimental-presentation-edition",
+    "frame-exact-annotation-alignment",
+    "accepted-narrative-semantics",
+    "alignment-result",
+    "recall-type-and-detail-codes-independently-verified-against-raw-audio",
+    "upstream-authors-have-reviewed-or-endorsed-this-use"
+  ]
+}

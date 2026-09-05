@@ -1,0 +1,48 @@
+{
+  "schema": "storymodel4s.memento.recall-population",
+  "schemaVersion": 1,
+  "artifactSetId": "memento-nonlinear-recall-source-set-v1",
+  "recordedAt": "2026-09-03",
+  "purpose": "Reconcile the workbook's participant sheets against the article's reported n, so a partition rule can be stated without inferring the analysis population from sheet order.",
+  "workbook": {
+    "subsIndexRows": 134,
+    "recallSheets": 133,
+    "matchedPairs": 130,
+    "inSubsWithoutSheet": ["S91", "S92", "S108", "S122"],
+    "sheetNotInSubs": ["S41", "S166", "S176"]
+  },
+  "identifiableEventRule": {
+    "definition": "count of distinct integer BroadSceneNum values on a participant's sheet",
+    "articleExclusion": "participants with fewer than two identifiable events recalled were dropped from transition analyses",
+    "sheetsBelowTwo": ["S41", "S82", "S94", "S102", "S110", "S170", "S187", "S189"]
+  },
+  "reconciliation": {
+    "note": "Conditions map to the article's four experiments in order. Conditions 3 and 4 reconcile exactly on both enrolled and analysed counts; conditions 1 and 2 each carry one sheet more than the article's enrolled n.",
+    "byCondition": [
+      { "condition": 1, "experiment": "original nonlinear film, free recall any order", "matchedSheets": 29, "belowTwoIdentifiable": 2, "remaining": 27, "articleEnrolled": 28, "articleDropped": 1, "articleAnalysed": 27, "agreement": "analysed matches; enrolled differs by one" },
+      { "condition": 2, "experiment": "original nonlinear film, recall in presented order", "matchedSheets": 33, "belowTwoIdentifiable": 0, "remaining": 33, "articleEnrolled": 32, "articleDropped": 0, "articleAnalysed": 32, "agreement": "differs by one" },
+      { "condition": 3, "experiment": "original nonlinear film, recall in chronological order", "matchedSheets": 32, "belowTwoIdentifiable": 2, "remaining": 30, "articleEnrolled": 32, "articleDropped": 2, "articleAnalysed": 30, "agreement": "exact" },
+      { "condition": 4, "experiment": "restitched linear chronological cut, free recall any order", "matchedSheets": 36, "belowTwoIdentifiable": 3, "remaining": 33, "articleEnrolled": 36, "articleDropped": 3, "articleAnalysed": 33, "agreement": "exact" }
+    ],
+    "totals": { "matchedSheets": 130, "remaining": 123, "articleEnrolled": 128, "articleAnalysed": 122 }
+  },
+  "partitionRule": {
+    "statement": "Use only sheets present in the subs index (130), then drop sheets with fewer than two distinct BroadSceneNum values, yielding 123 participants at 27/33/30/33.",
+    "residual": "One participant more than the article analyses, located in condition 2. Record this rather than silently matching the article's count; the surplus sheet is not identifiable from the workbook alone.",
+    "doNotDo": [
+      "infer the population from sheet order",
+      "use the three sheets absent from the subs index",
+      "treat condition as an instruction tweak rather than a separate experiment"
+    ]
+  },
+  "keyContrast": {
+    "statement": "Condition 1 versus condition 4 holds film content, runtime and free-recall instruction fixed while varying only whether presentation order carries the chronology.",
+    "use": "the within-dataset probe of whether a monotone prior tracks presentation order or story order",
+    "supportingArms": "conditions 2 and 3 vary recall instruction with the nonlinear stimulus held fixed"
+  },
+  "nonClaims": [
+    "the surplus condition-2 participant has been identified",
+    "the condition-to-experiment mapping is stated in the release",
+    "identifiable-event counts reproduce the article's own exclusion arithmetic"
+  ]
+}

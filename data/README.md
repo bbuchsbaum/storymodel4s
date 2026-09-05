@@ -18,14 +18,27 @@ data/
     Sherlock_Recall_Scene_n50_Onsets.csv      scene-level recall gold, sha256 68cc307c…3753
     recall/                                   17 word-timestamped recall CSVs and their aliases
     media/                                    the two presentation-edition parts (video bytes)
+  filmfestival/                             proposed second corpus; see docs/data/filmfestival/
+    README, participants.tsv, task-*.tsv      ds004042 v1.0.1 metadata and presentation schedule
+    recall_events/                            25 utterance transcripts, 20 participants, CC0
+    annotations/                              three coders' stimulus annotation, 216 coarse segments
+    recall_scenematched/                      recall-to-scene gold, 15 participants
+    textdata/                                 crowd descriptions and predictions, six films
+    derived/, subtitles/, FILMS.md            network metrics, one caption track, film sourcing
+  memento/                                  proposed third corpus; see docs/data/memento/
+    MementoStoryBoard.xlsx                    129 subscenes / 44 scenes, presentation and story order
+    Subjects.xlsx                             133 participants' recall, five-second grid, scene gold
+    ratings/r1-r7.xlsx                        seven raters' causal matrix and importance
   models/
     onnx/model.onnx, tokenizer.json           the pinned sentence encoder the pipeline reads
   study/
     recall-to-video/                          partition.json, one directory per arm, within-scene/
 ```
 
-Identities: `docs/data/sherlock/*.json` for the sources, and the study documents under `docs/plans/`
-for every arm and packet, each of which records the digests of what it read and wrote.
+Identities: `docs/data/<corpus>/*.json` for the sources, and the study documents under
+`docs/plans/` for every arm and packet, each of which records the digests of what it read and wrote.
+`filmfestival/` and `memento/` are staged but **not admitted**: their records state
+`admissionStatus.state = proposed`, and no court is open for either.
 
 ## Rules
 
