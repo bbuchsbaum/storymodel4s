@@ -111,6 +111,10 @@ final class StorySourceView private (
       evidence = n match
         case NarrativeNodeId.Situation(_) => evidence.propositionEvidenceOf(n)
         case NarrativeNodeId.Segment(_)   => None // segments never get a fabricated chart
+      ,
+      // This view reads predicates, participants and contexts off a compiled narrative model, so
+      // an absent predicate here is the node's own absence and the facets may be scored on it.
+      propositional = PropositionalScope.Declared
     )
 
   val nodes: Vector[NodeSummary] =

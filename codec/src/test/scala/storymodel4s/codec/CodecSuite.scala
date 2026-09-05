@@ -8,7 +8,8 @@ import storymodel4s.core.*
 import storymodel4s.document.*
 import storymodel4s.features.*
 import storymodel4s.laws.AddressGens
-import storymodel4s.proposition.{Checked, PropositionChart}
+import storymodel4s.proposition.{Checked, PropositionChart, PropositionEvidence}
+import storymodel4s.recall.RecallUnit
 import storymodel4s.story.{SegmentSummary, SummaryGap}
 import AddressGens.given
 import CodecGens.given
@@ -18,6 +19,7 @@ import FeatureCodecs.given
 import DerivationCodecs.given
 import DerivationRecordCodec.given
 import PropositionCodecs.given
+import RecallCodecs.given
 import StoryCodecs.given
 
 class CodecSuite extends ScalaCheckSuite:
@@ -84,6 +86,17 @@ class CodecSuite extends ScalaCheckSuite:
   lawsFor[SentenceCoverage]("SentenceCoverage")
   lawsFor[SummaryCoverage]("SummaryCoverage")
   lawsFor[DerivationArtifact]("DerivationArtifact")
+  lawsFor[PropositionEvidence]("PropositionEvidence")
+  lawsFor[RecallUnit]("RecallUnit")
+
+  /** The model stamps its own version and the codec checks a supported list, one module apart. If
+    * they disagree, every model encoded from a fresh build fails to decode, so the drift is total
+    * rather than partial — and until this test existed nothing observed it.
+    */
+  test("schema version: the model's stamp and the codec's supported list agree") {
+    assertEquals(storymodel4s.story.StoryModel.SchemaVersion, SchemaVersions.Current)
+    assert(SchemaVersions.Supported.contains(storymodel4s.story.StoryModel.SchemaVersion))
+  }
 
   property("PropositionChart: decode(encode(x)) is structurally equal and Checked") {
     forAll { (ch: PropositionChart[Checked]) =>

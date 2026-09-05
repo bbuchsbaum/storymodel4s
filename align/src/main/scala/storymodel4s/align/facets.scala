@@ -88,6 +88,14 @@ object FidelityFacets:
       case FidelityMode.Distorted(fs) =>
         FidelityReport(base.verdicts ++ fs.toSortedSet.toVector.map(_ -> FacetVerdict.Wrong))
 
+  /** Facets whose verdict is read off the source's propositional content. A view that declares none
+    * of it can support no verdict on them, so they abstain wholesale rather than each silently
+    * reducing to `Wrong` (actor, action, object, outcome, cause) or to `Correct` (context, whose
+    * `ContextTag` has no absent value).
+    */
+  private val PropositionalFacets: Set[Facet] =
+    Set(Facet.Actor, Facet.Action, Facet.Object, Facet.Outcome, Facet.Cause, Facet.Context)
+
   def assess(sketch: PropositionSketch, node: NodeSummary): FidelityReport =
     def names(p: Option[storymodel4s.recall.SketchParticipant]): Option[Set[String]] =
       p.filter(_.specified).map(_.names)
@@ -140,14 +148,20 @@ object FidelityFacets:
         then FacetVerdict.Wrong
         else FacetVerdict.Unspecified
       case _ => FacetVerdict.Unspecified
+    val verdicts = Map(
+      Facet.Actor -> actor,
+      Facet.Action -> action,
+      Facet.Object -> obj,
+      Facet.Location -> location,
+      Facet.Outcome -> text(sketch.outcome, node.outcome),
+      Facet.Cause -> text(sketch.cause, node.cause),
+      Facet.Context -> context
+    )
     FidelityReport(
-      Map(
-        Facet.Actor -> actor,
-        Facet.Action -> action,
-        Facet.Object -> obj,
-        Facet.Location -> location,
-        Facet.Outcome -> text(sketch.outcome, node.outcome),
-        Facet.Cause -> text(sketch.cause, node.cause),
-        Facet.Context -> context
-      )
+      if node.propositional.declares then verdicts
+      else
+        verdicts.map { (facet, verdict) =>
+          facet -> (if PropositionalFacets.contains(facet) then FacetVerdict.Unspecified
+                    else verdict)
+        }
     )

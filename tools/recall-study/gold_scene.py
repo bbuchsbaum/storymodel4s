@@ -125,6 +125,9 @@ def paired(la, pa, lb, pb):
 
 
 def main(argv):
+    if len(argv) < 6:
+        print(__doc__)
+        return 2
     goldp, la, da, lb, db = argv[1], argv[2], argv[3], argv[4], argv[5]
     partition = argv[6] if len(argv) > 6 else None
     gold = load_gold(goldp)
@@ -145,5 +148,9 @@ def main(argv):
         report(lb, fb)
         paired(la, fa, lb, fb)
 
-
-main(sys.argv)
+# Guarded so the module can be imported. Without this an `import gold_scene` runs a full comparison
+# against the pre-registered gold using the importer's argv, and §7 rule 3 counts every comparison
+# scored against that gold — so an import would spend one silently, which is the one thing a corpus
+# with fifteen participants cannot afford.
+if __name__ == "__main__":
+    sys.exit(main(sys.argv))

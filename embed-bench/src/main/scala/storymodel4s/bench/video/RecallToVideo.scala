@@ -17,6 +17,7 @@ import storymodel4s.core.{
   TextSpan
 }
 import storymodel4s.embed.onnx.{OnnxSentenceArtifacts, OnnxSentenceEmbedder, OnnxSentenceModel}
+import storymodel4s.features.MissingReason
 import storymodel4s.recall.{
   Lexical,
   ModalityTag,
@@ -166,7 +167,12 @@ object TimedSourceView:
         polarity = PolarityTag.Unknown,
         modality = ModalityTag.Unknown,
         locations = seg.locations,
-        lemmas = Lexical.stemSet(seg.text) ++ seg.extraLemmas
+        lemmas = Lexical.stemSet(seg.text) ++ seg.extraLemmas,
+        // A timed segment is text, lemmas and locations. It carries no predicate, participants or
+        // context, so the facets that read them abstain instead of scoring this silence.
+        propositional = PropositionalScope.Undeclared(
+          MissingReason.Custom("bench.video", "timed-segment-carries-no-propositions")
+        )
       )
     }
 
@@ -188,7 +194,10 @@ object TimedSourceView:
         polarity = PolarityTag.Unknown,
         modality = ModalityTag.Unknown,
         locations = members.flatMap(_.locations).distinct,
-        lemmas = Lexical.stemSet(g.label) ++ members.flatMap(_.lemmas)
+        lemmas = Lexical.stemSet(g.label) ++ members.flatMap(_.lemmas),
+        propositional = PropositionalScope.Undeclared(
+          MissingReason.Custom("bench.video", "timed-segment-carries-no-propositions")
+        )
       )
     }
 

@@ -191,7 +191,9 @@ object AnnaFixture:
       Vector("house"),
       nodeLemmasFromRawTerms(rootLemmaInputs)
     )
-  )
+    // This fixture supplies predicates, participants and contexts for every node, so it is a
+    // declared view and its facet verdicts are read from real source content.
+  ).map(_.copy(propositional = PropositionalScope.Declared))
 
   private val chain = Vector(e1, e2, e3, e4, e5)
   private def succ(xs: Vector[SourceNodeRef]) =

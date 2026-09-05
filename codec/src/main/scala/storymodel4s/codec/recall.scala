@@ -4,9 +4,11 @@ import io.circe.{Decoder, DecodingFailure, Encoder, Json}
 import io.circe.syntax.*
 import storymodel4s.core.*
 import storymodel4s.recall.*
+import storymodel4s.proposition.PropositionEvidence
 import storymodel4s.recall.RecallGraphStatus.Checked
 import CanonicalPrimitives.{*, given}
 import CoreCodecs.given
+import PropositionCodecs.given
 
 /** Codecs for `storymodel4s.recall`: the recall graph with its transcript source, units (including
   * the structured participant fields), and relations (including coreference).
@@ -139,7 +141,8 @@ object RecallCodecs:
       "function" -> u.function.asJson,
       "expressedUncertainty" -> u.expressedUncertainty.asJson,
       "proposition" -> u.proposition.asJson,
-      "grounding" -> opt(u.grounding)
+      "grounding" -> opt(u.grounding),
+      "evidence" -> opt(u.evidence)
     )
   }
   given Decoder[RecallUnit] = Decoder.instance { c =>
@@ -152,7 +155,8 @@ object RecallCodecs:
       eu <- field[ExpressedUncertainty](c, "expressedUncertainty")
       p <- field[PropositionSketch](c, "proposition")
       g <- field[Option[Probability]](c, "grounding")
-    yield RecallUnit(id, o, s, t, f, eu, p, g)
+      ev <- field[Option[PropositionEvidence]](c, "evidence")
+    yield RecallUnit(id, o, s, t, f, eu, p, g, ev)
   }
 
   given Encoder[RecallTemporalRelation] = enumEncoder(_.toString)

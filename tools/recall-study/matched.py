@@ -54,6 +54,9 @@ def is_leaf(r):
 
 
 def main(argv):
+    if len(argv) < 5:
+        print(__doc__)
+        return 2
     la, da, lb, db = argv[1], argv[2], argv[3], argv[4]
     A, B = load(da), load(db)
     shared = sorted(set(A) & set(B))
@@ -95,5 +98,8 @@ def main(argv):
         print(f"   {nm}: mean diff {statistics.mean(v):+.4f}  95% CI [{lo:+.4f}, {hi:+.4f}] "
               f"{excl}  improved {sum(1 for x in v if x > 0)}/{len(v)}")
 
-
-main(sys.argv)
+# Guarded for the same reason as gold_scene.py: an unguarded call at module scope means `import
+# matched` runs a full scoring pass under the importer's argv. agreement.py was fixed independently
+# on solo/filmfestival-stabilize, which is where that file's guard should land.
+if __name__ == "__main__":
+    sys.exit(main(sys.argv))

@@ -316,3 +316,23 @@ object PropositionCodecs:
     uncheckedChartDecoder.emap(ch =>
       ChartValidator.check(ch).left.map(vs => vs.map(_.message).mkString("; "))
     )
+
+  /** Evidence carries its own provenance beside the chart's.
+    *
+    * Why both are written: `PropositionEvidence.hand` sets `ChartProvenance.hand` while the chart
+    * keeps the origin it was built with, so the outer provenance is not recoverable from the inner
+    * one. Encoding only the chart would silently relabel hand-authored evidence as whatever the
+    * chart claims, which is the distinction ADR 0001 rev 3 §D4b exists to preserve.
+    */
+  given Encoder[PropositionEvidence] = Encoder.instance { e =>
+    obj(
+      "chart" -> e.chart.asJson,
+      "provenance" -> e.provenance.asJson
+    )
+  }
+  given Decoder[PropositionEvidence] = Decoder.instance { c =>
+    for
+      ch <- field[PropositionChart[Checked]](c, "chart")
+      pv <- field[ChartProvenance](c, "provenance")
+    yield PropositionEvidence(ch, pv)
+  }
