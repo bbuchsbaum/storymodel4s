@@ -120,4 +120,5 @@ class DirectedCausalSuite extends FunSuite:
 
   test("the declaration order is pinned in full: twelve older kinds, then the two directed ones") {
     assertEquals(TransitionKind.values.toVector, declaredOrder)
+    assertEquals(TransitionKind.features.toSet, declaredOrder.toSet -- Set(ExternalIn, ExternalStay))
   }
