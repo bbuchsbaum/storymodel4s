@@ -100,6 +100,16 @@ class FilmFestivalTests(unittest.TestCase):
         self.assertEqual(experiment.medoid(texts),experiment.medoid(texts[::-1]))
         with self.assertRaises(ValueError): experiment.medoid([])
 
+    def test_literal_tsv_preserves_quoted_source_for_scala(self):
+        with tempfile.TemporaryDirectory() as d:
+            p=Path(d)/'source.tsv'
+            row=dict.fromkeys(experiment.COLUMNS,'')
+            row['description']='"Synthetic quote" and  double space.'
+            experiment.write_table(p,[row])
+            raw=p.read_text().splitlines()[1].split('\t')[-1]
+            self.assertEqual(raw,row['description'])
+            self.assertEqual(experiment.read(p,'\t')[0]['description'],row['description'])
+
     def test_annotation_decimal_is_minutes_seconds(self):
         self.assertEqual(annotation.minsec_to_seconds(6.1000000000000005,'synthetic'),370)
         self.assertEqual(annotation.minsec_to_seconds(1.6,'synthetic'),120)

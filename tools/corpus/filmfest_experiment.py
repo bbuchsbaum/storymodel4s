@@ -29,7 +29,7 @@ def sha(path):
 
 def read(path, delimiter=","):
     with Path(path).open(newline="", encoding="utf-8") as f:
-        return list(csv.DictReader(f, delimiter=delimiter))
+        return list(csv.DictReader(f, delimiter=delimiter, quoting=csv.QUOTE_NONE if delimiter == "\t" else csv.QUOTE_MINIMAL))
 
 
 def medoid(texts):
@@ -47,12 +47,12 @@ def write_table(path, rows):
     if not rows:
         raise ValueError("empty source index")
     with Path(path).open("w", newline="", encoding="utf-8") as f:
-        w = csv.DictWriter(f, fieldnames=COLUMNS, delimiter="\t", lineterminator="\n")
-        w.writeheader()
+        # The Scala adapter reads a literal tab-separated replay, not quoted CSV.
+        f.write("\t".join(COLUMNS) + "\n")
         for n, row in enumerate(rows, 1):
             row = dict(row, segment=n)
-            row["description"] = " ".join(row["description"].split())
-            w.writerow(row)
+            row["description"] = row["description"].replace("\t", " ").replace("\n", " ").replace("\r", " ").strip()
+            f.write("\t".join(str(row[c]) for c in COLUMNS) + "\n")
 
 
 def prepare(data, output):
