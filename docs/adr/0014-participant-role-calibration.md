@@ -1,4 +1,4 @@
-# ADR 0013 — Participant-role calibration studies
+# ADR 0014 — Participant-role calibration studies
 
 Accepted 2026-09-04, single-developer mode. Implements the calibration handoff
 without manufacturing the adjudications it requires.
@@ -33,7 +33,7 @@ A `Judgment` binds the item checksum to Correct, Incorrect, or Unresolved, a
 named adjudicator fingerprint and the checksum of the adjudication protocol.
 These are external attestations, never labels inferred from the parser. A
 `Corpus` requires exactly one final judgment for every item, rejects duplicate
-items and unmatched judgments, and retains unresolved judgments in its identity
+items, repeated acquisitions of the same source endpoints, and unmatched judgments, and retains unresolved judgments in its identity
 and coverage. Unresolved is excluded from estimation, never counted incorrect.
 Do not present synthetic tests or machine labels as human gold.
 
@@ -104,3 +104,29 @@ Analysis, chapter 2](https://sites.stat.columbia.edu/gelman/book/BDA3.pdf).
 [Arrieta-Ibarra et al. (2022)](https://www.jmlr.org/papers/v23/22-0658.html)
 discuss why binned calibration summaries trade resolution against statistical
 confidence. Neither source establishes validity for this project's corpus.
+
+## Selection and unresolved judgments
+
+The fitted rate is conditional on the adjudication being resolved, as well as
+on the pipeline emitting the candidate and its role/scorer cell. Excluding
+unresolved judgments does not establish that their correctness rate matches
+the resolved cases: two correct and 98 unresolved would still yield 0.75 from
+the declared estimator, based on only two labels. Applying that rate to an
+unevaluable candidate is an unvalidated extrapolation. Predictions retained for
+unresolved test items are diagnostics and never enter loss totals. An intended
+production population needs evidence about this selection effect before a
+policy uses these probabilities to license claims. Neither a fitted model ID
+nor the successful compiler seam establishes that evidence.
+
+## Relationship to the frozen-set protocol
+
+The existing 2026-08-28 M1 fixture protocol still governs selection-quality
+claims: independent human annotation blind to charts and candidates, an audited
+frozen calibration partition, and untouched-test evaluation. This ADR supplies
+the mechanical fit and within-calibration-partition folds, not a new permission
+to call diagnostic labels gold. Final candidate judgments must be mapped from
+independently frozen source annotations; unresolved mappings remain unresolved.
+Protocol eligibility and selection effects are not proved by the `Corpus`
+constructor, and no production default is enabled here. The frozen corpus
+manifest is still a candidate list; no frozen resource directory was available
+in this checkout on 2026-09-04.
