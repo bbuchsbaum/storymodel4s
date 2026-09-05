@@ -1,0 +1,15 @@
+{
+  "revision": "be5caa6ef9421ffcfc3727290acf12c191a3af20",
+  "command": [
+    "python3",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "tools/recall-study/tests",
+    "-v"
+  ],
+  "exit": 0,
+  "tests": 16,
+  "logSha256": "b621edd414987312413bc66402281416b9e6c5e48314164a0e7a0513500969f7"
+}

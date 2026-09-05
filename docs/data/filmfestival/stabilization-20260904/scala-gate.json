@@ -1,0 +1,423 @@
+{
+  "revision": "7d81e4aa2fb5ff99939cdb4ab3c8666040685afa",
+  "export": "/private/tmp/storymodel4s-filmfestival-gate-7d81e4aa",
+  "verifiedBlobCount": 13924,
+  "command": [
+    "sbt",
+    "-batch",
+    "-J-XX:ActiveProcessorCount=3",
+    "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+    "checkAll"
+  ],
+  "base": "680ef6e652632fdd22f3410fb3b5e7caa7c80809",
+  "exitCode": 0,
+  "elapsedSeconds": 2651.367702960968,
+  "testTaskTotals": [
+    {
+      "total": 171,
+      "failed": 0,
+      "errors": 0,
+      "passed": 171,
+      "skipped": 0
+    },
+    {
+      "total": 171,
+      "failed": 0,
+      "errors": 0,
+      "passed": 171,
+      "skipped": 0
+    },
+    {
+      "total": 171,
+      "failed": 0,
+      "errors": 0,
+      "passed": 171,
+      "skipped": 0
+    },
+    {
+      "total": 51,
+      "failed": 0,
+      "errors": 0,
+      "passed": 51,
+      "skipped": 0
+    },
+    {
+      "total": 51,
+      "failed": 0,
+      "errors": 0,
+      "passed": 51,
+      "skipped": 0
+    },
+    {
+      "total": 51,
+      "failed": 0,
+      "errors": 0,
+      "passed": 51,
+      "skipped": 0
+    },
+    {
+      "total": 92,
+      "failed": 0,
+      "errors": 0,
+      "passed": 92,
+      "skipped": 0
+    },
+    {
+      "total": 92,
+      "failed": 0,
+      "errors": 0,
+      "passed": 92,
+      "skipped": 0
+    },
+    {
+      "total": 92,
+      "failed": 0,
+      "errors": 0,
+      "passed": 92,
+      "skipped": 0
+    },
+    {
+      "total": 66,
+      "failed": 0,
+      "errors": 0,
+      "passed": 66,
+      "skipped": 0
+    },
+    {
+      "total": 66,
+      "failed": 0,
+      "errors": 0,
+      "passed": 66,
+      "skipped": 0
+    },
+    {
+      "total": 66,
+      "failed": 0,
+      "errors": 0,
+      "passed": 66,
+      "skipped": 0
+    },
+    {
+      "total": 132,
+      "failed": 0,
+      "errors": 0,
+      "passed": 132,
+      "skipped": 0
+    },
+    {
+      "total": 132,
+      "failed": 0,
+      "errors": 0,
+      "passed": 132,
+      "skipped": 0
+    },
+    {
+      "total": 132,
+      "failed": 0,
+      "errors": 0,
+      "passed": 132,
+      "skipped": 0
+    },
+    {
+      "total": 69,
+      "failed": 0,
+      "errors": 0,
+      "passed": 69,
+      "skipped": 0
+    },
+    {
+      "total": 69,
+      "failed": 0,
+      "errors": 0,
+      "passed": 69,
+      "skipped": 0
+    },
+    {
+      "total": 69,
+      "failed": 0,
+      "errors": 0,
+      "passed": 69,
+      "skipped": 0
+    },
+    {
+      "total": 185,
+      "failed": 0,
+      "errors": 0,
+      "passed": 185,
+      "skipped": 0
+    },
+    {
+      "total": 182,
+      "failed": 0,
+      "errors": 0,
+      "passed": 182,
+      "skipped": 0
+    },
+    {
+      "total": 182,
+      "failed": 0,
+      "errors": 0,
+      "passed": 182,
+      "skipped": 0
+    },
+    {
+      "total": 47,
+      "failed": 0,
+      "errors": 0,
+      "passed": 47,
+      "skipped": 0
+    },
+    {
+      "total": 47,
+      "failed": 0,
+      "errors": 0,
+      "passed": 47,
+      "skipped": 0
+    },
+    {
+      "total": 47,
+      "failed": 0,
+      "errors": 0,
+      "passed": 47,
+      "skipped": 0
+    },
+    {
+      "total": 242,
+      "failed": 0,
+      "errors": 0,
+      "passed": 242,
+      "skipped": 0
+    },
+    {
+      "total": 242,
+      "failed": 0,
+      "errors": 0,
+      "passed": 242,
+      "skipped": 0
+    },
+    {
+      "total": 242,
+      "failed": 0,
+      "errors": 0,
+      "passed": 242,
+      "skipped": 0
+    },
+    {
+      "total": 104,
+      "failed": 0,
+      "errors": 0,
+      "passed": 104,
+      "skipped": 0
+    },
+    {
+      "total": 104,
+      "failed": 0,
+      "errors": 0,
+      "passed": 104,
+      "skipped": 0
+    },
+    {
+      "total": 104,
+      "failed": 0,
+      "errors": 0,
+      "passed": 104,
+      "skipped": 0
+    },
+    {
+      "total": 144,
+      "failed": 0,
+      "errors": 0,
+      "passed": 144,
+      "skipped": 0
+    },
+    {
+      "total": 144,
+      "failed": 0,
+      "errors": 0,
+      "passed": 144,
+      "skipped": 0
+    },
+    {
+      "total": 144,
+      "failed": 0,
+      "errors": 0,
+      "passed": 144,
+      "skipped": 0
+    },
+    {
+      "total": 119,
+      "failed": 0,
+      "errors": 0,
+      "passed": 119,
+      "skipped": 0
+    },
+    {
+      "total": 119,
+      "failed": 0,
+      "errors": 0,
+      "passed": 119,
+      "skipped": 0
+    },
+    {
+      "total": 119,
+      "failed": 0,
+      "errors": 0,
+      "passed": 119,
+      "skipped": 0
+    },
+    {
+      "total": 184,
+      "failed": 0,
+      "errors": 0,
+      "passed": 184,
+      "skipped": 0
+    },
+    {
+      "total": 184,
+      "failed": 0,
+      "errors": 0,
+      "passed": 184,
+      "skipped": 0
+    },
+    {
+      "total": 184,
+      "failed": 0,
+      "errors": 0,
+      "passed": 184,
+      "skipped": 0
+    },
+    {
+      "total": 122,
+      "failed": 0,
+      "errors": 0,
+      "passed": 122,
+      "skipped": 0
+    },
+    {
+      "total": 120,
+      "failed": 0,
+      "errors": 0,
+      "passed": 120,
+      "skipped": 0
+    },
+    {
+      "total": 120,
+      "failed": 0,
+      "errors": 0,
+      "passed": 120,
+      "skipped": 0
+    },
+    {
+      "total": 97,
+      "failed": 0,
+      "errors": 0,
+      "passed": 97,
+      "skipped": 0
+    },
+    {
+      "total": 97,
+      "failed": 0,
+      "errors": 0,
+      "passed": 97,
+      "skipped": 0
+    },
+    {
+      "total": 97,
+      "failed": 0,
+      "errors": 0,
+      "passed": 97,
+      "skipped": 0
+    },
+    {
+      "total": 98,
+      "failed": 0,
+      "errors": 0,
+      "passed": 98,
+      "skipped": 0
+    },
+    {
+      "total": 77,
+      "failed": 0,
+      "errors": 0,
+      "passed": 76,
+      "skipped": 1
+    },
+    {
+      "total": 28,
+      "failed": 0,
+      "errors": 0,
+      "passed": 28,
+      "skipped": 0
+    },
+    {
+      "total": 6,
+      "failed": 0,
+      "errors": 0,
+      "passed": 6,
+      "skipped": 0
+    },
+    {
+      "total": 122,
+      "failed": 0,
+      "errors": 0,
+      "passed": 121,
+      "skipped": 1
+    },
+    {
+      "total": 50,
+      "failed": 0,
+      "errors": 0,
+      "passed": 47,
+      "skipped": 3
+    },
+    {
+      "total": 50,
+      "failed": 0,
+      "errors": 0,
+      "passed": 50,
+      "skipped": 0
+    }
+  ],
+  "testTotals": {
+    "tasks": 52,
+    "total": 5896,
+    "passed": 5891,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 5
+  },
+  "logSha256": "23164c47c9fe1bc3b761b8a55eadecf3913b7929d72b862d024cf91443f3b47a",
+  "sourceEquivalence": {
+    "gateRevision": "7d81e4aa2fb5ff99939cdb4ab3c8666040685afa",
+    "scorerAndResultsRevision": "be5caa6ef9421ffcfc3727290acf12c191a3af20",
+    "unchangedScalaBuildAndResources": true,
+    "changedPaths": [
+      "docs/data/filmfestival/stabilization-20260904/cartoon.json",
+      "docs/data/filmfestival/stabilization-20260904/constant-anchor-control.json",
+      "docs/data/filmfestival/stabilization-20260904/dependency-state.json",
+      "docs/data/filmfestival/stabilization-20260904/historical-rescored-final.json",
+      "docs/data/filmfestival/stabilization-20260904/independence-five.json",
+      "docs/data/filmfestival/stabilization-20260904/independence-six.json",
+      "docs/data/filmfestival/stabilization-20260904/input-receipt.json",
+      "docs/data/filmfestival/stabilization-20260904/integration-field-parity.json",
+      "docs/data/filmfestival/stabilization-20260904/integration-parity.json",
+      "docs/data/filmfestival/stabilization-20260904/literal-tsv-audit.json",
+      "docs/data/filmfestival/stabilization-20260904/protocol-addendum.json",
+      "docs/data/filmfestival/stabilization-20260904/python-mutants-final.json",
+      "docs/data/filmfestival/stabilization-20260904/run-receipt.json",
+      "docs/data/filmfestival/stabilization-20260904/scala-mutants.json",
+      "docs/data/filmfestival/stabilization-20260904/scoring-receipts.json",
+      "docs/plans/2026-09-04-filmfestival-first-run.md",
+      "docs/plans/2026-09-04-filmfestival-handoff.md",
+      "docs/plans/2026-09-04-filmfestival-stabilization-results.md",
+      "docs/plans/2026-09-04-filmfestival-stabilization.md",
+      "tools/recall-study/agreement.py",
+      "tools/recall-study/filmfest_gold_film.py",
+      "tools/recall-study/tests/mutate_filmfestival.py",
+      "tools/recall-study/tests/test_filmfestival.py"
+    ],
+    "pythonTests": 16,
+    "pythonMutationKills": 11,
+    "scalaMutationKills": 2
+  }
+}

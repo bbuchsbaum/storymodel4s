@@ -75,8 +75,12 @@ unpopulated semantic source view are outside this scoreboard.
 
 Sixteen Python tests pass; eleven Python mutations and two Scala mutations are killed by named
 assertions. Both adapter tests pass. Separate cold reads caught population, path and TSV-dialect
-errors, verified their fixes and reported no remaining concrete blocker. Full Scala gate status is
-recorded in the gate receipt when it completes; a running gate is not a pass.
+errors, verified their fixes and reported no remaining concrete blocker. `sbt checkAll` completed with exit 0: 5,891 passed tests across
+52 test-task totals; 5 reported tests were skipped. The gate ran on the verified
+`7d81e4aa` export; all Scala, build and resource files match the scorer/result commit `be5caa6e`
+exactly, with a checked path-difference receipt. The 16 Python tests also ran on `be5caa6e`.
+Final `scalafmtCheckAll` and `scalafmtSbtCheck` also passed on the result commit.
+This is local evidence, not hosted CI or a release certification.
 
 The full gate uses the permitted local grakern override at `d736dc565d97f617726bad0a9d1ba2fdeae58dd2`
 (with an unrelated README edit), recorded in `dependency-state.json`; it is not evidence of a build
