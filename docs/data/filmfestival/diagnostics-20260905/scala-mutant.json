@@ -1,0 +1,22 @@
+{
+  "mutant": "reverse-local-cost-preference",
+  "baseRevision": "c39328902ab034b2f5733ac9569de06567bc469a",
+  "command": [
+    "sbt",
+    "-batch",
+    "-J-XX:ActiveProcessorCount=2",
+    "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+    "embedBench/testOnly *StageTraceSuite"
+  ],
+  "exitCode": 1,
+  "logSha256": "da2b2deb1be8e72a451cde62834fbeebfd397894f1b249140cf716fecc1c66e1",
+  "restoredSha256": "63055a540ba9c77d0fb7e31f375aa2c11c8cfdfdf15c79f9ff6b77f5673820c2",
+  "compiled": true,
+  "namedFailures": [
+    "analytic odds ratio at StageTraceSuite.scala:25",
+    "one-unit HSMM oracle at StageTraceSuite.scala:55"
+  ],
+  "failed": 2,
+  "passed": 3,
+  "total": 5
+}

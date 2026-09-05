@@ -1,0 +1,1658 @@
+{
+  "jl-all__jl-no-cartoons": {
+    "changes": [
+      {
+        "afterOrigin": "posterior_argmax",
+        "beforeOrigin": "decode_bound",
+        "firstObservedDivergence": "candidate_membership",
+        "kind": "regression",
+        "participant": "sub-07",
+        "unit": 0
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "posterior",
+        "kind": "regression",
+        "participant": "sub-07",
+        "unit": 1
+      },
+      {
+        "afterOrigin": "decode_bound",
+        "beforeOrigin": "decode_bound",
+        "firstObservedDivergence": "candidate_membership",
+        "kind": "regression",
+        "participant": "sub-07",
+        "unit": 2
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "decode_bound",
+        "firstObservedDivergence": "candidate_membership",
+        "kind": "regression",
+        "participant": "sub-07",
+        "unit": 3
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "posterior",
+        "kind": "regression",
+        "participant": "sub-07",
+        "unit": 4
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "decode_bound",
+        "firstObservedDivergence": "candidate_membership",
+        "kind": "regression",
+        "participant": "sub-07",
+        "unit": 5
+      },
+      {
+        "afterOrigin": "decode_bound",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "posterior",
+        "kind": "regression",
+        "participant": "sub-07",
+        "unit": 6
+      },
+      {
+        "afterOrigin": "posterior_argmax",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "nomination_rank_or_score",
+        "kind": "regression",
+        "participant": "sub-11",
+        "unit": 137
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "posterior",
+        "kind": "regression",
+        "participant": "sub-11",
+        "unit": 138
+      },
+      {
+        "afterOrigin": "decode_bound",
+        "beforeOrigin": "decode_bound",
+        "firstObservedDivergence": "posterior",
+        "kind": "regression",
+        "participant": "sub-13",
+        "unit": 57
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "posterior",
+        "kind": "regression",
+        "participant": "sub-13",
+        "unit": 58
+      },
+      {
+        "afterOrigin": "decode_bound",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "posterior",
+        "kind": "regression",
+        "participant": "sub-13",
+        "unit": 59
+      },
+      {
+        "afterOrigin": "posterior_argmax",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "nomination_rank_or_score",
+        "kind": "correction",
+        "participant": "sub-13",
+        "unit": 61
+      },
+      {
+        "afterOrigin": "posterior_argmax",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "posterior",
+        "kind": "correction",
+        "participant": "sub-13",
+        "unit": 62
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "nomination_rank_or_score",
+        "kind": "correction",
+        "participant": "sub-13",
+        "unit": 63
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "posterior",
+        "kind": "correction",
+        "participant": "sub-13",
+        "unit": 65
+      },
+      {
+        "afterOrigin": "decode_bound",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "nomination_rank_or_score",
+        "kind": "correction",
+        "participant": "sub-13",
+        "unit": 66
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "nomination_rank_or_score",
+        "kind": "correction",
+        "participant": "sub-13",
+        "unit": 67
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "nomination_rank_or_score",
+        "kind": "correction",
+        "participant": "sub-13",
+        "unit": 68
+      },
+      {
+        "afterOrigin": "posterior_argmax",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "nomination_rank_or_score",
+        "kind": "correction",
+        "participant": "sub-13",
+        "unit": 69
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "posterior_argmax",
+        "firstObservedDivergence": "posterior",
+        "kind": "correction",
+        "participant": "sub-13",
+        "unit": 70
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "decode_bound",
+        "firstObservedDivergence": "posterior",
+        "kind": "correction",
+        "participant": "sub-13",
+        "unit": 71
+      },
+      {
+        "afterOrigin": "posterior_argmax",
+        "beforeOrigin": "decode_bound",
+        "firstObservedDivergence": "posterior",
+        "kind": "correction",
+        "participant": "sub-13",
+        "unit": 72
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "nomination_rank_or_score",
+        "kind": "correction",
+        "participant": "sub-13",
+        "unit": 73
+      },
+      {
+        "afterOrigin": "decode_bound",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "nomination_rank_or_score",
+        "kind": "correction",
+        "participant": "sub-13",
+        "unit": 74
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "decode_bound",
+        "firstObservedDivergence": "posterior",
+        "kind": "correction",
+        "participant": "sub-13",
+        "unit": 75
+      },
+      {
+        "afterOrigin": "decode_bound",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "posterior",
+        "kind": "correction",
+        "participant": "sub-13",
+        "unit": 76
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "nomination_rank_or_score",
+        "kind": "correction",
+        "participant": "sub-13",
+        "unit": 77
+      },
+      {
+        "afterOrigin": "posterior_argmax",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "posterior",
+        "kind": "correction",
+        "participant": "sub-13",
+        "unit": 78
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "posterior",
+        "kind": "correction",
+        "participant": "sub-13",
+        "unit": 80
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "candidate_membership",
+        "kind": "correction",
+        "participant": "sub-13",
+        "unit": 81
+      },
+      {
+        "afterOrigin": "posterior_argmax",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "nomination_rank_or_score",
+        "kind": "correction",
+        "participant": "sub-13",
+        "unit": 82
+      },
+      {
+        "afterOrigin": "posterior_argmax",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "posterior",
+        "kind": "correction",
+        "participant": "sub-13",
+        "unit": 83
+      },
+      {
+        "afterOrigin": "decode_bound",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "nomination_rank_or_score",
+        "kind": "correction",
+        "participant": "sub-13",
+        "unit": 84
+      },
+      {
+        "afterOrigin": "posterior_argmax",
+        "beforeOrigin": "decode_bound",
+        "firstObservedDivergence": "nomination_rank_or_score",
+        "kind": "correction",
+        "participant": "sub-13",
+        "unit": 85
+      },
+      {
+        "afterOrigin": "posterior_argmax",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "candidate_membership",
+        "kind": "correction",
+        "participant": "sub-13",
+        "unit": 86
+      },
+      {
+        "afterOrigin": "posterior_argmax",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "candidate_membership",
+        "kind": "correction",
+        "participant": "sub-13",
+        "unit": 87
+      },
+      {
+        "afterOrigin": "posterior_argmax",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "nomination_rank_or_score",
+        "kind": "correction",
+        "participant": "sub-13",
+        "unit": 88
+      },
+      {
+        "afterOrigin": "decode_bound",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "candidate_membership",
+        "kind": "correction",
+        "participant": "sub-13",
+        "unit": 89
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "nomination_rank_or_score",
+        "kind": "correction",
+        "participant": "sub-13",
+        "unit": 90
+      },
+      {
+        "afterOrigin": "decode_bound",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "nomination_rank_or_score",
+        "kind": "correction",
+        "participant": "sub-13",
+        "unit": 91
+      },
+      {
+        "afterOrigin": "decode_bound",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "posterior",
+        "kind": "correction",
+        "participant": "sub-13",
+        "unit": 92
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "decode_bound",
+        "firstObservedDivergence": "nomination_rank_or_score",
+        "kind": "correction",
+        "participant": "sub-13",
+        "unit": 93
+      },
+      {
+        "afterOrigin": "decode_bound",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "nomination_rank_or_score",
+        "kind": "correction",
+        "participant": "sub-13",
+        "unit": 94
+      },
+      {
+        "afterOrigin": "posterior_argmax",
+        "beforeOrigin": "decode_bound",
+        "firstObservedDivergence": "posterior",
+        "kind": "correction",
+        "participant": "sub-13",
+        "unit": 95
+      },
+      {
+        "afterOrigin": "posterior_argmax",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "nomination_rank_or_score",
+        "kind": "correction",
+        "participant": "sub-13",
+        "unit": 96
+      },
+      {
+        "afterOrigin": "posterior_argmax",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "posterior",
+        "kind": "correction",
+        "participant": "sub-13",
+        "unit": 97
+      },
+      {
+        "afterOrigin": "posterior_argmax",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "nomination_rank_or_score",
+        "kind": "correction",
+        "participant": "sub-13",
+        "unit": 98
+      },
+      {
+        "afterOrigin": "decode_bound",
+        "beforeOrigin": "decode_bound",
+        "firstObservedDivergence": "nomination_rank_or_score",
+        "kind": "correction",
+        "participant": "sub-13",
+        "unit": 99
+      },
+      {
+        "afterOrigin": "posterior_argmax",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "nomination_rank_or_score",
+        "kind": "correction",
+        "participant": "sub-13",
+        "unit": 100
+      },
+      {
+        "afterOrigin": "decode_bound",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "nomination_rank_or_score",
+        "kind": "correction",
+        "participant": "sub-13",
+        "unit": 101
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "nomination_rank_or_score",
+        "kind": "correction",
+        "participant": "sub-13",
+        "unit": 102
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "decode_bound",
+        "firstObservedDivergence": "posterior",
+        "kind": "correction",
+        "participant": "sub-13",
+        "unit": 103
+      },
+      {
+        "afterOrigin": "posterior_argmax",
+        "beforeOrigin": "decode_bound",
+        "firstObservedDivergence": "posterior",
+        "kind": "correction",
+        "participant": "sub-13",
+        "unit": 104
+      },
+      {
+        "afterOrigin": "decode_bound",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "nomination_rank_or_score",
+        "kind": "correction",
+        "participant": "sub-13",
+        "unit": 105
+      },
+      {
+        "afterOrigin": "decode_bound",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "posterior",
+        "kind": "correction",
+        "participant": "sub-13",
+        "unit": 106
+      },
+      {
+        "afterOrigin": "posterior_argmax",
+        "beforeOrigin": "decode_bound",
+        "firstObservedDivergence": "nomination_rank_or_score",
+        "kind": "correction",
+        "participant": "sub-13",
+        "unit": 107
+      },
+      {
+        "afterOrigin": "posterior_argmax",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "nomination_rank_or_score",
+        "kind": "correction",
+        "participant": "sub-13",
+        "unit": 108
+      },
+      {
+        "afterOrigin": "posterior_argmax",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "nomination_rank_or_score",
+        "kind": "correction",
+        "participant": "sub-13",
+        "unit": 109
+      },
+      {
+        "afterOrigin": "decode_bound",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "nomination_rank_or_score",
+        "kind": "correction",
+        "participant": "sub-13",
+        "unit": 110
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "decode_bound",
+        "firstObservedDivergence": "nomination_rank_or_score",
+        "kind": "correction",
+        "participant": "sub-13",
+        "unit": 111
+      },
+      {
+        "afterOrigin": "posterior_argmax",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "posterior",
+        "kind": "correction",
+        "participant": "sub-13",
+        "unit": 112
+      },
+      {
+        "afterOrigin": "posterior_argmax",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "candidate_membership",
+        "kind": "correction",
+        "participant": "sub-13",
+        "unit": 113
+      },
+      {
+        "afterOrigin": "posterior_argmax",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "posterior",
+        "kind": "correction",
+        "participant": "sub-13",
+        "unit": 114
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "posterior",
+        "kind": "correction",
+        "participant": "sub-13",
+        "unit": 115
+      },
+      {
+        "afterOrigin": "decode_bound",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "nomination_rank_or_score",
+        "kind": "correction",
+        "participant": "sub-13",
+        "unit": 116
+      },
+      {
+        "afterOrigin": "posterior_argmax",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "nomination_rank_or_score",
+        "kind": "correction",
+        "participant": "sub-13",
+        "unit": 117
+      },
+      {
+        "afterOrigin": "posterior_argmax",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "posterior",
+        "kind": "correction",
+        "participant": "sub-13",
+        "unit": 118
+      },
+      {
+        "afterOrigin": "posterior_argmax",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "posterior",
+        "kind": "correction",
+        "participant": "sub-13",
+        "unit": 119
+      },
+      {
+        "afterOrigin": "posterior_argmax",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "posterior",
+        "kind": "correction",
+        "participant": "sub-13",
+        "unit": 120
+      },
+      {
+        "afterOrigin": "decode_bound",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "posterior",
+        "kind": "correction",
+        "participant": "sub-13",
+        "unit": 121
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "nomination_rank_or_score",
+        "kind": "correction",
+        "participant": "sub-13",
+        "unit": 122
+      },
+      {
+        "afterOrigin": "posterior_argmax",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "nomination_rank_or_score",
+        "kind": "correction",
+        "participant": "sub-13",
+        "unit": 123
+      },
+      {
+        "afterOrigin": "decode_bound",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "posterior",
+        "kind": "correction",
+        "participant": "sub-13",
+        "unit": 124
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "nomination_rank_or_score",
+        "kind": "correction",
+        "participant": "sub-13",
+        "unit": 125
+      },
+      {
+        "afterOrigin": "posterior_argmax",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "nomination_rank_or_score",
+        "kind": "correction",
+        "participant": "sub-13",
+        "unit": 126
+      },
+      {
+        "afterOrigin": "decode_bound",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "nomination_rank_or_score",
+        "kind": "correction",
+        "participant": "sub-13",
+        "unit": 127
+      },
+      {
+        "afterOrigin": "decode_bound",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "posterior",
+        "kind": "correction",
+        "participant": "sub-13",
+        "unit": 128
+      },
+      {
+        "afterOrigin": "decode_bound",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "posterior",
+        "kind": "correction",
+        "participant": "sub-13",
+        "unit": 129
+      },
+      {
+        "afterOrigin": "posterior_argmax",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "candidate_membership",
+        "kind": "correction",
+        "participant": "sub-13",
+        "unit": 130
+      },
+      {
+        "afterOrigin": "posterior_argmax",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "posterior",
+        "kind": "correction",
+        "participant": "sub-13",
+        "unit": 131
+      },
+      {
+        "afterOrigin": "posterior_argmax",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "nomination_rank_or_score",
+        "kind": "correction",
+        "participant": "sub-13",
+        "unit": 132
+      },
+      {
+        "afterOrigin": "posterior_argmax",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "posterior",
+        "kind": "correction",
+        "participant": "sub-13",
+        "unit": 133
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "nomination_rank_or_score",
+        "kind": "correction",
+        "participant": "sub-13",
+        "unit": 134
+      },
+      {
+        "afterOrigin": "decode_bound",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "nomination_rank_or_score",
+        "kind": "correction",
+        "participant": "sub-13",
+        "unit": 135
+      },
+      {
+        "afterOrigin": "posterior_argmax",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "posterior",
+        "kind": "correction",
+        "participant": "sub-13",
+        "unit": 136
+      },
+      {
+        "afterOrigin": "posterior_argmax",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "nomination_rank_or_score",
+        "kind": "correction",
+        "participant": "sub-13",
+        "unit": 137
+      },
+      {
+        "afterOrigin": "decode_bound",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "posterior",
+        "kind": "correction",
+        "participant": "sub-13",
+        "unit": 138
+      },
+      {
+        "afterOrigin": "posterior_argmax",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "posterior",
+        "kind": "correction",
+        "participant": "sub-13",
+        "unit": 139
+      },
+      {
+        "afterOrigin": "posterior_argmax",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "posterior",
+        "kind": "correction",
+        "participant": "sub-13",
+        "unit": 140
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "nomination_rank_or_score",
+        "kind": "correction",
+        "participant": "sub-13",
+        "unit": 141
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "decode_bound",
+        "firstObservedDivergence": "posterior",
+        "kind": "correction",
+        "participant": "sub-13",
+        "unit": 142
+      },
+      {
+        "afterOrigin": "decode_bound",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "posterior",
+        "kind": "correction",
+        "participant": "sub-13",
+        "unit": 143
+      },
+      {
+        "afterOrigin": "decode_bound",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "posterior",
+        "kind": "correction",
+        "participant": "sub-13",
+        "unit": 144
+      },
+      {
+        "afterOrigin": "decode_bound",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "posterior",
+        "kind": "correction",
+        "participant": "sub-13",
+        "unit": 145
+      },
+      {
+        "afterOrigin": "decode_bound",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "posterior",
+        "kind": "correction",
+        "participant": "sub-13",
+        "unit": 146
+      },
+      {
+        "afterOrigin": "decode_bound",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "nomination_rank_or_score",
+        "kind": "correction",
+        "participant": "sub-13",
+        "unit": 147
+      },
+      {
+        "afterOrigin": "posterior_argmax",
+        "beforeOrigin": "decode_bound",
+        "firstObservedDivergence": "posterior",
+        "kind": "correction",
+        "participant": "sub-13",
+        "unit": 148
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "nomination_rank_or_score",
+        "kind": "correction",
+        "participant": "sub-13",
+        "unit": 149
+      },
+      {
+        "afterOrigin": "posterior_argmax",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "nomination_rank_or_score",
+        "kind": "correction",
+        "participant": "sub-13",
+        "unit": 150
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "candidate_membership",
+        "kind": "regression",
+        "participant": "sub-13",
+        "unit": 161
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "candidate_membership",
+        "kind": "regression",
+        "participant": "sub-13",
+        "unit": 162
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "nomination_rank_or_score",
+        "kind": "regression",
+        "participant": "sub-13",
+        "unit": 163
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "posterior_argmax",
+        "firstObservedDivergence": "posterior",
+        "kind": "regression",
+        "participant": "sub-13",
+        "unit": 164
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "posterior_argmax",
+        "firstObservedDivergence": "candidate_membership",
+        "kind": "regression",
+        "participant": "sub-13",
+        "unit": 165
+      },
+      {
+        "afterOrigin": "decode_bound",
+        "beforeOrigin": "decode_bound",
+        "firstObservedDivergence": "nomination_rank_or_score",
+        "kind": "regression",
+        "participant": "sub-13",
+        "unit": 166
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "decode_bound",
+        "firstObservedDivergence": "candidate_membership",
+        "kind": "regression",
+        "participant": "sub-13",
+        "unit": 167
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "decode_bound",
+        "firstObservedDivergence": "candidate_membership",
+        "kind": "regression",
+        "participant": "sub-13",
+        "unit": 168
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "posterior",
+        "kind": "regression",
+        "participant": "sub-13",
+        "unit": 169
+      },
+      {
+        "afterOrigin": "decode_bound",
+        "beforeOrigin": "decode_bound",
+        "firstObservedDivergence": "posterior",
+        "kind": "regression",
+        "participant": "sub-13",
+        "unit": 170
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "decode_bound",
+        "firstObservedDivergence": "candidate_membership",
+        "kind": "regression",
+        "participant": "sub-13",
+        "unit": 171
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "posterior",
+        "kind": "regression",
+        "participant": "sub-13",
+        "unit": 172
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "posterior_argmax",
+        "firstObservedDivergence": "posterior",
+        "kind": "regression",
+        "participant": "sub-13",
+        "unit": 173
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "posterior",
+        "kind": "regression",
+        "participant": "sub-13",
+        "unit": 174
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "decode_bound",
+        "firstObservedDivergence": "nomination_rank_or_score",
+        "kind": "regression",
+        "participant": "sub-13",
+        "unit": 175
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "posterior_argmax",
+        "firstObservedDivergence": "posterior",
+        "kind": "regression",
+        "participant": "sub-13",
+        "unit": 176
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "posterior_argmax",
+        "firstObservedDivergence": "posterior",
+        "kind": "regression",
+        "participant": "sub-13",
+        "unit": 177
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "posterior",
+        "kind": "regression",
+        "participant": "sub-13",
+        "unit": 178
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "posterior_argmax",
+        "firstObservedDivergence": "posterior",
+        "kind": "regression",
+        "participant": "sub-13",
+        "unit": 179
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "decode_bound",
+        "firstObservedDivergence": "posterior",
+        "kind": "regression",
+        "participant": "sub-13",
+        "unit": 180
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "posterior_argmax",
+        "firstObservedDivergence": "nomination_rank_or_score",
+        "kind": "regression",
+        "participant": "sub-13",
+        "unit": 181
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "posterior",
+        "kind": "regression",
+        "participant": "sub-13",
+        "unit": 182
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "posterior_argmax",
+        "firstObservedDivergence": "nomination_rank_or_score",
+        "kind": "regression",
+        "participant": "sub-13",
+        "unit": 183
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "posterior_argmax",
+        "firstObservedDivergence": "nomination_rank_or_score",
+        "kind": "regression",
+        "participant": "sub-13",
+        "unit": 184
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "posterior_argmax",
+        "firstObservedDivergence": "posterior",
+        "kind": "regression",
+        "participant": "sub-13",
+        "unit": 185
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "candidate_membership",
+        "kind": "regression",
+        "participant": "sub-13",
+        "unit": 186
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "posterior",
+        "kind": "regression",
+        "participant": "sub-13",
+        "unit": 187
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "decode_bound",
+        "firstObservedDivergence": "posterior",
+        "kind": "regression",
+        "participant": "sub-13",
+        "unit": 188
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "decode_bound",
+        "firstObservedDivergence": "nomination_rank_or_score",
+        "kind": "regression",
+        "participant": "sub-13",
+        "unit": 189
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "posterior_argmax",
+        "firstObservedDivergence": "posterior",
+        "kind": "regression",
+        "participant": "sub-13",
+        "unit": 190
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "posterior_argmax",
+        "firstObservedDivergence": "candidate_membership",
+        "kind": "regression",
+        "participant": "sub-13",
+        "unit": 191
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "posterior_argmax",
+        "firstObservedDivergence": "posterior",
+        "kind": "regression",
+        "participant": "sub-13",
+        "unit": 192
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "nomination_rank_or_score",
+        "kind": "regression",
+        "participant": "sub-13",
+        "unit": 193
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "decode_bound",
+        "firstObservedDivergence": "posterior",
+        "kind": "regression",
+        "participant": "sub-13",
+        "unit": 194
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "posterior_argmax",
+        "firstObservedDivergence": "posterior",
+        "kind": "regression",
+        "participant": "sub-13",
+        "unit": 195
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "posterior_argmax",
+        "firstObservedDivergence": "nomination_rank_or_score",
+        "kind": "regression",
+        "participant": "sub-13",
+        "unit": 196
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "decode_bound",
+        "firstObservedDivergence": "posterior",
+        "kind": "regression",
+        "participant": "sub-13",
+        "unit": 197
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "decode_bound",
+        "firstObservedDivergence": "nomination_rank_or_score",
+        "kind": "regression",
+        "participant": "sub-13",
+        "unit": 198
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "posterior_argmax",
+        "firstObservedDivergence": "posterior",
+        "kind": "regression",
+        "participant": "sub-13",
+        "unit": 199
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "posterior",
+        "kind": "regression",
+        "participant": "sub-13",
+        "unit": 200
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "candidate_membership",
+        "kind": "regression",
+        "participant": "sub-13",
+        "unit": 201
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "posterior_argmax",
+        "firstObservedDivergence": "nomination_rank_or_score",
+        "kind": "regression",
+        "participant": "sub-13",
+        "unit": 202
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "decode_bound",
+        "firstObservedDivergence": "candidate_membership",
+        "kind": "regression",
+        "participant": "sub-13",
+        "unit": 203
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "posterior_argmax",
+        "firstObservedDivergence": "posterior",
+        "kind": "regression",
+        "participant": "sub-13",
+        "unit": 204
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "candidate_membership",
+        "kind": "regression",
+        "participant": "sub-13",
+        "unit": 205
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "decode_bound",
+        "firstObservedDivergence": "posterior",
+        "kind": "regression",
+        "participant": "sub-13",
+        "unit": 206
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "posterior",
+        "kind": "regression",
+        "participant": "sub-13",
+        "unit": 207
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "posterior_argmax",
+        "firstObservedDivergence": "nomination_rank_or_score",
+        "kind": "regression",
+        "participant": "sub-13",
+        "unit": 208
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "posterior_argmax",
+        "firstObservedDivergence": "nomination_rank_or_score",
+        "kind": "regression",
+        "participant": "sub-13",
+        "unit": 209
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "posterior_argmax",
+        "firstObservedDivergence": "nomination_rank_or_score",
+        "kind": "regression",
+        "participant": "sub-13",
+        "unit": 210
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "nomination_rank_or_score",
+        "kind": "regression",
+        "participant": "sub-13",
+        "unit": 211
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "posterior_argmax",
+        "firstObservedDivergence": "posterior",
+        "kind": "regression",
+        "participant": "sub-13",
+        "unit": 212
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "posterior_argmax",
+        "firstObservedDivergence": "candidate_membership",
+        "kind": "regression",
+        "participant": "sub-13",
+        "unit": 213
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "decode_bound",
+        "firstObservedDivergence": "nomination_rank_or_score",
+        "kind": "regression",
+        "participant": "sub-13",
+        "unit": 214
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "candidate_membership",
+        "kind": "regression",
+        "participant": "sub-13",
+        "unit": 215
+      },
+      {
+        "afterOrigin": "decode_bound",
+        "beforeOrigin": "decode_bound",
+        "firstObservedDivergence": "posterior",
+        "kind": "regression",
+        "participant": "sub-13",
+        "unit": 216
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "posterior_argmax",
+        "firstObservedDivergence": "nomination_rank_or_score",
+        "kind": "regression",
+        "participant": "sub-13",
+        "unit": 217
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "posterior_argmax",
+        "firstObservedDivergence": "posterior",
+        "kind": "regression",
+        "participant": "sub-13",
+        "unit": 218
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "posterior",
+        "kind": "regression",
+        "participant": "sub-13",
+        "unit": 219
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "decode_bound",
+        "firstObservedDivergence": "nomination_rank_or_score",
+        "kind": "regression",
+        "participant": "sub-13",
+        "unit": 220
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "posterior_argmax",
+        "firstObservedDivergence": "nomination_rank_or_score",
+        "kind": "regression",
+        "participant": "sub-13",
+        "unit": 221
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "decode_bound",
+        "firstObservedDivergence": "nomination_rank_or_score",
+        "kind": "regression",
+        "participant": "sub-13",
+        "unit": 222
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "posterior",
+        "kind": "regression",
+        "participant": "sub-13",
+        "unit": 223
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "posterior",
+        "kind": "regression",
+        "participant": "sub-13",
+        "unit": 224
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "decode_bound",
+        "firstObservedDivergence": "posterior",
+        "kind": "regression",
+        "participant": "sub-13",
+        "unit": 225
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "nomination_rank_or_score",
+        "kind": "regression",
+        "participant": "sub-13",
+        "unit": 226
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "candidate_membership",
+        "kind": "regression",
+        "participant": "sub-13",
+        "unit": 227
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "posterior",
+        "kind": "regression",
+        "participant": "sub-13",
+        "unit": 228
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "posterior_argmax",
+        "firstObservedDivergence": "nomination_rank_or_score",
+        "kind": "regression",
+        "participant": "sub-13",
+        "unit": 229
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "posterior_argmax",
+        "firstObservedDivergence": "posterior",
+        "kind": "regression",
+        "participant": "sub-13",
+        "unit": 230
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "posterior_argmax",
+        "firstObservedDivergence": "nomination_rank_or_score",
+        "kind": "regression",
+        "participant": "sub-13",
+        "unit": 231
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "posterior_argmax",
+        "firstObservedDivergence": "candidate_membership",
+        "kind": "regression",
+        "participant": "sub-13",
+        "unit": 232
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "decode_bound",
+        "firstObservedDivergence": "nomination_rank_or_score",
+        "kind": "regression",
+        "participant": "sub-13",
+        "unit": 233
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "posterior",
+        "kind": "regression",
+        "participant": "sub-13",
+        "unit": 234
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "decode_bound",
+        "firstObservedDivergence": "posterior",
+        "kind": "regression",
+        "participant": "sub-13",
+        "unit": 235
+      },
+      {
+        "afterOrigin": "decode_bound",
+        "beforeOrigin": "posterior_argmax",
+        "firstObservedDivergence": "candidate_membership",
+        "kind": "regression",
+        "participant": "sub-14",
+        "unit": 0
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "decode_bound",
+        "firstObservedDivergence": "candidate_membership",
+        "kind": "regression",
+        "participant": "sub-14",
+        "unit": 1
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "posterior_argmax",
+        "firstObservedDivergence": "candidate_membership",
+        "kind": "correction",
+        "participant": "sub-14",
+        "unit": 105
+      },
+      {
+        "afterOrigin": "decode_bound",
+        "beforeOrigin": "decode_bound",
+        "firstObservedDivergence": "candidate_membership",
+        "kind": "correction",
+        "participant": "sub-16",
+        "unit": 134
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "posterior_argmax",
+        "firstObservedDivergence": "candidate_membership",
+        "kind": "regression",
+        "participant": "sub-19",
+        "unit": 0
+      },
+      {
+        "afterOrigin": "decode_bound",
+        "beforeOrigin": "decode_bound",
+        "firstObservedDivergence": "candidate_membership",
+        "kind": "regression",
+        "participant": "sub-19",
+        "unit": 1
+      }
+    ],
+    "counts": {
+      "correction": 90,
+      "regression": 91
+    },
+    "firstObservedDivergence": {
+      "candidate_membership": 31,
+      "nomination_rank_or_score": 69,
+      "posterior": 81
+    },
+    "sample": [
+      {
+        "afterOrigin": "posterior_argmax",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "nomination_rank_or_score",
+        "kind": "correction",
+        "participant": "sub-13",
+        "unit": 98
+      },
+      {
+        "afterOrigin": "decode_bound",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "posterior",
+        "kind": "correction",
+        "participant": "sub-13",
+        "unit": 76
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "nomination_rank_or_score",
+        "kind": "correction",
+        "participant": "sub-13",
+        "unit": 73
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "posterior",
+        "kind": "correction",
+        "participant": "sub-13",
+        "unit": 80
+      },
+      {
+        "afterOrigin": "posterior_argmax",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "nomination_rank_or_score",
+        "kind": "correction",
+        "participant": "sub-13",
+        "unit": 126
+      },
+      {
+        "afterOrigin": "posterior_argmax",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "candidate_membership",
+        "kind": "correction",
+        "participant": "sub-13",
+        "unit": 130
+      },
+      {
+        "afterOrigin": "decode_bound",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "posterior",
+        "kind": "correction",
+        "participant": "sub-13",
+        "unit": 144
+      },
+      {
+        "afterOrigin": "posterior_argmax",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "posterior",
+        "kind": "correction",
+        "participant": "sub-13",
+        "unit": 114
+      },
+      {
+        "afterOrigin": "decode_bound",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "posterior",
+        "kind": "correction",
+        "participant": "sub-13",
+        "unit": 106
+      },
+      {
+        "afterOrigin": "posterior_argmax",
+        "beforeOrigin": "decode_bound",
+        "firstObservedDivergence": "posterior",
+        "kind": "correction",
+        "participant": "sub-13",
+        "unit": 104
+      },
+      {
+        "afterOrigin": "decode_bound",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "posterior",
+        "kind": "correction",
+        "participant": "sub-13",
+        "unit": 124
+      },
+      {
+        "afterOrigin": "posterior_argmax",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "posterior",
+        "kind": "correction",
+        "participant": "sub-13",
+        "unit": 140
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "posterior_argmax",
+        "firstObservedDivergence": "nomination_rank_or_score",
+        "kind": "regression",
+        "participant": "sub-13",
+        "unit": 202
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "candidate_membership",
+        "kind": "regression",
+        "participant": "sub-13",
+        "unit": 227
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "posterior_argmax",
+        "firstObservedDivergence": "nomination_rank_or_score",
+        "kind": "regression",
+        "participant": "sub-13",
+        "unit": 209
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "decode_bound",
+        "firstObservedDivergence": "nomination_rank_or_score",
+        "kind": "regression",
+        "participant": "sub-13",
+        "unit": 189
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "decode_bound",
+        "firstObservedDivergence": "posterior",
+        "kind": "regression",
+        "participant": "sub-13",
+        "unit": 206
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "decode_filled",
+        "firstObservedDivergence": "nomination_rank_or_score",
+        "kind": "regression",
+        "participant": "sub-13",
+        "unit": 163
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "decode_bound",
+        "firstObservedDivergence": "candidate_membership",
+        "kind": "regression",
+        "participant": "sub-07",
+        "unit": 5
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "posterior_argmax",
+        "firstObservedDivergence": "posterior",
+        "kind": "regression",
+        "participant": "sub-13",
+        "unit": 199
+      },
+      {
+        "afterOrigin": "decode_bound",
+        "beforeOrigin": "decode_bound",
+        "firstObservedDivergence": "posterior",
+        "kind": "regression",
+        "participant": "sub-13",
+        "unit": 57
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "decode_bound",
+        "firstObservedDivergence": "posterior",
+        "kind": "regression",
+        "participant": "sub-13",
+        "unit": 194
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "posterior_argmax",
+        "firstObservedDivergence": "nomination_rank_or_score",
+        "kind": "regression",
+        "participant": "sub-13",
+        "unit": 183
+      },
+      {
+        "afterOrigin": "decode_filled",
+        "beforeOrigin": "posterior_argmax",
+        "firstObservedDivergence": "nomination_rank_or_score",
+        "kind": "regression",
+        "participant": "sub-13",
+        "unit": 184
+      }
+    ],
+    "sampleRule": "12 per direction; ascending SHA256([20260905,participant,unit]); fixed before prose inspection"
+  }
+}

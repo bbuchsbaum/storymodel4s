@@ -1,0 +1,1782 @@
+{
+  "jl-all": {
+    "films": {
+      "1": {
+        "byOrigin": {
+          "decode_bound": {
+            "correct": 115,
+            "units": 115
+          },
+          "decode_filled": {
+            "correct": 51,
+            "units": 78
+          },
+          "posterior_argmax": {
+            "correct": 174,
+            "units": 174
+          }
+        },
+        "candidateGold": 359,
+        "eligible": 367,
+        "finalCorrect": 340,
+        "finalOutsidePosteriorSupport": 78,
+        "localCorrect": 283,
+        "localStateAnchored": 21,
+        "localStateCorrect": 20,
+        "noFillCorrect": 329,
+        "origins": {
+          "decode_bound": 115,
+          "decode_filled": 78,
+          "posterior_argmax": 174
+        },
+        "posteriorArgmaxCorrect": 292,
+        "posteriorSupportGold": 359
+      },
+      "10": {
+        "byOrigin": {
+          "decode_bound": {
+            "correct": 98,
+            "units": 121
+          },
+          "decode_filled": {
+            "correct": 83,
+            "units": 211
+          },
+          "posterior_argmax": {
+            "correct": 130,
+            "units": 133
+          }
+        },
+        "candidateGold": 446,
+        "eligible": 465,
+        "finalCorrect": 311,
+        "finalOutsidePosteriorSupport": 211,
+        "localCorrect": 316,
+        "localStateAnchored": 41,
+        "localStateCorrect": 36,
+        "noFillCorrect": 373,
+        "origins": {
+          "decode_bound": 121,
+          "decode_filled": 211,
+          "posterior_argmax": 133
+        },
+        "posteriorArgmaxCorrect": 367,
+        "posteriorSupportGold": 446
+      },
+      "11": {
+        "byOrigin": {
+          "decode_bound": {
+            "correct": 6,
+            "units": 6
+          },
+          "decode_filled": {
+            "correct": 3,
+            "units": 3
+          },
+          "posterior_argmax": {
+            "correct": 2,
+            "units": 2
+          }
+        },
+        "candidateGold": 8,
+        "eligible": 11,
+        "finalCorrect": 11,
+        "finalOutsidePosteriorSupport": 3,
+        "localCorrect": 6,
+        "localStateAnchored": 2,
+        "localStateCorrect": 2,
+        "noFillCorrect": 8,
+        "origins": {
+          "decode_bound": 6,
+          "decode_filled": 3,
+          "posterior_argmax": 2
+        },
+        "posteriorArgmaxCorrect": 7,
+        "posteriorSupportGold": 8
+      },
+      "2": {
+        "byOrigin": {
+          "decode_bound": {
+            "correct": 143,
+            "units": 143
+          },
+          "decode_filled": {
+            "correct": 59,
+            "units": 63
+          },
+          "posterior_argmax": {
+            "correct": 164,
+            "units": 165
+          }
+        },
+        "candidateGold": 363,
+        "eligible": 371,
+        "finalCorrect": 366,
+        "finalOutsidePosteriorSupport": 63,
+        "localCorrect": 287,
+        "localStateAnchored": 60,
+        "localStateCorrect": 58,
+        "noFillCorrect": 339,
+        "origins": {
+          "decode_bound": 143,
+          "decode_filled": 63,
+          "posterior_argmax": 165
+        },
+        "posteriorArgmaxCorrect": 294,
+        "posteriorSupportGold": 363
+      },
+      "3": {
+        "byOrigin": {
+          "decode_bound": {
+            "correct": 107,
+            "units": 149
+          },
+          "decode_filled": {
+            "correct": 76,
+            "units": 375
+          },
+          "posterior_argmax": {
+            "correct": 173,
+            "units": 181
+          }
+        },
+        "candidateGold": 694,
+        "eligible": 705,
+        "finalCorrect": 356,
+        "finalOutsidePosteriorSupport": 375,
+        "localCorrect": 532,
+        "localStateAnchored": 52,
+        "localStateCorrect": 51,
+        "noFillCorrect": 551,
+        "origins": {
+          "decode_bound": 149,
+          "decode_filled": 375,
+          "posterior_argmax": 181
+        },
+        "posteriorArgmaxCorrect": 542,
+        "posteriorSupportGold": 694
+      },
+      "4": {
+        "byOrigin": {
+          "decode_bound": {
+            "correct": 58,
+            "units": 66
+          },
+          "decode_filled": {
+            "correct": 38,
+            "units": 93
+          },
+          "posterior_argmax": {
+            "correct": 58,
+            "units": 61
+          }
+        },
+        "candidateGold": 189,
+        "eligible": 220,
+        "finalCorrect": 154,
+        "finalOutsidePosteriorSupport": 93,
+        "localCorrect": 115,
+        "localStateAnchored": 17,
+        "localStateCorrect": 15,
+        "noFillCorrect": 156,
+        "origins": {
+          "decode_bound": 66,
+          "decode_filled": 93,
+          "posterior_argmax": 61
+        },
+        "posteriorArgmaxCorrect": 125,
+        "posteriorSupportGold": 189
+      },
+      "5": {
+        "byOrigin": {
+          "decode_bound": {
+            "correct": 143,
+            "units": 171
+          },
+          "decode_filled": {
+            "correct": 95,
+            "units": 202
+          },
+          "posterior_argmax": {
+            "correct": 200,
+            "units": 204
+          }
+        },
+        "candidateGold": 553,
+        "eligible": 577,
+        "finalCorrect": 438,
+        "finalOutsidePosteriorSupport": 202,
+        "localCorrect": 430,
+        "localStateAnchored": 56,
+        "localStateCorrect": 55,
+        "noFillCorrect": 473,
+        "origins": {
+          "decode_bound": 171,
+          "decode_filled": 202,
+          "posterior_argmax": 204
+        },
+        "posteriorArgmaxCorrect": 462,
+        "posteriorSupportGold": 553
+      },
+      "6": {
+        "byOrigin": {
+          "decode_bound": {
+            "correct": 68,
+            "units": 76
+          },
+          "decode_filled": {
+            "correct": 34,
+            "units": 185
+          },
+          "posterior_argmax": {
+            "correct": 119,
+            "units": 122
+          }
+        },
+        "candidateGold": 356,
+        "eligible": 383,
+        "finalCorrect": 221,
+        "finalOutsidePosteriorSupport": 185,
+        "localCorrect": 305,
+        "localStateAnchored": 32,
+        "localStateCorrect": 32,
+        "noFillCorrect": 320,
+        "origins": {
+          "decode_bound": 76,
+          "decode_filled": 185,
+          "posterior_argmax": 122
+        },
+        "posteriorArgmaxCorrect": 315,
+        "posteriorSupportGold": 356
+      },
+      "7": {
+        "byOrigin": {
+          "decode_bound": {
+            "correct": 33,
+            "units": 50
+          },
+          "decode_filled": {
+            "correct": 19,
+            "units": 199
+          },
+          "posterior_argmax": {
+            "correct": 68,
+            "units": 72
+          }
+        },
+        "candidateGold": 301,
+        "eligible": 321,
+        "finalCorrect": 120,
+        "finalOutsidePosteriorSupport": 199,
+        "localCorrect": 227,
+        "localStateAnchored": 17,
+        "localStateCorrect": 16,
+        "noFillCorrect": 245,
+        "origins": {
+          "decode_bound": 50,
+          "decode_filled": 199,
+          "posterior_argmax": 72
+        },
+        "posteriorArgmaxCorrect": 246,
+        "posteriorSupportGold": 301
+      },
+      "8": {
+        "byOrigin": {
+          "decode_bound": {
+            "correct": 42,
+            "units": 50
+          },
+          "decode_filled": {
+            "correct": 19,
+            "units": 71
+          },
+          "posterior_argmax": {
+            "correct": 70,
+            "units": 70
+          }
+        },
+        "candidateGold": 176,
+        "eligible": 191,
+        "finalCorrect": 131,
+        "finalOutsidePosteriorSupport": 71,
+        "localCorrect": 135,
+        "localStateAnchored": 29,
+        "localStateCorrect": 27,
+        "noFillCorrect": 156,
+        "origins": {
+          "decode_bound": 50,
+          "decode_filled": 71,
+          "posterior_argmax": 70
+        },
+        "posteriorArgmaxCorrect": 146,
+        "posteriorSupportGold": 176
+      },
+      "9": {
+        "byOrigin": {
+          "decode_bound": {
+            "correct": 16,
+            "units": 25
+          },
+          "decode_filled": {
+            "correct": 14,
+            "units": 62
+          },
+          "posterior_argmax": {
+            "correct": 53,
+            "units": 53
+          }
+        },
+        "candidateGold": 126,
+        "eligible": 140,
+        "finalCorrect": 83,
+        "finalOutsidePosteriorSupport": 62,
+        "localCorrect": 94,
+        "localStateAnchored": 10,
+        "localStateCorrect": 9,
+        "noFillCorrect": 106,
+        "origins": {
+          "decode_bound": 25,
+          "decode_filled": 62,
+          "posterior_argmax": 53
+        },
+        "posteriorArgmaxCorrect": 104,
+        "posteriorSupportGold": 126
+      }
+    },
+    "overall": {
+      "byOrigin": {
+        "decode_bound": {
+          "correct": 829,
+          "units": 972
+        },
+        "decode_filled": {
+          "correct": 491,
+          "units": 1542
+        },
+        "posterior_argmax": {
+          "correct": 1211,
+          "units": 1237
+        }
+      },
+      "candidateGold": 3571,
+      "eligible": 3751,
+      "finalCorrect": 2531,
+      "finalOutsidePosteriorSupport": 1542,
+      "localCorrect": 2730,
+      "localStateAnchored": 337,
+      "localStateCorrect": 321,
+      "noFillCorrect": 3056,
+      "origins": {
+        "decode_bound": 972,
+        "decode_filled": 1542,
+        "posterior_argmax": 1237
+      },
+      "posteriorArgmaxCorrect": 2900,
+      "posteriorSupportGold": 3571
+    },
+    "pairedStageChanges": {
+      "localFilm__posteriorArgmaxFilm": {
+        "corrections": 239,
+        "deltaPercentagePoints": 4.532124766728872,
+        "participantBootstrap95": [
+          3.707440100882724,
+          5.325306783977773
+        ],
+        "regressions": 69
+      },
+      "localStateFilm__localFilm": {
+        "corrections": 2409,
+        "deltaPercentagePoints": 64.22287390029325,
+        "participantBootstrap95": [
+          62.52427184466019,
+          66.30974144685297
+        ],
+        "regressions": 0
+      },
+      "noFillFilm__finalFilm": {
+        "corrections": 286,
+        "deltaPercentagePoints": -13.99626766195681,
+        "participantBootstrap95": [
+          -20.598639455782312,
+          -6.8164411539443455
+        ],
+        "regressions": 811
+      },
+      "posteriorArgmaxFilm__finalFilm": {
+        "corrections": 536,
+        "deltaPercentagePoints": -9.837376699546788,
+        "participantBootstrap95": [
+          -17.609182530795074,
+          -1.5019115237575096
+        ],
+        "regressions": 905
+      },
+      "posteriorArgmaxFilm__noFillFilm": {
+        "corrections": 250,
+        "deltaPercentagePoints": 4.158890962410024,
+        "participantBootstrap95": [
+          2.396644697423607,
+          5.607476635514018
+        ],
+        "regressions": 94
+      }
+    },
+    "participants": {
+      "sub-01": {
+        "byOrigin": {
+          "decode_bound": {
+            "correct": 29,
+            "units": 41
+          },
+          "decode_filled": {
+            "correct": 7,
+            "units": 60
+          },
+          "posterior_argmax": {
+            "correct": 38,
+            "units": 39
+          }
+        },
+        "candidateGold": 133,
+        "eligible": 140,
+        "finalCorrect": 74,
+        "finalOutsidePosteriorSupport": 60,
+        "localCorrect": 103,
+        "localStateAnchored": 6,
+        "localStateCorrect": 6,
+        "noFillCorrect": 112,
+        "origins": {
+          "decode_bound": 41,
+          "decode_filled": 60,
+          "posterior_argmax": 39
+        },
+        "posteriorArgmaxCorrect": 112,
+        "posteriorSupportGold": 133
+      },
+      "sub-02": {
+        "byOrigin": {
+          "decode_bound": {
+            "correct": 77,
+            "units": 83
+          },
+          "decode_filled": {
+            "correct": 49,
+            "units": 78
+          },
+          "posterior_argmax": {
+            "correct": 121,
+            "units": 121
+          }
+        },
+        "candidateGold": 270,
+        "eligible": 282,
+        "finalCorrect": 247,
+        "finalOutsidePosteriorSupport": 78,
+        "localCorrect": 207,
+        "localStateAnchored": 31,
+        "localStateCorrect": 29,
+        "noFillCorrect": 246,
+        "origins": {
+          "decode_bound": 83,
+          "decode_filled": 78,
+          "posterior_argmax": 121
+        },
+        "posteriorArgmaxCorrect": 222,
+        "posteriorSupportGold": 270
+      },
+      "sub-07": {
+        "byOrigin": {
+          "decode_bound": {
+            "correct": 84,
+            "units": 91
+          },
+          "decode_filled": {
+            "correct": 50,
+            "units": 219
+          },
+          "posterior_argmax": {
+            "correct": 92,
+            "units": 93
+          }
+        },
+        "candidateGold": 384,
+        "eligible": 403,
+        "finalCorrect": 226,
+        "finalOutsidePosteriorSupport": 219,
+        "localCorrect": 289,
+        "localStateAnchored": 41,
+        "localStateCorrect": 38,
+        "noFillCorrect": 329,
+        "origins": {
+          "decode_bound": 91,
+          "decode_filled": 219,
+          "posterior_argmax": 93
+        },
+        "posteriorArgmaxCorrect": 308,
+        "posteriorSupportGold": 384
+      },
+      "sub-08": {
+        "byOrigin": {
+          "decode_bound": {
+            "correct": 55,
+            "units": 82
+          },
+          "decode_filled": {
+            "correct": 45,
+            "units": 164
+          },
+          "posterior_argmax": {
+            "correct": 107,
+            "units": 114
+          }
+        },
+        "candidateGold": 343,
+        "eligible": 360,
+        "finalCorrect": 207,
+        "finalOutsidePosteriorSupport": 164,
+        "localCorrect": 246,
+        "localStateAnchored": 28,
+        "localStateCorrect": 25,
+        "noFillCorrect": 270,
+        "origins": {
+          "decode_bound": 82,
+          "decode_filled": 164,
+          "posterior_argmax": 114
+        },
+        "posteriorArgmaxCorrect": 268,
+        "posteriorSupportGold": 343
+      },
+      "sub-09": {
+        "byOrigin": {
+          "decode_bound": {
+            "correct": 53,
+            "units": 58
+          },
+          "decode_filled": {
+            "correct": 36,
+            "units": 157
+          },
+          "posterior_argmax": {
+            "correct": 63,
+            "units": 64
+          }
+        },
+        "candidateGold": 265,
+        "eligible": 279,
+        "finalCorrect": 152,
+        "finalOutsidePosteriorSupport": 157,
+        "localCorrect": 199,
+        "localStateAnchored": 29,
+        "localStateCorrect": 26,
+        "noFillCorrect": 226,
+        "origins": {
+          "decode_bound": 58,
+          "decode_filled": 157,
+          "posterior_argmax": 64
+        },
+        "posteriorArgmaxCorrect": 213,
+        "posteriorSupportGold": 265
+      },
+      "sub-10": {
+        "byOrigin": {
+          "decode_bound": {
+            "correct": 101,
+            "units": 124
+          },
+          "decode_filled": {
+            "correct": 57,
+            "units": 158
+          },
+          "posterior_argmax": {
+            "correct": 122,
+            "units": 128
+          }
+        },
+        "candidateGold": 391,
+        "eligible": 410,
+        "finalCorrect": 280,
+        "finalOutsidePosteriorSupport": 158,
+        "localCorrect": 277,
+        "localStateAnchored": 31,
+        "localStateCorrect": 29,
+        "noFillCorrect": 313,
+        "origins": {
+          "decode_bound": 124,
+          "decode_filled": 158,
+          "posterior_argmax": 128
+        },
+        "posteriorArgmaxCorrect": 287,
+        "posteriorSupportGold": 391
+      },
+      "sub-11": {
+        "byOrigin": {
+          "decode_bound": {
+            "correct": 82,
+            "units": 90
+          },
+          "decode_filled": {
+            "correct": 46,
+            "units": 133
+          },
+          "posterior_argmax": {
+            "correct": 109,
+            "units": 110
+          }
+        },
+        "candidateGold": 306,
+        "eligible": 333,
+        "finalCorrect": 237,
+        "finalOutsidePosteriorSupport": 133,
+        "localCorrect": 243,
+        "localStateAnchored": 22,
+        "localStateCorrect": 22,
+        "noFillCorrect": 271,
+        "origins": {
+          "decode_bound": 90,
+          "decode_filled": 133,
+          "posterior_argmax": 110
+        },
+        "posteriorArgmaxCorrect": 255,
+        "posteriorSupportGold": 306
+      },
+      "sub-12": {
+        "byOrigin": {
+          "decode_bound": {
+            "correct": 23,
+            "units": 24
+          },
+          "decode_filled": {
+            "correct": 4,
+            "units": 13
+          },
+          "posterior_argmax": {
+            "correct": 23,
+            "units": 24
+          }
+        },
+        "candidateGold": 61,
+        "eligible": 61,
+        "finalCorrect": 50,
+        "finalOutsidePosteriorSupport": 13,
+        "localCorrect": 54,
+        "localStateAnchored": 6,
+        "localStateCorrect": 6,
+        "noFillCorrect": 56,
+        "origins": {
+          "decode_bound": 24,
+          "decode_filled": 13,
+          "posterior_argmax": 24
+        },
+        "posteriorArgmaxCorrect": 55,
+        "posteriorSupportGold": 61
+      },
+      "sub-13": {
+        "byOrigin": {
+          "decode_bound": {
+            "correct": 39,
+            "units": 53
+          },
+          "decode_filled": {
+            "correct": 40,
+            "units": 126
+          },
+          "posterior_argmax": {
+            "correct": 55,
+            "units": 56
+          }
+        },
+        "candidateGold": 220,
+        "eligible": 235,
+        "finalCorrect": 134,
+        "finalOutsidePosteriorSupport": 126,
+        "localCorrect": 159,
+        "localStateAnchored": 14,
+        "localStateCorrect": 14,
+        "noFillCorrect": 181,
+        "origins": {
+          "decode_bound": 53,
+          "decode_filled": 126,
+          "posterior_argmax": 56
+        },
+        "posteriorArgmaxCorrect": 173,
+        "posteriorSupportGold": 220
+      },
+      "sub-14": {
+        "byOrigin": {
+          "decode_bound": {
+            "correct": 13,
+            "units": 21
+          },
+          "decode_filled": {
+            "correct": 6,
+            "units": 38
+          },
+          "posterior_argmax": {
+            "correct": 45,
+            "units": 46
+          }
+        },
+        "candidateGold": 100,
+        "eligible": 105,
+        "finalCorrect": 64,
+        "finalOutsidePosteriorSupport": 38,
+        "localCorrect": 88,
+        "localStateAnchored": 14,
+        "localStateCorrect": 14,
+        "noFillCorrect": 85,
+        "origins": {
+          "decode_bound": 21,
+          "decode_filled": 38,
+          "posterior_argmax": 46
+        },
+        "posteriorArgmaxCorrect": 87,
+        "posteriorSupportGold": 100
+      },
+      "sub-16": {
+        "byOrigin": {
+          "decode_bound": {
+            "correct": 78,
+            "units": 83
+          },
+          "decode_filled": {
+            "correct": 36,
+            "units": 39
+          },
+          "posterior_argmax": {
+            "correct": 94,
+            "units": 95
+          }
+        },
+        "candidateGold": 203,
+        "eligible": 217,
+        "finalCorrect": 208,
+        "finalOutsidePosteriorSupport": 39,
+        "localCorrect": 154,
+        "localStateAnchored": 27,
+        "localStateCorrect": 26,
+        "noFillCorrect": 182,
+        "origins": {
+          "decode_bound": 83,
+          "decode_filled": 39,
+          "posterior_argmax": 95
+        },
+        "posteriorArgmaxCorrect": 163,
+        "posteriorSupportGold": 203
+      },
+      "sub-17": {
+        "byOrigin": {
+          "decode_bound": {
+            "correct": 32,
+            "units": 35
+          },
+          "decode_filled": {
+            "correct": 28,
+            "units": 142
+          },
+          "posterior_argmax": {
+            "correct": 56,
+            "units": 57
+          }
+        },
+        "candidateGold": 225,
+        "eligible": 234,
+        "finalCorrect": 116,
+        "finalOutsidePosteriorSupport": 142,
+        "localCorrect": 181,
+        "localStateAnchored": 25,
+        "localStateCorrect": 24,
+        "noFillCorrect": 200,
+        "origins": {
+          "decode_bound": 35,
+          "decode_filled": 142,
+          "posterior_argmax": 57
+        },
+        "posteriorArgmaxCorrect": 195,
+        "posteriorSupportGold": 225
+      },
+      "sub-18": {
+        "byOrigin": {
+          "decode_bound": {
+            "correct": 11,
+            "units": 24
+          },
+          "decode_filled": {
+            "correct": 4,
+            "units": 27
+          },
+          "posterior_argmax": {
+            "correct": 20,
+            "units": 22
+          }
+        },
+        "candidateGold": 70,
+        "eligible": 73,
+        "finalCorrect": 35,
+        "finalOutsidePosteriorSupport": 27,
+        "localCorrect": 52,
+        "localStateAnchored": 3,
+        "localStateCorrect": 3,
+        "noFillCorrect": 49,
+        "origins": {
+          "decode_bound": 24,
+          "decode_filled": 27,
+          "posterior_argmax": 22
+        },
+        "posteriorArgmaxCorrect": 55,
+        "posteriorSupportGold": 70
+      },
+      "sub-19": {
+        "byOrigin": {
+          "decode_bound": {
+            "correct": 40,
+            "units": 50
+          },
+          "decode_filled": {
+            "correct": 23,
+            "units": 96
+          },
+          "posterior_argmax": {
+            "correct": 91,
+            "units": 93
+          }
+        },
+        "candidateGold": 232,
+        "eligible": 239,
+        "finalCorrect": 154,
+        "finalOutsidePosteriorSupport": 96,
+        "localCorrect": 186,
+        "localStateAnchored": 31,
+        "localStateCorrect": 30,
+        "noFillCorrect": 204,
+        "origins": {
+          "decode_bound": 50,
+          "decode_filled": 96,
+          "posterior_argmax": 93
+        },
+        "posteriorArgmaxCorrect": 202,
+        "posteriorSupportGold": 232
+      },
+      "sub-20": {
+        "byOrigin": {
+          "decode_bound": {
+            "correct": 112,
+            "units": 113
+          },
+          "decode_filled": {
+            "correct": 60,
+            "units": 92
+          },
+          "posterior_argmax": {
+            "correct": 175,
+            "units": 175
+          }
+        },
+        "candidateGold": 368,
+        "eligible": 380,
+        "finalCorrect": 347,
+        "finalOutsidePosteriorSupport": 92,
+        "localCorrect": 292,
+        "localStateAnchored": 29,
+        "localStateCorrect": 29,
+        "noFillCorrect": 332,
+        "origins": {
+          "decode_bound": 113,
+          "decode_filled": 92,
+          "posterior_argmax": 175
+        },
+        "posteriorArgmaxCorrect": 305,
+        "posteriorSupportGold": 368
+      }
+    }
+  },
+  "jl-no-cartoons": {
+    "films": {
+      "1": {
+        "byOrigin": {
+          "decode_bound": {
+            "correct": 116,
+            "units": 116
+          },
+          "decode_filled": {
+            "correct": 52,
+            "units": 79
+          },
+          "posterior_argmax": {
+            "correct": 172,
+            "units": 172
+          }
+        },
+        "candidateGold": 359,
+        "eligible": 367,
+        "finalCorrect": 340,
+        "finalOutsidePosteriorSupport": 79,
+        "localCorrect": 284,
+        "localStateAnchored": 21,
+        "localStateCorrect": 20,
+        "noFillCorrect": 330,
+        "origins": {
+          "decode_bound": 116,
+          "decode_filled": 79,
+          "posterior_argmax": 172
+        },
+        "posteriorArgmaxCorrect": 293,
+        "posteriorSupportGold": 359
+      },
+      "10": {
+        "byOrigin": {
+          "decode_bound": {
+            "correct": 111,
+            "units": 133
+          },
+          "decode_filled": {
+            "correct": 90,
+            "units": 181
+          },
+          "posterior_argmax": {
+            "correct": 148,
+            "units": 151
+          }
+        },
+        "candidateGold": 446,
+        "eligible": 465,
+        "finalCorrect": 349,
+        "finalOutsidePosteriorSupport": 181,
+        "localCorrect": 316,
+        "localStateAnchored": 41,
+        "localStateCorrect": 36,
+        "noFillCorrect": 377,
+        "origins": {
+          "decode_bound": 133,
+          "decode_filled": 181,
+          "posterior_argmax": 151
+        },
+        "posteriorArgmaxCorrect": 367,
+        "posteriorSupportGold": 446
+      },
+      "11": {
+        "byOrigin": {
+          "decode_bound": {
+            "correct": 0,
+            "units": 4
+          },
+          "decode_filled": {
+            "correct": 0,
+            "units": 6
+          },
+          "posterior_argmax": {
+            "correct": 0,
+            "units": 1
+          }
+        },
+        "candidateGold": 0,
+        "eligible": 11,
+        "finalCorrect": 0,
+        "finalOutsidePosteriorSupport": 6,
+        "localCorrect": 0,
+        "localStateAnchored": 0,
+        "localStateCorrect": 0,
+        "noFillCorrect": 0,
+        "origins": {
+          "decode_bound": 4,
+          "decode_filled": 6,
+          "posterior_argmax": 1
+        },
+        "posteriorArgmaxCorrect": 0,
+        "posteriorSupportGold": 0
+      },
+      "2": {
+        "byOrigin": {
+          "decode_bound": {
+            "correct": 145,
+            "units": 147
+          },
+          "decode_filled": {
+            "correct": 56,
+            "units": 61
+          },
+          "posterior_argmax": {
+            "correct": 162,
+            "units": 163
+          }
+        },
+        "candidateGold": 363,
+        "eligible": 371,
+        "finalCorrect": 363,
+        "finalOutsidePosteriorSupport": 61,
+        "localCorrect": 290,
+        "localStateAnchored": 60,
+        "localStateCorrect": 58,
+        "noFillCorrect": 339,
+        "origins": {
+          "decode_bound": 147,
+          "decode_filled": 61,
+          "posterior_argmax": 163
+        },
+        "posteriorArgmaxCorrect": 296,
+        "posteriorSupportGold": 363
+      },
+      "3": {
+        "byOrigin": {
+          "decode_bound": {
+            "correct": 85,
+            "units": 129
+          },
+          "decode_filled": {
+            "correct": 52,
+            "units": 424
+          },
+          "posterior_argmax": {
+            "correct": 144,
+            "units": 152
+          }
+        },
+        "candidateGold": 695,
+        "eligible": 705,
+        "finalCorrect": 281,
+        "finalOutsidePosteriorSupport": 424,
+        "localCorrect": 532,
+        "localStateAnchored": 52,
+        "localStateCorrect": 51,
+        "noFillCorrect": 543,
+        "origins": {
+          "decode_bound": 129,
+          "decode_filled": 424,
+          "posterior_argmax": 152
+        },
+        "posteriorArgmaxCorrect": 544,
+        "posteriorSupportGold": 695
+      },
+      "4": {
+        "byOrigin": {
+          "decode_bound": {
+            "correct": 61,
+            "units": 65
+          },
+          "decode_filled": {
+            "correct": 47,
+            "units": 88
+          },
+          "posterior_argmax": {
+            "correct": 63,
+            "units": 67
+          }
+        },
+        "candidateGold": 189,
+        "eligible": 220,
+        "finalCorrect": 171,
+        "finalOutsidePosteriorSupport": 88,
+        "localCorrect": 117,
+        "localStateAnchored": 17,
+        "localStateCorrect": 15,
+        "noFillCorrect": 158,
+        "origins": {
+          "decode_bound": 65,
+          "decode_filled": 88,
+          "posterior_argmax": 67
+        },
+        "posteriorArgmaxCorrect": 125,
+        "posteriorSupportGold": 189
+      },
+      "5": {
+        "byOrigin": {
+          "decode_bound": {
+            "correct": 154,
+            "units": 174
+          },
+          "decode_filled": {
+            "correct": 99,
+            "units": 182
+          },
+          "posterior_argmax": {
+            "correct": 216,
+            "units": 221
+          }
+        },
+        "candidateGold": 554,
+        "eligible": 577,
+        "finalCorrect": 469,
+        "finalOutsidePosteriorSupport": 182,
+        "localCorrect": 431,
+        "localStateAnchored": 56,
+        "localStateCorrect": 55,
+        "noFillCorrect": 480,
+        "origins": {
+          "decode_bound": 174,
+          "decode_filled": 182,
+          "posterior_argmax": 221
+        },
+        "posteriorArgmaxCorrect": 461,
+        "posteriorSupportGold": 554
+      },
+      "6": {
+        "byOrigin": {
+          "decode_bound": {
+            "correct": 67,
+            "units": 72
+          },
+          "decode_filled": {
+            "correct": 35,
+            "units": 188
+          },
+          "posterior_argmax": {
+            "correct": 121,
+            "units": 123
+          }
+        },
+        "candidateGold": 357,
+        "eligible": 383,
+        "finalCorrect": 223,
+        "finalOutsidePosteriorSupport": 188,
+        "localCorrect": 305,
+        "localStateAnchored": 32,
+        "localStateCorrect": 32,
+        "noFillCorrect": 322,
+        "origins": {
+          "decode_bound": 72,
+          "decode_filled": 188,
+          "posterior_argmax": 123
+        },
+        "posteriorArgmaxCorrect": 316,
+        "posteriorSupportGold": 357
+      },
+      "7": {
+        "byOrigin": {
+          "decode_bound": {
+            "correct": 33,
+            "units": 51
+          },
+          "decode_filled": {
+            "correct": 19,
+            "units": 199
+          },
+          "posterior_argmax": {
+            "correct": 68,
+            "units": 71
+          }
+        },
+        "candidateGold": 301,
+        "eligible": 321,
+        "finalCorrect": 120,
+        "finalOutsidePosteriorSupport": 199,
+        "localCorrect": 227,
+        "localStateAnchored": 17,
+        "localStateCorrect": 16,
+        "noFillCorrect": 243,
+        "origins": {
+          "decode_bound": 51,
+          "decode_filled": 199,
+          "posterior_argmax": 71
+        },
+        "posteriorArgmaxCorrect": 246,
+        "posteriorSupportGold": 301
+      },
+      "8": {
+        "byOrigin": {
+          "decode_bound": {
+            "correct": 41,
+            "units": 48
+          },
+          "decode_filled": {
+            "correct": 19,
+            "units": 72
+          },
+          "posterior_argmax": {
+            "correct": 71,
+            "units": 71
+          }
+        },
+        "candidateGold": 176,
+        "eligible": 191,
+        "finalCorrect": 131,
+        "finalOutsidePosteriorSupport": 72,
+        "localCorrect": 136,
+        "localStateAnchored": 29,
+        "localStateCorrect": 27,
+        "noFillCorrect": 156,
+        "origins": {
+          "decode_bound": 48,
+          "decode_filled": 72,
+          "posterior_argmax": 71
+        },
+        "posteriorArgmaxCorrect": 147,
+        "posteriorSupportGold": 176
+      },
+      "9": {
+        "byOrigin": {
+          "decode_bound": {
+            "correct": 16,
+            "units": 25
+          },
+          "decode_filled": {
+            "correct": 14,
+            "units": 62
+          },
+          "posterior_argmax": {
+            "correct": 53,
+            "units": 53
+          }
+        },
+        "candidateGold": 127,
+        "eligible": 140,
+        "finalCorrect": 83,
+        "finalOutsidePosteriorSupport": 62,
+        "localCorrect": 94,
+        "localStateAnchored": 10,
+        "localStateCorrect": 9,
+        "noFillCorrect": 106,
+        "origins": {
+          "decode_bound": 25,
+          "decode_filled": 62,
+          "posterior_argmax": 53
+        },
+        "posteriorArgmaxCorrect": 104,
+        "posteriorSupportGold": 127
+      }
+    },
+    "overall": {
+      "byOrigin": {
+        "decode_bound": {
+          "correct": 829,
+          "units": 964
+        },
+        "decode_filled": {
+          "correct": 483,
+          "units": 1542
+        },
+        "posterior_argmax": {
+          "correct": 1218,
+          "units": 1245
+        }
+      },
+      "candidateGold": 3567,
+      "eligible": 3751,
+      "finalCorrect": 2530,
+      "finalOutsidePosteriorSupport": 1542,
+      "localCorrect": 2732,
+      "localStateAnchored": 335,
+      "localStateCorrect": 319,
+      "noFillCorrect": 3054,
+      "origins": {
+        "decode_bound": 964,
+        "decode_filled": 1542,
+        "posterior_argmax": 1245
+      },
+      "posteriorArgmaxCorrect": 2899,
+      "posteriorSupportGold": 3567
+    },
+    "pairedStageChanges": {
+      "localFilm__posteriorArgmaxFilm": {
+        "corrections": 236,
+        "deltaPercentagePoints": 4.452146094374833,
+        "participantBootstrap95": [
+          3.6665851869958446,
+          5.228562892142217
+        ],
+        "regressions": 69
+      },
+      "localStateFilm__localFilm": {
+        "corrections": 2413,
+        "deltaPercentagePoints": 64.32951213009864,
+        "participantBootstrap95": [
+          62.582469368520265,
+          66.46995708154506
+        ],
+        "regressions": 0
+      },
+      "noFillFilm__finalFilm": {
+        "corrections": 282,
+        "deltaPercentagePoints": -13.969608104505465,
+        "participantBootstrap95": [
+          -20.519236784485454,
+          -6.777616980221901
+        ],
+        "regressions": 806
+      },
+      "posteriorArgmaxFilm__finalFilm": {
+        "corrections": 526,
+        "deltaPercentagePoints": -9.837376699546788,
+        "participantBootstrap95": [
+          -17.41741741741742,
+          -1.702753836451545
+        ],
+        "regressions": 895
+      },
+      "posteriorArgmaxFilm__noFillFilm": {
+        "corrections": 244,
+        "deltaPercentagePoints": 4.132231404958677,
+        "participantBootstrap95": [
+          2.4052916416115453,
+          5.5464926590538335
+        ],
+        "regressions": 89
+      }
+    },
+    "participants": {
+      "sub-01": {
+        "byOrigin": {
+          "decode_bound": {
+            "correct": 29,
+            "units": 40
+          },
+          "decode_filled": {
+            "correct": 7,
+            "units": 60
+          },
+          "posterior_argmax": {
+            "correct": 38,
+            "units": 40
+          }
+        },
+        "candidateGold": 133,
+        "eligible": 140,
+        "finalCorrect": 74,
+        "finalOutsidePosteriorSupport": 60,
+        "localCorrect": 104,
+        "localStateAnchored": 6,
+        "localStateCorrect": 6,
+        "noFillCorrect": 111,
+        "origins": {
+          "decode_bound": 40,
+          "decode_filled": 60,
+          "posterior_argmax": 40
+        },
+        "posteriorArgmaxCorrect": 112,
+        "posteriorSupportGold": 133
+      },
+      "sub-02": {
+        "byOrigin": {
+          "decode_bound": {
+            "correct": 78,
+            "units": 84
+          },
+          "decode_filled": {
+            "correct": 49,
+            "units": 78
+          },
+          "posterior_argmax": {
+            "correct": 120,
+            "units": 120
+          }
+        },
+        "candidateGold": 270,
+        "eligible": 282,
+        "finalCorrect": 247,
+        "finalOutsidePosteriorSupport": 78,
+        "localCorrect": 208,
+        "localStateAnchored": 31,
+        "localStateCorrect": 29,
+        "noFillCorrect": 247,
+        "origins": {
+          "decode_bound": 84,
+          "decode_filled": 78,
+          "posterior_argmax": 120
+        },
+        "posteriorArgmaxCorrect": 224,
+        "posteriorSupportGold": 270
+      },
+      "sub-07": {
+        "byOrigin": {
+          "decode_bound": {
+            "correct": 82,
+            "units": 89
+          },
+          "decode_filled": {
+            "correct": 46,
+            "units": 221
+          },
+          "posterior_argmax": {
+            "correct": 91,
+            "units": 93
+          }
+        },
+        "candidateGold": 380,
+        "eligible": 403,
+        "finalCorrect": 219,
+        "finalOutsidePosteriorSupport": 221,
+        "localCorrect": 289,
+        "localStateAnchored": 41,
+        "localStateCorrect": 38,
+        "noFillCorrect": 325,
+        "origins": {
+          "decode_bound": 89,
+          "decode_filled": 221,
+          "posterior_argmax": 93
+        },
+        "posteriorArgmaxCorrect": 306,
+        "posteriorSupportGold": 380
+      },
+      "sub-08": {
+        "byOrigin": {
+          "decode_bound": {
+            "correct": 56,
+            "units": 82
+          },
+          "decode_filled": {
+            "correct": 44,
+            "units": 163
+          },
+          "posterior_argmax": {
+            "correct": 107,
+            "units": 115
+          }
+        },
+        "candidateGold": 343,
+        "eligible": 360,
+        "finalCorrect": 207,
+        "finalOutsidePosteriorSupport": 163,
+        "localCorrect": 246,
+        "localStateAnchored": 28,
+        "localStateCorrect": 25,
+        "noFillCorrect": 270,
+        "origins": {
+          "decode_bound": 82,
+          "decode_filled": 163,
+          "posterior_argmax": 115
+        },
+        "posteriorArgmaxCorrect": 268,
+        "posteriorSupportGold": 343
+      },
+      "sub-09": {
+        "byOrigin": {
+          "decode_bound": {
+            "correct": 53,
+            "units": 58
+          },
+          "decode_filled": {
+            "correct": 36,
+            "units": 157
+          },
+          "posterior_argmax": {
+            "correct": 63,
+            "units": 64
+          }
+        },
+        "candidateGold": 267,
+        "eligible": 279,
+        "finalCorrect": 152,
+        "finalOutsidePosteriorSupport": 157,
+        "localCorrect": 199,
+        "localStateAnchored": 29,
+        "localStateCorrect": 26,
+        "noFillCorrect": 225,
+        "origins": {
+          "decode_bound": 58,
+          "decode_filled": 157,
+          "posterior_argmax": 64
+        },
+        "posteriorArgmaxCorrect": 212,
+        "posteriorSupportGold": 267
+      },
+      "sub-10": {
+        "byOrigin": {
+          "decode_bound": {
+            "correct": 101,
+            "units": 124
+          },
+          "decode_filled": {
+            "correct": 57,
+            "units": 158
+          },
+          "posterior_argmax": {
+            "correct": 122,
+            "units": 128
+          }
+        },
+        "candidateGold": 392,
+        "eligible": 410,
+        "finalCorrect": 280,
+        "finalOutsidePosteriorSupport": 158,
+        "localCorrect": 279,
+        "localStateAnchored": 31,
+        "localStateCorrect": 29,
+        "noFillCorrect": 314,
+        "origins": {
+          "decode_bound": 124,
+          "decode_filled": 158,
+          "posterior_argmax": 128
+        },
+        "posteriorArgmaxCorrect": 289,
+        "posteriorSupportGold": 392
+      },
+      "sub-11": {
+        "byOrigin": {
+          "decode_bound": {
+            "correct": 79,
+            "units": 87
+          },
+          "decode_filled": {
+            "correct": 45,
+            "units": 133
+          },
+          "posterior_argmax": {
+            "correct": 111,
+            "units": 113
+          }
+        },
+        "candidateGold": 306,
+        "eligible": 333,
+        "finalCorrect": 235,
+        "finalOutsidePosteriorSupport": 133,
+        "localCorrect": 244,
+        "localStateAnchored": 22,
+        "localStateCorrect": 22,
+        "noFillCorrect": 270,
+        "origins": {
+          "decode_bound": 87,
+          "decode_filled": 133,
+          "posterior_argmax": 113
+        },
+        "posteriorArgmaxCorrect": 256,
+        "posteriorSupportGold": 306
+      },
+      "sub-12": {
+        "byOrigin": {
+          "decode_bound": {
+            "correct": 23,
+            "units": 24
+          },
+          "decode_filled": {
+            "correct": 4,
+            "units": 13
+          },
+          "posterior_argmax": {
+            "correct": 23,
+            "units": 24
+          }
+        },
+        "candidateGold": 61,
+        "eligible": 61,
+        "finalCorrect": 50,
+        "finalOutsidePosteriorSupport": 13,
+        "localCorrect": 54,
+        "localStateAnchored": 6,
+        "localStateCorrect": 6,
+        "noFillCorrect": 56,
+        "origins": {
+          "decode_bound": 24,
+          "decode_filled": 13,
+          "posterior_argmax": 24
+        },
+        "posteriorArgmaxCorrect": 55,
+        "posteriorSupportGold": 61
+      },
+      "sub-13": {
+        "byOrigin": {
+          "decode_bound": {
+            "correct": 43,
+            "units": 48
+          },
+          "decode_filled": {
+            "correct": 37,
+            "units": 122
+          },
+          "posterior_argmax": {
+            "correct": 64,
+            "units": 65
+          }
+        },
+        "candidateGold": 221,
+        "eligible": 235,
+        "finalCorrect": 144,
+        "finalOutsidePosteriorSupport": 122,
+        "localCorrect": 159,
+        "localStateAnchored": 14,
+        "localStateCorrect": 14,
+        "noFillCorrect": 187,
+        "origins": {
+          "decode_bound": 48,
+          "decode_filled": 122,
+          "posterior_argmax": 65
+        },
+        "posteriorArgmaxCorrect": 173,
+        "posteriorSupportGold": 221
+      },
+      "sub-14": {
+        "byOrigin": {
+          "decode_bound": {
+            "correct": 13,
+            "units": 22
+          },
+          "decode_filled": {
+            "correct": 7,
+            "units": 40
+          },
+          "posterior_argmax": {
+            "correct": 43,
+            "units": 43
+          }
+        },
+        "candidateGold": 98,
+        "eligible": 105,
+        "finalCorrect": 63,
+        "finalOutsidePosteriorSupport": 40,
+        "localCorrect": 86,
+        "localStateAnchored": 12,
+        "localStateCorrect": 12,
+        "noFillCorrect": 84,
+        "origins": {
+          "decode_bound": 22,
+          "decode_filled": 40,
+          "posterior_argmax": 43
+        },
+        "posteriorArgmaxCorrect": 86,
+        "posteriorSupportGold": 98
+      },
+      "sub-16": {
+        "byOrigin": {
+          "decode_bound": {
+            "correct": 79,
+            "units": 84
+          },
+          "decode_filled": {
+            "correct": 36,
+            "units": 39
+          },
+          "posterior_argmax": {
+            "correct": 94,
+            "units": 94
+          }
+        },
+        "candidateGold": 204,
+        "eligible": 217,
+        "finalCorrect": 209,
+        "finalOutsidePosteriorSupport": 39,
+        "localCorrect": 153,
+        "localStateAnchored": 27,
+        "localStateCorrect": 26,
+        "noFillCorrect": 183,
+        "origins": {
+          "decode_bound": 84,
+          "decode_filled": 39,
+          "posterior_argmax": 94
+        },
+        "posteriorArgmaxCorrect": 163,
+        "posteriorSupportGold": 204
+      },
+      "sub-17": {
+        "byOrigin": {
+          "decode_bound": {
+            "correct": 32,
+            "units": 35
+          },
+          "decode_filled": {
+            "correct": 28,
+            "units": 142
+          },
+          "posterior_argmax": {
+            "correct": 56,
+            "units": 57
+          }
+        },
+        "candidateGold": 225,
+        "eligible": 234,
+        "finalCorrect": 116,
+        "finalOutsidePosteriorSupport": 142,
+        "localCorrect": 181,
+        "localStateAnchored": 25,
+        "localStateCorrect": 24,
+        "noFillCorrect": 200,
+        "origins": {
+          "decode_bound": 35,
+          "decode_filled": 142,
+          "posterior_argmax": 57
+        },
+        "posteriorArgmaxCorrect": 195,
+        "posteriorSupportGold": 225
+      },
+      "sub-18": {
+        "byOrigin": {
+          "decode_bound": {
+            "correct": 11,
+            "units": 24
+          },
+          "decode_filled": {
+            "correct": 4,
+            "units": 27
+          },
+          "posterior_argmax": {
+            "correct": 20,
+            "units": 22
+          }
+        },
+        "candidateGold": 70,
+        "eligible": 73,
+        "finalCorrect": 35,
+        "finalOutsidePosteriorSupport": 27,
+        "localCorrect": 52,
+        "localStateAnchored": 3,
+        "localStateCorrect": 3,
+        "noFillCorrect": 49,
+        "origins": {
+          "decode_bound": 24,
+          "decode_filled": 27,
+          "posterior_argmax": 22
+        },
+        "posteriorArgmaxCorrect": 55,
+        "posteriorSupportGold": 70
+      },
+      "sub-19": {
+        "byOrigin": {
+          "decode_bound": {
+            "correct": 38,
+            "units": 50
+          },
+          "decode_filled": {
+            "correct": 23,
+            "units": 97
+          },
+          "posterior_argmax": {
+            "correct": 91,
+            "units": 92
+          }
+        },
+        "candidateGold": 229,
+        "eligible": 239,
+        "finalCorrect": 152,
+        "finalOutsidePosteriorSupport": 97,
+        "localCorrect": 184,
+        "localStateAnchored": 31,
+        "localStateCorrect": 30,
+        "noFillCorrect": 201,
+        "origins": {
+          "decode_bound": 50,
+          "decode_filled": 97,
+          "posterior_argmax": 92
+        },
+        "posteriorArgmaxCorrect": 199,
+        "posteriorSupportGold": 229
+      },
+      "sub-20": {
+        "byOrigin": {
+          "decode_bound": {
+            "correct": 112,
+            "units": 113
+          },
+          "decode_filled": {
+            "correct": 60,
+            "units": 92
+          },
+          "posterior_argmax": {
+            "correct": 175,
+            "units": 175
+          }
+        },
+        "candidateGold": 368,
+        "eligible": 380,
+        "finalCorrect": 347,
+        "finalOutsidePosteriorSupport": 92,
+        "localCorrect": 294,
+        "localStateAnchored": 29,
+        "localStateCorrect": 29,
+        "noFillCorrect": 332,
+        "origins": {
+          "decode_bound": 113,
+          "decode_filled": 92,
+          "posterior_argmax": 175
+        },
+        "posteriorArgmaxCorrect": 306,
+        "posteriorSupportGold": 368
+      }
+    }
+  }
+}

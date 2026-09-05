@@ -1,0 +1,31 @@
+{
+  "checks": [
+    {
+      "command": [
+        "/opt/homebrew/opt/python@3.14/bin/python3.14",
+        "/private/tmp/filmfest-python-final-20260905/tools/corpus/filmfest_source_court.py",
+        "/Users/bbuchsbaum/code/scala/storymodel4s/data",
+        "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/filmfestival/diagnostics-20260905/unreviewed-source-output",
+        "--correspondence",
+        "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/filmfestival/diagnostics-20260905/correspondence-template-v2.json"
+      ],
+      "exit": 1,
+      "refusal": "independent verified-film correspondence is required"
+    },
+    {
+      "command": [
+        "/opt/homebrew/opt/python@3.14/bin/python3.14",
+        "/private/tmp/filmfest-python-final-20260905/tools/recall-study/filmfest_annotation_packet.py",
+        "score",
+        "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/filmfestival/diagnostics-20260905/annotation-packet/packet.json",
+        "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/filmfestival/diagnostics-20260905/annotation-packet/answers-template.json",
+        "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/filmfestival/diagnostics-20260905/annotation-packet/PRIVATE-selection.json",
+        "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/filmfestival/diagnostics-20260905/historical-v3",
+        "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/filmfestival/diagnostics-20260905/unanswered-score.json"
+      ],
+      "exit": 1,
+      "refusal": "named independent annotator attestation required"
+    }
+  ],
+  "outputsNotWritten": true
+}

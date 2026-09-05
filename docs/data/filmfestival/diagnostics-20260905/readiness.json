@@ -1,0 +1,27 @@
+{
+  "annotation": {
+    "cases": 33,
+    "packetSha256": "4335764b1d09f3c7f7c63cd672f5c0ccbb2e814ccd8912a0d891fd2f05d2d6e8",
+    "sourceRefs": 844,
+    "status": "awaiting-independent-answers"
+  },
+  "confirmation": {
+    "status": "no-unseen-sample-supplied"
+  },
+  "dependency": {
+    "grakernRevision": "d736dc565d97f617726bad0a9d1ba2fdeae58dd2",
+    "grakernStatus": " M README.md\n"
+  },
+  "schema": "storymodel4s.filmfestival.diagnostic-readiness/v1",
+  "sourceCorrespondence": {
+    "exclusions": {
+      "knownLongerCutFilms": 1,
+      "mappedThirtySecondWindowDiffersFromActualDuration": 15,
+      "responsesWithConflictingWindowBounds": 10
+    },
+    "proposalsOutsideAnnotation": 11,
+    "status": "awaiting-independent-review",
+    "windows": 170,
+    "worksheetSha256": "6f5b48584325e961f3c8b168d3c27e4b38f5291169a71f473fe1a99261997f3d"
+  }
+}

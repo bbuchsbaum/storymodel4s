@@ -44,3 +44,6 @@ temperature, with no transitions or refinement; it is a comparator, not calibrat
 
 - Protocol recorded before new stage-level outcomes. Independent annotation/verified clip inputs
   requested from the owner while implementation proceeds.
+- Stage measurements and workflow outcomes are recorded in
+  [the diagnostic results](2026-09-05-filmfestival-diagnostic-results.md). Steps 1, 2 and 5 ran;
+  steps 3 and 4 have tested machinery and local worksheets/packets, with independent inputs pending.

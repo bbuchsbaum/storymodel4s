@@ -1,0 +1,94 @@
+{
+  "mutants": [
+    {
+      "mutant": "consume-unbound-sidecar",
+      "compiled": true,
+      "test": "test_filmfest_replay.ReplayTests.test_newly_consumed_sidecar_must_be_manifest_bound",
+      "exit": 1,
+      "killedByNamedAssertion": true,
+      "sibling": "test_filmfest_diagnostics.DiagnosticsTests.test_duplicate_unit_fails_instead_of_overwriting"
+    },
+    {
+      "mutant": "ignore-replay-input-drift",
+      "compiled": true,
+      "test": "test_filmfest_replay.ReplayTests.test_changed_input_fails_before_success_receipt",
+      "exit": 1,
+      "killedByNamedAssertion": true,
+      "sibling": "test_filmfest_diagnostics.DiagnosticsTests.test_duplicate_unit_fails_instead_of_overwriting"
+    },
+    {
+      "mutant": "silently-rebase-stage-expectation",
+      "compiled": true,
+      "test": "test_filmfest_replay.ReplayTests.test_wrong_stage_expectation_is_not_silently_rebased",
+      "exit": 1,
+      "killedByNamedAssertion": true,
+      "sibling": "test_filmfest_diagnostics.DiagnosticsTests.test_duplicate_unit_fails_instead_of_overwriting"
+    },
+    {
+      "mutant": "zero-mass-source-prediction",
+      "compiled": true,
+      "test": "test_filmfest_diagnostics.DiagnosticsTests.test_zero_source_mass_is_not_a_source_prediction",
+      "exit": 1,
+      "killedByNamedAssertion": true,
+      "sibling": "test_filmfest_diagnostics.DiagnosticsTests.test_duplicate_unit_fails_instead_of_overwriting"
+    },
+    {
+      "mutant": "ignore-trace-binding",
+      "compiled": true,
+      "test": "test_filmfest_diagnostics.DiagnosticsTests.test_valid_trace_joins_and_forged_binding_or_mass_is_refused",
+      "exit": 1,
+      "killedByNamedAssertion": true,
+      "sibling": "test_filmfest_diagnostics.DiagnosticsTests.test_duplicate_unit_fails_instead_of_overwriting"
+    },
+    {
+      "mutant": "ignore-local-normalization",
+      "compiled": true,
+      "test": "test_filmfest_diagnostics.DiagnosticsTests.test_valid_trace_joins_and_forged_binding_or_mass_is_refused",
+      "exit": 1,
+      "killedByNamedAssertion": true,
+      "sibling": "test_filmfest_diagnostics.DiagnosticsTests.test_duplicate_unit_fails_instead_of_overwriting"
+    },
+    {
+      "mutant": "hide-anchor-divergence",
+      "compiled": true,
+      "test": "test_filmfest_diagnostics.DiagnosticsTests.test_equal_film_totals_do_not_hide_anchor_mass_divergence",
+      "exit": 1,
+      "killedByNamedAssertion": true,
+      "sibling": "test_filmfest_diagnostics.DiagnosticsTests.test_duplicate_unit_fails_instead_of_overwriting"
+    },
+    {
+      "mutant": "ignore-packet-source",
+      "compiled": true,
+      "test": "test_filmfest_protocols.AnnotationProtocolTests.test_packet_refuses_source_or_recall_changed_after_diagnostics",
+      "exit": 1,
+      "killedByNamedAssertion": true,
+      "sibling": "test_filmfest_diagnostics.DiagnosticsTests.test_duplicate_unit_fails_instead_of_overwriting"
+    },
+    {
+      "mutant": "invent-independent-annotation",
+      "compiled": true,
+      "test": "test_filmfest_protocols.AnnotationProtocolTests.test_unanswered_and_nonindependent_records_never_count_as_labels",
+      "exit": 1,
+      "killedByNamedAssertion": true,
+      "sibling": "test_filmfest_diagnostics.DiagnosticsTests.test_duplicate_unit_fails_instead_of_overwriting"
+    },
+    {
+      "mutant": "duplicate-interpretations-as-ambiguity",
+      "compiled": true,
+      "test": "test_filmfest_protocols.AnnotationProtocolTests.test_duplicate_interpretations_cannot_manufacture_ambiguity",
+      "exit": 1,
+      "killedByNamedAssertion": true,
+      "sibling": "test_filmfest_diagnostics.DiagnosticsTests.test_duplicate_unit_fails_instead_of_overwriting"
+    },
+    {
+      "mutant": "admit-unreviewed-correspondence",
+      "compiled": true,
+      "test": "test_filmfest_protocols.SourceCourtTests.test_unreviewed_inventory_cannot_become_matched_inputs",
+      "exit": 1,
+      "killedByNamedAssertion": true,
+      "sibling": "test_filmfest_diagnostics.DiagnosticsTests.test_duplicate_unit_fails_instead_of_overwriting"
+    }
+  ],
+  "killed": 11,
+  "total": 11
+}

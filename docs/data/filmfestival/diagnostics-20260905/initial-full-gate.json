@@ -1,0 +1,23 @@
+{
+  "revision": "a4f8e4d68966d91bb7a2503bc5b467f94d3161f7",
+  "command": [
+    "sbt",
+    "-batch",
+    "-J-XX:ActiveProcessorCount=3",
+    "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+    "checkAll"
+  ],
+  "startedEpoch": 1788613200.503801,
+  "state": "finished",
+  "exitCode": 0,
+  "elapsedSeconds": 935.8173439502716,
+  "logSha256": "9381b6a9aa7680a574ce93779d27e8b6f10fc183a8a4abb21516bc45910f7e6f",
+  "endingRevision": "a4f8e4d68966d91bb7a2503bc5b467f94d3161f7",
+  "endingStatus": "",
+  "testTaskTotals": 52,
+  "total": 5901,
+  "failed": 0,
+  "errors": 0,
+  "passed": 5896,
+  "skipped": 5
+}
