@@ -6,6 +6,7 @@ import java.nio.file.{Files, Path, Paths}
 import storymodel4s.align.*
 import storymodel4s.bench.BenchChannels
 import storymodel4s.core.{
+  Checksum,
   PlaybackInstant,
   PlaybackInterval,
   PresentationAxis,
@@ -431,7 +432,8 @@ object RecallToVideo:
       axes: Map[String, PresentationAxis],
       transcriptLabel: String,
       outPath: Path,
-      coding: Option[storymodel4s.view.IndependentCoding] = None
+      coding: Option[storymodel4s.view.IndependentCoding] = None,
+      traceSourceChecksum: Option[Checksum] = None
   ): Unit =
     val t0 = System.nanoTime()
     // The shuffle control. With a seed set, the recall's sentences are permuted before segmentation
@@ -669,6 +671,22 @@ object RecallToVideo:
     val chosenAnchors = result.posterior.rows.zipWithIndex.map { case (row, i) =>
       if monotoneAnchors.isEmpty then row.mapSource else monotoneAnchors(i)
     }
+    if sys.env.get("STORYMODEL4S_STAGE_TRACE").contains("on") then
+      val trace = StageTrace.render(
+        built,
+        recall.ordered,
+        candidates,
+        result,
+        hsmmConfig,
+        decisions,
+        chosenAnchors,
+        Checksum.ofBytes(Files.readAllBytes(outPath)),
+        traceSourceChecksum
+      )
+      val _ = Files.write(
+        Paths.get(outPath.toString + ".stages.json"),
+        trace.getBytes(StandardCharsets.UTF_8)
+      )
     val sidecar = PosteriorSidecar.render(
       built,
       recall.ordered.map(_.ordinal),

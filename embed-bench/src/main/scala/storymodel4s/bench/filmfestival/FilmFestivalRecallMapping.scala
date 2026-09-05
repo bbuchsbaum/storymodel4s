@@ -256,4 +256,11 @@ object FilmFestivalAnnotationView:
 
   val csv = new String(Files.readAllBytes(Paths.get(recallCsv)), StandardCharsets.UTF_8)
   val words = RecallWordsCsv.parse(csv).fold(e => throw new IllegalArgumentException(e), identity)
-  RecallToVideo.run(built, words, axes, "filmfestival-recall", Paths.get(outPath))
+  RecallToVideo.run(
+    built,
+    words,
+    axes,
+    "filmfestival-recall",
+    Paths.get(outPath),
+    traceSourceChecksum = Some(table.checksum)
+  )
