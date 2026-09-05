@@ -1,0 +1,232 @@
+[
+  {
+    "name": "source-alias-leak",
+    "head": "db60795ce7794112e52ca4f0b63b76b98cccd439",
+    "file": "document/src/main/scala/storymodel4s/document/calibration.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/storymodel4s/.worktrees/feature-grakern-ref",
+      "documentJVM/testOnly *ParticipantCalibrationSuite"
+    ],
+    "original_sha256": "53d1a58abe6b941ad2f053e7ad53ca8c29ad2aa7d036e564dd3c8050ae9e018b",
+    "mutant_sha256": "a31becfab1550d8298fbd1636dfd59e02e0efac0225de26bf2cc2e26415744f0",
+    "exit": 1,
+    "totals": [
+      [
+        "20",
+        "1",
+        "0",
+        "19"
+      ]
+    ],
+    "killed": true
+  },
+  {
+    "name": "story-group-leak",
+    "head": "db60795ce7794112e52ca4f0b63b76b98cccd439",
+    "file": "document/src/main/scala/storymodel4s/document/calibration.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/storymodel4s/.worktrees/feature-grakern-ref",
+      "documentJVM/testOnly *ParticipantCalibrationSuite"
+    ],
+    "original_sha256": "53d1a58abe6b941ad2f053e7ad53ca8c29ad2aa7d036e564dd3c8050ae9e018b",
+    "mutant_sha256": "a350db9065aa7006cf093955ae7b8bc34faf6dcc2617f6b85e058b4bb8e0e3c1",
+    "exit": 1,
+    "totals": [
+      [
+        "20",
+        "1",
+        "0",
+        "19"
+      ]
+    ],
+    "killed": true
+  },
+  {
+    "name": "pool-roles",
+    "head": "db60795ce7794112e52ca4f0b63b76b98cccd439",
+    "file": "document/src/main/scala/storymodel4s/document/calibration.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/storymodel4s/.worktrees/feature-grakern-ref",
+      "documentJVM/testOnly *ParticipantCalibrationSuite"
+    ],
+    "original_sha256": "53d1a58abe6b941ad2f053e7ad53ca8c29ad2aa7d036e564dd3c8050ae9e018b",
+    "mutant_sha256": "632c4e009aadf4aefc0dcb4025a90b760d1d57df130a054dfee91adaf5cdfb60",
+    "exit": 1,
+    "totals": [
+      [
+        "20",
+        "3",
+        "0",
+        "17"
+      ]
+    ],
+    "killed": true
+  },
+  {
+    "name": "pool-scorers",
+    "head": "db60795ce7794112e52ca4f0b63b76b98cccd439",
+    "file": "document/src/main/scala/storymodel4s/document/calibration.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/storymodel4s/.worktrees/feature-grakern-ref",
+      "documentJVM/testOnly *ParticipantCalibrationSuite"
+    ],
+    "original_sha256": "53d1a58abe6b941ad2f053e7ad53ca8c29ad2aa7d036e564dd3c8050ae9e018b",
+    "mutant_sha256": "a61a7d8f196d8e0e2e1353307a04f24e8dfb08e9838ae763b843a390555d7189",
+    "exit": 1,
+    "totals": [
+      [
+        "20",
+        "2",
+        "0",
+        "18"
+      ]
+    ],
+    "killed": true
+  },
+  {
+    "name": "unresolved-as-negative",
+    "head": "db60795ce7794112e52ca4f0b63b76b98cccd439",
+    "file": "document/src/main/scala/storymodel4s/document/calibration.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/storymodel4s/.worktrees/feature-grakern-ref",
+      "documentJVM/testOnly *ParticipantCalibrationSuite"
+    ],
+    "original_sha256": "53d1a58abe6b941ad2f053e7ad53ca8c29ad2aa7d036e564dd3c8050ae9e018b",
+    "mutant_sha256": "6723e0ef11443216ad5a6fe1c35e7b5d785fb0a2fb033f493273eb2b4e12a58e",
+    "exit": 1,
+    "totals": [
+      [
+        "20",
+        "1",
+        "0",
+        "19"
+      ]
+    ],
+    "killed": true
+  },
+  {
+    "name": "held-out-training-leak",
+    "head": "db60795ce7794112e52ca4f0b63b76b98cccd439",
+    "file": "document/src/main/scala/storymodel4s/document/calibration.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/storymodel4s/.worktrees/feature-grakern-ref",
+      "documentJVM/testOnly *ParticipantCalibrationSuite"
+    ],
+    "original_sha256": "53d1a58abe6b941ad2f053e7ad53ca8c29ad2aa7d036e564dd3c8050ae9e018b",
+    "mutant_sha256": "a7dd3f7f5f66a822d2c3848f893f3b88838da988f8ffa901c1b4283b9390d0d5",
+    "exit": 1,
+    "totals": [
+      [
+        "20",
+        "3",
+        "0",
+        "17"
+      ]
+    ],
+    "killed": true
+  },
+  {
+    "name": "remove-declared-prior",
+    "head": "db60795ce7794112e52ca4f0b63b76b98cccd439",
+    "file": "document/src/main/scala/storymodel4s/document/calibration.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/storymodel4s/.worktrees/feature-grakern-ref",
+      "documentJVM/testOnly *ParticipantCalibrationSuite"
+    ],
+    "original_sha256": "53d1a58abe6b941ad2f053e7ad53ca8c29ad2aa7d036e564dd3c8050ae9e018b",
+    "mutant_sha256": "3b20d663bb043e08af04acadeee9f8ace17274c4a99bf72ec633fd693835adad",
+    "exit": 1,
+    "totals": [
+      [
+        "20",
+        "3",
+        "0",
+        "17"
+      ]
+    ],
+    "killed": true
+  },
+  {
+    "name": "omit-adjudication-protocol",
+    "head": "db60795ce7794112e52ca4f0b63b76b98cccd439",
+    "file": "document/src/main/scala/storymodel4s/document/calibration.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/storymodel4s/.worktrees/feature-grakern-ref",
+      "documentJVM/testOnly *ParticipantCalibrationSuite"
+    ],
+    "original_sha256": "53d1a58abe6b941ad2f053e7ad53ca8c29ad2aa7d036e564dd3c8050ae9e018b",
+    "mutant_sha256": "dd54c7e1e52bc1bfd355b3826db9e3a7a1be21aa82ca042158f338ad96bf5cbf",
+    "exit": 1,
+    "totals": [
+      [
+        "20",
+        "1",
+        "0",
+        "19"
+      ]
+    ],
+    "killed": true
+  },
+  {
+    "name": "structural-chart-identity",
+    "head": "db60795ce7794112e52ca4f0b63b76b98cccd439",
+    "file": "document/src/main/scala/storymodel4s/document/calibration.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/storymodel4s/.worktrees/feature-grakern-ref",
+      "documentJVM/testOnly *ParticipantCalibrationSuite"
+    ],
+    "original_sha256": "53d1a58abe6b941ad2f053e7ad53ca8c29ad2aa7d036e564dd3c8050ae9e018b",
+    "mutant_sha256": "18bca0b08115595b553b86e0ac46bb1da3995b2427fd526f805df2a5dae6d9cf",
+    "exit": 1,
+    "totals": [
+      [
+        "20",
+        "1",
+        "0",
+        "19"
+      ]
+    ],
+    "killed": true
+  },
+  {
+    "name": "omit-proposer-version",
+    "head": "db60795ce7794112e52ca4f0b63b76b98cccd439",
+    "file": "document/src/main/scala/storymodel4s/document/calibration.scala",
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/storymodel4s/.worktrees/feature-grakern-ref",
+      "documentJVM/testOnly *ParticipantCalibrationSuite"
+    ],
+    "original_sha256": "53d1a58abe6b941ad2f053e7ad53ca8c29ad2aa7d036e564dd3c8050ae9e018b",
+    "mutant_sha256": "9280d82be44f518dec7c2b445900caa20621ba3153de0c943477c01741063f33",
+    "exit": 1,
+    "totals": [
+      [
+        "20",
+        "1",
+        "0",
+        "19"
+      ]
+    ],
+    "killed": true
+  }
+]
