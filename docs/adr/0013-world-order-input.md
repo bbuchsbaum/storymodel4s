@@ -129,3 +129,12 @@ changes what is read only through the edges and order it yields.
 - **Validating `Explicit` before `build`, in a `WorldRank.from`.** The rank cannot be checked
   against a leaf set that does not exist yet; a pre-validated wrapper would either trust the caller
   to pass the same segments or need the same error channel in `build` anyway.
+
+## Film Festival caller decision (2026-09-04)
+
+The Film Festival diagnostic adapter supplies `Unknown(NotSupplied)` and propagates builder
+refusals into its existing `Either` boundary. Treating the two scanning runs or ten independent
+films as one story-world chronology was rejected: neither annotation order nor a playlist licenses
+that claim. Its annotation-byte-bound axes remain placeholders. The terminal command defaults to
+an explicitly required ONNX channel, with explicit lexical opt-in; corpus evaluation protocols and
+failure controls live in `2026-09-04-filmfestival-stabilization.md`.
