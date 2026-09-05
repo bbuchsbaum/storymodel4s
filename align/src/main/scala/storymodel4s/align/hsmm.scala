@@ -1,6 +1,7 @@
 package storymodel4s.align
 
 import storymodel4s.core.Checksum
+import storymodel4s.features.CanonicalDouble
 import storymodel4s.recall.*
 import storymodel4s.recall.RecallGraphStatus.Checked
 
@@ -23,6 +24,14 @@ enum TransitionKind:
   case Stay, DiscourseSuccessor, WorldTimeSuccessor, CausalNeighbor, HierarchyUp, HierarchyDown,
     SameEntityThread, SemanticNeighbor, Backward, LongJump, ExternalIn, ExternalStay,
     CauseToEffect, EffectToCause
+
+object TransitionKind:
+  /** The kinds [[TransitionFeatures.between]] computes as features of a source→source move. The two
+    * external logits are not among them: they parameterize the Bernoulli mixed in before
+    * normalization, and a logit has no inert value — zero is the prior p = 0.5, not absence.
+    */
+  val features: Vector[TransitionKind] =
+    values.toVector.filterNot(k => k == ExternalIn || k == ExternalStay)
 
 final case class TransitionModel(theta: Map[TransitionKind, Double]):
   def apply(k: TransitionKind): Double = theta.getOrElse(k, 0.0)
@@ -104,6 +113,92 @@ object TransitionFeatures:
       ) ++ positionFeatures
     )
 
+/** What a transition model reads from the source view and what it withholds, derived from θ and
+  * never supplied (ADR 0016).
+  *
+  * [[TransitionFeatures.between]] computes every feature on every move; a weight of zero makes a
+  * feature inert in the score, so "read" here means *carries weight*. The map from kinds to layers
+  * is the one `between` implements: `DiscourseSuccessor` reads `DiscourseSuccession`,
+  * `WorldTimeSuccessor` reads `WorldTime`, the three causal kinds read `Causal`, `SameEntityThread`
+  * reads `EntityContinuity`, `SemanticNeighbor` reads `Semantic`; the hierarchy kinds and
+  * `Backward` read the hierarchy through `NodeSummary.parent` rather than the `Hierarchy`
+  * adjacency, and `Backward`/`LongJump` read measured positions. The two external logits are not
+  * features and cannot be withheld — a zero logit is the prior p = 0.5, stronger than the shipped
+  * σ(−1.5) ≈ 0.18 — so the ledger carries them as the probabilities they set, never as "withheld".
+  * Refinement (`refinementPasses > 0`) reads layers through `view.reachable` and is outside this
+  * ledger, which is a statement about the transition model only. A ledger is the only way to say
+  * what an alignment was computed under, and it exists exactly when an [[HsmmConfig]] does: the
+  * constructor is private and the value is derived, so a ledger that disagrees with its model
+  * cannot be built.
+  */
+final class LayerUse private (
+    val weighted: Set[TransitionKind],
+    val withheld: Set[TransitionKind],
+    val layersRead: Set[RelationLayer],
+    val positionsRead: Boolean,
+    /** Probability of leaving the source for an external state, σ(θ_ExternalIn). */
+    val externalIn: Double,
+    /** Probability of remaining external once external, σ(θ_ExternalStay). */
+    val externalStay: Double
+):
+  private def parts = (weighted, withheld, layersRead, positionsRead, externalIn, externalStay)
+
+  override def equals(other: Any): Boolean = other match
+    case that: LayerUse => parts == that.parts
+    case _              => false
+
+  override def hashCode(): Int = parts.hashCode
+
+  /** Canonical one-line rendering for provenance; sorted, so independent of set iteration. */
+  def render: String =
+    def names[A](xs: Set[A]): String = xs.toVector.map(_.toString).sorted.mkString(",")
+    def prob(p: Double): String = String.format(java.util.Locale.ROOT, "%.4f", p)
+    s"layers=[${names(layersRead)}] positions=$positionsRead " +
+      s"weighted=[${names(weighted)}] withheld=[${names(withheld)}] " +
+      s"external=[pIn=${prob(externalIn)},pStay=${prob(externalStay)}]"
+
+  override def toString: String = s"LayerUse($render)"
+
+object LayerUse:
+  def of(model: TransitionModel): LayerUse =
+    import TransitionKind.*
+    val all = TransitionKind.features.toSet
+    val weighted = all.filter(k => model(k) != 0.0)
+    def any(ks: TransitionKind*): Boolean = ks.exists(weighted.contains)
+    val layers = Set.newBuilder[RelationLayer]
+    if any(DiscourseSuccessor) then layers += RelationLayer.DiscourseSuccession
+    if any(WorldTimeSuccessor) then layers += RelationLayer.WorldTime
+    if any(CausalNeighbor, CauseToEffect, EffectToCause) then layers += RelationLayer.Causal
+    if any(SameEntityThread) then layers += RelationLayer.EntityContinuity
+    if any(SemanticNeighbor) then layers += RelationLayer.Semantic
+    if any(HierarchyUp, HierarchyDown, Backward) then layers += RelationLayer.Hierarchy
+    new LayerUse(
+      weighted,
+      all -- weighted,
+      layers.result(),
+      any(Backward, LongJump),
+      model.pExternalIn,
+      model.pExternalStay
+    )
+
+/** Content address of an inference configuration: temperature, refinement, and every transition
+  * weight in declaration order, each rendered as its IEEE-754 bits like [[ViewFingerprint]]. An
+  * absent kind and an explicit zero render alike because [[TransitionModel.apply]] reads them
+  * alike. Before this existed a change to θ was invisible to every identity check (ADR 0016).
+  */
+object HsmmConfigFingerprint:
+  def of(config: HsmmConfig): Checksum =
+    val b = Render.Tokens()
+    import b.field
+    field("hsmm-config-fingerprint", "v1")
+    field("temperature", CanonicalDouble.render(config.temperature))
+    field("refinementPasses", config.refinementPasses.toString)
+    field("refinementWeight", CanonicalDouble.render(config.refinementWeight))
+    TransitionKind.values.foreach { k =>
+      field(k.toString, CanonicalDouble.render(config.transitions(k)))
+    }
+    b.digest
+
 /** Inference knobs. Not a case class: `fromProduct` would mint a non-positive temperature or
   * negative refinement weight that [[HsmmConfig.of]] refuses.
   */
@@ -113,6 +208,12 @@ final class HsmmConfig private (
     val refinementPasses: Int,
     val refinementWeight: Double
 ):
+  /** The ledger of what this configuration reads and withholds; derived, never supplied. */
+  val layerUse: LayerUse = LayerUse.of(transitions)
+
+  /** Content address of this configuration, θ included. */
+  def fingerprint: Checksum = HsmmConfigFingerprint.of(this)
+
   override def equals(other: Any): Boolean = other match
     case that: HsmmConfig =>
       temperature == that.temperature && transitions == that.transitions &&
@@ -141,7 +242,12 @@ object HsmmConfig:
       Left(AlignError.InvalidConfig("HsmmConfig.refinementWeight", "must be nonnegative"))
     else if transitions.theta.values.exists(v => v.isNaN || v.isInfinite) then
       Left(AlignError.InvalidConfig("HsmmConfig.transitions", "weights must be finite"))
-    else Right(new HsmmConfig(temperature, transitions, refinementPasses, refinementWeight))
+    else
+      // Negative zero is the same model as zero (equal scores, equal ledgers, equal `==`), so it
+      // is normalized here rather than left to make two addresses for one configuration.
+      def plain(v: Double): Double = if v == 0.0 then 0.0 else v
+      val theta = TransitionModel(transitions.theta.map((k, v) => k -> plain(v)))
+      Right(new HsmmConfig(temperature, theta, refinementPasses, plain(refinementWeight)))
 
   val default: HsmmConfig = of().fold(e => throw new IllegalStateException(e.message), identity)
 
@@ -494,12 +600,15 @@ object HsmmResult:
 
 /** Result of *ungated* inference, for ablations only. It deliberately has no `AlignmentMatrix`:
   * nothing that consumes a posterior ([[RecallSignature]], densities, population aggregates) can be
-  * fed an ungated result, so the ablation cannot masquerade as a scientific alignment.
+  * fed an ungated result, so the ablation cannot masquerade as a scientific alignment. It carries
+  * the [[LayerUse]] of the configuration it ran under, so a rung of an ablation ladder states what
+  * it withheld (ADR 0016).
   */
 final case class AblationResult(
     rows: Vector[(RecallUnitId, Map[AlignState, Double])],
     viterbi: Vector[AlignState],
-    logLikelihood: Double
+    logLikelihood: Double,
+    layerUse: LayerUse
 ):
   def massOn(unit: RecallUnitId, state: AlignState): Double =
     rows.find(_._1 == unit).flatMap(_._2.get(state)).getOrElse(0.0)
@@ -566,7 +675,7 @@ object GraphHsmm:
     else
       val (post, _, path, logZ, _, _, _) =
         run(units, recall, view, candidates, costModel, config, gate = false)
-      Right(AblationResult(post.rows.map(r => r.unit -> r.mass), path, logZ))
+      Right(AblationResult(post.rows.map(r => r.unit -> r.mass), path, logZ, config.layerUse))
 
   private type Costs = Map[RecallUnitId, Map[AlignState, CostBreakdown]]
   private type Adm = Map[RecallUnitId, Map[SourceNodeRef, Admissibility]]

@@ -417,13 +417,18 @@ object RecallToVideo:
       channelLabel: String,
       perLevel: Int,
       lexicalOverlap: Boolean,
-      priorScale: Option[Double],
+      run: RecallOrderControl.LadderRun,
       worldOrder: WorldOrderInput
   ): String =
+    // The scale, rung and model come from one `LadderRun`, so the label rendered here cannot
+    // disagree with the configuration that produced the numbers. Until ADR 0016 the scale was
+    // rendered as 1.0 for a run that used 1.5, so every default run's provenance misdescribed its
+    // own prior.
     s"channel=$channelLabel perLevel=$perLevel lexicalOverlap=$lexicalOverlap " +
-      s"priorScale=${priorScale.getOrElse(1.0)} monotone=${MonotoneScene.enabled} " +
+      s"priorScale=${run.scale} monotone=${MonotoneScene.enabled} " +
       s"fill=${MonotoneScene.fillEnabled} backward=${MonotoneScene.backwardPenalty} " +
-      s"forward=${MonotoneScene.forwardPenalty} worldOrder=${worldOrder.render}"
+      s"forward=${MonotoneScene.forwardPenalty} worldOrder=${worldOrder.render} " +
+      s"rung=${run.ladder.label} theta=${run.config.fingerprint.hex} ${run.config.layerUse.render}"
 
   def run(
       built: TimedSourceView.Built,
@@ -543,7 +548,14 @@ object RecallToVideo:
     // resists confidence is suggestive rather than significant (116 pairs closer, 95 farther).
     val priorScale =
       sys.env.get("STORYMODEL4S_PRIOR_SCALE").flatMap(_.trim.toDoubleOption).filter(_ >= 0.0)
-    val hsmmConfig = RecallOrderControl.scaledConfig(priorScale.getOrElse(1.5))
+    val scale = priorScale.getOrElse(1.5)
+    // Which rung of the ablation ladder this run is (ADR 0016): a declaration, refused rather
+    // than defaulted when a name is unknown, rendered into provenance beside the model's own
+    // fingerprint and ledger.
+    val ladderRun = RecallOrderControl.Ladder.fromEnv
+      .flatMap(ladder => RecallOrderControl.LadderRun.of(ladder, scale))
+      .fold(e => throw new IllegalArgumentException(e), identity)
+    val hsmmConfig = ladderRun.config
     val result = GraphHsmm
       .infer(recall, built.view, candidates, DefaultLocalCostModel(semantic = semantic), hsmmConfig)
       .fold(e => throw new IllegalStateException(e.message), identity)
@@ -683,7 +695,7 @@ object RecallToVideo:
 
     // The Recall Voyage document (ADR 0002 §14): the proven join a viewer compiles itself.
     val configRendering =
-      provenanceConfig(channelLabel, perLevel, lexicalOverlap, priorScale, built.worldOrder)
+      provenanceConfig(channelLabel, perLevel, lexicalOverlap, ladderRun, built.worldOrder)
     VoyageExport
       .document(
         built,
@@ -707,7 +719,9 @@ object RecallToVideo:
     println(s"semantic channel: $channelLabel")
     println(s"candidate policy: perLevel=$perLevel lexicalOverlap=$lexicalOverlap")
     println(s"recall order: ${shuffleSeed.fold("as recalled")(s => s"shuffled seed=$s")}")
-    println(s"ordering prior scale: ${priorScale.getOrElse(1.0)}")
+    println(s"ordering prior scale: $scale")
+    println(s"ladder rung: ${ladderRun.ladder.label}; theta=${hsmmConfig.fingerprint.hex}")
+    println(s"layer use: ${hsmmConfig.layerUse.render}")
     println(s"source segments: $leafCount; groups: $groupCount")
     println(s"recall words: ${words.size}; recall units: ${recall.ordered.size}")
     println(s"sparse candidates: ${candidates.totalSize}")
