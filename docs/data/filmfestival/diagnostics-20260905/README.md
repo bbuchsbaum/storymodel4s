@@ -9,6 +9,9 @@ stage comparison, development-only interpretation, pending inputs and reproducti
   outputs and the 120 byte-identical historical artifacts.
 - `replay-manifest.json`, `replay-receipt.json`: a three-second saved-output check, with relative data
   paths, complete consumed-input binding and synthetic contracts.
+- `landing-gate.json`, `final-checks.json`: final clean implementation at `8a89ff6f`; full
+  `checkAll` (5,896 passed, five skipped), 38 Python contracts and separate final formatting checks.
+  The following receipt-only commit changes no implementation, build input or test.
 - `initial-full-gate.json`, mutation receipts: initial Scala court and discriminating falsifiers.
 - `readiness.json`, `external-input-refusals.json`: unmatched/unreviewed source windows and unanswered
   independent annotations remain explicit pending inputs, with exercised refusal paths.

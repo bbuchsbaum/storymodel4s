@@ -1,0 +1,37 @@
+{
+  "revision": "8a89ff6f2a1c9dd302936461c524762a7f83b3ee",
+  "checks": [
+    {
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tools/recall-study/tests",
+        "-p",
+        "test_filmfest*.py"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 0.48913097381591797,
+      "log": "python-final.log",
+      "logSha256": "6549b9b9728d83e2a31b551c5fc9fb66f0f88cfa807e7ff63fa958b86fe48868"
+    },
+    {
+      "command": [
+        "sbt",
+        "-batch",
+        "-J-XX:ActiveProcessorCount=3",
+        "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+        "scalafmtCheckAll",
+        "scalafmtSbtCheck"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 12.529820919036865,
+      "log": "format-final.log",
+      "logSha256": "25e6b7690db2674b6f9c9e79ebebee3870d69d38b73aaa12e3ac3edee8d1251c"
+    }
+  ],
+  "endingRevision": "8a89ff6f2a1c9dd302936461c524762a7f83b3ee",
+  "endingStatus": ""
+}
