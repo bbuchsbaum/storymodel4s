@@ -1,0 +1,1272 @@
+{
+  "acquisition_note": "ANC server certificate was expired. These public unauthenticated downloads used certificate verification disabled only for www.anc.org requests. Checksums identify observed bytes; independent distribution authenticity is not established. PropBank HTTPS certificate verification remained enabled.",
+  "anc_metadata_pages": {
+    "browse": {
+      "sha256": "10f88a2a479475406273b2c8f51c4c50515e04e8765767ac284f0807eb7f23af",
+      "tls_certificate_verified": false
+    },
+    "download": {
+      "sha256": "d9b46652ab6c82e9820c52e0693f7b54c038ea3fb3dfdd7258e30d2289eca5ce",
+      "tls_certificate_verified": false
+    },
+    "overview": {
+      "sha256": "2c318425670b2b1260e39c4febd786dde516a4423ca83353aa6ed35e857961f6",
+      "tls_certificate_verified": false
+    }
+  },
+  "archives": {
+    "masc": {
+      "bytes": 37616026,
+      "final_url": "https://www.anc.org/MASC/download/MASC-3.0.0.tgz",
+      "headers": {
+        "Accept-Ranges": "bytes",
+        "Connection": "close",
+        "Content-Length": "37616026",
+        "Content-Type": "application/x-gzip",
+        "Date": "Sat, 05 Sep 2026 01:40:11 GMT",
+        "ETag": "\"23df99a-4e8521c90fe3c\"",
+        "Last-Modified": "Wed, 09 Oct 2013 17:21:11 GMT",
+        "Permissions-Policy": "accelerometer=(),autoplay=(),camera=(),displaycapture=(),document-domain=(),encryptedmedia=(),fullscreen=(),geolocation=(),gyroscope=(),magnetometer=(),microphone=(),midi=(),payment=(),picture-in-picture=(),publickey-credentials-get=(),screen-wake-lock=(),sync-xhr=(self),usb=(),webshare=(),xr-spatial-tracking=()",
+        "Referrer-Policy": "strict-origin",
+        "Server": "Apache/2.4.41 (Ubuntu)",
+        "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
+        "X-Content-Type-Options": "nosniff",
+        "X-XSS-Protection": "1; mode=block",
+        "x-Frame-Options": "SAMEORIGIN"
+      },
+      "sha256": "206d87511fb27cdbf82cc87982e08351ae84fd98e86d518c15a7461573589d0c",
+      "tls_certificate_verified": false,
+      "transport_note": "ANC certificate expired; public unauthenticated download",
+      "url": "https://www.anc.org/MASC/download/MASC-3.0.0.tgz"
+    },
+    "original-propbank": {
+      "bytes": 7264110,
+      "final_url": "https://www.anc.org/MASC/download/Propbank-original-format.tgz",
+      "headers": {
+        "Accept-Ranges": "bytes",
+        "Connection": "close",
+        "Content-Length": "7264110",
+        "Content-Type": "application/x-gzip",
+        "Date": "Sat, 05 Sep 2026 01:40:11 GMT",
+        "ETag": "\"6ed76e-5061ae4ab1121\"",
+        "Last-Modified": "Thu, 23 Oct 2014 18:04:18 GMT",
+        "Permissions-Policy": "accelerometer=(),autoplay=(),camera=(),displaycapture=(),document-domain=(),encryptedmedia=(),fullscreen=(),geolocation=(),gyroscope=(),magnetometer=(),microphone=(),midi=(),payment=(),picture-in-picture=(),publickey-credentials-get=(),screen-wake-lock=(),sync-xhr=(self),usb=(),webshare=(),xr-spatial-tracking=()",
+        "Referrer-Policy": "strict-origin",
+        "Server": "Apache/2.4.41 (Ubuntu)",
+        "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
+        "X-Content-Type-Options": "nosniff",
+        "X-XSS-Protection": "1; mode=block",
+        "x-Frame-Options": "SAMEORIGIN"
+      },
+      "sha256": "685b954342a1095fa6c6cab3202b327323554535f1014b204ce3ecab31e94a63",
+      "tls_certificate_verified": false,
+      "transport_note": "ANC certificate expired; public unauthenticated download",
+      "url": "https://www.anc.org/MASC/download/Propbank-original-format.tgz"
+    },
+    "treebank": {
+      "bytes": 2965271,
+      "final_url": "https://www.anc.org/MASC/download/penn-treebank.tgz",
+      "headers": {
+        "Accept-Ranges": "bytes",
+        "Connection": "close",
+        "Content-Length": "2965271",
+        "Content-Type": "application/x-gzip",
+        "Date": "Sat, 05 Sep 2026 01:40:11 GMT",
+        "ETag": "\"2d3f17-5648c9ad31ffd\"",
+        "Last-Modified": "Tue, 06 Feb 2018 15:12:19 GMT",
+        "Permissions-Policy": "accelerometer=(),autoplay=(),camera=(),displaycapture=(),document-domain=(),encryptedmedia=(),fullscreen=(),geolocation=(),gyroscope=(),magnetometer=(),microphone=(),midi=(),payment=(),picture-in-picture=(),publickey-credentials-get=(),screen-wake-lock=(),sync-xhr=(self),usb=(),webshare=(),xr-spatial-tracking=()",
+        "Referrer-Policy": "strict-origin",
+        "Server": "Apache/2.4.41 (Ubuntu)",
+        "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
+        "X-Content-Type-Options": "nosniff",
+        "X-XSS-Protection": "1; mode=block",
+        "x-Frame-Options": "SAMEORIGIN"
+      },
+      "sha256": "65ae26e4106cc576ad1291cf86a44048db7ff76fffa052658c45e8b1bb9f6230",
+      "tls_certificate_verified": false,
+      "transport_note": "ANC certificate expired; public unauthenticated download",
+      "url": "https://www.anc.org/MASC/download/penn-treebank.tgz"
+    }
+  },
+  "audit_date": "2026-09-04",
+  "propbank_files": [
+    {
+      "bytes": 20133,
+      "path": "LICENSE",
+      "sha256": "9348ddfd44da5a127c59141981954746a860ec8e03e0412cf3af7134af0f97e2",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/LICENSE"
+    },
+    {
+      "bytes": 7826,
+      "path": "README.md",
+      "sha256": "1c8f63c9cd7bfeeb9fe0f2747ab1a47053079afe582b4dfae100a9ef33c58b4c",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/README.md"
+    },
+    {
+      "bytes": 3280378,
+      "path": "data/oanc/masc/spoken/00/Day3PMSession.gold_skel",
+      "sha256": "ef45c114e6d3422fe7f315fc1c77d4893db00147c76134c0868849aaf2aa0e11",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/spoken/00/Day3PMSession.gold_skel"
+    },
+    {
+      "bytes": 424699,
+      "path": "data/oanc/masc/spoken/00/Day3PMSession.prop",
+      "sha256": "7df6a6d50fb901b31916ebf717c95af83c07c91553b7a4aa77f8e1c28a776e41",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/spoken/00/Day3PMSession.prop"
+    },
+    {
+      "bytes": 305825,
+      "path": "data/oanc/masc/spoken/00/NapierDianne.gold_skel",
+      "sha256": "ad4df7b5e4a073b0de473defe1ca9bbb3ee4f88962aac1a8a830e459b66f4486",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/spoken/00/NapierDianne.gold_skel"
+    },
+    {
+      "bytes": 42519,
+      "path": "data/oanc/masc/spoken/00/NapierDianne.prop",
+      "sha256": "e22488c599dbe39f24e9abc3f83c919de69d56b25867091be04712ff2af02dc6",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/spoken/00/NapierDianne.prop"
+    },
+    {
+      "bytes": 69197,
+      "path": "data/oanc/masc/spoken/00/PolkMaria.gold_skel",
+      "sha256": "fcc28b28331c61f97fb869285a93c22555466ec7e4e089542e4df2ec890dbc4b",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/spoken/00/PolkMaria.gold_skel"
+    },
+    {
+      "bytes": 9229,
+      "path": "data/oanc/masc/spoken/00/PolkMaria.prop",
+      "sha256": "3e9cf5d3a76788a7e3f08e2df6560739c9c08e4c37ce39c074b087b452979b07",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/spoken/00/PolkMaria.prop"
+    },
+    {
+      "bytes": 278606,
+      "path": "data/oanc/masc/spoken/00/ReidSandra.gold_skel",
+      "sha256": "b2685e14c261ebea670f79e2e25a46e3f856440ce82e5656ef8d5b759e4f6da1",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/spoken/00/ReidSandra.gold_skel"
+    },
+    {
+      "bytes": 38782,
+      "path": "data/oanc/masc/spoken/00/ReidSandra.prop",
+      "sha256": "9bb7cddc14a2e61f2c9a8a2094dfe9d3532c6ff310232d00c0ce8b869a7bc5a6",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/spoken/00/ReidSandra.prop"
+    },
+    {
+      "bytes": 52978,
+      "path": "data/oanc/masc/spoken/00/RindnerBonnie.gold_skel",
+      "sha256": "4e3fd6cd0f2ae82e08eac01279a36107300250f1247b368747e9da51627c849b",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/spoken/00/RindnerBonnie.gold_skel"
+    },
+    {
+      "bytes": 6812,
+      "path": "data/oanc/masc/spoken/00/RindnerBonnie.prop",
+      "sha256": "dd6b675f1c8c00792d6fa0d65edb7d9ae75e69d1027740e05a7a34263fa59ccd",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/spoken/00/RindnerBonnie.prop"
+    },
+    {
+      "bytes": 116134,
+      "path": "data/oanc/masc/spoken/00/sw2014-ms98-a-trans.gold_skel",
+      "sha256": "5efc00e00e0d1be72b2fbc4c505c044f70e7eca44512363e3ad1421768f43ca9",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/spoken/00/sw2014-ms98-a-trans.gold_skel"
+    },
+    {
+      "bytes": 17678,
+      "path": "data/oanc/masc/spoken/00/sw2014-ms98-a-trans.prop",
+      "sha256": "458e1d17f0c4acc7943bab632207091d55ea5cdd22c5d6ee76b2ae62d3b2b3c4",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/spoken/00/sw2014-ms98-a-trans.prop"
+    },
+    {
+      "bytes": 193644,
+      "path": "data/oanc/masc/spoken/00/sw2015-ms98-a-trans.gold_skel",
+      "sha256": "4970b5ba3b3afceb74fe048dd22f7f3c4224e55dd040795301dfbdcc65202a4b",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/spoken/00/sw2015-ms98-a-trans.gold_skel"
+    },
+    {
+      "bytes": 28858,
+      "path": "data/oanc/masc/spoken/00/sw2015-ms98-a-trans.prop",
+      "sha256": "26fc2ecf112fe01ebacf7bec627152e6be133b223a215de81e2e53037f50ab9c",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/spoken/00/sw2015-ms98-a-trans.prop"
+    },
+    {
+      "bytes": 232236,
+      "path": "data/oanc/masc/spoken/00/sw2025-ms98-a-trans.gold_skel",
+      "sha256": "80897efa9f4f55f62dd0e56f89991257bf7815e2b506d2db1f8e1544027245ab",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/spoken/00/sw2025-ms98-a-trans.gold_skel"
+    },
+    {
+      "bytes": 29124,
+      "path": "data/oanc/masc/spoken/00/sw2025-ms98-a-trans.prop",
+      "sha256": "a3dd6fc718f7ccc634296e95b2536a205f52513c9819de66d62131586e47469a",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/spoken/00/sw2025-ms98-a-trans.prop"
+    },
+    {
+      "bytes": 123263,
+      "path": "data/oanc/masc/spoken/00/sw2071-ms98-a-trans.gold_skel",
+      "sha256": "9538932a3192ef995785b8f0e2e007735d0f187a8b20881e4d21c6ac60dc4899",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/spoken/00/sw2071-ms98-a-trans.gold_skel"
+    },
+    {
+      "bytes": 16404,
+      "path": "data/oanc/masc/spoken/00/sw2071-ms98-a-trans.prop",
+      "sha256": "f3e5684ddb56ef2467d3de088ebfed5fb83800414b932e35e60e55aac834cf2a",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/spoken/00/sw2071-ms98-a-trans.prop"
+    },
+    {
+      "bytes": 290969,
+      "path": "data/oanc/masc/spoken/00/sw2078-ms98-a-trans.gold_skel",
+      "sha256": "9d5a6ff9f5e841e09db54836fa3aadcf6d1aea45a38534c1a1acad0933d38496",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/spoken/00/sw2078-ms98-a-trans.gold_skel"
+    },
+    {
+      "bytes": 49976,
+      "path": "data/oanc/masc/spoken/00/sw2078-ms98-a-trans.prop",
+      "sha256": "9d42643b22d13c46b7112dbbd89e07e75cfa3985dff0fbdfc931d73ab9e47f66",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/spoken/00/sw2078-ms98-a-trans.prop"
+    },
+    {
+      "bytes": 67404,
+      "path": "data/oanc/masc/written/00/110CYL067.gold_skel",
+      "sha256": "769acf2e5aee479813033032315acbe309356f4694472b5ebaa71b42c0fa9f2f",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/110CYL067.gold_skel"
+    },
+    {
+      "bytes": 10474,
+      "path": "data/oanc/masc/written/00/110CYL067.prop",
+      "sha256": "52441cab66513140147144c90a898a66e5cbf9f36f26e3a192cf5a40e87371c4",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/110CYL067.prop"
+    },
+    {
+      "bytes": 58273,
+      "path": "data/oanc/masc/written/00/110CYL068.gold_skel",
+      "sha256": "3bdecccd7855a56101d11330b58e1263ec1eec57c20ee9fee08fad3ab798c4fc",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/110CYL068.gold_skel"
+    },
+    {
+      "bytes": 7526,
+      "path": "data/oanc/masc/written/00/110CYL068.prop",
+      "sha256": "77cea224bb98a8aa0ca28d9ace0ec78fadd68a058e4dc8b0cfef1bd936f48d1d",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/110CYL068.prop"
+    },
+    {
+      "bytes": 70963,
+      "path": "data/oanc/masc/written/00/110CYL069.gold_skel",
+      "sha256": "09fd78a87558cc410b0e09f980e98ef941d5239288aad8a885023a4ca8c3277e",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/110CYL069.gold_skel"
+    },
+    {
+      "bytes": 9070,
+      "path": "data/oanc/masc/written/00/110CYL069.prop",
+      "sha256": "5b04e4ee9767342e7b7fe651c739db2257e2033892587f83764d350f8cc33085",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/110CYL069.prop"
+    },
+    {
+      "bytes": 23712,
+      "path": "data/oanc/masc/written/00/110CYL070.gold_skel",
+      "sha256": "7e26410e16327c6993969dd6ac5d4ed9e5d570a6788e9b0bfaa725290eb3336d",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/110CYL070.gold_skel"
+    },
+    {
+      "bytes": 3645,
+      "path": "data/oanc/masc/written/00/110CYL070.prop",
+      "sha256": "3c804bdccb30c80c05ca6c313824dc122a0ff8f8f679694096118381ee6fdcf0",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/110CYL070.prop"
+    },
+    {
+      "bytes": 50932,
+      "path": "data/oanc/masc/written/00/110CYL071.gold_skel",
+      "sha256": "1c66b8d5302683f2c05e73ab280f60843fdd8bfdfd877df2a39e8e621f36f77b",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/110CYL071.gold_skel"
+    },
+    {
+      "bytes": 6351,
+      "path": "data/oanc/masc/written/00/110CYL071.prop",
+      "sha256": "97abfe1d3970c58ef02e3387af4023bb0dc06b2967ead6fcc8b76cc88d026042",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/110CYL071.prop"
+    },
+    {
+      "bytes": 18139,
+      "path": "data/oanc/masc/written/00/110CYL072.gold_skel",
+      "sha256": "08739dffe040c30bbb554c185840cced888441771db352c73d7f17c53ee36357",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/110CYL072.gold_skel"
+    },
+    {
+      "bytes": 2686,
+      "path": "data/oanc/masc/written/00/110CYL072.prop",
+      "sha256": "c5e93a1449a6d8cd794d3bda05908522c05ef5ae1259fe8190abb6ae4fce5dc8",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/110CYL072.prop"
+    },
+    {
+      "bytes": 52363,
+      "path": "data/oanc/masc/written/00/110CYL200.gold_skel",
+      "sha256": "19216d61dab9df3a664fe24d7bd49378c576d17bd5e7840309c85792b0507999",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/110CYL200.gold_skel"
+    },
+    {
+      "bytes": 5932,
+      "path": "data/oanc/masc/written/00/110CYL200.prop",
+      "sha256": "d0ea7a0b5dd88e618d5748c0d62bf158236717451c8c4556e4f7e96fbf772a75",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/110CYL200.prop"
+    },
+    {
+      "bytes": 38022,
+      "path": "data/oanc/masc/written/00/112C-L012.gold_skel",
+      "sha256": "5cc284682dd3355929c90718f17ee254885c632b2a46d7b9c24593fc27045a97",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/112C-L012.gold_skel"
+    },
+    {
+      "bytes": 4360,
+      "path": "data/oanc/masc/written/00/112C-L012.prop",
+      "sha256": "77d69af42e4ab106728e1a345ae7809901f090c2032fe85235275a47a246ddb7",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/112C-L012.prop"
+    },
+    {
+      "bytes": 44343,
+      "path": "data/oanc/masc/written/00/112C-L013.gold_skel",
+      "sha256": "87a27cc7c1f46a1a61376462244f234b5b16ab665ada2b162e263d79a6e4dc05",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/112C-L013.gold_skel"
+    },
+    {
+      "bytes": 4523,
+      "path": "data/oanc/masc/written/00/112C-L013.prop",
+      "sha256": "8f90cba7ac760fcc17966fdd74c14fd1a6de5a193ed0105e19ec96a1da0c21e4",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/112C-L013.prop"
+    },
+    {
+      "bytes": 32846,
+      "path": "data/oanc/masc/written/00/112C-L014.gold_skel",
+      "sha256": "5395b0e92a611b997772c3dc84a0adcdc4dc2b2eb71a287f3142868fba26cc27",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/112C-L014.gold_skel"
+    },
+    {
+      "bytes": 3698,
+      "path": "data/oanc/masc/written/00/112C-L014.prop",
+      "sha256": "248b2e8a16bb9c0b31976b39049611c7e5d637da29fb32e0ed1c124559d9fc34",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/112C-L014.prop"
+    },
+    {
+      "bytes": 40277,
+      "path": "data/oanc/masc/written/00/112C-L015.gold_skel",
+      "sha256": "83b3cbfd06a843e8989cb9cb733c0bfb5842eea98596286a3e37cb64a4f44158",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/112C-L015.gold_skel"
+    },
+    {
+      "bytes": 4998,
+      "path": "data/oanc/masc/written/00/112C-L015.prop",
+      "sha256": "469c68c2c955cbd6326f0d616148028f774fe8b3118009429ea0c73aa8a12b0c",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/112C-L015.prop"
+    },
+    {
+      "bytes": 22486,
+      "path": "data/oanc/masc/written/00/112C-L016.gold_skel",
+      "sha256": "2e1c8ef9736ff44c6089a939519500a2bb10ce8aa588e5bf42eb71fd35cc3300",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/112C-L016.gold_skel"
+    },
+    {
+      "bytes": 2644,
+      "path": "data/oanc/masc/written/00/112C-L016.prop",
+      "sha256": "36d33097ef0da4e552eb074ec70cd636acdb18d05a4e6c392e6eefbf2df9c7ac",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/112C-L016.prop"
+    },
+    {
+      "bytes": 30925,
+      "path": "data/oanc/masc/written/00/113CWL017.gold_skel",
+      "sha256": "645ba1404264a8f847e39634b0be5e9f2942312630cee2df9726b4a7faa2c41b",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/113CWL017.gold_skel"
+    },
+    {
+      "bytes": 3171,
+      "path": "data/oanc/masc/written/00/113CWL017.prop",
+      "sha256": "094a319cceca8b43b04aae333afc588d49e6f85eaa5bf3a83c6d2f93678e1d87",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/113CWL017.prop"
+    },
+    {
+      "bytes": 26828,
+      "path": "data/oanc/masc/written/00/113CWL018.gold_skel",
+      "sha256": "46397eccf8fc641e93c5cc3ac206d0ce72dd3e8feaed09ca1e74caea34c1212d",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/113CWL018.gold_skel"
+    },
+    {
+      "bytes": 3360,
+      "path": "data/oanc/masc/written/00/113CWL018.prop",
+      "sha256": "054a5421eb9fe6435cc4d239f914da11377429035099aaf3f802127cccb7d3b2",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/113CWL018.prop"
+    },
+    {
+      "bytes": 32472,
+      "path": "data/oanc/masc/written/00/114CUL057.gold_skel",
+      "sha256": "df590346c9c954bae68d735f5e122bed71928ab79ca95c2aca800f3625249a7f",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/114CUL057.gold_skel"
+    },
+    {
+      "bytes": 3155,
+      "path": "data/oanc/masc/written/00/114CUL057.prop",
+      "sha256": "c508a85bd988d0af6aa7504cb0dc7f14027fca1d445cf3cc3705e1d846d6cb2e",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/114CUL057.prop"
+    },
+    {
+      "bytes": 43564,
+      "path": "data/oanc/masc/written/00/114CUL058.gold_skel",
+      "sha256": "e2a0b5bbed3482f9062130cdfdb4aee0165b2ea811d38e07db188662d5e3815b",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/114CUL058.gold_skel"
+    },
+    {
+      "bytes": 5006,
+      "path": "data/oanc/masc/written/00/114CUL058.prop",
+      "sha256": "b655636d6ec3810156d78f7cdd78db73c30de329af7a5a7e001529481f34411c",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/114CUL058.prop"
+    },
+    {
+      "bytes": 44153,
+      "path": "data/oanc/masc/written/00/114CUL059.gold_skel",
+      "sha256": "877612c12d323019f8fdc245391854c86bdec04c7c9ae78f55710a4ea2e9008e",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/114CUL059.gold_skel"
+    },
+    {
+      "bytes": 5322,
+      "path": "data/oanc/masc/written/00/114CUL059.prop",
+      "sha256": "72f6aa51a2cddecea246a2743efee29804d5e029265975ff32f487df4894da2c",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/114CUL059.prop"
+    },
+    {
+      "bytes": 52509,
+      "path": "data/oanc/masc/written/00/114CUL060.gold_skel",
+      "sha256": "5b23f8b075a936da611555d9524a77e497b6216c427d12f3c764afa8c1e9b3ea",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/114CUL060.gold_skel"
+    },
+    {
+      "bytes": 6397,
+      "path": "data/oanc/masc/written/00/114CUL060.prop",
+      "sha256": "6b8454c74f2535c3a438d0043300b3d74b98d17d763eb6aca55bb6d4aad2c765",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/114CUL060.prop"
+    },
+    {
+      "bytes": 44621,
+      "path": "data/oanc/masc/written/00/115CVL035.gold_skel",
+      "sha256": "0e81949a23f6a6bd146e16c4a9203cf8dccf0d5c4c287736d04228f5642cf315",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/115CVL035.gold_skel"
+    },
+    {
+      "bytes": 4321,
+      "path": "data/oanc/masc/written/00/115CVL035.prop",
+      "sha256": "b24a02df685b4f2352323f52c20cdfc12817e03d317a9038912c0a0194a60d60",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/115CVL035.prop"
+    },
+    {
+      "bytes": 51097,
+      "path": "data/oanc/masc/written/00/115CVL036.gold_skel",
+      "sha256": "c5961bff7f3510bf9c66cb18c5772b390db7136d7a8446f57e96cbe87fd4614d",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/115CVL036.gold_skel"
+    },
+    {
+      "bytes": 5610,
+      "path": "data/oanc/masc/written/00/115CVL036.prop",
+      "sha256": "4a4f1ca618b923a4f2be11a84713f1dbbc16a3546e0e7b2431b8f60fbaba8006",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/115CVL036.prop"
+    },
+    {
+      "bytes": 52710,
+      "path": "data/oanc/masc/written/00/115CVL037.gold_skel",
+      "sha256": "fb9417d9f6e8460758db9c4ab5032f8c6a92c482ea84c3a959139ee7defc1bb3",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/115CVL037.gold_skel"
+    },
+    {
+      "bytes": 3603,
+      "path": "data/oanc/masc/written/00/115CVL037.prop",
+      "sha256": "b36d7c07fb20f02916403f39e67840bcc3fa826db8e0f693233e99cc23366799",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/115CVL037.prop"
+    },
+    {
+      "bytes": 57622,
+      "path": "data/oanc/masc/written/00/116CUL032.gold_skel",
+      "sha256": "2f9d26bbf0abe5bd8d72b47c9ce7c6b83e07148dded0590eb603563aac85430c",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/116CUL032.gold_skel"
+    },
+    {
+      "bytes": 5939,
+      "path": "data/oanc/masc/written/00/116CUL032.prop",
+      "sha256": "9cbfd90a27510a995d0c735d9e75f89826bec071866d4403d7a4ca6f5ddd1a6a",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/116CUL032.prop"
+    },
+    {
+      "bytes": 39668,
+      "path": "data/oanc/masc/written/00/116CUL033.gold_skel",
+      "sha256": "8a074535bf70568d0bcbef07952d2cc92aaf149db46ba6411e4233a7042125b4",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/116CUL033.gold_skel"
+    },
+    {
+      "bytes": 3673,
+      "path": "data/oanc/masc/written/00/116CUL033.prop",
+      "sha256": "30b20bd4d2d833b32b1560039b5d18f43c70890e3659f7b85cd2c22b0394dd89",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/116CUL033.prop"
+    },
+    {
+      "bytes": 97004,
+      "path": "data/oanc/masc/written/00/116CUL034.gold_skel",
+      "sha256": "2561e9c54e6d7d42e2483d7c6e290556d3e4597710cea1670595d7cd062117e1",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/116CUL034.gold_skel"
+    },
+    {
+      "bytes": 8190,
+      "path": "data/oanc/masc/written/00/116CUL034.prop",
+      "sha256": "616fda3aecd4d628045f3aed20531d5c6793bbe031f4d8efe09471f2359daf12",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/116CUL034.prop"
+    },
+    {
+      "bytes": 29212,
+      "path": "data/oanc/masc/written/00/117CWL008.gold_skel",
+      "sha256": "0a489f0f2b1926a86640ab99f4c08d25e23e6f63ecc493754cf4a53910d73cc0",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/117CWL008.gold_skel"
+    },
+    {
+      "bytes": 2520,
+      "path": "data/oanc/masc/written/00/117CWL008.prop",
+      "sha256": "bf7ca501db783733fd6569d3c4cfd2ea40b89accea1fbc6056d5cf3e7277bfbf",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/117CWL008.prop"
+    },
+    {
+      "bytes": 32691,
+      "path": "data/oanc/masc/written/00/117CWL009.gold_skel",
+      "sha256": "069832f7023e15821c695285c61462f0a33fb2291e2df6d3ae059e303ab28695",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/117CWL009.gold_skel"
+    },
+    {
+      "bytes": 2943,
+      "path": "data/oanc/masc/written/00/117CWL009.prop",
+      "sha256": "db6c95633f16aedc7e93b6a6c7c73b5455a9443a1723be1e512ac0394cdf40c4",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/117CWL009.prop"
+    },
+    {
+      "bytes": 32103,
+      "path": "data/oanc/masc/written/00/118CWL048.gold_skel",
+      "sha256": "900c79135cac5e0809f23f5b253997101e7ade8ae4cb575488835a36713d3314",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/118CWL048.gold_skel"
+    },
+    {
+      "bytes": 4654,
+      "path": "data/oanc/masc/written/00/118CWL048.prop",
+      "sha256": "5a2033663d3537516afb439fd76c887abe2667989a6d68b330bc504aebf89c0f",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/118CWL048.prop"
+    },
+    {
+      "bytes": 46880,
+      "path": "data/oanc/masc/written/00/118CWL049.gold_skel",
+      "sha256": "dc60fb6f8a09f352a5cc0633c979ea5e9cb49eae2eeb0ac952949fe9eda4c5ac",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/118CWL049.gold_skel"
+    },
+    {
+      "bytes": 4309,
+      "path": "data/oanc/masc/written/00/118CWL049.prop",
+      "sha256": "30dc03e8d140fbce546c31b687d9a7f94ff9fbfe6151164974a8164aa5835edc",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/118CWL049.prop"
+    },
+    {
+      "bytes": 83721,
+      "path": "data/oanc/masc/written/00/118CWL050.gold_skel",
+      "sha256": "ea42aead2b1d751226974a2e8955b63e660583fa615f5abb0845267af73090b3",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/118CWL050.gold_skel"
+    },
+    {
+      "bytes": 9553,
+      "path": "data/oanc/masc/written/00/118CWL050.prop",
+      "sha256": "79b83fd0d95d1c974b9a08e46ea7d3e2b6a476a33b7504f3c42a5081b6f97602",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/118CWL050.prop"
+    },
+    {
+      "bytes": 28914,
+      "path": "data/oanc/masc/written/00/119CWL041.gold_skel",
+      "sha256": "c2937ed204a3bfe0de1242211f0c8193f61d86480cadd9490bd3857a2f2bc638",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/119CWL041.gold_skel"
+    },
+    {
+      "bytes": 3443,
+      "path": "data/oanc/masc/written/00/119CWL041.prop",
+      "sha256": "ea489f30c4a2cee1f75159f6b85147518327b78cbe3e109430f4b1418621e29a",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/119CWL041.prop"
+    },
+    {
+      "bytes": 35192,
+      "path": "data/oanc/masc/written/00/20000410_nyt-NEW.gold_skel",
+      "sha256": "7f26fc0a9cb369ca3dd54736ef617c8346116a2bdf53b7f6301f78319311d5dc",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/20000410_nyt-NEW.gold_skel"
+    },
+    {
+      "bytes": 3804,
+      "path": "data/oanc/masc/written/00/20000410_nyt-NEW.prop",
+      "sha256": "f3647068b5da11ae3a9644e832a3e234446baf855a5d27453ea4c559e0372810",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/20000410_nyt-NEW.prop"
+    },
+    {
+      "bytes": 48661,
+      "path": "data/oanc/masc/written/00/20000415_apw_eng-NEW.gold_skel",
+      "sha256": "d4b25020db0fb44908b58061fce77cbf3e675aa2c8a41c29640dd299e26e87f7",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/20000415_apw_eng-NEW.gold_skel"
+    },
+    {
+      "bytes": 5359,
+      "path": "data/oanc/masc/written/00/20000415_apw_eng-NEW.prop",
+      "sha256": "1f0ae55cf74d41d6e0c87901d4604a557837c2bd60e1306b6124a1e943a7e101",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/20000415_apw_eng-NEW.prop"
+    },
+    {
+      "bytes": 38664,
+      "path": "data/oanc/masc/written/00/20000419_apw_eng-NEW.gold_skel",
+      "sha256": "e671b26cee5bc0687eccd154901b01c1632efae560b23327ed29eccf414d53a9",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/20000419_apw_eng-NEW.gold_skel"
+    },
+    {
+      "bytes": 4259,
+      "path": "data/oanc/masc/written/00/20000419_apw_eng-NEW.prop",
+      "sha256": "4ba3e983e8874071a52333c3234186779383260ab278370620e118144d82900e",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/20000419_apw_eng-NEW.prop"
+    },
+    {
+      "bytes": 6344,
+      "path": "data/oanc/masc/written/00/20000424_nyt-NEW.gold_skel",
+      "sha256": "5eefeede6e5d78cf38c6c49af776bfa979043bf3d2ee3f2f04786afafd78dee2",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/20000424_nyt-NEW.gold_skel"
+    },
+    {
+      "bytes": 611,
+      "path": "data/oanc/masc/written/00/20000424_nyt-NEW.prop",
+      "sha256": "25e55844d21ed7d47eafa2dd7d8b27192fc3c302e327b4a9db33e93b72627471",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/20000424_nyt-NEW.prop"
+    },
+    {
+      "bytes": 41195,
+      "path": "data/oanc/masc/written/00/602CZL285.gold_skel",
+      "sha256": "7d89f0ba489ec383cea534a973c0f6ac98d476283d85ff260f961270bd87441c",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/602CZL285.gold_skel"
+    },
+    {
+      "bytes": 3754,
+      "path": "data/oanc/masc/written/00/602CZL285.prop",
+      "sha256": "578c4a483ca3aeffe247203579d97c4b96536ce735042de0efcafd00cd3352c6",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/602CZL285.prop"
+    },
+    {
+      "bytes": 28481,
+      "path": "data/oanc/masc/written/00/A1.E1-NEW.gold_skel",
+      "sha256": "b6588fcbfaa86db89d5d22a03ec9ba72ccbec0526117a646992a2ca6b82fd352",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/A1.E1-NEW.gold_skel"
+    },
+    {
+      "bytes": 2258,
+      "path": "data/oanc/masc/written/00/A1.E1-NEW.prop",
+      "sha256": "21dae6dc2be8824b5b649527d1f8a2f166b8c6470a9768e4bc24482cf7ef6215",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/A1.E1-NEW.prop"
+    },
+    {
+      "bytes": 36672,
+      "path": "data/oanc/masc/written/00/A1.E2-NEW.gold_skel",
+      "sha256": "fee32912be5ab14bf4875c143236c9065481a786ae02874d75a0041193d88da0",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/A1.E2-NEW.gold_skel"
+    },
+    {
+      "bytes": 3030,
+      "path": "data/oanc/masc/written/00/A1.E2-NEW.prop",
+      "sha256": "98802eacb1682ad65688b2e57b199da15beba96f3a5fd6fa2db848f79656001a",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/A1.E2-NEW.prop"
+    },
+    {
+      "bytes": 136449,
+      "path": "data/oanc/masc/written/00/Article247_327.gold_skel",
+      "sha256": "efb1032749c431ad912c5495c2295793fb1548612a93994fa2c49b586afe1765",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/Article247_327.gold_skel"
+    },
+    {
+      "bytes": 13169,
+      "path": "data/oanc/masc/written/00/Article247_327.prop",
+      "sha256": "598b0ff948570f2feb9db2b80d7f0b72088df1cf02e8be377cad5b1a413f5904",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/Article247_327.prop"
+    },
+    {
+      "bytes": 74869,
+      "path": "data/oanc/masc/written/00/Article247_328.gold_skel",
+      "sha256": "0ef2a7a9fa2415d0516eed2267416ac5d2ffc97dd30e9e2776e8c6ac6e802ecf",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/Article247_328.gold_skel"
+    },
+    {
+      "bytes": 7645,
+      "path": "data/oanc/masc/written/00/Article247_328.prop",
+      "sha256": "0d67b75f22024d5af899d9742b23d32267b052de6ee04b5da10474c47d58d00c",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/Article247_328.prop"
+    },
+    {
+      "bytes": 114477,
+      "path": "data/oanc/masc/written/00/Article247_3500.gold_skel",
+      "sha256": "67d23f7ee2a72c789c7aa17433f7a840bba445b2ce03f013b5e4a88047f2fed5",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/Article247_3500.gold_skel"
+    },
+    {
+      "bytes": 13377,
+      "path": "data/oanc/masc/written/00/Article247_3500.prop",
+      "sha256": "19b464b8d304b3b4ae489a037663b3c383580a933de6955e22c69fe84ad5ed30",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/Article247_3500.prop"
+    },
+    {
+      "bytes": 126004,
+      "path": "data/oanc/masc/written/00/Article247_400.gold_skel",
+      "sha256": "d548f0b00f731acd2a92201cef5c9a1181db4bba14215d5532335e6763eb657d",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/Article247_400.gold_skel"
+    },
+    {
+      "bytes": 11856,
+      "path": "data/oanc/masc/written/00/Article247_400.prop",
+      "sha256": "8069112751d80238f6d2c730c390ea0f9bc582d7627dd690b7317bb8a2160b55",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/Article247_400.prop"
+    },
+    {
+      "bytes": 117239,
+      "path": "data/oanc/masc/written/00/Article247_500.gold_skel",
+      "sha256": "4bade6d538df64dae0baac1136aa3858e100b9418b53b3b5c7318423268aace2",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/Article247_500.gold_skel"
+    },
+    {
+      "bytes": 11909,
+      "path": "data/oanc/masc/written/00/Article247_500.prop",
+      "sha256": "45011d3cb1418fb27c8ffff3ca20c6f80bd7c398d97a82314c0c1ced613cd82a",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/Article247_500.prop"
+    },
+    {
+      "bytes": 99837,
+      "path": "data/oanc/masc/written/00/Article247_66.gold_skel",
+      "sha256": "bc1745972ad37a250435bd5915944d64b206681604a9d7d731a0edf54f5e44a1",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/Article247_66.gold_skel"
+    },
+    {
+      "bytes": 11977,
+      "path": "data/oanc/masc/written/00/Article247_66.prop",
+      "sha256": "03867eeef9e2918315d9c5ac720ab8e94041dec20fb9486034dbadbc3e7db073",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/Article247_66.prop"
+    },
+    {
+      "bytes": 10528,
+      "path": "data/oanc/masc/written/00/ENRON-pearson-email-25jul02.gold_skel",
+      "sha256": "395b46011450d528ce27c8183d3e1bb5a419ff1b9c6b81e9c8ccffe909c3353c",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/ENRON-pearson-email-25jul02.gold_skel"
+    },
+    {
+      "bytes": 1703,
+      "path": "data/oanc/masc/written/00/ENRON-pearson-email-25jul02.prop",
+      "sha256": "57eee3251c0375abc9cbce6c95ef2f1ab3fc71e2a7d29115f15c01245e096df9",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/ENRON-pearson-email-25jul02.prop"
+    },
+    {
+      "bytes": 358565,
+      "path": "data/oanc/masc/written/00/HistoryGreek.gold_skel",
+      "sha256": "c7381dcf2a885ab646d67c135fc78e97eb2e259d35b10e78570baa9e40dcf8be",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/HistoryGreek.gold_skel"
+    },
+    {
+      "bytes": 37270,
+      "path": "data/oanc/masc/written/00/HistoryGreek.prop",
+      "sha256": "3afea1b42073280204f939a82a61ca92f6c5613bb9d3bf56633a468e6b62ebfa",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/HistoryGreek.prop"
+    },
+    {
+      "bytes": 392058,
+      "path": "data/oanc/masc/written/00/HistoryJerusalem.gold_skel",
+      "sha256": "06e76f48da84d5e6c3f0f986ac253ee046165b093d567e5507ce6eb47576e5d6",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/HistoryJerusalem.gold_skel"
+    },
+    {
+      "bytes": 38567,
+      "path": "data/oanc/masc/written/00/HistoryJerusalem.prop",
+      "sha256": "614c7f2cfda1e2c352502499f5fdeccb2620664906056496c6f2ca0c97e657f9",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/HistoryJerusalem.prop"
+    },
+    {
+      "bytes": 2359245,
+      "path": "data/oanc/masc/written/00/VOL15_3.gold_skel",
+      "sha256": "fb41c580af04f4813f60f9e1f96a65744e2f1eb2191abdf9758f014212a0e672",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/VOL15_3.gold_skel"
+    },
+    {
+      "bytes": 210893,
+      "path": "data/oanc/masc/written/00/VOL15_3.prop",
+      "sha256": "8292ef834fe5cb551fdb9a3c4122781857a986decad26d9d851dfce378d260cc",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/VOL15_3.prop"
+    },
+    {
+      "bytes": 113984,
+      "path": "data/oanc/masc/written/00/chZ.gold_skel",
+      "sha256": "fa5005632188745c6d10ba336ec3f197051ae8037519445e6980a437c4fe9493",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/chZ.gold_skel"
+    },
+    {
+      "bytes": 9672,
+      "path": "data/oanc/masc/written/00/chZ.prop",
+      "sha256": "3532ac3708ee74dc044c121b5952e1149a9e8ac258beca7eb3c1faf71f033021",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/chZ.prop"
+    },
+    {
+      "bytes": 886875,
+      "path": "data/oanc/masc/written/00/chapter-10.gold_skel",
+      "sha256": "85cd40d130ec651a0f082e36117640f15cb434b4197e04fde375bc873347fdd5",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/chapter-10.gold_skel"
+    },
+    {
+      "bytes": 92625,
+      "path": "data/oanc/masc/written/00/chapter-10.prop",
+      "sha256": "e9a5a666ad69e53088f24b5a7ef4eebf7eb29745904acfebf91694ed35b5a2a4",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/chapter-10.prop"
+    },
+    {
+      "bytes": 72642,
+      "path": "data/oanc/masc/written/00/enron-thread-159550.gold_skel",
+      "sha256": "0dc3f8e1063cf151ef71ddc044b8aeb37a689e3d58be4d3722bb59a8403892a4",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/enron-thread-159550.gold_skel"
+    },
+    {
+      "bytes": 9744,
+      "path": "data/oanc/masc/written/00/enron-thread-159550.prop",
+      "sha256": "4c2b124b297479a4e1199da02354f134e4f24d353ebb7ff00fcc39c1cd0f3448",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/enron-thread-159550.prop"
+    },
+    {
+      "bytes": 93785,
+      "path": "data/oanc/masc/written/00/lw1.gold_skel",
+      "sha256": "dbca34064e5db067b46d7270d16a3f79ef5e8bba16ad05c6ffa0e6fc38a3e016",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/lw1.gold_skel"
+    },
+    {
+      "bytes": 11525,
+      "path": "data/oanc/masc/written/00/lw1.prop",
+      "sha256": "ee68ad38a62d3977997d777c7ef693b59a51ac260d6aef2432e4887d7210600c",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/lw1.prop"
+    },
+    {
+      "bytes": 58685,
+      "path": "data/oanc/masc/written/00/pmed.0010029.gold_skel",
+      "sha256": "fea3d3901cc293d5973d9325a9fdddecdf054a0384f44b840a9626dec70bb9da",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/pmed.0010029.gold_skel"
+    },
+    {
+      "bytes": 4816,
+      "path": "data/oanc/masc/written/00/pmed.0010029.prop",
+      "sha256": "a739fed37506f56d2d1a0cbd8a1d17cc436fdfc142b46fbeffb35c8cf17ae9ba",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/pmed.0010029.prop"
+    },
+    {
+      "bytes": 5110,
+      "path": "data/oanc/masc/written/00/wsj_0006.gold_skel",
+      "sha256": "03078dbb88b7332bd799cb39d08984264f06059869948749daac9331d188a0a1",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/wsj_0006.gold_skel"
+    },
+    {
+      "bytes": 641,
+      "path": "data/oanc/masc/written/00/wsj_0006.prop",
+      "sha256": "7214ea5a97e14019a83b5e4294d8cbe0e989e6d05b61836537e7bd942b7144b4",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/wsj_0006.prop"
+    },
+    {
+      "bytes": 25281,
+      "path": "data/oanc/masc/written/00/wsj_0026.gold_skel",
+      "sha256": "6a57115c4eecf2a53e7c9b61c82443e9ac8f36e072cca8c5f93eedd527e4efa6",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/wsj_0026.gold_skel"
+    },
+    {
+      "bytes": 1556,
+      "path": "data/oanc/masc/written/00/wsj_0026.prop",
+      "sha256": "f8d4b620c8e908187a3fcde710496904f73cc1321f8cab402be68c34f146bc38",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/wsj_0026.prop"
+    },
+    {
+      "bytes": 29297,
+      "path": "data/oanc/masc/written/00/wsj_0027.gold_skel",
+      "sha256": "609d6b3f5c6cbbc56ea4e49390ca5509de663dbc8cd17a31072fd02cb4e38eab",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/wsj_0027.gold_skel"
+    },
+    {
+      "bytes": 2754,
+      "path": "data/oanc/masc/written/00/wsj_0027.prop",
+      "sha256": "fb12ecc5a4531707d85ade53243ba8bd8390c5e87b3e4de8a3ec4898d578967d",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/wsj_0027.prop"
+    },
+    {
+      "bytes": 10270,
+      "path": "data/oanc/masc/written/00/wsj_0032.gold_skel",
+      "sha256": "9018b06546c586c00e573b05c1367e15dffc869aefc992eb2f403dfd4ebdabd8",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/wsj_0032.gold_skel"
+    },
+    {
+      "bytes": 838,
+      "path": "data/oanc/masc/written/00/wsj_0032.prop",
+      "sha256": "18f7a87f86206cacf51870f9a879d91973535500cbedc6a760421f870aab3d16",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/wsj_0032.prop"
+    },
+    {
+      "bytes": 8067,
+      "path": "data/oanc/masc/written/00/wsj_0068.gold_skel",
+      "sha256": "4314ce7ec98351654b7bf2a4435f286d51f5770cd82bb592506fd15e4f093967",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/wsj_0068.gold_skel"
+    },
+    {
+      "bytes": 459,
+      "path": "data/oanc/masc/written/00/wsj_0068.prop",
+      "sha256": "3c8d030207d63fc739cab9d4f322eb74503e1e65aa8a113a3cd74e7c0afb4645",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/wsj_0068.prop"
+    },
+    {
+      "bytes": 15651,
+      "path": "data/oanc/masc/written/00/wsj_0073.gold_skel",
+      "sha256": "4c4ee39fcc8cef89f94000d99738a7f659284b0cbde5cd18d27f86ef6a5f3452",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/wsj_0073.gold_skel"
+    },
+    {
+      "bytes": 1555,
+      "path": "data/oanc/masc/written/00/wsj_0073.prop",
+      "sha256": "bc4be379a9c132dc2980b5389fbe5546a019d8ac32af95332c09836db1e619d0",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/wsj_0073.prop"
+    },
+    {
+      "bytes": 13126,
+      "path": "data/oanc/masc/written/00/wsj_0106.gold_skel",
+      "sha256": "9118f1ce7cafd3d1ce46f8ff636021614506cc860c139e7911a58a2b81d8e787",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/wsj_0106.gold_skel"
+    },
+    {
+      "bytes": 1274,
+      "path": "data/oanc/masc/written/00/wsj_0106.prop",
+      "sha256": "7e8a68b77122c383f67ad9f0f2260e85b02701e94e11b234e331a2b07692bc3b",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/wsj_0106.prop"
+    },
+    {
+      "bytes": 16605,
+      "path": "data/oanc/masc/written/00/wsj_0124.gold_skel",
+      "sha256": "91f6d6c3e9d23b80904930964feeb9b3e1c76ba5cbcdcf32eb98c3dfc7a67937",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/wsj_0124.gold_skel"
+    },
+    {
+      "bytes": 925,
+      "path": "data/oanc/masc/written/00/wsj_0124.prop",
+      "sha256": "4d517993ff64903868497b453e1fb9bd1f10dd97f67d8eb1d9feb1ae16db2669",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/wsj_0124.prop"
+    },
+    {
+      "bytes": 17875,
+      "path": "data/oanc/masc/written/00/wsj_0127.gold_skel",
+      "sha256": "21d6e7867d04b881d4cb8787dd3a4e4e29389fc1c41ebd7ce92f1b0520125ad1",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/wsj_0127.gold_skel"
+    },
+    {
+      "bytes": 751,
+      "path": "data/oanc/masc/written/00/wsj_0127.prop",
+      "sha256": "96f76d062195dd2595bc24628166da655d2a5df3e9b689eb5257a17620b05066",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/wsj_0127.prop"
+    },
+    {
+      "bytes": 17552,
+      "path": "data/oanc/masc/written/00/wsj_0132.gold_skel",
+      "sha256": "a80d74f06296b5261a79f150b743bf0c4c5b7c4b7a9fa142202d142ab2ff9c2b",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/wsj_0132.gold_skel"
+    },
+    {
+      "bytes": 793,
+      "path": "data/oanc/masc/written/00/wsj_0132.prop",
+      "sha256": "a4677a7430bc73830bd67fc9daf74b8925bb3a17b3fe577b808966f1909e37e3",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/wsj_0132.prop"
+    },
+    {
+      "bytes": 11651,
+      "path": "data/oanc/masc/written/00/wsj_0135.gold_skel",
+      "sha256": "abb41eb525f9511e205d32e58eb7e89a82f4230233bcaa02cabf2234a91be5cb",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/wsj_0135.gold_skel"
+    },
+    {
+      "bytes": 888,
+      "path": "data/oanc/masc/written/00/wsj_0135.prop",
+      "sha256": "2c0fccfa377acbfc0f2f072545d48f42f2224016fb094dd9d90bdd0154b92c5f",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/wsj_0135.prop"
+    },
+    {
+      "bytes": 15969,
+      "path": "data/oanc/masc/written/00/wsj_0136.gold_skel",
+      "sha256": "71c0899747c157cc5d0ee9676637323c8c501b8c7871d1b78b3288151f36e241",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/wsj_0136.gold_skel"
+    },
+    {
+      "bytes": 886,
+      "path": "data/oanc/masc/written/00/wsj_0136.prop",
+      "sha256": "ea26b394d6851c11817b09a548878c0e2144ac41d1c0ebc7b936b19a20ec0a75",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/wsj_0136.prop"
+    },
+    {
+      "bytes": 18599,
+      "path": "data/oanc/masc/written/00/wsj_0144.gold_skel",
+      "sha256": "08a68e2d3e1200fde605997af82f250ab0619fb2e6d176044e31cacf1763b738",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/wsj_0144.gold_skel"
+    },
+    {
+      "bytes": 687,
+      "path": "data/oanc/masc/written/00/wsj_0144.prop",
+      "sha256": "49715ca85021aed1965ff50f8e63f47a4092328bb6b4adc51b361928db41cf40",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/wsj_0144.prop"
+    },
+    {
+      "bytes": 14758,
+      "path": "data/oanc/masc/written/00/wsj_0150.gold_skel",
+      "sha256": "9811a69f7118b9dfe6cd3498a92c7794b85512f0327325d07d7d741f06dc3739",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/wsj_0150.gold_skel"
+    },
+    {
+      "bytes": 1080,
+      "path": "data/oanc/masc/written/00/wsj_0150.prop",
+      "sha256": "180da6be60fbbdccaddccd17239dddac83891ac5bb1ad50f7ab948166af99a4f",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/wsj_0150.prop"
+    },
+    {
+      "bytes": 24936,
+      "path": "data/oanc/masc/written/00/wsj_0151.gold_skel",
+      "sha256": "cb45d2994ba585657dc593bf1f7bb8106351be08f6e6db3a8e9690f6f0382fe1",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/wsj_0151.gold_skel"
+    },
+    {
+      "bytes": 2243,
+      "path": "data/oanc/masc/written/00/wsj_0151.prop",
+      "sha256": "d967b8da2323c900022eead74a74fbd9558cec7b588f7e914ae74c3769efe685",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/wsj_0151.prop"
+    },
+    {
+      "bytes": 14408,
+      "path": "data/oanc/masc/written/00/wsj_0152.gold_skel",
+      "sha256": "81f7c54462e31daf6b2ec3c55c515bf48f3743e43d051cb83edf68a249923942",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/wsj_0152.gold_skel"
+    },
+    {
+      "bytes": 1091,
+      "path": "data/oanc/masc/written/00/wsj_0152.prop",
+      "sha256": "e757bbcdf8e146db0435945fd331bd090225d93edf7d0e4e634dbe1f8876cc67",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/wsj_0152.prop"
+    },
+    {
+      "bytes": 19541,
+      "path": "data/oanc/masc/written/00/wsj_0157.gold_skel",
+      "sha256": "df21ff1121887994fe37cabc0f5559112aa12c4fadee8a5ec6ff6d98f0743a07",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/wsj_0157.gold_skel"
+    },
+    {
+      "bytes": 1377,
+      "path": "data/oanc/masc/written/00/wsj_0157.prop",
+      "sha256": "992919f0ba5f483f5aed2834ddce7a50d442ae4335c8ecafb2263231a5f48fd5",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/wsj_0157.prop"
+    },
+    {
+      "bytes": 37864,
+      "path": "data/oanc/masc/written/00/wsj_0158.gold_skel",
+      "sha256": "619d9c76cb072301055df7b457265de45f5f0bd59ce577f23c73964b468febc5",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/wsj_0158.gold_skel"
+    },
+    {
+      "bytes": 2555,
+      "path": "data/oanc/masc/written/00/wsj_0158.prop",
+      "sha256": "28c64bc3248c8e45022ca24bae8ef3334ca234a3fc815c297f86ece8c2dfc111",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/wsj_0158.prop"
+    },
+    {
+      "bytes": 21387,
+      "path": "data/oanc/masc/written/00/wsj_0159.gold_skel",
+      "sha256": "d302ccc73113ade7ec8f53119216f31dd0a07fdd61ce87e58f0c880af8e3e0df",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/wsj_0159.gold_skel"
+    },
+    {
+      "bytes": 1717,
+      "path": "data/oanc/masc/written/00/wsj_0159.prop",
+      "sha256": "77ca0600f8439ed7e11843d0b75a69b7c4b0a09bd57f124f0e4f75d7ea00ae97",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/wsj_0159.prop"
+    },
+    {
+      "bytes": 13444,
+      "path": "data/oanc/masc/written/00/wsj_0160.gold_skel",
+      "sha256": "5185c8e41b77708f3ce0593d24290b6234970d010871865d2fad9745736307a8",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/wsj_0160.gold_skel"
+    },
+    {
+      "bytes": 567,
+      "path": "data/oanc/masc/written/00/wsj_0160.prop",
+      "sha256": "e79211f21968ef79155dcda0ca780974417511cb495d8bb1ec1ced9d2a493f86",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/wsj_0160.prop"
+    },
+    {
+      "bytes": 16147,
+      "path": "data/oanc/masc/written/00/wsj_0161.gold_skel",
+      "sha256": "bbcf35ff907e180684f4cba8870112a1fc1f21e621274282054f9a65fa524302",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/wsj_0161.gold_skel"
+    },
+    {
+      "bytes": 1020,
+      "path": "data/oanc/masc/written/00/wsj_0161.prop",
+      "sha256": "b6684fb5da2d7d3d62a665ef963226576f2e7dea61e501950663a30e33d88b69",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/wsj_0161.prop"
+    },
+    {
+      "bytes": 21745,
+      "path": "data/oanc/masc/written/00/wsj_0165.gold_skel",
+      "sha256": "dcd4555e21a0ca5b955a18022583af1d673ed4c0f4575a474ecd985add8f62e1",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/wsj_0165.gold_skel"
+    },
+    {
+      "bytes": 1987,
+      "path": "data/oanc/masc/written/00/wsj_0165.prop",
+      "sha256": "29e0c6269ff56c74078ce0894ddcd86a19f512c23da70081dd0f9208dbbbe5a2",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/wsj_0165.prop"
+    },
+    {
+      "bytes": 15681,
+      "path": "data/oanc/masc/written/00/wsj_0167.gold_skel",
+      "sha256": "51029d2c8ec9d075bc91047a1639a0974598b7891bd8491d60ef85ec7e6e16f4",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/wsj_0167.gold_skel"
+    },
+    {
+      "bytes": 1095,
+      "path": "data/oanc/masc/written/00/wsj_0167.prop",
+      "sha256": "0bfbb0bbb24ea4a3ac1af9d9dba26a6467bc852cab27be692a62c837154a643c",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/wsj_0167.prop"
+    },
+    {
+      "bytes": 14148,
+      "path": "data/oanc/masc/written/00/wsj_0168.gold_skel",
+      "sha256": "1c0920785e48ca61d8a0600df15a58e086e1a1aeec0d4cb739636032c5752166",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/wsj_0168.gold_skel"
+    },
+    {
+      "bytes": 473,
+      "path": "data/oanc/masc/written/00/wsj_0168.prop",
+      "sha256": "30db3a21137a26366854db302fa2f5a9768d9294cd95c5e2f0c298364002b05d",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/wsj_0168.prop"
+    },
+    {
+      "bytes": 15196,
+      "path": "data/oanc/masc/written/00/wsj_0169.gold_skel",
+      "sha256": "59505ae73d52ded1830ba7f3ac5832844733d4a11b291f7cda4265925cd54493",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/wsj_0169.gold_skel"
+    },
+    {
+      "bytes": 627,
+      "path": "data/oanc/masc/written/00/wsj_0169.prop",
+      "sha256": "2679a5f92a5fc58e4e0e53284aef71f48f15b7d6a9669c09530862fdb04099d6",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/wsj_0169.prop"
+    },
+    {
+      "bytes": 20156,
+      "path": "data/oanc/masc/written/00/wsj_0171.gold_skel",
+      "sha256": "fc1ee5f275aea5d4eb274fa093ede69bd7d1c51f88d437b3d8eaa912c734ef57",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/wsj_0171.gold_skel"
+    },
+    {
+      "bytes": 1502,
+      "path": "data/oanc/masc/written/00/wsj_0171.prop",
+      "sha256": "f4109e36005f3a8eb77dcd55d2259d984c527215f84a28b0264437d556bd1c05",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/wsj_0171.prop"
+    },
+    {
+      "bytes": 12133,
+      "path": "data/oanc/masc/written/00/wsj_0172.gold_skel",
+      "sha256": "d81edfd78a45a7f010bde1d877fdcc2cac0f58188406c12ac19bbaea603a8e60",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/wsj_0172.gold_skel"
+    },
+    {
+      "bytes": 81,
+      "path": "data/oanc/masc/written/00/wsj_0172.prop",
+      "sha256": "944a3b956f6b92d878c4a02efb04910ea67302f3ce80e244bba222316e64af4d",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/wsj_0172.prop"
+    },
+    {
+      "bytes": 14374,
+      "path": "data/oanc/masc/written/00/wsj_0173.gold_skel",
+      "sha256": "fa0c679d1decdabb1c54d43ae0fc729aa4f82f5659285829be402360dd66a430",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/wsj_0173.gold_skel"
+    },
+    {
+      "bytes": 96,
+      "path": "data/oanc/masc/written/00/wsj_0173.prop",
+      "sha256": "313dfc4f6f8465600ae363ae4b217dd2f7e19209f157cfeef45de5649d687779",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/wsj_0173.prop"
+    },
+    {
+      "bytes": 14555,
+      "path": "data/oanc/masc/written/00/wsj_0175.gold_skel",
+      "sha256": "4370236e27f44f7c1009e1fbe1c1f91d257d5c0d7fb4d4e3611c1e18badbe903",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/wsj_0175.gold_skel"
+    },
+    {
+      "bytes": 1195,
+      "path": "data/oanc/masc/written/00/wsj_0175.prop",
+      "sha256": "53ef9039b9afb4b07ce636639dea376ed13d83aed8b469bb7f2f3f3bb56b4453",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/wsj_0175.prop"
+    },
+    {
+      "bytes": 18552,
+      "path": "data/oanc/masc/written/00/wsj_0176.gold_skel",
+      "sha256": "8f092637e2a33c99e6d9bfa225c42ea73bde4479af85e0933db4f83d0e7216f7",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/wsj_0176.gold_skel"
+    },
+    {
+      "bytes": 1220,
+      "path": "data/oanc/masc/written/00/wsj_0176.prop",
+      "sha256": "045c026570fef8b9609a2f256f9eafe4b2b4233364028c742a97cc8cf5f1b384",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/wsj_0176.prop"
+    },
+    {
+      "bytes": 35671,
+      "path": "data/oanc/masc/written/00/wsj_0184.gold_skel",
+      "sha256": "c0fc9a51ed69d575a47d2bdac79ede3e6a32c8508851b01ab31ee0d9525f7f5f",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/wsj_0184.gold_skel"
+    },
+    {
+      "bytes": 2663,
+      "path": "data/oanc/masc/written/00/wsj_0184.prop",
+      "sha256": "3b9ec6b31d817cea726c907719acd026c7a4b68b51caf395b274b6546395aea1",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/wsj_0184.prop"
+    },
+    {
+      "bytes": 32099,
+      "path": "data/oanc/masc/written/00/wsj_0187.gold_skel",
+      "sha256": "17f5cefc3e42e2807cca8e7a2f2bbc59a5ee04bb9382182b19a4d016c5b3d11f",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/wsj_0187.gold_skel"
+    },
+    {
+      "bytes": 2881,
+      "path": "data/oanc/masc/written/00/wsj_0187.prop",
+      "sha256": "dd62c38cea0ff3166ebee7a3949d2a1b38cebf383855ea2718d6af765471fec7",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/wsj_0187.prop"
+    },
+    {
+      "bytes": 29595,
+      "path": "data/oanc/masc/written/00/wsj_0189.gold_skel",
+      "sha256": "991bfdfec99fcc8bcf11b0dcbe3895a160a3eb9c81dd2b98b973095339850a79",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/wsj_0189.gold_skel"
+    },
+    {
+      "bytes": 1770,
+      "path": "data/oanc/masc/written/00/wsj_0189.prop",
+      "sha256": "1bfc5d9bc53bf91af66e24fb66e8de69d111e55adedffaaa30aa3a8e352f7b08",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/wsj_0189.prop"
+    },
+    {
+      "bytes": 81283,
+      "path": "data/oanc/masc/written/00/wsj_1640.gold_skel",
+      "sha256": "8e24b76e4c4feb20909c47623d95aac235eb7cee992a046d76204230b7e8ab71",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/wsj_1640.gold_skel"
+    },
+    {
+      "bytes": 8306,
+      "path": "data/oanc/masc/written/00/wsj_1640.prop",
+      "sha256": "1dc525ca64cb081ddabf516dbbd3fb4c85e8a7a7761bfc58a85cfa24a0db500b",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/wsj_1640.prop"
+    },
+    {
+      "bytes": 107731,
+      "path": "data/oanc/masc/written/00/wsj_2465.gold_skel",
+      "sha256": "9d8d3a0bea2d32bb2c8ba32363153e2992a8375e9dd3568b5a4ee169f4ed86c3",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/wsj_2465.gold_skel"
+    },
+    {
+      "bytes": 12132,
+      "path": "data/oanc/masc/written/00/wsj_2465.prop",
+      "sha256": "da186199b5cb159d6cdfa39a38097190d81525f5eeb3be098c0eb9ac25199d74",
+      "url": "https://raw.githubusercontent.com/propbank/propbank-release/4abade0b53ce4a181e1d98b3518101c1a44d395a/data/oanc/masc/written/00/wsj_2465.prop"
+    }
+  ],
+  "propbank_revision": "4abade0b53ce4a181e1d98b3518101c1a44d395a",
+  "purpose": "inventory only; no corpus admission or calibration fit"
+}
