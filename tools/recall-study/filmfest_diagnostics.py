@@ -72,7 +72,8 @@ def unique(rows, key):
 
 
 def load_arm(directory, annotation, gold_rows, ranges):
-    directory = Path(directory)
+    directory = Path(directory).resolve()
+    annotation = Path(annotation).resolve()
     refs = source_index(annotation)
     scored, exclusions = gold.score(directory, gold_rows, ranges)
     eligible = {tuple(u['key']): u for u in scored}
@@ -152,6 +153,7 @@ def load_arm(directory, annotation, gold_rows, ranges):
                 'finalInPosteriorSupport': chosen in support,
                 'goldInPosteriorSupport': e['goldMovie'] in {film(k) for k in support},
                 'goldPosteriorMass': film_mass[e['goldMovie']], 'filmMass': dict(film_mass),
+                'anchorMass': dict(masses),
                 'externalMass': sum(external.values()), 'externalStates': dict(external),
                 'posteriorSupportIdentity': sorted(refs[k]['identity'] for k in support),
                 'posteriorIdentity': sorted(posterior_identity),
@@ -226,7 +228,24 @@ def summarize(rows):
                 localStateCorrect=sum(r['localStateFilm']==r['goldFilm'] for r in rs),
                 noFillCorrect=sum(r['noFillFilm']==r['goldFilm'] for r in rs))
         return result
-    return {'overall': group(rows), 'participants': {s: group([r for r in rows if r['participant']==s])
+    pairs = [('posteriorArgmaxFilm','finalFilm')]
+    if all(r['nominationAvailable'] for r in rows):
+        pairs += [('localFilm','posteriorArgmaxFilm'),('posteriorArgmaxFilm','noFillFilm'),
+                  ('noFillFilm','finalFilm'),('localStateFilm','localFilm')]
+    stage_changes = {}
+    for before,after in pairs:
+        participants = []
+        for sub in sorted({r['participant'] for r in rows}):
+            rs = [r for r in rows if r['participant']==sub]
+            participants.append({'eligible':len(rs),
+                'delta':sum(int(r[after]==r['goldFilm'])-int(r[before]==r['goldFilm']) for r in rs)})
+        stage_changes[f'{before}__{after}'] = {
+            'deltaPercentagePoints':gold.percent(sum(p['delta'] for p in participants),len(rows)),
+            'participantBootstrap95':gold.cluster_ci(participants,'delta','eligible'),
+            'corrections':sum(r[before]!=r['goldFilm'] and r[after]==r['goldFilm'] for r in rows),
+            'regressions':sum(r[before]==r['goldFilm'] and r[after]!=r['goldFilm'] for r in rows)}
+    return {'overall': group(rows), 'pairedStageChanges':stage_changes,
+            'participants': {s: group([r for r in rows if r['participant']==s])
             for s in sorted({r['participant'] for r in rows})},
             'films': {str(f): group([r for r in rows if r['goldFilm']==f]) for f in sorted({r['goldFilm'] for r in rows})}}
 
@@ -285,8 +304,10 @@ def main():
     receipt = {'schema': 'storymodel4s.filmfestival.diagnostics/v1', 'arms': receipts,
                'referenceSha256': gold.digest(a.reference), 'goldSha256': gold.digest(a.gold),
                'scriptSha256': gold.digest(__file__), 'goldScorerSha256': gold.digest(gold.__file__)}
-    for name, value in [('receipt',receipt),('summary',summaries),('comparisons',comparisons)]:
+    for name, value in [('summary',summaries),('comparisons',comparisons)]:
         (a.output/f'{name}.json').write_text(json.dumps(value, indent=2, sort_keys=True)+'\n')
+    receipt['artifacts'] = {p.name:gold.digest(p) for p in sorted(a.output.glob('*.json'))}
+    (a.output/'receipt.json').write_text(json.dumps(receipt,indent=2,sort_keys=True)+'\n')
     print(json.dumps({k:v['overall'] for k,v in summaries.items()}, indent=2))
 
 
