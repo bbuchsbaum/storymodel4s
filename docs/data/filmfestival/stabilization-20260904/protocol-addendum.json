@@ -1,0 +1,9 @@
+{
+  "recordedUtc": "2026-09-05T02:07:34.803364+00:00",
+  "integrationBase": "680ef6e652632fdd22f3410fb3b5e7caa7c80809",
+  "reason": "The fetch before recovery cherry-pick included newer main commits than 5d17f169; git ancestry and the run receipts establish 680ef6e6 as the actual base. Final plan will correct its stale prose SHA.",
+  "inferenceRevision": "7d81e4aa2fb5ff99939cdb4ab3c8666040685afa",
+  "scorerRepair": "Literal TSV readers restore gold rows; repairs staged outside the running checkout; no new arm outcome has been scored.",
+  "goldRows": 3226,
+  "csvDefaultGoldRows": 3181
+}

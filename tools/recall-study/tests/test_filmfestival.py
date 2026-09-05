@@ -68,6 +68,28 @@ class FilmFestivalTests(unittest.TestCase):
             p.write_text(header+'u1\tsynthetic one\t0\t1\n')
             self.assertNotEqual(before,gold.recall_population(d))
 
+    def test_population_preserves_literal_quotes_and_rows(self):
+        with tempfile.TemporaryDirectory() as d:
+            p=Path(d)/'recall-map-sub-01.tsv'
+            header='unit\trecallText\trecallOnsetSeconds\trecallLastWordOnsetSeconds\n'
+            p.write_text(header+'u1\t"synthetic quote"\t0\t1\n')
+            quoted=gold.recall_population(d)
+            p.write_text(header+'u1\tsynthetic quote\t0\t1\n')
+            self.assertNotEqual(quoted,gold.recall_population(d))
+            p.write_text(header+'u1\t"unclosed synthetic quote\t0\t1\n'+'u2\tsecond unit\t2\t3\n')
+            both=gold.recall_population(d)
+            p.write_text(header+'u1\t"unclosed synthetic quote\t0\t1\n')
+            self.assertNotEqual(both,gold.recall_population(d))
+
+    def test_gold_reader_keeps_rows_after_an_unclosed_literal_quote(self):
+        with tempfile.TemporaryDirectory() as d:
+            p=Path(d)/'gold.tsv'
+            p.write_text('participant\trun\tmovie\tstart_s\tend_s\ttext\n'
+                         'sub-01\trun-01\t1\t0\t2\t"unclosed synthetic quote\n'
+                         'sub-01\trun-01\t2\t2\t4\tsynthetic next\n')
+            rows=gold.load_gold(p)['sub-01']
+            self.assertEqual([r['movie'] for r in rows],[1,2])
+
     def test_gold_overlap_and_single_word_boundaries(self):
         rows=[{'start':0,'end':2,'movie':1},{'start':2,'end':8,'movie':2}]
         self.assertEqual(gold.best_gold((1,5),rows)['movie'],2)
@@ -80,6 +102,13 @@ class FilmFestivalTests(unittest.TestCase):
             (Path(d)/'recall-map-sub.tsv').write_text('recallText\tmediaPart\tstartSeconds\nsynthetic\trun-01\t5\n')
             with self.assertRaisesRegex(ValueError,'parts.json'):
                 agreement.load(d)
+
+    def test_no_text_pairs_is_undefined_not_perfect_agreement(self):
+        with tempfile.TemporaryDirectory() as d:
+            for name in ('one','two'):
+                (Path(d)/f'recall-map-{name}.tsv').write_text('recallText\tmediaPart\tstartSeconds\nshort\tmedia-part-a\t5\n')
+            with self.assertRaisesRegex(ValueError,'no comparable text pairs'):
+                agreement.main(['agreement','synthetic',d])
 
     def test_nonfinite_offsets_refused(self):
         with tempfile.TemporaryDirectory() as d:

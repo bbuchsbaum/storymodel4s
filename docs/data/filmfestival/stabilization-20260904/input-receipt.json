@@ -1,0 +1,141 @@
+{
+  "films": {
+    "busstop": {
+      "annotationExtent": [
+        948,
+        1357
+      ],
+      "coderCandidates": 96,
+      "crowdWindows": 42,
+      "cutMismatch": false,
+      "publishedMappedEnd": 1373.0,
+      "rawRows": 1264,
+      "rejectedWindowBounds": 0,
+      "testDescriptions": 1264
+    },
+    "cmiyc_long": {
+      "annotationExtent": [
+        41,
+        391
+      ],
+      "coderCandidates": 59,
+      "crowdWindows": 66,
+      "cutMismatch": true,
+      "publishedMappedEnd": 704.0,
+      "rawRows": 1990,
+      "rejectedWindowBounds": 7,
+      "testDescriptions": 1990
+    },
+    "keithreynolds": {
+      "annotationExtent": [
+        1134,
+        1489
+      ],
+      "coderCandidates": 58,
+      "crowdWindows": 35,
+      "cutMismatch": false,
+      "publishedMappedEnd": 1493.0,
+      "rawRows": 1054,
+      "rejectedWindowBounds": 4,
+      "testDescriptions": 1054
+    },
+    "theboyfriend": {
+      "annotationExtent": [
+        529,
+        999
+      ],
+      "coderCandidates": 104,
+      "crowdWindows": 47,
+      "cutMismatch": false,
+      "publishedMappedEnd": 999.0,
+      "rawRows": 1410,
+      "rejectedWindowBounds": 5,
+      "testDescriptions": 1410
+    },
+    "therock": {
+      "annotationExtent": [
+        41,
+        370
+      ],
+      "coderCandidates": 88,
+      "crowdWindows": 33,
+      "cutMismatch": false,
+      "publishedMappedEnd": 371.0,
+      "rawRows": 990,
+      "rejectedWindowBounds": 1,
+      "testDescriptions": 990
+    },
+    "theshoe": {
+      "annotationExtent": [
+        999,
+        1134
+      ],
+      "coderCandidates": 30,
+      "crowdWindows": 13,
+      "cutMismatch": false,
+      "publishedMappedEnd": 1134.0,
+      "rawRows": 391,
+      "rejectedWindowBounds": 0,
+      "testDescriptions": 391
+    }
+  },
+  "fiveFilmSensitivityGoldCodes": [
+    3,
+    4,
+    5,
+    6,
+    10
+  ],
+  "goldRead": false,
+  "independenceEstimand": "film identity; candidate counts and text recipe differ; no window-time claim",
+  "inputs": {
+    "filmfestival/derived/annotation-JL.tsv": "f8b164c1cc81fa4627fb1237f37a4fe85ee9183752bcfc527349b8f9bc7485bc",
+    "filmfestival/textdata/Analysis Data/Description/busstop_consensus_mapped_to_neuro.csv": "515546e98fa4203b319d1537df2fe1ab481947ac5351566e83de5353912da590",
+    "filmfestival/textdata/Analysis Data/Description/cmiyc_long_consensus_mapped_to_neuro.csv": "8f10a610b14b2507334e97e3f5b887b0d13566bf59fccb2445e87cbd8e15f166",
+    "filmfestival/textdata/Analysis Data/Description/keithreynolds_consensus_mapped_to_neuro.csv": "a91d1edec023164ff3bf2f63ffed2f205a0ba8a8ab02ff53b23b1d21b70abd0e",
+    "filmfestival/textdata/Analysis Data/Description/theboyfriend_consensus_mapped_to_neuro.csv": "81e631c2a5eedbe030c2cc33e37ecefb5e6df09fa41cde9782edf84533086e01",
+    "filmfestival/textdata/Analysis Data/Description/therock_consensus_mapped_to_neuro.csv": "049d3a90fcfdb0de00e5fcb488822441831ac211db51ddff52b6df4e3db0c2f5",
+    "filmfestival/textdata/Analysis Data/Description/theshoe_consensus_mapped_to_neuro.csv": "492bb5b09be5504bf0abec5dda2da5aaa9241bdb1c0c2ab83f8e87f34175fbc7",
+    "filmfestival/textdata/Cleaned Data/Description_Cleaned_Data/busstop_description_cleaned.csv": "295f65fb6d34380018f1dad8ff8879681d61cc61c6e13e477a713f021646a000",
+    "filmfestival/textdata/Cleaned Data/Description_Cleaned_Data/cmiyc_long_description_cleaned.csv": "b56527bb52cab7d78bd8be0a7307de0ddb68b1e89ba75cb98b85365a4646b6a8",
+    "filmfestival/textdata/Cleaned Data/Description_Cleaned_Data/keithreynolds_description_cleaned.csv": "b526e8e014b706296f6ea7ba67cccc64b69562af5ab31639b3fe26eb875c45fd",
+    "filmfestival/textdata/Cleaned Data/Description_Cleaned_Data/theboyfriend_description_cleaned.csv": "c3bf5a672ea09a6aea4cb6286fda207fc508bf96b441366ff027a0abde320961",
+    "filmfestival/textdata/Cleaned Data/Description_Cleaned_Data/therock_description_cleaned.csv": "fcdf723c966afa7ab5c669b99e2deaf314f36e99fbccc3d0ac5d5c694a528403",
+    "filmfestival/textdata/Cleaned Data/Description_Cleaned_Data/theshoe_description_cleaned.csv": "7bac04f6fe39c36a5aa8ede8716ff900c3851578b7c4637d77943283bd1a4964"
+  },
+  "outputs": {
+    "crowd-six-film-identity": {
+      "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/filmfestival/stabilization-20260904/inputs-v3/crowd-six-film-identity.tsv",
+      "rows": 236,
+      "sha256": "3d25da9ab2b7b4a9523ad0ea63d4c22685ab094ca5e9756225b00b071d1f19db"
+    },
+    "jl-all": {
+      "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/filmfestival/stabilization-20260904/inputs-v3/jl-all.tsv",
+      "rows": 628,
+      "sha256": "f8b164c1cc81fa4627fb1237f37a4fe85ee9183752bcfc527349b8f9bc7485bc"
+    },
+    "jl-no-cartoons": {
+      "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/filmfestival/stabilization-20260904/inputs-v3/jl-no-cartoons.tsv",
+      "rows": 614,
+      "sha256": "b094ec48437dfc841980157a0a6a09719151af6e5f8b402e58002768c78f0d2e"
+    },
+    "jl-six-film-identity": {
+      "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/filmfestival/stabilization-20260904/inputs-v3/jl-six-film-identity.tsv",
+      "rows": 435,
+      "sha256": "dfa069d2ff0756c642de7d2a99640654615c70a8a6c95713eb52032738fafe15"
+    }
+  },
+  "parts": {
+    "run-01": 0.0,
+    "run-02": 1490.0
+  },
+  "schema": "storymodel4s.filmfestival.development-inputs/v1",
+  "sixFilmGoldCodes": [
+    1,
+    3,
+    4,
+    5,
+    6,
+    10
+  ]
+}

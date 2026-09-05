@@ -1,5 +1,11 @@
 # Film Festival: first end-to-end run
 
+**Historical development results; scoring superseded.** See
+`2026-09-04-filmfestival-stabilization-results.md`: literal-TSV parsing restores omitted gold rows,
+film boundaries are half-open, both cartoon durations count, and intervals resample participants.
+The original outputs and numbers below are retained for provenance.
+
+
 *2026-09-04.* The pipeline now runs on a second corpus. This records what was built, what it
 measured, and the one finding that should shape what comes next. It is a development probe, not an
 arm of the recall-to-video study: no partition was drawn, nothing was pre-registered, and no claim

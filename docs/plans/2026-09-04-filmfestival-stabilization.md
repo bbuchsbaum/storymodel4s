@@ -1,14 +1,14 @@
 # Film Festival stabilization and two development comparisons
 
 Written before scoring either new comparison. The owner authorized steps 1–5 on 2026-09-04.
-Baseline code is remote `main` at `5d17f16977cae175a39337644afc86a7ed1ca9ad`; recovery is
+Baseline code is remote `main` at `680ef6e652632fdd22f3410fb3b5e7caa7c80809`; recovery is
 `739acf79` on `recovery/filmfestival-20260904`. The isolated integration branch is
 `solo/filmfestival-stabilize`. The shared planning branch and its unrelated edits stay intact.
 
 ## Fixed analysis contract
 
 All available participants were previously inspected. These are development analyses, with no
-untouched confirmation claim and no arm selection or prior tuning. Two comparisons only:
+untouched confirmation claim and no arm selection or prior tuning. Two planned experimental comparisons (historical rescoring and integration audits are separate):
 
 1. JL full source versus JL excluding both cartoon candidate blocks. Recall units, gold eligibility,
    encoder and inference settings stay fixed. Cartoon-labelled recall remains eligible and can be
@@ -83,3 +83,23 @@ limitations and results will be recorded after the run.
   cluster resampling, stable pair identity, missing offsets and the degenerate agreement predictor.
 - Mutation witnesses and a separate fresh-context cold read (AGENTS.md SD1 and SD6).
 - Preserve prior reports, publish corrected baseline and both comparisons, regardless of sign.
+
+## Recorded corrections and scope of evidence
+
+The initial prose named the earlier remote tip `5d17f169`; the actual fetch had already advanced
+to `680ef6e6`. The run receipts and Git parent of `b70a9f76` establish that integration base.
+This correction was recorded in a local protocol addendum before scoring the new comparisons.
+
+Cold reads found and fixed full-population verification (including excluded units), relative-path
+receipt ambiguity, and literal-TSV quoting. The last issue occurred in the real gold: default CSV
+parsing returned 3,181 rows rather than 3,226. Full literal reading restores all rows. The prepared
+full JL index is byte-identical to the historical TSV. Report and gold readers use that same dialect.
+The engine ran all four arms at `7d81e4aa`; scorer repairs were staged outside its immutable checkout
+and integrated after the runs. Aggregate scores carry the exact scorer SHA-256.
+
+The historical-to-integrated comparison is an engineering audit added during execution, not a
+predeclared scientific comparison: accuracy moved by -0.32 percentage points under the integrated
+code and explicit world-order absence. No cause is isolated by that audit and no arm was selected
+from it. Final experimental comparisons use the freshly run integrated baseline.
+
+Results and conclusions: `2026-09-04-filmfestival-stabilization-results.md`.

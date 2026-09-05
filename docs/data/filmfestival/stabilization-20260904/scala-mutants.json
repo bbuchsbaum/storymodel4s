@@ -1,0 +1,26 @@
+[
+  {
+    "mutant": "fabricate-world-clock",
+    "test": "independent film blocks never acquire a fabricated world clock",
+    "exit": 1,
+    "killedByAssertion": true,
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+      "embedBench/testOnly storymodel4s.bench.filmfestival.FilmFestivalSuite"
+    ]
+  },
+  {
+    "mutant": "silent-encoder-fallback",
+    "test": "requested ONNX fails closed unless both artifacts exist",
+    "exit": 1,
+    "killedByAssertion": true,
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/Users/bbuchsbaum/code/scala/grakern",
+      "embedBench/testOnly storymodel4s.bench.filmfestival.FilmFestivalSuite"
+    ]
+  }
+]

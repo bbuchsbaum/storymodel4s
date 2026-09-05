@@ -1,0 +1,765 @@
+{
+  "arms": {
+    "crowd-six-film-identity": {
+      "anchorCoveragePct": 100.0,
+      "confusions": [
+        {
+          "gold": 1,
+          "predicted": 1,
+          "units": 321
+        },
+        {
+          "gold": 1,
+          "predicted": 3,
+          "units": 22
+        },
+        {
+          "gold": 1,
+          "predicted": 4,
+          "units": 6
+        },
+        {
+          "gold": 1,
+          "predicted": 5,
+          "units": 12
+        },
+        {
+          "gold": 1,
+          "predicted": 6,
+          "units": 4
+        },
+        {
+          "gold": 1,
+          "predicted": 10,
+          "units": 2
+        },
+        {
+          "gold": 3,
+          "predicted": 1,
+          "units": 13
+        },
+        {
+          "gold": 3,
+          "predicted": 3,
+          "units": 618
+        },
+        {
+          "gold": 3,
+          "predicted": 4,
+          "units": 7
+        },
+        {
+          "gold": 3,
+          "predicted": 5,
+          "units": 40
+        },
+        {
+          "gold": 3,
+          "predicted": 6,
+          "units": 12
+        },
+        {
+          "gold": 3,
+          "predicted": 10,
+          "units": 15
+        },
+        {
+          "gold": 4,
+          "predicted": 1,
+          "units": 3
+        },
+        {
+          "gold": 4,
+          "predicted": 3,
+          "units": 32
+        },
+        {
+          "gold": 4,
+          "predicted": 4,
+          "units": 134
+        },
+        {
+          "gold": 4,
+          "predicted": 5,
+          "units": 28
+        },
+        {
+          "gold": 4,
+          "predicted": 6,
+          "units": 8
+        },
+        {
+          "gold": 4,
+          "predicted": 10,
+          "units": 15
+        },
+        {
+          "gold": 5,
+          "predicted": 1,
+          "units": 26
+        },
+        {
+          "gold": 5,
+          "predicted": 3,
+          "units": 26
+        },
+        {
+          "gold": 5,
+          "predicted": 4,
+          "units": 13
+        },
+        {
+          "gold": 5,
+          "predicted": 5,
+          "units": 478
+        },
+        {
+          "gold": 5,
+          "predicted": 6,
+          "units": 16
+        },
+        {
+          "gold": 5,
+          "predicted": 10,
+          "units": 18
+        },
+        {
+          "gold": 6,
+          "predicted": 1,
+          "units": 10
+        },
+        {
+          "gold": 6,
+          "predicted": 3,
+          "units": 11
+        },
+        {
+          "gold": 6,
+          "predicted": 4,
+          "units": 4
+        },
+        {
+          "gold": 6,
+          "predicted": 5,
+          "units": 18
+        },
+        {
+          "gold": 6,
+          "predicted": 6,
+          "units": 328
+        },
+        {
+          "gold": 6,
+          "predicted": 10,
+          "units": 12
+        },
+        {
+          "gold": 10,
+          "predicted": 1,
+          "units": 4
+        },
+        {
+          "gold": 10,
+          "predicted": 3,
+          "units": 39
+        },
+        {
+          "gold": 10,
+          "predicted": 4,
+          "units": 15
+        },
+        {
+          "gold": 10,
+          "predicted": 5,
+          "units": 25
+        },
+        {
+          "gold": 10,
+          "predicted": 6,
+          "units": 11
+        },
+        {
+          "gold": 10,
+          "predicted": 10,
+          "units": 371
+        }
+      ],
+      "correctPerAnchorPct": 82.81192491718808,
+      "correctPerEligibleParticipantBootstrap95": [
+        81.09869646182496,
+        84.87530168946098
+      ],
+      "correctPerEligiblePct": 82.81192491718808,
+      "counts": {
+        "participantsWithoutGold": 5,
+        "unitsAnchored": 2717,
+        "unitsEligible": 2717,
+        "unitsOffTaskOrSearch": 32,
+        "unitsOutsideDeclaredFilms": 1034,
+        "unitsRead": 4624,
+        "unitsWithNoOverlappingGold": 7,
+        "unitsWithoutParticipantGold": 834
+      },
+      "durationWeightedGuessPct": 18.16052214643909,
+      "inSampleMostCommonGoldPct": 25.947736474052263,
+      "participantMeanCorrectPerEligiblePct": 83.85714089159792,
+      "participantMedianCorrectPerEligiblePct": 82.74509803921569,
+      "participants": [
+        {
+          "anchored": 91,
+          "correct": 70,
+          "eligible": 91,
+          "participant": "sub-01"
+        },
+        {
+          "anchored": 185,
+          "correct": 154,
+          "eligible": 185,
+          "participant": "sub-02"
+        },
+        {
+          "anchored": 255,
+          "correct": 211,
+          "eligible": 255,
+          "participant": "sub-07"
+        },
+        {
+          "anchored": 227,
+          "correct": 181,
+          "eligible": 227,
+          "participant": "sub-08"
+        },
+        {
+          "anchored": 238,
+          "correct": 193,
+          "eligible": 238,
+          "participant": "sub-09"
+        },
+        {
+          "anchored": 310,
+          "correct": 241,
+          "eligible": 310,
+          "participant": "sub-10"
+        },
+        {
+          "anchored": 217,
+          "correct": 180,
+          "eligible": 217,
+          "participant": "sub-11"
+        },
+        {
+          "anchored": 39,
+          "correct": 37,
+          "eligible": 39,
+          "participant": "sub-12"
+        },
+        {
+          "anchored": 211,
+          "correct": 172,
+          "eligible": 211,
+          "participant": "sub-13"
+        },
+        {
+          "anchored": 79,
+          "correct": 73,
+          "eligible": 79,
+          "participant": "sub-14"
+        },
+        {
+          "anchored": 157,
+          "correct": 137,
+          "eligible": 157,
+          "participant": "sub-16"
+        },
+        {
+          "anchored": 186,
+          "correct": 153,
+          "eligible": 186,
+          "participant": "sub-17"
+        },
+        {
+          "anchored": 73,
+          "correct": 58,
+          "eligible": 73,
+          "participant": "sub-18"
+        },
+        {
+          "anchored": 155,
+          "correct": 141,
+          "eligible": 155,
+          "participant": "sub-19"
+        },
+        {
+          "anchored": 294,
+          "correct": 249,
+          "eligible": 294,
+          "participant": "sub-20"
+        }
+      ],
+      "recallPopulationSha256": "5133114529ffefce3abf50735e8c20e37dada5625fee3b416ccc2e0c03ca9e01",
+      "reportSha256": {
+        "recall-map-sub-01.tsv": "b929537070e072afac81b727e996bd3b8a1b23e1777cfee213e4983ef64a18e3",
+        "recall-map-sub-02.tsv": "1a36e1480cebab9ccda9c38155790189ec20aa28c4f8b9ded00ee1d8ab3f06b2",
+        "recall-map-sub-03.tsv": "5e58582986950393f98959e8aa927bd9c9f7b717d584f51bf6153586509d53b6",
+        "recall-map-sub-04.tsv": "0024e4273cdc93ede8fba5a0ab9056f8843d92b25fbb67eda9b743e3ba85f745",
+        "recall-map-sub-05.tsv": "dfa111529e1159b91fdd68938d6621d1337e5d27a2eea9b46ee8e21fe3624833",
+        "recall-map-sub-06.tsv": "fab866ca646e99784593e37ca026da4e53d9bd5faefb24a22847c3289926728e",
+        "recall-map-sub-07.tsv": "27b536c25dd4806badef5231550c2cef8a64fd87c5c21a9bc18b00547c58d6bc",
+        "recall-map-sub-08.tsv": "fc7ebf698bbd39b39090b808c8e69dc52c784f3baf894ce7427c6268d2e1a56c",
+        "recall-map-sub-09.tsv": "e96b2c6c47dc49f180a3dc7f716ba0ac3f75c7addc7756edb6897bad456cb045",
+        "recall-map-sub-10.tsv": "8d947143e8c9779b74563e3b6699a198619b89fac8421e0f50da30613565d7f6",
+        "recall-map-sub-11.tsv": "ae807250b4c2057c6643bfe0ff7fa5469342f6685be9a8e5b788fa301307a32c",
+        "recall-map-sub-12.tsv": "f50ff0a0db3f6915a31f9fff65ce1bdf51bb743bc9a9025b0a992d4cca4e84a5",
+        "recall-map-sub-13.tsv": "8a6d0fa204cfbfeddaf4c34a55a685c6972d3fe65720fa39a0350973855d431e",
+        "recall-map-sub-14.tsv": "77fa3b6e30d034a2d3f815de39a78e4da73396e0c72a9cd4eb4907f4b633d67a",
+        "recall-map-sub-15.tsv": "8659bb4a01999edd3b64228d7dbdfbedd91bf934f41fdbd019c5950c8c097bff",
+        "recall-map-sub-16.tsv": "905ba02415fbccb908a36f0e0b8f21e0526f7d5853a8cf0193fec364954c58cf",
+        "recall-map-sub-17.tsv": "da53f48334da74db18ec588f67b049f6130ee8d4b0987f5fa5081b282de01584",
+        "recall-map-sub-18.tsv": "54c3da6f18dd6d4587ca12d616dae5b4700f19d06c487e0fc001727e720670f5",
+        "recall-map-sub-19.tsv": "2bdc70e30410e952cc572e3dee77deb5ea232f6223311c9c181b6345e586ce78",
+        "recall-map-sub-20.tsv": "603b5da346718468bc2fe14891e912b827a942dbf44e2161acc2bcda4ef33f14"
+      }
+    },
+    "jl-six-film-identity": {
+      "anchorCoveragePct": 100.0,
+      "confusions": [
+        {
+          "gold": 1,
+          "predicted": 1,
+          "units": 313
+        },
+        {
+          "gold": 1,
+          "predicted": 3,
+          "units": 23
+        },
+        {
+          "gold": 1,
+          "predicted": 4,
+          "units": 3
+        },
+        {
+          "gold": 1,
+          "predicted": 5,
+          "units": 5
+        },
+        {
+          "gold": 1,
+          "predicted": 6,
+          "units": 10
+        },
+        {
+          "gold": 1,
+          "predicted": 10,
+          "units": 13
+        },
+        {
+          "gold": 3,
+          "predicted": 1,
+          "units": 11
+        },
+        {
+          "gold": 3,
+          "predicted": 3,
+          "units": 590
+        },
+        {
+          "gold": 3,
+          "predicted": 4,
+          "units": 17
+        },
+        {
+          "gold": 3,
+          "predicted": 5,
+          "units": 24
+        },
+        {
+          "gold": 3,
+          "predicted": 6,
+          "units": 14
+        },
+        {
+          "gold": 3,
+          "predicted": 10,
+          "units": 49
+        },
+        {
+          "gold": 4,
+          "predicted": 3,
+          "units": 17
+        },
+        {
+          "gold": 4,
+          "predicted": 4,
+          "units": 131
+        },
+        {
+          "gold": 4,
+          "predicted": 5,
+          "units": 24
+        },
+        {
+          "gold": 4,
+          "predicted": 6,
+          "units": 9
+        },
+        {
+          "gold": 4,
+          "predicted": 10,
+          "units": 39
+        },
+        {
+          "gold": 5,
+          "predicted": 1,
+          "units": 21
+        },
+        {
+          "gold": 5,
+          "predicted": 3,
+          "units": 21
+        },
+        {
+          "gold": 5,
+          "predicted": 4,
+          "units": 7
+        },
+        {
+          "gold": 5,
+          "predicted": 5,
+          "units": 477
+        },
+        {
+          "gold": 5,
+          "predicted": 6,
+          "units": 24
+        },
+        {
+          "gold": 5,
+          "predicted": 10,
+          "units": 27
+        },
+        {
+          "gold": 6,
+          "predicted": 1,
+          "units": 7
+        },
+        {
+          "gold": 6,
+          "predicted": 3,
+          "units": 8
+        },
+        {
+          "gold": 6,
+          "predicted": 4,
+          "units": 1
+        },
+        {
+          "gold": 6,
+          "predicted": 5,
+          "units": 12
+        },
+        {
+          "gold": 6,
+          "predicted": 6,
+          "units": 324
+        },
+        {
+          "gold": 6,
+          "predicted": 10,
+          "units": 31
+        },
+        {
+          "gold": 10,
+          "predicted": 1,
+          "units": 4
+        },
+        {
+          "gold": 10,
+          "predicted": 3,
+          "units": 32
+        },
+        {
+          "gold": 10,
+          "predicted": 4,
+          "units": 11
+        },
+        {
+          "gold": 10,
+          "predicted": 5,
+          "units": 8
+        },
+        {
+          "gold": 10,
+          "predicted": 6,
+          "units": 9
+        },
+        {
+          "gold": 10,
+          "predicted": 10,
+          "units": 401
+        }
+      ],
+      "correctPerAnchorPct": 82.29665071770334,
+      "correctPerEligibleParticipantBootstrap95": [
+        80.88174701277298,
+        83.94128113879003
+      ],
+      "correctPerEligiblePct": 82.29665071770334,
+      "counts": {
+        "participantsWithoutGold": 5,
+        "unitsAnchored": 2717,
+        "unitsEligible": 2717,
+        "unitsOffTaskOrSearch": 32,
+        "unitsOutsideDeclaredFilms": 1034,
+        "unitsRead": 4624,
+        "unitsWithNoOverlappingGold": 7,
+        "unitsWithoutParticipantGold": 834
+      },
+      "durationWeightedGuessPct": 18.16052214643909,
+      "inSampleMostCommonGoldPct": 25.947736474052263,
+      "participantMeanCorrectPerEligiblePct": 83.38617481986397,
+      "participantMedianCorrectPerEligiblePct": 81.93832599118943,
+      "participants": [
+        {
+          "anchored": 91,
+          "correct": 74,
+          "eligible": 91,
+          "participant": "sub-01"
+        },
+        {
+          "anchored": 185,
+          "correct": 149,
+          "eligible": 185,
+          "participant": "sub-02"
+        },
+        {
+          "anchored": 255,
+          "correct": 211,
+          "eligible": 255,
+          "participant": "sub-07"
+        },
+        {
+          "anchored": 227,
+          "correct": 186,
+          "eligible": 227,
+          "participant": "sub-08"
+        },
+        {
+          "anchored": 238,
+          "correct": 194,
+          "eligible": 238,
+          "participant": "sub-09"
+        },
+        {
+          "anchored": 310,
+          "correct": 244,
+          "eligible": 310,
+          "participant": "sub-10"
+        },
+        {
+          "anchored": 217,
+          "correct": 177,
+          "eligible": 217,
+          "participant": "sub-11"
+        },
+        {
+          "anchored": 39,
+          "correct": 37,
+          "eligible": 39,
+          "participant": "sub-12"
+        },
+        {
+          "anchored": 211,
+          "correct": 165,
+          "eligible": 211,
+          "participant": "sub-13"
+        },
+        {
+          "anchored": 79,
+          "correct": 69,
+          "eligible": 79,
+          "participant": "sub-14"
+        },
+        {
+          "anchored": 157,
+          "correct": 126,
+          "eligible": 157,
+          "participant": "sub-16"
+        },
+        {
+          "anchored": 186,
+          "correct": 154,
+          "eligible": 186,
+          "participant": "sub-17"
+        },
+        {
+          "anchored": 73,
+          "correct": 62,
+          "eligible": 73,
+          "participant": "sub-18"
+        },
+        {
+          "anchored": 155,
+          "correct": 138,
+          "eligible": 155,
+          "participant": "sub-19"
+        },
+        {
+          "anchored": 294,
+          "correct": 250,
+          "eligible": 294,
+          "participant": "sub-20"
+        }
+      ],
+      "recallPopulationSha256": "5133114529ffefce3abf50735e8c20e37dada5625fee3b416ccc2e0c03ca9e01",
+      "reportSha256": {
+        "recall-map-sub-01.tsv": "1fcc77718709b50f2bc73011ffd083e3e93afc96eb44717c9a7a2d661dc091d6",
+        "recall-map-sub-02.tsv": "652a83e9e502227094045f29423180c1a030d8415d7b90df5b910616266798f1",
+        "recall-map-sub-03.tsv": "57a6e36d81882f526cf42e7d9c71fc982898bf1b3ea0021f65883a01233baee9",
+        "recall-map-sub-04.tsv": "9c2cc5adbe61cd246fa59d6bf49e055bdcb388053244d482d764884c582a9e31",
+        "recall-map-sub-05.tsv": "1d6459d05490228e7851b62db0b2ddf36fddc0af66b1c2899ae9172cd8297112",
+        "recall-map-sub-06.tsv": "f2333918ef16493370ab2ea9919768c6e629dcdbbe2872f0c09e02be6213ac1c",
+        "recall-map-sub-07.tsv": "c0df520dec71299a2919234f79beb518d8f02f79f49a546adc0fb0efacdae889",
+        "recall-map-sub-08.tsv": "9e0c3831c35ed10970e0a504aad9d2b33f351dd47d6c4d32a5456558d4a94219",
+        "recall-map-sub-09.tsv": "ba4efb4d3a719d6000e66e180bd78317ec2d61e43dd31c45ddf9cf3808d20fcf",
+        "recall-map-sub-10.tsv": "0db3b9d07a82806a4be6c5d09406e91718e5a052e561bd0c56823b11985688a2",
+        "recall-map-sub-11.tsv": "17e0017a860542bea0ba81005fb4145270d88105d63da49e54572a453b843c2c",
+        "recall-map-sub-12.tsv": "b1201ba90bed0c721912c64e1269ccafbcc824c58fce57708e5e9edbbe097bcc",
+        "recall-map-sub-13.tsv": "c8e6ec568f06072e2180ed09158ce19cabbe50c14dcd5bca3b2c4944912de42b",
+        "recall-map-sub-14.tsv": "31e03d9a6f3f60488213d5e4ae622a7ea779e8d746c61d8b2368466ad420aee8",
+        "recall-map-sub-15.tsv": "7853faf6e2d52b632524cbedd53d8c0e793dbfc9651dd2f06f3643164d0c6018",
+        "recall-map-sub-16.tsv": "bac1e3f9184375b3bd6b15e18e26b74cc5cd82a3999d5585803f48c9ef40cc88",
+        "recall-map-sub-17.tsv": "5296d6997cc463d0dcf45114639983fa3c9bf42349e41648e7c3fe67b2c86f63",
+        "recall-map-sub-18.tsv": "798a747c8e9897d2ecb8f9dc0f08fbb6175445d33f5e064fdcfd20c7a909ef08",
+        "recall-map-sub-19.tsv": "b1b2fce37d100daafc7dcf730196c4495cccdbdd739a9874991d56f0297755f6",
+        "recall-map-sub-20.tsv": "51500de1a4f464251e00288dbb3a9bf3e41ce566de46efef9eb443e4f16306f2"
+      }
+    }
+  },
+  "bootstrap": {
+    "draws": 4000,
+    "seed": 20260904,
+    "unit": "participant"
+  },
+  "comparisons": {
+    "crowd-six-film-identity-minus-jl-six-film-identity": {
+      "deltaCorrectPerEligiblePp": 0.5152741994847257,
+      "pairedParticipantBootstrap95Pp": [
+        -0.6139154160982264,
+        1.9128586609989373
+      ],
+      "participants": [
+        {
+          "delta": -4,
+          "deltaPp": -4.395604395604396,
+          "eligible": 91,
+          "participant": "sub-01"
+        },
+        {
+          "delta": 5,
+          "deltaPp": 2.7027027027027026,
+          "eligible": 185,
+          "participant": "sub-02"
+        },
+        {
+          "delta": 0,
+          "deltaPp": 0.0,
+          "eligible": 255,
+          "participant": "sub-07"
+        },
+        {
+          "delta": -5,
+          "deltaPp": -2.202643171806167,
+          "eligible": 227,
+          "participant": "sub-08"
+        },
+        {
+          "delta": -1,
+          "deltaPp": -0.42016806722689076,
+          "eligible": 238,
+          "participant": "sub-09"
+        },
+        {
+          "delta": -3,
+          "deltaPp": -0.967741935483871,
+          "eligible": 310,
+          "participant": "sub-10"
+        },
+        {
+          "delta": 3,
+          "deltaPp": 1.3824884792626728,
+          "eligible": 217,
+          "participant": "sub-11"
+        },
+        {
+          "delta": 0,
+          "deltaPp": 0.0,
+          "eligible": 39,
+          "participant": "sub-12"
+        },
+        {
+          "delta": 7,
+          "deltaPp": 3.3175355450236967,
+          "eligible": 211,
+          "participant": "sub-13"
+        },
+        {
+          "delta": 4,
+          "deltaPp": 5.063291139240507,
+          "eligible": 79,
+          "participant": "sub-14"
+        },
+        {
+          "delta": 11,
+          "deltaPp": 7.006369426751593,
+          "eligible": 157,
+          "participant": "sub-16"
+        },
+        {
+          "delta": -1,
+          "deltaPp": -0.5376344086021505,
+          "eligible": 186,
+          "participant": "sub-17"
+        },
+        {
+          "delta": -4,
+          "deltaPp": -5.47945205479452,
+          "eligible": 73,
+          "participant": "sub-18"
+        },
+        {
+          "delta": 3,
+          "deltaPp": 1.935483870967742,
+          "eligible": 155,
+          "participant": "sub-19"
+        },
+        {
+          "delta": -1,
+          "deltaPp": -0.3401360544217687,
+          "eligible": 294,
+          "participant": "sub-20"
+        }
+      ],
+      "transitions": {
+        "correctToCorrect": 2005,
+        "correctToWrongOrUnanchored": 231,
+        "wrongOrUnanchoredToCorrect": 245,
+        "wrongOrUnanchoredToWrongOrUnanchored": 236
+      }
+    }
+  },
+  "goldFilms": [
+    1,
+    3,
+    4,
+    5,
+    6,
+    10
+  ],
+  "inputs": {
+    "annotationSha256": "f8b164c1cc81fa4627fb1237f37a4fe85ee9183752bcfc527349b8f9bc7485bc",
+    "goldSha256": "0433e14f192fa783c010edcfb3f0db4f297b31f1d53bc0ab577619221ae16bd0"
+  },
+  "schema": "storymodel4s.filmfestival.film-score/v2",
+  "scorerSha256": "f5f22a9613069f7762e386bf7917f7ba4a5f3112563bd71c94421ad7c3e3370f"
+}

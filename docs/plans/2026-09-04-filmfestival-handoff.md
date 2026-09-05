@@ -2,6 +2,17 @@
 
 What a fresh agent needs to pick up the second-corpus line.
 
+**Superseded operational snapshot.** The recovered files are now committed on
+`solo/filmfestival-stabilize`, integrated over `680ef6e6`; all four development arms were run at
+`7d81e4aa`. Read `2026-09-04-filmfestival-stabilization-results.md` for corrected scoring,
+experiments, receipts and limitations. The original measurements below are retained as history.
+The current main-line world-order API is integrated using `Unknown(NotSupplied)` and typed refusal
+handling. ONNX is required by default; lexical execution is explicit. `agreement.py` is a supporting
+diagnostic and now has an import guard. The baseline arm took 17.5 minutes here, not eight.
+The original metric plan remains available at
+`cc11d142:docs/plans/2026-09-04-own-the-metric.md` on the recovery branch; it is not landed on this
+integration base.
+
 **Read `2026-09-04-own-the-metric.md` item 1 first.** Another session wrote it independently and it
 specifies exactly this work — same seam, same "gold-free scorers first" strategy, same `+106` trap.
 What follows is its execution, carried past the point that plan stops at. The other design records
@@ -92,7 +103,7 @@ numbers.
 3. **`duration` overruns the next onset on 41% of utterance pairs** because it is rounded up.
    `[onset, onset + duration)` runs word onsets backwards across every boundary.
 4. **Annotation times are `min.sec` decimals** arriving as dirty floats (`6.1000000000000005` is
-   6:31). Format to two decimals and split; never treat as a number. RC additionally writes two
+   6:10). Format to two decimals and split; never treat as a number. RC additionally writes two
    values whose seconds field is exactly 60, meaning a rollover, verified against neighbours.
 5. **Memento's `Time` column is a date-formatted cell.** `tools/corpus/xlsx_rows.py` deliberately
    does not apply number formats, so use `serial_time_seconds()`; a raw read gives meaningless
@@ -124,9 +135,9 @@ numbers.
    configuration problem.
 3. **Then, and only then, the prior re-fit** the scouting brief calls for. Ordering is second-order
    while a third of units are in the wrong film.
-   Note `own-the-metric` item 2 wants a human ceiling as the denominator; film selection now has a
-   real one (11.3% duration-weighted chance, 67.2% achieved), so this corpus can contribute that
-   argument without waiting on an adjudication lane.
+   Note `own-the-metric` item 2 wants a human ceiling as the denominator; film selection has a chance baseline,
+   **not a human ceiling**. Inter-coder reliability remains unmeasured; chance does not close that
+   requirement. The original claim conflated the two and is corrected here.
 4. If a real arm is wanted, **draw a partition first**. Everything so far is a development probe on
    all available participants.
 

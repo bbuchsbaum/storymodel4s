@@ -12,6 +12,11 @@ G='tools/recall-study/filmfest_gold_film.py'
 A='tools/recall-study/agreement.py'
 E='tools/corpus/filmfest_experiment.py'
 MUTANTS=[
+ ('parse-gold-quotes-as-csv', G, 'def load_gold(path):\n    by = collections.defaultdict(list)\n    with open(path, newline="", encoding="utf-8") as fh:\n        for r in csv.DictReader(fh, delimiter="\\t", quoting=csv.QUOTE_NONE):', 'def load_gold(path):\n    by = collections.defaultdict(list)\n    with open(path, newline="", encoding="utf-8") as fh:\n        for r in csv.DictReader(fh, delimiter="\\t"):', 'test_gold_reader_keeps_rows_after_an_unclosed_literal_quote'),
+ ('empty-pair-success', A, 'if total == 0:', 'if total < 0:', 'test_no_text_pairs_is_undefined_not_perfect_agreement'),
+ ('parse-literal-quotes-as-csv',G,'sub = path.stem.removeprefix("recall-map-")\n        with path.open(newline="", encoding="utf-8") as fh:\n            for r in csv.DictReader(fh, delimiter="\\t", quoting=csv.QUOTE_NONE):',
+  'sub = path.stem.removeprefix("recall-map-")\n        with path.open(newline="", encoding="utf-8") as fh:\n            for r in csv.DictReader(fh, delimiter="\\t"):',
+  'test_population_preserves_literal_quotes_and_rows'),
  ('overwrite-cartoon-duration',G,'durations[code] += hi - lo','durations[code] = hi - lo','test_both_cartoon_durations_survive'),
  ('closed-film-end',G,'lo <= t < hi','lo <= t <= hi','test_boundary_belongs_to_next_film'),
  ('drop-unanchored',G,'                code, name = None, None','                if not r.get("startSeconds"): continue\n                code, name = None, None','test_unanchored_stays_in_eligible_denominator'),

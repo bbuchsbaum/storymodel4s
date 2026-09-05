@@ -46,7 +46,7 @@ def gold_code(ordinal):
 def film_ranges(annotation_tsv):
     spans, order = {}, {}
     with open(annotation_tsv, newline="", encoding="utf-8") as fh:
-        for r in csv.DictReader(fh, delimiter="\t"):
+        for r in csv.DictReader(fh, delimiter="\t", quoting=csv.QUOTE_NONE):
             film = r["film"]
             t0 = PART_OFFSET[r["part_id"]] + finite(r["start_s"])
             t1 = PART_OFFSET[r["part_id"]] + finite(r["end_s"] or r["start_s"])
@@ -84,7 +84,7 @@ def film_at(t, ranges):
 def load_gold(path):
     by = collections.defaultdict(list)
     with open(path, newline="", encoding="utf-8") as fh:
-        for r in csv.DictReader(fh, delimiter="\t"):
+        for r in csv.DictReader(fh, delimiter="\t", quoting=csv.QUOTE_NONE):
             if r["run"] != "run-01":
                 continue  # the declared comparison uses the first recall run only
             start, end = finite(r["start_s"]), finite(r["end_s"] or r["start_s"])
@@ -116,7 +116,7 @@ def recall_population(arm_dir):
     for path in sorted(Path(arm_dir).glob("recall-map-*.tsv")):
         sub = path.stem.removeprefix("recall-map-")
         with path.open(newline="", encoding="utf-8") as fh:
-            for r in csv.DictReader(fh, delimiter="\t"):
+            for r in csv.DictReader(fh, delimiter="\t", quoting=csv.QUOTE_NONE):
                 key = (sub, r["unit"])
                 if key in population:
                     raise ValueError(f"duplicate recall unit {key}")
@@ -140,7 +140,7 @@ def score(arm_dir, gold_by_sub, ranges, films=None):
         if not rows:
             counts["participantsWithoutGold"] += 1
         with path.open(newline="", encoding="utf-8") as fh:
-            for r in csv.DictReader(fh, delimiter="\t"):
+            for r in csv.DictReader(fh, delimiter="\t", quoting=csv.QUOTE_NONE):
                 counts["unitsRead"] += 1
                 if rows is None:
                     counts["unitsWithoutParticipantGold"] += 1
@@ -263,7 +263,7 @@ def main():
         p.error("arms must be LABEL DIRECTORY pairs")
     films = {int(x) for x in args.films.split(",")} if args.films else None
     ranges, gold = film_ranges(args.annotation), load_gold(args.gold)
-    result = {"schema":SCHEMA,"bootstrap":{"unit":"participant","draws":BOOTSTRAP,"seed":SEED},
+    result = {"schema":SCHEMA,"scorerSha256":digest(__file__),"bootstrap":{"unit":"participant","draws":BOOTSTRAP,"seed":SEED},
               "goldFilms":sorted(films) if films else "all", "inputs":{"annotationSha256":digest(args.annotation),"goldSha256":digest(args.gold)},
               "arms":{}, "comparisons":{}}
     base, base_label, base_population = None, None, None

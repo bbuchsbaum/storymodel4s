@@ -1,0 +1,181 @@
+{
+  "agreementMedianGapSeconds": 0,
+  "agreementParticipants": 20,
+  "agreementTextPairs": 1788,
+  "agreementWithin60Pct": 100,
+  "baselineRecallPopulationSha256": "5133114529ffefce3abf50735e8c20e37dada5625fee3b416ccc2e0c03ca9e01",
+  "construction": "Every source anchor is fixed at run-01 second 0; unchanged recall/gold eligibility. A coordinate-only foil, not an inferred arm.",
+  "filmScore": {
+    "anchorCoveragePct": 100.0,
+    "confusions": [
+      {
+        "gold": 1,
+        "predicted": 11,
+        "units": 367
+      },
+      {
+        "gold": 2,
+        "predicted": 11,
+        "units": 371
+      },
+      {
+        "gold": 3,
+        "predicted": 11,
+        "units": 705
+      },
+      {
+        "gold": 4,
+        "predicted": 11,
+        "units": 220
+      },
+      {
+        "gold": 5,
+        "predicted": 11,
+        "units": 577
+      },
+      {
+        "gold": 6,
+        "predicted": 11,
+        "units": 383
+      },
+      {
+        "gold": 7,
+        "predicted": 11,
+        "units": 321
+      },
+      {
+        "gold": 8,
+        "predicted": 11,
+        "units": 191
+      },
+      {
+        "gold": 9,
+        "predicted": 11,
+        "units": 140
+      },
+      {
+        "gold": 10,
+        "predicted": 11,
+        "units": 465
+      },
+      {
+        "gold": 11,
+        "predicted": 11,
+        "units": 11
+      }
+    ],
+    "correctPerAnchorPct": 0.2932551319648094,
+    "correctPerEligibleParticipantBootstrap95": [
+      0.0,
+      0.678391959798995
+    ],
+    "correctPerEligiblePct": 0.2932551319648094,
+    "counts": {
+      "participantsWithoutGold": 5,
+      "unitsAnchored": 3751,
+      "unitsEligible": 3751,
+      "unitsOffTaskOrSearch": 32,
+      "unitsRead": 4624,
+      "unitsWithNoOverlappingGold": 7,
+      "unitsWithoutParticipantGold": 834
+    },
+    "durationWeightedGuessPct": 11.233265881967668,
+    "inSampleMostCommonGoldPct": 18.794988003199148,
+    "participantMeanCorrectPerEligiblePct": 0.2985703128772369,
+    "participantMedianCorrectPerEligiblePct": 0.0,
+    "participants": [
+      {
+        "anchored": 140,
+        "correct": 0,
+        "eligible": 140,
+        "participant": "sub-01"
+      },
+      {
+        "anchored": 282,
+        "correct": 0,
+        "eligible": 282,
+        "participant": "sub-02"
+      },
+      {
+        "anchored": 403,
+        "correct": 7,
+        "eligible": 403,
+        "participant": "sub-07"
+      },
+      {
+        "anchored": 360,
+        "correct": 0,
+        "eligible": 360,
+        "participant": "sub-08"
+      },
+      {
+        "anchored": 279,
+        "correct": 0,
+        "eligible": 279,
+        "participant": "sub-09"
+      },
+      {
+        "anchored": 410,
+        "correct": 0,
+        "eligible": 410,
+        "participant": "sub-10"
+      },
+      {
+        "anchored": 333,
+        "correct": 0,
+        "eligible": 333,
+        "participant": "sub-11"
+      },
+      {
+        "anchored": 61,
+        "correct": 0,
+        "eligible": 61,
+        "participant": "sub-12"
+      },
+      {
+        "anchored": 235,
+        "correct": 0,
+        "eligible": 235,
+        "participant": "sub-13"
+      },
+      {
+        "anchored": 105,
+        "correct": 2,
+        "eligible": 105,
+        "participant": "sub-14"
+      },
+      {
+        "anchored": 217,
+        "correct": 0,
+        "eligible": 217,
+        "participant": "sub-16"
+      },
+      {
+        "anchored": 234,
+        "correct": 0,
+        "eligible": 234,
+        "participant": "sub-17"
+      },
+      {
+        "anchored": 73,
+        "correct": 0,
+        "eligible": 73,
+        "participant": "sub-18"
+      },
+      {
+        "anchored": 239,
+        "correct": 2,
+        "eligible": 239,
+        "participant": "sub-19"
+      },
+      {
+        "anchored": 380,
+        "correct": 0,
+        "eligible": 380,
+        "participant": "sub-20"
+      }
+    ]
+  },
+  "schema": "storymodel4s.filmfestival.constant-anchor-control/v1",
+  "scorerSha256": "f5f22a9613069f7762e386bf7917f7ba4a5f3112563bd71c94421ad7c3e3370f"
+}

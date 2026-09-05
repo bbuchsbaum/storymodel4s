@@ -1,0 +1,72 @@
+{
+  "mutants": [
+    {
+      "mutant": "parse-gold-quotes-as-csv",
+      "test": "test_gold_reader_keeps_rows_after_an_unclosed_literal_quote",
+      "exit": 1,
+      "killedByAssertion": true
+    },
+    {
+      "mutant": "empty-pair-success",
+      "test": "test_no_text_pairs_is_undefined_not_perfect_agreement",
+      "exit": 1,
+      "killedByAssertion": true
+    },
+    {
+      "mutant": "parse-literal-quotes-as-csv",
+      "test": "test_population_preserves_literal_quotes_and_rows",
+      "exit": 1,
+      "killedByAssertion": true
+    },
+    {
+      "mutant": "overwrite-cartoon-duration",
+      "test": "test_both_cartoon_durations_survive",
+      "exit": 1,
+      "killedByAssertion": true
+    },
+    {
+      "mutant": "closed-film-end",
+      "test": "test_boundary_belongs_to_next_film",
+      "exit": 1,
+      "killedByAssertion": true
+    },
+    {
+      "mutant": "drop-unanchored",
+      "test": "test_unanchored_stays_in_eligible_denominator",
+      "exit": 1,
+      "killedByAssertion": true
+    },
+    {
+      "mutant": "ignore-cluster-resampling",
+      "test": "test_cluster_bootstrap_retains_participant_dependence",
+      "exit": 1,
+      "killedByAssertion": true
+    },
+    {
+      "mutant": "ignore-unit-signature",
+      "test": "test_pairing_refuses_different_recall_identity",
+      "exit": 1,
+      "killedByAssertion": true
+    },
+    {
+      "mutant": "drop-point-gold",
+      "test": "test_gold_overlap_and_single_word_boundaries",
+      "exit": 1,
+      "killedByAssertion": true
+    },
+    {
+      "mutant": "admit-nan-offset",
+      "test": "test_nonfinite_offsets_refused",
+      "exit": 1,
+      "killedByAssertion": true
+    },
+    {
+      "mutant": "medoid-arbitrary-last",
+      "test": "test_medoid_uses_consensus_and_is_permutation_invariant",
+      "exit": 1,
+      "killedByAssertion": true
+    }
+  ],
+  "killed": 11,
+  "total": 11
+}

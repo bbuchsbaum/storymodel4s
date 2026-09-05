@@ -67,7 +67,7 @@ def load(d):
         name = os.path.basename(p).replace("recall-map-", "").replace(".tsv", "")
         rows = []
         with open(p, newline="", encoding="utf-8") as fh:
-            records = list(csv.DictReader(fh, delimiter="\t"))
+            records = list(csv.DictReader(fh, delimiter="\t", quoting=csv.QUOTE_NONE))
         for r in records:
             if r.get("mediaPart") not in parts:
                 raise ValueError(f"unknown or absent media part in {p}; supply valid parts.json; use gold coverage for unanchored arms")
@@ -193,6 +193,8 @@ def main(argv):
             pairing[(pa, pb)] = pairs_for(tok[pa], tok[pb], idf)
     per_arm = {}
     total = sum(len(v) for v in pairing.values())
+    if total == 0:
+        raise ValueError("no comparable text pairs; agreement is undefined")
     print(f"pairing: {total} mutual-best cross-participant unit pairs over "
           f"{len(names)} participants, fixed across arms")
     print(f"constant-anchor control: median gap 0.0s; within 60s 100.0%; n={total}")

@@ -1,0 +1,54 @@
+[
+  {
+    "analysis": "cartoon",
+    "command": [
+      "/opt/homebrew/opt/python@3.14/bin/python3.14",
+      "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/filmfestival/stabilization-20260904/scorer-hardening/tools/recall-study/filmfest_gold_film.py",
+      "/Users/bbuchsbaum/code/scala/storymodel4s/data/filmfestival/derived/annotation-JL.tsv",
+      "/Users/bbuchsbaum/code/scala/storymodel4s/data/filmfestival/derived/gold-scenematched.tsv",
+      "jl-all",
+      "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/filmfestival/stabilization-20260904/arms/jl-all",
+      "jl-no-cartoons",
+      "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/filmfestival/stabilization-20260904/arms/jl-no-cartoons",
+      "--json-out",
+      "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/filmfestival/stabilization-20260904/cartoon.json"
+    ],
+    "exit": 0
+  },
+  {
+    "analysis": "independence-six",
+    "command": [
+      "/opt/homebrew/opt/python@3.14/bin/python3.14",
+      "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/filmfestival/stabilization-20260904/scorer-hardening/tools/recall-study/filmfest_gold_film.py",
+      "/Users/bbuchsbaum/code/scala/storymodel4s/data/filmfestival/derived/annotation-JL.tsv",
+      "/Users/bbuchsbaum/code/scala/storymodel4s/data/filmfestival/derived/gold-scenematched.tsv",
+      "jl-six-film-identity",
+      "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/filmfestival/stabilization-20260904/arms/jl-six-film-identity",
+      "crowd-six-film-identity",
+      "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/filmfestival/stabilization-20260904/arms/crowd-six-film-identity",
+      "--json-out",
+      "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/filmfestival/stabilization-20260904/independence-six.json",
+      "--films",
+      "1,3,4,5,6,10"
+    ],
+    "exit": 0
+  },
+  {
+    "analysis": "independence-five",
+    "command": [
+      "/opt/homebrew/opt/python@3.14/bin/python3.14",
+      "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/filmfestival/stabilization-20260904/scorer-hardening/tools/recall-study/filmfest_gold_film.py",
+      "/Users/bbuchsbaum/code/scala/storymodel4s/data/filmfestival/derived/annotation-JL.tsv",
+      "/Users/bbuchsbaum/code/scala/storymodel4s/data/filmfestival/derived/gold-scenematched.tsv",
+      "jl-six-film-identity",
+      "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/filmfestival/stabilization-20260904/arms/jl-six-film-identity",
+      "crowd-six-film-identity",
+      "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/filmfestival/stabilization-20260904/arms/crowd-six-film-identity",
+      "--json-out",
+      "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/filmfestival/stabilization-20260904/independence-five.json",
+      "--films",
+      "3,4,5,6,10"
+    ],
+    "exit": 0
+  }
+]
