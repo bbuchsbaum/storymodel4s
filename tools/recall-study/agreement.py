@@ -40,7 +40,10 @@ def part_offsets(d):
     if not os.path.exists(path):
         return PART
     with open(path, encoding="utf-8") as fh:
-        return {k: float(v) for k, v in json.load(fh).items()}
+        parts = {k: float(v) for k, v in json.load(fh).items()}
+        if not parts or any(not math.isfinite(v) or v < 0 for v in parts.values()):
+            raise ValueError("parts.json needs finite nonnegative offsets")
+        return parts
 MIN_OVERLAP = 0.22
 MIN_TOKENS = 4
 STOP = set(
@@ -63,12 +66,22 @@ def load(d):
     for p in sorted(glob.glob(os.path.join(d, "recall-map-*.tsv"))):
         name = os.path.basename(p).replace("recall-map-", "").replace(".tsv", "")
         rows = []
-        for r in csv.DictReader(open(p, newline="", encoding="utf-8"), delimiter="\t"):
-            if r.get("mediaPart") in parts and r.get("startSeconds"):
+        with open(p, newline="", encoding="utf-8") as fh:
+            records = list(csv.DictReader(fh, delimiter="\t"))
+        for r in records:
+            if r.get("mediaPart") not in parts:
+                raise ValueError(f"unknown or absent media part in {p}; supply valid parts.json; use gold coverage for unanchored arms")
+            if not r.get("startSeconds"):
+                raise ValueError(f"unanchored unit in {p}; agreement requires complete anchors; use gold coverage")
+            if not math.isfinite(float(r["startSeconds"])):
+                raise ValueError(f"non-finite anchor in {p}")
+            if r.get("startSeconds"):
                 rows.append(
                     (r.get("recallText") or "", parts[r["mediaPart"]] + float(r["startSeconds"]))
                 )
         out[name] = rows
+    if not out or any(not rows for rows in out.values()):
+        raise ValueError("empty agreement input")
     return out
 
 
@@ -166,6 +179,7 @@ def main(argv):
     if not arms:
         print(__doc__)
         sys.exit(2)
+    print("SUPPORTING DIAGNOSTIC: constant-anchor collapse obtains 0 s gap; this is not accuracy.")
     # The pairing is computed once, from the first arm's recall texts, and reused for every arm so
     # that all arms are scored on exactly the same set of cross-participant comparisons.
     ref = load(arms[0][1])
@@ -181,8 +195,12 @@ def main(argv):
     total = sum(len(v) for v in pairing.values())
     print(f"pairing: {total} mutual-best cross-participant unit pairs over "
           f"{len(names)} participants, fixed across arms")
+    print(f"constant-anchor control: median gap 0.0s; within 60s 100.0%; n={total}")
+    print("Legacy pair-resampled intervals below are descriptive, not participant-generalization intervals.")
     for label, d in arms:
         rows = load(d)
+        if rows.keys() != ref.keys() or any([t for t, _ in rows[n]] != [t for t, _ in ref[n]] for n in ref):
+            raise ValueError("agreement arms must have identical ordered recall texts")
         gaps = []
         for (pa, pb), prs in pairing.items():
             if pa not in rows or pb not in rows:
@@ -238,4 +256,5 @@ def main(argv):
                   f"within60 {obs_w:+5.1f}pp [{wlo:+.1f}, {whi:+.1f}] {wex}   signed-rank p={p:.4f}")
 
 
-main(sys.argv)
+if __name__ == "__main__":
+    main(sys.argv)

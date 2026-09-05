@@ -53,6 +53,11 @@ Film Festival supplies `WorldOrderInput.Unknown(NotSupplied)`: independent films
 story-world clock. Annotation axes remain placeholders. This integration does not repair or use
 source-empty fidelity facets; those remain outside the scoreboard.
 
+Input preflight found 17 cleaned responses whose bounds disagree with their published window
+(seven cmiyc, four Keith Reynolds, five Boyfriend, one Rock). Exclude those responses, count them
+in the input receipt, and select each medoid from the remaining matching responses. This rule was
+recorded before any new outcome was scored; it does not infer repaired timings.
+
 ## Reproduction
 
 Use `STORYMODEL4S_DATA` pointing to the primary checkout's ignored `data` directory when building in

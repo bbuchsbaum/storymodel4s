@@ -3,7 +3,15 @@ package storymodel4s.bench.filmfestival
 import java.nio.charset.StandardCharsets
 import java.nio.file.{Files, Paths}
 
-import storymodel4s.bench.video.{MediaLocus, RecallToVideo, RecallWordsCsv, TimedSegment, TimedSourceView}
+import storymodel4s.bench.video.{
+  MediaLocus,
+  RecallToVideo,
+  RecallWordsCsv,
+  TimedSegment,
+  TimedSourceView,
+  WorldOrderInput,
+  WorldOrderAbsence
+}
 import storymodel4s.core.*
 import storymodel4s.recall.Lexical
 
@@ -23,8 +31,9 @@ import storymodel4s.recall.Lexical
   *     placeholder in exactly the sense Sherlock's axis was before the owner declared an edition,
   *     and nothing downstream may read it as a claim about a film.
   *   - Coarse segment numbers restart in run 2 while the gold uses one global 1..216 space. The
-  *     replay tool resolves that and writes `scene_number` already global, or leaves it empty when a
-  *     coder's numbering cannot carry the gold. A row without a scene number simply gets no group.
+  *     replay tool resolves that and writes `scene_number` already global, or leaves it empty when
+  *     a coder's numbering cannot carry the gold. A row without a scene number simply gets no
+  *     group.
   *   - A segment whose successor is in the other run has no end, so it is bound as an `Instant`
   *     rather than given an invented duration.
   */
@@ -59,8 +68,15 @@ object FilmFestivalAnnotation:
 
   private val Header =
     Vector(
-      "segment", "part_id", "run", "film", "scene_number",
-      "coarse_start_s", "start_s", "end_s", "description"
+      "segment",
+      "part_id",
+      "run",
+      "film",
+      "scene_number",
+      "coarse_start_s",
+      "start_s",
+      "end_s",
+      "description"
     )
 
   def parse(bytes: Array[Byte]): Either[String, Table] =
@@ -71,7 +87,7 @@ object FilmFestivalAnnotation:
         val parsed = body.zipWithIndex.map { case (line, i) => rowOf(line, i + 2) }
         parsed.collectFirst { case Left(e) => e } match
           case Some(e) => Left(e)
-          case None =>
+          case None    =>
             val rows = parsed.collect { case Right(r) => r }
             if rows.isEmpty then Left("annotation replay has no rows")
             else if rows.map(_.segment) != rows.indices.map(_ + 1).toVector then
@@ -105,6 +121,25 @@ object FilmFestivalAnnotation:
 object FilmFestivalAnnotationView:
   import FilmFestivalAnnotation.{Row, Table, TicksPerSecond}
 
+  /** Fail before a run can silently substitute the lexical baseline for a requested encoder. */
+  private[filmfestival] def requireEncoder(
+      mode: String,
+      env: Map[String, String]
+  ): Either[String, Unit] =
+    val keys = Vector("STORYMODEL4S_ONNX_MODEL", "STORYMODEL4S_ONNX_TOKENIZER")
+    mode match
+      case "onnx" =>
+        keys.find(k =>
+          env.get(k).forall(p => p.trim.isEmpty || !Files.isReadable(Paths.get(p)))
+        ) match
+          case Some(k) => Left(s"ONNX requested: $k must name a readable artifact")
+          case None    => Right(())
+      case "lexical" =>
+        if keys.exists(env.contains) then
+          Left("lexical requested: unset both ONNX artifact variables")
+        else Right(())
+      case other => Left(s"unknown semantic channel '$other'; expected onnx or lexical")
+
   val naming: TimedSourceView.Naming =
     TimedSourceView.Naming(n => f"filmfest:seg:$n%04d", n => f"filmfest:scene:$n%03d")
 
@@ -122,7 +157,9 @@ object FilmFestivalAnnotationView:
         case (acc, partId) =>
           for
             soFar <- acc
-            edition <- EditionId.from(s"filmfestival-annotation-${table.checksum.short(12)}-$partId")
+            edition <- EditionId.from(
+              s"filmfestival-annotation-${table.checksum.short(12)}-$partId"
+            )
             timebase <- RationalTimebase.of(1L, TicksPerSecond)
             bundle <- SourceBundle.filmEdition(
               edition,
@@ -169,19 +206,39 @@ object FilmFestivalAnnotationView:
       )
     }
 
-  def build(table: Table): Either[DomainError, (TimedSourceView.Built, Map[String, PresentationAxis])] =
-    bundles(table).map { bs =>
-      (TimedSourceView.build(segments(table, bs), axes(bs), naming), axes(bs))
+  def build(
+      table: Table
+  ): Either[DomainError, (TimedSourceView.Built, Map[String, PresentationAxis])] =
+    bundles(table).flatMap { bs =>
+      TimedSourceView
+        .build(
+          segments(table, bs),
+          WorldOrderInput.Unknown(WorldOrderAbsence.NotSupplied),
+          axes(bs),
+          naming
+        )
+        .left
+        .map(e => DomainError.InvariantViolation("filmfestival/worldOrder", e.message))
+        .map(built => (built, axes(bs)))
     }
 
 /** Terminal diagnostic: map one Film Festival recall transcript onto the two scanning runs.
   *
   * Usage: `filmFestivalRecallMap <annotation-replay.tsv> <recall-words.csv> <report.tsv>`. Both
-  * inputs are produced by `tools/corpus/filmfest_annotation.py` and `tools/corpus/filmfest_recall.py`
-  * and stay outside Git; the report contains recall text and is therefore local-sensitive, so it is
-  * written under the local data root (`tools/data-root.sh`, `data/README.md`).
+  * inputs are produced by `tools/corpus/filmfest_annotation.py` and
+  * `tools/corpus/filmfest_recall.py` and stay outside Git; the report contains recall text and is
+  * therefore local-sensitive, so it is written under the local data root (`tools/data-root.sh`,
+  * `data/README.md`).
   */
-@main def filmFestivalRecallMap(annotationTsv: String, recallCsv: String, outPath: String): Unit =
+@main def filmFestivalRecallMap(
+    annotationTsv: String,
+    recallCsv: String,
+    outPath: String,
+    semanticChannel: String = "onnx"
+): Unit =
+  FilmFestivalAnnotationView
+    .requireEncoder(semanticChannel, sys.env)
+    .fold(e => throw new IllegalArgumentException(e), identity)
   val bytes = Files.readAllBytes(Paths.get(annotationTsv))
   val table = FilmFestivalAnnotation
     .parse(bytes)
@@ -191,7 +248,9 @@ object FilmFestivalAnnotationView:
     .fold(e => throw new IllegalArgumentException(e.message), identity)
 
   val scenes = table.rows.flatMap(_.sceneNumber).distinct.size
-  println(s"annotation rows: ${table.rows.size}; scenes: $scenes; parts: ${table.parts.mkString(", ")}")
+  println(
+    s"annotation rows: ${table.rows.size}; scenes: $scenes; parts: ${table.parts.mkString(", ")}"
+  )
   println(s"annotation identity: ${table.checksum.short(16)}")
   table.parts.foreach(p => println(s"  $p: axis 0..${table.endSecondsOf(p)}s"))
 
