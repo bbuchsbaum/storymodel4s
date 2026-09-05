@@ -14,6 +14,8 @@ P='tools/recall-study/filmfest_annotation_packet.py'
 C='tools/corpus/filmfest_source_court.py'
 R='tools/recall-study/filmfest_replay.py'
 MUTANTS=[
+ ('consume-unbound-sidecar',R,"if consumed!=arm['inputs']:",
+  'if False:','test_filmfest_replay.ReplayTests.test_newly_consumed_sidecar_must_be_manifest_bound'),
  ('ignore-replay-input-drift',R,"if gold.digest(local(rel))!=checksum: raise ValueError(f'changed replay input: {rel}')",
   'if False: pass','test_filmfest_replay.ReplayTests.test_changed_input_fails_before_success_receipt'),
  ('silently-rebase-stage-expectation',R,"if actual!=manifest['expectedOverall'][arm['name']]:",

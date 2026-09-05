@@ -40,7 +40,8 @@ def create(diagnostics, data, reference, labels, arms, path):
             if gold.digest(file)!=checksum: raise ValueError('input changed after diagnostics')
             inputs[relative(file,data)] = checksum
         arm_specs.append({'name':name,'reports':relative(reports,data),'source':relative(index,data),
-                          'population':receipt['arms'][name]['population']})
+                          'population':receipt['arms'][name]['population'],
+                          'inputs':{relative(p,data):h for p,h in bound.items()}})
     if len({a['name'] for a in arm_specs})!=len(arm_specs) or {a['name'] for a in arm_specs}!=set(receipt['arms']):
         raise ValueError('manifest must account for each arm exactly once')
     summaries = json.loads((diagnostics/'summary.json').read_text())
@@ -70,6 +71,9 @@ def replay(manifest_path, data, output, run_tests=True):
     results={}
     for arm in manifest['arms']:
         rows,receipt=diag.load_arm(local(arm['reports']),local(arm['source']),labels,ranges)
+        consumed={relative(p,data):h for p,h in receipt['inputs'].items()}
+        if consumed!=arm['inputs']:
+            raise ValueError('replay consumed input inventory changed')
         if receipt['population']!=arm['population']: raise ValueError('replay recall population changed')
         actual=diag.summarize(rows)['overall']
         if actual!=manifest['expectedOverall'][arm['name']]:

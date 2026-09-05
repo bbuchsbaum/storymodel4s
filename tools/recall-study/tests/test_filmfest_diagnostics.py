@@ -81,7 +81,7 @@ class DiagnosticsTests(unittest.TestCase):
             'reportSha256':gold.digest(self.report),'sourceInputSha256':gold.digest(self.annotation),
             'units':[{'unit':0,'unitId':'u0','finalAnchor':'sit:filmfest:seg:0002',
                 'posteriorAnchor':'sit:filmfest:seg:0001','noFillAnchor':'sit:filmfest:seg:0001',
-                'nominations':[{'ref':'sit:filmfest:seg:0001','rankWithinLevel':0,'rawScore':.1}],
+                'nominations':[{'ref':'sit:filmfest:seg:0001','level':0,'channel':'semantic','rankWithinLevel':0,'rawScore':.1}],
                 'states':[{'state':'sit:filmfest:seg:0001','anchor':'sit:filmfest:seg:0001',
                            'cost':-math.log(.8),'localMass':.8,'posteriorMass':.8},
                           {'state':'ext:Intrusion','anchor':None,'cost':-math.log(.2),

@@ -158,6 +158,7 @@ def load_arm(directory, annotation, gold_rows, ranges):
                 'posteriorSupportIdentity': sorted(refs[k]['identity'] for k in support),
                 'posteriorIdentity': sorted(posterior_identity),
                 'nominationAvailable': traces is not None,
+                'goldNominationRanks': None,
                 'goldInCandidates': None, 'goldLocalRank': None, 'localFilm': None,
                 'localStateFilm': None, 'noFillFilm': None}
             if traces is not None:
@@ -172,6 +173,9 @@ def load_arm(directory, annotation, gold_rows, ranges):
                     if not isinstance(n['rankWithinLevel'],int) or n['rankWithinLevel'] < 0:
                         raise ValueError('invalid nomination rank')
                 row['goldInCandidates'] = any(film(n['ref']) == e['goldMovie'] for n in nominated)
+                row['goldNominationRanks'] = [{'level':n['level'],'channel':n['channel'],
+                    'rankWithinLevel':n['rankWithinLevel'],'rawScore':n['rawScore']}
+                    for n in nominated if film(n['ref'])==e['goldMovie']]
                 local, traced_post, traced_external = collections.Counter(), collections.Counter(), collections.Counter()
                 unique(t['states'], 'state')
                 costs = [gold.finite(s['cost']) for s in t['states']]
@@ -203,6 +207,8 @@ def load_arm(directory, annotation, gold_rows, ranges):
                 row['localStateFilm'] = film(winner['anchor'])
                 row['noFillFilm'] = film(t['noFillAnchor'])
                 row['nominationIdentity'] = sorted({refs[n['ref']]['identity'] for n in nominated})
+                row['nominationEvidence'] = sorted((refs[n['ref']]['identity'],n['level'],n['channel'],
+                    n['rankWithinLevel'],n['rawScore']) for n in nominated)
                 row['localCostIdentity'] = sorted((refs[s['anchor']]['identity'] + ':' + s['state'].partition('/distorted/')[2] if s['anchor'] else s['state'],
                                                    s['cost']) for s in t['states'])
             output.append(row)
@@ -226,6 +232,7 @@ def summarize(rows):
             result.update(candidateGold=sum(r['goldInCandidates'] for r in rs),
                 localCorrect=sum(r['localFilm']==r['goldFilm'] for r in rs),
                 localStateCorrect=sum(r['localStateFilm']==r['goldFilm'] for r in rs),
+                localStateAnchored=sum(r['localStateFilm'] is not None for r in rs),
                 noFillCorrect=sum(r['noFillFilm']==r['goldFilm'] for r in rs))
         return result
     pairs = [('posteriorArgmaxFilm','finalFilm')]
@@ -263,7 +270,8 @@ def compare(a, b, sample_size=12):
         xc, yc = x['finalFilm']==x['goldFilm'], y['finalFilm']==y['goldFilm']
         if xc == yc: continue
         if x['nominationAvailable'] and y['nominationAvailable']:
-            if x['nominationIdentity'] != y['nominationIdentity']: first = 'nomination'
+            if x['nominationIdentity'] != y['nominationIdentity']: first = 'candidate_membership'
+            elif x['nominationEvidence'] != y['nominationEvidence']: first = 'nomination_rank_or_score'
             elif x['localCostIdentity'] != y['localCostIdentity']: first = 'local_cost'
             elif x['posteriorIdentity'] != y['posteriorIdentity']: first = 'posterior'
             else: first = 'decode_or_fill'
@@ -298,6 +306,12 @@ def main():
         rows, receipt = load_arm(Path(directory).resolve(), Path(annotation).resolve(), labels, ranges)
         results[name], receipts[name], summaries[name] = rows, receipt, summarize(rows)
         (a.output/f'{name}.units.json').write_text(json.dumps(rows, indent=2, sort_keys=True)+'\n')
+        columns = ['participant','unit','goldFilm','nominationAvailable','goldInCandidates',
+                   'goldLocalRank','localFilm','localStateFilm','posteriorArgmaxFilm','noFillFilm',
+                   'finalFilm','origin','finalMass','goldPosteriorMass','externalMass']
+        with (a.output/f'{name}.units.tsv').open('w',newline='') as f:
+            writer=csv.DictWriter(f,fieldnames=columns,delimiter='\t',extrasaction='ignore')
+            writer.writeheader(); writer.writerows(rows)
     if len({r['population'] for r in receipts.values()}) != 1:
         raise ValueError('complete recall populations differ')
     comparisons = {f'{a.arm[0][0]}__{name}': compare(results[a.arm[0][0]], results[name]) for name,_,_ in a.arm[1:]}
@@ -306,7 +320,7 @@ def main():
                'scriptSha256': gold.digest(__file__), 'goldScorerSha256': gold.digest(gold.__file__)}
     for name, value in [('summary',summaries),('comparisons',comparisons)]:
         (a.output/f'{name}.json').write_text(json.dumps(value, indent=2, sort_keys=True)+'\n')
-    receipt['artifacts'] = {p.name:gold.digest(p) for p in sorted(a.output.glob('*.json'))}
+    receipt['artifacts'] = {p.name:gold.digest(p) for p in sorted(a.output.iterdir()) if p.is_file()}
     (a.output/'receipt.json').write_text(json.dumps(receipt,indent=2,sort_keys=True)+'\n')
     print(json.dumps({k:v['overall'] for k,v in summaries.items()}, indent=2))
 
