@@ -272,3 +272,48 @@ rendering evidence note.
 Next after this slice: the calibration work already listed above, beginning
 with adjudicated roles and a leave-story-out evaluation design. Feature shading
 does not establish a calibrated confidence, a boundary, or causal structure.
+
+## 8. Calibration instrument — 2026-09-04
+
+`document.ParticipantCalibration` implements the role-study mechanics under
+ADR 0014. It extracts exact candidates from checked compiler inputs, binds final
+judgments to source/acquisition identities, estimates separate role/scorer/score
+cells with a declared Beta(1,1) prior, and refits leave-story-out folds. Source
+aliases, story-group reuse, incompatible producers, unseen cells and cells with
+only one training story produce explicit refusals. Unresolved judgments survive
+in the record and do not become negative labels. Losses are absent when no
+labeled prediction exists.
+
+A successful application returns a participant attempt carrying
+`AcceptanceBasis.Calibrated(p, CalibrationModelId)` through the existing resolver
+and compiler. Its raw score, source evidence and generating rule receipts
+survive. The compiler seam is exercised with synthetic labels; no production
+fit or acceptance default is claimed. Neither these probabilities nor this
+adjudication target answers cross-sentence identity or recall quality.
+
+The distinction that matters next is **a working fitting instrument versus an
+empirically supported calibration**. The 2026-08-28 frozen-fixture protocol
+requires independent human annotations blind to candidates, a frozen calibration
+partition, and untouched-test evaluation. Its manifest remains a candidate list;
+no frozen resource directory was present in this checkout. An external corpus
+may exist, but its location has not been supplied. The data-preparation and
+application guide is `docs/calibration/participant-roles.md`.
+
+Do next: locate or construct the independently adjudicated corpus under that
+protocol; map its frozen local role judgments onto exact extracted candidates;
+run the held-out study and report coverage, refusals and per-story losses; assess
+selection effects from unresolved annotations; then decide and receipt a
+production acceptance policy and CLI integration. Keep WOG diagnostic. The fit
+conditions on resolved adjudications and must not be advertised as reliability
+across unevaluable candidates without evidence for that transfer.
+
+Mechanical evidence is reproducible with
+`tools/role-calibration-mutation-check.py`; full gate receipts are under
+`target/role-calibration-evidence/` in the isolated calibration checkout. Those
+courts establish software behavior, not that human data has been collected or
+that a probability generalizes to new narratives.
+
+The focused JVM court passed 27 tests (20 study/compiler tests and seven
+external-package construction tests). All ten compiling mutations were killed;
+the ledger is `docs/calibration/2026-09-04-mutations.json`. These are locally
+observed mechanical results on synthetic material.
