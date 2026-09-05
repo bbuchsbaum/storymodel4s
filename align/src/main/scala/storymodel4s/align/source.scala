@@ -82,6 +82,38 @@ enum ContextTag:
 final case class ParticipantSummary(role: SketchRole, label: String, aliases: Set[String]):
   def names: Set[String] = aliases.map(Lexical.lower) + Lexical.lower(label)
 
+/** Whether a source view supplies propositional content for its nodes at all.
+  *
+  * Why this is a type and not an inference from `predicate == None`: that absence reads two ways —
+  * *this node has no predicate*, or *this view does not describe predicates* — and
+  * [[FidelityFacets]] scores the first reading. A view that supplies none therefore made every
+  * recall unit naming an actor or an action `Wrong` rather than `Unspecified`, and, because
+  * `context` has no absent value, scored `Context` `Correct` for every asserted unit at once. Both
+  * are claims about recall derived from a silence in the source.
+  *
+  * `Undeclared` is the default for the same reason [[ImportanceWeight.unmeasured]] is: a view that
+  * says nothing must abstain rather than assert. A view that does describe propositions says so,
+  * and then `predicate = None` means what it appears to mean.
+  *
+  * This governs reporting only. It is not a gate: [[ModeGate]] admissibility is unchanged, because
+  * an undeclared view already yields no contradictions and so already admits `Faithful` — the
+  * defect was never that the gate refused too little here, but that the facets asserted too much.
+  */
+enum PropositionalScope:
+  /** The view describes predicates, participants, and context; absences are the node's own. */
+  case Declared
+
+  /** The view does not describe them; no facet over them may be scored. */
+  case Undeclared(reason: MissingReason)
+
+  def declares: Boolean = this match
+    case Declared      => true
+    case Undeclared(_) => false
+
+object PropositionalScope:
+  /** No caller said what this view describes, so it is read as describing nothing. */
+  val unstated: PropositionalScope = Undeclared(MissingReason.ProviderAbstained)
+
 /** A measured node-salience weight, or an explicit reason why salience was not measured.
   *
   * Why: importance conditions a published estimand, so a non-finite or negative observation must be
@@ -162,7 +194,11 @@ final class NodeSummary private (
       * instead of silently duplicating uniform coverage under a second name.
       */
     val importance: ImportanceWeight,
-    val evidence: Option[PropositionEvidence]
+    val evidence: Option[PropositionEvidence],
+    /** What this node's view says it describes. Defaults to [[PropositionalScope.unstated]] so a
+      * caller that supplies no propositional content scores no facets over it.
+      */
+    val propositional: PropositionalScope
 ):
   def hasEvidence: Boolean = evidence.nonEmpty
   def byRole(role: SketchRole): Option[ParticipantSummary] = participants.find(_.role == role)
@@ -193,7 +229,8 @@ final class NodeSummary private (
       outcome: Option[String] = outcome,
       cause: Option[String] = cause,
       importance: ImportanceWeight = importance,
-      evidence: Option[PropositionEvidence] = evidence
+      evidence: Option[PropositionEvidence] = evidence,
+      propositional: PropositionalScope = propositional
   ): NodeSummary =
     new NodeSummary(
       ref,
@@ -211,7 +248,8 @@ final class NodeSummary private (
       outcome,
       cause,
       importance,
-      evidence
+      evidence,
+      propositional
     )
 
   private def fields =
@@ -259,7 +297,8 @@ object NodeSummary:
       outcome: Option[String] = None,
       cause: Option[String] = None,
       importance: ImportanceWeight = ImportanceWeight.unmeasured,
-      evidence: Option[PropositionEvidence] = None
+      evidence: Option[PropositionEvidence] = None,
+      propositional: PropositionalScope = PropositionalScope.unstated
   ): NodeSummary =
     new NodeSummary(
       ref,
@@ -277,7 +316,8 @@ object NodeSummary:
       outcome,
       cause,
       importance,
-      evidence
+      evidence,
+      propositional
     )
 
 /** Minimal read-only view of a source story for alignment. `story.AlignmentSource` is bridged to
