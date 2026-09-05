@@ -1,0 +1,12 @@
+{
+  "issue": "bd-01M1RZB6Z6ZMRMCPXSEFFEE35N",
+  "status": "closed",
+  "localLanding": "9ba3709b32557387116fa2452a913dfc42de36ad",
+  "testedImplementation": "6747bbd3043f628c41ddb5b55e6388007761ec2a",
+  "peerNotice": "msg-01M1S1CWRKVVHQVMHTQSMSBF5D",
+  "peerNoticeState": "queued",
+  "completionOperations": [
+    ".mote/ops/20260905T151703.187665Z-p79613-c0000-rc271-h398512.json",
+    ".mote/ops/20260905T151707.818808Z-p79613-c0001-r9604-h442cbf.json"
+  ]
+}
