@@ -32,9 +32,9 @@ class CoordinateSuite extends FunSuite:
   }
 
   test("ordering is by artifact, container, row, column") {
-    val sorted = Vector(at("s2", 1, "a"), at("s1", 9, "a"), at("s1", 2, "b"), at("s1", 2, "a"))
-      .sorted
-      .map(_.toString)
+    val sorted =
+      Vector(at("s2", 1, "a"), at("s1", 9, "a"), at("s1", 2, "b"), at("s1", 2, "a")).sorted
+        .map(_.toString)
     assertEquals(
       sorted,
       Vector(

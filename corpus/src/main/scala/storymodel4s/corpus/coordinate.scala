@@ -2,7 +2,8 @@ package storymodel4s.corpus
 
 import storymodel4s.core.{DomainError, OpaqueId}
 
-/** Identity of one artifact inside a corpus source set: a workbook, an archive, a delimited file. */
+/** Identity of one artifact inside a corpus source set: a workbook, an archive, a delimited file.
+  */
 object ArtifactId extends OpaqueId("ArtifactId")
 type ArtifactId = ArtifactId.T
 

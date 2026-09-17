@@ -91,3 +91,98 @@ class CorpusCarrierProbeSuite extends FunSuite:
       ).nonEmpty
     )
   }
+
+  /** The status IS the claim: that this literal decoded to this value under this code book, or that
+    * the column did not apply here. A consumer that can mint a `Known` can assert a decode that
+    * never happened while keeping a genuine coordinate, which is precisely the forgery the carrier
+    * exists to prevent. An earlier revision shipped these as `enum` cases — i.e. case classes — on
+    * the judgement that a forgeable status was harmless.
+    */
+  test("positive control: the Coded surface this suite names does resolve") {
+    assertEquals(
+      typeCheckErrors(
+        """(c: storymodel4s.corpus.Coded[Int]) => c.at"""
+      ),
+      Nil
+    )
+    assertEquals(
+      typeCheckErrors(
+        """(k: storymodel4s.corpus.Known[Int]) => (k.raw, k.book)"""
+      ),
+      Nil
+    )
+    assertEquals(
+      typeCheckErrors(
+        """storymodel4s.corpus.Applicability.WhenColumnEquals("RecallType", "1").render"""
+      ),
+      Nil
+    )
+  }
+
+  test("a consumer cannot fabricate a decode status") {
+    assert(
+      typeCheckErrors(
+        """(r: storymodel4s.corpus.Raw[Int]) =>
+             new storymodel4s.corpus.Known[Int](r, storymodel4s.corpus.CodeBookId.unsafe("b"))"""
+      ).nonEmpty
+    )
+    assert(
+      typeCheckErrors(
+        """(r: storymodel4s.corpus.Raw[String]) =>
+             new storymodel4s.corpus.Unmapped(r, storymodel4s.corpus.CodeBookId.unsafe("b"))"""
+      ).nonEmpty
+    )
+    assert(
+      typeCheckErrors(
+        """(r: storymodel4s.corpus.Raw[String]) => new storymodel4s.corpus.Absent(r)"""
+      ).nonEmpty
+    )
+    assert(
+      typeCheckErrors(
+        """(r: storymodel4s.corpus.Raw[String]) =>
+             new storymodel4s.corpus.NotApplicable(r, storymodel4s.corpus.Applicability.Always)"""
+      ).nonEmpty
+    )
+  }
+
+  test("a consumer cannot reach a decode status through Mirror or copy") {
+    assert(
+      typeCheckErrors(
+        """summon[scala.deriving.Mirror.ProductOf[storymodel4s.corpus.Known[Int]]]"""
+      ).nonEmpty
+    )
+    assert(
+      typeCheckErrors(
+        """summon[scala.deriving.Mirror.ProductOf[storymodel4s.corpus.NotApplicable]]"""
+      ).nonEmpty
+    )
+    assert(
+      typeCheckErrors(
+        """(k: storymodel4s.corpus.Known[Int]) => k.copy()"""
+      ).nonEmpty
+    )
+  }
+
+  test("a consumer cannot mint a code book, a row context, or run the decoder") {
+    assert(
+      typeCheckErrors(
+        """storymodel4s.corpus.CodeBook.of(
+             storymodel4s.corpus.CodeBookId.unsafe("b"),
+             storymodel4s.corpus.Citation("s", "l"),
+             Map(1 -> "x"),
+             storymodel4s.corpus.Applicability.Always)"""
+      ).nonEmpty
+    )
+    assert(
+      typeCheckErrors(
+        """storymodel4s.corpus.RowContext.of(Map("RecallType" -> "1"))"""
+      ).nonEmpty
+    )
+    assert(
+      typeCheckErrors(
+        """(b: storymodel4s.corpus.CodeBook[Int, String], l: storymodel4s.corpus.Raw[String],
+             r: storymodel4s.corpus.RowContext) =>
+             storymodel4s.corpus.Coded.decode(b, None, l, r)"""
+      ).nonEmpty
+    )
+  }
