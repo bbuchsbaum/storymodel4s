@@ -186,3 +186,77 @@ class CorpusCarrierProbeSuite extends FunSuite:
       ).nonEmpty
     )
   }
+
+  test("positive control: the Verified surface this suite names does resolve") {
+    assertEquals(
+      typeCheckErrors("""(v: storymodel4s.corpus.Verified) => (v.manifest, v.artifacts)"""),
+      Nil
+    )
+    assertEquals(
+      typeCheckErrors(
+        """(a: storymodel4s.corpus.VerifiedArtifact) => (a.id, a.checksum, a.byteLength)"""
+      ),
+      Nil
+    )
+    assertEquals(
+      typeCheckErrors(
+        """(m: storymodel4s.corpus.SourceManifest, s: storymodel4s.corpus.ArtifactStore) =>
+             storymodel4s.corpus.Verify.verify(m, s)"""
+      ),
+      Nil
+    )
+  }
+
+  /** Guarantee 1. A consumer that can mint a `Verified` can claim bytes were hashed that were not,
+    * which is the whole of the first wall.
+    */
+  test("a consumer cannot mint a Verified or a VerifiedArtifact") {
+    assert(
+      typeCheckErrors(
+        """(m: storymodel4s.corpus.SourceManifest) => new storymodel4s.corpus.Verified(m, Vector.empty)"""
+      ).nonEmpty
+    )
+    assert(
+      typeCheckErrors(
+        """new storymodel4s.corpus.VerifiedArtifact(
+             storymodel4s.corpus.ArtifactId.unsafe("a"),
+             IArray.empty[Byte],
+             storymodel4s.core.Checksum.ofText("x"))"""
+      ).nonEmpty
+    )
+    assert(
+      typeCheckErrors(
+        """summon[scala.deriving.Mirror.ProductOf[storymodel4s.corpus.Verified]]"""
+      ).nonEmpty
+    )
+    assert(
+      typeCheckErrors(
+        """(v: storymodel4s.corpus.Verified) => v.copy()"""
+      ).nonEmpty
+    )
+  }
+
+  test("a consumer cannot build a SourceManifest around bytes nobody hashed") {
+    assert(
+      typeCheckErrors(
+        """storymodel4s.corpus.SourceManifest.of(
+             storymodel4s.corpus.CorpusId.unsafe("c"), Vector.empty, Vector.empty,
+             storymodel4s.corpus.AdmissionStatus(
+               storymodel4s.corpus.AdmissionState.Proposed, false, Vector.empty),
+             storymodel4s.corpus.ContentPolicy(false, false, Vector.empty),
+             Vector.empty, Map.empty)"""
+      ).nonEmpty
+    )
+  }
+
+  /** The verified bytes are an IArray, so there is no write path at all -- not merely a private
+    * one. This is the type-level half of the two aliasing routes; the copy-before-hash half is
+    * proved behaviourally in VerifySuite.
+    */
+  test("a consumer cannot write through the verified bytes") {
+    assert(
+      typeCheckErrors(
+        """(a: storymodel4s.corpus.VerifiedArtifact) => a.bytes(0) = 1.toByte"""
+      ).nonEmpty
+    )
+  }
