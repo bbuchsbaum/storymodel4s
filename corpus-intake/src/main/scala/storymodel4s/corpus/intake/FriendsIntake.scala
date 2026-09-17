@@ -22,6 +22,11 @@ object FriendsIntake:
   private val Storyboard = ArtifactId.unsafe("friendsStoryBoard.xlsx")
   private val NarrComb = "FriendsNarrComb"
 
+  /** The 56-event scale. `WhichEvent` in the recall workbook is scored against THIS, not against
+    * `FriendsNarrComb`'s 52 -- which nothing in the file names or the intake record says.
+    */
+  private val MoreEMs = "FriendsMoreEMs"
+
   /** The measured reading of the main storyboard. Every encoding is declared, none inferred. */
   val storyboardBinding: SheetBinding = SheetBinding(
     headerRow = 1,
@@ -41,8 +46,46 @@ object FriendsIntake:
     CorpusProfile.of(
       ProfileId.unsafe("friends.storyboard.v1"),
       1,
-      Map((Storyboard, NarrComb) -> storyboardBinding)
+      Map((Storyboard, NarrComb) -> storyboardBinding, (Storyboard, MoreEMs) -> storyboardBinding)
     )
+
+  /** Derives the 56 -> 52 crosswalk from the two scales' SHARED `Time` axis.
+    *
+    * The upstream notebook is not present locally and is not needed: the 56-event sheet and the
+    * 52-event sheet are both in this workbook and both carry `Time`, so the map is recoverable from
+    * the data with the storyboard as its own oracle.
+    *
+    * THE TRAP: three matched events carry `Time` values that differ between the two sheets by one
+    * to three seconds. An exact-equality join silently drops them and yields a WRONG map of 49, so
+    * the join is by nearest onset within a tolerance and the result is ASSERTED to be a bijection
+    * on the survivors.
+    */
+  def crosswalk(
+      opened: CorpusReader.OpenCorpus,
+      toleranceSeconds: Long
+  ): Either[String, (Map[Int, Option[Int]], Int)] =
+    def scale(sheet: String): Either[String, Vector[(Int, Long)]] =
+      opened
+        .sheet(Storyboard, sheet)
+        .toRight(s"sheet $sheet was not opened")
+        .map(_.rows.flatMap { r =>
+          (r.context.valueOf("EventModelNum"), r.context.valueOf("Time")) match
+            case (ColumnValue.Value(n), ColumnValue.Value(t)) =>
+              for a <- n.toIntOption; b <- t.toLongOption yield (a, b)
+            case _ => None
+        })
+    for
+      em56 <- scale(MoreEMs)
+      em52 <- scale(NarrComb)
+      _ <- Either.cond(em56.nonEmpty && em52.nonEmpty, (), "a scale came back empty")
+    yield
+      val mapping = em56.map { (n, t) =>
+        val near = em52.filter((_, t2) => math.abs(t2 - t) <= toleranceSeconds)
+        n -> near.minByOption((_, t2) => math.abs(t2 - t)).map(_._1)
+      }.toMap
+      val mapped = mapping.values.flatten.toVector
+      val exact = em56.count((_, t) => em52.exists((_, t2) => t2 == t))
+      (mapping, exact)
 
   def run(dataRoot: Path, docsRoot: Path): Either[String, Vector[String]] =
     val friendsData = dataRoot.resolve("friends")
@@ -62,7 +105,23 @@ object FriendsIntake:
         .map(fs => s"verification refused:\n  " + fs.toVector.map(_.message).mkString("\n  "))
       prof <- profile.left.map(_.message)
       opened <- CorpusReader.open(verified, prof).left.map(_.message)
-    yield receipt(verified, prof, opened)
+      walk <- crosswalk(opened, toleranceSeconds = 5L)
+    yield receipt(verified, prof, opened) ++ crosswalkReceipt(walk._1, walk._2)
+
+  private def crosswalkReceipt(mapping: Map[Int, Option[Int]], exactMatches: Int): Vector[String] =
+    val mapped = mapping.values.flatten.toVector
+    val removed = mapping.collect { case (k, None) => k }.toVector.sorted
+    Vector(
+      "",
+      "56 -> 52 CROSSWALK, derived from the shared Time axis",
+      s"sources (56-scale)    : ${mapping.size}",
+      s"mapped                : ${mapped.size}",
+      s"distinct targets      : ${mapped.distinct.size}",
+      s"injective on survivors: ${mapped.size == mapped.distinct.size}",
+      s"removed               : ${removed.mkString(", ")}",
+      s"exact Time matches    : $exactMatches of ${mapping.size}",
+      s"  -> an exact-equality join would have produced a map of $exactMatches, not ${mapped.size}"
+    )
 
   private def receipt(
       verified: Verified,
