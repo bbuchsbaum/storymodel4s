@@ -21,8 +21,16 @@ final case class SheetBinding(headerRow: Int, columns: Map[String, ColumnBinding
 /** A declared, versioned reading of one corpus: source column to encoding, per sheet.
   *
   * Its identity is a checksum over its canonical rendering, on `LexiconTable`'s precedent from ADR
-  * 0011: the same content under two file names is one profile, and one changed encoding is another.
-  * That is what lets a receipt say which reading produced it.
+  * 0011, whose identity is "the canonical rendering of its entries PLUS ITS NAME". So the declared
+  * `ProfileId` and version ARE part of identity -- a version bump legitimately declares a different
+  * reading even when the bindings happen to match -- while the file a profile is stored in is not,
+  * because a profile under the data root has no committed path. That is what lets a receipt say
+  * which reading produced it.
+  *
+  * Every field that changes a READING is in the rendering: artifact, sheet, header row, column
+  * name, encoding (including the Excel day origin), and `indexOnly`. An omitted field would let two
+  * different readings share one identity and make a receipt ambiguous; a test varies each in turn
+  * and requires the checksum to move.
   *
   * A profile is DATA. For a source set whose admission is still `proposed`, it lives beside the
   * bytes under the git-ignored data root, never in this repository.

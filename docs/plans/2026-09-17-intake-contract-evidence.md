@@ -59,6 +59,7 @@ lies" below.
 | P2b-s | skip the dangling-record check | refused-at-construction fails |
 | P2b-s | trust the reference's schema | 2 tests fail |
 | P2b-ii | profile identity ignores the encoding | identity test fails |
+| P2b-ii | profile identity omits the header row | field-completeness test fails |
 | P2b-ii | `open` reads from disk | **5 tests fail, incl. the falsifier** |
 | P2b-ii | header-missing column skipped | fail-fast test fails |
 | P2b-ii | report only the first cell refusal | accumulation test fails |
@@ -80,7 +81,7 @@ lies" below.
 | P6desc | change a declared offset | consumer reads the change |
 | P6gold | descriptor declares TR 2.0 | reaches the rule |
 
-**44 mutants, 44 killed** (34 above plus the four JSON values whose gaps this hunt found and
+**45 mutants, 45 killed** (34 above plus the four JSON values whose gaps this hunt found and
 closed). Two mutants are recorded as *surviving and benign* by the P2b reviewer
 (`filter(present.contains)` removal, which only double-reports; and `verify`'s schema check, dead
 once `of` owns it) — both are noted rather than replaced.

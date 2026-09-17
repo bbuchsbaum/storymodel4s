@@ -319,3 +319,66 @@ class CorpusReaderSuite extends FunSuite:
       .fold(r => fail(r.message), identity)
     assert(CorpusReader.open(verifiedOf(payload), misspelled).isLeft)
   }
+
+  /** No field that changes a READING may be omitted from the profile's identity.
+    *
+    * The identity is what a receipt cites to say which reading produced it, so an omitted field
+    * means two different readings share one identity and a receipt becomes ambiguous. This varies
+    * every field in turn and requires the checksum to move.
+    *
+    * `id` and `version` ARE included, following ADR 0011's LexiconTable precedent -- identity is
+    * "the canonical rendering of its entries PLUS ITS NAME". The declared name is part of identity;
+    * the file a profile happens to be stored in is not, because a profile under the data root has
+    * no committed path.
+    */
+  test("every field that changes a reading changes the identity") {
+    val base = profile
+    def idOf(
+        pid: String = "synthetic.v1",
+        v: Int = 1,
+        artifact: ArtifactId = art,
+        sheet: String = "Narr",
+        b: SheetBinding = binding
+    ) =
+      CorpusProfile
+        .of(ProfileId.unsafe(pid), v, Map((artifact, sheet) -> b))
+        .fold(r => fail(r.message), identity)
+        .identity
+
+    assertEquals(idOf(), base.identity, "the same inputs must give the same identity")
+
+    val varied = Map(
+      "declared id" -> idOf(pid = "other.v1"),
+      "version" -> idOf(v = 2),
+      "artifact" -> idOf(artifact = ArtifactId.unsafe("other.xlsx")),
+      "sheet name" -> idOf(sheet = "Other"),
+      "header row" -> idOf(b = binding.copy(headerRow = 2)),
+      "column name" -> idOf(b =
+        binding.copy(columns =
+          binding.columns.removed("Time") + ("Moment" -> binding.columns("Time"))
+        )
+      ),
+      "encoding" -> idOf(b =
+        binding.copy(columns =
+          binding.columns.updated("Time", ColumnBinding(CellEncoding.MinuteDotSecond))
+        )
+      ),
+      "excel day origin" -> idOf(b =
+        binding.copy(columns =
+          binding.columns.updated("Time", ColumnBinding(CellEncoding.ExcelSerialDays(0)))
+        )
+      ),
+      "indexOnly" -> idOf(b =
+        binding.copy(columns =
+          binding.columns
+            .updated("EventModelNum", ColumnBinding(CellEncoding.IntegerText, indexOnly = false))
+        )
+      ),
+      "a dropped column" -> idOf(b = binding.copy(columns = binding.columns.removed("RecallType")))
+    )
+    varied.foreach { (field, id) =>
+      assertNotEquals(id, base.identity, s"changing the $field did not change the identity")
+    }
+    // and no two variations collide with each other
+    assertEquals(varied.values.toVector.distinct.size, varied.size, "two variations collided")
+  }
