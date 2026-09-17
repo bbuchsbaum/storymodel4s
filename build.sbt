@@ -346,7 +346,7 @@ lazy val media = project
     ),
     Test / fork := true
   )
-  .dependsOn(core.jvm)
+  .dependsOn(core.jvm, corpus.jvm)
 
 /** JVM-only story-build orchestrator (ADR 0009): text through `provider-agent` charts, the
   * `ChartProposalProvider`, and `NarrativeCompiler` to a three-file pre-bundle on disk. It owns

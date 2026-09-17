@@ -117,3 +117,27 @@ class MigrationSuite extends FunSuite:
     assertEquals(b.columns("TimeOrig").encoding, CellEncoding.ExcelSerialDays)
     assert(b.columns.values.forall(_.encoding != CellEncoding.Custom("", "")))
   }
+
+  /** D7's second half, stated where a `Verified` is actually reachable. */
+  test("a VerifiedArtifact's identity is OBSERVED, which a caller-supplied checksum cannot be") {
+    val dir = Files.createTempDirectory("corpus-observed")
+    try
+      Files.write(dir.resolve("a.xlsx"), payload)
+      val store = FileStore.at(dir).fold(r => fail(r.message), identity)
+      val good = LegacyManifest
+        .liftArtifactsArray(CorpusId.unsafe("c"), v1("s"))
+        .fold(r => fail(r.message), identity)
+      val a = Verify.verify(good, store).fold(f => fail(f.head.message), identity).artifacts.head
+      // the identity equals a hash of the bytes the carrier holds -- not a number it was handed
+      assertEquals(a.checksum, Checksum.ofBytes(a.toArray))
+
+      // a manifest declaring the WRONG identity produces nothing at all, which is exactly what
+      // comparing two declarations cannot catch
+      val wrong = v1("s").replace(sha, Checksum.ofText("something else").hex)
+      val bad = LegacyManifest
+        .liftArtifactsArray(CorpusId.unsafe("c"), wrong)
+        .fold(r => fail(r.message), identity)
+      assert(Verify.verify(bad, store).isLeft)
+    finally
+      Files.walk(dir).sorted(java.util.Comparator.reverseOrder()).forEach(Files.deleteIfExists(_))
+  }

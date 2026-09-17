@@ -238,6 +238,29 @@ object MediaProbe:
     * undeclared stream; a present PTS before a present DTS; a negative duration. Refusal preserves
     * the tool's raw fields in the message and repairs nothing.
     */
+  /** Joins a probe against bytes THIS process hashed.
+    *
+    * The other `join` takes a `Checksum` the caller supplies, so its check compares a number it was
+    * handed with a number the manifest declares -- it can tell you the caller is self-consistent
+    * and nothing more. `FixtureManifest.verify(bytes)` exists and was never on a main path. This
+    * door takes a [[storymodel4s.corpus.VerifiedArtifact]], whose checksum was computed here from
+    * owned storage, so the identity is observed rather than asserted.
+    */
+  def joinVerified(
+      manifest: FixtureManifest,
+      verified: storymodel4s.corpus.VerifiedArtifact,
+      tool: ToolRealization,
+      args: Vector[String],
+      output: FfprobeOutput
+  ): Either[DomainError, MediaProbe] =
+    join(manifest, verified.checksum, tool, args, output)
+
+  /** Joins a probe against an identity the CALLER asserts.
+    *
+    * Retained because a replay envelope legitimately supplies a recorded identity rather than
+    * bytes. Prefer [[joinVerified]] wherever the bytes are in hand: this one cannot detect a caller
+    * that computed its checksum over something else.
+    */
   def join(
       manifest: FixtureManifest,
       input: Checksum,
@@ -246,7 +269,7 @@ object MediaProbe:
       output: FfprobeOutput
   ): Either[DomainError, MediaProbe] =
     for
-      _ <- verifyInput(manifest, input)
+      _ <- declaredIdentityAgrees(manifest, input)
       _ <- args
         .find(_.contains('\u0000'))
         .fold[Either[DomainError, Unit]](Right(()))(_ =>
@@ -270,7 +293,15 @@ object MediaProbe:
       computeIdentity(receipt, streams)
     )
 
-  private def verifyInput(manifest: FixtureManifest, input: Checksum): Either[DomainError, Unit] =
+  /** Compares the identity the caller supplied with the one the manifest declares.
+    *
+    * Deliberately NOT named `verify`: it establishes that two declarations agree, not that any
+    * bytes hash to either. [[joinVerified]] is the door that observes.
+    */
+  private def declaredIdentityAgrees(
+      manifest: FixtureManifest,
+      input: Checksum
+  ): Either[DomainError, Unit] =
     if input == manifest.sha256 then Right(())
     else
       Left(
