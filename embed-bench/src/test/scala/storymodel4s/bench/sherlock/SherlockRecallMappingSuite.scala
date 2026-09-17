@@ -4,8 +4,8 @@ import java.nio.charset.StandardCharsets
 import java.nio.file.Paths
 
 import munit.FunSuite
-import storymodel4s.acquire.SherlockAnnotations
-import storymodel4s.acquire.SherlockAnnotations.{MediaManifest, PartIdentity}
+import storymodel4s.corpus.intake.SherlockAnnotations
+import storymodel4s.corpus.intake.SherlockAnnotations.{MediaManifest, PartIdentity}
 import storymodel4s.align.*
 import storymodel4s.bench.video.{
   MediaLocus,

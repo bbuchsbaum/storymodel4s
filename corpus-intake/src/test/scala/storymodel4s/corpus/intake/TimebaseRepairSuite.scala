@@ -2,7 +2,7 @@ package storymodel4s.corpus.intake
 
 import java.nio.file.{Files, Path}
 
-import storymodel4s.acquire.SherlockAnnotations.MediaManifest
+import storymodel4s.corpus.intake.SherlockAnnotations.MediaManifest
 import storymodel4s.core.*
 
 import munit.FunSuite

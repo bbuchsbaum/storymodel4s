@@ -1,4 +1,4 @@
-package storymodel4s.acquire
+package storymodel4s.corpus.intake
 
 import storymodel4s.core.*
 

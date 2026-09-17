@@ -1,9 +1,9 @@
-package storymodel4s.acquire
+package storymodel4s.corpus.intake
 
 import java.nio.charset.StandardCharsets
 
 import munit.FunSuite
-import storymodel4s.acquire.SherlockAnnotations.*
+import storymodel4s.corpus.intake.SherlockAnnotations.*
 import storymodel4s.core.{Checksum, DomainError}
 
 /** Courts for the Sherlock annotation adapter, on a synthetic six-row fixture shaped like the real

@@ -6,8 +6,8 @@ import java.time.LocalDate
 
 import io.circe.parser.parse as parseJson
 
-import storymodel4s.acquire.SherlockAnnotations
-import storymodel4s.acquire.SherlockAnnotations.Atlas
+import storymodel4s.corpus.intake.SherlockAnnotations
+import storymodel4s.corpus.intake.SherlockAnnotations.Atlas
 import storymodel4s.bench.video.{
   MediaLocus,
   RecallToVideo,

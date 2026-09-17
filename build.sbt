@@ -438,9 +438,7 @@ lazy val corpusIntake = project
       "io.circe" %% "circe-parser" % circeV
     )
   )
-  // `acquire` is here only so the timebase test can compare the JSON against the constants
-  // `SherlockAnnotations` currently transcribes. It goes away when that parser moves here.
-  .dependsOn(corpus.jvm, core.jvm, acquire.jvm)
+  .dependsOn(corpus.jvm, core.jvm)
 
 /** Reference fixtures: The War of the Ghosts narrative acceptance fixture, worked recall examples,
   * interview example.
