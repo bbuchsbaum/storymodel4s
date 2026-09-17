@@ -67,14 +67,43 @@ lies" below.
 | P3seg | onsets need not increase | invariant test fails |
 | P5clk | JSON `uncoveredTailTicks` 500 → 501 | derivation test fails |
 | P5clk | JSON `annotationRows` `1-482` → `1-481` | 2 tests fail |
+| P5clk | JSON `partId` (by path) | part-mapping test fails |
+| P5clk | JSON `axisId` (by path) | axis-binding test fails |
+| P5clk | JSON `annotationEndSeconds` (by path) | extent test fails |
+| P5clk | JSON `playbackStartTicks` (by path) | origin test fails |
 | P6desc | change a declared offset | consumer reads the change |
 | P6gold | descriptor declares TR 2.0 | reaches the rule |
 
-**34 mutants, 34 killed.** Two mutants are recorded as *surviving and benign* by the P2b reviewer
+**38 mutants, 38 killed** (34 above plus the four JSON values whose gaps this hunt found and
+closed). Two mutants are recorded as *surviving and benign* by the P2b reviewer
 (`filter(present.contains)` removal, which only double-reports; and `verify`'s schema check, dead
 once `of` owns it) — both are noted rather than replaced.
 
-## How a mutation run lies, twice, measured here
+## A claim of mine that was overstated, and the correction
+
+Commit `09292e25` said: *"the whole slice is ONE behaviour: change a value in
+`timebase-repair.json` and a test goes red."* It demonstrated two such values. **That was
+overstated.** Hunting for a counterexample found four load-bearing values in the crosswalk section
+that could be changed in silence:
+
+| value | why it is load-bearing |
+|---|---|
+| `partId` | says which media part a run maps to; a swap sends run-1 annotations to part B |
+| `axisId` | becomes the TARGET AXIS of a real `ClockRepair`; a wrong value binds a nonexistent axis |
+| `annotationEndSeconds` | the run's annotation extent |
+| `playbackStartTicks` | the run's playback origin, which is what makes the repair an identity |
+
+Four tests were added and each mutation now turns the suite red. Verified both before (green) and
+after (red) by mutating the crosswalk **by JSON path**.
+
+**And a third way a mutation run lies, found doing this.** A first pass reported `runId`, `partId`,
+`axisId` and `annotationEndSeconds` as uncovered. `runId` was a FALSE POSITIVE: the file has four
+`"runId"` keys in three sections, and a first-textual-occurrence string replace hit
+`coordinateSystems[]`, not `annotationToPlaybackCrosswalk.runs[]` — mutating something no test
+reads and calling the silence a gap. **A mutation targeted by text rather than by structure can
+report a gap that does not exist, as easily as it can miss one that does.**
+
+## How a mutation run lies, three ways, measured here
 
 1. **Zinc does not recompile a forge probe.** `typeCheckErrors` expands to a literal list, so no
    dependency is recorded and a mutant reads as *survived* when it is killed. A `zincAnchor` fixes
@@ -84,6 +113,9 @@ once `of` owns it) — both are noted rather than replaced.
 2. **A mutation that never applied.** One read as survived because scalafmt had aligned
    `case None    =>` and the mutator looked for `case None =>`. Every mutation since asserts a
    changed file first.
+3. **A mutation that applied to the wrong thing.** See the section above: a first-occurrence string
+   replace on a multi-section JSON file mutated a key no test reads, and the resulting green read
+   as an uncovered gap. Mutate structured data by PATH, not by text.
 
 ## Real-data runs (content-free receipts)
 

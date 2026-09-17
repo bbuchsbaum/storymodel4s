@@ -31,6 +31,7 @@ object TimebaseRepair:
       lastRow: Int,
       annotationEndSeconds: Long,
       playbackEndTicks: Long,
+      playbackStartTicks: Long,
       uncoveredTailTicks: Long
   ):
     /** The derivation that existed only as prose. */
@@ -107,8 +108,9 @@ object TimebaseRepair:
         case other          => Left(RepairRefusal.BadRowRange(other))
       endSeconds <- num("annotationEndSeconds")
       endTicks <- num("playbackEndTicks")
+      startTicks <- num("playbackStartTicks")
       tail <- num("uncoveredTailTicks")
-    yield Run(runId, partId, axisId, bounds._1, bounds._2, endSeconds, endTicks, tail)
+    yield Run(runId, partId, axisId, bounds._1, bounds._2, endSeconds, endTicks, startTicks, tail)
 
   /** Builds a REAL `ClockRepair` per run, giving `core`'s mapping vocabulary its first production
     * caller. The repair is the identity on seconds scaled to ticks, which is exactly what the

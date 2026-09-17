@@ -96,3 +96,50 @@ class TimebaseRepairSuite extends FunSuite:
     assertEquals(b.firstRow, a.lastRow + 1)
     assertEquals(b.lastRow, record.inputRows)
   }
+
+  /** The gaps found by hunting for a load-bearing value no test covered.
+    *
+    * Commit 09292e25 claimed "change a value in the JSON and a test goes red" on the strength of
+    * two demonstrated values. Mutating the crosswalk section BY JSON PATH found four more that
+    * could be changed in silence: partId, axisId, annotationEndSeconds and playbackStartTicks. Each
+    * is load-bearing -- partId says which media part a run maps to, and axisId becomes the target
+    * axis of a real ClockRepair -- so a wrong value produces a confidently wrong mapping.
+    */
+  test("each run maps to its OWN media part, and the two parts differ") {
+    val a = record.run("run-1").getOrElse(fail("no run-1"))
+    val b = record.run("run-2").getOrElse(fail("no run-2"))
+    assertEquals(a.partId, "media-part-a")
+    assertEquals(b.partId, "media-part-b")
+    assertNotEquals(a.partId, b.partId)
+  }
+
+  test("each run's axis id is the part's own playback axis, and becomes the repair's target") {
+    val a = record.run("run-1").getOrElse(fail("no run-1"))
+    val b = record.run("run-2").getOrElse(fail("no run-2"))
+    assertEquals(a.axisId, "media-part-a-playback-ticks")
+    assertEquals(b.axisId, "media-part-b-playback-ticks")
+    // the declared axis id is what the ClockRepair actually binds, not decoration
+    val repairs = TimebaseRepair
+      .clockRepairs(record, MediaManifest.nn2017.partA.ticksPerSecond)
+      .fold(e => fail(e.message), identity)
+    assertEquals(repairs(0).relation.targetAxis, PresentationAxisId.unsafe(a.axisId))
+    assertEquals(repairs(1).relation.targetAxis, PresentationAxisId.unsafe(b.axisId))
+  }
+
+  test("each run's annotation extent matches the annotation rows it covers") {
+    val a = record.run("run-1").getOrElse(fail("no run-1"))
+    val b = record.run("run-2").getOrElse(fail("no run-2"))
+    // measured: run 1 ends at 1426 s and run 2 at 1544 s on their own run-local clocks
+    assertEquals(a.annotationEndSeconds, 1426L)
+    assertEquals(b.annotationEndSeconds, 1544L)
+    // and the annotation end is consistent with the playback end at the declared tick rate
+    val ticks = MediaManifest.nn2017.partA.ticksPerSecond
+    assertEquals(a.annotationEndSeconds * ticks, a.playbackEndTicks)
+    assertEquals(b.annotationEndSeconds * ticks, b.playbackEndTicks)
+  }
+
+  test("both runs start at the origin, which is what makes the repair an identity") {
+    record.runs.foreach { r =>
+      assertEquals(r.playbackStartTicks, 0L, s"${r.runId} does not start at the origin")
+    }
+  }
