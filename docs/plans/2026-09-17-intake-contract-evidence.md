@@ -70,6 +70,7 @@ lies" below.
 | P3link | composition ignores the intermediate | mismatch test fails |
 | P3link | Coarsening stops checking ontoness | unreached-target test fails |
 | P3link | compose skips the intermediate-extent check | incomplete-intermediate test fails |
+| P3link | Bijection stops checking injectivity | invertibility property fails |
 | P3seg | onsets need not increase | invariant test fails |
 | P3seg | onsets must STRICTLY increase | invariant test fails (would refuse Sherlock) |
 | P5clk | JSON `uncoveredTailTicks` 500 → 501 | derivation test fails |
@@ -82,7 +83,7 @@ lies" below.
 | P6desc | change a declared offset | consumer reads the change |
 | P6gold | descriptor declares TR 2.0 | reaches the rule |
 
-**46 mutants, 46 killed** (34 above plus the four JSON values whose gaps this hunt found and
+**47 mutants, 47 killed** (34 above plus the four JSON values whose gaps this hunt found and
 closed). Two mutants are recorded as *surviving and benign* by the P2b reviewer
 (`filter(present.contains)` removal, which only double-reports; and `verify`'s schema check, dead
 once `of` owns it) — both are noted rather than replaced.

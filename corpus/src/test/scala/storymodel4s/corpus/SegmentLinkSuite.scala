@@ -273,3 +273,49 @@ class SegmentLinkSuite extends FunSuite:
         assertEquals(missing.sorted, Vector(4, 5))
       case other => fail(s"expected IntermediateIncomplete, got $other")
   }
+
+  /** A constructed `Bijection` must actually BE one -- provable from the link alone.
+    *
+    * The branch checks four things (no drops, injective, onto, plus the shared totality and
+    * in-range checks). This asserts the CONSEQUENCE rather than the checks: equal sizes, and an
+    * inverse that is total and single-valued. If the four checks were ever weakened, the property
+    * fails even if each individual assertion still passes.
+    */
+  test("a Bijection implies equal sizes and a total, single-valued inverse") {
+    def bijectionOf(n: Int) =
+      val a = seg(s"a$n", n)
+      val b = seg(s"b$n", n)
+      // a non-trivial permutation: reverse, so it is not accidentally the identity
+      val m = (1 to n).map(i => i -> to(b, n - i + 1)).toMap
+      (a, b, SegmentLink.of(a, b, LinkClaim.Bijection, 1, m).fold(r => fail(r.message), identity))
+
+    Vector(1, 2, 5, 12).foreach { n =>
+      val (from, target, link) = bijectionOf(n)
+      // equal cardinality
+      assertEquals(from.size, target.size, s"n=$n")
+      // total: every source has a target
+      assertEquals(from.ordinals.count(o => link(o).isDefined), n, s"n=$n total")
+      // single-valued inverse: every target is hit exactly once
+      val inverse = link.multiplicity
+      assertEquals(inverse.size, n, s"n=$n inverse size")
+      assert(inverse.values.forall(_ == 1), s"n=$n multiplicity ${inverse.values.toVector}")
+      // and nothing was dropped
+      assert(link.removed.isEmpty, s"n=$n removed")
+    }
+  }
+
+  test("a Bijection over a target of a different size cannot be constructed at all") {
+    val a = seg("a", 3)
+    val bigger = seg("bigger", 4)
+    // total and injective, but cannot be onto: 3 sources cannot reach 4 targets
+    val m = (1 to 3).map(i => i -> to(bigger, i)).toMap
+    assertEquals(SegmentLink.of(a, bigger, LinkClaim.Bijection, 1, m), Left(LinkRefusal.NotOnto))
+    // and the other direction: 4 sources onto 3 targets cannot be injective
+    val smaller = seg("smaller", 3)
+    val four = seg("four", 4)
+    val m2 = Map(1 -> to(smaller, 1), 2 -> to(smaller, 2), 3 -> to(smaller, 3), 4 -> to(smaller, 3))
+    assertEquals(
+      SegmentLink.of(four, smaller, LinkClaim.Bijection, 1, m2),
+      Left(LinkRefusal.NotInjective)
+    )
+  }
