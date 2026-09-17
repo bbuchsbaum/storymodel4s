@@ -272,15 +272,21 @@ Six risky slices were named in advance, with the reason recorded on each bead be
 Every agent spawned afterwards failed to execute at all** — producing neither a report nor any
 artifact on disk.
 
-Five distinct remedies were tried and none worked: re-tasking two agents that had already delivered
-successfully; a three-line prompt, to test whether prompt size was the cause; file-based delivery
-instead of messages, to route around the message channel; stopping seven idle agents to free
-concurrency, on the theory that a cap was starving later spawns; and repeated explicit requests
-inviting "did not complete" as an answer. The three that worked were early; nothing after them ran.
+**The cause, once it finally surfaced: the account ran out of Fable 5.1 usage credits.** Every
+failed agent reported `You're out of usage credits. Run /usage-credits to keep using Fable 5.1 or
+/model to switch models.` The three reviews that landed were spent before the budget was.
 
-This is a failure in the agent mechanism, not an omission, and it is recorded here rather than
-worked around, because a verification record that quietly substituted self-review for adversarial
-review would be the exact defect this subsystem was built to close.
+Five remedies were tried before that was known, and all five were treating the wrong thing:
+re-tasking two agents that had already delivered; a three-line prompt, to test prompt size;
+file-based delivery, to route around the message channel; stopping seven idle agents to free
+concurrency, on a *mistaken* diagnosis that a cap was starving later spawns; and repeated requests
+inviting "did not complete" as an answer. None addressed a credit limit, and the author's stated
+diagnosis at the time — a concurrency cap — was wrong.
+
+The gap is recorded rather than worked around, because a verification record that quietly
+substituted self-review for adversarial review would be the exact defect this subsystem was built
+to close. **It is resolvable by the owner and not by the author:** `/usage-credits`, or `/model` to
+review under a different model.
 
 **Four of the six silent agents had nonetheless done real work**, left in the session scratchpad and
 found only by listing it: a `BigDecimal` probe that found a denial-of-service in `Cell.normalize`, a
