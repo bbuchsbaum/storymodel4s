@@ -44,12 +44,11 @@ const outputInventory = [
 compareInventory('Scala source', sourceInventory, manifest.examples.map((entry) => entry.source).sort());
 compareInventory('recorded output', outputInventory, manifest.examples.map((entry) => entry.output).sort());
 
+// STORYMODEL4S_GRAKERN_BUILD may name a local grakern checkout. When it is unset the build resolves
+// grakern itself, from the revision pinned in build.sbt, by cloning it from GitHub. CI runs unset,
+// so the replay there is bound to the pin and not to whatever a developer has checked out.
 const grakernBuild = process.env.STORYMODEL4S_GRAKERN_BUILD;
-if (!grakernBuild) {
-  throw new Error(
-    'STORYMODEL4S_GRAKERN_BUILD must name the pinned local grakern checkout used by this repository'
-  );
-}
+const grakernOverride = grakernBuild ? [`-Dstorymodel4s.grakern.build=${grakernBuild}`] : [];
 
 function quoteForSbt(path) {
   return path.replaceAll('\\', '\\\\').replaceAll('"', '\\"');
@@ -65,7 +64,7 @@ for (const [project, entries] of byProject) {
     .map((entry) => `file("${quoteForSbt(resolve(siteRoot, entry.source))}")`)
     .join(', ');
   const args = [
-    `-Dstorymodel4s.grakern.build=${grakernBuild}`,
+    ...grakernOverride,
     '-Dsbt.supershell=false',
     `project ${project}`,
     `set Compile / unmanagedSources ++= Seq(${sources})`,

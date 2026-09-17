@@ -10,7 +10,8 @@ npm ci
 npm run verify
 ```
 
-Set `STORYMODEL4S_GRAKERN_BUILD` to the pinned local grakern checkout before running the gate.
+Set `STORYMODEL4S_GRAKERN_BUILD` to a local grakern checkout to replay against it; leave it unset to
+replay against the revision pinned in `build.sbt`, which is what CI does.
 `npm run verify` compiles and runs every program in `examples/manifest.json`, compares stdout
 byte-for-byte with its recorded output, type-checks and builds the Astro site, and proves that
 `public/artifacts/verbatim-proof.html` reached `dist/` byte-for-byte.
