@@ -222,8 +222,17 @@ have not reported, and nothing here rests on them having done so.**
 
 - **No corpus is admitted.** `AdmissionStatus` is recorded, never decided. Friends and Memento both
   remain `proposed`, no court is open, and no Friends or Memento artifact is committed.
+  *Evidenced:* both intake runners print the admission state they read, and both print `proposed`.
+  Reading the git-ignored data root was always permitted — `story-text-admission-checklist.md` §3
+  bars **committing** recall prose, not reading staged bytes — so verifying and reading a corpus is
+  not admitting it.
 - **No inference, default or published number changed.** No adapter was retrofitted onto the
   canonical tables, so no arm was re-run and no score moved.
+  *Evidenced:* `git diff main..HEAD --numstat tools/recall-study/` is **397 insertions, 0
+  deletions**. Every Python change is additive — a new module, new `configure` functions, new
+  tests — and no existing line was modified or removed. `configure()` has no caller outside the
+  tests, so the arm runners still read the same literals they always did. A scorer's computation
+  cannot have moved.
 - **The Python scorers are not rewired.** P6desc landed the descriptor contract and its refusals on
   both sides; the ten files that carry corpus constants still carry them. The gold rule exists in
   two implementations that now provably agree, which is what makes retiring one safe — not the same
