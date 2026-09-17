@@ -29,6 +29,12 @@ data/
     MementoStoryBoard.xlsx                    129 subscenes / 44 scenes, presentation and story order
     Subjects.xlsx                             133 participants' recall, five-second grid, scene gold
     ratings/r1-r7.xlsx                        seven raters' causal matrix and importance
+  friends/                                  proposed Friends source set; see docs/data/friends/
+    FriendsRecallScoring.xlsx                 23 participant recall-scoring sheets, raw workbook
+    friendsStoryBoard.xlsx                    main storyboard, transcript, and embedded ratings
+    friendsSRMStoryBoard.xlsx                 independent task-srm storyboard
+    eventseg.zip                              two-version event-segmentation response archive
+    ratings.zip                               six independent rater workbooks
   models/
     onnx/model.onnx, tokenizer.json           the pinned sentence encoder the pipeline reads
   study/
@@ -37,8 +43,8 @@ data/
 
 Identities: `docs/data/<corpus>/*.json` for the sources, and the study documents under
 `docs/plans/` for every arm and packet, each of which records the digests of what it read and wrote.
-`filmfestival/` and `memento/` are staged but **not admitted**: their records state
-`admissionStatus.state = proposed`, and no court is open for either.
+`filmfestival/`, `memento/`, and `friends/` are staged but **not admitted**: their records state
+`admissionStatus.state = proposed`, and no court is open for any of them.
 
 ## Rules
 
