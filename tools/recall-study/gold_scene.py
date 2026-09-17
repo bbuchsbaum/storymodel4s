@@ -9,8 +9,35 @@ Usage: gold_scene.py GOLD_CSV LABEL_A DIR_A LABEL_B DIR_B [PARTITION_JSON]
 """
 import csv, glob, math, os, random, statistics, sys
 
+import corpus_descriptor as cd
+
+# These are the SHERLOCK values, and they are the fallback only. `configure()` replaces them from a
+# descriptor. They stay here because this file is imported by risk_coverage.py and by the arm
+# runners, which must keep working while the descriptor is wired through the rest of P6desc.
+#
+# The rule they implement exists TWICE, by acknowledgement: SherlockSceneCoding.scala:14-15 says
+# "Two implementations of one rule is one too many, so this one cites the other". The Scala side
+# carries trSeconds = 1.5 (:18) and the same alias arithmetic (:21-24). Reading both from one
+# declared record is what makes them one rule rather than two that happen to agree today.
 TR = 1.5
 EXCLUDED = {"NN01"}  # gold subject 1's coding runs to 1417s against a 782s transcript
+PARTICIPANT_PATTERN = r"^NN(\d{2})_"
+
+
+def configure(descriptor_path):
+    """Replaces the module's gold-rule constants from a declared descriptor.
+
+    Refuses rather than falling back: a descriptor that cannot be read is a configuration error,
+    and silently scoring under Sherlock's constants for some other corpus is precisely the failure
+    this whole contract exists to prevent.
+    """
+    global TR, EXCLUDED, EXCLUDED_NUMS, PARTICIPANT_PATTERN
+    rule = cd.gold_rule(cd.load(descriptor_path))
+    TR = float(rule["trSeconds"])
+    EXCLUDED = set(rule["excludedParticipants"])
+    PARTICIPANT_PATTERN = rule["participantPattern"]
+    EXCLUDED_NUMS = {int(name[2:]) for name in EXCLUDED if name[2:].isdigit()}
+    return {"TR": TR, "EXCLUDED": sorted(EXCLUDED), "EXCLUDED_NUMS": sorted(EXCLUDED_NUMS)}
 
 
 def gold_subject_of(nn: int):
