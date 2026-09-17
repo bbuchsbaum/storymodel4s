@@ -313,14 +313,18 @@ class WindowSuite extends ScalaCheckSuite:
       )
     }
     // The refusal is about the policy, not the support: an empty support is refused too.
-    assert(
-      Reduction
-        .reduce(
-          Vector.empty[Sample[Double]],
-          red(ScalarReducer.Mean),
-          MissingValuePolicy.RequireMinCoverage(Double.NaN)
+    assertEquals(
+      Reduction.reduce(
+        Vector.empty[Sample[Double]],
+        red(ScalarReducer.Mean),
+        MissingValuePolicy.RequireMinCoverage(Double.NaN)
+      ),
+      Left(
+        DomainError.InvariantViolation(
+          "features/reduce",
+          "RequireMinCoverage fraction must be finite in [0, 1], got minCoverage(0x7ff8000000000000)"
         )
-        .isLeft
+      )
     )
   }
 

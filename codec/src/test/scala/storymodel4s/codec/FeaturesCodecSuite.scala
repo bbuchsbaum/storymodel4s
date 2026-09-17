@@ -198,15 +198,44 @@ class FeaturesCodecSuite extends ScalaCheckSuite:
     assertEquals(floor("0.25"), Right(MissingValuePolicy.RequireMinCoverage(0.25)))
     assertEquals(floor("0"), Right(MissingValuePolicy.RequireMinCoverage(0.0)))
     assertEquals(floor("1"), Right(MissingValuePolicy.RequireMinCoverage(1.0)))
-    Vector("-0.5", "-1e-9", "1.0000000001", "1.5", "\"NaN\"", "\"Infinity\"", "\"-Infinity\"")
-      .foreach(j => assert(floor(j).isLeft, s"fraction $j was admitted off the wire"))
+    def refusedByGuard(
+        r: Either[CodecError, MissingValuePolicy]
+    ): Either[Boolean, MissingValuePolicy] =
+      r.left.map(_.toString.contains("RequireMinCoverage fraction must be finite in [0, 1]"))
+    // Range half: plain JSON numbers reach the guard, so the refusal must be the guard's own.
+    Vector("-0.5", "-1e-9", "1.0000000001", "1.5").foreach { j =>
+      assertEquals(
+        refusedByGuard(floor(j)),
+        Left(true),
+        s"fraction $j was not refused by the guard"
+      )
+    }
+    // Finiteness half: the canonical wire spells a Double as 0x + 16 hex digits, so a JSON
+    // "NaN" string is refused as a bad double with or without the guard and proves nothing. The
+    // attack string is what the encoder itself emits for a NaN or infinite floor.
+    Vector(Double.NaN, Double.PositiveInfinity, Double.NegativeInfinity).foreach { f =>
+      val wire = Canonical.encode(MissingValuePolicy.RequireMinCoverage(f))
+      assertEquals(
+        refusedByGuard(Canonical.decode[MissingValuePolicy](wire)),
+        Left(true),
+        s"encoder-emitted floor $f ($wire) was not refused by the guard"
+      )
+    }
+    Vector("\"0x7ff8000000000000\"", "\"0x7ff0000000000000\"", "\"0xfff0000000000000\"").foreach {
+      j => assertEquals(refusedByGuard(floor(j)), Left(true), s"hex floor $j was not refused")
+    }
   }
 
   test("FeatureValueSchema: a vector dimension off the wire must be positive") {
     def dim(d: Int) = Canonical.decode[FeatureValueSchema](s"""{"type":"Vector","dimension":$d}""")
     assertEquals(dim(3), Right(FeatureValueSchema.Vector(3)))
-    assert(dim(0).isLeft, "dimension 0 was admitted off the wire")
-    assert(dim(-1).isLeft, "dimension -1 was admitted off the wire")
+    Vector(0, -1).foreach { d =>
+      assertEquals(
+        dim(d).left.map(_.toString.contains(s"non-positive vector dimension $d")),
+        Left(true),
+        s"dimension $d was not refused by the guard"
+      )
+    }
   }
 
   property("FeatureDerivation round-trips with and without a narrative window, id preserved") {
