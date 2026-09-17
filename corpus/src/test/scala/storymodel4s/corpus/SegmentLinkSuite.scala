@@ -246,3 +246,30 @@ class SegmentLinkSuite extends FunSuite:
       Left(LinkRefusal.NotOnto)
     )
   }
+
+  /** `compose` matched the intermediate by ID only, and a SegmentationId is just a string.
+    *
+    * Two `Segmentation` values can share an id and differ in size. Then `ab` validated its targets
+    * against a five-segment "mid" while `bc` was built from a three-segment "mid", and the
+    * composition silently reported the uncovered sources as `Removed` -- claiming the edit dropped
+    * them when in fact the two links disagree about what "mid" is. A false claim, not a missing
+    * value: the same shape as the blank-condition-column defect.
+    */
+  test("composing links that disagree about the intermediate is REFUSED, not silently Removed") {
+    val a = seg("a", 5)
+    val midWide = seg("mid", 5)
+    val midNarrow = seg("mid", 3)
+    val c = seg("c", 3)
+    val ab = SegmentLink
+      .of(a, midWide, LinkClaim.Bijection, 1, (1 to 5).map(i => i -> to(midWide, i)).toMap)
+      .fold(r => fail(r.message), identity)
+    val bc = SegmentLink
+      .of(midNarrow, c, LinkClaim.Bijection, 1, (1 to 3).map(i => i -> to(c, i)).toMap)
+      .fold(r => fail(r.message), identity)
+    // the ids match, so the old check passed; the SIZES do not
+    assertEquals(ab.to, bc.from)
+    SegmentLink.compose(ab, bc) match
+      case Left(LinkRefusal.IntermediateIncomplete(missing)) =>
+        assertEquals(missing.sorted, Vector(4, 5))
+      case other => fail(s"expected IntermediateIncomplete, got $other")
+  }

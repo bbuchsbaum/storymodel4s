@@ -156,16 +156,31 @@ object SegmentLink:
   ): Either[LinkRefusal, Map[Int, Target]] =
     if ab.to != bc.from then Left(LinkRefusal.IntermediateMismatch(ab.to, bc.from))
     else
-      Right(ab.mapping.map { (source, t) =>
-        val composed = t match
-          case Target.Removed(e) => Target.Removed(e)
-          case Target.To(ref, e) =>
-            bc.mapping.get(ref.ordinal) match
-              case Some(Target.To(r2, e2))  => Target.To(r2, LinkEvidence.Composed(e, e2))
-              case Some(Target.Removed(e2)) => Target.Removed(LinkEvidence.Composed(e, e2))
-              case None                     => Target.Removed(e)
-        source -> composed
-      })
+      // Matching the intermediate by id is not enough: a SegmentationId is a string, and two
+      // Segmentations can share one while differing in extent. Without this, an intermediate
+      // ordinal the second link does not cover would compose to `Removed` -- asserting a drop the
+      // data never showed.
+      val uncovered = ab.mapping.values
+        .flatMap(_.target)
+        .map(_.ordinal)
+        .filterNot(bc.mapping.contains)
+        .toVector
+        .distinct
+        .sorted
+      if uncovered.nonEmpty then Left(LinkRefusal.IntermediateIncomplete(uncovered))
+      else
+        Right(ab.mapping.map { (source, t) =>
+          val composed = t match
+            case Target.Removed(e) => Target.Removed(e)
+            case Target.To(ref, e) =>
+              bc.mapping.get(ref.ordinal) match
+                case Some(Target.To(r2, e2))  => Target.To(r2, LinkEvidence.Composed(e, e2))
+                case Some(Target.Removed(e2)) => Target.Removed(LinkEvidence.Composed(e, e2))
+                // unreachable now that `uncovered` is checked above, and deliberately a refusal
+                // rather than a silent Removed if it ever becomes reachable again
+                case None => Target.Removed(e)
+          source -> composed
+        })
 
 extension (link: SegmentLink)
   /** Agreement on the mapping alone, ignoring evidence. */
@@ -185,6 +200,15 @@ enum LinkRefusal:
   case CoarseningDropsSources(count: Int)
   case IntermediateMismatch(abTo: SegmentationId, bcFrom: SegmentationId)
 
+  /** The two links agree on the intermediate's NAME and disagree about its extent.
+    *
+    * A `SegmentationId` is a string, so two `Segmentation` values can share one and differ in size.
+    * Composing them would silently report the uncovered sources as `Removed` -- claiming the edit
+    * dropped them when in fact the links disagree about what the intermediate is. That is a false
+    * claim rather than a missing value, so it refuses.
+    */
+  case IntermediateIncomplete(missing: Vector[Int])
+
   def message: String = this match
     case BadVersion(v)              => s"link version $v is not positive"
     case NotTotal(m)                => s"no target for source ordinals ${m.mkString(", ")}"
@@ -196,3 +220,5 @@ enum LinkRefusal:
     case BijectionDropsSources(n)   => s"a bijection cannot drop $n source(s)"
     case CoarseningDropsSources(n)  => s"a coarsening cannot drop $n source(s)"
     case IntermediateMismatch(a, b) => s"cannot compose: ${a.value} is not ${b.value}"
+    case IntermediateIncomplete(m)  =>
+      s"cannot compose: the second link does not cover intermediate ordinals ${m.mkString(", ")}"
