@@ -63,6 +63,7 @@ lies" below.
 | P2b-ii | header-missing column skipped | fail-fast test fails |
 | P2b-ii | report only the first cell refusal | accumulation test fails |
 | P2b-ii | an unreadable cell reads as blank | present-and-empty test fails |
+| P2b-ii | duplicate headers resolved silently | duplicate-header test fails |
 | P3link | a bijection may drop sources | 2 tests fail |
 | P3link | totality unchecked | `NotTotal` test fails |
 | P3link | composition ignores the intermediate | mismatch test fails |
@@ -77,7 +78,7 @@ lies" below.
 | P6desc | change a declared offset | consumer reads the change |
 | P6gold | descriptor declares TR 2.0 | reaches the rule |
 
-**41 mutants, 41 killed** (34 above plus the four JSON values whose gaps this hunt found and
+**42 mutants, 42 killed** (34 above plus the four JSON values whose gaps this hunt found and
 closed). Two mutants are recorded as *surviving and benign* by the P2b reviewer
 (`filter(present.contains)` removal, which only double-reports; and `verify`'s schema check, dead
 once `of` owns it) — both are noted rather than replaced.
@@ -105,6 +106,19 @@ after (red) by mutating the crosswalk **by JSON path**.
 `coordinateSystems[]`, not `annotationToPlaybackCrosswalk.runs[]` — mutating something no test
 reads and calling the silence a gap. **A mutation targeted by text rather than by structure can
 report a gap that does not exist, as easily as it can miss one that does.**
+
+## A column read from the wrong place, non-deterministically
+
+`openSheet` built its header map by collecting into a `Map` keyed by the column NAME. Two header
+cells carrying the same bound name therefore collapsed silently, and the survivor was whichever the
+`Map` iteration happened to yield — not even deterministically. A whole column could be read from
+the wrong place, and nothing would say so.
+
+Friends sheets carry a pasted legend column (`Recall types`, present in 18 of 23 sheets), so
+duplicated header text is not hypothetical.
+
+Now a typed refusal, `DuplicateHeader`. Mutant: raise the duplicate threshold so duplicates resolve
+silently → the test fails.
 
 ## An implementation that contradicted its own ADR
 

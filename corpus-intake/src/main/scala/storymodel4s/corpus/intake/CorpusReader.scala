@@ -69,13 +69,23 @@ object CorpusReader:
       * and a fail-fast structural error rather than a per-row outcome.
       */
     case ColumnNotInHeader(artifact: ArtifactId, sheet: String, column: String)
+
+    /** Two header cells carry the same bound name, so which column the profile means is ambiguous.
+      *
+      * Resolving it silently would pick whichever the header Map happened to yield -- not even
+      * deterministically -- and a whole column could be read from the wrong place. Friends sheets
+      * carry a pasted legend column, so duplicated header text is not hypothetical.
+      */
+    case DuplicateHeader(artifact: ArtifactId, sheet: String, column: String)
     case Cell(refusal: CellRefusal)
 
     def message: String = this match
       case UnverifiedArtifact(a)      => s"${a.value} was not verified in this snapshot"
       case Unreadable(a, s, r)        => s"${a.value}!$s: $r"
       case ColumnNotInHeader(a, s, c) => s"${a.value}!$s has no column '$c' in its header row"
-      case Cell(r)                    => r.message
+      case DuplicateHeader(a, s, c)   =>
+        s"${a.value}!$s has more than one column named '$c'; which one the profile means is ambiguous"
+      case Cell(r) => r.message
 
   def open(verified: Verified, profile: CorpusProfile): Either[OpenRefusal, OpenCorpus] =
     val opened = profile.sheets.toVector.sortBy((k, _) => (k._1.value, k._2)).map {
@@ -108,9 +118,16 @@ object CorpusReader:
                   OpenRefusal.Unreadable(artifact, sheet, s"no row ${binding.headerRow}")
                 )
               // header letter -> declared name, for the columns the profile binds
-              letters = header.cells.collect {
+              bound = header.cells.toVector.collect {
                 case (letter, cell) if binding.columns.contains(cell.value) => cell.value -> letter
               }
+              _ <- bound
+                .groupBy(_._1)
+                .collectFirst { case (name, xs) if xs.sizeIs > 1 => name }
+                .toLeft(())
+                .left
+                .map(name => OpenRefusal.DuplicateHeader(artifact, sheet, name))
+              letters = bound.toMap
               _ <- binding.columns.keys
                 .find(!letters.contains(_))
                 .toRight(())

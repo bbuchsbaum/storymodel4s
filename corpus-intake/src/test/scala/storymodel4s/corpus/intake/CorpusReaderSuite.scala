@@ -237,3 +237,36 @@ class CorpusReaderSuite extends FunSuite:
       .fold(r => fail(r.message), identity)
     assert(CorpusReader.open(verifiedOf(payload), badProfile).isLeft)
   }
+
+  /** Two header cells carrying the SAME name: which column wins, and does the reader know?
+    *
+    * `letters` is built by collecting into a Map keyed by the column NAME, so a duplicate silently
+    * collapses and the survivor is whichever the Map iteration happens to yield. Friends sheets
+    * carry a pasted legend column (`Recall types`, present in 18 of 23 sheets), so duplicated
+    * header text is not hypothetical.
+    */
+  test("a duplicated header name is REFUSED, not silently resolved to one of them") {
+    val dup = wb(
+      row(1, "A1" -> "EventModelNum", "B1" -> "Time", "C1" -> "Time") +
+        row(2, "A2" -> "1", "B2" -> "1.0", "C2" -> "1.5") +
+        row(3, "A3" -> "2", "B3" -> "1.000439814814815", "C3" -> "1.9")
+    )
+    val p = CorpusProfile
+      .of(
+        ProfileId.unsafe("dup.v1"),
+        1,
+        Map(
+          (art, "Narr") -> SheetBinding(
+            1,
+            Map(
+              "EventModelNum" -> ColumnBinding(CellEncoding.IntegerText),
+              "Time" -> ColumnBinding(CellEncoding.ExcelSerialDays(1))
+            )
+          )
+        )
+      )
+      .fold(r => fail(r.message), identity)
+    CorpusReader.open(verifiedOf(dup), p) match
+      case Left(CorpusReader.OpenRefusal.DuplicateHeader(_, _, name)) => assertEquals(name, "Time")
+      case other => fail(s"expected DuplicateHeader, got $other")
+  }
