@@ -103,3 +103,94 @@ object LegacyManifest:
         .map(_ => MigrationRefusal.BadArtifact(i, "unsafe path"))
       role = c.get[String]("role").getOrElse("unstated")
     yield ArtifactRecord(ArtifactId.unsafe(path), rel, len, sha, role)
+
+  /** Lifts the Sherlock manifest, whose inventory is a different concept from Friends'.
+    *
+    * It has no `artifacts` array. Its inventory is `mediaParts` -- two external video files of 285
+    * MB and 311 MB, `storage: external-local-only`, with no path -- plus `boundNonVideoRecords`,
+    * which names the typed sidecars that ARE committed (`annotation-lineage.json`,
+    * `recall-lineage.json`).
+    *
+    * **The media parts are deliberately out of scope for this lift.** A v2 manifest is verified
+    * against a snapshot, and verifying bytes that are external by declaration would report them
+    * missing on every machine. Declaring an artifact this contract cannot check would be the same
+    * defect it exists to close, one level out. The lift therefore covers the COMMITTED sidecar
+    * records, which is what makes `timebase-repair.json` resolvable inside a verified snapshot --
+    * the point of the Sherlock retrofit.
+    *
+    * `records` is where the Sherlock shape pays off: `boundNonVideoRecords` is already a list of
+    * typed records referenced by id, which is exactly `RecordRef`. The v1 record was better
+    * organized than the flat shape it would have been folded into.
+    */
+  def liftSherlockRecords(
+      corpus: CorpusId,
+      json: String,
+      recordBytes: Map[String, Array[Byte]]
+  ): Either[MigrationRefusal, SourceManifest] =
+    for
+      doc <- parseJson(json).left.map(e => MigrationRefusal.NotJson(e.getMessage))
+      cur = doc.hcursor
+      schema = cur.get[String]("schema").getOrElse("<absent>")
+      bound <- cur
+        .get[Vector[io.circe.Json]]("boundNonVideoRecords")
+        .left
+        .map(_ => MigrationRefusal.NoArtifacts(schema))
+      named <- bound.zipWithIndex.foldLeft[Either[MigrationRefusal, Vector[(String, String)]]](
+        Right(Vector.empty)
+      ) { case (acc, (j, i)) =>
+        acc.flatMap { done =>
+          val c = j.hcursor
+          for
+            id <- c.get[String]("id").left.map(_ => MigrationRefusal.BadArtifact(i, "no id"))
+            rec <- c
+              .get[String]("record")
+              .left
+              .map(_ => MigrationRefusal.BadArtifact(i, "no record"))
+          yield done :+ (id -> rec)
+        }
+      }
+      present = named.filter((_, file) => recordBytes.contains(file))
+      _ <- Either.cond(present.nonEmpty, (), MigrationRefusal.NoArtifacts(schema))
+      artifacts <- present.foldLeft[Either[MigrationRefusal, Vector[ArtifactRecord]]](
+        Right(Vector.empty)
+      ) { case (acc, (_, file)) =>
+        acc.flatMap { done =>
+          RelativeArtifactPath
+            .from(file)
+            .left
+            .map(_ => MigrationRefusal.BadArtifact(-1, s"unsafe path $file"))
+            .map { rel =>
+              val bytes = recordBytes(file)
+              done :+ ArtifactRecord(
+                ArtifactId.unsafe(file),
+                rel,
+                bytes.length.toLong,
+                Checksum.ofBytes(bytes),
+                "typed-record"
+              )
+            }
+        }
+      }
+      refs = present.map((id, file) =>
+        RecordRef(RecordId.unsafe(id), "storymodel4s.sherlock.record", 1, ArtifactId.unsafe(file))
+      )
+      manifest <- SourceManifest
+        .of(
+          corpus,
+          SourceManifest.Schema,
+          SourceManifest.SchemaVersion,
+          artifacts,
+          refs,
+          AdmissionStatus(AdmissionState.Admitted, courtOpened = true, Vector.empty),
+          ContentPolicy(false, false, Vector("commercial-episode-video-bytes")),
+          cur.get[Vector[String]]("nonClaims").getOrElse(Vector.empty),
+          Map(
+            "migratedFrom" -> io.circe.Json.fromString(schema),
+            "mediaPartsOutOfScope" -> io.circe.Json.fromString(
+              "external-local-only video is declared by the v1 record and not verifiable here"
+            )
+          )
+        )
+        .left
+        .map(f => MigrationRefusal.BadArtifact(-1, f.message))
+    yield manifest

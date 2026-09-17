@@ -141,3 +141,56 @@ class MigrationSuite extends FunSuite:
     finally
       Files.walk(dir).sorted(java.util.Comparator.reverseOrder()).forEach(Files.deleteIfExists(_))
   }
+
+  /** The Sherlock shape, which the Friends lift correctly refuses. */
+  test("the Sherlock manifest lifts through its OWN shape, not the Friends one") {
+    val sherlock =
+      """{"schema":"storymodel4s.sherlock.source-manifest","schemaVersion":1,
+        | "nonClaims":["frame-exact-annotation-alignment"],
+        | "mediaParts":[{"id":"media-part-a","byteLength":285537456,"sha256":"aa"}],
+        | "boundNonVideoRecords":[
+        |   {"id":"sherlock-annotation-table-v1","record":"annotation-lineage.json"},
+        |   {"id":"sherlock-recall-export-set-v1","record":"recall-lineage.json"}]}""".stripMargin
+    val bytes = Map(
+      "annotation-lineage.json" -> "{}".getBytes("UTF-8"),
+      "recall-lineage.json" -> "{ }".getBytes("UTF-8")
+    )
+    val m = LegacyManifest
+      .liftSherlockRecords(CorpusId.unsafe("sherlock"), sherlock, bytes)
+      .fold(r => fail(r.message), identity)
+    assertEquals(m.artifacts.size, 2)
+    assertEquals(m.records.size, 2)
+    // boundNonVideoRecords IS a RecordRef list already -- the v1 record was better organized
+    // than the flat shape it would have been folded into
+    assertEquals(
+      m.records.map(_.id.value).sorted,
+      Vector("sherlock-annotation-table-v1", "sherlock-recall-export-set-v1")
+    )
+    // every record resolves to a declared artifact, or `of` would have refused
+    assert(m.records.forall(r => m.declaredIds.contains(r.artifact)))
+    // the external media parts are declared out of scope, with the reason recorded
+    assert(m.extensions.contains("mediaPartsOutOfScope"))
+    assert(!m.declaredIds.contains(ArtifactId.unsafe("media-part-a")))
+  }
+
+  test("a sidecar the snapshot does not hold is not declared, rather than declared and missing") {
+    val sherlock =
+      """{"schema":"s","boundNonVideoRecords":[
+        | {"id":"present","record":"a.json"},
+        | {"id":"absent","record":"gone.json"}]}""".stripMargin
+    val m = LegacyManifest
+      .liftSherlockRecords(
+        CorpusId.unsafe("sherlock"),
+        sherlock,
+        Map("a.json" -> "{}".getBytes("UTF-8"))
+      )
+      .fold(r => fail(r.message), identity)
+    assertEquals(m.artifacts.size, 1)
+    assertEquals(m.records.map(_.id.value), Vector("present"))
+  }
+
+  test("the Friends lift refuses the Sherlock shape, and the Sherlock lift refuses Friends'") {
+    val sherlock = """{"schema":"storymodel4s.sherlock.source-manifest","mediaParts":[]}"""
+    assert(LegacyManifest.liftArtifactsArray(CorpusId.unsafe("s"), sherlock).isLeft)
+    assert(LegacyManifest.liftSherlockRecords(CorpusId.unsafe("f"), v1("s"), Map.empty).isLeft)
+  }
