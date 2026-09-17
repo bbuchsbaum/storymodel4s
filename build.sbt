@@ -431,9 +431,15 @@ lazy val corpusIntake = project
   .settings(commonSettings)
   .settings(
     name := "storymodel4s-corpus-intake",
-    Test / fork := true
+    Test / fork := true,
+    libraryDependencies ++= Seq(
+      "io.circe" %% "circe-core" % circeV,
+      "io.circe" %% "circe-parser" % circeV
+    )
   )
-  .dependsOn(corpus.jvm, core.jvm)
+  // `acquire` is here only so the timebase test can compare the JSON against the constants
+  // `SherlockAnnotations` currently transcribes. It goes away when that parser moves here.
+  .dependsOn(corpus.jvm, core.jvm, acquire.jvm)
 
 /** Reference fixtures: The War of the Ghosts narrative acceptance fixture, worked recall examples,
   * interview example.
