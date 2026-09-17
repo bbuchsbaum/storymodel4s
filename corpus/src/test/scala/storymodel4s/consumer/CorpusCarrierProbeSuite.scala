@@ -2,6 +2,8 @@ package storymodel4s.consumer
 
 import scala.compiletime.testing.typeCheckErrors
 
+import storymodel4s.corpus.*
+
 import munit.FunSuite
 
 /** Out-of-package proof that the intake carriers cannot be forged (ADR 0018 §2).
@@ -17,6 +19,30 @@ import munit.FunSuite
   * repository (`docs/design/unforgeable-types.md`).
   */
 class CorpusCarrierProbeSuite extends FunSuite:
+
+  /** Real, typed references to every probed type. This method is never called; it exists so that
+    * Zinc records a dependency from this file on those types.
+    *
+    * Without it, `typeCheckErrors` expands to a literal list, Zinc sees no dependency, and this
+    * suite is NOT recompiled when a probed type's shape or visibility changes -- so a mutation
+    * silently SURVIVES unless the test scope is cleaned first. Measured: mutating
+    * `final class Known` to `final case class Known` leaves this suite green on `corpusJVM/test`
+    * and red only on `corpusJVM/clean corpusJVM/test`. "Always clean" is a workaround; this is the
+    * fix.
+    */
+  private def zincAnchor(
+      c: SourceCoordinate,
+      r: Raw[Int],
+      k: Known[Int],
+      u: Unmapped,
+      a: Absent,
+      n: NotApplicable,
+      d: Undetermined,
+      v: Verified,
+      va: VerifiedArtifact
+  ): Int =
+    c.row + r.value + k.raw.value + u.raw.literal.length + a.raw.literal.length +
+      n.condition.render.length + d.condition.render.length + v.artifacts.size + va.byteLength
 
   test("positive control: the public surface this suite names does resolve") {
     assertEquals(

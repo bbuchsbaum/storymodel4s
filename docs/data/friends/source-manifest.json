@@ -1,0 +1,283 @@
+{
+  "schema": "storymodel4s.friends.source-manifest",
+  "schemaVersion": 1,
+  "artifactSetId": "friends-s01e16-s01e17-recall-and-segmentation-source-set-v1",
+  "recordedAt": "2026-09-16",
+  "scientificRole": "proposed-friends-recall-storyboard-causality-and-event-segmentation-source-set",
+  "admissionStatus": {
+    "state": "proposed",
+    "courtOpened": false,
+    "blocking": [
+      "owner decision to open an acquisition and admission court",
+      "REB/IRB and human-subject provenance basis before any participant recall prose is committed",
+      "licence decision for the GitHub repository artifacts; the repository declares no LICENSE file"
+    ]
+  },
+  "episode": {
+    "series": "Friends",
+    "season": 1,
+    "episodes": [
+      {
+        "episodeNumber": 16,
+        "title": "The One With Two Parts, Part 1"
+      },
+      {
+        "episodeNumber": 17,
+        "title": "The One With Two Parts, Part 2"
+      }
+    ],
+    "stimulusForm": "concatenated two-part clip with an edited presentation cut; the exact cut and its timing are not yet independently reconstructed",
+    "identitySources": [
+      "https://github.com/OpenNeuroDatasets/ds008464/blob/main/README",
+      "https://friends.fandom.com/wiki/List_of_Friends_Episodes"
+    ]
+  },
+  "upstreamSources": [
+    {
+      "id": "friends-analysis-repository",
+      "kind": "github",
+      "repository": "https://github.com/JamesWardAntony/friends",
+      "commit": "7721753fffe3c14bd49ae26216cd459cf9b5737a",
+      "commitDate": "2026-07-23T22:52:30Z",
+      "licenseFilePresent": false,
+      "licenseStatus": "no-declared-license",
+      "scope": "all six locally accounted-for source artifacts and the upstream analysis notebooks"
+    },
+    {
+      "id": "friends-openneuro-dataset",
+      "kind": "openneuro-dataset",
+      "accession": "ds008464",
+      "snapshot": "1.0.0",
+      "doi": "doi:10.18112/openneuro.ds008464.v1.0.0",
+      "mirrorRepository": "https://github.com/OpenNeuroDatasets/ds008464",
+      "mirrorCommit": "cbb9ecee52120229ae71501d6055e0f8d044bac7",
+      "license": "CC0",
+      "stagedInThisSlice": false,
+      "role": "related fMRI release named by the upstream README; no MRI or video bytes are copied here"
+    }
+  ],
+  "contentPolicy": {
+    "participantRecallProsePresent": true,
+    "participantRecallProseLocation": "data/friends/FriendsRecallScoring.xlsx, git-ignored; never committed",
+    "stimulusTranscriptPresent": true,
+    "stimulusTranscriptLocation": "data/friends/friendsStoryBoard.xlsx, git-ignored; never committed",
+    "rawVideoPresent": false,
+    "fmriBytesPresent": false,
+    "analysisCodeCommittedHere": false,
+    "externalOnlyArtifactClasses": [
+      "participant-recall-prose",
+      "stimulus-transcript-prose",
+      "commercial-episode-video-bytes",
+      "fMRI-bytes",
+      "upstream-analysis-notebooks"
+    ]
+  },
+  "artifacts": [
+    {
+      "path": "FriendsRecallScoring.xlsx",
+      "role": "scored participant free-recall timeline and recall-code workbook",
+      "byteLength": 2180116,
+      "sha256": "db6b57955f4cd49458b54b559aa61723595abf7ff2142b023c88cbfbf8990fd1",
+      "upstreamGitBlob": "19aa498495671ad0c6a3d169bd390daea2d721b2",
+      "storage": "external-local-only",
+      "contentStoredInGit": false
+    },
+    {
+      "path": "friendsStoryBoard.xlsx",
+      "role": "main stimulus storyboard, transcript, scene/event attributes, and embedded causality/importance sheets",
+      "byteLength": 78405,
+      "sha256": "31525ec4c98933757956c9e90fd5443065cfc0a4c7013dc64de3d3368b8d9fbf",
+      "upstreamGitBlob": "bbe946395a16350eb447f533662defeccee8fd6d",
+      "storage": "external-local-only",
+      "contentStoredInGit": false
+    },
+    {
+      "path": "friendsSRMStoryBoard.xlsx",
+      "role": "independent task-srm storyboard",
+      "byteLength": 10705,
+      "sha256": "a74d474a7af430a86f14e2773d8e177d4e7eb5ab10c6bbd3c05d69848ece32a4",
+      "upstreamGitBlob": "d5c93932bea777c0e3147e127fe083661712982a",
+      "storage": "external-local-only",
+      "contentStoredInGit": false
+    },
+    {
+      "path": "eventseg.zip",
+      "role": "raw event-segmentation response archive from two declared experiment versions",
+      "byteLength": 251293,
+      "sha256": "c79d22d956ead586174f7483518cb2607ff582084dac74c4c3d32996f13e5954",
+      "upstreamGitBlob": "95bd9533d3bba4fb24d216f8e58dfaad2c8c3ae3",
+      "storage": "external-local-only",
+      "contentStoredInGit": false
+    },
+    {
+      "path": "ratings.zip",
+      "role": "independent causal and importance rating workbooks",
+      "byteLength": 115474,
+      "sha256": "be2215aee6766bb7294defbe17acf884ff55b3a45066bd11324720dcbc050dfc",
+      "upstreamGitBlob": "f1839b3be8a41a8e001d0ffa53252db17d3e22f6",
+      "storage": "external-local-only",
+      "contentStoredInGit": false
+    },
+    {
+      "path": "README.md",
+      "role": "upstream source README",
+      "byteLength": 2564,
+      "sha256": "1210630a8aae905eb96814d1f65f69e2c3cf090699aaaa3d10ca06d4d6de9cca",
+      "upstreamGitBlob": "0b11e63f35fffadad6eedd1782a6c5a6f87ae799",
+      "storage": "external-local-only",
+      "contentStoredInGit": false
+    }
+  ],
+  "analysisCode": {
+    "repository": "friends-analysis-repository",
+    "commit": "7721753fffe3c14bd49ae26216cd459cf9b5737a",
+    "notStagedAsData": true,
+    "notStagedReason": "analysis code is provenance for future adapter work, not a normalized data release",
+    "notebooks": [
+      "recallBehav.ipynb",
+      "event_seg.ipynb",
+      "GSBS.ipynb",
+      "Import_all.ipynb",
+      "SRM.ipynb",
+      "eventStatePatterns.ipynb"
+    ]
+  },
+  "verification": {
+    "method": "local bytes were hashed with SHA-256 and git hash-object; each staged source artifact was compared with the GitHub tree blob at the pinned repository commit",
+    "localArtifactCount": 6,
+    "upstreamBlobMatchCount": 6,
+    "upstreamBlobMismatchCount": 0,
+    "localRecallWorkbookMatchesProvidedDownload": true,
+    "recordedRepositoryHeadMatchesPinnedCommit": true,
+    "openNeuroMirrorCommitRecorded": true
+  },
+  "workbookAudit": {
+    "recallScoring": {
+      "sheetDimensions": "25 worksheets",
+      "legendSheet": "Hoja 1",
+      "participantSheetCount": 23,
+      "participantSheetIds": [
+        "s1", "s2", "s3", "s4", "s5", "s6", "s7", "s8", "s9", "s10", "s11", "s12", "s13", "s14", "s15", "s16", "s19", "s20", "s21", "s23", "s24", "s25", "s26"
+      ],
+      "missingNumberedSheets": ["s17", "s18", "s22"],
+      "timelineRowsWithTranscript": 23181,
+      "contiguousTranscriptRuns": 1268,
+      "uniqueTranscriptCells": 1254,
+      "rowsWithNotes": 1272,
+      "timeField": {
+        "canonicalCandidate": "SecondsOfRecall",
+        "rawFieldPreserved": "SecondsInMinuteTime",
+        "secondsOfRecallStartsAtOne": ["s12", "s20", "s23", "s25", "s26"],
+        "secondsOfRecallRangeBySheet": {
+          "s1": [0, 502], "s2": [0, 497], "s3": [0, 305], "s4": [0, 1405], "s5": [0, 1715], "s6": [0, 1837], "s7": [0, 2491], "s8": [0, 1157], "s9": [0, 398], "s10": [0, 566], "s11": [0, 720], "s12": [1, 850], "s13": [0, 232], "s14": [0, 308], "s15": [0, 525], "s16": [0, 259], "s19": [0, 923], "s20": [1, 2602], "s21": [0, 582], "s23": [1, 2729], "s24": [0, 440], "s25": [1, 1187], "s26": [1, 933]
+        }
+      },
+      "columns": [
+        "SecondsInMinuteTime", "SecondsOfRecall", "RecallType", "WhichEvent", "WhichStoryline", "Detail", "False memory? (1=yes)", "Transcript", "Notes", "Recall types"
+      ],
+      "codebook": {
+        "recallType": {
+          "1": "veridical recall with sufficient specific detail",
+          "2": "gist-based or summarized recall that is temporarily imprecise but accurate",
+          "3": "inaccurate detail that is nonetheless about the episode",
+          "4": "irrelevant commentary about the episode",
+          "5": "words not related to recall",
+          "6": "recall too hard to hear"
+        },
+        "detail": {
+          "1": "bare minimum or filler",
+          "2": "beyond the bare minimum, including characters or conversation",
+          "3": "specific setting, jokes, or nearly verbatim dialogue",
+          "4": "very high specificity, continuous back-and-forth, or scene-setting"
+        },
+        "whichStoryline": {
+          "1": "Joey/Phoebe/Ursula",
+          "2": "Ross Parenting",
+          "3": "Monica/Rachel",
+          "4": "Chandler/Nina/Boss",
+          "5": "Marcel Bad Behavior",
+          "Interlude": "scorer label present in raw workbook"
+        }
+      },
+      "observedValueCounts": {
+        "recallType": {"1": 20735, "2": 1093, "3": 18, "4": 590, "5": 459, "6": 131},
+        "whichEventRawRange": [1, 56],
+        "whichStorylineRawValues": [1, 2, 3, 4, 5, "Interlude"],
+        "detailRawValues": [1, 2, 3, 4]
+      },
+      "normalizationHazards": [
+        "SecondsInMinuteTime mixes strings and Excel datetime values; use SecondsOfRecall as the candidate numeric local clock while preserving the raw field",
+        "WhichEvent and Detail contain mixed numeric and string representations",
+        "False memory? is not binary in s5 rows 128-143: the raw values are strings 2 through 17 despite the binary header",
+        "15 repeated-transcript runs change one or more labels; retain row boundaries and resolve only under an explicit scoring contract",
+        "s1transcript contains 8 transcript rows whose Scene field is empty",
+        "the analysis notebook applies a piecewise raw-event remapping for removed interludes and merged events; this mapping is not yet a framework contract"
+      ]
+    },
+    "mainStoryboard": {
+      "sheets": [
+        "FriendsNarrComb", "friendsTranscript", "CausalityRatings", "ImportanceRatings", "FriendsMoreEMs_1_15_25", "FriendsMoreEMs", "OrigFriends"
+      ],
+      "friendsNarrCombDimensions": "54 rows x 21 columns",
+      "friendsNarrCombNonemptyEventRows": 52,
+      "eventModelNumRange": [1, 52],
+      "episodeRowsByEpisode": {"1": 30, "2": 23},
+      "distinctSceneNumCount": 30,
+      "friendsTranscriptDimensions": "695 rows x 3 columns",
+      "friendsTranscriptDataRows": 694,
+      "friendsTranscriptRowsByEpisode": {"1": 341, "2": 353},
+      "causalityRatingsDimensions": "54 rows x 54 columns",
+      "importanceRatingsDimensions": "53 rows x 2 columns"
+    },
+    "srmStoryboard": {
+      "sheet": "FriendsSRMNarr",
+      "dimensions": "58 rows x 15 columns",
+      "eventRows": 57
+    },
+    "eventSegmentation": {
+      "archiveEntries": 459,
+      "payloadFilesExcludingMacMetadata": 171,
+      "participantDirectories": 57,
+      "payloadByExtension": {".csv": 57, ".log": 57, ".psydat": 56, ".tsv": 1},
+      "notebookDeclaredGroups": {"version1": 20, "version2": 25},
+      "notebookDeclaredExcludedOrUnusedDirectories": 12,
+      "rawFormatHazard": "the archive contains multiple PsychoPy-related file types and platform metadata; parsing must select a declared file contract"
+    },
+    "ratings": {
+      "archiveEntriesExcludingMacMetadata": 6,
+      "workbooks": ["ratings/r1.xlsx", "ratings/r2.xlsx", "ratings/r3.xlsx", "ratings/r4.xlsx", "ratings/r5.xlsx", "ratings/r6.xlsx"]
+    }
+  },
+  "frameworkPlacement": {
+    "rawLocalRoot": "data/friends/",
+    "committedMetadataRoot": "docs/data/friends/",
+    "admissionState": "proposed",
+    "candidateModuleTargets": [
+      {"module": "story", "purpose": "episode storyboard and typed narrative event structure after event identity is normalized"},
+      {"module": "recall", "purpose": "scored recall units with a canonical recall-time axis and preserved raw scoring fields"},
+      {"module": "features", "purpose": "causality, importance, storyline, detail, and event-segmentation tracks as declared sidecars"},
+      {"module": "align", "purpose": "recall-to-event alignment after the raw-to-canonical event mapping is independently specified"},
+      {"module": "fixtures", "purpose": "small content-free or synthetic regression fixtures; no participant prose or stimulus transcript"}
+    ],
+    "notYetImplemented": [
+      "Friends-specific loader or adapter",
+      "normalized event table and versioned raw-to-canonical event mapping",
+      "normalized recall-unit table",
+      "episode-specific golden alignment fixture",
+      "recomputed causal, importance, or segmentation results"
+    ]
+  },
+  "nonClaims": [
+    "admission-court-opened",
+    "ethical-basis-for-redistribution-of-participant-recall-prose",
+    "licence-granted-for-the-GitHub-repository-artifacts",
+    "exact-edited-video-presentation-cut-reconstructed",
+    "raw-event-IDs-are-canonical-event-IDs",
+    "recall-type-and-detail-codes-independently-validated-against-audio",
+    "event-segmentation-group-membership-beyond-the-notebook-declared-lists",
+    "causality-or-importance-ratings-are-gold-labels",
+    "fMRI-or-video-bytes-available-in-this-source-set",
+    "alignment-result",
+    "upstream-authors-have-reviewed-or-endorsed-this-use"
+  ]
+}

@@ -74,6 +74,21 @@ Every forge probe lives in `storymodel4s.consumer`, **outside** the defining tre
 control in the same file and `typeCheckErrors` rather than a bare negative `typeChecks` — which
 returns `false` on any error and has already produced two false passes in this repository.
 
+Each probe file also carries a never-called `zincAnchor` method taking the probed types as real
+parameters. `typeCheckErrors` expands to a literal list, so without a real reference Zinc records no
+dependency and the suite is not recompiled when a probed type changes — a mutation then reads as
+survived when it is killed. See `docs/design/unforgeable-types.md`, "A probe that cannot fail".
+
+**Non-claim: the guarantees are closed at the TYPE level, not at runtime.** `private[corpus]`
+compiles to public bytecode, so plain `java.lang.reflect` — without even `setAccessible` — can
+construct a `SourceCoordinate`, a `Raw` and hence a `Known` from any package, and `Raw$.of` and
+`Coded$.decode` are callable from Java. Reflection and non-Scala callers are outside the perimeter
+these types defend.
+
+**A contract the encoding slice owes this one:** `Applicability` compares a column's *normalized*
+value, and normalization is the declared encoding's canonical rendering. Until that rendering is
+pinned per encoding, `RowContext` accepts whatever the reader put in it.
+
 ### 3. `private[corpus]` admits the whole `storymodel4s.corpus.*` tree
 
 That includes `corpus-intake` and its tests. The ceiling is stated rather than implied: "constructible

@@ -48,6 +48,31 @@ for a reason unrelated to Mirrors and keep passing through a mutation that shoul
 has already happened here on two carriers. Put a positive control in the same file and scope, and
 use `typeCheckErrors` to read the real message when diagnosing.
 
+## A probe that cannot fail, and why it looks fine
+
+Measured 2026-09-17, and it invalidates mutation evidence rather than a design.
+
+`typeCheckErrors` expands to a **literal list** at compile time, so Zinc records **no dependency**
+from the probe file on the types it names in those strings. The probe suite is therefore *not
+recompiled* when a probed type's shape or visibility changes, and the old result persists.
+
+The consequence is that a mutation reads as SURVIVED when it is in fact killed. Both of these
+mutations left a probe suite green under `sbt corpusJVM/test` and red only under
+`sbt "corpusJVM/clean" "corpusJVM/test"`:
+
+- `final class X private[p]` → `final case class X private[p]`
+- the constructor widened to fully public
+
+**"Always clean before a mutation run" is a workaround. The fix is to make the probe file
+self-invalidating:** add one never-called private method taking the probed types as real parameters
+and touching a field of each. Zinc then records the dependency, and the mutant dies without a clean.
+Verified both ways on `CorpusCarrierProbeSuite` — mutant survives without the anchor, dies with it,
+no clean in either run.
+
+Any probe suite in this repository written before that date is likely to have the same hole, and a
+green mutation score over one of them is not evidence until the anchor is added or the run is
+cleaned.
+
 ## The criterion
 
 > A forgeable type's documented promise survives the forge **only if some field's type is both
