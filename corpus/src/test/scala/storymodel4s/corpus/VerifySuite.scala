@@ -1,7 +1,5 @@
 package storymodel4s.corpus
 
-import cats.data.NonEmptyVector
-
 import io.circe.Json
 import storymodel4s.core.Checksum
 

@@ -76,7 +76,7 @@ class DescriptorSuite extends FunSuite:
             1,
             Map(
               "Num" -> ColumnBinding(CellEncoding.IntegerOrWholeDecimalText),
-              "Time" -> ColumnBinding(CellEncoding.ExcelSerialDays)
+              "Time" -> ColumnBinding(CellEncoding.ExcelSerialDays(1))
             )
           )
         )
@@ -88,7 +88,7 @@ class DescriptorSuite extends FunSuite:
   test("capabilities are DERIVED from the reading, never declared") {
     val (_, p, o) = fixture
     val caps = Descriptor.capabilities(p, o).map(_.render)
-    assert(caps.contains("stimulus-clock:excel-serial-days"), caps.toString)
+    assert(caps.contains("stimulus-clock:excel-serial-days@1"), caps.toString)
     assert(caps.contains("stimulus-rows:N=2"), caps.toString)
     assert(caps.contains("ordinal:N.Num=2"), caps.toString)
   }
@@ -106,7 +106,7 @@ class DescriptorSuite extends FunSuite:
     val j = Descriptor.json(v, p, o).noSpaces
     assert(j.contains(Descriptor.Schema))
     assert(j.contains(p.identity.hex))
-    assert(j.contains("stimulus-clock:excel-serial-days"))
+    assert(j.contains("stimulus-clock:excel-serial-days@1"))
     // the workbook's only cell values are 1, 2 and two Excel serials; none may appear as content
     assert(!j.contains("1.000439814814815"), j)
   }
@@ -123,7 +123,7 @@ class DescriptorSuite extends FunSuite:
             1,
             Map(
               "Num" -> ColumnBinding(CellEncoding.IntegerText),
-              "Time" -> ColumnBinding(CellEncoding.ExcelSerialDays)
+              "Time" -> ColumnBinding(CellEncoding.ExcelSerialDays(1))
             )
           )
         )

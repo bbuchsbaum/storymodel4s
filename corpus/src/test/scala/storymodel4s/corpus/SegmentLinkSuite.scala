@@ -114,7 +114,7 @@ class SegmentLinkSuite extends FunSuite:
       .of(b, c, LinkClaim.Edit, 1, Map(1 -> to(c, 1), 2 -> Target.Removed(ev), 3 -> to(c, 2)))
       .fold(r => fail(r.message), identity)
     val composed =
-      SegmentLink.compose(ab, bc, LinkClaim.Edit, 1).fold(r => fail(r.message), identity)
+      SegmentLink.compose(ab, bc).fold(r => fail(r.message), identity)
     assertEquals(composed(1).target, Some(SegmentRef(c.id, 1)))
     assertEquals(composed(2).target, None)
     assertEquals(composed(3).target, Some(SegmentRef(c.id, 2)))
@@ -127,7 +127,7 @@ class SegmentLinkSuite extends FunSuite:
     val ab = SegmentLink.of(a, b, LinkClaim.Bijection, 1, Map(1 -> to(b, 1))).toOption.get
     val cd = SegmentLink.of(c, d, LinkClaim.Bijection, 1, Map(1 -> to(d, 1))).toOption.get
     assertEquals(
-      SegmentLink.compose(ab, cd, LinkClaim.Edit, 1),
+      SegmentLink.compose(ab, cd),
       Left(LinkRefusal.IntermediateMismatch(b.id, c.id))
     )
   }
@@ -138,7 +138,7 @@ class SegmentLinkSuite extends FunSuite:
       SegmentLink.of(a, b, LinkClaim.Bijection, 1, Map(1 -> to(b, 1), 2 -> to(b, 2))).toOption.get
     val bc =
       SegmentLink.of(b, c, LinkClaim.Bijection, 1, Map(1 -> to(c, 1), 2 -> to(c, 2))).toOption.get
-    val composedMap = SegmentLink.compose(ab, bc, LinkClaim.Bijection, 1).toOption.get
+    val composedMap = SegmentLink.compose(ab, bc).toOption.get
     val composed = SegmentLink.of(a, c, LinkClaim.Bijection, 1, composedMap).toOption.get
     val declared =
       SegmentLink.of(a, c, LinkClaim.Bijection, 1, Map(1 -> to(c, 1), 2 -> to(c, 2))).toOption.get

@@ -45,13 +45,13 @@ class CellSuite extends FunSuite:
   test("Excel serial days read as whole seconds from the sheet's own origin") {
     // measured from FriendsNarrComb: event 1 sits at Time 1.0 (0 s), event 2 at 38 s, and
     // TimeOrig for event 2 is 85 s
-    assertEquals(secs("1.0", CellEncoding.ExcelSerialDays).map(_.map(_.value)), Right(Some(0L)))
+    assertEquals(secs("1.0", CellEncoding.ExcelSerialDays(1)).map(_.map(_.value)), Right(Some(0L)))
     assertEquals(
-      secs("1.000439814814815", CellEncoding.ExcelSerialDays).map(_.map(_.value)),
+      secs("1.000439814814815", CellEncoding.ExcelSerialDays(1)).map(_.map(_.value)),
       Right(Some(38L))
     )
     assertEquals(
-      secs("1.000983796296296", CellEncoding.ExcelSerialDays).map(_.map(_.value)),
+      secs("1.000983796296296", CellEncoding.ExcelSerialDays(1)).map(_.map(_.value)),
       Right(Some(85L))
     )
   }
@@ -81,14 +81,14 @@ class CellSuite extends FunSuite:
   test("a blank cell is absence, not a refusal") {
     assertEquals(int("", CellEncoding.IntegerText), Right(None))
     assertEquals(int("   ", CellEncoding.IntegerText), Right(None))
-    assertEquals(secs("", CellEncoding.ExcelSerialDays), Right(None))
+    assertEquals(secs("", CellEncoding.ExcelSerialDays(1)), Right(None))
     assertEquals(Cell.text(at("Place"), "Place", "", Some(CellEncoding.PlainText)), Right(None))
   }
 
   test("an encoding is refused for a shape it does not describe") {
     assert(Cell.integer(at("Place"), "Place", "x", Some(CellEncoding.PlainText)).isLeft)
     assert(Cell.seconds(at("Place"), "Place", "x", Some(CellEncoding.PlainText)).isLeft)
-    assert(Cell.text(at("Time"), "Time", "1.0", Some(CellEncoding.ExcelSerialDays)).isLeft)
+    assert(Cell.text(at("Time"), "Time", "1.0", Some(CellEncoding.ExcelSerialDays(1))).isLeft)
   }
 
   test("a non-numeric literal under a numeric encoding is refused with its coordinate") {

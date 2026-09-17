@@ -23,12 +23,18 @@ enum CellEncoding:
   /** A finite decimal, read exactly. */
   case DecimalText
 
-  /** Excel 1900 serial days, converted to whole seconds from the sheet's own day origin.
+  /** Excel serial days converted to whole seconds, from a DECLARED day origin.
     *
-    * Measured need: the Friends storyboard writes `Time` and `TimeOrig` as Excel datetimes, so
-    * `1.000439814814815` is 38 seconds, not a number near one.
+    * The origin is a parameter because two corpora disagree about it, which is exactly the kind of
+    * thing a second corpus is supposed to break. Measured:
+    *   - Friends `friendsStoryBoard!FriendsNarrComb.Time` starts at 1.0, so seconds are
+    *     `(v - 1) x 86400`: 1.000983796296296 is 85 s.
+    *   - Memento `MementoStoryBoard!storyBoard.Time` starts at 0, so seconds are `v x 86400`:
+    *     1.9560185185185184E-3 is 169 s.
+    * Applying either rule to the other corpus gives nonsense (-86,231 s and 86,485 s respectively),
+    * so a single hardcoded origin is wrong for one of them whichever is chosen.
     */
-  case ExcelSerialDays
+  case ExcelSerialDays(originDay: Int)
 
   /** `minutes.seconds` written as a decimal: `6.31` means 6:31, i.e. 391 seconds.
     *
@@ -48,7 +54,7 @@ enum CellEncoding:
     case IntegerText               => "integer"
     case IntegerOrWholeDecimalText => "integer-or-whole-decimal"
     case DecimalText               => "decimal"
-    case ExcelSerialDays           => "excel-serial-days"
+    case ExcelSerialDays(origin)   => s"excel-serial-days@$origin"
     case MinuteDotSecond           => "minute-dot-second"
     case PlainText                 => "text"
     case Custom(ns, label)         => s"$ns:$label"
@@ -111,7 +117,8 @@ object Cell:
         if blank(literal) then Right(None)
         else
           enc match
-            case CellEncoding.ExcelSerialDays => excelSeconds(at, literal).map(Some(_))
+            case CellEncoding.ExcelSerialDays(origin) =>
+              excelSeconds(at, literal, origin).map(Some(_))
             case CellEncoding.MinuteDotSecond => minuteDotSecond(at, literal).map(Some(_))
             case CellEncoding.IntegerText | CellEncoding.IntegerOrWholeDecimalText =>
               integerUnder(at, literal, enc).map(Some(_))
@@ -170,13 +177,25 @@ object Cell:
           else Left(CellRefusal.NotAnInteger(at, literal))
     catch case NonFatal(_) => Left(CellRefusal.NotAnInteger(at, literal))
 
-  /** `(serial - 1) * 86400`, rounded to the nearest second: day 1 is the sheet's own origin. */
-  private def excelSeconds(at: SourceCoordinate, literal: String): Either[CellRefusal, Raw[Long]] =
+  /** `(serial - originDay) * 86400`, rounded to the nearest second. */
+  private def excelSeconds(
+      at: SourceCoordinate,
+      literal: String,
+      originDay: Int
+  ): Either[CellRefusal, Raw[Long]] =
     try
       val d = BigDecimal(literal.trim)
-      val secs = ((d - 1) * 86400).setScale(0, BigDecimal.RoundingMode.HALF_UP).toLongExact
+      val secs =
+        ((d - originDay) * 86400).setScale(0, BigDecimal.RoundingMode.HALF_UP).toLongExact
       if secs < 0 then
-        Left(CellRefusal.Malformed(at, literal, CellEncoding.ExcelSerialDays, "before the origin"))
+        Left(
+          CellRefusal.Malformed(
+            at,
+            literal,
+            CellEncoding.ExcelSerialDays(originDay),
+            s"before day $originDay"
+          )
+        )
       else Right(Raw.of(secs, at, literal))
     catch case NonFatal(_) => Left(CellRefusal.NotFinite(at, literal))
 
@@ -230,8 +249,8 @@ object Cell:
             case CellEncoding.PlainText => Right(Some(literal.trim))
             case CellEncoding.IntegerText | CellEncoding.IntegerOrWholeDecimalText =>
               integerUnder(at, literal, enc).map(r => Some(r.value.toString))
-            case CellEncoding.ExcelSerialDays =>
-              excelSeconds(at, literal).map(r => Some(r.value.toString))
+            case CellEncoding.ExcelSerialDays(origin) =>
+              excelSeconds(at, literal, origin).map(r => Some(r.value.toString))
             case CellEncoding.MinuteDotSecond =>
               minuteDotSecond(at, literal).map(r => Some(r.value.toString))
             case CellEncoding.DecimalText =>

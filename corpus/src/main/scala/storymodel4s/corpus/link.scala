@@ -129,12 +129,14 @@ object SegmentLink:
     * The composed evidence is `Composed`, so a composed link is NOT equal to a directly declared
     * one of the same shape -- their evidence differs, and it should. Compare them with
     * [[sameMappingAs]] when the question is whether the mappings agree.
+    *
+    * It returns a MAPPING, not a link, and takes no claim: the caller runs `of` and states what it
+    * claims, which is then CHECKED. Composing and claiming in one step would let a caller assert a
+    * property of a composition it never established.
     */
   private[corpus] def compose(
       ab: SegmentLink,
-      bc: SegmentLink,
-      claim: LinkClaim,
-      version: Int
+      bc: SegmentLink
   ): Either[LinkRefusal, Map[Int, Target]] =
     if ab.to != bc.from then Left(LinkRefusal.IntermediateMismatch(ab.to, bc.from))
     else

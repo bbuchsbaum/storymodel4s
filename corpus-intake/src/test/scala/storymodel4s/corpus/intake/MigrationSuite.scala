@@ -113,8 +113,8 @@ class MigrationSuite extends FunSuite:
     val b = FriendsIntake.storyboardBinding
     assertEquals(b.headerRow, 1)
     // the two time columns are Excel serials, not decimals -- the measured hazard
-    assertEquals(b.columns("Time").encoding, CellEncoding.ExcelSerialDays)
-    assertEquals(b.columns("TimeOrig").encoding, CellEncoding.ExcelSerialDays)
+    assertEquals(b.columns("Time").encoding, CellEncoding.ExcelSerialDays(1))
+    assertEquals(b.columns("TimeOrig").encoding, CellEncoding.ExcelSerialDays(1))
     assert(b.columns.values.forall(_.encoding != CellEncoding.Custom("", "")))
   }
 

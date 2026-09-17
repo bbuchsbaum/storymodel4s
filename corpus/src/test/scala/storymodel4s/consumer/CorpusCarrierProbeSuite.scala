@@ -30,6 +30,7 @@ class CorpusCarrierProbeSuite extends FunSuite:
     * and red only on `corpusJVM/clean corpusJVM/test`. "Always clean" is a workaround; this is the
     * fix.
     */
+  @annotation.nowarn("msg=unused")
   private def zincAnchor(
       c: SourceCoordinate,
       r: Raw[Int],

@@ -20,7 +20,7 @@ final class FileStore private (root: Path, names: Vector[String]) extends Artifa
   def list: Vector[ArtifactId] = names.map(ArtifactId.unsafe)
 
   def bytes(id: ArtifactId): Either[IntakeRefusal, Array[Byte]] =
-    RelativeArtifactPath.from(id.value).flatMap { rel =>
+    RelativeArtifactPath.from(id.value).flatMap { _ =>
       try
         val p = root.resolve(id.value).normalize()
         if !p.startsWith(root.normalize()) then Left(IntakeRefusal.PathEscapesRoot(id))
@@ -31,21 +31,33 @@ final class FileStore private (root: Path, names: Vector[String]) extends Artifa
     }
 
 object FileStore:
-  /** Opens a store over `root`, listing its regular files one level deep. */
+  /** Opens a store over `root`, listing every regular file BENEATH it, recursively.
+    *
+    * Recursive because a corpus's own layout says so: Memento declares `ratings/r1.xlsx` through
+    * `r7.xlsx`, one directory deep. A one-level listing reported all seven as "declared but absent
+    * from the snapshot" -- a correct refusal against a store that could not see them, which is how
+    * this was found.
+    *
+    * Paths are relativized against the root, so an id is the corpus's own relative name and matches
+    * what its manifest declares.
+    */
   def at(root: Path): Either[IntakeRefusal, FileStore] =
     try
       if !Files.exists(root) then Left(IntakeRefusal.RootUnavailable(RootIssue.Missing))
       else if !Files.isDirectory(root) then
         Left(IntakeRefusal.RootUnavailable(RootIssue.NotDirectory))
       else
-        val names = Files
-          .list(root)
-          .iterator()
-          .asScala
-          .filter(Files.isRegularFile(_))
-          .map(p => root.relativize(p).toString)
-          .toVector
-          .sorted
+        val stream = Files.walk(root)
+        val names =
+          try
+            stream
+              .iterator()
+              .asScala
+              .filter(Files.isRegularFile(_))
+              .map(p => root.relativize(p).toString)
+              .toVector
+              .sorted
+          finally stream.close()
         Right(new FileStore(root, names))
     catch
       case _: SecurityException => Left(IntakeRefusal.RootUnavailable(RootIssue.AccessDenied))

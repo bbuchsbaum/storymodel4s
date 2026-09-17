@@ -80,7 +80,7 @@ class CorpusReaderSuite extends FunSuite:
     headerRow = 1,
     columns = Map(
       "EventModelNum" -> ColumnBinding(CellEncoding.IntegerText, indexOnly = true),
-      "Time" -> ColumnBinding(CellEncoding.ExcelSerialDays),
+      "Time" -> ColumnBinding(CellEncoding.ExcelSerialDays(1)),
       "RecallType" -> ColumnBinding(CellEncoding.IntegerOrWholeDecimalText)
     )
   )

@@ -31,7 +31,7 @@ object Descriptor:
   ): Vector[Capability] =
     val clocks = profile.sheets.values
       .flatMap(_.columns.values.map(_.encoding))
-      .filter(Capability.clockEncodings.contains)
+      .filter(Capability.isClock)
       .toVector
       .distinct
       .map(Capability.StimulusClock.apply)

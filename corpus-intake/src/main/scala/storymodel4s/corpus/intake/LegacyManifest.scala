@@ -90,7 +90,14 @@ object LegacyManifest:
   private def artifact(j: io.circe.Json, i: Int): Either[MigrationRefusal, ArtifactRecord] =
     val c = j.hcursor
     for
-      path <- c.get[String]("path").left.map(_ => MigrationRefusal.BadArtifact(i, "no path"))
+      // Friends names the file `path`; Memento names the same thing `id`. Both are the file's
+      // relative name and both are used as its identity by every other record in their corpus, so
+      // either is accepted -- and neither is invented when both are absent.
+      path <- c
+        .get[String]("path")
+        .orElse(c.get[String]("id"))
+        .left
+        .map(_ => MigrationRefusal.BadArtifact(i, "no path or id"))
       len <- c
         .get[Long]("byteLength")
         .left

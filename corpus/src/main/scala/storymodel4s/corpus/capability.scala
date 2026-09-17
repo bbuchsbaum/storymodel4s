@@ -35,6 +35,9 @@ enum Capability:
     case Custom(ns, label)      => s"$ns:$label"
 
 object Capability:
-  /** The encodings that make a column a clock. */
-  val clockEncodings: Set[CellEncoding] =
-    Set(CellEncoding.ExcelSerialDays, CellEncoding.MinuteDotSecond)
+  /** Whether an encoding makes a column a clock. A predicate rather than a set, because
+    * `ExcelSerialDays` now carries a day origin and so is a family, not a value.
+    */
+  def isClock(encoding: CellEncoding): Boolean = encoding match
+    case CellEncoding.ExcelSerialDays(_) | CellEncoding.MinuteDotSecond => true
+    case _                                                              => false
