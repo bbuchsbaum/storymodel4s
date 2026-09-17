@@ -213,3 +213,36 @@ class SegmentLinkSuite extends FunSuite:
     // run-2 local 1 is global 107, by the measured run-1 coarse count of 106
     assertEquals(global.segment(107).map(_.ordinal), Some(107))
   }
+
+  test("Edit adds no check beyond the shared invariants, and that is deliberate") {
+    val a = seg("a", 2)
+    val b = seg("b", 2)
+    // it still enforces the SHARED invariants -- totality, foreign ordinals, targets in range
+    assert(SegmentLink.of(a, b, LinkClaim.Edit, 1, Map(1 -> to(b, 1))).isLeft)
+    assert(
+      SegmentLink
+        .of(a, b, LinkClaim.Edit, 1, Map(1 -> to(b, 1), 2 -> to(b, 1), 9 -> to(b, 2)))
+        .isLeft
+    )
+    assert(SegmentLink.of(a, b, LinkClaim.Edit, 1, Map(1 -> to(b, 7), 2 -> to(b, 1))).isLeft)
+    // what it declines to claim is injectivity and ontoness, which is why it exists
+    assert(SegmentLink.of(a, b, LinkClaim.Edit, 1, Map(1 -> to(b, 1), 2 -> to(b, 1))).isRight)
+    // and an Edit that drops nothing is still an Edit -- the edit removed nothing this time
+    assert(SegmentLink.of(a, b, LinkClaim.Edit, 1, Map(1 -> to(b, 1), 2 -> to(b, 2))).isRight)
+  }
+
+  test("a Coarsening whose target has an unreached segment is refused") {
+    val fine = seg("fine", 3, GranularityLevel.Fine)
+    val coarse = seg("coarse", 3, GranularityLevel.Scene)
+    // all three sources pile onto target 1, leaving targets 2 and 3 unreached
+    assertEquals(
+      SegmentLink.of(
+        fine,
+        coarse,
+        LinkClaim.Coarsening,
+        1,
+        Map(1 -> to(coarse, 1), 2 -> to(coarse, 1), 3 -> to(coarse, 1))
+      ),
+      Left(LinkRefusal.NotOnto)
+    )
+  }

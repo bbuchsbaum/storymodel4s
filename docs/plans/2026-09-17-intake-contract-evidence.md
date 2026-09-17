@@ -67,6 +67,7 @@ lies" below.
 | P3link | a bijection may drop sources | 2 tests fail |
 | P3link | totality unchecked | `NotTotal` test fails |
 | P3link | composition ignores the intermediate | mismatch test fails |
+| P3link | Coarsening stops checking ontoness | unreached-target test fails |
 | P3seg | onsets need not increase | invariant test fails |
 | P3seg | onsets must STRICTLY increase | invariant test fails (would refuse Sherlock) |
 | P5clk | JSON `uncoveredTailTicks` 500 → 501 | derivation test fails |
@@ -79,7 +80,7 @@ lies" below.
 | P6desc | change a declared offset | consumer reads the change |
 | P6gold | descriptor declares TR 2.0 | reaches the rule |
 
-**43 mutants, 43 killed** (34 above plus the four JSON values whose gaps this hunt found and
+**44 mutants, 44 killed** (34 above plus the four JSON values whose gaps this hunt found and
 closed). Two mutants are recorded as *surviving and benign* by the P2b reviewer
 (`filter(present.contains)` removal, which only double-reports; and `verify`'s schema check, dead
 once `of` owns it) — both are noted rather than replaced.

@@ -39,7 +39,14 @@ enum LinkClaim:
   /** Many sources to one target, every target reached, nothing dropped. */
   case Coarsening
 
-  /** Sources may be dropped; everything that survives maps. */
+  /** Sources may be dropped; everything that survives maps.
+    *
+    * The weakest claim, and the only one Friends' 56->52 map can make: it is neither injective onto
+    * its target nor onto in the other direction once four sources are removed. Edit adds no check
+    * beyond the shared invariants, so anything that is a Bijection or a Coarsening is also a valid
+    * Edit -- a claim is a statement about what the caller is prepared to assert, and asserting less
+    * is always available.
+    */
   case Edit
 
   def render: String = productPrefix.toLowerCase
@@ -119,6 +126,15 @@ object SegmentLink:
           else if reached.distinct.sizeIs != to.size then Left(LinkRefusal.NotOnto)
           else Right(new SegmentLink(from.id, to.id, claim, version, mapping))
         case LinkClaim.Edit =>
+          // Edit adds NO check beyond the shared ones above, and that is deliberate rather than an
+          // omission. The shared checks already enforce everything an edit must satisfy: total over
+          // the source, no foreign ordinals, every target in the target segmentation, and evidence
+          // on every Target by type. What Edit declines to claim is injectivity and ontoness --
+          // which is the whole point of having it, because Friends' 56->52 map satisfies neither.
+          //
+          // An Edit that happens to drop nothing is still a legitimate Edit: the edit removed
+          // nothing this time. Requiring at least one drop would refuse a correct map for being
+          // insufficiently lossy.
           Right(new SegmentLink(from.id, to.id, claim, version, mapping))
 
   /** Function composition on `Option[SegmentRef]`.
