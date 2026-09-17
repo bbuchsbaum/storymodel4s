@@ -198,9 +198,15 @@ Three questions are deferred **to the slice that will have evidence**, not answe
 - **A Python-only interchange with no Scala types.** It cannot make either guarantee a
   precondition.
 - **Deriving capabilities and admitting on the manifest's own assertion.** That is identity asserted
-  by the caller. `Capability` is derived from the opened corpus and the declared set is a claim that
-  `open` checks. `CorpusRegistry`, `Requirement` and `CapabilityShape` are deferred until a second
-  experiment arm declares a requirement; `satisfying` has no caller today.
+  by the caller. Nor does the manifest carry a declared set to check: the manifest is thin, and
+  adding `capabilities` back to it would contradict that. **Capabilities are derived from the opened
+  corpus and emitted in the DESCRIPTOR**, which is the thing that consumes them — a derived set with
+  no consumer would be the same defect as a manifest no code reads.
+  Only capabilities a *reading* can establish are included. Semantic ones — is this column a thread
+  label, is this gold — cannot be derived from a reading and need a declaration this layer does not
+  have; they are absent rather than guessed, and a test asserts none is invented.
+  `CorpusRegistry`, `Requirement` and `CapabilityShape` stay deferred until a second experiment arm
+  declares a requirement; `satisfying` has no caller today.
 
 ## Non-claims
 
