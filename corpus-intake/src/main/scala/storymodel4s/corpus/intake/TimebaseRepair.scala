@@ -115,6 +115,19 @@ object TimebaseRepair:
   /** Builds a REAL `ClockRepair` per run, giving `core`'s mapping vocabulary its first production
     * caller. The repair is the identity on seconds scaled to ticks, which is exactly what the
     * record's own `formula` says: `playbackTicks = rawAnnotationSeconds * ticksPerSecond`.
+    *
+    * **Offset is zero for BOTH runs, and that is correct even though run-2 times are run-local.**
+    * The record declares `annotationStartSeconds: 0` and `playbackStartTicks: 0` for each run,
+    * because each run maps to its OWN part's playback axis, which also starts at zero. An offset
+    * would be needed only to map both runs onto one continuous timeline -- which is exactly the
+    * repaired notebook clock the record refuses, and refuses for media in `whyNotRepaired`.
+    *
+    * **The source axis is per-run, and that is not decoration.** The record declares one coordinate
+    * system, `annotation-run-local-seconds`, containing two runs -- but run-1 second 100 and run-2
+    * second 100 are DIFFERENT MOMENTS. They are two coordinate spaces sharing a name. Giving them
+    * one axis id would let a single source axis map to two different target axes, and
+    * `projectRunLocalSeconds` could not tell which repair applies to a given second. The suffix
+    * makes the spaces distinct, which is what lets the axis check in `ClockRepair` mean anything.
     */
   def clockRepairs(
       record: Record,

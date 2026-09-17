@@ -143,3 +143,45 @@ class TimebaseRepairSuite extends FunSuite:
       assertEquals(r.playbackStartTicks, 0L, s"${r.runId} does not start at the origin")
     }
   }
+
+  test("offset is zero for both runs, because each maps to its own part's origin") {
+    // the record declares annotationStartSeconds 0 and playbackStartTicks 0 for each run: an
+    // offset would only be needed to map both onto ONE continuous timeline, which is the repaired
+    // notebook clock this record explicitly refuses for media
+    record.runs.foreach { r =>
+      assertEquals(r.playbackStartTicks, 0L, s"${r.runId}")
+    }
+    val repairs = TimebaseRepair
+      .clockRepairs(record, MediaManifest.nn2017.partA.ticksPerSecond)
+      .fold(e => fail(e.message), identity)
+    // a zero offset means second 0 of a run is tick 0 of its part
+    val zero = ExactRational.of(0L, 1L).toOption.get
+    repairs.foreach { rep =>
+      val projected = ClockRepair
+        .projectRunLocalSeconds(zero, rep.relation.sourceAxis, rep.relation.targetAxis, rep)
+        .fold(e => fail(e.message), identity)
+      assertEquals(projected, zero)
+    }
+  }
+
+  test("the two runs get DISTINCT source axes, because run-local seconds are two spaces") {
+    // run-1 second 100 and run-2 second 100 are different moments. One shared source axis would let
+    // it map to two targets, and the axis check in ClockRepair would stop meaning anything.
+    val repairs = TimebaseRepair
+      .clockRepairs(record, MediaManifest.nn2017.partA.ticksPerSecond)
+      .fold(e => fail(e.message), identity)
+    assertNotEquals(repairs(0).relation.sourceAxis, repairs(1).relation.sourceAxis)
+    assertNotEquals(repairs(0).relation.targetAxis, repairs(1).relation.targetAxis)
+    // and crossing them is refused, which is only possible BECAUSE they are distinct
+    val s = ExactRational.of(100L, 1L).toOption.get
+    assert(
+      ClockRepair
+        .projectRunLocalSeconds(
+          s,
+          repairs(1).relation.sourceAxis,
+          repairs(0).relation.targetAxis,
+          repairs(0)
+        )
+        .isLeft
+    )
+  }
