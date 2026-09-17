@@ -1,6 +1,6 @@
 # The annotation intake contract: evidence record
 
-*2026-09-17. Branch `solo/intake-contract`, 27 commits from `main` at `0df1d9e7`.
+*2026-09-17. Branch `solo/intake-contract`, 39 commits from `main` at `0df1d9e7`.
 Implements ADR 0018 and the epic `bd-01M2R747J0SCHRFH9BF70TWT4S`.*
 
 Everything below is **LocallyObserved** (AGENTS.md §4): one author, one machine, no second party.
@@ -22,7 +22,7 @@ providerParser/test; recallJVM/test; storyJVM/test; viewJVM/test"
 |---|---|
 | Gate exit | **0** |
 | Modules reporting totals | **24 of 24** |
-| Tests | **2,421** |
+| Tests | **2,443** |
 | Failed | **0** |
 | Skipped | 5 |
 | `scalafmtCheckAll scalafmtSbtCheck` | exit **0**, 0 files unformatted |
