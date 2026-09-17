@@ -44,7 +44,19 @@ enum SegmentationAuthority:
     case ParticipantConsensus(n) => s"participants:$n"
     case Derived(from)           => s"derived:${from.value}"
 
-/** One segment: its 1-based position, its onset on the segmentation's axis, and its label. */
+/** One segment: its 1-based position, its onset on the segmentation's axis, and its label.
+  *
+  * Two consecutive segments MAY share an onset. Measured on the admitted Sherlock annotation (1,000
+  * rows): row 3 is zero-duration -- `rawStartSeconds == rawEndSeconds == 20` -- and row 4 also
+  * starts at 20, so the two share an onset. `SherlockAnnotations` documents this as lawful at
+  * :76-77 ("A zero-duration row is lawful here and becomes a media instant"). An earlier version of
+  * this type required STRICTLY increasing onsets and would therefore have refused the corpus this
+  * repository has already admitted. Order comes from the ordinal; the onset is an observation.
+  *
+  * What is still refused is a DECREASE. The same table has one at row 483, where run 2 restarts at
+  * 0 -- and that is the signal that the annotation is two segmentations, one per media part, not
+  * one. Exactly the boundary Film Festival's part-local numbering showed from the other side.
+  */
 final case class Segment(ordinal: Int, onsetTicks: Long, label: String)
 
 /** A named, ordered, timed partition of one stimulus at one granularity.
@@ -88,16 +100,16 @@ object Segmentation:
     if segments.isEmpty then Left(SegmentationRefusal.Empty(id))
     else if segments.map(_.ordinal) != (1 to segments.size).toVector then
       Left(SegmentationRefusal.OrdinalsNotDense(id))
-    else if segments.sliding(2).exists(w => w.sizeIs == 2 && w(1).onsetTicks <= w(0).onsetTicks)
-    then Left(SegmentationRefusal.OnsetsNotIncreasing(id))
+    else if segments.sliding(2).exists(w => w.sizeIs == 2 && w(1).onsetTicks < w(0).onsetTicks)
+    then Left(SegmentationRefusal.OnsetsDecrease(id))
     else Right(new Segmentation(id, work, level, authority, axis, segments))
 
 enum SegmentationRefusal:
   case Empty(id: SegmentationId)
   case OrdinalsNotDense(id: SegmentationId)
-  case OnsetsNotIncreasing(id: SegmentationId)
+  case OnsetsDecrease(id: SegmentationId)
 
   def message: String = this match
-    case Empty(id)               => s"${id.value} has no segments"
-    case OrdinalsNotDense(id)    => s"${id.value} ordinals are not 1..n in order"
-    case OnsetsNotIncreasing(id) => s"${id.value} onsets do not strictly increase"
+    case Empty(id)            => s"${id.value} has no segments"
+    case OrdinalsNotDense(id) => s"${id.value} ordinals are not 1..n in order"
+    case OnsetsDecrease(id)   => s"${id.value} onsets decrease"

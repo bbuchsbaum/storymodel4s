@@ -30,7 +30,13 @@ class SegmentLinkSuite extends FunSuite:
       Segmentation.of(id, work, GranularityLevel.Event, auth, axis, segs)
     assert(build(Vector.empty).isLeft)
     assert(build(Vector(Segment(1, 0, "a"), Segment(3, 10, "b"))).isLeft)
-    assert(build(Vector(Segment(1, 10, "a"), Segment(2, 10, "b"))).isLeft)
+    // two segments MAY share an onset: measured on the admitted Sherlock annotation, row 3 is
+    // zero-duration (start == end == 20) and row 4 also starts at 20. Requiring strict increase
+    // refused a corpus this repository has already admitted.
+    assert(build(Vector(Segment(1, 10, "a"), Segment(2, 10, "b"))).isRight)
+    // a DECREASE is still refused -- the same table has one where run 2 restarts at 0, which is
+    // the signal that the annotation is two segmentations, one per media part
+    assert(build(Vector(Segment(1, 10, "a"), Segment(2, 5, "b"))).isLeft)
     assert(build(Vector(Segment(1, 0, "a"), Segment(2, 10, "b"))).isRight)
   }
 

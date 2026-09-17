@@ -65,6 +65,7 @@ lies" below.
 | P3link | totality unchecked | `NotTotal` test fails |
 | P3link | composition ignores the intermediate | mismatch test fails |
 | P3seg | onsets need not increase | invariant test fails |
+| P3seg | onsets must STRICTLY increase | invariant test fails (would refuse Sherlock) |
 | P5clk | JSON `uncoveredTailTicks` 500 → 501 | derivation test fails |
 | P5clk | JSON `annotationRows` `1-482` → `1-481` | 2 tests fail |
 | P5clk | JSON `partId` (by path) | part-mapping test fails |
@@ -74,7 +75,7 @@ lies" below.
 | P6desc | change a declared offset | consumer reads the change |
 | P6gold | descriptor declares TR 2.0 | reaches the rule |
 
-**38 mutants, 38 killed** (34 above plus the four JSON values whose gaps this hunt found and
+**39 mutants, 39 killed** (34 above plus the four JSON values whose gaps this hunt found and
 closed). Two mutants are recorded as *surviving and benign* by the P2b reviewer
 (`filter(present.contains)` removal, which only double-reports; and `verify`'s schema check, dead
 once `of` owns it) — both are noted rather than replaced.
@@ -102,6 +103,24 @@ after (red) by mutating the crosswalk **by JSON path**.
 `coordinateSystems[]`, not `annotationToPlaybackCrosswalk.runs[]` — mutating something no test
 reads and calling the silence a gap. **A mutation targeted by text rather than by structure can
 report a gap that does not exist, as easily as it can miss one that does.**
+
+## A type that would have refused an already-admitted corpus
+
+`Segmentation` required STRICTLY increasing onsets. Measured against the admitted 1,000-row
+Sherlock annotation, that rule refuses it: row 3 is zero-duration (`rawStartSeconds ==
+rawEndSeconds == 20`) and row 4 also starts at 20, so two consecutive segments share an onset.
+`SherlockAnnotations` documents this as lawful at :76-77 — *"A zero-duration row is lawful here and
+becomes a media instant"* — so the new type contradicted a documented property of a corpus this
+repository has already admitted.
+
+Corrected to **non-decreasing**. Order comes from the ordinal; the onset is an observation. A
+DECREASE is still refused, and the same table has exactly one — at row 483, where run 2 restarts at
+0. That refusal is informative rather than obstructive: it is the signal that the Sherlock
+annotation is **two** segmentations, one per media part, not one. The same boundary Film Festival's
+part-local numbering showed from the other side.
+
+Found by running an attack I had briefed a reviewer to run, after the reviewer went quiet. Mutant:
+restore strict increase → the segmentation-invariant test fails.
 
 ## How a mutation run lies, three ways, measured here
 
