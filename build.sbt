@@ -319,6 +319,7 @@ lazy val embedBench = project
     run / connectInput := true
   )
   .dependsOn(
+    corpusIntake,
     embedCore.jvm,
     embedOnnx,
     embedGrakern,

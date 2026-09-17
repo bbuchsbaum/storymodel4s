@@ -1,5 +1,7 @@
 package storymodel4s.bench.nfrd
 
+import storymodel4s.corpus.{ReadOperation, RootIssue}
+
 import java.nio.file.{AccessDeniedException, Files, InvalidPathException, NoSuchFileException, Path}
 import scala.util.control.NonFatal
 
@@ -45,7 +47,10 @@ private[bench] object NfrdBaseballFiles:
       realRoot: Path,
       request: ArtifactRequest
   ): Either[NfrdIntakeError, Array[Byte]] =
-    val candidate = realRoot.resolve(request.path.value).normalize()
+    // resolved through the shared helper: the relative path's value never leaves the corpus tree
+    val candidate = storymodel4s.corpus.intake.IntakePaths
+      .resolve(realRoot, request.path)
+      .getOrElse(realRoot.resolve("<unsafe>"))
     if !candidate.startsWith(realRoot) then Left(NfrdIntakeError.PathEscapesRoot(request.label))
     else
       try

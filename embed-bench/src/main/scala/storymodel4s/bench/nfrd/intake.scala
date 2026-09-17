@@ -5,6 +5,7 @@ import java.nio.charset.{CharacterCodingException, CodingErrorAction, StandardCh
 
 import storymodel4s.bench.Origin
 import storymodel4s.core.{Checksum, ContentAddress, StoryId, StorySource, TextNorm}
+import storymodel4s.corpus.{ReadOperation, RelativeArtifactPath, RootIssue}
 
 /** Whether a released field is observed, derived, or unresolved at corpus intake. */
 private[bench] enum IntakeClass:
@@ -93,33 +94,6 @@ private[bench] final class ParticipantKey private[nfrd] (val checksum: Checksum)
   override def hashCode(): Int = checksum.hashCode()
   override def toString: String = render
 
-/** A checked relative path whose string representation never discloses its filename. */
-private[bench] final class RelativeArtifactPath private[nfrd] (private[nfrd] val value: String):
-  override def equals(other: Any): Boolean = other match
-    case that: RelativeArtifactPath => value == that.value
-    case _                          => false
-
-  override def hashCode(): Int = value.hashCode()
-  override def toString: String = "<external-artifact>"
-
-private[nfrd] object RelativeArtifactPath:
-  def from(raw: String, label: String): Either[NfrdIntakeError, RelativeArtifactPath] =
-    val segments = raw.split("/", -1).toVector
-    val windowsRoot = raw.length >= 2 && raw.charAt(1) == ':'
-    val invalid =
-      raw.isEmpty || raw.startsWith("/") || windowsRoot || raw.contains('\\') ||
-        raw.exists(c => c == 0.toChar || c == '\n' || c == '\r' || c == '\t') ||
-        segments.exists(s => s.isEmpty || s == "." || s == "..")
-    if invalid then Left(NfrdIntakeError.UnsafeRelativePath(label))
-    else Right(new RelativeArtifactPath(raw))
-
-  def child(
-      directory: RelativeArtifactPath,
-      filename: String,
-      label: String
-  ): Either[NfrdIntakeError, RelativeArtifactPath] =
-    from(s"${directory.value}/$filename", label)
-
 /** A non-disclosing label for one external read. */
 private[bench] enum ArtifactLabel:
   case TranscriptManifest
@@ -138,23 +112,6 @@ private[bench] enum ArtifactLabel:
     case StimulusAudio        => "stimulus-audio"
     case RecallTranscript(id) => s"recall-transcript:${id.checksum.short()}"
     case RecallTextGrid(id)   => s"recall-textgrid:${id.checksum.short()}"
-
-/** Closed reasons the external snapshot root itself cannot be admitted. */
-private[bench] enum RootIssue:
-  case Missing, NotDirectory, AccessDenied, InvalidPath, ResolutionFailed
-
-  def render: String = this match
-    case Missing          => "missing"
-    case NotDirectory     => "not-directory"
-    case AccessDenied     => "access-denied"
-    case InvalidPath      => "invalid-path"
-    case ResolutionFailed => "resolution-failed"
-
-/** Closed filesystem operations that can fail after an artifact has been identified safely. */
-private[bench] enum ReadOperation:
-  case Access, Read
-
-  def render: String = productPrefix.toLowerCase
 
 /** The only value a reader receives: a safe label plus a checked relative path. */
 private[bench] final class ArtifactRequest private[nfrd] (
@@ -300,13 +257,29 @@ private[bench] final class NfrdBaseballSpec private[nfrd] (
     val split: SplitSpec
 )
 
+/** Bridges the shared path validator to NFRD's labelled refusal.
+  *
+  * The shared `RelativeArtifactPath.from` carries no label, because a label is a per-corpus notion
+  * -- NFRD's is participant-shaped (`RecallTranscript(key)`), and a generic primitive must not know
+  * that. The label is reattached here, where it means something.
+  */
+private[nfrd] def childPath(
+    directory: RelativeArtifactPath,
+    filename: String,
+    label: String
+): Either[NfrdIntakeError, RelativeArtifactPath] =
+  RelativeArtifactPath
+    .child(directory, filename)
+    .left
+    .map(_ => NfrdIntakeError.UnsafeRelativePath(label))
+
 private[nfrd] object NfrdBaseballSpec:
   private def checksum(raw: String): Checksum = Checksum.unsafe(raw)
 
   private def path(raw: String, label: String): RelativeArtifactPath =
     RelativeArtifactPath
-      .from(raw, label)
-      .fold(error => throw new AssertionError(error.message), identity)
+      .from(raw)
+      .fold(_ => throw new AssertionError(s"unsafe relative path for $label"), identity)
 
   private def lineage(
       field: BaseballField,
@@ -776,12 +749,12 @@ private[bench] object NfrdBaseballVerifier:
           transcript = byTranscript(token)
           textGrid = byTextGrid(token)
           key = participantKey(token, transcriptManifestChecksum, split.participantDomain)
-          transcriptPath <- RelativeArtifactPath.child(
+          transcriptPath <- childPath(
             transcripts.spec.directory,
             transcript.filename,
             "recall-transcript"
           )
-          textGridPath <- RelativeArtifactPath.child(
+          textGridPath <- childPath(
             textGrids.spec.directory,
             textGrid.filename,
             "recall-textgrid"

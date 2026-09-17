@@ -15,6 +15,20 @@ import storymodel4s.core.Checksum
   * into logs.
   */
 final class RelativeArtifactPath private[corpus] (private[corpus] val value: String):
+  /** The path, deliberately named so that writing it somewhere is a visible choice.
+    *
+    * The property this type defends is ACCIDENTAL disclosure -- a path reaching a log, a receipt or
+    * a refusal because someone interpolated a value. `toString` is `<external-artifact>` for
+    * exactly that reason. It was never "no caller may ever obtain the path": a caller has to
+    * resolve it against a root to read the file, and the NFRD original it was extracted from
+    * exposed `private[nfrd] val value` for that purpose. Making it `private[corpus]` was stricter
+    * than the original and broke the reuse the extraction existed for.
+    *
+    * Use `IntakePaths.resolve` where a filesystem path is wanted; this is for callers that need the
+    * relative form itself, and every such use should be obvious in review.
+    */
+  def disclose: String = value
+
   override def equals(other: Any): Boolean = other match
     case that: RelativeArtifactPath => value == that.value
     case _                          => false
@@ -26,7 +40,12 @@ object RelativeArtifactPath:
     * differently from the string it was given: absolute paths, Windows drive roots, backslashes,
     * NUL and line breaks, and empty, `.` or `..` segments.
     */
-  private[corpus] def from(raw: String): Either[IntakeRefusal, RelativeArtifactPath] =
+  /** Public: this is a VALIDATOR, not a claim. It refuses unsafe input and is the only door to the
+    * type, so widening it widens nothing -- the class itself stays a final non-case class with a
+    * private constructor. The line this ADR holds is that validators are public and CLAIMS
+    * (`Verified`, `Raw`, `Coded`'s statuses, `SourceManifest`, `CorpusProfile`) are not.
+    */
+  def from(raw: String): Either[IntakeRefusal, RelativeArtifactPath] =
     val segments = raw.split("/", -1).toVector
     val windowsRoot = raw.length >= 2 && raw.charAt(1) == ':'
     val invalid =
@@ -35,7 +54,7 @@ object RelativeArtifactPath:
         segments.exists(s => s.isEmpty || s == "." || s == "..")
     if invalid then Left(IntakeRefusal.UnsafeRelativePath) else Right(new RelativeArtifactPath(raw))
 
-  private[corpus] def child(
+  def child(
       directory: RelativeArtifactPath,
       filename: String
   ): Either[IntakeRefusal, RelativeArtifactPath] =

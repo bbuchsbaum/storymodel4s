@@ -1,5 +1,7 @@
 package storymodel4s.bench.nfrd
 
+import storymodel4s.corpus.{ReadOperation, RelativeArtifactPath, RootIssue}
+
 import java.nio.charset.StandardCharsets
 import java.nio.file.{Files, LinkOption, Path}
 import scala.jdk.CollectionConverters.*
@@ -24,7 +26,7 @@ class NfrdBaseballSuite extends FunSuite:
   private def bytes(value: String): Array[Byte] = value.getBytes(Utf8)
 
   private def path(value: String, label: String): RelativeArtifactPath =
-    RelativeArtifactPath.from(value, label).fold(error => fail(error.message), identity)
+    RelativeArtifactPath.from(value).fold(_ => fail(s"unsafe path for $label"), identity)
 
   private def manifest(
       order: Vector[String],
@@ -156,17 +158,17 @@ class NfrdBaseballSuite extends FunSuite:
       split
     )
     val fixedFiles = Map(
-      transcriptManifestPath.value -> transcriptManifestBytes,
-      textGridManifestPath.value -> textGridManifestBytes,
-      stimulusTranscript.path.value -> sourceBytes,
-      stimulusTextGrid.path.value -> stimulusTextGridBytes,
-      stimulusAudio.path.value -> stimulusAudioBytes
+      transcriptManifestPath.disclose -> transcriptManifestBytes,
+      textGridManifestPath.disclose -> textGridManifestBytes,
+      stimulusTranscript.path.disclose -> sourceBytes,
+      stimulusTextGrid.path.disclose -> stimulusTextGridBytes,
+      stimulusAudio.path.disclose -> stimulusAudioBytes
     )
     val transcriptFiles = transcriptOrder.distinct.map { token =>
-      s"${transcriptDirectory.value}/${token}_baseball.txt" -> transcriptContents(token)
+      s"${transcriptDirectory.disclose}/${token}_baseball.txt" -> transcriptContents(token)
     }.toMap
     val textGridFiles = textGridOrder.distinct.map { token =>
-      s"${textGridDirectory.value}/${token}_baseball.TextGrid" -> textGridContents(token)
+      s"${textGridDirectory.disclose}/${token}_baseball.TextGrid" -> textGridContents(token)
     }.toMap
     Fixture(spec, fixedFiles ++ transcriptFiles ++ textGridFiles)
 
@@ -202,7 +204,7 @@ class NfrdBaseballSuite extends FunSuite:
       fixture.spec,
       request =>
         fixture.files
-          .get(request.path.value)
+          .get(request.path.disclose)
           .map(_.clone())
           .toRight(NfrdIntakeError.MissingArtifact(request.label))
     )
@@ -234,7 +236,7 @@ class NfrdBaseballSuite extends FunSuite:
       original.spec.expectedLineageChecksum,
       original.spec.split
     )
-    Fixture(spec, original.files.updated(old.path.value, replacement))
+    Fixture(spec, original.files.updated(old.path.disclose, replacement))
 
   private def withTextGridManifest(
       original: Fixture,
@@ -264,7 +266,7 @@ class NfrdBaseballSuite extends FunSuite:
       original.spec.expectedLineageChecksum,
       original.spec.split
     )
-    Fixture(spec, original.files.updated(old.path.value, replacement))
+    Fixture(spec, original.files.updated(old.path.disclose, replacement))
 
   private def rewriteManifestLine(
       manifestBytes: Array[Byte],
@@ -358,7 +360,7 @@ class NfrdBaseballSuite extends FunSuite:
       original.spec.expectedLineageChecksum,
       original.spec.split
     )
-    val second = accepted(Fixture(spec, original.files.updated(old.path.value, replacement)))
+    val second = accepted(Fixture(spec, original.files.updated(old.path.disclose, replacement)))
     assertEquals(second.receipt.stimulusAudioChecksum, Checksum.ofBytes(replacement))
     assertNotEquals(first.receipt.contentChecksum, second.receipt.contentChecksum)
   }
@@ -381,7 +383,7 @@ class NfrdBaseballSuite extends FunSuite:
 
   test("a false declared size fails even when the artifact checksum matches") {
     val original = fixture()
-    val manifestPath = original.spec.textGridManifest.path.value
+    val manifestPath = original.spec.textGridManifest.path.disclose
     val changed = rewriteManifestLine(
       original.files(manifestPath),
       "P002_baseball.TextGrid"
@@ -410,7 +412,7 @@ class NfrdBaseballSuite extends FunSuite:
 
   test("manifest aggregate identity and strict UTF-8 are separate courts") {
     val original = fixture()
-    val manifestPath = original.spec.transcriptManifest.path.value
+    val manifestPath = original.spec.transcriptManifest.path.disclose
     val changed = original.files(manifestPath).clone()
     changed(0) = (changed(0) ^ 1).toByte
     refusal(original.copy(files = original.files.updated(manifestPath, changed))) match
@@ -425,7 +427,7 @@ class NfrdBaseballSuite extends FunSuite:
 
   test("an empty participant artifact is refused even when its checksum is declared") {
     val original = fixture()
-    val manifestPath = original.spec.transcriptManifest.path.value
+    val manifestPath = original.spec.transcriptManifest.path.disclose
     val changed = rewriteManifestLine(
       original.files(manifestPath),
       "P001_baseball.txt"
@@ -461,7 +463,7 @@ class NfrdBaseballSuite extends FunSuite:
       original.spec.split
     )
     assertEquals(
-      refusal(Fixture(spec, original.files.updated(old.path.value, replacement))),
+      refusal(Fixture(spec, original.files.updated(old.path.disclose, replacement))),
       NfrdIntakeError.SourceEncoding
     )
   }
@@ -484,7 +486,7 @@ class NfrdBaseballSuite extends FunSuite:
       original.spec.expectedLineageChecksum,
       original.spec.split
     )
-    refusal(Fixture(spec, original.files.updated(old.path.value, replacement))) match
+    refusal(Fixture(spec, original.files.updated(old.path.disclose, replacement))) match
       case NfrdIntakeError.SourceLexicalChecksum(_, _) => ()
       case other => fail(s"expected lexical refusal, got ${other.message}")
   }
@@ -585,7 +587,7 @@ class NfrdBaseballSuite extends FunSuite:
   test("relative paths refuse traversal, platform roots, and ambiguous segments") {
     Vector("../x", "/x", "a//b", "a/./b", "C:/x", "a\\b").foreach { raw =>
       assert(
-        RelativeArtifactPath.from(raw, "probe").isLeft,
+        RelativeArtifactPath.from(raw).isLeft,
         s"unsafe path unexpectedly admitted: $raw"
       )
     }
