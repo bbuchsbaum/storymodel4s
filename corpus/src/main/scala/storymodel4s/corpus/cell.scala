@@ -206,3 +206,36 @@ object Cell:
           )
         else Right(Raw.of(minutes * 60 + secs, at, literal))
     catch case NonFatal(_) => Left(CellRefusal.NotFinite(at, literal))
+
+  /** The canonical rendering of a cell under its declared encoding, or `None` when blank.
+    *
+    * This is the contract `Applicability` depends on (ADR 0018 §2): a condition compares a column's
+    * NORMALIZED value, so two literals that mean one code must render identically. Measured need:
+    * Friends `WhichEvent` carries 60 string cells among 20,677 numeric ones and `Detail` carries 8,
+    * so `'35'` and `35.0` must both render `35` or a condition would hold on some rows and not
+    * others for no reason in the data.
+    */
+  private[corpus] def normalize(
+      at: SourceCoordinate,
+      column: String,
+      literal: String,
+      declared: Option[CellEncoding]
+  ): Either[CellRefusal, Option[String]] =
+    declared match
+      case None      => Left(CellRefusal.NoDeclaredEncoding(at, column))
+      case Some(enc) =>
+        if blank(literal) then Right(None)
+        else
+          enc match
+            case CellEncoding.PlainText => Right(Some(literal.trim))
+            case CellEncoding.IntegerText | CellEncoding.IntegerOrWholeDecimalText =>
+              integerUnder(at, literal, enc).map(r => Some(r.value.toString))
+            case CellEncoding.ExcelSerialDays =>
+              excelSeconds(at, literal).map(r => Some(r.value.toString))
+            case CellEncoding.MinuteDotSecond =>
+              minuteDotSecond(at, literal).map(r => Some(r.value.toString))
+            case CellEncoding.DecimalText =>
+              try Right(Some(BigDecimal(literal.trim).underlying.stripTrailingZeros.toPlainString))
+              catch case NonFatal(_) => Left(CellRefusal.NotFinite(at, literal))
+            case c @ CellEncoding.Custom(_, _) =>
+              Left(CellRefusal.Malformed(at, literal, c, "custom encodings declare no rendering"))
