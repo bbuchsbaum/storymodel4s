@@ -22,12 +22,28 @@ object CorpusReader:
     def literal(column: String): Option[String] = cells.get(column).map(_.value)
     override def toString: String = s"OpenRow($number, ${cells.size} cells)"
 
+  /** A sheet's rows, and the cell refusals gathered while reading them.
+    *
+    * Cell refusals ACCUMULATE; they do not abort the sheet. ADR 0018 §8: "accumulate cell-level
+    * refusals per sheet under a declared cap; fail fast on structural refusals... A 27,777-row
+    * workbook must not surrender one bad cell per run." An earlier version of this reader aborted
+    * the whole read on the first bad cell, which is precisely the behaviour that rule was written
+    * against -- on Friends you would learn about exactly one problem per run, across 23 sheets.
+    *
+    * A row with a refused cell is still returned, built from the cells that DID read. The refusal
+    * says which cell failed and where; discarding the row would hide the rest of it.
+    */
   final class OpenSheet private[intake] (
       val artifact: ArtifactId,
       val sheet: String,
-      val rows: Vector[OpenRow]
+      val rows: Vector[OpenRow],
+      val refusals: Vector[CellRefusal],
+      val refusalsTruncated: Boolean
   ):
-    override def toString: String = s"OpenSheet(${artifact.value}!$sheet, ${rows.size} rows)"
+    def isClean: Boolean = refusals.isEmpty
+    override def toString: String =
+      s"OpenSheet(${artifact.value}!$sheet, ${rows.size} rows, ${refusals.size} refusals" +
+        (if refusalsTruncated then "+" else "") + ")"
 
   final class OpenCorpus private[intake] (
       val verified: Verified,
@@ -38,6 +54,11 @@ object CorpusReader:
     override def toString: String =
       s"OpenCorpus(${verified.manifest.corpus.value}, ${sheets.size} sheets, " +
         s"profile ${profile.identity.short()})"
+
+  /** How many cell refusals one sheet reports before it stops collecting them. Bounded so that a
+    * systematically misdeclared column cannot turn one read into 27,777 error objects.
+    */
+  val RefusalCap: Int = 100
 
   enum OpenRefusal:
     /** The profile binds a sheet in an artifact the snapshot never verified. */
@@ -98,33 +119,44 @@ object CorpusReader:
                 .map(c => OpenRefusal.ColumnNotInHeader(artifact, sheet, c))
               indexLetters = binding.indexColumns.flatMap(letters.get)
               body = Xlsx.trimTrailing(raw.filter(_.number > binding.headerRow), indexLetters)
-              rows <- body.foldLeft[Either[OpenRefusal, Vector[OpenRow]]](Right(Vector.empty)) {
-                (acc, r) => acc.flatMap(done => openRow(r, binding, letters).map(done :+ _))
-              }
-            yield new OpenSheet(artifact, sheet, rows)
+              read = body.map(r => openRow(r, binding, letters))
+              rows = read.map(_._1)
+              found = read.flatMap(_._2)
+            yield new OpenSheet(
+              artifact,
+              sheet,
+              rows,
+              found.take(RefusalCap),
+              found.sizeIs > RefusalCap
+            )
 
+  /** Reads one row, returning it alongside any cell refusals rather than instead of it. */
   private def openRow(
       row: Xlsx.RawRow,
       binding: SheetBinding,
       letters: Map[String, String]
-  ): Either[OpenRefusal, OpenRow] =
+  ): (OpenRow, Vector[CellRefusal]) =
     val cells = Map.newBuilder[String, Raw[String]]
     val normalized = Map.newBuilder[String, String]
-    var refusal: Option[OpenRefusal] = None
+    val refusals = Vector.newBuilder[CellRefusal]
     binding.columns.foreach { (name, col) =>
-      if refusal.isEmpty then
-        letters.get(name).foreach { letter =>
-          row.cells.get(letter) match
-            case None      => ()
-            case Some(raw) =>
-              cells.addOne(name -> raw)
-              Cell.normalize(raw.at, name, raw.value, Some(col.encoding)) match
-                case Left(r)           => refusal = Some(OpenRefusal.Cell(r))
-                case Right(Some(norm)) => normalized.addOne(name -> norm)
-                case Right(None)       => normalized.addOne(name -> "")
-        }
-        // a column the profile binds but this row leaves out is BLANK, not undeclared
-        if letters.contains(name) && !row.cells.contains(letters(name)) then
-          normalized.addOne(name -> "")
+      letters.get(name).foreach { letter =>
+        row.cells.get(letter) match
+          // a column the profile binds but this row leaves out is BLANK, not undeclared
+          case None      => normalized.addOne(name -> "")
+          case Some(raw) =>
+            cells.addOne(name -> raw)
+            Cell.normalize(raw.at, name, raw.value, Some(col.encoding)) match
+              case Left(r) =>
+                refusals.addOne(r)
+                // the cell is unreadable, so it contributes no normalized value -- and must not
+                // contribute a blank one either, or a condition would read it as present-and-empty
+                ()
+              case Right(Some(norm)) => normalized.addOne(name -> norm)
+              case Right(None)       => normalized.addOne(name -> "")
+      }
     }
-    refusal.toLeft(new OpenRow(row.number, cells.result(), RowContext.of(normalized.result())))
+    (
+      new OpenRow(row.number, cells.result(), RowContext.of(normalized.result())),
+      refusals.result()
+    )

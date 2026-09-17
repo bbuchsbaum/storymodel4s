@@ -190,3 +190,50 @@ class CorpusReaderSuite extends FunSuite:
         .isLeft
     )
   }
+
+  /** ADR 0018 §8: cell refusals accumulate per sheet under a cap; structural ones fail fast.
+    *
+    * An earlier reader aborted the whole sheet on the first bad cell -- so on Friends, with 23
+    * sheets and 27,777 content rows, you would learn about exactly one problem per run. That is the
+    * behaviour the rule was written against.
+    */
+  test("a bad cell does not abort the sheet -- refusals ACCUMULATE") {
+    val bad = wb(
+      row(1, "A1" -> "EventModelNum", "B1" -> "Time", "C1" -> "RecallType") +
+        row(2, "A2" -> "1", "B2" -> "1.0", "C2" -> "1") +
+        row(3, "A3" -> "2", "B3" -> "not-a-serial", "C3" -> "1") +
+        row(4, "A4" -> "3", "B4" -> "also-bad", "C4" -> "1") +
+        row(5, "A5" -> "4", "B5" -> "1.000439814814815", "C5" -> "1")
+    )
+    val oc = CorpusReader.open(verifiedOf(bad), profile).fold(r => fail(r.message), identity)
+    val sheet = oc.sheet(art, "Narr").get
+    // every row is still returned, including the two with an unreadable cell
+    assertEquals(sheet.rows.map(_.number), Vector(2, 3, 4, 5))
+    // and BOTH failures are reported, not just the first
+    assertEquals(sheet.refusals.size, 2)
+    assert(!sheet.isClean)
+    assert(!sheet.refusalsTruncated)
+    // the readable columns of a bad row still read
+    val badRow = sheet.rows.find(_.number == 3).get
+    assertEquals(badRow.context.valueOf("RecallType"), ColumnValue.Value("1"))
+    // and the unreadable cell is ABSENT, not blank -- a condition must not read it as
+    // present-and-empty, which would be a claim the data does not support
+    assertEquals(badRow.context.valueOf("Time"), ColumnValue.Undeclared)
+  }
+
+  test("a clean sheet reports no refusals") {
+    val oc = CorpusReader.open(verifiedOf(payload), profile).fold(r => fail(r.message), identity)
+    assert(oc.sheet(art, "Narr").get.isClean)
+  }
+
+  test("a STRUCTURAL problem still fails fast, rather than accumulating") {
+    // a column the header lacks is a profile/source mismatch, not a datum
+    val badProfile = CorpusProfile
+      .of(
+        ProfileId.unsafe("bad.v1"),
+        1,
+        Map((art, "Narr") -> SheetBinding(1, Map("Nope" -> ColumnBinding(CellEncoding.PlainText))))
+      )
+      .fold(r => fail(r.message), identity)
+    assert(CorpusReader.open(verifiedOf(payload), badProfile).isLeft)
+  }

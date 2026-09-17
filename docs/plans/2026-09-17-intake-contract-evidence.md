@@ -61,6 +61,8 @@ lies" below.
 | P2b-ii | profile identity ignores the encoding | identity test fails |
 | P2b-ii | `open` reads from disk | **5 tests fail, incl. the falsifier** |
 | P2b-ii | header-missing column skipped | fail-fast test fails |
+| P2b-ii | report only the first cell refusal | accumulation test fails |
+| P2b-ii | an unreadable cell reads as blank | present-and-empty test fails |
 | P3link | a bijection may drop sources | 2 tests fail |
 | P3link | totality unchecked | `NotTotal` test fails |
 | P3link | composition ignores the intermediate | mismatch test fails |
@@ -75,7 +77,7 @@ lies" below.
 | P6desc | change a declared offset | consumer reads the change |
 | P6gold | descriptor declares TR 2.0 | reaches the rule |
 
-**39 mutants, 39 killed** (34 above plus the four JSON values whose gaps this hunt found and
+**41 mutants, 41 killed** (34 above plus the four JSON values whose gaps this hunt found and
 closed). Two mutants are recorded as *surviving and benign* by the P2b reviewer
 (`filter(present.contains)` removal, which only double-reports; and `verify`'s schema check, dead
 once `of` owns it) — both are noted rather than replaced.
@@ -103,6 +105,24 @@ after (red) by mutating the crosswalk **by JSON path**.
 `coordinateSystems[]`, not `annotationToPlaybackCrosswalk.runs[]` — mutating something no test
 reads and calling the silence a gap. **A mutation targeted by text rather than by structure can
 report a gap that does not exist, as easily as it can miss one that does.**
+
+## An implementation that contradicted its own ADR
+
+ADR 0018 §8 says: *"accumulate cell-level refusals per sheet under a declared cap; fail fast on
+structural refusals. A 27,777-row workbook must not surrender one bad cell per run."*
+
+`CorpusReader.openRow` did the opposite. One unreadable cell aborted the entire sheet, so on
+Friends — 23 sheets, 27,777 content rows — a run would report exactly one problem and stop.
+
+Corrected: cell refusals accumulate per sheet under a cap of 100, a row with a bad cell is still
+returned built from the cells that DID read, and structural refusals (a column the header lacks, an
+unverified artifact) still fail fast. An unreadable cell is `Undeclared` in the row context, not
+blank — reading it as present-and-empty would be a claim the data does not support.
+
+Mutants: report only the first refusal → the accumulation test fails; treat an unreadable cell as
+blank → the present-and-empty test fails.
+
+Found by reading `openRow` against §8 after a reviewer briefed on that exact function went quiet.
 
 ## A type that would have refused an already-admitted corpus
 
