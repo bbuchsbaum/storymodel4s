@@ -160,12 +160,26 @@ Three questions are deferred **to the slice that will have evidence**, not answe
    Blast radius measured before the change: four files reference `AxisKind`, all in `core`, and no
    codec switches on it. `coreJVM/test` 175 and `codecJVM/test` 193 green after.
    Retiring Film Festival's forged edition is a separate, later change to the bench adapter.
-2. **Where ordinal remaps live.** Film Festival's `+106` is an *ordinal* remap of coarse segment
-   numbers restarting in run 2, and ordinals have no home in the mapping apparatus at all. Either
-   `SegmentLink` is that home, or `MappingFamily` gains a fourth case.
-3. **`tools/corpus/xlsx_rows.py`.** Retire it once the Scala reader is proven, or bind the two by a
-   differential test on a synthetic workbook. Keeping it as informal "reference semantics" would
-   recreate the duplicated-rule defect on purpose.
+2. ~~Where ordinal remaps live.~~ **DECIDED 2026-09-17: `SegmentLink` for scale-to-scale maps;
+   `MappingFamily` gains nothing; Film Festival's `+106` is neither.**
+   Building `SegmentLink` showed that "Friends 56→52" and "Film Festival +106" are not the same
+   shape, though they are usually named together. Friends has two ANNOTATION SCALES of one
+   stimulus, both globally ordered; a link between them is exactly `SegmentLink`, and the map is a
+   test witness. Film Festival has ONE scale whose coarse segment numbers RESTART at 1 in run 2, so
+   `(run-1, 7)` and `(run-2, 7)` are different segments with the same ordinal and the source
+   numbering is not a total order over the work. A `Segmentation` requires dense 1..n ordinals, so
+   the run-local numbering cannot BE one until the offset has already been applied. **The `+106` is
+   therefore a reader-level reindex declared by the profile, not a mapping between segmentations**,
+   and `MappingFamily` needs no fourth case. Both halves are recorded as tests in
+   `SegmentLinkSuite`, including the refusal that makes the boundary checkable.
+3. **`tools/corpus/xlsx_rows.py`** — **DECIDED 2026-09-17: retire, on a stated condition.** The
+   Scala reader now exists with its own hazard tests (declared dimension untrusted, header-only
+   sheets named, padding trimmed on content, DTD disabled). `xlsx_rows.py` stays ONLY while the
+   five Film-Festival replay scripts in `tools/corpus/` still consume it, and is deleted when the
+   descriptor slice moves those onto the Scala reader's output. It is not kept as "reference
+   semantics": two implementations of one reading, with neither binding the other, is the
+   duplicated-rule defect this ADR is about, and keeping it deliberately would be worse than
+   having found it.
 
 ## Rejected
 

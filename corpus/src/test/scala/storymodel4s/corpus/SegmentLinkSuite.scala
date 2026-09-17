@@ -168,3 +168,42 @@ class SegmentLinkSuite extends FunSuite:
     // and it is NOT a bijection, because it drops four
     assert(SegmentLink.of(em56, em52, LinkClaim.Bijection, 1, mapping).isLeft)
   }
+
+  /** What `SegmentLink` is NOT for, recorded as a test so the boundary is checkable.
+    *
+    * Film Festival's `+106` is often described alongside Friends' 56->52 as "another remap". It is
+    * not the same shape. Friends has two ANNOTATION SCALES of one stimulus, both globally ordered,
+    * and a link between them is exactly this type. Film Festival has ONE scale whose coarse segment
+    * numbers RESTART at 1 in run 2, so the source numbering is not a total order over the work at
+    * all -- `(run-1, 7)` and `(run-2, 7)` are different segments with the same ordinal.
+    *
+    * A `Segmentation` requires dense 1..n ordinals, so the run-local numbering cannot BE one until
+    * the offset has already been applied. The `+106` therefore belongs to the reader, declared by
+    * the profile, and is not a link between two segmentations.
+    */
+  test("a part-local numbering cannot be a Segmentation, which is why +106 is not a SegmentLink") {
+    val runLocal = Vector(
+      Segment(1, 0, "run-1 seg 1"),
+      Segment(2, 10, "run-1 seg 2"),
+      // run 2 restarts at 1 -- and this is what the source actually writes
+      Segment(1, 20, "run-2 seg 1")
+    )
+    assertEquals(
+      Segmentation.of(
+        SegmentationId.unsafe("filmfest.run-local"),
+        WorkId.unsafe("filmfestival"),
+        GranularityLevel.Scene,
+        SegmentationAuthority.AuthorAnnotated(CoderId.unsafe("JL")),
+        axis,
+        runLocal
+      ),
+      Left(SegmentationRefusal.OrdinalsNotDense(SegmentationId.unsafe("filmfest.run-local")))
+    )
+  }
+
+  test("once the offset IS applied, the global scale is an ordinary Segmentation") {
+    val global = seg("filmfest.global", 216, GranularityLevel.Scene)
+    assertEquals(global.size, 216)
+    // run-2 local 1 is global 107, by the measured run-1 coarse count of 106
+    assertEquals(global.segment(107).map(_.ordinal), Some(107))
+  }
