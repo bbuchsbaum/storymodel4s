@@ -268,11 +268,28 @@ Six risky slices were named in advance, with the reason recorded on each bead be
 | P3 SegmentLink | **dispatched; never executed** — brief worked by the author |
 | P5 ClockRepair | **dispatched; never executed** — brief worked by the author |
 
-Nine review agents were dispatched in total. **Three delivered, all within the first third of the
-session; the remaining six went idle without executing**, including two that had already delivered
-once and were re-tasked, and one given a three-line prompt specifically to test whether prompt size
-was the cause. It was not. This is a delivery failure in the agent mechanism, and further attempts
-did not change it.
+**Eleven review agents were dispatched. Three delivered, all within the first third of the session.
+Every agent spawned afterwards failed to execute at all** — producing neither a report nor any
+artifact on disk.
+
+Five distinct remedies were tried and none worked: re-tasking two agents that had already delivered
+successfully; a three-line prompt, to test whether prompt size was the cause; file-based delivery
+instead of messages, to route around the message channel; stopping seven idle agents to free
+concurrency, on the theory that a cap was starving later spawns; and repeated explicit requests
+inviting "did not complete" as an answer. The three that worked were early; nothing after them ran.
+
+This is a failure in the agent mechanism, not an omission, and it is recorded here rather than
+worked around, because a verification record that quietly substituted self-review for adversarial
+review would be the exact defect this subsystem was built to close.
+
+**Four of the six silent agents had nonetheless done real work**, left in the session scratchpad and
+found only by listing it: a `BigDecimal` probe that found a denial-of-service in `Cell.normalize`, a
+probe suite that found two identity collisions, a mutation harness whose log named two surviving
+mutants, and a stashed attack suite that established three behaviours nothing tested. All four
+findings are in the tables above. Each found something the author had not found and, by
+construction, would not have found — the DoS because his suite tested `1E+2` and stopped, the
+collisions because his test was built to detect omissions rather than collisions, the survivors
+because he had only run his own designed mutants.
 
 For the three slices whose reviewers never ran, the author worked the briefs directly: **7 defects
 found and fixed, 7 decisions pinned with tests and mutants, no question left open.** Those findings
