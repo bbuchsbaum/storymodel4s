@@ -63,14 +63,26 @@ mutations left a probe suite green under `sbt corpusJVM/test` and red only under
 - `final class X private[p]` → `final case class X private[p]`
 - the constructor widened to fully public
 
-**"Always clean before a mutation run" is a workaround. The fix is to make the probe file
-self-invalidating:** add one never-called private method taking the probed types as real parameters
-and touching a field of each. Zinc then records the dependency, and the mutant dies without a clean.
-Verified both ways on `CorpusCarrierProbeSuite` — mutant survives without the anchor, dies with it,
-no clean in either run.
+**A `zincAnchor` helps, and only for one of the two mutation kinds.** Add one never-called private
+method taking the probed types as real parameters and touching a member of each. Zinc then records
+a dependency and the suite is recompiled. Measured on `CorpusCarrierProbeSuite`, both runs without
+`clean`:
 
-Any probe suite in this repository written before that date is likely to have the same hole, and a
-green mutation score over one of them is not evidence until the anchor is added or the run is
+| mutation | anchor present | outcome |
+|---|---|---|
+| `final class Known` → `final case class Known` (shape) | yes | **dies** (1 failed) |
+| `final class Known` → `final case class Known` (shape) | no | survives |
+| `private[corpus] def of` → `def of` (accessibility) | yes | **survives** |
+
+The asymmetry is structural, not an oversight in the anchor. Zinc invalidates a dependent that
+references the **changed member**. An anchor can name the type and its accessible members, but it
+**cannot name the member whose inaccessibility the probe asserts** — naming it is precisely what the
+probe says must not compile. So for any probe of the form "a consumer cannot call `X.y`", no anchor
+can create the dependency, and the mutation is invisible without a clean.
+
+**Therefore: a mutation run against a probe suite must still `clean` the test scope.** The anchor
+narrows the hole; it does not close it. Any probe suite in this repository written before 2026-09-17
+has the wider hole, and a green mutation score over one of them is not evidence until the run is
 cleaned.
 
 ## The criterion

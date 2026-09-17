@@ -40,6 +40,8 @@ class SidecarSuite extends FunSuite:
     SourceManifest
       .of(
         corpus,
+        SourceManifest.Schema,
+        SourceManifest.SchemaVersion,
         Vector(
           rec(crosswalkId, crosswalkBytes, "timebase-crosswalk"),
           rec(annotationId, annotationBytes, "annotation")
@@ -75,6 +77,8 @@ class SidecarSuite extends FunSuite:
     val dangling = RecordRef(recordId, "s", 1, ArtifactId.unsafe("never-declared.json"))
     SourceManifest.of(
       corpus,
+      SourceManifest.Schema,
+      SourceManifest.SchemaVersion,
       Vector(rec(crosswalkId, crosswalkBytes, "x")),
       Vector(dangling),
       AdmissionStatus(AdmissionState.Proposed, false, Vector.empty),
@@ -91,21 +95,46 @@ class SidecarSuite extends FunSuite:
   test("a sidecar's SCHEMA is checked inside the snapshot, not trusted from the reference") {
     val v = verified(Vector(ref))
     v.record(recordId, "storymodel4s.sherlock.SOMETHING-ELSE", 2) match
-      case Left(VerificationFailure.WrongSchema(found)) =>
-        assertEquals(found, "storymodel4s.sherlock.timebase-repair")
-      case other => fail(s"expected WrongSchema, got $other")
+      case Left(m: VerificationFailure.RecordSchemaMismatch) =>
+        assertEquals(m.declaredSchema, "storymodel4s.sherlock.timebase-repair")
+        assertEquals(m.requestedSchema, "storymodel4s.sherlock.SOMETHING-ELSE")
+        // the message must not name the MANIFEST schema as the expectation
+        assert(!m.message.contains("source-manifest"), m.message)
+      case other => fail(s"expected RecordSchemaMismatch, got $other")
   }
 
   test("a sidecar's VERSION is checked too") {
     val v = verified(Vector(ref))
     v.record(recordId, "storymodel4s.sherlock.timebase-repair", 1) match
-      case Left(VerificationFailure.WrongSchemaVersion(found)) => assertEquals(found, 2)
-      case other => fail(s"expected WrongSchemaVersion, got $other")
+      case Left(m: VerificationFailure.RecordSchemaMismatch) =>
+        assertEquals(m.declaredVersion, 2)
+        assertEquals(m.requestedVersion, 1)
+      case other => fail(s"expected RecordSchemaMismatch, got $other")
   }
 
-  test("an unknown record id does not resolve") {
+  test("an unknown record id says so, rather than inventing an artifact it blames") {
     val v = verified(Vector(ref))
-    assert(v.record(RecordId.unsafe("no-such-record"), "x", 1).isLeft)
+    val missing = RecordId.unsafe("no-such-record")
+    assertEquals(v.record(missing, "x", 1), Left(VerificationFailure.UnknownRecord(missing)))
+    // the old refusal fabricated ArtifactId "<unknown>" and blamed a dangling reference
+    assert(!v.record(missing, "x", 1).left.toOption.get.message.contains("<unknown>"))
+  }
+
+  test("a duplicate record id is refused at construction") {
+    val dup = RecordRef(recordId, "s", 1, crosswalkId)
+    SourceManifest.of(
+      corpus,
+      SourceManifest.Schema,
+      SourceManifest.SchemaVersion,
+      Vector(rec(crosswalkId, crosswalkBytes, "x")),
+      Vector(dup, dup),
+      AdmissionStatus(AdmissionState.Proposed, false, Vector.empty),
+      ContentPolicy(false, false, Vector.empty),
+      Vector.empty,
+      Map.empty[String, Json]
+    ) match
+      case Left(VerificationFailure.DuplicateRecord(r)) => assertEquals(r, recordId)
+      case other => fail(s"expected DuplicateRecord, got $other")
   }
 
   test("changed sidecar bytes fail the snapshot, so a sidecar cannot drift after declaration") {

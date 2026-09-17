@@ -37,6 +37,8 @@ class VerifySuite extends FunSuite:
     SourceManifest
       .of(
         corpus,
+        SourceManifest.Schema,
+        SourceManifest.SchemaVersion,
         artifacts,
         records,
         AdmissionStatus(AdmissionState.Proposed, courtOpened = false, Vector("owner decision")),
@@ -116,11 +118,44 @@ class VerifySuite extends FunSuite:
       case Right(_) => fail("expected failures")
   }
 
+  test("a wrong schema or version is refused where the manifest is BUILT, not later") {
+    def build(schema: String, version: Int) =
+      SourceManifest.of(
+        corpus,
+        schema,
+        version,
+        Vector(rec),
+        Vector.empty,
+        AdmissionStatus(AdmissionState.Proposed, false, Vector.empty),
+        ContentPolicy(false, false, Vector.empty),
+        Vector.empty,
+        Map.empty
+      )
+    assertEquals(
+      build("some.other.schema", 2),
+      Left(VerificationFailure.WrongSchema("some.other.schema"))
+    )
+    assertEquals(build(SourceManifest.Schema, 1), Left(VerificationFailure.WrongSchemaVersion(1)))
+    assert(build(SourceManifest.Schema, SourceManifest.SchemaVersion).isRight)
+  }
+
+  test("a store that throws is a refusal, not an escaping exception") {
+    val throwing = new ArtifactStore:
+      def list: Vector[ArtifactId] = Vector(rec.id)
+      def bytes(id: ArtifactId): Either[IntakeRefusal, Array[Byte]] =
+        throw new RuntimeException("disk went away")
+    Verify.verify(manifestOf(Vector(rec)), throwing) match
+      case Left(f)  => assert(f.exists(_.isInstanceOf[VerificationFailure.Unreadable]))
+      case Right(_) => fail("expected a failure")
+  }
+
   test("a manifest with no artifacts, or a duplicate, is refused at construction") {
     assertEquals(
       SourceManifest
         .of(
           corpus,
+          SourceManifest.Schema,
+          SourceManifest.SchemaVersion,
           Vector.empty,
           Vector.empty,
           AdmissionStatus(AdmissionState.Proposed, false, Vector.empty),
@@ -134,6 +169,8 @@ class VerifySuite extends FunSuite:
       SourceManifest
         .of(
           corpus,
+          SourceManifest.Schema,
+          SourceManifest.SchemaVersion,
           Vector(rec, rec),
           Vector.empty,
           AdmissionStatus(AdmissionState.Proposed, false, Vector.empty),
@@ -143,4 +180,18 @@ class VerifySuite extends FunSuite:
         )
         .isLeft
     )
+  }
+
+  test("ALIASING ROUTE 3: verified bytes cannot be rewritten through the stdlib") {
+    val v = Verify.verify(manifestOf(Vector(rec)), store).fold(f => fail(f.head.message), identity)
+    val a = v.artifact(rec.id).get
+    val before = a.toArray.toVector
+    // IArray is an opaque type over Array, and the stdlib hands the backing array straight back.
+    // There is no accessor that returns the array, so the stdlib route has nothing to grab.
+    val copy = a.toArray
+    copy(0) = 99.toByte
+    assertEquals(a.toArray.toVector, before, "verified bytes were rewritten after verification")
+    assert(a.toArray ne a.toArray, "toArray must hand out a fresh copy each call")
+    assertEquals(a.iterator.toVector, before)
+    assertEquals(a.checksum, Checksum.ofBytes(payload))
   }

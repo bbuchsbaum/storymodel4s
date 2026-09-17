@@ -58,7 +58,7 @@ final case class ContentPolicy(
   * `timebase-repair.json` in particular carries `certifies`/`doesNotCertify`, `nonEquivalences`,
   * `scientificRestrictions` and a `whyNotRepaired` note that a flat manifest would destroy.
   */
-final class SourceManifest private[corpus] (
+final class SourceManifest private (
     val corpus: CorpusId,
     val schema: String,
     val schemaVersion: Int,
@@ -79,8 +79,15 @@ object SourceManifest:
   val SchemaVersion: Int = 2
 
   /** Builds a manifest, refusing the structural errors that would make verification meaningless. */
+  /** The only door to a `SourceManifest`: the class constructor is private to this companion, so a
+    * reader cannot build one that skipped these checks and have `verify` accept it. `schema` and
+    * `schemaVersion` are what a DECODER found, and are refused here rather than in `verify`, which
+    * would otherwise be checking a value only this method can set.
+    */
   private[corpus] def of(
       corpus: CorpusId,
+      schema: String,
+      schemaVersion: Int,
       artifacts: Vector[ArtifactRecord],
       records: Vector[RecordRef],
       admission: AdmissionStatus,
@@ -89,8 +96,13 @@ object SourceManifest:
       extensions: Map[String, Json]
   ): Either[VerificationFailure, SourceManifest] =
     val dupes = artifacts.groupBy(_.id).collect { case (id, xs) if xs.sizeIs > 1 => id }
-    if artifacts.isEmpty then Left(VerificationFailure.EmptyManifest)
+    val dupeRecords = records.groupBy(_.id).collect { case (id, xs) if xs.sizeIs > 1 => id }
+    if schema != Schema then Left(VerificationFailure.WrongSchema(schema))
+    else if schemaVersion != SchemaVersion then
+      Left(VerificationFailure.WrongSchemaVersion(schemaVersion))
+    else if artifacts.isEmpty then Left(VerificationFailure.EmptyManifest)
     else if dupes.nonEmpty then Left(VerificationFailure.DuplicateArtifact(dupes.head))
+    else if dupeRecords.nonEmpty then Left(VerificationFailure.DuplicateRecord(dupeRecords.head))
     else
       val declared = artifacts.map(_.id).toSet
       records.find(r => !declared.contains(r.artifact)) match
@@ -114,6 +126,21 @@ object SourceManifest:
 enum VerificationFailure:
   case EmptyManifest
   case DuplicateArtifact(id: ArtifactId)
+  case DuplicateRecord(id: RecordId)
+
+  /** A record id that the manifest does not declare at all. */
+  case UnknownRecord(record: RecordId)
+
+  /** A sidecar's declared schema or version disagrees with what the caller asked for. Distinct from
+    * the MANIFEST's own schema, whose message names the manifest schema as the expectation.
+    */
+  case RecordSchemaMismatch(
+      record: RecordId,
+      declaredSchema: String,
+      declaredVersion: Int,
+      requestedSchema: String,
+      requestedVersion: Int
+  )
   case WrongSchema(found: String)
   case WrongSchemaVersion(found: Int)
 
@@ -132,6 +159,10 @@ enum VerificationFailure:
   def message: String = this match
     case EmptyManifest         => "manifest declares no artifacts"
     case DuplicateArtifact(id) => s"${id.value} is declared twice"
+    case DuplicateRecord(id)   => s"record ${id.value} is declared twice"
+    case UnknownRecord(r)      => s"record ${r.value} is not declared by this manifest"
+    case RecordSchemaMismatch(r, ds, dv, rs, rv) =>
+      s"record ${r.value} declares $ds/v$dv, requested $rs/v$rv"
     case WrongSchema(f)        => s"schema is '$f', expected '${SourceManifest.Schema}'"
     case WrongSchemaVersion(f) => s"schema version is $f, expected ${SourceManifest.SchemaVersion}"
     case MissingFromStore(id)  => s"${id.value} is declared but absent from the snapshot"
@@ -153,24 +184,40 @@ trait ArtifactStore:
   def list: Vector[ArtifactId]
   def bytes(id: ArtifactId): Either[IntakeRefusal, Array[Byte]]
 
-/** Bytes that THIS process hashed, held in storage it owns.
+/** Bytes that THIS process hashed, held in storage it owns and does not hand out.
   *
-  * `IArray`, not `Array`. Two aliasing routes were demonstrated by probe: writing through a public
-  * accessor, and writing through the array the store still holds. Making the carrier non-case
-  * addresses neither, so `verify` clones on entry and exposes only an immutable view.
+  * The backing array is `private`. An earlier version exposed it as an `IArray[Byte]` and claimed
+  * that was "an immutable view with no write path at all". That was false, and the falsification is
+  * the reason this class looks the way it does: `IArray` is an opaque type over `Array`, and the
+  * standard library hands the backing array straight back --
+  * `IArray.wrapByteIArray(a.bytes).unsafeArray(0) = 1` type-checks and mutates, as does matching
+  * the `IArray` against `Array[Byte]`. A consumer could not forge a `VerifiedArtifact`, but could
+  * rewrite one after verification while its checksum went on vouching for the original.
+  *
+  * So there is no accessor that returns the array. Readers take bytes one at a time, iterate, or
+  * ask for a copy they own.
   */
 final class VerifiedArtifact private[corpus] (
     val id: ArtifactId,
-    val bytes: IArray[Byte],
+    private val payload: Array[Byte],
     val checksum: Checksum
 ):
-  def byteLength: Int = bytes.length
+  def byteLength: Int = payload.length
 
-  /** A fresh mutable copy for callers that need one. Never the backing store. */
-  def toArray: Array[Byte] = IArray.genericWrapArray(bytes).toArray
+  /** One byte. Refuses an index outside the payload rather than throwing an array exception. */
+  def byteAt(index: Int): Either[IntakeRefusal, Byte] =
+    if index < 0 || index >= payload.length then
+      Left(IntakeRefusal.ReadFailed(id, ReadOperation.Read))
+    else Right(payload(index))
+
+  /** Reads the payload without exposing it. */
+  def iterator: Iterator[Byte] = payload.iterator
+
+  /** A fresh copy the caller owns. Never the backing array: `toArray ne toArray`. */
+  def toArray: Array[Byte] = payload.clone()
 
   override def toString: String =
-    s"VerifiedArtifact(${id.value},bytes=${bytes.length},checksum=${checksum.short()})"
+    s"VerifiedArtifact(${id.value},bytes=${payload.length},checksum=${checksum.short()})"
 
 /** A manifest and the bytes that were checked against it.
   *
@@ -198,11 +245,13 @@ final class Verified private[corpus] (
       schemaVersion: Int
   ): Either[VerificationFailure, VerifiedArtifact] =
     manifest.records.find(_.id == id) match
-      case None => Left(VerificationFailure.DanglingRecordRef(id, ArtifactId.unsafe("<unknown>")))
+      case None      => Left(VerificationFailure.UnknownRecord(id))
       case Some(ref) =>
-        if ref.schema != schema then Left(VerificationFailure.WrongSchema(ref.schema))
-        else if ref.schemaVersion != schemaVersion then
-          Left(VerificationFailure.WrongSchemaVersion(ref.schemaVersion))
+        if ref.schema != schema || ref.schemaVersion != schemaVersion then
+          Left(
+            VerificationFailure
+              .RecordSchemaMismatch(id, ref.schema, ref.schemaVersion, schema, schemaVersion)
+          )
         else
           byId
             .get(ref.artifact)
@@ -226,11 +275,6 @@ object Verify:
   ): Either[NonEmptyVector[VerificationFailure], Verified] =
     val failures = Vector.newBuilder[VerificationFailure]
 
-    if manifest.schema != SourceManifest.Schema then
-      failures += VerificationFailure.WrongSchema(manifest.schema)
-    if manifest.schemaVersion != SourceManifest.SchemaVersion then
-      failures += VerificationFailure.WrongSchemaVersion(manifest.schemaVersion)
-
     val present = store.list.toSet
     val declared = manifest.declaredIds
     declared.diff(present).toVector.sortBy(_.value).foreach { id =>
@@ -242,7 +286,12 @@ object Verify:
 
     val verified = Vector.newBuilder[VerifiedArtifact]
     manifest.artifacts.filter(r => present.contains(r.id)).foreach { rec =>
-      store.bytes(rec.id) match
+      scala.util
+        .Try(store.bytes(rec.id))
+        .toEither
+        .left
+        .map(_ => IntakeRefusal.ReadFailed(rec.id, ReadOperation.Read))
+        .flatten match
         case Left(refusal) => failures += VerificationFailure.Unreadable(rec.id, refusal)
         case Right(raw)    =>
           // Copy BEFORE hashing, into storage this object owns. Hashing the store's array and then
@@ -255,7 +304,7 @@ object Verify:
             val actual = Checksum.ofBytes(owned)
             if actual != rec.sha256 then
               failures += VerificationFailure.ChecksumMismatch(rec.id, rec.sha256, actual)
-            else verified += new VerifiedArtifact(rec.id, IArray.unsafeFromArray(owned), actual)
+            else verified += new VerifiedArtifact(rec.id, owned, actual)
     }
 
     val found = failures.result()

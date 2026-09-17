@@ -39,10 +39,20 @@ class CorpusCarrierProbeSuite extends FunSuite:
       n: NotApplicable,
       d: Undetermined,
       v: Verified,
-      va: VerifiedArtifact
+      va: VerifiedArtifact,
+      m: SourceManifest,
+      st: ArtifactStore,
+      b: CodeBook[Int, String],
+      rc: RowContext,
+      cd: Coded[Int],
+      ap: Applicability,
+      ar: ArtifactRecord,
+      rr: RecordRef
   ): Int =
     c.row + r.value + k.raw.value + u.raw.literal.length + a.raw.literal.length +
-      n.condition.render.length + d.condition.render.length + v.artifacts.size + va.byteLength
+      n.condition.render.length + d.condition.render.length + v.artifacts.size + va.byteLength +
+      m.declaredIds.size + SourceManifest.SchemaVersion + st.list.size + b.size +
+      rc.columns.size + cd.at.row + ap.render.length + ar.role.length + rr.schemaVersion
 
   test("positive control: the public surface this suite names does resolve") {
     assertEquals(
@@ -279,10 +289,19 @@ class CorpusCarrierProbeSuite extends FunSuite:
     * one. This is the type-level half of the two aliasing routes; the copy-before-hash half is
     * proved behaviourally in VerifySuite.
     */
-  test("a consumer cannot write through the verified bytes") {
-    assert(
+  /** There is no accessor that returns the backing array at all. An earlier version exposed one as
+    * an `IArray[Byte]` and claimed it was immutable; the standard library hands the backing array
+    * straight back from an `IArray`, so that claim was false and a verified payload could be
+    * rewritten after verification while its checksum went on vouching for the original.
+    */
+  test("a consumer cannot reach the verified bytes, by any accessor") {
+    assert(typeCheckErrors("""(a: storymodel4s.corpus.VerifiedArtifact) => a.bytes""").nonEmpty)
+    assert(typeCheckErrors("""(a: storymodel4s.corpus.VerifiedArtifact) => a.payload""").nonEmpty)
+    // what IS offered hands out copies and reads, never the array
+    assertEquals(
       typeCheckErrors(
-        """(a: storymodel4s.corpus.VerifiedArtifact) => a.bytes(0) = 1.toByte"""
-      ).nonEmpty
+        """(a: storymodel4s.corpus.VerifiedArtifact) => (a.toArray, a.iterator, a.byteAt(0))"""
+      ),
+      Nil
     )
   }

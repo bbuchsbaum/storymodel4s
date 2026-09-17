@@ -77,7 +77,18 @@ returns `false` on any error and has already produced two false passes in this r
 Each probe file also carries a never-called `zincAnchor` method taking the probed types as real
 parameters. `typeCheckErrors` expands to a literal list, so without a real reference Zinc records no
 dependency and the suite is not recompiled when a probed type changes — a mutation then reads as
-survived when it is killed. See `docs/design/unforgeable-types.md`, "A probe that cannot fail".
+survived when it is killed. The anchor fixes SHAPE mutations and **cannot** fix accessibility
+mutations, because it would have to name the very member the probe asserts is unnameable; those
+remain invisible without a clean, so **mutation runs still clean the test scope**. Measured table in
+`docs/design/unforgeable-types.md`, "A probe that cannot fail".
+
+**The verified payload is not exposed at all.** An earlier version of `VerifiedArtifact` offered
+`bytes: IArray[Byte]` and called it an immutable view. That was false: `IArray` is an opaque type
+over `Array`, and the standard library hands the backing array straight back —
+`IArray.wrapByteIArray(a.bytes).unsafeArray(0) = 1` type-checks and mutates, as does matching the
+`IArray` against `Array[Byte]`. A consumer could not forge a `VerifiedArtifact` but could rewrite
+one after verification while its checksum went on vouching for the original. There is now no
+accessor returning the array: readers use `byteAt`, `iterator`, or `toArray`, which copies.
 
 **Non-claim: the guarantees are closed at the TYPE level, not at runtime.** `private[corpus]`
 compiles to public bytecode, so plain `java.lang.reflect` — without even `setAccessible` — can
