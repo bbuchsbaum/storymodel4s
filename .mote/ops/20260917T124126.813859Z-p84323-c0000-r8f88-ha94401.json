@@ -1,0 +1,1 @@
+{"actor":"claude-storymodel4s-1p0","entity":"bd-01M1DB6J4VFETMCFG096713DCY","kind":"note","note_kind":"decision","op":"20260917T124126.813859Z-p84323-c0000-r8f88-ha94401","text":"2026-09-17: dependency on P1A (bd-01M1CQCSZSTHJQ5PA4PQ4GWKVB) removed; P1A was superseded by ADR 0008 (hosted parser behind ClaudeParserTransport).","ts":"2026-09-17T12:41:26.813859Z","v":1}

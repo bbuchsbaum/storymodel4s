@@ -298,3 +298,25 @@ analysis `post-01M162BWDYZ3H41SPNEZ2473F4`; the chief ratified it in
 `post-01M162FEB1VNM6TWMRQ7XMPEHD` and adopted the carrier algebra and derived-version refinements
 in `post-01M162GWXD475BKJV0M5JGFW50`. This ADR is the chief-assigned work item
 `bd-01M160WXHFCNTTW3VZD3BSTRGP`.
+
+### Amendment 2026-09-17 (single-developer mode, SD5)
+
+- `AlignError.EmptyPopulation` is added: a population aggregate requested over no
+  subjects. Until now both refusal sites in `PopulationAggregate.of` published
+  `SizeMismatch("population has no subjects")`, so "two things disagree in size"
+  and "you gave me nobody" were one case, separable only by string comparison.
+  `message` renders the same text. Rejected alternative: keep the string, because
+  `AlignError` is a published sum type and a case added after 1.0 breaks every
+  exhaustive match downstream.
+- `MassRatio.unsafe` and `MassRatio.support` now fail closed on NaN
+  (`conditioning > 0.0 then divide else None`), so the trusted constructor honours
+  the carrier contract above (§Carrier contracts: finite values or an explicit
+  absence) even when fed a forged flow. No live number changes: the polarity is
+  semantics-preserving for every non-NaN input.
+- `MissingValuePolicy.requireMinCoverage` (features) is the checked constructor
+  for the coverage floor — finite and in `[0, 1]` — with `isCoverageFraction` as
+  the predicate `Reduction.reduce` re-checks and the codec refuses at the wire.
+  Rejected alternative: a new opaque fraction type in `features`; it would be
+  public vocabulary for one field, and a Scala 3 enum case cannot hide its
+  constructor either way, so the point-of-use re-check is required regardless.
+

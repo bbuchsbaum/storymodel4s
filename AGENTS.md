@@ -429,7 +429,10 @@ the check to the script and leave one line here pointing at it.
    is a public case class passed straight to `solve`, so a `NaN` epsilon fails all
    three range checks and is ACCEPTED. Of the other two — `MassRatio.unsafe` admits
    `Some(NaN)` by polarity, but `MassRatio.of` explicitly rejects `NaN`/infinite and
-   `unsafe` is `private[align]`, so reachability needs a production-path probe;
+   `unsafe` is `private[align]`, so reachability needs a production-path probe
+   (traced 2026-09-17: no production path — `HsmmResult.validated` rejects NaN
+   flow mass — only forgery from an `align` sub-package; polarity flipped to
+   fail-closed anyway in `01cfbc46`, because the type's contract is the claim);
    `features/window.scala:122` is guarded upstream at :341, which rejects any sample
    failing `hasValidWeight` (finite and non-negative), so it is not reachable by the
    public path at all. `window.scala` does contain both polarities fifteen lines
