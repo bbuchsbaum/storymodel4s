@@ -382,3 +382,45 @@ class CorpusReaderSuite extends FunSuite:
     // and no two variations collide with each other
     assertEquals(varied.values.toVector.distinct.size, varied.size, "two variations collided")
   }
+
+  /** Two profiles that READ DIFFERENTLY must not share an identity.
+    *
+    * The field-completeness test varies each field in turn, which catches omissions but not
+    * COLLISIONS. These are the two adversarial shapes: a separator that appears inside a value it
+    * is meant to separate, in both the encoding rendering and the digest itself.
+    */
+  test("a Custom encoding cannot collide by moving the colon") {
+    def p(enc: CellEncoding) =
+      CorpusProfile
+        .of(
+          ProfileId.unsafe("c.v1"),
+          1,
+          Map((art, "Narr") -> SheetBinding(1, Map("X" -> ColumnBinding(enc))))
+        )
+        .fold(r => fail(r.message), identity)
+    // Custom("a:b","c") and Custom("a","b:c") both render "a:b:c" if the colon is a bare separator
+    val one = p(CellEncoding.Custom("a:b", "c"))
+    val two = p(CellEncoding.Custom("a", "b:c"))
+    assertNotEquals(one.identity, two.identity, "two different encodings share an identity")
+  }
+
+  test("a separator inside a column name cannot forge an identity") {
+    val nul = 0.toChar
+    def p(cols: Map[String, ColumnBinding]) =
+      CorpusProfile
+        .of(ProfileId.unsafe("n.v1"), 1, Map((art, "Narr") -> SheetBinding(1, cols)))
+        .fold(r => fail(r.message), identity)
+    // ContentAddress.digest joins parts with NUL. Each PlainText column contributes exactly
+    // ["text", name, "false"], so a single column named `a\0false\0text\0b` would join to the
+    // same byte sequence as the two columns `a` and `b` -- UNLESS every part is length-prefixed.
+    // Forged against the current field order deliberately: a collision test that does not match
+    // the real structure passes for the wrong reason, which a mutant caught here.
+    val forged = p(Map(s"a${nul}false${nul}text${nul}b" -> ColumnBinding(CellEncoding.PlainText)))
+    val genuine = p(
+      Map(
+        "a" -> ColumnBinding(CellEncoding.PlainText),
+        "b" -> ColumnBinding(CellEncoding.PlainText)
+      )
+    )
+    assertNotEquals(forged.identity, genuine.identity, "a NUL in a name forged an identity")
+  }

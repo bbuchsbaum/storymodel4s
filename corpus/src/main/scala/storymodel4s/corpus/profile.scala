@@ -77,15 +77,26 @@ object CorpusProfile:
       version: Int,
       sheets: Map[(ArtifactId, String), SheetBinding]
   ): Checksum =
+    def framed(part: String): String = s"${part.length}:$part"
     val parts = sheets.toVector
       .sortBy((k, _) => (k._1.value, k._2))
       .flatMap { case ((artifact, sheet), binding) =>
         Vector(artifact.value, sheet, binding.headerRow.toString) ++
           binding.columns.toVector.sortBy(_._1).flatMap { (name, b) =>
-            Vector(name, b.encoding.render, b.indexOnly.toString)
+            // the encoding is framed field by field, not through `render`, so a Custom namespace
+            // or label carrying a colon cannot move the boundary between them
+            encodingParts(b.encoding) ++ Vector(name, b.indexOnly.toString)
           }
       }
-    ContentAddress.digest(Vector("corpus-profile", id.value, version.toString) ++ parts)
+    ContentAddress.digest(
+      (Vector("corpus-profile", id.value, version.toString) ++ parts).map(framed)
+    )
+
+  /** An encoding as separate fields rather than one rendered string. */
+  private def encodingParts(encoding: CellEncoding): Vector[String] = encoding match
+    case CellEncoding.ExcelSerialDays(origin) => Vector("excel-serial-days", origin.toString)
+    case CellEncoding.Custom(ns, label)       => Vector("custom", ns, label)
+    case other                                => Vector(other.render)
 
 /** Why a profile could not be built. A configuration error, never a datum. */
 enum ProfileRefusal:

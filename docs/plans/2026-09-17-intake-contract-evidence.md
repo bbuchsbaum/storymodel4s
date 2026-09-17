@@ -61,6 +61,7 @@ lies" below.
 | P2b-s | trust the reference's schema | 2 tests fail |
 | P2b-ii | profile identity ignores the encoding | identity test fails |
 | P2b-ii | profile identity omits the header row | field-completeness test fails |
+| P2b-ii | drop length prefixing from the rendering | both collision tests fail |
 | P2b-ii | `open` reads from disk | **5 tests fail, incl. the falsifier** |
 | P2b-ii | header-missing column skipped | fail-fast test fails |
 | P2b-ii | report only the first cell refusal | accumulation test fails |
@@ -84,10 +85,27 @@ lies" below.
 | P6desc | change a declared offset | consumer reads the change |
 | P6gold | descriptor declares TR 2.0 | reaches the rule |
 
-**48 mutants, 48 killed** (34 above plus the four JSON values whose gaps this hunt found and
+**49 mutants, 49 killed** (34 above plus the four JSON values whose gaps this hunt found and
 closed). Two mutants are recorded as *surviving and benign* by the P2b reviewer
 (`filter(present.contains)` removal, which only double-reports; and `verify`'s schema check, dead
 once `of` owns it) — both are noted rather than replaced.
+
+## Two identity collisions, from a probe suite an agent left on disk
+
+`rev-profile` never reported, but had written a probe suite into the scratchpad. Two of its probes
+targeted something the field-completeness test structurally cannot catch — that test varies each
+field in turn, which finds OMISSIONS but not COLLISIONS. Both collided:
+
+- `Custom("a:b", "c")` and `Custom("a", "b:c")` both render `a:b:c`, so two different encodings
+  produced one identity.
+- `ContentAddress.digest` joins parts with NUL, so a column literally named
+  `a\u0000text\u0000false\u0000b` digested identically to two columns `a` and `b`.
+
+In a content-addressed scheme, two profiles that READ DIFFERENTLY sharing an identity means a
+receipt cannot say which reading produced it — the identity's entire purpose.
+
+Fixed by length-prefixing every part and framing the encoding field by field rather than through
+its rendered string. Mutant: remove the prefixing → both collision tests fail.
 
 ## A finding recovered from an agent that never reported
 
