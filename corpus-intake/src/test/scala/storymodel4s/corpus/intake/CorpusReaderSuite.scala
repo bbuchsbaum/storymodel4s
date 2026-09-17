@@ -270,3 +270,52 @@ class CorpusReaderSuite extends FunSuite:
       case Left(CorpusReader.OpenRefusal.DuplicateHeader(_, _, name)) => assertEquals(name, "Time")
       case other => fail(s"expected DuplicateHeader, got $other")
   }
+
+  /** The asymmetry question: a MISSPELLED column is refused, an OMITTED one is silent.
+    *
+    * That asymmetry is deliberate and this test pins it. A profile that names a column the header
+    * lacks has made a mistake -- the two disagree about the source. A profile that simply does not
+    * bind a column has made a CHOICE: reading a subset of a 21-column storyboard is the normal
+    * case, not an error. Making omission an error would force every profile to enumerate columns it
+    * does not use, and a profile that must list what it ignores is a profile nobody will keep
+    * correct.
+    */
+  test("an unbound column is ignored by choice, while a misspelled one is refused") {
+    // the workbook has EventModelNum, Time and RecallType; this profile binds only two
+    val subset = CorpusProfile
+      .of(
+        ProfileId.unsafe("subset.v1"),
+        1,
+        Map(
+          (art, "Narr") -> SheetBinding(
+            1,
+            Map(
+              "EventModelNum" -> ColumnBinding(CellEncoding.IntegerText),
+              "Time" -> ColumnBinding(CellEncoding.ExcelSerialDays(1))
+            )
+          )
+        )
+      )
+      .fold(r => fail(r.message), identity)
+    val oc = CorpusReader.open(verifiedOf(payload), subset).fold(r => fail(r.message), identity)
+    val first = oc.sheet(art, "Narr").get.rows.head
+    // the unbound column is absent from the row context, not blank -- it was never asked for
+    assertEquals(first.context.valueOf("RecallType"), ColumnValue.Undeclared)
+    assertEquals(first.literal("RecallType"), None)
+    assertEquals(first.context.valueOf("Time"), ColumnValue.Value("0"))
+
+    // whereas a column the header LACKS is a disagreement about the source, and refuses
+    val misspelled = CorpusProfile
+      .of(
+        ProfileId.unsafe("typo.v1"),
+        1,
+        Map(
+          (art, "Narr") -> SheetBinding(
+            1,
+            Map("EventModelNumm" -> ColumnBinding(CellEncoding.IntegerText))
+          )
+        )
+      )
+      .fold(r => fail(r.message), identity)
+    assert(CorpusReader.open(verifiedOf(payload), misspelled).isLeft)
+  }
