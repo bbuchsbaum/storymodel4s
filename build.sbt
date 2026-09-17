@@ -87,6 +87,7 @@ lazy val root = tlCrossRootProject
     embedCore,
     view,
     codec,
+    corpus,
     fixtures,
     laws,
     providerParser,
@@ -95,7 +96,8 @@ lazy val root = tlCrossRootProject
     embedOnnx,
     embedBench,
     media,
-    pipeline
+    pipeline,
+    corpusIntake
   )
 
 /** Identity, spans, evidence, claims, credence, provenance, hashing. No I/O. */
@@ -404,6 +406,35 @@ lazy val codec = crossProject(JVMPlatform, JSPlatform, NativePlatform)
     )
   )
 
+/** Portable corpus-intake contract (ADR 0018): source coordinates, typed cells, segmentations,
+  * segment links, code books, profiles, capabilities, the thin source manifest and its typed
+  * refusals. Schema and laws only -- it performs no I/O and knows no corpus.
+  */
+lazy val corpus = crossProject(JVMPlatform, JSPlatform, NativePlatform)
+  .crossType(CrossType.Pure)
+  .in(file("corpus"))
+  .settings(moduleSettings("corpus"))
+  .dependsOn(core)
+  .settings(
+    libraryDependencies ++= Seq(
+      "io.circe" %%% "circe-core" % circeV,
+      "io.circe" %%% "circe-parser" % circeV
+    )
+  )
+
+/** JVM-only corpus readers (ADR 0018): xlsx/zip/tsv readers, the byte verifier, receipt and
+  * descriptor emission. It owns I/O and file layout, and no semantics. No portable module depends
+  * on it.
+  */
+lazy val corpusIntake = project
+  .in(file("corpus-intake"))
+  .settings(commonSettings)
+  .settings(
+    name := "storymodel4s-corpus-intake",
+    Test / fork := true
+  )
+  .dependsOn(corpus.jvm, core.jvm)
+
 /** Reference fixtures: The War of the Ghosts narrative acceptance fixture, worked recall examples,
   * interview example.
   */
@@ -455,6 +486,7 @@ val allModules = List(
   "embedCore",
   "view",
   "codec",
+  "corpus",
   "fixtures",
   "laws"
 )
@@ -467,7 +499,8 @@ val jvmOnlyModules = List(
   "embedOnnx",
   "embedBench",
   "media",
-  "pipeline"
+  "pipeline",
+  "corpusIntake"
 )
 
 addCommandAlias(
