@@ -46,6 +46,7 @@ lies" below.
 | P1c | undeclared encoding guessed | unconditional-refusal test fails |
 | P1c | min.sec read as a number | 2 tests fail |
 | P1c | `IntegerText` accepts a whole decimal | that test fails |
+| P1c | no bound on the plain-decimal rendering | pathological-exponent test fails |
 | NF1 | drop the dot-segment check | 2 traversal tests fail |
 | NF1 | path `toString` renders its value | non-disclosure test fails |
 | P2a | header-only sheet reads as success | `NoDataRows` test fails |
@@ -83,10 +84,25 @@ lies" below.
 | P6desc | change a declared offset | consumer reads the change |
 | P6gold | descriptor declares TR 2.0 | reaches the rule |
 
-**47 mutants, 47 killed** (34 above plus the four JSON values whose gaps this hunt found and
+**48 mutants, 48 killed** (34 above plus the four JSON values whose gaps this hunt found and
 closed). Two mutants are recorded as *surviving and benign* by the P2b reviewer
 (`filter(present.contains)` removal, which only double-reports; and `verify`'s schema check, dead
 once `of` owns it) — both are noted rather than replaced.
+
+## A finding recovered from an agent that never reported
+
+One of the reviewers that went idle had in fact done work, left on disk in the session scratchpad:
+a `jshell` probe of `BigDecimal.stripTrailingZeros.toPlainString` across pathological inputs,
+including `1E+100000000`. Nothing was ever reported, and the artifact was found only by listing the
+scratchpad while chasing the missing reports.
+
+It was right. `Cell.normalize` under `DecimalText` expanded the exponent: `1E+10000000` renders as a
+**ten-million-character string in about 18 ms**, and a larger exponent exhausts the heap. A workbook
+is untrusted input — the same reason the XML parser refuses DTDs — so one crafted or corrupt cell
+could take the process down. My own `NormalizeSuite` had tested `1E+2` and stopped there.
+
+Now bounded at 1,000 characters, computed from `precision` and `scale` **without rendering the
+string**. Mutant: remove the bound → the pathological-exponent test fails.
 
 ## A claim of mine that was overstated, and the correction
 

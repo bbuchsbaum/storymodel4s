@@ -160,6 +160,37 @@ object Cell:
       case Some(other) =>
         Left(CellRefusal.Malformed(at, literal, other, "not a text encoding"))
 
+  /** The largest plain-decimal rendering this reader will produce, in characters.
+    *
+    * `BigDecimal.stripTrailingZeros.toPlainString` expands the exponent, so one cell reading
+    * `1E+10000000` yields a TEN-MILLION-character string in about 18 ms, and a larger exponent
+    * exhausts the heap. A workbook is untrusted input -- the same reason the XML parser refuses
+    * DTDs -- so a single crafted or corrupt cell must not be able to do that.
+    *
+    * 1,000 characters is far beyond any real annotation value and far below anything harmful.
+    */
+  private val MaxPlainDigits: Int = 1000
+
+  private def decimalPlain(
+      at: SourceCoordinate,
+      literal: String
+  ): Either[CellRefusal, String] =
+    try
+      val d = BigDecimal(literal.trim).underlying.stripTrailingZeros
+      // the plain form is about this long; computed WITHOUT rendering it
+      val span = d.precision().toLong + math.abs(d.scale().toLong)
+      if span > MaxPlainDigits then
+        Left(
+          CellRefusal.Malformed(
+            at,
+            literal,
+            CellEncoding.DecimalText,
+            s"plain form would be about $span characters, over $MaxPlainDigits"
+          )
+        )
+      else Right(d.toPlainString)
+    catch case NonFatal(_) => Left(CellRefusal.NotFinite(at, literal))
+
   private def integerUnder(
       at: SourceCoordinate,
       literal: String,
@@ -253,8 +284,6 @@ object Cell:
               excelSeconds(at, literal, origin).map(r => Some(r.value.toString))
             case CellEncoding.MinuteDotSecond =>
               minuteDotSecond(at, literal).map(r => Some(r.value.toString))
-            case CellEncoding.DecimalText =>
-              try Right(Some(BigDecimal(literal.trim).underlying.stripTrailingZeros.toPlainString))
-              catch case NonFatal(_) => Left(CellRefusal.NotFinite(at, literal))
+            case CellEncoding.DecimalText      => decimalPlain(at, literal).map(Some(_))
             case c @ CellEncoding.Custom(_, _) =>
               Left(CellRefusal.Malformed(at, literal, c, "custom encodings declare no rendering"))

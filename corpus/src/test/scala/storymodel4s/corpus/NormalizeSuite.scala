@@ -66,3 +66,26 @@ class NormalizeSuite extends FunSuite:
       assertEquals(n.toOption.flatten, d.toOption.flatten.map(_.value.toString), s"$lit")
     }
   }
+
+  /** A workbook is untrusted input, and one cell must not be able to exhaust the heap.
+    *
+    * `stripTrailingZeros.toPlainString` EXPANDS the exponent: `1E+10000000` renders as a
+    * ten-million-character string in about 18 ms, and a larger exponent takes the process down.
+    * Measured before the bound existed. The same reason the XML parser refuses DTDs.
+    */
+  test("a pathological exponent is refused without being rendered") {
+    Vector("1E+10000", "1E+10000000", "1E-10000000", "-1E+99999999").foreach { lit =>
+      norm(lit, CellEncoding.DecimalText) match
+        case Left(CellRefusal.Malformed(_, _, CellEncoding.DecimalText, reason)) =>
+          assert(reason.contains("characters"), reason)
+        case other => fail(s"$lit was not refused: $other")
+    }
+  }
+
+  test("ordinary decimals are unaffected by the bound") {
+    Vector("0", "1.5", "-1.5", "1E+2", "2515", "1.000439814814815", "0.000001").foreach { lit =>
+      assert(norm(lit, CellEncoding.DecimalText).isRight, s"$lit was refused")
+    }
+    // and a value right at the edge of plausibility still reads
+    assert(norm("1" + "0" * 200, CellEncoding.DecimalText).isRight)
+  }
