@@ -285,7 +285,7 @@ class F1ExcerptSuite extends FunSuite:
       Files
         .walk(dir)
         .sorted(java.util.Comparator.reverseOrder())
-        .forEach(p => Files.deleteIfExists(p))
+        .forEach(p => { Files.deleteIfExists(p); () })
       ()
 
 object F1ExcerptSuite:

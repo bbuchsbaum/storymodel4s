@@ -467,7 +467,7 @@ class BoundarySearchSuite extends FunSuite:
       Files
         .walk(dir)
         .sorted(java.util.Comparator.reverseOrder())
-        .forEach(p => Files.deleteIfExists(p))
+        .forEach(p => { Files.deleteIfExists(p); () })
       ()
 
 object BoundarySearchSuite:

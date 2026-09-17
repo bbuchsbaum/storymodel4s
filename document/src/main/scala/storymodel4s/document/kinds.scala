@@ -1,5 +1,6 @@
 package storymodel4s.document
 
+import scala.annotation.unused
 import storymodel4s.core.*
 import storymodel4s.core.NarrativeKind.{EntityK, SituationK}
 import storymodel4s.proposition.{CheckState, Concept, ConceptId, ConceptKind, PropositionChart}
@@ -28,8 +29,8 @@ sealed trait KindWitness[K <: NarrativeKind]:
     * [[NarrativeCompiler]]'s rule.
     */
   def acceptsAt[C <: CheckState](
-      chart: PropositionChart[C],
-      id: ConceptId,
+      @unused chart: PropositionChart[C],
+      @unused id: ConceptId,
       concept: Concept
   ): Boolean = accepts(concept.kind)
 

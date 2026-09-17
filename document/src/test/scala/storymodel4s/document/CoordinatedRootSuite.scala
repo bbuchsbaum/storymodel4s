@@ -83,7 +83,7 @@ class CoordinatedRootSuite extends FunSuite:
       relations: Vector[PropositionRelation] = Vector.empty,
       polarity: Map[String, ChartPolarity] = Map.empty,
       embedded: Vector[EmbeddedProposition] = Vector.empty,
-      alignments: Vector[PropositionAlignment] = Vector.empty,
+      alignments: Vector[PropositionAlignment],
       salt: String = ""
   ): PropositionEvidence =
     val unchecked = PropositionChart.unchecked(

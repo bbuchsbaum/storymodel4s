@@ -2,7 +2,6 @@ package storymodel4s.pipeline
 
 import java.nio.file.{Files, Path, Paths}
 import munit.FunSuite
-import storymodel4s.features.*
 
 /** The feature request vocabulary and the lexicon file loader: what a caller can ask for, how the
   * command line says it, and what a table file may and may not contain.

@@ -874,7 +874,7 @@ object ChartProposalProvider:
     for
       _ <- checkAtlas(source, atlas)
       _ <- checkSourceIsContentAddressed(source)
-      ordered <- checkCharts(source, atlas, charts)
+      ordered <- checkCharts(atlas, charts)
       _ <- ordered.traverse_((unit, ev) => checkAlignments(source, atlas, unit, ev.chart))
       placement = ContextPlacement.read(source, atlas, ordered.map((u, ev) => u.id -> ev.chart))
       outcomes <- ordered.traverse((unit, ev) => sentenceOutcome(source, unit, ev)(using placement))
@@ -987,7 +987,6 @@ object ChartProposalProvider:
     )
 
   private def checkCharts(
-      source: StorySource,
       atlas: SurfaceAtlas,
       charts: Vector[(SurfaceUnitId, PropositionEvidence)]
   ): Either[DomainError, Vector[(SurfaceUnit, PropositionEvidence)]] =

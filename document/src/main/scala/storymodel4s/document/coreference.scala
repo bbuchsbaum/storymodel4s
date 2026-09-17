@@ -227,7 +227,7 @@ object EntityIdentity:
               .resolvableAt(m, partition)
               .filter(c => ChartNumber.compatible(number, numberOfCluster(c)))
             candidates match
-              case Vector(one) =>
+              case Vector(_) =>
                 m -> MentionIdentity.Resolved(UniqueAntecedentRule)
               case Vector() =>
                 m -> MentionIdentity.Open(OpenReference.NoAntecedent, Vector.empty)

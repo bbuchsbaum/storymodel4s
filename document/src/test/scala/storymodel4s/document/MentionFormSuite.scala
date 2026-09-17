@@ -182,7 +182,6 @@ class MentionFormSuite extends ScalaCheckSuite:
         .of(
           table,
           Map(mid("m0") -> MentionForm.Name),
-          graph,
           MentionForms.sentenceRank(graph.sentences)
         )
         .isLeft
@@ -192,7 +191,7 @@ class MentionFormSuite extends ScalaCheckSuite:
       mid("m1") -> MentionForm.Name,
       mid("zz") -> MentionForm.Name
     )
-    assert(MentionForms.of(table, bogus, graph, MentionForms.sentenceRank(graph.sentences)).isLeft)
+    assert(MentionForms.of(table, bogus, MentionForms.sentenceRank(graph.sentences)).isLeft)
   }
 
   /** Generated documents: a sequence of lemmas drawn from names, nouns, and pronouns. */

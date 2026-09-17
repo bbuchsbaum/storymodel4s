@@ -2,7 +2,6 @@ package storymodel4s.document
 
 import cats.data.{NonEmptySet, NonEmptyVector}
 import munit.FunSuite
-import storymodel4s.acquire.*
 import storymodel4s.core.*
 import storymodel4s.proposition.{Polarity as ChartPolarity, *}
 import storymodel4s.story.*
@@ -112,11 +111,11 @@ class ContextPlacementSuite extends FunSuite:
       unit: SurfaceUnit,
       focus: String,
       concepts: Map[String, Concept],
-      relations: Vector[PropositionRelation] = Vector.empty,
-      polarity: Map[String, ChartPolarity] = Map.empty,
+      relations: Vector[PropositionRelation],
+      polarity: Map[String, ChartPolarity],
       embedded: Vector[EmbeddedProposition] = Vector.empty,
-      alignments: Vector[PropositionAlignment] = Vector.empty,
-      salt: String = ""
+      alignments: Vector[PropositionAlignment],
+      salt: String
   ): PropositionEvidence =
     val unchecked = PropositionChart.unchecked(
       Some(id(focus)),

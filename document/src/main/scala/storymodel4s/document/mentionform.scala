@@ -261,7 +261,6 @@ object MentionForms:
   def of(
       table: MentionTable[EntityK],
       forms: Map[MentionId[EntityK], MentionForm],
-      graph: MentionGraph,
       rank: SurfaceUnitId => Option[Int],
       offsetOf: ChartNodeRef => Int = _ => 0
   ): Either[DocumentError, MentionForms] =
@@ -300,4 +299,4 @@ object MentionForms:
         }
       }
     }.toMap
-    of(table, forms, graph, rank, offsetOf)
+    of(table, forms, rank, offsetOf)

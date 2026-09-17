@@ -119,6 +119,7 @@ class WarOfTheGhostsDraftAtlasSuite extends FunSuite:
     s.marks
       .groupBy {
         case _: VisualPrimitive.SurfaceUnit    => "surface-unit"
+        case _: VisualPrimitive.Feature        => "feature"
         case _: VisualPrimitive.Region         => "region"
         case _: VisualPrimitive.Landmark       => "landmark"
         case _: VisualPrimitive.Thread         => "thread"

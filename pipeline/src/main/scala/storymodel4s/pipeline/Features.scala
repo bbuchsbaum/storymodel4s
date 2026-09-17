@@ -3,7 +3,7 @@ package storymodel4s.pipeline
 import java.nio.charset.StandardCharsets
 import java.nio.file.{Files, Path}
 import scala.util.control.NonFatal
-import storymodel4s.codec.{FeatureMaterializer, FeaturesArtifact, MaterializedFeatures}
+import storymodel4s.codec.{FeatureMaterializer, FeaturesArtifact}
 import storymodel4s.core.*
 import storymodel4s.features.*
 import storymodel4s.story.{ModelStatus, StoryModel, StoryValidator}
@@ -159,7 +159,7 @@ object FeatureStage:
         .materialize(draft, tracks)
         .left
         .map(e => PipelineError.FeatureRefused(e.message))
-      stamped = stamp(materialized.model, requests, measures)
+      stamped = stamp(materialized.model, measures)
       _ <- featureLaws(stamped)
       artifact <- FeaturesArtifact
         .of(stamped, materialized.tracks)
@@ -203,7 +203,6 @@ object FeatureStage:
   /** The build receipt gains a `features` stage naming what was measured, when anything was. */
   private def stamp(
       model: StoryModel[ModelStatus.Draft],
-      requests: Vector[FeatureRequest],
       measures: Vector[LexicalMeasure]
   ): StoryModel[ModelStatus.Draft] =
     if measures.isEmpty then model

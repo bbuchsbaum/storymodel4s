@@ -10,7 +10,7 @@ import storymodel4s.features.*
 import storymodel4s.laws.AddressGens
 import storymodel4s.proposition.{Checked, PropositionChart, PropositionEvidence}
 import storymodel4s.recall.RecallUnit
-import storymodel4s.story.{SegmentSummary, SummaryGap}
+import storymodel4s.story.SegmentSummary
 import AddressGens.given
 import CodecGens.given
 import CanonicalPrimitives.given
