@@ -1,7 +1,7 @@
-canonical JSON bytes: 430246
-content checksum: 481888370ce2c9d0ace956c25131cb132f5efcb5ff3205aaf40317d3aea08cb1
+canonical JSON bytes: 477497
+content checksum: 3480df7007cb6dcab43d3f725cfd83820c3b42d523253166569b51940554a142
 decoded draft revalidates: true
 canonical JSON is a fixed point: true
 round-trip checksum matches: true
 unsupported schema rejected: true
-decode error: decode at $: unsupported schema version 99.0.0 (supported: 0.1.0)
+decode error: decode at $: unsupported schema version 99.0.0 (supported: 0.7.0)

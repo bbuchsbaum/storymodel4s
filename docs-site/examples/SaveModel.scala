@@ -23,7 +23,7 @@ import storymodel4s.story.{StoryValidator, ValidationPolicy}
   println(s"round-trip checksum matches: $sameChecksum")
 
   val unsupported = json.replace(
-    "\"schemaVersion\":\"0.1.0\"",
+    s"\"schemaVersion\":\"${model.schemaVersion}\"",
     "\"schemaVersion\":\"99.0.0\""
   )
   val rejected = StoryModelCodec.decode(unsupported).left.toOption

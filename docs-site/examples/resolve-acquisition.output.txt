@@ -1,4 +1,4 @@
-accepted: Accepted(value=Negative, calibrated=0.96, evidence=2)
+accepted: Accepted(value=Negative, basis=calibrated:polarity-calibration-v1=0.96, evidence=2)
 alternatives: Alternatives(Negative:providers=1:raw=0.91, Positive:providers=1:raw=0.71)
 unresolved: Unresolved(InsufficientAgreement(1,2))
 rejected: Rejected(StructurallyInvalid(Vector(polarity target is not a predicate)))

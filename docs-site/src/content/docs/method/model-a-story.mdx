@@ -15,8 +15,8 @@ import { resolve } from 'node:path';
 export const programPath = 'docs-site/examples/ModelAStory.scala';
 export const outputPath = 'docs-site/examples/model-a-story.output.txt';
 export const PROGRAM_SHA = 'fb72cb6eb6e16c6207d72abf9a7beb9967005dab15515f09194dc170df4fcabf';
-export const OUTPUT_SHA = 'c7e474e487d5cebf00ba3db0d288844e2e87f2fe88282c979348ae120d2b9b61';
-export const PRODUCER_REVISION = '76c62e738a2579d6598fccf3ac19266c60480e20';
+export const OUTPUT_SHA = 'e7868db4aa5e89d493041a52454f7a61cd90382a41561cb85199d07f7866a42f';
+export const PRODUCER_REVISION = '43140bcb7adf3ca43fac8a85845187f6eb1fd9a7';
 
 export const program = readFileSync(resolve(process.cwd(), 'examples/ModelAStory.scala'), 'utf8');
 export const output = readFileSync(resolve(process.cwd(), 'examples/model-a-story.output.txt'), 'utf8');
@@ -81,7 +81,7 @@ the JVM, and compares stdout byte-for-byte with the displayed output.
 
 The fixture contains 50 sentences and 517 tokens. Its narrative graph contains 14 entities, 71
 situations, and 12 contexts. The relation counts come from the graph itself: 52 temporal links,
-9 causal links, and 3 goal links. `model.claims` gathers 462 claim records from the graph, hierarchy,
+9 causal links, and 3 goal links. `model.claims` gathers 475 claim records from the graph, hierarchy,
 trajectory, descriptors, and hypotheses.
 
 The last two records explain why contexts matter:

@@ -48,7 +48,7 @@ import storymodel4s.proposition.Polarity
   def bundle(
       proposals: Vector[AgentProposal[Polarity]],
       structural: StructuralValidity = StructuralValidity.Valid,
-      calibrations: Vector[CandidateCalibration[Polarity]] = Vector.empty
+      bases: Vector[CandidateBasis[Polarity]] = Vector.empty
   ): EvidenceBundle[Polarity] =
     EvidenceBundle(
       proposals,
@@ -56,30 +56,30 @@ import storymodel4s.proposition.Polarity
       structural,
       SourceSupport(score = 1.0, spans = Some(spans)),
       agreementScore = 1.0,
-      calibrations
+      bases
     )
 
   val parserNegative = proposal(Polarity.Negative, "parser", 0.91)
   val agentNegative = proposal(Polarity.Negative, "agent", 0.87)
   val agentPositive = proposal(Polarity.Positive, "agent", 0.71)
-  val calibratedNegative = Vector(
+  val negativeBasis = Vector(
     CandidateBasis(Polarity.Negative, AcceptanceBasis.Calibrated(Probability.unsafe(0.96), CalibrationModelId.unsafe("polarity-calibration-v1")))
   )
 
   val cases = Vector(
-    "accepted" -> bundle(Vector(parserNegative, agentNegative), calibrations = calibratedNegative),
+    "accepted" -> bundle(Vector(parserNegative, agentNegative), bases = negativeBasis),
     "alternatives" -> bundle(Vector(parserNegative, agentPositive)),
-    "unresolved" -> bundle(Vector(parserNegative), calibrations = calibratedNegative),
+    "unresolved" -> bundle(Vector(parserNegative), bases = negativeBasis),
     "rejected" -> bundle(
       Vector(parserNegative, agentNegative),
       structural = StructuralValidity.invalid("polarity target is not a predicate"),
-      calibrations = calibratedNegative
+      bases = negativeBasis
     )
   )
 
   def render(state: ResolutionState[Polarity]): String = state match
-    case Accepted(value, probability, evidence) =>
-      f"Accepted(value=$value, calibrated=${probability.value}%.2f, evidence=${evidence.length})"
+    case Accepted(value, basis, evidence) =>
+      s"Accepted(value=$value, basis=${basis.render}, evidence=${evidence.length})"
     case Alternatives(values) =>
       val rows = values.toVector.map { weighted =>
         val score = weighted.score.fold("missing")(s => f"${s.value}%.2f")

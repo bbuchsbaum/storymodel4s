@@ -13,9 +13,9 @@ import { resolve } from 'node:path';
 
 export const programPath = 'docs-site/examples/SaveModel.scala';
 export const outputPath = 'docs-site/examples/save-model.output.txt';
-export const PROGRAM_SHA = '7526d4599c05e7afcdff74e784232e1bbc0cede04b478c646ca4b24483aa1bfa';
-export const OUTPUT_SHA = 'cc1f48b09b46f92eaf4b617837b4f343b84ad721cea0e2122048a54ac8217864';
-export const PRODUCER_REVISION = '76c62e738a2579d6598fccf3ac19266c60480e20';
+export const PROGRAM_SHA = '977e26ba8dfe48425975f8a00ff02c9b68a5a694a7b666688e0347da9b529707';
+export const OUTPUT_SHA = '5eaa27106fffdd30040fd944037e3773a58e58dc634950de664cebc23fa87653';
+export const PRODUCER_REVISION = '43140bcb7adf3ca43fac8a85845187f6eb1fd9a7';
 export const program = readFileSync(resolve(process.cwd(), 'examples/SaveModel.scala'), 'utf8');
 export const output = readFileSync(resolve(process.cwd(), 'examples/save-model.output.txt'), 'utf8');
 export const programSha = createHash('sha256').update(program).digest('hex');
@@ -59,12 +59,12 @@ sbt -Dstorymodel4s.grakern.build=/absolute/path/to/pinned-grakern \
 The replay gate compiles this exact program against revision `{PRODUCER_REVISION}`, runs it on the
 JVM, and compares stdout byte-for-byte with the displayed output.
 
-The *War of the Ghosts* model occupies 430,246 UTF-8 bytes in canonical JSON at this revision. Its
+The *War of the Ghosts* model occupies 477,497 UTF-8 bytes in canonical JSON at this revision. Its
 content checksum is the SHA-256 value printed above. The decoded draft passes `StoryValidator`, and
 encoding it again reproduces the same bytes and checksum.
 
-The final two lines show a failed decode. Changing `schemaVersion` from `0.1.0` to `99.0.0` produces
-a typed codec error that names the supported version.
+The final two lines show a failed decode. Changing `schemaVersion` from the model's own version to
+`99.0.0` produces a typed codec error that names the supported version.
 
 <Evidence
   status="Confirmed"

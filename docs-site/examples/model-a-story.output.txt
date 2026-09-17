@@ -2,7 +2,7 @@ story: The War of the Ghosts
 surface: 50 sentences, 517 tokens
 narrative graph: 14 entities, 71 situations, 12 contexts
 typed relations: 52 temporal, 9 causal, 3 goal
-auditable claims: 462
+auditable claims: 475
 
 wog:sit:ym1-says-no-arrows: event / say
   context: NarratedWorld (wog:ctx:world)
