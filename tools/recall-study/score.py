@@ -34,7 +34,19 @@ import sys
 
 BOOTSTRAP = 2000
 SEED = 20260902
+# Sherlock fallback. The 100000.0 is an ORDERING SENTINEL, not a time: this file feeds it only to
+# kendall_tau_b, a rank statistic where any monotone offset works. Declaring which kind it is, is
+# the whole point -- agreement.py needs the REAL 1426.0 for the same parts because it measures gaps.
 PART_OFFSET = {"media-part-a": 0.0, "media-part-b": 100000.0}
+OFFSET_KIND = "ordering-only"
+
+
+def configure(descriptor_path):
+    """Replaces PART_OFFSET from a declared descriptor of the ORDERING-ONLY kind."""
+    global PART_OFFSET
+    import corpus_descriptor as cd
+    PART_OFFSET = cd.part_offsets(cd.load(descriptor_path), cd.ORDERING_ONLY)
+    return PART_OFFSET
 
 
 def kendall_tau_b(xs):

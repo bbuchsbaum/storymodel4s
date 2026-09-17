@@ -11,7 +11,18 @@ Usage: matched.py LABEL_A DIR_A LABEL_B DIR_B
 """
 import csv, glob, math, os, random, statistics, sys
 
+# Sherlock fallback, ORDERING SENTINEL -- same reasoning as score.py: this file feeds it only to
+# tau_b. A third copy of the literal is what the descriptor exists to end.
 PART = {"media-part-a": 0.0, "media-part-b": 100000.0}
+OFFSET_KIND = "ordering-only"
+
+
+def configure(descriptor_path):
+    """Replaces PART from a declared descriptor of the ORDERING-ONLY kind."""
+    global PART
+    import corpus_descriptor as cd
+    PART = cd.part_offsets(cd.load(descriptor_path), cd.ORDERING_ONLY)
+    return PART
 
 
 def tau_b(xs):

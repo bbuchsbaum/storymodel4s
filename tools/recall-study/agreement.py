@@ -25,7 +25,18 @@ import csv, glob, json, math, os, random, statistics, sys
 # A continuous film timeline in real seconds. Part A runs to 1426s in the annotation, so part B is
 # offset by that rather than by a large sentinel: with a sentinel offset a pair split across the two
 # parts contributes a gap of tens of thousands of seconds and dominates any mean.
+# Sherlock fallback, ELAPSED TIME -- the real part-B offset, because this file measures gaps
+# between recall units and a sentinel would make every cross-part gap meaningless.
 PART = {"media-part-a": 0.0, "media-part-b": 1426.0}
+OFFSET_KIND = "elapsed-time"
+
+
+def configure(descriptor_path):
+    """Replaces PART from a declared descriptor of the ELAPSED-TIME kind."""
+    global PART
+    import corpus_descriptor as cd
+    PART = cd.part_offsets(cd.load(descriptor_path), cd.ELAPSED_TIME)
+    return PART
 
 
 def part_offsets(d):
