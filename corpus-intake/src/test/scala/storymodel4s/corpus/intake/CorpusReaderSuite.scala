@@ -424,3 +424,35 @@ class CorpusReaderSuite extends FunSuite:
     )
     assertNotEquals(forged.identity, genuine.identity, "a NUL in a name forged an identity")
   }
+
+  /** A third collision shape, probed after the first two were fixed: can a SHEET name absorb the
+    * field that follows it?
+    *
+    * The per-sheet parts are artifact, sheet, headerRow. A sheet named `S\u00001` would, without
+    * framing, join identically to sheet `S` with header row 1. Length prefixing makes every part
+    * self-delimiting, so it cannot -- but the first two collisions were also "obviously fine" until
+    * probed, so this one is pinned rather than reasoned about.
+    */
+  test("a sheet name cannot absorb the header row that follows it") {
+    val nul = 0.toChar
+    def p(sheet: String, header: Int) =
+      CorpusProfile
+        .of(
+          ProfileId.unsafe("s.v1"),
+          1,
+          Map(
+            (art, sheet) -> SheetBinding(header, Map("Z" -> ColumnBinding(CellEncoding.PlainText)))
+          )
+        )
+        .fold(r => fail(r.message), identity)
+    assertNotEquals(p("Narr", 1).identity, p(s"Narr${nul}1", 1).identity)
+    // The artifact id cannot carry the separator AT ALL: `IdRules.check` refuses whitespace and
+    // control characters, so that attack is closed one layer earlier, by the id type rather than by
+    // the digest. Worth asserting, because a defence in a different layer is one a later change to
+    // THIS layer will not notice it is relying on.
+    assert(ArtifactId.from(s"a.xlsx${nul}b").isLeft)
+    assert(ArtifactId.from("a.xlsx b").isLeft)
+    // sheet names and column names are NOT ids and get no such check, which is exactly why the
+    // digest has to frame them itself
+    assert(ProfileId.from(s"p${nul}v1").isLeft)
+  }
