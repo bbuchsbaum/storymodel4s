@@ -180,6 +180,11 @@ restore strict increase → the segmentation-invariant test fails.
 Both are runnable mains, not tests: the bytes are in the git-ignored data root and the source sets'
 admission state is `proposed`.
 
+Both receipts now report **cell refusals**, and both read `none`. They did not before: `OpenSheet`
+accumulated refusals and flagged truncation, but neither runner looked, so a run could have read a
+corpus with hundreds of unreadable cells and printed a clean-looking receipt. A receipt that does
+not mention failures overstates the read, which is what makes the accumulation worth having.
+
 **Friends** — 6/6 artifacts verified, 2,638,557 bytes hashed; 53 rows; 52 events, 30 scenes, 2
 episodes, 5 storylines, 10 places; `Time` 0..2515 s; `TimeOrig` max 1318 s. Every number
 independently reproduces earlier ad-hoc measurement.

@@ -107,6 +107,23 @@ object FriendsIntake:
       walk <- crosswalk(opened, toleranceSeconds = 5L)
     yield receipt(verified, prof, opened) ++ crosswalkReceipt(walk._1, walk._2)
 
+  /** A receipt that does not mention failures overstates the read.
+    *
+    * `OpenSheet` accumulates cell refusals and flags truncation, but nothing forces a caller to
+    * look -- so a run could read a corpus with hundreds of unreadable cells and print a
+    * clean-looking receipt. Reporting them is what makes the accumulation worth having.
+    */
+  private[intake] def refusalLineOf(sheet: Option[CorpusReader.OpenSheet]): String =
+    refusalLine(sheet)
+
+  private def refusalLine(sheet: Option[CorpusReader.OpenSheet]): String =
+    sheet match
+      case None                 => "sheet not opened"
+      case Some(s) if s.isClean => "none"
+      case Some(s)              =>
+        val head = s.refusals.take(3).map(_.message).mkString("; ")
+        s"${s.refusals.size}${if s.refusalsTruncated then "+ (capped)" else ""} -- $head"
+
   private def crosswalkReceipt(mapping: Map[Int, Option[Int]], exactMatches: Int): Vector[String] =
     val mapped = mapping.values.flatten.toVector
     val removed = mapping.collect { case (k, None) => k }.toVector.sorted
@@ -146,6 +163,7 @@ object FriendsIntake:
       s"profile               : ${prof.id.value} v${prof.version} ${prof.identity.short()}",
       s"sheet                 : $NarrComb",
       s"rows read             : ${rows.size}",
+      s"cell refusals         : ${refusalLine(sheet)}",
       s"distinct EventModelNum: ${distinct("EventModelNum").size}",
       s"distinct SceneNum     : ${distinct("SceneNum").size}",
       s"distinct Episode      : ${distinct("Episode").size}",
@@ -224,6 +242,8 @@ object MementoIntake:
         s"artifacts verified    : ${verified.artifacts.size} of ${verified.manifest.artifacts.size}",
         s"profile               : ${prof.id.value} ${prof.identity.short()}",
         s"rows read             : ${rows.size}",
+        s"cell refusals         : " +
+          FriendsIntake.refusalLineOf(opened.sheet(Storyboard, Sheet)),
         s"distinct subscenes    : ${distinct("OverallScene").size}",
         s"distinct broad scenes : ${distinct("BroadSceneNum").size}",
         s"distinct story order  : ${distinct("StoryOrderSceneNum").size}",
