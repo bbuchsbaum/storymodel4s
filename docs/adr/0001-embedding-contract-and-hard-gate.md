@@ -285,17 +285,20 @@ reaches the codec).
 - `admissibility-echo/v1` — tagged like the others: `entries` (count), then per
   `(unit, anchor)` sorted: `unit`, `anchor`, `contradictions` (list, in detection
   order), `faithful`, `facets` (list, sorted).
-- `hsmm/v4` is the canonical JSON object owned by `HsmmResultCodec` (the live
-  `SchemaVersion`; v1, v2, and v3 tags are not accepted and have no migration).
+- `hsmm/v3` is the canonical JSON object owned by `HsmmResultCodec` (the live
+  `SchemaVersion`; v1 and v2 tags are not accepted and have no migration).
   Its top-level fields are exactly `schemaVersion`, `posterior`, `flow`,
-  `viterbi`, `logLikelihood`, `costs`, `supportBasis`, `candidateAnchors`,
+  `viterbi`, `logLikelihood`, `costs`, `candidateAnchors`,
   `admissibilityEcho`, `viewFingerprint`, `recallChecksum`, and
-  `refinementPasses`. `supportBasis` is one `{term, value}` per `CostTerm`;
-  decode requires exact complete coverage, finite nonnegative weights, then
-  compares the rebuilt `SupportBasis` with an independently supplied expected
-  basis before any cell is rebuilt. The embedded basis proves internal
-  consistency only; it is not an execution receipt. The sparse DTOs are arrays,
-  never maps with composite string keys:
+  `refinementPasses`. Each `costs` entry is `{unit, costs}` and each cell cost
+  is `{terms, mode, exclusion, total, missingTerms, sourceChartCoverage,
+  reductions, supportWeight, imputedTerms}`; v2 added the required numeric
+  `supportWeight`, v3 added the required `imputedTerms`. The numeric
+  `supportWeight` cannot say whether support was assessed, unestablished, or
+  not applicable — a tagged support assessment with a result-level support
+  basis is the planned `hsmm/v4` (bd-01M19956MFSG7076QE4J66T7E9) and has not
+  landed; until it does, no document may describe it as live. The sparse DTOs
+  are arrays, never maps with composite string keys:
   - each posterior row is `{unit, mass}` and each mass is `{state, mass}`;
   - each flow step is `{from, to, mass}` and each mass is
     `{fromState, toState, mass}`;
@@ -334,8 +337,8 @@ reaches the codec).
   byte-exact; the schema does not claim that separately rerunning transcendental
   inference on different numeric runtimes produces bit-identical doubles.
 - There is deliberately no context-free `Decoder[HsmmResult]`. Decoding requires
-  the original `RecallGraph`, `SourceView`, and independently admitted
-  `SupportBasis`, rebuilds rows and records through smart constructors and
+  the original `RecallGraph` and `SourceView`, rebuilds rows and records
+  through smart constructors and
   `AlignWire`, calls `HsmmResult.validated`, then requires `AlignWire.matched`
   for the two contextual digests.
 

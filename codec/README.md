@@ -26,14 +26,15 @@ Canonical JSON wire seam for storymodel4s artifacts (codec milestone, view-indep
 | `StoryModel[S]` | status is not written; decodes to `Draft`; `StoryModelCodec.contentChecksum` is SHA-256 of the canonical text, identical for Draft/Validated/Adjudicated; the atlas is encoded units-only so the text appears exactly once (in `source`) |
 | `FeatureTrack[FeatureTarget, Double | String]` | inline scalar/categorical; `Estimate.Missing(reason)` is preserved, never `null`/`0`/`NaN`; vectors only via `SidecarManifest` |
 | `SidecarTrack[T, V]` | retains the true `FeatureSpace[V]` while observed values point to compact rows in an `SM4SFT01` binary sidecar; Missing remains explicit and consumes no row |
-| `HsmmResult` | schema `hsmm/v4` (`HsmmResultCodec.SchemaVersion`); v2 added required `supportWeight`, v3 added required `imputedTerms`, v4 replaces `supportWeight` with a required tagged `support` assessment and a required result-level `supportBasis`. There is no migration from earlier tags — a v1/v2/v3 artifact is re-derived, not upgraded. `HsmmResultCodec` writes the sparse posterior, flow, costs, support basis, nominated anchors, gate echo, and context fingerprints; decoding requires the original `RecallGraph`, `SourceView`, and an independently admitted `SupportBasis`, rebuilds records through `AlignWire`, then calls `HsmmResult.validated` and `AlignWire.matched`. The embedded basis proves internal consistency only; it is not an execution receipt. |
+| `HsmmResult` | schema `hsmm/v3` (`HsmmResultCodec.SchemaVersion`); v2 added required `supportWeight`, v3 added required `imputedTerms`. There is no migration from earlier tags — a v1/v2 artifact is re-derived, not upgraded. `HsmmResultCodec` writes the sparse posterior, flow, per-cell costs (`terms`, `mode`, `exclusion`, `total`, `missingTerms`, `sourceChartCoverage`, `reductions`, `supportWeight`, `imputedTerms`), nominated anchors, gate echo, and context fingerprints; decoding requires the original `RecallGraph` and `SourceView`, rebuilds records through `AlignWire`, then calls `HsmmResult.validated` and `AlignWire.matched`. Known limit: the numeric `supportWeight` publishes `1.0` both when every term was measured and when nothing was eligible; the tagged support assessment that separates those is the planned `hsmm/v4` (bd-01M19956MFSG7076QE4J66T7E9) and has not landed. |
 | `PropositionChart` | decodes to `Unchecked` then validates to `Checked` |
 | `RecallGraph`, `TranscriptAtlas` | transcript as plain `StorySource` until the `PseudonymizedText` split lands |
 | `ClaimLedger` | JSON Lines (`JsonLines.claims` / `readClaims`), append-only |
 
-The committed War of the Ghosts `hsmm/v4` golden is the JVM/Scala.js canonical encoding. A v3
-artifact is refused: the old numeric `supportWeight` cannot reveal whether support was assessed,
-unestablished, or not applicable, and inventing any of those meanings would fabricate evidence.
+The committed War of the Ghosts `hsmm/v3` golden (`fixtures/src/test/resources/golden/hsmm-v3-wog.json`)
+is the JVM/Scala.js canonical encoding. A v1 or v2 artifact is refused: v2 carries no `imputedTerms`,
+and the only value a migration could invent is "nothing was imputed", which is precisely the false
+claim the checked wire exists to refuse.
 Scala Native inference can differ in low-order `libm` bits; this is not hidden as a false
 byte-identity claim. On every platform, the portable guarantee is byte-exact decode and re-encode
 of one artifact after contextual validation. The schema does not claim cross-runtime inference

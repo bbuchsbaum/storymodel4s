@@ -90,6 +90,8 @@ Similarly, the three `sherlock-gate` doc variants: `19N7ms` (15:56) and `dpDs9i`
 (16:42) match what the worktree held; `FXQsSA` (16:28) is a superseded
 intermediate. All three carry an older ADR-0001 describing `hsmm/v1`; the
 worktree's `hsmm/v4` version was kept.
+(Reverted to `hsmm/v3` on 2026-09-17: the v4 codec source never landed, so the kept docs
+described a schema the library does not emit — bd-01M1D214VVRE118RTEQQ09P7SA.)
 
 ---
 
