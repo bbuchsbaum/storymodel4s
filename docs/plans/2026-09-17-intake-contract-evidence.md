@@ -210,9 +210,27 @@ Six risky slices were named in advance, with the reason recorded on each bead be
 | P1b Coded | closed; 3 majors remediated at `854b2d24` |
 | P2b-i Verified | closed; 2 majors remediated at `3206c205` |
 | P2b-s sidecars | closed; remediated with the above |
-| P2b-ii profile/open | dispatched; findings not delivered |
-| P3 SegmentLink | dispatched; findings not delivered |
-| P5 ClockRepair | dispatched; findings not delivered |
+| P2b-ii profile/open | **dispatched; never executed** — brief worked by the author |
+| P3 SegmentLink | **dispatched; never executed** — brief worked by the author |
+| P5 ClockRepair | **dispatched; never executed** — brief worked by the author |
+
+Nine review agents were dispatched in total. **Three delivered, all within the first third of the
+session; the remaining six went idle without executing**, including two that had already delivered
+once and were re-tasked, and one given a three-line prompt specifically to test whether prompt size
+was the cause. It was not. This is a delivery failure in the agent mechanism, and further attempts
+did not change it.
+
+For the three slices whose reviewers never ran, the author worked the briefs directly: **7 defects
+found and fixed, 7 decisions pinned with tests and mutants, no question left open.** Those findings
+are real and are listed above. **They are not a review**, and this table does not present them as
+one.
+
+The distinction is not a formality. The three delivered reviews each caught something the author
+had *written a justification for* — a forgeable decode status a prior reviewer had explicitly waved
+through, and an `IArray` a commit message described as having no write path. Everything found by
+self-attack was something simply *not yet examined*. Self-review reliably reaches the second
+category and reliably misses the first, which is why the reviews were scheduled before
+implementation rather than run afterwards by the author.
 
 The three closed reviews found defects in claims the commits had already made — including a third
 aliasing route into "verified" bytes that a commit described as having no write path, and a
