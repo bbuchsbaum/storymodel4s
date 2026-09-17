@@ -116,10 +116,13 @@ class PopulationSuite extends ScalaCheckSuite:
   // ---- constructor checks --------------------------------------------------------------------
 
   test("of rejects empty populations, duplicate ids, unknown nodes, malformed rows") {
-    assertEquals(
+    assertEquals(PopulationAggregate.of(view, Vector.empty), Left(AlignError.EmptyPopulation))
+    // A revert to the pre-2026-09-17 refusal must go red here, not merely change a string.
+    assertNotEquals(
       PopulationAggregate.of(view, Vector.empty),
       Left(AlignError.SizeMismatch("population has no subjects"))
     )
+    assertEquals(AlignError.EmptyPopulation.message, "population has no subjects")
     val a = SubjectAlignment(sid("s"), AnnaFixture.recall, full, None)
     assert(PopulationAggregate.of(view, Vector(a, a.copy(wordCount = Some(1)))).isLeft)
     val alien = SourceNodeRef.Situation(storymodel4s.core.SituationId.unsafe("not-in-view"))

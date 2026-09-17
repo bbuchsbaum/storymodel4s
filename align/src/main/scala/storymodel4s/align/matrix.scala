@@ -328,6 +328,13 @@ enum AlignError:
   case MalformedRow(unit: RecallUnitId, detail: String)
   case SizeMismatch(detail: String)
 
+  /** A population aggregate was requested over no subjects. Distinct from [[SizeMismatch]]: that
+    * case says two things you gave me disagree in size; this one says you gave me nobody. Both were
+    * published as `SizeMismatch("population has no subjects")` until 2026-09-17, which a consumer
+    * could tell apart only by string comparison (bd-01M16B4NE7R5HHXT70GFW629ZT).
+    */
+  case EmptyPopulation
+
   /** A gated result would carry mass, a cost, or a path step on an `(anchor, mode)` pair that the
     * recorded admissibility does not admit (ADR 0001 rev 3 L1).
     */
@@ -369,6 +376,7 @@ enum AlignError:
     case InvalidConfig(f, m)    => s"$f: $m"
     case MalformedRow(u, m)     => s"row ${u.value}: $m"
     case SizeMismatch(m)        => m
+    case EmptyPopulation        => "population has no subjects"
     case GateViolation(u, s, m) => s"unit ${u.value}, state ${s.key}: $m"
     case InconsistentResult(m)  => m
     case GateDrift(r, d)        =>

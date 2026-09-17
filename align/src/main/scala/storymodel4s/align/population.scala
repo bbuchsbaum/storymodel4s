@@ -328,7 +328,7 @@ object PopulationAggregate:
     val foreignRecall = ordered.find { s =>
       s.result.recallChecksum != AlignWire.recallChecksum(s.recall)
     }
-    if subjects.isEmpty then Left(AlignError.SizeMismatch("population has no subjects"))
+    if subjects.isEmpty then Left(AlignError.EmptyPopulation)
     else if dup.nonEmpty then
       Left(AlignError.SizeMismatch(s"duplicate subject ids: ${dup.map(_.value).mkString(", ")}"))
     else if foreignView.nonEmpty then
@@ -354,4 +354,4 @@ object PopulationAggregate:
     else
       NonEmptyVector.fromVector(ordered) match
         case Some(nonEmpty) => Right(new PopulationAggregate(view, nonEmpty))
-        case None           => Left(AlignError.SizeMismatch("population has no subjects"))
+        case None           => Left(AlignError.EmptyPopulation)
