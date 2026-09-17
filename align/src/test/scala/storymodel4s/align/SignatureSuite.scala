@@ -466,6 +466,20 @@ class SignatureSuite extends FunSuite:
     assert(nothing.render.contains("n/a"), nothing.render)
   }
 
+  test("a mass ratio fails closed on a NaN conditioning or total mass") {
+    // bd-01M174W3D9AZG2FGSRM11FZ7ZQ / tools/nan-polarity.sh: `conditioning <= 0.0` classifies NaN
+    // as a fine positive number and stores Some(NaN). Reachable only by forging a FlowStep from an
+    // align sub-package, so this is the type's contract under test, not a live number.
+    val nanConditioning = MassRatio.unsafe(1.0, Double.NaN, 1.0)
+    assertEquals(nanConditioning.value, None, "a NaN denominator produced a number")
+    val nanTotal = MassRatio.unsafe(0.5, 0.5, Double.NaN)
+    assertEquals(nanTotal.support, 0.0, "a NaN total produced a support fraction")
+    // Positive controls: the same constructor on lawful inputs still divides.
+    assertEquals(MassRatio.unsafe(1.0, 2.0, 4.0).value, Some(0.5))
+    assertEquals(MassRatio.unsafe(1.0, 2.0, 4.0).support, 0.5)
+    assertEquals(MassRatio.unsafe(0.0, 0.0, 4.0).value, None)
+  }
+
   test("support says what fraction of the whole the value rests on") {
     val r = MassRatio.of(1.0, 2.0, 8.0).fold(e => fail(e.message), identity)
     assertEquals(r.value, Some(0.5))

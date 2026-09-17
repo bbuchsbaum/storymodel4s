@@ -189,7 +189,7 @@ final class MassRatio private (
     val totalMass: Double
 ):
   /** Fraction of the whole that the value rests on; 0 when nothing was eligible. */
-  def support: Double = if totalMass <= 0.0 then 0.0 else conditioningMass / totalMass
+  def support: Double = if totalMass > 0.0 then conditioningMass / totalMass else 0.0
 
   def render: String =
     val v = value.map(x => f"$x%.4f").getOrElse("n/a")
@@ -217,9 +217,17 @@ object MassRatio:
     */
   private val Tolerance = 1e-9
 
-  /** Trusted construction from inside `align`, where the sums are computed together. */
+  /** Trusted construction from inside `align`, where the sums are computed together.
+    *
+    * Polarity is fail-closed on purpose: `conditioning > 0.0` puts the safe branch on the `else`,
+    * so a NaN conditioning mass yields `None` rather than `Some(NaN)`. Semantics-preserving for
+    * every non-NaN input by trichotomy. NaN cannot arrive here through `HsmmResult.validated`,
+    * which rejects NaN flow mass; it can arrive by forging a `FlowStep` from a `storymodel4s.align`
+    * sub-package, and a type whose contract is "refuses unsupported numbers" does not get to depend
+    * on nobody doing that (tools/nan-polarity.sh; bd-01M174W3D9AZG2FGSRM11FZ7ZQ).
+    */
   private[align] def unsafe(numerator: Double, conditioning: Double, total: Double): MassRatio =
-    val v = if conditioning <= 0.0 then None else Some(numerator / conditioning)
+    val v = if conditioning > 0.0 then Some(numerator / conditioning) else None
     new MassRatio(v, conditioning, total)
 
   /** Checked construction: masses finite and non-negative, conditioning no larger than the total,
