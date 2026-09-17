@@ -215,3 +215,52 @@ class VerifySuite extends FunSuite:
         assertEquals(forMissing.head, VerificationFailure.MissingFromStore(missing.id))
       case Right(_) => fail("expected a failure")
   }
+
+  /** Behaviours a reviewer confirmed CORRECT but which nothing pinned.
+    *
+    * A reviewer's attack suite established three properties of `verify` by inspection and probe:
+    * bytes are fetched once per artifact, an unlisted id is never fetched at all, and one array
+    * served under two ids yields two independent copies. All three were right. None had a test, and
+    * a confirmed-but-unpinned behaviour is one that drifts on the next edit.
+    */
+  private final class CountingStore(payloads: Map[ArtifactId, Array[Byte]]) extends ArtifactStore:
+    var fetches: Vector[ArtifactId] = Vector.empty
+    def list: Vector[ArtifactId] = payloads.keys.toVector
+    def bytes(id: ArtifactId): Either[IntakeRefusal, Array[Byte]] =
+      fetches = fetches :+ id
+      payloads.get(id).toRight(IntakeRefusal.MissingArtifact(id))
+
+  test("verify fetches each artifact's bytes EXACTLY once") {
+    val second = record("second.xlsx", "other bytes".getBytes("UTF-8"))
+    val s = new CountingStore(
+      Map(rec.id -> payload.clone(), second.id -> "other bytes".getBytes("UTF-8"))
+    )
+    Verify.verify(manifestOf(Vector(rec, second)), s).fold(f => fail(f.head.message), identity)
+    assertEquals(s.fetches.size, 2)
+    assertEquals(s.fetches.distinct.size, 2)
+  }
+
+  test("an artifact the store does not list is never FETCHED, only reported missing") {
+    val absent = record("absent.xlsx", "nope".getBytes("UTF-8"))
+    val s = new CountingStore(Map(rec.id -> payload.clone()))
+    Verify.verify(manifestOf(Vector(rec, absent)), s) match
+      case Left(f) =>
+        assert(f.exists(_ == VerificationFailure.MissingFromStore(absent.id)))
+        // reading a file the snapshot does not have is work, and worse, a second failure mode
+        assert(!s.fetches.contains(absent.id), s"absent artifact was fetched: ${s.fetches}")
+      case Right(_) => fail("expected a failure")
+  }
+
+  test("one array served under two ids yields two INDEPENDENT verified copies") {
+    val shared = payload.clone()
+    val a = record("a.xlsx", payload)
+    val b = record("b.xlsx", payload)
+    val s = new RetainingStore(Map(a.id -> shared, b.id -> shared))
+    val v = Verify.verify(manifestOf(Vector(a, b)), s).fold(f => fail(f.head.message), identity)
+    // mutating the store's single array must not move either verified copy
+    shared(0) = 'Z'.toByte
+    assertEquals(v.artifact(a.id).get.toArray.toVector, payload.toVector)
+    assertEquals(v.artifact(b.id).get.toArray.toVector, payload.toVector)
+    // and the two copies are not the same object
+    assert(v.artifact(a.id).get.toArray ne v.artifact(b.id).get.toArray)
+  }

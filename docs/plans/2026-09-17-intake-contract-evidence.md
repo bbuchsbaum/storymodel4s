@@ -88,6 +88,11 @@ lies" below.
 
 **50 mutants, 50 killed.**
 
+Three behaviours a reviewer confirmed CORRECT by probe had no test pinning them -- bytes fetched
+once per artifact, an unlisted id never fetched at all, and one array served under two ids yielding
+independent copies. A confirmed-but-unpinned behaviour is one that drifts on the next edit, so all
+three now have tests.
+
 One mutant a reviewer found SURVIVING has since been closed: removing `filter(present.contains)`
 before hashing caused a declared-but-absent artifact to be reported twice, once as
 `MissingFromStore` and again as `Unreadable`. The reviewer judged it benign and it was. Benign is
