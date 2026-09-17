@@ -57,6 +57,7 @@ lies" below.
 | P2b-i | `toArray` returns the backing store | aliasing route 2 fails |
 | P2b-i | skip present-but-undeclared | 2 tests fail |
 | P2b-i | compare byte length only | same-length test fails |
+| P2b-i | drop the present-filter before hashing | one-failure-per-artifact test fails |
 | P2b-s | skip the dangling-record check | refused-at-construction fails |
 | P2b-s | trust the reference's schema | 2 tests fail |
 | P2b-ii | profile identity ignores the encoding | identity test fails |
@@ -85,8 +86,17 @@ lies" below.
 | P6desc | change a declared offset | consumer reads the change |
 | P6gold | descriptor declares TR 2.0 | reaches the rule |
 
-**49 mutants, 49 killed** (34 above plus the four JSON values whose gaps this hunt found and
-closed). Two mutants are recorded as *surviving and benign* by the P2b reviewer
+**50 mutants, 50 killed.**
+
+One mutant a reviewer found SURVIVING has since been closed: removing `filter(present.contains)`
+before hashing caused a declared-but-absent artifact to be reported twice, once as
+`MissingFromStore` and again as `Unreadable`. The reviewer judged it benign and it was. Benign is
+not the same as intended, and an unpinned behaviour drifts -- a verification report that
+double-counts is one somebody eventually reads as two problems. A test now requires exactly one
+failure per missing artifact, and the mutant dies.
+
+The other surviving mutant, `verify`'s unreachable schema check, was made moot rather than tested:
+`SourceManifest.of` now owns that check, where it is reachable. Two mutants are recorded as *surviving and benign* by the P2b reviewer
 (`filter(present.contains)` removal, which only double-reports; and `verify`'s schema check, dead
 once `of` owns it) — both are noted rather than replaced.
 

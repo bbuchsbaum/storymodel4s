@@ -193,3 +193,25 @@ class VerifySuite extends FunSuite:
     assertEquals(a.iterator.toVector, before)
     assertEquals(a.checksum, Checksum.ofBytes(payload))
   }
+
+  /** One problem, one failure.
+    *
+    * A reviewer's mutation run found that removing the `filter(present.contains)` before hashing
+    * SURVIVED, and judged it benign: a declared-but-absent artifact would simply be reported twice,
+    * once as `MissingFromStore` and again as `Unreadable`. Benign is not the same as intended, and
+    * an unpinned behaviour drifts -- a verification report that double-counts is a report someone
+    * will eventually read as two problems.
+    */
+  test("a declared-but-absent artifact produces exactly ONE failure, not two") {
+    val missing = record("absent.xlsx", "nope".getBytes("UTF-8"))
+    Verify.verify(manifestOf(Vector(rec, missing)), store) match
+      case Left(f) =>
+        val forMissing = f.toVector.filter {
+          case VerificationFailure.MissingFromStore(id) => id == missing.id
+          case VerificationFailure.Unreadable(id, _)    => id == missing.id
+          case _                                        => false
+        }
+        assertEquals(forMissing.size, 1, s"expected one failure, got ${forMissing.map(_.message)}")
+        assertEquals(forMissing.head, VerificationFailure.MissingFromStore(missing.id))
+      case Right(_) => fail("expected a failure")
+  }
