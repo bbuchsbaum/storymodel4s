@@ -191,6 +191,24 @@ class FeaturesCodecSuite extends ScalaCheckSuite:
     assert(Canonical.decode[NarrativeWindowPlan]("""{}""").isLeft)
   }
 
+  test("MissingValuePolicy: a coverage floor off the wire must be finite and in [0, 1]") {
+    // bd-01M19NYZT593MXWEERP80RHY8J: the only untrusted-input path to a floor that never excludes.
+    def floor(json: String) =
+      Canonical.decode[MissingValuePolicy](s"""{"type":"RequireMinCoverage","fraction":$json}""")
+    assertEquals(floor("0.25"), Right(MissingValuePolicy.RequireMinCoverage(0.25)))
+    assertEquals(floor("0"), Right(MissingValuePolicy.RequireMinCoverage(0.0)))
+    assertEquals(floor("1"), Right(MissingValuePolicy.RequireMinCoverage(1.0)))
+    Vector("-0.5", "-1e-9", "1.0000000001", "1.5", "\"NaN\"", "\"Infinity\"", "\"-Infinity\"")
+      .foreach(j => assert(floor(j).isLeft, s"fraction $j was admitted off the wire"))
+  }
+
+  test("FeatureValueSchema: a vector dimension off the wire must be positive") {
+    def dim(d: Int) = Canonical.decode[FeatureValueSchema](s"""{"type":"Vector","dimension":$d}""")
+    assertEquals(dim(3), Right(FeatureValueSchema.Vector(3)))
+    assert(dim(0).isLeft, "dimension 0 was admitted off the wire")
+    assert(dim(-1).isLeft, "dimension -1 was admitted off the wire")
+  }
+
   property("FeatureDerivation round-trips with and without a narrative window, id preserved") {
     forAll(derivation) { d =>
       val back = Canonical.decode[FeatureDerivation](Canonical.encode(d))

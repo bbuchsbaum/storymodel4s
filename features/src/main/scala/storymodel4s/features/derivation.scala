@@ -36,6 +36,31 @@ enum MissingValuePolicy:
     case RequireMinCoverage(f) => s"minCoverage(${CanonicalDouble.render(f)})"
     case Fail                  => "fail"
 
+object MissingValuePolicy:
+  /** Whether `fraction` can serve as a coverage floor: finite and in `[0, 1]`.
+    *
+    * Why: the gate is `coverage < fraction`. Every IEEE-754 comparison against NaN is false, and
+    * nothing is below a negative floor, so a NaN or negative fraction never excludes anything —
+    * including a support with zero observed samples — while still reading as "coverage required". A
+    * floor above 1 excludes everything. None of these is a policy; all of them are refused.
+    */
+  def isCoverageFraction(fraction: Double): Boolean =
+    !fraction.isNaN && fraction >= 0.0 && fraction <= 1.0
+
+  /** Checked construction of [[MissingValuePolicy.RequireMinCoverage]]. The enum case itself stays
+    * constructible (Scala 3 enum cases cannot hide their constructor), so [[Reduction.reduce]]
+    * re-checks the fraction at the point of use and the codec refuses it at the wire.
+    */
+  def requireMinCoverage(fraction: Double): Either[DomainError, MissingValuePolicy] =
+    if isCoverageFraction(fraction) then Right(RequireMinCoverage(fraction))
+    else
+      Left(
+        DomainError.InvariantViolation(
+          "features/missing-policy",
+          s"RequireMinCoverage fraction must be finite in [0, 1], got $fraction"
+        )
+      )
+
 /** Post-reduction normalization, always tied to the population it was fitted on. */
 enum NormalizationPolicy:
   case ZScore(populationId: String)

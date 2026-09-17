@@ -28,8 +28,12 @@ object FeatureCodecs:
   }
   given Decoder[FeatureValueSchema] = Decoder.instance { c =>
     field[String](c, "type").flatMap {
-      case "Scalar"      => field[Option[String]](c, "units").map(FeatureValueSchema.Scalar.apply)
-      case "Vector"      => field[Int](c, "dimension").map(FeatureValueSchema.Vector.apply)
+      case "Scalar" => field[Option[String]](c, "units").map(FeatureValueSchema.Scalar.apply)
+      case "Vector" =>
+        field[Int](c, "dimension").flatMap { d =>
+          if d > 0 then Right(FeatureValueSchema.Vector(d))
+          else Left(DecodingFailure(s"non-positive vector dimension $d", c.history))
+        }
       case "Categorical" =>
         field[Vector[String]](c, "labels").map(FeatureValueSchema.Categorical.apply)
       case "Distribution" =>
@@ -331,7 +335,13 @@ object FeatureCodecs:
       case Some("IgnoreMissing") => Right(MissingValuePolicy.IgnoreMissing)
       case Some("Fail")          => Right(MissingValuePolicy.Fail)
       case Some(o) => Left(DecodingFailure(s"unknown MissingValuePolicy $o", c.history))
-      case None    => field[Double](c, "fraction").map(MissingValuePolicy.RequireMinCoverage.apply)
+      case None    =>
+        field[Double](c, "fraction").flatMap { f =>
+          MissingValuePolicy
+            .requireMinCoverage(f)
+            .left
+            .map(e => DecodingFailure(e.message, c.history))
+        }
   }
 
   given Encoder[NormalizationPolicy] = Encoder.instance {

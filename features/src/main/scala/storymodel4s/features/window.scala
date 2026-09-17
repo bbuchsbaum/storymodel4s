@@ -383,7 +383,17 @@ object Reduction:
       missing: MissingValuePolicy
   ): Either[DomainError, (Estimate[O], Coverage)] =
     val cov = Coverage.unsafe(samples.size, samples.count(_.estimate.isObserved))
-    if samples.exists(!_.hasValidWeight) then
+    val badFloor = missing match
+      case MissingValuePolicy.RequireMinCoverage(f) => !MissingValuePolicy.isCoverageFraction(f)
+      case _                                        => false
+    if badFloor then
+      Left(
+        DomainError.InvariantViolation(
+          "features/reduce",
+          s"RequireMinCoverage fraction must be finite in [0, 1], got ${missing.canonicalString}"
+        )
+      )
+    else if samples.exists(!_.hasValidWeight) then
       Left(
         DomainError.InvariantViolation("features/reduce", "negative or non-finite sample weight")
       )

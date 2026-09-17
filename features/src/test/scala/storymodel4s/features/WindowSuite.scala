@@ -286,6 +286,66 @@ class WindowSuite extends ScalaCheckSuite:
     assertEquals(e3, Estimate.Missing(MissingReason.AllMissing))
   }
 
+  test("Reduction refuses a coverage floor that cannot exclude (NaN, negative, above one)") {
+    // bd-01M19NYZT593MXWEERP80RHY8J: `cov.fraction < NaN` and `cov.fraction < -1.0` are both
+    // false, so before the guard these floors never excluded anything and the half-covered support
+    // below published a MEASURED mean. The positive control is the same support at a lawful floor.
+    val ss = Vector(
+      Sample(0, Estimate.observed(2.0), 1.0),
+      Sample(1, Estimate.Missing[Double](MissingReason.NotInLexicon), 1.0)
+    )
+    val control = Reduction
+      .reduce(ss, red(ScalarReducer.Mean), MissingValuePolicy.RequireMinCoverage(0.75))
+      .toOption
+      .get
+    assertEquals(control._1, Estimate.Missing(MissingReason.Excluded))
+    val floors = Vector(Double.NaN, -1.0, -1e-9, 1.0 + 1e-9, 1.5, Double.PositiveInfinity)
+    floors.foreach { f =>
+      assertEquals(
+        Reduction.reduce(ss, red(ScalarReducer.Mean), MissingValuePolicy.RequireMinCoverage(f)),
+        Left(
+          DomainError.InvariantViolation(
+            "features/reduce",
+            s"RequireMinCoverage fraction must be finite in [0, 1], got minCoverage(${CanonicalDouble.render(f)})"
+          )
+        ),
+        s"floor $f was not refused"
+      )
+    }
+    // The refusal is about the policy, not the support: an empty support is refused too.
+    assert(
+      Reduction
+        .reduce(
+          Vector.empty[Sample[Double]],
+          red(ScalarReducer.Mean),
+          MissingValuePolicy.RequireMinCoverage(Double.NaN)
+        )
+        .isLeft
+    )
+  }
+
+  test("MissingValuePolicy.requireMinCoverage admits exactly the finite floors in [0, 1]") {
+    Vector(0.0, 0.25, 1.0).foreach { f =>
+      assertEquals(
+        MissingValuePolicy.requireMinCoverage(f),
+        Right(MissingValuePolicy.RequireMinCoverage(f))
+      )
+    }
+    Vector(Double.NaN, -1e-9, 1.0 + 1e-9, Double.NegativeInfinity, Double.PositiveInfinity)
+      .foreach { f =>
+        assertEquals(
+          MissingValuePolicy.requireMinCoverage(f),
+          Left(
+            DomainError.InvariantViolation(
+              "features/missing-policy",
+              s"RequireMinCoverage fraction must be finite in [0, 1], got $f"
+            )
+          ),
+          s"floor $f was admitted"
+        )
+      }
+  }
+
   test(
     "imageability demo: windowed 20-by-5 retains coverage; sum grows with words, mean does not"
   ) {
