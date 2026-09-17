@@ -42,9 +42,17 @@ enum StreamKind:
   case Picture, Audio, Subtitle, CanonicalText, TimedText, Annotation, DerivedClock
   case Custom(namespace: String, label: String)
 
-/** Audience-facing axis kind. Edition playback is never an elementary stream clock. */
+/** Audience-facing axis kind. Edition playback is never an elementary stream clock.
+  *
+  * `AnnotationTimeline` exists because a timed annotation is not an edition and had no lawful axis.
+  * Without it the only corpus with no admitted video forged one -- minting
+  * `EditionId("filmfestival-annotation-<sha>-<part>")` and calling `SourceBundle.filmEdition`, with
+  * its own Scaladoc saying "This is deliberately not a film edition". The type said FilmEdition;
+  * the comment said it was not one. `SourceKind.AnnotationTable` was declared and unreachable for
+  * exactly this reason: every axis constructor was kind-specific.
+  */
 enum AxisKind:
-  case TextCharacter, EditionPlayback
+  case TextCharacter, EditionPlayback, AnnotationTimeline
 
 /** Declared rounding when a caller asks for an integral lattice. */
 enum RoundingPolicy:
@@ -649,6 +657,40 @@ object PresentationAxis:
       }
     }
 
+  /** The playback-shaped axis of a timed ANNOTATION, identified by the annotation's own checksum.
+    *
+    * It takes no `EditionId`, because there is no edition: the extent is the annotation's, not a
+    * film's. Nothing downstream may read it as a claim about media.
+    */
+  def annotationTable(
+      bundle: SourceBundleId,
+      start: Long,
+      endExclusive: Long,
+      timebase: RationalTimebase
+  ): Either[DomainError, PresentationAxis] =
+    AxisExtent.playbackTicks(start, endExclusive, timebase).flatMap { extent =>
+      val fp = fingerprintOf(
+        bundle,
+        None,
+        AxisKind.AnnotationTimeline,
+        SourceKind.AnnotationTable,
+        extent,
+        Some(timebase)
+      )
+      axisId(fp).map { id =>
+        new PresentationAxis(
+          id,
+          bundle,
+          None,
+          AxisKind.AnnotationTimeline,
+          SourceKind.AnnotationTable,
+          extent,
+          Some(timebase),
+          fp
+        )
+      }
+    }
+
   def inventedEditionPlayback(
       bundle: SourceBundleId,
       sourceKind: SourceKind,
@@ -1085,6 +1127,66 @@ object SourceBundle:
         None,
         SourceKind.WrittenText,
         Vector(bound),
+        axis,
+        Vector(streamId),
+        Vector.empty
+      )
+    yield bundle
+
+  /** A bundle over a timed annotation table: no edition, no picture stream, no media claim.
+    *
+    * This is what Film Festival and Friends need and did not have. The annotation's checksum is its
+    * identity, exactly as the Film Festival adapter already does by hand -- but without asserting a
+    * film edition that does not exist.
+    */
+  def annotationTable(
+      annotationChecksum: Checksum,
+      start: Long,
+      endExclusive: Long,
+      timebase: RationalTimebase
+  ): Either[DomainError, SourceBundle] =
+    for
+      streamId <- StreamId.from(ContentAddress.of("stream", annotationChecksum.hex))
+      extent <- AxisExtent.playbackTicks(start, endExclusive, timebase)
+      placeholder <- SourceBundleId.from(
+        ContentAddress.of("bundle", "annotation-placeholder", annotationChecksum.hex)
+      )
+      placeholderAxis <- PresentationAxis.annotationTable(
+        placeholder,
+        start,
+        endExclusive,
+        timebase
+      )
+      draft <- SourceStream.of(
+        streamId,
+        StreamKind.Annotation,
+        annotationChecksum,
+        placeholderAxis.id,
+        extent,
+        Some(timebase),
+        Vector.empty
+      )
+      bundleId <- computeId(
+        None,
+        SourceKind.AnnotationTable,
+        Vector(draft),
+        AxisKind.AnnotationTimeline,
+        Vector(streamId)
+      )
+      axis <- PresentationAxis.annotationTable(bundleId, start, endExclusive, timebase)
+      stream <- SourceStream.of(
+        streamId,
+        StreamKind.Annotation,
+        annotationChecksum,
+        axis.id,
+        extent,
+        Some(timebase),
+        Vector.empty
+      )
+      bundle <- of(
+        None,
+        SourceKind.AnnotationTable,
+        Vector(stream),
         axis,
         Vector(streamId),
         Vector.empty

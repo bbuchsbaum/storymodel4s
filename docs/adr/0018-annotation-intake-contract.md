@@ -151,9 +151,15 @@ wrong episode.
 
 Three questions are deferred **to the slice that will have evidence**, not answered here:
 
-1. **A lawful axis for a timed annotation table.** Add a `SourceBundle.annotationTable` constructor
-   that mints a non-edition axis, or keep forging and rename the construct so the type stops
-   asserting something false. Decided when Friends and Film Festival are both in hand.
+1. ~~A lawful axis for a timed annotation table.~~ **DECIDED 2026-09-17: add the constructor.**
+   `AxisKind.AnnotationTimeline`, `PresentationAxis.annotationTable` and
+   `SourceBundle.annotationTable` now exist in `core`. A timed annotation gets an axis identified by
+   the annotation's own checksum, with no `EditionId` and no picture stream, so no corpus has to
+   assert a film edition that does not exist. `SourceKind.AnnotationTable` was declared and
+   unreachable precisely because every axis constructor was kind-specific; it is now reachable.
+   Blast radius measured before the change: four files reference `AxisKind`, all in `core`, and no
+   codec switches on it. `coreJVM/test` 175 and `codecJVM/test` 193 green after.
+   Retiring Film Festival's forged edition is a separate, later change to the bench adapter.
 2. **Where ordinal remaps live.** Film Festival's `+106` is an *ordinal* remap of coarse segment
    numbers restarting in run 2, and ordinals have no home in the mapping apparatus at all. Either
    `SegmentLink` is that home, or `MappingFamily` gains a fourth case.
