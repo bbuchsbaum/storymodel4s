@@ -1,7 +1,13 @@
-# Toward the best recall-to-video mapper: the plan (revision 5)
+# Toward the best recall-to-video mapper: the plan (revision 6)
 
-*2026-09-18. Draft for owner approval, written against `main` at `ae73cd8c`. Everything below is
+*2026-09-18. Draft for owner approval, written against `main` at `598c7852`. Everything below is
 LocallyObserved.*
+
+*Revision 6 applies three owner-approved changes to revision 5 (2026-09-18):*
+- *the participant-average difference is the primary Phase 1a estimand, as in the preregistration
+  and the scorer;*
+- *Phase 2 orders the mapper slices before the film-compiler slices;*
+- *Memento is admitted and sealed, so the single final test opening has enough participants.*
 
 *Revision 5 preserves revision 4's input-size correction, FilmFestival inventory and explicit
 scope alternatives. It makes the recorded release scope the default, closes the scoring-denominator
@@ -169,8 +175,23 @@ green gate and a separate cold review.
 - Nothing in Phases 1a–2 reads it. The segmenter evaluation and any second coding in Phase 1b use
   development participants only.
 - Record the prior exposure: aggregate recall-order statistics have already been inspected across
-  all 23 participants. This is a model-untouched split, not an entirely unseen corpus. Seal Memento
-  by participant before any model or tuning inspection if it is admitted.
+  all 23 participants. This is a model-untouched split, not an entirely unseen corpus.
+
+**Step 1b. Admit and seal Memento (owner decision, 2026-09-18).** Friends alone would leave the
+single final test with perhaps ten participants. Memento has 133 (`docs/data/memento/README.md`).
+- **Admission.** The owner's decision clears blocker 1 in the Memento record. Blocker 2, an ethics
+  basis for committing recall prose, bars only committing text. Analysis reads the staged bytes
+  from the ignored data root, and nothing text-bearing is committed.
+- **Task, fixed at admission and before any model output:**
+  - scene gold on the five-second grid;
+  - only accurate recall (codes 1–2) enters accuracy; codes 3–5 never do;
+  - the seven non-integer rows are excluded explicitly;
+  - the population comes from `recall-population.json`, not sheet order.
+- **Seal** a participant-level test split, **stratified by the four conditions**, before any model
+  or tuning inspection. Commit the seed and membership, and record the counts and power
+  assumptions. Condition 1 (the nonlinear cut) is the hardest transfer test for monotone
+  decoding. Condition 4 (the linear re-cut) is its within-corpus control.
+- The final test opening (§3, Phase 3) covers both sealed corpora.
 
 **Step 2. The scoring contract.** This is a fix in `tools/recall-study`, because today the scorer
 fails open.
@@ -191,8 +212,13 @@ fails open.
     existing preregistration; never infer gold eligibility from a prediction;
   - report input count, gold-eligible count, every exclusion/outcome count and prediction coverage;
   - use the same frozen denominator and unit weights for both arms, including paired resamples.
-- The primary Phase 1a estimand is the pooled, unit-weighted exact-scene accuracy difference.
-  Participant-average differences are separately labelled; the two are not interchangeable.
+- **The primary Phase 1a estimand is the participant-average difference:** the mean of
+  per-participant exact-scene accuracy differences. This is what the preregistration's paired
+  comparisons report and what `gold_scene.py` `paired` computes (`:170-181`). The pooled,
+  unit-weighted difference is reported as a secondary series. The two are not interchangeable:
+  fill's development gain is +5.77 by the participant mean, while pooled accuracy rose 7.3 points
+  (study-log:714). Per-participant unit counts range from 67 to 351, so unit weighting lets the
+  heaviest recallers dominate.
 - **Scorer drops today:** it discards unlabelled rows silently (`:108-112`), and `paired` never
   checks unit identity (`:171`).
 - **Mutation witnesses.** Drop, duplicate or change one unit id and the paired run must fail.
@@ -210,7 +236,8 @@ What that means here:
   is not independent confirmation on clean data and does not replace the preregistration's
   historical comparison. Record this additional comparison in the ledger before running it.
 - Freeze the CI method, seed and resample count before scoring. Resample whole paired participant
-  clusters and recompute the pooled difference; show participant-level differences and a
+  clusters and recompute the participant-average difference, with the pooled difference as a
+  secondary series; show participant-level differences and a
   leave-one-participant-out sensitivity analysis. Report the small-cluster limitation.
 - **Every other arm is descriptive.** Any inferential family and multiplicity adjustment must be
   declared before its outputs are read; an unadjusted best-arm CI cannot establish superiority.
@@ -299,7 +326,7 @@ decided. Until an explicit P1 decision changes it, the recorded full film route 
   - FilmFestival: film identity. Scene within film waits for the clock work: the +106 offset,
     run-relative times, and media equivalence, which Phase 0 step 6 enables.
   - Friends: `WhichEvent`, veridical recall only.
-  - Memento, once admitted.
+  - Memento: scene on the five-second grid for accurate recall, per condition (Step 1b).
 - **Tracks:**
 
   | Track | Input | Corpora |
@@ -310,8 +337,9 @@ decided. Until an explicit P1 decision changes it, the recorded full film route 
   | T4 | video-derived | Sherlock; FilmFestival's eight films |
 
 - **Scoring and statistics:**
-  - freeze a primary estimand and weighting rule per task before comparisons; retain Phase 1a's
-    unit-weighted scores as a separate series if benchmark v1 adds word/time-weighted scores;
+  - freeze a primary estimand and weighting rule per task before comparisons. The participant
+    average stays primary for continuity with Phase 1a and the ledger. Pooled, word-weighted or
+    time-weighted scores are labelled secondary series;
   - a gold-unit oracle row;
   - the segmenter evaluated on Friends development gold;
   - stated split sizes and minimum detectable effects;
@@ -327,12 +355,22 @@ decided. Until an explicit P1 decision changes it, the recorded full film route 
 - **Output.** One command regenerates every leaderboard from upstream releases plus hashed
   manifests. Nothing restricted is redistributed.
 
-### Phase 2 — The mapper in the library (L)
+### Phase 2 — The mapper in the library (L for the mapper slices; XL+ with the film route)
 
 Under the recorded rulings, this phase includes all D1A-types slices, D1A-film and all of D1B.
 Land the mapper and film-compiler work in separate slices; neither waits for H5. Only explicit
-adoption of P1 reduces this to S0–S2 (plus S3 if needed) and D1B's signature work. The mapper
-slice is L; the full film route needs its own slice estimates and is not included in that L.
+adoption of P1 reduces this to S0–S2 (plus S3 if needed) and D1B's signature work.
+
+**Order (owner-approved, 2026-09-18): the mapper slices first, then the film-compiler slices.**
+- **Mapper slices:** D1A S0–S2, D1B's signatures, support honesty, the scoring channel, the
+  declared decoders, and `recall-map`. They serve the stated goal, and D1B's type changes are
+  shared with the film route.
+- **Film-compiler slices, after them:** D1A S3–S4c, D1A-film and D1B's end-to-end proofs.
+- **This is sequencing for one developer, not a gate.** H5 does not decide it, and ruling E still
+  requires the film slices before 1.0.
+- **Size.** The mapper slices are L. The film-compiler slices add roughly another XL: D1A S3–S4c
+  are L, D1A-film has no plan yet, and D1B's proofs are XL. Under the recorded rulings, Phase 2 as
+  a whole is multi-month.
 
 - **Parity first.** D1A S0 pins the text path. Sherlock's per-unit anchors reproduce
   byte-for-byte through the new path.
