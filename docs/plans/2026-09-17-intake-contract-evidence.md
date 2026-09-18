@@ -330,6 +330,79 @@ aliasing route into "verified" bytes that a commit described as having no write 
 forgeable decode status that an earlier review had explicitly waved through. **Three of six reviews
 have not reported, and nothing here rests on them having done so.**
 
+## Second cold review of the three risky slices, 2026-09-17 (post-fix)
+
+Requested by the owner after the first acceptance. Fable 5.1 was still out of credits (`fable-slices-2`
+idle in 54 s with the same verbatim failure), so this was again the default model, batched over all
+three slices. It reviewed the FIXES, which no one had reviewed — they were the newest code on the
+branch.
+
+**Slice A (`CorpusProfile` / `CorpusReader.open`) — held.** No fifth collision shape. The reviewer
+built 400,000 random adversarial profiles over the collision vocabulary and found 0 collisions in the
+shipped nested form. It also **verified rather than refuted** the author's judgement that the
+surviving flat-with-tags mutant is benign: the flat form is decodable left-to-right because group
+arity is recoverable from the tag literal, and the reviewer independently confirmed the one
+precondition that makes it so — that no arity-1 encoding's `render` collides with `custom` or
+`excel-serial-days`. That judgement had been made by its own author and checked by nobody; it now
+has an independent check.
+
+**Slice B (`SegmentLink`) — TWO DEFECTS, both fixed.**
+
+1. `compose` matched the intermediate BY NAME. A `SegmentLink` stored only `SegmentationId`s, and a
+   `SegmentationId` is a string. `compose` knew ids were untrustworthy — it checks intermediate
+   *coverage* for that reason — but coverage only catches an intermediate that is too small.
+   Demonstrated: onsets `0/10/20` composed with onsets `5000/6000/7000` under the shared id `b`
+   produced a 3-entry mapping asserting a relationship nothing had established.
+2. Found while reproducing (1): `Segmentation.equals` compared `id` and `segments` only, so a
+   **Friends segmentation equalled a Sherlock one** with the same ordinals. `work`, `axis`, `level`
+   and `authority` were all invisible to it — and that equality contradicted the cross-work refusal
+   `SegmentLink.of` had just gained.
+
+   Fix for both: `Segmentation` now carries a content `identity: Checksum` (the `CorpusProfile` /
+   ADR 0011 precedent), equality is identity, and `SegmentLink` carries `fromIdentity`/`toIdentity`
+   so `compose` can compare content. The rendering is framed AND nested, because
+   `GranularityLevel.Custom.render` and `SegmentationAuthority.render` both join with a colon at
+   variable arity — the exact shape that collided in `CorpusProfile`, not relearned here.
+
+   The identity check is ordered AFTER the coverage check deliberately: both refuse, but
+   `IntermediateIncomplete` names the uncovered ordinals and `IntermediateDiffers` does not. Putting
+   it first turned an existing test's precise answer into a vague one, which is a regression even
+   though both answers are refusals. The code was reordered; the test was not weakened.
+
+**Slice C (`TimebaseRepair`) — the file is only half load-bearing.**
+
+Measured by mutating `docs/data/sherlock/timebase-repair.json` BY JSON PATH (first-textual-occurrence
+replacement produced a false result earlier in this session) and asserting each mutation applied:
+
+- **18 of 18** fields that the code *reads* are load-bearing — every mutation died. That includes all
+  four the P5 bead named as once-untested: `partId`, `axisId`, `annotationEndSeconds`,
+  `playbackStartTicks`, in **both** runs.
+- **7 fields were SILENT** — changeable with the whole `corpus-intake` suite green.
+
+Three of the seven were load-bearing values the code *restated* rather than read, which is the
+epic's founding defect still alive in one corner: `MediaManifest.nn2017` hardcoded
+`durationTicks = 3565500L` and `3887000L`, which are exactly
+`coordinateSystems[0].parts[*].endSeconds × 2500`. The file declares each part's extent **twice**
+(once in `coordinateSystems`, once as `playbackEndTicks + uncoveredTailTicks`) and Scala a third
+time; two agreed by luck and nothing reconciled them.
+
+The test named for the file — `"the pinned nn2017 manifest carries the crosswalk constants of
+timebase-repair.json v2"` — asserted Scala literals against Scala literals, exactly as the P5 bead
+warned. It now opens the file, checks `nn2017` against the parsed record, and binds the file's two
+declarations of each extent to each other. `ticksPerSecond` is **derived** from the file
+(`playbackEndTicks / annotationEndSeconds`) rather than taken from the manifest, so the manifest's
+own 2500 is checked against the file instead of checking itself. All three mutations now die.
+
+Four fields remain silent and are left so, named rather than fixed:
+`coordinateSystems[1].runs[0].ordinaryEndSeconds` and `coordinateSystems[3].rowCount` (documentation
+of the repaired analysis axis, which no code consumes), `sourceDerivation.sha256` (a provenance claim
+about the upstream notebook that nothing verifies), and `coordinateSystems[2].secondsPerTr` = 1.5,
+which IS load-bearing and is transcribed into both `SherlockSceneCoding.scala` and `gold_scene.py`.
+Binding that one is the cross-language agreement this document already records as unpinned; it is
+descriptor work (P6), not a fix to make in passing.
+
+Gate after these fixes: exit 0, 24/24 modules, **2,472 tests**, 0 failed, 0 errors, scalafmt clean.
+
 ## What this evidence does NOT establish
 
 - **No corpus is admitted.** `AdmissionStatus` is recorded, never decided. Friends and Memento both

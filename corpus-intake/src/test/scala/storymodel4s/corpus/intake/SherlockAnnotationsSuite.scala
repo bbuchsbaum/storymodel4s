@@ -185,15 +185,100 @@ class SherlockAnnotationsSuite extends FunSuite:
       case other => fail(s"expected a scene refusal, got $other")
   }
 
-  test("the pinned nn2017 manifest carries the crosswalk constants of timebase-repair.json v2") {
+  /** This test is NAMED for `timebase-repair.json` and, until now, never opened it.
+    *
+    * It asserted Scala literals against Scala literals: `assertEquals(m.partA.durationTicks,
+    * 3565500L)` is true of any manifest that says 3565500, whatever the JSON says. The epic that
+    * built this module exists because the Sherlock crosswalk is declared in several places at once;
+    * a test that restates one of them is not a check, it is a fourth copy.
+    *
+    * Measured by mutation: seven fields of the JSON could be changed with the whole `corpus-intake`
+    * suite staying green. Three of them are load-bearing --
+    * `coordinateSystems[0].parts[*].endSeconds` (the part extents, which `nn2017` transcribes as
+    * `durationTicks` after multiplying by 2500) and `coordinateSystems[2].secondsPerTr`.
+    *
+    * So the constants are now read FROM the file, and the file's two independent declarations of
+    * the same quantity are bound to each other. `endSeconds * ticksPerSecond` must equal
+    * `playbackEndTicks + uncoveredTailTicks`; nothing had ever required those to agree, and they
+    * agreed by luck.
+    */
+  private def repairJson: String =
+    val a = java.nio.file.Path.of("../docs/data/sherlock/timebase-repair.json")
+    val b = java.nio.file.Path.of("docs/data/sherlock/timebase-repair.json")
+    if java.nio.file.Files.exists(a) then java.nio.file.Files.readString(a)
+    else java.nio.file.Files.readString(b)
+
+  test("the pinned nn2017 manifest is READ FROM timebase-repair.json, not restated") {
     val m = MediaManifest.nn2017
-    assertEquals(m.totalRows, 1000)
-    assertEquals(m.run1EndRow, 482)
-    assertEquals(m.partA.durationTicks, 3565500L)
-    assertEquals(m.partB.durationTicks, 3887000L)
-    assertEquals(m.partA.ticksPerSecond, 2500L)
-    assertEquals(
-      m.annotationSha256.hex,
-      "8c205826dcea8c58db24d7a17c71a3f99a9054e9379435e60b1dd0b987c2b296"
-    )
+    val record = TimebaseRepair
+      .parse(repairJson)
+      .fold(r => fail(s"the pinned repair record must parse: ${r.message}"), identity)
+
+    assertEquals(m.annotationSha256, record.annotationSha256)
+    assertEquals(Some(m.run1EndRow), record.run1EndRow)
+    assertEquals(m.totalRows, record.inputRows)
+
+    val run1 = record.run("run-1").getOrElse(fail("run-1 must be declared"))
+    val run2 = record.run("run-2").getOrElse(fail("run-2 must be declared"))
+    assertEquals(m.partA.partId, run1.partId)
+    assertEquals(m.partB.partId, run2.partId)
+    assertEquals(m.partA.durationTicks, run1.durationTicks)
+    assertEquals(m.partB.durationTicks, run2.durationTicks)
+  }
+
+  /** The file declares each part's extent TWICE, and nothing made the two agree.
+    *
+    * `annotationToPlaybackCrosswalk.runs[i]` gives `playbackEndTicks + uncoveredTailTicks`, which
+    * the code reads. `coordinateSystems[0].parts[i].endSeconds` gives the same extent in seconds,
+    * which the code does not read -- so it could be changed to 9999.9 with every test still green,
+    * measured. Two declarations that nothing reconciles are two declarations that will drift.
+    */
+  test("the file's two declarations of each part extent agree") {
+    val record = TimebaseRepair
+      .parse(repairJson)
+      .fold(r => fail(r.message), identity)
+    val cursor = io.circe.parser
+      .parse(repairJson)
+      .fold(e => fail(s"json must parse: $e"), _.hcursor)
+    val parts = cursor
+      .downField("coordinateSystems")
+      .downArray
+      .downField("parts")
+      .as[Vector[io.circe.Json]]
+      .fold(e => fail(s"coordinateSystems[0].parts must be an array: $e"), identity)
+    assertEquals(parts.size, 2)
+
+    Vector(("run-1", 0, MediaManifest.nn2017.partA), ("run-2", 1, MediaManifest.nn2017.partB))
+      .foreach { (runId, i, part) =>
+        val run = record.run(runId).getOrElse(fail(s"$runId must be declared"))
+        val c = parts(i).hcursor
+        assertEquals(
+          c.get[String]("partId").toOption,
+          Some(run.partId),
+          s"$runId names a different part in coordinateSystems than in the crosswalk"
+        )
+        // The rate is DERIVED from the file rather than taken from the manifest, so that the
+        // manifest's own 2500 is checked against the file instead of checking itself. The file's
+        // stated formula is `playbackTicks = rawAnnotationSeconds * ticksPerSecond`.
+        assertEquals(
+          run.playbackEndTicks % run.annotationEndSeconds,
+          0L,
+          s"$runId rate is not whole"
+        )
+        val ticksPerSecond = run.playbackEndTicks / run.annotationEndSeconds
+        assertEquals(
+          part.ticksPerSecond,
+          ticksPerSecond,
+          s"$runId: the manifest declares ${part.ticksPerSecond} ticks/s, the file implies $ticksPerSecond"
+        )
+        val endSeconds =
+          c.get[Double]("endSeconds").fold(e => fail(s"parts[$i].endSeconds: $e"), identity)
+        val declared = math.round(endSeconds * ticksPerSecond.toDouble)
+        assertEquals(
+          declared,
+          run.durationTicks,
+          s"$runId: coordinateSystems says ${endSeconds}s = $declared ticks, " +
+            s"the crosswalk says ${run.durationTicks}"
+        )
+      }
   }

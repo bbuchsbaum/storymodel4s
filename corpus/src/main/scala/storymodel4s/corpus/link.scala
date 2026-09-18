@@ -1,5 +1,7 @@
 package storymodel4s.corpus
 
+import storymodel4s.core.Checksum
+
 /** A position in a named segmentation. Two segmentations are two ordinal spaces, so they get two
   * values rather than one bare `Int` -- which is what lets composition check that the intermediate
   * segmentation agrees.
@@ -79,7 +81,15 @@ final class SegmentLink private (
     val to: SegmentationId,
     val claim: LinkClaim,
     val version: Int,
-    val mapping: Map[Int, Target]
+    val mapping: Map[Int, Target],
+    /** The CONTENT identities of the two segmentations, not just their names.
+      *
+      * A link stored ids alone, so `compose` could only match an intermediate by name -- and a
+      * `SegmentationId` is a string. Carrying the identities is what lets composition ask whether
+      * the two links are talking about the same segmentation rather than two that agree on a label.
+      */
+    val fromIdentity: Checksum,
+    val toIdentity: Checksum
 ):
   def apply(ordinal: Int): Option[SegmentRef] = mapping.get(ordinal).flatMap(_.target)
   def removed: Set[Int] = mapping.collect { case (k, Target.Removed(_)) => k }.toSet
@@ -126,7 +136,10 @@ object SegmentLink:
           if dropped > 0 then Left(LinkRefusal.BijectionDropsSources(dropped))
           else if reached.distinct.sizeIs != reached.size then Left(LinkRefusal.NotInjective)
           else if reached.distinct.sizeIs != to.size then Left(LinkRefusal.NotOnto)
-          else Right(new SegmentLink(from.id, to.id, claim, version, mapping))
+          else
+            Right(
+              new SegmentLink(from.id, to.id, claim, version, mapping, from.identity, to.identity)
+            )
         case LinkClaim.Coarsening =>
           // A reviewer proposed a fourth check here: that the target ordinal be non-decreasing as
           // the source ordinal ascends, so a coarsening groups CONTIGUOUS segments. On a single
@@ -138,7 +151,10 @@ object SegmentLink:
           // new vocabulary and wants an ADR (SD5). Admitted deliberately, and pinned by test.
           if dropped > 0 then Left(LinkRefusal.CoarseningDropsSources(dropped))
           else if reached.distinct.sizeIs != to.size then Left(LinkRefusal.NotOnto)
-          else Right(new SegmentLink(from.id, to.id, claim, version, mapping))
+          else
+            Right(
+              new SegmentLink(from.id, to.id, claim, version, mapping, from.identity, to.identity)
+            )
         case LinkClaim.Edit =>
           // Edit adds NO check beyond the shared ones above, and that is deliberate rather than an
           // omission. The shared checks already enforce everything an edit must satisfy: total over
@@ -149,7 +165,9 @@ object SegmentLink:
           // An Edit that happens to drop nothing is still a legitimate Edit: the edit removed
           // nothing this time. Requiring at least one drop would refuse a correct map for being
           // insufficiently lossy.
-          Right(new SegmentLink(from.id, to.id, claim, version, mapping))
+          Right(
+            new SegmentLink(from.id, to.id, claim, version, mapping, from.identity, to.identity)
+          )
 
   /** Function composition on `Option[SegmentRef]`.
     *
@@ -182,6 +200,13 @@ object SegmentLink:
         .distinct
         .sorted
       if uncovered.nonEmpty then Left(LinkRefusal.IntermediateIncomplete(uncovered))
+      // Identity is checked AFTER coverage, deliberately. Differing identities are the root cause
+      // and uncovered ordinals are a symptom, but the symptom NAMES THE ORDINALS and the root cause
+      // does not, so the more specific refusal wins where both apply. Ordering it the other way
+      // turned an existing test's precise answer into a vague one, which is a regression even
+      // though both answers are refusals.
+      else if ab.toIdentity != bc.fromIdentity then
+        Left(LinkRefusal.IntermediateDiffers(ab.to, ab.toIdentity, bc.fromIdentity))
       else
         Right(ab.mapping.map { (source, t) =>
           val composed = t match
@@ -225,6 +250,17 @@ enum LinkRefusal:
   case CoarseningDropsSources(count: Int)
   case IntermediateMismatch(abTo: SegmentationId, bcFrom: SegmentationId)
 
+  /** The two links agree on the intermediate's NAME and on its EXTENT, and are still talking about
+    * two different segmentations.
+    *
+    * `IntermediateIncomplete` below catches the case where the second link covers fewer ordinals
+    * than the first reaches. It cannot catch two segmentations of the SAME SIZE whose segments
+    * differ, because the only thing a link carried was the id. Demonstrated by cold review: onsets
+    * 0/10/20 composed with onsets 5000/6000/7000 under the shared id `b`, and the composition
+    * succeeded and produced a link asserting a relationship nothing had established.
+    */
+  case IntermediateDiffers(id: SegmentationId, abTo: Checksum, bcFrom: Checksum)
+
   /** The two links agree on the intermediate's NAME and disagree about its extent.
     *
     * A `SegmentationId` is a string, so two `Segmentation` values can share one and differ in size.
@@ -235,16 +271,19 @@ enum LinkRefusal:
   case IntermediateIncomplete(missing: Vector[Int])
 
   def message: String = this match
-    case BadVersion(v)              => s"link version $v is not positive"
-    case ForeignWork(f, t)          => s"cannot link work ${f.value} to work ${t.value}"
-    case NotTotal(m)                => s"no target for source ordinals ${m.mkString(", ")}"
-    case ForeignSource(o)           => s"ordinals ${o.mkString(", ")} are not in the source"
-    case ForeignTarget(s)           => s"a target names segmentation ${s.value}, not the target"
-    case TargetOutOfRange(r)        => s"target ordinal ${r.ordinal} is not in the target"
-    case NotInjective               => "two sources map to one target under a bijection"
-    case NotOnto                    => "a target segment is unreached"
-    case BijectionDropsSources(n)   => s"a bijection cannot drop $n source(s)"
-    case CoarseningDropsSources(n)  => s"a coarsening cannot drop $n source(s)"
-    case IntermediateMismatch(a, b) => s"cannot compose: ${a.value} is not ${b.value}"
-    case IntermediateIncomplete(m)  =>
+    case BadVersion(v)                 => s"link version $v is not positive"
+    case ForeignWork(f, t)             => s"cannot link work ${f.value} to work ${t.value}"
+    case NotTotal(m)                   => s"no target for source ordinals ${m.mkString(", ")}"
+    case ForeignSource(o)              => s"ordinals ${o.mkString(", ")} are not in the source"
+    case ForeignTarget(s)              => s"a target names segmentation ${s.value}, not the target"
+    case TargetOutOfRange(r)           => s"target ordinal ${r.ordinal} is not in the target"
+    case NotInjective                  => "two sources map to one target under a bijection"
+    case NotOnto                       => "a target segment is unreached"
+    case BijectionDropsSources(n)      => s"a bijection cannot drop $n source(s)"
+    case CoarseningDropsSources(n)     => s"a coarsening cannot drop $n source(s)"
+    case IntermediateMismatch(a, b)    => s"cannot compose: ${a.value} is not ${b.value}"
+    case IntermediateDiffers(id, a, b) =>
+      s"cannot compose: two different segmentations are both named ${id.value} " +
+        s"(${a.short()} vs ${b.short()})"
+    case IntermediateIncomplete(m) =>
       s"cannot compose: the second link does not cover intermediate ordinals ${m.mkString(", ")}"
