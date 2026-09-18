@@ -1,4 +1,4 @@
-# D1A: the source-to-story seam — a phase plan (revision 4)
+# D1A: the source-to-story seam — a phase plan (revision 4, approved in part)
 
 *2026-09-17. Draft for owner approval, written against `main` at `5799e94c`. The bead is
 `bd-01M1CQKRG1A4J4BEWCC78F4TEZ`. The governing record is ADR 0007: §5, §6, §7, the migration
@@ -30,6 +30,22 @@ The 1.0 handoff (§7) was about **signatures**. 1.0 must not freeze `StoryModel`
 - D1B's *signature* work (the public `align` types `SourceView`, `HsmmResult` and `wire`) needs
   only D1A-types. D1B's courts can use hand-built film models.
 - D1B's end-to-end film proofs, V1 and E0 need D1A-film.
+
+### Owner rulings, 2026-09-18
+
+- **A. The gate is adjusted.** The owner's ruling: "we're developing software. build first,
+  then researchers ask questions."
+  - ADR 0007's migration step 2 made engineering stages wait for "one answered research
+    question". That research half is removed. S1 records the change as an amendment.
+  - The step's engineering reason stays and gets a mechanism: "generalizing an unvalidated
+    compiler seam would multiply an unknown". S0 answers it by pinning the text compiler's
+    behaviour before any type moves, so the generalisation cannot silently change it.
+  - This does **not** claim the text seam is scientifically validated. It claims only that D1A
+    cannot alter it unseen.
+- **C. Approved:** the split, the design in §2 and the slices in §3.
+- **D. Approved:** D1 (one bundle per model; multi-part films compose) and D2 (the proposal
+  surface lives outside the bundle, bound by checksum and receipt).
+- **E. Open**, under discussion with the owner.
 
 ### Decisions the owner must make at approval
 
