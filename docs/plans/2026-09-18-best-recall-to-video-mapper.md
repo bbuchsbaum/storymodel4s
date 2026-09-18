@@ -527,3 +527,21 @@ one after seeing results. Shipping the library and earning a superiority claim a
 - Titles-only and cross-corpus contrasts neither establish nor bound training contamination.
 - A pinned model/runtime is replay provenance, not proof of bit-identical fresh inference.
 - This plan specifies implementation and evidence gates; it does not claim those gates have run.
+
+## 8. Tickets
+
+Filed in mote on 2026-09-18: epic `bd-01M2TA01EHVRF6MQ1N00XTVK1K`, with 54 child tickets, each
+with acceptance criteria and blocking edges, after one cold review of the ticket set and a
+redundancy pass over every open bead. Priority encodes this plan's order: 0 is Phase 0 and
+Phase 1a now; 1 is the mapper slices, Phase 1b, and Phases 3 and 4; 2 is the film-compiler
+slices; 3 is 1.x. Start with `mote ready`.
+
+Consolidations made while filing:
+- **E0** is re-scoped as the 1.x extension of `recall-map` to a compiled film source. Its
+  terminal courts (byte-identical reruns, no media bytes in output, posterior display with
+  retained remainder) move to the `recall-map` tickets.
+- **The HSMM v4 wire-docs bead** is merged into the support-honesty bead.
+- **D1A-types** is a container blocked by its seven slice tickets.
+- **Six existing beads** are linked in as prerequisites: the cost-model invocation receipt, the
+  forgeable align types, the support-grain naming, the empty-guard convention, the proposition
+  provider, and the licence and ethics dispositions.

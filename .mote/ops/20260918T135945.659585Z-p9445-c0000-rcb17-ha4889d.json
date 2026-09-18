@@ -1,0 +1,1 @@
+{"actor":"claude-storymodel4s-mapper-plan","entity":"bd-01M1D215EY4T5BR0VRJ694AMBQ","kind":"note","note_kind":"decision","op":"20260918T135945.659585Z-p9445-c0000-rcb17-ha4889d","text":"Mapper plan revision 6: closing this is a condition of the Phase 4 release gate; platform-labelled goldens land with support honesty in Phase 2.","ts":"2026-09-18T13:59:45.659585Z","v":1}
