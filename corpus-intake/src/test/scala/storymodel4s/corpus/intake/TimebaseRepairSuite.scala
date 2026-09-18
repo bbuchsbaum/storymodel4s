@@ -185,3 +185,65 @@ class TimebaseRepairSuite extends FunSuite:
         .isLeft
     )
   }
+
+  /** The receipt must QUOTE the record, not paraphrase it from memory.
+    *
+    * `clockRepairs` used to stamp a Scala literal id (`annotation-raw-to-part-playback-v1`) and a
+    * formula string it BUILT ITSELF into every `SourceDerivationReceipt`, while the record's own
+    * `id` and `formula` were parsed into nothing. Two consequences, both found by cold review: a v2
+    * crosswalk record would emit receipts naming a v1 derivation, and the record's formula could be
+    * changed to say anything at all -- `playbackTicks = rawAnnotationSeconds / 99` -- while the
+    * emitted receipt went on asserting the multiplication the code happened to implement. A receipt
+    * that contradicts its own source is worse than no receipt.
+    *
+    * Parsing them was not enough to make them load-bearing: the values flowed into the receipt and
+    * nothing looked. This is the test that looks.
+    */
+  test("every emitted receipt quotes the record's own crosswalk id and formula") {
+    val rec = record
+    val repairs = TimebaseRepair
+      .clockRepairs(rec, 2500L)
+      .fold(e => fail(s"repairs must build: ${e.message}"), identity)
+
+    assertEquals(repairs.size, rec.runs.size)
+    repairs.zip(rec.runs).foreach { (repair, run) =>
+      assertEquals(
+        repair.receipt.algorithm,
+        rec.crosswalkId,
+        "the receipt names a derivation the record does not declare"
+      )
+      assertEquals(
+        repair.receipt.parameters,
+        run.formula,
+        s"${run.runId}: the receipt asserts a formula its own source contradicts"
+      )
+      assertEquals(repair.receipt.inputChecksums, Vector(rec.annotationSha256))
+    }
+  }
+
+  /** The offset is derived from the record, not asserted to be zero.
+    *
+    * `playbackStartTicks` was parsed and then never read: the repair passed `ExactRational.Zero`
+    * regardless. It comes out zero for this record, which is what the prose argues, but a record
+    * declaring otherwise was silently overridden rather than honoured or refused.
+    */
+  test("the repair offset comes from the record's declared starts") {
+    val rec = record
+    val repairs = TimebaseRepair.clockRepairs(rec, 2500L).fold(e => fail(e.message), identity)
+    rec.runs.foreach { r =>
+      assertEquals(r.annotationStartSeconds, 0L, "the zero-offset argument assumes this")
+      assertEquals(r.playbackStartTicks, 0L, "and this")
+    }
+    repairs.foreach(rep => assertEquals(rep.offset, storymodel4s.core.ExactRational.Zero))
+  }
+
+  /** The record declares the mapping SHAPE, and only one shape is implemented. */
+  test("a record declaring a non-identity mapping is REFUSED, not handed an identity repair") {
+    val affine = source.replaceFirst("\"mapping\": \"identity\"", "\"mapping\": \"affine\"")
+    assertNotEquals(affine, source, "the mutation must actually apply")
+    val rec = TimebaseRepair.parse(affine).fold(r => fail(r.message), identity)
+    TimebaseRepair.clockRepairs(rec, 2500L) match
+      case Left(e)  => assert(e.message.contains("affine"), e.message)
+      case Right(_) =>
+        fail("a declared affine mapping was silently given an identity repair")
+  }

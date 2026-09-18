@@ -215,6 +215,10 @@ class SherlockAnnotationsSuite extends FunSuite:
       .fold(r => fail(s"the pinned repair record must parse: ${r.message}"), identity)
 
     assertEquals(m.annotationSha256, record.annotationSha256)
+    // The crosswalk id is provenance: every emitted receipt names it, so an accidental change
+    // would silently re-label every derivation this adapter produces. Pinned like the annotation
+    // hash beside it.
+    assertEquals(record.crosswalkId, "annotation-raw-to-part-playback-v1")
     assertEquals(Some(m.run1EndRow), record.run1EndRow)
     assertEquals(m.totalRows, record.inputRows)
 

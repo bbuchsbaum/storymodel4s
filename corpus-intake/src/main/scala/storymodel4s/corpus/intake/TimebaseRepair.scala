@@ -29,15 +29,36 @@ object TimebaseRepair:
       axisId: String,
       firstRow: Int,
       lastRow: Int,
+      /** Parsed because the zero-offset argument in `clockRepairs` rests on it being 0. It was not
+        * read, so the justification could be falsified in the file with nothing noticing.
+        */
+      annotationStartSeconds: Long,
       annotationEndSeconds: Long,
       playbackEndTicks: Long,
       playbackStartTicks: Long,
-      uncoveredTailTicks: Long
+      uncoveredTailTicks: Long,
+      /** The record's own statement of the mapping shape. `clockRepairs` implements the identity
+        * scaling and nothing else, so a record declaring anything else must REFUSE rather than be
+        * quietly given an identity repair.
+        */
+      mapping: String,
+      /** The record's own formula. The receipt used to build this string itself, which meant an
+        * emitted receipt could assert a derivation its own source contradicted.
+        */
+      formula: String
   ):
     /** The derivation that existed only as prose. */
     def durationTicks: Long = playbackEndTicks + uncoveredTailTicks
 
-  final case class Record(annotationSha256: Checksum, inputRows: Int, runs: Vector[Run]):
+  final case class Record(
+      annotationSha256: Checksum,
+      inputRows: Int,
+      runs: Vector[Run],
+      /** The crosswalk's declared id. The receipt carried a Scala literal `...-v1`, so a v2 record
+        * would have produced receipts naming a derivation that no longer existed.
+        */
+      crosswalkId: String
+  ):
     def run(id: String): Option[Run] = runs.find(_.runId == id)
 
     /** The last annotation row of run 1, which `SherlockAnnotations` calls `run1EndRow`. */
@@ -58,6 +79,14 @@ object TimebaseRepair:
       case BadRowRange(raw)      => s"annotationRows '$raw' is not a 'first-last' range"
 
   private val RowRange = raw"^(\d+)-(\d+)$$".r
+
+  /** The one derivation `clockRepairs` performs, written the way the record writes it.
+    *
+    * Symbolic, not interpolated: the record says `* ticksPerSecond`, and a receipt that said
+    * `* 2500` would be quoting something its source does not contain. A record declaring any other
+    * formula is refused rather than given this repair with its own words attached.
+    */
+  val ImplementedFormula: String = "playbackTicks = rawAnnotationSeconds * ticksPerSecond"
 
   def parse(json: String): Either[RepairRefusal, Record] =
     for
@@ -84,6 +113,11 @@ object TimebaseRepair:
         .get[Int]("inputRows")
         .left
         .map(_ => RepairRefusal.MissingField("repair/inputRows"))
+      crosswalkId <- cur
+        .downField("annotationToPlaybackCrosswalk")
+        .get[String]("id")
+        .left
+        .map(_ => RepairRefusal.MissingField("annotationToPlaybackCrosswalk/id"))
       runsJson <- cur
         .downField("annotationToPlaybackCrosswalk")
         .get[Vector[io.circe.Json]]("runs")
@@ -92,7 +126,7 @@ object TimebaseRepair:
       runs <- runsJson.foldLeft[Either[RepairRefusal, Vector[Run]]](Right(Vector.empty)) {
         (acc, j) => acc.flatMap(done => run(j).map(done :+ _))
       }
-    yield Record(sha, inputRows, runs)
+    yield Record(sha, inputRows, runs, crosswalkId)
 
   private def run(j: io.circe.Json): Either[RepairRefusal, Run] =
     val c = j.hcursor
@@ -106,11 +140,27 @@ object TimebaseRepair:
       bounds <- rows match
         case RowRange(a, b) => Right((a.toInt, b.toInt))
         case other          => Left(RepairRefusal.BadRowRange(other))
+      startSeconds <- num("annotationStartSeconds")
       endSeconds <- num("annotationEndSeconds")
       endTicks <- num("playbackEndTicks")
       startTicks <- num("playbackStartTicks")
       tail <- num("uncoveredTailTicks")
-    yield Run(runId, partId, axisId, bounds._1, bounds._2, endSeconds, endTicks, startTicks, tail)
+      mapping <- str("mapping")
+      formula <- str("formula")
+    yield Run(
+      runId,
+      partId,
+      axisId,
+      bounds._1,
+      bounds._2,
+      startSeconds,
+      endSeconds,
+      endTicks,
+      startTicks,
+      tail,
+      mapping,
+      formula
+    )
 
   /** Builds a REAL `ClockRepair` per run, giving `core`'s mapping vocabulary its first production
     * caller. The repair is the identity on seconds scaled to ticks, which is exactly what the
@@ -137,14 +187,52 @@ object TimebaseRepair:
       (acc, r) =>
         for
           done <- acc
+          // The record declares the mapping SHAPE and this function implements exactly one of
+          // them. A record declaring `affine` used to be handed an identity repair anyway -- the
+          // declaration was parsed into nothing and the code did as it pleased.
+          _ <- Either.cond(
+            r.mapping == "identity",
+            (),
+            DomainError.InvariantViolation(
+              s"sherlock/repair/${r.runId}/mapping",
+              s"the record declares mapping '${r.mapping}', and only 'identity' is implemented"
+            )
+          )
+          // The receipt QUOTES the record's formula, which is only safe if the record describes
+          // the operation this function performs. Quoting alone is not enough: a test comparing
+          // the receipt to the record passes tautologically once the receipt is a copy of it, so
+          // the formula is checked against the IMPLEMENTATION here instead.
+          //
+          // Note the old code built `... * $ticksPerSecond` (`* 2500`) while the record says
+          // `* ticksPerSecond` symbolically, so the emitted receipt never did match its source.
+          _ <- Either.cond(
+            r.formula == ImplementedFormula,
+            (),
+            DomainError.InvariantViolation(
+              s"sherlock/repair/${r.runId}/formula",
+              s"the record declares '${r.formula}', and this builds '$ImplementedFormula'"
+            )
+          )
           scale <- ExactRational.of(ticksPerSecond, 1L)
+          // The offset is DERIVED from the record rather than asserted to be zero. It comes out
+          // zero for this record because both declared starts are zero -- which is what the prose
+          // above argues -- but a record that said otherwise used to be silently overridden by
+          // `ExactRational.Zero`, and `playbackStartTicks` was parsed and then never read.
+          offset <- ExactRational.of(
+            r.playbackStartTicks - r.annotationStartSeconds * ticksPerSecond,
+            1L
+          )
           source <- Right(PresentationAxisId.unsafe(s"annotation-run-local-seconds:${r.runId}"))
           target <- Right(PresentationAxisId.unsafe(r.axisId))
+          // The receipt now QUOTES the record: its own crosswalk id and its own formula. It used
+          // to carry a Scala literal id and a formula this function built itself, so a receipt
+          // could assert a derivation its own source contradicted, and a v2 record would have
+          // produced receipts naming v1.
           receipt <- SourceDerivationReceipt.of(
-            "annotation-raw-to-part-playback-v1",
-            s"playbackTicks = rawAnnotationSeconds * $ticksPerSecond",
+            record.crosswalkId,
+            r.formula,
             Vector(record.annotationSha256)
           )
-          repair <- ClockRepair.of(source, target, scale, ExactRational.Zero, receipt)
+          repair <- ClockRepair.of(source, target, scale, offset, receipt)
         yield done :+ repair
     }
