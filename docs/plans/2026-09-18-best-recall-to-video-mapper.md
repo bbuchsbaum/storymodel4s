@@ -1,17 +1,13 @@
-# Toward the best recall-to-video mapper: the plan (revision 4)
+# Toward the best recall-to-video mapper: the plan (revision 5)
 
-*2026-09-18. Draft for owner approval, written against `main` at `aab88b2e`. Everything below is
+*2026-09-18. Draft for owner approval, written against `main` at `ae73cd8c`. Everything below is
 LocallyObserved.*
 
-*Revision 3 was returned by a cold review with four blockers.*
-- *It misstated the owner's rulings C and E, and quietly reintroduced a research gate.*
-- *It left the scoring contract unspecified, even though the scorer silently drops rows.*
-- *Its contamination probe did not measure contamination.*
-- *It ran several arms and picked the best on gold, without the Sherlock preregistration's
-  counting rules.*
-
-*It also caught a wrong input size that revision 3 had marked as checked. Revision 4 fixes all of
-it. It also records the FilmFestival stimulus material found on Trillium the same day.*
+*Revision 5 preserves revision 4's input-size correction, FilmFestival inventory and explicit
+scope alternatives. It makes the recorded release scope the default, closes the scoring-denominator
+contract, reserves one final test opening, moves support honesty before confidence work, separates
+LLM labels from candidate scores, and withdraws the contamination interpretation of titles-only
+performance.*
 
 ## 0. Goal, rulings, and what this plan proposes to change
 
@@ -50,7 +46,9 @@ names. Under P1:
   framing.
 
 **If the owner declines P1,** E stands: D1A-film and all D1A-types slices are on the 1.0 path.
-Phase 2 then adds D1A S3–S4c, and Phase 4 waits for D1A-film.
+This is also the default while P1 is undecided: approving the plan does not implicitly adopt P1.
+Phase 2 includes D1A S3–S4c, D1A-film and D1B's end-to-end proofs as separately gated slices.
+H5 is advisory under the recorded rulings; its result does not gate film engineering.
 
 **P2. Language models run locally first.** Hosted models, including TypeSafe's Jev, run only after
 the owner decides, per corpus, whether participant recall prose may leave this machine.
@@ -89,8 +87,9 @@ About 24.5 of Sherlock's 30.4-point gain comes from the decode step, not the ali
 5. **Two instruments mislead.**
    - Agreement did not track accuracy.
    - Risk–coverage ranks units by the wrong node's mass.
-6. **Power is unstated.** Only 10 development participants have usable Sherlock gold. A percentile
-   bootstrap over 10 clusters under-covers.
+6. **Power is unstated.** Only 10 development participants have usable Sherlock gold. Uncertainty
+   estimates with so few clusters need sensitivity checks; changing the interval method does not
+   create an independent confirmation sample.
 7. **Contamination.** Sherlock's annotation (2021), recall transcripts (2023) and gold are public.
    Friends and *Memento* are famous. A sealed participant split controls tuning leakage, not what
    a model saw in training.
@@ -121,8 +120,12 @@ Phase 0 ──> Phase 1a (sealed Friends split; unit manifest; baselines incl. l
                                                                                              │
                            ┌─────────────────────────────────────────────────────────────────┤
                            v                                                                 v
-               Phase 1b (benchmark v1)                                 Phase 2 (mapper in the library)
-                           └──────────────────────────────────> Phase 3 (climb) ──> Phase 4 (ship 1.0)
+               Phase 1b (benchmark v1)                                 Phase 2 (library + support honesty)
+                           └──────────────────────────────────> Phase 3 (development climb)
+                                                                          │
+                                                            freeze → one final test opening
+                                                                          │
+                                                                  Phase 4 (ship 1.0)
 ```
 
 **Sizes:** S is up to 2 days, M up to a week, L is 2–4 weeks. Every slice lands behind its own
@@ -160,25 +163,41 @@ green gate and a separate cold review.
 
 **Step 1. Seal the Friends test split before anything else.**
 - Draw it at participant level, and commit the seed and membership.
-- Record its size and minimum detectable effect when it is drawn: 23 participants, 630 gold
-  units.
+- The available pool is 23 participants and 630 gold units, not the test-set size. Record the
+  actual development/test counts and power assumptions when the split is drawn, before model
+  outputs are read. Test metadata used for this accounting must not enter tuning.
 - Nothing in Phases 1a–2 reads it. The segmenter evaluation and any second coding in Phase 1b use
   development participants only.
+- Record the prior exposure: aggregate recall-order statistics have already been inspected across
+  all 23 participants. This is a model-untouched split, not an entirely unseen corpus. Seal Memento
+  by participant before any model or tuning inspection if it is admitted.
 
 **Step 2. The scoring contract.** This is a fix in `tools/recall-study`, because today the scorer
 fails open.
-- Export B3's **unit manifest**: participant, ordinal, text, onset. The current pipeline scores
+- Export B3's **unit manifest**: stable unit id, participant, ordinal, text checksum, onset and
+  source-input checksum. The current pipeline produces
   2,560 `RecallSegmenter` units, 67–351 per participant (arm `all17-monofill`).
-- Every arm labels exactly those units. Language-model arms use constrained JSON keyed by unit id.
-- `gold_scene.py` changes in four ways:
-  - it fails loudly unless both arms cover the identical unit set;
-  - a missing or invalid label counts as wrong;
-  - it reports coverage;
-  - it rejects a file name that does not match a partition member instead of dropping it.
+- Keep text-bearing manifests and arm outputs in the ignored data root; commit only hashes and
+  aggregates. Freeze gold eligibility and exclusion reasons independently of arm predictions.
+- Every arm returns one typed outcome for every manifest unit. Language-model arms use constrained
+  JSON keyed by unit id. Outcomes distinguish a valid label, abstention, invalid response and
+  provider failure; raw failures and any budgeted retries remain in the receipt.
+- `gold_scene.py` changes before any baseline comparison:
+  - reconcile each arm against the manifest, refusing missing, duplicate or extra unit ids,
+    changed unit identity, and unexpected participant files;
+  - retain explicit blank/invalid predictions, abstentions and provider failures as wrong in the
+    primary exact-scene denominator whenever the unit has gold;
+  - retain units without gold in accounting, but outside the accuracy denominator under the
+    existing preregistration; never infer gold eligibility from a prediction;
+  - report input count, gold-eligible count, every exclusion/outcome count and prediction coverage;
+  - use the same frozen denominator and unit weights for both arms, including paired resamples.
+- The primary Phase 1a estimand is the pooled, unit-weighted exact-scene accuracy difference.
+  Participant-average differences are separately labelled; the two are not interchangeable.
 - **Scorer drops today:** it discards unlabelled rows silently (`:108-112`), and `paired` never
   checks unit identity (`:171`).
-- **Mutation witnesses.** Drop one unit from one arm, and the paired run must fail. Blank one
-  label, and it must be scored wrong.
+- **Mutation witnesses.** Drop, duplicate or change one unit id and the paired run must fail.
+  Blank a wrong label or replace it with a failure and primary accuracy must not improve.
+  A no-gold unit must remain accounted for without becoming a model error.
 
 **Step 3. The preregistration governs.** The committed Sherlock preregistration binds this phase.
 - **Rule 2:** any choice made on gold uses development participants only.
@@ -186,10 +205,15 @@ fails open.
 - `partition.json` says the untouched set "chooses nothing".
 
 What that means here:
-- **One confirmatory comparison is pre-specified.** L1 (local) against B3, on the 10 development
-  participants with usable gold, exact scene. Its paired CI uses BCa or a cluster permutation, not
-  a percentile bootstrap over 10 clusters.
-- **Every other arm is descriptive,** Holm-adjusted if any claim is made from it.
+- **One primary development comparison is pre-specified.** L1 (local) against B3, on the 10
+  development participants with usable gold, exact scene. It informs an engineering choice; it
+  is not independent confirmation on clean data and does not replace the preregistration's
+  historical comparison. Record this additional comparison in the ledger before running it.
+- Freeze the CI method, seed and resample count before scoring. Resample whole paired participant
+  clusters and recompute the pooled difference; show participant-level differences and a
+  leave-one-participant-out sensitivity analysis. Report the small-cluster limitation.
+- **Every other arm is descriptive.** Any inferential family and multiplicity adjustment must be
+  declared before its outputs are read; an unadjusted best-arm CI cannot establish superiority.
 - **Model and prompt piloting** use NN01 and NN05, the two participants with no usable gold, and
   judge only gold-free criteria: parse validity, coverage, whether the prompt fits the context
   window, and rerun agreement.
@@ -231,28 +255,34 @@ What that means here:
 | B0 | timing-only floor |
 | B1 / B2 | BM25 / embedding cosine, argmax over scenes |
 | B1t / B2t | the same, on scene **titles only** |
-| B3 / B4 | current pipeline, with and without fill (B3 is the confirmatory comparator) |
-| L0 | local model given **scene numbers and durations only**. Compared with B0, it measures order-and-timing guessing |
-| L1 | local model, per transcript: labels every unit in order. **Confirmatory arm** |
+| B3 / B4 | current pipeline, with and without fill (B3 is the primary development comparator) |
+| L0 | local model given **scene numbers and durations only**. An order/timing diagnostic against B0; it does not isolate prior episode knowledge |
+| L1 | local model, per transcript: labels every unit in order. **Primary development arm** |
 | L2 | local model, per unit, with prefix caching. Isolates matching |
-| L3 | local model, per transcript, **titles only**. Contamination estimate: L3 minus the better of B1t and B2t |
+| L3 | local model, per transcript, **titles only**. Title-information ablation, compared separately with B1t and B2t; not a contamination estimate |
 | H1, J1 | hosted frontier model; Jev. Only after the owner's per-corpus data decision and Jev access |
 
 **FilmFestival (development).** Film identity with B1, B2, B3/B4, L1 and L3, on the coder index
-(T1) and the crowd index (T2). Its obscure, often wordless shorts are the **least-exposed check**
-on the language-model arms.
+(T1) and the crowd index (T2). This is a cross-corpus development check. Training exposure is
+unknown; obscurity or wordlessness does not establish that a film or its annotations were unseen.
 
 **Step 6. Pre-declared rules, fixed before any language-model output is read.**
-- **R1.** The confirmatory L1 − B3 CI excludes zero in L1's favour. Phase 2 then ships a
-  language-model provider as a **Phase 2 deliverable**, and Phase 3 opens with H1.
+- **R1.** The primary development L1 − B3 CI excludes zero in L1's favour. Phase 2 then includes
+  the winning label-producing provider as a **Phase 2 deliverable**. A score-producing adapter
+  must pass the separate score-contract pilot below before H1 feeds it through the decode.
+  This rule selects engineering work; it does not establish superiority on clean test data.
 - **R2.** It does not. Phase 2 ships only the channel interface, with embedding and lexical
   providers. Language-model providers wait for H1 in Phase 3.
-- **R3.** The contamination estimate (L3 minus the titles-only retrieval) exceeds 10 points, or
-  FilmFestival's language-model advantage is materially smaller than Sherlock's. Then Sherlock's
-  language-model numbers are reported as **contamination-bounded**. R3 qualifies R1's *claim*, not
-  its build decision.
-- **R4** is scoped to the default *language-model* channel, and applies only if a hosted arm runs.
-  It is descriptive, not confirmatory.
+- **R3.** Report L3 as an input ablation and cross-corpus differences as transfer diagnostics.
+  Strong title matching can reflect semantic inference, and weak matching does not rule out
+  memorisation. Neither result establishes or bounds contamination. Record known training-data
+  provenance and unresolved exposure for every model/corpus pair, including Friends and Memento;
+  a participant split controls tuning leakage, not episode-level training exposure.
+- **R4.** If an authorized hosted arm runs, compare it with the pinned local model on identical
+  development units and inputs. If local exact-scene accuracy is within 5 percentage points of
+  hosted accuracy, prefer local as the default *language-model* channel. Otherwise the checkpoint
+  considers the measured gain, runtime and cost. This is a descriptive engineering preference,
+  not a non-inferiority or equivalence claim; without a hosted run, local remains the default.
 
 **Step 7. The readout.** Every arm, with coverage, CI and receipt hash. It is committed before the
 checkpoint. The word "calibrated" is not used: preregistration §7 rule 5 bars it on one film.
@@ -260,7 +290,7 @@ checkpoint. The word "calibrated" is not used: preregistration §7 rule 5 bars i
 ### Checkpoint
 
 The owner reads the readout, confirms or overrides R1/R2, and decides P1 and P2 if not already
-decided.
+decided. Until an explicit P1 decision changes it, the recorded full film route remains scheduled.
 
 ### Phase 1b — Benchmark v1 (M–L; partly waits on people)
 
@@ -280,11 +310,16 @@ decided.
   | T4 | video-derived | Sherlock; FilmFestival's eight films |
 
 - **Scoring and statistics:**
-  - weighting by words or time;
+  - freeze a primary estimand and weighting rule per task before comparisons; retain Phase 1a's
+    unit-weighted scores as a separate series if benchmark v1 adds word/time-weighted scores;
   - a gold-unit oracle row;
   - the segmenter evaluated on Friends development gold;
   - stated split sizes and minimum detectable effects;
-  - risk–coverage on the decoded anchor's own mass.
+  - fixed-denominator accounting from Phase 1a, with abstention coverage measured against all
+    gold-eligible units, not only units that received a prediction;
+  - risk–coverage for the final emitted decision. The decoded anchor's own mass is a diagnostic
+    input, not automatically its probability of correctness. Record scene mass separately from
+    leaf mass, and identify fill decisions and missing scores explicitly.
 - **Human ceiling.** A second coding of sampled **development** units for Sherlock, FilmFestival
   and Friends, which needs people. Plus the within-scene human lane.
 - **Published comparator.** Heusser et al. (2021) on Sherlock, stating that its 30 events are
@@ -294,8 +329,10 @@ decided.
 
 ### Phase 2 — The mapper in the library (L)
 
-This phase includes D1A-types S0–S2 and D1B's signature work. It also includes S3–S4c if P1 is
-declined.
+Under the recorded rulings, this phase includes all D1A-types slices, D1A-film and all of D1B.
+Land the mapper and film-compiler work in separate slices; neither waits for H5. Only explicit
+adoption of P1 reduces this to S0–S2 (plus S3 if needed) and D1B's signature work. The mapper
+slice is L; the full film route needs its own slice estimates and is not included in that L.
 
 - **Parity first.** D1A S0 pins the text path. Sherlock's per-unit anchors reproduce
   byte-for-byte through the new path.
@@ -303,25 +340,52 @@ declined.
   - `SourceView` without canonical text.
   - Nodes carry checked `EvidenceSupport` and exact `PlaybackInterval`s.
   - `HsmmResult` keeps exact intervals.
-- **Scoring channel.** One typed interface with a receipt per call.
+- **Support honesty, before public confidence output or H4.** Land `hsmm/v4` with tagged
+  `Assessed` / `Unestablished` / `NotApplicable` support and an explicit support basis. Empty or
+  zero-weight eligible evidence must not publish full support. Include schema migration,
+  platform-labelled goldens, construction checks and a mutation restoring the false full-support
+  value that fails a named test. Text-path anchor parity is established before this separate,
+  receipted wire change; any resulting numerical movement is reported, not silently rebaselined.
+- **Scoring channel.** One typed score interface with a receipt per call, separate from the
+  direct label-producing baseline interface.
   - It declares its **candidate level** (scene or leaf), and how scene scores distribute over
-    leaves for `GraphHsmm`.
+    leaves for `GraphHsmm`. A scene-level score alone cannot establish within-scene precision.
   - It has a **recorded-response replay mode**, so gates run without any model.
   - Providers: lexical and embedding always; language-model providers per R1/R2.
-  - Score-to-probability mapping is fitted on development data and reported as *measured
-    reliability*, not as calibration.
+  - **LLM score-contract pilot:** declare the extraction method (for example candidate-label
+    likelihoods or an explicit reranker), candidate set/order, score direction and normalization,
+    context and retry budgets, and unavailable-score outcomes. Pin its prompt and receipt.
+    A generated label, verbal confidence or absent candidate must not silently become a
+    probability vector, certainty, or zero score. Record candidate coverage and rerun agreement.
+  - Run the pilot on development data as a separately counted arm. R1's direct-label win does
+    not establish that this scoring adapter works. If scores cannot be obtained under the
+    declared contract, retain the direct labeller and report H1 as unavailable for that provider.
+- **Reliability belongs to the final decision.** Define the event being assessed (correct scene,
+  correct film, or a declared interval tolerance), and bind the reliability model to the complete
+  scorer, candidate set, decoder, fill policy and support version. Fit on a development calibration
+  partition or participant-level out-of-fold predictions, separate from its reliability assessment.
+  Report held-out reliability and risk–coverage with their corpus limits. A provider-score mapping
+  does not certify a changed decoded anchor; changing the decision policy requires reassessment.
+  Preserve the Sherlock preregistration's bar on a calibration claim based on one film.
 - **Declared decoders.** `MonotoneScene` generalised; fill off by default; per-corpus settings as
   data.
 - **`recall-map`.**
   - Inputs: a corpus descriptor and recall transcripts.
-  - Output: a per-unit mapping with interval, score and alternatives, plus an HTML report.
-  - It exits non-zero unless the mapping is complete.
+  - Output: one outcome per input unit, with a supported mapping or explicit abstention/external
+    state/failure. Mappings carry intervals, score provenance, available alternatives and a typed
+    reliability status; unavailable scores or reliability are explicit. Include an HTML report.
+  - Completeness means every input unit is accounted for, not that every unit is forced onto
+    the video. Valid abstentions and external states succeed; malformed/incomplete artifacts or
+    provider failures cause a non-zero exit while retaining the receipted partial result.
   - The benchmark runs through it, and `run-arm.sh` retires.
+- **Full film route (the default).** D1A-film compiles a film source through the library API;
+  D1B aligns recall against that compiled source and preserves exact playback intervals. Land its
+  end-to-end proofs and refusal mutations before declaring Phase 2 complete under ruling E.
 
 ### Phase 3 — Climb (iterative)
 
-Each hypothesis is an arm, tuned on development data and read **once** on the sealed Friends
-split (and Memento, when admitted) against its minimum detectable effect.
+Each hypothesis is an arm, iterated and selected using development data only. Friends and Memento
+test outputs remain sealed throughout that iteration; "once per hypothesis" is not the policy.
 
 - **H1.** Language-model scoring through the decode.
 - **H2.** Transfer-safe decoding:
@@ -331,30 +395,48 @@ split (and Memento, when admitted) against its minimum detectable effect.
   - a duration distribution, last.
 - **H3.** Coder-independent inputs: dialogue, captions from the FilmFestival and Sherlock frames,
   and crowd descriptions, plus the independence ablation.
-- **H4.** Confidence and abstention, after the support-honesty fix.
+- **H4.** Confidence and abstention, using Phase 2's support-honesty and final-decision contracts.
 - **H5.** The structural-spine pilot. Its s43 validation fix comes with an ADR 0005 amendment.
+  Under ruling A this pilot informs mapper design, not permission to build D1A-film.
+
+**Final freeze and one test opening.** Before reading any test output, commit a release-candidate
+manifest: code/model/prompt hashes, all compared configurations and baselines, calibration fits,
+decoder/fill/abstention settings, task estimands and weights, exclusions, primary contrasts,
+multiplicity treatment, CI methods and power assumptions. Select the shipping configuration on
+development data before this freeze. Baselines and frozen ablations run in the same final batch.
+
+Open each sealed corpus test once for that frozen batch. Compare results with the predeclared
+effect target and uncertainty; lack of evidence for a gain is not evidence of equivalence. Test
+results neither choose the winner nor start another climb on the same test participants. Any
+output-affecting correction, retuning or new hypothesis after opening is labelled development
+work on a consumed test; a new confirmation claim requires new untouched data. Preserve all
+failures and the original readout. Record an unavailable corpus or arm rather than substituting
+one after seeing results. Shipping the library and earning a superiority claim are separate gates.
 
 ### Phase 4 — Ship 1.0 (M–L)
 
 - **Release infrastructure.** Publishing, a MiMa baseline, and deployed docs.
-- **The `hsmm/v4` support-honesty wire,** before the freeze.
+- **Freeze the Phase 2 support wire and decision contracts.** No first landing of support honesty
+  remains for this phase; publish the migration documentation with the release.
 - **Hardening:**
-  - platform-labelled goldens;
+  - verify the platform-labelled goldens landed in Phase 2;
   - one refusal supertype;
   - readable I/O errors;
   - a facade around `recall-map`.
 - **The stability table.**
   - Stable: the mapper, the typed source view, `HsmmResult`, the core evidence types.
-  - `StoryModel` and the compiler: stable if P1 is declined and D1A-film lands, otherwise
+  - `StoryModel` and the compiler: stable under the recorded full-film route, otherwise
     experimental.
+- **Release gate.** Under ruling E, the film compiler and D1B end-to-end proofs must be landed
+  and green. Only an explicit recorded P1 decision can substitute the narrower mapper route.
 
 ## 4. The film chain under each choice
 
-| Bead | If P1 is adopted | If P1 is declined (E as recorded) |
+| Bead | Only if P1 is explicitly adopted | Default: E as recorded |
 |---|---|---|
 | D1A-types | S0–S2 in Phase 2. S3 only if D1B needs it. S4a–S4c pause | all slices, Phase 2 |
 | D1B | signature work in Phase 2; spine proofs with D1A-film | all of it before 1.0 |
-| D1A-film | P1a: unscheduled. P1b: after a positive H5 (needs A narrowed) | on the 1.0 path |
+| D1A-film | P1a: unscheduled. P1b: after a positive H5 (needs A narrowed) | Phase 2; on the 1.0 path regardless of H5 |
 | V1, E0 | 1.x | 1.x |
 
 ## 5. Owner decisions
@@ -364,7 +446,8 @@ split (and Memento, when admitted) against its minimum detectable effect.
 2. Approve the Phase 0 deletions.
 
 **At or before the checkpoint:**
-3. P1: adopt P1a, adopt P1b (and narrow A), or keep E as recorded.
+3. P1, only if a scope change is wanted: adopt P1a or P1b (and narrow A). Otherwise E stands;
+   its already-approved engineering needs no new scope approval.
 4. P2: per corpus, may recall prose go to hosted APIs? What is the spend budget?
 
 **Later:**
@@ -375,13 +458,15 @@ split (and Memento, when admitted) against its minimum detectable effect.
 ## 6. Tracker changes on approval
 
 - File the phase beads, carrying the Phase 1a arms table and rules R1–R4.
-- Once P1 is decided:
-  - apply §4's column to D1A-types, D1B and D1A-film;
-  - move V1 and E0 to 1.x.
+- Preserve the recorded D1A-types/D1A-film/D1B scope and dependencies by default; apply §4's
+  alternative column only after an explicit P1 decision.
+- Put support honesty and its mutation evidence in Phase 2, ahead of confidence work.
+- Record the final-freeze/test-opening gate, including corpus exposure and read-count ledgers.
+- Move V1 and E0 to 1.x.
 
 ## 7. Non-claims
 
-- **Checked by the author:**
+- **Checks reported by the revision 4 author (not all rerun in this revision):**
   - the validation gate;
   - the orphaned commit;
   - FilmFestival's partition statement;
@@ -397,5 +482,10 @@ split (and Memento, when admitted) against its minimum detectable effect.
   Other figures are as the surveys reported them.
 - The 63.8% is pooled over 15 participants. Development-only is 65.2%.
 - The Jev figures are vendor claims.
-- H1–H5 and the R-rule thresholds are judgement, declared before data.
-- Revision 4 has not been cold-reviewed.
+- Revision 5 rechecked the recorded ruling E, the Sherlock preregistration and the scorer's
+  dropped-row behaviour. A two-unit probe scored 50% with one wrong prediction and 100% when
+  that prediction was blank or invalid; this demonstrates the defect, not a repaired scorer.
+- H1–H5 and the R-rule choices are judgement, declared before data.
+- Titles-only and cross-corpus contrasts neither establish nor bound training contamination.
+- A pinned model/runtime is replay provenance, not proof of bit-identical fresh inference.
+- This plan specifies implementation and evidence gates; it does not claim those gates have run.
