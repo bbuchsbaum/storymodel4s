@@ -71,6 +71,16 @@ object CorpusProfile:
 
   /** Canonical rendering: sorted, fully qualified, and covering every field that changes a read. An
     * encoding left out here would make two different readings share one identity.
+    *
+    * The rendering is NESTED, not flat. Framing each part makes every part self-delimiting, and
+    * three probes confirmed that no part can absorb the one after it -- but a fourth found that
+    * framing is not sufficient, because `encodingParts` emits one, two or three elements and a
+    * variable-arity group inside a FLAT vector can straddle a sheet boundary. One sheet reading
+    * three columns rendered identically to two sheets reading one column each, ON DIFFERENT
+    * ARTIFACTS. So each column digests to a single 64-character part of its sheet, and each sheet
+    * to a single 64-character part of the profile: every vector that reaches `digest` is then a
+    * vector of fixed-width elements, and the structure is unambiguous however the arity below it
+    * varies. The probe is `a variable-arity encoding cannot straddle a sheet boundary`.
     */
   private def render(
       id: ProfileId,
@@ -78,19 +88,22 @@ object CorpusProfile:
       sheets: Map[(ArtifactId, String), SheetBinding]
   ): Checksum =
     def framed(part: String): String = s"${part.length}:$part"
-    val parts = sheets.toVector
+    def digestOf(parts: Vector[String]): Checksum = ContentAddress.digest(parts.map(framed))
+    val sheetParts = sheets.toVector
       .sortBy((k, _) => (k._1.value, k._2))
-      .flatMap { case ((artifact, sheet), binding) =>
-        Vector(artifact.value, sheet, binding.headerRow.toString) ++
-          binding.columns.toVector.sortBy(_._1).flatMap { (name, b) =>
-            // the encoding is framed field by field, not through `render`, so a Custom namespace
-            // or label carrying a colon cannot move the boundary between them
-            encodingParts(b.encoding) ++ Vector(name, b.indexOnly.toString)
-          }
+      .map { case ((artifact, sheet), binding) =>
+        val columnParts = binding.columns.toVector.sortBy(_._1).map { (name, b) =>
+          // the encoding is framed field by field, not through `render`, so a Custom namespace
+          // or label carrying a colon cannot move the boundary between them
+          digestOf(
+            Vector("column", name, b.indexOnly.toString) ++ encodingParts(b.encoding)
+          ).hex
+        }
+        digestOf(
+          Vector("sheet", artifact.value, sheet, binding.headerRow.toString) ++ columnParts
+        ).hex
       }
-    ContentAddress.digest(
-      (Vector("corpus-profile", id.value, version.toString) ++ parts).map(framed)
-    )
+    digestOf(Vector("corpus-profile", id.value, version.toString) ++ sheetParts)
 
   /** An encoding as separate fields rather than one rendered string. */
   private def encodingParts(encoding: CellEncoding): Vector[String] = encoding match

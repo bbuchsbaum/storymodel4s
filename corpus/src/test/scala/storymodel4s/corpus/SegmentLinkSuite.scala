@@ -319,3 +319,68 @@ class SegmentLinkSuite extends FunSuite:
       Left(LinkRefusal.NotInjective)
     )
   }
+
+  /** Three properties of `of` that a cold reviewer found unchecked, unpinned, or both.
+    *
+    * Every other test in this suite builds its segmentations from the one `seg` helper, so both
+    * sides always shared a work and an axis and no test could ever have exercised the case where
+    * they differ. Two of the three below are now enforced or documented in `of`; all three are
+    * pinned here, because the reviewer was right that the SUITE, not just the code, was the gap.
+    */
+  private def segOn(id: String, n: Int, w: WorkId, ax: PresentationAxisId) =
+    Segmentation
+      .of(
+        SegmentationId.unsafe(id),
+        w,
+        GranularityLevel.Event,
+        SegmentationAuthority.AuthorAnnotated(CoderId.unsafe("upstream")),
+        ax,
+        (1 to n).toVector.map(i => Segment(i, i.toLong * 10, s"e$i"))
+      )
+      .fold(r => fail(r.message), identity)
+
+  test("a link across two WORKS refuses: nothing else in `of` would catch it") {
+    val friends = segOn("f.scenes", 3, WorkId.unsafe("friends-s01e16-17"), axis)
+    val sherlock = segOn("s.scenes", 3, WorkId.unsafe("sherlock-a-study-in-pink"), axis)
+    // this mapping is total, injective, onto and in range -- every ordinal check passes
+    val mapping = Map(1 -> to(sherlock, 1), 2 -> to(sherlock, 2), 3 -> to(sherlock, 3))
+    SegmentLink.of(friends, sherlock, LinkClaim.Bijection, 1, mapping) match
+      case Left(LinkRefusal.ForeignWork(f, t)) =>
+        assertEquals(f.value, "friends-s01e16-17")
+        assertEquals(t.value, "sherlock-a-study-in-pink")
+      case other => fail(s"expected a foreign-work refusal, got $other")
+    // and the same two segmentations under one work are fine, so it is the WORK that refused
+    val sameWork = segOn("s.scenes", 3, WorkId.unsafe("friends-s01e16-17"), axis)
+    assert(SegmentLink.of(friends, sameWork, LinkClaim.Bijection, 1, mapping).isRight)
+  }
+
+  test("a link across two AXES is LEGAL: that is the crosswalk this module carries") {
+    val w = WorkId.unsafe("sherlock-a-study-in-pink")
+    val annotation = segOn("s.annotation", 3, w, PresentationAxisId.unsafe("axis:annotation"))
+    val playback = segOn("s.playback", 3, w, PresentationAxisId.unsafe("axis:playback"))
+    val mapping = Map(1 -> to(playback, 1), 2 -> to(playback, 2), 3 -> to(playback, 3))
+    assert(
+      SegmentLink.of(annotation, playback, LinkClaim.Bijection, 1, mapping).isRight,
+      "refusing a cross-axis link would refuse the annotation-to-playback crosswalk itself"
+    )
+  }
+
+  /** A reviewer proposed refusing a non-monotone Coarsening. Deliberately not done.
+    *
+    * `{1->2, 2->1, 3->2}` is a coarsening whose target ordinal decreases, which on a single
+    * timeline means non-contiguous grouping and is a mistake. Memento is not a single timeline: it
+    * is cut in reverse, so coarsening its discourse-ordered segments into story-ordered scenes
+    * decreases by construction. The check would refuse a corpus this repository already reads, the
+    * same way strict-increasing onsets refused Sherlock. Pinned so the decision is visible rather
+    * than merely absent.
+    */
+  test("a non-monotone coarsening is ADMITTED, because Memento is cut in reverse") {
+    val w = WorkId.unsafe("memento")
+    val discourse = segOn("m.discourse", 3, w, axis)
+    val story = segOn("m.story", 2, w, axis)
+    val mapping = Map(1 -> to(story, 2), 2 -> to(story, 1), 3 -> to(story, 2))
+    val link = SegmentLink
+      .of(discourse, story, LinkClaim.Coarsening, 1, mapping)
+      .fold(r => fail(s"a reverse-cut coarsening must be admitted: ${r.message}"), identity)
+    assertEquals(link.multiplicity(SegmentRef(story.id, 2)), 2)
+  }

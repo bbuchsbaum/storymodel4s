@@ -106,7 +106,13 @@ object SegmentLink:
     val foreignTargets = mapping.values.flatMap(_.target).filter(_.segmentation != to.id)
     val outOfRange = mapping.values.flatMap(_.target).filter(r => !to.ordinals.contains(r.ordinal))
 
-    if version < 1 then Left(LinkRefusal.BadVersion(version))
+    // The WORK must match; the AXIS deliberately need not. A link whose two sides sit on different
+    // axes is the crosswalk this module exists to carry -- an annotation timeline onto a playback
+    // clock -- and rule 5 keeps those apart precisely so a value can be moved between them by a
+    // declared link rather than by arithmetic in a scorer. Crossing works is nonsense in a way
+    // crossing axes is not, so only the first refuses.
+    if from.work != to.work then Left(LinkRefusal.ForeignWork(from.work, to.work))
+    else if version < 1 then Left(LinkRefusal.BadVersion(version))
     else if missing.nonEmpty then Left(LinkRefusal.NotTotal(missing.toVector.sorted))
     else if foreignKeys.nonEmpty then Left(LinkRefusal.ForeignSource(foreignKeys.toVector.sorted))
     else if foreignTargets.nonEmpty then
@@ -122,6 +128,14 @@ object SegmentLink:
           else if reached.distinct.sizeIs != to.size then Left(LinkRefusal.NotOnto)
           else Right(new SegmentLink(from.id, to.id, claim, version, mapping))
         case LinkClaim.Coarsening =>
+          // A reviewer proposed a fourth check here: that the target ordinal be non-decreasing as
+          // the source ordinal ascends, so a coarsening groups CONTIGUOUS segments. On a single
+          // timeline that is right, and it is rejected anyway, because the segmentations this links
+          // are not always on one timeline. Memento is cut in reverse: coarsening its
+          // discourse-ordered segments into story-ordered scenes is legitimately non-monotone, and
+          // the check would refuse a corpus this repository already reads. Contiguity is a property
+          // of the AXIS PAIR, not of the claim, and `LinkClaim` has no case for it -- adding one is
+          // new vocabulary and wants an ADR (SD5). Admitted deliberately, and pinned by test.
           if dropped > 0 then Left(LinkRefusal.CoarseningDropsSources(dropped))
           else if reached.distinct.sizeIs != to.size then Left(LinkRefusal.NotOnto)
           else Right(new SegmentLink(from.id, to.id, claim, version, mapping))
@@ -190,6 +204,17 @@ extension (link: SegmentLink)
 
 enum LinkRefusal:
   case BadVersion(version: Int)
+
+  /** The two segmentations belong to different WORKS.
+    *
+    * Nothing else in `of` would catch this: the checks are all about ordinals, and two corpora
+    * number their segments 1..n just the same. So a Friends 56-scene segmentation mapped onto a
+    * Sherlock 50-scene one satisfies totality, ontoness and range, and produces a link that is
+    * arithmetic nonsense. Only the `work` says so, and until this case nothing read it.
+    *
+    * Crossing an AXIS is a different matter and stays legal -- see `of`.
+    */
+  case ForeignWork(from: WorkId, to: WorkId)
   case NotTotal(missing: Vector[Int])
   case ForeignSource(ordinals: Vector[Int])
   case ForeignTarget(segmentation: SegmentationId)
@@ -211,6 +236,7 @@ enum LinkRefusal:
 
   def message: String = this match
     case BadVersion(v)              => s"link version $v is not positive"
+    case ForeignWork(f, t)          => s"cannot link work ${f.value} to work ${t.value}"
     case NotTotal(m)                => s"no target for source ordinals ${m.mkString(", ")}"
     case ForeignSource(o)           => s"ordinals ${o.mkString(", ")} are not in the source"
     case ForeignTarget(s)           => s"a target names segmentation ${s.value}, not the target"

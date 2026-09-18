@@ -62,6 +62,28 @@ def main():
     check("a changed TR reaches the rule", gold_scene.configure(h2.name)["TR"] == 2.0)
     gold_scene.configure(handle.name)  # restore
 
+    # MUTANT: participantPattern was DECLARED and read by nothing -- `int(name[2:4])` did the job
+    # and hardcoded Sherlock's two-letter shape, so a corpus with different ids would configure
+    # cleanly and then be parsed by the wrong rule. A declared knob that changes nothing is the
+    # defect this contract exists to remove, so the mutation is that a changed pattern must reach
+    # the parse, in BOTH the filename form and the bare-id form that `excludedParticipants` uses.
+    check("pattern parses a filename", gold_scene.participant_number("NN07_recall.tsv") == 7)
+    check("pattern parses a bare id", gold_scene.participant_number("NN01") == 1)
+    check("a non-participant file is skipped", gold_scene.participant_number("README.md") is None)
+
+    doc["goldRule"]["participantPattern"] = r"^sub-(\d{3})_"
+    doc["goldRule"]["excludedParticipants"] = ["sub-013"]
+    h3 = tempfile.NamedTemporaryFile("w", suffix=".json", delete=False, encoding="utf-8")
+    json.dump(doc, h3)
+    h3.close()
+    cfg = gold_scene.configure(h3.name)
+    check("a changed pattern reaches the filename parse",
+          gold_scene.participant_number("sub-013_recall.tsv") == 13)
+    check("a changed pattern reaches the exclusion list", cfg["EXCLUDED_NUMS"] == [13])
+    check("the OLD pattern no longer parses", gold_scene.participant_number("NN07_x.tsv") is None)
+    gold_scene.configure(handle.name)  # restore
+    check("restoring the descriptor restores the rule", gold_scene.EXCLUDED_NUMS == {1})
+
     if FAILURES:
         print("FAILED: " + "; ".join(FAILURES))
         return 1

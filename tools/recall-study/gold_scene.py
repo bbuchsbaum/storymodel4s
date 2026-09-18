@@ -7,7 +7,7 @@ fact that exactly one comparison is pre-specified. This file implements that and
 
 Usage: gold_scene.py GOLD_CSV LABEL_A DIR_A LABEL_B DIR_B [PARTITION_JSON]
 """
-import csv, glob, math, os, random, statistics, sys
+import csv, glob, math, os, random, re, statistics, sys
 
 import corpus_descriptor as cd
 
@@ -36,8 +36,36 @@ def configure(descriptor_path):
     TR = float(rule["trSeconds"])
     EXCLUDED = set(rule["excludedParticipants"])
     PARTICIPANT_PATTERN = rule["participantPattern"]
-    EXCLUDED_NUMS = {int(name[2:]) for name in EXCLUDED if name[2:].isdigit()}
+    EXCLUDED_NUMS = {n for n in (participant_number(name) for name in EXCLUDED) if n is not None}
     return {"TR": TR, "EXCLUDED": sorted(EXCLUDED), "EXCLUDED_NUMS": sorted(EXCLUDED_NUMS)}
+
+
+def participant_number(text):
+    r"""The participant number in a filename or a bare participant id, per the DECLARED pattern.
+
+    `PARTICIPANT_PATTERN` used to be assigned by `configure()` and read by NOTHING: this job was
+    done by `int(name[2:4])` for filenames and `int(name[2:])` for excluded ids, both of which
+    hardcode Sherlock's two-letter `NN01_` shape. A corpus whose ids are `sub-013_` would configure
+    without complaint and then be parsed by the wrong rule -- a declared knob that looks live and is
+    inert, which is the exact defect this contract exists to remove.
+
+    Two forms have to work, because the pattern describes a FILENAME (`^NN(\d{2})_`, separator
+    included) while `excludedParticipants` holds bare ids (`NN01`, no separator). Rather than
+    assume the separator, the bare form is matched against the pattern truncated at the end of its
+    first capture group -- the part that identifies the participant, with whatever follows dropped.
+
+    Returns None when the text matches neither form, so a stray file in an arm directory is skipped
+    rather than crashing the run; `label` reports what it skipped.
+    """
+    m = re.match(PARTICIPANT_PATTERN, text)
+    if m is None:
+        close = PARTICIPANT_PATTERN.find(")")
+        if close < 0:
+            return None
+        m = re.match(PARTICIPANT_PATTERN[: close + 1], text)
+    if m is None or not m.group(1).isdigit():
+        return None
+    return int(m.group(1))
 
 
 def gold_subject_of(nn: int):
@@ -90,7 +118,9 @@ def label(arm_rows, gold):
     """(gold_scene, predicted_scene) per unit that has gold, keyed by participant."""
     out = {}
     for name, rows in arm_rows.items():
-        nn = int(name[2:4])
+        nn = participant_number(name)
+        if nn is None:
+            continue
         gs = gold_subject_of(nn)
         if gs is None or gs not in gold:
             continue

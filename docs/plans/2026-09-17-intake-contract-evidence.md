@@ -319,6 +319,10 @@ have not reported, and nothing here rests on them having done so.**
 - **No corpus is admitted.** `AdmissionStatus` is recorded, never decided. Friends and Memento both
   remain `proposed`, no court is open, and no Friends or Memento artifact is committed.
   *Evidenced:* both intake runners print the admission state they read, and both print `proposed`.
+  **Corrected 2026-09-17:** this was FALSE when written. Only `FriendsIntake` printed an admission
+  line; `MementoIntake` printed none, so a reader comparing the two receipts would have taken
+  Memento's silence for a clean bill. Found by cold review. The claim was not weakened to match the
+  code — the line was added to `MementoIntake`, so the sentence above is now true of both.
   Reading the git-ignored data root was always permitted — `story-text-admission-checklist.md` §3
   bars **committing** recall prose, not reading staged bytes — so verifying and reading a corpus is
   not admitting it.
@@ -330,10 +334,43 @@ have not reported, and nothing here rests on them having done so.**
   tests, so the arm runners still read the same literals they always did. A scorer's computation
   cannot have moved.
 - **The Python scorers are not rewired.** P6desc landed the descriptor contract and its refusals on
-  both sides; the ten files that carry corpus constants still carry them. The gold rule exists in
-  two implementations that now provably agree, which is what makes retiring one safe — not the same
-  thing as having retired it.
+  both sides; the **seven** files that carry corpus constants still carry them — `agreement.py`,
+  `extract_scene_frames.py`, `gold_scene.py`, `matched.py`, `score.py`, `score_ladder.py`,
+  `within_scene.py`. The gold rule exists in two implementations, which is what makes retiring one
+  safe once they are shown to agree — not the same thing as having retired it.
+  **Corrected 2026-09-17**, on three counts, all found by cold review:
+  1. "ten files" was a guess that was never counted. It is seven, now enumerated and countable.
+  2. "provably agree" overstated `test_gold_rule_single.py`. That test compares the descriptor-driven
+     rule against the **Python literals it replaces**; it never reads `SherlockSceneCoding.scala`.
+     The Scala and Python implementations are *asserted* to agree by the ADR and the descriptor's
+     own provenance, not proven to by any test. Cross-language agreement remains unpinned.
+  3. `participantPattern` was declared by the descriptor, assigned by `configure()`, and **read by
+     nothing** — `int(name[2:4])` did the work and hardcoded Sherlock's two-letter `NN01_` shape. A
+     corpus with different ids would have configured without complaint and then been parsed by the
+     wrong rule: a declared knob that looks live and is inert, which is the exact defect this
+     contract exists to remove. Now load-bearing at both call sites, with a mutation test that a
+     changed pattern reaches the parse and that the old pattern stops matching.
 - **The guarantees are closed at the TYPE level, not at runtime.** `private[corpus]` is public
   bytecode; plain reflection forges a `Known`. Stated as a non-claim in ADR 0018.
-- **Nothing here was verified by a second party.** Three of six scheduled reviews are outstanding,
-  and the cold review of the whole subsystem is dispatched, not returned.
+- **Three of six scheduled reviews are outstanding.** The three Fable 5.1 reviews (P2b-ii, P3
+  `SegmentLink`, P5 `ClockRepair`) were never delivered: Fable usage credits were exhausted, which
+  is an account-level limit no retry can clear.
+  **Corrected 2026-09-17.** This bullet previously read "Nothing here was verified by a second
+  party," which was false when written — reviews had already been delivered and are cited elsewhere
+  in this document. The cold review of the whole subsystem has since returned, and it found one
+  blocker and three majors that the author had passed himself on:
+  - `CorpusProfile.identity` collided: one sheet reading three columns and **two sheets reading
+    different artifacts** produced the same digest, because framing made every *part* self-delimiting
+    while leaving the part *vector* flat and count-free against a variable-arity encoding. Three
+    prior forgery probes had each been reasoned about and passed. Fixed by nesting the digest.
+  - `SegmentLink.of` never compared `from.work` to `to.work`, so a Friends segmentation could be
+    linked onto a Sherlock one and pass every ordinal check. Fixed; cross-*axis* linking is
+    deliberately still legal and now pinned as such.
+  - The Friends receipt reported one sheet's cell refusals while the profile bound two, so an
+    unreadable MoreEMs sheet printed `cell refusals : none`. Fixed corpus-wide.
+  - `refusalsTruncated` was a Boolean, so 101 bad cells and 27,777 read identically. Now a count.
+
+  The methodological point is worth recording against the next branch: the review that found the
+  blocker was run by the **default model**, dispatched as a throwaway diagnostic after the Fable
+  agents failed. What made it effective was that it was cold, not which model ran it. The author had
+  attacked this digest three times and passed himself each time.

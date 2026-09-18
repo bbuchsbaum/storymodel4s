@@ -38,12 +38,20 @@ object CorpusReader:
       val sheet: String,
       val rows: Vector[OpenRow],
       val refusals: Vector[CellRefusal],
-      val refusalsTruncated: Boolean
+      /** How many refusals were FOUND, which is not how many were kept.
+        *
+        * `refusals` stops at `RefusalCap`. A Boolean "truncated" flag said that the number was
+        * larger without saying by how much, so a sheet with 101 bad cells and one with 27,777 read
+        * identically -- and the difference between those two is the difference between a typo and a
+        * misdeclared column. The count is the thing a reader needs, so it is the thing stored.
+        */
+      val refusalsSeen: Int
   ):
     def isClean: Boolean = refusals.isEmpty
+    def refusalsTruncated: Boolean = refusalsSeen > refusals.size
     override def toString: String =
-      s"OpenSheet(${artifact.value}!$sheet, ${rows.size} rows, ${refusals.size} refusals" +
-        (if refusalsTruncated then "+" else "") + ")"
+      s"OpenSheet(${artifact.value}!$sheet, ${rows.size} rows, $refusalsSeen refusals" +
+        (if refusalsTruncated then s" (${refusals.size} kept)" else "") + ")"
 
   final class OpenCorpus private[intake] (
       val verified: Verified,
@@ -51,6 +59,23 @@ object CorpusReader:
       val sheets: Map[(ArtifactId, String), OpenSheet]
   ):
     def sheet(a: ArtifactId, s: String): Option[OpenSheet] = sheets.get((a, s))
+
+    /** Every sheet's refusals, each tagged with the sheet it came from.
+      *
+      * A caller that reports refusals one sheet at a time reports only the sheets it remembered to
+      * ask about, and a sheet nobody asks about is a sheet whose failures never reach the receipt.
+      * That is a property of the CALLER, so it cannot be fixed in `OpenSheet`; the corpus has to be
+      * able to answer for all of its sheets at once.
+      */
+    def refusals: Vector[((ArtifactId, String), CellRefusal)] =
+      sheets.toVector
+        .sortBy((k, _) => (k._1.value, k._2))
+        .flatMap((k, s) => s.refusals.map(k -> _))
+
+    /** How many refusals the whole corpus found, across every sheet, before any cap. */
+    def refusalsSeen: Int = sheets.values.map(_.refusalsSeen).sum
+
+    def allClean: Boolean = sheets.values.forall(_.isClean)
     override def toString: String =
       s"OpenCorpus(${verified.manifest.corpus.value}, ${sheets.size} sheets, " +
         s"profile ${profile.identity.short()})"
@@ -144,7 +169,7 @@ object CorpusReader:
               sheet,
               rows,
               found.take(RefusalCap),
-              found.sizeIs > RefusalCap
+              found.size
             )
 
   /** Reads one row, returning it alongside any cell refusals rather than instead of it. */

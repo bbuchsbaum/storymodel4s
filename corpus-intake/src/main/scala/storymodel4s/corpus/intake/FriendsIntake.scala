@@ -122,7 +122,28 @@ object FriendsIntake:
       case Some(s) if s.isClean => "none"
       case Some(s)              =>
         val head = s.refusals.take(3).map(_.message).mkString("; ")
-        s"${s.refusals.size}${if s.refusalsTruncated then "+ (capped)" else ""} -- $head"
+        s"${s.refusalsSeen}${if s.refusalsTruncated then s" (${s.refusals.size} kept)" else ""}" +
+          s" -- $head"
+
+  /** The refusal line for the WHOLE corpus, not for whichever sheet the receipt happens to read.
+    *
+    * This receipt used to report `NarrComb` alone. The profile binds two sheets, so a run that
+    * could not read a single MoreEMs cell still printed `cell refusals : none` -- the precise
+    * overstatement the accumulation exists to prevent. The fix is not to add a second line per
+    * sheet, which is the same bug waiting for a third sheet, but to ask the corpus.
+    */
+  private[intake] def corpusRefusalLine(opened: CorpusReader.OpenCorpus): String =
+    if opened.allClean then s"none across ${opened.sheets.size} sheet(s)"
+    else
+      val all = opened.refusals
+      val bySheet = all
+        .groupBy(_._1)
+        .toVector
+        .sortBy((k, _) => (k._1.value, k._2))
+        .map((k, v) => s"${k._1.value}!${k._2}=${v.size}")
+        .mkString(", ")
+      val head = all.take(3).map(_._2.message).mkString("; ")
+      s"${opened.refusalsSeen} across ${opened.sheets.size} sheet(s) [$bySheet] -- $head"
 
   private def crosswalkReceipt(mapping: Map[Int, Option[Int]], exactMatches: Int): Vector[String] =
     val mapped = mapping.values.flatten.toVector
@@ -163,7 +184,8 @@ object FriendsIntake:
       s"profile               : ${prof.id.value} v${prof.version} ${prof.identity.short()}",
       s"sheet                 : $NarrComb",
       s"rows read             : ${rows.size}",
-      s"cell refusals         : ${refusalLine(sheet)}",
+      s"cell refusals         : ${corpusRefusalLine(opened)}",
+      s"  of which $NarrComb: ${refusalLine(sheet)}",
       s"distinct EventModelNum: ${distinct("EventModelNum").size}",
       s"distinct SceneNum     : ${distinct("SceneNum").size}",
       s"distinct Episode      : ${distinct("Episode").size}",
@@ -239,11 +261,16 @@ object MementoIntake:
       val times = distinct("Time").flatMap(_.toLongOption).sorted
       Vector(
         s"corpus                : ${verified.manifest.corpus.value}",
+        // The Friends receipt has printed this from the start and this one did not, so a reader
+        // comparing the two would have taken Memento's silence for a clean bill. The admission
+        // state is the first thing that governs what may be done with a corpus; a receipt that
+        // omits it is a receipt for an unstated permission.
+        s"admission             : ${verified.manifest.admission.state.render} " +
+          s"(court opened: ${verified.manifest.admission.courtOpened})",
         s"artifacts verified    : ${verified.artifacts.size} of ${verified.manifest.artifacts.size}",
         s"profile               : ${prof.id.value} ${prof.identity.short()}",
         s"rows read             : ${rows.size}",
-        s"cell refusals         : " +
-          FriendsIntake.refusalLineOf(opened.sheet(Storyboard, Sheet)),
+        s"cell refusals         : " + FriendsIntake.corpusRefusalLine(opened),
         s"distinct subscenes    : ${distinct("OverallScene").size}",
         s"distinct broad scenes : ${distinct("BroadSceneNum").size}",
         s"distinct story order  : ${distinct("StoryOrderSceneNum").size}",

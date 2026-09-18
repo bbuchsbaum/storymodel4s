@@ -456,3 +456,256 @@ class CorpusReaderSuite extends FunSuite:
     // digest has to frame them itself
     assert(ProfileId.from(s"p${nul}v1").isLeft)
   }
+
+  /** The fourth collision shape, and the first that SUCCEEDED.
+    *
+    * The first three probes each asked whether one part could absorb the next, and length-prefixing
+    * answered no every time. That made every PART self-delimiting and left the part VECTOR flat and
+    * count-free -- and `encodingParts` emits one, two, or THREE elements depending on the encoding.
+    * A variable-arity group in a flat vector means a column group can straddle a sheet boundary:
+    * the reader of the vector cannot tell where one sheet's columns stop.
+    *
+    * Concretely, both profiles below rendered to `35a327fc3baa...`:
+    *
+    *   - ONE sheet `storyboard.xlsx!S` at header row 1, reading three columns; and
+    *   - TWO sheets, `storyboard.xlsx!S` at header row 1 and `custom!ns0` at header row 7.
+    *
+    * These read DIFFERENT ARTIFACTS. A receipt citing that identity names neither reading, which is
+    * the one job the identity exists to do. Framing parts was necessary and not sufficient; the
+    * structure has to be unambiguous too, so each column and each sheet now digests to a single
+    * fixed-width part of its parent.
+    */
+  test("a variable-arity encoding cannot straddle a sheet boundary") {
+    val custom = ArtifactId.unsafe("custom")
+    // the forge depends on sheet ORDER: the shared prefix only lines up when the one-sheet
+    // profile's artifact sorts before `custom`, so this probe does not reuse `art`
+    val aa = ArtifactId.unsafe("a.xlsx")
+    def prof(sheets: Map[(ArtifactId, String), SheetBinding]) =
+      CorpusProfile
+        .of(ProfileId.unsafe("p.v1"), 1, sheets)
+        .fold(r => fail(r.message), identity)
+
+    val oneSheet = prof(
+      Map(
+        (aa, "S") -> SheetBinding(
+          1,
+          Map(
+            "aa" -> ColumnBinding(CellEncoding.PlainText),
+            "custom" -> ColumnBinding(CellEncoding.Custom("ns0", "7")),
+            "zz" -> ColumnBinding(CellEncoding.PlainText)
+          )
+        )
+      )
+    )
+    val twoSheets = prof(
+      Map(
+        (aa, "S") -> SheetBinding(1, Map("aa" -> ColumnBinding(CellEncoding.PlainText))),
+        (custom, "ns0") -> SheetBinding(
+          7,
+          Map("zz" -> ColumnBinding(CellEncoding.Custom("false", "text")))
+        )
+      )
+    )
+
+    assertEquals(oneSheet.sheets.size, 1)
+    assertEquals(twoSheets.sheets.size, 2)
+    assertEquals(
+      twoSheets.sheets.keys.map(_._1.value).toSet,
+      Set("a.xlsx", "custom"),
+      "the forgery is only interesting if the two profiles read different artifacts"
+    )
+    assertNotEquals(
+      oneSheet.identity,
+      twoSheets.identity,
+      "one sheet's columns were read as a second sheet: the identity names neither reading"
+    )
+  }
+
+  /** A receipt must answer for every sheet it opened, not for the one it happened to read.
+    *
+    * The Friends receipt reported `NarrComb` alone while the profile bound two sheets, so a run
+    * that could not read one MoreEMs cell still printed `cell refusals : none`. The per-sheet
+    * accumulator was working perfectly; nothing asked it. Both directions are pinned: the corpus
+    * reports a dirty sheet the caller never named, and stays quiet when every sheet is clean.
+    */
+  test("a refusal on a sheet the caller never asks about still reaches the receipt") {
+    val other = ArtifactId.unsafe("more-ems.xlsx")
+    val v = verifiedOf(payload)
+    def sh(a: ArtifactId, name: String, refusals: Vector[CellRefusal], seen: Int) =
+      new CorpusReader.OpenSheet(a, name, Vector.empty, refusals, seen)
+    val coord = SourceCoordinate.at(other, "MoreEMs", 9, "Ghost").toOption.get
+    val bad = CellRefusal.NoDeclaredEncoding(coord, "Ghost")
+    val corpus = new CorpusReader.OpenCorpus(
+      v,
+      profile,
+      Map(
+        (art, "Narr") -> sh(art, "Narr", Vector.empty, 0),
+        (other, "MoreEMs") -> sh(other, "MoreEMs", Vector(bad), 1)
+      )
+    )
+    assertEquals(corpus.allClean, false)
+    assertEquals(corpus.refusalsSeen, 1)
+    assertEquals(corpus.refusals.map(_._1), Vector((other, "MoreEMs")))
+    val line = FriendsIntake.corpusRefusalLine(corpus)
+    assert(line.contains("MoreEMs"), s"the unasked-for sheet is missing from the receipt: $line")
+    assert(line.contains("more-ems.xlsx!MoreEMs=1"), line)
+
+    val clean = new CorpusReader.OpenCorpus(
+      v,
+      profile,
+      Map((art, "Narr") -> sh(art, "Narr", Vector.empty, 0))
+    )
+    assert(clean.allClean)
+    assertEquals(FriendsIntake.corpusRefusalLine(clean), "none across 1 sheet(s)")
+  }
+
+  /** A capped refusal list must still say how many there were.
+    *
+    * `refusalsTruncated` was a Boolean, so 101 bad cells and 27,777 bad cells printed the same --
+    * and that difference is the difference between a typo and a misdeclared column.
+    */
+  test("the refusal count survives the cap that the refusal LIST does not") {
+    val one = CellRefusal.NoDeclaredEncoding(
+      SourceCoordinate.at(art, "Narr", 1, "Ghost").toOption.get,
+      "Ghost"
+    )
+    val capped = new CorpusReader.OpenSheet(
+      art,
+      "Narr",
+      Vector.empty,
+      Vector.fill(CorpusReader.RefusalCap)(one),
+      27777
+    )
+    assertEquals(capped.refusals.size, CorpusReader.RefusalCap)
+    assertEquals(capped.refusalsSeen, 27777)
+    assert(capped.refusalsTruncated)
+    assert(capped.toString.contains("27777"), capped.toString)
+    val exact = new CorpusReader.OpenSheet(art, "Narr", Vector.empty, Vector(one), 1)
+    assertEquals(exact.refusalsTruncated, false)
+  }
+
+  /** The INVARIANT, not one more instance of it.
+    *
+    * Four hand-built forgeries have now been tried against this digest and the fourth succeeded.
+    * That is a poor record for reasoning, and the reason is that each probe pins one shape: while
+    * mutation-testing the fix, merely reordering the parts within a column defeated the fourth
+    * forgery without making the structure any less ambiguous. A test that a reordering satisfies is
+    * testing the instance, not the property.
+    *
+    * So this enumerates a space built out of exactly the pieces the collisions were made from --
+    * one sheet versus two, columns whose NAMES are the encoding tags (`custom`, `text`), `Custom`
+    * whose namespace and label are other fields' values (`ns0`, `false`, `7`), and the arity-1,
+    * arity-2 and arity-3 encodings interleaved -- and requires every distinct profile in it to have
+    * a distinct identity. The property is injectivity; the forgeries were only ever evidence that
+    * it did not hold.
+    */
+  test("distinct profiles have distinct identities across the whole collision family") {
+    val a1 = ArtifactId.unsafe("a.xlsx")
+    val a2 = ArtifactId.unsafe("custom")
+    val encs = Vector(
+      CellEncoding.PlainText,
+      CellEncoding.IntegerText,
+      CellEncoding.ExcelSerialDays(0),
+      CellEncoding.ExcelSerialDays(1),
+      CellEncoding.Custom("ns0", "7"),
+      CellEncoding.Custom("false", "text"),
+      CellEncoding.Custom("text", "false"),
+      // a Custom whose fields are the STRUCTURAL tags, so an encoding can pose as a group opener
+      CellEncoding.Custom("sheet", "1"),
+      CellEncoding.Custom("column", "false"),
+      CellEncoding.Custom("a.xlsx", "S")
+    )
+    // Names drawn from the tag vocabulary AND from the structural tags, so a name can masquerade
+    // as an encoding tag or as the opener of a column or sheet group. Leaving `sheet` and `column`
+    // out of this vector was what let a flat-but-tagged rendering survive this test: the tags were
+    // never attacked with the one input that attacks them.
+    val names = Vector("aa", "custom", "text", "zz", "false", "sheet", "column", "1", "a.xlsx")
+
+    def cols(spec: Vector[(String, CellEncoding, Boolean)]) =
+      spec.map((n, e, i) => n -> ColumnBinding(e, indexOnly = i)).toMap
+
+    val singles =
+      for
+        n <- names
+        e <- encs
+        i <- Vector(false, true)
+      yield Map((a1, "S") -> SheetBinding(1, cols(Vector((n, e, i)))))
+
+    val triples =
+      for e <- encs
+      yield Map(
+        (a1, "S") -> SheetBinding(
+          1,
+          cols(
+            Vector(
+              ("aa", CellEncoding.PlainText, false),
+              ("custom", e, false),
+              ("zz", CellEncoding.PlainText, false)
+            )
+          )
+        )
+      )
+
+    val pairs =
+      for
+        e <- encs
+        h <- Vector(1, 7)
+      yield Map(
+        (a1, "S") -> SheetBinding(1, cols(Vector(("aa", CellEncoding.PlainText, false)))),
+        (a2, "ns0") -> SheetBinding(h, cols(Vector(("zz", e, false))))
+      )
+
+    val space = (singles ++ triples ++ pairs).distinct
+    val profiles = space.map(s =>
+      s -> CorpusProfile
+        .of(ProfileId.unsafe("p.v1"), 1, s)
+        .fold(r => fail(r.message), identity)
+        .identity
+    )
+    val byDigest = profiles.groupBy(_._2).filter(_._2.sizeIs > 1)
+    assertEquals(
+      byDigest,
+      Map.empty[Checksum, Vector[(Map[(ArtifactId, String), SheetBinding], Checksum)]],
+      s"${byDigest.size} digest(s) are shared by profiles that read differently"
+    )
+    assertEquals(profiles.map(_._2).distinct.size, space.size)
+    assert(space.sizeIs > 150, s"the family is too small to be evidence: ${space.size}")
+  }
+
+  /** A SURVIVING mutant, recorded rather than hidden.
+    *
+    * `render` nests -- each column digests to one part of its sheet, each sheet to one part of the
+    * profile -- and it also TAGS each group with a literal `column` or `sheet`. Mutating the
+    * nesting away while keeping the tags survives both the forgery above and the whole family, and
+    * that is not a gap in the family. With the tags present, a group's arity is a function of its
+    * tag literal (`custom` implies three parts, `excel-serial-days` two, anything else one), so the
+    * flat form is parseable without ambiguity, and no input built from today's `CellEncoding` cases
+    * can collide under it. The mutation is genuinely benign TODAY.
+    *
+    * The nesting is kept anyway, and the reason is the one thing the tags depend on: that arity can
+    * be recovered from the tag. A new `CellEncoding` case whose `render` collided with a tag, or a
+    * future variable-arity case, breaks that silently and returns this digest to the state the
+    * fourth forgery found it in. Nesting does not depend on the property at all -- every vector
+    * reaching `digest` is fixed-width by construction -- so it stays correct through a change that
+    * nobody thinks to re-probe. Following `VerifySuite`'s precedent: benign is not the same as
+    * intended, and an unpinned decision drifts.
+    */
+  test("the digest survives an encoding whose tag collides with a structural tag") {
+    val a1 = ArtifactId.unsafe("a.xlsx")
+    // `Custom("column", ...)` renders its tag as `custom`, but its NAMESPACE is `column` -- the
+    // nearest thing the current vocabulary has to an encoding that opens a group. Under nesting it
+    // cannot matter, which is the point: the assertion is about the structure, not the vocabulary.
+    def p(cols: Map[String, ColumnBinding]) =
+      CorpusProfile
+        .of(ProfileId.unsafe("p.v1"), 1, Map((a1, "S") -> SheetBinding(1, cols)))
+        .fold(r => fail(r.message), identity)
+        .identity
+    val x = p(Map("k" -> ColumnBinding(CellEncoding.Custom("column", "k"))))
+    val y = p(
+      Map(
+        "k" -> ColumnBinding(CellEncoding.PlainText),
+        "column" -> ColumnBinding(CellEncoding.Custom("k", "text"))
+      )
+    )
+    assertNotEquals(x, y)
+  }
