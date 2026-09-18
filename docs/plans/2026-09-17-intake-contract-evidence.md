@@ -20,14 +20,30 @@ providerParser/test; recallJVM/test; storyJVM/test; viewJVM/test"
 
 | | |
 |---|---|
-| Gate exit | **0** |
-| Modules reporting totals | **24 of 24** |
-| Tests | **2,443** |
-| Failed | **0** |
-| Skipped | 5 |
-| `scalafmtCheckAll scalafmtSbtCheck` | exit **0**, 0 files unformatted |
+| | at P8 sign-off (2026-09-17, after cold review) | as first recorded |
+|---|---|---|
+| Gate exit | **0** | 0 |
+| Modules reporting totals | **24 of 24** | 24 of 24 |
+| Tests | **2,466** | 2,443 |
+| Failed | **0** | 0 |
+| Errors | **0** | 0 |
+| `scalafmtCheckAll` (run LAST, separately) | exit **0** | exit 0 |
 
-A run with no totals did not run (SD2). All 24 modules reported.
+A run with no totals did not run (SD2). All 24 modules reported. The merge-base used was
+`0df1d9e746e0f72f25ec1d2102e797ce1e5f0f72`; the command above is pasted from `reference-scope.sh`,
+not retyped.
+
+The +23 tests are the cold-review fixes: the profile-identity forgery and its injectivity family,
+the `SegmentLink` cross-work and cross-axis pins, the non-monotone-coarsening pin, corpus-wide
+refusal reporting, the refusal-count pin, the `CorpusProfile` consumer probes, and the
+`participantPattern` mutations on the Python side.
+
+**A caveat recorded rather than smoothed over.** A first full-tree `sbt test` (all platforms, not
+the scoped JVM gate) reported `corpusNative / Compile / compileIncremental` failed. It did not
+reproduce: an immediate re-run of the same tree exited 0 with zero `[error]` lines, as did the
+scoped gate above. It followed the module `clean`s used during mutation testing, so a parallel
+compile race is the likely cause, but that is a hypothesis and not a diagnosis. If it recurs it is
+real.
 
 ## Mutants killed, by name
 

@@ -38,6 +38,7 @@ class CorpusCarrierProbeSuite extends FunSuite:
       u: Unmapped,
       a: Absent,
       n: NotApplicable,
+      prof: CorpusProfile,
       d: Undetermined,
       v: Verified,
       va: VerifiedArtifact,
@@ -304,5 +305,79 @@ class CorpusCarrierProbeSuite extends FunSuite:
         """(a: storymodel4s.corpus.VerifiedArtifact) => (a.toArray, a.iterator, a.byteAt(0))"""
       ),
       Nil
+    )
+  }
+
+  /** The SECOND site the P8 bead named as having this shape and no pass of its own.
+    *
+    * `CorpusProfile.identity` is a status field in the sense that matters here: a receipt cites it
+    * to say which reading produced it, so a consumer able to choose it can make a receipt name a
+    * reading that never happened. The bead was right to single it out. A cold review later found
+    * that the checksum COLLIDED -- two profiles reading different artifacts shared one identity --
+    * which is the same failure reached by arithmetic rather than by construction. This closes the
+    * construction route; `CorpusReaderSuite`'s injectivity family closes the arithmetic one.
+    */
+  test("positive control: the CorpusProfile surface this suite names does resolve") {
+    assertEquals(
+      typeCheckErrors(
+        """(p: storymodel4s.corpus.CorpusProfile) => (p.id, p.version, p.sheets, p.identity)"""
+      ),
+      Nil
+    )
+  }
+
+  /** Discovered by this probe's own positive control: the door is shut one layer earlier than the
+    * P8 bead assumed.
+    *
+    * The control was written expecting `CorpusProfile.of` to be the legitimate consumer route, and
+    * it failed -- `of` is `private[corpus]`, so a consumer cannot mint a profile by ANY route, safe
+    * or otherwise. That is intended and worth pinning: a profile is minted by intake code inside
+    * the `storymodel4s.corpus` tree and then read, so the smart constructor is not part of the
+    * consumer surface at all. Recorded because a later change relaxing `of` to public would be an
+    * expansion of that surface that nothing else in the suite would notice.
+    */
+  test("a consumer cannot even reach the SAFE constructor: profiles are minted inside intake") {
+    assert(
+      typeCheckErrors(
+        """storymodel4s.corpus.CorpusProfile.of(
+             storymodel4s.corpus.ProfileId.unsafe("p.v1"), 1, Map.empty)"""
+      ).nonEmpty
+    )
+  }
+
+  test("a consumer cannot mint a CorpusProfile, nor choose its identity") {
+    // the constructor is private, so the identity cannot be supplied alongside the bindings
+    assert(
+      typeCheckErrors(
+        """new storymodel4s.corpus.CorpusProfile(
+             storymodel4s.corpus.ProfileId.unsafe("p.v1"),
+             1,
+             Map.empty,
+             storymodel4s.core.Checksum.ofText("whatever I like"))"""
+      ).nonEmpty
+    )
+    // and a profile obtained legitimately cannot have its identity rewritten
+    assert(
+      typeCheckErrors(
+        """(p: storymodel4s.corpus.CorpusProfile) =>
+             p.identity = storymodel4s.core.Checksum.ofText("whatever I like")"""
+      ).nonEmpty
+    )
+  }
+
+  /** `private` suppresses the generated `apply` but a Mirror can survive it, which is how a "cannot
+    * be constructed" claim has been false twice in this repository already.
+    */
+  test("a consumer cannot reach a CorpusProfile through Mirror or copy") {
+    assert(
+      typeCheckErrors(
+        """summon[scala.deriving.Mirror.ProductOf[storymodel4s.corpus.CorpusProfile]]"""
+      ).nonEmpty
+    )
+    assert(
+      typeCheckErrors(
+        """(p: storymodel4s.corpus.CorpusProfile) =>
+             p.copy(identity = storymodel4s.core.Checksum.ofText("x"))"""
+      ).nonEmpty
     )
   }
