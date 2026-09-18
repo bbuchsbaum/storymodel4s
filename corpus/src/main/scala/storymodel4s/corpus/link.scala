@@ -142,13 +142,20 @@ object SegmentLink:
             )
         case LinkClaim.Coarsening =>
           // A reviewer proposed a fourth check here: that the target ordinal be non-decreasing as
-          // the source ordinal ascends, so a coarsening groups CONTIGUOUS segments. On a single
-          // timeline that is right, and it is rejected anyway, because the segmentations this links
-          // are not always on one timeline. Memento is cut in reverse: coarsening its
-          // discourse-ordered segments into story-ordered scenes is legitimately non-monotone, and
-          // the check would refuse a corpus this repository already reads. Contiguity is a property
-          // of the AXIS PAIR, not of the claim, and `LinkClaim` has no case for it -- adding one is
-          // new vocabulary and wants an ADR (SD5). Admitted deliberately, and pinned by test.
+          // the source ordinal ascends. Declined, but not for the reason first written down here.
+          //
+          // That check conflates two properties. CONTIGUOUS GROUPING is what a coarsening really
+          // requires; ORDER PRESERVATION depends only on how the two scales are numbered. Memento
+          // is cut in reverse, so coarsening its discourse-ordered segments into story-ordered
+          // scenes breaks the order while keeping every preimage contiguous -- monotonicity would
+          // refuse a corpus this repository reads, the way strict onsets once refused Sherlock.
+          //
+          // What this does NOT establish, and what the comment here used to imply: contiguity is
+          // unchecked in any form. `{1->2, 2->1, 3->2}` groups sources 1 and 3 while source 2 lands
+          // elsewhere, which no cut order produces, and it is admitted too. That is the honest
+          // boundary of `Coarsening`, whose promise is only "many to one, every target reached,
+          // nothing dropped". A claim that checked contiguity would be new vocabulary and want an
+          // ADR (SD5). Both cases are pinned, separately and for different reasons.
           if dropped > 0 then Left(LinkRefusal.CoarseningDropsSources(dropped))
           else if reached.distinct.sizeIs != to.size then Left(LinkRefusal.NotOnto)
           else

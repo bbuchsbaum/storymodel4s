@@ -226,6 +226,50 @@ class SherlockAnnotationsSuite extends FunSuite:
     assertEquals(m.partB.durationTicks, run2.durationTicks)
   }
 
+  /** The part BYTE IDENTITIES were transcribed too, and they are the most load-bearing values here.
+    *
+    * `SherlockAnnotations.scala:52-53` carries `Checksum.unsafe("eb036474...")` as a Scala literal
+    * while `presentationEditionIdentity.parts[*].sha256` declares the same hash in the file, and
+    * nothing compared them. That hash exists, in the adapter's own words, "so downstream playback
+    * can re-verify caller-supplied media" -- so a drift between the record and the adapter means
+    * the two vouch for DIFFERENT FILES while both claiming to identify the presented edition. Of
+    * everything measured silent in this file, this is the one whose silence matters most.
+    *
+    * Found by cold review, which asked directly whether the earlier fix covered it. It did not: the
+    * fix bound `partId` and `durationTicks` and stopped there.
+    */
+  test("the part byte identities are READ from the file, not transcribed beside it") {
+    val m = MediaManifest.nn2017
+    val cursor = io.circe.parser
+      .parse(repairJson)
+      .fold(e => fail(s"json must parse: $e"), _.hcursor)
+    val parts = cursor
+      .downField("presentationEditionIdentity")
+      .downField("parts")
+      .as[Vector[io.circe.Json]]
+      .fold(e => fail(s"presentationEditionIdentity.parts must be an array: $e"), identity)
+    assertEquals(parts.size, 2)
+
+    Vector(m.partA, m.partB).zip(parts).foreach { (part, json) =>
+      val c = json.hcursor
+      assertEquals(
+        c.get[String]("partId").toOption,
+        Some(part.partId),
+        "the edition identity names a different part than the manifest"
+      )
+      assertEquals(
+        c.get[Int]("presentationOrdinal").toOption,
+        Some(part.presentationOrdinal),
+        s"${part.partId} is presented in a different position than the manifest says"
+      )
+      assertEquals(
+        c.get[String]("sha256").toOption,
+        Some(part.sha256.hex),
+        s"${part.partId}: the record and the adapter vouch for DIFFERENT BYTES"
+      )
+    }
+  }
+
   /** The file declares each part's extent TWICE, and nothing made the two agree.
     *
     * `annotationToPlaybackCrosswalk.runs[i]` gives `playbackEndTicks + uncoveredTailTicks`, which

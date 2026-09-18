@@ -365,22 +365,60 @@ class SegmentLinkSuite extends FunSuite:
     )
   }
 
-  /** A reviewer proposed refusing a non-monotone Coarsening. Deliberately not done.
+  /** A reviewer proposed refusing a non-monotone Coarsening. Deliberately not done -- and the
+    * example that USED to stand here did not show what its name claimed.
     *
-    * `{1->2, 2->1, 3->2}` is a coarsening whose target ordinal decreases, which on a single
-    * timeline means non-contiguous grouping and is a mistake. Memento is not a single timeline: it
-    * is cut in reverse, so coarsening its discourse-ordered segments into story-ordered scenes
-    * decreases by construction. The check would refuse a corpus this repository already reads, the
-    * same way strict-increasing onsets refused Sherlock. Pinned so the decision is visible rather
-    * than merely absent.
+    * The decision is right and the reasoning was sloppy, which a second cold review caught. The
+    * proposed check (target ordinal non-decreasing as the source ascends) conflates two different
+    * properties: CONTIGUOUS GROUPING, which a coarsening really does require, and ORDER
+    * PRESERVATION, which depends only on how the two scales happen to be numbered. Memento breaks
+    * the second and not the first, so refusing on monotonicity would refuse a corpus this
+    * repository reads -- the same mistake strict-increasing onsets made with Sherlock.
+    *
+    * But the mapping originally pinned here, `{1->2, 2->1, 3->2}`, is not a reverse cut at all. Its
+    * preimage of story scene 2 is `{1, 3}`, which is not contiguous: source 2 sits INSIDE the block
+    * landing on scene 2. No cut order, forward or reverse, produces that. It is a scrambled
+    * grouping, and Memento does not license it. The test's name asserted something its data did not
+    * show.
+    *
+    * Both cases are now pinned, and they are pinned for different reasons.
     */
   test("a non-monotone coarsening is ADMITTED, because Memento is cut in reverse") {
     val w = WorkId.unsafe("memento")
     val discourse = segOn("m.discourse", 3, w, axis)
     val story = segOn("m.story", 2, w, axis)
-    val mapping = Map(1 -> to(story, 2), 2 -> to(story, 1), 3 -> to(story, 2))
+    // A GENUINE reverse cut: sources 1-2 are one story scene, source 3 is an earlier one. Every
+    // preimage is contiguous; only the ORDER is reversed. This is the Memento shape, and it is
+    // what justifies declining the monotonicity check.
+    val reverseCut = Map(1 -> to(story, 2), 2 -> to(story, 2), 3 -> to(story, 1))
     val link = SegmentLink
-      .of(discourse, story, LinkClaim.Coarsening, 1, mapping)
+      .of(discourse, story, LinkClaim.Coarsening, 1, reverseCut)
       .fold(r => fail(s"a reverse-cut coarsening must be admitted: ${r.message}"), identity)
     assertEquals(link.multiplicity(SegmentRef(story.id, 2)), 2)
+    assertEquals(link.multiplicity(SegmentRef(story.id, 1)), 1)
+  }
+
+  /** Contiguity is unchecked IN ANY FORM, and that is a wider permission than Memento justifies.
+    *
+    * `{1->2, 2->1, 3->2}` groups sources 1 and 3 together while source 2 lands elsewhere. No cut
+    * order produces it. `LinkClaim.Coarsening` nonetheless admits it, because what Coarsening
+    * actually promises is "many to one, every target reached, nothing dropped" -- and it delivers
+    * exactly that. So this is not a behaviour defect; it is the honest boundary of the claim.
+    *
+    * It is pinned separately from the Memento case so the record cannot be misread as saying the
+    * corpus licenses a scrambled grouping. It does not. Nothing checks contiguity, and a claim that
+    * did would be new vocabulary and want an ADR (SD5).
+    */
+  test("a SCRAMBLED coarsening is also admitted -- contiguity is not checked, by anything") {
+    val w = WorkId.unsafe("memento")
+    val discourse = segOn("m.discourse", 3, w, axis)
+    val story = segOn("m.story", 2, w, axis)
+    val scrambled = Map(1 -> to(story, 2), 2 -> to(story, 1), 3 -> to(story, 2))
+    val link = SegmentLink
+      .of(discourse, story, LinkClaim.Coarsening, 1, scrambled)
+      .fold(r => fail(r.message), identity)
+    // the preimage of scene 2 is {1, 3}: not contiguous, and admitted anyway
+    assertEquals(link.multiplicity(SegmentRef(story.id, 2)), 2)
+    assertEquals(link(1), link(3))
+    assertNotEquals(link(1), link(2))
   }

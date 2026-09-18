@@ -177,3 +177,47 @@ class SegmentLinkCompositionSuite extends FunSuite:
       case Right(_)    =>
         fail("composed an annotation-second scale onto a playback-tick scale through a fiction")
   }
+
+  /** B2: a cross-WORK intermediate was already refused, but by the wrong layer.
+    *
+    * The reviewer proved the cross-work refusal complete by transitivity: if `a.work == c.work`,
+    * then `ab` forces the intermediate's work to match `a` and `bc` forces it to match `c`, so a
+    * cross-work intermediate implies `a.work != c.work` and `of` refuses. Complete, but the
+    * diagnosis was wrong -- the message blamed the two ENDPOINTS when the fault was the
+    * intermediate, and it only surfaced at `of`, a step after the mistake was made.
+    *
+    * With the intermediate compared by identity, `compose` refuses first and names the right thing.
+    * Both layers are pinned: the near one because it is the correct diagnosis, the far one because
+    * it is the backstop if anyone ever loosens the near one.
+    */
+  test("a cross-WORK intermediate is refused by compose, naming the intermediate") {
+    val friends = WorkId.unsafe("friends-s01e16-17")
+    val sherlock = WorkId.unsafe("sherlock-a-study-in-pink")
+    val a = seg("a", Vector(0, 10, 20), friends)
+    val midFriends = seg("mid", Vector(0, 10, 20), friends)
+    val midSherlock = seg("mid", Vector(0, 10, 20), sherlock)
+    val c = seg("c", Vector(0, 10, 20), sherlock)
+
+    SegmentLink.compose(bijection(a, midFriends), bijection(midSherlock, c)) match
+      case Left(LinkRefusal.IntermediateDiffers(id, _, _)) =>
+        assertEquals(id.value, "mid", "the refusal must name the intermediate, not the endpoints")
+      case Left(other) => fail(s"refused for the wrong reason: ${other.message}")
+      case Right(_)    => fail("composed across two works")
+
+    // The backstop still holds: even handed a composed mapping, `of` refuses the endpoints.
+    SegmentLink.of(
+      a,
+      c,
+      LinkClaim.Bijection,
+      1,
+      Map(
+        1 -> Target.To(SegmentRef(c.id, 1), ev),
+        2 -> Target.To(SegmentRef(c.id, 2), ev),
+        3 -> Target.To(SegmentRef(c.id, 3), ev)
+      )
+    ) match
+      case Left(LinkRefusal.ForeignWork(f, t)) =>
+        assertEquals(f.value, "friends-s01e16-17")
+        assertEquals(t.value, "sherlock-a-study-in-pink")
+      case other => fail(s"expected the endpoint backstop to refuse, got $other")
+  }
