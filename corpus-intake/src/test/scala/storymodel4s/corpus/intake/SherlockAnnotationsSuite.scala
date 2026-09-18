@@ -326,3 +326,132 @@ class SherlockAnnotationsSuite extends FunSuite:
         )
       }
   }
+
+  /** The file must agree with ITSELF, which nothing had ever required.
+    *
+    * Sweeping the record field by field showed a pattern larger than any single silent value: the
+    * same physical quantity is declared in up to FIVE places and reconciled in none. Part A's
+    * extent appears as `coordinateSystems[0].parts[0].endSeconds` (1426.2 s), as
+    * `coordinateSystems[6].durationTicks` (3565500) and `durationSeconds`, as
+    * `presentationEditionIdentity.parts[0].video.durationTicks`, as
+    * `missingnessAndTails.partA.mediaEndSeconds`, and as a Scala literal in the adapter. Four of
+    * those five could be changed with every test green.
+    *
+    * Binding each one to the adapter separately would be a losing game -- the sixth declaration
+    * would arrive unbound. So this checks the RECORD against itself: every declaration of a
+    * quantity must equal every other. The adapter is bound to the record by the tests above, so
+    * agreement here plus agreement there is agreement throughout, and a value that drifts anywhere
+    * now turns something red.
+    *
+    * This is the epic's founding defect in miniature -- "the Sherlock crosswalk exists three times"
+    * -- measured inside a single file rather than across three languages.
+    */
+  test("the repair record agrees with itself about every part extent") {
+    val root = io.circe.parser
+      .parse(repairJson)
+      .fold(e => fail(s"json must parse: $e"), _.hcursor)
+
+    def axisFor(partId: String) = root
+      .downField("coordinateSystems")
+      .values
+      .getOrElse(fail("coordinateSystems must be an array"))
+      .map(_.hcursor)
+      .find(c =>
+        c.get[String]("kind").toOption.contains("edition-playback-time") &&
+          c.get[String]("partId").toOption.contains(partId)
+      )
+      .getOrElse(fail(s"no edition-playback-time axis for $partId"))
+
+    val localSeconds = root
+      .downField("coordinateSystems")
+      .values
+      .getOrElse(fail("coordinateSystems must be an array"))
+      .map(_.hcursor)
+      .find(_.get[String]("kind").toOption.contains("container-presentation-time"))
+      .getOrElse(fail("no container-presentation-time system"))
+
+    val editionParts = root
+      .downField("presentationEditionIdentity")
+      .downField("parts")
+      .values
+      .getOrElse(fail("presentationEditionIdentity.parts must be an array"))
+      .map(_.hcursor)
+      .toVector
+
+    val containerParts =
+      localSeconds.downField("parts").values.getOrElse(fail("parts")).map(_.hcursor).toVector
+
+    val record = TimebaseRepair.parse(repairJson).fold(r => fail(r.message), identity)
+
+    Vector(("media-part-a", "run-1", "partA", 0), ("media-part-b", "run-2", "partB", 1))
+      .foreach { (partId, runId, tailKey, i) =>
+        val axis = axisFor(partId)
+        val edition = editionParts(i)
+        val container = containerParts(i)
+        val run = record.run(runId).getOrElse(fail(s"$runId"))
+
+        def long(c: io.circe.HCursor, f: String) =
+          c.get[Long](f).fold(e => fail(s"$partId/$f: $e"), identity)
+        def dbl(c: io.circe.HCursor, f: String) =
+          c.get[Double](f).fold(e => fail(s"$partId/$f: $e"), identity)
+
+        val ticks = long(axis, "durationTicks")
+        val rate = long(axis, "ticksPerSecond")
+
+        // every declaration of the tick extent
+        assertEquals(
+          long(edition.downField("video").success.get, "durationTicks"),
+          ticks,
+          s"$partId: the observed edition and the playback axis disagree about durationTicks"
+        )
+        assertEquals(
+          run.durationTicks,
+          ticks,
+          s"$partId: the crosswalk's playbackEnd+tail disagrees with the playback axis"
+        )
+
+        // every declaration of the second extent
+        val seconds = dbl(axis, "durationSeconds")
+        assertEquals(
+          dbl(container, "endSeconds"),
+          seconds,
+          s"$partId: container-presentation-time disagrees about the extent in seconds"
+        )
+        assertEquals(dbl(edition.downField("video").success.get, "durationSeconds"), seconds)
+        assertEquals(
+          dbl(
+            root.downField("missingnessAndTails").downField(tailKey).success.get,
+            "mediaEndSeconds"
+          ),
+          seconds,
+          s"$partId: missingnessAndTails disagrees about where the media ends"
+        )
+
+        // the seconds and the ticks must be the same quantity
+        assertEquals(
+          math.round(seconds * rate.toDouble),
+          ticks,
+          s"$partId: ${seconds}s at $rate ticks/s is not $ticks ticks"
+        )
+
+        // and the rate is declared twice more
+        assertEquals(
+          long(edition.downField("video").success.get, "ticksPerSecond"),
+          rate,
+          s"$partId: the observed edition and the axis disagree about the tick rate"
+        )
+
+        // frames are a third statement of the same extent
+        val perFrame = long(axis, "ticksPerFrame")
+        assertEquals(
+          long(axis, "frameCount") * perFrame,
+          ticks,
+          s"$partId: frameCount x ticksPerFrame is not durationTicks"
+        )
+
+        // and every one of these must name the same part
+        assertEquals(container.get[String]("partId").toOption, Some(partId))
+        assertEquals(edition.get[String]("partId").toOption, Some(partId))
+        assertEquals(run.partId, partId)
+      }
+  }

@@ -393,7 +393,35 @@ declarations of each extent to each other. `ticksPerSecond` is **derived** from 
 (`playbackEndTicks / annotationEndSeconds`) rather than taken from the manifest, so the manifest's
 own 2500 is checked against the file instead of checking itself. All three mutations now die.
 
-Four fields remain silent and are left so, named rather than fixed:
+**The larger finding, from sweeping the rest of the file.** Binding each silent value to the adapter
+one at a time is a losing game, because the same physical quantity is declared in up to FIVE places
+and reconciled in none. Part A's extent appears as `coordinateSystems[0].parts[0].endSeconds`
+(1426.2 s), as `coordinateSystems[6].durationTicks` (3565500) and `durationSeconds`, as
+`presentationEditionIdentity.parts[0].video.durationTicks`, as
+`missingnessAndTails.partA.mediaEndSeconds`, and as a Scala literal in the adapter. Four of those
+five were silent. The tick rate 2500 is declared four times; the frame count states the same extent
+a third way.
+
+So the record is now checked against ITSELF: every declaration of a quantity must equal every other,
+`durationSeconds x ticksPerSecond` must equal `durationTicks`, `frameCount x ticksPerFrame` must
+equal `durationTicks`, and every site must name the same part. The adapter is separately bound to the
+record, so agreement here plus agreement there is agreement throughout — and the sixth declaration,
+when it arrives, has something to disagree with. Verified by mutation: seven further fields that were
+silent now die, including `coordinateSystems[6].durationTicks`, `ticksPerSecond`, `frameCount`,
+`partId`, `presentationEditionIdentity.parts[0].video.durationTicks`, and
+`missingnessAndTails.partA.mediaEndSeconds`.
+
+The **part byte identities** were bound too, and they were the silent field that mattered most.
+`SherlockAnnotations.scala:52-53` carried `Checksum.unsafe("eb036474...")` as a literal while
+`presentationEditionIdentity.parts[*].sha256` declared the same hash, with nothing comparing them —
+and that hash exists so downstream playback can re-verify caller-supplied media, so drift meant the
+record and the adapter would vouch for **different files** while both claiming to identify the
+presented edition. The reviewer asked directly whether the first fix had covered it. It had not.
+
+This is the epic's founding defect in miniature — "the Sherlock crosswalk exists three times" —
+measured inside one file rather than across three languages.
+
+Remaining silent fields, named rather than fixed:
 `coordinateSystems[1].runs[0].ordinaryEndSeconds` and `coordinateSystems[3].rowCount` (documentation
 of the repaired analysis axis, which no code consumes), `sourceDerivation.sha256` (a provenance claim
 about the upstream notebook that nothing verifies), and `coordinateSystems[2].secondsPerTr` = 1.5,
@@ -401,7 +429,20 @@ which IS load-bearing and is transcribed into both `SherlockSceneCoding.scala` a
 Binding that one is the cross-language agreement this document already records as unpinned; it is
 descriptor work (P6), not a fix to make in passing.
 
-Gate after these fixes: exit 0, 24/24 modules, **2,472 tests**, 0 failed, 0 errors, scalafmt clean.
+**The `Coarsening` decision record was wrong, and the decision was right.** The reviewer accepted
+the call to decline a monotonicity check — it conflates *contiguous grouping*, which a coarsening
+requires, with *order preservation*, which depends only on how the scales are numbered, and Memento
+breaks only the second. But the mapping pinned as evidence, `{1->2, 2->1, 3->2}`, is **not a reverse
+cut**: the preimage of scene 2 is `{1,3}`, so source 2 sits inside the block landing on scene 2, and
+no cut order produces that. It is a scrambled grouping that Memento does not license; the test's name
+asserted what its data did not show. Verified independently before acting.
+
+Both cases are now pinned separately: the Memento test carries a genuine reverse cut
+`{1->2, 2->2, 3->1}` (every preimage contiguous, only the order reversed), and a second test carries
+the scrambled case stating plainly that **contiguity is unchecked in any form** — a permission wider
+than Memento justifies, and the honest boundary of what `Coarsening` promises.
+
+Gate after these fixes: exit 0, 24/24 modules, **2,478 tests**, 0 failed, 0 errors, scalafmt clean.
 
 ## What this evidence does NOT establish
 
