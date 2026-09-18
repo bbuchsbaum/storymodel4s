@@ -1,171 +1,187 @@
-# D1A: the source-to-story seam — a phase plan (revision 3)
+# D1A: the source-to-story seam — a phase plan (revision 4)
 
-*2026-09-17. This is a draft for owner approval, written against `main` at `8355d8cd`. It covers
-bead `bd-01M1CQKRG1A4J4BEWCC78F4TEZ`. The governing record is ADR 0007: §5, §7, its migration
-sequence and its rejected alternatives. Everything below is LocallyObserved, and no code has
-moved.*
+*2026-09-17. Draft for owner approval, written against `main` at `5799e94c`. The bead is
+`bd-01M1CQKRG1A4J4BEWCC78F4TEZ`. The governing record is ADR 0007: §5, §6, §7, the migration
+sequence, and the rejected alternatives. Everything here is LocallyObserved. No code has moved.*
 
-*Two fresh-context cold reviews each returned the plan. Revision 1 had five blockers. Revision 2
-answered them at the outer doors, the model codec and the text aligner. The second review then
-found three more blockers one level in. The film model had no defined identity. The film
-proposal-surface text was unbound, so any text could be paired with any film. The component
-encoders stayed total over film values. Most of its should-fix items were also film-path depth.*
+*Three fresh-context cold reviews returned revisions 1, 2 and 3. Each round went one layer deeper:*
+- *revision 1 failed at the outer doors: film status, the codec, alignment, forgery, and
+  fingerprints;*
+- *revision 2 failed at identity, the proposal surface, and the component encoders;*
+- *revision 3 failed on whether its slices could land on their own, on how identity was defined,
+  and on whether splitting D1A could really stay additive.*
 
-*Revision 3 changes the plan's shape rather than patching it again.*
+*Revision 4 folds in every finding. The remaining design question is one the owner should make
+(decision D).*
 
-## 0. The shape: split D1A, and decide what 1.0 actually needs
+## 0. Scope, and the owner's decisions
 
-The handoff's concern (§7) was **signatures**. 1.0 must not freeze `StoryModel`, the story nodes,
-`Evidence` and `AlignmentSource` in text-only form. That concern is answered by making those
-public types film-capable while text behaviour stays byte-identical. It does not require the
-compiler to compile a film.
+The 1.0 handoff (§7) was about **signatures**. 1.0 must not freeze `StoryModel`, the story nodes,
+`Evidence` and `AlignmentSource` in a text-only form. So the work is split in two:
 
-Both reviews found that the film compile path carries design questions this plan cannot settle
-from surveys alone:
-- film identity headers;
-- a proposal surface bound to a bundle stream;
-- context placement;
-- Stage 1b provenance for film claims;
-- mention ranking on tick coordinates;
-- the meaning of `SurfaceExplicit` for perceptual evidence.
+- **D1A-types (this plan).** It makes the public types film-capable and adds the core refusals
+  and non-text identity. It also fixes the public shapes the film path will need (decisions D1
+  and D2), so that D1A-film really is additive. Text behaviour stays byte-identical, and parity is
+  pinned. It adds no film compile.
+- **D1A-film (a later plan and bead).** It lets the compiler compile a film source. Its open
+  questions are in §4.
 
-So the work splits in two:
+**What each piece blocks.**
+- D1B's *signature* work (the public `align` types `SourceView`, `HsmmResult` and `wire`) needs
+  only D1A-types. D1B's courts can use hand-built film models.
+- D1B's end-to-end film proofs, V1 and E0 need D1A-film.
 
-- **D1A-types (this plan).** It gives the public types a film-capable shape, adds the core
-  refusals, and defines film model identity. Every text behaviour stays intact, with parity
-  pinned. It adds no film compile path. This is 1.0-critical.
-- **D1A-film (a separate plan and bead, written after D1A-types lands).** The compiler compiles a
-  synthetic film source. It is additive to D1A-types' signatures: a new `NarrativeCompilerInput`
-  overload, a new atlas case and new renderings. Its open questions are listed in §4 so that
-  nothing found in review is lost.
+### Decisions the owner must make at approval
 
-**The 1.0 freeze also waits on D1B.** D1B (`bd-01M1CQNM5DZZNWD8BN4WRKVZRQ`) changes the public
-`SourceView`, `HsmmResult` and `wire` types in `align`. That is outside this plan, but it is on
-the same critical path.
-
-### Decisions for the owner at approval
-
-1. **A. Override ADR 0007's Stage D block, or show that it closed.**
-   - ADR 0007:477-479 blocks Stages B–D until the existing vertical gate closes: one real
-     transcript through Stage 1b to one answered research question.
-   - No record says it closed. Stages B and C landed anyway.
-   - The owner's decision that 1.0 includes video recall implies an override but does not state
-     one. S1 records the owner's line.
-2. **C. Approve the split, the design in §2 and the slices in §3.** D1A-types is L to XL. The
-   ADR 0007 §7 status question (formerly decision B) moves to D1A-film, where a film claim first
-   exists.
+1. **A. Override ADR 0007's Stage D block, or show that it closed.** ADR 0007:477-479 blocks
+   Stages B–D until one real transcript goes through Stage 1b to one answered research question.
+   No record says that happened. Stages B and C landed anyway. S1 records the owner's decision.
+2. **C. Approve the split, the design in §2 and the slices in §3.** D1A-types is sized at L to XL.
+3. **D. Where film proposal text lives, and how many bundles a model has.** This decides public
+   shapes now, so it cannot wait for D1A-film.
+   - **D1: one model has exactly one bundle.** A multi-part film such as Sherlock's two parts
+     becomes one composed bundle, built with the core `TrackComposition`, which is unused today.
+     Composition is an additive core operation, so it can land later. **Recommended.**
+   - **D2: the proposal surface lives outside the bundle** (**recommended**). The bundle is the
+     film as presented. Annotation descriptions and captions are *derivations* of the film: ADR
+     0007:112 calls the workbook "an observation of what a coder recorded and a derivation of the
+     episode". So the proposal surface is a separate artifact that the atlas binds by checksum and
+     receipt.
+     - **What it keeps working:** anchors minted today on film-only bundles by
+       `media/caption.scala:580`, `media/boundary.scala:456` and `SherlockAnnotations.scala:222`
+       stay valid.
+     - **What it costs:** the film model's identity must include the surface checksum (§2.2).
+     - **The alternative, inside the bundle:** the surface becomes a bundle stream whose units
+       are scoped by `StreamId`. The bundle id then changes with every annotation set, and every
+       existing film-anchor producer would need a rebase operation that does not exist.
+   - Under D2, `NarrativeProposalUnit.surface: Option[SurfaceUnitId]` keeps its shape. Each atlas
+     binds at most one proposal surface, so an id is unambiguous inside its model.
+4. **E. Does 1.0 ship video recall end to end, or only signatures that can carry it?**
+   - **Signatures only:** 1.0 needs D1A-types plus D1B's signature work.
+   - **End to end:** 1.0 also needs D1A-film, D1B's proofs, V1 and E0. That is about four more
+     XL items.
 
 ## 1. Facts that shape the design
 
-These were verified by hand or by at least two independent reads at `0e36a7fa`/`8355d8cd`.
+Each of these was verified by hand or by at least two independent reads.
 
-- **Node decoders** hard-code `SpanSet` at `codec/story.scala` 99, 146, 174, 239, 309 and
-  536-550. The encoders are type-directed.
-- **`StoryModelCodec`** returns a plain `String`/`Checksum` behind a total `Encoder` (:700-766),
-  with 9 main-code callers.
-- **The component givens have a public consumer.** `pipeline/BundleJson.scala:5-6` imports
-  `CoreCodecs.given` and encodes acquisition bundles, which carry `Evidence`. So those givens
-  cannot be hidden. Their film behaviour must be stated.
-- **The compiler hard-codes `SurfaceExplicit`** for situation and entity-mention claims
-  (`compiler.scala:1352`, `:1464`). `ClaimMeta.spanLaw` (`claim.scala:82-95`) has no bundle in
-  scope.
-- **`EvidenceSupport.of`** (`core/source.scala:1332`) checks only nonemptiness and bundle/stream
-  membership, and its second check is dead. `textSpans` merges spans across streams.
-  `PlaybackIntervalSet.of` refuses overlap (:919-925), so a union of support has no defined
-  canonical form.
-- **`NarrativeSourceAtlas`** (`atlas.scala:712`) is unsealed. Its only implementer is
-  `TextNarrativeAtlas`. `surfaceAtlas` has no production callers and is used only in
-  AtlasSuite:241,247.
-- **Model identity is `StorySource`-keyed throughout:**
-  - `StoryModel.source` (model.scala:20);
-  - 24 `input.source.id` reads in the compiler;
-  - the fingerprint and `candidateSet` headers (`compiler.scala:2250-2253`, `3015-3018`);
-  - the derived-view ids (`alignment.scala:117,123`);
-  - `BuildReceipt(storyId, sourceChecksum, …)` (`provenance.scala:145`).
-- **Text operations return collections:** `supporting` and `covering` on the model
-  (model.scala:47,55) and on the graph (`graph.scala:177,216,250`). `view/compiler.scala:696,733`
-  calls `model.supporting`.
+**Codec**
+- **Model decoders.** The decoders hard-code `SpanSet` (`codec/story.scala` 99, 146, 174, 239,
+  309, 536-550).
+- **Public codec entry points.** The public model givens are `modelEncoder` (:700) and
+  `draftDecoder` (:721). `StoryModelCodec` returns a plain `String` or `Checksum`, and it has 9
+  callers in main code.
+- **Unversioned claims ledger.** `JsonLines.claims`/`readClaims` (`ledger.scala:42-46`) is an
+  unversioned carrier for `ClaimMeta`/`Evidence`. `CodecSuite:232-234` round-trips it.
+- **`BundleJson` does not encode `Evidence`.** It encodes receipts (`BundleJson.scala:233-250`).
+- **Version-bump precedent.** Schema 0.6.0 moved to 0.7.0 when a field "began to be written at
+  all" (`model.scala:164-166`). `schemaVersion` sits inside the canonical model and inside
+  `BuildReceipt.contentChecksum`, so a bump moves every pinned checksum.
+
+**Core**
+- **`EvidenceSupport.of`** (`core/source.scala:1332`) checks only non-emptiness and
+  bundle/stream membership. It also has a dead branch.
+- **The anchor enum** (`source.scala:1253-1276`) has four cases: `Text`, `MediaTime`, `Shot` and
+  `Track`.
+- **`PlaybackIntervalSet.of` refuses overlapping intervals** (:919-925).
+- **Bundle ids are truncated.** `SourceBundle.computeId` leaves out axis extent, timebase and
+  mappings (:998-1016), and the id is a truncated `short()` address (`hash.scala:121-122`).
+  Two `filmEdition` bundles with the same edition and checksum but different extents therefore
+  share an id. Axis ids do include extent and timebase (:588-606).
+- **The only atlas implementer is `TextNarrativeAtlas`.** It is built only from `writtenText`
+  (`atlas.scala:738-753`).
+
+**Story**
+- **Model identity is keyed by `StorySource`.** The model holds `source` (`model.scala:20`) and
+  `draft` takes a caller-supplied `receipt` (:188). No law checks the join between receipt and
+  source.
+- **`BoundaryBelief.evidence`** (`hierarchy.scala:14`) is not in `model.claims`.
+- **Some ordering functions have no bundle to read.** `NarrativeGraph.discourseOrder` and
+  `discoursePosition` are public (`graph.scala:21-29`).
+
+**Tests**
 - **No golden pins compiler output.** The War of the Ghosts compile suites live in `pipeline`,
-  which is JVM-only. The model goldens (`95028b2c…`, `ce61e761…`) live in `fixtures`, which is
-  cross-platform.
+  which runs on the JVM only. `runs/2026-09-02-wog-record-1/` holds only
+  `compilation-report.json` and `receipts.json`. The model goldens live in `fixtures` and run on
+  all platforms.
 
 ## 2. The design of D1A-types
 
-### 2.1 A sealed atlas with one bundle, and no film surface yet
+### 2.1 Sealed atlas, one bundle, a bound surface slot
 
 `NarrativeSourceAtlas` becomes a `sealed trait` in `core` with two final cases:
 
-- **`TextNarrativeAtlas`**, as today. It alone carries the text surface.
-- **`AnchoredNarrativeAtlas.of(bundle, units)`**, which is checked. It refuses a unit whose
-  support is off the bundle, and it refuses a written-text bundle.
+- **`TextNarrativeAtlas`**, as today. It is the only case that carries canonical text.
+- **`AnchoredNarrativeAtlas.of(bundle, units, surface: Option[BoundProposalSurface])`**, which is
+  checked. It refuses:
+  - a unit whose support is off the bundle;
+  - a bundle whose primary axis is `TextCharacter`;
+  - a unit `surface` that is not a sentence of the bound surface;
+  - a duplicate unit surface.
 
-`surfaceAtlas` leaves the trait. A film atlas carries **no** surface in D1A-types. Binding a
-proposal surface to a named bundle stream by checksum is D1A-film's first question (§4), so that
-no untyped film surface can be added now and mistaken for canonical text.
+`BoundProposalSurface` is a distinct type: a `SurfaceAtlas` plus its checksum, plus the receipt of
+the derivation that produced it. It never converts to canonical text.
 
-`StoryModel` holds `atlas`, and `bundle` is `atlas.bundle`. That leaves one source of truth.
-Lookup becomes map-backed.
+D1A-types adds the slot and the checks. D1A-film populates it. `surfaceAtlas` leaves the trait.
+`StoryModel` holds `atlas`, and `bundle` is `atlas.bundle`.
 
-### 2.2 Model identity for a source with no canonical text
+### 2.2 Model identity
 
-`StoryModel.source` moves into `StoryText` (§2.3). Identity is derived, never supplied:
-
-| | text model (unchanged) | non-text model |
+| | text model | non-text model |
 |---|---|---|
-| `storyId` | `source.id` | content address of (bundle id, primary-axis id) |
-| receipt `sourceChecksum` | `source.canonicalChecksum` | the bundle's content checksum |
-| fingerprint and `candidateSet` headers | as today | bundle id plus primary axis (the rendering lands with D1A-film; the identity function lands here) |
+| `storyId` | unchanged: the source's id, including a `fromText` explicit id (`atlas.scala:199-210`) | `ContentAddress.of("story-anchored", bundle.id, primaryAxis.id, sorted mapping ids, surface checksum or "-")` |
+| receipt `sourceChecksum` | unchanged: `source.canonicalChecksum` | the full, untruncated SHA-256 of that same identity input |
 
-**Court:** one set of units on two different film bundles must give two `storyId`s. **Mutation:**
-drop the axis id from the address, and the court must fail.
+**The door.** `draft` checks that the receipt's `storyId` and `sourceChecksum` equal the derived
+values. That applies to text as well. Any existing text caller that passes a mismatched receipt
+is a defect found; S4b fixes the caller and names it.
 
-### 2.3 Text access is a witness minted in one place
+**The court** uses the pair the truncation creates: two `filmEdition` bundles with the same bundle
+id and different timebase or extent must give different `storyId`s. **Mutation:** drop the axis id
+from the address, and the court must fail. A second court checks that two surface checksums give
+two `storyId`s.
+
+### 2.3 Text access is one witness, minted from the atlas
 
 ```scala
 final class StoryText private (val source: StorySource, val surface: SurfaceAtlas, val stream: StreamId)
 final class TextModel[S <: ModelStatus] private (val model: StoryModel[S], val text: StoryText)
 object StoryModel:
-  def asText[S <: ModelStatus](m: StoryModel[S]): Option[TextModel[S]]
+  def asText[S <: ModelStatus](m: StoryModel[S]): Option[TextModel[S]]   // Some iff atlas is TextNarrativeAtlas
 ```
 
-**This is a runtime mint at one point, not a type-level proof.** `asText` succeeds only if all
-of the following hold:
-- the atlas is a `TextNarrativeAtlas`;
-- the bundle is `WrittenText` with a `TextCharacter` primary axis;
-- every node support is `Text`;
-- no claim evidence carries anchors.
+The other conditions a text model needs (all support is `Text`, and no evidence anchors) are
+already guaranteed at `draft` by the canonical form (§2.4). So `asText` checks the atlas case
+only. The courts are one positive case and one negative case.
 
-Each condition gets its own court in which it alone fails.
-
-**The witness survives validation.** `StoryValidator.validate` gains a `TextModel` overload that
-returns a `TextModel`. Promotion changes neither the atlas nor the support, so no caller meets an
+**The witness survives the model's transitions.** `StoryValidator.validate` and `adjudicated` gain
+`TextModel` overloads that return a `TextModel`. The compiler's text path yields a compilation
+whose draft is a `TextModel`, so `pipeline/StoryBuild.scala:194,231,312-317` never meets an
 impossible `None`.
 
-**The consumers that take `TextModel`** are every text-only consumer the two reviews enumerated:
-- **codec:** `StoryModelCodec`, the derivation artifact, `FeatureMaterializer`/`FeaturesArtifact`
-  (`codec/materialize.scala:42-295`);
-- **view:** `DraftModel` (`view/draft.scala:121-191`) and the `view` compilers;
-- **align:** `StorySourceView`;
-- **pipeline:** `Features`;
-- **story:** `NarrativeConsistency` (`consistency.scala:117`), `StoryRender` (`render.scala:10,112`)
-  and the derived-view ids;
-- **laws:** the laws generators;
-- **docs-site:** the docs-site examples.
+**These consumers take `TextModel`:**
+- **codec:** `StoryModelCodec`; the `modelEncoder` and `draftDecoder` givens; the derivation
+  artifact; `FeatureMaterializer` and `FeaturesArtifact`.
+- **view:** `DraftModel`; the view compilers.
+- **align:** `StorySourceView`, including its `adjudicated` path.
+- **pipeline:** `Features`; `StoryBuild`.
+- **story:** `NarrativeConsistency`; `StoryRender`.
+- **embed-bench:** `bench/wog.scala:49`.
+- **laws:** `Laws.scala:170-182` and the generators.
+- **docs-site:** the examples.
 
 **Text operations move behind the witness.** `supporting`, `covering` and `situationsCovering`
-become `private[story]` on the model and graph, and are exposed only on `TextModel`. Accessors
-that already return `Option` (`support.textSpans`, `ClaimMeta.spans`) stay. `None` is an honest
-answer for them, not a flattering empty collection.
+become `private[story]` and are exposed on `TextModel`. The derived-view ids
+(`alignment.scala:117,123`) use §2.2 identity, because they belong to the general source.
 
-**Rejected alternatives, each recorded in S1:**
-- **A phantom medium parameter.** ADR 0007 rejects parameterising the model by one medium.
-- **A capability index on `StoryModel`.** It puts a second type parameter on every mention of
+**Rejected, and recorded in S1:**
+- **A phantom medium parameter.** ADR 0007 rejects it.
+- **A capability index on `StoryModel`.** It would put a second parameter on every mention of
   the model.
-- **`Option` text fields.** They make pairing with a foreign text possible.
-- **An `Either`-returning `encode`.** It turns one compile-time fact into runtime refusals at 9
-  call sites.
+- **`Option` text fields.** A caller could pair a model with foreign text.
+- **An `Either` returned from `encode`.** It would add runtime refusals at 9 call sites.
 
-### 2.4 Node support: `TypedSupport` in core, one canonical form
+### 2.4 Node support and the canonical form
 
 ```scala
 enum TypedSupport:
@@ -173,82 +189,111 @@ enum TypedSupport:
   case Anchored(support: EvidenceSupport)
 ```
 
-It lives in `core` because both `acquire` and `story` need it (`build.sbt:152`).
+`TypedSupport` lives in `core`, because `acquire` does not depend on `story` (`build.sbt:152`).
 
-**The model's own door enforces three rules.** `StoryModel.draft` returns `Either`, and the
-`private[story] copy` routes through the same check. The rules are:
-- **canonical form:** `Text` iff the bundle is written text, and `Anchored` iff it is not, so the
-  twin cannot be represented;
+**Canonical form is keyed on the primary axis kind.** A `TextCharacter` primary axis, which
+covers written text and text-primary transcripts, requires `Text`. Any other primary axis
+requires `Anchored`. The twin form cannot be represented.
+
+`draft` returns `Either`, and the `private[story] copy` routes through the same check. It checks
+four things:
+- **canonical form**, over every support and every piece of evidence, including
+  `BoundaryBelief.evidence`;
 - **membership:** every anchor is on `atlas.bundle`;
-- **projectability:** every `Anchored` support has an anchor on the bundle's primary axis, so the
-  primary projection is total.
+- **projectability:** every `Anchored` support has an anchor on the primary axis;
+- **the receipt join** (§2.2).
 
-**What `draft` does not check.** It does not check text extent. `support.in-text` and
-`claims.spans-in-text` stay validator laws, so `ValidatorSuite:366`, the `InvalidStoryGens`
-cases (`:73-94`), and a decode that yields a draft carrying violations all behave as today.
+**Extent is not checked in `draft`.** It stays a validator law (`support.in-text`,
+`claims.spans-in-text`). `ValidatorSuite:366`, `InvalidStoryGens:73-94`, and a decode that yields
+a draft carrying violations all behave as they do today.
 
-**Nodes.** The node types are five case classes, the `SituationNode` enum wrapper and
-`CircumstanceEdge`. Overloaded companion `apply`s taking a `SpanSet` keep 54 text sites compiling.
-Text mention ids stay rendered from every span ref, never from a hull.
+**Nodes:** five case classes, the `SituationNode` wrapper, and `CircumstanceEdge`.
+- Overloaded `apply`s taking a `SpanSet` keep 54 construction sites compiling.
+- The 10 `.copy(support = SpanSet)` sites are edited.
+- Text mention ids stay rendered from every span ref, never from a hull.
 
-### 2.5 `core.Evidence`: an anchor field, with the law where the bundle is
+### 2.5 The primary projection and ordering
 
-`Evidence` gains `anchors: Option[EvidenceSupport] = None`. `Evidence` holds no bundle, so it
-cannot check the canonical form itself. Under rule 8's cartesian test, the joined claim is formed
-wherever evidence meets a bundle, and three places enforce the refusals there:
-- `StoryModel.draft`, for claim evidence;
-- `NarrativeCompilerInput.of`, for the evidence ledger and `EvidenceRef.Inline`;
+```scala
+enum PrimaryProjection:
+  case TextSpans(axis: PresentationAxisId, spans: SpanSet)
+  case Playback(axis: PresentationAxisId, intervals: PlaybackIntervalSet)
+```
+
+The projection is derived and never carried. `Text(s)` projects to `TextSpans`, and `Anchored(e)`
+projects to `Playback(e.intervalsOn(primaryAxis))`. The result is total, because `draft` enforces
+projectability.
+
+**Order:** by projection start, then end, then node id. For text this reproduces today's
+`minSpan` order exactly, and S0 pins it.
+
+`discourseOrder` and `discoursePosition` move to the model, which has the bundle. The graph-level
+versions become `private[story]`. `TypedSupport.Anchored` carries no projection, so the public
+enum never needs a case changed later.
+
+### 2.6 `core.Evidence`
+
+`Evidence` gains `anchors: Option[EvidenceSupport] = None`. `Evidence` holds no bundle. The joined
+claim forms wherever evidence meets a bundle, and the canonical-form refusals are enforced at
+each of those points:
+- `draft`;
+- `NarrativeCompilerInput.of`, for the ledger and `EvidenceRef.Inline`;
 - `AnchoredNarrativeAtlas.of`.
 
-The refusals are that both fields are set, and that the field does not match the bundle's kind.
-`Evidence` stays a public value carrier on the same ground as `TypedSupport.Text`.
+That satisfies rule 8's cartesian test. `Evidence` stays a public value carrier. `spanLaw` does
+not change in D1A-types.
 
-`spanLaw` is **unchanged** in D1A-types. No film claim exists until D1A-film.
+### 2.7 The codec: stated behaviour for each anchored value
 
-### 2.6 Codec: stated behaviour for every film-capable value
+The component encoders stay total. They gain one self-versioned sub-shape, `evidence-support/v1`,
+with one payload per anchor case:
 
-The component encoders stay public and total, because `pipeline` needs them. They gain one
-defined sub-shape, `evidence-support/v1`, holding bundle, stream, axis and exact interval ticks.
-It is written **only** when a value is anchored: for `TypedSupport.Anchored`, and for
-`Evidence.anchors` when it is `Some`. Text values never contain it, so text bytes are unchanged.
-The 0.7.0 decoders refuse the sub-shape with a typed error.
+- `Text`: bundle, stream, spans;
+- `MediaTime`: bundle, stream, axis, intervals;
+- `Shot`: bundle, stream, `ShotId`, interval;
+- `Track`: bundle, stream, `TrackId`, intervals.
 
-The model schema stays 0.7.0. No 0.7.0 model artifact can contain the sub-shape, because the
-model entry points take `TextModel`. The acquisition-bundle JSON can carry it only when a
-pipeline writes film values, and the first such writer (V1) versions it. There is no silent loss
-and no exception.
+The sub-shape is written only for anchored values. The 0.7.0 decoders refuse it with a typed
+error. Round-trip is declared a text-only law.
 
-**Court:** an anchored `Evidence` encodes to the sub-shape, and the 0.7.0 decoder refuses it.
-**Mutation:** make the encoder drop the anchors, and the court must fail.
+**No schema bump; S1 argues it.** Unlike 0.6.0 to 0.7.0, no 0.7.0 model artifact can contain the
+sub-shape: the model entry points take `TextModel`, and a `TextModel` holds no anchors. Absence
+is unambiguous. The sub-shape carries its own version tag.
 
-### 2.7 `AlignmentSource`
+The one unversioned carrier that could hold anchored claims is `JsonLines`. Its round-trip court
+stays text-only. V1 versions any film artifact when it first writes one.
 
-`AlignmentSource` becomes sealed. The general source built from any `StoryModel[Validated]`
-exposes `evidenceOf` and `primaryOf`. The text projection `sourceSupport` moves to the text
-source built from a `TextModel[Validated]`, which `StorySourceView` consumes. That touches three
-align call sites mechanically, with no scoring change. D1B moves align onto `primaryOf`.
+**Courts:** one per anchor case, each an encode followed by a typed refusal on decode.
+**Mutation:** drop one payload field, and its court must fail.
 
-## 3. The slices of D1A-types
+### 2.8 `AlignmentSource`
 
-Every slice lands on `main` on its own green gate (§5), and the S0 values must not change.
+`AlignmentSource` becomes sealed. The general source is built from any `StoryModel[Validated]` and
+exposes `evidenceOf` and `primaryOf`. The text source is built from a `TextModel[Validated]` and
+keeps `sourceSupport`, which `StorySourceView` consumes. Three align call sites change
+mechanically. Scoring does not change.
+
+## 3. The slices
+
+Every slice lands on `main` on its own green gate (§5). The values S0 pins must stay identical.
 
 ### S0 — Text parity baseline (test-only; S)
 
-**Compile parity, in `pipeline`.** It pins the War of the Ghosts compile:
-- the fingerprint;
-- the `candidateSet` hex;
-- `StoryModelCodec.contentChecksum` hex;
-- the `derivation.json` checksum;
-- one exemplar each of the `source-support/v2`, `evidence/v2` and mention-id renderings.
+**What it pins, on the JVM in `pipeline`:**
+- for the War of the Ghosts compile: the fingerprint, the `candidateSet` hex,
+  `StoryModelCodec.contentChecksum`, and the `derivation.json` checksum;
+- one exemplar each of the `source-support/v2`, `evidence/v2` and mention-id renderings;
+- the ordering of every node, as a list;
+- one `view` artifact checksum.
 
-S0 adopts `pipeline/src/test/resources/runs/2026-09-02-wog-record-1/`, or records why not.
+**The recorded run.** The receipts in `wog-record-1` are pinned as receipt checksums. That record
+holds no model or derivation bytes.
 
-**View parity.** One `view` artifact checksum.
+**Cross-platform coverage.** Model parity is cited from the `fixtures` goldens. Compile parity on
+JS and Native is a non-claim.
 
-**Cross-platform model parity** is cited from the `fixtures` goldens. Compile parity on JS and
-Native is a non-claim.
-
-**Mutation witnesses** are one fixture span offset plus three code-side mutants:
+**Mutation witnesses:**
+- one fixture span offset;
 - emitting `"anchors": null`;
 - changing the `Text` support encoding;
 - changing a `source-support/v2` span rendering.
@@ -256,177 +301,178 @@ Native is a non-claim.
 ### S1 — ADR 0007 amendment (docs; S)
 
 S1 records:
-- owner decision A;
+- owner decisions A, D and E;
 - the split;
 - the vocabulary: `TypedSupport`, `StoryText`, `TextModel`, `asText`, `PrimaryProjection`,
-  `AnchoredNarrativeAtlas`, `Evidence.anchors`, `evidence-support/v1`, `intervalsOn`,
-  `hasSupport`;
-- the canonical-form rule;
-- non-text identity (§2.2);
-- the rejected alternatives in §2;
-- that sealing the atlas makes ADR 0007 §5's future Sherlock adapter an `AnchoredNarrativeAtlas`
-  construction rather than an implementer, and that its repair receipts have no slot yet
-  (D1A-film).
+  `AnchoredNarrativeAtlas`, `BoundProposalSurface`, `Evidence.anchors`, `evidence-support/v1`,
+  `intervalsOn` and `hasSupport`;
+- the canonical-form rule, and non-text identity;
+- the no-bump argument, and round-trip as a text-only law;
+- the rejected alternatives;
+- that the Sherlock adapter becomes an `AnchoredNarrativeAtlas` construction over one composed
+  bundle.
 
-### S2 — Core substrate (core, laws; M)
+### S2 — Core substrate (core, laws, codec; M)
 
-- **The atlas:** seal it, add `AnchoredNarrativeAtlas`, remove `surfaceAtlas` from the trait, and
-  back lookup with a map.
+- **Atlas:** seal it, add `AnchoredNarrativeAtlas` and `BoundProposalSurface` with their checks,
+  remove `surfaceAtlas`, and back lookup with a map.
 - **`EvidenceSupport.of` refuses:**
-  - an anchor/stream kind mismatch;
+  - an anchor whose kind does not match its stream's kind;
   - a `MediaTime` axis that differs from its intervals' axis;
   - an axis foreign to the bundle;
-  - spans outside the text extent.
+  - spans outside the extent.
 
-  The dead branch is deleted.
-- **Per-stream text reads.** `textSpans` becomes per stream.
-- **A defined union.** Overlapping or abutting intervals on one axis merge into their canonical
-  form. `intervalsOn(axis)` returns that canonical union, and a law states it is idempotent and
-  order-independent.
+  Delete the dead branch.
+- **Per-stream `textSpans`.** Intervals on one axis that overlap or abut merge into one
+  canonical form. `intervalsOn(axis)` returns it, under a law that the merge is idempotent and
+  independent of order.
 - **New types:** `PrimaryProjection`, `TypedSupport` and `Evidence.anchors`.
-- **`LegacyAudioBinding.toMediaSupport`** can never return `Right` (:1639-1670). Fix it or
-  delete it.
+- **`evidence-support/v1`** in the codec, with its four courts. This is the only codec work in
+  S2, and it is additive.
+- **Remove `LegacyAudioBinding.toMediaSupport`,** which can never return `Right` (:1639-1670), or
+  fix it.
 - **Laws and probes:**
-  - one refusal law for each refusal above;
+  - one law per refusal;
   - the untested foreign-bundle case at `SourceBundleSuite:149`;
-  - construction probes for `NarrativeProposalUnit` and `AnchoredNarrativeAtlas`;
-  - a probe that nothing outside `core` extends the sealed atlas.
+  - construction probes for `NarrativeProposalUnit`, `AnchoredNarrativeAtlas` and
+    `BoundProposalSurface`;
+  - a probe that nothing outside `core` can extend the sealed atlas.
 
 ### S3 — acquire (acquire, document call sites; S–M)
 
-- **`SourceSupport`** becomes `(score, support: Option[TypedSupport])`, with a text constructor
-  and a derived `spans`.
-- **`EvidenceRef`** gets a support accessor and no new case.
-- **The resolver's `hasSpans`** becomes `hasSupport`.
-  - The names `requireSpanEvidence`, `NoSpanEvidence` and `MissingSpanEvidence` stop being
-    accurate (`resolve.scala:128,360`, `compiler.scala:2429`). They are kept, because they are
-    wire-visible gap reasons. Their scaladoc is corrected.
-  - A court checks that every existing text verdict is unchanged. This slice gets a cold review,
-    because it changes an acceptance rule.
+- **`SourceSupport(score, support: Option[TypedSupport])`**, with a text constructor and a
+  derived `spans`.
+- **`EvidenceRef` gets a support accessor.**
+- **`hasSpans` becomes `hasSupport`.**
+  - The wire-visible gap reasons `NoSpanEvidence` and `MissingSpanEvidence` keep their names,
+    but their scaladoc is corrected.
+  - A court checks that every text verdict is unchanged.
+  - This slice gets a cold review, because it changes an acceptance rule.
 - **`TaskReferences.validateAgainst`** gains a `NarrativeSourceAtlas` overload.
-- **No provider module changes.**
 
-### S4a — Envelope, identity and node support (story, codec, document, fixtures, laws; M–L)
+### S4a — Node support and a fallible `draft` (M–L)
 
-- **The envelope:** `StoryModel` holds the sealed atlas, and `draft` returns `Either` with the
-  §2.4 checks. The 17 `draft` callers adapt.
-- **Identity:** non-text identity (§2.2), with its court.
-- **Node support:** `TypedSupport` on the nodes, with the overloads.
-- **The codec:** the node codecs and the Evidence codec move to §2.6, and gain their court.
-- **The compiler's text path** adopts the types (`:1422`, `:2171`).
-- **Story `minSpan` users** keep text ordering and go through the text projection:
-  `NarrativeGraph.discourseOrder` (`graph.scala:21-27`), `DiscourseTrajectory.derive`
-  (`trajectory.scala:103-117`) and `validate.scala:597`.
+**Modules:** story, core, codec, document, fixtures, laws, view, pipeline, docs-site,
+embed-bench. That covers every reader of node `.support` and every caller of `draft`.
 
-S4a gives no film behaviour. S0 must not change.
+- **Nodes take `TypedSupport`,** with the overloads, and the 10 `copy` sites are edited.
+- **`draft` returns `Either`.** In this slice every model is still text, so the check is "all
+  `Text`". The model **keeps** `source` and `SurfaceAtlas`, so no consumer of those loses them.
+- **The node decoders** read `TypedSupport.Text`.
+- **Ordering moves to the projection** (§2.5), and the graph-level ordering functions become
+  `private[story]`.
+- **Rewrite the probes that `Either` makes vacuous.** These are the `copy[Validated]` and `Product`
+  probes in `StoryModelUnforgeableSuite:31-35`. Each is re-proved on its own clean recompile.
 
-### S4b — The text witness and its consumers (story, codec, view, pipeline, docs-site, laws; L)
+S0 must stay identical.
 
-- **The witness:** `StoryText`, `TextModel`, `asText` and the validate overload, with one court
-  per `asText` condition.
-- **The consumers:** every consumer listed in §2.3 moves to `TextModel`, and the text operations
-  go behind it.
-- **The validator:** text checks go behind the witness, and `hierarchy.member-within-parent`
-  (`validate.scala:402-412`) is re-expressed on the primary projection.
-- **New bound checks** cover `ContextFrame` and `CircumstanceEdge` support, and claim-evidence
-  anchors.
+### S4b — Envelope, identity and the text witness (L)
+
+S4b touches the same modules as S4a, plus align's `StorySourceView` line.
+
+- **Envelope:** `StoryModel` holds the sealed atlas, `source` moves into `StoryText`, and `draft`
+  gains the membership, projectability and receipt-join checks.
+- **Identity:** §2.2, with both courts.
+- **Witness:** `StoryText`, `TextModel`, `asText`, and the `validate`/`adjudicated` overloads. The
+  compiler's text path yields a `TextModel`.
+- **Consumers:** every consumer in §2.3 moves to `TextModel`, and the text operations move behind
+  it.
+- **Validator:**
+  - text checks move behind the witness;
+  - `member-within-parent` is re-expressed on the projection;
+  - bound checks are added for `ContextFrame` and `CircumstanceEdge`, and for claim-evidence and
+    boundary-belief anchors.
 - **Probes:**
-  - `StoryModelUnforgeableSuite` is extended.
-  - `StoryText` and `TextModel` have no public door.
-  - The node types get their first probes, which record what stays open and why.
-  - A negative compile assertion, paired with a same-shape positive control, shows that a
-    `StoryModel` cannot be passed where a `TextModel` is required.
+  - `StoryText` and `TextModel` have no public door;
+  - the first probes on the node types, recording what stays open and why;
+  - a negative compile assertion that a `StoryModel` cannot stand where a `TextModel` is
+    required, with a positive control of the same shape.
 
-S0 must not change.
+S0 must stay identical.
 
 ### S4c — `AlignmentSource` (story, align call sites; S)
 
-This slice seals `AlignmentSource` and splits it as in §2.7. S0 must not change, and that
-includes the HSMM golden.
+Seal `AlignmentSource` and split it as §2.8 describes. S0 must stay identical, including the
+HSMM golden.
 
-**Order:** S0, S1 and S2 come first. S3 and S4a can then land in either order. S4b follows S4a,
-and S4c follows S4b.
+**Order:**
+1. S0, then S1, then S2.
+2. S3 and S4a, in either order.
+3. S4b.
+4. S4c.
 
-## 4. D1A-film: the open questions, carried forward
+## 4. D1A-film: open questions carried forward
 
-A plan for D1A-film is written after S4c lands, and its bead is filed when this plan is approved.
-The questions it must answer come from both reviews:
+Decisions D1 and D2 settle the public shapes. The remaining questions are internal to the
+compiler, or additive:
 
-1. **Proposal surface.** Bind the proposal-source text (annotation descriptions or captions) to
-   a named bundle stream by checksum, as a distinct type rather than a `SurfaceAtlas` usable as
-   canonical text. It also needs a model law that no node or claim support is anchored on that
-   stream, because an `Anchored` support could otherwise hold spans into the description, which
-   is `TimedSourceView` under another name. The law must hold in `draft`, not only in the
-   compiler.
-2. **Identity rendering.** Fingerprint and `candidateSet` headers carry bundle id and primary
-   axis. The court is that the same description text on two bundles gives different
-   fingerprints.
-3. **Context placement.** Choose NarratedWorld only, with Held steps refused as a typed gap, or
-   Held steps anchored to the unit interval. `ContextStep` carries unvalidated text spans
-   (`placement.scala:84-103`, `compiler.scala:1674`).
-4. **The `within` rule** (`compiler.scala:553-556`) needs an anchored form: containment in the
-   unit whose surface is the attempt's sentence. The atlas must also refuse a non-sentence
-   surface and duplicate surfaces.
-5. **Stage 1b provenance.** `claimProvenance` finds parse calls through evidence spans
-   (`:2465-2476`), so film claims would silently lose their receipts.
-6. **Mention ranking and ids.** Ranking by description order (`:1512`) needs attention, and so
-   does `Int` `offsetOf` (`mentionform.scala:293`), because ticks are `Long`. `Material`,
-   `EmittedMention` and `derivedMeta` are typed `SpanSet` (`:1181,1194,2489-2500`).
-7. **The status rule (formerly decision B).** `SurfaceExplicit` is documented as "directly stated
-   by the source text; must cite spans" (`claim.scala:10`). Licensing it by an annotator's or
-   captioner's derivation changes its meaning, and `StatusWeight` gives it 1.0
-   (`relations.scala:234`).
-   - It must also be decided whether generated captions can license it.
-   - Consistency law 3 (`consistency.scala:115-123`) reads text tokens.
-   - The bundle-dependent half of any rule cannot live in `spanLaw`, which has no bundle.
-   - This is the owner's decision, with those disclosures.
-8. **Anchored fingerprint rendering** for `evidence/v2` and `source-support/v2`. The court is that
-   one tick moves the fingerprint.
-9. **The film court.** A synthetic single-edition film compiles through the same stages. Accepted
-   nodes keep their canonical interval union, gaps are preserved, no status is defaulted, and the
-   foreign-identity refusals hold.
-10. **The Sherlock adapter's repair receipts** need a slot on `AnchoredNarrativeAtlas`.
+1. **Populate `BoundProposalSurface`.** Add the model law that no node or claim support is
+   anchored on the surface.
+2. **Render identity.** Fingerprint and `candidateSet` headers carry the §2.2 identity. The court:
+   the same description text on two bundles yields two fingerprints.
+3. **Context placement.** Either the film placement is NarratedWorld only, and a `Held` context
+   becomes a typed gap, or `Held` is anchored to the unit's interval. `ContextStep` spans are
+   unvalidated today (`placement.scala:84-103`, `compiler.scala:1674`).
+4. **The anchored `within` rule** (`compiler.scala:553-556`): containment in the unit whose
+   surface is the attempt's sentence.
+5. **Stage 1b provenance.** `claimProvenance` locates parse calls through spans (:2465-2476).
+6. **Mention ranking and ids.** Ranking is `:1512`. `MentionPosition(offset: Int)`
+   (`mentionform.scala:174`) cannot hold `Long` ticks. The film path therefore needs an additive
+   position case. Replacing the field would be a break, so check this item first. `Material`,
+   `EmittedMention` and `derivedMeta` are typed as `SpanSet`.
+7. **The status rule.**
+   - **What the doc says:** `SurfaceExplicit` means "directly stated by the source text; must cite
+     spans" (`claim.scala:10`).
+   - **What is in play:** licensing it from an annotator's or a captioner's derivation changes
+     that meaning. `StatusWeight` is 1.0 (`relations.scala:234`), and consistency law 3 reads
+     tokens.
+   - **Where a rule can live:** `spanLaw` has no bundle in scope.
+   - **Owner decision:** whether generated captions can license `SurfaceExplicit` at all.
+8. **Anchored `evidence/v2` and `source-support/v2` rendering.** The court: moving one tick
+   changes the fingerprint.
+9. **The film court.**
+10. **The Sherlock adapter's repair receipts**, and composing its two parts (D1).
 
 ## 5. Gate, per slice
 
-- **Correctness first, then formatting.** Run `sbt -batch clean compileAll testAll` on the merge
+- **Correctness, then formatting.** Run `sbt -batch clean compileAll testAll` on the merge
   result, then `scalafmtCheckAll scalafmtSbtCheck` as a separate run.
-- **Docs examples.** Run `cd docs-site && npm run verify:examples` for S3 onward.
-- **SD2's two surviving checks:** a clean merge-result tree over the exact touched paths, and a
-  gate log with bound test totals and its command receipt. All 56 test tasks must report.
-- **Probe mutants:** each compile-time-probe mutation gets its own clean recompile
-  (AGENTS.md:1387-1398).
-- **Parity:** the S0 values do not change.
-- **Mutation witnesses:** one named witness for each new guard.
-- **Cold review:** a fresh-context agent reviews every slice in a separate pass (SD6).
-- **CI:** cite each run by URL, matrix cell and SHA once CI runs. It has never run, because the
-  Actions billing block is deferred.
+- **Docs examples.** Run `cd docs-site && npm run verify:examples` for every slice that touches
+  the docs-site examples (S3 onward).
+- **SD2's two surviving checks:**
+  - a clean tree for the merge result over the exact touched paths;
+  - a gate log with bound totals and its command receipt, with all 56 test tasks reporting.
+- **One clean recompile per compile-time probe mutation** (AGENTS.md:1387-1398).
+- **S0 identical.**
+- **A named mutation witness per new guard.**
+- **A fresh-context cold review for every slice.**
+- **CI:** cite a run by URL, matrix cell and SHA once CI runs. The Actions billing block is
+  deferred.
 
 ## 6. Tracker changes on approval
 
 - **`bd-01M1CQKRG1A4J4BEWCC78F4TEZ` becomes D1A-types.**
-  - Its paths add `core` (source, atlas, claim), `laws`, `codec` (story and core), `view`,
-    `pipeline`, `fixtures`, docs-site and the align call sites.
-  - "No align/codec edit" becomes: no align scoring change, no 0.7.0 wire change for text, and
-    film wire versioning left to V1.
-  - Its courts add S0 and the per-slice courts.
-- **A new D1A-film bead** is filed. It carries the §4 list, blocks D1B and E0, and is blocked by
-  D1A-types.
+  - Its paths and courts are rewritten to §3.
+  - "No align/codec edit" becomes three rules: no align scoring change; no 0.7.0 wire change for
+    text; the only codec addition is `evidence-support/v1`.
+- **A new D1A-film bead** carries §4. D1A-types blocks it.
+  - It blocks D1B's end-to-end proofs and E0.
+  - It does not block D1B's signature work.
+  - Whether it sits on the 1.0 path follows decision E.
 
 ## 7. What this plan does not do
 
-- It adds no film compile path (D1A-film).
-- It makes no aligner behaviour, `SourceView` or `HsmmResult` change (D1B).
-- It adds no film artifact versioning or renderer (V1).
-- It uses no Sherlock bytes and makes no corpus change.
-- It makes no provider, decoder or media change.
+- **No film compile.** That is D1A-film.
+- **No align behaviour, `SourceView` or `HsmmResult` change.** That is D1B.
+- **No film artifact versioning or renderer.** That is V1.
+- **No bundle composition code.** D1 records the rule, and D1A-film or intake P5 builds it.
+- **No provider, decoder, media or corpus change.**
 
 ## 8. Non-claims
 
-- Line and caller counts come from four surveys and two cold reviews, and are good to about ±10%.
-- Byte-identical text output is an intent until S0 exists and holds on every slice. Compile
-  parity is JVM-only.
-- The split rests on the author's reading that D1A-film is additive to D1A-types' signatures.
-  D1A-film's plan must confirm it, and any break it finds lands before 1.0.
-- Revision 3 has had a focused cold review of its D1A-types half. The result is recorded below
-  once it returns.
+- **Counts** come from four surveys and three cold reviews. They are good to about ±10%.
+- **Byte-identical text output** is intent until S0 exists and holds. Compile parity is JVM-only.
+- **The split is additive only under decisions D1 and D2.** Under the in-bundle alternative it is
+  not, and §2.1 and §2.2 would change.
+- **Revision 4 has not been cold-reviewed.** Review it before S2. S0 and S1 carry no design risk
+  and can proceed first.
