@@ -368,9 +368,20 @@ have not reported, and nothing here rests on them having done so.**
      changed pattern reaches the parse and that the old pattern stops matching.
 - **The guarantees are closed at the TYPE level, not at runtime.** `private[corpus]` is public
   bytecode; plain reflection forges a `Known`. Stated as a non-claim in ADR 0018.
-- **Three of six scheduled reviews are outstanding.** The three Fable 5.1 reviews (P2b-ii, P3
-  `SegmentLink`, P5 `ClockRepair`) were never delivered: Fable usage credits were exhausted, which
-  is an account-level limit no retry can clear.
+- **Three of six scheduled reviews were never delivered by the reviewer they were scheduled for.**
+  The Fable 5.1 reviews of P2b-ii, P3 `SegmentLink` and P5 `ClockRepair` did not run. The failure is
+  verbatim, and it is account-level, which is why no retry cleared it:
+  `"idleReason":"failed","failureReason":"You're out of usage credits. Run /usage-credits to keep
+  using Fable 5.1 or /model to switch models."`
+  Fable *did* review this branch before that: `fable-vet` (plan vet, 4 blockers — it is what flagged
+  P2b-ii as the riskiest slice), `fable-p1b` (`Coded`), `fable-p2b` (P2b-i/P2b-s). Three slices were
+  owed, not six.
+  **Owner decision, 2026-09-17:** the delivered cold review is accepted as sufficient for those three
+  slices and the Fable review is no longer owed (bead `bd-01M2RYPH4MA547YT4GS2A91RK3`, closed with
+  the full rationale). Recorded as the owner's call, asked and answered explicitly — not as the
+  author judging that his own code had been reviewed enough. What that acceptance does **not**
+  establish: no Fable review of these three slices exists, and the judgement that the surviving
+  digest-nesting mutant is benign was made by the author and checked by nobody else.
   **Corrected 2026-09-17.** This bullet previously read "Nothing here was verified by a second
   party," which was false when written — reviews had already been delivered and are cited elsewhere
   in this document. The cold review of the whole subsystem has since returned, and it found one
