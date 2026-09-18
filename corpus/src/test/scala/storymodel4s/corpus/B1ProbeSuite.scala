@@ -140,3 +140,40 @@ class SegmentLinkCompositionSuite extends FunSuite:
       .fold(r => fail(r.message), identity)
     assertNotEquals(customLevel("a", "b:c").identity, customLevel("a:b", "c").identity)
   }
+
+  /** The reviewer's own repro, kept because it is the REALISTIC shape of this defect.
+    *
+    * The version above differs the intermediates by onset, which is easy to dismiss as contrived.
+    * This one differs them by AXIS, which is the case this module exists for: `link.scala` says a
+    * cross-axis link "is the crosswalk this module exists to carry". So the two "mid" segmentations
+    * are an annotation-second scale and a playback-tick scale -- exactly the pair a real crosswalk
+    * sits between, and exactly the pair that must never be silently identified with each other.
+    *
+    * Before the fix this composed and built `SegmentLink(a -> c v1, bijection, 3 sources)` carrying
+    * `LinkEvidence.Composed(declared, declared)` -- evidence asserting a chain through a shared
+    * intermediate that nothing had established.
+    */
+  test("compose REFUSES an intermediate that differs only by AXIS") {
+    val w = WorkId.unsafe("sherlock-a-study-in-pink")
+    val annotationAxis = PresentationAxisId.unsafe("annotation-seconds")
+    val playbackAxis = PresentationAxisId.unsafe("part-a-playback-ticks")
+
+    val a = seg("a", Vector(0, 10, 20), w, annotationAxis)
+    val midAnnotation = seg("mid", Vector(0, 10, 20), w, annotationAxis)
+    val midPlayback = seg("mid", Vector(0, 25000, 50000), w, playbackAxis)
+    val c = seg("c", Vector(0, 25000, 50000), w, playbackAxis)
+
+    assertNotEquals(midAnnotation, midPlayback, "the two intermediates must really differ")
+
+    val ab = bijection(a, midAnnotation)
+    val bc = bijection(midPlayback, c)
+    // both links are individually legal -- a cross-axis link is exactly what this module carries
+    assertEquals(ab.from.value, "a")
+    assertEquals(bc.to.value, "c")
+
+    SegmentLink.compose(ab, bc) match
+      case Left(LinkRefusal.IntermediateDiffers(id, _, _)) => assertEquals(id.value, "mid")
+      case Left(other) => fail(s"refused for the wrong reason: ${other.message}")
+      case Right(_)    =>
+        fail("composed an annotation-second scale onto a playback-tick scale through a fiction")
+  }

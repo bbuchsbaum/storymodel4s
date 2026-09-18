@@ -709,3 +709,50 @@ class CorpusReaderSuite extends FunSuite:
     )
     assertNotEquals(x, y)
   }
+
+  /** The precondition the surviving mutant rests on, PINNED so it cannot break silently.
+    *
+    * A cold reviewer verified (rather than refuted) the judgement that dropping the digest nesting
+    * while keeping the `"column"`/`"sheet"` tags is benign: the flat form decodes left-to-right
+    * because a group's arity is recoverable from its tag literal. But the reviewer also found the
+    * near-miss that makes the precondition load-bearing rather than decorative.
+    * `Custom("sheet", label)` emits the run `"column", name, indexOnly, "custom", "sheet", label`,
+    * which has a SECOND candidate parse -- an arity-1 column whose encoding rendered `"custom"`,
+    * followed by a sheet block opening at `"sheet"`. That parse is unrealizable only because
+    * nothing renders `"custom"`.
+    *
+    * So one new `CellEncoding` case whose `render` collides with a structural or arity tag would
+    * return the flat form to the state the fourth forgery found it in -- and, in the reviewer's
+    * words, "silently, with no test noticing". This is the test that notices.
+    *
+    * The SHIPPED form nests and does not depend on this at all, which is exactly why the nesting is
+    * kept. This guards the fallback, and it guards anyone who reads the survivor note and concludes
+    * the tags alone are sufficient.
+    */
+  test("no encoding's tag may collide with a structural tag or an arity tag") {
+    val structural = Set("corpus-profile", "sheet", "column")
+    val arity = Set("custom", "excel-serial-days")
+    val arityOneEncodings = Vector(
+      CellEncoding.IntegerText,
+      CellEncoding.IntegerOrWholeDecimalText,
+      CellEncoding.DecimalText,
+      CellEncoding.MinuteDotSecond,
+      CellEncoding.PlainText
+    )
+    arityOneEncodings.foreach { e =>
+      val tag = e.render
+      assert(
+        !arity.contains(tag),
+        s"$e renders '$tag', which is an ARITY tag: the flat rendering can no longer be decoded"
+      )
+      assert(
+        !structural.contains(tag),
+        s"$e renders '$tag', which is a STRUCTURAL tag: it could open a group"
+      )
+    }
+    // Sanity: the two arity tags really are the ones the decode dispatches on, and they really are
+    // distinct from each other. If a future edit merges them this test should be revisited, not
+    // deleted.
+    assertEquals(arity.size, 2)
+    assertEquals(arityOneEncodings.map(_.render).distinct.size, arityOneEncodings.size)
+  }
