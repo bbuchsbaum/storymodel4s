@@ -1,4 +1,4 @@
-# D1A: the source-to-story seam — a phase plan (revision 4, approved in part)
+# D1A: the source-to-story seam — a phase plan (revision 4, approved)
 
 *2026-09-17. Draft for owner approval, written against `main` at `5799e94c`. The bead is
 `bd-01M1CQKRG1A4J4BEWCC78F4TEZ`. The governing record is ADR 0007: §5, §6, §7, the migration
@@ -45,7 +45,10 @@ The 1.0 handoff (§7) was about **signatures**. 1.0 must not freeze `StoryModel`
 - **C. Approved:** the split, the design in §2 and the slices in §3.
 - **D. Approved:** D1 (one bundle per model; multi-part films compose) and D2 (the proposal
   surface lives outside the bundle, bound by checksum and receipt).
-- **E. Open**, under discussion with the owner.
+- **E. Library end to end (2026-09-18).** 1.0 waits for D1A-types, D1A-film and all of D1B:
+  through the API, a film source compiles, recall aligns against it, and results carry exact
+  playback intervals. The film file format (V1) and the Sherlock terminal command (E0) are 1.x,
+  additive under their own schema version. D1A-film is therefore on the 1.0 path.
 
 ### Decisions the owner must make at approval
 
