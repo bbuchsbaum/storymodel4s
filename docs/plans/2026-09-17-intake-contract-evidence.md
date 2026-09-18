@@ -515,3 +515,32 @@ Gate after these fixes: exit 0, 24/24 modules, **2,478 tests**, 0 failed, 0 erro
   blocker was run by the **default model**, dispatched as a throwaway diagnostic after the Fable
   agents failed. What made it effective was that it was cold, not which model ran it. The author had
   attacked this digest three times and passed himself each time.
+
+## Landing gate (2026-09-17, on `main`)
+
+The branch landed on `main` as a fast-forward from `0df1d9e7` to `0e36a7fa`. That is the branch
+tip `b464ceaf` plus one commit moving the build coordinate to `io.github.bbuchsbaum`. A
+fast-forward has no merge commit to carry evidence, so it is recorded here.
+
+The P8 sign-off gate above was the scoped JVM run, and five commits (`ecc0bc2f`..`b464ceaf`)
+postdate it. The landing gate was therefore the full cross-platform build from clean, with
+correctness and formatting run separately so that a formatting nit cannot mask a failure:
+
+```
+sbt -batch clean compileAll testAll          # CORRECTNESS_EXIT=0
+sbt -batch scalafmtCheckAll scalafmtSbtCheck # FMT_EXIT=0
+```
+
+| | |
+|---|---|
+| Gate SHA | `0e36a7fae2689f4d99148480afc74618ad3e087e` |
+| Test tasks reporting totals | **56 of 56** (16 modules x JVM/JS/Native + 8 JVM-only) |
+| Tests | **6,383** |
+| Failed / errors | **0 / 0** |
+| `[error]` lines | 0 |
+
+The `corpusNative / Compile / compileIncremental` failure recorded in the caveat above did not
+recur on a clean build. That is one clean run, not a diagnosis.
+
+Not established: CI has never run (the first push hit an Actions billing block), so Temurin 17/21
+and the Playwright docs gate remain unexercised. `main` is not pushed.
