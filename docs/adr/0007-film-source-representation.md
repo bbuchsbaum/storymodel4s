@@ -1,6 +1,6 @@
 # ADR 0007 — Represent film through typed evidence and a presentation axis
 
-**Status:** Accepted. Stage C portable contracts landed (C1, salvaged 2026-09-01); the first acquisition court is executed locally under the 2026-09-01 amendments below, with `Draft` authority throughout; Stages D and E remain open
+**Status:** Accepted. Stage C portable contracts landed (C1, salvaged 2026-09-01); the first acquisition court is executed locally under the 2026-09-01 amendments below, with `Draft` authority throughout. The 2026-09-19 amendment records the approved D1A-types / D1A-film split and replaces the research prerequisite for engineering. Their implementation and the film proofs remain open.
 
 **Date:** 2026-08-29
 
@@ -474,7 +474,7 @@ This ADR fixes the direction; it does not authorize production changes.
 
 1. **Stage A — this ADR:** record the source, support, axis, atlas, compiler, and acquisition
    contracts. No code.
-2. **Existing vertical gate:** complete the already-scoped real-transcript path through Stage 1b
+2. **Existing vertical gate (superseded by the 2026-09-19 amendment):** complete the already-scoped real-transcript path through Stage 1b
    to one answered research question. Stages B through D remain blocked until that gate closes;
    generalizing an unvalidated compiler seam would multiply an unknown.
 3. **Stage B — artifact-specific admission:** keep actual episode video file contents external,
@@ -725,3 +725,133 @@ which would let the library own sampling and time (ledger §5 pattern; the adapt
 by ordinal instead); (2) emitting `TimedSegment`s directly, which would put a proposal where the
 recall-to-video pipeline expects trusted source text; (3) a remote captioning API, rejected in the
 admission record on rights and privacy grounds. 
+
+### 2026-09-19 — D1A source-to-story contracts and the engineering gate
+
+This amendment records the owner's 2026-09-18 rulings A, C, D and E in the
+[approved D1A revision 4](../plans/2026-09-17-d1a-source-to-story-plan.md). It supersedes
+conflicting earlier descriptions of the atlas, support migration and release sequencing in
+this ADR. [Delivery PLAN](../refactor/PLAN.md) governs the current implementation order;
+[S1](../refactor/goals/film-foundation-20260919.md) records these decisions before new public
+vocabulary enters code.
+
+**A — engineering precedes research claims.** The owner ruled: "we're developing software.
+build first, then researchers ask questions." The answered-research-question requirement in
+migration step 2 no longer blocks engineering stages B–D. Its engineering purpose survives:
+generalizing the compiler must not silently change the existing text behavior. The completed
+[S0 text parity court](../refactor/evidence/d1a-s0-text-parity-20260919/README.md), qualified at
+`051f88f3fc94e72ed484b672937c351cafe3618e` against production baseline
+`27ebdb71c33fcdccd97f109b46e30006f3fbcce8`, pins that behavior. Later slices retain those
+values; compatibility evidence does not scientifically validate the text compiler. Research
+comparisons remain separately gated in the delivery plan and do not determine whether ordinary
+film engineering can proceed.
+
+**C — split the work and preserve every approved slice.** D1A-types is S0 through S4c. It makes
+the model, nodes, evidence and alignment source capable of carrying film support, without
+compiling film. D1A-film subsequently populates the proposal surface and compiles a lawful film
+source through the deterministic stages. D1B's public signatures follow D1A-types; hand-built
+film models can exercise them. D1B's end-to-end proofs require D1A-film.
+
+**D — one bundle and a separate proposal surface.** A model has exactly one `SourceBundle`.
+Multiple film parts compose through checked `TrackComposition`; they do not become unrelated
+bundles inside one model. The proposal surface is an annotation or caption derivation outside
+that bundle, bound by checksum and derivation receipt. Existing film anchors therefore retain
+their bundle identities when proposal text is added. The Sherlock adapter becomes a checked
+`AnchoredNarrativeAtlas` construction over one composed bundle, carrying its admitted repair
+receipts. Bundle composition and that adapter belong to the later film work.
+
+**E — the library's end-to-end film route remains required for 1.0.** D1A-types, D1A-film and all
+of D1B must demonstrate that a film source compiles through the API, recall aligns against it,
+and results carry exact playback intervals. The full film-model wire format V1 and Sherlock
+terminal E0 remain additive 1.x work under their own versions. The mapper plan's proposed P1
+alternatives are **not adopted**: an annotation-assisted preview does not replace this route,
+and a benchmark win does not gate film engineering. Generated captions' eligibility to license
+`SurfaceExplicit` remains a distinct owner decision for the film phase plan; this amendment
+does not assign that license.
+
+#### Public vocabulary and construction boundaries
+
+- `NarrativeSourceAtlas` becomes sealed, with final `TextNarrativeAtlas` and
+  `AnchoredNarrativeAtlas` implementations. `surfaceAtlas` leaves the general trait.
+  `AnchoredNarrativeAtlas.of` checks bundle membership, refuses a text-character primary axis,
+  and refuses unit surfaces absent from, or duplicated in, the bound proposal surface.
+- `BoundProposalSurface` binds one checked `SurfaceAtlas`, its checksum and the
+  `SourceDerivationReceipt` of its production. A proposal unit's optional `SurfaceUnitId` names
+  a sentence of that one surface. The bound derivation never becomes canonical source text.
+- `TypedSupport` is the core sum `Text(SpanSet)` or `Anchored(EvidenceSupport)`; acquire can
+  consume it without depending on story. `Evidence.anchors: Option[EvidenceSupport]` defaults
+  to absence; existing text evidence bytes retain their omitted-anchor form.
+- `PrimaryProjection` is derived support on the model's primary axis:
+  `TextSpans(axis, spans)` or `Playback(axis, intervals)`. No cached projection travels inside
+  `TypedSupport`. `EvidenceSupport.intervalsOn(axis)` merges overlapping or abutting intervals
+  on that axis canonically, independently of order and idempotently. Text span access remains
+  per stream.
+- `StoryText` is the checked canonical-text witness containing source, surface and stream.
+  `TextModel[S]` binds that witness to a `StoryModel[S]`; neither has a public construction
+  door. `StoryModel.asText` yields the witness exactly for `TextNarrativeAtlas`. Text validation,
+  adjudication and compilation preserve it. Text slicing, covering, rendering, model codecs
+  and other consumers named in the approved plan require `TextModel`.
+- `hasSupport` replaces acquisition's `hasSpans` predicate, consuming the new typed support
+  accessor on `EvidenceRef`. Existing wire-visible gap names `NoSpanEvidence` and
+  `MissingSpanEvidence` stay unchanged, and the text verdict court must remain identical.
+
+#### Canonical form, identity and projection
+
+A `TextCharacter` primary axis requires `TypedSupport.Text`; any other primary axis requires
+`TypedSupport.Anchored`. Text-primary models cannot carry evidence anchors. The canonical
+form must be checked wherever evidence meets a bundle: the atlas constructor, compiler-input
+construction (including inline evidence and ledger evidence), and model draft construction.
+`StoryModel.draft` becomes fallible and its internal copy path uses the same checks. The full
+envelope checks every node support and all evidence, including `BoundaryBelief.evidence`, for
+canonical form and bundle membership; anchored node support must project to the primary axis.
+Span extent remains a validator law, preserving drafts that carry text-bound violations.
+
+Text identity remains the source's existing story ID (including an explicitly supplied ID)
+and canonical checksum. Non-text identity is derived from the domain `story-anchored`, bundle
+ID, primary-axis ID, sorted mapping IDs and bound-surface checksum or the absence marker `-`.
+The story ID uses `ContentAddress.of`; the receipt source checksum uses the full untruncated
+SHA-256 of the same identity input. `draft` checks both receipt fields against the atlas-derived
+values for text and non-text models. A bundle ID alone is insufficient: two bundles can share
+its truncated ID while differing in axis extent or timebase. The identity courts must
+distinguish that pair and two proposal-surface checksums.
+
+Ordering uses projection start, end, then node ID. For text it must preserve the existing
+`minSpan` ordering pinned by S0. Discourse order and position live on the model, which owns the
+bundle; graph-only versions become internal. `AlignmentSource` becomes sealed: the general
+source exposes evidence and primary projection, while its text-specific construction retains
+text `sourceSupport` for `StorySourceView`. D1A changes no alignment scoring behavior.
+
+#### Wire compatibility and rejected alternatives
+
+Component encoders remain total. Anchored values gain the self-versioned `evidence-support/v1`
+sub-shape, retaining the complete payload for each anchor kind: text bundle/stream/spans;
+media-time bundle/stream/axis/intervals; shot bundle/stream/shot ID/interval; and track
+bundle/stream/track ID/intervals. Version 0.7.0 decoders refuse anchored sub-shapes with typed
+errors, and each anchor case has an encode/typed-refusal court. The unversioned `JsonLines`
+claims carrier can encode anchored evidence but cannot promise its round trip under those
+decoders.
+
+The model schema remains 0.7.0. Model encoding requires `TextModel`, whose canonical form
+contains no anchors, so no model artifact can acquire the new anchored sub-shape. Its absence
+is unambiguous and text bytes stay unchanged. This differs from the 0.6.0 → 0.7.0 transition,
+which began writing a new field into model artifacts. Model, derivation and claims round-trip
+laws are explicitly text-only; V1 must version a film artifact when it first writes one.
+
+Rejected alternatives are recorded before implementation:
+
+- A phantom medium parameter on the whole model cannot describe mixed evidence and is already
+  rejected above. A second capability type parameter on every model occurrence adds pervasive
+  API complexity; the atlas-minted text witness supplies the needed guarantee locally.
+- Optional text fields permit a model to be paired with foreign text. The checked witness binds
+  the source, surface and stream to that model instead.
+- Making text `encode` return `Either` moves an impossible text-capability refusal into every
+  caller. Requiring `TextModel` establishes that capability at construction.
+- Putting proposal text inside the film bundle changes the bundle ID with every annotation
+  set and requires rebasing existing film anchors. The separate bound surface preserves those
+  anchors and contributes its checksum to model identity.
+- Multiple independent bundles inside one model weaken the single-source join; checked
+  composition supplies one bundle for multipart film. Composition is not implemented by this
+  amendment.
+
+This is a design and compatibility record. It adds no production capability, establishes no
+new scientific validity, and does not claim executed CI or film compiler completion.
