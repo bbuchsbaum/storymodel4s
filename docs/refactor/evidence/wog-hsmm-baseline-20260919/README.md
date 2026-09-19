@@ -34,9 +34,12 @@ provider calls, or scientific accuracy evaluation were involved.
 The [runner](run.py) and [capture source](WogHsmmBaselineCaptureSuite.scala) preserve the
 capture procedure. Raw logs and fresh JUnit checks remain under the ignored local data
 workspace `data/study/film-foundation-goal-20260919/hsmm-baseline/` and the clone paths
-recorded in the manifest. A new capture needs fresh output paths; the runner refuses to
-overwrite earlier logs. Baseline identity is fixed by this commit; a later mismatch cannot
-be repaired by regenerating these expected values.
+recorded in the manifest. Use the [fresh recapture recipe](recapture.md) for another run.
+The historical runner consumes its adjacent manifest and must not be executed in this
+evidence directory: its recorded checkout may now be at a later evidence commit. The recipe
+pins fresh checkouts, initializes empty result receipts, and records new runtime/difference
+receipts separately. Baseline identity is fixed by this commit; a later mismatch cannot be
+repaired by regenerating these expected values.
 
 This evidence is preparation for S4c. It does not close S2, S4c, or the goal, qualify the
 migration, establish empirical measurement validity, or report an executed CI run.
