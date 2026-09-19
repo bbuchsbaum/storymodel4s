@@ -1,0 +1,4055 @@
+{
+  "schema": "storymodel4s.backlog-reconciliation/v1",
+  "date": "2026-09-19",
+  "baseline": "1113f96864a38a2869e49d9c8c5d4e2dc43f5d10",
+  "concurrent_tracker_commit": "46d476e720ac715a247619b615aa32cab792935d",
+  "status": "applied-and-verified",
+  "issues": [
+    {
+      "id": "bd-01M1CQ2H7VPSKRT02M5H7HN1K6",
+      "before": {
+        "title": "CODE RED: executable Sherlock movie-to-recall P/F vertical",
+        "status": "doing",
+        "priority": 0,
+        "assignee": "codex-storymodel4s-chief",
+        "tags": [
+          "alignment",
+          "critical",
+          "film",
+          "product",
+          "recall"
+        ],
+        "deps": [
+          {
+            "kind": "blocks",
+            "parent": "bd-01M1CQSWJ538PAEME49200YARR"
+          }
+        ]
+      },
+      "before_body_sha256": "f7d5d409a3b75e6184aaff9b7d863da83150263174625b9977a867ffa54cb2da",
+      "title": "CODE RED: executable Sherlock movie-to-recall P/F vertical",
+      "status": "closed",
+      "priority": 2,
+      "lane": "closed",
+      "disposition": "superseded",
+      "reason": "Superseded fleet-era CODE RED container by bd-01M2TA01EHVRF6MQ1N00XTVK1K. D1A, film, D1B, V1 and E0 remain linked to the active delivery epic; no product completion claimed.",
+      "dependency_ids": [
+        "bd-01M1CQSWJ538PAEME49200YARR"
+      ],
+      "assignee": ""
+    },
+    {
+      "id": "bd-01M1CQQDCWN2RTT1Z8XNNB7VMY",
+      "before": {
+        "title": "V1 codec and renderer-neutral lowering for movie recall P F artifacts",
+        "status": "open",
+        "priority": 0,
+        "assignee": "codex-storymodel4s-collab",
+        "tags": [
+          "codec",
+          "critical",
+          "output",
+          "view"
+        ],
+        "deps": [
+          {
+            "kind": "blocks",
+            "parent": "bd-01M1CHWCRKMPNK6RARGT7JXVXX"
+          },
+          {
+            "kind": "blocks",
+            "parent": "bd-01M1CQNM5DZZNWD8BN4WRKVZRQ"
+          }
+        ]
+      },
+      "before_body_sha256": "82014daa0b083356108bb98337d0b329f7aecad3859af82e39fc98f22ac35769",
+      "title": "[later] V1 codec and renderer-neutral lowering for movie recall P F artifacts",
+      "status": "open",
+      "priority": 3,
+      "lane": "later",
+      "disposition": "retain",
+      "reason": "Ruling E: 1.x full film-model wire/terminal capability; separate from the initial mapping exchange preview.",
+      "dependency_ids": [
+        "bd-01M1CHWCRKMPNK6RARGT7JXVXX",
+        "bd-01M1CQNM5DZZNWD8BN4WRKVZRQ"
+      ],
+      "assignee": ""
+    },
+    {
+      "id": "bd-01M1DB6J4VFETMCFG096713DCY",
+      "before": {
+        "title": "P1B scientific Baseball proposition-to-narrative recall vertical",
+        "status": "open",
+        "priority": 0,
+        "assignee": null,
+        "tags": [
+          "critical",
+          "narrative",
+          "proposition",
+          "provenance",
+          "recall",
+          "scientific"
+        ],
+        "deps": [
+          {
+            "kind": "blocks",
+            "parent": "bd-01M17MT2JC0TS46BH9RTYMEVQ7"
+          }
+        ]
+      },
+      "before_body_sha256": "5f0c7621d4882201dd34e269b0236636d8a0b150ccf19f53bc1894092bd346b7",
+      "title": "[later] P1B scientific Baseball proposition-to-narrative recall vertical",
+      "status": "open",
+      "priority": 3,
+      "lane": "later",
+      "disposition": "retain",
+      "reason": "Outside the current preview path; preserve evidence and acceptance scope, resume only for a named consumer or demonstrated blocking defect.",
+      "dependency_ids": [
+        "bd-01M17MT2JC0TS46BH9RTYMEVQ7"
+      ],
+      "assignee": null
+    },
+    {
+      "id": "bd-01M2TA01EHVRF6MQ1N00XTVK1K",
+      "before": {
+        "title": "EPIC: best automatic recall-to-video mapper (plan 2026-09-18, revision 6)",
+        "status": "open",
+        "priority": 0,
+        "assignee": null,
+        "tags": [
+          "epic",
+          "mapper-plan"
+        ],
+        "deps": []
+      },
+      "before_body_sha256": "398d4452394560193039cecca85149f57162481a32b0b7695776c25073e682cf",
+      "title": "DELIVERY: usable recall mapping and defensible organization measurement",
+      "status": "open",
+      "priority": 1,
+      "lane": "container",
+      "disposition": "rescope",
+      "reason": "Contains work with rel, not a dependency on every child.",
+      "dependency_ids": [],
+      "assignee": null
+    },
+    {
+      "id": "bd-01M2TA0G1VSRQ992HJFWP13ZCM",
+      "before": {
+        "title": "OWNER: may participant recall prose go to hosted model APIs (per corpus), and at what spend?",
+        "status": "open",
+        "priority": 0,
+        "assignee": null,
+        "tags": [
+          "llm",
+          "mapper-plan",
+          "owner-decision",
+          "phase1a"
+        ],
+        "deps": []
+      },
+      "before_body_sha256": "2f7d0d9c26f662325f1a5b00dcdba81b556804966e1f9fa1e3aa169d10b61589",
+      "title": "OWNER: may participant recall prose go to hosted model APIs (per corpus), and at what spend?",
+      "status": "open",
+      "priority": 2,
+      "lane": "owner",
+      "disposition": "retain",
+      "reason": "Owner/data decision retained only for its named downstream track; it does not gate the local preview.",
+      "dependency_ids": [],
+      "assignee": null
+    },
+    {
+      "id": "bd-01M2TA2EMFCWRKXK6QJHGV702Q",
+      "before": {
+        "title": "Phase 0: rescue the only copy of audit/masc-role-corpus (b756b4bb) into the main repo",
+        "status": "open",
+        "priority": 0,
+        "assignee": null,
+        "tags": [
+          "hygiene",
+          "mapper-plan",
+          "phase0"
+        ],
+        "deps": []
+      },
+      "before_body_sha256": "063096bb3fbe8983fd288a51eb8bce288599d287328ff84c6f76ff720cf634d2",
+      "title": "[foundation] Phase 0: rescue the only copy of audit/masc-role-corpus (b756b4bb) into the main repo",
+      "status": "open",
+      "priority": 0,
+      "lane": "foundation",
+      "disposition": "rescope",
+      "reason": "At-risk commit b756b4bb is still absent from main object DB. Preserve named refs and audit unique objects before any deletion; this is independent preservation work.",
+      "dependency_ids": [],
+      "assignee": null
+    },
+    {
+      "id": "bd-01M2TA3780KD7C5PEQCEZ4ARSD",
+      "before": {
+        "title": "Phase 0: tracker hygiene -- close landed beads against their own titles, move V1 to 1.x, retire the fleet epic",
+        "status": "open",
+        "priority": 0,
+        "assignee": null,
+        "tags": [
+          "hygiene",
+          "mapper-plan",
+          "phase0",
+          "tracker"
+        ],
+        "deps": []
+      },
+      "before_body_sha256": "efccab575504b497857bcf80c77804f96e216a096e3b4c3de0fe6e9f8ed25c4f",
+      "title": "Phase 0: tracker hygiene -- close landed beads against their own titles, move V1 to 1.x, retire the fleet epic",
+      "status": "closed",
+      "priority": 1,
+      "lane": "closed",
+      "disposition": "completed-planning",
+      "reason": "This reorganization accounts for all 119 prior unfinished issues; landed versus unlanded probe commits distinguished, V1 moved to 1.x, fleet epic retired, stale status/assignee fields cleared. Follow-up defect closures require their own evidence. Three unlanded anchors are explicitly retained; no wholesale closure of all twelve is claimed.",
+      "dependency_ids": [],
+      "assignee": null
+    },
+    {
+      "id": "bd-01M2TA4BFRMK8WNA79PPRT8YCD",
+      "before": {
+        "title": "Phase 0: record the FilmFestival media -- a content-free hash manifest and corrected excerpt boundaries",
+        "status": "open",
+        "priority": 0,
+        "assignee": null,
+        "tags": [
+          "data",
+          "filmfestival",
+          "mapper-plan",
+          "media",
+          "phase0"
+        ],
+        "deps": []
+      },
+      "before_body_sha256": "95206a858ec55e2aa4f58cf4669461884eaf96f0f2b8208724a8cf3f58199e66",
+      "title": "[maintenance] Phase 0: record the FilmFestival media -- a content-free hash manifest and corrected excerpt boundaries",
+      "status": "open",
+      "priority": 2,
+      "lane": "maintenance",
+      "disposition": "retain",
+      "reason": "Retained with its original acceptance scope; recheck against current code before implementation or closure. Not a prerequisite for the annotation-assisted preview.",
+      "dependency_ids": [],
+      "assignee": null
+    },
+    {
+      "id": "bd-01M2TA4QG638M6ZH8Q23CAK401",
+      "before": {
+        "title": "Phase 1a: draw and seal the Friends participant-level test split",
+        "status": "open",
+        "priority": 0,
+        "assignee": null,
+        "tags": [
+          "friends",
+          "mapper-plan",
+          "phase1a",
+          "sealed-test"
+        ],
+        "deps": []
+      },
+      "before_body_sha256": "58461b86abfeb64e2447ea30451ef020b183a88ca71aa14e603ff33f1be7f26e",
+      "title": "[research] Phase 1a: draw and seal the Friends participant-level test split",
+      "status": "open",
+      "priority": 2,
+      "lane": "research",
+      "disposition": "retain",
+      "reason": "Research comparison retained; frozen exposure/eligibility rules apply. Not an engineering prerequisite or proof of behavioral recovery.",
+      "dependency_ids": [],
+      "assignee": null
+    },
+    {
+      "id": "bd-01M2TA53FEKFQY7R4XC48BZMR8",
+      "before": {
+        "title": "Phase 1a: admit Memento, fix its task, and seal a condition-stratified test split",
+        "status": "open",
+        "priority": 0,
+        "assignee": null,
+        "tags": [
+          "data",
+          "mapper-plan",
+          "memento",
+          "phase1a",
+          "sealed-test"
+        ],
+        "deps": []
+      },
+      "before_body_sha256": "0c6b5906d28b9c883f4b73e2647092f2b121982c413c82295af56e93a027e9c2",
+      "title": "[research] Phase 1a: admit Memento, fix its task, and seal a condition-stratified test split",
+      "status": "open",
+      "priority": 2,
+      "lane": "research",
+      "disposition": "retain",
+      "reason": "Research comparison retained; frozen exposure/eligibility rules apply. Not an engineering prerequisite or proof of behavioral recovery.",
+      "dependency_ids": [],
+      "assignee": null
+    },
+    {
+      "id": "bd-01M2TA5FB4ATF9QS9ZA9MDJNE2",
+      "before": {
+        "title": "Phase 1a: unit manifest and a fail-closed scorer with fixed denominators (gold_scene.py)",
+        "status": "open",
+        "priority": 0,
+        "assignee": null,
+        "tags": [
+          "benchmark",
+          "mapper-plan",
+          "phase1a",
+          "scorer"
+        ],
+        "deps": []
+      },
+      "before_body_sha256": "58d79f4081daf86ae08b846d1e54cb1a74204a60265f6ae0c0ffa8886c9c9c8c",
+      "title": "[foundation] Phase 1a: unit manifest and a fail-closed scorer with fixed denominators (gold_scene.py)",
+      "status": "open",
+      "priority": 0,
+      "lane": "foundation",
+      "disposition": "rescope",
+      "reason": "Preserve all existing fixed-population/unit-ID criteria; add separate timing eligibility, transcript-order eligibility and transition coverage. Synthetic load_arm probe on baseline retained 1 of 3 rows; no corpus gold read. Includes cross-language TR/alias agreement from the concurrent intake review.",
+      "dependency_ids": [
+        "bd-01M2WVCEBHAZBKJQ0EB84EA4HV"
+      ],
+      "assignee": null
+    },
+    {
+      "id": "bd-01M2TA5VFE5X7E4SP1AM4HJ530",
+      "before": {
+        "title": "Phase 1a: local pinned LLM runtime, gold-free model and prompt pilot, provenance receipt",
+        "status": "open",
+        "priority": 0,
+        "assignee": null,
+        "tags": [
+          "llm",
+          "local-model",
+          "mapper-plan",
+          "phase1a"
+        ],
+        "deps": [
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2TA4QG638M6ZH8Q23CAK401"
+          }
+        ]
+      },
+      "before_body_sha256": "81b5dddca3db29af548c7f0ccab5eb62fb92039759c9ae47d3e7abc4d33cba46",
+      "title": "[research] Phase 1a: local pinned LLM runtime, gold-free model and prompt pilot, provenance receipt",
+      "status": "open",
+      "priority": 2,
+      "lane": "research",
+      "disposition": "retain",
+      "reason": "Research comparison retained; frozen exposure/eligibility rules apply. Not an engineering prerequisite or proof of behavioral recovery.",
+      "dependency_ids": [
+        "bd-01M2TA4QG638M6ZH8Q23CAK401"
+      ],
+      "assignee": null
+    },
+    {
+      "id": "bd-01M2TA67DXJ2W0KX5N5DXSR1S2",
+      "before": {
+        "title": "Phase 1a: pre-register the Phase 1a comparisons in the study-log ledger before any gold read",
+        "status": "open",
+        "priority": 0,
+        "assignee": null,
+        "tags": [
+          "ledger",
+          "mapper-plan",
+          "phase1a",
+          "preregistration"
+        ],
+        "deps": [
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2TA4QG638M6ZH8Q23CAK401"
+          },
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2TA5FB4ATF9QS9ZA9MDJNE2"
+          },
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2TA5VFE5X7E4SP1AM4HJ530"
+          }
+        ]
+      },
+      "before_body_sha256": "9c53583224d22f3cb41634f8bb18861257334c5fc71381ddc814dfddc5adb690",
+      "title": "[research] Phase 1a: pre-register the Phase 1a comparisons in the study-log ledger before any gold read",
+      "status": "open",
+      "priority": 2,
+      "lane": "research",
+      "disposition": "retain",
+      "reason": "Research comparison retained; frozen exposure/eligibility rules apply. Not an engineering prerequisite or proof of behavioral recovery.",
+      "dependency_ids": [
+        "bd-01M2TA4QG638M6ZH8Q23CAK401",
+        "bd-01M2TA5FB4ATF9QS9ZA9MDJNE2",
+        "bd-01M2TA5VFE5X7E4SP1AM4HJ530"
+      ],
+      "assignee": null
+    },
+    {
+      "id": "bd-01M2TA6KFQV8ADNS3Z0ED4KYMW",
+      "before": {
+        "title": "Phase 1a: retrieval baselines B0-B4 and B1t/B2t on Sherlock; film identity on FilmFestival",
+        "status": "open",
+        "priority": 0,
+        "assignee": null,
+        "tags": [
+          "baselines",
+          "benchmark",
+          "mapper-plan",
+          "phase1a"
+        ],
+        "deps": [
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2TA5FB4ATF9QS9ZA9MDJNE2"
+          },
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2TA67DXJ2W0KX5N5DXSR1S2"
+          }
+        ]
+      },
+      "before_body_sha256": "eca53e367298ab8e2ad56bf1b12962a831d708a165c44d8e8e41a30d7557619a",
+      "title": "[research] Phase 1a: retrieval baselines B0-B4 and B1t/B2t on Sherlock; film identity on FilmFestival",
+      "status": "open",
+      "priority": 2,
+      "lane": "research",
+      "disposition": "retain",
+      "reason": "Research comparison retained; frozen exposure/eligibility rules apply. Not an engineering prerequisite or proof of behavioral recovery.",
+      "dependency_ids": [
+        "bd-01M2TA5FB4ATF9QS9ZA9MDJNE2",
+        "bd-01M2TA67DXJ2W0KX5N5DXSR1S2"
+      ],
+      "assignee": null
+    },
+    {
+      "id": "bd-01M2TA6ZHJGYPCYQBAN15PFZ0D",
+      "before": {
+        "title": "Phase 1a: local LLM arms L0-L3 on Sherlock, L1/L3 on FilmFestival",
+        "status": "open",
+        "priority": 0,
+        "assignee": null,
+        "tags": [
+          "benchmark",
+          "llm",
+          "local-model",
+          "mapper-plan",
+          "phase1a"
+        ],
+        "deps": [
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2TA5FB4ATF9QS9ZA9MDJNE2"
+          },
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2TA5VFE5X7E4SP1AM4HJ530"
+          },
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2TA67DXJ2W0KX5N5DXSR1S2"
+          }
+        ]
+      },
+      "before_body_sha256": "8b538e569d369ddab932df7403c2ea28bb5eb6cb4d97e98e19df3991556a70e2",
+      "title": "[research] Phase 1a: local LLM arms L0-L3 on Sherlock, L1/L3 on FilmFestival",
+      "status": "open",
+      "priority": 2,
+      "lane": "research",
+      "disposition": "retain",
+      "reason": "Research comparison retained; frozen exposure/eligibility rules apply. Not an engineering prerequisite or proof of behavioral recovery.",
+      "dependency_ids": [
+        "bd-01M2TA5FB4ATF9QS9ZA9MDJNE2",
+        "bd-01M2TA5VFE5X7E4SP1AM4HJ530",
+        "bd-01M2TA67DXJ2W0KX5N5DXSR1S2"
+      ],
+      "assignee": null
+    },
+    {
+      "id": "bd-01M2TA7QJW98EJ9JQ3T447HZK7",
+      "before": {
+        "title": "Phase 1a: readout and owner checkpoint",
+        "status": "open",
+        "priority": 0,
+        "assignee": null,
+        "tags": [
+          "checkpoint",
+          "mapper-plan",
+          "phase1a"
+        ],
+        "deps": [
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2TA6KFQV8ADNS3Z0ED4KYMW"
+          },
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2TA6ZHJGYPCYQBAN15PFZ0D"
+          }
+        ]
+      },
+      "before_body_sha256": "223bc3ccb9d269a922a0989d317916c22dab6aead3a8542003dba98518d0c5cb",
+      "title": "[research] Phase 1a: readout and owner checkpoint",
+      "status": "open",
+      "priority": 2,
+      "lane": "research",
+      "disposition": "rescope",
+      "reason": "The comparison checkpoint selects optional provider/reconstruction investments under preregistered rules. It no longer decides whether shared evidence, reference measurement, public mapping extraction or film engineering may start.",
+      "dependency_ids": [
+        "bd-01M2TA6KFQV8ADNS3Z0ED4KYMW",
+        "bd-01M2TA6ZHJGYPCYQBAN15PFZ0D"
+      ],
+      "assignee": null
+    },
+    {
+      "id": "bd-01M1606BEK9P4437GKVHFV1KPY",
+      "before": {
+        "title": "interview: typed fractional placement-resolution summary (the vehicle every estimand fix needs)",
+        "status": "doing",
+        "priority": 1,
+        "assignee": "claude-storymodel4s-m1",
+        "tags": [],
+        "deps": []
+      },
+      "before_body_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "title": "[later] interview: typed fractional placement-resolution summary (the vehicle every estimand fix needs)",
+      "status": "open",
+      "priority": 3,
+      "lane": "later",
+      "disposition": "retain",
+      "reason": "Interview-specific scientific work remains valid but follows the mapping preview; reuse measurement policy when this work resumes.",
+      "dependency_ids": [],
+      "assignee": ""
+    },
+    {
+      "id": "bd-01M17FAGN83C3ZT2VZ2VKHWTYJ",
+      "before": {
+        "title": "NFRD: primary-source inventory and observation-versus-derivation audit",
+        "status": "review",
+        "priority": 1,
+        "assignee": null,
+        "tags": [
+          "data",
+          "docs",
+          "validation"
+        ],
+        "deps": []
+      },
+      "before_body_sha256": "3359440cb11d20eee126abf13465ba8a710d0d597a8ffe1ba137a7c24e71ea99",
+      "title": "[later] NFRD: primary-source inventory and observation-versus-derivation audit",
+      "status": "open",
+      "priority": 3,
+      "lane": "later",
+      "disposition": "retain",
+      "reason": "Outside the current preview path; preserve evidence and acceptance scope, resume only for a named consumer or demonstrated blocking defect.",
+      "dependency_ids": [],
+      "assignee": null
+    },
+    {
+      "id": "bd-01M17MET0E4TWW304YKXPHBSBG",
+      "before": {
+        "title": "a real proposition provider: 50 of 50 sentences, not 4",
+        "status": "doing",
+        "priority": 1,
+        "assignee": "codex-storymodel4s-collab",
+        "tags": [],
+        "deps": []
+      },
+      "before_body_sha256": "341730d6ee63b70b33b83dccea50f254a55bd36218d746e1dad329e2b1e0cca8",
+      "title": "[maintenance] a real proposition provider: 50 of 50 sentences, not 4",
+      "status": "open",
+      "priority": 2,
+      "lane": "maintenance",
+      "disposition": "retain",
+      "reason": "Retained with its original acceptance scope; recheck against current code before implementation or closure. Not a prerequisite for the annotation-assisted preview.",
+      "dependency_ids": [],
+      "assignee": ""
+    },
+    {
+      "id": "bd-01M17MT2JC0TS46BH9RTYMEVQ7",
+      "before": {
+        "title": "NFRD Baseball: verify and freeze the external diagnostic-court inputs",
+        "status": "doing",
+        "priority": 1,
+        "assignee": null,
+        "tags": [
+          "external-data",
+          "nfrd",
+          "science"
+        ],
+        "deps": []
+      },
+      "before_body_sha256": "f7919419b52fbf4de9d8f1400ae28cbc99c6b2a3aa5ccd036da726ce0b045f06",
+      "title": "[later] NFRD Baseball: verify and freeze the external diagnostic-court inputs",
+      "status": "open",
+      "priority": 3,
+      "lane": "later",
+      "disposition": "retain",
+      "reason": "Outside the current preview path; preserve evidence and acceptance scope, resume only for a named consumer or demonstrated blocking defect.",
+      "dependency_ids": [],
+      "assignee": null
+    },
+    {
+      "id": "bd-01M17W5DZWHA0RTV3Q8R5DGEV6",
+      "before": {
+        "title": "mote-dx: ancestor_abandoned blocks descendants even when the abandoned commit is already in their base",
+        "status": "open",
+        "priority": 1,
+        "assignee": null,
+        "tags": [
+          "mote-dx"
+        ],
+        "deps": []
+      },
+      "before_body_sha256": "db48e5dda97f71b26939e47d33bb6b955c87a4247517a9e990a740eb24af347f",
+      "title": "[later] mote-dx: ancestor_abandoned blocks descendants even when the abandoned commit is already in their base",
+      "status": "open",
+      "priority": 3,
+      "lane": "later",
+      "disposition": "retain",
+      "reason": "Outside the current preview path; preserve evidence and acceptance scope, resume only for a named consumer or demonstrated blocking defect.",
+      "dependency_ids": [],
+      "assignee": null
+    },
+    {
+      "id": "bd-01M17ZNXY6AS1CMBQJRH3JMNVX",
+      "before": {
+        "title": "align: CostBreakdown and five sibling types are forgeable via Mirror.fromProduct, so every AlignWire invariant is advisory outside package align",
+        "status": "open",
+        "priority": 1,
+        "assignee": null,
+        "tags": [],
+        "deps": []
+      },
+      "before_body_sha256": "01202da61c8b3c3a15daadbd027413fbc7fcead81660d2319d4445b712f407fb",
+      "title": "[maintenance] align: CostBreakdown and five sibling types are forgeable via Mirror.fromProduct, so every AlignWire invariant is advisory outside package align",
+      "status": "open",
+      "priority": 2,
+      "lane": "maintenance",
+      "disposition": "retain",
+      "reason": "Original six-type report predates sealing work; re-inventory every named type at the implementation SHA and probe from an external package before changing code. Retain unresolved holes only; do not repeat already-landed conversions. Mandatory for the surfaces exported as checked.",
+      "dependency_ids": [],
+      "assignee": null
+    },
+    {
+      "id": "bd-01M184XP908JX51S3ZYFX20HC7",
+      "before": {
+        "title": "Q5 owner-action list: four remaining dispositions (pyannote terms, MF2, FilmFestival REB, recall-corpus REB)",
+        "status": "open",
+        "priority": 1,
+        "assignee": "claude-storymodel4s",
+        "tags": [],
+        "deps": []
+      },
+      "before_body_sha256": "bf88bcf0e87f9145d059cbffe43c9df87e2950b42f4e794cacb4630c05ab8633",
+      "title": "[owner] Q5 owner-action list: four remaining dispositions (pyannote terms, MF2, FilmFestival REB, recall-corpus REB)",
+      "status": "open",
+      "priority": 2,
+      "lane": "owner",
+      "disposition": "retain",
+      "reason": "Owner/data decision retained only for its named downstream track; it does not gate the local preview.",
+      "dependency_ids": [],
+      "assignee": ""
+    },
+    {
+      "id": "bd-01M1890HYQTY50KM80EB3C2ZKH",
+      "before": {
+        "title": "mote-dx: only a candidate's proposer can retire it, so an expired proposer leaves a pending row that permanently blocks its own successor",
+        "status": "open",
+        "priority": 1,
+        "assignee": null,
+        "tags": [],
+        "deps": []
+      },
+      "before_body_sha256": "7cd347f05c66b45ec3225f44f509ebc88ab693e300a31df48d73eda544485380",
+      "title": "[later] mote-dx: only a candidate's proposer can retire it, so an expired proposer leaves a pending row that permanently blocks its own successor",
+      "status": "open",
+      "priority": 3,
+      "lane": "later",
+      "disposition": "retain",
+      "reason": "Outside the current preview path; preserve evidence and acceptance scope, resume only for a named consumer or demonstrated blocking defect.",
+      "dependency_ids": [],
+      "assignee": null
+    },
+    {
+      "id": "bd-01M19956MFSG7076QE4J66T7E9",
+      "before": {
+        "title": "supportWeight: an empty eligible set must not publish 'fully supported' -- external support is NotApplicable or its own type, not a Double",
+        "status": "doing",
+        "priority": 1,
+        "assignee": "codex-storymodel4s-scout",
+        "tags": [],
+        "deps": [
+          {
+            "kind": "blocks",
+            "parent": "bd-01M1D214VVRE118RTEQQ09P7SA"
+          },
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2TAC80YRK5JFNKTT7B7CAQN"
+          }
+        ]
+      },
+      "before_body_sha256": "6bb4141765dcf5a93da526c5b32a83397351f5ef25f09ee06edbf0f7f3b5ed26",
+      "title": "G1: honest support assessment before shared evidence and confidence",
+      "status": "open",
+      "priority": 1,
+      "lane": "next",
+      "disposition": "retain",
+      "reason": "Foundation prerequisite of shared local evidence and the preview. Baseline capture precedes this migration; remove the old D1B prerequisite. Retain typed external/empty-eligible NotApplicable semantics and full wire migration tests. No empty eligible set may advertise fully supported.",
+      "dependency_ids": [
+        "bd-01M2WVCEBHAZBKJQ0EB84EA4HV"
+      ],
+      "assignee": ""
+    },
+    {
+      "id": "bd-01M1998654XQRSNA6R16S2ABDQ",
+      "before": {
+        "title": "CLI: Unicode text to source and surface bundle now; semantic markup waits for Stage 1b",
+        "status": "doing",
+        "priority": 1,
+        "assignee": "codex-cli-vertical-slice",
+        "tags": [],
+        "deps": []
+      },
+      "before_body_sha256": "e25d3ab5c898093f229ad2514cfe7458bf25d471d13e7c012788f8e3db5011ea",
+      "title": "[maintenance] CLI: Unicode text to source and surface bundle now; semantic markup waits for Stage 1b",
+      "status": "open",
+      "priority": 2,
+      "lane": "maintenance",
+      "disposition": "retain",
+      "reason": "Retained with its original acceptance scope; recheck against current code before implementation or closure. Not a prerequisite for the annotation-assisted preview.",
+      "dependency_ids": [],
+      "assignee": ""
+    },
+    {
+      "id": "bd-01M199ABAG5SXR9C6Y0G4X6J2T",
+      "before": {
+        "title": "Amend movie time and mapping contract before C1",
+        "status": "doing",
+        "priority": 1,
+        "assignee": null,
+        "tags": [
+          "architecture",
+          "film"
+        ],
+        "deps": []
+      },
+      "before_body_sha256": "dbbb11a2789f34239f0594def5955e43974fbb8c030f0daeec6047aae2bd7fb7",
+      "title": "[maintenance] Amend movie time and mapping contract before C1",
+      "status": "open",
+      "priority": 2,
+      "lane": "maintenance",
+      "disposition": "retain",
+      "reason": "Core now has exact axes and mappings, but the six-distinction amendment and all listed mutation courts were not fully requalified here. Keep open; reconcile each against D1A S2 and the clock ticket. No automatic closure from type presence.",
+      "dependency_ids": [],
+      "assignee": null
+    },
+    {
+      "id": "bd-01M199WBM2YVZ3GVC2GA61TYCJ",
+      "before": {
+        "title": "EPIC: story output bundle + pure-HTML/CSS visualization spec (board consensus)",
+        "status": "open",
+        "priority": 1,
+        "assignee": null,
+        "tags": [
+          "epic",
+          "spec"
+        ],
+        "deps": []
+      },
+      "before_body_sha256": "ecc10866a197fa781ebe160106fa64dda02fc53c4a728406477c8453b2619f76",
+      "title": "[container] EPIC: story output bundle + pure-HTML/CSS visualization spec (board consensus)",
+      "status": "open",
+      "priority": 2,
+      "lane": "container",
+      "disposition": "retain",
+      "reason": "Nonblocking container, not a work reservation or an implementation dependency.",
+      "dependency_ids": [],
+      "assignee": null
+    },
+    {
+      "id": "bd-01M19BN8T85XTDT3Z9AJW4820S",
+      "before": {
+        "title": "ROLE: chief's deputy for derived state -- measure before the chief asserts",
+        "status": "doing",
+        "priority": 1,
+        "assignee": "codex-storymodel-new-engineer",
+        "tags": [
+          "governance",
+          "role"
+        ],
+        "deps": []
+      },
+      "before_body_sha256": "542e68ca0cff6906dac15d81c1b3cec22f25d89dee884f8bb73199067a770457",
+      "title": "ROLE: chief's deputy for derived state -- measure before the chief asserts",
+      "status": "closed",
+      "priority": 2,
+      "lane": "closed",
+      "disposition": "retired",
+      "reason": "Retired chief-deputy fleet role under AGENTS.md SD4. Scientific evidence duties remain on implementation/release tickets; no code fix claimed.",
+      "dependency_ids": [],
+      "assignee": ""
+    },
+    {
+      "id": "bd-01M19CK0DXBAQRWD6DSGN348SV",
+      "before": {
+        "title": "DESIGN: how to run a board of coding agents with mote -- derive what you can, expire what you cannot, classify your blockers",
+        "status": "open",
+        "priority": 1,
+        "assignee": null,
+        "tags": [
+          "design",
+          "governance"
+        ],
+        "deps": []
+      },
+      "before_body_sha256": "518f2bdc1d7bd943dd0d4a4779221cb479b8d9ea36831795c5d2d2b255933319",
+      "title": "DESIGN: how to run a board of coding agents with mote -- derive what you can, expire what you cannot, classify your blockers",
+      "status": "closed",
+      "priority": 3,
+      "lane": "closed",
+      "disposition": "retired",
+      "reason": "Retired fleet-board design work under single-developer mode. Reopen only if the owner restarts a fleet; no Mote upstream defect claimed fixed.",
+      "dependency_ids": [],
+      "assignee": null
+    },
+    {
+      "id": "bd-01M19FPY1EC5QNTW6SBG3QYT3R",
+      "before": {
+        "title": "DOCS: a human-facing documentation guide in Astro, and a tech writer to own it",
+        "status": "doing",
+        "priority": 1,
+        "assignee": null,
+        "tags": [
+          "docs",
+          "role"
+        ],
+        "deps": []
+      },
+      "before_body_sha256": "b6cf1747f574cff44f00e74ebda496f28c1d39770880f9d48cccbec328578933",
+      "title": "[release] DOCS: complete current reader journey and visual qualification",
+      "status": "open",
+      "priority": 2,
+      "lane": "release",
+      "disposition": "retain",
+      "reason": "Astro site exists and September 17 records executable examples. Remaining: current reader journey/claims and visual qualification; deployment is the release-infrastructure ticket. A fictitious tech-writer fleet seat is no longer required.",
+      "dependency_ids": [],
+      "assignee": null
+    },
+    {
+      "id": "bd-01M19G69RQCHMT2EMG11XFT4WX",
+      "before": {
+        "title": "INFRA: there is no CI -- every gate result in this repository is self-reported by the agent that wanted the merge",
+        "status": "open",
+        "priority": 1,
+        "assignee": null,
+        "tags": [
+          "infra"
+        ],
+        "deps": []
+      },
+      "before_body_sha256": "c78ed5e6ededb882fa9d02a6aac8e872093bd22ca8f52135551ee712f3040f1b",
+      "title": "G0: obtain an executed exact-SHA clean build and CI receipt",
+      "status": "open",
+      "priority": 0,
+      "lane": "foundation",
+      "disposition": "rescope",
+      "reason": "Historical successful local gates are retained as prior evidence, not a current CI pass.",
+      "dependency_ids": [
+        "bd-01M2TA2283FC7FSA2G7TJ1WSMN"
+      ],
+      "assignee": null
+    },
+    {
+      "id": "bd-01M19HHV5P0A0MCNB4ZS9222Z7",
+      "before": {
+        "title": "interview: the six membership-gated metrics have no conditional gate to abstain through",
+        "status": "open",
+        "priority": 1,
+        "assignee": null,
+        "tags": [
+          "interview"
+        ],
+        "deps": []
+      },
+      "before_body_sha256": "853235465152b4f3eed9e0f9de2f68e50f8f258a78e81b4e42c3fc822c092e3f",
+      "title": "[later] interview: the six membership-gated metrics have no conditional gate to abstain through",
+      "status": "open",
+      "priority": 3,
+      "lane": "later",
+      "disposition": "retain",
+      "reason": "Interview-specific scientific work remains valid but follows the mapping preview; reuse measurement policy when this work resumes.",
+      "dependency_ids": [],
+      "assignee": null
+    },
+    {
+      "id": "bd-01M19N0W937KVZCK78F6X57X1D",
+      "before": {
+        "title": "sweep: enumerate CONSTRUCTIBLE PRODUCT TYPES WITH INVARIANTS, not case classes -- 422 parameterised enum cases were never in any population",
+        "status": "open",
+        "priority": 1,
+        "assignee": null,
+        "tags": [
+          "align"
+        ],
+        "deps": []
+      },
+      "before_body_sha256": "f4f73023489329c0da5ac0fc583d786f2c8a2882d2a86363315254bfb72ec030",
+      "title": "[maintenance] sweep: enumerate CONSTRUCTIBLE PRODUCT TYPES WITH INVARIANTS, not case classes -- 422 parameterised enum cases were never in any population",
+      "status": "open",
+      "priority": 2,
+      "lane": "maintenance",
+      "disposition": "retain",
+      "reason": "Retained with its original acceptance scope; recheck against current code before implementation or closure. Not a prerequisite for the annotation-assisted preview.",
+      "dependency_ids": [],
+      "assignee": null
+    },
+    {
+      "id": "bd-01M19W21RG7WY4E7Q4BDR9K7MH",
+      "before": {
+        "title": "AGENTS.md: 1207 lines, +15% today, and its author broke two of its rules while writing it",
+        "status": "open",
+        "priority": 1,
+        "assignee": null,
+        "tags": [
+          "governance"
+        ],
+        "deps": []
+      },
+      "before_body_sha256": "3dc0af8c5afda1628ba6ea732d453fd3a08af502cb3412d25446590e567f2584",
+      "title": "[later] AGENTS.md: 1207 lines, +15% today, and its author broke two of its rules while writing it",
+      "status": "open",
+      "priority": 3,
+      "lane": "later",
+      "disposition": "retain",
+      "reason": "Outside the current preview path; preserve evidence and acceptance scope, resume only for a named consumer or demonstrated blocking defect.",
+      "dependency_ids": [],
+      "assignee": null
+    },
+    {
+      "id": "bd-01M1CGP2K4H93WM8CW5EFEPTJK",
+      "before": {
+        "title": "reference-scope: fail closed on declaration-free module API changes",
+        "status": "open",
+        "priority": 1,
+        "assignee": null,
+        "tags": [
+          "governance",
+          "tooling"
+        ],
+        "deps": [
+          {
+            "kind": "blocks",
+            "parent": "bd-01M1C5KCPBXA2NNC2KV89FW76F"
+          }
+        ]
+      },
+      "before_body_sha256": "7f7ffc0047a8e7dd9f2de5dcb435f8bd1181e1d56883c8c55117e023151b91de",
+      "title": "[maintenance] reference-scope: fail closed on declaration-free module API changes",
+      "status": "open",
+      "priority": 2,
+      "lane": "maintenance",
+      "disposition": "retain",
+      "reason": "Retained with its original acceptance scope; recheck against current code before implementation or closure. Not a prerequisite for the annotation-assisted preview.",
+      "dependency_ids": [
+        "bd-01M1C5KCPBXA2NNC2KV89FW76F"
+      ],
+      "assignee": null
+    },
+    {
+      "id": "bd-01M1D215EY4T5BR0VRJ694AMBQ",
+      "before": {
+        "title": "Characterize and govern Native HSMM 1-ULP posterior and flow divergence",
+        "status": "open",
+        "priority": 1,
+        "assignee": null,
+        "tags": [
+          "align",
+          "numerical",
+          "portability"
+        ],
+        "deps": []
+      },
+      "before_body_sha256": "07640def21735f0e2fcc0b3641d691005f6bd57e0b7a3a56f04d66a5d3e26ca3",
+      "title": "[maintenance] Characterize and govern Native HSMM 1-ULP posterior and flow divergence",
+      "status": "open",
+      "priority": 2,
+      "lane": "maintenance",
+      "disposition": "retain",
+      "reason": "Retained with its original acceptance scope; recheck against current code before implementation or closure. Not a prerequisite for the annotation-assisted preview.",
+      "dependency_ids": [],
+      "assignee": null
+    },
+    {
+      "id": "bd-01M1DA6NJXYT4NEA18745FM3KY",
+      "before": {
+        "title": "P0 align: bind HsmmResult totals to an admitted cost-model invocation receipt",
+        "status": "open",
+        "priority": 1,
+        "assignee": null,
+        "tags": [
+          "align",
+          "calibration",
+          "p0",
+          "provenance"
+        ],
+        "deps": [
+          {
+            "kind": "blocks",
+            "parent": "bd-01M19956MFSG7076QE4J66T7E9"
+          },
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2TACM78289S4TECE91GT5K2"
+          }
+        ]
+      },
+      "before_body_sha256": "850b79f48000c778964e7c0c144e60b9128604e430553e1ba98c4a9693dabe2c",
+      "title": "[next] P0 align: bind HsmmResult totals to an admitted cost-model invocation receipt",
+      "status": "open",
+      "priority": 1,
+      "lane": "next",
+      "disposition": "rescope",
+      "reason": "Preserve custom-cost authentication protocol and recomputable-default-total acceptance; it gates invocation-authenticated/calibrated HSMM claims. Strict reference uses a bounded registered checked producer; unknown custom provenance must refuse reference compatibility. No universal authentication subsystem required before preview.",
+      "dependency_ids": [
+        "bd-01M19956MFSG7076QE4J66T7E9",
+        "bd-01M2TACM78289S4TECE91GT5K2"
+      ],
+      "assignee": null
+    },
+    {
+      "id": "bd-01M2TA0X79Y4BQZP0B6AT919C9",
+      "before": {
+        "title": "OWNER: people and protocol approval for second human codings (human ceiling)",
+        "status": "open",
+        "priority": 1,
+        "assignee": null,
+        "tags": [
+          "human-ceiling",
+          "mapper-plan",
+          "owner-decision",
+          "phase1b"
+        ],
+        "deps": []
+      },
+      "before_body_sha256": "8165b452a921cbc3625677f9a8a71e67c4734a7ba8bda338c97fa91120cb7af4",
+      "title": "OWNER: people and protocol approval for second human codings (human ceiling)",
+      "status": "open",
+      "priority": 2,
+      "lane": "owner",
+      "disposition": "retain",
+      "reason": "Owner/data decision retained only for its named downstream track; it does not gate the local preview.",
+      "dependency_ids": [],
+      "assignee": null
+    },
+    {
+      "id": "bd-01M2TA1P0GXBHRF24W0VE7B66D",
+      "before": {
+        "title": "OWNER: scope decision P1 at or before the Phase 1a checkpoint (keep ruling E, or adopt P1a / P1b)",
+        "status": "open",
+        "priority": 1,
+        "assignee": null,
+        "tags": [
+          "checkpoint",
+          "film-route",
+          "mapper-plan",
+          "owner-decision"
+        ],
+        "deps": []
+      },
+      "before_body_sha256": "f18f8943b20c4a83b16c63f72b031384c448d47ae82b6e4cc8ada9be99913bff",
+      "title": "[later] Optional scope change P1 (parked; ruling E remains governing)",
+      "status": "open",
+      "priority": 3,
+      "lane": "later",
+      "disposition": "retain",
+      "reason": "P1 is an optional future scope reduction, not a pending blocker. Ruling E governs this plan; no request to re-decide it is needed. Reopen active decision only if the owner explicitly proposes changing stable film scope.",
+      "dependency_ids": [],
+      "assignee": null
+    },
+    {
+      "id": "bd-01M2TA2283FC7FSA2G7TJ1WSMN",
+      "before": {
+        "title": "OWNER: push main to origin (about 75 local commits) and choose a CI route",
+        "status": "open",
+        "priority": 1,
+        "assignee": null,
+        "tags": [
+          "infra",
+          "mapper-plan",
+          "owner-decision",
+          "phase0"
+        ],
+        "deps": []
+      },
+      "before_body_sha256": "4483fdde963de0f2f0d70e55224b1355eed77f1f15ac4c8799f4a6974bba81a6",
+      "title": "OWNER: choose the CI account or runner route (push already complete)",
+      "status": "open",
+      "priority": 1,
+      "lane": "owner",
+      "disposition": "rescope",
+      "reason": "Operative scope and acceptance criteria replaced by the bounded current delivery contract.",
+      "dependency_ids": [],
+      "assignee": null
+    },
+    {
+      "id": "bd-01M2TA2TWN5QS8PT01VW7JX234",
+      "before": {
+        "title": "Phase 0: free disk by removing merged worktrees and redundant clones (owner OK required first)",
+        "status": "open",
+        "priority": 1,
+        "assignee": null,
+        "tags": [
+          "hygiene",
+          "mapper-plan",
+          "phase0"
+        ],
+        "deps": [
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2TA2EMFCWRKXK6QJHGV702Q"
+          }
+        ]
+      },
+      "before_body_sha256": "421f0ccc00f74af483265a3c580a8ab44b3f5683e852c5931456b9235864a45b",
+      "title": "[maintenance] Phase 0: free disk by removing merged worktrees and redundant clones (owner OK required first)",
+      "status": "open",
+      "priority": 2,
+      "lane": "maintenance",
+      "disposition": "retain",
+      "reason": "Retained with its original acceptance scope; recheck against current code before implementation or closure. Not a prerequisite for the annotation-assisted preview.",
+      "dependency_ids": [
+        "bd-01M2TA2EMFCWRKXK6QJHGV702Q"
+      ],
+      "assignee": null
+    },
+    {
+      "id": "bd-01M2TA3KKCFS707G2XJ9TS7ZCJ",
+      "before": {
+        "title": "Phase 0: correct false and overstated claims in README and the recall-study docs",
+        "status": "open",
+        "priority": 1,
+        "assignee": null,
+        "tags": [
+          "docs",
+          "mapper-plan",
+          "phase0"
+        ],
+        "deps": []
+      },
+      "before_body_sha256": "55078f2a7ad1b0e50c0e90da24145c1ed8efcf03e582f4819684c6ca90dc628c",
+      "title": "[foundation] Phase 0: correct false and overstated claims in README and the recall-study docs",
+      "status": "open",
+      "priority": 1,
+      "lane": "foundation",
+      "disposition": "rescope",
+      "reason": "Correct active claims, including ClockRepair production-caller and RecallOrderControl shuffle-as-bias-correction sentences. Preserve historical outputs and label reconstruction vs reference honestly.",
+      "dependency_ids": [],
+      "assignee": null
+    },
+    {
+      "id": "bd-01M2TA3ZEEGAE07PEVDQR94HX5",
+      "before": {
+        "title": "Phase 0: make the checkAll alias run correctness before formatting",
+        "status": "open",
+        "priority": 1,
+        "assignee": null,
+        "tags": [
+          "build",
+          "mapper-plan",
+          "phase0"
+        ],
+        "deps": []
+      },
+      "before_body_sha256": "c48c55e0ac184fa816365254fd06e589a5965b17ca64b9d21795ba928db626dc",
+      "title": "[maintenance] Phase 0: make the checkAll alias run correctness before formatting",
+      "status": "open",
+      "priority": 2,
+      "lane": "maintenance",
+      "disposition": "retain",
+      "reason": "Retained with its original acceptance scope; recheck against current code before implementation or closure. Not a prerequisite for the annotation-assisted preview.",
+      "dependency_ids": [],
+      "assignee": null
+    },
+    {
+      "id": "bd-01M2TA7BM74N2WKAQJA5EA4X2R",
+      "before": {
+        "title": "Phase 1a: hosted arms H1 (frontier model) and J1 (Jev), only after the owner's hosted-API decision",
+        "status": "open",
+        "priority": 1,
+        "assignee": null,
+        "tags": [
+          "hosted-model",
+          "llm",
+          "mapper-plan",
+          "phase1a"
+        ],
+        "deps": [
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2TA0G1VSRQ992HJFWP13ZCM"
+          },
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2TA6ZHJGYPCYQBAN15PFZ0D"
+          }
+        ]
+      },
+      "before_body_sha256": "19b121aab91f21001b117722190da1fba7efe11f10579e6df7e90f6e70b36b72",
+      "title": "[research] Phase 1a: hosted arms H1 (frontier model) and J1 (Jev), only after the owner's hosted-API decision",
+      "status": "open",
+      "priority": 2,
+      "lane": "research",
+      "disposition": "retain",
+      "reason": "Research comparison retained; frozen exposure/eligibility rules apply. Not an engineering prerequisite or proof of behavioral recovery.",
+      "dependency_ids": [
+        "bd-01M2TA0G1VSRQ992HJFWP13ZCM",
+        "bd-01M2TA6ZHJGYPCYQBAN15PFZ0D"
+      ],
+      "assignee": null
+    },
+    {
+      "id": "bd-01M2TA83GA06RRHR193AV3XYA5",
+      "before": {
+        "title": "Phase 1b: task, track and estimand fields in the corpus descriptor (schema only)",
+        "status": "open",
+        "priority": 1,
+        "assignee": null,
+        "tags": [
+          "benchmark",
+          "descriptor",
+          "mapper-plan",
+          "phase1b"
+        ],
+        "deps": []
+      },
+      "before_body_sha256": "813ac811c1f8c9ccbe0d3208510c19d051fa27c61863474b07c03f53e12467a9",
+      "title": "[research] Phase 1b: task, track and estimand fields in the corpus descriptor (schema only)",
+      "status": "open",
+      "priority": 2,
+      "lane": "research",
+      "disposition": "retain",
+      "reason": "Research comparison retained; frozen exposure/eligibility rules apply. Not an engineering prerequisite or proof of behavioral recovery.",
+      "dependency_ids": [],
+      "assignee": null
+    },
+    {
+      "id": "bd-01M2TA8FJYASVK1WNBQZ26ASTG",
+      "before": {
+        "title": "Phase 1b: benchmark v1 leaderboards regenerated by one command",
+        "status": "open",
+        "priority": 1,
+        "assignee": null,
+        "tags": [
+          "benchmark",
+          "mapper-plan",
+          "phase1b"
+        ],
+        "deps": [
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2TA4QG638M6ZH8Q23CAK401"
+          },
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2TA53FEKFQY7R4XC48BZMR8"
+          },
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2TA7QJW98EJ9JQ3T447HZK7"
+          },
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2TA83GA06RRHR193AV3XYA5"
+          }
+        ]
+      },
+      "before_body_sha256": "416ca40c1ee089d88707cc9162aeb91caaa3c174208142f56372ad4d3028f6e8",
+      "title": "[research] Phase 1b: benchmark v1 leaderboards regenerated by one command",
+      "status": "open",
+      "priority": 2,
+      "lane": "research",
+      "disposition": "retain",
+      "reason": "Research comparison retained; frozen exposure/eligibility rules apply. Not an engineering prerequisite or proof of behavioral recovery.",
+      "dependency_ids": [
+        "bd-01M2TA4QG638M6ZH8Q23CAK401",
+        "bd-01M2TA53FEKFQY7R4XC48BZMR8",
+        "bd-01M2TA7QJW98EJ9JQ3T447HZK7",
+        "bd-01M2TA83GA06RRHR193AV3XYA5"
+      ],
+      "assignee": null
+    },
+    {
+      "id": "bd-01M2TA97MQMGHTPQK3VYRXW9HG",
+      "before": {
+        "title": "Phase 1b: evaluate RecallSegmenter against Friends development gold; add a gold-unit oracle row",
+        "status": "open",
+        "priority": 1,
+        "assignee": null,
+        "tags": [
+          "benchmark",
+          "mapper-plan",
+          "phase1b",
+          "segmentation"
+        ],
+        "deps": [
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2TA4QG638M6ZH8Q23CAK401"
+          },
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2TA5FB4ATF9QS9ZA9MDJNE2"
+          }
+        ]
+      },
+      "before_body_sha256": "a9e02b34185388362630309216be83c2c8aa6fcfff4bcb011232375437964b0b",
+      "title": "[research] Phase 1b: evaluate RecallSegmenter against Friends development gold; add a gold-unit oracle row",
+      "status": "open",
+      "priority": 2,
+      "lane": "research",
+      "disposition": "retain",
+      "reason": "Research comparison retained; frozen exposure/eligibility rules apply. Not an engineering prerequisite or proof of behavioral recovery.",
+      "dependency_ids": [
+        "bd-01M2TA4QG638M6ZH8Q23CAK401",
+        "bd-01M2TA5FB4ATF9QS9ZA9MDJNE2"
+      ],
+      "assignee": null
+    },
+    {
+      "id": "bd-01M2TA9KKVFWPQ74HN90P0SM68",
+      "before": {
+        "title": "Phase 1b: human ceiling -- second codings of sampled development units",
+        "status": "open",
+        "priority": 1,
+        "assignee": null,
+        "tags": [
+          "benchmark",
+          "human-ceiling",
+          "mapper-plan",
+          "phase1b"
+        ],
+        "deps": [
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2TA0X79Y4BQZP0B6AT919C9"
+          },
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2TA4QG638M6ZH8Q23CAK401"
+          }
+        ]
+      },
+      "before_body_sha256": "757dcac6a57355dc54999ca381acd0a138d5acc7fe9cafcd29df69fa2cebf99b",
+      "title": "G3: independent human coding and organization-recovery study",
+      "status": "open",
+      "priority": 2,
+      "lane": "validation",
+      "disposition": "rescope",
+      "reason": "Extend the existing second-coding study to organization recovery; freeze sampling/tolerances before reads, include real reverse/revisit and repeated-occurrence recalls, permit ambiguity/multiple occurrences, no chronology-enforcement instruction. Measure candidate/localization/specificity and transition/group-effect recovery; independent annotation is not automatically truth.",
+      "dependency_ids": [
+        "bd-01M2TA0X79Y4BQZP0B6AT919C9",
+        "bd-01M2TA4QG638M6ZH8Q23CAK401"
+      ],
+      "assignee": null
+    },
+    {
+      "id": "bd-01M2TA9ZK64GTG3526RMNWNHCT",
+      "before": {
+        "title": "Phase 1b: the within-scene human lane (about 90 minutes of one person's answers)",
+        "status": "open",
+        "priority": 1,
+        "assignee": null,
+        "tags": [
+          "human-ceiling",
+          "mapper-plan",
+          "needs-human",
+          "phase1b"
+        ],
+        "deps": []
+      },
+      "before_body_sha256": "2534742b6952e8cc5184035428e9639df9e3f7769e813284bbf9bcf90e4168f6",
+      "title": "[research] Phase 1b: the within-scene human lane (about 90 minutes of one person's answers)",
+      "status": "open",
+      "priority": 2,
+      "lane": "research",
+      "disposition": "retain",
+      "reason": "Research comparison retained; frozen exposure/eligibility rules apply. Not an engineering prerequisite or proof of behavioral recovery.",
+      "dependency_ids": [],
+      "assignee": null
+    },
+    {
+      "id": "bd-01M2TAABPTGFSQMNG0G9G1D9XM",
+      "before": {
+        "title": "Phase 1b: published comparator -- Heusser, Fitzpatrick & Manning (2021) on Sherlock",
+        "status": "open",
+        "priority": 1,
+        "assignee": null,
+        "tags": [
+          "baselines",
+          "benchmark",
+          "mapper-plan",
+          "phase1b"
+        ],
+        "deps": [
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2TA5FB4ATF9QS9ZA9MDJNE2"
+          }
+        ]
+      },
+      "before_body_sha256": "e533fb9788c0cdb167b345499d74ef4911d67d398cc5c164b9defffba2d4434d",
+      "title": "[research] Phase 1b: published comparator -- Heusser, Fitzpatrick & Manning (2021) on Sherlock",
+      "status": "open",
+      "priority": 2,
+      "lane": "research",
+      "disposition": "retain",
+      "reason": "Research comparison retained; frozen exposure/eligibility rules apply. Not an engineering prerequisite or proof of behavioral recovery.",
+      "dependency_ids": [
+        "bd-01M2TA5FB4ATF9QS9ZA9MDJNE2"
+      ],
+      "assignee": null
+    },
+    {
+      "id": "bd-01M2TAAQNS7RCCBBM8WFFZF6ZZ",
+      "before": {
+        "title": "Phase 1b: repair the instruments -- risk-coverage on the emitted decision; retire agreement as a decoder judge",
+        "status": "open",
+        "priority": 1,
+        "assignee": null,
+        "tags": [
+          "benchmark",
+          "instruments",
+          "mapper-plan",
+          "phase1b"
+        ],
+        "deps": [
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2TA5FB4ATF9QS9ZA9MDJNE2"
+          }
+        ]
+      },
+      "before_body_sha256": "f4099058ec650576fcaac210ca31c8cdc4d41f3fdfdfed20e5780f9fe2a62591",
+      "title": "[research] Phase 1b: repair the instruments -- risk-coverage on the emitted decision; retire agreement as a decoder judge",
+      "status": "open",
+      "priority": 2,
+      "lane": "research",
+      "disposition": "retain",
+      "reason": "Research comparison retained; frozen exposure/eligibility rules apply. Not an engineering prerequisite or proof of behavioral recovery.",
+      "dependency_ids": [
+        "bd-01M2TA5FB4ATF9QS9ZA9MDJNE2"
+      ],
+      "assignee": null
+    },
+    {
+      "id": "bd-01M2TAB3QD2YXSPR8THYRGFBKS",
+      "before": {
+        "title": "D1A-types S0: text parity baseline (compile, codec, view pins)",
+        "status": "open",
+        "priority": 1,
+        "assignee": null,
+        "tags": [
+          "d1a",
+          "mapper-plan",
+          "mapper-slice",
+          "parity",
+          "phase2"
+        ],
+        "deps": []
+      },
+      "before_body_sha256": "63b6a9ede11e5e6020ab576b0f58c3e139dacdc3edcdd2150c756d1c40820b06",
+      "title": "[foundation] D1A-types S0: text parity baseline (compile, codec, view pins)",
+      "status": "open",
+      "priority": 0,
+      "lane": "foundation",
+      "disposition": "rescope",
+      "reason": "Text compiler/model/codec/view parity pins are independent of the benchmark campaign and start now; retain approved S0 mutations.",
+      "dependency_ids": [],
+      "assignee": null
+    },
+    {
+      "id": "bd-01M2TABFW72D8WWQF481SD37KW",
+      "before": {
+        "title": "D1A-types S1: ADR 0007 amendment (rulings, vocabulary, canonical form, identity)",
+        "status": "open",
+        "priority": 1,
+        "assignee": null,
+        "tags": [
+          "adr",
+          "d1a",
+          "mapper-plan",
+          "mapper-slice",
+          "phase2"
+        ],
+        "deps": [
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2TAB3QD2YXSPR8THYRGFBKS"
+          }
+        ]
+      },
+      "before_body_sha256": "13b0434e807f8480c38550588bf5772db4c83cbf6894c8a14a1e9598f70a61c4",
+      "title": "[film] D1A-types S1: ADR 0007 amendment (rulings, vocabulary, canonical form, identity)",
+      "status": "open",
+      "priority": 1,
+      "lane": "film",
+      "disposition": "retain",
+      "reason": "Preserved approved film-library scope. Follow S0-S4c order and exact text parity; the earlier annotation preview does not close this ticket.",
+      "dependency_ids": [
+        "bd-01M2TAB3QD2YXSPR8THYRGFBKS"
+      ],
+      "assignee": null
+    },
+    {
+      "id": "bd-01M2TABVXSM72M9DD0SNB6GZ11",
+      "before": {
+        "title": "D1A-types S2: core substrate -- sealed atlas, EvidenceSupport refusals, TypedSupport, PrimaryProjection, evidence-support/v1",
+        "status": "open",
+        "priority": 1,
+        "assignee": null,
+        "tags": [
+          "core",
+          "d1a",
+          "mapper-plan",
+          "mapper-slice",
+          "phase2"
+        ],
+        "deps": [
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2TABFW72D8WWQF481SD37KW"
+          }
+        ]
+      },
+      "before_body_sha256": "98f26ba9cc3b00be8cb90e955b41dbd318b00eabbe0372f09319422aaa129299",
+      "title": "[film] D1A-types S2: core substrate -- sealed atlas, EvidenceSupport refusals, TypedSupport, PrimaryProjection, evidence-support/v1",
+      "status": "open",
+      "priority": 1,
+      "lane": "film",
+      "disposition": "retain",
+      "reason": "Preserved approved film-library scope. Follow S0-S4c order and exact text parity; the earlier annotation preview does not close this ticket.",
+      "dependency_ids": [
+        "bd-01M2TABFW72D8WWQF481SD37KW"
+      ],
+      "assignee": null
+    },
+    {
+      "id": "bd-01M2TAC80YRK5JFNKTT7B7CAQN",
+      "before": {
+        "title": "Phase 2: D1B signatures -- typed source view with exact playback intervals (replaces the joined-text surrogate)",
+        "status": "open",
+        "priority": 1,
+        "assignee": null,
+        "tags": [
+          "align",
+          "d1b",
+          "mapper-plan",
+          "mapper-slice",
+          "phase2"
+        ],
+        "deps": [
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2TABVXSM72M9DD0SNB6GZ11"
+          }
+        ]
+      },
+      "before_body_sha256": "d1169c0275cb3a192b5cd096779997312b68a5169d180c9c9b674371d312d72b",
+      "title": "[film] Phase 2: D1B signatures -- typed source view with exact playback intervals (replaces the joined-text surrogate)",
+      "status": "open",
+      "priority": 1,
+      "lane": "film",
+      "disposition": "rescope",
+      "reason": "Full public SourceView/HsmmResult signature migration follows S4c, not S2 alone; coordinate with compiler types rather than duplicating them. Preview uses checked anchored targets before this migration. Sherlock parity uses the admitted clock path; current support wire semantics govern.",
+      "dependency_ids": [
+        "bd-01M2TAGDJ5F0FEPC3XPWVDSWDH",
+        "bd-01M2WTGF981AY7RCN8QC42JSPT"
+      ],
+      "assignee": null
+    },
+    {
+      "id": "bd-01M2TACM78289S4TECE91GT5K2",
+      "before": {
+        "title": "Phase 2: typed scoring-channel interface with receipts and recorded-response replay",
+        "status": "open",
+        "priority": 1,
+        "assignee": null,
+        "tags": [
+          "align",
+          "mapper-plan",
+          "mapper-slice",
+          "phase2"
+        ],
+        "deps": [
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2TAC80YRK5JFNKTT7B7CAQN"
+          }
+        ]
+      },
+      "before_body_sha256": "de7ef5272f70a2dd7db037b1305ec7c943935e244dcaeff7999189c7405d543a",
+      "title": "G1: extract shared local mapping evidence and receipted scoring channels",
+      "status": "open",
+      "priority": 1,
+      "lane": "next",
+      "disposition": "rescope",
+      "reason": "Removes D1B/benchmark-checkpoint prerequisite: this extraction uses existing checked target support; full film signature migration remains D1B.",
+      "dependency_ids": [
+        "bd-01M2WVENSB0P955Y0B603CC20Y",
+        "bd-01M19956MFSG7076QE4J66T7E9"
+      ],
+      "assignee": null
+    },
+    {
+      "id": "bd-01M2TAD04SR823TQVG9VPNH6R3",
+      "before": {
+        "title": "Phase 2: declared, versioned decoders in the library (MonotoneScene generalised; fill off by default)",
+        "status": "open",
+        "priority": 1,
+        "assignee": null,
+        "tags": [
+          "align",
+          "mapper-plan",
+          "mapper-slice",
+          "phase2"
+        ],
+        "deps": [
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2TA83GA06RRHR193AV3XYA5"
+          },
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2TAC80YRK5JFNKTT7B7CAQN"
+          }
+        ]
+      },
+      "before_body_sha256": "516cb0521273cc3d1a68d3a31bb988e8cfaadeb7bad87d2b3a7ac5351cc96dbb",
+      "title": "G1: extract named structured reconstruction and decision policies",
+      "status": "open",
+      "priority": 1,
+      "lane": "next",
+      "disposition": "rescope",
+      "reason": "Supersedes generic decoder extraction only; H2 is later reconstruction research.",
+      "dependency_ids": [
+        "bd-01M2TACM78289S4TECE91GT5K2"
+      ],
+      "assignee": null
+    },
+    {
+      "id": "bd-01M2TADC4VKSDZ2S9SXETH2MYM",
+      "before": {
+        "title": "Phase 2: recall-map command -- contract, per-unit outcomes, exit codes",
+        "status": "open",
+        "priority": 1,
+        "assignee": null,
+        "tags": [
+          "cli",
+          "mapper-plan",
+          "mapper-slice",
+          "phase2",
+          "usability"
+        ],
+        "deps": [
+          {
+            "kind": "blocks",
+            "parent": "bd-01M19956MFSG7076QE4J66T7E9"
+          },
+          {
+            "kind": "blocks",
+            "parent": "bd-01M1DA6NJXYT4NEA18745FM3KY"
+          },
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2TA83GA06RRHR193AV3XYA5"
+          },
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2TACM78289S4TECE91GT5K2"
+          },
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2TAD04SR823TQVG9VPNH6R3"
+          }
+        ]
+      },
+      "before_body_sha256": "21bdf1beb2b756309db140a2b187e568eef910c034433e394217f1b773cc5159",
+      "title": "G2: typed mapping facade, explicit config and safe batch publication",
+      "status": "open",
+      "priority": 1,
+      "lane": "next",
+      "disposition": "rescope",
+      "reason": "The checked record/codec is the records ticket; full HSMM invocation authority stays on the existing invocation ticket.",
+      "dependency_ids": [
+        "bd-01M2TAD04SR823TQVG9VPNH6R3",
+        "bd-01M2WVFV2WGF5BVQHX7JTYYWRH",
+        "bd-01M2WVH1DC8ZPDC992G4MX3TXG"
+      ],
+      "assignee": null
+    },
+    {
+      "id": "bd-01M2TADR4KM1S4J46HK2C3BN76",
+      "before": {
+        "title": "Phase 2: recall-map HTML report and benchmark migration; retire run-arm.sh",
+        "status": "open",
+        "priority": 1,
+        "assignee": null,
+        "tags": [
+          "benchmark",
+          "cli",
+          "mapper-plan",
+          "mapper-slice",
+          "phase2"
+        ],
+        "deps": [
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2TA8FJYASVK1WNBQZ26ASTG"
+          },
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2TADC4VKSDZ2S9SXETH2MYM"
+          }
+        ]
+      },
+      "before_body_sha256": "8850a8935b654f7e74490918484a141d03eb5eb7b3d799ff63fd9bb74c832d9b",
+      "title": "[release] Phase 2: recall-map HTML report and benchmark migration; retire run-arm.sh",
+      "status": "open",
+      "priority": 2,
+      "lane": "release",
+      "disposition": "rescope",
+      "reason": "HTML/migration remains useful after the table/API preview. Do not delete historical serializers or run-arm.sh until each historical arm has a replay/parity replacement; no preview dependency on viewer or benchmark campaign.",
+      "dependency_ids": [
+        "bd-01M2TA8FJYASVK1WNBQZ26ASTG",
+        "bd-01M2TADC4VKSDZ2S9SXETH2MYM"
+      ],
+      "assignee": null
+    },
+    {
+      "id": "bd-01M2TAE44D7S8T0RHGH6FWWVP8",
+      "before": {
+        "title": "Phase 2: label-producing provider interface, and the R1 winner behind it (n/a under R2)",
+        "status": "open",
+        "priority": 1,
+        "assignee": null,
+        "tags": [
+          "llm",
+          "mapper-plan",
+          "mapper-slice",
+          "phase2"
+        ],
+        "deps": [
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2TA7QJW98EJ9JQ3T447HZK7"
+          }
+        ]
+      },
+      "before_body_sha256": "4d9ce081193b0b63078a94dd60f9002e244982f737915537cee110b30e00cfe0",
+      "title": "[maintenance] Phase 2: label-producing provider interface, and the R1 winner behind it (n/a under R2)",
+      "status": "open",
+      "priority": 2,
+      "lane": "maintenance",
+      "disposition": "retain",
+      "reason": "Retained with its original acceptance scope; recheck against current code before implementation or closure. Not a prerequisite for the annotation-assisted preview.",
+      "dependency_ids": [
+        "bd-01M2TA7QJW98EJ9JQ3T447HZK7"
+      ],
+      "assignee": null
+    },
+    {
+      "id": "bd-01M2TAEG8RBTA6DQK474W4GEDR",
+      "before": {
+        "title": "Phase 2: LLM score-contract pilot (a separately counted development arm)",
+        "status": "open",
+        "priority": 1,
+        "assignee": null,
+        "tags": [
+          "llm",
+          "mapper-plan",
+          "phase2"
+        ],
+        "deps": [
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2TA7QJW98EJ9JQ3T447HZK7"
+          },
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2TACM78289S4TECE91GT5K2"
+          }
+        ]
+      },
+      "before_body_sha256": "05269977c9c6cb678fd1e97bf7fb3e46919303446bb6aa5bf8c8b81f1e673c98",
+      "title": "[maintenance] Phase 2: LLM score-contract pilot (a separately counted development arm)",
+      "status": "open",
+      "priority": 2,
+      "lane": "maintenance",
+      "disposition": "retain",
+      "reason": "Retained with its original acceptance scope; recheck against current code before implementation or closure. Not a prerequisite for the annotation-assisted preview.",
+      "dependency_ids": [
+        "bd-01M2TA7QJW98EJ9JQ3T447HZK7",
+        "bd-01M2TACM78289S4TECE91GT5K2"
+      ],
+      "assignee": null
+    },
+    {
+      "id": "bd-01M2TAEW794XCR7D2HZJFNXVJY",
+      "before": {
+        "title": "Phase 2: reliability contract for the final emitted decision",
+        "status": "open",
+        "priority": 1,
+        "assignee": null,
+        "tags": [
+          "confidence",
+          "mapper-plan",
+          "mapper-slice",
+          "phase2"
+        ],
+        "deps": [
+          {
+            "kind": "blocks",
+            "parent": "bd-01M19956MFSG7076QE4J66T7E9"
+          },
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2TAAQNS7RCCBBM8WFFZF6ZZ"
+          },
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2TADC4VKSDZ2S9SXETH2MYM"
+          }
+        ]
+      },
+      "before_body_sha256": "5ba3fc32ed03ae294cfe2f730860fa84f0d7be6ce28fc149c699041ceed77db7",
+      "title": "[validation] Phase 2: reliability contract for the final emitted decision",
+      "status": "open",
+      "priority": 2,
+      "lane": "validation",
+      "disposition": "rescope",
+      "reason": "Retain empirical fit/evaluation separation and event-specific confidence. Bind context, candidate, decoder, fill, grain, population and projection policies; unit calibration does not certify transitions. An uncalibrated release remains allowed; any certified profile waits for this evidence.",
+      "dependency_ids": [
+        "bd-01M19956MFSG7076QE4J66T7E9",
+        "bd-01M2TAAQNS7RCCBBM8WFFZF6ZZ",
+        "bd-01M2TADC4VKSDZ2S9SXETH2MYM"
+      ],
+      "assignee": null
+    },
+    {
+      "id": "bd-01M2TAH5VA3WJBGR8WKAAH14Z8",
+      "before": {
+        "title": "Phase 3: development-climb protocol and the exposure / read-count ledgers",
+        "status": "open",
+        "priority": 1,
+        "assignee": null,
+        "tags": [
+          "ledger",
+          "mapper-plan",
+          "phase3",
+          "protocol"
+        ],
+        "deps": [
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2TA7QJW98EJ9JQ3T447HZK7"
+          }
+        ]
+      },
+      "before_body_sha256": "4dde1090580530c5c94d44cfa8c64b8c0a284a2604ce348ef4d111a0f4107a7d",
+      "title": "[research] Phase 3: development-climb protocol and the exposure / read-count ledgers",
+      "status": "open",
+      "priority": 2,
+      "lane": "research",
+      "disposition": "retain",
+      "reason": "Research comparison retained; frozen exposure/eligibility rules apply. Not an engineering prerequisite or proof of behavioral recovery.",
+      "dependency_ids": [
+        "bd-01M2TA7QJW98EJ9JQ3T447HZK7"
+      ],
+      "assignee": null
+    },
+    {
+      "id": "bd-01M2TAHHXRTZPV9JWCKBXT6KVE",
+      "before": {
+        "title": "Phase 3 H1: language-model scoring through the decode",
+        "status": "open",
+        "priority": 1,
+        "assignee": null,
+        "tags": [
+          "hypothesis",
+          "llm",
+          "mapper-plan",
+          "phase3"
+        ],
+        "deps": [
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2TADR4KM1S4J46HK2C3BN76"
+          },
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2TAEG8RBTA6DQK474W4GEDR"
+          },
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2TAH5VA3WJBGR8WKAAH14Z8"
+          }
+        ]
+      },
+      "before_body_sha256": "413c98b1fb2ac766b98687c46e799a5ffcc612dd5d8456a42f69dacd3d92fb28",
+      "title": "[research] Phase 3 H1: language-model scoring through the decode",
+      "status": "open",
+      "priority": 2,
+      "lane": "research",
+      "disposition": "retain",
+      "reason": "Research comparison retained; frozen exposure/eligibility rules apply. Not an engineering prerequisite or proof of behavioral recovery.",
+      "dependency_ids": [
+        "bd-01M2TADR4KM1S4J46HK2C3BN76",
+        "bd-01M2TAEG8RBTA6DQK474W4GEDR",
+        "bd-01M2TAH5VA3WJBGR8WKAAH14Z8"
+      ],
+      "assignee": null
+    },
+    {
+      "id": "bd-01M2TAHYA8QWB9QXBX759KR82N",
+      "before": {
+        "title": "Phase 3 H2: transfer-safe decoding",
+        "status": "open",
+        "priority": 1,
+        "assignee": null,
+        "tags": [
+          "decoder",
+          "hypothesis",
+          "mapper-plan",
+          "phase3"
+        ],
+        "deps": [
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2TAD04SR823TQVG9VPNH6R3"
+          },
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2TADR4KM1S4J46HK2C3BN76"
+          },
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2TAH5VA3WJBGR8WKAAH14Z8"
+          }
+        ]
+      },
+      "before_body_sha256": "3f317c5aeec4356ecb5f44364f943b7359c2cb7471cb7c427963be5701b92af4",
+      "title": "[research] Phase 3 H2: transfer-safe decoding",
+      "status": "open",
+      "priority": 2,
+      "lane": "research",
+      "disposition": "rescope",
+      "reason": "Reconstruction optimization only. A participant-adaptive order penalty cannot turn its own decoded organization into reference measurement. Compare reference/reconstruction on fixed evidence and report recovery as well as localization; sensitivity is not bias correction.",
+      "dependency_ids": [
+        "bd-01M2TAD04SR823TQVG9VPNH6R3",
+        "bd-01M2TADR4KM1S4J46HK2C3BN76",
+        "bd-01M2TAH5VA3WJBGR8WKAAH14Z8"
+      ],
+      "assignee": null
+    },
+    {
+      "id": "bd-01M2TAJABHFWN5ZDYNST15Y9G5",
+      "before": {
+        "title": "Phase 3 H3: coder-independent inputs (dialogue, captions, crowd) and the independence ablation",
+        "status": "open",
+        "priority": 1,
+        "assignee": null,
+        "tags": [
+          "hypothesis",
+          "mapper-plan",
+          "phase3",
+          "tracks"
+        ],
+        "deps": [
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2TA4BFRMK8WNA79PPRT8YCD"
+          },
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2TA83GA06RRHR193AV3XYA5"
+          },
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2TADR4KM1S4J46HK2C3BN76"
+          },
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2TAH5VA3WJBGR8WKAAH14Z8"
+          }
+        ]
+      },
+      "before_body_sha256": "47933d674e74802ad5e0261440e666f8f24c3424a2bcdd5ed6260a5fe973bbba",
+      "title": "[research] Phase 3 H3: coder-independent inputs (dialogue, captions, crowd) and the independence ablation",
+      "status": "open",
+      "priority": 2,
+      "lane": "research",
+      "disposition": "retain",
+      "reason": "Research comparison retained; frozen exposure/eligibility rules apply. Not an engineering prerequisite or proof of behavioral recovery.",
+      "dependency_ids": [
+        "bd-01M2TA4BFRMK8WNA79PPRT8YCD",
+        "bd-01M2TA83GA06RRHR193AV3XYA5",
+        "bd-01M2TADR4KM1S4J46HK2C3BN76",
+        "bd-01M2TAH5VA3WJBGR8WKAAH14Z8"
+      ],
+      "assignee": null
+    },
+    {
+      "id": "bd-01M2TAJPFF1GK8YKPN5PNWM7TF",
+      "before": {
+        "title": "Phase 3 H4: confidence and abstention",
+        "status": "open",
+        "priority": 1,
+        "assignee": null,
+        "tags": [
+          "confidence",
+          "hypothesis",
+          "mapper-plan",
+          "phase3"
+        ],
+        "deps": [
+          {
+            "kind": "blocks",
+            "parent": "bd-01M19956MFSG7076QE4J66T7E9"
+          },
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2TAAQNS7RCCBBM8WFFZF6ZZ"
+          },
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2TAEW794XCR7D2HZJFNXVJY"
+          },
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2TAH5VA3WJBGR8WKAAH14Z8"
+          }
+        ]
+      },
+      "before_body_sha256": "a11e32062c479303f34c1f7bf4658f5ff2745205f933126673ee0892742d7fb2",
+      "title": "[research] Phase 3 H4: confidence and abstention",
+      "status": "open",
+      "priority": 2,
+      "lane": "research",
+      "disposition": "retain",
+      "reason": "Research comparison retained; frozen exposure/eligibility rules apply. Not an engineering prerequisite or proof of behavioral recovery.",
+      "dependency_ids": [
+        "bd-01M19956MFSG7076QE4J66T7E9",
+        "bd-01M2TAAQNS7RCCBBM8WFFZF6ZZ",
+        "bd-01M2TAEW794XCR7D2HZJFNXVJY",
+        "bd-01M2TAH5VA3WJBGR8WKAAH14Z8"
+      ],
+      "assignee": null
+    },
+    {
+      "id": "bd-01M2TAK2EFCDWR2A01Q3XSNS79",
+      "before": {
+        "title": "Phase 3 H5: structural-spine pilot, with the s43 validation fix",
+        "status": "open",
+        "priority": 1,
+        "assignee": null,
+        "tags": [
+          "hypothesis",
+          "mapper-plan",
+          "phase3",
+          "spine"
+        ],
+        "deps": [
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2TADR4KM1S4J46HK2C3BN76"
+          },
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2TAH5VA3WJBGR8WKAAH14Z8"
+          }
+        ]
+      },
+      "before_body_sha256": "8ce92804826f2d5292203ddedb53850157a40768fbb14df4a13d5de80d97942a",
+      "title": "[research] Phase 3 H5: structural-spine pilot, with the s43 validation fix",
+      "status": "open",
+      "priority": 2,
+      "lane": "research",
+      "disposition": "retain",
+      "reason": "Research comparison retained; frozen exposure/eligibility rules apply. Not an engineering prerequisite or proof of behavioral recovery.",
+      "dependency_ids": [
+        "bd-01M2TADR4KM1S4J46HK2C3BN76",
+        "bd-01M2TAH5VA3WJBGR8WKAAH14Z8"
+      ],
+      "assignee": null
+    },
+    {
+      "id": "bd-01M2TAKEF1GHZVXDQ024EZDR0Y",
+      "before": {
+        "title": "Phase 3: final freeze and the single test opening (Friends, Memento)",
+        "status": "open",
+        "priority": 1,
+        "assignee": null,
+        "tags": [
+          "final-test",
+          "mapper-plan",
+          "phase3",
+          "sealed-test"
+        ],
+        "deps": [
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2TA4QG638M6ZH8Q23CAK401"
+          },
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2TA53FEKFQY7R4XC48BZMR8"
+          },
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2TA7BM74N2WKAQJA5EA4X2R"
+          },
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2TA8FJYASVK1WNBQZ26ASTG"
+          },
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2TA97MQMGHTPQK3VYRXW9HG"
+          },
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2TA9KKVFWPQ74HN90P0SM68"
+          },
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2TA9ZK64GTG3526RMNWNHCT"
+          },
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2TAABPTGFSQMNG0G9G1D9XM"
+          },
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2TAAQNS7RCCBBM8WFFZF6ZZ"
+          },
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2TAHHXRTZPV9JWCKBXT6KVE"
+          },
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2TAHYA8QWB9QXBX759KR82N"
+          },
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2TAJABHFWN5ZDYNST15Y9G5"
+          },
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2TAJPFF1GK8YKPN5PNWM7TF"
+          },
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2TAK2EFCDWR2A01Q3XSNS79"
+          }
+        ]
+      },
+      "before_body_sha256": "05d3208e8328e4b0fc70c8fb77d27ab7fc9357122b407c1064794965b755918d",
+      "title": "[research] Phase 3: final freeze and the single test opening (Friends, Memento)",
+      "status": "open",
+      "priority": 2,
+      "lane": "research",
+      "disposition": "rescope",
+      "reason": "Keep one sealed opening/exposure guard and preregistered frozen comparison rules. This is a claim gate, not a shipping gate. No final-test read occurred in this planning exercise.",
+      "dependency_ids": [
+        "bd-01M2TA4QG638M6ZH8Q23CAK401",
+        "bd-01M2TA53FEKFQY7R4XC48BZMR8",
+        "bd-01M2TA7BM74N2WKAQJA5EA4X2R",
+        "bd-01M2TA8FJYASVK1WNBQZ26ASTG",
+        "bd-01M2TA97MQMGHTPQK3VYRXW9HG",
+        "bd-01M2TA9KKVFWPQ74HN90P0SM68",
+        "bd-01M2TA9ZK64GTG3526RMNWNHCT",
+        "bd-01M2TAABPTGFSQMNG0G9G1D9XM",
+        "bd-01M2TAAQNS7RCCBBM8WFFZF6ZZ",
+        "bd-01M2TAHHXRTZPV9JWCKBXT6KVE",
+        "bd-01M2TAHYA8QWB9QXBX759KR82N",
+        "bd-01M2TAJABHFWN5ZDYNST15Y9G5",
+        "bd-01M2TAJPFF1GK8YKPN5PNWM7TF",
+        "bd-01M2TAK2EFCDWR2A01Q3XSNS79"
+      ],
+      "assignee": null
+    },
+    {
+      "id": "bd-01M2TAKTB61XNXV4Y6A9J3CB0C",
+      "before": {
+        "title": "Phase 4: release infrastructure -- publishing, MiMa baseline, deployed docs",
+        "status": "open",
+        "priority": 1,
+        "assignee": null,
+        "tags": [
+          "mapper-plan",
+          "phase4",
+          "release"
+        ],
+        "deps": [
+          {
+            "kind": "blocks",
+            "parent": "bd-01M19G69RQCHMT2EMG11XFT4WX"
+          },
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2TA2283FC7FSA2G7TJ1WSMN"
+          }
+        ]
+      },
+      "before_body_sha256": "134eed7fe092c847f021311042f4bd32bbe35e49b9a27c92d8dff8469d273125",
+      "title": "[release] Phase 4: release infrastructure -- publishing, MiMa baseline, deployed docs",
+      "status": "open",
+      "priority": 2,
+      "lane": "release",
+      "disposition": "retain",
+      "reason": "Stable-release work follows preview and the preserved film API commitment; superiority remains a separate claim gate.",
+      "dependency_ids": [
+        "bd-01M19G69RQCHMT2EMG11XFT4WX",
+        "bd-01M2TA2283FC7FSA2G7TJ1WSMN"
+      ],
+      "assignee": null
+    },
+    {
+      "id": "bd-01M2TAM66RTEMY3VVHA3N2MYXK",
+      "before": {
+        "title": "Phase 4: hardening -- refusal supertype, readable I/O errors, facade around recall-map",
+        "status": "open",
+        "priority": 1,
+        "assignee": null,
+        "tags": [
+          "mapper-plan",
+          "phase4",
+          "usability"
+        ],
+        "deps": [
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2TADC4VKSDZ2S9SXETH2MYM"
+          }
+        ]
+      },
+      "before_body_sha256": "a07260282993f8af09ff1345d302ebd0422f2537f13e48bcab5e4639abf1673b",
+      "title": "G5: harden the public mapping facade and actionable errors",
+      "status": "open",
+      "priority": 2,
+      "lane": "release",
+      "disposition": "rescope",
+      "reason": "Supersedes the broad progressive-facade request for this delivery; unrelated API ergonomics remain later.",
+      "dependency_ids": [
+        "bd-01M2TADC4VKSDZ2S9SXETH2MYM"
+      ],
+      "assignee": null
+    },
+    {
+      "id": "bd-01M15BM35EY8P8FXZ9K65MT9D8",
+      "before": {
+        "title": "interview: Profile drops induced specificity and carries no contributor receipt \u2014 cannot descend from a profile number to DetailIds",
+        "status": "open",
+        "priority": 2,
+        "assignee": "cursor-grok-4.6-help",
+        "tags": [
+          "interview"
+        ],
+        "deps": []
+      },
+      "before_body_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "title": "[later] interview: Profile drops induced specificity and carries no contributor receipt \u2014 cannot descend from a profile number to DetailIds",
+      "status": "open",
+      "priority": 3,
+      "lane": "later",
+      "disposition": "retain",
+      "reason": "Interview-specific scientific work remains valid but follows the mapping preview; reuse measurement policy when this work resumes.",
+      "dependency_ids": [],
+      "assignee": ""
+    },
+    {
+      "id": "bd-01M15G280ZN0ZVNJEREVPJG1M5",
+      "before": {
+        "title": "interview: export placement bases with evidence \u2014 PlacementBasis (Seed | ContinuityStay | ExplicitReturn(markerSpan) | ContinuityReturn(partnerUnit) | Unattached | Ambiguous) on InductionResult/ClaimMeta, not encoded by mass convention",
+        "status": "open",
+        "priority": 2,
+        "assignee": "cursor-grok-4.6-help",
+        "tags": [
+          "interview"
+        ],
+        "deps": []
+      },
+      "before_body_sha256": "6ecdf1bcf110868dbbf7253512dd15728f9a201c0d65dd5a8e52677f868ecb14",
+      "title": "[later] interview: export placement bases with evidence \u2014 PlacementBasis (Seed | ContinuityStay | ExplicitReturn(markerSpan) | ContinuityReturn(partnerUnit) | Unattached | Ambiguous) on InductionResult/ClaimMeta, not encoded by mass convention",
+      "status": "open",
+      "priority": 3,
+      "lane": "later",
+      "disposition": "retain",
+      "reason": "Interview-specific scientific work remains valid but follows the mapping preview; reuse measurement policy when this work resumes.",
+      "dependency_ids": [],
+      "assignee": ""
+    },
+    {
+      "id": "bd-01M15G2835J1RK08G22JES7BHG",
+      "before": {
+        "title": "interview: return-rule extensions \u2014 negation/reported-speech guard on ReturnMarker; resumption of an earlier (non-current) digression; ClusterContinuity consults recall relations (causal/temporal edges)",
+        "status": "open",
+        "priority": 2,
+        "assignee": "cursor-grok-4.6-help",
+        "tags": [
+          "interview"
+        ],
+        "deps": []
+      },
+      "before_body_sha256": "e350f3018801c49d271b2622b917d6d4962ec939c8e52967f74ff7bd77088d43",
+      "title": "[later] interview: return-rule extensions \u2014 negation/reported-speech guard on ReturnMarker; resumption of an earlier (non-current) digression; ClusterContinuity consults recall relations (causal/temporal edges)",
+      "status": "open",
+      "priority": 3,
+      "lane": "later",
+      "disposition": "retain",
+      "reason": "Interview-specific scientific work remains valid but follows the mapping preview; reuse measurement policy when this work resumes.",
+      "dependency_ids": [],
+      "assignee": ""
+    },
+    {
+      "id": "bd-01M168TZ3VRQYSE7TNT5JKJTSJ",
+      "before": {
+        "title": "recall: segmenting a PseudonymizedTranscript loses its certification - RecallGraph carries no privacy witness",
+        "status": "open",
+        "priority": 2,
+        "assignee": null,
+        "tags": [],
+        "deps": []
+      },
+      "before_body_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "title": "[maintenance] recall: segmenting a PseudonymizedTranscript loses its certification - RecallGraph carries no privacy witness",
+      "status": "open",
+      "priority": 2,
+      "lane": "maintenance",
+      "disposition": "retain",
+      "reason": "Retained with its original acceptance scope; recheck against current code before implementation or closure. Not a prerequisite for the annotation-assisted preview.",
+      "dependency_ids": [],
+      "assignee": null
+    },
+    {
+      "id": "bd-01M16DBEH9PKER423BZ47ZKBMV",
+      "before": {
+        "title": "features: Estimate cannot express Ineligible - the eligible/missing distinction is portable and currently exists only in embed-bench",
+        "status": "open",
+        "priority": 2,
+        "assignee": null,
+        "tags": [],
+        "deps": []
+      },
+      "before_body_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "title": "[maintenance] features: Estimate cannot express Ineligible - the eligible/missing distinction is portable and currently exists only in embed-bench",
+      "status": "open",
+      "priority": 2,
+      "lane": "maintenance",
+      "disposition": "retain",
+      "reason": "Retained with its original acceptance scope; recheck against current code before implementation or closure. Not a prerequisite for the annotation-assisted preview.",
+      "dependency_ids": [],
+      "assignee": null
+    },
+    {
+      "id": "bd-01M16E05TWX28QKJF2GFY67ZZV",
+      "before": {
+        "title": "align: the remaining 14 unmigrated RecallSignature fields (ADR 0003 backlog)",
+        "status": "open",
+        "priority": 2,
+        "assignee": null,
+        "tags": [],
+        "deps": []
+      },
+      "before_body_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "title": "[maintenance] align: the remaining 14 unmigrated RecallSignature fields (ADR 0003 backlog)",
+      "status": "open",
+      "priority": 2,
+      "lane": "maintenance",
+      "disposition": "retain",
+      "reason": "Preserve ADR 0003 signature migration. Explicit residual from MassRatio polarity fix: forged NaN operands still stored although ratio abstains; inspect construction/consumer consequences before claiming closure. New organization readouts must use explicit counts/denominators rather than inheriting these fields blindly.",
+      "dependency_ids": [],
+      "assignee": null
+    },
+    {
+      "id": "bd-01M16TYAMC8TA58V0TW6CJET6Y",
+      "before": {
+        "title": "policy: every empty-guard constant must declare its class (forced / delete-sentinel / conservative / flattering)",
+        "status": "open",
+        "priority": 2,
+        "assignee": null,
+        "tags": [
+          "estimand"
+        ],
+        "deps": []
+      },
+      "before_body_sha256": "24c68958eea4c299e37723a6e29b1587c47e9b74fab990694c1fa4847aedc4ba",
+      "title": "[maintenance] policy: every empty-guard constant must declare its class (forced / delete-sentinel / conservative / flattering)",
+      "status": "open",
+      "priority": 2,
+      "lane": "maintenance",
+      "disposition": "retain",
+      "reason": "Retained with its original acceptance scope; recheck against current code before implementation or closure. Not a prerequisite for the annotation-assisted preview.",
+      "dependency_ids": [],
+      "assignee": null
+    },
+    {
+      "id": "bd-01M17010MM68DG7B49DMEKA2AA",
+      "before": {
+        "title": "acquire/core: there is no admitted-story loader - provenance headers have no machine-readable boundary, so every consumer writes its own parser",
+        "status": "open",
+        "priority": 2,
+        "assignee": null,
+        "tags": [
+          "spike"
+        ],
+        "deps": []
+      },
+      "before_body_sha256": "b7357b17a98ce2032d375ddc40b8476d8c4946c1978589fc24bdc200b3300b84",
+      "title": "[maintenance] acquire/core: there is no admitted-story loader - provenance headers have no machine-readable boundary, so every consumer writes its own parser",
+      "status": "open",
+      "priority": 2,
+      "lane": "maintenance",
+      "disposition": "retain",
+      "reason": "Corpus readers do not by themselves prove that the admitted-story header/text boundary is fixed. Keep open for a direct WOG-loader/header checksum witness; do not build a second corpus framework.",
+      "dependency_ids": [],
+      "assignee": null
+    },
+    {
+      "id": "bd-01M1717JYQZ2T22PKQ1X1X5XFH",
+      "before": {
+        "title": "mote-dx: a reservation can outlive its bead and ONLY its holder can free it - no chief override, blocking is unresolvable by anyone else",
+        "status": "open",
+        "priority": 2,
+        "assignee": null,
+        "tags": [
+          "mote-dx"
+        ],
+        "deps": []
+      },
+      "before_body_sha256": "b06a8131a835dc03cecf2733b19d92f2fe83e196d8d33701ee1287d9cd95e684",
+      "title": "[later] mote-dx: a reservation can outlive its bead and ONLY its holder can free it - no chief override, blocking is unresolvable by anyone else",
+      "status": "open",
+      "priority": 3,
+      "lane": "later",
+      "disposition": "retain",
+      "reason": "Outside the current preview path; preserve evidence and acceptance scope, resume only for a named consumer or demonstrated blocking defect.",
+      "dependency_ids": [],
+      "assignee": null
+    },
+    {
+      "id": "bd-01M17GC475EPDVW5Z4D776AYH0",
+      "before": {
+        "title": "Add typed narrative relation licensing basis",
+        "status": "open",
+        "priority": 2,
+        "assignee": null,
+        "tags": [
+          "epistemic-status",
+          "narrative-compiler"
+        ],
+        "deps": []
+      },
+      "before_body_sha256": "26ef561c6eaf859fbb8af402847227ab30b6a9e7c33912bbe27d5beb6543402b",
+      "title": "[maintenance] Add typed narrative relation licensing basis",
+      "status": "open",
+      "priority": 2,
+      "lane": "maintenance",
+      "disposition": "retain",
+      "reason": "Retained with its original acceptance scope; recheck against current code before implementation or closure. Not a prerequisite for the annotation-assisted preview.",
+      "dependency_ids": [],
+      "assignee": null
+    },
+    {
+      "id": "bd-01M17JFDHKHPD6N6JWA7NCMM4A",
+      "before": {
+        "title": "OSF gptkz (Ost 2022): real human serial reproduction of War of the Ghosts - the story we already model",
+        "status": "review",
+        "priority": 2,
+        "assignee": "codex-storyatlas-root",
+        "tags": [],
+        "deps": []
+      },
+      "before_body_sha256": "97db20e3d25733de45600e2456a86b782399d793478df72803d8440dad3594f4",
+      "title": "[later] OSF gptkz (Ost 2022): real human serial reproduction of War of the Ghosts - the story we already model",
+      "status": "open",
+      "priority": 3,
+      "lane": "later",
+      "disposition": "retain",
+      "reason": "Outside the current preview path; preserve evidence and acceptance scope, resume only for a named consumer or demonstrated blocking defect.",
+      "dependency_ids": [],
+      "assignee": ""
+    },
+    {
+      "id": "bd-01M17QW2A4S992ETKVWRTZKZKD",
+      "before": {
+        "title": "OSF 5qxkh: non-vendored human detail-recall benchmark",
+        "status": "open",
+        "priority": 2,
+        "assignee": null,
+        "tags": [
+          "external-data"
+        ],
+        "deps": []
+      },
+      "before_body_sha256": "88466ee08bf335c4f184883c789bef943cf5aa78096cc15ea022589510abec84",
+      "title": "[later] OSF 5qxkh: non-vendored human detail-recall benchmark",
+      "status": "open",
+      "priority": 3,
+      "lane": "later",
+      "disposition": "retain",
+      "reason": "Outside the current preview path; preserve evidence and acceptance scope, resume only for a named consumer or demonstrated blocking defect.",
+      "dependency_ids": [],
+      "assignee": null
+    },
+    {
+      "id": "bd-01M1836WDBB72KXXPKG23PSSWT",
+      "before": {
+        "title": "probe coverage: 12 of 21 construction-boundary suites test the companion fromProduct door but not the Mirror.ProductOf summon door",
+        "status": "open",
+        "priority": 2,
+        "assignee": null,
+        "tags": [],
+        "deps": []
+      },
+      "before_body_sha256": "9c4a23d2318e02365716ad1b9099587e57850f7a685d8d947766d222764ce668",
+      "title": "[maintenance] probe coverage: 12 of 21 construction-boundary suites test the companion fromProduct door but not the Mirror.ProductOf summon door",
+      "status": "open",
+      "priority": 2,
+      "lane": "maintenance",
+      "disposition": "retain",
+      "reason": "Keep open: nine dependency anchors landed but three did not; Mirror.ProductOf coverage is a separate property from dependency anchoring. Audit actual remaining named doors; no blanket sweep completion claim.",
+      "dependency_ids": [],
+      "assignee": null
+    },
+    {
+      "id": "bd-01M183K7YXA46F66NMTEF8T3ZR",
+      "before": {
+        "title": "storyatlas4s pins storymodel4s 50 commits behind main (3a6d73d8 at storyatlas4s/build.sbt:36), so sealing work on main does not protect the atlas",
+        "status": "open",
+        "priority": 2,
+        "assignee": null,
+        "tags": [],
+        "deps": []
+      },
+      "before_body_sha256": "82de0152b90f023e77725ebf194810384520dab6239962e7b3a1fc71058accb0",
+      "title": "[later] storyatlas4s pins storymodel4s 50 commits behind main (3a6d73d8 at storyatlas4s/build.sbt:36), so sealing work on main does not protect the atlas",
+      "status": "open",
+      "priority": 3,
+      "lane": "later",
+      "disposition": "retain",
+      "reason": "Outside the current preview path; preserve evidence and acceptance scope, resume only for a named consumer or demonstrated blocking defect.",
+      "dependency_ids": [],
+      "assignee": null
+    },
+    {
+      "id": "bd-01M19GPDP08NHEW2S64ZNYPFPE",
+      "before": {
+        "title": "interview: per-metric membership exclusion (reading C) -- PlacementResolution is one summary per account, not one per metric",
+        "status": "open",
+        "priority": 2,
+        "assignee": null,
+        "tags": [
+          "interview"
+        ],
+        "deps": []
+      },
+      "before_body_sha256": "2d9a6f2a830193f34884b48d5ae8f6e054b31043ead7fa85acaec49b4cb3d433",
+      "title": "[later] interview: per-metric membership exclusion (reading C) -- PlacementResolution is one summary per account, not one per metric",
+      "status": "open",
+      "priority": 3,
+      "lane": "later",
+      "disposition": "retain",
+      "reason": "Interview-specific scientific work remains valid but follows the mapping preview; reuse measurement policy when this work resumes.",
+      "dependency_ids": [],
+      "assignee": null
+    },
+    {
+      "id": "bd-01M19NYZT593MXWEERP80RHY8J",
+      "before": {
+        "title": "align: which parameterised enum cases carry an invariant construction could violate - judgement pass over the receipt-reachable surface",
+        "status": "open",
+        "priority": 2,
+        "assignee": null,
+        "tags": [],
+        "deps": []
+      },
+      "before_body_sha256": "3892ef9587ee2b516b4ad3923e4c0bf5b92c46b2ed2de0514bf7d5919ffeb76f",
+      "title": "[maintenance] align: which parameterised enum cases carry an invariant construction could violate - judgement pass over the receipt-reachable surface",
+      "status": "open",
+      "priority": 2,
+      "lane": "maintenance",
+      "disposition": "retain",
+      "reason": "Whole-surface invariant judgement remains unexecuted here. Prioritize receipt/result-reachable types at the current API boundary; broad inventory is maintenance, not a blocker for unrelated local evidence extraction.",
+      "dependency_ids": [],
+      "assignee": null
+    },
+    {
+      "id": "bd-01M19XMM8BZ27KZWGX8R9PN5RE",
+      "before": {
+        "title": "S4 output bundle: locally-openable HTML/CSS renderer contract extending CodexHtml",
+        "status": "open",
+        "priority": 2,
+        "assignee": null,
+        "tags": [
+          "output"
+        ],
+        "deps": []
+      },
+      "before_body_sha256": "bb4e9ef0492ed00698c6bf8384e5817a29ad128f1558e897eedf3892629e5232",
+      "title": "[later] S4 output bundle: locally-openable HTML/CSS renderer contract extending CodexHtml",
+      "status": "open",
+      "priority": 3,
+      "lane": "later",
+      "disposition": "retain",
+      "reason": "Outside the current preview path; preserve evidence and acceptance scope, resume only for a named consumer or demonstrated blocking defect.",
+      "dependency_ids": [],
+      "assignee": null
+    },
+    {
+      "id": "bd-01M19XMQN4VK4WSTVSHBD3X1YB",
+      "before": {
+        "title": "S5 output bundle: declared-lossy external exporters",
+        "status": "open",
+        "priority": 2,
+        "assignee": null,
+        "tags": [
+          "output"
+        ],
+        "deps": []
+      },
+      "before_body_sha256": "c300f92f8b5f6dd91d7135cf82eed1fd2eb6211f515b2306cba6954c8c85576d",
+      "title": "[later] S5 output bundle: declared-lossy external exporters",
+      "status": "open",
+      "priority": 3,
+      "lane": "later",
+      "disposition": "retain",
+      "reason": "Outside the current preview path; preserve evidence and acceptance scope, resume only for a named consumer or demonstrated blocking defect.",
+      "dependency_ids": [],
+      "assignee": null
+    },
+    {
+      "id": "bd-01M1A49W8H5MNJNKFXR84ZQFJP",
+      "before": {
+        "title": "amr-interop: anchor AmrGraph construction probe to guarded source",
+        "status": "review",
+        "priority": 2,
+        "assignee": null,
+        "tags": [
+          "construction-boundary",
+          "tests"
+        ],
+        "deps": []
+      },
+      "before_body_sha256": "ab435419fc427035cf5dbabc6bbd968d01226bfd64622dda9841e4ef4166f61b",
+      "title": "amr-interop: anchor AmrGraph construction probe to guarded source",
+      "status": "closed",
+      "priority": 2,
+      "lane": "closed",
+      "disposition": "landed",
+      "reason": "Commit 6ca05d72 is reachable from baseline main; affected tests inspected: amr-interop/src/test/scala/storymodel4s/probes/AmrGraphUnforgeableSuite.scala. Existing locally observed clean gate/mutation evidence: docs/plans/2026-09-17-one-point-oh-session-1.md and original issue review notes. No tests rerun in this planning pass.",
+      "dependency_ids": [],
+      "assignee": null
+    },
+    {
+      "id": "bd-01M1BY93E78KHABT8CMEASZA4G",
+      "before": {
+        "title": "proposition: anchor PropositionChart construction probe to guarded source",
+        "status": "review",
+        "priority": 2,
+        "assignee": null,
+        "tags": [
+          "construction-boundary",
+          "tests"
+        ],
+        "deps": []
+      },
+      "before_body_sha256": "0f633649b75131167979bea61d088677f1dc031c088950a0fa4219b69e5dd8cc",
+      "title": "proposition: anchor PropositionChart construction probe to guarded source",
+      "status": "closed",
+      "priority": 2,
+      "lane": "closed",
+      "disposition": "landed",
+      "reason": "Commit b85ee23b is reachable from baseline main; affected tests inspected: proposition/src/test/scala/storymodel4s/probes/PropositionChartUnforgeableSuite.scala. Existing locally observed clean gate/mutation evidence: docs/plans/2026-09-17-one-point-oh-session-1.md and original issue review notes. No tests rerun in this planning pass.",
+      "dependency_ids": [],
+      "assignee": null
+    },
+    {
+      "id": "bd-01M1BZ5PR6T5G598S9QZWJBEWJ",
+      "before": {
+        "title": "story: anchor StoryModel construction probe to guarded source",
+        "status": "review",
+        "priority": 2,
+        "assignee": "codex-storymodel4s-collab",
+        "tags": [
+          "construction-boundary",
+          "tests"
+        ],
+        "deps": []
+      },
+      "before_body_sha256": "c2fb249a2261a5f74fcd623acadd71be663c2bdb5d0db09357fbf302fbf77a5c",
+      "title": "story: anchor StoryModel construction probe to guarded source",
+      "status": "closed",
+      "priority": 2,
+      "lane": "closed",
+      "disposition": "landed",
+      "reason": "Commit aa07368b is reachable from baseline main; affected tests inspected: story/src/test/scala/storymodel4s/probes/StoryModelUnforgeableSuite.scala. Existing locally observed clean gate/mutation evidence: docs/plans/2026-09-17-one-point-oh-session-1.md and original issue review notes. No tests rerun in this planning pass.",
+      "dependency_ids": [],
+      "assignee": ""
+    },
+    {
+      "id": "bd-01M1BZQCM0P8566KACRE28RVAR",
+      "before": {
+        "title": "acquire: anchor CriticFinding construction probes to guarded source",
+        "status": "review",
+        "priority": 2,
+        "assignee": "codex-storymodel4s-collab",
+        "tags": [
+          "construction-boundary",
+          "tests"
+        ],
+        "deps": []
+      },
+      "before_body_sha256": "c6ebbb46cbbef8db888db675c31987573d0ceda5effdb1925e10346207cc7765",
+      "title": "acquire: anchor CriticFinding construction probes to guarded source",
+      "status": "closed",
+      "priority": 2,
+      "lane": "closed",
+      "disposition": "landed",
+      "reason": "Commit 19e8da05 is reachable from baseline main; affected tests inspected: acquire/src/test/scala/storymodel4s/acquireprobe/ConstructionBoundarySuite.scala, acquire/src/test/scala/storymodel4s/acquireprobe/ConstructionProbeSuite.scala. Existing locally observed clean gate/mutation evidence: docs/plans/2026-09-17-one-point-oh-session-1.md and original issue review notes. No tests rerun in this planning pass.",
+      "dependency_ids": [],
+      "assignee": ""
+    },
+    {
+      "id": "bd-01M1C0DA89WDXC9H3VTKJ46R9A",
+      "before": {
+        "title": "embed-grakern: anchor StructuralProgram construction probe",
+        "status": "review",
+        "priority": 2,
+        "assignee": "codex-storymodel4s-collab",
+        "tags": [
+          "construction-boundary",
+          "tests"
+        ],
+        "deps": []
+      },
+      "before_body_sha256": "e23d4d4e7ae9327d9e9ae746afa6572fafb58fd5ab826855ec045bb6e55297f3",
+      "title": "embed-grakern: anchor StructuralProgram construction probe",
+      "status": "closed",
+      "priority": 2,
+      "lane": "closed",
+      "disposition": "landed",
+      "reason": "Commit d8d16a83 is reachable from baseline main; affected tests inspected: embed-grakern/src/test/scala/storymodel4s/grakernprobe/StructuralProgramBoundarySuite.scala. Existing locally observed clean gate/mutation evidence: docs/plans/2026-09-17-one-point-oh-session-1.md and original issue review notes. No tests rerun in this planning pass.",
+      "dependency_ids": [],
+      "assignee": ""
+    },
+    {
+      "id": "bd-01M1C0XXGBNZ91S4N313JF0HE4",
+      "before": {
+        "title": "document: anchor construction boundary suite to guarded types",
+        "status": "review",
+        "priority": 2,
+        "assignee": "codex-storymodel4s-collab",
+        "tags": [
+          "construction-boundary",
+          "tests"
+        ],
+        "deps": []
+      },
+      "before_body_sha256": "2c61a9681b81369e7edf7d2e19ec7cd660c3b8243e25a121c93de3945198b3a9",
+      "title": "document: anchor construction boundary suite to guarded types",
+      "status": "closed",
+      "priority": 2,
+      "lane": "closed",
+      "disposition": "landed",
+      "reason": "Commit c52c641f is reachable from baseline main; affected tests inspected: document/src/test/scala/storymodel4s/documentprobe/ConstructionBoundarySuite.scala. Existing locally observed clean gate/mutation evidence: docs/plans/2026-09-17-one-point-oh-session-1.md and original issue review notes. No tests rerun in this planning pass.",
+      "dependency_ids": [],
+      "assignee": ""
+    },
+    {
+      "id": "bd-01M1C1S0BRF8H7EX74CGQZVV1M",
+      "before": {
+        "title": "codec: anchor sidecar construction probes to guarded types",
+        "status": "review",
+        "priority": 2,
+        "assignee": "codex-storymodel4s-collab",
+        "tags": [
+          "construction-boundary",
+          "tests"
+        ],
+        "deps": []
+      },
+      "before_body_sha256": "6aa395038ad7c924261a1feedaaa862925a21d1c58389240028ab3b5d515acba",
+      "title": "codec: anchor sidecar construction probes to guarded types",
+      "status": "closed",
+      "priority": 2,
+      "lane": "closed",
+      "disposition": "landed",
+      "reason": "Commit e6602356 is reachable from baseline main; affected tests inspected: codec/src/test/scala/storymodel4s/codecprobe/ConstructionProbeSuite.scala. Existing locally observed clean gate/mutation evidence: docs/plans/2026-09-17-one-point-oh-session-1.md and original issue review notes. No tests rerun in this planning pass.",
+      "dependency_ids": [],
+      "assignee": ""
+    },
+    {
+      "id": "bd-01M1C2K4PW5F9YS43NZNJ8ZRXV",
+      "before": {
+        "title": "view: anchor construction probe suite to guarded types",
+        "status": "review",
+        "priority": 2,
+        "assignee": "codex-storymodel4s-collab",
+        "tags": [
+          "construction-boundary",
+          "tests"
+        ],
+        "deps": []
+      },
+      "before_body_sha256": "3cb73a1098a97c0448f33c2a6b10f74ac9643639bc8d9d6cde05c9e3b1e928dc",
+      "title": "view: anchor construction probe suite to guarded types",
+      "status": "closed",
+      "priority": 2,
+      "lane": "closed",
+      "disposition": "landed",
+      "reason": "Commit bc6fd710 is reachable from baseline main; affected tests inspected: view/src/test/scala/storymodel4s/viewprobe/ConstructionProbeSuite.scala. Existing locally observed clean gate/mutation evidence: docs/plans/2026-09-17-one-point-oh-session-1.md and original issue review notes. No tests rerun in this planning pass.",
+      "dependency_ids": [],
+      "assignee": ""
+    },
+    {
+      "id": "bd-01M1C3GHNJJ2XX4SQ4BV8042ZB",
+      "before": {
+        "title": "embed-core: anchor construction probe suite to guarded types",
+        "status": "review",
+        "priority": 2,
+        "assignee": "codex-storymodel4s-collab",
+        "tags": [
+          "construction-boundary",
+          "tests"
+        ],
+        "deps": []
+      },
+      "before_body_sha256": "391514ca7172483359303a05b8b12dfcb215a5c36ca378c83a3ea665589b3126",
+      "title": "embed-core: anchor construction probe suite to guarded types",
+      "status": "closed",
+      "priority": 2,
+      "lane": "closed",
+      "disposition": "landed",
+      "reason": "Commit 8ec2acb1 is reachable from baseline main; affected tests inspected: embed-core/src/test/scala/storymodel4s/embedprobe/ConstructionProbeSuite.scala. Existing locally observed clean gate/mutation evidence: docs/plans/2026-09-17-one-point-oh-session-1.md and original issue review notes. No tests rerun in this planning pass.",
+      "dependency_ids": [],
+      "assignee": ""
+    },
+    {
+      "id": "bd-01M1C4Q11FWAY7MZFNNMXTTJEJ",
+      "before": {
+        "title": "features: anchor construction boundary suites to guarded types",
+        "status": "doing",
+        "priority": 2,
+        "assignee": "codex-storymodel4s-collab",
+        "tags": [
+          "construction-boundary",
+          "tests"
+        ],
+        "deps": []
+      },
+      "before_body_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "title": "[maintenance] features: anchor construction boundary suites to guarded types",
+      "status": "open",
+      "priority": 2,
+      "lane": "maintenance",
+      "disposition": "retain",
+      "reason": "NOT landed: 658e3044 exists on salvage/candidate refs but git merge-base --is-ancestor 658e3044 HEAD is nonzero, and current probe paths lack these anchors. Recover/review current diff, prove incremental invalidation with mutation, gate, then land. The nine landed probe closures do not cover this ticket.",
+      "dependency_ids": [],
+      "assignee": ""
+    },
+    {
+      "id": "bd-01M1C5Y9ESYXAFNT91BVBTKZB9",
+      "before": {
+        "title": "interview: anchor macro-only construction probes",
+        "status": "doing",
+        "priority": 2,
+        "assignee": "codex-storymodel4s-collab",
+        "tags": [
+          "construction-boundary",
+          "tests"
+        ],
+        "deps": []
+      },
+      "before_body_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "title": "[maintenance] interview: anchor macro-only construction probes",
+      "status": "open",
+      "priority": 2,
+      "lane": "maintenance",
+      "disposition": "retain",
+      "reason": "NOT landed: 50eea3a7 exists on salvage/candidate refs but git merge-base --is-ancestor 50eea3a7 HEAD is nonzero, and current probe paths lack these anchors. Recover/review current diff, prove incremental invalidation with mutation, gate, then land. The nine landed probe closures do not cover this ticket.",
+      "dependency_ids": [],
+      "assignee": ""
+    },
+    {
+      "id": "bd-01M1C6XV4F99RVRWCTF3YX16G7",
+      "before": {
+        "title": "align: anchor macro-only construction probes",
+        "status": "doing",
+        "priority": 2,
+        "assignee": "codex-storymodel4s-collab",
+        "tags": [
+          "construction-boundary",
+          "tests"
+        ],
+        "deps": []
+      },
+      "before_body_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "title": "[maintenance] align: anchor macro-only construction probes",
+      "status": "open",
+      "priority": 2,
+      "lane": "maintenance",
+      "disposition": "retain",
+      "reason": "NOT landed: 4c09362c exists on salvage/candidate refs but git merge-base --is-ancestor 4c09362c HEAD is nonzero, and current probe paths lack these anchors. Recover/review current diff, prove incremental invalidation with mutation, gate, then land. The nine landed probe closures do not cover this ticket.",
+      "dependency_ids": [],
+      "assignee": ""
+    },
+    {
+      "id": "bd-01M1CQKRG1A4J4BEWCC78F4TEZ",
+      "before": {
+        "title": "D1A-types: film-capable StoryModel, nodes, Evidence and AlignmentSource, text byte-identical",
+        "status": "open",
+        "priority": 2,
+        "assignee": "codex-storymodel4s-collab",
+        "tags": [
+          "compiler",
+          "critical",
+          "film",
+          "story"
+        ],
+        "deps": [
+          {
+            "kind": "blocks",
+            "parent": "bd-01M1CQEWA4GWY5NW0QAGWYP31H"
+          },
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2TAB3QD2YXSPR8THYRGFBKS"
+          },
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2TABFW72D8WWQF481SD37KW"
+          },
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2TABVXSM72M9DD0SNB6GZ11"
+          },
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2TAF8JH42NYJJAFWPD7HTZB"
+          },
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2TAFN5WMXW4NT20YJQAW2FR"
+          },
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2TAG1GEAGXCY33P0B17QBJ1"
+          },
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2TAGDJ5F0FEPC3XPWVDSWDH"
+          }
+        ]
+      },
+      "before_body_sha256": "c3161ceeca49c557138e41ea5260f855ea04ac91b849f75aef53e1053e6ecbba",
+      "title": "[film] D1A-types: film-capable StoryModel, nodes, Evidence and AlignmentSource, text byte-identical",
+      "status": "open",
+      "priority": 1,
+      "lane": "film",
+      "disposition": "retain",
+      "reason": "Preserved approved film-library scope. Follow S0-S4c order and exact text parity; the earlier annotation preview does not close this ticket.",
+      "dependency_ids": [
+        "bd-01M1CQEWA4GWY5NW0QAGWYP31H",
+        "bd-01M2TAB3QD2YXSPR8THYRGFBKS",
+        "bd-01M2TABFW72D8WWQF481SD37KW",
+        "bd-01M2TABVXSM72M9DD0SNB6GZ11",
+        "bd-01M2TAF8JH42NYJJAFWPD7HTZB",
+        "bd-01M2TAFN5WMXW4NT20YJQAW2FR",
+        "bd-01M2TAG1GEAGXCY33P0B17QBJ1",
+        "bd-01M2TAGDJ5F0FEPC3XPWVDSWDH"
+      ],
+      "assignee": ""
+    },
+    {
+      "id": "bd-01M1CQNM5DZZNWD8BN4WRKVZRQ",
+      "before": {
+        "title": "D1B migrate SourceView and HsmmResult to movie intervals with full nomination and P F proofs",
+        "status": "open",
+        "priority": 2,
+        "assignee": "codex-storymodel4s-recall-collab",
+        "tags": [
+          "align",
+          "critical",
+          "film",
+          "provenance"
+        ],
+        "deps": [
+          {
+            "kind": "blocks",
+            "parent": "bd-01M1C8WSZ49M7SHG2HMQCWRK6E"
+          },
+          {
+            "kind": "blocks",
+            "parent": "bd-01M1CBKNA3KTBYTB3BACXJMXZZ"
+          },
+          {
+            "kind": "blocks",
+            "parent": "bd-01M1CQH3QNRMHZYR593DQWEBY7"
+          },
+          {
+            "kind": "blocks",
+            "parent": "bd-01M1CQKRG1A4J4BEWCC78F4TEZ"
+          },
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2T32SGVJXR2RT3RTS2DCN9P"
+          },
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2TAC80YRK5JFNKTT7B7CAQN"
+          }
+        ]
+      },
+      "before_body_sha256": "f918b9eb1b8258c660b821c45899bcd9d9a84254e3bd9867db7cce850b40334d",
+      "title": "[film] D1B migrate SourceView and HsmmResult to movie intervals with full nomination and P F proofs",
+      "status": "open",
+      "priority": 1,
+      "lane": "film",
+      "disposition": "rescope",
+      "reason": "This is the end-to-end film proof half; signature work lives on D1B-signatures. Retain original exact nomination/P/F/foreign-identity/backward-revisit courts; reference readouts use the same exported support, with no unsupported fidelity claims.",
+      "dependency_ids": [
+        "bd-01M1C8WSZ49M7SHG2HMQCWRK6E",
+        "bd-01M1CBKNA3KTBYTB3BACXJMXZZ",
+        "bd-01M1CQH3QNRMHZYR593DQWEBY7",
+        "bd-01M1CQKRG1A4J4BEWCC78F4TEZ",
+        "bd-01M2T32SGVJXR2RT3RTS2DCN9P",
+        "bd-01M2TAC80YRK5JFNKTT7B7CAQN"
+      ],
+      "assignee": ""
+    },
+    {
+      "id": "bd-01M1DD1KVSVNK35C4Y9XPMSEHX",
+      "before": {
+        "title": "API ergonomics: progressive facade after the algorithmic core is verified",
+        "status": "open",
+        "priority": 2,
+        "assignee": null,
+        "tags": [
+          "api",
+          "docs"
+        ],
+        "deps": []
+      },
+      "before_body_sha256": "d5fbe7e75246749d34533d34f828f9eb8111c037139153f101f73a4704843753",
+      "title": "API ergonomics: progressive facade after the algorithmic core is verified",
+      "status": "closed",
+      "priority": 2,
+      "lane": "closed",
+      "disposition": "superseded",
+      "reason": "Superseded for the current product by bd-01M2TADC4VKSDZ2S9SXETH2MYM and bd-01M2TAM66RTEMY3VVHA3N2MYXK; acceptance now requires a real public mapping consumer, with broad unrelated ergonomic work deferred.",
+      "dependency_ids": [],
+      "assignee": null
+    },
+    {
+      "id": "bd-01M2T32SGVJXR2RT3RTS2DCN9P",
+      "before": {
+        "title": "D1A-film: compile a film source through the same deterministic stages",
+        "status": "open",
+        "priority": 2,
+        "assignee": null,
+        "tags": [
+          "compiler",
+          "film",
+          "story"
+        ],
+        "deps": [
+          {
+            "kind": "blocks",
+            "parent": "bd-01M1CQKRG1A4J4BEWCC78F4TEZ"
+          },
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2TAGST4EBFR1HM9Q3EWSYAH"
+          }
+        ]
+      },
+      "before_body_sha256": "425d483eb142c562a2c1ee62543760e1db33f195196a441c40b1b88718982a5a",
+      "title": "[film] D1A-film: compile a film source through the same deterministic stages",
+      "status": "open",
+      "priority": 1,
+      "lane": "film",
+      "disposition": "rescope",
+      "reason": "Ruling E is already decided: film compiler stays on 1.0 path. Phase plan resolves its ten concrete questions; no research-win prerequisite.",
+      "dependency_ids": [
+        "bd-01M1CQKRG1A4J4BEWCC78F4TEZ",
+        "bd-01M2TAGST4EBFR1HM9Q3EWSYAH"
+      ],
+      "assignee": null
+    },
+    {
+      "id": "bd-01M2TA19PH7GDT1Q2WXEKD6RE2",
+      "before": {
+        "title": "OWNER: supply the Catch Me If You Can and The Prisoner excerpts (and Memento media if T4 is wanted there)",
+        "status": "open",
+        "priority": 2,
+        "assignee": null,
+        "tags": [
+          "filmfestival",
+          "mapper-plan",
+          "media",
+          "owner-decision"
+        ],
+        "deps": []
+      },
+      "before_body_sha256": "ae3c0740b3ce0e669dbb5e134d2e830cc24905abd687f03988a3c3a209c8b1c1",
+      "title": "OWNER: supply the Catch Me If You Can and The Prisoner excerpts (and Memento media if T4 is wanted there)",
+      "status": "open",
+      "priority": 2,
+      "lane": "owner",
+      "disposition": "retain",
+      "reason": "Owner/data decision retained only for its named downstream track; it does not gate the local preview.",
+      "dependency_ids": [],
+      "assignee": null
+    },
+    {
+      "id": "bd-01M2TA8VM5B6XQWR6CVH25HB7V",
+      "before": {
+        "title": "Phase 1b: FilmFestival clock work for the scene-within-film task",
+        "status": "open",
+        "priority": 2,
+        "assignee": null,
+        "tags": [
+          "data",
+          "filmfestival",
+          "mapper-plan",
+          "phase1b"
+        ],
+        "deps": [
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2TA4BFRMK8WNA79PPRT8YCD"
+          },
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2TA83GA06RRHR193AV3XYA5"
+          }
+        ]
+      },
+      "before_body_sha256": "a08c62e673e8e974b2cb6fae9873ce876358aaa97107788a19f9c9bf08d8ce1a",
+      "title": "[research] Phase 1b: FilmFestival clock work for the scene-within-film task",
+      "status": "open",
+      "priority": 2,
+      "lane": "research",
+      "disposition": "retain",
+      "reason": "Research comparison retained; frozen exposure/eligibility rules apply. Not an engineering prerequisite or proof of behavioral recovery.",
+      "dependency_ids": [
+        "bd-01M2TA4BFRMK8WNA79PPRT8YCD",
+        "bd-01M2TA83GA06RRHR193AV3XYA5"
+      ],
+      "assignee": null
+    },
+    {
+      "id": "bd-01M2TAF8JH42NYJJAFWPD7HTZB",
+      "before": {
+        "title": "D1A-types S3: acquire carries TypedSupport (film-compiler slice)",
+        "status": "open",
+        "priority": 2,
+        "assignee": null,
+        "tags": [
+          "acquire",
+          "d1a",
+          "film-slice",
+          "mapper-plan",
+          "phase2"
+        ],
+        "deps": [
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2TABVXSM72M9DD0SNB6GZ11"
+          }
+        ]
+      },
+      "before_body_sha256": "a5e46234be9ba1b701894670d25216e9aa54173114e0c73de229bc6bd6aafb5e",
+      "title": "[film] D1A-types S3: acquire carries TypedSupport (film-compiler slice)",
+      "status": "open",
+      "priority": 1,
+      "lane": "film",
+      "disposition": "retain",
+      "reason": "Preserved approved film-library scope. Follow S0-S4c order and exact text parity; the earlier annotation preview does not close this ticket.",
+      "dependency_ids": [
+        "bd-01M2TABVXSM72M9DD0SNB6GZ11"
+      ],
+      "assignee": null
+    },
+    {
+      "id": "bd-01M2TAFN5WMXW4NT20YJQAW2FR",
+      "before": {
+        "title": "D1A-types S4a: node support becomes TypedSupport; draft becomes fallible",
+        "status": "open",
+        "priority": 2,
+        "assignee": null,
+        "tags": [
+          "d1a",
+          "film-slice",
+          "mapper-plan",
+          "phase2",
+          "story"
+        ],
+        "deps": [
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2TABVXSM72M9DD0SNB6GZ11"
+          }
+        ]
+      },
+      "before_body_sha256": "3eb8c2a5e77423627a9094903d7b0912b0dcb74c8dcae3c266e96c91ab006e63",
+      "title": "[film] D1A-types S4a: node support becomes TypedSupport; draft becomes fallible",
+      "status": "open",
+      "priority": 1,
+      "lane": "film",
+      "disposition": "retain",
+      "reason": "Preserved approved film-library scope. Follow S0-S4c order and exact text parity; the earlier annotation preview does not close this ticket.",
+      "dependency_ids": [
+        "bd-01M2TABVXSM72M9DD0SNB6GZ11"
+      ],
+      "assignee": null
+    },
+    {
+      "id": "bd-01M2TAG1GEAGXCY33P0B17QBJ1",
+      "before": {
+        "title": "D1A-types S4b: envelope, non-text identity, and the TextModel witness",
+        "status": "open",
+        "priority": 2,
+        "assignee": null,
+        "tags": [
+          "d1a",
+          "film-slice",
+          "mapper-plan",
+          "phase2",
+          "story"
+        ],
+        "deps": [
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2TAF8JH42NYJJAFWPD7HTZB"
+          },
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2TAFN5WMXW4NT20YJQAW2FR"
+          }
+        ]
+      },
+      "before_body_sha256": "9cfd503e48cad4bb41afb96092a4c01e2d788b20ed272e1c5c187d14ad4bba63",
+      "title": "[film] D1A-types S4b: envelope, non-text identity, and the TextModel witness",
+      "status": "open",
+      "priority": 1,
+      "lane": "film",
+      "disposition": "retain",
+      "reason": "Preserved approved film-library scope. Follow S0-S4c order and exact text parity; the earlier annotation preview does not close this ticket.",
+      "dependency_ids": [
+        "bd-01M2TAF8JH42NYJJAFWPD7HTZB",
+        "bd-01M2TAFN5WMXW4NT20YJQAW2FR"
+      ],
+      "assignee": null
+    },
+    {
+      "id": "bd-01M2TAGDJ5F0FEPC3XPWVDSWDH",
+      "before": {
+        "title": "D1A-types S4c: seal and split AlignmentSource",
+        "status": "open",
+        "priority": 2,
+        "assignee": null,
+        "tags": [
+          "d1a",
+          "film-slice",
+          "mapper-plan",
+          "phase2",
+          "story"
+        ],
+        "deps": [
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2TAG1GEAGXCY33P0B17QBJ1"
+          }
+        ]
+      },
+      "before_body_sha256": "3d51bf98afad698fdf37b7c3f9cb188adc1f0685ccb40462712355981f736bad",
+      "title": "[film] D1A-types S4c: seal and split AlignmentSource",
+      "status": "open",
+      "priority": 1,
+      "lane": "film",
+      "disposition": "retain",
+      "reason": "Preserved approved film-library scope. Follow S0-S4c order and exact text parity; the earlier annotation preview does not close this ticket.",
+      "dependency_ids": [
+        "bd-01M2TAG1GEAGXCY33P0B17QBJ1"
+      ],
+      "assignee": null
+    },
+    {
+      "id": "bd-01M2TAGST4EBFR1HM9Q3EWSYAH",
+      "before": {
+        "title": "D1A-film: write and cold-review its phase plan, then file its slice tickets",
+        "status": "open",
+        "priority": 2,
+        "assignee": null,
+        "tags": [
+          "film-route",
+          "film-slice",
+          "mapper-plan",
+          "phase2",
+          "plan"
+        ],
+        "deps": [
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2TAGDJ5F0FEPC3XPWVDSWDH"
+          }
+        ]
+      },
+      "before_body_sha256": "0cc72f89f47cc79075a763210b4ec6b3826aa61dbc7ae499d89a15ccc0f59435",
+      "title": "[film] D1A-film: write and cold-review its phase plan, then file its slice tickets",
+      "status": "open",
+      "priority": 1,
+      "lane": "film",
+      "disposition": "retain",
+      "reason": "Preserved approved film-library scope. Follow S0-S4c order and exact text parity; the earlier annotation preview does not close this ticket.",
+      "dependency_ids": [
+        "bd-01M2TAGDJ5F0FEPC3XPWVDSWDH"
+      ],
+      "assignee": null
+    },
+    {
+      "id": "bd-01M2TAMJ95K9D7H248A8387YW4",
+      "before": {
+        "title": "Phase 4: 1.0 release gate and stability table",
+        "status": "open",
+        "priority": 2,
+        "assignee": null,
+        "tags": [
+          "gate",
+          "mapper-plan",
+          "phase4",
+          "release"
+        ],
+        "deps": [
+          {
+            "kind": "blocks",
+            "parent": "bd-01M17AGFAVE90MA9QS50V0FTZD"
+          },
+          {
+            "kind": "blocks",
+            "parent": "bd-01M17ZNXY6AS1CMBQJRH3JMNVX"
+          },
+          {
+            "kind": "blocks",
+            "parent": "bd-01M19956MFSG7076QE4J66T7E9"
+          },
+          {
+            "kind": "blocks",
+            "parent": "bd-01M19G69RQCHMT2EMG11XFT4WX"
+          },
+          {
+            "kind": "blocks",
+            "parent": "bd-01M1CQKRG1A4J4BEWCC78F4TEZ"
+          },
+          {
+            "kind": "blocks",
+            "parent": "bd-01M1CQNM5DZZNWD8BN4WRKVZRQ"
+          },
+          {
+            "kind": "blocks",
+            "parent": "bd-01M1D215EY4T5BR0VRJ694AMBQ"
+          },
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2T32SGVJXR2RT3RTS2DCN9P"
+          },
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2TAE44D7S8T0RHGH6FWWVP8"
+          },
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2TAEW794XCR7D2HZJFNXVJY"
+          },
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2TAKTB61XNXV4Y6A9J3CB0C"
+          },
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2TAM66RTEMY3VVHA3N2MYXK"
+          }
+        ]
+      },
+      "before_body_sha256": "9f9b0aae972c03a0a49860d581e354527aaefbbef8f83049bb6f2d8c567aeed3",
+      "title": "[release] Phase 4: 1.0 release gate and stability table",
+      "status": "open",
+      "priority": 2,
+      "lane": "release",
+      "disposition": "rescope",
+      "reason": "Retain ruling E film compiler/types/D1B and public stability requirements. Add the reference analysis preview, support honesty, compatibility and deterministic recovery gate; empirical superiority/optional provider/calibration wins are separate claim gates. Remove mandatory empirical calibration/label-provider prerequisites; unavailable calibration must be explicit.",
+      "dependency_ids": [
+        "bd-01M2WVJ8HKX6EHG2C5CXYEZYJ6",
+        "bd-01M1CQKRG1A4J4BEWCC78F4TEZ",
+        "bd-01M2T32SGVJXR2RT3RTS2DCN9P",
+        "bd-01M1CQNM5DZZNWD8BN4WRKVZRQ",
+        "bd-01M2TAKTB61XNXV4Y6A9J3CB0C",
+        "bd-01M2TAM66RTEMY3VVHA3N2MYXK",
+        "bd-01M19956MFSG7076QE4J66T7E9",
+        "bd-01M1DA6NJXYT4NEA18745FM3KY",
+        "bd-01M17ZNXY6AS1CMBQJRH3JMNVX",
+        "bd-01M1D215EY4T5BR0VRJ694AMBQ",
+        "bd-01M17AGFAVE90MA9QS50V0FTZD"
+      ],
+      "assignee": null
+    },
+    {
+      "id": "bd-01M16B4NE7R5HHXT70GFW629ZT",
+      "before": {
+        "title": "align: PopulationAggregate.of refuses an empty subject vector but nothing tests it, and it reports SizeMismatch for a non-mismatch",
+        "status": "open",
+        "priority": 3,
+        "assignee": null,
+        "tags": [],
+        "deps": []
+      },
+      "before_body_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "title": "align: PopulationAggregate.of refuses an empty subject vector but nothing tests it, and it reports SizeMismatch for a non-mismatch",
+      "status": "closed",
+      "priority": 2,
+      "lane": "closed",
+      "disposition": "landed",
+      "reason": "Commit e285fed5 is reachable from baseline main; affected tests inspected: align/src/main/scala/storymodel4s/align/matrix.scala, align/src/main/scala/storymodel4s/align/population.scala, align/src/test/scala/storymodel4s/align/PopulationSuite.scala. Existing locally observed clean gate/mutation evidence: docs/plans/2026-09-17-one-point-oh-session-1.md and original issue review notes. No tests rerun in this planning pass.",
+      "dependency_ids": [],
+      "assignee": null
+    },
+    {
+      "id": "bd-01M174W3D9AZG2FGSRM11FZ7ZQ",
+      "before": {
+        "title": "align: harden MassRatio.unsafe against NaN \u2014 UNVERIFIED, the earlier \"closed as a side effect\" claim was never confirmed (signature.scala:212 takes the else branch on NaN and yields Some(NaN); caller validation unaudited)",
+        "status": "open",
+        "priority": 3,
+        "assignee": "claude-storymodel4s-m1",
+        "tags": [
+          "estimand"
+        ],
+        "deps": []
+      },
+      "before_body_sha256": "21d26b22de7bcdd863f6c6d5ea4a22c3ccf2f774edf951952d04c406122c5299",
+      "title": "align: harden MassRatio.unsafe against NaN \u2014 UNVERIFIED, the earlier \"closed as a side effect\" claim was never confirmed (signature.scala:212 takes the else branch on NaN and yields Some(NaN); caller validation unaudited)",
+      "status": "closed",
+      "priority": 2,
+      "lane": "closed",
+      "disposition": "landed",
+      "reason": "Commit 01cfbc46 is reachable from baseline main; affected tests inspected: align/src/main/scala/storymodel4s/align/signature.scala, align/src/test/scala/storymodel4s/align/SignatureSuite.scala. Existing locally observed clean gate/mutation evidence: docs/plans/2026-09-17-one-point-oh-session-1.md and original issue review notes. No tests rerun in this planning pass. Residual forged NaN operand storage is explicitly retained on the signature-migration ticket, not claimed fixed.",
+      "dependency_ids": [],
+      "assignee": ""
+    },
+    {
+      "id": "bd-01M175Y5FEZJ661PPBSGJFT8RX",
+      "before": {
+        "title": "docs: split rule 4 (548 lines, 37% of AGENTS.md at 1491 lines) into docs/EVIDENCE.md - the contract is no longer readable as one",
+        "status": "open",
+        "priority": 3,
+        "assignee": null,
+        "tags": [],
+        "deps": []
+      },
+      "before_body_sha256": "a7f66bb6bbf9a67d86878133114fe81872dbfd180922ce7b72c82b9ba54300dc",
+      "title": "[later] docs: split rule 4 (548 lines, 37% of AGENTS.md at 1491 lines) into docs/EVIDENCE.md - the contract is no longer readable as one",
+      "status": "open",
+      "priority": 3,
+      "lane": "later",
+      "disposition": "retain",
+      "reason": "Outside the current preview path; preserve evidence and acceptance scope, resume only for a named consumer or demonstrated blocking defect.",
+      "dependency_ids": [],
+      "assignee": null
+    },
+    {
+      "id": "bd-01M17AGFAVE90MA9QS50V0FTZD",
+      "before": {
+        "title": "align: support accessor name erases count-vs-mass grain",
+        "status": "open",
+        "priority": 3,
+        "assignee": null,
+        "tags": [
+          "align",
+          "api",
+          "estimand"
+        ],
+        "deps": []
+      },
+      "before_body_sha256": "b4e6c6ccfd1f45d878bfb0750aa227a19a1ab8b62b26f38cd27ce5bea8df6e7f",
+      "title": "[maintenance] align: support accessor name erases count-vs-mass grain",
+      "status": "open",
+      "priority": 2,
+      "lane": "maintenance",
+      "disposition": "retain",
+      "reason": "Retained with its original acceptance scope; recheck against current code before implementation or closure. Not a prerequisite for the annotation-assisted preview.",
+      "dependency_ids": [],
+      "assignee": null
+    },
+    {
+      "id": "bd-01M1CQSWJ538PAEME49200YARR",
+      "before": {
+        "title": "E0 (1.x): recall-map over a compiled film source -- the story-spine route, keeping E0's terminal courts",
+        "status": "open",
+        "priority": 3,
+        "assignee": "codex-storymodel4s-chief",
+        "tags": [
+          "1.x",
+          "critical",
+          "film",
+          "mapper-plan",
+          "product",
+          "recall",
+          "vertical"
+        ],
+        "deps": [
+          {
+            "kind": "blocks",
+            "parent": "bd-01M1CQ5YS5M25F7HD9NN5YVAYP"
+          },
+          {
+            "kind": "blocks",
+            "parent": "bd-01M1CQH3QNRMHZYR593DQWEBY7"
+          },
+          {
+            "kind": "blocks",
+            "parent": "bd-01M1CQKRG1A4J4BEWCC78F4TEZ"
+          },
+          {
+            "kind": "blocks",
+            "parent": "bd-01M1CQNM5DZZNWD8BN4WRKVZRQ"
+          },
+          {
+            "kind": "blocks",
+            "parent": "bd-01M1CQQDCWN2RTT1Z8XNNB7VMY"
+          },
+          {
+            "kind": "blocks",
+            "parent": "bd-01M1DB6J4VFETMCFG096713DCY"
+          },
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2T32SGVJXR2RT3RTS2DCN9P"
+          },
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2TADC4VKSDZ2S9SXETH2MYM"
+          }
+        ]
+      },
+      "before_body_sha256": "b5290e28940bbbc8f557681c602d4eb26dea6124cf25ab7a5681edb6ef64fdcb",
+      "title": "[later] E0 (1.x): recall-map over a compiled film source -- the story-spine route, keeping E0's terminal courts",
+      "status": "open",
+      "priority": 3,
+      "lane": "later",
+      "disposition": "retain",
+      "reason": "Ruling E: 1.x full film-model wire/terminal capability; separate from the initial mapping exchange preview.",
+      "dependency_ids": [
+        "bd-01M1CQ5YS5M25F7HD9NN5YVAYP",
+        "bd-01M1CQH3QNRMHZYR593DQWEBY7",
+        "bd-01M1CQKRG1A4J4BEWCC78F4TEZ",
+        "bd-01M1CQNM5DZZNWD8BN4WRKVZRQ",
+        "bd-01M1CQQDCWN2RTT1Z8XNNB7VMY",
+        "bd-01M1DB6J4VFETMCFG096713DCY",
+        "bd-01M2T32SGVJXR2RT3RTS2DCN9P",
+        "bd-01M2TADC4VKSDZ2S9SXETH2MYM"
+      ],
+      "assignee": ""
+    },
+    {
+      "id": "bd-01M2WTGF981AY7RCN8QC42JSPT",
+      "before": {
+        "title": "Sherlock crosswalk: route production through ClockRepair and derive the manifest from the record (review finding C1)",
+        "status": "open",
+        "priority": 1,
+        "assignee": null,
+        "tags": [
+          "intake",
+          "sherlock",
+          "crosswalk"
+        ],
+        "deps": []
+      },
+      "before_body_sha256": "76b1af64a9c6b0b526720ff9cf7ef3753325f3bc035b3577444abc0859127015",
+      "title": "G0: route Sherlock production coordinates through receipted ClockRepair",
+      "status": "open",
+      "priority": 0,
+      "lane": "foundation",
+      "disposition": "consolidated-owner",
+      "reason": "Canonical C1 implementation ticket; absorbs record, loader, hash application, locus, receipt and verification children. Baseline is bd-01M2WVCEBHAZBKJQ0EB84EA4HV.",
+      "dependency_ids": [
+        "bd-01M2WVCEBHAZBKJQ0EB84EA4HV"
+      ],
+      "assignee": null,
+      "snapshot": "concurrent-intake-commit"
+    },
+    {
+      "id": "bd-01M2WTGW0J5YRNZ8M0C1PDNNJK",
+      "before": {
+        "title": "C1: the clockRepairs Scaladoc claims a production caller that does not exist -- make it true or remove it",
+        "status": "open",
+        "priority": 1,
+        "assignee": null,
+        "tags": [
+          "intake",
+          "sherlock",
+          "crosswalk"
+        ],
+        "deps": []
+      },
+      "before_body_sha256": "88da5560b5b199b2eb1eef6f51e1f50f5032932b0eb768c239fcf1d1f3c4f775",
+      "title": "C1: the clockRepairs Scaladoc claims a production caller that does not exist -- make it true or remove it",
+      "status": "closed",
+      "priority": 2,
+      "lane": "closed",
+      "disposition": "completed-doc-correction",
+      "reason": "The planning checkpoint corrects the false production-caller Scaladoc. Integration remains open on bd-01M2WTGF981AY7RCN8QC42JSPT; no production implementation claimed.",
+      "dependency_ids": [],
+      "assignee": null,
+      "snapshot": "concurrent-intake-commit"
+    },
+    {
+      "id": "bd-01M2WTH9R8SNCMVCS8V3F3RFW1",
+      "before": {
+        "title": "C1 DECISION (owner): admission hashes -- one key (read from timebase-repair.json) or two keys (JSON plus a test-bound Scala literal)",
+        "status": "open",
+        "priority": 1,
+        "assignee": null,
+        "tags": [
+          "intake",
+          "sherlock",
+          "crosswalk",
+          "decision"
+        ],
+        "deps": []
+      },
+      "before_body_sha256": "ee117f6e7780bf43df4b4a63e5980dd897077df00f0542b50fe09603126a48d0",
+      "title": "C1 DECISION (owner): admission hashes -- one key (read from timebase-repair.json) or two keys (JSON plus a test-bound Scala literal)",
+      "status": "closed",
+      "priority": 2,
+      "lane": "closed",
+      "disposition": "decided",
+      "reason": "Decision recorded in PLAN section 2 and ADR 0019: one reviewed committed JSON admission authority, with byte verification and bound record identity; arbitrary caller JSON is not trusted. Implementation remains on bd-01M2WTGF981AY7RCN8QC42JSPT.",
+      "dependency_ids": [],
+      "assignee": null,
+      "snapshot": "concurrent-intake-commit"
+    },
+    {
+      "id": "bd-01M2WTHRNHANY0JKHC0275ATMS",
+      "before": {
+        "title": "C1: capture a content-free baseline of sherlockRecallMap output on the real data root BEFORE any crosswalk change",
+        "status": "open",
+        "priority": 1,
+        "assignee": null,
+        "tags": [
+          "intake",
+          "sherlock",
+          "crosswalk"
+        ],
+        "deps": []
+      },
+      "before_body_sha256": "e42eb403705eca5e8922b95281a0938a6625dc2cd3834ae6ba613f268fb20ae7",
+      "title": "C1: capture a content-free baseline of sherlockRecallMap output on the real data root BEFORE any crosswalk change",
+      "status": "closed",
+      "priority": 2,
+      "lane": "closed",
+      "disposition": "superseded",
+      "reason": "Acceptance retained by the broader frozen baseline ticket bd-01M2WVCEBHAZBKJQ0EB84EA4HV, including repeated real-input output and row-locus digests. No second baseline task.",
+      "dependency_ids": [],
+      "assignee": null,
+      "snapshot": "concurrent-intake-commit"
+    },
+    {
+      "id": "bd-01M2WTJ7VEA16CY9BDBA7SVB87",
+      "before": {
+        "title": "C1: extend TimebaseRepair.Record with the edition parts and the scientific restrictions; build MediaManifest's measurements from it",
+        "status": "open",
+        "priority": 1,
+        "assignee": null,
+        "tags": [
+          "intake",
+          "sherlock",
+          "crosswalk"
+        ],
+        "deps": []
+      },
+      "before_body_sha256": "fa95bd1a11aa8132848ec6afe6af93382c1b53574d15c237c874c48d1a7986f2",
+      "title": "C1: extend TimebaseRepair.Record with the edition parts and the scientific restrictions; build MediaManifest's measurements from it",
+      "status": "closed",
+      "priority": 2,
+      "lane": "closed",
+      "disposition": "superseded",
+      "reason": "Acceptance consolidated into canonical clock integration bd-01M2WTGF981AY7RCN8QC42JSPT. This closure removes duplicate scheduling, not implementation work.",
+      "dependency_ids": [],
+      "assignee": null,
+      "snapshot": "concurrent-intake-commit"
+    },
+    {
+      "id": "bd-01M2WTJRM780AW4BSYYWXR3VMK",
+      "before": {
+        "title": "C1: apply the admission-hash decision to MediaManifest",
+        "status": "open",
+        "priority": 2,
+        "assignee": null,
+        "tags": [
+          "intake",
+          "sherlock",
+          "crosswalk"
+        ],
+        "deps": [
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2WTH9R8SNCMVCS8V3F3RFW1"
+          },
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2WTJ7VEA16CY9BDBA7SVB87"
+          }
+        ]
+      },
+      "before_body_sha256": "1c26a518d3aa4d5daf417e052588f1a2eeb82f3f6962ca8b8fb30303de2ad85c",
+      "title": "C1: apply the admission-hash decision to MediaManifest",
+      "status": "closed",
+      "priority": 2,
+      "lane": "closed",
+      "disposition": "superseded",
+      "reason": "Acceptance consolidated into canonical clock integration bd-01M2WTGF981AY7RCN8QC42JSPT. This closure removes duplicate scheduling, not implementation work.",
+      "dependency_ids": [
+        "bd-01M2WTH9R8SNCMVCS8V3F3RFW1",
+        "bd-01M2WTJ7VEA16CY9BDBA7SVB87"
+      ],
+      "assignee": null,
+      "snapshot": "concurrent-intake-commit"
+    },
+    {
+      "id": "bd-01M2WTK7H8PPVWKC5E1406ARJX",
+      "before": {
+        "title": "C1: SherlockAnnotations.locusFor projects through ClockRepair.projectRunLocalSeconds instead of hand arithmetic",
+        "status": "open",
+        "priority": 1,
+        "assignee": null,
+        "tags": [
+          "intake",
+          "sherlock",
+          "crosswalk"
+        ],
+        "deps": [
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2WTHRNHANY0JKHC0275ATMS"
+          },
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2WTJ7VEA16CY9BDBA7SVB87"
+          }
+        ]
+      },
+      "before_body_sha256": "5c0874e817c10a7578c664666877f9fd924ea39cec61b2d4b52328420584a0ed",
+      "title": "C1: SherlockAnnotations.locusFor projects through ClockRepair.projectRunLocalSeconds instead of hand arithmetic",
+      "status": "closed",
+      "priority": 2,
+      "lane": "closed",
+      "disposition": "superseded",
+      "reason": "Acceptance consolidated into canonical clock integration bd-01M2WTGF981AY7RCN8QC42JSPT. This closure removes duplicate scheduling, not implementation work.",
+      "dependency_ids": [
+        "bd-01M2WTHRNHANY0JKHC0275ATMS",
+        "bd-01M2WTJ7VEA16CY9BDBA7SVB87"
+      ],
+      "assignee": null,
+      "snapshot": "concurrent-intake-commit"
+    },
+    {
+      "id": "bd-01M2WTKP5PXP3FJEDWEQ0SWKHV",
+      "before": {
+        "title": "C1: Atlas carries each row's ClockRepair receipt, so a mapped row cites the derivation that placed it",
+        "status": "open",
+        "priority": 2,
+        "assignee": null,
+        "tags": [
+          "intake",
+          "sherlock",
+          "crosswalk"
+        ],
+        "deps": [
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2WTK7H8PPVWKC5E1406ARJX"
+          }
+        ]
+      },
+      "before_body_sha256": "b031223b74bb25a09d3dddc8985ef94af0cb783af941f607e160c611e55d6e19",
+      "title": "C1: Atlas carries each row's ClockRepair receipt, so a mapped row cites the derivation that placed it",
+      "status": "closed",
+      "priority": 2,
+      "lane": "closed",
+      "disposition": "superseded",
+      "reason": "Acceptance consolidated into canonical clock integration bd-01M2WTGF981AY7RCN8QC42JSPT. This closure removes duplicate scheduling, not implementation work.",
+      "dependency_ids": [
+        "bd-01M2WTK7H8PPVWKC5E1406ARJX"
+      ],
+      "assignee": null,
+      "snapshot": "concurrent-intake-commit"
+    },
+    {
+      "id": "bd-01M2WTM4PYFHJ3XNG28WSZY2ZT",
+      "before": {
+        "title": "C1: one reusable loader for the admitted Sherlock record, called by every entry point",
+        "status": "open",
+        "priority": 1,
+        "assignee": null,
+        "tags": [
+          "intake",
+          "sherlock",
+          "crosswalk"
+        ],
+        "deps": [
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2WTJ7VEA16CY9BDBA7SVB87"
+          }
+        ]
+      },
+      "before_body_sha256": "719668937219dbab6900af13db81f4deba9a967cc6ebc60b7ad48c83e8ba6aad",
+      "title": "C1: one reusable loader for the admitted Sherlock record, called by every entry point",
+      "status": "closed",
+      "priority": 2,
+      "lane": "closed",
+      "disposition": "superseded",
+      "reason": "Acceptance consolidated into canonical clock integration bd-01M2WTGF981AY7RCN8QC42JSPT. This closure removes duplicate scheduling, not implementation work.",
+      "dependency_ids": [
+        "bd-01M2WTJ7VEA16CY9BDBA7SVB87"
+      ],
+      "assignee": null,
+      "snapshot": "concurrent-intake-commit"
+    },
+    {
+      "id": "bd-01M2WTMGV3C6HYRJN823JDBRWV",
+      "before": {
+        "title": "C1: verify -- byte-identical sherlockRecallMap output against the baseline, mutations, gate, cold review",
+        "status": "open",
+        "priority": 1,
+        "assignee": null,
+        "tags": [
+          "intake",
+          "sherlock",
+          "crosswalk"
+        ],
+        "deps": [
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2WTHRNHANY0JKHC0275ATMS"
+          },
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2WTJRM780AW4BSYYWXR3VMK"
+          },
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2WTK7H8PPVWKC5E1406ARJX"
+          },
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2WTKP5PXP3FJEDWEQ0SWKHV"
+          },
+          {
+            "kind": "blocks",
+            "parent": "bd-01M2WTM4PYFHJ3XNG28WSZY2ZT"
+          }
+        ]
+      },
+      "before_body_sha256": "6ca73385fb4876395fe586cfbd0685912774ed0acf883ee1f6a6244496be98ba",
+      "title": "C1: verify -- byte-identical sherlockRecallMap output against the baseline, mutations, gate, cold review",
+      "status": "closed",
+      "priority": 2,
+      "lane": "closed",
+      "disposition": "superseded",
+      "reason": "Acceptance consolidated into canonical clock integration bd-01M2WTGF981AY7RCN8QC42JSPT. This closure removes duplicate scheduling, not implementation work.",
+      "dependency_ids": [
+        "bd-01M2WTHRNHANY0JKHC0275ATMS",
+        "bd-01M2WTJRM780AW4BSYYWXR3VMK",
+        "bd-01M2WTK7H8PPVWKC5E1406ARJX",
+        "bd-01M2WTKP5PXP3FJEDWEQ0SWKHV",
+        "bd-01M2WTM4PYFHJ3XNG28WSZY2ZT"
+      ],
+      "assignee": null,
+      "snapshot": "concurrent-intake-commit"
+    },
+    {
+      "id": "bd-01M2WTMWXY5QH2QDZ9DB7PCTMX",
+      "before": {
+        "title": "Gold rule: bind secondsPerTr and the alias rule across timebase-repair.json, SherlockSceneCoding.scala and gold_scene.py",
+        "status": "open",
+        "priority": 1,
+        "assignee": null,
+        "tags": [
+          "intake",
+          "gold-rule"
+        ],
+        "deps": []
+      },
+      "before_body_sha256": "ecb0627b71e810f3abdf7603c203f75694f0b0dbca11c8f36a8de077446261ee",
+      "title": "Gold rule: bind secondsPerTr and the alias rule across timebase-repair.json, SherlockSceneCoding.scala and gold_scene.py",
+      "status": "closed",
+      "priority": 2,
+      "lane": "closed",
+      "disposition": "superseded",
+      "reason": "TR and participant-alias single-authority and Scala/Python agreement witnesses move into scorer bd-01M2TA5FB4ATF9QS9ZA9MDJNE2, which edits the same boundary. No independent gold read is authorized by this closure.",
+      "dependency_ids": [],
+      "assignee": null,
+      "snapshot": "concurrent-intake-commit"
+    },
+    {
+      "id": "bd-01M2WTN8ZDYV4YYZRJH1RRHEJS",
+      "before": {
+        "title": "timebase-repair.json: bind the last three silent fields to the record itself, or declare them unverified",
+        "status": "open",
+        "priority": 2,
+        "assignee": null,
+        "tags": [
+          "intake",
+          "sherlock"
+        ],
+        "deps": []
+      },
+      "before_body_sha256": "85914e0018baf4df38f7aa1161c779ba315e2c83a60877edd51abae6eba0fa64",
+      "title": "timebase-repair.json: bind the last three silent fields to the record itself, or declare them unverified",
+      "status": "closed",
+      "priority": 2,
+      "lane": "closed",
+      "disposition": "superseded",
+      "reason": "Retained-row, run-boundary and upstream-digest status acceptance moves into record integration bd-01M2WTGF981AY7RCN8QC42JSPT. Missing upstream verification must remain explicit.",
+      "dependency_ids": [],
+      "assignee": null,
+      "snapshot": "concurrent-intake-commit"
+    },
+    {
+      "id": "bd-01M2WTNN04AYE8GA7CG2ZWW4AA",
+      "before": {
+        "title": "Coarsening admits non-contiguous grouping -- decide whether a contiguity-checked claim is wanted (ADR first)",
+        "status": "open",
+        "priority": 3,
+        "assignee": null,
+        "tags": [
+          "intake",
+          "design"
+        ],
+        "deps": []
+      },
+      "before_body_sha256": "00b7ac813bc60c3a88e693e2d07abb66fee0084b83793ac2a6a57d87f9bc0183",
+      "title": "[later] Coarsening admits non-contiguous grouping -- decide whether a contiguity-checked claim is wanted (ADR first)",
+      "status": "open",
+      "priority": 3,
+      "lane": "later",
+      "disposition": "retain",
+      "reason": "Coarsening remains deliberately order-free. No defect or new public claim without a concrete consumer and ADR; unrelated to the preview.",
+      "dependency_ids": [],
+      "assignee": null,
+      "snapshot": "concurrent-intake-commit"
+    },
+    {
+      "id": "bd-01M2WTP16RXN7S7SZ25JZ4PQ7F",
+      "before": {
+        "title": "Rename B1ProbeSuite.scala to SegmentLinkCompositionSuite.scala (file and class disagree)",
+        "status": "open",
+        "priority": 3,
+        "assignee": null,
+        "tags": [
+          "intake",
+          "chore"
+        ],
+        "deps": []
+      },
+      "before_body_sha256": "80f1d589859a02d0ad175070ad75177ae259e1bf7d6481c286a9a032febe35a6",
+      "title": "[maintenance] Rename B1ProbeSuite.scala to SegmentLinkCompositionSuite.scala (file and class disagree)",
+      "status": "open",
+      "priority": 3,
+      "lane": "maintenance",
+      "disposition": "retain",
+      "reason": "Keep the test-file rename as an optional narrow cleanup; it does not gate the preview or scientific claim.",
+      "dependency_ids": [],
+      "assignee": null,
+      "snapshot": "concurrent-intake-commit"
+    },
+    {
+      "id": "bd-01M2WTPDBB4MQBXEJ181Q85ZG2",
+      "before": {
+        "title": "Retrieve the undelivered remainder of the post-fix cold review: MINOR A3, the rest of C1, the refuse-to-merge verdict",
+        "status": "open",
+        "priority": 2,
+        "assignee": null,
+        "tags": [
+          "intake",
+          "review"
+        ],
+        "deps": []
+      },
+      "before_body_sha256": "6574a1c5da81db2f9dcadd61b4305c4a06db453531963a878af6acd10ba92f0e",
+      "title": "[maintenance] Retrieve the undelivered remainder of the post-fix cold review: MINOR A3, the rest of C1, the refuse-to-merge verdict",
+      "status": "open",
+      "priority": 2,
+      "lane": "maintenance",
+      "disposition": "retain",
+      "reason": "Retain the incomplete intake-review scope as a bounded cold review of A-C. The current planning review does not certify the missing findings.",
+      "dependency_ids": [],
+      "assignee": null,
+      "snapshot": "concurrent-intake-commit"
+    },
+    {
+      "id": "bd-01M2WTPSFGC31SJ3GMMQT4806M",
+      "before": {
+        "title": "Watch: corpusNative compileIncremental failed once after module cleans and did not reproduce",
+        "status": "open",
+        "priority": 3,
+        "assignee": null,
+        "tags": [
+          "intake",
+          "infra"
+        ],
+        "deps": []
+      },
+      "before_body_sha256": "2ee36ca4cb5a7fc57f4318790e0a5bd50a6563af4003447d24c343ba735c0660",
+      "title": "[maintenance] Watch: corpusNative compileIncremental failed once after module cleans and did not reproduce",
+      "status": "open",
+      "priority": 3,
+      "lane": "maintenance",
+      "disposition": "watch",
+      "reason": "A single unreproduced compile failure is a watch item, not an inferred race or automatic release block. On recurrence retain the full log and exact tree.",
+      "dependency_ids": [],
+      "assignee": null,
+      "snapshot": "concurrent-intake-commit"
+    },
+    {
+      "id": "bd-01M2WTQ5PNB7RJ6NEAAAYCHYRY",
+      "before": {
+        "title": "EPIC (ADR first): a canonical on-disk emission of Segmentation, SegmentLink and Coded, so consumers stop re-reading raw files",
+        "status": "open",
+        "priority": 2,
+        "assignee": null,
+        "tags": [
+          "intake",
+          "design",
+          "epic"
+        ],
+        "deps": []
+      },
+      "before_body_sha256": "5d4417a09fca9f70c1fa65ebf50ec9ad44ba40a58d56ff969e8b2652df1adfee",
+      "title": "[later] EPIC (ADR first): a canonical on-disk emission of Segmentation, SegmentLink and Coded, so consumers stop re-reading raw files",
+      "status": "open",
+      "priority": 3,
+      "lane": "later",
+      "disposition": "retain",
+      "reason": "Canonical corpus interchange is distinct from mapping output. Park the ADR-first proposal until a concrete second consumer needs it; do not gate shared mapping evidence or preview on a universal intake format.",
+      "dependency_ids": [],
+      "assignee": null,
+      "snapshot": "concurrent-intake-commit"
+    }
+  ],
+  "execution_receipt": "EXECUTION_RECEIPT.json"
+}

@@ -1,126 +1,73 @@
 # Mission
 
-The mission of storymodel4s is to build an **unattended and auditable** system
-for representing stories, recall, and the transformation between them. The
-current library provides portable Scala 3 types, laws, validators, and inference
-algorithms for those artifacts. Automatic construction of a complete story
-model from raw text is the M1–M5 programme and is not yet implemented.
+Deliver a usable, reproducible system for modeling written and audiovisual narratives, modeling their recall, and exporting evidence-grounded recall-to-source mappings for downstream data analysis.
 
-## What we are building
+## The delivery contract
 
-The target system follows one compositional pipeline:
+For a versioned source representation and a recall transcript, the system must produce a versioned mapping artifact that accounts for every requested recall unit. Its public views must locate the corresponding recall words and any measured recall timing; identify source referents and their text or playback support; retain alternatives and non-localizable outcomes; and state the inference method, decision rule, support coverage, and calibration status.
 
-```text
-text or transcript
-  -> exact surface atlas and word traversal
-  -> local proposition charts and aligned feature tracks
-  -> document identity, reference, and context
-  -> events, states, relations, scenes, episodes, and trajectories
-  -> partial open-world recall alignment and multidimensional outputs
-```
+The product must support two interoperable source-building routes: a lightweight route from checked, anchored annotations, and a narrative-model route that compiles source evidence into a richer story representation. Both feed the same public mapping and analysis contract. Annotation-assisted video mapping must be identified as such. A claim of automatic video-derived modeling requires an executed path from audiovisual material, not merely matching against human scene descriptions.
 
-Each layer has a narrow responsibility.
+## Commitments
 
-- The surface atlas preserves canonical text, stable offsets, tokens, clauses,
-  sentences, turns, and exact span lookup.
-- Feature tracks attach scalar or vector measurements to that shared axis.
-  Declared window plans can compute sums, means, slopes, kernels, or other
-  reductions while retaining coverage, missingness, and derivation receipts.
-- Proposition charts represent local concepts, roles, polarity, reentrancy,
-  embedded content, partial values, and exact source alignment. AMR/PENMAN is a
-  standards-compatible adapter into this contract, not the global story
-  ontology and not a prerequisite for usable output.
-- Document semantics preserves mentions so that a later resolver can establish
-  cross-sentence entity and event identity, reference, speech, belief,
-  intention, and other contexts without destroying local evidence.
-- The story model represents typed temporal, causal, participant, state-change,
-  and hierarchy relations. It keeps discourse time separate from story-world
-  time and retains both resolved structure and boundary evidence.
-- The recall model represents a second process with its own order, discourse
-  functions, uncertainty, and external material.
-- Alignment is partial, probabilistic, hierarchical, directed, and open-world.
-  It permits omission, compression, elaboration, blending, backtracking,
-  misordering, association, and intrusion.
+### 1. Keep source, evidence, and interpretation separate
 
-## How unattended, auditable builds work
+Pin source bytes or externally supplied source identities, editions, streams, coordinate axes, annotations, provider outputs, and transformations. Preserve the distinction between presentation time and story-world chronology. Derived caption or annotation text is not canonical film content. Build source representations independently of the recall outputs used to evaluate mapping.
 
-Parsers, language models, embedding models, rules, and future providers all
-implement replaceable acquisition interfaces. They return typed proposals with
-source evidence and receipts. They do not write accepted scientific claims
-directly.
+### 2. Make addressing exact and precision honest
 
-Deterministic resolvers check proposal schemas, endpoint types, graph laws,
-temporal consistency, evidence spans, and configured acceptance policies. A
-build may accept a claim, retain weighted alternatives, leave it unresolved,
-or reject it. Every outcome is a valid machine-readable result. Human expertise
-is used to design standards, gold data, prompts, calibration, and audits; it is
-not required to process an ordinary input.
+Preserve exact text spans, stable word identifiers, and edition-bound playback coordinates. Store exact timebases and ticks as authoritative; decimal seconds are derived conveniences. Preserve discontiguous supports, uncertain occurrence identity, and missing timestamps. Never infer a word offset from the next word's onset without an explicit estimation policy.
 
-Every accepted explicit claim must cite exact UTF-16 code-unit spans without
-cutting a Unicode code point. Inferences must cite upstream claims. Every
-numeric credence must be identified as a raw score or as a probability
-calibrated by a named model. Provider calls, configurations, artifacts, and
-cache keys must be receipted so a build can be replayed from its recorded
-inputs.
+### 3. Keep the useful path small
 
-## Operating commitments
+A researcher can perform basic localization using anchored units without complete semantic parsing, complete event graphs, or an external visualization application. Rich semantics, structural comparisons, and trajectory models are capability-bearing enrichments rather than universal prerequisites. The approved film-capable library path remains an explicit delivery commitment, not an indefinitely experimental branch.
 
-We will:
+### 4. Distinguish localization, fidelity, and processing status
 
-1. preserve exact evidence and make every accepted claim traceable to the input
-   or to named upstream claims;
-2. support direct traversal from words to windows to narrative units and back
-   again;
-3. use similarity to retrieve candidates and typed structure to adjudicate role
-   direction, polarity, embedded propositions, context, and chronology;
-4. keep local propositions, continuous features, document identity, narrative
-   relations, and hierarchy distinct but interoperable;
-5. treat discourse time, story-world time, and recall time as separate clocks,
-   and keep reported, believed, intended, and hypothetical content in explicit
-   scopes;
-6. represent omission, gist, blending, elaboration, backtracking, association,
-   intrusion, ambiguity, missingness, and provider disagreement as explicit
-   outcomes rather than error residue; an unresolved build must return
-   alternatives or `Unresolved`, never manufacture precision merely to finish;
-7. keep truth, salience, phenomenology, accessibility, and veridicality as
-   separate quantities;
-8. make every build versioned, content-addressed, cache-replayable, and graph
-   diffable;
-9. use typed, sparse, provider-neutral contracts that run on the JVM, Scala.js,
-   and Scala Native where portable; portable modules must not depend on JVM-only
-   services or runtime-specific parsing features such as regex lookaround;
-10. remain sparse by construction, with no dense event-pair or unit-to-node
-    allocation in core processing;
-11. record every feature space used to infer a boundary or hierarchy and never
-    test that feature against the induced structure without an ablation,
-    cross-fitting, or an independent boundary set;
-12. validate with structural laws and adversarial foils, and establish a
-    leave-story-out harness before any learned component ships;
-13. expose multidimensional recall signatures first and derive scalar or legacy
-    scores only through named, versioned policies;
-14. protect sensitive autobiographical material through explicit provider,
-    provenance, and relational pseudonymization boundaries.
+A recall may refer to an event and distort it. Missing propositional evidence cannot establish fidelity or distortion. Missing candidates do not establish intrusion. Provider failure does not describe the rememberer's behavior. Represent each distinction in data, not only in prose warnings.
 
-## Boundaries
+### 5. Preserve one result with explicit views
 
-The mission is not to produce a single canonical embedding, a bag of generic
-triples, or an opaque accuracy score. It is not to turn every plausible causal
-interpretation into source fact. It is not to require PropBank coverage, a
-particular AMR parser, an LLM provider, a graph database, or a human annotator
-during a production build. AMR is an interoperability adapter, not the story
-ontology; parser output is never ground truth; and automatic output is never
-called gold merely because it passed validation.
+Raw scores, posterior or transport measures, discrete decisions, imputation, temporal projection, and trajectory summaries have named derivations. A decoded anchor is never accompanied by another anchor's confidence without an explicit label. A post-processing step cannot silently rewrite the original posterior. Multi-event recall is not misrepresented as uncertainty between mutually exclusive events.
 
-For natural autobiographical recall, the system is designed to characterize the
-episode implied by the interview, its specificity, organization, and expressed
-phenomenology. It cannot establish historical truth or genuine re-experiencing
-without independent evidence. Current target-episode induction is rule-based
-and uncalibrated. For known or staged source events, those extra questions can
-eventually be measured through explicit source-to-recall alignment.
+### 6. Expose uncertainty without overstating it
 
-The current repository is the portable foundation for this mission. It does not
-yet include provider adapters, the unattended build orchestrator, automatic
-cross-sentence identity resolution, relation extraction, hierarchy induction,
-or the corpora needed for scientific calibration. Their absence must be stated
-plainly until the corresponding gates pass. The first release is
-English-oriented and does not train a parser or foundation model.
+Declare the meaning and normalization of every measure. Model posteriors are conditional on the model, candidate set, source representation, and policy. Empirical calibration requires a separately identified evaluation protocol and a calibration artifact bound to the relevant pipeline and decision. Uncalibrated outputs remain usable for declared exploratory purposes and are always labeled.
+
+### 7. Make analysis outputs part of the core product
+
+Publish documented tables, sparse relations, and machine-readable manifests. Provide a working example that loads a mapping in R or Python, recovers discrete and probabilistic views, and checks accounting and coordinate invariants without reading internal Scala implementation code. Derived measures name their denominators, support policies, and assumptions.
+
+### 8. Prefer deterministic validation at the boundaries
+
+Providers propose evidence or interpretations. Checked constructors and validators enforce identity, membership, coordinate, referential, and serialization rules. Validation does not establish scientific truth. Preserve useful partial outputs with explicit readiness and failures; do not fabricate completeness or require irrelevant semantic layers for a basic localization request.
+
+### 9. Make operation reproducible and economical
+
+Use explicit, versioned configuration; resolve it once per run. Cache reusable source-side work and content-addressed provider exchanges. Make batch failures local, retries budgeted, and completed artifacts verifiable. Offline replay and no-network modes must be enforceable. External transmission of participant content requires an explicit permitted policy for the relevant data.
+
+### 10. Evaluate the entire inference-to-analysis path
+
+Freeze input and gold eligibility independently of predictions. Include every eligible failure and abstention in the appropriate primary denominator. Match comparisons by stable unit identity and participant population. Separate annotation-assisted, transcript-only, and audiovisual-derived input tracks. Test reorderings, silent visual events, ambiguous summaries, missing timing, multiple editions, and insufficient source coverage, not only favorable examples.
+
+### 11. Separate delivery evidence from scientific claims
+
+Maintain a current capability/status record with commit, command, test or example, result, and limitations. A passing unit test, a historical local execution, a clean-machine reproduction, and a held-out scientific validation are different achievements. Engineering may proceed without winning a research comparison; claims of accuracy or superiority may not proceed without the relevant evidence.
+
+### 12. Converge rather than accumulate parallel products
+
+Production inference belongs in library and orchestration modules, not in benchmark scripts. Benchmarks consume the public API. One active delivery plan, a dependency-ordered tracker, and explicit acceptance artifacts govern the current release. New abstractions must close a named delivery gap or remove demonstrated duplication.
+
+### 13. Distinguish measurement from reconstruction
+
+Keep immutable mapping evidence reusable across a strict reference measurement profile and named structured reconstruction profiles. Bind scientific readouts to stage-level inference policies, preserve uncertain and missing transitions, and validate recovery of organization as well as localization. An order-prior ablation or a shuffled-transcript subtraction does not by itself make a reconstruction an independent measurement. Policy compliance is not empirical calibration.
+
+## Release scope and scope changes
+
+The accepted film-capable library requirement is preserved: a film source can be compiled through the API, recall can be aligned against it, and results preserve exact playback support. Lightweight mapping previews can precede that completion but cannot be represented as completing it.
+
+The accompanying turnaround plan proposes an earlier generic analysis preview and documented exports. That sequencing is adopted in the active delivery plan; full film-model interchange (V1) and the corpus-specific film terminal (E0) remain 1.x under ruling E.
+
+Current implementation status belongs in the capability/status record, not in this mission. Unimplemented features must be marked there and must not be advertised as available.
+
+The current delivery order, acceptance gates and evidence are in [the active plan](docs/refactor/PLAN.md).

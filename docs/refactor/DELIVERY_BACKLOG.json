@@ -1,0 +1,908 @@
+{
+  "schema": "storymodel4s.turnaround.backlog",
+  "schema_version": 1,
+  "status": "proposed-not-imported",
+  "audit_revision": "1113f96864a38a2869e49d9c8c5d4e2dc43f5d10",
+  "preparation_date": "2026-09-18",
+  "scheduling_notes": [
+    "Reconcile planning IDs with existing tracker work before import.",
+    "TA-13 (D1A S0) starts early after mapping fixture capture and precedes extraction; the rest of G3 may close after G2.",
+    "Evaluation can run alongside engineering after scoring correction; it does not reinstate the removed research-win gate.",
+    "One critical implementation slice and at most one independent evaluation/fixture slice at a time.",
+    "Empirical calibration may remain unavailable; its absence must be correctly represented. Stable release does not require winning a superiority comparison.",
+    "All listed status values are proposed; artifact preparation here is not implementation completion."
+  ],
+  "tasks": [
+    {
+      "id": "TA-01",
+      "title": "Adopt the product charter and reconcile authority",
+      "gate": "G0",
+      "priority": "P0",
+      "status": "proposed",
+      "owner_role": "Project owner + integration lead",
+      "depends_on": [],
+      "affected_paths_or_symbols": [
+        "vision.md",
+        "mission.md",
+        "README.md",
+        "docs/plans/",
+        "existing tracker"
+      ],
+      "change_boundary": "Adopt replacements; mark governing versus historical plans; preserve D1A-film scope; create one evidence-backed status record.",
+      "acceptance_tests": [
+        "No current capability claim lacks a status/evidence pointer.",
+        "D1A owner rulings are not overridden by a later unapproved P1 alternative."
+      ],
+      "required_evidence": [
+        "Approved scope record",
+        "Current capability/status manifest"
+      ],
+      "existing_work_crosswalk": "D1A owner rulings; mapper-plan P1 remains unapproved unless explicitly decided.",
+      "implementation_note": "Test names or new paths marked proposed are acceptance specifications, not claims of existing implementation."
+    },
+    {
+      "id": "TA-02",
+      "title": "Obtain a current clean build and resolve workflow failures",
+      "gate": "G0",
+      "priority": "P0",
+      "status": "proposed",
+      "owner_role": "Implementation lead",
+      "depends_on": [
+        "TA-01"
+      ],
+      "affected_paths_or_symbols": [
+        "build.sbt",
+        ".github/workflows/",
+        "docs-site/"
+      ],
+      "change_boundary": "Inspect actual job logs; fix cause; run all claimed platform gates and public examples without a private sibling checkout.",
+      "acceptance_tests": [
+        "Clean checkout build/test result recorded at exact SHA.",
+        "Environment-gated skips distinguished from executed tests.",
+        "Unsuccessful checks are explained by evidence, not guessed."
+      ],
+      "required_evidence": [
+        "Command and logs",
+        "Supported-platform table",
+        "Dependency pin inventory"
+      ],
+      "existing_work_crosswalk": "T6/CI readiness; reconcile already-landed warnings and workflow setup.",
+      "implementation_note": "Test names or new paths marked proposed are acceptance specifications, not claims of existing implementation."
+    },
+    {
+      "id": "TA-03",
+      "title": "Freeze mapping regression fixtures and run identities",
+      "gate": "G0",
+      "priority": "P0",
+      "status": "proposed",
+      "owner_role": "Implementation lead",
+      "depends_on": [
+        "TA-01"
+      ],
+      "affected_paths_or_symbols": [
+        "embed-bench/src/test/scala/storymodel4s/bench/video/",
+        "fixtures/",
+        "tools/recall-study/"
+      ],
+      "change_boundary": "Capture permitted tiny text/video/recall inputs, legacy outputs and resolved preset/config hashes. Keep participant prose private when required.",
+      "acceptance_tests": [
+        "Fixture licenses/permissions and content policy recorded.",
+        "Baseline output hashes and input identities fixed.",
+        "Argmax/decode disagreement, missing timing and an external unit included."
+      ],
+      "required_evidence": [
+        "Baseline fixture manifest",
+        "Legacy result bundle"
+      ],
+      "existing_work_crosswalk": "Existing recall-to-video study records and fixtures.",
+      "implementation_note": "Test names or new paths marked proposed are acceptance specifications, not claims of existing implementation."
+    },
+    {
+      "id": "TA-04",
+      "title": "Make scoring fail closed on population and unit identity",
+      "gate": "G0",
+      "priority": "P0",
+      "status": "proposed",
+      "owner_role": "Research/evaluation owner",
+      "depends_on": [
+        "TA-03"
+      ],
+      "affected_paths_or_symbols": [
+        "tools/recall-study/gold_scene.py"
+      ],
+      "change_boundary": "Create gold-independent input/eligibility manifest; make arms emit complete outcomes; reconcile stable IDs and report all exclusions.",
+      "acceptance_tests": [
+        "Dropped, duplicate, extra or changed unit ID invalidates comparison.",
+        "Blanking a wrong label or replacing it with provider failure cannot improve eligible primary accuracy.",
+        "No-gold units stay accounted for without becoming invented gold errors.",
+        "Boundary/overlap gold policy tested."
+      ],
+      "required_evidence": [
+        "Scorer mutation tests",
+        "Frozen scoring/estimand manifest"
+      ],
+      "existing_work_crosswalk": "September 18 mapper plan Phase 1a scoring contract.",
+      "implementation_note": "Test names or new paths marked proposed are acceptance specifications, not claims of existing implementation."
+    },
+    {
+      "id": "TA-05",
+      "title": "Implement checked RecallMapping records and codec preview",
+      "gate": "G1",
+      "priority": "P0",
+      "status": "proposed",
+      "owner_role": "Implementation lead",
+      "depends_on": [
+        "TA-03"
+      ],
+      "affected_paths_or_symbols": [
+        "align: proposed result records",
+        "codec: proposed mapping codec"
+      ],
+      "change_boundary": "Implement ANALYSIS_CONTRACT fields, identities, full outcomes, measure kinds and referential/coordinate checks; version independently.",
+      "acceptance_tests": [
+        "Round trip preserves raw measures and exact coordinate strings.",
+        "Foreign source or recall identities and unresolved targets refuse.",
+        "Missing/duplicate outcome rows refuse."
+      ],
+      "required_evidence": [
+        "Mapping codec fixture",
+        "Schema/field dictionary"
+      ],
+      "existing_work_crosswalk": "Reconcile with current tracker; do not create a duplicate blindly.",
+      "implementation_note": "Test names or new paths marked proposed are acceptance specifications, not claims of existing implementation."
+    },
+    {
+      "id": "TA-06",
+      "title": "Standardize recall word identity and timing intake",
+      "gate": "G1",
+      "priority": "P0",
+      "status": "proposed",
+      "owner_role": "Implementation lead",
+      "depends_on": [
+        "TA-03",
+        "TA-05"
+      ],
+      "affected_paths_or_symbols": [
+        "recall: proposed timing and word membership",
+        "corpus-intake: proposed recall reader",
+        "core/src/main/scala/storymodel4s/core/transcript.scala"
+      ],
+      "change_boundary": "Extract measured timing logic; pin normalization; preserve word IDs across segmentation changes; keep onset-only and missing duration explicit.",
+      "acceptance_tests": [
+        "Non-BMP UTF-16 and code-point conversion fixture.",
+        "Quoted/newline CSV parsing fixture.",
+        "Missing first word onset is not labeled true passage onset.",
+        "No invented offset or silence coverage."
+      ],
+      "required_evidence": [
+        "Word/unit manifest",
+        "Timing provenance tests"
+      ],
+      "existing_work_crosswalk": "Reconcile with current tracker; do not create a duplicate blindly.",
+      "implementation_note": "Test names or new paths marked proposed are acceptance specifications, not claims of existing implementation."
+    },
+    {
+      "id": "TA-07",
+      "title": "Separate raw measures, decoded choices, fill and assessed fidelity",
+      "gate": "G1",
+      "priority": "P0",
+      "status": "proposed",
+      "owner_role": "Implementation lead",
+      "depends_on": [
+        "TA-05"
+      ],
+      "affected_paths_or_symbols": [
+        "embed-bench/src/main/scala/storymodel4s/bench/video/PosteriorSidecar.scala",
+        "embed-bench/src/main/scala/storymodel4s/bench/video/RecallToVideo.scala",
+        "align/src/main/scala/storymodel4s/align/matrix.scala"
+      ],
+      "change_boundary": "Promote sidecar semantics into checked records; preserve legacy serializer; make confidence refer to the named target/stage.",
+      "acceptance_tests": [
+        "Decoded target differs from raw mode and both values remain correct.",
+        "Fill outside posterior support is labeled, with zero/absent raw support preserved.",
+        "Undeclared proposition scope yields unassessed fidelity, not a correctness claim."
+      ],
+      "required_evidence": [
+        "Decision semantics regression fixture",
+        "Compatibility adapter"
+      ],
+      "existing_work_crosswalk": "Reconcile with current tracker; do not create a duplicate blindly.",
+      "implementation_note": "Test names or new paths marked proposed are acceptance specifications, not claims of existing implementation."
+    },
+    {
+      "id": "TA-08",
+      "title": "Extract generic mapping logic from benchmark ownership",
+      "gate": "G2",
+      "priority": "P0",
+      "status": "proposed",
+      "owner_role": "Implementation lead",
+      "depends_on": [
+        "TA-05",
+        "TA-06",
+        "TA-07",
+        "TA-13"
+      ],
+      "affected_paths_or_symbols": [
+        "embed-bench/src/main/scala/storymodel4s/bench/video/",
+        "align: proposed bridge/decode packages",
+        "recall: timing"
+      ],
+      "change_boundary": "Move pure timed view, lexical/decode logic and timing to existing appropriate library packages. Leave corpus runners, shuffle experiments and historical serializers in bench.",
+      "acceptance_tests": [
+        "No public mapping caller imports bench.",
+        "Legacy preset parity under frozen inputs.",
+        "Duplicate ordinals/groups cannot silently overwrite targets.",
+        "Missing child loci and multipart/discontiguous supports handled explicitly."
+      ],
+      "required_evidence": [
+        "Dependency check",
+        "Before/after parity report"
+      ],
+      "existing_work_crosswalk": "D1B extraction work; avoid duplicate mapper implementations.",
+      "implementation_note": "Test names or new paths marked proposed are acceptance specifications, not claims of existing implementation."
+    },
+    {
+      "id": "TA-09",
+      "title": "Provide typed orchestration and explicit configuration",
+      "gate": "G2",
+      "priority": "P0",
+      "status": "proposed",
+      "owner_role": "Implementation lead",
+      "depends_on": [
+        "TA-08"
+      ],
+      "affected_paths_or_symbols": [
+        "pipeline: proposed RecallMap facade",
+        "embed-bench: public API clients"
+      ],
+      "change_boundary": "Resolve config once; return typed results instead of Unit/print-only outcomes; make providers/profiles explicit and record identities.",
+      "acceptance_tests": [
+        "Invalid values refuse rather than selecting hidden defaults.",
+        "No hidden environment changes a run after config resolution.",
+        "Changing behavior-changing config changes derivation identity."
+      ],
+      "required_evidence": [
+        "Public API example",
+        "Resolved-config receipt"
+      ],
+      "existing_work_crosswalk": "Reconcile with current tracker; do not create a duplicate blindly.",
+      "implementation_note": "Test names or new paths marked proposed are acceptance specifications, not claims of existing implementation."
+    },
+    {
+      "id": "TA-10",
+      "title": "Make batch execution and artifact publication safe",
+      "gate": "G2",
+      "priority": "P0",
+      "status": "proposed",
+      "owner_role": "Implementation lead",
+      "depends_on": [
+        "TA-09"
+      ],
+      "affected_paths_or_symbols": [
+        "pipeline/src/main/scala/storymodel4s/pipeline/StoryBuild.scala",
+        "pipeline: mapping output lifecycle"
+      ],
+      "change_boundary": "Use temporary output plus verified publication/completion marker; explicit readiness requirements; isolate participant failures; budget retries and enforce offline replay.",
+      "acceptance_tests": [
+        "Injected failure halfway through writing is not readable as a complete run.",
+        "One participant failure preserves all other outcomes.",
+        "Require-playback fails when coordinates are unavailable.",
+        "Offline replay makes no network calls."
+      ],
+      "required_evidence": [
+        "Failure injection log",
+        "Replay receipt"
+      ],
+      "existing_work_crosswalk": "Reconcile with current tracker; do not create a duplicate blindly.",
+      "implementation_note": "Test names or new paths marked proposed are acceptance specifications, not claims of existing implementation."
+    },
+    {
+      "id": "TA-11",
+      "title": "Deliver exchange tables and one independent R/Python consumer",
+      "gate": "G2",
+      "priority": "P0",
+      "status": "proposed",
+      "owner_role": "Implementation lead",
+      "depends_on": [
+        "TA-05",
+        "TA-06",
+        "TA-07",
+        "TA-09"
+      ],
+      "affected_paths_or_symbols": [
+        "codec: mapping exchange",
+        "pipeline: export command",
+        "examples: proposed analysis example"
+      ],
+      "change_boundary": "Write manifest and required tables; generate discrete and soft views; consumer reconstructs word-level joins without Scala internals.",
+      "acceptance_tests": [
+        "All word/unit/target keys reconcile.",
+        "Exact integer strings survive consumer load.",
+        "Expected mapped-unit count matches hand-authored fixture.",
+        "No accidental Cartesian multiplication on hierarchy/word joins."
+      ],
+      "required_evidence": [
+        "Exchange example bundle",
+        "Executed consumer script and expected output"
+      ],
+      "existing_work_crosswalk": "Reconcile with current tracker; do not create a duplicate blindly.",
+      "implementation_note": "Test names or new paths marked proposed are acceptance specifications, not claims of existing implementation."
+    },
+    {
+      "id": "TA-12",
+      "title": "Demonstrate the annotation-assisted preview end to end",
+      "gate": "G2",
+      "priority": "P0",
+      "status": "proposed",
+      "owner_role": "Project owner + integration lead",
+      "depends_on": [
+        "TA-04",
+        "TA-10",
+        "TA-11"
+      ],
+      "affected_paths_or_symbols": [
+        "pipeline: public facade",
+        "corpus-intake: existing adapters",
+        "docs-site: proposed preview tutorial"
+      ],
+      "change_boundary": "Run permitted real recall plus source annotations; repeat on a differently structured source. Label annotation-only versus verified edition playback capabilities.",
+      "acceptance_tests": [
+        "No source edit or undocumented environment state needed.",
+        "No human-authored annotations mislabeled automatic audiovisual perception.",
+        "Two source structures use same public pipeline."
+      ],
+      "required_evidence": [
+        "Real-input smoke run",
+        "New-user tutorial transcript"
+      ],
+      "existing_work_crosswalk": "Reconcile with current tracker; do not create a duplicate blindly.",
+      "implementation_note": "Test names or new paths marked proposed are acceptance specifications, not claims of existing implementation."
+    },
+    {
+      "id": "TA-13",
+      "title": "D1A S0: pin the text compiler, model, HSMM and view baseline",
+      "gate": "G3",
+      "priority": "P0",
+      "status": "proposed",
+      "owner_role": "Implementation lead",
+      "depends_on": [
+        "TA-03"
+      ],
+      "affected_paths_or_symbols": [
+        "fixtures/",
+        "pipeline/",
+        "align/",
+        "view/"
+      ],
+      "change_boundary": "Run this early, before TA-08 or any support-type change. Capture the existing D1A S0 pins and mutations; mapping fixture work alone is insufficient.",
+      "acceptance_tests": [
+        "Compiler and receipt baselines captured at exact revision.",
+        "Span/support encoding/order mutations are detected.",
+        "Cross-platform compile non-claims recorded."
+      ],
+      "required_evidence": [
+        "D1A S0 baseline artifacts"
+      ],
+      "existing_work_crosswalk": "Approved D1A-types S0; early prerequisite even though full G3 closes later.",
+      "implementation_note": "Test names or new paths marked proposed are acceptance specifications, not claims of existing implementation."
+    },
+    {
+      "id": "TA-14",
+      "title": "D1A S1: record the approved ADR amendment",
+      "gate": "G3",
+      "priority": "P0",
+      "status": "proposed",
+      "owner_role": "Project owner + integration lead",
+      "depends_on": [
+        "TA-01",
+        "TA-13"
+      ],
+      "affected_paths_or_symbols": [
+        "docs/adr/",
+        "docs/plans/2026-09-17-d1a-source-to-story-plan.md"
+      ],
+      "change_boundary": "Record A/D/E rulings, one-bundle envelope, external proposal surface, vocabulary, canonical form and compatibility reasoning.",
+      "acceptance_tests": [
+        "Research-win gate is not reintroduced.",
+        "Film compiler remains on stable API path."
+      ],
+      "required_evidence": [
+        "Accepted ADR amendment"
+      ],
+      "existing_work_crosswalk": "Approved D1A-types S1.",
+      "implementation_note": "Test names or new paths marked proposed are acceptance specifications, not claims of existing implementation."
+    },
+    {
+      "id": "TA-15",
+      "title": "D1A S2: complete checked core support and atlas substrate",
+      "gate": "G3",
+      "priority": "P0",
+      "status": "proposed",
+      "owner_role": "Implementation lead",
+      "depends_on": [
+        "TA-14"
+      ],
+      "affected_paths_or_symbols": [
+        "core/src/main/scala/storymodel4s/core/atlas.scala",
+        "core/src/main/scala/storymodel4s/core/source.scala",
+        "codec/",
+        "laws/"
+      ],
+      "change_boundary": "Implement sealed anchored atlas, bound surface, TypedSupport/PrimaryProjection, evidence validation and canonical interval union per approved design.",
+      "acceptance_tests": [
+        "Wrong stream kind, foreign axis/bundle and out-of-extent anchors refuse.",
+        "Union idempotent and independent of input order.",
+        "External code cannot forge the sealed/checked boundary."
+      ],
+      "required_evidence": [
+        "S2 law/probe results",
+        "Additive evidence codec round trip"
+      ],
+      "existing_work_crosswalk": "Approved D1A-types S2.",
+      "implementation_note": "Test names or new paths marked proposed are acceptance specifications, not claims of existing implementation."
+    },
+    {
+      "id": "TA-16",
+      "title": "D1A S3: make acquisition support modality-capable",
+      "gate": "G3",
+      "priority": "P0",
+      "status": "proposed",
+      "owner_role": "Implementation lead",
+      "depends_on": [
+        "TA-15"
+      ],
+      "affected_paths_or_symbols": [
+        "acquire: SourceSupport/EvidenceRef/TaskReferences",
+        "document call sites"
+      ],
+      "change_boundary": "Replace span-only admission with the approved support accessor and atlas-aware validation while preserving wire reason names and text decisions.",
+      "acceptance_tests": [
+        "Every pinned text acceptance verdict unchanged.",
+        "Anchored support can satisfy supported admission.",
+        "Absent support cannot be inferred from nonempty description prose."
+      ],
+      "required_evidence": [
+        "Acceptance-rule review",
+        "Text parity results"
+      ],
+      "existing_work_crosswalk": "Approved D1A-types S3.",
+      "implementation_note": "Test names or new paths marked proposed are acceptance specifications, not claims of existing implementation."
+    },
+    {
+      "id": "TA-17",
+      "title": "D1A S4a: typed node support and fallible draft construction",
+      "gate": "G3",
+      "priority": "P0",
+      "status": "proposed",
+      "owner_role": "Implementation lead",
+      "depends_on": [
+        "TA-15"
+      ],
+      "affected_paths_or_symbols": [
+        "story/",
+        "document/",
+        "codec/",
+        "fixtures/",
+        "laws/",
+        "view/",
+        "pipeline/",
+        "docs-site/",
+        "embed-bench/"
+      ],
+      "change_boundary": "Migrate support readers/constructors, checked draft, text node decoders and projection-based ordering without changing the text envelope yet.",
+      "acceptance_tests": [
+        "S0 pins unchanged.",
+        "Updated construction probes are not vacuous after Either migration.",
+        "No fake position zero on unsupported nodes."
+      ],
+      "required_evidence": [
+        "S4a compatibility report"
+      ],
+      "existing_work_crosswalk": "Approved D1A-types S4a.",
+      "implementation_note": "Test names or new paths marked proposed are acceptance specifications, not claims of existing implementation."
+    },
+    {
+      "id": "TA-18",
+      "title": "D1A S4b: atlas envelope, identity joins and text witness",
+      "gate": "G3",
+      "priority": "P0",
+      "status": "proposed",
+      "owner_role": "Implementation lead",
+      "depends_on": [
+        "TA-16",
+        "TA-17"
+      ],
+      "affected_paths_or_symbols": [
+        "story/",
+        "core/",
+        "codec/",
+        "document/",
+        "align/src/main/scala/storymodel4s/align/bridge/StorySourceView.scala",
+        "pipeline/",
+        "view/"
+      ],
+      "change_boundary": "Bind model atlas/source identity and receipts; restrict text operations behind TextModel/StoryText; migrate validators and consumers.",
+      "acceptance_tests": [
+        "Same proposal prose on distinct axes/editions yields different identities.",
+        "Foreign receipt/source join refuses.",
+        "Text-only APIs reject a general film model at compile time.",
+        "S0 pins unchanged."
+      ],
+      "required_evidence": [
+        "Identity and type-boundary probes",
+        "S4b parity report"
+      ],
+      "existing_work_crosswalk": "Approved D1A-types S4b.",
+      "implementation_note": "Test names or new paths marked proposed are acceptance specifications, not claims of existing implementation."
+    },
+    {
+      "id": "TA-19",
+      "title": "D1A S4c: seal and split the alignment source contract",
+      "gate": "G3",
+      "priority": "P0",
+      "status": "proposed",
+      "owner_role": "Implementation lead",
+      "depends_on": [
+        "TA-18"
+      ],
+      "affected_paths_or_symbols": [
+        "story: AlignmentSource",
+        "align: StorySourceView call sites"
+      ],
+      "change_boundary": "Complete approved alignment source split without reintroducing text as a universal coordinate system.",
+      "acceptance_tests": [
+        "S0 HSMM and text view goldens unchanged.",
+        "Source references resolve through the public source boundary."
+      ],
+      "required_evidence": [
+        "S4c review and parity report"
+      ],
+      "existing_work_crosswalk": "Approved D1A-types S4c.",
+      "implementation_note": "Test names or new paths marked proposed are acceptance specifications, not claims of existing implementation."
+    },
+    {
+      "id": "TA-20",
+      "title": "D1A-film: compile an anchored film source",
+      "gate": "G4",
+      "priority": "P0",
+      "status": "proposed",
+      "owner_role": "Implementation lead",
+      "depends_on": [
+        "TA-19"
+      ],
+      "affected_paths_or_symbols": [
+        "document: NarrativeCompiler and film proposal integration",
+        "acquire/",
+        "media/",
+        "pipeline/"
+      ],
+      "change_boundary": "Populate bound proposal surface; compile grounded film observations; preserve unsupported contexts as gaps; compose multipart source explicitly.",
+      "acceptance_tests": [
+        "Same text attached to different sources produces distinct derivation identity.",
+        "No claim/node is falsely grounded on proposal prose as canonical film evidence.",
+        "Nonempty supported film narrative emerges without hand-building final StoryModel."
+      ],
+      "required_evidence": [
+        "Deterministic recorded film compile fixture",
+        "Real-input compile report with observation origin"
+      ],
+      "existing_work_crosswalk": "Approved D1A-film; exact implementation sub-slices follow its technical design.",
+      "implementation_note": "Test names or new paths marked proposed are acceptance specifications, not claims of existing implementation."
+    },
+    {
+      "id": "TA-21",
+      "title": "D1B: carry typed support through source views, inference results and wire",
+      "gate": "G4",
+      "priority": "P0",
+      "status": "proposed",
+      "owner_role": "Implementation lead",
+      "depends_on": [
+        "TA-05",
+        "TA-08",
+        "TA-19"
+      ],
+      "affected_paths_or_symbols": [
+        "align/src/main/scala/storymodel4s/align/source.scala",
+        "align/src/main/scala/storymodel4s/align/bridge/",
+        "align/src/main/scala/storymodel4s/align/hsmm.scala",
+        "align/src/main/scala/storymodel4s/align/wire.scala",
+        "codec: mapping exchange"
+      ],
+      "change_boundary": "Unify annotation-assisted and compiled-story mapping at a film-capable source view; carry exact support and missingness into results. Hand-built film models are acceptable here, not for TA-22.",
+      "acceptance_tests": [
+        "Film nodes survive without text spans.",
+        "World order unknown/partial stays distinct from playback order.",
+        "Interval sets and foreign-axis refusals survive serialization.",
+        "Text parity preserved where promised."
+      ],
+      "required_evidence": [
+        "D1B signature and wire tests"
+      ],
+      "existing_work_crosswalk": "Approved D1B signature work; depends on D1A-types, not D1A-film execution.",
+      "implementation_note": "Test names or new paths marked proposed are acceptance specifications, not claims of existing implementation."
+    },
+    {
+      "id": "TA-22",
+      "title": "Prove the full compiled-film API journey",
+      "gate": "G4",
+      "priority": "P0",
+      "status": "proposed",
+      "owner_role": "Project owner + integration lead",
+      "depends_on": [
+        "TA-10",
+        "TA-11",
+        "TA-20",
+        "TA-21"
+      ],
+      "affected_paths_or_symbols": [
+        "pipeline: public film source-to-recall path",
+        "fixtures: proposed audiovisual acceptance set",
+        "view: inspection consumer"
+      ],
+      "change_boundary": "Exercise actual film source plus declared grounded observations through compiler, aligner and analysis export. Test silent visual content, audible content, reordering and repeated occurrences.",
+      "acceptance_tests": [
+        "No manually constructed final graph substitutes for compiler output.",
+        "Every exported locus identifies the correct edition/axis.",
+        "Display hull is not exported as fully observed support.",
+        "Observation track label matches the executed route."
+      ],
+      "required_evidence": [
+        "Real-film end-to-end run",
+        "Recorded CI fixture",
+        "Source support audit"
+      ],
+      "existing_work_crosswalk": "Approved D1B end-to-end proof; closes owner ruling E.",
+      "implementation_note": "Test names or new paths marked proposed are acceptance specifications, not claims of existing implementation."
+    },
+    {
+      "id": "TA-23",
+      "title": "Enforce evidence coverage and measure-kind honesty",
+      "gate": "G5",
+      "priority": "P0",
+      "status": "proposed",
+      "owner_role": "Implementation lead",
+      "depends_on": [
+        "TA-05",
+        "TA-07",
+        "TA-21"
+      ],
+      "affected_paths_or_symbols": [
+        "align/src/main/scala/storymodel4s/align/wire.scala",
+        "align/src/main/scala/storymodel4s/align/matrix.scala",
+        "codec: mapping exchange"
+      ],
+      "change_boundary": "Add witnesses for empty/partial evidence and complete the applicable fixes; distinguish model posterior, transport, score and calibrated output.",
+      "acceptance_tests": [
+        "Empty evidence cannot publish full support.",
+        "No normalization converts unknown candidate coverage into known mass.",
+        "Transport row and normalized posterior use distinct validation.",
+        "No NaN/Infinity silently becomes a valid confidence."
+      ],
+      "required_evidence": [
+        "Support and normalization mutation tests"
+      ],
+      "existing_work_crosswalk": "Mapper-plan support honesty item; verify each reported defect before closing it.",
+      "implementation_note": "Test names or new paths marked proposed are acceptance specifications, not claims of existing implementation."
+    },
+    {
+      "id": "TA-24",
+      "title": "Implement word, hierarchy and time projection with explicit policies",
+      "gate": "G5",
+      "priority": "P0",
+      "status": "proposed",
+      "owner_role": "Implementation lead",
+      "depends_on": [
+        "TA-06",
+        "TA-11",
+        "TA-21"
+      ],
+      "affected_paths_or_symbols": [
+        "align: proposed analysis projections",
+        "codec: projection metadata",
+        "examples: time-bin analysis"
+      ],
+      "change_boundary": "Implement explicit word membership and W-P-H style optional projection; preserve coarse/unknown/unprojectable support and occurrence ambiguity.",
+      "acceptance_tests": [
+        "Clause projection does not claim word-level inference.",
+        "Onset-only data does not become duration coverage.",
+        "No ancestor/descendant double count on chosen hierarchy cut.",
+        "Unprojectable/external mass accounted for."
+      ],
+      "required_evidence": [
+        "Independent projection fixtures",
+        "Executed sparse projection example"
+      ],
+      "existing_work_crosswalk": "Reconcile with current tracker; do not create a duplicate blindly.",
+      "implementation_note": "Test names or new paths marked proposed are acceptance specifications, not claims of existing implementation."
+    },
+    {
+      "id": "TA-25",
+      "title": "Bind calibration and fidelity to their actual evidence",
+      "gate": "G5",
+      "priority": "P1",
+      "status": "proposed",
+      "owner_role": "Research/evaluation owner",
+      "depends_on": [
+        "TA-04",
+        "TA-07",
+        "TA-23"
+      ],
+      "affected_paths_or_symbols": [
+        "align/src/main/scala/storymodel4s/align/calibration.scala",
+        "align/src/main/scala/storymodel4s/align/facets.scala",
+        "codec: calibration/readiness metadata"
+      ],
+      "change_boundary": "Represent absence of calibration and fidelity assessment explicitly. Implement calibration receipts for supported profiles only; assess selected-decision confidence at the correct stage.",
+      "acceptance_tests": [
+        "Source with undeclared propositions exports no assessed correctness claim.",
+        "Changing model, decision rule or applicable domain invalidates calibration applicability.",
+        "Unranked/provider failure is not recoded as participant intrusion."
+      ],
+      "required_evidence": [
+        "Capability tests",
+        "Calibration protocol/artifact or explicit uncalibrated status"
+      ],
+      "existing_work_crosswalk": "Reconcile with current tracker; do not create a duplicate blindly.",
+      "implementation_note": "Test names or new paths marked proposed are acceptance specifications, not claims of existing implementation."
+    },
+    {
+      "id": "TA-26",
+      "title": "Verify analysis estimands with independent expected answers",
+      "gate": "G5",
+      "priority": "P0",
+      "status": "proposed",
+      "owner_role": "Research/evaluation owner",
+      "depends_on": [
+        "TA-23",
+        "TA-24",
+        "TA-25"
+      ],
+      "affected_paths_or_symbols": [
+        "examples: R/Python analysis",
+        "align: analysis tests",
+        "docs-site: metric definitions"
+      ],
+      "change_boundary": "Ship discrete trajectory, expected assignment count and time-projection examples; distinguish probability of any recall from summed assignment probability.",
+      "acceptance_tests": [
+        "Expected mapped-unit counts computed independently.",
+        "No default independent noisy-OR coverage claim.",
+        "Compound recall is split or explicitly unresolved rather than mistaken for categorical ambiguity."
+      ],
+      "required_evidence": [
+        "Executed consumer outputs",
+        "Metric dictionary"
+      ],
+      "existing_work_crosswalk": "Reconcile with current tracker; do not create a duplicate blindly.",
+      "implementation_note": "Test names or new paths marked proposed are acceptance specifications, not claims of existing implementation."
+    },
+    {
+      "id": "TA-27",
+      "title": "Freeze comparable evaluation tracks and baseline arms",
+      "gate": "G6",
+      "priority": "P0",
+      "status": "proposed",
+      "owner_role": "Research/evaluation owner",
+      "depends_on": [
+        "TA-04",
+        "TA-12"
+      ],
+      "affected_paths_or_symbols": [
+        "tools/recall-study/",
+        "embed-bench/",
+        "docs/plans: evaluation protocol"
+      ],
+      "change_boundary": "Run baseline clients on identical input information and unit manifest; preserve participant-average comparison where preregistered; audit all holdout exposure.",
+      "acceptance_tests": [
+        "Arm inputs and denominators match.",
+        "Failures remain in primary eligible denominator.",
+        "Annotation/subtitle/audiovisual tracks cannot be pooled as algorithm-only comparison.",
+        "Participant/condition partitions and prior exposure recorded."
+      ],
+      "required_evidence": [
+        "Benchmark protocol and arm receipts",
+        "Human/reference coding agreement where available"
+      ],
+      "existing_work_crosswalk": "September 18 benchmark plan; existing sealed-split and one-opening rules retained.",
+      "implementation_note": "Test names or new paths marked proposed are acceptance specifications, not claims of existing implementation."
+    },
+    {
+      "id": "TA-28",
+      "title": "Freeze profiles and perform the permitted final evaluation",
+      "gate": "G6",
+      "priority": "P1",
+      "status": "proposed",
+      "owner_role": "Research/evaluation owner",
+      "depends_on": [
+        "TA-22",
+        "TA-23",
+        "TA-25",
+        "TA-27"
+      ],
+      "affected_paths_or_symbols": [
+        "tools/recall-study/",
+        "pipeline: named profile registry",
+        "docs-site: capability/model cards"
+      ],
+      "change_boundary": "Select profiles using allowed development evidence; freeze model/prompt/config; perform the permitted final opening; report limitations and input-domain scope.",
+      "acceptance_tests": [
+        "Final test does not select settings.",
+        "Raw concentration is not called calibration.",
+        "A simpler baseline can be selected when advanced methods do not improve.",
+        "No world-best claim without the needed comparisons and evidence."
+      ],
+      "required_evidence": [
+        "Frozen profile manifest",
+        "Final evaluation report",
+        "Calibration scope"
+      ],
+      "existing_work_crosswalk": "Reconcile with current tracker; do not create a duplicate blindly.",
+      "implementation_note": "Test names or new paths marked proposed are acceptance specifications, not claims of existing implementation."
+    },
+    {
+      "id": "TA-29",
+      "title": "Package the public examples and release candidate",
+      "gate": "G6",
+      "priority": "P0",
+      "status": "proposed",
+      "owner_role": "Implementation lead",
+      "depends_on": [
+        "TA-02",
+        "TA-12",
+        "TA-22",
+        "TA-26"
+      ],
+      "affected_paths_or_symbols": [
+        "build.sbt",
+        "pipeline: command wrapper",
+        "docs-site/",
+        "examples/",
+        "codec/"
+      ],
+      "change_boundary": "Resolve authorized publishing coordinates; document dependencies; test installation and examples in clean supported environments; publish reproducibility/capability metadata.",
+      "acceptance_tests": [
+        "No private sibling checkout required for declared normal use.",
+        "No ordinary user imports bench or edits source.",
+        "Supported platform/schema matrix verified.",
+        "Malformed/incomplete bundles rejected by installed reader."
+      ],
+      "required_evidence": [
+        "Release-candidate installation log",
+        "Executed tutorials",
+        "Compatibility and dependency record"
+      ],
+      "existing_work_crosswalk": "T7 publishability; preserve separate V1/E0 scope.",
+      "implementation_note": "Test names or new paths marked proposed are acceptance specifications, not claims of existing implementation."
+    },
+    {
+      "id": "TA-30",
+      "title": "Close release gates with evidence, not task counts",
+      "gate": "G6",
+      "priority": "P0",
+      "status": "proposed",
+      "owner_role": "Project owner + integration lead",
+      "depends_on": [
+        "TA-01",
+        "TA-02",
+        "TA-28",
+        "TA-29"
+      ],
+      "affected_paths_or_symbols": [
+        "current capability/status record",
+        "release notes",
+        "existing tracker"
+      ],
+      "change_boundary": "Confirm complete film API requirement, analysis consumer, all required checks, profile limitations and privacy policy. Reconcile ticket states and publish only supported claims.",
+      "acceptance_tests": [
+        "G4 film proof is not replaced by G2 annotation preview.",
+        "Every release claim has an executed evidence pointer.",
+        "Historical findings and current unresolved limitations are not suppressed."
+      ],
+      "required_evidence": [
+        "Signed-off release checklist",
+        "Published artifact identity or explicit release-candidate status"
+      ],
+      "existing_work_crosswalk": "Reconcile with current tracker; do not create a duplicate blindly.",
+      "implementation_note": "Test names or new paths marked proposed are acceptance specifications, not claims of existing implementation."
+    }
+  ]
+}

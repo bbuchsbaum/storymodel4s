@@ -9,15 +9,12 @@ import storymodel4s.align.{HsmmConfig, TransitionKind, TransitionModel}
   * marched through the film ignoring the recall entirely would score well. That is why the study
   * deferred transition work rather than tuning into the metric.
   *
-  * Shuffling removes the circularity. Permute the recall's sentences and run the pipeline on the
-  * permuted transcript. A mapper driven by content loses its ordering, because the anchors follow
-  * text whose order is now scrambled, and its tau collapses toward zero. A mapper driven by its own
-  * forward prior keeps emitting monotone anchors whatever it is shown, so its tau survives. The
-  * difference `tau(real) - tau(shuffled)` is therefore ordering attributable to the recall rather
-  * than to the prior, and a degenerate prior inflates both terms equally and cannot win on it.
-  *
-  * This also audits the number already claimed: whatever share of the pipeline's tau survives
-  * shuffling was never evidence of alignment in the first place.
+  * Shuffling is a sensitivity diagnostic, not a bias correction. The prior can interact differently
+  * with real and shuffled content; shuffled language can be less interpretable, and resegmentation
+  * can change the units being compared. Therefore `tau(real) - tau(shuffled)` does not isolate
+  * ordering attributable to the participant. A reference measurement requires fixed packets and an
+  * inference policy without behavioral sequence preferences; see docs/refactor/PLAN.md. This
+  * control remains useful for inspecting reconstruction sensitivity.
   */
 object RecallOrderControl:
 

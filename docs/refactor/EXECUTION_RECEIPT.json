@@ -1,0 +1,90 @@
+{
+  "schema": "storymodel4s.planning-execution/v1",
+  "date": "2026-09-19",
+  "code_assessment_baseline": "1113f96864a38a2869e49d9c8c5d4e2dc43f5d10",
+  "concurrent_tracker_commit": "46d476e720ac715a247619b615aa32cab792935d",
+  "actor": "codex-storymodel4s-review-plan",
+  "scope": "Assessment, design, backlog reconciliation and two Scaladoc corrections; no runtime implementation qualification.",
+  "initial_unfinished": 119,
+  "concurrent_unfinished": 17,
+  "existing_reconciled": 136,
+  "new_created": 10,
+  "new_active": 9,
+  "new_superseded": 1,
+  "existing_closed": 27,
+  "final_counts": {
+    "closed": 234,
+    "open": 118
+  },
+  "accepted_dependency_relationship_tag_operations": 87,
+  "rejected_batch_operations": 0,
+  "critical_live_bodies_and_dependencies_verified": [
+    "baseline",
+    "clock",
+    "scorer",
+    "evidence",
+    "command",
+    "preview",
+    "d1b",
+    "release",
+    "support"
+  ],
+  "planned_dependency_graph_acyclic": true,
+  "preview_research_or_film_prerequisites": [],
+  "foundation_ready": [
+    {
+      "id": "bd-01M2TA2EMFCWRKXK6QJHGV702Q",
+      "title": "[foundation] Phase 0: rescue the only copy of audit/masc-role-corpus (b756b4bb) into the main repo"
+    },
+    {
+      "id": "bd-01M2TAB3QD2YXSPR8THYRGFBKS",
+      "title": "[foundation] D1A-types S0: text parity baseline (compile, codec, view pins)"
+    },
+    {
+      "id": "bd-01M2WVCEBHAZBKJQ0EB84EA4HV",
+      "title": "G0: freeze mapping regression inputs, configurations and historical outputs"
+    },
+    {
+      "id": "bd-01M2TA3KKCFS707G2XJ9TS7ZCJ",
+      "title": "[foundation] Phase 0: correct false and overstated claims in README and the recall-study docs"
+    }
+  ],
+  "mote_doctor": {
+    "ok": true,
+    "fsck_clean": true,
+    "ops_checked": 14304
+  },
+  "operation_count": 259,
+  "operation_manifest_sha256": "2e15bda0f6d6f41f4b1afb1d782b09a717e298abdf8f51e54c7ace66d74674d7",
+  "operation_digest_recipe": "SHA256 of sorted lines: repository-relative operation path, TAB, SHA256 of its exact bytes, LF; operations by the named actor added in this planning checkpoint.",
+  "checks": [
+    {
+      "command": "sbt -batch 'embedBench / Compile / scalafmt' scalafmtCheckAll scalafmtSbtCheck",
+      "exit": 0,
+      "meaning": "Formatting only; initial formatting failure corrected."
+    },
+    {
+      "command": "git diff --check",
+      "exit": 0
+    },
+    {
+      "command": "Python comparison after stripping Scaladoc blocks",
+      "result": "Both changed Scala files have identical executable content to the code baseline."
+    },
+    {
+      "command": "Synthetic gold_scene.load_arm probe",
+      "result": "Three synthetic input units, one retained; no real gold read."
+    },
+    {
+      "command": "mote --json ls --all; mote --json ready; mote --json ls --tag lane-foundation --ready; mote --json show <critical IDs>; mote --actor codex-storymodel4s-review-plan --json doctor",
+      "exit": 0
+    }
+  ],
+  "not_executed": [
+    "Full checkAll/testAll",
+    "Real-data Sherlock before/after parity",
+    "Reference/reconstruction implementation",
+    "Behavioral recovery or calibration studies"
+  ],
+  "cold_review": "Fresh-context specification review; contract gaps and complete-row clock parity witness corrected. This is not independent empirical reproduction."
+}

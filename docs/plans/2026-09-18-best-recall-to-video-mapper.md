@@ -1,5 +1,7 @@
 # Toward the best recall-to-video mapper: the plan (revision 6)
 
+> Delivery sequencing was reconciled on 2026-09-19 in [docs/refactor/PLAN.md](../refactor/PLAN.md). This remains the research-protocol record; reference measurement and public extraction no longer wait for a benchmark checkpoint. Ruling E remains governing; P1 is not adopted.
+
 *2026-09-18. Draft for owner approval, written against `main` at `598c7852`. Everything below is
 LocallyObserved.*
 

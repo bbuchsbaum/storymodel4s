@@ -162,9 +162,10 @@ object TimebaseRepair:
       formula
     )
 
-  /** Builds a REAL `ClockRepair` per run, giving `core`'s mapping vocabulary its first production
-    * caller. The repair is the identity on seconds scaled to ticks, which is exactly what the
-    * record's own `formula` says: `playbackTicks = rawAnnotationSeconds * ticksPerSecond`.
+  /** Builds a checked `ClockRepair` per run. Production row projection does not yet call this
+    * builder; see docs/refactor/PLAN.md for the integration gate. The repair scales seconds to
+    * ticks, as the record's `formula` says:
+    * `playbackTicks = rawAnnotationSeconds * ticksPerSecond`.
     *
     * **Offset is zero for BOTH runs, and that is correct even though run-2 times are run-local.**
     * The record declares `annotationStartSeconds: 0` and `playbackStartTicks: 0` for each run,

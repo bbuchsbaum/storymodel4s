@@ -1,0 +1,650 @@
+{
+  "schema": "storymodel4s.delivery-backlog/v1",
+  "baseline": "1113f96864a38a2869e49d9c8c5d4e2dc43f5d10",
+  "status": "applied-and-verified",
+  "ids": {
+    "epic": "bd-01M2TA01EHVRF6MQ1N00XTVK1K",
+    "scorer": "bd-01M2TA5FB4ATF9QS9ZA9MDJNE2",
+    "s0": "bd-01M2TAB3QD2YXSPR8THYRGFBKS",
+    "s1": "bd-01M2TABFW72D8WWQF481SD37KW",
+    "s2": "bd-01M2TABVXSM72M9DD0SNB6GZ11",
+    "s3": "bd-01M2TAF8JH42NYJJAFWPD7HTZB",
+    "s4a": "bd-01M2TAFN5WMXW4NT20YJQAW2FR",
+    "s4b": "bd-01M2TAG1GEAGXCY33P0B17QBJ1",
+    "s4c": "bd-01M2TAGDJ5F0FEPC3XPWVDSWDH",
+    "filmplan": "bd-01M2TAGST4EBFR1HM9Q3EWSYAH",
+    "film": "bd-01M2T32SGVJXR2RT3RTS2DCN9P",
+    "d1b": "bd-01M2TAC80YRK5JFNKTT7B7CAQN",
+    "filmproof": "bd-01M1CQNM5DZZNWD8BN4WRKVZRQ",
+    "types": "bd-01M1CQKRG1A4J4BEWCC78F4TEZ",
+    "evidence": "bd-01M2TACM78289S4TECE91GT5K2",
+    "decode": "bd-01M2TAD04SR823TQVG9VPNH6R3",
+    "command": "bd-01M2TADC4VKSDZ2S9SXETH2MYM",
+    "migration": "bd-01M2TADR4KM1S4J46HK2C3BN76",
+    "support": "bd-01M19956MFSG7076QE4J66T7E9",
+    "invocation": "bd-01M1DA6NJXYT4NEA18745FM3KY",
+    "ci": "bd-01M19G69RQCHMT2EMG11XFT4WX",
+    "ciowner": "bd-01M2TA2283FC7FSA2G7TJ1WSMN",
+    "rescue": "bd-01M2TA2EMFCWRKXK6QJHGV702Q",
+    "hygiene": "bd-01M2TA3780KD7C5PEQCEZ4ARSD",
+    "claims": "bd-01M2TA3KKCFS707G2XJ9TS7ZCJ",
+    "release": "bd-01M2TAMJ95K9D7H248A8387YW4",
+    "infra": "bd-01M2TAKTB61XNXV4Y6A9J3CB0C",
+    "hardening": "bd-01M2TAM66RTEMY3VVHA3N2MYXK",
+    "calibration": "bd-01M2TAEW794XCR7D2HZJFNXVJY",
+    "humans": "bd-01M2TA9KKVFWPQ74HN90P0SM68",
+    "humanowner": "bd-01M2TA0X79Y4BQZP0B6AT919C9",
+    "risk": "bd-01M2TAAQNS7RCCBBM8WFFZF6ZZ",
+    "checkpoint": "bd-01M2TA7QJW98EJ9JQ3T447HZK7",
+    "prereg": "bd-01M2TA67DXJ2W0KX5N5DXSR1S2",
+    "descriptor": "bd-01M2TA83GA06RRHR193AV3XYA5",
+    "h2": "bd-01M2TAHYA8QWB9QXBX759KR82N",
+    "finaltest": "bd-01M2TAKEF1GHZVXDQ024EZDR0Y",
+    "baselines": "bd-01M2TA6KFQV8ADNS3Z0ED4KYMW",
+    "baseline": "bd-01M2WVCEBHAZBKJQ0EB84EA4HV",
+    "clock": "bd-01M2WTGF981AY7RCN8QC42JSPT",
+    "records": "bd-01M2WVENSB0P955Y0B603CC20Y",
+    "reference": "bd-01M2WVF86T8QEEA1TK8Z0ASJHW",
+    "compatibility": "bd-01M2WVFV2WGF5BVQHX7JTYYWRH",
+    "readouts": "bd-01M2WVGFA0J4D9T9ZBNR3MY2MR",
+    "projection": "bd-01M2WVH1DC8ZPDC992G4MX3TXG",
+    "exports": "bd-01M2WVHF4B5DAXJYY4W91VK4WV",
+    "recovery": "bd-01M2WVHVVYQBKSBSW573HZYR9Q",
+    "preview": "bd-01M2WVJ8HKX6EHG2C5CXYEZYJ6"
+  },
+  "tasks": [
+    {
+      "key": "baseline",
+      "id": "bd-01M2WVCEBHAZBKJQ0EB84EA4HV",
+      "title": "G0: freeze mapping regression inputs, configurations and historical outputs",
+      "lane": "foundation",
+      "priority": 0,
+      "depends_on": [],
+      "paths": [
+        "embed-bench/video",
+        "tools/recall-study",
+        "docs/refactor/evidence"
+      ],
+      "acceptance": [
+        "Commit a content-free baseline manifest with code SHA, input/record hashes, fixed unit/word IDs, source grain/axes, model/cache/render/config identities, source target inventory, outcomes and output checksums. No new gold read or sealed-test output.",
+        "Capture an independently authored redistributable text and two-part annotated-video miniature; include backward/revisit, external, missing-unit, partial-support and argmax/decode-disagreement cases.",
+        "On admitted Sherlock local inputs, preserve exact existing TSV/anchor/sidecar outputs and provider replay inputs before behavior changes. State platform and nondeterministic metadata exclusions in advance. An unexplained mismatch fails.",
+        "Receipt links resolve; changed input/config and dropped/duplicated unit mutations fail identity checks. S0 text compiler pins remain a separate existing ticket.",
+        "Run the frozen admitted Sherlock baseline twice with unchanged inputs/config/cache and require identical legacy output digests. Also retain a content-free digest of every annotation MediaLocus tuple (row, part, startTick, endTick), including rows unused by a particular recall."
+      ],
+      "validation_command": "tools/data-root.sh --check; existing sherlockRecallMap in frozen replay configuration; proposed baseline-manifest verifier",
+      "remaining": "No model tuning, new corpus intake, or full compiler refactor.",
+      "existing": false,
+      "body": "Governing plan: docs/refactor/PLAN.md (2026-09-19); ADR 0019. Key: baseline; lane: foundation.\n\nScope: embed-bench/video, tools/recall-study, docs/refactor/evidence\n\nAcceptance criteria:\n1. Commit a content-free baseline manifest with code SHA, input/record hashes, fixed unit/word IDs, source grain/axes, model/cache/render/config identities, source target inventory, outcomes and output checksums. No new gold read or sealed-test output.\n2. Capture an independently authored redistributable text and two-part annotated-video miniature; include backward/revisit, external, missing-unit, partial-support and argmax/decode-disagreement cases.\n3. On admitted Sherlock local inputs, preserve exact existing TSV/anchor/sidecar outputs and provider replay inputs before behavior changes. State platform and nondeterministic metadata exclusions in advance. An unexplained mismatch fails.\n4. Receipt links resolve; changed input/config and dropped/duplicated unit mutations fail identity checks. S0 text compiler pins remain a separate existing ticket.\n5. Run the frozen admitted Sherlock baseline twice with unchanged inputs/config/cache and require identical legacy output digests. Also retain a content-free digest of every annotation MediaLocus tuple (row, part, startTick, endTick), including rows unused by a particular recall.\n\nValidation: tools/data-root.sh --check; existing sherlockRecallMap in frozen replay configuration; proposed baseline-manifest verifier\n\nCompletion evidence: exact baseline/result SHA, executable command and bound test totals/exit, artifact digests, discriminating failure injection, compatibility impact, separate SD6 review. Run reference-scope for the actual diff and SD2 checkAll before landing. Proposed suite names below are acceptance specifications, not existing or executed tests. No efficacy claim follows from a synthetic pass.\n\nBoundary: No model tuning, new corpus intake, or full compiler refactor.",
+      "dependency_ids": []
+    },
+    {
+      "key": "clock",
+      "id": "bd-01M2WTGF981AY7RCN8QC42JSPT",
+      "title": "G0: route Sherlock production coordinates through receipted ClockRepair",
+      "lane": "foundation",
+      "priority": 0,
+      "depends_on": [
+        "baseline"
+      ],
+      "paths": [
+        "corpus-intake/TimebaseRepair.scala",
+        "corpus-intake/SherlockAnnotations.scala",
+        "embed-bench/sherlock/SherlockRecallMapping.scala",
+        "docs/data/sherlock/timebase-repair.json"
+      ],
+      "acceptance": [
+        "Parse presentation parts/rates/durations/row ranges/IDs plus certifies, doesNotCertify, whyNotRepaired and explicitlyNotUsed. Committed verified JSON is the single hash authority; bind its digest/schema/version in provenance. Reject unsupported machine-readable semantics and malformed/duplicate/missing/crossed references.",
+        "Construct MediaManifest from that record; join every declared part/axis to the actual SourceBundle axis with extent/timebase/identity checks. Keep per-run source axes distinct. No self-comparison of a repair target in place of checking the selected bundle.",
+        "Every locus start/end uses ClockRepair.projectRunLocalSeconds; checked exact rational offset/scale construction avoids Long intermediate overflow. Require integral representable ticks and correct bounds. Atlas exposes row-to-repair receipt linkage. CLI loads the admitted record; no fallback to literal manifest.",
+        "Refusal witnesses: missing repair, wrong run/target axis, altered annotation/media identity declaration, inconsistent row partition, nonintegral ticks, overflow, unsupported formula/mapping, missing record and changed semantic restrictions. Keep instants, rows 481-482 and both uncovered tails.",
+        "Real-data same-platform same-config cached-response before/after legacy report bytes, anchor checksums and the complete per-row MediaLocus tuple digest are identical, including rows unused by the recall. New provenance fields are checked separately; report parity is not demanded of intentionally extended sidecars. Two-run synthetic offset/origin consistency (refuse formula-inconsistent declarations) and wrong-axis tests kill direct-multiplication bypass. No-repair overload still refuses.",
+        "Bind retainedRows to inputRows minus dropped rows and the declared 998-row coordinate system; bind the ordinary run-1 end to the run-2 offset and raw boundary. Verify the upstream notebook digest against a pinned fetch receipt, or explicitly retain declared-unverified status. Mutate each JSON path and assert the mutation applied before requiring its witness to fail."
+      ],
+      "validation_command": "sbt -batch 'corpusIntake/testOnly *TimebaseRepairSuite *SherlockAnnotationsSuite'; real sherlockRecallMap twice with baseline inputs and cmp",
+      "remaining": "Reuse existing vocabulary; this is one integration bead, not a general clock framework.",
+      "existing": true,
+      "body": "Governing plan: docs/refactor/PLAN.md (2026-09-19); ADR 0019. Key: clock; lane: foundation.\n\nScope: corpus-intake/TimebaseRepair.scala, corpus-intake/SherlockAnnotations.scala, embed-bench/sherlock/SherlockRecallMapping.scala, docs/data/sherlock/timebase-repair.json\n\nAcceptance criteria:\n1. Parse presentation parts/rates/durations/row ranges/IDs plus certifies, doesNotCertify, whyNotRepaired and explicitlyNotUsed. Committed verified JSON is the single hash authority; bind its digest/schema/version in provenance. Reject unsupported machine-readable semantics and malformed/duplicate/missing/crossed references.\n2. Construct MediaManifest from that record; join every declared part/axis to the actual SourceBundle axis with extent/timebase/identity checks. Keep per-run source axes distinct. No self-comparison of a repair target in place of checking the selected bundle.\n3. Every locus start/end uses ClockRepair.projectRunLocalSeconds; checked exact rational offset/scale construction avoids Long intermediate overflow. Require integral representable ticks and correct bounds. Atlas exposes row-to-repair receipt linkage. CLI loads the admitted record; no fallback to literal manifest.\n4. Refusal witnesses: missing repair, wrong run/target axis, altered annotation/media identity declaration, inconsistent row partition, nonintegral ticks, overflow, unsupported formula/mapping, missing record and changed semantic restrictions. Keep instants, rows 481-482 and both uncovered tails.\n5. Real-data same-platform same-config cached-response before/after legacy report bytes, anchor checksums and the complete per-row MediaLocus tuple digest are identical, including rows unused by the recall. New provenance fields are checked separately; report parity is not demanded of intentionally extended sidecars. Two-run synthetic offset/origin consistency (refuse formula-inconsistent declarations) and wrong-axis tests kill direct-multiplication bypass. No-repair overload still refuses.\n6. Bind retainedRows to inputRows minus dropped rows and the declared 998-row coordinate system; bind the ordinary run-1 end to the run-2 offset and raw boundary. Verify the upstream notebook digest against a pinned fetch receipt, or explicitly retain declared-unverified status. Mutate each JSON path and assert the mutation applied before requiring its witness to fail.\n\nValidation: sbt -batch 'corpusIntake/testOnly *TimebaseRepairSuite *SherlockAnnotationsSuite'; real sherlockRecallMap twice with baseline inputs and cmp\n\nCompletion evidence: exact baseline/result SHA, executable command and bound test totals/exit, artifact digests, discriminating failure injection, compatibility impact, separate SD6 review. Run reference-scope for the actual diff and SD2 checkAll before landing. Proposed suite names below are acceptance specifications, not existing or executed tests. No efficacy claim follows from a synthetic pass.\n\nBoundary: Reuse existing vocabulary; this is one integration bead, not a general clock framework.\n\nConsolidates the C1 child tickets filed in 46d476e720ac715a247619b615aa32cab792935d. Use one reusable admitted-record loader shared by present and replacement commands. Do not retain a silent literal-manifest default. Baseline and integration remain distinct tickets.",
+      "dependency_ids": [
+        "bd-01M2WVCEBHAZBKJQ0EB84EA4HV"
+      ]
+    },
+    {
+      "key": "records",
+      "id": "bd-01M2WVENSB0P955Y0B603CC20Y",
+      "title": "G1: checked mapping records, stage provenance and versioned codec",
+      "lane": "next",
+      "priority": 1,
+      "depends_on": [
+        "baseline"
+      ],
+      "paths": [
+        "align mapping result",
+        "recall unit inventory",
+        "codec mapping codec"
+      ],
+      "acceptance": [
+        "One checked mapping result accounts for all requested fixed units and words, source targets, exact support, alternatives, missingness, external outcomes, processing failures and compound-reference/decomposition status.",
+        "Separate RawScore, NormalizedScoreMass, TransportMass, ModelPosterior and CalibratedProbability. Raw argmax, selected target mass, calibrated chosen-decision event and fill/projection derivations remain distinct. No inherited Faithful label becomes assessed fidelity.",
+        "Schema includes inference/context/candidate/reference-prior policies, target universe/grain, stage assumption receipts, coverage, inference/organization/projection units and compatibility provenance. Unknown historical provenance cannot self-certify.",
+        "Preview represents multipart sources with explicit bundle inventory and per-target/axis membership, not a fabricated single bundle; canonical StoryModel remains one bundle under D1A. Long ticks/rational integers survive wire as decimal strings.",
+        "External-package probes refuse Mirror/copy/alias forgery, foreign identities/axes, duplicates and missing units; independent miniature round-trips. Mutating chosen confidence to raw argmax confidence and dropping failure rows each fail."
+      ],
+      "validation_command": "proposed MappingContractSuite / MappingCodecSuite on JVM, JS, Native; public consumer construction probes",
+      "remaining": "0.x mapping schema, separate from StoryModel and HSMM schemas; no new module.",
+      "existing": false,
+      "body": "Governing plan: docs/refactor/PLAN.md (2026-09-19); ADR 0019. Key: records; lane: next.\n\nScope: align mapping result, recall unit inventory, codec mapping codec\n\nAcceptance criteria:\n1. One checked mapping result accounts for all requested fixed units and words, source targets, exact support, alternatives, missingness, external outcomes, processing failures and compound-reference/decomposition status.\n2. Separate RawScore, NormalizedScoreMass, TransportMass, ModelPosterior and CalibratedProbability. Raw argmax, selected target mass, calibrated chosen-decision event and fill/projection derivations remain distinct. No inherited Faithful label becomes assessed fidelity.\n3. Schema includes inference/context/candidate/reference-prior policies, target universe/grain, stage assumption receipts, coverage, inference/organization/projection units and compatibility provenance. Unknown historical provenance cannot self-certify.\n4. Preview represents multipart sources with explicit bundle inventory and per-target/axis membership, not a fabricated single bundle; canonical StoryModel remains one bundle under D1A. Long ticks/rational integers survive wire as decimal strings.\n5. External-package probes refuse Mirror/copy/alias forgery, foreign identities/axes, duplicates and missing units; independent miniature round-trips. Mutating chosen confidence to raw argmax confidence and dropping failure rows each fail.\n\nValidation: proposed MappingContractSuite / MappingCodecSuite on JVM, JS, Native; public consumer construction probes\n\nCompletion evidence: exact baseline/result SHA, executable command and bound test totals/exit, artifact digests, discriminating failure injection, compatibility impact, separate SD6 review. Run reference-scope for the actual diff and SD2 checkAll before landing. Proposed suite names below are acceptance specifications, not existing or executed tests. No efficacy claim follows from a synthetic pass.\n\nBoundary: 0.x mapping schema, separate from StoryModel and HSMM schemas; no new module.",
+      "dependency_ids": [
+        "bd-01M2WVCEBHAZBKJQ0EB84EA4HV"
+      ]
+    },
+    {
+      "key": "reference",
+      "id": "bd-01M2WVF86T8QEEA1TK8Z0ASJHW",
+      "title": "G1: strict local reference measurement from shared mapping evidence",
+      "lane": "next",
+      "priority": 1,
+      "depends_on": [
+        "evidence"
+      ],
+      "paths": [
+        "align reference inference",
+        "embed-bench StageTrace adapter"
+      ],
+      "acceptance": [
+        "Pure public reference operation consumes checked immutable local evidence without first running GraphHsmm. Reuse stable local normalization from StageTrace; initially deterministic lexical scoring plus vetted existing channels. No transitions/refinement/monotone decoder/fill.",
+        "State target universe, one grain/hierarchy cut, prior weights, temperature, normalization and external alternatives; reject duplicate target identity. Missing computation is not uniform evidence; distinguish successful indistinguishable evidence from unavailable scores.",
+        "Restricted retrieval/render/scorer inputs contain opaque target IDs and content, not playback positions, chronological numbers/list order or prior assignments. Source coordinates are supplied separately to readouts.",
+        "Fixed-packet permutation preserves each packet mapping after ID reconciliation; source storage permutation and bijective opaque-ID rename preserve results. Equal-score shortlist ties are tie-complete or refused, never chronology/ID-truncated. Freeze floating tolerances before runs.",
+        "Identical candidates/scores/receipt digest feed reference and HSMM paths. Anti-tests injecting chronology, previous assignments, sequential external preference or refined emissions fail. Uniform evidence remains flagged uninformative and uncalibrated."
+      ],
+      "validation_command": "proposed ReferenceMeasurementSuite and ReferenceIsolationSuite on all align platforms; StageTrace parity suite",
+      "remaining": "No contextual reference inference or statistical calibration in this slice.",
+      "existing": false,
+      "body": "Governing plan: docs/refactor/PLAN.md (2026-09-19); ADR 0019. Key: reference; lane: next.\n\nScope: align reference inference, embed-bench StageTrace adapter\n\nAcceptance criteria:\n1. Pure public reference operation consumes checked immutable local evidence without first running GraphHsmm. Reuse stable local normalization from StageTrace; initially deterministic lexical scoring plus vetted existing channels. No transitions/refinement/monotone decoder/fill.\n2. State target universe, one grain/hierarchy cut, prior weights, temperature, normalization and external alternatives; reject duplicate target identity. Missing computation is not uniform evidence; distinguish successful indistinguishable evidence from unavailable scores.\n3. Restricted retrieval/render/scorer inputs contain opaque target IDs and content, not playback positions, chronological numbers/list order or prior assignments. Source coordinates are supplied separately to readouts.\n4. Fixed-packet permutation preserves each packet mapping after ID reconciliation; source storage permutation and bijective opaque-ID rename preserve results. Equal-score shortlist ties are tie-complete or refused, never chronology/ID-truncated. Freeze floating tolerances before runs.\n5. Identical candidates/scores/receipt digest feed reference and HSMM paths. Anti-tests injecting chronology, previous assignments, sequential external preference or refined emissions fail. Uniform evidence remains flagged uninformative and uncalibrated.\n\nValidation: proposed ReferenceMeasurementSuite and ReferenceIsolationSuite on all align platforms; StageTrace parity suite\n\nCompletion evidence: exact baseline/result SHA, executable command and bound test totals/exit, artifact digests, discriminating failure injection, compatibility impact, separate SD6 review. Run reference-scope for the actual diff and SD2 checkAll before landing. Proposed suite names below are acceptance specifications, not existing or executed tests. No efficacy claim follows from a synthetic pass.\n\nBoundary: No contextual reference inference or statistical calibration in this slice.",
+      "dependency_ids": [
+        "bd-01M2TACM78289S4TECE91GT5K2"
+      ]
+    },
+    {
+      "key": "compatibility",
+      "id": "bd-01M2WVFV2WGF5BVQHX7JTYYWRH",
+      "title": "G1: enforce readout compatibility with executed inference policies",
+      "lane": "next",
+      "priority": 1,
+      "depends_on": [
+        "reference",
+        "records"
+      ],
+      "paths": [
+        "align measurement policy",
+        "codec stage receipts"
+      ],
+      "acceptance": [
+        "Readout request declares quantity, source axis/order, recall organization unit, resolution and unknown-transition policy. Derived stage ledger covers candidates/rendering/scoring/context/refinement/inference/decision/projection.",
+        "Checked outcomes distinguish CompatibleWithDeclaredPolicy, ModelDependentOnly, Incompatible, UnknownProvenance. A hard-monotone path cannot satisfy a reference backtracking request. PriorScale=0 and Content rung do not pass automatically.",
+        "Round-trip preserves the decision and its reasons. Receipt omission, caller-label forgery and stage/config/provider/candidate substitution fail; old artifacts remain UnknownProvenance.",
+        "Strict compatibility establishes implemented policy only. Custom unverifiable scoring cannot mint reference or calibrated authority; it remains explicitly exploratory. Reconstruction summaries are still available under their own policy."
+      ],
+      "validation_command": "proposed MeasurementCompatibilitySuite + codec/public-consumer negative probes",
+      "remaining": "Reuse LayerUse details without pretending its transition-only scope covers the pipeline.",
+      "existing": false,
+      "body": "Governing plan: docs/refactor/PLAN.md (2026-09-19); ADR 0019. Key: compatibility; lane: next.\n\nScope: align measurement policy, codec stage receipts\n\nAcceptance criteria:\n1. Readout request declares quantity, source axis/order, recall organization unit, resolution and unknown-transition policy. Derived stage ledger covers candidates/rendering/scoring/context/refinement/inference/decision/projection.\n2. Checked outcomes distinguish CompatibleWithDeclaredPolicy, ModelDependentOnly, Incompatible, UnknownProvenance. A hard-monotone path cannot satisfy a reference backtracking request. PriorScale=0 and Content rung do not pass automatically.\n3. Round-trip preserves the decision and its reasons. Receipt omission, caller-label forgery and stage/config/provider/candidate substitution fail; old artifacts remain UnknownProvenance.\n4. Strict compatibility establishes implemented policy only. Custom unverifiable scoring cannot mint reference or calibrated authority; it remains explicitly exploratory. Reconstruction summaries are still available under their own policy.\n\nValidation: proposed MeasurementCompatibilitySuite + codec/public-consumer negative probes\n\nCompletion evidence: exact baseline/result SHA, executable command and bound test totals/exit, artifact digests, discriminating failure injection, compatibility impact, separate SD6 review. Run reference-scope for the actual diff and SD2 checkAll before landing. Proposed suite names below are acceptance specifications, not existing or executed tests. No efficacy claim follows from a synthetic pass.\n\nBoundary: Reuse LayerUse details without pretending its transition-only scope covers the pipeline.",
+      "dependency_ids": [
+        "bd-01M2WVF86T8QEEA1TK8Z0ASJHW",
+        "bd-01M2WVENSB0P955Y0B603CC20Y"
+      ]
+    },
+    {
+      "key": "readouts",
+      "id": "bd-01M2WVGFA0J4D9T9ZBNR3MY2MR",
+      "title": "G2: uncertainty-aware organization counts and conditional ambiguity bounds",
+      "lane": "next",
+      "priority": 1,
+      "depends_on": [
+        "compatibility"
+      ],
+      "paths": [
+        "align organization readouts"
+      ],
+      "acceptance": [
+        "Calculate backward/forward/same-target counts over adjacent original organization units. Keep external, incomparable, unresolved and failed adjacencies accounted separately. Name ratio-of-expected-counts denominator; zero denominator is unavailable.",
+        "Use joint assignments, or row products only under the strict independent local policy. Equal row marginals with different joints give different answers; reject unexplained marginal products. Normalized-score summaries keep score-conditional labels.",
+        "Independent enumerator verifies point path 2,7,3,8 => backward 1, forward 2, same 0; two uniform binary rows => .25/.25/.5 with backward bounds [0,1]. A,unknown,C has no direct A-C observation. Copy to 15 display words changes no count.",
+        "First bounds cover additive transition counts on the Cartesian product of per-unit admissible sets (optional explicit local edge restrictions only); compare sparse DP to exhaustive tiny enumeration. General coupled/HSMM admissibility is refused unless supplied by a later certified solver.",
+        "Bounds carry candidate coverage, admissible-set construction and grain; they are not confidence intervals. No chronology means incomparable; no universe for unknown rows means bounds unavailable or a separately declared completion universe. All-uninformative evidence yields a low-information result, not a scientific precision claim."
+      ],
+      "validation_command": "proposed OrganizationReadoutSuite and independent exhaustive enumeration fixtures",
+      "remaining": "No generic joint posterior engine, arbitrary ratio bounds, or mandatory trajectory sampler.",
+      "existing": false,
+      "body": "Governing plan: docs/refactor/PLAN.md (2026-09-19); ADR 0019. Key: readouts; lane: next.\n\nScope: align organization readouts\n\nAcceptance criteria:\n1. Calculate backward/forward/same-target counts over adjacent original organization units. Keep external, incomparable, unresolved and failed adjacencies accounted separately. Name ratio-of-expected-counts denominator; zero denominator is unavailable.\n2. Use joint assignments, or row products only under the strict independent local policy. Equal row marginals with different joints give different answers; reject unexplained marginal products. Normalized-score summaries keep score-conditional labels.\n3. Independent enumerator verifies point path 2,7,3,8 => backward 1, forward 2, same 0; two uniform binary rows => .25/.25/.5 with backward bounds [0,1]. A,unknown,C has no direct A-C observation. Copy to 15 display words changes no count.\n4. First bounds cover additive transition counts on the Cartesian product of per-unit admissible sets (optional explicit local edge restrictions only); compare sparse DP to exhaustive tiny enumeration. General coupled/HSMM admissibility is refused unless supplied by a later certified solver.\n5. Bounds carry candidate coverage, admissible-set construction and grain; they are not confidence intervals. No chronology means incomparable; no universe for unknown rows means bounds unavailable or a separately declared completion universe. All-uninformative evidence yields a low-information result, not a scientific precision claim.\n\nValidation: proposed OrganizationReadoutSuite and independent exhaustive enumeration fixtures\n\nCompletion evidence: exact baseline/result SHA, executable command and bound test totals/exit, artifact digests, discriminating failure injection, compatibility impact, separate SD6 review. Run reference-scope for the actual diff and SD2 checkAll before landing. Proposed suite names below are acceptance specifications, not existing or executed tests. No efficacy claim follows from a synthetic pass.\n\nBoundary: No generic joint posterior engine, arbitrary ratio bounds, or mandatory trajectory sampler.",
+      "dependency_ids": [
+        "bd-01M2WVFV2WGF5BVQHX7JTYYWRH"
+      ]
+    },
+    {
+      "key": "projection",
+      "id": "bd-01M2WVH1DC8ZPDC992G4MX3TXG",
+      "title": "G2: stable recall words, timing and honest support projections",
+      "lane": "next",
+      "priority": 1,
+      "depends_on": [
+        "records"
+      ],
+      "paths": [
+        "recall RecallTiming extraction",
+        "codec unit_words/support tables"
+      ],
+      "acceptance": [
+        "Stable transcript-bound UTF-16 word IDs and explicit unit membership survive segmentation changes; unit IDs change when unitization changes. Unicode/newline/quoted input and missing/onset-only/interval timing are explicit.",
+        "Keep inference_unit, organization_unit and projection_unit distinct. Word copying does not create event-transition observations; audio timing is not needed for transcript-order analysis.",
+        "Support uses per-axis interval unions with complete/partial/unknown coverage and separate display hull. Missing child loci cannot create full group support; duplicates/foreign axes refuse.",
+        "Optional time-grid projection states W/P/H and exposure/allocation policy, preserves missing recall exposure and external/unprojectable mass. No silent uniform scene-to-second or next-onset-as-offset rule."
+      ],
+      "validation_command": "proposed RecallProjectionSuite on recall platforms; exact integer >2^53 and non-BMP consumer fixture",
+      "remaining": "Minimal source/word tables first; dense matrices and new granularity models deferred.",
+      "existing": false,
+      "body": "Governing plan: docs/refactor/PLAN.md (2026-09-19); ADR 0019. Key: projection; lane: next.\n\nScope: recall RecallTiming extraction, codec unit_words/support tables\n\nAcceptance criteria:\n1. Stable transcript-bound UTF-16 word IDs and explicit unit membership survive segmentation changes; unit IDs change when unitization changes. Unicode/newline/quoted input and missing/onset-only/interval timing are explicit.\n2. Keep inference_unit, organization_unit and projection_unit distinct. Word copying does not create event-transition observations; audio timing is not needed for transcript-order analysis.\n3. Support uses per-axis interval unions with complete/partial/unknown coverage and separate display hull. Missing child loci cannot create full group support; duplicates/foreign axes refuse.\n4. Optional time-grid projection states W/P/H and exposure/allocation policy, preserves missing recall exposure and external/unprojectable mass. No silent uniform scene-to-second or next-onset-as-offset rule.\n\nValidation: proposed RecallProjectionSuite on recall platforms; exact integer >2^53 and non-BMP consumer fixture\n\nCompletion evidence: exact baseline/result SHA, executable command and bound test totals/exit, artifact digests, discriminating failure injection, compatibility impact, separate SD6 review. Run reference-scope for the actual diff and SD2 checkAll before landing. Proposed suite names below are acceptance specifications, not existing or executed tests. No efficacy claim follows from a synthetic pass.\n\nBoundary: Minimal source/word tables first; dense matrices and new granularity models deferred.",
+      "dependency_ids": [
+        "bd-01M2WVENSB0P955Y0B603CC20Y"
+      ]
+    },
+    {
+      "key": "exports",
+      "id": "bd-01M2WVHF4B5DAXJYY4W91VK4WV",
+      "title": "G2: mapping exchange tables and an independent Python or R consumer",
+      "lane": "next",
+      "priority": 1,
+      "depends_on": [
+        "records",
+        "projection",
+        "readouts"
+      ],
+      "paths": [
+        "codec exchange writer/reader",
+        "pipeline export",
+        "examples"
+      ],
+      "acceptance": [
+        "Document TSV quoting and types plus JSON manifest; export target/word/unit/support/measure/decision/transition tables from one checked result. No inference is reconstructed from display strings.",
+        "Independent Python or R reader checks hashes, joins, all outcomes, stage policies, exact ticks and interval membership; reproduces manually authored tiny transition answers without importing Scala exporter logic.",
+        "Schema rejects duplicate/missing keys, foreign source/recall identity, digest mismatch, unsupported versions and partial publication unless explicitly requested. Do not round authoritative measures or cast exact ticks through floating point.",
+        "Reference and structured views coexist with common evidence digest and separate policies/decisions. Calibration unavailable stays explicit; consumer sees ambiguity and coverage limitations."
+      ],
+      "validation_command": "proposed MappingExchangeSuite; python3 examples/mapping/read_mapping.py <miniature> (path to be implemented)",
+      "remaining": "One downstream language is enough; no viewer or Parquet requirement.",
+      "existing": false,
+      "body": "Governing plan: docs/refactor/PLAN.md (2026-09-19); ADR 0019. Key: exports; lane: next.\n\nScope: codec exchange writer/reader, pipeline export, examples\n\nAcceptance criteria:\n1. Document TSV quoting and types plus JSON manifest; export target/word/unit/support/measure/decision/transition tables from one checked result. No inference is reconstructed from display strings.\n2. Independent Python or R reader checks hashes, joins, all outcomes, stage policies, exact ticks and interval membership; reproduces manually authored tiny transition answers without importing Scala exporter logic.\n3. Schema rejects duplicate/missing keys, foreign source/recall identity, digest mismatch, unsupported versions and partial publication unless explicitly requested. Do not round authoritative measures or cast exact ticks through floating point.\n4. Reference and structured views coexist with common evidence digest and separate policies/decisions. Calibration unavailable stays explicit; consumer sees ambiguity and coverage limitations.\n\nValidation: proposed MappingExchangeSuite; python3 examples/mapping/read_mapping.py <miniature> (path to be implemented)\n\nCompletion evidence: exact baseline/result SHA, executable command and bound test totals/exit, artifact digests, discriminating failure injection, compatibility impact, separate SD6 review. Run reference-scope for the actual diff and SD2 checkAll before landing. Proposed suite names below are acceptance specifications, not existing or executed tests. No efficacy claim follows from a synthetic pass.\n\nBoundary: One downstream language is enough; no viewer or Parquet requirement.",
+      "dependency_ids": [
+        "bd-01M2WVENSB0P955Y0B603CC20Y",
+        "bd-01M2WVH1DC8ZPDC992G4MX3TXG",
+        "bd-01M2WVGFA0J4D9T9ZBNR3MY2MR"
+      ]
+    },
+    {
+      "key": "recovery",
+      "id": "bd-01M2WVHVVYQBKSBSW573HZYR9Q",
+      "title": "G3: frozen synthetic recovery court for recall organization",
+      "lane": "validation",
+      "priority": 1,
+      "depends_on": [
+        "scorer",
+        "readouts"
+      ],
+      "paths": [
+        "tools/recall-study recovery fixtures",
+        "docs preregistration"
+      ],
+      "acceptance": [
+        "Commit known forward, reverse, jump and revisit packets with independent intended assignments; freeze admissible sets, grain, primary estimands, tolerances, seeds, missingness and aggregation before model comparisons.",
+        "Packet equivariance uses fixed IDs and packets, not resegmented shuffled text. Full language-pipeline reverse/revisit examples are authored coherently; source order/ID/chronology metadata perturbations reconcile.",
+        "Assess localization, candidate coverage, specificity and organization recovery bias, reversal sensitivity, group-effect attenuation and uncertainty/bounds coverage. At fixed true organization vary omissions, ambiguity, paraphrase and transcription quality.",
+        "Uniform/no-information evidence cannot produce a confident behavioral conclusion. Mutating to monotone paths, dropping unresolved units and counting projected word transitions each fails a known-answer witness.",
+        "All cases/failures remain in results. A negative result closes the executed study with a failed claim gate; tolerances are not loosened. Synthetic success does not establish human recovery."
+      ],
+      "validation_command": "proposed python3 tools/recall-study/recovery.py --frozen-manifest <path>; independent fixture oracle",
+      "remaining": "No sealed participant gold read and no numeric human-accuracy promise.",
+      "existing": false,
+      "body": "Governing plan: docs/refactor/PLAN.md (2026-09-19); ADR 0019. Key: recovery; lane: validation.\n\nScope: tools/recall-study recovery fixtures, docs preregistration\n\nAcceptance criteria:\n1. Commit known forward, reverse, jump and revisit packets with independent intended assignments; freeze admissible sets, grain, primary estimands, tolerances, seeds, missingness and aggregation before model comparisons.\n2. Packet equivariance uses fixed IDs and packets, not resegmented shuffled text. Full language-pipeline reverse/revisit examples are authored coherently; source order/ID/chronology metadata perturbations reconcile.\n3. Assess localization, candidate coverage, specificity and organization recovery bias, reversal sensitivity, group-effect attenuation and uncertainty/bounds coverage. At fixed true organization vary omissions, ambiguity, paraphrase and transcription quality.\n4. Uniform/no-information evidence cannot produce a confident behavioral conclusion. Mutating to monotone paths, dropping unresolved units and counting projected word transitions each fails a known-answer witness.\n5. All cases/failures remain in results. A negative result closes the executed study with a failed claim gate; tolerances are not loosened. Synthetic success does not establish human recovery.\n\nValidation: proposed python3 tools/recall-study/recovery.py --frozen-manifest <path>; independent fixture oracle\n\nCompletion evidence: exact baseline/result SHA, executable command and bound test totals/exit, artifact digests, discriminating failure injection, compatibility impact, separate SD6 review. Run reference-scope for the actual diff and SD2 checkAll before landing. Proposed suite names below are acceptance specifications, not existing or executed tests. No efficacy claim follows from a synthetic pass.\n\nBoundary: No sealed participant gold read and no numeric human-accuracy promise.",
+      "dependency_ids": [
+        "bd-01M2TA5FB4ATF9QS9ZA9MDJNE2",
+        "bd-01M2WVGFA0J4D9T9ZBNR3MY2MR"
+      ]
+    },
+    {
+      "key": "preview",
+      "id": "bd-01M2WVJ8HKX6EHG2C5CXYEZYJ6",
+      "title": "G2: demonstrate the public annotation-assisted analysis journey",
+      "lane": "next",
+      "priority": 1,
+      "depends_on": [
+        "clock",
+        "command",
+        "exports",
+        "recovery",
+        "scorer"
+      ],
+      "paths": [
+        "pipeline examples",
+        "docs-site analysis guide",
+        "docs/refactor/evidence"
+      ],
+      "acceptance": [
+        "New analyst runs a text miniature and an admitted real annotated-video recall from ordinary local input paths through library/CLI to reference+reconstruction mapping tables and the independent consumer. No normal consumer imports bench.",
+        "Configuration resolved once; source reused across two recall inputs without rewriting its identity. Offline replay forbids network and yields deterministic scientific payloads; provider failure remains one typed participant/unit outcome.",
+        "Require reference-compatible organization readouts, per-unit and per-transition coverage and exact support/receipt joins. Declare annotation-assisted origin, inference grain and uncalibrated status. Do not claim automatic visual understanding or independent empirical recovery.",
+        "Crash/partial-write/digest mutations cause incomplete output refusal. Execution completion, structural validity and requested capability readiness are separate. No media/prose leaks into committed logs.",
+        "Commit command/config/input/output hashes, platform, totals and one reader walkthrough; private artifacts remain local. This gate is not D1A-film, V1, or the stable 1.0 release."
+      ],
+      "validation_command": "proposed pipeline public recall-map invocation + offline replay + independent reader; docs-site executable example",
+      "remaining": "This is the first usable product milestone.",
+      "existing": false,
+      "body": "Governing plan: docs/refactor/PLAN.md (2026-09-19); ADR 0019. Key: preview; lane: next.\n\nScope: pipeline examples, docs-site analysis guide, docs/refactor/evidence\n\nAcceptance criteria:\n1. New analyst runs a text miniature and an admitted real annotated-video recall from ordinary local input paths through library/CLI to reference+reconstruction mapping tables and the independent consumer. No normal consumer imports bench.\n2. Configuration resolved once; source reused across two recall inputs without rewriting its identity. Offline replay forbids network and yields deterministic scientific payloads; provider failure remains one typed participant/unit outcome.\n3. Require reference-compatible organization readouts, per-unit and per-transition coverage and exact support/receipt joins. Declare annotation-assisted origin, inference grain and uncalibrated status. Do not claim automatic visual understanding or independent empirical recovery.\n4. Crash/partial-write/digest mutations cause incomplete output refusal. Execution completion, structural validity and requested capability readiness are separate. No media/prose leaks into committed logs.\n5. Commit command/config/input/output hashes, platform, totals and one reader walkthrough; private artifacts remain local. This gate is not D1A-film, V1, or the stable 1.0 release.\n\nValidation: proposed pipeline public recall-map invocation + offline replay + independent reader; docs-site executable example\n\nCompletion evidence: exact baseline/result SHA, executable command and bound test totals/exit, artifact digests, discriminating failure injection, compatibility impact, separate SD6 review. Run reference-scope for the actual diff and SD2 checkAll before landing. Proposed suite names below are acceptance specifications, not existing or executed tests. No efficacy claim follows from a synthetic pass.\n\nBoundary: This is the first usable product milestone.",
+      "dependency_ids": [
+        "bd-01M2WTGF981AY7RCN8QC42JSPT",
+        "bd-01M2TADC4VKSDZ2S9SXETH2MYM",
+        "bd-01M2WVHF4B5DAXJYY4W91VK4WV",
+        "bd-01M2WVHVVYQBKSBSW573HZYR9Q",
+        "bd-01M2TA5FB4ATF9QS9ZA9MDJNE2"
+      ]
+    },
+    {
+      "key": "evidence",
+      "id": "bd-01M2TACM78289S4TECE91GT5K2",
+      "title": "G1: extract shared local mapping evidence and receipted scoring channels",
+      "lane": "next",
+      "priority": 1,
+      "depends_on": [
+        "records",
+        "support"
+      ],
+      "paths": [
+        "align cost/candidates",
+        "embed-bench StageTrace/RecallToVideo"
+      ],
+      "acceptance": [
+        "Extract candidate nomination, raw local score/cost evaluation and outcome receipts BEFORE HSMM/refinement. Both reference and GraphHsmm consume the same immutable evidence object; historical StageTrace adapter reads it.",
+        "Register deterministic lexical and existing embedding channels with finite score direction/scale, declared grain/empty-input policy, input/render/config/model/candidate identities and replay. Unavailable scores remain typed unavailable, not 0 or uniform.",
+        "Represent content-only scorer input separately from source coordinates/adjacency, so strict reference providers cannot read behavioral features. Audit retrieval and equal-score tie handling, not only decoder.",
+        "Compare evidence/state membership/term values and digest across both uses; same-platform legacy embedding evidence parity holds under the frozen preset. Refined emissions cannot be relabeled as base costs.",
+        "External support is NotApplicable or its distinct measured contract, not 1.0 from no terms. No scene-score allocation is presented as within-scene measurement. Guard and alias/forgery mutations fail."
+      ],
+      "validation_command": "proposed LocalMappingEvidenceSuite plus existing StageTraceSuite; no-network provider replay",
+      "remaining": "Removes D1B/benchmark-checkpoint prerequisite: this extraction uses existing checked target support; full film signature migration remains D1B.",
+      "existing": true,
+      "body": "Governing plan: docs/refactor/PLAN.md (2026-09-19); ADR 0019. Key: evidence; lane: next.\n\nScope: align cost/candidates, embed-bench StageTrace/RecallToVideo\n\nAcceptance criteria:\n1. Extract candidate nomination, raw local score/cost evaluation and outcome receipts BEFORE HSMM/refinement. Both reference and GraphHsmm consume the same immutable evidence object; historical StageTrace adapter reads it.\n2. Register deterministic lexical and existing embedding channels with finite score direction/scale, declared grain/empty-input policy, input/render/config/model/candidate identities and replay. Unavailable scores remain typed unavailable, not 0 or uniform.\n3. Represent content-only scorer input separately from source coordinates/adjacency, so strict reference providers cannot read behavioral features. Audit retrieval and equal-score tie handling, not only decoder.\n4. Compare evidence/state membership/term values and digest across both uses; same-platform legacy embedding evidence parity holds under the frozen preset. Refined emissions cannot be relabeled as base costs.\n5. External support is NotApplicable or its distinct measured contract, not 1.0 from no terms. No scene-score allocation is presented as within-scene measurement. Guard and alias/forgery mutations fail.\n\nValidation: proposed LocalMappingEvidenceSuite plus existing StageTraceSuite; no-network provider replay\n\nCompletion evidence: exact baseline/result SHA, executable command and bound test totals/exit, artifact digests, discriminating failure injection, compatibility impact, separate SD6 review. Run reference-scope for the actual diff and SD2 checkAll before landing. Proposed suite names below are acceptance specifications, not existing or executed tests. No efficacy claim follows from a synthetic pass.\n\nBoundary: Removes D1B/benchmark-checkpoint prerequisite: this extraction uses existing checked target support; full film signature migration remains D1B.",
+      "dependency_ids": [
+        "bd-01M2WVENSB0P955Y0B603CC20Y",
+        "bd-01M19956MFSG7076QE4J66T7E9"
+      ]
+    },
+    {
+      "key": "command",
+      "id": "bd-01M2TADC4VKSDZ2S9SXETH2MYM",
+      "title": "G2: typed mapping facade, explicit config and safe batch publication",
+      "lane": "next",
+      "priority": 1,
+      "depends_on": [
+        "decode",
+        "compatibility",
+        "projection"
+      ],
+      "paths": [
+        "pipeline mapping facade",
+        "codec publication manifest"
+      ],
+      "acceptance": [
+        "Public typed API and thin CLI accept checked source/recall inputs and explicit versioned profiles; no bench imports. Resolve config once; reject invalid config rather than environment fallback.",
+        "Produce one outcome per input unit and participant, including failure, abstention and external alternatives; batch failures remain local. Exit policy separates execution, structural validity and requested capability readiness, preserving receipted partial outputs.",
+        "Write to verified temporary output then atomic rename, or completion manifest last with readers refusing incomplete output. Do not overwrite historical runs silently; interruption and corrupt-output tests fail closed.",
+        "Cache identities bind source/provider/render/config; enforce offline replay/no network and budgeted retries. Frozen legacy structured preset matches baseline scientific outputs; reference uses its own explicit policy.",
+        "Reference provenance is derived from registered supported stages. Unverifiable custom/legacy results remain UnknownProvenance/ModelDependentOnly; do not wait for a universal custom-cost authentication protocol to ship honest exploratory output."
+      ],
+      "validation_command": "proposed MappingPipelineSuite and public CLI replay/crash tests",
+      "remaining": "The checked record/codec is the records ticket; full HSMM invocation authority stays on the existing invocation ticket.",
+      "existing": true,
+      "body": "Governing plan: docs/refactor/PLAN.md (2026-09-19); ADR 0019. Key: command; lane: next.\n\nScope: pipeline mapping facade, codec publication manifest\n\nAcceptance criteria:\n1. Public typed API and thin CLI accept checked source/recall inputs and explicit versioned profiles; no bench imports. Resolve config once; reject invalid config rather than environment fallback.\n2. Produce one outcome per input unit and participant, including failure, abstention and external alternatives; batch failures remain local. Exit policy separates execution, structural validity and requested capability readiness, preserving receipted partial outputs.\n3. Write to verified temporary output then atomic rename, or completion manifest last with readers refusing incomplete output. Do not overwrite historical runs silently; interruption and corrupt-output tests fail closed.\n4. Cache identities bind source/provider/render/config; enforce offline replay/no network and budgeted retries. Frozen legacy structured preset matches baseline scientific outputs; reference uses its own explicit policy.\n5. Reference provenance is derived from registered supported stages. Unverifiable custom/legacy results remain UnknownProvenance/ModelDependentOnly; do not wait for a universal custom-cost authentication protocol to ship honest exploratory output.\n\nValidation: proposed MappingPipelineSuite and public CLI replay/crash tests\n\nCompletion evidence: exact baseline/result SHA, executable command and bound test totals/exit, artifact digests, discriminating failure injection, compatibility impact, separate SD6 review. Run reference-scope for the actual diff and SD2 checkAll before landing. Proposed suite names below are acceptance specifications, not existing or executed tests. No efficacy claim follows from a synthetic pass.\n\nBoundary: The checked record/codec is the records ticket; full HSMM invocation authority stays on the existing invocation ticket.",
+      "dependency_ids": [
+        "bd-01M2TAD04SR823TQVG9VPNH6R3",
+        "bd-01M2WVFV2WGF5BVQHX7JTYYWRH",
+        "bd-01M2WVH1DC8ZPDC992G4MX3TXG"
+      ]
+    },
+    {
+      "key": "decode",
+      "id": "bd-01M2TAD04SR823TQVG9VPNH6R3",
+      "title": "G1: extract named structured reconstruction and decision policies",
+      "lane": "next",
+      "priority": 1,
+      "depends_on": [
+        "evidence"
+      ],
+      "paths": [
+        "align structured decision policies",
+        "embed-bench MonotoneScene/RecallToVideo"
+      ],
+      "acceptance": [
+        "Move pure structured decision logic/config into the library; named versioned reconstruction profile declares persistence/order/hierarchy/causal/external/refinement/fill choices. Keep historical Sherlock preset explicit.",
+        "No fill by default for new explicit profiles; historical fill remains available only by request. Raw evidence and posterior immutable; raw argmax, chosen target, chosen mass and fill origin exported separately.",
+        "Same recorded inputs/config reproduce historical anchor bytes. Config changes alter policy identity; no raw-argmax confidence is attached to a different chosen target.",
+        "Structured output cannot satisfy strict reference compatibility. No transfer decoder tuning in this extraction; generic configuration does not require a corpus-schema research comparison."
+      ],
+      "validation_command": "existing MonotoneScene suites plus proposed ReconstructionPolicySuite",
+      "remaining": "Supersedes generic decoder extraction only; H2 is later reconstruction research.",
+      "existing": true,
+      "body": "Governing plan: docs/refactor/PLAN.md (2026-09-19); ADR 0019. Key: decode; lane: next.\n\nScope: align structured decision policies, embed-bench MonotoneScene/RecallToVideo\n\nAcceptance criteria:\n1. Move pure structured decision logic/config into the library; named versioned reconstruction profile declares persistence/order/hierarchy/causal/external/refinement/fill choices. Keep historical Sherlock preset explicit.\n2. No fill by default for new explicit profiles; historical fill remains available only by request. Raw evidence and posterior immutable; raw argmax, chosen target, chosen mass and fill origin exported separately.\n3. Same recorded inputs/config reproduce historical anchor bytes. Config changes alter policy identity; no raw-argmax confidence is attached to a different chosen target.\n4. Structured output cannot satisfy strict reference compatibility. No transfer decoder tuning in this extraction; generic configuration does not require a corpus-schema research comparison.\n\nValidation: existing MonotoneScene suites plus proposed ReconstructionPolicySuite\n\nCompletion evidence: exact baseline/result SHA, executable command and bound test totals/exit, artifact digests, discriminating failure injection, compatibility impact, separate SD6 review. Run reference-scope for the actual diff and SD2 checkAll before landing. Proposed suite names below are acceptance specifications, not existing or executed tests. No efficacy claim follows from a synthetic pass.\n\nBoundary: Supersedes generic decoder extraction only; H2 is later reconstruction research.",
+      "dependency_ids": [
+        "bd-01M2TACM78289S4TECE91GT5K2"
+      ]
+    },
+    {
+      "key": "ci",
+      "id": "bd-01M19G69RQCHMT2EMG11XFT4WX",
+      "title": "G0: obtain an executed exact-SHA clean build and CI receipt",
+      "lane": "foundation",
+      "priority": 0,
+      "depends_on": [
+        "ciowner"
+      ],
+      "paths": [
+        ".github/workflows",
+        "build.sbt",
+        "docs-site verification"
+      ],
+      "acceptance": [
+        "Diagnose actual job-start failure; baseline CI 35406786299 has empty steps and billing/spending-limit annotation. Existing workflows are present; do not report a Scala failure from this.",
+        "After the chosen account/runner route, obtain clean pinned-dependency JVM/JS/Native and docs receipts with commands, exit, module totals, skipped/environment-gated tasks and immutable code SHA. No private sibling override may establish pin qualification.",
+        "A local clean archive/standalone-clone check can advance engineering while owner action is pending, but is labeled local and does not close the CI execution requirement. Workflow integrity checks regenerate from build settings.",
+        "Capture startup and test failures distinctly; a zero-tests exit does not pass. Do not alter billing, paid infrastructure or repository visibility without the existing owner decision."
+      ],
+      "validation_command": "sbt -batch checkAll; githubWorkflowCheck; declared docs verification; CI run/check annotations",
+      "remaining": "Historical successful local gates are retained as prior evidence, not a current CI pass.",
+      "existing": true,
+      "body": "Governing plan: docs/refactor/PLAN.md (2026-09-19); ADR 0019. Key: ci; lane: foundation.\n\nScope: .github/workflows, build.sbt, docs-site verification\n\nAcceptance criteria:\n1. Diagnose actual job-start failure; baseline CI 35406786299 has empty steps and billing/spending-limit annotation. Existing workflows are present; do not report a Scala failure from this.\n2. After the chosen account/runner route, obtain clean pinned-dependency JVM/JS/Native and docs receipts with commands, exit, module totals, skipped/environment-gated tasks and immutable code SHA. No private sibling override may establish pin qualification.\n3. A local clean archive/standalone-clone check can advance engineering while owner action is pending, but is labeled local and does not close the CI execution requirement. Workflow integrity checks regenerate from build settings.\n4. Capture startup and test failures distinctly; a zero-tests exit does not pass. Do not alter billing, paid infrastructure or repository visibility without the existing owner decision.\n\nValidation: sbt -batch checkAll; githubWorkflowCheck; declared docs verification; CI run/check annotations\n\nCompletion evidence: exact baseline/result SHA, executable command and bound test totals/exit, artifact digests, discriminating failure injection, compatibility impact, separate SD6 review. Run reference-scope for the actual diff and SD2 checkAll before landing. Proposed suite names below are acceptance specifications, not existing or executed tests. No efficacy claim follows from a synthetic pass.\n\nBoundary: Historical successful local gates are retained as prior evidence, not a current CI pass.",
+      "dependency_ids": [
+        "bd-01M2TA2283FC7FSA2G7TJ1WSMN"
+      ]
+    },
+    {
+      "key": "ciowner",
+      "id": "bd-01M2TA2283FC7FSA2G7TJ1WSMN",
+      "title": "OWNER: choose the CI account or runner route (push already complete)",
+      "lane": "owner",
+      "priority": 1,
+      "depends_on": [],
+      "paths": [
+        "GitHub Actions account/runner decision"
+      ],
+      "acceptance": [
+        "Record owner choice of billing remediation or a specific permitted runner route; no repository-visibility or spending change is inferred.",
+        "Push portion complete at baseline: local HEAD, origin/main and live remote main all equal 1113f96864a38a2869e49d9c8c5d4e2dc43f5d10. Preserve this evidence rather than asking again.",
+        "CI ticket executes the chosen route and verifies tests actually ran; this decision ticket alone is not qualification."
+      ],
+      "validation_command": "git ls-remote origin refs/heads/main; owner decision recorded on this issue",
+      "remaining": "",
+      "existing": true,
+      "body": "Governing plan: docs/refactor/PLAN.md (2026-09-19); ADR 0019. Key: ciowner; lane: owner.\n\nScope: GitHub Actions account/runner decision\n\nAcceptance criteria:\n1. Record owner choice of billing remediation or a specific permitted runner route; no repository-visibility or spending change is inferred.\n2. Push portion complete at baseline: local HEAD, origin/main and live remote main all equal 1113f96864a38a2869e49d9c8c5d4e2dc43f5d10. Preserve this evidence rather than asking again.\n3. CI ticket executes the chosen route and verifies tests actually ran; this decision ticket alone is not qualification.\n\nValidation: git ls-remote origin refs/heads/main; owner decision recorded on this issue\n\nCompletion evidence: exact baseline/result SHA, executable command and bound test totals/exit, artifact digests, discriminating failure injection, compatibility impact, separate SD6 review. Run reference-scope for the actual diff and SD2 checkAll before landing. Proposed suite names below are acceptance specifications, not existing or executed tests. No efficacy claim follows from a synthetic pass.\n\nBoundary: "
+    },
+    {
+      "key": "epic",
+      "id": "bd-01M2TA01EHVRF6MQ1N00XTVK1K",
+      "title": "DELIVERY: usable recall mapping and defensible organization measurement",
+      "lane": "container",
+      "priority": 1,
+      "depends_on": [],
+      "paths": [
+        "docs/refactor/PLAN.md",
+        "BACKLOG.md"
+      ],
+      "acceptance": [
+        "G0-G2 public annotation-assisted preview demonstrated with complete accounting, reference/reconstruction policies, compatibility and downstream reader.",
+        "G4 compiled-film API and full D1B proof remain required for stable 1.0 under ruling E; V1/E0 stay 1.x.",
+        "Release gate closes on execution/structural/API evidence. Scientific recovery, calibrated confidence and superiority are distinct named claim gates; no optional provider or research win gates engineering.",
+        "Every unfinished issue has a lane and remaining-work statement; only executable prerequisites use dep; no stale fleet authority. Gate review identifies one next failing witness."
+      ],
+      "validation_command": "Mote graph/crosswalk checks and exact-SHA gate receipts",
+      "remaining": "Contains work with rel, not a dependency on every child.",
+      "existing": true,
+      "body": "Governing plan: docs/refactor/PLAN.md (2026-09-19); ADR 0019. Key: epic; lane: container.\n\nScope: docs/refactor/PLAN.md, BACKLOG.md\n\nAcceptance criteria:\n1. G0-G2 public annotation-assisted preview demonstrated with complete accounting, reference/reconstruction policies, compatibility and downstream reader.\n2. G4 compiled-film API and full D1B proof remain required for stable 1.0 under ruling E; V1/E0 stay 1.x.\n3. Release gate closes on execution/structural/API evidence. Scientific recovery, calibrated confidence and superiority are distinct named claim gates; no optional provider or research win gates engineering.\n4. Every unfinished issue has a lane and remaining-work statement; only executable prerequisites use dep; no stale fleet authority. Gate review identifies one next failing witness.\n\nValidation: Mote graph/crosswalk checks and exact-SHA gate receipts\n\nCompletion evidence: exact baseline/result SHA, executable command and bound test totals/exit, artifact digests, discriminating failure injection, compatibility impact, separate SD6 review. Run reference-scope for the actual diff and SD2 checkAll before landing. Proposed suite names below are acceptance specifications, not existing or executed tests. No efficacy claim follows from a synthetic pass.\n\nBoundary: Contains work with rel, not a dependency on every child."
+    },
+    {
+      "key": "hardening",
+      "id": "bd-01M2TAM66RTEMY3VVHA3N2MYXK",
+      "title": "G5: harden the public mapping facade and actionable errors",
+      "lane": "release",
+      "priority": 2,
+      "depends_on": [
+        "command"
+      ],
+      "paths": [
+        "pipeline public error facade",
+        "docs-site examples"
+      ],
+      "acceptance": [
+        "Public entry points return typed actionable failures with path and exception class where safe; keep source/participant prose out of logs.",
+        "Requested capability failure and invalid draft are distinct from success; tests cover advertised CLI exit behavior.",
+        "Unify only errors crossing this facade where a concrete consumer needs it. A repository-wide migration of all 45 refusal types is deferred.",
+        "A newcomer executes documented local analyze/inspect/export calls without manually assembling internal proof objects; facade cannot bypass identity/privacy/validation."
+      ],
+      "validation_command": "public MappingPipelineSuite consumer tests and docs-site example verification",
+      "remaining": "Supersedes the broad progressive-facade request for this delivery; unrelated API ergonomics remain later.",
+      "existing": true,
+      "body": "Governing plan: docs/refactor/PLAN.md (2026-09-19); ADR 0019. Key: hardening; lane: release.\n\nScope: pipeline public error facade, docs-site examples\n\nAcceptance criteria:\n1. Public entry points return typed actionable failures with path and exception class where safe; keep source/participant prose out of logs.\n2. Requested capability failure and invalid draft are distinct from success; tests cover advertised CLI exit behavior.\n3. Unify only errors crossing this facade where a concrete consumer needs it. A repository-wide migration of all 45 refusal types is deferred.\n4. A newcomer executes documented local analyze/inspect/export calls without manually assembling internal proof objects; facade cannot bypass identity/privacy/validation.\n\nValidation: public MappingPipelineSuite consumer tests and docs-site example verification\n\nCompletion evidence: exact baseline/result SHA, executable command and bound test totals/exit, artifact digests, discriminating failure injection, compatibility impact, separate SD6 review. Run reference-scope for the actual diff and SD2 checkAll before landing. Proposed suite names below are acceptance specifications, not existing or executed tests. No efficacy claim follows from a synthetic pass.\n\nBoundary: Supersedes the broad progressive-facade request for this delivery; unrelated API ergonomics remain later."
+    }
+  ],
+  "withdrawn_new_tickets": [
+    {
+      "id": "bd-01M2WVE385Q85CHG1QMRE3KY06",
+      "status": "closed",
+      "disposition": "superseded",
+      "canonical": "bd-01M2WTGF981AY7RCN8QC42JSPT",
+      "reason": "Created before the concurrent intake filing was observed; use the existing C1 ticket. No implementation completed."
+    }
+  ],
+  "ta_crosswalk": {
+    "1": [
+      "epic",
+      "hygiene",
+      "claims"
+    ],
+    "2": [
+      "ci"
+    ],
+    "3": [
+      "baseline"
+    ],
+    "4": [
+      "scorer"
+    ],
+    "5": [
+      "records"
+    ],
+    "6": [
+      "projection"
+    ],
+    "7": [
+      "records",
+      "decode"
+    ],
+    "8": [
+      "evidence",
+      "decode",
+      "projection"
+    ],
+    "9": [
+      "command"
+    ],
+    "10": [
+      "command"
+    ],
+    "11": [
+      "exports"
+    ],
+    "12": [
+      "preview"
+    ],
+    "13": [
+      "s0"
+    ],
+    "14": [
+      "s1"
+    ],
+    "15": [
+      "s2"
+    ],
+    "16": [
+      "s3"
+    ],
+    "17": [
+      "s4a"
+    ],
+    "18": [
+      "s4b"
+    ],
+    "19": [
+      "s4c"
+    ],
+    "20": [
+      "filmplan",
+      "film"
+    ],
+    "21": [
+      "d1b",
+      "filmproof"
+    ],
+    "22": [
+      "filmproof"
+    ],
+    "23": [
+      "support",
+      "records"
+    ],
+    "24": [
+      "projection"
+    ],
+    "25": [
+      "calibration"
+    ],
+    "26": [
+      "readouts",
+      "recovery"
+    ],
+    "27": [
+      "prereg",
+      "baselines"
+    ],
+    "28": [
+      "finaltest",
+      "calibration"
+    ],
+    "29": [
+      "infra",
+      "hardening",
+      "exports"
+    ],
+    "30": [
+      "release"
+    ]
+  },
+  "execution_receipt": "EXECUTION_RECEIPT.json"
+}
