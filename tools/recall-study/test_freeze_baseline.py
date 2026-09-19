@@ -25,6 +25,7 @@ class BaselineSuite(unittest.TestCase):
         packets = f["recallPackets"]
         self.inv = {"schema": "storymodel4s.bench.baseline-inventory/v1",
                     "transcriptSha256": baseline.digest(" ".join(p["text"] for p in packets).encode()),
+                    "recallGraphSha256": baseline.digest(baseline.canonical(packets)),
                     "sourceFingerprint": baseline.digest(baseline.canonical(events)),
                     "units": [], "words": [], "targets": [{"id": "seg:" + e["id"]} for e in events],
                     "rowLoci": []}
@@ -99,7 +100,7 @@ class BaselineSuite(unittest.TestCase):
             baseline.write_json(paths["stages"], {
                 "schema": "storymodel4s.bench.stage-trace/v1",
                 "reportSha256": baseline.file_hash(paths["report"]),
-                "recallChecksum": self.inv["transcriptSha256"],
+                "recallChecksum": self.inv["recallGraphSha256"],
                 "sourceFingerprint": self.inv["sourceFingerprint"],
                 "units": [{"unit": i, "unitId": p["id"], "finalAnchor": target}
                           for i, (p, target) in enumerate(zip(packets, chosen))]})
@@ -139,6 +140,7 @@ class BaselineSuite(unittest.TestCase):
     def test_complete_synthetic_replay_preserves_distinct_outcomes(self):
         summary = self.verify()
         self.assertEqual(summary["units"], 8)
+        self.assertNotEqual(self.inv["transcriptSha256"], self.inv["recallGraphSha256"])
         self.assertEqual(summary["outcomes"], {"reportRows": 8, "sourceChosen": 6, "withoutSourceChoice": 2})
         self.assertIsNone(self.inv["words"][self.inv["units"][2]["wordIndices"][0]]["onsetSeconds"])
         post = baseline.load(self.paths[0]["posterior"])["units"][2]

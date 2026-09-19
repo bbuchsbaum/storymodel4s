@@ -5,7 +5,7 @@ import java.nio.file.{Files, Paths}
 
 import io.circe.Json
 
-import storymodel4s.align.ViewFingerprint
+import storymodel4s.align.{AlignWire, ViewFingerprint}
 import storymodel4s.bench.video.{RecallTiming, RecallWordsCsv}
 import storymodel4s.core.{AxisExtent, Checksum, StorySource}
 import storymodel4s.corpus.intake.SherlockAnnotations
@@ -33,7 +33,8 @@ object SherlockBaselineCapture:
     val transcript = StorySource
       .fromText(transcriptText, Some("sherlock-recall"))
       .fold(e => throw new IllegalArgumentException(e.message), identity)
-    val units = RecallSegmenter.segment(transcript).ordered
+    val recall = RecallSegmenter.segment(transcript)
+    val units = recall.ordered
     val spans = RecallTiming.wordSpans(words)
     val nodeTexts = built.nodeTexts.toMap
     val recallHash = Checksum.ofBytes(recallCsv).hex
@@ -70,6 +71,7 @@ object SherlockBaselineCapture:
       "annotationSha256" -> str(Checksum.ofBytes(annotation).hex),
       "recallSha256" -> str(recallHash),
       "transcriptSha256" -> str(Checksum.ofText(transcriptText).hex),
+      "recallGraphSha256" -> str(AlignWire.recallChecksum(recall).hex),
       "runtime" -> Json.obj(
         Vector("java.version", "java.vendor", "os.name", "os.arch", "os.version")
           .map(k => k -> str(System.getProperty(k)))*

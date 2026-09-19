@@ -172,7 +172,7 @@ def inspect_run(paths, expected_inventory=None):
     require([u["unit"] for u in stages["units"]] == ordinals, "stage unit accounting mismatch")
     require([u["unitId"] for u in stages["units"]] == unit_ids, "stage unit identity mismatch")
     require(stages["reportSha256"] == file_hash(paths["report"]), "foreign stage/report receipt")
-    require(stages["recallChecksum"] == inv["transcriptSha256"], "foreign recall receipt")
+    require(stages["recallChecksum"] == inv["recallGraphSha256"], "foreign recall receipt")
     require(stages["sourceFingerprint"] == inv["sourceFingerprint"], "foreign source receipt")
     anchors = []
     for row, post, stage in zip(report, posterior["units"], stages["units"]):
