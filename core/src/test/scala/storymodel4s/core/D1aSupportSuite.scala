@@ -548,3 +548,23 @@ class D1aSupportSuite extends FunSuite:
     assertEquals(duplicated.identity, reordered.identity)
     assert(EvidenceSupport.of(duplicated, Vector(secondary(duplicated, 20L, 24L))).isRight)
     assert(EvidenceSupport.of(reordered, Vector(secondary(reordered, 20L, 24L))).isRight)
+
+  test("single-interval selection refuses a foreign axis for every playback anchor"):
+    val bundle = film()
+    val interval = iv(bundle, 1L, 4L)
+    val intervals = PlaybackIntervalSet.one(interval)
+    val anchors = Vector(
+      media(bundle, 1L, 4L),
+      EvidenceAnchor.Shot(bundle.id, bundle.streams.head.id, ShotId.unsafe("axis-shot"), interval),
+      EvidenceAnchor.Track(
+        bundle.id,
+        bundle.streams.head.id,
+        TrackId.unsafe("axis-track"),
+        intervals
+      )
+    )
+    anchors.foreach { anchor =>
+      val checked = support(bundle, anchor)
+      assertEquals(checked.intervalsOn(bundle.primaryAxis.id), Right(intervals))
+      assert(checked.intervalsOn(native.primaryAxis.id).isLeft, clues(anchor))
+    }
