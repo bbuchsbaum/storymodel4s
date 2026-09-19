@@ -1,0 +1,237 @@
+{
+  "compile" : {
+    "fingerprint" : "6fc077fc1dd92cad095d6522f7999f89fc0b5dbcfe97dd4fd0f3cb97f85991f8",
+    "candidateSet" : "19b08a4428a7cd8803da0040188c2a7120450ced3444a18429bda80747a877f9",
+    "modelContentChecksum" : "6fa169accaa678d3cb9bd4c1053828ba21f3abfc630d73777299e87cbb138ef5",
+    "modelFileSha256" : "6fa169accaa678d3cb9bd4c1053828ba21f3abfc630d73777299e87cbb138ef5",
+    "derivationFileSha256" : "332face967176d7c948ac48bdb4b9d0e12eec23299c2947ef0936b0e54e4ba96"
+  },
+  "exemplars" : {
+    "sourceSupportTarget" : "story:e4b036101a7a:s0#p",
+    "sourceSupport" : "17:source-support/v23:1.0110:9:option/v14:some90:8:spans/v237:7:span/v217:9:option/v14:none2:112:1737:7:span/v217:9:option/v14:none2:212:27",
+    "evidence" : "11:evidence/v239:chart-proposal-evidence/v2:02b2bdd40696163:9:option/v14:some142:8:spans/v241:7:span/v217:9:option/v14:none4:15354:153841:7:span/v217:9:option/v14:none4:15394:154441:7:span/v217:9:option/v14:none4:15514:155214:11:upstream/v140:storymodel4s:chart-proposal-provider:0.123:chart-proposal-provider",
+    "evidenceWire" : {
+      "id" : "chart-proposal-evidence/v2:02b2bdd40696",
+      "spans" : [
+        {
+          "span" : {
+            "start" : 1535,
+            "end" : 1538
+          }
+        },
+        {
+          "span" : {
+            "start" : 1539,
+            "end" : 1544
+          }
+        },
+        {
+          "span" : {
+            "start" : 1551,
+            "end" : 1552
+          }
+        }
+      ],
+      "upstream" : [
+      ],
+      "extractor" : "storymodel4s:chart-proposal-provider:0.1",
+      "stage" : "chart-proposal-provider"
+    },
+    "entity" : "c-entity:002a43306f30",
+    "mentionId" : "m-entity:918ce071c9dd",
+    "textSupportWire" : [
+      {
+        "span" : {
+          "start" : 1275,
+          "end" : 1280
+        }
+      }
+    ]
+  },
+  "nodeOrders" : {
+    "discourseOrder" : [
+      "c-situation:fc53541116d2",
+      "c-situation:ee179d0b1d28",
+      "c-situation:e99598a963a3",
+      "c-situation:c72b028ba80e",
+      "c-situation:4b5a03722bf9",
+      "c-situation:c6a431f0762e",
+      "c-situation:f956e9fe135c",
+      "c-situation:25e9f1f19d7c",
+      "c-situation:7b42c644696a",
+      "c-situation:4c214d87ead8",
+      "c-situation:8be7bef39e23",
+      "c-situation:6e60e51e3409",
+      "c-situation:6e1b8024e20c",
+      "c-situation:a0acedb86fcd",
+      "c-situation:8b63f2e05644",
+      "c-situation:f3995f60913d",
+      "c-situation:5565b40133c1",
+      "c-situation:22eaf4d55106",
+      "c-situation:6f6515d36e30",
+      "c-situation:3810db8cee13",
+      "c-situation:41a6fe0f1882",
+      "c-situation:21bd2c45dca2",
+      "c-situation:d47223694133",
+      "c-situation:9383dafa876b",
+      "c-situation:b58225e02cc4",
+      "c-situation:adb5fe3d8fd5",
+      "c-situation:6d358428d28a",
+      "c-situation:fb1b361266f7",
+      "c-situation:c7a42f0eedef",
+      "c-situation:beab91f0121c",
+      "c-situation:4437656b8a06",
+      "c-situation:996bd74190b0",
+      "c-situation:e8b27914afbf",
+      "c-situation:06c569865236",
+      "c-situation:2ca59dbb4315",
+      "c-situation:24596604eeae",
+      "c-situation:8cfbba684f05",
+      "c-situation:be57a6a7cb88",
+      "c-situation:10c32a0c877c",
+      "c-situation:3e03f4c7c025",
+      "c-situation:df18125ac3e6",
+      "c-situation:52207ef0a95f",
+      "c-situation:9a7a639167fb",
+      "c-situation:d14b46cac4a1",
+      "c-situation:b701bbbe8763",
+      "c-situation:6577e30c506b",
+      "c-situation:c6e3e71d7a6f",
+      "c-situation:2fbb9cbe91f2",
+      "c-situation:549888e5fad7",
+      "c-situation:87f31019ca47",
+      "c-situation:2e159931bf5d",
+      "c-situation:b03e655ffec3",
+      "c-situation:f6a50f6a6e17",
+      "c-situation:f549a2ccfcdb",
+      "c-situation:ac4911df3433",
+      "c-situation:d86a26bcf566",
+      "c-situation:dd818b76c4fb",
+      "c-situation:fd3e1422158e",
+      "c-situation:274a5b26a848",
+      "c-situation:d947e7862188",
+      "c-situation:d805f38deb83",
+      "c-situation:d3b8e536159b",
+      "c-situation:3ced89d335ee",
+      "c-situation:95b06d7d07f2",
+      "c-situation:30603fa680a1"
+    ],
+    "entitiesBySupport" : [
+      "c-entity:089c2a242e38",
+      "c-entity:851be5712c9d",
+      "c-entity:5978a39128b4",
+      "c-entity:df72eb12cda3",
+      "c-entity:bc2e66840e1e",
+      "c-entity:5d0c42ead77e",
+      "c-entity:41f2b3f6eeca",
+      "c-entity:61d7148c016c",
+      "c-entity:7617388f3e74",
+      "c-entity:4c760cb438b7",
+      "c-entity:376819cf1543",
+      "c-entity:21f58293b953",
+      "c-entity:a78a9efc8ef9",
+      "c-entity:002a43306f30",
+      "c-entity:9e93e09ea398",
+      "c-entity:22e665ce77a1",
+      "c-entity:de9f7eba304f",
+      "c-entity:624d5c5a9523",
+      "c-entity:966a9b2758c2",
+      "c-entity:a3d902d3b21d",
+      "c-entity:4352c4118d40",
+      "c-entity:97fdf194fc3e",
+      "c-entity:4e381637af33"
+    ],
+    "situationsBySupport" : [
+      "c-situation:fc53541116d2",
+      "c-situation:ee179d0b1d28",
+      "c-situation:e99598a963a3",
+      "c-situation:c72b028ba80e",
+      "c-situation:4b5a03722bf9",
+      "c-situation:c6a431f0762e",
+      "c-situation:f956e9fe135c",
+      "c-situation:25e9f1f19d7c",
+      "c-situation:7b42c644696a",
+      "c-situation:4c214d87ead8",
+      "c-situation:8be7bef39e23",
+      "c-situation:6e60e51e3409",
+      "c-situation:6e1b8024e20c",
+      "c-situation:a0acedb86fcd",
+      "c-situation:8b63f2e05644",
+      "c-situation:f3995f60913d",
+      "c-situation:5565b40133c1",
+      "c-situation:22eaf4d55106",
+      "c-situation:6f6515d36e30",
+      "c-situation:3810db8cee13",
+      "c-situation:41a6fe0f1882",
+      "c-situation:21bd2c45dca2",
+      "c-situation:d47223694133",
+      "c-situation:9383dafa876b",
+      "c-situation:b58225e02cc4",
+      "c-situation:adb5fe3d8fd5",
+      "c-situation:6d358428d28a",
+      "c-situation:fb1b361266f7",
+      "c-situation:c7a42f0eedef",
+      "c-situation:beab91f0121c",
+      "c-situation:4437656b8a06",
+      "c-situation:996bd74190b0",
+      "c-situation:e8b27914afbf",
+      "c-situation:06c569865236",
+      "c-situation:2ca59dbb4315",
+      "c-situation:24596604eeae",
+      "c-situation:8cfbba684f05",
+      "c-situation:be57a6a7cb88",
+      "c-situation:10c32a0c877c",
+      "c-situation:3e03f4c7c025",
+      "c-situation:df18125ac3e6",
+      "c-situation:52207ef0a95f",
+      "c-situation:9a7a639167fb",
+      "c-situation:d14b46cac4a1",
+      "c-situation:b701bbbe8763",
+      "c-situation:6577e30c506b",
+      "c-situation:c6e3e71d7a6f",
+      "c-situation:2fbb9cbe91f2",
+      "c-situation:549888e5fad7",
+      "c-situation:87f31019ca47",
+      "c-situation:2e159931bf5d",
+      "c-situation:b03e655ffec3",
+      "c-situation:f6a50f6a6e17",
+      "c-situation:f549a2ccfcdb",
+      "c-situation:ac4911df3433",
+      "c-situation:d86a26bcf566",
+      "c-situation:dd818b76c4fb",
+      "c-situation:fd3e1422158e",
+      "c-situation:274a5b26a848",
+      "c-situation:d947e7862188",
+      "c-situation:d805f38deb83",
+      "c-situation:d3b8e536159b",
+      "c-situation:3ced89d335ee",
+      "c-situation:95b06d7d07f2",
+      "c-situation:30603fa680a1"
+    ],
+    "segmentsBySupport" : [
+      "segment-root:1a8848fe631c"
+    ],
+    "contextsBySupport" : [
+      "context-root:8e53d88dbf49",
+      "context:9d37ad139883",
+      "context:a7b73be9acbd",
+      "context:89047c5df92e",
+      "context:5576f908e3ef",
+      "context:bff9aa199251"
+    ]
+  },
+  "view" : {
+    "artifact" : "NarrativeScene.textualTwin, UTF-8, no extra newline",
+    "sha256" : "60e16622b6ea3b2b3885143fd3cfcce39be3d447ad21e0a58571628a29b02aaa"
+  },
+  "historicalReceipts" : {
+    "files" : [
+      "compilation-report.json",
+      "receipts.json"
+    ],
+    "receiptsFileSha256" : "0567d96f9c0f8d946e8d7f97e162fd8be0f038f6948c75b111f2b489ed56086c",
+    "reportFileSha256" : "75483db6474e09589736de4176542c11ad47070900762f1559c0f589b1dc07bf",
+    "parserReceiptChecksum" : "d0fb872e2ad323a7c1b45f6727249568c418c261f10a6a61d4c7b276295f9678",
+    "compilerReceiptChecksum" : "dbf1722c17ce4a7e02961475b1cb100dc588b80dba8ca319ecbbf9bd60f35633"
+  }
+}
