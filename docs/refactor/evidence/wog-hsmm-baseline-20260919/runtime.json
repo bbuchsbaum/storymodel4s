@@ -1,0 +1,45 @@
+{
+  "executionContext": "same escalated host context as the sbt capture",
+  "system": "Darwin",
+  "release": "23.3.0",
+  "machine": "arm64",
+  "platform": "macOS-14.3-arm64-arm-64bit-Mach-O",
+  "macOS": {
+    "command": [
+      "sw_vers",
+      "-productVersion"
+    ],
+    "exitCode": 0,
+    "output": "14.3"
+  },
+  "java": {
+    "command": [
+      "java",
+      "-version"
+    ],
+    "exitCode": 0,
+    "output": "openjdk version \"22\" 2024-03-19\nOpenJDK Runtime Environment (build 22+36-2370)\nOpenJDK 64-Bit Server VM (build 22+36-2370, mixed mode, sharing)"
+  },
+  "node": {
+    "command": [
+      "node",
+      "--version"
+    ],
+    "exitCode": 0,
+    "output": "v26.7.0"
+  },
+  "clang": {
+    "command": [
+      "clang",
+      "--version"
+    ],
+    "exitCode": 0,
+    "output": "Apple clang version 15.0.0 (clang-1500.1.0.2.5)\nTarget: arm64-apple-darwin23.3.0\nThread model: posix\nInstalledDir: /Library/Developer/CommandLineTools/usr/bin"
+  },
+  "sbtRuntimeFromLogs": {
+    "native.log": "[info] welcome to sbt 1.12.14 (Homebrew Java 25.0.1)",
+    "js.log": "[info] welcome to sbt 1.12.14 (Homebrew Java 25.0.1)",
+    "jvm.log": "[info] welcome to sbt 1.12.14 (Homebrew Java 25.0.1)"
+  },
+  "qualification": "The sbt welcome lines identify the Java runtime actually used (Homebrew25.0.1). The direct java command resolves Java22 in both probes and must not be substituted for that runtime. OS/architecture, Node and default clang are separately observed; these probes do not prove which clang binary Native selected."
+}

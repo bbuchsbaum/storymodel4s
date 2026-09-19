@@ -1,0 +1,50 @@
+{
+  "schema": "wog-hsmm-backend-difference/v1",
+  "JVMEqualsJS": true,
+  "JVMEqualsNative": false,
+  "differenceCount": 5,
+  "structuralDifferenceCount": 0,
+  "differences": [
+    {
+      "path": "/flow/0/mass/8/mass",
+      "kind": "leaf",
+      "jvm": "0x3f1b6b38f0f1bc60",
+      "native": "0x3f1b6b38f0f1bc5f",
+      "sameSignBit": true,
+      "bitPatternDistance": 1
+    },
+    {
+      "path": "/flow/0/mass/17/mass",
+      "kind": "leaf",
+      "jvm": "0x3f1b6b38f0f1bc60",
+      "native": "0x3f1b6b38f0f1bc5f",
+      "sameSignBit": true,
+      "bitPatternDistance": 1
+    },
+    {
+      "path": "/flow/0/mass/35/mass",
+      "kind": "leaf",
+      "jvm": "0x3f1b6b38f0f1bc60",
+      "native": "0x3f1b6b38f0f1bc5f",
+      "sameSignBit": true,
+      "bitPatternDistance": 1
+    },
+    {
+      "path": "/flow/0/mass/44/mass",
+      "kind": "leaf",
+      "jvm": "0x3f1b6b38f0f1bc60",
+      "native": "0x3f1b6b38f0f1bc5f",
+      "sameSignBit": true,
+      "bitPatternDistance": 1
+    },
+    {
+      "path": "/posterior/1/mass/7/mass",
+      "kind": "leaf",
+      "jvm": "0x3f655be4582d2fe4",
+      "native": "0x3f655be4582d2fe5",
+      "sameSignBit": true,
+      "bitPatternDistance": 1
+    }
+  ],
+  "interpretation": "Observed differences in pre-migration output. No tolerance selected, no numeric policy changed. Future parity compares each candidate backend to its corresponding baseline on the recorded platform/runtime."
+}

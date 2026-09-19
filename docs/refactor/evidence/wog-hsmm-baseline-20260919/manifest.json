@@ -1,0 +1,144 @@
+{
+  "schema": "wog-hsmm-platform-baseline/v1",
+  "baselineProductionRevision": "75c8df52adb2ffc54a5cd3586528deddabf4a531",
+  "instrumentedRevision": "f3c6edb41621c43de599ef76f66790ae52b5af1e",
+  "instrumentationPath": "fixtures/src/test/scala/storymodel4s/fixtures/wog/WogHsmmBaselineCaptureSuite.scala",
+  "instrumentationSha256": "b02f6057be12b3489f75ed03595f4f63eee7d729d7b4e88466144bf97bd7965d",
+  "repository": "/private/tmp/storymodel4s-film-hsmm-20260919-ejrihr43/storymodel4s",
+  "grakernRepository": "/private/tmp/storymodel4s-film-hsmm-20260919-ejrihr43/grakern",
+  "grakernRevision": "0329c43c88a0b71e9aa4456723bb16bac2fa3841",
+  "branch": "work/film-hsmm-baseline-20260919",
+  "platforms": {
+    "JVM": {
+      "command": [
+        "sbt",
+        "-batch",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-hsmm-20260919-ejrihr43/grakern",
+        "fixturesJVM/testOnly storymodel4s.fixtures.wog.WogHsmmBaselineCaptureSuite storymodel4s.fixtures.wog.WarOfTheGhostsCodecGoldenSuite"
+      ],
+      "cwd": "/private/tmp/storymodel4s-film-hsmm-20260919-ejrihr43/storymodel4s",
+      "exitCode": 0,
+      "startedEpochSeconds": 1789858948.1496708,
+      "elapsedSeconds": 36.39544320106506,
+      "cleanBefore": true,
+      "cleanAfter": true,
+      "testTotals": [
+        "[info] Passed: Total 3, Failed 0, Errors 0, Passed 3"
+      ],
+      "logSha256": "3f4597e8544f42298f33af78a95ad9f803627d8c3beeb7a55244d95c90b825d0",
+      "logBytes": 30949,
+      "artifact": "jvm.json",
+      "sha256": "ce61e761a131c1e2ffeebcf912a9c04d9dd2bf2fb4c09f9d4bda0c2741f2cf1a",
+      "bytes": 26284,
+      "topLevelKeys": [
+        "admissibilityEcho",
+        "candidateAnchors",
+        "costs",
+        "flow",
+        "logLikelihood",
+        "posterior",
+        "recallChecksum",
+        "refinementPasses",
+        "schemaVersion",
+        "viewFingerprint",
+        "viterbi"
+      ],
+      "passedTests": [
+        "capture the existing canonical WOG HSMM output",
+        "the WOG hsmm/v3 bytes are canonical, sparse, and contain no story text",
+        "the WOG hsmm/v3 bytes contextually decode to the inferred result"
+      ],
+      "schemaVersion": "hsmm/v3"
+    },
+    "JS": {
+      "command": [
+        "sbt",
+        "-batch",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-hsmm-20260919-ejrihr43/grakern",
+        "fixturesJS/testOnly storymodel4s.fixtures.wog.WogHsmmBaselineCaptureSuite storymodel4s.fixtures.wog.WarOfTheGhostsCodecGoldenSuite"
+      ],
+      "cwd": "/private/tmp/storymodel4s-film-hsmm-20260919-ejrihr43/storymodel4s",
+      "exitCode": 0,
+      "startedEpochSeconds": 1789858984.696488,
+      "elapsedSeconds": 34.89283609390259,
+      "cleanBefore": true,
+      "cleanAfter": true,
+      "testTotals": [
+        "[info] Passed: Total 3, Failed 0, Errors 0, Passed 3"
+      ],
+      "logSha256": "2b8dec3f14e3f7933856c912da3f908ac47b0cb395e2da4a01313a0184a6ea66",
+      "logBytes": 31090,
+      "artifact": "js.json",
+      "sha256": "ce61e761a131c1e2ffeebcf912a9c04d9dd2bf2fb4c09f9d4bda0c2741f2cf1a",
+      "bytes": 26284,
+      "topLevelKeys": [
+        "admissibilityEcho",
+        "candidateAnchors",
+        "costs",
+        "flow",
+        "logLikelihood",
+        "posterior",
+        "recallChecksum",
+        "refinementPasses",
+        "schemaVersion",
+        "viewFingerprint",
+        "viterbi"
+      ],
+      "passedTests": [
+        "capture the existing canonical WOG HSMM output",
+        "the WOG hsmm/v3 bytes are canonical, sparse, and contain no story text",
+        "the WOG hsmm/v3 bytes contextually decode to the inferred result"
+      ],
+      "schemaVersion": "hsmm/v3"
+    },
+    "Native": {
+      "command": [
+        "sbt",
+        "-batch",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-hsmm-20260919-ejrihr43/grakern",
+        "fixturesNative/testOnly storymodel4s.fixtures.wog.WogHsmmBaselineCaptureSuite storymodel4s.fixtures.wog.WarOfTheGhostsCodecGoldenSuite"
+      ],
+      "cwd": "/private/tmp/storymodel4s-film-hsmm-20260919-ejrihr43/storymodel4s",
+      "exitCode": 0,
+      "startedEpochSeconds": 1789859019.720122,
+      "elapsedSeconds": 53.97740983963013,
+      "cleanBefore": true,
+      "cleanAfter": true,
+      "testTotals": [
+        "[info] Passed: Total 3, Failed 0, Errors 0, Passed 3"
+      ],
+      "logSha256": "1237d50e256eac074a6fdbfac32814ef06bbb9bcccc7f216e40c23dff41f5929",
+      "logBytes": 32595,
+      "artifact": "native.json",
+      "sha256": "ccb0b98f21c7c2e1c9d5d81bad3f0858ed4c2f5d4f4c3ac671a6f45b152af012",
+      "bytes": 26284,
+      "topLevelKeys": [
+        "admissibilityEcho",
+        "candidateAnchors",
+        "costs",
+        "flow",
+        "logLikelihood",
+        "posterior",
+        "recallChecksum",
+        "refinementPasses",
+        "schemaVersion",
+        "viewFingerprint",
+        "viterbi"
+      ],
+      "passedTests": [
+        "capture the existing canonical WOG HSMM output",
+        "the WOG hsmm/v3 bytes are canonical, sparse, and contain no story text",
+        "the WOG hsmm/v3 bytes contextually decode to the inferred result"
+      ],
+      "schemaVersion": "hsmm/v3"
+    }
+  },
+  "qualification": "Pre-migration engineering baseline of the existing inferred WOG result, separately labelled per backend. No cross-platform numerical-equivalence or scientific calibration claim.",
+  "crossPlatformObservedDigestsEqual": false,
+  "runtimeReceipt": "runtime.json",
+  "runtimeReceiptSha256": "a570d4b609336ab1dc9af298fc3ac579fb9003ae8d6ce294a1b7829903fc0317",
+  "backendDifferenceReceipt": "backend-differences.json",
+  "backendDifferenceReceiptSha256": "000e86f66cf4684b979ef08e950143a9a1df93e08657cd1ed35bf98215cbc2b8",
+  "preservedPrimaryRepositoryBranch": "work/film-hsmm-baseline-20260919",
+  "runnerSha256": "68fb8f23929aca4ccf93da41d778cc617d1d49924cb48c4d728228abc5bc8774"
+}
