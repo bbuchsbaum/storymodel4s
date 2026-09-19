@@ -91,6 +91,7 @@ Admitted by:   <who checked>, <date>, checked against <edition>
 | Text | Basis | Status |
 |---|---|---|
 | `war-of-the-ghosts-boas1901.txt` | Boas, *Kathlamet Texts*, BAE Bulletin 26 (1901) — US Government publication | Admitted. §1 and §2 satisfied in the file header. **§2 attribution amended 2026-08-29** to name Charles Cultee as narrator. §4 tradition (Kathlamet) recorded. |
+| `tools/recall-study/fixtures/baseline-miniatures.json` | Original project-authored synthetic diagnostic packets (2026, Toronto), contributed under repository Apache-2.0. | Admitted 2026-09-19 by fresh-context agent `baseline_cold_review`, checked against the original file edition; source and recall sentences are synthetic, with no participant material. |
 
-Nothing else. Any addition to this table is a reviewed change, not an
-incidental part of a feature commit.
+Any addition to this table is a reviewed change, not an incidental part of a
+feature commit.

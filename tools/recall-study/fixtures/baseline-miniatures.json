@@ -1,0 +1,67 @@
+{
+  "_admission": {
+    "Source": "Project-authored synthetic diagnostic packets, Codex for storymodel4s, 2026; this file is the original edition, authored in the Toronto workspace.",
+    "Basis": "Original synthetic test material contributed under this repository's Apache-2.0 licence; no third-party story or participant transcript is copied or adapted.",
+    "Modifications": "None: first edition. Text and video-support views describe the same authored event packets.",
+    "Tradition": "Invented neutral diagnostic material; no oral tradition, community source, narrator or participant.",
+    "HumanSubjects": "All source and recall sentences are synthetic; no human-subject data or empirical labels.",
+    "AdmittedBy": "Fresh-context agent baseline_cold_review, 2026-09-19; checked against this original 2026 Toronto edition, tools/recall-study/fixtures/baseline-miniatures.json."
+  },
+  "schema": "storymodel4s.bench.baseline-miniatures/v1",
+  "meaning": "Independently authored contract fixtures and expected alternatives, not mapper predictions or calibration data.",
+  "textSource": {
+    "id": "synthetic-text-v1",
+    "join": "newline",
+    "events": [
+      {"id":"e1","order":1,"text":"A courier folds a silver map."},
+      {"id":"e2","order":2,"text":"A mechanic lifts a violet lantern."},
+      {"id":"e3","order":3,"text":"A baker locks a round tin."},
+      {"id":"e4","order":4,"text":"A pilot counts five copper pins."},
+      {"id":"e5","order":5,"text":"A gardener rinses a blue cup."},
+      {"id":"e6","order":6,"text":"A diver unties a green ribbon."},
+      {"id":"e7","order":7,"text":"A painter rolls a striped rug."},
+      {"id":"e8","order":8,"text":"A nurse closes an empty crate."}
+    ]
+  },
+  "annotatedVideoSource": {
+    "id":"synthetic-two-part-v1",
+    "mediaBytes":"none: invented annotations and coordinates, not an acquired film",
+    "parts":[
+      {"part":"part-a","axis":"axis-a","ticksPerSecond":"10","durationTicks":"40"},
+      {"part":"part-b","axis":"axis-b","ticksPerSecond":"10","durationTicks":"40"}
+    ],
+    "loci":[
+      {"event":"e1","part":"part-a","startTick":"0","endTick":"10"},
+      {"event":"e2","part":"part-a","startTick":"10","endTick":"20"},
+      {"event":"e3","part":"part-a","startTick":"20","endTick":"30"},
+      {"event":"e4","part":null,"startTick":null,"endTick":null},
+      {"event":"e5","part":"part-b","startTick":"0","endTick":"10"},
+      {"event":"e6","part":"part-b","startTick":"10","endTick":"20"},
+      {"event":"e7","part":"part-b","startTick":"20","endTick":"30"},
+      {"event":"e8","part":"part-b","startTick":"30","endTick":"30"}
+    ],
+    "partialGroup":{"id":"g1","members":["e2","e4"],"completePlaybackSupport":false}
+  },
+  "recallPackets":[
+    {"id":"p1","text":"The mechanic lifted the violet lantern.","admissible":["e2"],"onsetSeconds":"1.0"},
+    {"id":"p2","text":"The painter rolled the striped rug.","admissible":["e7"],"onsetSeconds":"2.0"},
+    {"id":"p3","text":"The baker locked the round tin.","admissible":["e3"],"onsetSeconds":null},
+    {"id":"p4","text":"The nurse closed the empty crate.","admissible":["e8"],"onsetSeconds":"4.0"},
+    {"id":"p5","text":"I replaced the batteries in my desk clock.","admissible":["external"],"onsetSeconds":"5.0"},
+    {"id":"p6","text":"The diver untied the green ribbon.","admissible":["e6"],"onsetSeconds":"6.0"},
+    {"id":"p7","text":"Someone closed a container.","admissible":["e3","e8"],"onsetSeconds":"7.0"},
+    {"id":"p8","text":"The mechanic lifted that violet lantern again.","admissible":["e2"],"onsetSeconds":"8.0"}
+  ],
+  "expectedCases": {
+    "clearPath":["e2","e7","e3","e8"],
+    "clearBackward":1,
+    "clearForward":2,
+    "revisitPacket":"p8",
+    "externalPacket":"p5",
+    "missingTimingPacket":"p3",
+    "processingFailureControl":{"packet":"p6","status":"failed","selected":null},
+    "argmaxDecodeDisagreement":{"packet":"p3","argmax":"e3","decoded":"e7","meaning":"deliberately different reconstruction choice; not a second observation"},
+    "partialSupportTarget":"g1",
+    "ambiguousPacket":"p7"
+  }
+}

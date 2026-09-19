@@ -3,6 +3,10 @@
 Development-only iteration on the recall-to-video mapping, under the study plan
 (`docs/plans/2026-09-02-recall-to-video-study-plan.md`).
 
+Scientific interpretation and the current delivery sequence are governed by
+[`docs/refactor/PLAN.md`](../../docs/refactor/PLAN.md). Earlier arm-selection
+claims below are historical study notes, not measurement validation.
+
 Inputs and outputs live under the local data root (`tools/data-root.sh`; layout in `data/README.md`),
 one copy shared by every worktree; the study record is `data/study/recall-to-video/`.
 
@@ -24,6 +28,41 @@ one copy shared by every worktree; the study record is `data/study/recall-to-vid
 - `matched.py A DIR_A B DIR_B` repeats that comparison on the units whose anchor stayed at the leaf
   level in both arms, which is how an apparent ordering gain is told apart from a shift to coarser
   anchors.
+
+## Frozen engineering baseline
+
+`freeze_baseline.py` records one development participant twice using the current
+local ONNX reconstruction path. It clears ambient study settings, refuses sealed
+participants, verifies admitted input bytes, and requires exact report, posterior,
+stage, voyage and inventory parity. An independent integer-coordinate oracle
+checks every annotation row, including rows never selected by inference. It reads
+no gold. Raw prose stays under the ignored data root; its manifest contains hashes,
+identifiers, coordinates, configuration and command receipts.
+
+```sh
+python3 tools/recall-study/test_freeze_baseline.py -v
+python3 tools/recall-study/mutate_baseline_checks.py
+python3 tools/recall-study/freeze_baseline.py capture \
+  --data-root "$STUDY_DATA_ROOT" --out "$STUDY_DATA_ROOT/study/recall-to-video/baseline-capture" \
+  --participant NN03_ANT_202231_final
+python3 tools/recall-study/freeze_baseline.py verify \
+  "$STUDY_DATA_ROOT/study/recall-to-video/baseline-capture/manifest.json" \
+  --data-root "$STUDY_DATA_ROOT"
+```
+
+Set `STUDY_DATA_ROOT` to the resolved data directory returned by `tools/data-root.sh`.
+Commit code before capture; each command and output binds that revision. Run logs
+are retained and hashed, but timing and output-path differences in logs are excluded
+from byte parity. There is no tolerance for differences in the five artifacts.
+Verification uses the original paths recorded in command receipts; it is a local
+replay record, not a relocatable corpus package.
+
+The admitted `fixtures/baseline-miniatures.json` supplies original synthetic text
+and two-part annotation views with reversals, revisits, external material, unknown
+timing, partial support and deliberately distinct argmax/decoded choices. These
+are hand-authored contract cases. The Python tests exercise receipt integrity;
+they do not run a mapper on these packets or establish behavioral recovery.
+The baseline likewise makes no accuracy, calibration or reference-measurement claim.
 
 ## A no-op that is checked rather than intended
 

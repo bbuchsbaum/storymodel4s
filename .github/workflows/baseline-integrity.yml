@@ -1,0 +1,25 @@
+name: Baseline integrity
+
+on:
+  pull_request:
+    paths:
+      - 'tools/recall-study/**'
+      - '.github/workflows/baseline-integrity.yml'
+  push:
+    paths:
+      - 'tools/recall-study/**'
+      - '.github/workflows/baseline-integrity.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  synthetic-integrity:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v6
+      - name: Synthetic identity and completeness courts (no corpus or model)
+        run: python3 tools/recall-study/test_freeze_baseline.py -v
+      - name: Guard-deletion witnesses
+        run: python3 tools/recall-study/mutate_baseline_checks.py
