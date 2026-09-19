@@ -1,0 +1,15 @@
+{
+  "codeRevision": "dd6050e0ea2ac85e7c3de2e045882d5c64118e2b",
+  "command": [
+    "sbt",
+    "-batch",
+    "scalafmtCheckAll"
+  ],
+  "exitCode": 0,
+  "cleanBefore": true,
+  "cleanAfter": true,
+  "logSha256": "5859519e00e03c5ef7a57f3d6d5307ccb48ead5f552ab859a6c2ada79265a85b",
+  "logBytes": 1233,
+  "logPath": "study/recall-to-video/scorer-20260919/format-last.log",
+  "testTotals": []
+}

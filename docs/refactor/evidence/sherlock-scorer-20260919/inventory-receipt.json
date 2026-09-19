@@ -1,0 +1,58 @@
+{
+  "codeRevision": "dd6050e0ea2ac85e7c3de2e045882d5c64118e2b",
+  "manifestSha256": "7408c72545e49895a19ed16144afe09601334d258ef1621744563b3b55e38188",
+  "manifestBytes": 836472,
+  "manifestPath": "study/recall-to-video/scorer-20260919/unit-manifest.json",
+  "participants": 17,
+  "units": 2577,
+  "minUnits": 68,
+  "maxUnits": 352,
+  "timedUnits": 2577,
+  "transcriptOrderUnits": 2577,
+  "adjacentInputPairs": 2560,
+  "countsByParticipantNumber": {
+    "1": 101,
+    "2": 105,
+    "3": 173,
+    "4": 96,
+    "5": 68,
+    "6": 104,
+    "7": 98,
+    "8": 181,
+    "9": 71,
+    "10": 180,
+    "11": 148,
+    "12": 212,
+    "13": 338,
+    "14": 164,
+    "15": 97,
+    "16": 89,
+    "17": 352
+  },
+  "lastOrdinalSum": 2560,
+  "minLastOrdinal": 67,
+  "maxLastOrdinal": 351,
+  "baselineDevelopmentControl": {
+    "participantNumber": 3,
+    "units": 173,
+    "identicalFields": [
+      "recallSha256",
+      "transcriptSha256",
+      "recallGraphSha256",
+      "unit.id",
+      "unit.ordinal",
+      "unit.textSha256",
+      "unit.reportTextSha256"
+    ],
+    "allUnitOnsetsMatchBaselineFirstTimedWord": true
+  },
+  "inputPins": {
+    "sourceInputSha256": "8c205826dcea8c58db24d7a17c71a3f99a9054e9379435e60b1dd0b987c2b296",
+    "partitionSha256": "cc9958bf6d1cc6d07fde508ef7951dc90b3a85ca8744cedf5900ca60acea365f",
+    "lineageSha256": "4b41ef7e6ebacbd0d24800fca0c7ee172a7540b9996cf903edc2782744f9363e",
+    "ruleSha256": "d304975117bc0f77dbe5f76819d834e68d262dcf2ba7301c6bf2efa9f5fdf284"
+  },
+  "goldRead": false,
+  "savedSealedPredictionsRead": false,
+  "qualification": "observation identity only; original 2560 figure equals sum of final zero-based ordinals, not row counts"
+}

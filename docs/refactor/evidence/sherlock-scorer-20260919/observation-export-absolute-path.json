@@ -1,0 +1,15 @@
+{
+  "codeRevision": "dd6050e0ea2ac85e7c3de2e045882d5c64118e2b",
+  "command": [
+    "sbt",
+    "-batch",
+    "embedBench/Test/runMain storymodel4s.bench.sherlock.SherlockUnitManifest /Users/bbuchsbaum/code/scala/storymodel4s/data /private/tmp/storymodel4s-scorer-gate-20260919/docs/data/sherlock/recall-lineage.json /Users/bbuchsbaum/code/scala/storymodel4s/data/study/recall-to-video/scorer-20260919/unit-manifest.json dd6050e0ea2ac85e7c3de2e045882d5c64118e2b"
+  ],
+  "exitCode": 0,
+  "cleanBefore": true,
+  "cleanAfter": true,
+  "logSha256": "9aa2ee9f0b9e3d8f4cf2f43c44c66c72c6b054b87cf9e23e65e34fed1b08d0e4",
+  "logBytes": 2138,
+  "logPath": "study/recall-to-video/scorer-20260919/observation-export-absolute-path.log",
+  "testTotals": []
+}

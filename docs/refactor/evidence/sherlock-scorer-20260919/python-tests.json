@@ -1,0 +1,77 @@
+{
+  "codeRevision": "dd6050e0ea2ac85e7c3de2e045882d5c64118e2b",
+  "tests": [
+    {
+      "command": [
+        "/opt/homebrew/opt/python@3.14/bin/python3.14",
+        "tools/recall-study/tests/test_corpus_descriptor.py"
+      ],
+      "exitCode": 0,
+      "logSha256": "85a7f3dd0ffeed1eed4183943242f5729fb2c0bdf812edfd66d74126ef14d959",
+      "logPath": "study/recall-to-video/scorer-20260919/test_corpus_descriptor.log"
+    },
+    {
+      "command": [
+        "/opt/homebrew/opt/python@3.14/bin/python3.14",
+        "tools/recall-study/tests/test_filmfest_diagnostics.py"
+      ],
+      "exitCode": 0,
+      "logSha256": "ca76ae23d74a4f8311220fb98bf9133410292fe2127b0b3238e002043c23db77",
+      "logPath": "study/recall-to-video/scorer-20260919/test_filmfest_diagnostics.log"
+    },
+    {
+      "command": [
+        "/opt/homebrew/opt/python@3.14/bin/python3.14",
+        "tools/recall-study/tests/test_filmfest_protocols.py"
+      ],
+      "exitCode": 0,
+      "logSha256": "cad4b5a6c7a3ead5c109e2d6fde865e8a8e6bb34d6d5fec7c4bd9f3be355982d",
+      "logPath": "study/recall-to-video/scorer-20260919/test_filmfest_protocols.log"
+    },
+    {
+      "command": [
+        "/opt/homebrew/opt/python@3.14/bin/python3.14",
+        "tools/recall-study/tests/test_filmfest_replay.py"
+      ],
+      "exitCode": 0,
+      "logSha256": "8cb18497e866ffdec11093c7a366796761949eba1fc5f45b3f704094964bb4a9",
+      "logPath": "study/recall-to-video/scorer-20260919/test_filmfest_replay.log"
+    },
+    {
+      "command": [
+        "/opt/homebrew/opt/python@3.14/bin/python3.14",
+        "tools/recall-study/tests/test_filmfestival.py"
+      ],
+      "exitCode": 0,
+      "logSha256": "c9a04ee466e9deeaf88b86349fac0b4b43d9fe6fbddbfca145a4a99ddfc6b405",
+      "logPath": "study/recall-to-video/scorer-20260919/test_filmfestival.log"
+    },
+    {
+      "command": [
+        "/opt/homebrew/opt/python@3.14/bin/python3.14",
+        "tools/recall-study/tests/test_gold_rule_single.py"
+      ],
+      "exitCode": 0,
+      "logSha256": "3d8a9c1b3d6dadaf754af09d4c824c6dda7b9c5dafcbc63cdc3ebccd6bda7f5c",
+      "logPath": "study/recall-to-video/scorer-20260919/test_gold_rule_single.log"
+    },
+    {
+      "command": [
+        "/opt/homebrew/opt/python@3.14/bin/python3.14",
+        "tools/recall-study/tests/test_gold_scene.py"
+      ],
+      "exitCode": 0,
+      "logSha256": "675c9c8acba9d80f4675f77795eb5e1686ba909bde0fbee3f342b18e1a0a5485",
+      "logPath": "study/recall-to-video/scorer-20260919/test_gold_scene.log"
+    },
+    {
+      "command": [
+        "/opt/homebrew/opt/python@3.14/bin/python3.14",
+        "tools/recall-study/tests/test_offset_kinds.py"
+      ],
+      "exitCode": 0,
+      "logSha256": "ae30e03181b0ed5d3307427f4e86b2b02628a94e7226fd4935172c0c4a0208ec",
+      "logPath": "study/recall-to-video/scorer-20260919/test_offset_kinds.log"
+    }
+  ]
+}

@@ -189,9 +189,14 @@ Implementation order:
 Execution checkpoint, 19 September 2026: the [frozen mapping baseline](evidence/sherlock-baseline-20260919/README.md)
 is complete. Two unchanged development runs and the historical TSV agree; all
 1,000 annotation coordinates are retained. The clean local full gate passed.
-The next sequential slice is the fail-closed scorer/unit manifest; S0 pins and
-production ClockRepair integration remain separate foundation work. G0 as a whole
-remains open, and no measurement-validity claim follows from this baseline.
+The [fail-closed scorer and unit manifest](evidence/sherlock-scorer-20260919/README.md)
+are also complete: fixed support, complete outcomes, distinct participant/pooled estimates,
+and actual Scala/Python rule witnesses with mutations. The measured observation inventory
+contains **2,577 units**, not the original plan's 2,560 (the latter is the sum of final
+zero-based ordinals and the adjacent-pair count). No units were dropped to match that error.
+The next sequential slice is production **ClockRepair integration** against the frozen
+baseline. S0 text pins remain separate foundation work. G0 as a whole remains open;
+these engineering gates establish no accuracy or measurement-validity claim.
 
 1. **Capture baseline**, repair scorer, and pin S0. Preserve the at-risk MASC branch before any
    cleanup. Obtain a clean gate through the infrastructure ticket; a billing block does not stop

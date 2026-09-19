@@ -1,0 +1,12 @@
+{
+  "codeRevision": "dd6050e0ea2ac85e7c3de2e045882d5c64118e2b",
+  "command": [
+    "bash",
+    "tools/reference-scope.sh",
+    "ee5ffcb524476da160c5099b24861a548f91a50d",
+    "HEAD"
+  ],
+  "exitCode": 0,
+  "logSha256": "71e0ee2ca03064f1b9367ca092db3cf559244f55e83f8d376d5974cdaff961a5",
+  "output": "types defined by this candidate:\n  SherlockGoldRule\n  SherlockGoldRuleSuite\n  SherlockGoldRuleWitness\n  SherlockSceneCoding\n  SherlockUnitManifest\n\nmodules that reference them (the gate must cover all of these):\n  embed-bench\n\ngate command (JVM; paste it, do not retype the module names):\n  sbt -batch \"embedBench/test\"\n\n  Run it in a CLONE, never a linked worktree. Capture the exit status. Run\n  scalafmtCheckAll LAST, separately. Then grep the log for 'Passed: Total' --\n  a red gate with no totals measured your infrastructure, not the candidate.\n"
+}

@@ -199,7 +199,11 @@ single final test with perhaps ten participants. Memento has 133 (`docs/data/mem
 fails open.
 - Export B3's **unit manifest**: stable unit id, participant, ordinal, text checksum, onset and
   source-input checksum. The current pipeline produces
-  2,560 `RecallSegmenter` units, 67–351 per participant (arm `all17-monofill`).
+  **2,577 `RecallSegmenter` units, 68–352 per participant** (measured observation-only export,
+  2026-09-19). The original 2,560 / 67–351 figures exactly match the sum/range of final
+  zero-based ordinals, suggesting an off-by-one counting error; the old generating command
+  was not recovered. 2,560 is also the adjacent-pair count. Preserve every unit; do not remove
+  17 rows to reproduce that mistaken total. The earlier study log already reports 2,577 anchors.
 - Keep text-bearing manifests and arm outputs in the ignored data root; commit only hashes and
   aggregates. Freeze gold eligibility and exclusion reasons independently of arm predictions.
 - Every arm returns one typed outcome for every manifest unit. Language-model arms use constrained

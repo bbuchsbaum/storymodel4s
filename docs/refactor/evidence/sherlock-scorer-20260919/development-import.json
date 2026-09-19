@@ -1,0 +1,16 @@
+{
+  "codeRevision": "dd6050e0ea2ac85e7c3de2e045882d5c64118e2b",
+  "probe": "one-development-participant import using a temporary manifest subset; not a new study population",
+  "baselineReportSha256": "528ceb1b1e84ddca9f0ef3395b1047929d60cc1bccac22fb0dcc3c67273aafc7",
+  "fullObservationManifestSha256": "7408c72545e49895a19ed16144afe09601334d258ef1621744563b3b55e38188",
+  "units": 173,
+  "outcomeCounts": {
+    "label": 173,
+    "abstention": 0,
+    "invalid": 0,
+    "provider-failure": 0
+  },
+  "identityValidation": "passed",
+  "goldRead": false,
+  "accuracyComputed": false
+}

@@ -13,12 +13,13 @@ observations, partition metadata and admitted annotation bytes, but no predictio
 Keep the result beneath the ignored data root. Only hashes and aggregates belong in git.
 
 ```sh
-sbt 'embedBench/Test/runMain storymodel4s.bench.sherlock.SherlockUnitManifest DATA_ROOT docs/data/sherlock/recall-lineage.json OUTPUT.json CODE_SHA'
+sbt 'embedBench/Test/runMain storymodel4s.bench.sherlock.SherlockUnitManifest ABS_DATA_ROOT ABS_REPO/docs/data/sherlock/recall-lineage.json ABS_OUTPUT.json CODE_SHA'
 ```
 
 The manifest binds all 17 participants to their own admitted CSV bytes, source annotation
 identity, partition, shared scene rule, unit IDs, ordinals, text hashes and optional onsets.
 Missing timing does not remove a transcript unit. An existing output is never overwritten.
+Use absolute paths: the forked `embedBench` process runs from the module directory.
 
 ## Freeze gold support before opening predictions
 
@@ -73,8 +74,8 @@ These are coverage counts, not scientific estimates of backward transitions or p
 ```sh
 python3 tools/recall-study/tests/test_gold_scene.py -v
 python3 tools/recall-study/mutate_scorer_checks.py
-sbt 'embedBench/testOnly storymodel4s.bench.sherlock.SherlockGoldRuleSuite' 'embedBench/Test/runMain storymodel4s.bench.sherlock.SherlockGoldRuleWitness NEW_WITNESS.json'
-python3 tools/recall-study/tests/test_gold_rule_single.py --scala-witness NEW_WITNESS.json
+sbt 'embedBench/testOnly storymodel4s.bench.sherlock.SherlockGoldRuleSuite' 'embedBench/Test/runMain storymodel4s.bench.sherlock.SherlockGoldRuleWitness ABS_NEW_WITNESS.json'
+python3 tools/recall-study/tests/test_gold_rule_single.py --scala-witness ABS_NEW_WITNESS.json
 ```
 
 The witness runs actual Scala and Python code. The Python test without a Scala export checks

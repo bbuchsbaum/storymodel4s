@@ -1,0 +1,15 @@
+{
+  "qualification": "owned local execution runners; retained for audit, not portable public commands",
+  "runners": [
+    {
+      "path": "study/recall-to-video/scorer-20260919/scorer_qualify_20260919.py",
+      "sha256": "94350072a0e9228431acbd467f3e5083a33702a7e212e982f093c46f7ada7156",
+      "bytes": 2316
+    },
+    {
+      "path": "study/recall-to-video/scorer-20260919/scorer_mutation_qualify_20260919.py",
+      "sha256": "ee4f2e655b10df9f3f96fffbae084b8ca6611f532267c26b184645400cb77c01",
+      "bytes": 7622
+    }
+  ]
+}

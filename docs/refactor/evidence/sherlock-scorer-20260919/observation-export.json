@@ -1,0 +1,16 @@
+{
+  "codeRevision": "dd6050e0ea2ac85e7c3de2e045882d5c64118e2b",
+  "command": [
+    "sbt",
+    "-batch",
+    "embedBench/Test/runMain storymodel4s.bench.sherlock.SherlockGoldRuleWitness /Users/bbuchsbaum/code/scala/storymodel4s/data/study/recall-to-video/scorer-20260919/scala-rule.json",
+    "embedBench/Test/runMain storymodel4s.bench.sherlock.SherlockUnitManifest /Users/bbuchsbaum/code/scala/storymodel4s/data docs/data/sherlock/recall-lineage.json /Users/bbuchsbaum/code/scala/storymodel4s/data/study/recall-to-video/scorer-20260919/unit-manifest.json dd6050e0ea2ac85e7c3de2e045882d5c64118e2b"
+  ],
+  "exitCode": 1,
+  "cleanBefore": true,
+  "cleanAfter": true,
+  "logSha256": "9aa2c75fcd1c9cfe657a5fefeeb4eee4cd8a0ab8e9947164727b1e53bd75eef8",
+  "logBytes": 7282,
+  "logPath": "study/recall-to-video/scorer-20260919/observation-export.log",
+  "testTotals": []
+}

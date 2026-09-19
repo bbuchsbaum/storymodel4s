@@ -1,0 +1,95 @@
+{
+  "sourceSha256": "a57807352d99ff9255f7cb23e0feb9833031f133bf4d137fbcbcf4daaa525fd4",
+  "mutations": [
+    {
+      "mutation": "ARM_UNIT_SET",
+      "rejectingTest": "test_extra_identical_unit_refused",
+      "acceptingTest": "test_accepting_identical_complete_arms",
+      "compiled": true,
+      "tests": 2,
+      "failedAssertions": 1,
+      "passes": 1,
+      "logSha256": "ba0b375a24df524804fcad867ae3f24861c63a8e9ef172083a07a713026bf934"
+    },
+    {
+      "mutation": "ARM_PARTICIPANT_SET",
+      "rejectingTest": "test_extra_identical_participant_refused",
+      "acceptingTest": "test_accepting_identical_complete_arms",
+      "compiled": true,
+      "tests": 2,
+      "failedAssertions": 1,
+      "passes": 1,
+      "logSha256": "b98ee464e092542f586788b6af97a69506f7ca668e3612fccad90c833c413b20"
+    },
+    {
+      "mutation": "ARM_INPUT_IDENTITY",
+      "rejectingTest": "test_foreign_source_receipt_refused",
+      "acceptingTest": "test_accepting_identical_complete_arms",
+      "compiled": true,
+      "tests": 2,
+      "failedAssertions": 1,
+      "passes": 1,
+      "logSha256": "e0158ff7c833e7bc757409e143ff9837902a941d491b74d6cf33594658c6f1e1"
+    },
+    {
+      "mutation": "ARM_UNIT_IDENTITY",
+      "rejectingTest": "test_text_onset_and_ordinal_identity_mutations_refused",
+      "acceptingTest": "test_accepting_identical_complete_arms",
+      "compiled": true,
+      "tests": 2,
+      "failedAssertions": 4,
+      "passes": 1,
+      "logSha256": "a0d0e529e317cae897056df8f6cf00af52c23526978bee333bfe1f324fa6eef1"
+    },
+    {
+      "mutation": "FROZEN_SUPPORT_CHANGED",
+      "rejectingTest": "test_frozen_support_mutation_refused_before_scoring",
+      "acceptingTest": "test_accepting_identical_complete_arms",
+      "compiled": true,
+      "tests": 2,
+      "failedAssertions": 1,
+      "passes": 1,
+      "logSha256": "3b20c7d8eaf2a3d534cf6261786964a3fb19678766d3fbd3206111b2e40fea06"
+    },
+    {
+      "mutation": "SUPPORT_EXCLUSION",
+      "rejectingTest": "test_impossible_exclusion_refused_even_under_refreshed_synthetic_pin",
+      "acceptingTest": "test_accepting_identical_complete_arms",
+      "compiled": true,
+      "tests": 2,
+      "failedAssertions": 3,
+      "passes": 1,
+      "logSha256": "6bd31463c4fd3f0f8978bede39ea8191ff6ab13ec104ee114334a7829c898cee"
+    },
+    {
+      "mutation": "UNEXPECTED_PARTICIPANT_FILE",
+      "rejectingTest": "test_unexpected_tsv_file_refused",
+      "acceptingTest": "test_accepting_identical_complete_arms",
+      "compiled": true,
+      "tests": 2,
+      "failedAssertions": 1,
+      "passes": 1,
+      "logSha256": "acbc8ff7ed002509e5de1739efab76986cc39eb7ab5e073fab31657796e652b8"
+    },
+    {
+      "mutation": "drop nonlabels from denominator",
+      "rejectingTest": "test_two_unit_wrong_blank_invalid_and_failure_keep_denominator",
+      "acceptingTest": "test_accepting_identical_complete_arms",
+      "compiled": true,
+      "tests": 2,
+      "failedAssertions": 3,
+      "passes": 1,
+      "logSha256": "7e3c26c15774f81386a0b15ae8844c185ec7e3b46877495f793ee73d2993ffa5"
+    },
+    {
+      "mutation": "pooled result masquerades as primary",
+      "rejectingTest": "test_primary_pooled_ci_and_leave_one_out_independent_answers",
+      "acceptingTest": "test_accepting_identical_complete_arms",
+      "compiled": true,
+      "tests": 2,
+      "failedAssertions": 1,
+      "passes": 1,
+      "logSha256": "beb487480b6b7765cd6f12b066959ebd98a9e81cf79228e7d801044346d8fa7f"
+    }
+  ]
+}

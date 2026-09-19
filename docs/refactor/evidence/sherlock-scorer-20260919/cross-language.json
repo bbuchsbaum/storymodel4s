@@ -1,0 +1,19 @@
+{
+  "codeRevision": "dd6050e0ea2ac85e7c3de2e045882d5c64118e2b",
+  "command": [
+    "/opt/homebrew/opt/python@3.14/bin/python3.14",
+    "tools/recall-study/tests/test_gold_rule_single.py",
+    "--scala-witness",
+    "data/study/recall-to-video/scorer-20260919/scala-rule.json"
+  ],
+  "exitCode": 0,
+  "logSha256": "b7d999c20f5bb4f1e995bf09b4376903adaa179f8d65cdcec6287e739e2be62a",
+  "witnessSha256": "a81640277e404e45663f9bb02aaaf80b804e6779752fc326e985fee7c8d87639",
+  "output": "PASS actual Python/Scala agreement: TR, parsed IDs, all 17 aliases and boundary refusals\n",
+  "sharedFields": [
+    "trSeconds",
+    "participants[0..18].parsed",
+    "participants[0..18].goldSubject"
+  ],
+  "goldRead": false
+}

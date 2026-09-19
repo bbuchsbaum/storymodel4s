@@ -1,0 +1,83 @@
+{
+  "codeRevision": "dd6050e0ea2ac85e7c3de2e045882d5c64118e2b",
+  "mutations": [
+    {
+      "mutation": "Python subjectOf plus one",
+      "compiled": true,
+      "refusal": "PYTHON_SCALA_RULE_DISAGREEMENT",
+      "mutatedSourceSha256": "996442de5ddf4ee8219a6eaff515bf623a889b85f19b53d03aa7f383e490abf6",
+      "restoredControl": "pass"
+    },
+    {
+      "command": [
+        "sbt",
+        "-batch",
+        "embedBench/Test/runMain storymodel4s.bench.sherlock.SherlockGoldRuleWitness /Users/bbuchsbaum/code/scala/storymodel4s/data/study/recall-to-video/scorer-20260919/scala-alias-witness.json",
+        "embedBench/testOnly storymodel4s.bench.sherlock.SherlockGoldRuleSuite"
+      ],
+      "exitCode": 1,
+      "logSha256": "0e1d27a39461aca4563f07c499467486df20fe53f0a228bf520060c4ee59de6f",
+      "logPath": "study/recall-to-video/scorer-20260919/scala-alias.log",
+      "mutation": "scala-alias",
+      "compiled": true,
+      "rejectingTests": 1,
+      "acceptingTests": 1,
+      "witnessSha256": "897067e3561fd3c1acb3a813fd754c8c82a584534590d9e4afe225a23e6657c3",
+      "refusal": "PYTHON_SCALA_RULE_DISAGREEMENT"
+    },
+    {
+      "command": [
+        "sbt",
+        "-batch",
+        "embedBench/Test/runMain storymodel4s.bench.sherlock.SherlockGoldRuleWitness /Users/bbuchsbaum/code/scala/storymodel4s/data/study/recall-to-video/scorer-20260919/record-tr-witness.json",
+        "embedBench/testOnly storymodel4s.bench.sherlock.SherlockGoldRuleSuite"
+      ],
+      "exitCode": 1,
+      "logSha256": "2d2b0b8f102eff7bd0d8dba70369692abc47a2476ac3abbe8a6ddd4a05ce0d71",
+      "logPath": "study/recall-to-video/scorer-20260919/record-tr.log",
+      "mutation": "record-tr",
+      "compiled": true,
+      "rejectingTests": 1,
+      "acceptingTests": 1,
+      "witnessSha256": "b5d610744ed0a02acfddd237aca65fee7060571f1febe5c23618c383cb0ee5d3",
+      "refusal": "PYTHON_SCALA_RULE_DISAGREEMENT",
+      "coordinatedRecordChange": "cross-language values agree but independent preregistered oracle refuses"
+    },
+    {
+      "command": [
+        "sbt",
+        "-batch",
+        "embedBench/Test/runMain storymodel4s.bench.sherlock.SherlockUnitManifest /Users/bbuchsbaum/code/scala/storymodel4s/data/study/recall-to-video/scorer-20260919/participant-swap /private/tmp/storymodel4s-scorer-gate-20260919/docs/data/sherlock/recall-lineage.json /Users/bbuchsbaum/code/scala/storymodel4s/data/study/recall-to-video/scorer-20260919/swap-refused.json dd6050e0ea2ac85e7c3de2e045882d5c64118e2b"
+      ],
+      "exitCode": 1,
+      "logSha256": "aa29c4300d9aa301d069e18f8a6251327965f20e457a422a61d8b00b54914eb5",
+      "logPath": "study/recall-to-video/scorer-20260919/participant-swap-refusal.log",
+      "refusal": "unadmitted participant bytes",
+      "mutation": "replace participant-specific pin with any admitted hash",
+      "mutant": {
+        "command": [
+          "sbt",
+          "-batch",
+          "embedBench/Test/runMain storymodel4s.bench.sherlock.SherlockUnitManifest /Users/bbuchsbaum/code/scala/storymodel4s/data/study/recall-to-video/scorer-20260919/participant-swap /private/tmp/storymodel4s-scorer-gate-20260919/docs/data/sherlock/recall-lineage.json /Users/bbuchsbaum/code/scala/storymodel4s/data/study/recall-to-video/scorer-20260919/swap-mutant-accepted.json dd6050e0ea2ac85e7c3de2e045882d5c64118e2b"
+        ],
+        "exitCode": 0,
+        "logSha256": "dd8292e1e32b3e788ff0a5811c8936b18acc0fef006599f6957e06d371640089",
+        "logPath": "study/recall-to-video/scorer-20260919/participant-swap-mutant.log"
+      },
+      "rejectingWitness": "original refuses swapped admitted files; compiled mutant accepts",
+      "acceptingControl": "original all17 observation export succeeds"
+    }
+  ],
+  "restoredControl": {
+    "command": [
+      "sbt",
+      "-batch",
+      "embedBench/testOnly storymodel4s.bench.sherlock.SherlockGoldRuleSuite",
+      "scalafmtCheckAll"
+    ],
+    "exitCode": 0,
+    "logSha256": "e291aa3cc3fd13dda804b275c8e2ee94a223a6ffa711ccd7de18a5647a995384",
+    "logPath": "study/recall-to-video/scorer-20260919/restored-rule-court.log"
+  },
+  "cleanAfter": true
+}
