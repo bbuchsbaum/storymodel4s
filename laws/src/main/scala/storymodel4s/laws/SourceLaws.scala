@@ -102,3 +102,118 @@ object SourceLaws extends Laws:
         }
       }
     )
+
+  def supports: RuleSet =
+    val film = SourceBundle
+      .filmEdition(
+        EditionId.unsafe("law-film"),
+        Checksum.ofText("film"),
+        0L,
+        1000L,
+        RationalTimebase.Millisecond
+      )
+      .toOption
+      .get
+    val foreign = SourceBundle
+      .filmEdition(
+        EditionId.unsafe("law-foreign"),
+        Checksum.ofText("foreign"),
+        0L,
+        1000L,
+        RationalTimebase.Millisecond
+      )
+      .toOption
+      .get
+    val textSource = StorySource.fromText("Alpha beta.").toOption.get
+    val text = SourceBundle.writtenText(textSource).toOption.get
+    def intervals(start: Long, end: Long): PlaybackIntervalSet =
+      PlaybackIntervalSet.one(PlaybackInterval.on(film.primaryAxis, start, end).toOption.get)
+    def anchor(start: Long, end: Long): EvidenceAnchor =
+      EvidenceAnchor.MediaTime(
+        film.id,
+        film.streams.head.id,
+        film.primaryAxis.id,
+        intervals(start, end)
+      )
+    new DefaultRuleSet(
+      "source.supports",
+      None,
+      "anchor kind matches stream" -> forAll(Gen.chooseNum(1, 10)) { end =>
+        EvidenceSupport
+          .text(film, film.streams.head.id, SpanSet.one(TextSpan.unsafe(0, end)))
+          .isLeft
+      },
+      "MediaTime axis agrees with intervals" -> forAll(Gen.chooseNum(1L, 999L)) { end =>
+        EvidenceSupport
+          .of(
+            film,
+            Vector(
+              EvidenceAnchor.MediaTime(
+                film.id,
+                film.streams.head.id,
+                foreign.primaryAxis.id,
+                intervals(0L, end)
+              )
+            )
+          )
+          .isLeft
+      },
+      "foreign axis refuses" -> forAll(Gen.chooseNum(1L, 999L)) { end =>
+        val foreignIntervals =
+          PlaybackIntervalSet.one(PlaybackInterval.on(foreign.primaryAxis, 0L, end).toOption.get)
+        EvidenceSupport
+          .of(
+            film,
+            Vector(
+              EvidenceAnchor
+                .MediaTime(film.id, film.streams.head.id, foreign.primaryAxis.id, foreignIntervals)
+            )
+          )
+          .isLeft
+      },
+      "text extent refuses overflow" -> forAll(Gen.chooseNum(1, 100)) { excess =>
+        EvidenceSupport
+          .text(
+            text,
+            text.streams.head.id,
+            SpanSet.one(TextSpan.unsafe(0, textSource.canonicalText.length + excess))
+          )
+          .isLeft
+      },
+      "foreign bundle refuses" -> forAll(Gen.chooseNum(1L, 999L)) { end =>
+        EvidenceSupport
+          .of(
+            film,
+            Vector(
+              EvidenceAnchor.MediaTime(
+                foreign.id,
+                film.streams.head.id,
+                film.primaryAxis.id,
+                intervals(0L, end)
+              )
+            )
+          )
+          .isLeft
+      },
+      "union is order-independent and idempotent" -> forAll(Gen.chooseNum(1L, 400L)) { start =>
+        val anchors = Vector(
+          anchor(start, start + 4L),
+          anchor(start + 3L, start + 6L),
+          anchor(start + 6L, start + 8L),
+          anchor(start + 10L, start + 12L)
+        )
+        val forward =
+          EvidenceSupport.of(film, anchors).toOption.get.intervalsOn(film.primaryAxis.id)
+        val backward =
+          EvidenceSupport.of(film, anchors.reverse).toOption.get.intervalsOn(film.primaryAxis.id)
+        val expected = Vector((start, start + 8L), (start + 10L, start + 12L))
+        forward == backward && forward.toOption.exists { result =>
+          result.intervals.toVector.map(i => (i.start, i.endExclusive)) == expected &&
+          EvidenceSupport
+            .media(film, film.streams.head.id, result)
+            .toOption
+            .get
+            .intervalsOn(film.primaryAxis.id) == forward
+        }
+      }
+    )

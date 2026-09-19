@@ -408,6 +408,7 @@ S1 records:
   DerivedClock and Custom have no implicit evidence capability. A playback anchor must use its
   stream's native axis, or the primary axis reached from that native axis by an explicit
   ClockRepair/TrackComposition in the bundle. EditionCorrespondence is not a coordinate cast.
+  Exactly one distinct applicable mapping must be present; ambiguous endpoint matches are refused.
   Native-axis bounds use that stream's extent; mapped primary-axis bounds use the primary extent.
   A mapped anchor must also be fully covered by the chosen mapping's image. Composition source
   segments must lie within the selected stream extent; their target union preserves gaps.

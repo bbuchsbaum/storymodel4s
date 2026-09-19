@@ -247,7 +247,11 @@ class SurfaceAtlasConformanceSuite extends munit.FunSuite:
       narrative.atlas.unitAt(token.span.start, SurfaceUnitKind.Token).map(_.id),
       Some(token.id)
     )
-    assert(narrative.units.forall(_.support.textSpans(narrative.bundle.streams.head.id).exists(_.coveredLength > 0)))
+    assert(
+      narrative.units.forall(
+        _.support.textSpans(narrative.bundle.streams.head.id).exists(_.coveredLength > 0)
+      )
+    )
     assertEquals(narrative.bundle.sourceKind, SourceKind.WrittenText)
     assertEquals(narrative.bundle.primaryAxis.kind, AxisKind.TextCharacter)
 

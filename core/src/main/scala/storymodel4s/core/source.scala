@@ -1324,16 +1324,22 @@ final class EvidenceSupport private (val anchors: NonEmptyVector[EvidenceAnchor]
 
   /** A canonical interval union on exactly the requested axis; gaps are retained. */
   def intervalsOn(axis: PresentationAxisId): Either[DomainError, PlaybackIntervalSet] =
-    val intervals = anchors.toVector.flatMap {
-      case EvidenceAnchor.MediaTime(_, _, a, set) if a == axis => set.intervals.toVector
-      case EvidenceAnchor.Shot(_, _, _, interval) if interval.axis == axis => Vector(interval)
-      case EvidenceAnchor.Track(_, _, _, set) if set.axis == axis => set.intervals.toVector
-      case _ => Vector.empty
-    }.sortBy(i => (i.start, i.endExclusive))
+    val intervals = anchors.toVector
+      .flatMap {
+        case EvidenceAnchor.MediaTime(_, _, a, set) if a == axis => set.intervals.toVector
+        case EvidenceAnchor.Shot(_, _, _, interval) if interval.axis == axis => Vector(interval)
+        case EvidenceAnchor.Track(_, _, _, set) if set.axis == axis => set.intervals.toVector
+        case _                                                      => Vector.empty
+      }
+      .sortBy(i => (i.start, i.endExclusive))
     val merged = intervals.foldLeft(Vector.empty[PlaybackInterval]) { (out, interval) =>
       out.lastOption match
         case Some(last) if interval.start <= last.endExclusive =>
-          out.init :+ new PlaybackInterval(axis, last.start, last.endExclusive.max(interval.endExclusive))
+          out.init :+ new PlaybackInterval(
+            axis,
+            last.start,
+            last.endExclusive.max(interval.endExclusive)
+          )
         case _ => out :+ interval
     }
     PlaybackIntervalSet.of(merged)
@@ -1359,9 +1365,11 @@ object EvidenceSupport:
     NonEmptyVector.fromVector(anchors) match
       case None      => Left(SourceCanon.fmt("EvidenceSupport", "[]", "empty support"))
       case Some(nev) =>
-        nev.toVector.foldLeft[Either[DomainError, Unit]](Right(())) { (result, anchor) =>
-          result.flatMap(_ => SourceSupportChecks.anchor(bundle, anchor))
-        }.map(_ => new EvidenceSupport(nev))
+        nev.toVector
+          .foldLeft[Either[DomainError, Unit]](Right(())) { (result, anchor) =>
+            result.flatMap(_ => SourceSupportChecks.anchor(bundle, anchor))
+          }
+          .map(_ => new EvidenceSupport(nev))
 
   def text(
       bundle: SourceBundle,
@@ -1416,6 +1424,7 @@ sealed trait CheckedMapping:
   def family: MappingFamily
   def axes: Vector[PresentationAxisId]
   def receipt: SourceDerivationReceipt
+
   /** Binds the mapping payload and receipt, not merely its relation endpoints. */
   final lazy val identity: Checksum = SourceIdentity.mapping(this)
 

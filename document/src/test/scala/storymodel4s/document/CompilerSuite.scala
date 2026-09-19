@@ -183,7 +183,8 @@ class CompilerSuite extends FunSuite:
       membershipAttempts: Option[Vector[SegmentMembershipAttempt]] = None,
       provenanceCalls: Vector[ProviderCall] = Vector.empty,
       coverageAttempts: Option[Vector[ParticipantCoverageAttempt]] = None,
-      temporal: Vector[TemporalAttempt] = Vector.empty
+      temporal: Vector[TemporalAttempt] = Vector.empty,
+      evidenceRecords: Vector[Evidence] = Vector(ev0, ev1, evSummary)
   ): Either[NarrativeCompilerError, NarrativeCompilerInput] =
     val receipt = BuildReceipt(
       source.id,
@@ -196,7 +197,7 @@ class CompilerSuite extends FunSuite:
       source,
       atlas,
       chartOrder,
-      Vector(ev0, ev1, evSummary),
+      evidenceRecords,
       situationAttempts,
       contextAttempts.getOrElse(situationAttempts.map(a => contextAttempt(a.source))),
       summaryAttempt,
@@ -246,6 +247,64 @@ class CompilerSuite extends FunSuite:
 
   private def compile(in: NarrativeCompilerInput): NarrativeCompilation =
     NarrativeCompiler.compile(in).fold(e => fail(e.message), identity)
+
+  private def anchoredRecord: Evidence =
+    val film = SourceBundle
+      .filmEdition(
+        EditionId.unsafe("compiler-film"),
+        Checksum.ofText("film"),
+        0L,
+        100L,
+        RationalTimebase.Millisecond
+      )
+      .toOption
+      .get
+    val anchors = EvidenceSupport
+      .media(
+        film,
+        film.streams.head.id,
+        PlaybackIntervalSet.one(PlaybackInterval.on(film.primaryAxis, 1L, 2L).toOption.get)
+      )
+      .toOption
+      .get
+    ev0.copy(id = EvidenceId.unsafe("new-anchored-evidence"), anchors = Some(anchors))
+
+  test("text compiler refuses anchored ledger evidence with an accepting text control"):
+    val attempt = SituationAttempt(ref0, bundle(situation0, ev0, "situation-agent", "s0"))
+    val record = anchoredRecord
+    assert(
+      attemptedInput(
+        Vector(attempt),
+        evidenceRecords = Vector(ev0, ev1, evSummary, record.copy(anchors = None))
+      ).isRight
+    )
+    val result =
+      attemptedInput(Vector(attempt), evidenceRecords = Vector(ev0, ev1, evSummary, record))
+    assert(result.isLeft)
+    assert(
+      result.swap.toOption.get.message
+        .contains("text compiler input cannot carry anchored evidence")
+    )
+
+  test("text compiler refuses anchored inline evidence with an accepting text control"):
+    def attempt(record: Evidence): SituationAttempt = SituationAttempt(
+      ref0,
+      bundle(
+        situation0,
+        ev0,
+        "situation-agent",
+        "s0",
+        evidenceRef = Some(EvidenceRef.Inline(record))
+      )
+    )
+    val record = anchoredRecord
+    assert(attemptedInput(Vector(attempt(record.copy(anchors = None)))).isRight)
+    val result = attemptedInput(Vector(attempt(record)))
+    assert(result.isLeft)
+    assert(
+      result.swap.toOption.get.message
+        .contains("text compiler input cannot carry anchored inline evidence")
+    )
 
   test("accepted evidence compiles into a validated story model") {
     val result = compile(

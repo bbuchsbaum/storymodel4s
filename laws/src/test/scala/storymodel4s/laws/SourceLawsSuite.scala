@@ -8,6 +8,7 @@ class SourceLawsSuite extends DisciplineSuite:
   checkAll("SourceRescaleLaws", SourceLaws.rescale)
   checkAll("SourceTimestampLaws", SourceLaws.timestamps)
   checkAll("SourceBundleLaws", SourceLaws.bundles)
+  checkAll("SourceSupportLaws", SourceLaws.supports)
 
   test("capacity: a foil with PTS < DTS is refused while the sibling lawful pair is admitted"):
     assert(PacketTimeFields.of(TimestampField.present(1L), TimestampField.present(2L)).isLeft)

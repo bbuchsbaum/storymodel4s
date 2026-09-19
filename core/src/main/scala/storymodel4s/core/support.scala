@@ -16,38 +16,47 @@ private[core] object SourceSupportChecks:
 
   def anchor(bundle: SourceBundle, anchor: EvidenceAnchor): Either[DomainError, Unit] =
     if anchor.anchorBundle != bundle.id then invalid("bundle", "foreign bundle identity")
-    else bundle.stream(anchor.anchorStream) match
-      case None => invalid("stream", "anchor stream is foreign to the bundle")
-      case Some(stream) =>
-        val kindMatches = anchor match
-          case _: EvidenceAnchor.Text => stream.kind match
-            case StreamKind.CanonicalText | StreamKind.Subtitle | StreamKind.TimedText |
-                StreamKind.Annotation => stream.extent.isInstanceOf[AxisExtent.TextChars]
-            case _ => false
-          case _: EvidenceAnchor.MediaTime => stream.kind match
-            case StreamKind.Picture | StreamKind.Audio | StreamKind.Subtitle |
-                StreamKind.TimedText | StreamKind.Annotation =>
+    else
+      bundle.stream(anchor.anchorStream) match
+        case None         => invalid("stream", "anchor stream is foreign to the bundle")
+        case Some(stream) =>
+          val kindMatches = anchor match
+            case _: EvidenceAnchor.Text =>
+              stream.kind match
+                case StreamKind.CanonicalText | StreamKind.Subtitle | StreamKind.TimedText |
+                    StreamKind.Annotation =>
+                  stream.extent.isInstanceOf[AxisExtent.TextChars]
+                case _ => false
+            case _: EvidenceAnchor.MediaTime =>
+              stream.kind match
+                case StreamKind.Picture | StreamKind.Audio | StreamKind.Subtitle |
+                    StreamKind.TimedText | StreamKind.Annotation =>
+                  stream.extent.isInstanceOf[AxisExtent.PlaybackTicks]
+                case _ => false
+            case _: EvidenceAnchor.Shot =>
+              stream.kind == StreamKind.Picture && stream.extent
+                .isInstanceOf[AxisExtent.PlaybackTicks]
+            case _: EvidenceAnchor.Track =>
+              (stream.kind == StreamKind.Picture || stream.kind == StreamKind.Audio) &&
               stream.extent.isInstanceOf[AxisExtent.PlaybackTicks]
-            case _ => false
-          case _: EvidenceAnchor.Shot =>
-            stream.kind == StreamKind.Picture && stream.extent.isInstanceOf[AxisExtent.PlaybackTicks]
-          case _: EvidenceAnchor.Track =>
-            (stream.kind == StreamKind.Picture || stream.kind == StreamKind.Audio) &&
-              stream.extent.isInstanceOf[AxisExtent.PlaybackTicks]
-        if !kindMatches then invalid("kind", "anchor kind does not match the stream kind and extent")
-        else anchor match
-          case EvidenceAnchor.Text(_, _, spans) => stream.extent match
-            case extent: AxisExtent.TextChars if spans.spans.forall(_.endExclusive <= extent.length) =>
-              Right(())
-            case _ => invalid("extent", "text support escapes the selected stream extent")
-          case EvidenceAnchor.MediaTime(_, _, axis, intervals) if axis != intervals.axis =>
-            invalid("interval-axis", "MediaTime axis differs from its intervals")
-          case EvidenceAnchor.MediaTime(_, _, axis, intervals) =>
-            playback(bundle, stream, axis, intervals.intervals.toVector)
-          case EvidenceAnchor.Shot(_, _, _, interval) =>
-            playback(bundle, stream, interval.axis, Vector(interval))
-          case EvidenceAnchor.Track(_, _, _, intervals) =>
-            playback(bundle, stream, intervals.axis, intervals.intervals.toVector)
+          if !kindMatches then
+            invalid("kind", "anchor kind does not match the stream kind and extent")
+          else
+            anchor match
+              case EvidenceAnchor.Text(_, _, spans) =>
+                stream.extent match
+                  case extent: AxisExtent.TextChars
+                      if spans.spans.forall(_.endExclusive <= extent.length) =>
+                    Right(())
+                  case _ => invalid("extent", "text support escapes the selected stream extent")
+              case EvidenceAnchor.MediaTime(_, _, axis, intervals) if axis != intervals.axis =>
+                invalid("interval-axis", "MediaTime axis differs from its intervals")
+              case EvidenceAnchor.MediaTime(_, _, axis, intervals) =>
+                playback(bundle, stream, axis, intervals.intervals.toVector)
+              case EvidenceAnchor.Shot(_, _, _, interval) =>
+                playback(bundle, stream, interval.axis, Vector(interval))
+              case EvidenceAnchor.Track(_, _, _, intervals) =>
+                playback(bundle, stream, intervals.axis, intervals.intervals.toVector)
 
   private def within(interval: PlaybackInterval, extent: AxisExtent.PlaybackTicks): Boolean =
     interval.start >= extent.start && interval.endExclusive <= extent.endExclusive
@@ -58,11 +67,10 @@ private[core] object SourceSupportChecks:
       axis: PresentationAxisId,
       intervals: Vector[PlaybackInterval]
   ): Either[DomainError, Unit] =
-    if axis != bundle.primaryAxis.id && !bundle.streams.exists(_.nativeAxis == axis) then
-      invalid("axis", "playback axis is foreign to the bundle")
-    else if axis == stream.nativeAxis then stream.extent match
-      case extent: AxisExtent.PlaybackTicks if intervals.forall(within(_, extent)) => Right(())
-      case _ => invalid("extent", "playback support escapes the selected native extent")
+    if axis == stream.nativeAxis then
+      stream.extent match
+        case extent: AxisExtent.PlaybackTicks if intervals.forall(within(_, extent)) => Right(())
+        case _ => invalid("extent", "playback support escapes the selected native extent")
     else if axis != bundle.primaryAxis.id then
       invalid("stream-axis", "anchor axis does not belong to the selected stream")
     else
@@ -78,9 +86,17 @@ private[core] object SourceSupportChecks:
           bundle.primaryAxis.extent match
             case extent: AxisExtent.PlaybackTicks if intervals.forall(within(_, extent)) =>
               if imageCovers(mapping, stream, intervals) then Right(())
-              else invalid("mapping-image", "support is not wholly covered by the selected stream mapping")
+              else
+                invalid(
+                  "mapping-image",
+                  "support is not wholly covered by the selected stream mapping"
+                )
             case _ => invalid("extent", "playback support escapes the primary extent")
-        case _ => invalid("stream-axis", "support requires one unambiguous coordinate mapping from its stream")
+        case _ =>
+          invalid(
+            "stream-axis",
+            "support requires one unambiguous coordinate mapping from its stream"
+          )
 
   // BigInt rational comparisons avoid rounding or overflow at image boundaries.
   private final case class Fraction(n: BigInt, d: BigInt):
@@ -97,16 +113,17 @@ private[core] object SourceSupportChecks:
       stream: SourceStream,
       intervals: Vector[PlaybackInterval]
   ): Boolean = stream.extent match
-    case extent: AxisExtent.PlaybackTicks => mapping match
-      case repair: ClockRepair =>
-        val factor = fraction(extent.timebase.scale) * fraction(repair.scale)
-        val offset = fraction(repair.offset)
-        val start = Fraction(BigInt(extent.start), 1) * factor + offset
-        val end = Fraction(BigInt(extent.endExclusive), 1) * factor + offset
-        intervals.forall(i => start.atMost(i.start) && end.atLeast(i.endExclusive))
-      case composition: TrackComposition =>
-        val segments = composition.segments.toVector
-        segments.forall(segment => within(segment.source, extent)) &&
+    case extent: AxisExtent.PlaybackTicks =>
+      mapping match
+        case repair: ClockRepair =>
+          val factor = fraction(extent.timebase.scale) * fraction(repair.scale)
+          val offset = fraction(repair.offset)
+          val start = Fraction(BigInt(extent.start), 1) * factor + offset
+          val end = Fraction(BigInt(extent.endExclusive), 1) * factor + offset
+          intervals.forall(i => start.atMost(i.start) && end.atLeast(i.endExclusive))
+        case composition: TrackComposition =>
+          val segments = composition.segments.toVector
+          segments.forall(segment => within(segment.source, extent)) &&
           intervals.forall { interval =>
             val image = segments.map(_.target).sortBy(i => (i.start, i.endExclusive))
             val coveredUntil = image.foldLeft(interval.start) { (covered, part) =>
@@ -115,5 +132,5 @@ private[core] object SourceSupportChecks:
             }
             coveredUntil >= interval.endExclusive
           }
-      case _: EditionCorrespondence => false
+        case _: EditionCorrespondence => false
     case _ => false

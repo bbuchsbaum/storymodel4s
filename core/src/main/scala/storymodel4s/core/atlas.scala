@@ -766,14 +766,20 @@ final class BoundProposalSurface private (
 ):
   override def equals(other: Any): Boolean = other match
     case that: BoundProposalSurface => surface == that.surface && receipt == that.receipt
-    case _ => false
+    case _                          => false
   override def hashCode(): Int = (surface, receipt).hashCode()
 
 object BoundProposalSurface:
   def of(surface: SurfaceAtlas, receipt: SourceDerivationReceipt): BoundProposalSurface =
     val checksum = SourceIdentity.surface(surface)
-    val identity = SourceIdentity.digest(Vector("bound-proposal-surface/v1", checksum.hex,
-      surface.source.canonicalChecksum.hex, receipt.bindingIdentity.hex))
+    val identity = SourceIdentity.digest(
+      Vector(
+        "bound-proposal-surface/v1",
+        checksum.hex,
+        surface.source.canonicalChecksum.hex,
+        receipt.bindingIdentity.hex
+      )
+    )
     new BoundProposalSurface(surface, checksum, receipt, identity)
 
 /** Checked film proposal inventory. Text derivations remain outside the film bundle. */
@@ -800,17 +806,30 @@ object AnchoredNarrativeAtlas:
     val ids = units.map(_.id)
     val surfaces = units.flatMap(_.surface)
     if bundle.primaryAxis.kind != AxisKind.EditionPlayback then
-      Left(SourceCanon.inv("atlas/primary-axis", "anchored atlas requires edition playback; other kinds remain unsupported"))
+      Left(
+        SourceCanon.inv(
+          "atlas/primary-axis",
+          "anchored atlas requires edition playback; other kinds remain unsupported"
+        )
+      )
     else if ids.distinct.size != ids.size then
       Left(SourceCanon.inv("atlas/units", "duplicate narrative proposal unit identity"))
     else if surfaces.distinct.size != surfaces.size then
       Left(SourceCanon.inv("atlas/surface", "duplicate proposal surface sentence"))
-    else if surfaces.exists(id => !surface.exists(_.surface.byId.get(id).exists(_.kind == SurfaceUnitKind.Sentence))) then
-      Left(SourceCanon.inv("atlas/surface", "proposal surface is not a sentence of the bound surface"))
+    else if surfaces.exists(id =>
+        !surface.exists(_.surface.byId.get(id).exists(_.kind == SurfaceUnitKind.Sentence))
+      )
+    then
+      Left(
+        SourceCanon.inv("atlas/surface", "proposal surface is not a sentence of the bound surface")
+      )
     else
-      units.foldLeft[Either[DomainError, Unit]](Right(())) { (result, unit) =>
-        result.flatMap(_ => EvidenceSupport.of(bundle, unit.support.anchors.toVector).map(_ => ()))
-      }.map(_ => new AnchoredNarrativeAtlas(bundle, units, surface))
+      units
+        .foldLeft[Either[DomainError, Unit]](Right(())) { (result, unit) =>
+          result
+            .flatMap(_ => EvidenceSupport.of(bundle, unit.support.anchors.toVector).map(_ => ()))
+        }
+        .map(_ => new AnchoredNarrativeAtlas(bundle, units, surface))
 
   def bundleOf(source: StorySource): Either[DomainError, SourceBundle] =
     SourceBundle.writtenText(source)
