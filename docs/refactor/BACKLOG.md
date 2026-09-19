@@ -2,17 +2,17 @@
 
 Reconciled 19 September 2026 against `1113f96864a38a2869e49d9c8c5d4e2dc43f5d10`. Governing direction: [PLAN.md](PLAN.md).
 
-**Application status:** applied and verified through Mote CLI. Reconciled 136 existing issues; closed 27 with explicit dispositions; added nine active tickets and superseded one duplicate. Final store: 118 open, 234 closed, none doing/review/blocked. All 87 dependency/relationship/tag operations were accepted. See [execution receipt](EXECUTION_RECEIPT.json).
+**Planning checkpoint (historical):** applied and verified through Mote CLI. Reconciled 136 existing issues; closed 27 with explicit dispositions; added nine active tickets and superseded one duplicate. That checkpoint had 118 open, 234 closed, none doing/review/blocked. All 87 dependency/relationship/tag operations were accepted. See [execution receipt](EXECUTION_RECEIPT.json); live Mote and the completion evidence below supersede those status counts.
 
 The 30 consultant TA keys are crosswalk references, not another set of tickets. Nine new active tickets cover genuine gaps. A tenth clock ticket was superseded after a concurrent intake filing was discovered; the existing C1 ticket is retained. Existing mapper, film, scoring, reliability and release tickets retain their identities. Broad context-sensitive measurement and joint inference stay deferred in PLAN rather than gaining speculative subtasks.
 
 ## What to do first
 
-One implementation slice at a time. Start baseline capture; scorer repair and clock integration then have frozen inputs to protect. S0 and at-risk branch preservation are independent foundation work. The account/runner decision blocks CI execution, not local engineering.
+One implementation slice at a time. Baseline capture, scorer repair and production clock integration are complete. **S0 text parity pins are next.** At-risk branch preservation remains independent foundation work. The account/runner decision blocks CI execution, not local engineering.
 
-- `bd-01M2WVCEBHAZBKJQ0EB84EA4HV` — G0: freeze mapping regression inputs, configurations and historical outputs
-- `bd-01M2TA5FB4ATF9QS9ZA9MDJNE2` — [foundation] Phase 1a: unit manifest and a fail-closed scorer with fixed denominators (gold_scene.py)
-- `bd-01M2WTGF981AY7RCN8QC42JSPT` — G0: route Sherlock production coordinates through receipted ClockRepair
+- Completed `bd-01M2WVCEBHAZBKJQ0EB84EA4HV` — [frozen mapping baseline](evidence/sherlock-baseline-20260919/README.md)
+- Completed `bd-01M2TA5FB4ATF9QS9ZA9MDJNE2` — [unit manifest and fail-closed scorer](evidence/sherlock-scorer-20260919/README.md)
+- Completed `bd-01M2WTGF981AY7RCN8QC42JSPT` — [production ClockRepair integration](evidence/sherlock-clock-repair-20260919/README.md)
 - `bd-01M2TAB3QD2YXSPR8THYRGFBKS` — [foundation] D1A-types S0: text parity baseline (compile, codec, view pins)
 - `bd-01M2TA2EMFCWRKXK6QJHGV702Q` — [foundation] Phase 0: rescue the only copy of audit/masc-role-corpus (b756b4bb) into the main repo
 - `bd-01M19G69RQCHMT2EMG11XFT4WX` — G0: obtain an executed exact-SHA clean build and CI receipt
@@ -67,6 +67,8 @@ No model tuning, new corpus intake, or full compiler refactor.
 ### G0: route Sherlock production coordinates through receipted ClockRepair
 
 Mote: `bd-01M2WTGF981AY7RCN8QC42JSPT` · reused · lane `foundation` · priority 0.
+
+Completed 19 September 2026. [Implementation, frozen parity, refusal mutations and clean gate](evidence/sherlock-clock-repair-20260919/README.md). The acceptance criteria below remain the closure contract.
 
 Prerequisites: `bd-01M2WVCEBHAZBKJQ0EB84EA4HV`.
 

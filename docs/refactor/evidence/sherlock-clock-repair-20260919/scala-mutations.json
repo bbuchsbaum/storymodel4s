@@ -1,0 +1,179 @@
+{
+  "codeRevision": "6a5a92881451fb2add3947e974a196cd85070d10",
+  "mutations": [
+    {
+      "mutation": "direct-multiplication-bypass",
+      "path": "corpus-intake/src/main/scala/storymodel4s/corpus/intake/SherlockAnnotations.scala",
+      "compiled": true,
+      "mutantSha256": "f9ea72a44688918d36bbe99bae30a913dc5c1ab9d6697ac9171cd0178d54ba72",
+      "command": [
+        "sbt",
+        "-batch",
+        "corpusIntake/testOnly storymodel4s.corpus.intake.SherlockAnnotationsSuite"
+      ],
+      "exitCode": 1,
+      "namedRejectingTest": "the actual projection seam refuses crossed run and target axes",
+      "acceptingControl": "the synthetic table parses with both runs, scenes, and typed missing TRs",
+      "acceptingControlPassed": true,
+      "totalTests": 17,
+      "failedTests": [
+        "the actual projection seam refuses crossed run and target axes"
+      ],
+      "logSha256": "0e87cae24d6eac32ff794928fcdaf4910568711ab8590f3bae10a482df81c334",
+      "logBytes": 2783,
+      "logPath": "study/recall-to-video/clock-repair-20260919/direct-multiplication-bypass.log"
+    },
+    {
+      "mutation": "identity-join-bypass",
+      "path": "corpus-intake/src/main/scala/storymodel4s/corpus/intake/TimebaseRepair.scala",
+      "compiled": true,
+      "mutantSha256": "491152f3be6d935b3c0e27f9f9a76189f7f15a93ced05382d46a723e4861c413",
+      "command": [
+        "sbt",
+        "-batch",
+        "corpusIntake/testOnly storymodel4s.corpus.intake.TimebaseRepairSuite"
+      ],
+      "exitCode": 1,
+      "namedRejectingTest": "changing the single media admission pin changes identity and refuses the old bundle",
+      "acceptingControl": "the committed record builds two checked actual-axis repairs with complete receipts",
+      "acceptingControlPassed": true,
+      "totalTests": 70,
+      "failedTests": [
+        "changing the single media admission pin changes identity and refuses the old bundle",
+        "bundle identity extent timebase and population are checked against the selected record"
+      ],
+      "logSha256": "859a252c5390b66e8b6f5793b1011b44f52a81fb983ce940be1aeb5ad70b0fb1",
+      "logBytes": 3592,
+      "logPath": "study/recall-to-video/clock-repair-20260919/identity-join-bypass.log"
+    },
+    {
+      "mutation": "integrality-bypass",
+      "path": "corpus-intake/src/main/scala/storymodel4s/corpus/intake/SherlockAnnotations.scala",
+      "compiled": true,
+      "mutantSha256": "5f6c3de275673d1c652a8c918512991ca8c5e48df89d0f327ef0a9e4dc1a13ab",
+      "command": [
+        "sbt",
+        "-batch",
+        "corpusIntake/testOnly storymodel4s.corpus.intake.SherlockAnnotationsSuite"
+      ],
+      "exitCode": 1,
+      "namedRejectingTest": "the projection seam refuses fractional ticks and exact arithmetic overflow",
+      "acceptingControl": "the synthetic table parses with both runs, scenes, and typed missing TRs",
+      "acceptingControlPassed": true,
+      "totalTests": 17,
+      "failedTests": [
+        "the projection seam refuses fractional ticks and exact arithmetic overflow"
+      ],
+      "logSha256": "69996231e70576817bcf728583485d6bac9269f847b63df03f2e7a92de848408",
+      "logBytes": 2939,
+      "logPath": "study/recall-to-video/clock-repair-20260919/integrality-bypass.log"
+    },
+    {
+      "mutation": "formula-bypass",
+      "path": "corpus-intake/src/main/scala/storymodel4s/corpus/intake/TimebaseRepair.scala",
+      "compiled": true,
+      "mutantSha256": "68a93cf9d4ba72188280ed944651c5a31bb383e3894caf318a2f8e79bf9d8eb8",
+      "command": [
+        "sbt",
+        "-batch",
+        "corpusIntake/testOnly storymodel4s.corpus.intake.TimebaseRepairSuite"
+      ],
+      "exitCode": 1,
+      "namedRejectingTest": "unsupported or crossed declaration refuses: annotationToPlaybackCrosswalk/runs/1/formula",
+      "acceptingControl": "the committed record builds two checked actual-axis repairs with complete receipts",
+      "acceptingControlPassed": true,
+      "totalTests": 70,
+      "failedTests": [
+        "unsupported or crossed declaration refuses: annotationToPlaybackCrosswalk/runs/1/formula"
+      ],
+      "logSha256": "d89cf930f77736fb303c9a660c7a8ee66a5bb082cabe38c0c653360f5bcec457",
+      "logBytes": 2941,
+      "logPath": "study/recall-to-video/clock-repair-20260919/formula-bypass.log"
+    },
+    {
+      "mutation": "offset-consistency-bypass",
+      "path": "corpus-intake/src/main/scala/storymodel4s/corpus/intake/TimebaseRepair.scala",
+      "compiled": true,
+      "mutantSha256": "abce671ac46b4096a49680646c29998bee22cff3e6cd5a2c5c5118e3a4ed0e49",
+      "command": [
+        "sbt",
+        "-batch",
+        "corpusIntake/testOnly storymodel4s.corpus.intake.TimebaseRepairSuite"
+      ],
+      "exitCode": 1,
+      "namedRejectingTest": "inconsistent numeric declaration refuses: annotationToPlaybackCrosswalk/runs/0/playbackStartTicks",
+      "acceptingControl": "the committed record builds two checked actual-axis repairs with complete receipts",
+      "acceptingControlPassed": true,
+      "totalTests": 70,
+      "failedTests": [
+        "inconsistent numeric declaration refuses: annotationToPlaybackCrosswalk/runs/0/playbackStartTicks"
+      ],
+      "logSha256": "5ab12fcbe40903150058aaea9ab8b0bf382be579efa7fbacb774f368b1b3c54c",
+      "logBytes": 2956,
+      "logPath": "study/recall-to-video/clock-repair-20260919/offset-consistency-bypass.log"
+    },
+    {
+      "mutation": "duplicate-keys-bypass",
+      "path": "corpus-intake/src/main/scala/storymodel4s/corpus/intake/TimebaseRepair.scala",
+      "compiled": true,
+      "mutantSha256": "a45379dcaae2e6405c2218c0d5134c4554e6c401b76061a0c760e3d2f05fae69",
+      "command": [
+        "sbt",
+        "-batch",
+        "corpusIntake/testOnly storymodel4s.corpus.intake.TimebaseRepairSuite"
+      ],
+      "exitCode": 1,
+      "namedRejectingTest": "malformed numeric pairs and duplicate JSON keys refuse before interpretation",
+      "acceptingControl": "the committed record builds two checked actual-axis repairs with complete receipts",
+      "acceptingControlPassed": true,
+      "totalTests": 70,
+      "failedTests": [
+        "malformed numeric pairs and duplicate JSON keys refuse before interpretation"
+      ],
+      "logSha256": "bcdfcf154f19403c0e45b1748a45b2f74546409449b6bec5e0d642c5753335d7",
+      "logBytes": 2828,
+      "logPath": "study/recall-to-video/clock-repair-20260919/duplicate-keys-bypass.log"
+    },
+    {
+      "mutation": "observed-scanner-bypass",
+      "path": "corpus-intake/src/main/scala/storymodel4s/corpus/intake/TimebaseRepair.scala",
+      "compiled": true,
+      "mutantSha256": "b8876aac7ef3c52d6721afd508110d36f12aa66c8e9de4117a2e9b286ca0efaf",
+      "command": [
+        "sbt",
+        "-batch",
+        "corpusIntake/testOnly storymodel4s.corpus.intake.SherlockAnnotationsSuite"
+      ],
+      "exitCode": 1,
+      "namedRejectingTest": "the observed scanner extent must equal the declaration even when boundaries fit",
+      "acceptingControl": "the synthetic table parses with both runs, scenes, and typed missing TRs",
+      "acceptingControlPassed": true,
+      "totalTests": 17,
+      "failedTests": [
+        "the observed scanner extent must equal the declaration even when boundaries fit"
+      ],
+      "logSha256": "ce00a5abdbfcb330dff9d2fa1a648d45cc4ef5f63de0aa55c757776509ba84d3",
+      "logBytes": 2957,
+      "logPath": "study/recall-to-video/clock-repair-20260919/observed-scanner-bypass.log"
+    }
+  ],
+  "cleanAfter": true,
+  "restoredControl": {
+    "command": [
+      "sbt",
+      "-batch",
+      "corpusIntake/testOnly *TimebaseRepairSuite *SherlockAnnotationsSuite",
+      "embedBench/testOnly *SherlockRecallMappingSuite",
+      "scalafmtCheckAll"
+    ],
+    "exitCode": 0,
+    "formatLast": true,
+    "logSha256": "255c75193a52856a19fc04c30889c82ef757dd166ce016b92e804cb41b4e0876",
+    "logBytes": 3576,
+    "logPath": "study/recall-to-video/clock-repair-20260919/restored-control.log",
+    "testTotals": [
+      "[info] Passed: Total 87, Failed 0, Errors 0, Passed 87",
+      "[info] Passed: Total 9, Failed 0, Errors 0, Passed 8, Skipped 1"
+    ]
+  }
+}

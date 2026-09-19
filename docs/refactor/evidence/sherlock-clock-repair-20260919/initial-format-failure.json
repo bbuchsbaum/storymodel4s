@@ -1,0 +1,15 @@
+{
+  "codeRevision": "2ce9b13f7af7d484c97fd8fbcc2a45dae191005c",
+  "command": [
+    "sbt",
+    "-batch",
+    "checkAll"
+  ],
+  "exitCode": 1,
+  "cleanBefore": true,
+  "cleanAfter": true,
+  "logSha256": "0dcc37840b92e73851791d15479146d9230cbbc2cba6fc3d4396731704d3eca0",
+  "logBytes": 13628,
+  "logPath": "study/recall-to-video/clock-repair-20260919/checkAll.log",
+  "testTotals": []
+}

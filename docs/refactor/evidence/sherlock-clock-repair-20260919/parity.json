@@ -1,0 +1,48 @@
+{
+  "beforeRevision": "99344ea01ffd82613b85337d6dd23a49b809f0c7",
+  "afterRevision": "2ce9b13f7af7d484c97fd8fbcc2a45dae191005c",
+  "legacyArtifactHashes": {
+    "inventory": "b8a356bc7e87942ef7eb848c57481623e21e1673c6b3464ef938a7f4bae7f3fc",
+    "posterior": "cc26b5607c5bf60489786330f6478b417481e2fb84eba551acfc03cce1d7fcee",
+    "report": "528ceb1b1e84ddca9f0ef3395b1047929d60cc1bccac22fb0dcc3c67273aafc7",
+    "stages": "02655fb1482cd1da089d33f3b756729b3c2834328e4f4a5b53e9f8a2b14f177f",
+    "voyage": "d2eeb592cf9ac562d174e2430aedff0d157afa36d5e7a1f505f13588d51cb2aa"
+  },
+  "summary": {
+    "anchorsSha256": "e4ef1382fda290595d779922da3fea87bd6e9a74cc717dcf66103c5290465282",
+    "annotationRows": 1000,
+    "outcomes": {
+      "reportRows": 173,
+      "sourceChosen": 173,
+      "withoutSourceChoice": 0
+    },
+    "rowLociSha256": "59e8118472c91e07506910ab27b4cbf4a30ea9f0ce8703a6f44f66b4531dd8dc",
+    "targets": 1050,
+    "units": 173,
+    "words": 2495
+  },
+  "provenance": {
+    "rows": 1000,
+    "repairs": 2,
+    "recordSha256": "b64d7ab2fa6457ebb39e7d43be48daf0fad910faa77c494c40979cd7f5f66146",
+    "receiptIds": [
+      "6da95016229079b6f35d4a2f0149483c75914d9cf757d95f3f4dc2a43f699e7d",
+      "8554939cb4ccacea10f795128df653b19d6c8d22de3e5077d3e9e7d5bfb02f2d"
+    ]
+  },
+  "sidecars": [
+    {
+      "base": "data",
+      "path": "study/recall-to-video/clock-repair-20260919-nn03/run-1/report.tsv.clock-repair.json",
+      "sha256": "2f16f42792cfa03776eb865ed479435004b48d6bd04c46aad71d0af39c5b490b",
+      "bytes": 214510
+    },
+    {
+      "base": "data",
+      "path": "study/recall-to-video/clock-repair-20260919-nn03/run-2/report.tsv.clock-repair.json",
+      "sha256": "2f16f42792cfa03776eb865ed479435004b48d6bd04c46aad71d0af39c5b490b",
+      "bytes": 214510
+    }
+  ],
+  "qualification": "engineering byte parity; no gold, media reachability or behavioral-validity claim"
+}

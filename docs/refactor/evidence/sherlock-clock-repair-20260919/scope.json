@@ -1,0 +1,16 @@
+{
+  "codeRevision": "6a5a92881451fb2add3947e974a196cd85070d10",
+  "command": [
+    "bash",
+    "tools/reference-scope.sh",
+    "a4771a09",
+    "6a5a92881451fb2add3947e974a196cd85070d10"
+  ],
+  "exitCode": 0,
+  "cleanBefore": true,
+  "cleanAfter": true,
+  "logSha256": "fe559335c85d6fd2b8f35c99eb9c059ae8459889f11f998d9997b1f2e3ff38f9",
+  "logBytes": 1225,
+  "logPath": "study/recall-to-video/clock-repair-20260919/scope-release.log",
+  "testTotals": []
+}

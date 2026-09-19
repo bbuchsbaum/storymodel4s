@@ -194,8 +194,11 @@ are also complete: fixed support, complete outcomes, distinct participant/pooled
 and actual Scala/Python rule witnesses with mutations. The measured observation inventory
 contains **2,577 units**, not the original plan's 2,560 (the latter is the sum of final
 zero-based ordinals and the adjacent-pair count). No units were dropped to match that error.
-The next sequential slice is production **ClockRepair integration** against the frozen
-baseline. S0 text pins remain separate foundation work. G0 as a whole remains open;
+The [production ClockRepair integration](evidence/sherlock-clock-repair-20260919/README.md)
+is complete: every annotation bound uses the checked map, each row carries a repair receipt,
+and two development replays preserve all five legacy artifacts and all 1,000 coordinates.
+Seven compiled refusal mutations and the clean full gate passed. The next sequential slice
+is **S0 text parity pins** (`bd-01M2TAB3QD2YXSPR8THYRGFBKS`). G0 as a whole remains open;
 these engineering gates establish no accuracy or measurement-validity claim.
 
 1. **Capture baseline**, repair scorer, and pin S0. Preserve the at-risk MASC branch before any

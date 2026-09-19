@@ -1,0 +1,30 @@
+{
+  "qualification": "Owned local execution runners retained under the ignored data root.",
+  "runners": [
+    {
+      "path": "study/recall-to-video/clock-repair-20260919/clock_qualify_20260919.py",
+      "sha256": "01ac1003ce3116ef023079876990e529c6b1d491f5359f6bfa5d71a878a6f3c9",
+      "bytes": 2112
+    },
+    {
+      "path": "study/recall-to-video/clock-repair-20260919/clock_release_20260919.py",
+      "sha256": "edd6a4f6b3b0da6a36beff89f423afee3fb89f36041b712243a24a7da39da969",
+      "bytes": 242
+    },
+    {
+      "path": "study/recall-to-video/clock-repair-20260919/clock_mutations_20260919.py",
+      "sha256": "60346836527fb891f0345dc3191b78d537d8b3cb47ec38bbd8c50089765bc3f4",
+      "bytes": 7099
+    },
+    {
+      "path": "study/recall-to-video/clock-repair-20260919/provenance_witnesses_20260919.py",
+      "sha256": "7afd198db33a7dd4d152c68bc0691ec929c9197c21d0e44532be169cec1b3ba8",
+      "bytes": 4030
+    },
+    {
+      "path": "study/recall-to-video/clock-repair-20260919/assemble_evidence_20260919.py",
+      "sha256": "165486d30bf009bb793d7828366932b4e3858405e3e2f55c713a632dc43a6448",
+      "bytes": 10570
+    }
+  ]
+}

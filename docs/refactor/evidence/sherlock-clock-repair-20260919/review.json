@@ -1,0 +1,29 @@
+{
+  "reviewer": "clock_cold_review",
+  "mode": "separate fresh-context SD6 review",
+  "productionFindings": [
+    {
+      "finding": "Malformed numeric middle tokens were discarded",
+      "independentCompiledProbe": "1-junk-482 and 25/junk/1 were accepted",
+      "resolution": "Require exactly two parseable numeric tokens; path mutations refuse."
+    },
+    {
+      "finding": "Duplicate JSON formula keys accepted the last declaration",
+      "independentCompiledProbe": "Unsupported first formula followed by supported formula accepted",
+      "resolution": "Jawn refuses duplicate keys before field interpretation; raw-string witness and compiled mutation."
+    },
+    {
+      "finding": "Scanner maximum was not reconciled with admitted rows",
+      "independentCompiledProbe": "Full six-row Atlas accepted maximumTr=2 despite observed 29",
+      "resolution": "Check declared boundaries and observed min/max; altered extent and compiled mutation refuse."
+    }
+  ],
+  "deltaReview": "No new consequential production finding; corrected exact record bytes to exact record byte digest; synthetic provenance cleaned.",
+  "verifierFinding": {
+    "independentProbe": "Consistently rehashed forged parameters and row links accepted",
+    "resolution": "Reconstruct parameters from admitted record and actual inventory axis before hashing; compiled guard mutant killed."
+  },
+  "independentParity": "Reviewer executed verifier: five legacy artifact hashes, 1000 rows and both sidecars agree; altered ticks, instants, receipt links, axes and authority refuse.",
+  "qualification": "Reviewer used read-only source review and independent compiled/Python probes; full sbt gate and final mutations were run separately by the implementation agent.",
+  "finalEvidenceReview": "Separate final read-only pass found no consequential wording or qualification gap; independently confirmed capture-to-qualified diff is Scaladoc wrapping plus Python verifier, and checked honest local-only gates, one-key root authority, declared-unverified upstream, failures/skips and remaining G0 scope."
+}

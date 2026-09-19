@@ -1,0 +1,246 @@
+{
+  "codeRevision": "2ce9b13f7af7d484c97fd8fbcc2a45dae191005c",
+  "configuration": {
+    "environment": {
+      "STORYMODEL4S_BACKWARD_PENALTY": "hard",
+      "STORYMODEL4S_CANDIDATES_LEXICAL_OVERLAP": "false",
+      "STORYMODEL4S_CANDIDATES_PER_LEVEL": "8",
+      "STORYMODEL4S_CAPTION_CHANNEL": "embed",
+      "STORYMODEL4S_FORWARD_PENALTY": "0.0",
+      "STORYMODEL4S_LEXICAL_BLEND": "0.8",
+      "STORYMODEL4S_LEXICAL_FIELDS": "lemmas",
+      "STORYMODEL4S_MONOTONE_FILL": "on",
+      "STORYMODEL4S_MONOTONE_SCENE": "on",
+      "STORYMODEL4S_PRIOR_SCALE": "1.5",
+      "STORYMODEL4S_SOURCE_TEXT": "bare",
+      "STORYMODEL4S_STAGE_TRACE": "on"
+    },
+    "provider": "pinned-local-onnx",
+    "responseCache": "none; local model recomputed",
+    "unset": [
+      "STORYMODEL4S_SCENE_CODING",
+      "STORYMODEL4S_SCENE_CAPTIONS",
+      "STORYMODEL4S_SHUFFLE_RECALL",
+      "STORYMODEL4S_RUNG",
+      "STORYMODEL4S_WITHHOLD_KINDS"
+    ]
+  },
+  "excludedFromByteParity": [
+    "run logs: sbt timings, elapsed milliseconds, output paths"
+  ],
+  "historicalArtifacts": [
+    {
+      "base": "data",
+      "bytes": 64590,
+      "path": "study/recall-to-video/clock-repair-20260919-nn03/historical-report.tsv",
+      "sha256": "528ceb1b1e84ddca9f0ef3395b1047929d60cc1bccac22fb0dcc3c67273aafc7"
+    }
+  ],
+  "inputs": {
+    "annotation": {
+      "base": "data",
+      "bytes": 225692,
+      "path": "sherlock/Sherlock_Segments_1000_NN_2017.tsv",
+      "sha256": "8c205826dcea8c58db24d7a17c71a3f99a9054e9379435e60b1dd0b987c2b296"
+    },
+    "build:.jvmopts": {
+      "base": "repo",
+      "bytes": 27,
+      "path": ".jvmopts",
+      "sha256": "41e79abf442c20b248d6f934483574a705afe9b2cc494d92b76783427ed2cef2"
+    },
+    "build:build.sbt": {
+      "base": "repo",
+      "bytes": 18303,
+      "path": "build.sbt",
+      "sha256": "31697d4309febf7286e1ced7eb0b59f15b5cc6b13dd8b0cdc0261f7a75147b40"
+    },
+    "build:project/build.properties": {
+      "base": "repo",
+      "bytes": 20,
+      "path": "project/build.properties",
+      "sha256": "d24588794d56b7bda7e561d899310803eba64264d1cfa5570f7d63f33641e4a7"
+    },
+    "build:project/plugins.sbt": {
+      "base": "repo",
+      "bytes": 332,
+      "path": "project/plugins.sbt",
+      "sha256": "12e82f4a3117eb9a5409d5839460f11e79e5067333e0adae40f4600e759dfa7c"
+    },
+    "build:zz-worktree-local.sbt": {
+      "base": "repo",
+      "bytes": 156,
+      "path": "zz-worktree-local.sbt",
+      "sha256": "308ce206ef197270332567a9a6741b04d72300aa596a8e6c6bae25538216d4f9"
+    },
+    "model": {
+      "base": "data",
+      "bytes": 90405214,
+      "path": "models/onnx/model.onnx",
+      "sha256": "6fd5d72fe4589f189f8ebc006442dbb529bb7ce38f8082112682524616046452"
+    },
+    "partition": {
+      "base": "data",
+      "bytes": 1461,
+      "path": "study/recall-to-video/partition.json",
+      "sha256": "cc9958bf6d1cc6d07fde508ef7951dc90b3a85ca8744cedf5900ca60acea365f"
+    },
+    "recall": {
+      "base": "data",
+      "bytes": 91928,
+      "path": "sherlock/recall/NN03_ANT_202231_final.csv",
+      "sha256": "5bfe5e4afa516e86d302912db8f6978f16f80ab00a84cb2a878eb2ed0c15e48e"
+    },
+    "recallLineage": {
+      "base": "repo",
+      "bytes": 13755,
+      "path": "docs/data/sherlock/recall-lineage.json",
+      "sha256": "4b41ef7e6ebacbd0d24800fca0c7ee172a7540b9996cf903edc2782744f9363e"
+    },
+    "repairRecord": {
+      "base": "repo",
+      "bytes": 13943,
+      "path": "docs/data/sherlock/timebase-repair.json",
+      "sha256": "b64d7ab2fa6457ebb39e7d43be48daf0fad910faa77c494c40979cd7f5f66146"
+    },
+    "tokenizer": {
+      "base": "data",
+      "bytes": 466247,
+      "path": "models/onnx/tokenizer.json",
+      "sha256": "be50c3628f2bf5bb5e3a7f17b1f74611b2561a3a27eeab05e5aa30f411572037"
+    }
+  },
+  "mediaVerification": "declared pins retained in repairRecord; media bytes not opened",
+  "participant": "NN03_ANT_202231_final",
+  "qualification": "development-only engineering replay; no gold read; not reference measurement",
+  "runs": [
+    {
+      "artifacts": {
+        "inventory": {
+          "base": "data",
+          "bytes": 784937,
+          "path": "study/recall-to-video/clock-repair-20260919-nn03/run-1/inventory.json",
+          "sha256": "b8a356bc7e87942ef7eb848c57481623e21e1673c6b3464ef938a7f4bae7f3fc"
+        },
+        "posterior": {
+          "base": "data",
+          "bytes": 385362,
+          "path": "study/recall-to-video/clock-repair-20260919-nn03/run-1/report.tsv.posterior.json",
+          "sha256": "cc26b5607c5bf60489786330f6478b417481e2fb84eba551acfc03cce1d7fcee"
+        },
+        "report": {
+          "base": "data",
+          "bytes": 64590,
+          "path": "study/recall-to-video/clock-repair-20260919-nn03/run-1/report.tsv",
+          "sha256": "528ceb1b1e84ddca9f0ef3395b1047929d60cc1bccac22fb0dcc3c67273aafc7"
+        },
+        "stages": {
+          "base": "data",
+          "bytes": 1437162,
+          "path": "study/recall-to-video/clock-repair-20260919-nn03/run-1/report.tsv.stages.json",
+          "sha256": "02655fb1482cd1da089d33f3b756729b3c2834328e4f4a5b53e9f8a2b14f177f"
+        },
+        "voyage": {
+          "base": "data",
+          "bytes": 606421,
+          "path": "study/recall-to-video/clock-repair-20260919-nn03/run-1/report.tsv.voyage.json",
+          "sha256": "d2eeb592cf9ac562d174e2430aedff0d157afa36d5e7a1f505f13588d51cb2aa"
+        }
+      },
+      "command": [
+        "sbt",
+        "-batch",
+        "embedBench/Test/runMain storymodel4s.bench.sherlock.SherlockBaselineCapture /Users/bbuchsbaum/code/scala/storymodel4s/data/sherlock/Sherlock_Segments_1000_NN_2017.tsv /Users/bbuchsbaum/code/scala/storymodel4s/data/sherlock/recall/NN03_ANT_202231_final.csv /Users/bbuchsbaum/code/scala/storymodel4s/data/study/recall-to-video/clock-repair-20260919-nn03/run-1/inventory.json",
+        "embedBench/runMain storymodel4s.bench.sherlock.sherlockRecallMap /Users/bbuchsbaum/code/scala/storymodel4s/data/sherlock/Sherlock_Segments_1000_NN_2017.tsv /Users/bbuchsbaum/code/scala/storymodel4s/data/sherlock/recall/NN03_ANT_202231_final.csv /Users/bbuchsbaum/code/scala/storymodel4s/data/study/recall-to-video/clock-repair-20260919-nn03/run-1/report.tsv"
+      ],
+      "exitCode": 0,
+      "log": {
+        "base": "data",
+        "bytes": 6061,
+        "path": "study/recall-to-video/clock-repair-20260919-nn03/run-1/run.log",
+        "sha256": "3d41d4c1bc522e55e353fabcda84ff299233f8d3d74f2119d4fa6a2d121468af"
+      }
+    },
+    {
+      "artifacts": {
+        "inventory": {
+          "base": "data",
+          "bytes": 784937,
+          "path": "study/recall-to-video/clock-repair-20260919-nn03/run-2/inventory.json",
+          "sha256": "b8a356bc7e87942ef7eb848c57481623e21e1673c6b3464ef938a7f4bae7f3fc"
+        },
+        "posterior": {
+          "base": "data",
+          "bytes": 385362,
+          "path": "study/recall-to-video/clock-repair-20260919-nn03/run-2/report.tsv.posterior.json",
+          "sha256": "cc26b5607c5bf60489786330f6478b417481e2fb84eba551acfc03cce1d7fcee"
+        },
+        "report": {
+          "base": "data",
+          "bytes": 64590,
+          "path": "study/recall-to-video/clock-repair-20260919-nn03/run-2/report.tsv",
+          "sha256": "528ceb1b1e84ddca9f0ef3395b1047929d60cc1bccac22fb0dcc3c67273aafc7"
+        },
+        "stages": {
+          "base": "data",
+          "bytes": 1437162,
+          "path": "study/recall-to-video/clock-repair-20260919-nn03/run-2/report.tsv.stages.json",
+          "sha256": "02655fb1482cd1da089d33f3b756729b3c2834328e4f4a5b53e9f8a2b14f177f"
+        },
+        "voyage": {
+          "base": "data",
+          "bytes": 606421,
+          "path": "study/recall-to-video/clock-repair-20260919-nn03/run-2/report.tsv.voyage.json",
+          "sha256": "d2eeb592cf9ac562d174e2430aedff0d157afa36d5e7a1f505f13588d51cb2aa"
+        }
+      },
+      "command": [
+        "sbt",
+        "-batch",
+        "embedBench/Test/runMain storymodel4s.bench.sherlock.SherlockBaselineCapture /Users/bbuchsbaum/code/scala/storymodel4s/data/sherlock/Sherlock_Segments_1000_NN_2017.tsv /Users/bbuchsbaum/code/scala/storymodel4s/data/sherlock/recall/NN03_ANT_202231_final.csv /Users/bbuchsbaum/code/scala/storymodel4s/data/study/recall-to-video/clock-repair-20260919-nn03/run-2/inventory.json",
+        "embedBench/runMain storymodel4s.bench.sherlock.sherlockRecallMap /Users/bbuchsbaum/code/scala/storymodel4s/data/sherlock/Sherlock_Segments_1000_NN_2017.tsv /Users/bbuchsbaum/code/scala/storymodel4s/data/sherlock/recall/NN03_ANT_202231_final.csv /Users/bbuchsbaum/code/scala/storymodel4s/data/study/recall-to-video/clock-repair-20260919-nn03/run-2/report.tsv"
+      ],
+      "exitCode": 0,
+      "log": {
+        "base": "data",
+        "bytes": 5917,
+        "path": "study/recall-to-video/clock-repair-20260919-nn03/run-2/run.log",
+        "sha256": "b33ef71d0576bbd02c67e4803af6754f130f2dd665f5c327779bd93024c2d299"
+      }
+    }
+  ],
+  "schema": "storymodel4s.bench.frozen-baseline/v1",
+  "summary": {
+    "anchorsSha256": "e4ef1382fda290595d779922da3fea87bd6e9a74cc717dcf66103c5290465282",
+    "annotationRows": 1000,
+    "outcomes": {
+      "reportRows": 173,
+      "sourceChosen": 173,
+      "withoutSourceChoice": 0
+    },
+    "rowLociSha256": "59e8118472c91e07506910ab27b4cbf4a30ea9f0ce8703a6f44f66b4531dd8dc",
+    "targets": 1050,
+    "units": 173,
+    "words": 2495
+  },
+  "completeManifest": {
+    "path": "study/recall-to-video/clock-repair-20260919-nn03/manifest.json",
+    "sha256": "16b85cedf72c663975d801393333e5392881d4395414b37ca2d329d790bb0990",
+    "bytes": 792493
+  },
+  "qualifiedRevision": "6a5a92881451fb2add3947e974a196cd85070d10",
+  "postCaptureScalaChanges": {
+    "files": [
+      "corpus-intake/src/main/scala/storymodel4s/corpus/intake/TimebaseRepair.scala"
+    ],
+    "difference": "Scaladoc wrapping only; code identical after stripping Scaladoc blocks"
+  },
+  "verificationCommand": [
+    "python3",
+    "tools/recall-study/verify_clock_repair.py",
+    "docs/refactor/evidence/sherlock-baseline-20260919/manifest.json",
+    "data/study/recall-to-video/clock-repair-20260919-nn03/manifest.json",
+    "--data-root",
+    "data"
+  ]
+}

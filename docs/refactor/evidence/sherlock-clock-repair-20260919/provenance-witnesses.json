@@ -1,0 +1,98 @@
+{
+  "codeRevision": "6a5a92881451fb2add3947e974a196cd85070d10",
+  "verifierSha256": "226a39a073c627ac623046dd79ef0b1f39e4aa9f70c0c76e3f1acd64abb6e1a5",
+  "inputMutations": [
+    {
+      "path": [
+        "recordSha256"
+      ],
+      "refusal": "foreign repair record",
+      "acceptingControl": true
+    },
+    {
+      "path": [
+        "recordIdentityBasis"
+      ],
+      "refusal": "overstated root or notebook authority",
+      "acceptingControl": true
+    },
+    {
+      "path": [
+        "notebookProvenanceStatus"
+      ],
+      "refusal": "overstated root or notebook authority",
+      "acceptingControl": true
+    },
+    {
+      "path": [
+        "certifies"
+      ],
+      "refusal": "lost crosswalk restriction: certifies",
+      "acceptingControl": true
+    },
+    {
+      "path": [
+        "repairs",
+        0,
+        "targetAxis"
+      ],
+      "refusal": "crossed repair axes",
+      "acceptingControl": true
+    },
+    {
+      "path": [
+        "repairs",
+        0,
+        "scale",
+        "numerator"
+      ],
+      "refusal": "changed exact arithmetic",
+      "acceptingControl": true
+    },
+    {
+      "path": [
+        "repairs",
+        0,
+        "receiptId"
+      ],
+      "refusal": "receipt identity differs",
+      "acceptingControl": true
+    },
+    {
+      "path": [
+        "rows",
+        999,
+        "receiptId"
+      ],
+      "refusal": "missing changed or wrongly receipted row",
+      "acceptingControl": true
+    },
+    {
+      "path": [
+        "rows",
+        999,
+        "endTick"
+      ],
+      "refusal": "missing changed or wrongly receipted row",
+      "acceptingControl": true
+    },
+    {
+      "mutation": "drop final annotation row",
+      "refusal": "missing changed or wrongly receipted row",
+      "acceptingControl": true
+    },
+    {
+      "mutation": "consistently rehashed forged parameters and linked rows",
+      "refusal": "receipt parameters contradict record",
+      "acceptingControl": true
+    }
+  ],
+  "compiledGuardMutation": {
+    "compiled": true,
+    "mutation": "delete parameter-to-record equality guard",
+    "rejectingWitnessFailed": true,
+    "acceptingControlPassed": true,
+    "mutantSha256": "e873235a0b2327c38df998650ad5ce164cbf0c9628218138db003b116a9e0d51"
+  },
+  "restoredOriginalPassed": true
+}

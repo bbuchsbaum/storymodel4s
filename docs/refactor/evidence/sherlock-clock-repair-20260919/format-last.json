@@ -1,0 +1,15 @@
+{
+  "codeRevision": "6a5a92881451fb2add3947e974a196cd85070d10",
+  "command": [
+    "sbt",
+    "-batch",
+    "scalafmtCheckAll"
+  ],
+  "exitCode": 0,
+  "cleanBefore": true,
+  "cleanAfter": true,
+  "logSha256": "df5263435341cddabdf1ea09e8d005ff731a9d2f08e413812391d9cc7f32c518",
+  "logBytes": 1230,
+  "logPath": "study/recall-to-video/clock-repair-20260919/format-last-release.log",
+  "testTotals": []
+}

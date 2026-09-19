@@ -23,5 +23,7 @@ evidence table and future gate receipts, not in the charter.
 
 The [execution receipt](EXECUTION_RECEIPT.json) records the applied tracker counts, ready queue, checks, and qualification limits.
 
-Implementation evidence: [frozen Sherlock mapping baseline, 19 September 2026](evidence/sherlock-baseline-20260919/README.md).
+Implementation evidence, 19 September 2026: [frozen Sherlock baseline](evidence/sherlock-baseline-20260919/README.md),
+[fail-closed scorer](evidence/sherlock-scorer-20260919/README.md), and
+[production ClockRepair integration](evidence/sherlock-clock-repair-20260919/README.md).
 Tracker snapshots above describe the planning checkpoint; use live Mote for current status.
