@@ -46,6 +46,14 @@ def provenance(value, manifest, repair):
         require(actual["inputChecksums"] == [value["recordSha256"], value["annotationSha256"],
                                              part["sha256"]], "unbound receipt inputs")
         require(actual["algorithm"] == crosswalk["id"], "foreign repair algorithm")
+        expected_parameters = (
+            f"{repair['schema']}/v{repair['schemaVersion']}; run={declared['runId']}; "
+            f"declaredAxis={declared['axisId']}; targetAxis={axes[declared['partId']]['axis']}; "
+            f"formula={declared['formula']}; certifies={crosswalk['certifies']}; "
+            f"doesNotCertify={crosswalk['doesNotCertify']}; "
+            f"explicitlyNotUsed={crosswalk['explicitlyNotUsed']}; notebookProvenance=declared-unverified"
+        )
+        require(actual["parameters"] == expected_parameters, "receipt parameters contradict record")
         # Independently reproduce core ContentAddress's documented NUL-separated receipt digest.
         receipt = baseline.digest("\0".join(["derivation", actual["algorithm"],
                                            actual["parameters"], *actual["inputChecksums"]]).encode())
