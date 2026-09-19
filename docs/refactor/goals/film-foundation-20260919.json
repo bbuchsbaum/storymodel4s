@@ -1,0 +1,173 @@
+{
+  "schema": "storymodel4s.goal-cohort/v1",
+  "goal": "film-foundation-20260919",
+  "startingRevision": "d9eb9543d0be9a0dac0423ba12afe7f413bd76f6",
+  "worker": "/root/film_foundation",
+  "moteActor": "codex-storymodel4s-film-foundation",
+  "moteCount": 9,
+  "executableDeliverables": 8,
+  "containerClosures": 1,
+  "externalPrerequisitesAtSetup": {
+    "bd-01M1CQEWA4GWY5NW0QAGWYP31H": "closed",
+    "bd-01M2TAB3QD2YXSPR8THYRGFBKS": "closed",
+    "bd-01M2WTGF981AY7RCN8QC42JSPT": "closed"
+  },
+  "s0Golden": "pipeline/src/test/resources/golden/d1a-s0-text-parity.json",
+  "s0GoldenSha256": "cc201d9dd3e3576fabcd45677369f00c023ca5a455ea9d9e7ba694700c759fb3",
+  "executionStatusSource": "live Mote and goal state; this is the setup snapshot",
+  "tickets": [
+    {
+      "step": "s1",
+      "id": "bd-01M2TABFW72D8WWQF481SD37KW",
+      "title": "[film] D1A-types S1: ADR 0007 amendment (rulings, vocabulary, canonical form, identity)",
+      "statusAtSetup": "open",
+      "deps": [
+        {
+          "kind": "blocks",
+          "parent": "bd-01M2TAB3QD2YXSPR8THYRGFBKS"
+        }
+      ],
+      "kind": "deliverable"
+    },
+    {
+      "step": "s2",
+      "id": "bd-01M2TABVXSM72M9DD0SNB6GZ11",
+      "title": "[film] D1A-types S2: core substrate -- sealed atlas, EvidenceSupport refusals, TypedSupport, PrimaryProjection, evidence-support/v1",
+      "statusAtSetup": "open",
+      "deps": [
+        {
+          "kind": "blocks",
+          "parent": "bd-01M2TABFW72D8WWQF481SD37KW"
+        }
+      ],
+      "kind": "deliverable"
+    },
+    {
+      "step": "s3",
+      "id": "bd-01M2TAF8JH42NYJJAFWPD7HTZB",
+      "title": "[film] D1A-types S3: acquire carries TypedSupport (film-compiler slice)",
+      "statusAtSetup": "open",
+      "deps": [
+        {
+          "kind": "blocks",
+          "parent": "bd-01M2TABVXSM72M9DD0SNB6GZ11"
+        }
+      ],
+      "kind": "deliverable"
+    },
+    {
+      "step": "s4a",
+      "id": "bd-01M2TAFN5WMXW4NT20YJQAW2FR",
+      "title": "[film] D1A-types S4a: node support becomes TypedSupport; draft becomes fallible",
+      "statusAtSetup": "open",
+      "deps": [
+        {
+          "kind": "blocks",
+          "parent": "bd-01M2TABVXSM72M9DD0SNB6GZ11"
+        }
+      ],
+      "kind": "deliverable"
+    },
+    {
+      "step": "s4b",
+      "id": "bd-01M2TAG1GEAGXCY33P0B17QBJ1",
+      "title": "[film] D1A-types S4b: envelope, non-text identity, and the TextModel witness",
+      "statusAtSetup": "open",
+      "deps": [
+        {
+          "kind": "blocks",
+          "parent": "bd-01M2TAF8JH42NYJJAFWPD7HTZB"
+        },
+        {
+          "kind": "blocks",
+          "parent": "bd-01M2TAFN5WMXW4NT20YJQAW2FR"
+        }
+      ],
+      "kind": "deliverable"
+    },
+    {
+      "step": "s4c",
+      "id": "bd-01M2TAGDJ5F0FEPC3XPWVDSWDH",
+      "title": "[film] D1A-types S4c: seal and split AlignmentSource",
+      "statusAtSetup": "open",
+      "deps": [
+        {
+          "kind": "blocks",
+          "parent": "bd-01M2TAG1GEAGXCY33P0B17QBJ1"
+        }
+      ],
+      "kind": "deliverable"
+    },
+    {
+      "step": "d1b",
+      "id": "bd-01M2TAC80YRK5JFNKTT7B7CAQN",
+      "title": "[film] Phase 2: D1B signatures -- typed source view with exact playback intervals (replaces the joined-text surrogate)",
+      "statusAtSetup": "open",
+      "deps": [
+        {
+          "kind": "blocks",
+          "parent": "bd-01M2TAGDJ5F0FEPC3XPWVDSWDH"
+        },
+        {
+          "kind": "blocks",
+          "parent": "bd-01M2WTGF981AY7RCN8QC42JSPT"
+        }
+      ],
+      "kind": "deliverable"
+    },
+    {
+      "step": "filmplan",
+      "id": "bd-01M2TAGST4EBFR1HM9Q3EWSYAH",
+      "title": "[film] D1A-film: write and cold-review its phase plan, then file its slice tickets",
+      "statusAtSetup": "open",
+      "deps": [
+        {
+          "kind": "blocks",
+          "parent": "bd-01M2TAGDJ5F0FEPC3XPWVDSWDH"
+        }
+      ],
+      "kind": "deliverable"
+    },
+    {
+      "step": "parent",
+      "id": "bd-01M1CQKRG1A4J4BEWCC78F4TEZ",
+      "title": "[film] D1A-types: film-capable StoryModel, nodes, Evidence and AlignmentSource, text byte-identical",
+      "statusAtSetup": "open",
+      "deps": [
+        {
+          "kind": "blocks",
+          "parent": "bd-01M1CQEWA4GWY5NW0QAGWYP31H"
+        },
+        {
+          "kind": "blocks",
+          "parent": "bd-01M2TAB3QD2YXSPR8THYRGFBKS"
+        },
+        {
+          "kind": "blocks",
+          "parent": "bd-01M2TABFW72D8WWQF481SD37KW"
+        },
+        {
+          "kind": "blocks",
+          "parent": "bd-01M2TABVXSM72M9DD0SNB6GZ11"
+        },
+        {
+          "kind": "blocks",
+          "parent": "bd-01M2TAF8JH42NYJJAFWPD7HTZB"
+        },
+        {
+          "kind": "blocks",
+          "parent": "bd-01M2TAFN5WMXW4NT20YJQAW2FR"
+        },
+        {
+          "kind": "blocks",
+          "parent": "bd-01M2TAG1GEAGXCY33P0B17QBJ1"
+        },
+        {
+          "kind": "blocks",
+          "parent": "bd-01M2TAGDJ5F0FEPC3XPWVDSWDH"
+        }
+      ],
+      "kind": "container-closure"
+    }
+  ]
+}

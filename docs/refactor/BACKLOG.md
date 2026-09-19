@@ -10,6 +10,10 @@ The 30 consultant TA keys are crosswalk references, not another set of tickets. 
 
 One implementation slice at a time. Baseline capture, scorer repair, production clock integration and S0 text parity pins are complete. **S1's ADR amendment is next on the D1A track.** At-risk branch preservation remains independent foundation work. The account/runner decision blocks CI execution, not local engineering.
 
+The active [film foundation goal](goals/film-foundation-20260919.md) assigns nine existing
+Motes to `film_foundation`, beginning with S1. It contains eight executable deliverables
+and one parent reconciliation, with a bounded finish line and each ticket's gates retained.
+
 - Completed `bd-01M2WVCEBHAZBKJQ0EB84EA4HV` — [frozen mapping baseline](evidence/sherlock-baseline-20260919/README.md)
 - Completed `bd-01M2TA5FB4ATF9QS9ZA9MDJNE2` — [unit manifest and fail-closed scorer](evidence/sherlock-scorer-20260919/README.md)
 - Completed `bd-01M2WTGF981AY7RCN8QC42JSPT` — [production ClockRepair integration](evidence/sherlock-clock-repair-20260919/README.md)

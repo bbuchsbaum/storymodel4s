@@ -206,6 +206,12 @@ The next sequential D1A slice is **S1's ADR amendment** (`bd-01M2TABFW72D8WWQF48
 G0 as a whole remains open for infrastructure and independent preservation work;
 these engineering gates establish no accuracy or measurement-validity claim.
 
+Active goal, 19 September 2026: the owner requested a larger delegated work package.
+[Film library foundation](goals/film-foundation-20260919.md) groups S1–S4c, D1B signatures,
+the film phase plan and D1A-types parent closure: nine existing Motes, one implementation
+worker (`film_foundation`), sequential gates, unchanged S0 values and explicit owner decisions.
+The broader reference-measurement and delivery lanes remain as defined below.
+
 1. **Capture baseline**, repair scorer, and pin S0. Preserve the at-risk MASC branch before any
    cleanup. Obtain a clean gate through the infrastructure ticket; a billing block does not stop
    local engineering but cannot count as an executed CI pass.
