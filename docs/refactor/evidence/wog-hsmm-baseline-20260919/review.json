@@ -1,0 +1,30 @@
+{
+  "schema": "wog-hsmm-baseline-review/v1",
+  "reviewer": "/root/cold_plan_review",
+  "evidenceRevision": "b1b91560a9fe31ae429e25603cbc6cacfe70f132",
+  "reproductionFixRevision": "7aff0cba5c8d52e8c1edc4aba2430d402be87f4c",
+  "instrumentedRevision": "f3c6edb41621c43de599ef76f66790ae52b5af1e",
+  "findings": [
+    {
+      "severity": "P2",
+      "issue": "Fresh recapture instructions inherited historical absolute paths and result receipts",
+      "status": "closed",
+      "fixedBy": "7aff0cba5c8d52e8c1edc4aba2430d402be87f4c"
+    }
+  ],
+  "remainingFindings": [],
+  "verified": [
+    "Committed artifact and receipt hashes match retained files/logs",
+    "Three named passing tests per backend and fresh JUnit timestamps",
+    "Instrumentation changes test code only",
+    "Five Native adjacent-bit differences and no structural differences",
+    "Fresh setup uses clean pinned clones and empty output receipts; refuses existing destination"
+  ],
+  "limitations": [
+    "Read-only cold review; no reviewer builds",
+    "Setup recipe executed separately without sbt; finalization recipe inspected and parsed, not executed",
+    "No migration, cross-OS numerical policy, full gate, scientific or CI qualification"
+  ],
+  "recipeSetupReceipt": "recapture-recipe-check.json",
+  "recipeSetupReceiptSha256": "5f040239785d83ec2ec5cecd56686be68fb4d0362779531330efe5f85dd40929"
+}

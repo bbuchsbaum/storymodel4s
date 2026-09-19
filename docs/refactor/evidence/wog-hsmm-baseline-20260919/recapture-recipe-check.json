@@ -1,0 +1,14 @@
+{
+  "scope": "Fresh setup recipe and existing-destination refusal only; no sbt/capture run",
+  "command": [
+    "python3",
+    "/private/tmp/wog-recapture-recipe-check-dq8n5a_3/setup.py",
+    "/private/tmp/storymodel4s-film-hsmm-20260919-ejrihr43/storymodel4s",
+    "/private/tmp/storymodel4s-film-hsmm-20260919-ejrihr43/grakern",
+    "/private/tmp/wog-recapture-recipe-check-dq8n5a_3/attempt"
+  ],
+  "exitCode": 0,
+  "repeatExitCode": 1,
+  "destination": "/private/tmp/wog-recapture-recipe-check-dq8n5a_3/attempt",
+  "finalizationSyntax": "parsed only"
+}
