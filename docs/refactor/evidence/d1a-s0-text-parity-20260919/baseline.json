@@ -1,0 +1,21 @@
+{
+  "productionBaseline": "27ebdb71c33fcdccd97f109b46e30006f3fbcce8",
+  "qualifiedRevision": "051f88f3fc94e72ed484b672937c351cafe3618e",
+  "goldenPath": "pipeline/src/test/resources/golden/d1a-s0-text-parity.json",
+  "goldenSha256": "cc201d9dd3e3576fabcd45677369f00c023ca5a455ea9d9e7ba694700c759fb3",
+  "changedPaths": [
+    ".mote/ops/20260919T212847.617561Z-p35515-c0000-r7b25-hd4150f.json",
+    "docs/plans/2026-09-17-d1a-source-to-story-plan.md",
+    "pipeline/src/test/resources/golden/d1a-s0-text-parity.json",
+    "pipeline/src/test/resources/golden/d1a-s0-text-parity.md",
+    "pipeline/src/test/scala/storymodel4s/pipeline/TextParitySuite.scala"
+  ],
+  "productionChanges": [],
+  "compilationPlatform": "JVM",
+  "crossPlatformModelPin": "codec/src/test/scala/storymodel4s/codec/StoryModelCodecSuite.scala",
+  "acquisition": "existing captured WOG recordings, replay only",
+  "fixedTimeEpochMillis": 1700000000000,
+  "title": null,
+  "features": [],
+  "compatibilityOnly": true
+}

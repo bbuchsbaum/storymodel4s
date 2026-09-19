@@ -1,0 +1,188 @@
+{
+  "codeRevision": "80f80ca26c525b5c4e16bcb78e52bf4e1bda24fd",
+  "mutations": [
+    {
+      "codeRevision": "80f80ca26c525b5c4e16bcb78e52bf4e1bda24fd",
+      "command": [
+        "sbt",
+        "-batch",
+        "pipeline/testOnly storymodel4s.pipeline.TextParitySuite"
+      ],
+      "exitCode": 1,
+      "cleanBefore": false,
+      "cleanAfter": false,
+      "logSha256": "43614aa491e362e2bfdf6cc552311b7714f9ba74c6ebdcb44f4df452a5aecec2",
+      "logBytes": 5854,
+      "logPath": "study/d1a-s0-20260919/fixture-span-offset.log",
+      "testTotals": [
+        "[error] Failed: Total 8, Failed 3, Errors 0, Passed 5"
+      ],
+      "mutation": "fixture-span-offset",
+      "path": "pipeline/src/test/resources/recordings/wog-captured/cc829e1739a5350704b7ac9107ef259172a54e9cc3c6d46b7659c23a1599e1d7.json",
+      "compiled": true,
+      "originalSha256": "80bc1ea6c6dcc45c943dddb813466bdb3de6f8e5df62e526be46eef975c3a150",
+      "mutantSha256": "095941707004d2e2b855d580a5936c9da194f4428b1898e50481d50e1cf3adbd",
+      "namedRejectingTest": "S0 text parity: compile",
+      "acceptingControl": "historical receipts remain a receipt-only record",
+      "acceptingControlPassed": true,
+      "failedTests": [
+        "S0 text parity: compile",
+        "S0 text parity: nodeOrders",
+        "S0 text parity: view"
+      ],
+      "totalTests": 8
+    },
+    {
+      "codeRevision": "80f80ca26c525b5c4e16bcb78e52bf4e1bda24fd",
+      "command": [
+        "sbt",
+        "-batch",
+        "pipeline/testOnly storymodel4s.pipeline.TextParitySuite"
+      ],
+      "exitCode": 1,
+      "cleanBefore": false,
+      "cleanAfter": false,
+      "logSha256": "0a3a15119a6dde003f34768a9bce1b57a571d54ade0bf4025d866a072ef58b3e",
+      "logBytes": 4660,
+      "logPath": "study/d1a-s0-20260919/anchors-null.log",
+      "testTotals": [
+        "[error] Failed: Total 8, Failed 3, Errors 0, Passed 5"
+      ],
+      "mutation": "anchors-null",
+      "path": "codec/src/main/scala/storymodel4s/codec/core.scala",
+      "compiled": true,
+      "originalSha256": "77d31b4f779220282994dedc4a52bdb73fe819f6bb3dcdd0993c6a6f549ee693",
+      "mutantSha256": "da144a68528f7d93e7708638d91048bea8999e67c528a072bb76572873b3dcea",
+      "namedRejectingTest": "S0 text parity: exemplars",
+      "acceptingControl": "historical receipts remain a receipt-only record",
+      "acceptingControlPassed": true,
+      "failedTests": [
+        "S0 text parity: exemplars",
+        "S0 text parity: view",
+        "the full replay remains partial and the writer binds its own model"
+      ],
+      "totalTests": 8
+    },
+    {
+      "codeRevision": "80f80ca26c525b5c4e16bcb78e52bf4e1bda24fd",
+      "command": [
+        "sbt",
+        "-batch",
+        "pipeline/testOnly storymodel4s.pipeline.TextParitySuite"
+      ],
+      "exitCode": 1,
+      "cleanBefore": false,
+      "cleanAfter": false,
+      "logSha256": "5585b30964660e6b1dcf2788dd8458ce243c5862c84b1a182e9180bfab4a3e28",
+      "logBytes": 9691,
+      "logPath": "study/d1a-s0-20260919/text-support-encoding.log",
+      "testTotals": [
+        "[error] Failed: Total 8, Failed 6, Errors 0, Passed 2"
+      ],
+      "mutation": "text-support-encoding",
+      "path": "codec/src/main/scala/storymodel4s/codec/core.scala",
+      "compiled": true,
+      "originalSha256": "77d31b4f779220282994dedc4a52bdb73fe819f6bb3dcdd0993c6a6f549ee693",
+      "mutantSha256": "4b6f8b0185742290ad8ad52d3e93a6fdc1c91bfbf016d8495df6fcf499fc9a72",
+      "namedRejectingTest": "S0 text parity: compile",
+      "acceptingControl": "historical receipts remain a receipt-only record",
+      "acceptingControlPassed": true,
+      "failedTests": [
+        "S0 text parity: compile",
+        "S0 text parity: exemplars",
+        "S0 text parity: nodeOrders",
+        "S0 text parity: view",
+        "the full replay remains partial and the writer binds its own model",
+        "text wire omits anchors and preserves canonical model bytes"
+      ],
+      "totalTests": 8
+    },
+    {
+      "codeRevision": "80f80ca26c525b5c4e16bcb78e52bf4e1bda24fd",
+      "command": [
+        "sbt",
+        "-batch",
+        "pipeline/testOnly storymodel4s.pipeline.TextParitySuite"
+      ],
+      "exitCode": 1,
+      "cleanBefore": false,
+      "cleanAfter": false,
+      "logSha256": "1441256e840eee66fc8435a5c59668e665803f8209b7d8b9728fdb86f8872991",
+      "logBytes": 5969,
+      "logPath": "study/d1a-s0-20260919/source-support-span-rendering.log",
+      "testTotals": [
+        "[error] Failed: Total 8, Failed 2, Errors 0, Passed 6"
+      ],
+      "mutation": "source-support-span-rendering",
+      "path": "document/src/main/scala/storymodel4s/document/compiler.scala",
+      "compiled": true,
+      "originalSha256": "f40d9a89b659c542452d09e1519b91338df943fb37728c55d676bd47da6b749b",
+      "mutantSha256": "947284e4efb3970f3d28ed504fdf7c44d9c14520c19921915af286bafab4899b",
+      "namedRejectingTest": "S0 text parity: exemplars",
+      "acceptingControl": "historical receipts remain a receipt-only record",
+      "acceptingControlPassed": true,
+      "failedTests": [
+        "S0 text parity: compile",
+        "S0 text parity: exemplars"
+      ],
+      "totalTests": 8
+    },
+    {
+      "codeRevision": "051f88f3fc94e72ed484b672937c351cafe3618e",
+      "command": [
+        "sbt",
+        "-batch",
+        "pipeline/testOnly storymodel4s.pipeline.TextParitySuite"
+      ],
+      "exitCode": 1,
+      "cleanBefore": false,
+      "cleanAfter": false,
+      "logSha256": "552977ac2e303af347a72eed7b1542943e832320f783eea9e10c7971a3ea163f",
+      "logBytes": 4628,
+      "logPath": "study/d1a-s0-20260919/anchors-null-wire.log",
+      "testTotals": [
+        "[error] Failed: Total 8, Failed 2, Errors 0, Passed 6"
+      ],
+      "mutation": "anchors-null-wire",
+      "path": "codec/src/main/scala/storymodel4s/codec/story.scala",
+      "compiled": true,
+      "originalSha256": "48eb7d72d8c70097e1cd2dab5dd1feea8bfedf2285d111fa2d18f7b994d2a246",
+      "mutantSha256": "9a4c16dd0527254f2a351267d7b8d06d89787585e06a85f67b4f80d7df2f7e99",
+      "namedRejectingTest": "text wire omits anchors and preserves canonical model bytes",
+      "acceptingControl": "the full replay remains partial and the writer binds its own model",
+      "acceptingControlPassed": true,
+      "totalTests": 8,
+      "failedTests": [
+        "S0 text parity: compile",
+        "text wire omits anchors and preserves canonical model bytes"
+      ]
+    }
+  ],
+  "restoredControl": {
+    "codeRevision": "051f88f3fc94e72ed484b672937c351cafe3618e",
+    "command": [
+      "sbt",
+      "-batch",
+      "pipeline/testOnly storymodel4s.pipeline.TextParitySuite"
+    ],
+    "exitCode": 0,
+    "cleanBefore": true,
+    "cleanAfter": true,
+    "logSha256": "d5aa731b0fab40d568e52b8590e4954a799286ca4f59678c46da4fa6c8a58083",
+    "logBytes": 2099,
+    "logPath": "study/d1a-s0-20260919/wire-restored-control.log",
+    "testTotals": [
+      "[info] Passed: Total 8, Failed 0, Errors 0, Passed 8"
+    ],
+    "aggregateTestCounts": {
+      "Total": 8,
+      "Failed": 0,
+      "Errors": 0,
+      "Passed": 8,
+      "Skipped": 0
+    },
+    "modulePlatformTotals": 1,
+    "skipLines": []
+  },
+  "cleanAfter": true
+}

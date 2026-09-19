@@ -1,0 +1,16 @@
+{
+  "codeRevision": "051f88f3fc94e72ed484b672937c351cafe3618e",
+  "command": [
+    "bash",
+    "tools/reference-scope.sh",
+    "27ebdb71",
+    "051f88f3fc94e72ed484b672937c351cafe3618e"
+  ],
+  "exitCode": 0,
+  "cleanBefore": true,
+  "cleanAfter": true,
+  "logSha256": "f88999030d8d19af8fa13ba76b06e57b7f39f2d299fa2ee4a0d92b7baf4a0015",
+  "logBytes": 450,
+  "logPath": "study/d1a-s0-20260919/scope.log",
+  "testTotals": []
+}

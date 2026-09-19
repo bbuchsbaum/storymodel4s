@@ -1,0 +1,26 @@
+{
+  "codeRevision": "80f80ca26c525b5c4e16bcb78e52bf4e1bda24fd",
+  "command": [
+    "sbt",
+    "-batch",
+    "pipeline/testOnly storymodel4s.pipeline.TextParitySuite"
+  ],
+  "exitCode": 0,
+  "cleanBefore": true,
+  "cleanAfter": true,
+  "logSha256": "8c8446ea7dbe9f1e5bfdac7fe2ee8ad4b597468cbaf2314b8d2f7b283614dc44",
+  "logBytes": 4584,
+  "logPath": "study/d1a-s0-20260919/isolated-control.log",
+  "testTotals": [
+    "[info] Passed: Total 8, Failed 0, Errors 0, Passed 8"
+  ],
+  "aggregateTestCounts": {
+    "Total": 8,
+    "Failed": 0,
+    "Errors": 0,
+    "Passed": 8,
+    "Skipped": 0
+  },
+  "modulePlatformTotals": 1,
+  "skipLines": []
+}

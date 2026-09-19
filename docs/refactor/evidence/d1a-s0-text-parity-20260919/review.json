@@ -1,0 +1,22 @@
+{
+  "reviewedRevision": "80f80ca26c525b5c4e16bcb78e52bf4e1bda24fd",
+  "qualifiedRevision": "051f88f3fc94e72ed484b672937c351cafe3618e",
+  "reviewer": "fresh-context s0_cold_review agent, AGENTS.md SD6",
+  "findings": [
+    {
+      "finding": "HSMM golden suite does not assert its checksum constant or load the JSON golden",
+      "resolution": "Cite codec/StoryModelCodecSuite as the actual cross-platform model pin; describe HSMM checks accurately"
+    },
+    {
+      "finding": "Four node-family order lists are computed by the test; only discourseOrder directly reads a production order API",
+      "resolution": "Label reference lists explicitly; future D1A projection API must consume the same lists"
+    }
+  ],
+  "resolutionRevision": "051f88f3fc94e72ed484b672937c351cafe3618e",
+  "productionChanges": [],
+  "postReviewChangedPaths": [
+    "docs/plans/2026-09-17-d1a-source-to-story-plan.md",
+    "pipeline/src/test/resources/golden/d1a-s0-text-parity.md"
+  ],
+  "hsmmFollowup": "bd-01M1D215EY4T5BR0VRJ694AMBQ"
+}

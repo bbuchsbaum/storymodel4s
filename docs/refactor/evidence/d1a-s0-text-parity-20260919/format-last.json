@@ -1,0 +1,16 @@
+{
+  "codeRevision": "051f88f3fc94e72ed484b672937c351cafe3618e",
+  "command": [
+    "sbt",
+    "-batch",
+    "scalafmtCheckAll",
+    "scalafmtSbtCheck"
+  ],
+  "exitCode": 0,
+  "cleanBefore": true,
+  "cleanAfter": true,
+  "logSha256": "6fb176b72424cb3db63d0d29c01b5928c59a6482472e44a927f0973d382fe728",
+  "logBytes": 13019,
+  "logPath": "study/d1a-s0-20260919/format-last.log",
+  "testTotals": []
+}

@@ -8,12 +8,13 @@ The 30 consultant TA keys are crosswalk references, not another set of tickets. 
 
 ## What to do first
 
-One implementation slice at a time. Baseline capture, scorer repair and production clock integration are complete. **S0 text parity pins are next.** At-risk branch preservation remains independent foundation work. The account/runner decision blocks CI execution, not local engineering.
+One implementation slice at a time. Baseline capture, scorer repair, production clock integration and S0 text parity pins are complete. **S1's ADR amendment is next on the D1A track.** At-risk branch preservation remains independent foundation work. The account/runner decision blocks CI execution, not local engineering.
 
 - Completed `bd-01M2WVCEBHAZBKJQ0EB84EA4HV` — [frozen mapping baseline](evidence/sherlock-baseline-20260919/README.md)
 - Completed `bd-01M2TA5FB4ATF9QS9ZA9MDJNE2` — [unit manifest and fail-closed scorer](evidence/sherlock-scorer-20260919/README.md)
 - Completed `bd-01M2WTGF981AY7RCN8QC42JSPT` — [production ClockRepair integration](evidence/sherlock-clock-repair-20260919/README.md)
-- `bd-01M2TAB3QD2YXSPR8THYRGFBKS` — [foundation] D1A-types S0: text parity baseline (compile, codec, view pins)
+- Completed `bd-01M2TAB3QD2YXSPR8THYRGFBKS` — [S0 text parity pins](evidence/d1a-s0-text-parity-20260919/README.md)
+- Next `bd-01M2TABFW72D8WWQF481SD37KW` — D1A-types S1: ADR 0007 amendment (rulings, vocabulary, canonical form, identity)
 - `bd-01M2TA2EMFCWRKXK6QJHGV702Q` — [foundation] Phase 0: rescue the only copy of audit/masc-role-corpus (b756b4bb) into the main repo
 - `bd-01M19G69RQCHMT2EMG11XFT4WX` — G0: obtain an executed exact-SHA clean build and CI receipt
 

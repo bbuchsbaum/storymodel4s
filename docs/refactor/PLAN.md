@@ -197,8 +197,13 @@ zero-based ordinals and the adjacent-pair count). No units were dropped to match
 The [production ClockRepair integration](evidence/sherlock-clock-repair-20260919/README.md)
 is complete: every annotation bound uses the checked map, each row carries a repair receipt,
 and two development replays preserve all five legacy artifacts and all 1,000 coordinates.
-Seven compiled refusal mutations and the clean full gate passed. The next sequential slice
-is **S0 text parity pins** (`bd-01M2TAB3QD2YXSPR8THYRGFBKS`). G0 as a whole remains open;
+Seven compiled refusal mutations and the clean full gate passed.
+The [S0 text parity pins](evidence/d1a-s0-text-parity-20260919/README.md) are also complete:
+the captured WOG compile, model/derivation bytes, renderings, node orders, Atlas textual twin
+and historical receipts are frozen. Five compiled mutations cover the four required changes;
+the clean full gate reports 6,444 passed executions and 5 skips across all 56 test tasks.
+The next sequential D1A slice is **S1's ADR amendment** (`bd-01M2TABFW72D8WWQF481SD37KW`).
+G0 as a whole remains open for infrastructure and independent preservation work;
 these engineering gates establish no accuracy or measurement-validity claim.
 
 1. **Capture baseline**, repair scorer, and pin S0. Preserve the at-risk MASC branch before any

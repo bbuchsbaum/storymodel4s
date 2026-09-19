@@ -119,7 +119,7 @@ Each of these was verified by hand or by at least two independent reads.
   `discoursePosition` are public (`graph.scala:21-29`).
 
 **Tests**
-- **No golden pins compiler output.** The War of the Ghosts compile suites live in `pipeline`,
+- **Before S0, no golden pinned compiler output.** The War of the Ghosts compile suites live in `pipeline`,
   which runs on the JVM only. `runs/2026-09-02-wog-record-1/` holds only
   `compilation-report.json` and `receipts.json`. The model checksum golden lives in
   `codec/StoryModelCodecSuite`; `fixtures/WarOfTheGhostsCodecGoldenSuite` separately checks
@@ -299,6 +299,10 @@ mechanically. Scoring does not change.
 Every slice lands on `main` on its own green gate (§5). The values S0 pins must stay identical.
 
 ### S0 — Text parity baseline (test-only; S)
+
+Completed 19 September 2026 at `051f88f3`: [frozen pins, mutation witnesses, cold review and
+clean full-gate receipt](../refactor/evidence/d1a-s0-text-parity-20260919/README.md).
+Later slices must leave the frozen values unchanged.
 
 **What it pins, on the JVM in `pipeline`:**
 - for the War of the Ghosts compile: the fingerprint, the `candidateSet` hex,
@@ -493,7 +497,8 @@ compiler, or additive:
 ## 8. Non-claims
 
 - **Counts** come from four surveys and three cold reviews. They are good to about ±10%.
-- **Byte-identical text output** is intent until S0 exists and holds. Compile parity is JVM-only.
+- **Byte-identical text output** now has the S0 witness above. Every later slice must retain
+  those pins. Compile parity is JVM-only; cross-platform model encoding has its separate court.
 - **The split is additive only under decisions D1 and D2.** Under the in-bundle alternative it is
   not, and §2.1 and §2.2 would change.
 - **Revision 4 has not been cold-reviewed.** Review it before S2. S0 and S1 carry no design risk
