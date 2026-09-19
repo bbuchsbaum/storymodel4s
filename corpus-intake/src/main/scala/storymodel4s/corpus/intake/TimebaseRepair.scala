@@ -630,7 +630,8 @@ object TimebaseRepair:
     )
 
   /** Bind the record's external axis names to actual bundle axes, after checking their identities.
-    * Production uses these repairs for every row; the receipt includes the exact record byte digest.
+    * Production uses these repairs for every row; the receipt includes the exact record byte
+    * digest.
     */
   def clockRepairs(
       record: Record,
