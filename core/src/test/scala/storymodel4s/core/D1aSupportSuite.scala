@@ -529,10 +529,14 @@ class D1aSupportSuite extends FunSuite:
 
   test("equivalent mapping order has identical identity and support admission"):
     val raw = withExtra(extra())
-    val a = CompositionSegment.of(iv(native, 0L, 4L), iv(raw, 20L, 24L),
-      OccurrenceId.unsafe("a")).toOption.get
-    val b = CompositionSegment.of(iv(native, 5L, 10L), iv(raw, 30L, 35L),
-      OccurrenceId.unsafe("b")).toOption.get
+    val a = CompositionSegment
+      .of(iv(native, 0L, 4L), iv(raw, 20L, 24L), OccurrenceId.unsafe("a"))
+      .toOption
+      .get
+    val b = CompositionSegment
+      .of(iv(native, 5L, 10L), iv(raw, 30L, 35L), OccurrenceId.unsafe("b"))
+      .toOption
+      .get
     def composition(segments: Vector[CompositionSegment]): TrackComposition =
       TrackComposition.of(native.primaryAxis.id, raw.primaryAxis.id, segments, receipt).toOption.get
     val forward = composition(Vector(a, b))

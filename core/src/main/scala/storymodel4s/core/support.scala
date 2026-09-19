@@ -74,13 +74,15 @@ private[core] object SourceSupportChecks:
     else if axis != bundle.primaryAxis.id then
       invalid("stream-axis", "anchor axis does not belong to the selected stream")
     else
-      val maps = bundle.mappings.filter {
-        case repair: ClockRepair =>
-          repair.relation.sourceAxis == stream.nativeAxis && repair.relation.targetAxis == axis
-        case composition: TrackComposition =>
-          composition.relation.sourceAxis == stream.nativeAxis && composition.relation.targetAxis == axis
-        case _: EditionCorrespondence => false
-      }.distinctBy(_.identity)
+      val maps = bundle.mappings
+        .filter {
+          case repair: ClockRepair =>
+            repair.relation.sourceAxis == stream.nativeAxis && repair.relation.targetAxis == axis
+          case composition: TrackComposition =>
+            composition.relation.sourceAxis == stream.nativeAxis && composition.relation.targetAxis == axis
+          case _: EditionCorrespondence => false
+        }
+        .distinctBy(_.identity)
       maps match
         case Vector(mapping) =>
           bundle.primaryAxis.extent match
