@@ -778,7 +778,7 @@ does not assign that license.
   surfaces absent from, or duplicated in, the bound proposal surface.
 - `BoundProposalSurface` derives a checksum over source identity/canonical bytes and canonical
   unit structure (ID, kind, span, ordinal, tagged parent), and an association identity binding
-  that checksum, the canonical source checksum and the supplied `SourceDerivationReceipt`.
+  that checksum, the canonical source checksum and the supplied `SourceDerivationReceipt.bindingIdentity`.
   Free-form fields are hashed before joining. The receipt records inputs, so this association
   is not independent output attestation. A proposal unit's optional `SurfaceUnitId` names a
   sentence of that one surface. The bound derivation never becomes canonical source text.
@@ -821,7 +821,11 @@ values for text and non-text models. A bundle ID alone is insufficient: two bund
 its truncated ID while differing in axis extent or timebase. The full bundle identity includes
 all stream coordinate metadata, the primary-axis fingerprint, ordered authority tracks and
 sorted `CheckedMapping.identity` values. Full mapping identity includes family, axes, exact
-rational or occurrence/interval/pair payload and receipt identity. The courts distinguish
+rational or occurrence/interval/pair payload and safe receipt binding identity. The additive
+`SourceDerivationReceipt.bindingIdentity` hashes algorithm and parameters separately with ordered
+input checksums under its own domain, preserving historical `receipt.identity`. A paired NUL-in-
+algorithm versus NUL-in-parameters witness must distinguish the collision in the legacy join.
+The courts distinguish
 changed mapping parameters with unchanged relation IDs, changed secondary-stream coordinates,
 changed primary extent/timebase, and changed proposal content or associated receipt.
 
@@ -877,7 +881,10 @@ The pre-S2 revision-4 cold review on 2026-09-19 required these construction and 
 corrections; [revision 5 of the plan](../plans/2026-09-17-d1a-source-to-story-plan.md) records the
 complete stream-kind/anchor compatibility table, native-or-explicitly-mapped axis rule, exact
 temporary refusals and witnesses. `DerivedClock` and `Custom` receive no implicit support
-capability. `AnnotationTimeline` stays on the existing annotation-preview path. Admitted
+capability. A mapped anchor must lie wholly in the mapping image: composition preserves target
+gaps and validates source segments against the selected stream; ClockRepair maps exact native
+seconds (ticks times rational timebase) through its scale/offset with no rounding.
+`AnnotationTimeline` stays on the existing annotation-preview path. Admitted
 Sherlock row 13 is an instant; D1B must add an explicit point-capable projection before claiming
 to carry that source inventory. It cannot substitute a fabricated positive interval.
 

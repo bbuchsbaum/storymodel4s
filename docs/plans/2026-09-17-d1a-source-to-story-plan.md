@@ -147,7 +147,7 @@ Each of these was verified by hand or by at least two independent reads.
 binds the source's identity and canonical bytes plus every unit's ID, kind, span, ordinal and
 explicitly tagged parent absence/presence, in canonical unit order. Free-form fields are hashed
 before joining so separators cannot alias two records. The association identity binds this
-digest, the canonical source checksum and the receipt identity. No caller-supplied digest is
+digest, the canonical source checksum and the receipt's safe `bindingIdentity`. No caller-supplied digest is
 trusted. This is a recorded association: the input-only receipt cannot independently attest
 that it produced those output bytes. It never converts to canonical text. Same text with
 different unit structure, and the same surface with a different receipt, must differ.
@@ -172,7 +172,11 @@ Its full digest binds the edition, source kind, every stream's ID/kind/checksum/
 extent, timebase and derivation parents, the full primary-axis fingerprint, ordered authority
 tracks and sorted full `CheckedMapping.identity` values. Option and enum cases are tagged.
 Each mapping identity binds family, axes, exact rational parameters or complete occurrence/
-interval/pair payload, and receipt identity. A relation ID names only a mapping's family and
+interval/pair payload, and receipt `bindingIdentity`. `SourceDerivationReceipt.bindingIdentity`
+is additive: it hashes algorithm and parameter fields separately, plus ordered input checksums,
+under an explicit domain. Historical `receipt.identity` stays unchanged. The legacy NUL-joined
+preimage aliases algorithm/parameter pairs `("a\\u0000b", "c")` and `("a", "b\\u0000c")`;
+the new identity must distinguish their actual embedded-NUL strings. A relation ID names only a mapping's family and
 endpoints; using it as the mapping's content identity is rejected because a different repair
 offset or composition can share it. The new identity courts include those pairs and changes
 to a non-primary stream's coordinate metadata.
@@ -405,8 +409,14 @@ S1 records:
   stream's native axis, or the primary axis reached from that native axis by an explicit
   ClockRepair/TrackComposition in the bundle. EditionCorrespondence is not a coordinate cast.
   Native-axis bounds use that stream's extent; mapped primary-axis bounds use the primary extent.
+  A mapped anchor must also be fully covered by the chosen mapping's image. Composition source
+  segments must lie within the selected stream extent; their target union preserves gaps.
+  ClockRepair's source coordinate is exact run-local seconds: convert native extent ticks using
+  its rational timebase, then apply its exact scale/offset. Compare image bounds without rounding.
+  No matching-endpoint map licenses coordinates in an unmapped gap or outside its image.
   Bundle-wide axis membership alone is insufficient. Test a right-bundle/wrong-stream axis pair
-  and two textual streams; neither may borrow the other's support or extent.
+  and two textual streams; neither may borrow the other's support or extent. Include out-of-image,
+  gap-crossing, partial-coverage and foreign source-segment refusals with mapped accepting controls.
 - **Per-stream `textSpans`.** Intervals on one axis that overlap or abut merge into one
   canonical form. `intervalsOn(axis)` returns it, under a law that the merge is idempotent and
   independent of order.
