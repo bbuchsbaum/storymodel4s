@@ -773,11 +773,15 @@ does not assign that license.
 
 - `NarrativeSourceAtlas` becomes sealed, with final `TextNarrativeAtlas` and
   `AnchoredNarrativeAtlas` implementations. `surfaceAtlas` leaves the general trait.
-  `AnchoredNarrativeAtlas.of` checks bundle membership, refuses a text-character primary axis,
-  and refuses unit surfaces absent from, or duplicated in, the bound proposal surface.
-- `BoundProposalSurface` binds one checked `SurfaceAtlas`, its checksum and the
-  `SourceDerivationReceipt` of its production. A proposal unit's optional `SurfaceUnitId` names
-  a sentence of that one surface. The bound derivation never becomes canonical source text.
+  `AnchoredNarrativeAtlas.of` checks bundle membership, admits only an `EditionPlayback` primary
+  axis in this slice, refuses duplicate proposal-unit IDs before map lookup, and refuses unit
+  surfaces absent from, or duplicated in, the bound proposal surface.
+- `BoundProposalSurface` derives a checksum over source identity/canonical bytes and canonical
+  unit structure (ID, kind, span, ordinal, tagged parent), and an association identity binding
+  that checksum, the canonical source checksum and the supplied `SourceDerivationReceipt`.
+  Free-form fields are hashed before joining. The receipt records inputs, so this association
+  is not independent output attestation. A proposal unit's optional `SurfaceUnitId` names a
+  sentence of that one surface. The bound derivation never becomes canonical source text.
 - `TypedSupport` is the core sum `Text(SpanSet)` or `Anchored(EvidenceSupport)`; acquire can
   consume it without depending on story. `Evidence.anchors: Option[EvidenceSupport]` defaults
   to absence; existing text evidence bytes retain their omitted-anchor form.
@@ -797,8 +801,10 @@ does not assign that license.
 
 #### Canonical form, identity and projection
 
-A `TextCharacter` primary axis requires `TypedSupport.Text`; any other primary axis requires
-`TypedSupport.Anchored`. Text-primary models cannot carry evidence anchors. The canonical
+A `TextCharacter` primary axis requires `TypedSupport.Text`; the admitted non-text primary kind
+`EditionPlayback` requires `TypedSupport.Anchored`. Other primary kinds are refused by the
+anchored atlas in this slice. Text-primary models cannot carry evidence anchors; film evidence
+cannot carry bare spans. Upstream-only evidence may carry neither. The canonical
 form must be checked wherever evidence meets a bundle: the atlas constructor, compiler-input
 construction (including inline evidence and ledger evidence), and model draft construction.
 `StoryModel.draft` becomes fallible and its internal copy path uses the same checks. The full
@@ -807,17 +813,23 @@ canonical form and bundle membership; anchored node support must project to the 
 Span extent remains a validator law, preserving drafts that carry text-bound violations.
 
 Text identity remains the source's existing story ID (including an explicitly supplied ID)
-and canonical checksum. Non-text identity is derived from the domain `story-anchored`, bundle
-ID, primary-axis ID, sorted mapping IDs and bound-surface checksum or the absence marker `-`.
+and canonical checksum. Non-text identity is derived from the domain `story-anchored`, full
+`SourceBundle.identity` and explicitly tagged bound-surface association identity or absence.
 The story ID uses `ContentAddress.of`; the receipt source checksum uses the full untruncated
 SHA-256 of the same identity input. `draft` checks both receipt fields against the atlas-derived
 values for text and non-text models. A bundle ID alone is insufficient: two bundles can share
-its truncated ID while differing in axis extent or timebase. The identity courts must
-distinguish that pair and two proposal-surface checksums.
+its truncated ID while differing in axis extent or timebase. The full bundle identity includes
+all stream coordinate metadata, the primary-axis fingerprint, ordered authority tracks and
+sorted `CheckedMapping.identity` values. Full mapping identity includes family, axes, exact
+rational or occurrence/interval/pair payload and receipt identity. The courts distinguish
+changed mapping parameters with unchanged relation IDs, changed secondary-stream coordinates,
+changed primary extent/timebase, and changed proposal content or associated receipt.
 
 Ordering uses projection start, end, then node ID. For text it must preserve the existing
 `minSpan` ordering pinned by S0. Discourse order and position live on the model, which owns the
-bundle; graph-only versions become internal. `AlignmentSource` becomes sealed: the general
+bundle; unbound graph-only versions become internal. Checked
+`NarrativeGraph.discourseOrderOn(bundle)` shares the projection implementation for the compiler's
+pre-model trajectory construction. `AlignmentSource` becomes sealed: the general
 source exposes evidence and primary projection, while its text-specific construction retains
 text `sourceSupport` for `StorySourceView`. D1A changes no alignment scoring behavior.
 
@@ -831,8 +843,13 @@ errors, and each anchor case has an encode/typed-refusal court. The unversioned 
 claims carrier can encode anchored evidence but cannot promise its round trip under those
 decoders.
 
-The model schema remains 0.7.0. Model encoding requires `TextModel`, whose canonical form
-contains no anchors, so no model artifact can acquire the new anchored sub-shape. Its absence
+The model schema remains 0.7.0. At S4b model encoding requires `TextModel`, whose canonical form
+contains no anchors. S2 first installs temporary anchor refusals in every existing text-model
+construction path, including boundary evidence, and in text compiler-input inline/ledger joins.
+The still-total model constructor throws `IllegalArgumentException` for this newly expressible
+invalid input until S4a replaces the refusal with `Either`. Anchored component decoding is
+explicitly refused. A guard-removal mutation must demonstrate the export boundary, so no
+intermediate landed model can acquire the new anchored sub-shape. Its absence
 is unambiguous and text bytes stay unchanged. This differs from the 0.6.0 → 0.7.0 transition,
 which began writing a new field into model artifacts. Model, derivation and claims round-trip
 laws are explicitly text-only; V1 must version a film artifact when it first writes one.
@@ -852,6 +869,17 @@ Rejected alternatives are recorded before implementation:
 - Multiple independent bundles inside one model weaken the single-source join; checked
   composition supplies one bundle for multipart film. Composition is not implemented by this
   amendment.
+- Hashing only `MappingRelation.id` is rejected: it binds family and endpoints, so distinct
+  scales, offsets, composition segments or occurrence correspondences can share it. Full checked
+  mapping content and receipts participate in non-text model identity.
+
+The pre-S2 revision-4 cold review on 2026-09-19 required these construction and staging
+corrections; [revision 5 of the plan](../plans/2026-09-17-d1a-source-to-story-plan.md) records the
+complete stream-kind/anchor compatibility table, native-or-explicitly-mapped axis rule, exact
+temporary refusals and witnesses. `DerivedClock` and `Custom` receive no implicit support
+capability. `AnnotationTimeline` stays on the existing annotation-preview path. Admitted
+Sherlock row 13 is an instant; D1B must add an explicit point-capable projection before claiming
+to carry that source inventory. It cannot substitute a fabricated positive interval.
 
 This is a design and compatibility record. It adds no production capability, establishes no
 new scientific validity, and does not claim executed CI or film compiler completion.
