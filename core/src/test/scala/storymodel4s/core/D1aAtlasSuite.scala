@@ -134,8 +134,10 @@ class D1aAtlasSuite extends FunSuite:
       .of(SurfaceAtlas.of(surface.source, Vector(parent, value)).toOption.get, receipt)
       .checksum
     val baseline = digest(child)
-    assertNotEquals(baseline, digest(child.copy(id = SurfaceUnitId.unsafe("renamed"))))
+    // Keep the unit before "parent" in canonical order, so ordering cannot mask an omitted ID.
+    assertNotEquals(baseline, digest(child.copy(id = SurfaceUnitId.unsafe("child-renamed"))))
     assertNotEquals(baseline, digest(child.copy(kind = SurfaceUnitKind.Sentence)))
     assertNotEquals(baseline, digest(child.copy(span = TextSpan.unsafe(1, 3))))
+    assertNotEquals(baseline, digest(child.copy(span = TextSpan.unsafe(0, 4))))
     assertNotEquals(baseline, digest(child.copy(ordinal = 1)))
     assertNotEquals(baseline, digest(child.copy(parent = Some(parent.id))))

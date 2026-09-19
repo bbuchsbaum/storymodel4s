@@ -1,0 +1,23 @@
+{
+  "baseRevision": "75c8df52",
+  "reviewedRevision": "10179ddf",
+  "repairRevision": "03eabf4a",
+  "formattedCandidateRevision": "fef98b53",
+  "reviewer": "/root/s0_cold_review, separate non-author SD6 review",
+  "findings": [
+    {
+      "issue": "SurfaceAtlasConformance.bundleOf was accidentally relocated into AnchoredNarrativeAtlas",
+      "resolution": "Restored the original public path and signature; added a positive external type-check probe"
+    },
+    {
+      "issue": "Applicable mapping deduplication used order-sensitive equality while full mapping identity canonicalizes composition segment order",
+      "resolution": "Deduplicate by full mapping identity; test two equivalent reordered compositions with equal bundle identity and equal admission, retaining genuinely different-map ambiguity refusal"
+    },
+    {
+      "issue": "The MediaTime axis-mismatch fixture also failed the stream-axis guard, masking removal of the claimed equality guard",
+      "resolution": "Use the valid explicit native axis with foreign-axis intervals in both example and law; retain an axis-matching accepting control"
+    }
+  ],
+  "recheck": "All three findings resolved in committed source at 03eabf4a; no new findings. Whitespace check passed. fef98b53 applies formatting only.",
+  "qualification": "Source and test-design review. Executed mutation and gate results are recorded separately; the reviewer did not run sbt."
+}
