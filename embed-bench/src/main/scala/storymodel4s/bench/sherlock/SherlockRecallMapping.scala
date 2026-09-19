@@ -5,8 +5,9 @@ import java.nio.file.{Files, Paths}
 import java.time.LocalDate
 
 import io.circe.parser.parse as parseJson
+import io.circe.Json
 
-import storymodel4s.corpus.intake.SherlockAnnotations
+import storymodel4s.corpus.intake.{SherlockAnnotations, TimebaseRepair}
 import storymodel4s.corpus.intake.SherlockAnnotations.Atlas
 import storymodel4s.bench.video.{
   MediaLocus,
@@ -18,7 +19,8 @@ import storymodel4s.bench.video.{
   WorldOrderRefusal,
   WorldOrderWitness
 }
-import storymodel4s.core.PresentationAxis
+import storymodel4s.core.{Checksum, ExactRational, PresentationAxis}
+import storymodel4s.align.ViewFingerprint
 import storymodel4s.recall.Lexical
 
 /** Sherlock adapter for the general recall-to-video pipeline: the checked annotation atlas becomes
@@ -192,6 +194,68 @@ object SherlockAnnotationView:
       atlas.manifest.partB.partId -> atlas.partBBundle.primaryAxis
     )
 
+  /** Content-free provenance kept separate so coordinate integration does not rewrite the mapping
+    * report. Every admitted annotation row, including unselected rows and instants, cites a repair.
+    */
+  private[bench] def clockProvenance(
+      atlas: Atlas,
+      built: TimedSourceView.Built,
+      report: Checksum
+  ): Json =
+    def rational(value: ExactRational): Json = Json.obj(
+      "numerator" -> Json.fromString(value.numerator.toString),
+      "denominator" -> Json.fromString(value.denominator.toString)
+    )
+    val record = atlas.repairRecord
+    Json.obj(
+      "schema" -> Json.fromString("storymodel4s.bench.clock-repair"),
+      "schemaVersion" -> Json.fromInt(1),
+      "reportSha256" -> Json.fromString(report.hex),
+      "sourceFingerprint" -> Json.fromString(ViewFingerprint.of(built.view).toString),
+      "recordSchema" -> Json.fromString(TimebaseRepair.Schema),
+      "recordSchemaVersion" -> Json.fromInt(TimebaseRepair.SchemaVersion),
+      "recordSha256" -> Json.fromString(record.checksum.hex),
+      "recordIdentityBasis" -> Json.fromString("observed-local-root-bytes"),
+      "annotationSha256" -> Json.fromString(record.annotationSha256.hex),
+      "certifies" -> Json.fromString(record.certifies),
+      "doesNotCertify" -> Json.fromString(record.doesNotCertify),
+      "whyNotRepaired" -> Json.fromString(record.whyNotRepaired),
+      "explicitlyNotUsed" -> Json.fromString(record.explicitlyNotUsed),
+      "notebookProvenanceStatus" -> Json.fromString(record.notebookProvenanceStatus),
+      "scientificRestrictions" -> Json.obj(record.scientificRestrictions.toVector.sortBy(_._1).map {
+        (key, values) => key -> Json.arr(values.map(Json.fromString)*)
+      }*),
+      "nonEquivalences" -> Json.arr(record.nonEquivalences.map(Json.fromString)*),
+      "repairs" -> Json.arr(record.runs.map { run =>
+        val repair = atlas.repairsByRun(run.runId)
+        Json.obj(
+          "run" -> Json.fromString(run.runId),
+          "part" -> Json.fromString(run.partId),
+          "declaredTargetAxis" -> Json.fromString(run.axisId),
+          "sourceAxis" -> Json.fromString(repair.relation.sourceAxis.value),
+          "targetAxis" -> Json.fromString(repair.relation.targetAxis.value),
+          "scale" -> rational(repair.scale),
+          "offset" -> rational(repair.offset),
+          "receiptId" -> Json.fromString(repair.receipt.identity.hex),
+          "algorithm" -> Json.fromString(repair.receipt.algorithm),
+          "parameters" -> Json.fromString(repair.receipt.parameters),
+          "inputChecksums" -> Json.arr(
+            repair.receipt.inputChecksums.map(c => Json.fromString(c.hex))*
+          )
+        )
+      }*),
+      "rows" -> Json.arr(atlas.rows.map { row =>
+        val locus = atlas.mediaByRow(row.row)
+        Json.obj(
+          "row" -> Json.fromInt(row.row),
+          "receiptId" -> Json.fromString(atlas.repairByRow(row.row).receipt.identity.hex),
+          "part" -> Json.fromString(locus.part),
+          "startTick" -> Json.fromString(locus.startTick.toString),
+          "endTick" -> Json.fromString(locus.endTick.toString)
+        )
+      }*)
+    )
+
   /** The world clock this edition is built under (ADR 0013). A Study in Pink is read as presented:
     * the 50-scene annotation follows the broadcast cut and this declaration treats that cut as
     * story-world order. That is a claim with known exceptions, recorded in the basis rather than
@@ -232,8 +296,11 @@ object SherlockAnnotationView:
   */
 @main def sherlockRecallMap(annotationTsv: String, recallCsv: String, outPath: String): Unit =
   val bytes = Files.readAllBytes(Paths.get(annotationTsv))
+  val record = TimebaseRepair
+    .loadCommitted()
+    .fold(e => throw new IllegalArgumentException(e.message), identity)
   val atlas = SherlockAnnotations
-    .parse(bytes)
+    .parse(bytes, record)
     .fold(e => throw new IllegalArgumentException(e.message), identity)
   val built = SherlockAnnotationView
     .build(atlas)
@@ -266,4 +333,14 @@ object SherlockAnnotationView:
     "sherlock-recall",
     Paths.get(outPath),
     coding
+  )
+  val provenance = SherlockAnnotationView.clockProvenance(
+    atlas,
+    built,
+    Checksum.ofBytes(Files.readAllBytes(Paths.get(outPath)))
+  )
+  val _ = Files.writeString(
+    Paths.get(outPath + ".clock-repair.json"),
+    provenance.spaces2 + "\n",
+    StandardCharsets.UTF_8
   )

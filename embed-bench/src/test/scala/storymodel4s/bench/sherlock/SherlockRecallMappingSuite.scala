@@ -4,8 +4,7 @@ import java.nio.charset.StandardCharsets
 import java.nio.file.Paths
 
 import munit.FunSuite
-import storymodel4s.corpus.intake.SherlockAnnotations
-import storymodel4s.corpus.intake.SherlockAnnotations.{MediaManifest, PartIdentity}
+import storymodel4s.corpus.intake.{SherlockAnnotations, TimebaseRepair}
 import storymodel4s.align.*
 import storymodel4s.bench.video.{
   MediaLocus,
@@ -42,16 +41,18 @@ class SherlockRecallMappingSuite extends FunSuite:
 
   private def atlas: SherlockAnnotations.Atlas =
     val bytes = (header +: fixtureRows).mkString("\n").getBytes(StandardCharsets.UTF_8)
-    val manifest = MediaManifest(
-      annotationSha256 = Checksum.ofBytes(bytes),
-      partA = PartIdentity("media-part-a", 1, Checksum.ofText("synthetic-a"), 76000L, 2500L),
-      partB = PartIdentity("media-part-b", 2, Checksum.ofText("synthetic-b"), 30000L, 2500L),
-      totalRows = 6,
-      run1EndRow = 4
-    )
-    SherlockAnnotations
-      .parse(bytes, manifest)
-      .fold(e => throw new IllegalStateException(e.message), identity)
+    val relative = "corpus-intake/src/test/resources/sherlock-synthetic-repair.json"
+    val path =
+      if java.nio.file.Files.exists(Paths.get(relative)) then Paths.get(relative)
+      else Paths.get("..", relative)
+    // Preserve the previously frozen synthetic source/edition identities.
+    val json = java.nio.file.Files
+      .readString(path)
+      .replace("0" * 64, Checksum.ofBytes(bytes).hex)
+      .replace(Checksum.ofText("synthetic-part-a").hex, Checksum.ofText("synthetic-a").hex)
+      .replace(Checksum.ofText("synthetic-part-b").hex, Checksum.ofText("synthetic-b").hex)
+    val record = TimebaseRepair.parse(json).fold(e => fail(e.message), identity)
+    SherlockAnnotations.parse(bytes, record).fold(e => fail(e.message), identity)
 
   private def refOfRow(built: TimedSourceView.Built, row: Int): SourceNodeRef =
     built.segmentByRef.collectFirst { case (r, s) if s.ordinal == row => r }.get
@@ -64,6 +65,37 @@ class SherlockRecallMappingSuite extends FunSuite:
     */
   private val fingerprintBeforeDeclaration =
     "0ffa14649aff8382f718478d89a84496d9de5d89d5e72f188acc3320b8fb2c54"
+
+  test("clock provenance covers all rows and binds the record report and actual axes") {
+    val a = atlas
+    val report = Checksum.ofText("synthetic report")
+    val json = SherlockAnnotationView.clockProvenance(a, view(a), report)
+    val c = json.hcursor
+    assertEquals(c.get[String]("reportSha256"), Right(report.hex))
+    assertEquals(c.get[String]("recordSha256"), Right(a.repairRecord.checksum.hex))
+    assertEquals(c.get[String]("sourceFingerprint"), Right(fingerprintBeforeDeclaration))
+    assertEquals(c.get[String]("notebookProvenanceStatus"), Right("declared-unverified"))
+    val repairs = c.get[Vector[io.circe.Json]]("repairs").toOption.get
+    assertEquals(
+      repairs.map(_.hcursor.get[String]("targetAxis").toOption.get),
+      Vector(a.partABundle.primaryAxis.id.value, a.partBBundle.primaryAxis.id.value)
+    )
+    val rows = c.get[Vector[io.circe.Json]]("rows").toOption.get
+    assertEquals(rows.map(_.hcursor.get[Int]("row").toOption.get), (1 to 6).toVector)
+    rows.zipWithIndex.foreach { (row, i) =>
+      val number = i + 1
+      assertEquals(
+        row.hcursor.get[String]("receiptId"),
+        Right(a.repairByRow(number).receipt.identity.hex)
+      )
+      assertEquals(
+        row.hcursor.get[String]("startTick"),
+        Right(a.mediaByRow(number).startTick.toString)
+      )
+      assertEquals(row.hcursor.get[String]("endTick"), Right(a.mediaByRow(number).endTick.toString))
+    }
+    assert(a.rows.forall(r => !json.noSpaces.contains(r.description)))
+  }
 
   test("the bridge exposes every microsegment and scene exactly once, with resolvable supports") {
     val built = view(atlas)

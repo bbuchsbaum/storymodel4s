@@ -1,0 +1,393 @@
+{
+  "schema": "storymodel4s.sherlock.timebase-repair",
+  "schemaVersion": 2,
+  "artifactId": "synthetic-clock-repair-test",
+  "inputAnnotation": {
+    "artifactId": "synthetic-six-row-table",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "sourceDerivation": {
+    "repository": "synthetic-test-no-upstream-repository",
+    "commit": "1111111111111111111111111111111111111111",
+    "repositoryPath": "synthetic-test-no-notebook",
+    "gitBlob": "2222222222222222222222222222222222222222",
+    "byteLength": 1,
+    "sha256": "2d711642b726b04401627ca9fbac32f5c8530fb1903cc4db02258717921a4881",
+    "publishedOperation": "Synthetic replay: remove row 4 and offset run 2 by 20 seconds. No upstream notebook is authenticated."
+  },
+  "coordinateSystems": [
+    {
+      "id": "media-part-local-seconds",
+      "kind": "container-presentation-time",
+      "parts": [
+        {
+          "partId": "media-part-a",
+          "startSeconds": 0.0,
+          "endSeconds": 30.4
+        },
+        {
+          "partId": "media-part-b",
+          "startSeconds": 0.0,
+          "endSeconds": 12.0
+        }
+      ],
+      "experimentalEditionBinding": "owner-declared-and-byte-identified",
+      "experimentalEditionReceipt": "presentation-edition-identity-v1"
+    },
+    {
+      "id": "annotation-run-local-seconds",
+      "kind": "coder-table-interval",
+      "runs": [
+        {
+          "runId": "run-1",
+          "ordinaryRows": "1-3",
+          "ordinaryStartSeconds": 0,
+          "ordinaryEndSeconds": 20,
+          "scanBreakRows": [
+            4
+          ],
+          "rawEndIncludingScanBreakSeconds": 30
+        },
+        {
+          "runId": "run-2",
+          "rows": "5-6",
+          "startSeconds": 0,
+          "endSeconds": 12
+        }
+      ]
+    },
+    {
+      "id": "scanner-tr",
+      "kind": "scanner-index",
+      "secondsPerTr": 1.5,
+      "minimumTr": 1,
+      "maximumTr": 29,
+      "rowsWithMissingBounds": [
+        4
+      ],
+      "missingBoundsImputed": false
+    },
+    {
+      "id": "topic-notebook-repaired-seconds",
+      "kind": "derived-analysis-time",
+      "startSeconds": 0,
+      "endSeconds": 32,
+      "rowCount": 5,
+      "derivationReceipt": "topic-notebook-repair-replay-v1"
+    },
+    {
+      "id": "recall-princeton-seconds-and-tr",
+      "kind": "recall-export-clock",
+      "sourceCount": 17,
+      "detailsRecord": "recall-lineage.json"
+    },
+    {
+      "id": "recall-openneuro-seconds-and-tr",
+      "kind": "recall-export-clock",
+      "sourceCount": 17,
+      "detailsRecord": "recall-lineage.json"
+    },
+    {
+      "id": "media-part-a-playback-ticks",
+      "kind": "edition-playback-time",
+      "status": "established",
+      "partId": "media-part-a",
+      "editionReceipt": "presentation-edition-identity-v1",
+      "timeBase": "1/2500",
+      "ticksPerSecond": 2500,
+      "ticksPerFrame": 100,
+      "startPts": 0,
+      "durationTicks": 76000,
+      "durationSeconds": 30.4,
+      "frameCount": 760
+    },
+    {
+      "id": "media-part-b-playback-ticks",
+      "kind": "edition-playback-time",
+      "status": "established",
+      "partId": "media-part-b",
+      "editionReceipt": "presentation-edition-identity-v1",
+      "timeBase": "1/2500",
+      "ticksPerSecond": 2500,
+      "ticksPerFrame": 100,
+      "startPts": 0,
+      "durationTicks": 30000,
+      "durationSeconds": 12.0,
+      "frameCount": 300
+    }
+  ],
+  "repair": {
+    "id": "topic-notebook-repair-replay-v1",
+    "purity": "pure-coordinate-transform",
+    "inputRows": 6,
+    "dropSourceRows": [
+      4
+    ],
+    "retainedRows": 5,
+    "runAssignment": [
+      {
+        "sourceRows": "1-3",
+        "runId": "run-1"
+      },
+      {
+        "sourceRows": "5-6",
+        "runId": "run-2"
+      }
+    ],
+    "offsetSeconds": {
+      "run-1": 0,
+      "run-2": 20
+    },
+    "formula": {
+      "repairedStartSeconds": "rawStartSeconds + offsetSeconds(runId)",
+      "repairedEndSeconds": "rawEndSeconds + offsetSeconds(runId)"
+    },
+    "boundaryChecks": [
+      {
+        "sourceRow": 3,
+        "runId": "run-1",
+        "rawStartSeconds": 20,
+        "rawEndSeconds": 20,
+        "repairedStartSeconds": 20,
+        "repairedEndSeconds": 20,
+        "startTr": 14,
+        "endTr": 14
+      },
+      {
+        "sourceRow": 5,
+        "runId": "run-2",
+        "rawStartSeconds": 0,
+        "rawEndSeconds": 5,
+        "repairedStartSeconds": 20,
+        "repairedEndSeconds": 25,
+        "startTr": 21,
+        "endTr": 24
+      },
+      {
+        "sourceRow": 6,
+        "runId": "run-2",
+        "rawStartSeconds": 5,
+        "rawEndSeconds": 12,
+        "repairedStartSeconds": 25,
+        "repairedEndSeconds": 32,
+        "startTr": 25,
+        "endTr": 29
+      }
+    ],
+    "serializationReceipt": {
+      "recordOrder": "ascending source row",
+      "fields": [
+        "source-row-zero-padded-to-four-digits",
+        "run-id",
+        "raw-start-seconds-base10-integer",
+        "raw-end-seconds-base10-integer",
+        "repaired-start-seconds-base10-integer",
+        "repaired-end-seconds-base10-integer",
+        "start-tr-base10-integer-or-empty",
+        "end-tr-base10-integer-or-empty"
+      ],
+      "fieldSeparator": "TAB",
+      "recordSeparator": "LF",
+      "finalRecordSeparator": true,
+      "recordCount": 5,
+      "sha256": "4a41a04e978d31a41c331c25cbc9603bd9c19783cc335248e561100be5d90a3f"
+    }
+  },
+  "missingnessAndTails": {
+    "scanBreakRows": [
+      {
+        "sourceRow": 4,
+        "startSeconds": 20,
+        "endSeconds": 30,
+        "trBounds": "missing"
+      }
+    ],
+    "partA": {
+      "mediaEndSeconds": 30.4,
+      "rawAnnotationEndIncludingBreakSeconds": 30,
+      "rawAnnotationToMediaTailSeconds": 0.4,
+      "retainedNotebookAnnotationEndSeconds": 20,
+      "retainedNotebookAnnotationToMediaTailSeconds": 10.4
+    },
+    "partB": {
+      "mediaEndSeconds": 12,
+      "annotationEndSeconds": 12,
+      "annotationToMediaTailSeconds": 0
+    },
+    "tailHandling": "observed-not-trimmed-not-imputed"
+  },
+  "nonEquivalences": [
+    "The synthetic 32-second notebook axis drops row 4; it is not the two separate 30.4-second and 12-second playback axes.",
+    "Synthetic notebook provenance is declared-unverified, not upstream evidence."
+  ],
+  "scientificRestrictions": {
+    "clockRepairMayEstablish": [
+      "deterministic-published-analysis-order",
+      "replayable-5-row-derived-axis"
+    ],
+    "clockRepairDoesNotEstablish": [
+      "exact-media-edition",
+      "frame-exact-evidence",
+      "missing-tr-imputation",
+      "accepted-narrative-semantics"
+    ],
+    "editionIdentityEstablishes": [
+      "declared-presentation-edition",
+      "per-part-playback-axis",
+      "exact-annotation-to-playback-crosswalk"
+    ],
+    "editionIdentityDoesNotEstablish": [
+      "accepted-narrative-semantics",
+      "recall-to-playback-alignment",
+      "media-reachability-at-any-later-time"
+    ]
+  },
+  "presentationEditionIdentity": {
+    "id": "presentation-edition-identity-v1",
+    "declaredBy": "owner",
+    "declaration": "Synthetic identity and extents for the pre-existing six-row test fixture; no real media bytes or owner claim.",
+    "authority": "owner-declaration-plus-byte-identity",
+    "bytesDisposition": "external-to-git-and-not-redistributed",
+    "observedWith": "synthetic fixture; no media observation",
+    "parts": [
+      {
+        "partId": "media-part-a",
+        "presentationOrdinal": 1,
+        "sha256": "a952b0ddb84e0665fde8cd87209fb4d2fcf26ad548e02b999f43f2c2bde92352",
+        "byteLength": 1,
+        "container": {
+          "formatName": "mov,mp4,m4a,3gp,3g2,mj2",
+          "majorBrand": "M4V ",
+          "compatibleBrands": "M4V M4A mp42isom"
+        },
+        "primaryStream": "video",
+        "video": {
+          "codecName": "h264",
+          "profile": "Constrained Baseline",
+          "level": 30,
+          "width": 640,
+          "height": 360,
+          "pixelFormat": "yuv420p",
+          "frameRate": "25/1",
+          "constantFrameRate": true,
+          "timeBase": "1/2500",
+          "ticksPerSecond": 2500,
+          "ticksPerFrame": 100,
+          "startPts": 0,
+          "durationTicks": 76000,
+          "durationSeconds": 30.4,
+          "frameCount": 760
+        },
+        "audio": {
+          "codecName": "aac",
+          "sampleRateHz": 44100,
+          "channels": 2,
+          "channelLayout": "stereo",
+          "timeBase": "1/44100",
+          "startPts": 0,
+          "durationTicks": 1323000,
+          "durationSeconds": 30,
+          "frameCount": 1
+        },
+        "streamExtentNote": "Synthetic audio is shorter than synthetic video; only video supplies the tested axis."
+      },
+      {
+        "partId": "media-part-b",
+        "presentationOrdinal": 2,
+        "sha256": "8ef6fa0abeb443cdecb00638d9f9bca1a81f8e3346c41ac988847421d2b66dfe",
+        "byteLength": 2,
+        "container": {
+          "formatName": "mov,mp4,m4a,3gp,3g2,mj2",
+          "majorBrand": "M4V ",
+          "compatibleBrands": "M4V M4A mp42isom"
+        },
+        "primaryStream": "video",
+        "video": {
+          "codecName": "h264",
+          "profile": "Constrained Baseline",
+          "level": 30,
+          "width": 640,
+          "height": 360,
+          "pixelFormat": "yuv420p",
+          "frameRate": "25/1",
+          "constantFrameRate": true,
+          "timeBase": "1/2500",
+          "ticksPerSecond": 2500,
+          "ticksPerFrame": 100,
+          "startPts": 0,
+          "durationTicks": 30000,
+          "durationSeconds": 12.0,
+          "frameCount": 300
+        },
+        "audio": {
+          "codecName": "aac",
+          "sampleRateHz": 44100,
+          "channels": 2,
+          "channelLayout": "stereo",
+          "timeBase": "1/44100",
+          "startPts": 0,
+          "durationTicks": 485100,
+          "durationSeconds": 11,
+          "frameCount": 1
+        },
+        "streamExtentNote": "Synthetic audio is shorter than synthetic video; only video supplies the tested axis."
+      }
+    ],
+    "filenamesUsedAsIdentity": false,
+    "pathsRecorded": false
+  },
+  "annotationToPlaybackCrosswalk": {
+    "id": "annotation-raw-to-part-playback-v1",
+    "status": "established",
+    "editionReceipt": "presentation-edition-identity-v1",
+    "certifies": "coordinate-mapping-only",
+    "doesNotCertify": "media-reachability",
+    "sourceCoordinate": "annotation-run-local-seconds (raw)",
+    "explicitlyNotUsed": "topic-notebook-repaired-seconds",
+    "whyNotRepaired": "The synthetic notebook drops the scan-break row and adds the first-run offset; playback retains the row on its own part.",
+    "runs": [
+      {
+        "runId": "run-1",
+        "partId": "media-part-a",
+        "axisId": "media-part-a-playback-ticks",
+        "sourceCoordinate": "annotation-run-local-seconds (raw)",
+        "mapping": "identity",
+        "formula": "playbackTicks = rawAnnotationSeconds * ticksPerSecond",
+        "annotationRows": "1-4",
+        "annotationStartSeconds": 0,
+        "annotationEndSeconds": 30,
+        "playbackStartTicks": 0,
+        "playbackEndTicks": 75000,
+        "playbackEndFrame": 750,
+        "uncoveredTailTicks": 1000,
+        "uncoveredTailSeconds": 0.4,
+        "uncoveredTailFrames": 10
+      },
+      {
+        "runId": "run-2",
+        "partId": "media-part-b",
+        "axisId": "media-part-b-playback-ticks",
+        "sourceCoordinate": "annotation-run-local-seconds (raw)",
+        "mapping": "identity",
+        "formula": "playbackTicks = rawAnnotationSeconds * ticksPerSecond",
+        "annotationRows": "5-6",
+        "annotationStartSeconds": 0,
+        "annotationEndSeconds": 12,
+        "playbackStartTicks": 0,
+        "playbackEndTicks": 30000,
+        "playbackEndFrame": 300,
+        "uncoveredTailTicks": 0,
+        "uncoveredTailSeconds": 0.0,
+        "uncoveredTailFrames": 0
+      }
+    ],
+    "exactness": {
+      "annotationTimeValues": 12,
+      "nonIntegerValues": 0,
+      "valuesOffFrameBoundary": 0,
+      "valuesOffPtsTick": 0,
+      "conclusion": "Every annotation bound lands on an exact frame boundary and an exact presentation tick in both parts. The crosswalk needs no rounding, interpolation, or extrapolation."
+    },
+    "tailHandling": "observed-not-trimmed-not-imputed"
+  }
+}

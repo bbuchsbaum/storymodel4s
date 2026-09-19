@@ -8,7 +8,7 @@ import io.circe.Json
 import storymodel4s.align.{AlignWire, ViewFingerprint}
 import storymodel4s.bench.video.{RecallTiming, RecallWordsCsv}
 import storymodel4s.core.{AxisExtent, Checksum, StorySource}
-import storymodel4s.corpus.intake.SherlockAnnotations
+import storymodel4s.corpus.intake.{SherlockAnnotations, TimebaseRepair}
 import storymodel4s.recall.RecallSegmenter
 
 /** Test-scope inventory of the existing adapter, independent of which targets inference selects. It
@@ -20,8 +20,11 @@ object SherlockBaselineCapture:
   private def tick(n: Long): Json = str(n.toString)
 
   private[sherlock] def inventory(annotation: Array[Byte], recallCsv: Array[Byte]): Json =
+    val record = TimebaseRepair
+      .loadCommitted()
+      .fold(e => throw new IllegalArgumentException(e.message), identity)
     val atlas = SherlockAnnotations
-      .parse(annotation)
+      .parse(annotation, record)
       .fold(e => throw new IllegalArgumentException(e.message), identity)
     val built = SherlockAnnotationView
       .build(atlas)

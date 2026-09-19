@@ -40,6 +40,34 @@ One pattern, ten instances: **records and types that assert authority and are wi
 
 ## Decisions
 
+### Sherlock production clock integration, 2026-09-19
+
+`SherlockAnnotations.parse(bytes, record)` now constructs its media manifest from the checked
+repair record and projects every bound through `ClockRepair.projectRunLocalSeconds`. The
+one-argument overload refuses; `MediaManifest.nn2017` and its duplicate hash/extent literals are
+removed. Callers load the repository record explicitly with `TimebaseRepair.loadCommitted()`
+or pass an explicitly selected checked record. The loader has no embedded fallback.
+
+The committed JSON is the sole admission declaration for annotation and media hashes. Its root
+bytes enter an observed one-record manifest, resolve uniquely through `RecordRef` to an owned
+`VerifiedArtifact`, and are decoded with duplicate keys refused. That proves byte consistency
+and records identity, not independent authenticity or Git committedness. Review of the root
+declaration supplies admission authority. Annotation bytes are hashed against its pin; media
+reachability is not checked by this adapter. The upstream notebook remains `declared-unverified`;
+the declared notebook table checksum is checked by replaying the admitted annotation rows.
+
+Declared part-axis names are joined to the actual `SourceBundle` identities, extents and
+timebases before a repair is built. Each run has a distinct source axis. Projection requires
+integral, representable ticks and retains zero-duration instants, scan-break rows and tails.
+`Atlas` carries the checked record, per-run repairs and every row's repair. The diagnostic adds
+`<report>.clock-repair.json`, binding the report, source fingerprint, record digest/schema/version,
+restrictions, actual axes, receipts and all row loci without changing the existing report format.
+Recall-export clock metadata and audio observations remain opaque documentary fields; this
+adapter certifies the declared annotation-to-video coordinate mapping only.
+
+Rejected: deleting the unused mapping type, retaining a second Scala admission pin, or checking
+the repair's declared target against itself. This integrates existing vocabulary under ADR 0018.
+
 ### Sherlock scene-scoring integration, 2026-09-19
 
 The packaged `embed-bench` resource `storymodel4s/bench/sherlock/scene-coding-rule.json`

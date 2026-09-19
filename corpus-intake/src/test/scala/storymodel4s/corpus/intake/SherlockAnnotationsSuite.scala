@@ -4,7 +4,7 @@ import java.nio.charset.StandardCharsets
 
 import munit.FunSuite
 import storymodel4s.corpus.intake.SherlockAnnotations.*
-import storymodel4s.core.{Checksum, DomainError}
+import storymodel4s.core.*
 
 /** Courts for the Sherlock annotation adapter, on a synthetic six-row fixture shaped like the real
   * table (two runs, a scene opening each run, a zero-duration row, a scan-break-style row with
@@ -33,33 +33,39 @@ class SherlockAnnotationsSuite extends FunSuite:
   private def bytesOf(rows: Vector[String]): Array[Byte] =
     (header +: rows).mkString("\n").getBytes(StandardCharsets.UTF_8)
 
-  private def manifestFor(bytes: Array[Byte]): MediaManifest =
-    MediaManifest(
-      annotationSha256 = Checksum.ofBytes(bytes),
-      partA = PartIdentity(
-        partId = "media-part-a",
-        presentationOrdinal = 1,
-        sha256 = Checksum.ofBytes("synthetic-part-a".getBytes(StandardCharsets.UTF_8)),
-        durationTicks = 76000L, // 30.4 s at 1/2500: leaves a 0.4 s uncovered tail
-        ticksPerSecond = 2500L
-      ),
-      partB = PartIdentity(
-        partId = "media-part-b",
-        presentationOrdinal = 2,
-        sha256 = Checksum.ofBytes("synthetic-part-b".getBytes(StandardCharsets.UTF_8)),
-        durationTicks = 30000L, // exactly 12 s: run-2 annotation may end flush with the extent
-        ticksPerSecond = 2500L
-      ),
-      totalRows = 6,
-      run1EndRow = 4
-    )
+  private def recordFor(bytes: Array[Byte]): TimebaseRepair.Record =
+    val stream = getClass.getResourceAsStream("/sherlock-synthetic-repair.json")
+    val json =
+      try new String(stream.readAllBytes(), StandardCharsets.UTF_8)
+      finally stream.close()
+    val changed = json.replace("0" * 64, Checksum.ofBytes(bytes).hex)
+    TimebaseRepair.parse(changed).fold(e => fail(e.message), identity)
 
   private def parseFixture(rows: Vector[String] = fixtureRows): Either[DomainError, Atlas] =
     val bytes = bytesOf(rows)
-    SherlockAnnotations.parse(bytes, manifestFor(bytes))
+    SherlockAnnotations.parse(bytes, recordFor(bytes))
 
   private def parsed: Atlas =
     parseFixture().fold(e => fail(s"fixture must parse: ${e.message}"), identity)
+
+  test("the observed scanner extent must equal the declaration even when boundaries fit") {
+    val bytes = bytesOf(fixtureRows)
+    val original = recordFor(bytes).document
+    val changed = original.hcursor
+      .downField("coordinateSystems")
+      .downN(2)
+      .downField("maximumTr")
+      .withFocus(_ => io.circe.Json.fromInt(30))
+      .top
+      .get
+    assertEquals(
+      changed.hcursor.downField("coordinateSystems").downN(2).get[Int]("maximumTr"),
+      Right(30)
+    )
+    val record = TimebaseRepair.parse(changed.noSpaces).fold(e => fail(e.message), identity)
+    assert(SherlockAnnotations.parse(bytes, record).isLeft)
+    assert(parseFixture().isRight)
+  }
 
   test("the synthetic table parses with both runs, scenes, and typed missing TRs") {
     val atlas = parsed
@@ -116,7 +122,7 @@ class SherlockAnnotationsSuite extends FunSuite:
 
   test("foreign bytes refuse before any parsing") {
     val bytes = bytesOf(fixtureRows)
-    val foreign = manifestFor("something else entirely".getBytes(StandardCharsets.UTF_8))
+    val foreign = recordFor("something else entirely".getBytes(StandardCharsets.UTF_8))
     SherlockAnnotations.parse(bytes, foreign) match
       case Left(DomainError.InvariantViolation(path, _)) =>
         assertEquals(path, "sherlock/annotation/identity")
@@ -185,277 +191,74 @@ class SherlockAnnotationsSuite extends FunSuite:
       case other => fail(s"expected a scene refusal, got $other")
   }
 
-  /** This test is NAMED for `timebase-repair.json` and, until now, never opened it.
-    *
-    * It asserted Scala literals against Scala literals: `assertEquals(m.partA.durationTicks,
-    * 3565500L)` is true of any manifest that says 3565500, whatever the JSON says. The epic that
-    * built this module exists because the Sherlock crosswalk is declared in several places at once;
-    * a test that restates one of them is not a check, it is a fourth copy.
-    *
-    * Measured by mutation: seven fields of the JSON could be changed with the whole `corpus-intake`
-    * suite staying green. Three of them are load-bearing --
-    * `coordinateSystems[0].parts[*].endSeconds` (the part extents, which `nn2017` transcribes as
-    * `durationTicks` after multiplying by 2500) and `coordinateSystems[2].secondsPerTr`.
-    *
-    * So the constants are now read FROM the file, and the file's two independent declarations of
-    * the same quantity are bound to each other. `endSeconds * ticksPerSecond` must equal
-    * `playbackEndTicks + uncoveredTailTicks`; nothing had ever required those to agree, and they
-    * agreed by luck.
-    */
-  private def repairJson: String =
-    val a = java.nio.file.Path.of("../docs/data/sherlock/timebase-repair.json")
-    val b = java.nio.file.Path.of("docs/data/sherlock/timebase-repair.json")
-    if java.nio.file.Files.exists(a) then java.nio.file.Files.readString(a)
-    else java.nio.file.Files.readString(b)
-
-  test("the pinned nn2017 manifest is READ FROM timebase-repair.json, not restated") {
-    val m = MediaManifest.nn2017
-    val record = TimebaseRepair
-      .parse(repairJson)
-      .fold(r => fail(s"the pinned repair record must parse: ${r.message}"), identity)
-
-    assertEquals(m.annotationSha256, record.annotationSha256)
-    // The crosswalk id is provenance: every emitted receipt names it, so an accidental change
-    // would silently re-label every derivation this adapter produces. Pinned like the annotation
-    // hash beside it.
-    assertEquals(record.crosswalkId, "annotation-raw-to-part-playback-v1")
-    assertEquals(Some(m.run1EndRow), record.run1EndRow)
-    assertEquals(m.totalRows, record.inputRows)
-
-    val run1 = record.run("run-1").getOrElse(fail("run-1 must be declared"))
-    val run2 = record.run("run-2").getOrElse(fail("run-2 must be declared"))
-    assertEquals(m.partA.partId, run1.partId)
-    assertEquals(m.partB.partId, run2.partId)
-    assertEquals(m.partA.durationTicks, run1.durationTicks)
-    assertEquals(m.partB.durationTicks, run2.durationTicks)
+  test("omitting the record refuses; every accepted row carries the executed repair") {
+    assert(SherlockAnnotations.parse(bytesOf(fixtureRows)).isLeft)
+    val atlas = parsed
+    assertEquals(atlas.repairByRow.keySet, atlas.mediaByRow.keySet)
+    assertEquals(atlas.repairByRow(1), atlas.repairsByRun("run-1"))
+    assertEquals(atlas.repairByRow(5), atlas.repairsByRun("run-2"))
+    assert(
+      atlas.repairByRow.values.forall(
+        _.receipt.inputChecksums.contains(atlas.repairRecord.checksum)
+      )
+    )
   }
 
-  /** The part BYTE IDENTITIES were transcribed too, and they are the most load-bearing values here.
-    *
-    * `SherlockAnnotations.scala:52-53` carries `Checksum.unsafe("eb036474...")` as a Scala literal
-    * while `presentationEditionIdentity.parts[*].sha256` declares the same hash in the file, and
-    * nothing compared them. That hash exists, in the adapter's own words, "so downstream playback
-    * can re-verify caller-supplied media" -- so a drift between the record and the adapter means
-    * the two vouch for DIFFERENT FILES while both claiming to identify the presented edition. Of
-    * everything measured silent in this file, this is the one whose silence matters most.
-    *
-    * Found by cold review, which asked directly whether the earlier fix covered it. It did not: the
-    * fix bound `partId` and `durationTicks` and stopped there.
-    */
-  test("the part byte identities are READ from the file, not transcribed beside it") {
-    val m = MediaManifest.nn2017
-    val cursor = io.circe.parser
-      .parse(repairJson)
-      .fold(e => fail(s"json must parse: $e"), _.hcursor)
-    val parts = cursor
-      .downField("presentationEditionIdentity")
-      .downField("parts")
-      .as[Vector[io.circe.Json]]
-      .fold(e => fail(s"presentationEditionIdentity.parts must be an array: $e"), identity)
-    assertEquals(parts.size, 2)
-
-    Vector(m.partA, m.partB).zip(parts).foreach { (part, json) =>
-      val c = json.hcursor
-      assertEquals(
-        c.get[String]("partId").toOption,
-        Some(part.partId),
-        "the edition identity names a different part than the manifest"
-      )
-      assertEquals(
-        c.get[Int]("presentationOrdinal").toOption,
-        Some(part.presentationOrdinal),
-        s"${part.partId} is presented in a different position than the manifest says"
-      )
-      assertEquals(
-        c.get[String]("sha256").toOption,
-        Some(part.sha256.hex),
-        s"${part.partId}: the record and the adapter vouch for DIFFERENT BYTES"
-      )
-    }
+  test("the actual projection seam refuses crossed run and target axes") {
+    val atlas = parsed
+    val run1 = atlas.repairRecord.runs.head
+    val run2 = atlas.repairRecord.runs(1)
+    val one = ExactRational.integer(1L)
+    assertEquals(
+      SherlockAnnotations
+        .project(one, run1.sourceAxis, atlas.partABundle, atlas.repairsByRun("run-1"))
+        .toOption,
+      Some(2500L)
+    )
+    assert(
+      SherlockAnnotations
+        .project(one, run2.sourceAxis, atlas.partABundle, atlas.repairsByRun("run-1"))
+        .isLeft
+    )
+    assert(
+      SherlockAnnotations
+        .project(one, run1.sourceAxis, atlas.partBBundle, atlas.repairsByRun("run-1"))
+        .isLeft
+    )
+    assert(
+      ClockRepair
+        .projectRunLocalSeconds(one, run1.sourceAxis, atlas.partABundle.primaryAxis.id)
+        .isLeft
+    )
+    assert(
+      SherlockAnnotations
+        .locusFor(atlas.rows.head, run1, atlas.partABundle, atlas.repairsByRun("run-1"))
+        .isRight
+    )
+    assert(
+      SherlockAnnotations
+        .locusFor(atlas.rows.head, run1, atlas.partABundle, atlas.repairsByRun("run-2"))
+        .isLeft
+    )
   }
 
-  /** The file declares each part's extent TWICE, and nothing made the two agree.
-    *
-    * `annotationToPlaybackCrosswalk.runs[i]` gives `playbackEndTicks + uncoveredTailTicks`, which
-    * the code reads. `coordinateSystems[0].parts[i].endSeconds` gives the same extent in seconds,
-    * which the code does not read -- so it could be changed to 9999.9 with every test still green,
-    * measured. Two declarations that nothing reconciles are two declarations that will drift.
-    */
-  test("the file's two declarations of each part extent agree") {
-    val record = TimebaseRepair
-      .parse(repairJson)
-      .fold(r => fail(r.message), identity)
-    val cursor = io.circe.parser
-      .parse(repairJson)
-      .fold(e => fail(s"json must parse: $e"), _.hcursor)
-    val parts = cursor
-      .downField("coordinateSystems")
-      .downArray
-      .downField("parts")
-      .as[Vector[io.circe.Json]]
-      .fold(e => fail(s"coordinateSystems[0].parts must be an array: $e"), identity)
-    assertEquals(parts.size, 2)
-
-    Vector(("run-1", 0, MediaManifest.nn2017.partA), ("run-2", 1, MediaManifest.nn2017.partB))
-      .foreach { (runId, i, part) =>
-        val run = record.run(runId).getOrElse(fail(s"$runId must be declared"))
-        val c = parts(i).hcursor
-        assertEquals(
-          c.get[String]("partId").toOption,
-          Some(run.partId),
-          s"$runId names a different part in coordinateSystems than in the crosswalk"
-        )
-        // The rate is DERIVED from the file rather than taken from the manifest, so that the
-        // manifest's own 2500 is checked against the file instead of checking itself. The file's
-        // stated formula is `playbackTicks = rawAnnotationSeconds * ticksPerSecond`.
-        assertEquals(
-          run.playbackEndTicks % run.annotationEndSeconds,
-          0L,
-          s"$runId rate is not whole"
-        )
-        val ticksPerSecond = run.playbackEndTicks / run.annotationEndSeconds
-        assertEquals(
-          part.ticksPerSecond,
-          ticksPerSecond,
-          s"$runId: the manifest declares ${part.ticksPerSecond} ticks/s, the file implies $ticksPerSecond"
-        )
-        val endSeconds =
-          c.get[Double]("endSeconds").fold(e => fail(s"parts[$i].endSeconds: $e"), identity)
-        val declared = math.round(endSeconds * ticksPerSecond.toDouble)
-        assertEquals(
-          declared,
-          run.durationTicks,
-          s"$runId: coordinateSystems says ${endSeconds}s = $declared ticks, " +
-            s"the crosswalk says ${run.durationTicks}"
-        )
-      }
+  test("the projection seam refuses fractional ticks and exact arithmetic overflow") {
+    val atlas = parsed
+    val run = atlas.repairRecord.runs.head
+    val repair = atlas.repairsByRun("run-1")
+    val fraction = ExactRational.of(1L, 3L).toOption.get
+    assert(SherlockAnnotations.project(fraction, run.sourceAxis, atlas.partABundle, repair).isLeft)
+    assert(
+      SherlockAnnotations
+        .project(ExactRational.integer(Long.MaxValue), run.sourceAxis, atlas.partABundle, repair)
+        .isLeft
+    )
   }
 
-  /** The file must agree with ITSELF, which nothing had ever required.
-    *
-    * Sweeping the record field by field showed a pattern larger than any single silent value: the
-    * same physical quantity is declared in up to FIVE places and reconciled in none. Part A's
-    * extent appears as `coordinateSystems[0].parts[0].endSeconds` (1426.2 s), as
-    * `coordinateSystems[6].durationTicks` (3565500) and `durationSeconds`, as
-    * `presentationEditionIdentity.parts[0].video.durationTicks`, as
-    * `missingnessAndTails.partA.mediaEndSeconds`, and as a Scala literal in the adapter. Four of
-    * those five could be changed with every test green.
-    *
-    * Binding each one to the adapter separately would be a losing game -- the sixth declaration
-    * would arrive unbound. So this checks the RECORD against itself: every declaration of a
-    * quantity must equal every other. The adapter is bound to the record by the tests above, so
-    * agreement here plus agreement there is agreement throughout, and a value that drifts anywhere
-    * now turns something red.
-    *
-    * This is the epic's founding defect in miniature -- "the Sherlock crosswalk exists three times"
-    * -- measured inside a single file rather than across three languages.
-    */
-  test("the repair record agrees with itself about every part extent") {
-    val root = io.circe.parser
-      .parse(repairJson)
-      .fold(e => fail(s"json must parse: $e"), _.hcursor)
-
-    def axisFor(partId: String) = root
-      .downField("coordinateSystems")
-      .values
-      .getOrElse(fail("coordinateSystems must be an array"))
-      .map(_.hcursor)
-      .find(c =>
-        c.get[String]("kind").toOption.contains("edition-playback-time") &&
-          c.get[String]("partId").toOption.contains(partId)
-      )
-      .getOrElse(fail(s"no edition-playback-time axis for $partId"))
-
-    val localSeconds = root
-      .downField("coordinateSystems")
-      .values
-      .getOrElse(fail("coordinateSystems must be an array"))
-      .map(_.hcursor)
-      .find(_.get[String]("kind").toOption.contains("container-presentation-time"))
-      .getOrElse(fail("no container-presentation-time system"))
-
-    val editionParts = root
-      .downField("presentationEditionIdentity")
-      .downField("parts")
-      .values
-      .getOrElse(fail("presentationEditionIdentity.parts must be an array"))
-      .map(_.hcursor)
-      .toVector
-
-    val containerParts =
-      localSeconds.downField("parts").values.getOrElse(fail("parts")).map(_.hcursor).toVector
-
-    val record = TimebaseRepair.parse(repairJson).fold(r => fail(r.message), identity)
-
-    Vector(("media-part-a", "run-1", "partA", 0), ("media-part-b", "run-2", "partB", 1))
-      .foreach { (partId, runId, tailKey, i) =>
-        val axis = axisFor(partId)
-        val edition = editionParts(i)
-        val container = containerParts(i)
-        val run = record.run(runId).getOrElse(fail(s"$runId"))
-
-        def long(c: io.circe.HCursor, f: String) =
-          c.get[Long](f).fold(e => fail(s"$partId/$f: $e"), identity)
-        def dbl(c: io.circe.HCursor, f: String) =
-          c.get[Double](f).fold(e => fail(s"$partId/$f: $e"), identity)
-
-        val ticks = long(axis, "durationTicks")
-        val rate = long(axis, "ticksPerSecond")
-
-        // every declaration of the tick extent
-        assertEquals(
-          long(edition.downField("video").success.get, "durationTicks"),
-          ticks,
-          s"$partId: the observed edition and the playback axis disagree about durationTicks"
-        )
-        assertEquals(
-          run.durationTicks,
-          ticks,
-          s"$partId: the crosswalk's playbackEnd+tail disagrees with the playback axis"
-        )
-
-        // every declaration of the second extent
-        val seconds = dbl(axis, "durationSeconds")
-        assertEquals(
-          dbl(container, "endSeconds"),
-          seconds,
-          s"$partId: container-presentation-time disagrees about the extent in seconds"
-        )
-        assertEquals(dbl(edition.downField("video").success.get, "durationSeconds"), seconds)
-        assertEquals(
-          dbl(
-            root.downField("missingnessAndTails").downField(tailKey).success.get,
-            "mediaEndSeconds"
-          ),
-          seconds,
-          s"$partId: missingnessAndTails disagrees about where the media ends"
-        )
-
-        // the seconds and the ticks must be the same quantity
-        assertEquals(
-          math.round(seconds * rate.toDouble),
-          ticks,
-          s"$partId: ${seconds}s at $rate ticks/s is not $ticks ticks"
-        )
-
-        // and the rate is declared twice more
-        assertEquals(
-          long(edition.downField("video").success.get, "ticksPerSecond"),
-          rate,
-          s"$partId: the observed edition and the axis disagree about the tick rate"
-        )
-
-        // frames are a third statement of the same extent
-        val perFrame = long(axis, "ticksPerFrame")
-        assertEquals(
-          long(axis, "frameCount") * perFrame,
-          ticks,
-          s"$partId: frameCount x ticksPerFrame is not durationTicks"
-        )
-
-        // and every one of these must name the same part
-        assertEquals(container.get[String]("partId").toOption, Some(partId))
-        assertEquals(edition.get[String]("partId").toOption, Some(partId))
-        assertEquals(run.partId, partId)
-      }
+  test("oversized integer annotation seconds refuse without throwing") {
+    val broken = fixtureRows.updated(
+      0,
+      fixtureRows.head.replace("\t0\t10\t", "\t99999999999999999999999\t10\t")
+    )
+    assert(parseFixture(broken).isLeft)
   }

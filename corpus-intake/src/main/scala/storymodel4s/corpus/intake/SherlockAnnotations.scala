@@ -40,32 +40,6 @@ object SherlockAnnotations:
       run1EndRow: Int
   )
 
-  object MediaManifest:
-    /** `docs/data/sherlock/timebase-repair.json` schemaVersion 2, established 2026-09-01. */
-    val nn2017: MediaManifest = MediaManifest(
-      annotationSha256 = Checksum.unsafe(
-        "8c205826dcea8c58db24d7a17c71a3f99a9054e9379435e60b1dd0b987c2b296"
-      ),
-      partA = PartIdentity(
-        partId = "media-part-a",
-        presentationOrdinal = 1,
-        sha256 =
-          Checksum.unsafe("eb0364748e4bc6f66f43a84ab53e82792ac27dda48e9958bd5ba652c82b3ecca"),
-        durationTicks = 3565500L,
-        ticksPerSecond = 2500L
-      ),
-      partB = PartIdentity(
-        partId = "media-part-b",
-        presentationOrdinal = 2,
-        sha256 =
-          Checksum.unsafe("f6e2c839d355f86709379d74d28f24d89b919e45e0ac43771d197843ae694907"),
-        durationTicks = 3887000L,
-        ticksPerSecond = 2500L
-      ),
-      totalRows = 1000,
-      run1EndRow = 482
-    )
-
   /** Which presentation run a row belongs to. Derived from the row number against the manifest
     * boundary, never asserted by a caller.
     */
@@ -125,7 +99,10 @@ object SherlockAnnotations:
       val partBBundle: SourceBundle,
       val rows: Vector[Row],
       val mediaByRow: Map[Int, MediaLocus],
-      val scenes: Vector[Scene]
+      val scenes: Vector[Scene],
+      val repairRecord: TimebaseRepair.Record,
+      val repairsByRun: Map[String, ClockRepair],
+      val repairByRow: Map[Int, ClockRepair]
   ):
     def runOf(row: Int): RunId =
       if row <= manifest.run1EndRow then RunId.Run1 else RunId.Run2
@@ -170,16 +147,16 @@ object SherlockAnnotations:
           fail(s"sherlock/row/$expectedRow", s"row numbering breaks: found $row")
         )
         start <- Either.cond(
-          IntegerField.matches(startCell),
-          startCell.toInt,
+          IntegerField.matches(startCell) && startCell.toIntOption.nonEmpty,
+          startCell.toIntOption.getOrElse(0),
           fail(
             s"sherlock/row/$row",
             s"start '$startCell' is not an integer second; the crosswalk claims integer bounds"
           )
         )
         end <- Either.cond(
-          IntegerField.matches(endCell),
-          endCell.toInt,
+          IntegerField.matches(endCell) && endCell.toIntOption.nonEmpty,
+          endCell.toIntOption.getOrElse(0),
           fail(
             s"sherlock/row/$row",
             s"end '$endCell' is not an integer second; the crosswalk claims integer bounds"
@@ -219,7 +196,7 @@ object SherlockAnnotations:
         location = optCell(cells, 11)
       )
 
-  private def partBundle(part: PartIdentity): Either[DomainError, SourceBundle] =
+  private[intake] def partBundle(part: PartIdentity): Either[DomainError, SourceBundle] =
     for
       edition <- EditionId.from(s"sherlock-nn2017-${part.partId}")
       timebase <- RationalTimebase.of(1L, part.ticksPerSecond)
@@ -232,19 +209,49 @@ object SherlockAnnotations:
       )
     yield bundle
 
-  private def locusFor(
+  /** This seam is shared by production and the wrong-axis/fractional-tick refusal courts. */
+  private[intake] def project(
+      seconds: ExactRational,
+      sourceAxis: PresentationAxisId,
+      bundle: SourceBundle,
+      repair: ClockRepair
+  ): Either[DomainError, Long] =
+    ClockRepair.projectRunLocalSeconds(seconds, sourceAxis, bundle.primaryAxis.id, repair).flatMap {
+      ticks =>
+        Either.cond(
+          ticks.denominator == 1L,
+          ticks.numerator,
+          fail("sherlock/clock/integrality", "projection must produce integral representable ticks")
+        )
+    }
+
+  private[intake] def locusFor(
       row: Row,
-      part: PartIdentity,
-      bundle: SourceBundle
+      run: TimebaseRepair.Run,
+      bundle: SourceBundle,
+      repair: ClockRepair
   ): Either[DomainError, MediaLocus] =
-    val startTick = row.rawStartSeconds.toLong * part.ticksPerSecond
-    val endTick = row.rawEndSeconds.toLong * part.ticksPerSecond
-    if startTick == endTick then
-      PlaybackInstant.on(bundle.primaryAxis, startTick).map(MediaLocus.Instant(part.partId, _))
-    else
-      PlaybackInterval
-        .on(bundle.primaryAxis, startTick, endTick)
-        .map(MediaLocus.Extent(part.partId, _))
+    for
+      startTick <- project(
+        ExactRational.integer(row.rawStartSeconds.toLong),
+        run.sourceAxis,
+        bundle,
+        repair
+      )
+      endTick <- project(
+        ExactRational.integer(row.rawEndSeconds.toLong),
+        run.sourceAxis,
+        bundle,
+        repair
+      )
+      locus <-
+        if startTick == endTick then
+          PlaybackInstant.on(bundle.primaryAxis, startTick).map(MediaLocus.Instant(run.partId, _))
+        else
+          PlaybackInterval
+            .on(bundle.primaryAxis, startTick, endTick)
+            .map(MediaLocus.Extent(run.partId, _))
+    yield locus
 
   private def groupScenes(rows: Vector[Row]): Either[DomainError, Vector[Scene]] =
     rows.headOption match
@@ -258,7 +265,7 @@ object SherlockAnnotations:
         }
         Right(scenes)
 
-  /** Parse and check the admitted annotation table against `manifest`.
+  /** Parse and check the annotation table against a checked repair record.
     *
     * Refuses (never repairs): a byte identity other than the pinned annotation hash, a row count or
     * numbering break, non-integer or reversed second bounds, an empty description, and any
@@ -266,9 +273,11 @@ object SherlockAnnotations:
     */
   def parse(
       bytes: Array[Byte],
-      manifest: MediaManifest = MediaManifest.nn2017
+      record: TimebaseRepair.Record
   ): Either[DomainError, Atlas] =
-    val observed = Checksum.ofBytes(bytes)
+    val owned = bytes.clone()
+    val manifest = record.manifest
+    val observed = Checksum.ofBytes(owned)
     if observed != manifest.annotationSha256 then
       Left(
         fail(
@@ -277,7 +286,7 @@ object SherlockAnnotations:
         )
       )
     else
-      val content = new String(bytes, java.nio.charset.StandardCharsets.UTF_8)
+      val content = new String(owned, java.nio.charset.StandardCharsets.UTF_8)
       val lines = content.split('\n').toVector.map(_.stripSuffix("\r"))
       val dataLines = lines.drop(1).filter(_.nonEmpty)
       if dataLines.size != manifest.totalRows then
@@ -296,15 +305,38 @@ object SherlockAnnotations:
           }
           bundleA <- partBundle(manifest.partA)
           bundleB <- partBundle(manifest.partB)
+          bundles = Map(manifest.partA.partId -> bundleA, manifest.partB.partId -> bundleB)
+          repairs <- TimebaseRepair.clockRepairs(record, bundles)
+          byRun = record.runs.map(_.runId).zip(repairs).toMap
           media <- rows.foldLeft(
             Right(Map.empty[Int, MediaLocus]): Either[DomainError, Map[Int, MediaLocus]]
           ) { (acc, row) =>
             acc.flatMap { m =>
-              val (part, bundle) =
-                if row.row <= manifest.run1EndRow then (manifest.partA, bundleA)
-                else (manifest.partB, bundleB)
-              locusFor(row, part, bundle).map(l => m + (row.row -> l))
+              val run = record.runs.find(r => row.row >= r.firstRow && row.row <= r.lastRow).get
+              locusFor(row, run, bundles(run.partId), byRun(run.runId)).map(l => m + (row.row -> l))
             }
           }
+          _ <- TimebaseRepair.validateRows(record, rows)
           scenes <- groupScenes(rows)
-        yield new Atlas(manifest, bundleA, bundleB, rows, media, scenes)
+        yield new Atlas(
+          manifest,
+          bundleA,
+          bundleB,
+          rows,
+          media,
+          scenes,
+          record,
+          byRun,
+          rows
+            .map(r => r.row -> byRun(if r.row <= manifest.run1EndRow then "run-1" else "run-2"))
+            .toMap
+        )
+
+  /** Omitting the declaration cannot silently select a literal edition or clock. */
+  def parse(bytes: Array[Byte]): Either[DomainError, Atlas] =
+    Left(
+      fail(
+        "sherlock/repair/missing",
+        s"${bytes.length} annotation bytes require a checked repair record"
+      )
+    )

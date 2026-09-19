@@ -7,7 +7,7 @@ import io.circe.parser.parse
 import storymodel4s.align.AlignWire
 import storymodel4s.bench.video.{RecallTiming, RecallWordsCsv}
 import storymodel4s.core.{Checksum, StorySource}
-import storymodel4s.corpus.intake.SherlockAnnotations
+import storymodel4s.corpus.intake.{SherlockAnnotations, TimebaseRepair}
 import storymodel4s.recall.RecallSegmenter
 
 /** Observation-only export: segmentation and word timing, without inference, predictions or gold.
@@ -50,8 +50,11 @@ object SherlockUnitManifest:
     val admitted = lineageRows.toMap
     val sourceBytes =
       Files.readAllBytes(root.resolve("sherlock/Sherlock_Segments_1000_NN_2017.tsv"))
+    val record = TimebaseRepair
+      .loadCommitted()
+      .fold(e => throw new IllegalArgumentException(e.message), identity)
     val _ = SherlockAnnotations
-      .parse(sourceBytes)
+      .parse(sourceBytes, record)
       .fold(e => throw new IllegalArgumentException(e.message), identity)
     val sourceHash = Checksum.ofBytes(sourceBytes).hex
     val participants = names.map { (name, group) =>
