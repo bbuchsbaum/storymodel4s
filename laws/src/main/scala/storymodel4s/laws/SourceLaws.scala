@@ -144,6 +144,9 @@ object SourceLaws extends Laws:
           .isLeft
       },
       "MediaTime axis agrees with intervals" -> forAll(Gen.chooseNum(1L, 999L)) { end =>
+        val foreignIntervals = PlaybackIntervalSet.one(
+          PlaybackInterval.on(foreign.primaryAxis, 0L, end).toOption.get
+        )
         EvidenceSupport
           .of(
             film,
@@ -151,8 +154,8 @@ object SourceLaws extends Laws:
               EvidenceAnchor.MediaTime(
                 film.id,
                 film.streams.head.id,
-                foreign.primaryAxis.id,
-                intervals(0L, end)
+                film.primaryAxis.id,
+                foreignIntervals
               )
             )
           )

@@ -84,6 +84,7 @@ class D1aConstructionBoundarySuite extends FunSuite:
     }""").nonEmpty)
 
   test("checked factories remain visible"):
+    assert(typeCheckErrors("storymodel4s.core.SurfaceAtlasConformance.bundleOf(null)").isEmpty)
     assert(
       typeCheckErrors(
         "storymodel4s.core.NarrativeProposalUnit.of(storymodel4s.core.NarrativeProposalUnitId.unsafe(\"u\"), null, None)"

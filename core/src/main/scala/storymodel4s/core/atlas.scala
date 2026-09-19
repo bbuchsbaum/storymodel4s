@@ -757,6 +757,9 @@ object SurfaceAtlasConformance:
   def narrativeAtlas(atlas: SurfaceAtlas): Either[DomainError, NarrativeSourceAtlas] =
     TextNarrativeAtlas.of(atlas)
 
+  def bundleOf(source: StorySource): Either[DomainError, SourceBundle] =
+    SourceBundle.writtenText(source)
+
 /** A derived proposal surface associated with a supplied receipt, not an output attestation. */
 final class BoundProposalSurface private (
     val surface: SurfaceAtlas,
@@ -830,6 +833,3 @@ object AnchoredNarrativeAtlas:
             .flatMap(_ => EvidenceSupport.of(bundle, unit.support.anchors.toVector).map(_ => ()))
         }
         .map(_ => new AnchoredNarrativeAtlas(bundle, units, surface))
-
-  def bundleOf(source: StorySource): Either[DomainError, SourceBundle] =
-    SourceBundle.writtenText(source)

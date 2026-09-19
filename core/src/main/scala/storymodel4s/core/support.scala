@@ -80,7 +80,7 @@ private[core] object SourceSupportChecks:
         case composition: TrackComposition =>
           composition.relation.sourceAxis == stream.nativeAxis && composition.relation.targetAxis == axis
         case _: EditionCorrespondence => false
-      }.distinct
+      }.distinctBy(_.identity)
       maps match
         case Vector(mapping) =>
           bundle.primaryAxis.extent match
