@@ -1,0 +1,94 @@
+{
+  "schema": "storymodel4s.bench.sherlock-scene-rule/v1",
+  "trSeconds": 1.5,
+  "sceneCount": 50,
+  "participantPattern": "^NN(\\d{2})(?:_|$)",
+  "intervalConvention": "closed-first-sorted",
+  "participants": [
+    {
+      "participant": 1,
+      "goldSubject": null,
+      "eligibility": "excluded-inconsistent-clock"
+    },
+    {
+      "participant": 2,
+      "goldSubject": 2,
+      "eligibility": "eligible"
+    },
+    {
+      "participant": 3,
+      "goldSubject": 3,
+      "eligibility": "eligible"
+    },
+    {
+      "participant": 4,
+      "goldSubject": 4,
+      "eligibility": "eligible"
+    },
+    {
+      "participant": 5,
+      "goldSubject": null,
+      "eligibility": "no-gold-source"
+    },
+    {
+      "participant": 6,
+      "goldSubject": 5,
+      "eligibility": "eligible"
+    },
+    {
+      "participant": 7,
+      "goldSubject": 6,
+      "eligibility": "eligible"
+    },
+    {
+      "participant": 8,
+      "goldSubject": 7,
+      "eligibility": "eligible"
+    },
+    {
+      "participant": 9,
+      "goldSubject": 8,
+      "eligibility": "eligible"
+    },
+    {
+      "participant": 10,
+      "goldSubject": 9,
+      "eligibility": "eligible"
+    },
+    {
+      "participant": 11,
+      "goldSubject": 10,
+      "eligibility": "eligible"
+    },
+    {
+      "participant": 12,
+      "goldSubject": 11,
+      "eligibility": "eligible"
+    },
+    {
+      "participant": 13,
+      "goldSubject": 12,
+      "eligibility": "eligible"
+    },
+    {
+      "participant": 14,
+      "goldSubject": 13,
+      "eligibility": "eligible"
+    },
+    {
+      "participant": 15,
+      "goldSubject": 14,
+      "eligibility": "eligible"
+    },
+    {
+      "participant": 16,
+      "goldSubject": 15,
+      "eligibility": "eligible"
+    },
+    {
+      "participant": 17,
+      "goldSubject": 16,
+      "eligibility": "eligible"
+    }
+  ]
+}

@@ -1,95 +1,63 @@
 #!/usr/bin/env python3
-"""One gold rule: the descriptor-driven constants must equal the literals they replace.
-
-`SherlockSceneCoding.scala:14-15` states the defect outright -- "Two implementations of one rule is
-one too many, so this one cites the other". This is the differential receipt that lets the second
-implementation be retired: old literals and descriptor-driven values must agree on every field
-BEFORE either is removed.
-"""
+"""Preregistered numeric oracle; --scala-witness adds actual cross-language agreement."""
+import argparse
 import json
 from pathlib import Path
 import sys
 import tempfile
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+import gold_scene as gs
 
-HERE = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(HERE))
-import corpus_descriptor as cd  # noqa: E402
-import gold_scene  # noqa: E402
-
-FAILURES = []
+# Independent transcription of the committed preregistration, including both exclusions.
+EXPECTED = [None, None, 2, 3, 4, None, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, None]
 
 
-def check(name, ok):
-    if not ok:
-        FAILURES.append(name)
+def observations():
+    return {'ruleSha256': gs.sha(gs.RULE_PATH), 'trSeconds': gs.TR,
+            'participants': [{'participant': n, 'parsed': gs.participant_number(f'NN{n:02d}_synthetic.csv'),
+                              'goldSubject': gs.gold_subject_of(n)} for n in range(19)]}
+
+
+def validate_scala(path):
+    actual = gs.load(path)
+    assert actual == observations(), 'PYTHON_SCALA_RULE_DISAGREEMENT'
+    return actual
 
 
 def main():
-    # the literals as they stand today, captured before anything is reconfigured
-    before = {"TR": gold_scene.TR, "EXCLUDED": sorted(gold_scene.EXCLUDED),
-              "EXCLUDED_NUMS": sorted(gold_scene.EXCLUDED_NUMS)}
-
-    doc = {
-        "schema": cd.SCHEMA,
-        "schemaVersion": cd.SCHEMA_VERSION,
-        "corpus": "sherlock",
-        "goldRule": {
-            "trSeconds": 1.5,
-            "excludedParticipants": ["NN01"],
-            "participantPattern": r"^NN(\d{2})_",
-        },
-    }
-    handle = tempfile.NamedTemporaryFile("w", suffix=".json", delete=False, encoding="utf-8")
-    json.dump(doc, handle)
-    handle.close()
-
-    after = gold_scene.configure(handle.name)
-    check("TR agrees", after["TR"] == before["TR"] == 1.5)
-    check("exclusions agree", after["EXCLUDED"] == before["EXCLUDED"] == ["NN01"])
-    check("excluded numbers agree", after["EXCLUDED_NUMS"] == before["EXCLUDED_NUMS"] == [1])
-
-    # and the alias arithmetic is unchanged by reconfiguration -- the rule itself did not move
-    check("alias identity below 5", gold_scene.gold_subject_of(4) == 4)
-    check("alias skip at 5", gold_scene.gold_subject_of(5) is None)
-    check("alias shift above 5", gold_scene.gold_subject_of(6) == 5)
-    check("excluded subject refused", gold_scene.gold_subject_of(1) is None)
-
-    # MUTANT: a descriptor with a different TR must change the rule, or the descriptor is decoration
-    doc["goldRule"]["trSeconds"] = 2.0
-    h2 = tempfile.NamedTemporaryFile("w", suffix=".json", delete=False, encoding="utf-8")
-    json.dump(doc, h2)
-    h2.close()
-    check("a changed TR reaches the rule", gold_scene.configure(h2.name)["TR"] == 2.0)
-    gold_scene.configure(handle.name)  # restore
-
-    # MUTANT: participantPattern was DECLARED and read by nothing -- `int(name[2:4])` did the job
-    # and hardcoded Sherlock's two-letter shape, so a corpus with different ids would configure
-    # cleanly and then be parsed by the wrong rule. A declared knob that changes nothing is the
-    # defect this contract exists to remove, so the mutation is that a changed pattern must reach
-    # the parse, in BOTH the filename form and the bare-id form that `excludedParticipants` uses.
-    check("pattern parses a filename", gold_scene.participant_number("NN07_recall.tsv") == 7)
-    check("pattern parses a bare id", gold_scene.participant_number("NN01") == 1)
-    check("a non-participant file is skipped", gold_scene.participant_number("README.md") is None)
-
-    doc["goldRule"]["participantPattern"] = r"^sub-(\d{3})_"
-    doc["goldRule"]["excludedParticipants"] = ["sub-013"]
-    h3 = tempfile.NamedTemporaryFile("w", suffix=".json", delete=False, encoding="utf-8")
-    json.dump(doc, h3)
-    h3.close()
-    cfg = gold_scene.configure(h3.name)
-    check("a changed pattern reaches the filename parse",
-          gold_scene.participant_number("sub-013_recall.tsv") == 13)
-    check("a changed pattern reaches the exclusion list", cfg["EXCLUDED_NUMS"] == [13])
-    check("the OLD pattern no longer parses", gold_scene.participant_number("NN07_x.tsv") is None)
-    gold_scene.configure(handle.name)  # restore
-    check("restoring the descriptor restores the rule", gold_scene.EXCLUDED_NUMS == {1})
-
-    if FAILURES:
-        print("FAILED: " + "; ".join(FAILURES))
-        return 1
-    print("ok: descriptor-driven gold rule agrees with the literals it replaces, field by field")
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--scala-witness', type=Path)
+    args = parser.parse_args()
+    assert gs.TR == 1.5
+    assert [gs.gold_subject_of(n) for n in range(19)] == EXPECTED
+    assert gs.EXCLUDED == {'NN01'}
+    for n in range(1, 18):
+        assert gs.participant_number(f'NN{n:02d}_synthetic.csv') == n
+        assert gs.participant_number(f'NN{n:02d}') == n
+    for name in ('NN03foreign', 'NN00_invalid', 'NN18_invalid', 'README.md'):
+        assert gs.participant_number(name) is None
+    if args.scala_witness:
+        validate_scala(args.scala_witness)
+        print('PASS actual Python/Scala agreement: TR, parsed IDs, all 17 aliases and boundary refusals')
+    else:
+        print('PASS Python preregistration oracle; cross-language check requires --scala-witness')
+    # A descriptor cannot supply a second authority; absent or changed values refuse.
+    with tempfile.TemporaryDirectory() as temp:
+        path = Path(temp) / 'descriptor.json'
+        doc = {'schema': 'storymodel4s.corpus.descriptor', 'schemaVersion': 1,
+               'goldRule': {'trSeconds': gs.TR, 'excludedParticipants': sorted(gs.EXCLUDED),
+                            'participantPattern': gs.PARTICIPANT_PATTERN}}
+        path.write_text(json.dumps(doc))
+        assert gs.configure(path)['TR'] == 1.5
+        doc['goldRule']['trSeconds'] = 2.0
+        path.write_text(json.dumps(doc))
+        try:
+            gs.configure(path)
+            raise AssertionError('changed descriptor admitted')
+        except ValueError as error:
+            assert 'DESCRIPTOR_RULE_DISAGREEMENT' in str(error)
     return 0
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     sys.exit(main())

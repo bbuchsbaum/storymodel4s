@@ -1,0 +1,11 @@
+{
+  "schema": "storymodel4s.bench.scene-scoring-config/v1",
+  "primary": "participant-average-paired-difference",
+  "secondary": "pooled-unit-weighted-paired-difference",
+  "bootstrapMethod": "paired-participant-cluster-percentile",
+  "seed": 20260902,
+  "resamples": 2000,
+  "confidence": 0.95,
+  "unitWeight": 1,
+  "percentileIndices": "floor(alpha/2*n),floor((1-alpha/2)*n)-1"
+}

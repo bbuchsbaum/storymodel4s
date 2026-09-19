@@ -27,6 +27,8 @@ def main():
     parser.add_argument('data', type=Path)
     parser.add_argument('output', type=Path)
     args = parser.parse_args()
+    parser.error('This historical readout requires migration to the frozen unit/support scorer; '
+                 'use gold_scene.py import-tsv and compare. No gold has been opened.')
     data, output = args.data.resolve(), args.output.resolve()
     study = data / 'study/recall-to-video'
     root = Path(__file__).resolve().parents[2]

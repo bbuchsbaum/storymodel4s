@@ -11,22 +11,19 @@ import storymodel4s.view.{ClockSpan, CodedInterval, IndependentCoding}
   * (`docs/plans/2026-09-02-gold-scene-preregistration.md` §2–3) and `gold_scene.py` implements:
   * onsets and offsets are TR indices at 1.5 s; gold subject *n* is participant `NN0n` up to 4 and
   * `NN0(n+1)` from 5; `NN05` has no coding; `NN01` is excluded because its coding runs to 1417 s
-  * against a 782 s transcript. Two implementations of one rule is one too many, so this one cites
-  * the other and the study log carries the numbers that check them against each other.
+  * against a 782 s transcript. The packaged `scene-coding-rule.json` is read here and by Python; a
+  * synthetic cross-language witness binds the TR and every admitted participant alias.
   */
 object SherlockSceneCoding:
-  val trSeconds: Double = 1.5
+  val trSeconds: Double = SherlockGoldRule.trSeconds
 
   /** Gold subject for a participant number, or none for the two the pre-registration excludes. */
   def subjectOf(participant: Int): Option[Int] =
-    if participant == 1 || participant == 5 then None
-    else if participant <= 4 then Some(participant)
-    else Some(participant - 1)
+    SherlockGoldRule.subjectOf(participant)
 
   /** The participant number from a recall file name such as `NN03_ANT_202231_final.csv`. */
   def participantOf(fileName: String): Option[Int] =
-    val m = "^NN(\\d{2})_".r.findFirstMatchIn(fileName)
-    m.map(_.group(1).toInt)
+    SherlockGoldRule.participantOf(fileName)
 
   /** Read the coding for one participant; `None` when the participant has no gold. */
   def load(csv: Path, participant: Int): Either[DomainError, Option[IndependentCoding]] =

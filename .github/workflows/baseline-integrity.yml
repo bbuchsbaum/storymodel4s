@@ -4,10 +4,12 @@ on:
   pull_request:
     paths:
       - 'tools/recall-study/**'
+      - 'embed-bench/src/main/resources/storymodel4s/bench/sherlock/scene-coding-rule.json'
       - '.github/workflows/baseline-integrity.yml'
   push:
     paths:
       - 'tools/recall-study/**'
+      - 'embed-bench/src/main/resources/storymodel4s/bench/sherlock/scene-coding-rule.json'
       - '.github/workflows/baseline-integrity.yml'
 
 permissions:
@@ -23,3 +25,8 @@ jobs:
         run: python3 tools/recall-study/test_freeze_baseline.py -v
       - name: Guard-deletion witnesses
         run: python3 tools/recall-study/mutate_baseline_checks.py
+      - name: Fixed-support scorer and numeric rule oracle (synthetic only)
+        run: |
+          python3 tools/recall-study/tests/test_gold_scene.py -v
+          python3 tools/recall-study/tests/test_gold_rule_single.py
+          python3 tools/recall-study/mutate_scorer_checks.py

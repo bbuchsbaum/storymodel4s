@@ -40,6 +40,18 @@ One pattern, ten instances: **records and types that assert authority and are wi
 
 ## Decisions
 
+### Sherlock scene-scoring integration, 2026-09-19
+
+The packaged `embed-bench` resource `storymodel4s/bench/sherlock/scene-coding-rule.json`
+is the single declaration of TR duration, participant aliases and exclusions, scene count,
+and the existing closed-interval, first-sorted-match convention. Scala `SherlockSceneCoding`
+and the Python scene scorer read that record; corpus descriptors may assert agreement but
+cannot override it. An actual Scala export is checked against Python observations and the
+preregistered numeric oracle. Changed aliases or TR values must fail the witness.
+
+Rejected: maintaining two arithmetic implementations and comparing their declarations by
+inspection. These are evaluation rules, not additional features for mapping recall content.
+
 ### 1. Two modules, mirroring the `core` → `media`/`pipeline` split
 
 ```

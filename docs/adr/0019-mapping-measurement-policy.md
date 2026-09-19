@@ -43,3 +43,17 @@ Sherlock integration reuses ADR 0018's `ClockRepair` and existing manifest vocab
 JSON is the single admission-pin source, loaded through verified identity and receipted by its
 own digest. Duplicating those hashes in Scala is rejected: agreement between two editable copies
 does not supply independent evidence. This changes admission maintenance, not the admitted bytes.
+
+The first scoring slice (2026-09-19) introduces only versioned benchmark artifacts in existing
+modules: the recall unit manifest, frozen gold support, complete scene outcomes, comparison
+result and scoring configuration. It does not implement the proposed public mapping-result API.
+Freeze observation identity first and gold eligibility separately, before opening predictions.
+The support's canonical digest is supplied independently from the support file and recorded in
+the evaluation ledger; a changed support requires a new declared artifact and ledger entry.
+Reject silently recomputing the digest during comparison, which would allow denominator edits.
+
+Retain the preregistered uniform unit weights and participant-average paired difference;
+report pooled unit-weighted differences separately. Nonlabel outcomes remain wrong when gold
+eligible, and no-gold units remain accounted for. Empty populations and singleton bootstrap
+intervals are explicitly undefined. Timing, transcript-order and adjacent-transition coverage
+remain separate; unresolved units never create a synthetic direct transition across a gap.
