@@ -467,6 +467,8 @@ final class SourceDerivationReceipt private (
     val inputChecksums: Vector[Checksum],
     val identity: Checksum
 ):
+  /** Safe full payload binding; preserves the historical `identity` preimage. */
+  lazy val bindingIdentity: Checksum = SourceIdentity.receipt(this)
   override def equals(other: Any): Boolean = other match
     case that: SourceDerivationReceipt =>
       algorithm == that.algorithm && parameters == that.parameters &&
@@ -982,6 +984,8 @@ final class SourceBundle private (
     val authorityTracks: Vector[StreamId],
     val mappings: Vector[CheckedMapping]
 ):
+  /** Full stream, coordinate and mapping identity; the legacy anchor-facing ID is unchanged. */
+  lazy val identity: Checksum = SourceIdentity.bundle(this)
   lazy val streamById: Map[StreamId, SourceStream] = streams.iterator.map(s => s.id -> s).toMap
   def stream(id: StreamId): Option[SourceStream] = streamById.get(id)
   override def equals(other: Any): Boolean = other match
@@ -1318,8 +1322,27 @@ final class EvidenceSupport private (val anchors: NonEmptyVector[EvidenceAnchor]
         val end = nev.toVector.map(_.endExclusive).max
         Right(new PlaybackInterval(axis, start, end))
 
-  def textSpans: Option[SpanSet] =
-    val sets = anchors.toVector.collect { case EvidenceAnchor.Text(_, _, spans) => spans }
+  /** A canonical interval union on exactly the requested axis; gaps are retained. */
+  def intervalsOn(axis: PresentationAxisId): Either[DomainError, PlaybackIntervalSet] =
+    val intervals = anchors.toVector.flatMap {
+      case EvidenceAnchor.MediaTime(_, _, a, set) if a == axis => set.intervals.toVector
+      case EvidenceAnchor.Shot(_, _, _, interval) if interval.axis == axis => Vector(interval)
+      case EvidenceAnchor.Track(_, _, _, set) if set.axis == axis => set.intervals.toVector
+      case _ => Vector.empty
+    }.sortBy(i => (i.start, i.endExclusive))
+    val merged = intervals.foldLeft(Vector.empty[PlaybackInterval]) { (out, interval) =>
+      out.lastOption match
+        case Some(last) if interval.start <= last.endExclusive =>
+          out.init :+ new PlaybackInterval(axis, last.start, last.endExclusive.max(interval.endExclusive))
+        case _ => out :+ interval
+    }
+    PlaybackIntervalSet.of(merged)
+
+  /** Text coordinates from distinct streams are never unioned implicitly. */
+  def textSpans(stream: StreamId): Option[SpanSet] =
+    val sets = anchors.toVector.collect {
+      case EvidenceAnchor.Text(_, s, spans) if s == stream => spans
+    }
     sets.reduceOption(_ ++ _)
 
   override def equals(other: Any): Boolean = other match
@@ -1336,21 +1359,9 @@ object EvidenceSupport:
     NonEmptyVector.fromVector(anchors) match
       case None      => Left(SourceCanon.fmt("EvidenceSupport", "[]", "empty support"))
       case Some(nev) =>
-        val foreign = nev.toVector.find { a =>
-          a.anchorBundle != bundle.id || bundle.stream(a.anchorStream).isEmpty
-        }
-        foreign match
-          case Some(a) =>
-            Left(
-              SourceCanon.inv(
-                "support/anchor",
-                s"anchor stream ${a.anchorStream.value} is foreign to bundle ${bundle.id.value}"
-              )
-            )
-          case None =>
-            val mixedBundle = nev.toVector.exists(_.anchorBundle != bundle.id)
-            if mixedBundle then Left(SourceCanon.inv("support/bundle", "foreign bundle identity"))
-            else Right(new EvidenceSupport(nev))
+        nev.toVector.foldLeft[Either[DomainError, Unit]](Right(())) { (result, anchor) =>
+          result.flatMap(_ => SourceSupportChecks.anchor(bundle, anchor))
+        }.map(_ => new EvidenceSupport(nev))
 
   def text(
       bundle: SourceBundle,
@@ -1405,6 +1416,8 @@ sealed trait CheckedMapping:
   def family: MappingFamily
   def axes: Vector[PresentationAxisId]
   def receipt: SourceDerivationReceipt
+  /** Binds the mapping payload and receipt, not merely its relation endpoints. */
+  final lazy val identity: Checksum = SourceIdentity.mapping(this)
 
 /** Partial monotone exact-rational clock repair for one source. */
 final class ClockRepair private (
@@ -1634,41 +1647,6 @@ object BoundarySearchCoverage:
         s"empty $layer detector output cannot construct a negative-boundary proposal"
       )
     )
-
-/** Legacy AudioSpan stays a text-first millisecond overlay until a checked 1/1000 binding exists.
-  */
-object LegacyAudioBinding:
-  def toMediaSupport(
-      span: AudioSpan,
-      bundle: SourceBundle,
-      stream: StreamId,
-      axis: PresentationAxis
-  ): Either[DomainError, EvidenceSupport] =
-    if axis.kind == AxisKind.EditionPlayback then
-      Left(
-        SourceCanon.inv(
-          "audio-span/promotion",
-          "AudioSpan cannot enter edition playback without a named 1/1000 local axis and mapping"
-        )
-      )
-    else if axis.timebase.forall(_ != RationalTimebase.Millisecond) then
-      Left(
-        SourceCanon.inv(
-          "audio-span/scale",
-          "AudioSpan binding requires an exact 1/1000 timebase"
-        )
-      )
-    else if span.startMillis == span.endMillis then
-      Left(
-        SourceCanon.inv(
-          "audio-span/empty",
-          "legacy-empty AudioSpan cannot construct a media interval"
-        )
-      )
-    else
-      PlaybackInterval.on(axis, span.startMillis, span.endMillis).flatMap { iv =>
-        EvidenceSupport.media(bundle, stream, PlaybackIntervalSet.one(iv))
-      }
 
 /** Proposal unit carried by a checked narrative atlas. */
 final class NarrativeProposalUnit private (

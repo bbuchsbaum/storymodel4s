@@ -709,12 +709,11 @@ object SurfaceAnalyzer:
   * Why a trait: text keeps [[SurfaceAtlas]] as the exact UTF-16 implementation, while a film
   * adapter can supply the same compiler-facing surface without changing text constructors.
   */
-trait NarrativeSourceAtlas:
+sealed trait NarrativeSourceAtlas:
   def bundle: SourceBundle
   def units: Vector[NarrativeProposalUnit]
   def unit(id: NarrativeProposalUnitId): Option[NarrativeProposalUnit]
   def supportOf(id: NarrativeProposalUnitId): Option[EvidenceSupport]
-  def surfaceAtlas: Option[SurfaceAtlas]
 
 /** Text conformance adapter. Equality and lookup of the wrapped [[SurfaceAtlas]] are unchanged. */
 final class TextNarrativeAtlas private (
@@ -722,9 +721,9 @@ final class TextNarrativeAtlas private (
     val bundle: SourceBundle,
     val units: Vector[NarrativeProposalUnit]
 ) extends NarrativeSourceAtlas:
-  def unit(id: NarrativeProposalUnitId): Option[NarrativeProposalUnit] = units.find(_.id == id)
+  private lazy val byId = units.iterator.map(unit => unit.id -> unit).toMap
+  def unit(id: NarrativeProposalUnitId): Option[NarrativeProposalUnit] = byId.get(id)
   def supportOf(id: NarrativeProposalUnitId): Option[EvidenceSupport] = unit(id).map(_.support)
-  def surfaceAtlas: Option[SurfaceAtlas] = Some(atlas)
 
   override def equals(other: Any): Boolean = other match
     case that: TextNarrativeAtlas =>
@@ -757,6 +756,61 @@ object TextNarrativeAtlas:
 object SurfaceAtlasConformance:
   def narrativeAtlas(atlas: SurfaceAtlas): Either[DomainError, NarrativeSourceAtlas] =
     TextNarrativeAtlas.of(atlas)
+
+/** A derived proposal surface associated with a supplied receipt, not an output attestation. */
+final class BoundProposalSurface private (
+    val surface: SurfaceAtlas,
+    val checksum: Checksum,
+    val receipt: SourceDerivationReceipt,
+    val identity: Checksum
+):
+  override def equals(other: Any): Boolean = other match
+    case that: BoundProposalSurface => surface == that.surface && receipt == that.receipt
+    case _ => false
+  override def hashCode(): Int = (surface, receipt).hashCode()
+
+object BoundProposalSurface:
+  def of(surface: SurfaceAtlas, receipt: SourceDerivationReceipt): BoundProposalSurface =
+    val checksum = SourceIdentity.surface(surface)
+    val identity = SourceIdentity.digest(Vector("bound-proposal-surface/v1", checksum.hex,
+      surface.source.canonicalChecksum.hex, receipt.bindingIdentity.hex))
+    new BoundProposalSurface(surface, checksum, receipt, identity)
+
+/** Checked film proposal inventory. Text derivations remain outside the film bundle. */
+final class AnchoredNarrativeAtlas private (
+    val bundle: SourceBundle,
+    val units: Vector[NarrativeProposalUnit],
+    val surface: Option[BoundProposalSurface]
+) extends NarrativeSourceAtlas:
+  private lazy val byId = units.iterator.map(unit => unit.id -> unit).toMap
+  def unit(id: NarrativeProposalUnitId): Option[NarrativeProposalUnit] = byId.get(id)
+  def supportOf(id: NarrativeProposalUnitId): Option[EvidenceSupport] = unit(id).map(_.support)
+  override def equals(other: Any): Boolean = other match
+    case that: AnchoredNarrativeAtlas =>
+      bundle == that.bundle && units == that.units && surface == that.surface
+    case _ => false
+  override def hashCode(): Int = (bundle, units, surface).hashCode()
+
+object AnchoredNarrativeAtlas:
+  def of(
+      bundle: SourceBundle,
+      units: Vector[NarrativeProposalUnit],
+      surface: Option[BoundProposalSurface] = None
+  ): Either[DomainError, AnchoredNarrativeAtlas] =
+    val ids = units.map(_.id)
+    val surfaces = units.flatMap(_.surface)
+    if bundle.primaryAxis.kind != AxisKind.EditionPlayback then
+      Left(SourceCanon.inv("atlas/primary-axis", "anchored atlas requires edition playback; other kinds remain unsupported"))
+    else if ids.distinct.size != ids.size then
+      Left(SourceCanon.inv("atlas/units", "duplicate narrative proposal unit identity"))
+    else if surfaces.distinct.size != surfaces.size then
+      Left(SourceCanon.inv("atlas/surface", "duplicate proposal surface sentence"))
+    else if surfaces.exists(id => !surface.exists(_.surface.byId.get(id).exists(_.kind == SurfaceUnitKind.Sentence))) then
+      Left(SourceCanon.inv("atlas/surface", "proposal surface is not a sentence of the bound surface"))
+    else
+      units.foldLeft[Either[DomainError, Unit]](Right(())) { (result, unit) =>
+        result.flatMap(_ => EvidenceSupport.of(bundle, unit.support.anchors.toVector).map(_ => ()))
+      }.map(_ => new AnchoredNarrativeAtlas(bundle, units, surface))
 
   def bundleOf(source: StorySource): Either[DomainError, SourceBundle] =
     SourceBundle.writtenText(source)

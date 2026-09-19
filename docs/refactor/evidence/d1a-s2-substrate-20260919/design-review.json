@@ -1,0 +1,16 @@
+{
+  "reviewedRevision": "3c4cdf40",
+  "acceptedDesignRevision": "62d225b1",
+  "reviewer": "/root/cold_plan_review, separate non-author SD6 design review",
+  "findings": [
+    "Bind full mappings and all stream coordinates, preserving legacy IDs",
+    "Keep intermediate text model and compiler doors closed before publishing anchored evidence",
+    "Derive proposal-surface identity and refuse duplicate proposal IDs",
+    "Admit EditionPlayback only; preserve actual instants as a mandatory D1B type requirement",
+    "Provide shared checked pre-model ordering for compiler trajectory construction",
+    "Specify stream-kind and stream-axis compatibility with full mapping-image coverage",
+    "Use safe additive receipt payload binding to avoid legacy NUL-join collisions"
+  ],
+  "resolution": "Revision 5 and ADR 0007 corrected before implementation; reviewer recheck accepted at 62d225b1.",
+  "qualification": "Design acceptance only; code, mutations, parity and gates remain pending."
+}

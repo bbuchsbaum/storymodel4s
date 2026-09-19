@@ -532,6 +532,8 @@ object NarrativeCompilerInput:
     duplicateEvidence.foreach(id => invalid("compiler/evidence", s"duplicate ${id.value}"))
     val evidenceMap = evs.map(e => e.id -> e).toMap
     evs.foreach { evidence =>
+      if evidence.anchors.nonEmpty then
+        invalid("compiler/evidence", "text compiler input cannot carry anchored evidence")
       if evidence.upstream.nonEmpty then
         invalid(
           "compiler/evidence",
@@ -952,6 +954,8 @@ object NarrativeCompilerInput:
       case EvidenceRef.ById(id) if !evidence.contains(id) =>
         invalid(path, s"unknown evidence ${id.value}")
       case EvidenceRef.Inline(ev) =>
+        if ev.anchors.nonEmpty then
+          invalid(path, "text compiler input cannot carry anchored inline evidence")
         if ev.upstream.nonEmpty then
           invalid(path, s"inline evidence ${ev.id.value} cites unavailable upstream claims")
         evidence.get(ev.id).foreach { recorded =>

@@ -203,7 +203,7 @@ class SourceBundleSuite extends FunSuite:
       .toOption
       .get
     assert(text.selectedPlaybackAxis.isLeft)
-    assertEquals(text.textSpans.map(_.coveredLength), Some(5))
+    assertEquals(text.textSpans(textBundle.streams.head.id).map(_.coveredLength), Some(5))
 
   test("clock repair is required before run-local seconds become PTS"):
     val src = PresentationAxisId.unsafe("run-local")
@@ -238,14 +238,6 @@ class SourceBundleSuite extends FunSuite:
     assertNotEquals(Some(empty), Some(nonempty))
     assertEquals(empty.durationMillis, 0L)
     assertEquals(nonempty.durationMillis, 40L)
-    assert(
-      LegacyAudioBinding.toMediaSupport(empty, film, film.streams.head.id, film.primaryAxis).isLeft
-    )
-    assert(
-      LegacyAudioBinding
-        .toMediaSupport(nonempty, film, film.streams.head.id, film.primaryAxis)
-        .isLeft
-    )
 
   test("SpanSet text behavior is unchanged beside the new support type"):
     val a = SpanSet.one(TextSpan.unsafe(0, 4))
@@ -255,7 +247,7 @@ class SourceBundleSuite extends FunSuite:
     assert(joined.isContiguous)
     assertEquals(SpanSet.of(Vector.empty), None)
     val support = EvidenceSupport.text(textBundle, textBundle.streams.head.id, joined).toOption.get
-    assertEquals(support.textSpans.map(_.coveredLength), Some(8))
+    assertEquals(support.textSpans(textBundle.streams.head.id).map(_.coveredLength), Some(8))
 
   test("text and playback coordinates have no common comparison"):
     val text = TextCoordinate.on(textBundle.primaryAxis, 0).toOption.get

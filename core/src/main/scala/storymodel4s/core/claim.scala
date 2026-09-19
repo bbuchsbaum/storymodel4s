@@ -31,7 +31,8 @@ final case class Evidence(
     spans: Option[SpanSet],
     upstream: Set[ClaimId],
     extractor: Fingerprint,
-    stage: StageId
+    stage: StageId,
+    anchors: Option[EvidenceSupport] = None
 ):
   def hasSpans: Boolean = spans.nonEmpty
 

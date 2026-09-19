@@ -108,6 +108,36 @@ object CoreCodecs:
     .decodeVector[SpanRef]
     .emap(v => SpanSet.of(v).toRight("SpanSet requires at least one span"))
 
+  private def playbackInterval(interval: PlaybackInterval): Json =
+    Json.obj("axis" -> interval.axis.value.asJson, "startTick" -> interval.start.toString.asJson,
+      "endExclusiveTick" -> interval.endExclusive.toString.asJson)
+
+  /** An additive component shape; the 0.7.0 text model wire cannot contain it. */
+  given Encoder[EvidenceSupport] = Encoder.instance { support =>
+    val anchors = support.anchors.toVector.map {
+      case EvidenceAnchor.Text(bundle, stream, spans) =>
+        Json.obj("type" -> "Text".asJson, "bundle" -> bundle.value.asJson,
+          "stream" -> stream.value.asJson, "spans" -> spans.asJson)
+      case EvidenceAnchor.MediaTime(bundle, stream, axis, intervals) =>
+        Json.obj("type" -> "MediaTime".asJson, "bundle" -> bundle.value.asJson,
+          "stream" -> stream.value.asJson, "axis" -> axis.value.asJson,
+          "intervals" -> intervals.intervals.toVector.map(playbackInterval).asJson)
+      case EvidenceAnchor.Shot(bundle, stream, shot, interval) =>
+        Json.obj("type" -> "Shot".asJson, "bundle" -> bundle.value.asJson,
+          "stream" -> stream.value.asJson, "shot" -> shot.value.asJson,
+          "interval" -> playbackInterval(interval))
+      case EvidenceAnchor.Track(bundle, stream, track, intervals) =>
+        Json.obj("type" -> "Track".asJson, "bundle" -> bundle.value.asJson,
+          "stream" -> stream.value.asJson, "track" -> track.value.asJson,
+          "intervals" -> intervals.intervals.toVector.map(playbackInterval).asJson)
+    }
+    Json.obj("schema" -> "evidence-support/v1".asJson, "anchors" -> anchors.asJson)
+  }
+
+  given Decoder[EvidenceSupport] = Decoder.instance { cursor =>
+    Left(DecodingFailure("evidence-support/v1 is unsupported by the 0.7.0 text decoder", cursor.history))
+  }
+
   // ---- source and atlas -----------------------------------------------------------------
   given Encoder[StorySource] = Encoder.instance { s =>
     obj(
@@ -268,11 +298,14 @@ object CoreCodecs:
       "spans" -> opt(e.spans),
       "upstream" -> sortedSetEncoder[ClaimId](e.upstream),
       "extractor" -> e.extractor.asJson,
-      "stage" -> e.stage.asJson
+      "stage" -> e.stage.asJson,
+      "anchors" -> opt(e.anchors)
     )
   }
   given Decoder[Evidence] = Decoder.instance { c =>
     for
+      _ <- if c.downField("anchors").focus.isEmpty then Right(())
+           else Left(DecodingFailure("anchored Evidence is unsupported by the 0.7.0 text decoder", c.history))
       id <- field[EvidenceId](c, "id")
       s <- field[Option[SpanSet]](c, "spans")
       up <- field[Vector[ClaimId]](c, "upstream")

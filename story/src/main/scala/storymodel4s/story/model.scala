@@ -38,6 +38,14 @@ final class StoryModel[S <: ModelStatus] private[story] (
     (graph.allMeta ++ hierarchy.allMeta ++ trajectory.allMeta ++ descriptors.map(_.meta) ++
       hypotheses.map(_.meta)).sortBy(_.id)
 
+  // Transitional D1A S2 boundary: S4a makes draft construction return Either. Keep every
+  // constructor/copy/status path text-only until then; 0.7.0 must never export anchors.
+  require(
+    claims.forall(_.evidence.forall(_.anchors.isEmpty)) &&
+      hierarchy.boundaryBeliefs.forall(_.evidence.forall(_.anchors.isEmpty)),
+    "text StoryModel cannot carry anchored evidence"
+  )
+
   /** The derived, normalized claim ledger; fails on duplicate claim identifiers. */
   lazy val ledger: Either[DomainError, ClaimLedger] = ClaimLedger.empty.addAll(claims)
 
