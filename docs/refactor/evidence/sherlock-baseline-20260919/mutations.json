@@ -1,0 +1,35 @@
+{
+  "sourceSha256": "f38f3dd92ca20340b7ac9c520857889fec7e6af735d44ce2efcd03eea1429e00",
+  "mutations": [
+    {
+      "deletedGuard": "complete row-locus oracle mismatch",
+      "rejectingTest": "test_unused_source_row_change_refused_even_with_refreshed_hashes",
+      "acceptingTest": "test_complete_synthetic_replay_preserves_distinct_outcomes",
+      "compiled": true,
+      "tests": 2,
+      "failures": 1,
+      "passes": 1,
+      "logSha256": "4d863e7dd7fe490212494df1896a00068d8a92c0a407a60a9e01ea7e67335450"
+    },
+    {
+      "deletedGuard": "repeat run artifact bytes differ",
+      "rejectingTest": "test_two_run_byte_difference_refused",
+      "acceptingTest": "test_complete_synthetic_replay_preserves_distinct_outcomes",
+      "compiled": true,
+      "tests": 2,
+      "failures": 1,
+      "passes": 1,
+      "logSha256": "e6b0bb134dfda319231171623ddccfa7b52f993c401bf52f3da574c47f3e0c56"
+    },
+    {
+      "deletedGuard": "distinct run artifact and log paths required",
+      "rejectingTest": "test_duplicate_run_receipt_refused",
+      "acceptingTest": "test_complete_synthetic_replay_preserves_distinct_outcomes",
+      "compiled": true,
+      "tests": 2,
+      "failures": 1,
+      "passes": 1,
+      "logSha256": "f16d13eca9a7a09bbf98c7736c019c92cd68bd7836596ffb21880c5ee2639d08"
+    }
+  ]
+}

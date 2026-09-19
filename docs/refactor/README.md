@@ -22,3 +22,6 @@ was not supplied. Root vision/mission are the adopted charter; capability claims
 evidence table and future gate receipts, not in the charter.
 
 The [execution receipt](EXECUTION_RECEIPT.json) records the applied tracker counts, ready queue, checks, and qualification limits.
+
+Implementation evidence: [frozen Sherlock mapping baseline, 19 September 2026](evidence/sherlock-baseline-20260919/README.md).
+Tracker snapshots above describe the planning checkpoint; use live Mote for current status.

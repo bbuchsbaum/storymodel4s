@@ -186,6 +186,13 @@ affected code, falsifier, artifacts and completion boundary.
 
 Implementation order:
 
+Execution checkpoint, 19 September 2026: the [frozen mapping baseline](evidence/sherlock-baseline-20260919/README.md)
+is complete. Two unchanged development runs and the historical TSV agree; all
+1,000 annotation coordinates are retained. The clean local full gate passed.
+The next sequential slice is the fail-closed scorer/unit manifest; S0 pins and
+production ClockRepair integration remain separate foundation work. G0 as a whole
+remains open, and no measurement-validity claim follows from this baseline.
+
 1. **Capture baseline**, repair scorer, and pin S0. Preserve the at-risk MASC branch before any
    cleanup. Obtain a clean gate through the infrastructure ticket; a billing block does not stop
    local engineering but cannot count as an executed CI pass.

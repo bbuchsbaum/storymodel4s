@@ -1,0 +1,12 @@
+{
+  "codeRevision": "99344ea01ffd82613b85337d6dd23a49b809f0c7",
+  "command": [
+    "sbt",
+    "-batch",
+    "scalafmtCheckAll",
+    "scalafmtSbtCheck"
+  ],
+  "exitCode": 0,
+  "logSha256": "b9085a41c6fdc5972768399d7cffd46f73a9767a5e09b55e91d70cc024d9b478",
+  "cleanAfter": true
+}

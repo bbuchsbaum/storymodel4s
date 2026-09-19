@@ -1,0 +1,27 @@
+{
+  "reviewer": "baseline_cold_review",
+  "mode": "separate fresh-context agent; read-only review",
+  "date": "2026-09-19",
+  "codeRevision": "99344ea01ffd82613b85337d6dd23a49b809f0c7",
+  "scope": [
+    "synthetic text admission",
+    "capture and verifier integrity",
+    "graph versus transcript checksum correction",
+    "saved content-free evidence and README claims"
+  ],
+  "findingsAddressed": [
+    "Voyage schema, coding absence, unit/row/decision/text/source/target joins",
+    "Two retained runs require distinct resolved artifact/log paths",
+    "Source cleanliness rechecked after each run; log and exact command receipts verified"
+  ],
+  "independentlyObserved": [
+    "Saved manifest verifier exit 0 and five identical artifact pairs",
+    "Historical TSV digest equality",
+    "173 units, 2495 words, 1050 targets, 1000 annotation rows",
+    "2401 covered word indices and exactly 94 indices outside units",
+    "14 synthetic tests pass; three compiled guard-deletion mutants have intended failing and passing controls",
+    "Temporary restored graph/text conflation fails the accepting fixture",
+    "Refused initial attempt remains present"
+  ],
+  "boundary": "No new real-participant run, raw prose inspection or Scala gate by reviewer. Full Scala gate is a separate exact-commit mechanical witness. This review does not establish scientific accuracy."
+}

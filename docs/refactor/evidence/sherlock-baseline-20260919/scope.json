@@ -1,0 +1,13 @@
+{
+  "command": [
+    "bash",
+    "tools/reference-scope.sh",
+    "46d476e720ac715a247619b615aa32cab792935d",
+    "99344ea01ffd82613b85337d6dd23a49b809f0c7"
+  ],
+  "exitCode": 0,
+  "codeRevision": "99344ea01ffd82613b85337d6dd23a49b809f0c7",
+  "output": "types defined by this candidate:\n  Ladder\n  LadderRun\n  RecallOrderControl\n  Record\n  RepairRefusal\n  Run\n  Rung\n  SherlockBaselineCapture\n  TimebaseRepair\n\nmodules that reference them (the gate must cover all of these):\n  acquire\n  corpus-intake\n  embed-bench\n  fixtures\n  media\n  pipeline\n  provider-agent\n  provider-parser\n\ngate command (JVM; paste it, do not retype the module names):\n  sbt -batch \"acquireJVM/test; corpusIntake/test; embedBench/test; fixturesJVM/test; media/test; pipeline/test; providerAgent/test; providerParser/test\"\n\n  Run it in a CLONE, never a linked worktree. Capture the exit status. Run\n  scalafmtCheckAll LAST, separately. Then grep the log for 'Passed: Total' --\n  a red gate with no totals measured your infrastructure, not the candidate.\n",
+  "sha256": "b00ee017634c6e526b03fd3de133e1519436621495109f9b8b9b7dc0db8b97c7",
+  "coverage": "Full checkAll covers the emitted scopes and all cross-built platforms."
+}

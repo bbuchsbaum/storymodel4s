@@ -1,0 +1,13 @@
+{
+  "codeRevision": "99344ea01ffd82613b85337d6dd23a49b809f0c7",
+  "command": [
+    "python3",
+    "tools/recall-study/test_freeze_baseline.py",
+    "-v"
+  ],
+  "exitCode": 0,
+  "tests": 14,
+  "logSha256": "8649b0ddce9edba9a1956819c8cc091160a30cb3145f2e7bf9b59443ba52c744",
+  "logPath": "study/recall-to-video/baseline-20260919-nn03-v2/python-tests.log",
+  "testScope": "synthetic integrity only; no mapper inference or corpus access"
+}
