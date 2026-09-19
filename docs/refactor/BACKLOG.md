@@ -8,7 +8,7 @@ The 30 consultant TA keys are crosswalk references, not another set of tickets. 
 
 ## What to do first
 
-One implementation slice at a time. Baseline capture, scorer repair, production clock integration and S0 text parity pins are complete. **S1's ADR amendment is next on the D1A track.** At-risk branch preservation remains independent foundation work. The account/runner decision blocks CI execution, not local engineering.
+One implementation slice at a time. Baseline capture, scorer repair, production clock integration, S0 text parity pins and S1's ADR amendment are complete. **S2's core substrate is next on the D1A track, beginning with the required design review.** At-risk branch preservation remains independent foundation work. The account/runner decision blocks CI execution, not local engineering.
 
 The active [film foundation goal](goals/film-foundation-20260919.md) assigns nine existing
 Motes to `film_foundation`, beginning with S1. It contains eight executable deliverables
@@ -18,7 +18,8 @@ and one parent reconciliation, with a bounded finish line and each ticket's gate
 - Completed `bd-01M2TA5FB4ATF9QS9ZA9MDJNE2` — [unit manifest and fail-closed scorer](evidence/sherlock-scorer-20260919/README.md)
 - Completed `bd-01M2WTGF981AY7RCN8QC42JSPT` — [production ClockRepair integration](evidence/sherlock-clock-repair-20260919/README.md)
 - Completed `bd-01M2TAB3QD2YXSPR8THYRGFBKS` — [S0 text parity pins](evidence/d1a-s0-text-parity-20260919/README.md)
-- Next `bd-01M2TABFW72D8WWQF481SD37KW` — D1A-types S1: ADR 0007 amendment (rulings, vocabulary, canonical form, identity)
+- Completed `bd-01M2TABFW72D8WWQF481SD37KW` — [S1 ADR amendment](evidence/d1a-s1-adr-20260919/README.md)
+- Next `bd-01M2TABVXSM72M9DD0SNB6GZ11` — D1A-types S2: core substrate, after the revision-4 design review
 - `bd-01M2TA2EMFCWRKXK6QJHGV702Q` — [foundation] Phase 0: rescue the only copy of audit/masc-role-corpus (b756b4bb) into the main repo
 - `bd-01M19G69RQCHMT2EMG11XFT4WX` — G0: obtain an executed exact-SHA clean build and CI receipt
 

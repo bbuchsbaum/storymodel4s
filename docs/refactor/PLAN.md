@@ -202,7 +202,10 @@ The [S0 text parity pins](evidence/d1a-s0-text-parity-20260919/README.md) are al
 the captured WOG compile, model/derivation bytes, renderings, node orders, Atlas textual twin
 and historical receipts are frozen. Five compiled mutations cover the four required changes;
 the clean full gate reports 6,444 passed executions and 5 skips across all 56 test tasks.
-The next sequential D1A slice is **S1's ADR amendment** (`bd-01M2TABFW72D8WWQF481SD37KW`).
+The [S1 ADR amendment](evidence/d1a-s1-adr-20260919/README.md) records the approved rulings
+and compatibility design; its separate committed-text review found no S1 findings.
+The next sequential D1A slice is **S2's core substrate** (`bd-01M2TABVXSM72M9DD0SNB6GZ11`),
+starting with the outstanding revision-4 design review and any required corrections.
 G0 as a whole remains open for infrastructure and independent preservation work;
 these engineering gates establish no accuracy or measurement-validity claim.
 

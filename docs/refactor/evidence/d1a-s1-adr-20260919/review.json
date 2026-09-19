@@ -1,0 +1,20 @@
+{
+  "reviewedRevision": "3c4cdf400e35a2bd7e99429c19f18aad00f83775",
+  "baseRevision": "3407347d",
+  "reviewer": "/root/s0_cold_review, separate non-author SD6 review",
+  "findings": [],
+  "checks": {
+    "gitDiffCheck": "passed",
+    "changedPaths": [
+      "docs/adr/0007-film-source-representation.md"
+    ],
+    "newLocalLinksResolve": [
+      "../plans/2026-09-17-d1a-source-to-story-plan.md",
+      "../refactor/PLAN.md",
+      "../refactor/goals/film-foundation-20260919.md",
+      "../refactor/evidence/d1a-s0-text-parity-20260919/README.md"
+    ],
+    "s0GoldenSha256": "cc201d9dd3e3576fabcd45677369f00c023ca5a455ea9d9e7ba694700c759fb3"
+  },
+  "scope": "Documentation only; no sbt or production qualification claimed. Revision-4 design cold review remains a separate S2 prerequisite."
+}
