@@ -122,8 +122,9 @@ Each of these was verified by hand or by at least two independent reads.
 - **No golden pins compiler output.** The War of the Ghosts compile suites live in `pipeline`,
   which runs on the JVM only. `runs/2026-09-02-wog-record-1/` holds only
   `compilation-report.json` and `receipts.json`. The model checksum golden lives in
-  `codec/StoryModelCodecSuite`; `fixtures/WarOfTheGhostsCodecGoldenSuite` separately pins an
-  HSMM artifact. Both run on all platforms. (Locations corrected during S0.)
+  `codec/StoryModelCodecSuite`; `fixtures/WarOfTheGhostsCodecGoldenSuite` separately checks
+  HSMM encoding and round trips, without asserting its checksum constant. Both run on all
+  platforms. (Coverage corrected during S0.)
 
 ## 2. The design of D1A-types
 
@@ -310,8 +311,8 @@ Every slice lands on `main` on its own green gate (§5). The values S0 pins must
 holds no model or derivation bytes.
 
 **Cross-platform coverage.** Model parity is cited from `codec/StoryModelCodecSuite`; the
-`fixtures` golden separately covers an HSMM artifact. Compile parity on JS and Native is a
-non-claim. These existing goldens are not duplicated by S0.
+`fixtures` suite separately checks HSMM encoding and round trips. Compile parity on JS and
+Native is a non-claim. These existing checks are not duplicated by S0.
 
 **Mutation witnesses:**
 - one fixture span offset;

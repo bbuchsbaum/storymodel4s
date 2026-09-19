@@ -19,9 +19,11 @@ The pins cover:
 - Actual private compiler `source-support/v2` and `evidence/v2` renderings, read through
   a small JVM test adapter. Their selected input identities are recorded. A public emitted
   entity mention ID and the existing unwrapped text-support wire encoding are also pinned.
-- The production graph's discourse order, plus all four node families in the declared
-  order `(support.minSpan.start, support.minSpan.endExclusive, id)`. Each is a full list;
-  map iteration order is not a contract. In this implementation `minSpan` is the support hull.
+- The production graph's discourse order, plus test-computed reference lists for all four
+  node families in the declared order `(support.minSpan.start, support.minSpan.endExclusive, id)`.
+  The later D1A projection API must consume these same expected lists. Today only the
+  situation discourse order observes a production ordering API; map iteration order is not
+  a contract. In this implementation `minSpan` is the support hull.
 - The SHA-256 of the draft Atlas `NarrativeScene.textualTwin` in UTF-8 with no appended
   newline, using the scene/hidden/selected spec, empty state and `d1a-s0-text-parity`
   renderer identity. This is a semantic view artifact, not a browser screenshot.
@@ -31,8 +33,9 @@ The pins cover:
 
 Cross-platform model encoding already has a literal checksum witness in
 `codec/src/test/scala/storymodel4s/codec/StoryModelCodecSuite.scala`, on JVM, JS and Native.
-`fixtures/.../WarOfTheGhostsCodecGoldenSuite.scala` separately pins an HSMM artifact. Neither
-is duplicated here. **The S0 compilation witness is JVM-only**; neither JS/Native compilation
+`fixtures/.../WarOfTheGhostsCodecGoldenSuite.scala` separately checks HSMM encoding and
+round trips; despite its name it does not assert its checksum constant or read its JSON golden.
+Those checks are not duplicated here. **The S0 compilation witness is JVM-only**; neither JS/Native compilation
 parity nor scientific correctness of the machine interpretation is claimed.
 
 Required mutation witnesses: shift a captured fixture alignment to an adjacent token;
