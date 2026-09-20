@@ -1,0 +1,1339 @@
+{
+  "codeRevision": "87848b96351b7458463690352cc3e3d7ff26f3ab",
+  "runnerSha256": "fa3112890acef52ec201e12a7315dc36b7bbd721f5c8a3ad53579137847553b8",
+  "testSourceSha256": {
+    "core/src/test/scala/storymodel4s/core/D1bPointSupportSuite.scala": "c8d67c7f7d58cf61c495b7b8507de941b17195e7d1997305c55729cdf5904bf9",
+    "core/src/test/scala/storymodel4s/core/probes/D1bPlaybackSupportBoundarySuite.scala": "8d9deeceac2f194e2c08f9ba9441819fa9e2ac243bf4e49ba1baf098b986c579",
+    "align/src/test/scala/storymodel4s/align/D1bScoringPositionSuite.scala": "a7f02eed7e6415898fdd6773e86ee4eb85b78633ca0264aa8f0f6a95fa8de8f2",
+    "align/src/test/scala/storymodel4s/align/probes/D1bResultBoundarySuite.scala": "df97d3ba845983d7f5310b5e6d5e8f0f473eeb9c6f3dbb7d85680e15325e1c12",
+    "codec/src/test/scala/storymodel4s/codec/AlignCodecSuite.scala": "3dd85e5066ba58c0214e29a69d09e59bcf38ef9b942a81cae0052ec1b0f6f985",
+    "codec/src/test/scala/storymodel4s/codec/D1bPointCodecSuite.scala": "5deaab7cca0ecb7fccc12fa49c350f5dbfe34264a47a6849b29ca832c13ecb0c",
+    "corpus-intake/src/test/scala/storymodel4s/corpus/intake/SherlockAnnotationsSuite.scala": "ca904b0e2c13085cd7b8369e81ad9cda28817f0b0286b55fe3537f350361e97f",
+    "embed-bench/src/test/scala/storymodel4s/bench/WogDiagnosticSuite.scala": "6518ed656ac5813f4f3f413300d745dca1eaf4d0966689cfe94c5874ccdb9f37",
+    "laws/src/test/scala/storymodel4s/laws/LawsSuite.scala": "8e3e888822e6c99f9e009b55fc49e92f02fed94bea1cb9a8732d116db530d8c1"
+  },
+  "expectedControlCounts": {
+    "storymodel4s.core.D1bPointSupportSuite": 14,
+    "storymodel4s.core.probes.D1bPlaybackSupportBoundarySuite": 3,
+    "storymodel4s.align.D1bScoringPositionSuite": 6,
+    "storymodel4s.align.probes.D1bResultBoundarySuite": 3,
+    "storymodel4s.codec.AlignCodecSuite": 14,
+    "storymodel4s.codec.D1bPointCodecSuite": 2,
+    "storymodel4s.corpus.intake.SherlockAnnotationsSuite": 23,
+    "storymodel4s.bench.WogDiagnosticSuite": 22,
+    "storymodel4s.laws.LawsSuite": 3
+  },
+  "controlCommand": [
+    "sbt",
+    "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+    "-batch",
+    "coreJVM/testOnly storymodel4s.core.D1bPointSupportSuite",
+    "coreJVM/testOnly storymodel4s.core.probes.D1bPlaybackSupportBoundarySuite",
+    "alignJVM/testOnly storymodel4s.align.D1bScoringPositionSuite",
+    "alignJVM/testOnly storymodel4s.align.probes.D1bResultBoundarySuite",
+    "codecJVM/testOnly storymodel4s.codec.AlignCodecSuite storymodel4s.codec.D1bPointCodecSuite",
+    "corpusIntake/testOnly storymodel4s.corpus.intake.SherlockAnnotationsSuite",
+    "embedBench/testOnly storymodel4s.bench.WogDiagnosticSuite",
+    "lawsJVM/testOnly storymodel4s.laws.LawsSuite -- --tests *scoring*"
+  ],
+  "plannedMutationCount": 67,
+  "inventoryStatus": "frozen before execution",
+  "cases": [
+    {
+      "id": "playback-nonempty",
+      "path": "core/src/main/scala/storymodel4s/core/support.scala",
+      "group": "point",
+      "rejectSuite": "storymodel4s.core.D1bPointSupportSuite",
+      "rejectingTest": "complete support requires a member and one common axis",
+      "controlSuite": "storymodel4s.core.D1bPointSupportSuite",
+      "acceptingControl": "accepting control: an interval-only projection keeps its exact checked coordinates",
+      "cleanRecompile": false,
+      "originalSha256": "a58e30cb19079dc351f4b7d5c4c2fb11d67e50c0f3596c8458e3328a9edd024b",
+      "mutantSha256": "9698e92d30f50c11d73ffc8bb0d1ced105b11efb004527fa3e5141894ef1b277",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "coreJVM/testOnly storymodel4s.core.D1bPointSupportSuite"
+      ],
+      "diff": "--- core/src/main/scala/storymodel4s/core/support.scala\n+++ core/src/main/scala/storymodel4s/core/support.scala\n@@ -44,7 +44,7 @@\n       intervals: Vector[PlaybackInterval],\n       points: Vector[PlaybackInstant]\n   ): Either[DomainError, PlaybackSupport] =\n-    if intervals.isEmpty && points.isEmpty then\n+    if false then\n       Left(SourceCanon.inv(\"playback-support/empty\", \"support requires an interval or point\"))\n     else if intervals.exists(_.axis != axis) || points.exists(_.axis != axis) then\n       Left(SourceCanon.inv(\"playback-support/axis\", \"support has a foreign axis\"))\n"
+    },
+    {
+      "id": "playback-interval-axis",
+      "path": "core/src/main/scala/storymodel4s/core/support.scala",
+      "group": "point",
+      "rejectSuite": "storymodel4s.core.D1bPointSupportSuite",
+      "rejectingTest": "complete support requires a member and one common axis",
+      "controlSuite": "storymodel4s.core.D1bPointSupportSuite",
+      "acceptingControl": "accepting control: an interval-only projection keeps its exact checked coordinates",
+      "cleanRecompile": false,
+      "originalSha256": "a58e30cb19079dc351f4b7d5c4c2fb11d67e50c0f3596c8458e3328a9edd024b",
+      "mutantSha256": "8e805e18b9f8e1d5a5d4169203d42478786b858ff93888a5b24502cec9c91374",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "coreJVM/testOnly storymodel4s.core.D1bPointSupportSuite"
+      ],
+      "diff": "--- core/src/main/scala/storymodel4s/core/support.scala\n+++ core/src/main/scala/storymodel4s/core/support.scala\n@@ -46,7 +46,7 @@\n   ): Either[DomainError, PlaybackSupport] =\n     if intervals.isEmpty && points.isEmpty then\n       Left(SourceCanon.inv(\"playback-support/empty\", \"support requires an interval or point\"))\n-    else if intervals.exists(_.axis != axis) || points.exists(_.axis != axis) then\n+    else if points.exists(_.axis != axis) then\n       Left(SourceCanon.inv(\"playback-support/axis\", \"support has a foreign axis\"))\n     else\n       val merged =\n"
+    },
+    {
+      "id": "playback-point-axis",
+      "path": "core/src/main/scala/storymodel4s/core/support.scala",
+      "group": "point",
+      "rejectSuite": "storymodel4s.core.D1bPointSupportSuite",
+      "rejectingTest": "complete support requires a member and one common axis",
+      "controlSuite": "storymodel4s.core.D1bPointSupportSuite",
+      "acceptingControl": "accepting control: an interval-only projection keeps its exact checked coordinates",
+      "cleanRecompile": false,
+      "originalSha256": "a58e30cb19079dc351f4b7d5c4c2fb11d67e50c0f3596c8458e3328a9edd024b",
+      "mutantSha256": "d840f56f138d3e71ac3b5f30af31e1df3141ed85b0fe05cadf0ec1abfe582c9b",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "coreJVM/testOnly storymodel4s.core.D1bPointSupportSuite"
+      ],
+      "diff": "--- core/src/main/scala/storymodel4s/core/support.scala\n+++ core/src/main/scala/storymodel4s/core/support.scala\n@@ -46,7 +46,7 @@\n   ): Either[DomainError, PlaybackSupport] =\n     if intervals.isEmpty && points.isEmpty then\n       Left(SourceCanon.inv(\"playback-support/empty\", \"support requires an interval or point\"))\n-    else if intervals.exists(_.axis != axis) || points.exists(_.axis != axis) then\n+    else if intervals.exists(_.axis != axis) then\n       Left(SourceCanon.inv(\"playback-support/axis\", \"support has a foreign axis\"))\n     else\n       val merged =\n"
+    },
+    {
+      "id": "playback-retain-points",
+      "path": "core/src/main/scala/storymodel4s/core/support.scala",
+      "group": "point",
+      "rejectSuite": "storymodel4s.core.D1bPointSupportSuite",
+      "rejectingTest": "mixed support retains interval gaps and explicit inside-interval points",
+      "controlSuite": "storymodel4s.core.D1bPointSupportSuite",
+      "acceptingControl": "accepting control: an interval-only projection keeps its exact checked coordinates",
+      "cleanRecompile": false,
+      "originalSha256": "a58e30cb19079dc351f4b7d5c4c2fb11d67e50c0f3596c8458e3328a9edd024b",
+      "mutantSha256": "ed8739ac6b4a7105d226680faa7dbd64a4a81d91386b9b396811e2fb8e0d0da6",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "coreJVM/testOnly storymodel4s.core.D1bPointSupportSuite"
+      ],
+      "diff": "--- core/src/main/scala/storymodel4s/core/support.scala\n+++ core/src/main/scala/storymodel4s/core/support.scala\n@@ -61,7 +61,7 @@\n                 )\n               case _ => out :+ interval\n         }\n-      Right(new PlaybackSupport(axis, merged, points.distinct.sortBy(_.at)))\n+      Right(new PlaybackSupport(axis, merged, Vector.empty))\n \n /** Support on one declared primary axis. Playback intervals retain gaps. */\n enum PrimaryProjection:\n"
+    },
+    {
+      "id": "playback-retain-inside-points",
+      "path": "core/src/main/scala/storymodel4s/core/support.scala",
+      "group": "point",
+      "rejectSuite": "storymodel4s.core.D1bPointSupportSuite",
+      "rejectingTest": "mixed support retains interval gaps and explicit inside-interval points",
+      "controlSuite": "storymodel4s.core.D1bPointSupportSuite",
+      "acceptingControl": "accepting control: an interval-only projection keeps its exact checked coordinates",
+      "cleanRecompile": false,
+      "originalSha256": "a58e30cb19079dc351f4b7d5c4c2fb11d67e50c0f3596c8458e3328a9edd024b",
+      "mutantSha256": "9c525159ef3954edf17b76cb05b2c4da1798d22b9c3f453735aeec80f4765dc0",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "coreJVM/testOnly storymodel4s.core.D1bPointSupportSuite"
+      ],
+      "diff": "--- core/src/main/scala/storymodel4s/core/support.scala\n+++ core/src/main/scala/storymodel4s/core/support.scala\n@@ -61,7 +61,7 @@\n                 )\n               case _ => out :+ interval\n         }\n-      Right(new PlaybackSupport(axis, merged, points.distinct.sortBy(_.at)))\n+      Right(new PlaybackSupport(axis, merged, points.distinct.sortBy(_.at).filterNot(p => merged.exists(_.contains(p.at)))))\n \n /** Support on one declared primary axis. Playback intervals retain gaps. */\n enum PrimaryProjection:\n"
+    },
+    {
+      "id": "playback-deduplicate-points",
+      "path": "core/src/main/scala/storymodel4s/core/support.scala",
+      "group": "point",
+      "rejectSuite": "storymodel4s.core.D1bPointSupportSuite",
+      "rejectingTest": "mixed support retains interval gaps and explicit inside-interval points",
+      "controlSuite": "storymodel4s.core.D1bPointSupportSuite",
+      "acceptingControl": "accepting control: an interval-only projection keeps its exact checked coordinates",
+      "cleanRecompile": false,
+      "originalSha256": "a58e30cb19079dc351f4b7d5c4c2fb11d67e50c0f3596c8458e3328a9edd024b",
+      "mutantSha256": "a1fedc06ac4ecbb51c24cb0f6583ebfe403b5a63e4de2ac397d4cdde4f6e9b47",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "coreJVM/testOnly storymodel4s.core.D1bPointSupportSuite"
+      ],
+      "diff": "--- core/src/main/scala/storymodel4s/core/support.scala\n+++ core/src/main/scala/storymodel4s/core/support.scala\n@@ -61,7 +61,7 @@\n                 )\n               case _ => out :+ interval\n         }\n-      Right(new PlaybackSupport(axis, merged, points.distinct.sortBy(_.at)))\n+      Right(new PlaybackSupport(axis, merged, points.sortBy(_.at)))\n \n /** Support on one declared primary axis. Playback intervals retain gaps. */\n enum PrimaryProjection:\n"
+    },
+    {
+      "id": "playback-sort-points",
+      "path": "core/src/main/scala/storymodel4s/core/support.scala",
+      "group": "point",
+      "rejectSuite": "storymodel4s.core.D1bPointSupportSuite",
+      "rejectingTest": "complete union merges overlapping and adjacent intervals and bounds outer points",
+      "controlSuite": "storymodel4s.core.D1bPointSupportSuite",
+      "acceptingControl": "accepting control: an interval-only projection keeps its exact checked coordinates",
+      "cleanRecompile": false,
+      "originalSha256": "a58e30cb19079dc351f4b7d5c4c2fb11d67e50c0f3596c8458e3328a9edd024b",
+      "mutantSha256": "45c6aecbc28507790590b2d46bfab8ccb9f21a7b4640ea59d740af5f212320ce",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "coreJVM/testOnly storymodel4s.core.D1bPointSupportSuite"
+      ],
+      "diff": "--- core/src/main/scala/storymodel4s/core/support.scala\n+++ core/src/main/scala/storymodel4s/core/support.scala\n@@ -61,7 +61,7 @@\n                 )\n               case _ => out :+ interval\n         }\n-      Right(new PlaybackSupport(axis, merged, points.distinct.sortBy(_.at)))\n+      Right(new PlaybackSupport(axis, merged, points.distinct))\n \n /** Support on one declared primary axis. Playback intervals retain gaps. */\n enum PrimaryProjection:\n"
+    },
+    {
+      "id": "playback-merge-overlap",
+      "path": "core/src/main/scala/storymodel4s/core/support.scala",
+      "group": "point",
+      "rejectSuite": "storymodel4s.core.D1bPointSupportSuite",
+      "rejectingTest": "complete union merges overlapping and adjacent intervals and bounds outer points",
+      "controlSuite": "storymodel4s.core.D1bPointSupportSuite",
+      "acceptingControl": "accepting control: an interval-only projection keeps its exact checked coordinates",
+      "cleanRecompile": false,
+      "originalSha256": "a58e30cb19079dc351f4b7d5c4c2fb11d67e50c0f3596c8458e3328a9edd024b",
+      "mutantSha256": "42a2f1a134bdeaf4311900f908f330b54a78c4d1b24515a096999828eac1f2b5",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "coreJVM/testOnly storymodel4s.core.D1bPointSupportSuite"
+      ],
+      "diff": "--- core/src/main/scala/storymodel4s/core/support.scala\n+++ core/src/main/scala/storymodel4s/core/support.scala\n@@ -53,7 +53,7 @@\n         intervals.sortBy(i => (i.start, i.endExclusive)).foldLeft(Vector.empty[PlaybackInterval]) {\n           (out, interval) =>\n             out.lastOption match\n-              case Some(last) if interval.start <= last.endExclusive =>\n+              case Some(last) if interval.start == last.endExclusive =>\n                 out.init :+ new PlaybackInterval(\n                   axis,\n                   last.start,\n"
+    },
+    {
+      "id": "playback-preserve-gap",
+      "path": "core/src/main/scala/storymodel4s/core/support.scala",
+      "group": "point",
+      "rejectSuite": "storymodel4s.core.D1bPointSupportSuite",
+      "rejectingTest": "mixed support retains interval gaps and explicit inside-interval points",
+      "controlSuite": "storymodel4s.core.D1bPointSupportSuite",
+      "acceptingControl": "accepting control: an interval-only projection keeps its exact checked coordinates",
+      "cleanRecompile": false,
+      "originalSha256": "a58e30cb19079dc351f4b7d5c4c2fb11d67e50c0f3596c8458e3328a9edd024b",
+      "mutantSha256": "fc896bc3500a48632f6a6f21c587627b4e073d9237924eda58f7b15b4de1f9c8",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "coreJVM/testOnly storymodel4s.core.D1bPointSupportSuite"
+      ],
+      "diff": "--- core/src/main/scala/storymodel4s/core/support.scala\n+++ core/src/main/scala/storymodel4s/core/support.scala\n@@ -53,7 +53,7 @@\n         intervals.sortBy(i => (i.start, i.endExclusive)).foldLeft(Vector.empty[PlaybackInterval]) {\n           (out, interval) =>\n             out.lastOption match\n-              case Some(last) if interval.start <= last.endExclusive =>\n+              case Some(last) =>\n                 out.init :+ new PlaybackInterval(\n                   axis,\n                   last.start,\n"
+    },
+    {
+      "id": "playback-point-lower-bound",
+      "path": "core/src/main/scala/storymodel4s/core/support.scala",
+      "group": "point",
+      "rejectSuite": "storymodel4s.core.D1bPointSupportSuite",
+      "rejectingTest": "complete union merges overlapping and adjacent intervals and bounds outer points",
+      "controlSuite": "storymodel4s.core.D1bPointSupportSuite",
+      "acceptingControl": "accepting control: an interval-only projection keeps its exact checked coordinates",
+      "cleanRecompile": false,
+      "originalSha256": "a58e30cb19079dc351f4b7d5c4c2fb11d67e50c0f3596c8458e3328a9edd024b",
+      "mutantSha256": "9efbbc3951a7efbc1ac4b8b93f833117b10ef393113e8512cb69c173e5a63e84",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "coreJVM/testOnly storymodel4s.core.D1bPointSupportSuite"
+      ],
+      "diff": "--- core/src/main/scala/storymodel4s/core/support.scala\n+++ core/src/main/scala/storymodel4s/core/support.scala\n@@ -22,7 +22,7 @@\n ):\n   def bounds: (Long, Long) =\n     (\n-      (intervals.map(_.start) ++ points.map(_.at)).min,\n+      intervals.map(_.start).min,\n       (intervals.map(_.endExclusive) ++ points.map(_.at)).max\n     )\n \n"
+    },
+    {
+      "id": "playback-point-upper-bound",
+      "path": "core/src/main/scala/storymodel4s/core/support.scala",
+      "group": "point",
+      "rejectSuite": "storymodel4s.core.D1bPointSupportSuite",
+      "rejectingTest": "complete union merges overlapping and adjacent intervals and bounds outer points",
+      "controlSuite": "storymodel4s.core.D1bPointSupportSuite",
+      "acceptingControl": "accepting control: an interval-only projection keeps its exact checked coordinates",
+      "cleanRecompile": false,
+      "originalSha256": "a58e30cb19079dc351f4b7d5c4c2fb11d67e50c0f3596c8458e3328a9edd024b",
+      "mutantSha256": "31986ce3f1f71cfcfd4ef7a5f8505519aaf229043ca928025c7b6b631998396e",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "coreJVM/testOnly storymodel4s.core.D1bPointSupportSuite"
+      ],
+      "diff": "--- core/src/main/scala/storymodel4s/core/support.scala\n+++ core/src/main/scala/storymodel4s/core/support.scala\n@@ -23,7 +23,7 @@\n   def bounds: (Long, Long) =\n     (\n       (intervals.map(_.start) ++ points.map(_.at)).min,\n-      (intervals.map(_.endExclusive) ++ points.map(_.at)).max\n+      intervals.map(_.endExclusive).max\n     )\n \n   def contains(other: PlaybackSupport): Boolean =\n"
+    },
+    {
+      "id": "containment-axis",
+      "path": "core/src/main/scala/storymodel4s/core/support.scala",
+      "group": "point",
+      "rejectSuite": "storymodel4s.core.D1bPointSupportSuite",
+      "rejectingTest": "complete union merges overlapping and adjacent intervals and bounds outer points",
+      "controlSuite": "storymodel4s.core.D1bPointSupportSuite",
+      "acceptingControl": "accepting control: an interval-only projection keeps its exact checked coordinates",
+      "cleanRecompile": false,
+      "originalSha256": "a58e30cb19079dc351f4b7d5c4c2fb11d67e50c0f3596c8458e3328a9edd024b",
+      "mutantSha256": "a030ab39149b3ab527041607d71e674c1310dfdaf48d83e7ec62d0943940a0e5",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "coreJVM/testOnly storymodel4s.core.D1bPointSupportSuite"
+      ],
+      "diff": "--- core/src/main/scala/storymodel4s/core/support.scala\n+++ core/src/main/scala/storymodel4s/core/support.scala\n@@ -27,7 +27,7 @@\n     )\n \n   def contains(other: PlaybackSupport): Boolean =\n-    axis == other.axis && other.intervals.forall(c =>\n+    other.intervals.forall(c =>\n       intervals.exists(p => p.start <= c.start && p.endExclusive >= c.endExclusive)\n     ) && other.points.forall(p => points.contains(p) || intervals.exists(_.contains(p.at)))\n \n"
+    },
+    {
+      "id": "containment-points",
+      "path": "core/src/main/scala/storymodel4s/core/support.scala",
+      "group": "point",
+      "rejectSuite": "storymodel4s.core.D1bPointSupportSuite",
+      "rejectingTest": "containment distinguishes points, gaps and positive duration",
+      "controlSuite": "storymodel4s.core.D1bPointSupportSuite",
+      "acceptingControl": "accepting control: an interval-only projection keeps its exact checked coordinates",
+      "cleanRecompile": false,
+      "originalSha256": "a58e30cb19079dc351f4b7d5c4c2fb11d67e50c0f3596c8458e3328a9edd024b",
+      "mutantSha256": "1c19e8148c6eefb80320e85b38bb8b9b49d6d67f15a084f446e4db61be617015",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "coreJVM/testOnly storymodel4s.core.D1bPointSupportSuite"
+      ],
+      "diff": "--- core/src/main/scala/storymodel4s/core/support.scala\n+++ core/src/main/scala/storymodel4s/core/support.scala\n@@ -29,7 +29,7 @@\n   def contains(other: PlaybackSupport): Boolean =\n     axis == other.axis && other.intervals.forall(c =>\n       intervals.exists(p => p.start <= c.start && p.endExclusive >= c.endExclusive)\n-    ) && other.points.forall(p => points.contains(p) || intervals.exists(_.contains(p.at)))\n+    ) && other.points.forall(p => points.contains(p) || intervals.exists(i => i.start <= p.at && p.at <= i.endExclusive))\n \n   override def equals(other: Any): Boolean = other match\n     case that: PlaybackSupport =>\n"
+    },
+    {
+      "id": "containment-positive-duration",
+      "path": "core/src/main/scala/storymodel4s/core/support.scala",
+      "group": "point",
+      "rejectSuite": "storymodel4s.core.D1bPointSupportSuite",
+      "rejectingTest": "containment distinguishes points, gaps and positive duration",
+      "controlSuite": "storymodel4s.core.D1bPointSupportSuite",
+      "acceptingControl": "accepting control: an interval-only projection keeps its exact checked coordinates",
+      "cleanRecompile": false,
+      "originalSha256": "a58e30cb19079dc351f4b7d5c4c2fb11d67e50c0f3596c8458e3328a9edd024b",
+      "mutantSha256": "2a9a0b827a6364df55c7fa21f3d0c7dbb5256e4724b9224742e3fb8c0bd3b74d",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "coreJVM/testOnly storymodel4s.core.D1bPointSupportSuite"
+      ],
+      "diff": "--- core/src/main/scala/storymodel4s/core/support.scala\n+++ core/src/main/scala/storymodel4s/core/support.scala\n@@ -28,7 +28,7 @@\n \n   def contains(other: PlaybackSupport): Boolean =\n     axis == other.axis && other.intervals.forall(c =>\n-      intervals.exists(p => p.start <= c.start && p.endExclusive >= c.endExclusive)\n+      intervals.exists(p => p.start <= c.start && p.endExclusive >= c.endExclusive) || points.exists(_.at == c.start)\n     ) && other.points.forall(p => points.contains(p) || intervals.exists(_.contains(p.at)))\n \n   override def equals(other: Any): Boolean = other match\n"
+    },
+    {
+      "id": "point-native-end",
+      "path": "core/src/main/scala/storymodel4s/core/support.scala",
+      "group": "point",
+      "rejectSuite": "storymodel4s.core.D1bPointSupportSuite",
+      "rejectingTest": "point membership independently checks selected stream extent and kind",
+      "controlSuite": "storymodel4s.core.D1bPointSupportSuite",
+      "acceptingControl": "accepting control: an interval-only projection keeps its exact checked coordinates",
+      "cleanRecompile": false,
+      "originalSha256": "a58e30cb19079dc351f4b7d5c4c2fb11d67e50c0f3596c8458e3328a9edd024b",
+      "mutantSha256": "f62b55503538c670a282336d29a0e0cf96428f15416d54d9e55655597bd0b3e7",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "coreJVM/testOnly storymodel4s.core.D1bPointSupportSuite"
+      ],
+      "diff": "--- core/src/main/scala/storymodel4s/core/support.scala\n+++ core/src/main/scala/storymodel4s/core/support.scala\n@@ -165,7 +165,7 @@\n       stream.extent match\n         case extent: AxisExtent.PlaybackTicks\n             if intervals.forall(within(_, extent)) && points\n-              .forall(p => p.at >= extent.start && p.at < extent.endExclusive) =>\n+              .forall(p => p.at >= extent.start && p.at <= extent.endExclusive) =>\n           Right(())\n         case _ => invalid(\"extent\", \"playback support escapes the selected native extent\")\n     else if axis != bundle.primaryAxis.id then\n"
+    },
+    {
+      "id": "point-kind",
+      "path": "core/src/main/scala/storymodel4s/core/support.scala",
+      "group": "point",
+      "rejectSuite": "storymodel4s.core.D1bPointSupportSuite",
+      "rejectingTest": "point membership independently checks selected stream extent and kind",
+      "controlSuite": "storymodel4s.core.D1bPointSupportSuite",
+      "acceptingControl": "accepting control: an interval-only projection keeps its exact checked coordinates",
+      "cleanRecompile": false,
+      "originalSha256": "a58e30cb19079dc351f4b7d5c4c2fb11d67e50c0f3596c8458e3328a9edd024b",
+      "mutantSha256": "7be90f85ed6c205c04a8e10546873d83f0efdf8d98cc0118f9f87b69ef2d62f3",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "coreJVM/testOnly storymodel4s.core.D1bPointSupportSuite"
+      ],
+      "diff": "--- core/src/main/scala/storymodel4s/core/support.scala\n+++ core/src/main/scala/storymodel4s/core/support.scala\n@@ -130,7 +130,7 @@\n             case _: EvidenceAnchor.Track =>\n               (stream.kind == StreamKind.Picture || stream.kind == StreamKind.Audio) &&\n               stream.extent.isInstanceOf[AxisExtent.PlaybackTicks]\n-          if !kindMatches then\n+          if !kindMatches && !anchor.isInstanceOf[EvidenceAnchor.MediaPoint] then\n             invalid(\"kind\", \"anchor kind does not match the stream kind and extent\")\n           else\n             anchor match\n"
+    },
+    {
+      "id": "point-clock-end",
+      "path": "core/src/main/scala/storymodel4s/core/support.scala",
+      "group": "point",
+      "rejectSuite": "storymodel4s.core.D1bPointSupportSuite",
+      "rejectingTest": "mapped point obeys exact clock image with excluded end and ambiguous mapping refusal",
+      "controlSuite": "storymodel4s.core.D1bPointSupportSuite",
+      "acceptingControl": "accepting control: an interval-only projection keeps its exact checked coordinates",
+      "cleanRecompile": false,
+      "originalSha256": "a58e30cb19079dc351f4b7d5c4c2fb11d67e50c0f3596c8458e3328a9edd024b",
+      "mutantSha256": "532f654d81142ddf1e319463bac5f208fb1996ec9ba8d7e91a62eb17b22d453b",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "coreJVM/testOnly storymodel4s.core.D1bPointSupportSuite"
+      ],
+      "diff": "--- core/src/main/scala/storymodel4s/core/support.scala\n+++ core/src/main/scala/storymodel4s/core/support.scala\n@@ -224,7 +224,7 @@\n           val start = Fraction(BigInt(extent.start), 1) * factor + offset\n           val end = Fraction(BigInt(extent.endExclusive), 1) * factor + offset\n           intervals.forall(i => start.atMost(i.start) && end.atLeast(i.endExclusive)) &&\n-          points.forall(p => start.atMost(p.at) && end.greaterThan(p.at))\n+          points.forall(p => start.atMost(p.at) && end.atLeast(p.at))\n         case composition: TrackComposition =>\n           val segments = composition.segments.toVector\n           segments.forall(segment => within(segment.source, extent)) &&\n"
+    },
+    {
+      "id": "point-clock-start",
+      "path": "core/src/main/scala/storymodel4s/core/support.scala",
+      "group": "point",
+      "rejectSuite": "storymodel4s.core.D1bPointSupportSuite",
+      "rejectingTest": "mapped point obeys exact clock image with excluded end and ambiguous mapping refusal",
+      "controlSuite": "storymodel4s.core.D1bPointSupportSuite",
+      "acceptingControl": "accepting control: an interval-only projection keeps its exact checked coordinates",
+      "cleanRecompile": false,
+      "originalSha256": "a58e30cb19079dc351f4b7d5c4c2fb11d67e50c0f3596c8458e3328a9edd024b",
+      "mutantSha256": "b5ec9da40ddb651cd871db311d68bab4585004b9beb6c26a96ec2d53e148fdeb",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "coreJVM/testOnly storymodel4s.core.D1bPointSupportSuite"
+      ],
+      "diff": "--- core/src/main/scala/storymodel4s/core/support.scala\n+++ core/src/main/scala/storymodel4s/core/support.scala\n@@ -224,7 +224,7 @@\n           val start = Fraction(BigInt(extent.start), 1) * factor + offset\n           val end = Fraction(BigInt(extent.endExclusive), 1) * factor + offset\n           intervals.forall(i => start.atMost(i.start) && end.atLeast(i.endExclusive)) &&\n-          points.forall(p => start.atMost(p.at) && end.greaterThan(p.at))\n+          points.forall(p => end.greaterThan(p.at))\n         case composition: TrackComposition =>\n           val segments = composition.segments.toVector\n           segments.forall(segment => within(segment.source, extent)) &&\n"
+    },
+    {
+      "id": "point-composition-gap",
+      "path": "core/src/main/scala/storymodel4s/core/support.scala",
+      "group": "point",
+      "rejectSuite": "storymodel4s.core.D1bPointSupportSuite",
+      "rejectingTest": "composition points preserve gaps, next segment start and source bounds",
+      "controlSuite": "storymodel4s.core.D1bPointSupportSuite",
+      "acceptingControl": "accepting control: an interval-only projection keeps its exact checked coordinates",
+      "cleanRecompile": false,
+      "originalSha256": "a58e30cb19079dc351f4b7d5c4c2fb11d67e50c0f3596c8458e3328a9edd024b",
+      "mutantSha256": "9ed36e197d7bbfda9a533e45b85e68be10b28a4c332c16b915693f5e0187c2c4",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "coreJVM/testOnly storymodel4s.core.D1bPointSupportSuite"
+      ],
+      "diff": "--- core/src/main/scala/storymodel4s/core/support.scala\n+++ core/src/main/scala/storymodel4s/core/support.scala\n@@ -228,7 +228,7 @@\n         case composition: TrackComposition =>\n           val segments = composition.segments.toVector\n           segments.forall(segment => within(segment.source, extent)) &&\n-          points.forall(p => segments.exists(_.target.contains(p.at))) &&\n+          points.forall(p => p.at >= segments.map(_.target.start).min && p.at < segments.map(_.target.endExclusive).max) &&\n           intervals.forall { interval =>\n             val image = segments.map(_.target).sortBy(i => (i.start, i.endExclusive))\n             val coveredUntil = image.foldLeft(interval.start) { (covered, part) =>\n"
+    },
+    {
+      "id": "point-composition-source-extent",
+      "path": "core/src/main/scala/storymodel4s/core/support.scala",
+      "group": "point",
+      "rejectSuite": "storymodel4s.core.D1bPointSupportSuite",
+      "rejectingTest": "composition points preserve gaps, next segment start and source bounds",
+      "controlSuite": "storymodel4s.core.D1bPointSupportSuite",
+      "acceptingControl": "accepting control: an interval-only projection keeps its exact checked coordinates",
+      "cleanRecompile": false,
+      "originalSha256": "a58e30cb19079dc351f4b7d5c4c2fb11d67e50c0f3596c8458e3328a9edd024b",
+      "mutantSha256": "dd927f01da11ed25c22b6a2462b7b82512671f9fc88e0755b1b9876712f50948",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "coreJVM/testOnly storymodel4s.core.D1bPointSupportSuite"
+      ],
+      "diff": "--- core/src/main/scala/storymodel4s/core/support.scala\n+++ core/src/main/scala/storymodel4s/core/support.scala\n@@ -227,7 +227,7 @@\n           points.forall(p => start.atMost(p.at) && end.greaterThan(p.at))\n         case composition: TrackComposition =>\n           val segments = composition.segments.toVector\n-          segments.forall(segment => within(segment.source, extent)) &&\n+          segments.nonEmpty &&\n           points.forall(p => segments.exists(_.target.contains(p.at))) &&\n           intervals.forall { interval =>\n             val image = segments.map(_.target).sortBy(i => (i.start, i.endExclusive))\n"
+    },
+    {
+      "id": "full-support-binding",
+      "path": "core/src/main/scala/storymodel4s/core/source.scala",
+      "group": "point",
+      "rejectSuite": "storymodel4s.core.D1bPointSupportSuite",
+      "rejectingTest": "full bundle binding refuses same-id metadata drift until explicit checked rebuild",
+      "controlSuite": "storymodel4s.core.D1bPointSupportSuite",
+      "acceptingControl": "accepting control: an interval-only projection keeps its exact checked coordinates",
+      "cleanRecompile": false,
+      "originalSha256": "4ea8746727a37c8e31cd50d02cf312f314b13f92838437029f32d27a0c5f7e5e",
+      "mutantSha256": "cd03d706ede924986cb1f7cd463a666c9f2f3780b14c89e8b078d7cc0309e4e3",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "coreJVM/testOnly storymodel4s.core.D1bPointSupportSuite"
+      ],
+      "diff": "--- core/src/main/scala/storymodel4s/core/source.scala\n+++ core/src/main/scala/storymodel4s/core/source.scala\n@@ -1327,7 +1327,7 @@\n ):\n   /** Recheck the complete bundle binding before joining this support to a model or atlas. */\n   def checkedOn(bundle: SourceBundle): Either[DomainError, EvidenceSupport] =\n-    if bundle.identity != bundleIdentity then\n+    if false then\n       Left(\n         SourceCanon\n           .inv(\"support/bundle-identity\", \"support belongs to a different full bundle identity\")\n"
+    },
+    {
+      "id": "projection-full-binding",
+      "path": "core/src/main/scala/storymodel4s/core/support.scala",
+      "group": "point",
+      "rejectSuite": "storymodel4s.core.D1bPointSupportSuite",
+      "rejectingTest": "full bundle binding refuses same-id metadata drift until explicit checked rebuild",
+      "controlSuite": "storymodel4s.core.D1bPointSupportSuite",
+      "acceptingControl": "accepting control: an interval-only projection keeps its exact checked coordinates",
+      "cleanRecompile": false,
+      "originalSha256": "a58e30cb19079dc351f4b7d5c4c2fb11d67e50c0f3596c8458e3328a9edd024b",
+      "mutantSha256": "f6de1948cb73ff65ba3ebc9fab13c253bcc1b17c0d608d1c87a2833c6e89bce7",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "coreJVM/testOnly storymodel4s.core.D1bPointSupportSuite"
+      ],
+      "diff": "--- core/src/main/scala/storymodel4s/core/support.scala\n+++ core/src/main/scala/storymodel4s/core/support.scala\n@@ -83,7 +83,7 @@\n         Right(PrimaryProjection.TextSpans(bundle.primaryAxis.id, spans))\n       case (AxisKind.EditionPlayback, TypedSupport.Anchored(anchors)) =>\n         for\n-          checked <- anchors.checkedOn(bundle)\n+          checked <- Right(anchors)\n           playback <- checked.playbackOn(bundle.primaryAxis.id)\n         yield PrimaryProjection.Playback(bundle.primaryAxis.id, playback)\n       case (AxisKind.TextCharacter | AxisKind.EditionPlayback, _) =>\n"
+    },
+    {
+      "id": "point-hull-refusal",
+      "path": "core/src/main/scala/storymodel4s/core/source.scala",
+      "group": "point",
+      "rejectSuite": "storymodel4s.core.D1bPointSupportSuite",
+      "rejectingTest": "point support has no interval-only hull and no invented interval",
+      "controlSuite": "storymodel4s.core.D1bPointSupportSuite",
+      "acceptingControl": "accepting control: an interval-only projection keeps its exact checked coordinates",
+      "cleanRecompile": false,
+      "originalSha256": "4ea8746727a37c8e31cd50d02cf312f314b13f92838437029f32d27a0c5f7e5e",
+      "mutantSha256": "f96e6f277d56aa53360dc07c0c24505c81883b95f63b5c02d1d10186a271bcae",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "coreJVM/testOnly storymodel4s.core.D1bPointSupportSuite"
+      ],
+      "diff": "--- core/src/main/scala/storymodel4s/core/source.scala\n+++ core/src/main/scala/storymodel4s/core/source.scala\n@@ -1363,7 +1363,7 @@\n       case EvidenceAnchor.Track(_, _, _, set) if set.axis == axis          => set.intervals.toVector\n     }.flatten\n     if anchors.toVector.exists {\n-        case EvidenceAnchor.MediaPoint(_, _, at) => at.axis == axis\n+        case EvidenceAnchor.MediaPoint(_, _, _) => false\n         case _                                   => false\n       }\n     then\n"
+    },
+    {
+      "id": "point-axis-selection",
+      "path": "core/src/main/scala/storymodel4s/core/source.scala",
+      "group": "point",
+      "rejectSuite": "storymodel4s.core.D1bPointSupportSuite",
+      "rejectingTest": "point identity independently binds the selected stream and axis within one bundle",
+      "controlSuite": "storymodel4s.core.D1bPointSupportSuite",
+      "acceptingControl": "accepting control: an interval-only projection keeps its exact checked coordinates",
+      "cleanRecompile": false,
+      "originalSha256": "4ea8746727a37c8e31cd50d02cf312f314b13f92838437029f32d27a0c5f7e5e",
+      "mutantSha256": "01dca597058485608d083d5b50753186058ab9aa1b2f6bafc44b4ec460568e02",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "coreJVM/testOnly storymodel4s.core.D1bPointSupportSuite"
+      ],
+      "diff": "--- core/src/main/scala/storymodel4s/core/source.scala\n+++ core/src/main/scala/storymodel4s/core/source.scala\n@@ -1343,7 +1343,7 @@\n       case _                                                               => Vector.empty\n     }\n     val points = anchors.toVector.collect {\n-      case EvidenceAnchor.MediaPoint(_, _, at) if at.axis == axis => at\n+      case EvidenceAnchor.MediaPoint(_, _, at) => at\n     }\n     PlaybackSupport.of(axis, intervals, points)\n \n"
+    },
+    {
+      "id": "identity-full-binding",
+      "path": "core/src/main/scala/storymodel4s/core/sourceIdentity.scala",
+      "group": "point",
+      "rejectSuite": "storymodel4s.core.D1bPointSupportSuite",
+      "rejectingTest": "full bundle binding refuses same-id metadata drift until explicit checked rebuild",
+      "controlSuite": "storymodel4s.core.D1bPointSupportSuite",
+      "acceptingControl": "accepting control: an interval-only projection keeps its exact checked coordinates",
+      "cleanRecompile": false,
+      "originalSha256": "7b27ffd5421629e34f58aea5619a80adcfc8ee438f46c4abd25b16acae2f1438",
+      "mutantSha256": "ccbd5ef5194be61148fcd72476518defb3d3aed4a61bc5c8ba833dc3c3374b65",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "coreJVM/testOnly storymodel4s.core.D1bPointSupportSuite"
+      ],
+      "diff": "--- core/src/main/scala/storymodel4s/core/sourceIdentity.scala\n+++ core/src/main/scala/storymodel4s/core/sourceIdentity.scala\n@@ -149,7 +149,7 @@\n       digest(\n         Vector(\n           \"typed-support/anchored/v1\",\n-          value.bundleIdentity.hex,\n+          \"omitted-binding\",\n           anchors.size.toString\n         ) ++ anchors\n       )\n"
+    },
+    {
+      "id": "identity-point-tick",
+      "path": "core/src/main/scala/storymodel4s/core/sourceIdentity.scala",
+      "group": "point",
+      "rejectSuite": "storymodel4s.core.D1bPointSupportSuite",
+      "rejectingTest": "physical identity distinguishes point tick axis stream and interval shape",
+      "controlSuite": "storymodel4s.core.D1bPointSupportSuite",
+      "acceptingControl": "accepting control: an interval-only projection keeps its exact checked coordinates",
+      "cleanRecompile": false,
+      "originalSha256": "7b27ffd5421629e34f58aea5619a80adcfc8ee438f46c4abd25b16acae2f1438",
+      "mutantSha256": "233e781792a16cd3f1d656c8600c44205130758da77fbff8ea5123c76ed259c0",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "coreJVM/testOnly storymodel4s.core.D1bPointSupportSuite"
+      ],
+      "diff": "--- core/src/main/scala/storymodel4s/core/sourceIdentity.scala\n+++ core/src/main/scala/storymodel4s/core/sourceIdentity.scala\n@@ -134,7 +134,7 @@\n             ).hex\n           case EvidenceAnchor.MediaPoint(bundle, stream, at) =>\n             digest(\n-              Vector(\"media-point\", bundle.value, stream.value, at.axis.value, at.at.toString)\n+              Vector(\"media-point\", bundle.value, stream.value, at.axis.value, \"omitted-tick\")\n             ).hex\n           case EvidenceAnchor.Shot(bundle, stream, shot, at) =>\n             digest(Vector(\"shot\", bundle.value, stream.value, shot.value) ++ interval(at)).hex\n"
+    },
+    {
+      "id": "identity-point-axis",
+      "path": "core/src/main/scala/storymodel4s/core/sourceIdentity.scala",
+      "group": "point",
+      "rejectSuite": "storymodel4s.core.D1bPointSupportSuite",
+      "rejectingTest": "point identity independently binds the selected stream and axis within one bundle",
+      "controlSuite": "storymodel4s.core.D1bPointSupportSuite",
+      "acceptingControl": "accepting control: an interval-only projection keeps its exact checked coordinates",
+      "cleanRecompile": false,
+      "originalSha256": "7b27ffd5421629e34f58aea5619a80adcfc8ee438f46c4abd25b16acae2f1438",
+      "mutantSha256": "0ca08b8180eb8e2de47876c30bcb5f049a56083963ed85662301c4df0ea05f8b",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "coreJVM/testOnly storymodel4s.core.D1bPointSupportSuite"
+      ],
+      "diff": "--- core/src/main/scala/storymodel4s/core/sourceIdentity.scala\n+++ core/src/main/scala/storymodel4s/core/sourceIdentity.scala\n@@ -134,7 +134,7 @@\n             ).hex\n           case EvidenceAnchor.MediaPoint(bundle, stream, at) =>\n             digest(\n-              Vector(\"media-point\", bundle.value, stream.value, at.axis.value, at.at.toString)\n+              Vector(\"media-point\", bundle.value, stream.value, \"omitted-axis\", at.at.toString)\n             ).hex\n           case EvidenceAnchor.Shot(bundle, stream, shot, at) =>\n             digest(Vector(\"shot\", bundle.value, stream.value, shot.value) ++ interval(at)).hex\n"
+    },
+    {
+      "id": "identity-point-stream",
+      "path": "core/src/main/scala/storymodel4s/core/sourceIdentity.scala",
+      "group": "point",
+      "rejectSuite": "storymodel4s.core.D1bPointSupportSuite",
+      "rejectingTest": "point identity independently binds the selected stream and axis within one bundle",
+      "controlSuite": "storymodel4s.core.D1bPointSupportSuite",
+      "acceptingControl": "accepting control: an interval-only projection keeps its exact checked coordinates",
+      "cleanRecompile": false,
+      "originalSha256": "7b27ffd5421629e34f58aea5619a80adcfc8ee438f46c4abd25b16acae2f1438",
+      "mutantSha256": "c2ea6fee3f58ba4df4c4b25f0885bb778d7234097fbec281a8d79d017e76714c",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "coreJVM/testOnly storymodel4s.core.D1bPointSupportSuite"
+      ],
+      "diff": "--- core/src/main/scala/storymodel4s/core/sourceIdentity.scala\n+++ core/src/main/scala/storymodel4s/core/sourceIdentity.scala\n@@ -134,7 +134,7 @@\n             ).hex\n           case EvidenceAnchor.MediaPoint(bundle, stream, at) =>\n             digest(\n-              Vector(\"media-point\", bundle.value, stream.value, at.axis.value, at.at.toString)\n+              Vector(\"media-point\", bundle.value, \"omitted-stream\", at.axis.value, at.at.toString)\n             ).hex\n           case EvidenceAnchor.Shot(bundle, stream, shot, at) =>\n             digest(Vector(\"shot\", bundle.value, stream.value, shot.value) ++ interval(at)).hex\n"
+    },
+    {
+      "id": "constructor-PlaybackSupport",
+      "path": "core/src/main/scala/storymodel4s/core/support.scala",
+      "group": "playprobe",
+      "rejectSuite": "storymodel4s.core.probes.D1bPlaybackSupportBoundarySuite",
+      "rejectingTest": "playback union constructor stays private even inside core",
+      "controlSuite": "storymodel4s.core.probes.D1bPlaybackSupportBoundarySuite",
+      "acceptingControl": "accepting control: checked playback union permits explicit intervals and points",
+      "cleanRecompile": true,
+      "originalSha256": "a58e30cb19079dc351f4b7d5c4c2fb11d67e50c0f3596c8458e3328a9edd024b",
+      "mutantSha256": "69eb40b261ca8d9f8bffc591507b793a10f9667e5248ea462f3f60d9a17ff36b",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "coreJVM/Compile/clean",
+        "coreJVM/Test/clean",
+        "coreJVM/testOnly storymodel4s.core.probes.D1bPlaybackSupportBoundarySuite"
+      ],
+      "diff": "--- core/src/main/scala/storymodel4s/core/support.scala\n+++ core/src/main/scala/storymodel4s/core/support.scala\n@@ -15,7 +15,7 @@\n \n /** Canonical playback union with explicit point observations. Points are retained inside intervals.\n   */\n-final class PlaybackSupport private (\n+final class PlaybackSupport private[core] (\n     val axis: PresentationAxisId,\n     val intervals: Vector[PlaybackInterval],\n     val points: Vector[PlaybackInstant]\n"
+    },
+    {
+      "id": "product-PlaybackSupport",
+      "path": "core/src/main/scala/storymodel4s/core/support.scala",
+      "group": "playprobe",
+      "rejectSuite": "storymodel4s.core.probes.D1bPlaybackSupportBoundarySuite",
+      "rejectingTest": "playback union has no Product or Mirror construction door",
+      "controlSuite": "storymodel4s.core.probes.D1bPlaybackSupportBoundarySuite",
+      "acceptingControl": "accepting control: checked playback union permits explicit intervals and points",
+      "cleanRecompile": true,
+      "originalSha256": "a58e30cb19079dc351f4b7d5c4c2fb11d67e50c0f3596c8458e3328a9edd024b",
+      "mutantSha256": "c5d8919d8c661952d4904e744ced5652958a5d663a1462a4c726c1fa20ffe04f",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "coreJVM/Compile/clean",
+        "coreJVM/Test/clean",
+        "coreJVM/testOnly storymodel4s.core.probes.D1bPlaybackSupportBoundarySuite"
+      ],
+      "diff": "--- core/src/main/scala/storymodel4s/core/support.scala\n+++ core/src/main/scala/storymodel4s/core/support.scala\n@@ -19,7 +19,10 @@\n     val axis: PresentationAxisId,\n     val intervals: Vector[PlaybackInterval],\n     val points: Vector[PlaybackInstant]\n-):\n+) extends Product:\n+  def canEqual(that: Any): Boolean = that.isInstanceOf[PlaybackSupport]\n+  def productArity: Int = 0\n+  def productElement(index: Int): Any = throw new IndexOutOfBoundsException(index.toString)\n   def bounds: (Long, Long) =\n     (\n       (intervals.map(_.start) ++ points.map(_.at)).min,\n"
+    },
+    {
+      "id": "mirror-PlaybackSupport",
+      "path": "core/src/main/scala/storymodel4s/core/support.scala",
+      "group": "playprobe",
+      "rejectSuite": "storymodel4s.core.probes.D1bPlaybackSupportBoundarySuite",
+      "rejectingTest": "playback union has no Product or Mirror construction door",
+      "controlSuite": "storymodel4s.core.probes.D1bPlaybackSupportBoundarySuite",
+      "acceptingControl": "accepting control: checked playback union permits explicit intervals and points",
+      "cleanRecompile": true,
+      "originalSha256": "a58e30cb19079dc351f4b7d5c4c2fb11d67e50c0f3596c8458e3328a9edd024b",
+      "mutantSha256": "ff28c8fe8d1f647119e48ca093750cd50da167da037a72b86f8a59925c6f5a93",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "coreJVM/Compile/clean",
+        "coreJVM/Test/clean",
+        "coreJVM/testOnly storymodel4s.core.probes.D1bPlaybackSupportBoundarySuite"
+      ],
+      "diff": "--- core/src/main/scala/storymodel4s/core/support.scala\n+++ core/src/main/scala/storymodel4s/core/support.scala\n@@ -39,6 +39,15 @@\n   override def toString: String = s\"PlaybackSupport(${axis.value}, $intervals, $points)\"\n \n object PlaybackSupport:\n+  given mutantMirror: scala.deriving.Mirror.ProductOf[PlaybackSupport] =\n+    new scala.deriving.Mirror.Product:\n+      type MirroredType = PlaybackSupport\n+      type MirroredMonoType = PlaybackSupport\n+      type MirroredElemTypes = EmptyTuple\n+      type MirroredElemLabels = EmptyTuple\n+      type MirroredLabel = \"PlaybackSupport\"\n+      def fromProduct(value: Product): PlaybackSupport = throw new IllegalArgumentException(value.productArity.toString)\n+\n   def of(\n       axis: PresentationAxisId,\n       intervals: Vector[PlaybackInterval],\n"
+    },
+    {
+      "id": "constructor-HsmmResult",
+      "path": "align/src/main/scala/storymodel4s/align/hsmm.scala",
+      "group": "resultprobe",
+      "rejectSuite": "storymodel4s.align.probes.D1bResultBoundarySuite",
+      "rejectingTest": "result constructor is inaccessible even inside align",
+      "controlSuite": "storymodel4s.align.probes.D1bResultBoundarySuite",
+      "acceptingControl": "accepting control: result validation derives its own exact support map",
+      "cleanRecompile": true,
+      "originalSha256": "7756c0218f2ac12197ed40e7df21ce400cfe9e82d18524dcd4b54ffacbdf6b48",
+      "mutantSha256": "3b6c15f732131dd27a4af9740d0490e2e1dbd46152efe8101fb8e3a127f3ec5b",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "alignJVM/Compile/clean",
+        "alignJVM/Test/clean",
+        "alignJVM/testOnly storymodel4s.align.probes.D1bResultBoundarySuite"
+      ],
+      "diff": "--- align/src/main/scala/storymodel4s/align/hsmm.scala\n+++ align/src/main/scala/storymodel4s/align/hsmm.scala\n@@ -289,7 +289,7 @@\n   * Residual (stated, not hidden): nomination *provenance* (which channel nominated an anchor) is\n   * not proven; the candidate-anchor set is construction data like the posterior itself.\n   */\n-final class HsmmResult private (\n+final class HsmmResult private[align] (\n     val posterior: AlignmentMatrix,\n     val flow: TransitionFlow,\n     val viterbi: Vector[AlignState],\n"
+    },
+    {
+      "id": "product-HsmmResult",
+      "path": "align/src/main/scala/storymodel4s/align/hsmm.scala",
+      "group": "resultprobe",
+      "rejectSuite": "storymodel4s.align.probes.D1bResultBoundarySuite",
+      "rejectingTest": "result has no Product or Mirror construction door",
+      "controlSuite": "storymodel4s.align.probes.D1bResultBoundarySuite",
+      "acceptingControl": "accepting control: result validation derives its own exact support map",
+      "cleanRecompile": true,
+      "originalSha256": "7756c0218f2ac12197ed40e7df21ce400cfe9e82d18524dcd4b54ffacbdf6b48",
+      "mutantSha256": "fdb11de03791ef0a4cc0eae1a6e836b43dce7a792007af892f3d4b596c3439ee",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "alignJVM/Compile/clean",
+        "alignJVM/Test/clean",
+        "alignJVM/testOnly storymodel4s.align.probes.D1bResultBoundarySuite"
+      ],
+      "diff": "--- align/src/main/scala/storymodel4s/align/hsmm.scala\n+++ align/src/main/scala/storymodel4s/align/hsmm.scala\n@@ -302,7 +302,10 @@\n     val refinementPasses: Int,\n     val sourceSupport: Map[SourceNodeRef, TypedSupport],\n     val textWireCompatible: Boolean\n-):\n+) extends Product:\n+  def canEqual(that: Any): Boolean = that.isInstanceOf[HsmmResult]\n+  def productArity: Int = 0\n+  def productElement(index: Int): Any = throw new IndexOutOfBoundsException(index.toString)\n   /** Digest of the derived admissibility, for the wire's drift check. */\n   def admissibilityEcho: AdmissibilityEcho = AdmissibilityEcho.of(admissibility)\n \n"
+    },
+    {
+      "id": "mirror-HsmmResult",
+      "path": "align/src/main/scala/storymodel4s/align/hsmm.scala",
+      "group": "resultprobe",
+      "rejectSuite": "storymodel4s.align.probes.D1bResultBoundarySuite",
+      "rejectingTest": "result has no Product or Mirror construction door",
+      "controlSuite": "storymodel4s.align.probes.D1bResultBoundarySuite",
+      "acceptingControl": "accepting control: result validation derives its own exact support map",
+      "cleanRecompile": true,
+      "originalSha256": "7756c0218f2ac12197ed40e7df21ce400cfe9e82d18524dcd4b54ffacbdf6b48",
+      "mutantSha256": "ad25bc331e7f3ffa170a744ac281212333e89b530440a1b707bf2c55a8a74698",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "alignJVM/Compile/clean",
+        "alignJVM/Test/clean",
+        "alignJVM/testOnly storymodel4s.align.probes.D1bResultBoundarySuite"
+      ],
+      "diff": "--- align/src/main/scala/storymodel4s/align/hsmm.scala\n+++ align/src/main/scala/storymodel4s/align/hsmm.scala\n@@ -331,6 +331,15 @@\n       s\"passes=$refinementPasses, view=${viewFingerprint.checksum.short()})\"\n \n object HsmmResult:\n+  given mutantMirror: scala.deriving.Mirror.ProductOf[HsmmResult] =\n+    new scala.deriving.Mirror.Product:\n+      type MirroredType = HsmmResult\n+      type MirroredMonoType = HsmmResult\n+      type MirroredElemTypes = EmptyTuple\n+      type MirroredElemLabels = EmptyTuple\n+      type MirroredLabel = \"HsmmResult\"\n+      def fromProduct(value: Product): HsmmResult = throw new IllegalArgumentException(value.productArity.toString)\n+\n \n   /** Tolerance for row normalization and flow-marginal consistency.\n     *\n"
+    },
+    {
+      "id": "position-missing-as-zero",
+      "path": "align/src/main/scala/storymodel4s/align/source.scala",
+      "group": "position",
+      "rejectSuite": "storymodel4s.align.D1bScoringPositionSuite",
+      "rejectingTest": "a present film node without a scoring feature remains absent through transition features",
+      "controlSuite": "storymodel4s.align.D1bScoringPositionSuite",
+      "acceptingControl": "accepting control: physical point and declared scoring feature retain separate exact values",
+      "cleanRecompile": false,
+      "originalSha256": "3384052d235cc63668fa9fe87868abb7649d96af4a14823b0c54646ba6672cfd",
+      "mutantSha256": "2315354da4b11c46528928985f2e23c4adfc71cd91ec45270a6eb06ae3ab0d97",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "alignJVM/testOnly storymodel4s.align.D1bScoringPositionSuite"
+      ],
+      "diff": "--- align/src/main/scala/storymodel4s/align/source.scala\n+++ align/src/main/scala/storymodel4s/align/source.scala\n@@ -511,7 +511,7 @@\n \n   /** Midpoint of the declared scoring feature, never substituted with a physical coordinate. */\n   def measuredPosition(ref: SourceNodeRef): Option[Double] =\n-    relativeSpan(ref).map((a, b) => (a + b) / 2.0)\n+    relativeSpan(ref).map((a, b) => (a + b) / 2.0).orElse(Some(0.0))\n \n /** Simple in-memory `SourceView`. Hierarchy adjacency is derived from parents unless supplied. */\n final case class InMemorySourceView(\n"
+    },
+    {
+      "id": "position-denominator",
+      "path": "align/src/main/scala/storymodel4s/align/source.scala",
+      "group": "position",
+      "rejectSuite": "storymodel4s.align.D1bScoringPositionSuite",
+      "rejectingTest": "measured zero differs from missing and an unmeasured denominator remains absent",
+      "controlSuite": "storymodel4s.align.D1bScoringPositionSuite",
+      "acceptingControl": "accepting control: physical point and declared scoring feature retain separate exact values",
+      "cleanRecompile": false,
+      "originalSha256": "3384052d235cc63668fa9fe87868abb7649d96af4a14823b0c54646ba6672cfd",
+      "mutantSha256": "c331589e69597f563b5077681d3081957f027a072a7ce9ddf03c7c103cdb81be",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "alignJVM/testOnly storymodel4s.align.D1bScoringPositionSuite"
+      ],
+      "diff": "--- align/src/main/scala/storymodel4s/align/source.scala\n+++ align/src/main/scala/storymodel4s/align/source.scala\n@@ -169,7 +169,7 @@\n     case LegacyAnnotationText(value) => value\n \n   def relativeTo(length: Int): Option[(Double, Double)] =\n-    if length > 0 then\n+    if length >= 0 then\n       val span = spans.minSpan\n       Some((span.start.toDouble / length, span.endExclusive.toDouble / length))\n     else None\n"
+    },
+    {
+      "id": "position-total-accessor",
+      "path": "align/src/main/scala/storymodel4s/align/source.scala",
+      "group": "position",
+      "rejectSuite": "storymodel4s.align.D1bScoringPositionSuite",
+      "rejectingTest": "public missing-as-zero accessor is absent with a measured-position accepting control",
+      "controlSuite": "storymodel4s.align.D1bScoringPositionSuite",
+      "acceptingControl": "accepting control: physical point and declared scoring feature retain separate exact values",
+      "cleanRecompile": true,
+      "originalSha256": "3384052d235cc63668fa9fe87868abb7649d96af4a14823b0c54646ba6672cfd",
+      "mutantSha256": "51eab3350cf9ebc2dcbdd379889e8e8734c600da063e7e93c998bac227d1bc48",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "alignJVM/Compile/clean",
+        "alignJVM/Test/clean",
+        "alignJVM/testOnly storymodel4s.align.D1bScoringPositionSuite"
+      ],
+      "diff": "--- align/src/main/scala/storymodel4s/align/source.scala\n+++ align/src/main/scala/storymodel4s/align/source.scala\n@@ -395,6 +395,7 @@\n   * through measuredPosition; transition features and metrics retain that absence.\n   */\n trait SourceView:\n+  def relativePosition(ref: SourceNodeRef): Double = measuredPosition(ref).getOrElse(0.0)\n   def nodes: Vector[NodeSummary]\n   def node(ref: SourceNodeRef): Option[NodeSummary]\n   def adjacency(layer: RelationLayer): Map[SourceNodeRef, Map[SourceNodeRef, Double]]\n"
+    },
+    {
+      "id": "fingerprint-physical",
+      "path": "align/src/main/scala/storymodel4s/align/wire.scala",
+      "group": "position",
+      "rejectSuite": "storymodel4s.align.D1bScoringPositionSuite",
+      "rejectingTest": "physical evidence and scoring coordinates independently affect fingerprint",
+      "controlSuite": "storymodel4s.align.D1bScoringPositionSuite",
+      "acceptingControl": "accepting control: physical point and declared scoring feature retain separate exact values",
+      "cleanRecompile": false,
+      "originalSha256": "9e2dfac4866d9a16cef4ef91a2ed069cec64e061e9a87d8cae557d372576d82a",
+      "mutantSha256": "25d7d15268eea99e2ae13069deaba78163b6cec59bfb6ab0fc82c964bb165f6c",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "alignJVM/testOnly storymodel4s.align.D1bScoringPositionSuite"
+      ],
+      "diff": "--- align/src/main/scala/storymodel4s/align/wire.scala\n+++ align/src/main/scala/storymodel4s/align/wire.scala\n@@ -100,7 +100,7 @@\n           n.support.textSpans.toVector.flatMap(_.refs.toVector.sorted.map(Render.spanRef))\n         )\n       else\n-        field(\"physicalSupport\", n.support.identity.hex)\n+        field(\"physicalSupport\", \"omitted\")\n         n.scoringPosition match\n           case None           => field(\"scoringPosition\", \"none\")\n           case Some(position) =>\n"
+    },
+    {
+      "id": "fingerprint-feature-spans",
+      "path": "align/src/main/scala/storymodel4s/align/wire.scala",
+      "group": "position",
+      "rejectSuite": "storymodel4s.align.D1bScoringPositionSuite",
+      "rejectingTest": "physical evidence and scoring coordinates independently affect fingerprint",
+      "controlSuite": "storymodel4s.align.D1bScoringPositionSuite",
+      "acceptingControl": "accepting control: physical point and declared scoring feature retain separate exact values",
+      "cleanRecompile": false,
+      "originalSha256": "9e2dfac4866d9a16cef4ef91a2ed069cec64e061e9a87d8cae557d372576d82a",
+      "mutantSha256": "101b3527edc282ed187afa8c939bd237969835a43ea17af2f0f768f53c58a37e",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "alignJVM/testOnly storymodel4s.align.D1bScoringPositionSuite"
+      ],
+      "diff": "--- align/src/main/scala/storymodel4s/align/wire.scala\n+++ align/src/main/scala/storymodel4s/align/wire.scala\n@@ -110,7 +110,7 @@\n                 case _: ScoringPosition.CanonicalText        => \"canonical-text\"\n                 case _: ScoringPosition.LegacyAnnotationText => \"legacy-annotation-text\"\n             )\n-            list(\"scoringSpans\", position.spans.refs.toVector.sorted.map(Render.spanRef))\n+            list(\"scoringSpans\", Vector.empty)\n       field(\"predicate\", n.predicate.getOrElse(\"\"))\n       list(\n         \"participants\",\n"
+    },
+    {
+      "id": "fingerprint-feature-kind",
+      "path": "align/src/main/scala/storymodel4s/align/wire.scala",
+      "group": "position",
+      "rejectSuite": "storymodel4s.align.D1bScoringPositionSuite",
+      "rejectingTest": "physical evidence and scoring coordinates independently affect fingerprint",
+      "controlSuite": "storymodel4s.align.D1bScoringPositionSuite",
+      "acceptingControl": "accepting control: physical point and declared scoring feature retain separate exact values",
+      "cleanRecompile": false,
+      "originalSha256": "9e2dfac4866d9a16cef4ef91a2ed069cec64e061e9a87d8cae557d372576d82a",
+      "mutantSha256": "4267c467ff490d16b0a555846d4cd6419b789aab94ee2781ffcb06a246162d44",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "alignJVM/testOnly storymodel4s.align.D1bScoringPositionSuite"
+      ],
+      "diff": "--- align/src/main/scala/storymodel4s/align/wire.scala\n+++ align/src/main/scala/storymodel4s/align/wire.scala\n@@ -107,7 +107,7 @@\n             field(\n               \"scoringPosition\",\n               position match\n-                case _: ScoringPosition.CanonicalText        => \"canonical-text\"\n+                case _: ScoringPosition.CanonicalText        => \"legacy-annotation-text\"\n                 case _: ScoringPosition.LegacyAnnotationText => \"legacy-annotation-text\"\n             )\n             list(\"scoringSpans\", position.spans.refs.toVector.sorted.map(Render.spanRef))\n"
+    },
+    {
+      "id": "fingerprint-denominator",
+      "path": "align/src/main/scala/storymodel4s/align/wire.scala",
+      "group": "position",
+      "rejectSuite": "storymodel4s.align.D1bScoringPositionSuite",
+      "rejectingTest": "physical evidence and scoring coordinates independently affect fingerprint",
+      "controlSuite": "storymodel4s.align.D1bScoringPositionSuite",
+      "acceptingControl": "accepting control: physical point and declared scoring feature retain separate exact values",
+      "cleanRecompile": false,
+      "originalSha256": "9e2dfac4866d9a16cef4ef91a2ed069cec64e061e9a87d8cae557d372576d82a",
+      "mutantSha256": "f97feaa557291f33f14e8e908bcb0c12dad3145fcb1eae3f9be0868093172b05",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "alignJVM/testOnly storymodel4s.align.D1bScoringPositionSuite"
+      ],
+      "diff": "--- align/src/main/scala/storymodel4s/align/wire.scala\n+++ align/src/main/scala/storymodel4s/align/wire.scala\n@@ -149,7 +149,7 @@\n         _.toVector.sortBy(_._1.key).map((r, i) => Render.composite(Vector(r.key, i.toString)))\n       )\n     )\n-    field(\"textLength\", view.scoringLength.toString)\n+    field(\"textLength\", \"omitted\")\n     b.digest\n \n   /** Rehydrate a fingerprint carried on the wire; the value is compared, never trusted. */\n"
+    },
+    {
+      "id": "wire-legacy-feature",
+      "path": "align/src/main/scala/storymodel4s/align/source.scala",
+      "group": "codec",
+      "rejectSuite": "storymodel4s.codec.AlignCodecSuite",
+      "rejectingTest": "text support with absent or noncanonical scoring cannot enter the v3 wire",
+      "controlSuite": "storymodel4s.codec.AlignCodecSuite",
+      "acceptingControl": "a real inferred result has a canonical contextual round trip",
+      "cleanRecompile": false,
+      "originalSha256": "3384052d235cc63668fa9fe87868abb7649d96af4a14823b0c54646ba6672cfd",
+      "mutantSha256": "64302fb3de6fd06d5891d79105f7c3e983419d88e0d00d75bcc60e677abc7083",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "codecJVM/testOnly storymodel4s.codec.AlignCodecSuite storymodel4s.codec.D1bPointCodecSuite"
+      ],
+      "diff": "--- align/src/main/scala/storymodel4s/align/source.scala\n+++ align/src/main/scala/storymodel4s/align/source.scala\n@@ -404,8 +404,8 @@\n   /** Only this exact subset has the historical text-only HSMM v3 representation. */\n   final def textWireCompatible: Boolean = nodes.forall { node =>\n     (node.support, node.scoringPosition) match\n-      case (TypedSupport.Text(spans), Some(ScoringPosition.CanonicalText(position))) =>\n-        spans == position\n+      case (TypedSupport.Text(spans), Some(position)) =>\n+        spans == position.spans\n       case _ => false\n   }\n \n"
+    },
+    {
+      "id": "wire-feature-equality",
+      "path": "align/src/main/scala/storymodel4s/align/source.scala",
+      "group": "codec",
+      "rejectSuite": "storymodel4s.codec.AlignCodecSuite",
+      "rejectingTest": "text support with absent or noncanonical scoring cannot enter the v3 wire",
+      "controlSuite": "storymodel4s.codec.AlignCodecSuite",
+      "acceptingControl": "a real inferred result has a canonical contextual round trip",
+      "cleanRecompile": false,
+      "originalSha256": "3384052d235cc63668fa9fe87868abb7649d96af4a14823b0c54646ba6672cfd",
+      "mutantSha256": "3fdc0765c12c76cd795e4165b6d484ae1601104eb4cee59a37a96b40601a0ed2",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "codecJVM/testOnly storymodel4s.codec.AlignCodecSuite storymodel4s.codec.D1bPointCodecSuite"
+      ],
+      "diff": "--- align/src/main/scala/storymodel4s/align/source.scala\n+++ align/src/main/scala/storymodel4s/align/source.scala\n@@ -405,7 +405,7 @@\n   final def textWireCompatible: Boolean = nodes.forall { node =>\n     (node.support, node.scoringPosition) match\n       case (TypedSupport.Text(spans), Some(ScoringPosition.CanonicalText(position))) =>\n-        spans == position\n+        spans.minSpan.start >= 0 && position.minSpan.start >= 0\n       case _ => false\n   }\n \n"
+    },
+    {
+      "id": "result-duplicate-inventory",
+      "path": "align/src/main/scala/storymodel4s/align/hsmm.scala",
+      "group": "codec",
+      "rejectSuite": "storymodel4s.codec.AlignCodecSuite",
+      "rejectingTest": "result refuses duplicate inventory lookup disagreement and lookup-only nominations",
+      "controlSuite": "storymodel4s.codec.AlignCodecSuite",
+      "acceptingControl": "a real inferred result has a canonical contextual round trip",
+      "cleanRecompile": false,
+      "originalSha256": "7756c0218f2ac12197ed40e7df21ce400cfe9e82d18524dcd4b54ffacbdf6b48",
+      "mutantSha256": "843e3ca3172aa5d9e2028a9ff254b14442c6e65d408ad963c0ce9c89d23d82df",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "codecJVM/testOnly storymodel4s.codec.AlignCodecSuite storymodel4s.codec.D1bPointCodecSuite"
+      ],
+      "diff": "--- align/src/main/scala/storymodel4s/align/hsmm.scala\n+++ align/src/main/scala/storymodel4s/align/hsmm.scala\n@@ -385,9 +385,7 @@\n     val sourceNodes = view.nodes\n     val sourceIndex = sourceNodes.map(n => n.ref -> n).toMap\n     val inventory: Either[AlignError, Unit] =\n-      if sourceIndex.size != sourceNodes.size || sourceNodes.exists(n =>\n-          view.node(n.ref) != Some(n)\n-        )\n+      if sourceNodes.exists(n => view.node(n.ref) != Some(n))\n       then\n         Left(\n           AlignError.InconsistentResult(\n"
+    },
+    {
+      "id": "result-lookup-inventory",
+      "path": "align/src/main/scala/storymodel4s/align/hsmm.scala",
+      "group": "codec",
+      "rejectSuite": "storymodel4s.codec.AlignCodecSuite",
+      "rejectingTest": "result refuses duplicate inventory lookup disagreement and lookup-only nominations",
+      "controlSuite": "storymodel4s.codec.AlignCodecSuite",
+      "acceptingControl": "a real inferred result has a canonical contextual round trip",
+      "cleanRecompile": false,
+      "originalSha256": "7756c0218f2ac12197ed40e7df21ce400cfe9e82d18524dcd4b54ffacbdf6b48",
+      "mutantSha256": "a2379fcb03b6984d1fdb1441fd1a9987a0fcd130454087a464de28f3aeb86da2",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "codecJVM/testOnly storymodel4s.codec.AlignCodecSuite storymodel4s.codec.D1bPointCodecSuite"
+      ],
+      "diff": "--- align/src/main/scala/storymodel4s/align/hsmm.scala\n+++ align/src/main/scala/storymodel4s/align/hsmm.scala\n@@ -385,9 +385,7 @@\n     val sourceNodes = view.nodes\n     val sourceIndex = sourceNodes.map(n => n.ref -> n).toMap\n     val inventory: Either[AlignError, Unit] =\n-      if sourceIndex.size != sourceNodes.size || sourceNodes.exists(n =>\n-          view.node(n.ref) != Some(n)\n-        )\n+      if sourceIndex.size != sourceNodes.size\n       then\n         Left(\n           AlignError.InconsistentResult(\n"
+    },
+    {
+      "id": "result-nomination-inventory",
+      "path": "align/src/main/scala/storymodel4s/align/hsmm.scala",
+      "group": "codec",
+      "rejectSuite": "storymodel4s.codec.AlignCodecSuite",
+      "rejectingTest": "result refuses duplicate inventory lookup disagreement and lookup-only nominations",
+      "controlSuite": "storymodel4s.codec.AlignCodecSuite",
+      "acceptingControl": "a real inferred result has a canonical contextual round trip",
+      "cleanRecompile": false,
+      "originalSha256": "7756c0218f2ac12197ed40e7df21ce400cfe9e82d18524dcd4b54ffacbdf6b48",
+      "mutantSha256": "44aa87ba2bd9d88d5794fa8c664147399e9d0e8186a9319ca9189333ade0822f",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "codecJVM/testOnly storymodel4s.codec.AlignCodecSuite storymodel4s.codec.D1bPointCodecSuite"
+      ],
+      "diff": "--- align/src/main/scala/storymodel4s/align/hsmm.scala\n+++ align/src/main/scala/storymodel4s/align/hsmm.scala\n@@ -489,7 +489,7 @@\n                 )\n               )\n             else\n-              anchors.find(ref => !sourceIndex.contains(ref)) match\n+              anchors.find(ref => view.node(ref).isEmpty) match\n                 case Some(ref) =>\n                   Left(\n                     AlignError.GateViolation(\n"
+    },
+    {
+      "id": "result-retain-unused",
+      "path": "align/src/main/scala/storymodel4s/align/hsmm.scala",
+      "group": "codec",
+      "rejectSuite": "storymodel4s.codec.AlignCodecSuite",
+      "rejectingTest": "generic HSMM encoding and both contextual decode doors refuse non-text support",
+      "controlSuite": "storymodel4s.codec.AlignCodecSuite",
+      "acceptingControl": "a real inferred result has a canonical contextual round trip",
+      "cleanRecompile": false,
+      "originalSha256": "7756c0218f2ac12197ed40e7df21ce400cfe9e82d18524dcd4b54ffacbdf6b48",
+      "mutantSha256": "a7114d0e124a49fddafcc1871cb74ce5d143830faddbfd96904fee2475ba5ab7",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "codecJVM/testOnly storymodel4s.codec.AlignCodecSuite storymodel4s.codec.D1bPointCodecSuite"
+      ],
+      "diff": "--- align/src/main/scala/storymodel4s/align/hsmm.scala\n+++ align/src/main/scala/storymodel4s/align/hsmm.scala\n@@ -605,7 +605,7 @@\n       ViewFingerprint.of(view),\n       AlignWire.recallChecksum(recall),\n       refinementPasses,\n-      sourceIndex.view.mapValues(_.support).toMap,\n+      sourceIndex.filter((ref, _) => candidateAnchors.valuesIterator.flatten.contains(ref)).view.mapValues(_.support).toMap,\n       view.textWireCompatible\n     )\n \n"
+    },
+    {
+      "id": "wire-toJson-refusal",
+      "path": "codec/src/main/scala/storymodel4s/codec/align.scala",
+      "group": "codec",
+      "rejectSuite": "storymodel4s.codec.AlignCodecSuite",
+      "rejectingTest": "generic HSMM encoding and both contextual decode doors refuse non-text support",
+      "controlSuite": "storymodel4s.codec.AlignCodecSuite",
+      "acceptingControl": "a real inferred result has a canonical contextual round trip",
+      "cleanRecompile": false,
+      "originalSha256": "43f19e26ca338ae0dfe1daa70bc4c71fad9fe6c43d2267fb9212d9f9bc5c3d05",
+      "mutantSha256": "2ea38295272e07aa0f17b9de30ed10ae9c79e0282849d77fb1a8224f173e0c0d",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "codecJVM/testOnly storymodel4s.codec.AlignCodecSuite storymodel4s.codec.D1bPointCodecSuite"
+      ],
+      "diff": "--- codec/src/main/scala/storymodel4s/codec/align.scala\n+++ codec/src/main/scala/storymodel4s/codec/align.scala\n@@ -131,7 +131,7 @@\n \n   /** Encode a proved result as a canonical JSON value. */\n   def toJson(result: HsmmResult): Either[HsmmCodecError, Json] =\n-    if !result.textWireCompatible then Left(HsmmCodecError.UnsupportedSupport)\n+    if false then Left(HsmmCodecError.UnsupportedSupport)\n     else Right(summon[Encoder[Wire]].apply(Wire.from(result)))\n \n   /** Decode canonical JSON text only after revalidating it against `recall` and `view`. */\n"
+    },
+    {
+      "id": "wire-encode-refusal",
+      "path": "codec/src/main/scala/storymodel4s/codec/align.scala",
+      "group": "codec",
+      "rejectSuite": "storymodel4s.codec.AlignCodecSuite",
+      "rejectingTest": "generic HSMM encoding and both contextual decode doors refuse non-text support",
+      "controlSuite": "storymodel4s.codec.AlignCodecSuite",
+      "acceptingControl": "a real inferred result has a canonical contextual round trip",
+      "cleanRecompile": false,
+      "originalSha256": "43f19e26ca338ae0dfe1daa70bc4c71fad9fe6c43d2267fb9212d9f9bc5c3d05",
+      "mutantSha256": "c3c379414c6fe7e101bf77da64d138ec547add39d545b10891b4eaf130a00b60",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "codecJVM/testOnly storymodel4s.codec.AlignCodecSuite storymodel4s.codec.D1bPointCodecSuite"
+      ],
+      "diff": "--- codec/src/main/scala/storymodel4s/codec/align.scala\n+++ codec/src/main/scala/storymodel4s/codec/align.scala\n@@ -127,7 +127,7 @@\n \n   /** Encode a proved result as canonical JSON text. */\n   def encode(result: HsmmResult): Either[HsmmCodecError, String] =\n-    toJson(result).map(Canonical.print)\n+    Right(Canonical.print(summon[Encoder[Wire]].apply(Wire.from(result))))\n \n   /** Encode a proved result as a canonical JSON value. */\n   def toJson(result: HsmmResult): Either[HsmmCodecError, Json] =\n"
+    },
+    {
+      "id": "wire-decode-refusal",
+      "path": "codec/src/main/scala/storymodel4s/codec/align.scala",
+      "group": "codec",
+      "rejectSuite": "storymodel4s.codec.AlignCodecSuite",
+      "rejectingTest": "generic HSMM encoding and both contextual decode doors refuse non-text support",
+      "controlSuite": "storymodel4s.codec.AlignCodecSuite",
+      "acceptingControl": "a real inferred result has a canonical contextual round trip",
+      "cleanRecompile": false,
+      "originalSha256": "43f19e26ca338ae0dfe1daa70bc4c71fad9fe6c43d2267fb9212d9f9bc5c3d05",
+      "mutantSha256": "f594b6141b8639597168cf20d39ac001fba5c7b04fdda7bdcf8e7c47c72fba56",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "codecJVM/testOnly storymodel4s.codec.AlignCodecSuite storymodel4s.codec.D1bPointCodecSuite"
+      ],
+      "diff": "--- codec/src/main/scala/storymodel4s/codec/align.scala\n+++ codec/src/main/scala/storymodel4s/codec/align.scala\n@@ -140,7 +140,7 @@\n       recall: RecallGraph[Checked],\n       view: SourceView\n   ): Either[HsmmCodecError, HsmmResult] =\n-    if !view.textWireCompatible then Left(HsmmCodecError.UnsupportedSupport)\n+    if false then Left(HsmmCodecError.UnsupportedSupport)\n     else\n       Canonical\n         .decode[Wire](text)\n"
+    },
+    {
+      "id": "wire-decodeJson-refusal",
+      "path": "codec/src/main/scala/storymodel4s/codec/align.scala",
+      "group": "codec",
+      "rejectSuite": "storymodel4s.codec.AlignCodecSuite",
+      "rejectingTest": "generic HSMM encoding and both contextual decode doors refuse non-text support",
+      "controlSuite": "storymodel4s.codec.AlignCodecSuite",
+      "acceptingControl": "a real inferred result has a canonical contextual round trip",
+      "cleanRecompile": false,
+      "originalSha256": "43f19e26ca338ae0dfe1daa70bc4c71fad9fe6c43d2267fb9212d9f9bc5c3d05",
+      "mutantSha256": "013a916604eb8973fd29a19df663668c0768855e596146a84586ec73679c5f33",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "codecJVM/testOnly storymodel4s.codec.AlignCodecSuite storymodel4s.codec.D1bPointCodecSuite"
+      ],
+      "diff": "--- codec/src/main/scala/storymodel4s/codec/align.scala\n+++ codec/src/main/scala/storymodel4s/codec/align.scala\n@@ -154,7 +154,7 @@\n       recall: RecallGraph[Checked],\n       view: SourceView\n   ): Either[HsmmCodecError, HsmmResult] =\n-    if !view.textWireCompatible then Left(HsmmCodecError.UnsupportedSupport)\n+    if false then Left(HsmmCodecError.UnsupportedSupport)\n     else\n       Canonical\n         .decodeJson[Wire](json)\n"
+    },
+    {
+      "id": "wire-generic-encoder",
+      "path": "codec/src/main/scala/storymodel4s/codec/align.scala",
+      "group": "codec",
+      "rejectSuite": "storymodel4s.codec.AlignCodecSuite",
+      "rejectingTest": "checked encoding remains available but no generic Encoder HsmmResult exists",
+      "controlSuite": "storymodel4s.codec.AlignCodecSuite",
+      "acceptingControl": "a real inferred result has a canonical contextual round trip",
+      "cleanRecompile": true,
+      "originalSha256": "43f19e26ca338ae0dfe1daa70bc4c71fad9fe6c43d2267fb9212d9f9bc5c3d05",
+      "mutantSha256": "e9618be5e11cdd517bdaa1dddb53f535b499d94c4a98d29e114cbb8d074ffdbf",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "codecJVM/Compile/clean",
+        "codecJVM/Test/clean",
+        "codecJVM/testOnly storymodel4s.codec.AlignCodecSuite storymodel4s.codec.D1bPointCodecSuite"
+      ],
+      "diff": "--- codec/src/main/scala/storymodel4s/codec/align.scala\n+++ codec/src/main/scala/storymodel4s/codec/align.scala\n@@ -35,6 +35,7 @@\n   * stringly JSON keys and duplicate entries are rejected before construction.\n   */\n object HsmmResultCodec:\n+  given Encoder[HsmmResult] = Encoder.instance(r => toJson(r).toOption.get)\n   /** Version of the complete HSMM wire object, independent of the package-wide JSON version.\n     *\n     * v2 adds a REQUIRED `supportWeight` to every cost breakdown. It is required in both directions,\n"
+    },
+    {
+      "id": "point-component-binding",
+      "path": "codec/src/main/scala/storymodel4s/codec/core.scala",
+      "group": "codec",
+      "rejectSuite": "storymodel4s.codec.D1bPointCodecSuite",
+      "rejectingTest": "same legacy id with changed full binding has distinct point component bytes",
+      "controlSuite": "storymodel4s.codec.AlignCodecSuite",
+      "acceptingControl": "a real inferred result has a canonical contextual round trip",
+      "cleanRecompile": false,
+      "originalSha256": "c1a47ca30ac2af608ee9241bf44357c1d977347cb6fcc359351a6da2c23f6a2d",
+      "mutantSha256": "9cf6f7e8538f12ee03549b3bfed99542626f13e7c1e884b1ccf34bd375aed014",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "codecJVM/testOnly storymodel4s.codec.AlignCodecSuite storymodel4s.codec.D1bPointCodecSuite"
+      ],
+      "diff": "--- codec/src/main/scala/storymodel4s/codec/core.scala\n+++ codec/src/main/scala/storymodel4s/codec/core.scala\n@@ -164,7 +164,7 @@\n       else \"evidence-support/v1\"\n     val component = Json.obj(\"schema\" -> schema.asJson, \"anchors\" -> anchors.asJson)\n     if schema == \"evidence-support/v2\" then\n-      component.mapObject(_.add(\"bundleIdentity\", support.bundleIdentity.hex.asJson))\n+      component\n     else component\n   }\n \n"
+    },
+    {
+      "id": "point-component-tick",
+      "path": "codec/src/main/scala/storymodel4s/codec/core.scala",
+      "group": "codec",
+      "rejectSuite": "storymodel4s.codec.D1bPointCodecSuite",
+      "rejectingTest": "accepting control: point component records exact point and full binding",
+      "controlSuite": "storymodel4s.codec.AlignCodecSuite",
+      "acceptingControl": "a real inferred result has a canonical contextual round trip",
+      "cleanRecompile": false,
+      "originalSha256": "c1a47ca30ac2af608ee9241bf44357c1d977347cb6fcc359351a6da2c23f6a2d",
+      "mutantSha256": "ec08e19fd6511644640df2d08aaace8bb3f167b36b0947e38b1a2258aaae6721",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "codecJVM/testOnly storymodel4s.codec.AlignCodecSuite storymodel4s.codec.D1bPointCodecSuite"
+      ],
+      "diff": "--- codec/src/main/scala/storymodel4s/codec/core.scala\n+++ codec/src/main/scala/storymodel4s/codec/core.scala\n@@ -139,7 +139,7 @@\n           \"bundle\" -> bundle.value.asJson,\n           \"stream\" -> stream.value.asJson,\n           \"axis\" -> at.axis.value.asJson,\n-          \"tick\" -> at.at.toString.asJson\n+          \"tick\" -> \"0\".asJson\n         )\n       case EvidenceAnchor.Shot(bundle, stream, shot, interval) =>\n         Json.obj(\n"
+    },
+    {
+      "id": "direction-missing-feature",
+      "path": "embed-bench/src/main/scala/storymodel4s/bench/metrics.scala",
+      "group": "metrics",
+      "rejectSuite": "storymodel4s.bench.WogDiagnosticSuite",
+      "rejectingTest": "present inferred anchor without scoring feature stays eligible missing",
+      "controlSuite": "storymodel4s.bench.WogDiagnosticSuite",
+      "acceptingControl": "the route metric actually fires on the multi-unit case, and abstains elsewhere",
+      "cleanRecompile": false,
+      "originalSha256": "da1319d9a051791a3240f8c9ca4d06f724196fc66602ef6f043a2d5ca55e9981",
+      "mutantSha256": "9c191d8bbf8fabfccd7801d7c7f5ba56e011ad385ac7912c0fcbc0d747c3c43f",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "embedBench/testOnly storymodel4s.bench.WogDiagnosticSuite"
+      ],
+      "diff": "--- embed-bench/src/main/scala/storymodel4s/bench/metrics.scala\n+++ embed-bench/src/main/scala/storymodel4s/bench/metrics.scala\n@@ -363,7 +363,7 @@\n                             MetricObservation.observed(\n                               ind(stepDirection(gp, gc) == stepDirection(ip, ic))\n                             )\n-                          case _ => MetricObservation.Missing(MissingReason.AllMissing)\n+                          case _ => MetricObservation.Ineligible\n                       case _ => MetricObservation.Ineligible\n                   case _ => MetricObservation.Ineligible\n               case _ => MetricObservation.Ineligible\n"
+    },
+    {
+      "id": "direction-unranked",
+      "path": "embed-bench/src/main/scala/storymodel4s/bench/metrics.scala",
+      "group": "metrics",
+      "rejectSuite": "storymodel4s.bench.WogDiagnosticSuite",
+      "rejectingTest": "present inferred anchor without scoring feature stays eligible missing",
+      "controlSuite": "storymodel4s.bench.WogDiagnosticSuite",
+      "acceptingControl": "the route metric actually fires on the multi-unit case, and abstains elsewhere",
+      "cleanRecompile": false,
+      "originalSha256": "da1319d9a051791a3240f8c9ca4d06f724196fc66602ef6f043a2d5ca55e9981",
+      "mutantSha256": "3a6a93a0ba1c22f2756d6fe90975807813e1775c2b95ebf6507752981875c812",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "embedBench/testOnly storymodel4s.bench.WogDiagnosticSuite"
+      ],
+      "diff": "--- embed-bench/src/main/scala/storymodel4s/bench/metrics.scala\n+++ embed-bench/src/main/scala/storymodel4s/bench/metrics.scala\n@@ -349,7 +349,7 @@\n                   case (Some(previousRow), Some(currentRow))\n                       if previousRow.externalMass(ExternalState.Unranked) > 0.0 ||\n                         currentRow.externalMass(ExternalState.Unranked) > 0.0 =>\n-                    MetricObservation.Missing(MissingReason.ProviderAbstained)\n+                    MetricObservation.Missing(MissingReason.AllMissing)\n                   case (Some(previousRow), Some(currentRow)) =>\n                     (mapAnchor(previousRow), mapAnchor(currentRow)) match\n                       case (Some(previous), Some(current)) =>\n"
+    },
+    {
+      "id": "displacement-missing-feature",
+      "path": "embed-bench/src/main/scala/storymodel4s/bench/metrics.scala",
+      "group": "metrics",
+      "rejectSuite": "storymodel4s.bench.WogDiagnosticSuite",
+      "rejectingTest": "present inferred anchor without scoring feature stays eligible missing",
+      "controlSuite": "storymodel4s.bench.WogDiagnosticSuite",
+      "acceptingControl": "the route metric actually fires on the multi-unit case, and abstains elsewhere",
+      "cleanRecompile": false,
+      "originalSha256": "da1319d9a051791a3240f8c9ca4d06f724196fc66602ef6f043a2d5ca55e9981",
+      "mutantSha256": "693cd08aed1a55f6f3357f5c0b0ff744dd60205609cc9bb4600886156333971d",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "embedBench/testOnly storymodel4s.bench.WogDiagnosticSuite"
+      ],
+      "diff": "--- embed-bench/src/main/scala/storymodel4s/bench/metrics.scala\n+++ embed-bench/src/main/scala/storymodel4s/bench/metrics.scala\n@@ -435,7 +435,7 @@\n                         MetricObservation.observed(\n                           1.0 - math.abs(goldDistance - inferredDistance)\n                         )\n-                      case _ => MetricObservation.Missing(MissingReason.AllMissing)\n+                      case _ => MetricObservation.Ineligible\n                   case _ => MetricObservation.Missing(MissingReason.AllMissing)\n               case _ => MetricObservation.Ineligible\n         UnitObservation(u.id, observation)\n"
+    },
+    {
+      "id": "displacement-unranked",
+      "path": "embed-bench/src/main/scala/storymodel4s/bench/metrics.scala",
+      "group": "metrics",
+      "rejectSuite": "storymodel4s.bench.WogDiagnosticSuite",
+      "rejectingTest": "present inferred anchor without scoring feature stays eligible missing",
+      "controlSuite": "storymodel4s.bench.WogDiagnosticSuite",
+      "acceptingControl": "the route metric actually fires on the multi-unit case, and abstains elsewhere",
+      "cleanRecompile": false,
+      "originalSha256": "da1319d9a051791a3240f8c9ca4d06f724196fc66602ef6f043a2d5ca55e9981",
+      "mutantSha256": "498d144f9451fb01aabbd0479f88383d6b1db978b80defa9f0a797dfdcdf8b92",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "embedBench/testOnly storymodel4s.bench.WogDiagnosticSuite"
+      ],
+      "diff": "--- embed-bench/src/main/scala/storymodel4s/bench/metrics.scala\n+++ embed-bench/src/main/scala/storymodel4s/bench/metrics.scala\n@@ -416,7 +416,7 @@\n                 (inferredRows(i - 1), inferredRows(i)) match\n                   case (Some(previousRow), Some(currentRow))\n                       if hasUnranked(previousRow) || hasUnranked(currentRow) =>\n-                    MetricObservation.Missing(MissingReason.ProviderAbstained)\n+                    MetricObservation.Missing(MissingReason.AllMissing)\n                   case (Some(previousRow), Some(currentRow)) =>\n                     (\n                       positionOf(goldPreviousRef),\n"
+    },
+    {
+      "id": "composition-rate",
+      "path": "corpus-intake/src/main/scala/storymodel4s/corpus/intake/SherlockSourceAtlas.scala",
+      "group": "corpus",
+      "rejectSuite": "storymodel4s.corpus.intake.SherlockAnnotationsSuite",
+      "rejectingTest": "different admitted part rates use exact LCM ticks for both native and primary support",
+      "controlSuite": "storymodel4s.corpus.intake.SherlockAnnotationsSuite",
+      "acceptingControl": "accepting control: composed atlas retains an ordinary interval on both declared axes",
+      "cleanRecompile": false,
+      "originalSha256": "a7b4178c250c01564f243f6b0e14b38dec84f655b66f6adc98c45cbc79a897db",
+      "mutantSha256": "f45204edf7d32c20bc6c88f8fd53cbdcad1071b6a3968b3c0ed5d65d478d0cf2",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "corpusIntake/testOnly storymodel4s.corpus.intake.SherlockAnnotationsSuite"
+      ],
+      "diff": "--- corpus-intake/src/main/scala/storymodel4s/corpus/intake/SherlockSourceAtlas.scala\n+++ corpus-intake/src/main/scala/storymodel4s/corpus/intake/SherlockSourceAtlas.scala\n@@ -37,7 +37,7 @@\n     then refuse(\"parts require unique presentation ordinals 1 and 2 and unique identities\")\n     else if parts.exists(_._1.ticksPerSecond <= 0L) then refuse(\"part timebase is not positive\")\n     else\n-      val rate = parts.map(p => BigInt(p._1.ticksPerSecond)).reduce((a, b) => a / a.gcd(b) * b)\n+      val rate = BigInt(parts.head._1.ticksPerSecond)\n       val lengths = parts.map { (part, _) =>\n         BigInt(part.durationTicks) * rate / part.ticksPerSecond\n       }\n"
+    },
+    {
+      "id": "composition-project-scale",
+      "path": "corpus-intake/src/main/scala/storymodel4s/corpus/intake/SherlockSourceAtlas.scala",
+      "group": "corpus",
+      "rejectSuite": "storymodel4s.corpus.intake.SherlockAnnotationsSuite",
+      "rejectingTest": "different admitted part rates use exact LCM ticks for both native and primary support",
+      "controlSuite": "storymodel4s.corpus.intake.SherlockAnnotationsSuite",
+      "acceptingControl": "accepting control: composed atlas retains an ordinary interval on both declared axes",
+      "cleanRecompile": false,
+      "originalSha256": "a7b4178c250c01564f243f6b0e14b38dec84f655b66f6adc98c45cbc79a897db",
+      "mutantSha256": "42e0bf20622d6d431ddbbb1c7fcd87ad02ee6c62febc5d7533aefe7a7f986960",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "corpusIntake/testOnly storymodel4s.corpus.intake.SherlockAnnotationsSuite"
+      ],
+      "diff": "--- corpus-intake/src/main/scala/storymodel4s/corpus/intake/SherlockSourceAtlas.scala\n+++ corpus-intake/src/main/scala/storymodel4s/corpus/intake/SherlockSourceAtlas.scala\n@@ -26,7 +26,7 @@\n       val numerator = (BigInt(tick) - source.start) * (BigInt(target.endExclusive) - target.start)\n       val denominator = BigInt(source.endExclusive) - source.start\n       if numerator % denominator != 0 then refuse(\"composition requires an integral target tick\")\n-      else asLong(BigInt(target.start) + numerator / denominator)\n+      else asLong(BigInt(target.start) + (BigInt(tick) - source.start) + (numerator / denominator) * 0)\n \n   def of(input: SherlockAnnotations.Atlas): Either[DomainError, SherlockSourceAtlas] =\n     val parts =\n"
+    },
+    {
+      "id": "composition-receipt-record",
+      "path": "corpus-intake/src/main/scala/storymodel4s/corpus/intake/SherlockSourceAtlas.scala",
+      "group": "corpus",
+      "rejectSuite": "storymodel4s.corpus.intake.SherlockAnnotationsSuite",
+      "rejectingTest": "composition receipt binds the exact admitted record annotation and ordered part identities",
+      "controlSuite": "storymodel4s.corpus.intake.SherlockAnnotationsSuite",
+      "acceptingControl": "accepting control: composed atlas retains an ordinary interval on both declared axes",
+      "cleanRecompile": false,
+      "originalSha256": "a7b4178c250c01564f243f6b0e14b38dec84f655b66f6adc98c45cbc79a897db",
+      "mutantSha256": "69553d7ce9d1940d3a93401653b0a3c42e90f21dc1c209840a17fe20e3b9f751",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "corpusIntake/testOnly storymodel4s.corpus.intake.SherlockAnnotationsSuite"
+      ],
+      "diff": "--- corpus-intake/src/main/scala/storymodel4s/corpus/intake/SherlockSourceAtlas.scala\n+++ corpus-intake/src/main/scala/storymodel4s/corpus/intake/SherlockSourceAtlas.scala\n@@ -59,7 +59,7 @@\n         receipt <- SourceDerivationReceipt.of(\n           \"sherlock/presentation-composition/v1\",\n           \"manifest ordinal concatenation; exact integral target ticks; native loci retained\",\n-          Vector(input.repairRecord.checksum, input.manifest.annotationSha256) ++ parts.map(\n+          Vector(input.manifest.annotationSha256, input.manifest.annotationSha256) ++ parts.map(\n             _._2.identity\n           )\n         )\n"
+    },
+    {
+      "id": "composition-receipt-annotation",
+      "path": "corpus-intake/src/main/scala/storymodel4s/corpus/intake/SherlockSourceAtlas.scala",
+      "group": "corpus",
+      "rejectSuite": "storymodel4s.corpus.intake.SherlockAnnotationsSuite",
+      "rejectingTest": "composition receipt binds the exact admitted record annotation and ordered part identities",
+      "controlSuite": "storymodel4s.corpus.intake.SherlockAnnotationsSuite",
+      "acceptingControl": "accepting control: composed atlas retains an ordinary interval on both declared axes",
+      "cleanRecompile": false,
+      "originalSha256": "a7b4178c250c01564f243f6b0e14b38dec84f655b66f6adc98c45cbc79a897db",
+      "mutantSha256": "d9bb1801588014bce513afa3db863893af1add8b0223b09bd3e5d04d5d206e82",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "corpusIntake/testOnly storymodel4s.corpus.intake.SherlockAnnotationsSuite"
+      ],
+      "diff": "--- corpus-intake/src/main/scala/storymodel4s/corpus/intake/SherlockSourceAtlas.scala\n+++ corpus-intake/src/main/scala/storymodel4s/corpus/intake/SherlockSourceAtlas.scala\n@@ -59,7 +59,7 @@\n         receipt <- SourceDerivationReceipt.of(\n           \"sherlock/presentation-composition/v1\",\n           \"manifest ordinal concatenation; exact integral target ticks; native loci retained\",\n-          Vector(input.repairRecord.checksum, input.manifest.annotationSha256) ++ parts.map(\n+          Vector(input.repairRecord.checksum, input.repairRecord.checksum) ++ parts.map(\n             _._2.identity\n           )\n         )\n"
+    },
+    {
+      "id": "composition-receipt-parts",
+      "path": "corpus-intake/src/main/scala/storymodel4s/corpus/intake/SherlockSourceAtlas.scala",
+      "group": "corpus",
+      "rejectSuite": "storymodel4s.corpus.intake.SherlockAnnotationsSuite",
+      "rejectingTest": "composition receipt binds the exact admitted record annotation and ordered part identities",
+      "controlSuite": "storymodel4s.corpus.intake.SherlockAnnotationsSuite",
+      "acceptingControl": "accepting control: composed atlas retains an ordinary interval on both declared axes",
+      "cleanRecompile": false,
+      "originalSha256": "a7b4178c250c01564f243f6b0e14b38dec84f655b66f6adc98c45cbc79a897db",
+      "mutantSha256": "13ca5d33aa12565460550387c1fb5d6d2e7967970c1dd0b8038eca91cbb01a71",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "corpusIntake/testOnly storymodel4s.corpus.intake.SherlockAnnotationsSuite"
+      ],
+      "diff": "--- corpus-intake/src/main/scala/storymodel4s/corpus/intake/SherlockSourceAtlas.scala\n+++ corpus-intake/src/main/scala/storymodel4s/corpus/intake/SherlockSourceAtlas.scala\n@@ -60,7 +60,7 @@\n           \"sherlock/presentation-composition/v1\",\n           \"manifest ordinal concatenation; exact integral target ticks; native loci retained\",\n           Vector(input.repairRecord.checksum, input.manifest.annotationSha256) ++ parts.map(\n-            _._2.identity\n+            p => p._2.streams.head.checksum\n           )\n         )\n         segments <- parts\n"
+    },
+    {
+      "id": "composition-native-point",
+      "path": "corpus-intake/src/main/scala/storymodel4s/corpus/intake/SherlockSourceAtlas.scala",
+      "group": "corpus",
+      "rejectSuite": "storymodel4s.corpus.intake.SherlockAnnotationsSuite",
+      "rejectingTest": "composed source atlas retains exact native and primary row and scene support",
+      "controlSuite": "storymodel4s.corpus.intake.SherlockAnnotationsSuite",
+      "acceptingControl": "accepting control: composed atlas retains an ordinary interval on both declared axes",
+      "cleanRecompile": false,
+      "originalSha256": "a7b4178c250c01564f243f6b0e14b38dec84f655b66f6adc98c45cbc79a897db",
+      "mutantSha256": "fe0f0741c12c71d5ff4640e92e9a54923c91fc3a615cce6818626f3a9cd033cc",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "corpusIntake/testOnly storymodel4s.corpus.intake.SherlockAnnotationsSuite"
+      ],
+      "diff": "--- corpus-intake/src/main/scala/storymodel4s/corpus/intake/SherlockSourceAtlas.scala\n+++ corpus-intake/src/main/scala/storymodel4s/corpus/intake/SherlockSourceAtlas.scala\n@@ -152,7 +152,7 @@\n                   tick <- project(at.at, segment)\n                   projected <- PlaybackInstant.on(primary, tick)\n                 yield Vector(\n-                  EvidenceAnchor.MediaPoint(bundle.id, stream.id, at),\n+                  EvidenceAnchor.MediaPoint(bundle.id, stream.id, projected),\n                   EvidenceAnchor.MediaPoint(bundle.id, stream.id, projected)\n                 )\n             support <- EvidenceSupport.of(bundle, anchors)\n"
+    },
+    {
+      "id": "composition-primary-point",
+      "path": "corpus-intake/src/main/scala/storymodel4s/corpus/intake/SherlockSourceAtlas.scala",
+      "group": "corpus",
+      "rejectSuite": "storymodel4s.corpus.intake.SherlockAnnotationsSuite",
+      "rejectingTest": "a point-only scene remains a point-only checked proposal unit",
+      "controlSuite": "storymodel4s.corpus.intake.SherlockAnnotationsSuite",
+      "acceptingControl": "accepting control: composed atlas retains an ordinary interval on both declared axes",
+      "cleanRecompile": false,
+      "originalSha256": "a7b4178c250c01564f243f6b0e14b38dec84f655b66f6adc98c45cbc79a897db",
+      "mutantSha256": "e10559fe4ee80ca57e497fb9a4b641500495369c23bd61cc1a2c298aaba7239a",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "corpusIntake/testOnly storymodel4s.corpus.intake.SherlockAnnotationsSuite"
+      ],
+      "diff": "--- corpus-intake/src/main/scala/storymodel4s/corpus/intake/SherlockSourceAtlas.scala\n+++ corpus-intake/src/main/scala/storymodel4s/corpus/intake/SherlockSourceAtlas.scala\n@@ -150,7 +150,7 @@\n               case SherlockAnnotations.MediaLocus.Instant(_, at) =>\n                 for\n                   tick <- project(at.at, segment)\n-                  projected <- PlaybackInstant.on(primary, tick)\n+                  projected <- PlaybackInstant.on(primary, tick + 1L)\n                 yield Vector(\n                   EvidenceAnchor.MediaPoint(bundle.id, stream.id, at),\n                   EvidenceAnchor.MediaPoint(bundle.id, stream.id, projected)\n"
+    },
+    {
+      "id": "composition-scene-points",
+      "path": "corpus-intake/src/main/scala/storymodel4s/corpus/intake/SherlockSourceAtlas.scala",
+      "group": "corpus",
+      "rejectSuite": "storymodel4s.corpus.intake.SherlockAnnotationsSuite",
+      "rejectingTest": "a point-only scene remains a point-only checked proposal unit",
+      "controlSuite": "storymodel4s.corpus.intake.SherlockAnnotationsSuite",
+      "acceptingControl": "accepting control: composed atlas retains an ordinary interval on both declared axes",
+      "cleanRecompile": false,
+      "originalSha256": "a7b4178c250c01564f243f6b0e14b38dec84f655b66f6adc98c45cbc79a897db",
+      "mutantSha256": "806a98d08844dc9b61b0b2118add6a576e33ebc77fe24bb6ab9ba004d1bfefa8",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "corpusIntake/testOnly storymodel4s.corpus.intake.SherlockAnnotationsSuite"
+      ],
+      "diff": "--- corpus-intake/src/main/scala/storymodel4s/corpus/intake/SherlockSourceAtlas.scala\n+++ corpus-intake/src/main/scala/storymodel4s/corpus/intake/SherlockSourceAtlas.scala\n@@ -168,7 +168,7 @@\n               bundle,\n               input.rows\n                 .filter(r => r.row >= scene.firstRow && r.row <= scene.lastRow)\n-                .flatMap(r => rows(r.row).support.anchors.toVector)\n+                .flatMap(r => rows(r.row).support.anchors.toVector).filterNot(_.isInstanceOf[EvidenceAnchor.MediaPoint])\n             )\n             id <- NarrativeProposalUnitId.from(f\"sherlock:scene:${scene.ordinal}%03d\")\n           yield previous.updated(scene.ordinal, NarrativeProposalUnit.of(id, support, None))\n"
+    },
+    {
+      "id": "law-optional-feature",
+      "path": "laws/src/main/scala/storymodel4s/laws/Laws.scala",
+      "group": "laws",
+      "rejectSuite": "storymodel4s.laws.LawsSuite",
+      "rejectingTest": "source-view laws accept exact film support without a scoring-position feature",
+      "controlSuite": "storymodel4s.laws.LawsSuite",
+      "acceptingControl": "SourceViewLaws: align.sourceView.InMemorySourceView: scoring-feature presence is retained",
+      "cleanRecompile": false,
+      "originalSha256": "fc4133e10256aa0c19c371f1fbbba5b3a91da8241b6a1fc7fce3aa6c92a4a471",
+      "mutantSha256": "4d27427a2ad2f23374cbb75729aa2bb65ad9b74cccf10132bf2acb0153078d33",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "lawsJVM/testOnly storymodel4s.laws.LawsSuite -- --tests *scoring*"
+      ],
+      "diff": "--- laws/src/main/scala/storymodel4s/laws/Laws.scala\n+++ laws/src/main/scala/storymodel4s/laws/Laws.scala\n@@ -151,7 +151,7 @@\n   def positionsAreMeasured(v: SourceView): Boolean =\n     exposedRefs(v).forall { ref =>\n       v.node(ref).exists { node =>\n-        val expected = node.scoringPosition.nonEmpty && v.scoringLength > 0\n+        val expected = node.support != null && v.scoringLength > 0\n         v.relativeSpan(ref).isDefined == expected && v.measuredPosition(ref).isDefined == expected\n       }\n     }\n"
+    }
+  ],
+  "boundaries": [
+    "Compile-door mutants clean both Compile and Test and require actual main/test recompilation.",
+    "A kill requires a compiled named failing test plus an independent named passing control. Invalid, surviving and interrupted attempts remain retained.",
+    "Adapter malformed metadata guards are defensive beneath the sealed checked intake Atlas. Reachable tests cover differing valid rates, exact part coordinates, point retention, scene gaps and receipt inputs.",
+    "Historical text JSON, backend WOG bytes, all1000 source loci and all17 inference anchors are separate preservation courts.",
+    "Resume refuses any changed revision, runner, inventory, test/source/mutant hash, command, receipt, log, XML or incomplete restoration."
+  ]
+}
