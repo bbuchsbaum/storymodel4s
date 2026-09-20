@@ -1014,3 +1014,72 @@ only checks canonical encoding and contextual round trips. Retain both, and comp
 candidate's exact output with each frozen pre-migration backend artifact on the recorded
 runtime. Existing Native differences remain labelled; no universal cross-OS checksum or
 new tolerance is adopted. Point support still belongs to the subsequent D1B slice.
+
+#### D1B typed recall signatures and admitted points — 20 September 2026
+
+This slice follows S4c's completed local acceptance at `146df652`. Its ordinary Mote
+close was rejected by automatic approval review despite explicit owner authorization;
+that administrative status does not reopen the passed substrate boundary.
+
+Add `EvidenceAnchor.MediaPoint(bundle, stream, at: PlaybackInstant)`. Its axis is derived
+from `at`; it obeys the same stream-kind table as MediaTime. Native and mapped image
+membership is half-open: included start, excluded end, with composition gaps preserved.
+Use existing exact PlaybackInstant construction, never an empty or invented-duration
+interval. Add checked, final `PlaybackSupport` with one axis, a canonical interval union
+and sorted/deduplicated points, requiring at least one member. Keep points explicit even
+inside intervals. `EvidenceSupport.playbackOn` derives it; PrimaryProjection.Playback
+carries it. Ordering uses exact min/max bounds; containment checks the full union plus
+point membership. Explicit interval-only access remains named as such; the complete
+projection must never use it to erase points. A point-only interval hull is refused.
+Reject an interval-or-point sum because it loses mixed parent support.
+
+`EvidenceSupport` retains the full checked bundle identity, and `TypedSupport.identity`
+binds it plus canonical, tagged anchor payloads, including axis, tick, anchor family,
+stream and text reference details. This is additive to historical bundle IDs. The detached
+component encoder uses `evidence-support/v2` when points occur, leaving existing interval
+components unchanged; the text model decoder continues to refuse anchored components.
+This component shape is not an HSMM wire format or a film model codec.
+
+`NodeSummary.support` and `CellCoordinates.sourceSupport` become TypedSupport. A required
+`ScoringPosition` is separate: `CanonicalText(spans)` or `LegacyAnnotationText(spans)`.
+These are feature coordinates, not physical support. The existing text constructor derives
+the canonical-text feature; the typed constructor requires it explicitly. SourceView's
+required `scoringLength` replaces the misleading general `textLength` name. Relative-span,
+measured-position and transition Backward/LongJump arithmetic reads only this declared
+feature and its denominator. Missing position remains None; no zero fallback is introduced.
+The Sherlock adapter preserves its old joined-description offsets, group feature hulls,
+and denominator solely as LegacyAnnotationText scoring inputs. Physical leaf and parent
+support is checked media evidence, never that document or its hull.
+
+For text nodes whose canonical scoring spans equal their support, preserve the exact v1
+fingerprint token stream, including the historical textLength token. Otherwise use a
+versioned fingerprint with separately tagged complete physical support and scoring feature.
+Changing either must change identity. `HsmmResult.validated` derives and retains immutable
+support for the view's entire node inventory, including unused candidates and point-only
+parents; no caller-supplied support map enters the constructor. CellCoordinates reads that
+retained support after the existing result/view/recall join. Existing proof/gate checks stay.
+
+No generic non-text wire representation: hsmm/v3 JSON remains text-only and byte-identical;
+every generic encoding door refuses a non-text result with a typed error; any v4 support-
+bearing wire is deferred. Change both encode and toJson to checked Either results, remove
+the generic Encoder[HsmmResult], and refuse non-text views at both contextual decoding
+doors. Use HsmmCodecError.UnsupportedSupport for this refusal. A forged generic total
+encoder or silent support omission is rejected. WOG bytes remain the exact text court,
+separately from the new negative construction/encoding probes and compiled mutants.
+
+The admitted Sherlock adapter builds one composed edition from its two immutable part
+bundles in manifest presentation order. A checked TrackComposition records one explicit
+occurrence per part; exact rational tick conversion must be integral and representable.
+Retain both part-native and composed-primary anchors for every row. The composition uses
+part duration/timebase metadata, not the notebook run offset. Bound the proposal atlas to
+these checked supports; no generated caption receives SurfaceExplicit authority. Parent
+support is the union of member anchors, preserving points and gaps. Existing report loci
+remain part-native, so the frozen all-17 report comparison still tests the same coordinates.
+
+Acceptance includes every admitted row (especially row 13 at native tick 112500), exact
+point/interval/mixed support and projection, construction/Mirror and foreign-coordinate
+refusals, complete result retention, fingerprint mutations, all v3 doors, frozen S0/WOG
+bytes, all 17 participant output projection parity and the independent 1000-row coordinate
+oracle. Preserve the preexisting backend differences and frozen expectations. Record the
+public stability boundary in docs/api-stability.md; generic film wire/compiler licensing
+and empirical claims remain outside this slice.
