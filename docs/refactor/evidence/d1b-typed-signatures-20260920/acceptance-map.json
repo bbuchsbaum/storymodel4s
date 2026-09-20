@@ -1,6 +1,6 @@
 {
   "ticket": "bd-01M2TAC80YRK5JFNKTT7B7CAQN",
-  "status": "All required local execution gates passed; local landing and tracker reconciliation pending",
+  "status": "Local delivery complete; ordinary tracker reconciliation remains blocked",
   "operativeInterpretation": [
     "Exact physical support admits intervals and explicit points; point row13 is mandatory.",
     "Legacy annotation-text coordinates remain declared scoring features only, separately fingerprinted; they are never physical support.",
@@ -147,8 +147,7 @@
     }
   ],
   "remaining": [
-    "final evidence reconciliation and local landing",
-    "ordinary tracker updates remain rejected; no bypass"
+    "Live D1B Mote remains open until authorized ordinary tracker update succeeds; no bypass attempted."
   ],
   "limitations": [
     "Not an end-to-end film compiler or full D1B scientific proof",
@@ -182,5 +181,12 @@
     "testTasks": 8,
     "formatAndAppLink": true,
     "browser": "No shell change; pin-only consumer delta, no browser automation run."
+  },
+  "localLanding": {
+    "provider": "provider-local-landing.json",
+    "consumer": "consumer-local-landing.json",
+    "codeDelivered": true,
+    "trackerClosed": false,
+    "pushed": false
   }
 }

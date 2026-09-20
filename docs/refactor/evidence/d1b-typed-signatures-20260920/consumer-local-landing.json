@@ -1,0 +1,15 @@
+{
+  "before": "d95b9eacbcc1ac93c05f352c175c544a0dc6bdb1",
+  "candidate": "77297769af637e8d6fd93bb652dc9db5cb3209cc",
+  "main": "77297769af637e8d6fd93bb652dc9db5cb3209cc",
+  "branch": "main",
+  "trackedClean": true,
+  "untrackedCount": 636,
+  "untrackedPathsSha256": "b03cc1c74d0e78357e1a3e281559e48b76488a70c9bf20e2ae2619cb581c81b9",
+  "untrackedHashEncoding": "Exact NUL-terminated git ls-files --others --exclude-standard -z",
+  "untrackedPathsPreserved": true,
+  "candidateAncestorOfMain": true,
+  "providerPin": "774fb1e8fa7358de3d8343e78371f5b4d36eb1cf",
+  "operation": "local fast-forward",
+  "push": false
+}

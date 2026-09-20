@@ -99,9 +99,19 @@
       "revision": "774fb1e8",
       "scope": "Direct supplemental FilmFestival archive audit",
       "result": "24 members/hash/size and exact ace77121 runner/helper/production/test/mutant/restoration verified; seven XMLs reconcile with receipts/logs. Qualified group3 proves 3pass, compiled named kill plus 2pass including interval control, then clean3pass. Historical group2 raw flag is explicitly superseded; original67 archive unchanged. No P1/P2."
+    },
+    {
+      "reviewer": "/root/s0_cold_review",
+      "revision": "09b8019b",
+      "scope": "Direct final provider archive audit",
+      "result": "634 archive members;624 fresh exact-clone XMLs across56 tasks reconcile7109/7104/5skips/0fail. Clean774 provider and0329 dependency, format,13docs exact outputs, frozenS0/eight S0 passes verified. Historical red850 preserved. No P1/P2."
+    },
+    {
+      "reviewer": "/root (relayed separate fresh-context review)",
+      "revision": "b260d0c2",
+      "scope": "Direct consumer archive audit and final D1B acceptance reconciliation",
+      "result": "Consumer audit clean at exact77297769/provider774fb1e8; final acceptance map covers all six operative criteria with no P1/P2 or missing criterion. Landing/tracker were correctly pending at review time."
     }
   ],
-  "remaining": [
-    "Final provider/consumer execution evidence review"
-  ]
+  "remaining": []
 }

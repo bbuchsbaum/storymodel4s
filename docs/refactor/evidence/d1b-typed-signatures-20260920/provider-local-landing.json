@@ -1,0 +1,11 @@
+{
+  "before": "7c91ae43c20d27af01b45bc16ff027c7d6a808e1",
+  "candidate": "b260d0c2fbed9eaf9c93a7ff0af3061c6eb638e7",
+  "main": "b260d0c2fbed9eaf9c93a7ff0af3061c6eb638e7",
+  "branch": "main",
+  "trackedAndUntrackedClean": true,
+  "qualifiedCandidate": "774fb1e8fa7358de3d8343e78371f5b4d36eb1cf",
+  "qualifiedCandidateAncestor": true,
+  "operation": "local fast-forward",
+  "push": false
+}

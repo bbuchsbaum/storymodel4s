@@ -8,7 +8,7 @@ The 30 consultant TA keys are crosswalk references, not another set of tickets. 
 
 ## What to do first
 
-One implementation slice at a time. Baseline capture, scorer repair, production clock integration, S0 text parity pins, S1's ADR amendment, S2's checked substrate, S3's typed acquisition support, S4a's typed nodes/fallible draft S4b's sealed envelope/text witness and S4c's sealed alignment capabilities are complete. **D1B typed recall signatures are next, including exact media points and the frozen all-17 parity court.** At-risk branch preservation remains independent foundation work. The account/runner decision blocks CI execution, not local engineering.
+One implementation slice at a time. Baseline capture, scorer repair, production clock integration, S0 text parity pins, S1's ADR amendment, S2's checked substrate, S3's typed acquisition support, S4a's typed nodes/fallible draft, S4b's sealed envelope/text witness, S4c's sealed alignment capabilities and D1B's typed recall signatures are delivered locally. D1B preserves exact media points and the frozen all-17 parity court. **Next: file the cold-reviewed film-plan children, put the disclosed status choice to the owner, and reconcile the types parent.** Ordinary tracker updates for S4c/D1B remain pending after automatic approval-review rejection; local completion does not mean those live statuses are closed. At-risk branch preservation remains independent foundation work. The account/runner decision blocks CI execution, not local engineering.
 
 The active [film foundation goal](goals/film-foundation-20260919.md) assigns nine existing
 Motes to `film_foundation`, beginning with S1. It contains eight executable deliverables
@@ -23,8 +23,9 @@ and one parent reconciliation, with a bounded finish line and each ticket's gate
 - Completed `bd-01M2TAF8JH42NYJJAFWPD7HTZB` — [S3 typed acquisition support](evidence/d1a-s3-acquire-20260919/README.md)
 - Completed `bd-01M2TAFN5WMXW4NT20YJQAW2FR` — [S4a typed node support, fallible draft and projection ordering](evidence/d1a-s4a-node-support-20260919/README.md)
 - Completed `bd-01M2TAG1GEAGXCY33P0B17QBJ1` — [S4b sealed envelope, identity and checked text witness](evidence/d1a-s4b-envelope-20260919/README.md)
-- Completed `bd-01M2TAGDJ5F0FEPC3XPWVDSWDH` — [S4c sealed alignment capabilities](evidence/d1a-s4c-alignment-source-20260920/README.md)
-- Next `bd-01M2TAC80YRK5JFNKTT7B7CAQN` — D1B typed recall signatures
+- Locally completed; tracker reconciliation pending `bd-01M2TAGDJ5F0FEPC3XPWVDSWDH` — [S4c sealed alignment capabilities](evidence/d1a-s4c-alignment-source-20260920/README.md)
+- Locally completed; tracker reconciliation pending `bd-01M2TAC80YRK5JFNKTT7B7CAQN` — [D1B typed recall signatures](evidence/d1b-typed-signatures-20260920/README.md)
+- Next `bd-01M2TAGST4EBFR1HM9Q3EWSYAH` — [cold-reviewed film phase plan](../plans/2026-09-20-film-compiler-phase-plan.md); actual child filing and owner question remain
 - `bd-01M2TA2EMFCWRKXK6QJHGV702Q` — [foundation] Phase 0: rescue the only copy of audit/masc-role-corpus (b756b4bb) into the main repo
 - `bd-01M19G69RQCHMT2EMG11XFT4WX` — G0: obtain an executed exact-SHA clean build and CI receipt
 

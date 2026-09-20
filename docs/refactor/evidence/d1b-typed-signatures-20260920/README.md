@@ -1,10 +1,12 @@
 # D1B typed signature qualification
 
-Status: implementation, the frozen mutation court, real coordinates, all 17 recalls,
-backend byte parity, full provider gate, formatting and documentation examples have
-passed their local courts. The pinned consumer gate also passed; local landing remains pending.
-Ordinary Mote updates remain blocked by automatic approval review;
-the authorized substantive sequence follows S4c's green local landing.
+Status: D1B is delivered locally. Implementation, the frozen mutation court, real
+coordinates, all 17 recalls, backend byte parity, full provider/consumer gates,
+formatting and documentation examples passed. [Provider main](provider-local-landing.json)
+landed at `b260d0c2`; [consumer main](consumer-local-landing.json) landed at `77297769`.
+The live D1B Mote remains open because ordinary tracker updates were blocked by
+automatic approval review. No rejected action was bypassed. The authorized
+substantive sequence follows S4c's green local landing; no push occurred.
 
 The candidate separates checked physical `TypedSupport` from optional declared
 scoring position, retains point observations and complete result inventories,
@@ -33,7 +35,9 @@ tasks, formatting and production application linking at consumer `77297769` and
 provider `774fb1e8`, with exact clean dependency pins. Its only change is the provider
 pin; the shell is unchanged and no browser smoke was run for this slice.
 [Consumer receipts and fresh JUnit](consumer-evidence-manifest.json) are archived.
-Local landing and truthful tracker reconciliation remain.
+Both local landings preserve named branches and candidate ancestry. The provider
+tree is clean; the consumer tracked tree is clean and all 636 preexisting untracked
+paths are preserved. Ordinary tracker reconciliation remains pending.
 
 Adapter guards for impossible malformed metadata beneath sealed, checked intake
 values are defensive checks. The reachable adapter witnesses cover differing
