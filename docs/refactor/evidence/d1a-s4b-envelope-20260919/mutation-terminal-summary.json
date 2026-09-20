@@ -1,0 +1,1507 @@
+{
+  "schema": "d1a-mutation-terminal-summary/v1",
+  "codeRevision": "9a7caf45829e737e9638a23cd9176f30002a0187",
+  "observedEpochSeconds": 1789876057.181317,
+  "completed": 54,
+  "planned": 54,
+  "compiledKilled": 54,
+  "namedAcceptingControlsPassed": 54,
+  "cleanProbeRecompiles": 24,
+  "runnerExitCode": 0,
+  "runnerExitBasis": "Terminal exec session 82915 returned exit 0; final manifest is written only after clean restoration",
+  "perCaseStatusLimit": "Clean states follow completed runner assertions, not independent per-case git-status snapshots. Each sbt receipt correctly reports the intentionally dirty mutant-present tree.",
+  "terminalCloneClean": true,
+  "terminalRestoredControl": {
+    "codeRevision": "9a7caf45829e737e9638a23cd9176f30002a0187",
+    "command": [
+      "sbt",
+      "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+      "-batch",
+      "storyJVM/Test/clean",
+      "codecJVM/Test/clean",
+      "storyJVM/testOnly storymodel4s.story.D1aEnvelopeSuite storymodel4s.story.D1aEnvelopeAdmissionSuite storymodel4s.story.D1aOrderingSuite storymodel4s.probes.D1aTextWitnessSuite storymodel4s.story.probes.D1aModelConstructorSuite",
+      "codecJVM/testOnly storymodel4s.probes.D1aCodecWitnessSuite"
+    ],
+    "exitCode": 0,
+    "cleanBefore": true,
+    "cleanAfter": true,
+    "startedEpochSeconds": 1789875946.248023,
+    "seconds": 23.425253868103027,
+    "logPath": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1a-s4b-20260919/restored-control-clean.log",
+    "logSha256": "e1d51636cd193fd9cb9e959488027f18ab00db0885fb4abf7242ff65f4398f47",
+    "testTotals": [
+      "[info] Passed: Total 58, Failed 0, Errors 0, Passed 58",
+      "[info] Passed: Total 4, Failed 0, Errors 0, Passed 4"
+    ],
+    "aggregateTestCounts": {
+      "Total": 62,
+      "Failed": 0,
+      "Errors": 0,
+      "Passed": 62,
+      "Skipped": 0
+    }
+  },
+  "runnerSha256": "9fb2bc40f4bd14eb75a0d183f67822027fd4f60f107be6b44c1492f7583c4f5a",
+  "runnerLogSha256": "3b17399773a1b469fef92ef9b061c9ecad295bdab012ec4fe20443522d9cd04d",
+  "manifestSha256": "71f60c1098c01c7e3a258c909ec89471c4fb25436149af4b006043479634e5ff",
+  "records": [
+    {
+      "id": "identity-primary-axis-fingerprint",
+      "path": "core/src/main/scala/storymodel4s/core/sourceIdentity.scala",
+      "originalSha256": "b8a9b0b910820ebca08a05e89f7ae65b6b05a76acdb12606b233eb0ebb751008",
+      "mutantSha256": "dc78f269deefc26958e893c47e0ea5a72391fc282459882502b22744427b2e7b",
+      "restoredSha256": "b8a9b0b910820ebca08a05e89f7ae65b6b05a76acdb12606b233eb0ebb751008",
+      "baselineCleanBeforeMutation": true,
+      "restoredCleanAfterMutation": true,
+      "cleanStateBasis": "Initial runner assertion",
+      "restorationBasis": "Finally write_bytes(saved), followed by assert clean(); completed uninterrupted loop",
+      "hashObservation": "Original and reconstructed mutant bound to Git/attempt receipt; restored bytes checked at terminal",
+      "rejecting": {
+        "suite": "storymodel4s.story.D1aEnvelopeSuite",
+        "name": "bundle-only copy recomputes primary selection and reverses order while retaining native evidence",
+        "outcome": "failure"
+      },
+      "control": {
+        "suite": "storymodel4s.story.D1aEnvelopeSuite",
+        "name": "accepting control: anchored draft validates and has no canonical text witness",
+        "outcome": "passed"
+      },
+      "cleanTestRecompile": false,
+      "logSha256": "464b815784d2ea5f83dc48dc2612818f7a2b4359844737e8314517bc67a5b953",
+      "junitSha256": {
+        "storymodel4s.story.D1aEnvelopeSuite": "51a29615deea10b2991522ad84d5a33ef98459312206f7dec1f5e47787e427a0"
+      }
+    },
+    {
+      "id": "identity-full-bundle",
+      "path": "story/src/main/scala/storymodel4s/story/model.scala",
+      "originalSha256": "7646d033d9d9175ca66763c6959c5bab8d875f84e0b8ccb50eae1d58d2bb0e24",
+      "mutantSha256": "e54e87f09eafe112305ee6ff38f866e56b8697f3f6950644536d90061e33af08",
+      "restoredSha256": "7646d033d9d9175ca66763c6959c5bab8d875f84e0b8ccb50eae1d58d2bb0e24",
+      "baselineCleanBeforeMutation": true,
+      "restoredCleanAfterMutation": true,
+      "cleanStateBasis": "Previous iteration restoration assertion",
+      "restorationBasis": "Finally write_bytes(saved), followed by assert clean(); completed uninterrupted loop",
+      "hashObservation": "Original and reconstructed mutant bound to Git/attempt receipt; restored bytes checked at terminal",
+      "rejecting": {
+        "suite": "storymodel4s.story.D1aEnvelopeSuite",
+        "name": "non-primary coordinate metadata and mapping payload reach both model identity fields",
+        "outcome": "failure"
+      },
+      "control": {
+        "suite": "storymodel4s.story.D1aEnvelopeSuite",
+        "name": "accepting control: anchored draft validates and has no canonical text witness",
+        "outcome": "passed"
+      },
+      "cleanTestRecompile": false,
+      "logSha256": "236f2e866059231fc98e18feb2e288e1c83230429ec482fbf84763eb850b0722",
+      "junitSha256": {
+        "storymodel4s.story.D1aEnvelopeSuite": "3693654bd4d9d7ee876de7e48ce4c91bd07a9499ce6b38b2bb8d07508e9a020a"
+      }
+    },
+    {
+      "id": "identity-bound-surface",
+      "path": "story/src/main/scala/storymodel4s/story/model.scala",
+      "originalSha256": "7646d033d9d9175ca66763c6959c5bab8d875f84e0b8ccb50eae1d58d2bb0e24",
+      "mutantSha256": "5996e5a296673f2796e76e9d8bdd83d390eb9138269ff907284a7241126b1eb5",
+      "restoredSha256": "7646d033d9d9175ca66763c6959c5bab8d875f84e0b8ccb50eae1d58d2bb0e24",
+      "baselineCleanBeforeMutation": true,
+      "restoredCleanAfterMutation": true,
+      "cleanStateBasis": "Previous iteration restoration assertion",
+      "restorationBasis": "Finally write_bytes(saved), followed by assert clean(); completed uninterrupted loop",
+      "hashObservation": "Original and reconstructed mutant bound to Git/attempt receipt; restored bytes checked at terminal",
+      "rejecting": {
+        "suite": "storymodel4s.story.D1aEnvelopeSuite",
+        "name": "non-text identity binds bound surface content, units and receipt association",
+        "outcome": "failure"
+      },
+      "control": {
+        "suite": "storymodel4s.story.D1aEnvelopeSuite",
+        "name": "accepting control: anchored draft validates and has no canonical text witness",
+        "outcome": "passed"
+      },
+      "cleanTestRecompile": false,
+      "logSha256": "fa76e5b22dafe0e6e023cd1dddbe30ec33c3de3d58686092bf775969253ffdcf",
+      "junitSha256": {
+        "storymodel4s.story.D1aEnvelopeSuite": "15bee2571b42bd882f46dd0c4d065bbcf76a022421eec4fdefc11aa3664abb25"
+      }
+    },
+    {
+      "id": "receipt-story-id",
+      "path": "story/src/main/scala/storymodel4s/story/model.scala",
+      "originalSha256": "7646d033d9d9175ca66763c6959c5bab8d875f84e0b8ccb50eae1d58d2bb0e24",
+      "mutantSha256": "cd28e5cad412effacad24caea4052ab01334f64a2495e4384176900a62a0687d",
+      "restoredSha256": "7646d033d9d9175ca66763c6959c5bab8d875f84e0b8ccb50eae1d58d2bb0e24",
+      "baselineCleanBeforeMutation": true,
+      "restoredCleanAfterMutation": true,
+      "cleanStateBasis": "Previous iteration restoration assertion",
+      "restorationBasis": "Finally write_bytes(saved), followed by assert clean(); completed uninterrupted loop",
+      "hashObservation": "Original and reconstructed mutant bound to Git/attempt receipt; restored bytes checked at terminal",
+      "rejecting": {
+        "suite": "storymodel4s.story.D1aEnvelopeSuite",
+        "name": "receipt joins check story id and full source checksum for draft and copy",
+        "outcome": "failure"
+      },
+      "control": {
+        "suite": "storymodel4s.story.D1aEnvelopeSuite",
+        "name": "accepting control: anchored draft validates and has no canonical text witness",
+        "outcome": "passed"
+      },
+      "cleanTestRecompile": false,
+      "logSha256": "c977970a55dd4377482b128be475db719216f646eae3193c105c381a3a86abac",
+      "junitSha256": {
+        "storymodel4s.story.D1aEnvelopeSuite": "010e4a6510a1327ac65bc09ad43f59da60ff6bcc456cec2fc158346148b714cc"
+      }
+    },
+    {
+      "id": "receipt-source-checksum",
+      "path": "story/src/main/scala/storymodel4s/story/model.scala",
+      "originalSha256": "7646d033d9d9175ca66763c6959c5bab8d875f84e0b8ccb50eae1d58d2bb0e24",
+      "mutantSha256": "bcd57d2d18a0f606d0c0dd523cee5ce78ae323e880651e03d6d3d9b174a9d66f",
+      "restoredSha256": "7646d033d9d9175ca66763c6959c5bab8d875f84e0b8ccb50eae1d58d2bb0e24",
+      "baselineCleanBeforeMutation": true,
+      "restoredCleanAfterMutation": true,
+      "cleanStateBasis": "Previous iteration restoration assertion",
+      "restorationBasis": "Finally write_bytes(saved), followed by assert clean(); completed uninterrupted loop",
+      "hashObservation": "Original and reconstructed mutant bound to Git/attempt receipt; restored bytes checked at terminal",
+      "rejecting": {
+        "suite": "storymodel4s.story.D1aEnvelopeSuite",
+        "name": "receipt joins check story id and full source checksum for draft and copy",
+        "outcome": "failure"
+      },
+      "control": {
+        "suite": "storymodel4s.story.D1aEnvelopeSuite",
+        "name": "accepting control: anchored draft validates and has no canonical text witness",
+        "outcome": "passed"
+      },
+      "cleanTestRecompile": false,
+      "logSha256": "1f83dbf9c5842141fa1ce8d4fb175d589779720ce700551b9dd0b8fae4e26929",
+      "junitSha256": {
+        "storymodel4s.story.D1aEnvelopeSuite": "f5b65d3d40bf18319bed0323e4b345b4f827d7a848260a9aa30bf916bb7cb4b7"
+      }
+    },
+    {
+      "id": "canonical-text-evidence",
+      "path": "story/src/main/scala/storymodel4s/story/model.scala",
+      "originalSha256": "7646d033d9d9175ca66763c6959c5bab8d875f84e0b8ccb50eae1d58d2bb0e24",
+      "mutantSha256": "f40a6cabef1b9878089430c2c58843b2c4269277fc200b7c01e208eac4b1ec2e",
+      "restoredSha256": "7646d033d9d9175ca66763c6959c5bab8d875f84e0b8ccb50eae1d58d2bb0e24",
+      "baselineCleanBeforeMutation": true,
+      "restoredCleanAfterMutation": true,
+      "cleanStateBasis": "Previous iteration restoration assertion",
+      "restorationBasis": "Finally write_bytes(saved), followed by assert clean(); completed uninterrupted loop",
+      "hashObservation": "Original and reconstructed mutant bound to Git/attempt receipt; restored bytes checked at terminal",
+      "rejecting": {
+        "suite": "storymodel4s.story.D1aEnvelopeAdmissionSuite",
+        "name": "text evidence refuses anchors that otherwise belong to its own bundle",
+        "outcome": "failure"
+      },
+      "control": {
+        "suite": "storymodel4s.story.D1aEnvelopeAdmissionSuite",
+        "name": "accepting control: fully anchored graph, hierarchy, trajectory and claims validate",
+        "outcome": "passed"
+      },
+      "cleanTestRecompile": false,
+      "logSha256": "6112b491a44a160400016a94c25ed39d8878683e3df146edfb5f5e40d427453a",
+      "junitSha256": {
+        "storymodel4s.story.D1aEnvelopeAdmissionSuite": "07fd2d1971307a355f0a5add8b9dc09f965211d570dc199faf70886a666a692f"
+      }
+    },
+    {
+      "id": "canonical-film-evidence",
+      "path": "story/src/main/scala/storymodel4s/story/model.scala",
+      "originalSha256": "7646d033d9d9175ca66763c6959c5bab8d875f84e0b8ccb50eae1d58d2bb0e24",
+      "mutantSha256": "68641c0d9b2bc24d6421b07f95ed12345161c46f2f3ac3292251801cb539da5b",
+      "restoredSha256": "7646d033d9d9175ca66763c6959c5bab8d875f84e0b8ccb50eae1d58d2bb0e24",
+      "baselineCleanBeforeMutation": true,
+      "restoredCleanAfterMutation": true,
+      "cleanStateBasis": "Previous iteration restoration assertion",
+      "restorationBasis": "Finally write_bytes(saved), followed by assert clean(); completed uninterrupted loop",
+      "hashObservation": "Original and reconstructed mutant bound to Git/attempt receipt; restored bytes checked at terminal",
+      "rejecting": {
+        "suite": "storymodel4s.story.D1aEnvelopeAdmissionSuite",
+        "name": "graph evidence is checked on both draft and copy",
+        "outcome": "failure"
+      },
+      "control": {
+        "suite": "storymodel4s.story.D1aEnvelopeAdmissionSuite",
+        "name": "accepting control: fully anchored graph, hierarchy, trajectory and claims validate",
+        "outcome": "passed"
+      },
+      "cleanTestRecompile": false,
+      "logSha256": "3bddefa473058d74ef168a567da0cd2d0f489563b519ae811ce31113a7e8ba99",
+      "junitSha256": {
+        "storymodel4s.story.D1aEnvelopeAdmissionSuite": "ff60029ebcb6b72b0ddcaf2ef495fb43c3332485d853a3beeeee6e57bdbbeeca"
+      }
+    },
+    {
+      "id": "claim-anchor-membership",
+      "path": "story/src/main/scala/storymodel4s/story/model.scala",
+      "originalSha256": "7646d033d9d9175ca66763c6959c5bab8d875f84e0b8ccb50eae1d58d2bb0e24",
+      "mutantSha256": "cf1b5c64f0513280ad41ce654bdc1e44c04e7ccf8a51fb2ce9d4bbc4cbdaf1d5",
+      "restoredSha256": "7646d033d9d9175ca66763c6959c5bab8d875f84e0b8ccb50eae1d58d2bb0e24",
+      "baselineCleanBeforeMutation": true,
+      "restoredCleanAfterMutation": true,
+      "cleanStateBasis": "Previous iteration restoration assertion",
+      "restorationBasis": "Finally write_bytes(saved), followed by assert clean(); completed uninterrupted loop",
+      "hashObservation": "Original and reconstructed mutant bound to Git/attempt receipt; restored bytes checked at terminal",
+      "rejecting": {
+        "suite": "storymodel4s.story.D1aEnvelopeAdmissionSuite",
+        "name": "graph evidence is checked on both draft and copy",
+        "outcome": "failure"
+      },
+      "control": {
+        "suite": "storymodel4s.story.D1aEnvelopeAdmissionSuite",
+        "name": "accepting control: fully anchored graph, hierarchy, trajectory and claims validate",
+        "outcome": "passed"
+      },
+      "cleanTestRecompile": false,
+      "logSha256": "44eb0bfa72616e4000afd542bfcee83822d45238f8d78d66ee91191f7286ca11",
+      "junitSha256": {
+        "storymodel4s.story.D1aEnvelopeAdmissionSuite": "b5e24b0668549d99917c5b5db0333ddd1f068b7e830e91a2daeab6d1e2515788"
+      }
+    },
+    {
+      "id": "collect-graph",
+      "path": "story/src/main/scala/storymodel4s/story/model.scala",
+      "originalSha256": "7646d033d9d9175ca66763c6959c5bab8d875f84e0b8ccb50eae1d58d2bb0e24",
+      "mutantSha256": "7123013657815a934040e2c1bd3bb7a23d0eda93021a99da5153cf0f117ff901",
+      "restoredSha256": "7646d033d9d9175ca66763c6959c5bab8d875f84e0b8ccb50eae1d58d2bb0e24",
+      "baselineCleanBeforeMutation": true,
+      "restoredCleanAfterMutation": true,
+      "cleanStateBasis": "Previous iteration restoration assertion",
+      "restorationBasis": "Finally write_bytes(saved), followed by assert clean(); completed uninterrupted loop",
+      "hashObservation": "Original and reconstructed mutant bound to Git/attempt receipt; restored bytes checked at terminal",
+      "rejecting": {
+        "suite": "storymodel4s.story.D1aEnvelopeAdmissionSuite",
+        "name": "graph evidence is checked on both draft and copy",
+        "outcome": "failure"
+      },
+      "control": {
+        "suite": "storymodel4s.story.D1aEnvelopeAdmissionSuite",
+        "name": "accepting control: fully anchored graph, hierarchy, trajectory and claims validate",
+        "outcome": "passed"
+      },
+      "cleanTestRecompile": false,
+      "logSha256": "d0ac4efcd4c251acc500ef0b16435b0d9029c39ce7315abc9f3d8df5ccffb5c3",
+      "junitSha256": {
+        "storymodel4s.story.D1aEnvelopeAdmissionSuite": "54a6e5e09e5fc9297476130cf02ba6700a74f11e564186468017414068c7a144"
+      }
+    },
+    {
+      "id": "collect-hierarchy",
+      "path": "story/src/main/scala/storymodel4s/story/model.scala",
+      "originalSha256": "7646d033d9d9175ca66763c6959c5bab8d875f84e0b8ccb50eae1d58d2bb0e24",
+      "mutantSha256": "035d91b8db1e7cf99ce61fa6dea4218efba28715515b3026b0cdf46480e783cc",
+      "restoredSha256": "7646d033d9d9175ca66763c6959c5bab8d875f84e0b8ccb50eae1d58d2bb0e24",
+      "baselineCleanBeforeMutation": true,
+      "restoredCleanAfterMutation": true,
+      "cleanStateBasis": "Previous iteration restoration assertion",
+      "restorationBasis": "Finally write_bytes(saved), followed by assert clean(); completed uninterrupted loop",
+      "hashObservation": "Original and reconstructed mutant bound to Git/attempt receipt; restored bytes checked at terminal",
+      "rejecting": {
+        "suite": "storymodel4s.story.D1aEnvelopeAdmissionSuite",
+        "name": "hierarchy evidence is checked on both draft and copy",
+        "outcome": "failure"
+      },
+      "control": {
+        "suite": "storymodel4s.story.D1aEnvelopeAdmissionSuite",
+        "name": "accepting control: fully anchored graph, hierarchy, trajectory and claims validate",
+        "outcome": "passed"
+      },
+      "cleanTestRecompile": false,
+      "logSha256": "60eb2efaff394ac875dfa1f4efc2e5bb4d797a291aa857351d5eefe9c85610ff",
+      "junitSha256": {
+        "storymodel4s.story.D1aEnvelopeAdmissionSuite": "087b48191ca6b8e997843baf2793b6861f0345cb56cb511f44d9754d37f3505b"
+      }
+    },
+    {
+      "id": "collect-trajectory",
+      "path": "story/src/main/scala/storymodel4s/story/model.scala",
+      "originalSha256": "7646d033d9d9175ca66763c6959c5bab8d875f84e0b8ccb50eae1d58d2bb0e24",
+      "mutantSha256": "8d96528bde8ad057b9bd3d5ac9b2ed7de49c99501461eacc9f840c25a3792fae",
+      "restoredSha256": "7646d033d9d9175ca66763c6959c5bab8d875f84e0b8ccb50eae1d58d2bb0e24",
+      "baselineCleanBeforeMutation": true,
+      "restoredCleanAfterMutation": true,
+      "cleanStateBasis": "Previous iteration restoration assertion",
+      "restorationBasis": "Finally write_bytes(saved), followed by assert clean(); completed uninterrupted loop",
+      "hashObservation": "Original and reconstructed mutant bound to Git/attempt receipt; restored bytes checked at terminal",
+      "rejecting": {
+        "suite": "storymodel4s.story.D1aEnvelopeAdmissionSuite",
+        "name": "trajectory evidence is checked on both draft and copy",
+        "outcome": "failure"
+      },
+      "control": {
+        "suite": "storymodel4s.story.D1aEnvelopeAdmissionSuite",
+        "name": "accepting control: fully anchored graph, hierarchy, trajectory and claims validate",
+        "outcome": "passed"
+      },
+      "cleanTestRecompile": false,
+      "logSha256": "14c4e46ba577cd112d0c882528258ee686fa052e88132a29473b268b814732a6",
+      "junitSha256": {
+        "storymodel4s.story.D1aEnvelopeAdmissionSuite": "864d47d09523d79e418134961e053ec41e7a6ae02da9d7d0c0c727ff47375d8a"
+      }
+    },
+    {
+      "id": "collect-descriptor",
+      "path": "story/src/main/scala/storymodel4s/story/model.scala",
+      "originalSha256": "7646d033d9d9175ca66763c6959c5bab8d875f84e0b8ccb50eae1d58d2bb0e24",
+      "mutantSha256": "69d3102d11d117a32deca34b73b0c404adbeb06a221a75b2783d8272ecef30e4",
+      "restoredSha256": "7646d033d9d9175ca66763c6959c5bab8d875f84e0b8ccb50eae1d58d2bb0e24",
+      "baselineCleanBeforeMutation": true,
+      "restoredCleanAfterMutation": true,
+      "cleanStateBasis": "Previous iteration restoration assertion",
+      "restorationBasis": "Finally write_bytes(saved), followed by assert clean(); completed uninterrupted loop",
+      "hashObservation": "Original and reconstructed mutant bound to Git/attempt receipt; restored bytes checked at terminal",
+      "rejecting": {
+        "suite": "storymodel4s.story.D1aEnvelopeAdmissionSuite",
+        "name": "descriptor evidence is checked on both draft and copy",
+        "outcome": "failure"
+      },
+      "control": {
+        "suite": "storymodel4s.story.D1aEnvelopeAdmissionSuite",
+        "name": "accepting control: fully anchored graph, hierarchy, trajectory and claims validate",
+        "outcome": "passed"
+      },
+      "cleanTestRecompile": false,
+      "logSha256": "0fe7da4e7b42e4e94b2d638c068c3e352e676bbaa2abe30cc6e06bab3fa47778",
+      "junitSha256": {
+        "storymodel4s.story.D1aEnvelopeAdmissionSuite": "ce5ca2cd420ca69ecfd5a956636bf26192822e3330d17681356b4a7eded2ea10"
+      }
+    },
+    {
+      "id": "collect-hypothesis",
+      "path": "story/src/main/scala/storymodel4s/story/model.scala",
+      "originalSha256": "7646d033d9d9175ca66763c6959c5bab8d875f84e0b8ccb50eae1d58d2bb0e24",
+      "mutantSha256": "46a384368b30d68c4e1d89b8f25d76d02567937b0b14c0208ca4a2b0272be661",
+      "restoredSha256": "7646d033d9d9175ca66763c6959c5bab8d875f84e0b8ccb50eae1d58d2bb0e24",
+      "baselineCleanBeforeMutation": true,
+      "restoredCleanAfterMutation": true,
+      "cleanStateBasis": "Previous iteration restoration assertion",
+      "restorationBasis": "Finally write_bytes(saved), followed by assert clean(); completed uninterrupted loop",
+      "hashObservation": "Original and reconstructed mutant bound to Git/attempt receipt; restored bytes checked at terminal",
+      "rejecting": {
+        "suite": "storymodel4s.story.D1aEnvelopeAdmissionSuite",
+        "name": "hypothesis evidence is checked on both draft and copy",
+        "outcome": "failure"
+      },
+      "control": {
+        "suite": "storymodel4s.story.D1aEnvelopeAdmissionSuite",
+        "name": "accepting control: fully anchored graph, hierarchy, trajectory and claims validate",
+        "outcome": "passed"
+      },
+      "cleanTestRecompile": false,
+      "logSha256": "3f7169ea35a550bb7c9be91b71216d97301af3bc69383ccb696634089ccc3545",
+      "junitSha256": {
+        "storymodel4s.story.D1aEnvelopeAdmissionSuite": "15a4c6ec27896740e8eb7f2b145c8c2ce135f5e3179f710220d492fac77f8202"
+      }
+    },
+    {
+      "id": "collect-hierarchy-boundary",
+      "path": "story/src/main/scala/storymodel4s/story/model.scala",
+      "originalSha256": "7646d033d9d9175ca66763c6959c5bab8d875f84e0b8ccb50eae1d58d2bb0e24",
+      "mutantSha256": "b8ccc5c055be69ffd4cc96ffe1b69efc0448cebf5df78a0b933056477a298126",
+      "restoredSha256": "7646d033d9d9175ca66763c6959c5bab8d875f84e0b8ccb50eae1d58d2bb0e24",
+      "baselineCleanBeforeMutation": true,
+      "restoredCleanAfterMutation": true,
+      "cleanStateBasis": "Previous iteration restoration assertion",
+      "restorationBasis": "Finally write_bytes(saved), followed by assert clean(); completed uninterrupted loop",
+      "hashObservation": "Original and reconstructed mutant bound to Git/attempt receipt; restored bytes checked at terminal",
+      "rejecting": {
+        "suite": "storymodel4s.story.D1aEnvelopeAdmissionSuite",
+        "name": "hierarchy boundary evidence is checked on both draft and copy",
+        "outcome": "failure"
+      },
+      "control": {
+        "suite": "storymodel4s.story.D1aEnvelopeAdmissionSuite",
+        "name": "accepting control: fully anchored graph, hierarchy, trajectory and claims validate",
+        "outcome": "passed"
+      },
+      "cleanTestRecompile": false,
+      "logSha256": "4cc4c7bf4dd5ce2e0123d790289a136788a6f353e0583a5ef7e58fbfe57abdb4",
+      "junitSha256": {
+        "storymodel4s.story.D1aEnvelopeAdmissionSuite": "66d335d42240f9fd1085f820b970e0b5a50bf04967a73a8ddcb952d5325c588e"
+      }
+    },
+    {
+      "id": "collect-step-boundary",
+      "path": "story/src/main/scala/storymodel4s/story/model.scala",
+      "originalSha256": "7646d033d9d9175ca66763c6959c5bab8d875f84e0b8ccb50eae1d58d2bb0e24",
+      "mutantSha256": "2e6c3b05a44be6f78789e8e5903c614810225ffe6f06029ad164f10e02932f01",
+      "restoredSha256": "7646d033d9d9175ca66763c6959c5bab8d875f84e0b8ccb50eae1d58d2bb0e24",
+      "baselineCleanBeforeMutation": true,
+      "restoredCleanAfterMutation": true,
+      "cleanStateBasis": "Previous iteration restoration assertion",
+      "restorationBasis": "Finally write_bytes(saved), followed by assert clean(); completed uninterrupted loop",
+      "hashObservation": "Original and reconstructed mutant bound to Git/attempt receipt; restored bytes checked at terminal",
+      "rejecting": {
+        "suite": "storymodel4s.story.D1aEnvelopeAdmissionSuite",
+        "name": "step boundary evidence is checked on both draft and copy",
+        "outcome": "failure"
+      },
+      "control": {
+        "suite": "storymodel4s.story.D1aEnvelopeAdmissionSuite",
+        "name": "accepting control: fully anchored graph, hierarchy, trajectory and claims validate",
+        "outcome": "passed"
+      },
+      "cleanTestRecompile": false,
+      "logSha256": "1b71511b0e563e57e7a8931c47bc617bf5ecba5dfd83df9aecc288a06c4d2e7f",
+      "junitSha256": {
+        "storymodel4s.story.D1aEnvelopeAdmissionSuite": "f9e7ca093ca6143c047011e940784be4a16d71b50ad43a0ffc6287b6972e918d"
+      }
+    },
+    {
+      "id": "projection-rechecks-membership",
+      "path": "core/src/main/scala/storymodel4s/core/support.scala",
+      "originalSha256": "989551ce8ecedb777ef4ec421ff7d1247a656509bfe5af837ed40593aa305c46",
+      "mutantSha256": "c224e43d336042ca3f003ad0205be64edbbfd61c24a473bf812736d234136760",
+      "restoredSha256": "989551ce8ecedb777ef4ec421ff7d1247a656509bfe5af837ed40593aa305c46",
+      "baselineCleanBeforeMutation": true,
+      "restoredCleanAfterMutation": true,
+      "cleanStateBasis": "Previous iteration restoration assertion",
+      "restorationBasis": "Finally write_bytes(saved), followed by assert clean(); completed uninterrupted loop",
+      "hashObservation": "Original and reconstructed mutant bound to Git/attempt receipt; restored bytes checked at terminal",
+      "rejecting": {
+        "suite": "storymodel4s.story.D1aEnvelopeSuite",
+        "name": "node membership is rechecked independently of an available primary interval",
+        "outcome": "failure"
+      },
+      "control": {
+        "suite": "storymodel4s.story.D1aEnvelopeSuite",
+        "name": "accepting control: anchored draft validates and has no canonical text witness",
+        "outcome": "passed"
+      },
+      "cleanTestRecompile": false,
+      "logSha256": "b37b7fb4b601364603450f7dd6f4d0d6c8b64d9478a9bf3b91980ca199cbfe32",
+      "junitSha256": {
+        "storymodel4s.story.D1aEnvelopeSuite": "3c9e8dac11b1b1b81104c268dee440e2aa77c3073c23a4dee13b109fd5ba047e"
+      }
+    },
+    {
+      "id": "projection-direct-primary-refusal",
+      "path": "core/src/main/scala/storymodel4s/core/support.scala",
+      "originalSha256": "989551ce8ecedb777ef4ec421ff7d1247a656509bfe5af837ed40593aa305c46",
+      "mutantSha256": "56249e5de46dde1999ebe64f0c942cac5dc74bae540f75be90a46574c5081cd8",
+      "restoredSha256": "989551ce8ecedb777ef4ec421ff7d1247a656509bfe5af837ed40593aa305c46",
+      "baselineCleanBeforeMutation": true,
+      "restoredCleanAfterMutation": true,
+      "cleanStateBasis": "Previous iteration restoration assertion",
+      "restorationBasis": "Finally write_bytes(saved), followed by assert clean(); completed uninterrupted loop",
+      "hashObservation": "Original and reconstructed mutant bound to Git/attempt receipt; restored bytes checked at terminal",
+      "rejecting": {
+        "suite": "storymodel4s.story.D1aEnvelopeSuite",
+        "name": "native-only support is refused even when an explicit map exists",
+        "outcome": "failure"
+      },
+      "control": {
+        "suite": "storymodel4s.story.D1aEnvelopeSuite",
+        "name": "accepting control: anchored draft validates and has no canonical text witness",
+        "outcome": "passed"
+      },
+      "cleanTestRecompile": false,
+      "logSha256": "b2ad0220310a5a56423131a4c546323de73b0dd60c24d88d9e69544dd059cce9",
+      "junitSha256": {
+        "storymodel4s.story.D1aEnvelopeSuite": "9f3e7587044c2e04fd84bb94e18fdcdb470a0e80f5e4f0eb6a0a4c505f8e8005"
+      }
+    },
+    {
+      "id": "projection-refuses-film-text",
+      "path": "core/src/main/scala/storymodel4s/core/support.scala",
+      "originalSha256": "989551ce8ecedb777ef4ec421ff7d1247a656509bfe5af837ed40593aa305c46",
+      "mutantSha256": "d810116f1a2cfd7b409bc38608628a5f365884629447c71616ba06739a64f100",
+      "restoredSha256": "989551ce8ecedb777ef4ec421ff7d1247a656509bfe5af837ed40593aa305c46",
+      "baselineCleanBeforeMutation": true,
+      "restoredCleanAfterMutation": true,
+      "cleanStateBasis": "Previous iteration restoration assertion",
+      "restorationBasis": "Finally write_bytes(saved), followed by assert clean(); completed uninterrupted loop",
+      "hashObservation": "Original and reconstructed mutant bound to Git/attempt receipt; restored bytes checked at terminal",
+      "rejecting": {
+        "suite": "storymodel4s.story.D1aEnvelopeAdmissionSuite",
+        "name": "anchored entity support cannot be replaced with bare text",
+        "outcome": "failure"
+      },
+      "control": {
+        "suite": "storymodel4s.story.D1aEnvelopeAdmissionSuite",
+        "name": "accepting control: fully anchored graph, hierarchy, trajectory and claims validate",
+        "outcome": "passed"
+      },
+      "cleanTestRecompile": false,
+      "logSha256": "9c418812779722374cb952a788719eb839ae3fb13c6793d03223cabc048b1f56",
+      "junitSha256": {
+        "storymodel4s.story.D1aEnvelopeAdmissionSuite": "ddfeafb3af2111c6194ab62a004cf19527b375e122a33f6413974a1cfdbffdce"
+      }
+    },
+    {
+      "id": "empty-order-primary-kind",
+      "path": "story/src/main/scala/storymodel4s/story/graph.scala",
+      "originalSha256": "28aa1513c8ef516ec8a8052c7e1f39e7c4aa644240f4052c2554299691f7b9d7",
+      "mutantSha256": "faf5c52b5b86d3afa0ff0dbfdec2d59db682527193b2efae27015ce785006200",
+      "restoredSha256": "28aa1513c8ef516ec8a8052c7e1f39e7c4aa644240f4052c2554299691f7b9d7",
+      "baselineCleanBeforeMutation": true,
+      "restoredCleanAfterMutation": true,
+      "cleanStateBasis": "Previous iteration restoration assertion",
+      "restorationBasis": "Finally write_bytes(saved), followed by assert clean(); completed uninterrupted loop",
+      "hashObservation": "Original and reconstructed mutant bound to Git/attempt receipt; restored bytes checked at terminal",
+      "rejecting": {
+        "suite": "storymodel4s.story.D1aOrderingSuite",
+        "name": "empty ordering refuses an unsupported annotation primary axis",
+        "outcome": "failure"
+      },
+      "control": {
+        "suite": "storymodel4s.story.D1aOrderingSuite",
+        "name": "empty graph admits both supported primary kinds",
+        "outcome": "passed"
+      },
+      "cleanTestRecompile": false,
+      "logSha256": "6211fcb6fc874d705d6f8a0bfe2c14c84777a99bba884eb66d68a2e67a1571a2",
+      "junitSha256": {
+        "storymodel4s.story.D1aOrderingSuite": "5e9ac77ff286dfc11ea06b509872deca622b0671ca5aee55f8ccf33308c8a2f2"
+      }
+    },
+    {
+      "id": "copy-shared-admission",
+      "path": "story/src/main/scala/storymodel4s/story/model.scala",
+      "originalSha256": "7646d033d9d9175ca66763c6959c5bab8d875f84e0b8ccb50eae1d58d2bb0e24",
+      "mutantSha256": "e6dde6e1a1c3c96d3823a8c77a3bd4dcec096d5bbc501f6638213716d4ad1ae3",
+      "restoredSha256": "7646d033d9d9175ca66763c6959c5bab8d875f84e0b8ccb50eae1d58d2bb0e24",
+      "baselineCleanBeforeMutation": true,
+      "restoredCleanAfterMutation": true,
+      "cleanStateBasis": "Previous iteration restoration assertion",
+      "restorationBasis": "Finally write_bytes(saved), followed by assert clean(); completed uninterrupted loop",
+      "hashObservation": "Original and reconstructed mutant bound to Git/attempt receipt; restored bytes checked at terminal",
+      "rejecting": {
+        "suite": "storymodel4s.story.D1aEnvelopeAdmissionSuite",
+        "name": "graph evidence is checked on both draft and copy",
+        "outcome": "failure"
+      },
+      "control": {
+        "suite": "storymodel4s.story.D1aEnvelopeAdmissionSuite",
+        "name": "accepting control: fully anchored graph, hierarchy, trajectory and claims validate",
+        "outcome": "passed"
+      },
+      "cleanTestRecompile": false,
+      "logSha256": "e0a266b3a25a7526da0247c6352854511e0a6fce86fcd35de8a50cd84a462d74",
+      "junitSha256": {
+        "storymodel4s.story.D1aEnvelopeAdmissionSuite": "9da731cb27448ee6a64ee21771d74062f398576cbc2f313ab67e069fc8eaec21"
+      }
+    },
+    {
+      "id": "copy-recomputes-order",
+      "path": "story/src/main/scala/storymodel4s/story/model.scala",
+      "originalSha256": "7646d033d9d9175ca66763c6959c5bab8d875f84e0b8ccb50eae1d58d2bb0e24",
+      "mutantSha256": "04e3b940f51b71595e62cd9d9931c01de17eaebbf3d5805d3af48f977b1e4572",
+      "restoredSha256": "7646d033d9d9175ca66763c6959c5bab8d875f84e0b8ccb50eae1d58d2bb0e24",
+      "baselineCleanBeforeMutation": true,
+      "restoredCleanAfterMutation": true,
+      "cleanStateBasis": "Previous iteration restoration assertion",
+      "restorationBasis": "Finally write_bytes(saved), followed by assert clean(); completed uninterrupted loop",
+      "hashObservation": "Original and reconstructed mutant bound to Git/attempt receipt; restored bytes checked at terminal",
+      "rejecting": {
+        "suite": "storymodel4s.story.D1aEnvelopeSuite",
+        "name": "bundle-only copy recomputes primary selection and reverses order while retaining native evidence",
+        "outcome": "failure"
+      },
+      "control": {
+        "suite": "storymodel4s.story.D1aEnvelopeSuite",
+        "name": "accepting control: anchored draft validates and has no canonical text witness",
+        "outcome": "passed"
+      },
+      "cleanTestRecompile": false,
+      "logSha256": "7174bf97e14af656ef107ec91e18d461c35473f8122ea08ec82d291cdd25c2f0",
+      "junitSha256": {
+        "storymodel4s.story.D1aEnvelopeSuite": "30bf955922b2c798c01e4c35db172ba8d2f4be49ae4cbc5ccb11dbb76652d7ca"
+      }
+    },
+    {
+      "id": "copy-recomputes-projection",
+      "path": "story/src/main/scala/storymodel4s/story/model.scala",
+      "originalSha256": "7646d033d9d9175ca66763c6959c5bab8d875f84e0b8ccb50eae1d58d2bb0e24",
+      "mutantSha256": "e378ed3b1353d7a8730431b9a03f65129c450a1202cab1505b3a40facd5ec0c0",
+      "restoredSha256": "7646d033d9d9175ca66763c6959c5bab8d875f84e0b8ccb50eae1d58d2bb0e24",
+      "baselineCleanBeforeMutation": true,
+      "restoredCleanAfterMutation": true,
+      "cleanStateBasis": "Previous iteration restoration assertion",
+      "restorationBasis": "Finally write_bytes(saved), followed by assert clean(); completed uninterrupted loop",
+      "hashObservation": "Original and reconstructed mutant bound to Git/attempt receipt; restored bytes checked at terminal",
+      "rejecting": {
+        "suite": "storymodel4s.story.D1aEnvelopeSuite",
+        "name": "bundle-only copy recomputes primary selection and reverses order while retaining native evidence",
+        "outcome": "failure"
+      },
+      "control": {
+        "suite": "storymodel4s.story.D1aEnvelopeSuite",
+        "name": "accepting control: anchored draft validates and has no canonical text witness",
+        "outcome": "passed"
+      },
+      "cleanTestRecompile": false,
+      "logSha256": "fd23b58ea124c8b266dbc0b5880223925e2176a46939dabb6ca663518bb4da21",
+      "junitSha256": {
+        "storymodel4s.story.D1aEnvelopeSuite": "30acaacca3782779c62dcdbe309c35d1ad58d26075a882d06d5a2b2026081b7a"
+      }
+    },
+    {
+      "id": "containment-preserves-gaps",
+      "path": "story/src/main/scala/storymodel4s/story/validate.scala",
+      "originalSha256": "605c5829b9f81f8a4ece0308d8a250ca09790d86e8f2964d0cb64c48dd76c33a",
+      "mutantSha256": "f391200f682d4b9773897b23bee5d1c611981775777df78999703635fc054fb4",
+      "restoredSha256": "605c5829b9f81f8a4ece0308d8a250ca09790d86e8f2964d0cb64c48dd76c33a",
+      "baselineCleanBeforeMutation": true,
+      "restoredCleanAfterMutation": true,
+      "cleanStateBasis": "Previous iteration restoration assertion",
+      "restorationBasis": "Finally write_bytes(saved), followed by assert clean(); completed uninterrupted loop",
+      "hashObservation": "Original and reconstructed mutant bound to Git/attempt receipt; restored bytes checked at terminal",
+      "rejecting": {
+        "suite": "storymodel4s.story.D1aEnvelopeAdmissionSuite",
+        "name": "playback containment checks the interval union rather than its hull",
+        "outcome": "failure"
+      },
+      "control": {
+        "suite": "storymodel4s.story.D1aEnvelopeAdmissionSuite",
+        "name": "accepting control: fully anchored graph, hierarchy, trajectory and claims validate",
+        "outcome": "passed"
+      },
+      "cleanTestRecompile": false,
+      "logSha256": "a03fbfc472cf3d763de4acbf01799519466ccd1ad982f7260913fb43fd6a04c8",
+      "junitSha256": {
+        "storymodel4s.story.D1aEnvelopeAdmissionSuite": "bd43eeb26c5788c375e5fa73203a90a321ae1a270e1d7538f9d4ec9a821ae399"
+      }
+    },
+    {
+      "id": "containment-covers-every-member",
+      "path": "story/src/main/scala/storymodel4s/story/validate.scala",
+      "originalSha256": "605c5829b9f81f8a4ece0308d8a250ca09790d86e8f2964d0cb64c48dd76c33a",
+      "mutantSha256": "a3213517379fcf748090c82b27a4761adebcc02902d6668b4bcdb15b137dc365",
+      "restoredSha256": "605c5829b9f81f8a4ece0308d8a250ca09790d86e8f2964d0cb64c48dd76c33a",
+      "baselineCleanBeforeMutation": true,
+      "restoredCleanAfterMutation": true,
+      "cleanStateBasis": "Previous iteration restoration assertion",
+      "restorationBasis": "Finally write_bytes(saved), followed by assert clean(); completed uninterrupted loop",
+      "hashObservation": "Original and reconstructed mutant bound to Git/attempt receipt; restored bytes checked at terminal",
+      "rejecting": {
+        "suite": "storymodel4s.story.D1aEnvelopeAdmissionSuite",
+        "name": "playback containment checks the interval union rather than its hull",
+        "outcome": "failure"
+      },
+      "control": {
+        "suite": "storymodel4s.story.D1aEnvelopeAdmissionSuite",
+        "name": "accepting control: fully anchored graph, hierarchy, trajectory and claims validate",
+        "outcome": "passed"
+      },
+      "cleanTestRecompile": false,
+      "logSha256": "3b15e5e77df5188e07b3254f439f9e4ce581eed7ca39e592d20b4258ec65705e",
+      "junitSha256": {
+        "storymodel4s.story.D1aEnvelopeAdmissionSuite": "8af05b3b4700f965cd2bcae16aed0eae15fb43b48acd69872f9bede6adfc3594"
+      }
+    },
+    {
+      "id": "context-circumstance-text-extent",
+      "path": "story/src/main/scala/storymodel4s/story/validate.scala",
+      "originalSha256": "605c5829b9f81f8a4ece0308d8a250ca09790d86e8f2964d0cb64c48dd76c33a",
+      "mutantSha256": "091070f03ab26775c88789f281c0d2361719106822c90941c4256e5ed1b4348d",
+      "restoredSha256": "605c5829b9f81f8a4ece0308d8a250ca09790d86e8f2964d0cb64c48dd76c33a",
+      "baselineCleanBeforeMutation": true,
+      "restoredCleanAfterMutation": true,
+      "cleanStateBasis": "Previous iteration restoration assertion",
+      "restorationBasis": "Finally write_bytes(saved), followed by assert clean(); completed uninterrupted loop",
+      "hashObservation": "Original and reconstructed mutant bound to Git/attempt receipt; restored bytes checked at terminal",
+      "rejecting": {
+        "suite": "storymodel4s.story.D1aEnvelopeAdmissionSuite",
+        "name": "text context and circumstance bounds remain validation laws with exact paths",
+        "outcome": "failure"
+      },
+      "control": {
+        "suite": "storymodel4s.story.D1aEnvelopeAdmissionSuite",
+        "name": "accepting control: fully anchored graph, hierarchy, trajectory and claims validate",
+        "outcome": "passed"
+      },
+      "cleanTestRecompile": false,
+      "logSha256": "0ac93100e4d7a29b477f1b830a010f58e543d11521151071b681bea81e9763f3",
+      "junitSha256": {
+        "storymodel4s.story.D1aEnvelopeAdmissionSuite": "367011af862abb78acecad8ebe5a33f0df0fc369c161578d9a260105ca0a9b8b"
+      }
+    },
+    {
+      "id": "generic-consistency-rules",
+      "path": "story/src/main/scala/storymodel4s/story/validate.scala",
+      "originalSha256": "605c5829b9f81f8a4ece0308d8a250ca09790d86e8f2964d0cb64c48dd76c33a",
+      "mutantSha256": "7356fc4b2a963d5a4824872448692910b4c39fc6227a25db85a500e710fa5ef2",
+      "restoredSha256": "605c5829b9f81f8a4ece0308d8a250ca09790d86e8f2964d0cb64c48dd76c33a",
+      "baselineCleanBeforeMutation": true,
+      "restoredCleanAfterMutation": true,
+      "cleanStateBasis": "Previous iteration restoration assertion",
+      "restorationBasis": "Finally write_bytes(saved), followed by assert clean(); completed uninterrupted loop",
+      "hashObservation": "Original and reconstructed mutant bound to Git/attempt receipt; restored bytes checked at terminal",
+      "rejecting": {
+        "suite": "storymodel4s.story.D1aEnvelopeSuite",
+        "name": "generic anchored validation retains root Reported and retrospective duplicate rules",
+        "outcome": "failure"
+      },
+      "control": {
+        "suite": "storymodel4s.story.D1aEnvelopeSuite",
+        "name": "accepting control: anchored draft validates and has no canonical text witness",
+        "outcome": "passed"
+      },
+      "cleanTestRecompile": false,
+      "logSha256": "e0c8908e7f560409c6cca486db42d5804e6a46e5030db50b2aac8be28287ef0c",
+      "junitSha256": {
+        "storymodel4s.story.D1aEnvelopeSuite": "3493011963a724b589de8188ea1144399c925975d9a6cbf7cbb9cdbfdf0441c5"
+      }
+    },
+    {
+      "id": "promotion-retains-text-witness",
+      "path": "story/src/main/scala/storymodel4s/story/model.scala",
+      "originalSha256": "7646d033d9d9175ca66763c6959c5bab8d875f84e0b8ccb50eae1d58d2bb0e24",
+      "mutantSha256": "2e19ef8a8b651ce6abc52d8aa63f663b50b808dd002a4afb1816c46f4524c051",
+      "restoredSha256": "7646d033d9d9175ca66763c6959c5bab8d875f84e0b8ccb50eae1d58d2bb0e24",
+      "baselineCleanBeforeMutation": true,
+      "restoredCleanAfterMutation": true,
+      "cleanStateBasis": "Previous iteration restoration assertion",
+      "restorationBasis": "Finally write_bytes(saved), followed by assert clean(); completed uninterrupted loop",
+      "hashObservation": "Original and reconstructed mutant bound to Git/attempt receipt; restored bytes checked at terminal",
+      "rejecting": {
+        "suite": "storymodel4s.story.D1aEnvelopeSuite",
+        "name": "text identity and witness survive validation and adjudication without replacement",
+        "outcome": "failure"
+      },
+      "control": {
+        "suite": "storymodel4s.story.D1aEnvelopeSuite",
+        "name": "accepting control: anchored draft validates and has no canonical text witness",
+        "outcome": "passed"
+      },
+      "cleanTestRecompile": false,
+      "logSha256": "02d221686cabb35ee74a4a0cb4191b4cc1c9db71537644e916c5762baf683531",
+      "junitSha256": {
+        "storymodel4s.story.D1aEnvelopeSuite": "314bf71ce4b50a655f8758d949464dce4bf866a19c9e1a0a98a8bf4ea240aa13"
+      }
+    },
+    {
+      "id": "text-validation-blocking",
+      "path": "story/src/main/scala/storymodel4s/story/validate.scala",
+      "originalSha256": "605c5829b9f81f8a4ece0308d8a250ca09790d86e8f2964d0cb64c48dd76c33a",
+      "mutantSha256": "3c3cb9d8b50c8143ab0ec0b4b73ae76f805679895962a16c43d22634cbdaea22",
+      "restoredSha256": "605c5829b9f81f8a4ece0308d8a250ca09790d86e8f2964d0cb64c48dd76c33a",
+      "baselineCleanBeforeMutation": true,
+      "restoredCleanAfterMutation": true,
+      "cleanStateBasis": "Previous iteration restoration assertion",
+      "restorationBasis": "Finally write_bytes(saved), followed by assert clean(); completed uninterrupted loop",
+      "hashObservation": "Original and reconstructed mutant bound to Git/attempt receipt; restored bytes checked at terminal",
+      "rejecting": {
+        "suite": "storymodel4s.story.D1aEnvelopeSuite",
+        "name": "failed text validation retains the same report and no promoted witness",
+        "outcome": "failure"
+      },
+      "control": {
+        "suite": "storymodel4s.story.D1aEnvelopeSuite",
+        "name": "accepting control: anchored draft validates and has no canonical text witness",
+        "outcome": "passed"
+      },
+      "cleanTestRecompile": false,
+      "logSha256": "78db4e6222887364ea0a0793b99f4f28acd7118ca767b857abafccfdd104c3d4",
+      "junitSha256": {
+        "storymodel4s.story.D1aEnvelopeSuite": "1388e49c5848e5d1b0d97c7e8deae99c81128f9122ecb95d82721e9242a40f3e"
+      }
+    },
+    {
+      "id": "text-wrapper-value-equality",
+      "path": "story/src/main/scala/storymodel4s/story/model.scala",
+      "originalSha256": "7646d033d9d9175ca66763c6959c5bab8d875f84e0b8ccb50eae1d58d2bb0e24",
+      "mutantSha256": "295d991966cd0d8ff8c198d31a590a7527c6a6a5f37c9f11a01edd783d41b878",
+      "restoredSha256": "7646d033d9d9175ca66763c6959c5bab8d875f84e0b8ccb50eae1d58d2bb0e24",
+      "baselineCleanBeforeMutation": true,
+      "restoredCleanAfterMutation": true,
+      "cleanStateBasis": "Previous iteration restoration assertion",
+      "restorationBasis": "Finally write_bytes(saved), followed by assert clean(); completed uninterrupted loop",
+      "hashObservation": "Original and reconstructed mutant bound to Git/attempt receipt; restored bytes checked at terminal",
+      "rejecting": {
+        "suite": "storymodel4s.story.D1aEnvelopeSuite",
+        "name": "text identity and witness survive validation and adjudication without replacement",
+        "outcome": "failure"
+      },
+      "control": {
+        "suite": "storymodel4s.story.D1aEnvelopeSuite",
+        "name": "accepting control: anchored draft validates and has no canonical text witness",
+        "outcome": "passed"
+      },
+      "cleanTestRecompile": false,
+      "logSha256": "a9c3d254d26298b71be448583c533c3fa00b25a49c76225dea47470af49234a5",
+      "junitSha256": {
+        "storymodel4s.story.D1aEnvelopeSuite": "8eb612456a2a3673a04d6a61f11eb4143cb235ce1a9cf6dab3f93699bd22d993"
+      }
+    },
+    {
+      "id": "as-text-requires-canonical-atlas",
+      "path": "story/src/main/scala/storymodel4s/story/model.scala",
+      "originalSha256": "7646d033d9d9175ca66763c6959c5bab8d875f84e0b8ccb50eae1d58d2bb0e24",
+      "mutantSha256": "29784c6a094baefd21ab5bd30a43ac2248d8be01a4caf86a0f76f8d8212a94dd",
+      "restoredSha256": "7646d033d9d9175ca66763c6959c5bab8d875f84e0b8ccb50eae1d58d2bb0e24",
+      "baselineCleanBeforeMutation": true,
+      "restoredCleanAfterMutation": true,
+      "cleanStateBasis": "Previous iteration restoration assertion",
+      "restorationBasis": "Finally write_bytes(saved), followed by assert clean(); completed uninterrupted loop",
+      "hashObservation": "Original and reconstructed mutant bound to Git/attempt receipt; restored bytes checked at terminal",
+      "rejecting": {
+        "suite": "storymodel4s.story.D1aEnvelopeAdmissionSuite",
+        "name": "bound surface unit ids are checked as surface ids without granting text access",
+        "outcome": "failure"
+      },
+      "control": {
+        "suite": "storymodel4s.story.D1aEnvelopeAdmissionSuite",
+        "name": "text receipt joins check id and checksum independently on draft and copy",
+        "outcome": "passed"
+      },
+      "cleanTestRecompile": false,
+      "logSha256": "643777f050fbac56c70079d65962acfe17286b2a11e001600d3b408f95b611fa",
+      "junitSha256": {
+        "storymodel4s.story.D1aEnvelopeAdmissionSuite": "101d4bc092c52618ace1e92881c3dc9a93c2c9da6457a2390dd08124fd641f92"
+      }
+    },
+    {
+      "id": "constructor-StoryText",
+      "path": "story/src/main/scala/storymodel4s/story/model.scala",
+      "originalSha256": "7646d033d9d9175ca66763c6959c5bab8d875f84e0b8ccb50eae1d58d2bb0e24",
+      "mutantSha256": "86f48b9b28cb03bb23416f8d8c0dfab8889727216763564d8468f2bd3cc417df",
+      "restoredSha256": "7646d033d9d9175ca66763c6959c5bab8d875f84e0b8ccb50eae1d58d2bb0e24",
+      "baselineCleanBeforeMutation": true,
+      "restoredCleanAfterMutation": true,
+      "cleanStateBasis": "Previous iteration restoration assertion",
+      "restorationBasis": "Finally write_bytes(saved), followed by assert clean(); completed uninterrupted loop",
+      "hashObservation": "Original and reconstructed mutant bound to Git/attempt receipt; restored bytes checked at terminal",
+      "rejecting": {
+        "suite": "storymodel4s.story.probes.D1aModelConstructorSuite",
+        "name": "StoryText constructor is private even inside the story package",
+        "outcome": "failure"
+      },
+      "control": {
+        "suite": "storymodel4s.story.probes.D1aModelConstructorSuite",
+        "name": "accepting control: model factory is available inside the story package",
+        "outcome": "passed"
+      },
+      "cleanTestRecompile": true,
+      "logSha256": "817430a6f2a05a29da4658ae36d80f54112fdfc906f1efff37c21196fedac3e1",
+      "junitSha256": {
+        "storymodel4s.story.probes.D1aModelConstructorSuite": "ed3a0440d9d95ca00dd27b96ca3070b4ae35b3d3c33cb417cb94df74bd8d7bf8"
+      }
+    },
+    {
+      "id": "apply-StoryText",
+      "path": "story/src/main/scala/storymodel4s/story/model.scala",
+      "originalSha256": "7646d033d9d9175ca66763c6959c5bab8d875f84e0b8ccb50eae1d58d2bb0e24",
+      "mutantSha256": "93249d52ac555194f2172b6cd9b6639682b3783a6608e547ec1f705c0c86ef64",
+      "restoredSha256": "7646d033d9d9175ca66763c6959c5bab8d875f84e0b8ccb50eae1d58d2bb0e24",
+      "baselineCleanBeforeMutation": true,
+      "restoredCleanAfterMutation": true,
+      "cleanStateBasis": "Previous iteration restoration assertion",
+      "restorationBasis": "Finally write_bytes(saved), followed by assert clean(); completed uninterrupted loop",
+      "hashObservation": "Original and reconstructed mutant bound to Git/attempt receipt; restored bytes checked at terminal",
+      "rejecting": {
+        "suite": "storymodel4s.probes.D1aTextWitnessSuite",
+        "name": "StoryText has no public apply or copy",
+        "outcome": "failure"
+      },
+      "control": {
+        "suite": "storymodel4s.probes.D1aTextWitnessSuite",
+        "name": "accepting control: checked text factories, promotions and text reads compile",
+        "outcome": "passed"
+      },
+      "cleanTestRecompile": true,
+      "logSha256": "5e690b41586c0d743efd0dcac0ba7b26949b5348798c590462d444ec00343b68",
+      "junitSha256": {
+        "storymodel4s.probes.D1aTextWitnessSuite": "49c47393dec0738b2db10b46c7f4bcb329dfdf6c68b6b6bb239d97643c2e0442"
+      }
+    },
+    {
+      "id": "copy-StoryText",
+      "path": "story/src/main/scala/storymodel4s/story/model.scala",
+      "originalSha256": "7646d033d9d9175ca66763c6959c5bab8d875f84e0b8ccb50eae1d58d2bb0e24",
+      "mutantSha256": "e8760070ac9f14fb0864d29776ec389e902157670f0e5cbe32ac4f6ac0dc2cd0",
+      "restoredSha256": "7646d033d9d9175ca66763c6959c5bab8d875f84e0b8ccb50eae1d58d2bb0e24",
+      "baselineCleanBeforeMutation": true,
+      "restoredCleanAfterMutation": true,
+      "cleanStateBasis": "Previous iteration restoration assertion",
+      "restorationBasis": "Finally write_bytes(saved), followed by assert clean(); completed uninterrupted loop",
+      "hashObservation": "Original and reconstructed mutant bound to Git/attempt receipt; restored bytes checked at terminal",
+      "rejecting": {
+        "suite": "storymodel4s.probes.D1aTextWitnessSuite",
+        "name": "StoryText has no public apply or copy",
+        "outcome": "failure"
+      },
+      "control": {
+        "suite": "storymodel4s.probes.D1aTextWitnessSuite",
+        "name": "accepting control: checked text factories, promotions and text reads compile",
+        "outcome": "passed"
+      },
+      "cleanTestRecompile": true,
+      "logSha256": "f0269d129399bd4dc1e4c29c8042b3a93aaa4fc34fae5bf7e1cb8aa099b77b2c",
+      "junitSha256": {
+        "storymodel4s.probes.D1aTextWitnessSuite": "e632644abc89759fedbafb3c7d0f7b756c73a0c75ad5f157e33700f1c2c340a0"
+      }
+    },
+    {
+      "id": "product-StoryText",
+      "path": "story/src/main/scala/storymodel4s/story/model.scala",
+      "originalSha256": "7646d033d9d9175ca66763c6959c5bab8d875f84e0b8ccb50eae1d58d2bb0e24",
+      "mutantSha256": "aa743c38920d08c01fa8e250f59338ea154a4b626538c8e0654116c797bcc288",
+      "restoredSha256": "7646d033d9d9175ca66763c6959c5bab8d875f84e0b8ccb50eae1d58d2bb0e24",
+      "baselineCleanBeforeMutation": true,
+      "restoredCleanAfterMutation": true,
+      "cleanStateBasis": "Previous iteration restoration assertion",
+      "restorationBasis": "Finally write_bytes(saved), followed by assert clean(); completed uninterrupted loop",
+      "hashObservation": "Original and reconstructed mutant bound to Git/attempt receipt; restored bytes checked at terminal",
+      "rejecting": {
+        "suite": "storymodel4s.probes.D1aTextWitnessSuite",
+        "name": "StoryText is not a Product and has no Product Mirror",
+        "outcome": "failure"
+      },
+      "control": {
+        "suite": "storymodel4s.probes.D1aTextWitnessSuite",
+        "name": "accepting control: checked text factories, promotions and text reads compile",
+        "outcome": "passed"
+      },
+      "cleanTestRecompile": true,
+      "logSha256": "bf66f0cbcd799bc694d884e89f4b449631ab46b49709c9252499346a132f513d",
+      "junitSha256": {
+        "storymodel4s.probes.D1aTextWitnessSuite": "eeb841b70968dcbf77f7c3d1f79139ea0b493b811a34950747cc6dfdd3dda02e"
+      }
+    },
+    {
+      "id": "mirror-StoryText",
+      "path": "story/src/main/scala/storymodel4s/story/model.scala",
+      "originalSha256": "7646d033d9d9175ca66763c6959c5bab8d875f84e0b8ccb50eae1d58d2bb0e24",
+      "mutantSha256": "89d655e039fb1b2fa206724700efe8d52589cfdb6c9a833359ee56cd33aeb773",
+      "restoredSha256": "7646d033d9d9175ca66763c6959c5bab8d875f84e0b8ccb50eae1d58d2bb0e24",
+      "baselineCleanBeforeMutation": true,
+      "restoredCleanAfterMutation": true,
+      "cleanStateBasis": "Previous iteration restoration assertion",
+      "restorationBasis": "Finally write_bytes(saved), followed by assert clean(); completed uninterrupted loop",
+      "hashObservation": "Original and reconstructed mutant bound to Git/attempt receipt; restored bytes checked at terminal",
+      "rejecting": {
+        "suite": "storymodel4s.probes.D1aTextWitnessSuite",
+        "name": "StoryText is not a Product and has no Product Mirror",
+        "outcome": "failure"
+      },
+      "control": {
+        "suite": "storymodel4s.probes.D1aTextWitnessSuite",
+        "name": "accepting control: checked text factories, promotions and text reads compile",
+        "outcome": "passed"
+      },
+      "cleanTestRecompile": true,
+      "logSha256": "8bec693e45fdf2b8da61d8968148fd9cfd300b6501858b58bcda10fb819184b1",
+      "junitSha256": {
+        "storymodel4s.probes.D1aTextWitnessSuite": "08c0f9bf45911304db7cb61d0f7f1094f256729ac26089a068a5817063fa9ce8"
+      }
+    },
+    {
+      "id": "constructor-TextModel",
+      "path": "story/src/main/scala/storymodel4s/story/model.scala",
+      "originalSha256": "7646d033d9d9175ca66763c6959c5bab8d875f84e0b8ccb50eae1d58d2bb0e24",
+      "mutantSha256": "53643b448209a2d752dde0c1b1a5a744e6a6b7bf0679706c7ac5523b1f56c47f",
+      "restoredSha256": "7646d033d9d9175ca66763c6959c5bab8d875f84e0b8ccb50eae1d58d2bb0e24",
+      "baselineCleanBeforeMutation": true,
+      "restoredCleanAfterMutation": true,
+      "cleanStateBasis": "Previous iteration restoration assertion",
+      "restorationBasis": "Finally write_bytes(saved), followed by assert clean(); completed uninterrupted loop",
+      "hashObservation": "Original and reconstructed mutant bound to Git/attempt receipt; restored bytes checked at terminal",
+      "rejecting": {
+        "suite": "storymodel4s.story.probes.D1aModelConstructorSuite",
+        "name": "TextModel constructor is private even inside the story package",
+        "outcome": "failure"
+      },
+      "control": {
+        "suite": "storymodel4s.story.probes.D1aModelConstructorSuite",
+        "name": "accepting control: model factory is available inside the story package",
+        "outcome": "passed"
+      },
+      "cleanTestRecompile": true,
+      "logSha256": "104790da8671d769af1f15c0ff299a0d9214e68e7eb70fba4e2a2e826ef71e83",
+      "junitSha256": {
+        "storymodel4s.story.probes.D1aModelConstructorSuite": "51baf00048b1b920c2308d94aa0c38deaa91f65320b88440cdbb5f5756407147"
+      }
+    },
+    {
+      "id": "apply-TextModel",
+      "path": "story/src/main/scala/storymodel4s/story/model.scala",
+      "originalSha256": "7646d033d9d9175ca66763c6959c5bab8d875f84e0b8ccb50eae1d58d2bb0e24",
+      "mutantSha256": "fc636ce308c42b73f4f120ab4421d1031db7aa3bdd0bdd50f8bacafcf39739c0",
+      "restoredSha256": "7646d033d9d9175ca66763c6959c5bab8d875f84e0b8ccb50eae1d58d2bb0e24",
+      "baselineCleanBeforeMutation": true,
+      "restoredCleanAfterMutation": true,
+      "cleanStateBasis": "Previous iteration restoration assertion",
+      "restorationBasis": "Finally write_bytes(saved), followed by assert clean(); completed uninterrupted loop",
+      "hashObservation": "Original and reconstructed mutant bound to Git/attempt receipt; restored bytes checked at terminal",
+      "rejecting": {
+        "suite": "storymodel4s.probes.D1aTextWitnessSuite",
+        "name": "TextModel has no public apply or copy",
+        "outcome": "failure"
+      },
+      "control": {
+        "suite": "storymodel4s.probes.D1aTextWitnessSuite",
+        "name": "accepting control: checked text factories, promotions and text reads compile",
+        "outcome": "passed"
+      },
+      "cleanTestRecompile": true,
+      "logSha256": "cf33b665b925181c58bf3c65b7c14d1ebf45e5a4e216c74a8a75f15f32113b1b",
+      "junitSha256": {
+        "storymodel4s.probes.D1aTextWitnessSuite": "a478acc7edd1d4b0ce7472a460e3681c9454f6dea86fd8b598db82d0271f9070"
+      }
+    },
+    {
+      "id": "copy-TextModel",
+      "path": "story/src/main/scala/storymodel4s/story/model.scala",
+      "originalSha256": "7646d033d9d9175ca66763c6959c5bab8d875f84e0b8ccb50eae1d58d2bb0e24",
+      "mutantSha256": "9d57024b5b44ab21c41f8ebc0941106b02499b2338c74316eec74b55f38f51c6",
+      "restoredSha256": "7646d033d9d9175ca66763c6959c5bab8d875f84e0b8ccb50eae1d58d2bb0e24",
+      "baselineCleanBeforeMutation": true,
+      "restoredCleanAfterMutation": true,
+      "cleanStateBasis": "Previous iteration restoration assertion",
+      "restorationBasis": "Finally write_bytes(saved), followed by assert clean(); completed uninterrupted loop",
+      "hashObservation": "Original and reconstructed mutant bound to Git/attempt receipt; restored bytes checked at terminal",
+      "rejecting": {
+        "suite": "storymodel4s.probes.D1aTextWitnessSuite",
+        "name": "TextModel has no public apply or copy",
+        "outcome": "failure"
+      },
+      "control": {
+        "suite": "storymodel4s.probes.D1aTextWitnessSuite",
+        "name": "accepting control: checked text factories, promotions and text reads compile",
+        "outcome": "passed"
+      },
+      "cleanTestRecompile": true,
+      "logSha256": "60d52b660b5d99e329a0a1eefcd37d6f31c739d3fb4f470c1598f7c5e4db08e8",
+      "junitSha256": {
+        "storymodel4s.probes.D1aTextWitnessSuite": "e329b5806ff7553a165abfaeab3155011c530be01a27208dd60420d907077c0b"
+      }
+    },
+    {
+      "id": "product-TextModel",
+      "path": "story/src/main/scala/storymodel4s/story/model.scala",
+      "originalSha256": "7646d033d9d9175ca66763c6959c5bab8d875f84e0b8ccb50eae1d58d2bb0e24",
+      "mutantSha256": "8d65dffadf4048e8b26d119cca0665517899b92ffcdcb5e913067c872b124637",
+      "restoredSha256": "7646d033d9d9175ca66763c6959c5bab8d875f84e0b8ccb50eae1d58d2bb0e24",
+      "baselineCleanBeforeMutation": true,
+      "restoredCleanAfterMutation": true,
+      "cleanStateBasis": "Previous iteration restoration assertion",
+      "restorationBasis": "Finally write_bytes(saved), followed by assert clean(); completed uninterrupted loop",
+      "hashObservation": "Original and reconstructed mutant bound to Git/attempt receipt; restored bytes checked at terminal",
+      "rejecting": {
+        "suite": "storymodel4s.probes.D1aTextWitnessSuite",
+        "name": "TextModel is not a Product and has no Product Mirror",
+        "outcome": "failure"
+      },
+      "control": {
+        "suite": "storymodel4s.probes.D1aTextWitnessSuite",
+        "name": "accepting control: checked text factories, promotions and text reads compile",
+        "outcome": "passed"
+      },
+      "cleanTestRecompile": true,
+      "logSha256": "6d685c5de45ec92a694c937cec26ae68f8da62b9973e4157a66e089d1718bb6d",
+      "junitSha256": {
+        "storymodel4s.probes.D1aTextWitnessSuite": "6f6af572d488cb1451712ebe81dbb9a1c71c5b55aa1940ace2311030e03c38b4"
+      }
+    },
+    {
+      "id": "mirror-TextModel",
+      "path": "story/src/main/scala/storymodel4s/story/model.scala",
+      "originalSha256": "7646d033d9d9175ca66763c6959c5bab8d875f84e0b8ccb50eae1d58d2bb0e24",
+      "mutantSha256": "7ed4975133aaefff88fa6545c4540d6d2c0c9b3020789f953af1b420bf8ac132",
+      "restoredSha256": "7646d033d9d9175ca66763c6959c5bab8d875f84e0b8ccb50eae1d58d2bb0e24",
+      "baselineCleanBeforeMutation": true,
+      "restoredCleanAfterMutation": true,
+      "cleanStateBasis": "Previous iteration restoration assertion",
+      "restorationBasis": "Finally write_bytes(saved), followed by assert clean(); completed uninterrupted loop",
+      "hashObservation": "Original and reconstructed mutant bound to Git/attempt receipt; restored bytes checked at terminal",
+      "rejecting": {
+        "suite": "storymodel4s.probes.D1aTextWitnessSuite",
+        "name": "TextModel is not a Product and has no Product Mirror",
+        "outcome": "failure"
+      },
+      "control": {
+        "suite": "storymodel4s.probes.D1aTextWitnessSuite",
+        "name": "accepting control: checked text factories, promotions and text reads compile",
+        "outcome": "passed"
+      },
+      "cleanTestRecompile": true,
+      "logSha256": "0635e7a49fd1a8266bbfdbf2c8f5bf1355378614aa82345b8f81effef5c82e0f",
+      "junitSha256": {
+        "storymodel4s.probes.D1aTextWitnessSuite": "2ba059bab17e5d71d2b3ae2b6ba637611edd8fc8a2f7f598c2c656fc01d9972e"
+      }
+    },
+    {
+      "id": "private-text-promotion",
+      "path": "story/src/main/scala/storymodel4s/story/model.scala",
+      "originalSha256": "7646d033d9d9175ca66763c6959c5bab8d875f84e0b8ccb50eae1d58d2bb0e24",
+      "mutantSha256": "cc87bf179d9312ddcac428b6562e67fcfc7aa26c7363cf3710ed9f90f82d08b3",
+      "restoredSha256": "7646d033d9d9175ca66763c6959c5bab8d875f84e0b8ccb50eae1d58d2bb0e24",
+      "baselineCleanBeforeMutation": true,
+      "restoredCleanAfterMutation": true,
+      "cleanStateBasis": "Previous iteration restoration assertion",
+      "restorationBasis": "Finally write_bytes(saved), followed by assert clean(); completed uninterrupted loop",
+      "hashObservation": "Original and reconstructed mutant bound to Git/attempt receipt; restored bytes checked at terminal",
+      "rejecting": {
+        "suite": "storymodel4s.probes.D1aTextWitnessSuite",
+        "name": "text witness does not forward internal copy or promotion",
+        "outcome": "failure"
+      },
+      "control": {
+        "suite": "storymodel4s.probes.D1aTextWitnessSuite",
+        "name": "accepting control: checked text factories, promotions and text reads compile",
+        "outcome": "passed"
+      },
+      "cleanTestRecompile": true,
+      "logSha256": "b9dfec1d26d9db6e4ce36f09d85333ea1076a2ef7ab2c1376db7c22432498023",
+      "junitSha256": {
+        "storymodel4s.probes.D1aTextWitnessSuite": "7bf75aab4aab1ca8f30e52c5ab6e1d941abb9ebd4a855551a6c59df130510ee4"
+      }
+    },
+    {
+      "id": "text-status-forwarding",
+      "path": "story/src/main/scala/storymodel4s/story/model.scala",
+      "originalSha256": "7646d033d9d9175ca66763c6959c5bab8d875f84e0b8ccb50eae1d58d2bb0e24",
+      "mutantSha256": "2b94637e3a63a844b7041c42452d4d060eed260f6537794c16d9378698dbabce",
+      "restoredSha256": "7646d033d9d9175ca66763c6959c5bab8d875f84e0b8ccb50eae1d58d2bb0e24",
+      "baselineCleanBeforeMutation": true,
+      "restoredCleanAfterMutation": true,
+      "cleanStateBasis": "Previous iteration restoration assertion",
+      "restorationBasis": "Finally write_bytes(saved), followed by assert clean(); completed uninterrupted loop",
+      "hashObservation": "Original and reconstructed mutant bound to Git/attempt receipt; restored bytes checked at terminal",
+      "rejecting": {
+        "suite": "storymodel4s.probes.D1aTextWitnessSuite",
+        "name": "text witness does not forward internal copy or promotion",
+        "outcome": "failure"
+      },
+      "control": {
+        "suite": "storymodel4s.probes.D1aTextWitnessSuite",
+        "name": "accepting control: checked text factories, promotions and text reads compile",
+        "outcome": "passed"
+      },
+      "cleanTestRecompile": true,
+      "logSha256": "892202dcd98f17dd45eb3353c4d5a02e758a89fc8b8de0fb3fff2ddc4351ac20",
+      "junitSha256": {
+        "storymodel4s.probes.D1aTextWitnessSuite": "60d5dd995e10a11121fbbb81a23f35b22f0423a7f6f7cbcda594354e561de6d2"
+      }
+    },
+    {
+      "id": "generic-model-source-access",
+      "path": "story/src/main/scala/storymodel4s/story/model.scala",
+      "originalSha256": "7646d033d9d9175ca66763c6959c5bab8d875f84e0b8ccb50eae1d58d2bb0e24",
+      "mutantSha256": "f3a01a0696c7f4fad3b6e5c159d8e0166adbec8fb8c3405eb1a176d9b8a7b82d",
+      "restoredSha256": "7646d033d9d9175ca66763c6959c5bab8d875f84e0b8ccb50eae1d58d2bb0e24",
+      "baselineCleanBeforeMutation": true,
+      "restoredCleanAfterMutation": true,
+      "cleanStateBasis": "Previous iteration restoration assertion",
+      "restorationBasis": "Finally write_bytes(saved), followed by assert clean(); completed uninterrupted loop",
+      "hashObservation": "Original and reconstructed mutant bound to Git/attempt receipt; restored bytes checked at terminal",
+      "rejecting": {
+        "suite": "storymodel4s.probes.D1aTextWitnessSuite",
+        "name": "generic model has no source or public text support queries",
+        "outcome": "failure"
+      },
+      "control": {
+        "suite": "storymodel4s.probes.D1aTextWitnessSuite",
+        "name": "accepting control: checked text factories, promotions and text reads compile",
+        "outcome": "passed"
+      },
+      "cleanTestRecompile": true,
+      "logSha256": "eb4fbcb201a57f9591f1eb9ba262b28f5c17e2e337a7891fc713d790b43c0449",
+      "junitSha256": {
+        "storymodel4s.probes.D1aTextWitnessSuite": "5cd60d1b9d18277d9913b1961a0e6eb82f56c693138696a348c592dbd65f5f7e"
+      }
+    },
+    {
+      "id": "text-factory-independent-source",
+      "path": "story/src/main/scala/storymodel4s/story/model.scala",
+      "originalSha256": "7646d033d9d9175ca66763c6959c5bab8d875f84e0b8ccb50eae1d58d2bb0e24",
+      "mutantSha256": "9b8395a684c8268cf4f93f3a4d35216c91b18403310ead946876fc70a4fbd8c1",
+      "restoredSha256": "7646d033d9d9175ca66763c6959c5bab8d875f84e0b8ccb50eae1d58d2bb0e24",
+      "baselineCleanBeforeMutation": true,
+      "restoredCleanAfterMutation": true,
+      "cleanStateBasis": "Previous iteration restoration assertion",
+      "restorationBasis": "Finally write_bytes(saved), followed by assert clean(); completed uninterrupted loop",
+      "hashObservation": "Original and reconstructed mutant bound to Git/attempt receipt; restored bytes checked at terminal",
+      "rejecting": {
+        "suite": "storymodel4s.probes.D1aTextWitnessSuite",
+        "name": "text factory accepts no independent source",
+        "outcome": "failure"
+      },
+      "control": {
+        "suite": "storymodel4s.probes.D1aTextWitnessSuite",
+        "name": "accepting control: checked text factories, promotions and text reads compile",
+        "outcome": "passed"
+      },
+      "cleanTestRecompile": true,
+      "logSha256": "a9d6cd31c7dcb3ee7a0ee9f8af8e910eea3f7a1bc414b5223a1bd66889faf718",
+      "junitSha256": {
+        "storymodel4s.probes.D1aTextWitnessSuite": "a5146dd2f56d6bf7d2298ca7fe1de01bd509a9882ab7e1a8af70f68fd32b9d27"
+      }
+    },
+    {
+      "id": "visibility-model-supporting",
+      "path": "story/src/main/scala/storymodel4s/story/model.scala",
+      "originalSha256": "7646d033d9d9175ca66763c6959c5bab8d875f84e0b8ccb50eae1d58d2bb0e24",
+      "mutantSha256": "31d19f63490520dcc78bbbfd8867f0bd5ce816d6018022308697e05ccbecb705",
+      "restoredSha256": "7646d033d9d9175ca66763c6959c5bab8d875f84e0b8ccb50eae1d58d2bb0e24",
+      "baselineCleanBeforeMutation": true,
+      "restoredCleanAfterMutation": true,
+      "cleanStateBasis": "Previous iteration restoration assertion",
+      "restorationBasis": "Finally write_bytes(saved), followed by assert clean(); completed uninterrupted loop",
+      "hashObservation": "Original and reconstructed mutant bound to Git/attempt receipt; restored bytes checked at terminal",
+      "rejecting": {
+        "suite": "storymodel4s.probes.D1aTextWitnessSuite",
+        "name": "generic model has no source or public text support queries",
+        "outcome": "failure"
+      },
+      "control": {
+        "suite": "storymodel4s.probes.D1aTextWitnessSuite",
+        "name": "accepting control: checked text factories, promotions and text reads compile",
+        "outcome": "passed"
+      },
+      "cleanTestRecompile": true,
+      "logSha256": "17b42f6513be92aca5c8e09aef99efcfa3468ddea81c3c42750378c2d9f7e4a0",
+      "junitSha256": {
+        "storymodel4s.probes.D1aTextWitnessSuite": "4ce5e31688c234dfc58f4752a0ac91b16f8a9e256907d6955b0c1b0e20370182"
+      }
+    },
+    {
+      "id": "visibility-model-covering",
+      "path": "story/src/main/scala/storymodel4s/story/model.scala",
+      "originalSha256": "7646d033d9d9175ca66763c6959c5bab8d875f84e0b8ccb50eae1d58d2bb0e24",
+      "mutantSha256": "71366706bf614cd1b65cd7296c510b4e27be714b8f3a16f7134b2d96944b6aa0",
+      "restoredSha256": "7646d033d9d9175ca66763c6959c5bab8d875f84e0b8ccb50eae1d58d2bb0e24",
+      "baselineCleanBeforeMutation": true,
+      "restoredCleanAfterMutation": true,
+      "cleanStateBasis": "Previous iteration restoration assertion",
+      "restorationBasis": "Finally write_bytes(saved), followed by assert clean(); completed uninterrupted loop",
+      "hashObservation": "Original and reconstructed mutant bound to Git/attempt receipt; restored bytes checked at terminal",
+      "rejecting": {
+        "suite": "storymodel4s.probes.D1aTextWitnessSuite",
+        "name": "generic model has no source or public text support queries",
+        "outcome": "failure"
+      },
+      "control": {
+        "suite": "storymodel4s.probes.D1aTextWitnessSuite",
+        "name": "accepting control: checked text factories, promotions and text reads compile",
+        "outcome": "passed"
+      },
+      "cleanTestRecompile": true,
+      "logSha256": "ced0d26a3dc4f79efdc9cbfcf48eb5984e4dd0b81b136d6dadf2bbcc6274598a",
+      "junitSha256": {
+        "storymodel4s.probes.D1aTextWitnessSuite": "3ba3b106285993f7a2755be6a845a70879724bb39903b519b01fec328c0ba324"
+      }
+    },
+    {
+      "id": "visibility-model-situationsCovering",
+      "path": "story/src/main/scala/storymodel4s/story/model.scala",
+      "originalSha256": "7646d033d9d9175ca66763c6959c5bab8d875f84e0b8ccb50eae1d58d2bb0e24",
+      "mutantSha256": "abf24bc6d61e22587e8687ec31616d9f64ea4011f4342cc054aaa79960ed76d4",
+      "restoredSha256": "7646d033d9d9175ca66763c6959c5bab8d875f84e0b8ccb50eae1d58d2bb0e24",
+      "baselineCleanBeforeMutation": true,
+      "restoredCleanAfterMutation": true,
+      "cleanStateBasis": "Previous iteration restoration assertion",
+      "restorationBasis": "Finally write_bytes(saved), followed by assert clean(); completed uninterrupted loop",
+      "hashObservation": "Original and reconstructed mutant bound to Git/attempt receipt; restored bytes checked at terminal",
+      "rejecting": {
+        "suite": "storymodel4s.probes.D1aTextWitnessSuite",
+        "name": "generic model has no source or public text support queries",
+        "outcome": "failure"
+      },
+      "control": {
+        "suite": "storymodel4s.probes.D1aTextWitnessSuite",
+        "name": "accepting control: checked text factories, promotions and text reads compile",
+        "outcome": "passed"
+      },
+      "cleanTestRecompile": true,
+      "logSha256": "33713695ca95f037ece0093315c980ae01f8d04bb8b92a35f6c208b07a38a935",
+      "junitSha256": {
+        "storymodel4s.probes.D1aTextWitnessSuite": "b3d30dd9e36c3485e801217feaa068317f08b5b4fd04c49e985f61cc97302498"
+      }
+    },
+    {
+      "id": "visibility-graph-supporting",
+      "path": "story/src/main/scala/storymodel4s/story/graph.scala",
+      "originalSha256": "28aa1513c8ef516ec8a8052c7e1f39e7c4aa644240f4052c2554299691f7b9d7",
+      "mutantSha256": "987bcead712a7bf02f6df3936c0641897b06e1fde9e74a41d2141febf43e87f5",
+      "restoredSha256": "28aa1513c8ef516ec8a8052c7e1f39e7c4aa644240f4052c2554299691f7b9d7",
+      "baselineCleanBeforeMutation": true,
+      "restoredCleanAfterMutation": true,
+      "cleanStateBasis": "Previous iteration restoration assertion",
+      "restorationBasis": "Finally write_bytes(saved), followed by assert clean(); completed uninterrupted loop",
+      "hashObservation": "Original and reconstructed mutant bound to Git/attempt receipt; restored bytes checked at terminal",
+      "rejecting": {
+        "suite": "storymodel4s.probes.D1aTextWitnessSuite",
+        "name": "unbound graph has no public text support queries",
+        "outcome": "failure"
+      },
+      "control": {
+        "suite": "storymodel4s.probes.D1aTextWitnessSuite",
+        "name": "accepting control: checked text factories, promotions and text reads compile",
+        "outcome": "passed"
+      },
+      "cleanTestRecompile": true,
+      "logSha256": "c4228a81fcd7db221353cb21db2e439840f1fa0e3b054335383ed496e6ee85e3",
+      "junitSha256": {
+        "storymodel4s.probes.D1aTextWitnessSuite": "ad5242dbed3132fd6ab84bd33f079ac40ebb7588fbc041b1ca58b16f60951c29"
+      }
+    },
+    {
+      "id": "visibility-graph-covering",
+      "path": "story/src/main/scala/storymodel4s/story/graph.scala",
+      "originalSha256": "28aa1513c8ef516ec8a8052c7e1f39e7c4aa644240f4052c2554299691f7b9d7",
+      "mutantSha256": "2964d1e3d6bbe4e1e8305f96626d49550df3b569eb55d4bd366dc815e37c0663",
+      "restoredSha256": "28aa1513c8ef516ec8a8052c7e1f39e7c4aa644240f4052c2554299691f7b9d7",
+      "baselineCleanBeforeMutation": true,
+      "restoredCleanAfterMutation": true,
+      "cleanStateBasis": "Previous iteration restoration assertion",
+      "restorationBasis": "Finally write_bytes(saved), followed by assert clean(); completed uninterrupted loop",
+      "hashObservation": "Original and reconstructed mutant bound to Git/attempt receipt; restored bytes checked at terminal",
+      "rejecting": {
+        "suite": "storymodel4s.probes.D1aTextWitnessSuite",
+        "name": "unbound graph has no public text support queries",
+        "outcome": "failure"
+      },
+      "control": {
+        "suite": "storymodel4s.probes.D1aTextWitnessSuite",
+        "name": "accepting control: checked text factories, promotions and text reads compile",
+        "outcome": "passed"
+      },
+      "cleanTestRecompile": true,
+      "logSha256": "c6101363296e4fc3a8be6e2cd2fb1c2517ef366ee0fe965a045bdc633b8ee07e",
+      "junitSha256": {
+        "storymodel4s.probes.D1aTextWitnessSuite": "ba49183778a8d28ccfa8dce2e97c26de4b81ef89be435d1cd7581255a3fba75a"
+      }
+    },
+    {
+      "id": "generic-text-consumer-bridge",
+      "path": "story/src/main/scala/storymodel4s/story/model.scala",
+      "originalSha256": "7646d033d9d9175ca66763c6959c5bab8d875f84e0b8ccb50eae1d58d2bb0e24",
+      "mutantSha256": "211a3a955722b2db660a1534e30691864cc3cb17bf26c838d2ecda59a876828a",
+      "restoredSha256": "7646d033d9d9175ca66763c6959c5bab8d875f84e0b8ccb50eae1d58d2bb0e24",
+      "baselineCleanBeforeMutation": true,
+      "restoredCleanAfterMutation": true,
+      "cleanStateBasis": "Previous iteration restoration assertion",
+      "restorationBasis": "Finally write_bytes(saved), followed by assert clean(); completed uninterrupted loop",
+      "hashObservation": "Original and reconstructed mutant bound to Git/attempt receipt; restored bytes checked at terminal",
+      "rejecting": {
+        "suite": "storymodel4s.probes.D1aTextWitnessSuite",
+        "name": "generic model cannot stand in for a text model at a text consumer",
+        "outcome": "failure"
+      },
+      "control": {
+        "suite": "storymodel4s.probes.D1aTextWitnessSuite",
+        "name": "accepting control: checked text factories, promotions and text reads compile",
+        "outcome": "passed"
+      },
+      "cleanTestRecompile": true,
+      "logSha256": "6e10cabb96bfd7b79d6d48cd112556ea0c2bfb77c9a2d02b9e14fb153553dee9",
+      "junitSha256": {
+        "storymodel4s.probes.D1aTextWitnessSuite": "e6b585283b756b93e4ba9f16938515e09701d428879db52632643028fee05bf8"
+      }
+    },
+    {
+      "id": "generic-codec-method-bridge",
+      "path": "story/src/main/scala/storymodel4s/story/model.scala",
+      "originalSha256": "7646d033d9d9175ca66763c6959c5bab8d875f84e0b8ccb50eae1d58d2bb0e24",
+      "mutantSha256": "211a3a955722b2db660a1534e30691864cc3cb17bf26c838d2ecda59a876828a",
+      "restoredSha256": "7646d033d9d9175ca66763c6959c5bab8d875f84e0b8ccb50eae1d58d2bb0e24",
+      "baselineCleanBeforeMutation": true,
+      "restoredCleanAfterMutation": true,
+      "cleanStateBasis": "Previous iteration restoration assertion",
+      "restorationBasis": "Finally write_bytes(saved), followed by assert clean(); completed uninterrupted loop",
+      "hashObservation": "Original and reconstructed mutant bound to Git/attempt receipt; restored bytes checked at terminal",
+      "rejecting": {
+        "suite": "storymodel4s.probes.D1aCodecWitnessSuite",
+        "name": "generic models cannot enter text encode and checksum methods",
+        "outcome": "failure"
+      },
+      "control": {
+        "suite": "storymodel4s.probes.D1aCodecWitnessSuite",
+        "name": "accepting control: canonical model codecs accept and return text witnesses",
+        "outcome": "passed"
+      },
+      "cleanTestRecompile": true,
+      "logSha256": "36f1b65a0f021bb8f2b84dde3b1328f483c2bbb076ec685c43c7e7047d0c699f",
+      "junitSha256": {
+        "storymodel4s.probes.D1aCodecWitnessSuite": "4714189726ff8dfd24671d07bec0bc057cd9c74dd231ae62a9572f7d8560bab6"
+      }
+    },
+    {
+      "id": "generic-codec-encoder",
+      "path": "codec/src/main/scala/storymodel4s/codec/story.scala",
+      "originalSha256": "c4fe4b64df3c340a92127031545593dd1bfb4eaa7abe2b08196efd9e0fa8c8bf",
+      "mutantSha256": "4b503e89c97d5b510d2f953c0b8ee7ab3a104c35d43704b1df0ac9791c18a262",
+      "restoredSha256": "c4fe4b64df3c340a92127031545593dd1bfb4eaa7abe2b08196efd9e0fa8c8bf",
+      "baselineCleanBeforeMutation": true,
+      "restoredCleanAfterMutation": true,
+      "cleanStateBasis": "Previous iteration restoration assertion",
+      "restorationBasis": "Finally write_bytes(saved), followed by assert clean(); completed uninterrupted loop",
+      "hashObservation": "Original and reconstructed mutant bound to Git/attempt receipt; restored bytes checked at terminal",
+      "rejecting": {
+        "suite": "storymodel4s.probes.D1aCodecWitnessSuite",
+        "name": "generic models have no canonical Encoder",
+        "outcome": "failure"
+      },
+      "control": {
+        "suite": "storymodel4s.probes.D1aCodecWitnessSuite",
+        "name": "accepting control: canonical model codecs accept and return text witnesses",
+        "outcome": "passed"
+      },
+      "cleanTestRecompile": true,
+      "logSha256": "f1bc5c069408473fea2ec8493f08b8d85d8de87fa89c7b530e2b085062fd70c0",
+      "junitSha256": {
+        "storymodel4s.probes.D1aCodecWitnessSuite": "2609b5ec57b98304b3144b3326e0539a085372751a9912d7df3c0be6d9ab4c12"
+      }
+    },
+    {
+      "id": "generic-codec-decoder",
+      "path": "codec/src/main/scala/storymodel4s/codec/story.scala",
+      "originalSha256": "c4fe4b64df3c340a92127031545593dd1bfb4eaa7abe2b08196efd9e0fa8c8bf",
+      "mutantSha256": "de0bb3959e5b501411ee79c8672cd03123e5eaad0f75ee60bdac9bd22f492770",
+      "restoredSha256": "c4fe4b64df3c340a92127031545593dd1bfb4eaa7abe2b08196efd9e0fa8c8bf",
+      "baselineCleanBeforeMutation": true,
+      "restoredCleanAfterMutation": true,
+      "cleanStateBasis": "Previous iteration restoration assertion",
+      "restorationBasis": "Finally write_bytes(saved), followed by assert clean(); completed uninterrupted loop",
+      "hashObservation": "Original and reconstructed mutant bound to Git/attempt receipt; restored bytes checked at terminal",
+      "rejecting": {
+        "suite": "storymodel4s.probes.D1aCodecWitnessSuite",
+        "name": "generic models have no canonical Decoder",
+        "outcome": "failure"
+      },
+      "control": {
+        "suite": "storymodel4s.probes.D1aCodecWitnessSuite",
+        "name": "accepting control: canonical model codecs accept and return text witnesses",
+        "outcome": "passed"
+      },
+      "cleanTestRecompile": true,
+      "logSha256": "c38de4f387de13c3d1605a1c14ae800ae332d10c19eba70ec08df94802fa3f49",
+      "junitSha256": {
+        "storymodel4s.probes.D1aCodecWitnessSuite": "7a2dc81da38e5ef3491ba80ecd19e0b5ebfc9b6b57b3c8eebb36a2223b976417"
+      }
+    },
+    {
+      "id": "private-model-constructor",
+      "path": "story/src/main/scala/storymodel4s/story/model.scala",
+      "originalSha256": "7646d033d9d9175ca66763c6959c5bab8d875f84e0b8ccb50eae1d58d2bb0e24",
+      "mutantSha256": "3961dbdfbbeac43ef7005b0f2e5a9c561acc0c054f0cd0b6a75dc84cdb4d5d29",
+      "restoredSha256": "7646d033d9d9175ca66763c6959c5bab8d875f84e0b8ccb50eae1d58d2bb0e24",
+      "baselineCleanBeforeMutation": true,
+      "restoredCleanAfterMutation": true,
+      "cleanStateBasis": "Previous iteration restoration assertion",
+      "restorationBasis": "Finally write_bytes(saved), followed by assert clean(); completed uninterrupted loop",
+      "hashObservation": "Original and reconstructed mutant bound to Git/attempt receipt; restored bytes checked at terminal",
+      "rejecting": {
+        "suite": "storymodel4s.story.probes.D1aModelConstructorSuite",
+        "name": "direct model constructor is private even inside the story package",
+        "outcome": "failure"
+      },
+      "control": {
+        "suite": "storymodel4s.story.probes.D1aModelConstructorSuite",
+        "name": "accepting control: model factory is available inside the story package",
+        "outcome": "passed"
+      },
+      "cleanTestRecompile": true,
+      "logSha256": "73e358ea6c9d773bee4015ddc1b8d3e966121db5973d4c63f726688cd0dfa1be",
+      "junitSha256": {
+        "storymodel4s.story.probes.D1aModelConstructorSuite": "ff3713e835a0c273c524d89d8b283eb2826d4fd6f84a4cd68f9d348364c9b0c7"
+      }
+    }
+  ]
+}

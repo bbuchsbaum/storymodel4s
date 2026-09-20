@@ -13,5 +13,20 @@
     "Source/test migration"
   ],
   "advisory": "An extra EOF blank line in the test bundle fixture was removed by the later formatter.",
-  "qualification": "Read-only SD6 review; no build or mutation executed by reviewer. Later formatting/additional probes have a separate recheck pending."
+  "qualification": "Read-only SD6 review and bounded recheck; runtime qualification remains separate.",
+  "recheck": {
+    "from": "844b680c086906dba48458b8eddd5588d51a9cf3",
+    "to": "9a7caf45829e737e9638a23cd9176f30002a0187",
+    "reviewer": "/root/s0_cold_review",
+    "verdict": "No material findings",
+    "scope": [
+      "Production formatting retains tokens and branch structure",
+      "Same-bundle text evidence isolates canonical refusal",
+      "Package-internal constructor probes catch private to private[story] widening",
+      "Primary-only identity assertions",
+      "Failed text validation report and None parity",
+      "ADR SurfaceExplicit limitation"
+    ],
+    "execution": "Read-only; no builds or mutations executed by reviewer."
+  }
 }

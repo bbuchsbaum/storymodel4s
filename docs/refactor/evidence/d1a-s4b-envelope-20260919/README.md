@@ -2,7 +2,8 @@
 
 Mote: `bd-01M2TAG1GEAGXCY33P0B17QBJ1`. Based on landed S4a `57ee3595`;
 the formatted source/test candidate is `9a7caf45829e737e9638a23cd9176f30002a0187`.
-Qualification is in progress. Final mutations, restoration, full provider,
+All 54 compiled mutations were killed with named passing controls; the restored
+clean court passed 62 tests. Qualification is in progress: full provider,
 documentation and consumer gates are pending; this record does not close S4b.
 
 `StoryModel` now owns its sealed `NarrativeSourceAtlas` and derived bundle.
@@ -45,7 +46,8 @@ captions or inventing a film-side execution.
 
 ## Current evidence
 
-The [cold source review](code-review.json) reports no material findings at `844b680c`.
+The [cold source review and recheck](code-review.json) report no material findings
+through `9a7caf45`.
 The [first focused court](focused-1.json) passed 35 tests and compiled the downstream
 test sources. The [expanded court](focused-2.json) passed 77 tests. After formatting,
 the [full JVM story and codec court](focused-3.json) passed 355 tests with formatting
@@ -53,10 +55,22 @@ checks. The [last added guard court](focused-4.json) passed 20 tests before appl
 its recorded formatter output. These are preparation receipts, not the final gate.
 Earlier failed compile attempts remain alongside the passing receipts.
 
-The [mutation inventory](guard-witness-inventory.json) names 54 falsifiers and 24
-individual clean test recompiles for compile-time probes. Each named failure must
-execute alongside a named passing control. The [runner](qualify.py) retains failed
-attempts, refuses existing logs and restores original source after each attempt.
+The [pre-execution inventory](guard-witness-inventory.json) names 54 falsifiers and 24
+individual clean test recompiles for compile-time probes. All were
+[compiled and killed](mutations.json) on their first attempt with named passing
+controls. The [runner](qualify.py) refuses existing logs and restores original source
+after each attempt. Its [terminal summary](mutation-terminal-summary.json) binds
+original, mutant and terminal-restored hashes and the complete restoration chain.
+The per-case clean states follow the completed runner assertions; they are not
+independent per-case status snapshots. Individual sbt receipts intentionally capture
+the mutant-present dirty tree. [Clean restoration](restored-control-clean.json)
+passes 62 tests with both affected test outputs rebuilt.
+
+All 173 command receipts, logs and focused XML artifacts remain inspectable in the
+[compressed archive](mutation-artifacts.tar.gz), whose [manifest](mutation-artifact-manifest.json)
+records each member's SHA-256. Raw copies also remain in the ignored local study
+workspace. [summarize-mutations.py](summarize-mutations.py) reconciles the named
+outcomes and terminal source hashes; independent final receipt review is separate.
 The text canonical-form witness uses otherwise valid anchors from its own bundle,
 so foreign membership cannot hide a missing canonical guard. Validator anchor checks
 are redundant on publicly constructible models; their source review is not described
@@ -67,7 +81,11 @@ test-source compilation at consumer `6a6aa4b`, using provider `844b680c`; it doe
 claim test execution. Consumer branch `work/d1a-s4b-consumer-20260919` is preserved in
 the real sibling repository. Its current pin commit `08bced0` binds provider `9a7caf45`.
 Final consumer qualification will bind all four actual clone revisions separately
-from generated Pins.
+from generated Pins. The [consumer gate runner](consumer-gate.py) executes all eight
+task aliases plus compile, formatting and production linking. Because the app entry
+point's parameter type changed, the [shell runner](consumer-smoke.py) also builds an
+edition and runs the existing pinned Playwright smoke with browser audits before
+and after, an isolated owned browser cache and an actual browser-executable receipt.
 
 The frozen S0 JSON is unchanged: SHA-256
 `cc201d9dd3e3576fabcd45677369f00c023ca5a455ea9d9e7ba694700c759fb3`.
