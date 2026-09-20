@@ -1,0 +1,148 @@
+{
+  "schema": "d1b/film-group-regression/v1",
+  "codeRevision": "ace77121e6e6507246f62116922d94c64e087322",
+  "qualified": true,
+  "originalSha256": "46069ecb2fbba5002f8512e1cd621a4f792e9b2ae9710ffdcb92dc82fcbe237b",
+  "mutantSha256": "0940a96e706c469692d6c4c5d82007397fedf39dc7a56a7ecc798c99d1e08b24",
+  "path": "embed-bench/src/main/scala/storymodel4s/bench/video/RecallToVideo.scala",
+  "testSourcePath": "embed-bench/src/test/scala/storymodel4s/bench/filmfestival/FilmFestivalSuite.scala",
+  "testSourceSha256": "5c4524acae76645fe2ec0ebbd47bf164fdbe03a84f4278d9194668516c51aefe",
+  "qualificationHelperSha256": "fa3112890acef52ec201e12a7315dc36b7bbd721f5c8a3ad53579137847553b8",
+  "runnerSha256": "3f18e6b95ce0e067ccb8fff2730e99e830b1e951dace03acaa3291cf4f9d6778",
+  "runs": {
+    "film-group-control": {
+      "receipt": {
+        "codeRevision": "ace77121e6e6507246f62116922d94c64e087322",
+        "command": [
+          "sbt",
+          "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+          "-batch",
+          "embedBench/testOnly storymodel4s.bench.filmfestival.FilmFestivalSuite",
+          "scalafmtCheckAll"
+        ],
+        "exitCode": 0,
+        "cleanBefore": true,
+        "cleanAfter": true,
+        "startedEpochSeconds": 1789889884.557653,
+        "seconds": 12.61183214187622,
+        "logPath": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/film-group-3/film-group-control.log",
+        "logSha256": "a867fc90472f2d146033c6073638ef96d58fda318454bbec49d591c9fa268f5a",
+        "testTotals": [
+          "[info] Passed: Total 3, Failed 0, Errors 0, Passed 3"
+        ],
+        "aggregateTestCounts": {
+          "Total": 3,
+          "Failed": 0,
+          "Errors": 0,
+          "Passed": 3,
+          "Skipped": 0,
+          "Ignored": 0
+        }
+      },
+      "rawReceiptSha256": "4722320ca6e17696cb863420b7caed0007f7f4ea21f735d7215cf7e39b717963",
+      "reports": {
+        "storymodel4s.bench.filmfestival.FilmFestivalSuite": {
+          "path": "film-group-control--storymodel4s.bench.filmfestival.FilmFestivalSuite.xml",
+          "sha256": "14c38a0f804ee0f28d3021a6e907d4f7aeeff0db7fee76a511818471b1b0564a"
+        }
+      },
+      "outcomes": {
+        "storymodel4s.bench.filmfestival.FilmFestivalSuite": {
+          "independent film blocks never acquire a fabricated world clock": "passed",
+          "accepting control: an interval-only film group retains its exact extent": "passed",
+          "requested ONNX fails closed unless both artifacts exist": "passed"
+        }
+      }
+    },
+    "film-group-deletion": {
+      "receipt": {
+        "codeRevision": "ace77121e6e6507246f62116922d94c64e087322",
+        "command": [
+          "sbt",
+          "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+          "-batch",
+          "embedBench/testOnly storymodel4s.bench.filmfestival.FilmFestivalSuite"
+        ],
+        "exitCode": 1,
+        "cleanBefore": false,
+        "cleanAfter": false,
+        "startedEpochSeconds": 1789889897.320426,
+        "seconds": 15.063472986221313,
+        "logPath": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/film-group-3/film-group-deletion.log",
+        "logSha256": "9d7ffee497eec278609e3b76a3078216ec6e2b353af0c9d19d3de5d4945998dc",
+        "testTotals": [
+          "[error] Failed: Total 3, Failed 1, Errors 0, Passed 2"
+        ],
+        "aggregateTestCounts": {
+          "Total": 3,
+          "Failed": 1,
+          "Errors": 0,
+          "Passed": 2,
+          "Skipped": 0,
+          "Ignored": 0
+        }
+      },
+      "rawReceiptSha256": "658f0e81d1dee57d3b4e836a3e22510fbf5ecd8fb217fb862401073829261595",
+      "reports": {
+        "storymodel4s.bench.filmfestival.FilmFestivalSuite": {
+          "path": "film-group-deletion--storymodel4s.bench.filmfestival.FilmFestivalSuite.xml",
+          "sha256": "7f8e316978b72be90e11b3dc82f51baadda417555db30652b6181d0d38a075c9"
+        }
+      },
+      "outcomes": {
+        "storymodel4s.bench.filmfestival.FilmFestivalSuite": {
+          "independent film blocks never acquire a fabricated world clock": "failed",
+          "accepting control: an interval-only film group retains its exact extent": "passed",
+          "requested ONNX fails closed unless both artifacts exist": "passed"
+        }
+      }
+    },
+    "film-group-restored": {
+      "receipt": {
+        "codeRevision": "ace77121e6e6507246f62116922d94c64e087322",
+        "command": [
+          "sbt",
+          "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+          "-batch",
+          "embedBench/testOnly storymodel4s.bench.filmfestival.FilmFestivalSuite",
+          "scalafmtCheckAll"
+        ],
+        "exitCode": 0,
+        "cleanBefore": true,
+        "cleanAfter": true,
+        "startedEpochSeconds": 1789889912.499399,
+        "seconds": 16.340415000915527,
+        "logPath": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/film-group-3/film-group-restored.log",
+        "logSha256": "1572a109330466dd3f5cae900d609ba1115faff8d08876bf148d39cab438341a",
+        "testTotals": [
+          "[info] Passed: Total 3, Failed 0, Errors 0, Passed 3"
+        ],
+        "aggregateTestCounts": {
+          "Total": 3,
+          "Failed": 0,
+          "Errors": 0,
+          "Passed": 3,
+          "Skipped": 0,
+          "Ignored": 0
+        }
+      },
+      "rawReceiptSha256": "b9828f8285e3797312d7d7e95b9d713ed3a034eb49373d801224d2aeeaa4f53a",
+      "reports": {
+        "storymodel4s.bench.filmfestival.FilmFestivalSuite": {
+          "path": "film-group-restored--storymodel4s.bench.filmfestival.FilmFestivalSuite.xml",
+          "sha256": "be5c875ff32e89b15abe194c91cd838927a14708542008e25d6b6b304b8f8325"
+        }
+      },
+      "outcomes": {
+        "storymodel4s.bench.filmfestival.FilmFestivalSuite": {
+          "independent film blocks never acquire a fabricated world clock": "passed",
+          "accepting control: an interval-only film group retains its exact extent": "passed",
+          "requested ONNX fails closed unless both artifacts exist": "passed"
+        }
+      }
+    }
+  },
+  "baselineCleanBeforeMutation": true,
+  "restoredSha256": "46069ecb2fbba5002f8512e1cd621a4f792e9b2ae9710ffdcb92dc82fcbe237b",
+  "restoredClean": true
+}

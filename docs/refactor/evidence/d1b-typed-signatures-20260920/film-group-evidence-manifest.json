@@ -1,0 +1,135 @@
+{
+  "schema": "d1b/film-group-archive/v1",
+  "archive": "film-group-evidence.tar.gz",
+  "sha256": "ca0f0da7cb482f954eb3a711c5fcbd3b8c07367623cb1b9d7aeeb84ebd3bcc7a",
+  "bytes": 9012,
+  "memberCount": 24,
+  "historicalAttempts": {
+    "film-group-1": "Three tests passed, formatting command failed; no mutation executed.",
+    "film-group-2": "Expected kill/restoration observed, but verifier input binding was incomplete; not qualified."
+  },
+  "qualifyingAttempt": "film-group-3",
+  "originalMutationCourt": "Separate frozen 67 cases at 87848b96; unchanged.",
+  "members": [
+    {
+      "path": "film-group-1/film-group-control--storymodel4s.bench.filmfestival.FilmFestivalSuite.xml",
+      "bytes": 5407,
+      "sha256": "54443a9b7a9aa7006b2934b821961c7ccf5f2c18ffecf9afc54c2fde950c57a8"
+    },
+    {
+      "path": "film-group-1/film-group-control.json",
+      "bytes": 869,
+      "sha256": "7272355a241b21fd01499e97a35b81797ec7ad6479739009bce00c0c4df95366"
+    },
+    {
+      "path": "film-group-1/film-group-control.log",
+      "bytes": 13784,
+      "sha256": "2137d0612fb6e231c18ff0298826fa8bd20745dd8ad91786a312b60ded9d2f04"
+    },
+    {
+      "path": "film-group-1/film-group-regression.json",
+      "bytes": 2313,
+      "sha256": "ac3126602ee7a7319d1eb12d83af8fc9336c50888d3fda45ec1d334e97fb4b33"
+    },
+    {
+      "path": "film-group-2/film-group-control--storymodel4s.bench.filmfestival.FilmFestivalSuite.xml",
+      "bytes": 5407,
+      "sha256": "d91ccd06954fff0f123536a85814157899e0ac75a0e4bd178060f686a5b10f6b"
+    },
+    {
+      "path": "film-group-2/film-group-control.json",
+      "bytes": 869,
+      "sha256": "ffd972e42207dd49afe406744bb45ba8aeb1e5b0ae97f96106bdfd54ebc6d720"
+    },
+    {
+      "path": "film-group-2/film-group-control.log",
+      "bytes": 2288,
+      "sha256": "4b5112f80299b059fd38b230639e4a18b0243a5b47bca2273340e52356a83d44"
+    },
+    {
+      "path": "film-group-2/film-group-deletion--storymodel4s.bench.filmfestival.FilmFestivalSuite.xml",
+      "bytes": 6352,
+      "sha256": "6f47ba7071d19b2b7fa5121fc2bac7695a2b91bbd33fbda47060fa2361981868"
+    },
+    {
+      "path": "film-group-2/film-group-deletion.json",
+      "bytes": 848,
+      "sha256": "c8517f3e4a8c90db9cdc40a1a268dcbcfdeeb8a2984e33758fcc0ec6b5f96eaf"
+    },
+    {
+      "path": "film-group-2/film-group-deletion.log",
+      "bytes": 2925,
+      "sha256": "76ca7a34ed3fbf15e87833b0006bef34a454fee3a3435cbfba3dddbabc76e8c2"
+    },
+    {
+      "path": "film-group-2/film-group-regression.json",
+      "bytes": 6083,
+      "sha256": "cc6ea810b9244f218683ab16d96e750dc50eb63e3a9eefc8a82033ae19501173"
+    },
+    {
+      "path": "film-group-2/film-group-restored--storymodel4s.bench.filmfestival.FilmFestivalSuite.xml",
+      "bytes": 5407,
+      "sha256": "98d505ceac5247695f0255ebb4ddfd3e280a3bd5a2ffcf9b2b28f170c58a028e"
+    },
+    {
+      "path": "film-group-2/film-group-restored.json",
+      "bytes": 869,
+      "sha256": "325d9a6692c03012da04c3788f4de577fefef50771ed5e84749789ebe9fc5de6"
+    },
+    {
+      "path": "film-group-2/film-group-restored.log",
+      "bytes": 2284,
+      "sha256": "76ae385e176caca5d054796659cf8b30814e9a8a68312559d4e6124a06800514"
+    },
+    {
+      "path": "film-group-3/film-group-control--storymodel4s.bench.filmfestival.FilmFestivalSuite.xml",
+      "bytes": 5407,
+      "sha256": "14c38a0f804ee0f28d3021a6e907d4f7aeeff0db7fee76a511818471b1b0564a"
+    },
+    {
+      "path": "film-group-3/film-group-control.json",
+      "bytes": 867,
+      "sha256": "4722320ca6e17696cb863420b7caed0007f7f4ea21f735d7215cf7e39b717963"
+    },
+    {
+      "path": "film-group-3/film-group-control.log",
+      "bytes": 2045,
+      "sha256": "a867fc90472f2d146033c6073638ef96d58fda318454bbec49d591c9fa268f5a"
+    },
+    {
+      "path": "film-group-3/film-group-deletion--storymodel4s.bench.filmfestival.FilmFestivalSuite.xml",
+      "bytes": 6352,
+      "sha256": "7f8e316978b72be90e11b3dc82f51baadda417555db30652b6181d0d38a075c9"
+    },
+    {
+      "path": "film-group-3/film-group-deletion.json",
+      "bytes": 848,
+      "sha256": "658f0e81d1dee57d3b4e836a3e22510fbf5ecd8fb217fb862401073829261595"
+    },
+    {
+      "path": "film-group-3/film-group-deletion.log",
+      "bytes": 2927,
+      "sha256": "9d7ffee497eec278609e3b76a3078216ec6e2b353af0c9d19d3de5d4945998dc"
+    },
+    {
+      "path": "film-group-3/film-group-regression.json",
+      "bytes": 6376,
+      "sha256": "33728999700bd05fc9fb534155ab9be473419161aeda1d706d0602821b8877db"
+    },
+    {
+      "path": "film-group-3/film-group-restored--storymodel4s.bench.filmfestival.FilmFestivalSuite.xml",
+      "bytes": 5407,
+      "sha256": "be5c875ff32e89b15abe194c91cd838927a14708542008e25d6b6b304b8f8325"
+    },
+    {
+      "path": "film-group-3/film-group-restored.json",
+      "bytes": 869,
+      "sha256": "b9828f8285e3797312d7d7e95b9d713ed3a034eb49373d801224d2aeeaa4f53a"
+    },
+    {
+      "path": "film-group-3/film-group-restored.log",
+      "bytes": 2284,
+      "sha256": "1572a109330466dd3f5cae900d609ba1115faff8d08876bf148d39cab438341a"
+    }
+  ]
+}

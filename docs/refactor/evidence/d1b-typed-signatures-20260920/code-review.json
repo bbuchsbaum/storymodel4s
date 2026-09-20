@@ -84,6 +84,15 @@
       "revision": "da169af2",
       "scope": "FilmFestival exact point-group expectation repair after red850 provider gate",
       "result": "No findings; world-order absence retained, exact interval and point controls. Subsequent ec8c08ed changes only two formatter line wraps."
+    },
+    {
+      "reviewer": "/root/s0_cold_review",
+      "revision": "ace77121",
+      "scope": "Supplemental FilmFestival point-group runner input binding",
+      "resolved": [
+        "Exact committed runner/helper/production/test bytes and helper/test hashes"
+      ],
+      "result": "No P1/P2. Prior attempts remain historical; fresh execution is separate."
     }
   ],
   "remaining": [
