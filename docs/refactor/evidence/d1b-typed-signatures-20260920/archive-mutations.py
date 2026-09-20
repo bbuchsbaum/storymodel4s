@@ -20,7 +20,7 @@ assert sha(dest/'qualify.py')==inventory['runnerSha256']
 spec=importlib.util.spec_from_file_location('qualify',dest/'qualify.py');q=importlib.util.module_from_spec(spec);spec.loader.exec_module(q)
 binding=sha(data/'guard-witness-inventory.json');assert binding==manifest['bindingSha256']
 _,control_names=q.checked_control('isolated-control',binding)
-restored,_=q.checked_control('restored-control-clean',binding,control_names)
+restored,_=q.checked_control('restored-control-clean',binding,control_names,True)
 assert restored==manifest['restoredControl'] and restored['aggregateTestCounts']['Passed']==90
 for row in rows:
  q.verify_completed(row,expected[row['id']],binding,control_names)
