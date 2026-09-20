@@ -23,6 +23,7 @@ control='accepting control: an interval-only film group retains its exact extent
 names={reject,control,'requested ONNX fails closed unless both artifacts exist'}
 path=q.repo/'embed-bench/src/main/scala/storymodel4s/bench/video/RecallToVideo.scala'
 saved=path.read_bytes()
+assert saved==subprocess.check_output(['git','show',expected+':'+str(path.relative_to(q.repo))],cwd=q.repo)
 old='''              else
                 PlaybackInstant
                   .on(axis, start)
