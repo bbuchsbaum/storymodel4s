@@ -6,6 +6,8 @@ q=importlib.util.module_from_spec(spec);spec.loader.exec_module(q)
 parser=argparse.ArgumentParser();parser.add_argument('--candidate',required=True);expected=parser.parse_args().candidate
 assert re.fullmatch('[0-9a-f]{40}',expected) and q.revision==expected
 assert (q.repo/'.git').is_dir() and q.clean()
+runner_path='docs/refactor/evidence/d1b-typed-signatures-20260920/film-group-regression.py'
+assert Path(__file__).read_bytes()==subprocess.check_output(['git','show',expected+':'+runner_path],cwd=q.repo)
 helper=Path(__file__).with_name('qualify.py')
 helper_path='docs/refactor/evidence/d1b-typed-signatures-20260920/qualify.py'
 assert helper.read_bytes()==subprocess.check_output(['git','show',expected+':'+helper_path],cwd=q.repo)
