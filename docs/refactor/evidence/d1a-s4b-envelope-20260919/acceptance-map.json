@@ -1,6 +1,6 @@
 {
   "mote": "bd-01M2TAG1GEAGXCY33P0B17QBJ1",
-  "status": "54 mutations and provider/format/docs complete; final consumer execution pending",
+  "status": "All required local qualification checks pass; local landing and tracker closure follow.",
   "sourceTestCandidate": "9a7caf45829e737e9638a23cd9176f30002a0187",
   "releaseCandidate": "9dcaf8e786207d523787d670810c28d104efe117",
   "criteria": [
@@ -26,7 +26,7 @@
       "number": 4,
       "criterion": "Every text-only consumer carries the witness",
       "court": "Codec, compiler, materializer, view, pipeline, fixtures, laws and StorySourceView take/return TextModel; text queries are behind it. storyatlas migration includes input joins and app/compiler entry points.",
-      "falsifierOrQualification": "24 clean compile-probe mutants cover newly claimed doors; exact provider gate passes, final consumer gate pending."
+      "falsifierOrQualification": "24 clean compile-probe mutants cover newly claimed doors; exact provider gate, 245-test consumer gate and 260-check repaired browser smoke pass."
     },
     {
       "number": 5,

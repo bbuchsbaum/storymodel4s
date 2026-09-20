@@ -1,0 +1,34 @@
+{
+  "scope": "Independent S4b browser-smoke receipt reconciliation; no browser launch or process action by auditor.",
+  "revisions": {
+    "storyatlas4s": "b156029d95a662107c819dd2aefc80abec7d748e",
+    "storymodel4s": "9dcaf8e786207d523787d670810c28d104efe117",
+    "intaglio": "4eb566d9208f474d64d61e778e084dee2ddbaa76",
+    "grakern": "0329c43c88a0b71e9aa4456723bb16bac2fa3841"
+  },
+  "smokeReceiptSha256": "3362de14fea5aecc645adc29f79c61e9c7394b3ea0543ea8eb44db2505f15251",
+  "smokeLogSha256": "b2c2ef41f5509d00f4227672079207c8a10032dc415d3b51b47660dd65129138",
+  "scriptSha256": "45b7ae67f5308a2fd730887cb62b23063cd7d52fbf732d15e548dd2d59a5242f",
+  "passedChecks": 260,
+  "browser": {
+    "playwrightVersion": "1.55.1",
+    "actualExecutable": "/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/playwright-browsers/chromium_headless_shell-1193/chrome-mac/headless_shell",
+    "actualExecutableSha256": "7620dd648c04434941b896d62cf775305ce9623d5863ed321578dbc9f3d3b9c1",
+    "launchedPid": 18182,
+    "node": {
+      "version": "v22.18.0",
+      "executable": "/Users/bbuchsbaum/.nvm/versions/node/v22.18.0/bin/node",
+      "executableSha256": "9187ad22c98cea5b635a79db52fa32ab3f6aa9d41e3abf5da71437cfef1ca9de"
+    }
+  },
+  "lifecycle": {
+    "preGuard": "766ac2de1b5456f59596450537d778f4077a4abf2fc296c02ba97d4c97e3647c",
+    "postGuard": "766ac2de1b5456f59596450537d778f4077a4abf2fc296c02ba97d4c97e3647c",
+    "ownedBefore": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "ownedAfter": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "allOwnedRowsAbsentAfter": true
+  },
+  "proxyCenterDiagnosticSha256": "d945d6a020406b48c52a14fbc8d81a8e18ae188e7fdafd694d3a889d8d3919a4",
+  "conclusion": "Passed: 260 live checks, exact launched owned browser identified, global and cache/PID-scoped cleanup receipts clean.",
+  "limits": "This validates the recorded local smoke only; it does not establish CI execution, remote publication, or scientific validity."
+}

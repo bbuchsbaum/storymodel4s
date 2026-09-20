@@ -1,0 +1,171 @@
+{
+  "schema": "d1a-consumer-smoke/v1",
+  "before": {
+    "storyatlas4s": {
+      "revision": "3e6566817463e79000e45d6d5ad3249116e59b20",
+      "status": ""
+    },
+    "storymodel4s": {
+      "revision": "9dcaf8e786207d523787d670810c28d104efe117",
+      "status": ""
+    },
+    "intaglio": {
+      "revision": "4eb566d9208f474d64d61e778e084dee2ddbaa76",
+      "status": ""
+    },
+    "grakern": {
+      "revision": "0329c43c88a0b71e9aa4456723bb16bac2fa3841",
+      "status": ""
+    }
+  },
+  "environmentOverrides": {
+    "PLAYWRIGHT_BROWSERS_PATH": "/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/playwright-browsers",
+    "STORYATLAS4S_SMOKE_DIAGNOSTICS_DIR": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1a-s4b-20260919/smoke-diagnostics",
+    "DEBUG": "pw:browser"
+  },
+  "clearedMutationEnvironment": [
+    "STORYATLAS4S_SMOKE_MUTATION",
+    "STORYATLAS4S_SMOKE_FAIL_AFTER_LAUNCH"
+  ],
+  "scriptSha256": "d5153f9f73fec9d96900f11fc389735b1d3fc814ad0a950a0eb4a6a3472e874c",
+  "lockfileSha256": "6bb6c8b873f443426d2bbec0850706f54ede2bc49cc13897ea85cd57f1c42455",
+  "freshEditionDirectory": true,
+  "editionBuild": {
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstoryatlas4s.storymodel4s.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/storymodel4s",
+      "-Dstoryatlas4s.intaglio.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/intaglio",
+      "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+      "cli/run edition --out target/edition",
+      "app/editionBundle"
+    ],
+    "exitCode": 0,
+    "startedEpochSeconds": 1789877604.8152058,
+    "endedEpochSeconds": 1789877618.2670112,
+    "logPath": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1a-s4b-20260919/consumer-edition-build.log",
+    "logSha256": "25891974dc462121f93c549222e8f6e5cc0f39b916d4cbe81ed9af0183362a27"
+  },
+  "linkedProductionMain": {
+    "path": "/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/storyatlas4s/app/target/scala-3.7.4/storyatlas4s-app-fastopt/main.js",
+    "sha256": "f9fb45ff12ea7e13c88719285f6b1a3877c4208b5d53224ad604799998c71796"
+  },
+  "editionFiles": {
+    "index.html": {
+      "bytes": 6498,
+      "sha256": "193cca8e61c82a8454b97a3ed92bea52539d1c963624800428a9d4a6cbe88684",
+      "mtime": 1789877618.1752508,
+      "ctime": 1789877618.1754243
+    },
+    "app.js": {
+      "bytes": 9070512,
+      "sha256": "f9fb45ff12ea7e13c88719285f6b1a3877c4208b5d53224ad604799998c71796",
+      "mtime": 1789877618.1733482,
+      "ctime": 1789877618.1735406
+    },
+    "receipt.json": {
+      "bytes": 14937,
+      "sha256": "df5b491a8ecd9f1f8666142a540d5da5d7e79e0aee8bef7bfd50f0bafafa30c9",
+      "mtime": 1789877617.1147041,
+      "ctime": 1789877617.1147041
+    }
+  },
+  "browser": {
+    "version": "1.55.1",
+    "executable": "/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/playwright-browsers/chromium-1193/chrome-mac/Chromium.app/Contents/MacOS/Chromium",
+    "executableSha256": "78de9455371d0b18e1a88ff9e7775bcfaf8b19a3bb50561266cf425a76289528",
+    "actualLaunchedExecutable": "/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/playwright-browsers/chromium_headless_shell-1193/chrome-mac/headless_shell",
+    "actualLaunchedExecutableSha256": "7620dd648c04434941b896d62cf775305ce9623d5863ed321578dbc9f3d3b9c1",
+    "actualLaunchedPid": 14208
+  },
+  "nodeRuntime": {
+    "version": "v22.18.0",
+    "executable": "/Users/bbuchsbaum/.nvm/versions/node/v22.18.0/bin/node",
+    "executableSha256": "9187ad22c98cea5b635a79db52fa32ab3f6aa9d41e3abf5da71437cfef1ca9de"
+  },
+  "guardBefore": {
+    "command": [
+      "node",
+      "/Users/bbuchsbaum/.local/share/agent-policy/browser-automation-guard.mjs",
+      "--audit"
+    ],
+    "exitCode": 0,
+    "startedEpochSeconds": 1789877619.478667,
+    "endedEpochSeconds": 1789877619.6086452,
+    "logPath": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1a-s4b-20260919/browser-guard-before.log",
+    "logSha256": "766ac2de1b5456f59596450537d778f4077a4abf2fc296c02ba97d4c97e3647c"
+  },
+  "ownedProcessesBefore": {
+    "command": [
+      "ps",
+      "-axo",
+      "pid=,ppid=,command="
+    ],
+    "observedEpochSeconds": 1789877619.609094,
+    "cachePath": "/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/playwright-browsers",
+    "exactLaunchedPids": [],
+    "rawScopedRows": [],
+    "logPath": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1a-s4b-20260919/browser-owned-processes-before.log",
+    "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "smoke": {
+    "command": [
+      "node",
+      "app/smoke/smoke.cjs",
+      "target/edition/index.html"
+    ],
+    "exitCode": 1,
+    "startedEpochSeconds": 1789877619.709451,
+    "endedEpochSeconds": 1789877653.825632,
+    "logPath": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1a-s4b-20260919/consumer-browser-smoke.log",
+    "logSha256": "051604425aad786c712fe19e8a20ea7bc2db4f214ec17c7ce159fdae2ea6b659",
+    "passedChecks": 237,
+    "failedChecks": 1,
+    "terminalPassed": false
+  },
+  "guardAfter": {
+    "command": [
+      "node",
+      "/Users/bbuchsbaum/.local/share/agent-policy/browser-automation-guard.mjs",
+      "--audit"
+    ],
+    "exitCode": 0,
+    "startedEpochSeconds": 1789877653.825824,
+    "endedEpochSeconds": 1789877653.951972,
+    "logPath": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1a-s4b-20260919/browser-guard-after.log",
+    "logSha256": "766ac2de1b5456f59596450537d778f4077a4abf2fc296c02ba97d4c97e3647c"
+  },
+  "ownedProcessesAfter": {
+    "command": [
+      "ps",
+      "-axo",
+      "pid=,ppid=,command="
+    ],
+    "observedEpochSeconds": 1789877653.9525702,
+    "cachePath": "/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/playwright-browsers",
+    "exactLaunchedPids": [
+      14208
+    ],
+    "rawScopedRows": [],
+    "logPath": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1a-s4b-20260919/browser-owned-processes-after.log",
+    "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "after": {
+    "storyatlas4s": {
+      "revision": "3e6566817463e79000e45d6d5ad3249116e59b20",
+      "status": ""
+    },
+    "storymodel4s": {
+      "revision": "9dcaf8e786207d523787d670810c28d104efe117",
+      "status": ""
+    },
+    "intaglio": {
+      "revision": "4eb566d9208f474d64d61e778e084dee2ddbaa76",
+      "status": ""
+    },
+    "grakern": {
+      "revision": "0329c43c88a0b71e9aa4456723bb16bac2fa3841",
+      "status": ""
+    }
+  }
+}

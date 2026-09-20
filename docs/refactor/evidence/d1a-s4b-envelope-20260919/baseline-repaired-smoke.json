@@ -1,0 +1,171 @@
+{
+  "schema": "d1a-consumer-smoke/v1",
+  "before": {
+    "storyatlas4s": {
+      "revision": "cb1cfdca4895c9aa281deb229eee0c4db06daffc",
+      "status": ""
+    },
+    "storymodel4s": {
+      "revision": "add6858a1b191e3e5199eadd08c7d95f549180bf",
+      "status": ""
+    },
+    "intaglio": {
+      "revision": "4eb566d9208f474d64d61e778e084dee2ddbaa76",
+      "status": ""
+    },
+    "grakern": {
+      "revision": "0329c43c88a0b71e9aa4456723bb16bac2fa3841",
+      "status": ""
+    }
+  },
+  "environmentOverrides": {
+    "PLAYWRIGHT_BROWSERS_PATH": "/private/tmp/storymodel4s-s4b-smoke-baseline-wz57zb0i/playwright-browsers",
+    "STORYATLAS4S_SMOKE_DIAGNOSTICS_DIR": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1a-s4b-20260919/smoke-baseline-repaired/smoke-diagnostics",
+    "DEBUG": "pw:browser"
+  },
+  "clearedMutationEnvironment": [
+    "STORYATLAS4S_SMOKE_MUTATION",
+    "STORYATLAS4S_SMOKE_FAIL_AFTER_LAUNCH"
+  ],
+  "scriptSha256": "45b7ae67f5308a2fd730887cb62b23063cd7d52fbf732d15e548dd2d59a5242f",
+  "lockfileSha256": "6bb6c8b873f443426d2bbec0850706f54ede2bc49cc13897ea85cd57f1c42455",
+  "freshEditionDirectory": true,
+  "editionBuild": {
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstoryatlas4s.storymodel4s.build=/private/tmp/storymodel4s-s4b-smoke-baseline-wz57zb0i/storymodel4s",
+      "-Dstoryatlas4s.intaglio.build=/private/tmp/storymodel4s-s4b-smoke-baseline-wz57zb0i/intaglio",
+      "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-s4b-smoke-baseline-wz57zb0i/grakern",
+      "cli/run edition --out target/edition",
+      "app/editionBundle"
+    ],
+    "exitCode": 0,
+    "startedEpochSeconds": 1789878100.714777,
+    "endedEpochSeconds": 1789878115.632629,
+    "logPath": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1a-s4b-20260919/smoke-baseline-repaired/consumer-edition-build.log",
+    "logSha256": "81cfa78a9053cdb69af9b67a5ab1b4ed967db98ea95654556ded6ab41bf4c01d"
+  },
+  "linkedProductionMain": {
+    "path": "/private/tmp/storymodel4s-s4b-smoke-baseline-wz57zb0i/storyatlas4s/app/target/scala-3.7.4/storyatlas4s-app-fastopt/main.js",
+    "sha256": "e094aa689a17b60a2b303f6bcd58881de7bffab4462cba2bd8e5b8ffc31594f5"
+  },
+  "editionFiles": {
+    "index.html": {
+      "bytes": 6498,
+      "sha256": "193cca8e61c82a8454b97a3ed92bea52539d1c963624800428a9d4a6cbe88684",
+      "mtime": 1789878115.5573049,
+      "ctime": 1789878115.5574331
+    },
+    "app.js": {
+      "bytes": 8890907,
+      "sha256": "e094aa689a17b60a2b303f6bcd58881de7bffab4462cba2bd8e5b8ffc31594f5",
+      "mtime": 1789878115.55546,
+      "ctime": 1789878115.5557246
+    },
+    "receipt.json": {
+      "bytes": 14937,
+      "sha256": "85a6705b111c77941839c28cb4b22ee8fdba7588cfcb0c983288d4d944b9abee",
+      "mtime": 1789878114.0643003,
+      "ctime": 1789878114.0643003
+    }
+  },
+  "browser": {
+    "version": "1.55.1",
+    "executable": "/private/tmp/storymodel4s-s4b-smoke-baseline-wz57zb0i/playwright-browsers/chromium-1193/chrome-mac/Chromium.app/Contents/MacOS/Chromium",
+    "executableSha256": "78de9455371d0b18e1a88ff9e7775bcfaf8b19a3bb50561266cf425a76289528",
+    "actualLaunchedExecutable": "/private/tmp/storymodel4s-s4b-smoke-baseline-wz57zb0i/playwright-browsers/chromium_headless_shell-1193/chrome-mac/headless_shell",
+    "actualLaunchedExecutableSha256": "7620dd648c04434941b896d62cf775305ce9623d5863ed321578dbc9f3d3b9c1",
+    "actualLaunchedPid": 16435
+  },
+  "nodeRuntime": {
+    "version": "v22.18.0",
+    "executable": "/Users/bbuchsbaum/.nvm/versions/node/v22.18.0/bin/node",
+    "executableSha256": "9187ad22c98cea5b635a79db52fa32ab3f6aa9d41e3abf5da71437cfef1ca9de"
+  },
+  "guardBefore": {
+    "command": [
+      "node",
+      "/Users/bbuchsbaum/.local/share/agent-policy/browser-automation-guard.mjs",
+      "--audit"
+    ],
+    "exitCode": 0,
+    "startedEpochSeconds": 1789878115.989142,
+    "endedEpochSeconds": 1789878116.1272588,
+    "logPath": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1a-s4b-20260919/smoke-baseline-repaired/browser-guard-before.log",
+    "logSha256": "766ac2de1b5456f59596450537d778f4077a4abf2fc296c02ba97d4c97e3647c"
+  },
+  "ownedProcessesBefore": {
+    "command": [
+      "ps",
+      "-axo",
+      "pid=,ppid=,command="
+    ],
+    "observedEpochSeconds": 1789878116.1274712,
+    "cachePath": "/private/tmp/storymodel4s-s4b-smoke-baseline-wz57zb0i/playwright-browsers",
+    "exactLaunchedPids": [],
+    "rawScopedRows": [],
+    "logPath": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1a-s4b-20260919/smoke-baseline-repaired/browser-owned-processes-before.log",
+    "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "smoke": {
+    "command": [
+      "node",
+      "app/smoke/smoke.cjs",
+      "target/edition/index.html"
+    ],
+    "exitCode": 0,
+    "startedEpochSeconds": 1789878116.220462,
+    "endedEpochSeconds": 1789878118.4813418,
+    "logPath": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1a-s4b-20260919/smoke-baseline-repaired/consumer-browser-smoke.log",
+    "logSha256": "1fd979db4b350d689e141c3dc74a508fea400bfbd315f7a437d5d42bbd188c77",
+    "passedChecks": 260,
+    "failedChecks": 0,
+    "terminalPassed": true
+  },
+  "guardAfter": {
+    "command": [
+      "node",
+      "/Users/bbuchsbaum/.local/share/agent-policy/browser-automation-guard.mjs",
+      "--audit"
+    ],
+    "exitCode": 0,
+    "startedEpochSeconds": 1789878118.481558,
+    "endedEpochSeconds": 1789878118.602239,
+    "logPath": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1a-s4b-20260919/smoke-baseline-repaired/browser-guard-after.log",
+    "logSha256": "766ac2de1b5456f59596450537d778f4077a4abf2fc296c02ba97d4c97e3647c"
+  },
+  "ownedProcessesAfter": {
+    "command": [
+      "ps",
+      "-axo",
+      "pid=,ppid=,command="
+    ],
+    "observedEpochSeconds": 1789878118.602933,
+    "cachePath": "/private/tmp/storymodel4s-s4b-smoke-baseline-wz57zb0i/playwright-browsers",
+    "exactLaunchedPids": [
+      16435
+    ],
+    "rawScopedRows": [],
+    "logPath": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1a-s4b-20260919/smoke-baseline-repaired/browser-owned-processes-after.log",
+    "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "after": {
+    "storyatlas4s": {
+      "revision": "cb1cfdca4895c9aa281deb229eee0c4db06daffc",
+      "status": ""
+    },
+    "storymodel4s": {
+      "revision": "add6858a1b191e3e5199eadd08c7d95f549180bf",
+      "status": ""
+    },
+    "intaglio": {
+      "revision": "4eb566d9208f474d64d61e778e084dee2ddbaa76",
+      "status": ""
+    },
+    "grakern": {
+      "revision": "0329c43c88a0b71e9aa4456723bb16bac2fa3841",
+      "status": ""
+    }
+  }
+}

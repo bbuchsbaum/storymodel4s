@@ -1,0 +1,93 @@
+{
+  "schema": "consumer-smoke-repair/v1",
+  "originalFailures": [
+    {
+      "path": "consumer-smoke.json",
+      "sha256": "36e77f5df2f0e9009f5d29e2e48f8a40a0e3826c742e3ec6b9fa3625113b786c",
+      "observedChecks": {
+        "command": [
+          "node",
+          "app/smoke/smoke.cjs",
+          "target/edition/index.html"
+        ],
+        "exitCode": 1,
+        "startedEpochSeconds": 1789877619.709451,
+        "endedEpochSeconds": 1789877653.825632,
+        "logPath": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1a-s4b-20260919/consumer-browser-smoke.log",
+        "logSha256": "051604425aad786c712fe19e8a20ea7bc2db4f214ec17c7ce159fdae2ea6b659",
+        "passedChecks": 237,
+        "failedChecks": 1,
+        "terminalPassed": false
+      }
+    },
+    {
+      "path": "smoke-baseline/consumer-smoke.json",
+      "sha256": "701c48e887339a0c1c509a649aa3eca1ee164a62c130677f2ea83aa6452cd254",
+      "observedChecks": {
+        "command": [
+          "node",
+          "app/smoke/smoke.cjs",
+          "target/edition/index.html"
+        ],
+        "exitCode": 1,
+        "startedEpochSeconds": 1789877921.980695,
+        "endedEpochSeconds": 1789877954.084007,
+        "logPath": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1a-s4b-20260919/smoke-baseline/consumer-browser-smoke.log",
+        "logSha256": "ad9f3436d945caffc27a704bb6ff1b0946ed189c267b6401f01363eaf9aed4b5",
+        "passedChecks": 237,
+        "failedChecks": 1,
+        "terminalPassed": false
+      }
+    }
+  ],
+  "baselineRepaired": {
+    "path": "smoke-baseline-repaired/consumer-smoke.json",
+    "sha256": "5ce3dad9148bdf970723fe5e50d49a518b7b20e17849013261997cfeeb349bec",
+    "observedChecks": {
+      "command": [
+        "node",
+        "app/smoke/smoke.cjs",
+        "target/edition/index.html"
+      ],
+      "exitCode": 0,
+      "startedEpochSeconds": 1789878116.220462,
+      "endedEpochSeconds": 1789878118.4813418,
+      "logPath": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1a-s4b-20260919/smoke-baseline-repaired/consumer-browser-smoke.log",
+      "logSha256": "1fd979db4b350d689e141c3dc74a508fea400bfbd315f7a437d5d42bbd188c77",
+      "passedChecks": 260,
+      "failedChecks": 0,
+      "terminalPassed": true
+    }
+  },
+  "originalSmokeSha256": "d5153f9f73fec9d96900f11fc389735b1d3fc814ad0a950a0eb4a6a3472e874c",
+  "repairConsumer": "b156029d95a662107c819dd2aefc80abec7d748e",
+  "repairBaselineConsumer": "cb1cfdca4895c9aa281deb229eee0c4db06daffc",
+  "diagnosis": [
+    "Both unchanged baseline and candidate smoke assert stale 1600x420px instead of pinned EditionSpec 1600x1080px.",
+    "Both time out on the same proxy group center click. The repaired baseline DOM center-hit diagnostic independently identifies the full SVG background polygon."
+  ],
+  "repair": [
+    "Correct literal to immutable EditionSpec dimensions.",
+    "Use documented focus and Shift+Enter with an activeElement assertion; retain pointer activation court and all composite visual/identity/ARIA assertions.",
+    "Record passive pre-activation proxy DOM and center hit; add failure HTML."
+  ],
+  "coldReview": {
+    "reviewer": "/root/s0_cold_review",
+    "base": "3e6566817463e79000e45d6d5ad3249116e59b20",
+    "candidate": "b156029d95a662107c819dd2aefc80abec7d748e",
+    "result": "No concrete source finding; geometry matches EditionSpec; keyboard event uses same activate/extend handler; existing assertions retained. No browser/build executed by reviewer."
+  },
+  "candidateFinal": {
+    "gate": "consumer-gate.json",
+    "smoke": "consumer-smoke.json",
+    "checks": 260,
+    "failedChecks": 0,
+    "launchedPid": 18182,
+    "ownedProcessesAfter": [],
+    "globalGuardExits": [
+      0,
+      0
+    ]
+  },
+  "preservation": "Both original failed editions, screenshots, logs, receipts and clean lifecycle outcomes retained locally; neither failed run is counted as qualification."
+}
