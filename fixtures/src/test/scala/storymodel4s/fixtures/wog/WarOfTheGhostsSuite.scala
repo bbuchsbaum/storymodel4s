@@ -374,10 +374,10 @@ class WarOfTheGhostsSuite extends munit.FunSuite:
       m.atlas,
       graph,
       hierarchy,
-      DiscourseTrajectory.derive(graph, hierarchy, m.atlas),
+      DiscourseTrajectory.derive(graph, hierarchy, m.atlas).fold(error => throw new IllegalArgumentException(error.message), identity),
       descriptors = m.descriptors,
       hypotheses = m.hypotheses
-    )
+    ).fold(error => throw new IllegalArgumentException(error.message), identity)
 
   private def caught(draft: StoryModel[ModelStatus.Draft], law: String): Unit =
     val vs = StoryValidator.validate(draft).report.violations

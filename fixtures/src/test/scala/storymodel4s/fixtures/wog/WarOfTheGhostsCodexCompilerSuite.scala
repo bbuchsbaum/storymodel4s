@@ -88,7 +88,7 @@ class WarOfTheGhostsCodexCompilerSuite extends ScalaCheckSuite:
       model.sensoryProfiles,
       model.receipt,
       model.schemaVersion
-    )
+    ).fold(error => throw new IllegalArgumentException(error.message), identity)
     val outcome = StoryValidator.validate(draft)
     outcome.validated.getOrElse(fail(outcome.report.render))
 
@@ -162,7 +162,7 @@ class WarOfTheGhostsCodexCompilerSuite extends ScalaCheckSuite:
       model.atlas,
       graph,
       hierarchy,
-      DiscourseTrajectory.derive(graph, hierarchy, model.atlas),
+      DiscourseTrajectory.derive(graph, hierarchy, model.atlas).fold(error => throw new IllegalArgumentException(error.message), identity),
       model.featureSpaces,
       model.sidecars,
       model.featureRefs,
@@ -171,7 +171,7 @@ class WarOfTheGhostsCodexCompilerSuite extends ScalaCheckSuite:
       model.sensoryProfiles,
       model.receipt,
       model.schemaVersion
-    )
+    ).fold(error => throw new IllegalArgumentException(error.message), identity)
     val outcome = StoryValidator.validate(draft)
     outcome.validated.getOrElse(fail(outcome.report.render))
 

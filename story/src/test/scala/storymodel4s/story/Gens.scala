@@ -49,10 +49,10 @@ object Small:
         atlas,
         graph,
         hierarchy,
-        DiscourseTrajectory.derive(graph, hierarchy, atlas),
+        DiscourseTrajectory.derive(graph, hierarchy, atlas).fold(error => throw new IllegalArgumentException(error.message), identity),
         featureSpaces,
         featureRefs = featureRefs
-      )
+      ).fold(error => throw new IllegalArgumentException(error.message), identity)
 
   /** `n` situations in one scene under one root, `m` entities, a Before chain, participants. */
   def build(n: Int, m: Int, chain: Boolean = true): Built =
@@ -299,13 +299,13 @@ object Mutations:
       SurfaceAnalyzer.analyze(other),
       b.graph,
       b.hierarchy,
-      DiscourseTrajectory.derive(b.graph, b.hierarchy, b.atlas)
-    )
+      DiscourseTrajectory.derive(b.graph, b.hierarchy, b.atlas).fold(error => throw new IllegalArgumentException(error.message), identity)
+    ).fold(error => throw new IllegalArgumentException(error.message), identity)
 
   /** A scene whose span no longer covers its members. */
   def sceneTooSmall(b: Small.Built): StoryModel[ModelStatus.Draft] =
     val scene = b.graph.segments(b.scene)
-    val shrunk = scene.copy(support = sp(b, 0))
+    val shrunk = scene.copy(support = TypedSupport.Text(sp(b, 0)))
     b.draft(graph = b.graph.copy(segments = b.graph.segments.updated(b.scene, shrunk)))
 
   /** The selected entity label repeated as an alternative. */
@@ -321,8 +321,8 @@ object Mutations:
 
   /** A trajectory with a step missing. */
   def incompleteTrajectory(b: Small.Built): StoryModel[ModelStatus.Draft] =
-    val t = DiscourseTrajectory.derive(b.graph, b.hierarchy, b.atlas)
-    StoryModel.draft(b.source, b.atlas, b.graph, b.hierarchy, DiscourseTrajectory(t.steps.drop(1)))
+    val t = DiscourseTrajectory.derive(b.graph, b.hierarchy, b.atlas).fold(error => throw new IllegalArgumentException(error.message), identity)
+    StoryModel.draft(b.source, b.atlas, b.graph, b.hierarchy, DiscourseTrajectory(t.steps.drop(1))).fold(error => throw new IllegalArgumentException(error.message), identity)
 
   /** A sidecar whose dimension disagrees with the declared vector schema. */
   def dimensionMismatch(b: Small.Built): StoryModel[ModelStatus.Draft] =
@@ -343,10 +343,10 @@ object Mutations:
       b.atlas,
       b.graph,
       b.hierarchy,
-      DiscourseTrajectory.derive(b.graph, b.hierarchy, b.atlas),
+      DiscourseTrajectory.derive(b.graph, b.hierarchy, b.atlas).fold(error => throw new IllegalArgumentException(error.message), identity),
       featureSpaces = Map(id -> space),
       sidecars = Map(id -> manifest)
-    )
+    ).fold(error => throw new IllegalArgumentException(error.message), identity)
 
   /** A group membership cycle. */
   def membershipCycle(b: Small.Built): StoryModel[ModelStatus.Draft] =

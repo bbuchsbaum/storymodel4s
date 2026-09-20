@@ -96,16 +96,18 @@ class TextParitySuite extends FunSuite:
 
   private lazy val orders =
     val graph = model.graph
-    def bySupport(nodes: Vector[(String, SpanSet)]): Json =
+    val bundle = SourceBundle.writtenText(model.source).fold(error => fail(error.message), identity)
+    def bySupport(nodes: Vector[(String, TypedSupport)]): Json =
       nodes
         .sortBy { case (id, support) =>
-          val span = support.minSpan
-          (span.start, span.endExclusive, id)
+          val projection = PrimaryProjection.on(bundle, support).fold(error => fail(error.message), identity)
+          val (start, end) = projection.bounds
+          (start, end, id)
         }
         .map(_._1)
         .asJson
     Json.obj(
-      "discourseOrder" -> graph.discourseOrder.map(_.value).asJson,
+      "discourseOrder" -> model.discourseOrder.map(_.value).asJson,
       "entitiesBySupport" -> bySupport(
         graph.entities.values.toVector.map(n => n.id.value -> n.support)
       ),

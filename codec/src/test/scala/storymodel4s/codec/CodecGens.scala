@@ -911,7 +911,7 @@ object CodecFixture:
   )
 
   val draft: StoryModel[ModelStatus.Draft] =
-    val trajectory = DiscourseTrajectory.derive(graph, hierarchy, atlas)
+    val trajectory = DiscourseTrajectory.derive(graph, hierarchy, atlas).fold(error => throw new IllegalArgumentException(error.message), identity)
     StoryModel.draft(
       source,
       atlas,
@@ -961,7 +961,7 @@ object CodecFixture:
           0L
         )
       )
-    )
+    ).fold(error => throw new IllegalArgumentException(error.message), identity)
 
   lazy val validated: StoryModel[ModelStatus.Validated] =
     val out = StoryValidator.validate(draft, ValidationPolicy.default)

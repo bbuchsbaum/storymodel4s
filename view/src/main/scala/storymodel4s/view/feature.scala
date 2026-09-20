@@ -97,8 +97,8 @@ object FeatureRendering:
     val space = track.space.id
     val resolver = SupportResolver(
       SurfaceSequence(model.atlas),
-      situation = id => model.graph.situations.get(id).map(_.support),
-      segment = id => model.graph.segments.get(id).map(_.support)
+      situation = id => model.graph.situations.get(id).flatMap(_.support.textSpans),
+      segment = id => model.graph.segments.get(id).flatMap(_.support.textSpans)
     )
     val observedTargets = track.observations.filter(_.estimate.isObserved).map(_.target)
     val refs = model.featureRefs.filter(_.space == space).sortBy(_.row)

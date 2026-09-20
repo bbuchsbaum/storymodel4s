@@ -69,7 +69,7 @@ class DraftAtlasSuite extends FunSuite:
       NarrativeGraph.empty.copy(contexts = Map(rootContext.id -> rootContext)),
       NarrativeHierarchy(Vector.empty, Vector.empty),
       DiscourseTrajectory.empty
-    )
+    ).fold(error => throw new IllegalArgumentException(error.message), identity)
 
   private def node(index: Int, concept: String): ChartNodeRef =
     ChartNodeRef(sentences(index).id, ConceptId.unsafe(concept))

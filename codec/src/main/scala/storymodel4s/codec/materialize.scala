@@ -55,10 +55,10 @@ object FeatureMaterializer:
         ) { (acc, track) =>
           acc.flatMap(done => one(widen(track)).map(done :+ _))
         }
-        .map { materialized =>
+        .flatMap { materialized =>
           val sidecarTracks = materialized.map(_._1)
           val bytes = materialized.map((t, b) => t.space.id -> b).toMap
-          val model = StoryModel.draft(
+          StoryModel.draft(
             draft.source,
             draft.atlas,
             draft.graph,
@@ -73,7 +73,8 @@ object FeatureMaterializer:
             draft.receipt,
             draft.schemaVersion
           )
-          new MaterializedFeatures(model, bytes, sidecarTracks)
+            .left.map(CodecError.Domain.apply)
+            .map(model => new MaterializedFeatures(model, bytes, sidecarTracks))
         }
 
   private def widen(

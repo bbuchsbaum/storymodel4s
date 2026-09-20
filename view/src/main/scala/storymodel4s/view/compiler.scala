@@ -927,8 +927,8 @@ private[view] object FeaturePlanner:
   ): SupportResolver =
     SupportResolver(
       SurfaceSequence(model.atlas),
-      situation = id => model.graph.situations.get(id).map(_.support),
-      segment = id => model.graph.segments.get(id).map(_.support)
+      situation = id => model.graph.situations.get(id).flatMap(_.support.textSpans),
+      segment = id => model.graph.segments.get(id).flatMap(_.support.textSpans)
     )
 
   private def validateFeatureRefs(

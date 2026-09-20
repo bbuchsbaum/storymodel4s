@@ -1432,7 +1432,7 @@ object NarrativeCompiler:
           gaps += gap(record.target, record.bundle, ClaimFamily.SituationMention, gapReason(state))
     }
 
-    val emitted = emittedSituations.result().sortBy(s => (s.node.support.minSpan, s.node.id))
+    val emitted = emittedSituations.result().sortBy(s => (s.node.support.textSpans.get.minSpan, s.node.id))
     val emittedNev = NonEmptyVector.fromVector(emitted)
     val situationEntries = emitted.map(s => s.mention -> s.source)
     val situationTable = MentionTable.of[SituationK](situationEntries, input.mentionGraph) match
@@ -2118,7 +2118,13 @@ object NarrativeCompiler:
 
     val situationRecordBySource = situationRecords.map(r => r.source -> r).toMap
     val emittedById = emitted.map(s => s.node.id -> s).toMap
-    val orderedEmitted = graph.discourseOrder.flatMap(emittedById.get)
+    val checkedOrder = (for
+      bundle <- SourceBundle.writtenText(input.source)
+      order <- graph.discourseOrderOn(bundle)
+    yield order) match
+      case Left(error) => return Left(NarrativeCompilerError.ClaimConstruction(error))
+      case Right(value) => value
+    val orderedEmitted = checkedOrder.flatMap(emittedById.get)
     val pairs = orderedEmitted.zip(orderedEmitted.drop(1))
     // A step is derived only when the pair carries an accepted temporal relation (`Unclear`
     // included); otherwise `DiscourseTrajectory.derive` would read an absent edge as an ordinary
@@ -2147,7 +2153,9 @@ object NarrativeCompiler:
           input.atlas,
           input.provenance.softwareVersion,
           coverageResolved
-        )
+        ) match
+          case Left(error) => return Left(NarrativeCompilerError.ClaimConstruction(error))
+          case Right(value) => value
       else DiscourseTrajectory.empty
     trajectory.steps.foreach { step =>
       (emittedById.get(step.from), emittedById.get(step.to)) match
@@ -2188,7 +2196,9 @@ object NarrativeCompiler:
       hierarchy,
       trajectory,
       receipt = Some(input.receipt)
-    )
+    ) match
+      case Left(error) => return Left(NarrativeCompilerError.ClaimConstruction(error))
+      case Right(value) => value
     val gapVec = gaps.result().sortBy(g => (g.target.render, g.reason.render))
     val structuralValidation = StoryValidator.validate(draft)
     // The summary is not here (ADR 0005 §10): a model with no description of its root is partial

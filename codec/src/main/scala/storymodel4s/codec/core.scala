@@ -162,6 +162,18 @@ object CoreCodecs:
     )
   }
 
+  /** Text retains its 0.7.0 shape; detached anchored components use the tagged additive shape. */
+  given Encoder[TypedSupport] = Encoder.instance {
+    case TypedSupport.Text(spans) => spans.asJson
+    case TypedSupport.Anchored(support) => support.asJson
+  }
+
+  given Decoder[TypedSupport] = Decoder.instance { cursor =>
+    if cursor.value.isObject then
+      summon[Decoder[EvidenceSupport]].apply(cursor).map(TypedSupport.Anchored(_))
+    else summon[Decoder[SpanSet]].apply(cursor).map(TypedSupport.Text(_))
+  }
+
   // ---- source and atlas -----------------------------------------------------------------
   given Encoder[StorySource] = Encoder.instance { s =>
     obj(

@@ -1531,7 +1531,7 @@ object WarOfTheGhostsModel:
     RelationLayers(participants, temporal, causal, goals, stateChanges, references, entityRelations)
   )
 
-  val trajectory: DiscourseTrajectory = DiscourseTrajectory.derive(graph, hierarchy, atlas)
+  val trajectory: DiscourseTrajectory = DiscourseTrajectory.derive(graph, hierarchy, atlas).fold(error => throw new IllegalArgumentException(error.message), identity)
 
   val draft: StoryModel[ModelStatus.Draft] =
     StoryModel.draft(
@@ -1542,7 +1542,7 @@ object WarOfTheGhostsModel:
       trajectory,
       descriptors = descriptors,
       hypotheses = hypotheses
-    )
+    ).fold(error => throw new IllegalArgumentException(error.message), identity)
 
   val validation: ValidationOutcome = StoryValidator.validate(draft, ValidationPolicy.default)
 

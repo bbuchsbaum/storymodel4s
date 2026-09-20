@@ -134,13 +134,13 @@ object StorySmall:
         atlas,
         graph,
         hierarchy,
-        trajectory.getOrElse(DiscourseTrajectory.derive(graph, hierarchy, atlas)),
+        trajectory.getOrElse(DiscourseTrajectory.derive(graph, hierarchy, atlas).fold(error => throw new IllegalArgumentException(error.message), identity)),
         featureSpaces,
         sidecars,
         featureRefs,
         descriptors,
         sensoryProfiles = sensoryProfiles
-      )
+      ).fold(error => throw new IllegalArgumentException(error.message), identity)
 
   /** One scene under one root, `n` situations, `m` entities, an optional Before chain. */
   def build(n: Int, m: Int, chain: Boolean = true): Built =

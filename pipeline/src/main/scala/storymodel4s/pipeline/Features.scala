@@ -159,7 +159,7 @@ object FeatureStage:
         .materialize(draft, tracks)
         .left
         .map(e => PipelineError.FeatureRefused(e.message))
-      stamped = stamp(materialized.model, measures)
+      stamped <- stamp(materialized.model, measures)
       _ <- featureLaws(stamped)
       artifact <- FeaturesArtifact
         .of(stamped, materialized.tracks)
@@ -191,12 +191,12 @@ object FeatureStage:
     val sequence = SurfaceSequence(draft.atlas)
     val resolver = SupportResolver(
       sequence,
-      situation = id => draft.graph.situations.get(id).map(_.support)
+      situation = id => draft.graph.situations.get(id).flatMap(_.support.textSpans)
     )
     (for
       raw <- TokenTracks.measure(sequence, m)
       sentences <- TokenTracks.perSentence(raw, sequence)
-      situations <- TokenTracks.perSituation(raw, resolver, draft.graph.discourseOrder)
+      situations <- TokenTracks.perSituation(raw, resolver, draft.discourseOrder)
     yield Vector(raw, sentences, situations)).left
       .map(e => PipelineError.FeatureRefused(s"${m.space.id.value}: ${e.message}"))
 
@@ -204,8 +204,8 @@ object FeatureStage:
   private def stamp(
       model: StoryModel[ModelStatus.Draft],
       measures: Vector[LexicalMeasure]
-  ): StoryModel[ModelStatus.Draft] =
-    if measures.isEmpty then model
+  ): Either[PipelineError, StoryModel[ModelStatus.Draft]] =
+    if measures.isEmpty then Right(model)
     else
       val digest = ContentAddress.digest(
         "features/v1" +: measures.map(m => s"${m.space.id.value}=${m.identity.hex}")
@@ -226,6 +226,7 @@ object FeatureStage:
         receipt,
         model.schemaVersion
       )
+        .left.map(error => PipelineError.FeatureRefused(error.message))
 
   /** The model's own feature laws over the augmented draft; any of them failing is a refusal, since
     * the compiler's outcome was measured on a draft without these fields.

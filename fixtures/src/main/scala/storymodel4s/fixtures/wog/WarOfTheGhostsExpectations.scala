@@ -291,7 +291,7 @@ object WarOfTheGhostsExpectations:
             )
           case DiscourseBefore(a, b) =>
             Either.cond(
-              (for x <- g.discoursePosition.get(a); y <- g.discoursePosition.get(b)
+              (for x <- model.discoursePosition.get(a); y <- model.discoursePosition.get(b)
               yield x < y).getOrElse(false),
               (),
               s"${a.value} not before ${b.value} in discourse"

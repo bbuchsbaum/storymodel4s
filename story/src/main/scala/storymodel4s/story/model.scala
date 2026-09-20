@@ -235,7 +235,8 @@ object StoryModel:
       Left(DomainError.InvariantViolation(wrongSupport.get._1 + "/support", "text StoryModel requires Text support"))
     else if allClaims.exists(_.evidence.exists(_.anchors.nonEmpty)) then
       Left(DomainError.InvariantViolation("model/evidence", "text StoryModel cannot carry anchored claim evidence"))
-    else if hierarchy.boundaryBeliefs.exists(_.evidence.exists(_.anchors.nonEmpty)) then
+    else if (hierarchy.boundaryBeliefs ++ trajectory.steps.flatMap(_.boundaryBeliefs))
+      .exists(_.evidence.exists(_.anchors.nonEmpty)) then
       Left(DomainError.InvariantViolation("model/boundary-evidence", "text StoryModel cannot carry anchored boundary evidence"))
     else
       for

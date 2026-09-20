@@ -743,12 +743,12 @@ final class AtlasCompiler private (provenance: ViewProvenance):
       primaryContainment.map(edge => edge.member -> edge.parent).toMap
 
     val situationSupport: Map[SituationId, SpanSet] =
-      g.discourseOrder.flatMap { id =>
+      model.discourseOrder.flatMap { id =>
         g.situations.get(id).flatMap { node =>
-          if claimVisible(node.meta) then clipped(node.support).map(id -> _) else None
+          if claimVisible(node.meta) then node.support.textSpans.flatMap(clipped).map(id -> _) else None
         }
       }.toMap
-    val visibleSituations: Vector[SituationId] = g.discourseOrder.filter(situationSupport.contains)
+    val visibleSituations: Vector[SituationId] = model.discourseOrder.filter(situationSupport.contains)
     val visibleSet = visibleSituations.toSet
 
     // Lanes: only horizon-visible contexts may affect geometry. The narrated-world root is lane 0
@@ -877,7 +877,7 @@ final class AtlasCompiler private (provenance: ViewProvenance):
         .filter(frame => claimVisible(frame.meta))
         .traverse { frame =>
           val lane = lanes.getOrElse(frame.id, 0)
-          clipped(frame.support) match
+          frame.support.textSpans.flatMap(clipped) match
             case None          => Right(Vector.empty[VisualPrimitive])
             case Some(support) =>
               support.refs.toVector
@@ -922,7 +922,7 @@ final class AtlasCompiler private (provenance: ViewProvenance):
         )
         .map(_.situation)
         .distinct
-        .sortBy(id => g.discoursePosition.getOrElse(id, Int.MaxValue))
+        .sortBy(id => model.discoursePosition.getOrElse(id, Int.MaxValue))
     val participationsByEntity: Map[EntityId, Vector[SituationId]] =
       g.entities.keysIterator
         .map(entity => entity -> visibleParticipations(entity))
@@ -1104,7 +1104,7 @@ final class AtlasCompiler private (provenance: ViewProvenance):
       case StoryRef.Segment(id)   =>
         g.segments
           .get(id)
-          .exists(segment => claimVisible(segment.meta) && clipped(segment.support).nonEmpty)
+          .exists(segment => claimVisible(segment.meta) && segment.support.textSpans.flatMap(clipped).nonEmpty)
       case _ => false
     def visibleAncestor(ref: StoryRef): Option[Address] =
       val start: Option[NarrativeMember] = ref match
@@ -1114,7 +1114,7 @@ final class AtlasCompiler private (provenance: ViewProvenance):
       def segmentVisible(id: SegmentId): Boolean =
         g.segments
           .get(id)
-          .exists(segment => claimVisible(segment.meta) && clipped(segment.support).nonEmpty)
+          .exists(segment => claimVisible(segment.meta) && segment.support.textSpans.flatMap(clipped).nonEmpty)
       start
         .flatMap(member =>
           VisibleAncestorChain.from(member, primaryParent, segmentVisible).find(marked.contains)
@@ -1242,8 +1242,8 @@ final class AtlasCompiler private (provenance: ViewProvenance):
       case VisualPrimitive.Feature(_, value) =>
         val resolver = storymodel4s.features.SupportResolver(
           SurfaceSequence(model.atlas),
-          situation = id => model.graph.situations.get(id).map(_.support),
-          segment = id => model.graph.segments.get(id).map(_.support)
+          situation = id => model.graph.situations.get(id).flatMap(_.support.textSpans),
+          segment = id => model.graph.segments.get(id).flatMap(_.support.textSpans)
         )
         mark.address == value.address && resolver.support(value.target).contains(value.support)
       case VisualPrimitive.SurfaceUnit(_, span, kind, unitOrdinal, parent) =>

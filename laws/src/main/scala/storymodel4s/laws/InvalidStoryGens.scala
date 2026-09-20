@@ -88,7 +88,7 @@ object InvalidStoryGens:
           val e0 = b.entities(0)
           val ent = b.graph
             .entities(e0)
-            .copy(support = SpanSet.one(SpanRef(None, TextSpan.unsafe(len + 1, len + 3))))
+            .copy(support = TypedSupport.Text(SpanSet.one(SpanRef(None, TextSpan.unsafe(len + 1, len + 3)))))
           b.draft(graph = b.graph.copy(entities = b.graph.entities.updated(e0, ent)))
       ),
       (

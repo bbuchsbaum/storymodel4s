@@ -96,7 +96,7 @@ object StoryCodecs:
       ms <- field[Vector[MentionId[EntityK]]](c, "mentions")
       mn <- nev(c, "entity mentions", ms)
       at <- field[Vector[ScopedAttribute]](c, "attributes")
-      su <- field[SpanSet](c, "support")
+      su <- field[TypedSupport](c, "support")
       me <- field[ClaimMeta](c, "meta")
     yield EntityNode(id, l, t, mn, at, su, me)
   }
@@ -143,7 +143,7 @@ object StoryCodecs:
       po <- field[storymodel4s.story.Polarity](c, "polarity")
       mo <- field[Modality](c, "modality")
       as <- field[Option[Aspect]](c, "aspect")
-      su <- field[SpanSet](c, "support")
+      su <- field[TypedSupport](c, "support")
       ms <- field[Vector[MentionId[SituationK]]](c, "mentions")
       mn <- nev(c, "situation mentions", ms)
       me <- field[ClaimMeta](c, "meta")
@@ -171,7 +171,7 @@ object StoryCodecs:
       ctx <- field[ContextId](c, "context")
       po <- field[storymodel4s.story.Polarity](c, "polarity")
       mo <- field[Modality](c, "modality")
-      su <- field[SpanSet](c, "support")
+      su <- field[TypedSupport](c, "support")
       ms <- field[Vector[MentionId[SituationK]]](c, "mentions")
       mn <- nev(c, "situation mentions", ms)
       me <- field[ClaimMeta](c, "meta")
@@ -236,7 +236,7 @@ object StoryCodecs:
       l <- field[Int](c, "level")
       m <- field[ClaimMeta](c, "meta")
       s <- field[SegmentSummary](c, "summary")
-      su <- field[SpanSet](c, "support")
+      su <- field[TypedSupport](c, "support")
     yield SegmentNode(id, k, l, m, s, su)
   }
 
@@ -306,7 +306,7 @@ object StoryCodecs:
       id <- field[ContextId](c, "id")
       p <- field[Option[ContextId]](c, "parent")
       k <- field[ContextKind](c, "kind")
-      su <- field[SpanSet](c, "support")
+      su <- field[TypedSupport](c, "support")
       m <- field[ClaimMeta](c, "meta")
     yield ContextFrame(id, p, k, su, m)
   }
@@ -547,7 +547,7 @@ object StoryCodecs:
       s <- field[SituationId](c, "situation")
       k <- field[CircumstanceKind](c, "kind")
       l <- field[String](c, "label")
-      sp <- field[SpanSet](c, "support")
+      sp <- field[TypedSupport](c, "support")
       m <- field[ClaimMeta](c, "meta")
     yield CircumstanceEdge(s, k, l, sp, m)
   }
@@ -737,7 +737,7 @@ object StoryModelCodec:
       hypotheses <- field[Vector[HypothesisClaim]](c, "hypotheses")
       sensory <- field[Map[SituationId, Vector[SensoryProfile]]](c, "sensoryProfiles")
       receipt <- field[Option[BuildReceipt]](c, "receipt")
-    yield StoryModel.draft(
+      model <- StoryModel.draft(
       source,
       atlas,
       graph,
@@ -752,6 +752,8 @@ object StoryModelCodec:
       receipt,
       sv
     )
+        .left.map(error => DecodingFailure(error.message, c.history))
+    yield model
   }
 
   def encode[S <: ModelStatus](m: StoryModel[S]): String = Canonical.encode(m)
