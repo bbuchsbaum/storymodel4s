@@ -189,8 +189,8 @@ class WarOfTheGhostsSuite extends munit.FunSuite:
   }
 
   test("discourse order and narrated-world chronology diverge at the recounting") {
-    assert(g.discoursePosition(S.weFought) > g.discoursePosition(S.ym2ToHouse))
-    assert(g.discoursePosition(S.battle) < g.discoursePosition(S.ym2ToHouse))
+    assert(m.discoursePosition(S.weFought) > m.discoursePosition(S.ym2ToHouse))
+    assert(m.discoursePosition(S.battle) < m.discoursePosition(S.ym2ToHouse))
     val world = src.relationMatrix(RelationLayer.WorldTime)
     def reaches(a: SituationId, b: SituationId): Boolean =
       var frontier = Set(a)
@@ -284,7 +284,7 @@ class WarOfTheGhostsSuite extends munit.FunSuite:
     assert(E.ym1 != E.ym2)
     assert(g.groupsOf(E.ym1).contains(E.youngMen))
     assert(g.groupsOf(E.ym2).contains(E.youngMen))
-    assert(g.situationsByEntity(E.ym2).contains(S.huntSeals))
+    assert(m.situationsByEntity(E.ym2).contains(S.huntSeals))
     val cont = src.relationMatrix(RelationLayer.EntityContinuity)
     assert(cont.contains((sit(S.huntSeals), sit(S.ym2Accompanies))))
   }

@@ -201,7 +201,7 @@ class CoordinatedRootSuite extends FunSuite:
     val model = compiled.validated.getOrElse(fail(compiled.validation.report.render))
     assertEquals(model.graph.situations.size, 2)
     assertEquals(
-      model.graph.discourseOrder.flatMap(model.graph.situations.get).map(_.predicate.lemma),
+      model.discourseOrder.flatMap(model.graph.situations.get).map(_.predicate.lemma),
       Vector("land", "go")
     )
     // "They" opens the text with no antecedent (ADR 0012), so its reference, the two participant

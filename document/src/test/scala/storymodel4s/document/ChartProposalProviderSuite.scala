@@ -1197,7 +1197,7 @@ class ChartProposalProviderSuite extends FunSuite:
       case other       => fail(s"expected one root segment, got ${other.size}")
     assertEquals(root.kind, SegmentKind.Story)
     assertEquals(root.summary, SegmentSummary.Unsummarized(SummaryGap.NotProposed))
-    assertEquals(root.support.minSpan, TextSpan.of(0, untitled.canonicalText.length).toOption.get)
+    assertEquals(root.support.textSpans.get.minSpan, TextSpan.of(0, untitled.canonicalText.length).toOption.get)
     assertEquals(root.meta.evidence.head.upstream, graph.situations.values.map(_.meta.id).toSet)
     assertEquals(
       compiled.draft.hierarchy.primary.map(e => (e.member, e.parent)),

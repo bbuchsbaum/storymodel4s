@@ -311,7 +311,7 @@ class WarOfTheGhostsAtlasSuite extends FunSuite:
 
   test("V-P1: landmarks are ordered by exact discourse offset consistent with discourse order"):
     val s = scene(NarrativeLevel.Scene)
-    val xs = model.graph.discourseOrder.map(id =>
+    val xs = model.discourseOrder.map(id =>
       landmarks(s)
         .find(_.address == ev.address(StoryRef.Situation(id)))
         .getOrElse(fail(s"missing ${id.value}"))
@@ -422,9 +422,9 @@ class WarOfTheGhostsAtlasSuite extends FunSuite:
     assert(threads.nonEmpty)
     threads.foreach { t =>
       val e = ev.parse(t.address).collect { case StoryRef.Entity(id) => id }.get
-      val expected = model.graph
+      val expected = model
         .situationsByEntity(e)
-        .map(id => model.graph.situations(id).support.minSpan.start)
+        .map(id => model.graph.situations(id).support.textSpans.get.minSpan.start)
       assertEquals(t.points.map(_.x), expected)
     }
 
@@ -440,18 +440,18 @@ class WarOfTheGhostsAtlasSuite extends FunSuite:
     val portals = scene(NarrativeLevel.Scene, state(layers = Set(RelationLayer.Reference))).marks
       .collect { case p: VisualPrimitive.Portal => p }
     val nonAdjacent = model.graph.relations.references.count(r =>
-      math.abs(model.graph.discoursePosition(r.from) - model.graph.discoursePosition(r.to)) > 1
+      math.abs(model.discoursePosition(r.from) - model.discoursePosition(r.to)) > 1
     )
     assertEquals(portals.size, nonAdjacent)
 
   test("reader horizon uses the shared evidence closure and clips regions to visible children"):
     val sourceModel = rebuilt(hierarchy = groundedHierarchy())
-    val mid = sourceModel.graph.situations(Wog.S.battle).support.minSpan.start
+    val mid = sourceModel.graph.situations(Wog.S.battle).support.textSpans.get.minSpan.start
     val st = state(horizon = EpistemicHorizon.ReaderAt(mid))
     val s = scene(NarrativeLevel.Scene, st, sourceModel = sourceModel)
     val ledger = sourceModel.ledger.toOption.get
     val visible = EvidenceVisibility.visibleClaims(mid, ledger)
-    val expected = sourceModel.graph.discourseOrder.filter { id =>
+    val expected = sourceModel.discourseOrder.filter { id =>
       val n = sourceModel.graph.situations(id)
       visible.contains(n.meta.id) &&
       EvidenceVisibility.clipSupport(n.support, st.horizon).isDefined
@@ -599,7 +599,7 @@ class WarOfTheGhostsAtlasSuite extends FunSuite:
         case value: VisualPrimitive.Thread if value.address == entityAddress => value
       }
       .getOrElse(fail("missing selected young-men thread"))
-    val hiddenX = sourceModel.graph.situations(Wog.S.huntSeals).support.minSpan.start
+    val hiddenX = sourceModel.graph.situations(Wog.S.huntSeals).support.textSpans.get.minSpan.start
 
     assert(visible.contains(sourceModel.graph.entities(Wog.E.youngMen).meta.id))
     assert(visible.contains(sourceModel.graph.situations(Wog.S.huntSeals).meta.id))

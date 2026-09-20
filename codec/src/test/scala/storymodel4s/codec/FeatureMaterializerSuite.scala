@@ -19,7 +19,7 @@ class FeatureMaterializerSuite extends FunSuite:
     val raw = TokenTracks.measure(sequence, m).fold(e => fail(e.message), identity)
     val sentences = TokenTracks.perSentence(raw, sequence).fold(e => fail(e.message), identity)
     val situations = TokenTracks
-      .perSituation(raw, resolver, draft.graph.discourseOrder)
+      .perSituation(raw, resolver, draft.discourseOrder)
       .fold(e => fail(e.message), identity)
     Vector(raw, sentences, situations)
 

@@ -1443,7 +1443,7 @@ object WarOfTheGhostsModel:
 
   private def sceneOf(id: SituationId): SegmentId =
     val n = atlas.sentences.indexWhere(u =>
-      u.span.contains(situations.find(_.id == id).get.support.refs.head.span.start)
+      u.span.contains(situations.find(_.id == id).get.support.textSpans.get.refs.head.span.start)
     )
     if n <= 3 then G.sc1a
     else if n <= 7 then G.sc1b

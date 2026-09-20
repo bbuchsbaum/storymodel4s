@@ -9,39 +9,32 @@ class StoryModelUnforgeableSuite extends FunSuite:
   private val dependsOn: Class[?] =
     classOf[storymodel4s.story.StoryModel[?]]
 
-  test("Validated cannot be claimed through Mirror.fromProduct") {
+  test("accepting control: typed model consumer and tuple Product/Mirror compile"):
     assert(dependsOn != null)
-    assert(
-      typeChecks("""
-        import storymodel4s.story.*
-        def consumeValidated(model: StoryModel[ModelStatus.Validated]): String = model.schemaVersion
-      """)
-    )
-    assert(typeChecks("summon[scala.deriving.Mirror.ProductOf[(Int, String)]]"))
-    assert(
-      !typeChecks("""
-        import scala.deriving.Mirror
-        import storymodel4s.story.*
-        val draft = Small.build(n = 1, m = 1).draft()
-        val forged: StoryModel[ModelStatus.Validated] =
-          summon[Mirror.ProductOf[StoryModel[ModelStatus.Validated]]].fromProduct(draft)
-      """)
-    )
-    assert(
-      !typeChecks("""
-        import storymodel4s.story.*
-        val draft = Small.build(n = 1, m = 1).draft()
-        val forged: StoryModel[ModelStatus.Validated] = draft.copy[ModelStatus.Validated]()
-      """)
-    )
-    assert(
-      !typeChecks("""
-        import storymodel4s.story.*
-        val draft = Small.build(n = 1, m = 1).draft()
-        val product: Product = draft
-      """)
-    )
-  }
+    assert(typeChecks("""
+      import storymodel4s.story.*
+      def consume(model: StoryModel[ModelStatus.Draft]): String = model.schemaVersion
+      val product: Product = (1, "text")
+      summon[scala.deriving.Mirror.ProductOf[(Int, String)]]
+    """))
+
+  test("model has no synthesizable Product Mirror"):
+    assert(!typeChecks("""
+      import storymodel4s.story.*
+      summon[scala.deriving.Mirror.ProductOf[StoryModel[ModelStatus.Validated]]]
+    """))
+
+  test("external callers cannot invoke internal copy"):
+    assert(!typeChecks("""
+      import storymodel4s.story.*
+      def copyModel(model: StoryModel[ModelStatus.Draft]) = model.copy[ModelStatus.Validated]()
+    """))
+
+  test("model is not a Product"):
+    assert(!typeChecks("""
+      import storymodel4s.story.*
+      def product(model: StoryModel[ModelStatus.Draft]): Product = model
+    """))
 
   test("plain-class replacement preserves value semantics without payload diagnostics") {
     val a = storymodel4s.story.Small.build(n = 1, m = 1).draft()

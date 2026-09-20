@@ -12,17 +12,17 @@ class GraphSuite extends ScalaCheckSuite:
   property("discourse order is a permutation of situations, ordered by first span") {
     forAll { (b: Small.Built) =>
       val g = b.graph
-      val ord = g.discourseOrder
+      val ord = b.draft().discourseOrder
       ord.toSet == g.situations.keySet && ord.size == g.situations.size &&
-      ord.map(id => g.situations(id).support.refs.head.span.start) ==
-        ord.map(id => g.situations(id).support.refs.head.span.start).sorted
+      ord.map(id => g.situations(id).support.textSpans.get.refs.head.span.start) ==
+        ord.map(id => g.situations(id).support.textSpans.get.refs.head.span.start).sorted
     }
   }
 
   property("situationsByEntity and participantsOf are inverse views of the participant layer") {
     forAll { (b: Small.Built) =>
       val g = b.graph
-      val fromEntity = g.situationsByEntity.toVector.flatMap((e, ss) => ss.map(s => (s, e))).toSet
+      val fromEntity = b.draft().situationsByEntity.toVector.flatMap((e, ss) => ss.map(s => (s, e))).toSet
       val fromSit = g.participantsOf.toVector.flatMap((s, ps) => ps.map((_, e) => (s, e))).toSet
       fromEntity == fromSit
     }

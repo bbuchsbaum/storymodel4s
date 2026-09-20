@@ -12,10 +12,10 @@ class CoveringSuite extends FunSuite:
   test("supporting returns node support and edge claim spans, None for unknown refs"):
     assertEquals(
       g.supporting(StoryRef.Situation(b.situations(2))),
-      Some(g.situations(b.situations(2)).support)
+      g.situations(b.situations(2)).support.textSpans
     )
-    assertEquals(g.supporting(StoryRef.Segment(b.scene)), Some(g.segments(b.scene).support))
-    assertEquals(g.supporting(StoryRef.Context(b.world)), Some(g.contexts(b.world).support))
+    assertEquals(g.supporting(StoryRef.Segment(b.scene)), g.segments(b.scene).support.textSpans)
+    assertEquals(g.supporting(StoryRef.Context(b.world)), g.contexts(b.world).support.textSpans)
     assertEquals(g.supporting(StoryRef.Situation(SituationId.unsafe("nope"))), None)
     val t = g.relations.temporal.head
     assertEquals(
@@ -47,7 +47,8 @@ class CoveringSuite extends FunSuite:
 
   test("situationsCovering follows discourse order"):
     val whole = TextSpan.unsafe(0, b.source.canonicalText.length)
-    assertEquals(g.situationsCovering(whole), g.discourseOrder)
+    val model = b.draft()
+    assertEquals(model.situationsCovering(whole), model.discourseOrder)
 
   test("model-level supporting resolves containment edges through the hierarchy"):
     val m = b.draft()

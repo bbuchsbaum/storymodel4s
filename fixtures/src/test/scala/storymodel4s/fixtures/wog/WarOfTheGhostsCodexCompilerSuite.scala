@@ -312,7 +312,7 @@ class WarOfTheGhostsCodexCompilerSuite extends ScalaCheckSuite:
       .of(
         selection = Set(battle),
         horizon = EpistemicHorizon.ReaderAt(
-          model.graph.situations(WarOfTheGhostsModel.S.battle).support.minSpan.start
+          model.graph.situations(WarOfTheGhostsModel.S.battle).support.textSpans.get.minSpan.start
         )
       )
       .fold(error => fail(error.message), identity)
@@ -545,7 +545,7 @@ class WarOfTheGhostsCodexCompilerSuite extends ScalaCheckSuite:
     assert(!support.isContiguous)
     assertEquals(placement.support, support)
     assertEquals(placement.xExtents, support.spans)
-    assertNotEquals(placement.xExtents.toVector, Vector(support.minSpan))
+    assertNotEquals(placement.xExtents.toVector, Vector(support.textSpans.get.minSpan))
     assert(!scene.marks.exists(_.address == placement.address))
     assert(scene.textualTwin.contains(placement.address.render))
 
