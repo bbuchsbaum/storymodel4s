@@ -210,12 +210,14 @@ def mutations():
             path.write_text(mutant)
             tasks=([project+'/Compile/clean',project+'/Test/clean'] if c['cleanRecompile'] else [])+[command(c['group'])]
             receipt=run(label,prefix+tasks,False)
-            assert receipt['exitCode']==1 and receipt['aggregateTestCounts']['Failed']>0 and receipt['aggregateTestCounts']['Errors']==0,(c['id'],'not an executed failing mutant')
             outcomes={};xml_hashes={}
             for suite in suites:
-                report=report_path(project,suite);assert report.exists(),report
+                report=report_path(project,suite)
+                if not report.exists():continue
+                assert report.stat().st_mtime>=receipt['startedEpochSeconds'],('stale XML',report)
                 xml=report.read_bytes();(out/(label+'--'+suite+'.xml')).write_bytes(xml);xml_hashes[suite]=sha(xml)
                 for t in ET.fromstring(xml).findall('testcase'):outcomes[(suite,t.attrib['name'])]=t
+            assert receipt['exitCode']==1 and receipt['aggregateTestCounts']['Failed']>0 and receipt['aggregateTestCounts']['Errors']==0,(c['id'],'not an executed failing mutant')
             rejecting=outcomes[(c['rejectSuite'],c['rejectingTest'])];control=outcomes[(c['controlSuite'],c['acceptingControl'])]
             assert rejecting.find('failure') is not None,(c['id'],'survived')
             assert all(control.find(k) is None for k in ['failure','error','skipped']),(c['id'],'control failed')
@@ -227,7 +229,12 @@ def mutations():
                 failedTests=[dict(suite=s,name=n) for (s,n),t in outcomes.items() if t.find('failure') is not None])
             results.append(receipt);(out/'mutation-progress.json').write_text(json.dumps(results,indent=2)+'\n')
             print(c['id'],'KILLED; named control passed',flush=True)
-        finally:path.write_bytes(saved)
+        finally:
+            path.write_bytes(saved)
+            restoration=dict(codeRevision=revision,id=c['id'],path=c['path'],baselineCleanBeforeMutation=True,
+                originalSha256=sha(saved),mutantSha256=sha(mutant.encode()),restoredSha256=sha(path.read_bytes()),
+                restoredCleanAfterMutation=clean(),qualification='Restoration only; execution verdict is separate.')
+            (out/(label+'-restoration.json')).write_text(json.dumps(restoration,indent=2)+'\n')
         assert clean()
         receipt.update(baselineCleanBeforeMutation=True,restoredSha256=sha(path.read_bytes()),restoredCleanAfterMutation=clean())
         (out/'mutation-progress.json').write_text(json.dumps(results,indent=2)+'\n')
