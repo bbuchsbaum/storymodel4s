@@ -35,6 +35,11 @@ class D1aOrderingSuite extends FunSuite:
     assertEquals(model.situationsByEntity(built.entities.head), expected)
     assertEquals(model.situationsCovering(TextSpan.unsafe(1, 2)), Vector(ids(1), ids(0)))
 
+  test("projected start precedes end when their orders disagree"):
+    val g = graph(Vector(spans(0 -> 100), spans(1 -> 2), spans(2 -> 3)))
+    assertEquals(g.discourseOrderOn(bundle), Right(ids))
+    assertEquals(draft(g).discourseOrder, ids)
+
   test("equal projected hulls use id independent of map insertion order"):
     val g = graph(Vector.fill(3)(spans(1 -> 4)))
     val expected = ids.sorted
