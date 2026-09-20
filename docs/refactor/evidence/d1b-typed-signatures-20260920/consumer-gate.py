@@ -5,7 +5,7 @@ root=Path(os.environ.get('D1B_ROOT','/Users/bbuchsbaum/code/scala/storymodel4s')
 out=Path(os.environ.get('D1B_OUTPUT',str(root/'data/study/d1b-20260920'))).resolve();out.mkdir(parents=True,exist_ok=True)
 clone_root=Path(os.environ.get('D1B_CONSUMER_ROOT','/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z')).resolve()
 repos={name:clone_root/name for name in ['storyatlas4s','storymodel4s','intaglio','grakern']};consumer=repos['storyatlas4s']
-expected={'storyatlas4s':'42e451ce0577dcf5f40485776b2279d72b941cdf','storymodel4s':'850a6d645dd0d63e5c2d01cd03a41f1e3bd53e37',
+expected={'storyatlas4s':'77297769af637e8d6fd93bb652dc9db5cb3209cc','storymodel4s':'774fb1e8fa7358de3d8343e78371f5b4d36eb1cf',
  'intaglio':'4eb566d9208f474d64d61e778e084dee2ddbaa76','grakern':'0329c43c88a0b71e9aa4456723bb16bac2fa3841'}
 def sha(b):return hashlib.sha256(b).hexdigest()
 def state():

@@ -27,6 +27,11 @@ valid timebases, composition offsets, exact native and primary point retention,
 scene gaps, and receipt inputs. Synthetic inference in the capture harness tests
 inventory retention only. It is not a participant replay or a recovery score.
 
+The raw `film-group-2/film-group-regression.json` retains the weaker runner's
+historical `qualified: true` flag. The archive manifest supersedes that flag:
+attempt 2 is unqualified for closure because its helper/test binding was incomplete.
+Only the separately replayed `film-group-3` supplies the supplemental qualification.
+
 Raw annotations, recalls, and generated participant outputs stay ignored and
 local. This record makes no scientific, generic film-wire, caption-licensing,
 film-compiler, remote CI, or publication claim.

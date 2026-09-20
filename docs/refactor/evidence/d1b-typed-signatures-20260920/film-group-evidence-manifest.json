@@ -6,7 +6,7 @@
   "memberCount": 24,
   "historicalAttempts": {
     "film-group-1": "Three tests passed, formatting command failed; no mutation executed.",
-    "film-group-2": "Expected kill/restoration observed, but verifier input binding was incomplete; not qualified."
+    "film-group-2": "The unchanged raw terminal JSON has historical qualified:true from the weaker runner. This manifest supersedes that flag: helper/test binding was incomplete, so attempt 2 is unqualified for closure. Only film-group-3 qualifies."
   },
   "qualifyingAttempt": "film-group-3",
   "originalMutationCourt": "Separate frozen 67 cases at 87848b96; unchanged.",

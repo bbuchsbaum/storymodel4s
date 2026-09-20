@@ -23,7 +23,7 @@ archive=dest/'film-group-evidence.tar.gz';assert not archive.exists()
 with tarfile.open(archive,'w:gz') as tar:
  for p in paths:tar.add(p,arcname=str(p.relative_to(data)))
 index=dict(schema='d1b/film-group-archive/v1',archive=archive.name,sha256=sha(archive),bytes=archive.stat().st_size,memberCount=len(paths),
- historicalAttempts={'film-group-1':'Three tests passed, formatting command failed; no mutation executed.','film-group-2':'Expected kill/restoration observed, but verifier input binding was incomplete; not qualified.'},
+ historicalAttempts={'film-group-1':'Three tests passed, formatting command failed; no mutation executed.','film-group-2':'The unchanged raw terminal JSON has historical qualified:true from the weaker runner. This manifest supersedes that flag: helper/test binding was incomplete, so attempt 2 is unqualified for closure. Only film-group-3 qualifies.'},
  qualifyingAttempt='film-group-3',originalMutationCourt='Separate frozen 67 cases at 87848b96; unchanged.',
  members=[dict(path=str(p.relative_to(data)),bytes=p.stat().st_size,sha256=sha(p)) for p in paths])
 (dest/'film-group-evidence-manifest.json').write_text(json.dumps(index,indent=2)+'\n')
