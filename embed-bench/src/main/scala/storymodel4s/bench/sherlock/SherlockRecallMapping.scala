@@ -7,7 +7,7 @@ import java.time.LocalDate
 import io.circe.parser.parse as parseJson
 import io.circe.Json
 
-import storymodel4s.corpus.intake.{SherlockAnnotations, TimebaseRepair}
+import storymodel4s.corpus.intake.{SherlockAnnotations, SherlockSourceAtlas, TimebaseRepair}
 import storymodel4s.corpus.intake.SherlockAnnotations.Atlas
 import storymodel4s.bench.video.{
   MediaLocus,
@@ -16,11 +16,10 @@ import storymodel4s.bench.video.{
   TimedSegment,
   TimedSourceView,
   WorldOrderInput,
-  WorldOrderRefusal,
   WorldOrderWitness
 }
-import storymodel4s.core.{Checksum, ExactRational, PresentationAxis}
-import storymodel4s.align.ViewFingerprint
+import storymodel4s.core.{Checksum, DomainError, ExactRational, PresentationAxis, TypedSupport}
+import storymodel4s.align.{ScoringPosition, ViewFingerprint}
 import storymodel4s.recall.Lexical
 
 /** Sherlock adapter for the general recall-to-video pipeline: the checked annotation atlas becomes
@@ -277,15 +276,31 @@ object SherlockAnnotationView:
     )
   )
 
-  def build(atlas: Atlas): Either[WorldOrderRefusal, TimedSourceView.Built] =
+  def build(atlas: Atlas): Either[DomainError, TimedSourceView.Built] =
     buildWith(atlas, worldOrder)
 
   /** Build under another declaration. The diagnostic uses [[worldOrder]] and nothing else. */
   def buildWith(
       atlas: Atlas,
       declared: WorldOrderInput
-  ): Either[WorldOrderRefusal, TimedSourceView.Built] =
-    TimedSourceView.build(segments(atlas), declared, axes(atlas), naming)
+  ): Either[DomainError, TimedSourceView.Built] =
+    for
+      source <- SherlockSourceAtlas.of(atlas)
+      features <- TimedSourceView.build(segments(atlas), declared, axes(atlas), naming)
+        .left.map(error => DomainError.InvariantViolation("sherlock/world-order", error.message))
+      nodes <- features.view.nodes.foldLeft[Either[DomainError, Vector[storymodel4s.align.NodeSummary]]](Right(Vector.empty)) {
+        (acc, node) =>
+          val unit = features.segmentByRef.get(node.ref).flatMap(s => source.rows.get(s.ordinal))
+            .orElse(features.groupByRef.get(node.ref).flatMap(g => source.scenes.get(g.ordinal)))
+          for
+            previous <- acc
+            admitted <- unit.toRight(DomainError.InvariantViolation("sherlock/source-view", s"missing unit ${node.ref.key}"))
+            position <- node.scoringPosition.toRight(DomainError.InvariantViolation(
+              "sherlock/source-view", "legacy annotation scoring feature is absent"))
+          yield previous :+ node.copy(support = TypedSupport.Anchored(admitted.support),
+            scoringPosition = Some(ScoringPosition.LegacyAnnotationText(position.spans)))
+      }
+    yield features.copy(view = features.view.copy(nodes = nodes), sourceAtlas = Some(source.atlas))
 
 /** Terminal diagnostic: map one Sherlock recall transcript onto the two media parts.
   *

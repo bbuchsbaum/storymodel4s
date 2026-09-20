@@ -90,8 +90,8 @@ object SherlockBaselineCapture:
           "id" -> str(n.ref.key),
           "level" -> int(n.level),
           "renderSha256" -> str(Checksum.ofText(nodeTexts(n.ref)).hex),
-          "supportStartUtf16" -> int(n.support.minSpan.start),
-          "supportEndUtf16" -> int(n.support.minSpan.endExclusive),
+          "supportStartUtf16" -> int(n.scoringPosition.get.spans.minSpan.start),
+          "supportEndUtf16" -> int(n.scoringPosition.get.spans.minSpan.endExclusive),
           "part" -> locus.fold(Json.Null)(l => str(l.part)),
           "startTick" -> locus.fold(Json.Null)(l => tick(l.startTick)),
           "endTick" -> locus.fold(Json.Null)(l => tick(l.endTick))

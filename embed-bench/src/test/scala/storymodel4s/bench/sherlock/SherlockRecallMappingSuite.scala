@@ -104,7 +104,7 @@ class SherlockRecallMappingSuite extends FunSuite:
     assertEquals(built.view.maxLevel, 1)
     // every leaf support slices back to its own description on the derived document
     atlas.rows.foreach { row =>
-      val span = built.view.node(refOfRow(built, row.row)).get.support.minSpan
+      val span = built.view.node(refOfRow(built, row.row)).get.scoringPosition.get.spans.minSpan
       assertEquals(built.document.substring(span.start, span.endExclusive), row.description)
     }
   }

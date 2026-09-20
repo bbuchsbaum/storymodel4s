@@ -34,7 +34,7 @@ class RecallToVideoSuite extends FunSuite:
     assertEquals(built.media, Map.empty[SourceNodeRef, MediaLocus])
     segments.foreach { seg =>
       val ref = built.segmentByRef.collectFirst { case (r, s) if s.ordinal == seg.ordinal => r }.get
-      val span = built.view.node(ref).get.support.minSpan
+      val span = built.view.node(ref).get.scoringPosition.get.spans.minSpan
       assertEquals(built.document.substring(span.start, span.endExclusive), seg.text)
     }
     assertEquals(built.nodeTexts.map(_._2), segments.map(_.text))

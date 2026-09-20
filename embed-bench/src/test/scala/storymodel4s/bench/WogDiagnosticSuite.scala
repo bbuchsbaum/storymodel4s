@@ -502,6 +502,17 @@ class WogDiagnosticSuite extends FunSuite:
       Vector(observations), Vector(c.inputChecksum), seed = 1L)
     assertEquals(aggregate.coverage.eligible, 1)
     assertEquals(aggregate.coverage.observed, 0)
+    val noGoldPosition = c.copy(view = view.copy(nodes = view.nodes.map(_.copy(scoringPosition = None))))
+    val external = Metrics.observe(noGoldPosition,
+      resultFor(noGoldPosition, Vector(None, None), ExternalState.Intrusion))
+    assertEquals(external.byMetric(Metrics.Names.routeSupportMidpointDirection)(1).observation,
+      MetricObservation.Ineligible)
+    val unranked = Metrics.observe(noGoldPosition, resultFor(noGoldPosition, Vector(None, None)))
+    assertEquals(unranked.byMetric(Metrics.Names.routeSupportMidpointDirection)(1).observation,
+      MetricObservation.Missing(MissingReason.ProviderAbstained))
+    val sourceMissing = Metrics.observe(noGoldPosition, resultFor(noGoldPosition, refs))
+    assertEquals(sourceMissing.byMetric(Metrics.Names.routeSupportMidpointDirection)(1).observation,
+      MetricObservation.Missing(MissingReason.AllMissing))
   }
 
   test("an Unranked route step is eligible missing, never ineligible") {

@@ -1093,6 +1093,18 @@ object SourceBundle:
       }
     }
 
+  /** Derive a proposed edition axis from an exact stream inventory; `of` checks the final bundle. */
+  def editionPlaybackAxis(
+      edition: EditionId,
+      streams: Vector[SourceStream],
+      authorityTracks: Vector[StreamId],
+      start: Long,
+      endExclusive: Long,
+      timebase: RationalTimebase
+  ): Either[DomainError, PresentationAxis] =
+    computeId(Some(edition), SourceKind.FilmEdition, streams, AxisKind.EditionPlayback, authorityTracks)
+      .flatMap(id => PresentationAxis.editionPlayback(id, edition, start, endExclusive, timebase))
+
   def writtenText(source: StorySource): Either[DomainError, SourceBundle] =
     for
       streamId <- StreamId.from(ContentAddress.of("stream", source.canonicalChecksum.hex))

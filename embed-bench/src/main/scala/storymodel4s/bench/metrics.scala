@@ -336,17 +336,15 @@ object Metrics:
       * as agreement or disagreement would be an invention.
       */
     val route: (String, Vector[UnitObservation]) =
-      def positionOf(ref: SourceNodeRef): Option[Double] =
-        view.measuredPosition(ref)
-      def goldPos(u: RecallUnit): Option[Double] =
-        c.gold(u.id).flatMap(_.primary).map(_.node).flatMap(positionOf)
+      def goldAnchor(u: RecallUnit): Option[SourceNodeRef] =
+        c.gold(u.id).flatMap(_.primary).map(_.node)
       val values = units.zipWithIndex.map { case (u, i) =>
         val observation =
           if i == 0 then MetricObservation.Ineligible
           else
             val prev = units(i - 1)
-            (goldPos(prev), goldPos(u)) match
-              case (Some(gp), Some(gc)) =>
+            (goldAnchor(prev), goldAnchor(u)) match
+              case (Some(goldPrevious), Some(goldCurrent)) =>
                 (result.posterior.row(prev.id), result.posterior.row(u.id)) match
                   case (Some(previousRow), Some(currentRow))
                       if previousRow.externalMass(ExternalState.Unranked) > 0.0 ||
@@ -355,15 +353,13 @@ object Metrics:
                   case (Some(previousRow), Some(currentRow)) =>
                     (mapAnchor(previousRow), mapAnchor(currentRow)) match
                       case (Some(previous), Some(current)) =>
-                        (positionOf(previous), positionOf(current)) match
-                          case (Some(ip), Some(ic)) =>
+                        (view.measuredPosition(goldPrevious), view.measuredPosition(goldCurrent),
+                          view.measuredPosition(previous), view.measuredPosition(current)) match
+                          case (Some(gp), Some(gc), Some(ip), Some(ic)) =>
                             MetricObservation.observed(ind(stepDirection(gp, gc) == stepDirection(ip, ic)))
                           case _ => MetricObservation.Missing(MissingReason.AllMissing)
                       case _ => MetricObservation.Ineligible
                   case _ => MetricObservation.Ineligible
-              case _ if c.gold(prev.id).flatMap(_.primary).nonEmpty &&
-                  c.gold(u.id).flatMap(_.primary).nonEmpty =>
-                MetricObservation.Missing(MissingReason.AllMissing)
               case _ => MetricObservation.Ineligible
         UnitObservation(u.id, observation)
       }

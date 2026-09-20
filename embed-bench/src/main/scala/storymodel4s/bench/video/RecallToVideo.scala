@@ -6,6 +6,7 @@ import java.nio.file.{Files, Path, Paths}
 import storymodel4s.align.*
 import storymodel4s.bench.BenchChannels
 import storymodel4s.core.{
+  AnchoredNarrativeAtlas,
   Checksum,
   PlaybackInstant,
   PlaybackInterval,
@@ -125,7 +126,8 @@ object TimedSourceView:
       groupByRef: Map[SourceNodeRef, TimedSegment.Group],
       nodeTexts: Vector[(SourceNodeRef, String)],
       lexicalTexts: Vector[(SourceNodeRef, String)],
-      worldOrder: WorldOrderInput
+      worldOrder: WorldOrderInput,
+      sourceAtlas: Option[AnchoredNarrativeAtlas] = None
   )
 
   /** The world-time layer and world order a declaration yields: both present or both absent. */
@@ -239,7 +241,8 @@ object TimedSourceView:
                   .on(axis, start, end)
                   .toOption
                   .map(iv => groupRef(g.ordinal) -> MediaLocus.Extent(partId, iv))
-              else None
+              else PlaybackInstant.on(axis, start).toOption.map(at =>
+                groupRef(g.ordinal) -> MediaLocus.Instant(partId, at))
             }
           case _ => None
       }.toMap
