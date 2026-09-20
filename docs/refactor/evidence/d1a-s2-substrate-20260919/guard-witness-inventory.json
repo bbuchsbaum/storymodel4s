@@ -1,0 +1,378 @@
+{
+  "codeRevision": "c24ddd66026f0d1848b61369b0bbaff7a90a5d40",
+  "inventoryStatus": "settled before final mutation run and full gate",
+  "plannedMutationCount": 52,
+  "mutations": [
+    {
+      "id": "foreign-bundle",
+      "path": "core/src/main/scala/storymodel4s/core/support.scala",
+      "suite": "storymodel4s.core.D1aSupportSuite",
+      "rejectingTest": "refuse foreign bundle even with a local stream",
+      "cleanRecompile": false
+    },
+    {
+      "id": "foreign-stream",
+      "path": "core/src/main/scala/storymodel4s/core/support.scala",
+      "suite": "storymodel4s.core.D1aSupportSuite",
+      "rejectingTest": "refuse foreign stream even with a local bundle",
+      "cleanRecompile": false
+    },
+    {
+      "id": "stream-kind",
+      "path": "core/src/main/scala/storymodel4s/core/support.scala",
+      "suite": "storymodel4s.core.D1aSupportSuite",
+      "rejectingTest": "refuse anchor stream-kind mismatch",
+      "cleanRecompile": false
+    },
+    {
+      "id": "interval-axis",
+      "path": "core/src/main/scala/storymodel4s/core/support.scala",
+      "suite": "storymodel4s.core.D1aSupportSuite",
+      "rejectingTest": "refuse MediaTime axis different from its interval axis",
+      "cleanRecompile": false
+    },
+    {
+      "id": "text-extent",
+      "path": "core/src/main/scala/storymodel4s/core/support.scala",
+      "suite": "storymodel4s.core.D1aSupportSuite",
+      "rejectingTest": "refuse text spans outside the selected extent",
+      "cleanRecompile": false
+    },
+    {
+      "id": "stream-axis",
+      "path": "core/src/main/scala/storymodel4s/core/support.scala",
+      "suite": "storymodel4s.core.D1aSupportSuite",
+      "rejectingTest": "right bundle does not license another stream's axis",
+      "cleanRecompile": false
+    },
+    {
+      "id": "native-extent",
+      "path": "core/src/main/scala/storymodel4s/core/support.scala",
+      "suite": "storymodel4s.core.D1aSupportSuite",
+      "rejectingTest": "native support obeys the selected stream extent",
+      "cleanRecompile": false
+    },
+    {
+      "id": "mapping-image",
+      "path": "core/src/main/scala/storymodel4s/core/support.scala",
+      "suite": "storymodel4s.core.D1aSupportSuite",
+      "rejectingTest": "clock mapping admits its exact image and refuses partial or absent coverage",
+      "cleanRecompile": false
+    },
+    {
+      "id": "composition-source",
+      "path": "core/src/main/scala/storymodel4s/core/support.scala",
+      "suite": "storymodel4s.core.D1aSupportSuite",
+      "rejectingTest": "composition image preserves gaps and refuses source segments outside stream extent",
+      "cleanRecompile": false
+    },
+    {
+      "id": "composition-gap",
+      "path": "core/src/main/scala/storymodel4s/core/support.scala",
+      "suite": "storymodel4s.core.D1aSupportSuite",
+      "rejectingTest": "composition image preserves gaps and refuses source segments outside stream extent",
+      "cleanRecompile": false
+    },
+    {
+      "id": "clock-timebase",
+      "path": "core/src/main/scala/storymodel4s/core/support.scala",
+      "suite": "storymodel4s.core.D1aSupportSuite",
+      "rejectingTest": "clock image uses native timebase and exact fractional boundaries",
+      "cleanRecompile": false
+    },
+    {
+      "id": "text-stream-selection",
+      "path": "core/src/main/scala/storymodel4s/core/source.scala",
+      "suite": "storymodel4s.core.D1aSupportSuite",
+      "rejectingTest": "text spans are selected per stream",
+      "cleanRecompile": false
+    },
+    {
+      "id": "union-overlap",
+      "path": "core/src/main/scala/storymodel4s/core/source.scala",
+      "suite": "storymodel4s.core.D1aSupportSuite",
+      "rejectingTest": "interval union merges overlap and adjacency while preserving gaps",
+      "cleanRecompile": false
+    },
+    {
+      "id": "union-adjacency",
+      "path": "core/src/main/scala/storymodel4s/core/source.scala",
+      "suite": "storymodel4s.core.D1aSupportSuite",
+      "rejectingTest": "interval union merges overlap and adjacency while preserving gaps",
+      "cleanRecompile": false
+    },
+    {
+      "id": "duplicate-unit-v2",
+      "path": "core/src/main/scala/storymodel4s/core/atlas.scala",
+      "suite": "storymodel4s.core.D1aAtlasSuite",
+      "rejectingTest": "refuse duplicate proposal unit IDs before map construction",
+      "cleanRecompile": false
+    },
+    {
+      "id": "duplicate-surface-v2",
+      "path": "core/src/main/scala/storymodel4s/core/atlas.scala",
+      "suite": "storymodel4s.core.D1aAtlasSuite",
+      "rejectingTest": "refuse duplicated bound sentence",
+      "cleanRecompile": false
+    },
+    {
+      "id": "atlas-primary-v2",
+      "path": "core/src/main/scala/storymodel4s/core/atlas.scala",
+      "suite": "storymodel4s.core.D1aAtlasSuite",
+      "rejectingTest": "refuse text and annotation timeline primaries explicitly",
+      "cleanRecompile": false
+    },
+    {
+      "id": "atlas-surface-v2",
+      "path": "core/src/main/scala/storymodel4s/core/atlas.scala",
+      "suite": "storymodel4s.core.D1aAtlasSuite",
+      "rejectingTest": "refuse missing, foreign and nonsentence proposal surfaces",
+      "cleanRecompile": false
+    },
+    {
+      "id": "missing-map",
+      "path": "core/src/main/scala/storymodel4s/core/support.scala",
+      "suite": "storymodel4s.core.D1aSupportSuite",
+      "rejectingTest": "right bundle does not license another stream's axis",
+      "cleanRecompile": false
+    },
+    {
+      "id": "mapping-cardinality",
+      "path": "core/src/main/scala/storymodel4s/core/support.scala",
+      "suite": "storymodel4s.core.D1aSupportSuite",
+      "rejectingTest": "clock mapping admits its exact image and refuses partial or absent coverage",
+      "cleanRecompile": false
+    },
+    {
+      "id": "interval-axis-media",
+      "path": "core/src/main/scala/storymodel4s/core/source.scala",
+      "suite": "storymodel4s.core.D1aSupportSuite",
+      "rejectingTest": "single-interval selection refuses a foreign axis for every playback anchor",
+      "cleanRecompile": false
+    },
+    {
+      "id": "interval-axis-shot",
+      "path": "core/src/main/scala/storymodel4s/core/source.scala",
+      "suite": "storymodel4s.core.D1aSupportSuite",
+      "rejectingTest": "single-interval selection refuses a foreign axis for every playback anchor",
+      "cleanRecompile": false
+    },
+    {
+      "id": "interval-axis-track",
+      "path": "core/src/main/scala/storymodel4s/core/source.scala",
+      "suite": "storymodel4s.core.D1aSupportSuite",
+      "rejectingTest": "single-interval selection refuses a foreign axis for every playback anchor",
+      "cleanRecompile": false
+    },
+    {
+      "id": "mapping-equivalence",
+      "path": "core/src/main/scala/storymodel4s/core/support.scala",
+      "suite": "storymodel4s.core.D1aSupportSuite",
+      "rejectingTest": "equivalent mapping order has identical identity and support admission",
+      "cleanRecompile": false
+    },
+    {
+      "id": "atlas-support-attempt2-v2",
+      "path": "core/src/main/scala/storymodel4s/core/atlas.scala",
+      "suite": "storymodel4s.core.D1aAtlasSuite",
+      "rejectingTest": "refuse support belonging to another bundle",
+      "cleanRecompile": false
+    },
+    {
+      "id": "receipt-safe-binding",
+      "path": "core/src/main/scala/storymodel4s/core/source.scala",
+      "suite": "storymodel4s.core.D1aSupportSuite",
+      "rejectingTest": "safe receipt binding distinguishes legacy delimiter collision",
+      "cleanRecompile": false
+    },
+    {
+      "id": "mapping-offset",
+      "path": "core/src/main/scala/storymodel4s/core/sourceIdentity.scala",
+      "suite": "storymodel4s.core.D1aSupportSuite",
+      "rejectingTest": "full mapping and bundle identity distinguish equal relation IDs",
+      "cleanRecompile": false
+    },
+    {
+      "id": "mapping-scale",
+      "path": "core/src/main/scala/storymodel4s/core/sourceIdentity.scala",
+      "suite": "storymodel4s.core.D1aSupportSuite",
+      "rejectingTest": "mapping identity binds scale, receipt, composition and correspondence payloads",
+      "cleanRecompile": false
+    },
+    {
+      "id": "bundle-mapping",
+      "path": "core/src/main/scala/storymodel4s/core/sourceIdentity.scala",
+      "suite": "storymodel4s.core.D1aSupportSuite",
+      "rejectingTest": "full mapping and bundle identity distinguish equal relation IDs",
+      "cleanRecompile": false
+    },
+    {
+      "id": "bundle-stream-extent",
+      "path": "core/src/main/scala/storymodel4s/core/sourceIdentity.scala",
+      "suite": "storymodel4s.core.D1aSupportSuite",
+      "rejectingTest": "full mapping and bundle identity distinguish equal relation IDs",
+      "cleanRecompile": false
+    },
+    {
+      "id": "bundle-primary",
+      "path": "core/src/main/scala/storymodel4s/core/sourceIdentity.scala",
+      "suite": "storymodel4s.core.D1aSupportSuite",
+      "rejectingTest": "full bundle identity independently binds its primary fingerprint",
+      "cleanRecompile": false
+    },
+    {
+      "id": "surface-id-v2",
+      "path": "core/src/main/scala/storymodel4s/core/sourceIdentity.scala",
+      "suite": "storymodel4s.core.D1aAtlasSuite",
+      "rejectingTest": "surface digest binds each unit field independently",
+      "cleanRecompile": false
+    },
+    {
+      "id": "surface-kind-v2",
+      "path": "core/src/main/scala/storymodel4s/core/sourceIdentity.scala",
+      "suite": "storymodel4s.core.D1aAtlasSuite",
+      "rejectingTest": "surface digest binds each unit field independently",
+      "cleanRecompile": false
+    },
+    {
+      "id": "surface-span-v2",
+      "path": "core/src/main/scala/storymodel4s/core/sourceIdentity.scala",
+      "suite": "storymodel4s.core.D1aAtlasSuite",
+      "rejectingTest": "surface digest binds each unit field independently",
+      "cleanRecompile": false
+    },
+    {
+      "id": "surface-ordinal-v2",
+      "path": "core/src/main/scala/storymodel4s/core/sourceIdentity.scala",
+      "suite": "storymodel4s.core.D1aAtlasSuite",
+      "rejectingTest": "surface digest binds each unit field independently",
+      "cleanRecompile": false
+    },
+    {
+      "id": "surface-endExclusive-v2",
+      "path": "core/src/main/scala/storymodel4s/core/sourceIdentity.scala",
+      "suite": "storymodel4s.core.D1aAtlasSuite",
+      "rejectingTest": "surface digest binds each unit field independently",
+      "cleanRecompile": false
+    },
+    {
+      "id": "surface-parent-v2",
+      "path": "core/src/main/scala/storymodel4s/core/sourceIdentity.scala",
+      "suite": "storymodel4s.core.D1aAtlasSuite",
+      "rejectingTest": "surface digest binds each unit field independently",
+      "cleanRecompile": false
+    },
+    {
+      "id": "surface-source-v2",
+      "path": "core/src/main/scala/storymodel4s/core/sourceIdentity.scala",
+      "suite": "storymodel4s.core.D1aAtlasSuite",
+      "rejectingTest": "surface binding distinguishes canonical bytes, unit structure and receipt",
+      "cleanRecompile": false
+    },
+    {
+      "id": "codec-text",
+      "path": "codec/src/main/scala/storymodel4s/codec/core.scala",
+      "suite": "storymodel4s.codec.EvidenceSupportCodecSuite",
+      "rejectingTest": "Text payload is complete and its anchored encoding is refused on decode",
+      "cleanRecompile": false
+    },
+    {
+      "id": "codec-mediatime",
+      "path": "codec/src/main/scala/storymodel4s/codec/core.scala",
+      "suite": "storymodel4s.codec.EvidenceSupportCodecSuite",
+      "rejectingTest": "MediaTime payload is complete and its anchored encoding is refused on decode",
+      "cleanRecompile": false
+    },
+    {
+      "id": "codec-shot",
+      "path": "codec/src/main/scala/storymodel4s/codec/core.scala",
+      "suite": "storymodel4s.codec.EvidenceSupportCodecSuite",
+      "rejectingTest": "Shot payload is complete and its anchored encoding is refused on decode",
+      "cleanRecompile": false
+    },
+    {
+      "id": "codec-track",
+      "path": "codec/src/main/scala/storymodel4s/codec/core.scala",
+      "suite": "storymodel4s.codec.EvidenceSupportCodecSuite",
+      "rejectingTest": "Track payload is complete and its anchored encoding is refused on decode",
+      "cleanRecompile": false
+    },
+    {
+      "id": "evidence-decode-refusal",
+      "path": "codec/src/main/scala/storymodel4s/codec/core.scala",
+      "suite": "storymodel4s.codec.EvidenceSupportCodecSuite",
+      "rejectingTest": "Text payload is complete and its anchored encoding is refused on decode",
+      "cleanRecompile": false
+    },
+    {
+      "id": "support-decode-refusal",
+      "path": "codec/src/main/scala/storymodel4s/codec/core.scala",
+      "suite": "storymodel4s.codec.EvidenceSupportCodecSuite",
+      "rejectingTest": "Text payload is complete and its anchored encoding is refused on decode",
+      "cleanRecompile": false
+    },
+    {
+      "id": "text-model-claims",
+      "path": "story/src/main/scala/storymodel4s/story/model.scala",
+      "suite": "storymodel4s.story.D1aTextBoundarySuite",
+      "rejectingTest": "text draft refuses anchored ordinary claim evidence before export",
+      "cleanRecompile": false
+    },
+    {
+      "id": "text-model-boundary",
+      "path": "story/src/main/scala/storymodel4s/story/model.scala",
+      "suite": "storymodel4s.story.D1aTextBoundarySuite",
+      "rejectingTest": "text draft refuses anchored boundary evidence outside the claim ledger",
+      "cleanRecompile": false
+    },
+    {
+      "id": "compiler-ledger",
+      "path": "document/src/main/scala/storymodel4s/document/compiler.scala",
+      "suite": "storymodel4s.document.CompilerSuite",
+      "rejectingTest": "text compiler refuses anchored ledger evidence with an accepting text control",
+      "cleanRecompile": false
+    },
+    {
+      "id": "compiler-inline",
+      "path": "document/src/main/scala/storymodel4s/document/compiler.scala",
+      "suite": "storymodel4s.document.CompilerSuite",
+      "rejectingTest": "text compiler refuses anchored inline evidence with an accepting text control",
+      "cleanRecompile": false
+    },
+    {
+      "id": "probe-NarrativeProposalUnit",
+      "path": "core/src/main/scala/storymodel4s/core/source.scala",
+      "suite": "storymodel4s.coreprobe.D1aConstructionBoundarySuite",
+      "rejectingTest": "NarrativeProposalUnit has no unchecked constructor, copy or Product doors",
+      "cleanRecompile": true
+    },
+    {
+      "id": "probe-AnchoredNarrativeAtlas",
+      "path": "core/src/main/scala/storymodel4s/core/atlas.scala",
+      "suite": "storymodel4s.coreprobe.D1aConstructionBoundarySuite",
+      "rejectingTest": "AnchoredNarrativeAtlas has no unchecked constructor, copy or Product doors",
+      "cleanRecompile": true
+    },
+    {
+      "id": "probe-BoundProposalSurface",
+      "path": "core/src/main/scala/storymodel4s/core/atlas.scala",
+      "suite": "storymodel4s.coreprobe.D1aConstructionBoundarySuite",
+      "rejectingTest": "BoundProposalSurface has no unchecked constructor, copy or Product doors",
+      "cleanRecompile": true
+    },
+    {
+      "id": "probe-sealed-atlas",
+      "path": "core/src/main/scala/storymodel4s/core/atlas.scala",
+      "suite": "storymodel4s.coreprobe.D1aConstructionBoundarySuite",
+      "rejectingTest": "NarrativeSourceAtlas cannot be extended outside core",
+      "cleanRecompile": true
+    }
+  ],
+  "boundaryNotes": [
+    "All new public refusal contracts are mapped to the listed executed witness targets; each has a passing control in its suite.",
+    "Primary-axis interval bounds are also established by checked PlaybackInterval.on on the immutable extent-derived axis ID. The shared within predicate is independently falsified through native stream bounds; no new public unchecked interval constructor is introduced.",
+    "EditionCorrespondence is excluded both by applicable-map selection and the mapping-image case. It supplies no coordinate mapping in this slice.",
+    "Preexisting C1 constructor checks (nonempty support/intervals, positive rational timebase and mapping scale, validated mapping endpoints) remain covered by their existing suites, not claimed as newly introduced guards.",
+    "Identity coverage uses parameter/receipt/stream/surface mutations as well as literal algebraic and collision fixtures; it is not a claim of exhaustive SHA-256 collision testing."
+  ]
+}

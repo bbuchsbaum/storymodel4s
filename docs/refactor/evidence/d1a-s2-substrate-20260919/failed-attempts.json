@@ -1,0 +1,118 @@
+[
+  {
+    "codeRevision": "fef98b53db2b565651d36078196b89fa5b2cfcb6",
+    "command": [
+      "sbt",
+      "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+      "-batch",
+      "coreJVM/testOnly storymodel4s.core.D1aAtlasSuite"
+    ],
+    "exitCode": 1,
+    "cleanBefore": false,
+    "cleanAfter": false,
+    "seconds": 11.125,
+    "logPath": "study/d1a-s2-20260919/atlas-support.log",
+    "logSha256": "ed3aa67132f99f844c105110a62ad6a2798dbd1cac0d3d18004cdf3be0b598a7",
+    "testTotals": [],
+    "aggregateTestCounts": {
+      "Total": 0,
+      "Failed": 0,
+      "Errors": 0,
+      "Passed": 0,
+      "Skipped": 0
+    },
+    "compiled": false,
+    "countedAsWitness": false,
+    "reason": "Mutation harness used Either.orElse with a function instead of a by-name Either; corrected in atlas-support-attempt2."
+  },
+  {
+    "codeRevision": "fef98b53db2b565651d36078196b89fa5b2cfcb6",
+    "command": [
+      "sbt",
+      "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+      "-batch",
+      "coreJVM/testOnly storymodel4s.core.D1aAtlasSuite"
+    ],
+    "exitCode": 0,
+    "cleanBefore": false,
+    "cleanAfter": false,
+    "seconds": 10.743,
+    "logPath": "study/d1a-s2-20260919/surface-id.log",
+    "logSha256": "7ebe51b8c0279823999456372f64f734e4964a24560b2d013cd62b54bd166f15",
+    "testTotals": [
+      "[info] Passed: Total 9, Failed 0, Errors 0, Passed 9"
+    ],
+    "aggregateTestCounts": {
+      "Total": 9,
+      "Failed": 0,
+      "Errors": 0,
+      "Passed": 9,
+      "Skipped": 0
+    },
+    "compiled": true,
+    "countedAsWitness": false,
+    "reason": "Survived: changing child ID also changed canonical order, so order masked omission of ID. New fixture changes ID without changing order."
+  },
+  {
+    "codeRevision": "3cd484d60ef9dd5ecd7099df0ffc63bf5b57fd46",
+    "command": [
+      "sbt",
+      "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+      "-batch",
+      "coreJVM/testOnly storymodel4s.core.D1aSupportSuite",
+      "coreJVM/testOnly storymodel4s.core.D1aAtlasSuite",
+      "coreJVM/testOnly storymodel4s.coreprobe.D1aConstructionBoundarySuite",
+      "codecJVM/testOnly storymodel4s.codec.EvidenceSupportCodecSuite",
+      "storyJVM/testOnly storymodel4s.story.D1aTextBoundarySuite",
+      "documentJVM/testOnly storymodel4s.document.CompilerSuite"
+    ],
+    "exitCode": 1,
+    "cleanBefore": true,
+    "cleanAfter": true,
+    "seconds": 13.371,
+    "logPath": "study/d1a-s2-20260919/restored-control.log",
+    "logSha256": "36db38917f2a09e33ab654d44dc299c1cdddf0777c33d41ff365245a6831a655",
+    "testTotals": [
+      "[info] Passed: Total 19, Failed 0, Errors 0, Passed 19",
+      "[info] Passed: Total 9, Failed 0, Errors 0, Passed 9",
+      "[error] Failed: Total 6, Failed 1, Errors 0, Passed 5"
+    ],
+    "aggregateTestCounts": {
+      "Total": 34,
+      "Failed": 1,
+      "Errors": 0,
+      "Passed": 33,
+      "Skipped": 0
+    },
+    "countedAsWitness": false,
+    "reason": "Incremental restoration left the compile-time sealed-atlas probe compiled under the prior mutant. Repeat restoration with coreJVM/clean; no source changes."
+  },
+  {
+    "codeRevision": "3cd484d60ef9dd5ecd7099df0ffc63bf5b57fd46",
+    "command": [
+      "sbt",
+      "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+      "-batch",
+      "coreJVM/testOnly storymodel4s.core.D1aSupportSuite"
+    ],
+    "exitCode": 0,
+    "cleanBefore": false,
+    "cleanAfter": false,
+    "seconds": 12.391,
+    "logPath": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1a-s2-20260919/interval-axis-selection.log",
+    "logSha256": "f965052887ba4c0bc09d22a89179f7cb9e4caef9665a103f364b27c1ea17f043",
+    "testTotals": [
+      "[info] Passed: Total 19, Failed 0, Errors 0, Passed 19"
+    ],
+    "aggregateTestCounts": {
+      "Total": 19,
+      "Failed": 0,
+      "Errors": 0,
+      "Passed": 19,
+      "Skipped": 0
+    },
+    "compiled": true,
+    "countedAsWitness": false,
+    "reason": "Survived: gapped union produced a mixed-axis set after selector deletion, so a second refusal masked the selector. Permanent single-interval controls appended in c24ddd66 for MediaTime, Shot and Track."
+  }
+]

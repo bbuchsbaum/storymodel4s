@@ -1,0 +1,15 @@
+{
+  "scope": "Independent inspection of appended S2 selector test; no Scala execution by root",
+  "before": "3cd484d60ef9dd5ecd7099df0ffc63bf5b57fd46",
+  "after": "c24ddd66026f0d1848b61369b0bbaff7a90a5d40",
+  "changedPaths": [
+    "core/src/test/scala/storymodel4s/core/D1aSupportSuite.scala"
+  ],
+  "originalTestFileIsExactPrefix": true,
+  "oldTestFileSha256": "c39ddbf8c16d90b3beb81c39bae9eeefeca3f48973e3f4a5b2c3a8df1b8c5525",
+  "newTestFileSha256": "88e7dc9363b1dd4d1cff7b9b5763984249ebbbb095e7ca35cdfbbf64dffdc80c",
+  "appendedTestCount": 1,
+  "appendedTestLines": 20,
+  "review": "Each MediaTime/Shot/Track singleton has exact correct-axis control and foreign-axis refusal; no mixed-axis downstream rejection can mask omitted selection. Separate cold reviewer reported no findings.",
+  "qualification": "Existing original test bodies/helpers and all production sources are unchanged; retain earlier witnesses with their actual executed revisions/counts. New selectors and full candidate gate require new receipts."
+}

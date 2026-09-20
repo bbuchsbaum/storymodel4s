@@ -1,0 +1,1968 @@
+{
+  "codeRevision": "c24ddd66026f0d1848b61369b0bbaff7a90a5d40",
+  "mutations": [
+    {
+      "codeRevision": "fef98b53db2b565651d36078196b89fa5b2cfcb6",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "coreJVM/testOnly storymodel4s.core.D1aSupportSuite"
+      ],
+      "exitCode": 1,
+      "cleanBefore": false,
+      "cleanAfter": false,
+      "seconds": 11.28,
+      "logPath": "study/d1a-s2-20260919/foreign-bundle.log",
+      "logSha256": "ed108aa19259da9a79b54d8b9cb834a9f515feca91fa9b7544b4d590a57b5fc6",
+      "testTotals": [
+        "[error] Failed: Total 19, Failed 1, Errors 0, Passed 18"
+      ],
+      "aggregateTestCounts": {
+        "Total": 19,
+        "Failed": 1,
+        "Errors": 0,
+        "Passed": 18,
+        "Skipped": 0
+      },
+      "path": "core/src/main/scala/storymodel4s/core/support.scala",
+      "compiled": true,
+      "cleanRecompile": false,
+      "originalSha256": "7511d849b1239b2f23f36179b8b8a59073876f5a20a92a56fbafa125ce1f1712",
+      "mutantSha256": "708bd67c81792090758e78e8c72033dba0b027adbb565c3a7c15a175fee3dafb",
+      "namedRejectingTest": "refuse foreign bundle even with a local stream",
+      "acceptingControl": "accepting control: all four lawful anchor kinds survive",
+      "acceptingControlPassed": true,
+      "failedTests": [
+        "refuse foreign bundle even with a local stream"
+      ]
+    },
+    {
+      "codeRevision": "fef98b53db2b565651d36078196b89fa5b2cfcb6",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "coreJVM/testOnly storymodel4s.core.D1aSupportSuite"
+      ],
+      "exitCode": 1,
+      "cleanBefore": false,
+      "cleanAfter": false,
+      "seconds": 11.306,
+      "logPath": "study/d1a-s2-20260919/foreign-stream.log",
+      "logSha256": "e8605efb27a5e7f8cb9d02b8ddf634f15318070560416b7fad429eae5a547832",
+      "testTotals": [
+        "[error] Failed: Total 19, Failed 1, Errors 0, Passed 18"
+      ],
+      "aggregateTestCounts": {
+        "Total": 19,
+        "Failed": 1,
+        "Errors": 0,
+        "Passed": 18,
+        "Skipped": 0
+      },
+      "path": "core/src/main/scala/storymodel4s/core/support.scala",
+      "compiled": true,
+      "cleanRecompile": false,
+      "originalSha256": "7511d849b1239b2f23f36179b8b8a59073876f5a20a92a56fbafa125ce1f1712",
+      "mutantSha256": "c8675607991f823fab0650023e35268567dfd41edbaba1649f27293dffd11128",
+      "namedRejectingTest": "refuse foreign stream even with a local bundle",
+      "acceptingControl": "accepting control: all four lawful anchor kinds survive",
+      "acceptingControlPassed": true,
+      "failedTests": [
+        "refuse foreign stream even with a local bundle"
+      ]
+    },
+    {
+      "codeRevision": "fef98b53db2b565651d36078196b89fa5b2cfcb6",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "coreJVM/testOnly storymodel4s.core.D1aSupportSuite"
+      ],
+      "exitCode": 1,
+      "cleanBefore": false,
+      "cleanAfter": false,
+      "seconds": 11.844,
+      "logPath": "study/d1a-s2-20260919/stream-kind.log",
+      "logSha256": "0603c0685b2abbbfe8ca8e296ad37d083106ca6c4258aad787e7336948dfe524",
+      "testTotals": [
+        "[error] Failed: Total 19, Failed 1, Errors 0, Passed 18"
+      ],
+      "aggregateTestCounts": {
+        "Total": 19,
+        "Failed": 1,
+        "Errors": 0,
+        "Passed": 18,
+        "Skipped": 0
+      },
+      "path": "core/src/main/scala/storymodel4s/core/support.scala",
+      "compiled": true,
+      "cleanRecompile": false,
+      "originalSha256": "7511d849b1239b2f23f36179b8b8a59073876f5a20a92a56fbafa125ce1f1712",
+      "mutantSha256": "de7d1df05cffe4282737bdd8bc240dcda7baf5692d2b777f90dbbe0bad3cd867",
+      "namedRejectingTest": "refuse anchor stream-kind mismatch",
+      "acceptingControl": "accepting control: all four lawful anchor kinds survive",
+      "acceptingControlPassed": true,
+      "failedTests": [
+        "refuse anchor stream-kind mismatch"
+      ]
+    },
+    {
+      "codeRevision": "fef98b53db2b565651d36078196b89fa5b2cfcb6",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "coreJVM/testOnly storymodel4s.core.D1aSupportSuite"
+      ],
+      "exitCode": 1,
+      "cleanBefore": false,
+      "cleanAfter": false,
+      "seconds": 11.888,
+      "logPath": "study/d1a-s2-20260919/interval-axis.log",
+      "logSha256": "fd06346622ff6aa2a250617a761f941e8a5ec2367e3a22b682e837c25704d708",
+      "testTotals": [
+        "[error] Failed: Total 19, Failed 1, Errors 0, Passed 18"
+      ],
+      "aggregateTestCounts": {
+        "Total": 19,
+        "Failed": 1,
+        "Errors": 0,
+        "Passed": 18,
+        "Skipped": 0
+      },
+      "path": "core/src/main/scala/storymodel4s/core/support.scala",
+      "compiled": true,
+      "cleanRecompile": false,
+      "originalSha256": "7511d849b1239b2f23f36179b8b8a59073876f5a20a92a56fbafa125ce1f1712",
+      "mutantSha256": "0b57f35b710810a35677a6c5c1d0d5419856e025b49db6275688e6a82ade6987",
+      "namedRejectingTest": "refuse MediaTime axis different from its interval axis",
+      "acceptingControl": "accepting control: all four lawful anchor kinds survive",
+      "acceptingControlPassed": true,
+      "failedTests": [
+        "refuse MediaTime axis different from its interval axis"
+      ]
+    },
+    {
+      "codeRevision": "fef98b53db2b565651d36078196b89fa5b2cfcb6",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "coreJVM/testOnly storymodel4s.core.D1aSupportSuite"
+      ],
+      "exitCode": 1,
+      "cleanBefore": false,
+      "cleanAfter": false,
+      "seconds": 11.278,
+      "logPath": "study/d1a-s2-20260919/text-extent.log",
+      "logSha256": "a01604dec3cbf3318adf92a31f68bd3ea9ea3a6a55496c20043a4f59996917f0",
+      "testTotals": [
+        "[error] Failed: Total 19, Failed 1, Errors 0, Passed 18"
+      ],
+      "aggregateTestCounts": {
+        "Total": 19,
+        "Failed": 1,
+        "Errors": 0,
+        "Passed": 18,
+        "Skipped": 0
+      },
+      "path": "core/src/main/scala/storymodel4s/core/support.scala",
+      "compiled": true,
+      "cleanRecompile": false,
+      "originalSha256": "7511d849b1239b2f23f36179b8b8a59073876f5a20a92a56fbafa125ce1f1712",
+      "mutantSha256": "bcf4509aa671ccf8f37d7f2a86b2a2f5206696f669a4cd6464478bdd398b86b4",
+      "namedRejectingTest": "refuse text spans outside the selected extent",
+      "acceptingControl": "accepting control: all four lawful anchor kinds survive",
+      "acceptingControlPassed": true,
+      "failedTests": [
+        "refuse text spans outside the selected extent"
+      ]
+    },
+    {
+      "codeRevision": "fef98b53db2b565651d36078196b89fa5b2cfcb6",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "coreJVM/testOnly storymodel4s.core.D1aSupportSuite"
+      ],
+      "exitCode": 1,
+      "cleanBefore": false,
+      "cleanAfter": false,
+      "seconds": 11.031,
+      "logPath": "study/d1a-s2-20260919/stream-axis.log",
+      "logSha256": "6b7a698e05f84c97c70c032cb63ab946e2af465a3a0d2bfc184755cc02e430b4",
+      "testTotals": [
+        "[error] Failed: Total 19, Failed 2, Errors 0, Passed 17"
+      ],
+      "aggregateTestCounts": {
+        "Total": 19,
+        "Failed": 2,
+        "Errors": 0,
+        "Passed": 17,
+        "Skipped": 0
+      },
+      "path": "core/src/main/scala/storymodel4s/core/support.scala",
+      "compiled": true,
+      "cleanRecompile": false,
+      "originalSha256": "7511d849b1239b2f23f36179b8b8a59073876f5a20a92a56fbafa125ce1f1712",
+      "mutantSha256": "c88bc63737e874549bf319204c0e549171d47114de9cbb7409a500bfafbc043a",
+      "namedRejectingTest": "right bundle does not license another stream's axis",
+      "acceptingControl": "accepting control: all four lawful anchor kinds survive",
+      "acceptingControlPassed": true,
+      "failedTests": [
+        "refuse foreign axis even with local bundle and stream",
+        "right bundle does not license another stream's axis"
+      ]
+    },
+    {
+      "codeRevision": "fef98b53db2b565651d36078196b89fa5b2cfcb6",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "coreJVM/testOnly storymodel4s.core.D1aSupportSuite"
+      ],
+      "exitCode": 1,
+      "cleanBefore": false,
+      "cleanAfter": false,
+      "seconds": 10.977,
+      "logPath": "study/d1a-s2-20260919/native-extent.log",
+      "logSha256": "260740fff1f32da97415f61f59cfb6f002b9838158610902d88166e72eb7e53e",
+      "testTotals": [
+        "[error] Failed: Total 19, Failed 2, Errors 0, Passed 17"
+      ],
+      "aggregateTestCounts": {
+        "Total": 19,
+        "Failed": 2,
+        "Errors": 0,
+        "Passed": 17,
+        "Skipped": 0
+      },
+      "path": "core/src/main/scala/storymodel4s/core/support.scala",
+      "compiled": true,
+      "cleanRecompile": false,
+      "originalSha256": "7511d849b1239b2f23f36179b8b8a59073876f5a20a92a56fbafa125ce1f1712",
+      "mutantSha256": "6093852b05b6bf9b094e63a0d2804d58c66b36364e0377afe121bf89959431f0",
+      "namedRejectingTest": "native support obeys the selected stream extent",
+      "acceptingControl": "accepting control: all four lawful anchor kinds survive",
+      "acceptingControlPassed": true,
+      "failedTests": [
+        "native support obeys the selected stream extent",
+        "composition image preserves gaps and refuses source segments outside stream extent"
+      ]
+    },
+    {
+      "codeRevision": "fef98b53db2b565651d36078196b89fa5b2cfcb6",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "coreJVM/testOnly storymodel4s.core.D1aSupportSuite"
+      ],
+      "exitCode": 1,
+      "cleanBefore": false,
+      "cleanAfter": false,
+      "seconds": 11.146,
+      "logPath": "study/d1a-s2-20260919/mapping-image.log",
+      "logSha256": "f39d7604dfb2be253b936bff6d27a8a79ed6188570ec19c85591bf0f09654da0",
+      "testTotals": [
+        "[error] Failed: Total 19, Failed 3, Errors 0, Passed 16"
+      ],
+      "aggregateTestCounts": {
+        "Total": 19,
+        "Failed": 3,
+        "Errors": 0,
+        "Passed": 16,
+        "Skipped": 0
+      },
+      "path": "core/src/main/scala/storymodel4s/core/support.scala",
+      "compiled": true,
+      "cleanRecompile": false,
+      "originalSha256": "7511d849b1239b2f23f36179b8b8a59073876f5a20a92a56fbafa125ce1f1712",
+      "mutantSha256": "aaf10288d8077d124238fe9d181514e4f4450b27669087d9e72d87fdd9bb33fb",
+      "namedRejectingTest": "clock mapping admits its exact image and refuses partial or absent coverage",
+      "acceptingControl": "accepting control: all four lawful anchor kinds survive",
+      "acceptingControlPassed": true,
+      "failedTests": [
+        "clock mapping admits its exact image and refuses partial or absent coverage",
+        "composition image preserves gaps and refuses source segments outside stream extent",
+        "clock image uses native timebase and exact fractional boundaries"
+      ]
+    },
+    {
+      "codeRevision": "fef98b53db2b565651d36078196b89fa5b2cfcb6",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "coreJVM/testOnly storymodel4s.core.D1aSupportSuite"
+      ],
+      "exitCode": 1,
+      "cleanBefore": false,
+      "cleanAfter": false,
+      "seconds": 11.18,
+      "logPath": "study/d1a-s2-20260919/composition-source.log",
+      "logSha256": "74ef37aaa6a6080b5193a077a663418f171c9fdb4b8cd4d2b1a58d8cc1cdfcc8",
+      "testTotals": [
+        "[error] Failed: Total 19, Failed 1, Errors 0, Passed 18"
+      ],
+      "aggregateTestCounts": {
+        "Total": 19,
+        "Failed": 1,
+        "Errors": 0,
+        "Passed": 18,
+        "Skipped": 0
+      },
+      "path": "core/src/main/scala/storymodel4s/core/support.scala",
+      "compiled": true,
+      "cleanRecompile": false,
+      "originalSha256": "7511d849b1239b2f23f36179b8b8a59073876f5a20a92a56fbafa125ce1f1712",
+      "mutantSha256": "8ce586996ccb0e7b110debd7c1adefe310650416451628f1fe48a3080961e8ee",
+      "namedRejectingTest": "composition image preserves gaps and refuses source segments outside stream extent",
+      "acceptingControl": "accepting control: all four lawful anchor kinds survive",
+      "acceptingControlPassed": true,
+      "failedTests": [
+        "composition image preserves gaps and refuses source segments outside stream extent"
+      ]
+    },
+    {
+      "codeRevision": "fef98b53db2b565651d36078196b89fa5b2cfcb6",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "coreJVM/testOnly storymodel4s.core.D1aSupportSuite"
+      ],
+      "exitCode": 1,
+      "cleanBefore": false,
+      "cleanAfter": false,
+      "seconds": 11.737,
+      "logPath": "study/d1a-s2-20260919/composition-gap.log",
+      "logSha256": "66740f598e511c1409e277fc38af63d15d9495fae97f46cddb4f0e2e17a3b4f2",
+      "testTotals": [
+        "[error] Failed: Total 19, Failed 1, Errors 0, Passed 18"
+      ],
+      "aggregateTestCounts": {
+        "Total": 19,
+        "Failed": 1,
+        "Errors": 0,
+        "Passed": 18,
+        "Skipped": 0
+      },
+      "path": "core/src/main/scala/storymodel4s/core/support.scala",
+      "compiled": true,
+      "cleanRecompile": false,
+      "originalSha256": "7511d849b1239b2f23f36179b8b8a59073876f5a20a92a56fbafa125ce1f1712",
+      "mutantSha256": "c0c35c63e29598f17bcbb3505da8e08cb4d96aad7a557132cfbc5eb41c47420a",
+      "namedRejectingTest": "composition image preserves gaps and refuses source segments outside stream extent",
+      "acceptingControl": "accepting control: all four lawful anchor kinds survive",
+      "acceptingControlPassed": true,
+      "failedTests": [
+        "composition image preserves gaps and refuses source segments outside stream extent"
+      ]
+    },
+    {
+      "codeRevision": "fef98b53db2b565651d36078196b89fa5b2cfcb6",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "coreJVM/testOnly storymodel4s.core.D1aSupportSuite"
+      ],
+      "exitCode": 1,
+      "cleanBefore": false,
+      "cleanAfter": false,
+      "seconds": 11.167,
+      "logPath": "study/d1a-s2-20260919/clock-timebase.log",
+      "logSha256": "b7b185781724f3ebddd3e3dcf7b6a4f9687dfc3d52a0326a6b011cc7a015cad8",
+      "testTotals": [
+        "[error] Failed: Total 19, Failed 2, Errors 0, Passed 17"
+      ],
+      "aggregateTestCounts": {
+        "Total": 19,
+        "Failed": 2,
+        "Errors": 0,
+        "Passed": 17,
+        "Skipped": 0
+      },
+      "path": "core/src/main/scala/storymodel4s/core/support.scala",
+      "compiled": true,
+      "cleanRecompile": false,
+      "originalSha256": "7511d849b1239b2f23f36179b8b8a59073876f5a20a92a56fbafa125ce1f1712",
+      "mutantSha256": "7addab600a695dc09b4e1ea2ae4ed51e3ccff6220c074838c836cd85fdac29af",
+      "namedRejectingTest": "clock image uses native timebase and exact fractional boundaries",
+      "acceptingControl": "accepting control: all four lawful anchor kinds survive",
+      "acceptingControlPassed": true,
+      "failedTests": [
+        "clock mapping admits its exact image and refuses partial or absent coverage",
+        "clock image uses native timebase and exact fractional boundaries"
+      ]
+    },
+    {
+      "codeRevision": "fef98b53db2b565651d36078196b89fa5b2cfcb6",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "coreJVM/testOnly storymodel4s.core.D1aSupportSuite"
+      ],
+      "exitCode": 1,
+      "cleanBefore": false,
+      "cleanAfter": false,
+      "seconds": 12.938,
+      "logPath": "study/d1a-s2-20260919/text-stream-selection.log",
+      "logSha256": "e60399073a9c989412a48be4bb3273de3b537a10b44b57daf3059a7d1f2d8e8f",
+      "testTotals": [
+        "[error] Failed: Total 19, Failed 1, Errors 0, Passed 18"
+      ],
+      "aggregateTestCounts": {
+        "Total": 19,
+        "Failed": 1,
+        "Errors": 0,
+        "Passed": 18,
+        "Skipped": 0
+      },
+      "path": "core/src/main/scala/storymodel4s/core/source.scala",
+      "compiled": true,
+      "cleanRecompile": false,
+      "originalSha256": "97d4c0309638c88f26a9fc010ec9f45d3c233693ad35f6f673bbd2b428b3484b",
+      "mutantSha256": "1ff090f2fc2731dd11947f84e5ed3561a976b3540c371b26418c582fd191abdd",
+      "namedRejectingTest": "text spans are selected per stream",
+      "acceptingControl": "accepting control: all four lawful anchor kinds survive",
+      "acceptingControlPassed": true,
+      "failedTests": [
+        "text spans are selected per stream"
+      ]
+    },
+    {
+      "codeRevision": "fef98b53db2b565651d36078196b89fa5b2cfcb6",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "coreJVM/testOnly storymodel4s.core.D1aSupportSuite"
+      ],
+      "exitCode": 1,
+      "cleanBefore": false,
+      "cleanAfter": false,
+      "seconds": 12.692,
+      "logPath": "study/d1a-s2-20260919/union-overlap.log",
+      "logSha256": "58db09adef496d709ca538db42ceab226358f9d4aa5bc052cd956efe1004331e",
+      "testTotals": [
+        "[error] Failed: Total 19, Failed 1, Errors 0, Passed 18"
+      ],
+      "aggregateTestCounts": {
+        "Total": 19,
+        "Failed": 1,
+        "Errors": 0,
+        "Passed": 18,
+        "Skipped": 0
+      },
+      "path": "core/src/main/scala/storymodel4s/core/source.scala",
+      "compiled": true,
+      "cleanRecompile": false,
+      "originalSha256": "97d4c0309638c88f26a9fc010ec9f45d3c233693ad35f6f673bbd2b428b3484b",
+      "mutantSha256": "5863e28472f04ef6e565cad67262d358fd7832a55facddb229146b0b25271ffc",
+      "namedRejectingTest": "interval union merges overlap and adjacency while preserving gaps",
+      "acceptingControl": "accepting control: all four lawful anchor kinds survive",
+      "acceptingControlPassed": true,
+      "failedTests": [
+        "interval union merges overlap and adjacency while preserving gaps"
+      ]
+    },
+    {
+      "codeRevision": "fef98b53db2b565651d36078196b89fa5b2cfcb6",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "coreJVM/testOnly storymodel4s.core.D1aSupportSuite"
+      ],
+      "exitCode": 1,
+      "cleanBefore": false,
+      "cleanAfter": false,
+      "seconds": 12.569,
+      "logPath": "study/d1a-s2-20260919/union-adjacency.log",
+      "logSha256": "6cfee404a0d66f843faf8df2dc9afd6399d7b938cc9b3e0217b78493ad0d3ac6",
+      "testTotals": [
+        "[error] Failed: Total 19, Failed 1, Errors 0, Passed 18"
+      ],
+      "aggregateTestCounts": {
+        "Total": 19,
+        "Failed": 1,
+        "Errors": 0,
+        "Passed": 18,
+        "Skipped": 0
+      },
+      "path": "core/src/main/scala/storymodel4s/core/source.scala",
+      "compiled": true,
+      "cleanRecompile": false,
+      "originalSha256": "97d4c0309638c88f26a9fc010ec9f45d3c233693ad35f6f673bbd2b428b3484b",
+      "mutantSha256": "5885c80daa442e71dc958588d45219edefb2cfb7fcc459c4014aee7717c41708",
+      "namedRejectingTest": "interval union merges overlap and adjacency while preserving gaps",
+      "acceptingControl": "accepting control: all four lawful anchor kinds survive",
+      "acceptingControlPassed": true,
+      "failedTests": [
+        "interval union merges overlap and adjacency while preserving gaps"
+      ]
+    },
+    {
+      "codeRevision": "fef98b53db2b565651d36078196b89fa5b2cfcb6",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "coreJVM/testOnly storymodel4s.core.D1aSupportSuite"
+      ],
+      "exitCode": 1,
+      "cleanBefore": false,
+      "cleanAfter": false,
+      "seconds": 12.143,
+      "logPath": "study/d1a-s2-20260919/mapping-equivalence.log",
+      "logSha256": "09176d8ce1368dc2c68b799658111d5103016c6c10e2d9c03c13e17035ce91a7",
+      "testTotals": [
+        "[error] Failed: Total 19, Failed 1, Errors 0, Passed 18"
+      ],
+      "aggregateTestCounts": {
+        "Total": 19,
+        "Failed": 1,
+        "Errors": 0,
+        "Passed": 18,
+        "Skipped": 0
+      },
+      "path": "core/src/main/scala/storymodel4s/core/support.scala",
+      "compiled": true,
+      "cleanRecompile": false,
+      "originalSha256": "7511d849b1239b2f23f36179b8b8a59073876f5a20a92a56fbafa125ce1f1712",
+      "mutantSha256": "3b5765d005b0b7043a1638670a37a483a0c28d6029fe3016f28cf79738552437",
+      "namedRejectingTest": "equivalent mapping order has identical identity and support admission",
+      "acceptingControl": "accepting control: all four lawful anchor kinds survive",
+      "acceptingControlPassed": true,
+      "failedTests": [
+        "equivalent mapping order has identical identity and support admission"
+      ]
+    },
+    {
+      "codeRevision": "fef98b53db2b565651d36078196b89fa5b2cfcb6",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "coreJVM/testOnly storymodel4s.core.D1aSupportSuite"
+      ],
+      "exitCode": 1,
+      "cleanBefore": false,
+      "cleanAfter": false,
+      "seconds": 13.249,
+      "logPath": "study/d1a-s2-20260919/receipt-safe-binding.log",
+      "logSha256": "cca37b76eb31209bccc55230804ce92f3a38ddef8bc1aa2a42af87ab4a117d37",
+      "testTotals": [
+        "[error] Failed: Total 19, Failed 1, Errors 0, Passed 18"
+      ],
+      "aggregateTestCounts": {
+        "Total": 19,
+        "Failed": 1,
+        "Errors": 0,
+        "Passed": 18,
+        "Skipped": 0
+      },
+      "path": "core/src/main/scala/storymodel4s/core/source.scala",
+      "compiled": true,
+      "cleanRecompile": false,
+      "originalSha256": "97d4c0309638c88f26a9fc010ec9f45d3c233693ad35f6f673bbd2b428b3484b",
+      "mutantSha256": "9dea2e7068606233164a5955700fd0f33e400c01d21d9d98cef12bf112327ca5",
+      "junitSha256": "5c86c4d5da5600fb93cb32fad5d25e04156b425ebf5d06178c3990881748b235",
+      "namedRejectingTest": "safe receipt binding distinguishes legacy delimiter collision",
+      "acceptingControl": "accepting control: all four lawful anchor kinds survive",
+      "acceptingControlPassed": true,
+      "failedTests": [
+        "safe receipt binding distinguishes legacy delimiter collision"
+      ]
+    },
+    {
+      "codeRevision": "fef98b53db2b565651d36078196b89fa5b2cfcb6",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "coreJVM/testOnly storymodel4s.core.D1aSupportSuite"
+      ],
+      "exitCode": 1,
+      "cleanBefore": false,
+      "cleanAfter": false,
+      "seconds": 12.94,
+      "logPath": "study/d1a-s2-20260919/mapping-offset.log",
+      "logSha256": "5f5eabf0e68a5ece2dbce71f77a8d700357d1637102186ae07708b34ebd255f7",
+      "testTotals": [
+        "[error] Failed: Total 19, Failed 2, Errors 0, Passed 17"
+      ],
+      "aggregateTestCounts": {
+        "Total": 19,
+        "Failed": 2,
+        "Errors": 0,
+        "Passed": 17,
+        "Skipped": 0
+      },
+      "path": "core/src/main/scala/storymodel4s/core/sourceIdentity.scala",
+      "compiled": true,
+      "cleanRecompile": false,
+      "originalSha256": "b8a9b0b910820ebca08a05e89f7ae65b6b05a76acdb12606b233eb0ebb751008",
+      "mutantSha256": "35fd019f0cb77855ec5c4bb84f64dfc336ac796291a3c0929c6f75ad3c1627eb",
+      "junitSha256": "03208f4a79eac85169415e1025fd482de26b1a66e4757f73c3ad39ec0b586bd6",
+      "namedRejectingTest": "full mapping and bundle identity distinguish equal relation IDs",
+      "acceptingControl": "accepting control: all four lawful anchor kinds survive",
+      "acceptingControlPassed": true,
+      "failedTests": [
+        "clock mapping admits its exact image and refuses partial or absent coverage",
+        "full mapping and bundle identity distinguish equal relation IDs"
+      ]
+    },
+    {
+      "codeRevision": "fef98b53db2b565651d36078196b89fa5b2cfcb6",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "coreJVM/testOnly storymodel4s.core.D1aSupportSuite"
+      ],
+      "exitCode": 1,
+      "cleanBefore": false,
+      "cleanAfter": false,
+      "seconds": 10.875,
+      "logPath": "study/d1a-s2-20260919/mapping-scale.log",
+      "logSha256": "2588752593c17b593458751d6ce4064da54966063335be1ee9e3bd19dca62c21",
+      "testTotals": [
+        "[error] Failed: Total 19, Failed 1, Errors 0, Passed 18"
+      ],
+      "aggregateTestCounts": {
+        "Total": 19,
+        "Failed": 1,
+        "Errors": 0,
+        "Passed": 18,
+        "Skipped": 0
+      },
+      "path": "core/src/main/scala/storymodel4s/core/sourceIdentity.scala",
+      "compiled": true,
+      "cleanRecompile": false,
+      "originalSha256": "b8a9b0b910820ebca08a05e89f7ae65b6b05a76acdb12606b233eb0ebb751008",
+      "mutantSha256": "e7f16922e109732147bf588c0f8a4ca65ce1328f1f4314c44b289b7637ad394a",
+      "junitSha256": "91642a34a2f7be2c2558a811a9f1bc521bb8237357276538ca2b614b2ff06d62",
+      "namedRejectingTest": "mapping identity binds scale, receipt, composition and correspondence payloads",
+      "acceptingControl": "accepting control: all four lawful anchor kinds survive",
+      "acceptingControlPassed": true,
+      "failedTests": [
+        "mapping identity binds scale, receipt, composition and correspondence payloads"
+      ]
+    },
+    {
+      "codeRevision": "fef98b53db2b565651d36078196b89fa5b2cfcb6",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "coreJVM/testOnly storymodel4s.core.D1aSupportSuite"
+      ],
+      "exitCode": 1,
+      "cleanBefore": false,
+      "cleanAfter": false,
+      "seconds": 11.126,
+      "logPath": "study/d1a-s2-20260919/bundle-mapping.log",
+      "logSha256": "848aa9b6e4a038ea4be1c3bfe8248e958425051a456e48f1cf742351a376de8f",
+      "testTotals": [
+        "[error] Failed: Total 19, Failed 1, Errors 0, Passed 18"
+      ],
+      "aggregateTestCounts": {
+        "Total": 19,
+        "Failed": 1,
+        "Errors": 0,
+        "Passed": 18,
+        "Skipped": 0
+      },
+      "path": "core/src/main/scala/storymodel4s/core/sourceIdentity.scala",
+      "compiled": true,
+      "cleanRecompile": false,
+      "originalSha256": "b8a9b0b910820ebca08a05e89f7ae65b6b05a76acdb12606b233eb0ebb751008",
+      "mutantSha256": "a1ded580bf87904bb62d1675909fa07b828c67d9d57e84e916d3ea25e22e9077",
+      "junitSha256": "835bea7e802067dd90b07985af3d2fee9990f1f729754c8e6cb55c7287eefd38",
+      "namedRejectingTest": "full mapping and bundle identity distinguish equal relation IDs",
+      "acceptingControl": "accepting control: all four lawful anchor kinds survive",
+      "acceptingControlPassed": true,
+      "failedTests": [
+        "full mapping and bundle identity distinguish equal relation IDs"
+      ]
+    },
+    {
+      "codeRevision": "fef98b53db2b565651d36078196b89fa5b2cfcb6",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "coreJVM/testOnly storymodel4s.core.D1aSupportSuite"
+      ],
+      "exitCode": 1,
+      "cleanBefore": false,
+      "cleanAfter": false,
+      "seconds": 10.923,
+      "logPath": "study/d1a-s2-20260919/bundle-stream-extent.log",
+      "logSha256": "f81312e521a6d1304193f383d8618000a887e8aa0862736663c4afff8e15a28d",
+      "testTotals": [
+        "[error] Failed: Total 19, Failed 1, Errors 0, Passed 18"
+      ],
+      "aggregateTestCounts": {
+        "Total": 19,
+        "Failed": 1,
+        "Errors": 0,
+        "Passed": 18,
+        "Skipped": 0
+      },
+      "path": "core/src/main/scala/storymodel4s/core/sourceIdentity.scala",
+      "compiled": true,
+      "cleanRecompile": false,
+      "originalSha256": "b8a9b0b910820ebca08a05e89f7ae65b6b05a76acdb12606b233eb0ebb751008",
+      "mutantSha256": "f85201fd2d6e4e078379ae3915bc1d661eaf4cb145074e49cbed32d55add0edd",
+      "junitSha256": "1b38b3ab60b3d7c97a3cae841f523e44d6915a5fee9e9da511c1081cbf607a6f",
+      "namedRejectingTest": "full mapping and bundle identity distinguish equal relation IDs",
+      "acceptingControl": "accepting control: all four lawful anchor kinds survive",
+      "acceptingControlPassed": true,
+      "failedTests": [
+        "full mapping and bundle identity distinguish equal relation IDs"
+      ]
+    },
+    {
+      "codeRevision": "fef98b53db2b565651d36078196b89fa5b2cfcb6",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "coreJVM/testOnly storymodel4s.core.D1aSupportSuite"
+      ],
+      "exitCode": 1,
+      "cleanBefore": false,
+      "cleanAfter": false,
+      "seconds": 11.021,
+      "logPath": "study/d1a-s2-20260919/bundle-primary.log",
+      "logSha256": "6a40bdb15035f0701808504ae88bc33fd90ade55447c5360aae9194b1882a8f9",
+      "testTotals": [
+        "[error] Failed: Total 19, Failed 1, Errors 0, Passed 18"
+      ],
+      "aggregateTestCounts": {
+        "Total": 19,
+        "Failed": 1,
+        "Errors": 0,
+        "Passed": 18,
+        "Skipped": 0
+      },
+      "path": "core/src/main/scala/storymodel4s/core/sourceIdentity.scala",
+      "compiled": true,
+      "cleanRecompile": false,
+      "originalSha256": "b8a9b0b910820ebca08a05e89f7ae65b6b05a76acdb12606b233eb0ebb751008",
+      "mutantSha256": "fc7165be9002a0e1cc8b70fd5732db8b2ac70f18cbb83f9579e31b3f36b1721c",
+      "junitSha256": "3f3b55f1ffe0da378f693989ca6b608cf745a9e0bb739c0b97f5434e909af4ab",
+      "namedRejectingTest": "full bundle identity independently binds its primary fingerprint",
+      "acceptingControl": "accepting control: all four lawful anchor kinds survive",
+      "acceptingControlPassed": true,
+      "failedTests": [
+        "full bundle identity independently binds its primary fingerprint"
+      ]
+    },
+    {
+      "codeRevision": "3cd484d60ef9dd5ecd7099df0ffc63bf5b57fd46",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "coreJVM/testOnly storymodel4s.core.D1aAtlasSuite"
+      ],
+      "exitCode": 1,
+      "cleanBefore": false,
+      "cleanAfter": false,
+      "seconds": 12.962,
+      "logPath": "study/d1a-s2-20260919/duplicate-unit-v2.log",
+      "logSha256": "cc92b6f8e33216c0cfaa918413eaafddda747436d64147347dd63f0069826ef9",
+      "testTotals": [
+        "[error] Failed: Total 9, Failed 1, Errors 0, Passed 8"
+      ],
+      "aggregateTestCounts": {
+        "Total": 9,
+        "Failed": 1,
+        "Errors": 0,
+        "Passed": 8,
+        "Skipped": 0
+      },
+      "path": "core/src/main/scala/storymodel4s/core/atlas.scala",
+      "compiled": true,
+      "cleanRecompile": false,
+      "originalSha256": "64c1baab5d34036dcadf15a9d40b247cef5180ffed371663a48bc6649a7a55b8",
+      "mutantSha256": "a0675002e0eeea54825e64e948fe04ae6edf9a1a71a8372300da734fbb324d63",
+      "junitSha256": "b1ce5940fe47e0ffd03096a51af3dd21a6bb387008ddc5f1415735dfc53533b6",
+      "namedRejectingTest": "refuse duplicate proposal unit IDs before map construction",
+      "acceptingControl": "accepting control: unique units and bound sentences have exact lookup",
+      "acceptingControlPassed": true,
+      "failedTests": [
+        "refuse duplicate proposal unit IDs before map construction"
+      ]
+    },
+    {
+      "codeRevision": "3cd484d60ef9dd5ecd7099df0ffc63bf5b57fd46",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "coreJVM/testOnly storymodel4s.core.D1aAtlasSuite"
+      ],
+      "exitCode": 1,
+      "cleanBefore": false,
+      "cleanAfter": false,
+      "seconds": 12.578,
+      "logPath": "study/d1a-s2-20260919/duplicate-surface-v2.log",
+      "logSha256": "ae5f37fefd9a2e2950dcf7af477334db5dd5c0f2565197f927f715ebabbaec3f",
+      "testTotals": [
+        "[error] Failed: Total 9, Failed 1, Errors 0, Passed 8"
+      ],
+      "aggregateTestCounts": {
+        "Total": 9,
+        "Failed": 1,
+        "Errors": 0,
+        "Passed": 8,
+        "Skipped": 0
+      },
+      "path": "core/src/main/scala/storymodel4s/core/atlas.scala",
+      "compiled": true,
+      "cleanRecompile": false,
+      "originalSha256": "64c1baab5d34036dcadf15a9d40b247cef5180ffed371663a48bc6649a7a55b8",
+      "mutantSha256": "5d159abdd3a968736ec898579bd6f7085f5838d14e503af525924572db48f427",
+      "junitSha256": "c24427fc637e4a6269dd492eb5dba6b2376ef3979ee157fcca1e02a96b4d2163",
+      "namedRejectingTest": "refuse duplicated bound sentence",
+      "acceptingControl": "accepting control: unique units and bound sentences have exact lookup",
+      "acceptingControlPassed": true,
+      "failedTests": [
+        "refuse duplicated bound sentence"
+      ]
+    },
+    {
+      "codeRevision": "3cd484d60ef9dd5ecd7099df0ffc63bf5b57fd46",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "coreJVM/testOnly storymodel4s.core.D1aAtlasSuite"
+      ],
+      "exitCode": 1,
+      "cleanBefore": false,
+      "cleanAfter": false,
+      "seconds": 12.178,
+      "logPath": "study/d1a-s2-20260919/atlas-primary-v2.log",
+      "logSha256": "234f7bf5e6d3f6150fa6b22be79f30fdd3b7f665b3206c99fbaeae374c8a3d4f",
+      "testTotals": [
+        "[error] Failed: Total 9, Failed 1, Errors 0, Passed 8"
+      ],
+      "aggregateTestCounts": {
+        "Total": 9,
+        "Failed": 1,
+        "Errors": 0,
+        "Passed": 8,
+        "Skipped": 0
+      },
+      "path": "core/src/main/scala/storymodel4s/core/atlas.scala",
+      "compiled": true,
+      "cleanRecompile": false,
+      "originalSha256": "64c1baab5d34036dcadf15a9d40b247cef5180ffed371663a48bc6649a7a55b8",
+      "mutantSha256": "00c3fcc618eb9f229b673fd2317cb0e9cb9ee34bc6f4a7eb349676c3ca8e68dd",
+      "junitSha256": "e143ccfe9c717726b75484ab980a1c3f73f6ddf8efeccf74be2d93f9373c52a3",
+      "namedRejectingTest": "refuse text and annotation timeline primaries explicitly",
+      "acceptingControl": "accepting control: unique units and bound sentences have exact lookup",
+      "acceptingControlPassed": true,
+      "failedTests": [
+        "refuse text and annotation timeline primaries explicitly"
+      ]
+    },
+    {
+      "codeRevision": "3cd484d60ef9dd5ecd7099df0ffc63bf5b57fd46",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "coreJVM/testOnly storymodel4s.core.D1aAtlasSuite"
+      ],
+      "exitCode": 1,
+      "cleanBefore": false,
+      "cleanAfter": false,
+      "seconds": 12.33,
+      "logPath": "study/d1a-s2-20260919/atlas-surface-v2.log",
+      "logSha256": "0dcf3db8eb2612ebce831185c8088f6256ea3c8cec3ce139a5325d034406304f",
+      "testTotals": [
+        "[error] Failed: Total 9, Failed 1, Errors 0, Passed 8"
+      ],
+      "aggregateTestCounts": {
+        "Total": 9,
+        "Failed": 1,
+        "Errors": 0,
+        "Passed": 8,
+        "Skipped": 0
+      },
+      "path": "core/src/main/scala/storymodel4s/core/atlas.scala",
+      "compiled": true,
+      "cleanRecompile": false,
+      "originalSha256": "64c1baab5d34036dcadf15a9d40b247cef5180ffed371663a48bc6649a7a55b8",
+      "mutantSha256": "209b6ab2ea136c28c0061bf7fa1750d86ef0e1a818d199e40299cd677703f740",
+      "junitSha256": "2f54f0287a6a7bd3fba41e65d17d97e4b5d640d8696ee06c06cc5f97ed7bd073",
+      "namedRejectingTest": "refuse missing, foreign and nonsentence proposal surfaces",
+      "acceptingControl": "accepting control: unique units and bound sentences have exact lookup",
+      "acceptingControlPassed": true,
+      "failedTests": [
+        "refuse missing, foreign and nonsentence proposal surfaces"
+      ]
+    },
+    {
+      "codeRevision": "3cd484d60ef9dd5ecd7099df0ffc63bf5b57fd46",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "coreJVM/testOnly storymodel4s.core.D1aAtlasSuite"
+      ],
+      "exitCode": 1,
+      "cleanBefore": false,
+      "cleanAfter": false,
+      "seconds": 12.059,
+      "logPath": "study/d1a-s2-20260919/atlas-support-attempt2-v2.log",
+      "logSha256": "eca1214193cd7fde89952a198553c22613374a99a6afa5e27cc6f3add0a1d1aa",
+      "testTotals": [
+        "[error] Failed: Total 9, Failed 1, Errors 0, Passed 8"
+      ],
+      "aggregateTestCounts": {
+        "Total": 9,
+        "Failed": 1,
+        "Errors": 0,
+        "Passed": 8,
+        "Skipped": 0
+      },
+      "path": "core/src/main/scala/storymodel4s/core/atlas.scala",
+      "compiled": true,
+      "cleanRecompile": false,
+      "originalSha256": "64c1baab5d34036dcadf15a9d40b247cef5180ffed371663a48bc6649a7a55b8",
+      "mutantSha256": "f089bf993cb55c4b106fab8476063303c9768a6241ff6845b67da58207de2231",
+      "junitSha256": "7eefea67ae2b6fe5d437d86f2e3d8233e5d2895d090b7a932d563950fc9b359f",
+      "namedRejectingTest": "refuse support belonging to another bundle",
+      "acceptingControl": "accepting control: unique units and bound sentences have exact lookup",
+      "acceptingControlPassed": true,
+      "failedTests": [
+        "refuse support belonging to another bundle"
+      ]
+    },
+    {
+      "codeRevision": "3cd484d60ef9dd5ecd7099df0ffc63bf5b57fd46",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "coreJVM/testOnly storymodel4s.core.D1aAtlasSuite"
+      ],
+      "exitCode": 1,
+      "cleanBefore": false,
+      "cleanAfter": false,
+      "seconds": 12.383,
+      "logPath": "study/d1a-s2-20260919/surface-id-v2.log",
+      "logSha256": "3368daa4cb2d7c615c78a8f325234624bfec1e9ae3d3f3beb4530caedf4bf444",
+      "testTotals": [
+        "[error] Failed: Total 9, Failed 1, Errors 0, Passed 8"
+      ],
+      "aggregateTestCounts": {
+        "Total": 9,
+        "Failed": 1,
+        "Errors": 0,
+        "Passed": 8,
+        "Skipped": 0
+      },
+      "path": "core/src/main/scala/storymodel4s/core/sourceIdentity.scala",
+      "compiled": true,
+      "cleanRecompile": false,
+      "originalSha256": "b8a9b0b910820ebca08a05e89f7ae65b6b05a76acdb12606b233eb0ebb751008",
+      "mutantSha256": "c57e6ac249fc6d5db8e1a0ba9d1a6e712e9c7e2b46107c0dfcfdf5f9e89ed0f6",
+      "junitSha256": "45707c197ddec4940af7960d6949991f224bb5bfd2586b2f2f05cb4be3547ccb",
+      "namedRejectingTest": "surface digest binds each unit field independently",
+      "acceptingControl": "accepting control: unique units and bound sentences have exact lookup",
+      "acceptingControlPassed": true,
+      "failedTests": [
+        "surface digest binds each unit field independently"
+      ]
+    },
+    {
+      "codeRevision": "3cd484d60ef9dd5ecd7099df0ffc63bf5b57fd46",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "coreJVM/testOnly storymodel4s.core.D1aAtlasSuite"
+      ],
+      "exitCode": 1,
+      "cleanBefore": false,
+      "cleanAfter": false,
+      "seconds": 11.27,
+      "logPath": "study/d1a-s2-20260919/surface-kind-v2.log",
+      "logSha256": "882c32c57d1fd99e168285bda30b820f3c37b74234317f1f7b1f389cc5525c6c",
+      "testTotals": [
+        "[error] Failed: Total 9, Failed 1, Errors 0, Passed 8"
+      ],
+      "aggregateTestCounts": {
+        "Total": 9,
+        "Failed": 1,
+        "Errors": 0,
+        "Passed": 8,
+        "Skipped": 0
+      },
+      "path": "core/src/main/scala/storymodel4s/core/sourceIdentity.scala",
+      "compiled": true,
+      "cleanRecompile": false,
+      "originalSha256": "b8a9b0b910820ebca08a05e89f7ae65b6b05a76acdb12606b233eb0ebb751008",
+      "mutantSha256": "951adc6b7593469db1326d22c5c31d3269e6800bc0234f7886f7d0d3fca4c20c",
+      "junitSha256": "b1a8e903de31e3af3e520b97873aaf48f14401218b5012428a572314905ee11e",
+      "namedRejectingTest": "surface digest binds each unit field independently",
+      "acceptingControl": "accepting control: unique units and bound sentences have exact lookup",
+      "acceptingControlPassed": true,
+      "failedTests": [
+        "surface digest binds each unit field independently"
+      ]
+    },
+    {
+      "codeRevision": "3cd484d60ef9dd5ecd7099df0ffc63bf5b57fd46",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "coreJVM/testOnly storymodel4s.core.D1aAtlasSuite"
+      ],
+      "exitCode": 1,
+      "cleanBefore": false,
+      "cleanAfter": false,
+      "seconds": 10.903,
+      "logPath": "study/d1a-s2-20260919/surface-span-v2.log",
+      "logSha256": "b16b56ac7ebd61c2d79b60bbb3a2fe29185d0864f8a5b12d11303bb9e53625a1",
+      "testTotals": [
+        "[error] Failed: Total 9, Failed 1, Errors 0, Passed 8"
+      ],
+      "aggregateTestCounts": {
+        "Total": 9,
+        "Failed": 1,
+        "Errors": 0,
+        "Passed": 8,
+        "Skipped": 0
+      },
+      "path": "core/src/main/scala/storymodel4s/core/sourceIdentity.scala",
+      "compiled": true,
+      "cleanRecompile": false,
+      "originalSha256": "b8a9b0b910820ebca08a05e89f7ae65b6b05a76acdb12606b233eb0ebb751008",
+      "mutantSha256": "4f81793e233deb335195353125b3c5abafa1d09d4bafc9c677ebd91409123b9d",
+      "junitSha256": "d72769a6466a4f92e89d5ac67753ef092be9d171393b7ba3a93ae8c85ed86412",
+      "namedRejectingTest": "surface digest binds each unit field independently",
+      "acceptingControl": "accepting control: unique units and bound sentences have exact lookup",
+      "acceptingControlPassed": true,
+      "failedTests": [
+        "surface digest binds each unit field independently"
+      ]
+    },
+    {
+      "codeRevision": "3cd484d60ef9dd5ecd7099df0ffc63bf5b57fd46",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "coreJVM/testOnly storymodel4s.core.D1aAtlasSuite"
+      ],
+      "exitCode": 1,
+      "cleanBefore": false,
+      "cleanAfter": false,
+      "seconds": 11.196,
+      "logPath": "study/d1a-s2-20260919/surface-ordinal-v2.log",
+      "logSha256": "3bb0e174ceaf936eb271ee84cb85c4eedf6d7d4ed923591c9928bae1515635cc",
+      "testTotals": [
+        "[error] Failed: Total 9, Failed 1, Errors 0, Passed 8"
+      ],
+      "aggregateTestCounts": {
+        "Total": 9,
+        "Failed": 1,
+        "Errors": 0,
+        "Passed": 8,
+        "Skipped": 0
+      },
+      "path": "core/src/main/scala/storymodel4s/core/sourceIdentity.scala",
+      "compiled": true,
+      "cleanRecompile": false,
+      "originalSha256": "b8a9b0b910820ebca08a05e89f7ae65b6b05a76acdb12606b233eb0ebb751008",
+      "mutantSha256": "d84888a6dfc38b828752a61caacc1ed064af7d00a6d8ebd86de89388d182464a",
+      "junitSha256": "f80537332bcb9da1c83c200e1ab21a8e6231d33067b044cfc7883fbc54051d0f",
+      "namedRejectingTest": "surface digest binds each unit field independently",
+      "acceptingControl": "accepting control: unique units and bound sentences have exact lookup",
+      "acceptingControlPassed": true,
+      "failedTests": [
+        "surface digest binds each unit field independently"
+      ]
+    },
+    {
+      "codeRevision": "3cd484d60ef9dd5ecd7099df0ffc63bf5b57fd46",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "coreJVM/testOnly storymodel4s.core.D1aAtlasSuite"
+      ],
+      "exitCode": 1,
+      "cleanBefore": false,
+      "cleanAfter": false,
+      "seconds": 11.466,
+      "logPath": "study/d1a-s2-20260919/surface-endExclusive-v2.log",
+      "logSha256": "e142bf3c1e5b0c791dde3ded3d6c1f4c14d49dcf26c05a7c0760930ab0916ca3",
+      "testTotals": [
+        "[error] Failed: Total 9, Failed 1, Errors 0, Passed 8"
+      ],
+      "aggregateTestCounts": {
+        "Total": 9,
+        "Failed": 1,
+        "Errors": 0,
+        "Passed": 8,
+        "Skipped": 0
+      },
+      "path": "core/src/main/scala/storymodel4s/core/sourceIdentity.scala",
+      "compiled": true,
+      "cleanRecompile": false,
+      "originalSha256": "b8a9b0b910820ebca08a05e89f7ae65b6b05a76acdb12606b233eb0ebb751008",
+      "mutantSha256": "ca80ed4c39dbcfc1da5e56f4f114a481df5c668f6520473ae285ff241483f0fc",
+      "junitSha256": "8539f45e5f5c83102bacc10088e379a05549bfae71892d40be6f0c8090828957",
+      "namedRejectingTest": "surface digest binds each unit field independently",
+      "acceptingControl": "accepting control: unique units and bound sentences have exact lookup",
+      "acceptingControlPassed": true,
+      "failedTests": [
+        "surface digest binds each unit field independently"
+      ]
+    },
+    {
+      "codeRevision": "3cd484d60ef9dd5ecd7099df0ffc63bf5b57fd46",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "coreJVM/testOnly storymodel4s.core.D1aAtlasSuite"
+      ],
+      "exitCode": 1,
+      "cleanBefore": false,
+      "cleanAfter": false,
+      "seconds": 11.64,
+      "logPath": "study/d1a-s2-20260919/surface-parent-v2.log",
+      "logSha256": "064d1b538f162c7587884960a22c7f2cc6c2de4704e9f56f9f62541bf94f039c",
+      "testTotals": [
+        "[error] Failed: Total 9, Failed 1, Errors 0, Passed 8"
+      ],
+      "aggregateTestCounts": {
+        "Total": 9,
+        "Failed": 1,
+        "Errors": 0,
+        "Passed": 8,
+        "Skipped": 0
+      },
+      "path": "core/src/main/scala/storymodel4s/core/sourceIdentity.scala",
+      "compiled": true,
+      "cleanRecompile": false,
+      "originalSha256": "b8a9b0b910820ebca08a05e89f7ae65b6b05a76acdb12606b233eb0ebb751008",
+      "mutantSha256": "71d71cb7aa44b642e114d9369ba36e866924d9ada9df8f2ce1f84927545504e9",
+      "junitSha256": "21362a13c9205bf7b98a50ccd89664e2bdaf14f4b110d6f18cc4fae58ecb8df7",
+      "namedRejectingTest": "surface digest binds each unit field independently",
+      "acceptingControl": "accepting control: unique units and bound sentences have exact lookup",
+      "acceptingControlPassed": true,
+      "failedTests": [
+        "surface digest binds each unit field independently"
+      ]
+    },
+    {
+      "codeRevision": "3cd484d60ef9dd5ecd7099df0ffc63bf5b57fd46",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "coreJVM/testOnly storymodel4s.core.D1aAtlasSuite"
+      ],
+      "exitCode": 1,
+      "cleanBefore": false,
+      "cleanAfter": false,
+      "seconds": 11.59,
+      "logPath": "study/d1a-s2-20260919/surface-source-v2.log",
+      "logSha256": "27f3bac9615c16ecdeae3a4f7f7b8e65732a961c26d581ccff587ec2b009209d",
+      "testTotals": [
+        "[error] Failed: Total 9, Failed 1, Errors 0, Passed 8"
+      ],
+      "aggregateTestCounts": {
+        "Total": 9,
+        "Failed": 1,
+        "Errors": 0,
+        "Passed": 8,
+        "Skipped": 0
+      },
+      "path": "core/src/main/scala/storymodel4s/core/sourceIdentity.scala",
+      "compiled": true,
+      "cleanRecompile": false,
+      "originalSha256": "b8a9b0b910820ebca08a05e89f7ae65b6b05a76acdb12606b233eb0ebb751008",
+      "mutantSha256": "62fba1fd9584d3a8852700db0d640dcee08397598423a09d87a0ded45f736aa1",
+      "junitSha256": "fc67c926989da93b74b364995e687e41674f4a2727cd3d6b6b064cda15541568",
+      "namedRejectingTest": "surface binding distinguishes canonical bytes, unit structure and receipt",
+      "acceptingControl": "accepting control: unique units and bound sentences have exact lookup",
+      "acceptingControlPassed": true,
+      "failedTests": [
+        "surface binding distinguishes canonical bytes, unit structure and receipt"
+      ]
+    },
+    {
+      "codeRevision": "3cd484d60ef9dd5ecd7099df0ffc63bf5b57fd46",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "codecJVM/testOnly storymodel4s.codec.EvidenceSupportCodecSuite"
+      ],
+      "exitCode": 1,
+      "cleanBefore": false,
+      "cleanAfter": false,
+      "seconds": 13.937,
+      "logPath": "study/d1a-s2-20260919/codec-text.log",
+      "logSha256": "8cab4c1c279ef12f06a49fbd369d8bfe58a991d4e7eb9102abcad0f774a2a8ad",
+      "testTotals": [
+        "[error] Failed: Total 5, Failed 1, Errors 0, Passed 4"
+      ],
+      "aggregateTestCounts": {
+        "Total": 5,
+        "Failed": 1,
+        "Errors": 0,
+        "Passed": 4,
+        "Skipped": 0
+      },
+      "path": "codec/src/main/scala/storymodel4s/codec/core.scala",
+      "compiled": true,
+      "cleanRecompile": false,
+      "originalSha256": "cfa76fcbd9b9f362e9d5f9b6b2628af877d9bc97c2960a23892d08f4ae06344a",
+      "mutantSha256": "6b6355e51c1a565e3d9add26f4f47af61dfcf5340abd72d16f9ab418f2aa23dd",
+      "junitSha256": "d1bbfa4175cbaf94d5d65896f735bd3132725ec64f8fe8189138a3e87e6385cc",
+      "namedRejectingTest": "Text payload is complete and its anchored encoding is refused on decode",
+      "acceptingControl": "accepting control: ordinary text evidence keeps its omitted-anchor wire and round trip",
+      "acceptingControlPassed": true,
+      "failedTests": [
+        "Text payload is complete and its anchored encoding is refused on decode"
+      ]
+    },
+    {
+      "codeRevision": "3cd484d60ef9dd5ecd7099df0ffc63bf5b57fd46",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "codecJVM/testOnly storymodel4s.codec.EvidenceSupportCodecSuite"
+      ],
+      "exitCode": 1,
+      "cleanBefore": false,
+      "cleanAfter": false,
+      "seconds": 13.991,
+      "logPath": "study/d1a-s2-20260919/codec-mediatime.log",
+      "logSha256": "ea006bcbbe6257a59bc265771c173b0c9dacdec4eccb2bcd408ef3086f99d5d3",
+      "testTotals": [
+        "[error] Failed: Total 5, Failed 1, Errors 0, Passed 4"
+      ],
+      "aggregateTestCounts": {
+        "Total": 5,
+        "Failed": 1,
+        "Errors": 0,
+        "Passed": 4,
+        "Skipped": 0
+      },
+      "path": "codec/src/main/scala/storymodel4s/codec/core.scala",
+      "compiled": true,
+      "cleanRecompile": false,
+      "originalSha256": "cfa76fcbd9b9f362e9d5f9b6b2628af877d9bc97c2960a23892d08f4ae06344a",
+      "mutantSha256": "a9ee787e4be780976620437c715dcbb3f91d0e3bd04d875540008551a8ac60f9",
+      "junitSha256": "175f734c732d91d1254fb870da192d7aa6c7930f2244f784ded78efb4affd1ad",
+      "namedRejectingTest": "MediaTime payload is complete and its anchored encoding is refused on decode",
+      "acceptingControl": "accepting control: ordinary text evidence keeps its omitted-anchor wire and round trip",
+      "acceptingControlPassed": true,
+      "failedTests": [
+        "MediaTime payload is complete and its anchored encoding is refused on decode"
+      ]
+    },
+    {
+      "codeRevision": "3cd484d60ef9dd5ecd7099df0ffc63bf5b57fd46",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "codecJVM/testOnly storymodel4s.codec.EvidenceSupportCodecSuite"
+      ],
+      "exitCode": 1,
+      "cleanBefore": false,
+      "cleanAfter": false,
+      "seconds": 14.375,
+      "logPath": "study/d1a-s2-20260919/codec-shot.log",
+      "logSha256": "578510b86ebc7b747fe5c17209b578e6d51416ce392c838a223b7a5dc3cfa717",
+      "testTotals": [
+        "[error] Failed: Total 5, Failed 1, Errors 0, Passed 4"
+      ],
+      "aggregateTestCounts": {
+        "Total": 5,
+        "Failed": 1,
+        "Errors": 0,
+        "Passed": 4,
+        "Skipped": 0
+      },
+      "path": "codec/src/main/scala/storymodel4s/codec/core.scala",
+      "compiled": true,
+      "cleanRecompile": false,
+      "originalSha256": "cfa76fcbd9b9f362e9d5f9b6b2628af877d9bc97c2960a23892d08f4ae06344a",
+      "mutantSha256": "a0a57e0373c30f560a51343f653c346198391bce96ad01d9bb287b942a3ee941",
+      "junitSha256": "e8c5d88722cf70efc3c170cb30cfe9927dc2403418892c0d9ffbee81ffeb0592",
+      "namedRejectingTest": "Shot payload is complete and its anchored encoding is refused on decode",
+      "acceptingControl": "accepting control: ordinary text evidence keeps its omitted-anchor wire and round trip",
+      "acceptingControlPassed": true,
+      "failedTests": [
+        "Shot payload is complete and its anchored encoding is refused on decode"
+      ]
+    },
+    {
+      "codeRevision": "3cd484d60ef9dd5ecd7099df0ffc63bf5b57fd46",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "codecJVM/testOnly storymodel4s.codec.EvidenceSupportCodecSuite"
+      ],
+      "exitCode": 1,
+      "cleanBefore": false,
+      "cleanAfter": false,
+      "seconds": 14.197,
+      "logPath": "study/d1a-s2-20260919/codec-track.log",
+      "logSha256": "05c09a8a5b99d2a976861f6ae616c90160cabd2b27d31c6ab85fbb955aa174ab",
+      "testTotals": [
+        "[error] Failed: Total 5, Failed 1, Errors 0, Passed 4"
+      ],
+      "aggregateTestCounts": {
+        "Total": 5,
+        "Failed": 1,
+        "Errors": 0,
+        "Passed": 4,
+        "Skipped": 0
+      },
+      "path": "codec/src/main/scala/storymodel4s/codec/core.scala",
+      "compiled": true,
+      "cleanRecompile": false,
+      "originalSha256": "cfa76fcbd9b9f362e9d5f9b6b2628af877d9bc97c2960a23892d08f4ae06344a",
+      "mutantSha256": "548dc7b961f4091d6b9dc0ce262b7b199d7990778748dfc283643aa2ef53f17d",
+      "junitSha256": "7dbef3e69788321e888ce1d756c24a05739efbb9967eea2ba94cfb39b8ad14fe",
+      "namedRejectingTest": "Track payload is complete and its anchored encoding is refused on decode",
+      "acceptingControl": "accepting control: ordinary text evidence keeps its omitted-anchor wire and round trip",
+      "acceptingControlPassed": true,
+      "failedTests": [
+        "Track payload is complete and its anchored encoding is refused on decode"
+      ]
+    },
+    {
+      "codeRevision": "3cd484d60ef9dd5ecd7099df0ffc63bf5b57fd46",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "storyJVM/testOnly storymodel4s.story.D1aTextBoundarySuite"
+      ],
+      "exitCode": 1,
+      "cleanBefore": false,
+      "cleanAfter": false,
+      "seconds": 12.744,
+      "logPath": "study/d1a-s2-20260919/text-model-claims.log",
+      "logSha256": "abce652fd0c50d56f4414e43ba38efba311cc671f5ff5d2e9af39408ef18f5a7",
+      "testTotals": [
+        "[error] Failed: Total 4, Failed 1, Errors 0, Passed 3"
+      ],
+      "aggregateTestCounts": {
+        "Total": 4,
+        "Failed": 1,
+        "Errors": 0,
+        "Passed": 3,
+        "Skipped": 0
+      },
+      "path": "story/src/main/scala/storymodel4s/story/model.scala",
+      "compiled": true,
+      "cleanRecompile": false,
+      "originalSha256": "c0f0ce1cbedd1d515d1a3166af437935f4ccb7dffe902a80231eacf1b3569a9a",
+      "mutantSha256": "344c5cf7d4366ed493f71c9f7db3fc739af732af1b60fcde0c8cdb1108bd1d9f",
+      "junitSha256": "0ada9786a608f508478e1715ef8f9823b2c6b77d16966c6d5b6c756550181d64",
+      "namedRejectingTest": "text draft refuses anchored ordinary claim evidence before export",
+      "acceptingControl": "accepting control: ordinary text draft and internal copy remain constructible",
+      "acceptingControlPassed": true,
+      "failedTests": [
+        "text draft refuses anchored ordinary claim evidence before export"
+      ]
+    },
+    {
+      "codeRevision": "3cd484d60ef9dd5ecd7099df0ffc63bf5b57fd46",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "storyJVM/testOnly storymodel4s.story.D1aTextBoundarySuite"
+      ],
+      "exitCode": 1,
+      "cleanBefore": false,
+      "cleanAfter": false,
+      "seconds": 12.65,
+      "logPath": "study/d1a-s2-20260919/text-model-boundary.log",
+      "logSha256": "7af1eb6dc7b44a8bbb9f5fd832c18b2ac5252c68b3c5eaa4100dc964a06caf7e",
+      "testTotals": [
+        "[error] Failed: Total 4, Failed 2, Errors 0, Passed 2"
+      ],
+      "aggregateTestCounts": {
+        "Total": 4,
+        "Failed": 2,
+        "Errors": 0,
+        "Passed": 2,
+        "Skipped": 0
+      },
+      "path": "story/src/main/scala/storymodel4s/story/model.scala",
+      "compiled": true,
+      "cleanRecompile": false,
+      "originalSha256": "c0f0ce1cbedd1d515d1a3166af437935f4ccb7dffe902a80231eacf1b3569a9a",
+      "mutantSha256": "0b05d3f0204201823a3e14cde6e7f1f01f03eebf3f4cd0c5c2d4be521e792072",
+      "junitSha256": "86b2dc9f074c7cb93dd75921f32345587355b3b977855e8b79fd92eeb6e4b3e0",
+      "namedRejectingTest": "text draft refuses anchored boundary evidence outside the claim ledger",
+      "acceptingControl": "accepting control: ordinary text draft and internal copy remain constructible",
+      "acceptingControlPassed": true,
+      "failedTests": [
+        "text draft refuses anchored boundary evidence outside the claim ledger",
+        "internal copy cannot bypass anchored evidence refusal"
+      ]
+    },
+    {
+      "codeRevision": "3cd484d60ef9dd5ecd7099df0ffc63bf5b57fd46",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "documentJVM/testOnly storymodel4s.document.CompilerSuite"
+      ],
+      "exitCode": 1,
+      "cleanBefore": false,
+      "cleanAfter": false,
+      "seconds": 14.919,
+      "logPath": "study/d1a-s2-20260919/compiler-ledger.log",
+      "logSha256": "18936a8c08cf668d611d62b574154439030ae54303ad40b8ca98b4ad7da5506d",
+      "testTotals": [
+        "[error] Failed: Total 29, Failed 1, Errors 0, Passed 28"
+      ],
+      "aggregateTestCounts": {
+        "Total": 29,
+        "Failed": 1,
+        "Errors": 0,
+        "Passed": 28,
+        "Skipped": 0
+      },
+      "path": "document/src/main/scala/storymodel4s/document/compiler.scala",
+      "compiled": true,
+      "cleanRecompile": false,
+      "originalSha256": "efe91ea95d3474fb2c8f0385ca57cb02d53052d315776fd54960b07d219dec28",
+      "mutantSha256": "3fc6fb9eccd66823bb6fbf5b97d6c63afbaae0952bcf74aabe076c675a649937",
+      "junitSha256": "5add8baf345e63c08532c6a6da2f736881fb568cd42c13c617aa2f882e45e3d9",
+      "namedRejectingTest": "text compiler refuses anchored ledger evidence with an accepting text control",
+      "acceptingControl": "accepted evidence compiles into a validated story model",
+      "acceptingControlPassed": true,
+      "failedTests": [
+        "text compiler refuses anchored ledger evidence with an accepting text control"
+      ]
+    },
+    {
+      "codeRevision": "3cd484d60ef9dd5ecd7099df0ffc63bf5b57fd46",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "documentJVM/testOnly storymodel4s.document.CompilerSuite"
+      ],
+      "exitCode": 1,
+      "cleanBefore": false,
+      "cleanAfter": false,
+      "seconds": 14.62,
+      "logPath": "study/d1a-s2-20260919/compiler-inline.log",
+      "logSha256": "6063fbab542a26f12d25892d5f024ce791fe0d0224fe9fb2110490eb2d39f6fc",
+      "testTotals": [
+        "[error] Failed: Total 29, Failed 1, Errors 0, Passed 28"
+      ],
+      "aggregateTestCounts": {
+        "Total": 29,
+        "Failed": 1,
+        "Errors": 0,
+        "Passed": 28,
+        "Skipped": 0
+      },
+      "path": "document/src/main/scala/storymodel4s/document/compiler.scala",
+      "compiled": true,
+      "cleanRecompile": false,
+      "originalSha256": "efe91ea95d3474fb2c8f0385ca57cb02d53052d315776fd54960b07d219dec28",
+      "mutantSha256": "1c2ba1d0b139a3aa199cf94ba66d79301fc1aaf911bb6af50355ba19865288d8",
+      "junitSha256": "1a4afb62222d39e3771c0d021eccd580b3ccf15ac6ae7b1af45bc4fe070f6236",
+      "namedRejectingTest": "text compiler refuses anchored inline evidence with an accepting text control",
+      "acceptingControl": "accepted evidence compiles into a validated story model",
+      "acceptingControlPassed": true,
+      "failedTests": [
+        "text compiler refuses anchored inline evidence with an accepting text control"
+      ]
+    },
+    {
+      "codeRevision": "3cd484d60ef9dd5ecd7099df0ffc63bf5b57fd46",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "coreJVM/clean",
+        "coreJVM/testOnly storymodel4s.coreprobe.D1aConstructionBoundarySuite"
+      ],
+      "exitCode": 1,
+      "cleanBefore": false,
+      "cleanAfter": false,
+      "seconds": 19.733,
+      "logPath": "study/d1a-s2-20260919/probe-NarrativeProposalUnit.log",
+      "logSha256": "b3911eda5c6c3b810b257bf0eb1ccc02d224654334a53f72ddc03929ee48f0bd",
+      "testTotals": [
+        "[error] Failed: Total 6, Failed 1, Errors 0, Passed 5"
+      ],
+      "aggregateTestCounts": {
+        "Total": 6,
+        "Failed": 1,
+        "Errors": 0,
+        "Passed": 5,
+        "Skipped": 0
+      },
+      "path": "core/src/main/scala/storymodel4s/core/source.scala",
+      "compiled": true,
+      "cleanRecompile": true,
+      "originalSha256": "97d4c0309638c88f26a9fc010ec9f45d3c233693ad35f6f673bbd2b428b3484b",
+      "mutantSha256": "68718a716212453b9e22f19b3619494ded4b92704f37cfe11e6f543b2dce674c",
+      "junitSha256": "040299fb8ea8059b050d7645efe968d5b255c004c7b08dfb6aa04f182e13b9f8",
+      "namedRejectingTest": "NarrativeProposalUnit has no unchecked constructor, copy or Product doors",
+      "acceptingControl": "accepting control: same-module value carriers retain construction doors",
+      "acceptingControlPassed": true,
+      "failedTests": [
+        "NarrativeProposalUnit has no unchecked constructor, copy or Product doors"
+      ]
+    },
+    {
+      "codeRevision": "3cd484d60ef9dd5ecd7099df0ffc63bf5b57fd46",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "coreJVM/clean",
+        "coreJVM/testOnly storymodel4s.coreprobe.D1aConstructionBoundarySuite"
+      ],
+      "exitCode": 1,
+      "cleanBefore": false,
+      "cleanAfter": false,
+      "seconds": 19.932,
+      "logPath": "study/d1a-s2-20260919/probe-AnchoredNarrativeAtlas.log",
+      "logSha256": "26c68b1da893d3e08c7e30edff9fd27517ca7193fb6c37860f85fa4987e0fb55",
+      "testTotals": [
+        "[error] Failed: Total 6, Failed 1, Errors 0, Passed 5"
+      ],
+      "aggregateTestCounts": {
+        "Total": 6,
+        "Failed": 1,
+        "Errors": 0,
+        "Passed": 5,
+        "Skipped": 0
+      },
+      "path": "core/src/main/scala/storymodel4s/core/atlas.scala",
+      "compiled": true,
+      "cleanRecompile": true,
+      "originalSha256": "64c1baab5d34036dcadf15a9d40b247cef5180ffed371663a48bc6649a7a55b8",
+      "mutantSha256": "9b78a9218c39c6201cf05ad2e79c52da022474370e558a1ffc13fe604757d05a",
+      "junitSha256": "865303680e0a712ee8fb3d48061cb9ec9b6471833045d7a479446309bb36a551",
+      "namedRejectingTest": "AnchoredNarrativeAtlas has no unchecked constructor, copy or Product doors",
+      "acceptingControl": "accepting control: same-module value carriers retain construction doors",
+      "acceptingControlPassed": true,
+      "failedTests": [
+        "AnchoredNarrativeAtlas has no unchecked constructor, copy or Product doors"
+      ]
+    },
+    {
+      "codeRevision": "3cd484d60ef9dd5ecd7099df0ffc63bf5b57fd46",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "coreJVM/clean",
+        "coreJVM/testOnly storymodel4s.coreprobe.D1aConstructionBoundarySuite"
+      ],
+      "exitCode": 1,
+      "cleanBefore": false,
+      "cleanAfter": false,
+      "seconds": 20.864,
+      "logPath": "study/d1a-s2-20260919/probe-BoundProposalSurface.log",
+      "logSha256": "c1291f4750e4f5cb4ea03172dadce828218557affdf22c3d1f3d9d6f8e3c663b",
+      "testTotals": [
+        "[error] Failed: Total 6, Failed 1, Errors 0, Passed 5"
+      ],
+      "aggregateTestCounts": {
+        "Total": 6,
+        "Failed": 1,
+        "Errors": 0,
+        "Passed": 5,
+        "Skipped": 0
+      },
+      "path": "core/src/main/scala/storymodel4s/core/atlas.scala",
+      "compiled": true,
+      "cleanRecompile": true,
+      "originalSha256": "64c1baab5d34036dcadf15a9d40b247cef5180ffed371663a48bc6649a7a55b8",
+      "mutantSha256": "3f3eb03b0a3ff0045c505c58a328fb0a7eddee7269197158579dcd7bd3cf311e",
+      "junitSha256": "ecd52c67457a9f3f8647109c78d12d0fd53ffda038c4b1718b6197758ee5a4bd",
+      "namedRejectingTest": "BoundProposalSurface has no unchecked constructor, copy or Product doors",
+      "acceptingControl": "accepting control: same-module value carriers retain construction doors",
+      "acceptingControlPassed": true,
+      "failedTests": [
+        "BoundProposalSurface has no unchecked constructor, copy or Product doors"
+      ]
+    },
+    {
+      "codeRevision": "3cd484d60ef9dd5ecd7099df0ffc63bf5b57fd46",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "coreJVM/clean",
+        "coreJVM/testOnly storymodel4s.coreprobe.D1aConstructionBoundarySuite"
+      ],
+      "exitCode": 1,
+      "cleanBefore": false,
+      "cleanAfter": false,
+      "seconds": 19.88,
+      "logPath": "study/d1a-s2-20260919/probe-sealed-atlas.log",
+      "logSha256": "5d93b016825ae17881fce26b4355fcc473d9b32e6cfd830b8c759a7bf5bf599e",
+      "testTotals": [
+        "[error] Failed: Total 6, Failed 1, Errors 0, Passed 5"
+      ],
+      "aggregateTestCounts": {
+        "Total": 6,
+        "Failed": 1,
+        "Errors": 0,
+        "Passed": 5,
+        "Skipped": 0
+      },
+      "path": "core/src/main/scala/storymodel4s/core/atlas.scala",
+      "compiled": true,
+      "cleanRecompile": true,
+      "originalSha256": "64c1baab5d34036dcadf15a9d40b247cef5180ffed371663a48bc6649a7a55b8",
+      "mutantSha256": "21821078eba1b049b4396af53e190c1de2ab9a0a98990eb39b96a23f5feba9bc",
+      "junitSha256": "a7d1802c79ee23cc05bbc45c48168177bbf2d7898af2acb85f142f700c0046b5",
+      "namedRejectingTest": "NarrativeSourceAtlas cannot be extended outside core",
+      "acceptingControl": "accepting control: same-module value carriers retain construction doors",
+      "acceptingControlPassed": true,
+      "failedTests": [
+        "NarrativeSourceAtlas cannot be extended outside core"
+      ]
+    },
+    {
+      "codeRevision": "3cd484d60ef9dd5ecd7099df0ffc63bf5b57fd46",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "coreJVM/testOnly storymodel4s.core.D1aSupportSuite"
+      ],
+      "exitCode": 1,
+      "cleanBefore": false,
+      "cleanAfter": false,
+      "seconds": 10.99,
+      "logPath": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1a-s2-20260919/mapping-cardinality.log",
+      "logSha256": "9fbe2682d445266b78ff5fae5065126b11a5aa44412b1f2da7fe8c96ead087b9",
+      "testTotals": [
+        "[error] Failed: Total 19, Failed 1, Errors 0, Passed 18"
+      ],
+      "aggregateTestCounts": {
+        "Total": 19,
+        "Failed": 1,
+        "Errors": 0,
+        "Passed": 18,
+        "Skipped": 0
+      },
+      "path": "core/src/main/scala/storymodel4s/core/support.scala",
+      "compiled": true,
+      "cleanRecompile": false,
+      "originalSha256": "7511d849b1239b2f23f36179b8b8a59073876f5a20a92a56fbafa125ce1f1712",
+      "mutantSha256": "13cc1eb1c38772b0abda7322c8e5bf6946b7b408d1bd58eb03cb01d874fae68d",
+      "junitSha256": "9b7f48912d976195bfd37e5e1cf5ef3b555d799670d5ca80348fa22178911e15",
+      "namedRejectingTest": "clock mapping admits its exact image and refuses partial or absent coverage",
+      "acceptingControl": "accepting control: all four lawful anchor kinds survive",
+      "acceptingControlPassed": true,
+      "failedTests": [
+        "clock mapping admits its exact image and refuses partial or absent coverage"
+      ]
+    },
+    {
+      "codeRevision": "c24ddd66026f0d1848b61369b0bbaff7a90a5d40",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "coreJVM/testOnly storymodel4s.core.D1aSupportSuite"
+      ],
+      "exitCode": 1,
+      "cleanBefore": false,
+      "cleanAfter": false,
+      "seconds": 12.604,
+      "logPath": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1a-s2-20260919/final/missing-map.log",
+      "logSha256": "63a1f04abb13723974eb316da9441ac43ff5a9d282a52a6bb23b176c7a1b982b",
+      "testTotals": [
+        "[error] Failed: Total 20, Failed 2, Errors 0, Passed 18"
+      ],
+      "aggregateTestCounts": {
+        "Total": 20,
+        "Failed": 2,
+        "Errors": 0,
+        "Passed": 18,
+        "Skipped": 0
+      },
+      "path": "core/src/main/scala/storymodel4s/core/support.scala",
+      "compiled": true,
+      "cleanRecompile": false,
+      "originalSha256": "7511d849b1239b2f23f36179b8b8a59073876f5a20a92a56fbafa125ce1f1712",
+      "mutantSha256": "9edf8b264ae91ebe26770529c345b6e188798c646d5bd89e92421ce8d436a909",
+      "junitSha256": "c28815ea3bf65d031429a8ad2e3fe78582395e2c20a9f76455f4d27e68f16fbb",
+      "namedRejectingTest": "right bundle does not license another stream's axis",
+      "acceptingControl": "accepting control: all four lawful anchor kinds survive",
+      "acceptingControlPassed": true,
+      "failedTests": [
+        "right bundle does not license another stream's axis",
+        "clock mapping admits its exact image and refuses partial or absent coverage"
+      ]
+    },
+    {
+      "codeRevision": "c24ddd66026f0d1848b61369b0bbaff7a90a5d40",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "coreJVM/testOnly storymodel4s.core.D1aSupportSuite"
+      ],
+      "exitCode": 1,
+      "cleanBefore": false,
+      "cleanAfter": false,
+      "seconds": 12.427,
+      "logPath": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1a-s2-20260919/final/interval-axis-media.log",
+      "logSha256": "19d6577959f6ebddedddc5189e6e72027f41a095c8707aff4ab9cd6e6e4d9812",
+      "testTotals": [
+        "[error] Failed: Total 20, Failed 1, Errors 0, Passed 19"
+      ],
+      "aggregateTestCounts": {
+        "Total": 20,
+        "Failed": 1,
+        "Errors": 0,
+        "Passed": 19,
+        "Skipped": 0
+      },
+      "path": "core/src/main/scala/storymodel4s/core/source.scala",
+      "compiled": true,
+      "cleanRecompile": false,
+      "originalSha256": "97d4c0309638c88f26a9fc010ec9f45d3c233693ad35f6f673bbd2b428b3484b",
+      "mutantSha256": "8140eda7e850317ba953e8f9c183e0efdc558e058030a221e61bba6ba2ea708f",
+      "junitSha256": "72c50560d4968795c32074c40be3286b5fd15f38aeb0aa1641f459cdb6533e52",
+      "namedRejectingTest": "single-interval selection refuses a foreign axis for every playback anchor",
+      "acceptingControl": "accepting control: all four lawful anchor kinds survive",
+      "acceptingControlPassed": true,
+      "failedTests": [
+        "single-interval selection refuses a foreign axis for every playback anchor"
+      ]
+    },
+    {
+      "codeRevision": "c24ddd66026f0d1848b61369b0bbaff7a90a5d40",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "coreJVM/testOnly storymodel4s.core.D1aSupportSuite"
+      ],
+      "exitCode": 1,
+      "cleanBefore": false,
+      "cleanAfter": false,
+      "seconds": 12.602,
+      "logPath": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1a-s2-20260919/final/interval-axis-shot.log",
+      "logSha256": "ded6f384b1cf25fd911030032948ba539a9fe5342a453c640c39b5b6e36a31d6",
+      "testTotals": [
+        "[error] Failed: Total 20, Failed 1, Errors 0, Passed 19"
+      ],
+      "aggregateTestCounts": {
+        "Total": 20,
+        "Failed": 1,
+        "Errors": 0,
+        "Passed": 19,
+        "Skipped": 0
+      },
+      "path": "core/src/main/scala/storymodel4s/core/source.scala",
+      "compiled": true,
+      "cleanRecompile": false,
+      "originalSha256": "97d4c0309638c88f26a9fc010ec9f45d3c233693ad35f6f673bbd2b428b3484b",
+      "mutantSha256": "d477553b65fc3b7c2121433423e33234a8592b3b5e5924d89c5ec4f0362d8955",
+      "junitSha256": "f8e4e53fc990f7984ae711f9c740711ec8a222b34bfbc1410c4b6d0300528356",
+      "namedRejectingTest": "single-interval selection refuses a foreign axis for every playback anchor",
+      "acceptingControl": "accepting control: all four lawful anchor kinds survive",
+      "acceptingControlPassed": true,
+      "failedTests": [
+        "single-interval selection refuses a foreign axis for every playback anchor"
+      ]
+    },
+    {
+      "codeRevision": "c24ddd66026f0d1848b61369b0bbaff7a90a5d40",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "coreJVM/testOnly storymodel4s.core.D1aSupportSuite"
+      ],
+      "exitCode": 1,
+      "cleanBefore": false,
+      "cleanAfter": false,
+      "seconds": 12.496,
+      "logPath": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1a-s2-20260919/final/interval-axis-track.log",
+      "logSha256": "1acdf7890b34f4b7c9b5a3c2c34d79879ea29df9b8676c39049f76f9baf5f898",
+      "testTotals": [
+        "[error] Failed: Total 20, Failed 1, Errors 0, Passed 19"
+      ],
+      "aggregateTestCounts": {
+        "Total": 20,
+        "Failed": 1,
+        "Errors": 0,
+        "Passed": 19,
+        "Skipped": 0
+      },
+      "path": "core/src/main/scala/storymodel4s/core/source.scala",
+      "compiled": true,
+      "cleanRecompile": false,
+      "originalSha256": "97d4c0309638c88f26a9fc010ec9f45d3c233693ad35f6f673bbd2b428b3484b",
+      "mutantSha256": "8adc59037b33c0c9ad48f16361bb1c3b6ce5afcf8bc0cb5a69c2f5a877e53352",
+      "junitSha256": "45874537a320123578aa149c105815b9e2e106534c5aa0648152361f52b96e01",
+      "namedRejectingTest": "single-interval selection refuses a foreign axis for every playback anchor",
+      "acceptingControl": "accepting control: all four lawful anchor kinds survive",
+      "acceptingControlPassed": true,
+      "failedTests": [
+        "single-interval selection refuses a foreign axis for every playback anchor"
+      ]
+    },
+    {
+      "codeRevision": "c24ddd66026f0d1848b61369b0bbaff7a90a5d40",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "codecJVM/testOnly storymodel4s.codec.EvidenceSupportCodecSuite"
+      ],
+      "exitCode": 1,
+      "cleanBefore": false,
+      "cleanAfter": false,
+      "seconds": 15.271,
+      "logPath": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1a-s2-20260919/final/evidence-decode-refusal.log",
+      "logSha256": "11c7eb09edbe90a00ce92032cc02e4ca7ca5cb79d1bff72263eb78522e9c44da",
+      "testTotals": [
+        "[error] Failed: Total 5, Failed 4, Errors 0, Passed 1"
+      ],
+      "aggregateTestCounts": {
+        "Total": 5,
+        "Failed": 4,
+        "Errors": 0,
+        "Passed": 1,
+        "Skipped": 0
+      },
+      "path": "codec/src/main/scala/storymodel4s/codec/core.scala",
+      "compiled": true,
+      "cleanRecompile": false,
+      "originalSha256": "cfa76fcbd9b9f362e9d5f9b6b2628af877d9bc97c2960a23892d08f4ae06344a",
+      "mutantSha256": "2a94b716a23367392912aa0f45d84997e7eac2ccc0d356003e67d76b81a5a29c",
+      "junitSha256": "4440dad55f457645e0179b6fbdd5d21422a7dda1bf1c30a33cea6d8ab325da14",
+      "namedRejectingTest": "Text payload is complete and its anchored encoding is refused on decode",
+      "acceptingControl": "accepting control: ordinary text evidence keeps its omitted-anchor wire and round trip",
+      "acceptingControlPassed": true,
+      "failedTests": [
+        "Text payload is complete and its anchored encoding is refused on decode",
+        "MediaTime payload is complete and its anchored encoding is refused on decode",
+        "Shot payload is complete and its anchored encoding is refused on decode",
+        "Track payload is complete and its anchored encoding is refused on decode"
+      ]
+    },
+    {
+      "codeRevision": "c24ddd66026f0d1848b61369b0bbaff7a90a5d40",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "codecJVM/testOnly storymodel4s.codec.EvidenceSupportCodecSuite"
+      ],
+      "exitCode": 1,
+      "cleanBefore": false,
+      "cleanAfter": false,
+      "seconds": 13.904,
+      "logPath": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1a-s2-20260919/final/support-decode-refusal.log",
+      "logSha256": "b2e2ed48289371bdc18b4e618eb31b117f5caf029593e2bacde2b9bda9a1e90b",
+      "testTotals": [
+        "[error] Failed: Total 5, Failed 4, Errors 0, Passed 1"
+      ],
+      "aggregateTestCounts": {
+        "Total": 5,
+        "Failed": 4,
+        "Errors": 0,
+        "Passed": 1,
+        "Skipped": 0
+      },
+      "path": "codec/src/main/scala/storymodel4s/codec/core.scala",
+      "compiled": true,
+      "cleanRecompile": false,
+      "originalSha256": "cfa76fcbd9b9f362e9d5f9b6b2628af877d9bc97c2960a23892d08f4ae06344a",
+      "mutantSha256": "a527f64bd3c61c165674afbb9cede3a30ff54e5a487ed1043482f4415ef3c56c",
+      "junitSha256": "6359f0b5c2c58563219613cedfa72a64691acc72d659c503b378b996395abd2a",
+      "namedRejectingTest": "Text payload is complete and its anchored encoding is refused on decode",
+      "acceptingControl": "accepting control: ordinary text evidence keeps its omitted-anchor wire and round trip",
+      "acceptingControlPassed": true,
+      "failedTests": [
+        "Text payload is complete and its anchored encoding is refused on decode",
+        "MediaTime payload is complete and its anchored encoding is refused on decode",
+        "Shot payload is complete and its anchored encoding is refused on decode",
+        "Track payload is complete and its anchored encoding is refused on decode"
+      ]
+    }
+  ],
+  "restoredControl": {
+    "codeRevision": "c24ddd66026f0d1848b61369b0bbaff7a90a5d40",
+    "command": [
+      "sbt",
+      "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+      "-batch",
+      "coreJVM/clean",
+      "coreJVM/testOnly storymodel4s.core.D1aSupportSuite",
+      "coreJVM/testOnly storymodel4s.core.D1aAtlasSuite",
+      "coreJVM/testOnly storymodel4s.coreprobe.D1aConstructionBoundarySuite",
+      "codecJVM/testOnly storymodel4s.codec.EvidenceSupportCodecSuite",
+      "storyJVM/testOnly storymodel4s.story.D1aTextBoundarySuite",
+      "documentJVM/testOnly storymodel4s.document.CompilerSuite"
+    ],
+    "exitCode": 0,
+    "cleanBefore": true,
+    "cleanAfter": true,
+    "seconds": 23.2,
+    "logPath": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1a-s2-20260919/final/restored-control-final.log",
+    "logSha256": "e6640b29b549d5d18f80f15ff1626d52c142f9d0c2c94556962251de93069c17",
+    "testTotals": [
+      "[info] Passed: Total 20, Failed 0, Errors 0, Passed 20",
+      "[info] Passed: Total 9, Failed 0, Errors 0, Passed 9",
+      "[info] Passed: Total 6, Failed 0, Errors 0, Passed 6",
+      "[info] Passed: Total 5, Failed 0, Errors 0, Passed 5",
+      "[info] Passed: Total 4, Failed 0, Errors 0, Passed 4",
+      "[info] Passed: Total 29, Failed 0, Errors 0, Passed 29"
+    ],
+    "aggregateTestCounts": {
+      "Total": 73,
+      "Failed": 0,
+      "Errors": 0,
+      "Passed": 73,
+      "Skipped": 0
+    }
+  }
+}

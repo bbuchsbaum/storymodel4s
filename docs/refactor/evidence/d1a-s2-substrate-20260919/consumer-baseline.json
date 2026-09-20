@@ -1,0 +1,325 @@
+{
+  "schema": "film-consumer-baseline/v1",
+  "directory": "/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z",
+  "repos": [
+    {
+      "name": "storymodel4s",
+      "path": "/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/storymodel4s",
+      "revision": "75c8df52adb2ffc54a5cd3586528deddabf4a531",
+      "clean": true
+    },
+    {
+      "name": "storyatlas4s",
+      "path": "/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/storyatlas4s",
+      "revision": "fb33bef7d0971530531fcec43cd3d7f141b8e137",
+      "clean": true
+    },
+    {
+      "name": "intaglio",
+      "path": "/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/intaglio",
+      "revision": "4eb566d9208f474d64d61e778e084dee2ddbaa76",
+      "clean": true
+    },
+    {
+      "name": "grakern",
+      "path": "/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+      "revision": "0329c43c88a0b71e9aa4456723bb16bac2fa3841",
+      "clean": true
+    }
+  ],
+  "purpose": "Pre-S2 consumer baseline against landed storymodel4s; no source edits or pin publication",
+  "gate": {
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstoryatlas4s.storymodel4s.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/storymodel4s",
+      "-Dstoryatlas4s.intaglio.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/intaglio",
+      "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+      "clean",
+      "compileAll",
+      "testAll",
+      "scalafmtCheckAll",
+      "app/fastLinkJS"
+    ],
+    "cwd": "/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/storyatlas4s",
+    "startedEpochSeconds": 1789857732.550805,
+    "elapsedSeconds": 114.2397449016571,
+    "exitCode": 0,
+    "before": {
+      "storymodel4s": {
+        "revision": "75c8df52adb2ffc54a5cd3586528deddabf4a531",
+        "status": ""
+      },
+      "storyatlas4s": {
+        "revision": "fb33bef7d0971530531fcec43cd3d7f141b8e137",
+        "status": ""
+      },
+      "intaglio": {
+        "revision": "4eb566d9208f474d64d61e778e084dee2ddbaa76",
+        "status": ""
+      },
+      "grakern": {
+        "revision": "0329c43c88a0b71e9aa4456723bb16bac2fa3841",
+        "status": ""
+      }
+    },
+    "after": {
+      "storymodel4s": {
+        "revision": "75c8df52adb2ffc54a5cd3586528deddabf4a531",
+        "status": ""
+      },
+      "storyatlas4s": {
+        "revision": "fb33bef7d0971530531fcec43cd3d7f141b8e137",
+        "status": ""
+      },
+      "intaglio": {
+        "revision": "4eb566d9208f474d64d61e778e084dee2ddbaa76",
+        "status": ""
+      },
+      "grakern": {
+        "revision": "0329c43c88a0b71e9aa4456723bb16bac2fa3841",
+        "status": ""
+      }
+    },
+    "expectedTestTasks": [
+      "layoutJVM/test",
+      "layoutJS/test",
+      "intaglioJVM/test",
+      "intaglioJS/test",
+      "editionJVM/test",
+      "editionJS/test",
+      "cli/test",
+      "app/test"
+    ],
+    "testTotals": [
+      "[info] Passed: Total 22, Failed 0, Errors 0, Passed 22",
+      "[info] Passed: Total 26, Failed 0, Errors 0, Passed 26",
+      "[info] Passed: Total 59, Failed 0, Errors 0, Passed 59",
+      "[info] Passed: Total 59, Failed 0, Errors 0, Passed 59",
+      "[info] Passed: Total 57, Failed 0, Errors 0, Passed 57",
+      "[info] Passed: Total 22, Failed 0, Errors 0, Passed 22"
+    ],
+    "aggregateTestCounts": {
+      "Total": 245,
+      "Failed": 0,
+      "Errors": 0,
+      "Passed": 245,
+      "Skipped": 0
+    },
+    "logPath": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/film-foundation-goal-20260919/root-consumer-baseline.log",
+    "logSha256": "b6e0cb8f6d0bf38378051186a55e10a446c2e4209570489cb1e2fb21efb04dc1",
+    "logBytes": 24349,
+    "qualification": "Pre-migration consumer baseline only; not a candidate gate.",
+    "testTaskWitnesses": {
+      "layoutJVM/test": {
+        "suites": [
+          {
+            "suite": "storyatlas4s.layout.AwtMeasurerSuite",
+            "tests": 3,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0
+          },
+          {
+            "suite": "storyatlas4s.layout.PaginatorLawsSuite",
+            "tests": 14,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0
+          },
+          {
+            "suite": "storyatlas4s.layout.WarOfTheGhostsPaginationSuite",
+            "tests": 5,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0
+          }
+        ],
+        "testCount": 22
+      },
+      "layoutJS/test": {
+        "suites": [
+          {
+            "suite": "storyatlas4s.layout.DomMeasurerSuite",
+            "tests": 7,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0
+          },
+          {
+            "suite": "storyatlas4s.layout.PaginatorLawsSuite",
+            "tests": 14,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0
+          },
+          {
+            "suite": "storyatlas4s.layout.WarOfTheGhostsPaginationSuite",
+            "tests": 5,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0
+          }
+        ],
+        "testCount": 26
+      },
+      "intaglioJVM/test": {
+        "suites": [
+          {
+            "suite": "storyatlas4s.intaglio.DraftLoweringSuite",
+            "tests": 7,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0
+          },
+          {
+            "suite": "storyatlas4s.intaglio.PagedCodexLoweringSuite",
+            "tests": 4,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0
+          },
+          {
+            "suite": "storyatlas4s.intaglio.PlateCraftSuite",
+            "tests": 24,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0
+          },
+          {
+            "suite": "storyatlas4s.intaglio.VoyageLoweringSuite",
+            "tests": 14,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0
+          },
+          {
+            "suite": "storyatlas4s.intaglio.WarOfTheGhostsLoweringSuite",
+            "tests": 10,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0
+          }
+        ],
+        "testCount": 59
+      },
+      "intaglioJS/test": {
+        "suites": [
+          {
+            "suite": "storyatlas4s.intaglio.DraftLoweringSuite",
+            "tests": 7,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0
+          },
+          {
+            "suite": "storyatlas4s.intaglio.PagedCodexLoweringSuite",
+            "tests": 4,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0
+          },
+          {
+            "suite": "storyatlas4s.intaglio.PlateCraftSuite",
+            "tests": 24,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0
+          },
+          {
+            "suite": "storyatlas4s.intaglio.VoyageLoweringSuite",
+            "tests": 14,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0
+          },
+          {
+            "suite": "storyatlas4s.intaglio.WarOfTheGhostsLoweringSuite",
+            "tests": 10,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0
+          }
+        ],
+        "testCount": 59
+      },
+      "editionJVM/test": {
+        "suites": [],
+        "testCount": 0,
+        "testSourceFiles": []
+      },
+      "editionJS/test": {
+        "suites": [],
+        "testCount": 0,
+        "testSourceFiles": []
+      },
+      "cli/test": {
+        "suites": [
+          {
+            "suite": "storyatlas4s.cli.CodexHtmlSuite",
+            "tests": 8,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0
+          },
+          {
+            "suite": "storyatlas4s.cli.EditionSuite",
+            "tests": 7,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0
+          },
+          {
+            "suite": "storyatlas4s.cli.ModelInputSuite",
+            "tests": 21,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0
+          },
+          {
+            "suite": "storyatlas4s.cli.VoyageEditionSuite",
+            "tests": 4,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0
+          },
+          {
+            "suite": "storyatlas4s.cli.WorkspaceSuite",
+            "tests": 17,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0
+          }
+        ],
+        "testCount": 57
+      },
+      "app/test": {
+        "suites": [
+          {
+            "suite": "storyatlas4s.app.AppCompilerSuite",
+            "tests": 13,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0
+          },
+          {
+            "suite": "storyatlas4s.app.SemanticZoomSuite",
+            "tests": 6,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0
+          },
+          {
+            "suite": "storyatlas4s.app.SvgDomSuite",
+            "tests": 3,
+            "failures": 0,
+            "errors": 0,
+            "skipped": 0
+          }
+        ],
+        "testCount": 22
+      }
+    }
+  },
+  "handoff": "Reusable clones transferred to film_foundation after the terminal baseline gate; candidate qualification must rerun against the exact changed provider commit."
+}

@@ -1,0 +1,75 @@
+{
+  "codeRevision": "c24ddd66026f0d1848b61369b0bbaff7a90a5d40",
+  "scope": "Final six new witnesses, all52 source/mutant/log hashes and inventory; historical45 detailed audit remains separately retained; mapping-cardinality checked through manifest hashes and XML below",
+  "inventoryCount": 52,
+  "terminalWitnesses": 52,
+  "newChecks": [
+    {
+      "id": "missing-map",
+      "tests": 20,
+      "failed": [
+        "right bundle does not license another stream's axis",
+        "clock mapping admits its exact image and refuses partial or absent coverage"
+      ],
+      "controlPassed": true,
+      "sourceMutantLogAndXmlHashesVerified": true
+    },
+    {
+      "id": "interval-axis-media",
+      "tests": 20,
+      "failed": [
+        "single-interval selection refuses a foreign axis for every playback anchor"
+      ],
+      "controlPassed": true,
+      "sourceMutantLogAndXmlHashesVerified": true
+    },
+    {
+      "id": "interval-axis-shot",
+      "tests": 20,
+      "failed": [
+        "single-interval selection refuses a foreign axis for every playback anchor"
+      ],
+      "controlPassed": true,
+      "sourceMutantLogAndXmlHashesVerified": true
+    },
+    {
+      "id": "interval-axis-track",
+      "tests": 20,
+      "failed": [
+        "single-interval selection refuses a foreign axis for every playback anchor"
+      ],
+      "controlPassed": true,
+      "sourceMutantLogAndXmlHashesVerified": true
+    },
+    {
+      "id": "evidence-decode-refusal",
+      "tests": 5,
+      "failed": [
+        "Text payload is complete and its anchored encoding is refused on decode",
+        "MediaTime payload is complete and its anchored encoding is refused on decode",
+        "Shot payload is complete and its anchored encoding is refused on decode",
+        "Track payload is complete and its anchored encoding is refused on decode"
+      ],
+      "controlPassed": true,
+      "sourceMutantLogAndXmlHashesVerified": true
+    },
+    {
+      "id": "support-decode-refusal",
+      "tests": 5,
+      "failed": [
+        "Text payload is complete and its anchored encoding is refused on decode",
+        "MediaTime payload is complete and its anchored encoding is refused on decode",
+        "Shot payload is complete and its anchored encoding is refused on decode",
+        "Track payload is complete and its anchored encoding is refused on decode"
+      ],
+      "controlPassed": true,
+      "sourceMutantLogAndXmlHashesVerified": true
+    }
+  ],
+  "restoredTests": 73,
+  "restoredJunitSnapshot": "data/study/film-foundation-goal-20260919/s2-final-restoration-junit",
+  "cleanCloneObserved": true,
+  "manifestSha256": "b7822cd4a2a87db1f2343808ee19116b997e617978fc76c1875b73fb22f0b570",
+  "priorAudit": "data/study/film-foundation-goal-20260919/root-s2-mutation-final-audit.json",
+  "mappingCardinalityXmlVerified": true
+}

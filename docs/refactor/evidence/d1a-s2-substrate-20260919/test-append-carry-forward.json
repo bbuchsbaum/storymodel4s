@@ -1,0 +1,13 @@
+{
+  "fromRevision": "3cd484d6",
+  "toRevision": "c24ddd66026f0d1848b61369b0bbaff7a90a5d40",
+  "changedPaths": [
+    "core/src/test/scala/storymodel4s/core/D1aSupportSuite.scala"
+  ],
+  "existingTestFileIsExactPrefix": true,
+  "originalTestFileSha256": "c39ddbf8c16d90b3beb81c39bae9eeefeca3f48973e3f4a5b2c3a8df1b8c5525",
+  "newTestFileSha256": "88e7dc9363b1dd4d1cff7b9b5763984249ebbbb095e7ca35cdfbbf64dffdc80c",
+  "appendedBytes": 749,
+  "retainedWitnessCount": 46,
+  "reason": "One additional test registered after the entire original file. Every original test body and fixture remains byte-identical; production has no changes. Original executed revisions/counts remain attached to each retained witness."
+}

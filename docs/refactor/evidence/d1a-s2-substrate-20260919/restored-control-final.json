@@ -1,0 +1,36 @@
+{
+  "codeRevision": "c24ddd66026f0d1848b61369b0bbaff7a90a5d40",
+  "command": [
+    "sbt",
+    "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+    "-batch",
+    "coreJVM/clean",
+    "coreJVM/testOnly storymodel4s.core.D1aSupportSuite",
+    "coreJVM/testOnly storymodel4s.core.D1aAtlasSuite",
+    "coreJVM/testOnly storymodel4s.coreprobe.D1aConstructionBoundarySuite",
+    "codecJVM/testOnly storymodel4s.codec.EvidenceSupportCodecSuite",
+    "storyJVM/testOnly storymodel4s.story.D1aTextBoundarySuite",
+    "documentJVM/testOnly storymodel4s.document.CompilerSuite"
+  ],
+  "exitCode": 0,
+  "cleanBefore": true,
+  "cleanAfter": true,
+  "seconds": 23.2,
+  "logPath": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1a-s2-20260919/final/restored-control-final.log",
+  "logSha256": "e6640b29b549d5d18f80f15ff1626d52c142f9d0c2c94556962251de93069c17",
+  "testTotals": [
+    "[info] Passed: Total 20, Failed 0, Errors 0, Passed 20",
+    "[info] Passed: Total 9, Failed 0, Errors 0, Passed 9",
+    "[info] Passed: Total 6, Failed 0, Errors 0, Passed 6",
+    "[info] Passed: Total 5, Failed 0, Errors 0, Passed 5",
+    "[info] Passed: Total 4, Failed 0, Errors 0, Passed 4",
+    "[info] Passed: Total 29, Failed 0, Errors 0, Passed 29"
+  ],
+  "aggregateTestCounts": {
+    "Total": 73,
+    "Failed": 0,
+    "Errors": 0,
+    "Passed": 73,
+    "Skipped": 0
+  }
+}

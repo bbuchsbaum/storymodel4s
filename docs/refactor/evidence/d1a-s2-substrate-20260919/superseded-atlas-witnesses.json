@@ -1,0 +1,183 @@
+[
+  {
+    "codeRevision": "fef98b53db2b565651d36078196b89fa5b2cfcb6",
+    "command": [
+      "sbt",
+      "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+      "-batch",
+      "coreJVM/testOnly storymodel4s.core.D1aAtlasSuite"
+    ],
+    "exitCode": 1,
+    "cleanBefore": false,
+    "cleanAfter": false,
+    "seconds": 13.214,
+    "logPath": "study/d1a-s2-20260919/duplicate-unit.log",
+    "logSha256": "4d000d031fac0a9a65b911b388b4e40e4e34ec6dd5a49fd3eb91b9bd36bb6595",
+    "testTotals": [
+      "[error] Failed: Total 9, Failed 1, Errors 0, Passed 8"
+    ],
+    "aggregateTestCounts": {
+      "Total": 9,
+      "Failed": 1,
+      "Errors": 0,
+      "Passed": 8,
+      "Skipped": 0
+    },
+    "path": "core/src/main/scala/storymodel4s/core/atlas.scala",
+    "compiled": true,
+    "cleanRecompile": false,
+    "originalSha256": "64c1baab5d34036dcadf15a9d40b247cef5180ffed371663a48bc6649a7a55b8",
+    "mutantSha256": "a0675002e0eeea54825e64e948fe04ae6edf9a1a71a8372300da734fbb324d63",
+    "namedRejectingTest": "refuse duplicate proposal unit IDs before map construction",
+    "acceptingControl": "accepting control: unique units and bound sentences have exact lookup",
+    "acceptingControlPassed": true,
+    "failedTests": [
+      "refuse duplicate proposal unit IDs before map construction"
+    ]
+  },
+  {
+    "codeRevision": "fef98b53db2b565651d36078196b89fa5b2cfcb6",
+    "command": [
+      "sbt",
+      "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+      "-batch",
+      "coreJVM/testOnly storymodel4s.core.D1aAtlasSuite"
+    ],
+    "exitCode": 1,
+    "cleanBefore": false,
+    "cleanAfter": false,
+    "seconds": 12.294,
+    "logPath": "study/d1a-s2-20260919/duplicate-surface.log",
+    "logSha256": "0fd70c877611a6e61a9cdea4bf8bf2259ca9ab33361afd6e7d75a0f26ac6bec0",
+    "testTotals": [
+      "[error] Failed: Total 9, Failed 1, Errors 0, Passed 8"
+    ],
+    "aggregateTestCounts": {
+      "Total": 9,
+      "Failed": 1,
+      "Errors": 0,
+      "Passed": 8,
+      "Skipped": 0
+    },
+    "path": "core/src/main/scala/storymodel4s/core/atlas.scala",
+    "compiled": true,
+    "cleanRecompile": false,
+    "originalSha256": "64c1baab5d34036dcadf15a9d40b247cef5180ffed371663a48bc6649a7a55b8",
+    "mutantSha256": "5d159abdd3a968736ec898579bd6f7085f5838d14e503af525924572db48f427",
+    "namedRejectingTest": "refuse duplicated bound sentence",
+    "acceptingControl": "accepting control: unique units and bound sentences have exact lookup",
+    "acceptingControlPassed": true,
+    "failedTests": [
+      "refuse duplicated bound sentence"
+    ]
+  },
+  {
+    "codeRevision": "fef98b53db2b565651d36078196b89fa5b2cfcb6",
+    "command": [
+      "sbt",
+      "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+      "-batch",
+      "coreJVM/testOnly storymodel4s.core.D1aAtlasSuite"
+    ],
+    "exitCode": 1,
+    "cleanBefore": false,
+    "cleanAfter": false,
+    "seconds": 12.262,
+    "logPath": "study/d1a-s2-20260919/atlas-primary.log",
+    "logSha256": "6b62c3d95d1db3b4d7953f7558c943cb16feb33ca47f24dbd5d9598a7b8591c3",
+    "testTotals": [
+      "[error] Failed: Total 9, Failed 1, Errors 0, Passed 8"
+    ],
+    "aggregateTestCounts": {
+      "Total": 9,
+      "Failed": 1,
+      "Errors": 0,
+      "Passed": 8,
+      "Skipped": 0
+    },
+    "path": "core/src/main/scala/storymodel4s/core/atlas.scala",
+    "compiled": true,
+    "cleanRecompile": false,
+    "originalSha256": "64c1baab5d34036dcadf15a9d40b247cef5180ffed371663a48bc6649a7a55b8",
+    "mutantSha256": "00c3fcc618eb9f229b673fd2317cb0e9cb9ee34bc6f4a7eb349676c3ca8e68dd",
+    "namedRejectingTest": "refuse text and annotation timeline primaries explicitly",
+    "acceptingControl": "accepting control: unique units and bound sentences have exact lookup",
+    "acceptingControlPassed": true,
+    "failedTests": [
+      "refuse text and annotation timeline primaries explicitly"
+    ]
+  },
+  {
+    "codeRevision": "fef98b53db2b565651d36078196b89fa5b2cfcb6",
+    "command": [
+      "sbt",
+      "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+      "-batch",
+      "coreJVM/testOnly storymodel4s.core.D1aAtlasSuite"
+    ],
+    "exitCode": 1,
+    "cleanBefore": false,
+    "cleanAfter": false,
+    "seconds": 12.82,
+    "logPath": "study/d1a-s2-20260919/atlas-surface.log",
+    "logSha256": "c363f559c767c934f7784f729c655e60cabcd8fb789650a228a9d6e32b9f4896",
+    "testTotals": [
+      "[error] Failed: Total 9, Failed 1, Errors 0, Passed 8"
+    ],
+    "aggregateTestCounts": {
+      "Total": 9,
+      "Failed": 1,
+      "Errors": 0,
+      "Passed": 8,
+      "Skipped": 0
+    },
+    "path": "core/src/main/scala/storymodel4s/core/atlas.scala",
+    "compiled": true,
+    "cleanRecompile": false,
+    "originalSha256": "64c1baab5d34036dcadf15a9d40b247cef5180ffed371663a48bc6649a7a55b8",
+    "mutantSha256": "209b6ab2ea136c28c0061bf7fa1750d86ef0e1a818d199e40299cd677703f740",
+    "namedRejectingTest": "refuse missing, foreign and nonsentence proposal surfaces",
+    "acceptingControl": "accepting control: unique units and bound sentences have exact lookup",
+    "acceptingControlPassed": true,
+    "failedTests": [
+      "refuse missing, foreign and nonsentence proposal surfaces"
+    ]
+  },
+  {
+    "codeRevision": "fef98b53db2b565651d36078196b89fa5b2cfcb6",
+    "command": [
+      "sbt",
+      "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+      "-batch",
+      "coreJVM/testOnly storymodel4s.core.D1aAtlasSuite"
+    ],
+    "exitCode": 1,
+    "cleanBefore": false,
+    "cleanAfter": false,
+    "seconds": 12.515,
+    "logPath": "study/d1a-s2-20260919/atlas-support-attempt2.log",
+    "logSha256": "c9448eb0f8ca8f907b45ae87290c1b88e10507e09d1d08233df7e221ce2b4104",
+    "testTotals": [
+      "[error] Failed: Total 9, Failed 1, Errors 0, Passed 8"
+    ],
+    "aggregateTestCounts": {
+      "Total": 9,
+      "Failed": 1,
+      "Errors": 0,
+      "Passed": 8,
+      "Skipped": 0
+    },
+    "path": "core/src/main/scala/storymodel4s/core/atlas.scala",
+    "compiled": true,
+    "cleanRecompile": false,
+    "originalSha256": "64c1baab5d34036dcadf15a9d40b247cef5180ffed371663a48bc6649a7a55b8",
+    "mutantSha256": "f089bf993cb55c4b106fab8476063303c9768a6241ff6845b67da58207de2231",
+    "junitSha256": "135c626275f45d003040200b374986b8123249f58a2e5007fc7b3639ae256171",
+    "namedRejectingTest": "refuse support belonging to another bundle",
+    "acceptingControl": "accepting control: unique units and bound sentences have exact lookup",
+    "acceptingControlPassed": true,
+    "failedTests": [
+      "refuse support belonging to another bundle"
+    ]
+  }
+]

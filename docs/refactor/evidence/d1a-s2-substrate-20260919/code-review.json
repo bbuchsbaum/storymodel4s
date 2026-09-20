@@ -19,5 +19,10 @@
     }
   ],
   "recheck": "All three findings resolved in committed source at 03eabf4a; no new findings. Whitespace check passed. fef98b53 applies formatting only.",
-  "qualification": "Source and test-design review. Executed mutation and gate results are recorded separately; the reviewer did not run sbt."
+  "qualification": "Source and test-design review. Executed mutation and gate results are recorded separately; the reviewer did not run sbt.",
+  "testWitnessRepairRevision": "3cd484d6",
+  "testWitnessRepairRecheck": "No findings. The renamed child stays before parent in canonical order, isolating the unit ID. The new span (0,3) to (0,4) changes only endExclusive within unchanged bounds. Production source is unchanged. Read-only recheck; no executed qualification claimed.",
+  "finalCandidateRevision": "c24ddd66",
+  "selectorWitnessRepairRevision": "c24ddd66",
+  "selectorWitnessRepairRecheck": "No findings. The single-interval test covers correct-axis acceptance and foreign-axis refusal for MediaTime, Shot and Track independently, without a secondary mixed-axis or overlap refusal. Production and all prior test bodies are unchanged. Read-only review; execution is recorded separately."
 }

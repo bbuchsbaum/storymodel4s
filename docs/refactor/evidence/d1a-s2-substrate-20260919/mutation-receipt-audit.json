@@ -1,0 +1,330 @@
+{
+  "scope": "Independent read-only final S2 mutation/clean-restoration receipt audit; full provider/consumer release gates still separate",
+  "codeRevision": "3cd484d60ef9dd5ecd7099df0ffc63bf5b57fd46",
+  "mutationManifestSha256": "fbb038bb4ee6231c4003cb2c9907857d69d7136c791a256e5438a1d106273f3f",
+  "qualifyRunnerSha256": "f8daf58df6f613cbb806bd953c9f80c23b89b72c8cfdad1f0b412f54872b043d",
+  "mutantsVerified": 45,
+  "freshCompileProbesVerified": 4,
+  "restoredTests": 72,
+  "restoredSuites": 6,
+  "carryForwardBlobsVerified": 5,
+  "currentIsolatedSourceClean": true,
+  "remainingFindings": [],
+  "checks": [
+    {
+      "label": "foreign-bundle",
+      "codeRevision": "fef98b53db2b565651d36078196b89fa5b2cfcb6",
+      "sourceAndMutantHashesVerified": true,
+      "namedFailureAndControl": "19 static declarations and complete named failures/zero ignored; control in passed complement, no retained XML",
+      "cleanProbeRecompileVerified": false
+    },
+    {
+      "label": "foreign-stream",
+      "codeRevision": "fef98b53db2b565651d36078196b89fa5b2cfcb6",
+      "sourceAndMutantHashesVerified": true,
+      "namedFailureAndControl": "19 static declarations and complete named failures/zero ignored; control in passed complement, no retained XML",
+      "cleanProbeRecompileVerified": false
+    },
+    {
+      "label": "stream-kind",
+      "codeRevision": "fef98b53db2b565651d36078196b89fa5b2cfcb6",
+      "sourceAndMutantHashesVerified": true,
+      "namedFailureAndControl": "19 static declarations and complete named failures/zero ignored; control in passed complement, no retained XML",
+      "cleanProbeRecompileVerified": false
+    },
+    {
+      "label": "interval-axis",
+      "codeRevision": "fef98b53db2b565651d36078196b89fa5b2cfcb6",
+      "sourceAndMutantHashesVerified": true,
+      "namedFailureAndControl": "19 static declarations and complete named failures/zero ignored; control in passed complement, no retained XML",
+      "cleanProbeRecompileVerified": false
+    },
+    {
+      "label": "text-extent",
+      "codeRevision": "fef98b53db2b565651d36078196b89fa5b2cfcb6",
+      "sourceAndMutantHashesVerified": true,
+      "namedFailureAndControl": "19 static declarations and complete named failures/zero ignored; control in passed complement, no retained XML",
+      "cleanProbeRecompileVerified": false
+    },
+    {
+      "label": "stream-axis",
+      "codeRevision": "fef98b53db2b565651d36078196b89fa5b2cfcb6",
+      "sourceAndMutantHashesVerified": true,
+      "namedFailureAndControl": "19 static declarations and complete named failures/zero ignored; control in passed complement, no retained XML",
+      "cleanProbeRecompileVerified": false
+    },
+    {
+      "label": "native-extent",
+      "codeRevision": "fef98b53db2b565651d36078196b89fa5b2cfcb6",
+      "sourceAndMutantHashesVerified": true,
+      "namedFailureAndControl": "19 static declarations and complete named failures/zero ignored; control in passed complement, no retained XML",
+      "cleanProbeRecompileVerified": false
+    },
+    {
+      "label": "mapping-image",
+      "codeRevision": "fef98b53db2b565651d36078196b89fa5b2cfcb6",
+      "sourceAndMutantHashesVerified": true,
+      "namedFailureAndControl": "19 static declarations and complete named failures/zero ignored; control in passed complement, no retained XML",
+      "cleanProbeRecompileVerified": false
+    },
+    {
+      "label": "composition-source",
+      "codeRevision": "fef98b53db2b565651d36078196b89fa5b2cfcb6",
+      "sourceAndMutantHashesVerified": true,
+      "namedFailureAndControl": "19 static declarations and complete named failures/zero ignored; control in passed complement, no retained XML",
+      "cleanProbeRecompileVerified": false
+    },
+    {
+      "label": "composition-gap",
+      "codeRevision": "fef98b53db2b565651d36078196b89fa5b2cfcb6",
+      "sourceAndMutantHashesVerified": true,
+      "namedFailureAndControl": "19 static declarations and complete named failures/zero ignored; control in passed complement, no retained XML",
+      "cleanProbeRecompileVerified": false
+    },
+    {
+      "label": "clock-timebase",
+      "codeRevision": "fef98b53db2b565651d36078196b89fa5b2cfcb6",
+      "sourceAndMutantHashesVerified": true,
+      "namedFailureAndControl": "19 static declarations and complete named failures/zero ignored; control in passed complement, no retained XML",
+      "cleanProbeRecompileVerified": false
+    },
+    {
+      "label": "text-stream-selection",
+      "codeRevision": "fef98b53db2b565651d36078196b89fa5b2cfcb6",
+      "sourceAndMutantHashesVerified": true,
+      "namedFailureAndControl": "19 static declarations and complete named failures/zero ignored; control in passed complement, no retained XML",
+      "cleanProbeRecompileVerified": false
+    },
+    {
+      "label": "union-overlap",
+      "codeRevision": "fef98b53db2b565651d36078196b89fa5b2cfcb6",
+      "sourceAndMutantHashesVerified": true,
+      "namedFailureAndControl": "19 static declarations and complete named failures/zero ignored; control in passed complement, no retained XML",
+      "cleanProbeRecompileVerified": false
+    },
+    {
+      "label": "union-adjacency",
+      "codeRevision": "fef98b53db2b565651d36078196b89fa5b2cfcb6",
+      "sourceAndMutantHashesVerified": true,
+      "namedFailureAndControl": "19 static declarations and complete named failures/zero ignored; control in passed complement, no retained XML",
+      "cleanProbeRecompileVerified": false
+    },
+    {
+      "label": "mapping-equivalence",
+      "codeRevision": "fef98b53db2b565651d36078196b89fa5b2cfcb6",
+      "sourceAndMutantHashesVerified": true,
+      "namedFailureAndControl": "19 static declarations and complete named failures/zero ignored; control in passed complement, no retained XML",
+      "cleanProbeRecompileVerified": false
+    },
+    {
+      "label": "receipt-safe-binding",
+      "codeRevision": "fef98b53db2b565651d36078196b89fa5b2cfcb6",
+      "sourceAndMutantHashesVerified": true,
+      "namedFailureAndControl": "retained JUnit",
+      "cleanProbeRecompileVerified": false
+    },
+    {
+      "label": "mapping-offset",
+      "codeRevision": "fef98b53db2b565651d36078196b89fa5b2cfcb6",
+      "sourceAndMutantHashesVerified": true,
+      "namedFailureAndControl": "retained JUnit",
+      "cleanProbeRecompileVerified": false
+    },
+    {
+      "label": "mapping-scale",
+      "codeRevision": "fef98b53db2b565651d36078196b89fa5b2cfcb6",
+      "sourceAndMutantHashesVerified": true,
+      "namedFailureAndControl": "retained JUnit",
+      "cleanProbeRecompileVerified": false
+    },
+    {
+      "label": "bundle-mapping",
+      "codeRevision": "fef98b53db2b565651d36078196b89fa5b2cfcb6",
+      "sourceAndMutantHashesVerified": true,
+      "namedFailureAndControl": "retained JUnit",
+      "cleanProbeRecompileVerified": false
+    },
+    {
+      "label": "bundle-stream-extent",
+      "codeRevision": "fef98b53db2b565651d36078196b89fa5b2cfcb6",
+      "sourceAndMutantHashesVerified": true,
+      "namedFailureAndControl": "retained JUnit",
+      "cleanProbeRecompileVerified": false
+    },
+    {
+      "label": "bundle-primary",
+      "codeRevision": "fef98b53db2b565651d36078196b89fa5b2cfcb6",
+      "sourceAndMutantHashesVerified": true,
+      "namedFailureAndControl": "retained JUnit",
+      "cleanProbeRecompileVerified": false
+    },
+    {
+      "label": "duplicate-unit-v2",
+      "codeRevision": "3cd484d60ef9dd5ecd7099df0ffc63bf5b57fd46",
+      "sourceAndMutantHashesVerified": true,
+      "namedFailureAndControl": "retained JUnit",
+      "cleanProbeRecompileVerified": false
+    },
+    {
+      "label": "duplicate-surface-v2",
+      "codeRevision": "3cd484d60ef9dd5ecd7099df0ffc63bf5b57fd46",
+      "sourceAndMutantHashesVerified": true,
+      "namedFailureAndControl": "retained JUnit",
+      "cleanProbeRecompileVerified": false
+    },
+    {
+      "label": "atlas-primary-v2",
+      "codeRevision": "3cd484d60ef9dd5ecd7099df0ffc63bf5b57fd46",
+      "sourceAndMutantHashesVerified": true,
+      "namedFailureAndControl": "retained JUnit",
+      "cleanProbeRecompileVerified": false
+    },
+    {
+      "label": "atlas-surface-v2",
+      "codeRevision": "3cd484d60ef9dd5ecd7099df0ffc63bf5b57fd46",
+      "sourceAndMutantHashesVerified": true,
+      "namedFailureAndControl": "retained JUnit",
+      "cleanProbeRecompileVerified": false
+    },
+    {
+      "label": "atlas-support-attempt2-v2",
+      "codeRevision": "3cd484d60ef9dd5ecd7099df0ffc63bf5b57fd46",
+      "sourceAndMutantHashesVerified": true,
+      "namedFailureAndControl": "retained JUnit",
+      "cleanProbeRecompileVerified": false
+    },
+    {
+      "label": "surface-id-v2",
+      "codeRevision": "3cd484d60ef9dd5ecd7099df0ffc63bf5b57fd46",
+      "sourceAndMutantHashesVerified": true,
+      "namedFailureAndControl": "retained JUnit",
+      "cleanProbeRecompileVerified": false
+    },
+    {
+      "label": "surface-kind-v2",
+      "codeRevision": "3cd484d60ef9dd5ecd7099df0ffc63bf5b57fd46",
+      "sourceAndMutantHashesVerified": true,
+      "namedFailureAndControl": "retained JUnit",
+      "cleanProbeRecompileVerified": false
+    },
+    {
+      "label": "surface-span-v2",
+      "codeRevision": "3cd484d60ef9dd5ecd7099df0ffc63bf5b57fd46",
+      "sourceAndMutantHashesVerified": true,
+      "namedFailureAndControl": "retained JUnit",
+      "cleanProbeRecompileVerified": false
+    },
+    {
+      "label": "surface-ordinal-v2",
+      "codeRevision": "3cd484d60ef9dd5ecd7099df0ffc63bf5b57fd46",
+      "sourceAndMutantHashesVerified": true,
+      "namedFailureAndControl": "retained JUnit",
+      "cleanProbeRecompileVerified": false
+    },
+    {
+      "label": "surface-endExclusive-v2",
+      "codeRevision": "3cd484d60ef9dd5ecd7099df0ffc63bf5b57fd46",
+      "sourceAndMutantHashesVerified": true,
+      "namedFailureAndControl": "retained JUnit",
+      "cleanProbeRecompileVerified": false
+    },
+    {
+      "label": "surface-parent-v2",
+      "codeRevision": "3cd484d60ef9dd5ecd7099df0ffc63bf5b57fd46",
+      "sourceAndMutantHashesVerified": true,
+      "namedFailureAndControl": "retained JUnit",
+      "cleanProbeRecompileVerified": false
+    },
+    {
+      "label": "surface-source-v2",
+      "codeRevision": "3cd484d60ef9dd5ecd7099df0ffc63bf5b57fd46",
+      "sourceAndMutantHashesVerified": true,
+      "namedFailureAndControl": "retained JUnit",
+      "cleanProbeRecompileVerified": false
+    },
+    {
+      "label": "codec-text",
+      "codeRevision": "3cd484d60ef9dd5ecd7099df0ffc63bf5b57fd46",
+      "sourceAndMutantHashesVerified": true,
+      "namedFailureAndControl": "retained JUnit",
+      "cleanProbeRecompileVerified": false
+    },
+    {
+      "label": "codec-mediatime",
+      "codeRevision": "3cd484d60ef9dd5ecd7099df0ffc63bf5b57fd46",
+      "sourceAndMutantHashesVerified": true,
+      "namedFailureAndControl": "retained JUnit",
+      "cleanProbeRecompileVerified": false
+    },
+    {
+      "label": "codec-shot",
+      "codeRevision": "3cd484d60ef9dd5ecd7099df0ffc63bf5b57fd46",
+      "sourceAndMutantHashesVerified": true,
+      "namedFailureAndControl": "retained JUnit",
+      "cleanProbeRecompileVerified": false
+    },
+    {
+      "label": "codec-track",
+      "codeRevision": "3cd484d60ef9dd5ecd7099df0ffc63bf5b57fd46",
+      "sourceAndMutantHashesVerified": true,
+      "namedFailureAndControl": "retained JUnit",
+      "cleanProbeRecompileVerified": false
+    },
+    {
+      "label": "text-model-claims",
+      "codeRevision": "3cd484d60ef9dd5ecd7099df0ffc63bf5b57fd46",
+      "sourceAndMutantHashesVerified": true,
+      "namedFailureAndControl": "retained JUnit",
+      "cleanProbeRecompileVerified": false
+    },
+    {
+      "label": "text-model-boundary",
+      "codeRevision": "3cd484d60ef9dd5ecd7099df0ffc63bf5b57fd46",
+      "sourceAndMutantHashesVerified": true,
+      "namedFailureAndControl": "retained JUnit",
+      "cleanProbeRecompileVerified": false
+    },
+    {
+      "label": "compiler-ledger",
+      "codeRevision": "3cd484d60ef9dd5ecd7099df0ffc63bf5b57fd46",
+      "sourceAndMutantHashesVerified": true,
+      "namedFailureAndControl": "retained JUnit",
+      "cleanProbeRecompileVerified": false
+    },
+    {
+      "label": "compiler-inline",
+      "codeRevision": "3cd484d60ef9dd5ecd7099df0ffc63bf5b57fd46",
+      "sourceAndMutantHashesVerified": true,
+      "namedFailureAndControl": "retained JUnit",
+      "cleanProbeRecompileVerified": false
+    },
+    {
+      "label": "probe-NarrativeProposalUnit",
+      "codeRevision": "3cd484d60ef9dd5ecd7099df0ffc63bf5b57fd46",
+      "sourceAndMutantHashesVerified": true,
+      "namedFailureAndControl": "retained JUnit",
+      "cleanProbeRecompileVerified": true
+    },
+    {
+      "label": "probe-AnchoredNarrativeAtlas",
+      "codeRevision": "3cd484d60ef9dd5ecd7099df0ffc63bf5b57fd46",
+      "sourceAndMutantHashesVerified": true,
+      "namedFailureAndControl": "retained JUnit",
+      "cleanProbeRecompileVerified": true
+    },
+    {
+      "label": "probe-BoundProposalSurface",
+      "codeRevision": "3cd484d60ef9dd5ecd7099df0ffc63bf5b57fd46",
+      "sourceAndMutantHashesVerified": true,
+      "namedFailureAndControl": "retained JUnit",
+      "cleanProbeRecompileVerified": true
+    },
+    {
+      "label": "probe-sealed-atlas",
+      "codeRevision": "3cd484d60ef9dd5ecd7099df0ffc63bf5b57fd46",
+      "sourceAndMutantHashesVerified": true,
+      "namedFailureAndControl": "retained JUnit",
+      "cleanProbeRecompileVerified": true
+    }
+  ]
+}

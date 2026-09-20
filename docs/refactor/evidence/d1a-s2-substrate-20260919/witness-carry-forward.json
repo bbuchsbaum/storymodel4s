@@ -1,0 +1,17 @@
+{
+  "fromRevision": "fef98b53",
+  "toRevision": "3cd484d60ef9dd5ecd7099df0ffc63bf5b57fd46",
+  "changedPaths": [
+    "core/src/test/scala/storymodel4s/core/D1aAtlasSuite.scala",
+    "docs/refactor/evidence/d1a-s2-substrate-20260919/code-review.json"
+  ],
+  "retainedWitnessCount": 21,
+  "identicalBlobs": {
+    "core/src/main/scala/storymodel4s/core/source.scala": "84327118164dab02a699959b1849c657c870b351",
+    "core/src/main/scala/storymodel4s/core/atlas.scala": "59c9ccd767cf0094e32177681044cad1fed5af42",
+    "core/src/main/scala/storymodel4s/core/sourceIdentity.scala": "5f998aec8665a2fa72c9561abd913445bea1f2c1",
+    "core/src/main/scala/storymodel4s/core/support.scala": "2fcc39d615a3584d281b23b175463cfadd55d7fb",
+    "core/src/test/scala/storymodel4s/core/D1aSupportSuite.scala": "0ec7d6abda3d44f60cec09e1e9706ccd56404968"
+  },
+  "reason": "Only the atlas identity fixture changed. All atlas witnesses are rerun at the new revision; earlier support-only witnesses carry unchanged production and test blobs. Actual executed codeRevision remains recorded per witness."
+}
