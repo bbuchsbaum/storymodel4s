@@ -19,7 +19,7 @@ private[acquire] object D1aAcquireFixtures:
   val atlas = AnchoredNarrativeAtlas.of(film, Vector.empty, Some(bound)).toOption.get
   val noSurface = AnchoredNarrativeAtlas.of(film, Vector.empty).toOption.get
 
-  def inline(id: String, text: Boolean = false, anchors: Boolean = false): EvidenceRef =
+  def inlineEvidence(id: String, text: Boolean = false, anchors: Boolean = false): EvidenceRef =
     EvidenceRef.Inline(Fixtures.evidence(id, Option.when(text)(Fixtures.someSpans))
       .copy(anchors = Option.when(anchors)(anchored)))
 

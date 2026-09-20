@@ -27,8 +27,8 @@ class D1aTextResolverParitySuite extends FunSuite:
       structural <- Vector(StructuralValidity.Valid, StructuralValidity.invalid("named-violation"))
       critic <- 0 until 3
     do
-      val e1 = inline("first", text = supportForm >= 2)
-      val e2 = inline("second", text = supportForm >= 2)
+      val e1 = inlineEvidence("first", text = supportForm >= 2)
+      val e2 = inlineEvidence("second", text = supportForm >= 2)
       val proposals = pattern match
         case 0 => Vector(proposal(1, e1))
         case 1 => Vector(proposal(1, e1), proposal(1, e2))
@@ -72,15 +72,15 @@ class D1aTextResolverParitySuite extends FunSuite:
       FamilyPolicy.Ordinary, "ById with bundle spans")
 
   test("text losing support and losing calibration cannot license the leader"):
-    val b = bundle(Vector(proposal(1, inline("one"), "one"),
-      proposal(1, inline("two"), "two"), proposal(2, inline("losing", text = true), "three")))
+    val b = bundle(Vector(proposal(1, inlineEvidence("one"), "one"),
+      proposal(1, inlineEvidence("two"), "two"), proposal(2, inlineEvidence("losing", text = true), "three")))
     same(b, FamilyPolicy.Ordinary, "only losing support")
     same(b.copy(bases = Vector(CandidateBasis(2, calibrated(0.99)))),
       FamilyPolicy.Ordinary, "only losing calibration")
 
   test("text rank ties and duplicate evidence retain complete ordering"):
-    val a = inline("a", text = true)
-    val z = inline("z", text = true)
+    val a = inlineEvidence("a", text = true)
+    val z = inlineEvidence("z", text = true)
     val patterns = Vector(
       Vector(proposal(2, z), proposal(1, a)),
       Vector(proposal(1, a, score = None), proposal(2, z, score = Some(-0.1))),
@@ -99,8 +99,8 @@ class D1aTextResolverParitySuite extends FunSuite:
 
   test("text threshold neighbors and critic score boundaries preserve outcomes"):
     for fp <- Vector(FamilyPolicy.Ordinary, FamilyPolicy.Conservative, FamilyPolicy.Development) do
-      val b = bundle(Vector(proposal(1, inline("a", text = true)),
-        proposal(1, inline("b", text = true), "two")))
+      val b = bundle(Vector(proposal(1, inlineEvidence("a", text = true)),
+        proposal(1, inlineEvidence("b", text = true), "two")))
       for threshold <- Vector(fp.reviewBand.value, fp.acceptThreshold.value)
           p <- Vector(java.lang.Math.nextDown(threshold), threshold, java.lang.Math.nextUp(threshold)) do
         same(b.copy(bases = Vector(CandidateBasis(1, calibrated(p)))), fp, s"probability=$p")
