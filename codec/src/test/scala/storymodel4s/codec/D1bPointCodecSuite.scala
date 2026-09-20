@@ -25,7 +25,11 @@ class D1bPointCodecSuite extends FunSuite:
 
   test("same legacy id with changed full binding has distinct point component bytes"):
     val a = bundle(RationalTimebase.Millisecond)
-    val b = bundle(RationalTimebase.of(1L, 100L).toOption.get)
+    val first = a.streams.head
+    val changed = SourceStream.of(first.id, first.kind, first.checksum, first.nativeAxis,
+      first.extent, first.timebase, Vector(StreamId.unsafe("upstream-receipt"))).toOption.get
+    val b = SourceBundle.of(a.edition, a.sourceKind, Vector(changed), a.primaryAxis,
+      a.authorityTracks, a.mappings).toOption.get
     assertEquals(a.id, b.id)
     assertEquals(a.primaryAxis.id, b.primaryAxis.id)
     assertEquals(support(a).anchors.toVector, support(b).anchors.toVector)

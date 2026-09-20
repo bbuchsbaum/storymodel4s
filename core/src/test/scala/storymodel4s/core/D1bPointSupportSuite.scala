@@ -72,8 +72,11 @@ class D1bPointSupportSuite extends FunSuite:
     assert(!parent.contains(right(PlaybackSupport.of(axis.id, Vector(interval(25L, 26L)), Vector.empty))))
 
   test("full bundle binding refuses same-id metadata drift until explicit checked rebuild"):
-    val altered = right(SourceBundle.filmEdition(bundle.edition.get, bundle.streams.head.checksum,
-      0L, 100L, right(RationalTimebase.of(1L, 100L))))
+    val first = bundle.streams.head
+    val changed = right(SourceStream.of(first.id, first.kind, first.checksum, first.nativeAxis,
+      first.extent, first.timebase, Vector(StreamId.unsafe("upstream-receipt"))))
+    val altered = right(SourceBundle.of(bundle.edition, bundle.sourceKind, Vector(changed),
+      bundle.primaryAxis, bundle.authorityTracks, bundle.mappings))
     assertEquals(altered.id, bundle.id)
     val original = support(anchor(25L))
     assert(original.checkedOn(altered).isLeft)
