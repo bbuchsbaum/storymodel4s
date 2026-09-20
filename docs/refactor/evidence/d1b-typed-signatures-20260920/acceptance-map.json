@@ -1,6 +1,6 @@
 {
   "ticket": "bd-01M2TAC80YRK5JFNKTT7B7CAQN",
-  "status": "provider qualified; exact-pinned consumer and landing pending",
+  "status": "All required local execution gates passed; local landing and tracker reconciliation pending",
   "operativeInterpretation": [
     "Exact physical support admits intervals and explicit points; point row13 is mandatory.",
     "Legacy annotation-text coordinates remain declared scoring features only, separately fingerprinted; they are never physical support.",
@@ -147,8 +147,8 @@
     }
   ],
   "remaining": [
-    "exact-pinned storyatlas consumer",
-    "final cold evidence review/local landing/tracker reconciliation"
+    "final evidence reconciliation and local landing",
+    "ordinary tracker updates remain rejected; no bypass"
   ],
   "limitations": [
     "Not an end-to-end film compiler or full D1B scientific proof",
@@ -173,5 +173,14 @@
     "frozenS0Sha256": "cc201d9dd3e3576fabcd45677369f00c023ca5a455ea9d9e7ba694700c759fb3",
     "priorRed": "provider-red-attempt-1-manifest.json",
     "supplementalRegression": "film-group-regression.json"
+  },
+  "consumerQualification": {
+    "consumer": "77297769af637e8d6fd93bb652dc9db5cb3209cc",
+    "provider": "774fb1e8fa7358de3d8343e78371f5b4d36eb1cf",
+    "receipt": "consumer-gate.json",
+    "passed": 245,
+    "testTasks": 8,
+    "formatAndAppLink": true,
+    "browser": "No shell change; pin-only consumer delta, no browser automation run."
   }
 }

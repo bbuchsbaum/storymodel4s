@@ -1,0 +1,325 @@
+{
+  "schema": "d1b/consumer-gate/v1",
+  "qualified": true,
+  "expectedRevisions": {
+    "storyatlas4s": "77297769af637e8d6fd93bb652dc9db5cb3209cc",
+    "storymodel4s": "774fb1e8fa7358de3d8343e78371f5b4d36eb1cf",
+    "intaglio": "4eb566d9208f474d64d61e778e084dee2ddbaa76",
+    "grakern": "0329c43c88a0b71e9aa4456723bb16bac2fa3841"
+  },
+  "runnerSha256": "604042af5a634663e14567e0bd3b2e52a470744273d9e56d4a7bc4a049a1cb0f",
+  "cwd": "/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/storyatlas4s",
+  "before": {
+    "storyatlas4s": {
+      "path": "/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/storyatlas4s",
+      "standalone": true,
+      "revision": "77297769af637e8d6fd93bb652dc9db5cb3209cc",
+      "status": ""
+    },
+    "storymodel4s": {
+      "path": "/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/storymodel4s",
+      "standalone": true,
+      "revision": "774fb1e8fa7358de3d8343e78371f5b4d36eb1cf",
+      "status": ""
+    },
+    "intaglio": {
+      "path": "/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/intaglio",
+      "standalone": true,
+      "revision": "4eb566d9208f474d64d61e778e084dee2ddbaa76",
+      "status": ""
+    },
+    "grakern": {
+      "path": "/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+      "standalone": true,
+      "revision": "0329c43c88a0b71e9aa4456723bb16bac2fa3841",
+      "status": ""
+    }
+  },
+  "expectedTestTasks": [
+    "layoutJVM/test",
+    "layoutJS/test",
+    "intaglioJVM/test",
+    "intaglioJS/test",
+    "editionJVM/test",
+    "editionJS/test",
+    "cli/test",
+    "app/test"
+  ],
+  "command": [
+    "sbt",
+    "-batch",
+    "-Dstoryatlas4s.storymodel4s.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/storymodel4s",
+    "-Dstoryatlas4s.intaglio.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/intaglio",
+    "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+    "clean",
+    "compileAll",
+    "testAll",
+    "scalafmtCheckAll",
+    "app/fastLinkJS"
+  ],
+  "startedEpochSeconds": 1789891314.0067132,
+  "exitCode": 0,
+  "elapsedSeconds": 87.03890681266785,
+  "logPath": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/consumer-gate.log",
+  "logSha256": "429214e74e7071760697204081a7e8fb93b60ff767ab872c17b936d9024fcee5",
+  "testTotals": [
+    "[info] Passed: Total 22, Failed 0, Errors 0, Passed 22",
+    "[info] Passed: Total 26, Failed 0, Errors 0, Passed 26",
+    "[info] Passed: Total 59, Failed 0, Errors 0, Passed 59",
+    "[info] Passed: Total 59, Failed 0, Errors 0, Passed 59",
+    "[info] Passed: Total 57, Failed 0, Errors 0, Passed 57",
+    "[info] Passed: Total 22, Failed 0, Errors 0, Passed 22"
+  ],
+  "aggregateTestCounts": {
+    "Total": 245,
+    "Failed": 0,
+    "Errors": 0,
+    "Passed": 245,
+    "Skipped": 0,
+    "Ignored": 0
+  },
+  "junitCounts": {
+    "Total": 245,
+    "Failed": 0,
+    "Errors": 0,
+    "Passed": 245,
+    "Skipped": 0,
+    "Ignored": 0
+  },
+  "testTaskWitnesses": {
+    "layoutJVM/test": {
+      "suites": [
+        {
+          "path": "layout/.jvm/target/test-reports/TEST-storyatlas4s.layout.AwtMeasurerSuite.xml",
+          "sha256": "81653cf4bc95d095eac91b402c40c63766fcbb265e0601cb3ccf22d1f67963df",
+          "fresh": true,
+          "suite": "storyatlas4s.layout.AwtMeasurerSuite",
+          "tests": 3
+        },
+        {
+          "path": "layout/.jvm/target/test-reports/TEST-storyatlas4s.layout.PaginatorLawsSuite.xml",
+          "sha256": "f306c62a839bf341a5a1a54929665064dd47d0caa9b1992afa674ec661a6d155",
+          "fresh": true,
+          "suite": "storyatlas4s.layout.PaginatorLawsSuite",
+          "tests": 14
+        },
+        {
+          "path": "layout/.jvm/target/test-reports/TEST-storyatlas4s.layout.WarOfTheGhostsPaginationSuite.xml",
+          "sha256": "49f3e8eab755a190db6ed7cc973c99abc5532aa6deb87dcd6030263197bc067e",
+          "fresh": true,
+          "suite": "storyatlas4s.layout.WarOfTheGhostsPaginationSuite",
+          "tests": 5
+        }
+      ]
+    },
+    "layoutJS/test": {
+      "suites": [
+        {
+          "path": "layout/.js/target/test-reports/TEST-storyatlas4s.layout.DomMeasurerSuite.xml",
+          "sha256": "37eddd563863633dc8607947d9e3c858d09e747b8ba8770a9e781ecd041b4743",
+          "fresh": true,
+          "suite": "storyatlas4s.layout.DomMeasurerSuite",
+          "tests": 7
+        },
+        {
+          "path": "layout/.js/target/test-reports/TEST-storyatlas4s.layout.PaginatorLawsSuite.xml",
+          "sha256": "8548e44d744527dbc42d20c317b9402e47134af6bc00af43e274f0c232fe24a1",
+          "fresh": true,
+          "suite": "storyatlas4s.layout.PaginatorLawsSuite",
+          "tests": 14
+        },
+        {
+          "path": "layout/.js/target/test-reports/TEST-storyatlas4s.layout.WarOfTheGhostsPaginationSuite.xml",
+          "sha256": "f6fa267d31b9f290ee982ba5b3c3c3516550b3d8136eaddee87bb273ed427823",
+          "fresh": true,
+          "suite": "storyatlas4s.layout.WarOfTheGhostsPaginationSuite",
+          "tests": 5
+        }
+      ]
+    },
+    "intaglioJVM/test": {
+      "suites": [
+        {
+          "path": "intaglio/.jvm/target/test-reports/TEST-storyatlas4s.intaglio.DraftLoweringSuite.xml",
+          "sha256": "3d13fd9a1f1813130cb1fee8b00b2f661f4a50dd75e47b2cc249b0cbe3c85db9",
+          "fresh": true,
+          "suite": "storyatlas4s.intaglio.DraftLoweringSuite",
+          "tests": 7
+        },
+        {
+          "path": "intaglio/.jvm/target/test-reports/TEST-storyatlas4s.intaglio.PagedCodexLoweringSuite.xml",
+          "sha256": "d4edb17ba19e64de2fa26f10910a09aef756e381d888de6c0f40a2e486999423",
+          "fresh": true,
+          "suite": "storyatlas4s.intaglio.PagedCodexLoweringSuite",
+          "tests": 4
+        },
+        {
+          "path": "intaglio/.jvm/target/test-reports/TEST-storyatlas4s.intaglio.PlateCraftSuite.xml",
+          "sha256": "fbe086b5ac23507bb4b6ff900ecdaa3abe2a8e503db020a750b9b7806d112754",
+          "fresh": true,
+          "suite": "storyatlas4s.intaglio.PlateCraftSuite",
+          "tests": 24
+        },
+        {
+          "path": "intaglio/.jvm/target/test-reports/TEST-storyatlas4s.intaglio.VoyageLoweringSuite.xml",
+          "sha256": "d8410b3a204fb389c0cb05973ed0f31faa2bf917d0b8ebe2398a916a0c1b76a6",
+          "fresh": true,
+          "suite": "storyatlas4s.intaglio.VoyageLoweringSuite",
+          "tests": 14
+        },
+        {
+          "path": "intaglio/.jvm/target/test-reports/TEST-storyatlas4s.intaglio.WarOfTheGhostsLoweringSuite.xml",
+          "sha256": "17c0ce3dbedb6ed479c7a19d5d2ca6ad99e5e59eaa5d23a6d51344238fbe919a",
+          "fresh": true,
+          "suite": "storyatlas4s.intaglio.WarOfTheGhostsLoweringSuite",
+          "tests": 10
+        }
+      ]
+    },
+    "intaglioJS/test": {
+      "suites": [
+        {
+          "path": "intaglio/.js/target/test-reports/TEST-storyatlas4s.intaglio.DraftLoweringSuite.xml",
+          "sha256": "a40fc078b39b5be49a73861a72ee4925f4e22560aac76c9cae5771e2ce0329a6",
+          "fresh": true,
+          "suite": "storyatlas4s.intaglio.DraftLoweringSuite",
+          "tests": 7
+        },
+        {
+          "path": "intaglio/.js/target/test-reports/TEST-storyatlas4s.intaglio.PagedCodexLoweringSuite.xml",
+          "sha256": "d5463751d54961fb282fa768526b350501039860fe2bb03d9502de3bda374b77",
+          "fresh": true,
+          "suite": "storyatlas4s.intaglio.PagedCodexLoweringSuite",
+          "tests": 4
+        },
+        {
+          "path": "intaglio/.js/target/test-reports/TEST-storyatlas4s.intaglio.PlateCraftSuite.xml",
+          "sha256": "b2ec91d9ac870ea3d26668fde5d092cb8fa827d883dd7786892817ef0b0bf5a9",
+          "fresh": true,
+          "suite": "storyatlas4s.intaglio.PlateCraftSuite",
+          "tests": 24
+        },
+        {
+          "path": "intaglio/.js/target/test-reports/TEST-storyatlas4s.intaglio.VoyageLoweringSuite.xml",
+          "sha256": "c636c449169dab6d864ad795fb5f2afdb582930d255db5a2fff03d840f8da9c9",
+          "fresh": true,
+          "suite": "storyatlas4s.intaglio.VoyageLoweringSuite",
+          "tests": 14
+        },
+        {
+          "path": "intaglio/.js/target/test-reports/TEST-storyatlas4s.intaglio.WarOfTheGhostsLoweringSuite.xml",
+          "sha256": "ec1c1c6ca2ca04518ff829c1e50d0ff0d2fe4dfda6e499a2ad0cdb55a504b393",
+          "fresh": true,
+          "suite": "storyatlas4s.intaglio.WarOfTheGhostsLoweringSuite",
+          "tests": 10
+        }
+      ]
+    },
+    "editionJVM/test": {
+      "suites": [],
+      "testSourceFiles": []
+    },
+    "editionJS/test": {
+      "suites": [],
+      "testSourceFiles": []
+    },
+    "cli/test": {
+      "suites": [
+        {
+          "path": "cli/target/test-reports/TEST-storyatlas4s.cli.CodexHtmlSuite.xml",
+          "sha256": "7c559678e504fb070187198fbc31816e946d1d8910d81e8cc1f932fd6bf251c3",
+          "fresh": true,
+          "suite": "storyatlas4s.cli.CodexHtmlSuite",
+          "tests": 8
+        },
+        {
+          "path": "cli/target/test-reports/TEST-storyatlas4s.cli.EditionSuite.xml",
+          "sha256": "521eaef8e124c0d095a2a7387f7d4c2744f3e6af96042a809ab4c2c1cd858f18",
+          "fresh": true,
+          "suite": "storyatlas4s.cli.EditionSuite",
+          "tests": 7
+        },
+        {
+          "path": "cli/target/test-reports/TEST-storyatlas4s.cli.ModelInputSuite.xml",
+          "sha256": "2cbadfb1e88b86f0b8c9666ba2d7a855a76ba34526bac58e060d616c9bf81aa9",
+          "fresh": true,
+          "suite": "storyatlas4s.cli.ModelInputSuite",
+          "tests": 21
+        },
+        {
+          "path": "cli/target/test-reports/TEST-storyatlas4s.cli.VoyageEditionSuite.xml",
+          "sha256": "9e3f6791f3d7e816d580d1b396dcf5fac5b844aa8453fcc80ea3e6233d80ff01",
+          "fresh": true,
+          "suite": "storyatlas4s.cli.VoyageEditionSuite",
+          "tests": 4
+        },
+        {
+          "path": "cli/target/test-reports/TEST-storyatlas4s.cli.WorkspaceSuite.xml",
+          "sha256": "bf1c7577b603ac6715daf774d8b9602dfb5285b1e0a6dc334bef1ef70d29bac6",
+          "fresh": true,
+          "suite": "storyatlas4s.cli.WorkspaceSuite",
+          "tests": 17
+        }
+      ]
+    },
+    "app/test": {
+      "suites": [
+        {
+          "path": "app/target/test-reports/TEST-storyatlas4s.app.AppCompilerSuite.xml",
+          "sha256": "79633b155bf7f28a66d1a726f2e1f5f5720ed9039b7496529eaac1f84bbc1803",
+          "fresh": true,
+          "suite": "storyatlas4s.app.AppCompilerSuite",
+          "tests": 13
+        },
+        {
+          "path": "app/target/test-reports/TEST-storyatlas4s.app.SemanticZoomSuite.xml",
+          "sha256": "a93e41e91a994c6e53672ac73a78055412375c4b6ca48020e84a9786692bfa78",
+          "fresh": true,
+          "suite": "storyatlas4s.app.SemanticZoomSuite",
+          "tests": 6
+        },
+        {
+          "path": "app/target/test-reports/TEST-storyatlas4s.app.SvgDomSuite.xml",
+          "sha256": "049774d2b2f2a3f325ca7fe1daa78770af8677cd44d49f92d2b7b5e74b65c6c0",
+          "fresh": true,
+          "suite": "storyatlas4s.app.SvgDomSuite",
+          "tests": 3
+        }
+      ]
+    }
+  },
+  "xmlParseProblems": [],
+  "after": {
+    "storyatlas4s": {
+      "path": "/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/storyatlas4s",
+      "standalone": true,
+      "revision": "77297769af637e8d6fd93bb652dc9db5cb3209cc",
+      "status": ""
+    },
+    "storymodel4s": {
+      "path": "/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/storymodel4s",
+      "standalone": true,
+      "revision": "774fb1e8fa7358de3d8343e78371f5b4d36eb1cf",
+      "status": ""
+    },
+    "intaglio": {
+      "path": "/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/intaglio",
+      "standalone": true,
+      "revision": "4eb566d9208f474d64d61e778e084dee2ddbaa76",
+      "status": ""
+    },
+    "grakern": {
+      "path": "/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+      "standalone": true,
+      "revision": "0329c43c88a0b71e9aa4456723bb16bac2fa3841",
+      "status": ""
+    }
+  },
+  "productionAppLink": {
+    "path": "/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/storyatlas4s/app/target/scala-3.7.4/storyatlas4s-app-fastopt/main.js",
+    "bytes": 9079817,
+    "sha256": "d2981f1e4d87bd87f2dc0a2236baa932c829eff1f6a215af31d1295c04ef3f4a"
+  },
+  "sbtRuntimeFromLog": "[info] welcome to sbt 1.12.14 (Homebrew Java 25.0.1)",
+  "qualification": "Local exact-provider pin gate; consumer delta changes only build.sbt pin. No shell change or browser smoke; no remote publication/CI."
+}
