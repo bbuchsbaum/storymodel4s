@@ -5,6 +5,7 @@ spec=importlib.util.spec_from_file_location('qualification',Path(__file__).with_
 q=importlib.util.module_from_spec(spec);spec.loader.exec_module(q)
 args=argparse.ArgumentParser();args.add_argument('--candidate',required=True);expected=args.parse_args().candidate
 assert re.fullmatch('[0-9a-f]{40}',expected),'explicit full candidate SHA required'
+assert Path(q.pin).is_absolute(),'D1B_GRAKERN must be absolute so checks and sbt/docs resolve the same dependency'
 GR='0329c43c88a0b71e9aa4456723bb16bac2fa3841'
 terminal=q.out/'release-terminal.json';assert not terminal.exists(),terminal
 record=dict(schema='d1b/release-terminal/v1',expectedCandidate=expected,expectedGrakern=GR,
