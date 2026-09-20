@@ -383,11 +383,20 @@ class D1bPointSupportSuite extends FunSuite:
     assertEquals(projection.intervals, Vector(interval(10L, 40L)))
     assertEquals(projection.points, Vector(point(5L), point(50L)))
     assertEquals(projection.bounds, (5L, 50L))
+    val foreignAxis = right(
+      SourceBundle.filmEdition(
+        EditionId.unsafe("containment-foreign"),
+        Checksum.ofText("foreign"),
+        0L,
+        100L,
+        RationalTimebase.Millisecond
+      )
+    ).primaryAxis
     val foreign = right(
       PlaybackSupport.of(
-        native.primaryAxis.id,
+        foreignAxis.id,
         Vector.empty,
-        Vector(right(PlaybackInstant.on(native.primaryAxis, 5L)))
+        Vector(right(PlaybackInstant.on(foreignAxis, 15L)))
       )
     )
     assert(!projection.contains(foreign))

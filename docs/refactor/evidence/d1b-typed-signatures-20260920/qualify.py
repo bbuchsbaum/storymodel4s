@@ -2,11 +2,11 @@
 from pathlib import Path
 import hashlib,json,os,re,subprocess,sys,time,xml.etree.ElementTree as ET
 
-root=Path(os.environ.get('D1A_D1B_ROOT','/Users/bbuchsbaum/code/scala/storymodel4s'))
-repo=Path(os.environ.get('D1A_D1B_REPO','/private/tmp/storymodel4s-d1b-20260920'))
-out=Path(os.environ.get('D1A_D1B_OUTPUT',str(root/'data/study/d1b-20260920')))
+root=Path(os.environ.get('D1B_ROOT','/Users/bbuchsbaum/code/scala/storymodel4s'))
+repo=Path(os.environ.get('D1B_REPO','/private/tmp/storymodel4s-d1b-20260920'))
+out=Path(os.environ.get('D1B_OUTPUT',str(root/'data/study/d1b-20260920')))
 out.mkdir(parents=True,exist_ok=True)
-pin=os.environ.get('D1A_D1B_GRAKERN','/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern')
+pin=os.environ.get('D1B_GRAKERN','/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern')
 revision=subprocess.check_output(['git','rev-parse','HEAD'],cwd=repo,text=True).strip()
 prefix=['sbt','-Dstorymodel4s.grakern.build='+pin,'-batch']
 def sha(b): return hashlib.sha256(b).hexdigest()
@@ -167,82 +167,183 @@ edit('composition-scene-points',corpus,'.flatMap(r => rows(r.row).support.anchor
 
 edit('law-optional-feature','laws/src/main/scala/storymodel4s/laws/Laws.scala','node.scoringPosition.nonEmpty && v.scoringLength > 0','node.support != null && v.scoringLength > 0','laws','source-view laws accept exact film support without a scoring-position feature')
 
+expected_counts={point:14,playprobe:3,position:6,resultprobe:3,aligncodec:14,pointcodec:2,
+ annotation:23,metric:22,'storymodel4s.laws.LawsSuite':3}
+def json_bytes(value):return (json.dumps(value,indent=2)+'\n').encode()
+def immutable(path,value):
+ raw=json_bytes(value)
+ if path.exists():assert path.read_bytes()==raw,('refuse changed frozen record',path)
+ else:path.write_bytes(raw)
+ return sha(raw)
+def report_path(project,suite):return repo/modules[project]/'target/test-reports'/('TEST-'+suite+'.xml')
+def command(group):
+ project,suites=groups[group]
+ return project+'/testOnly '+' '.join(suites)+(' -- --tests *scoring*' if group=='laws' else '')
+def control_tasks():return [command(g) for g in groups]
+def mutant_tasks(c):
+ project=groups[c['group']][0]
+ return ([project+'/Compile/clean',project+'/Test/clean'] if c['cleanRecompile'] else [])+[command(c['group'])]
 def inventory():
  import difflib
+ assert clean()
+ runner_path=Path(__file__).resolve().relative_to(root).as_posix()
+ runner=Path(__file__).read_bytes()
+ assert runner==subprocess.check_output(['git','show',revision+':'+runner_path],cwd=repo),'runner is not the candidate runner'
  rows=[]
  for c in cases:
-  original=(repo/c['path']).read_text(); mutant=c['change'](original)
+  original=(repo/c['path']).read_text();mutant=c['change'](original)
   assert original!=mutant,c['id']
   row={k:v for k,v in c.items() if k!='change'}
-  row.update(originalSha256=sha(original.encode()),mutantSha256=sha(mutant.encode()),
+  row.update(originalSha256=sha(original.encode()),mutantSha256=sha(mutant.encode()),command=prefix+mutant_tasks(c),
    diff=''.join(difflib.unified_diff(original.splitlines(True),mutant.splitlines(True),fromfile=c['path'],tofile=c['path'])))
   rows.append(row)
- value=dict(codeRevision=revision,plannedMutationCount=len(cases),inventoryStatus='settled before execution',cases=rows,
+ tests={}
+ for project,suites in groups.values():
+  for suite in suites:
+   path=modules[project].removesuffix('/.jvm')+'/src/test/scala/'+suite.replace('.','/')+'.scala'
+   tests[path]=sha((repo/path).read_bytes())
+ value=dict(codeRevision=revision,runnerSha256=sha(runner),testSourceSha256=tests,
+  expectedControlCounts=expected_counts,controlCommand=prefix+control_tasks(),plannedMutationCount=len(cases),
+  inventoryStatus='frozen before execution',cases=rows,
   boundaries=[
    'Compile-door mutants clean both Compile and Test and require actual main/test recompilation.',
    'A kill requires a compiled named failing test plus an independent named passing control. Invalid, surviving and interrupted attempts remain retained.',
-   'Adapter malformed metadata guards are defensive beneath the sealed checked intake Atlas. The executable adapter court targets differing valid rates, exact part coordinates, point retention, scene gaps and receipt inputs.',
-   'Historical text JSON and backend WOG bytes, all1000 source loci and all17 inference anchors are separate preservation courts, not established by these mutants.',
-   'SourceSupportChecks reuses previously qualified interval mapping arithmetic. The new point witnesses exercise native extent, kind, strict clock-image endpoints and composition gaps/source bounds.'])
- (out/'guard-witness-inventory.json').write_text(json.dumps(value,indent=2)+'\n');return value
+   'Adapter malformed metadata guards are defensive beneath the sealed checked intake Atlas. Reachable tests cover differing valid rates, exact part coordinates, point retention, scene gaps and receipt inputs.',
+   'Historical text JSON, backend WOG bytes, all1000 source loci and all17 inference anchors are separate preservation courts.',
+   'Resume refuses any changed revision, runner, inventory, test/source/mutant hash, command, receipt, log, XML or incomplete restoration.'])
+ immutable(out/'guard-witness-inventory.json',value)
+ return value
 
-def report_path(project,suite):
- return repo/modules[project]/'target/test-reports'/('TEST-'+suite+'.xml')
-def command(group):
- project,suites=groups[group];return project+'/testOnly '+' '.join(suites)+(' -- --tests *scoring*' if group=='laws' else '')
-def control_tasks():
- return [command(g) for g in groups]
+def outcomes(raw):
+ tree=ET.fromstring(raw);rows=tree.findall('testcase');assert rows
+ names=[r.attrib['name'] for r in rows];assert len(set(names))==len(names)
+ return {r.attrib['name']:('failed' if r.find('failure') is not None else 'error' if r.find('error') is not None else 'skipped' if r.find('skipped') is not None else 'passed') for r in rows}
+def total_outcomes(values):
+ flattened=[v for row in values.values() for v in row.values()]
+ return dict(Total=len(flattened),Passed=flattened.count('passed'),Failed=flattened.count('failed'),
+  Errors=flattened.count('error'),Skipped=flattened.count('skipped'),Ignored=0)
+def verify_log(receipt):
+ assert receipt['codeRevision']==revision
+ log=Path(receipt['logPath']);assert sha(log.read_bytes())==receipt['logSha256']
+ return log.read_text()
+def capture_reports(label,receipt,selected):
+ records={};values={}
+ for project,suites in selected:
+  for suite in suites:
+   path=report_path(project,suite)
+   if not path.exists():continue
+   assert receipt['startedEpochSeconds']<=path.stat().st_mtime<=receipt['startedEpochSeconds']+receipt['seconds']+2,('stale XML',path)
+   raw=path.read_bytes();target=out/(label+'--'+suite+'.xml');assert not target.exists();target.write_bytes(raw)
+   records[suite]=dict(path=target.name,sha256=sha(raw));values[suite]=outcomes(raw)
+ return records,values
+def verify_reports(records):
+ values={}
+ for suite,r in records.items():
+  raw=(out/r['path']).read_bytes();assert sha(raw)==r['sha256'];values[suite]=outcomes(raw)
+ return values
+def clear_reports(selected):
+ for project,suites in selected:
+  for suite in suites:report_path(project,suite).unlink(missing_ok=True)
+def checked_control(label,binding,expected_names=None,clean_tests=False):
+ cert=out/(label+'-verified.json')
+ tasks=([p+'/Test/clean' for p in modules] if clean_tests else [])+control_tasks()
+ argv=prefix+tasks
+ if (out/(label+'.json')).exists():
+  assert cert.exists(),('incomplete control cannot be reused',label)
+  value=json.loads(cert.read_text());assert value['bindingSha256']==binding
+  receipt=json.loads((out/(label+'.json')).read_text())
+  assert value['receiptSha256']==sha((out/(label+'.json')).read_bytes())
+  records=value['reports'];values=verify_reports(records)
+ else:
+  clear_reports(groups.values());receipt=run(label,argv)
+  records,values=capture_reports(label,receipt,groups.values())
+  value=dict(bindingSha256=binding,receiptSha256=sha((out/(label+'.json')).read_bytes()),reports=records)
+ assert receipt['command']==argv and receipt['cleanBefore'] and receipt['cleanAfter'] and receipt['exitCode']==0
+ verify_log(receipt)
+ assert {k:len(v) for k,v in values.items()}==expected_counts
+ assert all(v=='passed' for row in values.values() for v in row.values()),(label,'nonpassing control')
+ assert total_outcomes(values)==receipt['aggregateTestCounts'],(label,'log/XML totals differ')
+ names={k:sorted(v) for k,v in values.items()}
+ if expected_names is not None:assert names==expected_names
+ for c in cases:
+  assert c['rejectingTest'] in values[c['rejectSuite']]
+  assert values[c['controlSuite']][c['acceptingControl']]=='passed'
+ value['testNames']=names;immutable(cert,value)
+ assert clean()
+ return receipt,names
+
+def verify_completed(row,planned,binding,control_names):
+ assert row['bindingSha256']==binding and row['codeRevision']==revision
+ for key in planned:
+  if key=='diff':continue
+  assert row[key]==planned[key],(row['id'],key)
+ assert row['restoredSha256']==planned['originalSha256'] and row['restoredCleanAfterMutation'] and row['baselineCleanBeforeMutation']
+ assert row['compiled'] and row['acceptingControlPassed'] and row['exitCode']==1
+ log=verify_log(row);label=Path(row['logPath']).stem
+ raw=(out/(label+'.json')).read_bytes();assert sha(raw)==row['rawReceiptSha256']
+ original=json.loads(raw)
+ for key in original:assert row[key]==original[key],(label,key)
+ restore=(out/(label+'-restoration.json')).read_bytes();assert sha(restore)==row['restorationSha256']
+ restoration=json.loads(restore)
+ assert restoration['bindingSha256']==binding and restoration['restoredCleanAfterMutation'] and restoration['baselineCleanBeforeMutation']
+ assert restoration['id']==row['id'] and restoration['path']==row['path']
+ assert restoration['originalSha256']==restoration['restoredSha256']==planned['originalSha256']
+ assert restoration['mutantSha256']==planned['mutantSha256'] and restoration['codeRevision']==revision
+ values=verify_reports(row['reports']);project,suites=groups[row['group']]
+ assert {s:sorted(v) for s,v in values.items()}=={s:control_names[s] for s in suites}
+ assert total_outcomes(values)==row['aggregateTestCounts']
+ assert values[row['rejectSuite']][row['rejectingTest']]=='failed'
+ assert values[row['controlSuite']][row['acceptingControl']]=='passed'
+ assert row['failedTests']==[dict(suite=s,name=n) for s,rs in values.items() for n,v in rs.items() if v=='failed']
+ if row['cleanRecompile']:
+  for leaf in ['classes','test-classes']:
+   assert re.search(r'compiling \d+ Scala sources? to .*/'+re.escape(modules[project])+r'/target/scala-[^/]+/'+leaf,log),('missing main/probe compilation',row['id'],leaf)
+
 def mutations():
-    assert clean();inventory()
-    if not (out/'isolated-control.json').exists():run('isolated-control',prefix+control_tasks())
-    results=json.loads((out/'mutation-progress.json').read_text()) if (out/'mutation-progress.json').exists() else []
-    completed={r['id'] for r in results}
-    for c in cases:
-        if c['id'] in completed:continue
-        assert clean()
-        path=repo/c['path'];saved=path.read_bytes();mutant=c['change'](saved.decode())
-        project,suites=groups[c['group']]
-        for suite in suites:report_path(project,suite).unlink(missing_ok=True)
-        attempt=1
-        while (out/(c['id']+'-attempt-'+str(attempt)+'.log')).exists():attempt+=1
-        label=c['id']+'-attempt-'+str(attempt)
-        try:
-            path.write_text(mutant)
-            tasks=([project+'/Compile/clean',project+'/Test/clean'] if c['cleanRecompile'] else [])+[command(c['group'])]
-            receipt=run(label,prefix+tasks,False)
-            outcomes={};xml_hashes={}
-            for suite in suites:
-                report=report_path(project,suite)
-                if not report.exists():continue
-                assert report.stat().st_mtime>=receipt['startedEpochSeconds'],('stale XML',report)
-                xml=report.read_bytes();(out/(label+'--'+suite+'.xml')).write_bytes(xml);xml_hashes[suite]=sha(xml)
-                for t in ET.fromstring(xml).findall('testcase'):outcomes[(suite,t.attrib['name'])]=t
-            assert receipt['exitCode']==1 and receipt['aggregateTestCounts']['Failed']>0 and receipt['aggregateTestCounts']['Errors']==0,(c['id'],'not an executed failing mutant')
-            rejecting=outcomes[(c['rejectSuite'],c['rejectingTest'])];control=outcomes[(c['controlSuite'],c['acceptingControl'])]
-            assert rejecting.find('failure') is not None,(c['id'],'survived')
-            assert all(control.find(k) is None for k in ['failure','error','skipped']),(c['id'],'control failed')
-            if c['cleanRecompile']:
-                assert re.search(r'compiling \d+ Scala sources? to .*/'+modules[project]+r'/target/scala-[^/]+/test-classes', (out/(label+'.log')).read_text()),'missing actual probe compilation'
-                assert re.search(r'compiling \d+ Scala sources? to .*/'+modules[project]+r'/target/scala-[^/]+/classes', (out/(label+'.log')).read_text()),'missing actual production compilation'
-            receipt.update({k:v for k,v in c.items() if k!='change'})
-            receipt.update(compiled=True,acceptingControlPassed=True,originalSha256=sha(saved),mutantSha256=sha(mutant.encode()),junitSha256=xml_hashes,
-                failedTests=[dict(suite=s,name=n) for (s,n),t in outcomes.items() if t.find('failure') is not None])
-            results.append(receipt);(out/'mutation-progress.json').write_text(json.dumps(results,indent=2)+'\n')
-            print(c['id'],'KILLED; named control passed',flush=True)
-        finally:
-            path.write_bytes(saved)
-            restoration=dict(codeRevision=revision,id=c['id'],path=c['path'],baselineCleanBeforeMutation=True,
-                originalSha256=sha(saved),mutantSha256=sha(mutant.encode()),restoredSha256=sha(path.read_bytes()),
-                restoredCleanAfterMutation=clean(),qualification='Restoration only; execution verdict is separate.')
-            (out/(label+'-restoration.json')).write_text(json.dumps(restoration,indent=2)+'\n')
-        assert clean()
-        receipt.update(baselineCleanBeforeMutation=True,restoredSha256=sha(path.read_bytes()),restoredCleanAfterMutation=clean())
-        (out/'mutation-progress.json').write_text(json.dumps(results,indent=2)+'\n')
-    restored=run('restored-control-clean',prefix+[p+'/Test/clean' for p in modules]+control_tasks())
-    for group,(project,suites) in groups.items():
-        for suite in suites:
-            report=report_path(project,suite)
-            (out/('restored-control-clean--'+suite+'.xml')).write_bytes(report.read_bytes())
-    (out/'mutations.json').write_text(json.dumps(dict(codeRevision=revision,mutations=results,restoredControl=restored),indent=2)+'\n')
+ assert clean();frozen=inventory();binding=sha((out/'guard-witness-inventory.json').read_bytes())
+ _,control_names=checked_control('isolated-control',binding)
+ planned={c['id']:c for c in frozen['cases']}
+ results=json.loads((out/'mutation-progress.json').read_text()) if (out/'mutation-progress.json').exists() else []
+ assert len({r['id'] for r in results})==len(results)
+ for r in results:verify_completed(r,planned[r['id']],binding,control_names)
+ completed={r['id'] for r in results}
+ for c in cases:
+  assert clean()
+  if c['id'] in completed:continue
+  expected=planned[c['id']];path=repo/c['path'];saved=path.read_bytes();mutant=c['change'](saved.decode()).encode()
+  assert sha(saved)==expected['originalSha256'] and sha(mutant)==expected['mutantSha256']
+  project,suites=groups[c['group']];clear_reports([(project,suites)])
+  attempt=1
+  while (out/(c['id']+'-attempt-'+str(attempt)+'.log')).exists():attempt+=1
+  label=c['id']+'-attempt-'+str(attempt)
+  try:
+   path.write_bytes(mutant)
+   receipt=run(label,expected['command'],False)
+   records,values=capture_reports(label,receipt,[(project,suites)])
+   assert receipt['exitCode']==1 and receipt['aggregateTestCounts']['Failed']>0 and receipt['aggregateTestCounts']['Errors']==0,(c['id'],'not an executed failing mutant')
+   assert {s:sorted(v) for s,v in values.items()}=={s:control_names[s] for s in suites}
+   assert total_outcomes(values)==receipt['aggregateTestCounts']
+   assert values[c['rejectSuite']][c['rejectingTest']]=='failed',(c['id'],'survived')
+   assert values[c['controlSuite']][c['acceptingControl']]=='passed',(c['id'],'control failed')
+   receipt.update({k:v for k,v in c.items() if k!='change'})
+   receipt.update(bindingSha256=binding,compiled=True,acceptingControlPassed=True,
+    originalSha256=sha(saved),mutantSha256=sha(mutant),reports=records,
+    rawReceiptSha256=sha((out/(label+'.json')).read_bytes()),
+    failedTests=[dict(suite=s,name=n) for s,row in values.items() for n,v in row.items() if v=='failed'])
+  finally:
+   path.write_bytes(saved)
+   restoration=dict(bindingSha256=binding,codeRevision=revision,id=c['id'],path=c['path'],baselineCleanBeforeMutation=True,
+    originalSha256=sha(saved),mutantSha256=sha(mutant),restoredSha256=sha(path.read_bytes()),restoredCleanAfterMutation=clean())
+   immutable(out/(label+'-restoration.json'),restoration)
+  assert clean()
+  receipt.update(baselineCleanBeforeMutation=True,restoredSha256=sha(path.read_bytes()),restoredCleanAfterMutation=True,
+   restorationSha256=sha((out/(label+'-restoration.json')).read_bytes()))
+  verify_completed(receipt,expected,binding,control_names)
+  results.append(receipt);(out/'mutation-progress.json').write_bytes(json_bytes(results))
+  print(c['id'],'KILLED; named control passed; source restored clean',flush=True)
+ restored,_=checked_control('restored-control-clean',binding,control_names,True)
+ assert clean() and len(results)==len(cases)
+ for r in results:verify_completed(r,planned[r['id']],binding,control_names)
+ immutable(out/'mutations.json',dict(codeRevision=revision,bindingSha256=binding,mutations=results,restoredControl=restored))
 
 if __name__=='__main__':{'inventory':inventory,'mutations':mutations}[sys.argv[1]]()
