@@ -58,6 +58,18 @@ enum EvidenceRef:
     case ById(_)   => None
     case Inline(e) => e.spans
 
+  /** Singular direct support when available without a ledger. `None` also covers detached
+    * twin-form evidence: neither coordinate is silently preferred. This is not a membership,
+    * projectability or epistemic-license check; joins enforce those contracts.
+    */
+  def support: Option[TypedSupport] = this match
+    case ById(_) => None
+    case Inline(e) =>
+      (e.spans, e.anchors) match
+        case (Some(spans), None)   => Some(TypedSupport.Text(spans))
+        case (None, Some(anchors)) => Some(TypedSupport.Anchored(anchors))
+        case _                     => None
+
 /** What a proposal conflicts with, as reported by the agent that noticed it. */
 enum ConflictTarget:
   case Claim(id: ClaimId)

@@ -890,3 +890,18 @@ to carry that source inventory. It cannot substitute a fabricated positive inter
 
 This is a design and compatibility record. It adds no production capability, establishes no
 new scientific validity, and does not claim executed CI or film compiler completion.
+
+#### S3 acquisition boundary clarification — 19 September 2026
+
+`SourceSupport` carries optional `TypedSupport` with a text constructor and derived
+`spans`. `EvidenceRef.support` returns a singular support only for spans alone or anchors
+alone; detached twin-form evidence and `ById` return `None`, while the raw text accessor
+is retained. Selecting anchors first is rejected because it hides the second coordinate
+form. Resolver support presence comes from the bundle or the winning proposals. This is
+neither a bundle join nor a license for `SurfaceExplicit`; `ClaimMeta.spanLaw` stays on
+text spans. The historical policy and gap names remain wire-compatible.
+
+The shared text compiler-input validator refuses anchored `SourceSupport` until the
+film compiler defines its input and canonical rendering. Accepting it while the current
+renderer only fingerprints derived text spans would discard identity-relevant payload.
+This temporary refusal has explicit text/absent controls and a compiled deletion witness.

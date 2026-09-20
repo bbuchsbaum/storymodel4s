@@ -1179,7 +1179,7 @@ class ChartProposalProviderSuite extends FunSuite:
 
     assertEquals(proposals.summaryCoverage, SummaryCoverage.NoTitle)
     assertEquals(dispositions(proposals.summary.bundle), Vector(ProposalDisposition.Abstained))
-    assertEquals(proposals.summary.bundle.sourceSupport, SourceSupport(0.0, None))
+    assertEquals(proposals.summary.bundle.sourceSupport, SourceSupport.text(0.0, None))
 
     // ADR 0005 §10: the summary is still a gap, and nothing else waits for it. The root segment is
     // derived from its one member, spans the canonical text, cites the member's claim, and records

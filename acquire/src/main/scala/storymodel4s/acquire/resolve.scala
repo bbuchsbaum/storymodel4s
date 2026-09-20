@@ -31,6 +31,7 @@ enum ResolutionFailure:
   case Uncalibrated
   case InsufficientAgreement(have: Int, need: Int)
   case InsufficientSupport(score: Double)
+  /** Required direct source support is absent. Historical wire name retained for typed support. */
   case NoSpanEvidence
   case BlockingFinding(codes: Vector[FindingCode])
 
@@ -125,8 +126,9 @@ object ClaimFamily:
   *
   *   - `requireAgreement` counts *distinct providers* (by provider/model/version of the call
   *     receipt), never proposals: a retried or double-decoded call cannot agree with itself.
-  *   - `requireSpanEvidence`: acceptance needs exact source spans, either in the bundle's source
-  *     support or inline on the winning proposals' evidence (contract 3).
+  *   - `requireSpanEvidence`: historical name for requiring direct typed source support, either in
+  *     the bundle or inline on the winning proposals. Presence is not a bundle join or a license
+  *     for `SurfaceExplicit`; those checks belong to the subsequent construction boundary.
   *   - `criticBlockThreshold`: a `Blocking` finding blocks only when its raw score is at least this
   *     value or absent; low-confidence blocking findings are retained as warnings.
   */
@@ -250,8 +252,13 @@ object StructuralValidity:
   val Valid: StructuralValidity = StructuralValidity(true, Vector.empty)
   def invalid(reasons: String*): StructuralValidity = StructuralValidity(false, reasons.toVector)
 
-/** Degree to which the source text supports the claim, in `[0, 1]`, with the spans found. */
-final case class SourceSupport(score: Double, spans: Option[SpanSet])
+/** Degree to which the source supports the claim, in `[0, 1]`, with its typed support. */
+final case class SourceSupport(score: Double, support: Option[TypedSupport]):
+  def spans: Option[SpanSet] = support.collect { case TypedSupport.Text(spans) => spans }
+
+object SourceSupport:
+  def text(score: Double, spans: Option[SpanSet]): SourceSupport =
+    SourceSupport(score, spans.map(TypedSupport.Text(_)))
 
 /** What licenses acceptance of one candidate value. Two cases and no third: a probability from a
   * named fitted calibration model, or determination by a named rule whose value is a total function
@@ -357,15 +364,15 @@ object Resolver:
       leading: Candidate[A],
       basis: AcceptanceBasis
   ): ResolutionState[A] =
-    if fp.requireSpanEvidence && !hasSpans(bundle, leading) then
+    if fp.requireSpanEvidence && !hasSupport(bundle, leading) then
       ResolutionState.Unresolved(ResolutionFailure.NoSpanEvidence)
     else
       NonEmptyVector.fromVector(leading.evidence) match
         case Some(ev) => ResolutionState.Accepted(leading.value, basis, ev)
         case None     => ResolutionState.Unresolved(ResolutionFailure.NoSpanEvidence)
 
-  private def hasSpans[A](bundle: EvidenceBundle[A], c: Candidate[A]): Boolean =
-    bundle.sourceSupport.spans.nonEmpty || c.evidence.exists(_.spans.nonEmpty)
+  private def hasSupport[A](bundle: EvidenceBundle[A], c: Candidate[A]): Boolean =
+    bundle.sourceSupport.support.nonEmpty || c.evidence.exists(_.support.nonEmpty)
 
   /** Identity of the provider behind a proposal, for counting independent agreement. */
   private def providerKey(p: AgentProposal[?]): (String, String, String) =

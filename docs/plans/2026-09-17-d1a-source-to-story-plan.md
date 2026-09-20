@@ -443,12 +443,21 @@ S1 records:
 - **`SourceSupport(score, support: Option[TypedSupport])`**, with a text constructor and a
   derived `spans`.
 - **`EvidenceRef` gets a support accessor.**
+  For inline evidence it returns `Text` for spans alone, `Anchored` for anchors alone,
+  and `None` for neither or both. `ById` returns `None` without a ledger. Here `None`
+  means no unambiguous singular support; the raw `spans` accessor remains available.
+  The pure resolver tests bundle support or winning inline support presence, not
+  bundle membership, projectability or a `SurfaceExplicit` license.
 - **`hasSpans` becomes `hasSupport`.**
   - The wire-visible gap reasons `NoSpanEvidence` and `MissingSpanEvidence` keep their names,
     but their scaladoc is corrected.
   - A court checks that every text verdict is unchanged.
   - This slice gets a cold review, because it changes an acceptance rule.
 - **`TaskReferences.validateAgainst`** gains a `NarrativeSourceAtlas` overload.
+- The text compiler's shared bundle validator refuses anchored `SourceSupport`, with
+  passing `Text`/absent controls and a deletion mutant. Its current canonical renderer
+  only records text spans; accepting anchored support here would hide that payload.
+  This extends S2's temporary text joins, without implementing the film compiler.
 
 ### S4a — Node support and a fallible `draft` (M–L)
 

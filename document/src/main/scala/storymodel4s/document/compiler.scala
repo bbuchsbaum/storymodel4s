@@ -220,6 +220,9 @@ enum DerivationGapReason:
   case Unresolved(reason: ResolutionFailure)
   case Rejected(reason: RejectionReason)
   case MissingRawScore
+  /** Required source support could not be materialized. Historical wire name; the text compiler
+    * still requires spans, while acquisition can carry typed support.
+    */
   case MissingSpanEvidence
   case MissingUpstream(addresses: Vector[NarrativeCandidateAddress])
 
@@ -941,6 +944,11 @@ object NarrativeCompilerInput:
         invalid(path, s"$field must be finite and in [0, 1], found $value")
 
     unitInterval(bundle.sourceSupport.score, "source support")
+    if bundle.sourceSupport.support.exists {
+        case TypedSupport.Anchored(_) => true
+        case TypedSupport.Text(_)     => false
+      }
+    then invalid(path, "text compiler input cannot carry anchored source support")
     unitInterval(bundle.agreementScore, "agreement score")
     if bundle.structural.valid && bundle.structural.violations.nonEmpty then
       invalid(path, "structurally valid bundle must not carry violations")

@@ -2019,7 +2019,7 @@ object ChartProposalProvider:
         Vector(proposal),
         Vector.empty,
         StructuralValidity.Valid,
-        SourceSupport(1.0, evidence.spans),
+        SourceSupport.text(1.0, evidence.spans),
         agreementScore = 1.0,
         Vector(CandidateBasis(value, AcceptanceBasis.Determined(determinedBy)))
       ),
@@ -2042,7 +2042,7 @@ object ChartProposalProvider:
         Vector(proposal),
         Vector.empty,
         StructuralValidity.Valid,
-        SourceSupport(0.0, None),
+        SourceSupport.text(0.0, None),
         agreementScore = 0.0,
         Vector.empty
       ),

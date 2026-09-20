@@ -100,7 +100,7 @@ class CompilerSuite extends FunSuite:
       proposals,
       findings,
       StructuralValidity.Valid,
-      SourceSupport(1.0, ev.spans),
+      SourceSupport.text(1.0, ev.spans),
       agreementScore = 1.0,
       bases =
         if calibrated then
@@ -305,6 +305,17 @@ class CompilerSuite extends FunSuite:
       result.swap.toOption.get.message
         .contains("text compiler input cannot carry anchored inline evidence")
     )
+
+  test("text compiler refuses anchored source support with text and absent controls"):
+    val original = bundle(situation0, ev0, "situation-agent", "source-support")
+    def checked(support: SourceSupport) = attemptedInput(Vector(
+      SituationAttempt(ref0, original.copy(sourceSupport = support))
+    ))
+    assert(checked(SourceSupport.text(1.0, ev0.spans)).isRight)
+    assert(checked(SourceSupport.text(1.0, None)).isRight)
+    val result = checked(SourceSupport(1.0, Some(TypedSupport.Anchored(anchoredRecord.anchors.get))))
+    assert(result.isLeft)
+    assert(result.swap.toOption.get.message.contains("text compiler input cannot carry anchored source support"))
 
   test("accepted evidence compiles into a validated story model") {
     val result = compile(
@@ -681,7 +692,7 @@ class CompilerSuite extends FunSuite:
         ),
         Vector.empty,
         StructuralValidity.Valid,
-        SourceSupport(0.0, None),
+        SourceSupport.text(0.0, None),
         0.0,
         Vector.empty
       )
@@ -715,7 +726,7 @@ class CompilerSuite extends FunSuite:
           Vector.empty,
           Vector.empty,
           StructuralValidity.Valid,
-          SourceSupport(0.0, None),
+          SourceSupport.text(0.0, None),
           0.0,
           Vector.empty
         )
@@ -768,7 +779,7 @@ class CompilerSuite extends FunSuite:
 
   test("input rejects non-finite source support before resolution") {
     val malformed = bundle(situation0, ev0, "situation-agent", "s0").copy(
-      sourceSupport = SourceSupport(Double.NaN, ev0.spans)
+      sourceSupport = SourceSupport.text(Double.NaN, ev0.spans)
     )
     val attempted = attemptedInput(
       situationAttempts = Vector(

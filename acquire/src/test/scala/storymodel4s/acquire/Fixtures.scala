@@ -120,7 +120,7 @@ object Fixtures:
       proposals,
       findings,
       structural,
-      SourceSupport(support, spans),
+      SourceSupport.text(support, spans),
       agreementScore = 1.0,
       calibrated.toVector.flatMap(p =>
         values.map(v =>

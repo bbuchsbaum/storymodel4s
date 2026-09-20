@@ -54,7 +54,7 @@ import storymodel4s.proposition.Polarity
       proposals,
       findings = Vector.empty,
       structural,
-      SourceSupport(score = 1.0, spans = Some(spans)),
+      SourceSupport.text(score = 1.0, spans = Some(spans)),
       agreementScore = 1.0,
       bases
     )

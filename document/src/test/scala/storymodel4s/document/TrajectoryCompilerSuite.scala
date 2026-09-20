@@ -149,7 +149,7 @@ class TrajectoryCompilerSuite extends FunSuite:
       proposals,
       Vector.empty,
       StructuralValidity.Valid,
-      SourceSupport(1.0, ev.spans),
+      SourceSupport.text(1.0, ev.spans),
       agreementScore = 1.0,
       bases =
         if calibrated then
