@@ -1,0 +1,385 @@
+{
+  "codeRevision": "17194421f018e3780aafa4adf754fccf55398b61",
+  "mutationReceiptSha256": "acaedf278cf04b54b2ddc06848734397f48959497697e4185681f5e9bb2ed723",
+  "inventorySha256": "0f64963ced24990eea7d2be23cebe3b326b6b810a60cd067b993c411ec5916a1",
+  "runnerSha256": "075f55cbe2b87949d32fa3f6fb6f920383af6bf0204327f3b40a40c350319a5a",
+  "mutants": [
+    {
+      "id": "inline-text-loss",
+      "originalSha256": "9fab0ec02669404c664a1f5e0b27f546715c328fd13d8ed7f5b76401b81a87e9",
+      "mutantSha256": "b171fa668ea7eeaceef195275ba8e2e175f03abf18d1941dee056f3b4e1f9106",
+      "logSha256": "66f67d74bfb469982be5cba21fa73163c418e04a23637f6190958faace00b47b",
+      "junitSha256": {
+        "storymodel4s.acquire.D1aAcquireSupportSuite": "e1878e24138a3551c1324c4d37fdd7cb2503214bb08d3f668fe75ffdad917c2b"
+      },
+      "counts": {
+        "Total": 8,
+        "Failed": 1,
+        "Errors": 0,
+        "Passed": 7,
+        "Skipped": 0
+      },
+      "compiledNamedKillAndControl": true,
+      "freshReports": true,
+      "junitTimestampZone": "America/Toronto"
+    },
+    {
+      "id": "inline-anchor-loss",
+      "originalSha256": "9fab0ec02669404c664a1f5e0b27f546715c328fd13d8ed7f5b76401b81a87e9",
+      "mutantSha256": "ebd01c0d5fd7438f0a9b7825a8ada9639cc061c5e85e93024fb01329c58533ec",
+      "logSha256": "5d0f835499a37d23ec9d43658167f8d0ec9b59e35ab095be8cbef72ebc2062da",
+      "junitSha256": {
+        "storymodel4s.acquire.D1aAcquireSupportSuite": "ee20dabb0338da6be22382d239822426e111d7f1a527888c3daa289868653f66"
+      },
+      "counts": {
+        "Total": 8,
+        "Failed": 3,
+        "Errors": 0,
+        "Passed": 5,
+        "Skipped": 0
+      },
+      "compiledNamedKillAndControl": true,
+      "freshReports": true,
+      "junitTimestampZone": "America/Toronto"
+    },
+    {
+      "id": "twin-form-preference",
+      "originalSha256": "9fab0ec02669404c664a1f5e0b27f546715c328fd13d8ed7f5b76401b81a87e9",
+      "mutantSha256": "cb7eeaf053b4e6bf9ab6886e469e02273ad432ead80ec5b6e3bf9542f4613852",
+      "logSha256": "22252969cac234b1d1030e45eef19a0517ea172f751c5607edde8dff20ad21f8",
+      "junitSha256": {
+        "storymodel4s.acquire.D1aAcquireSupportSuite": "bf25730f130a51cc62a2aa4f5ec736ecd0fe99f14b452bcd7eb94b311ae31bb9"
+      },
+      "counts": {
+        "Total": 8,
+        "Failed": 2,
+        "Errors": 0,
+        "Passed": 6,
+        "Skipped": 0
+      },
+      "compiledNamedKillAndControl": true,
+      "freshReports": true,
+      "junitTimestampZone": "America/Toronto"
+    },
+    {
+      "id": "by-id-invention",
+      "originalSha256": "9fab0ec02669404c664a1f5e0b27f546715c328fd13d8ed7f5b76401b81a87e9",
+      "mutantSha256": "4aa049c41800880719515146d720e64d6bff42e58c9e1a4e0a63311ec429630b",
+      "logSha256": "6df180480dffa99b014e280bd0ea05c842396f746eb11b9499ef47f5d3251afa",
+      "junitSha256": {
+        "storymodel4s.acquire.D1aAcquireSupportSuite": "1899ea143db542f84be0a002e78325a1d62275b8395004678599f29a8cfa5cc2"
+      },
+      "counts": {
+        "Total": 8,
+        "Failed": 1,
+        "Errors": 0,
+        "Passed": 7,
+        "Skipped": 0
+      },
+      "compiledNamedKillAndControl": true,
+      "freshReports": true,
+      "junitTimestampZone": "America/Toronto"
+    },
+    {
+      "id": "bundle-anchor-loss",
+      "originalSha256": "61082dab15b7375104960b6b9025d729b392800f9d0bd237902543e6538233fe",
+      "mutantSha256": "df6079f6ea4493e8c0c134a108bfccf8324501b972b77bf92087386123756d35",
+      "logSha256": "4ac3600944e326f468464870aae15bff88aa1fab2a5a447d35e4bd5ac13ae789",
+      "junitSha256": {
+        "storymodel4s.acquire.D1aAcquireSupportSuite": "9db0fa05e3c72ae03cd36165490a40edbfe90f027ea7363dffc9997f085a3eca"
+      },
+      "counts": {
+        "Total": 8,
+        "Failed": 3,
+        "Errors": 0,
+        "Passed": 5,
+        "Skipped": 0
+      },
+      "compiledNamedKillAndControl": true,
+      "freshReports": true,
+      "junitTimestampZone": "America/Toronto"
+    },
+    {
+      "id": "winning-anchor-loss",
+      "originalSha256": "61082dab15b7375104960b6b9025d729b392800f9d0bd237902543e6538233fe",
+      "mutantSha256": "fa56fa02f97967ed562cd7a4de425004a0aaa29e71accbdcd590d7c17d68e699",
+      "logSha256": "9cd0cac004e042b16ca2556a944ff9e23e1701464ffc43211113180c245994af",
+      "junitSha256": {
+        "storymodel4s.acquire.D1aAcquireSupportSuite": "a2f4b58c582059ec9e098e11b3767b28eecccf597fa9dc34ba1c7d209c7bf31e"
+      },
+      "counts": {
+        "Total": 8,
+        "Failed": 3,
+        "Errors": 0,
+        "Passed": 5,
+        "Skipped": 0
+      },
+      "compiledNamedKillAndControl": true,
+      "freshReports": true,
+      "junitTimestampZone": "America/Toronto"
+    },
+    {
+      "id": "losing-evidence-counts",
+      "originalSha256": "61082dab15b7375104960b6b9025d729b392800f9d0bd237902543e6538233fe",
+      "mutantSha256": "8617f47f25d8b678f73f9fcd23eb391e48bd1f7d51c21aae440962ea1307d657",
+      "logSha256": "950a9a3cabc745aebcdef47033226c657e35a88f561f801cfc800759b45ea0b7",
+      "junitSha256": {
+        "storymodel4s.acquire.D1aAcquireSupportSuite": "96da671cc6804b304843f7b3187212747e72e9cba18cd968be03daa453b3a783"
+      },
+      "counts": {
+        "Total": 8,
+        "Failed": 1,
+        "Errors": 0,
+        "Passed": 7,
+        "Skipped": 0
+      },
+      "compiledNamedKillAndControl": true,
+      "freshReports": true,
+      "junitTimestampZone": "America/Toronto"
+    },
+    {
+      "id": "derived-text-span-loss",
+      "originalSha256": "61082dab15b7375104960b6b9025d729b392800f9d0bd237902543e6538233fe",
+      "mutantSha256": "3dffe3d9e764a30a250a142aa31273354cc5d1c9bf476f72254cfbb803f94f19",
+      "logSha256": "f49b99ea18bad2ae1a6a2ba3be5e4c359c8cf9cb04cddf86581907055d951dd8",
+      "junitSha256": {
+        "storymodel4s.acquire.D1aAcquireSupportSuite": "3c2881a775bb1c302c86dfde7d57196d58dd14e2ade00829a5eb3b77ca9ccb5a"
+      },
+      "counts": {
+        "Total": 8,
+        "Failed": 1,
+        "Errors": 0,
+        "Passed": 7,
+        "Skipped": 0
+      },
+      "compiledNamedKillAndControl": true,
+      "freshReports": true,
+      "junitTimestampZone": "America/Toronto"
+    },
+    {
+      "id": "text-constructor-loss",
+      "originalSha256": "61082dab15b7375104960b6b9025d729b392800f9d0bd237902543e6538233fe",
+      "mutantSha256": "5512eac68839d71874e841851107edc6ab5fbbfec7527163a4563f51baa26e88",
+      "logSha256": "b2402b3ace51dc745a3c8e3331e1ba661b1a1d4f9148ffa09954cf4ed7d2bf73",
+      "junitSha256": {
+        "storymodel4s.acquire.D1aAcquireSupportSuite": "7f1921e7ba29668bfe2c7f9aaca7af7f2ad30518cb6b9af4c800eda809afbf89"
+      },
+      "counts": {
+        "Total": 8,
+        "Failed": 2,
+        "Errors": 0,
+        "Passed": 6,
+        "Skipped": 0
+      },
+      "compiledNamedKillAndControl": true,
+      "freshReports": true,
+      "junitTimestampZone": "America/Toronto"
+    },
+    {
+      "id": "current-resolver-text-loss",
+      "originalSha256": "61082dab15b7375104960b6b9025d729b392800f9d0bd237902543e6538233fe",
+      "mutantSha256": "716ee741b1dbc585254c2308d4ef7c84b8234c3817a9680260a5f458bb6a8b79",
+      "logSha256": "0422aa63e689e10f9abfedc6e75ebce57c36c808568fcf9bf70d49aab70796ba",
+      "junitSha256": {
+        "storymodel4s.acquire.D1aTextResolverParitySuite": "7f453d16c54bb0a96c8d98f758679c5f1e53cdf08ca024d44bb7cd87a5f7e98d",
+        "storymodel4s.acquire.D1aAcquireSupportSuite": "0f1683d8feff66eb9e039e992dfee38a863095f7c1acf5e3dee746b3a379cfd8"
+      },
+      "counts": {
+        "Total": 14,
+        "Failed": 6,
+        "Errors": 0,
+        "Passed": 8,
+        "Skipped": 0
+      },
+      "compiledNamedKillAndControl": true,
+      "freshReports": true,
+      "junitTimestampZone": "America/Toronto"
+    },
+    {
+      "id": "task-missing-unit",
+      "originalSha256": "b2154955dcfe3d30400d6f264663b2c6ab3b53de35a51c09a608fc59c4ac2290",
+      "mutantSha256": "070a938891d281574f4492e34a05dc61860c4d79fb67d35413b72b16a8719c3d",
+      "logSha256": "4e6c1ba90e08d5c727ef70b3aed8328b4a2fa8226adda0920ffc4d6d4a84d669",
+      "junitSha256": {
+        "storymodel4s.acquire.D1aTaskReferencesSuite": "9637b4e3839d7058a8a6680fd822a1d6e07a444f22c130200df7272e1b956d9c"
+      },
+      "counts": {
+        "Total": 5,
+        "Failed": 2,
+        "Errors": 0,
+        "Passed": 3,
+        "Skipped": 0
+      },
+      "compiledNamedKillAndControl": true,
+      "freshReports": true,
+      "junitTimestampZone": "America/Toronto"
+    },
+    {
+      "id": "task-wrong-kind",
+      "originalSha256": "b2154955dcfe3d30400d6f264663b2c6ab3b53de35a51c09a608fc59c4ac2290",
+      "mutantSha256": "994f5fdda1ecce20267b0d1cfb7cf8a162653bf4a6e1130c5a51acbdb8850485",
+      "logSha256": "3f5ccf676a8015290bac315a0ae787f0fafd5564d6d0de1544ff3d9107e59834",
+      "junitSha256": {
+        "storymodel4s.acquire.D1aTaskReferencesSuite": "a3faef123fe91cda48d9b3e3b18b02b87087ff940bb32478e7d599abba5e843a"
+      },
+      "counts": {
+        "Total": 5,
+        "Failed": 2,
+        "Errors": 0,
+        "Passed": 3,
+        "Skipped": 0
+      },
+      "compiledNamedKillAndControl": true,
+      "freshReports": true,
+      "junitTimestampZone": "America/Toronto"
+    },
+    {
+      "id": "task-missing-surface",
+      "originalSha256": "b2154955dcfe3d30400d6f264663b2c6ab3b53de35a51c09a608fc59c4ac2290",
+      "mutantSha256": "19a495cb1411f63006c77e9efda1eb7b5199121af142b2e25a6ceaa4039f2496",
+      "logSha256": "2b16204cb659a3a87c121aa3aff8fe4df2a6e4864e35afd153f65e46483bdf74",
+      "junitSha256": {
+        "storymodel4s.acquire.D1aTaskReferencesSuite": "8082b26e958d5bfdb88be7d96233357842e96b7aef0aaa8f14546049989f2887"
+      },
+      "counts": {
+        "Total": 5,
+        "Failed": 1,
+        "Errors": 0,
+        "Passed": 4,
+        "Skipped": 0
+      },
+      "compiledNamedKillAndControl": true,
+      "freshReports": true,
+      "junitTimestampZone": "America/Toronto"
+    },
+    {
+      "id": "task-text-refusal",
+      "originalSha256": "b2154955dcfe3d30400d6f264663b2c6ab3b53de35a51c09a608fc59c4ac2290",
+      "mutantSha256": "85b354509aa840da56b1f7ff57789074f44a4193b09d42ed275159cb635c5abe",
+      "logSha256": "811443c5689310fb695f0a4343d63250c6f33c783349d72f719f82ac5ebb66fb",
+      "junitSha256": {
+        "storymodel4s.acquire.D1aTaskReferencesSuite": "2d7dafecdc25b1016c56d5df9fa0aefb3f62b04e8ea5eab83e9bc8a3850204a5"
+      },
+      "counts": {
+        "Total": 5,
+        "Failed": 1,
+        "Errors": 0,
+        "Passed": 4,
+        "Skipped": 0
+      },
+      "compiledNamedKillAndControl": true,
+      "freshReports": true,
+      "junitTimestampZone": "America/Toronto"
+    },
+    {
+      "id": "text-source-support-guard",
+      "originalSha256": "44ea5fcd769ce66bc7fe3340893a412c3eb6dbbcbf904f9f1357a1b214ab9ecb",
+      "mutantSha256": "4fa55b6c73226fe637fd19e703f53382b8af781d169a39e9ff97fd3ac8d652bc",
+      "logSha256": "6fa4fcb6600727b22762a7795f4d9e15f453f4c1cb75078b0c70d82fe39c7abc",
+      "junitSha256": {
+        "storymodel4s.document.CompilerSuite": "60b02d756ae585cdea88b5bad75993bd582b385653c72e12842ca9fb52b9effd"
+      },
+      "counts": {
+        "Total": 30,
+        "Failed": 1,
+        "Errors": 0,
+        "Passed": 29,
+        "Skipped": 0
+      },
+      "compiledNamedKillAndControl": true,
+      "freshReports": true,
+      "junitTimestampZone": "America/Toronto"
+    },
+    {
+      "id": "wire-resolution-name",
+      "originalSha256": "88c85b5fcad3e72d9bbe726a53cd24dc276e189001605802c8cf83c6c2a9062c",
+      "mutantSha256": "7a2e6c26a6785c56b322324f7b33fd8f1f55adc3ab6f4cf01560da68f35b4e6a",
+      "logSha256": "4d10faf45fd172bec788807a3ed6ef3a5001f198fe3bc2af237d38e82f3d68fe",
+      "junitSha256": {
+        "storymodel4s.codec.D1aGapWireSuite": "2ab8cbfe6716e95b79bf83685666c39996e4dd53318bfd751d25db68fec53b7d",
+        "storymodel4s.codec.EvidenceSupportCodecSuite": "9ecca1bad822af960f088d6e2c40a9541184dc30f8b9d63ca8c394f91b205f37"
+      },
+      "counts": {
+        "Total": 6,
+        "Failed": 1,
+        "Errors": 0,
+        "Passed": 5,
+        "Skipped": 0
+      },
+      "compiledNamedKillAndControl": true,
+      "freshReports": true,
+      "junitTimestampZone": "America/Toronto"
+    },
+    {
+      "id": "wire-gap-name",
+      "originalSha256": "88c85b5fcad3e72d9bbe726a53cd24dc276e189001605802c8cf83c6c2a9062c",
+      "mutantSha256": "44f8522215b86a4939ee83f4355a06bdeb59b04d42f3771087ea3f1e42ad9625",
+      "logSha256": "d1f7e427896d7f967424f1f66650ffec05dcc512cf1f7db4b180e39869c9633b",
+      "junitSha256": {
+        "storymodel4s.codec.D1aGapWireSuite": "cc2d9ba42e1d87b65fc3efc91f87b1fe06584d5864494fdf04578269e39d53aa",
+        "storymodel4s.codec.EvidenceSupportCodecSuite": "cdbcbfe8bd7959d882238cc8fb6c9f3f9375ea625e9efe1b20960955d0a71434"
+      },
+      "counts": {
+        "Total": 6,
+        "Failed": 1,
+        "Errors": 0,
+        "Passed": 5,
+        "Skipped": 0
+      },
+      "compiledNamedKillAndControl": true,
+      "freshReports": true,
+      "junitTimestampZone": "America/Toronto"
+    },
+    {
+      "id": "wire-gap-render",
+      "originalSha256": "44ea5fcd769ce66bc7fe3340893a412c3eb6dbbcbf904f9f1357a1b214ab9ecb",
+      "mutantSha256": "cb0c603264d6eade663a1ecac24238033f835aa3ba490a6721143360ed593a2f",
+      "logSha256": "24008c468282c269a6959601fa42f266e2d1353197393bc339b51e655ef020ba",
+      "junitSha256": {
+        "storymodel4s.codec.D1aGapWireSuite": "d83ea1cdd6a38a7ca83b07bb655bbdc555cfde22b5b0e33f7b499331f770746c",
+        "storymodel4s.codec.EvidenceSupportCodecSuite": "7d0604c8a3779a26b7abc5b93efd5cd08502a0d92e0b237e8f362ca4d23cce84"
+      },
+      "counts": {
+        "Total": 6,
+        "Failed": 1,
+        "Errors": 0,
+        "Passed": 5,
+        "Skipped": 0
+      },
+      "compiledNamedKillAndControl": true,
+      "freshReports": true,
+      "junitTimestampZone": "America/Toronto"
+    }
+  ],
+  "controls": {
+    "isolated-control": {
+      "logSha256": "20ee815c981a035946fecca4c88695dce139c599e5c0d6224f7b9976fb9aa7bb",
+      "counts": {
+        "Total": 55,
+        "Failed": 0,
+        "Errors": 0,
+        "Passed": 55,
+        "Skipped": 0
+      },
+      "receiptSha256": "634d47fa7f337dc24216094cc26974334a407e6e91cc5d3dc4dc7de5682a0597"
+    },
+    "restored-control": {
+      "logSha256": "28b865242867b6d4be99d9ad7e03fc8c1d8d09dbea54dcc4a978ec2c393142e4",
+      "counts": {
+        "Total": 55,
+        "Failed": 0,
+        "Errors": 0,
+        "Passed": 55,
+        "Skipped": 0
+      },
+      "receiptSha256": "f245d51e2eb35549728c2865555d0ea38c68d7c531b42ff88156e133b43d856c"
+    }
+  },
+  "cleanCloneAtAudit": true,
+  "s0Sha256": "cc201d9dd3e3576fabcd45677369f00c023ca5a455ea9d9e7ba694700c759fb3",
+  "findings": [],
+  "limitations": [
+    "Focused before/after controls independently reconciled to their captured logs; this audit does not claim archived per-suite control XML. Full final provider XML is a separate qualification.",
+    "Runtime mutation evidence is not empirical film or scientific recovery validation."
+  ]
+}

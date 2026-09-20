@@ -58,6 +58,10 @@ passes [55 tests before mutation](isolated-control.json). The
 [18 compiled mutants](mutations.json) each fail their named rejecting test while
 a named accepting control passes, with zero test errors. After restoring every
 source, the [clean focused court](restored-control.json) again passes all 55 tests.
+The [independent mutation audit](mutation-audit.json) reconstructs every edit and
+checks source, mutant, log and per-mutant JUnit hashes and named outcomes. The
+55-test before/after control receipts are bound to their logs; the runner did not
+archive separate control XML. Final provider JUnit is a separate court.
 [The failed first compile](failed-attempts.json) retains the test-helper keyword
 error and its repair; it is not a mutation witness.
 
