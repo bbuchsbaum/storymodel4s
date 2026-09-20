@@ -1,19 +1,24 @@
 # Film compiler phase plan
 
-Revision 1, 20 September 2026. This is the plan for
+Revision 2, 20 September 2026. This is the plan for
 `bd-01M2TAGST4EBFR1HM9Q3EWSYAH`, under film parent
 `bd-01M2T32SGVJXR2RT3RTS2DCN9P`. It answers the parent's ten questions against
 provider candidate `774fb1e8`; its production APIs are identical to the inspected
-`850a6d64` checkpoint. S4c is substantively landed at `146df652`. D1B's release
-gate is pending when this draft is written. This document does not qualify D1B.
+`850a6d64` checkpoint. S4c is substantively landed at `146df652`. D1B signatures
+qualified and landed locally; D1B's end-to-end film proof remains pending, and this
+document neither adds to nor substitutes for it.
 
 Status: cold review completed with both findings repaired; see the
 [review record](../refactor/evidence/d1a-film-phase-plan-20260920/cold-review.json).
-Actual child-ticket filing and presentation of the status decision remain pending.
-The owner has not chosen the caption license.
+The seven child tickets are filed with their declared dependencies, and the disclosed
+[status-decision brief](../refactor/evidence/d1a-film-phase-plan-20260920/owner-decision-brief.md)
+has been put to the owner. The owner has not selected a caption license, so F0 records
+any later answer and F4 remains blocked until it exists.
 The [child payloads](../refactor/evidence/d1a-film-phase-plan-20260920/children.json)
-are reviewable filing inputs, not existing tickets. Tracker mutations are currently
-blocked by automatic approval review; no acceptance criterion is waived for that.
+are the reviewable initial payloads of the filed tickets, rather than a substitute for
+their live tracker records. F4 and film materialization remain blocked until the selected
+policy is recorded; independently unblocked prerequisite work keeps its live dependency
+schedule. No acceptance criterion is waived.
 
 The governing [delivery plan](../refactor/PLAN.md),
 [D1A revision 5](2026-09-17-d1a-source-to-story-plan.md), and
@@ -287,13 +292,14 @@ proof remains on its existing later ticket.
 
 ## Children, gates and closure
 
-The only current child of the film parent is this phase-plan ticket, as read on
-20 September. The payloads propose seven new children, with stable local keys until
-actual IDs are filed. Preserve existing S4c, D1B signature and film parent tickets.
-Parent links and blocking edges are distinct; do not introduce a dependency cycle.
-In addition to those parent relations, file an explicit **F6 blocks film parent**
-edge. F6's transitive prerequisites cover F0–F5 and the existing plan/types/signature
-work, so the film parent cannot become ready while its implementation remains open.
+The film parent now has this phase-plan ticket and the filed F0–F6 children:
+F0 `bd-01M2YY1Z7W0SGT0RMYGH68T5PG`, F1 `bd-01M2YY2YJWXT406AZ3W4K9935W`,
+F2 `bd-01M2YY37377TYWWKQM6AZJSBQ0`, F3 `bd-01M2YY3FK1F5MJEMQX36NTXHNP`,
+F4 `bd-01M2YY3R25N9XWWAC4EZ3X3BJ9`, F5 `bd-01M2YY40FSG20HFF30S6RVVDQ5`,
+and F6 `bd-01M2YY490C0BAPDT6VRTEZ5DTF`. Preserve existing S4c, D1B signature
+and film parent tickets. Parent links and blocking edges are distinct; do not introduce
+a dependency cycle. The filed **F6 blocks film parent** edge makes the parent wait for
+F6; its transitive prerequisites cover F0–F5 and the existing plan/types/signature work.
 
 | Key | Deliverable | Blocking prerequisites |
 |---|---|---|

@@ -1,0 +1,31 @@
+{
+  "reviewedAt": "2026-09-20",
+  "reviewer": "/root/s0_cold_review",
+  "reviewType": "separate-agent cold review of revision-2 status reconciliation and owner decision brief",
+  "artifacts": [
+    {
+      "path": "docs/plans/2026-09-20-film-compiler-phase-plan.md",
+      "sha256": "005e77efdeaa4e9810c59878acb3eb2a7b9b9d964914515e3bd440024894fe05"
+    },
+    {
+      "path": "docs/refactor/evidence/d1a-film-phase-plan-20260920/owner-decision-brief.md",
+      "sha256": "13a03b010b5abf427d3c12bb7eacb001e21d4276ba19140746fac5a35516d530"
+    }
+  ],
+  "checked": [
+    "all ten design answers remained byte-identical",
+    "live F0-F6 titles, parent links, acceptance criteria, gates, scope limits and exact dependency sets matched children.json",
+    "the filed F6-to-film-parent blocking edge exists",
+    "F0 remains open and F4 remains blocked pending the owner answer",
+    "D1B signature closure and 00b1d9e6 ancestry support local landing without claiming end-to-end film proof",
+    "the owner brief presents both alternatives, the concrete trigger, StatusWeight and calibration/raw-score consequences, A/B consistency consequences, and a valid section-7 link"
+  ],
+  "resolvedFindings": [
+    "replaced obsolete proposed-child and unfiled-edge prose with live F0-F6 identifiers and F6-parent edge",
+    "corrected obsolete D1B-pending wording and preserved the end-to-end-proof boundary",
+    "narrowed the policy gate to F4/materialization so independently unblocked prerequisites retain their live schedule",
+    "recorded the owner-facing A/B question durably without recording an answer"
+  ],
+  "verdict": "clean after corrections; no P1 or P2 findings",
+  "limitations": "No builds, edits, tracker changes, policy selection, film implementation, end-to-end film proof, CI, remote publication, or scientific claim were made by this review."
+}
