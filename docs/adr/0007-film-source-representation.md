@@ -942,3 +942,35 @@ The fallible factory does not justify weak compile probes: fixture helpers still
 actual StoryModel, copy/Product/Mirror probes isolate their own boundaries, and every visibility
 mutation gets a clean recompile. A copied Either would falsely hide copy visibility; Product
 instead fails visibly. These are corrections to probe design, not relaxed acceptance.
+
+#### S4b factory and text-validation refinement — 20 September 2026
+
+`StoryModel.draft(atlas: NarrativeSourceAtlas, ...)` constructs the general envelope.
+`StoryModel.draftText(surface: SurfaceAtlas, ...)` constructs and returns a checked
+`TextModel`; its source is the surface's own source. An independent source argument is
+removed rather than retaining a redundant pair. Separate names avoid Scala's conflicting
+default-argument overloads. Both use the same canonical-form, membership, primary-projection,
+receipt and order checks. Text extent remains a validator law.
+
+`TextValidationOutcome(report, validated: Option[TextModel[Validated]])` is an additive
+carrier beside the existing general `ValidationOutcome`. A generic or higher-kinded outcome
+redesign is rejected because it adds migration without strengthening this witness. One
+validation/report/policy implementation serves both routes. The general `validate` retains
+its default policy; text overloads are `validate(text)` and `validate(text, policy)` without
+duplicate defaults. Text validation and adjudication promote their own admitted model and
+retain its unchanged atlas-derived witness. They never recover text with `flatMap(asText)`
+or convert an invariant violation into an ordinary failed validation.
+
+The text compiler, codec, materializer and view pipeline retain this capability in both
+inputs and returned values, including the compiler-required-gap `None` branch. Promotion
+joins compare underlying model values; separately allocated text wrappers have value
+equality and hash semantics. This outcome carrier does not attest that an arbitrary report
+belongs to an arbitrary draft; existing model/receipt joins remain mandatory.
+
+`StoryText` and `TextModel` are final checked wrappers. TextModel explicitly forwards named
+immutable reads and text queries; `source` and its compatibility `atlas` alias come from its
+own text witness, while `model.atlas` remains the sealed general atlas. Wildcard forwarding,
+implicit model conversions, public copy/status methods and helpers pairing foreign text
+with a model are rejected. The existing public node carriers remain detached values;
+the shared model join establishes their canonical form. Construction probes distinguish
+those intentionally open carriers from the closed model/text witnesses.

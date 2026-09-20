@@ -211,6 +211,18 @@ only. The courts are one positive case and one negative case.
 whose draft is a `TextModel`, so `pipeline/StoryBuild.scala:194,231,312-317` never meets an
 impossible `None`.
 
+S4b's reviewed factory refinement uses `StoryModel.draft(atlas: NarrativeSourceAtlas, ...)`
+for the general envelope and `draftText(surface: SurfaceAtlas, ...)` for a returned TextModel.
+The latter derives source from the supplied checked surface; it has no independent source
+argument. Separate names avoid conflicting default arguments. An additive
+`TextValidationOutcome(report, Option[TextModel[Validated]])` carries the text validation
+result beside the existing general outcome. Both validation routes share report/policy logic;
+text overloads have no duplicate defaults. Text promotion changes its own model's status and
+retains its witness, never recovering with `flatMap(asText)`. Explicit forwarding keeps
+copy/status/construction doors closed. Compiler promotion joins compare underlying model
+values, and wrappers retain value equality. The ADR records the rejected generic-outcome and
+wildcard-forwarding alternatives. This carrier does not attest report-to-draft provenance.
+
 **These consumers take `TextModel`:**
 - **codec:** `StoryModelCodec`; the `modelEncoder` and `draftDecoder` givens; the derivation
   artifact; `FeatureMaterializer` and `FeaturesArtifact`.
