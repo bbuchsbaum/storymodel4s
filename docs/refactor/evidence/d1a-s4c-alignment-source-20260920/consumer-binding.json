@@ -1,0 +1,19 @@
+{
+  "schema": "d1a-s4c-consumer-binding/v1",
+  "consumerRevision": "d95b9eacbcc1ac93c05f352c175c544a0dc6bdb1",
+  "providerRevision": "7a35bff7c82a42a334d397831446c6acf59d7fb0",
+  "junitReportCount": 24,
+  "junitCounts": {
+    "tests": 245,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "productionLink": {
+    "path": "app/target/scala-3.7.4/storyatlas4s-app-fastopt/main.js",
+    "bytes": 9070768,
+    "sha256": "9bd66645f06adea579e78a9ea4cddff045c2a302509807d7a8429c86a7d827a4",
+    "mtime": 1789881734.027476
+  },
+  "browserSmoke": "Not rerun: only the immutable provider pin changed from the previously qualified consumer; no shell change. S4b smoke remains historical evidence."
+}

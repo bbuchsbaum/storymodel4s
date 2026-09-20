@@ -1,6 +1,6 @@
 # D1A S4c — checked alignment source capabilities
 
-Release qualification is pending. Source/test candidate: `369965b2`. This slice seals
+All required execution gates pass. Source/test candidate: `369965b2`. This slice seals
 `AlignmentSource`, exposes exact `TypedSupport` and admitted `PrimaryProjection`, and
 adds `TextAlignmentSource` for exact character spans plus its own checked text witness.
 Only validated/adjudicated models enter the public factories. `StorySourceView` now
@@ -75,6 +75,16 @@ is also present in S4b; no warning-clean claim is made.
 The [scoring perturbation comparison](score-perturbation-differences.json) observes 101
 changed leaves, including posterior/flow masses and likelihood as well as fingerprint.
 
-Pending: exact pinned storyatlas4s consumer gate, local landing, and ticket closure. D1B still owns point-capable support,
+The [exact pinned consumer gate](consumer-gate.json) passes all 245 tests across eight
+tasks (both edition tasks have no test sources), formatting and the production app link.
+The [consumer binding](consumer-binding.json) and [archive](consumer-evidence.tar.gz)
+with its [manifest](consumer-evidence-manifest.json) retain all 24 fresh JUnit reports,
+command receipts and the production bundle hash. All four clones remain clean.
+Only the immutable provider pin changed in the consumer; no browser smoke was rerun.
+
+The [independent audit](root-independent-audit.json) reconciles archive contents, provider
+and consumer counts, frozen resources and exact revisions with no findings. The consumer
+is [landed locally](consumer-local-landing.json); provider landing and ticket closure follow
+this evidence commit. D1B still owns point-capable support,
 all 17 participant parity, and the typed recall path. This slice makes no film compiler,
 caption licensing, empirical accuracy, remote publication, or executed CI claim.

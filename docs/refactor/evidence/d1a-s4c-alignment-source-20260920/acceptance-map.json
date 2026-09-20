@@ -57,7 +57,6 @@
   "compiledMutationEvidence": "mutation-terminal-summary.json",
   "coldReviews": "code-review.json",
   "pending": [
-    "Pinned storyatlas consumer gate",
     "Local landing and Mote closure"
   ],
   "limitations": [
@@ -79,5 +78,15 @@
   "docsGate": {
     "receipt": "docs-examples.json",
     "examples": 13
+  },
+  "consumerGate": {
+    "receipt": "consumer-gate.json",
+    "binding": "consumer-binding.json",
+    "tasks": 8,
+    "total": 245,
+    "passed": 245,
+    "skipped": 0,
+    "failed": 0,
+    "errors": 0
   }
 }

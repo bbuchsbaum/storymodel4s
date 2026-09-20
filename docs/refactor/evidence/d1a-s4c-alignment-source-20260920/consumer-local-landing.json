@@ -1,0 +1,20 @@
+{
+  "before": {
+    "head": "b156029d95a662107c819dd2aefc80abec7d748e",
+    "branch": "main",
+    "trackedClean": true,
+    "untrackedFileCount": 636,
+    "untrackedInventorySha256": "4a60d592772ad7f4cfa26853e075b72a7054ef7b643faf6228651a86487577a2"
+  },
+  "after": {
+    "head": "d95b9eacbcc1ac93c05f352c175c544a0dc6bdb1",
+    "branch": "main",
+    "trackedClean": true,
+    "untrackedFileCount": 636,
+    "untrackedInventorySha256": "4a60d592772ad7f4cfa26853e075b72a7054ef7b643faf6228651a86487577a2"
+  },
+  "qualifiedConsumer": "d95b9eacbcc1ac93c05f352c175c544a0dc6bdb1",
+  "qualifiedProvider": "7a35bff7c82a42a334d397831446c6acf59d7fb0",
+  "qualification": "Local fast-forward only; all unrelated untracked file content preserved. Exact consumer gate245 passed; no push.",
+  "untrackedInventoryEncoding": "SHA-256 of Python json.dumps([{path, sha256(file bytes)}], sort_keys=True), in git ls-files order; compared before/after only."
+}

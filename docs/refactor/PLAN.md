@@ -224,8 +224,14 @@ is complete: 54 compiled mutants are killed, including 24 separately cleaned com
 skips across 56 tasks. Formatting, all 13 docs examples, the exact-provider 245-test consumer
 gate and 260 browser checks pass. The preserved baseline reproduces two existing smoke defects;
 the separately reviewed test-only repair changes no application behavior. S0 is unchanged.
-The next sequential D1A slice is **S4c's sealed and split AlignmentSource**
-(`bd-01M2TAGDJ5F0FEPC3XPWVDSWDH`).
+The [S4c sealed alignment capabilities](evidence/d1a-s4c-alignment-source-20260920/README.md)
+are complete: 24 compiled mutants are killed, including 14 clean production/probe recompiles;
+26 restored focused tests pass. All three backend HSMM artifacts exactly preserve their own
+frozen baseline, including existing Native differences. The clean full provider gate passes
+6,996 executions with the same five skips across 56 tasks; formatting, 13 docs examples and
+the exact-provider 245-test consumer gate pass. Both frozen resources remain unchanged.
+The next sequential slice is **D1B typed recall signatures**
+(`bd-01M2TAC80YRK5JFNKTT7B7CAQN`), including point support and all 17 participant parity.
 G0 as a whole remains open for infrastructure and independent preservation work;
 these engineering gates establish no accuracy or measurement-validity claim.
 

@@ -1,0 +1,148 @@
+{
+  "archive": "consumer-evidence.tar.gz",
+  "sha256": "072bb19c269bbaba9156797d0ec9f0eecbe444131d897f9424665426a20f6c93",
+  "bytes": 17600,
+  "memberCount": 28,
+  "members": [
+    {
+      "path": "consumer-gate.json",
+      "bytes": 7761,
+      "sha256": "eaaa120040febcf43e0f2221d3975f5758ee6351d39ce9c75598235d4c5c1492"
+    },
+    {
+      "path": "consumer-gate.log",
+      "bytes": 21739,
+      "sha256": "4cae11405d9d40609f790a6c136188a1963abd56f5b5f4fb073e94daa57efa6c"
+    },
+    {
+      "path": "consumer-runner.log",
+      "bytes": 7761,
+      "sha256": "eaaa120040febcf43e0f2221d3975f5758ee6351d39ce9c75598235d4c5c1492"
+    },
+    {
+      "path": "junit/app/target/test-reports/TEST-storyatlas4s.app.AppCompilerSuite.xml",
+      "bytes": 7831,
+      "sha256": "5f6547d1d942b96ad2efaf2a0dc6beb5865bebb210322ca91823b7b3c1c3a5d5"
+    },
+    {
+      "path": "junit/app/target/test-reports/TEST-storyatlas4s.app.SemanticZoomSuite.xml",
+      "bytes": 6358,
+      "sha256": "e8dc6475b32f7340cfd52dd25f3be78e6f4580f8bff1adebf07d678e7794ad29"
+    },
+    {
+      "path": "junit/app/target/test-reports/TEST-storyatlas4s.app.SvgDomSuite.xml",
+      "bytes": 5737,
+      "sha256": "eb134b2efd488242a54f5adfe0b2e2e28ed238774b05fde1594db1d41ec31783"
+    },
+    {
+      "path": "junit/cli/target/test-reports/TEST-storyatlas4s.cli.CodexHtmlSuite.xml",
+      "bytes": 6788,
+      "sha256": "08ce7c446b9b29b1c186cb95c6dbbcf1d8d597505dcf833dd945a12d88de1dad"
+    },
+    {
+      "path": "junit/cli/target/test-reports/TEST-storyatlas4s.cli.EditionSuite.xml",
+      "bytes": 6549,
+      "sha256": "c15859b87bc2c869031118b3e5562a721ba3cf3cd41f628cbf73612626cfa9ef"
+    },
+    {
+      "path": "junit/cli/target/test-reports/TEST-storyatlas4s.cli.ModelInputSuite.xml",
+      "bytes": 9331,
+      "sha256": "f0d15c097d388352b348904d1b31ae612e3a991f1e06788d1e562a7362c8219c"
+    },
+    {
+      "path": "junit/cli/target/test-reports/TEST-storyatlas4s.cli.VoyageEditionSuite.xml",
+      "bytes": 5940,
+      "sha256": "a4ab9adbdc50b8c0b2e74af88d50faaba78c1623129b9e09ae000017a60afad1"
+    },
+    {
+      "path": "junit/cli/target/test-reports/TEST-storyatlas4s.cli.WorkspaceSuite.xml",
+      "bytes": 8461,
+      "sha256": "5f186eda6c50d5717f28d7514ec1df39dbf0a87219517e64c810ee91a0456255"
+    },
+    {
+      "path": "junit/intaglio/.js/target/test-reports/TEST-storyatlas4s.intaglio.DraftLoweringSuite.xml",
+      "bytes": 6586,
+      "sha256": "ad25eaa8a46c1e00d08007e67041040cd9aaa09a4aff4e112e848240183dfe3e"
+    },
+    {
+      "path": "junit/intaglio/.js/target/test-reports/TEST-storyatlas4s.intaglio.PagedCodexLoweringSuite.xml",
+      "bytes": 6042,
+      "sha256": "665f4cc003a44b96e6fe3470ee52de3b8ef36afe8c52bd50ee7648424977f09b"
+    },
+    {
+      "path": "junit/intaglio/.js/target/test-reports/TEST-storyatlas4s.intaglio.PlateCraftSuite.xml",
+      "bytes": 10044,
+      "sha256": "37421bc3c1725b27c103311af420a84ee549cf09fb64695497c9bfdd643f8aab"
+    },
+    {
+      "path": "junit/intaglio/.js/target/test-reports/TEST-storyatlas4s.intaglio.VoyageLoweringSuite.xml",
+      "bytes": 8075,
+      "sha256": "8398d0c899005a1120ed69dff2934ee3f17fa52129c4bddc6fcb83afa3945226"
+    },
+    {
+      "path": "junit/intaglio/.js/target/test-reports/TEST-storyatlas4s.intaglio.WarOfTheGhostsLoweringSuite.xml",
+      "bytes": 7412,
+      "sha256": "e91709c04e8217507f8490fb05d11725e878b6e487900449c3961028b4c0b03f"
+    },
+    {
+      "path": "junit/intaglio/.jvm/target/test-reports/TEST-storyatlas4s.intaglio.DraftLoweringSuite.xml",
+      "bytes": 6585,
+      "sha256": "3d5dde61b586d056b41f60fc55b788ee41689d69d95e2289770db915d469cb2b"
+    },
+    {
+      "path": "junit/intaglio/.jvm/target/test-reports/TEST-storyatlas4s.intaglio.PagedCodexLoweringSuite.xml",
+      "bytes": 6043,
+      "sha256": "b131fc4567b1f5e0f0a3cfaf5d3e2fa1d1697e40e4c9f6e762e6a374b5067b02"
+    },
+    {
+      "path": "junit/intaglio/.jvm/target/test-reports/TEST-storyatlas4s.intaglio.PlateCraftSuite.xml",
+      "bytes": 10048,
+      "sha256": "e7666d7efc6aa87785015ea2b260857f32220cbc0e543732f2b16248f892e5f4"
+    },
+    {
+      "path": "junit/intaglio/.jvm/target/test-reports/TEST-storyatlas4s.intaglio.VoyageLoweringSuite.xml",
+      "bytes": 8081,
+      "sha256": "9c8d89010ebd2ff0cce44f9c860bc3d9318871cd47fd28ae062e21dec0eb5fda"
+    },
+    {
+      "path": "junit/intaglio/.jvm/target/test-reports/TEST-storyatlas4s.intaglio.WarOfTheGhostsLoweringSuite.xml",
+      "bytes": 7412,
+      "sha256": "d1284633d0759cce52a69ccd7d4778eb969e17cfe4ff6422c73280aafacb524f"
+    },
+    {
+      "path": "junit/layout/.js/target/test-reports/TEST-storyatlas4s.layout.DomMeasurerSuite.xml",
+      "bytes": 6528,
+      "sha256": "64896720f33be96dfae6cbdb868725625318e215bf4b702d613a6dccd9b5e3c3"
+    },
+    {
+      "path": "junit/layout/.js/target/test-reports/TEST-storyatlas4s.layout.PaginatorLawsSuite.xml",
+      "bytes": 7949,
+      "sha256": "eed900f807d756d68f4abdb336812121f26f6e13d1779ced86bf0ead5d4356ac"
+    },
+    {
+      "path": "junit/layout/.js/target/test-reports/TEST-storyatlas4s.layout.WarOfTheGhostsPaginationSuite.xml",
+      "bytes": 6193,
+      "sha256": "e221cf57f754887a3c903c1c0c6567833c6190b559203b1666193dfed000b235"
+    },
+    {
+      "path": "junit/layout/.jvm/target/test-reports/TEST-storyatlas4s.layout.AwtMeasurerSuite.xml",
+      "bytes": 5620,
+      "sha256": "06b51b34acc1b7943faf4243de7ef645227ff3acf59abd56fac652b5f9675f9f"
+    },
+    {
+      "path": "junit/layout/.jvm/target/test-reports/TEST-storyatlas4s.layout.PaginatorLawsSuite.xml",
+      "bytes": 7894,
+      "sha256": "010962f077c04797f11a23d08528f8cbef8ef85284ea2ff91a5f6a357500b8b0"
+    },
+    {
+      "path": "junit/layout/.jvm/target/test-reports/TEST-storyatlas4s.layout.WarOfTheGhostsPaginationSuite.xml",
+      "bytes": 6130,
+      "sha256": "646822ea09dea03f45ee815ab83e16e051644c16e7d514847af97eb4f529a992"
+    },
+    {
+      "path": "consumer-binding.json",
+      "bytes": 700,
+      "sha256": "7274de5df2c0ddf6fa841fdc5c6edb6d792d1de5cac30d9d99dc5f0c2563aaa6"
+    }
+  ]
+}
