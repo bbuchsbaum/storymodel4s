@@ -24,6 +24,21 @@ def run(label,argv):
         stream.write('\nCOMMAND_EXIT='+str(result.returncode)+'\n')
     return dict(command=argv,exitCode=result.returncode,startedEpochSeconds=started,endedEpochSeconds=time.time(),
         logPath=str(path),logSha256=sha(path))
+def owned_processes(label,launched_pids=()):
+    # The global guard does not recognize Playwright's headless_shell name. Keep
+    # unmodified ps rows for this cache and the exact launched PID independently.
+    command=['ps','-axo','pid=,ppid=,command=']
+    observed=time.time()
+    raw=subprocess.check_output(command,text=True)
+    rows=[]
+    for line in raw.splitlines():
+        parts=line.split(None,2)
+        if len(parts)==3 and (str(browser_path) in parts[2] or int(parts[0]) in launched_pids):
+            rows.append(line)
+    path=out/(label+'.log');assert not path.exists(),path
+    path.write_text(''.join(line+'\n' for line in rows))
+    return dict(command=command,observedEpochSeconds=observed,cachePath=str(browser_path),
+        exactLaunchedPids=list(launched_pids),rawScopedRows=rows,logPath=str(path),logSha256=sha(path))
 
 assert not (out/'consumer-smoke.json').exists()
 before=state();assert all(not value['status'] for value in before.values())
@@ -56,22 +71,32 @@ try:
     assert receipt['browser']['version']=='1.55.1'
     assert Path(receipt['browser']['executable']).is_relative_to(browser_path)
     receipt['browser']['executableSha256']=sha(Path(receipt['browser']['executable']))
+    receipt['nodeRuntime']=json.loads(subprocess.check_output(['node','-e',
+        'console.log(JSON.stringify({version:process.version,executable:process.execPath}))'],env=env,text=True))
+    receipt['nodeRuntime']['executableSha256']=sha(Path(receipt['nodeRuntime']['executable']))
     receipt['guardBefore']=run('browser-guard-before',['node',str(guard),'--audit'])
     assert receipt['guardBefore']['exitCode'] in [0,1], 'browser audit could not inspect processes'
     assert str(browser_path) not in Path(receipt['guardBefore']['logPath']).read_text(), 'owned browser unexpectedly already running'
+    receipt['ownedProcessesBefore']=owned_processes('browser-owned-processes-before')
+    assert not receipt['ownedProcessesBefore']['rawScopedRows'], 'owned cache already in use'
     try:
         receipt['smoke']=run('consumer-browser-smoke',['node','app/smoke/smoke.cjs','target/edition/index.html'])
     finally:
         receipt['guardAfter']=run('browser-guard-after',['node',str(guard),'--audit'])
+        log=(out/'consumer-browser-smoke.log').read_text()
+        launched_pids=[int(value) for value in re.findall(r'<launched> pid=(\d+)',log)]
+        receipt['ownedProcessesAfter']=owned_processes('browser-owned-processes-after',launched_pids)
     assert receipt['guardAfter']['exitCode'] in [0,1], 'browser audit could not inspect processes'
     assert str(browser_path) not in Path(receipt['guardAfter']['logPath']).read_text(), 'owned browser remains after smoke'
     log=Path(receipt['smoke']['logPath']).read_text()
-    launch=re.search(r'<launching> (.*?) --',log)
-    assert launch,'actual browser launch missing from debug receipt'
-    executable=Path(launch.group(1))
+    launches=re.findall(r'<launching> (.*?) --',log)
+    assert len(launches)==len(launched_pids)==1,'expected exactly one actual browser launch'
+    executable=Path(launches[0])
     assert executable.is_relative_to(browser_path)
     receipt['browser']['actualLaunchedExecutable']=str(executable)
     receipt['browser']['actualLaunchedExecutableSha256']=sha(executable)
+    receipt['browser']['actualLaunchedPid']=launched_pids[0]
+    assert not receipt['ownedProcessesAfter']['rawScopedRows'], 'owned browser or child remains after smoke'
     receipt['smoke']['passedChecks']=sum(line.startswith('ok  ') for line in log.splitlines())
     receipt['smoke']['failedChecks']=sum(line.startswith('FAIL') for line in log.splitlines())
     receipt['smoke']['terminalPassed']='\nsmoke passed\n' in log

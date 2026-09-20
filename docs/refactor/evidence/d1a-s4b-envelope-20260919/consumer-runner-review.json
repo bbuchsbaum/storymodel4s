@@ -1,0 +1,8 @@
+{
+  "scope": "consumer-gate.py and consumer-smoke.py at 9dcaf8e7",
+  "reviewer": "/root/s0_cold_review",
+  "finding": "P2: mandatory global guard does not recognize Playwright headless_shell, so owned-cache absence in that guard alone cannot prove cleanup.",
+  "repair": "Keep both global guards, capture raw ps rows scoped to the owned cache and exact launched PID, bind single actual executable/PID from Playwright debug log, and require all owned rows absent afterward. Record actual Node binary.",
+  "recheck": "pending",
+  "execution": "pending"
+}
