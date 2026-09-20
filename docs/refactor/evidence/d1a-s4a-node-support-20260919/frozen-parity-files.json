@@ -1,0 +1,11 @@
+{
+  "before": "5ddd9039",
+  "after": "94e0a9a2",
+  "files": [
+    {
+      "path": "pipeline/src/test/resources/golden/d1a-s0-text-parity.json",
+      "sha256": "cc201d9dd3e3576fabcd45677369f00c023ca5a455ea9d9e7ba694700c759fb3",
+      "identical": true
+    }
+  ]
+}

@@ -1,0 +1,876 @@
+{
+  "codeRevision": "94e0a9a229fe4224f9312220baae23c8e6e9ffa5",
+  "mutationReceiptSha256": "3256201ed85d8418320fe5d9fa64f6a9f4953f33a330ed8b0a2e95e9f100300c",
+  "inventorySha256": "05db429ca937ca5521248e2843d42d317d415b0a17734f28452cf7d9005d824d",
+  "runnerSha256": "af5da2ca4f5788a42f2f2d01b4b652b04f08f63d055449ff3f6acdbbb3531068",
+  "mutants": [
+    {
+      "id": "projection-primary-kind",
+      "attempt": "projection-primary-kind-attempt-1",
+      "originalSha256": "7ddcbabdc5b87e156872073133829b1673ccd4d1a2c370ce2fb4166885677666",
+      "mutantSha256": "e20e7d679f5e9a21af543c4371d814de7dddafbae523054b6c564e038ea85e40",
+      "attemptReceiptSha256": "f2fa0456032ad1eb8a15c201b2aee139222cea707e85b15d2c2fa41d3201ad8b",
+      "logSha256": "51205d289b85638a216982720b1b929cf8b0b8ecc6c395bca9c0ea3898bc6c44",
+      "junitSha256": {
+        "storymodel4s.core.D1aProjectionSuite": "b7176543707bc1e1735bbbbcec3432aa305ad36ee6850b3a53de9bdec7c5c869"
+      },
+      "counts": {
+        "Total": 4,
+        "Failed": 1,
+        "Errors": 0,
+        "Passed": 3,
+        "Skipped": 0
+      },
+      "namedKillAndControlReconciled": true,
+      "freshReports": true,
+      "cloneDirectoryBound": true,
+      "testcasePopulationMatchesRestored": true,
+      "cleanProbeRecompile": false
+    },
+    {
+      "id": "projection-anchored-refusal",
+      "attempt": "projection-anchored-refusal-attempt-1",
+      "originalSha256": "7ddcbabdc5b87e156872073133829b1673ccd4d1a2c370ce2fb4166885677666",
+      "mutantSha256": "ab330c29f9d04b88d2193b8681f179d231b64b6c44c40ffa625302903435523e",
+      "attemptReceiptSha256": "99352e9e9a40e7df4e9c49924f20cde1f4e2bde015d26f4a145edb60865341c2",
+      "logSha256": "3186fa03153991a347b00347a210556969f4022ea47004dfa402f7f01f17636e",
+      "junitSha256": {
+        "storymodel4s.core.D1aProjectionSuite": "a094ee402d03bdd6ba88397081b2b372bc8a39e788b6ded90d1676a6b334de93"
+      },
+      "counts": {
+        "Total": 4,
+        "Failed": 1,
+        "Errors": 0,
+        "Passed": 3,
+        "Skipped": 0
+      },
+      "namedKillAndControlReconciled": true,
+      "freshReports": true,
+      "cloneDirectoryBound": true,
+      "testcasePopulationMatchesRestored": true,
+      "cleanProbeRecompile": false
+    },
+    {
+      "id": "projection-ref-retention",
+      "attempt": "projection-ref-retention-attempt-1",
+      "originalSha256": "7ddcbabdc5b87e156872073133829b1673ccd4d1a2c370ce2fb4166885677666",
+      "mutantSha256": "3fd05d7c567710cfba4f22df084b2a8769a662db5535517989380f7a50d4f180",
+      "attemptReceiptSha256": "ae8fc12c5145e3b6638c67ca2f8244b66613be805628c04bddae56d125e08749",
+      "logSha256": "a05b8f2748a30dff5f251c8b3972e57a1b7e238f83fe6234d1fda138e701b807",
+      "junitSha256": {
+        "storymodel4s.core.D1aProjectionSuite": "67fecb5f9ab5638f27f4a7bcf39a18ef35a43da4b52d0fcd93090ed227e1df9f"
+      },
+      "counts": {
+        "Total": 4,
+        "Failed": 1,
+        "Errors": 0,
+        "Passed": 3,
+        "Skipped": 0
+      },
+      "namedKillAndControlReconciled": true,
+      "freshReports": true,
+      "cloneDirectoryBound": true,
+      "testcasePopulationMatchesRestored": true,
+      "cleanProbeRecompile": false
+    },
+    {
+      "id": "projection-axis-binding",
+      "attempt": "projection-axis-binding-attempt-1",
+      "originalSha256": "7ddcbabdc5b87e156872073133829b1673ccd4d1a2c370ce2fb4166885677666",
+      "mutantSha256": "7c5b2a460f03fd2e4d8bf8699b46e4634c0882ecc0c4303da3d377ed5a03acc3",
+      "attemptReceiptSha256": "c3a7eea95884b9de6e91c381827a7bb3948e8706696ad767f3aab192343ce309",
+      "logSha256": "56df1c2fe4a8d0bd507ddda8c9a5f65dbc595ff05ce525d978ed0d757c357469",
+      "junitSha256": {
+        "storymodel4s.core.D1aProjectionSuite": "3435040e75895648b0ce914a812682eecda250918e9298c3b1f7f6f757d654fb"
+      },
+      "counts": {
+        "Total": 4,
+        "Failed": 2,
+        "Errors": 0,
+        "Passed": 2,
+        "Skipped": 0
+      },
+      "namedKillAndControlReconciled": true,
+      "freshReports": true,
+      "cloneDirectoryBound": true,
+      "testcasePopulationMatchesRestored": true,
+      "cleanProbeRecompile": false
+    },
+    {
+      "id": "projection-hull-end",
+      "attempt": "projection-hull-end-attempt-1",
+      "originalSha256": "7ddcbabdc5b87e156872073133829b1673ccd4d1a2c370ce2fb4166885677666",
+      "mutantSha256": "b4f289c29820b3828243065877b21d5137380fd7342e96ab47cb15fc9aac059d",
+      "attemptReceiptSha256": "85ed65b7c748aad8fbbadfd87fcdf1a817882e2d9c9b612a8126909a827f82d7",
+      "logSha256": "7ab6c3564d9b2c4743a2285e3e3179e31145234bfce61cc7e38b7d91d052b619",
+      "junitSha256": {
+        "storymodel4s.core.D1aProjectionSuite": "1a5788eb5b3d81841621f025ff18f9eb004fa4a9d1047446aea6ae91bbc7f34c"
+      },
+      "counts": {
+        "Total": 4,
+        "Failed": 1,
+        "Errors": 0,
+        "Passed": 3,
+        "Skipped": 0
+      },
+      "namedKillAndControlReconciled": true,
+      "freshReports": true,
+      "cloneDirectoryBound": true,
+      "testcasePopulationMatchesRestored": true,
+      "cleanProbeRecompile": false
+    },
+    {
+      "id": "text-accessor-ref-retention",
+      "attempt": "text-accessor-ref-retention-attempt-1",
+      "originalSha256": "7ddcbabdc5b87e156872073133829b1673ccd4d1a2c370ce2fb4166885677666",
+      "mutantSha256": "976b9af6337cd1bd6297a4c8a7d0fc8b393f7b5a35bdce1d432466156e3bb678",
+      "attemptReceiptSha256": "f6c79d0833d0ceed51e4fd66d0cabc34c40b5f5e2827492d8e3f67e892eeff20",
+      "logSha256": "29bc9081735459bbe2427fa981cb43be001429a381135f72b86fe9360d554c60",
+      "junitSha256": {
+        "storymodel4s.core.D1aProjectionSuite": "c5423e669ffc93db25accac4b237fd6d57af4f5d6b0b9ea89733bde93ac2de08"
+      },
+      "counts": {
+        "Total": 4,
+        "Failed": 1,
+        "Errors": 0,
+        "Passed": 3,
+        "Skipped": 0
+      },
+      "namedKillAndControlReconciled": true,
+      "freshReports": true,
+      "cloneDirectoryBound": true,
+      "testcasePopulationMatchesRestored": true,
+      "cleanProbeRecompile": false
+    },
+    {
+      "id": "anchored-accessor-no-cast",
+      "attempt": "anchored-accessor-no-cast-attempt-1",
+      "originalSha256": "7ddcbabdc5b87e156872073133829b1673ccd4d1a2c370ce2fb4166885677666",
+      "mutantSha256": "f08c9a16976b0b6cd027d2d8729558d568614f4f3a5c664e6f24363003fb759b",
+      "attemptReceiptSha256": "59c20cc62b315420f5f02171d8a27e01e3ffad0f566f3975021e8302d08b053b",
+      "logSha256": "2e66bd5b9cc29cb79188d46fe4376d5d18810bd479d02ad042db38f924613730",
+      "junitSha256": {
+        "storymodel4s.core.D1aProjectionSuite": "7a82c434d27308ef37e45a7e10a456afadbc899d710a9c26bf18dc5f2c6a6400"
+      },
+      "counts": {
+        "Total": 4,
+        "Failed": 1,
+        "Errors": 0,
+        "Passed": 3,
+        "Skipped": 0
+      },
+      "namedKillAndControlReconciled": true,
+      "freshReports": true,
+      "cloneDirectoryBound": true,
+      "testcasePopulationMatchesRestored": true,
+      "cleanProbeRecompile": false
+    },
+    {
+      "id": "graph-primary-kind",
+      "attempt": "graph-primary-kind-attempt-1",
+      "originalSha256": "26ced1e56eaac6ebbf127b3e091721060aa8cd6fe7959499e77c2d81251386ce",
+      "mutantSha256": "91d2f42925f59779555b6816e592aef7f75c9994b3a5a487fcb0074a3a66069b",
+      "attemptReceiptSha256": "f0be48b6b233258cecc66bed297933dfa2a7aa3e0fad123cd234708fdcb16695",
+      "logSha256": "890dcdc42553a7005dfbe88662ee1fff5afb214a6611b4697fc4327890cb6a4e",
+      "junitSha256": {
+        "storymodel4s.story.D1aOrderingSuite": "7ca55d8c8eeeac4381caef62a4a2526ae68d29bfbac21746da8b35557efc0b94"
+      },
+      "counts": {
+        "Total": 6,
+        "Failed": 1,
+        "Errors": 0,
+        "Passed": 5,
+        "Skipped": 0
+      },
+      "namedKillAndControlReconciled": true,
+      "freshReports": true,
+      "cloneDirectoryBound": true,
+      "testcasePopulationMatchesRestored": true,
+      "cleanProbeRecompile": false
+    },
+    {
+      "id": "order-start-precedence",
+      "attempt": "order-start-precedence-attempt-1",
+      "originalSha256": "26ced1e56eaac6ebbf127b3e091721060aa8cd6fe7959499e77c2d81251386ce",
+      "mutantSha256": "972eef82f2dc0c241eb28cb908fe4af8ff9a15e266470eb36a77ef9996627323",
+      "attemptReceiptSha256": "f4edcd2e4dbc936469e9752423bdaf3d28b96b6275406055a42f27ea29df61c2",
+      "logSha256": "bbbe8ef2ae8808821a411c2676ce3d1f10b5385fe9908020984c49bb87f2d330",
+      "junitSha256": {
+        "storymodel4s.story.D1aOrderingSuite": "dafe11eb9a41b4fdb9b9939f63e53571fb530d3f93a9109fa612e92a90ab9d15"
+      },
+      "counts": {
+        "Total": 6,
+        "Failed": 1,
+        "Errors": 0,
+        "Passed": 5,
+        "Skipped": 0
+      },
+      "namedKillAndControlReconciled": true,
+      "freshReports": true,
+      "cloneDirectoryBound": true,
+      "testcasePopulationMatchesRestored": true,
+      "cleanProbeRecompile": false
+    },
+    {
+      "id": "order-end-precedence",
+      "attempt": "order-end-precedence-attempt-1",
+      "originalSha256": "26ced1e56eaac6ebbf127b3e091721060aa8cd6fe7959499e77c2d81251386ce",
+      "mutantSha256": "0f22ee1371239479c9e5f1fb857529e8d5e69ee5e73f7a32b457286247ab3bce",
+      "attemptReceiptSha256": "9812130d03cb12f839db5a1800737f28d846c4b3cbe1c164a76b028047a533d0",
+      "logSha256": "25a5e9bb74ade90d7dd38a140294446e2e1089feb1becd7b2ebe3ae6b3de381e",
+      "junitSha256": {
+        "storymodel4s.story.D1aOrderingSuite": "0d9bf61e19a7393a959f9a8159fbc394697d49f37427570654face936ea284d9"
+      },
+      "counts": {
+        "Total": 6,
+        "Failed": 1,
+        "Errors": 0,
+        "Passed": 5,
+        "Skipped": 0
+      },
+      "namedKillAndControlReconciled": true,
+      "freshReports": true,
+      "cloneDirectoryBound": true,
+      "testcasePopulationMatchesRestored": true,
+      "cleanProbeRecompile": false
+    },
+    {
+      "id": "order-id-tie",
+      "attempt": "order-id-tie-attempt-1",
+      "originalSha256": "26ced1e56eaac6ebbf127b3e091721060aa8cd6fe7959499e77c2d81251386ce",
+      "mutantSha256": "6ad6af155cfa98f8e9aa01c99edb2ca7c09b34bb169ca5e32c2107d554ea2bb0",
+      "attemptReceiptSha256": "ec11fcd038f0748da89b8a0080022eb8c1896ff8675f108c922bf3968886508d",
+      "logSha256": "a46aded7fcce906bce0692ecf4ab4286689ff708d4a2f159669e6147a51eeab4",
+      "junitSha256": {
+        "storymodel4s.story.D1aOrderingSuite": "31ed4def1108ad459359479954e33ef049659931f4db43bb809d1a5b832047fd"
+      },
+      "counts": {
+        "Total": 6,
+        "Failed": 1,
+        "Errors": 0,
+        "Passed": 5,
+        "Skipped": 0
+      },
+      "namedKillAndControlReconciled": true,
+      "freshReports": true,
+      "cloneDirectoryBound": true,
+      "testcasePopulationMatchesRestored": true,
+      "cleanProbeRecompile": false
+    },
+    {
+      "id": "model-all-text-guard",
+      "attempt": "model-all-text-guard-attempt-1",
+      "originalSha256": "291f807ab09e995fe699b7d6ae6f318a063b396bcee15239a77b278469d7eaaf",
+      "mutantSha256": "3ca4add87c3563973fd54d49003b398c0fc714a615f5e22e5c2bf2466335b4ac",
+      "attemptReceiptSha256": "b3139694a9e8be0eaabb1337669b4cbbf2aea2f8390eee708814a790469716ed",
+      "logSha256": "fd8f0183516cf2c6a19c76127f2e129ba15916bc7e03ab945858804b26d578f3",
+      "junitSha256": {
+        "storymodel4s.story.D1aTextBoundarySuite": "e1c9d6a80dcd24d130015a3462dc59571de4e19efe6c615f2bb952ae2da296eb"
+      },
+      "counts": {
+        "Total": 13,
+        "Failed": 4,
+        "Errors": 0,
+        "Passed": 9,
+        "Skipped": 0
+      },
+      "namedKillAndControlReconciled": true,
+      "freshReports": true,
+      "cloneDirectoryBound": true,
+      "testcasePopulationMatchesRestored": true,
+      "cleanProbeRecompile": false
+    },
+    {
+      "id": "model-enumerate-entities",
+      "attempt": "model-enumerate-entities-attempt-1",
+      "originalSha256": "26ced1e56eaac6ebbf127b3e091721060aa8cd6fe7959499e77c2d81251386ce",
+      "mutantSha256": "7ccea38469e2d6820fef1a23879d957c4ddec08e809001e0ab16a64f17d99b1b",
+      "attemptReceiptSha256": "9f773250f44d64410607e1826840869201cec8e00043deb86a062068a2242828",
+      "logSha256": "65dbbe62f0bfccf34ce805f39dd75f2f7e248d5e15533019b7b4c97904a2917a",
+      "junitSha256": {
+        "storymodel4s.story.D1aTextBoundarySuite": "24e6ca3bdc1544d9f022bdefa0215af40056e71291a284532bbf475d3cd880fa"
+      },
+      "counts": {
+        "Total": 13,
+        "Failed": 1,
+        "Errors": 0,
+        "Passed": 12,
+        "Skipped": 0
+      },
+      "namedKillAndControlReconciled": true,
+      "freshReports": true,
+      "cloneDirectoryBound": true,
+      "testcasePopulationMatchesRestored": true,
+      "cleanProbeRecompile": false
+    },
+    {
+      "id": "model-enumerate-segments",
+      "attempt": "model-enumerate-segments-attempt-1",
+      "originalSha256": "26ced1e56eaac6ebbf127b3e091721060aa8cd6fe7959499e77c2d81251386ce",
+      "mutantSha256": "3248e8e5ad5fe66f95417ac51518c194fc37a2d79bf87dee1be38932191dea44",
+      "attemptReceiptSha256": "77011ff0ff82907f1c13a831c69a006488e225fd327877af91545631ec827869",
+      "logSha256": "211d9272e6280799a710aef2d657b6d7097274088f0dfd61c1f835b4e9b0242c",
+      "junitSha256": {
+        "storymodel4s.story.D1aTextBoundarySuite": "5c2d0670e80cb7ffb09e03cebaf6fdbd9224488cb57b8e1beceec7709dcd3009"
+      },
+      "counts": {
+        "Total": 13,
+        "Failed": 1,
+        "Errors": 0,
+        "Passed": 12,
+        "Skipped": 0
+      },
+      "namedKillAndControlReconciled": true,
+      "freshReports": true,
+      "cloneDirectoryBound": true,
+      "testcasePopulationMatchesRestored": true,
+      "cleanProbeRecompile": false
+    },
+    {
+      "id": "model-enumerate-contexts",
+      "attempt": "model-enumerate-contexts-attempt-1",
+      "originalSha256": "26ced1e56eaac6ebbf127b3e091721060aa8cd6fe7959499e77c2d81251386ce",
+      "mutantSha256": "2113cb4dcbb5e0a86e241dfe8e55a23662a72d8e4ae6073eb3e32ce99ef97eab",
+      "attemptReceiptSha256": "b66440efc40a0150e990c6e267d5a33efeaf1c8f571ad32f53756a57790c47eb",
+      "logSha256": "2dc7eeac9dfdcc40010e282c7fd6b5d338678f7c5ed1b77ad5bbe9cc023fe2f6",
+      "junitSha256": {
+        "storymodel4s.story.D1aTextBoundarySuite": "1e629d231b8d054d6557b5e1f8d64fb6f07dc69722c02b386c43db409cf14e77"
+      },
+      "counts": {
+        "Total": 13,
+        "Failed": 1,
+        "Errors": 0,
+        "Passed": 12,
+        "Skipped": 0
+      },
+      "namedKillAndControlReconciled": true,
+      "freshReports": true,
+      "cloneDirectoryBound": true,
+      "testcasePopulationMatchesRestored": true,
+      "cleanProbeRecompile": false
+    },
+    {
+      "id": "model-enumerate-circumstances",
+      "attempt": "model-enumerate-circumstances-attempt-1",
+      "originalSha256": "26ced1e56eaac6ebbf127b3e091721060aa8cd6fe7959499e77c2d81251386ce",
+      "mutantSha256": "76c1e6310e50bd12c8beba3aa2f951cf67f71a735558332aed4419ebb44e4038",
+      "attemptReceiptSha256": "9266036cac096750bac195c645228943ee337688c509b0d1fcab3c77ad7f64ac",
+      "logSha256": "7a28104b01c96bf68e722a585ae26682ff61c9ff1d41b3dd50cf8cda12c7f2c7",
+      "junitSha256": {
+        "storymodel4s.story.D1aTextBoundarySuite": "57b8a9a7121dfa3d5f68875616c1260e28a70cfc74686ba602f200a0030395ae"
+      },
+      "counts": {
+        "Total": 13,
+        "Failed": 1,
+        "Errors": 0,
+        "Passed": 12,
+        "Skipped": 0
+      },
+      "namedKillAndControlReconciled": true,
+      "freshReports": true,
+      "cloneDirectoryBound": true,
+      "testcasePopulationMatchesRestored": true,
+      "cleanProbeRecompile": false
+    },
+    {
+      "id": "model-claim-evidence",
+      "attempt": "model-claim-evidence-attempt-1",
+      "originalSha256": "291f807ab09e995fe699b7d6ae6f318a063b396bcee15239a77b278469d7eaaf",
+      "mutantSha256": "3bcaba10c1e58bdbdd4e2aeb6221db82d8a71e9815f9c61fb47eee5199e0044c",
+      "attemptReceiptSha256": "7e4aefe92cb45a9c0f82f2090f207057ed7c759051e70715455c677ded2cc701",
+      "logSha256": "8b088a9ff7b26254c6111d4dea6f1ae94cf8eda41922576cff5bb13cd8862c0a",
+      "junitSha256": {
+        "storymodel4s.story.D1aTextBoundarySuite": "82d2682a621e3c2af7f97f4ba940a31c0906f502ef2db34dfc330b64713e3882"
+      },
+      "counts": {
+        "Total": 13,
+        "Failed": 1,
+        "Errors": 0,
+        "Passed": 12,
+        "Skipped": 0
+      },
+      "namedKillAndControlReconciled": true,
+      "freshReports": true,
+      "cloneDirectoryBound": true,
+      "testcasePopulationMatchesRestored": true,
+      "cleanProbeRecompile": false
+    },
+    {
+      "id": "model-hierarchy-boundary",
+      "attempt": "model-hierarchy-boundary-attempt-1",
+      "originalSha256": "291f807ab09e995fe699b7d6ae6f318a063b396bcee15239a77b278469d7eaaf",
+      "mutantSha256": "e622df757efd0eb8efa9234a8a59543b9011de91a4d2f8472d276c96eb54c64b",
+      "attemptReceiptSha256": "b1db42c2dc3021783c05fc8df89d307687299045c5594e7fced6bfe3bfb48fc3",
+      "logSha256": "830ee1decf4f6aefda2dbb457c1d4eb46dce6a65e6eedbe809ad0a77bb78ed51",
+      "junitSha256": {
+        "storymodel4s.story.D1aTextBoundarySuite": "b1a4a26cdd301a0c52b4e4e5e6f8a07c60b686e3fa5cb100d5f8c77c5766051d"
+      },
+      "counts": {
+        "Total": 13,
+        "Failed": 1,
+        "Errors": 0,
+        "Passed": 12,
+        "Skipped": 0
+      },
+      "namedKillAndControlReconciled": true,
+      "freshReports": true,
+      "cloneDirectoryBound": true,
+      "testcasePopulationMatchesRestored": true,
+      "cleanProbeRecompile": false
+    },
+    {
+      "id": "model-step-boundary",
+      "attempt": "model-step-boundary-attempt-1",
+      "originalSha256": "291f807ab09e995fe699b7d6ae6f318a063b396bcee15239a77b278469d7eaaf",
+      "mutantSha256": "321c3388c26467ef5d645f26e29f1cca4ca0412af4da4c287ff41d88089d1876",
+      "attemptReceiptSha256": "a7ee36811ef7630bca05465dd1614c01a32cbf4529952cef81a7af4ba82b69cb",
+      "logSha256": "f454bacafeeeddc7ded2ffec02804d06eb759291c5fdf2d7db3bf9b536238f1f",
+      "junitSha256": {
+        "storymodel4s.story.D1aTextBoundarySuite": "a90b220a4c2e555f47d00088edd68e0e5b1eb9c69ed2a065944fc824302370df"
+      },
+      "counts": {
+        "Total": 13,
+        "Failed": 1,
+        "Errors": 0,
+        "Passed": 12,
+        "Skipped": 0
+      },
+      "namedKillAndControlReconciled": true,
+      "freshReports": true,
+      "cloneDirectoryBound": true,
+      "testcasePopulationMatchesRestored": true,
+      "cleanProbeRecompile": false
+    },
+    {
+      "id": "copy-shared-admission",
+      "attempt": "copy-shared-admission-attempt-1",
+      "originalSha256": "291f807ab09e995fe699b7d6ae6f318a063b396bcee15239a77b278469d7eaaf",
+      "mutantSha256": "322384c5d25913f2a33073028e32a619089cbc31c25cfa0571ab21b6a4c6de31",
+      "attemptReceiptSha256": "246b5e8c6c385084be8624a1c79f59576404d8f41a1d9f4613cb994decdec1e2",
+      "logSha256": "fe721f7c6a2e8675484072eff274e979501069cb9db8a93d8557b26679a9ca00",
+      "junitSha256": {
+        "storymodel4s.story.D1aTextBoundarySuite": "1460b752a67eacd40699131751f6bc9879403f49b37fe73044861e2168cea81b"
+      },
+      "counts": {
+        "Total": 13,
+        "Failed": 9,
+        "Errors": 0,
+        "Passed": 4,
+        "Skipped": 0
+      },
+      "namedKillAndControlReconciled": true,
+      "freshReports": true,
+      "cloneDirectoryBound": true,
+      "testcasePopulationMatchesRestored": true,
+      "cleanProbeRecompile": false
+    },
+    {
+      "id": "copy-stale-order",
+      "attempt": "copy-stale-order-attempt-1",
+      "originalSha256": "291f807ab09e995fe699b7d6ae6f318a063b396bcee15239a77b278469d7eaaf",
+      "mutantSha256": "ffa23b65c501cd97e2f4f6a05e65c60eba1003db45995a692c6ec350cb7041df",
+      "attemptReceiptSha256": "2a26579613cea4c614727b74adddf4bf90b0fed8accec8e8174c84cdebf99aee",
+      "logSha256": "8654bca5fada0f3cc40af473277b6b1eff1f37a1dbb2441acd822b4cb64cb24b",
+      "junitSha256": {
+        "storymodel4s.story.D1aOrderingSuite": "ef2b08bc707b6c65b2199de1c05208dcc31de569e146237d178bed68498557ad"
+      },
+      "counts": {
+        "Total": 6,
+        "Failed": 1,
+        "Errors": 0,
+        "Passed": 5,
+        "Skipped": 0
+      },
+      "namedKillAndControlReconciled": true,
+      "freshReports": true,
+      "cloneDirectoryBound": true,
+      "testcasePopulationMatchesRestored": true,
+      "cleanProbeRecompile": false
+    },
+    {
+      "id": "trajectory-propagates-refusal",
+      "attempt": "trajectory-propagates-refusal-attempt-1",
+      "originalSha256": "14f627e5191dc6d2fa6d6972e87562605062ff81a01185c3601c974c25fce869",
+      "mutantSha256": "9a8fc70dc130ae463988a0e04ac60f5523320002b02c9f7732c3d11c81b73d7f",
+      "attemptReceiptSha256": "cd12e21208137eba2f1c85a0ccd56d9a5aef4ba87cc5606210149c7c37deeb4d",
+      "logSha256": "b2f61b6519c0fdfa5c1779d42e352a05ca0628539dde46afb312f560ccbd975a",
+      "junitSha256": {
+        "storymodel4s.story.D1aTextBoundarySuite": "933299fd27d774fdfe795c6c62a363e3b486fb4d85aec4785d387cf2484ae73f"
+      },
+      "counts": {
+        "Total": 13,
+        "Failed": 1,
+        "Errors": 0,
+        "Passed": 12,
+        "Skipped": 0
+      },
+      "namedKillAndControlReconciled": true,
+      "freshReports": true,
+      "cloneDirectoryBound": true,
+      "testcasePopulationMatchesRestored": true,
+      "cleanProbeRecompile": false
+    },
+    {
+      "id": "visibility-discourseOrder",
+      "attempt": "visibility-discourseOrder-attempt-1",
+      "originalSha256": "26ced1e56eaac6ebbf127b3e091721060aa8cd6fe7959499e77c2d81251386ce",
+      "mutantSha256": "00a449e65cb133d928ddf2ae52ec71dfc859f5e3f5c8071637af08673ae830cc",
+      "attemptReceiptSha256": "40fb2cb8f600c22f78832f1c659a78a6d03c223eb92bff5b879399b2233da84d",
+      "logSha256": "1e34df3f0700d8732e035174c57047bce324d77d4e0a51512e22ef4e97c775b7",
+      "junitSha256": {
+        "storymodel4s.probes.D1aGraphBoundarySuite": "02434c1ae4eb670cfc11965f9070f852748beb26a346f05e5e8b269371237a3a"
+      },
+      "counts": {
+        "Total": 7,
+        "Failed": 1,
+        "Errors": 0,
+        "Passed": 6,
+        "Skipped": 0
+      },
+      "namedKillAndControlReconciled": true,
+      "freshReports": true,
+      "cloneDirectoryBound": true,
+      "testcasePopulationMatchesRestored": true,
+      "cleanProbeRecompile": true
+    },
+    {
+      "id": "visibility-discoursePosition",
+      "attempt": "visibility-discoursePosition-attempt-1",
+      "originalSha256": "26ced1e56eaac6ebbf127b3e091721060aa8cd6fe7959499e77c2d81251386ce",
+      "mutantSha256": "d35929447d2e851dab399218809c98128504098e38a1b19f6d3e74361fe47d0c",
+      "attemptReceiptSha256": "56c7503c195f89f9a318d5938945715fc1c403f224ce09d1225203f3c45f8eb6",
+      "logSha256": "840f9695f628ee20dcf87608591841f2505ec0172bcdabc1d645bf5c6ad3268c",
+      "junitSha256": {
+        "storymodel4s.probes.D1aGraphBoundarySuite": "713f1dd88b6414ae3a9d7a33562d0824fd2bcfc2b1c7e3207796cd781261d4ba"
+      },
+      "counts": {
+        "Total": 7,
+        "Failed": 1,
+        "Errors": 0,
+        "Passed": 6,
+        "Skipped": 0
+      },
+      "namedKillAndControlReconciled": true,
+      "freshReports": true,
+      "cloneDirectoryBound": true,
+      "testcasePopulationMatchesRestored": true,
+      "cleanProbeRecompile": true
+    },
+    {
+      "id": "visibility-situationsByEntity",
+      "attempt": "visibility-situationsByEntity-attempt-1",
+      "originalSha256": "26ced1e56eaac6ebbf127b3e091721060aa8cd6fe7959499e77c2d81251386ce",
+      "mutantSha256": "f53b3a6c9f87df811382de3f26e8ccca73854981903cd8f9ad4d2d2353f49c23",
+      "attemptReceiptSha256": "173012a6b1709d68fd5bc39f5b64f1b98d3901c63ee192fb8fd1d9bf97762b88",
+      "logSha256": "4a39110883f17d854bc7acc51bb389835db552a8ce33f1220e1ebb04440c23c3",
+      "junitSha256": {
+        "storymodel4s.probes.D1aGraphBoundarySuite": "70a0906c08110f10908effb7f2e683cfeff51abe5f4a05db6a47fcec8be095e4"
+      },
+      "counts": {
+        "Total": 7,
+        "Failed": 1,
+        "Errors": 0,
+        "Passed": 6,
+        "Skipped": 0
+      },
+      "namedKillAndControlReconciled": true,
+      "freshReports": true,
+      "cloneDirectoryBound": true,
+      "testcasePopulationMatchesRestored": true,
+      "cleanProbeRecompile": true
+    },
+    {
+      "id": "visibility-situationsByContext",
+      "attempt": "visibility-situationsByContext-attempt-1",
+      "originalSha256": "26ced1e56eaac6ebbf127b3e091721060aa8cd6fe7959499e77c2d81251386ce",
+      "mutantSha256": "a1917690cf62b97c7613b21b5e1b0ff5510938c4d89da4cc0989138bf3b3da61",
+      "attemptReceiptSha256": "4081e18302e781492ed593fd5a2eb1f677b88a72bf9fac014ab5aeef11d1eeed",
+      "logSha256": "405d6ed6d72c35757ff0fb16e5bc0c7ff3b57d36281ba461adfa1a9b5d969dda",
+      "junitSha256": {
+        "storymodel4s.probes.D1aGraphBoundarySuite": "5ecbecc07afc257f9e2572a731a59ef9bdb195e1e2130cac6d0ba021c0f4171c"
+      },
+      "counts": {
+        "Total": 7,
+        "Failed": 1,
+        "Errors": 0,
+        "Passed": 6,
+        "Skipped": 0
+      },
+      "namedKillAndControlReconciled": true,
+      "freshReports": true,
+      "cloneDirectoryBound": true,
+      "testcasePopulationMatchesRestored": true,
+      "cleanProbeRecompile": true
+    },
+    {
+      "id": "visibility-situationsWithin",
+      "attempt": "visibility-situationsWithin-attempt-1",
+      "originalSha256": "26ced1e56eaac6ebbf127b3e091721060aa8cd6fe7959499e77c2d81251386ce",
+      "mutantSha256": "a8943c90a1ed3c2576268eaa1f2a42647b7d18f506fc096face7b2a762e8225e",
+      "attemptReceiptSha256": "0cf13600635ae3e9cfc2af93221058f7d8b7c56be96bfdc74e5ad305d9aaf30a",
+      "logSha256": "f810ac77a2bb0e3b31150d332138ebf4b0cb279c726dd51581625cd50c605dc5",
+      "junitSha256": {
+        "storymodel4s.probes.D1aGraphBoundarySuite": "6c0f2cc3129510b392b048c888d8f58694ee2833c134aa3cf039c4932d44de93"
+      },
+      "counts": {
+        "Total": 7,
+        "Failed": 1,
+        "Errors": 0,
+        "Passed": 6,
+        "Skipped": 0
+      },
+      "namedKillAndControlReconciled": true,
+      "freshReports": true,
+      "cloneDirectoryBound": true,
+      "testcasePopulationMatchesRestored": true,
+      "cleanProbeRecompile": true
+    },
+    {
+      "id": "visibility-situationsCovering",
+      "attempt": "visibility-situationsCovering-attempt-1",
+      "originalSha256": "26ced1e56eaac6ebbf127b3e091721060aa8cd6fe7959499e77c2d81251386ce",
+      "mutantSha256": "c791703378077bfa1089fec0fc2f88c157d7f0b6323131beb1fd6d352b548949",
+      "attemptReceiptSha256": "59b37f0fbf74d62086444bc223db8eafb215463bb53ae32ebdbe7d1697a6f1b9",
+      "logSha256": "c86e2c10436580e6dc99b822f9817c42f54773060435054d1897f3fa700d2a13",
+      "junitSha256": {
+        "storymodel4s.probes.D1aGraphBoundarySuite": "b355b4c9268c6106c40664d56174c9ce19913a864df407c21631f29c73f4efc8"
+      },
+      "counts": {
+        "Total": 7,
+        "Failed": 1,
+        "Errors": 0,
+        "Passed": 6,
+        "Skipped": 0
+      },
+      "namedKillAndControlReconciled": true,
+      "freshReports": true,
+      "cloneDirectoryBound": true,
+      "testcasePopulationMatchesRestored": true,
+      "cleanProbeRecompile": true
+    },
+    {
+      "id": "visibility-model-constructor",
+      "attempt": "visibility-model-constructor-attempt-1",
+      "originalSha256": "291f807ab09e995fe699b7d6ae6f318a063b396bcee15239a77b278469d7eaaf",
+      "mutantSha256": "526ca8d1518414b8e156f8ce24fc8f68f48155780fad06a0430f6b71357e1f12",
+      "attemptReceiptSha256": "fbe7a020bbb0b71ec47658a7bd826fd143c6be278c07674a981cdc4ff4126366",
+      "logSha256": "93f6ad1f0292a10ec051da26c20af9bfdc2f019b0782e7556b5ebfbc4ba10429",
+      "junitSha256": {
+        "storymodel4s.story.probes.D1aModelConstructorSuite": "9a23dda4b28e36200c9c4596219e0e96c01cfe4421550626490dc7a175d10c67"
+      },
+      "counts": {
+        "Total": 2,
+        "Failed": 1,
+        "Errors": 0,
+        "Passed": 1,
+        "Skipped": 0
+      },
+      "namedKillAndControlReconciled": true,
+      "freshReports": true,
+      "cloneDirectoryBound": true,
+      "testcasePopulationMatchesRestored": true,
+      "cleanProbeRecompile": true
+    },
+    {
+      "id": "visibility-model-copy",
+      "attempt": "visibility-model-copy-attempt-1",
+      "originalSha256": "291f807ab09e995fe699b7d6ae6f318a063b396bcee15239a77b278469d7eaaf",
+      "mutantSha256": "29323955fd66566d82aa0797af4444a1c6115f21b1147b7bd3a412ab4cb4a2ec",
+      "attemptReceiptSha256": "55d9abece863237d4d3f798704b5209857cf127df6c08f11274cc753cee1602b",
+      "logSha256": "ac91c422b630d8177364160641d7da85e3b45288a618d370546ab946226c81b5",
+      "junitSha256": {
+        "storymodel4s.probes.StoryModelUnforgeableSuite": "3c61b69c3ee2bd263eb62f073526327616eb207c7dcc35959539bbb794331577"
+      },
+      "counts": {
+        "Total": 5,
+        "Failed": 1,
+        "Errors": 0,
+        "Passed": 4,
+        "Skipped": 0
+      },
+      "namedKillAndControlReconciled": true,
+      "freshReports": true,
+      "cloneDirectoryBound": true,
+      "testcasePopulationMatchesRestored": true,
+      "cleanProbeRecompile": true
+    },
+    {
+      "id": "model-product",
+      "attempt": "model-product-attempt-1",
+      "originalSha256": "291f807ab09e995fe699b7d6ae6f318a063b396bcee15239a77b278469d7eaaf",
+      "mutantSha256": "c58e1f1033c9dc33eb15ca6eca2ccc85bc49fab354e8cc1d56061e6a4ff0eff2",
+      "attemptReceiptSha256": "21347429005b3e3709cee579710f59ed1f24d4ac7aec1f9b59c108598066292e",
+      "logSha256": "5ab64c73d72a0037280aec7fe7b9450e9b60d6bb2715c0ec2281861bb07a049d",
+      "junitSha256": {
+        "storymodel4s.probes.StoryModelUnforgeableSuite": "1d4705729724270773b52c9a8b947e777d676533e50f65ec0a908645dff4c977"
+      },
+      "counts": {
+        "Total": 5,
+        "Failed": 1,
+        "Errors": 0,
+        "Passed": 4,
+        "Skipped": 0
+      },
+      "namedKillAndControlReconciled": true,
+      "freshReports": true,
+      "cloneDirectoryBound": true,
+      "testcasePopulationMatchesRestored": true,
+      "cleanProbeRecompile": true
+    },
+    {
+      "id": "model-mirror",
+      "attempt": "model-mirror-attempt-1",
+      "originalSha256": "291f807ab09e995fe699b7d6ae6f318a063b396bcee15239a77b278469d7eaaf",
+      "mutantSha256": "4d00102673ccce69e56720c447c89699e5dc60102d35984fe52fce3b0eeafccb",
+      "attemptReceiptSha256": "da81c0c6cc57110e5b2268aca92b099ff1c420b4f1849705c7f10f79b8ce9553",
+      "logSha256": "d38a6238a163cf11da981aff574ccfbde7898ca58232c36b6bb151434f0252d1",
+      "junitSha256": {
+        "storymodel4s.probes.StoryModelUnforgeableSuite": "da7f9997d31baee23f161314ca83d5fd0a8c8d003e86886a0bed858120234c0c"
+      },
+      "counts": {
+        "Total": 5,
+        "Failed": 1,
+        "Errors": 0,
+        "Passed": 4,
+        "Skipped": 0
+      },
+      "namedKillAndControlReconciled": true,
+      "freshReports": true,
+      "cloneDirectoryBound": true,
+      "testcasePopulationMatchesRestored": true,
+      "cleanProbeRecompile": true
+    },
+    {
+      "id": "codec-text-ref-retention",
+      "attempt": "codec-text-ref-retention-attempt-1",
+      "originalSha256": "10d1d0d4640a4f10b7cc15ebb5a3459bcdc17ee004317e7fc778698c176b0c50",
+      "mutantSha256": "070a5d06074f9e83a3be16be475a90fc1bd55a4e6e258cd659b66a8a17365ecd",
+      "attemptReceiptSha256": "d6166a630f3fe4d5b9b544b5226083a168a4c5586b39e03a8d7aa14c98541274",
+      "logSha256": "041d7396ccbc761f7e822b05e620039f78f022fcc4bd7f4476671e5b35d59970",
+      "junitSha256": {
+        "storymodel4s.codec.D1aTypedSupportCodecSuite": "048d5b133aafccb7b42a9ffd87fa24fa4a0ffe462a41a04e29aa48b5d508ed6e"
+      },
+      "counts": {
+        "Total": 3,
+        "Failed": 2,
+        "Errors": 0,
+        "Passed": 1,
+        "Skipped": 0
+      },
+      "namedKillAndControlReconciled": true,
+      "freshReports": true,
+      "cloneDirectoryBound": true,
+      "testcasePopulationMatchesRestored": true,
+      "cleanProbeRecompile": false
+    },
+    {
+      "id": "codec-anchored-payload",
+      "attempt": "codec-anchored-payload-attempt-1",
+      "originalSha256": "10d1d0d4640a4f10b7cc15ebb5a3459bcdc17ee004317e7fc778698c176b0c50",
+      "mutantSha256": "8a5b5471bc682f09c2577439f62c1e429fe28eb4697a16d921e7689b864d6df9",
+      "attemptReceiptSha256": "1de446c67e15818362053a442acfbb5c509bb582e74ba27b55bf391ae6b8684f",
+      "logSha256": "fb10e19ecfdfeb5cfd4b18a41c14a187f82fa4ac3bf85483b789cae0c642f75b",
+      "junitSha256": {
+        "storymodel4s.codec.D1aTypedSupportCodecSuite": "20c8957bef081613f26ae572e1a88d465632d807aeeff510548a6329df86283e"
+      },
+      "counts": {
+        "Total": 3,
+        "Failed": 1,
+        "Errors": 0,
+        "Passed": 2,
+        "Skipped": 0
+      },
+      "namedKillAndControlReconciled": true,
+      "freshReports": true,
+      "cloneDirectoryBound": true,
+      "testcasePopulationMatchesRestored": true,
+      "cleanProbeRecompile": false
+    },
+    {
+      "id": "codec-anchored-refusal",
+      "attempt": "codec-anchored-refusal-attempt-1",
+      "originalSha256": "10d1d0d4640a4f10b7cc15ebb5a3459bcdc17ee004317e7fc778698c176b0c50",
+      "mutantSha256": "816bf5a9f7039ae563bbeee4539a4b18b0e29682a9d79ae5d775423df71db20f",
+      "attemptReceiptSha256": "e4f7ff354beab0bc1f3422fe0cbb1a466bd582866c9dac21227884a4d026f967",
+      "logSha256": "841092a115bbc314c7ccdf329023fcb0817864074d2d9beb99066e837079f4bb",
+      "junitSha256": {
+        "storymodel4s.codec.D1aTypedSupportCodecSuite": "54228c606f722e553efc2a661128320681df5ec373780c04dee45f0ad62f5c61"
+      },
+      "counts": {
+        "Total": 3,
+        "Failed": 2,
+        "Errors": 0,
+        "Passed": 1,
+        "Skipped": 0
+      },
+      "namedKillAndControlReconciled": true,
+      "freshReports": true,
+      "cloneDirectoryBound": true,
+      "testcasePopulationMatchesRestored": true,
+      "cleanProbeRecompile": false
+    },
+    {
+      "id": "codec-text-decode-retention",
+      "attempt": "codec-text-decode-retention-attempt-1",
+      "originalSha256": "10d1d0d4640a4f10b7cc15ebb5a3459bcdc17ee004317e7fc778698c176b0c50",
+      "mutantSha256": "7a947886833636450d448226f4550bde06bd203cd57c9054ee723601243778ba",
+      "attemptReceiptSha256": "5e3c5be6665c07d16adc60a2dea8bb7e59237e52404a8c9ee6b099ba4af026a2",
+      "logSha256": "4fd507a0913f5ac2fa0dbbb0b093221dfbbeef1267bfcdd33c8dd2c82ef29575",
+      "junitSha256": {
+        "storymodel4s.codec.D1aTypedSupportCodecSuite": "3eece66155dbfc753a625f85a8b8286745b9a95ad575508567c3596aedce9e82"
+      },
+      "counts": {
+        "Total": 3,
+        "Failed": 2,
+        "Errors": 0,
+        "Passed": 1,
+        "Skipped": 0
+      },
+      "namedKillAndControlReconciled": true,
+      "freshReports": true,
+      "cloneDirectoryBound": true,
+      "testcasePopulationMatchesRestored": true,
+      "cleanProbeRecompile": false
+    }
+  ],
+  "controls": {
+    "isolated-control": {
+      "logSha256": "f3c1a65438751bafa5e22f6b47302d9e91e578732a02798e0c7d85d043efda10",
+      "counts": {
+        "Total": 40,
+        "Failed": 0,
+        "Errors": 0,
+        "Passed": 40,
+        "Skipped": 0
+      },
+      "receiptSha256": "44614ccd8ec2a10dfeee97bedcb75188fd5534ae5d17182d6be6c148e50ae4b3"
+    },
+    "restored-control-clean": {
+      "logSha256": "3c8bb28d3018a73be3bd0638e5a4ef6fda20453fb273292a21cd6dbcdc60d361",
+      "counts": {
+        "Total": 40,
+        "Failed": 0,
+        "Errors": 0,
+        "Passed": 40,
+        "Skipped": 0
+      },
+      "receiptSha256": "9f0c88aabeacfde7dcb77ecbcd282f1f9a47525de1d9b56c37b6d1d0e4344dfc",
+      "junitSha256": {
+        "storymodel4s.codec.D1aTypedSupportCodecSuite": "24f61d995dc02b43163ce02bf67ea8d5b9f9a2355f3d96493b4d4dee363be38b",
+        "storymodel4s.core.D1aProjectionSuite": "5c1a90b36ef32c9b0b71fb09febf8dffb8dae285b1ceb2a852ab04f7577484dc",
+        "storymodel4s.probes.D1aGraphBoundarySuite": "d70c717292e930808ab8c53dbeb34798f701be79a496d0416a3e513f132af29d",
+        "storymodel4s.probes.StoryModelUnforgeableSuite": "797d076e35127f7e1f03e9d831c22d7684841d85b0d72e03ceedcd5e47a178a4",
+        "storymodel4s.story.D1aOrderingSuite": "86f713335deb1d7d492ee70f3e1a5aa16b1a22aeddf0a2406ad9a0c99e0b777c",
+        "storymodel4s.story.D1aTextBoundarySuite": "259c53ce44b30942e9726bb9d5b62370a76f4feff619e700732af2350510c886",
+        "storymodel4s.story.probes.D1aModelConstructorSuite": "5f7c3f0834ddf505da62da8da09e98cd590e0505e2fd38014589937c4f96d326"
+      }
+    }
+  },
+  "cleanCloneAtAudit": true,
+  "s0Sha256": "cc201d9dd3e3576fabcd45677369f00c023ca5a455ea9d9e7ba694700c759fb3",
+  "findings": [],
+  "limitations": [
+    "Initial control reconciled to its captured log; per-suite control XML is archived for the clean restored run.",
+    "This verifies local mutation evidence, not the full provider, docs, consumer or scientific recovery gates."
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "revision": "750b4bf70d4e79ff99818830758ef3d1a46a5854",
+  "reviewer": "/root",
+  "files": [
+    {
+      "path": "codec/src/test/scala/storymodel4s/codec/D1aTypedSupportCodecSuite.scala",
+      "sha256": "15db517431c2fdd1b586f4a33631da4bed462f12083409136e36a88f2e0ecf06"
+    },
+    {
+      "path": "story/src/test/scala/storymodel4s/story/probes/D1aModelConstructorSuite.scala",
+      "sha256": "d92fa2361cb8d9218e07fad434b21da0d5d00c65eec59095a9c3407ee398ff08"
+    }
+  ],
+  "findings": [],
+  "observations": [
+    "Same-package direct-constructor refusal uses the actual complete constructor signature and has a checked-factory positive control.",
+    "TypedSupport Text encoding is compared to the historical SpanSet encoder with exact referenced spans and a text model round trip.",
+    "Anchored typed support is compared to the complete EvidenceSupport encoding and explicitly refused by text decoding.",
+    "All six component forms have text round-trip controls and anchored decoding refusals."
+  ],
+  "pending": [
+    "Compile and execute both suites on the final candidate.",
+    "Execute isolated clean-recompile constructor visibility mutation and named codec mutants.",
+    "Run full provider, docs and consumer acceptance checks."
+  ],
+  "qualification": "Source-only review of these two suites; no claim of execution, mutation qualification, final-candidate review, or S4a completion."
+}

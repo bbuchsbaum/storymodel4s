@@ -13,7 +13,7 @@
       "repairRevision": "3328a36a",
       "repair": "Shared draft/copy check enumerates hierarchy and trajectory-step boundary beliefs.",
       "status": "closed in source review",
-      "witness": "D1aTextBoundarySuite step-only text control and anchored/twin refusals; compiled mutation pending"
+      "witness": "Step-only text control and anchored/twin refusals; model-step-boundary compiled mutant failed that named refusal while its text control passed."
     }
   ],
   "finalVerdict": "No remaining actionable source/test findings at c2af2a93.",

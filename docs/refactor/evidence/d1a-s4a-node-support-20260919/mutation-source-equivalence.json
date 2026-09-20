@@ -1,0 +1,24 @@
+{
+  "mutationSourceRevision": "94e0a9a229fe4224f9312220baae23c8e6e9ffa5",
+  "finalGateCandidateRevision": "add6858a1b191e3e5199eadd08c7d95f549180bf",
+  "isAncestor": true,
+  "changedPaths": [
+    "docs-site/examples/ModelAStory.scala",
+    "docs/refactor/evidence/d1a-s4a-node-support-20260919/README.md",
+    "docs/refactor/evidence/d1a-s4a-node-support-20260919/code-review.json",
+    "docs/refactor/evidence/d1a-s4a-node-support-20260919/consumer-gate.py",
+    "docs/refactor/evidence/d1a-s4a-node-support-20260919/focused-1.json",
+    "docs/refactor/evidence/d1a-s4a-node-support-20260919/focused-2.json",
+    "docs/refactor/evidence/d1a-s4a-node-support-20260919/focused-final-1.json",
+    "docs/refactor/evidence/d1a-s4a-node-support-20260919/guard-witness-inventory.json",
+    "docs/refactor/evidence/d1a-s4a-node-support-20260919/initial-story-compile.json",
+    "docs/refactor/evidence/d1a-s4a-node-support-20260919/integration-compile-1.json",
+    "docs/refactor/evidence/d1a-s4a-node-support-20260919/integration-compile-2.json",
+    "docs/refactor/evidence/d1a-s4a-node-support-20260919/isolated-control.json",
+    "docs/refactor/evidence/d1a-s4a-node-support-20260919/qualify.py"
+  ],
+  "identicalScope": "Every tracked file outside the one named executable documentation example and the named archived-evidence directory is byte-identical between revisions. Production sources, test sources, build files and frozen resources are unchanged.",
+  "s0Sha256": "cc201d9dd3e3576fabcd45677369f00c023ca5a455ea9d9e7ba694700c759fb3",
+  "exampleChange": "Read TypedSupport.textSpans through the optional text accessor; retain original example output.",
+  "qualification": "Source equivalence for carrying mutation results forward only; final full, formatting, executable docs and consumer gates at the later revision remain pending."
+}

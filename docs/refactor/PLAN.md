@@ -213,8 +213,13 @@ The [S3 typed acquisition support](evidence/d1a-s3-acquire-20260919/README.md) i
 unchanged, and all 18 compiled mutants are killed with accepting controls. Restored focused tests
 pass 55/55; the clean full gate passes 6,663 executions with the same five skips across 56 tasks.
 Formatting, all 13 docs examples and the exact-provider 245-test consumer gate also pass.
-The next sequential D1A slice is **S4a's typed node support and fallible draft**
-(`bd-01M2TAFN5WMXW4NT20YJQAW2FR`), retaining the text-only envelope and frozen S0 values.
+The [S4a typed node support and fallible draft](evidence/d1a-s4a-node-support-20260919/README.md)
+is complete: all 36 compiled mutants are killed, including ten separately cleaned construction
+and visibility probes; 40 restored focused tests pass. The clean full gate passes 6,765
+executions with the same five skips across 56 tasks. Formatting, all 13 docs examples and the
+245-test migrated storyatlas4s consumer gate pass; frozen S0 values remain unchanged.
+The next sequential D1A slice is **S4b's sealed envelope, identity and checked text witness**
+(`bd-01M2TAG1GEAGXCY33P0B17QBJ1`).
 G0 as a whole remains open for infrastructure and independent preservation work;
 these engineering gates establish no accuracy or measurement-validity claim.
 

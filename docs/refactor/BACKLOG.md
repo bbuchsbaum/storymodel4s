@@ -8,7 +8,7 @@ The 30 consultant TA keys are crosswalk references, not another set of tickets. 
 
 ## What to do first
 
-One implementation slice at a time. Baseline capture, scorer repair, production clock integration, S0 text parity pins, S1's ADR amendment, S2's checked substrate and S3's typed acquisition support are complete. **S4a's typed node support and fallible draft are next on the D1A track, preserving the frozen text behavior.** At-risk branch preservation remains independent foundation work. The account/runner decision blocks CI execution, not local engineering.
+One implementation slice at a time. Baseline capture, scorer repair, production clock integration, S0 text parity pins, S1's ADR amendment, S2's checked substrate, S3's typed acquisition support and S4a's typed nodes/fallible draft are complete. **S4b's sealed envelope, identity and checked text witness are next on the D1A track, preserving the frozen text behavior.** At-risk branch preservation remains independent foundation work. The account/runner decision blocks CI execution, not local engineering.
 
 The active [film foundation goal](goals/film-foundation-20260919.md) assigns nine existing
 Motes to `film_foundation`, beginning with S1. It contains eight executable deliverables
@@ -21,7 +21,8 @@ and one parent reconciliation, with a bounded finish line and each ticket's gate
 - Completed `bd-01M2TABFW72D8WWQF481SD37KW` — [S1 ADR amendment](evidence/d1a-s1-adr-20260919/README.md)
 - Completed `bd-01M2TABVXSM72M9DD0SNB6GZ11` — [S2 checked substrate](evidence/d1a-s2-substrate-20260919/README.md)
 - Completed `bd-01M2TAF8JH42NYJJAFWPD7HTZB` — [S3 typed acquisition support](evidence/d1a-s3-acquire-20260919/README.md)
-- Next `bd-01M2TAFN5WMXW4NT20YJQAW2FR` — D1A-types S4a: typed node support, fallible draft and projection ordering
+- Completed `bd-01M2TAFN5WMXW4NT20YJQAW2FR` — [S4a typed node support, fallible draft and projection ordering](evidence/d1a-s4a-node-support-20260919/README.md)
+- Next `bd-01M2TAG1GEAGXCY33P0B17QBJ1` — D1A-types S4b: sealed envelope, identity and checked text witness
 - `bd-01M2TA2EMFCWRKXK6QJHGV702Q` — [foundation] Phase 0: rescue the only copy of audit/masc-role-corpus (b756b4bb) into the main repo
 - `bd-01M19G69RQCHMT2EMG11XFT4WX` — G0: obtain an executed exact-SHA clean build and CI receipt
 

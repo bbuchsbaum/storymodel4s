@@ -1,0 +1,35 @@
+{
+  "schema": "d1a-s4a-carry-forward/v1",
+  "mutationRevision": "94e0a9a229fe4224f9312220baae23c8e6e9ffa5",
+  "releaseCandidate": "add6858a1b191e3e5199eadd08c7d95f549180bf",
+  "changedPaths": [
+    "docs-site/examples/ModelAStory.scala",
+    "docs/refactor/evidence/d1a-s4a-node-support-20260919/README.md",
+    "docs/refactor/evidence/d1a-s4a-node-support-20260919/code-review.json",
+    "docs/refactor/evidence/d1a-s4a-node-support-20260919/consumer-gate.py",
+    "docs/refactor/evidence/d1a-s4a-node-support-20260919/focused-1.json",
+    "docs/refactor/evidence/d1a-s4a-node-support-20260919/focused-2.json",
+    "docs/refactor/evidence/d1a-s4a-node-support-20260919/focused-final-1.json",
+    "docs/refactor/evidence/d1a-s4a-node-support-20260919/guard-witness-inventory.json",
+    "docs/refactor/evidence/d1a-s4a-node-support-20260919/initial-story-compile.json",
+    "docs/refactor/evidence/d1a-s4a-node-support-20260919/integration-compile-1.json",
+    "docs/refactor/evidence/d1a-s4a-node-support-20260919/integration-compile-2.json",
+    "docs/refactor/evidence/d1a-s4a-node-support-20260919/isolated-control.json",
+    "docs/refactor/evidence/d1a-s4a-node-support-20260919/qualify.py"
+  ],
+  "identicalModuleAndBuildTreesSha256": "7290c8329dfb13d99320c7f4c8ec06b1a7ba651fd4adf6579c5f4fd5be06eb40",
+  "checkedModules": [
+    "core",
+    "story",
+    "codec",
+    "document",
+    "fixtures",
+    "laws",
+    "view",
+    "pipeline",
+    "align",
+    "build.sbt",
+    "project"
+  ],
+  "scope": "Mutation original source and all module test bodies are unchanged; release adds only evidence and one docs example accessor. Full and docs gates remain pending."
+}

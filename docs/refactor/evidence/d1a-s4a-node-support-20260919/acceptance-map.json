@@ -1,0 +1,82 @@
+{
+  "schema": "d1a-s4a-acceptance-map/v1",
+  "mote": "bd-01M2TAFN5WMXW4NT20YJQAW2FR",
+  "status": "Complete: 36 compiled killed mutants, 40 restored tests, full provider 6765 passed plus 5 unchanged skips, format/docs13/consumer245 passed.",
+  "criteria": [
+    {
+      "number": 1,
+      "contract": "Five node classes and CircumstanceEdge store TypedSupport; text apply overloads and copy callers migrate.",
+      "witnesses": [
+        "full-gate.json: clean compileAll/testAll at add6858a, all 56 test tasks",
+        "D1aTypedSupportCodecSuite six component controls/refusals",
+        "D1aTextBoundarySuite six support-family refusals"
+      ]
+    },
+    {
+      "number": 2,
+      "contract": "draft and internal copy return Either and enforce the text canonical form while retaining source/SurfaceAtlas.",
+      "witnesses": [
+        "D1aTextBoundarySuite ordinary and hierarchy/trajectory boundary evidence",
+        "model-all-text-guard",
+        "model-enumerate-*",
+        "model-claim-evidence",
+        "model-hierarchy-boundary",
+        "model-step-boundary",
+        "copy-shared-admission"
+      ]
+    },
+    {
+      "number": 3,
+      "contract": "Text support encodes with historical SpanSet shape and decodes to TypedSupport.Text.",
+      "witnesses": [
+        "D1aTypedSupportCodecSuite",
+        "codec-text-ref-retention",
+        "codec-text-decode-retention",
+        "codec-anchored-payload",
+        "codec-anchored-refusal",
+        "frozen S0 component/model pins"
+      ]
+    },
+    {
+      "number": 4,
+      "contract": "Checked text projection determines ordering; unbound graph ordering APIs are private[story].",
+      "witnesses": [
+        "D1aProjectionSuite",
+        "D1aOrderingSuite",
+        "D1aGraphBoundarySuite",
+        "projection-*",
+        "order-*",
+        "visibility-discourseOrder",
+        "visibility-discoursePosition",
+        "visibility-situationsByEntity",
+        "visibility-situationsByContext",
+        "visibility-situationsWithin",
+        "visibility-situationsCovering",
+        "copy-stale-order"
+      ]
+    },
+    {
+      "number": 5,
+      "contract": "Typed construction/copy/Product/Mirror probes cannot succeed because an Either replaced the model.",
+      "witnesses": [
+        "StoryModelUnforgeableSuite",
+        "D1aModelConstructorSuite",
+        "visibility-model-copy",
+        "visibility-model-constructor",
+        "model-product",
+        "model-mirror",
+        "each of ten probe mutations has its own clean recompile"
+      ]
+    },
+    {
+      "number": 6,
+      "contract": "S0 frozen values unchanged, and actual projection/model APIs feed ordering references.",
+      "witnesses": [
+        "frozen-parity-files.json",
+        "TextParitySuite eight tests at 750b4bf7",
+        "provider-audit.json and docs-format-audit.json: exact final candidate and all frozen outputs",
+        "consumer-audit.json: exact provider and migrated consumer, 245 passed"
+      ]
+    }
+  ]
+}

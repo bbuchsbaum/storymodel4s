@@ -1,0 +1,293 @@
+{
+  "schema": "d1a-consumer-gate/v1",
+  "command": [
+    "sbt",
+    "-batch",
+    "-Dstoryatlas4s.storymodel4s.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/storymodel4s",
+    "-Dstoryatlas4s.intaglio.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/intaglio",
+    "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+    "clean",
+    "compileAll",
+    "testAll",
+    "scalafmtCheckAll",
+    "app/fastLinkJS"
+  ],
+  "cwd": "/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/storyatlas4s",
+  "startedEpochSeconds": 1789871963.5179641,
+  "elapsedSeconds": 96.72096991539001,
+  "exitCode": 0,
+  "before": {
+    "storyatlas4s": {
+      "revision": "b5bbe2c584fda0bc487430d2399fa9bff996ddef",
+      "status": ""
+    },
+    "storymodel4s": {
+      "revision": "add6858a1b191e3e5199eadd08c7d95f549180bf",
+      "status": ""
+    },
+    "intaglio": {
+      "revision": "4eb566d9208f474d64d61e778e084dee2ddbaa76",
+      "status": ""
+    },
+    "grakern": {
+      "revision": "0329c43c88a0b71e9aa4456723bb16bac2fa3841",
+      "status": ""
+    }
+  },
+  "after": {
+    "storyatlas4s": {
+      "revision": "b5bbe2c584fda0bc487430d2399fa9bff996ddef",
+      "status": ""
+    },
+    "storymodel4s": {
+      "revision": "add6858a1b191e3e5199eadd08c7d95f549180bf",
+      "status": ""
+    },
+    "intaglio": {
+      "revision": "4eb566d9208f474d64d61e778e084dee2ddbaa76",
+      "status": ""
+    },
+    "grakern": {
+      "revision": "0329c43c88a0b71e9aa4456723bb16bac2fa3841",
+      "status": ""
+    }
+  },
+  "expectedTestTasks": [
+    "layoutJVM/test",
+    "layoutJS/test",
+    "intaglioJVM/test",
+    "intaglioJS/test",
+    "editionJVM/test",
+    "editionJS/test",
+    "cli/test",
+    "app/test"
+  ],
+  "testTotals": [
+    "[info] Passed: Total 22, Failed 0, Errors 0, Passed 22",
+    "[info] Passed: Total 26, Failed 0, Errors 0, Passed 26",
+    "[info] Passed: Total 59, Failed 0, Errors 0, Passed 59",
+    "[info] Passed: Total 59, Failed 0, Errors 0, Passed 59",
+    "[info] Passed: Total 57, Failed 0, Errors 0, Passed 57",
+    "[info] Passed: Total 22, Failed 0, Errors 0, Passed 22"
+  ],
+  "aggregateTestCounts": {
+    "Total": 245,
+    "Failed": 0,
+    "Errors": 0,
+    "Passed": 245,
+    "Skipped": 0
+  },
+  "testTaskWitnesses": {
+    "layoutJVM/test": {
+      "suites": [
+        {
+          "suite": "storyatlas4s.layout.AwtMeasurerSuite",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "suite": "storyatlas4s.layout.PaginatorLawsSuite",
+          "tests": 14,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "suite": "storyatlas4s.layout.WarOfTheGhostsPaginationSuite",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      ],
+      "testCount": 22
+    },
+    "layoutJS/test": {
+      "suites": [
+        {
+          "suite": "storyatlas4s.layout.DomMeasurerSuite",
+          "tests": 7,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "suite": "storyatlas4s.layout.PaginatorLawsSuite",
+          "tests": 14,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "suite": "storyatlas4s.layout.WarOfTheGhostsPaginationSuite",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      ],
+      "testCount": 26
+    },
+    "intaglioJVM/test": {
+      "suites": [
+        {
+          "suite": "storyatlas4s.intaglio.DraftLoweringSuite",
+          "tests": 7,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "suite": "storyatlas4s.intaglio.PagedCodexLoweringSuite",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "suite": "storyatlas4s.intaglio.PlateCraftSuite",
+          "tests": 24,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "suite": "storyatlas4s.intaglio.VoyageLoweringSuite",
+          "tests": 14,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "suite": "storyatlas4s.intaglio.WarOfTheGhostsLoweringSuite",
+          "tests": 10,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      ],
+      "testCount": 59
+    },
+    "intaglioJS/test": {
+      "suites": [
+        {
+          "suite": "storyatlas4s.intaglio.DraftLoweringSuite",
+          "tests": 7,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "suite": "storyatlas4s.intaglio.PagedCodexLoweringSuite",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "suite": "storyatlas4s.intaglio.PlateCraftSuite",
+          "tests": 24,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "suite": "storyatlas4s.intaglio.VoyageLoweringSuite",
+          "tests": 14,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "suite": "storyatlas4s.intaglio.WarOfTheGhostsLoweringSuite",
+          "tests": 10,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      ],
+      "testCount": 59
+    },
+    "editionJVM/test": {
+      "suites": [],
+      "testCount": 0,
+      "testSourceFiles": []
+    },
+    "editionJS/test": {
+      "suites": [],
+      "testCount": 0,
+      "testSourceFiles": []
+    },
+    "cli/test": {
+      "suites": [
+        {
+          "suite": "storyatlas4s.cli.CodexHtmlSuite",
+          "tests": 8,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "suite": "storyatlas4s.cli.EditionSuite",
+          "tests": 7,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "suite": "storyatlas4s.cli.ModelInputSuite",
+          "tests": 21,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "suite": "storyatlas4s.cli.VoyageEditionSuite",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "suite": "storyatlas4s.cli.WorkspaceSuite",
+          "tests": 17,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      ],
+      "testCount": 57
+    },
+    "app/test": {
+      "suites": [
+        {
+          "suite": "storyatlas4s.app.AppCompilerSuite",
+          "tests": 13,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "suite": "storyatlas4s.app.SemanticZoomSuite",
+          "tests": 6,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "suite": "storyatlas4s.app.SvgDomSuite",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      ],
+      "testCount": 22
+    }
+  },
+  "logPath": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1a-s4a-20260919/consumer-gate.log",
+  "logSha256": "a6ee30aa774232929e9b6b302aa1979cc71da91240d0cc7820ac30a04999a525",
+  "qualification": "Local exact-provider candidate gate; no remote publication or executed CI."
+}

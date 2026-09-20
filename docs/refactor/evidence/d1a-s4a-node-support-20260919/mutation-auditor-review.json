@@ -1,0 +1,20 @@
+{
+  "artifact": "data/study/film-foundation-goal-20260919/audit-s4a-mutations.py",
+  "sha256": "8ed821ec1f293522842c4222402b28e5df6e5d82692b8e1147a246f45fb5976c",
+  "reviewer": "/root/s0_cold_review",
+  "scope": "Read-only reconciliation-script review against the S4a runner and settled inventory; no execution or build.",
+  "findings": [
+    {
+      "id": "attempt-and-clone-binding",
+      "status": "closed in source recheck",
+      "repair": "Require all original attempt receipt fields to equal aggregate fields, retain receipt hash, and require unique JUnit user.dir matching the verified clone."
+    },
+    {
+      "id": "suite-population-binding",
+      "status": "closed in source recheck",
+      "repair": "Seed exact per-suite testcase membership from seven restored-control XMLs totaling 40 tests; require every mutant suite to have the identical membership."
+    }
+  ],
+  "remainingFindings": [],
+  "executionStatus": "Pending terminal mutation receipt and restored control."
+}

@@ -1,0 +1,682 @@
+{
+  "previousRevision": "17194421f018e3780aafa4adf754fccf55398b61",
+  "revision": "add6858a1b191e3e5199eadd08c7d95f549180bf",
+  "previousTotal": 6668,
+  "currentTotal": 6770,
+  "delta": 102,
+  "perTaskDelta": {
+    "coreJVM/test": 4,
+    "coreJS/test": 4,
+    "coreNative/test": 4,
+    "storyJVM/test": 27,
+    "storyJS/test": 27,
+    "storyNative/test": 27,
+    "codecJVM/test": 3,
+    "codecJS/test": 3,
+    "codecNative/test": 3
+  },
+  "removedTests": [
+    [
+      "storyJS/test",
+      "storymodel4s.probes.StoryModelUnforgeableSuite",
+      "Validated cannot be claimed through Mirror.fromProduct"
+    ],
+    [
+      "storyJS/test",
+      "storymodel4s.story.D1aTextBoundarySuite",
+      "internal copy cannot bypass anchored evidence refusal"
+    ],
+    [
+      "storyJS/test",
+      "storymodel4s.story.D1aTextBoundarySuite",
+      "text draft refuses anchored boundary evidence outside the claim ledger"
+    ],
+    [
+      "storyJS/test",
+      "storymodel4s.story.D1aTextBoundarySuite",
+      "text draft refuses anchored ordinary claim evidence before export"
+    ],
+    [
+      "storyJVM/test",
+      "storymodel4s.probes.StoryModelUnforgeableSuite",
+      "Validated cannot be claimed through Mirror.fromProduct"
+    ],
+    [
+      "storyJVM/test",
+      "storymodel4s.story.D1aTextBoundarySuite",
+      "internal copy cannot bypass anchored evidence refusal"
+    ],
+    [
+      "storyJVM/test",
+      "storymodel4s.story.D1aTextBoundarySuite",
+      "text draft refuses anchored boundary evidence outside the claim ledger"
+    ],
+    [
+      "storyJVM/test",
+      "storymodel4s.story.D1aTextBoundarySuite",
+      "text draft refuses anchored ordinary claim evidence before export"
+    ],
+    [
+      "storyNative/test",
+      "storymodel4s.probes.StoryModelUnforgeableSuite",
+      "Validated cannot be claimed through Mirror.fromProduct"
+    ],
+    [
+      "storyNative/test",
+      "storymodel4s.story.D1aTextBoundarySuite",
+      "internal copy cannot bypass anchored evidence refusal"
+    ],
+    [
+      "storyNative/test",
+      "storymodel4s.story.D1aTextBoundarySuite",
+      "text draft refuses anchored boundary evidence outside the claim ledger"
+    ],
+    [
+      "storyNative/test",
+      "storymodel4s.story.D1aTextBoundarySuite",
+      "text draft refuses anchored ordinary claim evidence before export"
+    ]
+  ],
+  "addedTests": [
+    [
+      "codecJS/test",
+      "storymodel4s.codec.D1aTypedSupportCodecSuite",
+      "Anchored component encodes full support and text decode refuses it"
+    ],
+    [
+      "codecJS/test",
+      "storymodel4s.codec.D1aTypedSupportCodecSuite",
+      "accepting control: Text support has exact historical bytes and references"
+    ],
+    [
+      "codecJS/test",
+      "storymodel4s.codec.D1aTypedSupportCodecSuite",
+      "all six narrative support components preserve Text and refuse Anchored decoding"
+    ],
+    [
+      "codecJVM/test",
+      "storymodel4s.codec.D1aTypedSupportCodecSuite",
+      "Anchored component encodes full support and text decode refuses it"
+    ],
+    [
+      "codecJVM/test",
+      "storymodel4s.codec.D1aTypedSupportCodecSuite",
+      "accepting control: Text support has exact historical bytes and references"
+    ],
+    [
+      "codecJVM/test",
+      "storymodel4s.codec.D1aTypedSupportCodecSuite",
+      "all six narrative support components preserve Text and refuse Anchored decoding"
+    ],
+    [
+      "codecNative/test",
+      "storymodel4s.codec.D1aTypedSupportCodecSuite",
+      "Anchored component encodes full support and text decode refuses it"
+    ],
+    [
+      "codecNative/test",
+      "storymodel4s.codec.D1aTypedSupportCodecSuite",
+      "accepting control: Text support has exact historical bytes and references"
+    ],
+    [
+      "codecNative/test",
+      "storymodel4s.codec.D1aTypedSupportCodecSuite",
+      "all six narrative support components preserve Text and refuse Anchored decoding"
+    ],
+    [
+      "coreJS/test",
+      "storymodel4s.core.D1aProjectionSuite",
+      "accepting control: text projection retains exact UTF-16 references and hull"
+    ],
+    [
+      "coreJS/test",
+      "storymodel4s.core.D1aProjectionSuite",
+      "text projection refuses a non-text primary even with Text support"
+    ],
+    [
+      "coreJS/test",
+      "storymodel4s.core.D1aProjectionSuite",
+      "text projection refuses anchored support"
+    ],
+    [
+      "coreJS/test",
+      "storymodel4s.core.D1aProjectionSuite",
+      "zero-length and out-of-extent spans remain deferred text validator concerns"
+    ],
+    [
+      "coreJVM/test",
+      "storymodel4s.core.D1aProjectionSuite",
+      "accepting control: text projection retains exact UTF-16 references and hull"
+    ],
+    [
+      "coreJVM/test",
+      "storymodel4s.core.D1aProjectionSuite",
+      "text projection refuses a non-text primary even with Text support"
+    ],
+    [
+      "coreJVM/test",
+      "storymodel4s.core.D1aProjectionSuite",
+      "text projection refuses anchored support"
+    ],
+    [
+      "coreJVM/test",
+      "storymodel4s.core.D1aProjectionSuite",
+      "zero-length and out-of-extent spans remain deferred text validator concerns"
+    ],
+    [
+      "coreNative/test",
+      "storymodel4s.core.D1aProjectionSuite",
+      "accepting control: text projection retains exact UTF-16 references and hull"
+    ],
+    [
+      "coreNative/test",
+      "storymodel4s.core.D1aProjectionSuite",
+      "text projection refuses a non-text primary even with Text support"
+    ],
+    [
+      "coreNative/test",
+      "storymodel4s.core.D1aProjectionSuite",
+      "text projection refuses anchored support"
+    ],
+    [
+      "coreNative/test",
+      "storymodel4s.core.D1aProjectionSuite",
+      "zero-length and out-of-extent spans remain deferred text validator concerns"
+    ],
+    [
+      "storyJS/test",
+      "storymodel4s.probes.D1aGraphBoundarySuite",
+      "accepting control: external checked pre-model ordering and model reads compile"
+    ],
+    [
+      "storyJS/test",
+      "storymodel4s.probes.D1aGraphBoundarySuite",
+      "unbound graph context ordering is internal"
+    ],
+    [
+      "storyJS/test",
+      "storymodel4s.probes.D1aGraphBoundarySuite",
+      "unbound graph covering ordering is internal"
+    ],
+    [
+      "storyJS/test",
+      "storymodel4s.probes.D1aGraphBoundarySuite",
+      "unbound graph discourse order is internal"
+    ],
+    [
+      "storyJS/test",
+      "storymodel4s.probes.D1aGraphBoundarySuite",
+      "unbound graph discourse position is internal"
+    ],
+    [
+      "storyJS/test",
+      "storymodel4s.probes.D1aGraphBoundarySuite",
+      "unbound graph entity ordering is internal"
+    ],
+    [
+      "storyJS/test",
+      "storymodel4s.probes.D1aGraphBoundarySuite",
+      "unbound graph within ordering is internal"
+    ],
+    [
+      "storyJS/test",
+      "storymodel4s.probes.StoryModelUnforgeableSuite",
+      "accepting control: typed model consumer and tuple Product/Mirror compile"
+    ],
+    [
+      "storyJS/test",
+      "storymodel4s.probes.StoryModelUnforgeableSuite",
+      "external callers cannot invoke internal copy"
+    ],
+    [
+      "storyJS/test",
+      "storymodel4s.probes.StoryModelUnforgeableSuite",
+      "model has no synthesizable Product Mirror"
+    ],
+    [
+      "storyJS/test",
+      "storymodel4s.probes.StoryModelUnforgeableSuite",
+      "model is not a Product"
+    ],
+    [
+      "storyJS/test",
+      "storymodel4s.story.D1aOrderingSuite",
+      "accepting control: projection order uses start then full hull end then id"
+    ],
+    [
+      "storyJS/test",
+      "storymodel4s.story.D1aOrderingSuite",
+      "empty graph still refuses non-text ordering axis"
+    ],
+    [
+      "storyJS/test",
+      "storymodel4s.story.D1aOrderingSuite",
+      "equal projected hulls use id independent of map insertion order"
+    ],
+    [
+      "storyJS/test",
+      "storymodel4s.story.D1aOrderingSuite",
+      "internal graph copy recomputes every ordered model query"
+    ],
+    [
+      "storyJS/test",
+      "storymodel4s.story.D1aOrderingSuite",
+      "out-of-text support is admitted as Draft and diagnosed by validation"
+    ],
+    [
+      "storyJS/test",
+      "storymodel4s.story.D1aOrderingSuite",
+      "projected start precedes end when their orders disagree"
+    ],
+    [
+      "storyJS/test",
+      "storymodel4s.story.D1aTextBoundarySuite",
+      "accepting control: checked trajectory derivation retains text transitions"
+    ],
+    [
+      "storyJS/test",
+      "storymodel4s.story.D1aTextBoundarySuite",
+      "accepting control: text boundary evidence may live only on a trajectory step"
+    ],
+    [
+      "storyJS/test",
+      "storymodel4s.story.D1aTextBoundarySuite",
+      "checked trajectory derivation refuses anchored event and state support"
+    ],
+    [
+      "storyJS/test",
+      "storymodel4s.story.D1aTextBoundarySuite",
+      "text draft and copy refuse anchored circumstance support"
+    ],
+    [
+      "storyJS/test",
+      "storymodel4s.story.D1aTextBoundarySuite",
+      "text draft and copy refuse anchored context support"
+    ],
+    [
+      "storyJS/test",
+      "storymodel4s.story.D1aTextBoundarySuite",
+      "text draft and copy refuse anchored entity support"
+    ],
+    [
+      "storyJS/test",
+      "storymodel4s.story.D1aTextBoundarySuite",
+      "text draft and copy refuse anchored event support"
+    ],
+    [
+      "storyJS/test",
+      "storymodel4s.story.D1aTextBoundarySuite",
+      "text draft and copy refuse anchored hierarchy boundary evidence"
+    ],
+    [
+      "storyJS/test",
+      "storymodel4s.story.D1aTextBoundarySuite",
+      "text draft and copy refuse anchored ordinary claim evidence before export"
+    ],
+    [
+      "storyJS/test",
+      "storymodel4s.story.D1aTextBoundarySuite",
+      "text draft and copy refuse anchored segment support"
+    ],
+    [
+      "storyJS/test",
+      "storymodel4s.story.D1aTextBoundarySuite",
+      "text draft and copy refuse anchored state support"
+    ],
+    [
+      "storyJS/test",
+      "storymodel4s.story.D1aTextBoundarySuite",
+      "text draft and copy refuse step-only anchored and twin boundary evidence"
+    ],
+    [
+      "storyJS/test",
+      "storymodel4s.story.probes.D1aModelConstructorSuite",
+      "accepting control: model factory is available inside the story package"
+    ],
+    [
+      "storyJS/test",
+      "storymodel4s.story.probes.D1aModelConstructorSuite",
+      "direct model constructor is private even inside the story package"
+    ],
+    [
+      "storyJVM/test",
+      "storymodel4s.probes.D1aGraphBoundarySuite",
+      "accepting control: external checked pre-model ordering and model reads compile"
+    ],
+    [
+      "storyJVM/test",
+      "storymodel4s.probes.D1aGraphBoundarySuite",
+      "unbound graph context ordering is internal"
+    ],
+    [
+      "storyJVM/test",
+      "storymodel4s.probes.D1aGraphBoundarySuite",
+      "unbound graph covering ordering is internal"
+    ],
+    [
+      "storyJVM/test",
+      "storymodel4s.probes.D1aGraphBoundarySuite",
+      "unbound graph discourse order is internal"
+    ],
+    [
+      "storyJVM/test",
+      "storymodel4s.probes.D1aGraphBoundarySuite",
+      "unbound graph discourse position is internal"
+    ],
+    [
+      "storyJVM/test",
+      "storymodel4s.probes.D1aGraphBoundarySuite",
+      "unbound graph entity ordering is internal"
+    ],
+    [
+      "storyJVM/test",
+      "storymodel4s.probes.D1aGraphBoundarySuite",
+      "unbound graph within ordering is internal"
+    ],
+    [
+      "storyJVM/test",
+      "storymodel4s.probes.StoryModelUnforgeableSuite",
+      "accepting control: typed model consumer and tuple Product/Mirror compile"
+    ],
+    [
+      "storyJVM/test",
+      "storymodel4s.probes.StoryModelUnforgeableSuite",
+      "external callers cannot invoke internal copy"
+    ],
+    [
+      "storyJVM/test",
+      "storymodel4s.probes.StoryModelUnforgeableSuite",
+      "model has no synthesizable Product Mirror"
+    ],
+    [
+      "storyJVM/test",
+      "storymodel4s.probes.StoryModelUnforgeableSuite",
+      "model is not a Product"
+    ],
+    [
+      "storyJVM/test",
+      "storymodel4s.story.D1aOrderingSuite",
+      "accepting control: projection order uses start then full hull end then id"
+    ],
+    [
+      "storyJVM/test",
+      "storymodel4s.story.D1aOrderingSuite",
+      "empty graph still refuses non-text ordering axis"
+    ],
+    [
+      "storyJVM/test",
+      "storymodel4s.story.D1aOrderingSuite",
+      "equal projected hulls use id independent of map insertion order"
+    ],
+    [
+      "storyJVM/test",
+      "storymodel4s.story.D1aOrderingSuite",
+      "internal graph copy recomputes every ordered model query"
+    ],
+    [
+      "storyJVM/test",
+      "storymodel4s.story.D1aOrderingSuite",
+      "out-of-text support is admitted as Draft and diagnosed by validation"
+    ],
+    [
+      "storyJVM/test",
+      "storymodel4s.story.D1aOrderingSuite",
+      "projected start precedes end when their orders disagree"
+    ],
+    [
+      "storyJVM/test",
+      "storymodel4s.story.D1aTextBoundarySuite",
+      "accepting control: checked trajectory derivation retains text transitions"
+    ],
+    [
+      "storyJVM/test",
+      "storymodel4s.story.D1aTextBoundarySuite",
+      "accepting control: text boundary evidence may live only on a trajectory step"
+    ],
+    [
+      "storyJVM/test",
+      "storymodel4s.story.D1aTextBoundarySuite",
+      "checked trajectory derivation refuses anchored event and state support"
+    ],
+    [
+      "storyJVM/test",
+      "storymodel4s.story.D1aTextBoundarySuite",
+      "text draft and copy refuse anchored circumstance support"
+    ],
+    [
+      "storyJVM/test",
+      "storymodel4s.story.D1aTextBoundarySuite",
+      "text draft and copy refuse anchored context support"
+    ],
+    [
+      "storyJVM/test",
+      "storymodel4s.story.D1aTextBoundarySuite",
+      "text draft and copy refuse anchored entity support"
+    ],
+    [
+      "storyJVM/test",
+      "storymodel4s.story.D1aTextBoundarySuite",
+      "text draft and copy refuse anchored event support"
+    ],
+    [
+      "storyJVM/test",
+      "storymodel4s.story.D1aTextBoundarySuite",
+      "text draft and copy refuse anchored hierarchy boundary evidence"
+    ],
+    [
+      "storyJVM/test",
+      "storymodel4s.story.D1aTextBoundarySuite",
+      "text draft and copy refuse anchored ordinary claim evidence before export"
+    ],
+    [
+      "storyJVM/test",
+      "storymodel4s.story.D1aTextBoundarySuite",
+      "text draft and copy refuse anchored segment support"
+    ],
+    [
+      "storyJVM/test",
+      "storymodel4s.story.D1aTextBoundarySuite",
+      "text draft and copy refuse anchored state support"
+    ],
+    [
+      "storyJVM/test",
+      "storymodel4s.story.D1aTextBoundarySuite",
+      "text draft and copy refuse step-only anchored and twin boundary evidence"
+    ],
+    [
+      "storyJVM/test",
+      "storymodel4s.story.probes.D1aModelConstructorSuite",
+      "accepting control: model factory is available inside the story package"
+    ],
+    [
+      "storyJVM/test",
+      "storymodel4s.story.probes.D1aModelConstructorSuite",
+      "direct model constructor is private even inside the story package"
+    ],
+    [
+      "storyNative/test",
+      "storymodel4s.probes.D1aGraphBoundarySuite",
+      "accepting control: external checked pre-model ordering and model reads compile"
+    ],
+    [
+      "storyNative/test",
+      "storymodel4s.probes.D1aGraphBoundarySuite",
+      "unbound graph context ordering is internal"
+    ],
+    [
+      "storyNative/test",
+      "storymodel4s.probes.D1aGraphBoundarySuite",
+      "unbound graph covering ordering is internal"
+    ],
+    [
+      "storyNative/test",
+      "storymodel4s.probes.D1aGraphBoundarySuite",
+      "unbound graph discourse order is internal"
+    ],
+    [
+      "storyNative/test",
+      "storymodel4s.probes.D1aGraphBoundarySuite",
+      "unbound graph discourse position is internal"
+    ],
+    [
+      "storyNative/test",
+      "storymodel4s.probes.D1aGraphBoundarySuite",
+      "unbound graph entity ordering is internal"
+    ],
+    [
+      "storyNative/test",
+      "storymodel4s.probes.D1aGraphBoundarySuite",
+      "unbound graph within ordering is internal"
+    ],
+    [
+      "storyNative/test",
+      "storymodel4s.probes.StoryModelUnforgeableSuite",
+      "accepting control: typed model consumer and tuple Product/Mirror compile"
+    ],
+    [
+      "storyNative/test",
+      "storymodel4s.probes.StoryModelUnforgeableSuite",
+      "external callers cannot invoke internal copy"
+    ],
+    [
+      "storyNative/test",
+      "storymodel4s.probes.StoryModelUnforgeableSuite",
+      "model has no synthesizable Product Mirror"
+    ],
+    [
+      "storyNative/test",
+      "storymodel4s.probes.StoryModelUnforgeableSuite",
+      "model is not a Product"
+    ],
+    [
+      "storyNative/test",
+      "storymodel4s.story.D1aOrderingSuite",
+      "accepting control: projection order uses start then full hull end then id"
+    ],
+    [
+      "storyNative/test",
+      "storymodel4s.story.D1aOrderingSuite",
+      "empty graph still refuses non-text ordering axis"
+    ],
+    [
+      "storyNative/test",
+      "storymodel4s.story.D1aOrderingSuite",
+      "equal projected hulls use id independent of map insertion order"
+    ],
+    [
+      "storyNative/test",
+      "storymodel4s.story.D1aOrderingSuite",
+      "internal graph copy recomputes every ordered model query"
+    ],
+    [
+      "storyNative/test",
+      "storymodel4s.story.D1aOrderingSuite",
+      "out-of-text support is admitted as Draft and diagnosed by validation"
+    ],
+    [
+      "storyNative/test",
+      "storymodel4s.story.D1aOrderingSuite",
+      "projected start precedes end when their orders disagree"
+    ],
+    [
+      "storyNative/test",
+      "storymodel4s.story.D1aTextBoundarySuite",
+      "accepting control: checked trajectory derivation retains text transitions"
+    ],
+    [
+      "storyNative/test",
+      "storymodel4s.story.D1aTextBoundarySuite",
+      "accepting control: text boundary evidence may live only on a trajectory step"
+    ],
+    [
+      "storyNative/test",
+      "storymodel4s.story.D1aTextBoundarySuite",
+      "checked trajectory derivation refuses anchored event and state support"
+    ],
+    [
+      "storyNative/test",
+      "storymodel4s.story.D1aTextBoundarySuite",
+      "text draft and copy refuse anchored circumstance support"
+    ],
+    [
+      "storyNative/test",
+      "storymodel4s.story.D1aTextBoundarySuite",
+      "text draft and copy refuse anchored context support"
+    ],
+    [
+      "storyNative/test",
+      "storymodel4s.story.D1aTextBoundarySuite",
+      "text draft and copy refuse anchored entity support"
+    ],
+    [
+      "storyNative/test",
+      "storymodel4s.story.D1aTextBoundarySuite",
+      "text draft and copy refuse anchored event support"
+    ],
+    [
+      "storyNative/test",
+      "storymodel4s.story.D1aTextBoundarySuite",
+      "text draft and copy refuse anchored hierarchy boundary evidence"
+    ],
+    [
+      "storyNative/test",
+      "storymodel4s.story.D1aTextBoundarySuite",
+      "text draft and copy refuse anchored ordinary claim evidence before export"
+    ],
+    [
+      "storyNative/test",
+      "storymodel4s.story.D1aTextBoundarySuite",
+      "text draft and copy refuse anchored segment support"
+    ],
+    [
+      "storyNative/test",
+      "storymodel4s.story.D1aTextBoundarySuite",
+      "text draft and copy refuse anchored state support"
+    ],
+    [
+      "storyNative/test",
+      "storymodel4s.story.D1aTextBoundarySuite",
+      "text draft and copy refuse step-only anchored and twin boundary evidence"
+    ],
+    [
+      "storyNative/test",
+      "storymodel4s.story.probes.D1aModelConstructorSuite",
+      "accepting control: model factory is available inside the story package"
+    ],
+    [
+      "storyNative/test",
+      "storymodel4s.story.probes.D1aModelConstructorSuite",
+      "direct model constructor is private even inside the story package"
+    ]
+  ],
+  "allOtherTestIdentitiesRetained": true,
+  "replacementBasis": "Three old boundary cases are exercised by explicit draft-and-copy cases; the old combined Mirror case is split into independently compiled construction probes. New focused suite membership is bound to the archived clean 40-test restoration.",
+  "skippedTests": [
+    {
+      "task": "providerAgent/test",
+      "suite": "storymodel4s.provider.agent.LiveSmokeSuite",
+      "test": "live smoke: one WOG sentence through the model, recorded as captured, judged by the court"
+    },
+    {
+      "task": "embedBench/test",
+      "suite": "storymodel4s.bench.sherlock.SherlockRecallMappingSuite",
+      "test": "the neural channel puts the red-door unit nearer its row than an unrelated row"
+    },
+    {
+      "task": "media/test",
+      "suite": "storymodel4s.media.BoundarySearchSuite",
+      "test": "live ffmpeg and worker, when this machine has both, reproduce the recorded proposals"
+    },
+    {
+      "task": "media/test",
+      "suite": "storymodel4s.media.CaptionSearchSuite",
+      "test": "live worker and weights, when this machine has them, reproduce the recorded proposals"
+    },
+    {
+      "task": "media/test",
+      "suite": "storymodel4s.media.F1ExcerptSuite",
+      "test": "live tools, when this machine has them and the excerpt, reproduce the recorded packet table and proposals"
+    }
+  ],
+  "findings": []
+}

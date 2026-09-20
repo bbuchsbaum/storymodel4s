@@ -1,0 +1,56 @@
+{
+  "codeRevision": "add6858a1b191e3e5199eadd08c7d95f549180bf",
+  "stages": {
+    "format-last": {
+      "receiptSha256": "cd123c07eaa405cef5edda460f271d4d839b52281ccaf7a047c1976d2be9500a",
+      "logSha256": "fa4f6027bcada46113719770e938aa80e9c6f8f9f42c945c1d134e3be27fbad8",
+      "command": [
+        "sbt",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "-batch",
+        "scalafmtCheckAll",
+        "scalafmtSbtCheck"
+      ],
+      "exitCode": 0,
+      "cleanBefore": true,
+      "cleanAfter": true
+    },
+    "docs-examples": {
+      "receiptSha256": "4cd1c31ad6ef4d1d7a1bef4ec712eff174a8ba131230c8a52544f09ee02da341",
+      "logSha256": "737d4c83127c2e8e54a22c38cd8fe7ccb134a1a997cf4dcea18c3f4d486e21ca",
+      "command": [
+        "env",
+        "STORYMODEL4S_GRAKERN_BUILD=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "npm",
+        "--prefix",
+        "docs-site",
+        "run",
+        "verify:examples"
+      ],
+      "exitCode": 0,
+      "cleanBefore": true,
+      "cleanAfter": true
+    }
+  },
+  "manifestSha256": "e62e57143c8d458fb6931e39e71ff55f5fb77abd76cfac13a9dbce29f9d65e66",
+  "verifierSha256": "7ce9ea1c5c81e9d5ba4f9568d93fe1b37f906489be66ed4c1673e3695bcbdf46",
+  "examples": {
+    "inspect-source": 381,
+    "model-a-story": 729,
+    "penman-to-chart": 840,
+    "resolve-acquisition": 318,
+    "compose-document": 340,
+    "represent-recall": 598,
+    "window-features": 634,
+    "use-embeddings": 436,
+    "align-and-interpret": 551,
+    "summarize-recall": 756,
+    "score-interview": 1074,
+    "save-model": 330,
+    "structural-distance": 402
+  },
+  "exampleOutputsUnchangedFromS3": true,
+  "cleanExactCloneObserved": true,
+  "findings": [],
+  "qualification": "Independent receipt and exact manifest/output reconciliation for separate formatting and all13 executable documentation examples; provider and consumer qualification are separate."
+}

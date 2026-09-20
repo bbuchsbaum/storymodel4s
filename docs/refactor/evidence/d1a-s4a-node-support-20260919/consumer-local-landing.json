@@ -1,0 +1,19 @@
+{
+  "before": {
+    "head": "fb33bef7d0971530531fcec43cd3d7f141b8e137",
+    "branch": "main",
+    "trackedClean": true,
+    "untrackedFileCount": 636,
+    "untrackedInventorySha256": "b03cc1c74d0e78357e1a3e281559e48b76488a70c9bf20e2ae2619cb581c81b9"
+  },
+  "after": {
+    "head": "b5bbe2c584fda0bc487430d2399fa9bff996ddef",
+    "branch": "main",
+    "trackedClean": true,
+    "untrackedFileCount": 636,
+    "untrackedInventorySha256": "b03cc1c74d0e78357e1a3e281559e48b76488a70c9bf20e2ae2619cb581c81b9"
+  },
+  "qualifiedConsumer": "b5bbe2c584fda0bc487430d2399fa9bff996ddef",
+  "qualifiedProvider": "add6858a1b191e3e5199eadd08c7d95f549180bf",
+  "qualification": "Local fast-forward only; all 636 unrelated untracked paths preserved; no push."
+}
