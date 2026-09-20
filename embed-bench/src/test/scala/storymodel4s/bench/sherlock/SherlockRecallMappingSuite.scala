@@ -66,6 +66,26 @@ class SherlockRecallMappingSuite extends FunSuite:
   private val fingerprintBeforeDeclaration =
     "0ffa14649aff8382f718478d89a84496d9de5d89d5e72f188acc3320b8fb2c54"
 
+  // D1B changes physical support and deliberately moves this view to fingerprint v2.
+  private val typedFingerprint =
+    "22f1876667a455c2f5e72d2575dafa5325c8f82c79e210c3ebaf1df9d93577f8"
+
+  test("legacy scoring text view retains its frozen v1 fingerprint while physical support differs") {
+    val built = view(atlas)
+    val legacy = built.view.copy(nodes = built.view.nodes.map { node =>
+      val spans = node.scoringPosition.get.spans
+      node.copy(support = TypedSupport.Text(spans),
+        scoringPosition = Some(ScoringPosition.CanonicalText(spans)))
+    })
+    assertEquals(ViewFingerprint.of(legacy).toString, fingerprintBeforeDeclaration)
+    assertEquals(ViewFingerprint.of(built.view).toString, typedFingerprint)
+    assertNotEquals(typedFingerprint, fingerprintBeforeDeclaration)
+    built.view.nodes.foreach { node =>
+      assertEquals(built.view.relativeSpan(node.ref), legacy.relativeSpan(node.ref))
+      assertEquals(built.view.measuredPosition(node.ref), legacy.measuredPosition(node.ref))
+    }
+  }
+
   test("clock provenance covers all rows and binds the record report and actual axes") {
     val a = atlas
     val report = Checksum.ofText("synthetic report")
@@ -73,7 +93,7 @@ class SherlockRecallMappingSuite extends FunSuite:
     val c = json.hcursor
     assertEquals(c.get[String]("reportSha256"), Right(report.hex))
     assertEquals(c.get[String]("recordSha256"), Right(a.repairRecord.checksum.hex))
-    assertEquals(c.get[String]("sourceFingerprint"), Right(fingerprintBeforeDeclaration))
+    assertEquals(c.get[String]("sourceFingerprint"), Right(typedFingerprint))
     assertEquals(c.get[String]("notebookProvenanceStatus"), Right("declared-unverified"))
     val repairs = c.get[Vector[io.circe.Json]]("repairs").toOption.get
     assertEquals(
@@ -139,7 +159,7 @@ class SherlockRecallMappingSuite extends FunSuite:
     val row4 = refOfRow(built, 4)
     val row5 = refOfRow(built, 5)
     assert(order(row4) < order(row5), "run 2 rows must come after run 1 rows in world order")
-    assertEquals(ViewFingerprint.of(built.view).toString, fingerprintBeforeDeclaration)
+    assertEquals(ViewFingerprint.of(built.view).toString, typedFingerprint)
   }
 
   test("an Unknown clock drops the world-time layer and the world order from the Sherlock view") {
@@ -155,7 +175,7 @@ class SherlockRecallMappingSuite extends FunSuite:
       built.view.adjacency(RelationLayer.DiscourseSuccession).exists(_._2.nonEmpty),
       "the discourse clock is not the one declared unknown"
     )
-    assertNotEquals(ViewFingerprint.of(built.view).toString, fingerprintBeforeDeclaration)
+    assertNotEquals(ViewFingerprint.of(built.view).toString, typedFingerprint)
   }
 
   test("the recall CSV reader takes the word column and refuses a foreign header") {
