@@ -1,0 +1,25 @@
+{
+  "codeRevision": "9dcaf8e786207d523787d670810c28d104efe117",
+  "command": [
+    "sbt",
+    "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+    "-batch",
+    "scalafmtCheckAll",
+    "scalafmtSbtCheck"
+  ],
+  "exitCode": 0,
+  "cleanBefore": true,
+  "cleanAfter": true,
+  "startedEpochSeconds": 1789877267.121616,
+  "seconds": 17.791588068008423,
+  "logPath": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1a-s4b-20260919/format-last.log",
+  "logSha256": "98e586eceda4cc91c69f5be78bf2b2276c326e8189eea9071af332fdf3c30197",
+  "testTotals": [],
+  "aggregateTestCounts": {
+    "Total": 0,
+    "Failed": 0,
+    "Errors": 0,
+    "Passed": 0,
+    "Skipped": 0
+  }
+}

@@ -1,0 +1,56 @@
+{
+  "mote": "bd-01M2TAG1GEAGXCY33P0B17QBJ1",
+  "status": "54 mutations and provider/format/docs complete; final consumer execution pending",
+  "sourceTestCandidate": "9a7caf45829e737e9638a23cd9176f30002a0187",
+  "releaseCandidate": "9dcaf8e786207d523787d670810c28d104efe117",
+  "criteria": [
+    {
+      "number": 1,
+      "criterion": "Sealed atlas envelope and joined draft/copy",
+      "court": "D1aEnvelopeSuite receipt, membership and direct-primary courts; D1aEnvelopeAdmissionSuite all seven evidence stores and six support families.",
+      "falsifierOrQualification": "receipt-story-id, receipt-source-checksum, claim-anchor-membership, projection-rechecks-membership, projection-direct-primary-refusal, canonical-text-evidence, canonical-film-evidence and collect-* mutants."
+    },
+    {
+      "number": 2,
+      "criterion": "Full non-text identity without truncated or endpoint-only aliases",
+      "court": "D1aEnvelopeSuite distinguishes primary extent/timebase/selection, non-primary stream metadata, mapping payloads, caption bytes, unit structure and receipt; bundle-only primary switch holds every stream and legacy bundle id unchanged.",
+      "falsifierOrQualification": "identity-primary-axis-fingerprint, identity-full-bundle and identity-bound-surface mutants. Historical ticket wording using mapping IDs is superseded by reviewed revision 5 full-payload binding."
+    },
+    {
+      "number": 3,
+      "criterion": "Checked text capability through validation, adjudication and compiler",
+      "court": "Private StoryText/TextModel derive from own TextNarrativeAtlas; asText iff canonical text atlas; TextValidationOutcome shares report logic and preserves successful witness, failure None and wrapper value semantics. Compiler/materializer results retain TextModel.",
+      "falsifierOrQualification": "as-text-requires-canonical-atlas, promotion-retains-text-witness, text-validation-blocking and text-wrapper-value-equality mutants, plus constructor probes."
+    },
+    {
+      "number": 4,
+      "criterion": "Every text-only consumer carries the witness",
+      "court": "Codec, compiler, materializer, view, pipeline, fixtures, laws and StorySourceView take/return TextModel; text queries are behind it. storyatlas migration includes input joins and app/compiler entry points.",
+      "falsifierOrQualification": "24 clean compile-probe mutants cover newly claimed doors; exact provider gate passes, final consumer gate pending."
+    },
+    {
+      "number": 5,
+      "criterion": "Validation over complete projection and evidence membership",
+      "court": "Interval-union containment preserves gaps and covers every child interval; text containment stays historical. Context/circumstance text extents remain validation laws. All claim and boundary anchors are checked at construction and validator. Generic graph/status/context consistency remains active.",
+      "falsifierOrQualification": "containment-preserves-gaps, containment-covers-every-member, context-circumstance-text-extent and generic-consistency-rules mutants. Validator anchor guards are redundant behind public construction and are not claimed independent mutation kills."
+    },
+    {
+      "number": 6,
+      "criterion": "Nonvacuous external construction and conversion probes",
+      "court": "D1aTextWitnessSuite, story-package D1aModelConstructorSuite and D1aCodecWitnessSuite pair explicit typed negative inputs with accepting controls. Detached node Product/Mirror behavior stays explicitly open.",
+      "falsifierOrQualification": "Each of 24 compile-door mutants gets its own clean test recompile and executed named failure/control."
+    },
+    {
+      "number": 7,
+      "criterion": "Frozen S0 values unchanged",
+      "court": "Expected JSON remains SHA-256 cc201d9dd3e3576fabcd45677369f00c023ca5a455ea9d9e7ba694700c759fb3; migrated call sites use real projection/model reads.",
+      "falsifierOrQualification": "Focused parity courts and final clean exact-candidate full provider gate pass, with unchanged expected bytes."
+    }
+  ],
+  "scopeLimitations": [
+    "Film compiler/model codec and generated-caption licensing are not implemented.",
+    "AlignmentSource sealing and unrelated source/model bridge closure remain S4c.",
+    "Instant and all17 exact-anchor acceptance remain D1B.",
+    "No executed CI, scientific qualification or remote push."
+  ]
+}

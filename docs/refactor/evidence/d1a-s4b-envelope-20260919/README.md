@@ -3,8 +3,9 @@
 Mote: `bd-01M2TAG1GEAGXCY33P0B17QBJ1`. Based on landed S4a `57ee3595`;
 the formatted source/test candidate is `9a7caf45829e737e9638a23cd9176f30002a0187`.
 All 54 compiled mutations were killed with named passing controls; the restored
-clean court passed 62 tests. Qualification is in progress: full provider,
-documentation and consumer gates are pending; this record does not close S4b.
+clean court passed 62 tests. The exact release `9dcaf8e7` passed all 56 provider
+tasks (6,927 passed, five existing skips), both format checks and all 13 documentation
+examples. Consumer tests and browser smoke remain pending; this record does not close S4b.
 
 `StoryModel` now owns its sealed `NarrativeSourceAtlas` and derived bundle.
 Its general draft and internal copy check canonical support, membership, direct
@@ -79,18 +80,26 @@ as an independently killed deletion mutant.
 The [consumer compilation receipt](consumer-compile-1.json) passes production and
 test-source compilation at consumer `6a6aa4b`, using provider `844b680c`; it does not
 claim test execution. Consumer branch `work/d1a-s4b-consumer-20260919` is preserved in
-the real sibling repository. Its current pin commit `08bced0` binds provider `9a7caf45`.
+the real sibling repository. Its release pin commit `3e65668` binds provider `9dcaf8e7`.
 Final consumer qualification will bind all four actual clone revisions separately
 from generated Pins. The [consumer gate runner](consumer-gate.py) executes all eight
 task aliases plus compile, formatting and production linking. Because the app entry
 point's parameter type changed, the [shell runner](consumer-smoke.py) also builds an
 edition and runs the existing pinned Playwright smoke with browser audits before
-and after, an isolated owned browser cache and an actual browser-executable receipt.
+and after, an isolated owned browser cache and an actual browser-executable/PID receipt.
+The repaired runner also checks raw process rows for its owned cache and exact PID,
+because the global guard does not recognize `headless_shell`. Its [cold review record](consumer-runner-review.json)
+keeps that finding and the bounded repair separate from execution. The [acceptance map](acceptance-map.json)
+reconciles all seven ticket criteria and labels pending release checks.
 
 The frozen S0 JSON is unchanged: SHA-256
 `cc201d9dd3e3576fabcd45677369f00c023ca5a455ea9d9e7ba694700c759fb3`.
-The final provider gate must execute it with the migrated call sites and identical
-expected values. Film compilation/encoding, instant support, alignment-source sealing,
+The [full provider receipt](full-gate.json) executes it with the migrated call sites
+and identical expected values. [Formatting](format-last.json) and all
+[13 documentation examples](docs-examples.json) also pass. The
+[source equivalence record](source-equivalence.json) binds the mutation candidate to
+release `9dcaf8e7`; only static evidence files changed. The [runtime receipt](runtime.json)
+binds the actual sbt Java 25.0.1 welcome. Independent terminal receipt audit remains separate. Film compilation/encoding, instant support, alignment-source sealing,
 caption licensing, scientific qualification, CI execution and remote publication are
 outside this S4b record. S4c and D1B retain their distinct later acceptance courts.
 
@@ -99,6 +108,6 @@ outside this S4b record. S4c and D1B retain their distinct later acceptance cour
 Use a clean standalone clone at `9a7caf45` and grakern at
 `0329c43c88a0b71e9aa4456723bb16bac2fa3841`. Set `D1A_S4B_REPO`,
 `D1A_S4B_GRAKERN` and a fresh `D1A_S4B_OUTPUT`, then run
-`python3 qualify.py mutations`. After clean restoration, `python3 qualify.py release`
-runs `clean compileAll testAll`, both format checks and all executable documentation
+`python3 qualify.py mutations`. After clean restoration, verify the unchanged production/test/build inputs and
+advance the clone to release `9dcaf8e7`. Then `python3 qualify.py release` runs `clean compileAll testAll`, both format checks and all executable documentation
 examples. Do not run heavy provider and consumer gates concurrently.

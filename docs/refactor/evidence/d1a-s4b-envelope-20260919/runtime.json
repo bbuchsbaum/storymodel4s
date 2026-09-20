@@ -1,0 +1,12 @@
+{
+  "codeRevision": "9dcaf8e786207d523787d670810c28d104efe117",
+  "observedEpochSeconds": 1789877365.011424,
+  "sbtWelcome": [
+    "[info] welcome to sbt 1.12.14 (Homebrew Java 25.0.1)"
+  ],
+  "gateLogSha256": "016921664a4fe0afcd97215cd121d73b20fa8f4aa00508b3748897d0e1a1f4b3",
+  "os": "macOS-14.3-arm64-arm-64bit-Mach-O",
+  "architecture": "arm64",
+  "nodeAtProviderDocsCommand": "v26.7.0",
+  "runtimeQualification": "Actual sbt JVM is established by the gate welcome; no shell java probe is substituted for it."
+}

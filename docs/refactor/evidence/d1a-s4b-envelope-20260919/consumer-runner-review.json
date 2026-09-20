@@ -3,6 +3,7 @@
   "reviewer": "/root/s0_cold_review",
   "finding": "P2: mandatory global guard does not recognize Playwright headless_shell, so owned-cache absence in that guard alone cannot prove cleanup.",
   "repair": "Keep both global guards, capture raw ps rows scoped to the owned cache and exact launched PID, bind single actual executable/PID from Playwright debug log, and require all owned rows absent afterward. Record actual Node binary.",
-  "recheck": "pending",
-  "execution": "pending"
+  "recheck": "Resolved at ffd1ed76; no remaining concrete source finding. Global audits and raw owned-cache/exact-PID snapshots fail closed; unrelated rows are filtered before persistence. No browser/build execution by reviewer.",
+  "execution": "pending",
+  "repairCommit": "ffd1ed76"
 }
