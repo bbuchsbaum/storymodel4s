@@ -82,7 +82,7 @@ class GraphSuite extends ScalaCheckSuite:
       val t1 = Renderer.text(text)
       val t2 = Renderer.text(text)
       val d = Renderer.dot(text)
-      t1 == t2 && d == Renderer.dot(m) &&
+      t1 == t2 && d == Renderer.dot(text) &&
       b.graph.situations.keys.forall(id => t1.contains(id.value) && d.contains(id.value)) &&
       b.graph.entities.keys.forall(id => t1.contains(id.value))
     }
