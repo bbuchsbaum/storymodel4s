@@ -331,6 +331,23 @@ class D1aEnvelopeAdmissionSuite extends FunSuite:
       assert(text.copy[ModelStatus.Draft](receipt = Some(wrong)).isLeft)
     }
 
+  test("text evidence refuses anchors that otherwise belong to its own bundle"):
+    val built = Small.build(2, 1)
+    val text = built.draft()
+    val context = text.graph.contexts(built.world)
+    val spans = context.support.textSpans.getOrElse(fail("text fixture support changed"))
+    val local = right(EvidenceSupport.text(text.bundle, text.bundle.streams.head.id, spans))
+    assert(EvidenceSupport.of(text.bundle, local.anchors.toVector).isRight)
+    val ordinary = Small.meta("ctx:world", EpistemicStatus.Hypothesized, Some(spans))
+    val control = text.graph.copy(contexts = Map(built.world -> context.copy(meta = ordinary)))
+    assert(text.copy[ModelStatus.Draft](graph = control).isRight)
+    Vector(None, Some(spans)).foreach { bare =>
+      val changed = right(ordinary.withEvidence(ordinary.evidence.map(_.copy(spans = bare, anchors = Some(local)))))
+      val graph = text.graph.copy(contexts = Map(built.world -> context.copy(meta = changed)))
+      assert(StoryModel.draftText(built.atlas, graph, text.hierarchy, text.trajectory).isLeft)
+      assert(text.copy[ModelStatus.Draft](graph = graph).isLeft)
+    }
+
   test("text context and circumstance bounds remain validation laws with exact paths"):
     val built = Small.build(2, 1)
     val text = built.draft()
