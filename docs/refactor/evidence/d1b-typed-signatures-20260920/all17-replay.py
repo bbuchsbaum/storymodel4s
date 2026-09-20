@@ -25,7 +25,7 @@ def project_reports(out,inputs):
  raw=buf.getvalue().encode();return raw,counts
 
 def main():
- repo,data,out,grakern,support_capture,support_receipt=(Path(x).resolve() for x in sys.argv[1:])
+ repo,data,out,grakern,support_capture=(Path(x).resolve() for x in sys.argv[1:])
  need(all(not any(c.isspace() for c in str(p)) for p in [repo,data,out,grakern]),'task paths contain whitespace')
  need(clean(repo) and clean(grakern) and head(grakern)==GR,'candidate/dependency not clean exact pin')
  need(not out.exists(),'fresh output directory required')
@@ -36,9 +36,7 @@ def main():
  need(sha(inputpath.read_bytes())==INPUTS,'immutable recall inventory changed')
  inputs=json.loads(inputpath.read_bytes())
  need(len(inputs)==17 and len({r['participant'] for r in inputs})==17 and [r['participant'] for r in inputs]==sorted(r['participant'] for r in inputs),'wrong participant inventory')
- capture=json.loads(support_capture.read_bytes());parity=json.loads(support_receipt.read_bytes())
- need(parity['captureSha256']==sha(support_capture.read_bytes()) and parity['summary']['rowLociSha256']==ROW_DIGEST and
-  parity['summary']['exactPhysicalAndScoringComparison'] is True,'typed support court must pass first')
+ capture=json.loads(support_capture.read_bytes())
  expected_rows=frozen['inventory']['rowLoci']
  receipts=[];input_files={}
  for key in ['annotation','model','tokenizer','repairRecord','recallLineage']:
@@ -57,9 +55,20 @@ def main():
  need('STORYMODEL4S_SCENE_CODING' not in env and env['STORYMODEL4S_PRIOR_SCALE']=='1.5','wrong config')
  need('val onnxRuntimeV = \"1.29.0\"' in (repo/'build.sbt').read_text(),'ONNX version changed')
  out.mkdir();revision=head(repo)
+ # Execute the exact committed verifier afresh; an older receipt cannot bypass new checks.
+ verifier=repo/'docs/refactor/evidence/d1b-typed-signatures-20260920/support-parity.py'
+ support_receipt=out/'fresh-support-parity.json';support_log=out/'fresh-support-parity.log'
+ verify_command=[sys.executable,str(verifier),str(repo),input_files['annotation']['path'],str(support_capture),str(support_receipt)]
+ with support_log.open('x') as stream:
+  checked=subprocess.run(verify_command,stdout=stream,stderr=subprocess.STDOUT)
+ need(checked.returncode==0,'fresh typed-support comparison failed; no replay launched')
+ parity=json.loads(support_receipt.read_bytes())
+ need(parity['captureSha256']==sha(support_capture.read_bytes()) and parity['summary']['rowLociSha256']==ROW_DIGEST and
+  parity['summary']['exactPhysicalAndScoringComparison'] is True,'fresh typed-support receipt mismatch')
+ verifier_receipt=dict(command=verify_command,exitCode=checked.returncode,verifier=file_record(verifier),log=file_record(support_log))
  manifest=dict(schema='d1b/all17-replay/v1',codeRevision=revision,cwd=str(repo),cleanBefore=True,
   grakernRevision=head(grakern),frozenManifestSha256=BASELINE,expectedProjectionSha256=EXPECTED,
-  runnerSha256=sha(Path(__file__).read_bytes()),typedSupportCapture=file_record(support_capture),typedSupportParity=file_record(support_receipt),inputInventorySha256=sha(inputpath.read_bytes()),inputs=input_files,
+  runnerSha256=sha(Path(__file__).read_bytes()),typedSupportCapture=file_record(support_capture),typedSupportParity=file_record(support_receipt),freshSupportVerification=verifier_receipt,inputInventorySha256=sha(inputpath.read_bytes()),inputs=input_files,
   environment={k:v for k,v in env.items() if k.startswith('STORYMODEL4S_') or k=='ORT_DISABLE_TELEMETRY'},
   unset=frozen['configuration']['unset'],clearedInheritedStorymodelOverrides=True,
   host=dict(system=platform.system(),release=platform.release(),machine=platform.machine()),
