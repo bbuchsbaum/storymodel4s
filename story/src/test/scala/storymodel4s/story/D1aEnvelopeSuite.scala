@@ -135,24 +135,7 @@ class D1aEnvelopeSuite extends FunSuite:
     assert(StoryValidator.validate(repeated).report.warnings.exists(_.law == "no-duplicate-occurrence-via-retrospective-reference"))
     assert(!StoryValidator.validate(repeated).report.violations.exists(_.law == "explicit-causal-requires-span-with-causal-cue"))
 
-  /** Two native picture axes in one legacy bundle identity; either may be primary. */
-  private def twoAxes(): (SourceBundle, SourceBundle) =
-    val seed = film()
-    val edition = Some(EditionId.unsafe("two-axis-film"))
-    val aId = StreamId.unsafe("picture-a")
-    val bId = StreamId.unsafe("picture-b")
-    def stream(id: StreamId, axis: PresentationAxis): SourceStream =
-      right(SourceStream.of(id, StreamKind.Picture, Checksum.ofText(id.value), axis.id,
-        axis.extent, axis.timebase, Vector.empty))
-    val placeholders = Vector(stream(aId, seed.primaryAxis), stream(bId, seed.primaryAxis))
-    val id = right(SourceBundle.computeId(edition, SourceKind.FilmEdition, placeholders,
-      AxisKind.EditionPlayback, Vector(aId, bId)))
-    val a = right(PresentationAxis.editionPlayback(id, edition.get, 0L, 100L, RationalTimebase.Millisecond))
-    val b = right(PresentationAxis.editionPlayback(id, edition.get, 0L, 200L, RationalTimebase.Millisecond))
-    val streams = Vector(stream(aId, a), stream(bId, b))
-    def bundle(axis: PresentationAxis) = right(SourceBundle.of(edition, SourceKind.FilmEdition,
-      streams, axis, Vector(aId, bId), Vector.empty))
-    (bundle(a), bundle(b))
+  private def twoAxes(): (SourceBundle, SourceBundle) = D1aBundleFixtures.twoAxes()
 
   private def mediaAt(bundle: SourceBundle, stream: SourceStream, axis: PresentationAxis, start: Long, end: Long): EvidenceAnchor =
     EvidenceAnchor.MediaTime(bundle.id, stream.id, axis.id,
