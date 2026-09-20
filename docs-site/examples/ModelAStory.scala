@@ -11,7 +11,7 @@ import storymodel4s.fixtures.wog.WarOfTheGhostsModel
   def show(id: storymodel4s.core.SituationId): Unit =
     val situation = graph.situations(id)
     val context = graph.contexts(situation.context)
-    val evidence = situation.support.units.toVector
+    val evidence = situation.support.textSpans.toVector.flatMap(_.units)
       .flatMap(model.atlas.byId.get)
       .filter(_.kind == SurfaceUnitKind.Sentence)
       .sortBy(_.ordinal)
