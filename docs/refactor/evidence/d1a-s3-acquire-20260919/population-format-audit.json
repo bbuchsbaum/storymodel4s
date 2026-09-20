@@ -1,0 +1,52 @@
+{
+  "codeRevision": "17194421f018e3780aafa4adf754fccf55398b61",
+  "testDeltaByTask": {
+    "acquireJVM/test": 19,
+    "acquireJS/test": 19,
+    "acquireNative/test": 19,
+    "documentJVM/test": 1,
+    "documentJS/test": 1,
+    "documentNative/test": 1,
+    "codecJVM/test": 1,
+    "codecJS/test": 1,
+    "codecNative/test": 1
+  },
+  "unchangedSkippedTests": [
+    {
+      "task": "providerAgent/test",
+      "suite": "storymodel4s.provider.agent.LiveSmokeSuite",
+      "test": "live smoke: one WOG sentence through the model, recorded as captured, judged by the court"
+    },
+    {
+      "task": "embedBench/test",
+      "suite": "storymodel4s.bench.sherlock.SherlockRecallMappingSuite",
+      "test": "the neural channel puts the red-door unit nearer its row than an unrelated row"
+    },
+    {
+      "task": "media/test",
+      "suite": "storymodel4s.media.BoundarySearchSuite",
+      "test": "live ffmpeg and worker, when this machine has both, reproduce the recorded proposals"
+    },
+    {
+      "task": "media/test",
+      "suite": "storymodel4s.media.CaptionSearchSuite",
+      "test": "live worker and weights, when this machine has them, reproduce the recorded proposals"
+    },
+    {
+      "task": "media/test",
+      "suite": "storymodel4s.media.F1ExcerptSuite",
+      "test": "live tools, when this machine has them and the excerpt, reproduce the recorded packet table and proposals"
+    }
+  ],
+  "formatReceiptSha256": "56edf75b7bb03427da77b32d91afed5c33decb28a9f59a110d9bb45928f5241e",
+  "formatLogSha256": "d23a775849664a4aa60f6bee688d6a9d7389601ed6b64b33587444f00ea6b0c6",
+  "formatCommand": [
+    "sbt",
+    "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+    "-batch",
+    "scalafmtCheckAll",
+    "scalafmtSbtCheck"
+  ],
+  "formatExitCode": 0,
+  "findings": []
+}

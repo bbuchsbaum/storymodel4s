@@ -1,0 +1,24 @@
+{
+  "codeRevision": "17194421f018e3780aafa4adf754fccf55398b61",
+  "command": [
+    "bash",
+    "tools/reference-scope.sh",
+    "e94ef776",
+    "17194421f018e3780aafa4adf754fccf55398b61"
+  ],
+  "exitCode": 0,
+  "cleanBefore": true,
+  "cleanAfter": true,
+  "startedEpochSeconds": 1789865586.062433,
+  "seconds": 19.79349708557129,
+  "logPath": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1a-s3-20260919/scope.log",
+  "logSha256": "8a0445a62bb8f23b888954f16e0b131ca1dd19c6be7e253157f4698592f98e1b",
+  "testTotals": [],
+  "aggregateTestCounts": {
+    "Total": 0,
+    "Failed": 0,
+    "Errors": 0,
+    "Passed": 0,
+    "Skipped": 0
+  }
+}

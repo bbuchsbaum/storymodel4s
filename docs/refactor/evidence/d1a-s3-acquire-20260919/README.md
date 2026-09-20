@@ -1,8 +1,9 @@
 # D1A S3 typed acquisition support — 19 September 2026
 
 Mote: `bd-01M2TAF8JH42NYJJAFWPD7HTZB`. Source/test candidate `17194421`,
-based on landed S2 checkpoint `e94ef776`. All 18 mutation witnesses and clean restoration passed; final release qualification
-is in progress. This receipt does not yet close S3 or authorize its landing.
+based on landed S2 checkpoint `e94ef776`. All 18 mutation witnesses, clean restoration, the full provider gate and formatting
+passed; all 13 documentation examples also pass. Consumer qualification is in
+progress. This receipt does not yet close S3 or authorize its landing.
 
 `SourceSupport` carries optional `TypedSupport`, with `text(score, spans)` and a
 derived text `spans` accessor. `EvidenceRef.support` exposes spans alone as `Text`
@@ -65,7 +66,7 @@ archive separate control XML. Final provider JUnit is a separate court.
 [The failed first compile](failed-attempts.json) retains the test-helper keyword
 error and its repair; it is not a mutation witness.
 
-## Pending qualification and reproduction
+## Qualification and reproduction
 
 The [settled inventory](guard-witness-inventory.json) names 18 mutations covering
 the support cases and selection, text conversion/access, historical text
@@ -78,9 +79,16 @@ grakern clone at `0329c43c88a0b71e9aa4456723bb16bac2fa3841`. Set
 Existing logs are refused rather than overwritten. No new compile-time
 construction boundary is introduced in S3; these are runtime witnesses.
 
-The release command runs `clean compileAll testAll`, separately checks
-`scalafmtCheckAll scalafmtSbtCheck`, and verifies executable docs examples.
-The exact-provider storyatlas4s consumer gate is also required before closure.
+The [clean provider gate](full-gate.json) passes 6,663 tests with five skips and
+zero failures/errors across all 56 alias tasks. [Formatting](format-last.json)
+passes separately. [Runtime](runtime.json) binds the actual sbt Java 25.0.1
+welcome and S0 file hash. The [independent provider audit](provider-audit.json) reconciles every fresh
+JUnit suite/testcase against its task total; the [population comparison](population-format-audit.json)
+confirms the expected 63 additional test executions and the same five skipped
+identities as S2. [All 13 executable docs examples](docs-examples.json) pass; the
+[independent docs audit](docs-audit.json) binds each name and exact output byte
+length to its candidate manifest and artifact.
+The exact-provider storyatlas4s consumer gate remains required before closure.
 Raw logs and per-mutant JUnit remain under `data/study/d1a-s3-20260919/`.
 The S0 frozen JSON must retain SHA-256
 `cc201d9dd3e3576fabcd45677369f00c023ca5a455ea9d9e7ba694700c759fb3`.

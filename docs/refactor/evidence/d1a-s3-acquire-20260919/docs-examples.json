@@ -1,0 +1,27 @@
+{
+  "codeRevision": "17194421f018e3780aafa4adf754fccf55398b61",
+  "command": [
+    "env",
+    "STORYMODEL4S_GRAKERN_BUILD=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+    "npm",
+    "--prefix",
+    "docs-site",
+    "run",
+    "verify:examples"
+  ],
+  "exitCode": 0,
+  "cleanBefore": true,
+  "cleanAfter": true,
+  "startedEpochSeconds": 1789867053.7898161,
+  "seconds": 199.52677297592163,
+  "logPath": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1a-s3-20260919/docs-examples.log",
+  "logSha256": "737d4c83127c2e8e54a22c38cd8fe7ccb134a1a997cf4dcea18c3f4d486e21ca",
+  "testTotals": [],
+  "aggregateTestCounts": {
+    "Total": 0,
+    "Failed": 0,
+    "Errors": 0,
+    "Passed": 0,
+    "Skipped": 0
+  }
+}

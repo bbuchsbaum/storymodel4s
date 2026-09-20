@@ -1,0 +1,9 @@
+{
+  "codeRevision": "17194421f018e3780aafa4adf754fccf55398b61",
+  "fullGateReceiptSha256": "f026b65aa501b0c69c8cae612ff0c14e622c1e3bad7fa71e60678790ac589c01",
+  "logBytes": 169927,
+  "sbtWelcome": "[info] welcome to sbt 1.12.14 (Homebrew Java 25.0.1)",
+  "host": "macOS-14.3-arm64-arm-64bit-Mach-O",
+  "s0GoldenSha256": "cc201d9dd3e3576fabcd45677369f00c023ca5a455ea9d9e7ba694700c759fb3",
+  "qualification": "Runtime is bound to the actual sbt welcome; shell java is not substituted. Skip identities are supplied by the independent provider JUnit audit."
+}

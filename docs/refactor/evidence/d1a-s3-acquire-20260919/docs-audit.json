@@ -1,0 +1,34 @@
+{
+  "codeRevision": "17194421f018e3780aafa4adf754fccf55398b61",
+  "receiptSha256": "10576861e0b71bdfb7f63b8b2858872596a0825b3adc189fa4e71fa6b515fa4c",
+  "logSha256": "737d4c83127c2e8e54a22c38cd8fe7ccb134a1a997cf4dcea18c3f4d486e21ca",
+  "command": [
+    "env",
+    "STORYMODEL4S_GRAKERN_BUILD=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+    "npm",
+    "--prefix",
+    "docs-site",
+    "run",
+    "verify:examples"
+  ],
+  "exitCode": 0,
+  "manifestSha256": "e62e57143c8d458fb6931e39e71ff55f5fb77abd76cfac13a9dbce29f9d65e66",
+  "verifierSha256": "7ce9ea1c5c81e9d5ba4f9568d93fe1b37f906489be66ed4c1673e3695bcbdf46",
+  "examples": {
+    "inspect-source": 381,
+    "model-a-story": 729,
+    "penman-to-chart": 840,
+    "resolve-acquisition": 318,
+    "compose-document": 340,
+    "represent-recall": 598,
+    "window-features": 634,
+    "use-embeddings": 436,
+    "align-and-interpret": 551,
+    "summarize-recall": 756,
+    "score-interview": 1074,
+    "save-model": 330,
+    "structural-distance": 402
+  },
+  "findings": [],
+  "qualification": "Local exact-candidate executable documentation output parity, 13 manifest-bound examples; not remote CI."
+}
