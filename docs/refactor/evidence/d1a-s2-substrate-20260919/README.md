@@ -15,9 +15,10 @@ bundle. Lookup is map-backed; the original `SurfaceAtlasConformance.bundleOf` re
 available at its original public path.
 
 `EvidenceSupport.of` checks bundle, stream, kind, axis and extent together. Native
-support belongs to its selected stream. Primary support requires one distinct full
-mapping identity and complete coverage by that mapping's image. Clock arithmetic is
-exact; composition gaps stay gaps. Text spans are selected per stream, and playback
+support belongs to its selected stream. Support projected onto a non-native primary
+axis requires one distinct full mapping identity and complete coverage by that
+mapping's image. Clock arithmetic is exact; composition gaps stay gaps. Text spans
+are selected per stream, and playback
 intervals merge overlaps and adjacency without filling gaps. `TypedSupport`,
 `PrimaryProjection` and the optional `Evidence.anchors` carrier are additive. The
 unusable `LegacyAudioBinding.toMediaSupport` adapter is removed.
@@ -46,7 +47,7 @@ evidence, the compiler evidence ledger and all inline proposal evidence joins.
 | Codec boundary | `EvidenceSupportCodecSuite`: four payload pins and encode/refuse courts, one payload-deletion mutant per anchor; two separate decoder-refusal mutants |
 | Construction doors remain shut | Three private-class to case-class mutants and the unsealing mutant, each after its own `coreJVM/clean` and executed rejecting test; positive consumer construction control retained |
 | Temporary text-only joins | `D1aTextBoundarySuite` and `CompilerSuite`: ordinary claims, boundary beliefs, ledger and inline evidence guards, each with a compiled mutation and text accepting control |
-| Existing text behavior | Unchanged S0 expectations and model codec pin run in the full provider gate; consumer suite uses the exact provider candidate |
+| Existing text behavior | Final provider S0/model-pin run and exact-provider consumer gate are pending; the earlier provider/consumer runs remain historical evidence |
 
 The [settled guard inventory](guard-witness-inventory.json) names all **52** planned
 mutants. [Mutation receipts](mutations.json) bind their original revisions, source and
@@ -55,8 +56,9 @@ compiled and were killed; all named controls passed. The
 [final clean restoration](restored-control-final.json) passes **73 tests** across the
 six focused suites. Source is restored and the isolated clone is clean.
 
-The [separate SD6 review](code-review.json) and repair rechecks have no remaining
-findings. The independent [original mutation audit](mutation-receipt-audit.json) and
+The [separate SD6 review](code-review.json), repair rechecks and
+[receipt/prose review](receipt-review.json) have no remaining findings.
+The independent [original mutation audit](mutation-receipt-audit.json) and
 [settled 52 audit](settled52-audit.json) check evidence against actual source revisions
 and retained logs. Fifteen early witnesses have no retained per-run JUnit: the audit
 uses the exact 19 unconditionally registered test bodies, complete named failure set
@@ -115,7 +117,8 @@ call is needed for these courts.
 
 ## Limits and next slice
 
-This qualifies the source substrate locally. It does not establish executed CI,
+These checks provide local source-substrate evidence; final qualification remains
+pending. They do not establish executed CI,
 remote publication, film compilation, caption licensing, numerical calibration or
 scientific validity. Annotation-timeline primaries are refused by this anchored
 atlas. Point-capable evidence/projection remains required before D1B can carry

@@ -1,0 +1,32 @@
+{
+  "reviewer": "/root/s0_cold_review",
+  "scope": "Bounded non-author README and linked-receipt pass; source/test candidate c24ddd66, evidence commit a830ecbd plus three prose corrections.",
+  "findings": [
+    {
+      "issue": "Primary support wording incorrectly implied native-equals-primary requires a mapping.",
+      "resolution": "Require mapping only for support projected onto a non-native primary axis."
+    },
+    {
+      "issue": "Existing text behavior row could imply the final provider/consumer runs had already passed.",
+      "resolution": "Row explicitly identifies pending final gates and historical earlier evidence."
+    },
+    {
+      "issue": "Limits paragraph prematurely claimed completed local qualification.",
+      "resolution": "States that current checks provide evidence and final qualification is pending."
+    }
+  ],
+  "remainingFindings": [],
+  "checks": [
+    "52 unique manifest witnesses exactly equal settled inventory",
+    "Compiled and accepting-control fields; named failed-test membership",
+    "All52 retained log hashes",
+    "Final manifest hash matches settled52 audit",
+    "73-test clean restoration log hash",
+    "15 disclosed missing per-run JUnit records",
+    "Carry-forward blob equality and exact749-byte test append",
+    "Frozen S0 SHA256",
+    "All README links resolve",
+    "Historical45 manifest retained with matching audit hash"
+  ],
+  "qualification": "Receipt and prose review only. Final provider, formatting, documentation and consumer gate results remain separately required. No sbt run by reviewer."
+}
