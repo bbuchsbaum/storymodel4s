@@ -55,7 +55,14 @@ an exact grakern checkout at `0329c43c88a0b71e9aa4456723bb16bac2fa3841`. Set
 `python3 qualify.py release`; final release and consumer revisions will be recorded
 when those gates finish. Existing output logs are never overwritten.
 
-Pending: per-backend exact comparison, clean
+The [terminal HSMM comparison](hsmm-parity.json) passed on all three backends at
+`369965b2`: JVM/JS `ce61e761…2cf1a`, Native `ccb0b98f…af012`, each 26,284 bytes,
+exactly equal to its immutable baseline. All ten named tests passed (four JVM, three
+each JS/Native). The [capture archive](hsmm-parity-evidence.tar.gz) and its
+[member manifest](hsmm-parity-evidence-manifest.json) preserve actual bytes, raw logs,
+fresh XML and command/runtime receipts. Each byte-comparator mutation was rejected.
+
+Pending: clean
 full provider gate, formatting, 13 documentation examples, exact pinned storyatlas4s
 consumer gate, local landing, and ticket closure. D1B still owns point-capable support,
 all 17 participant parity, and the typed recall path. This slice makes no film compiler,

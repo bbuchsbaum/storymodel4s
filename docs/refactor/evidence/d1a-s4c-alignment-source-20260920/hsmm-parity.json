@@ -1,0 +1,214 @@
+{
+  "schema": "d1a-s4c-hsmm-preservation/v1",
+  "candidateRevision": "369965b29228caccb6baba8cfd4943eee4322fb7",
+  "baselineProductionRevision": "75c8df52adb2ffc54a5cd3586528deddabf4a531",
+  "baselineCaptureRevision": "f3c6edb41621c43de599ef76f66790ae52b5af1e",
+  "baselineManifestSha256": "1b6d0023340bd76d24f6b4bdc24935b587a9b9feffb564342cd9e4c04f816153",
+  "platform": {
+    "system": "Darwin",
+    "release": "23.3.0",
+    "machine": "arm64",
+    "macOS": {
+      "command": [
+        "sw_vers",
+        "-productVersion"
+      ],
+      "exitCode": 0,
+      "output": "14.3"
+    },
+    "node": {
+      "command": [
+        "node",
+        "--version"
+      ],
+      "exitCode": 0,
+      "output": "v26.7.0"
+    },
+    "clang": {
+      "command": [
+        "clang",
+        "--version"
+      ],
+      "exitCode": 0,
+      "output": "Apple clang version 15.0.0 (clang-1500.1.0.2.5)\nTarget: arm64-apple-darwin23.3.0\nThread model: posix\nInstalledDir: /Library/Developer/CommandLineTools/usr/bin"
+    }
+  },
+  "qualification": "Host-bound exact per-backend preservation. Existing JVM resource checksum remains a separate test. Native expected bytes are not a universal cross-OS guarantee; no tolerance or numerical policy changes.",
+  "backends": {
+    "JVM": {
+      "commandReceipt": {
+        "codeRevision": "369965b29228caccb6baba8cfd4943eee4322fb7",
+        "command": [
+          "sbt",
+          "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+          "-batch",
+          "fixturesJVM/testOnly storymodel4s.fixtures.wog.WogHsmmBaselineCaptureSuite storymodel4s.fixtures.wog.WarOfTheGhostsCodecGoldenSuite storymodel4s.fixtures.wog.WarOfTheGhostsCodecGoldenResourceSuite"
+        ],
+        "exitCode": 0,
+        "cleanBefore": true,
+        "cleanAfter": true,
+        "startedEpochSeconds": 1789880258.659379,
+        "seconds": 10.15537405014038,
+        "logPath": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1a-s4c-20260920/hsmm-parity/jvm.log",
+        "logSha256": "6cefadd4c6cdb96e443bf6dff05c93fe9bde1d6d6f3477f13c6be29da7519458",
+        "testTotals": [
+          "[info] Passed: Total 4, Failed 0, Errors 0, Passed 4"
+        ],
+        "aggregateTestCounts": {
+          "Total": 4,
+          "Failed": 0,
+          "Errors": 0,
+          "Passed": 4,
+          "Skipped": 0
+        }
+      },
+      "baselineSha256": "ce61e761a131c1e2ffeebcf912a9c04d9dd2bf2fb4c09f9d4bda0c2741f2cf1a",
+      "actualSha256": "ce61e761a131c1e2ffeebcf912a9c04d9dd2bf2fb4c09f9d4bda0c2741f2cf1a",
+      "baselineBytes": 26284,
+      "actualBytes": 26284,
+      "exactEqual": true,
+      "schemaVersion": "hsmm/v3",
+      "reports": {
+        "storymodel4s.fixtures.wog.WogHsmmBaselineCaptureSuite": {
+          "file": "jvm--storymodel4s.fixtures.wog.WogHsmmBaselineCaptureSuite.xml",
+          "sha256": "171fa59da9e63f97b838c8c42fd1746ddc2f5cd79051fd1cfa52f1de29771ac4"
+        },
+        "storymodel4s.fixtures.wog.WarOfTheGhostsCodecGoldenSuite": {
+          "file": "jvm--storymodel4s.fixtures.wog.WarOfTheGhostsCodecGoldenSuite.xml",
+          "sha256": "ae1224cc9a5d409df9d20bf1c8e5399e2358ad27a6e2a54306e92958cc4cd8b5"
+        },
+        "storymodel4s.fixtures.wog.WarOfTheGhostsCodecGoldenResourceSuite": {
+          "file": "jvm--storymodel4s.fixtures.wog.WarOfTheGhostsCodecGoldenResourceSuite.xml",
+          "sha256": "c795e3494388b8b93c53a917a3dd2b8e090f178069f442005540c9a2c44bc178"
+        }
+      },
+      "namedPassedTests": [
+        "capture the existing canonical WOG HSMM output",
+        "the WOG hsmm/v3 bytes are canonical, sparse, and contain no story text",
+        "the WOG hsmm/v3 bytes contextually decode to the inferred result",
+        "the committed hsmm/v3 resource matches the inferred artifact and fixed checksum"
+      ],
+      "sbtRuntimeFromLog": "[info] welcome to sbt 1.12.14 (Homebrew Java 25.0.1)",
+      "byteComparatorFalsifier": {
+        "originalAccepted": true,
+        "changedLastByteRejected": true,
+        "mutantSha256": "88ceb39d8f2717187854cd8eebba2ed11750fd267ca0d59641dda7de00eebb3c",
+        "changedByteOffset": 26283
+      }
+    },
+    "JS": {
+      "commandReceipt": {
+        "codeRevision": "369965b29228caccb6baba8cfd4943eee4322fb7",
+        "command": [
+          "sbt",
+          "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+          "-batch",
+          "fixturesJS/testOnly storymodel4s.fixtures.wog.WogHsmmBaselineCaptureSuite storymodel4s.fixtures.wog.WarOfTheGhostsCodecGoldenSuite"
+        ],
+        "exitCode": 0,
+        "cleanBefore": true,
+        "cleanAfter": true,
+        "startedEpochSeconds": 1789880268.865866,
+        "seconds": 37.27584099769592,
+        "logPath": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1a-s4c-20260920/hsmm-parity/js.log",
+        "logSha256": "9b49f40bad949275da1d7bdd89c86555383a78af522b846f13b95207a1c0370b",
+        "testTotals": [
+          "[info] Passed: Total 3, Failed 0, Errors 0, Passed 3"
+        ],
+        "aggregateTestCounts": {
+          "Total": 3,
+          "Failed": 0,
+          "Errors": 0,
+          "Passed": 3,
+          "Skipped": 0
+        }
+      },
+      "baselineSha256": "ce61e761a131c1e2ffeebcf912a9c04d9dd2bf2fb4c09f9d4bda0c2741f2cf1a",
+      "actualSha256": "ce61e761a131c1e2ffeebcf912a9c04d9dd2bf2fb4c09f9d4bda0c2741f2cf1a",
+      "baselineBytes": 26284,
+      "actualBytes": 26284,
+      "exactEqual": true,
+      "schemaVersion": "hsmm/v3",
+      "reports": {
+        "storymodel4s.fixtures.wog.WogHsmmBaselineCaptureSuite": {
+          "file": "js--storymodel4s.fixtures.wog.WogHsmmBaselineCaptureSuite.xml",
+          "sha256": "25ccd1187ca4df23330628a01936b00663cd855c6351509109dade26b53755d9"
+        },
+        "storymodel4s.fixtures.wog.WarOfTheGhostsCodecGoldenSuite": {
+          "file": "js--storymodel4s.fixtures.wog.WarOfTheGhostsCodecGoldenSuite.xml",
+          "sha256": "324cbdd7a68e0be4e14a59c77c6155e2b3a5dc67aa61395dd3efed5a6274f45e"
+        }
+      },
+      "namedPassedTests": [
+        "capture the existing canonical WOG HSMM output",
+        "the WOG hsmm/v3 bytes are canonical, sparse, and contain no story text",
+        "the WOG hsmm/v3 bytes contextually decode to the inferred result"
+      ],
+      "sbtRuntimeFromLog": "[info] welcome to sbt 1.12.14 (Homebrew Java 25.0.1)",
+      "byteComparatorFalsifier": {
+        "originalAccepted": true,
+        "changedLastByteRejected": true,
+        "mutantSha256": "88ceb39d8f2717187854cd8eebba2ed11750fd267ca0d59641dda7de00eebb3c",
+        "changedByteOffset": 26283
+      }
+    },
+    "Native": {
+      "commandReceipt": {
+        "codeRevision": "369965b29228caccb6baba8cfd4943eee4322fb7",
+        "command": [
+          "sbt",
+          "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+          "-batch",
+          "fixturesNative/testOnly storymodel4s.fixtures.wog.WogHsmmBaselineCaptureSuite storymodel4s.fixtures.wog.WarOfTheGhostsCodecGoldenSuite"
+        ],
+        "exitCode": 0,
+        "cleanBefore": true,
+        "cleanAfter": true,
+        "startedEpochSeconds": 1789880306.194006,
+        "seconds": 41.655498027801514,
+        "logPath": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1a-s4c-20260920/hsmm-parity/native.log",
+        "logSha256": "729ca602761016b018efd267564a9983913c5f253a289489685d7c6df8fd1340",
+        "testTotals": [
+          "[info] Passed: Total 3, Failed 0, Errors 0, Passed 3"
+        ],
+        "aggregateTestCounts": {
+          "Total": 3,
+          "Failed": 0,
+          "Errors": 0,
+          "Passed": 3,
+          "Skipped": 0
+        }
+      },
+      "baselineSha256": "ccb0b98f21c7c2e1c9d5d81bad3f0858ed4c2f5d4f4c3ac671a6f45b152af012",
+      "actualSha256": "ccb0b98f21c7c2e1c9d5d81bad3f0858ed4c2f5d4f4c3ac671a6f45b152af012",
+      "baselineBytes": 26284,
+      "actualBytes": 26284,
+      "exactEqual": true,
+      "schemaVersion": "hsmm/v3",
+      "reports": {
+        "storymodel4s.fixtures.wog.WogHsmmBaselineCaptureSuite": {
+          "file": "native--storymodel4s.fixtures.wog.WogHsmmBaselineCaptureSuite.xml",
+          "sha256": "6efdf55063b6d4fd1edf859a002cf95a2dafb47f12359b960fcbe91bcec57d97"
+        },
+        "storymodel4s.fixtures.wog.WarOfTheGhostsCodecGoldenSuite": {
+          "file": "native--storymodel4s.fixtures.wog.WarOfTheGhostsCodecGoldenSuite.xml",
+          "sha256": "bf4cbd1138156d5938b5b2ceb30e336d8940faf008f9ed4360ccf1884a80efa2"
+        }
+      },
+      "namedPassedTests": [
+        "capture the existing canonical WOG HSMM output",
+        "the WOG hsmm/v3 bytes are canonical, sparse, and contain no story text",
+        "the WOG hsmm/v3 bytes contextually decode to the inferred result"
+      ],
+      "sbtRuntimeFromLog": "[info] welcome to sbt 1.12.14 (Homebrew Java 25.0.1)",
+      "byteComparatorFalsifier": {
+        "originalAccepted": true,
+        "changedLastByteRejected": true,
+        "mutantSha256": "9782406e8d63594b63b6adb7ec94c748e19c7f2bcb142261aaabd58cbc1b28ab",
+        "changedByteOffset": 26283
+      }
+    }
+  },
+  "unchangedCaptureHarnessSha256": "b02f6057be12b3489f75ed03595f4f63eee7d729d7b4e88466144bf97bd7965d",
+  "allBackendsExact": true
+}
