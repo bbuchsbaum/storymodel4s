@@ -71,7 +71,7 @@ object NarrativeConsistency:
     // are ordinary; without a reference edge there is no structural evidence of duplication, so
     // no rule fires on them. Duplication is only diagnosable through the reference (rule 1) or
     // through the speech-scoped twin (rule 2).
-    val rootAsserted = g.discourseOrder
+    val rootAsserted = m.discourseOrder
       .flatMap(g.situations.get)
       .filter(s => isRoot(s) && s.modality == Modality.Asserted && s.isEvent)
 
@@ -98,7 +98,7 @@ object NarrativeConsistency:
       speechScoped
         .filter(t =>
           t.predicate.lemma == s.predicate.lemma && roleSet(t.id) == roleSet(s.id) &&
-            roleSet(s.id).nonEmpty && s.support.overlaps(t.support) &&
+            roleSet(s.id).nonEmpty && s.support.textSpans.exists(a => t.support.textSpans.exists(a.overlaps)) &&
             !g.referencesOut.getOrElse(s.id, Vector.empty).exists(_.to == t.id) &&
             !g.referencesOut.getOrElse(t.id, Vector.empty).exists(_.to == s.id)
         )

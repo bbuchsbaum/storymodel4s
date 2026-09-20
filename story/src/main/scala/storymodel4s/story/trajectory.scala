@@ -71,65 +71,71 @@ object DiscourseTrajectory:
       atlas: SurfaceAtlas,
       softwareVersion: String = StoryModel.SchemaVersion,
       castResolved: SituationId => Boolean = _ => true
-  ): DiscourseTrajectory =
-    val order = graph.discourseOrder
-    val provenance = Provenance.deterministic(softwareVersion, Checksum.ofText("trajectory-derive"))
-    val steps = order.zip(order.drop(1)).map { (a, b) =>
-      val sa = graph.situations(a)
-      val sb = graph.situations(b)
-      val ea = graph.expandedEntitiesOf(a)
-      val eb = graph.expandedEntitiesOf(b)
-      val union = ea.union(eb)
-      val turnover: ScoreEstimate =
-        if !(castResolved(a) && castResolved(b)) then
-          Estimate.Missing(MissingReason.InputUnresolved)
-        else if union.isEmpty then Estimate.observed(0.0)
-        else Estimate.observed(1.0 - ea.intersect(eb).size.toDouble / union.size)
-      val ctxChange = sa.context != sb.context
-      val scope = graph.commonContext(sa.context, sb.context)
-      val scoped = scope.map(graph.temporalEdgesIn).getOrElse(Vector.empty)
-      val forward = scoped.find(e => e.from == a && e.to == b).map(_.relation)
-      val backward = scoped.find(e => e.from == b && e.to == a).map(_.relation.converse)
-      val transition = forward.orElse(backward) match
-        case Some(TemporalRelation.Meets)  => WorldTimeTransition.Continues
-        case Some(TemporalRelation.Before) => WorldTimeTransition.JumpForward(None)
-        case Some(TemporalRelation.After | TemporalRelation.MetBy) =>
-          WorldTimeTransition.JumpBackward(None)
-        case Some(TemporalRelation.Unclear) | None => WorldTimeTransition.Unresolved(Vector.empty)
-        case Some(_)                               => WorldTimeTransition.SimultaneousThreadSwitch
-      val claimId = ClaimId.unsafe(ContentAddress.of("flow", a.value, b.value))
-      val evidence = Evidence(
-        EvidenceId.unsafe(ContentAddress.of("flow-ev", a.value, b.value)),
-        Some(sa.support ++ sb.support),
-        Set(sa.meta.id, sb.meta.id),
-        DeriveFingerprint,
-        DeriveStage
-      )
-      val meta = ClaimMeta.unsafe(
-        claimId,
-        EpistemicStatus.StructurallyDerived,
-        Credence.unsafeDetermined(DeriveRule),
-        NonEmptyVector.one(evidence),
-        provenance
-      )
-      val endA = sa.support.minSpan.endExclusive
-      val startB = sb.support.minSpan.start
-      val unitsBetween =
-        atlas.sentences.filter(u => u.span.endExclusive >= endA && u.span.start < startB).map(_.id)
-      val beliefs = hierarchy.boundaryBeliefs.filter(bb => unitsBetween.contains(bb.afterUnit))
-      FlowStep(
-        a,
-        b,
-        Map.empty,
-        turnover,
-        None,
-        ctxChange,
-        Resolved(transition, meta, Vector.empty),
-        scope,
-        beliefs
-      )
-    }
-    DiscourseTrajectory(steps)
+  ): Either[DomainError, DiscourseTrajectory] =
+    for
+      bundle <- SourceBundle.writtenText(atlas.source)
+      order <- graph.discourseOrderOn(bundle)
+    yield
+      // The shared checked order has established Text support for every situation. This local
+      // extraction preserves that joined proof; it is not a generic TypedSupport span cast.
+      val supports = graph.situations.view.mapValues(_.support.textSpans.get).toMap
+      val provenance = Provenance.deterministic(softwareVersion, Checksum.ofText("trajectory-derive"))
+      val steps = order.zip(order.drop(1)).map { (a, b) =>
+        val sa = graph.situations(a)
+        val sb = graph.situations(b)
+        val ea = graph.expandedEntitiesOf(a)
+        val eb = graph.expandedEntitiesOf(b)
+        val union = ea.union(eb)
+        val turnover: ScoreEstimate =
+          if !(castResolved(a) && castResolved(b)) then
+            Estimate.Missing(MissingReason.InputUnresolved)
+          else if union.isEmpty then Estimate.observed(0.0)
+          else Estimate.observed(1.0 - ea.intersect(eb).size.toDouble / union.size)
+        val ctxChange = sa.context != sb.context
+        val scope = graph.commonContext(sa.context, sb.context)
+        val scoped = scope.map(graph.temporalEdgesIn).getOrElse(Vector.empty)
+        val forward = scoped.find(e => e.from == a && e.to == b).map(_.relation)
+        val backward = scoped.find(e => e.from == b && e.to == a).map(_.relation.converse)
+        val transition = forward.orElse(backward) match
+          case Some(TemporalRelation.Meets)  => WorldTimeTransition.Continues
+          case Some(TemporalRelation.Before) => WorldTimeTransition.JumpForward(None)
+          case Some(TemporalRelation.After | TemporalRelation.MetBy) =>
+            WorldTimeTransition.JumpBackward(None)
+          case Some(TemporalRelation.Unclear) | None => WorldTimeTransition.Unresolved(Vector.empty)
+          case Some(_)                               => WorldTimeTransition.SimultaneousThreadSwitch
+        val claimId = ClaimId.unsafe(ContentAddress.of("flow", a.value, b.value))
+        val evidence = Evidence(
+          EvidenceId.unsafe(ContentAddress.of("flow-ev", a.value, b.value)),
+          Some(supports(a) ++ supports(b)),
+          Set(sa.meta.id, sb.meta.id),
+          DeriveFingerprint,
+          DeriveStage
+        )
+        val meta = ClaimMeta.unsafe(
+          claimId,
+          EpistemicStatus.StructurallyDerived,
+          Credence.unsafeDetermined(DeriveRule),
+          NonEmptyVector.one(evidence),
+          provenance
+        )
+        val endA = supports(a).minSpan.endExclusive
+        val startB = supports(b).minSpan.start
+        val unitsBetween =
+          atlas.sentences.filter(u => u.span.endExclusive >= endA && u.span.start < startB).map(_.id)
+        val beliefs = hierarchy.boundaryBeliefs.filter(bb => unitsBetween.contains(bb.afterUnit))
+        FlowStep(
+          a,
+          b,
+          Map.empty,
+          turnover,
+          None,
+          ctxChange,
+          Resolved(transition, meta, Vector.empty),
+          scope,
+          beliefs
+        )
+      }
+      DiscourseTrajectory(steps)
 
 enum SensoryModality:
   case Visual, Auditory, Tactile, Motor, Spatial, Olfactory, Gustatory, Interoceptive

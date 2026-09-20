@@ -183,17 +183,19 @@ object StoryValidator:
         err("hypothesis.has-alternatives", path, "a hypothesis needs at least one rival reading")
     }
 
+    // S4a model construction proves every node support is Text; extent remains this validator law.
+    // The optional text accessor is extracted only inside this admitted text-model boundary.
     // node supports within text
     g.situations.values.foreach(s =>
-      if s.support.minSpan.endExclusive > textLen then
+      if s.support.textSpans.get.minSpan.endExclusive > textLen then
         err("support.in-text", s"situations/${s.id.value}", "support exceeds text")
     )
     g.entities.values.foreach(e =>
-      if e.support.minSpan.endExclusive > textLen then
+      if e.support.textSpans.get.minSpan.endExclusive > textLen then
         err("support.in-text", s"entities/${e.id.value}", "support exceeds text")
     )
     g.segments.values.foreach(s =>
-      if s.support.minSpan.endExclusive > textLen then
+      if s.support.textSpans.get.minSpan.endExclusive > textLen then
         err("support.in-text", s"segments/${s.id.value}", "support exceeds text")
     )
 
@@ -401,9 +403,9 @@ object StoryValidator:
         err("containment.acyclic", path, "segment contains itself")
       if okMember && okParent && e.isPrimary then
         val memberSpan = e.member match
-          case NarrativeMember.Situation(id) => g.situations(id).support.minSpan
-          case NarrativeMember.Segment(id)   => g.segments(id).support.minSpan
-        val parentSpan = g.segments(e.parent).support.minSpan
+          case NarrativeMember.Situation(id) => g.situations(id).support.textSpans.get.minSpan
+          case NarrativeMember.Segment(id)   => g.segments(id).support.textSpans.get.minSpan
+        val parentSpan = g.segments(e.parent).support.textSpans.get.minSpan
         if !parentSpan.contains(memberSpan) then
           err(
             "hierarchy.member-within-parent",
@@ -594,7 +596,7 @@ object StoryValidator:
     )
 
     // trajectory: exactly the adjacent pairs of discourse order, in order; turnover in [0,1]
-    val expectedSteps = g.discourseOrder.zip(g.discourseOrder.drop(1))
+    val expectedSteps = m.discourseOrder.zip(m.discourseOrder.drop(1))
     val actualSteps = m.trajectory.steps.map(s => (s.from, s.to))
     if actualSteps != expectedSteps then
       err(

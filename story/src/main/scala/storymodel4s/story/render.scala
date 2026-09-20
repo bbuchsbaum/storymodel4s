@@ -32,7 +32,8 @@ object Renderer:
     }
 
     sb.append("\n## Situations (discourse order)\n")
-    g.discourseOrder.zipWithIndex.foreach { (id, i) =>
+    // S4a admits only text models; S4b moves this operation behind the checked text witness.
+    m.discourseOrder.zipWithIndex.foreach { (id, i) =>
       val s = g.situations(id)
       val parts = g.participantsOf
         .getOrElse(id, Vector.empty)
@@ -43,7 +44,7 @@ object Renderer:
       sb.append(s" | ctx=${ctxLabel(g, s.context)} pol=${s.polarity} mod=${s.modality}")
       sb.append(s" status=${s.meta.status}")
       if parts.nonEmpty then sb.append(s" | $parts")
-      sb.append(s" | ${s.support.minSpan}\n")
+      sb.append(s" | ${s.support.textSpans.get.minSpan}\n")
     }
 
     sb.append("\n## Contexts\n")

@@ -93,20 +93,20 @@ private[story] final class StoryAlignmentSource(model: StoryModel[?]) extends Al
     g.segments.values.toVector.sortBy(s => (s.level, s.id)).map(_.id)
 
   lazy val allNodes: Vector[NarrativeNodeId] =
-    g.discourseOrder.map(NarrativeNodeId.Situation(_)) ++
+    model.discourseOrder.map(NarrativeNodeId.Situation(_)) ++
       segmentsSorted.map(NarrativeNodeId.Segment(_))
 
   def alignableNodes(levels: Set[Int]): Vector[NarrativeNodeId] =
     allNodes.filter(n => levels.contains(levelOf(n)))
 
   def sourceSupport(target: NarrativeNodeId): Option[SpanSet] = target match
-    case NarrativeNodeId.Situation(id) => g.situations.get(id).map(_.support)
-    case NarrativeNodeId.Segment(id)   => g.segments.get(id).map(_.support)
+    case NarrativeNodeId.Situation(id) => g.situations.get(id).flatMap(_.support.textSpans)
+    case NarrativeNodeId.Segment(id)   => g.segments.get(id).flatMap(_.support.textSpans)
 
   def discoursePosition(target: NarrativeNodeId): Option[Int] = target match
-    case NarrativeNodeId.Situation(id) => g.discoursePosition.get(id)
+    case NarrativeNodeId.Situation(id) => model.discoursePosition.get(id)
     case NarrativeNodeId.Segment(id)   =>
-      h.situationsUnder(id).flatMap(g.discoursePosition.get).minOption
+      h.situationsUnder(id).flatMap(model.discoursePosition.get).minOption
 
   private def sit(id: SituationId): NarrativeNodeId = NarrativeNodeId.Situation(id)
 
@@ -189,8 +189,8 @@ private[story] final class StoryAlignmentSource(model: StoryModel[?]) extends Al
       case RelationLayer.Semantic            => Vector.empty
       case RelationLayer.DiscourseSuccession =>
         val order = context match
-          case None    => g.discourseOrder
-          case Some(c) => g.situationsWithin(c)
+          case None    => model.discourseOrder
+          case Some(c) => model.situationsWithin(c)
         order.zip(order.drop(1)).map((a, b) => derived(sit(a), sit(b), 1.0))
       case RelationLayer.Hierarchy =>
         hierarchyMembership.toVector.map((k, w) => derived(k._1, k._2, w))
@@ -199,7 +199,7 @@ private[story] final class StoryAlignmentSource(model: StoryModel[?]) extends Al
         // entity (directly or through group membership); built from the entity index so cost is
         // proportional to Σ_e deg(e)², not to the number of situations squared.
         val pairs = for
-          (_, sits) <- g.situationsByEntity.toVector
+          (_, sits) <- model.situationsByEntity.toVector
           a <- sits
           b <- sits
           if a != b && keep(a, b)

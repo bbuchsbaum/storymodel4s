@@ -15,7 +15,7 @@ object ModelStatus:
   * and an optional receipt. Constructed only through [[StoryModel.draft]] and promoted by
   * validation.
   */
-final class StoryModel[S <: ModelStatus] private[story] (
+final class StoryModel[S <: ModelStatus] private (
     val schemaVersion: String,
     val source: StorySource,
     val atlas: SurfaceAtlas,
@@ -28,7 +28,8 @@ final class StoryModel[S <: ModelStatus] private[story] (
     val descriptors: Vector[DescriptorClaim],
     val hypotheses: Vector[HypothesisClaim],
     val sensoryProfiles: Map[SituationId, Vector[SensoryProfile]],
-    val receipt: Option[BuildReceipt]
+    val receipt: Option[BuildReceipt],
+    val discourseOrder: Vector[SituationId]
 ):
   /** Every inline claim in the model, in a deterministic order: node claims, resolved-value claims
     * (entity labels, segment summaries), scoped attributes, every relation layer, containment,
@@ -38,13 +39,12 @@ final class StoryModel[S <: ModelStatus] private[story] (
     (graph.allMeta ++ hierarchy.allMeta ++ trajectory.allMeta ++ descriptors.map(_.meta) ++
       hypotheses.map(_.meta)).sortBy(_.id)
 
-  // Transitional D1A S2 boundary: S4a makes draft construction return Either. Keep every
-  // constructor/copy/status path text-only until then; 0.7.0 must never export anchors.
-  require(
-    claims.forall(_.evidence.forall(_.anchors.isEmpty)) &&
-      hierarchy.boundaryBeliefs.forall(_.evidence.forall(_.anchors.isEmpty)),
-    "text StoryModel cannot carry anchored evidence"
-  )
+  /** All ordered read views share the order checked during construction. */
+  lazy val discoursePosition: Map[SituationId, Int] = graph.discoursePosition(discourseOrder)
+  lazy val situationsByEntity: Map[EntityId, Vector[SituationId]] = graph.situationsByEntity(discourseOrder)
+  lazy val situationsByContext: Map[ContextId, Vector[SituationId]] = graph.situationsByContext(discourseOrder)
+  def situationsWithin(context: ContextId): Vector[SituationId] = graph.situationsWithin(context, discourseOrder)
+  def situationsCovering(span: TextSpan): Vector[SituationId] = graph.situationsCovering(span, discourseOrder)
 
   /** The derived, normalized claim ledger; fails on duplicate claim identifiers. */
   lazy val ledger: Either[DomainError, ClaimLedger] = ClaimLedger.empty.addAll(claims)
@@ -84,8 +84,8 @@ final class StoryModel[S <: ModelStatus] private[story] (
       hypotheses: Vector[HypothesisClaim] = hypotheses,
       sensoryProfiles: Map[SituationId, Vector[SensoryProfile]] = sensoryProfiles,
       receipt: Option[BuildReceipt] = receipt
-  ): StoryModel[T] =
-    new StoryModel[T](
+  ): Either[DomainError, StoryModel[T]] =
+    StoryModel.checked[T](
       schemaVersion,
       source,
       atlas,
@@ -115,7 +115,8 @@ final class StoryModel[S <: ModelStatus] private[story] (
       descriptors,
       hypotheses,
       sensoryProfiles,
-      receipt
+      receipt,
+      discourseOrder
     )
 
   override def equals(other: Any): Boolean = other match
@@ -195,8 +196,8 @@ object StoryModel:
       sensoryProfiles: Map[SituationId, Vector[SensoryProfile]] = Map.empty,
       receipt: Option[BuildReceipt] = None,
       schemaVersion: String = SchemaVersion
-  ): StoryModel[ModelStatus.Draft] =
-    new StoryModel[ModelStatus.Draft](
+  ): Either[DomainError, StoryModel[ModelStatus.Draft]] =
+    checked[ModelStatus.Draft](
       schemaVersion,
       source,
       atlas,
@@ -211,6 +212,51 @@ object StoryModel:
       sensoryProfiles,
       receipt
     )
+
+  private def checked[S <: ModelStatus](
+    schemaVersion: String,
+    source: StorySource,
+    atlas: SurfaceAtlas,
+    graph: NarrativeGraph,
+    hierarchy: NarrativeHierarchy,
+    trajectory: DiscourseTrajectory,
+    featureSpaces: Map[FeatureSpaceId, FeatureSpace[?]],
+    sidecars: Map[FeatureSpaceId, SidecarManifest],
+    featureRefs: Vector[FeatureRef],
+    descriptors: Vector[DescriptorClaim],
+    hypotheses: Vector[HypothesisClaim],
+    sensoryProfiles: Map[SituationId, Vector[SensoryProfile]],
+    receipt: Option[BuildReceipt]
+  ): Either[DomainError, StoryModel[S]] =
+    val wrongSupport = graph.supportEntries.sortBy(_._1).find(entry => !entry._2.isInstanceOf[TypedSupport.Text])
+    val allClaims = graph.allMeta ++ hierarchy.allMeta ++ trajectory.allMeta ++
+      descriptors.map(_.meta) ++ hypotheses.map(_.meta)
+    if wrongSupport.nonEmpty then
+      Left(DomainError.InvariantViolation(wrongSupport.get._1 + "/support", "text StoryModel requires Text support"))
+    else if allClaims.exists(_.evidence.exists(_.anchors.nonEmpty)) then
+      Left(DomainError.InvariantViolation("model/evidence", "text StoryModel cannot carry anchored claim evidence"))
+    else if hierarchy.boundaryBeliefs.exists(_.evidence.exists(_.anchors.nonEmpty)) then
+      Left(DomainError.InvariantViolation("model/boundary-evidence", "text StoryModel cannot carry anchored boundary evidence"))
+    else
+      for
+        bundle <- SourceBundle.writtenText(source)
+        order <- graph.discourseOrderOn(bundle)
+      yield new StoryModel[S](
+        schemaVersion,
+        source,
+        atlas,
+        graph,
+        hierarchy,
+        trajectory,
+        featureSpaces,
+        sidecars,
+        featureRefs,
+        descriptors,
+        hypotheses,
+        sensoryProfiles,
+        receipt,
+        order
+      )
 
   /** Human adjudication promotes a validated model; the adjudicator is recorded by the caller in
     * the claim ledger, so this is a pure status change.

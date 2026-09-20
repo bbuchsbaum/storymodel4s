@@ -5,10 +5,31 @@ enum TypedSupport:
   case Text(spans: SpanSet)
   case Anchored(support: EvidenceSupport)
 
+  /** Text coordinates only; anchored evidence is never cast to character offsets. */
+  def textSpans: Option[SpanSet] = this match
+    case Text(spans) => Some(spans)
+    case Anchored(_) => None
+
 /** Support on one declared primary axis. Playback intervals retain gaps. */
 enum PrimaryProjection:
   case TextSpans(axis: PresentationAxisId, spans: SpanSet)
   case Playback(axis: PresentationAxisId, intervals: PlaybackIntervalSet)
+
+  /** Exact hull bounds for ordering, without replacing the support's disjoint members. */
+  def bounds: (Long, Long) = this match
+    case TextSpans(_, spans) => (spans.minSpan.start.toLong, spans.minSpan.endExclusive.toLong)
+    case Playback(_, intervals) =>
+      (intervals.intervals.toVector.map(_.start).min, intervals.intervals.toVector.map(_.endExclusive).max)
+
+object PrimaryProjection:
+  /** S4a's checked text projection. Source extent remains a validator law. */
+  def on(bundle: SourceBundle, support: TypedSupport): Either[DomainError, PrimaryProjection] =
+    if bundle.primaryAxis.kind != AxisKind.TextCharacter then
+      Left(SourceCanon.inv("projection/primary-kind", "text projection requires TextCharacter"))
+    else support match
+      case TypedSupport.Text(spans) => Right(PrimaryProjection.TextSpans(bundle.primaryAxis.id, spans))
+      case TypedSupport.Anchored(_) =>
+        Left(SourceCanon.inv("projection/support-kind", "text projection requires Text support"))
 
 private[core] object SourceSupportChecks:
   private def invalid(rule: String, detail: String): Left[DomainError, Nothing] =
