@@ -3,8 +3,8 @@ package storymodel4s.bench.filmfestival
 import java.nio.file.Files
 
 import munit.FunSuite
-import storymodel4s.bench.video.{WorldOrderAbsence, WorldOrderInput}
-import storymodel4s.core.Checksum
+import storymodel4s.bench.video.{MediaLocus, WorldOrderAbsence, WorldOrderInput}
+import storymodel4s.core.{Checksum, PlaybackInstant, PlaybackInterval}
 
 /** Synthetic adapter courts; no corpus or participant prose is embedded here. */
 class FilmFestivalSuite extends FunSuite:
@@ -24,8 +24,28 @@ class FilmFestivalSuite extends FunSuite:
     assertEquals(axes.size, 2)
     assertEquals(built.segmentByRef.values.flatMap(_.group.map(_.ordinal)).toSet, Set(1, 107))
     assert(built.segmentByRef.keys.forall(built.media.contains))
-    // The instant-only second group has no nonzero hull; its leaf retains its own instant.
-    assertEquals(built.groupByRef.keys.count(built.media.contains), 1)
+    assertEquals(built.groupByRef.keys.count(built.media.contains), 2)
+    val interval = PlaybackInterval.on(axes("run-01"), 0L, 5000L).fold(e => fail(e.message), identity)
+    val point = PlaybackInstant.on(axes("run-02"), 0L).fold(e => fail(e.message), identity)
+    val groups = built.groupByRef.map { case (ref, group) => group.ordinal -> built.media(ref) }
+    assertEquals(groups(1), MediaLocus.Extent("run-01", interval))
+    assertEquals(groups(107), MediaLocus.Instant("run-02", point))
+    val secondLeaf = built.segmentByRef.find(_._2.ordinal == 2).get._1
+    assertEquals(built.media(secondLeaf), MediaLocus.Instant("run-02", point))
+  }
+
+  test("accepting control: an interval-only film group retains its exact extent") {
+    val table = FilmFestivalAnnotation.Table(
+      Vector(
+        FilmFestivalAnnotation
+          .Row(1, "run-01", "Run 1", "synthetic one", Some(1), 0, Some(5), "Synthetic alpha.")
+      ),
+      Checksum.ofText("synthetic interval control")
+    )
+    val (built, axes) = FilmFestivalAnnotationView.build(table).fold(e => fail(e.message), identity)
+    val interval = PlaybackInterval.on(axes("run-01"), 0L, 5000L).fold(e => fail(e.message), identity)
+    assertEquals(built.groupByRef.size, 1)
+    assertEquals(built.media(built.groupByRef.keys.head), MediaLocus.Extent("run-01", interval))
   }
 
   test("requested ONNX fails closed unless both artifacts exist") {
