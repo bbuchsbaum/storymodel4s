@@ -89,5 +89,12 @@
     "embed-bench/src/test/scala/storymodel4s/bench/sherlock/D1bSherlockSupportCapture.scala"
   ],
   "changes": "Three additive capture JSON fields (separately compiled and real-data checked); FilmFestival test expectation repair plus interval control (separately qualified). No production/build source changed.",
-  "originalMutationCourtStill67": true
+  "originalMutationCourtStill67": true,
+  "finalProviderCandidate": "774fb1e8fa7358de3d8343e78371f5b4d36eb1cf",
+  "all17ProductionBuildUnchangedFrom": "4fbb8c7e7e3f040e0f1a9b4ede9a266d4540b93d",
+  "wogProductionBuildUnchangedFrom": "661c7fca871b2394754794bd6dd974195163043a",
+  "wogCaptureHarnessUnchanged": {
+    "path": "fixtures/src/test/scala/storymodel4s/fixtures/wog/WogHsmmBaselineCaptureSuite.scala",
+    "sha256": "b02f6057be12b3489f75ed03595f4f63eee7d729d7b4e88466144bf97bd7965d"
+  }
 }

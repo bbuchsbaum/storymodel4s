@@ -7,8 +7,10 @@ provider candidate `774fb1e8`; its production APIs are identical to the inspecte
 `850a6d64` checkpoint. S4c is substantively landed at `146df652`. D1B's release
 gate is pending when this draft is written. This document does not qualify D1B.
 
-Status: awaiting cold review, actual child-ticket filing and presentation of the
-status decision to the owner. The owner has not chosen the caption license.
+Status: cold review completed with both findings repaired; see the
+[review record](../refactor/evidence/d1a-film-phase-plan-20260920/cold-review.json).
+Actual child-ticket filing and presentation of the status decision remain pending.
+The owner has not chosen the caption license.
 The [child payloads](../refactor/evidence/d1a-film-phase-plan-20260920/children.json)
 are reviewable filing inputs, not existing tickets. Tracker mutations are currently
 blocked by automatic approval review; no acceptance criterion is waived for that.

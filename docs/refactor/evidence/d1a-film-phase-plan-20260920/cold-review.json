@@ -1,0 +1,27 @@
+{
+  "schema": "film-phase-plan/cold-review/v1",
+  "initialCandidate": "1962b052",
+  "repairCandidate": "ca3577e2",
+  "reviewedScope": "Documentation and proposed child payloads only; no film implementation or tracker mutation",
+  "reviews": [
+    {
+      "reviewer": "/root (relayed fresh-context plan reviewer)",
+      "findings": [
+        "F1 input-only slice cannot claim emitted-claim provenance before F5 compiler exists.",
+        "Parent relations do not block the film parent; add explicit F6 blocks parent edge."
+      ],
+      "repairs": "F1 keeps input associations/selection helper; F5 owns actual emitted-claim inclusion/exclusion. Additional blocking edge is explicit. Plan owns asking the status question before its closure; F0 records the answer.",
+      "verdict": "Repair re-review clean; no remaining findings."
+    },
+    {
+      "reviewer": "/root/s0_cold_review",
+      "scope": "Independent source/API cross-check at1962b052",
+      "verdict": "No P1/P2; all eleven source hashes match850/774/1962, seven slices cover all ten questions, future capabilities and unchosen owner policy remain explicit."
+    }
+  ],
+  "remainingAcceptance": [
+    "File actual child tickets and blocking edges, with filing receipt.",
+    "Put the concrete status decision to owner with affected actual child link."
+  ],
+  "limits": "Cold text/source review only; no executable compiler, license decision, remote CI or scientific qualification."
+}

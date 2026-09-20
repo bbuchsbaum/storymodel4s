@@ -1,6 +1,6 @@
 {
   "schema": "film-phase-plan/child-filing-proposal/v1",
-  "status": "Draft payloads only; not filed or dispatched",
+  "status": "Cold-reviewed filing payloads; not filed or dispatched",
   "parent": "bd-01M2T32SGVJXR2RT3RTS2DCN9P",
   "phasePlanTicket": "bd-01M2TAGST4EBFR1HM9Q3EWSYAH",
   "plan": "docs/plans/2026-09-20-film-compiler-phase-plan.md",
