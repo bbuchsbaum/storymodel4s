@@ -1,0 +1,163 @@
+{
+  "ticket": "bd-01M2TAC80YRK5JFNKTT7B7CAQN",
+  "status": "partial qualification; final courts pending",
+  "operativeInterpretation": [
+    "Exact physical support admits intervals and explicit points; point row13 is mandatory.",
+    "Legacy annotation-text coordinates remain declared scoring features only, separately fingerprinted; they are never physical support.",
+    "No generic non-text wire representation: hsmm/v3 JSON remains text-only and byte-identical; every generic encoding door refuses unsupported non-text results with a typed error; support-bearing v4 is deferred.",
+    "Tracker body/status are retained as observed; automatic review currently blocks ordinary tracker mutations."
+  ],
+  "criteria": [
+    {
+      "number": 1,
+      "implementation": [
+        "TypedSupport node/cell fields",
+        "optional ScoringPosition",
+        "full-inventory HsmmResult.sourceSupport"
+      ],
+      "witnesses": [
+        "D1bScoringPositionSuite",
+        "AlignCodecSuite unused point retention",
+        "real-support-parity.json"
+      ],
+      "mutations": [
+        "position-missing-as-zero",
+        "position-denominator",
+        "position-total-accessor",
+        "fingerprint-physical",
+        "fingerprint-feature-spans",
+        "fingerprint-feature-kind",
+        "fingerprint-denominator",
+        "result-duplicate-inventory",
+        "result-lookup-inventory",
+        "result-nomination-inventory",
+        "result-retain-unused"
+      ],
+      "status": "focused/mutation/real-coordinate courts passed; full gate pending"
+    },
+    {
+      "number": 2,
+      "implementation": [
+        "SherlockSourceAtlas composed core atlas",
+        "SherlockAnnotationView typed support substitution with explicit legacy scoring feature"
+      ],
+      "witnesses": [
+        "SherlockAnnotationsSuite LCM/gap/point/receipt courts",
+        "SherlockRecallMappingSuite separate frozen legacy and typed fingerprints",
+        "real-support-parity.json"
+      ],
+      "mutations": [
+        "composition-rate",
+        "composition-project-scale",
+        "composition-receipt-record",
+        "composition-receipt-annotation",
+        "composition-receipt-parts",
+        "composition-native-point",
+        "composition-primary-point",
+        "composition-scene-points"
+      ],
+      "status": "real1000/50/1050 and nine falsifiers passed; all17 running"
+    },
+    {
+      "number": 3,
+      "implementation": [
+        "checked encode/toJson/decode/decodeJson",
+        "generic Encoder removed",
+        "canonical text v1 fingerprint retained"
+      ],
+      "witnesses": [
+        "AlignCodecSuite",
+        "D1bPointCodecSuite"
+      ],
+      "mutations": [
+        "wire-legacy-feature",
+        "wire-feature-equality",
+        "wire-toJson-refusal",
+        "wire-encode-refusal",
+        "wire-decode-refusal",
+        "wire-decodeJson-refusal",
+        "wire-generic-encoder",
+        "point-component-binding",
+        "point-component-tick"
+      ],
+      "status": "focused and mutation passed; per-backend WOG pending"
+    },
+    {
+      "number": 4,
+      "witnesses": [
+        "all17-replay.py frozen2577 projection",
+        "support-parity.py frozen1000 row oracle",
+        "unchanged frozen S0 JSON",
+        "hsmm-parity.py backend-specific bytes"
+      ],
+      "status": "coordinate passed; all17 and WOG/S0 full gate pending"
+    },
+    {
+      "number": 5,
+      "witnesses": [
+        "D1bPlaybackSupportBoundarySuite",
+        "D1bResultBoundarySuite",
+        "D1bPointSupportSuite"
+      ],
+      "mutations": [
+        "playback-nonempty",
+        "playback-interval-axis",
+        "playback-point-axis",
+        "playback-retain-points",
+        "playback-retain-inside-points",
+        "playback-deduplicate-points",
+        "playback-sort-points",
+        "playback-merge-overlap",
+        "playback-preserve-gap",
+        "playback-point-lower-bound",
+        "playback-point-upper-bound",
+        "containment-axis",
+        "containment-points",
+        "containment-positive-duration",
+        "point-native-end",
+        "point-kind",
+        "point-clock-end",
+        "point-clock-start",
+        "point-composition-gap",
+        "point-composition-source-extent",
+        "point-hull-refusal",
+        "point-axis-selection",
+        "identity-full-binding",
+        "identity-point-tick",
+        "identity-point-axis",
+        "identity-point-stream",
+        "constructor-PlaybackSupport",
+        "product-PlaybackSupport",
+        "mirror-PlaybackSupport",
+        "constructor-HsmmResult",
+        "product-HsmmResult",
+        "mirror-HsmmResult",
+        "point-component-binding",
+        "point-component-tick"
+      ],
+      "status": "67/67 settled mutations includes all eight fresh main/probe compile doors; restored90pass"
+    },
+    {
+      "number": 6,
+      "witnesses": [
+        "docs/api-stability.md",
+        "ADR0007 D1B refinement"
+      ],
+      "status": "documented; final qualification links pending"
+    }
+  ],
+  "remaining": [
+    "platform-labelled WOG bytes",
+    "all17 terminal projection",
+    "clean56-task provider full gate",
+    "separate format gate",
+    "13 docs examples",
+    "exact-pinned storyatlas consumer",
+    "final cold evidence review/local landing/tracker reconciliation"
+  ],
+  "limitations": [
+    "Not an end-to-end film compiler or full D1B scientific proof",
+    "No new Native numerical identity/tolerance policy",
+    "No remote CI, publication or push"
+  ]
+}
