@@ -329,7 +329,7 @@ object Mutations:
   def incompleteTrajectory(b: Small.Built): StoryModel[ModelStatus.Draft] =
     val t = DiscourseTrajectory
       .derive(b.graph, b.hierarchy, b.atlas)
-      .fold(error => throw new IllegalArgumentException(error.message), _.model)
+      .fold(error => throw new IllegalArgumentException(error.message), identity)
     StoryModel
       .draftText(b.atlas, b.graph, b.hierarchy, DiscourseTrajectory(t.steps.drop(1)))
       .fold(error => throw new IllegalArgumentException(error.message), _.model)

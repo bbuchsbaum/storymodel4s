@@ -78,9 +78,10 @@ class GraphSuite extends ScalaCheckSuite:
   property("renderer output is deterministic and lists every situation and entity") {
     forAll { (b: Small.Built) =>
       val m = b.draft()
-      val t1 = Renderer.text(m)
-      val t2 = Renderer.text(m)
-      val d = Renderer.dot(m)
+      val text = StoryModel.asText(m).getOrElse(fail("fixture lost its text witness"))
+      val t1 = Renderer.text(text)
+      val t2 = Renderer.text(text)
+      val d = Renderer.dot(text)
       t1 == t2 && d == Renderer.dot(m) &&
       b.graph.situations.keys.forall(id => t1.contains(id.value) && d.contains(id.value)) &&
       b.graph.entities.keys.forall(id => t1.contains(id.value))
@@ -94,7 +95,10 @@ class GraphSuite extends ScalaCheckSuite:
       situations = g.situations.toVector.reverse.toMap,
       entities = g.entities.toVector.reverse.toMap
     )
-    assertEquals(Renderer.text(b.draft(graph = shuffled)), Renderer.text(b.draft()))
+    assertEquals(
+      Renderer.text(StoryModel.asText(b.draft(graph = shuffled)).get),
+      Renderer.text(StoryModel.asText(b.draft()).get)
+    )
   }
 
   test("hierarchy helpers") {

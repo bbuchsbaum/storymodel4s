@@ -51,8 +51,8 @@ class D1aEnvelopeSuite extends FunSuite:
     val adjudicated = StoryModel.adjudicated(validated)
     assert(validated.text eq model.text)
     assert(adjudicated.text eq model.text)
-    assertEquals(validated.model, model.model)
-    assertEquals(adjudicated.model, model.model)
+    assert(validated.model == model.model)
+    assert(adjudicated.model == model.model)
 
   test("non-text identity binds full axis extent and timebase despite equal legacy bundle ids"):
     val base = film()
