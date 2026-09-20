@@ -4,7 +4,7 @@ import java.net.{URL, URLClassLoader}
 
 import munit.FunSuite
 
-import storymodel4s.story.StoryModel
+import storymodel4s.story.TextModel
 
 /** Guards fixture initialization in a classloader unaffected by the order of other test suites. */
 class WarOfTheGhostsInitializationSuite extends FunSuite:
@@ -24,7 +24,7 @@ class WarOfTheGhostsInitializationSuite extends FunSuite:
 
       val fixture = module(loader, "storymodel4s.fixtures.wog.WarOfTheGhostsModel$")
       assert(fixture.getClass.getClassLoader eq loader, "model escaped isolation")
-      val model = fixture.getClass.getMethod("model").invoke(fixture).asInstanceOf[StoryModel[?]]
+      val model = fixture.getClass.getMethod("model").invoke(fixture).asInstanceOf[TextModel[?]]
       assertEquals(model.graph.situations.size, 71)
     finally loader.close()
   }

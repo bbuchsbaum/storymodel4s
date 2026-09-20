@@ -12,9 +12,11 @@ class D1aGraphBoundarySuite extends FunSuite:
       import storymodel4s.core.*
       import storymodel4s.story.*
       def checked(graph: NarrativeGraph, bundle: SourceBundle) = graph.discourseOrderOn(bundle)
-      def read(model: StoryModel[ModelStatus.Draft], context: ContextId, span: TextSpan) =
+      def read(model: StoryModel[ModelStatus.Draft], context: ContextId) =
         (model.discourseOrder, model.discoursePosition, model.situationsByEntity,
-          model.situationsByContext, model.situationsWithin(context), model.situationsCovering(span))
+          model.situationsByContext, model.situationsWithin(context))
+      def textRead(model: TextModel[ModelStatus.Draft], span: TextSpan) =
+        model.situationsCovering(span)
     """))
 
   test("unbound graph discourse order is internal"):

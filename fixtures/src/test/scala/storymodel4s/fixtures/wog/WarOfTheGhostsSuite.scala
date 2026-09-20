@@ -544,6 +544,6 @@ class WarOfTheGhostsSuite extends munit.FunSuite:
     val graph = g.copy(relations = g.relations.copy(temporal = g.relations.temporal :+ beliefEdge))
     val out = StoryValidator.validate(redraft(graph))
     assertEquals(out.report.errors, Vector.empty, out.report.render)
-    val world = AlignmentSource(out.validated.get).relationMatrix(RelationLayer.WorldTime)
+    val world = AlignmentSource(out.validated.get.model).relationMatrix(RelationLayer.WorldTime)
     assert(!world.contains((sit(S.dead), sit(S.battle))))
   }

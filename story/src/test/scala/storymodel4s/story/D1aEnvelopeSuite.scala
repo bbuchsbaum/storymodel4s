@@ -73,7 +73,12 @@ class D1aEnvelopeSuite extends FunSuite:
         right(SourceDerivationReceipt.of(algorithm, "parameters", Vector(Checksum.ofText("input")))))
     val bundle = film()
     val first = bound("First caption.", "captioner")
-    val variants = Vector(None, Some(bound("Other caption.", "captioner")), Some(bound("First caption.", "other-captioner")))
+    val token = first.surface.tokens.head
+    val changedUnits = right(SurfaceAtlas.of(first.surface.source, first.surface.units.map(u =>
+      if u.id == token.id then u.copy(id = SurfaceUnitId.unsafe("renamed-token")) else u)))
+    val structuralVariant = BoundProposalSurface.of(changedUnits, first.receipt)
+    assertEquals(structuralVariant.surface.source, first.surface.source)
+    val variants = Vector(None, Some(bound("Other caption.", "captioner")), Some(bound("First caption.", "other-captioner")), Some(structuralVariant))
     variants.foreach { surface =>
       assertNotEquals(draft(bundle, surface).storyId, draft(bundle, Some(first)).storyId)
       assertNotEquals(draft(bundle, surface).sourceChecksum, draft(bundle, Some(first)).sourceChecksum)
@@ -129,3 +134,122 @@ class D1aEnvelopeSuite extends FunSuite:
     val repeated = right(base.copy[ModelStatus.Draft](graph = g.copy(situations = Map(a.id -> a, asserted.id -> asserted), relations = RelationLayers.empty.copy(references = Vector(ref)))))
     assert(StoryValidator.validate(repeated).report.warnings.exists(_.law == "no-duplicate-occurrence-via-retrospective-reference"))
     assert(!StoryValidator.validate(repeated).report.violations.exists(_.law == "explicit-causal-requires-span-with-causal-cue"))
+
+  /** Two native picture axes in one legacy bundle identity; either may be primary. */
+  private def twoAxes(): (SourceBundle, SourceBundle) =
+    val seed = film()
+    val edition = Some(EditionId.unsafe("two-axis-film"))
+    val aId = StreamId.unsafe("picture-a")
+    val bId = StreamId.unsafe("picture-b")
+    def stream(id: StreamId, axis: PresentationAxis): SourceStream =
+      right(SourceStream.of(id, StreamKind.Picture, Checksum.ofText(id.value), axis.id,
+        axis.extent, axis.timebase, Vector.empty))
+    val placeholders = Vector(stream(aId, seed.primaryAxis), stream(bId, seed.primaryAxis))
+    val id = right(SourceBundle.computeId(edition, SourceKind.FilmEdition, placeholders,
+      AxisKind.EditionPlayback, Vector(aId, bId)))
+    val a = right(PresentationAxis.editionPlayback(id, edition.get, 0L, 100L, RationalTimebase.Millisecond))
+    val b = right(PresentationAxis.editionPlayback(id, edition.get, 0L, 200L, RationalTimebase.Millisecond))
+    val streams = Vector(stream(aId, a), stream(bId, b))
+    def bundle(axis: PresentationAxis) = right(SourceBundle.of(edition, SourceKind.FilmEdition,
+      streams, axis, Vector(aId, bId), Vector.empty))
+    (bundle(a), bundle(b))
+
+  private def mediaAt(bundle: SourceBundle, stream: SourceStream, axis: PresentationAxis, start: Long, end: Long): EvidenceAnchor =
+    EvidenceAnchor.MediaTime(bundle.id, stream.id, axis.id,
+      PlaybackIntervalSet.one(right(PlaybackInterval.on(axis, start, end))))
+
+  test("bundle-only copy recomputes primary selection and reverses order while retaining native evidence"):
+    val (a, b) = twoAxes()
+    assertEquals(a.id, b.id)
+    def mixed(aStart: Long, bStart: Long): TypedSupport =
+      TypedSupport.Anchored(right(EvidenceSupport.of(a, Vector(
+        mediaAt(a, a.streams(0), a.primaryAxis, aStart, aStart + 2L),
+        mediaAt(a, a.streams(1), b.primaryAxis, bStart, bStart + 2L)))))
+    val firstSupport = mixed(1L, 50L)
+    val secondSupport = mixed(10L, 2L)
+    def supported(key: String, support: TypedSupport): SituationNode = event(a, key, 1L, 3L) match
+      case SituationNode.Event(n) => SituationNode.Event(n.copy(support = support))
+      case _ => fail("event fixture changed")
+    val first = supported("first", firstSupport)
+    val second = supported("second", secondSupport)
+    val context = graph(a).contexts(world).copy(support = firstSupport)
+    val g = graph(a).copy(contexts = Map(world -> context), situations = Map(first.id -> first, second.id -> second))
+    val before = right(StoryModel.draft(atlas(a), g, NarrativeHierarchy.empty, DiscourseTrajectory.empty))
+    val after = right(before.copy[ModelStatus.Draft](atlas = atlas(b)))
+    assertEquals(before.discourseOrder, Vector(first.id, second.id))
+    assertEquals(after.discourseOrder, Vector(second.id, first.id))
+    assertEquals(after.situationsByContext(world), Vector(second.id, first.id))
+    assertEquals(after.graph, before.graph)
+    assertEquals(before.projectionOf(firstSupport).bounds, (1L, 3L))
+    assertEquals(after.projectionOf(firstSupport).bounds, (50L, 52L))
+    assertEquals(after.graph.situations(first.id).support, firstSupport)
+    assertNotEquals(before.sourceChecksum, after.sourceChecksum)
+
+  test("node membership is rechecked independently of an available primary interval"):
+    val (a, b) = twoAxes()
+    val support = right(EvidenceSupport.of(a, Vector(
+      mediaAt(a, a.streams(0), a.primaryAxis, 1L, 3L),
+      mediaAt(a, a.streams(1), b.primaryAxis, 50L, 52L))))
+    val original = graph(a).contexts(world)
+    val g = graph(a).copy(contexts = Map(world -> original.copy(support = TypedSupport.Anchored(support))))
+    val accepted = right(StoryModel.draft(atlas(a), g, NarrativeHierarchy.empty, DiscourseTrajectory.empty))
+    val other = a.streams(1)
+    val narrowed = right(SourceStream.of(other.id, other.kind, other.checksum, other.nativeAxis,
+      right(AxisExtent.playbackTicks(0L, 40L, RationalTimebase.Millisecond)), other.timebase, other.derivedFrom))
+    val changed = right(SourceBundle.of(a.edition, a.sourceKind, Vector(a.streams(0), narrowed),
+      a.primaryAxis, a.authorityTracks, a.mappings))
+    assertEquals(a.id, changed.id)
+    assert(right(support.intervalsOn(changed.primaryAxis.id)).intervals.toVector.nonEmpty)
+    assert(accepted.copy[ModelStatus.Draft](atlas = atlas(changed)).isLeft)
+    assert(StoryModel.draft(atlas(changed), g, NarrativeHierarchy.empty, DiscourseTrajectory.empty).isLeft)
+
+  test("non-primary coordinate metadata and mapping payload reach both model identity fields"):
+    val (base, otherPrimary) = twoAxes()
+    val secondary = base.streams(1)
+    val changedStream = right(SourceStream.of(secondary.id, secondary.kind, secondary.checksum,
+      secondary.nativeAxis, right(AxisExtent.playbackTicks(0L, 150L, RationalTimebase.Millisecond)),
+      secondary.timebase, secondary.derivedFrom))
+    val changedMetadata = right(SourceBundle.of(base.edition, base.sourceKind,
+      Vector(base.streams(0), changedStream), base.primaryAxis, base.authorityTracks, Vector.empty))
+    val receipt = right(SourceDerivationReceipt.of("clock", "parameters", Vector(Checksum.ofText("input"))))
+    def mapped(offset: Long): SourceBundle =
+      val repair = right(ClockRepair.of(otherPrimary.primaryAxis.id, base.primaryAxis.id,
+        right(ExactRational.of(1L, 1L)), right(ExactRational.of(offset, 1L)), receipt))
+      right(SourceBundle.of(base.edition, base.sourceKind, base.streams, base.primaryAxis,
+        base.authorityTracks, Vector(repair)))
+    Vector((base, changedMetadata), (mapped(0L), mapped(1L))).foreach { (before, after) =>
+      assertEquals(before.id, after.id)
+      assertNotEquals(draft(before).storyId, draft(after).storyId)
+      assertNotEquals(draft(before).sourceChecksum, draft(after).sourceChecksum)
+    }
+
+  test("primary interval union preserves gaps and selects every direct primary anchor"):
+    val bundle = film()
+    val stream = bundle.streams.head.id
+    def iv(a: Long, b: Long) = right(PlaybackInterval.on(bundle.primaryAxis, a, b))
+    val support = right(EvidenceSupport.of(bundle, Vector(
+      EvidenceAnchor.MediaTime(bundle.id, stream, bundle.primaryAxis.id,
+        right(PlaybackIntervalSet.of(Vector(iv(1L, 5L), iv(10L, 12L))))),
+      EvidenceAnchor.Shot(bundle.id, stream, ShotId.unsafe("shot"), iv(4L, 8L)),
+      EvidenceAnchor.Track(bundle.id, stream, TrackId.unsafe("track"), PlaybackIntervalSet.one(iv(20L, 21L))))))
+    val projection = right(PrimaryProjection.on(bundle, TypedSupport.Anchored(support)))
+    projection match
+      case PrimaryProjection.Playback(axis, intervals) =>
+        assertEquals(axis, bundle.primaryAxis.id)
+        assertEquals(intervals.intervals.toVector.map(i => (i.start, i.endExclusive)),
+          Vector((1L, 8L), (10L, 12L), (20L, 21L)))
+      case _ => fail("lost playback projection")
+    assertEquals(support.anchors.length, 3)
+
+  test("native-only support is refused even when an explicit map exists"):
+    val (base, other) = twoAxes()
+    val receipt = right(SourceDerivationReceipt.of("clock", "parameters", Vector.empty))
+    val repair = right(ClockRepair.of(other.primaryAxis.id, base.primaryAxis.id,
+      right(ExactRational.of(1L, 1L)), right(ExactRational.of(0L, 1L)), receipt))
+    val bundle = right(SourceBundle.of(base.edition, base.sourceKind, base.streams, base.primaryAxis,
+      base.authorityTracks, Vector(repair)))
+    val native = right(EvidenceSupport.of(bundle, Vector(mediaAt(bundle, bundle.streams(1), other.primaryAxis, 1L, 3L))))
+    assert(PrimaryProjection.on(bundle, TypedSupport.Anchored(native)).isLeft)
+    val context = graph(bundle).contexts(world).copy(support = TypedSupport.Anchored(native))
+    assert(StoryModel.draft(atlas(bundle), graph(bundle).copy(contexts = Map(world -> context)),
+      NarrativeHierarchy.empty, DiscourseTrajectory.empty).isLeft)
