@@ -1,0 +1,3549 @@
+{
+  "codeRevision": "c24ddd66026f0d1848b61369b0bbaff7a90a5d40",
+  "command": [
+    "sbt",
+    "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+    "-batch",
+    "clean",
+    "compileAll",
+    "testAll"
+  ],
+  "receiptSha256": "633a9ff6724c971c1d702f5ead3d8adeca14bdf41fd6a6bc11757a4a480d8b49",
+  "logSha256": "13e6b656a44724e9bf094b44c4195bbc84aba31a69c65e3432ed60d71fe16821",
+  "taskCount": 56,
+  "aggregateTestCounts": {
+    "Total": 6605,
+    "Failed": 0,
+    "Errors": 0,
+    "Passed": 6600,
+    "Skipped": 5
+  },
+  "s0GoldenSha256": "cc201d9dd3e3576fabcd45677369f00c023ca5a455ea9d9e7ba694700c759fb3",
+  "cleanCloneObserved": true,
+  "freshnessTimeBasis": "log file creation timestamp",
+  "snapshotDirectory": "data/study/film-foundation-goal-20260919/root-s2-final-provider-audit",
+  "tasks": [
+    {
+      "task": "coreJVM/test",
+      "suites": [
+        {
+          "name": "storymodel4s.core.AddressSuite",
+          "file": "coreJVM-test/TEST-storymodel4s.core.AddressSuite.xml",
+          "sha256": "9fdfc22c1d5428db62b7a5031e641773ab3c436a03d2c2c342e2b4138f40d01a"
+        },
+        {
+          "name": "storymodel4s.core.AnnotationAxisSuite",
+          "file": "coreJVM-test/TEST-storymodel4s.core.AnnotationAxisSuite.xml",
+          "sha256": "65b93f6f63497291b14522bf9c111ba0ca8ddda07aa8111ca1437ec4c0bee250"
+        },
+        {
+          "name": "storymodel4s.core.AtlasSuite",
+          "file": "coreJVM-test/TEST-storymodel4s.core.AtlasSuite.xml",
+          "sha256": "6d03ab9ea8e1e6c32d65fef0f069140c4a0e440866cbb773a2cc75a9c94cf18d"
+        },
+        {
+          "name": "storymodel4s.core.ClaimSuite",
+          "file": "coreJVM-test/TEST-storymodel4s.core.ClaimSuite.xml",
+          "sha256": "65aeae39cf864e45fd998bfe2ab8aa9aee7686823250f4d34c8cedd38e2e04f2"
+        },
+        {
+          "name": "storymodel4s.core.D1aAtlasSuite",
+          "file": "coreJVM-test/TEST-storymodel4s.core.D1aAtlasSuite.xml",
+          "sha256": "6374e7937e4b7553f000713d7ef99b92ac36abd363b4117b9e4292af3efa6a31"
+        },
+        {
+          "name": "storymodel4s.core.D1aSupportSuite",
+          "file": "coreJVM-test/TEST-storymodel4s.core.D1aSupportSuite.xml",
+          "sha256": "8c30a08b87ed8c4f0dc854bc42f9a243ef5d657d6363830c20b442ec80773ebe"
+        },
+        {
+          "name": "storymodel4s.core.HashSuite",
+          "file": "coreJVM-test/TEST-storymodel4s.core.HashSuite.xml",
+          "sha256": "3b524458101e5fa104d9a53ceda1447a510538057e52d4aa4e78ef834ef55d3d"
+        },
+        {
+          "name": "storymodel4s.core.IdsSuite",
+          "file": "coreJVM-test/TEST-storymodel4s.core.IdsSuite.xml",
+          "sha256": "dcb24c89266e6d32bdbab2808c15433f5d77f8337fc7d8acec7ab11edc4f43af"
+        },
+        {
+          "name": "storymodel4s.core.QuotationSuite",
+          "file": "coreJVM-test/TEST-storymodel4s.core.QuotationSuite.xml",
+          "sha256": "e6216f83f66ecddf630a70dbbad25bba7b72f40361fbb0f942195df34d46c85b"
+        },
+        {
+          "name": "storymodel4s.core.QuoteSuite",
+          "file": "coreJVM-test/TEST-storymodel4s.core.QuoteSuite.xml",
+          "sha256": "eaf9cfcf592247f5f4bd6c5c55e8cb7807e4cc4f06b156a490d6b118afe0e75f"
+        },
+        {
+          "name": "storymodel4s.core.SourceBundleSuite",
+          "file": "coreJVM-test/TEST-storymodel4s.core.SourceBundleSuite.xml",
+          "sha256": "b6cc34d6ce09bd13f34c8f0ccc09031b5fb2c029ac16bbf6fc26df92068fa697"
+        },
+        {
+          "name": "storymodel4s.core.SpanSuite",
+          "file": "coreJVM-test/TEST-storymodel4s.core.SpanSuite.xml",
+          "sha256": "b1d967d2635d81dcd12165716d5555d0dfeee77c776de7c2006dc0628f5bb440"
+        },
+        {
+          "name": "storymodel4s.core.SplitterEdgeSuite",
+          "file": "coreJVM-test/TEST-storymodel4s.core.SplitterEdgeSuite.xml",
+          "sha256": "ac796069e66b6b8926ff1c633e1fcad85f370fa0e614f58744f694037aa4d700"
+        },
+        {
+          "name": "storymodel4s.core.SurfaceAtlasConformanceSuite",
+          "file": "coreJVM-test/TEST-storymodel4s.core.SurfaceAtlasConformanceSuite.xml",
+          "sha256": "8b724222238eccc2c91aae35c9d7eb8e086ad3c450f09a6c2d0bc8d7a1c73b3a"
+        },
+        {
+          "name": "storymodel4s.core.SurfaceSuite",
+          "file": "coreJVM-test/TEST-storymodel4s.core.SurfaceSuite.xml",
+          "sha256": "71c2bf59ed3f829c076934dc53acf3698512449e405ba5553861b47f09ebe106"
+        },
+        {
+          "name": "storymodel4s.core.TranscriptSuite",
+          "file": "coreJVM-test/TEST-storymodel4s.core.TranscriptSuite.xml",
+          "sha256": "cedecc299b6fea8c35ccc8f4a7fe2d49832e421c9c914c1d495d1731e7628578"
+        },
+        {
+          "name": "storymodel4s.coreprobe.AtlasConstructionBoundarySuite",
+          "file": "coreJVM-test/TEST-storymodel4s.coreprobe.AtlasConstructionBoundarySuite.xml",
+          "sha256": "b583e232905fc485389caf270b8d0f1abc4cd42aa0e3ed2f55f349a40275fd96"
+        },
+        {
+          "name": "storymodel4s.coreprobe.ConstructionProbeSuite",
+          "file": "coreJVM-test/TEST-storymodel4s.coreprobe.ConstructionProbeSuite.xml",
+          "sha256": "f7ab3ac86d44c1f989e98c36665cb295ad45babdaabb90b38e5a1aa45c0d83dd"
+        },
+        {
+          "name": "storymodel4s.coreprobe.D1aConstructionBoundarySuite",
+          "file": "coreJVM-test/TEST-storymodel4s.coreprobe.D1aConstructionBoundarySuite.xml",
+          "sha256": "4fa9e3748693d789a0223e5e631489f29f42bc89802152a5b26674c2aa245f3a"
+        },
+        {
+          "name": "storymodel4s.coreprobe.SourceConstructionBoundarySuite",
+          "file": "coreJVM-test/TEST-storymodel4s.coreprobe.SourceConstructionBoundarySuite.xml",
+          "sha256": "ac590f218e6354fe8c8b1ee2ab90705a1d37d1dc73340d8a748bb6640f625a7d"
+        }
+      ],
+      "counts": {
+        "Total": 210,
+        "Failed": 0,
+        "Errors": 0,
+        "Passed": 210,
+        "Skipped": 0
+      }
+    },
+    {
+      "task": "coreJS/test",
+      "suites": [
+        {
+          "name": "storymodel4s.core.AddressSuite",
+          "file": "coreJS-test/TEST-storymodel4s.core.AddressSuite.xml",
+          "sha256": "557007644aef1e71f7667507f6ab5907401a9c0723513d27ff69fea3ee8d37bb"
+        },
+        {
+          "name": "storymodel4s.core.AnnotationAxisSuite",
+          "file": "coreJS-test/TEST-storymodel4s.core.AnnotationAxisSuite.xml",
+          "sha256": "f105221795126e6a12dfbe1a27b170b4a8f4dc25feedbe8bc6bf3b375ba796de"
+        },
+        {
+          "name": "storymodel4s.core.AtlasSuite",
+          "file": "coreJS-test/TEST-storymodel4s.core.AtlasSuite.xml",
+          "sha256": "ebc936b36f0bddc41bfe41c43cb1fb7326716d357c32b24745c9f9304904508f"
+        },
+        {
+          "name": "storymodel4s.core.ClaimSuite",
+          "file": "coreJS-test/TEST-storymodel4s.core.ClaimSuite.xml",
+          "sha256": "3aa405bce38f054254cc72b2ff26e7fdd9ad6790094481aa8f9778fba69f4d1e"
+        },
+        {
+          "name": "storymodel4s.core.D1aAtlasSuite",
+          "file": "coreJS-test/TEST-storymodel4s.core.D1aAtlasSuite.xml",
+          "sha256": "1f625d76be059b9fa9f388a9ead758d4e118dd7846e39decd17be909e2380098"
+        },
+        {
+          "name": "storymodel4s.core.D1aSupportSuite",
+          "file": "coreJS-test/TEST-storymodel4s.core.D1aSupportSuite.xml",
+          "sha256": "691f0640ec72c0690b3c4568a5d4f08cf70b9c8977949293b1011b9c6273aa8f"
+        },
+        {
+          "name": "storymodel4s.core.HashSuite",
+          "file": "coreJS-test/TEST-storymodel4s.core.HashSuite.xml",
+          "sha256": "076a72bdaa7bb1b706b68487dd7ba50cc960977f32ff65dcbb585170e1beb7a6"
+        },
+        {
+          "name": "storymodel4s.core.IdsSuite",
+          "file": "coreJS-test/TEST-storymodel4s.core.IdsSuite.xml",
+          "sha256": "be4e8ead782464c617cdc95b15c6fb98310f689bbc208181ee52779214039e98"
+        },
+        {
+          "name": "storymodel4s.core.QuotationSuite",
+          "file": "coreJS-test/TEST-storymodel4s.core.QuotationSuite.xml",
+          "sha256": "d096f2a25f984ce3c77deaa9b3fe64165772e9ffd335d23f50b85db011706f51"
+        },
+        {
+          "name": "storymodel4s.core.QuoteSuite",
+          "file": "coreJS-test/TEST-storymodel4s.core.QuoteSuite.xml",
+          "sha256": "725911579fbcdc3670140164aba70e1c4a4d5f16e17da82f33a66cc767eae1ef"
+        },
+        {
+          "name": "storymodel4s.core.SourceBundleSuite",
+          "file": "coreJS-test/TEST-storymodel4s.core.SourceBundleSuite.xml",
+          "sha256": "cadfad6848917066f2d6ad134ec5c3074b7224678c904589e00e2673a4fdff13"
+        },
+        {
+          "name": "storymodel4s.core.SpanSuite",
+          "file": "coreJS-test/TEST-storymodel4s.core.SpanSuite.xml",
+          "sha256": "0a32d997ff1083aba0f84fde1ea85b0844667f5bff20435e17a38ffd89841353"
+        },
+        {
+          "name": "storymodel4s.core.SplitterEdgeSuite",
+          "file": "coreJS-test/TEST-storymodel4s.core.SplitterEdgeSuite.xml",
+          "sha256": "0ef712c37656c31651f819d879dac63fa01df2de7bc48f7a66d28b63fce60583"
+        },
+        {
+          "name": "storymodel4s.core.SurfaceAtlasConformanceSuite",
+          "file": "coreJS-test/TEST-storymodel4s.core.SurfaceAtlasConformanceSuite.xml",
+          "sha256": "bc907907986a8cde0b9febcd7b9e1b800915b44f6a704270c5efb41ae60d306d"
+        },
+        {
+          "name": "storymodel4s.core.SurfaceSuite",
+          "file": "coreJS-test/TEST-storymodel4s.core.SurfaceSuite.xml",
+          "sha256": "9ba4610ed03bd6584c22a9c8b4bc0e732c15faefb689c9f3c05ec0a388beb02b"
+        },
+        {
+          "name": "storymodel4s.core.TranscriptSuite",
+          "file": "coreJS-test/TEST-storymodel4s.core.TranscriptSuite.xml",
+          "sha256": "8afaafb86d5531295ea8ae20a7345f18b57a13bdda86395679ca9a1ca3ef3135"
+        },
+        {
+          "name": "storymodel4s.coreprobe.AtlasConstructionBoundarySuite",
+          "file": "coreJS-test/TEST-storymodel4s.coreprobe.AtlasConstructionBoundarySuite.xml",
+          "sha256": "0705c85fc8bd1c15e3c16187d83ee411ae058088cc28d1abe4f310941e77b9a5"
+        },
+        {
+          "name": "storymodel4s.coreprobe.ConstructionProbeSuite",
+          "file": "coreJS-test/TEST-storymodel4s.coreprobe.ConstructionProbeSuite.xml",
+          "sha256": "d58d8ecf8541e207d24ea6d2214472293265a4c3d3b043c5d495de7ed01c2fc5"
+        },
+        {
+          "name": "storymodel4s.coreprobe.D1aConstructionBoundarySuite",
+          "file": "coreJS-test/TEST-storymodel4s.coreprobe.D1aConstructionBoundarySuite.xml",
+          "sha256": "75455d0ac29e7f506cbb63523deaaa4a577532b033657a7173a1e4ca6a0578d5"
+        },
+        {
+          "name": "storymodel4s.coreprobe.SourceConstructionBoundarySuite",
+          "file": "coreJS-test/TEST-storymodel4s.coreprobe.SourceConstructionBoundarySuite.xml",
+          "sha256": "1506373f803fbaa30088e4406428fff6dabe9221f0c2dd160cedc5801c874b3f"
+        }
+      ],
+      "counts": {
+        "Total": 210,
+        "Failed": 0,
+        "Errors": 0,
+        "Passed": 210,
+        "Skipped": 0
+      }
+    },
+    {
+      "task": "coreNative/test",
+      "suites": [
+        {
+          "name": "storymodel4s.core.AddressSuite",
+          "file": "coreNative-test/TEST-storymodel4s.core.AddressSuite.xml",
+          "sha256": "09ff50ef102d2588f5327188d7d86bc6319e027986c3641657a9926f4f56a885"
+        },
+        {
+          "name": "storymodel4s.core.AnnotationAxisSuite",
+          "file": "coreNative-test/TEST-storymodel4s.core.AnnotationAxisSuite.xml",
+          "sha256": "af459ecdc03c7fa36b50d3da9c99775c9e7179da0909c67d3f0f26ab238b00a6"
+        },
+        {
+          "name": "storymodel4s.core.AtlasSuite",
+          "file": "coreNative-test/TEST-storymodel4s.core.AtlasSuite.xml",
+          "sha256": "9e63fb3c6c2ddd228f29232e69a1759c0c86a32906a9b28123fccb8d17d832e3"
+        },
+        {
+          "name": "storymodel4s.core.ClaimSuite",
+          "file": "coreNative-test/TEST-storymodel4s.core.ClaimSuite.xml",
+          "sha256": "c5fed3f3cbad13cc6ea3b87be3085423c8ca190e42c75990bd5a18fa84acbc5a"
+        },
+        {
+          "name": "storymodel4s.core.D1aAtlasSuite",
+          "file": "coreNative-test/TEST-storymodel4s.core.D1aAtlasSuite.xml",
+          "sha256": "7c3186a28d729b9705063ec97244dc0769e8adb33e17bed5aba5d26d8e9fcc06"
+        },
+        {
+          "name": "storymodel4s.core.D1aSupportSuite",
+          "file": "coreNative-test/TEST-storymodel4s.core.D1aSupportSuite.xml",
+          "sha256": "a89872c168a89f2b399a10867402bd0215d647736cf0107ed17cb2b20c7ae1d5"
+        },
+        {
+          "name": "storymodel4s.core.HashSuite",
+          "file": "coreNative-test/TEST-storymodel4s.core.HashSuite.xml",
+          "sha256": "3f0fc82df722aa8e45b1bb73891ff3cfc61896245d7d82e687b8ef3289e19061"
+        },
+        {
+          "name": "storymodel4s.core.IdsSuite",
+          "file": "coreNative-test/TEST-storymodel4s.core.IdsSuite.xml",
+          "sha256": "1c854d267724b739f4fedd794602a13a6445454cb7076815aa7793bba6f91f4b"
+        },
+        {
+          "name": "storymodel4s.core.QuotationSuite",
+          "file": "coreNative-test/TEST-storymodel4s.core.QuotationSuite.xml",
+          "sha256": "7d9f9fbd60ccbfe9093c86a1742c6173122becc7bd4368de7025cd8c43faf031"
+        },
+        {
+          "name": "storymodel4s.core.QuoteSuite",
+          "file": "coreNative-test/TEST-storymodel4s.core.QuoteSuite.xml",
+          "sha256": "fcf00170effa67437e3725e02c481f1e01616e3ffe93f55db05c03fc0efdbf64"
+        },
+        {
+          "name": "storymodel4s.core.SourceBundleSuite",
+          "file": "coreNative-test/TEST-storymodel4s.core.SourceBundleSuite.xml",
+          "sha256": "6cc8fe55417c613e2239cfd148ce139fd6813b9bb69311cd34927800a1420d79"
+        },
+        {
+          "name": "storymodel4s.core.SpanSuite",
+          "file": "coreNative-test/TEST-storymodel4s.core.SpanSuite.xml",
+          "sha256": "841634435bb970e5d97e996d2080a05225334dfc7f93a4389395e63031e140c3"
+        },
+        {
+          "name": "storymodel4s.core.SplitterEdgeSuite",
+          "file": "coreNative-test/TEST-storymodel4s.core.SplitterEdgeSuite.xml",
+          "sha256": "9a72fcbb2dce437a394fa53c8b32a8273cebe1b00e26373030fe185f79d74615"
+        },
+        {
+          "name": "storymodel4s.core.SurfaceAtlasConformanceSuite",
+          "file": "coreNative-test/TEST-storymodel4s.core.SurfaceAtlasConformanceSuite.xml",
+          "sha256": "d0af816b35864cef474f0c3986e36bdb25720ff7e2dc9f3692ba37216eb13afb"
+        },
+        {
+          "name": "storymodel4s.core.SurfaceSuite",
+          "file": "coreNative-test/TEST-storymodel4s.core.SurfaceSuite.xml",
+          "sha256": "36687aafd76f5910d1dde333ba94042bd4119ef3c24493b9d7409c0b084f7ce6"
+        },
+        {
+          "name": "storymodel4s.core.TranscriptSuite",
+          "file": "coreNative-test/TEST-storymodel4s.core.TranscriptSuite.xml",
+          "sha256": "67279922705c7be114b1afb47dae505a340f499b974783233a6be34103103691"
+        },
+        {
+          "name": "storymodel4s.coreprobe.AtlasConstructionBoundarySuite",
+          "file": "coreNative-test/TEST-storymodel4s.coreprobe.AtlasConstructionBoundarySuite.xml",
+          "sha256": "891ab8d93ddacc5fc8be389a19f59e9a4ba624f1f060670faca6f371c82d709e"
+        },
+        {
+          "name": "storymodel4s.coreprobe.ConstructionProbeSuite",
+          "file": "coreNative-test/TEST-storymodel4s.coreprobe.ConstructionProbeSuite.xml",
+          "sha256": "e3403a031fe3e24111b7f7b20301ff5a0dd4a0d2c839ad7c6feda1e73e4330d9"
+        },
+        {
+          "name": "storymodel4s.coreprobe.D1aConstructionBoundarySuite",
+          "file": "coreNative-test/TEST-storymodel4s.coreprobe.D1aConstructionBoundarySuite.xml",
+          "sha256": "9a0e153620a648bdf3098814d71281986bbbdca48f9e40f402e3ead72eb069d7"
+        },
+        {
+          "name": "storymodel4s.coreprobe.SourceConstructionBoundarySuite",
+          "file": "coreNative-test/TEST-storymodel4s.coreprobe.SourceConstructionBoundarySuite.xml",
+          "sha256": "e9a64022a5dfc47796670afd611255070f8b5ca06695d9acfe98144222bfacaa"
+        }
+      ],
+      "counts": {
+        "Total": 210,
+        "Failed": 0,
+        "Errors": 0,
+        "Passed": 210,
+        "Skipped": 0
+      }
+    },
+    {
+      "task": "propositionJVM/test",
+      "suites": [
+        {
+          "name": "storymodel4s.probes.PropositionChartUnforgeableSuite",
+          "file": "propositionJVM-test/TEST-storymodel4s.probes.PropositionChartUnforgeableSuite.xml",
+          "sha256": "e89fb6cb4db63fd0c157342ad5a1b8c307491e6b5ae79b556c7c8c17500861e5"
+        },
+        {
+          "name": "storymodel4s.proposition.CompatSuite",
+          "file": "propositionJVM-test/TEST-storymodel4s.proposition.CompatSuite.xml",
+          "sha256": "dc99f7e6c6321813807552aee0677f17db42f2076790c76b2095cd09b9b56eec"
+        },
+        {
+          "name": "storymodel4s.proposition.GlossSuite",
+          "file": "propositionJVM-test/TEST-storymodel4s.proposition.GlossSuite.xml",
+          "sha256": "25dcb1072d1653818e840d5e5ff0edfc6475ac88d43515cb4e399530cab0a0d3"
+        },
+        {
+          "name": "storymodel4s.proposition.IdentityHardSuite",
+          "file": "propositionJVM-test/TEST-storymodel4s.proposition.IdentityHardSuite.xml",
+          "sha256": "c9e3aa1e24e6743cd8db9efcc2a6e3187bd07c19ea442fdcb120a38d65e97147"
+        },
+        {
+          "name": "storymodel4s.proposition.IdentitySuite",
+          "file": "propositionJVM-test/TEST-storymodel4s.proposition.IdentitySuite.xml",
+          "sha256": "4afea98605ea8bb3f0458eaabba6491c44499c602388bd695c346a9ac0232222"
+        },
+        {
+          "name": "storymodel4s.proposition.OrderLawsSuite",
+          "file": "propositionJVM-test/TEST-storymodel4s.proposition.OrderLawsSuite.xml",
+          "sha256": "1ead8d31cf3959c6c750e7940c23a831f93b2c87e649f83589f06dda985bccd9"
+        },
+        {
+          "name": "storymodel4s.proposition.ValidateRolesSuite",
+          "file": "propositionJVM-test/TEST-storymodel4s.proposition.ValidateRolesSuite.xml",
+          "sha256": "7b3230c108a64fed61889aece7aa0a4e237e87714b2202d366abf5763db2ca40"
+        },
+        {
+          "name": "storymodel4s.proposition.ValidateSuite",
+          "file": "propositionJVM-test/TEST-storymodel4s.proposition.ValidateSuite.xml",
+          "sha256": "c5d820148c5863b003a10880198f06de22d0e3d51bb2d264e7875588486c3571"
+        }
+      ],
+      "counts": {
+        "Total": 51,
+        "Failed": 0,
+        "Errors": 0,
+        "Passed": 51,
+        "Skipped": 0
+      }
+    },
+    {
+      "task": "propositionJS/test",
+      "suites": [
+        {
+          "name": "storymodel4s.probes.PropositionChartUnforgeableSuite",
+          "file": "propositionJS-test/TEST-storymodel4s.probes.PropositionChartUnforgeableSuite.xml",
+          "sha256": "6111caee33f21bdaf58a0261d1bbe40b780c50689199f7a4b6554774a9a909fe"
+        },
+        {
+          "name": "storymodel4s.proposition.CompatSuite",
+          "file": "propositionJS-test/TEST-storymodel4s.proposition.CompatSuite.xml",
+          "sha256": "1e3438e7a2122762b3ddc6957d2ff9f5f1e741afe22d6f68722609d670334c16"
+        },
+        {
+          "name": "storymodel4s.proposition.GlossSuite",
+          "file": "propositionJS-test/TEST-storymodel4s.proposition.GlossSuite.xml",
+          "sha256": "9483575cb1f92d132b544a07b70a40c92ac9305641fc8737440f674902945448"
+        },
+        {
+          "name": "storymodel4s.proposition.IdentityHardSuite",
+          "file": "propositionJS-test/TEST-storymodel4s.proposition.IdentityHardSuite.xml",
+          "sha256": "e06551cde9187f166e647b16f6a0b65f37ad167a85b0a5f2fe9d24b0ef4e0267"
+        },
+        {
+          "name": "storymodel4s.proposition.IdentitySuite",
+          "file": "propositionJS-test/TEST-storymodel4s.proposition.IdentitySuite.xml",
+          "sha256": "a4090c571d660e43738e627752c14efe8237df47c7730ff9796d350a60de2aaf"
+        },
+        {
+          "name": "storymodel4s.proposition.OrderLawsSuite",
+          "file": "propositionJS-test/TEST-storymodel4s.proposition.OrderLawsSuite.xml",
+          "sha256": "40c083136cec86916e5299650d518e878727dbe186ce3846b83d0d56feaf29d4"
+        },
+        {
+          "name": "storymodel4s.proposition.ValidateRolesSuite",
+          "file": "propositionJS-test/TEST-storymodel4s.proposition.ValidateRolesSuite.xml",
+          "sha256": "8ae64ef35acda4784c861624aa095618f05c9bf9ed6db187f3192b501ddffcfe"
+        },
+        {
+          "name": "storymodel4s.proposition.ValidateSuite",
+          "file": "propositionJS-test/TEST-storymodel4s.proposition.ValidateSuite.xml",
+          "sha256": "81f3d0c5f6508078939b64afb88fb24e23b0db683085b06f05b137e627358535"
+        }
+      ],
+      "counts": {
+        "Total": 51,
+        "Failed": 0,
+        "Errors": 0,
+        "Passed": 51,
+        "Skipped": 0
+      }
+    },
+    {
+      "task": "propositionNative/test",
+      "suites": [
+        {
+          "name": "storymodel4s.probes.PropositionChartUnforgeableSuite",
+          "file": "propositionNative-test/TEST-storymodel4s.probes.PropositionChartUnforgeableSuite.xml",
+          "sha256": "161c280cf5d08c6ab787a3b92106403cf2d9b8dca5c5b7e4ccf125126cd61670"
+        },
+        {
+          "name": "storymodel4s.proposition.CompatSuite",
+          "file": "propositionNative-test/TEST-storymodel4s.proposition.CompatSuite.xml",
+          "sha256": "0d9cb42eb52a5788e0db3ebd50026e9dab70783aea3c7f871b87c2b25ad1ef46"
+        },
+        {
+          "name": "storymodel4s.proposition.GlossSuite",
+          "file": "propositionNative-test/TEST-storymodel4s.proposition.GlossSuite.xml",
+          "sha256": "b88060c6435f945c2c8f8dcee2a7a00ad722c4396bd69eba1da331409f42e009"
+        },
+        {
+          "name": "storymodel4s.proposition.IdentityHardSuite",
+          "file": "propositionNative-test/TEST-storymodel4s.proposition.IdentityHardSuite.xml",
+          "sha256": "e3be1592556d5691d74f7a6dad0a1bc3bb002cc3096e2214e74e093c76e91d9d"
+        },
+        {
+          "name": "storymodel4s.proposition.IdentitySuite",
+          "file": "propositionNative-test/TEST-storymodel4s.proposition.IdentitySuite.xml",
+          "sha256": "0d60cceef7be45583aa346a434862ba0520dfbfa35e0ae98428ad1b050367296"
+        },
+        {
+          "name": "storymodel4s.proposition.OrderLawsSuite",
+          "file": "propositionNative-test/TEST-storymodel4s.proposition.OrderLawsSuite.xml",
+          "sha256": "5620d6f5fba4ad70f221d36ad659b7465c3ee3426bf820ee28fc6ddf33789d19"
+        },
+        {
+          "name": "storymodel4s.proposition.ValidateRolesSuite",
+          "file": "propositionNative-test/TEST-storymodel4s.proposition.ValidateRolesSuite.xml",
+          "sha256": "db84bc89f0c59bb8ba8993e113789d4dfa13c69ea615086c576da09385799e09"
+        },
+        {
+          "name": "storymodel4s.proposition.ValidateSuite",
+          "file": "propositionNative-test/TEST-storymodel4s.proposition.ValidateSuite.xml",
+          "sha256": "9f1ac18aeeb9a762e71daf7a905aed2b7971c60c73e2db8646ba354042e62d64"
+        }
+      ],
+      "counts": {
+        "Total": 51,
+        "Failed": 0,
+        "Errors": 0,
+        "Passed": 51,
+        "Skipped": 0
+      }
+    },
+    {
+      "task": "amrInteropJVM/test",
+      "suites": [
+        {
+          "name": "storymodel4s.amr.CanonicalFormSuite",
+          "file": "amrInteropJVM-test/TEST-storymodel4s.amr.CanonicalFormSuite.xml",
+          "sha256": "142b658718d767e198fec0c8841c277a9d66b0d4d2aca8b173be91a209c6d4a7"
+        },
+        {
+          "name": "storymodel4s.amr.GraphSuite",
+          "file": "amrInteropJVM-test/TEST-storymodel4s.amr.GraphSuite.xml",
+          "sha256": "efc2c4eca999f6b2ee4a21273289d6374c653317e315706334fbf426441b3461"
+        },
+        {
+          "name": "storymodel4s.amr.InteropLossSuite",
+          "file": "amrInteropJVM-test/TEST-storymodel4s.amr.InteropLossSuite.xml",
+          "sha256": "8b523d1dbd328c251064efd1716e53828c7ecb45e5bfc3e5811604d72dcd6772"
+        },
+        {
+          "name": "storymodel4s.amr.InteropSuite",
+          "file": "amrInteropJVM-test/TEST-storymodel4s.amr.InteropSuite.xml",
+          "sha256": "6f4b4faff935f5e791f4922b75bc4cb942e5153a9bca65f7a11a293b9cc53d20"
+        },
+        {
+          "name": "storymodel4s.amr.ParserTotalitySuite",
+          "file": "amrInteropJVM-test/TEST-storymodel4s.amr.ParserTotalitySuite.xml",
+          "sha256": "252ce75f144f46aa3ed3ef98143a3b22510fc215491445ee634de11a0fc256db"
+        },
+        {
+          "name": "storymodel4s.amr.PenmanSuite",
+          "file": "amrInteropJVM-test/TEST-storymodel4s.amr.PenmanSuite.xml",
+          "sha256": "b4c4bf2cb594b5077312aa0299a64f2b627fdddd968f599f8955d22dadfcd1ef"
+        },
+        {
+          "name": "storymodel4s.amr.ZZStressProbe",
+          "file": "amrInteropJVM-test/TEST-storymodel4s.amr.ZZStressProbe.xml",
+          "sha256": "98687d3942b7e75dd021bcda4008f12ec4e6f76ae09b1be2569dcba84d54ad5c"
+        },
+        {
+          "name": "storymodel4s.probes.AmrGraphUnforgeableSuite",
+          "file": "amrInteropJVM-test/TEST-storymodel4s.probes.AmrGraphUnforgeableSuite.xml",
+          "sha256": "7c5e49a6668adbb973a305f2a2ad3cd703679f1985a7f5b569ca7f36431da2b7"
+        }
+      ],
+      "counts": {
+        "Total": 92,
+        "Failed": 0,
+        "Errors": 0,
+        "Passed": 92,
+        "Skipped": 0
+      }
+    },
+    {
+      "task": "amrInteropJS/test",
+      "suites": [
+        {
+          "name": "storymodel4s.amr.CanonicalFormSuite",
+          "file": "amrInteropJS-test/TEST-storymodel4s.amr.CanonicalFormSuite.xml",
+          "sha256": "2bafe227cf5b0a31c2d74b98b1a739b1a6dd665696b551ce110cc501083fb5d7"
+        },
+        {
+          "name": "storymodel4s.amr.GraphSuite",
+          "file": "amrInteropJS-test/TEST-storymodel4s.amr.GraphSuite.xml",
+          "sha256": "1b7460ea54833a66f3acbdfa4a674dde6cc975597007f13fb30b330d61eb05bd"
+        },
+        {
+          "name": "storymodel4s.amr.InteropLossSuite",
+          "file": "amrInteropJS-test/TEST-storymodel4s.amr.InteropLossSuite.xml",
+          "sha256": "45a9aca4184303476d6e1596b0cc610fccb2c2f68698ae5020402194cfb1938b"
+        },
+        {
+          "name": "storymodel4s.amr.InteropSuite",
+          "file": "amrInteropJS-test/TEST-storymodel4s.amr.InteropSuite.xml",
+          "sha256": "839b034a668b1f4a7e84fb8f17699f8ede5ed37af14897b29e7fed70a0715650"
+        },
+        {
+          "name": "storymodel4s.amr.ParserTotalitySuite",
+          "file": "amrInteropJS-test/TEST-storymodel4s.amr.ParserTotalitySuite.xml",
+          "sha256": "49ab7fa909fa582f4255e6189605d5aa00dd49b06dd3615c06972732fe683f07"
+        },
+        {
+          "name": "storymodel4s.amr.PenmanSuite",
+          "file": "amrInteropJS-test/TEST-storymodel4s.amr.PenmanSuite.xml",
+          "sha256": "93aee303c639bbfdc63f54387fd451f2af39ce5d1ef5d1ab9c909ad06787fe94"
+        },
+        {
+          "name": "storymodel4s.amr.ZZStressProbe",
+          "file": "amrInteropJS-test/TEST-storymodel4s.amr.ZZStressProbe.xml",
+          "sha256": "cd9ead0a1f276343b929a4be313c3e1c1f3ee238a0089e5a327b7161224d7b00"
+        },
+        {
+          "name": "storymodel4s.probes.AmrGraphUnforgeableSuite",
+          "file": "amrInteropJS-test/TEST-storymodel4s.probes.AmrGraphUnforgeableSuite.xml",
+          "sha256": "adbc889f4f48a0c6760c4e8c58328f75a5bd5362116f1c0cfbc3397b40114b5a"
+        }
+      ],
+      "counts": {
+        "Total": 92,
+        "Failed": 0,
+        "Errors": 0,
+        "Passed": 92,
+        "Skipped": 0
+      }
+    },
+    {
+      "task": "amrInteropNative/test",
+      "suites": [
+        {
+          "name": "storymodel4s.amr.CanonicalFormSuite",
+          "file": "amrInteropNative-test/TEST-storymodel4s.amr.CanonicalFormSuite.xml",
+          "sha256": "613b7b9750dc8cc06c4411dbc9e8c4081e3b8acbd8aec8afa78a85cc194ec8e0"
+        },
+        {
+          "name": "storymodel4s.amr.GraphSuite",
+          "file": "amrInteropNative-test/TEST-storymodel4s.amr.GraphSuite.xml",
+          "sha256": "c84b5d6fbb6ad08b222d55b8d03c50075a4120d92c6a635c5ff8f3cd1a99eae8"
+        },
+        {
+          "name": "storymodel4s.amr.InteropLossSuite",
+          "file": "amrInteropNative-test/TEST-storymodel4s.amr.InteropLossSuite.xml",
+          "sha256": "d2f0d449083a2c3b90f25d223070e085e63ccd7288c48110d849f2d43a479983"
+        },
+        {
+          "name": "storymodel4s.amr.InteropSuite",
+          "file": "amrInteropNative-test/TEST-storymodel4s.amr.InteropSuite.xml",
+          "sha256": "0aea4bfdad6ef2489beef0cbc385c94bb83bf2f0d74f449b1500d6f4a7daf18c"
+        },
+        {
+          "name": "storymodel4s.amr.ParserTotalitySuite",
+          "file": "amrInteropNative-test/TEST-storymodel4s.amr.ParserTotalitySuite.xml",
+          "sha256": "59f57f987fd3ed565888f21ca54ae16e49bae2a2a7ae8e595f4c966335480d4b"
+        },
+        {
+          "name": "storymodel4s.amr.PenmanSuite",
+          "file": "amrInteropNative-test/TEST-storymodel4s.amr.PenmanSuite.xml",
+          "sha256": "e322e70e6034a3bc8ba19d5f9798f8515570f7f4573f39999017d19a10b9011b"
+        },
+        {
+          "name": "storymodel4s.amr.ZZStressProbe",
+          "file": "amrInteropNative-test/TEST-storymodel4s.amr.ZZStressProbe.xml",
+          "sha256": "02344a1a52dbc7d16fe5126b76ae0047b9e20509dfab4e1784ebeabf25fbaa45"
+        },
+        {
+          "name": "storymodel4s.probes.AmrGraphUnforgeableSuite",
+          "file": "amrInteropNative-test/TEST-storymodel4s.probes.AmrGraphUnforgeableSuite.xml",
+          "sha256": "af1912692d7b5176ca6ffdbcbdc42f032ad627561b0643b24caab9b27617b4ea"
+        }
+      ],
+      "counts": {
+        "Total": 92,
+        "Failed": 0,
+        "Errors": 0,
+        "Passed": 92,
+        "Skipped": 0
+      }
+    },
+    {
+      "task": "featuresJVM/test",
+      "suites": [
+        {
+          "name": "storymodel4s.features.MeasureSuite",
+          "file": "featuresJVM-test/TEST-storymodel4s.features.MeasureSuite.xml",
+          "sha256": "79fccd65c060b1f19679275aa907ec2f0d44ce95a17407e01df1cb08fde3c7fd"
+        },
+        {
+          "name": "storymodel4s.features.StructureSuite",
+          "file": "featuresJVM-test/TEST-storymodel4s.features.StructureSuite.xml",
+          "sha256": "acd1adff84a8ecbfb6c3f72e65fea6e4b54199a5ac3c3927a72e088b4119e2d9"
+        },
+        {
+          "name": "storymodel4s.features.WindowSuite",
+          "file": "featuresJVM-test/TEST-storymodel4s.features.WindowSuite.xml",
+          "sha256": "3989e80198b91ba152496d12ddc9fb38dab1015c441d89a50bec82eecd41bbcd"
+        },
+        {
+          "name": "storymodel4s.featuresprobe.ConstructionBoundarySuite",
+          "file": "featuresJVM-test/TEST-storymodel4s.featuresprobe.ConstructionBoundarySuite.xml",
+          "sha256": "0966af9d4e0e9b47df298877c586fce4a18ddbb58b0e1bcf4321a0d41ce2bf0b"
+        },
+        {
+          "name": "storymodel4s.featuresprobe.CoverageBoundarySuite",
+          "file": "featuresJVM-test/TEST-storymodel4s.featuresprobe.CoverageBoundarySuite.xml",
+          "sha256": "0ec79911243dd67acc2fa1582188eac56f06dee124dd6d2e0652d1f9503820c6"
+        }
+      ],
+      "counts": {
+        "Total": 68,
+        "Failed": 0,
+        "Errors": 0,
+        "Passed": 68,
+        "Skipped": 0
+      }
+    },
+    {
+      "task": "featuresJS/test",
+      "suites": [
+        {
+          "name": "storymodel4s.features.MeasureSuite",
+          "file": "featuresJS-test/TEST-storymodel4s.features.MeasureSuite.xml",
+          "sha256": "813c6181be58f003cb793d94ceb2354e09bb1191830fbdb6d2258cfc75712e5e"
+        },
+        {
+          "name": "storymodel4s.features.StructureSuite",
+          "file": "featuresJS-test/TEST-storymodel4s.features.StructureSuite.xml",
+          "sha256": "9b3a15dd5e38fb6d34755377021f34214f0c4538ffdc069323765cfc88f0fa64"
+        },
+        {
+          "name": "storymodel4s.features.WindowSuite",
+          "file": "featuresJS-test/TEST-storymodel4s.features.WindowSuite.xml",
+          "sha256": "6a2094f0a1adc16f98f4cb021306e316eb0b1989d35ee4bf01513303dc9710ec"
+        },
+        {
+          "name": "storymodel4s.featuresprobe.ConstructionBoundarySuite",
+          "file": "featuresJS-test/TEST-storymodel4s.featuresprobe.ConstructionBoundarySuite.xml",
+          "sha256": "434d7a254621ab8e93d7ca7fc2cf436e44bbf4ffe344c35e5c3d8b371c07e47c"
+        },
+        {
+          "name": "storymodel4s.featuresprobe.CoverageBoundarySuite",
+          "file": "featuresJS-test/TEST-storymodel4s.featuresprobe.CoverageBoundarySuite.xml",
+          "sha256": "415127c61aff56790f81400ed4fe0b03bf1ba31f7f40b20ecf4cd47c1320b211"
+        }
+      ],
+      "counts": {
+        "Total": 68,
+        "Failed": 0,
+        "Errors": 0,
+        "Passed": 68,
+        "Skipped": 0
+      }
+    },
+    {
+      "task": "featuresNative/test",
+      "suites": [
+        {
+          "name": "storymodel4s.features.MeasureSuite",
+          "file": "featuresNative-test/TEST-storymodel4s.features.MeasureSuite.xml",
+          "sha256": "32141ebaee0f950d750f57fd1b2e30525aa49d60a56574087dfcbf56567f6069"
+        },
+        {
+          "name": "storymodel4s.features.StructureSuite",
+          "file": "featuresNative-test/TEST-storymodel4s.features.StructureSuite.xml",
+          "sha256": "03ac1dbc6fbac3c43e356bac0528d84add77dff4fe5daa8de1f59b69f7faef63"
+        },
+        {
+          "name": "storymodel4s.features.WindowSuite",
+          "file": "featuresNative-test/TEST-storymodel4s.features.WindowSuite.xml",
+          "sha256": "f7f5c3e5a5a90b70fdc892ebe3bd9d22b0f34cdc87ce3d9e004e32afb760dc18"
+        },
+        {
+          "name": "storymodel4s.featuresprobe.ConstructionBoundarySuite",
+          "file": "featuresNative-test/TEST-storymodel4s.featuresprobe.ConstructionBoundarySuite.xml",
+          "sha256": "6810a055a85c3dcd9eafb04421a573eaa9913bf10a6c4cc95d92eef5a5c1d5c4"
+        },
+        {
+          "name": "storymodel4s.featuresprobe.CoverageBoundarySuite",
+          "file": "featuresNative-test/TEST-storymodel4s.featuresprobe.CoverageBoundarySuite.xml",
+          "sha256": "5870a772c0a5d3b0a8f837bfb5b2ab75659d8090a4c75e5d0eaeee6b155395ae"
+        }
+      ],
+      "counts": {
+        "Total": 68,
+        "Failed": 0,
+        "Errors": 0,
+        "Passed": 68,
+        "Skipped": 0
+      }
+    },
+    {
+      "task": "acquireJVM/test",
+      "suites": [
+        {
+          "name": "storymodel4s.acquire.CacheSuite",
+          "file": "acquireJVM-test/TEST-storymodel4s.acquire.CacheSuite.xml",
+          "sha256": "ecb161922c616ca53aeeeba6809f867f7acf8d50214ba12d65ad643ee3934593"
+        },
+        {
+          "name": "storymodel4s.acquire.FoilSuite",
+          "file": "acquireJVM-test/TEST-storymodel4s.acquire.FoilSuite.xml",
+          "sha256": "00a664d7fabd2ba54649a94db893ba6b0c3c4f7394334bc71ecfc1993d7e5c51"
+        },
+        {
+          "name": "storymodel4s.acquire.OrchestrateSuite",
+          "file": "acquireJVM-test/TEST-storymodel4s.acquire.OrchestrateSuite.xml",
+          "sha256": "2bb9d7a22be4a4c023b5a85251f68692835a3c78e2cda43bd79a7f4589dc93e6"
+        },
+        {
+          "name": "storymodel4s.acquire.OutputSuite",
+          "file": "acquireJVM-test/TEST-storymodel4s.acquire.OutputSuite.xml",
+          "sha256": "0c22d835c1114149bcf038f06780530c82b5440870210af8a6fe28859aec7745"
+        },
+        {
+          "name": "storymodel4s.acquire.PatchSuite",
+          "file": "acquireJVM-test/TEST-storymodel4s.acquire.PatchSuite.xml",
+          "sha256": "327a8b2767031cfa9deac4e6cf1ef700ed1c37770472d3e51ce98ecc18e63526"
+        },
+        {
+          "name": "storymodel4s.acquire.PromptSuite",
+          "file": "acquireJVM-test/TEST-storymodel4s.acquire.PromptSuite.xml",
+          "sha256": "647b57101dadafa691b28f7f798c661ac30c1688f10cad1993fa5e6725055207"
+        },
+        {
+          "name": "storymodel4s.acquire.ProposalSuite",
+          "file": "acquireJVM-test/TEST-storymodel4s.acquire.ProposalSuite.xml",
+          "sha256": "8f48d644cdc9803ac87adb53f631631c4108c6767351adc312ec4894ae0d2ad2"
+        },
+        {
+          "name": "storymodel4s.acquire.ResolveSuite",
+          "file": "acquireJVM-test/TEST-storymodel4s.acquire.ResolveSuite.xml",
+          "sha256": "4a9705146decd325d6c7e88754b1a012f6884c37d9f0b51ea8f54755f11c2b27"
+        },
+        {
+          "name": "storymodel4s.acquire.TaskSuite",
+          "file": "acquireJVM-test/TEST-storymodel4s.acquire.TaskSuite.xml",
+          "sha256": "9f958b818017745165a0282041359e46805a55dae43bbd933847634c324c4e32"
+        },
+        {
+          "name": "storymodel4s.acquire.attack.AcquirePackageIssuerBypassRefusalSuite",
+          "file": "acquireJVM-test/TEST-storymodel4s.acquire.attack.AcquirePackageIssuerBypassRefusalSuite.xml",
+          "sha256": "bb173c69e0098e42884d9c032d605a4580a36a5f3615c1dc59a194a4e2235f08"
+        },
+        {
+          "name": "storymodel4s.acquireprobe.ConstructionBoundarySuite",
+          "file": "acquireJVM-test/TEST-storymodel4s.acquireprobe.ConstructionBoundarySuite.xml",
+          "sha256": "abd8e69dd18cac1b408ee3a2e5b92eaa1f9d4036520fddcacb19e0fa6b12ad75"
+        },
+        {
+          "name": "storymodel4s.acquireprobe.ConstructionProbeSuite",
+          "file": "acquireJVM-test/TEST-storymodel4s.acquireprobe.ConstructionProbeSuite.xml",
+          "sha256": "8f33bfe4547473b8c1921a4afe990335b26239a5612295b7576ebf1b1ba3ede0"
+        },
+        {
+          "name": "storymodel4s.consumerattack.OutputConstructionProbeSuite",
+          "file": "acquireJVM-test/TEST-storymodel4s.consumerattack.OutputConstructionProbeSuite.xml",
+          "sha256": "08551f72f1b255ccf6c65f21dce9cbcb66e93e0a531bb85a61e591c216899861"
+        }
+      ],
+      "counts": {
+        "Total": 119,
+        "Failed": 0,
+        "Errors": 0,
+        "Passed": 119,
+        "Skipped": 0
+      }
+    },
+    {
+      "task": "acquireJS/test",
+      "suites": [
+        {
+          "name": "storymodel4s.acquire.CacheSuite",
+          "file": "acquireJS-test/TEST-storymodel4s.acquire.CacheSuite.xml",
+          "sha256": "b831e4750dd1df60c1dd2bbe6a1cc62f7853d2b2dd7ee6fd8ace7de809b972fe"
+        },
+        {
+          "name": "storymodel4s.acquire.FoilSuite",
+          "file": "acquireJS-test/TEST-storymodel4s.acquire.FoilSuite.xml",
+          "sha256": "4a66c61fc4628d0a2d5987f9cab0265f325ea3329dbc30b53eb9b6a65bfb029a"
+        },
+        {
+          "name": "storymodel4s.acquire.OrchestrateSuite",
+          "file": "acquireJS-test/TEST-storymodel4s.acquire.OrchestrateSuite.xml",
+          "sha256": "12711f29c06962f7789517b3e2339bb674d525702b879a60c4e74e339c3c6464"
+        },
+        {
+          "name": "storymodel4s.acquire.OutputSuite",
+          "file": "acquireJS-test/TEST-storymodel4s.acquire.OutputSuite.xml",
+          "sha256": "bcead1d1f6818624cc4779f37d2cd0b122079e9991b688dcbdb9a1dcb60943d8"
+        },
+        {
+          "name": "storymodel4s.acquire.PatchSuite",
+          "file": "acquireJS-test/TEST-storymodel4s.acquire.PatchSuite.xml",
+          "sha256": "0e9be9466864de3fde39cb1fdc1ab3fd2f94e7f376560499a719e7d7e52f89fb"
+        },
+        {
+          "name": "storymodel4s.acquire.PromptSuite",
+          "file": "acquireJS-test/TEST-storymodel4s.acquire.PromptSuite.xml",
+          "sha256": "d1743efd7930e7783c88d00e78990eb5f202b15a71d5a500b1b9a5e75f14aba0"
+        },
+        {
+          "name": "storymodel4s.acquire.ProposalSuite",
+          "file": "acquireJS-test/TEST-storymodel4s.acquire.ProposalSuite.xml",
+          "sha256": "ed41ad6cb2acdfdf1f65b2a2b777e656253c8a229706c8835ba6874a1dc13e70"
+        },
+        {
+          "name": "storymodel4s.acquire.ResolveSuite",
+          "file": "acquireJS-test/TEST-storymodel4s.acquire.ResolveSuite.xml",
+          "sha256": "e45870818ba6d080282c3fc98ab4ac4efe3e860d22ac5ed8712f2275d6bcd76d"
+        },
+        {
+          "name": "storymodel4s.acquire.TaskSuite",
+          "file": "acquireJS-test/TEST-storymodel4s.acquire.TaskSuite.xml",
+          "sha256": "b6ff8ff42010ffa80fb279d0d0177ea447bb4443cf45b9f0597b06bede723ade"
+        },
+        {
+          "name": "storymodel4s.acquire.attack.AcquirePackageIssuerBypassRefusalSuite",
+          "file": "acquireJS-test/TEST-storymodel4s.acquire.attack.AcquirePackageIssuerBypassRefusalSuite.xml",
+          "sha256": "726015f6e9fbd67d368544fe2ff3bb7ec7af08bf7afe6a892064aa6c29c19494"
+        },
+        {
+          "name": "storymodel4s.acquireprobe.ConstructionBoundarySuite",
+          "file": "acquireJS-test/TEST-storymodel4s.acquireprobe.ConstructionBoundarySuite.xml",
+          "sha256": "9ad0f5bd8ce892d8b08e50facc2891f559971fb7b42f37c8e09f6349ef4dfd19"
+        },
+        {
+          "name": "storymodel4s.acquireprobe.ConstructionProbeSuite",
+          "file": "acquireJS-test/TEST-storymodel4s.acquireprobe.ConstructionProbeSuite.xml",
+          "sha256": "64acf43df387427bc90593f244af5259a37c270f8a8cec1b79389c2c06c629b9"
+        },
+        {
+          "name": "storymodel4s.consumerattack.OutputConstructionProbeSuite",
+          "file": "acquireJS-test/TEST-storymodel4s.consumerattack.OutputConstructionProbeSuite.xml",
+          "sha256": "7e654cf09d247a225f5cb8ef0a050de8c74fd54f4b06e9454ea3e70e9c9a4960"
+        }
+      ],
+      "counts": {
+        "Total": 119,
+        "Failed": 0,
+        "Errors": 0,
+        "Passed": 119,
+        "Skipped": 0
+      }
+    },
+    {
+      "task": "acquireNative/test",
+      "suites": [
+        {
+          "name": "storymodel4s.acquire.CacheSuite",
+          "file": "acquireNative-test/TEST-storymodel4s.acquire.CacheSuite.xml",
+          "sha256": "aa47ffc625930eb41331c4d750ddbeb9a83b1dc51d1a14b040683427e331a77f"
+        },
+        {
+          "name": "storymodel4s.acquire.FoilSuite",
+          "file": "acquireNative-test/TEST-storymodel4s.acquire.FoilSuite.xml",
+          "sha256": "21ae488d975612772d2929ff6ed46f45c46a6d93d85a8daa80fb346672ae0f93"
+        },
+        {
+          "name": "storymodel4s.acquire.OrchestrateSuite",
+          "file": "acquireNative-test/TEST-storymodel4s.acquire.OrchestrateSuite.xml",
+          "sha256": "1cbddb9aaf68de86dcd10fc24c5d5a5f64037564de153b58d1d9900a74f9d181"
+        },
+        {
+          "name": "storymodel4s.acquire.OutputSuite",
+          "file": "acquireNative-test/TEST-storymodel4s.acquire.OutputSuite.xml",
+          "sha256": "bcb47c187c178e50574ac01c33e24ff64bc1933051349d7bd29b3a3e5eedcb58"
+        },
+        {
+          "name": "storymodel4s.acquire.PatchSuite",
+          "file": "acquireNative-test/TEST-storymodel4s.acquire.PatchSuite.xml",
+          "sha256": "acc5a308416c0dba1a00967975766b3fe6fe08dc54f8f2dfc52d175187630d06"
+        },
+        {
+          "name": "storymodel4s.acquire.PromptSuite",
+          "file": "acquireNative-test/TEST-storymodel4s.acquire.PromptSuite.xml",
+          "sha256": "5ffa514222145adf325bd178caae1c53ad2aa1aa33c9251ed3c93e6af3754a4c"
+        },
+        {
+          "name": "storymodel4s.acquire.ProposalSuite",
+          "file": "acquireNative-test/TEST-storymodel4s.acquire.ProposalSuite.xml",
+          "sha256": "8dfa5d7236752829a779284dc2fcd96e7b7c022a448e101e0ac5c845c85a2e32"
+        },
+        {
+          "name": "storymodel4s.acquire.ResolveSuite",
+          "file": "acquireNative-test/TEST-storymodel4s.acquire.ResolveSuite.xml",
+          "sha256": "9321e93aa86268e44bddf5f2782e4e78144cfb574010a680883f0ed528317038"
+        },
+        {
+          "name": "storymodel4s.acquire.TaskSuite",
+          "file": "acquireNative-test/TEST-storymodel4s.acquire.TaskSuite.xml",
+          "sha256": "ecacc5d358ad6043539d67929356e67dfb1c5422da3c84ae9d7b3a579ed9f1b3"
+        },
+        {
+          "name": "storymodel4s.acquire.attack.AcquirePackageIssuerBypassRefusalSuite",
+          "file": "acquireNative-test/TEST-storymodel4s.acquire.attack.AcquirePackageIssuerBypassRefusalSuite.xml",
+          "sha256": "49a22339d07270d0c7574f47af54e114bf9aee2f3494523986ee0e3818d530b1"
+        },
+        {
+          "name": "storymodel4s.acquireprobe.ConstructionBoundarySuite",
+          "file": "acquireNative-test/TEST-storymodel4s.acquireprobe.ConstructionBoundarySuite.xml",
+          "sha256": "3277401676ba2686d6fc3a06a2693fa73f407d912ea48d4faed802e8b065df65"
+        },
+        {
+          "name": "storymodel4s.acquireprobe.ConstructionProbeSuite",
+          "file": "acquireNative-test/TEST-storymodel4s.acquireprobe.ConstructionProbeSuite.xml",
+          "sha256": "3ae697df381342afab6bcbb31b96c9c53f075e79a949ec63dc8fcbd926d165aa"
+        },
+        {
+          "name": "storymodel4s.consumerattack.OutputConstructionProbeSuite",
+          "file": "acquireNative-test/TEST-storymodel4s.consumerattack.OutputConstructionProbeSuite.xml",
+          "sha256": "c8c9219fea3af4eb8f3d14790960bc80f07f69862195c99ddbe34b42ea2a0580"
+        }
+      ],
+      "counts": {
+        "Total": 119,
+        "Failed": 0,
+        "Errors": 0,
+        "Passed": 119,
+        "Skipped": 0
+      }
+    },
+    {
+      "task": "storyJVM/test",
+      "suites": [
+        {
+          "name": "storymodel4s.probes.StoryModelUnforgeableSuite",
+          "file": "storyJVM-test/TEST-storymodel4s.probes.StoryModelUnforgeableSuite.xml",
+          "sha256": "597fd756482a17897a50a88d17fac8956280f4ff50a42fbd78da70a479ee80c3"
+        },
+        {
+          "name": "storymodel4s.story.CoveringSuite",
+          "file": "storyJVM-test/TEST-storymodel4s.story.CoveringSuite.xml",
+          "sha256": "e1f921678037c1e18af1ea17acb611bcd72b2f1786f9c83a8eadb931fc7b361b"
+        },
+        {
+          "name": "storymodel4s.story.D1aTextBoundarySuite",
+          "file": "storyJVM-test/TEST-storymodel4s.story.D1aTextBoundarySuite.xml",
+          "sha256": "3a2dd75fbde9b91d9d8d56b211058ec904889962de0146198debbb8373b44e41"
+        },
+        {
+          "name": "storymodel4s.story.GraphSuite",
+          "file": "storyJVM-test/TEST-storymodel4s.story.GraphSuite.xml",
+          "sha256": "03f3475ad10b81bebd4b87638166317bf6f515cb31641f8f5397411bf90c8b89"
+        },
+        {
+          "name": "storymodel4s.story.RelationsSuite",
+          "file": "storyJVM-test/TEST-storymodel4s.story.RelationsSuite.xml",
+          "sha256": "b4d654b2da1cd463db764d736cefbb3354c70ac8ecf746ab402dcfdc16dd4b46"
+        },
+        {
+          "name": "storymodel4s.story.ReviewFixesSuite",
+          "file": "storyJVM-test/TEST-storymodel4s.story.ReviewFixesSuite.xml",
+          "sha256": "29c73d1110d9588f518f921be23c2cf73478d76f7d56d2b26199411878bc9a50"
+        },
+        {
+          "name": "storymodel4s.story.ValidatorSuite",
+          "file": "storyJVM-test/TEST-storymodel4s.story.ValidatorSuite.xml",
+          "sha256": "44a3e5567da3125517e900c648ad621a5d0c6843c7029bbd250b1364720c90c0"
+        }
+      ],
+      "counts": {
+        "Total": 73,
+        "Failed": 0,
+        "Errors": 0,
+        "Passed": 73,
+        "Skipped": 0
+      }
+    },
+    {
+      "task": "storyJS/test",
+      "suites": [
+        {
+          "name": "storymodel4s.probes.StoryModelUnforgeableSuite",
+          "file": "storyJS-test/TEST-storymodel4s.probes.StoryModelUnforgeableSuite.xml",
+          "sha256": "ca5ec897a29a1a13e2f710875677703c3df126b5bf59a580ebde26220739bb5a"
+        },
+        {
+          "name": "storymodel4s.story.CoveringSuite",
+          "file": "storyJS-test/TEST-storymodel4s.story.CoveringSuite.xml",
+          "sha256": "1ad97700359fa5daa3aeb1184a5651b218597e3baf4f8b544f98b4be66b3715a"
+        },
+        {
+          "name": "storymodel4s.story.D1aTextBoundarySuite",
+          "file": "storyJS-test/TEST-storymodel4s.story.D1aTextBoundarySuite.xml",
+          "sha256": "1a68f80cba01d6b92722a43e7faf293900af663581bb24fee03b2ab11e98f8b5"
+        },
+        {
+          "name": "storymodel4s.story.GraphSuite",
+          "file": "storyJS-test/TEST-storymodel4s.story.GraphSuite.xml",
+          "sha256": "00f413c90a4f0466f1eb2fc6157350434c4735a09bc75db0f23a1f654649e246"
+        },
+        {
+          "name": "storymodel4s.story.RelationsSuite",
+          "file": "storyJS-test/TEST-storymodel4s.story.RelationsSuite.xml",
+          "sha256": "161d634a33c2a19f8b96b7cb2adf5b59f13e0b4f2986606d0399462af4ab547d"
+        },
+        {
+          "name": "storymodel4s.story.ReviewFixesSuite",
+          "file": "storyJS-test/TEST-storymodel4s.story.ReviewFixesSuite.xml",
+          "sha256": "b522c9d66427b142a46768a5ab802be33d15dac6ee1059f602110771bbd350b1"
+        },
+        {
+          "name": "storymodel4s.story.ValidatorSuite",
+          "file": "storyJS-test/TEST-storymodel4s.story.ValidatorSuite.xml",
+          "sha256": "575958cf6d1e77cec17eca4530c02874befaa331cfe4605d7c0690ed26bbb22b"
+        }
+      ],
+      "counts": {
+        "Total": 73,
+        "Failed": 0,
+        "Errors": 0,
+        "Passed": 73,
+        "Skipped": 0
+      }
+    },
+    {
+      "task": "storyNative/test",
+      "suites": [
+        {
+          "name": "storymodel4s.probes.StoryModelUnforgeableSuite",
+          "file": "storyNative-test/TEST-storymodel4s.probes.StoryModelUnforgeableSuite.xml",
+          "sha256": "1f8218d2c97d5645995386ba56c46b1ffc370d391bc54794ecbc6a9a56abbb4f"
+        },
+        {
+          "name": "storymodel4s.story.CoveringSuite",
+          "file": "storyNative-test/TEST-storymodel4s.story.CoveringSuite.xml",
+          "sha256": "65145b28c6367c46ae1973081c8c6fb243bfa37980ba0d2fcb7f7350e42c9d05"
+        },
+        {
+          "name": "storymodel4s.story.D1aTextBoundarySuite",
+          "file": "storyNative-test/TEST-storymodel4s.story.D1aTextBoundarySuite.xml",
+          "sha256": "0aba43c70e86057047adc7d5ad11624123db2a02d425695148a9d86b04e15d7b"
+        },
+        {
+          "name": "storymodel4s.story.GraphSuite",
+          "file": "storyNative-test/TEST-storymodel4s.story.GraphSuite.xml",
+          "sha256": "90fb2f10b9870e95f55d96240100afca82d94341e515500190c307af606dce05"
+        },
+        {
+          "name": "storymodel4s.story.RelationsSuite",
+          "file": "storyNative-test/TEST-storymodel4s.story.RelationsSuite.xml",
+          "sha256": "273cf07a30545b1d656a6b2422ff519b4ee988b6f090e0022ea97da8b21c6682"
+        },
+        {
+          "name": "storymodel4s.story.ReviewFixesSuite",
+          "file": "storyNative-test/TEST-storymodel4s.story.ReviewFixesSuite.xml",
+          "sha256": "9d15718cd085b361bfa1efe38225518ed068216a8c2c149ad12d72da9e2bbc22"
+        },
+        {
+          "name": "storymodel4s.story.ValidatorSuite",
+          "file": "storyNative-test/TEST-storymodel4s.story.ValidatorSuite.xml",
+          "sha256": "b1cb68144f5a6fd3e0d8e0bf66ae197e1ae11f7aa3681d3bcfc086cb71bf8dca"
+        }
+      ],
+      "counts": {
+        "Total": 73,
+        "Failed": 0,
+        "Errors": 0,
+        "Passed": 73,
+        "Skipped": 0
+      }
+    },
+    {
+      "task": "documentJVM/test",
+      "suites": [
+        {
+          "name": "storymodel4s.document.ChartProposalProviderSuite",
+          "file": "documentJVM-test/TEST-storymodel4s.document.ChartProposalProviderSuite.xml",
+          "sha256": "45659b5c37c5dac289ea7493ec9620eb2babe69eab6ce40922bd1975bfef859d"
+        },
+        {
+          "name": "storymodel4s.document.ChartProposalStaticCourtSuite",
+          "file": "documentJVM-test/TEST-storymodel4s.document.ChartProposalStaticCourtSuite.xml",
+          "sha256": "bc19623cb1d5c4410f5d536246d06e995fdf78e7afa0e8cf3162a4eb721da108"
+        },
+        {
+          "name": "storymodel4s.document.CompilerSuite",
+          "file": "documentJVM-test/TEST-storymodel4s.document.CompilerSuite.xml",
+          "sha256": "ce8012c9fe0cebb3717b37e08d8dbf6e3efe71a3e522c92ee95b80b232adc048"
+        },
+        {
+          "name": "storymodel4s.document.ContextPlacementSuite",
+          "file": "documentJVM-test/TEST-storymodel4s.document.ContextPlacementSuite.xml",
+          "sha256": "687bb4b579e49a42381974af36086832aee60b780a4fe14701dc4ae19a4b0f11"
+        },
+        {
+          "name": "storymodel4s.document.CoordinatedRootSuite",
+          "file": "documentJVM-test/TEST-storymodel4s.document.CoordinatedRootSuite.xml",
+          "sha256": "41e06635d906b1ec40eda85f2c5229acc788a67cd602ee80ee964045b4379efe"
+        },
+        {
+          "name": "storymodel4s.document.DocRefSuite",
+          "file": "documentJVM-test/TEST-storymodel4s.document.DocRefSuite.xml",
+          "sha256": "9d230f58b6b2d73608a077a665054ef83fa2ee16fc4a15677114afadebc87675"
+        },
+        {
+          "name": "storymodel4s.document.DocumentSuite",
+          "file": "documentJVM-test/TEST-storymodel4s.document.DocumentSuite.xml",
+          "sha256": "59d00a60ac59eeb207d5fb76537ead4fbff67b3f4c2693189415d41a1941d63d"
+        },
+        {
+          "name": "storymodel4s.document.EntityIdentitySuite",
+          "file": "documentJVM-test/TEST-storymodel4s.document.EntityIdentitySuite.xml",
+          "sha256": "1ce5bb6b71eab28b96c43ef2a440d384fe7492c912b1a0144c428d09143e2011"
+        },
+        {
+          "name": "storymodel4s.document.MentionFormSuite",
+          "file": "documentJVM-test/TEST-storymodel4s.document.MentionFormSuite.xml",
+          "sha256": "02b3251e22262577652c2ddb0e595eac161628db8544fa788f06ea52006b4d5e"
+        },
+        {
+          "name": "storymodel4s.document.ParticipantCalibrationSuite",
+          "file": "documentJVM-test/TEST-storymodel4s.document.ParticipantCalibrationSuite.xml",
+          "sha256": "64d4320a30d346a0ba35836a7955e2cbc6088acd93c627c3fdaa32cd7ccea39b"
+        },
+        {
+          "name": "storymodel4s.document.ReferentialitySuite",
+          "file": "documentJVM-test/TEST-storymodel4s.document.ReferentialitySuite.xml",
+          "sha256": "1f85f4e4d174b48da79f67c5179920ffe251d16a8f3371c2ffa9108b4a4c5955"
+        },
+        {
+          "name": "storymodel4s.document.TrajectoryCompilerSuite",
+          "file": "documentJVM-test/TEST-storymodel4s.document.TrajectoryCompilerSuite.xml",
+          "sha256": "afb715db6d036da7fe84a32baedb48a6ca32bc55d03054b079358bfeac1200e4"
+        },
+        {
+          "name": "storymodel4s.documentprobe.CalibrationBoundarySuite",
+          "file": "documentJVM-test/TEST-storymodel4s.documentprobe.CalibrationBoundarySuite.xml",
+          "sha256": "d742682c17d35f48e429247b957841a95e8177f0d486acfa8eb7120959d36adf"
+        },
+        {
+          "name": "storymodel4s.documentprobe.ConstructionBoundarySuite",
+          "file": "documentJVM-test/TEST-storymodel4s.documentprobe.ConstructionBoundarySuite.xml",
+          "sha256": "8f81162ca1871a1ca494c524db3d26db2b9297c76aaac0f642c94ac2c8866f19"
+        }
+      ],
+      "counts": {
+        "Total": 187,
+        "Failed": 0,
+        "Errors": 0,
+        "Passed": 187,
+        "Skipped": 0
+      }
+    },
+    {
+      "task": "documentJS/test",
+      "suites": [
+        {
+          "name": "storymodel4s.document.ChartProposalProviderSuite",
+          "file": "documentJS-test/TEST-storymodel4s.document.ChartProposalProviderSuite.xml",
+          "sha256": "d8d6676dac1a01cdf5ec9fe13f4bdd018c859494f5aea5db86a9be0724d610b0"
+        },
+        {
+          "name": "storymodel4s.document.CompilerSuite",
+          "file": "documentJS-test/TEST-storymodel4s.document.CompilerSuite.xml",
+          "sha256": "954d1de8849d67e54732e408054aec48192f83898fe4fa06ca7f008e916367dc"
+        },
+        {
+          "name": "storymodel4s.document.ContextPlacementSuite",
+          "file": "documentJS-test/TEST-storymodel4s.document.ContextPlacementSuite.xml",
+          "sha256": "84133843ed66ed498c9b11421a1c728a0aa37f977e140a12d212e0e4db32871c"
+        },
+        {
+          "name": "storymodel4s.document.CoordinatedRootSuite",
+          "file": "documentJS-test/TEST-storymodel4s.document.CoordinatedRootSuite.xml",
+          "sha256": "e27ab232c94fb8384889817852c0540e849c32feb4fac4e2401ca22b26eb9b48"
+        },
+        {
+          "name": "storymodel4s.document.DocRefSuite",
+          "file": "documentJS-test/TEST-storymodel4s.document.DocRefSuite.xml",
+          "sha256": "4e39b48f40ff860005a269e7d5df98b0edd06ef16c4664d43b5e4db296512d54"
+        },
+        {
+          "name": "storymodel4s.document.DocumentSuite",
+          "file": "documentJS-test/TEST-storymodel4s.document.DocumentSuite.xml",
+          "sha256": "c30ec84aab32e7e283f8616b47f0eb7b9e7dcecfcf705461d3bec7ab1db60412"
+        },
+        {
+          "name": "storymodel4s.document.EntityIdentitySuite",
+          "file": "documentJS-test/TEST-storymodel4s.document.EntityIdentitySuite.xml",
+          "sha256": "37c919b90e27da531f15023f74bb51cd12b8a829bacbb8123e8bb73cc051ba90"
+        },
+        {
+          "name": "storymodel4s.document.MentionFormSuite",
+          "file": "documentJS-test/TEST-storymodel4s.document.MentionFormSuite.xml",
+          "sha256": "b39356e659f73312181fbe1746019f4c59aae6dee34b7aac75a6f93bc9d1a85e"
+        },
+        {
+          "name": "storymodel4s.document.ParticipantCalibrationSuite",
+          "file": "documentJS-test/TEST-storymodel4s.document.ParticipantCalibrationSuite.xml",
+          "sha256": "b10b0caa805c5c40ea696f0697c74c9a7bec9f8489b79fff7d59f63fbede45fa"
+        },
+        {
+          "name": "storymodel4s.document.ReferentialitySuite",
+          "file": "documentJS-test/TEST-storymodel4s.document.ReferentialitySuite.xml",
+          "sha256": "fa22a0c289dd20e520692f3514b75ca962acb8faa14cf603bf6d7c1fdb13dc39"
+        },
+        {
+          "name": "storymodel4s.document.TrajectoryCompilerSuite",
+          "file": "documentJS-test/TEST-storymodel4s.document.TrajectoryCompilerSuite.xml",
+          "sha256": "7a918bff43b3fc7b1aa99787142cdc679c27f9455af4824480e8d2a648d6bd7b"
+        },
+        {
+          "name": "storymodel4s.documentprobe.CalibrationBoundarySuite",
+          "file": "documentJS-test/TEST-storymodel4s.documentprobe.CalibrationBoundarySuite.xml",
+          "sha256": "aecf9acab9ea12690cfd46dadd288122233c1b2bfdfe40172a9afe6d8ebc8002"
+        },
+        {
+          "name": "storymodel4s.documentprobe.ConstructionBoundarySuite",
+          "file": "documentJS-test/TEST-storymodel4s.documentprobe.ConstructionBoundarySuite.xml",
+          "sha256": "e582905076b615ebe5e48a5513e3d9d1703c35c7352a777bf827dbaf8ebae9c4"
+        }
+      ],
+      "counts": {
+        "Total": 184,
+        "Failed": 0,
+        "Errors": 0,
+        "Passed": 184,
+        "Skipped": 0
+      }
+    },
+    {
+      "task": "documentNative/test",
+      "suites": [
+        {
+          "name": "storymodel4s.document.ChartProposalProviderSuite",
+          "file": "documentNative-test/TEST-storymodel4s.document.ChartProposalProviderSuite.xml",
+          "sha256": "6afe41ffda3b9d386d6d85b5b7a2c576b209002c767a8e48e2280e647ea7f549"
+        },
+        {
+          "name": "storymodel4s.document.CompilerSuite",
+          "file": "documentNative-test/TEST-storymodel4s.document.CompilerSuite.xml",
+          "sha256": "4040bde10791f22f8dd4b0917fcedc33f338b0f01106b0e4a3aff6eba85d7be6"
+        },
+        {
+          "name": "storymodel4s.document.ContextPlacementSuite",
+          "file": "documentNative-test/TEST-storymodel4s.document.ContextPlacementSuite.xml",
+          "sha256": "1af88f7d9726ca2ab1eb5ea2cd01f7133db9599f3fcc02f20a10a6d1bd9e059d"
+        },
+        {
+          "name": "storymodel4s.document.CoordinatedRootSuite",
+          "file": "documentNative-test/TEST-storymodel4s.document.CoordinatedRootSuite.xml",
+          "sha256": "178456e61b3317eb992743cfc1a4294f1617c42566416b6b80eaec2ecc963acd"
+        },
+        {
+          "name": "storymodel4s.document.DocRefSuite",
+          "file": "documentNative-test/TEST-storymodel4s.document.DocRefSuite.xml",
+          "sha256": "4642fd8d2d8839323284b90ce3ce740fcc4c0a58823a29fb5d75615500a46516"
+        },
+        {
+          "name": "storymodel4s.document.DocumentSuite",
+          "file": "documentNative-test/TEST-storymodel4s.document.DocumentSuite.xml",
+          "sha256": "c4afd77e40e0fc6120adf08dbc4c8171aa20681bf307422e35d49afc43fdd04b"
+        },
+        {
+          "name": "storymodel4s.document.EntityIdentitySuite",
+          "file": "documentNative-test/TEST-storymodel4s.document.EntityIdentitySuite.xml",
+          "sha256": "b476e349e061ef08f224d6a25fa4dec73aff10824e80301d0e740859d0140b70"
+        },
+        {
+          "name": "storymodel4s.document.MentionFormSuite",
+          "file": "documentNative-test/TEST-storymodel4s.document.MentionFormSuite.xml",
+          "sha256": "721cd75a2972008fb58a003e3c91b875f7258bb44930f3fd9639785bf63e52ca"
+        },
+        {
+          "name": "storymodel4s.document.ParticipantCalibrationSuite",
+          "file": "documentNative-test/TEST-storymodel4s.document.ParticipantCalibrationSuite.xml",
+          "sha256": "7c348458c80521f6acc7eca72482914da1f3c02a51af66cdafb4bf9e322f0b27"
+        },
+        {
+          "name": "storymodel4s.document.ReferentialitySuite",
+          "file": "documentNative-test/TEST-storymodel4s.document.ReferentialitySuite.xml",
+          "sha256": "7761cd9e93559737ead00137ece14fda16a4c3d663d29f15d187cd4cabae8573"
+        },
+        {
+          "name": "storymodel4s.document.TrajectoryCompilerSuite",
+          "file": "documentNative-test/TEST-storymodel4s.document.TrajectoryCompilerSuite.xml",
+          "sha256": "c61fe8b98d93abd655d1facc4ee9b972f5ce982a0d74434b93e9150cfece6cf5"
+        },
+        {
+          "name": "storymodel4s.documentprobe.CalibrationBoundarySuite",
+          "file": "documentNative-test/TEST-storymodel4s.documentprobe.CalibrationBoundarySuite.xml",
+          "sha256": "8f0aa5e37fe10b39bc6efffdd86807b67f9c2c6c1523124f3307b373ad94baee"
+        },
+        {
+          "name": "storymodel4s.documentprobe.ConstructionBoundarySuite",
+          "file": "documentNative-test/TEST-storymodel4s.documentprobe.ConstructionBoundarySuite.xml",
+          "sha256": "cd08fe20610e811948d308a900f85886568a28a1306116056b8e0081456f0eba"
+        }
+      ],
+      "counts": {
+        "Total": 184,
+        "Failed": 0,
+        "Errors": 0,
+        "Passed": 184,
+        "Skipped": 0
+      }
+    },
+    {
+      "task": "recallJVM/test",
+      "suites": [
+        {
+          "name": "storymodel4s.probes.RecallGraphUnforgeableSuite",
+          "file": "recallJVM-test/TEST-storymodel4s.probes.RecallGraphUnforgeableSuite.xml",
+          "sha256": "da238c4c5d127d3558a1494ef91351f89c1c1abb060970b38fbb52b94781d2cb"
+        },
+        {
+          "name": "storymodel4s.recall.GraphSuite",
+          "file": "recallJVM-test/TEST-storymodel4s.recall.GraphSuite.xml",
+          "sha256": "3f40fad2d4d4b5a366483e9e2ec95a355431c0b457d808ea93754e8938096775"
+        },
+        {
+          "name": "storymodel4s.recall.SegmenterSuite",
+          "file": "recallJVM-test/TEST-storymodel4s.recall.SegmenterSuite.xml",
+          "sha256": "fab4446b795c30414dba5ceac7f7e1d59756cb211bf2089b8a1ce70412288efa"
+        }
+      ],
+      "counts": {
+        "Total": 47,
+        "Failed": 0,
+        "Errors": 0,
+        "Passed": 47,
+        "Skipped": 0
+      }
+    },
+    {
+      "task": "recallJS/test",
+      "suites": [
+        {
+          "name": "storymodel4s.probes.RecallGraphUnforgeableSuite",
+          "file": "recallJS-test/TEST-storymodel4s.probes.RecallGraphUnforgeableSuite.xml",
+          "sha256": "9c5c1ff99c46d1ec5c39f8290fe961874ed97ac2cb4b3761954483291b695d51"
+        },
+        {
+          "name": "storymodel4s.recall.GraphSuite",
+          "file": "recallJS-test/TEST-storymodel4s.recall.GraphSuite.xml",
+          "sha256": "fa1473359299407c40f3ebe8969212261052b07acbf19aea1423775622bbbbef"
+        },
+        {
+          "name": "storymodel4s.recall.SegmenterSuite",
+          "file": "recallJS-test/TEST-storymodel4s.recall.SegmenterSuite.xml",
+          "sha256": "6dfb6e614cbe3979b0a60e54ebcf7cc596a534bbc014b8b3d177a9b99bd88d8b"
+        }
+      ],
+      "counts": {
+        "Total": 47,
+        "Failed": 0,
+        "Errors": 0,
+        "Passed": 47,
+        "Skipped": 0
+      }
+    },
+    {
+      "task": "recallNative/test",
+      "suites": [
+        {
+          "name": "storymodel4s.probes.RecallGraphUnforgeableSuite",
+          "file": "recallNative-test/TEST-storymodel4s.probes.RecallGraphUnforgeableSuite.xml",
+          "sha256": "ed08e0f67d4d747d1309244c44c7ac4938e332d8419ef74d817a592427ebb859"
+        },
+        {
+          "name": "storymodel4s.recall.GraphSuite",
+          "file": "recallNative-test/TEST-storymodel4s.recall.GraphSuite.xml",
+          "sha256": "9216a63a05ca2293adf678a66d8977e9df8bfa6af9aa13a431452bdaeda31ac3"
+        },
+        {
+          "name": "storymodel4s.recall.SegmenterSuite",
+          "file": "recallNative-test/TEST-storymodel4s.recall.SegmenterSuite.xml",
+          "sha256": "ab2662315b960096ee2f6c0f60286afdf7ee98e14c0a49db99f8fb23eda0e323"
+        }
+      ],
+      "counts": {
+        "Total": 47,
+        "Failed": 0,
+        "Errors": 0,
+        "Passed": 47,
+        "Skipped": 0
+      }
+    },
+    {
+      "task": "alignJVM/test",
+      "suites": [
+        {
+          "name": "storymodel4s.align.AnnaFixtureSuite",
+          "file": "alignJVM-test/TEST-storymodel4s.align.AnnaFixtureSuite.xml",
+          "sha256": "097c70776cb2c63830e8f9e203b46572f437087ba8260edc88c39a12f3f16c8a"
+        },
+        {
+          "name": "storymodel4s.align.CalibrationSuite",
+          "file": "alignJVM-test/TEST-storymodel4s.align.CalibrationSuite.xml",
+          "sha256": "977cc4e05df7f863aa4978bb67eca4e7ce2f616889f8683dc9ce8a6ee4a351a1"
+        },
+        {
+          "name": "storymodel4s.align.CostSuite",
+          "file": "alignJVM-test/TEST-storymodel4s.align.CostSuite.xml",
+          "sha256": "ad00ea1b53e7a15bf1246c47944ff00212da2b2e52170d35882ca54a4d8063b4"
+        },
+        {
+          "name": "storymodel4s.align.DirectedCausalSuite",
+          "file": "alignJVM-test/TEST-storymodel4s.align.DirectedCausalSuite.xml",
+          "sha256": "2c869709089cc2a2fd96253cf3b2cfa92569a83d773609a4b68d76be15633952"
+        },
+        {
+          "name": "storymodel4s.align.EvidenceSuite",
+          "file": "alignJVM-test/TEST-storymodel4s.align.EvidenceSuite.xml",
+          "sha256": "ed9de08eb7917cd79079c63ae2bab4c0eee2c798a3ddf4befd522388549737b0"
+        },
+        {
+          "name": "storymodel4s.align.FeaturesIntegrationSuite",
+          "file": "alignJVM-test/TEST-storymodel4s.align.FeaturesIntegrationSuite.xml",
+          "sha256": "ea7555330bfd7a1561c091a1d726400375ded6d82c78acf4f40f75b497b52461"
+        },
+        {
+          "name": "storymodel4s.align.GateProofSuite",
+          "file": "alignJVM-test/TEST-storymodel4s.align.GateProofSuite.xml",
+          "sha256": "b36398a5480dc8d78d956358e286e175163ac0c8344ecbea41f44dbf2ed808c0"
+        },
+        {
+          "name": "storymodel4s.align.LayerUseSuite",
+          "file": "alignJVM-test/TEST-storymodel4s.align.LayerUseSuite.xml",
+          "sha256": "ffd4cbcad641457a69d0a55095c5fcff019b2049f1b4fc1fda836358b6adb2b3"
+        },
+        {
+          "name": "storymodel4s.align.PopulationSuite",
+          "file": "alignJVM-test/TEST-storymodel4s.align.PopulationSuite.xml",
+          "sha256": "bc67c437a82d85d42d78e8b2a7811d1092cf9bead86cf020dc4cef9a1011d4c7"
+        },
+        {
+          "name": "storymodel4s.align.PropertySuite",
+          "file": "alignJVM-test/TEST-storymodel4s.align.PropertySuite.xml",
+          "sha256": "09534d3d326f7a3b03bb5b8430071141a813e69198c51ffcecd0096a6f63d4a6"
+        },
+        {
+          "name": "storymodel4s.align.PropositionalScopeSuite",
+          "file": "alignJVM-test/TEST-storymodel4s.align.PropositionalScopeSuite.xml",
+          "sha256": "4bee244a87af01ead277a19e5e2ef0d6e2946df3360c98a70a3108bc1f59a860"
+        },
+        {
+          "name": "storymodel4s.align.RefSuite",
+          "file": "alignJVM-test/TEST-storymodel4s.align.RefSuite.xml",
+          "sha256": "5862528e49a4508d37f96a0aecf70038f3201794b9188f74133444354d0956c3"
+        },
+        {
+          "name": "storymodel4s.align.SensoryAbsenceSuite",
+          "file": "alignJVM-test/TEST-storymodel4s.align.SensoryAbsenceSuite.xml",
+          "sha256": "217327f0d0e084054cc31b573ebfd29761f1e504ff7a7df98c45846f27b83713"
+        },
+        {
+          "name": "storymodel4s.align.SignatureSuite",
+          "file": "alignJVM-test/TEST-storymodel4s.align.SignatureSuite.xml",
+          "sha256": "70a1a4034721946b974eecd8457b3474dc817463a8adeaeaed42f2f199f52431"
+        },
+        {
+          "name": "storymodel4s.align.SinkhornSuite",
+          "file": "alignJVM-test/TEST-storymodel4s.align.SinkhornSuite.xml",
+          "sha256": "65db86c1ac28c12a0c888d84272d9af2c478e1e1ebee161a7482a30a07a63894"
+        },
+        {
+          "name": "storymodel4s.align.StructuralReductionSuite",
+          "file": "alignJVM-test/TEST-storymodel4s.align.StructuralReductionSuite.xml",
+          "sha256": "ae1653607050e6c6409977c535c9ce805155fc11003ad743f4f6f1db6b19ea49"
+        },
+        {
+          "name": "storymodel4s.align.TraceSuite",
+          "file": "alignJVM-test/TEST-storymodel4s.align.TraceSuite.xml",
+          "sha256": "c3b31cfe2d4779c6916f77a5f50cfc7c1f5294c6a5a5fbb0066c7a94b22a38d8"
+        },
+        {
+          "name": "storymodel4s.align.TransitionFeaturesSuite",
+          "file": "alignJVM-test/TEST-storymodel4s.align.TransitionFeaturesSuite.xml",
+          "sha256": "2fb37d9dc63a13c89be5a7e4df2ec1eb015c4f135b498d05d6f4aa7d7a060233"
+        },
+        {
+          "name": "storymodel4s.align.WireSuite",
+          "file": "alignJVM-test/TEST-storymodel4s.align.WireSuite.xml",
+          "sha256": "195f4ae319d6122933bd65ae87a32363fd86b942d7003fd7894cd0aa69777de6"
+        },
+        {
+          "name": "storymodel4s.align.WorkedExampleSuite",
+          "file": "alignJVM-test/TEST-storymodel4s.align.WorkedExampleSuite.xml",
+          "sha256": "e849ec5c4ef0af3fa2082f4411575094f81fd75e37b59ef88a80ffd1b95e2890"
+        },
+        {
+          "name": "storymodel4s.consumer.AlignBoundarySuite",
+          "file": "alignJVM-test/TEST-storymodel4s.consumer.AlignBoundarySuite.xml",
+          "sha256": "34cdd0bb3035eda19cd536b40122c244aab391c3fb45a32bbdeef16c5a25df95"
+        },
+        {
+          "name": "storymodel4s.consumer.PopulationBoundarySuite",
+          "file": "alignJVM-test/TEST-storymodel4s.consumer.PopulationBoundarySuite.xml",
+          "sha256": "30560ac01c1dcc7a3a4bf7eef51eeadbdd73f8c076c9755e52a40620aef702dd"
+        },
+        {
+          "name": "storymodel4s.probes.CellCoordinatesUnforgeableSuite",
+          "file": "alignJVM-test/TEST-storymodel4s.probes.CellCoordinatesUnforgeableSuite.xml",
+          "sha256": "6a17c01ae6450b9f5b2f4df3bbca5a01b2d5ac1e1ace70cb916f9b3223f0bb8a"
+        },
+        {
+          "name": "storymodel4s.probes.StructuralChannelUnforgeableSuite",
+          "file": "alignJVM-test/TEST-storymodel4s.probes.StructuralChannelUnforgeableSuite.xml",
+          "sha256": "ae1aa36d8bc12ba666647d94d3a82d52ff58ecc04c074797bee4cf7d987593bb"
+        }
+      ],
+      "counts": {
+        "Total": 257,
+        "Failed": 0,
+        "Errors": 0,
+        "Passed": 257,
+        "Skipped": 0
+      }
+    },
+    {
+      "task": "alignJS/test",
+      "suites": [
+        {
+          "name": "storymodel4s.align.AnnaFixtureSuite",
+          "file": "alignJS-test/TEST-storymodel4s.align.AnnaFixtureSuite.xml",
+          "sha256": "7ed4625b4b206ada7e8c0452811a4e8b4ac500ab311686fa97e6df60a24c5b17"
+        },
+        {
+          "name": "storymodel4s.align.CalibrationSuite",
+          "file": "alignJS-test/TEST-storymodel4s.align.CalibrationSuite.xml",
+          "sha256": "f53e8d056090291149d7c6036203edd77220a31d7b51b9116c3e73801d541484"
+        },
+        {
+          "name": "storymodel4s.align.CostSuite",
+          "file": "alignJS-test/TEST-storymodel4s.align.CostSuite.xml",
+          "sha256": "95fb9e695bf2c760da41aef7a47990a109e72aebda2c35472c0bbbb56f1c53df"
+        },
+        {
+          "name": "storymodel4s.align.DirectedCausalSuite",
+          "file": "alignJS-test/TEST-storymodel4s.align.DirectedCausalSuite.xml",
+          "sha256": "ab7a43ad808752601c9c65b8ea0bca94c6837c1b84a05156e99d8242075fa30e"
+        },
+        {
+          "name": "storymodel4s.align.EvidenceSuite",
+          "file": "alignJS-test/TEST-storymodel4s.align.EvidenceSuite.xml",
+          "sha256": "b75c872c644cc9e17d7f6e55d50b7a50b328d4962cc55425ea24538f6ebbd44a"
+        },
+        {
+          "name": "storymodel4s.align.FeaturesIntegrationSuite",
+          "file": "alignJS-test/TEST-storymodel4s.align.FeaturesIntegrationSuite.xml",
+          "sha256": "4350dd18ecc691f20c94ed60c1325ee39fe10e94c076da65d32417fa672c7e1b"
+        },
+        {
+          "name": "storymodel4s.align.GateProofSuite",
+          "file": "alignJS-test/TEST-storymodel4s.align.GateProofSuite.xml",
+          "sha256": "73298a32f2cc27434a4727ffd7daa85a3d4cb1c29cb5a2d099ffe5bd1375b8e5"
+        },
+        {
+          "name": "storymodel4s.align.LayerUseSuite",
+          "file": "alignJS-test/TEST-storymodel4s.align.LayerUseSuite.xml",
+          "sha256": "7fca30f1314090fb271148cb9190c36bb3f2ccaa9cc43f39db268a1239e3d077"
+        },
+        {
+          "name": "storymodel4s.align.PopulationSuite",
+          "file": "alignJS-test/TEST-storymodel4s.align.PopulationSuite.xml",
+          "sha256": "f0d9bb44de13f4b348fecf9da381241562c2a2a914ad3b682e580f21d495c078"
+        },
+        {
+          "name": "storymodel4s.align.PropertySuite",
+          "file": "alignJS-test/TEST-storymodel4s.align.PropertySuite.xml",
+          "sha256": "becbcbeae8e1ab4406e82f30d87f92e429b41379a86f6d1d88d087c740b0652a"
+        },
+        {
+          "name": "storymodel4s.align.PropositionalScopeSuite",
+          "file": "alignJS-test/TEST-storymodel4s.align.PropositionalScopeSuite.xml",
+          "sha256": "83c333b62fef2f2af3f7100b505e3cd655bb9dc4249d1e3f3a946e961fc70b06"
+        },
+        {
+          "name": "storymodel4s.align.RefSuite",
+          "file": "alignJS-test/TEST-storymodel4s.align.RefSuite.xml",
+          "sha256": "f453b7df4d45c42ed3be60066644b2f2bc4ea52a6137b88a581165f757185dfd"
+        },
+        {
+          "name": "storymodel4s.align.SensoryAbsenceSuite",
+          "file": "alignJS-test/TEST-storymodel4s.align.SensoryAbsenceSuite.xml",
+          "sha256": "57a3117bb8296199040364f48bf97b31910e8a6428c225db9e3e07bd337b9283"
+        },
+        {
+          "name": "storymodel4s.align.SignatureSuite",
+          "file": "alignJS-test/TEST-storymodel4s.align.SignatureSuite.xml",
+          "sha256": "3f84c47a993e226b28017d42c2cc7d744c4a0088b5511edbcfb6f2419a76f51b"
+        },
+        {
+          "name": "storymodel4s.align.SinkhornSuite",
+          "file": "alignJS-test/TEST-storymodel4s.align.SinkhornSuite.xml",
+          "sha256": "2e05f51287d96b86d78de05c7174b460a3bddd80de89cf8d5362fd672b91d2bd"
+        },
+        {
+          "name": "storymodel4s.align.StructuralReductionSuite",
+          "file": "alignJS-test/TEST-storymodel4s.align.StructuralReductionSuite.xml",
+          "sha256": "066034284cb076bd3ca28235eac2c06f4f1a6c9ef5ef3c17263294605763b219"
+        },
+        {
+          "name": "storymodel4s.align.TraceSuite",
+          "file": "alignJS-test/TEST-storymodel4s.align.TraceSuite.xml",
+          "sha256": "a35b721c409d1de7e087d0e40010b834891cf555a747bbd9e3ba326f0a054e21"
+        },
+        {
+          "name": "storymodel4s.align.TransitionFeaturesSuite",
+          "file": "alignJS-test/TEST-storymodel4s.align.TransitionFeaturesSuite.xml",
+          "sha256": "42945aa1c60532b21425668a8e1733d433b0d53980b444db87681d1ad0dee89f"
+        },
+        {
+          "name": "storymodel4s.align.WireSuite",
+          "file": "alignJS-test/TEST-storymodel4s.align.WireSuite.xml",
+          "sha256": "080c6f70ca90d521385c1cb8646dc4ffa32f7289b129240c1b873b49dd0b8c6e"
+        },
+        {
+          "name": "storymodel4s.align.WorkedExampleSuite",
+          "file": "alignJS-test/TEST-storymodel4s.align.WorkedExampleSuite.xml",
+          "sha256": "4bc5b7acba52b22cd2977f05b292e537f650530c74a7065658763904d6535e5a"
+        },
+        {
+          "name": "storymodel4s.consumer.AlignBoundarySuite",
+          "file": "alignJS-test/TEST-storymodel4s.consumer.AlignBoundarySuite.xml",
+          "sha256": "fdfae9c9f11a538161370f0185a1bfcb37a9dc0c757afe674e9f133ccab18834"
+        },
+        {
+          "name": "storymodel4s.consumer.PopulationBoundarySuite",
+          "file": "alignJS-test/TEST-storymodel4s.consumer.PopulationBoundarySuite.xml",
+          "sha256": "b368bdb3f0a01802cbac1ca49fbebe6c72360854274b170761fbdf3fdb339d93"
+        },
+        {
+          "name": "storymodel4s.probes.CellCoordinatesUnforgeableSuite",
+          "file": "alignJS-test/TEST-storymodel4s.probes.CellCoordinatesUnforgeableSuite.xml",
+          "sha256": "9af28407ab9c4d2abedf54b8f0a2d451317c78496480796ee249e7b5353a5781"
+        },
+        {
+          "name": "storymodel4s.probes.StructuralChannelUnforgeableSuite",
+          "file": "alignJS-test/TEST-storymodel4s.probes.StructuralChannelUnforgeableSuite.xml",
+          "sha256": "02f42b604aefefdaad52fa9fbe23f2d7078cb38609e616adfa560767e1e4c70d"
+        }
+      ],
+      "counts": {
+        "Total": 257,
+        "Failed": 0,
+        "Errors": 0,
+        "Passed": 257,
+        "Skipped": 0
+      }
+    },
+    {
+      "task": "alignNative/test",
+      "suites": [
+        {
+          "name": "storymodel4s.align.AnnaFixtureSuite",
+          "file": "alignNative-test/TEST-storymodel4s.align.AnnaFixtureSuite.xml",
+          "sha256": "dde6f9950afce51b37c91a2a6d956f08b676eaba088e6826f016ff61a35d9f46"
+        },
+        {
+          "name": "storymodel4s.align.CalibrationSuite",
+          "file": "alignNative-test/TEST-storymodel4s.align.CalibrationSuite.xml",
+          "sha256": "78d2b2f136819d21ac47e86e6c5f4633adf3a1ff57dabc53e0c8a00c82581c99"
+        },
+        {
+          "name": "storymodel4s.align.CostSuite",
+          "file": "alignNative-test/TEST-storymodel4s.align.CostSuite.xml",
+          "sha256": "6681a1f63944b9468ae06d7df02042685d2b36853fc9992ed4c8c65235dd1f8b"
+        },
+        {
+          "name": "storymodel4s.align.DirectedCausalSuite",
+          "file": "alignNative-test/TEST-storymodel4s.align.DirectedCausalSuite.xml",
+          "sha256": "5515025d4858c852c255ea9ce1af7e3fe79f4a473aa99e1b40e78c1fd6876db8"
+        },
+        {
+          "name": "storymodel4s.align.EvidenceSuite",
+          "file": "alignNative-test/TEST-storymodel4s.align.EvidenceSuite.xml",
+          "sha256": "e9e02342f8929d1a84d9c0553b017bbb525d11392b0b54be8c6c5fbd60a4dbc4"
+        },
+        {
+          "name": "storymodel4s.align.FeaturesIntegrationSuite",
+          "file": "alignNative-test/TEST-storymodel4s.align.FeaturesIntegrationSuite.xml",
+          "sha256": "76a824f443cc47aaae122c9f532f25559e962626c11720b04611adfcf0f7db03"
+        },
+        {
+          "name": "storymodel4s.align.GateProofSuite",
+          "file": "alignNative-test/TEST-storymodel4s.align.GateProofSuite.xml",
+          "sha256": "a191abf09d3bba0c7f9bf3038cef54afb9290dac08c0300b4bb4f48a02734161"
+        },
+        {
+          "name": "storymodel4s.align.LayerUseSuite",
+          "file": "alignNative-test/TEST-storymodel4s.align.LayerUseSuite.xml",
+          "sha256": "849d00e616465a27f9c986ad88e5c958bdb4c87f181c3b25a6ba7195c99366fc"
+        },
+        {
+          "name": "storymodel4s.align.PopulationSuite",
+          "file": "alignNative-test/TEST-storymodel4s.align.PopulationSuite.xml",
+          "sha256": "01c98809a3442e3264af9196713948a313548e900a8ce94740c892b3b4c8eb5d"
+        },
+        {
+          "name": "storymodel4s.align.PropertySuite",
+          "file": "alignNative-test/TEST-storymodel4s.align.PropertySuite.xml",
+          "sha256": "08dc504252ec30a984f24af07a4b2fa7bfa4f3e65b3a8e027b3a56336eef69bf"
+        },
+        {
+          "name": "storymodel4s.align.PropositionalScopeSuite",
+          "file": "alignNative-test/TEST-storymodel4s.align.PropositionalScopeSuite.xml",
+          "sha256": "d7ce1752287670a38fad74ee98b59c457b47aecdb309335111b6c0fcd3ae7bda"
+        },
+        {
+          "name": "storymodel4s.align.RefSuite",
+          "file": "alignNative-test/TEST-storymodel4s.align.RefSuite.xml",
+          "sha256": "2fbfb8b255a238daaefc77f094a169e9f1a67e927d4e9b6373e99afdcf9236ce"
+        },
+        {
+          "name": "storymodel4s.align.SensoryAbsenceSuite",
+          "file": "alignNative-test/TEST-storymodel4s.align.SensoryAbsenceSuite.xml",
+          "sha256": "9bdd3bf6cf2c2fdb3ed781b515e78f331c98a82fad49482935ea16f993b1e208"
+        },
+        {
+          "name": "storymodel4s.align.SignatureSuite",
+          "file": "alignNative-test/TEST-storymodel4s.align.SignatureSuite.xml",
+          "sha256": "05bbff8f4a8bdf7b7e9980a882b008699c5e3dcb8825abb61f1c48f6cb331a37"
+        },
+        {
+          "name": "storymodel4s.align.SinkhornSuite",
+          "file": "alignNative-test/TEST-storymodel4s.align.SinkhornSuite.xml",
+          "sha256": "d239a66cdff7464edea2cc536e16e5c6bdebcb9c0e1920e0b992a061102e3a01"
+        },
+        {
+          "name": "storymodel4s.align.StructuralReductionSuite",
+          "file": "alignNative-test/TEST-storymodel4s.align.StructuralReductionSuite.xml",
+          "sha256": "0512431ca6294559d904c91423c6479c2cf9b1dbd319c39c73c6d26e7f5ae34e"
+        },
+        {
+          "name": "storymodel4s.align.TraceSuite",
+          "file": "alignNative-test/TEST-storymodel4s.align.TraceSuite.xml",
+          "sha256": "0b85151404da09af9edb129f805d890db54625d45f97f818298ad76e5fcda3da"
+        },
+        {
+          "name": "storymodel4s.align.TransitionFeaturesSuite",
+          "file": "alignNative-test/TEST-storymodel4s.align.TransitionFeaturesSuite.xml",
+          "sha256": "8d152c6b4de8df79cdfa8a7fc06b7f32e392cd4d7d8cc3a3ab3054cbe628cfdf"
+        },
+        {
+          "name": "storymodel4s.align.WireSuite",
+          "file": "alignNative-test/TEST-storymodel4s.align.WireSuite.xml",
+          "sha256": "9116745a3c9452579f3158c6a0dcd8c5b43790ec0733cd80ee2a6e35a7af7c41"
+        },
+        {
+          "name": "storymodel4s.align.WorkedExampleSuite",
+          "file": "alignNative-test/TEST-storymodel4s.align.WorkedExampleSuite.xml",
+          "sha256": "57689107cde0bb20cbd1dd29afc2f4c4c572f77b5ee3abcf6880b9120f2e6310"
+        },
+        {
+          "name": "storymodel4s.consumer.AlignBoundarySuite",
+          "file": "alignNative-test/TEST-storymodel4s.consumer.AlignBoundarySuite.xml",
+          "sha256": "06de9d507b45bf5c10492a507f4716a276323a5a60ba83ab75645564d40cac18"
+        },
+        {
+          "name": "storymodel4s.consumer.PopulationBoundarySuite",
+          "file": "alignNative-test/TEST-storymodel4s.consumer.PopulationBoundarySuite.xml",
+          "sha256": "dd76af74d34ad89f389a319fcbbc9e2390108c242470e78c065832a33026de23"
+        },
+        {
+          "name": "storymodel4s.probes.CellCoordinatesUnforgeableSuite",
+          "file": "alignNative-test/TEST-storymodel4s.probes.CellCoordinatesUnforgeableSuite.xml",
+          "sha256": "f8374d460320c939c3ab18e630109ae7f7c5066b0b29e1fb00f0e285bb5a552f"
+        },
+        {
+          "name": "storymodel4s.probes.StructuralChannelUnforgeableSuite",
+          "file": "alignNative-test/TEST-storymodel4s.probes.StructuralChannelUnforgeableSuite.xml",
+          "sha256": "b6fe3bc6acca1fe22664f78d0d281120f065fecef962e3d804552fbcffb14303"
+        }
+      ],
+      "counts": {
+        "Total": 257,
+        "Failed": 0,
+        "Errors": 0,
+        "Passed": 257,
+        "Skipped": 0
+      }
+    },
+    {
+      "task": "interviewJVM/test",
+      "suites": [
+        {
+          "name": "storymodel4s.interview.AmbiguousPlacementSuite",
+          "file": "interviewJVM-test/TEST-storymodel4s.interview.AmbiguousPlacementSuite.xml",
+          "sha256": "5633cb03f1c60408ee09b386ad6cf82596b28bfd9a3f8b9a6b1b196823bc3fa7"
+        },
+        {
+          "name": "storymodel4s.interview.InterviewInductionSuite",
+          "file": "interviewJVM-test/TEST-storymodel4s.interview.InterviewInductionSuite.xml",
+          "sha256": "48dd5d4c899bf74621fea25566ff61d2cd6dc72279df7e4b5afd3a4ce89fb3eb"
+        },
+        {
+          "name": "storymodel4s.interview.InterviewPhenomenologySuite",
+          "file": "interviewJVM-test/TEST-storymodel4s.interview.InterviewPhenomenologySuite.xml",
+          "sha256": "d1eb655efe375744dc2cbee5a170d9e3cef9847348b168135ce244a2e64985c3"
+        },
+        {
+          "name": "storymodel4s.interview.InterviewProfileSuite",
+          "file": "interviewJVM-test/TEST-storymodel4s.interview.InterviewProfileSuite.xml",
+          "sha256": "6a281546de9c8880e0afdeb640f6fa0b854cd228aa6c1f7347b736f37faf313f"
+        },
+        {
+          "name": "storymodel4s.interview.InterviewSuite",
+          "file": "interviewJVM-test/TEST-storymodel4s.interview.InterviewSuite.xml",
+          "sha256": "03d651d7ec87af0415a21b864836dea5bd0fef91d5d00191e394b8ccb6431c27"
+        },
+        {
+          "name": "storymodel4s.interview.ResolutionSuite",
+          "file": "interviewJVM-test/TEST-storymodel4s.interview.ResolutionSuite.xml",
+          "sha256": "004993c0ea3b38960d96d75538d8eaf6e315bb4f4d6662cd60fd30b43b2e6ecd"
+        },
+        {
+          "name": "storymodel4s.interview.scoring.PlacementProducerSuite",
+          "file": "interviewJVM-test/TEST-storymodel4s.interview.scoring.PlacementProducerSuite.xml",
+          "sha256": "2323b75f54c928a77c75f43858a6168a457f019aada7a9abcfd79522dee40ee2"
+        },
+        {
+          "name": "storymodel4s.interviewprobe.ConstructionBoundarySuite",
+          "file": "interviewJVM-test/TEST-storymodel4s.interviewprobe.ConstructionBoundarySuite.xml",
+          "sha256": "80d047fe746903ef4e6f5753a60158b97403fded0ff81f6d29340df9bc37c0c0"
+        },
+        {
+          "name": "storymodel4s.probes.PlacementResolutionRemedySuite",
+          "file": "interviewJVM-test/TEST-storymodel4s.probes.PlacementResolutionRemedySuite.xml",
+          "sha256": "c6384fe76b425f75c5f49705ba43e385103faa05c775871b7bb2b764d0075c1a"
+        }
+      ],
+      "counts": {
+        "Total": 104,
+        "Failed": 0,
+        "Errors": 0,
+        "Passed": 104,
+        "Skipped": 0
+      }
+    },
+    {
+      "task": "interviewJS/test",
+      "suites": [
+        {
+          "name": "storymodel4s.interview.AmbiguousPlacementSuite",
+          "file": "interviewJS-test/TEST-storymodel4s.interview.AmbiguousPlacementSuite.xml",
+          "sha256": "79b82a503c8458d2495f3e573d948b4588a53cb1440d370803b922812572b1e5"
+        },
+        {
+          "name": "storymodel4s.interview.InterviewInductionSuite",
+          "file": "interviewJS-test/TEST-storymodel4s.interview.InterviewInductionSuite.xml",
+          "sha256": "5e10974fc2da9f3851d700ed47264b231aae9f903fec523a3f12258078eb197a"
+        },
+        {
+          "name": "storymodel4s.interview.InterviewPhenomenologySuite",
+          "file": "interviewJS-test/TEST-storymodel4s.interview.InterviewPhenomenologySuite.xml",
+          "sha256": "00c1938d4da4b522b31d5d5484ee77365171bab503c18ea7c3458e71bcba0fcd"
+        },
+        {
+          "name": "storymodel4s.interview.InterviewProfileSuite",
+          "file": "interviewJS-test/TEST-storymodel4s.interview.InterviewProfileSuite.xml",
+          "sha256": "15fe22af8180be6df812d6fb27cd127c7d36f4583002fe2b2a966af1c3272c2e"
+        },
+        {
+          "name": "storymodel4s.interview.InterviewSuite",
+          "file": "interviewJS-test/TEST-storymodel4s.interview.InterviewSuite.xml",
+          "sha256": "109ae7065252a6c51b65ef6ea790ae5d68a6981a618859b965a7cc21944dc8fb"
+        },
+        {
+          "name": "storymodel4s.interview.ResolutionSuite",
+          "file": "interviewJS-test/TEST-storymodel4s.interview.ResolutionSuite.xml",
+          "sha256": "133733814370654f0c86adad3e56f5429ab6666205237511696d88e294b96e70"
+        },
+        {
+          "name": "storymodel4s.interview.scoring.PlacementProducerSuite",
+          "file": "interviewJS-test/TEST-storymodel4s.interview.scoring.PlacementProducerSuite.xml",
+          "sha256": "ed8cc0c23b9afcbd7f49d121e6679c45bb3c42134740ac213f120809531f5aec"
+        },
+        {
+          "name": "storymodel4s.interviewprobe.ConstructionBoundarySuite",
+          "file": "interviewJS-test/TEST-storymodel4s.interviewprobe.ConstructionBoundarySuite.xml",
+          "sha256": "897865ce2055a5ee429e127ffe631ce0b09092c56375ca59e0eb532113e1cb16"
+        },
+        {
+          "name": "storymodel4s.probes.PlacementResolutionRemedySuite",
+          "file": "interviewJS-test/TEST-storymodel4s.probes.PlacementResolutionRemedySuite.xml",
+          "sha256": "5370616d34e26e07e7bba83f9aabf0dc49f532d7757641c25ce5862ac0cf54e7"
+        }
+      ],
+      "counts": {
+        "Total": 104,
+        "Failed": 0,
+        "Errors": 0,
+        "Passed": 104,
+        "Skipped": 0
+      }
+    },
+    {
+      "task": "interviewNative/test",
+      "suites": [
+        {
+          "name": "storymodel4s.interview.AmbiguousPlacementSuite",
+          "file": "interviewNative-test/TEST-storymodel4s.interview.AmbiguousPlacementSuite.xml",
+          "sha256": "2928d5e3b2235ea8599e130868c6db826caa3f28d71a3c37edab138b73e8ebc4"
+        },
+        {
+          "name": "storymodel4s.interview.InterviewInductionSuite",
+          "file": "interviewNative-test/TEST-storymodel4s.interview.InterviewInductionSuite.xml",
+          "sha256": "689d5c5501bfb13ca1a76a3067185eddec5347f3150ebac27e1c00643dc086a1"
+        },
+        {
+          "name": "storymodel4s.interview.InterviewPhenomenologySuite",
+          "file": "interviewNative-test/TEST-storymodel4s.interview.InterviewPhenomenologySuite.xml",
+          "sha256": "1e5d93ae0b29b95ee81df88b2b4e980cc61180123e8967d8cc8a523478eea04c"
+        },
+        {
+          "name": "storymodel4s.interview.InterviewProfileSuite",
+          "file": "interviewNative-test/TEST-storymodel4s.interview.InterviewProfileSuite.xml",
+          "sha256": "bc2f3fd0486e797f9e15cdb10a98c73dc628694b50a768554e264470667b099a"
+        },
+        {
+          "name": "storymodel4s.interview.InterviewSuite",
+          "file": "interviewNative-test/TEST-storymodel4s.interview.InterviewSuite.xml",
+          "sha256": "d63ba543277b7c4bd5799133e2bf032b64ff9dd56b05c5e5da880879b994640c"
+        },
+        {
+          "name": "storymodel4s.interview.ResolutionSuite",
+          "file": "interviewNative-test/TEST-storymodel4s.interview.ResolutionSuite.xml",
+          "sha256": "3096ef0d53f88e3ccbbc61f972f1beda6bb60193f7824025651c2d0ef3467c65"
+        },
+        {
+          "name": "storymodel4s.interview.scoring.PlacementProducerSuite",
+          "file": "interviewNative-test/TEST-storymodel4s.interview.scoring.PlacementProducerSuite.xml",
+          "sha256": "f400f0569710a4e1074a1cc50962072e5e3a430348f8edb16f6d560c496eb24a"
+        },
+        {
+          "name": "storymodel4s.interviewprobe.ConstructionBoundarySuite",
+          "file": "interviewNative-test/TEST-storymodel4s.interviewprobe.ConstructionBoundarySuite.xml",
+          "sha256": "3e06df7369cbd45782d1ab65bb882257d201fa685f35c17f6f20f6d709bcd183"
+        },
+        {
+          "name": "storymodel4s.probes.PlacementResolutionRemedySuite",
+          "file": "interviewNative-test/TEST-storymodel4s.probes.PlacementResolutionRemedySuite.xml",
+          "sha256": "c3b6534da58027979d125407dc1464a98b41f4f8898949b5297429cb530cbef2"
+        }
+      ],
+      "counts": {
+        "Total": 104,
+        "Failed": 0,
+        "Errors": 0,
+        "Passed": 104,
+        "Skipped": 0
+      }
+    },
+    {
+      "task": "embedCoreJVM/test",
+      "suites": [
+        {
+          "name": "storymodel4s.embed.BaselineSuite",
+          "file": "embedCoreJVM-test/TEST-storymodel4s.embed.BaselineSuite.xml",
+          "sha256": "6fed9d95399d098680919bcb36958279f72811d5847cc6ba3a8762eec3fd6a26"
+        },
+        {
+          "name": "storymodel4s.embed.ContractSuite",
+          "file": "embedCoreJVM-test/TEST-storymodel4s.embed.ContractSuite.xml",
+          "sha256": "05299355e900e62a3fe17ec433803434c7cc261be28d89d4d16b69787e5a9dd3"
+        },
+        {
+          "name": "storymodel4s.embed.DigestPrivacySuite",
+          "file": "embedCoreJVM-test/TEST-storymodel4s.embed.DigestPrivacySuite.xml",
+          "sha256": "12225db0118537d2b086789a923363f2975c1a32a2dec45893848e5af4f699ea"
+        },
+        {
+          "name": "storymodel4s.embed.IdentitySuite",
+          "file": "embedCoreJVM-test/TEST-storymodel4s.embed.IdentitySuite.xml",
+          "sha256": "e817e604370b987eb6f1b3680f09e0085d729498a648c10d4f6558e8a3c4ff42"
+        },
+        {
+          "name": "storymodel4s.embed.PrivacySuite",
+          "file": "embedCoreJVM-test/TEST-storymodel4s.embed.PrivacySuite.xml",
+          "sha256": "955f7cfcb2a68f42cbf72338d97ffa18d6ccc764fdf7db3b0ca5fb6426579b5b"
+        },
+        {
+          "name": "storymodel4s.embed.ReceiptDigestSuite",
+          "file": "embedCoreJVM-test/TEST-storymodel4s.embed.ReceiptDigestSuite.xml",
+          "sha256": "8b941bffe05c80b477fbbd7e0221461a1af87edef2031ee0f6ed1d78064b8932"
+        },
+        {
+          "name": "storymodel4s.embed.VectorSuite",
+          "file": "embedCoreJVM-test/TEST-storymodel4s.embed.VectorSuite.xml",
+          "sha256": "83cec23ad42043156bb4b6c62bc8e483d5bc2e84ceddba995730d57c9ead4f05"
+        },
+        {
+          "name": "storymodel4s.embedprobe.ConstructionProbeSuite",
+          "file": "embedCoreJVM-test/TEST-storymodel4s.embedprobe.ConstructionProbeSuite.xml",
+          "sha256": "dc6ee4d82f2ad35db8fdb4158c604adf64677ca36469830a99f304e358b69fcf"
+        }
+      ],
+      "counts": {
+        "Total": 144,
+        "Failed": 0,
+        "Errors": 0,
+        "Passed": 144,
+        "Skipped": 0
+      }
+    },
+    {
+      "task": "embedCoreJS/test",
+      "suites": [
+        {
+          "name": "storymodel4s.embed.BaselineSuite",
+          "file": "embedCoreJS-test/TEST-storymodel4s.embed.BaselineSuite.xml",
+          "sha256": "2b0d56fe617b787601ee0176d4529b08a6442242d72a659210bb8810e73e4bed"
+        },
+        {
+          "name": "storymodel4s.embed.ContractSuite",
+          "file": "embedCoreJS-test/TEST-storymodel4s.embed.ContractSuite.xml",
+          "sha256": "2a8ad0bea50b9a7e81f8166dae51743f2ec14e736dc346cdac86845fac3b661e"
+        },
+        {
+          "name": "storymodel4s.embed.DigestPrivacySuite",
+          "file": "embedCoreJS-test/TEST-storymodel4s.embed.DigestPrivacySuite.xml",
+          "sha256": "1c6967f05a22caf584fa39dcb431a0a07f9b0585d84f750c484f815f046a085e"
+        },
+        {
+          "name": "storymodel4s.embed.IdentitySuite",
+          "file": "embedCoreJS-test/TEST-storymodel4s.embed.IdentitySuite.xml",
+          "sha256": "53db6fa424090e7e97ccc137c83f31a88245b64557e4b117125ae8ea08a6208f"
+        },
+        {
+          "name": "storymodel4s.embed.PrivacySuite",
+          "file": "embedCoreJS-test/TEST-storymodel4s.embed.PrivacySuite.xml",
+          "sha256": "e5ecc7d487766cb238ead105f09a6260d84659fc545395086ad5ced8f973525e"
+        },
+        {
+          "name": "storymodel4s.embed.ReceiptDigestSuite",
+          "file": "embedCoreJS-test/TEST-storymodel4s.embed.ReceiptDigestSuite.xml",
+          "sha256": "32f2a6728091b5fbae580b50a50ff4935a2a14aeafe5af62d403d048ab0b4fd0"
+        },
+        {
+          "name": "storymodel4s.embed.VectorSuite",
+          "file": "embedCoreJS-test/TEST-storymodel4s.embed.VectorSuite.xml",
+          "sha256": "b8bf65460428e1f098fcadab9271170b8d6dbc2a4020fd0e2b9fc94c03c94aa6"
+        },
+        {
+          "name": "storymodel4s.embedprobe.ConstructionProbeSuite",
+          "file": "embedCoreJS-test/TEST-storymodel4s.embedprobe.ConstructionProbeSuite.xml",
+          "sha256": "c77c5cc215cf348bc0ff235fdfdf9503568292e6db3712c53be275d626e9a0e2"
+        }
+      ],
+      "counts": {
+        "Total": 144,
+        "Failed": 0,
+        "Errors": 0,
+        "Passed": 144,
+        "Skipped": 0
+      }
+    },
+    {
+      "task": "embedCoreNative/test",
+      "suites": [
+        {
+          "name": "storymodel4s.embed.BaselineSuite",
+          "file": "embedCoreNative-test/TEST-storymodel4s.embed.BaselineSuite.xml",
+          "sha256": "6380ae33dfa54477213a211075e4cff1212c3c827c93fa623d8b919d60dea18d"
+        },
+        {
+          "name": "storymodel4s.embed.ContractSuite",
+          "file": "embedCoreNative-test/TEST-storymodel4s.embed.ContractSuite.xml",
+          "sha256": "5c0007cbd96270f26fdb63658bafd7ba348b08d58d45e1f1c5baf47c51de47fd"
+        },
+        {
+          "name": "storymodel4s.embed.DigestPrivacySuite",
+          "file": "embedCoreNative-test/TEST-storymodel4s.embed.DigestPrivacySuite.xml",
+          "sha256": "8c24f3fa0910172f5a6d5c172c99d86524f8733688fd2445045f77a5342d6539"
+        },
+        {
+          "name": "storymodel4s.embed.IdentitySuite",
+          "file": "embedCoreNative-test/TEST-storymodel4s.embed.IdentitySuite.xml",
+          "sha256": "205c9c88134ae35bb2b14865a15e77ceaeb2c2af6f31f2238bf0b2c6cc811212"
+        },
+        {
+          "name": "storymodel4s.embed.PrivacySuite",
+          "file": "embedCoreNative-test/TEST-storymodel4s.embed.PrivacySuite.xml",
+          "sha256": "e9c7600957b00b20731b654c7d34bd57a2a9db611507eb1b7438f008dd3cde71"
+        },
+        {
+          "name": "storymodel4s.embed.ReceiptDigestSuite",
+          "file": "embedCoreNative-test/TEST-storymodel4s.embed.ReceiptDigestSuite.xml",
+          "sha256": "e9dd6a39b60ea31b328b0d23163500b514240e275dc47c2c36b911282f947076"
+        },
+        {
+          "name": "storymodel4s.embed.VectorSuite",
+          "file": "embedCoreNative-test/TEST-storymodel4s.embed.VectorSuite.xml",
+          "sha256": "336864a1ec648d84b97b29231b2261d15c5c0a0614a8f759078353d6870ad0be"
+        },
+        {
+          "name": "storymodel4s.embedprobe.ConstructionProbeSuite",
+          "file": "embedCoreNative-test/TEST-storymodel4s.embedprobe.ConstructionProbeSuite.xml",
+          "sha256": "40c3968040019ba1f4751e90f420ddb58ec890d78a2d1e1740de13b11a160b50"
+        }
+      ],
+      "counts": {
+        "Total": 144,
+        "Failed": 0,
+        "Errors": 0,
+        "Passed": 144,
+        "Skipped": 0
+      }
+    },
+    {
+      "task": "viewJVM/test",
+      "suites": [
+        {
+          "name": "storymodel4s.view.AtlasSuite",
+          "file": "viewJVM-test/TEST-storymodel4s.view.AtlasSuite.xml",
+          "sha256": "6e58083843110394403cd894c4bef0f178e493717515faa65dac5b1ca5789263"
+        },
+        {
+          "name": "storymodel4s.view.CodexCompilerSuite",
+          "file": "viewJVM-test/TEST-storymodel4s.view.CodexCompilerSuite.xml",
+          "sha256": "81a47511c7fe75bf5537f231f7c2c3e9b02e99856c3146995b6260971ee79bed"
+        },
+        {
+          "name": "storymodel4s.view.CodexFlowSuite",
+          "file": "viewJVM-test/TEST-storymodel4s.view.CodexFlowSuite.xml",
+          "sha256": "797ea66d9e15ee1301b3a83c58083a9d2fed9b4ca047d396e7602cc50e7d3bde"
+        },
+        {
+          "name": "storymodel4s.view.CompiledAtlasSuite",
+          "file": "viewJVM-test/TEST-storymodel4s.view.CompiledAtlasSuite.xml",
+          "sha256": "6e6c9eb99a85f2834e02087a75c6f9775aae21847d146868098afdb77c7a24c4"
+        },
+        {
+          "name": "storymodel4s.view.DraftAtlasSuite",
+          "file": "viewJVM-test/TEST-storymodel4s.view.DraftAtlasSuite.xml",
+          "sha256": "4c735adda6bab10cbc4760160997ff8566b27def2958301a548c1dee9b4d91f3"
+        },
+        {
+          "name": "storymodel4s.view.DraftCodexSuite",
+          "file": "viewJVM-test/TEST-storymodel4s.view.DraftCodexSuite.xml",
+          "sha256": "a36cca6d20f262c4a11130e8167f399be146f23ec45cd638a8033494ede3adff"
+        },
+        {
+          "name": "storymodel4s.view.FeatureSelectionSuite",
+          "file": "viewJVM-test/TEST-storymodel4s.view.FeatureSelectionSuite.xml",
+          "sha256": "a76e21b2b9111177a0041ebfbb5bd1474ba80f825741d1d537c6ed59c86aa66e"
+        },
+        {
+          "name": "storymodel4s.view.OutputSuite",
+          "file": "viewJVM-test/TEST-storymodel4s.view.OutputSuite.xml",
+          "sha256": "eca040ea0f54d16f880c5349b3b3fa3b3714ce3b658c776097136f38aa2ef9cd"
+        },
+        {
+          "name": "storymodel4s.view.ViewRefSuite",
+          "file": "viewJVM-test/TEST-storymodel4s.view.ViewRefSuite.xml",
+          "sha256": "411c0cc2cd476cd59a3e657b657674f8f16e169b2173bf026fc198a8346fa557"
+        },
+        {
+          "name": "storymodel4s.view.VisibilitySuite",
+          "file": "viewJVM-test/TEST-storymodel4s.view.VisibilitySuite.xml",
+          "sha256": "7c4eb74f05698d308280dee2f0114796ef81df14469a9f740965fc1e05ddd536"
+        },
+        {
+          "name": "storymodel4s.view.VoyageSuite",
+          "file": "viewJVM-test/TEST-storymodel4s.view.VoyageSuite.xml",
+          "sha256": "a614032c45ca59ee64e15bdad4699ff1b17ea3cda80dd81c0f3578d58829137e"
+        },
+        {
+          "name": "storymodel4s.viewprobe.ConstructionProbeSuite",
+          "file": "viewJVM-test/TEST-storymodel4s.viewprobe.ConstructionProbeSuite.xml",
+          "sha256": "28023fa88ce13e2361f33a6442af5ec36823cc3b0a587064695f6daa528cf7b6"
+        },
+        {
+          "name": "storymodel4s.viewprobe.OutputConstructionProbeSuite",
+          "file": "viewJVM-test/TEST-storymodel4s.viewprobe.OutputConstructionProbeSuite.xml",
+          "sha256": "4dc6bab58b33076edda5d64d3ac35bfd9d9d8df8082a6aa2412f7bcd434276eb"
+        }
+      ],
+      "counts": {
+        "Total": 119,
+        "Failed": 0,
+        "Errors": 0,
+        "Passed": 119,
+        "Skipped": 0
+      }
+    },
+    {
+      "task": "viewJS/test",
+      "suites": [
+        {
+          "name": "storymodel4s.view.AtlasSuite",
+          "file": "viewJS-test/TEST-storymodel4s.view.AtlasSuite.xml",
+          "sha256": "d51a49211c6f83fe0d87ebb1e9769b32bcd2341e4b9586e597d3d067637246b3"
+        },
+        {
+          "name": "storymodel4s.view.CodexCompilerSuite",
+          "file": "viewJS-test/TEST-storymodel4s.view.CodexCompilerSuite.xml",
+          "sha256": "7ed4208fc5e93fe477f0ded5638f6bf6cf030529e9cdfa2313e02858539a06c6"
+        },
+        {
+          "name": "storymodel4s.view.CodexFlowSuite",
+          "file": "viewJS-test/TEST-storymodel4s.view.CodexFlowSuite.xml",
+          "sha256": "98855921d6b1f50f7bc238a545fc36830a80be89b0f0ad2fcd438117df5f16a2"
+        },
+        {
+          "name": "storymodel4s.view.CompiledAtlasSuite",
+          "file": "viewJS-test/TEST-storymodel4s.view.CompiledAtlasSuite.xml",
+          "sha256": "eeba32a902722304ba2bb7eadd4edfd5ae280a41ae963f4ca67fb7afb8fe7e0c"
+        },
+        {
+          "name": "storymodel4s.view.DraftAtlasSuite",
+          "file": "viewJS-test/TEST-storymodel4s.view.DraftAtlasSuite.xml",
+          "sha256": "c29792f3c027516a670e3dc5640fb926fe7f5f72dbdbd78fd8c0e670dfb279db"
+        },
+        {
+          "name": "storymodel4s.view.DraftCodexSuite",
+          "file": "viewJS-test/TEST-storymodel4s.view.DraftCodexSuite.xml",
+          "sha256": "a93fa994857853e19d1462991f08f73a753bf39204efaa9a4ccef13637f4e3c9"
+        },
+        {
+          "name": "storymodel4s.view.FeatureSelectionSuite",
+          "file": "viewJS-test/TEST-storymodel4s.view.FeatureSelectionSuite.xml",
+          "sha256": "b2d5c7fedfa4a30dd1e087a9d2045abd6998613216fe13bde9a7aa040f18e3d9"
+        },
+        {
+          "name": "storymodel4s.view.OutputSuite",
+          "file": "viewJS-test/TEST-storymodel4s.view.OutputSuite.xml",
+          "sha256": "13bbed32cc7ad3cc3028086fa09adcb54ca89c770a156a1ebbe2bf68dac872fe"
+        },
+        {
+          "name": "storymodel4s.view.ViewRefSuite",
+          "file": "viewJS-test/TEST-storymodel4s.view.ViewRefSuite.xml",
+          "sha256": "5be74c21f90afd1b3596f6c02ebbed5decb7e3884aea755843552cb104d7f275"
+        },
+        {
+          "name": "storymodel4s.view.VisibilitySuite",
+          "file": "viewJS-test/TEST-storymodel4s.view.VisibilitySuite.xml",
+          "sha256": "259a4b9e83c14fba91a19ed7d5d219604ffe1606e74d635b4ae9879f822a06fd"
+        },
+        {
+          "name": "storymodel4s.view.VoyageSuite",
+          "file": "viewJS-test/TEST-storymodel4s.view.VoyageSuite.xml",
+          "sha256": "6478f8a708f376e1ac8f5218b16fe66a89dea86e5695d325384d8ac74731e731"
+        },
+        {
+          "name": "storymodel4s.viewprobe.ConstructionProbeSuite",
+          "file": "viewJS-test/TEST-storymodel4s.viewprobe.ConstructionProbeSuite.xml",
+          "sha256": "caa1deb7b30ff024a7e019b0a2c1f1a5b240774b25eb57f0cc56f4eb125c5f3c"
+        },
+        {
+          "name": "storymodel4s.viewprobe.OutputConstructionProbeSuite",
+          "file": "viewJS-test/TEST-storymodel4s.viewprobe.OutputConstructionProbeSuite.xml",
+          "sha256": "80422bed11cea265c109f849c653c9c44e57ea1771145e2c26e292fc69710007"
+        }
+      ],
+      "counts": {
+        "Total": 119,
+        "Failed": 0,
+        "Errors": 0,
+        "Passed": 119,
+        "Skipped": 0
+      }
+    },
+    {
+      "task": "viewNative/test",
+      "suites": [
+        {
+          "name": "storymodel4s.view.AtlasSuite",
+          "file": "viewNative-test/TEST-storymodel4s.view.AtlasSuite.xml",
+          "sha256": "a47ed5523e9102ca97b74c619b9e2b51003ef3ecdc4bc1244336e3a2a1061cf4"
+        },
+        {
+          "name": "storymodel4s.view.CodexCompilerSuite",
+          "file": "viewNative-test/TEST-storymodel4s.view.CodexCompilerSuite.xml",
+          "sha256": "ab2da991b0bf2cd9824578467daadcb2ba62a7026994c66d943c9c59350a979a"
+        },
+        {
+          "name": "storymodel4s.view.CodexFlowSuite",
+          "file": "viewNative-test/TEST-storymodel4s.view.CodexFlowSuite.xml",
+          "sha256": "b8d53bdc93ca41c9eebae8d8ffdd41d5fdccf24abe14cb4a3d5847d376b5e5e5"
+        },
+        {
+          "name": "storymodel4s.view.CompiledAtlasSuite",
+          "file": "viewNative-test/TEST-storymodel4s.view.CompiledAtlasSuite.xml",
+          "sha256": "aa29ab40b4bb8faa35e013ec96f3d64449135e65bb726de418c954795f86dd34"
+        },
+        {
+          "name": "storymodel4s.view.DraftAtlasSuite",
+          "file": "viewNative-test/TEST-storymodel4s.view.DraftAtlasSuite.xml",
+          "sha256": "2fbb15d1abe6a65b0c01435aaa5d4b1130ab3a779302c26cdf6cc2035d5db3d8"
+        },
+        {
+          "name": "storymodel4s.view.DraftCodexSuite",
+          "file": "viewNative-test/TEST-storymodel4s.view.DraftCodexSuite.xml",
+          "sha256": "bbf36c4e6af62a54bf19ac31c39ecc232f2480c20527b3852a61b30b2a0ad2ad"
+        },
+        {
+          "name": "storymodel4s.view.FeatureSelectionSuite",
+          "file": "viewNative-test/TEST-storymodel4s.view.FeatureSelectionSuite.xml",
+          "sha256": "ef9bd256620fb2404df882e9e3d90ecb504667859dca429363e8abca1e2c72b7"
+        },
+        {
+          "name": "storymodel4s.view.OutputSuite",
+          "file": "viewNative-test/TEST-storymodel4s.view.OutputSuite.xml",
+          "sha256": "7839f1cbd3722ec2a51b0c645bbf8c67d100922f2ad2fcff2bf0d02452832da8"
+        },
+        {
+          "name": "storymodel4s.view.ViewRefSuite",
+          "file": "viewNative-test/TEST-storymodel4s.view.ViewRefSuite.xml",
+          "sha256": "4f87c603bb99ad5337805785df9c98e7b8db590011fb07f3fedf7b9fac5340ec"
+        },
+        {
+          "name": "storymodel4s.view.VisibilitySuite",
+          "file": "viewNative-test/TEST-storymodel4s.view.VisibilitySuite.xml",
+          "sha256": "c2c7e16d397ad1b72215a90fd9db69d6a5f27a12be8951a8a27d099f618767af"
+        },
+        {
+          "name": "storymodel4s.view.VoyageSuite",
+          "file": "viewNative-test/TEST-storymodel4s.view.VoyageSuite.xml",
+          "sha256": "b548abad3edea5fe7c27fb86654679917694c633d36fdd6b5fcdfaf4aeade8b8"
+        },
+        {
+          "name": "storymodel4s.viewprobe.ConstructionProbeSuite",
+          "file": "viewNative-test/TEST-storymodel4s.viewprobe.ConstructionProbeSuite.xml",
+          "sha256": "721e0cc2dce7d8c830e10b4b9fe6910a7226ce2d318d9c6515bd0d9a1a194f05"
+        },
+        {
+          "name": "storymodel4s.viewprobe.OutputConstructionProbeSuite",
+          "file": "viewNative-test/TEST-storymodel4s.viewprobe.OutputConstructionProbeSuite.xml",
+          "sha256": "6447ad69d3ccb674bf1001f6bb908b7c463f40da33ac18fe6cb11b236d4271a8"
+        }
+      ],
+      "counts": {
+        "Total": 119,
+        "Failed": 0,
+        "Errors": 0,
+        "Passed": 119,
+        "Skipped": 0
+      }
+    },
+    {
+      "task": "codecJVM/test",
+      "suites": [
+        {
+          "name": "storymodel4s.codec.AlignCodecSuite",
+          "file": "codecJVM-test/TEST-storymodel4s.codec.AlignCodecSuite.xml",
+          "sha256": "f7bbee6141dd8609d03ba981b0945b25ba7e7af9397017783a493adf42e1fd6f"
+        },
+        {
+          "name": "storymodel4s.codec.CodecSuite",
+          "file": "codecJVM-test/TEST-storymodel4s.codec.CodecSuite.xml",
+          "sha256": "d9a9f1c73cd3148dd1c2adfac2bbda8f649d34228c6a86f398a6ca75323fdecb"
+        },
+        {
+          "name": "storymodel4s.codec.DerivationRecordCodecSuite",
+          "file": "codecJVM-test/TEST-storymodel4s.codec.DerivationRecordCodecSuite.xml",
+          "sha256": "f48b301a052394e7d28be9546d3e409fdee722bad15278379c6c8b892295a77e"
+        },
+        {
+          "name": "storymodel4s.codec.EvidenceSupportCodecSuite",
+          "file": "codecJVM-test/TEST-storymodel4s.codec.EvidenceSupportCodecSuite.xml",
+          "sha256": "390dbf19c5a25540f964ff9d1154e43998c695feff05630d85a5f05dddc5755b"
+        },
+        {
+          "name": "storymodel4s.codec.FeatureMaterializerSuite",
+          "file": "codecJVM-test/TEST-storymodel4s.codec.FeatureMaterializerSuite.xml",
+          "sha256": "c7d0bcd876eb7b718f06f0fc6b4814c65260b3e6abc333fcff68df974cae713c"
+        },
+        {
+          "name": "storymodel4s.codec.FeaturesCodecSuite",
+          "file": "codecJVM-test/TEST-storymodel4s.codec.FeaturesCodecSuite.xml",
+          "sha256": "8fa78fdd21b668c38e938b287519bd3b0fa1d4d2b07b7ff5dcf38689c98572f7"
+        },
+        {
+          "name": "storymodel4s.codec.OutputCodecSuite",
+          "file": "codecJVM-test/TEST-storymodel4s.codec.OutputCodecSuite.xml",
+          "sha256": "fdb72a0e2e9fec404d8879d9c886562c81ba88e45135554cce9743857b93bb98"
+        },
+        {
+          "name": "storymodel4s.codec.SidecarSuite",
+          "file": "codecJVM-test/TEST-storymodel4s.codec.SidecarSuite.xml",
+          "sha256": "b9e2e19371a448a65e1d2bc19e553de8521f0d51a16e7d767055995e7a852762"
+        },
+        {
+          "name": "storymodel4s.codec.StoryModelCodecSuite",
+          "file": "codecJVM-test/TEST-storymodel4s.codec.StoryModelCodecSuite.xml",
+          "sha256": "007f728bd88e6e08548a80ee9a7f4e483361f2ecc9e06c4aa697eecd1131c2ee"
+        },
+        {
+          "name": "storymodel4s.codec.SurfaceAtlasArtifactCodecSuite",
+          "file": "codecJVM-test/TEST-storymodel4s.codec.SurfaceAtlasArtifactCodecSuite.xml",
+          "sha256": "551200a97bac1a64157986405fc37ff97e5bf0423718157f7e56e4708a897e3d"
+        },
+        {
+          "name": "storymodel4s.codec.SurfaceAtlasSourceIdentityOracleSuite",
+          "file": "codecJVM-test/TEST-storymodel4s.codec.SurfaceAtlasSourceIdentityOracleSuite.xml",
+          "sha256": "4a7c52a0353c21f362dd78277d37337ee19a48e2b2ca96fd37dec2c5cb6d1e4d"
+        },
+        {
+          "name": "storymodel4s.codec.VoyageCodecSuite",
+          "file": "codecJVM-test/TEST-storymodel4s.codec.VoyageCodecSuite.xml",
+          "sha256": "f5ffb42ec553525355719d77ebd92182a45593abd989116e2c963474bcc70349"
+        },
+        {
+          "name": "storymodel4s.codecprobe.ConstructionProbeSuite",
+          "file": "codecJVM-test/TEST-storymodel4s.codecprobe.ConstructionProbeSuite.xml",
+          "sha256": "b3723398c05e1ce6af0f66aa3084eee644a650a627c3ed46f1c3676ff51f1587"
+        }
+      ],
+      "counts": {
+        "Total": 198,
+        "Failed": 0,
+        "Errors": 0,
+        "Passed": 198,
+        "Skipped": 0
+      }
+    },
+    {
+      "task": "codecJS/test",
+      "suites": [
+        {
+          "name": "storymodel4s.codec.AlignCodecSuite",
+          "file": "codecJS-test/TEST-storymodel4s.codec.AlignCodecSuite.xml",
+          "sha256": "b81599060a06b3dd25826434ce54cdeb55f6cd2a28ff34ebc96b0a86bccbd486"
+        },
+        {
+          "name": "storymodel4s.codec.CodecSuite",
+          "file": "codecJS-test/TEST-storymodel4s.codec.CodecSuite.xml",
+          "sha256": "e1239d670fef0e5141d6d0acc890f7a89406b75c3dc4d810ce630801a5eab7f8"
+        },
+        {
+          "name": "storymodel4s.codec.DerivationRecordCodecSuite",
+          "file": "codecJS-test/TEST-storymodel4s.codec.DerivationRecordCodecSuite.xml",
+          "sha256": "24beef93d732d3ca2f663b9b56cdf7b664e50861dac7f298f9028e7bba490603"
+        },
+        {
+          "name": "storymodel4s.codec.EvidenceSupportCodecSuite",
+          "file": "codecJS-test/TEST-storymodel4s.codec.EvidenceSupportCodecSuite.xml",
+          "sha256": "c2abafc6c6bbfb827819d09bdbbe9665be01712e3d34d9d97df4a6db05f27ddd"
+        },
+        {
+          "name": "storymodel4s.codec.FeatureMaterializerSuite",
+          "file": "codecJS-test/TEST-storymodel4s.codec.FeatureMaterializerSuite.xml",
+          "sha256": "c02c6e67b8e1e77d809ee4537906a8176472e30da454243f579c68258b96d80b"
+        },
+        {
+          "name": "storymodel4s.codec.FeaturesCodecSuite",
+          "file": "codecJS-test/TEST-storymodel4s.codec.FeaturesCodecSuite.xml",
+          "sha256": "1233d2903e3e1930910428203abfb843316919a18e34ae10e7efc678819b6f72"
+        },
+        {
+          "name": "storymodel4s.codec.OutputCodecSuite",
+          "file": "codecJS-test/TEST-storymodel4s.codec.OutputCodecSuite.xml",
+          "sha256": "afa1fa55e0138eda46c2502069a2ef1032f44cc12d88db1b91678c6bc12af67d"
+        },
+        {
+          "name": "storymodel4s.codec.SidecarSuite",
+          "file": "codecJS-test/TEST-storymodel4s.codec.SidecarSuite.xml",
+          "sha256": "82e9ac1de09abc1d80c930f599ea1545df3bae85ff1c8bcacc8467a15850e287"
+        },
+        {
+          "name": "storymodel4s.codec.StoryModelCodecSuite",
+          "file": "codecJS-test/TEST-storymodel4s.codec.StoryModelCodecSuite.xml",
+          "sha256": "47207baed0b07bc92bbef450971f286342aad25fd7c40ebd465c488a1196d71d"
+        },
+        {
+          "name": "storymodel4s.codec.SurfaceAtlasArtifactCodecSuite",
+          "file": "codecJS-test/TEST-storymodel4s.codec.SurfaceAtlasArtifactCodecSuite.xml",
+          "sha256": "d061c7d65907fbe27182c4b6955a886946c42a038b0624b4282a47b6e757f0e2"
+        },
+        {
+          "name": "storymodel4s.codec.SurfaceAtlasSourceIdentityOracleSuite",
+          "file": "codecJS-test/TEST-storymodel4s.codec.SurfaceAtlasSourceIdentityOracleSuite.xml",
+          "sha256": "8012112a6763ca48a6a79ae7da5ba3d3efa660404127a6e48f6b8e813ca048ce"
+        },
+        {
+          "name": "storymodel4s.codec.VoyageCodecSuite",
+          "file": "codecJS-test/TEST-storymodel4s.codec.VoyageCodecSuite.xml",
+          "sha256": "c7bcba7fd90d77be81c627388efe6fb1933abea298fe44bd63db2f08fda7a1da"
+        },
+        {
+          "name": "storymodel4s.codecprobe.ConstructionProbeSuite",
+          "file": "codecJS-test/TEST-storymodel4s.codecprobe.ConstructionProbeSuite.xml",
+          "sha256": "3243662929a12db6a4c6c934ef6cdd90c82de5ad518513d1d58645c9b5d8ed9d"
+        }
+      ],
+      "counts": {
+        "Total": 198,
+        "Failed": 0,
+        "Errors": 0,
+        "Passed": 198,
+        "Skipped": 0
+      }
+    },
+    {
+      "task": "codecNative/test",
+      "suites": [
+        {
+          "name": "storymodel4s.codec.AlignCodecSuite",
+          "file": "codecNative-test/TEST-storymodel4s.codec.AlignCodecSuite.xml",
+          "sha256": "eedfb6426ce350e4e859657bfdf33fb78e8d5f00874bd41f03d25425b3a1649e"
+        },
+        {
+          "name": "storymodel4s.codec.CodecSuite",
+          "file": "codecNative-test/TEST-storymodel4s.codec.CodecSuite.xml",
+          "sha256": "e3c51868478fadb52d1a4068af19eb4446eceb91b6ab5fd05b372fd7051631af"
+        },
+        {
+          "name": "storymodel4s.codec.DerivationRecordCodecSuite",
+          "file": "codecNative-test/TEST-storymodel4s.codec.DerivationRecordCodecSuite.xml",
+          "sha256": "622c478a85766158e2cd1502b3ba8db1efcca1ab55b65a92b27bb8111486e17a"
+        },
+        {
+          "name": "storymodel4s.codec.EvidenceSupportCodecSuite",
+          "file": "codecNative-test/TEST-storymodel4s.codec.EvidenceSupportCodecSuite.xml",
+          "sha256": "de4fdb1b95e7f00d6febee25f195b6320d53b5f45d30ec469e671e3c3151df6f"
+        },
+        {
+          "name": "storymodel4s.codec.FeatureMaterializerSuite",
+          "file": "codecNative-test/TEST-storymodel4s.codec.FeatureMaterializerSuite.xml",
+          "sha256": "d4ec0629468d05f1cb5b5a9a0a9fe2d9ce58e0780a2f4168c794bbac47a94505"
+        },
+        {
+          "name": "storymodel4s.codec.FeaturesCodecSuite",
+          "file": "codecNative-test/TEST-storymodel4s.codec.FeaturesCodecSuite.xml",
+          "sha256": "978e6314e3aff4921d1c943b49e3f61207fc44c524670b8a42ddadbb7438ff47"
+        },
+        {
+          "name": "storymodel4s.codec.OutputCodecSuite",
+          "file": "codecNative-test/TEST-storymodel4s.codec.OutputCodecSuite.xml",
+          "sha256": "653ba7c77284c54c1e9f9fbc2d99357f8fba6fb58f3df3215c2d75d9d2f693ea"
+        },
+        {
+          "name": "storymodel4s.codec.SidecarSuite",
+          "file": "codecNative-test/TEST-storymodel4s.codec.SidecarSuite.xml",
+          "sha256": "2bd3ecd2cbfdd7124acd995d3d359a29a54b845df669bb34a88d90900e4d6379"
+        },
+        {
+          "name": "storymodel4s.codec.StoryModelCodecSuite",
+          "file": "codecNative-test/TEST-storymodel4s.codec.StoryModelCodecSuite.xml",
+          "sha256": "683cb9d78fe1cdf7e239a89eab02e3a78e2684084a101ab1d4835f36de707741"
+        },
+        {
+          "name": "storymodel4s.codec.SurfaceAtlasArtifactCodecSuite",
+          "file": "codecNative-test/TEST-storymodel4s.codec.SurfaceAtlasArtifactCodecSuite.xml",
+          "sha256": "b036fc06b887f6c5d5c596a9ed762a160dd603bb9a3b35b7cdd0eed343415ede"
+        },
+        {
+          "name": "storymodel4s.codec.SurfaceAtlasSourceIdentityOracleSuite",
+          "file": "codecNative-test/TEST-storymodel4s.codec.SurfaceAtlasSourceIdentityOracleSuite.xml",
+          "sha256": "a4cb609c9a6a2367af7d19149eb7c7fbc885ea08163d923c676185fc81b2a615"
+        },
+        {
+          "name": "storymodel4s.codec.VoyageCodecSuite",
+          "file": "codecNative-test/TEST-storymodel4s.codec.VoyageCodecSuite.xml",
+          "sha256": "45e5cfcd1bb67664acd394fe84dfcf0869487245707e30fdadeb2f7f0961b35c"
+        },
+        {
+          "name": "storymodel4s.codecprobe.ConstructionProbeSuite",
+          "file": "codecNative-test/TEST-storymodel4s.codecprobe.ConstructionProbeSuite.xml",
+          "sha256": "f12ba7f2797fce3f102d0099001d1b48c164a6c2f1a9ee77125722b866657e77"
+        }
+      ],
+      "counts": {
+        "Total": 198,
+        "Failed": 0,
+        "Errors": 0,
+        "Passed": 198,
+        "Skipped": 0
+      }
+    },
+    {
+      "task": "corpusJVM/test",
+      "suites": [
+        {
+          "name": "storymodel4s.consumer.CorpusCarrierProbeSuite",
+          "file": "corpusJVM-test/TEST-storymodel4s.consumer.CorpusCarrierProbeSuite.xml",
+          "sha256": "7739a882e7fedfc98b9fdc0d37ab83aa6c6d9c16941b36fc295f7ba362ed2988"
+        },
+        {
+          "name": "storymodel4s.corpus.ArtifactSuite",
+          "file": "corpusJVM-test/TEST-storymodel4s.corpus.ArtifactSuite.xml",
+          "sha256": "ed934aafdf6017db0f31c1b055290a150d9040cce3bc56af94f35fea59326c79"
+        },
+        {
+          "name": "storymodel4s.corpus.CellSuite",
+          "file": "corpusJVM-test/TEST-storymodel4s.corpus.CellSuite.xml",
+          "sha256": "28ba1435a39a63f7ad3f46042158457c2ba834cc2daad042fb4095aff48064d5"
+        },
+        {
+          "name": "storymodel4s.corpus.CodedSuite",
+          "file": "corpusJVM-test/TEST-storymodel4s.corpus.CodedSuite.xml",
+          "sha256": "b492a6a5f092b3701831dc6ce087c00eb62e7fe9b0087ea2dacfac2721620475"
+        },
+        {
+          "name": "storymodel4s.corpus.CoordinateSuite",
+          "file": "corpusJVM-test/TEST-storymodel4s.corpus.CoordinateSuite.xml",
+          "sha256": "ccc148c3fa33f19688e2e27dcc802bca9ca2d13d8702f7c42299fdefa350be4f"
+        },
+        {
+          "name": "storymodel4s.corpus.NormalizeSuite",
+          "file": "corpusJVM-test/TEST-storymodel4s.corpus.NormalizeSuite.xml",
+          "sha256": "3857c24bcb0b089452bf0f5f7d35eafe0b57111ec11f816845ce2e9b6269ea95"
+        },
+        {
+          "name": "storymodel4s.corpus.SegmentLinkCompositionSuite",
+          "file": "corpusJVM-test/TEST-storymodel4s.corpus.SegmentLinkCompositionSuite.xml",
+          "sha256": "33fbb6f23adaf016f060f7f598ef6bf9d6b356011a6f7a22a9b216de9fac1dc2"
+        },
+        {
+          "name": "storymodel4s.corpus.SegmentLinkSuite",
+          "file": "corpusJVM-test/TEST-storymodel4s.corpus.SegmentLinkSuite.xml",
+          "sha256": "06854cd61bca66968dd35ae90c0c421e108fcae37fa288a87b921c822ab2b7b8"
+        },
+        {
+          "name": "storymodel4s.corpus.SidecarSuite",
+          "file": "corpusJVM-test/TEST-storymodel4s.corpus.SidecarSuite.xml",
+          "sha256": "9f8cbb541d85625047b09f5b6b0c1adfad8188da7fb8a51400c2c67552775844"
+        },
+        {
+          "name": "storymodel4s.corpus.VerifySuite",
+          "file": "corpusJVM-test/TEST-storymodel4s.corpus.VerifySuite.xml",
+          "sha256": "751f8dbd691319308cdc72f54d01bc7ea27fb67cbfc44997c34b34938c03bd2b"
+        }
+      ],
+      "counts": {
+        "Total": 114,
+        "Failed": 0,
+        "Errors": 0,
+        "Passed": 114,
+        "Skipped": 0
+      }
+    },
+    {
+      "task": "corpusJS/test",
+      "suites": [
+        {
+          "name": "storymodel4s.consumer.CorpusCarrierProbeSuite",
+          "file": "corpusJS-test/TEST-storymodel4s.consumer.CorpusCarrierProbeSuite.xml",
+          "sha256": "779959d39b6e923e9aedb9af316089663f2a55220e146f5dd516bc5468d87781"
+        },
+        {
+          "name": "storymodel4s.corpus.ArtifactSuite",
+          "file": "corpusJS-test/TEST-storymodel4s.corpus.ArtifactSuite.xml",
+          "sha256": "41834d106601004f389622cd5a9f715a084dc71464defbeaa7e2a71178bdbf66"
+        },
+        {
+          "name": "storymodel4s.corpus.CellSuite",
+          "file": "corpusJS-test/TEST-storymodel4s.corpus.CellSuite.xml",
+          "sha256": "dd7982987f437a6e727ec811aeb5aa74e58848df873e08b72732bb18b1a329c6"
+        },
+        {
+          "name": "storymodel4s.corpus.CodedSuite",
+          "file": "corpusJS-test/TEST-storymodel4s.corpus.CodedSuite.xml",
+          "sha256": "e9d03098521441be3848e0da18242bd272713043756b6ee1bc264f7fc7f84cc7"
+        },
+        {
+          "name": "storymodel4s.corpus.CoordinateSuite",
+          "file": "corpusJS-test/TEST-storymodel4s.corpus.CoordinateSuite.xml",
+          "sha256": "4ee5eafa35c653a43ae04455f3edbd1ab25f80b0c058b50d9071c31b85722b13"
+        },
+        {
+          "name": "storymodel4s.corpus.NormalizeSuite",
+          "file": "corpusJS-test/TEST-storymodel4s.corpus.NormalizeSuite.xml",
+          "sha256": "30f60163a611e82009e0f54c25970d79f7dd8a6fbf78ba1312b019f667a81d77"
+        },
+        {
+          "name": "storymodel4s.corpus.SegmentLinkCompositionSuite",
+          "file": "corpusJS-test/TEST-storymodel4s.corpus.SegmentLinkCompositionSuite.xml",
+          "sha256": "6f0f541e78824415a8d0706b82024f9c425d1c148be19419620dc564e6d714a0"
+        },
+        {
+          "name": "storymodel4s.corpus.SegmentLinkSuite",
+          "file": "corpusJS-test/TEST-storymodel4s.corpus.SegmentLinkSuite.xml",
+          "sha256": "714487e5b1353d7746d7c89d0c6ceaa6f3aeb384e0bd43fabcc6d27dbb1ed542"
+        },
+        {
+          "name": "storymodel4s.corpus.SidecarSuite",
+          "file": "corpusJS-test/TEST-storymodel4s.corpus.SidecarSuite.xml",
+          "sha256": "ab8f2c21ab6dccacb158b04a12f2da499a0e6ad365781df64c79a7e8e056e275"
+        },
+        {
+          "name": "storymodel4s.corpus.VerifySuite",
+          "file": "corpusJS-test/TEST-storymodel4s.corpus.VerifySuite.xml",
+          "sha256": "52a19745fd6676bc2ee66cee7cd54d03258f4c3c6ec850916d97eb53e41915e4"
+        }
+      ],
+      "counts": {
+        "Total": 114,
+        "Failed": 0,
+        "Errors": 0,
+        "Passed": 114,
+        "Skipped": 0
+      }
+    },
+    {
+      "task": "corpusNative/test",
+      "suites": [
+        {
+          "name": "storymodel4s.consumer.CorpusCarrierProbeSuite",
+          "file": "corpusNative-test/TEST-storymodel4s.consumer.CorpusCarrierProbeSuite.xml",
+          "sha256": "eca9ca3671fb2cfbd91dfc298cdf74abb47a4ed929e87bb834775a13607bcdc1"
+        },
+        {
+          "name": "storymodel4s.corpus.ArtifactSuite",
+          "file": "corpusNative-test/TEST-storymodel4s.corpus.ArtifactSuite.xml",
+          "sha256": "a7a31796fa8e7ca41e3a544b4de3e11258365b14ffdb4015d81471f2b0ea8aee"
+        },
+        {
+          "name": "storymodel4s.corpus.CellSuite",
+          "file": "corpusNative-test/TEST-storymodel4s.corpus.CellSuite.xml",
+          "sha256": "c13a8d93a60700ee14257a59f1f7122d7770533316c071db42dbcf8b067586d4"
+        },
+        {
+          "name": "storymodel4s.corpus.CodedSuite",
+          "file": "corpusNative-test/TEST-storymodel4s.corpus.CodedSuite.xml",
+          "sha256": "61beb30c82067487e6b8a55eac1c5185fe6179f5eae3d990e7914c6f28d9a4ac"
+        },
+        {
+          "name": "storymodel4s.corpus.CoordinateSuite",
+          "file": "corpusNative-test/TEST-storymodel4s.corpus.CoordinateSuite.xml",
+          "sha256": "9109a8f4093d94d9e016ab3a71c9b3184c623b2f1313cdda3f3e9e37d2061fb9"
+        },
+        {
+          "name": "storymodel4s.corpus.NormalizeSuite",
+          "file": "corpusNative-test/TEST-storymodel4s.corpus.NormalizeSuite.xml",
+          "sha256": "42d8ddb50139895b6a83615fd0687ce5fea00af5217ff1bbe8c07bfcb664fc1d"
+        },
+        {
+          "name": "storymodel4s.corpus.SegmentLinkCompositionSuite",
+          "file": "corpusNative-test/TEST-storymodel4s.corpus.SegmentLinkCompositionSuite.xml",
+          "sha256": "ffd702c29706098a4e249ae264703449c5f53c586d5ab9be761d126bc6c05f3c"
+        },
+        {
+          "name": "storymodel4s.corpus.SegmentLinkSuite",
+          "file": "corpusNative-test/TEST-storymodel4s.corpus.SegmentLinkSuite.xml",
+          "sha256": "dff8e9fad972a641f555575d311d111098231d575ed1176942508f04999380b7"
+        },
+        {
+          "name": "storymodel4s.corpus.SidecarSuite",
+          "file": "corpusNative-test/TEST-storymodel4s.corpus.SidecarSuite.xml",
+          "sha256": "bf56d5639af6dbf7db6c5b6a0dfa08bee9340cb976ab5bb058122517825d4bec"
+        },
+        {
+          "name": "storymodel4s.corpus.VerifySuite",
+          "file": "corpusNative-test/TEST-storymodel4s.corpus.VerifySuite.xml",
+          "sha256": "49458a372d188760e35f6486198ef0e44d39604d5fa6e06067fad7841d52328c"
+        }
+      ],
+      "counts": {
+        "Total": 114,
+        "Failed": 0,
+        "Errors": 0,
+        "Passed": 114,
+        "Skipped": 0
+      }
+    },
+    {
+      "task": "fixturesJVM/test",
+      "suites": [
+        {
+          "name": "storymodel4s.fixtures.interview.BirthdayInterviewSuite",
+          "file": "fixturesJVM-test/TEST-storymodel4s.fixtures.interview.BirthdayInterviewSuite.xml",
+          "sha256": "1bfc89136be516993afae0968eb1d0eea67d7f0dfc8834d6db640bdf86d55272"
+        },
+        {
+          "name": "storymodel4s.fixtures.interview.PrivacyFixtureSuite",
+          "file": "fixturesJVM-test/TEST-storymodel4s.fixtures.interview.PrivacyFixtureSuite.xml",
+          "sha256": "86bd1332f4f583fa07ffd49f7dfaf81a4c7b5c4ad3fc169cdf1724f659e1be57"
+        },
+        {
+          "name": "storymodel4s.fixtures.wog.ChartProposalCourtSuite",
+          "file": "fixturesJVM-test/TEST-storymodel4s.fixtures.wog.ChartProposalCourtSuite.xml",
+          "sha256": "7ce0e9450c22bac0778593d3b9548827e708ec60efa7b81648414dbf6d216597"
+        },
+        {
+          "name": "storymodel4s.fixtures.wog.NarrativeCompilerVerticalSuite",
+          "file": "fixturesJVM-test/TEST-storymodel4s.fixtures.wog.NarrativeCompilerVerticalSuite.xml",
+          "sha256": "b027806a8a09a96abf710b22545a1e70053cb4c763573892150b2c0ab2b0f48a"
+        },
+        {
+          "name": "storymodel4s.fixtures.wog.WarOfTheGhostsAlignmentSuite",
+          "file": "fixturesJVM-test/TEST-storymodel4s.fixtures.wog.WarOfTheGhostsAlignmentSuite.xml",
+          "sha256": "0017da7bab73d5f499c8738c7cfffae3bf933526a5b25b8cdd5ebd020160d64c"
+        },
+        {
+          "name": "storymodel4s.fixtures.wog.WarOfTheGhostsAtlasSuite",
+          "file": "fixturesJVM-test/TEST-storymodel4s.fixtures.wog.WarOfTheGhostsAtlasSuite.xml",
+          "sha256": "a38fe0ebe6792b81804e876c0270688ea384dfc0fd22fc3b8260a8fa5e9f8c40"
+        },
+        {
+          "name": "storymodel4s.fixtures.wog.WarOfTheGhostsCodecGoldenResourceSuite",
+          "file": "fixturesJVM-test/TEST-storymodel4s.fixtures.wog.WarOfTheGhostsCodecGoldenResourceSuite.xml",
+          "sha256": "28fcc3c493c21972d90bbf1d6b23f161191ae6645eaeed1be282bab2741a313b"
+        },
+        {
+          "name": "storymodel4s.fixtures.wog.WarOfTheGhostsCodecGoldenSuite",
+          "file": "fixturesJVM-test/TEST-storymodel4s.fixtures.wog.WarOfTheGhostsCodecGoldenSuite.xml",
+          "sha256": "c586473e9b78e56cd2beb6367aee83cdc60b929c070cfe46100897e7cc16550c"
+        },
+        {
+          "name": "storymodel4s.fixtures.wog.WarOfTheGhostsCodexCompilerSuite",
+          "file": "fixturesJVM-test/TEST-storymodel4s.fixtures.wog.WarOfTheGhostsCodexCompilerSuite.xml",
+          "sha256": "b882b267ef59a97e332974475abea270a86952f5c4c3daa805467f5f4c07d200"
+        },
+        {
+          "name": "storymodel4s.fixtures.wog.WarOfTheGhostsCodexSuite",
+          "file": "fixturesJVM-test/TEST-storymodel4s.fixtures.wog.WarOfTheGhostsCodexSuite.xml",
+          "sha256": "4de4322357a7385bd5faab6f3b112007a35fc86fca8e5db0e453e1fb7e0b1a7a"
+        },
+        {
+          "name": "storymodel4s.fixtures.wog.WarOfTheGhostsInitializationSuite",
+          "file": "fixturesJVM-test/TEST-storymodel4s.fixtures.wog.WarOfTheGhostsInitializationSuite.xml",
+          "sha256": "70abec836bf17f82e865bb2bb43458baa13b82658ba6fc061ccc7c33dc2c1a97"
+        },
+        {
+          "name": "storymodel4s.fixtures.wog.WarOfTheGhostsSuite",
+          "file": "fixturesJVM-test/TEST-storymodel4s.fixtures.wog.WarOfTheGhostsSuite.xml",
+          "sha256": "416a48c36244b6a492c987f85b8764e8194864c7a5fe36e107e11d0fa06f4b68"
+        }
+      ],
+      "counts": {
+        "Total": 122,
+        "Failed": 0,
+        "Errors": 0,
+        "Passed": 122,
+        "Skipped": 0
+      }
+    },
+    {
+      "task": "fixturesJS/test",
+      "suites": [
+        {
+          "name": "storymodel4s.fixtures.interview.BirthdayInterviewSuite",
+          "file": "fixturesJS-test/TEST-storymodel4s.fixtures.interview.BirthdayInterviewSuite.xml",
+          "sha256": "22b66bfda275d9264b38469f169f7f0ae9c0c3ddd3d43d03d7a8049cfbeab6d3"
+        },
+        {
+          "name": "storymodel4s.fixtures.interview.PrivacyFixtureSuite",
+          "file": "fixturesJS-test/TEST-storymodel4s.fixtures.interview.PrivacyFixtureSuite.xml",
+          "sha256": "3547fae7aa251830bab049dea7cb297be2810581592941b0a603d8f90e2a134c"
+        },
+        {
+          "name": "storymodel4s.fixtures.wog.ChartProposalCourtSuite",
+          "file": "fixturesJS-test/TEST-storymodel4s.fixtures.wog.ChartProposalCourtSuite.xml",
+          "sha256": "ee77be8af9f7374278987a2c2651d8b53358a0a1a91292e36bc4fb2b780fc8f7"
+        },
+        {
+          "name": "storymodel4s.fixtures.wog.NarrativeCompilerVerticalSuite",
+          "file": "fixturesJS-test/TEST-storymodel4s.fixtures.wog.NarrativeCompilerVerticalSuite.xml",
+          "sha256": "7e9760edd6b8ca96b33bf66f3841b1e5dc1502baff7b832319fe62ed189fbb5e"
+        },
+        {
+          "name": "storymodel4s.fixtures.wog.WarOfTheGhostsAlignmentSuite",
+          "file": "fixturesJS-test/TEST-storymodel4s.fixtures.wog.WarOfTheGhostsAlignmentSuite.xml",
+          "sha256": "84b0037e2dae88e9028b2452691558c745f79491a34a55c62d47c9cb36c8f302"
+        },
+        {
+          "name": "storymodel4s.fixtures.wog.WarOfTheGhostsAtlasSuite",
+          "file": "fixturesJS-test/TEST-storymodel4s.fixtures.wog.WarOfTheGhostsAtlasSuite.xml",
+          "sha256": "d98f49d54110183d512fdf9901cbbd6a4e999391528e9dfe72c62d9756c74f6d"
+        },
+        {
+          "name": "storymodel4s.fixtures.wog.WarOfTheGhostsCodecGoldenSuite",
+          "file": "fixturesJS-test/TEST-storymodel4s.fixtures.wog.WarOfTheGhostsCodecGoldenSuite.xml",
+          "sha256": "a43b1d315ec4dfa89ae39f7f7e5534dc5b0dc9bdef4f90d20ba168ccb74700cd"
+        },
+        {
+          "name": "storymodel4s.fixtures.wog.WarOfTheGhostsCodexCompilerSuite",
+          "file": "fixturesJS-test/TEST-storymodel4s.fixtures.wog.WarOfTheGhostsCodexCompilerSuite.xml",
+          "sha256": "3c6cabd293761cd933a553197d305bbcd0ca04842e43781c019687002d7fd601"
+        },
+        {
+          "name": "storymodel4s.fixtures.wog.WarOfTheGhostsCodexSuite",
+          "file": "fixturesJS-test/TEST-storymodel4s.fixtures.wog.WarOfTheGhostsCodexSuite.xml",
+          "sha256": "831ef6b20deb5d57008c21114be3be6937c9d2df6cff7735a9708868e6e66529"
+        },
+        {
+          "name": "storymodel4s.fixtures.wog.WarOfTheGhostsSuite",
+          "file": "fixturesJS-test/TEST-storymodel4s.fixtures.wog.WarOfTheGhostsSuite.xml",
+          "sha256": "ef309a45181a0ee5107f0fa66fe1e9bada9ef9fdaf8d0945d1ba2254f19358bb"
+        }
+      ],
+      "counts": {
+        "Total": 120,
+        "Failed": 0,
+        "Errors": 0,
+        "Passed": 120,
+        "Skipped": 0
+      }
+    },
+    {
+      "task": "fixturesNative/test",
+      "suites": [
+        {
+          "name": "storymodel4s.fixtures.interview.BirthdayInterviewSuite",
+          "file": "fixturesNative-test/TEST-storymodel4s.fixtures.interview.BirthdayInterviewSuite.xml",
+          "sha256": "7a06e1ffe393f8a177a36927d4f34127413f97f9c9014c6869c9621768f1736c"
+        },
+        {
+          "name": "storymodel4s.fixtures.interview.PrivacyFixtureSuite",
+          "file": "fixturesNative-test/TEST-storymodel4s.fixtures.interview.PrivacyFixtureSuite.xml",
+          "sha256": "43690a4c3f748941f620a5b961ddffd623ce76bff02b3ed8a0b1b4256b57344f"
+        },
+        {
+          "name": "storymodel4s.fixtures.wog.ChartProposalCourtSuite",
+          "file": "fixturesNative-test/TEST-storymodel4s.fixtures.wog.ChartProposalCourtSuite.xml",
+          "sha256": "d8edef149f3e362f5200626479cc02227563d1dce8345f98c917cbfb02946ba6"
+        },
+        {
+          "name": "storymodel4s.fixtures.wog.NarrativeCompilerVerticalSuite",
+          "file": "fixturesNative-test/TEST-storymodel4s.fixtures.wog.NarrativeCompilerVerticalSuite.xml",
+          "sha256": "d5ab4548aa0e2dea11104d013a67a7e43d7cbc9199ca468d06265c42e1f97191"
+        },
+        {
+          "name": "storymodel4s.fixtures.wog.WarOfTheGhostsAlignmentSuite",
+          "file": "fixturesNative-test/TEST-storymodel4s.fixtures.wog.WarOfTheGhostsAlignmentSuite.xml",
+          "sha256": "e0c5b93485a72d03ae444ea81d3c872a6682eba48275ef09b95d24a64c98bdad"
+        },
+        {
+          "name": "storymodel4s.fixtures.wog.WarOfTheGhostsAtlasSuite",
+          "file": "fixturesNative-test/TEST-storymodel4s.fixtures.wog.WarOfTheGhostsAtlasSuite.xml",
+          "sha256": "ed06e7d47eeed5791daf5ff51c96f82d76215bc599aad0f4b3131c44cad3d06c"
+        },
+        {
+          "name": "storymodel4s.fixtures.wog.WarOfTheGhostsCodecGoldenSuite",
+          "file": "fixturesNative-test/TEST-storymodel4s.fixtures.wog.WarOfTheGhostsCodecGoldenSuite.xml",
+          "sha256": "0be13b0d46e1332a54b8d80aaf65b2d3d26d1109d4234f20d5ea8fdf17e24b73"
+        },
+        {
+          "name": "storymodel4s.fixtures.wog.WarOfTheGhostsCodexCompilerSuite",
+          "file": "fixturesNative-test/TEST-storymodel4s.fixtures.wog.WarOfTheGhostsCodexCompilerSuite.xml",
+          "sha256": "a4f928a1e96b4afb0800f63c547e3fdc25150e487d88f70451baf2da2dc401a1"
+        },
+        {
+          "name": "storymodel4s.fixtures.wog.WarOfTheGhostsCodexSuite",
+          "file": "fixturesNative-test/TEST-storymodel4s.fixtures.wog.WarOfTheGhostsCodexSuite.xml",
+          "sha256": "4d0680ac67a594942c8c906c5b14e65429a9200b1e9483d3063c6635e1cb0649"
+        },
+        {
+          "name": "storymodel4s.fixtures.wog.WarOfTheGhostsSuite",
+          "file": "fixturesNative-test/TEST-storymodel4s.fixtures.wog.WarOfTheGhostsSuite.xml",
+          "sha256": "4b3052592a8cd4fc5a87b2d1bc9efb91f25cd312dc285d9384793dc5b3b0be4f"
+        }
+      ],
+      "counts": {
+        "Total": 120,
+        "Failed": 0,
+        "Errors": 0,
+        "Passed": 120,
+        "Skipped": 0
+      }
+    },
+    {
+      "task": "lawsJVM/test",
+      "suites": [
+        {
+          "name": "storymodel4s.laws.LawsSuite",
+          "file": "lawsJVM-test/TEST-storymodel4s.laws.LawsSuite.xml",
+          "sha256": "38bc36ba8b53100bb71e05d0df2e66d03556933d2bd82f8cdfdbb3460d4c15f5"
+        },
+        {
+          "name": "storymodel4s.laws.SourceLawsSuite",
+          "file": "lawsJVM-test/TEST-storymodel4s.laws.SourceLawsSuite.xml",
+          "sha256": "9dd599a56db9e9c1d81ab6912e1f5666927a9fbf4b18bac9839a46f5b912871e"
+        }
+      ],
+      "counts": {
+        "Total": 103,
+        "Failed": 0,
+        "Errors": 0,
+        "Passed": 103,
+        "Skipped": 0
+      }
+    },
+    {
+      "task": "lawsJS/test",
+      "suites": [
+        {
+          "name": "storymodel4s.laws.LawsSuite",
+          "file": "lawsJS-test/TEST-storymodel4s.laws.LawsSuite.xml",
+          "sha256": "2e39049698ed99b316913982f61f2ca4337e3e664181a717f55ca39674e7b5c0"
+        },
+        {
+          "name": "storymodel4s.laws.SourceLawsSuite",
+          "file": "lawsJS-test/TEST-storymodel4s.laws.SourceLawsSuite.xml",
+          "sha256": "a07db6866f77fee000208f5b9a57c95a81c1c507a8439ade82b268e48759016b"
+        }
+      ],
+      "counts": {
+        "Total": 103,
+        "Failed": 0,
+        "Errors": 0,
+        "Passed": 103,
+        "Skipped": 0
+      }
+    },
+    {
+      "task": "lawsNative/test",
+      "suites": [
+        {
+          "name": "storymodel4s.laws.LawsSuite",
+          "file": "lawsNative-test/TEST-storymodel4s.laws.LawsSuite.xml",
+          "sha256": "93f82a3523b0cca4c17507e41e840b07e0fa5860df4fe90983baf9bd6d59ebda"
+        },
+        {
+          "name": "storymodel4s.laws.SourceLawsSuite",
+          "file": "lawsNative-test/TEST-storymodel4s.laws.SourceLawsSuite.xml",
+          "sha256": "b0116fab5ef1b88f256207e6af091a16218e96793029b383c3e801d7d56fcb9f"
+        }
+      ],
+      "counts": {
+        "Total": 103,
+        "Failed": 0,
+        "Errors": 0,
+        "Passed": 103,
+        "Skipped": 0
+      }
+    },
+    {
+      "task": "providerParser/test",
+      "suites": [
+        {
+          "name": "storymodel4s.provider.parser.CacheSuite",
+          "file": "providerParser-test/TEST-storymodel4s.provider.parser.CacheSuite.xml",
+          "sha256": "8fc981570fea107a1917191fb94082887b055a7f0ad5fa5b32d8941260e8e15b"
+        },
+        {
+          "name": "storymodel4s.provider.parser.ConformingSuite",
+          "file": "providerParser-test/TEST-storymodel4s.provider.parser.ConformingSuite.xml",
+          "sha256": "e07c18b70d0b14c7bf927307654302a9038f96792721c91157bc9472cc673b65"
+        },
+        {
+          "name": "storymodel4s.provider.parser.ContractSuite",
+          "file": "providerParser-test/TEST-storymodel4s.provider.parser.ContractSuite.xml",
+          "sha256": "21ac9d2b388f5b2ed4d8add66044a26e679c86916e74e3c0408df28c99c1f357"
+        },
+        {
+          "name": "storymodel4s.provider.parser.DeterminismSuite",
+          "file": "providerParser-test/TEST-storymodel4s.provider.parser.DeterminismSuite.xml",
+          "sha256": "2672c0437d91169437137cc955032e56de977fa53a0a2d1fa62147060937fe6d"
+        },
+        {
+          "name": "storymodel4s.provider.parser.EnvelopeSuite",
+          "file": "providerParser-test/TEST-storymodel4s.provider.parser.EnvelopeSuite.xml",
+          "sha256": "6c1dfa52925bd54e984d38cad41ba62641736a76c2e5ed792f77d016fe94cc9c"
+        },
+        {
+          "name": "storymodel4s.provider.parser.RemoteRuntimeSuite",
+          "file": "providerParser-test/TEST-storymodel4s.provider.parser.RemoteRuntimeSuite.xml",
+          "sha256": "1f70f67329e589c0d724438bc3febbb781ec2bee713f37e498db968a29fdd3bc"
+        },
+        {
+          "name": "storymodel4s.provider.parserprobe.ConstructionBoundarySuite",
+          "file": "providerParser-test/TEST-storymodel4s.provider.parserprobe.ConstructionBoundarySuite.xml",
+          "sha256": "18e518078293cb0ec711ca5650c5b4e8a34ba5d13fdde2c763995e4568d023f8"
+        }
+      ],
+      "counts": {
+        "Total": 98,
+        "Failed": 0,
+        "Errors": 0,
+        "Passed": 98,
+        "Skipped": 0
+      }
+    },
+    {
+      "task": "providerAgent/test",
+      "suites": [
+        {
+          "name": "storymodel4s.provider.agent.CredentialsSuite",
+          "file": "providerAgent-test/TEST-storymodel4s.provider.agent.CredentialsSuite.xml",
+          "sha256": "ab8073147ad61147ff79f52445b8d780492c174076d4e1cc9c9a4b851609222c"
+        },
+        {
+          "name": "storymodel4s.provider.agent.EnvelopeSuite",
+          "file": "providerAgent-test/TEST-storymodel4s.provider.agent.EnvelopeSuite.xml",
+          "sha256": "7961a9b25c3a6eb8b75e6b2d72e37c5be125aa2bafb00e05a81e4a1f59eaec42"
+        },
+        {
+          "name": "storymodel4s.provider.agent.LiveSmokeSuite",
+          "file": "providerAgent-test/TEST-storymodel4s.provider.agent.LiveSmokeSuite.xml",
+          "sha256": "652d086a5db28919b0875291e8c9024df96c9dc083fe84701318b72dc142913f"
+        },
+        {
+          "name": "storymodel4s.provider.agent.MutationSuite",
+          "file": "providerAgent-test/TEST-storymodel4s.provider.agent.MutationSuite.xml",
+          "sha256": "33b99a44cd66db6cb3d3eeeb4f53efae9dbcc4d26172248102ce0537318f3f31"
+        },
+        {
+          "name": "storymodel4s.provider.agent.OpenAiExchangeSuite",
+          "file": "providerAgent-test/TEST-storymodel4s.provider.agent.OpenAiExchangeSuite.xml",
+          "sha256": "f7124d463c58a067953d9c804fa5dedbf3a6b7ed9ecfe6a7369935348c0e7003"
+        },
+        {
+          "name": "storymodel4s.provider.agent.RecordedReplaySuite",
+          "file": "providerAgent-test/TEST-storymodel4s.provider.agent.RecordedReplaySuite.xml",
+          "sha256": "717c12e1cfc026610bf8ac748992e771d80b59cf93e7a216a27ed8deae59125a"
+        },
+        {
+          "name": "storymodel4s.provider.agent.RecordingsSuite",
+          "file": "providerAgent-test/TEST-storymodel4s.provider.agent.RecordingsSuite.xml",
+          "sha256": "9fbe30fde187dfd860928bba3416018d7dac8eeeb24b51479ea730dac17cd2d0"
+        }
+      ],
+      "counts": {
+        "Total": 77,
+        "Failed": 0,
+        "Errors": 0,
+        "Passed": 76,
+        "Skipped": 1
+      }
+    },
+    {
+      "task": "embedGrakern/test",
+      "suites": [
+        {
+          "name": "storymodel4s.embed.grakern.DistanceSuite",
+          "file": "embedGrakern-test/TEST-storymodel4s.embed.grakern.DistanceSuite.xml",
+          "sha256": "63a18631a4d8bcbdcbe7be8027ce61f8fc550926c0a9c4be091e9c317e6e8c22"
+        },
+        {
+          "name": "storymodel4s.embed.grakern.IntegrationSuite",
+          "file": "embedGrakern-test/TEST-storymodel4s.embed.grakern.IntegrationSuite.xml",
+          "sha256": "768373cee975e40031ee088588debd3155f213c6932dadf0556a2ef1f0067247"
+        },
+        {
+          "name": "storymodel4s.embed.grakern.PinnedApiSuite",
+          "file": "embedGrakern-test/TEST-storymodel4s.embed.grakern.PinnedApiSuite.xml",
+          "sha256": "3379b590129435c59f9e391de68e1e7d7830a19270f2616f703f9a5973a6f0ab"
+        },
+        {
+          "name": "storymodel4s.embed.grakern.ReificationSuite",
+          "file": "embedGrakern-test/TEST-storymodel4s.embed.grakern.ReificationSuite.xml",
+          "sha256": "c6a04d7b821fb2f178081a0d3dc8d71283c82251793e41c1100ee37117f2f696"
+        },
+        {
+          "name": "storymodel4s.grakernprobe.StructuralProgramBoundarySuite",
+          "file": "embedGrakern-test/TEST-storymodel4s.grakernprobe.StructuralProgramBoundarySuite.xml",
+          "sha256": "d1d0cf9f46390c1abdb7afd7aebed5493f8743aca0e1e89cb50037af5505a745"
+        }
+      ],
+      "counts": {
+        "Total": 28,
+        "Failed": 0,
+        "Errors": 0,
+        "Passed": 28,
+        "Skipped": 0
+      }
+    },
+    {
+      "task": "embedOnnx/test",
+      "suites": [
+        {
+          "name": "storymodel4s.embed.onnx.OnnxSentenceEmbedderSuite",
+          "file": "embedOnnx-test/TEST-storymodel4s.embed.onnx.OnnxSentenceEmbedderSuite.xml",
+          "sha256": "a14fc095b160350e2ae3dc64089462ac603ec6b438ef903fdc9e77f42a8d0512"
+        }
+      ],
+      "counts": {
+        "Total": 6,
+        "Failed": 0,
+        "Errors": 0,
+        "Passed": 6,
+        "Skipped": 0
+      }
+    },
+    {
+      "task": "embedBench/test",
+      "suites": [
+        {
+          "name": "storymodel4s.bench.LabelSuite",
+          "file": "embedBench-test/TEST-storymodel4s.bench.LabelSuite.xml",
+          "sha256": "a952942a3a207635cf0f5027f5e8bcfade67ba15d317494a80d09864e7214d3f"
+        },
+        {
+          "name": "storymodel4s.bench.LeakageSuite",
+          "file": "embedBench-test/TEST-storymodel4s.bench.LeakageSuite.xml",
+          "sha256": "fa5c93c7a5e54fd1b6a1324d31a2b5b76d4d21975177e175999b4dc15cfb557d"
+        },
+        {
+          "name": "storymodel4s.bench.MetricsSuite",
+          "file": "embedBench-test/TEST-storymodel4s.bench.MetricsSuite.xml",
+          "sha256": "36262a82ab15d57a6e992c01dcbc3b46835b1019e0e682288d59b07ad96d71af"
+        },
+        {
+          "name": "storymodel4s.bench.ProtocolSuite",
+          "file": "embedBench-test/TEST-storymodel4s.bench.ProtocolSuite.xml",
+          "sha256": "a86a5eef924f6b37746f25ae07674e882c7627f80c31ef1790f08398daa69234"
+        },
+        {
+          "name": "storymodel4s.bench.WogDiagnosticSuite",
+          "file": "embedBench-test/TEST-storymodel4s.bench.WogDiagnosticSuite.xml",
+          "sha256": "0aff94d33ea0ed616def3abc146a8888f9ac87779bb72f4fdaef4488aea9f03d"
+        },
+        {
+          "name": "storymodel4s.bench.filmfestival.FilmFestivalSuite",
+          "file": "embedBench-test/TEST-storymodel4s.bench.filmfestival.FilmFestivalSuite.xml",
+          "sha256": "7d505cb5c2475a6c420242d92e631db1722e3e953c88d75f4b1da39fd8396dce"
+        },
+        {
+          "name": "storymodel4s.bench.nfrd.NfrdBaseballSuite",
+          "file": "embedBench-test/TEST-storymodel4s.bench.nfrd.NfrdBaseballSuite.xml",
+          "sha256": "bc59e5af6565c223bd719d292711ef1ea49e06a7e4138bfb450a3640256e117c"
+        },
+        {
+          "name": "storymodel4s.bench.sherlock.SherlockGoldRuleSuite",
+          "file": "embedBench-test/TEST-storymodel4s.bench.sherlock.SherlockGoldRuleSuite.xml",
+          "sha256": "8d161165f6db1683505e3b6eb57376341a67f27f650e8931ec36e72fb1532310"
+        },
+        {
+          "name": "storymodel4s.bench.sherlock.SherlockRecallMappingSuite",
+          "file": "embedBench-test/TEST-storymodel4s.bench.sherlock.SherlockRecallMappingSuite.xml",
+          "sha256": "a17eec2093ac66208b15d99b6749fe7cb7a5d6d29940dc2d22cc38152eb476e7"
+        },
+        {
+          "name": "storymodel4s.bench.video.LadderSuite",
+          "file": "embedBench-test/TEST-storymodel4s.bench.video.LadderSuite.xml",
+          "sha256": "9ec9245998197ec8ce3e7396cadbb8c24b469ef4e5975349ef0e3b5fd3c75822"
+        },
+        {
+          "name": "storymodel4s.bench.video.LexicalBlendSuite",
+          "file": "embedBench-test/TEST-storymodel4s.bench.video.LexicalBlendSuite.xml",
+          "sha256": "98edfaffaedda4f0f5775026d7cf91e952150c4276c75ab7563a96826a74e8ad"
+        },
+        {
+          "name": "storymodel4s.bench.video.MonotoneSceneSuite",
+          "file": "embedBench-test/TEST-storymodel4s.bench.video.MonotoneSceneSuite.xml",
+          "sha256": "c24296952f09284f4f4374315d75d2c221b273c940001b08c76df930de68eed6"
+        },
+        {
+          "name": "storymodel4s.bench.video.RecallToVideoSuite",
+          "file": "embedBench-test/TEST-storymodel4s.bench.video.RecallToVideoSuite.xml",
+          "sha256": "b6a000649987764fa4c56c371699e0653123fc9ef0f4eae1a6b9f9b51a4a510e"
+        },
+        {
+          "name": "storymodel4s.bench.video.StageTraceSuite",
+          "file": "embedBench-test/TEST-storymodel4s.bench.video.StageTraceSuite.xml",
+          "sha256": "c608f48577c007ecfbcf01eebc0137d67644eadef2843c29815b30e729841dca"
+        },
+        {
+          "name": "storymodel4s.bench.video.WorldOrderInputSuite",
+          "file": "embedBench-test/TEST-storymodel4s.bench.video.WorldOrderInputSuite.xml",
+          "sha256": "62124bc2437b9fdd6776a54560c08ee3c2253c02075cacba80aecf718c741e76"
+        },
+        {
+          "name": "storymodel4s.benchprobe.ConstructionProbeSuite",
+          "file": "embedBench-test/TEST-storymodel4s.benchprobe.ConstructionProbeSuite.xml",
+          "sha256": "e213f7d5e454e65e7f801c3495c0e01f4ae5c536c1b748c6761010700d8b7f1b"
+        },
+        {
+          "name": "storymodel4s.consumer.MetricObservationPublicSuite",
+          "file": "embedBench-test/TEST-storymodel4s.consumer.MetricObservationPublicSuite.xml",
+          "sha256": "89d0fa99c7377c05bcde427b659aa3336535c8f2e2dfc48b9afe911a6fed8815"
+        },
+        {
+          "name": "storymodel4s.consumer.NfrdIntakePublicSuite",
+          "file": "embedBench-test/TEST-storymodel4s.consumer.NfrdIntakePublicSuite.xml",
+          "sha256": "5f8fb8751185c014dc9ca42875e372425084ff025d5209678a5245923ad54b97"
+        }
+      ],
+      "counts": {
+        "Total": 137,
+        "Failed": 0,
+        "Errors": 0,
+        "Passed": 136,
+        "Skipped": 1
+      }
+    },
+    {
+      "task": "media/test",
+      "suites": [
+        {
+          "name": "storymodel4s.media.BoundarySearchSuite",
+          "file": "media-test/TEST-storymodel4s.media.BoundarySearchSuite.xml",
+          "sha256": "7d0296fdce74a13e78ceab2db1aab7e92c9bffaf9c34b0e2fdda3317e1799831"
+        },
+        {
+          "name": "storymodel4s.media.CaptionSearchSuite",
+          "file": "media-test/TEST-storymodel4s.media.CaptionSearchSuite.xml",
+          "sha256": "f06df8641a7b0afaa85abeab0630ce40d2f0436a5353e6e8f868036cd8ba7281"
+        },
+        {
+          "name": "storymodel4s.media.F1ExcerptSuite",
+          "file": "media-test/TEST-storymodel4s.media.F1ExcerptSuite.xml",
+          "sha256": "4a4a2682f8ac7759a61dc0ff9fcb034d97f04d545ad03ad452c515bc888acde4"
+        },
+        {
+          "name": "storymodel4s.media.MediaProbeSuite",
+          "file": "media-test/TEST-storymodel4s.media.MediaProbeSuite.xml",
+          "sha256": "0efa4cd388733ddb461eb3aa68311e61af884930de2a426c2a4deb7ebff5c630"
+        },
+        {
+          "name": "storymodel4s.media.VerifiedProbeSuite",
+          "file": "media-test/TEST-storymodel4s.media.VerifiedProbeSuite.xml",
+          "sha256": "3b74f3e7e88b658e117fa576ddf019d800f543efff1f0421f62d2f929d66fec0"
+        }
+      ],
+      "counts": {
+        "Total": 52,
+        "Failed": 0,
+        "Errors": 0,
+        "Passed": 49,
+        "Skipped": 3
+      }
+    },
+    {
+      "task": "pipeline/test",
+      "suites": [
+        {
+          "name": "storymodel4s.pipeline.FeatureStageSuite",
+          "file": "pipeline-test/TEST-storymodel4s.pipeline.FeatureStageSuite.xml",
+          "sha256": "4eb84280db90789669fe8edaf57c865fcd4bf7556c0300a9d5c7617194071cf7"
+        },
+        {
+          "name": "storymodel4s.pipeline.StoryBuildSuite",
+          "file": "pipeline-test/TEST-storymodel4s.pipeline.StoryBuildSuite.xml",
+          "sha256": "42487a752385cf141ba16c21fd80614bfed1da5b340b4fbb75a24fc349e010a9"
+        },
+        {
+          "name": "storymodel4s.pipeline.TextParitySuite",
+          "file": "pipeline-test/TEST-storymodel4s.pipeline.TextParitySuite.xml",
+          "sha256": "c1d6c3e7a6d807243badb13da451d97aa5b53bf03cc0d37c2aac28f53ede8024"
+        },
+        {
+          "name": "storymodel4s.pipeline.WarOfTheGhostsDraftAtlasSuite",
+          "file": "pipeline-test/TEST-storymodel4s.pipeline.WarOfTheGhostsDraftAtlasSuite.xml",
+          "sha256": "1080f37a071c9b9dd472c425054efd238d430dc09bacf99c5410824a689c798d"
+        },
+        {
+          "name": "storymodel4s.pipeline.WarOfTheGhostsDraftCodexSuite",
+          "file": "pipeline-test/TEST-storymodel4s.pipeline.WarOfTheGhostsDraftCodexSuite.xml",
+          "sha256": "41fbf6c7bc0b0e0f6bc7cd810dd425fdd84fac540f3036294bf9de121da198f4"
+        }
+      ],
+      "counts": {
+        "Total": 58,
+        "Failed": 0,
+        "Errors": 0,
+        "Passed": 58,
+        "Skipped": 0
+      }
+    },
+    {
+      "task": "corpusIntake/test",
+      "suites": [
+        {
+          "name": "storymodel4s.corpus.intake.CorpusReaderSuite",
+          "file": "corpusIntake-test/TEST-storymodel4s.corpus.intake.CorpusReaderSuite.xml",
+          "sha256": "901484c783a20f620da68b4780921ef1a413e91bc5b855459ac39fb243a6fd6f"
+        },
+        {
+          "name": "storymodel4s.corpus.intake.DescriptorSuite",
+          "file": "corpusIntake-test/TEST-storymodel4s.corpus.intake.DescriptorSuite.xml",
+          "sha256": "b5c75bf475c6958a1532b1a3070b24c8ce485cc1b6bd314fe78f847be49be118"
+        },
+        {
+          "name": "storymodel4s.corpus.intake.MigrationSuite",
+          "file": "corpusIntake-test/TEST-storymodel4s.corpus.intake.MigrationSuite.xml",
+          "sha256": "c9122eadd0178871f5170de4b0b39ae649733a520f6db5e6dbc35eb54dc5b5e4"
+        },
+        {
+          "name": "storymodel4s.corpus.intake.SherlockAnnotationsSuite",
+          "file": "corpusIntake-test/TEST-storymodel4s.corpus.intake.SherlockAnnotationsSuite.xml",
+          "sha256": "6d2a1529a3e5a57433fe8023ed02084de05932bd63e2958b912fceba99c98a7e"
+        },
+        {
+          "name": "storymodel4s.corpus.intake.TimebaseRepairSuite",
+          "file": "corpusIntake-test/TEST-storymodel4s.corpus.intake.TimebaseRepairSuite.xml",
+          "sha256": "1bc822d9687cda2a5c77710591454fd983c909c8b3084e44b616dc936c34d53d"
+        },
+        {
+          "name": "storymodel4s.corpus.intake.XlsxSuite",
+          "file": "corpusIntake-test/TEST-storymodel4s.corpus.intake.XlsxSuite.xml",
+          "sha256": "bf28b1751cc54197b145e654988c2d44907aa7723bee4121057f1be0ba472308"
+        }
+      ],
+      "counts": {
+        "Total": 135,
+        "Failed": 0,
+        "Errors": 0,
+        "Passed": 135,
+        "Skipped": 0
+      }
+    }
+  ],
+  "skippedTests": [
+    {
+      "task": "providerAgent/test",
+      "suite": "storymodel4s.provider.agent.LiveSmokeSuite",
+      "test": "live smoke: one WOG sentence through the model, recorded as captured, judged by the court"
+    },
+    {
+      "task": "embedBench/test",
+      "suite": "storymodel4s.bench.sherlock.SherlockRecallMappingSuite",
+      "test": "the neural channel puts the red-door unit nearer its row than an unrelated row"
+    },
+    {
+      "task": "media/test",
+      "suite": "storymodel4s.media.BoundarySearchSuite",
+      "test": "live ffmpeg and worker, when this machine has both, reproduce the recorded proposals"
+    },
+    {
+      "task": "media/test",
+      "suite": "storymodel4s.media.CaptionSearchSuite",
+      "test": "live worker and weights, when this machine has them, reproduce the recorded proposals"
+    },
+    {
+      "task": "media/test",
+      "suite": "storymodel4s.media.F1ExcerptSuite",
+      "test": "live tools, when this machine has them and the excerpt, reproduce the recorded packet table and proposals"
+    }
+  ],
+  "qualification": "Independent local provider receipt reconciliation; no consumer, formatting, docs, CI or scientific qualification.",
+  "skipIdentityComparison": {
+    "sameAsHistorical3cdProviderAudit": true,
+    "historicalAuditAlsoVerifiedAgainstS0": true,
+    "count": 5
+  },
+  "receiptBeforeMetadataEnrichmentSha256": "37f82d9071d892ac8ea6a18ee668afb9043a80a6198017d1acefa9100516617c",
+  "receiptEnrichmentRechecked": [
+    "log byte length",
+    "sbt welcome",
+    "unchanged code/command/counts/clean-state/task order/log hash"
+  ],
+  "formattingReceipt": {
+    "sha256": "1bd5da0ca40175e9f52019c444b04d1f071587f48afe929a00636f2ffb5d8a92",
+    "logSha256": "fdfb3f5157f3e27c5c8d0c93ab1b5b821756d56ab0fce5dfbfe1c9f986ec55b4",
+    "exitCode": 0
+  },
+  "environmentReceiptSha256": "c527a117c5033f462189d154a27cdfbf6735837eca81ce24697c2a1ae81c77f8",
+  "docsExamplesReceipt": {
+    "sha256": "2b964a21fde5156bbeb94c121367b934b4fdab99dc43cbde80bcc0b28813ab43",
+    "command": [
+      "env",
+      "STORYMODEL4S_GRAKERN_BUILD=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+      "npm",
+      "--prefix",
+      "docs-site",
+      "run",
+      "verify:examples"
+    ],
+    "logSha256": "737d4c83127c2e8e54a22c38cd8fe7ccb134a1a997cf4dcea18c3f4d486e21ca",
+    "verifiedExamples": [
+      "verified inspect-source: 381 output bytes",
+      "verified model-a-story: 729 output bytes",
+      "verified represent-recall: 598 output bytes",
+      "verified align-and-interpret: 551 output bytes",
+      "verified summarize-recall: 756 output bytes",
+      "verified score-interview: 1074 output bytes",
+      "verified save-model: 330 output bytes",
+      "verified penman-to-chart: 840 output bytes",
+      "verified resolve-acquisition: 318 output bytes",
+      "verified compose-document: 340 output bytes",
+      "verified window-features: 634 output bytes",
+      "verified use-embeddings: 436 output bytes",
+      "verified structural-distance: 402 output bytes"
+    ],
+    "exitCode": 0,
+    "parsingNote": "13 per-example byte receipts; separate final summary line excluded."
+  }
+}

@@ -1,0 +1,61 @@
+{
+  "codeRevision": "c24ddd66026f0d1848b61369b0bbaff7a90a5d40",
+  "receiptSha256": "2b964a21fde5156bbeb94c121367b934b4fdab99dc43cbde80bcc0b28813ab43",
+  "logSha256": "737d4c83127c2e8e54a22c38cd8fe7ccb134a1a997cf4dcea18c3f4d486e21ca",
+  "exampleCount": 13,
+  "examples": [
+    {
+      "name": "inspect-source",
+      "outputBytes": 381
+    },
+    {
+      "name": "model-a-story",
+      "outputBytes": 729
+    },
+    {
+      "name": "represent-recall",
+      "outputBytes": 598
+    },
+    {
+      "name": "align-and-interpret",
+      "outputBytes": 551
+    },
+    {
+      "name": "summarize-recall",
+      "outputBytes": 756
+    },
+    {
+      "name": "score-interview",
+      "outputBytes": 1074
+    },
+    {
+      "name": "save-model",
+      "outputBytes": 330
+    },
+    {
+      "name": "penman-to-chart",
+      "outputBytes": 840
+    },
+    {
+      "name": "resolve-acquisition",
+      "outputBytes": 318
+    },
+    {
+      "name": "compose-document",
+      "outputBytes": 340
+    },
+    {
+      "name": "window-features",
+      "outputBytes": 634
+    },
+    {
+      "name": "use-embeddings",
+      "outputBytes": 436
+    },
+    {
+      "name": "structural-distance",
+      "outputBytes": 402
+    }
+  ],
+  "qualification": "All13 executable documentation examples compiled, ran and matched expected output under the repository verifier; this is not a testAll task count."
+}

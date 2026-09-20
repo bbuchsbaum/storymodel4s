@@ -204,8 +204,12 @@ and historical receipts are frozen. Five compiled mutations cover the four requi
 the clean full gate reports 6,444 passed executions and 5 skips across all 56 test tasks.
 The [S1 ADR amendment](evidence/d1a-s1-adr-20260919/README.md) records the approved rulings
 and compatibility design; its separate committed-text review found no S1 findings.
-The next sequential D1A slice is **S2's core substrate** (`bd-01M2TABVXSM72M9DD0SNB6GZ11`),
-starting with the outstanding revision-4 design review and any required corrections.
+The [S2 checked substrate](evidence/d1a-s2-substrate-20260919/README.md) is complete:
+revision-5 design corrections, 52 compiled killed mutants, 73 passing restored focused tests,
+and a clean full gate with 6,600 passed executions and 5 unchanged skips across all 56 tasks.
+All 13 docs examples and the 245-test storyatlas4s consumer gate pass at the exact candidate.
+The next sequential D1A slice is **S3's typed acquisition support**
+(`bd-01M2TAF8JH42NYJJAFWPD7HTZB`), preserving text resolver verdicts and wire-visible gap names.
 G0 as a whole remains open for infrastructure and independent preservation work;
 these engineering gates establish no accuracy or measurement-validity claim.
 
