@@ -208,8 +208,13 @@ The [S2 checked substrate](evidence/d1a-s2-substrate-20260919/README.md) is comp
 revision-5 design corrections, 52 compiled killed mutants, 73 passing restored focused tests,
 and a clean full gate with 6,600 passed executions and 5 unchanged skips across all 56 tasks.
 All 13 docs examples and the 245-test storyatlas4s consumer gate pass at the exact candidate.
-The next sequential D1A slice is **S3's typed acquisition support**
-(`bd-01M2TAF8JH42NYJJAFWPD7HTZB`), preserving text resolver verdicts and wire-visible gap names.
+The [S3 typed acquisition support](evidence/d1a-s3-acquire-20260919/README.md) is complete:
+8,640 declared historical text cases preserve complete resolver states, literal gap names remain
+unchanged, and all 18 compiled mutants are killed with accepting controls. Restored focused tests
+pass 55/55; the clean full gate passes 6,663 executions with the same five skips across 56 tasks.
+Formatting, all 13 docs examples and the exact-provider 245-test consumer gate also pass.
+The next sequential D1A slice is **S4a's typed node support and fallible draft**
+(`bd-01M2TAFN5WMXW4NT20YJQAW2FR`), retaining the text-only envelope and frozen S0 values.
 G0 as a whole remains open for infrastructure and independent preservation work;
 these engineering gates establish no accuracy or measurement-validity claim.
 
