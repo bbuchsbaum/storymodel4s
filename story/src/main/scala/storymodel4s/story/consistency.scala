@@ -37,7 +37,7 @@ object NarrativeConsistency:
       atlas.unitsOverlapping(r.span, SurfaceUnitKind.Token).map(t => TextNorm.lower(atlas.text(t)))
     }
 
-  def check(m: StoryModel[?]): Vector[Violation] =
+  def check(m: TextModel[?]): Vector[Violation] =
     val g = m.graph
     val out = Vector.newBuilder[Violation]
     def warn(law: String, path: String, reason: String): Unit =

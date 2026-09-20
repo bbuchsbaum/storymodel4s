@@ -17,8 +17,7 @@ object ModelStatus:
   */
 final class StoryModel[S <: ModelStatus] private (
     val schemaVersion: String,
-    val source: StorySource,
-    val atlas: SurfaceAtlas,
+    val atlas: NarrativeSourceAtlas,
     val graph: NarrativeGraph,
     val hierarchy: NarrativeHierarchy,
     val trajectory: DiscourseTrajectory,
@@ -29,8 +28,17 @@ final class StoryModel[S <: ModelStatus] private (
     val hypotheses: Vector[HypothesisClaim],
     val sensoryProfiles: Map[SituationId, Vector[SensoryProfile]],
     val receipt: Option[BuildReceipt],
-    val discourseOrder: Vector[SituationId]
+    val discourseOrder: Vector[SituationId],
+    private val supportProjections: Map[TypedSupport, PrimaryProjection]
 ):
+  val bundle: SourceBundle = atlas.bundle
+  private val identity = StoryModel.identityOf(atlas)
+  val storyId: StoryId = identity._1
+  val sourceChecksum: Checksum = identity._2
+
+  /** Projection of an admitted model support; the map is derived at the shared join. */
+  private[story] def projectionOf(support: TypedSupport): PrimaryProjection = supportProjections(support)
+
   /** Every inline claim in the model, in a deterministic order: node claims, resolved-value claims
     * (entity labels, segment summaries), scoped attributes, every relation layer, containment,
     * trajectory transitions, descriptors, and hypotheses.
@@ -47,7 +55,7 @@ final class StoryModel[S <: ModelStatus] private (
     graph.situationsByContext(discourseOrder)
   def situationsWithin(context: ContextId): Vector[SituationId] =
     graph.situationsWithin(context, discourseOrder)
-  def situationsCovering(span: TextSpan): Vector[SituationId] =
+  private[story] def situationsCovering(span: TextSpan): Vector[SituationId] =
     graph.situationsCovering(span, discourseOrder)
 
   /** The derived, normalized claim ledger; fails on duplicate claim identifiers. */
@@ -56,7 +64,7 @@ final class StoryModel[S <: ModelStatus] private (
   /** Evidence support of a reference across graph and hierarchy: containment edges resolve to the
     * spans their claims cite; everything else delegates to [[NarrativeGraph.supporting]].
     */
-  def supporting(ref: StoryRef): Option[SpanSet] = ref match
+  private[story] def supporting(ref: StoryRef): Option[SpanSet] = ref match
     case StoryRef.Containment(m, p, k) =>
       hierarchy.containment
         .find(e => e.member == m && e.parent == p && e.kind == k)
@@ -64,7 +72,7 @@ final class StoryModel[S <: ModelStatus] private (
     case other => graph.supporting(other)
 
   /** Every graph or hierarchy reference whose evidence overlaps `span`, ordered by address. */
-  def covering(span: TextSpan): Vector[StoryRef] =
+  private[story] def covering(span: TextSpan): Vector[StoryRef] =
     val fromHierarchy = hierarchy.containment
       .filter(e => e.meta.spans.exists(_.spans.exists(_.overlaps(span))))
       .map(e => StoryRef.Containment(e.member, e.parent, e.kind))
@@ -76,8 +84,7 @@ final class StoryModel[S <: ModelStatus] private (
     */
   private[story] def copy[T <: ModelStatus](
       schemaVersion: String = schemaVersion,
-      source: StorySource = source,
-      atlas: SurfaceAtlas = atlas,
+      atlas: NarrativeSourceAtlas = atlas,
       graph: NarrativeGraph = graph,
       hierarchy: NarrativeHierarchy = hierarchy,
       trajectory: DiscourseTrajectory = trajectory,
@@ -91,7 +98,6 @@ final class StoryModel[S <: ModelStatus] private (
   ): Either[DomainError, StoryModel[T]] =
     StoryModel.checked[T](
       schemaVersion,
-      source,
       atlas,
       graph,
       hierarchy,
@@ -108,7 +114,6 @@ final class StoryModel[S <: ModelStatus] private (
   private[story] def withStatus[T <: ModelStatus]: StoryModel[T] =
     new StoryModel[T](
       schemaVersion,
-      source,
       atlas,
       graph,
       hierarchy,
@@ -120,12 +125,13 @@ final class StoryModel[S <: ModelStatus] private (
       hypotheses,
       sensoryProfiles,
       receipt,
-      discourseOrder
+      discourseOrder,
+      supportProjections
     )
 
   override def equals(other: Any): Boolean = other match
     case that: StoryModel[?] =>
-      schemaVersion == that.schemaVersion && source == that.source && atlas == that.atlas &&
+      schemaVersion == that.schemaVersion && atlas == that.atlas &&
       graph == that.graph && hierarchy == that.hierarchy && trajectory == that.trajectory &&
       featureSpaces == that.featureSpaces && sidecars == that.sidecars &&
       featureRefs == that.featureRefs && descriptors == that.descriptors &&
@@ -136,7 +142,6 @@ final class StoryModel[S <: ModelStatus] private (
   override def hashCode: Int =
     (
       schemaVersion,
-      source,
       atlas,
       graph,
       hierarchy,
@@ -187,8 +192,7 @@ object StoryModel:
   val SchemaVersion: String = "0.7.0"
 
   def draft(
-      source: StorySource,
-      atlas: SurfaceAtlas,
+      atlas: NarrativeSourceAtlas,
       graph: NarrativeGraph,
       hierarchy: NarrativeHierarchy,
       trajectory: DiscourseTrajectory,
@@ -203,7 +207,6 @@ object StoryModel:
   ): Either[DomainError, StoryModel[ModelStatus.Draft]] =
     checked[ModelStatus.Draft](
       schemaVersion,
-      source,
       atlas,
       graph,
       hierarchy,
@@ -219,8 +222,7 @@ object StoryModel:
 
   private def checked[S <: ModelStatus](
       schemaVersion: String,
-      source: StorySource,
-      atlas: SurfaceAtlas,
+      atlas: NarrativeSourceAtlas,
       graph: NarrativeGraph,
       hierarchy: NarrativeHierarchy,
       trajectory: DiscourseTrajectory,
@@ -232,56 +234,127 @@ object StoryModel:
       sensoryProfiles: Map[SituationId, Vector[SensoryProfile]],
       receipt: Option[BuildReceipt]
   ): Either[DomainError, StoryModel[S]] =
-    val wrongSupport =
-      graph.supportEntries.sortBy(_._1).find(entry => !entry._2.isInstanceOf[TypedSupport.Text])
+    val bundle = atlas.bundle
     val allClaims = graph.allMeta ++ hierarchy.allMeta ++ trajectory.allMeta ++
       descriptors.map(_.meta) ++ hypotheses.map(_.meta)
-    if wrongSupport.nonEmpty then
-      Left(
-        DomainError.InvariantViolation(
-          wrongSupport.get._1 + "/support",
-          "text StoryModel requires Text support"
-        )
-      )
-    else if allClaims.exists(_.evidence.exists(_.anchors.nonEmpty)) then
-      Left(
-        DomainError.InvariantViolation(
-          "model/evidence",
-          "text StoryModel cannot carry anchored claim evidence"
-        )
-      )
-    else if (hierarchy.boundaryBeliefs ++ trajectory.steps.flatMap(_.boundaryBeliefs))
-        .exists(_.evidence.exists(_.anchors.nonEmpty))
-    then
-      Left(
-        DomainError.InvariantViolation(
-          "model/boundary-evidence",
-          "text StoryModel cannot carry anchored boundary evidence"
-        )
-      )
-    else
-      for
-        bundle <- SourceBundle.writtenText(source)
-        order <- graph.discourseOrderOn(bundle)
-      yield new StoryModel[S](
-        schemaVersion,
-        source,
-        atlas,
-        graph,
-        hierarchy,
-        trajectory,
-        featureSpaces,
-        sidecars,
-        featureRefs,
-        descriptors,
-        hypotheses,
-        sensoryProfiles,
-        receipt,
-        order
-      )
+    val boundaries = hierarchy.boundaryBeliefs ++ trajectory.steps.flatMap(_.boundaryBeliefs)
+    val evidence = allClaims.flatMap(_.evidence.toVector) ++ boundaries.flatMap(_.evidence)
+    val (storyId, checksum) = identityOf(atlas)
+    def invalid(path: String, reason: String): Left[DomainError, Nothing] =
+      Left(DomainError.InvariantViolation(path, reason))
+    def checkEvidence(e: Evidence): Either[DomainError, Unit] =
+      if bundle.primaryAxis.kind == AxisKind.TextCharacter && e.anchors.nonEmpty then
+        invalid("model/evidence", "text StoryModel cannot carry anchored evidence")
+      else if bundle.primaryAxis.kind == AxisKind.EditionPlayback && e.spans.nonEmpty then
+        invalid("model/evidence", "anchored StoryModel cannot carry bare text spans")
+      else e.anchors match
+        case None => Right(())
+        case Some(support) => EvidenceSupport.of(bundle, support.anchors.toVector).map(_ => ())
+    for
+      projections <- graph.supportEntries.sortBy(_._1)
+        .foldLeft[Either[DomainError, Map[TypedSupport, PrimaryProjection]]](Right(Map.empty)) {
+          case (result, (path, support)) =>
+            for
+              values <- result
+              projection <- PrimaryProjection.on(bundle, support).left.map(error =>
+                DomainError.InvariantViolation(path + "/support", error.message))
+            yield values.updated(support, projection)
+        }
+      _ <- evidence.foldLeft[Either[DomainError, Unit]](Right(()))((result, e) => result.flatMap(_ => checkEvidence(e)))
+      _ <- receipt match
+        case Some(r) if r.storyId != storyId || r.sourceChecksum != checksum =>
+          invalid("model/receipt", "receipt story identity or source checksum differs from the atlas")
+        case _ => Right(())
+      order <- graph.discourseOrderOn(bundle)
+    yield new StoryModel[S](schemaVersion, atlas, graph, hierarchy, trajectory, featureSpaces,
+      sidecars, featureRefs, descriptors, hypotheses, sensoryProfiles, receipt, order, projections)
+
+  private def identityOf(atlas: NarrativeSourceAtlas): (StoryId, Checksum) = atlas match
+    case text: TextNarrativeAtlas => (text.atlas.source.id, text.atlas.source.canonicalChecksum)
+    case anchored: AnchoredNarrativeAtlas =>
+      val surface = anchored.surface.fold(Vector("surface:none"))(s => Vector("surface:some", s.identity.hex))
+      val parts = Vector("story-anchored", anchored.bundle.identity.hex) ++ surface
+      (StoryId.unsafe(ContentAddress.of(parts.head, parts.tail*)), ContentAddress.digest(parts))
+
+  /** The source is derived from this surface, never supplied as an independent pair. */
+  def draftText(
+      surface: SurfaceAtlas,
+      graph: NarrativeGraph,
+      hierarchy: NarrativeHierarchy,
+      trajectory: DiscourseTrajectory,
+      featureSpaces: Map[FeatureSpaceId, FeatureSpace[?]] = Map.empty,
+      sidecars: Map[FeatureSpaceId, SidecarManifest] = Map.empty,
+      featureRefs: Vector[FeatureRef] = Vector.empty,
+      descriptors: Vector[DescriptorClaim] = Vector.empty,
+      hypotheses: Vector[HypothesisClaim] = Vector.empty,
+      sensoryProfiles: Map[SituationId, Vector[SensoryProfile]] = Map.empty,
+      receipt: Option[BuildReceipt] = None,
+      schemaVersion: String = SchemaVersion
+  ): Either[DomainError, TextModel[ModelStatus.Draft]] =
+    for
+      atlas <- TextNarrativeAtlas.of(surface)
+      model <- draft(atlas, graph, hierarchy, trajectory, featureSpaces, sidecars, featureRefs,
+        descriptors, hypotheses, sensoryProfiles, receipt, schemaVersion)
+      text <- TextModel.checked(model)
+    yield text
+
+  def asText[S <: ModelStatus](model: StoryModel[S]): Option[TextModel[S]] = TextModel.fromModel(model)
 
   /** Human adjudication promotes a validated model; the adjudicator is recorded by the caller in
     * the claim ledger, so this is a pure status change.
     */
   def adjudicated(model: StoryModel[ModelStatus.Validated]): StoryModel[ModelStatus.Adjudicated] =
     model.withStatus[ModelStatus.Adjudicated]
+
+  def adjudicated(model: TextModel[ModelStatus.Validated]): TextModel[ModelStatus.Adjudicated] =
+    model.promoted[ModelStatus.Adjudicated]
+
+/** Canonical text access derived only from the model's text atlas. */
+final class StoryText private (val source: StorySource, val surface: SurfaceAtlas, val stream: StreamId)
+object StoryText:
+  private[story] def fromAtlas(atlas: TextNarrativeAtlas): StoryText =
+    new StoryText(atlas.atlas.source, atlas.atlas, atlas.bundle.streams.head.id)
+
+/** A checked text capability; no implicit conversion or independent text/model join. */
+final class TextModel[S <: ModelStatus] private (val model: StoryModel[S], val text: StoryText):
+  def source: StorySource = text.source
+  def atlas: SurfaceAtlas = text.surface
+  def bundle: SourceBundle = model.bundle
+  def storyId: StoryId = model.storyId
+  def sourceChecksum: Checksum = model.sourceChecksum
+  def schemaVersion: String = model.schemaVersion
+  def graph: NarrativeGraph = model.graph
+  def hierarchy: NarrativeHierarchy = model.hierarchy
+  def trajectory: DiscourseTrajectory = model.trajectory
+  def featureSpaces: Map[FeatureSpaceId, FeatureSpace[?]] = model.featureSpaces
+  def sidecars: Map[FeatureSpaceId, SidecarManifest] = model.sidecars
+  def featureRefs: Vector[FeatureRef] = model.featureRefs
+  def descriptors: Vector[DescriptorClaim] = model.descriptors
+  def hypotheses: Vector[HypothesisClaim] = model.hypotheses
+  def sensoryProfiles: Map[SituationId, Vector[SensoryProfile]] = model.sensoryProfiles
+  def receipt: Option[BuildReceipt] = model.receipt
+  def claims: Vector[ClaimMeta] = model.claims
+  def ledger: Either[DomainError, ClaimLedger] = model.ledger
+  def discourseOrder: Vector[SituationId] = model.discourseOrder
+  def discoursePosition: Map[SituationId, Int] = model.discoursePosition
+  def situationsByEntity: Map[EntityId, Vector[SituationId]] = model.situationsByEntity
+  def situationsByContext: Map[ContextId, Vector[SituationId]] = model.situationsByContext
+  def situationsWithin(context: ContextId): Vector[SituationId] = model.situationsWithin(context)
+  def situationsCovering(span: TextSpan): Vector[SituationId] = model.situationsCovering(span)
+  def supporting(ref: StoryRef): Option[SpanSet] = model.supporting(ref)
+  def covering(span: TextSpan): Vector[StoryRef] = model.covering(span)
+  private[story] def promoted[T <: ModelStatus]: TextModel[T] =
+    new TextModel(model.withStatus[T], text)
+  override def equals(other: Any): Boolean = other match
+    case that: TextModel[?] => model == that.model
+    case _ => false
+  override def hashCode: Int = model.hashCode
+  override def toString: String = s"TextModel($model)"
+
+object TextModel:
+  private[story] def fromModel[S <: ModelStatus](model: StoryModel[S]): Option[TextModel[S]] =
+    model.atlas match
+      case atlas: TextNarrativeAtlas => Some(new TextModel(model, StoryText.fromAtlas(atlas)))
+      case _: AnchoredNarrativeAtlas => None
+  private[story] def checked[S <: ModelStatus](model: StoryModel[S]): Either[DomainError, TextModel[S]] =
+    fromModel(model).toRight(DomainError.InvariantViolation("model/text", "model has no canonical text atlas"))

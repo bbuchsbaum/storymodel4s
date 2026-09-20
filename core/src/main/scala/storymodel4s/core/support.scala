@@ -25,16 +25,22 @@ enum PrimaryProjection:
       )
 
 object PrimaryProjection:
-  /** S4a's checked text projection. Source extent remains a validator law. */
+  /** Checked primary selection. Text extent remains a validator law; native anchors are retained
+    * in their original support and are never implicitly mapped onto primary.
+    */
   def on(bundle: SourceBundle, support: TypedSupport): Either[DomainError, PrimaryProjection] =
-    if bundle.primaryAxis.kind != AxisKind.TextCharacter then
-      Left(SourceCanon.inv("projection/primary-kind", "text projection requires TextCharacter"))
-    else
-      support match
-        case TypedSupport.Text(spans) =>
-          Right(PrimaryProjection.TextSpans(bundle.primaryAxis.id, spans))
-        case TypedSupport.Anchored(_) =>
-          Left(SourceCanon.inv("projection/support-kind", "text projection requires Text support"))
+    (bundle.primaryAxis.kind, support) match
+      case (AxisKind.TextCharacter, TypedSupport.Text(spans)) =>
+        Right(PrimaryProjection.TextSpans(bundle.primaryAxis.id, spans))
+      case (AxisKind.EditionPlayback, TypedSupport.Anchored(anchors)) =>
+        for
+          checked <- EvidenceSupport.of(bundle, anchors.anchors.toVector)
+          intervals <- checked.intervalsOn(bundle.primaryAxis.id)
+        yield PrimaryProjection.Playback(bundle.primaryAxis.id, intervals)
+      case (AxisKind.TextCharacter | AxisKind.EditionPlayback, _) =>
+        Left(SourceCanon.inv("projection/support-kind", "support does not match the primary coordinate kind"))
+      case _ =>
+        Left(SourceCanon.inv("projection/primary-kind", "primary projection requires TextCharacter or EditionPlayback"))
 
 private[core] object SourceSupportChecks:
   private def invalid(rule: String, detail: String): Left[DomainError, Nothing] =

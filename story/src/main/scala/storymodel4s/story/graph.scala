@@ -14,17 +14,17 @@ final case class NarrativeGraph(
     relations: RelationLayers
 ):
 
-  /** Checked pre-model order. S4a supports text only, including empty text graphs. */
+  /** Checked pre-model order on the declared text or playback primary. */
   def discourseOrderOn(bundle: SourceBundle): Either[DomainError, Vector[SituationId]] =
     discourseOrder(bundle)
 
   private[story] def discourseOrder(
       bundle: SourceBundle
   ): Either[DomainError, Vector[SituationId]] =
-    if bundle.primaryAxis.kind != AxisKind.TextCharacter then
+    if bundle.primaryAxis.kind != AxisKind.TextCharacter && bundle.primaryAxis.kind != AxisKind.EditionPlayback then
       Left(
         DomainError
-          .InvariantViolation("graph/order/primary-kind", "text ordering requires TextCharacter")
+          .InvariantViolation("graph/order/primary-kind", "ordering requires TextCharacter or EditionPlayback")
       )
     else
       situations.values.toVector
@@ -213,7 +213,7 @@ final case class NarrativeGraph(
     * hull of its endpoints; the evidence law (ADR 0002 V-E3) forbids marking text an edge does not
     * cite.
     */
-  def supporting(ref: StoryRef): Option[SpanSet] = ref match
+  private[story] def supporting(ref: StoryRef): Option[SpanSet] = ref match
     case StoryRef.Situation(id)           => situations.get(id).flatMap(_.support.textSpans)
     case StoryRef.Segment(id)             => segments.get(id).flatMap(_.support.textSpans)
     case StoryRef.Entity(id)              => entities.get(id).flatMap(_.support.textSpans)
@@ -252,7 +252,7 @@ final case class NarrativeGraph(
     * their support, relation edges by the spans their claims cite. Deterministic order: by address
     * rendering. This is the "select text -> every supported claim" query.
     */
-  def covering(span: TextSpan): Vector[StoryRef] =
+  private[story] def covering(span: TextSpan): Vector[StoryRef] =
     def hits(s: SpanSet): Boolean = s.spans.exists(_.overlaps(span))
     val nodes: Vector[StoryRef] =
       situations.values.toVector

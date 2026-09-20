@@ -7,7 +7,7 @@ import storymodel4s.core.*
   */
 object Renderer:
 
-  def text(m: StoryModel[?]): String =
+  def text(m: TextModel[?]): String =
     val g = m.graph
     val h = m.hierarchy
     val sb = new StringBuilder
@@ -110,7 +110,7 @@ object Renderer:
   /** Graphviz DOT: situations as boxes clustered by primary segment, entities as ellipses, typed
     * edges with labels.
     */
-  def dot(m: StoryModel[?]): String =
+  def dot(m: TextModel[?]): String =
     val g = m.graph
     val h = m.hierarchy
     val sb = new StringBuilder

@@ -114,13 +114,13 @@ private[story] final class StoryAlignmentSource(model: StoryModel[?]) extends Al
 
   private val derivedMeta: ClaimMeta =
     ClaimMeta.unsafe(
-      ClaimId.unsafe(ContentAddress.of("derived-view", model.source.canonicalChecksum.hex)),
+      ClaimId.unsafe(ContentAddress.of("derived-view", model.sourceChecksum.hex)),
       EpistemicStatus.StructurallyDerived,
       Credence.unsafeDetermined(AlignmentSource.DerivedViewRule),
       cats.data.NonEmptyVector.one(
         Evidence(
           EvidenceId.unsafe(
-            ContentAddress.of("derived-view-ev", model.source.canonicalChecksum.hex)
+            ContentAddress.of("derived-view-ev", model.sourceChecksum.hex)
           ),
           None,
           Set.empty,

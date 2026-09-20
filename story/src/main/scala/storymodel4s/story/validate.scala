@@ -94,6 +94,12 @@ final case class ValidationOutcome(
     validated: Option[StoryModel[ModelStatus.Validated]]
 )
 
+/** Validation outcome retaining the admitted text capability. */
+final case class TextValidationOutcome(
+    report: ValidationReport,
+    validated: Option[TextModel[ModelStatus.Validated]]
+)
+
 /** Structural laws of a story model (design record §32.6). Each law has a stable name so gate
   * reports and tests can address it. Narrative-consistency rules ([[NarrativeConsistency]]) are
   * included in the report so a validation policy can block on them.
@@ -104,11 +110,24 @@ object StoryValidator:
       draft: StoryModel[ModelStatus.Draft],
       policy: ValidationPolicy = ValidationPolicy.default
   ): ValidationOutcome =
-    val vs =
-      (check(draft) ++ NarrativeConsistency.check(draft)).sortBy(v => (v.law, v.path, v.reason))
-    val report = ValidationReport(vs)
-    val blocked = vs.exists(v => policy.blocking.contains(v.severity))
-    ValidationOutcome(report, if blocked then None else Some(draft.withStatus))
+    val result = report(draft)
+    ValidationOutcome(result, if blocked(result, policy) then None else Some(draft.withStatus))
+
+  def validate(draft: TextModel[ModelStatus.Draft]): TextValidationOutcome =
+    validate(draft, ValidationPolicy.default)
+
+  def validate(draft: TextModel[ModelStatus.Draft], policy: ValidationPolicy): TextValidationOutcome =
+    val result = report(draft.model)
+    TextValidationOutcome(result, if blocked(result, policy) then None else Some(draft.promoted))
+
+  private def blocked(report: ValidationReport, policy: ValidationPolicy): Boolean =
+    report.violations.exists(v => policy.blocking.contains(v.severity))
+
+  private def report(model: StoryModel[?]): ValidationReport =
+    val textRules = StoryModel.asText(model).toVector.flatMap(NarrativeConsistency.check)
+    ValidationReport((check(model) ++ textRules).sortBy(v => (v.law, v.path, v.reason)))
+
+  def check(model: TextModel[?]): Vector[Violation] = check(model.model)
 
   /** All violations of all structural laws, deterministic order. */
   def check(m: StoryModel[?]): Vector[Violation] =
@@ -120,12 +139,17 @@ object StoryValidator:
     def warn(law: String, path: String, reason: String): Unit =
       out += Violation(law, Severity.Warning, path, reason, Violation.addressOf(path, g))
 
-    val textLen = m.source.canonicalText.length
+    val text = StoryModel.asText(m)
+    val textLen = text.map(_.source.canonicalText.length)
+    val surface = m.atlas match
+      case a: TextNarrativeAtlas => Some(a.atlas)
+      case a: AnchoredNarrativeAtlas => a.surface.map(_.surface)
 
-    // atlas: exact recovery against the model's own source
-    SurfaceAtlas.validated(m.atlas).left.foreach(e => err("atlas.valid", "atlas", e.message))
-    if m.atlas.source.canonicalChecksum != m.source.canonicalChecksum then
-      err("atlas.source-match", "atlas", "atlas was built from a different canonical text")
+    // Canonical text laws require the model's own text witness.
+    text.foreach(t => SurfaceAtlas.validated(t.atlas).left.foreach(e => err("atlas.valid", "atlas", e.message)))
+    def anchorsInBundle(path: String, evidence: Evidence): Unit =
+      evidence.anchors.foreach(a => EvidenceSupport.of(m.bundle, a.anchors.toVector)
+        .left.foreach(e => err("evidence.anchors-in-bundle", path, e.message)))
 
     // ids: map keys agree with node ids
     g.entities.foreach((k, e) =>
@@ -153,10 +177,16 @@ object StoryValidator:
     allClaims.foreach { c =>
       c.evidence.toVector.flatMap(_.spans).foreach { ss =>
         ss.spans.toVector.foreach { sp =>
-          if sp.endExclusive > textLen then
-            err("claims.spans-in-text", s"claims/${c.id.value}", s"span $sp exceeds text $textLen")
+          textLen.foreach { length =>
+            if sp.endExclusive > length then
+              err("claims.spans-in-text", s"claims/${c.id.value}", s"span $sp exceeds text $length")
+          }
         }
       }
+    }
+    allClaims.foreach(c => c.evidence.toVector.foreach(e => anchorsInBundle(s"claims/${c.id.value}", e)))
+    (h.boundaryBeliefs ++ m.trajectory.steps.flatMap(_.boundaryBeliefs)).zipWithIndex.foreach { (belief, i) =>
+      belief.evidence.foreach(e => anchorsInBundle(s"boundaryBeliefs/$i", e))
     }
     // resolved values: no duplicate or self alternative
     def alternativesLaw[A](path: String, r: Resolved[A]): Unit =
@@ -183,21 +213,16 @@ object StoryValidator:
         err("hypothesis.has-alternatives", path, "a hypothesis needs at least one rival reading")
     }
 
-    // S4a model construction proves every node support is Text; extent remains this validator law.
-    // The optional text accessor is extracted only inside this admitted text-model boundary.
-    // node supports within text
-    g.situations.values.foreach(s =>
-      if s.support.textSpans.get.minSpan.endExclusive > textLen then
-        err("support.in-text", s"situations/${s.id.value}", "support exceeds text")
-    )
-    g.entities.values.foreach(e =>
-      if e.support.textSpans.get.minSpan.endExclusive > textLen then
-        err("support.in-text", s"entities/${e.id.value}", "support exceeds text")
-    )
-    g.segments.values.foreach(s =>
-      if s.support.textSpans.get.minSpan.endExclusive > textLen then
-        err("support.in-text", s"segments/${s.id.value}", "support exceeds text")
-    )
+    // Every support family is checked, including contexts and circumstances.
+    g.supportEntries.foreach { (path, support) =>
+      support match
+        case TypedSupport.Text(spans) => textLen.foreach { length =>
+          if spans.minSpan.endExclusive > length then err("support.in-text", path, "support exceeds text")
+        }
+        case TypedSupport.Anchored(anchors) =>
+          EvidenceSupport.of(m.bundle, anchors.anchors.toVector).left.foreach(e =>
+            err("support.anchors-in-bundle", path, e.message))
+    }
 
     // mentions map to one canonical node
     g.entities.values.toVector
@@ -402,16 +427,22 @@ object StoryValidator:
       if e.member == NarrativeMember.Segment(e.parent) then
         err("containment.acyclic", path, "segment contains itself")
       if okMember && okParent && e.isPrimary then
-        val memberSpan = e.member match
-          case NarrativeMember.Situation(id) => g.situations(id).support.textSpans.get.minSpan
-          case NarrativeMember.Segment(id)   => g.segments(id).support.textSpans.get.minSpan
-        val parentSpan = g.segments(e.parent).support.textSpans.get.minSpan
-        if !parentSpan.contains(memberSpan) then
-          err(
-            "hierarchy.member-within-parent",
-            path,
-            s"member span $memberSpan escapes parent span $parentSpan"
-          )
+        val memberSupport = e.member match
+          case NarrativeMember.Situation(id) => g.situations(id).support
+          case NarrativeMember.Segment(id) => g.segments(id).support
+        val member = m.projectionOf(memberSupport)
+        val parent = m.projectionOf(g.segments(e.parent).support)
+        (member, parent) match
+          case (PrimaryProjection.TextSpans(_, child), PrimaryProjection.TextSpans(_, enclosing)) =>
+            val memberSpan = child.minSpan
+            val parentSpan = enclosing.minSpan
+            if !parentSpan.contains(memberSpan) then
+              err("hierarchy.member-within-parent", path, s"member span $memberSpan escapes parent span $parentSpan")
+          case (PrimaryProjection.Playback(axis, child), PrimaryProjection.Playback(parentAxis, enclosing)) =>
+            if axis != parentAxis || !child.intervals.toVector.forall(c =>
+                enclosing.intervals.toVector.exists(p => p.start <= c.start && p.endExclusive >= c.endExclusive)) then
+              err("hierarchy.member-within-parent", path, "member playback support escapes parent interval union")
+          case _ => err("hierarchy.member-within-parent", path, "incompatible primary projection kinds")
     }
     h.primary
       .groupBy(_.member)
@@ -480,7 +511,7 @@ object StoryValidator:
       }
     }
     h.boundaryBeliefs.zipWithIndex.foreach { (b, i) =>
-      if !m.atlas.byId.contains(b.afterUnit) then
+      if !surface.exists(_.byId.contains(b.afterUnit)) then
         err("boundary.unit-exists", s"boundaryBeliefs/$i", s"unknown unit ${b.afterUnit.value}")
       if b.level < 1 then err("boundary.level", s"boundaryBeliefs/$i", s"level ${b.level} < 1")
     }
@@ -557,13 +588,13 @@ object StoryValidator:
         case FeatureTarget.Situation(id) => sit("feature.target-exists", path, id)
         case FeatureTarget.Segment(id)   => seg("feature.target-exists", path, id)
         case FeatureTarget.Sentence(u)   =>
-          if !m.atlas.byId.contains(u) then
+          if !surface.exists(_.byId.contains(u)) then
             err("feature.target-exists", path, s"unknown surface unit ${u.value}")
         case FeatureTarget.Boundary(u) =>
-          if !m.atlas.byId.contains(u) then
+          if !surface.exists(_.byId.contains(u)) then
             err("feature.target-exists", path, s"unknown surface unit ${u.value}")
         case FeatureTarget.SurfaceUnit(u) =>
-          if !m.atlas.byId.contains(u) then
+          if !surface.exists(_.byId.contains(u)) then
             err("feature.target-exists", path, s"unknown surface unit ${u.value}")
         case FeatureTarget.Token(_) | FeatureTarget.Window(_) | FeatureTarget.Turn(_) => ()
     }
