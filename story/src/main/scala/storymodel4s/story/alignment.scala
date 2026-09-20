@@ -152,10 +152,13 @@ object AlignmentSource:
     private def within(s: SituationId, context: ContextId): Boolean =
       g.situations.get(s).exists(x => g.contextWithin(x.context, context))
 
-    /** Edges of a layer, optionally restricted to a context. `WorldTime` is restricted by the edge's
-      * own context; every other stored layer by the endpoints' contexts.
+    /** Edges of a layer, optionally restricted to a context. `WorldTime` is restricted by the
+      * edge's own context; every other stored layer by the endpoints' contexts.
       */
-    private def edgesOf(layer: RelationLayer, context: Option[ContextId]): Vector[RelationEdgeView] =
+    private def edgesOf(
+        layer: RelationLayer,
+        context: Option[ContextId]
+    ): Vector[RelationEdgeView] =
       def keep(a: SituationId, b: SituationId): Boolean =
         context.forall(c => within(a, c) && within(b, c))
       layer match
@@ -180,7 +183,13 @@ object AlignmentSource:
           g.relations.goals
             .filter(e => keep(e.from, e.to))
             .map(e =>
-              RelationEdgeView(sit(e.from), sit(e.to), StatusWeight.of(e.meta), e.meta.status, e.meta)
+              RelationEdgeView(
+                sit(e.from),
+                sit(e.to),
+                StatusWeight.of(e.meta),
+                e.meta.status,
+                e.meta
+              )
             )
         case RelationLayer.StateChange =>
           g.relations.stateChanges
@@ -198,7 +207,13 @@ object AlignmentSource:
           g.relations.references
             .filter(e => keep(e.from, e.to))
             .map(e =>
-              RelationEdgeView(sit(e.from), sit(e.to), StatusWeight.of(e.meta), e.meta.status, e.meta)
+              RelationEdgeView(
+                sit(e.from),
+                sit(e.to),
+                StatusWeight.of(e.meta),
+                e.meta.status,
+                e.meta
+              )
             )
         case RelationLayer.Participant         => Vector.empty
         case RelationLayer.Semantic            => Vector.empty
@@ -288,7 +303,8 @@ object AlignmentSource:
     def entityLabel(id: EntityId): Option[String] = g.entities.get(id).map(_.label.value)
 
   private final class StoryTextAlignmentSource(model: TextModel[?])
-      extends StoryAlignmentSource(model.model) with TextAlignmentSource:
+      extends StoryAlignmentSource(model.model)
+      with TextAlignmentSource:
     val text: StoryText = model.text
     def sourceSupport(target: NarrativeNodeId): Option[SpanSet] =
       evidenceOf(target).flatMap(_.textSpans)
