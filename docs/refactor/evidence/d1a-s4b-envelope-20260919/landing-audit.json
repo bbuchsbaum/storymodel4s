@@ -1,0 +1,128 @@
+{
+  "scope": "Independent local S4b evidence reconciliation; no builds, browser launch, process action, remote publication, or Mote mutation by auditor.",
+  "revisions": {
+    "mutationSourceAndTests": "9a7caf45829e737e9638a23cd9176f30002a0187",
+    "providerRelease": "9dcaf8e786207d523787d670810c28d104efe117",
+    "providerEvidence": "c929c52f",
+    "consumer": "b156029d95a662107c819dd2aefc80abec7d748e"
+  },
+  "mutation": {
+    "plannedKilledControls": 54,
+    "cleanCompileProbes": 24,
+    "restoredControl": {
+      "Total": 62,
+      "Failed": 0,
+      "Errors": 0,
+      "Passed": 62,
+      "Skipped": 0
+    },
+    "terminalCloneClean": true
+  },
+  "provider": {
+    "taskCount": 56,
+    "tests": {
+      "Total": 6932,
+      "Failed": 0,
+      "Errors": 0,
+      "Passed": 6927,
+      "Skipped": 5
+    },
+    "s0Sha256": "cc201d9dd3e3576fabcd45677369f00c023ca5a455ea9d9e7ba694700c759fb3",
+    "auditSha256": "ab4a970e6559cd88af1a069ce0969bf0a23743c6eb30afa2c86c64322ab4e752"
+  },
+  "consumer": {
+    "taskCount": 8,
+    "tests": {
+      "Total": 245,
+      "Failed": 0,
+      "Errors": 0,
+      "Passed": 245,
+      "Skipped": 0
+    },
+    "auditSha256": "0c225e5a78508f56bf922672aad335ca2f3c9ef6b3a91ad9b21af48955a69e12"
+  },
+  "smoke": {
+    "checks": 260,
+    "auditSha256": "e888a002a297b8c7eb52e6ec51aa7a6d20180d1ebd74ea29f1bd255a9c96dafa",
+    "ownedRowsAbsentAfter": true
+  },
+  "failedSmokeRepair": {
+    "baselineAndCandidateOriginalFailuresPreserved": 2,
+    "baselineRepairedChecks": 260,
+    "candidateChecks": 260
+  },
+  "evidenceArchive": {
+    "members": 669,
+    "archiveSha256": "becea63f2a57562731d3095a78695fa021650d8bad25dfde54901b15914eea68",
+    "manifestSha256": "4bf0e34720ff65c984103c0f8ec84530dd1ae10e1c6373d1e8ab124009c353ec"
+  },
+  "acceptanceCriteria": 7,
+  "postMutationSourceChanges": [
+    "docs/refactor/evidence/d1a-s4b-envelope-20260919/README.md",
+    "docs/refactor/evidence/d1a-s4b-envelope-20260919/acceptance-map.json",
+    "docs/refactor/evidence/d1a-s4b-envelope-20260919/audit-smoke.py",
+    "docs/refactor/evidence/d1a-s4b-envelope-20260919/baseline-original-smoke.json",
+    "docs/refactor/evidence/d1a-s4b-envelope-20260919/baseline-repaired-smoke.json",
+    "docs/refactor/evidence/d1a-s4b-envelope-20260919/candidate-original-smoke.json",
+    "docs/refactor/evidence/d1a-s4b-envelope-20260919/code-review.json",
+    "docs/refactor/evidence/d1a-s4b-envelope-20260919/consumer-compile-1.json",
+    "docs/refactor/evidence/d1a-s4b-envelope-20260919/consumer-gate.json",
+    "docs/refactor/evidence/d1a-s4b-envelope-20260919/consumer-gate.py",
+    "docs/refactor/evidence/d1a-s4b-envelope-20260919/consumer-runner-review.json",
+    "docs/refactor/evidence/d1a-s4b-envelope-20260919/consumer-smoke-repair.json",
+    "docs/refactor/evidence/d1a-s4b-envelope-20260919/consumer-smoke.json",
+    "docs/refactor/evidence/d1a-s4b-envelope-20260919/consumer-smoke.py",
+    "docs/refactor/evidence/d1a-s4b-envelope-20260919/docs-examples.json",
+    "docs/refactor/evidence/d1a-s4b-envelope-20260919/focused-1.json",
+    "docs/refactor/evidence/d1a-s4b-envelope-20260919/focused-2.json",
+    "docs/refactor/evidence/d1a-s4b-envelope-20260919/focused-3.json",
+    "docs/refactor/evidence/d1a-s4b-envelope-20260919/focused-4.json",
+    "docs/refactor/evidence/d1a-s4b-envelope-20260919/format-last.json",
+    "docs/refactor/evidence/d1a-s4b-envelope-20260919/format-prepare-1.json",
+    "docs/refactor/evidence/d1a-s4b-envelope-20260919/full-gate.json",
+    "docs/refactor/evidence/d1a-s4b-envelope-20260919/guard-witness-inventory.json",
+    "docs/refactor/evidence/d1a-s4b-envelope-20260919/initial-story-compile.json",
+    "docs/refactor/evidence/d1a-s4b-envelope-20260919/integration-compile-1.json",
+    "docs/refactor/evidence/d1a-s4b-envelope-20260919/isolated-control.json",
+    "docs/refactor/evidence/d1a-s4b-envelope-20260919/mutation-artifact-manifest.json",
+    "docs/refactor/evidence/d1a-s4b-envelope-20260919/mutation-artifacts.tar.gz",
+    "docs/refactor/evidence/d1a-s4b-envelope-20260919/mutation-terminal-summary.json",
+    "docs/refactor/evidence/d1a-s4b-envelope-20260919/mutations.json",
+    "docs/refactor/evidence/d1a-s4b-envelope-20260919/qualify.py",
+    "docs/refactor/evidence/d1a-s4b-envelope-20260919/release-artifact-manifest.json",
+    "docs/refactor/evidence/d1a-s4b-envelope-20260919/release-artifacts.tar.gz",
+    "docs/refactor/evidence/d1a-s4b-envelope-20260919/restored-control-clean.json",
+    "docs/refactor/evidence/d1a-s4b-envelope-20260919/run-consumer-preflight.py",
+    "docs/refactor/evidence/d1a-s4b-envelope-20260919/run.py",
+    "docs/refactor/evidence/d1a-s4b-envelope-20260919/runtime.json",
+    "docs/refactor/evidence/d1a-s4b-envelope-20260919/smoke-audit.json",
+    "docs/refactor/evidence/d1a-s4b-envelope-20260919/source-equivalence.json",
+    "docs/refactor/evidence/d1a-s4b-envelope-20260919/story-compile-2.json",
+    "docs/refactor/evidence/d1a-s4b-envelope-20260919/summarize-mutations.py",
+    "docs/refactor/evidence/d1a-s4b-envelope-20260919/test-compile-1.json",
+    "docs/refactor/evidence/d1a-s4b-envelope-20260919/test-compile-2.json",
+    "docs/refactor/evidence/d1a-s4b-envelope-20260919/test-compile-3.json",
+    "docs/refactor/evidence/d1a-s4b-envelope-20260919/test-compile-4.json"
+  ],
+  "consumerLocalLanding": {
+    "before": {
+      "head": "b5bbe2c584fda0bc487430d2399fa9bff996ddef",
+      "branch": "main",
+      "trackedClean": true,
+      "untrackedFileCount": 636,
+      "untrackedInventorySha256": "b03cc1c74d0e78357e1a3e281559e48b76488a70c9bf20e2ae2619cb581c81b9"
+    },
+    "after": {
+      "head": "b156029d95a662107c819dd2aefc80abec7d748e",
+      "branch": "main",
+      "trackedClean": true,
+      "untrackedFileCount": 636,
+      "untrackedInventorySha256": "b03cc1c74d0e78357e1a3e281559e48b76488a70c9bf20e2ae2619cb581c81b9"
+    },
+    "qualifiedConsumer": "b156029d95a662107c819dd2aefc80abec7d748e",
+    "qualifiedProvider": "9dcaf8e786207d523787d670810c28d104efe117",
+    "qualification": "Local fast-forward only; unrelated untracked paths preserved; no push. Gate245 and repaired smoke260 passed on this exact consumer/provider pair."
+  },
+  "findings": [],
+  "limits": "Local qualification and landing reconciliation only; no CI, remote push, film compiler, caption licensing, S4c, D1B, or scientific qualification."
+}

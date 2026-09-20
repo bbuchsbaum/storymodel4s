@@ -1,6 +1,6 @@
 {
   "mote": "bd-01M2TAG1GEAGXCY33P0B17QBJ1",
-  "status": "All required local qualification checks pass; local landing and tracker closure follow.",
+  "status": "All seven criteria locally qualified; independent reconciliation has no findings. Provider landing and ordinary tracker closure cite this map.",
   "sourceTestCandidate": "9a7caf45829e737e9638a23cd9176f30002a0187",
   "releaseCandidate": "9dcaf8e786207d523787d670810c28d104efe117",
   "criteria": [
@@ -52,5 +52,6 @@
     "AlignmentSource sealing and unrelated source/model bridge closure remain S4c.",
     "Instant and all17 exact-anchor acceptance remain D1B.",
     "No executed CI, scientific qualification or remote push."
-  ]
+  ],
+  "independentReconciliation": "landing-audit.json"
 }

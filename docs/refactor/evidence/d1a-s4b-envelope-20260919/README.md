@@ -6,8 +6,9 @@ All 54 compiled mutations were killed with named passing controls; the restored
 clean court passed 62 tests. The exact release `9dcaf8e7` passed all 56 provider
 tasks (6,927 passed, five existing skips), both format checks and all 13 documentation
 examples. The final pinned consumer passes 245 tests and all 260 browser-smoke
-checks, with clean lifecycle receipts. Local landing and tracker reconciliation
-follow this qualification record.
+checks, with clean lifecycle receipts. The [independent reconciliation](landing-audit.json) reports no findings; it
+checks the evidence archive, all terminal gates and the clean local consumer landing.
+Provider landing and tracker closure cite this record.
 
 `StoryModel` now owns its sealed `NarrativeSourceAtlas` and derived bundle.
 Its general draft and internal copy check canonical support, membership, direct
@@ -119,7 +120,10 @@ and identical expected values. [Formatting](format-last.json) and all
 [13 documentation examples](docs-examples.json) also pass. The
 [source equivalence record](source-equivalence.json) binds the mutation candidate to
 release `9dcaf8e7`; only static evidence files changed. The [runtime receipt](runtime.json)
-binds the actual sbt Java 25.0.1 welcome. Independent terminal receipt audit remains separate. Film compilation/encoding, instant support, alignment-source sealing,
+binds the actual sbt Java 25.0.1 welcome. The independent [provider](provider-audit.json), [consumer](consumer-audit.json) and
+[browser](smoke-audit.json) audits reconcile the terminal artifacts. The consumer was
+[fast-forwarded locally](consumer-local-landing.json), preserving all 636 unrelated
+untracked paths; no push was performed. Film compilation/encoding, instant support, alignment-source sealing,
 caption licensing, scientific qualification, CI execution and remote publication are
 outside this S4b record. S4c and D1B retain their distinct later acceptance courts.
 

@@ -1,0 +1,19 @@
+{
+  "before": {
+    "head": "b5bbe2c584fda0bc487430d2399fa9bff996ddef",
+    "branch": "main",
+    "trackedClean": true,
+    "untrackedFileCount": 636,
+    "untrackedInventorySha256": "b03cc1c74d0e78357e1a3e281559e48b76488a70c9bf20e2ae2619cb581c81b9"
+  },
+  "after": {
+    "head": "b156029d95a662107c819dd2aefc80abec7d748e",
+    "branch": "main",
+    "trackedClean": true,
+    "untrackedFileCount": 636,
+    "untrackedInventorySha256": "b03cc1c74d0e78357e1a3e281559e48b76488a70c9bf20e2ae2619cb581c81b9"
+  },
+  "qualifiedConsumer": "b156029d95a662107c819dd2aefc80abec7d748e",
+  "qualifiedProvider": "9dcaf8e786207d523787d670810c28d104efe117",
+  "qualification": "Local fast-forward only; unrelated untracked paths preserved; no push. Gate245 and repaired smoke260 passed on this exact consumer/provider pair."
+}
