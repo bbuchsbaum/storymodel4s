@@ -1,0 +1,51 @@
+{
+  "scope": "Independent bounded S3 historical-code oracle and declared text partition review",
+  "candidate": "17194421f018e3780aafa4adf754fccf55398b61",
+  "historicalRevision": "75c8df52adb2ffc54a5cd3586528deddabf4a531",
+  "oracleFileSha256": "d7bf2fa7a0ca40bb288ff3f9c815177f5256e1d6c724032bbc12a8a638fdb7bb",
+  "historicalObjectSha256": "d4f92b7d8deda647b9c06a161c3d3df3d6b513f112631b85ab04c6b88d2ca6b0",
+  "objectBodyMatch": "Exact after restoring only the object name and ignoring trailing file whitespace; package/import wrapper is outside original object.",
+  "sharedHelperPreflight": "root-s3-shared-helper-preflight.json",
+  "partition": {
+    "dimensions": {
+      "policy": 3,
+      "leadingBasis": 8,
+      "agreementPattern": 5,
+      "textSupportPlacement": 4,
+      "sourceScore": 3,
+      "structuralValidity": 2,
+      "critic": 3
+    },
+    "expectedCases": 8640,
+    "assertsExecutedCaseCount": true,
+    "comparison": "Complete ResolutionState equality",
+    "additionalCases": [
+      "NoProposal and structural/critic precedence",
+      "ById with/without bundle support",
+      "losing support and losing basis",
+      "ranking and duplicate evidence order",
+      "nextDown/exact/nextUp threshold and critic score boundaries",
+      "upstream-only evidence and all declared claim families with overrides"
+    ]
+  },
+  "taskReferences": "Text overload compares complete Validated results and error order to unchanged SurfaceAtlas overload; anchored surface membership/kind and no-surface cases exercised.",
+  "testSources": [
+    {
+      "path": "acquire/src/test/scala/storymodel4s/acquire/D1aTextResolverParitySuite.scala",
+      "sha256": "7556b514e4f15897a1d02a323487fd3fba6cbe5f8f3cd2e9e580828f8df50a6c"
+    },
+    {
+      "path": "acquire/src/test/scala/storymodel4s/acquire/D1aAcquireFixtures.scala",
+      "sha256": "34af9f60e62056434c7edeee6f7440c9fa72f65bf9b3aa4cd6c208f85b07d67c"
+    },
+    {
+      "path": "acquire/src/test/scala/storymodel4s/acquire/D1aTaskReferencesSuite.scala",
+      "sha256": "aead4d880e9b36cd1f820cc4a88a17bb3e331889664c77cf0d539c1c2b88a2f6"
+    }
+  ],
+  "findings": [],
+  "qualification": "Selected static review only. 49-test focused run at83e7d83d reported separately; final mutation, cold-code and release/consumer gates are still required.",
+  "previousReviewedCandidate": "24bb6ebd65e04374c1611ee2f69e535c39de99ea",
+  "sharedHelperFinalReview": "root-s3-shared-helper-final-review.json",
+  "formattingRebind": "Historical object rechecked; source diff contains formatting/comment changes. Task accepting control split remains separately reviewed."
+}

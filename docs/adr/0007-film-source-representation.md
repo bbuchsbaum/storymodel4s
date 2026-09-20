@@ -904,4 +904,4 @@ text spans. The historical policy and gap names remain wire-compatible.
 The shared text compiler-input validator refuses anchored `SourceSupport` until the
 film compiler defines its input and canonical rendering. Accepting it while the current
 renderer only fingerprints derived text spans would discard identity-relevant payload.
-This temporary refusal has explicit text/absent controls and a compiled deletion witness.
+This temporary refusal requires explicit text/absent controls and a compiled deletion witness.

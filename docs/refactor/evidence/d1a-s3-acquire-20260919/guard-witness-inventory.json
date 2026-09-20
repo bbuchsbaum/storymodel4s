@@ -1,0 +1,175 @@
+{
+  "codeRevision": "17194421f018e3780aafa4adf754fccf55398b61",
+  "plannedMutationCount": 18,
+  "inventoryStatus": "settled before mutation and full release gates",
+  "cases": [
+    {
+      "id": "inline-text-loss",
+      "path": "acquire/src/main/scala/storymodel4s/acquire/proposal.scala",
+      "group": "support",
+      "rejectSuite": "storymodel4s.acquire.D1aAcquireSupportSuite",
+      "rejectingTest": "inline singular support covers neither, text, anchors and twin form without selecting a winner",
+      "controlSuite": "storymodel4s.acquire.D1aAcquireSupportSuite",
+      "acceptingControl": "accepting control: existing text support retains spans and acceptance"
+    },
+    {
+      "id": "inline-anchor-loss",
+      "path": "acquire/src/main/scala/storymodel4s/acquire/proposal.scala",
+      "group": "support",
+      "rejectSuite": "storymodel4s.acquire.D1aAcquireSupportSuite",
+      "rejectingTest": "winning inline anchored support alone admits determined and calibrated winners",
+      "controlSuite": "storymodel4s.acquire.D1aAcquireSupportSuite",
+      "acceptingControl": "accepting control: existing text support retains spans and acceptance"
+    },
+    {
+      "id": "twin-form-preference",
+      "path": "acquire/src/main/scala/storymodel4s/acquire/proposal.scala",
+      "group": "support",
+      "rejectSuite": "storymodel4s.acquire.D1aAcquireSupportSuite",
+      "rejectingTest": "twin-form inline evidence alone is ambiguous but does not erase another valid witness",
+      "controlSuite": "storymodel4s.acquire.D1aAcquireSupportSuite",
+      "acceptingControl": "accepting control: existing text support retains spans and acceptance"
+    },
+    {
+      "id": "by-id-invention",
+      "path": "acquire/src/main/scala/storymodel4s/acquire/proposal.scala",
+      "group": "support",
+      "rejectSuite": "storymodel4s.acquire.D1aAcquireSupportSuite",
+      "rejectingTest": "ById cannot invent direct support without a ledger",
+      "controlSuite": "storymodel4s.acquire.D1aAcquireSupportSuite",
+      "acceptingControl": "accepting control: existing text support retains spans and acceptance"
+    },
+    {
+      "id": "bundle-anchor-loss",
+      "path": "acquire/src/main/scala/storymodel4s/acquire/resolve.scala",
+      "group": "support",
+      "rejectSuite": "storymodel4s.acquire.D1aAcquireSupportSuite",
+      "rejectingTest": "anchored bundle support alone admits determined and calibrated winners",
+      "controlSuite": "storymodel4s.acquire.D1aAcquireSupportSuite",
+      "acceptingControl": "accepting control: existing text support retains spans and acceptance"
+    },
+    {
+      "id": "winning-anchor-loss",
+      "path": "acquire/src/main/scala/storymodel4s/acquire/resolve.scala",
+      "group": "support",
+      "rejectSuite": "storymodel4s.acquire.D1aAcquireSupportSuite",
+      "rejectingTest": "winning inline anchored support alone admits determined and calibrated winners",
+      "controlSuite": "storymodel4s.acquire.D1aAcquireSupportSuite",
+      "acceptingControl": "accepting control: existing text support retains spans and acceptance"
+    },
+    {
+      "id": "losing-evidence-counts",
+      "path": "acquire/src/main/scala/storymodel4s/acquire/resolve.scala",
+      "group": "support",
+      "rejectSuite": "storymodel4s.acquire.D1aAcquireSupportSuite",
+      "rejectingTest": "losing inline anchors do not support the winner",
+      "controlSuite": "storymodel4s.acquire.D1aAcquireSupportSuite",
+      "acceptingControl": "accepting control: existing text support retains spans and acceptance"
+    },
+    {
+      "id": "derived-text-span-loss",
+      "path": "acquire/src/main/scala/storymodel4s/acquire/resolve.scala",
+      "group": "support",
+      "rejectSuite": "storymodel4s.acquire.D1aAcquireSupportSuite",
+      "rejectingTest": "accepting control: existing text support retains spans and acceptance",
+      "controlSuite": "storymodel4s.acquire.D1aAcquireSupportSuite",
+      "acceptingControl": "anchored bundle support alone admits determined and calibrated winners"
+    },
+    {
+      "id": "text-constructor-loss",
+      "path": "acquire/src/main/scala/storymodel4s/acquire/resolve.scala",
+      "group": "support",
+      "rejectSuite": "storymodel4s.acquire.D1aAcquireSupportSuite",
+      "rejectingTest": "accepting control: existing text support retains spans and acceptance",
+      "controlSuite": "storymodel4s.acquire.D1aAcquireSupportSuite",
+      "acceptingControl": "anchored bundle support alone admits determined and calibrated winners"
+    },
+    {
+      "id": "current-resolver-text-loss",
+      "path": "acquire/src/main/scala/storymodel4s/acquire/resolve.scala",
+      "group": "parity",
+      "rejectSuite": "storymodel4s.acquire.D1aTextResolverParitySuite",
+      "rejectingTest": "all 8640 declared text-policy cases preserve complete resolution states",
+      "controlSuite": "storymodel4s.acquire.D1aAcquireSupportSuite",
+      "acceptingControl": "anchored bundle support alone admits determined and calibrated winners"
+    },
+    {
+      "id": "task-missing-unit",
+      "path": "acquire/src/main/scala/storymodel4s/acquire/task.scala",
+      "group": "task",
+      "rejectSuite": "storymodel4s.acquire.D1aTaskReferencesSuite",
+      "rejectingTest": "anchored references refuse missing and wrong-kind parser units",
+      "controlSuite": "storymodel4s.acquire.D1aTaskReferencesSuite",
+      "acceptingControl": "accepting control: anchored references use bound parser surface units"
+    },
+    {
+      "id": "task-wrong-kind",
+      "path": "acquire/src/main/scala/storymodel4s/acquire/task.scala",
+      "group": "task",
+      "rejectSuite": "storymodel4s.acquire.D1aTaskReferencesSuite",
+      "rejectingTest": "anchored references refuse missing and wrong-kind parser units",
+      "controlSuite": "storymodel4s.acquire.D1aTaskReferencesSuite",
+      "acceptingControl": "accepting control: anchored references use bound parser surface units"
+    },
+    {
+      "id": "task-missing-surface",
+      "path": "acquire/src/main/scala/storymodel4s/acquire/task.scala",
+      "group": "task",
+      "rejectSuite": "storymodel4s.acquire.D1aTaskReferencesSuite",
+      "rejectingTest": "absence of a bound proposal surface refuses all parser references",
+      "controlSuite": "storymodel4s.acquire.D1aTaskReferencesSuite",
+      "acceptingControl": "accepting control: anchored references use bound parser surface units"
+    },
+    {
+      "id": "task-text-refusal",
+      "path": "acquire/src/main/scala/storymodel4s/acquire/task.scala",
+      "group": "task",
+      "rejectSuite": "storymodel4s.acquire.D1aTaskReferencesSuite",
+      "rejectingTest": "text atlas overload preserves complete validation and error order",
+      "controlSuite": "storymodel4s.acquire.D1aTaskReferencesSuite",
+      "acceptingControl": "accepting control: anchored references use bound parser surface units"
+    },
+    {
+      "id": "text-source-support-guard",
+      "path": "document/src/main/scala/storymodel4s/document/compiler.scala",
+      "group": "compiler",
+      "rejectSuite": "storymodel4s.document.CompilerSuite",
+      "rejectingTest": "text compiler refuses anchored source support with text and absent controls",
+      "controlSuite": "storymodel4s.document.CompilerSuite",
+      "acceptingControl": "accepted evidence compiles into a validated story model"
+    },
+    {
+      "id": "wire-resolution-name",
+      "path": "codec/src/main/scala/storymodel4s/codec/derivation.scala",
+      "group": "wire",
+      "rejectSuite": "storymodel4s.codec.D1aGapWireSuite",
+      "rejectingTest": "historical direct-support failure and gap names keep literal wire values",
+      "controlSuite": "storymodel4s.codec.EvidenceSupportCodecSuite",
+      "acceptingControl": "accepting control: ordinary text evidence keeps its omitted-anchor wire and round trip"
+    },
+    {
+      "id": "wire-gap-name",
+      "path": "codec/src/main/scala/storymodel4s/codec/derivation.scala",
+      "group": "wire",
+      "rejectSuite": "storymodel4s.codec.D1aGapWireSuite",
+      "rejectingTest": "historical direct-support failure and gap names keep literal wire values",
+      "controlSuite": "storymodel4s.codec.EvidenceSupportCodecSuite",
+      "acceptingControl": "accepting control: ordinary text evidence keeps its omitted-anchor wire and round trip"
+    },
+    {
+      "id": "wire-gap-render",
+      "path": "document/src/main/scala/storymodel4s/document/compiler.scala",
+      "group": "wire",
+      "rejectSuite": "storymodel4s.codec.D1aGapWireSuite",
+      "rejectingTest": "historical direct-support failure and gap names keep literal wire values",
+      "controlSuite": "storymodel4s.codec.EvidenceSupportCodecSuite",
+      "acceptingControl": "accepting control: ordinary text evidence keeps its omitted-anchor wire and round trip"
+    }
+  ],
+  "boundaries": [
+    "Pure resolver support presence is not membership/projectability or SurfaceExplicit licensing.",
+    "No new checked constructor or compile-time construction boundary is introduced; no clean construction-probe mutant is required.",
+    "Current-Resolver-only text mutant leaves the historical oracle and shared conversion helpers unchanged; direct helper mutants separately test text conversion/access.",
+    "All numerical score, basis, ranking, provider-agreement and structural/critic policies remain unchanged."
+  ]
+}

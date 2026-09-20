@@ -1,0 +1,69 @@
+{
+  "candidate": "17194421f018e3780aafa4adf754fccf55398b61",
+  "historicalRevision": "75c8df52adb2ffc54a5cd3586528deddabf4a531",
+  "checks": [
+    {
+      "component": "Weighted",
+      "historicalSha256": "c75b50ac939453a8f06a94f571c5763a66ee2bff0e773945767bdd3d743ca472",
+      "currentSha256": "c75b50ac939453a8f06a94f571c5763a66ee2bff0e773945767bdd3d743ca472",
+      "permittedCommentReplacements": [],
+      "implementationUnchanged": true
+    },
+    {
+      "component": "ResolutionState and ClaimFamily",
+      "historicalSha256": "60f4eee825fc8a83e23cde74a5e0ffc145b7f4232e3a8a74f96cedb914879cbe",
+      "currentSha256": "60f4eee825fc8a83e23cde74a5e0ffc145b7f4232e3a8a74f96cedb914879cbe",
+      "permittedCommentReplacements": [],
+      "implementationUnchanged": true
+    },
+    {
+      "component": "FamilyPolicy, AcceptancePolicy, StructuralValidity",
+      "historicalSha256": "20e579dcc6816270ad2b4daa420773775e56694cfc3635bbb9d2fc3bc7207940",
+      "currentSha256": "deb080899a47eec5f6e89d99f82ff7422425b1c002cb5ea50d6de41aa799eab7",
+      "permittedCommentReplacements": [
+        {
+          "from": "/** High-impact default: two independent agreeing providers, calibration and spans mandatory. */",
+          "to": "/** High-impact default: two independent agreeing providers, a basis and direct support mandatory.\n    */"
+        },
+        {
+          "from": "/** Ordinary default: one provider, calibration and spans mandatory. */",
+          "to": "/** Ordinary default: one provider, a basis and direct support mandatory. */"
+        },
+        {
+          "from": "/** Development only: uncalibrated bundles yield alternatives instead of blocking, and spans are\n    * not required. Never accepts without calibration either.",
+          "to": "/** Development only: bundles lacking a basis yield alternatives instead of blocking, and direct\n    * support is not required. Never accepts without a licensed basis either."
+        }
+      ],
+      "implementationUnchanged": true
+    },
+    {
+      "component": "AcceptanceBasis, CandidateBasis, EvidenceBundle",
+      "historicalSha256": "d41566404236e6215c8a23fc9cd67dfe12948e823c74c0867d537ca580c24074",
+      "currentSha256": "d41566404236e6215c8a23fc9cd67dfe12948e823c74c0867d537ca580c24074",
+      "permittedCommentReplacements": [],
+      "implementationUnchanged": true
+    },
+    {
+      "component": "Critic definitions and threshold logic",
+      "historicalSha256": "873782cdfa7298a1fb0f4807f0e69de438c1e50f5cefbacfbd05814575f321f0",
+      "currentSha256": "873782cdfa7298a1fb0f4807f0e69de438c1e50f5cefbacfbd05814575f321f0",
+      "permittedCommentReplacements": [],
+      "implementationUnchanged": true
+    },
+    {
+      "component": "EvidenceRef raw spans",
+      "historicalSha256": "15d3e64f218c893c62eca92932c98f054b0c8d1b7251ec0fdaf4962b069c3ed5",
+      "currentSha256": "15d3e64f218c893c62eca92932c98f054b0c8d1b7251ec0fdaf4962b069c3ed5",
+      "permittedCommentReplacements": [],
+      "implementationUnchanged": true
+    },
+    {
+      "component": "TaskReferences validation helper",
+      "historicalSha256": "6b1354ecde14ba8a1015b9dda65b7bd5db5b1a36d9d181f763aedf26190a2df8",
+      "currentSha256": "6b1354ecde14ba8a1015b9dda65b7bd5db5b1a36d9d181f763aedf26190a2df8",
+      "permittedCommentReplacements": [],
+      "implementationUnchanged": true
+    }
+  ],
+  "qualification": "Exact historical-code helper implementation comparison with three explicit comment-only substitutions; no execution claim."
+}

@@ -1,0 +1,28 @@
+{
+  "historicalRevision": "75c8df52adb2ffc54a5cd3586528deddabf4a531",
+  "preS3Revision": "e94ef776de25c7eb7c725499dd194bbbe28bc03a",
+  "manifestSha256": "6b4199018195c3fd0743c6f9af3d96f9db3aad7f50e966535021bbc3b35f87c5",
+  "files": [
+    {
+      "path": "acquire/src/main/scala/storymodel4s/acquire/resolve.scala",
+      "sha256": "42847dfd34eb41039fdf68328ebe4da1b57915efef1a176fd9705343d4d5d17f",
+      "matchesHistoricalAndPreS3Commit": true
+    },
+    {
+      "path": "acquire/src/main/scala/storymodel4s/acquire/proposal.scala",
+      "sha256": "9a6a27c898c85fd0456db6e312ee7f0a1a1939de1e197037e2261254b762b721",
+      "matchesHistoricalAndPreS3Commit": true
+    },
+    {
+      "path": "acquire/src/main/scala/storymodel4s/acquire/critic.scala",
+      "sha256": "873782cdfa7298a1fb0f4807f0e69de438c1e50f5cefbacfbd05814575f321f0",
+      "matchesHistoricalAndPreS3Commit": true
+    },
+    {
+      "path": "acquire/src/main/scala/storymodel4s/acquire/task.scala",
+      "sha256": "7626aed904b03f16b254899c515332a9b79566bc0a7b062c7754e304a2cb4726",
+      "matchesHistoricalAndPreS3Commit": true
+    }
+  ],
+  "qualification": "Independent read-only historical source capture check. Resolver oracle extraction and execution remain pending."
+}

@@ -1,0 +1,21 @@
+{
+  "codeRevision": "83e7d83d",
+  "command": [
+    "sbt",
+    "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+    "-batch",
+    "acquireJVM/testOnly storymodel4s.acquire.D1a*",
+    "documentJVM/testOnly storymodel4s.document.CompilerSuite",
+    "codecJVM/testOnly storymodel4s.codec.D1aGapWireSuite"
+  ],
+  "exitCode": 0,
+  "testTotals": [
+    "[info] Passed: Total 18, Failed 0, Errors 0, Passed 18",
+    "[info] Passed: Total 30, Failed 0, Errors 0, Passed 30",
+    "[info] Passed: Total 1, Failed 0, Errors 0, Passed 1"
+  ],
+  "passed": 49,
+  "logPath": "data/study/d1a-s3-20260919/focused-2.log",
+  "logSha256": "66b7a268edd3a1e1f6286df5d64811507baeb2412b81cc08aff44e186f7374fd",
+  "qualification": "Initial compiling checkpoint. Later split-control/format candidate requires its own formal focused/mutation/release receipts."
+}

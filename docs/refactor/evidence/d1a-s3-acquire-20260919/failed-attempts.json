@@ -1,0 +1,11 @@
+[
+  {
+    "codeRevision": "71ba7485",
+    "exitCode": 1,
+    "logPath": "data/study/d1a-s3-20260919/focused-1.log",
+    "logSha256": "4eefafec1f94335605ef28f31360379fe9a9948e0117779637a374d4d9a3d752",
+    "cause": "The test helper named inline was parsed as a Scala keyword at call sites.",
+    "resolution": "Helper renamed inlineEvidence in83e7d83d; production source unchanged. Subsequent focused test court passed49.",
+    "qualification": "Compilation failure; no executed-test or mutation witness claimed."
+  }
+]

@@ -1,0 +1,26 @@
+{
+  "baseRevision": "e94ef776",
+  "reviewedRevision": "83e7d83d",
+  "controlRepairReviewedRevision": "24bb6ebd",
+  "formattedRevision": "17194421",
+  "reviewer": "/root/s0_cold_review, separate non-author SD6 pass",
+  "materialFindings": [],
+  "checks": [
+    "Acceptance rule now uses bundle or winning inline typed support; ranking/basis/structural/critic/agreement behavior unchanged.",
+    "Singular EvidenceRef support follows neither/text/anchor/twin/ById partition; ClaimMeta.spanLaw unchanged.",
+    "Task references retain surface membership/kind checks and text delegation.",
+    "Shared compiler validator covers all attempt families before canonical rendering, with isolated Text/None controls.",
+    "Text differential court compares complete states and excludes anchored fixtures. Exact oracle/matrix checked separately by root."
+  ],
+  "advisories": [
+    {
+      "issue": "ADR prematurely said compiled deletion witness exists.",
+      "resolution": "Changed has to requires while mutation qualification remains pending."
+    },
+    {
+      "issue": "Trailing blank line in test fixture.",
+      "resolution": "Removed by formatter at17194421."
+    }
+  ],
+  "qualification": "Source/test design review only; compiled mutation and final gate results remain separate."
+}
