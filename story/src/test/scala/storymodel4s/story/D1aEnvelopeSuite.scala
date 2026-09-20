@@ -163,10 +163,28 @@ class D1aEnvelopeSuite extends FunSuite:
     assertEquals(after.discourseOrder, Vector(second.id, first.id))
     assertEquals(after.situationsByContext(world), Vector(second.id, first.id))
     assertEquals(after.graph, before.graph)
+    assertEquals(after.bundle.streams, before.bundle.streams)
+    assertEquals(after.bundle.id, before.bundle.id)
     assertEquals(before.projectionOf(firstSupport).bounds, (1L, 3L))
     assertEquals(after.projectionOf(firstSupport).bounds, (50L, 52L))
     assertEquals(after.graph.situations(first.id).support, firstSupport)
     assertNotEquals(before.sourceChecksum, after.sourceChecksum)
+    assertNotEquals(before.storyId, after.storyId)
+
+  test("failed text validation retains the same report and no promoted witness"):
+    val built = Small.build(2, 1)
+    val before = built.draft()
+    val context = before.graph.contexts(built.world)
+    val outside = TypedSupport.Text(SpanSet.one(TextSpan.unsafe(0, built.source.canonicalText.length + 1)))
+    val model = right(before.copy[ModelStatus.Draft](graph = before.graph.copy(
+      contexts = Map(built.world -> context.copy(support = outside)))))
+    val text = StoryModel.asText(model).getOrElse(fail("text witness lost"))
+    val general = StoryValidator.validate(model)
+    val witnessed = StoryValidator.validate(text)
+    assertEquals(witnessed.report, general.report)
+    assertEquals(witnessed.report.errors.map(_.law), Vector("support.in-text"))
+    assertEquals(witnessed.validated, None)
+    assertEquals(general.validated, None)
 
   test("node membership is rechecked independently of an available primary interval"):
     val (a, b) = twoAxes()

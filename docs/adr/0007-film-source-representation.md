@@ -980,3 +980,8 @@ context: retrospective duplicate occurrence, root Reported refusal and hypothesi
 Only the overlap-dependent duplicate-report branch and causal text cues require TextModel.
 The aggregate text report and its ordering remain unchanged; losing the text witness cannot
 silently remove a medium-independent rule or license a text-only one.
+
+The hypothesis-subject rule remains shared, but a lawful film model currently cannot carry
+a `SurfaceExplicit` subject: ClaimMeta requires bare text spans and the film join refuses
+them. Its text court remains executable; the film court proves that construction refusal.
+This limitation is not film-side execution of the rule and does not settle caption licensing.
