@@ -78,7 +78,7 @@ class StoryModelCodecSuite extends FunSuite:
   }
 
   test("StoryModel: an atlas over a different source is rejected") {
-    val json = summon[io.circe.Encoder[StoryModel[ModelStatus.Validated]]](validated)
+    val json = summon[io.circe.Encoder[TextModel[ModelStatus.Validated]]](validated)
     // units from a longer text exceed the model source: rejected at decode by atlas validation
     val longer = StorySource
       .fromText("Something else entirely, and considerably longer than the fixture text is.")
@@ -86,11 +86,11 @@ class StoryModelCodecSuite extends FunSuite:
       .get
     val longerAtlas = SurfaceAnalyzer.analyze(longer)
     val tampered = json.mapObject(_.add("atlas", CoreCodecs.atlasUnitsEncoder(longerAtlas)))
-    assert(Canonical.decodeJson[StoryModel[ModelStatus.Draft]](tampered).isLeft)
+    assert(Canonical.decodeJson[TextModel[ModelStatus.Draft]](tampered).isLeft)
     // units from a shorter text fit the bounds and decode, but the model no longer revalidates
     val shorter = SurfaceAnalyzer.analyze(StorySource.fromText("Short one.").toOption.get)
     val decodable = json.mapObject(_.add("atlas", CoreCodecs.atlasUnitsEncoder(shorter)))
-    val decoded = Canonical.decodeJson[StoryModel[ModelStatus.Draft]](decodable)
+    val decoded = Canonical.decodeJson[TextModel[ModelStatus.Draft]](decodable)
     assert(decoded.isRight)
     assert(
       StoryValidator.validate(decoded.toOption.get, ValidationPolicy.default).validated.isEmpty
@@ -98,20 +98,20 @@ class StoryModelCodecSuite extends FunSuite:
   }
 
   test("StoryModel: tampered source checksum is rejected") {
-    val json = summon[io.circe.Encoder[StoryModel[ModelStatus.Validated]]](validated)
+    val json = summon[io.circe.Encoder[TextModel[ModelStatus.Validated]]](validated)
     val tampered = json.hcursor
       .downField("source")
       .downField("canonicalChecksum")
       .set(Json.fromString("0" * 64))
       .top
       .get
-    assert(Canonical.decodeJson[StoryModel[ModelStatus.Draft]](tampered).isLeft)
+    assert(Canonical.decodeJson[TextModel[ModelStatus.Draft]](tampered).isLeft)
   }
 
   test("StoryModel: unknown schema version is rejected") {
-    val json = summon[io.circe.Encoder[StoryModel[ModelStatus.Validated]]](validated)
+    val json = summon[io.circe.Encoder[TextModel[ModelStatus.Validated]]](validated)
       .mapObject(_.add("schemaVersion", Json.fromString("2.0.0")))
-    Canonical.decodeJson[StoryModel[ModelStatus.Draft]](json) match
+    Canonical.decodeJson[TextModel[ModelStatus.Draft]](json) match
       case Left(CodecError.Decode(_, m)) => assert(m.contains("unsupported schema"), m)
       case other                         => fail(s"expected schema rejection, got $other")
   }
@@ -130,7 +130,7 @@ class StoryModelCodecSuite extends FunSuite:
 
   test("Migration.decode reads a current-version model") {
     val text = StoryModelCodec.encode(validated)
-    assert(Migration.decode[StoryModel[ModelStatus.Draft]](text).isRight)
+    assert(Migration.decode[TextModel[ModelStatus.Draft]](text).isRight)
   }
 
   private def countOf(text: String, needle: String): Int =

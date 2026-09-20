@@ -77,10 +77,9 @@ class DraftCodexSuite extends FunSuite:
       meta("context-speech", spansOf(1))
     )
 
-  private val model: StoryModel[ModelStatus.Draft] =
+  private val model: TextModel[ModelStatus.Draft] =
     StoryModel
-      .draft(
-        source,
+      .draftText(
         atlas,
         NarrativeGraph.empty.copy(contexts = Map(narrated.id -> narrated, reported.id -> reported)),
         NarrativeHierarchy(Vector.empty, Vector.empty),
@@ -107,8 +106,8 @@ class DraftCodexSuite extends FunSuite:
 
   private val unresolved = ResolutionFailure.NoProposal
 
-  private def outcomeOf(violations: Vector[Violation]): ValidationOutcome =
-    ValidationOutcome(ValidationReport(violations), None)
+  private def outcomeOf(violations: Vector[Violation]): TextValidationOutcome =
+    TextValidationOutcome(ValidationReport(violations), None)
 
   private val spec = CodexSpec
     .of(

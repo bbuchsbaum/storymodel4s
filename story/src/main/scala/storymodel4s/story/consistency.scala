@@ -37,7 +37,12 @@ object NarrativeConsistency:
       atlas.unitsOverlapping(r.span, SurfaceUnitKind.Token).map(t => TextNorm.lower(atlas.text(t)))
     }
 
-  def check(m: TextModel[?]): Vector[Violation] =
+  def check(m: TextModel[?]): Vector[Violation] = checkParts(m.model, Some(m))
+
+  /** These rules use graph/status/context only and also govern non-text models. */
+  private[story] def checkGeneral(m: StoryModel[?]): Vector[Violation] = checkParts(m, None)
+
+  private def checkParts(m: StoryModel[?], text: Option[TextModel[?]]): Vector[Violation] =
     val g = m.graph
     val out = Vector.newBuilder[Violation]
     def warn(law: String, path: String, reason: String): Unit =
@@ -94,34 +99,40 @@ object NarrativeConsistency:
           case ContextKind.Speech(_) => true
           case _                     => false)
     }
-    rootAsserted.foreach { s =>
-      speechScoped
-        .filter(t =>
-          t.predicate.lemma == s.predicate.lemma && roleSet(t.id) == roleSet(s.id) &&
-            roleSet(s.id).nonEmpty && s.support.textSpans
-              .exists(a => t.support.textSpans.exists(a.overlaps)) &&
-            !g.referencesOut.getOrElse(s.id, Vector.empty).exists(_.to == t.id) &&
-            !g.referencesOut.getOrElse(t.id, Vector.empty).exists(_.to == s.id)
-        )
-        .foreach(t =>
-          warn(
-            "reported-content-not-root-without-root-claim",
-            s"situations/${s.id.value}",
-            s"narrated-world `${s.predicate.lemma}` duplicates speech-scoped ${t.id.value} on the same span with no reference: reported content promoted to fact"
+    text.foreach { _ =>
+      rootAsserted.foreach { s =>
+        speechScoped
+          .filter(t =>
+            t.predicate.lemma == s.predicate.lemma && roleSet(t.id) == roleSet(s.id) &&
+              roleSet(s.id).nonEmpty && s.support.textSpans
+                .exists(a => t.support.textSpans.exists(a.overlaps)) &&
+              !g.referencesOut.getOrElse(s.id, Vector.empty).exists(_.to == t.id) &&
+              !g.referencesOut.getOrElse(t.id, Vector.empty).exists(_.to == s.id)
           )
-        )
+          .foreach(t =>
+            warn(
+              "reported-content-not-root-without-root-claim",
+              s"situations/${s.id.value}",
+              s"narrated-world `${s.predicate.lemma}` duplicates speech-scoped ${t.id.value} on the same span with no reference: reported content promoted to fact"
+            )
+          )
+      }
+
     }
 
     // 3. A surface-explicit causal edge needs a causal cue in its evidence spans.
-    g.relations.causal.zipWithIndex.foreach { (c, i) =>
-      if c.meta.status == EpistemicStatus.SurfaceExplicit then
-        val toks = c.meta.evidence.toVector.flatMap(_.spans).flatMap(ss => tokensIn(m.atlas, ss))
-        if !toks.exists(CausalCues.contains) then
-          err(
-            "explicit-causal-requires-span-with-causal-cue",
-            s"causal/$i",
-            s"${c.cause.value} ${c.relation} ${c.effect.value} is SurfaceExplicit but its evidence contains no causal cue"
-          )
+    text.foreach { witnessed =>
+      g.relations.causal.zipWithIndex.foreach { (c, i) =>
+        if c.meta.status == EpistemicStatus.SurfaceExplicit then
+          val toks = c.meta.evidence.toVector.flatMap(_.spans).flatMap(ss => tokensIn(witnessed.atlas, ss))
+          if !toks.exists(CausalCues.contains) then
+            err(
+              "explicit-causal-requires-span-with-causal-cue",
+              s"causal/$i",
+              s"${c.cause.value} ${c.relation} ${c.effect.value} is SurfaceExplicit but its evidence contains no causal cue"
+            )
+      }
+
     }
 
     // 4. A hypothesis must be about a hypothesized subject, not an explicit one.

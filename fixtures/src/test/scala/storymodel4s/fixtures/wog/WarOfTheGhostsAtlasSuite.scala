@@ -20,7 +20,7 @@ class WarOfTheGhostsAtlasSuite extends FunSuite:
     AtlasSpec(ZoomLevel(level, surface), threads)
 
   def provenanceFor(
-      sourceModel: StoryModel[ModelStatus.Validated],
+      sourceModel: TextModel[ModelStatus.Validated],
       state: CommonViewState,
       s: AtlasSpec
   ): ViewProvenance =
@@ -36,7 +36,7 @@ class WarOfTheGhostsAtlasSuite extends FunSuite:
       level: NarrativeLevel,
       state: CommonViewState = CommonViewState.empty,
       threads: ThreadPolicy = all3,
-      sourceModel: StoryModel[ModelStatus.Validated] = model,
+      sourceModel: TextModel[ModelStatus.Validated] = model,
       surface: SurfaceDetail = SurfaceDetail.Hidden
   ): NarrativeScene =
     val s = spec(level, threads, surface)
@@ -58,10 +58,9 @@ class WarOfTheGhostsAtlasSuite extends FunSuite:
       atlas: SurfaceAtlas = model.atlas,
       graph: NarrativeGraph = model.graph,
       hierarchy: NarrativeHierarchy = model.hierarchy
-  ): StoryModel[ModelStatus.Validated] =
+  ): TextModel[ModelStatus.Validated] =
     val draft = StoryModel
-      .draft(
-        model.source,
+      .draftText(
         atlas,
         graph,
         hierarchy,

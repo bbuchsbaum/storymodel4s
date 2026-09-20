@@ -974,3 +974,9 @@ implicit model conversions, public copy/status methods and helpers pairing forei
 with a model are rejected. The existing public node carriers remain detached values;
 the shared model join establishes their canonical form. Construction probes distinguish
 those intentionally open carriers from the closed model/text witnesses.
+
+Generic validation retains the existing consistency rules that inspect only graph, status and
+context: retrospective duplicate occurrence, root Reported refusal and hypothesis subject.
+Only the overlap-dependent duplicate-report branch and causal text cues require TextModel.
+The aggregate text report and its ordering remain unchanged; losing the text witness cannot
+silently remove a medium-independent rule or license a text-only one.

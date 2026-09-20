@@ -34,7 +34,7 @@ class D1aTextBoundarySuite extends FunSuite:
       hierarchy: NarrativeHierarchy = built.hierarchy,
       trajectory: DiscourseTrajectory = ordinary.trajectory
   ) =
-    StoryModel.draft(built.source, built.atlas, graph, hierarchy, trajectory)
+    StoryModel.draftText(built.atlas, graph, hierarchy, trajectory).map(_.model)
   private def belief(evidence: cats.data.NonEmptyVector[Evidence]) =
     BoundaryBelief(built.atlas.sentences.head.id, 0, 0.5, None, evidence)
 

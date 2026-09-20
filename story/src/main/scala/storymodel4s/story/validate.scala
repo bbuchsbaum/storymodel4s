@@ -124,8 +124,10 @@ object StoryValidator:
     report.violations.exists(v => policy.blocking.contains(v.severity))
 
   private def report(model: StoryModel[?]): ValidationReport =
-    val textRules = StoryModel.asText(model).toVector.flatMap(NarrativeConsistency.check)
-    ValidationReport((check(model) ++ textRules).sortBy(v => (v.law, v.path, v.reason)))
+    val consistency = StoryModel.asText(model) match
+      case Some(text) => NarrativeConsistency.check(text)
+      case None => NarrativeConsistency.checkGeneral(model)
+    ValidationReport((check(model) ++ consistency).sortBy(v => (v.law, v.path, v.reason)))
 
   def check(model: TextModel[?]): Vector[Violation] = check(model.model)
 

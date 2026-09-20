@@ -20,7 +20,8 @@ class D1aOrderingSuite extends FunSuite:
         .toMap
     )
   private def draft(g: NarrativeGraph) = StoryModel
-    .draft(built.source, built.atlas, g, built.hierarchy, DiscourseTrajectory(Vector.empty))
+    .draftText(built.atlas, g, built.hierarchy, DiscourseTrajectory(Vector.empty))
+    .map(_.model)
     .fold(error => fail(error.message), identity)
 
   test("accepting control: projection order uses start then full hull end then id"):
@@ -70,7 +71,7 @@ class D1aOrderingSuite extends FunSuite:
       draft(graph(Vector(spans(0 -> 1), spans(1 -> 2), spans((length + 1) -> (length + 2)))))
     assert(StoryValidator.validate(model).report.violations.exists(_.law == "support.in-text"))
 
-  test("empty graph still refuses non-text ordering axis"):
+  test("empty graph admits both supported primary kinds"):
     val film = SourceBundle
       .filmEdition(
         EditionId.unsafe("order-film"),
@@ -83,4 +84,4 @@ class D1aOrderingSuite extends FunSuite:
       .get
     val empty = built.graph.copy(situations = Map.empty)
     assertEquals(empty.discourseOrderOn(bundle), Right(Vector.empty))
-    assert(empty.discourseOrderOn(film).isLeft)
+    assertEquals(empty.discourseOrderOn(film), Right(Vector.empty))

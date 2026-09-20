@@ -370,8 +370,7 @@ class WarOfTheGhostsSuite extends munit.FunSuite:
 
   private def redraft(graph: NarrativeGraph, hierarchy: NarrativeHierarchy = m.hierarchy) =
     StoryModel
-      .draft(
-        m.source,
+      .draftText(
         m.atlas,
         graph,
         hierarchy,
@@ -383,7 +382,7 @@ class WarOfTheGhostsSuite extends munit.FunSuite:
       )
       .fold(error => throw new IllegalArgumentException(error.message), identity)
 
-  private def caught(draft: StoryModel[ModelStatus.Draft], law: String): Unit =
+  private def caught(draft: TextModel[ModelStatus.Draft], law: String): Unit =
     val vs = StoryValidator.validate(draft).report.violations
     assert(
       vs.exists(_.law == law),

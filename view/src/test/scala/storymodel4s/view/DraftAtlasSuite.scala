@@ -62,10 +62,9 @@ class DraftAtlasSuite extends FunSuite:
       )
     )
 
-  private val model: StoryModel[ModelStatus.Draft] =
+  private val model: TextModel[ModelStatus.Draft] =
     StoryModel
-      .draft(
-        source,
+      .draftText(
         atlas,
         NarrativeGraph.empty.copy(contexts = Map(rootContext.id -> rootContext)),
         NarrativeHierarchy(Vector.empty, Vector.empty),
@@ -92,8 +91,8 @@ class DraftAtlasSuite extends FunSuite:
 
   private val unresolved = ResolutionFailure.NoProposal
 
-  private def outcomeOf(violations: Vector[Violation]): ValidationOutcome =
-    ValidationOutcome(ValidationReport(violations), None)
+  private def outcomeOf(violations: Vector[Violation]): TextValidationOutcome =
+    TextValidationOutcome(ValidationReport(violations), None)
 
   private val spec =
     AtlasSpec(ZoomLevel(NarrativeLevel.Scene, SurfaceDetail.Hidden), ThreadPolicy.Selected)

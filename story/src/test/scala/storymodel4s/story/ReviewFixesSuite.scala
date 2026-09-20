@@ -141,10 +141,11 @@ class ReviewFixesSuite extends ScalaCheckSuite:
 
   // --- #5 atlas agreement -------------------------------------------------------------------------
 
-  test("atlas.source-match: an atlas of a different text is rejected") {
+  test("text source is derived from the supplied atlas rather than an independent pair") {
     val b = Small.build(2, 1)
-    val ls = laws(Mutations.foreignAtlas(b))
-    assert(ls.contains("atlas.source-match"), ls.toString)
+    val changed = StoryModel.asText(Mutations.foreignAtlas(b)).get
+    assertNotEquals(changed.source, b.source)
+    assertEquals(changed.source, changed.atlas.source)
   }
 
   // --- #26 hierarchy / alternatives / trajectory / features --------------------------------------
@@ -277,8 +278,7 @@ class ReviewFixesSuite extends ScalaCheckSuite:
       )
     )
     val draft = StoryModel
-      .draft(
-        b.source,
+      .draftText(
         b.atlas,
         b.graph,
         b.hierarchy,
@@ -287,7 +287,7 @@ class ReviewFixesSuite extends ScalaCheckSuite:
           .fold(error => throw new IllegalArgumentException(error.message), identity),
         hypotheses = Vector(good)
       )
-      .fold(error => throw new IllegalArgumentException(error.message), identity)
+      .fold(error => throw new IllegalArgumentException(error.message), _.model)
     // the subject is SurfaceExplicit in Small.build, so the consistency checker warns
     val out = StoryValidator.validate(draft)
     assertEquals(out.report.errors, Vector.empty)

@@ -910,13 +910,12 @@ object CodecFixture:
     FeatureRef.unsafe(FeatureTarget.Situation(s2), vectorSpace, 2)
   )
 
-  val draft: StoryModel[ModelStatus.Draft] =
+  val draft: TextModel[ModelStatus.Draft] =
     val trajectory = DiscourseTrajectory
       .derive(graph, hierarchy, atlas)
       .fold(error => throw new IllegalArgumentException(error.message), identity)
     StoryModel
-      .draft(
-        source,
+      .draftText(
         atlas,
         graph,
         hierarchy,
@@ -967,7 +966,7 @@ object CodecFixture:
       )
       .fold(error => throw new IllegalArgumentException(error.message), identity)
 
-  lazy val validated: StoryModel[ModelStatus.Validated] =
+  lazy val validated: TextModel[ModelStatus.Validated] =
     val out = StoryValidator.validate(draft, ValidationPolicy.default)
     out.validated.getOrElse(throw new IllegalStateException(out.report.toString))
 

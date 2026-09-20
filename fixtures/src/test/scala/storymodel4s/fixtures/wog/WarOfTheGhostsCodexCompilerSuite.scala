@@ -65,7 +65,7 @@ class WarOfTheGhostsCodexCompilerSuite extends ScalaCheckSuite:
       refs: Vector[FeatureRef],
       spaceId: FeatureSpaceId = featureSpaceId,
       atlas: SurfaceAtlas = scaleAtlas
-  ): StoryModel[ModelStatus.Validated] =
+  ): TextModel[ModelStatus.Validated] =
     val manifest = SidecarManifest.unsafe(
       spaceId,
       dimension = 1,
@@ -75,8 +75,7 @@ class WarOfTheGhostsCodexCompilerSuite extends ScalaCheckSuite:
       layout = Layout.RowMajor
     )
     val draft = StoryModel
-      .draft(
-        model.source,
+      .draftText(
         atlas,
         model.graph,
         model.hierarchy,
@@ -118,7 +117,7 @@ class WarOfTheGhostsCodexCompilerSuite extends ScalaCheckSuite:
   )
 
   private def compile(
-      sourceModel: StoryModel[ModelStatus.Validated],
+      sourceModel: TextModel[ModelStatus.Validated],
       state: CommonViewState,
       spec: CodexSpec
   ): CodexFlow =
@@ -134,7 +133,7 @@ class WarOfTheGhostsCodexCompilerSuite extends ScalaCheckSuite:
     compile(model, state, spec)
 
   private def compileAtlas(
-      sourceModel: StoryModel[ModelStatus.Validated],
+      sourceModel: TextModel[ModelStatus.Validated],
       state: CommonViewState,
       scale: FeatureScale,
       level: NarrativeLevel = NarrativeLevel.Scene
@@ -158,10 +157,9 @@ class WarOfTheGhostsCodexCompilerSuite extends ScalaCheckSuite:
   private def rebuilt(
       graph: NarrativeGraph,
       hierarchy: NarrativeHierarchy
-  ): StoryModel[ModelStatus.Validated] =
+  ): TextModel[ModelStatus.Validated] =
     val draft = StoryModel
-      .draft(
-        model.source,
+      .draftText(
         model.atlas,
         graph,
         hierarchy,
