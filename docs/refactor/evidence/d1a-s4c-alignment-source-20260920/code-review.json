@@ -18,5 +18,17 @@
       ]
     }
   ],
-  "qualification": "Read-only cold reviews; builds, compiled mutants and byte comparison are separate executed courts."
+  "qualification": "Read-only cold reviews; builds, compiled mutants and byte comparison are separate executed courts.",
+  "runnerReview": [
+    {
+      "reviewer": "/root",
+      "finding": "Compile-door runs must clean/recompile production and test classes.",
+      "repair": "Each final probe invokes Compile/clean and Test/clean and requires both compile log lines; prior attempts retained as historical."
+    },
+    {
+      "reviewer": "/root",
+      "finding": "Expected HSMM artifacts must be bound to an immutable manifest.",
+      "repair": "Pins the manifest SHA from 5c3ea026 and verifies every expected artifact hash/length plus capture harness hash before running."
+    }
+  ]
 }

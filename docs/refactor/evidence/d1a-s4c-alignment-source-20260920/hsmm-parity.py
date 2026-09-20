@@ -6,6 +6,15 @@ q=importlib.util.module_from_spec(spec);spec.loader.exec_module(q)
 q.out=q.out/'hsmm-parity';q.out.mkdir(parents=True,exist_ok=True)
 baseline=q.repo/'docs/refactor/evidence/wog-hsmm-baseline-20260919'
 def sha(b):return hashlib.sha256(b).hexdigest()
+# Pin from landed evidence commit 5c3ea026, not from mutable current expectations.
+frozen_manifest_sha='1b6d0023340bd76d24f6b4bdc24935b587a9b9feffb564342cd9e4c04f816153'
+assert sha((baseline/'manifest.json').read_bytes())==frozen_manifest_sha
+expected_manifest=json.loads((baseline/'manifest.json').read_text())
+for name,entry in expected_manifest['platforms'].items():
+    raw=(baseline/(name.lower()+'.json')).read_bytes()
+    assert sha(raw)==entry['sha256'] and len(raw)==entry['bytes'],name
+assert sha((baseline/'WogHsmmBaselineCaptureSuite.scala').read_bytes())==expected_manifest['instrumentationSha256']
+
 def probe(argv):
     r=subprocess.run(argv,text=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
     return dict(command=argv,exitCode=r.returncode,output=r.stdout.strip())
