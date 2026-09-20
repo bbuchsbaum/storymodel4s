@@ -3,7 +3,7 @@
 Mote: `bd-01M2TABVXSM72M9DD0SNB6GZ11`. Final source/test candidate:
 `c24ddd66026f0d1848b61369b0bbaff7a90a5d40`, based on landed S1 `75c8df52`.
 All required local provider, formatting, documentation and consumer gates passed.
-The slice is ready for local landing; git and the live Mote record that landing.
+The slice landed on local `main` at `21534e66`; the live Mote records its closure.
 
 ## Implemented boundary
 
