@@ -924,7 +924,11 @@ ordering uses that projection. The joined model exposes discourse order/position
 entity/context/within/covering queries from the same derived order. All unbound graph ordering
 forms become internal; internal helpers may consume an already checked order. A private
 constructor may retain that derived order, but it is never an independently supplied public
-claim or an input cache on TypedSupport. Text trajectory derivation is checked, and compiler
+claim or an input cache on TypedSupport. Draft and copy derive it afresh from the resulting
+graph and bundle; neither public factory nor internal copy accepts an order argument. Only
+status-only promotion with the same immutable graph/bundle may reuse the cache. A changed-support
+copy must reverse its order/ordered queries as expected, and a stale-cache mutant must fail that
+witness. Bundle-changing copy witnesses join S4b. Text trajectory derivation is checked, and compiler
 failures propagate through its typed error channel without dropping nodes or falling back.
 
 At S4b the anchored primary projection selects the exact union of all intervals already on

@@ -297,7 +297,11 @@ supports only `Text` on `TextCharacter`, checks the primary kind even for an emp
 returns typed refusals for anchored/mixed support or other primary kinds. It preserves exact
 historical hull-start/hull-end/id order without clipping, normalization or dropped nodes.
 The graph's ordered entity/context/within/covering queries also become internal; their public
-model counterparts use the same checked order. Internal helpers may receive that derived order,
+model counterparts use the same checked order. Draft and copy recompute any private order cache
+from the resulting graph and bundle; no public factory or copy accepts a caller-supplied order.
+Only status-only promotion with unchanged immutable inputs reuses it. An S4a graph-copy reversal
+witness and stale-cache mutant prove this; the changed-bundle variant belongs to S4b.
+Internal helpers may receive that derived order,
 but no public raw-graph wrapper may invent one. Public text trajectory derivation becomes checked
 and propagates refusal; render, consistency, validation and alignment read the joined model order.
 `TypedSupport.Anchored`
