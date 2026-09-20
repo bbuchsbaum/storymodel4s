@@ -342,7 +342,9 @@ class D1aEnvelopeAdmissionSuite extends FunSuite:
     val control = text.graph.copy(contexts = Map(built.world -> context.copy(meta = ordinary)))
     assert(text.copy[ModelStatus.Draft](graph = control).isRight)
     Vector(None, Some(spans)).foreach { bare =>
-      val changed = right(ordinary.withEvidence(ordinary.evidence.map(_.copy(spans = bare, anchors = Some(local)))))
+      val changed = right(
+        ordinary.withEvidence(ordinary.evidence.map(_.copy(spans = bare, anchors = Some(local))))
+      )
       val graph = text.graph.copy(contexts = Map(built.world -> context.copy(meta = changed)))
       assert(StoryModel.draftText(built.atlas, graph, text.hierarchy, text.trajectory).isLeft)
       assert(text.copy[ModelStatus.Draft](graph = graph).isLeft)
