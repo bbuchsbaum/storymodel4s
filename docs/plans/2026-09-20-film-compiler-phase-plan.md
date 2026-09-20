@@ -128,11 +128,13 @@ contributing chart references; it does not infer parse membership from playback
 ticks or proposal-text span overlap. Bind expected parser/request/recipe/source
 identities and output chart identity at the join. A run-wide list is not sufficient.
 
-With two independently parsed descriptions, the emitted claim for A cites A's
-parse/derivation calls and excludes B's unrelated calls. A claim genuinely joining
-A and B cites both; common upstream calls are deduplicated without losing them.
-Missing, swapped or foreign associations refuse the input. Keep exact proposal
-surface/chart links for audit without converting those spans into film evidence.
+F1 tests the association table and provenance-selection helper with two independently
+parsed descriptions: selecting A's chart references selects A's relevant calls,
+selecting both selects both, and common upstream calls are deduplicated without
+losing them. Missing, swapped or foreign associations refuse the input. F5 then
+tests the actual emitted claims for the same inclusion/exclusion behavior through
+`compileFilm`. Keep exact proposal surface/chart links for audit without converting
+those spans into film evidence. F1 does not claim to emit a film claim.
 
 ## 6. Mention positions and IDs
 
@@ -161,6 +163,10 @@ must carry typed support on the film path without replacing the text overloads.
 
 F0 records the owner's choice; F4 and film materialization remain blocked until
 that answer exists. This plan recommends A but adopts neither alternative.
+The phase-plan ticket owns putting the question to the owner before its own
+closure; F0 then records the answer to that already-presented question. Its
+dependency on the phase-plan ticket does not defer asking the question until
+after this ticket closes.
 
 **A — preserve the text meaning (recommended).** `SurfaceExplicit` continues to
 mean directly stated by source text. A caption-derived claim about a film retains
@@ -241,6 +247,10 @@ The resulting model must retain exact original native/primary support and comple
 unions/points, use its primary projection for order, refuse proposal-text physical
 support and expose those exact values through general `AlignmentSource`. Exercise
 actual result receipt/model joins and both successful and blocked validation.
+With two independently parsed descriptions, the actual claim for A includes A's
+parse/derivation calls and excludes B's unrelated calls; a claim using both includes
+both, preserving relevant shared upstream calls. This emitted-claim provenance
+court belongs here, after the input helper is available from F1.
 Permuting semantically unordered inputs preserves canonical results. Foreign
 bundle/axis/receipt, stale same-ID full binding, native-unit substitution and
 Held-to-root fallback each have a passing control and compiled falsifier. Run the
@@ -279,6 +289,9 @@ The only current child of the film parent is this phase-plan ticket, as read on
 20 September. The payloads propose seven new children, with stable local keys until
 actual IDs are filed. Preserve existing S4c, D1B signature and film parent tickets.
 Parent links and blocking edges are distinct; do not introduce a dependency cycle.
+In addition to those parent relations, file an explicit **F6 blocks film parent**
+edge. F6's transitive prerequisites cover F0–F5 and the existing plan/types/signature
+work, so the film parent cannot become ready while its implementation remains open.
 
 | Key | Deliverable | Blocking prerequisites |
 |---|---|---|

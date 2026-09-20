@@ -28,7 +28,7 @@
         7
       ],
       "acceptanceCriteria": [
-        "Put plan section 7 alternatives A/B to the owner with the concrete caption trigger and affected F4 ticket link; retain the question verbatim in the decision record.",
+        "Verify the phase-plan ticket already put section 7 alternatives A/B to the owner with the concrete caption trigger and affected F4 ticket link; carry that exact question into this answer record. The plan owns asking before its own closure; this child owns recording the answer.",
         "Record the explicit answer and whether generated captions can license film SurfaceExplicit. No answer keeps this ticket open and F4 blocked.",
         "Record constructor/join/provenance/component/consistency/StatusWeight consequences and any selected constraints; preserve the distinction between text caption and claim about film.",
         "F4 cites this actual decision record before implementing any license; a plan recommendation or elapsed time cannot substitute for an answer."
@@ -73,7 +73,7 @@
         "Multi-sentence descriptions create distinct associated sentence units with inherited physical envelopes; original row/scene units remain separately addressable. Recipe/separators/sentence boundaries and complete table participate in identity.",
         "MediaTime/MediaPoint support checks full bundle binding and every stream/axis, and is contained in the complete same-stream/unit interval union plus points; unsupported anchor kinds refuse explicitly.",
         "Wrong native unit with matching primary support, real gaps, excluded ends, point-versus-interval containment and partial coverage have isolated refusals plus lawful mixed-support controls; no hull or implicit coordinate conversion.",
-        "Two independently parsed descriptions bind each chart and relevant parse/derivation calls to its sentence unit. Single-origin claims exclude unrelated calls; genuine cross-origin claims retain both; swaps/refused joins are falsified.",
+        "Two independently parsed descriptions bind each chart and relevant parse/derivation calls to its sentence unit. The input provenance-selection helper returns A-only calls for A references, both for combined references, and preserves shared upstream calls; swapped or foreign joins refuse. Emitted-claim inclusion/exclusion is an F5 court, outside this input-only child.",
         "Model canonical-form guards still reject proposal-surface text as film physical support. Changing source bytes, unit structure, expected receipt or origin changes identity or refuses."
       ],
       "gates": [
@@ -238,6 +238,7 @@
         "Actual film input with two separated intervals, explicit point, two separately parsed descriptions, one root clause and one Held clause traverses resolution, placement, mentions, materialization and checked validation; inspect retained resolutions/gaps as well as nodes.",
         "Admitted model and general AlignmentSource retain every native/primary anchor and exact interval union/point; primary projection determines order and proposal text never becomes physical evidence.",
         "Owner-selected explicit license, actual receipt/model joins, successful and blocked validation, and source-input permutation controls execute through public factories, not fixture bypasses.",
+        "Through actual compileFilm output, a claim using only description A includes A parse/derivation calls and excludes unrelated B calls; a claim using both includes both and retains shared upstream calls. This tests emitted provenance, beyond the F1 input helper.",
         "Foreign bundle/axis/receipt, stale same-ID full binding, native-unit substitution and Held fallback have decisive compiled mutations and passing controls; complete text/S0 and consumer courts remain green."
       ],
       "gates": [
@@ -292,6 +293,13 @@
       "scopeLimits": [
         "No new acquisition admission; full participant film-alignment proof stays on its existing later ticket."
       ]
+    }
+  ],
+  "additionalBlockingEdges": [
+    {
+      "blockerChildKey": "F6",
+      "blockedTicketId": "bd-01M2T32SGVJXR2RT3RTS2DCN9P",
+      "reason": "The film parent must remain blocked until its actual compiler/adapter implementation closes; F6 transitively requires all other proposed children."
     }
   ]
 }
