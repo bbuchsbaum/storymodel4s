@@ -338,9 +338,15 @@ class D1bPointSupportSuite extends FunSuite:
     val at = right(PlaybackInstant.on(b.primaryAxis, 5L))
     val original = identity(b.streams(1).id, at)
     val nativeAt = right(PlaybackInstant.on(native.primaryAxis, 5L))
-    val both = right(EvidenceSupport.of(b, Vector(
-      EvidenceAnchor.MediaPoint(b.id, b.streams(1).id, at),
-      EvidenceAnchor.MediaPoint(b.id, b.streams(1).id, nativeAt))))
+    val both = right(
+      EvidenceSupport.of(
+        b,
+        Vector(
+          EvidenceAnchor.MediaPoint(b.id, b.streams(1).id, at),
+          EvidenceAnchor.MediaPoint(b.id, b.streams(1).id, nativeAt)
+        )
+      )
+    )
     assertEquals(right(both.playbackOn(b.primaryAxis.id)).points, Vector(at))
     assertEquals(right(both.playbackOn(native.primaryAxis.id)).points, Vector(nativeAt))
     assertNotEquals(original, identity(b.streams.head.id, at))
