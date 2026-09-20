@@ -1092,3 +1092,12 @@ EvidenceSupport.of(newBundle, oldSupport.anchors.toVector), validating every anc
 retaining the new full identity. Discarding a successful revalidation while keeping the
 old binding is rejected. Existing bundle-copy courts must perform this explicit rebuild;
 a separate stale-same-ID control must refuse. This affects anchored joins only.
+
+The corpus adapter is `SherlockSourceAtlas.of(SherlockAnnotations.Atlas)`, returning a
+checked AnchoredNarrativeAtlas plus row/scene unit lookups and part compositions. It uses
+`SourceBundle.editionPlaybackAxis` to derive the proposed primary axis from the exact
+stream inventory before constructing mappings; SourceBundle.of still validates the final
+join. The helper does not attest a bundle by itself. Scene units union all member anchors,
+including point-only scenes. The scoring adapter consumes this library atlas's support;
+it may reuse the existing lexical/semantic feature assembly, but its published physical
+NodeSummary support must come from the checked row/scene units.
