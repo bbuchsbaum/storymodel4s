@@ -9,7 +9,9 @@ repos={name:clone_root/name for name in ['storyatlas4s','storymodel4s','intaglio
 consumer=repos['storyatlas4s']
 def state():
     return {name:dict(revision=subprocess.check_output(['git','rev-parse','HEAD'],cwd=path,text=True).strip(),status=subprocess.check_output(['git','status','--porcelain'],cwd=path,text=True).strip()) for name,path in repos.items()}
+expectedRevisions={'storyatlas4s': 'd95b9eacbcc1ac93c05f352c175c544a0dc6bdb1', 'storymodel4s': '7a35bff7c82a42a334d397831446c6acf59d7fb0', 'intaglio': '4eb566d9208f474d64d61e778e084dee2ddbaa76', 'grakern': '0329c43c88a0b71e9aa4456723bb16bac2fa3841'}
 before=state()
+assert {name:item['revision'] for name,item in before.items()}==expectedRevisions,before
 assert all(not x['status'] for x in before.values())
 command=['sbt','-batch',
     '-Dstoryatlas4s.storymodel4s.build='+str(repos['storymodel4s']),
@@ -45,7 +47,7 @@ for task in tasks:
         witnesses[task]['testSourceFiles']=[str(p.relative_to(consumer)) for p in sources]
         assert not sources,(task,sources)
 after=state()
-receipt=dict(schema='d1a-consumer-gate/v1',command=command,cwd=str(consumer),startedEpochSeconds=started,elapsedSeconds=time.time()-started,exitCode=result.returncode,before=before,after=after,expectedTestTasks=tasks,testTotals=totals,aggregateTestCounts=counts,testTaskWitnesses=witnesses,logPath=str(log),logSha256=hashlib.sha256(log.read_bytes()).hexdigest(),qualification='Local exact-provider candidate gate; no remote publication or executed CI.')
+receipt=dict(schema='d1a-consumer-gate/v1',command=command,cwd=str(consumer),startedEpochSeconds=started,elapsedSeconds=time.time()-started,exitCode=result.returncode,before=before,after=after,expectedRevisions=expectedRevisions,expectedTestTasks=tasks,testTotals=totals,aggregateTestCounts=counts,testTaskWitnesses=witnesses,logPath=str(log),logSha256=hashlib.sha256(log.read_bytes()).hexdigest(),qualification='Local exact-provider candidate gate; no remote publication or executed CI.')
 (out/'consumer-gate.json').write_text(json.dumps(receipt,indent=2)+'\n')
 assert result.returncode==0
 assert after==before

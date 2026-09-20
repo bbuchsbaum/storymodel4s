@@ -1,0 +1,72 @@
+{
+  "schema": "d1a-s4c-acceptance-map/v1",
+  "ticket": "bd-01M2TAGDJ5F0FEPC3XPWVDSWDH",
+  "sourceTestRevision": "369965b29228caccb6baba8cfd4943eee4322fb7",
+  "releaseRevision": "7a35bff7c82a42a334d397831446c6acf59d7fb0",
+  "criteria": [
+    {
+      "number": 1,
+      "criterion": "AlignmentSource is sealed.",
+      "witnesses": [
+        "D1aAlignmentBoundarySuite: general/text external implementation refusal",
+        "seal-general / seal-text compiled mutants",
+        "D1aAlignmentConstructorSuite: private implementation construction refusals and compiled mutants"
+      ]
+    },
+    {
+      "number": 2,
+      "criterion": "General source has evidenceOf/primaryOf; text source retains sourceSupport and is the StorySourceView input.",
+      "witnesses": [
+        "D1aAlignmentSourceSuite: exact typed text/native evidence, full gapped primary union, missing node None, retained text witness/span refs",
+        "Four status factory compile probes and mutants",
+        "D1aStorySourceBoundarySuite: text-source passing control; general source and independent-model pairing refusals with compiled mutants"
+      ]
+    },
+    {
+      "number": 3,
+      "criterion": "Three align construction call sites change mechanically; scoring unchanged.",
+      "witnesses": [
+        "StorySourceView apply/validated/adjudicated derive text from one text source",
+        "unchanged-scoring-source.json compares actual relation/feature implementation tokens",
+        "hsmm-parity.json compares each complete inferred backend artifact to frozen baseline",
+        "score-text-length: compiled real feature-input perturbation fails JVM inferred-artifact court while canonical capture control passes"
+      ]
+    },
+    {
+      "number": 4,
+      "criterion": "S0 pins and HSMM golden remain unchanged.",
+      "witnesses": [
+        "Frozen file SHA records below",
+        "hsmm-parity.json: exact 26,284-byte JVM/JS/Native baseline preservation",
+        "Final full-provider S0 execution pending"
+      ]
+    }
+  ],
+  "frozenResources": [
+    {
+      "path": "pipeline/src/test/resources/golden/d1a-s0-text-parity.json",
+      "sha256": "cc201d9dd3e3576fabcd45677369f00c023ca5a455ea9d9e7ba694700c759fb3",
+      "unchangedFrom": "7358eb7c"
+    },
+    {
+      "path": "fixtures/src/test/resources/golden/hsmm-v3-wog.json",
+      "sha256": "ce61e761a131c1e2ffeebcf912a9c04d9dd2bf2fb4c09f9d4bda0c2741f2cf1a",
+      "unchangedFrom": "7358eb7c"
+    }
+  ],
+  "compiledMutationEvidence": "mutation-terminal-summary.json",
+  "coldReviews": "code-review.json",
+  "pending": [
+    "Final clean provider gate",
+    "Separate formatting gate",
+    "13 documentation examples",
+    "Pinned storyatlas consumer gate",
+    "Local landing and Mote closure"
+  ],
+  "limitations": [
+    "No point support or D1B typed recall signature yet.",
+    "No film compiler or caption licensing decision.",
+    "No new Native tolerance or universal cross-platform byte equality.",
+    "Local execution only; no CI or remote publication."
+  ]
+}

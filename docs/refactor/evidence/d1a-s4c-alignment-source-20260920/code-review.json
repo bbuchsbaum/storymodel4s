@@ -16,6 +16,28 @@
         "Relation comparison is wrapper consistency, not historical numerical parity.",
         "Capture suite alone is canonicalization/output capture, not frozen parity."
       ]
+    },
+    {
+      "reviewer": "/root/cold_plan_review",
+      "candidate": "7a35bff7",
+      "scope": "Evidence-only cold review of terminal mutation and backend parity archives",
+      "findings": [],
+      "observed": {
+        "mutationArchiveMembers": 129,
+        "hsmmArchiveMembers": 17,
+        "compiledMutants": 24,
+        "cleanProductionAndProbeRecompiles": 14,
+        "restoredControlsPassed": 26,
+        "backendTests": [
+          4,
+          3,
+          3
+        ],
+        "allBackendBytesEqualFrozen": true
+      },
+      "limits": [
+        "Final provider, formatting, documentation and pinned-consumer gates remained pending."
+      ]
     }
   ],
   "qualification": "Read-only cold reviews; builds, compiled mutants and byte comparison are separate executed courts.",
@@ -29,6 +51,11 @@
       "reviewer": "/root",
       "finding": "Expected HSMM artifacts must be bound to an immutable manifest.",
       "repair": "Pins the manifest SHA from 5c3ea026 and verifies every expected artifact hash/length plus capture harness hash before running."
+    },
+    {
+      "reviewer": "/root",
+      "finding": "Consumer runner must assert the intended immutable four-pin set, not merely record observed heads.",
+      "repair": "Exact expected revisions asserted before execution and retained in receipt; after-state must equal before-state."
     }
   ]
 }

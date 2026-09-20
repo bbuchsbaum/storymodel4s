@@ -1,0 +1,93 @@
+{
+  "assignee": "codex-storymodel4s-film-foundation",
+  "body": "Scheduling lane: film. Current plan: docs/refactor/PLAN.md. Live dependency edges supersede historical sequencing below.\n\nCurrent disposition, 2026-09-19; governing docs/refactor/PLAN.md.\nPreserved approved film-library scope. Follow S0-S4c order and exact text parity; the earlier annotation preview does not close this ticket.\n\nOriginal scope retained below for evidence; fleet procedure/assignments are historical and do not govern single-developer work.\n\nPlan: docs/plans/2026-09-18-best-recall-to-video-mapper.md docs/plans/2026-09-17-d1a-source-to-story-plan.md \u00a72.8, \u00a73 S4c.\n\nThe general source (any validated model) exposes evidenceOf and primaryOf; the text source keeps sourceSupport.\n\nScope:\nstory and align call sites.\n\nAcceptance criteria:\n1. AlignmentSource is sealed.\n2. The general source built from any StoryModel[Validated] exposes evidenceOf and primaryOf; the text source built from TextModel[Validated] keeps sourceSupport and is what StorySourceView consumes.\n3. Three align call sites change mechanically; scoring is unchanged.\n4. The S0 pins are unchanged, including the HSMM golden.\n\nGate (AGENTS.md SD2/SD6): `sbt -batch clean compileAll testAll` on the merge result, then\n`sbt -batch scalafmtCheckAll scalafmtSbtCheck` as a separate run; every test task in build.sbt's\ntestAll alias reports bound totals (56 at 0e36a7fa, after the corpus modules were added; recount if\nmodules change); a named mutation witness per new guard, and each compile-time-probe mutation proved\nafter its own clean recompile; `cd docs-site && npm run verify:examples` when public API or examples\nchange; fresh-context cold review in a separate pass; the commit body states the evidence and what\nit does not establish.\n\nSize: S.",
+  "children": [],
+  "clock": {
+    "assignee": "20260919T222455.611349Z-p68644-c0000-r4d8e-h8527df",
+    "body": "20260919T130153.197316Z-p57817-c0000-r67ff-h7db661",
+    "priority": "20260919T130153.197316Z-p57817-c0000-r67ff-h7db661",
+    "status": "20260920T043159.546317Z-p18551-c0000-r1bff-hb94322",
+    "title": "20260919T130153.197316Z-p57817-c0000-r67ff-h7db661"
+  },
+  "created_at": "2026-09-18T13:15:17.957936Z",
+  "deleted_at": null,
+  "dependents": [
+    {
+      "assignee": "codex-storymodel4s-film-foundation",
+      "id": "bd-01M1CQKRG1A4J4BEWCC78F4TEZ",
+      "kind": "blocks",
+      "priority": 1,
+      "status": "open",
+      "tags": [
+        "compiler",
+        "critical",
+        "delivery-20260919",
+        "film",
+        "story"
+      ],
+      "title": "[film] D1A-types: film-capable StoryModel, nodes, Evidence and AlignmentSource, text byte-identical"
+    },
+    {
+      "assignee": "codex-storymodel4s-film-foundation",
+      "id": "bd-01M2TAC80YRK5JFNKTT7B7CAQN",
+      "kind": "blocks",
+      "priority": 1,
+      "status": "open",
+      "tags": [
+        "align",
+        "d1b",
+        "delivery-20260919",
+        "mapper-plan",
+        "mapper-slice",
+        "phase2"
+      ],
+      "title": "[film] Phase 2: D1B signatures -- typed source view with exact playback intervals (replaces the joined-text surrogate)"
+    },
+    {
+      "assignee": "codex-storymodel4s-film-foundation",
+      "id": "bd-01M2TAGST4EBFR1HM9Q3EWSYAH",
+      "kind": "blocks",
+      "priority": 1,
+      "status": "open",
+      "tags": [
+        "delivery-20260919",
+        "film-route",
+        "film-slice",
+        "mapper-plan",
+        "phase2",
+        "plan"
+      ],
+      "title": "[film] D1A-film: write and cold-review its phase plan, then file its slice tickets"
+    }
+  ],
+  "deps": [
+    {
+      "kind": "blocks",
+      "parent": "bd-01M2TAG1GEAGXCY33P0B17QBJ1"
+    }
+  ],
+  "discussion_sources": {
+    "posts": [],
+    "topics": []
+  },
+  "id": "bd-01M2TAGDJ5F0FEPC3XPWVDSWDH",
+  "notes": [],
+  "priority": 1,
+  "ready": false,
+  "relations": [
+    {
+      "kind": "parent",
+      "parent": "bd-01M1CQKRG1A4J4BEWCC78F4TEZ"
+    }
+  ],
+  "status": "doing",
+  "tags": [
+    "d1a",
+    "delivery-20260919",
+    "film-slice",
+    "mapper-plan",
+    "phase2",
+    "story"
+  ],
+  "title": "[film] D1A-types S4c: seal and split AlignmentSource"
+}
