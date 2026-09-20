@@ -1,0 +1,30 @@
+{
+  "codeRevision": "94e0a9a229fe4224f9312220baae23c8e6e9ffa5",
+  "command": [
+    "sbt",
+    "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+    "-batch",
+    "coreJVM/testOnly storymodel4s.core.D1aProjectionSuite",
+    "storyJVM/testOnly storymodel4s.story.D1aTextBoundarySuite storymodel4s.story.D1aOrderingSuite storymodel4s.probes.D1aGraphBoundarySuite storymodel4s.probes.StoryModelUnforgeableSuite storymodel4s.story.probes.D1aModelConstructorSuite",
+    "codecJVM/testOnly storymodel4s.codec.D1aTypedSupportCodecSuite"
+  ],
+  "exitCode": 0,
+  "cleanBefore": true,
+  "cleanAfter": true,
+  "startedEpochSeconds": 1789869651.679772,
+  "seconds": 20.364729166030884,
+  "logPath": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1a-s4a-20260919/isolated-control.log",
+  "logSha256": "f3c1a65438751bafa5e22f6b47302d9e91e578732a02798e0c7d85d043efda10",
+  "testTotals": [
+    "[info] Passed: Total 4, Failed 0, Errors 0, Passed 4",
+    "[info] Passed: Total 33, Failed 0, Errors 0, Passed 33",
+    "[info] Passed: Total 3, Failed 0, Errors 0, Passed 3"
+  ],
+  "aggregateTestCounts": {
+    "Total": 40,
+    "Failed": 0,
+    "Errors": 0,
+    "Passed": 40,
+    "Skipped": 0
+  }
+}

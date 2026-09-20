@@ -1,0 +1,26 @@
+{
+  "schema": "d1a-s4a-cold-review/v1",
+  "baseRevision": "5ddd9039",
+  "reviewedRevision": "c2af2a93",
+  "reviewer": "/root/s0_cold_review",
+  "scope": "Complete source/test/format delta; read only, no execution qualification",
+  "findings": [
+    {
+      "id": "trajectory-only-boundary-evidence",
+      "severity": "P2",
+      "foundAt": "ed42ded0",
+      "origin": "Preexisting in 5ddd9039 constructor require; trajectory.allMeta covers world-time claims, not FlowStep.boundaryBeliefs.",
+      "repairRevision": "3328a36a",
+      "repair": "Shared draft/copy check enumerates hierarchy and trajectory-step boundary beliefs.",
+      "status": "closed in source review",
+      "witness": "D1aTextBoundarySuite step-only text control and anchored/twin refusals; compiled mutation pending"
+    }
+  ],
+  "finalVerdict": "No remaining actionable source/test findings at c2af2a93.",
+  "additionalReview": {
+    "reviewer": "/root",
+    "revision": "94e0a9a2",
+    "scope": "Five-line independent start-before-end ordering witness and settled 36-case mutation inventory",
+    "verdict": "No findings; runtime receipts remain pending"
+  }
+}

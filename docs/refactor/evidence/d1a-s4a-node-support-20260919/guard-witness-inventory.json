@@ -1,0 +1,375 @@
+{
+  "codeRevision": "94e0a9a229fe4224f9312220baae23c8e6e9ffa5",
+  "plannedMutationCount": 36,
+  "inventoryStatus": "settled before mutation and full release gates",
+  "cases": [
+    {
+      "id": "projection-primary-kind",
+      "path": "core/src/main/scala/storymodel4s/core/support.scala",
+      "group": "core",
+      "rejectSuite": "storymodel4s.core.D1aProjectionSuite",
+      "rejectingTest": "text projection refuses a non-text primary even with Text support",
+      "controlSuite": "storymodel4s.core.D1aProjectionSuite",
+      "acceptingControl": "zero-length and out-of-extent spans remain deferred text validator concerns",
+      "cleanRecompile": false
+    },
+    {
+      "id": "projection-anchored-refusal",
+      "path": "core/src/main/scala/storymodel4s/core/support.scala",
+      "group": "core",
+      "rejectSuite": "storymodel4s.core.D1aProjectionSuite",
+      "rejectingTest": "text projection refuses anchored support",
+      "controlSuite": "storymodel4s.core.D1aProjectionSuite",
+      "acceptingControl": "zero-length and out-of-extent spans remain deferred text validator concerns",
+      "cleanRecompile": false
+    },
+    {
+      "id": "projection-ref-retention",
+      "path": "core/src/main/scala/storymodel4s/core/support.scala",
+      "group": "core",
+      "rejectSuite": "storymodel4s.core.D1aProjectionSuite",
+      "rejectingTest": "accepting control: text projection retains exact UTF-16 references and hull",
+      "controlSuite": "storymodel4s.core.D1aProjectionSuite",
+      "acceptingControl": "zero-length and out-of-extent spans remain deferred text validator concerns",
+      "cleanRecompile": false
+    },
+    {
+      "id": "projection-axis-binding",
+      "path": "core/src/main/scala/storymodel4s/core/support.scala",
+      "group": "core",
+      "rejectSuite": "storymodel4s.core.D1aProjectionSuite",
+      "rejectingTest": "accepting control: text projection retains exact UTF-16 references and hull",
+      "controlSuite": "storymodel4s.core.D1aProjectionSuite",
+      "acceptingControl": "text projection refuses anchored support",
+      "cleanRecompile": false
+    },
+    {
+      "id": "projection-hull-end",
+      "path": "core/src/main/scala/storymodel4s/core/support.scala",
+      "group": "core",
+      "rejectSuite": "storymodel4s.core.D1aProjectionSuite",
+      "rejectingTest": "accepting control: text projection retains exact UTF-16 references and hull",
+      "controlSuite": "storymodel4s.core.D1aProjectionSuite",
+      "acceptingControl": "zero-length and out-of-extent spans remain deferred text validator concerns",
+      "cleanRecompile": false
+    },
+    {
+      "id": "text-accessor-ref-retention",
+      "path": "core/src/main/scala/storymodel4s/core/support.scala",
+      "group": "core",
+      "rejectSuite": "storymodel4s.core.D1aProjectionSuite",
+      "rejectingTest": "accepting control: text projection retains exact UTF-16 references and hull",
+      "controlSuite": "storymodel4s.core.D1aProjectionSuite",
+      "acceptingControl": "zero-length and out-of-extent spans remain deferred text validator concerns",
+      "cleanRecompile": false
+    },
+    {
+      "id": "anchored-accessor-no-cast",
+      "path": "core/src/main/scala/storymodel4s/core/support.scala",
+      "group": "core",
+      "rejectSuite": "storymodel4s.core.D1aProjectionSuite",
+      "rejectingTest": "accepting control: text projection retains exact UTF-16 references and hull",
+      "controlSuite": "storymodel4s.core.D1aProjectionSuite",
+      "acceptingControl": "zero-length and out-of-extent spans remain deferred text validator concerns",
+      "cleanRecompile": false
+    },
+    {
+      "id": "graph-primary-kind",
+      "path": "story/src/main/scala/storymodel4s/story/graph.scala",
+      "group": "order",
+      "rejectSuite": "storymodel4s.story.D1aOrderingSuite",
+      "rejectingTest": "empty graph still refuses non-text ordering axis",
+      "controlSuite": "storymodel4s.story.D1aOrderingSuite",
+      "acceptingControl": "equal projected hulls use id independent of map insertion order",
+      "cleanRecompile": false
+    },
+    {
+      "id": "order-start-precedence",
+      "path": "story/src/main/scala/storymodel4s/story/graph.scala",
+      "group": "order",
+      "rejectSuite": "storymodel4s.story.D1aOrderingSuite",
+      "rejectingTest": "projected start precedes end when their orders disagree",
+      "controlSuite": "storymodel4s.story.D1aOrderingSuite",
+      "acceptingControl": "empty graph still refuses non-text ordering axis",
+      "cleanRecompile": false
+    },
+    {
+      "id": "order-end-precedence",
+      "path": "story/src/main/scala/storymodel4s/story/graph.scala",
+      "group": "order",
+      "rejectSuite": "storymodel4s.story.D1aOrderingSuite",
+      "rejectingTest": "accepting control: projection order uses start then full hull end then id",
+      "controlSuite": "storymodel4s.story.D1aOrderingSuite",
+      "acceptingControl": "empty graph still refuses non-text ordering axis",
+      "cleanRecompile": false
+    },
+    {
+      "id": "order-id-tie",
+      "path": "story/src/main/scala/storymodel4s/story/graph.scala",
+      "group": "order",
+      "rejectSuite": "storymodel4s.story.D1aOrderingSuite",
+      "rejectingTest": "equal projected hulls use id independent of map insertion order",
+      "controlSuite": "storymodel4s.story.D1aOrderingSuite",
+      "acceptingControl": "empty graph still refuses non-text ordering axis",
+      "cleanRecompile": false
+    },
+    {
+      "id": "model-all-text-guard",
+      "path": "story/src/main/scala/storymodel4s/story/model.scala",
+      "group": "boundary",
+      "rejectSuite": "storymodel4s.story.D1aTextBoundarySuite",
+      "rejectingTest": "text draft and copy refuse anchored entity support",
+      "controlSuite": "storymodel4s.story.D1aTextBoundarySuite",
+      "acceptingControl": "accepting control: ordinary text draft and internal copy remain constructible",
+      "cleanRecompile": false
+    },
+    {
+      "id": "model-enumerate-entities",
+      "path": "story/src/main/scala/storymodel4s/story/graph.scala",
+      "group": "boundary",
+      "rejectSuite": "storymodel4s.story.D1aTextBoundarySuite",
+      "rejectingTest": "text draft and copy refuse anchored entity support",
+      "controlSuite": "storymodel4s.story.D1aTextBoundarySuite",
+      "acceptingControl": "accepting control: ordinary text draft and internal copy remain constructible",
+      "cleanRecompile": false
+    },
+    {
+      "id": "model-enumerate-segments",
+      "path": "story/src/main/scala/storymodel4s/story/graph.scala",
+      "group": "boundary",
+      "rejectSuite": "storymodel4s.story.D1aTextBoundarySuite",
+      "rejectingTest": "text draft and copy refuse anchored segment support",
+      "controlSuite": "storymodel4s.story.D1aTextBoundarySuite",
+      "acceptingControl": "accepting control: ordinary text draft and internal copy remain constructible",
+      "cleanRecompile": false
+    },
+    {
+      "id": "model-enumerate-contexts",
+      "path": "story/src/main/scala/storymodel4s/story/graph.scala",
+      "group": "boundary",
+      "rejectSuite": "storymodel4s.story.D1aTextBoundarySuite",
+      "rejectingTest": "text draft and copy refuse anchored context support",
+      "controlSuite": "storymodel4s.story.D1aTextBoundarySuite",
+      "acceptingControl": "accepting control: ordinary text draft and internal copy remain constructible",
+      "cleanRecompile": false
+    },
+    {
+      "id": "model-enumerate-circumstances",
+      "path": "story/src/main/scala/storymodel4s/story/graph.scala",
+      "group": "boundary",
+      "rejectSuite": "storymodel4s.story.D1aTextBoundarySuite",
+      "rejectingTest": "text draft and copy refuse anchored circumstance support",
+      "controlSuite": "storymodel4s.story.D1aTextBoundarySuite",
+      "acceptingControl": "accepting control: ordinary text draft and internal copy remain constructible",
+      "cleanRecompile": false
+    },
+    {
+      "id": "model-claim-evidence",
+      "path": "story/src/main/scala/storymodel4s/story/model.scala",
+      "group": "boundary",
+      "rejectSuite": "storymodel4s.story.D1aTextBoundarySuite",
+      "rejectingTest": "text draft and copy refuse anchored ordinary claim evidence before export",
+      "controlSuite": "storymodel4s.story.D1aTextBoundarySuite",
+      "acceptingControl": "accepting control: ordinary text draft and internal copy remain constructible",
+      "cleanRecompile": false
+    },
+    {
+      "id": "model-hierarchy-boundary",
+      "path": "story/src/main/scala/storymodel4s/story/model.scala",
+      "group": "boundary",
+      "rejectSuite": "storymodel4s.story.D1aTextBoundarySuite",
+      "rejectingTest": "text draft and copy refuse anchored hierarchy boundary evidence",
+      "controlSuite": "storymodel4s.story.D1aTextBoundarySuite",
+      "acceptingControl": "accepting control: ordinary text draft and internal copy remain constructible",
+      "cleanRecompile": false
+    },
+    {
+      "id": "model-step-boundary",
+      "path": "story/src/main/scala/storymodel4s/story/model.scala",
+      "group": "boundary",
+      "rejectSuite": "storymodel4s.story.D1aTextBoundarySuite",
+      "rejectingTest": "text draft and copy refuse step-only anchored and twin boundary evidence",
+      "controlSuite": "storymodel4s.story.D1aTextBoundarySuite",
+      "acceptingControl": "accepting control: text boundary evidence may live only on a trajectory step",
+      "cleanRecompile": false
+    },
+    {
+      "id": "copy-shared-admission",
+      "path": "story/src/main/scala/storymodel4s/story/model.scala",
+      "group": "boundary",
+      "rejectSuite": "storymodel4s.story.D1aTextBoundarySuite",
+      "rejectingTest": "text draft and copy refuse anchored ordinary claim evidence before export",
+      "controlSuite": "storymodel4s.story.D1aTextBoundarySuite",
+      "acceptingControl": "accepting control: ordinary text draft and internal copy remain constructible",
+      "cleanRecompile": false
+    },
+    {
+      "id": "copy-stale-order",
+      "path": "story/src/main/scala/storymodel4s/story/model.scala",
+      "group": "order",
+      "rejectSuite": "storymodel4s.story.D1aOrderingSuite",
+      "rejectingTest": "internal graph copy recomputes every ordered model query",
+      "controlSuite": "storymodel4s.story.D1aOrderingSuite",
+      "acceptingControl": "empty graph still refuses non-text ordering axis",
+      "cleanRecompile": false
+    },
+    {
+      "id": "trajectory-propagates-refusal",
+      "path": "story/src/main/scala/storymodel4s/story/trajectory.scala",
+      "group": "boundary",
+      "rejectSuite": "storymodel4s.story.D1aTextBoundarySuite",
+      "rejectingTest": "checked trajectory derivation refuses anchored event and state support",
+      "controlSuite": "storymodel4s.story.D1aTextBoundarySuite",
+      "acceptingControl": "accepting control: checked trajectory derivation retains text transitions",
+      "cleanRecompile": false
+    },
+    {
+      "id": "visibility-discourseOrder",
+      "path": "story/src/main/scala/storymodel4s/story/graph.scala",
+      "group": "graph-probe",
+      "rejectSuite": "storymodel4s.probes.D1aGraphBoundarySuite",
+      "rejectingTest": "unbound graph discourse order is internal",
+      "controlSuite": "storymodel4s.probes.D1aGraphBoundarySuite",
+      "acceptingControl": "accepting control: external checked pre-model ordering and model reads compile",
+      "cleanRecompile": true
+    },
+    {
+      "id": "visibility-discoursePosition",
+      "path": "story/src/main/scala/storymodel4s/story/graph.scala",
+      "group": "graph-probe",
+      "rejectSuite": "storymodel4s.probes.D1aGraphBoundarySuite",
+      "rejectingTest": "unbound graph discourse position is internal",
+      "controlSuite": "storymodel4s.probes.D1aGraphBoundarySuite",
+      "acceptingControl": "accepting control: external checked pre-model ordering and model reads compile",
+      "cleanRecompile": true
+    },
+    {
+      "id": "visibility-situationsByEntity",
+      "path": "story/src/main/scala/storymodel4s/story/graph.scala",
+      "group": "graph-probe",
+      "rejectSuite": "storymodel4s.probes.D1aGraphBoundarySuite",
+      "rejectingTest": "unbound graph entity ordering is internal",
+      "controlSuite": "storymodel4s.probes.D1aGraphBoundarySuite",
+      "acceptingControl": "accepting control: external checked pre-model ordering and model reads compile",
+      "cleanRecompile": true
+    },
+    {
+      "id": "visibility-situationsByContext",
+      "path": "story/src/main/scala/storymodel4s/story/graph.scala",
+      "group": "graph-probe",
+      "rejectSuite": "storymodel4s.probes.D1aGraphBoundarySuite",
+      "rejectingTest": "unbound graph context ordering is internal",
+      "controlSuite": "storymodel4s.probes.D1aGraphBoundarySuite",
+      "acceptingControl": "accepting control: external checked pre-model ordering and model reads compile",
+      "cleanRecompile": true
+    },
+    {
+      "id": "visibility-situationsWithin",
+      "path": "story/src/main/scala/storymodel4s/story/graph.scala",
+      "group": "graph-probe",
+      "rejectSuite": "storymodel4s.probes.D1aGraphBoundarySuite",
+      "rejectingTest": "unbound graph within ordering is internal",
+      "controlSuite": "storymodel4s.probes.D1aGraphBoundarySuite",
+      "acceptingControl": "accepting control: external checked pre-model ordering and model reads compile",
+      "cleanRecompile": true
+    },
+    {
+      "id": "visibility-situationsCovering",
+      "path": "story/src/main/scala/storymodel4s/story/graph.scala",
+      "group": "graph-probe",
+      "rejectSuite": "storymodel4s.probes.D1aGraphBoundarySuite",
+      "rejectingTest": "unbound graph covering ordering is internal",
+      "controlSuite": "storymodel4s.probes.D1aGraphBoundarySuite",
+      "acceptingControl": "accepting control: external checked pre-model ordering and model reads compile",
+      "cleanRecompile": true
+    },
+    {
+      "id": "visibility-model-constructor",
+      "path": "story/src/main/scala/storymodel4s/story/model.scala",
+      "group": "constructor",
+      "rejectSuite": "storymodel4s.story.probes.D1aModelConstructorSuite",
+      "rejectingTest": "direct model constructor is private even inside the story package",
+      "controlSuite": "storymodel4s.story.probes.D1aModelConstructorSuite",
+      "acceptingControl": "accepting control: model factory is available inside the story package",
+      "cleanRecompile": true
+    },
+    {
+      "id": "visibility-model-copy",
+      "path": "story/src/main/scala/storymodel4s/story/model.scala",
+      "group": "model-probe",
+      "rejectSuite": "storymodel4s.probes.StoryModelUnforgeableSuite",
+      "rejectingTest": "external callers cannot invoke internal copy",
+      "controlSuite": "storymodel4s.probes.StoryModelUnforgeableSuite",
+      "acceptingControl": "accepting control: typed model consumer and tuple Product/Mirror compile",
+      "cleanRecompile": true
+    },
+    {
+      "id": "model-product",
+      "path": "story/src/main/scala/storymodel4s/story/model.scala",
+      "group": "model-probe",
+      "rejectSuite": "storymodel4s.probes.StoryModelUnforgeableSuite",
+      "rejectingTest": "model is not a Product",
+      "controlSuite": "storymodel4s.probes.StoryModelUnforgeableSuite",
+      "acceptingControl": "accepting control: typed model consumer and tuple Product/Mirror compile",
+      "cleanRecompile": true
+    },
+    {
+      "id": "model-mirror",
+      "path": "story/src/main/scala/storymodel4s/story/model.scala",
+      "group": "model-probe",
+      "rejectSuite": "storymodel4s.probes.StoryModelUnforgeableSuite",
+      "rejectingTest": "model has no synthesizable Product Mirror",
+      "controlSuite": "storymodel4s.probes.StoryModelUnforgeableSuite",
+      "acceptingControl": "accepting control: typed model consumer and tuple Product/Mirror compile",
+      "cleanRecompile": true
+    },
+    {
+      "id": "codec-text-ref-retention",
+      "path": "codec/src/main/scala/storymodel4s/codec/core.scala",
+      "group": "codec",
+      "rejectSuite": "storymodel4s.codec.D1aTypedSupportCodecSuite",
+      "rejectingTest": "accepting control: Text support has exact historical bytes and references",
+      "controlSuite": "storymodel4s.codec.D1aTypedSupportCodecSuite",
+      "acceptingControl": "Anchored component encodes full support and text decode refuses it",
+      "cleanRecompile": false
+    },
+    {
+      "id": "codec-anchored-payload",
+      "path": "codec/src/main/scala/storymodel4s/codec/core.scala",
+      "group": "codec",
+      "rejectSuite": "storymodel4s.codec.D1aTypedSupportCodecSuite",
+      "rejectingTest": "Anchored component encodes full support and text decode refuses it",
+      "controlSuite": "storymodel4s.codec.D1aTypedSupportCodecSuite",
+      "acceptingControl": "accepting control: Text support has exact historical bytes and references",
+      "cleanRecompile": false
+    },
+    {
+      "id": "codec-anchored-refusal",
+      "path": "codec/src/main/scala/storymodel4s/codec/core.scala",
+      "group": "codec",
+      "rejectSuite": "storymodel4s.codec.D1aTypedSupportCodecSuite",
+      "rejectingTest": "Anchored component encodes full support and text decode refuses it",
+      "controlSuite": "storymodel4s.codec.D1aTypedSupportCodecSuite",
+      "acceptingControl": "accepting control: Text support has exact historical bytes and references",
+      "cleanRecompile": false
+    },
+    {
+      "id": "codec-text-decode-retention",
+      "path": "codec/src/main/scala/storymodel4s/codec/core.scala",
+      "group": "codec",
+      "rejectSuite": "storymodel4s.codec.D1aTypedSupportCodecSuite",
+      "rejectingTest": "accepting control: Text support has exact historical bytes and references",
+      "controlSuite": "storymodel4s.codec.D1aTypedSupportCodecSuite",
+      "acceptingControl": "Anchored component encodes full support and text decode refuses it",
+      "cleanRecompile": false
+    }
+  ],
+  "boundaries": [
+    "Every visibility/Product/Mirror probe mutant receives its own storyJVM/Test/clean before testOnly.",
+    "Support enumeration for situations is deliberately redundant with checked projection; both event/state refusals run, and the projection refusal mutant separately falsifies that guard.",
+    "Text extent remains a validator law, with an accepting Draft plus violation witness. No new numeric validation is introduced.",
+    "Trajectory-only boundary evidence was already omitted at pre-S4a 5ddd9039. The new shared enumeration repairs it without changing evidence licensing.",
+    "The graph pre-sort also provides stable ID ties; reverse-ID mutation targets the observable ID ordering contract rather than claiming deletion of a redundant key changes behavior.",
+    "Full text bytes, fixture rendering and numerical trajectory behavior are additionally governed by unchanged S0/WOG/full-suite courts."
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "codeRevision": "2b33f7f332c100c0c445de917b994c2e35274a84",
+  "command": [
+    "sbt",
+    "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+    "-batch",
+    "compileAll",
+    "coreJVM/Test/compile",
+    "storyJVM/Test/compile"
+  ],
+  "exitCode": 1,
+  "cleanBefore": true,
+  "cleanAfter": true,
+  "startedEpochSeconds": 1789868951.195625,
+  "seconds": 105.73554873466492,
+  "logPath": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1a-s4a-20260919/integration-compile-2.log",
+  "logSha256": "69840931a85475f1b398505c442c1869a62699021ee95a01be1b686c0a1610dd",
+  "testTotals": [],
+  "aggregateTestCounts": {
+    "Total": 0,
+    "Passed": 0,
+    "Failed": 0,
+    "Errors": 0,
+    "Skipped": 0
+  }
+}
