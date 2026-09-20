@@ -124,7 +124,8 @@ object NarrativeConsistency:
     text.foreach { witnessed =>
       g.relations.causal.zipWithIndex.foreach { (c, i) =>
         if c.meta.status == EpistemicStatus.SurfaceExplicit then
-          val toks = c.meta.evidence.toVector.flatMap(_.spans).flatMap(ss => tokensIn(witnessed.atlas, ss))
+          val toks =
+            c.meta.evidence.toVector.flatMap(_.spans).flatMap(ss => tokensIn(witnessed.atlas, ss))
           if !toks.exists(CausalCues.contains) then
             err(
               "explicit-causal-requires-span-with-causal-cue",

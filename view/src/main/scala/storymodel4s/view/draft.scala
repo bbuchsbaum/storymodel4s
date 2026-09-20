@@ -59,11 +59,11 @@ enum DerivationRecord:
 /** The exact promotion state of a draft model, derived from its own validation outcome.
   *
   * Why unforgeable rather than a product: `promoted`, `unsatisfiedLaws` and `gapCount` stand in a
-  * derived relation to one [[TextValidationOutcome]] and one [[DerivationRecord]], so most combinations
-  * of individually lawful field values are false. A caller who could state them independently could
-  * mint a receipt reading "promoted, no unsatisfied laws" over a model with a hundred and
-  * thirty-five of them, and that receipt would survive every audit downstream. An identity is
-  * derived from what it describes, never asserted by the caller.
+  * derived relation to one [[TextValidationOutcome]] and one [[DerivationRecord]], so most
+  * combinations of individually lawful field values are false. A caller who could state them
+  * independently could mint a receipt reading "promoted, no unsatisfied laws" over a model with a
+  * hundred and thirty-five of them, and that receipt would survive every audit downstream. An
+  * identity is derived from what it describes, never asserted by the caller.
   *
   * `gapCount` is deliberately an `Option`, and `None` is not `Some(0)`: see [[DerivationRecord]].
   */

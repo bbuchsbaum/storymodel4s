@@ -25,8 +25,8 @@ enum PrimaryProjection:
       )
 
 object PrimaryProjection:
-  /** Checked primary selection. Text extent remains a validator law; native anchors are retained
-    * in their original support and are never implicitly mapped onto primary.
+  /** Checked primary selection. Text extent remains a validator law; native anchors are retained in
+    * their original support and are never implicitly mapped onto primary.
     */
   def on(bundle: SourceBundle, support: TypedSupport): Either[DomainError, PrimaryProjection] =
     (bundle.primaryAxis.kind, support) match
@@ -38,9 +38,19 @@ object PrimaryProjection:
           intervals <- checked.intervalsOn(bundle.primaryAxis.id)
         yield PrimaryProjection.Playback(bundle.primaryAxis.id, intervals)
       case (AxisKind.TextCharacter | AxisKind.EditionPlayback, _) =>
-        Left(SourceCanon.inv("projection/support-kind", "support does not match the primary coordinate kind"))
+        Left(
+          SourceCanon.inv(
+            "projection/support-kind",
+            "support does not match the primary coordinate kind"
+          )
+        )
       case _ =>
-        Left(SourceCanon.inv("projection/primary-kind", "primary projection requires TextCharacter or EditionPlayback"))
+        Left(
+          SourceCanon.inv(
+            "projection/primary-kind",
+            "primary projection requires TextCharacter or EditionPlayback"
+          )
+        )
 
 private[core] object SourceSupportChecks:
   private def invalid(rule: String, detail: String): Left[DomainError, Nothing] =

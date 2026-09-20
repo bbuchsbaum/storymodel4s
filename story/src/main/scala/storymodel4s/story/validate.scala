@@ -116,7 +116,10 @@ object StoryValidator:
   def validate(draft: TextModel[ModelStatus.Draft]): TextValidationOutcome =
     validate(draft, ValidationPolicy.default)
 
-  def validate(draft: TextModel[ModelStatus.Draft], policy: ValidationPolicy): TextValidationOutcome =
+  def validate(
+      draft: TextModel[ModelStatus.Draft],
+      policy: ValidationPolicy
+  ): TextValidationOutcome =
     val result = report(draft.model)
     TextValidationOutcome(result, if blocked(result, policy) then None else Some(draft.promoted))
 
@@ -126,7 +129,7 @@ object StoryValidator:
   private def report(model: StoryModel[?]): ValidationReport =
     val consistency = StoryModel.asText(model) match
       case Some(text) => NarrativeConsistency.check(text)
-      case None => NarrativeConsistency.checkGeneral(model)
+      case None       => NarrativeConsistency.checkGeneral(model)
     ValidationReport((check(model) ++ consistency).sortBy(v => (v.law, v.path, v.reason)))
 
   def check(model: TextModel[?]): Vector[Violation] = check(model.model)
@@ -144,14 +147,20 @@ object StoryValidator:
     val text = StoryModel.asText(m)
     val textLen = text.map(_.source.canonicalText.length)
     val surface = m.atlas match
-      case a: TextNarrativeAtlas => Some(a.atlas)
+      case a: TextNarrativeAtlas     => Some(a.atlas)
       case a: AnchoredNarrativeAtlas => a.surface.map(_.surface)
 
     // Canonical text laws require the model's own text witness.
-    text.foreach(t => SurfaceAtlas.validated(t.atlas).left.foreach(e => err("atlas.valid", "atlas", e.message)))
+    text.foreach(t =>
+      SurfaceAtlas.validated(t.atlas).left.foreach(e => err("atlas.valid", "atlas", e.message))
+    )
     def anchorsInBundle(path: String, evidence: Evidence): Unit =
-      evidence.anchors.foreach(a => EvidenceSupport.of(m.bundle, a.anchors.toVector)
-        .left.foreach(e => err("evidence.anchors-in-bundle", path, e.message)))
+      evidence.anchors.foreach(a =>
+        EvidenceSupport
+          .of(m.bundle, a.anchors.toVector)
+          .left
+          .foreach(e => err("evidence.anchors-in-bundle", path, e.message))
+      )
 
     // ids: map keys agree with node ids
     g.entities.foreach((k, e) =>
@@ -186,9 +195,12 @@ object StoryValidator:
         }
       }
     }
-    allClaims.foreach(c => c.evidence.toVector.foreach(e => anchorsInBundle(s"claims/${c.id.value}", e)))
-    (h.boundaryBeliefs ++ m.trajectory.steps.flatMap(_.boundaryBeliefs)).zipWithIndex.foreach { (belief, i) =>
-      belief.evidence.toVector.foreach(e => anchorsInBundle(s"boundaryBeliefs/$i", e))
+    allClaims.foreach(c =>
+      c.evidence.toVector.foreach(e => anchorsInBundle(s"claims/${c.id.value}", e))
+    )
+    (h.boundaryBeliefs ++ m.trajectory.steps.flatMap(_.boundaryBeliefs)).zipWithIndex.foreach {
+      (belief, i) =>
+        belief.evidence.toVector.foreach(e => anchorsInBundle(s"boundaryBeliefs/$i", e))
     }
     // resolved values: no duplicate or self alternative
     def alternativesLaw[A](path: String, r: Resolved[A]): Unit =
@@ -218,12 +230,16 @@ object StoryValidator:
     // Every support family is checked, including contexts and circumstances.
     g.supportEntries.foreach { (path, support) =>
       support match
-        case TypedSupport.Text(spans) => textLen.foreach { length =>
-          if spans.minSpan.endExclusive > length then err("support.in-text", path, "support exceeds text")
-        }
+        case TypedSupport.Text(spans) =>
+          textLen.foreach { length =>
+            if spans.minSpan.endExclusive > length then
+              err("support.in-text", path, "support exceeds text")
+          }
         case TypedSupport.Anchored(anchors) =>
-          EvidenceSupport.of(m.bundle, anchors.anchors.toVector).left.foreach(e =>
-            err("support.anchors-in-bundle", path, e.message))
+          EvidenceSupport
+            .of(m.bundle, anchors.anchors.toVector)
+            .left
+            .foreach(e => err("support.anchors-in-bundle", path, e.message))
     }
 
     // mentions map to one canonical node
@@ -431,7 +447,7 @@ object StoryValidator:
       if okMember && okParent && e.isPrimary then
         val memberSupport = e.member match
           case NarrativeMember.Situation(id) => g.situations(id).support
-          case NarrativeMember.Segment(id) => g.segments(id).support
+          case NarrativeMember.Segment(id)   => g.segments(id).support
         val member = m.projectionOf(memberSupport)
         val parent = m.projectionOf(g.segments(e.parent).support)
         (member, parent) match
@@ -439,12 +455,28 @@ object StoryValidator:
             val memberSpan = child.minSpan
             val parentSpan = enclosing.minSpan
             if !parentSpan.contains(memberSpan) then
-              err("hierarchy.member-within-parent", path, s"member span $memberSpan escapes parent span $parentSpan")
-          case (PrimaryProjection.Playback(axis, child), PrimaryProjection.Playback(parentAxis, enclosing)) =>
+              err(
+                "hierarchy.member-within-parent",
+                path,
+                s"member span $memberSpan escapes parent span $parentSpan"
+              )
+          case (
+                PrimaryProjection.Playback(axis, child),
+                PrimaryProjection.Playback(parentAxis, enclosing)
+              ) =>
             if axis != parentAxis || !child.intervals.toVector.forall(c =>
-                enclosing.intervals.toVector.exists(p => p.start <= c.start && p.endExclusive >= c.endExclusive)) then
-              err("hierarchy.member-within-parent", path, "member playback support escapes parent interval union")
-          case _ => err("hierarchy.member-within-parent", path, "incompatible primary projection kinds")
+                enclosing.intervals.toVector.exists(p =>
+                  p.start <= c.start && p.endExclusive >= c.endExclusive
+                )
+              )
+            then
+              err(
+                "hierarchy.member-within-parent",
+                path,
+                "member playback support escapes parent interval union"
+              )
+          case _ =>
+            err("hierarchy.member-within-parent", path, "incompatible primary projection kinds")
     }
     h.primary
       .groupBy(_.member)

@@ -13,6 +13,21 @@ class D1aModelConstructorSuite extends FunSuite:
       import storymodel4s.story.*
       def remake(m: StoryModel[ModelStatus.Draft]) =
         StoryModel.draft(m.atlas, m.graph, m.hierarchy, m.trajectory)
+      def text(m: TextModel[ModelStatus.Draft]) =
+        StoryModel.draftText(m.atlas, m.graph, m.hierarchy, m.trajectory)
+    """))
+
+  test("StoryText constructor is private even inside the story package"):
+    assert(!typeChecks("""
+      import storymodel4s.story.*
+      def bypass(text: StoryText) = new StoryText(text.source, text.surface, text.stream)
+    """))
+
+  test("TextModel constructor is private even inside the story package"):
+    assert(!typeChecks("""
+      import storymodel4s.story.*
+      def bypass(model: StoryModel[ModelStatus.Draft], text: StoryText) =
+        new TextModel[ModelStatus.Draft](model, text)
     """))
   test("direct model constructor is private even inside the story package"):
     assert(!typeChecks("""

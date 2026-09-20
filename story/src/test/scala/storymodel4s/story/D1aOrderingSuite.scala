@@ -87,7 +87,9 @@ class D1aOrderingSuite extends FunSuite:
     assertEquals(empty.discourseOrderOn(film), Right(Vector.empty))
 
   test("empty ordering refuses an unsupported annotation primary axis"):
-    val annotation = SourceBundle.annotationTable(Checksum.ofText("annotations"), 0L, 100L,
-      RationalTimebase.Millisecond).toOption.get
+    val annotation = SourceBundle
+      .annotationTable(Checksum.ofText("annotations"), 0L, 100L, RationalTimebase.Millisecond)
+      .toOption
+      .get
     assert(built.graph.copy(situations = Map.empty).discourseOrderOn(annotation).isLeft)
     assert(PrimaryProjection.on(annotation, TypedSupport.Text(spans(0 -> 1))).isLeft)

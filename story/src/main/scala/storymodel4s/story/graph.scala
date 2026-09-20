@@ -21,10 +21,14 @@ final case class NarrativeGraph(
   private[story] def discourseOrder(
       bundle: SourceBundle
   ): Either[DomainError, Vector[SituationId]] =
-    if bundle.primaryAxis.kind != AxisKind.TextCharacter && bundle.primaryAxis.kind != AxisKind.EditionPlayback then
+    if bundle.primaryAxis.kind != AxisKind.TextCharacter && bundle.primaryAxis.kind != AxisKind.EditionPlayback
+    then
       Left(
         DomainError
-          .InvariantViolation("graph/order/primary-kind", "ordering requires TextCharacter or EditionPlayback")
+          .InvariantViolation(
+            "graph/order/primary-kind",
+            "ordering requires TextCharacter or EditionPlayback"
+          )
       )
     else
       situations.values.toVector
