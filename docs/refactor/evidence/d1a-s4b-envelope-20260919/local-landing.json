@@ -1,0 +1,9 @@
+{
+  "providerLanded": "e174fdbe",
+  "qualifiedProvider": "9dcaf8e786207d523787d670810c28d104efe117",
+  "qualifiedSourceTest": "9a7caf45829e737e9638a23cd9176f30002a0187",
+  "consumerLanded": "b156029d95a662107c819dd2aefc80abec7d748e",
+  "status": "S4b locally landed and ordinary Mote status closed after all acceptance checks",
+  "next": "S4c",
+  "remotePush": false
+}

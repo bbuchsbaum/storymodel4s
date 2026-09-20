@@ -218,8 +218,14 @@ is complete: all 36 compiled mutants are killed, including ten separately cleane
 and visibility probes; 40 restored focused tests pass. The clean full gate passes 6,765
 executions with the same five skips across 56 tasks. Formatting, all 13 docs examples and the
 245-test migrated storyatlas4s consumer gate pass; frozen S0 values remain unchanged.
-The next sequential D1A slice is **S4b's sealed envelope, identity and checked text witness**
-(`bd-01M2TAG1GEAGXCY33P0B17QBJ1`).
+The [S4b sealed envelope, identity and checked text witness](evidence/d1a-s4b-envelope-20260919/README.md)
+is complete: 54 compiled mutants are killed, including 24 separately cleaned compile probes;
+62 restored focused tests pass. The clean full gate passes 6,927 executions with the same five
+skips across 56 tasks. Formatting, all 13 docs examples, the exact-provider 245-test consumer
+gate and 260 browser checks pass. The preserved baseline reproduces two existing smoke defects;
+the separately reviewed test-only repair changes no application behavior. S0 is unchanged.
+The next sequential D1A slice is **S4c's sealed and split AlignmentSource**
+(`bd-01M2TAGDJ5F0FEPC3XPWVDSWDH`).
 G0 as a whole remains open for infrastructure and independent preservation work;
 these engineering gates establish no accuracy or measurement-validity claim.
 
