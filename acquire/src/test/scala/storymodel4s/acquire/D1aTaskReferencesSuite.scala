@@ -22,6 +22,8 @@ class D1aTaskReferencesSuite extends FunSuite:
   test("accepting control: anchored references use bound parser surface units"):
     assert(valid.validateAgainst(atlas).isValid)
     assert(TaskReferences.empty.validateAgainst(noSurface).isValid)
+
+  test("anchored validation preserves bound surface errors and their order"):
     cases.foreach(refs => assertEquals(refs.validateAgainst(atlas), refs.validateAgainst(surface)))
 
   test("anchored references refuse missing and wrong-kind parser units"):

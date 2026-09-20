@@ -44,7 +44,7 @@ enum RejectionReason:
 
 /** Outcome of deterministic resolution for one claim (design record §94).
   *
-  * `Accepted` carries, by type, a calibrated probability *for the accepted value* and the evidence
+  * `Accepted` carries, by type, a licensed acceptance basis *for the accepted value* and the evidence
   * references from which a lawful [[storymodel4s.core.ClaimMeta]] can be built. There is no way to
   * accept a claim on a raw score, on another candidate's probability, or without evidence.
   */
@@ -198,7 +198,7 @@ object FamilyPolicy:
         )
       )
 
-  /** High-impact default: two independent agreeing providers, calibration and spans mandatory. */
+  /** High-impact default: two independent agreeing providers, a basis and direct support mandatory. */
   val Conservative: FamilyPolicy =
     new FamilyPolicy(
       Probability.unsafe(0.9),
@@ -210,7 +210,7 @@ object FamilyPolicy:
       DefaultCriticBlockThreshold
     )
 
-  /** Ordinary default: one provider, calibration and spans mandatory. */
+  /** Ordinary default: one provider, a basis and direct support mandatory. */
   val Ordinary: FamilyPolicy =
     new FamilyPolicy(
       Probability.unsafe(0.7),
@@ -222,8 +222,8 @@ object FamilyPolicy:
       DefaultCriticBlockThreshold
     )
 
-  /** Development only: uncalibrated bundles yield alternatives instead of blocking, and spans are
-    * not required. Never accepts without calibration either.
+  /** Development only: bundles lacking a basis yield alternatives instead of blocking, and direct
+    * support is not required. Never accepts without a licensed basis either.
     */
   val Development: FamilyPolicy =
     new FamilyPolicy(
@@ -300,8 +300,8 @@ final case class EvidenceBundle[A](
     bases.find(_.value == value).map(_.basis)
 
 /** Deterministic resolution (design record §94). Not a vote: provider agreement gates acceptance
-  * via `requireAgreement`, but the decision is made on structural validity, blocking findings, span
-  * evidence, and the calibrated probability of the leading value.
+  * via `requireAgreement`, but the decision is made on structural validity, blocking findings,
+  * direct support and the licensed basis of the leading value.
   */
 object Resolver:
   private final case class Candidate[A](
@@ -354,10 +354,10 @@ object Resolver:
                         ResolutionState.Rejected(RejectionReason.BelowRejectBand(p, fp.reviewBand))
                     case AcceptanceBasis.Determined(_) =>
                       // A determined value has no probability to threshold: it is accepted on
-                      // agreement and span evidence alone, or not at all.
+                      // agreement and direct support alone, or not at all.
                       accept(fp, bundle, leading, basis)
 
-  /** Acceptance once the basis has licensed it: span evidence per policy, then the evidence set. */
+  /** Acceptance once the basis has licensed it: direct support per policy, then the evidence set. */
   private def accept[A](
       fp: FamilyPolicy,
       bundle: EvidenceBundle[A],
