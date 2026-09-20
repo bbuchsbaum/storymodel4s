@@ -42,6 +42,9 @@ class StoryModelCodecSuite extends FunSuite:
     assertEquals(decoded.hypotheses, validated.hypotheses)
     assertEquals(decoded.sensoryProfiles, validated.sensoryProfiles)
     assertEquals(decoded.receipt, validated.receipt)
+    assert(decoded == validated)
+    assertEquals(decoded.hashCode, validated.hashCode)
+    assertEquals(StoryModel.asText(decoded.model), Some(decoded))
     val revalidated = StoryValidator.validate(decoded, ValidationPolicy.default).validated
     assert(revalidated.isDefined, "decoded draft must revalidate")
     assertEquals(
