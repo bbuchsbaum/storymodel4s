@@ -125,11 +125,8 @@ object TemporalLaws extends Laws:
 /** Discipline rule sets for alignment posteriors and flows. */
 /** The `SourceView` totality contract: every ref a view EXPOSES resolves through `node`.
   *
-  * Asserted over BOTH implementations, because the invariant is currently satisfied by accident in
-  * each of them and stated by neither. A violation is silent rather than loud: an unresolvable ref
-  * makes `relativeSpan` return `None`, `relativePosition` maps that to `0.0`, and `0.0` is the
-  * beginning of the discourse rather than a missing marker — so the view reports the node as
-  * occurring first and feeds that to chronology.
+  * Lookup remains total over exposed refs. Scoring position is a separate optional feature;
+  * lawful absence must remain absent even when the view declares a nonempty denominator.
   */
 object SourceViewLaws extends Laws:
 
@@ -150,11 +147,14 @@ object SourceViewLaws extends Laws:
   def total(v: SourceView): Boolean =
     exposedRefs(v).forall(r => v.node(r).isDefined)
 
-  /** The consequence that makes it matter: with a non-empty text, every exposed ref has a real
-    * discourse span, so no consumer of `relativePosition` can be handed a fabricated `0.0`.
-    */
+  /** Position presence follows the declared feature and denominator, never physical support. */
   def positionsAreMeasured(v: SourceView): Boolean =
-    v.scoringLength <= 0 || exposedRefs(v).forall(r => v.relativeSpan(r).isDefined)
+    exposedRefs(v).forall { ref =>
+      v.node(ref).exists { node =>
+        val expected = node.scoringPosition.nonEmpty && v.scoringLength > 0
+        v.relativeSpan(ref).isDefined == expected && v.measuredPosition(ref).isDefined == expected
+      }
+    }
 
   def sourceView(using
       Arbitrary[AlignGens.Case],
@@ -165,7 +165,7 @@ object SourceViewLaws extends Laws:
       None,
       "InMemorySourceView: node is total over the refs the view exposes" ->
         forAll((c: AlignGens.Case) => total(c.view)),
-      "InMemorySourceView: every exposed ref has a measured discourse span" ->
+      "InMemorySourceView: scoring-feature presence is retained" ->
         forAll((c: AlignGens.Case) => positionsAreMeasured(c.view)),
       "StorySourceView: node is total over the refs the view exposes" ->
         forAll { (b: StorySmall.Built) =>
@@ -174,7 +174,7 @@ object SourceViewLaws extends Laws:
             .validated
             .forall(m => total(bridge.StorySourceView.validated(m)))
         },
-      "StorySourceView: every exposed ref has a measured discourse span" ->
+      "StorySourceView: scoring-feature presence is retained" ->
         forAll { (b: StorySmall.Built) =>
           StoryValidator
             .validate(b.draft(), ValidationPolicy.strict)

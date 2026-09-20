@@ -478,6 +478,32 @@ class WogDiagnosticSuite extends FunSuite:
     }
   }
 
+  test("present inferred anchor without scoring feature stays eligible missing") {
+    val original = routeCase("missing-scoring-position", Vector(leafRefs(0), leafRefs(1)))
+    val inferred = leafRefs(2)
+    val refs = Vector(Some(inferred), Some(inferred))
+    val control = Metrics.observe(original, resultFor(original, refs))
+    assert(control.byMetric(Metrics.Names.routeSupportMidpointDirection)(1).observation
+      .isInstanceOf[MetricObservation.Observed])
+    val edges = RelationLayer.values.toVector.map { layer =>
+      layer -> original.view.adjacency(layer).toVector.flatMap { (from, row) =>
+        row.toVector.map { (to, weight) => (from, to, weight) }
+      }
+    }.toMap
+    val view = InMemorySourceView(original.view.nodes.map { node =>
+      if node.ref == inferred then node.copy(scoringPosition = None) else node
+    }, edges, original.view.worldOrder, original.view.scoringLength)
+    val c = original.copy(view = view)
+    assert(c.gold(c.recall.ordered.head.id).flatMap(_.primary).flatMap(g => view.measuredPosition(g.node)).nonEmpty)
+    val observations = Metrics.observe(c, resultFor(c, refs))
+    assertEquals(observations.byMetric(Metrics.Names.routeSupportMidpointDirection)(1).observation,
+      MetricObservation.Missing(MissingReason.AllMissing))
+    val aggregate = Metrics.aggregate(Metrics.Names.routeSupportMidpointDirection,
+      Vector(observations), Vector(c.inputChecksum), seed = 1L)
+    assertEquals(aggregate.coverage.eligible, 1)
+    assertEquals(aggregate.coverage.observed, 0)
+  }
+
   test("an Unranked route step is eligible missing, never ineligible") {
     val c = WogDiagnostic.fullRecallCase
     val candidates = Candidates(

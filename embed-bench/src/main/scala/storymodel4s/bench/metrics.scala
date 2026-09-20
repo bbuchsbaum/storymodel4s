@@ -353,13 +353,17 @@ object Metrics:
                         currentRow.externalMass(ExternalState.Unranked) > 0.0 =>
                     MetricObservation.Missing(MissingReason.ProviderAbstained)
                   case (Some(previousRow), Some(currentRow)) =>
-                    val agreement =
-                      for
-                        ip <- mapAnchor(previousRow).flatMap(positionOf)
-                        ic <- mapAnchor(currentRow).flatMap(positionOf)
-                      yield ind(stepDirection(gp, gc) == stepDirection(ip, ic))
-                    MetricObservation.fromOption(agreement)
+                    (mapAnchor(previousRow), mapAnchor(currentRow)) match
+                      case (Some(previous), Some(current)) =>
+                        (positionOf(previous), positionOf(current)) match
+                          case (Some(ip), Some(ic)) =>
+                            MetricObservation.observed(ind(stepDirection(gp, gc) == stepDirection(ip, ic)))
+                          case _ => MetricObservation.Missing(MissingReason.AllMissing)
+                      case _ => MetricObservation.Ineligible
                   case _ => MetricObservation.Ineligible
+              case _ if c.gold(prev.id).flatMap(_.primary).nonEmpty &&
+                  c.gold(u.id).flatMap(_.primary).nonEmpty =>
+                MetricObservation.Missing(MissingReason.AllMissing)
               case _ => MetricObservation.Ineligible
         UnitObservation(u.id, observation)
       }

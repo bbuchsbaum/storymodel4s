@@ -44,11 +44,26 @@ class LawsSuite extends DisciplineSuite:
     assert(!SourceViewLaws.total(Foil), "the totality law must REJECT this view")
     assert(!SourceViewLaws.positionsAreMeasured(Foil), "the span law must REJECT this view")
 
-    // And this is why the contract is load-bearing rather than tidy: the violation is silent.
-    // Nothing throws; the phantom is simply reported as occurring at the very start of the
-    // discourse, which is a real position and indistinguishable from a measured one.
+    // Missing lookup remains absent; it must not become a measured zero.
     assertEquals(Foil.relativeSpan(phantom), None)
     assertEquals(Foil.measuredPosition(phantom), None)
+  }
+
+  test("source-view laws accept exact film support without a scoring-position feature") {
+    import storymodel4s.align.*
+    import storymodel4s.core.*
+    import storymodel4s.recall.{ModalityTag, PolarityTag}
+    val bundle = SourceBundle.filmEdition(EditionId.unsafe("law-film"), Checksum.ofText("picture"),
+      0L, 100L, RationalTimebase.Millisecond).toOption.get
+    val evidence = EvidenceSupport.of(bundle, Vector(EvidenceAnchor.MediaPoint(bundle.id,
+      bundle.streams.head.id, PlaybackInstant.on(bundle.primaryAxis, 25L).toOption.get))).toOption.get
+    val node = NodeSummary.typed(SourceNodeRef.Situation(SituationId.unsafe("point")), 0, None, 0,
+      TypedSupport.Anchored(evidence), None, None, Vector.empty, ContextTag.NarratedWorld,
+      PolarityTag.Unknown, ModalityTag.Unknown, Vector.empty, Set.empty)
+    val view = InMemorySourceView(Vector(node), Map.empty, None, 100)
+    assert(SourceViewLaws.total(view))
+    assert(SourceViewLaws.positionsAreMeasured(view))
+    assertEquals(view.measuredPosition(node.ref), None)
   }
 
   test("HsmmResult, rows, matrices, and admissibility cannot be constructed outside align") {
