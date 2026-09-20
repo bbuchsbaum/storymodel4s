@@ -13,7 +13,7 @@ class FeatureMaterializerSuite extends FunSuite:
   private val draft = CodecFixture.draft
   private val sequence = SurfaceSequence(draft.atlas)
   private val resolver =
-    SupportResolver(sequence, situation = id => draft.graph.situations.get(id).map(_.support))
+    SupportResolver(sequence, situation = id => draft.graph.situations.get(id).flatMap(_.support.textSpans))
 
   private def tracks(m: LexicalMeasure): Vector[FeatureTrack[? <: FeatureTarget, Double]] =
     val raw = TokenTracks.measure(sequence, m).fold(e => fail(e.message), identity)

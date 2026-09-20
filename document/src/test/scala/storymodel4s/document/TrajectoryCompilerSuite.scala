@@ -663,7 +663,7 @@ class TrajectoryCompilerSuite extends FunSuite:
     assertEquals(circumstances.head.label, "then")
     // The circumstance carries its own words, and the entity layer is exactly the size it is
     // without it: recording a time never adds a referent.
-    assert(circumstances.head.support.refs.toVector.nonEmpty)
+    assert(circumstances.head.support.textSpans.get.refs.toVector.nonEmpty)
     assertEquals(with_.draft.graph.entities.size, without.draft.graph.entities.size)
     assertEquals(with_.draft.graph.relations.participants.size, 2)
   }

@@ -101,8 +101,8 @@ class WarOfTheGhostsCodexCompilerSuite extends ScalaCheckSuite:
       SpanSet.one(featureModel.atlas.byId(id).span)
     case FeatureTarget.SurfaceUnit(id) =>
       SpanSet.one(featureModel.atlas.byId(id).span)
-    case FeatureTarget.Situation(id) => featureModel.graph.situations(id).support
-    case FeatureTarget.Segment(id)   => featureModel.graph.segments(id).support
+    case FeatureTarget.Situation(id) => featureModel.graph.situations(id).support.textSpans.get
+    case FeatureTarget.Segment(id)   => featureModel.graph.segments(id).support.textSpans.get
     case other                       => fail(s"unexpected target $other")
 
   private val relationLayers = Set(
@@ -545,7 +545,7 @@ class WarOfTheGhostsCodexCompilerSuite extends ScalaCheckSuite:
     assert(!support.isContiguous)
     assertEquals(placement.support, support)
     assertEquals(placement.xExtents, support.spans)
-    assertNotEquals(placement.xExtents.toVector, Vector(support.textSpans.get.minSpan))
+    assertNotEquals(placement.xExtents.toVector, Vector(support.minSpan))
     assert(!scene.marks.exists(_.address == placement.address))
     assert(scene.textualTwin.contains(placement.address.render))
 

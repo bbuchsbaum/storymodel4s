@@ -370,14 +370,14 @@ class ValidatorSuite extends ScalaCheckSuite:
       case SituationNode.Event(n) =>
         SituationNode.Event(
           n.copy(
-            support = far,
+            support = TypedSupport.Text(far),
             meta = Small.meta("far", EpistemicStatus.SurfaceExplicit, Some(far))
           )
         )
       case SituationNode.State(n) =>
         SituationNode.State(
           n.copy(
-            support = far,
+            support = TypedSupport.Text(far),
             meta = Small.meta("far", EpistemicStatus.SurfaceExplicit, Some(far))
           )
         )

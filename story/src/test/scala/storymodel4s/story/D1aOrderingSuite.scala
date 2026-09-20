@@ -53,7 +53,7 @@ class D1aOrderingSuite extends FunSuite:
   test("out-of-text support is admitted as Draft and diagnosed by validation"):
     val length = built.source.canonicalText.length
     val model = draft(graph(Vector(spans(0 -> 1), spans(1 -> 2), spans((length + 1) -> (length + 2)))))
-    assert(StoryValidator.validate(model).report.violations.exists(_.law == "span.in-source"))
+    assert(StoryValidator.validate(model).report.violations.exists(_.law == "support.in-text"))
 
   test("empty graph still refuses non-text ordering axis"):
     val film = SourceBundle.filmEdition(EditionId.unsafe("order-film"), Checksum.ofText("film"),

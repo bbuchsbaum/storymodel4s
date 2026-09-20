@@ -279,11 +279,11 @@ class ReviewFixesSuite extends ScalaCheckSuite:
     assertEquals(out.report.errors, Vector.empty)
     assertEquals(out.report.warnings.map(_.law), Vector("hypothesis-subject-explicit"))
     val noAlt = good.copy(reading = good.reading.copy(alternatives = Vector.empty))
-    assert(laws(draft.copy(hypotheses = Vector(noAlt)).fold(error => fail(error.message), identity)).contains("hypothesis.has-alternatives"))
+    assert(laws(draft.copy[ModelStatus.Draft](hypotheses = Vector(noAlt)).fold(error => fail(error.message), identity)).contains("hypothesis.has-alternatives"))
     val wrongStatus = good.copy(reading =
       good.reading.copy(meta = Small.meta("h2", EpistemicStatus.SurfaceExplicit, Some(sp(b, 0))))
     )
-    assert(laws(draft.copy(hypotheses = Vector(wrongStatus)).fold(error => fail(error.message), identity)).contains("hypothesis.status"))
+    assert(laws(draft.copy[ModelStatus.Draft](hypotheses = Vector(wrongStatus)).fold(error => fail(error.message), identity)).contains("hypothesis.status"))
   }
 
   // --- narrative consistency ----------------------------------------------------------------------------
@@ -309,7 +309,7 @@ class ReviewFixesSuite extends ScalaCheckSuite:
         SituationNode.Event(
           n.copy(
             id = b.situations(1),
-            support = sp(b, 1),
+            support = TypedSupport.Text(sp(b, 1)),
             mentions = NonEmptyVector.one(MentionId.unsafe[SituationK]("m:dup")),
             meta = Small.meta("dup", EpistemicStatus.SurfaceExplicit, Some(sp(b, 1)))
           )
