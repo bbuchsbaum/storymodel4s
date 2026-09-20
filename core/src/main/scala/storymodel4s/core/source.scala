@@ -1093,7 +1093,8 @@ object SourceBundle:
       }
     }
 
-  /** Derive a proposed edition axis from an exact stream inventory; `of` checks the final bundle. */
+  /** Derive a proposed edition axis from an exact stream inventory; `of` checks the final bundle.
+    */
   def editionPlaybackAxis(
       edition: EditionId,
       streams: Vector[SourceStream],
@@ -1102,7 +1103,13 @@ object SourceBundle:
       endExclusive: Long,
       timebase: RationalTimebase
   ): Either[DomainError, PresentationAxis] =
-    computeId(Some(edition), SourceKind.FilmEdition, streams, AxisKind.EditionPlayback, authorityTracks)
+    computeId(
+      Some(edition),
+      SourceKind.FilmEdition,
+      streams,
+      AxisKind.EditionPlayback,
+      authorityTracks
+    )
       .flatMap(id => PresentationAxis.editionPlayback(id, edition, start, endExclusive, timebase))
 
   def writtenText(source: StorySource): Either[DomainError, SourceBundle] =
@@ -1295,21 +1302,21 @@ enum EvidenceAnchor:
   def axisId: Option[PresentationAxisId] = this match
     case EvidenceAnchor.Text(_, _, _)            => None
     case EvidenceAnchor.MediaTime(_, _, axis, _) => Some(axis)
-    case EvidenceAnchor.MediaPoint(_, _, at) => Some(at.axis)
+    case EvidenceAnchor.MediaPoint(_, _, at)     => Some(at.axis)
     case EvidenceAnchor.Shot(_, _, _, interval)  => Some(interval.axis)
     case EvidenceAnchor.Track(_, _, _, ivs)      => Some(ivs.axis)
 
   def anchorBundle: SourceBundleId = this match
     case EvidenceAnchor.Text(b, _, _)         => b
     case EvidenceAnchor.MediaTime(b, _, _, _) => b
-    case EvidenceAnchor.MediaPoint(b, _, _) => b
+    case EvidenceAnchor.MediaPoint(b, _, _)   => b
     case EvidenceAnchor.Shot(b, _, _, _)      => b
     case EvidenceAnchor.Track(b, _, _, _)     => b
 
   def anchorStream: StreamId = this match
     case EvidenceAnchor.Text(_, s, _)         => s
     case EvidenceAnchor.MediaTime(_, s, _, _) => s
-    case EvidenceAnchor.MediaPoint(_, s, _) => s
+    case EvidenceAnchor.MediaPoint(_, s, _)   => s
     case EvidenceAnchor.Shot(_, s, _, _)      => s
     case EvidenceAnchor.Track(_, s, _, _)     => s
 
@@ -1321,16 +1328,19 @@ final class EvidenceSupport private (
   /** Recheck the complete bundle binding before joining this support to a model or atlas. */
   def checkedOn(bundle: SourceBundle): Either[DomainError, EvidenceSupport] =
     if bundle.identity != bundleIdentity then
-      Left(SourceCanon.inv("support/bundle-identity", "support belongs to a different full bundle identity"))
+      Left(
+        SourceCanon
+          .inv("support/bundle-identity", "support belongs to a different full bundle identity")
+      )
     else EvidenceSupport.of(bundle, anchors.toVector)
 
   /** Complete primary-axis support, retaining both explicit points and interval gaps. */
   def playbackOn(axis: PresentationAxisId): Either[DomainError, PlaybackSupport] =
     val intervals = anchors.toVector.flatMap {
-      case EvidenceAnchor.MediaTime(_, _, a, set) if a == axis => set.intervals.toVector
+      case EvidenceAnchor.MediaTime(_, _, a, set) if a == axis             => set.intervals.toVector
       case EvidenceAnchor.Shot(_, _, _, interval) if interval.axis == axis => Vector(interval)
-      case EvidenceAnchor.Track(_, _, _, set) if set.axis == axis => set.intervals.toVector
-      case _ => Vector.empty
+      case EvidenceAnchor.Track(_, _, _, set) if set.axis == axis          => set.intervals.toVector
+      case _                                                               => Vector.empty
     }
     val points = anchors.toVector.collect {
       case EvidenceAnchor.MediaPoint(_, _, at) if at.axis == axis => at
@@ -1353,16 +1363,24 @@ final class EvidenceSupport private (
       case EvidenceAnchor.Track(_, _, _, set) if set.axis == axis          => set.intervals.toVector
     }.flatten
     if anchors.toVector.exists {
-      case EvidenceAnchor.MediaPoint(_, _, at) => at.axis == axis
-      case _ => false
-    } then Left(SourceCanon.inv("support/hull-point", "point-bearing support has no interval-only hull; use playbackOn"))
-    else NonEmptyVector.fromVector(ivs) match
-      case None =>
-        Left(SourceCanon.inv("support/hull", "no intervals on the requested axis"))
-      case Some(nev) =>
-        val start = nev.toVector.map(_.start).min
-        val end = nev.toVector.map(_.endExclusive).max
-        Right(new PlaybackInterval(axis, start, end))
+        case EvidenceAnchor.MediaPoint(_, _, at) => at.axis == axis
+        case _                                   => false
+      }
+    then
+      Left(
+        SourceCanon.inv(
+          "support/hull-point",
+          "point-bearing support has no interval-only hull; use playbackOn"
+        )
+      )
+    else
+      NonEmptyVector.fromVector(ivs) match
+        case None =>
+          Left(SourceCanon.inv("support/hull", "no intervals on the requested axis"))
+        case Some(nev) =>
+          val start = nev.toVector.map(_.start).min
+          val end = nev.toVector.map(_.endExclusive).max
+          Right(new PlaybackInterval(axis, start, end))
 
   /** A canonical interval union on exactly the requested axis; gaps are retained. */
   def intervalsOn(axis: PresentationAxisId): Either[DomainError, PlaybackIntervalSet] =
@@ -1394,8 +1412,9 @@ final class EvidenceSupport private (
     sets.reduceOption(_ ++ _)
 
   override def equals(other: Any): Boolean = other match
-    case that: EvidenceSupport => anchors.toVector == that.anchors.toVector && bundleIdentity == that.bundleIdentity
-    case _                     => false
+    case that: EvidenceSupport =>
+      anchors.toVector == that.anchors.toVector && bundleIdentity == that.bundleIdentity
+    case _ => false
   override def hashCode(): Int = (anchors.toVector, bundleIdentity).hashCode()
   override def toString: String = s"EvidenceSupport(${anchors.length})"
 

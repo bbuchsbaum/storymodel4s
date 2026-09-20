@@ -125,8 +125,8 @@ object TemporalLaws extends Laws:
 /** Discipline rule sets for alignment posteriors and flows. */
 /** The `SourceView` totality contract: every ref a view EXPOSES resolves through `node`.
   *
-  * Lookup remains total over exposed refs. Scoring position is a separate optional feature;
-  * lawful absence must remain absent even when the view declares a nonempty denominator.
+  * Lookup remains total over exposed refs. Scoring position is a separate optional feature; lawful
+  * absence must remain absent even when the view declares a nonempty denominator.
   */
 object SourceViewLaws extends Laws:
 

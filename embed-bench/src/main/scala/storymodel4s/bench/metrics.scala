@@ -353,10 +353,16 @@ object Metrics:
                   case (Some(previousRow), Some(currentRow)) =>
                     (mapAnchor(previousRow), mapAnchor(currentRow)) match
                       case (Some(previous), Some(current)) =>
-                        (view.measuredPosition(goldPrevious), view.measuredPosition(goldCurrent),
-                          view.measuredPosition(previous), view.measuredPosition(current)) match
+                        (
+                          view.measuredPosition(goldPrevious),
+                          view.measuredPosition(goldCurrent),
+                          view.measuredPosition(previous),
+                          view.measuredPosition(current)
+                        ) match
                           case (Some(gp), Some(gc), Some(ip), Some(ic)) =>
-                            MetricObservation.observed(ind(stepDirection(gp, gc) == stepDirection(ip, ic)))
+                            MetricObservation.observed(
+                              ind(stepDirection(gp, gc) == stepDirection(ip, ic))
+                            )
                           case _ => MetricObservation.Missing(MissingReason.AllMissing)
                       case _ => MetricObservation.Ineligible
                   case _ => MetricObservation.Ineligible
@@ -413,11 +419,17 @@ object Metrics:
                     MetricObservation.Missing(MissingReason.ProviderAbstained)
                   case (Some(previousRow), Some(currentRow)) =>
                     (
-                      positionOf(goldPreviousRef), positionOf(goldCurrentRef),
+                      positionOf(goldPreviousRef),
+                      positionOf(goldCurrentRef),
                       mapAnchor(previousRow).flatMap(positionOf),
                       mapAnchor(currentRow).flatMap(positionOf)
                     ) match
-                      case (Some(goldPrevious), Some(goldCurrent), Some(inferredPrevious), Some(inferredCurrent)) =>
+                      case (
+                            Some(goldPrevious),
+                            Some(goldCurrent),
+                            Some(inferredPrevious),
+                            Some(inferredCurrent)
+                          ) =>
                         val goldDistance = math.abs(goldCurrent - goldPrevious)
                         val inferredDistance = math.abs(inferredCurrent - inferredPrevious)
                         MetricObservation.observed(

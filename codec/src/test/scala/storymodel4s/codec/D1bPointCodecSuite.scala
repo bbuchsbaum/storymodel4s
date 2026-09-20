@@ -6,11 +6,20 @@ import storymodel4s.core.*
 import CoreCodecs.given
 
 class D1bPointCodecSuite extends FunSuite:
-  private def bundle(timebase: RationalTimebase) = SourceBundle.filmEdition(
-    EditionId.unsafe("point-wire"), Checksum.ofText("picture"), 0L, 100L, timebase).toOption.get
-  private def support(b: SourceBundle) = EvidenceSupport.of(b, Vector(
-    EvidenceAnchor.MediaPoint(b.id, b.streams.head.id,
-      PlaybackInstant.on(b.primaryAxis, 25L).toOption.get))).toOption.get
+  private def bundle(timebase: RationalTimebase) = SourceBundle
+    .filmEdition(EditionId.unsafe("point-wire"), Checksum.ofText("picture"), 0L, 100L, timebase)
+    .toOption
+    .get
+  private def support(b: SourceBundle) = EvidenceSupport
+    .of(
+      b,
+      Vector(
+        EvidenceAnchor
+          .MediaPoint(b.id, b.streams.head.id, PlaybackInstant.on(b.primaryAxis, 25L).toOption.get)
+      )
+    )
+    .toOption
+    .get
 
   test("accepting control: point component records exact point and full binding"):
     val b = bundle(RationalTimebase.Millisecond)
@@ -26,10 +35,22 @@ class D1bPointCodecSuite extends FunSuite:
   test("same legacy id with changed full binding has distinct point component bytes"):
     val a = bundle(RationalTimebase.Millisecond)
     val first = a.streams.head
-    val changed = SourceStream.of(first.id, first.kind, first.checksum, first.nativeAxis,
-      first.extent, first.timebase, Vector(StreamId.unsafe("upstream-receipt"))).toOption.get
-    val b = SourceBundle.of(a.edition, a.sourceKind, Vector(changed), a.primaryAxis,
-      a.authorityTracks, a.mappings).toOption.get
+    val changed = SourceStream
+      .of(
+        first.id,
+        first.kind,
+        first.checksum,
+        first.nativeAxis,
+        first.extent,
+        first.timebase,
+        Vector(StreamId.unsafe("upstream-receipt"))
+      )
+      .toOption
+      .get
+    val b = SourceBundle
+      .of(a.edition, a.sourceKind, Vector(changed), a.primaryAxis, a.authorityTracks, a.mappings)
+      .toOption
+      .get
     assertEquals(a.id, b.id)
     assertEquals(a.primaryAxis.id, b.primaryAxis.id)
     assertEquals(support(a).anchors.toVector, support(b).anchors.toVector)

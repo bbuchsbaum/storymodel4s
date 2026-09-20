@@ -271,11 +271,17 @@ class SherlockAnnotationsSuite extends FunSuite:
     assertEquals(model.rows.keySet, (1 to 6).toSet)
     assertEquals(model.atlas.units.size, 8)
     val point = model.rows(3).support
-    assertEquals(point.anchors.toVector.collect { case EvidenceAnchor.MediaPoint(_, _, at) =>
-      (at.axis, at.at)
-    }, Vector((input.partABundle.primaryAxis.id, 50000L), (primary.id, 50000L)))
+    assertEquals(
+      point.anchors.toVector.collect { case EvidenceAnchor.MediaPoint(_, _, at) =>
+        (at.axis, at.at)
+      },
+      Vector((input.partABundle.primaryAxis.id, 50000L), (primary.id, 50000L))
+    )
     val secondRun = model.rows(5).support
-    assertEquals(secondRun.intervalsOn(input.partBBundle.primaryAxis.id).toOption.get.intervals.head.start, 0L)
+    assertEquals(
+      secondRun.intervalsOn(input.partBBundle.primaryAxis.id).toOption.get.intervals.head.start,
+      0L
+    )
     assertEquals(secondRun.intervalsOn(primary.id).toOption.get.intervals.head.start, 76000L)
     val scene = model.scenes(1).support.playbackOn(primary.id).toOption.get
     assertEquals(scene.intervals.map(i => (i.start, i.endExclusive)), Vector((0L, 75000L)))
@@ -286,11 +292,64 @@ class SherlockAnnotationsSuite extends FunSuite:
   test("a point-only scene remains a point-only checked proposal unit") {
     def label(row: String, name: String): String =
       row.split("\t", -1).updated(5, name).mkString("\t")
-    val rows = fixtureRows.updated(2, label(fixtureRows(2), "2. Instant"))
+    val rows = fixtureRows
+      .updated(2, label(fixtureRows(2), "2. Instant"))
       .updated(3, label(fixtureRows(3), "3. Switch"))
     val input = parseFixture(rows).fold(e => fail(e.message), identity)
     val model = SherlockSourceAtlas.of(input).fold(e => fail(e.message), identity)
-    val pointScene = model.scenes(2).support.playbackOn(model.atlas.bundle.primaryAxis.id).toOption.get
+    val pointScene =
+      model.scenes(2).support.playbackOn(model.atlas.bundle.primaryAxis.id).toOption.get
     assertEquals(pointScene.intervals, Vector.empty)
     assertEquals(pointScene.points.map(_.at), Vector(50000L))
+  }
+
+  test("scene union preserves the genuine gap between part extents") {
+    val rows = fixtureRows.updated(4, fixtureRows(4).split("\t", -1).updated(5, "").mkString("\t"))
+    val input = parseFixture(rows).fold(e => fail(e.message), identity)
+    val model = SherlockSourceAtlas.of(input).fold(e => fail(e.message), identity)
+    val support = model.scenes(1).support.playbackOn(model.atlas.bundle.primaryAxis.id).toOption.get
+    assertEquals(support.intervals.map(i => (i.start, i.endExclusive)),
+      Vector((0L, 75000L), (76000L, 106000L)))
+    assertEquals(support.points.map(_.at), Vector(50000L))
+  }
+
+  test("composition receipt binds the exact admitted record annotation and ordered part identities") {
+    val input = parsed
+    val model = SherlockSourceAtlas.of(input).fold(e => fail(e.message), identity)
+    val expected = Vector(input.repairRecord.checksum, input.manifest.annotationSha256,
+      input.partABundle.identity, input.partBBundle.identity)
+    model.compositions.values.foreach { mapping =>
+      assertEquals(mapping.receipt.algorithm, "sherlock/presentation-composition/v1")
+      assertEquals(mapping.receipt.inputChecksums, expected)
+    }
+  }
+
+  test("different admitted part rates use exact LCM ticks for both native and primary support") {
+    val bytes = bytesOf(fixtureRows)
+    def playback(json: io.circe.Json): io.circe.Json = json.mapObject(_
+      .add("timeBase", io.circe.Json.fromString("1/1000"))
+      .add("ticksPerSecond", io.circe.Json.fromLong(1000L))
+      .add("ticksPerFrame", io.circe.Json.fromLong(40L))
+      .add("durationTicks", io.circe.Json.fromLong(12000L)))
+    val changed = recordFor(bytes).document.hcursor
+      .downField("coordinateSystems").downN(7).withFocus(playback).top.get.hcursor
+      .downField("presentationEditionIdentity").downField("parts").downN(1)
+      .downField("video").withFocus(playback).top.get.hcursor
+      .downField("annotationToPlaybackCrosswalk").downField("runs").downN(1)
+      .downField("playbackEndTicks").withFocus(_ => io.circe.Json.fromLong(12000L)).top.get
+    val record = TimebaseRepair.parse(changed.noSpaces).fold(e => fail(e.message), identity)
+    val input = SherlockAnnotations.parse(bytes, record).fold(e => fail(e.message), identity)
+    val model = SherlockSourceAtlas.of(input).fold(e => fail(e.message), identity)
+    val axis = model.atlas.bundle.primaryAxis
+    assertEquals(axis.timebase, Some(RationalTimebase.of(1L, 5000L).toOption.get))
+    assertEquals(axis.extent.asInstanceOf[AxisExtent.PlaybackTicks].endExclusive, 212000L)
+    val a = model.rows(1).support
+    assertEquals(a.intervalsOn(input.partABundle.primaryAxis.id).toOption.get.intervals.head.endExclusive, 25000L)
+    assertEquals(a.intervalsOn(axis.id).toOption.get.intervals.head.endExclusive, 50000L)
+    assertEquals(model.rows(3).support.playbackOn(axis.id).toOption.get.points.map(_.at), Vector(100000L))
+    val b = model.rows(6).support
+    val native = b.intervalsOn(input.partBBundle.primaryAxis.id).toOption.get.intervals.head
+    val primary = b.intervalsOn(axis.id).toOption.get.intervals.head
+    assertEquals((native.start, native.endExclusive), (5000L, 12000L))
+    assertEquals((primary.start, primary.endExclusive), (177000L, 212000L))
   }

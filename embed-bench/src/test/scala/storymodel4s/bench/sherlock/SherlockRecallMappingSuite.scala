@@ -70,12 +70,16 @@ class SherlockRecallMappingSuite extends FunSuite:
   private val typedFingerprint =
     "22f1876667a455c2f5e72d2575dafa5325c8f82c79e210c3ebaf1df9d93577f8"
 
-  test("legacy scoring text view retains its frozen v1 fingerprint while physical support differs") {
+  test(
+    "legacy scoring text view retains its frozen v1 fingerprint while physical support differs"
+  ) {
     val built = view(atlas)
     val legacy = built.view.copy(nodes = built.view.nodes.map { node =>
       val spans = node.scoringPosition.get.spans
-      node.copy(support = TypedSupport.Text(spans),
-        scoringPosition = Some(ScoringPosition.CanonicalText(spans)))
+      node.copy(
+        support = TypedSupport.Text(spans),
+        scoringPosition = Some(ScoringPosition.CanonicalText(spans))
+      )
     })
     assertEquals(ViewFingerprint.of(legacy).toString, fingerprintBeforeDeclaration)
     assertEquals(ViewFingerprint.of(built.view).toString, typedFingerprint)
@@ -124,7 +128,11 @@ class SherlockRecallMappingSuite extends FunSuite:
     assertEquals(built.view.maxLevel, 1)
     assert(built.sourceAtlas.nonEmpty)
     assert(built.view.nodes.forall(_.support.isInstanceOf[TypedSupport.Anchored]))
-    assert(built.view.nodes.forall(_.scoringPosition.exists(_.isInstanceOf[ScoringPosition.LegacyAnnotationText])))
+    assert(
+      built.view.nodes.forall(
+        _.scoringPosition.exists(_.isInstanceOf[ScoringPosition.LegacyAnnotationText])
+      )
+    )
     // Every declared scoring feature still slices its own description; it is not physical support.
     atlas.rows.foreach { row =>
       val span = built.view.node(refOfRow(built, row.row)).get.scoringPosition.get.spans.minSpan
@@ -220,8 +228,10 @@ class SherlockRecallMappingSuite extends FunSuite:
     assertEquals(retained, built.view.node(pointRef).get.support)
     retained match
       case TypedSupport.Anchored(support) =>
-        assertEquals(support.anchors.toVector.collect { case EvidenceAnchor.MediaPoint(_, _, at) => at.at },
-          Vector(50000L, 50000L))
+        assertEquals(
+          support.anchors.toVector.collect { case EvidenceAnchor.MediaPoint(_, _, at) => at.at },
+          Vector(50000L, 50000L)
+        )
       case _ => fail("instant row was reduced to text support")
 
     val doorUnit = recall.ordered

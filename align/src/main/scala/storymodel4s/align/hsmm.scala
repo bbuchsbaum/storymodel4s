@@ -385,8 +385,15 @@ object HsmmResult:
     val sourceNodes = view.nodes
     val sourceIndex = sourceNodes.map(n => n.ref -> n).toMap
     val inventory: Either[AlignError, Unit] =
-      if sourceIndex.size != sourceNodes.size || sourceNodes.exists(n => view.node(n.ref) != Some(n)) then
-        Left(AlignError.InconsistentResult("source inventory has duplicate refs or disagrees with lookup"))
+      if sourceIndex.size != sourceNodes.size || sourceNodes.exists(n =>
+          view.node(n.ref) != Some(n)
+        )
+      then
+        Left(
+          AlignError.InconsistentResult(
+            "source inventory has duplicate refs or disagrees with lookup"
+          )
+        )
       else Right(())
     val rows = posterior.rows
     def close(a: Double, b: Double): Boolean = math.abs(a - b) <= Tolerance

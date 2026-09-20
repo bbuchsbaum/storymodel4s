@@ -69,7 +69,8 @@ class WorkedExampleSuite extends FunSuite:
     assert(u3.expressedUncertainty.isMarked)
     assertEquals(r.mapSource, Some(e2))
     val step = result.flow.steps(2)
-    val backward = step.sourceMass((a, b) => view.measuredPosition(b).get < view.measuredPosition(a).get)
+    val backward =
+      step.sourceMass((a, b) => view.measuredPosition(b).get < view.measuredPosition(a).get)
     assert(backward > 0.5, s"backward mass = $backward")
     assert(r.localizability(view.sourceNodeCount).exists(_ < 1.0))
   }

@@ -305,7 +305,9 @@ object AlignGens:
       "level" -> withNode(n => n.copy(level = n.level + 1)),
       "parent" -> withNode(_.copy(parent = None)),
       "discoursePosition" -> withNode(n => n.copy(discoursePosition = n.discoursePosition + 1)),
-      "support" -> withNode(_.copy(support = storymodel4s.core.TypedSupport.Text(SpanSet.one(TextSpan.unsafe(0, 1))))),
+      "support" -> withNode(
+        _.copy(support = storymodel4s.core.TypedSupport.Text(SpanSet.one(TextSpan.unsafe(0, 1))))
+      ),
       "predicate" -> withNode(_.copy(predicate = Some("zzz"))),
       "participants" -> withNode(_.copy(participants = Vector.empty)),
       "context" -> withNode(_.copy(context = ContextTag.Belief)),

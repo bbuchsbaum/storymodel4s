@@ -13,15 +13,18 @@ enum TypedSupport:
     case Text(spans) => Some(spans)
     case Anchored(_) => None
 
-/** Canonical playback union with explicit point observations. Points are retained inside intervals. */
+/** Canonical playback union with explicit point observations. Points are retained inside intervals.
+  */
 final class PlaybackSupport private (
     val axis: PresentationAxisId,
     val intervals: Vector[PlaybackInterval],
     val points: Vector[PlaybackInstant]
 ):
   def bounds: (Long, Long) =
-    ((intervals.map(_.start) ++ points.map(_.at)).min,
-      (intervals.map(_.endExclusive) ++ points.map(_.at)).max)
+    (
+      (intervals.map(_.start) ++ points.map(_.at)).min,
+      (intervals.map(_.endExclusive) ++ points.map(_.at)).max
+    )
 
   def contains(other: PlaybackSupport): Boolean =
     axis == other.axis && other.intervals.forall(c =>
@@ -29,7 +32,8 @@ final class PlaybackSupport private (
     ) && other.points.forall(p => points.contains(p) || intervals.exists(_.contains(p.at)))
 
   override def equals(other: Any): Boolean = other match
-    case that: PlaybackSupport => axis == that.axis && intervals == that.intervals && points == that.points
+    case that: PlaybackSupport =>
+      axis == that.axis && intervals == that.intervals && points == that.points
     case _ => false
   override def hashCode(): Int = (axis, intervals, points).hashCode()
   override def toString: String = s"PlaybackSupport(${axis.value}, $intervals, $points)"
@@ -45,12 +49,18 @@ object PlaybackSupport:
     else if intervals.exists(_.axis != axis) || points.exists(_.axis != axis) then
       Left(SourceCanon.inv("playback-support/axis", "support has a foreign axis"))
     else
-      val merged = intervals.sortBy(i => (i.start, i.endExclusive)).foldLeft(Vector.empty[PlaybackInterval]) {
-        (out, interval) => out.lastOption match
-          case Some(last) if interval.start <= last.endExclusive =>
-            out.init :+ new PlaybackInterval(axis, last.start, last.endExclusive.max(interval.endExclusive))
-          case _ => out :+ interval
-      }
+      val merged =
+        intervals.sortBy(i => (i.start, i.endExclusive)).foldLeft(Vector.empty[PlaybackInterval]) {
+          (out, interval) =>
+            out.lastOption match
+              case Some(last) if interval.start <= last.endExclusive =>
+                out.init :+ new PlaybackInterval(
+                  axis,
+                  last.start,
+                  last.endExclusive.max(interval.endExclusive)
+                )
+              case _ => out :+ interval
+        }
       Right(new PlaybackSupport(axis, merged, points.distinct.sortBy(_.at)))
 
 /** Support on one declared primary axis. Playback intervals retain gaps. */
@@ -60,7 +70,7 @@ enum PrimaryProjection:
 
   /** Exact hull bounds for ordering, without replacing the support's disjoint members. */
   def bounds: (Long, Long) = this match
-    case TextSpans(_, spans)    => (spans.minSpan.start.toLong, spans.minSpan.endExclusive.toLong)
+    case TextSpans(_, spans)  => (spans.minSpan.start.toLong, spans.minSpan.endExclusive.toLong)
     case Playback(_, support) => support.bounds
 
 object PrimaryProjection:
@@ -153,7 +163,10 @@ private[core] object SourceSupportChecks:
   ): Either[DomainError, Unit] =
     if axis == stream.nativeAxis then
       stream.extent match
-        case extent: AxisExtent.PlaybackTicks if intervals.forall(within(_, extent)) && points.forall(p => p.at >= extent.start && p.at < extent.endExclusive) => Right(())
+        case extent: AxisExtent.PlaybackTicks
+            if intervals.forall(within(_, extent)) && points
+              .forall(p => p.at >= extent.start && p.at < extent.endExclusive) =>
+          Right(())
         case _ => invalid("extent", "playback support escapes the selected native extent")
     else if axis != bundle.primaryAxis.id then
       invalid("stream-axis", "anchor axis does not belong to the selected stream")
@@ -170,7 +183,9 @@ private[core] object SourceSupportChecks:
       maps match
         case Vector(mapping) =>
           bundle.primaryAxis.extent match
-            case extent: AxisExtent.PlaybackTicks if intervals.forall(within(_, extent)) && points.forall(p => p.at >= extent.start && p.at < extent.endExclusive) =>
+            case extent: AxisExtent.PlaybackTicks
+                if intervals.forall(within(_, extent)) && points
+                  .forall(p => p.at >= extent.start && p.at < extent.endExclusive) =>
               if imageCovers(mapping, stream, intervals, points) then Right(())
               else
                 invalid(
@@ -209,7 +224,7 @@ private[core] object SourceSupportChecks:
           val start = Fraction(BigInt(extent.start), 1) * factor + offset
           val end = Fraction(BigInt(extent.endExclusive), 1) * factor + offset
           intervals.forall(i => start.atMost(i.start) && end.atLeast(i.endExclusive)) &&
-            points.forall(p => start.atMost(p.at) && end.greaterThan(p.at))
+          points.forall(p => start.atMost(p.at) && end.greaterThan(p.at))
         case composition: TrackComposition =>
           val segments = composition.segments.toVector
           segments.forall(segment => within(segment.source, extent)) &&

@@ -241,8 +241,11 @@ object TimedSourceView:
                   .on(axis, start, end)
                   .toOption
                   .map(iv => groupRef(g.ordinal) -> MediaLocus.Extent(partId, iv))
-              else PlaybackInstant.on(axis, start).toOption.map(at =>
-                groupRef(g.ordinal) -> MediaLocus.Instant(partId, at))
+              else
+                PlaybackInstant
+                  .on(axis, start)
+                  .toOption
+                  .map(at => groupRef(g.ordinal) -> MediaLocus.Instant(partId, at))
             }
           case _ => None
       }.toMap

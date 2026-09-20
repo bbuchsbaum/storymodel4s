@@ -286,20 +286,37 @@ object SherlockAnnotationView:
   ): Either[DomainError, TimedSourceView.Built] =
     for
       source <- SherlockSourceAtlas.of(atlas)
-      features <- TimedSourceView.build(segments(atlas), declared, axes(atlas), naming)
-        .left.map(error => DomainError.InvariantViolation("sherlock/world-order", error.message))
-      nodes <- features.view.nodes.foldLeft[Either[DomainError, Vector[storymodel4s.align.NodeSummary]]](Right(Vector.empty)) {
-        (acc, node) =>
-          val unit = features.segmentByRef.get(node.ref).flatMap(s => source.rows.get(s.ordinal))
+      features <- TimedSourceView
+        .build(segments(atlas), declared, axes(atlas), naming)
+        .left
+        .map(error => DomainError.InvariantViolation("sherlock/world-order", error.message))
+      nodes <- features.view.nodes
+        .foldLeft[Either[DomainError, Vector[storymodel4s.align.NodeSummary]]](
+          Right(Vector.empty)
+        ) { (acc, node) =>
+          val unit = features.segmentByRef
+            .get(node.ref)
+            .flatMap(s => source.rows.get(s.ordinal))
             .orElse(features.groupByRef.get(node.ref).flatMap(g => source.scenes.get(g.ordinal)))
           for
             previous <- acc
-            admitted <- unit.toRight(DomainError.InvariantViolation("sherlock/source-view", s"missing unit ${node.ref.key}"))
-            position <- node.scoringPosition.toRight(DomainError.InvariantViolation(
-              "sherlock/source-view", "legacy annotation scoring feature is absent"))
-          yield previous :+ node.copy(support = TypedSupport.Anchored(admitted.support),
-            scoringPosition = Some(ScoringPosition.LegacyAnnotationText(position.spans)))
-      }
+            admitted <- unit.toRight(
+              DomainError.InvariantViolation(
+                "sherlock/source-view",
+                s"missing unit ${node.ref.key}"
+              )
+            )
+            position <- node.scoringPosition.toRight(
+              DomainError.InvariantViolation(
+                "sherlock/source-view",
+                "legacy annotation scoring feature is absent"
+              )
+            )
+          yield previous :+ node.copy(
+            support = TypedSupport.Anchored(admitted.support),
+            scoringPosition = Some(ScoringPosition.LegacyAnnotationText(position.spans))
+          )
+        }
     yield features.copy(view = features.view.copy(nodes = nodes), sourceAtlas = Some(source.atlas))
 
 /** Terminal diagnostic: map one Sherlock recall transcript onto the two media parts.

@@ -147,7 +147,18 @@ class D1aAlignmentSourceSuite extends FunSuite:
           assertEquals(source.evidenceOf(node), Some(support))
           assertEquals(
             source.primaryOf(node),
-            Some(PrimaryProjection.Playback(bundle.primaryAxis.id, right(PlaybackSupport.of(bundle.primaryAxis.id, primary.intervals.toVector, Vector.empty))))
+            Some(
+              PrimaryProjection.Playback(
+                bundle.primaryAxis.id,
+                right(
+                  PlaybackSupport.of(
+                    bundle.primaryAxis.id,
+                    primary.intervals.toVector,
+                    Vector.empty
+                  )
+                )
+              )
+            )
           )
         }
       }

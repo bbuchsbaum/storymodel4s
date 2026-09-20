@@ -26,4 +26,8 @@ class D1bPlaybackSupportBoundarySuite extends FunSuite:
       import storymodel4s.core.PlaybackSupport
       def product(s: PlaybackSupport): Product = s
     """).nonEmpty)
-    assert(typeCheckErrors("summon[scala.deriving.Mirror.ProductOf[storymodel4s.core.PlaybackSupport]]").nonEmpty)
+    assert(
+      typeCheckErrors(
+        "summon[scala.deriving.Mirror.ProductOf[storymodel4s.core.PlaybackSupport]]"
+      ).nonEmpty
+    )

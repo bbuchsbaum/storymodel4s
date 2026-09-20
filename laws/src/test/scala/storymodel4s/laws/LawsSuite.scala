@@ -53,13 +53,44 @@ class LawsSuite extends DisciplineSuite:
     import storymodel4s.align.*
     import storymodel4s.core.*
     import storymodel4s.recall.{ModalityTag, PolarityTag}
-    val bundle = SourceBundle.filmEdition(EditionId.unsafe("law-film"), Checksum.ofText("picture"),
-      0L, 100L, RationalTimebase.Millisecond).toOption.get
-    val evidence = EvidenceSupport.of(bundle, Vector(EvidenceAnchor.MediaPoint(bundle.id,
-      bundle.streams.head.id, PlaybackInstant.on(bundle.primaryAxis, 25L).toOption.get))).toOption.get
-    val node = NodeSummary.typed(SourceNodeRef.Situation(SituationId.unsafe("point")), 0, None, 0,
-      TypedSupport.Anchored(evidence), None, None, Vector.empty, ContextTag.NarratedWorld,
-      PolarityTag.Unknown, ModalityTag.Unknown, Vector.empty, Set.empty)
+    val bundle = SourceBundle
+      .filmEdition(
+        EditionId.unsafe("law-film"),
+        Checksum.ofText("picture"),
+        0L,
+        100L,
+        RationalTimebase.Millisecond
+      )
+      .toOption
+      .get
+    val evidence = EvidenceSupport
+      .of(
+        bundle,
+        Vector(
+          EvidenceAnchor.MediaPoint(
+            bundle.id,
+            bundle.streams.head.id,
+            PlaybackInstant.on(bundle.primaryAxis, 25L).toOption.get
+          )
+        )
+      )
+      .toOption
+      .get
+    val node = NodeSummary.typed(
+      SourceNodeRef.Situation(SituationId.unsafe("point")),
+      0,
+      None,
+      0,
+      TypedSupport.Anchored(evidence),
+      None,
+      None,
+      Vector.empty,
+      ContextTag.NarratedWorld,
+      PolarityTag.Unknown,
+      ModalityTag.Unknown,
+      Vector.empty,
+      Set.empty
+    )
     val view = InMemorySourceView(Vector(node), Map.empty, None, 100)
     assert(SourceViewLaws.total(view))
     assert(SourceViewLaws.positionsAreMeasured(view))

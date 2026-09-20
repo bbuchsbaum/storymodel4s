@@ -95,15 +95,21 @@ object ViewFingerprint:
       field("parent", n.parent.map(_.key).getOrElse(""))
       field("discoursePosition", n.discoursePosition.toString)
       if textWire then
-        list("support", n.support.textSpans.toVector.flatMap(_.refs.toVector.sorted.map(Render.spanRef)))
+        list(
+          "support",
+          n.support.textSpans.toVector.flatMap(_.refs.toVector.sorted.map(Render.spanRef))
+        )
       else
         field("physicalSupport", n.support.identity.hex)
         n.scoringPosition match
-          case None => field("scoringPosition", "none")
+          case None           => field("scoringPosition", "none")
           case Some(position) =>
-            field("scoringPosition", position match
-              case _: ScoringPosition.CanonicalText => "canonical-text"
-              case _: ScoringPosition.LegacyAnnotationText => "legacy-annotation-text")
+            field(
+              "scoringPosition",
+              position match
+                case _: ScoringPosition.CanonicalText        => "canonical-text"
+                case _: ScoringPosition.LegacyAnnotationText => "legacy-annotation-text"
+            )
             list("scoringSpans", position.spans.refs.toVector.sorted.map(Render.spanRef))
       field("predicate", n.predicate.getOrElse(""))
       list(

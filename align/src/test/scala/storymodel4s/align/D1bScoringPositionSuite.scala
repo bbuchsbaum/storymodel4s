@@ -6,17 +6,41 @@ import storymodel4s.core.*
 
 class D1bScoringPositionSuite extends FunSuite:
   private val text = AnnaFixture.view
-  private val bundle = SourceBundle.filmEdition(EditionId.unsafe("position-film"),
-    Checksum.ofText("picture"), 0L, 100L, RationalTimebase.Millisecond).toOption.get
+  private val bundle = SourceBundle
+    .filmEdition(
+      EditionId.unsafe("position-film"),
+      Checksum.ofText("picture"),
+      0L,
+      100L,
+      RationalTimebase.Millisecond
+    )
+    .toOption
+    .get
   private def support(at: Long): TypedSupport = TypedSupport.Anchored(
-    EvidenceSupport.of(bundle, Vector(EvidenceAnchor.MediaPoint(bundle.id,
-      bundle.streams.head.id, PlaybackInstant.on(bundle.primaryAxis, at).toOption.get))).toOption.get)
+    EvidenceSupport
+      .of(
+        bundle,
+        Vector(
+          EvidenceAnchor.MediaPoint(
+            bundle.id,
+            bundle.streams.head.id,
+            PlaybackInstant.on(bundle.primaryAxis, at).toOption.get
+          )
+        )
+      )
+      .toOption
+      .get
+  )
   private def film(position: Option[ScoringPosition], at: Long = 25L): InMemorySourceView =
-    text.copy(nodes = text.nodes.map(_.copy(support = support(at), scoringPosition = position)),
-      scoringLength = 100)
+    text.copy(
+      nodes = text.nodes.map(_.copy(support = support(at), scoringPosition = position)),
+      scoringLength = 100
+    )
   private val feature = ScoringPosition.LegacyAnnotationText(SpanSet.one(TextSpan.unsafe(10, 30)))
 
-  test("accepting control: physical point and declared scoring feature retain separate exact values"):
+  test(
+    "accepting control: physical point and declared scoring feature retain separate exact values"
+  ):
     val view = film(Some(feature))
     val ref = view.nodes.head.ref
     assertEquals(view.node(ref).get.support, support(25L))
@@ -42,8 +66,10 @@ class D1bScoringPositionSuite extends FunSuite:
     assertNotEquals(base.contentFingerprint, film(Some(altered)).contentFingerprint)
     assertNotEquals(base.contentFingerprint, film(None).contentFingerprint)
     assertNotEquals(base.contentFingerprint, base.copy(scoringLength = 101).contentFingerprint)
-    assertNotEquals(base.contentFingerprint,
-      film(Some(ScoringPosition.CanonicalText(feature.spans))).contentFingerprint)
+    assertNotEquals(
+      base.contentFingerprint,
+      film(Some(ScoringPosition.CanonicalText(feature.spans))).contentFingerprint
+    )
 
   test("measured zero differs from missing and an unmeasured denominator remains absent"):
     val zero = film(Some(ScoringPosition.LegacyAnnotationText(SpanSet.one(TextSpan.unsafe(0, 0)))))
@@ -58,8 +84,12 @@ class D1bScoringPositionSuite extends FunSuite:
       val spans = node.support.textSpans.get
       assertEquals(node.scoringPosition, Some(ScoringPosition.CanonicalText(spans)))
       val span = spans.minSpan
-      assertEquals(text.measuredPosition(node.ref),
-        Some((span.start.toDouble / text.scoringLength + span.endExclusive.toDouble / text.scoringLength) / 2.0))
+      assertEquals(
+        text.measuredPosition(node.ref),
+        Some(
+          (span.start.toDouble / text.scoringLength + span.endExclusive.toDouble / text.scoringLength) / 2.0
+        )
+      )
     }
 
   test("public missing-as-zero accessor is absent with a measured-position accepting control"):

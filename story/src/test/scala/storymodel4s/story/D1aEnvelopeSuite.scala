@@ -312,7 +312,8 @@ class D1aEnvelopeSuite extends FunSuite:
     val reboundGraph = g.copy(
       contexts = Map(world -> context.copy(support = rebound(firstSupport))),
       situations = g.situations.view.mapValues {
-        case SituationNode.Event(node) => SituationNode.Event(node.copy(support = rebound(node.support)))
+        case SituationNode.Event(node) =>
+          SituationNode.Event(node.copy(support = rebound(node.support)))
         case _ => fail("event fixture changed")
       }.toMap
     )

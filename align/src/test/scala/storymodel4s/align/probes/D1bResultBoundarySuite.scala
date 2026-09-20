@@ -30,4 +30,8 @@ class D1bResultBoundarySuite extends FunSuite:
     assert(typeCheckErrors("""
       def product(r: storymodel4s.align.HsmmResult): Product = r
     """).nonEmpty)
-    assert(typeCheckErrors("summon[scala.deriving.Mirror.ProductOf[storymodel4s.align.HsmmResult]]").nonEmpty)
+    assert(
+      typeCheckErrors(
+        "summon[scala.deriving.Mirror.ProductOf[storymodel4s.align.HsmmResult]]"
+      ).nonEmpty
+    )

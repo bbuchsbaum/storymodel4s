@@ -52,7 +52,9 @@ private[wog] object WarOfTheGhostsCodecGolden:
     "ce61e761a131c1e2ffeebcf912a9c04d9dd2bf2fb4c09f9d4bda0c2741f2cf1a"
 
   lazy val context: GoldenContext = GoldenContext.build()
-  lazy val encoded: String = HsmmResultCodec.encode(context.result).fold(e => throw new IllegalStateException(e.message), identity)
+  lazy val encoded: String = HsmmResultCodec
+    .encode(context.result)
+    .fold(e => throw new IllegalStateException(e.message), identity)
 
   final case class GoldenContext(
       recall: RecallGraph[Checked],

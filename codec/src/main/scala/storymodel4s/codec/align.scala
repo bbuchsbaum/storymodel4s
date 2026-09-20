@@ -23,8 +23,8 @@ enum HsmmCodecError:
   case UnsupportedSupport
 
   def message: String = this match
-    case Wire(error)     => error.message
-    case Rejected(error) => error.message
+    case Wire(error)        => error.message
+    case Rejected(error)    => error.message
     case UnsupportedSupport => "hsmm/v3 requires canonical text support and scoring coordinates"
 
 /** Canonical JSON for a gated [[HsmmResult]].
@@ -147,6 +147,7 @@ object HsmmResultCodec:
         .left
         .map(HsmmCodecError.Wire.apply)
         .flatMap(_.materialize(recall, view).left.map(HsmmCodecError.Rejected.apply))
+
   /** Decode a JSON value only after revalidating it against `recall` and `view`. */
   def decodeJson(
       json: Json,

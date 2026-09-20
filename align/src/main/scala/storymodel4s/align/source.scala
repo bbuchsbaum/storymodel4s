@@ -165,7 +165,7 @@ enum ScoringPosition:
   case LegacyAnnotationText(value: SpanSet)
 
   def spans: SpanSet = this match
-    case CanonicalText(value) => value
+    case CanonicalText(value)        => value
     case LegacyAnnotationText(value) => value
 
   def relativeTo(length: Int): Option[(Double, Double)] =
@@ -321,9 +321,24 @@ object NodeSummary:
       propositional: PropositionalScope = PropositionalScope.unstated
   ): NodeSummary =
     typed(
-      ref, level, parent, discoursePosition, TypedSupport.Text(support),
-      Some(ScoringPosition.CanonicalText(support)), predicate, participants, context,
-      polarity, modality, locations, lemmas, outcome, cause, importance, evidence, propositional
+      ref,
+      level,
+      parent,
+      discoursePosition,
+      TypedSupport.Text(support),
+      Some(ScoringPosition.CanonicalText(support)),
+      predicate,
+      participants,
+      context,
+      polarity,
+      modality,
+      locations,
+      lemmas,
+      outcome,
+      cause,
+      importance,
+      evidence,
+      propositional
     )
 
   def typed(
@@ -389,7 +404,8 @@ trait SourceView:
   /** Only this exact subset has the historical text-only HSMM v3 representation. */
   final def textWireCompatible: Boolean = nodes.forall { node =>
     (node.support, node.scoringPosition) match
-      case (TypedSupport.Text(spans), Some(ScoringPosition.CanonicalText(position))) => spans == position
+      case (TypedSupport.Text(spans), Some(ScoringPosition.CanonicalText(position))) =>
+        spans == position
       case _ => false
   }
 

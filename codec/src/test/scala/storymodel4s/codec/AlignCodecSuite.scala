@@ -12,7 +12,8 @@ import storymodel4s.recall.RecallGraphStatus.Checked
 class AlignCodecSuite extends FunSuite:
 
   private lazy val fixture = Fixture.build()
-  private lazy val encoded = HsmmResultCodec.encode(fixture.result).fold(e => fail(e.message), identity)
+  private lazy val encoded =
+    HsmmResultCodec.encode(fixture.result).fold(e => fail(e.message), identity)
   private lazy val json = Canonical.parse(encoded).toOption.get
 
   test("a real inferred result has a canonical contextual round trip") {
@@ -157,25 +158,64 @@ class AlignCodecSuite extends FunSuite:
   }
 
   test("generic HSMM encoding and both contextual decode doors refuse non-text support") {
-    val bundle = SourceBundle.filmEdition(EditionId.unsafe("hsmm-film"), Checksum.ofText("picture"),
-      0L, 100L, RationalTimebase.Millisecond).toOption.get
-    val anchors = EvidenceSupport.of(bundle, Vector(EvidenceAnchor.MediaPoint(bundle.id,
-      bundle.streams.head.id, PlaybackInstant.on(bundle.primaryAxis, 25L).toOption.get))).toOption.get
-    val pointNodes = fixture.view.nodes.map(_.copy(
-      support = TypedSupport.Anchored(anchors), scoringPosition = None))
-    val unused = pointNodes.head.copy(ref = SourceNodeRef.Situation(SituationId.unsafe("unnominated-point")))
+    val bundle = SourceBundle
+      .filmEdition(
+        EditionId.unsafe("hsmm-film"),
+        Checksum.ofText("picture"),
+        0L,
+        100L,
+        RationalTimebase.Millisecond
+      )
+      .toOption
+      .get
+    val anchors = EvidenceSupport
+      .of(
+        bundle,
+        Vector(
+          EvidenceAnchor.MediaPoint(
+            bundle.id,
+            bundle.streams.head.id,
+            PlaybackInstant.on(bundle.primaryAxis, 25L).toOption.get
+          )
+        )
+      )
+      .toOption
+      .get
+    val pointNodes = fixture.view.nodes.map(
+      _.copy(support = TypedSupport.Anchored(anchors), scoringPosition = None)
+    )
+    val unused =
+      pointNodes.head.copy(ref = SourceNodeRef.Situation(SituationId.unsafe("unnominated-point")))
     val view = fixture.view.copy(nodes = pointNodes :+ unused)
     val old = fixture.result
-    val result = HsmmResult.validated(fixture.recall, view, old.candidateAnchors, old.posterior,
-      old.flow, old.viterbi, old.logLikelihood, old.costs, old.refinementPasses).toOption.get
+    val result = HsmmResult
+      .validated(
+        fixture.recall,
+        view,
+        old.candidateAnchors,
+        old.posterior,
+        old.flow,
+        old.viterbi,
+        old.logLikelihood,
+        old.costs,
+        old.refinementPasses
+      )
+      .toOption
+      .get
     assertEquals(result.sourceSupport.keySet, view.nodes.map(_.ref).toSet)
     assert(result.sourceSupport.values.forall(_ == TypedSupport.Anchored(anchors)))
     assert(!old.candidateAnchors.values.flatten.toSet.contains(unused.ref))
     assertEquals(result.sourceSupport.get(unused.ref), Some(TypedSupport.Anchored(anchors)))
     assertEquals(HsmmResultCodec.encode(result), Left(HsmmCodecError.UnsupportedSupport))
     assertEquals(HsmmResultCodec.toJson(result), Left(HsmmCodecError.UnsupportedSupport))
-    assertEquals(HsmmResultCodec.decode(encoded, fixture.recall, view), Left(HsmmCodecError.UnsupportedSupport))
-    assertEquals(HsmmResultCodec.decodeJson(json, fixture.recall, view), Left(HsmmCodecError.UnsupportedSupport))
+    assertEquals(
+      HsmmResultCodec.decode(encoded, fixture.recall, view),
+      Left(HsmmCodecError.UnsupportedSupport)
+    )
+    assertEquals(
+      HsmmResultCodec.decodeJson(json, fixture.recall, view),
+      Left(HsmmCodecError.UnsupportedSupport)
+    )
   }
 
   test("checked encoding remains available but no generic Encoder HsmmResult exists") {
@@ -190,6 +230,40 @@ class AlignCodecSuite extends FunSuite:
       import storymodel4s.codec.HsmmResultCodec.given
       summon[Encoder[HsmmResult]]
     """).nonEmpty)
+  }
+
+  test("result refuses duplicate inventory lookup disagreement and lookup-only nominations") {
+    val old = fixture.result
+    def rebuild(view: SourceView) = HsmmResult.validated(fixture.recall, view,
+      old.candidateAnchors, old.posterior, old.flow, old.viterbi, old.logLikelihood,
+      old.costs, old.refinementPasses)
+    def wrapped(inventory: Vector[NodeSummary], lookup: SourceNodeRef => Option[NodeSummary]): SourceView =
+      new SourceView:
+        val nodes = inventory
+        def node(ref: SourceNodeRef) = lookup(ref)
+        def adjacency(layer: RelationLayer) = fixture.view.adjacency(layer)
+        val worldOrder = fixture.view.worldOrder
+        val scoringLength = fixture.view.scoringLength
+    assertEquals(rebuild(fixture.view), Right(old))
+    val first = fixture.view.nodes.head
+    assert(rebuild(wrapped(fixture.view.nodes :+ first, fixture.view.node)).isLeft)
+    assert(rebuild(wrapped(fixture.view.nodes, ref => fixture.view.node(ref)
+      .map(_.copy(scoringPosition = None)))).isLeft)
+    val nominated = old.candidateAnchors.values.flatten.head
+    assert(rebuild(wrapped(fixture.view.nodes.filterNot(_.ref == nominated), fixture.view.node)).isLeft)
+  }
+
+  test("text support with absent or noncanonical scoring cannot enter the v3 wire") {
+    val old = fixture.result
+    val positions = Vector(None, Some(ScoringPosition.LegacyAnnotationText(fixture.view.nodes.head.support.textSpans.get)),
+      Some(ScoringPosition.CanonicalText(SpanSet.one(TextSpan.unsafe(0, 0)))))
+    positions.foreach { position =>
+      val view = fixture.view.copy(nodes = fixture.view.nodes.map(_.copy(scoringPosition = position)))
+      assert(!view.textWireCompatible)
+      val result = HsmmResult.validated(fixture.recall, view, old.candidateAnchors, old.posterior,
+        old.flow, old.viterbi, old.logLikelihood, old.costs, old.refinementPasses).toOption.get
+      assertEquals(HsmmResultCodec.encode(result), Left(HsmmCodecError.UnsupportedSupport))
+    }
   }
 
   private def updateFirstObjectInArray(

@@ -483,41 +483,74 @@ class WogDiagnosticSuite extends FunSuite:
     val inferred = leafRefs(2)
     val refs = Vector(Some(inferred), Some(inferred))
     val control = Metrics.observe(original, resultFor(original, refs))
-    assert(control.byMetric(Metrics.Names.routeSupportMidpointDirection)(1).observation
-      .isInstanceOf[MetricObservation.Observed])
+    assert(
+      control
+        .byMetric(Metrics.Names.routeSupportMidpointDirection)(1)
+        .observation
+        .isInstanceOf[MetricObservation.Observed]
+    )
     val edges = RelationLayer.values.toVector.map { layer =>
       layer -> original.view.adjacency(layer).toVector.flatMap { (from, row) =>
         row.toVector.map { (to, weight) => (from, to, weight) }
       }
     }.toMap
-    val view = InMemorySourceView(original.view.nodes.map { node =>
-      if node.ref == inferred then node.copy(scoringPosition = None) else node
-    }, edges, original.view.worldOrder, original.view.scoringLength)
+    val view = InMemorySourceView(
+      original.view.nodes.map { node =>
+        if node.ref == inferred then node.copy(scoringPosition = None) else node
+      },
+      edges,
+      original.view.worldOrder,
+      original.view.scoringLength
+    )
     val c = original.copy(view = view)
-    assert(c.gold(c.recall.ordered.head.id).flatMap(_.primary).flatMap(g => view.measuredPosition(g.node)).nonEmpty)
+    assert(
+      c.gold(c.recall.ordered.head.id)
+        .flatMap(_.primary)
+        .flatMap(g => view.measuredPosition(g.node))
+        .nonEmpty
+    )
     val observations = Metrics.observe(c, resultFor(c, refs))
-    assertEquals(observations.byMetric(Metrics.Names.routeSupportMidpointDirection)(1).observation,
-      MetricObservation.Missing(MissingReason.AllMissing))
-    val aggregate = Metrics.aggregate(Metrics.Names.routeSupportMidpointDirection,
-      Vector(observations), Vector(c.inputChecksum), seed = 1L)
+    assertEquals(
+      observations.byMetric(Metrics.Names.routeSupportMidpointDirection)(1).observation,
+      MetricObservation.Missing(MissingReason.AllMissing)
+    )
+    val aggregate = Metrics.aggregate(
+      Metrics.Names.routeSupportMidpointDirection,
+      Vector(observations),
+      Vector(c.inputChecksum),
+      seed = 1L
+    )
     assertEquals(aggregate.coverage.eligible, 1)
     assertEquals(aggregate.coverage.observed, 0)
-    val noGoldPosition = c.copy(view = view.copy(nodes = view.nodes.map(_.copy(scoringPosition = None))))
-    val external = Metrics.observe(noGoldPosition,
-      resultFor(noGoldPosition, Vector(None, None), ExternalState.Intrusion))
-    assertEquals(external.byMetric(Metrics.Names.routeSupportMidpointDirection)(1).observation,
-      MetricObservation.Ineligible)
+    val noGoldPosition =
+      c.copy(view = view.copy(nodes = view.nodes.map(_.copy(scoringPosition = None))))
+    val external = Metrics.observe(
+      noGoldPosition,
+      resultFor(noGoldPosition, Vector(None, None), ExternalState.Intrusion)
+    )
+    assertEquals(
+      external.byMetric(Metrics.Names.routeSupportMidpointDirection)(1).observation,
+      MetricObservation.Ineligible
+    )
     val unranked = Metrics.observe(noGoldPosition, resultFor(noGoldPosition, Vector(None, None)))
-    assertEquals(unranked.byMetric(Metrics.Names.routeSupportMidpointDirection)(1).observation,
-      MetricObservation.Missing(MissingReason.ProviderAbstained))
+    assertEquals(
+      unranked.byMetric(Metrics.Names.routeSupportMidpointDirection)(1).observation,
+      MetricObservation.Missing(MissingReason.ProviderAbstained)
+    )
     val sourceMissing = Metrics.observe(noGoldPosition, resultFor(noGoldPosition, refs))
-    assertEquals(sourceMissing.byMetric(Metrics.Names.routeSupportMidpointDirection)(1).observation,
-      MetricObservation.Missing(MissingReason.AllMissing))
+    assertEquals(
+      sourceMissing.byMetric(Metrics.Names.routeSupportMidpointDirection)(1).observation,
+      MetricObservation.Missing(MissingReason.AllMissing)
+    )
     for observation <- Vector(observations, external, sourceMissing) do
-      assertEquals(observation.byMetric(Metrics.Names.routeTransitionDisplacementCloseness)(1).observation,
-        MetricObservation.Missing(MissingReason.AllMissing))
-    assertEquals(unranked.byMetric(Metrics.Names.routeTransitionDisplacementCloseness)(1).observation,
-      MetricObservation.Missing(MissingReason.ProviderAbstained))
+      assertEquals(
+        observation.byMetric(Metrics.Names.routeTransitionDisplacementCloseness)(1).observation,
+        MetricObservation.Missing(MissingReason.AllMissing)
+      )
+    assertEquals(
+      unranked.byMetric(Metrics.Names.routeTransitionDisplacementCloseness)(1).observation,
+      MetricObservation.Missing(MissingReason.ProviderAbstained)
+    )
   }
 
   test("an Unranked route step is eligible missing, never ineligible") {
