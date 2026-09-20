@@ -1,0 +1,93 @@
+{
+  "archive": "hsmm-parity-evidence.tar.gz",
+  "sha256": "a4350a14656f792bf31985bcacf9dc463b28f0b302d8d644388038550dc3feac",
+  "bytes": 20566,
+  "memberCount": 17,
+  "members": [
+    {
+      "path": "js--storymodel4s.fixtures.wog.WarOfTheGhostsCodecGoldenSuite.xml",
+      "bytes": 5269,
+      "sha256": "b8edb112640bc69ab1984243b9baa402b36f17841a4959beb4a99e77c815f9dc"
+    },
+    {
+      "path": "js--storymodel4s.fixtures.wog.WogHsmmBaselineCaptureSuite.xml",
+      "bytes": 5021,
+      "sha256": "59e957cb00e52f1a43a5df4c4699ee760a2a23c6b4ba07e6e3aa7be4df11d941"
+    },
+    {
+      "path": "js-actual.json",
+      "bytes": 26284,
+      "sha256": "ce61e761a131c1e2ffeebcf912a9c04d9dd2bf2fb4c09f9d4bda0c2741f2cf1a"
+    },
+    {
+      "path": "js.json",
+      "bytes": 887,
+      "sha256": "9428bb8f2db9634960535ba5f844ac351df354469044f198b4ee2219b24b0492"
+    },
+    {
+      "path": "js.log",
+      "bytes": 30333,
+      "sha256": "8c591835175c9e5a00176ad7f4eed9bc239cbab422c020c1d854285dd826c801"
+    },
+    {
+      "path": "jvm--storymodel4s.fixtures.wog.WarOfTheGhostsCodecGoldenResourceSuite.xml",
+      "bytes": 5142,
+      "sha256": "a932fbb29542b145b0cdc589a3aba6e184b3a2bbc45e995deece45d89a136ce4"
+    },
+    {
+      "path": "jvm--storymodel4s.fixtures.wog.WarOfTheGhostsCodecGoldenSuite.xml",
+      "bytes": 5336,
+      "sha256": "9025f74dfd56912e9d18251c386658cb9e4d9102d625808dab2b9779ef0c8db1"
+    },
+    {
+      "path": "jvm--storymodel4s.fixtures.wog.WogHsmmBaselineCaptureSuite.xml",
+      "bytes": 5087,
+      "sha256": "2a910f2bcf5324fa35127a0ae24651632a84fc2dc582ad2c0bae66bb612a35dd"
+    },
+    {
+      "path": "jvm-actual.json",
+      "bytes": 26284,
+      "sha256": "ce61e761a131c1e2ffeebcf912a9c04d9dd2bf2fb4c09f9d4bda0c2741f2cf1a"
+    },
+    {
+      "path": "jvm.json",
+      "bytes": 955,
+      "sha256": "91cca74fa4fb8918d83cc50122f1f7e9ff6cc4960d33a7f003eddd0220f066b9"
+    },
+    {
+      "path": "jvm.log",
+      "bytes": 28515,
+      "sha256": "9b48c4be9492afe2962db1916a8537508e4d2a1eb43cd895c42eb5587af30299"
+    },
+    {
+      "path": "manifest.json",
+      "bytes": 9325,
+      "sha256": "0474d4eab34115d1326f57afd1915c01cb7453cc3d07bb192a3346538003af94"
+    },
+    {
+      "path": "native--storymodel4s.fixtures.wog.WarOfTheGhostsCodecGoldenSuite.xml",
+      "bytes": 5273,
+      "sha256": "a2153d8a33681d295f79c7d479b1acdefe86a0ec0820097dff7c42f5ccc603b3"
+    },
+    {
+      "path": "native--storymodel4s.fixtures.wog.WogHsmmBaselineCaptureSuite.xml",
+      "bytes": 5025,
+      "sha256": "b580b9b06fbe48a74101d2ec2a8c7e82bf62f0756f9a5c4c551de59bd6b1167a"
+    },
+    {
+      "path": "native-actual.json",
+      "bytes": 26284,
+      "sha256": "ccb0b98f21c7c2e1c9d5d81bad3f0858ed4c2f5d4f4c3ac671a6f45b152af012"
+    },
+    {
+      "path": "native.json",
+      "bytes": 896,
+      "sha256": "a13fb2f65c8ec40fe9804b16a8933f20c1463ec27840b78554072de731b8c0a3"
+    },
+    {
+      "path": "native.log",
+      "bytes": 31661,
+      "sha256": "b753f2a58a5ba6282b88d28f3b7ee1df0930b8e515f7f90918dc98460c29724b"
+    }
+  ]
+}

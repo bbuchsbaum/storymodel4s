@@ -56,7 +56,7 @@
         "composition-primary-point",
         "composition-scene-points"
       ],
-      "status": "real1000/50/1050 and nine falsifiers passed; all17 running"
+      "status": "real1000/50/1050 and nine falsifiers passed; all17 passed"
     },
     {
       "number": 3,
@@ -80,7 +80,7 @@
         "point-component-binding",
         "point-component-tick"
       ],
-      "status": "focused and mutation passed; per-backend WOG pending"
+      "status": "focused/mutation and exact per-backend WOG passed"
     },
     {
       "number": 4,
@@ -90,7 +90,7 @@
         "unchanged frozen S0 JSON",
         "hsmm-parity.py backend-specific bytes"
       ],
-      "status": "coordinate passed; all17 and WOG/S0 full gate pending"
+      "status": "coordinate/all17/WOG passed; S0 full gate pending"
     },
     {
       "number": 5,
@@ -147,8 +147,6 @@
     }
   ],
   "remaining": [
-    "platform-labelled WOG bytes",
-    "all17 terminal projection",
     "clean56-task provider full gate",
     "separate format gate",
     "13 docs examples",
