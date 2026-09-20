@@ -1,0 +1,55 @@
+{
+  "schema": "d1b/support-parity/v1",
+  "captureSha256": "557c40e4c552c8498d72127614b3ae52eebb76c82081115082302000ef0af83a",
+  "frozenManifestSha256": "42b9ec1558272487192829fc6f381965cff858764cb83aed96d35559a0ceadca",
+  "annotationSha256": "8c205826dcea8c58db24d7a17c71a3f99a9054e9379435e60b1dd0b987c2b296",
+  "repairSha256": "b64d7ab2fa6457ebb39e7d43be48daf0fad910faa77c494c40979cd7f5f66146",
+  "summary": {
+    "rows": 1000,
+    "scenes": 50,
+    "resultInventory": 1050,
+    "rowLociSha256": "59e8118472c91e07506910ab27b4cbf4a30ea9f0ce8703a6f44f66b4531dd8dc",
+    "row13NativeTick": "112500",
+    "row13UnusedPointRetained": true,
+    "exactPhysicalAndScoringComparison": true
+  },
+  "comparatorFalsifiers": [
+    {
+      "name": "row13-tick",
+      "rejected": true
+    },
+    {
+      "name": "row13-omitted",
+      "rejected": true
+    },
+    {
+      "name": "foreign-stream",
+      "rejected": true
+    },
+    {
+      "name": "foreign-bundle",
+      "rejected": true
+    },
+    {
+      "name": "changed-full-binding",
+      "rejected": true
+    },
+    {
+      "name": "changed-composed-binding",
+      "rejected": true
+    },
+    {
+      "name": "row-association-swap",
+      "rejected": true
+    },
+    {
+      "name": "scene-point-omitted",
+      "rejected": true
+    },
+    {
+      "name": "scoring-coordinate-changed",
+      "rejected": true
+    }
+  ],
+  "limitation": "Independent exact coordinate/legacy scoring comparison and synthetic retention control; not participant replay or scientific validation."
+}

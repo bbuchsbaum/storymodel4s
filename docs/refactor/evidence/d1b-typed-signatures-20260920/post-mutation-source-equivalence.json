@@ -1,0 +1,20 @@
+{
+  "mutationRevision": "87848b96351b7458463690352cc3e3d7ff26f3ab",
+  "captureRevision": "dcd3f1d33875a0e30505289752e56237aa2461d0",
+  "changedPaths": [
+    "docs/refactor/evidence/d1b-typed-signatures-20260920/README.md",
+    "docs/refactor/evidence/d1b-typed-signatures-20260920/all17-inputs.json",
+    "docs/refactor/evidence/d1b-typed-signatures-20260920/all17-replay.py",
+    "docs/refactor/evidence/d1b-typed-signatures-20260920/archive-mutations.py",
+    "docs/refactor/evidence/d1b-typed-signatures-20260920/guard-witness-inventory.json",
+    "docs/refactor/evidence/d1b-typed-signatures-20260920/hsmm-parity.py",
+    "docs/refactor/evidence/d1b-typed-signatures-20260920/mutation-evidence-manifest.json",
+    "docs/refactor/evidence/d1b-typed-signatures-20260920/mutation-evidence.tar.gz",
+    "docs/refactor/evidence/d1b-typed-signatures-20260920/mutation-terminal-summary.json",
+    "docs/refactor/evidence/d1b-typed-signatures-20260920/support-parity.py",
+    "embed-bench/src/test/scala/storymodel4s/bench/sherlock/D1bSherlockSupportCapture.scala"
+  ],
+  "productionAndMutationWitnessesUnchanged": true,
+  "onlyScalaDelta": "Three additive content-free capture JSON fields: supportBundleIdentity, stream, bundleId. This main harness is not used by mutation tests.",
+  "frozenS0Sha256": "cc201d9dd3e3576fabcd45677369f00c023ca5a455ea9d9e7ba694700c759fb3"
+}

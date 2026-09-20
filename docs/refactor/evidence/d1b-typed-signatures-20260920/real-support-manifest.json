@@ -1,0 +1,65 @@
+{
+  "codeRevision": "dcd3f1d33875a0e30505289752e56237aa2461d0",
+  "captureCommandReceipt": {
+    "codeRevision": "dcd3f1d33875a0e30505289752e56237aa2461d0",
+    "command": [
+      "sbt",
+      "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+      "-batch",
+      "embedBench/Test/runMain storymodel4s.bench.sherlock.D1bSherlockSupportCapture /Users/bbuchsbaum/code/scala/storymodel4s/data/sherlock/Sherlock_Segments_1000_NN_2017.tsv /Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/real-support-capture.json"
+    ],
+    "exitCode": 0,
+    "cleanBefore": true,
+    "cleanAfter": true,
+    "startedEpochSeconds": 1789887121.162389,
+    "seconds": 11.360028982162476,
+    "logPath": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/real-support-capture-1.log",
+    "logSha256": "b549d91fdd0aec618537e6716a4a6430a2fcb41bc61c6844af63f804d8a391f1",
+    "testTotals": [],
+    "aggregateTestCounts": {
+      "Total": 0,
+      "Failed": 0,
+      "Errors": 0,
+      "Passed": 0,
+      "Skipped": 0,
+      "Ignored": 0
+    }
+  },
+  "verifierCommandReceipt": {
+    "codeRevision": "dcd3f1d33875a0e30505289752e56237aa2461d0",
+    "command": [
+      "/opt/homebrew/opt/python@3.14/bin/python3.14",
+      "/private/tmp/storymodel4s-d1b-20260920/docs/refactor/evidence/d1b-typed-signatures-20260920/support-parity.py",
+      "/private/tmp/storymodel4s-d1b-20260920",
+      "/Users/bbuchsbaum/code/scala/storymodel4s/data/sherlock/Sherlock_Segments_1000_NN_2017.tsv",
+      "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/real-support-capture.json",
+      "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/real-support-parity.json"
+    ],
+    "exitCode": 0,
+    "cleanBefore": true,
+    "cleanAfter": true,
+    "startedEpochSeconds": 1789887132.577514,
+    "seconds": 0.28827500343322754,
+    "logPath": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/real-support-parity-1.log",
+    "logSha256": "42028fa80056f2ce2eae40fa627f84b77de7b090e9e0f204e55db0671e3416f2",
+    "testTotals": [],
+    "aggregateTestCounts": {
+      "Total": 0,
+      "Failed": 0,
+      "Errors": 0,
+      "Passed": 0,
+      "Skipped": 0,
+      "Ignored": 0
+    }
+  },
+  "captureSha256": "557c40e4c552c8498d72127614b3ae52eebb76c82081115082302000ef0af83a",
+  "verifierSha256": "3c9048b11dbdf8174af2a7e93be94a969623b94ebaeaf8c1a68e08291d78b10e",
+  "parityReceiptSha256": "5aa92708b7fc7f1f3f3325130c2164fc193a5ce0a87620d0d7b541df4be4cb8f",
+  "runtime": {
+    "java.vendor": "Homebrew",
+    "os.arch": "aarch64",
+    "os.version": "14.3",
+    "os.name": "Mac OS X",
+    "java.version": "25.0.1"
+  }
+}

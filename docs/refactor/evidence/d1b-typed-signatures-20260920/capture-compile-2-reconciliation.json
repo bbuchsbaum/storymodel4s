@@ -1,0 +1,17 @@
+{
+  "receiptSha256": "4e2fad2f712d55082b9ea178af58ad9536a63b7707aba670dc9f5b2f977c77cb",
+  "junitSha256": "4df1df639a8750591ae706b6babb839c0ca6f945bddfcc1dd9c56cc04f0053de",
+  "tests": 10,
+  "passed": 9,
+  "skipped": [
+    "the neural channel puts the red-door unit nearer its row than an unrelated row"
+  ],
+  "sbtExitCode": 0,
+  "wrapperExitCode": 1,
+  "explanation": "The outer postcondition mistakenly expected Ignored=1; sbt and JUnit correctly report Skipped=1. Compile, test and both format commands passed at the clean exact revision. No test or expectation was changed; this reconciliation preserves the failed wrapper assertion.",
+  "outerWrapperTranscript": {
+    "path": "data/study/d1b-20260920/capture-compile-2-wrapper-transcript.json",
+    "sha256": "6b9532cadbfa952e466bd5c0055d90ebdd563bc789145a330d00b347c0c229a4",
+    "captureKind": "exact tool-transcript transcription"
+  }
+}
