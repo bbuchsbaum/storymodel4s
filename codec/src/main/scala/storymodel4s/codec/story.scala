@@ -737,22 +737,24 @@ object StoryModelCodec:
       hypotheses <- field[Vector[HypothesisClaim]](c, "hypotheses")
       sensory <- field[Map[SituationId, Vector[SensoryProfile]]](c, "sensoryProfiles")
       receipt <- field[Option[BuildReceipt]](c, "receipt")
-      model <- StoryModel.draft(
-      source,
-      atlas,
-      graph,
-      hierarchy,
-      trajectory,
-      spaces,
-      sidecars,
-      refs,
-      descriptors,
-      hypotheses,
-      sensory,
-      receipt,
-      sv
-    )
-        .left.map(error => DecodingFailure(error.message, c.history))
+      model <- StoryModel
+        .draft(
+          source,
+          atlas,
+          graph,
+          hierarchy,
+          trajectory,
+          spaces,
+          sidecars,
+          refs,
+          descriptors,
+          hypotheses,
+          sensory,
+          receipt,
+          sv
+        )
+        .left
+        .map(error => DecodingFailure(error.message, c.history))
     yield model
   }
 

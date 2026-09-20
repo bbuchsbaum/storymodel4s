@@ -7,17 +7,33 @@ import storymodel4s.core.*
 class D1aTextBoundarySuite extends FunSuite:
   private val built = Small.build(2, 1)
   private val ordinary = built.draft()
-  private val film = SourceBundle.filmEdition(EditionId.unsafe("boundary-film"),
-    Checksum.ofText("film"), 0L, 100L, RationalTimebase.Millisecond).toOption.get
-  private val anchors = EvidenceSupport.media(film, film.streams.head.id,
-    PlaybackIntervalSet.one(PlaybackInterval.on(film.primaryAxis, 1L, 2L).toOption.get)).toOption.get
+  private val film = SourceBundle
+    .filmEdition(
+      EditionId.unsafe("boundary-film"),
+      Checksum.ofText("film"),
+      0L,
+      100L,
+      RationalTimebase.Millisecond
+    )
+    .toOption
+    .get
+  private val anchors = EvidenceSupport
+    .media(
+      film,
+      film.streams.head.id,
+      PlaybackIntervalSet.one(PlaybackInterval.on(film.primaryAxis, 1L, 2L).toOption.get)
+    )
+    .toOption
+    .get
   private val anchored = TypedSupport.Anchored(anchors)
   private val context = built.graph.contexts(built.world)
   private val textEvidence = context.meta.evidence
   private val anchoredEvidence = textEvidence.map(_.copy(anchors = Some(anchors)))
-  private def draft(graph: NarrativeGraph = built.graph,
+  private def draft(
+      graph: NarrativeGraph = built.graph,
       hierarchy: NarrativeHierarchy = built.hierarchy,
-      trajectory: DiscourseTrajectory = ordinary.trajectory) =
+      trajectory: DiscourseTrajectory = ordinary.trajectory
+  ) =
     StoryModel.draft(built.source, built.atlas, graph, hierarchy, trajectory)
   private def belief(evidence: cats.data.NonEmptyVector[Evidence]) =
     BoundaryBelief(built.atlas.sentences.head.id, 0, 0.5, None, evidence)
@@ -57,17 +73,39 @@ class D1aTextBoundarySuite extends FunSuite:
     val g = built.graph
     val entity = g.entities.values.head
     val event = g.situations.values.collectFirst { case SituationNode.Event(n) => n }.get
-    val state = StateNode(event.id, event.predicate, event.description, event.context, event.polarity, event.modality, event.support, event.mentions, event.meta)
+    val state = StateNode(
+      event.id,
+      event.predicate,
+      event.description,
+      event.context,
+      event.polarity,
+      event.modality,
+      event.support,
+      event.mentions,
+      event.meta
+    )
     val segment = g.segments.values.head
     Vector(
       "entity" -> g.copy(entities = g.entities.updated(entity.id, entity.copy(support = anchored))),
-      "event" -> g.copy(situations = g.situations.updated(event.id, SituationNode.Event(event.copy(support = anchored)))),
-      "state" -> g.copy(situations = g.situations.updated(state.id, SituationNode.State(state.copy(support = anchored)))),
-      "segment" -> g.copy(segments = g.segments.updated(segment.id, segment.copy(support = anchored))),
-      "context" -> g.copy(contexts = g.contexts.updated(context.id, context.copy(support = anchored))),
-      "circumstance" -> g.copy(relations = g.relations.copy(circumstances = Vector(
-        CircumstanceEdge(event.id, CircumstanceKind.Time, "time", anchored, event.meta)
-      )))
+      "event" -> g.copy(situations =
+        g.situations.updated(event.id, SituationNode.Event(event.copy(support = anchored)))
+      ),
+      "state" -> g.copy(situations =
+        g.situations.updated(state.id, SituationNode.State(state.copy(support = anchored)))
+      ),
+      "segment" -> g.copy(segments =
+        g.segments.updated(segment.id, segment.copy(support = anchored))
+      ),
+      "context" -> g.copy(contexts =
+        g.contexts.updated(context.id, context.copy(support = anchored))
+      ),
+      "circumstance" -> g.copy(relations =
+        g.relations.copy(circumstances =
+          Vector(
+            CircumstanceEdge(event.id, CircumstanceKind.Time, "time", anchored, event.meta)
+          )
+        )
+      )
     )
 
   supportChanges.foreach { (kind, graph) =>
@@ -75,3 +113,14 @@ class D1aTextBoundarySuite extends FunSuite:
       assert(draft(graph = graph).isLeft)
       assert(ordinary.copy(graph = graph).isLeft)
   }
+
+  test("accepting control: checked trajectory derivation retains text transitions"):
+    assertEquals(
+      DiscourseTrajectory.derive(built.graph, built.hierarchy, built.atlas),
+      Right(ordinary.trajectory)
+    )
+
+  test("checked trajectory derivation refuses anchored event and state support"):
+    supportChanges.filter((kind, _) => kind == "event" || kind == "state").foreach { (_, graph) =>
+      assert(DiscourseTrajectory.derive(graph, built.hierarchy, built.atlas).isLeft)
+    }

@@ -98,7 +98,8 @@ object NarrativeConsistency:
       speechScoped
         .filter(t =>
           t.predicate.lemma == s.predicate.lemma && roleSet(t.id) == roleSet(s.id) &&
-            roleSet(s.id).nonEmpty && s.support.textSpans.exists(a => t.support.textSpans.exists(a.overlaps)) &&
+            roleSet(s.id).nonEmpty && s.support.textSpans
+              .exists(a => t.support.textSpans.exists(a.overlaps)) &&
             !g.referencesOut.getOrElse(s.id, Vector.empty).exists(_.to == t.id) &&
             !g.referencesOut.getOrElse(t.id, Vector.empty).exists(_.to == s.id)
         )

@@ -164,7 +164,7 @@ object CoreCodecs:
 
   /** Text retains its 0.7.0 shape; detached anchored components use the tagged additive shape. */
   given Encoder[TypedSupport] = Encoder.instance {
-    case TypedSupport.Text(spans) => spans.asJson
+    case TypedSupport.Text(spans)       => spans.asJson
     case TypedSupport.Anchored(support) => support.asJson
   }
 

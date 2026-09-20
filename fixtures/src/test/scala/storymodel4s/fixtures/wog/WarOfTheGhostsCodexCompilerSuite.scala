@@ -74,21 +74,23 @@ class WarOfTheGhostsCodexCompilerSuite extends ScalaCheckSuite:
       checksum = Checksum.ofText("wog-scale-selector-sidecar:" + spaceId.value),
       layout = Layout.RowMajor
     )
-    val draft = StoryModel.draft(
-      model.source,
-      atlas,
-      model.graph,
-      model.hierarchy,
-      model.trajectory,
-      model.featureSpaces.updated(spaceId, featureSpace.copy(id = spaceId)),
-      model.sidecars.updated(spaceId, manifest),
-      refs,
-      model.descriptors,
-      model.hypotheses,
-      model.sensoryProfiles,
-      model.receipt,
-      model.schemaVersion
-    ).fold(error => throw new IllegalArgumentException(error.message), identity)
+    val draft = StoryModel
+      .draft(
+        model.source,
+        atlas,
+        model.graph,
+        model.hierarchy,
+        model.trajectory,
+        model.featureSpaces.updated(spaceId, featureSpace.copy(id = spaceId)),
+        model.sidecars.updated(spaceId, manifest),
+        refs,
+        model.descriptors,
+        model.hypotheses,
+        model.sensoryProfiles,
+        model.receipt,
+        model.schemaVersion
+      )
+      .fold(error => throw new IllegalArgumentException(error.message), identity)
     val outcome = StoryValidator.validate(draft)
     outcome.validated.getOrElse(fail(outcome.report.render))
 
@@ -157,21 +159,25 @@ class WarOfTheGhostsCodexCompilerSuite extends ScalaCheckSuite:
       graph: NarrativeGraph,
       hierarchy: NarrativeHierarchy
   ): StoryModel[ModelStatus.Validated] =
-    val draft = StoryModel.draft(
-      model.source,
-      model.atlas,
-      graph,
-      hierarchy,
-      DiscourseTrajectory.derive(graph, hierarchy, model.atlas).fold(error => throw new IllegalArgumentException(error.message), identity),
-      model.featureSpaces,
-      model.sidecars,
-      model.featureRefs,
-      model.descriptors,
-      model.hypotheses,
-      model.sensoryProfiles,
-      model.receipt,
-      model.schemaVersion
-    ).fold(error => throw new IllegalArgumentException(error.message), identity)
+    val draft = StoryModel
+      .draft(
+        model.source,
+        model.atlas,
+        graph,
+        hierarchy,
+        DiscourseTrajectory
+          .derive(graph, hierarchy, model.atlas)
+          .fold(error => throw new IllegalArgumentException(error.message), identity),
+        model.featureSpaces,
+        model.sidecars,
+        model.featureRefs,
+        model.descriptors,
+        model.hypotheses,
+        model.sensoryProfiles,
+        model.receipt,
+        model.schemaVersion
+      )
+      .fold(error => throw new IllegalArgumentException(error.message), identity)
     val outcome = StoryValidator.validate(draft)
     outcome.validated.getOrElse(fail(outcome.report.render))
 

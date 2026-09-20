@@ -78,13 +78,15 @@ class DraftCodexSuite extends FunSuite:
     )
 
   private val model: StoryModel[ModelStatus.Draft] =
-    StoryModel.draft(
-      source,
-      atlas,
-      NarrativeGraph.empty.copy(contexts = Map(narrated.id -> narrated, reported.id -> reported)),
-      NarrativeHierarchy(Vector.empty, Vector.empty),
-      DiscourseTrajectory.empty
-    ).fold(error => throw new IllegalArgumentException(error.message), identity)
+    StoryModel
+      .draft(
+        source,
+        atlas,
+        NarrativeGraph.empty.copy(contexts = Map(narrated.id -> narrated, reported.id -> reported)),
+        NarrativeHierarchy(Vector.empty, Vector.empty),
+        DiscourseTrajectory.empty
+      )
+      .fold(error => throw new IllegalArgumentException(error.message), identity)
 
   private def node(index: Int, concept: String): ChartNodeRef =
     ChartNodeRef(sentences(index).id, ConceptId.unsafe(concept))

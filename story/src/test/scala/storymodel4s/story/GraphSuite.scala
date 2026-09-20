@@ -22,7 +22,8 @@ class GraphSuite extends ScalaCheckSuite:
   property("situationsByEntity and participantsOf are inverse views of the participant layer") {
     forAll { (b: Small.Built) =>
       val g = b.graph
-      val fromEntity = b.draft().situationsByEntity.toVector.flatMap((e, ss) => ss.map(s => (s, e))).toSet
+      val fromEntity =
+        b.draft().situationsByEntity.toVector.flatMap((e, ss) => ss.map(s => (s, e))).toSet
       val fromSit = g.participantsOf.toVector.flatMap((s, ps) => ps.map((_, e) => (s, e))).toSet
       fromEntity == fromSit
     }

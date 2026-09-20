@@ -30,13 +30,13 @@ final case class EntityNode(
 object EntityNode:
   /** Source-compatible text construction; the stored support retains its coordinate family. */
   def apply(
-    id: EntityId,
-    label: Resolved[String],
-    entityType: EntityType,
-    mentions: NonEmptyVector[MentionId[EntityK]],
-    attributes: Vector[ScopedAttribute],
-    support: SpanSet,
-    meta: ClaimMeta
+      id: EntityId,
+      label: Resolved[String],
+      entityType: EntityType,
+      mentions: NonEmptyVector[MentionId[EntityK]],
+      attributes: Vector[ScopedAttribute],
+      support: SpanSet,
+      meta: ClaimMeta
   ): EntityNode =
     new EntityNode(id, label, entityType, mentions, attributes, TypedSupport.Text(support), meta)
 
@@ -74,18 +74,29 @@ final case class EventNode(
 object EventNode:
   /** Source-compatible text construction; the stored support retains its coordinate family. */
   def apply(
-    id: SituationId,
-    predicate: Predicate,
-    description: String,
-    context: ContextId,
-    polarity: Polarity,
-    modality: Modality,
-    aspect: Option[Aspect],
-    support: SpanSet,
-    mentions: NonEmptyVector[MentionId[SituationK]],
-    meta: ClaimMeta
+      id: SituationId,
+      predicate: Predicate,
+      description: String,
+      context: ContextId,
+      polarity: Polarity,
+      modality: Modality,
+      aspect: Option[Aspect],
+      support: SpanSet,
+      mentions: NonEmptyVector[MentionId[SituationK]],
+      meta: ClaimMeta
   ): EventNode =
-    new EventNode(id, predicate, description, context, polarity, modality, aspect, TypedSupport.Text(support), mentions, meta)
+    new EventNode(
+      id,
+      predicate,
+      description,
+      context,
+      polarity,
+      modality,
+      aspect,
+      TypedSupport.Text(support),
+      mentions,
+      meta
+    )
 
 /** A condition holding over an interval (fog, not feeling sick, being dead). */
 final case class StateNode(
@@ -103,17 +114,27 @@ final case class StateNode(
 object StateNode:
   /** Source-compatible text construction; the stored support retains its coordinate family. */
   def apply(
-    id: SituationId,
-    predicate: Predicate,
-    description: String,
-    context: ContextId,
-    polarity: Polarity,
-    modality: Modality,
-    support: SpanSet,
-    mentions: NonEmptyVector[MentionId[SituationK]],
-    meta: ClaimMeta
+      id: SituationId,
+      predicate: Predicate,
+      description: String,
+      context: ContextId,
+      polarity: Polarity,
+      modality: Modality,
+      support: SpanSet,
+      mentions: NonEmptyVector[MentionId[SituationK]],
+      meta: ClaimMeta
   ): StateNode =
-    new StateNode(id, predicate, description, context, polarity, modality, TypedSupport.Text(support), mentions, meta)
+    new StateNode(
+      id,
+      predicate,
+      description,
+      context,
+      polarity,
+      modality,
+      TypedSupport.Text(support),
+      mentions,
+      meta
+    )
 
 /** Situations are events or states; both are alignable at hierarchy level 0. */
 enum SituationNode:
@@ -224,12 +245,12 @@ final case class SegmentNode(
 object SegmentNode:
   /** Source-compatible text construction; the stored support retains its coordinate family. */
   def apply(
-    id: SegmentId,
-    kind: SegmentKind,
-    level: Int,
-    meta: ClaimMeta,
-    summary: SegmentSummary,
-    support: SpanSet
+      id: SegmentId,
+      kind: SegmentKind,
+      level: Int,
+      meta: ClaimMeta,
+      summary: SegmentSummary,
+      support: SpanSet
   ): SegmentNode =
     new SegmentNode(id, kind, level, meta, summary, TypedSupport.Text(support))
 
@@ -339,11 +360,11 @@ final case class ContextFrame(
 object ContextFrame:
   /** Source-compatible text construction; the stored support retains its coordinate family. */
   def apply(
-    id: ContextId,
-    parent: Option[ContextId],
-    kind: ContextKind,
-    support: SpanSet,
-    meta: ClaimMeta
+      id: ContextId,
+      parent: Option[ContextId],
+      kind: ContextKind,
+      support: SpanSet,
+      meta: ClaimMeta
   ): ContextFrame =
     new ContextFrame(id, parent, kind, TypedSupport.Text(support), meta)
 

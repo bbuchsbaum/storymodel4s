@@ -41,10 +41,14 @@ final class StoryModel[S <: ModelStatus] private (
 
   /** All ordered read views share the order checked during construction. */
   lazy val discoursePosition: Map[SituationId, Int] = graph.discoursePosition(discourseOrder)
-  lazy val situationsByEntity: Map[EntityId, Vector[SituationId]] = graph.situationsByEntity(discourseOrder)
-  lazy val situationsByContext: Map[ContextId, Vector[SituationId]] = graph.situationsByContext(discourseOrder)
-  def situationsWithin(context: ContextId): Vector[SituationId] = graph.situationsWithin(context, discourseOrder)
-  def situationsCovering(span: TextSpan): Vector[SituationId] = graph.situationsCovering(span, discourseOrder)
+  lazy val situationsByEntity: Map[EntityId, Vector[SituationId]] =
+    graph.situationsByEntity(discourseOrder)
+  lazy val situationsByContext: Map[ContextId, Vector[SituationId]] =
+    graph.situationsByContext(discourseOrder)
+  def situationsWithin(context: ContextId): Vector[SituationId] =
+    graph.situationsWithin(context, discourseOrder)
+  def situationsCovering(span: TextSpan): Vector[SituationId] =
+    graph.situationsCovering(span, discourseOrder)
 
   /** The derived, normalized claim ledger; fails on duplicate claim identifiers. */
   lazy val ledger: Either[DomainError, ClaimLedger] = ClaimLedger.empty.addAll(claims)
@@ -214,30 +218,47 @@ object StoryModel:
     )
 
   private def checked[S <: ModelStatus](
-    schemaVersion: String,
-    source: StorySource,
-    atlas: SurfaceAtlas,
-    graph: NarrativeGraph,
-    hierarchy: NarrativeHierarchy,
-    trajectory: DiscourseTrajectory,
-    featureSpaces: Map[FeatureSpaceId, FeatureSpace[?]],
-    sidecars: Map[FeatureSpaceId, SidecarManifest],
-    featureRefs: Vector[FeatureRef],
-    descriptors: Vector[DescriptorClaim],
-    hypotheses: Vector[HypothesisClaim],
-    sensoryProfiles: Map[SituationId, Vector[SensoryProfile]],
-    receipt: Option[BuildReceipt]
+      schemaVersion: String,
+      source: StorySource,
+      atlas: SurfaceAtlas,
+      graph: NarrativeGraph,
+      hierarchy: NarrativeHierarchy,
+      trajectory: DiscourseTrajectory,
+      featureSpaces: Map[FeatureSpaceId, FeatureSpace[?]],
+      sidecars: Map[FeatureSpaceId, SidecarManifest],
+      featureRefs: Vector[FeatureRef],
+      descriptors: Vector[DescriptorClaim],
+      hypotheses: Vector[HypothesisClaim],
+      sensoryProfiles: Map[SituationId, Vector[SensoryProfile]],
+      receipt: Option[BuildReceipt]
   ): Either[DomainError, StoryModel[S]] =
-    val wrongSupport = graph.supportEntries.sortBy(_._1).find(entry => !entry._2.isInstanceOf[TypedSupport.Text])
+    val wrongSupport =
+      graph.supportEntries.sortBy(_._1).find(entry => !entry._2.isInstanceOf[TypedSupport.Text])
     val allClaims = graph.allMeta ++ hierarchy.allMeta ++ trajectory.allMeta ++
       descriptors.map(_.meta) ++ hypotheses.map(_.meta)
     if wrongSupport.nonEmpty then
-      Left(DomainError.InvariantViolation(wrongSupport.get._1 + "/support", "text StoryModel requires Text support"))
+      Left(
+        DomainError.InvariantViolation(
+          wrongSupport.get._1 + "/support",
+          "text StoryModel requires Text support"
+        )
+      )
     else if allClaims.exists(_.evidence.exists(_.anchors.nonEmpty)) then
-      Left(DomainError.InvariantViolation("model/evidence", "text StoryModel cannot carry anchored claim evidence"))
+      Left(
+        DomainError.InvariantViolation(
+          "model/evidence",
+          "text StoryModel cannot carry anchored claim evidence"
+        )
+      )
     else if (hierarchy.boundaryBeliefs ++ trajectory.steps.flatMap(_.boundaryBeliefs))
-      .exists(_.evidence.exists(_.anchors.nonEmpty)) then
-      Left(DomainError.InvariantViolation("model/boundary-evidence", "text StoryModel cannot carry anchored boundary evidence"))
+        .exists(_.evidence.exists(_.anchors.nonEmpty))
+    then
+      Left(
+        DomainError.InvariantViolation(
+          "model/boundary-evidence",
+          "text StoryModel cannot carry anchored boundary evidence"
+        )
+      )
     else
       for
         bundle <- SourceBundle.writtenText(source)

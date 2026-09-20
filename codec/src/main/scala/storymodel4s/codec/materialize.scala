@@ -58,22 +58,27 @@ object FeatureMaterializer:
         .flatMap { materialized =>
           val sidecarTracks = materialized.map(_._1)
           val bytes = materialized.map((t, b) => t.space.id -> b).toMap
-          StoryModel.draft(
-            draft.source,
-            draft.atlas,
-            draft.graph,
-            draft.hierarchy,
-            draft.trajectory,
-            draft.featureSpaces ++ sidecarTracks.map(t => t.space.id -> (t.space: FeatureSpace[?])),
-            draft.sidecars ++ sidecarTracks.map(t => t.space.id -> t.manifest),
-            draft.featureRefs ++ sidecarTracks.flatMap(_.observations.flatMap(_.estimate.toOption)),
-            draft.descriptors,
-            draft.hypotheses,
-            draft.sensoryProfiles,
-            draft.receipt,
-            draft.schemaVersion
-          )
-            .left.map(CodecError.Domain.apply)
+          StoryModel
+            .draft(
+              draft.source,
+              draft.atlas,
+              draft.graph,
+              draft.hierarchy,
+              draft.trajectory,
+              draft.featureSpaces ++ sidecarTracks
+                .map(t => t.space.id -> (t.space: FeatureSpace[?])),
+              draft.sidecars ++ sidecarTracks.map(t => t.space.id -> t.manifest),
+              draft.featureRefs ++ sidecarTracks.flatMap(
+                _.observations.flatMap(_.estimate.toOption)
+              ),
+              draft.descriptors,
+              draft.hypotheses,
+              draft.sensoryProfiles,
+              draft.receipt,
+              draft.schemaVersion
+            )
+            .left
+            .map(CodecError.Domain.apply)
             .map(model => new MaterializedFeatures(model, bytes, sidecarTracks))
         }
 

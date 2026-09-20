@@ -59,21 +59,25 @@ class WarOfTheGhostsAtlasSuite extends FunSuite:
       graph: NarrativeGraph = model.graph,
       hierarchy: NarrativeHierarchy = model.hierarchy
   ): StoryModel[ModelStatus.Validated] =
-    val draft = StoryModel.draft(
-      model.source,
-      atlas,
-      graph,
-      hierarchy,
-      DiscourseTrajectory.derive(graph, hierarchy, atlas).fold(error => throw new IllegalArgumentException(error.message), identity),
-      model.featureSpaces,
-      model.sidecars,
-      model.featureRefs,
-      model.descriptors,
-      model.hypotheses,
-      model.sensoryProfiles,
-      model.receipt,
-      model.schemaVersion
-    ).fold(error => throw new IllegalArgumentException(error.message), identity)
+    val draft = StoryModel
+      .draft(
+        model.source,
+        atlas,
+        graph,
+        hierarchy,
+        DiscourseTrajectory
+          .derive(graph, hierarchy, atlas)
+          .fold(error => throw new IllegalArgumentException(error.message), identity),
+        model.featureSpaces,
+        model.sidecars,
+        model.featureRefs,
+        model.descriptors,
+        model.hypotheses,
+        model.sensoryProfiles,
+        model.receipt,
+        model.schemaVersion
+      )
+      .fold(error => throw new IllegalArgumentException(error.message), identity)
     val outcome = StoryValidator.validate(draft)
     outcome.validated.getOrElse(fail(outcome.report.render))
 

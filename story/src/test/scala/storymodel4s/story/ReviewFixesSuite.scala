@@ -190,12 +190,19 @@ class ReviewFixesSuite extends ScalaCheckSuite:
     // give situation 2 an additional earlier span listed second: it should now come first
     val support = SpanSet.of(Vector(sp(b, 2).refs.head, sp(b, 0).refs.head)).get
     val moved = s2 match
-      case SituationNode.Event(n) => SituationNode.Event(n.copy(support = TypedSupport.Text(support)))
-      case SituationNode.State(n) => SituationNode.State(n.copy(support = TypedSupport.Text(support)))
+      case SituationNode.Event(n) =>
+        SituationNode.Event(n.copy(support = TypedSupport.Text(support)))
+      case SituationNode.State(n) =>
+        SituationNode.State(n.copy(support = TypedSupport.Text(support)))
     val g = b.graph.copy(situations = b.graph.situations.updated(moved.id, moved))
     // its hull now starts with sentence 0, so it precedes situation 1 (and ties with 0 on start,
     // losing on the longer hull end)
-    assert(b.draft(graph = g).discourseOrder.indexOf(b.situations(2)) < b.draft(graph = g).discourseOrder.indexOf(b.situations(1)))
+    assert(
+      b.draft(graph = g).discourseOrder.indexOf(b.situations(2)) < b
+        .draft(graph = g)
+        .discourseOrder
+        .indexOf(b.situations(1))
+    )
     assertEquals(b.draft(graph = g).discourseOrder.head, b.situations(0))
   }
 
@@ -230,7 +237,10 @@ class ReviewFixesSuite extends ScalaCheckSuite:
       Small.meta("mem", EpistemicStatus.SurfaceExplicit, Some(sp(b, 0)))
     )
     val g = b.graph.copy(relations = b.graph.relations.copy(entityRelations = Vector(member)))
-    assertEquals(b.draft(graph = g).situationsByEntity(b.entities(1)).toSet, Set(b.situations(0), b.situations(1)))
+    assertEquals(
+      b.draft(graph = g).situationsByEntity(b.entities(1)).toSet,
+      Set(b.situations(0), b.situations(1))
+    )
     val v = StoryValidator.validate(b.draft(graph = g), ValidationPolicy.strict)
     assertEquals(v.report.violations, Vector.empty, v.report.render)
     val cont = AlignmentSource(v.validated.get).relationMatrix(RelationLayer.EntityContinuity)
@@ -266,24 +276,40 @@ class ReviewFixesSuite extends ScalaCheckSuite:
         Vector(("it did not happen", Credence.unsafeRaw(0.4, ScorerId.unsafe("test-scorer"))))
       )
     )
-    val draft = StoryModel.draft(
-      b.source,
-      b.atlas,
-      b.graph,
-      b.hierarchy,
-      DiscourseTrajectory.derive(b.graph, b.hierarchy, b.atlas).fold(error => throw new IllegalArgumentException(error.message), identity),
-      hypotheses = Vector(good)
-    ).fold(error => throw new IllegalArgumentException(error.message), identity)
+    val draft = StoryModel
+      .draft(
+        b.source,
+        b.atlas,
+        b.graph,
+        b.hierarchy,
+        DiscourseTrajectory
+          .derive(b.graph, b.hierarchy, b.atlas)
+          .fold(error => throw new IllegalArgumentException(error.message), identity),
+        hypotheses = Vector(good)
+      )
+      .fold(error => throw new IllegalArgumentException(error.message), identity)
     // the subject is SurfaceExplicit in Small.build, so the consistency checker warns
     val out = StoryValidator.validate(draft)
     assertEquals(out.report.errors, Vector.empty)
     assertEquals(out.report.warnings.map(_.law), Vector("hypothesis-subject-explicit"))
     val noAlt = good.copy(reading = good.reading.copy(alternatives = Vector.empty))
-    assert(laws(draft.copy[ModelStatus.Draft](hypotheses = Vector(noAlt)).fold(error => fail(error.message), identity)).contains("hypothesis.has-alternatives"))
+    assert(
+      laws(
+        draft
+          .copy[ModelStatus.Draft](hypotheses = Vector(noAlt))
+          .fold(error => fail(error.message), identity)
+      ).contains("hypothesis.has-alternatives")
+    )
     val wrongStatus = good.copy(reading =
       good.reading.copy(meta = Small.meta("h2", EpistemicStatus.SurfaceExplicit, Some(sp(b, 0))))
     )
-    assert(laws(draft.copy[ModelStatus.Draft](hypotheses = Vector(wrongStatus)).fold(error => fail(error.message), identity)).contains("hypothesis.status"))
+    assert(
+      laws(
+        draft
+          .copy[ModelStatus.Draft](hypotheses = Vector(wrongStatus))
+          .fold(error => fail(error.message), identity)
+      ).contains("hypothesis.status")
+    )
   }
 
   // --- narrative consistency ----------------------------------------------------------------------------

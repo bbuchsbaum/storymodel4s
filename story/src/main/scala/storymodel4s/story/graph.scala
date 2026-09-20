@@ -18,18 +18,30 @@ final case class NarrativeGraph(
   def discourseOrderOn(bundle: SourceBundle): Either[DomainError, Vector[SituationId]] =
     discourseOrder(bundle)
 
-  private[story] def discourseOrder(bundle: SourceBundle): Either[DomainError, Vector[SituationId]] =
+  private[story] def discourseOrder(
+      bundle: SourceBundle
+  ): Either[DomainError, Vector[SituationId]] =
     if bundle.primaryAxis.kind != AxisKind.TextCharacter then
-      Left(DomainError.InvariantViolation("graph/order/primary-kind", "text ordering requires TextCharacter"))
+      Left(
+        DomainError
+          .InvariantViolation("graph/order/primary-kind", "text ordering requires TextCharacter")
+      )
     else
-      situations.values.toVector.sortBy(_.id)
-        .foldLeft[Either[DomainError, Vector[(SituationId, PrimaryProjection)]]](Right(Vector.empty)) {
-          (result, situation) =>
-            for
-              values <- result
-              projection <- PrimaryProjection.on(bundle, situation.support).left.map(error =>
-                DomainError.InvariantViolation(s"situations/${situation.id.value}/support", error.message))
-            yield values :+ (situation.id -> projection)
+      situations.values.toVector
+        .sortBy(_.id)
+        .foldLeft[Either[DomainError, Vector[(SituationId, PrimaryProjection)]]](
+          Right(Vector.empty)
+        ) { (result, situation) =>
+          for
+            values <- result
+            projection <- PrimaryProjection
+              .on(bundle, situation.support)
+              .left
+              .map(error =>
+                DomainError
+                  .InvariantViolation(s"situations/${situation.id.value}/support", error.message)
+              )
+          yield values :+ (situation.id -> projection)
         }
         .map(_.sortBy { (id, projection) =>
           val (start, end) = projection.bounds
@@ -87,7 +99,9 @@ final case class NarrativeGraph(
   /** Situations each entity participates in, in discourse order, including situations of any group
     * the entity is (transitively) a member of.
     */
-  private[story] def situationsByEntity(order: Vector[SituationId]): Map[EntityId, Vector[SituationId]] =
+  private[story] def situationsByEntity(
+      order: Vector[SituationId]
+  ): Map[EntityId, Vector[SituationId]] =
     val positions = discoursePosition(order)
     val direct = relations.participants.groupMap(_.entity)(_.situation)
     val all = entities.keys.toVector.map { e =>
@@ -113,7 +127,9 @@ final case class NarrativeGraph(
     val base = entitiesOf(id)
     base ++ base.flatMap(groupsOf) ++ base.flatMap(g => membersOf.getOrElse(g, Vector.empty))
 
-  private[story] def situationsByContext(order: Vector[SituationId]): Map[ContextId, Vector[SituationId]] =
+  private[story] def situationsByContext(
+      order: Vector[SituationId]
+  ): Map[ContextId, Vector[SituationId]] =
     val positions = discoursePosition(order)
     situations.values.toVector
       .groupMap(_.context)(_.id)
@@ -169,7 +185,10 @@ final case class NarrativeGraph(
   lazy val goalsOut: Map[SituationId, Vector[GoalEdge]] = relations.goals.groupBy(_.from)
 
   /** Situations whose context is (or is within) the given context. */
-  private[story] def situationsWithin(context: ContextId, order: Vector[SituationId]): Vector[SituationId] =
+  private[story] def situationsWithin(
+      context: ContextId,
+      order: Vector[SituationId]
+  ): Vector[SituationId] =
     order.filter(id => situations.get(id).exists(s => contextWithin(s.context, context)))
 
   /** Every inline claim of the graph: node claims, resolved-value claims, scoped attributes, and
@@ -236,10 +255,18 @@ final case class NarrativeGraph(
   def covering(span: TextSpan): Vector[StoryRef] =
     def hits(s: SpanSet): Boolean = s.spans.exists(_.overlaps(span))
     val nodes: Vector[StoryRef] =
-      situations.values.toVector.filter(s => s.support.textSpans.exists(hits)).map(s => StoryRef.Situation(s.id)) ++
-        segments.values.toVector.filter(s => s.support.textSpans.exists(hits)).map(s => StoryRef.Segment(s.id)) ++
-        entities.values.toVector.filter(e => e.support.textSpans.exists(hits)).map(e => StoryRef.Entity(e.id)) ++
-        contexts.values.toVector.filter(c => c.support.textSpans.exists(hits)).map(c => StoryRef.Context(c.id))
+      situations.values.toVector
+        .filter(s => s.support.textSpans.exists(hits))
+        .map(s => StoryRef.Situation(s.id)) ++
+        segments.values.toVector
+          .filter(s => s.support.textSpans.exists(hits))
+          .map(s => StoryRef.Segment(s.id)) ++
+        entities.values.toVector
+          .filter(e => e.support.textSpans.exists(hits))
+          .map(e => StoryRef.Entity(e.id)) ++
+        contexts.values.toVector
+          .filter(c => c.support.textSpans.exists(hits))
+          .map(c => StoryRef.Context(c.id))
     def cited(meta: ClaimMeta): Boolean = meta.spans.exists(hits)
     val edges: Vector[StoryRef] =
       relations.participants
@@ -267,8 +294,13 @@ final case class NarrativeGraph(
     (nodes ++ edges).distinct.sortBy(r => ev.address(r).render)
 
   /** Situations whose support overlaps `span`, in discourse order. */
-  private[story] def situationsCovering(span: TextSpan, order: Vector[SituationId]): Vector[SituationId] =
-    order.filter(id => situations.get(id).exists(_.support.textSpans.exists(_.spans.exists(_.overlaps(span)))))
+  private[story] def situationsCovering(
+      span: TextSpan,
+      order: Vector[SituationId]
+  ): Vector[SituationId] =
+    order.filter(id =>
+      situations.get(id).exists(_.support.textSpans.exists(_.spans.exists(_.overlaps(span))))
+    )
 
 object NarrativeGraph:
   val empty: NarrativeGraph =

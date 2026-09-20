@@ -1432,7 +1432,8 @@ object NarrativeCompiler:
           gaps += gap(record.target, record.bundle, ClaimFamily.SituationMention, gapReason(state))
     }
 
-    val emitted = emittedSituations.result().sortBy(s => (s.node.support.textSpans.get.minSpan, s.node.id))
+    val emitted =
+      emittedSituations.result().sortBy(s => (s.node.support.textSpans.get.minSpan, s.node.id))
     val emittedNev = NonEmptyVector.fromVector(emitted)
     val situationEntries = emitted.map(s => s.mention -> s.source)
     val situationTable = MentionTable.of[SituationK](situationEntries, input.mentionGraph) match
@@ -2122,7 +2123,7 @@ object NarrativeCompiler:
       bundle <- SourceBundle.writtenText(input.source)
       order <- graph.discourseOrderOn(bundle)
     yield order) match
-      case Left(error) => return Left(NarrativeCompilerError.ClaimConstruction(error))
+      case Left(error)  => return Left(NarrativeCompilerError.ClaimConstruction(error))
       case Right(value) => value
     val orderedEmitted = checkedOrder.flatMap(emittedById.get)
     val pairs = orderedEmitted.zip(orderedEmitted.drop(1))
@@ -2154,7 +2155,7 @@ object NarrativeCompiler:
           input.provenance.softwareVersion,
           coverageResolved
         ) match
-          case Left(error) => return Left(NarrativeCompilerError.ClaimConstruction(error))
+          case Left(error)  => return Left(NarrativeCompilerError.ClaimConstruction(error))
           case Right(value) => value
       else DiscourseTrajectory.empty
     trajectory.steps.foreach { step =>
@@ -2197,7 +2198,7 @@ object NarrativeCompiler:
       trajectory,
       receipt = Some(input.receipt)
     ) match
-      case Left(error) => return Left(NarrativeCompilerError.ClaimConstruction(error))
+      case Left(error)  => return Left(NarrativeCompilerError.ClaimConstruction(error))
       case Right(value) => value
     val gapVec = gaps.result().sortBy(g => (g.target.render, g.reason.render))
     val structuralValidation = StoryValidator.validate(draft)

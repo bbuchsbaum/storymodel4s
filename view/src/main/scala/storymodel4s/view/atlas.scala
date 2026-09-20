@@ -745,10 +745,12 @@ final class AtlasCompiler private (provenance: ViewProvenance):
     val situationSupport: Map[SituationId, SpanSet] =
       model.discourseOrder.flatMap { id =>
         g.situations.get(id).flatMap { node =>
-          if claimVisible(node.meta) then node.support.textSpans.flatMap(clipped).map(id -> _) else None
+          if claimVisible(node.meta) then node.support.textSpans.flatMap(clipped).map(id -> _)
+          else None
         }
       }.toMap
-    val visibleSituations: Vector[SituationId] = model.discourseOrder.filter(situationSupport.contains)
+    val visibleSituations: Vector[SituationId] =
+      model.discourseOrder.filter(situationSupport.contains)
     val visibleSet = visibleSituations.toSet
 
     // Lanes: only horizon-visible contexts may affect geometry. The narrated-world root is lane 0
@@ -1104,7 +1106,9 @@ final class AtlasCompiler private (provenance: ViewProvenance):
       case StoryRef.Segment(id)   =>
         g.segments
           .get(id)
-          .exists(segment => claimVisible(segment.meta) && segment.support.textSpans.flatMap(clipped).nonEmpty)
+          .exists(segment =>
+            claimVisible(segment.meta) && segment.support.textSpans.flatMap(clipped).nonEmpty
+          )
       case _ => false
     def visibleAncestor(ref: StoryRef): Option[Address] =
       val start: Option[NarrativeMember] = ref match
@@ -1114,7 +1118,9 @@ final class AtlasCompiler private (provenance: ViewProvenance):
       def segmentVisible(id: SegmentId): Boolean =
         g.segments
           .get(id)
-          .exists(segment => claimVisible(segment.meta) && segment.support.textSpans.flatMap(clipped).nonEmpty)
+          .exists(segment =>
+            claimVisible(segment.meta) && segment.support.textSpans.flatMap(clipped).nonEmpty
+          )
       start
         .flatMap(member =>
           VisibleAncestorChain.from(member, primaryParent, segmentVisible).find(marked.contains)

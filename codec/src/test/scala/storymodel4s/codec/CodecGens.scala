@@ -911,57 +911,61 @@ object CodecFixture:
   )
 
   val draft: StoryModel[ModelStatus.Draft] =
-    val trajectory = DiscourseTrajectory.derive(graph, hierarchy, atlas).fold(error => throw new IllegalArgumentException(error.message), identity)
-    StoryModel.draft(
-      source,
-      atlas,
-      graph,
-      hierarchy,
-      trajectory,
-      featureSpaces,
-      sidecars,
-      featureRefs,
-      descriptors = Vector(
-        DescriptorClaim(
-          root,
-          DescriptorKind.Summary,
-          "Anna comes home and rests.",
-          meta("d0", EpistemicStatus.Hypothesized, None)
-        )
-      ),
-      hypotheses = Vector(
-        HypothesisClaim(
-          s2,
-          Resolved(
-            "the house was quiet",
-            meta("hyp0", EpistemicStatus.Hypothesized, None),
-            Vector(
-              ("the house was not quiet", Credence.unsafeRaw(0.3, ScorerId.unsafe("test-scorer")))
+    val trajectory = DiscourseTrajectory
+      .derive(graph, hierarchy, atlas)
+      .fold(error => throw new IllegalArgumentException(error.message), identity)
+    StoryModel
+      .draft(
+        source,
+        atlas,
+        graph,
+        hierarchy,
+        trajectory,
+        featureSpaces,
+        sidecars,
+        featureRefs,
+        descriptors = Vector(
+          DescriptorClaim(
+            root,
+            DescriptorKind.Summary,
+            "Anna comes home and rests.",
+            meta("d0", EpistemicStatus.Hypothesized, None)
+          )
+        ),
+        hypotheses = Vector(
+          HypothesisClaim(
+            s2,
+            Resolved(
+              "the house was quiet",
+              meta("hyp0", EpistemicStatus.Hypothesized, None),
+              Vector(
+                ("the house was not quiet", Credence.unsafeRaw(0.3, ScorerId.unsafe("test-scorer")))
+              )
             )
           )
-        )
-      ),
-      sensoryProfiles = Map(
-        s2 -> Vector(
-          SensoryProfile(
-            SensoryProfileKind.Expressed,
-            Map(
-              SensoryModality.Auditory -> Estimate.score(0.8),
-              SensoryModality.Visual -> Estimate.missing(MissingReason.NotInLexicon)
+        ),
+        sensoryProfiles = Map(
+          s2 -> Vector(
+            SensoryProfile(
+              SensoryProfileKind.Expressed,
+              Map(
+                SensoryModality.Auditory -> Estimate.score(0.8),
+                SensoryModality.Visual -> Estimate.missing(MissingReason.NotInLexicon)
+              )
             )
           )
-        )
-      ),
-      receipt = Some(
-        BuildReceipt(
-          source.id,
-          source.canonicalChecksum,
-          StoryModel.SchemaVersion,
-          Vector((stage, Checksum.ofText("stage"))),
-          0L
+        ),
+        receipt = Some(
+          BuildReceipt(
+            source.id,
+            source.canonicalChecksum,
+            StoryModel.SchemaVersion,
+            Vector((stage, Checksum.ofText("stage"))),
+            0L
+          )
         )
       )
-    ).fold(error => throw new IllegalArgumentException(error.message), identity)
+      .fold(error => throw new IllegalArgumentException(error.message), identity)
 
   lazy val validated: StoryModel[ModelStatus.Validated] =
     val out = StoryValidator.validate(draft, ValidationPolicy.default)

@@ -100,7 +100,8 @@ class TextParitySuite extends FunSuite:
     def bySupport(nodes: Vector[(String, TypedSupport)]): Json =
       nodes
         .sortBy { case (id, support) =>
-          val projection = PrimaryProjection.on(bundle, support).fold(error => fail(error.message), identity)
+          val projection =
+            PrimaryProjection.on(bundle, support).fold(error => fail(error.message), identity)
           val (start, end) = projection.bounds
           (start, end, id)
         }

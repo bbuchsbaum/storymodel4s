@@ -48,11 +48,11 @@ final case class CircumstanceEdge(
 object CircumstanceEdge:
   /** Source-compatible text construction; the stored support retains its coordinate family. */
   def apply(
-    situation: SituationId,
-    kind: CircumstanceKind,
-    label: String,
-    support: SpanSet,
-    meta: ClaimMeta
+      situation: SituationId,
+      kind: CircumstanceKind,
+      label: String,
+      support: SpanSet,
+      meta: ClaimMeta
   ): CircumstanceEdge =
     new CircumstanceEdge(situation, kind, label, TypedSupport.Text(support), meta)
 

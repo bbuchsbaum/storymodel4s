@@ -79,7 +79,8 @@ object DiscourseTrajectory:
       // The shared checked order has established Text support for every situation. This local
       // extraction preserves that joined proof; it is not a generic TypedSupport span cast.
       val supports = graph.situations.view.mapValues(_.support.textSpans.get).toMap
-      val provenance = Provenance.deterministic(softwareVersion, Checksum.ofText("trajectory-derive"))
+      val provenance =
+        Provenance.deterministic(softwareVersion, Checksum.ofText("trajectory-derive"))
       val steps = order.zip(order.drop(1)).map { (a, b) =>
         val sa = graph.situations(a)
         val sb = graph.situations(b)
@@ -121,7 +122,9 @@ object DiscourseTrajectory:
         val endA = supports(a).minSpan.endExclusive
         val startB = supports(b).minSpan.start
         val unitsBetween =
-          atlas.sentences.filter(u => u.span.endExclusive >= endA && u.span.start < startB).map(_.id)
+          atlas.sentences
+            .filter(u => u.span.endExclusive >= endA && u.span.start < startB)
+            .map(_.id)
         val beliefs = hierarchy.boundaryBeliefs.filter(bb => unitsBetween.contains(bb.afterUnit))
         FlowStep(
           a,

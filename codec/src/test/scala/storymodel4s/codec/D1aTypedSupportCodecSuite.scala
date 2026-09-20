@@ -9,14 +9,32 @@ import StoryCodecs.given
 
 class D1aTypedSupportCodecSuite extends FunSuite:
   private val model = CodecFixture.draft
-  private val spans = SpanSet.of(Vector(
-    SpanRef(Some(SurfaceUnitId.unsafe("left")), TextSpan.unsafe(0, 1)),
-    SpanRef(Some(SurfaceUnitId.unsafe("right")), TextSpan.unsafe(3, 4))
-  )).get
-  private val film = SourceBundle.filmEdition(EditionId.unsafe("typed-codec-film"),
-    Checksum.ofText("film"), 0L, 100L, RationalTimebase.Millisecond).toOption.get
-  private val support = EvidenceSupport.media(film, film.streams.head.id,
-    PlaybackIntervalSet.one(PlaybackInterval.on(film.primaryAxis, 1L, 2L).toOption.get)).toOption.get
+  private val spans = SpanSet
+    .of(
+      Vector(
+        SpanRef(Some(SurfaceUnitId.unsafe("left")), TextSpan.unsafe(0, 1)),
+        SpanRef(Some(SurfaceUnitId.unsafe("right")), TextSpan.unsafe(3, 4))
+      )
+    )
+    .get
+  private val film = SourceBundle
+    .filmEdition(
+      EditionId.unsafe("typed-codec-film"),
+      Checksum.ofText("film"),
+      0L,
+      100L,
+      RationalTimebase.Millisecond
+    )
+    .toOption
+    .get
+  private val support = EvidenceSupport
+    .media(
+      film,
+      film.streams.head.id,
+      PlaybackIntervalSet.one(PlaybackInterval.on(film.primaryAxis, 1L, 2L).toOption.get)
+    )
+    .toOption
+    .get
   private val anchored: TypedSupport = TypedSupport.Anchored(support)
 
   test("accepting control: Text support has exact historical bytes and references"):
@@ -37,8 +55,17 @@ class D1aTypedSupportCodecSuite extends FunSuite:
     val g = model.graph
     val entity = g.entities.values.head
     val event = g.situations.values.collectFirst { case SituationNode.Event(n) => n }.get
-    val state = StateNode(event.id, event.predicate, event.description, event.context, event.polarity,
-      event.modality, event.support, event.mentions, event.meta)
+    val state = StateNode(
+      event.id,
+      event.predicate,
+      event.description,
+      event.context,
+      event.polarity,
+      event.modality,
+      event.support,
+      event.mentions,
+      event.meta
+    )
     val segment = g.segments.values.head
     val context = g.contexts.values.head
     val circumstance = CircumstanceEdge(event.id, CircumstanceKind.Time, "time", spans, event.meta)

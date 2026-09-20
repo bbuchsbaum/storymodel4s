@@ -211,22 +211,24 @@ object FeatureStage:
         "features/v1" +: measures.map(m => s"${m.space.id.value}=${m.identity.hex}")
       )
       val receipt = model.receipt.map(r => r.copy(stages = r.stages :+ (Stage, digest)))
-      StoryModel.draft(
-        model.source,
-        model.atlas,
-        model.graph,
-        model.hierarchy,
-        model.trajectory,
-        model.featureSpaces,
-        model.sidecars,
-        model.featureRefs,
-        model.descriptors,
-        model.hypotheses,
-        model.sensoryProfiles,
-        receipt,
-        model.schemaVersion
-      )
-        .left.map(error => PipelineError.FeatureRefused(error.message))
+      StoryModel
+        .draft(
+          model.source,
+          model.atlas,
+          model.graph,
+          model.hierarchy,
+          model.trajectory,
+          model.featureSpaces,
+          model.sidecars,
+          model.featureRefs,
+          model.descriptors,
+          model.hypotheses,
+          model.sensoryProfiles,
+          receipt,
+          model.schemaVersion
+        )
+        .left
+        .map(error => PipelineError.FeatureRefused(error.message))
 
   /** The model's own feature laws over the augmented draft; any of them failing is a refusal, since
     * the compiler's outcome was measured on a draft without these fields.

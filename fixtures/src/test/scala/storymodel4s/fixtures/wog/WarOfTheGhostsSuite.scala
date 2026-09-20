@@ -369,15 +369,19 @@ class WarOfTheGhostsSuite extends munit.FunSuite:
   // --- adversarial mutants: each §27.2 prohibition, realized, is caught ------------------------
 
   private def redraft(graph: NarrativeGraph, hierarchy: NarrativeHierarchy = m.hierarchy) =
-    StoryModel.draft(
-      m.source,
-      m.atlas,
-      graph,
-      hierarchy,
-      DiscourseTrajectory.derive(graph, hierarchy, m.atlas).fold(error => throw new IllegalArgumentException(error.message), identity),
-      descriptors = m.descriptors,
-      hypotheses = m.hypotheses
-    ).fold(error => throw new IllegalArgumentException(error.message), identity)
+    StoryModel
+      .draft(
+        m.source,
+        m.atlas,
+        graph,
+        hierarchy,
+        DiscourseTrajectory
+          .derive(graph, hierarchy, m.atlas)
+          .fold(error => throw new IllegalArgumentException(error.message), identity),
+        descriptors = m.descriptors,
+        hypotheses = m.hypotheses
+      )
+      .fold(error => throw new IllegalArgumentException(error.message), identity)
 
   private def caught(draft: StoryModel[ModelStatus.Draft], law: String): Unit =
     val vs = StoryValidator.validate(draft).report.violations
