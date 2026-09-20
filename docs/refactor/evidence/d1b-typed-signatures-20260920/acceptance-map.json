@@ -1,6 +1,6 @@
 {
   "ticket": "bd-01M2TAC80YRK5JFNKTT7B7CAQN",
-  "status": "partial qualification; final courts pending",
+  "status": "provider qualified; exact-pinned consumer and landing pending",
   "operativeInterpretation": [
     "Exact physical support admits intervals and explicit points; point row13 is mandatory.",
     "Legacy annotation-text coordinates remain declared scoring features only, separately fingerprinted; they are never physical support.",
@@ -33,7 +33,7 @@
         "result-nomination-inventory",
         "result-retain-unused"
       ],
-      "status": "focused/mutation/real-coordinate courts passed; full gate pending"
+      "status": "focused/mutation/real-coordinate and full56-task gate passed"
     },
     {
       "number": 2,
@@ -90,7 +90,7 @@
         "unchanged frozen S0 JSON",
         "hsmm-parity.py backend-specific bytes"
       ],
-      "status": "coordinate/all17/WOG passed; S0 full gate pending"
+      "status": "coordinate/all17/WOG and frozen S0 full gate passed"
     },
     {
       "number": 5,
@@ -143,13 +143,10 @@
         "docs/api-stability.md",
         "ADR0007 D1B refinement"
       ],
-      "status": "documented; final qualification links pending"
+      "status": "documented; provider format and13 executable examples passed"
     }
   ],
   "remaining": [
-    "clean56-task provider full gate",
-    "separate format gate",
-    "13 docs examples",
     "exact-pinned storyatlas consumer",
     "final cold evidence review/local landing/tracker reconciliation"
   ],
@@ -157,5 +154,24 @@
     "Not an end-to-end film compiler or full D1B scientific proof",
     "No new Native numerical identity/tolerance policy",
     "No remote CI, publication or push"
-  ]
+  ],
+  "providerQualification": {
+    "candidate": "774fb1e8fa7358de3d8343e78371f5b4d36eb1cf",
+    "receipt": "release-terminal.json",
+    "counts": {
+      "Total": 7109,
+      "Passed": 7104,
+      "Skipped": 5,
+      "Failed": 0,
+      "Errors": 0
+    },
+    "docsExamples": 13,
+    "formatChecks": [
+      "scalafmtCheckAll",
+      "scalafmtSbtCheck"
+    ],
+    "frozenS0Sha256": "cc201d9dd3e3576fabcd45677369f00c023ca5a455ea9d9e7ba694700c759fb3",
+    "priorRed": "provider-red-attempt-1-manifest.json",
+    "supplementalRegression": "film-group-regression.json"
+  }
 }

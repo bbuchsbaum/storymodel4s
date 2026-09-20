@@ -93,6 +93,12 @@
         "Exact committed runner/helper/production/test bytes and helper/test hashes"
       ],
       "result": "No P1/P2. Prior attempts remain historical; fresh execution is separate."
+    },
+    {
+      "reviewer": "/root/s0_cold_review",
+      "revision": "774fb1e8",
+      "scope": "Direct supplemental FilmFestival archive audit",
+      "result": "24 members/hash/size and exact ace77121 runner/helper/production/test/mutant/restoration verified; seven XMLs reconcile with receipts/logs. Qualified group3 proves 3pass, compiled named kill plus 2pass including interval control, then clean3pass. Historical group2 raw flag is explicitly superseded; original67 archive unchanged. No P1/P2."
     }
   ],
   "remaining": [
