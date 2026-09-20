@@ -1266,6 +1266,7 @@ enum EvidenceAnchor:
       axis: PresentationAxisId,
       intervals: PlaybackIntervalSet
   )
+  case MediaPoint(bundle: SourceBundleId, stream: StreamId, at: PlaybackInstant)
   case Shot(
       bundle: SourceBundleId,
       stream: StreamId,
@@ -1282,23 +1283,48 @@ enum EvidenceAnchor:
   def axisId: Option[PresentationAxisId] = this match
     case EvidenceAnchor.Text(_, _, _)            => None
     case EvidenceAnchor.MediaTime(_, _, axis, _) => Some(axis)
+    case EvidenceAnchor.MediaPoint(_, _, at) => Some(at.axis)
     case EvidenceAnchor.Shot(_, _, _, interval)  => Some(interval.axis)
     case EvidenceAnchor.Track(_, _, _, ivs)      => Some(ivs.axis)
 
   def anchorBundle: SourceBundleId = this match
     case EvidenceAnchor.Text(b, _, _)         => b
     case EvidenceAnchor.MediaTime(b, _, _, _) => b
+    case EvidenceAnchor.MediaPoint(b, _, _) => b
     case EvidenceAnchor.Shot(b, _, _, _)      => b
     case EvidenceAnchor.Track(b, _, _, _)     => b
 
   def anchorStream: StreamId = this match
     case EvidenceAnchor.Text(_, s, _)         => s
     case EvidenceAnchor.MediaTime(_, s, _, _) => s
+    case EvidenceAnchor.MediaPoint(_, s, _) => s
     case EvidenceAnchor.Shot(_, s, _, _)      => s
     case EvidenceAnchor.Track(_, s, _, _)     => s
 
 /** Nonempty heterogeneous support. Hull, overlap, and order require one selected axis. */
-final class EvidenceSupport private (val anchors: NonEmptyVector[EvidenceAnchor]):
+final class EvidenceSupport private (
+    val anchors: NonEmptyVector[EvidenceAnchor],
+    val bundleIdentity: Checksum
+):
+  /** Recheck the complete bundle binding before joining this support to a model or atlas. */
+  def checkedOn(bundle: SourceBundle): Either[DomainError, EvidenceSupport] =
+    if bundle.identity != bundleIdentity then
+      Left(SourceCanon.inv("support/bundle-identity", "support belongs to a different full bundle identity"))
+    else EvidenceSupport.of(bundle, anchors.toVector)
+
+  /** Complete primary-axis support, retaining both explicit points and interval gaps. */
+  def playbackOn(axis: PresentationAxisId): Either[DomainError, PlaybackSupport] =
+    val intervals = anchors.toVector.flatMap {
+      case EvidenceAnchor.MediaTime(_, _, a, set) if a == axis => set.intervals.toVector
+      case EvidenceAnchor.Shot(_, _, _, interval) if interval.axis == axis => Vector(interval)
+      case EvidenceAnchor.Track(_, _, _, set) if set.axis == axis => set.intervals.toVector
+      case _ => Vector.empty
+    }
+    val points = anchors.toVector.collect {
+      case EvidenceAnchor.MediaPoint(_, _, at) if at.axis == axis => at
+    }
+    PlaybackSupport.of(axis, intervals, points)
+
   def selectedPlaybackAxis: Either[DomainError, PresentationAxisId] =
     val axes = anchors.toVector.flatMap(_.axisId).distinct
     axes match
@@ -1314,7 +1340,11 @@ final class EvidenceSupport private (val anchors: NonEmptyVector[EvidenceAnchor]
       case EvidenceAnchor.Shot(_, _, _, interval) if interval.axis == axis => Vector(interval)
       case EvidenceAnchor.Track(_, _, _, set) if set.axis == axis          => set.intervals.toVector
     }.flatten
-    NonEmptyVector.fromVector(ivs) match
+    if anchors.toVector.exists {
+      case EvidenceAnchor.MediaPoint(_, _, at) => at.axis == axis
+      case _ => false
+    } then Left(SourceCanon.inv("support/hull-point", "point-bearing support has no interval-only hull; use playbackOn"))
+    else NonEmptyVector.fromVector(ivs) match
       case None =>
         Left(SourceCanon.inv("support/hull", "no intervals on the requested axis"))
       case Some(nev) =>
@@ -1352,9 +1382,9 @@ final class EvidenceSupport private (val anchors: NonEmptyVector[EvidenceAnchor]
     sets.reduceOption(_ ++ _)
 
   override def equals(other: Any): Boolean = other match
-    case that: EvidenceSupport => anchors.toVector == that.anchors.toVector
+    case that: EvidenceSupport => anchors.toVector == that.anchors.toVector && bundleIdentity == that.bundleIdentity
     case _                     => false
-  override def hashCode(): Int = anchors.toVector.hashCode()
+  override def hashCode(): Int = (anchors.toVector, bundleIdentity).hashCode()
   override def toString: String = s"EvidenceSupport(${anchors.length})"
 
 object EvidenceSupport:
@@ -1369,7 +1399,7 @@ object EvidenceSupport:
           .foldLeft[Either[DomainError, Unit]](Right(())) { (result, anchor) =>
             result.flatMap(_ => SourceSupportChecks.anchor(bundle, anchor))
           }
-          .map(_ => new EvidenceSupport(nev))
+          .map(_ => new EvidenceSupport(nev, bundle.identity))
 
   def text(
       bundle: SourceBundle,

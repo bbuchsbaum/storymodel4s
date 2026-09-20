@@ -133,6 +133,14 @@ object CoreCodecs:
           "axis" -> axis.value.asJson,
           "intervals" -> intervals.intervals.toVector.map(playbackInterval).asJson
         )
+      case EvidenceAnchor.MediaPoint(bundle, stream, at) =>
+        Json.obj(
+          "type" -> "MediaPoint".asJson,
+          "bundle" -> bundle.value.asJson,
+          "stream" -> stream.value.asJson,
+          "axis" -> at.axis.value.asJson,
+          "tick" -> at.at.toString.asJson
+        )
       case EvidenceAnchor.Shot(bundle, stream, shot, interval) =>
         Json.obj(
           "type" -> "Shot".asJson,
@@ -150,7 +158,9 @@ object CoreCodecs:
           "intervals" -> intervals.intervals.toVector.map(playbackInterval).asJson
         )
     }
-    Json.obj("schema" -> "evidence-support/v1".asJson, "anchors" -> anchors.asJson)
+    val schema = if support.anchors.toVector.exists(_.isInstanceOf[EvidenceAnchor.MediaPoint]) then
+      "evidence-support/v2" else "evidence-support/v1"
+    Json.obj("schema" -> schema.asJson, "anchors" -> anchors.asJson)
   }
 
   given Decoder[EvidenceSupport] = Decoder.instance { cursor =>

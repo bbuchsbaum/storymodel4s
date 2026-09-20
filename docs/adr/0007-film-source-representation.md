@@ -1030,7 +1030,7 @@ and sorted/deduplicated points, requiring at least one member. Keep points expli
 inside intervals. `EvidenceSupport.playbackOn` derives it; PrimaryProjection.Playback
 carries it. Ordering uses exact min/max bounds; containment checks the full union plus
 point membership. Explicit interval-only access remains named as such; the complete
-projection must never use it to erase points. A point-only interval hull is refused.
+projection must never use it to erase points. An interval-only hull is refused whenever selected support contains points.
 Reject an interval-or-point sum because it loses mixed parent support.
 
 `EvidenceSupport` retains the full checked bundle identity, and `TypedSupport.identity`
@@ -1083,3 +1083,10 @@ bytes, all 17 participant output projection parity and the independent 1000-row 
 oracle. Preserve the preexisting backend differences and frozen expectations. Record the
 public stability boundary in docs/api-stability.md; generic film wire/compiler licensing
 and empirical claims remain outside this slice.
+
+Full support binding is strict at every model/atlas/projection join: equal legacy IDs do
+not excuse a changed bundle identity. A legitimate bundle edit explicitly reconstructs
+EvidenceSupport.of(newBundle, oldSupport.anchors.toVector), validating every anchor and
+retaining the new full identity. Discarding a successful revalidation while keeping the
+old binding is rejected. Existing bundle-copy courts must perform this explicit rebuild;
+a separate stale-same-ID control must refuse. This affects anchored joins only.

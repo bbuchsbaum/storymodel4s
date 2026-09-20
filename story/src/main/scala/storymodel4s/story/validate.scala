@@ -464,16 +464,12 @@ object StoryValidator:
                 PrimaryProjection.Playback(axis, child),
                 PrimaryProjection.Playback(parentAxis, enclosing)
               ) =>
-            if axis != parentAxis || !child.intervals.toVector.forall(c =>
-                enclosing.intervals.toVector.exists(p =>
-                  p.start <= c.start && p.endExclusive >= c.endExclusive
-                )
-              )
+            if axis != parentAxis || !enclosing.contains(child)
             then
               err(
                 "hierarchy.member-within-parent",
                 path,
-                "member playback support escapes parent interval union"
+                "member playback support escapes parent interval/point union"
               )
           case _ =>
             err("hierarchy.member-within-parent", path, "incompatible primary projection kinds")

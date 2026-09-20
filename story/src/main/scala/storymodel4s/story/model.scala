@@ -252,7 +252,7 @@ object StoryModel:
       else
         e.anchors match
           case None          => Right(())
-          case Some(support) => EvidenceSupport.of(bundle, support.anchors.toVector).map(_ => ())
+          case Some(support) => support.checkedOn(bundle).map(_ => ())
     for
       projections <- graph.supportEntries
         .sortBy(_._1)

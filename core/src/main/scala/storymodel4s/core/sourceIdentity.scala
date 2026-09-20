@@ -111,3 +111,28 @@ private[core] object SourceIdentity:
         units.size.toString
       ) ++ units
     )
+
+  private def spans(value: SpanSet): Vector[String] =
+    value.refs.toVector.sorted.map { ref =>
+      digest(Vector("span-ref", ref.span.start.toString, ref.span.endExclusive.toString) ++
+        optional(ref.unit.map(_.value))).hex
+    }
+
+  def support(value: TypedSupport): Checksum = value match
+    case TypedSupport.Text(value) => digest(Vector("typed-support/text/v1") ++ spans(value))
+    case TypedSupport.Anchored(value) =>
+      val anchors = value.anchors.toVector.map {
+        case EvidenceAnchor.Text(bundle, stream, refs) =>
+          digest(Vector("text", bundle.value, stream.value) ++ spans(refs)).hex
+        case EvidenceAnchor.MediaTime(bundle, stream, axis, intervals) =>
+          digest(Vector("media-time", bundle.value, stream.value, axis.value) ++
+            intervals.intervals.toVector.flatMap(interval)).hex
+        case EvidenceAnchor.MediaPoint(bundle, stream, at) =>
+          digest(Vector("media-point", bundle.value, stream.value, at.axis.value, at.at.toString)).hex
+        case EvidenceAnchor.Shot(bundle, stream, shot, at) =>
+          digest(Vector("shot", bundle.value, stream.value, shot.value) ++ interval(at)).hex
+        case EvidenceAnchor.Track(bundle, stream, track, intervals) =>
+          digest(Vector("track", bundle.value, stream.value, track.value) ++
+            intervals.intervals.toVector.flatMap(interval)).hex
+      }.distinct.sorted
+      digest(Vector("typed-support/anchored/v1", value.bundleIdentity.hex, anchors.size.toString) ++ anchors)

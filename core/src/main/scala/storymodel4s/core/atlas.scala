@@ -830,6 +830,6 @@ object AnchoredNarrativeAtlas:
       units
         .foldLeft[Either[DomainError, Unit]](Right(())) { (result, unit) =>
           result
-            .flatMap(_ => EvidenceSupport.of(bundle, unit.support.anchors.toVector).map(_ => ()))
+            .flatMap(_ => unit.support.checkedOn(bundle).map(_ => ()))
         }
         .map(_ => new AnchoredNarrativeAtlas(bundle, units, surface))
