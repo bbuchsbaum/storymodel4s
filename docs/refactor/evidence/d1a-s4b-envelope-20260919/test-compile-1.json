@@ -1,0 +1,31 @@
+{
+  "codeRevision": "0a92b1e1826a275fee61375c6395c90ce486e0d6",
+  "command": [
+    "sbt",
+    "-batch",
+    "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+    "storyJVM/Test/compile",
+    "codecJVM/Test/compile",
+    "documentJVM/Test/compile",
+    "viewJVM/Test/compile",
+    "fixturesJVM/Test/compile",
+    "alignJVM/Test/compile",
+    "pipeline/Test/compile"
+  ],
+  "cwd": "/private/tmp/storymodel4s-d1a-s4b-20260919",
+  "startedEpochSeconds": 1789873351.649915,
+  "seconds": 16.689941883087158,
+  "exitCode": 1,
+  "cleanBefore": true,
+  "cleanAfter": true,
+  "logPath": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1a-s4b-20260919/test-compile-1.log",
+  "logSha256": "14b013b98731cc4a0f355c5ff07c16e64ef6b8c1c76ee61c6016a65d452ae49d",
+  "testTotals": [],
+  "aggregateTestCounts": {
+    "Total": 0,
+    "Failed": 0,
+    "Errors": 0,
+    "Passed": 0,
+    "Skipped": 0
+  }
+}

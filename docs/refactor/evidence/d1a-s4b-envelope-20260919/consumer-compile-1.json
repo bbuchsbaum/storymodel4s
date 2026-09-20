@@ -1,0 +1,32 @@
+{
+  "codeRevision": "6a6aa4b4ab8a8096dbe03fe01ef4521f3f3a6530",
+  "command": [
+    "sbt",
+    "-batch",
+    "-Dstoryatlas4s.storymodel4s.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/storymodel4s",
+    "-Dstoryatlas4s.intaglio.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/intaglio",
+    "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+    "compileAll",
+    "intaglioJVM/Test/compile",
+    "intaglioJS/Test/compile",
+    "cli/Test/compile",
+    "app/Test/compile",
+    "scalafmtAll"
+  ],
+  "cwd": "/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/storyatlas4s",
+  "startedEpochSeconds": 1789874539.663593,
+  "seconds": 62.39932990074158,
+  "exitCode": 0,
+  "cleanBefore": true,
+  "cleanAfter": true,
+  "logPath": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1a-s4b-20260919/consumer-compile-1.log",
+  "logSha256": "e563ec8693e92fdd7a47a24216cb4cd2e41e86b20226f68e934823339f1dcf94",
+  "testTotals": [],
+  "aggregateTestCounts": {
+    "Total": 0,
+    "Failed": 0,
+    "Errors": 0,
+    "Passed": 0,
+    "Skipped": 0
+  }
+}

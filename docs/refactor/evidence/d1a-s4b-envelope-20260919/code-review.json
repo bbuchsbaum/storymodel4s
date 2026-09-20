@@ -1,0 +1,17 @@
+{
+  "schema": "d1a-source-review/v1",
+  "reviewer": "/root/s0_cold_review",
+  "base": "57ee3595",
+  "reviewedCandidate": "844b680c086906dba48458b8eddd5588d51a9cf3",
+  "verdict": "No material source/test findings",
+  "scope": [
+    "Model and text witness construction doors",
+    "Full identity propagation and receipt joins",
+    "Canonical support/evidence joins and all collectors",
+    "Interval-union validation",
+    "Copy projection/order recomputation",
+    "Source/test migration"
+  ],
+  "advisory": "An extra EOF blank line in the test bundle fixture was removed by the later formatter.",
+  "qualification": "Read-only SD6 review; no build or mutation executed by reviewer. Later formatting/additional probes have a separate recheck pending."
+}
