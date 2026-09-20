@@ -1,0 +1,81 @@
+{
+  "schema": "d1b/cold-review-record/v1",
+  "qualification": "Separate fresh-context source/evidence review records; executed gates remain bound to their own receipts.",
+  "reviews": [
+    {
+      "reviewer": "/root/s0_cold_review",
+      "revision": "c57f11fb",
+      "scope": "D1B source/test repair against eecb4fb9",
+      "result": "No remaining findings; point/mapping/scene/result retention, private constructor probe and metric status-order courts sound."
+    },
+    {
+      "reviewer": "/root/s0_cold_review",
+      "revision": "87848b96",
+      "scope": "Mutation runner repair versus56b2a51d",
+      "resolved": [
+        "Resume provenance and completed restoration",
+        "Exact90-test clean controls",
+        "Independent containment-axis falsifier at tick15"
+      ],
+      "result": "No remaining P1/P2; execution still separate at review time."
+    },
+    {
+      "reviewer": "/root/cold_plan_review",
+      "revision": "fa041f32",
+      "scope": "Real-coordinate capture/verifier",
+      "resolved": [
+        "Anchor stream/bundle/full binding",
+        "Exact row/scene ordinal-to-node/proposal association"
+      ],
+      "result": "No remaining findings; nine isolated comparator falsifiers."
+    },
+    {
+      "reviewer": "/root/s0_cold_review",
+      "revision": "dcd3f1d3",
+      "scope": "Capture compile reconciliation",
+      "result": "Raw sbt exit0/9pass1skip and wrapper exit1 independently bound to log/XML/tool transcript; no rerun or expectation change."
+    },
+    {
+      "reviewer": "/root/cold_plan_review",
+      "revision": "4fbb8c7e",
+      "scope": "All17 replay fresh-verifier prerequisite",
+      "resolved": [
+        "Old support receipt bypass"
+      ],
+      "result": "Fresh committed support verifier executes before any replay."
+    },
+    {
+      "reviewer": "/root/s0_cold_review",
+      "revision": "4fbb8c7e",
+      "scope": "Independent all17 terminal artifact review",
+      "result": "135 assertions passed;17runs, exact2577-row digest, clock/input/output bindings, endpoint mutant, six content-free archive members; no findings."
+    },
+    {
+      "reviewer": "/root/cold_plan_review",
+      "revision": "b9c2acf9",
+      "scope": "Provider release runner",
+      "resolved": [
+        "Explicit candidate/dependency binding",
+        "Preserve raw red XML and post-validation failure",
+        "Reject relative dependency override"
+      ],
+      "result": "No remaining P1/P2; full execution separate."
+    },
+    {
+      "reviewer": "/root/cold_plan_review",
+      "revision": "41c3eb22",
+      "scope": "Consumer runner",
+      "result": "No remaining findings; full execution separate."
+    },
+    {
+      "reviewer": "/root/s0_cold_review",
+      "revision": "87848b96",
+      "scope": "Direct terminal mutation-archive audit",
+      "result": "309members,67reconstructed source patches,67production compiles,8clean probe recompiles,67named kills/controls,98XML files, baseline/restored90passes; no findings. Later850 full gate not qualified by this audit."
+    }
+  ],
+  "remaining": [
+    "Final source/test delta c57f11fb\u219287848b96 review",
+    "Final provider/consumer execution evidence review"
+  ]
+}
