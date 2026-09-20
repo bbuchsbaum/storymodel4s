@@ -121,7 +121,7 @@ final class StorySourceView private (
     all.flatMap(n => source.sourceSupport(n).map(s => summarize(n, s)))
   private val index: Map[SourceNodeRef, NodeSummary] = nodes.iterator.map(n => n.ref -> n).toMap
   def node(ref: SourceNodeRef): Option[NodeSummary] = index.get(ref)
-  val textLength: Int = text.length
+  val scoringLength: Int = text.length
 
   private val known: Set[NarrativeNodeId] = all.toSet
 

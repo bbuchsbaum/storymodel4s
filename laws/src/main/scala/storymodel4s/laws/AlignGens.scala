@@ -290,7 +290,7 @@ object AlignGens:
         v.nodes.reverse,
         v.edges.map((l, es) => l -> es.reverse),
         v.worldOrder.map(_.toVector.reverse.toMap),
-        v.textLength
+        v.scoringLength
       )
     )
     val target = v.leaves.head
@@ -299,7 +299,7 @@ object AlignGens:
         v.nodes.map(n => if n.ref == target.ref then f(n) else n),
         v.edges,
         v.worldOrder,
-        v.textLength
+        v.scoringLength
       )
     val different = Vector(
       "level" -> withNode(n => n.copy(level = n.level + 1)),
@@ -329,10 +329,10 @@ object AlignGens:
         v.nodes,
         v.edges.updated(RelationLayer.Goal, Vector((target.ref, root, 1.0))),
         v.worldOrder,
-        v.textLength
+        v.scoringLength
       ),
-      "worldOrder" -> InMemorySourceView(v.nodes, v.edges, None, v.textLength),
-      "textLength" -> InMemorySourceView(v.nodes, v.edges, v.worldOrder, v.textLength + 1)
+      "worldOrder" -> InMemorySourceView(v.nodes, v.edges, None, v.scoringLength),
+      "scoringLength" -> InMemorySourceView(v.nodes, v.edges, v.worldOrder, v.scoringLength + 1)
     )
     (same, different)
 
@@ -394,7 +394,7 @@ object AlignGens:
             else n
           )
           (
-            InMemorySourceView(withPatient, c.view.edges, c.view.worldOrder, c.view.textLength),
+            InMemorySourceView(withPatient, c.view.edges, c.view.worldOrder, c.view.scoringLength),
             PropositionSketch.empty.copy(
               predicate = pred,
               participants = Vector(
@@ -414,7 +414,7 @@ object AlignGens:
             if n.ref == leaf.ref then n.copy(context = ContextTag.Speech) else n
           )
           (
-            InMemorySourceView(speech, c.view.edges, c.view.worldOrder, c.view.textLength),
+            InMemorySourceView(speech, c.view.edges, c.view.worldOrder, c.view.scoringLength),
             PropositionSketch.empty.copy(
               predicate = pred,
               participants = Vector(anna),
@@ -426,7 +426,7 @@ object AlignGens:
             if n.ref == leaf.ref then n.copy(modality = ModalityTag.Intended) else n
           )
           (
-            InMemorySourceView(intended, c.view.edges, c.view.worldOrder, c.view.textLength),
+            InMemorySourceView(intended, c.view.edges, c.view.worldOrder, c.view.scoringLength),
             PropositionSketch.empty.copy(
               predicate = pred,
               participants = Vector(anna),

@@ -180,8 +180,8 @@ object TimedSourceView:
     val groupsInOrder: Vector[TimedSegment.Group] = segments.flatMap(_.group).distinct
     val groupNodes = groupsInOrder.zipWithIndex.map { case (g, gi) =>
       val members = segLeaf.collect { case (s, n) if s.group.contains(g) => n }
-      val start = members.map(_.support.minSpan.start).min
-      val end = members.map(_.support.minSpan.endExclusive).max
+      val start = members.map(_.scoringPosition.get.spans.minSpan.start).min
+      val end = members.map(_.scoringPosition.get.spans.minSpan.endExclusive).max
       NodeSummary(
         ref = groupRef(g.ordinal),
         level = 1,
@@ -270,7 +270,7 @@ object TimedSourceView:
         nodes = leaves ++ groupNodes,
         edges = edges,
         worldOrder = clock.order,
-        textLength = document.length
+        scoringLength = document.length
       )
       Built(
         view,

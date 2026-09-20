@@ -85,7 +85,8 @@ object ViewFingerprint:
   def of(view: SourceView): ViewFingerprint =
     val b = Render.Tokens()
     import b.{field, list}
-    field("view-fingerprint", "v1")
+    val textWire = view.textWireCompatible
+    field("view-fingerprint", if textWire then "v1" else "v2")
     val nodes = view.nodes.sortBy(_.ref.key)
     field("nodes", nodes.size.toString)
     nodes.foreach { n =>
@@ -93,7 +94,17 @@ object ViewFingerprint:
       field("level", n.level.toString)
       field("parent", n.parent.map(_.key).getOrElse(""))
       field("discoursePosition", n.discoursePosition.toString)
-      list("support", n.support.refs.toVector.sorted.map(Render.spanRef))
+      if textWire then
+        list("support", n.support.textSpans.toVector.flatMap(_.refs.toVector.sorted.map(Render.spanRef)))
+      else
+        field("physicalSupport", n.support.identity.hex)
+        n.scoringPosition match
+          case None => field("scoringPosition", "none")
+          case Some(position) =>
+            field("scoringPosition", position match
+              case _: ScoringPosition.CanonicalText => "canonical-text"
+              case _: ScoringPosition.LegacyAnnotationText => "legacy-annotation-text")
+            list("scoringSpans", position.spans.refs.toVector.sorted.map(Render.spanRef))
       field("predicate", n.predicate.getOrElse(""))
       list(
         "participants",
@@ -132,7 +143,7 @@ object ViewFingerprint:
         _.toVector.sortBy(_._1.key).map((r, i) => Render.composite(Vector(r.key, i.toString)))
       )
     )
-    field("textLength", view.textLength.toString)
+    field("textLength", view.scoringLength.toString)
     b.digest
 
   /** Rehydrate a fingerprint carried on the wire; the value is compared, never trusted. */

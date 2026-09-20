@@ -377,7 +377,7 @@ class CostSuite extends FunSuite:
       view.nodes.map(n => n.copy(evidence = if n.ref == e4 then Some(costChartEvidence) else None)),
       view.edges,
       view.worldOrder,
-      view.textLength
+      view.scoringLength
     )
     val segment = v.node(sc2).get
     // Preconditions, asserted rather than assumed: the law is vacuous if the fixture stops being a
@@ -424,7 +424,7 @@ class CostSuite extends FunSuite:
       view.nodes.map(_.copy(evidence = None)),
       view.edges,
       view.worldOrder,
-      view.textLength
+      view.scoringLength
     )
     val segment = chartless.node(sc2).get
     assert(
@@ -455,7 +455,7 @@ class CostSuite extends FunSuite:
       view.nodes.map(n => n.copy(evidence = if n.ref == e4 then Some(costChartEvidence) else None)),
       view.edges,
       view.worldOrder,
-      view.textLength
+      view.scoringLength
     )
     val segment = charted.node(sc2).get
     val withUnitChart = u2.copy(evidence = Some(costChartEvidence))

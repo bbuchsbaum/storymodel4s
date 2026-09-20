@@ -1,5 +1,7 @@
 package storymodel4s.align
 
+import storymodel4s.core.TypedSupport
+
 import storymodel4s.core.SpanSet
 import storymodel4s.recall.{RecallGraph, RecallUnitId}
 import storymodel4s.recall.RecallGraphStatus.Checked
@@ -52,7 +54,7 @@ final class CellCoordinates private[align] (
     val unitText: String,
     val node: SourceNodeRef,
     /** Source spans supporting the node - exact evidence, not a paraphrase. */
-    val sourceSupport: SpanSet,
+    val sourceSupport: TypedSupport,
     /** The state this cell was scored as, which fixes the anchor as well as the mode. */
     val state: AlignState,
     /** The fidelity mode this cell was scored under, absent for an external state. */
@@ -163,7 +165,7 @@ object CellCoordinates:
                   unit.span,
                   unit.text,
                   node.ref,
-                  node.support,
+                  result.sourceSupport(node.ref),
                   state,
                   breakdown.mode,
                   breakdown.reductions

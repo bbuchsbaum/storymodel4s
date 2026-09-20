@@ -38,7 +38,7 @@ class LawsSuite extends DisciplineSuite:
       def adjacency(layer: RelationLayer): Map[SourceNodeRef, Map[SourceNodeRef, Double]] =
         Map(phantom -> Map.empty)
       def worldOrder: Option[Map[SourceNodeRef, Int]] = None
-      def textLength: Int = 100
+      def scoringLength: Int = 100
 
     assert(SourceViewLaws.exposedRefs(Foil).contains(phantom), "the foil must expose the ref")
     assert(!SourceViewLaws.total(Foil), "the totality law must REJECT this view")
@@ -48,7 +48,7 @@ class LawsSuite extends DisciplineSuite:
     // Nothing throws; the phantom is simply reported as occurring at the very start of the
     // discourse, which is a real position and indistinguishable from a measured one.
     assertEquals(Foil.relativeSpan(phantom), None)
-    assertEquals(Foil.relativePosition(phantom), 0.0)
+    assertEquals(Foil.measuredPosition(phantom), None)
   }
 
   test("HsmmResult, rows, matrices, and admissibility cannot be constructed outside align") {

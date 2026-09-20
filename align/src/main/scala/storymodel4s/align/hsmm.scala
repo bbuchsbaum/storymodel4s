@@ -1,6 +1,6 @@
 package storymodel4s.align
 
-import storymodel4s.core.Checksum
+import storymodel4s.core.{Checksum, TypedSupport}
 import storymodel4s.features.CanonicalDouble
 import storymodel4s.recall.*
 import storymodel4s.recall.RecallGraphStatus.Checked
@@ -299,7 +299,9 @@ final class HsmmResult private[align] (
     val admissibility: Map[RecallUnitId, Map[SourceNodeRef, Admissibility]],
     val viewFingerprint: ViewFingerprint,
     val recallChecksum: Checksum,
-    val refinementPasses: Int
+    val refinementPasses: Int,
+    val sourceSupport: Map[SourceNodeRef, TypedSupport],
+    val textWireCompatible: Boolean
 ):
   /** Digest of the derived admissibility, for the wire's drift check. */
   def admissibilityEcho: AdmissibilityEcho = AdmissibilityEcho.of(admissibility)
@@ -315,7 +317,9 @@ final class HsmmResult private[align] (
       admissibility,
       viewFingerprint,
       recallChecksum,
-      refinementPasses
+      refinementPasses,
+      sourceSupport,
+      textWireCompatible
     )
 
   override def equals(o: Any): Boolean = o match
@@ -586,7 +590,9 @@ object HsmmResult:
       admissibility,
       ViewFingerprint.of(view),
       AlignWire.recallChecksum(recall),
-      refinementPasses
+      refinementPasses,
+      view.nodes.map(n => n.ref -> n.support).toMap,
+      view.textWireCompatible
     )
 
   /** Row-marginal consistency of a flow step with its adjacent rows (deterministic key order). */

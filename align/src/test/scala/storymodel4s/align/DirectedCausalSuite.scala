@@ -39,7 +39,7 @@ class DirectedCausalSuite extends FunSuite:
     nodes = Vector(node(a, 0), node(b, 1), node(c, 2)),
     edges = Map(RelationLayer.Causal -> Vector((a, b, 1.0), (b, c, 1.0), (c, b, 1.0))),
     worldOrder = None,
-    textLength = 30
+    scoringLength = 30
   )
 
   private def f(s: SourceNodeRef, t: SourceNodeRef): Map[TransitionKind, Double] =

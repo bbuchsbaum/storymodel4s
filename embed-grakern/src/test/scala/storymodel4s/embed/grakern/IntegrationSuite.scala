@@ -35,7 +35,7 @@ class IntegrationSuite extends FunSuite:
       view.nodes.map(n => n.copy(evidence = evidence.get(n.ref))),
       view.edges,
       view.worldOrder,
-      view.textLength
+      view.scoringLength
     )
 
   private val unitChart: RecallUnit = u2.copy(evidence = Some(PropositionEvidence.hand(straight)))

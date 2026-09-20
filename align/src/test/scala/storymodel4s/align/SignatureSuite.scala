@@ -20,7 +20,7 @@ class SignatureSuite extends FunSuite:
     * identically. `relativePosition` gives both `0.0`; `measuredPosition` separates them.
     *
     * This is the distinction `signature` used to destroy: `discoursePos` was
-    * `r => Some(view.relativePosition(r))`, an absence channel with `None` made structurally
+    * `r => Some(view.measuredPosition(r).get)`, an absence channel with `None` made structurally
     * unreachable, so an unplaceable node entered chronology as the beginning of the story.
     *
     * Mutation run 2026-08-29: replacing `measuredPosition`'s body with
@@ -37,19 +37,19 @@ class SignatureSuite extends FunSuite:
       def adjacency(layer: RelationLayer): Map[SourceNodeRef, Map[SourceNodeRef, Double]] =
         Map(phantom -> Map.empty)
       def worldOrder: Option[Map[SourceNodeRef, Int]] = None
-      def textLength: Int = 100
+      def scoringLength: Int = 100
 
     assertEquals(
       Foil.measuredPosition(phantom),
       None,
       "an unresolvable ref has NO measured position"
     )
-    assertEquals(Foil.relativePosition(phantom), 0.0, "the lossy accessor still fabricates 0.0")
+    assertEquals(Foil.relativeSpan(phantom), None)
 
     // The other half, and the reason `None` is not simply "position 0": a node the view CAN place
     // at the very start must report a measured Some(0.0), not an absence. If `measuredPosition`
     // returned None for a real leading node the fix would have traded one conflation for another.
-    val leading = view.leaves.map(_.ref).minBy(r => view.relativePosition(r))
+    val leading = view.leaves.map(_.ref).minBy(r => view.measuredPosition(r).get)
     assert(view.measuredPosition(leading).isDefined, "a placeable node must report a position")
 
     // And a view with no measured length cannot place anything, including its own real nodes.
@@ -59,7 +59,7 @@ class SignatureSuite extends FunSuite:
       def adjacency(layer: RelationLayer): Map[SourceNodeRef, Map[SourceNodeRef, Double]] =
         Map.empty
       def worldOrder: Option[Map[SourceNodeRef, Int]] = None
-      def textLength: Int = 0
+      def scoringLength: Int = 0
     assertEquals(Unmeasured.measuredPosition(phantom), None)
   }
 

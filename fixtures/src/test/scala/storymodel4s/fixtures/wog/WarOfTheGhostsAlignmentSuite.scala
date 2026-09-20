@@ -86,7 +86,7 @@ class WarOfTheGhostsAlignmentSuite extends FunSuite:
           }
         }.toMap,
         bridge.worldOrder,
-        bridge.textLength
+        bridge.scoringLength
       )
 
   private lazy val bridge: StorySourceView = StorySourceView.validated(WarOfTheGhostsModel.model)

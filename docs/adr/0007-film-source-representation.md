@@ -1041,12 +1041,14 @@ components unchanged; the text model decoder continues to refuse anchored compon
 This component shape is not an HSMM wire format or a film model codec.
 
 `NodeSummary.support` and `CellCoordinates.sourceSupport` become TypedSupport. A required
-`ScoringPosition` is separate: `CanonicalText(spans)` or `LegacyAnnotationText(spans)`.
+`Option[ScoringPosition]` is separate: `CanonicalText(spans)` or `LegacyAnnotationText(spans)`.
 These are feature coordinates, not physical support. The existing text constructor derives
-the canonical-text feature; the typed constructor requires it explicitly. SourceView's
+Some canonical-text feature; the typed constructor requires an explicit Some or None.
+None means no scoring-position measurement and cannot fabricate text spans. SourceView's
 required `scoringLength` replaces the misleading general `textLength` name. Relative-span,
 measured-position and transition Backward/LongJump arithmetic reads only this declared
-feature and its denominator. Missing position remains None; no zero fallback is introduced.
+feature and its denominator. Missing position remains None; the total relativePosition zero-fallback accessor is removed.
+Benchmark consumers use measuredPosition directly, preserving absence; absence is fingerprinted.
 The Sherlock adapter preserves its old joined-description offsets, group feature hulls,
 and denominator solely as LegacyAnnotationText scoring inputs. Physical leaf and parent
 support is checked media evidence, never that document or its hull.

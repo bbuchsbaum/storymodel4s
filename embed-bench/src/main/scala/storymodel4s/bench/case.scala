@@ -23,8 +23,8 @@ final case class BenchCase(
 ):
   /** Text under a source node's support, sliced from the story's canonical text. */
   def nodeText(ref: SourceNodeRef): Option[String] =
-    view.node(ref).map { n =>
-      n.support.spans.toVector
+    view.node(ref).flatMap(_.support.textSpans).map { spans =>
+      spans.spans.toVector
         .sortBy(_.start)
         .flatMap(_.slice(story.canonicalText).toOption)
         .mkString(" ")

@@ -337,7 +337,7 @@ object Metrics:
       */
     val route: (String, Vector[UnitObservation]) =
       def positionOf(ref: SourceNodeRef): Option[Double] =
-        view.node(ref).map(_ => view.relativePosition(ref))
+        view.measuredPosition(ref)
       def goldPos(u: RecallUnit): Option[Double] =
         c.gold(u.id).flatMap(_.primary).map(_.node).flatMap(positionOf)
       val values = units.zipWithIndex.map { case (u, i) =>
@@ -366,7 +366,7 @@ object Metrics:
       Names.routeSupportMidpointDirection -> values
 
     def positionOf(ref: SourceNodeRef): Option[Double] =
-      view.node(ref).map(_ => view.relativePosition(ref))
+      view.measuredPosition(ref)
     def goldAnchor(unit: RecallUnit): Option[SourceNodeRef] =
       c.gold(unit.id).flatMap(_.primary).map(_.node)
     val goldAnchors = units.map(goldAnchor)

@@ -215,7 +215,7 @@ class WireSuite extends FunSuite:
       view.nodes.reverse,
       view.edges.map((l, es) => l -> es.reverse),
       view.worldOrder.map(_.toVector.reverse.toMap),
-      view.textLength
+      view.scoringLength
     )
     assertEquals(shuffled.contentFingerprint, view.contentFingerprint)
     // a zero-weight edge is the same as no edge (absent pairs are 0 by contract)
@@ -226,7 +226,7 @@ class WireSuite extends FunSuite:
         view.edges.getOrElse(RelationLayer.Semantic, Vector.empty) :+ (e1, e5, 0.0)
       ),
       view.worldOrder,
-      view.textLength
+      view.scoringLength
     )
     assertEquals(zero.contentFingerprint, view.contentFingerprint)
   }
@@ -237,7 +237,7 @@ class WireSuite extends FunSuite:
         view.nodes.map(n => if n.ref == e1 then f(n) else n),
         view.edges,
         view.worldOrder,
-        view.textLength
+        view.scoringLength
       ).contentFingerprint
     val base = view.contentFingerprint
     val variants = Vector(
@@ -269,25 +269,25 @@ class WireSuite extends FunSuite:
         view.nodes,
         view.edges.updated(RelationLayer.Causal, Vector((e1, e5, 1.0))),
         view.worldOrder,
-        view.textLength
+        view.scoringLength
       ).contentFingerprint,
       "weight" -> InMemorySourceView(
         view.nodes,
         view.edges.updated(RelationLayer.Semantic, Vector((e1, e5, 0.25))),
         view.worldOrder,
-        view.textLength
+        view.scoringLength
       ).contentFingerprint,
       "worldOrder" -> InMemorySourceView(
         view.nodes,
         view.edges,
         None,
-        view.textLength
+        view.scoringLength
       ).contentFingerprint,
-      "textLength" -> InMemorySourceView(
+      "scoringLength" -> InMemorySourceView(
         view.nodes,
         view.edges,
         view.worldOrder,
-        view.textLength + 1
+        view.scoringLength + 1
       ).contentFingerprint
     )
     variants.foreach { (name, fp) => assertNotEquals(fp, base, s"$name change not fingerprinted") }
@@ -319,7 +319,7 @@ class WireSuite extends FunSuite:
         view.nodes.map(n => if n.ref == e1 then n.copy(outcome = outcome, cause = cause) else n),
         view.edges,
         view.worldOrder,
-        view.textLength
+        view.scoringLength
       ).contentFingerprint
     assertNotEquals(node(a._1, a._2), node(bb._1, bb._2))
     val recall = AnnaFixture.recall
@@ -549,7 +549,7 @@ class WireSuite extends FunSuite:
         ),
         view.edges,
         view.worldOrder,
-        view.textLength
+        view.scoringLength
       ).contentFingerprint
     val raw = storymodel4s.core.Credence.raw(0.7, ScorerId.unsafe("test-scorer")).toOption.get
     val calibrated = storymodel4s.core.Credence

@@ -69,7 +69,7 @@ class WorkedExampleSuite extends FunSuite:
     assert(u3.expressedUncertainty.isMarked)
     assertEquals(r.mapSource, Some(e2))
     val step = result.flow.steps(2)
-    val backward = step.sourceMass((a, b) => view.relativePosition(b) < view.relativePosition(a))
+    val backward = step.sourceMass((a, b) => view.measuredPosition(b).get < view.measuredPosition(a).get)
     assert(backward > 0.5, s"backward mass = $backward")
     assert(r.localizability(view.sourceNodeCount).exists(_ < 1.0))
   }
@@ -134,7 +134,7 @@ class WorkedExampleSuite extends FunSuite:
       view.nodes.map(n => if n.isLeaf then n.copy(predicate = Some("find")) else n),
       view.edges,
       view.worldOrder,
-      view.textLength
+      view.scoringLength
     )
     val sem = SemanticDistance.of((_, _) => 0.1)
     val cands = CandidateGenerator(sem, perLevel = 10).generate(negated.recall.ordered, allFind)
@@ -183,7 +183,7 @@ class WorkedExampleSuite extends FunSuite:
       ),
       view.edges,
       view.worldOrder,
-      view.textLength
+      view.scoringLength
     )
     val b =
       ModeGate.assess(negated.unit, withCompatibleSibling.node(sc2).get, withCompatibleSibling)
@@ -198,7 +198,7 @@ class WorkedExampleSuite extends FunSuite:
       view.nodes.map(n => if n.ref == e5 then n.copy(context = ContextTag.Speech) else n),
       view.edges,
       view.worldOrder,
-      view.textLength
+      view.scoringLength
     )
     val adm = ModeGate.assess(u2, speechE5.node(e5).get, speechE5)
     assert(adm.contradictions.contains(Contradiction.ContextConflict))

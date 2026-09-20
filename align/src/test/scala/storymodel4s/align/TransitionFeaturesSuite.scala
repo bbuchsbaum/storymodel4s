@@ -15,9 +15,9 @@ class TransitionFeaturesSuite extends FunSuite:
       def adjacency(layer: RelationLayer): Map[SourceNodeRef, Map[SourceNodeRef, Double]] =
         view.adjacency(layer).updated(phantom, Map.empty)
       def worldOrder: Option[Map[SourceNodeRef, Int]] = view.worldOrder
-      def textLength: Int = view.textLength
+      def scoringLength: Int = view.scoringLength
 
-    val placed = view.leaves.maxBy(node => view.relativePosition(node.ref)).ref
+    val placed = view.leaves.maxBy(node => view.measuredPosition(node.ref).get).ref
     val intoUnmeasured = TransitionFeatures.between(Foil, placed, phantom)
     val fromUnmeasured = TransitionFeatures.between(Foil, phantom, placed)
 
@@ -28,7 +28,7 @@ class TransitionFeaturesSuite extends FunSuite:
 
     // A measured zero is evidence, not absence. Keeping both keys distinguishes a real adjacent
     // move from an unmeasurable one even though both contribute zero to the transition score.
-    val leading = view.leaves.minBy(node => view.relativePosition(node.ref)).ref
+    val leading = view.leaves.minBy(node => view.measuredPosition(node.ref).get).ref
     val measuredZero = TransitionFeatures.between(view, leading, leading)
     assertEquals(measuredZero.values.get(TransitionKind.Backward), Some(0.0))
     assertEquals(measuredZero.values.get(TransitionKind.LongJump), Some(0.0))

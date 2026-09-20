@@ -12,13 +12,13 @@ import storymodel4s.recall.RecallGraphStatus.Checked
 class AlignCodecSuite extends FunSuite:
 
   private lazy val fixture = Fixture.build()
-  private lazy val encoded = HsmmResultCodec.encode(fixture.result)
+  private lazy val encoded = HsmmResultCodec.encode(fixture.result).fold(e => fail(e.message), identity)
   private lazy val json = Canonical.parse(encoded).toOption.get
 
   test("a real inferred result has a canonical contextual round trip") {
     val decoded = HsmmResultCodec.decode(encoded, fixture.recall, fixture.view)
     assertEquals(decoded, Right(fixture.result))
-    assertEquals(decoded.map(HsmmResultCodec.encode), Right(encoded))
+    assertEquals(decoded.flatMap(HsmmResultCodec.encode), Right(encoded))
     assert(encoded.contains(s"\"schemaVersion\":\"${HsmmResultCodec.SchemaVersion}\""))
     assert(encoded.contains("\"candidateAnchors\""))
     assert(encoded.contains("\"admissibilityEcho\""))
@@ -27,7 +27,7 @@ class AlignCodecSuite extends FunSuite:
   }
 
   test("a view-only change is rejected by the mandatory fingerprint match") {
-    val changed = fixture.view.copy(textLength = fixture.view.textLength + 1)
+    val changed = fixture.view.copy(scoringLength = fixture.view.scoringLength + 1)
     HsmmResultCodec.decode(encoded, fixture.recall, changed) match
       case Left(HsmmCodecError.Rejected(AlignError.FingerprintMismatch(field, _, _))) =>
         assertEquals(field, "viewFingerprint")

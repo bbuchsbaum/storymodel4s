@@ -29,7 +29,7 @@ class WarOfTheGhostsCodecGoldenSuite extends FunSuite:
   test("the WOG hsmm/v3 bytes contextually decode to the inferred result") {
     val decoded = HsmmResultCodec.decode(encoded, context.recall, context.view)
     assertEquals(decoded, Right(context.result))
-    assertEquals(decoded.map(HsmmResultCodec.encode), Right(encoded))
+    assertEquals(decoded.flatMap(HsmmResultCodec.encode), Right(encoded))
   }
 
 private[wog] object WarOfTheGhostsCodecGolden:
@@ -52,7 +52,7 @@ private[wog] object WarOfTheGhostsCodecGolden:
     "ce61e761a131c1e2ffeebcf912a9c04d9dd2bf2fb4c09f9d4bda0c2741f2cf1a"
 
   lazy val context: GoldenContext = GoldenContext.build()
-  lazy val encoded: String = HsmmResultCodec.encode(context.result)
+  lazy val encoded: String = HsmmResultCodec.encode(context.result).fold(e => throw new IllegalStateException(e.message), identity)
 
   final case class GoldenContext(
       recall: RecallGraph[Checked],

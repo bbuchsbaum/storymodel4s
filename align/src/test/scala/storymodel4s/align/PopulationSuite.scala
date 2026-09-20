@@ -173,7 +173,7 @@ class PopulationSuite extends ScalaCheckSuite:
       view.nodes.map(n => if n.ref == e1 then n.copy(lemmas = n.lemmas + "zzz") else n),
       view.edges,
       view.worldOrder,
-      view.textLength
+      view.scoringLength
     )
 
   private lazy val fullOnFoil: HsmmResult =

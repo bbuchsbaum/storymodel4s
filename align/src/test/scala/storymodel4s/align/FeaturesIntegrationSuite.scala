@@ -29,7 +29,7 @@ class FeaturesIntegrationSuite extends FunSuite:
       view.nodes.map(_.copy(importance = importance(1.0))),
       view.edges,
       view.worldOrder,
-      view.textLength
+      view.scoringLength
     )
     val sig = signature(weighted)
     val missingE3 = InMemorySourceView(
@@ -40,13 +40,13 @@ class FeaturesIntegrationSuite extends FunSuite:
       ),
       view.edges,
       view.worldOrder,
-      view.textLength
+      view.scoringLength
     )
     val zeroE3 = InMemorySourceView(
       weighted.nodes.map(n => if n.ref == e3 then n.copy(importance = importance(0.0)) else n),
       view.edges,
       view.worldOrder,
-      view.textLength
+      view.scoringLength
     )
     val sigMissing = signature(missingE3)
     val sigZero = signature(zeroE3)
@@ -131,7 +131,7 @@ class FeaturesIntegrationSuite extends FunSuite:
         ),
         view.edges,
         view.worldOrder,
-        view.textLength
+        view.scoringLength
       )
 
     val oneHeavy =

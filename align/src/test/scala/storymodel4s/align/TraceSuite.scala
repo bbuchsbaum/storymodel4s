@@ -46,7 +46,7 @@ class TraceSuite extends FunSuite:
     // Exact spans, not a hull: a unit assembled from distant mentions keeps all of them, which is
     // why SpanSet is discontinuous in the first place.
     assertEquals(c.unitSpan.refs.toVector, someUnit.span.refs.toVector)
-    assertEquals(c.sourceSupport.refs.toVector, someNode.support.refs.toVector)
+    assertEquals(c.sourceSupport, someNode.support)
     assertEquals(c.mode, result.costs(someUnit.id)(someState).mode)
     assertEquals(c.reductions, result.costs(someUnit.id)(someState).reductions)
   }
@@ -99,7 +99,7 @@ class TraceSuite extends FunSuite:
       ),
       view.edges,
       view.worldOrder,
-      view.textLength
+      view.scoringLength
     )
     assertNotEquals(
       ViewFingerprint.of(doctored),

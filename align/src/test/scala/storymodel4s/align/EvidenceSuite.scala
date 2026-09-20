@@ -53,7 +53,7 @@ class EvidenceSuite extends FunSuite:
       view.nodes.map(n => n.copy(evidence = evidence.get(n.ref))),
       view.edges,
       view.worldOrder,
-      view.textLength
+      view.scoringLength
     )
 
   private val u2Chart: RecallUnit = u2.copy(evidence = Some(straight))

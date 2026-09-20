@@ -20,10 +20,12 @@ import RecallCodecs.given
 enum HsmmCodecError:
   case Wire(error: CodecError)
   case Rejected(error: AlignError)
+  case UnsupportedSupport
 
   def message: String = this match
     case Wire(error)     => error.message
     case Rejected(error) => error.message
+    case UnsupportedSupport => "hsmm/v3 requires canonical text support and scoring coordinates"
 
 /** Canonical JSON for a gated [[HsmmResult]].
   *
@@ -124,10 +126,13 @@ object HsmmResultCodec:
   )
 
   /** Encode a proved result as canonical JSON text. */
-  def encode(result: HsmmResult): String = Canonical.print(toJson(result))
+  def encode(result: HsmmResult): Either[HsmmCodecError, String] =
+    toJson(result).map(Canonical.print)
 
   /** Encode a proved result as a canonical JSON value. */
-  def toJson(result: HsmmResult): Json = summon[Encoder[Wire]].apply(Wire.from(result))
+  def toJson(result: HsmmResult): Either[HsmmCodecError, Json] =
+    if !result.textWireCompatible then Left(HsmmCodecError.UnsupportedSupport)
+    else Right(summon[Encoder[Wire]].apply(Wire.from(result)))
 
   /** Decode canonical JSON text only after revalidating it against `recall` and `view`. */
   def decode(
@@ -135,27 +140,26 @@ object HsmmResultCodec:
       recall: RecallGraph[Checked],
       view: SourceView
   ): Either[HsmmCodecError, HsmmResult] =
-    Canonical
-      .decode[Wire](text)
-      .left
-      .map(HsmmCodecError.Wire.apply)
-      .flatMap(_.materialize(recall, view).left.map(HsmmCodecError.Rejected.apply))
-
+    if !view.textWireCompatible then Left(HsmmCodecError.UnsupportedSupport)
+    else
+      Canonical
+        .decode[Wire](text)
+        .left
+        .map(HsmmCodecError.Wire.apply)
+        .flatMap(_.materialize(recall, view).left.map(HsmmCodecError.Rejected.apply))
   /** Decode a JSON value only after revalidating it against `recall` and `view`. */
   def decodeJson(
       json: Json,
       recall: RecallGraph[Checked],
       view: SourceView
   ): Either[HsmmCodecError, HsmmResult] =
-    Canonical
-      .decodeJson[Wire](json)
-      .left
-      .map(HsmmCodecError.Wire.apply)
-      .flatMap(_.materialize(recall, view).left.map(HsmmCodecError.Rejected.apply))
-
-  /** Encoder-only instance: reconstructing the proof always requires explicit context. */
-  given Encoder[HsmmResult] = Encoder.instance(toJson)
-
+    if !view.textWireCompatible then Left(HsmmCodecError.UnsupportedSupport)
+    else
+      Canonical
+        .decodeJson[Wire](json)
+        .left
+        .map(HsmmCodecError.Wire.apply)
+        .flatMap(_.materialize(recall, view).left.map(HsmmCodecError.Rejected.apply))
   private[codec] given Encoder[SourceNodeRef] = Encoder.instance {
     case SourceNodeRef.Situation(id) =>
       Json.obj("type" -> "Situation".asJson, "id" -> id.asJson)

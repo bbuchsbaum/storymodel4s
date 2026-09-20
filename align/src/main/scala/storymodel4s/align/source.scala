@@ -1,6 +1,6 @@
 package storymodel4s.align
 
-import storymodel4s.core.{Credence, SegmentId, SituationId, SpanSet}
+import storymodel4s.core.{Credence, SegmentId, SituationId, SpanSet, TypedSupport}
 import storymodel4s.features.{Coverage, Estimate, MissingReason, ScoreEstimate}
 import storymodel4s.proposition.PropositionEvidence
 import storymodel4s.recall.{Lexical, ModalityTag, PolarityTag, SketchRole}
@@ -159,11 +159,26 @@ object ImportanceWeight:
   def unsafe(estimate: ScoreEstimate): ImportanceWeight =
     from(estimate).fold(error => throw new IllegalArgumentException(error.message), identity)
 
+/** Coordinates used by scoring, separate from physical source evidence. */
+enum ScoringPosition:
+  case CanonicalText(value: SpanSet)
+  case LegacyAnnotationText(value: SpanSet)
+
+  def spans: SpanSet = this match
+    case CanonicalText(value) => value
+    case LegacyAnnotationText(value) => value
+
+  def relativeTo(length: Int): Option[(Double, Double)] =
+    if length > 0 then
+      val span = spans.minSpan
+      Some((span.start.toDouble / length, span.endExclusive.toDouble / length))
+    else None
+
 /** Everything the aligner needs to know about one source node.
   *
   * Contract: `level` is 0 for atomic situations and increases toward the root; `parent` is the
   * primary-containment parent; `discoursePosition` is the rank of the node's first mention among
-  * all nodes at its level (0-based); `support` is exact evidence in the source text; `lemmas` are
+  * all nodes at its level (0-based); `support` is exact typed physical evidence; `lemmas` are
   * content stems of the supporting text plus the predicate and participant labels; `importance` is
   * an injected salience weight used only for importance-weighted coverage, never for matching
   * (`Missing` importance excludes the node from importance-weighted coverage; it is never zero).
@@ -178,7 +193,8 @@ final class NodeSummary private (
     val level: Int,
     val parent: Option[SourceNodeRef],
     val discoursePosition: Int,
-    val support: SpanSet,
+    val support: TypedSupport,
+    val scoringPosition: Option[ScoringPosition],
     val predicate: Option[String],
     val participants: Vector[ParticipantSummary],
     val context: ContextTag,
@@ -218,7 +234,8 @@ final class NodeSummary private (
       level: Int = level,
       parent: Option[SourceNodeRef] = parent,
       discoursePosition: Int = discoursePosition,
-      support: SpanSet = support,
+      support: TypedSupport = support,
+      scoringPosition: Option[ScoringPosition] = scoringPosition,
       predicate: Option[String] = predicate,
       participants: Vector[ParticipantSummary] = participants,
       context: ContextTag = context,
@@ -238,6 +255,7 @@ final class NodeSummary private (
       parent,
       discoursePosition,
       support,
+      scoringPosition,
       predicate,
       participants,
       context,
@@ -259,6 +277,7 @@ final class NodeSummary private (
       parent,
       discoursePosition,
       support,
+      scoringPosition,
       predicate,
       participants,
       context,
@@ -301,12 +320,39 @@ object NodeSummary:
       evidence: Option[PropositionEvidence] = None,
       propositional: PropositionalScope = PropositionalScope.unstated
   ): NodeSummary =
+    typed(
+      ref, level, parent, discoursePosition, TypedSupport.Text(support),
+      Some(ScoringPosition.CanonicalText(support)), predicate, participants, context,
+      polarity, modality, locations, lemmas, outcome, cause, importance, evidence, propositional
+    )
+
+  def typed(
+      ref: SourceNodeRef,
+      level: Int,
+      parent: Option[SourceNodeRef],
+      discoursePosition: Int,
+      support: TypedSupport,
+      scoringPosition: Option[ScoringPosition],
+      predicate: Option[String],
+      participants: Vector[ParticipantSummary],
+      context: ContextTag,
+      polarity: PolarityTag,
+      modality: ModalityTag,
+      locations: Vector[String],
+      lemmas: Set[String],
+      outcome: Option[String] = None,
+      cause: Option[String] = None,
+      importance: ImportanceWeight = ImportanceWeight.unmeasured,
+      evidence: Option[PropositionEvidence] = None,
+      propositional: PropositionalScope = PropositionalScope.unstated
+  ): NodeSummary =
     new NodeSummary(
       ref,
       level,
       parent,
       discoursePosition,
       support,
+      scoringPosition,
       predicate,
       participants,
       context,
@@ -329,42 +375,23 @@ object NodeSummary:
   *   - `adjacency(layer)` returns sparse directed weights; absent pairs are 0. Weights are in
   *     `[0, 1]` and `> 0` means the relation holds (graded for `Semantic`).
   *   - `worldOrder` gives a total or partial rank by story-world time when the source knows it.
-  *   - `textLength` is the canonical text length, the denominator for discourse positions.
-  *
-  * ==Totality of `node` (contract, not a suggestion)==
-  *
-  * '''Every ref a view EXPOSES must resolve through `node`.''' The exposed refs are those in
-  * [[nodes]], those appearing as either endpoint of any [[adjacency]] layer, and the keys of
-  * [[worldOrder]]. An implementation that mentions a ref in adjacency or world order without
-  * placing it in the node index breaks this contract.
-  *
-  * This is load-bearing rather than tidy. [[relativeSpan]] returns `None` for an unresolvable ref
-  * and [[relativePosition]] then maps that `None` to `0.0` — which is not a missing marker but a
-  * MEANINGFUL POSITION, the very start of the discourse. So a violation of this contract does not
-  * throw and does not surface as an absent value: it reports an unresolvable node as occurring at
-  * the beginning of the story.
-  *
-  * `signature` and `population` USED to launder that through `r => Some(view.relativePosition(r))`
-  * — an `Option` whose `None` was structurally unreachable. Both now call [[measuredPosition]] and
-  * carry the absence (3b246ea and its successor). The contract is still load-bearing because
-  * `hsmm.TransitionFeatures.between` reads [[relativePosition]] RAW into the `Backward` and
-  * `LongJump` features, where a fabricated `0.0` changes which alignment is found rather than
-  * merely how one is described — tracked as bd-01M17Y03XGDD0XR26PN41TJVRJ. Do not delete this
-  * paragraph when that lands; replace it with whatever is then true.
-  *
-  * Both current implementations satisfy it, and both do so BY ACCIDENT rather than by construction
-  * — `StorySourceView` because it filters `all` to nodes with source support before anything else
-  * is derived from it, `InMemorySourceView` because its index is built from the same `nodes` its
-  * refs come from. Neither states the invariant, so neither would notice losing it.
-  * `SourceViewLaws` in the `laws` module asserts it for both, with a foil that violates it
-  * deliberately so the law is known to be able to fail.
+  *   - `scoringLength` is the declared feature-coordinate denominator, not a media extent.
+  * Every exposed ref must resolve through node. A missing node or scoring feature remains None
+  * through measuredPosition; transition features and metrics retain that absence.
   */
 trait SourceView:
   def nodes: Vector[NodeSummary]
   def node(ref: SourceNodeRef): Option[NodeSummary]
   def adjacency(layer: RelationLayer): Map[SourceNodeRef, Map[SourceNodeRef, Double]]
   def worldOrder: Option[Map[SourceNodeRef, Int]]
-  def textLength: Int
+  def scoringLength: Int
+
+  /** Only this exact subset has the historical text-only HSMM v3 representation. */
+  final def textWireCompatible: Boolean = nodes.forall { node =>
+    (node.support, node.scoringPosition) match
+      case (TypedSupport.Text(spans), Some(ScoringPosition.CanonicalText(position))) => spans == position
+      case _ => false
+  }
 
   lazy val maxLevel: Int = nodes.map(_.level).maxOption.getOrElse(0)
   lazy val leaves: Vector[NodeSummary] = nodes.filter(_.isLeaf)
@@ -462,42 +489,20 @@ trait SourceView:
   def reachable(layer: RelationLayer, from: SourceNodeRef, to: SourceNodeRef): Boolean =
     reachabilityIndex(layer).getOrElse(from, Set.empty).contains(to)
 
-  /** Relative discourse span of a node: `[start, end]` of its support hull in `[0, 1]`. */
+  /** Relative span of the declared scoring feature; missing input remains absent. */
   def relativeSpan(ref: SourceNodeRef): Option[(Double, Double)] =
-    node(ref) match
-      case Some(n) if textLength > 0 =>
-        val s = n.support.minSpan
-        Some((s.start.toDouble / textLength, s.endExclusive.toDouble / textLength))
-      case _ => None
+    node(ref).flatMap(_.scoringPosition).flatMap(_.relativeTo(scoringLength))
 
-  /** Discourse position of a node normalized to `[0, 1]` by support midpoint, or `None` when the
-    * ref does not resolve in this view or the source has no measured length.
-    *
-    * '''Prefer this to [[relativePosition]] wherever the caller can carry an absence.'''
-    * `relativePosition` substitutes `0.0` for both of those failures, and `0.0` is not a missing
-    * marker — it is the very start of the discourse. A caller that wraps it as
-    * `Some(view.relativePosition(r))` declares an absence channel and then makes `None`
-    * structurally unreachable, publishing a fabricated position as a measured one.
-    */
+  /** Midpoint of the declared scoring feature, never substituted with a physical coordinate. */
   def measuredPosition(ref: SourceNodeRef): Option[Double] =
     relativeSpan(ref).map((a, b) => (a + b) / 2.0)
-
-  /** Discourse position of a node normalized to `[0, 1]` by support midpoint, substituting `0.0`
-    * for an unresolvable ref or an unmeasured source.
-    *
-    * The substitution is why [[measuredPosition]] exists: `0.0` is a real position, so this method
-    * cannot tell a node at the start of the story from one it could not place at all. Use it only
-    * where the caller genuinely has no absence channel, and never to fill one that exists.
-    */
-  def relativePosition(ref: SourceNodeRef): Double =
-    measuredPosition(ref).getOrElse(0.0)
 
 /** Simple in-memory `SourceView`. Hierarchy adjacency is derived from parents unless supplied. */
 final case class InMemorySourceView(
     nodes: Vector[NodeSummary],
     edges: Map[RelationLayer, Vector[(SourceNodeRef, SourceNodeRef, Double)]],
     worldOrder: Option[Map[SourceNodeRef, Int]],
-    textLength: Int
+    scoringLength: Int
 ) extends SourceView:
   private lazy val index: Map[SourceNodeRef, NodeSummary] =
     nodes.iterator.map(n => n.ref -> n).toMap

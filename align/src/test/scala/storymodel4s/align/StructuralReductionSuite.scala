@@ -45,7 +45,7 @@ class StructuralReductionSuite extends ScalaCheckSuite:
       orderedNodes.map(node => node.copy(evidence = evidence.get(node.ref))),
       view.edges,
       view.worldOrder,
-      view.textLength
+      view.scoringLength
     )
 
   property("an incompatible chart with a flattering estimate cannot lower segment cost") {

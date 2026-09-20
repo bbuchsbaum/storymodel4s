@@ -113,7 +113,7 @@ class WogDiagnosticSuite extends FunSuite:
   private lazy val leafRefs: Vector[SourceNodeRef] =
     WogDiagnostic.view.nodes
       .filter(_.level == 0)
-      .sortBy(n => WogDiagnostic.view.relativePosition(n.ref))
+      .sortBy(n => WogDiagnostic.view.measuredPosition(n.ref).get)
       .map(_.ref)
 
   test("the neural facade admits the closed ONNX encoder, not a caller-labelled lexical embedder") {
@@ -263,7 +263,7 @@ class WogDiagnosticSuite extends FunSuite:
       ),
       edges,
       base.view.worldOrder,
-      base.view.textLength
+      base.view.scoringLength
     )
     val overflowingCase = base.copy(id = "wog:overflowing-importance", view = overflowingView)
     val result = Bench

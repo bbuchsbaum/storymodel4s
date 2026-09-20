@@ -273,7 +273,7 @@ class GateProofSuite extends FunSuite:
       view.nodes.map(n => if n.ref == e1 then n.copy(lemmas = n.lemmas + "porch") else n),
       view.edges,
       view.worldOrder,
-      view.textLength
+      view.scoringLength
     )
     assertNotEquals(altered.contentFingerprint, view.contentFingerprint)
     val r2 =

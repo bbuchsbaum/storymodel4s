@@ -154,7 +154,7 @@ object SourceViewLaws extends Laws:
     * discourse span, so no consumer of `relativePosition` can be handed a fabricated `0.0`.
     */
   def positionsAreMeasured(v: SourceView): Boolean =
-    v.textLength <= 0 || exposedRefs(v).forall(r => v.relativeSpan(r).isDefined)
+    v.scoringLength <= 0 || exposedRefs(v).forall(r => v.relativeSpan(r).isDefined)
 
   def sourceView(using
       Arbitrary[AlignGens.Case],
