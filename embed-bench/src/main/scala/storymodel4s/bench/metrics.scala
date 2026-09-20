@@ -325,10 +325,10 @@ object Metrics:
       if breakdowns.isEmpty then None
       else Some(breakdowns.count(_.has(term)).toDouble / breakdowns.size)
 
-    /** Support-midpoint route agreement, recorded on the later unit of each adjacent pair.
+    /** Scoring-position midpoint route agreement, recorded on the later unit of each adjacent pair.
       *
       * For each step, compare the direction the GOLD route took through the source with the
-      * direction the inferred MAP anchors took on the level-independent source-support midpoint
+      * direction the inferred MAP anchors took on the level-independent declared scoring-position midpoint
       * axis. A channel can place every unit on a plausible anchor and still reconstruct the wrong
       * journey; nothing else in this suite would notice, because every other metric scores units
       * independently. Steps where either side is not source-anchored are `None` — an external

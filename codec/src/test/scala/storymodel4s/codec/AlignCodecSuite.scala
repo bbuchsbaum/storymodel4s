@@ -234,10 +234,21 @@ class AlignCodecSuite extends FunSuite:
 
   test("result refuses duplicate inventory lookup disagreement and lookup-only nominations") {
     val old = fixture.result
-    def rebuild(view: SourceView) = HsmmResult.validated(fixture.recall, view,
-      old.candidateAnchors, old.posterior, old.flow, old.viterbi, old.logLikelihood,
-      old.costs, old.refinementPasses)
-    def wrapped(inventory: Vector[NodeSummary], lookup: SourceNodeRef => Option[NodeSummary]): SourceView =
+    def rebuild(view: SourceView) = HsmmResult.validated(
+      fixture.recall,
+      view,
+      old.candidateAnchors,
+      old.posterior,
+      old.flow,
+      old.viterbi,
+      old.logLikelihood,
+      old.costs,
+      old.refinementPasses
+    )
+    def wrapped(
+        inventory: Vector[NodeSummary],
+        lookup: SourceNodeRef => Option[NodeSummary]
+    ): SourceView =
       new SourceView:
         val nodes = inventory
         def node(ref: SourceNodeRef) = lookup(ref)
@@ -247,21 +258,48 @@ class AlignCodecSuite extends FunSuite:
     assertEquals(rebuild(fixture.view), Right(old))
     val first = fixture.view.nodes.head
     assert(rebuild(wrapped(fixture.view.nodes :+ first, fixture.view.node)).isLeft)
-    assert(rebuild(wrapped(fixture.view.nodes, ref => fixture.view.node(ref)
-      .map(_.copy(scoringPosition = None)))).isLeft)
+    assert(
+      rebuild(
+        wrapped(
+          fixture.view.nodes,
+          ref =>
+            fixture.view
+              .node(ref)
+              .map(_.copy(scoringPosition = None))
+        )
+      ).isLeft
+    )
     val nominated = old.candidateAnchors.values.flatten.head
-    assert(rebuild(wrapped(fixture.view.nodes.filterNot(_.ref == nominated), fixture.view.node)).isLeft)
+    assert(
+      rebuild(wrapped(fixture.view.nodes.filterNot(_.ref == nominated), fixture.view.node)).isLeft
+    )
   }
 
   test("text support with absent or noncanonical scoring cannot enter the v3 wire") {
     val old = fixture.result
-    val positions = Vector(None, Some(ScoringPosition.LegacyAnnotationText(fixture.view.nodes.head.support.textSpans.get)),
-      Some(ScoringPosition.CanonicalText(SpanSet.one(TextSpan.unsafe(0, 0)))))
+    val positions = Vector(
+      None,
+      Some(ScoringPosition.LegacyAnnotationText(fixture.view.nodes.head.support.textSpans.get)),
+      Some(ScoringPosition.CanonicalText(SpanSet.one(TextSpan.unsafe(0, 0))))
+    )
     positions.foreach { position =>
-      val view = fixture.view.copy(nodes = fixture.view.nodes.map(_.copy(scoringPosition = position)))
+      val view =
+        fixture.view.copy(nodes = fixture.view.nodes.map(_.copy(scoringPosition = position)))
       assert(!view.textWireCompatible)
-      val result = HsmmResult.validated(fixture.recall, view, old.candidateAnchors, old.posterior,
-        old.flow, old.viterbi, old.logLikelihood, old.costs, old.refinementPasses).toOption.get
+      val result = HsmmResult
+        .validated(
+          fixture.recall,
+          view,
+          old.candidateAnchors,
+          old.posterior,
+          old.flow,
+          old.viterbi,
+          old.logLikelihood,
+          old.costs,
+          old.refinementPasses
+        )
+        .toOption
+        .get
       assertEquals(HsmmResultCodec.encode(result), Left(HsmmCodecError.UnsupportedSupport))
     }
   }

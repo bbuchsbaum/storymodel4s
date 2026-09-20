@@ -308,16 +308,24 @@ class SherlockAnnotationsSuite extends FunSuite:
     val input = parseFixture(rows).fold(e => fail(e.message), identity)
     val model = SherlockSourceAtlas.of(input).fold(e => fail(e.message), identity)
     val support = model.scenes(1).support.playbackOn(model.atlas.bundle.primaryAxis.id).toOption.get
-    assertEquals(support.intervals.map(i => (i.start, i.endExclusive)),
-      Vector((0L, 75000L), (76000L, 106000L)))
+    assertEquals(
+      support.intervals.map(i => (i.start, i.endExclusive)),
+      Vector((0L, 75000L), (76000L, 106000L))
+    )
     assertEquals(support.points.map(_.at), Vector(50000L))
   }
 
-  test("composition receipt binds the exact admitted record annotation and ordered part identities") {
+  test(
+    "composition receipt binds the exact admitted record annotation and ordered part identities"
+  ) {
     val input = parsed
     val model = SherlockSourceAtlas.of(input).fold(e => fail(e.message), identity)
-    val expected = Vector(input.repairRecord.checksum, input.manifest.annotationSha256,
-      input.partABundle.identity, input.partBBundle.identity)
+    val expected = Vector(
+      input.repairRecord.checksum,
+      input.manifest.annotationSha256,
+      input.partABundle.identity,
+      input.partBBundle.identity
+    )
     model.compositions.values.foreach { mapping =>
       assertEquals(mapping.receipt.algorithm, "sherlock/presentation-composition/v1")
       assertEquals(mapping.receipt.inputChecksums, expected)
@@ -326,17 +334,34 @@ class SherlockAnnotationsSuite extends FunSuite:
 
   test("different admitted part rates use exact LCM ticks for both native and primary support") {
     val bytes = bytesOf(fixtureRows)
-    def playback(json: io.circe.Json): io.circe.Json = json.mapObject(_
-      .add("timeBase", io.circe.Json.fromString("1/1000"))
-      .add("ticksPerSecond", io.circe.Json.fromLong(1000L))
-      .add("ticksPerFrame", io.circe.Json.fromLong(40L))
-      .add("durationTicks", io.circe.Json.fromLong(12000L)))
+    def playback(json: io.circe.Json): io.circe.Json = json.mapObject(
+      _.add("timeBase", io.circe.Json.fromString("1/1000"))
+        .add("ticksPerSecond", io.circe.Json.fromLong(1000L))
+        .add("ticksPerFrame", io.circe.Json.fromLong(40L))
+        .add("durationTicks", io.circe.Json.fromLong(12000L))
+    )
     val changed = recordFor(bytes).document.hcursor
-      .downField("coordinateSystems").downN(7).withFocus(playback).top.get.hcursor
-      .downField("presentationEditionIdentity").downField("parts").downN(1)
-      .downField("video").withFocus(playback).top.get.hcursor
-      .downField("annotationToPlaybackCrosswalk").downField("runs").downN(1)
-      .downField("playbackEndTicks").withFocus(_ => io.circe.Json.fromLong(12000L)).top.get
+      .downField("coordinateSystems")
+      .downN(7)
+      .withFocus(playback)
+      .top
+      .get
+      .hcursor
+      .downField("presentationEditionIdentity")
+      .downField("parts")
+      .downN(1)
+      .downField("video")
+      .withFocus(playback)
+      .top
+      .get
+      .hcursor
+      .downField("annotationToPlaybackCrosswalk")
+      .downField("runs")
+      .downN(1)
+      .downField("playbackEndTicks")
+      .withFocus(_ => io.circe.Json.fromLong(12000L))
+      .top
+      .get
     val record = TimebaseRepair.parse(changed.noSpaces).fold(e => fail(e.message), identity)
     val input = SherlockAnnotations.parse(bytes, record).fold(e => fail(e.message), identity)
     val model = SherlockSourceAtlas.of(input).fold(e => fail(e.message), identity)
@@ -344,12 +369,27 @@ class SherlockAnnotationsSuite extends FunSuite:
     assertEquals(axis.timebase, Some(RationalTimebase.of(1L, 5000L).toOption.get))
     assertEquals(axis.extent.asInstanceOf[AxisExtent.PlaybackTicks].endExclusive, 212000L)
     val a = model.rows(1).support
-    assertEquals(a.intervalsOn(input.partABundle.primaryAxis.id).toOption.get.intervals.head.endExclusive, 25000L)
+    assertEquals(
+      a.intervalsOn(input.partABundle.primaryAxis.id).toOption.get.intervals.head.endExclusive,
+      25000L
+    )
     assertEquals(a.intervalsOn(axis.id).toOption.get.intervals.head.endExclusive, 50000L)
-    assertEquals(model.rows(3).support.playbackOn(axis.id).toOption.get.points.map(_.at), Vector(100000L))
+    assertEquals(
+      model.rows(3).support.playbackOn(axis.id).toOption.get.points.map(_.at),
+      Vector(100000L)
+    )
     val b = model.rows(6).support
     val native = b.intervalsOn(input.partBBundle.primaryAxis.id).toOption.get.intervals.head
     val primary = b.intervalsOn(axis.id).toOption.get.intervals.head
     assertEquals((native.start, native.endExclusive), (5000L, 12000L))
     assertEquals((primary.start, primary.endExclusive), (177000L, 212000L))
+  }
+
+  test("accepting control: composed atlas retains an ordinary interval on both declared axes") {
+    val input = parsed
+    val model = SherlockSourceAtlas.of(input).fold(e => fail(e.message), identity)
+    val support = model.rows(1).support
+    assertEquals(support.intervalsOn(input.partABundle.primaryAxis.id).toOption.get.intervals.head.endExclusive, 25000L)
+    assertEquals(support.intervalsOn(model.atlas.bundle.primaryAxis.id).toOption.get.intervals.head.endExclusive, 25000L)
+    assert(support.checkedOn(model.atlas.bundle).isRight)
   }
