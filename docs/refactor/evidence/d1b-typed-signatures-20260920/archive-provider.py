@@ -1,7 +1,7 @@
 """Archive the exact qualified provider gate and executable documentation receipts."""
 from pathlib import Path
-import hashlib,json,re,subprocess,tarfile
-root=Path('/Users/bbuchsbaum/code/scala/storymodel4s');data=root/'data/study/d1b-20260920';dest=root/'docs/refactor/evidence/d1b-typed-signatures-20260920'
+import hashlib,json,os,re,subprocess,tarfile
+root=Path('/Users/bbuchsbaum/code/scala/storymodel4s');data=Path(os.environ.get('D1B_OUTPUT',str(root/'data/study/d1b-20260920')));dest=root/'docs/refactor/evidence/d1b-typed-signatures-20260920'
 repo=Path('/private/tmp/storymodel4s-d1b-20260920')
 def sha(path):return hashlib.sha256(path.read_bytes()).hexdigest()
 terminal=json.loads((data/'release-terminal.json').read_bytes());assert terminal['qualified']

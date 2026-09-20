@@ -1,0 +1,93 @@
+{
+  "schema": "d1b/source-equivalence/v1",
+  "mutationCandidate": "87848b96351b7458463690352cc3e3d7ff26f3ab",
+  "reviewedTestRepairCandidate": "ec8c08ed861143506251d3f15a60d3408614ac33",
+  "unchangedMutationSourceAndTestFiles": [
+    {
+      "path": "align/src/main/scala/storymodel4s/align/hsmm.scala",
+      "sha256": "7756c0218f2ac12197ed40e7df21ce400cfe9e82d18524dcd4b54ffacbdf6b48"
+    },
+    {
+      "path": "align/src/main/scala/storymodel4s/align/source.scala",
+      "sha256": "3384052d235cc63668fa9fe87868abb7649d96af4a14823b0c54646ba6672cfd"
+    },
+    {
+      "path": "align/src/main/scala/storymodel4s/align/wire.scala",
+      "sha256": "9e2dfac4866d9a16cef4ef91a2ed069cec64e061e9a87d8cae557d372576d82a"
+    },
+    {
+      "path": "align/src/test/scala/storymodel4s/align/D1bScoringPositionSuite.scala",
+      "sha256": "a7f02eed7e6415898fdd6773e86ee4eb85b78633ca0264aa8f0f6a95fa8de8f2"
+    },
+    {
+      "path": "align/src/test/scala/storymodel4s/align/probes/D1bResultBoundarySuite.scala",
+      "sha256": "df97d3ba845983d7f5310b5e6d5e8f0f473eeb9c6f3dbb7d85680e15325e1c12"
+    },
+    {
+      "path": "codec/src/main/scala/storymodel4s/codec/align.scala",
+      "sha256": "43f19e26ca338ae0dfe1daa70bc4c71fad9fe6c43d2267fb9212d9f9bc5c3d05"
+    },
+    {
+      "path": "codec/src/main/scala/storymodel4s/codec/core.scala",
+      "sha256": "c1a47ca30ac2af608ee9241bf44357c1d977347cb6fcc359351a6da2c23f6a2d"
+    },
+    {
+      "path": "codec/src/test/scala/storymodel4s/codec/AlignCodecSuite.scala",
+      "sha256": "3dd85e5066ba58c0214e29a69d09e59bcf38ef9b942a81cae0052ec1b0f6f985"
+    },
+    {
+      "path": "codec/src/test/scala/storymodel4s/codec/D1bPointCodecSuite.scala",
+      "sha256": "5deaab7cca0ecb7fccc12fa49c350f5dbfe34264a47a6849b29ca832c13ecb0c"
+    },
+    {
+      "path": "core/src/main/scala/storymodel4s/core/source.scala",
+      "sha256": "4ea8746727a37c8e31cd50d02cf312f314b13f92838437029f32d27a0c5f7e5e"
+    },
+    {
+      "path": "core/src/main/scala/storymodel4s/core/sourceIdentity.scala",
+      "sha256": "7b27ffd5421629e34f58aea5619a80adcfc8ee438f46c4abd25b16acae2f1438"
+    },
+    {
+      "path": "core/src/main/scala/storymodel4s/core/support.scala",
+      "sha256": "a58e30cb19079dc351f4b7d5c4c2fb11d67e50c0f3596c8458e3328a9edd024b"
+    },
+    {
+      "path": "core/src/test/scala/storymodel4s/core/D1bPointSupportSuite.scala",
+      "sha256": "c8d67c7f7d58cf61c495b7b8507de941b17195e7d1997305c55729cdf5904bf9"
+    },
+    {
+      "path": "core/src/test/scala/storymodel4s/core/probes/D1bPlaybackSupportBoundarySuite.scala",
+      "sha256": "8d9deeceac2f194e2c08f9ba9441819fa9e2ac243bf4e49ba1baf098b986c579"
+    },
+    {
+      "path": "corpus-intake/src/main/scala/storymodel4s/corpus/intake/SherlockSourceAtlas.scala",
+      "sha256": "a7b4178c250c01564f243f6b0e14b38dec84f655b66f6adc98c45cbc79a897db"
+    },
+    {
+      "path": "corpus-intake/src/test/scala/storymodel4s/corpus/intake/SherlockAnnotationsSuite.scala",
+      "sha256": "ca904b0e2c13085cd7b8369e81ad9cda28817f0b0286b55fe3537f350361e97f"
+    },
+    {
+      "path": "embed-bench/src/main/scala/storymodel4s/bench/metrics.scala",
+      "sha256": "da1319d9a051791a3240f8c9ca4d06f724196fc66602ef6f043a2d5ca55e9981"
+    },
+    {
+      "path": "embed-bench/src/test/scala/storymodel4s/bench/WogDiagnosticSuite.scala",
+      "sha256": "6518ed656ac5813f4f3f413300d745dca1eaf4d0966689cfe94c5874ccdb9f37"
+    },
+    {
+      "path": "laws/src/main/scala/storymodel4s/laws/Laws.scala",
+      "sha256": "fc4133e10256aa0c19c371f1fbbba5b3a91da8241b6a1fc7fce3aa6c92a4a471"
+    },
+    {
+      "path": "laws/src/test/scala/storymodel4s/laws/LawsSuite.scala",
+      "sha256": "8e3e888822e6c99f9e009b55fc49e92f02fed94bea1cb9a8732d116db530d8c1"
+    }
+  ],
+  "changedSourcePaths": [
+    "embed-bench/src/test/scala/storymodel4s/bench/filmfestival/FilmFestivalSuite.scala",
+    "embed-bench/src/test/scala/storymodel4s/bench/sherlock/D1bSherlockSupportCapture.scala"
+  ],
+  "changes": "Three additive capture JSON fields (separately compiled and real-data checked); FilmFestival test expectation repair plus interval control (separately qualified). No production/build source changed.",
+  "originalMutationCourtStill67": true
+}

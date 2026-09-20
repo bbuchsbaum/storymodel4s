@@ -72,10 +72,21 @@
       "revision": "87848b96",
       "scope": "Direct terminal mutation-archive audit",
       "result": "309members,67reconstructed source patches,67production compiles,8clean probe recompiles,67named kills/controls,98XML files, baseline/restored90passes; no findings. Later850 full gate not qualified by this audit."
+    },
+    {
+      "reviewer": "/root (relayed separate fresh-context review)",
+      "revision": "87848b96",
+      "scope": "Final source/test delta from c57f11fb, with later changes through b9c2acf9 inventoried",
+      "result": "No P1/P2. Later changes are evidence/docs plus three additive capture fields. This source review does not establish final execution."
+    },
+    {
+      "reviewer": "/root (relayed separate fresh-context review)",
+      "revision": "da169af2",
+      "scope": "FilmFestival exact point-group expectation repair after red850 provider gate",
+      "result": "No findings; world-order absence retained, exact interval and point controls. Subsequent ec8c08ed changes only two formatter line wraps."
     }
   ],
   "remaining": [
-    "Final source/test delta c57f11fb\u219287848b96 review",
     "Final provider/consumer execution evidence review"
   ]
 }
