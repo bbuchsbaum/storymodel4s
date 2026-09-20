@@ -600,7 +600,7 @@ final class AtlasCompiler private (provenance: ViewProvenance):
     * the resolver. The view checks its model, space, target, basis and support joins.
     */
   def compileFeatures(
-      model: StoryModel[ModelStatus.Validated],
+      model: TextModel[ModelStatus.Validated],
       state: CommonViewState,
       spec: AtlasSpec,
       track: storymodel4s.features.FeatureTrack[FeatureTarget, Double]
@@ -622,7 +622,7 @@ final class AtlasCompiler private (provenance: ViewProvenance):
 
   /** Compile a validated story into an evidence-backed scene under the exact supplied receipt. */
   def compile(
-      model: StoryModel[ModelStatus.Validated],
+      model: TextModel[ModelStatus.Validated],
       state: CommonViewState,
       spec: AtlasSpec
   ): Either[AtlasCompileError, NarrativeScene] =
@@ -676,7 +676,7 @@ final class AtlasCompiler private (provenance: ViewProvenance):
     else run(draft.model, Some(draft), state, spec)
 
   private def run(
-      model: StoryModel[?],
+      model: TextModel[?],
       draft: Option[DraftModel],
       state: CommonViewState,
       spec: AtlasSpec
@@ -711,7 +711,7 @@ final class AtlasCompiler private (provenance: ViewProvenance):
     yield scene
 
   private def build(
-      model: StoryModel[?],
+      model: TextModel[?],
       draft: Option[DraftModel],
       ledger: ClaimLedger,
       state: CommonViewState,
@@ -1183,7 +1183,7 @@ final class AtlasCompiler private (provenance: ViewProvenance):
 
   /** Provenance binds source, model build, and this exact view configuration. */
   private def validateProvenance(
-      model: StoryModel[?],
+      model: TextModel[?],
       state: CommonViewState,
       spec: AtlasSpec
   ): Either[DomainError, Unit] =
@@ -1235,7 +1235,7 @@ final class AtlasCompiler private (provenance: ViewProvenance):
     * cites. An absence with no discourse position claims no text and so cannot lie about any.
     */
   private[view] def checkEvidence(
-      model: StoryModel[?],
+      model: TextModel[?],
       mark: VisualPrimitive
   ): Either[DomainError, Unit] =
     def onExactUnits(placement: EpistemicPlacement): Boolean = placement match

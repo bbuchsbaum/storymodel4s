@@ -13,7 +13,7 @@ import storymodel4s.features.{FeatureRef, FeatureTarget}
   * still be reported, but consequential violations (e.g. a dangling endpoint after a key remap) are
   * allowed.
   */
-final case class Mutant(law: String, exact: Boolean, draft: StoryModel[ModelStatus.Draft])
+final case class Mutant(law: String, exact: Boolean, draft: TextModel[ModelStatus.Draft])
 
 /** Minimally-invalid story models: one mutation per validator law (design record §32.6). */
 object InvalidStoryGens:
@@ -47,7 +47,7 @@ object InvalidStoryGens:
     TemporalEdge(b.situations(from), rel, b.situations(to), ctx, inferredMeta(s"mut:t:$from:$to"))
 
   /** `(law, exact, mutation)`; a mutation returns the mutated draft. */
-  val mutations: Vector[(String, Boolean, StorySmall.Built => StoryModel[ModelStatus.Draft])] =
+  val mutations: Vector[(String, Boolean, StorySmall.Built => TextModel[ModelStatus.Draft])] =
     Vector(
       (
         "ids.key-consistency",

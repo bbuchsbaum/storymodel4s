@@ -196,7 +196,7 @@ object WarOfTheGhostsExpectations:
   )
 
   /** Evaluate every check of every expectation against a model; empty result means all pass. */
-  def evaluate(model: StoryModel[?]): Vector[(Expectation, Check, String)] =
+  def evaluate(model: TextModel[?]): Vector[(Expectation, Check, String)] =
     val g = model.graph
     val src = new StoryAlignmentSourceView(model)
     def ctxKind(s: SituationId): Option[ContextKind] =
@@ -323,7 +323,7 @@ object WarOfTheGhostsExpectations:
     }
 
   /** Narrated-world strict-precedence reachability over the root-scoped WorldTime view. */
-  private final class StoryAlignmentSourceView(model: StoryModel[?]):
+  private final class StoryAlignmentSourceView(model: TextModel[?]):
     private val g = model.graph
     private val edges: Map[SituationId, Vector[SituationId]] =
       g.rootContext

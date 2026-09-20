@@ -16,9 +16,9 @@ import storymodel4s.document.{
 import storymodel4s.story.{
   ModelStatus,
   Severity,
-  StoryModel,
+  TextModel,
   StoryRef,
-  ValidationOutcome,
+  TextValidationOutcome,
   Violation
 }
 
@@ -59,7 +59,7 @@ enum DerivationRecord:
 /** The exact promotion state of a draft model, derived from its own validation outcome.
   *
   * Why unforgeable rather than a product: `promoted`, `unsatisfiedLaws` and `gapCount` stand in a
-  * derived relation to one [[ValidationOutcome]] and one [[DerivationRecord]], so most combinations
+  * derived relation to one [[TextValidationOutcome]] and one [[DerivationRecord]], so most combinations
   * of individually lawful field values are false. A caller who could state them independently could
   * mint a receipt reading "promoted, no unsatisfied laws" over a model with a hundred and
   * thirty-five of them, and that receipt would survive every audit downstream. An identity is
@@ -96,7 +96,7 @@ final class DraftPromotion private (
 object DraftPromotion:
   /** Derive the promotion state from the validator's own outcome and the compilation's own record.
     */
-  def from(outcome: ValidationOutcome, derivation: DerivationRecord): DraftPromotion =
+  def from(outcome: TextValidationOutcome, derivation: DerivationRecord): DraftPromotion =
     val laws = outcome.report.violations
       .groupBy(violation => (violation.law, violation.severity))
       .toVector
@@ -119,7 +119,7 @@ object DraftPromotion:
   * accepting it.
   */
 final class DraftModel private (
-    val model: StoryModel[ModelStatus.Draft],
+    val model: TextModel[ModelStatus.Draft],
     val promotion: DraftPromotion,
     val derivation: DerivationRecord,
     val violations: Vector[Violation]
@@ -162,8 +162,8 @@ final class DraftModel private (
 object DraftModel:
   /** Bind a draft to its validation outcome and to whatever derivation record accompanied it. */
   def of(
-      model: StoryModel[ModelStatus.Draft],
-      outcome: ValidationOutcome,
+      model: TextModel[ModelStatus.Draft],
+      outcome: TextValidationOutcome,
       derivation: DerivationRecord
   ): DraftModel =
     val sorted = derivation match
@@ -186,8 +186,8 @@ object DraftModel:
     * violates and states that it was told nothing about derivation.
     */
   def withoutDerivationRecord(
-      model: StoryModel[ModelStatus.Draft],
-      outcome: ValidationOutcome
+      model: TextModel[ModelStatus.Draft],
+      outcome: TextValidationOutcome
   ): DraftModel = of(model, outcome, DerivationRecord.NotSupplied)
 
 /** Why a sentence yielded no situation root, derived from the provider's own coverage row.
@@ -503,7 +503,7 @@ object DraftAbsence:
 private[view] object AbsencePlacement:
   /** Exact spans of the surface units an absence names, or the typed reason it has no position. */
   def onUnits(
-      model: StoryModel[?],
+      model: TextModel[?],
       units: Vector[SurfaceUnitId],
       clip: SpanSet => Option[SpanSet]
   ): EpistemicPlacement =
@@ -527,7 +527,7 @@ private[view] object AbsencePlacement:
 
   /** A law claims its subject's own cited words, or none at all; never a guessed position. */
   def forLaw(
-      model: StoryModel[?],
+      model: TextModel[?],
       violation: Violation,
       clip: SpanSet => Option[SpanSet]
   ): EpistemicPlacement = violation.address match
@@ -543,7 +543,7 @@ private[view] object AbsencePlacement:
 
   /** The placement of any absence, dispatched on its own typed content. */
   def of(
-      model: StoryModel[?],
+      model: TextModel[?],
       absence: DraftAbsence,
       clip: SpanSet => Option[SpanSet]
   ): EpistemicPlacement = absence.content match

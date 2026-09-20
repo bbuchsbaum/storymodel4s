@@ -1054,12 +1054,12 @@ final class NarrativeCompilation private (
     val derivation: DerivationReceipt,
     val evidenceLedger: Map[EvidenceId, Evidence],
     val provenance: Provenance,
-    val draft: StoryModel[ModelStatus.Draft],
-    val validation: ValidationOutcome,
+    val draft: TextModel[ModelStatus.Draft],
+    val validation: TextValidationOutcome,
     val receipt: BuildReceipt,
     val fingerprint: Checksum
 ):
-  def validated: Option[StoryModel[ModelStatus.Validated]] = validation.validated
+  def validated: Option[TextModel[ModelStatus.Validated]] = validation.validated
   def isPartial: Boolean = derivation.gaps.nonEmpty || validated.isEmpty
 
   override def equals(other: Any): Boolean = other match
@@ -1114,8 +1114,8 @@ object NarrativeCompilation:
       derivation: DerivationReceipt,
       evidenceLedger: Map[EvidenceId, Evidence],
       provenance: Provenance,
-      draft: StoryModel[ModelStatus.Draft],
-      validation: ValidationOutcome,
+      draft: TextModel[ModelStatus.Draft],
+      validation: TextValidationOutcome,
       receipt: BuildReceipt,
       fingerprint: Checksum
   ): Either[DomainError, NarrativeCompilation] =
@@ -1148,7 +1148,7 @@ object NarrativeCompilation:
     val missingGapUpstream = derivation.gaps.flatMap(_.upstreamClaims).toSet -- claimLedger.keySet
     val failure =
       if draft.receipt != Some(receipt) then Some("draft and compilation receipts differ")
-      else if validation.validated.exists(_ != draft) then
+      else if validation.validated.exists(_.model != draft.model) then
         Some("validated promotion does not represent the compilation draft")
       else if draftClaims.exists((id, meta) => claimLedger.get(id) != Some(meta)) then
         Some("derivation receipt omits claims present in the draft")
@@ -2190,8 +2190,7 @@ object NarrativeCompiler:
           DerivationGap(Stage, ClaimFamily.DiscourseTrajectory, target, reason, upstream, evidence)
         }
     gaps ++= trajectoryGaps
-    val draft = StoryModel.draft(
-      input.source,
+    val draft = StoryModel.draftText(
       input.atlas,
       graph,
       hierarchy,
@@ -2222,7 +2221,7 @@ object NarrativeCompiler:
     val validation =
       if compilerViolations.isEmpty then structuralValidation
       else
-        ValidationOutcome(
+        TextValidationOutcome(
           ValidationReport(
             (structuralValidation.report.violations ++ compilerViolations)
               .sortBy(v => (v.law, v.path, v.reason))
@@ -2943,7 +2942,7 @@ object NarrativeCompiler:
       graph: NarrativeGraph,
       hierarchy: NarrativeHierarchy,
       trajectory: DiscourseTrajectory,
-      validation: ValidationOutcome
+      validation: TextValidationOutcome
   ): Checksum =
     val attempts = derivation.attempts.map { attempt =>
       val outcome = attempt.disposition match

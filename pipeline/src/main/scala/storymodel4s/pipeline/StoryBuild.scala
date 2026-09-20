@@ -9,7 +9,7 @@ import storymodel4s.codec.{
   FeaturesRecordCodec,
   StoryModelCodec
 }
-import storymodel4s.story.{ModelStatus, StoryModel}
+import storymodel4s.story.{ModelStatus, TextModel}
 import storymodel4s.core.*
 import storymodel4s.document.{
   ChartProposalProvider,
@@ -191,7 +191,7 @@ object BuildSummary:
       parsed: ParseOutcome,
       proposals: ChartProposals,
       compilation: NarrativeCompilation,
-      written: StoryModel[ModelStatus.Draft],
+      written: TextModel[ModelStatus.Draft],
       files: BundleFiles
   ): Either[PipelineError, BuildSummary] =
     val receipt = written.receipt.getOrElse(compilation.receipt)

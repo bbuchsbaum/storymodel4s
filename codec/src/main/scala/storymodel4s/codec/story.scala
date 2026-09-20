@@ -21,7 +21,7 @@ import PropositionCodecs.given
 
 /** Codecs for `storymodel4s.story` and the `StoryModel` artifact.
   *
-  * Status is never on the wire: decoding yields `StoryModel[Draft]` and consumers revalidate. The
+  * Status is never on the wire: decoding yields `TextModel[Draft]` and consumers revalidate. The
   * content checksum is computed over the same canonical text, so `Draft` and `Validated` of the
   * same content hash equal.
   */
@@ -697,7 +697,7 @@ object StoryModelCodec:
   private given Decoder[FeatureSpace[?]] = FeatureCodecs.spaceExistentialDecoder
 
   /** Status is a phantom and is not written; every other field is. */
-  given modelEncoder[S <: ModelStatus]: Encoder[StoryModel[S]] = Encoder.instance { m =>
+  given modelEncoder[S <: ModelStatus]: Encoder[TextModel[S]] = Encoder.instance { m =>
     obj(
       "schemaVersion" -> m.schemaVersion.asJson,
       "source" -> m.source.asJson,
@@ -718,7 +718,7 @@ object StoryModelCodec:
   /** Decoding yields a draft; the atlas is checked against the source (same checksums) and the
     * consumer revalidates with `StoryValidator` to recover `Validated`.
     */
-  given draftDecoder: Decoder[StoryModel[ModelStatus.Draft]] = Decoder.instance { c =>
+  given draftDecoder: Decoder[TextModel[ModelStatus.Draft]] = Decoder.instance { c =>
     for
       sv <- SchemaVersions.check(c)
       source <- field[StorySource](c, "source")
@@ -738,8 +738,7 @@ object StoryModelCodec:
       sensory <- field[Map[SituationId, Vector[SensoryProfile]]](c, "sensoryProfiles")
       receipt <- field[Option[BuildReceipt]](c, "receipt")
       model <- StoryModel
-        .draft(
-          source,
+        .draftText(
           atlas,
           graph,
           hierarchy,
@@ -758,13 +757,13 @@ object StoryModelCodec:
     yield model
   }
 
-  def encode[S <: ModelStatus](m: StoryModel[S]): String = Canonical.encode(m)
+  def encode[S <: ModelStatus](m: TextModel[S]): String = Canonical.encode(m)
 
-  def decode(text: String): Either[CodecError, StoryModel[ModelStatus.Draft]] =
-    Canonical.decode[StoryModel[ModelStatus.Draft]](text)
+  def decode(text: String): Either[CodecError, TextModel[ModelStatus.Draft]] =
+    Canonical.decode[TextModel[ModelStatus.Draft]](text)
 
   /** SHA-256 of the canonical text. Status is not part of the text, so `Draft`, `Validated`, and
     * `Adjudicated` models with identical content have identical checksums. Vectors are excluded by
     * construction (only sidecar manifests are inline).
     */
-  def contentChecksum[S <: ModelStatus](m: StoryModel[S]): Checksum = Canonical.checksum(m)
+  def contentChecksum[S <: ModelStatus](m: TextModel[S]): Checksum = Canonical.checksum(m)

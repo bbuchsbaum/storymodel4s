@@ -6,7 +6,7 @@ import scala.util.control.NonFatal
 import storymodel4s.codec.{FeatureMaterializer, FeaturesArtifact}
 import storymodel4s.core.*
 import storymodel4s.features.*
-import storymodel4s.story.{ModelStatus, StoryModel, StoryValidator}
+import storymodel4s.story.{ModelStatus, StoryModel, TextModel, StoryValidator}
 
 /** A word-level measure the caller asked the build to lay over the text.
   *
@@ -135,13 +135,13 @@ object FeatureStage:
   val Stage: StageId = StageId.unsafe("features")
 
   final class Built private[pipeline] (
-      val model: StoryModel[ModelStatus.Draft],
+      val model: TextModel[ModelStatus.Draft],
       val sidecars: Map[FeatureSpaceId, Array[Byte]],
       val artifact: FeaturesArtifact
   )
 
   def build(
-      draft: StoryModel[ModelStatus.Draft],
+      draft: TextModel[ModelStatus.Draft],
       requests: Vector[FeatureRequest]
   ): Either[PipelineError, Built] =
     for
@@ -185,7 +185,7 @@ object FeatureStage:
     * situation in discourse order.
     */
   private def tracksOf(
-      draft: StoryModel[ModelStatus.Draft],
+      draft: TextModel[ModelStatus.Draft],
       m: LexicalMeasure
   ): Either[PipelineError, Vector[FeatureTrack[? <: FeatureTarget, Double]]] =
     val sequence = SurfaceSequence(draft.atlas)
@@ -202,9 +202,9 @@ object FeatureStage:
 
   /** The build receipt gains a `features` stage naming what was measured, when anything was. */
   private def stamp(
-      model: StoryModel[ModelStatus.Draft],
+      model: TextModel[ModelStatus.Draft],
       measures: Vector[LexicalMeasure]
-  ): Either[PipelineError, StoryModel[ModelStatus.Draft]] =
+  ): Either[PipelineError, TextModel[ModelStatus.Draft]] =
     if measures.isEmpty then Right(model)
     else
       val digest = ContentAddress.digest(
@@ -212,8 +212,7 @@ object FeatureStage:
       )
       val receipt = model.receipt.map(r => r.copy(stages = r.stages :+ (Stage, digest)))
       StoryModel
-        .draft(
-          model.source,
+        .draftText(
           model.atlas,
           model.graph,
           model.hierarchy,
@@ -233,7 +232,7 @@ object FeatureStage:
   /** The model's own feature laws over the augmented draft; any of them failing is a refusal, since
     * the compiler's outcome was measured on a draft without these fields.
     */
-  private def featureLaws(model: StoryModel[ModelStatus.Draft]): Either[PipelineError, Unit] =
+  private def featureLaws(model: TextModel[ModelStatus.Draft]): Either[PipelineError, Unit] =
     val violations =
       StoryValidator.validate(model).report.violations.filter(_.law.startsWith("feature."))
     violations.headOption match

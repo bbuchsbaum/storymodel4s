@@ -509,7 +509,7 @@ final class CodexCompiler private (provenance: ViewProvenance):
 
   /** Compile a validated story under shared semantic state and a checked Codex policy. */
   def compile(
-      model: StoryModel[ModelStatus.Validated],
+      model: TextModel[ModelStatus.Validated],
       state: CommonViewState,
       spec: CodexSpec
   ): Either[DomainError, CodexFlow] =
@@ -561,11 +561,11 @@ final class CodexCompiler private (provenance: ViewProvenance):
       )
     else run(draft.model, Some(draft), state, spec)
 
-  // `StoryModel[?]`: nothing this compiler reads is guarded by the promotion phantom, and the
+  // `TextModel[?]`: nothing this compiler reads is guarded by the promotion phantom, and the
   // draft path must get the same annotations from the same rules as the validated one. What
   // separates the two is the receipt, the absence channels and the ledger, not a second compiler.
   private def run(
-      model: StoryModel[?],
+      model: TextModel[?],
       draft: Option[DraftModel],
       state: CommonViewState,
       spec: CodexSpec
@@ -617,7 +617,7 @@ final class CodexCompiler private (provenance: ViewProvenance):
     * failure claims the same words in both projections or is unplaced in both.
     */
   private def compileAbsences(
-      model: StoryModel[?],
+      model: TextModel[?],
       draft: Option[DraftModel],
       horizon: EpistemicHorizon
   ): Either[DomainError, CodexCompiler.AbsenceCompilation] =
@@ -681,11 +681,11 @@ final class CodexCompiler private (provenance: ViewProvenance):
         )
       else Right(Some(ledger))
 
-  // `StoryModel[?]`: the ancestor chains read the hierarchy and the claim ledger, neither of which
+  // `TextModel[?]`: the ancestor chains read the hierarchy and the claim ledger, neither of which
   // the promotion phantom guards, and a draft's reading view needs the same navigation a validated
   // one gets.
   private def visibleAncestorChains(
-      model: StoryModel[?],
+      model: TextModel[?],
       visibleClaims: Option[Set[ClaimId]],
       horizon: EpistemicHorizon
   ): Map[Address, Vector[Address]] =
@@ -721,7 +721,7 @@ final class CodexCompiler private (provenance: ViewProvenance):
     (situations ++ segments).toMap
 
   private def proposal(
-      model: StoryModel[?],
+      model: TextModel[?],
       visibleClaims: Option[Set[ClaimId]],
       horizon: EpistemicHorizon,
       candidate: Candidate,
@@ -766,7 +766,7 @@ final class CodexCompiler private (provenance: ViewProvenance):
     else Right(())
 
   private def validateProvenance(
-      model: StoryModel[?],
+      model: TextModel[?],
       state: CommonViewState,
       spec: CodexSpec
   ): Either[DomainError, Unit] =
@@ -804,7 +804,7 @@ final class CodexCompiler private (provenance: ViewProvenance):
           )
 
   private def compileFeature(
-      model: StoryModel[?],
+      model: TextModel[?],
       state: CommonViewState,
       spec: CodexSpec
   ): Either[DomainError, CodexCompiler.FeatureCompilation] =
@@ -834,10 +834,10 @@ final class CodexCompiler private (provenance: ViewProvenance):
 
 /** One pure feature planner shared by every canonical view compiler. */
 private[view] object FeaturePlanner:
-  // `StoryModel[?]`: a feature plan reads `featureRefs` and the atlas, neither of which the
+  // `TextModel[?]`: a feature plan reads `featureRefs` and the atlas, neither of which the
   // promotion phantom guards, and the draft path needs the same plan the validated path gets.
   def plan(
-      model: StoryModel[?],
+      model: TextModel[?],
       selection: Option[FeatureSelection],
       scale: FeatureScale,
       horizon: EpistemicHorizon,
@@ -923,7 +923,7 @@ private[view] object FeaturePlanner:
       )
 
   private def supportResolver(
-      model: StoryModel[?]
+      model: TextModel[?]
   ): SupportResolver =
     SupportResolver(
       SurfaceSequence(model.atlas),
@@ -965,7 +965,7 @@ private[view] object FeaturePlanner:
           case None => Right(refs)
 
   private[view] def atScale(
-      model: StoryModel[?],
+      model: TextModel[?],
       scale: FeatureScale,
       target: FeatureTarget
   ): Boolean = scale match
@@ -1104,10 +1104,10 @@ object CodexCompiler:
       "lanes.maxPerKind" -> spec.lanePolicy.maxLanesPerKind.toString
     )
 
-  // `StoryModel[?]`: the candidate enumeration reads the graph and the hierarchy, neither of which
+  // `TextModel[?]`: the candidate enumeration reads the graph and the hierarchy, neither of which
   // the promotion phantom guards. A draft's words get exactly the annotations a validated model's
   // words would get from the same claims.
-  private def candidates(model: StoryModel[?]): Vector[Candidate] =
+  private def candidates(model: TextModel[?]): Vector[Candidate] =
     val graph = model.graph
     val nodes =
       graph.situations.valuesIterator

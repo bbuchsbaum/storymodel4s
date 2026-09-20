@@ -1535,10 +1535,9 @@ object WarOfTheGhostsModel:
     .derive(graph, hierarchy, atlas)
     .fold(error => throw new IllegalArgumentException(error.message), identity)
 
-  val draft: StoryModel[ModelStatus.Draft] =
+  val draft: TextModel[ModelStatus.Draft] =
     StoryModel
-      .draft(
-        source,
+      .draftText(
         atlas,
         graph,
         hierarchy,
@@ -1548,16 +1547,16 @@ object WarOfTheGhostsModel:
       )
       .fold(error => throw new IllegalArgumentException(error.message), identity)
 
-  val validation: ValidationOutcome = StoryValidator.validate(draft, ValidationPolicy.default)
+  val validation: TextValidationOutcome = StoryValidator.validate(draft, ValidationPolicy.default)
 
   /** The validated fixture. Throws with the full report if the hand model violates a law, which is
     * the intended failure mode for a fixture that must always be law-abiding.
     */
-  val model: StoryModel[ModelStatus.Validated] =
+  val model: TextModel[ModelStatus.Validated] =
     validation.validated.getOrElse(
       throw new IllegalStateException(
         "War of the Ghosts fixture failed validation:\n" + validation.report.render
       )
     )
 
-  val alignmentSource: AlignmentSource = AlignmentSource(model)
+  val alignmentSource: AlignmentSource = AlignmentSource(model.model)

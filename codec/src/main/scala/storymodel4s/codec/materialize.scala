@@ -6,7 +6,7 @@ import io.circe.{Decoder, DecodingFailure, Encoder, Json}
 import io.circe.syntax.*
 import storymodel4s.core.*
 import storymodel4s.features.*
-import storymodel4s.story.{ModelStatus, StoryModel}
+import storymodel4s.story.{ModelStatus, StoryModel, TextModel}
 import CanonicalPrimitives.{*, given}
 import CoreCodecs.given
 import FeatureCodecs.given
@@ -16,7 +16,7 @@ import FeatureCodecs.given
   * for the `features.json` record.
   */
 final class MaterializedFeatures private[codec] (
-    val model: StoryModel[ModelStatus.Draft],
+    val model: TextModel[ModelStatus.Draft],
     val sidecars: Map[FeatureSpaceId, Array[Byte]],
     val tracks: Vector[SidecarTrack[FeatureTarget, Double]]
 ):
@@ -40,7 +40,7 @@ object FeatureMaterializer:
     SidecarBlockRows.from(256).fold(e => throw new IllegalStateException(e.message), identity)
 
   def materialize(
-      draft: StoryModel[ModelStatus.Draft],
+      draft: TextModel[ModelStatus.Draft],
       tracks: Vector[FeatureTrack[? <: FeatureTarget, Double]]
   ): Either[CodecError, MaterializedFeatures] =
     val ids = tracks.map(_.space.id)
@@ -59,8 +59,7 @@ object FeatureMaterializer:
           val sidecarTracks = materialized.map(_._1)
           val bytes = materialized.map((t, b) => t.space.id -> b).toMap
           StoryModel
-            .draft(
-              draft.source,
+            .draftText(
               draft.atlas,
               draft.graph,
               draft.hierarchy,
@@ -162,7 +161,7 @@ final class FeaturesArtifact private (
     val modelChecksum: Checksum,
     val tracks: Vector[FeaturesArtifact.Entry]
 ):
-  def describes[S <: ModelStatus](model: StoryModel[S]): Boolean =
+  def describes[S <: ModelStatus](model: TextModel[S]): Boolean =
     storyId == model.source.id &&
       canonicalSourceChecksum == model.source.canonicalChecksum &&
       modelChecksum == StoryModelCodec.contentChecksum(model)
@@ -187,7 +186,7 @@ object FeaturesArtifact:
     s"features/${manifest.checksum.short(24)}.sidecar"
 
   def of[S <: ModelStatus](
-      model: StoryModel[S],
+      model: TextModel[S],
       tracks: Vector[SidecarTrack[FeatureTarget, Double]]
   ): Either[DomainError, FeaturesArtifact] =
     val ids = tracks.map(_.space.id)
@@ -285,7 +284,7 @@ object FeaturesRecordCodec:
 
   /** Decode and refuse unless written for exactly `model`. */
   def decode[S <: ModelStatus](
-      model: StoryModel[S],
+      model: TextModel[S],
       text: String
   ): Either[CodecError, FeaturesArtifact] =
     decode(text).flatMap { artifact =>

@@ -87,7 +87,7 @@ object FeatureRendering:
     )
 
   private[view] def attach(
-      model: StoryModel[?],
+      model: TextModel[?],
       scene: NarrativeScene,
       track: FeatureTrack[FeatureTarget, Double]
   ): Either[DomainError, NarrativeScene] =

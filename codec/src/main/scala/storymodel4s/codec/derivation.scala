@@ -13,7 +13,7 @@ import storymodel4s.acquire.{
 }
 import storymodel4s.core.*
 import storymodel4s.document.*
-import storymodel4s.story.{ModelStatus, StoryModel}
+import storymodel4s.story.{ModelStatus, TextModel}
 import storymodel4s.view.DerivationRecord
 import CanonicalPrimitives.{*, given}
 import CoreCodecs.given
@@ -54,7 +54,7 @@ final class DerivationArtifact private (
   def record: DerivationRecord = DerivationRecord.Reported(gaps, coverage)
 
   /** Whether this record was written for exactly `model`: same story, same source, same bytes. */
-  def describes[S <: ModelStatus](model: StoryModel[S]): Boolean =
+  def describes[S <: ModelStatus](model: TextModel[S]): Boolean =
     storyId == model.source.id &&
       canonicalSourceChecksum == model.source.canonicalChecksum &&
       modelChecksum == StoryModelCodec.contentChecksum(model)
@@ -106,7 +106,7 @@ object DerivationArtifact:
   def from(
       compilation: NarrativeCompilation,
       proposals: ChartProposals,
-      written: StoryModel[ModelStatus.Draft]
+      written: TextModel[ModelStatus.Draft]
   ): Either[DomainError, DerivationArtifact] =
     of(
       written.source.id,
@@ -838,7 +838,7 @@ object DerivationRecordCodec:
 
   /** Decode a record and refuse it unless it was written for exactly `model`. */
   def decode[S <: ModelStatus](
-      model: StoryModel[S],
+      model: TextModel[S],
       text: String
   ): Either[CodecError, DerivationArtifact] =
     decode(text).flatMap { artifact =>

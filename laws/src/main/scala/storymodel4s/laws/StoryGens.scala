@@ -126,12 +126,10 @@ object StorySmall:
         descriptors: Vector[DescriptorClaim] = Vector.empty,
         sensoryProfiles: Map[SituationId, Vector[SensoryProfile]] = Map.empty,
         trajectory: Option[DiscourseTrajectory] = None,
-        source: StorySource = source,
         atlas: SurfaceAtlas = atlas
-    ): StoryModel[ModelStatus.Draft] =
+    ): TextModel[ModelStatus.Draft] =
       StoryModel
-        .draft(
-          source,
+        .draftText(
           atlas,
           graph,
           hierarchy,

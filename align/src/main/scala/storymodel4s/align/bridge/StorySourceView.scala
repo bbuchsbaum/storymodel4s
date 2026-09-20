@@ -12,7 +12,7 @@ import storymodel4s.story.{
   NarrativeNodeId,
   Polarity,
   PropositionEvidenceSource,
-  StoryModel,
+  TextModel,
   RelationLayer as StoryLayer
 }
 
@@ -43,7 +43,7 @@ import storymodel4s.story.{
   */
 final class StorySourceView private (
     source: AlignmentSource,
-    model: StoryModel[?],
+    model: TextModel[?],
     semantic: Map[SourceNodeRef, Map[SourceNodeRef, Double]],
     maxFanout: Int,
     evidence: PropositionEvidenceSource
@@ -295,7 +295,7 @@ object StorySourceView:
 
   def apply(
       source: AlignmentSource,
-      model: StoryModel[ModelStatus.Validated],
+      model: TextModel[ModelStatus.Validated],
       semantic: Map[SourceNodeRef, Map[SourceNodeRef, Double]] = Map.empty,
       maxFanout: Int = DefaultMaxFanout,
       evidence: PropositionEvidenceSource = PropositionEvidenceSource.none
@@ -303,17 +303,17 @@ object StorySourceView:
     new StorySourceView(source, model, semantic, math.max(1, maxFanout), evidence)
 
   def validated(
-      model: StoryModel[ModelStatus.Validated],
+      model: TextModel[ModelStatus.Validated],
       evidence: PropositionEvidenceSource = PropositionEvidenceSource.none
   ): StorySourceView =
-    new StorySourceView(AlignmentSource(model), model, Map.empty, DefaultMaxFanout, evidence)
+    new StorySourceView(AlignmentSource(model.model), model, Map.empty, DefaultMaxFanout, evidence)
 
   def adjudicated(
-      model: StoryModel[ModelStatus.Adjudicated],
+      model: TextModel[ModelStatus.Adjudicated],
       evidence: PropositionEvidenceSource = PropositionEvidenceSource.none
   ): StorySourceView =
     new StorySourceView(
-      AlignmentSource.adjudicated(model),
+      AlignmentSource.adjudicated(model.model),
       model,
       Map.empty,
       DefaultMaxFanout,
