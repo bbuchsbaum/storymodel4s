@@ -1,8 +1,8 @@
 # D1A S3 typed acquisition support — 19 September 2026
 
 Mote: `bd-01M2TAF8JH42NYJJAFWPD7HTZB`. Source/test candidate `17194421`,
-based on landed S2 checkpoint `e94ef776`. Mutation and final release qualification
-are in progress. This receipt does not yet close S3 or authorize its landing.
+based on landed S2 checkpoint `e94ef776`. All 18 mutation witnesses and clean restoration passed; final release qualification
+is in progress. This receipt does not yet close S3 or authorize its landing.
 
 `SourceSupport` carries optional `TypedSupport`, with `text(score, spans)` and a
 derived text `spans` accessor. `EvidenceRef.support` exposes spans alone as `Text`
@@ -54,7 +54,10 @@ acceptance rule and has no material findings. The accepting task-reference
 control is separate from negative/error-order assertions, so a refusal mutation
 cannot invalidate its own control. [Initial compilation](initial-focused.json)
 passes 49 tests at `83e7d83d`; the formatted candidate's expanded focused court
-passes 55 tests before mutation. Final evidence will bind that latter result.
+passes [55 tests before mutation](isolated-control.json). The
+[18 compiled mutants](mutations.json) each fail their named rejecting test while
+a named accepting control passes, with zero test errors. After restoring every
+source, the [clean focused court](restored-control.json) again passes all 55 tests.
 [The failed first compile](failed-attempts.json) retains the test-helper keyword
 error and its repair; it is not a mutation witness.
 

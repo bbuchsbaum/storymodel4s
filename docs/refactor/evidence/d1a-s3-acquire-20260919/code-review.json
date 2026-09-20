@@ -22,5 +22,17 @@
       "resolution": "Removed by formatter at17194421."
     }
   ],
-  "qualification": "Source/test design review only; compiled mutation and final gate results remain separate."
+  "qualification": "Source/test design review only; compiled mutation and final gate results remain separate.",
+  "terminalRecheck": {
+    "fromRevision": "24bb6ebd",
+    "toRevision": "17194421",
+    "advisoryRepairRevision": "78f01adc",
+    "materialFindings": [],
+    "checks": [
+      "All ten changed Scala files retain identical non-comment/non-whitespace token content with strings preserved.",
+      "Significant-indentation blocks and loop bodies independently read; no semantic drift.",
+      "Task accepting control remains separate from reference error-order assertions.",
+      "Both housekeeping advisories resolved; git diff --check e94ef776..78f01adc passed."
+    ]
+  }
 }
