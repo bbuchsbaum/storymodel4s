@@ -41,10 +41,10 @@ class WarOfTheGhostsSuite extends munit.FunSuite:
         assert(u.get.span.contains(r.span), s"$where: ${r.span} escapes unit ${u.get.span}")
       }
     m.model.claims.foreach(c => c.evidence.toVector.flatMap(_.spans).foreach(check(_, c.id.value)))
-    g.situations.values.foreach(s => check(s.support, s.id.value))
-    g.entities.values.foreach(e => check(e.support, e.id.value))
-    g.segments.values.foreach(s => check(s.support, s.id.value))
-    g.contexts.values.foreach(c => check(c.support, c.id.value))
+    g.situations.values.foreach(s => check(s.support.textSpans.get, s.id.value))
+    g.entities.values.foreach(e => check(e.support.textSpans.get, e.id.value))
+    g.segments.values.foreach(s => check(s.support.textSpans.get, s.id.value))
+    g.contexts.values.foreach(c => check(c.support.textSpans.get, c.id.value))
   }
 
   test("claim ledger derives without duplicates and covers labels, summaries, hypotheses") {
@@ -189,8 +189,8 @@ class WarOfTheGhostsSuite extends munit.FunSuite:
   }
 
   test("discourse order and narrated-world chronology diverge at the recounting") {
-    assert(m.discoursePosition(S.weFought) > m.discoursePosition(S.ym2ToHouse))
-    assert(m.discoursePosition(S.battle) < m.discoursePosition(S.ym2ToHouse))
+    assert(m.model.discoursePosition(S.weFought) > m.model.discoursePosition(S.ym2ToHouse))
+    assert(m.model.discoursePosition(S.battle) < m.model.discoursePosition(S.ym2ToHouse))
     val world = src.relationMatrix(RelationLayer.WorldTime)
     def reaches(a: SituationId, b: SituationId): Boolean =
       var frontier = Set(a)
@@ -284,7 +284,7 @@ class WarOfTheGhostsSuite extends munit.FunSuite:
     assert(E.ym1 != E.ym2)
     assert(g.groupsOf(E.ym1).contains(E.youngMen))
     assert(g.groupsOf(E.ym2).contains(E.youngMen))
-    assert(m.situationsByEntity(E.ym2).contains(S.huntSeals))
+    assert(m.model.situationsByEntity(E.ym2).contains(S.huntSeals))
     val cont = src.relationMatrix(RelationLayer.EntityContinuity)
     assert(cont.contains((sit(S.huntSeals), sit(S.ym2Accompanies))))
   }
@@ -394,7 +394,7 @@ class WarOfTheGhostsSuite extends munit.FunSuite:
     val dup = SituationNode.Event(
       battle.copy(
         id = dupId,
-        support = m.sp(39),
+        support = TypedSupport.Text(m.sp(39)),
         mentions = NonEmptyVector.one(MentionId.unsafe[SituationK]("wog:m:sit:mutant:s39")),
         meta = m.meta("mutant:battle-again", EpistemicStatus.SurfaceExplicit, Some(m.sp(39)))
       )
@@ -512,7 +512,7 @@ class WarOfTheGhostsSuite extends munit.FunSuite:
           MentionId.unsafe[storymodel4s.core.NarrativeKind.EntityK]("wog:m:ent:mutant-ghosts:s31")
         ),
         attributes = Vector.empty,
-        support = m.sp(31),
+        support = TypedSupport.Text(m.sp(31)),
         meta = m.meta("mutant:ghosts", EpistemicStatus.SurfaceExplicit, Some(m.sp(31)))
       )
     val retargeted = g.relations.participants.map(p =>

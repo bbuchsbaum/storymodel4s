@@ -454,7 +454,7 @@ class WarOfTheGhostsAtlasSuite extends FunSuite:
     val expected = sourceModel.discourseOrder.filter { id =>
       val n = sourceModel.graph.situations(id)
       visible.contains(n.meta.id) &&
-      EvidenceVisibility.clipSupport(n.support, st.horizon).isDefined
+      EvidenceVisibility.clipSupport(n.support.textSpans.get, st.horizon).isDefined
     }
     assertEquals(
       landmarks(s)

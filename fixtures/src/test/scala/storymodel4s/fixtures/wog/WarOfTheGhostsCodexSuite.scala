@@ -16,7 +16,7 @@ class WarOfTheGhostsCodexSuite extends FunSuite:
     val annotation = TextAnnotation
       .of(
         target,
-        battle.support,
+        battle.support.textSpans.get,
         AnnotationKind.Claim,
         AnnotationPriority.unsafe(100),
         AuditRecord.of(upstream, battle.meta.provenance)
