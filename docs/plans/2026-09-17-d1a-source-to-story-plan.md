@@ -2,7 +2,8 @@
 
 *2026-09-17. Draft for owner approval, written against `main` at `5799e94c`. The bead is
 `bd-01M1CQKRG1A4J4BEWCC78F4TEZ`. The governing record is ADR 0007: §5, §6, §7, the migration
-sequence, and the rejected alternatives. Everything here is LocallyObserved. No code has moved.*
+sequence, and the rejected alternatives. This paragraph records the original draft context;
+current landed implementation and qualification are indexed in `docs/refactor/PLAN.md`.*
 
 *Three fresh-context cold reviews returned revisions 1, 2 and 3. Each round went one layer deeper:*
 - *revision 1 failed at the outer doors: film status, the codec, alignment, forgery, and
@@ -13,7 +14,8 @@ sequence, and the rejected alternatives. Everything here is LocallyObserved. No 
 
 *Revision 4 was approved under the A/C/D/E rulings below. Revision 5, 2026-09-19, folds the
 outstanding pre-S2 cold review into bounded construction, identity and staging corrections.
-Those rulings stay in force. S0 and S1 are complete; implementation after them remains open.*
+Those rulings stay in force. S0–S3 are now complete. The S4a staging and projection
+clarifications below preserve those rulings and the remaining S4b/S4c boundaries.*
 
 ## 0. Scope, and the owner's decisions
 
@@ -272,9 +274,17 @@ enum PrimaryProjection:
   case Playback(axis: PresentationAxisId, intervals: PlaybackIntervalSet)
 ```
 
-The projection is derived and never carried. `Text(s)` projects to `TextSpans`, and `Anchored(e)`
-projects to `Playback(e.intervalsOn(primaryAxis))`. The result is total, because `draft` enforces
-projectability.
+The projection is derived against the model bundle, never supplied as an independent cache on
+`TypedSupport`. `Text(s)` projects to `TextSpans` retaining the full `SpanSet`, including every
+unit reference and zero-length/UTF-16 coordinate. Its hull supplies ordering bounds; extent
+remains a validator law, so invalid-but-orderable text drafts are retained.
+
+At S4b, `Anchored(e)` projects to the canonical union of **all intervals already expressed on the
+primary axis**. Every other native or text anchor stays unchanged in `e`; selection does not
+convert its coordinates or assert full temporal coverage of heterogeneous evidence. This
+primary-axis positioning view is total on admitted models because draft requires a direct
+primary anchor. Native-only support is refused for this view, even when a mapping exists;
+implicit conversion and an all-anchors-primary admission restriction are rejected.
 
 **Order:** by projection start, then end, then node id. For text this reproduces today's
 `minSpan` order exactly, and S0 pins it.
@@ -282,7 +292,15 @@ projectability.
 `discourseOrder` and `discoursePosition` move to the model, which has the bundle. The unbound
 graph-level versions become `private[story]`. A checked `NarrativeGraph.discourseOrderOn(bundle)`
 operation shares the same projection/order implementation and returns `Either`; it is needed
-by the compiler when it constructs trajectory before the model exists. `TypedSupport.Anchored`
+by the compiler when it constructs trajectory before the model exists. In S4a the operation
+supports only `Text` on `TextCharacter`, checks the primary kind even for an empty graph, and
+returns typed refusals for anchored/mixed support or other primary kinds. It preserves exact
+historical hull-start/hull-end/id order without clipping, normalization or dropped nodes.
+The graph's ordered entity/context/within/covering queries also become internal; their public
+model counterparts use the same checked order. Internal helpers may receive that derived order,
+but no public raw-graph wrapper may invent one. Public text trajectory derivation becomes checked
+and propagates refusal; render, consistency, validation and alignment read the joined model order.
+`TypedSupport.Anchored`
 carries no cached projection. Point support required by admitted Sherlock row 13 is a named
 D1B prerequisite; no interval-only result may claim to include that instant.
 
@@ -466,12 +484,20 @@ embed-bench. That covers every reader of node `.support` and every caller of `dr
 
 - **Nodes take `TypedSupport`,** with the overloads, and the 10 `copy` sites are edited.
 - **`draft` returns `Either`.** In this slice every model is still text, so the check is "all
-  `Text`". The model **keeps** `source` and `SurfaceAtlas`, so no consumer of those loses them.
-- **The node decoders** read `TypedSupport.Text`.
+  `Text`" over all five node classes and `CircumstanceEdge`, plus no anchored ordinary or
+  boundary-belief evidence. Internal copy uses the same check. The model **keeps** `source`
+  and `SurfaceAtlas`, so no consumer of those loses them. Extent stays a validator law.
+- **The node decoders** read `TypedSupport.Text`; component encoders retain the historical
+  text shape and emit `evidence-support/v1` for anchored support, whose text decoder refuses it.
+  `TypedSupport.textSpans` is an optional text-only accessor, never a throwing generic cast.
 - **Ordering moves to the projection** (§2.5), and the graph-level ordering functions become
   `private[story]`. The compiler's pre-model ordering uses the checked shared operation.
-- **Rewrite the probes that `Either` makes vacuous.** These are the `copy[Validated]` and `Product`
-  probes in `StoryModelUnforgeableSuite:31-35`. Each is re-proved on its own clean recompile.
+- **Keep construction probes explicitly typed as `StoryModel[Draft]`.** Propagating `Either`
+  into their fixture helper can make the copy probe pass for the wrong reason; the Product probe
+  instead fails visibly. Isolate copy visibility, Product conformance and Mirror availability,
+  and re-prove each on its own clean recompile with a successful construction control. Keep
+  fixture extraction checked. Probe every hidden unbound graph ordering accessor from an
+  external package, with a passing model/checked-order control and clean mutation recompiles.
 
 S0 must stay identical.
 

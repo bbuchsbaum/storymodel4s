@@ -905,3 +905,36 @@ The shared text compiler-input validator refuses anchored `SourceSupport` until 
 film compiler defines its input and canonical rendering. Accepting it while the current
 renderer only fingerprints derived text spans would discard identity-relevant payload.
 This temporary refusal requires explicit text/absent controls and a compiled deletion witness.
+
+
+#### S4a checked text staging and projection meaning — 19 September 2026
+
+S4a changes node support to `TypedSupport`, with text companion overloads and an optional
+`TypedSupport.textSpans` accessor. A throwing generic span cast is rejected. The component
+encoder writes Text as the existing span shape and Anchored as `evidence-support/v1`; the
+text decoder explicitly refuses the latter. The model remains text-only in this slice.
+`StoryModel.draft` and its internal copy return `Either[DomainError, StoryModel[...]]` and
+check every node/circumstance support plus all ordinary and boundary evidence. They do not
+move text extent laws into construction. Status-only promotion preserves the admitted value.
+
+`PrimaryProjection.on(bundle, support)` is the checked projection entry point. S4a admits
+only Text on a TextCharacter primary, preserving the original SpanSet and exact hull bounds;
+other families/kinds return typed refusals, even for empty-graph ordering. Graph pre-model
+ordering uses that projection. The joined model exposes discourse order/position and ordered
+entity/context/within/covering queries from the same derived order. All unbound graph ordering
+forms become internal; internal helpers may consume an already checked order. A private
+constructor may retain that derived order, but it is never an independently supplied public
+claim or an input cache on TypedSupport. Text trajectory derivation is checked, and compiler
+failures propagate through its typed error channel without dropping nodes or falling back.
+
+At S4b the anchored primary projection selects the exact union of all intervals already on
+primary. Other native/text anchors remain in the original evidence, unchanged. A direct
+primary anchor makes this selected view total over admitted models; it does not convert every
+anchor or certify all-channel temporal coverage. Native-only support cannot acquire primary
+coordinates merely because a mapping exists. Implicit mapping and silently narrowing admission
+to all-anchors-primary are rejected; complete mapped projection is a different future contract.
+
+The fallible factory does not justify weak compile probes: fixture helpers still extract an
+actual StoryModel, copy/Product/Mirror probes isolate their own boundaries, and every visibility
+mutation gets a clean recompile. A copied Either would falsely hide copy visibility; Product
+instead fails visibly. These are corrections to probe design, not relaxed acceptance.

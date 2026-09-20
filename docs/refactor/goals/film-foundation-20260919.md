@@ -2,7 +2,9 @@
 
 Activated 19 September 2026 at the owner's request for roughly ten existing Motes dispatched
 to an implementation sub-agent. Starting revision: `d9eb9543`. Governing delivery plan:
-[PLAN](../PLAN.md); approved design: [D1A revision 4](../../plans/2026-09-17-d1a-source-to-story-plan.md).
+[PLAN](../PLAN.md); design approved at setup: [D1A revision 4](../../plans/2026-09-17-d1a-source-to-story-plan.md).
+The operative plan is revision 5, incorporating the completed pre-S2 cold review and
+bounded staging clarifications; the A/C/D/E rulings are unchanged.
 The live goal and Mote own execution status; this document defines the completion boundary.
 
 ## Result
