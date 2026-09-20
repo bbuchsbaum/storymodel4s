@@ -25,7 +25,8 @@ class FilmFestivalSuite extends FunSuite:
     assertEquals(built.segmentByRef.values.flatMap(_.group.map(_.ordinal)).toSet, Set(1, 107))
     assert(built.segmentByRef.keys.forall(built.media.contains))
     assertEquals(built.groupByRef.keys.count(built.media.contains), 2)
-    val interval = PlaybackInterval.on(axes("run-01"), 0L, 5000L).fold(e => fail(e.message), identity)
+    val interval =
+      PlaybackInterval.on(axes("run-01"), 0L, 5000L).fold(e => fail(e.message), identity)
     val point = PlaybackInstant.on(axes("run-02"), 0L).fold(e => fail(e.message), identity)
     val groups = built.groupByRef.map { case (ref, group) => group.ordinal -> built.media(ref) }
     assertEquals(groups(1), MediaLocus.Extent("run-01", interval))
@@ -43,7 +44,8 @@ class FilmFestivalSuite extends FunSuite:
       Checksum.ofText("synthetic interval control")
     )
     val (built, axes) = FilmFestivalAnnotationView.build(table).fold(e => fail(e.message), identity)
-    val interval = PlaybackInterval.on(axes("run-01"), 0L, 5000L).fold(e => fail(e.message), identity)
+    val interval =
+      PlaybackInterval.on(axes("run-01"), 0L, 5000L).fold(e => fail(e.message), identity)
     assertEquals(built.groupByRef.size, 1)
     assertEquals(built.media(built.groupByRef.keys.head), MediaLocus.Extent("run-01", interval))
   }
