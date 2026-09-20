@@ -1,0 +1,20 @@
+{
+  "base": "7358eb7c",
+  "candidate": "369965b2",
+  "scope": "Alignment relation/query implementation after projection accessor; complete StorySourceView feature/relation implementation after canonical text binding and before companion factories",
+  "rows": [
+    {
+      "path": "story/src/main/scala/storymodel4s/story/alignment.scala",
+      "comparison": "Exact non-comment/non-whitespace tokens with strings preserved",
+      "equal": true,
+      "tokenSha256": "c7fd7768c01d04e03b811ff3a38121e11134309d1fc6f10eac7a92e03a316344"
+    },
+    {
+      "path": "align/src/main/scala/storymodel4s/align/bridge/StorySourceView.scala",
+      "comparison": "Exact non-comment/non-whitespace tokens with strings preserved",
+      "equal": true,
+      "tokenSha256": "d5672bf425c7eda268b87a1342c978ac661227be6265e4841b950e6ac4b46cb3"
+    }
+  ],
+  "qualification": "Source token preservation only; Scala indentation separately cold-reviewed. Executed numerical preservation is the separate exact per-backend HSMM court."
+}

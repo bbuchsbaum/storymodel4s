@@ -1,0 +1,482 @@
+{
+  "schema": "d1a-s4c-mutation-terminal/v1",
+  "codeRevision": "369965b29228caccb6baba8cfd4943eee4322fb7",
+  "planned": 24,
+  "compiledKilled": 24,
+  "freshMainAndProbeRecompiles": 14,
+  "namedControlsPassed": 24,
+  "terminalCloneClean": true,
+  "restoredControl": {
+    "codeRevision": "369965b29228caccb6baba8cfd4943eee4322fb7",
+    "command": [
+      "sbt",
+      "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+      "-batch",
+      "storyJVM/Test/clean",
+      "alignJVM/Test/clean",
+      "fixturesJVM/Test/clean",
+      "storyJVM/testOnly storymodel4s.story.D1aAlignmentSourceSuite storymodel4s.probes.D1aAlignmentBoundarySuite storymodel4s.story.probes.D1aAlignmentConstructorSuite",
+      "alignJVM/testOnly storymodel4s.probes.D1aStorySourceBoundarySuite",
+      "fixturesJVM/testOnly storymodel4s.fixtures.wog.WarOfTheGhostsCodecGoldenResourceSuite storymodel4s.fixtures.wog.WogHsmmBaselineCaptureSuite storymodel4s.fixtures.wog.WarOfTheGhostsCodecGoldenSuite"
+    ],
+    "exitCode": 0,
+    "cleanBefore": true,
+    "cleanAfter": true,
+    "startedEpochSeconds": 1789880213.6495419,
+    "seconds": 23.191991090774536,
+    "logPath": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1a-s4c-20260920/restored-control-clean.log",
+    "logSha256": "d93fd5eb95f6825fe7362e74f480a51850c4127b901315b5ef755db7d5f04db4",
+    "testTotals": [
+      "[info] Passed: Total 17, Failed 0, Errors 0, Passed 17",
+      "[info] Passed: Total 5, Failed 0, Errors 0, Passed 5",
+      "[info] Passed: Total 4, Failed 0, Errors 0, Passed 4"
+    ],
+    "aggregateTestCounts": {
+      "Total": 26,
+      "Failed": 0,
+      "Errors": 0,
+      "Passed": 26,
+      "Skipped": 0
+    }
+  },
+  "restorationBasis": "Per-case baseline clean assertion, finally restores original bytes, and post-case hash/clean assertion; independent terminal hashes rechecked.",
+  "historicalAttemptsExcluded": "Seven Test-only-clean probe attempts plus one uncompilable private-base constructor attempt; retained in archive.",
+  "manifestSha256": "52e0e9336048613d35357d10916a3949b11a2232f42c626b85153dab29fc63ae",
+  "runnerSha256": "5b0f790c83db8ead5fcfb123069e47be8d27addf7a69bd9a1c6a662d60c33083",
+  "records": [
+    {
+      "id": "seal-general",
+      "path": "story/src/main/scala/storymodel4s/story/alignment.scala",
+      "originalSha256": "2470ba5aa5298e598640ade06bc1ae10d6ec77f3037e5309a6fae7b56b8829fd",
+      "mutantSha256": "661b451df2b767d1395c9f8d87920db1d6ff6fc6510c7318f53aa5d1c90bb765",
+      "restoredSha256": "2470ba5aa5298e598640ade06bc1ae10d6ec77f3037e5309a6fae7b56b8829fd",
+      "baselineCleanBeforeMutation": true,
+      "restoredCleanAfterMutation": true,
+      "rejectSuite": "storymodel4s.probes.D1aAlignmentBoundarySuite",
+      "rejectingTest": "general alignment source cannot be externally implemented",
+      "controlSuite": "storymodel4s.probes.D1aAlignmentBoundarySuite",
+      "acceptingControl": "accepting control: validated and adjudicated factories preserve source capabilities",
+      "cleanRecompile": true,
+      "logSha256": "1216e55b6faeddee6b22296bf53ee00c23603d220f4d92e93156d888cd84160b",
+      "junitSha256": {
+        "storymodel4s.probes.D1aAlignmentBoundarySuite": "1214edcc0e61ab3e0b99e6a5658f8ef129215e8fdcf4133a8bda780d5d803a44"
+      }
+    },
+    {
+      "id": "seal-text",
+      "path": "story/src/main/scala/storymodel4s/story/alignment.scala",
+      "originalSha256": "2470ba5aa5298e598640ade06bc1ae10d6ec77f3037e5309a6fae7b56b8829fd",
+      "mutantSha256": "fc732086158ca66ae27b0230175f087b3c34416fe4e5e861a9f495c68b7389d3",
+      "restoredSha256": "2470ba5aa5298e598640ade06bc1ae10d6ec77f3037e5309a6fae7b56b8829fd",
+      "baselineCleanBeforeMutation": true,
+      "restoredCleanAfterMutation": true,
+      "rejectSuite": "storymodel4s.probes.D1aAlignmentBoundarySuite",
+      "rejectingTest": "text alignment source cannot be externally implemented",
+      "controlSuite": "storymodel4s.probes.D1aAlignmentBoundarySuite",
+      "acceptingControl": "accepting control: validated and adjudicated factories preserve source capabilities",
+      "cleanRecompile": true,
+      "logSha256": "178c897da1f2d07e7c60d4f2bfa070903fd2b038c47c0876abc1439dbb9d9146",
+      "junitSha256": {
+        "storymodel4s.probes.D1aAlignmentBoundarySuite": "5ea3c59bb729010a6647f94cbf64db14d1326861a2d3e0c60f1d117d5a5d98a1"
+      }
+    },
+    {
+      "id": "status-general-validated",
+      "path": "story/src/main/scala/storymodel4s/story/alignment.scala",
+      "originalSha256": "2470ba5aa5298e598640ade06bc1ae10d6ec77f3037e5309a6fae7b56b8829fd",
+      "mutantSha256": "cc8cb3e5d52863edb017828d4673fe5504ae046c65e9d1a39dbfa29ece9f0f19",
+      "restoredSha256": "2470ba5aa5298e598640ade06bc1ae10d6ec77f3037e5309a6fae7b56b8829fd",
+      "baselineCleanBeforeMutation": true,
+      "restoredCleanAfterMutation": true,
+      "rejectSuite": "storymodel4s.probes.D1aAlignmentBoundarySuite",
+      "rejectingTest": "general validated factory refuses Draft",
+      "controlSuite": "storymodel4s.probes.D1aAlignmentBoundarySuite",
+      "acceptingControl": "accepting control: validated and adjudicated factories preserve source capabilities",
+      "cleanRecompile": true,
+      "logSha256": "689faf9c365fa63e9ba74e2596dc04a4f248e518c59da3553b58384680ef3c4d",
+      "junitSha256": {
+        "storymodel4s.probes.D1aAlignmentBoundarySuite": "566c2888846db05a8cd665733fb6a73dd421ec97a94efed12ca2b653e8186d97"
+      }
+    },
+    {
+      "id": "status-general-adjudicated",
+      "path": "story/src/main/scala/storymodel4s/story/alignment.scala",
+      "originalSha256": "2470ba5aa5298e598640ade06bc1ae10d6ec77f3037e5309a6fae7b56b8829fd",
+      "mutantSha256": "72398efa5f0f4f497ebe55b1669ec3b795b29897cd03843f255c1da2452f3e67",
+      "restoredSha256": "2470ba5aa5298e598640ade06bc1ae10d6ec77f3037e5309a6fae7b56b8829fd",
+      "baselineCleanBeforeMutation": true,
+      "restoredCleanAfterMutation": true,
+      "rejectSuite": "storymodel4s.probes.D1aAlignmentBoundarySuite",
+      "rejectingTest": "general adjudicated factory refuses Draft",
+      "controlSuite": "storymodel4s.probes.D1aAlignmentBoundarySuite",
+      "acceptingControl": "accepting control: validated and adjudicated factories preserve source capabilities",
+      "cleanRecompile": true,
+      "logSha256": "4c85119069f45de7a16a6fbba43d0e7cdff15891bfa1104cdbadae38b11d0fcc",
+      "junitSha256": {
+        "storymodel4s.probes.D1aAlignmentBoundarySuite": "4896e6c39591bbe34ebd7738bcc604e4e06444d33d6c60fbda90912e8ab42012"
+      }
+    },
+    {
+      "id": "status-text-validated",
+      "path": "story/src/main/scala/storymodel4s/story/alignment.scala",
+      "originalSha256": "2470ba5aa5298e598640ade06bc1ae10d6ec77f3037e5309a6fae7b56b8829fd",
+      "mutantSha256": "976838fbf41e6afa32d53655d597e844eec9a8840790e953e4bc329c0da2ab75",
+      "restoredSha256": "2470ba5aa5298e598640ade06bc1ae10d6ec77f3037e5309a6fae7b56b8829fd",
+      "baselineCleanBeforeMutation": true,
+      "restoredCleanAfterMutation": true,
+      "rejectSuite": "storymodel4s.probes.D1aAlignmentBoundarySuite",
+      "rejectingTest": "text validated factory refuses Draft",
+      "controlSuite": "storymodel4s.probes.D1aAlignmentBoundarySuite",
+      "acceptingControl": "accepting control: validated and adjudicated factories preserve source capabilities",
+      "cleanRecompile": true,
+      "logSha256": "10e070b4dc79e29c6ca19cc05fba860abc1de8305e479b63e57a1c1daf9e40d1",
+      "junitSha256": {
+        "storymodel4s.probes.D1aAlignmentBoundarySuite": "70c50e7ff7842893f3f8419fffdb3378790afcf2a6c7c8450c74022aa9e1070b"
+      }
+    },
+    {
+      "id": "status-text-adjudicated",
+      "path": "story/src/main/scala/storymodel4s/story/alignment.scala",
+      "originalSha256": "2470ba5aa5298e598640ade06bc1ae10d6ec77f3037e5309a6fae7b56b8829fd",
+      "mutantSha256": "5ad5dc0b7b8bb1562d67310b1de7762bb923cd4e8552c7618d71af9c42ba1d71",
+      "restoredSha256": "2470ba5aa5298e598640ade06bc1ae10d6ec77f3037e5309a6fae7b56b8829fd",
+      "baselineCleanBeforeMutation": true,
+      "restoredCleanAfterMutation": true,
+      "rejectSuite": "storymodel4s.probes.D1aAlignmentBoundarySuite",
+      "rejectingTest": "text adjudicated factory refuses Draft",
+      "controlSuite": "storymodel4s.probes.D1aAlignmentBoundarySuite",
+      "acceptingControl": "accepting control: validated and adjudicated factories preserve source capabilities",
+      "cleanRecompile": true,
+      "logSha256": "63c4e534fc7635a285b8a32ed517958c89dcdcafce4b67905592f4b3b6cb0264",
+      "junitSha256": {
+        "storymodel4s.probes.D1aAlignmentBoundarySuite": "c86a94683aa175ba4f08e65241f2c8452c743bc217d3c0ffef3ebf384bfe4919"
+      }
+    },
+    {
+      "id": "constructor-general",
+      "path": "story/src/main/scala/storymodel4s/story/alignment.scala",
+      "originalSha256": "2470ba5aa5298e598640ade06bc1ae10d6ec77f3037e5309a6fae7b56b8829fd",
+      "mutantSha256": "33837c27e9387ac919e326d66b3655b61af680c916e3f7a2dde66314b393105d",
+      "restoredSha256": "2470ba5aa5298e598640ade06bc1ae10d6ec77f3037e5309a6fae7b56b8829fd",
+      "baselineCleanBeforeMutation": true,
+      "restoredCleanAfterMutation": true,
+      "rejectSuite": "storymodel4s.story.probes.D1aAlignmentConstructorSuite",
+      "rejectingTest": "general implementation constructor is private even inside story",
+      "controlSuite": "storymodel4s.story.probes.D1aAlignmentConstructorSuite",
+      "acceptingControl": "accepting control: checked source factories remain available inside story",
+      "cleanRecompile": true,
+      "logSha256": "8cd70286bdd45acf12104ea5816ebc33d88cd316354f062fae0c936f1710371c",
+      "junitSha256": {
+        "storymodel4s.story.probes.D1aAlignmentConstructorSuite": "e03edeeaebc6b389831d4d3eeadfbb7068d8d58e0ec3c1cf15e4c055d6c0c123"
+      }
+    },
+    {
+      "id": "constructor-text",
+      "path": "story/src/main/scala/storymodel4s/story/alignment.scala",
+      "originalSha256": "2470ba5aa5298e598640ade06bc1ae10d6ec77f3037e5309a6fae7b56b8829fd",
+      "mutantSha256": "ad678cd5050565141f04d6fe5da478652d9f83aa7028be4289a938b87bc554de",
+      "restoredSha256": "2470ba5aa5298e598640ade06bc1ae10d6ec77f3037e5309a6fae7b56b8829fd",
+      "baselineCleanBeforeMutation": true,
+      "restoredCleanAfterMutation": true,
+      "rejectSuite": "storymodel4s.story.probes.D1aAlignmentConstructorSuite",
+      "rejectingTest": "text implementation constructor is private even inside story",
+      "controlSuite": "storymodel4s.story.probes.D1aAlignmentConstructorSuite",
+      "acceptingControl": "accepting control: checked source factories remain available inside story",
+      "cleanRecompile": true,
+      "logSha256": "3ee73a113b8d97960015f316f1ebd0bb558096e0c3fb15f3093d0893da747d7e",
+      "junitSha256": {
+        "storymodel4s.story.probes.D1aAlignmentConstructorSuite": "1dcb8167d06b5a4d5f592f503158ef14e327b2e2ce4bd403908fbdab4caf8200"
+      }
+    },
+    {
+      "id": "general-text-span-door",
+      "path": "story/src/main/scala/storymodel4s/story/alignment.scala",
+      "originalSha256": "2470ba5aa5298e598640ade06bc1ae10d6ec77f3037e5309a6fae7b56b8829fd",
+      "mutantSha256": "a6729dc88ce849ad577bce47e27fb67a46909904b2d13578656390b83b3f7d5c",
+      "restoredSha256": "2470ba5aa5298e598640ade06bc1ae10d6ec77f3037e5309a6fae7b56b8829fd",
+      "baselineCleanBeforeMutation": true,
+      "restoredCleanAfterMutation": true,
+      "rejectSuite": "storymodel4s.probes.D1aAlignmentBoundarySuite",
+      "rejectingTest": "general source has no text span accessor",
+      "controlSuite": "storymodel4s.probes.D1aAlignmentBoundarySuite",
+      "acceptingControl": "accepting control: validated and adjudicated factories preserve source capabilities",
+      "cleanRecompile": true,
+      "logSha256": "a9037aee0c24fc462903aadc0cc1e1a3bf074454537b564bce48043a70aa789a",
+      "junitSha256": {
+        "storymodel4s.probes.D1aAlignmentBoundarySuite": "3b4c0f35788f1279955d3331215a1496e6b00770e4ec946b65a3b9776c4a2c08"
+      }
+    },
+    {
+      "id": "general-text-witness-door",
+      "path": "story/src/main/scala/storymodel4s/story/alignment.scala",
+      "originalSha256": "2470ba5aa5298e598640ade06bc1ae10d6ec77f3037e5309a6fae7b56b8829fd",
+      "mutantSha256": "aa5481ea1d984ec5b650128e34d375caa0af19ef04f613dcb547908a84d23b26",
+      "restoredSha256": "2470ba5aa5298e598640ade06bc1ae10d6ec77f3037e5309a6fae7b56b8829fd",
+      "baselineCleanBeforeMutation": true,
+      "restoredCleanAfterMutation": true,
+      "rejectSuite": "storymodel4s.probes.D1aAlignmentBoundarySuite",
+      "rejectingTest": "general source has no canonical text witness",
+      "controlSuite": "storymodel4s.probes.D1aAlignmentBoundarySuite",
+      "acceptingControl": "accepting control: validated and adjudicated factories preserve source capabilities",
+      "cleanRecompile": true,
+      "logSha256": "2158c1c8179572405148d649f112984ccb899ce908232d8e78f821fab29cc750",
+      "junitSha256": {
+        "storymodel4s.probes.D1aAlignmentBoundarySuite": "ed3fb661767f5d78fc0d10919139e0f57192ab1fb7f06010f85eb760e793eb55"
+      }
+    },
+    {
+      "id": "situation-evidence",
+      "path": "story/src/main/scala/storymodel4s/story/alignment.scala",
+      "originalSha256": "2470ba5aa5298e598640ade06bc1ae10d6ec77f3037e5309a6fae7b56b8829fd",
+      "mutantSha256": "91c88454326d788710dd614f171efae16d88a5e9654724f657c64fb5ecf99f60",
+      "restoredSha256": "2470ba5aa5298e598640ade06bc1ae10d6ec77f3037e5309a6fae7b56b8829fd",
+      "baselineCleanBeforeMutation": true,
+      "restoredCleanAfterMutation": true,
+      "rejectSuite": "storymodel4s.story.D1aAlignmentSourceSuite",
+      "rejectingTest": "general text source returns complete typed evidence and primary projection",
+      "controlSuite": "storymodel4s.story.D1aAlignmentSourceSuite",
+      "acceptingControl": "accepting control: validated and adjudicated sources preserve ordered nodes and relations",
+      "cleanRecompile": false,
+      "logSha256": "de1036977523f55e838d62946f304bdbf9eb834c7091c8d4a8430009929b4d0d",
+      "junitSha256": {
+        "storymodel4s.story.D1aAlignmentSourceSuite": "f5082e26de7be82f64fc27f1b210fab152d3c1465f3a7df888638a9d5c36ad84"
+      }
+    },
+    {
+      "id": "segment-evidence",
+      "path": "story/src/main/scala/storymodel4s/story/alignment.scala",
+      "originalSha256": "2470ba5aa5298e598640ade06bc1ae10d6ec77f3037e5309a6fae7b56b8829fd",
+      "mutantSha256": "f90c271cf80b74a2a54a13d7900b14e21943846334ddffb7b5b353f3474df880",
+      "restoredSha256": "2470ba5aa5298e598640ade06bc1ae10d6ec77f3037e5309a6fae7b56b8829fd",
+      "baselineCleanBeforeMutation": true,
+      "restoredCleanAfterMutation": true,
+      "rejectSuite": "storymodel4s.story.D1aAlignmentSourceSuite",
+      "rejectingTest": "general text source returns complete typed evidence and primary projection",
+      "controlSuite": "storymodel4s.story.D1aAlignmentSourceSuite",
+      "acceptingControl": "accepting control: validated and adjudicated sources preserve ordered nodes and relations",
+      "cleanRecompile": false,
+      "logSha256": "4cc7dbf5f6ff6787f75604704ceac2582fbf0355f900afac4b60bb38bce12239",
+      "junitSha256": {
+        "storymodel4s.story.D1aAlignmentSourceSuite": "403b16c7d82517039f4f0bdb8c1c62f5fef6903d77f2946f5b59398e7ed550c9"
+      }
+    },
+    {
+      "id": "missing-situation",
+      "path": "story/src/main/scala/storymodel4s/story/alignment.scala",
+      "originalSha256": "2470ba5aa5298e598640ade06bc1ae10d6ec77f3037e5309a6fae7b56b8829fd",
+      "mutantSha256": "90bb9d7211c1e5738130cea26b6177e8ae107b18e948e7aac92a739822bcc9e3",
+      "restoredSha256": "2470ba5aa5298e598640ade06bc1ae10d6ec77f3037e5309a6fae7b56b8829fd",
+      "baselineCleanBeforeMutation": true,
+      "restoredCleanAfterMutation": true,
+      "rejectSuite": "storymodel4s.story.D1aAlignmentSourceSuite",
+      "rejectingTest": "missing situation and segment have no evidence projection or text support",
+      "controlSuite": "storymodel4s.story.D1aAlignmentSourceSuite",
+      "acceptingControl": "accepting control: validated and adjudicated sources preserve ordered nodes and relations",
+      "cleanRecompile": false,
+      "logSha256": "418ca38063867633a15508c9304a8e0b6b2a0ac27a918083358a752f16481ef9",
+      "junitSha256": {
+        "storymodel4s.story.D1aAlignmentSourceSuite": "7b3b11ee7b0803832578f0f1d4b0035f67bb900383763007cd2fe09ad2102bc1"
+      }
+    },
+    {
+      "id": "missing-segment",
+      "path": "story/src/main/scala/storymodel4s/story/alignment.scala",
+      "originalSha256": "2470ba5aa5298e598640ade06bc1ae10d6ec77f3037e5309a6fae7b56b8829fd",
+      "mutantSha256": "3762d01fccc7e98fa0fc75bf37fd103987fd31737a647cc5546c0ac6a0583e0c",
+      "restoredSha256": "2470ba5aa5298e598640ade06bc1ae10d6ec77f3037e5309a6fae7b56b8829fd",
+      "baselineCleanBeforeMutation": true,
+      "restoredCleanAfterMutation": true,
+      "rejectSuite": "storymodel4s.story.D1aAlignmentSourceSuite",
+      "rejectingTest": "missing situation and segment have no evidence projection or text support",
+      "controlSuite": "storymodel4s.story.D1aAlignmentSourceSuite",
+      "acceptingControl": "accepting control: validated and adjudicated sources preserve ordered nodes and relations",
+      "cleanRecompile": false,
+      "logSha256": "a73ad4bc78f864851c8a8de6962c123b3ab430d5f3e9128f6d12a13e97ee7167",
+      "junitSha256": {
+        "storymodel4s.story.D1aAlignmentSourceSuite": "5725e36ba0bcfe5b9915a550f00609662d7d1754fde16db5340643f9fd3e9d70"
+      }
+    },
+    {
+      "id": "primary-presence",
+      "path": "story/src/main/scala/storymodel4s/story/alignment.scala",
+      "originalSha256": "2470ba5aa5298e598640ade06bc1ae10d6ec77f3037e5309a6fae7b56b8829fd",
+      "mutantSha256": "50084c6c1e1b72107e0cc4b712044722a7de2f440e630c37aff9860dfc3ad5e5",
+      "restoredSha256": "2470ba5aa5298e598640ade06bc1ae10d6ec77f3037e5309a6fae7b56b8829fd",
+      "baselineCleanBeforeMutation": true,
+      "restoredCleanAfterMutation": true,
+      "rejectSuite": "storymodel4s.story.D1aAlignmentSourceSuite",
+      "rejectingTest": "general text source returns complete typed evidence and primary projection",
+      "controlSuite": "storymodel4s.story.D1aAlignmentSourceSuite",
+      "acceptingControl": "accepting control: validated and adjudicated sources preserve ordered nodes and relations",
+      "cleanRecompile": false,
+      "logSha256": "e2887098b4d3e127d26b875d1f5f7100e454f9660b2e9af86872e47b1ba835eb",
+      "junitSha256": {
+        "storymodel4s.story.D1aAlignmentSourceSuite": "68474048e2e616e24d09dfac9fe3cd768a140883ab576ee193f315561f634870"
+      }
+    },
+    {
+      "id": "primary-complete-union",
+      "path": "story/src/main/scala/storymodel4s/story/alignment.scala",
+      "originalSha256": "2470ba5aa5298e598640ade06bc1ae10d6ec77f3037e5309a6fae7b56b8829fd",
+      "mutantSha256": "b1c5cfd0b8198e3902d2b2211ddc027b4a4a5a2422b605d8ad7e18b178377702",
+      "restoredSha256": "2470ba5aa5298e598640ade06bc1ae10d6ec77f3037e5309a6fae7b56b8829fd",
+      "baselineCleanBeforeMutation": true,
+      "restoredCleanAfterMutation": true,
+      "rejectSuite": "storymodel4s.story.D1aAlignmentSourceSuite",
+      "rejectingTest": "general film source preserves native evidence and the complete gapped primary union",
+      "controlSuite": "storymodel4s.story.D1aAlignmentSourceSuite",
+      "acceptingControl": "accepting control: validated and adjudicated sources preserve ordered nodes and relations",
+      "cleanRecompile": false,
+      "logSha256": "d4f682f0f333b7bafb72cc149ec63c01059283497a7557634fe132f9008a560c",
+      "junitSha256": {
+        "storymodel4s.story.D1aAlignmentSourceSuite": "4adad43de7b9e89a3f7f93b8f5b5a158f67e17d1c1c4be1c62a61a5ad85fb185"
+      }
+    },
+    {
+      "id": "native-evidence-retention",
+      "path": "story/src/main/scala/storymodel4s/story/alignment.scala",
+      "originalSha256": "2470ba5aa5298e598640ade06bc1ae10d6ec77f3037e5309a6fae7b56b8829fd",
+      "mutantSha256": "8681d525153114d22c01d4c703261ae95608f45496db3f7fe75550b60524c50d",
+      "restoredSha256": "2470ba5aa5298e598640ade06bc1ae10d6ec77f3037e5309a6fae7b56b8829fd",
+      "baselineCleanBeforeMutation": true,
+      "restoredCleanAfterMutation": true,
+      "rejectSuite": "storymodel4s.story.D1aAlignmentSourceSuite",
+      "rejectingTest": "general film source preserves native evidence and the complete gapped primary union",
+      "controlSuite": "storymodel4s.story.D1aAlignmentSourceSuite",
+      "acceptingControl": "accepting control: validated and adjudicated sources preserve ordered nodes and relations",
+      "cleanRecompile": false,
+      "logSha256": "cef3abf0675ebce13aa6e53176de57436ec4a34524eeb2d9368471ee595f1820",
+      "junitSha256": {
+        "storymodel4s.story.D1aAlignmentSourceSuite": "f45d9ef3bad67bdf4a0b759fe3032a6f3cd3b2bbc2029a0c633684c772e1d959"
+      }
+    },
+    {
+      "id": "text-span-exactness",
+      "path": "story/src/main/scala/storymodel4s/story/alignment.scala",
+      "originalSha256": "2470ba5aa5298e598640ade06bc1ae10d6ec77f3037e5309a6fae7b56b8829fd",
+      "mutantSha256": "63099b669da5353799487f247f0a4ea49025e792fa21fbfe94dcdd746de4fc07",
+      "restoredSha256": "2470ba5aa5298e598640ade06bc1ae10d6ec77f3037e5309a6fae7b56b8829fd",
+      "baselineCleanBeforeMutation": true,
+      "restoredCleanAfterMutation": true,
+      "rejectSuite": "storymodel4s.story.D1aAlignmentSourceSuite",
+      "rejectingTest": "text source keeps its own witness and exact span references",
+      "controlSuite": "storymodel4s.story.D1aAlignmentSourceSuite",
+      "acceptingControl": "accepting control: validated and adjudicated sources preserve ordered nodes and relations",
+      "cleanRecompile": false,
+      "logSha256": "58996841e23db0d7189776f9ad8332946fbc09361cd03e377fecdd02b9f6ee6a",
+      "junitSha256": {
+        "storymodel4s.story.D1aAlignmentSourceSuite": "a8289b4ea8559accff8231a9a2813fd3a9c027f83a39dc185b287dbf74eaec7f"
+      }
+    },
+    {
+      "id": "text-witness-retention",
+      "path": "story/src/main/scala/storymodel4s/story/alignment.scala",
+      "originalSha256": "2470ba5aa5298e598640ade06bc1ae10d6ec77f3037e5309a6fae7b56b8829fd",
+      "mutantSha256": "b580d56fbee164d8a4e1f2754f31a3ed7a8e26908dcf8ed8a3f9154c176bbe75",
+      "restoredSha256": "2470ba5aa5298e598640ade06bc1ae10d6ec77f3037e5309a6fae7b56b8829fd",
+      "baselineCleanBeforeMutation": true,
+      "restoredCleanAfterMutation": true,
+      "rejectSuite": "storymodel4s.story.D1aAlignmentSourceSuite",
+      "rejectingTest": "text source keeps its own witness and exact span references",
+      "controlSuite": "storymodel4s.story.D1aAlignmentSourceSuite",
+      "acceptingControl": "accepting control: validated and adjudicated sources preserve ordered nodes and relations",
+      "cleanRecompile": false,
+      "logSha256": "2971751e299440232f1fb6e4d39d3daa11c7a7e3474d2d00b21f04641d7562ac",
+      "junitSha256": {
+        "storymodel4s.story.D1aAlignmentSourceSuite": "0ca3e14ee785b844fd2c80c07f5a9717232314c97168b906e918e7ba94452024"
+      }
+    },
+    {
+      "id": "bridge-general-source",
+      "path": "align/src/main/scala/storymodel4s/align/bridge/StorySourceView.scala",
+      "originalSha256": "ed4013152c0678a941a267800c805f0c7ded12725ea91905c37144542b2566be",
+      "mutantSha256": "d3cd07ee07ab4a3a5d89e3cdf9378106bd8c6e9bb46ae06e6e49712784a87c92",
+      "restoredSha256": "ed4013152c0678a941a267800c805f0c7ded12725ea91905c37144542b2566be",
+      "baselineCleanBeforeMutation": true,
+      "restoredCleanAfterMutation": true,
+      "rejectSuite": "storymodel4s.probes.D1aStorySourceBoundarySuite",
+      "rejectingTest": "general source cannot construct a text view",
+      "controlSuite": "storymodel4s.probes.D1aStorySourceBoundarySuite",
+      "acceptingControl": "accepting control: text sources and status checked text models construct a view",
+      "cleanRecompile": true,
+      "logSha256": "cf4307a5ee0eaf6ec74b255427b27450ea5999a8a8243116b01e18349426480d",
+      "junitSha256": {
+        "storymodel4s.probes.D1aStorySourceBoundarySuite": "f9db2ec6425f90ed9783cb9ba20ff29792fdaa964c54a9e3aa6789d9b93405f5"
+      }
+    },
+    {
+      "id": "bridge-independent-model",
+      "path": "align/src/main/scala/storymodel4s/align/bridge/StorySourceView.scala",
+      "originalSha256": "ed4013152c0678a941a267800c805f0c7ded12725ea91905c37144542b2566be",
+      "mutantSha256": "f15422d180d4b0a272573431c217d8ef0ca2a6d23f2df35dcfc9b518275f3b7f",
+      "restoredSha256": "ed4013152c0678a941a267800c805f0c7ded12725ea91905c37144542b2566be",
+      "baselineCleanBeforeMutation": true,
+      "restoredCleanAfterMutation": true,
+      "rejectSuite": "storymodel4s.probes.D1aStorySourceBoundarySuite",
+      "rejectingTest": "source cannot be paired with an independent text model",
+      "controlSuite": "storymodel4s.probes.D1aStorySourceBoundarySuite",
+      "acceptingControl": "accepting control: text sources and status checked text models construct a view",
+      "cleanRecompile": true,
+      "logSha256": "bf32db7c72f76a5102ecccdba304894feac403f6b548c6a0920951604bfa859c",
+      "junitSha256": {
+        "storymodel4s.probes.D1aStorySourceBoundarySuite": "b4ea8e0dd2c7776ebabdbcb9e4be0acdbb190cd00fd8d8857c7e932f8bb567d7"
+      }
+    },
+    {
+      "id": "bridge-status-validated",
+      "path": "align/src/main/scala/storymodel4s/align/bridge/StorySourceView.scala",
+      "originalSha256": "ed4013152c0678a941a267800c805f0c7ded12725ea91905c37144542b2566be",
+      "mutantSha256": "7167e39cfc0ddc07f5fa505a3112acafff6cf93b3e541608ca760e070d7bc538",
+      "restoredSha256": "ed4013152c0678a941a267800c805f0c7ded12725ea91905c37144542b2566be",
+      "baselineCleanBeforeMutation": true,
+      "restoredCleanAfterMutation": true,
+      "rejectSuite": "storymodel4s.probes.D1aStorySourceBoundarySuite",
+      "rejectingTest": "validated view factory refuses Draft",
+      "controlSuite": "storymodel4s.probes.D1aStorySourceBoundarySuite",
+      "acceptingControl": "accepting control: text sources and status checked text models construct a view",
+      "cleanRecompile": true,
+      "logSha256": "32d9035aee594688fa4b22fbcb5d574709018f4027d2b7e5150e10243429ac2c",
+      "junitSha256": {
+        "storymodel4s.probes.D1aStorySourceBoundarySuite": "6f6990a4c1f54642c1190f68a7f0c3bcd25d849f85aa208098efdf38ea4db72a"
+      }
+    },
+    {
+      "id": "bridge-status-adjudicated",
+      "path": "align/src/main/scala/storymodel4s/align/bridge/StorySourceView.scala",
+      "originalSha256": "ed4013152c0678a941a267800c805f0c7ded12725ea91905c37144542b2566be",
+      "mutantSha256": "b364716120473a340961e5ccbfb234971b707a269ac150b484deddb25463b4d9",
+      "restoredSha256": "ed4013152c0678a941a267800c805f0c7ded12725ea91905c37144542b2566be",
+      "baselineCleanBeforeMutation": true,
+      "restoredCleanAfterMutation": true,
+      "rejectSuite": "storymodel4s.probes.D1aStorySourceBoundarySuite",
+      "rejectingTest": "adjudicated view factory refuses Draft",
+      "controlSuite": "storymodel4s.probes.D1aStorySourceBoundarySuite",
+      "acceptingControl": "accepting control: text sources and status checked text models construct a view",
+      "cleanRecompile": true,
+      "logSha256": "b531186bb167051ba2238de81705cf3899d62fec9c670ccffdc99277a574d13b",
+      "junitSha256": {
+        "storymodel4s.probes.D1aStorySourceBoundarySuite": "50abfbd30e4936e80abc6703027fdd033c6052f067b0afee4380e90933d3be13"
+      }
+    },
+    {
+      "id": "score-text-length",
+      "path": "align/src/main/scala/storymodel4s/align/bridge/StorySourceView.scala",
+      "originalSha256": "ed4013152c0678a941a267800c805f0c7ded12725ea91905c37144542b2566be",
+      "mutantSha256": "42c8e164077642046c98b0cb2737fa9a6ad39525261a18f95997133be3dd9517",
+      "restoredSha256": "ed4013152c0678a941a267800c805f0c7ded12725ea91905c37144542b2566be",
+      "baselineCleanBeforeMutation": true,
+      "restoredCleanAfterMutation": true,
+      "rejectSuite": "storymodel4s.fixtures.wog.WarOfTheGhostsCodecGoldenResourceSuite",
+      "rejectingTest": "the committed hsmm/v3 resource matches the inferred artifact and fixed checksum",
+      "controlSuite": "storymodel4s.fixtures.wog.WogHsmmBaselineCaptureSuite",
+      "acceptingControl": "capture the existing canonical WOG HSMM output",
+      "cleanRecompile": false,
+      "logSha256": "49e8011544311f0f527aa28e26c1d267abf8091559891c1c0d1fbe51c23e64d1",
+      "junitSha256": {
+        "storymodel4s.fixtures.wog.WarOfTheGhostsCodecGoldenResourceSuite": "83e026140aa9e9e03fcc397b4165fa7434428db66e01cbd9b3a9c2d1a3c8c5b6",
+        "storymodel4s.fixtures.wog.WogHsmmBaselineCaptureSuite": "6d2fea5546c8109710ec870470e33a109984e6b3d894afa81f87fb95f0299c99",
+        "storymodel4s.fixtures.wog.WarOfTheGhostsCodecGoldenSuite": "eb0443b5ab4a65528a831a7f127a7eebcac59aada423fa8944573f045b82a0cd"
+      }
+    }
+  ]
+}

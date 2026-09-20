@@ -7,7 +7,8 @@ Only validated/adjudicated models enter the public factories. `StorySourceView` 
 consumes that text capability directly; there is no independent model/text argument to
 pair with an unrelated source. Missing node IDs remain `None`.
 
-The relation and scoring implementation is unchanged. The runtime wrapper comparison
+The [source comparison](unchanged-scoring-source.json) binds unchanged relation and
+scoring tokens against S4b, separately from executable numerical preservation. The runtime wrapper comparison
 checks consistency across general/text and validated/adjudicated entry points; it is
 not an independent historical numerical oracle. Native anchors remain in original
 support, while primary projection retains the entire direct-primary interval union,
@@ -25,6 +26,12 @@ compilation. Initial Test-only-clean attempts are retained as historical evidenc
 are excluded from final qualification. The first text-constructor mutation was invalid:
 a widened subclass cannot expose a still-private superclass in its Scala signature.
 The compilable replacement widens both, with a separate base-only mutation retained.
+
+The [terminal mutation summary](mutation-terminal-summary.json) records 24 compiled
+kills, 24 named passing controls, 14 clean production/probe recompiles, and 26 passing
+restored controls on a clean `369965b2` clone. The [evidence archive](mutation-evidence.tar.gz)
+retains all final and historical command receipts, logs, XML, and source hashes; its
+[member manifest](mutation-evidence-manifest.json) binds each file.
 
 The [runner](qualify.py) restores each exact original source and checks cleanliness
 before the next mutation. The [HSMM comparison runner](hsmm-parity.py) compares actual
@@ -48,7 +55,7 @@ an exact grakern checkout at `0329c43c88a0b71e9aa4456723bb16bac2fa3841`. Set
 `python3 qualify.py release`; final release and consumer revisions will be recorded
 when those gates finish. Existing output logs are never overwritten.
 
-Pending: terminal mutation/restoration receipts, per-backend exact comparison, clean
+Pending: per-backend exact comparison, clean
 full provider gate, formatting, 13 documentation examples, exact pinned storyatlas4s
 consumer gate, local landing, and ticket closure. D1B still owns point-capable support,
 all 17 participant parity, and the typed recall path. This slice makes no film compiler,
