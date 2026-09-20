@@ -389,7 +389,25 @@ class SherlockAnnotationsSuite extends FunSuite:
     val input = parsed
     val model = SherlockSourceAtlas.of(input).fold(e => fail(e.message), identity)
     val support = model.rows(1).support
-    assertEquals(support.intervalsOn(input.partABundle.primaryAxis.id).toOption.get.intervals.head.endExclusive, 25000L)
-    assertEquals(support.intervalsOn(model.atlas.bundle.primaryAxis.id).toOption.get.intervals.head.endExclusive, 25000L)
+    assertEquals(
+      support
+        .intervalsOn(input.partABundle.primaryAxis.id)
+        .toOption
+        .get
+        .intervals
+        .head
+        .endExclusive,
+      25000L
+    )
+    assertEquals(
+      support
+        .intervalsOn(model.atlas.bundle.primaryAxis.id)
+        .toOption
+        .get
+        .intervals
+        .head
+        .endExclusive,
+      25000L
+    )
     assert(support.checkedOn(model.atlas.bundle).isRight)
   }

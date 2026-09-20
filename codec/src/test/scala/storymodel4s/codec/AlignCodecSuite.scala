@@ -277,14 +277,16 @@ class AlignCodecSuite extends FunSuite:
 
   test("text support with absent or noncanonical scoring cannot enter the v3 wire") {
     val old = fixture.result
-    val positions = Vector(
-      None,
-      Some(ScoringPosition.LegacyAnnotationText(fixture.view.nodes.head.support.textSpans.get)),
-      Some(ScoringPosition.CanonicalText(SpanSet.one(TextSpan.unsafe(0, 0))))
+    val positions: Vector[NodeSummary => Option[ScoringPosition]] = Vector(
+      _ => None,
+      node => Some(ScoringPosition.LegacyAnnotationText(node.support.textSpans.get)),
+      _ => Some(ScoringPosition.CanonicalText(SpanSet.one(TextSpan.unsafe(0, 0))))
     )
     positions.foreach { position =>
       val view =
-        fixture.view.copy(nodes = fixture.view.nodes.map(_.copy(scoringPosition = position)))
+        fixture.view.copy(nodes =
+          fixture.view.nodes.map(node => node.copy(scoringPosition = position(node)))
+        )
       assert(!view.textWireCompatible)
       val result = HsmmResult
         .validated(

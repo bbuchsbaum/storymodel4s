@@ -337,6 +337,12 @@ class D1bPointSupportSuite extends FunSuite:
       .identity
     val at = right(PlaybackInstant.on(b.primaryAxis, 5L))
     val original = identity(b.streams(1).id, at)
+    val nativeAt = right(PlaybackInstant.on(native.primaryAxis, 5L))
+    val both = right(EvidenceSupport.of(b, Vector(
+      EvidenceAnchor.MediaPoint(b.id, b.streams(1).id, at),
+      EvidenceAnchor.MediaPoint(b.id, b.streams(1).id, nativeAt))))
+    assertEquals(right(both.playbackOn(b.primaryAxis.id)).points, Vector(at))
+    assertEquals(right(both.playbackOn(native.primaryAxis.id)).points, Vector(nativeAt))
     assertNotEquals(original, identity(b.streams.head.id, at))
     assertNotEquals(
       original,
@@ -345,8 +351,14 @@ class D1bPointSupportSuite extends FunSuite:
   }
 
   test("accepting control: an interval-only projection keeps its exact checked coordinates") {
-    val value = support(EvidenceAnchor.MediaTime(bundle.id, stream, axis.id,
-      PlaybackIntervalSet.one(interval(10L, 20L))))
+    val value = support(
+      EvidenceAnchor.MediaTime(
+        bundle.id,
+        stream,
+        axis.id,
+        PlaybackIntervalSet.one(interval(10L, 20L))
+      )
+    )
     val projection = right(value.playbackOn(axis.id))
     assertEquals(projection.intervals, Vector(interval(10L, 20L)))
     assertEquals(projection.points, Vector.empty)
@@ -355,13 +367,22 @@ class D1bPointSupportSuite extends FunSuite:
   }
 
   test("complete union merges overlapping and adjacent intervals and bounds outer points") {
-    val projection = right(PlaybackSupport.of(axis.id,
-      Vector(interval(30L, 40L), interval(19L, 30L), interval(10L, 20L)),
-      Vector(point(50L), point(5L), point(5L))))
+    val projection = right(
+      PlaybackSupport.of(
+        axis.id,
+        Vector(interval(30L, 40L), interval(19L, 30L), interval(10L, 20L)),
+        Vector(point(50L), point(5L), point(5L))
+      )
+    )
     assertEquals(projection.intervals, Vector(interval(10L, 40L)))
     assertEquals(projection.points, Vector(point(5L), point(50L)))
     assertEquals(projection.bounds, (5L, 50L))
-    val foreign = right(PlaybackSupport.of(native.primaryAxis.id, Vector.empty,
-      Vector(right(PlaybackInstant.on(native.primaryAxis, 5L)))))
+    val foreign = right(
+      PlaybackSupport.of(
+        native.primaryAxis.id,
+        Vector.empty,
+        Vector(right(PlaybackInstant.on(native.primaryAxis, 5L)))
+      )
+    )
     assert(!projection.contains(foreign))
   }
