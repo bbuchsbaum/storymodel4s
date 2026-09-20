@@ -85,11 +85,11 @@ final case class TaskReferences(
   /** Parser unit references belong to the bound proposal surface, never to media anchor IDs. */
   def validateAgainst(atlas: NarrativeSourceAtlas): ValidatedNec[DomainError, TaskReferences] =
     atlas match
-      case text: TextNarrativeAtlas => validateAgainst(text.atlas)
+      case text: TextNarrativeAtlas         => validateAgainst(text.atlas)
       case anchored: AnchoredNarrativeAtlas =>
         validateWith(
-          unitExists = (id, kind) =>
-            anchored.surface.exists(_.surface.byId.get(id).exists(_.kind == kind)),
+          unitExists =
+            (id, kind) => anchored.surface.exists(_.surface.byId.get(id).exists(_.kind == kind)),
           nodeExists = _ => true,
           claimExists = _ => true
         )

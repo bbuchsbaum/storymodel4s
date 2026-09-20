@@ -19,6 +19,11 @@ class D1aGapWireSuite extends FunSuite:
     assertEquals(Decoder[DerivationGapReason].decodeJson(gapJson), Right(gap))
     assertEquals(gap.render, "missing-span-evidence")
     val unresolved = Json.obj("type" -> Json.fromString("Unresolved"), "reason" -> failureJson)
-    assertEquals(Encoder[DerivationGapReason].apply(DerivationGapReason.Unresolved(failure)), unresolved)
-    assertEquals(Decoder[DerivationGapReason].decodeJson(unresolved),
-      Right(DerivationGapReason.Unresolved(failure)))
+    assertEquals(
+      Encoder[DerivationGapReason].apply(DerivationGapReason.Unresolved(failure)),
+      unresolved
+    )
+    assertEquals(
+      Decoder[DerivationGapReason].decodeJson(unresolved),
+      Right(DerivationGapReason.Unresolved(failure))
+    )

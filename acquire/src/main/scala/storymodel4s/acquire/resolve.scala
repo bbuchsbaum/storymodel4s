@@ -31,6 +31,7 @@ enum ResolutionFailure:
   case Uncalibrated
   case InsufficientAgreement(have: Int, need: Int)
   case InsufficientSupport(score: Double)
+
   /** Required direct source support is absent. Historical wire name retained for typed support. */
   case NoSpanEvidence
   case BlockingFinding(codes: Vector[FindingCode])
@@ -44,9 +45,10 @@ enum RejectionReason:
 
 /** Outcome of deterministic resolution for one claim (design record §94).
   *
-  * `Accepted` carries, by type, a licensed acceptance basis *for the accepted value* and the evidence
-  * references from which a lawful [[storymodel4s.core.ClaimMeta]] can be built. There is no way to
-  * accept a claim on a raw score, on another candidate's probability, or without evidence.
+  * `Accepted` carries, by type, a licensed acceptance basis *for the accepted value* and the
+  * evidence references from which a lawful [[storymodel4s.core.ClaimMeta]] can be built. There is
+  * no way to accept a claim on a raw score, on another candidate's probability, or without
+  * evidence.
   */
 enum ResolutionState[+A]:
   case Accepted(value: A, basis: AcceptanceBasis, evidence: NonEmptyVector[EvidenceRef])
@@ -198,7 +200,8 @@ object FamilyPolicy:
         )
       )
 
-  /** High-impact default: two independent agreeing providers, a basis and direct support mandatory. */
+  /** High-impact default: two independent agreeing providers, a basis and direct support mandatory.
+    */
   val Conservative: FamilyPolicy =
     new FamilyPolicy(
       Probability.unsafe(0.9),
@@ -357,7 +360,8 @@ object Resolver:
                       // agreement and direct support alone, or not at all.
                       accept(fp, bundle, leading, basis)
 
-  /** Acceptance once the basis has licensed it: direct support per policy, then the evidence set. */
+  /** Acceptance once the basis has licensed it: direct support per policy, then the evidence set.
+    */
   private def accept[A](
       fp: FamilyPolicy,
       bundle: EvidenceBundle[A],

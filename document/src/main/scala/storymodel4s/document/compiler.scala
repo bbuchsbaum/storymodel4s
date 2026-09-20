@@ -220,6 +220,7 @@ enum DerivationGapReason:
   case Unresolved(reason: ResolutionFailure)
   case Rejected(reason: RejectionReason)
   case MissingRawScore
+
   /** Required source support could not be materialized. Historical wire name; the text compiler
     * still requires spans, while acquisition can carry typed support.
     */

@@ -308,14 +308,20 @@ class CompilerSuite extends FunSuite:
 
   test("text compiler refuses anchored source support with text and absent controls"):
     val original = bundle(situation0, ev0, "situation-agent", "source-support")
-    def checked(support: SourceSupport) = attemptedInput(Vector(
-      SituationAttempt(ref0, original.copy(sourceSupport = support))
-    ))
+    def checked(support: SourceSupport) = attemptedInput(
+      Vector(
+        SituationAttempt(ref0, original.copy(sourceSupport = support))
+      )
+    )
     assert(checked(SourceSupport.text(1.0, ev0.spans)).isRight)
     assert(checked(SourceSupport.text(1.0, None)).isRight)
-    val result = checked(SourceSupport(1.0, Some(TypedSupport.Anchored(anchoredRecord.anchors.get))))
+    val result =
+      checked(SourceSupport(1.0, Some(TypedSupport.Anchored(anchoredRecord.anchors.get))))
     assert(result.isLeft)
-    assert(result.swap.toOption.get.message.contains("text compiler input cannot carry anchored source support"))
+    assert(
+      result.swap.toOption.get.message
+        .contains("text compiler input cannot carry anchored source support")
+    )
 
   test("accepted evidence compiles into a validated story model") {
     val result = compile(
