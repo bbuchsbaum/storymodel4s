@@ -262,3 +262,35 @@ class SherlockAnnotationsSuite extends FunSuite:
     )
     assert(parseFixture(broken).isLeft)
   }
+
+  test("composed source atlas retains exact native and primary row and scene support") {
+    val input = parsed
+    val model = SherlockSourceAtlas.of(input).fold(e => fail(e.message), identity)
+    val primary = model.atlas.bundle.primaryAxis
+    assertEquals(primary.extent.asInstanceOf[AxisExtent.PlaybackTicks].endExclusive, 106000L)
+    assertEquals(model.rows.keySet, (1 to 6).toSet)
+    assertEquals(model.atlas.units.size, 8)
+    val point = model.rows(3).support
+    assertEquals(point.anchors.toVector.collect { case EvidenceAnchor.MediaPoint(_, _, at) =>
+      (at.axis, at.at)
+    }, Vector((input.partABundle.primaryAxis.id, 50000L), (primary.id, 50000L)))
+    val secondRun = model.rows(5).support
+    assertEquals(secondRun.intervalsOn(input.partBBundle.primaryAxis.id).toOption.get.intervals.head.start, 0L)
+    assertEquals(secondRun.intervalsOn(primary.id).toOption.get.intervals.head.start, 76000L)
+    val scene = model.scenes(1).support.playbackOn(primary.id).toOption.get
+    assertEquals(scene.intervals.map(i => (i.start, i.endExclusive)), Vector((0L, 75000L)))
+    assertEquals(scene.points.map(_.at), Vector(50000L))
+    assert(model.atlas.units.forall(_.support.checkedOn(model.atlas.bundle).isRight))
+  }
+
+  test("a point-only scene remains a point-only checked proposal unit") {
+    def label(row: String, name: String): String =
+      row.split("\t", -1).updated(5, name).mkString("\t")
+    val rows = fixtureRows.updated(2, label(fixtureRows(2), "2. Instant"))
+      .updated(3, label(fixtureRows(3), "3. Switch"))
+    val input = parseFixture(rows).fold(e => fail(e.message), identity)
+    val model = SherlockSourceAtlas.of(input).fold(e => fail(e.message), identity)
+    val pointScene = model.scenes(2).support.playbackOn(model.atlas.bundle.primaryAxis.id).toOption.get
+    assertEquals(pointScene.intervals, Vector.empty)
+    assertEquals(pointScene.points.map(_.at), Vector(50000L))
+  }

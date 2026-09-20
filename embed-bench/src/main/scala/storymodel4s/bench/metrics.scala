@@ -405,18 +405,19 @@ object Metrics:
           if i == 0 then MetricObservation.Ineligible
           else
             val previous = units(i - 1)
-            (goldAnchor(previous).flatMap(positionOf), goldAnchor(u).flatMap(positionOf)) match
-              case (Some(goldPrevious), Some(goldCurrent)) =>
+            (goldAnchor(previous), goldAnchor(u)) match
+              case (Some(goldPreviousRef), Some(goldCurrentRef)) =>
                 (inferredRows(i - 1), inferredRows(i)) match
                   case (Some(previousRow), Some(currentRow))
                       if hasUnranked(previousRow) || hasUnranked(currentRow) =>
                     MetricObservation.Missing(MissingReason.ProviderAbstained)
                   case (Some(previousRow), Some(currentRow)) =>
                     (
+                      positionOf(goldPreviousRef), positionOf(goldCurrentRef),
                       mapAnchor(previousRow).flatMap(positionOf),
                       mapAnchor(currentRow).flatMap(positionOf)
                     ) match
-                      case (Some(inferredPrevious), Some(inferredCurrent)) =>
+                      case (Some(goldPrevious), Some(goldCurrent), Some(inferredPrevious), Some(inferredCurrent)) =>
                         val goldDistance = math.abs(goldCurrent - goldPrevious)
                         val inferredDistance = math.abs(inferredCurrent - inferredPrevious)
                         MetricObservation.observed(

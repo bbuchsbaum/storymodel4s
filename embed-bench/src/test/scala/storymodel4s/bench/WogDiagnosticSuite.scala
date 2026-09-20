@@ -513,6 +513,11 @@ class WogDiagnosticSuite extends FunSuite:
     val sourceMissing = Metrics.observe(noGoldPosition, resultFor(noGoldPosition, refs))
     assertEquals(sourceMissing.byMetric(Metrics.Names.routeSupportMidpointDirection)(1).observation,
       MetricObservation.Missing(MissingReason.AllMissing))
+    for observation <- Vector(observations, external, sourceMissing) do
+      assertEquals(observation.byMetric(Metrics.Names.routeTransitionDisplacementCloseness)(1).observation,
+        MetricObservation.Missing(MissingReason.AllMissing))
+    assertEquals(unranked.byMetric(Metrics.Names.routeTransitionDisplacementCloseness)(1).observation,
+      MetricObservation.Missing(MissingReason.ProviderAbstained))
   }
 
   test("an Unranked route step is eligible missing, never ineligible") {

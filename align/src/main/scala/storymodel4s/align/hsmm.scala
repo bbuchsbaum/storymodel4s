@@ -289,7 +289,7 @@ object HsmmConfig:
   * Residual (stated, not hidden): nomination *provenance* (which channel nominated an anchor) is
   * not proven; the candidate-anchor set is construction data like the posterior itself.
   */
-final class HsmmResult private[align] (
+final class HsmmResult private (
     val posterior: AlignmentMatrix,
     val flow: TransitionFlow,
     val viterbi: Vector[AlignState],

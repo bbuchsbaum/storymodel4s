@@ -91,3 +91,61 @@ class D1bPointSupportSuite extends FunSuite:
     val extent = support(EvidenceAnchor.MediaTime(bundle.id, stream, axis.id,
       PlaybackIntervalSet.one(interval(25L, 26L))))
     assertNotEquals(original, TypedSupport.Anchored(extent).identity)
+
+  private val native = right(SourceBundle.filmEdition(EditionId.unsafe("native-point"),
+    Checksum.ofText("native"), 0L, 10L, RationalTimebase.Millisecond))
+  private val receipt = right(SourceDerivationReceipt.of("point-map", "fixture", Vector.empty))
+  private def mapped(kind: StreamKind = StreamKind.Audio, nativeEnd: Long = 10L)(
+      mappings: (PresentationAxis, SourceStream) => Vector[CheckedMapping]
+  ): SourceBundle =
+    val secondary = right(SourceStream.of(StreamId.unsafe("secondary-point"), kind,
+      Checksum.ofText("secondary"), native.primaryAxis.id,
+      right(AxisExtent.playbackTicks(0L, nativeEnd, RationalTimebase.Millisecond)),
+      Some(RationalTimebase.Millisecond), Vector.empty))
+    val proposed = Vector(bundle.streams.head, secondary)
+    val axis = right(SourceBundle.editionPlaybackAxis(bundle.edition.get, proposed,
+      bundle.authorityTracks, 0L, 100L, RationalTimebase.Millisecond))
+    val first = bundle.streams.head
+    val picture = right(SourceStream.of(first.id, first.kind, first.checksum,
+      axis.id, axis.extent, axis.timebase, Vector.empty))
+    right(SourceBundle.of(bundle.edition, bundle.sourceKind, Vector(picture, secondary), axis,
+      bundle.authorityTracks, mappings(axis, secondary)))
+
+  private def mappedPoint(b: SourceBundle, at: Long): Either[DomainError, EvidenceSupport] =
+    EvidenceSupport.of(b, Vector(EvidenceAnchor.MediaPoint(b.id, b.streams(1).id,
+      right(PlaybackInstant.on(b.primaryAxis, at)))))
+
+  test("mapped point obeys exact clock image with excluded end and ambiguous mapping refusal"):
+    def repair(axis: PresentationAxis, offset: Long) = right(ClockRepair.of(native.primaryAxis.id,
+      axis.id, ExactRational.integer(1000L), ExactRational.integer(offset), receipt))
+    val b = mapped()((axis, _) => Vector(repair(axis, 20L)))
+    assert(mappedPoint(b, 20L).isRight)
+    assert(mappedPoint(b, 29L).isRight)
+    assert(mappedPoint(b, 19L).isLeft)
+    assert(mappedPoint(b, 30L).isLeft)
+    val ambiguous = mapped()((axis, _) => Vector(repair(axis, 20L), repair(axis, 21L)))
+    assert(mappedPoint(ambiguous, 25L).isLeft)
+
+  test("composition points preserve gaps, next segment start and source bounds"):
+    def composition(axis: PresentationAxis) = right(TrackComposition.of(native.primaryAxis.id,
+      axis.id, Vector((0L, 3L, 20L, 23L), (6L, 10L, 26L, 30L)).zipWithIndex.map {
+        case ((a, b, c, d), n) => right(CompositionSegment.of(
+          right(PlaybackInterval.on(native.primaryAxis, a, b)), right(PlaybackInterval.on(axis, c, d)),
+          OccurrenceId.unsafe(s"point-occurrence-$n")))
+      }, receipt))
+    val b = mapped()((axis, _) => Vector(composition(axis)))
+    assert(mappedPoint(b, 20L).isRight)
+    assert(mappedPoint(b, 26L).isRight)
+    Vector(23L, 25L, 30L).foreach(tick => assert(mappedPoint(b, tick).isLeft))
+    val truncated = mapped(nativeEnd = 3L)((axis, _) => Vector(composition(axis)))
+    assert(mappedPoint(truncated, 20L).isLeft)
+
+  test("point membership independently checks selected stream extent and kind"):
+    def nativePoint(b: SourceBundle, tick: Long) = EvidenceSupport.of(b, Vector(
+      EvidenceAnchor.MediaPoint(b.id, b.streams(1).id, right(PlaybackInstant.on(native.primaryAxis, tick)))))
+    val b = mapped(nativeEnd = 3L)((_, _) => Vector.empty)
+    assert(nativePoint(b, 0L).isRight)
+    assert(nativePoint(b, 2L).isRight)
+    assert(nativePoint(b, 3L).isLeft)
+    val wrongKind = mapped(kind = StreamKind.CanonicalText)((_, _) => Vector.empty)
+    assert(nativePoint(wrongKind, 2L).isLeft)

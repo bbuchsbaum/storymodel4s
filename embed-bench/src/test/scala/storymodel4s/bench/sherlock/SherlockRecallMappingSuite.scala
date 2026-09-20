@@ -14,7 +14,7 @@ import storymodel4s.bench.video.{
   WorldOrderInput
 }
 import storymodel4s.bench.{BenchChannels, SemanticChannelKind}
-import storymodel4s.core.{Checksum, StorySource}
+import storymodel4s.core.{Checksum, StorySource, TypedSupport, EvidenceAnchor}
 import storymodel4s.embed.onnx.{OnnxSentenceArtifacts, OnnxSentenceEmbedder, OnnxSentenceModel}
 import storymodel4s.recall.RecallSegmenter
 
@@ -102,7 +102,10 @@ class SherlockRecallMappingSuite extends FunSuite:
     assertEquals(built.view.leaves.size, 6)
     assertEquals(built.view.nodes.size, 8)
     assertEquals(built.view.maxLevel, 1)
-    // every leaf support slices back to its own description on the derived document
+    assert(built.sourceAtlas.nonEmpty)
+    assert(built.view.nodes.forall(_.support.isInstanceOf[TypedSupport.Anchored]))
+    assert(built.view.nodes.forall(_.scoringPosition.exists(_.isInstanceOf[ScoringPosition.LegacyAnnotationText])))
+    // Every declared scoring feature still slices its own description; it is not physical support.
     atlas.rows.foreach { row =>
       val span = built.view.node(refOfRow(built, row.row)).get.scoringPosition.get.spans.minSpan
       assertEquals(built.document.substring(span.start, span.endExclusive), row.description)
@@ -191,6 +194,15 @@ class SherlockRecallMappingSuite extends FunSuite:
     val result = GraphHsmm
       .infer(recall, built.view, candidates, DefaultLocalCostModel(semantic = semantic))
       .fold(e => throw new IllegalStateException(e.message), identity)
+
+    val pointRef = refOfRow(built, 3)
+    val retained = result.sourceSupport(pointRef)
+    assertEquals(retained, built.view.node(pointRef).get.support)
+    retained match
+      case TypedSupport.Anchored(support) =>
+        assertEquals(support.anchors.toVector.collect { case EvidenceAnchor.MediaPoint(_, _, at) => at.at },
+          Vector(50000L, 50000L))
+      case _ => fail("instant row was reduced to text support")
 
     val doorUnit = recall.ordered
       .find(_.text.toLowerCase.contains("red door"))

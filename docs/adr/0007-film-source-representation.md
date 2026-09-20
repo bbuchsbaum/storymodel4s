@@ -1101,3 +1101,11 @@ join. The helper does not attest a bundle by itself. Scene units union all membe
 including point-only scenes. The scoring adapter consumes this library atlas's support;
 it may reuse the existing lexical/semantic feature assembly, but its published physical
 NodeSummary support must come from the checked row/scene units.
+
+HsmmResult construction is companion-private, including callers in align subpackages. Its
+retained support is therefore derived only by validated, which also requires unique node
+inventory agreeing with lookup and all nominated refs present in that inventory. The
+optional-scoring migration preserves metric eligibility: classify source/external/Unranked
+before coordinate availability. Direction retains ordinary-external Ineligible; displacement
+retains ordinary-external Missing. Both report AllMissing for eligible source coordinates
+that were not measured, and ProviderAbstained for Unranked. These are distinct estimands.
