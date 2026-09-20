@@ -1109,3 +1109,20 @@ optional-scoring migration preserves metric eligibility: classify source/externa
 before coordinate availability. Direction retains ordinary-external Ineligible; displacement
 retains ordinary-external Missing. Both report AllMissing for eligible source coordinates
 that were not measured, and ProviderAbstained for Unranked. These are distinct estimands.
+
+### Film compiler planning record — 20 September 2026
+
+The [film phase plan](../plans/2026-09-20-film-compiler-phase-plan.md) records the
+proposed next public boundary: checked `FilmCompilerInput`, named `compileFilm`,
+`AnchoredNarrativeCompilation`, and an additive checked anchored mention-coordinate
+case while retaining existing text constructors/return types. These are planned
+child deliverables, not implemented or qualified APIs. The first film placement
+route is NarratedWorld-only with Held as an explicit retained gap. Reject reuse of
+`TextModel` as a film carrier, narrowing playback ticks into an Int text offset,
+implicit mapping/hull containment, and root fallback for a held proposition.
+
+The plan and filing payloads require a separate cold review. Caption-derived
+SurfaceExplicit licensing remains unchosen: both disclosed alternatives are put
+to the owner only after the concrete plan and affected child are reviewable.
+No planned name or recommended alternative grants a film claim license, changes
+text bytes, lifts existing text/HSMM wire refusals, or completes film compilation.

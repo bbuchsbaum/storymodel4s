@@ -1,0 +1,297 @@
+{
+  "schema": "film-phase-plan/child-filing-proposal/v1",
+  "status": "Draft payloads only; not filed or dispatched",
+  "parent": "bd-01M2T32SGVJXR2RT3RTS2DCN9P",
+  "phasePlanTicket": "bd-01M2TAGST4EBFR1HM9Q3EWSYAH",
+  "plan": "docs/plans/2026-09-20-film-compiler-phase-plan.md",
+  "ownerDecision": "Unasked and unanswered; F4 remains gated",
+  "filingRule": "Resolve local child keys to actual newly filed IDs, then create exact blocking edges; parent relations are distinct. Preserve existing work. Do not treat payloads as filed tickets.",
+  "children": [
+    {
+      "key": "F0",
+      "title": "[film] record the disclosed film claim-status decision",
+      "parent": "bd-01M2T32SGVJXR2RT3RTS2DCN9P",
+      "intendedStatus": "open",
+      "assignee": null,
+      "priority": 1,
+      "tags": [
+        "film",
+        "compiler",
+        "film-phase-plan-20260920"
+      ],
+      "blockingPrerequisites": [
+        {
+          "ticketId": "bd-01M2TAGST4EBFR1HM9Q3EWSYAH"
+        }
+      ],
+      "planSections": [
+        7
+      ],
+      "acceptanceCriteria": [
+        "Put plan section 7 alternatives A/B to the owner with the concrete caption trigger and affected F4 ticket link; retain the question verbatim in the decision record.",
+        "Record the explicit answer and whether generated captions can license film SurfaceExplicit. No answer keeps this ticket open and F4 blocked.",
+        "Record constructor/join/provenance/component/consistency/StatusWeight consequences and any selected constraints; preserve the distinction between text caption and claim about film.",
+        "F4 cites this actual decision record before implementing any license; a plan recommendation or elapsed time cannot substitute for an answer."
+      ],
+      "gates": [
+        "Committed owner question, answer and decision provenance; no build."
+      ],
+      "scopeLimits": [
+        "Decision only; no automatic implementation, status widening, calibrated confidence or wire expansion."
+      ]
+    },
+    {
+      "key": "F1",
+      "title": "[film] check film proposal surfaces, unit containment and chart provenance",
+      "parent": "bd-01M2T32SGVJXR2RT3RTS2DCN9P",
+      "intendedStatus": "open",
+      "assignee": null,
+      "priority": 1,
+      "tags": [
+        "film",
+        "compiler",
+        "film-phase-plan-20260920"
+      ],
+      "blockingPrerequisites": [
+        {
+          "ticketId": "bd-01M2TAGST4EBFR1HM9Q3EWSYAH"
+        },
+        {
+          "ticketId": "bd-01M1CQKRG1A4J4BEWCC78F4TEZ"
+        },
+        {
+          "ticketId": "bd-01M2TAC80YRK5JFNKTT7B7CAQN"
+        }
+      ],
+      "planSections": [
+        1,
+        4,
+        5
+      ],
+      "acceptanceCriteria": [
+        "Checked FilmCompilerInput joins one composed AnchoredNarrativeAtlas, BoundProposalSurface, exact ordered source records and a sentence-unit-to-origin table; missing/duplicate/foreign/swapped associations refuse.",
+        "Multi-sentence descriptions create distinct associated sentence units with inherited physical envelopes; original row/scene units remain separately addressable. Recipe/separators/sentence boundaries and complete table participate in identity.",
+        "MediaTime/MediaPoint support checks full bundle binding and every stream/axis, and is contained in the complete same-stream/unit interval union plus points; unsupported anchor kinds refuse explicitly.",
+        "Wrong native unit with matching primary support, real gaps, excluded ends, point-versus-interval containment and partial coverage have isolated refusals plus lawful mixed-support controls; no hull or implicit coordinate conversion.",
+        "Two independently parsed descriptions bind each chart and relevant parse/derivation calls to its sentence unit. Single-origin claims exclude unrelated calls; genuine cross-origin claims retain both; swaps/refused joins are falsified.",
+        "Model canonical-form guards still reject proposal-surface text as film physical support. Changing source bytes, unit structure, expected receipt or origin changes identity or refuses."
+      ],
+      "gates": [
+        "Separate committed-source SD6 cold review with findings resolved.",
+        "Named compiled mutations and independent accepting controls; compile-door witnesses clean both Compile and Test and prove both recompilations.",
+        "Clean exact-candidate standalone provider compileAll/testAll, separate format checks, frozen S0 values and applicable WOG backend byte court.",
+        "Executable docs examples for public API changes; exact-pinned storyatlas consumer suite when its dependencies or interfaces are touched.",
+        "Local evidence and commits only; no push or scientific/CI qualification implied."
+      ],
+      "scopeLimits": [
+        "Input assembly only; no status choice, full compiler result, actual media acquisition or scientific inference."
+      ]
+    },
+    {
+      "key": "F2",
+      "title": "[film] render complete film compiler identity and support",
+      "parent": "bd-01M2T32SGVJXR2RT3RTS2DCN9P",
+      "intendedStatus": "open",
+      "assignee": null,
+      "priority": 1,
+      "tags": [
+        "film",
+        "compiler",
+        "film-phase-plan-20260920"
+      ],
+      "blockingPrerequisites": [
+        {
+          "childKey": "F1"
+        }
+      ],
+      "planSections": [
+        2,
+        8
+      ],
+      "acceptanceCriteria": [
+        "Film input/candidate-set/compilation/build-receipt headers use full bundle, bound surface and origin/unit/support identities, plus versioned compiler/policy inputs; stale or foreign receipt joins refuse.",
+        "Canonical film renderings bind full TypedSupport identity and tagged payload for inline evidence, ledger evidence and SourceSupport, including exact points, interval unions, stream and full bundle binding.",
+        "Same descriptions on distinct bundles, mapping offset changes with stable endpoint IDs, same legacy axis with changed timebase, substituted surface structure/receipt and each one-tick carrier change produce independently distinguishable fingerprints.",
+        "Equivalent support permutation is stable; gaps and explicit points remain observable. Each omitted-field mutation has an isolated named failure and passing control.",
+        "Text fingerprint preimages and S0 bytes stay exact; text entry-point anchor refusals remain. The film entry point cannot open until its input and canonical rendering both participate in identity."
+      ],
+      "gates": [
+        "Separate committed-source SD6 cold review with findings resolved.",
+        "Named compiled mutations and independent accepting controls; compile-door witnesses clean both Compile and Test and prove both recompilations.",
+        "Clean exact-candidate standalone provider compileAll/testAll, separate format checks, frozen S0 values and applicable WOG backend byte court.",
+        "Executable docs examples for public API changes; exact-pinned storyatlas consumer suite when its dependencies or interfaces are touched.",
+        "Local evidence and commits only; no push or scientific/CI qualification implied."
+      ],
+      "scopeLimits": [
+        "Compiler identity rendering only; hsmm/v3 remains text-only; no generic model-wire V1."
+      ]
+    },
+    {
+      "key": "F3",
+      "title": "[film] add exact film mention positions and explicit Held gaps",
+      "parent": "bd-01M2T32SGVJXR2RT3RTS2DCN9P",
+      "intendedStatus": "open",
+      "assignee": null,
+      "priority": 1,
+      "tags": [
+        "film",
+        "compiler",
+        "film-phase-plan-20260920"
+      ],
+      "blockingPrerequisites": [
+        {
+          "childKey": "F1"
+        }
+      ],
+      "planSections": [
+        3,
+        6
+      ],
+      "acceptanceCriteria": [
+        "Record ADR/API inventory for additive MentionCoordinate/AnchoredMentionPosition and the film forms result. Existing MentionPosition constructor/fields/order and MentionForms text returns remain compatible.",
+        "Checked anchored positions retain full bundle, axis, Long bounds, proposal ordinal/ID and concept; own-atlas ordering is deterministic for point/interval ties and values beyond Int.MaxValue. No mixed text/tick total order or narrowing.",
+        "Film forms read only the bound proposal text as linguistic features; typed physical support drives film IDs and positions. Distinct support remains distinguishable and unordered input permutation is stable.",
+        "NarratedWorld proposals have a lawful positive control. Held, ambiguous and refused placements emit typed retained gaps, never root fallback; affected relations gap while independent root clauses remain possible.",
+        "Named narrowing/order/identity and Held-to-root mutations fail. Existing text quoted/embedded placement and mention-form courts are unchanged."
+      ],
+      "gates": [
+        "Separate committed-source SD6 cold review with findings resolved.",
+        "Named compiled mutations and independent accepting controls; compile-door witnesses clean both Compile and Test and prove both recompilations.",
+        "Clean exact-candidate standalone provider compileAll/testAll, separate format checks, frozen S0 values and applicable WOG backend byte court.",
+        "Executable docs examples for public API changes; exact-pinned storyatlas consumer suite when its dependencies or interfaces are touched.",
+        "Local evidence and commits only; no push or scientific/CI qualification implied."
+      ],
+      "scopeLimits": [
+        "No anchored Held contexts in this first route; no license choice or standalone fake model compiler court."
+      ]
+    },
+    {
+      "key": "F4",
+      "title": "[film] implement the owner-selected explicit film claim license",
+      "parent": "bd-01M2T32SGVJXR2RT3RTS2DCN9P",
+      "intendedStatus": "open",
+      "assignee": null,
+      "priority": 1,
+      "tags": [
+        "film",
+        "compiler",
+        "film-phase-plan-20260920"
+      ],
+      "blockingPrerequisites": [
+        {
+          "childKey": "F0"
+        },
+        {
+          "childKey": "F1"
+        }
+      ],
+      "planSections": [
+        7
+      ],
+      "acceptanceCriteria": [
+        "Cite the recorded owner answer; implement only that alternative with an explicit family-specific license rule rather than copying text SurfaceExplicit assignments.",
+        "Alternative A preserves the span law: caption/model-only conjecture is Hypothesized with complete derivation; HumanAdjudicated needs a record for the particular emitted claim. Alternative B first records the changed meaning and adds the checked derivative basis to construction, join, component disclosure and consistency checks.",
+        "Same sentence as source text versus film derivative remains distinguishable. High raw score or accepted resolution alone cannot license film SurfaceExplicit; human authorship alone is not specific adjudication.",
+        "Join expected source bundle, recipe/model/request, output-bound caption proposal, receipt and sampled-frame inventory. Substitution and borrowed licenses on another bundle refuse.",
+        "Keep caption hull and exact sampled-frame inventory distinct; preserve claim-union gaps and text StatusWeight/calibrated override semantics.",
+        "A lawful film control and compiled deletion of the selected license/provenance guard establish that the policy fires. Selected public basis/component changes have explicit ADR and API/wire inventory entries."
+      ],
+      "gates": [
+        "Separate committed-source SD6 cold review with findings resolved.",
+        "Named compiled mutations and independent accepting controls; compile-door witnesses clean both Compile and Test and prove both recompilations.",
+        "Clean exact-candidate standalone provider compileAll/testAll, separate format checks, frozen S0 values and applicable WOG backend byte court.",
+        "Executable docs examples for public API changes; exact-pinned storyatlas consumer suite when its dependencies or interfaces are touched.",
+        "Local evidence and commits only; no push or scientific/CI qualification implied."
+      ],
+      "scopeLimits": [
+        "Blocked until owner answer; no policy inferred from this payload. No generic model-wire or calibrated truth claim."
+      ]
+    },
+    {
+      "key": "F5",
+      "title": "[film] compile a synthetic film through the deterministic stages",
+      "parent": "bd-01M2T32SGVJXR2RT3RTS2DCN9P",
+      "intendedStatus": "open",
+      "assignee": null,
+      "priority": 1,
+      "tags": [
+        "film",
+        "compiler",
+        "film-phase-plan-20260920"
+      ],
+      "blockingPrerequisites": [
+        {
+          "childKey": "F2"
+        },
+        {
+          "childKey": "F3"
+        },
+        {
+          "childKey": "F4"
+        }
+      ],
+      "planSections": [
+        9
+      ],
+      "acceptanceCriteria": [
+        "Add the checked compileFilm/AnchoredNarrativeCompilation API, sharing private deterministic stages while preserving text compile/NarrativeCompilation/TextModel returns.",
+        "Actual film input with two separated intervals, explicit point, two separately parsed descriptions, one root clause and one Held clause traverses resolution, placement, mentions, materialization and checked validation; inspect retained resolutions/gaps as well as nodes.",
+        "Admitted model and general AlignmentSource retain every native/primary anchor and exact interval union/point; primary projection determines order and proposal text never becomes physical evidence.",
+        "Owner-selected explicit license, actual receipt/model joins, successful and blocked validation, and source-input permutation controls execute through public factories, not fixture bypasses.",
+        "Foreign bundle/axis/receipt, stale same-ID full binding, native-unit substitution and Held fallback have decisive compiled mutations and passing controls; complete text/S0 and consumer courts remain green."
+      ],
+      "gates": [
+        "Separate committed-source SD6 cold review with findings resolved.",
+        "Named compiled mutations and independent accepting controls; compile-door witnesses clean both Compile and Test and prove both recompilations.",
+        "Clean exact-candidate standalone provider compileAll/testAll, separate format checks, frozen S0 values and applicable WOG backend byte court.",
+        "Executable docs examples for public API changes; exact-pinned storyatlas consumer suite when its dependencies or interfaces are touched.",
+        "Local evidence and commits only; no push or scientific/CI qualification implied."
+      ],
+      "scopeLimits": [
+        "Engineering compiler witness only; no scientific accuracy, end-to-end film alignment proof, V1 or E0 closure."
+      ]
+    },
+    {
+      "key": "F6",
+      "title": "[film] join Sherlock repair and composition to film compilation",
+      "parent": "bd-01M2T32SGVJXR2RT3RTS2DCN9P",
+      "intendedStatus": "open",
+      "assignee": null,
+      "priority": 1,
+      "tags": [
+        "film",
+        "compiler",
+        "film-phase-plan-20260920"
+      ],
+      "blockingPrerequisites": [
+        {
+          "childKey": "F5"
+        },
+        {
+          "ticketId": "bd-01M2TAC80YRK5JFNKTT7B7CAQN"
+        }
+      ],
+      "planSections": [
+        10
+      ],
+      "acceptanceCriteria": [
+        "Reuse the existing checked SherlockSourceAtlas and admitted repair record; add checked proposal-surface/chart/origin associations without a second clock or text support surrogate.",
+        "Preserve annotation hash, repair checksum, ordered part identities and exact native/primary row/scene support through every unit derivation, including unused point row13 and point-only scenes.",
+        "Wrong part, offset, valid differing rates, excluded mapping image and substituted repair receipt have isolated controls/mutations; complete interval gaps remain preserved.",
+        "Run the actual compiler on a content-free intake-contract fixture, then a separately receipted authorized local admitted-input association court. Raw annotations/recalls/participant outputs remain ignored.",
+        "Bind and reuse the complete D1B 1000-row coordinate and all17/2577-row frozen projection evidence; optional legacy scoring coordinates remain feature inputs only. No gold opening or parameter tuning.",
+        "Separate admitted byte identities from playable-media reachability and report missing external files honestly; do not replace identities to make a court run."
+      ],
+      "gates": [
+        "Separate committed-source SD6 cold review with findings resolved.",
+        "Named compiled mutations and independent accepting controls; compile-door witnesses clean both Compile and Test and prove both recompilations.",
+        "Clean exact-candidate standalone provider compileAll/testAll, separate format checks, frozen S0 values and applicable WOG backend byte court.",
+        "Executable docs examples for public API changes; exact-pinned storyatlas consumer suite when its dependencies or interfaces are touched.",
+        "Local evidence and commits only; no push or scientific/CI qualification implied."
+      ],
+      "scopeLimits": [
+        "No new acquisition admission; full participant film-alignment proof stays on its existing later ticket."
+      ]
+    }
+  ]
+}

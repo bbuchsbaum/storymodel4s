@@ -1,0 +1,29 @@
+{
+  "inspectedRevision": "850a6d645dd0d63e5c2d01cd03a41f1e3bd53e37",
+  "qualification": "Read-only API inspection; all eleven production file hashes independently match plan candidate. D1B release gate remains pending.",
+  "sourceHashes": {
+    "core/src/main/scala/storymodel4s/core/atlas.scala": "4065c41f727c1bb1ce74080c895a706673c42463687c7257ac51370d95021f92",
+    "core/src/main/scala/storymodel4s/core/source.scala": "4ea8746727a37c8e31cd50d02cf312f314b13f92838437029f32d27a0c5f7e5e",
+    "core/src/main/scala/storymodel4s/core/support.scala": "a58e30cb19079dc351f4b7d5c4c2fb11d67e50c0f3596c8458e3328a9edd024b",
+    "core/src/main/scala/storymodel4s/core/claim.scala": "42ef703dd95b168335390e7008ecf75ae6623017c99b3f90b20efbaef2e04f39",
+    "document/src/main/scala/storymodel4s/document/compiler.scala": "86c0d0bf2d32e17f5b44d3723917dbb0dc2b5915cccdc9e31f924d0ca97f803a",
+    "document/src/main/scala/storymodel4s/document/mentionform.scala": "88d4e59a351aca7ec9ffe337302ea97dbc154c5a762dea06e8325f5a3cf5f8d5",
+    "document/src/main/scala/storymodel4s/document/placement.scala": "46e6aa02b459a6f1752bb27440ed5fa78e123e6e4e501a40c58e0e01ce0d371a",
+    "story/src/main/scala/storymodel4s/story/consistency.scala": "7f180926412c976abadab8af3d82adead31f8e21fd70bf024e8379fa18ec2bf2",
+    "story/src/main/scala/storymodel4s/story/relations.scala": "2f1d7be066d5574baa66c648af4f9795b177e4b5900a3a74c5dec1eb4205623d",
+    "corpus-intake/src/main/scala/storymodel4s/corpus/intake/SherlockSourceAtlas.scala": "a7b4178c250c01564f243f6b0e14b38dec84f655b66f6adc98c45cbc79a897db",
+    "media/src/main/scala/storymodel4s/media/caption.scala": "47e5ca8477dd5b80f6cd4ff7e1c597c66bfa2c2d43716949093da1357674e4e3"
+  },
+  "findings": [
+    "NarrativeProposalUnit.surface remains Option[SurfaceUnitId]; AnchoredNarrativeAtlas rejects duplicate surface sentence IDs and requires every supplied one be a bound-surface Sentence.",
+    "Therefore a multi-sentence description needs explicit sentence proposal units with checked inherited physical support; no untyped many-sentence unit shortcut is already available.",
+    "NarrativeCompiler and NarrativeCompilation remain text-witness APIs with anchored input refusals at ledger, inline evidence and SourceSupport joins; film rendering/compilation remains future work.",
+    "MentionPosition remains sentenceRank:Int/offset:Int/concept; exact Long playback positions cannot reuse that offset.",
+    "ClaimMeta SurfaceExplicit still requires span evidence; generic film model admission forbids canonical text evidence. The owner status choice remains real and unmade.",
+    "NarrativeConsistency now shares graph/status rules with generic models and keeps text overlap/causal cue rules on TextModel; film plan must preserve that split.",
+    "SherlockSourceAtlas now composes exact parts and native+primary MediaTime/MediaPoint row/scene supports; no surface associations or compiler output are claimed.",
+    "EvidenceSupport.checkedOn now requires retained full bundle identity, and PlaybackSupport retains mixed interval unions/points. Future within/parent laws must include points and strict full binding.",
+    "CaptionProposal remains Draft; support hull and sampled-frame inventory remain distinct; no change to caption license was made."
+  ],
+  "planCandidate": "774fb1e8fa7358de3d8343e78371f5b4d36eb1cf"
+}
