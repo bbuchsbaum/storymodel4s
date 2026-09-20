@@ -244,7 +244,7 @@ class WireSuite extends FunSuite:
       "level" -> withNode(_.copy(level = 3)),
       "parent" -> withNode(_.copy(parent = None)),
       "position" -> withNode(_.copy(discoursePosition = 9)),
-      "support" -> withNode(_.copy(support = SpanSet.one(SpanRef(TextSpan.unsafe(0, 1))))),
+      "support" -> withNode(_.copy(support = TypedSupport.Text(SpanSet.one(SpanRef(TextSpan.unsafe(0, 1)))))),
       "predicate" -> withNode(_.copy(predicate = Some("leave"))),
       "participants" -> withNode(_.copy(participants = Vector.empty)),
       "context" -> withNode(_.copy(context = ContextTag.Speech)),

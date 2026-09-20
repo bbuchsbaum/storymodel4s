@@ -160,7 +160,10 @@ object CoreCodecs:
     }
     val schema = if support.anchors.toVector.exists(_.isInstanceOf[EvidenceAnchor.MediaPoint]) then
       "evidence-support/v2" else "evidence-support/v1"
-    Json.obj("schema" -> schema.asJson, "anchors" -> anchors.asJson)
+    val component = Json.obj("schema" -> schema.asJson, "anchors" -> anchors.asJson)
+    if schema == "evidence-support/v2" then
+      component.mapObject(_.add("bundleIdentity", support.bundleIdentity.hex.asJson))
+    else component
   }
 
   given Decoder[EvidenceSupport] = Decoder.instance { cursor =>

@@ -274,7 +274,7 @@ class D1aEnvelopeSuite extends FunSuite:
     )
 
   test(
-    "bundle-only copy recomputes primary selection and reverses order while retaining native evidence"
+    "explicit bundle rebind recomputes primary selection and reverses order while retaining native evidence"
   ):
     val (a, b) = twoAxes()
     assertEquals(a.id, b.id)
@@ -304,16 +304,28 @@ class D1aEnvelopeSuite extends FunSuite:
     )
     val before =
       right(StoryModel.draft(atlas(a), g, NarrativeHierarchy.empty, DiscourseTrajectory.empty))
-    val after = right(before.copy[ModelStatus.Draft](atlas = atlas(b)))
+    assert(before.copy[ModelStatus.Draft](atlas = atlas(b)).isLeft)
+    def rebound(value: TypedSupport): TypedSupport = value match
+      case TypedSupport.Anchored(support) =>
+        TypedSupport.Anchored(right(EvidenceSupport.of(b, support.anchors.toVector)))
+      case other => other
+    val reboundGraph = g.copy(
+      contexts = Map(world -> context.copy(support = rebound(firstSupport))),
+      situations = g.situations.view.mapValues {
+        case SituationNode.Event(node) => SituationNode.Event(node.copy(support = rebound(node.support)))
+        case _ => fail("event fixture changed")
+      }.toMap
+    )
+    val after = right(before.copy[ModelStatus.Draft](atlas = atlas(b), graph = reboundGraph))
     assertEquals(before.discourseOrder, Vector(first.id, second.id))
     assertEquals(after.discourseOrder, Vector(second.id, first.id))
     assertEquals(after.situationsByContext(world), Vector(second.id, first.id))
-    assertEquals(after.graph, before.graph)
+    assertEquals(after.graph.situations.keySet, before.graph.situations.keySet)
     assertEquals(after.bundle.streams, before.bundle.streams)
     assertEquals(after.bundle.id, before.bundle.id)
     assertEquals(before.projectionOf(firstSupport).bounds, (1L, 3L))
-    assertEquals(after.projectionOf(firstSupport).bounds, (50L, 52L))
-    assertEquals(after.graph.situations(first.id).support, firstSupport)
+    assertEquals(after.projectionOf(rebound(firstSupport)).bounds, (50L, 52L))
+    assertEquals(after.graph.situations(first.id).support, rebound(firstSupport))
     assertNotEquals(before.sourceChecksum, after.sourceChecksum)
     assertNotEquals(before.storyId, after.storyId)
 

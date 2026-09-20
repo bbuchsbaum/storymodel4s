@@ -156,6 +156,38 @@ class AlignCodecSuite extends FunSuite:
     assert(errors.nonEmpty)
   }
 
+  test("generic HSMM encoding and both contextual decode doors refuse non-text support") {
+    val bundle = SourceBundle.filmEdition(EditionId.unsafe("hsmm-film"), Checksum.ofText("picture"),
+      0L, 100L, RationalTimebase.Millisecond).toOption.get
+    val anchors = EvidenceSupport.of(bundle, Vector(EvidenceAnchor.MediaPoint(bundle.id,
+      bundle.streams.head.id, PlaybackInstant.on(bundle.primaryAxis, 25L).toOption.get))).toOption.get
+    val view = fixture.view.copy(nodes = fixture.view.nodes.map(_.copy(
+      support = TypedSupport.Anchored(anchors), scoringPosition = None)))
+    val old = fixture.result
+    val result = HsmmResult.validated(fixture.recall, view, old.candidateAnchors, old.posterior,
+      old.flow, old.viterbi, old.logLikelihood, old.costs, old.refinementPasses).toOption.get
+    assertEquals(result.sourceSupport.keySet, view.nodes.map(_.ref).toSet)
+    assert(result.sourceSupport.values.forall(_ == TypedSupport.Anchored(anchors)))
+    assertEquals(HsmmResultCodec.encode(result), Left(HsmmCodecError.UnsupportedSupport))
+    assertEquals(HsmmResultCodec.toJson(result), Left(HsmmCodecError.UnsupportedSupport))
+    assertEquals(HsmmResultCodec.decode(encoded, fixture.recall, view), Left(HsmmCodecError.UnsupportedSupport))
+    assertEquals(HsmmResultCodec.decodeJson(json, fixture.recall, view), Left(HsmmCodecError.UnsupportedSupport))
+  }
+
+  test("checked encoding remains available but no generic Encoder HsmmResult exists") {
+    assert(typeCheckErrors("""
+      import storymodel4s.align.HsmmResult
+      import storymodel4s.codec.{HsmmResultCodec, HsmmCodecError}
+      def encode(r: HsmmResult): Either[HsmmCodecError, String] = HsmmResultCodec.encode(r)
+    """).isEmpty)
+    assert(typeCheckErrors("""
+      import io.circe.Encoder
+      import storymodel4s.align.HsmmResult
+      import storymodel4s.codec.HsmmResultCodec.given
+      summon[Encoder[HsmmResult]]
+    """).nonEmpty)
+  }
+
   private def updateFirstObjectInArray(
       document: Json,
       field: String

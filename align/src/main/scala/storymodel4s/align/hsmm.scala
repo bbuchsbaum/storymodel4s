@@ -382,6 +382,12 @@ object HsmmResult:
       refinementPasses: Int,
       admissibilityEcho: Option[AdmissibilityEcho] = None
   ): Either[AlignError, HsmmResult] =
+    val sourceNodes = view.nodes
+    val sourceIndex = sourceNodes.map(n => n.ref -> n).toMap
+    val inventory: Either[AlignError, Unit] =
+      if sourceIndex.size != sourceNodes.size || sourceNodes.exists(n => view.node(n.ref) != Some(n)) then
+        Left(AlignError.InconsistentResult("source inventory has duplicate refs or disagrees with lookup"))
+      else Right(())
     val rows = posterior.rows
     def close(a: Double, b: Double): Boolean = math.abs(a - b) <= Tolerance
     val structural: Either[AlignError, Unit] =
@@ -476,7 +482,7 @@ object HsmmResult:
                 )
               )
             else
-              anchors.find(ref => view.node(ref).isEmpty) match
+              anchors.find(ref => !sourceIndex.contains(ref)) match
                 case Some(ref) =>
                   Left(
                     AlignError.GateViolation(
@@ -575,6 +581,7 @@ object HsmmResult:
       val pathV = rows.zip(viterbi).iterator.flatMap { (r, s) => check(r.unit, s, "viterbi step") }
       (posteriorV ++ flowV ++ costV ++ pathV).nextOption().toLeft(())
     for
+      _ <- inventory
       _ <- structural
       _ <- nomination
       admissibility = derive
@@ -591,7 +598,7 @@ object HsmmResult:
       ViewFingerprint.of(view),
       AlignWire.recallChecksum(recall),
       refinementPasses,
-      view.nodes.map(n => n.ref -> n.support).toMap,
+      sourceIndex.view.mapValues(_.support).toMap,
       view.textWireCompatible
     )
 
