@@ -1,0 +1,26 @@
+{
+  "codeRevision": "abb2391d2393ff9134acd9abd1a869712cde749b",
+  "command": [
+    "sbt",
+    "-batch",
+    "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+    "compileAll",
+    "storyJVM/Test/compile",
+    "alignJVM/Test/compile",
+    "fixturesJVM/Test/compile"
+  ],
+  "exitCode": 0,
+  "cleanBefore": true,
+  "cleanAfter": true,
+  "startedEpochSeconds": 1789878946.1963,
+  "elapsedSeconds": 103.18203592300415,
+  "testTotals": [],
+  "aggregateTestCounts": {
+    "Total": 0,
+    "Failed": 0,
+    "Errors": 0,
+    "Passed": 0,
+    "Skipped": 0
+  },
+  "logSha256": "4901a4e729f6ecb7a7c27e41653ab4b4947dfcccc2036c8c9f6ec2d56925706e"
+}

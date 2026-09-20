@@ -1,0 +1,29 @@
+{
+  "codeRevision": "862cea93bb3c4b630561cd3c89525010b225b8e4",
+  "command": [
+    "sbt",
+    "-batch",
+    "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+    "storyJVM/testOnly *D1aAlignment*Suite",
+    "alignJVM/testOnly *D1aStorySourceBoundarySuite",
+    "fixturesJVM/testOnly *WogHsmmBaselineCaptureSuite *WarOfTheGhostsCodecGoldenSuite *WarOfTheGhostsCodecGoldenResourceSuite"
+  ],
+  "exitCode": 0,
+  "cleanBefore": true,
+  "cleanAfter": true,
+  "startedEpochSeconds": 1789879367.893409,
+  "elapsedSeconds": 17.446248054504395,
+  "testTotals": [
+    "[info] Passed: Total 17, Failed 0, Errors 0, Passed 17",
+    "[info] Passed: Total 5, Failed 0, Errors 0, Passed 5",
+    "[info] Passed: Total 4, Failed 0, Errors 0, Passed 4"
+  ],
+  "aggregateTestCounts": {
+    "Total": 26,
+    "Failed": 0,
+    "Errors": 0,
+    "Passed": 26,
+    "Skipped": 0
+  },
+  "logSha256": "b25e2fbc2b5f25cdaf3066ec4aa1c104fe4d67f718dc49d6ac0d02eac7982bf8"
+}

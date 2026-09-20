@@ -1,0 +1,22 @@
+{
+  "schema": "d1a-s4c-code-review/v1",
+  "reviews": [
+    {
+      "reviewer": "/root/s0_cold_review",
+      "candidate": "abb2391d2393ff9134acd9abd1a869712cde749b",
+      "scope": "WIP production source",
+      "findings": []
+    },
+    {
+      "reviewer": "/root/cold_plan_review",
+      "candidate": "862cea93bb3c4b630561cd3c89525010b225b8e4",
+      "scope": "Source plus focused runtime and compile-probe courts",
+      "findings": [],
+      "limits": [
+        "Relation comparison is wrapper consistency, not historical numerical parity.",
+        "Capture suite alone is canonicalization/output capture, not frozen parity."
+      ]
+    }
+  ],
+  "qualification": "Read-only cold reviews; builds, compiled mutants and byte comparison are separate executed courts."
+}
