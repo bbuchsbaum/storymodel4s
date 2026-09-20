@@ -1,0 +1,7 @@
+{
+  "baselineLogSha256": "4f66f88ecc5283746f0a30464d0bf98e1f659fb2ddc068aead63d6a8dfaf013b",
+  "candidateLogSha256": "cda7b3d66b224142855d22f219c2509bfbc7a2a7760ffe007fda9f52a0f967d0",
+  "warningLines": 73,
+  "warningLinesIdentical": true,
+  "qualification": "Existing consumer warnings are byte-identical to the S2 consumer gate; no warning cleanup or warning-free claim."
+}

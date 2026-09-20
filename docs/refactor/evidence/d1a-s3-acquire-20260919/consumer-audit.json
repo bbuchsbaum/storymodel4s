@@ -1,0 +1,241 @@
+{
+  "scope": "Independent exact-provider consumer gate, per-task fresh JUnit and production link reconciliation",
+  "actualRevisions": {
+    "storymodel4s": "17194421f018e3780aafa4adf754fccf55398b61",
+    "storyatlas4s": "fb33bef7d0971530531fcec43cd3d7f141b8e137",
+    "intaglio": "4eb566d9208f474d64d61e778e084dee2ddbaa76",
+    "grakern": "0329c43c88a0b71e9aa4456723bb16bac2fa3841"
+  },
+  "command": [
+    "sbt",
+    "-batch",
+    "-Dstoryatlas4s.storymodel4s.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/storymodel4s",
+    "-Dstoryatlas4s.intaglio.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/intaglio",
+    "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+    "clean",
+    "compileAll",
+    "testAll",
+    "scalafmtCheckAll",
+    "app/fastLinkJS"
+  ],
+  "receiptSha256": "bd4fcbf1136ca354287fa3ea783045d455f6ab3130971840b5e44b7c78724a9b",
+  "logSha256": "cda7b3d66b224142855d22f219c2509bfbc7a2a7760ffe007fda9f52a0f967d0",
+  "tasks": [
+    {
+      "task": "layoutJVM/test",
+      "counts": {
+        "Total": 22,
+        "Failed": 0,
+        "Errors": 0,
+        "Passed": 22,
+        "Skipped": 0
+      },
+      "suites": [
+        {
+          "path": "layoutJVM/TEST-storyatlas4s.layout.AwtMeasurerSuite.xml",
+          "sha256": "b1a6616967a9dd3e7d649c5555d67b701d52db952da5a815f4611e27f04d0438"
+        },
+        {
+          "path": "layoutJVM/TEST-storyatlas4s.layout.PaginatorLawsSuite.xml",
+          "sha256": "7614f468a7629cbedb1fbf4fb1df79402e615e610d3d0058f636b9d9e3f670f6"
+        },
+        {
+          "path": "layoutJVM/TEST-storyatlas4s.layout.WarOfTheGhostsPaginationSuite.xml",
+          "sha256": "0ced817644e92dececa6456bf2d1b4a85b80b02c9013d77b1062d0c508f3850e"
+        }
+      ],
+      "emptyTaskSourceChecked": false
+    },
+    {
+      "task": "layoutJS/test",
+      "counts": {
+        "Total": 26,
+        "Failed": 0,
+        "Errors": 0,
+        "Passed": 26,
+        "Skipped": 0
+      },
+      "suites": [
+        {
+          "path": "layoutJS/TEST-storyatlas4s.layout.DomMeasurerSuite.xml",
+          "sha256": "1ff19ca7f7c8ec89204d1a56e050b858183f2d72944c078908ef46fb0e4d7b69"
+        },
+        {
+          "path": "layoutJS/TEST-storyatlas4s.layout.PaginatorLawsSuite.xml",
+          "sha256": "952de8903c553f309eed1342d4e151b2a95220c92e06d0501d021ccecc788f4e"
+        },
+        {
+          "path": "layoutJS/TEST-storyatlas4s.layout.WarOfTheGhostsPaginationSuite.xml",
+          "sha256": "bd8afadb8273bbfe681bed8411699bbcaef9d4c5de90239395d805e2bec86e41"
+        }
+      ],
+      "emptyTaskSourceChecked": false
+    },
+    {
+      "task": "intaglioJVM/test",
+      "counts": {
+        "Total": 59,
+        "Failed": 0,
+        "Errors": 0,
+        "Passed": 59,
+        "Skipped": 0
+      },
+      "suites": [
+        {
+          "path": "intaglioJVM/TEST-storyatlas4s.intaglio.DraftLoweringSuite.xml",
+          "sha256": "b28988a4a30162d9ad9c047d77bdc1f9f21750bae800995c9b8aec2ab5f08071"
+        },
+        {
+          "path": "intaglioJVM/TEST-storyatlas4s.intaglio.PagedCodexLoweringSuite.xml",
+          "sha256": "42d9941e88dd39ab149aaae04637e1b7cf524704cca2d828c5425d7f6ee21240"
+        },
+        {
+          "path": "intaglioJVM/TEST-storyatlas4s.intaglio.PlateCraftSuite.xml",
+          "sha256": "f30ac54c7d2dbd1931e363676143219e736d3733c2f7898a2db52186919a0df1"
+        },
+        {
+          "path": "intaglioJVM/TEST-storyatlas4s.intaglio.VoyageLoweringSuite.xml",
+          "sha256": "d559587620ee8b01b63195fc2c49e4a18939d3922be64bf5f4c995c0a8e94901"
+        },
+        {
+          "path": "intaglioJVM/TEST-storyatlas4s.intaglio.WarOfTheGhostsLoweringSuite.xml",
+          "sha256": "7459903ad087d81e50ed4422082eae481e29dbd5566ba3c964a73c8b015b9a15"
+        }
+      ],
+      "emptyTaskSourceChecked": false
+    },
+    {
+      "task": "intaglioJS/test",
+      "counts": {
+        "Total": 59,
+        "Failed": 0,
+        "Errors": 0,
+        "Passed": 59,
+        "Skipped": 0
+      },
+      "suites": [
+        {
+          "path": "intaglioJS/TEST-storyatlas4s.intaglio.DraftLoweringSuite.xml",
+          "sha256": "7423e35ce6c3c51885cbbd8246aa8d81a870d99642e43113e5b185e2dd901244"
+        },
+        {
+          "path": "intaglioJS/TEST-storyatlas4s.intaglio.PagedCodexLoweringSuite.xml",
+          "sha256": "e68b992cabff408f93b4c059939f391cf087477e7a04755e633214b7ec003445"
+        },
+        {
+          "path": "intaglioJS/TEST-storyatlas4s.intaglio.PlateCraftSuite.xml",
+          "sha256": "84235a3f72b2274be194b494f4fb2e6a75ed342cd0be114df6839cbb9c83da28"
+        },
+        {
+          "path": "intaglioJS/TEST-storyatlas4s.intaglio.VoyageLoweringSuite.xml",
+          "sha256": "97c499ff3759028c84915eea85eedbc4e684c978941ce568ed58d2948592b735"
+        },
+        {
+          "path": "intaglioJS/TEST-storyatlas4s.intaglio.WarOfTheGhostsLoweringSuite.xml",
+          "sha256": "204504d15f8c4f61d08386ce82cab0dfe43fb2bda44db6dbdfc63407c126baef"
+        }
+      ],
+      "emptyTaskSourceChecked": false
+    },
+    {
+      "task": "editionJVM/test",
+      "counts": {
+        "Total": 0,
+        "Failed": 0,
+        "Errors": 0,
+        "Passed": 0,
+        "Skipped": 0
+      },
+      "suites": [],
+      "emptyTaskSourceChecked": true
+    },
+    {
+      "task": "editionJS/test",
+      "counts": {
+        "Total": 0,
+        "Failed": 0,
+        "Errors": 0,
+        "Passed": 0,
+        "Skipped": 0
+      },
+      "suites": [],
+      "emptyTaskSourceChecked": true
+    },
+    {
+      "task": "cli/test",
+      "counts": {
+        "Total": 57,
+        "Failed": 0,
+        "Errors": 0,
+        "Passed": 57,
+        "Skipped": 0
+      },
+      "suites": [
+        {
+          "path": "cli/TEST-storyatlas4s.cli.CodexHtmlSuite.xml",
+          "sha256": "3ed4a8452bc2a985d1629a4d83dfa0cf4fc224fdc90aacb8f0be5ddb21ca3752"
+        },
+        {
+          "path": "cli/TEST-storyatlas4s.cli.EditionSuite.xml",
+          "sha256": "e1bc2c5404ee8ff33aafb099ce55d04207688b1f533ce3417e62a5e9abaae17a"
+        },
+        {
+          "path": "cli/TEST-storyatlas4s.cli.ModelInputSuite.xml",
+          "sha256": "37cbb3964fe42d81aeeafbaf8ba0d8ef5730a065d732d80150a8dcd7d5a3c2ed"
+        },
+        {
+          "path": "cli/TEST-storyatlas4s.cli.VoyageEditionSuite.xml",
+          "sha256": "e47dd05b1abc28931d2f1d823ea0b9f16aab6c6383ed824123c4ca621ac3c17b"
+        },
+        {
+          "path": "cli/TEST-storyatlas4s.cli.WorkspaceSuite.xml",
+          "sha256": "dbd1f0042b58823ee968b40be489920a593db781c001414aa34e21449d9af1c5"
+        }
+      ],
+      "emptyTaskSourceChecked": false
+    },
+    {
+      "task": "app/test",
+      "counts": {
+        "Total": 22,
+        "Failed": 0,
+        "Errors": 0,
+        "Passed": 22,
+        "Skipped": 0
+      },
+      "suites": [
+        {
+          "path": "app/TEST-storyatlas4s.app.AppCompilerSuite.xml",
+          "sha256": "70fbad33081cb90eec9b6f6e50af18cbba205ea0851ac11ff37c76238e75157a"
+        },
+        {
+          "path": "app/TEST-storyatlas4s.app.SemanticZoomSuite.xml",
+          "sha256": "65a4f42d556bd2a432c8a6633d0f93b340d3b5f4ec712a88d49b6e2c092d2340"
+        },
+        {
+          "path": "app/TEST-storyatlas4s.app.SvgDomSuite.xml",
+          "sha256": "920a7ed11689611cf340103ee603beee12666e2be796ae64e6ce4528c66bab28"
+        }
+      ],
+      "emptyTaskSourceChecked": false
+    }
+  ],
+  "aggregateTestCounts": {
+    "Total": 245,
+    "Failed": 0,
+    "Errors": 0,
+    "Passed": 245,
+    "Skipped": 0
+  },
+  "allCloneStatesVerifiedClean": true,
+  "artifactWindow": {
+    "start": 1789867302.832444,
+    "end": 1789867418.23899,
+    "toleranceSeconds": 1
+  },
+  "snapshotDirectory": "data/study/film-foundation-goal-20260919/root-s3-final-consumer-audit",
+  "linkedMainJs": "/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/storyatlas4s/app/target/scala-3.7.4/storyatlas4s-app-fastopt/main.js",
+  "linkedMainJsSha256": "a1973fb17acb80a40323bfa1e06b046774baba02e6920235e3022d5db3b6df3f",
+  "findings": [],
+  "limits": "Local compilation/tests/linking only; no browser interaction or remote publication."
+}

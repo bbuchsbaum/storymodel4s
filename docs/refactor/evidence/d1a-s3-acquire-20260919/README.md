@@ -1,9 +1,13 @@
 # D1A S3 typed acquisition support — 19 September 2026
 
 Mote: `bd-01M2TAF8JH42NYJJAFWPD7HTZB`. Source/test candidate `17194421`,
-based on landed S2 checkpoint `e94ef776`. All 18 mutation witnesses, clean restoration, the full provider gate and formatting
-passed; all 13 documentation examples also pass. Consumer qualification is in
-progress. This receipt does not yet close S3 or authorize its landing.
+based on landed S2 checkpoint `e94ef776`. Local qualification is complete: all 18
+compiled mutations, 55 restored focused tests, the full provider gate, formatting,
+13 executable documentation examples and the exact-provider consumer gate pass.
+The later branch commits contain ADR wording and evidence only; source/test/build
+inputs remain those of the qualified candidate, as recorded in the
+[source equivalence receipt](source-equivalence.json). Local landing and closure are
+recorded in the Mote and delivery plan.
 
 `SourceSupport` carries optional `TypedSupport`, with `text(score, spans)` and a
 derived text `spans` accessor. `EvidenceRef.support` exposes spans alone as `Text`
@@ -88,7 +92,27 @@ confirms the expected 63 additional test executions and the same five skipped
 identities as S2. [All 13 executable docs examples](docs-examples.json) pass; the
 [independent docs audit](docs-audit.json) binds each name and exact output byte
 length to its candidate manifest and artifact.
-The exact-provider storyatlas4s consumer gate remains required before closure.
+The [consumer gate](consumer-gate.json) passes all 245 tests, formatting and
+production `app/fastLinkJS`. The [independent consumer audit](consumer-audit.json)
+accounts for all eight alias tasks: six have test suites; `editionJVM` and
+`editionJS` have no tracked test sources. It binds the fresh production app bundle
+separately from test bundles. All four clones remain clean at the exact revisions
+below. The [existing consumer warnings](consumer-warning-comparison.json) are
+byte-identical to S2; this is not a warning-free claim.
+
+| Consumer gate input | Exact revision |
+| --- | --- |
+| storymodel4s override | `17194421f018e3780aafa4adf754fccf55398b61` |
+| storyatlas4s | `fb33bef7d0971530531fcec43cd3d7f141b8e137` |
+| intaglio | `4eb566d9208f474d64d61e778e084dee2ddbaa76` |
+| grakern | `0329c43c88a0b71e9aa4456723bb16bac2fa3841` |
+
+To repeat the consumer court, create four clean standalone clones at these
+revisions beneath one directory, named as in the table. Set
+`D1A_S3_CONSUMER_ROOT` to that directory and `D1A_S3_OUTPUT` to a fresh output
+directory, then run [consumer-gate.py](consumer-gate.py). Its command supplies all
+three local build overrides explicitly. The generated consumer Pins still prints
+the literal build pin; the gate receipt binds the actual override revision.
 Raw logs and per-mutant JUnit remain under `data/study/d1a-s3-20260919/`.
 The S0 frozen JSON must retain SHA-256
 `cc201d9dd3e3576fabcd45677369f00c023ca5a455ea9d9e7ba694700c759fb3`.
