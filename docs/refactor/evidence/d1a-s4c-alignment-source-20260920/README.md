@@ -84,7 +84,9 @@ Only the immutable provider pin changed in the consumer; no browser smoke was re
 
 The [independent audit](root-independent-audit.json) reconciles archive contents, provider
 and consumer counts, frozen resources and exact revisions with no findings. The consumer
-is [landed locally](consumer-local-landing.json); provider landing and ticket closure follow
-this evidence commit. D1B still owns point-capable support,
+is [landed locally](consumer-local-landing.json), as is provider `146df652`.
+The [landing record](local-landing.json) separates completed acceptance from the live ticket:
+automatic approval review rejected the ordinary Mote close twice despite the owner
+authorizing status updates. Its live status remains doing; no bypass was attempted. D1B still owns point-capable support,
 all 17 participant parity, and the typed recall path. This slice makes no film compiler,
 caption licensing, empirical accuracy, remote publication, or executed CI claim.

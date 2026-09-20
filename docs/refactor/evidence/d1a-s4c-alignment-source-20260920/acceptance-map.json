@@ -57,7 +57,7 @@
   "compiledMutationEvidence": "mutation-terminal-summary.json",
   "coldReviews": "code-review.json",
   "pending": [
-    "Local landing and Mote closure"
+    "Ordinary Mote closure blocked by automatic approval review despite explicit owner authorization"
   ],
   "limitations": [
     "No point support or D1B typed recall signature yet.",
@@ -88,5 +88,6 @@
     "skipped": 0,
     "failed": 0,
     "errors": 0
-  }
+  },
+  "localLanding": "local-landing.json"
 }

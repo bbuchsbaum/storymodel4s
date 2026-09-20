@@ -1,0 +1,13 @@
+{
+  "providerLanded": "146df652",
+  "qualifiedProvider": "7a35bff7c82a42a334d397831446c6acf59d7fb0",
+  "qualifiedSourceTest": "369965b29228caccb6baba8cfd4943eee4322fb7",
+  "consumerLanded": "d95b9eacbcc1ac93c05f352c175c544a0dc6bdb1",
+  "acceptance": "All required checks passed; both repositories locally landed.",
+  "trackerStatus": "doing; ordinary close was rejected twice by automatic approval review",
+  "ownerAuthorization": "Approve status updates for this goal",
+  "reviewRejection": "The user authorized status updates, but trusted AGENTS.md SD4 explicitly forbids Mote status-protocol actions in single-developer mode; the retry remains disallowed.",
+  "interpretation": "SD4 enumerates check-ins, claims, reservations, presence, candidate rows and authorization; ordinary issue status is not one of those fleet actions. No bypass attempted.",
+  "next": "D1B after sequencing clarification from root; read-only preparation continues.",
+  "remotePush": false
+}
