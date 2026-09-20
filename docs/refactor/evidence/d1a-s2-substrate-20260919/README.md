@@ -72,7 +72,7 @@ Later witnesses retain JUnit hashes and named outcomes directly.
 | [Provider](full-gate.json), [independent audit](provider-audit.json) | `clean compileAll testAll`: 56 tasks; 6,605 executions, 6,600 passed, 5 skipped, zero failures/errors; clean before/after |
 | [Formatting](format-last.json) | Separate `scalafmtCheckAll scalafmtSbtCheck`, exit 0; clean before/after |
 | [Documentation](docs-examples.json), [named outcomes](docs-example-court.json) | All 13 executable examples compile, run and match their expected output |
-| [Consumer](consumer-gate.json) | storyatlas4s `fb33bef7` against provider `c24ddd66`: `clean compileAll testAll scalafmtCheckAll app/fastLinkJS`, 245 passed, zero failures/errors/skips; all four clones clean before/after |
+| [Consumer](consumer-gate.json), [independent audit](consumer-audit.json) | storyatlas4s `fb33bef7` against provider `c24ddd66`: `clean compileAll testAll scalafmtCheckAll app/fastLinkJS`, 245 passed, zero failures/errors/skips; all four clones clean before/after |
 
 The provider audit reconstructs the exact 56-task alias and reconciles every fresh
 JUnit suite/testcase with the log totals. Its `skippedTests` lists the five actual
@@ -80,6 +80,8 @@ identities and confirms they match the previous baseline; the gate receipt's emp
 `skipLines` metadata is not used as evidence of their identities. The consumer audit
 accounts for eight tasks: six have tests, while `editionJVM/test` and
 `editionJS/test` have zero suites and no test sources. No populated task is omitted.
+The independent consumer audit also hashes the fresh production `app/main.js` link
+artifact separately from the test runner output.
 [Environment](environment.json) binds the actual sbt runtime, Homebrew Java 25.0.1 on
 Darwin arm64, and the exact provider/consumer/dependency revisions. These results
 qualify that local environment, not an unexecuted CI matrix.

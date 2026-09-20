@@ -1,0 +1,66 @@
+{
+  "scope": "Independent final consumer receipt and fresh JUnit reconciliation",
+  "actualRevisions": {
+    "storymodel4s": "c24ddd66026f0d1848b61369b0bbaff7a90a5d40",
+    "storyatlas4s": "fb33bef7d0971530531fcec43cd3d7f141b8e137",
+    "intaglio": "4eb566d9208f474d64d61e778e084dee2ddbaa76",
+    "grakern": "0329c43c88a0b71e9aa4456723bb16bac2fa3841"
+  },
+  "command": [
+    "sbt",
+    "-batch",
+    "-Dstoryatlas4s.storymodel4s.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/storymodel4s",
+    "-Dstoryatlas4s.intaglio.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/intaglio",
+    "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+    "clean",
+    "compileAll",
+    "testAll",
+    "scalafmtCheckAll",
+    "app/fastLinkJS"
+  ],
+  "receiptSha256": "4f4b83a4c829e60db007db90760f487017eeb9069c52a5e35894ddc95ab752a4",
+  "logSha256": "4f66f88ecc5283746f0a30464d0bf98e1f659fb2ddc068aead63d6a8dfaf013b",
+  "tasks": [
+    {
+      "task": "layoutJVM/test",
+      "tests": 22
+    },
+    {
+      "task": "layoutJS/test",
+      "tests": 26
+    },
+    {
+      "task": "intaglioJVM/test",
+      "tests": 59
+    },
+    {
+      "task": "intaglioJS/test",
+      "tests": 59
+    },
+    {
+      "task": "editionJVM/test",
+      "tests": 0
+    },
+    {
+      "task": "editionJS/test",
+      "tests": 0
+    },
+    {
+      "task": "cli/test",
+      "tests": 57
+    },
+    {
+      "task": "app/test",
+      "tests": 22
+    }
+  ],
+  "passed": 245,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "allCloneStatesVerifiedClean": true,
+  "snapshotDirectory": "data/study/film-foundation-goal-20260919/s2-final-consumer-junit",
+  "linkedMainJs": "/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/storyatlas4s/app/target/scala-3.7.4/storyatlas4s-app-fastopt/main.js",
+  "linkedMainJsSha256": "a1973fb17acb80a40323bfa1e06b046774baba02e6920235e3022d5db3b6df3f",
+  "limits": "Local compilation/tests/linking only; no browser interaction or remote publication."
+}
