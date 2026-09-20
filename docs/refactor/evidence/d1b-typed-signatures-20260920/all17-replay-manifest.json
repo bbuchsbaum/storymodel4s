@@ -1,0 +1,1126 @@
+{
+  "schema": "d1b/all17-replay/v1",
+  "codeRevision": "4fbb8c7e7e3f040e0f1a9b4ede9a266d4540b93d",
+  "cwd": "/private/tmp/storymodel4s-d1b-20260920",
+  "cleanBefore": true,
+  "grakernRevision": "0329c43c88a0b71e9aa4456723bb16bac2fa3841",
+  "frozenManifestSha256": "42b9ec1558272487192829fc6f381965cff858764cb83aed96d35559a0ceadca",
+  "expectedProjectionSha256": "94baf6e4ea94dd9238e377d3434ddc405332af17139b898d3c6a20710c21ce62",
+  "runnerSha256": "f1def5cb17f6987339959ae977c956da0f631a9d6d4acd5b684adf757eb81cff",
+  "typedSupportCapture": {
+    "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/real-support-capture.json",
+    "bytes": 1459447,
+    "sha256": "557c40e4c552c8498d72127614b3ae52eebb76c82081115082302000ef0af83a"
+  },
+  "typedSupportParity": {
+    "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/fresh-support-parity.json",
+    "bytes": 1522,
+    "sha256": "5aa92708b7fc7f1f3f3325130c2164fc193a5ce0a87620d0d7b541df4be4cb8f"
+  },
+  "freshSupportVerification": {
+    "command": [
+      "/opt/homebrew/opt/python@3.14/bin/python3.14",
+      "/private/tmp/storymodel4s-d1b-20260920/docs/refactor/evidence/d1b-typed-signatures-20260920/support-parity.py",
+      "/private/tmp/storymodel4s-d1b-20260920",
+      "/Users/bbuchsbaum/code/scala/storymodel4s/data/sherlock/Sherlock_Segments_1000_NN_2017.tsv",
+      "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/real-support-capture.json",
+      "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/fresh-support-parity.json"
+    ],
+    "exitCode": 0,
+    "verifier": {
+      "path": "/private/tmp/storymodel4s-d1b-20260920/docs/refactor/evidence/d1b-typed-signatures-20260920/support-parity.py",
+      "bytes": 13139,
+      "sha256": "3c9048b11dbdf8174af2a7e93be94a969623b94ebaeaf8c1a68e08291d78b10e"
+    },
+    "log": {
+      "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/fresh-support-parity.log",
+      "bytes": 245,
+      "sha256": "42028fa80056f2ce2eae40fa627f84b77de7b090e9e0f204e55db0671e3416f2"
+    }
+  },
+  "inputInventorySha256": "aae2fed17c0b989205c29b6e9aa95054c4f7665429dc7a19e91367ec743fde92",
+  "inputs": {
+    "annotation": {
+      "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/sherlock/Sherlock_Segments_1000_NN_2017.tsv",
+      "bytes": 225692,
+      "sha256": "8c205826dcea8c58db24d7a17c71a3f99a9054e9379435e60b1dd0b987c2b296"
+    },
+    "model": {
+      "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/models/onnx/model.onnx",
+      "bytes": 90405214,
+      "sha256": "6fd5d72fe4589f189f8ebc006442dbb529bb7ce38f8082112682524616046452"
+    },
+    "tokenizer": {
+      "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/models/onnx/tokenizer.json",
+      "bytes": 466247,
+      "sha256": "be50c3628f2bf5bb5e3a7f17b1f74611b2561a3a27eeab05e5aa30f411572037"
+    },
+    "repairRecord": {
+      "path": "/private/tmp/storymodel4s-d1b-20260920/docs/data/sherlock/timebase-repair.json",
+      "bytes": 13943,
+      "sha256": "b64d7ab2fa6457ebb39e7d43be48daf0fad910faa77c494c40979cd7f5f66146"
+    },
+    "recallLineage": {
+      "path": "/private/tmp/storymodel4s-d1b-20260920/docs/data/sherlock/recall-lineage.json",
+      "bytes": 13755,
+      "sha256": "4b41ef7e6ebacbd0d24800fca0c7ee172a7540b9996cf903edc2782744f9363e"
+    },
+    "NN01_JEX_181931_final": {
+      "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/sherlock/recall/NN01_JEX_181931_final.csv",
+      "bytes": 58792,
+      "sha256": "a3ef639814ea34f2e7c9ceb0900bbd6e133d27b0d0da0065e4ebc3e92f3c6649"
+    },
+    "NN02_AHQ_202231_final": {
+      "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/sherlock/recall/NN02_AHQ_202231_final.csv",
+      "bytes": 81582,
+      "sha256": "6389e169c4cc23bcd35bb490417efd60ae8f891e3ecce0772679056357fd6488"
+    },
+    "NN03_ANT_202231_final": {
+      "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/sherlock/recall/NN03_ANT_202231_final.csv",
+      "bytes": 91928,
+      "sha256": "5bfe5e4afa516e86d302912db8f6978f16f80ab00a84cb2a878eb2ed0c15e48e"
+    },
+    "NN04_ATE_163931_final": {
+      "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/sherlock/recall/NN04_ATE_163931_final.csv",
+      "bytes": 61977,
+      "sha256": "0488180df8bc19f9307e2eed1ebc72d01958e35f8fb9ede81ce00cc82fc4c5db"
+    },
+    "NN05_MUN_151631_final": {
+      "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/sherlock/recall/NN05_MUN_151631_final.csv",
+      "bytes": 52939,
+      "sha256": "a20cc241597b6366496175c6b33706adc01afd25caf50373fe6cd03a510fc7ff"
+    },
+    "NN06_SQT_213031_final": {
+      "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/sherlock/recall/NN06_SQT_213031_final.csv",
+      "bytes": 91641,
+      "sha256": "0f9426b27251f7f0d66b4d6281584438330e682fe236b3730fa9fb456a9235a6"
+    },
+    "NN07_SKS_213031_final": {
+      "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/sherlock/recall/NN07_SKS_213031_final.csv",
+      "bytes": 73435,
+      "sha256": "797fc2996485e4013b2236e4cd54abcb73d47d147c0bf6d5a1809bc582faec04"
+    },
+    "NN08_OLZ_224031_final": {
+      "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/sherlock/recall/NN08_OLZ_224031_final.csv",
+      "bytes": 132023,
+      "sha256": "51420d0615480b749e2408b52b8d8aceba9284f6fd476b62541df17fad1cfe19"
+    },
+    "NN09_NFO_231731_final": {
+      "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/sherlock/recall/NN09_NFO_231731_final.csv",
+      "bytes": 61744,
+      "sha256": "5ec95404e8531f91b59e45242246fd52846ddc7936b29297c5bf5f203cc3fe17"
+    },
+    "NN10_NMM_233031_final": {
+      "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/sherlock/recall/NN10_NMM_233031_final.csv",
+      "bytes": 97695,
+      "sha256": "f8f0d2371f38057353811dca9c7409b321cc8bb98a043f7798d7dfe03602cf62"
+    },
+    "NN11_NMA_233131_final": {
+      "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/sherlock/recall/NN11_NMA_233131_final.csv",
+      "bytes": 77082,
+      "sha256": "2f0e1c6f7f727efb36ff090f6b740c7cab7c4a487f97ba2387079ae1a9e965bf"
+    },
+    "NN12_DED_241531_final": {
+      "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/sherlock/recall/NN12_DED_241531_final.csv",
+      "bytes": 175923,
+      "sha256": "785717e33837aaa83fb8afd40248e27e4222cf93ff53b70bcc2b93d5a24004cc"
+    },
+    "NN13_DII_241731_final": {
+      "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/sherlock/recall/NN13_DII_241731_final.csv",
+      "bytes": 240811,
+      "sha256": "18c51ec8a08c1c3ce7f33750f77c8ac709d396f7edbee60e56c5db5c6d9efa83"
+    },
+    "NN14_DSN_242031_final": {
+      "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/sherlock/recall/NN14_DSN_242031_final.csv",
+      "bytes": 141827,
+      "sha256": "f2e9efa9d05347ca0535618df5ff682c28df7d0e71e34fd98bfd067db224a1e6"
+    },
+    "NN15_DBF_242231_final": {
+      "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/sherlock/recall/NN15_DBF_242231_final.csv",
+      "bytes": 76364,
+      "sha256": "9e805df1232634987dda35caccfc171a1da327dc458dd391dbdec0279d5d5ed8"
+    },
+    "NN16_DBN_242731_final": {
+      "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/sherlock/recall/NN16_DBN_242731_final.csv",
+      "bytes": 103293,
+      "sha256": "9b1213d49ccb6412c2ae51b7c0e8aacc037cadc3d9527c812261d082d2f997f5"
+    },
+    "NN17_DBE_242331_final": {
+      "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/sherlock/recall/NN17_DBE_242331_final.csv",
+      "bytes": 196697,
+      "sha256": "dc560db33ff99d502b9ff09daa20f790f068ddea858b20f4ae1e2df6c69d56c2"
+    }
+  },
+  "environment": {
+    "STORYMODEL4S_BACKWARD_PENALTY": "hard",
+    "STORYMODEL4S_CANDIDATES_LEXICAL_OVERLAP": "false",
+    "STORYMODEL4S_CANDIDATES_PER_LEVEL": "8",
+    "STORYMODEL4S_CAPTION_CHANNEL": "embed",
+    "STORYMODEL4S_FORWARD_PENALTY": "0.0",
+    "STORYMODEL4S_LEXICAL_BLEND": "0.8",
+    "STORYMODEL4S_LEXICAL_FIELDS": "lemmas",
+    "STORYMODEL4S_MONOTONE_FILL": "on",
+    "STORYMODEL4S_MONOTONE_SCENE": "on",
+    "STORYMODEL4S_PRIOR_SCALE": "1.5",
+    "STORYMODEL4S_SOURCE_TEXT": "bare",
+    "STORYMODEL4S_STAGE_TRACE": "on",
+    "ORT_DISABLE_TELEMETRY": "1",
+    "STORYMODEL4S_ONNX_MODEL": "/Users/bbuchsbaum/code/scala/storymodel4s/data/models/onnx/model.onnx",
+    "STORYMODEL4S_ONNX_TOKENIZER": "/Users/bbuchsbaum/code/scala/storymodel4s/data/models/onnx/tokenizer.json"
+  },
+  "unset": [
+    "STORYMODEL4S_SCENE_CODING",
+    "STORYMODEL4S_SCENE_CAPTIONS",
+    "STORYMODEL4S_SHUFFLE_RECALL",
+    "STORYMODEL4S_RUNG",
+    "STORYMODEL4S_WITHHOLD_KINDS"
+  ],
+  "clearedInheritedStorymodelOverrides": true,
+  "host": {
+    "system": "Darwin",
+    "release": "23.3.0",
+    "machine": "arm64"
+  },
+  "onnxRuntimeDeclaredInExactBuild": "1.29.0",
+  "buildInputs": {
+    ".jvmopts": "41e79abf442c20b248d6f934483574a705afe9b2cc494d92b76783427ed2cef2",
+    "build.sbt": "31697d4309febf7286e1ced7eb0b59f15b5cc6b13dd8b0cdc0261f7a75147b40",
+    "project/build.properties": "d24588794d56b7bda7e561d899310803eba64264d1cfa5570f7d63f33641e4a7",
+    "project/plugins.sbt": "12e82f4a3117eb9a5409d5839460f11e79e5067333e0adae40f4600e759dfa7c"
+  },
+  "qualification": "Development-only local ONNX engineering replay; no gold/scoring input. Original all17 launcher/revision unestablished; comparison is to frozen output projection.",
+  "runs": [
+    {
+      "participant": "NN01_JEX_181931_final",
+      "command": [
+        "sbt",
+        "-batch",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "embedBench/runMain storymodel4s.bench.sherlock.sherlockRecallMap /Users/bbuchsbaum/code/scala/storymodel4s/data/sherlock/Sherlock_Segments_1000_NN_2017.tsv /Users/bbuchsbaum/code/scala/storymodel4s/data/sherlock/recall/NN01_JEX_181931_final.csv /Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/recall-map-NN01_JEX_181931_final.tsv"
+      ],
+      "exitCode": 0,
+      "startedEpochSeconds": 1789887188.3776379,
+      "seconds": 23.156654119491577,
+      "cleanAfter": true,
+      "revisionAfter": "4fbb8c7e7e3f040e0f1a9b4ede9a266d4540b93d",
+      "log": {
+        "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/NN01_JEX_181931_final.log",
+        "bytes": 5071,
+        "sha256": "1d1b802ad978679e20ca1f8bbd3f9f9019723f03896d72b16c48996cb73147d4"
+      },
+      "artifacts": {
+        "recall-map-NN01_JEX_181931_final.tsv": {
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/recall-map-NN01_JEX_181931_final.tsv",
+          "bytes": 38925,
+          "sha256": "7bea7c8dfca8f4be2bbaf5ebab90742f9e2234dbc05cbd684f6eace654a1ee06"
+        },
+        "recall-map-NN01_JEX_181931_final.tsv.posterior.json": {
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/recall-map-NN01_JEX_181931_final.tsv.posterior.json",
+          "bytes": 224998,
+          "sha256": "83d83479d7c33d3232f1ab14f046846011b90cc8fc1cc23124f13526cfb15ea5"
+        },
+        "recall-map-NN01_JEX_181931_final.tsv.stages.json": {
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/recall-map-NN01_JEX_181931_final.tsv.stages.json",
+          "bytes": 839303,
+          "sha256": "75b653a6a20c7440bbf8d32681edaa75804d16cf2a1d08a79b41a7a0d716d91e"
+        },
+        "recall-map-NN01_JEX_181931_final.tsv.voyage.json": {
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/recall-map-NN01_JEX_181931_final.tsv.voyage.json",
+          "bytes": 428260,
+          "sha256": "64f3bcc6f593ba16935b9e0547896fcf309f888075fbf3962be4623cede67a4c"
+        },
+        "recall-map-NN01_JEX_181931_final.tsv.clock-repair.json": {
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/recall-map-NN01_JEX_181931_final.tsv.clock-repair.json",
+          "bytes": 214510,
+          "sha256": "711b49f1d1374d7940144ebd51a92248f57e8667a47a282018823bfc5b2184a7"
+        }
+      },
+      "clockBinding": {
+        "all1000RowsExact": true,
+        "row13PointRetained": true,
+        "sourceFingerprint": "5d9608a66539d267894989a11be6350b32acfaaaa5cf44f1eb4b4cada5c6bd29",
+        "reportSha256": "7bea7c8dfca8f4be2bbaf5ebab90742f9e2234dbc05cbd684f6eace654a1ee06"
+      },
+      "sbtRuntimeFromLog": "[info] welcome to sbt 1.12.14 (Homebrew Java 25.0.1)"
+    },
+    {
+      "participant": "NN02_AHQ_202231_final",
+      "command": [
+        "sbt",
+        "-batch",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "embedBench/runMain storymodel4s.bench.sherlock.sherlockRecallMap /Users/bbuchsbaum/code/scala/storymodel4s/data/sherlock/Sherlock_Segments_1000_NN_2017.tsv /Users/bbuchsbaum/code/scala/storymodel4s/data/sherlock/recall/NN02_AHQ_202231_final.csv /Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/recall-map-NN02_AHQ_202231_final.tsv"
+      ],
+      "exitCode": 0,
+      "startedEpochSeconds": 1789887211.68375,
+      "seconds": 25.102224111557007,
+      "cleanAfter": true,
+      "revisionAfter": "4fbb8c7e7e3f040e0f1a9b4ede9a266d4540b93d",
+      "log": {
+        "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/NN02_AHQ_202231_final.log",
+        "bytes": 5071,
+        "sha256": "a4043d138ee33a23afe035af76dcab9b6b149c2e95cd562c10abf15af0bbdbde"
+      },
+      "artifacts": {
+        "recall-map-NN02_AHQ_202231_final.tsv": {
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/recall-map-NN02_AHQ_202231_final.tsv",
+          "bytes": 42063,
+          "sha256": "6f77e4565e80fd8026eee31eb30cff560c582d7c6b5503bab72f7fbb8fe2367c"
+        },
+        "recall-map-NN02_AHQ_202231_final.tsv.posterior.json": {
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/recall-map-NN02_AHQ_202231_final.tsv.posterior.json",
+          "bytes": 233899,
+          "sha256": "42748e21d66e359c46711e6fea414e253ed241878242c296dc38419b1c9287d6"
+        },
+        "recall-map-NN02_AHQ_202231_final.tsv.stages.json": {
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/recall-map-NN02_AHQ_202231_final.tsv.stages.json",
+          "bytes": 872612,
+          "sha256": "c98fbb54f286dd1c85ebd403c6e773f53756c36d2f45956c7d99faf17b03b7d0"
+        },
+        "recall-map-NN02_AHQ_202231_final.tsv.voyage.json": {
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/recall-map-NN02_AHQ_202231_final.tsv.voyage.json",
+          "bytes": 440473,
+          "sha256": "42d1a6261b5ea3809d7960c7184274c57d9597df8c5794d9c08481a0fe1ed5fa"
+        },
+        "recall-map-NN02_AHQ_202231_final.tsv.clock-repair.json": {
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/recall-map-NN02_AHQ_202231_final.tsv.clock-repair.json",
+          "bytes": 214510,
+          "sha256": "f832e9e2d11512d504085f4c53db8eef9fbc0475925271d41ea24da7d20d3b83"
+        }
+      },
+      "clockBinding": {
+        "all1000RowsExact": true,
+        "row13PointRetained": true,
+        "sourceFingerprint": "5d9608a66539d267894989a11be6350b32acfaaaa5cf44f1eb4b4cada5c6bd29",
+        "reportSha256": "6f77e4565e80fd8026eee31eb30cff560c582d7c6b5503bab72f7fbb8fe2367c"
+      },
+      "sbtRuntimeFromLog": "[info] welcome to sbt 1.12.14 (Homebrew Java 25.0.1)"
+    },
+    {
+      "participant": "NN03_ANT_202231_final",
+      "command": [
+        "sbt",
+        "-batch",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "embedBench/runMain storymodel4s.bench.sherlock.sherlockRecallMap /Users/bbuchsbaum/code/scala/storymodel4s/data/sherlock/Sherlock_Segments_1000_NN_2017.tsv /Users/bbuchsbaum/code/scala/storymodel4s/data/sherlock/recall/NN03_ANT_202231_final.csv /Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/recall-map-NN03_ANT_202231_final.tsv"
+      ],
+      "exitCode": 0,
+      "startedEpochSeconds": 1789887236.949656,
+      "seconds": 22.428658962249756,
+      "cleanAfter": true,
+      "revisionAfter": "4fbb8c7e7e3f040e0f1a9b4ede9a266d4540b93d",
+      "log": {
+        "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/NN03_ANT_202231_final.log",
+        "bytes": 5072,
+        "sha256": "5f51c2193ebdd67dc61749813c5c41f989b4586dfa2ff5d30540276161794f1e"
+      },
+      "artifacts": {
+        "recall-map-NN03_ANT_202231_final.tsv": {
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/recall-map-NN03_ANT_202231_final.tsv",
+          "bytes": 64590,
+          "sha256": "528ceb1b1e84ddca9f0ef3395b1047929d60cc1bccac22fb0dcc3c67273aafc7"
+        },
+        "recall-map-NN03_ANT_202231_final.tsv.posterior.json": {
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/recall-map-NN03_ANT_202231_final.tsv.posterior.json",
+          "bytes": 385362,
+          "sha256": "cc26b5607c5bf60489786330f6478b417481e2fb84eba551acfc03cce1d7fcee"
+        },
+        "recall-map-NN03_ANT_202231_final.tsv.stages.json": {
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/recall-map-NN03_ANT_202231_final.tsv.stages.json",
+          "bytes": 1437162,
+          "sha256": "757fd1cb0a0eae487cf56e74b91d86df93f31381262c4dab19fe7a104195ba2f"
+        },
+        "recall-map-NN03_ANT_202231_final.tsv.voyage.json": {
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/recall-map-NN03_ANT_202231_final.tsv.voyage.json",
+          "bytes": 606421,
+          "sha256": "c6e1b597f8c29a94b4b2e580fdad5c8a59e5cdaa5bdd5d12c4214f3134ae0bc7"
+        },
+        "recall-map-NN03_ANT_202231_final.tsv.clock-repair.json": {
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/recall-map-NN03_ANT_202231_final.tsv.clock-repair.json",
+          "bytes": 214510,
+          "sha256": "5defab89580eec291a1fc493734ae414e4dffb2d61215044d78066ed0df57766"
+        }
+      },
+      "clockBinding": {
+        "all1000RowsExact": true,
+        "row13PointRetained": true,
+        "sourceFingerprint": "5d9608a66539d267894989a11be6350b32acfaaaa5cf44f1eb4b4cada5c6bd29",
+        "reportSha256": "528ceb1b1e84ddca9f0ef3395b1047929d60cc1bccac22fb0dcc3c67273aafc7"
+      },
+      "sbtRuntimeFromLog": "[info] welcome to sbt 1.12.14 (Homebrew Java 25.0.1)"
+    },
+    {
+      "participant": "NN04_ATE_163931_final",
+      "command": [
+        "sbt",
+        "-batch",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "embedBench/runMain storymodel4s.bench.sherlock.sherlockRecallMap /Users/bbuchsbaum/code/scala/storymodel4s/data/sherlock/Sherlock_Segments_1000_NN_2017.tsv /Users/bbuchsbaum/code/scala/storymodel4s/data/sherlock/recall/NN04_ATE_163931_final.csv /Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/recall-map-NN04_ATE_163931_final.tsv"
+      ],
+      "exitCode": 0,
+      "startedEpochSeconds": 1789887259.5217128,
+      "seconds": 24.873123168945312,
+      "cleanAfter": true,
+      "revisionAfter": "4fbb8c7e7e3f040e0f1a9b4ede9a266d4540b93d",
+      "log": {
+        "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/NN04_ATE_163931_final.log",
+        "bytes": 5063,
+        "sha256": "d5d3b5d9d60376686a9a27644f454fbb6eb5ebb9eadd2dd9dcb74d1fc3b54014"
+      },
+      "artifacts": {
+        "recall-map-NN04_ATE_163931_final.tsv": {
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/recall-map-NN04_ATE_163931_final.tsv",
+          "bytes": 38856,
+          "sha256": "62ae132895d22258a082e59fad5b416a2ad4964e33336c656218c752dff30b3d"
+        },
+        "recall-map-NN04_ATE_163931_final.tsv.posterior.json": {
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/recall-map-NN04_ATE_163931_final.tsv.posterior.json",
+          "bytes": 213801,
+          "sha256": "0dcb9b1d9e60e8981a3827db66578440babfadc6251c4c82b6380893d5594454"
+        },
+        "recall-map-NN04_ATE_163931_final.tsv.stages.json": {
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/recall-map-NN04_ATE_163931_final.tsv.stages.json",
+          "bytes": 797669,
+          "sha256": "5393aa835b9b741c6af8e47aad0ef55055575ada8393062c37854b910a7d406b"
+        },
+        "recall-map-NN04_ATE_163931_final.tsv.voyage.json": {
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/recall-map-NN04_ATE_163931_final.tsv.voyage.json",
+          "bytes": 416621,
+          "sha256": "ec2f25d31caaa672795d0ebddc14df4050440c1735d03235069e25f26625734f"
+        },
+        "recall-map-NN04_ATE_163931_final.tsv.clock-repair.json": {
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/recall-map-NN04_ATE_163931_final.tsv.clock-repair.json",
+          "bytes": 214510,
+          "sha256": "ef069ba9233b257faa40514e3b410f188ac7716cd3a6064666237da42f4907b8"
+        }
+      },
+      "clockBinding": {
+        "all1000RowsExact": true,
+        "row13PointRetained": true,
+        "sourceFingerprint": "5d9608a66539d267894989a11be6350b32acfaaaa5cf44f1eb4b4cada5c6bd29",
+        "reportSha256": "62ae132895d22258a082e59fad5b416a2ad4964e33336c656218c752dff30b3d"
+      },
+      "sbtRuntimeFromLog": "[info] welcome to sbt 1.12.14 (Homebrew Java 25.0.1)"
+    },
+    {
+      "participant": "NN05_MUN_151631_final",
+      "command": [
+        "sbt",
+        "-batch",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "embedBench/runMain storymodel4s.bench.sherlock.sherlockRecallMap /Users/bbuchsbaum/code/scala/storymodel4s/data/sherlock/Sherlock_Segments_1000_NN_2017.tsv /Users/bbuchsbaum/code/scala/storymodel4s/data/sherlock/recall/NN05_MUN_151631_final.csv /Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/recall-map-NN05_MUN_151631_final.tsv"
+      ],
+      "exitCode": 0,
+      "startedEpochSeconds": 1789887284.55174,
+      "seconds": 20.303645133972168,
+      "cleanAfter": true,
+      "revisionAfter": "4fbb8c7e7e3f040e0f1a9b4ede9a266d4540b93d",
+      "log": {
+        "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/NN05_MUN_151631_final.log",
+        "bytes": 5062,
+        "sha256": "53d721280b1c296b4bafeb400e6e8a448f2e5212b7ea60f4e3675c4f37f05bcd"
+      },
+      "artifacts": {
+        "recall-map-NN05_MUN_151631_final.tsv": {
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/recall-map-NN05_MUN_151631_final.tsv",
+          "bytes": 29243,
+          "sha256": "624c9a485aa9a432a248496ba252107828799000e0b17de121381f0b8d3fa991"
+        },
+        "recall-map-NN05_MUN_151631_final.tsv.posterior.json": {
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/recall-map-NN05_MUN_151631_final.tsv.posterior.json",
+          "bytes": 151523,
+          "sha256": "73a51228d81e4cac8f300d809e6dcd69213a1b57df173ae602c60ed149ed3aca"
+        },
+        "recall-map-NN05_MUN_151631_final.tsv.stages.json": {
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/recall-map-NN05_MUN_151631_final.tsv.stages.json",
+          "bytes": 564842,
+          "sha256": "0b41be4d345cac37785acfabf8a2e81fe3e068dff9bd705f2c4c9fda66360ee6"
+        },
+        "recall-map-NN05_MUN_151631_final.tsv.voyage.json": {
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/recall-map-NN05_MUN_151631_final.tsv.voyage.json",
+          "bytes": 347702,
+          "sha256": "2ed6b8434f7313a4105ca33d462bdf5954d41bcb82f175fb0c812180419463aa"
+        },
+        "recall-map-NN05_MUN_151631_final.tsv.clock-repair.json": {
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/recall-map-NN05_MUN_151631_final.tsv.clock-repair.json",
+          "bytes": 214510,
+          "sha256": "9abb39efcface6f0ef21e057991af0bb661d8cc3115a3934ccbbad57818506a7"
+        }
+      },
+      "clockBinding": {
+        "all1000RowsExact": true,
+        "row13PointRetained": true,
+        "sourceFingerprint": "5d9608a66539d267894989a11be6350b32acfaaaa5cf44f1eb4b4cada5c6bd29",
+        "reportSha256": "624c9a485aa9a432a248496ba252107828799000e0b17de121381f0b8d3fa991"
+      },
+      "sbtRuntimeFromLog": "[info] welcome to sbt 1.12.14 (Homebrew Java 25.0.1)"
+    },
+    {
+      "participant": "NN06_SQT_213031_final",
+      "command": [
+        "sbt",
+        "-batch",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "embedBench/runMain storymodel4s.bench.sherlock.sherlockRecallMap /Users/bbuchsbaum/code/scala/storymodel4s/data/sherlock/Sherlock_Segments_1000_NN_2017.tsv /Users/bbuchsbaum/code/scala/storymodel4s/data/sherlock/recall/NN06_SQT_213031_final.csv /Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/recall-map-NN06_SQT_213031_final.tsv"
+      ],
+      "exitCode": 0,
+      "startedEpochSeconds": 1789887305.027282,
+      "seconds": 24.8018741607666,
+      "cleanAfter": true,
+      "revisionAfter": "4fbb8c7e7e3f040e0f1a9b4ede9a266d4540b93d",
+      "log": {
+        "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/NN06_SQT_213031_final.log",
+        "bytes": 5071,
+        "sha256": "45ce807aaa2ebf5b47c11a842e1c9b06c15f3d8a91bc3636351686dbc802f930"
+      },
+      "artifacts": {
+        "recall-map-NN06_SQT_213031_final.tsv": {
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/recall-map-NN06_SQT_213031_final.tsv",
+          "bytes": 46814,
+          "sha256": "f492d3fc50a00db8982b117b81847e6ca8a48d1b69b8e59706a4576dcc178b20"
+        },
+        "recall-map-NN06_SQT_213031_final.tsv.posterior.json": {
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/recall-map-NN06_SQT_213031_final.tsv.posterior.json",
+          "bytes": 231652,
+          "sha256": "5d04fe142119901bafeff09927466a6c8a51982df1cff07540da153f350d043e"
+        },
+        "recall-map-NN06_SQT_213031_final.tsv.stages.json": {
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/recall-map-NN06_SQT_213031_final.tsv.stages.json",
+          "bytes": 864166,
+          "sha256": "e1a837453294893b73f2381858135f7dd739afcd899a42a4c8ea1664609b9d10"
+        },
+        "recall-map-NN06_SQT_213031_final.tsv.voyage.json": {
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/recall-map-NN06_SQT_213031_final.tsv.voyage.json",
+          "bytes": 439694,
+          "sha256": "ba9ccbe37a6aedc6c32903b23b4107bcc243e0d3821a60fa24944441f804ebc2"
+        },
+        "recall-map-NN06_SQT_213031_final.tsv.clock-repair.json": {
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/recall-map-NN06_SQT_213031_final.tsv.clock-repair.json",
+          "bytes": 214510,
+          "sha256": "8ebce5c4b0a21acc15f87154a88734257d881a09690749f434ddcc2837a98d0b"
+        }
+      },
+      "clockBinding": {
+        "all1000RowsExact": true,
+        "row13PointRetained": true,
+        "sourceFingerprint": "5d9608a66539d267894989a11be6350b32acfaaaa5cf44f1eb4b4cada5c6bd29",
+        "reportSha256": "f492d3fc50a00db8982b117b81847e6ca8a48d1b69b8e59706a4576dcc178b20"
+      },
+      "sbtRuntimeFromLog": "[info] welcome to sbt 1.12.14 (Homebrew Java 25.0.1)"
+    },
+    {
+      "participant": "NN07_SKS_213031_final",
+      "command": [
+        "sbt",
+        "-batch",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "embedBench/runMain storymodel4s.bench.sherlock.sherlockRecallMap /Users/bbuchsbaum/code/scala/storymodel4s/data/sherlock/Sherlock_Segments_1000_NN_2017.tsv /Users/bbuchsbaum/code/scala/storymodel4s/data/sherlock/recall/NN07_SKS_213031_final.csv /Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/recall-map-NN07_SKS_213031_final.tsv"
+      ],
+      "exitCode": 0,
+      "startedEpochSeconds": 1789887329.985156,
+      "seconds": 21.09450602531433,
+      "cleanAfter": true,
+      "revisionAfter": "4fbb8c7e7e3f040e0f1a9b4ede9a266d4540b93d",
+      "log": {
+        "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/NN07_SKS_213031_final.log",
+        "bytes": 5062,
+        "sha256": "d03ef6607b9b38b8e700d74783dff0f5cd752fdc9fdc0c3847e5224bf3cf2347"
+      },
+      "artifacts": {
+        "recall-map-NN07_SKS_213031_final.tsv": {
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/recall-map-NN07_SKS_213031_final.tsv",
+          "bytes": 40372,
+          "sha256": "1021559fda33eb74c3056b5180e1e039b5e68c9e5b3d67bc36764ccbe3fd6b40"
+        },
+        "recall-map-NN07_SKS_213031_final.tsv.posterior.json": {
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/recall-map-NN07_SKS_213031_final.tsv.posterior.json",
+          "bytes": 218324,
+          "sha256": "9dc22a1254ad3ad2cad4768fbb60d2a1fac9f08388bed75cc807e7a4fb0215e8"
+        },
+        "recall-map-NN07_SKS_213031_final.tsv.stages.json": {
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/recall-map-NN07_SKS_213031_final.tsv.stages.json",
+          "bytes": 814593,
+          "sha256": "7b33b538afd2134ee25a3d45e8c715c3e1f3887da01c0df852f96ec6b568e624"
+        },
+        "recall-map-NN07_SKS_213031_final.tsv.voyage.json": {
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/recall-map-NN07_SKS_213031_final.tsv.voyage.json",
+          "bytes": 422733,
+          "sha256": "1aedd4aaefdfbbf8c7dd4ae406b4dafcf0bd2299e1d1df42c489c14aaaa0b415"
+        },
+        "recall-map-NN07_SKS_213031_final.tsv.clock-repair.json": {
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/recall-map-NN07_SKS_213031_final.tsv.clock-repair.json",
+          "bytes": 214510,
+          "sha256": "2e49d51bfb106e61716af6ee5aa5af8c36b9e8b99f5cbf40925968988af7e45f"
+        }
+      },
+      "clockBinding": {
+        "all1000RowsExact": true,
+        "row13PointRetained": true,
+        "sourceFingerprint": "5d9608a66539d267894989a11be6350b32acfaaaa5cf44f1eb4b4cada5c6bd29",
+        "reportSha256": "1021559fda33eb74c3056b5180e1e039b5e68c9e5b3d67bc36764ccbe3fd6b40"
+      },
+      "sbtRuntimeFromLog": "[info] welcome to sbt 1.12.14 (Homebrew Java 25.0.1)"
+    },
+    {
+      "participant": "NN08_OLZ_224031_final",
+      "command": [
+        "sbt",
+        "-batch",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "embedBench/runMain storymodel4s.bench.sherlock.sherlockRecallMap /Users/bbuchsbaum/code/scala/storymodel4s/data/sherlock/Sherlock_Segments_1000_NN_2017.tsv /Users/bbuchsbaum/code/scala/storymodel4s/data/sherlock/recall/NN08_OLZ_224031_final.csv /Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/recall-map-NN08_OLZ_224031_final.tsv"
+      ],
+      "exitCode": 0,
+      "startedEpochSeconds": 1789887351.332114,
+      "seconds": 27.018966913223267,
+      "cleanAfter": true,
+      "revisionAfter": "4fbb8c7e7e3f040e0f1a9b4ede9a266d4540b93d",
+      "log": {
+        "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/NN08_OLZ_224031_final.log",
+        "bytes": 5072,
+        "sha256": "ab107b9019593280be64ecdbd6aa3a99a2552baf6f2c2f022d044be484832caa"
+      },
+      "artifacts": {
+        "recall-map-NN08_OLZ_224031_final.tsv": {
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/recall-map-NN08_OLZ_224031_final.tsv",
+          "bytes": 72514,
+          "sha256": "bed8711b5bf7d748e8d457a1da7e5c005e935b6034ab4d7e0a520a8dfcccab1e"
+        },
+        "recall-map-NN08_OLZ_224031_final.tsv.posterior.json": {
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/recall-map-NN08_OLZ_224031_final.tsv.posterior.json",
+          "bytes": 403209,
+          "sha256": "de495276f95b93bb9d4db7d909c804a682b71d55ca3d0d2c2b44f4b9e18432c1"
+        },
+        "recall-map-NN08_OLZ_224031_final.tsv.stages.json": {
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/recall-map-NN08_OLZ_224031_final.tsv.stages.json",
+          "bytes": 1503772,
+          "sha256": "bc053851457c6b15ac68df2ffc0fd0987c0342a7acf145889f725fa53191264b"
+        },
+        "recall-map-NN08_OLZ_224031_final.tsv.voyage.json": {
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/recall-map-NN08_OLZ_224031_final.tsv.voyage.json",
+          "bytes": 629698,
+          "sha256": "6186b3ba71221bc9f22e0b8fe0f7338da4e0e0ef6f9c7199c6f93a9f437c3aab"
+        },
+        "recall-map-NN08_OLZ_224031_final.tsv.clock-repair.json": {
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/recall-map-NN08_OLZ_224031_final.tsv.clock-repair.json",
+          "bytes": 214510,
+          "sha256": "ea61df7c7f0d9648b67e4d4693deff3c58ad5ec703f2faf135617f6bd0d7288a"
+        }
+      },
+      "clockBinding": {
+        "all1000RowsExact": true,
+        "row13PointRetained": true,
+        "sourceFingerprint": "5d9608a66539d267894989a11be6350b32acfaaaa5cf44f1eb4b4cada5c6bd29",
+        "reportSha256": "bed8711b5bf7d748e8d457a1da7e5c005e935b6034ab4d7e0a520a8dfcccab1e"
+      },
+      "sbtRuntimeFromLog": "[info] welcome to sbt 1.12.14 (Homebrew Java 25.0.1)"
+    },
+    {
+      "participant": "NN09_NFO_231731_final",
+      "command": [
+        "sbt",
+        "-batch",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "embedBench/runMain storymodel4s.bench.sherlock.sherlockRecallMap /Users/bbuchsbaum/code/scala/storymodel4s/data/sherlock/Sherlock_Segments_1000_NN_2017.tsv /Users/bbuchsbaum/code/scala/storymodel4s/data/sherlock/recall/NN09_NFO_231731_final.csv /Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/recall-map-NN09_NFO_231731_final.tsv"
+      ],
+      "exitCode": 0,
+      "startedEpochSeconds": 1789887378.625946,
+      "seconds": 21.31435489654541,
+      "cleanAfter": true,
+      "revisionAfter": "4fbb8c7e7e3f040e0f1a9b4ede9a266d4540b93d",
+      "log": {
+        "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/NN09_NFO_231731_final.log",
+        "bytes": 5063,
+        "sha256": "416cfc3e7be8d9b979e5e37abdc9ade54037897a745486cfaa3ce87bbd67d026"
+      },
+      "artifacts": {
+        "recall-map-NN09_NFO_231731_final.tsv": {
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/recall-map-NN09_NFO_231731_final.tsv",
+          "bytes": 31311,
+          "sha256": "87511554ca880f5d3df467cf743efda9b72eb3a3c9bedd0eb0d1981347288971"
+        },
+        "recall-map-NN09_NFO_231731_final.tsv.posterior.json": {
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/recall-map-NN09_NFO_231731_final.tsv.posterior.json",
+          "bytes": 158165,
+          "sha256": "3fc73b72ce59c640f68ccf3da115cad9a5b4031ea2ff4e6a64a5fc97081ebf0d"
+        },
+        "recall-map-NN09_NFO_231731_final.tsv.stages.json": {
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/recall-map-NN09_NFO_231731_final.tsv.stages.json",
+          "bytes": 590038,
+          "sha256": "b5b64dd3b17bc1c15e3c298f731cf45912810b41432c6c2b2c62bdb031372e1f"
+        },
+        "recall-map-NN09_NFO_231731_final.tsv.voyage.json": {
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/recall-map-NN09_NFO_231731_final.tsv.voyage.json",
+          "bytes": 356193,
+          "sha256": "dd32833b39670ece60d554bbd59efa0f6e8890ac9abf8549e9e8bf63c1e60b17"
+        },
+        "recall-map-NN09_NFO_231731_final.tsv.clock-repair.json": {
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/recall-map-NN09_NFO_231731_final.tsv.clock-repair.json",
+          "bytes": 214510,
+          "sha256": "1e3010d093bcff130d70270b3f3b8e9aa9092894226b81ee9edd9b07bc657318"
+        }
+      },
+      "clockBinding": {
+        "all1000RowsExact": true,
+        "row13PointRetained": true,
+        "sourceFingerprint": "5d9608a66539d267894989a11be6350b32acfaaaa5cf44f1eb4b4cada5c6bd29",
+        "reportSha256": "87511554ca880f5d3df467cf743efda9b72eb3a3c9bedd0eb0d1981347288971"
+      },
+      "sbtRuntimeFromLog": "[info] welcome to sbt 1.12.14 (Homebrew Java 25.0.1)"
+    },
+    {
+      "participant": "NN10_NMM_233031_final",
+      "command": [
+        "sbt",
+        "-batch",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "embedBench/runMain storymodel4s.bench.sherlock.sherlockRecallMap /Users/bbuchsbaum/code/scala/storymodel4s/data/sherlock/Sherlock_Segments_1000_NN_2017.tsv /Users/bbuchsbaum/code/scala/storymodel4s/data/sherlock/recall/NN10_NMM_233031_final.csv /Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/recall-map-NN10_NMM_233031_final.tsv"
+      ],
+      "exitCode": 0,
+      "startedEpochSeconds": 1789887400.108327,
+      "seconds": 25.93314003944397,
+      "cleanAfter": true,
+      "revisionAfter": "4fbb8c7e7e3f040e0f1a9b4ede9a266d4540b93d",
+      "log": {
+        "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/NN10_NMM_233031_final.log",
+        "bytes": 5070,
+        "sha256": "87957293f7bc41e08632e6aba98ab5c53234a70e1a94a9168d7d36d9944dfeef"
+      },
+      "artifacts": {
+        "recall-map-NN10_NMM_233031_final.tsv": {
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/recall-map-NN10_NMM_233031_final.tsv",
+          "bytes": 66487,
+          "sha256": "72cbaa7d2fb6550e0dcd484a82c864343b62881eb0958b5b007a5b8e6e0b7d41"
+        },
+        "recall-map-NN10_NMM_233031_final.tsv.posterior.json": {
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/recall-map-NN10_NMM_233031_final.tsv.posterior.json",
+          "bytes": 400942,
+          "sha256": "4a670fb60383343ea5cc3247432a0a706306e352e025b5fd4d7ba8622626ae6c"
+        },
+        "recall-map-NN10_NMM_233031_final.tsv.stages.json": {
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/recall-map-NN10_NMM_233031_final.tsv.stages.json",
+          "bytes": 1494876,
+          "sha256": "f2dd64a1d1a58dc9bda8e58376c994478317dcb39d927b0ee7960b3d919b5e57"
+        },
+        "recall-map-NN10_NMM_233031_final.tsv.voyage.json": {
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/recall-map-NN10_NMM_233031_final.tsv.voyage.json",
+          "bytes": 623757,
+          "sha256": "be1451c30d1ff197bea7024f2c2deeb1d74d961821f05105517005dd65ae70a8"
+        },
+        "recall-map-NN10_NMM_233031_final.tsv.clock-repair.json": {
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/recall-map-NN10_NMM_233031_final.tsv.clock-repair.json",
+          "bytes": 214510,
+          "sha256": "9f34b116f95b9761f7866f7d5d5b6b65ace218274a0a06ec3fc2c093f131d663"
+        }
+      },
+      "clockBinding": {
+        "all1000RowsExact": true,
+        "row13PointRetained": true,
+        "sourceFingerprint": "5d9608a66539d267894989a11be6350b32acfaaaa5cf44f1eb4b4cada5c6bd29",
+        "reportSha256": "72cbaa7d2fb6550e0dcd484a82c864343b62881eb0958b5b007a5b8e6e0b7d41"
+      },
+      "sbtRuntimeFromLog": "[info] welcome to sbt 1.12.14 (Homebrew Java 25.0.1)"
+    },
+    {
+      "participant": "NN11_NMA_233131_final",
+      "command": [
+        "sbt",
+        "-batch",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "embedBench/runMain storymodel4s.bench.sherlock.sherlockRecallMap /Users/bbuchsbaum/code/scala/storymodel4s/data/sherlock/Sherlock_Segments_1000_NN_2017.tsv /Users/bbuchsbaum/code/scala/storymodel4s/data/sherlock/recall/NN11_NMA_233131_final.csv /Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/recall-map-NN11_NMA_233131_final.tsv"
+      ],
+      "exitCode": 0,
+      "startedEpochSeconds": 1789887426.184608,
+      "seconds": 22.86207103729248,
+      "cleanAfter": true,
+      "revisionAfter": "4fbb8c7e7e3f040e0f1a9b4ede9a266d4540b93d",
+      "log": {
+        "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/NN11_NMA_233131_final.log",
+        "bytes": 5071,
+        "sha256": "c120cc968989afb5e2fc3f18379ad4c398d5ba38c7767424c6347a0716416a04"
+      },
+      "artifacts": {
+        "recall-map-NN11_NMA_233131_final.tsv": {
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/recall-map-NN11_NMA_233131_final.tsv",
+          "bytes": 52457,
+          "sha256": "5baa44ff49666c7da813dfcb526c8b28cf0d232ed4f18252da0749e2fe89b7e6"
+        },
+        "recall-map-NN11_NMA_233131_final.tsv.posterior.json": {
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/recall-map-NN11_NMA_233131_final.tsv.posterior.json",
+          "bytes": 329680,
+          "sha256": "efa1c50ab7863c28c454ff00e521038d9c5930e3c86ddaac0e6b1f2ee41e7d2b"
+        },
+        "recall-map-NN11_NMA_233131_final.tsv.stages.json": {
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/recall-map-NN11_NMA_233131_final.tsv.stages.json",
+          "bytes": 1229619,
+          "sha256": "2f4c98ef1ad77fd279e2496a7e13b54939255477833602a0fc3c1a18a40f1da6"
+        },
+        "recall-map-NN11_NMA_233131_final.tsv.voyage.json": {
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/recall-map-NN11_NMA_233131_final.tsv.voyage.json",
+          "bytes": 543468,
+          "sha256": "07c3bfa558c7914d301db8a27fbc9cccfd03a8669f4599cc21727a7dc05863c3"
+        },
+        "recall-map-NN11_NMA_233131_final.tsv.clock-repair.json": {
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/recall-map-NN11_NMA_233131_final.tsv.clock-repair.json",
+          "bytes": 214510,
+          "sha256": "3686524a149e058ac80b42dc863c3a982e2dd90fc8b004376e73a3ec57581ddf"
+        }
+      },
+      "clockBinding": {
+        "all1000RowsExact": true,
+        "row13PointRetained": true,
+        "sourceFingerprint": "5d9608a66539d267894989a11be6350b32acfaaaa5cf44f1eb4b4cada5c6bd29",
+        "reportSha256": "5baa44ff49666c7da813dfcb526c8b28cf0d232ed4f18252da0749e2fe89b7e6"
+      },
+      "sbtRuntimeFromLog": "[info] welcome to sbt 1.12.14 (Homebrew Java 25.0.1)"
+    },
+    {
+      "participant": "NN12_DED_241531_final",
+      "command": [
+        "sbt",
+        "-batch",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "embedBench/runMain storymodel4s.bench.sherlock.sherlockRecallMap /Users/bbuchsbaum/code/scala/storymodel4s/data/sherlock/Sherlock_Segments_1000_NN_2017.tsv /Users/bbuchsbaum/code/scala/storymodel4s/data/sherlock/recall/NN12_DED_241531_final.csv /Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/recall-map-NN12_DED_241531_final.tsv"
+      ],
+      "exitCode": 0,
+      "startedEpochSeconds": 1789887449.207915,
+      "seconds": 27.941262006759644,
+      "cleanAfter": true,
+      "revisionAfter": "4fbb8c7e7e3f040e0f1a9b4ede9a266d4540b93d",
+      "log": {
+        "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/NN12_DED_241531_final.log",
+        "bytes": 5072,
+        "sha256": "2375d3414b47d4bf23570fd7ec450ea25315040fe51e2e36096c48244de5de72"
+      },
+      "artifacts": {
+        "recall-map-NN12_DED_241531_final.tsv": {
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/recall-map-NN12_DED_241531_final.tsv",
+          "bytes": 86218,
+          "sha256": "ef257ceb5e42519a26568c4467135b3f788b56907caa9c17d43d42ad3b0dec92"
+        },
+        "recall-map-NN12_DED_241531_final.tsv.posterior.json": {
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/recall-map-NN12_DED_241531_final.tsv.posterior.json",
+          "bytes": 472177,
+          "sha256": "d211db55ae67d58956e5b82f4cdf7599a38d062dd2af343e176b6c97fcfc9aac"
+        },
+        "recall-map-NN12_DED_241531_final.tsv.stages.json": {
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/recall-map-NN12_DED_241531_final.tsv.stages.json",
+          "bytes": 1762565,
+          "sha256": "7b36911205a7bdbfd29a8b38ede167ecfb4e08a8c5f7a3b1e1565a3a1e25ab22"
+        },
+        "recall-map-NN12_DED_241531_final.tsv.voyage.json": {
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/recall-map-NN12_DED_241531_final.tsv.voyage.json",
+          "bytes": 709864,
+          "sha256": "f37e2b6ce7ed007bd34df1c34a139f45415aed543963a560d183f1a80f6ee776"
+        },
+        "recall-map-NN12_DED_241531_final.tsv.clock-repair.json": {
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/recall-map-NN12_DED_241531_final.tsv.clock-repair.json",
+          "bytes": 214510,
+          "sha256": "3f42a8a8e71491e11838aab47d803cac9128d6b170f9a6ee94db708b7bf1bb23"
+        }
+      },
+      "clockBinding": {
+        "all1000RowsExact": true,
+        "row13PointRetained": true,
+        "sourceFingerprint": "5d9608a66539d267894989a11be6350b32acfaaaa5cf44f1eb4b4cada5c6bd29",
+        "reportSha256": "ef257ceb5e42519a26568c4467135b3f788b56907caa9c17d43d42ad3b0dec92"
+      },
+      "sbtRuntimeFromLog": "[info] welcome to sbt 1.12.14 (Homebrew Java 25.0.1)"
+    },
+    {
+      "participant": "NN13_DII_241731_final",
+      "command": [
+        "sbt",
+        "-batch",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "embedBench/runMain storymodel4s.bench.sherlock.sherlockRecallMap /Users/bbuchsbaum/code/scala/storymodel4s/data/sherlock/Sherlock_Segments_1000_NN_2017.tsv /Users/bbuchsbaum/code/scala/storymodel4s/data/sherlock/recall/NN13_DII_241731_final.csv /Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/recall-map-NN13_DII_241731_final.tsv"
+      ],
+      "exitCode": 0,
+      "startedEpochSeconds": 1789887477.306994,
+      "seconds": 25.301948070526123,
+      "cleanAfter": true,
+      "revisionAfter": "4fbb8c7e7e3f040e0f1a9b4ede9a266d4540b93d",
+      "log": {
+        "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/NN13_DII_241731_final.log",
+        "bytes": 5072,
+        "sha256": "9023282ce1805611c84e5f34341d101aee3d21231a14da96de602ca19fc4fac1"
+      },
+      "artifacts": {
+        "recall-map-NN13_DII_241731_final.tsv": {
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/recall-map-NN13_DII_241731_final.tsv",
+          "bytes": 136314,
+          "sha256": "12f3a99ac87710edab1146f275df2ee546c1050ebaac205df3edc298884dfee7"
+        },
+        "recall-map-NN13_DII_241731_final.tsv.posterior.json": {
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/recall-map-NN13_DII_241731_final.tsv.posterior.json",
+          "bytes": 752814,
+          "sha256": "6fc9a5c1e97b029936fb0e56f5d4310ba14094173d249a8b9db1d48860176581"
+        },
+        "recall-map-NN13_DII_241731_final.tsv.stages.json": {
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/recall-map-NN13_DII_241731_final.tsv.stages.json",
+          "bytes": 2808397,
+          "sha256": "e8e3a9169b82e57b577eb6916f2f489e483089be51f70baa612774a5070c2804"
+        },
+        "recall-map-NN13_DII_241731_final.tsv.voyage.json": {
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/recall-map-NN13_DII_241731_final.tsv.voyage.json",
+          "bytes": 1023290,
+          "sha256": "68fa29560d605f5f3fdd42feb07dc9534f7df66b95cc789b14fd824f53a862e2"
+        },
+        "recall-map-NN13_DII_241731_final.tsv.clock-repair.json": {
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/recall-map-NN13_DII_241731_final.tsv.clock-repair.json",
+          "bytes": 214510,
+          "sha256": "ed87a2052154b51355889c530a63b1885b5f6d340f5e0ff34e4d78facbb8488a"
+        }
+      },
+      "clockBinding": {
+        "all1000RowsExact": true,
+        "row13PointRetained": true,
+        "sourceFingerprint": "5d9608a66539d267894989a11be6350b32acfaaaa5cf44f1eb4b4cada5c6bd29",
+        "reportSha256": "12f3a99ac87710edab1146f275df2ee546c1050ebaac205df3edc298884dfee7"
+      },
+      "sbtRuntimeFromLog": "[info] welcome to sbt 1.12.14 (Homebrew Java 25.0.1)"
+    },
+    {
+      "participant": "NN14_DSN_242031_final",
+      "command": [
+        "sbt",
+        "-batch",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "embedBench/runMain storymodel4s.bench.sherlock.sherlockRecallMap /Users/bbuchsbaum/code/scala/storymodel4s/data/sherlock/Sherlock_Segments_1000_NN_2017.tsv /Users/bbuchsbaum/code/scala/storymodel4s/data/sherlock/recall/NN14_DSN_242031_final.csv /Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/recall-map-NN14_DSN_242031_final.tsv"
+      ],
+      "exitCode": 0,
+      "startedEpochSeconds": 1789887502.769063,
+      "seconds": 26.436220169067383,
+      "cleanAfter": true,
+      "revisionAfter": "4fbb8c7e7e3f040e0f1a9b4ede9a266d4540b93d",
+      "log": {
+        "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/NN14_DSN_242031_final.log",
+        "bytes": 5072,
+        "sha256": "d0bdd0831148a5af1bbf2264d87ada9ec2218e4cfdc25dd6c85aba09e2de7189"
+      },
+      "artifacts": {
+        "recall-map-NN14_DSN_242031_final.tsv": {
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/recall-map-NN14_DSN_242031_final.tsv",
+          "bytes": 68267,
+          "sha256": "d7dd53e9d76f9ccde6a11d7a442ff5dae26c6e072ef64fd02863a19678444c5f"
+        },
+        "recall-map-NN14_DSN_242031_final.tsv.posterior.json": {
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/recall-map-NN14_DSN_242031_final.tsv.posterior.json",
+          "bytes": 365306,
+          "sha256": "2fe90bce25fdcc5607a7df37b4b65ba7dbc774bcf866dd47f7222df36d7b7eb4"
+        },
+        "recall-map-NN14_DSN_242031_final.tsv.stages.json": {
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/recall-map-NN14_DSN_242031_final.tsv.stages.json",
+          "bytes": 1362971,
+          "sha256": "c09fe257545b7b3d269bfac178d2a489426411edc3aacd1f9c4d3210db9c4d90"
+        },
+        "recall-map-NN14_DSN_242031_final.tsv.voyage.json": {
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/recall-map-NN14_DSN_242031_final.tsv.voyage.json",
+          "bytes": 590880,
+          "sha256": "9c7950e9c946e097c30fe9558085faaf9b60a3308d2e9450c2d912c681a65fda"
+        },
+        "recall-map-NN14_DSN_242031_final.tsv.clock-repair.json": {
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/recall-map-NN14_DSN_242031_final.tsv.clock-repair.json",
+          "bytes": 214510,
+          "sha256": "db921903111d9de0c577d480273f30dc8005ce2b8dfc6da28b6f444e2ceae372"
+        }
+      },
+      "clockBinding": {
+        "all1000RowsExact": true,
+        "row13PointRetained": true,
+        "sourceFingerprint": "5d9608a66539d267894989a11be6350b32acfaaaa5cf44f1eb4b4cada5c6bd29",
+        "reportSha256": "d7dd53e9d76f9ccde6a11d7a442ff5dae26c6e072ef64fd02863a19678444c5f"
+      },
+      "sbtRuntimeFromLog": "[info] welcome to sbt 1.12.14 (Homebrew Java 25.0.1)"
+    },
+    {
+      "participant": "NN15_DBF_242231_final",
+      "command": [
+        "sbt",
+        "-batch",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "embedBench/runMain storymodel4s.bench.sherlock.sherlockRecallMap /Users/bbuchsbaum/code/scala/storymodel4s/data/sherlock/Sherlock_Segments_1000_NN_2017.tsv /Users/bbuchsbaum/code/scala/storymodel4s/data/sherlock/recall/NN15_DBF_242231_final.csv /Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/recall-map-NN15_DBF_242231_final.tsv"
+      ],
+      "exitCode": 0,
+      "startedEpochSeconds": 1789887529.378117,
+      "seconds": 21.0767719745636,
+      "cleanAfter": true,
+      "revisionAfter": "4fbb8c7e7e3f040e0f1a9b4ede9a266d4540b93d",
+      "log": {
+        "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/NN15_DBF_242231_final.log",
+        "bytes": 5063,
+        "sha256": "552d910374ec8a8b8af48b02809c4f2b785d03a790d1ccd10d4101d354fe2845"
+      },
+      "artifacts": {
+        "recall-map-NN15_DBF_242231_final.tsv": {
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/recall-map-NN15_DBF_242231_final.tsv",
+          "bytes": 40690,
+          "sha256": "48c8d400b8d2a64815e62d4a849357462c1f249777931d55e86ff0cf57c2dc98"
+        },
+        "recall-map-NN15_DBF_242231_final.tsv.posterior.json": {
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/recall-map-NN15_DBF_242231_final.tsv.posterior.json",
+          "bytes": 216103,
+          "sha256": "2a15575efadc853d554da0e4e194cb1132e46a38abbd4ac94bf73a2148498250"
+        },
+        "recall-map-NN15_DBF_242231_final.tsv.stages.json": {
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/recall-map-NN15_DBF_242231_final.tsv.stages.json",
+          "bytes": 806046,
+          "sha256": "8874e7a40630ccab281de3e07acc7f5c3392a1e7e69802a19056013974cc91cd"
+        },
+        "recall-map-NN15_DBF_242231_final.tsv.voyage.json": {
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/recall-map-NN15_DBF_242231_final.tsv.voyage.json",
+          "bytes": 421050,
+          "sha256": "a9c24b24745cdd04cc2f5168858dfa66db1cd404049e217bfd8150d11ad6f5bc"
+        },
+        "recall-map-NN15_DBF_242231_final.tsv.clock-repair.json": {
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/recall-map-NN15_DBF_242231_final.tsv.clock-repair.json",
+          "bytes": 214510,
+          "sha256": "aa15b36cd4e82e1b44e0222855e9443f537171528df67ed888d6beef025fdc84"
+        }
+      },
+      "clockBinding": {
+        "all1000RowsExact": true,
+        "row13PointRetained": true,
+        "sourceFingerprint": "5d9608a66539d267894989a11be6350b32acfaaaa5cf44f1eb4b4cada5c6bd29",
+        "reportSha256": "48c8d400b8d2a64815e62d4a849357462c1f249777931d55e86ff0cf57c2dc98"
+      },
+      "sbtRuntimeFromLog": "[info] welcome to sbt 1.12.14 (Homebrew Java 25.0.1)"
+    },
+    {
+      "participant": "NN16_DBN_242731_final",
+      "command": [
+        "sbt",
+        "-batch",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "embedBench/runMain storymodel4s.bench.sherlock.sherlockRecallMap /Users/bbuchsbaum/code/scala/storymodel4s/data/sherlock/Sherlock_Segments_1000_NN_2017.tsv /Users/bbuchsbaum/code/scala/storymodel4s/data/sherlock/recall/NN16_DBN_242731_final.csv /Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/recall-map-NN16_DBN_242731_final.tsv"
+      ],
+      "exitCode": 0,
+      "startedEpochSeconds": 1789887550.688389,
+      "seconds": 24.693925857543945,
+      "cleanAfter": true,
+      "revisionAfter": "4fbb8c7e7e3f040e0f1a9b4ede9a266d4540b93d",
+      "log": {
+        "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/NN16_DBN_242731_final.log",
+        "bytes": 5063,
+        "sha256": "dd2df20848165d858f1a9f0fa74d6de3b0612a87ab86d3180d8edc4c26405930"
+      },
+      "artifacts": {
+        "recall-map-NN16_DBN_242731_final.tsv": {
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/recall-map-NN16_DBN_242731_final.tsv",
+          "bytes": 40333,
+          "sha256": "3651b3ff48926917603c78c559c20db2da6c68ab19f4d7d2f7971383c5deede3"
+        },
+        "recall-map-NN16_DBN_242731_final.tsv.posterior.json": {
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/recall-map-NN16_DBN_242731_final.tsv.posterior.json",
+          "bytes": 198236,
+          "sha256": "0e62ef0dfa23de2bbcdafc379754a77b7491e6d153d017fddb332b77f0abd15a"
+        },
+        "recall-map-NN16_DBN_242731_final.tsv.stages.json": {
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/recall-map-NN16_DBN_242731_final.tsv.stages.json",
+          "bytes": 739904,
+          "sha256": "6fcc6fc2cf4121f7aaadd2365c689624fa104747a88b35ff6ad425110675e396"
+        },
+        "recall-map-NN16_DBN_242731_final.tsv.voyage.json": {
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/recall-map-NN16_DBN_242731_final.tsv.voyage.json",
+          "bytes": 404725,
+          "sha256": "5bd9ae7c89972e628344ecd1545dcae1aa10697756934fec271e72e89071d307"
+        },
+        "recall-map-NN16_DBN_242731_final.tsv.clock-repair.json": {
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/recall-map-NN16_DBN_242731_final.tsv.clock-repair.json",
+          "bytes": 214510,
+          "sha256": "6c07889e014430eb1becccfc1b75b9944a0b288fdc828a14f6bca46d80d5cab5"
+        }
+      },
+      "clockBinding": {
+        "all1000RowsExact": true,
+        "row13PointRetained": true,
+        "sourceFingerprint": "5d9608a66539d267894989a11be6350b32acfaaaa5cf44f1eb4b4cada5c6bd29",
+        "reportSha256": "3651b3ff48926917603c78c559c20db2da6c68ab19f4d7d2f7971383c5deede3"
+      },
+      "sbtRuntimeFromLog": "[info] welcome to sbt 1.12.14 (Homebrew Java 25.0.1)"
+    },
+    {
+      "participant": "NN17_DBE_242331_final",
+      "command": [
+        "sbt",
+        "-batch",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-film-consumer-20260919-9zqdg50z/grakern",
+        "embedBench/runMain storymodel4s.bench.sherlock.sherlockRecallMap /Users/bbuchsbaum/code/scala/storymodel4s/data/sherlock/Sherlock_Segments_1000_NN_2017.tsv /Users/bbuchsbaum/code/scala/storymodel4s/data/sherlock/recall/NN17_DBE_242331_final.csv /Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/recall-map-NN17_DBE_242331_final.tsv"
+      ],
+      "exitCode": 0,
+      "startedEpochSeconds": 1789887575.544377,
+      "seconds": 24.837621927261353,
+      "cleanAfter": true,
+      "revisionAfter": "4fbb8c7e7e3f040e0f1a9b4ede9a266d4540b93d",
+      "log": {
+        "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/NN17_DBE_242331_final.log",
+        "bytes": 5072,
+        "sha256": "228150247d0426b0e1e9611254d258f39335c5e5b0243e34b2e51916b9557993"
+      },
+      "artifacts": {
+        "recall-map-NN17_DBE_242331_final.tsv": {
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/recall-map-NN17_DBE_242331_final.tsv",
+          "bytes": 128398,
+          "sha256": "da27a50661dbb7d9d0a52b2c943070cbf905beca92451e163f51c10b0db63bd0"
+        },
+        "recall-map-NN17_DBE_242331_final.tsv.posterior.json": {
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/recall-map-NN17_DBE_242331_final.tsv.posterior.json",
+          "bytes": 784133,
+          "sha256": "6e4d01594dc2d3d7940bba9a4bfb8c5c54bafe5d5a70ff81ae9c8db5cbd61126"
+        },
+        "recall-map-NN17_DBE_242331_final.tsv.stages.json": {
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/recall-map-NN17_DBE_242331_final.tsv.stages.json",
+          "bytes": 2924230,
+          "sha256": "cb6167bb51e8ca1a54136f352c86a590b9a6c029788af11c8b4922af6ecfeedc"
+        },
+        "recall-map-NN17_DBE_242331_final.tsv.voyage.json": {
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/recall-map-NN17_DBE_242331_final.tsv.voyage.json",
+          "bytes": 1051973,
+          "sha256": "eb9fc566ded1bf7113610939cce649003b84f31110f2c6ffea2ca56789748ad5"
+        },
+        "recall-map-NN17_DBE_242331_final.tsv.clock-repair.json": {
+          "path": "/Users/bbuchsbaum/code/scala/storymodel4s/data/study/d1b-20260920/all17-1/recall-map-NN17_DBE_242331_final.tsv.clock-repair.json",
+          "bytes": 214510,
+          "sha256": "50cd2f4a6c670aa39a7027516d54b58109199034bb7e4b8130c0b68e56d52a91"
+        }
+      },
+      "clockBinding": {
+        "all1000RowsExact": true,
+        "row13PointRetained": true,
+        "sourceFingerprint": "5d9608a66539d267894989a11be6350b32acfaaaa5cf44f1eb4b4cada5c6bd29",
+        "reportSha256": "da27a50661dbb7d9d0a52b2c943070cbf905beca92451e163f51c10b0db63bd0"
+      },
+      "sbtRuntimeFromLog": "[info] welcome to sbt 1.12.14 (Homebrew Java 25.0.1)"
+    }
+  ],
+  "projection": {
+    "sha256": "94baf6e4ea94dd9238e377d3434ddc405332af17139b898d3c6a20710c21ce62",
+    "rows": 2577,
+    "perParticipant": {
+      "NN01_JEX_181931_final": 101,
+      "NN02_AHQ_202231_final": 105,
+      "NN03_ANT_202231_final": 173,
+      "NN04_ATE_163931_final": 96,
+      "NN05_MUN_151631_final": 68,
+      "NN06_SQT_213031_final": 104,
+      "NN07_SKS_213031_final": 98,
+      "NN08_OLZ_224031_final": 181,
+      "NN09_NFO_231731_final": 71,
+      "NN10_NMM_233031_final": 180,
+      "NN11_NMA_233131_final": 148,
+      "NN12_DED_241531_final": 212,
+      "NN13_DII_241731_final": 338,
+      "NN14_DSN_242031_final": 164,
+      "NN15_DBF_242231_final": 97,
+      "NN16_DBN_242731_final": 89,
+      "NN17_DBE_242331_final": 352
+    },
+    "exactEqual": true,
+    "comparatorFalsifier": {
+      "originalAccepted": true,
+      "changedEndpointRejected": true,
+      "mutantSha256": "b35c5ea84026248117f6000b88fefccfefcf0c365a0efdeaf166dd37efaa24f0"
+    }
+  },
+  "cleanAfter": true,
+  "grakernCleanAfter": true
+}

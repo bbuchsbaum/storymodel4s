@@ -1,0 +1,39 @@
+{
+  "archive": "all17-content-free-evidence.tar.gz",
+  "sha256": "eaf241a8fc9393b90ea06c24390aa7ca4c651c7d89533c2b436f7ff351217969",
+  "bytes": 34036,
+  "memberCount": 6,
+  "members": [
+    {
+      "path": "manifest.json",
+      "bytes": 62941,
+      "sha256": "a768973da0027639a26d841a99f2dc8c2c3976b4800457501e21228cbd5ed532"
+    },
+    {
+      "path": "anchor-projection.tsv",
+      "bytes": 188050,
+      "sha256": "94baf6e4ea94dd9238e377d3434ddc405332af17139b898d3c6a20710c21ce62"
+    },
+    {
+      "path": "fresh-support-parity.json",
+      "bytes": 1522,
+      "sha256": "5aa92708b7fc7f1f3f3325130c2164fc193a5ce0a87620d0d7b541df4be4cb8f"
+    },
+    {
+      "path": "fresh-support-parity.log",
+      "bytes": 245,
+      "sha256": "42028fa80056f2ce2eae40fa627f84b77de7b090e9e0f204e55db0671e3416f2"
+    },
+    {
+      "path": "resolved-onnx-classpath.json",
+      "bytes": 654,
+      "sha256": "fbfcb869ff386983110bd6e23d11a3eecc26de25417b3241dd528d00cc300bcc"
+    },
+    {
+      "path": "resolved-managed-classpath.txt",
+      "bytes": 2288,
+      "sha256": "74fdbdfc0d3e79a619a0ba8e5a16db97ea06b51972f6dba9e4d016c7adf5b050"
+    }
+  ],
+  "limitation": "Raw annotations, recalls, participant reports/posteriors/voyages/stages and run logs remain local ignored files; execution manifest binds their hashes, not their contents. Projection has identifiers and media endpoints only."
+}
