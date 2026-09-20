@@ -45,7 +45,7 @@ class GraphSuite extends ScalaCheckSuite:
       src.allNodes.size == n + v.graph.segments.size &&
       src.alignableNodes(Set(0)).size == n &&
       src.alignableNodes(Set(1, 2)).size == 2 &&
-      src.allNodes.forall(node => src.sourceSupport(node).isDefined) &&
+      src.allNodes.forall(node => src.evidenceOf(node).isDefined && src.primaryOf(node).isDefined) &&
       src.allNodes.forall(node =>
         node == NarrativeNodeId.Segment(b.root) || src.parentOf(node).isDefined
       )

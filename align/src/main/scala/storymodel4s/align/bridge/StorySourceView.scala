@@ -13,6 +13,7 @@ import storymodel4s.story.{
   Polarity,
   PropositionEvidenceSource,
   TextModel,
+  TextAlignmentSource,
   RelationLayer as StoryLayer
 }
 
@@ -42,14 +43,13 @@ import storymodel4s.story.{
   * support are not fabricated at position 0: they are omitted and listed in `dropped`.
   */
 final class StorySourceView private (
-    source: AlignmentSource,
-    model: TextModel[?],
+    source: TextAlignmentSource,
     semantic: Map[SourceNodeRef, Map[SourceNodeRef, Double]],
     maxFanout: Int,
     evidence: PropositionEvidenceSource
 ) extends SourceView:
 
-  private val text: String = model.source.canonicalText
+  private val text: String = source.text.source.canonicalText
 
   private def toRef(n: NarrativeNodeId): SourceNodeRef = n match
     case NarrativeNodeId.Situation(id) => SourceNodeRef.Situation(id)
@@ -294,27 +294,25 @@ object StorySourceView:
   val DefaultMaxFanout: Int = 8
 
   def apply(
-      source: AlignmentSource,
-      model: TextModel[ModelStatus.Validated],
+      source: TextAlignmentSource,
       semantic: Map[SourceNodeRef, Map[SourceNodeRef, Double]] = Map.empty,
       maxFanout: Int = DefaultMaxFanout,
       evidence: PropositionEvidenceSource = PropositionEvidenceSource.none
   ): StorySourceView =
-    new StorySourceView(source, model, semantic, math.max(1, maxFanout), evidence)
+    new StorySourceView(source, semantic, math.max(1, maxFanout), evidence)
 
   def validated(
       model: TextModel[ModelStatus.Validated],
       evidence: PropositionEvidenceSource = PropositionEvidenceSource.none
   ): StorySourceView =
-    new StorySourceView(AlignmentSource(model.model), model, Map.empty, DefaultMaxFanout, evidence)
+    new StorySourceView(AlignmentSource(model), Map.empty, DefaultMaxFanout, evidence)
 
   def adjudicated(
       model: TextModel[ModelStatus.Adjudicated],
       evidence: PropositionEvidenceSource = PropositionEvidenceSource.none
   ): StorySourceView =
     new StorySourceView(
-      AlignmentSource.adjudicated(model.model),
-      model,
+      AlignmentSource.adjudicated(model),
       Map.empty,
       DefaultMaxFanout,
       evidence

@@ -8,7 +8,7 @@ The 30 consultant TA keys are crosswalk references, not another set of tickets. 
 
 ## What to do first
 
-One implementation slice at a time. Baseline capture, scorer repair, production clock integration, S0 text parity pins, S1's ADR amendment, S2's checked substrate, S3's typed acquisition support S4a's typed nodes/fallible draft and S4b's sealed envelope/text witness are complete. **S4c's sealed and split AlignmentSource is the active D1A slice, preserving the frozen text behavior.** At-risk branch preservation remains independent foundation work. The account/runner decision blocks CI execution, not local engineering.
+One implementation slice at a time. Baseline capture, scorer repair, production clock integration, S0 text parity pins, S1's ADR amendment, S2's checked substrate, S3's typed acquisition support, S4a's typed nodes/fallible draft and S4b's sealed envelope/text witness are complete. **S4c's sealed and split AlignmentSource is the active D1A slice, preserving the frozen text behavior.** At-risk branch preservation remains independent foundation work. The account/runner decision blocks CI execution, not local engineering.
 
 The active [film foundation goal](goals/film-foundation-20260919.md) assigns nine existing
 Motes to `film_foundation`, beginning with S1. It contains eight executable deliverables
