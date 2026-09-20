@@ -38,7 +38,7 @@
       "witnesses": [
         "Frozen file SHA records below",
         "hsmm-parity.json: exact 26,284-byte JVM/JS/Native baseline preservation",
-        "Final full-provider S0 execution pending"
+        "Final full-provider TextParitySuite passes all eight tests; frozen S0 bytes unchanged"
       ]
     }
   ],
@@ -57,9 +57,6 @@
   "compiledMutationEvidence": "mutation-terminal-summary.json",
   "coldReviews": "code-review.json",
   "pending": [
-    "Final clean provider gate",
-    "Separate formatting gate",
-    "13 documentation examples",
     "Pinned storyatlas consumer gate",
     "Local landing and Mote closure"
   ],
@@ -68,5 +65,19 @@
     "No film compiler or caption licensing decision.",
     "No new Native tolerance or universal cross-platform byte equality.",
     "Local execution only; no CI or remote publication."
-  ]
+  ],
+  "providerGate": {
+    "receipt": "full-gate.json",
+    "tasks": 56,
+    "total": 7001,
+    "passed": 6996,
+    "skipped": 5,
+    "failed": 0,
+    "errors": 0
+  },
+  "formatGate": "format-last.json",
+  "docsGate": {
+    "receipt": "docs-examples.json",
+    "examples": 13
+  }
 }

@@ -1,0 +1,84 @@
+{
+  "examples": [
+    {
+      "id": "inspect-source",
+      "expectedPath": "examples/inspect-source.output.txt",
+      "bytes": 381,
+      "sha256": "969764286a168527ad246984130e77b3eadf6d13ef0c3b8b672aedae82ff4bda"
+    },
+    {
+      "id": "model-a-story",
+      "expectedPath": "examples/model-a-story.output.txt",
+      "bytes": 729,
+      "sha256": "e7868db4aa5e89d493041a52454f7a61cd90382a41561cb85199d07f7866a42f"
+    },
+    {
+      "id": "penman-to-chart",
+      "expectedPath": "examples/penman-to-chart.output.txt",
+      "bytes": 840,
+      "sha256": "b6556a24885e7c99f54892a2371ffdad82c3b7e9e5047ea3e081c9e1eb7041c8"
+    },
+    {
+      "id": "resolve-acquisition",
+      "expectedPath": "examples/resolve-acquisition.output.txt",
+      "bytes": 318,
+      "sha256": "c159e3e52668e292e16db47cce99cbb44e0b978b2cd1b574583543f86d123cf0"
+    },
+    {
+      "id": "compose-document",
+      "expectedPath": "examples/compose-document.output.txt",
+      "bytes": 340,
+      "sha256": "66b876c11d2cc5386f0c6fdbc07a16e714e5371279e8b45680b9917425304804"
+    },
+    {
+      "id": "represent-recall",
+      "expectedPath": "examples/represent-recall.output.txt",
+      "bytes": 598,
+      "sha256": "ec2fbcb012e17740a0722f9c11d095c5b42009d089711fb841e50805f8f0da7c"
+    },
+    {
+      "id": "window-features",
+      "expectedPath": "examples/window-features.output.txt",
+      "bytes": 634,
+      "sha256": "f5b9d8bbfc43cf5266d604345359585bb53c6775f806f56eaae3a99fa1f2a284"
+    },
+    {
+      "id": "use-embeddings",
+      "expectedPath": "examples/use-embeddings.output.txt",
+      "bytes": 436,
+      "sha256": "a0609f215741b12fe739a27d25e4b1049ed964caf464abf90bc1726fd61d647c"
+    },
+    {
+      "id": "align-and-interpret",
+      "expectedPath": "examples/align-and-interpret.output.txt",
+      "bytes": 551,
+      "sha256": "5fcb58008a3076d1d4a0812e29b53b519ed047bda8de4e8fd4ab1244f3d6e0bf"
+    },
+    {
+      "id": "summarize-recall",
+      "expectedPath": "examples/summarize-recall.output.txt",
+      "bytes": 756,
+      "sha256": "5665e473bf6ef45e3f47754a7493da93be858b229ca6ef6df2b40b42525b5982"
+    },
+    {
+      "id": "score-interview",
+      "expectedPath": "examples/score-interview.output.txt",
+      "bytes": 1074,
+      "sha256": "4399b05090dfff9774341b123880a47a631874618f566768e3eed558d38a276d"
+    },
+    {
+      "id": "save-model",
+      "expectedPath": "examples/save-model.output.txt",
+      "bytes": 330,
+      "sha256": "5eaa27106fffdd30040fd944037e3773a58e58dc634950de664cebc23fa87653"
+    },
+    {
+      "id": "structural-distance",
+      "expectedPath": "examples-grakern/structural-distance.output.txt",
+      "bytes": 402,
+      "sha256": "3da7e647966310647fc0139da01fdf59bdad94eff0ea4b8cac6c66173d52ccae"
+    }
+  ],
+  "manifestSha256": "e62e57143c8d458fb6931e39e71ff55f5fb77abd76cfac13a9dbce29f9d65e66",
+  "logSha256": "737d4c83127c2e8e54a22c38cd8fe7ccb134a1a997cf4dcea18c3f4d486e21ca"
+}

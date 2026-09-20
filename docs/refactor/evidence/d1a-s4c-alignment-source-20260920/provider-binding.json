@@ -1,0 +1,36 @@
+{
+  "schema": "d1a-s4c-provider-binding/v1",
+  "sourceTestRevision": "369965b29228caccb6baba8cfd4943eee4322fb7",
+  "releaseRevision": "7a35bff7c82a42a334d397831446c6acf59d7fb0",
+  "evidenceOnlyChangedPaths": [
+    "docs/refactor/evidence/d1a-s4c-alignment-source-20260920/README.md",
+    "docs/refactor/evidence/d1a-s4c-alignment-source-20260920/archive-mutations.py",
+    "docs/refactor/evidence/d1a-s4c-alignment-source-20260920/audit-source-preservation.py",
+    "docs/refactor/evidence/d1a-s4c-alignment-source-20260920/code-review.json",
+    "docs/refactor/evidence/d1a-s4c-alignment-source-20260920/consumer-gate.py",
+    "docs/refactor/evidence/d1a-s4c-alignment-source-20260920/focused-1.json",
+    "docs/refactor/evidence/d1a-s4c-alignment-source-20260920/guard-witness-inventory.json",
+    "docs/refactor/evidence/d1a-s4c-alignment-source-20260920/hsmm-parity-evidence-manifest.json",
+    "docs/refactor/evidence/d1a-s4c-alignment-source-20260920/hsmm-parity-evidence.tar.gz",
+    "docs/refactor/evidence/d1a-s4c-alignment-source-20260920/hsmm-parity.json",
+    "docs/refactor/evidence/d1a-s4c-alignment-source-20260920/hsmm-parity.py",
+    "docs/refactor/evidence/d1a-s4c-alignment-source-20260920/mutation-evidence-manifest.json",
+    "docs/refactor/evidence/d1a-s4c-alignment-source-20260920/mutation-evidence.tar.gz",
+    "docs/refactor/evidence/d1a-s4c-alignment-source-20260920/mutation-terminal-summary.json",
+    "docs/refactor/evidence/d1a-s4c-alignment-source-20260920/production-compile-1.json",
+    "docs/refactor/evidence/d1a-s4c-alignment-source-20260920/qualify.py",
+    "docs/refactor/evidence/d1a-s4c-alignment-source-20260920/unchanged-scoring-source.json"
+  ],
+  "s0Golden": {
+    "path": "pipeline/src/test/resources/golden/d1a-s0-text-parity.json",
+    "sha256": "cc201d9dd3e3576fabcd45677369f00c023ca5a455ea9d9e7ba694700c759fb3"
+  },
+  "sbtRuntimeFromLog": "[info] welcome to sbt 1.12.14 (Homebrew Java 25.0.1)",
+  "preexistingWarning": {
+    "path": "embed-bench/src/test/scala/storymodel4s/bench/nfrd/NfrdBaseballSuite.scala",
+    "line": 3,
+    "kind": "Unused ReadOperation import",
+    "sourceUnchangedFrom": "7358eb7c",
+    "alsoObservedIn": "data/study/d1a-s4b-20260919/full-gate.log"
+  }
+}

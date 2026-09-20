@@ -1,0 +1,513 @@
+{
+  "mutation": "score-text-length",
+  "codeRevision": "369965b29228caccb6baba8cfd4943eee4322fb7",
+  "logSha256": "49e8011544311f0f527aa28e26c1d267abf8091559891c1c0d1fbe51c23e64d1",
+  "changedLeaves": [
+    {
+      "path": "$.flow[0].mass[0].mass",
+      "before": "0x3f4e8a6e961b45a2",
+      "after": "0x3f4e8a6e93dba3c6"
+    },
+    {
+      "path": "$.flow[0].mass[1].mass",
+      "before": "0x3f4e8a6e961b45a2",
+      "after": "0x3f4e8a6e93dba3c6"
+    },
+    {
+      "path": "$.flow[0].mass[2].mass",
+      "before": "0x3f9ac0dad1db50b4",
+      "after": "0x3f9ac0dacfe31170"
+    },
+    {
+      "path": "$.flow[0].mass[3].mass",
+      "before": "0x3f4e8a6e961b45a2",
+      "after": "0x3f4e8a6e93dba3c6"
+    },
+    {
+      "path": "$.flow[0].mass[4].mass",
+      "before": "0x3f4e8a6e961b45a2",
+      "after": "0x3f4e8a6e93dba3c6"
+    },
+    {
+      "path": "$.flow[0].mass[5].mass",
+      "before": "0x3f13578480ad02de",
+      "after": "0x3f1357847f4074a1"
+    },
+    {
+      "path": "$.flow[0].mass[6].mass",
+      "before": "0x3f2b8cc7cd2601ba",
+      "after": "0x3f2b8cc7cb1ebedf"
+    },
+    {
+      "path": "$.flow[0].mass[7].mass",
+      "before": "0x3f13578480ad02de",
+      "after": "0x3f1357847f4074a1"
+    },
+    {
+      "path": "$.flow[0].mass[8].mass",
+      "before": "0x3f1b6b38f0f1bc60",
+      "after": "0x3f1b6b38eeecf205"
+    },
+    {
+      "path": "$.flow[0].mass[9].mass",
+      "before": "0x3f4e8a6e961b45a2",
+      "after": "0x3f4e8a6e93dba3c6"
+    },
+    {
+      "path": "$.flow[0].mass[10].mass",
+      "before": "0x3f4e8a6e961b45a2",
+      "after": "0x3f4e8a6e93dba3c6"
+    },
+    {
+      "path": "$.flow[0].mass[11].mass",
+      "before": "0x3f9ac0dad1db50b4",
+      "after": "0x3f9ac0dacfe31170"
+    },
+    {
+      "path": "$.flow[0].mass[12].mass",
+      "before": "0x3f4e8a6e961b45a2",
+      "after": "0x3f4e8a6e93dba3c6"
+    },
+    {
+      "path": "$.flow[0].mass[13].mass",
+      "before": "0x3f4e8a6e961b45a2",
+      "after": "0x3f4e8a6e93dba3c6"
+    },
+    {
+      "path": "$.flow[0].mass[14].mass",
+      "before": "0x3f13578480ad02de",
+      "after": "0x3f1357847f4074a1"
+    },
+    {
+      "path": "$.flow[0].mass[15].mass",
+      "before": "0x3f2b8cc7cd2601ba",
+      "after": "0x3f2b8cc7cb1ebedf"
+    },
+    {
+      "path": "$.flow[0].mass[16].mass",
+      "before": "0x3f13578480ad02de",
+      "after": "0x3f1357847f4074a1"
+    },
+    {
+      "path": "$.flow[0].mass[17].mass",
+      "before": "0x3f1b6b38f0f1bc60",
+      "after": "0x3f1b6b38eeecf205"
+    },
+    {
+      "path": "$.flow[0].mass[18].mass",
+      "before": "0x3f9ac0dad1db50b4",
+      "after": "0x3f9ac0dacfe31170"
+    },
+    {
+      "path": "$.flow[0].mass[19].mass",
+      "before": "0x3f9ac0dad1db50b4",
+      "after": "0x3f9ac0dacfe31170"
+    },
+    {
+      "path": "$.flow[0].mass[20].mass",
+      "before": "0x3fe76f8438c54513",
+      "after": "0x3fe76f84370b8e25"
+    },
+    {
+      "path": "$.flow[0].mass[21].mass",
+      "before": "0x3f9ac0dad1db50b4",
+      "after": "0x3f9ac0dacfe31170"
+    },
+    {
+      "path": "$.flow[0].mass[22].mass",
+      "before": "0x3f9ac0dad1db50b4",
+      "after": "0x3f9ac0dacfe31170"
+    },
+    {
+      "path": "$.flow[0].mass[23].mass",
+      "before": "0x3f60f178ab69b629",
+      "after": "0x3f60f178aa2a5d78"
+    },
+    {
+      "path": "$.flow[0].mass[24].mass",
+      "before": "0x3f7822272c7798e5",
+      "after": "0x3f7822272ab0bb06"
+    },
+    {
+      "path": "$.flow[0].mass[25].mass",
+      "before": "0x3f60f178ab69b629",
+      "after": "0x3f60f178aa2a5d78"
+    },
+    {
+      "path": "$.flow[0].mass[26].mass",
+      "before": "0x3f6804c1ae4ee25e",
+      "after": "0x3f6804c1ac8a2e90"
+    },
+    {
+      "path": "$.flow[0].mass[27].mass",
+      "before": "0x3f4e8a6e961b45a2",
+      "after": "0x3f4e8a6e93dba3c6"
+    },
+    {
+      "path": "$.flow[0].mass[28].mass",
+      "before": "0x3f4e8a6e961b45a2",
+      "after": "0x3f4e8a6e93dba3c6"
+    },
+    {
+      "path": "$.flow[0].mass[29].mass",
+      "before": "0x3f9ac0dad1db50b4",
+      "after": "0x3f9ac0dacfe31170"
+    },
+    {
+      "path": "$.flow[0].mass[30].mass",
+      "before": "0x3f4e8a6e961b45a2",
+      "after": "0x3f4e8a6e93dba3c6"
+    },
+    {
+      "path": "$.flow[0].mass[31].mass",
+      "before": "0x3f4e8a6e961b45a2",
+      "after": "0x3f4e8a6e93dba3c6"
+    },
+    {
+      "path": "$.flow[0].mass[32].mass",
+      "before": "0x3f13578480ad02de",
+      "after": "0x3f1357847f4074a1"
+    },
+    {
+      "path": "$.flow[0].mass[33].mass",
+      "before": "0x3f2b8cc7cd2601ba",
+      "after": "0x3f2b8cc7cb1ebedf"
+    },
+    {
+      "path": "$.flow[0].mass[34].mass",
+      "before": "0x3f13578480ad02de",
+      "after": "0x3f1357847f4074a1"
+    },
+    {
+      "path": "$.flow[0].mass[35].mass",
+      "before": "0x3f1b6b38f0f1bc60",
+      "after": "0x3f1b6b38eeecf205"
+    },
+    {
+      "path": "$.flow[0].mass[36].mass",
+      "before": "0x3f4e8a6e961b45a2",
+      "after": "0x3f4e8a6e93dba3c6"
+    },
+    {
+      "path": "$.flow[0].mass[37].mass",
+      "before": "0x3f4e8a6e961b45a2",
+      "after": "0x3f4e8a6e93dba3c6"
+    },
+    {
+      "path": "$.flow[0].mass[38].mass",
+      "before": "0x3f9ac0dad1db50b4",
+      "after": "0x3f9ac0dacfe31170"
+    },
+    {
+      "path": "$.flow[0].mass[39].mass",
+      "before": "0x3f4e8a6e961b45a2",
+      "after": "0x3f4e8a6e93dba3c6"
+    },
+    {
+      "path": "$.flow[0].mass[40].mass",
+      "before": "0x3f4e8a6e961b45a2",
+      "after": "0x3f4e8a6e93dba3c6"
+    },
+    {
+      "path": "$.flow[0].mass[41].mass",
+      "before": "0x3f13578480ad02de",
+      "after": "0x3f1357847f4074a1"
+    },
+    {
+      "path": "$.flow[0].mass[42].mass",
+      "before": "0x3f2b8cc7cd2601ba",
+      "after": "0x3f2b8cc7cb1ebedf"
+    },
+    {
+      "path": "$.flow[0].mass[43].mass",
+      "before": "0x3f13578480ad02de",
+      "after": "0x3f1357847f4074a1"
+    },
+    {
+      "path": "$.flow[0].mass[44].mass",
+      "before": "0x3f1b6b38f0f1bc60",
+      "after": "0x3f1b6b38eeecf205"
+    },
+    {
+      "path": "$.flow[0].mass[45].mass",
+      "before": "0x3f14e0a0595029ea",
+      "after": "0x3f14e0a057c6aa5c"
+    },
+    {
+      "path": "$.flow[0].mass[46].mass",
+      "before": "0x3f14e0a0595029ea",
+      "after": "0x3f14e0a057c6aa5c"
+    },
+    {
+      "path": "$.flow[0].mass[47].mass",
+      "before": "0x3f6249d47dc13879",
+      "after": "0x3f6249d47c68854e"
+    },
+    {
+      "path": "$.flow[0].mass[48].mass",
+      "before": "0x3f14e0a0595029ea",
+      "after": "0x3f14e0a057c6aa5c"
+    },
+    {
+      "path": "$.flow[0].mass[49].mass",
+      "before": "0x3f14e0a0595029ea",
+      "after": "0x3f14e0a057c6aa5c"
+    },
+    {
+      "path": "$.flow[0].mass[50].mass",
+      "before": "0x3edc5253e588e5da",
+      "after": "0x3edc5298af5cc247"
+    },
+    {
+      "path": "$.flow[0].mass[51].mass",
+      "before": "0x3ef2cd97d929a786",
+      "after": "0x3ef2cded2c92a834"
+    },
+    {
+      "path": "$.flow[0].mass[52].mass",
+      "before": "0x3efa104a904b809a",
+      "after": "0x3efa0feab82afe1d"
+    },
+    {
+      "path": "$.flow[0].mass[53].mass",
+      "before": "0x3eeeee76d5ea14e0",
+      "after": "0x3eeeef00da72b78a"
+    },
+    {
+      "path": "$.flow[0].mass[54].mass",
+      "before": "0x3f14888c567420e3",
+      "after": "0x3f14888c54f11d6e"
+    },
+    {
+      "path": "$.flow[0].mass[55].mass",
+      "before": "0x3f14888c567420e3",
+      "after": "0x3f14888c54f11d6e"
+    },
+    {
+      "path": "$.flow[0].mass[56].mass",
+      "before": "0x3f61fcacb29ff910",
+      "after": "0x3f61fcacb14cf41f"
+    },
+    {
+      "path": "$.flow[0].mass[57].mass",
+      "before": "0x3f14888c567420e3",
+      "after": "0x3f14888c54f11d6e"
+    },
+    {
+      "path": "$.flow[0].mass[58].mass",
+      "before": "0x3f14888c567420e3",
+      "after": "0x3f14888c54f11d6e"
+    },
+    {
+      "path": "$.flow[0].mass[59].mass",
+      "before": "0x3ef4a7817abf712a",
+      "after": "0x3ef4a71d8f1506d3"
+    },
+    {
+      "path": "$.flow[0].mass[60].mass",
+      "before": "0x3ef2421b6b4cadf4",
+      "after": "0x3ef241e997d5efbc"
+    },
+    {
+      "path": "$.flow[0].mass[61].mass",
+      "before": "0x3ef00a9873c740fa",
+      "after": "0x3ef00ac4ad901e6b"
+    },
+    {
+      "path": "$.flow[0].mass[62].mass",
+      "before": "0x3ee30993e0f58175",
+      "after": "0x3ee30a6354fe790c"
+    },
+    {
+      "path": "$.flow[0].mass[63].mass",
+      "before": "0x3f13c0a2cc57f48f",
+      "after": "0x3f13c0a2cae3a90d"
+    },
+    {
+      "path": "$.flow[0].mass[64].mass",
+      "before": "0x3f13c0a2cc57f48f",
+      "after": "0x3f13c0a2cae3a90d"
+    },
+    {
+      "path": "$.flow[0].mass[65].mass",
+      "before": "0x3f614d8dc5e77f99",
+      "after": "0x3f614d8dc4a15f56"
+    },
+    {
+      "path": "$.flow[0].mass[66].mass",
+      "before": "0x3f13c0a2cc57f48f",
+      "after": "0x3f13c0a2cae3a90d"
+    },
+    {
+      "path": "$.flow[0].mass[67].mass",
+      "before": "0x3f13c0a2cc57f48f",
+      "after": "0x3f13c0a2cae3a90d"
+    },
+    {
+      "path": "$.flow[0].mass[68].mass",
+      "before": "0x3edfbdda21f82af5",
+      "after": "0x3edfbe83c6cfbb63"
+    },
+    {
+      "path": "$.flow[0].mass[69].mass",
+      "before": "0x3ef512ddad512877",
+      "after": "0x3ef5137ac0c171a2"
+    },
+    {
+      "path": "$.flow[0].mass[70].mass",
+      "before": "0x3ef1af5480418024",
+      "after": "0x3ef1aeddba152c1d"
+    },
+    {
+      "path": "$.flow[0].mass[71].mass",
+      "before": "0x3ef521d68931523b",
+      "after": "0x3ef521f49a8dabf1"
+    },
+    {
+      "path": "$.flow[0].mass[72].mass",
+      "before": "0x3f452da6428f2367",
+      "after": "0x3f452da640fff81d"
+    },
+    {
+      "path": "$.flow[0].mass[73].mass",
+      "before": "0x3f452da6428f2367",
+      "after": "0x3f452da640fff81d"
+    },
+    {
+      "path": "$.flow[0].mass[74].mass",
+      "before": "0x3f928d4d2675bb36",
+      "after": "0x3f928d4d25181059"
+    },
+    {
+      "path": "$.flow[0].mass[75].mass",
+      "before": "0x3f452da6428f2367",
+      "after": "0x3f452da640fff81d"
+    },
+    {
+      "path": "$.flow[0].mass[76].mass",
+      "before": "0x3f452da6428f2367",
+      "after": "0x3f452da640fff81d"
+    },
+    {
+      "path": "$.flow[0].mass[77].mass",
+      "before": "0x3f1138b04345a184",
+      "after": "0x3f11387b83a1a844"
+    },
+    {
+      "path": "$.flow[0].mass[78].mass",
+      "before": "0x3f26ddfa9c5bd599",
+      "after": "0x3f26dde4cb04f854"
+    },
+    {
+      "path": "$.flow[0].mass[79].mass",
+      "before": "0x3f287e6ada530e4b",
+      "after": "0x3f287e480117a314"
+    },
+    {
+      "path": "$.flow[0].mass[80].mass",
+      "before": "0x3f1d11887304a703",
+      "after": "0x3f1d124bb2fbf2c5"
+    },
+    {
+      "path": "$.logLikelihood",
+      "before": "0xc03208cd3d48245d",
+      "after": "0xc03208cd3d354b46"
+    },
+    {
+      "path": "$.posterior[0].mass[0].mass",
+      "before": "0x3f9f0b5c762b5130",
+      "after": "0x3f9f0b5c73e23145"
+    },
+    {
+      "path": "$.posterior[0].mass[1].mass",
+      "before": "0x3f9f0b5c762b5130",
+      "after": "0x3f9f0b5c73e23145"
+    },
+    {
+      "path": "$.posterior[0].mass[2].mass",
+      "before": "0x3feb31cb945ec0c4",
+      "after": "0x3feb31cb925e30cc"
+    },
+    {
+      "path": "$.posterior[0].mass[3].mass",
+      "before": "0x3f9f0b5c762b5130",
+      "after": "0x3f9f0b5c73e23145"
+    },
+    {
+      "path": "$.posterior[0].mass[4].mass",
+      "before": "0x3f9f0b5c762b5130",
+      "after": "0x3f9f0b5c73e23145"
+    },
+    {
+      "path": "$.posterior[0].mass[5].mass",
+      "before": "0x3f656cbbee86d699",
+      "after": "0x3f656cbc845cf715"
+    },
+    {
+      "path": "$.posterior[0].mass[6].mass",
+      "before": "0x3f650eb03c031966",
+      "after": "0x3f650eb036e90c75"
+    },
+    {
+      "path": "$.posterior[0].mass[7].mass",
+      "before": "0x3f644d491df10242",
+      "after": "0x3f644d49fa0c04f8"
+    },
+    {
+      "path": "$.posterior[0].mass[8].mass",
+      "before": "0x3f95c004f26b47ba",
+      "after": "0x3f95c0050e06e63d"
+    },
+    {
+      "path": "$.posterior[1].mass[0].mass",
+      "before": "0x3f9f78bfa62f4ebd",
+      "after": "0x3f9f78bfa3de2115"
+    },
+    {
+      "path": "$.posterior[1].mass[1].mass",
+      "before": "0x3f9f78bfa62f4ebd",
+      "after": "0x3f9f78bfa3de2115"
+    },
+    {
+      "path": "$.posterior[1].mass[2].mass",
+      "before": "0x3feb919e0b2aa5ac",
+      "after": "0x3feb919e092307a6"
+    },
+    {
+      "path": "$.posterior[1].mass[3].mass",
+      "before": "0x3f9f78bfa62f4ebd",
+      "after": "0x3f9f78bfa3de2115"
+    },
+    {
+      "path": "$.posterior[1].mass[4].mass",
+      "before": "0x3f9f78bfa62f4ebd",
+      "after": "0x3f9f78bfa3de2115"
+    },
+    {
+      "path": "$.posterior[1].mass[5].mass",
+      "before": "0x3f642d85d792c2f1",
+      "after": "0x3f642d83df88b991"
+    },
+    {
+      "path": "$.posterior[1].mass[6].mass",
+      "before": "0x3f7c84d28bf0ff46",
+      "after": "0x3f7c84d29bf1e49c"
+    },
+    {
+      "path": "$.posterior[1].mass[7].mass",
+      "before": "0x3f655be4582d2fe4",
+      "after": "0x3f655be0d46386ca"
+    },
+    {
+      "path": "$.posterior[1].mass[8].mass",
+      "before": "0x3f6cb6f0c7ce8158",
+      "after": "0x3f6cb6f8756438ea"
+    },
+    {
+      "path": "$.viewFingerprint",
+      "before": "322aff222888462c162d3f6c457e1b6624ebd954da144f93aeb00758989ae932",
+      "after": "43e5a19065f2aeea5118707e87570e14940b9b6b3dccb3235bfd349d08ae7055"
+    }
+  ],
+  "qualification": "Observed full output differences for a real text-length perturbation; not an accuracy or sensitivity benchmark."
+}

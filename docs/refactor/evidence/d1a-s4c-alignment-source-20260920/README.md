@@ -51,9 +51,10 @@ inferred-artifact court, separately from construction refusal.
 To reproduce, create a clean standalone clone at the exact source/test candidate and
 an exact grakern checkout at `0329c43c88a0b71e9aa4456723bb16bac2fa3841`. Set
 `D1A_S4C_REPO`, `D1A_S4C_GRAKERN`, and a fresh `D1A_S4C_OUTPUT`; run
-`python3 qualify.py mutations` and `python3 hsmm-parity.py`. The release command is
-`python3 qualify.py release`; final release and consumer revisions will be recorded
-when those gates finish. Existing output logs are never overwritten.
+`python3 qualify.py mutations` and `python3 hsmm-parity.py` at `369965b2`.
+After confirming the evidence-only difference in provider-binding.json, advance the clone
+to `7a35bff7` and run `python3 qualify.py release`. The consumer runner asserts exact
+consumer `d95b9ea` and provider `7a35bff7` plus both immutable sibling pins. Existing output logs are never overwritten.
 
 The [terminal HSMM comparison](hsmm-parity.json) passed on all three backends at
 `369965b2`: JVM/JS `ce61e761…2cf1a`, Native `ccb0b98f…af012`, each 26,284 bytes,
@@ -62,8 +63,18 @@ each JS/Native). The [capture archive](hsmm-parity-evidence.tar.gz) and its
 [member manifest](hsmm-parity-evidence-manifest.json) preserve actual bytes, raw logs,
 fresh XML and command/runtime receipts. Each byte-comparator mutation was rejected.
 
-Pending: clean
-full provider gate, formatting, 13 documentation examples, exact pinned storyatlas4s
-consumer gate, local landing, and ticket closure. D1B still owns point-capable support,
+The [clean full provider gate](full-gate.json) at `7a35bff7` passes all 56 tasks:
+7,001 total / 6,996 passed / five existing skips / zero failures or errors.
+[Formatting](format-last.json) and [all 13 documentation examples](docs-examples.json)
+pass separately. The [provider archive](provider-evidence.tar.gz) and its
+[manifest](provider-evidence-manifest.json) retain command logs and all 609 fresh JUnit
+reports. [Source binding](provider-binding.json) shows only evidence changes after the
+mutation/parity candidate and verifies frozen S0. The unchanged NFRD test import warning
+is also present in S4b; no warning-clean claim is made.
+
+The [scoring perturbation comparison](score-perturbation-differences.json) observes 101
+changed leaves, including posterior/flow masses and likelihood as well as fingerprint.
+
+Pending: exact pinned storyatlas4s consumer gate, local landing, and ticket closure. D1B still owns point-capable support,
 all 17 participant parity, and the typed recall path. This slice makes no film compiler,
 caption licensing, empirical accuracy, remote publication, or executed CI claim.
