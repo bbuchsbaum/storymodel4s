@@ -79,6 +79,7 @@ object D1bSherlockSupportCapture:
         "ref" -> ref.key.asJson,
         "unit" -> unit.id.value.asJson,
         "physicalIdentity" -> support.identity.hex.asJson,
+        "supportBundleIdentity" -> unit.support.bundleIdentity.hex.asJson,
         "physicalSupport" -> support.asJson,
         "primaryIntervals" -> projection.intervals
           .map(i => Vector(i.start.toString, i.endExclusive.toString))
@@ -104,6 +105,7 @@ object D1bSherlockSupportCapture:
             "part" -> part.partId.asJson,
             "ordinal" -> part.presentationOrdinal.asJson,
             "axis" -> source.primaryAxis.id.value.asJson,
+            "stream" -> source.streams.head.id.value.asJson,
             "ticksPerSecond" -> part.ticksPerSecond.toString.asJson,
             "durationTicks" -> part.durationTicks.toString.asJson
           )
@@ -113,6 +115,7 @@ object D1bSherlockSupportCapture:
       "annotationSha256" -> Checksum.ofBytes(annotation).hex.asJson,
       "repairRecordSha256" -> record.checksum.hex.asJson,
       "bundleIdentity" -> bundle.identity.hex.asJson,
+      "bundleId" -> bundle.id.value.asJson,
       "viewFingerprint" -> built.view.contentFingerprint.checksum.hex.asJson,
       "scoringLength" -> built.view.scoringLength.asJson,
       "primaryAxis" -> primary.id.value.asJson,
