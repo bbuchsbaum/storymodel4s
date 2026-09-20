@@ -364,10 +364,24 @@ stays text-only. V1 versions any film artifact when it first writes one.
 
 ### 2.8 `AlignmentSource`
 
-`AlignmentSource` becomes sealed. The general source is built from any `StoryModel[Validated]` and
-exposes `evidenceOf` and `primaryOf`. The text source is built from a `TextModel[Validated]` and
-keeps `sourceSupport`, which `StorySourceView` consumes. Three align call sites change
-mechanically. Scoring does not change.
+`AlignmentSource` becomes sealed. Its validated/adjudicated factories accept the corresponding
+general StoryModel and expose `evidenceOf: Option[TypedSupport]` and
+`primaryOf: Option[PrimaryProjection]` for a NarrativeNodeId. Missing nodes stay None;
+existing nodes return their exact stored support and admitted model projection.
+
+The same named factories overload on TextModel and return sealed `TextAlignmentSource`,
+which carries its own `StoryText` and retains `sourceSupport: Option[SpanSet]`. Implementations
+are private inside the companion; no wildcard-status constructor is exposed. `StorySourceView`
+consumes only TextAlignmentSource and derives canonical text from it. Its former independent
+source/model pair is removed, so unrelated text cannot be paired with another source's nodes.
+The validated/adjudicated conveniences build this checked source internally. The three text
+support reads and relation/scoring computations remain mechanical.
+
+Courts distinguish general/text and validated/adjudicated inputs, refuse Draft factories and
+external subclass/implementation construction, and preserve exact spans/references and gapped
+playback support. Each new compile door has a clean-recompiled mutant. The frozen S0 and
+existing JVM HSMM resource/checksum court remain unchanged; an executable exact-byte comparison
+uses the separate JVM/JS/Native pre-migration artifacts and records their runtime distinction.
 
 ## 3. The slices
 

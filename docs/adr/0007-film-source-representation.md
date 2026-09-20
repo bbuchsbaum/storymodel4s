@@ -985,3 +985,32 @@ The hypothesis-subject rule remains shared, but a lawful film model currently ca
 a `SurfaceExplicit` subject: ClaimMeta requires bare text spans and the film join refuses
 them. Its text court remains executable; the film court proves that construction refusal.
 This limitation is not film-side execution of the rule and does not settle caption licensing.
+
+
+#### S4c alignment-source capability refinement — 20 September 2026
+
+`AlignmentSource` is sealed. Its existing validated and adjudicated factories retain their
+status requirements and expose exact `evidenceOf(node): Option[TypedSupport]` and
+`primaryOf(node): Option[PrimaryProjection]`. Existing nodes use the model's admitted support
+and projection cache; a missing node returns None. This neither drops native evidence nor
+maps additional anchors into primary coordinates.
+
+Overloads on the corresponding TextModel return sealed `TextAlignmentSource`. It owns the
+same model's StoryText and keeps `sourceSupport(node): Option[SpanSet]` for text consumers.
+Both implementation classes are private within the companion; exposing a wildcard-status
+implementation constructor would bypass the status boundary and is rejected.
+
+`StorySourceView.apply` accepts only TextAlignmentSource, without an independent model
+argument. Its text is derived from that source's own StoryText. The previous pair could
+combine one model's supports and relations with another model's canonical text. A runtime
+identity check on that redundant pair is rejected in favor of removing the pairing door.
+Validated/adjudicated conveniences preserve their existing model inputs and build the
+corresponding text source internally. Shared relation calculations, numerical feature
+inputs and scoring are unchanged.
+
+The prior description of the HSMM checksum as unused was overbroad: the separate JVM
+resource suite already asserts it and runs in the full gate. The portable two-test suite
+only checks canonical encoding and contextual round trips. Retain both, and compare the
+candidate's exact output with each frozen pre-migration backend artifact on the recorded
+runtime. Existing Native differences remain labelled; no universal cross-OS checksum or
+new tolerance is adopted. Point support still belongs to the subsequent D1B slice.

@@ -87,10 +87,12 @@ Use its operative 19 September amendment. Determine the actual current version a
 capabilities; do not downgrade the wire or imply unsupported interval serialization works.
 Record any necessary vocabulary/version decision in the governing ADR before implementation.
 
-The named WOG HSMM “golden” currently has an unused checksum constant; its running suite
-checks encoding and contextual round trips. Do not claim that as a byte pin. At the S4c
-review, make the intended preservation witness executable against the pre-migration
-behavior, using platform-labelled before/after evidence where needed. Preserve the
+The portable WOG HSMM two-test suite checks encoding and contextual round trips without
+asserting the checksum. The separate JVM resource suite does assert the committed bytes
+and fixed checksum, and the prior full gates execute it. S4c corrects the earlier blanket
+“unused checksum” description while retaining that existing JVM court. Make preservation
+executable on all three backends against the frozen pre-migration artifacts, using
+platform-labelled before/after evidence. Preserve the
 independent Native numerical-policy issue `bd-01M1D215EY4T5BR0VRJ694AMBQ`; do not silently
 claim one cross-platform HSMM byte identity or choose a new tolerance. The existing
 `codec/StoryModelCodecSuite` does provide a literal cross-platform model-encoding checksum.
