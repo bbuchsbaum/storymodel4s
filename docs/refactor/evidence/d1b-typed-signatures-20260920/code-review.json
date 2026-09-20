@@ -20,7 +20,7 @@
       "result": "No remaining P1/P2; execution still separate at review time."
     },
     {
-      "reviewer": "/root/cold_plan_review",
+      "reviewer": "/root (relayed separate fresh-context review)",
       "revision": "fa041f32",
       "scope": "Real-coordinate capture/verifier",
       "resolved": [
@@ -36,7 +36,7 @@
       "result": "Raw sbt exit0/9pass1skip and wrapper exit1 independently bound to log/XML/tool transcript; no rerun or expectation change."
     },
     {
-      "reviewer": "/root/cold_plan_review",
+      "reviewer": "/root (relayed separate fresh-context review)",
       "revision": "4fbb8c7e",
       "scope": "All17 replay fresh-verifier prerequisite",
       "resolved": [
@@ -51,7 +51,7 @@
       "result": "135 assertions passed;17runs, exact2577-row digest, clock/input/output bindings, endpoint mutant, six content-free archive members; no findings."
     },
     {
-      "reviewer": "/root/cold_plan_review",
+      "reviewer": "/root (relayed separate fresh-context review)",
       "revision": "b9c2acf9",
       "scope": "Provider release runner",
       "resolved": [
@@ -62,7 +62,7 @@
       "result": "No remaining P1/P2; full execution separate."
     },
     {
-      "reviewer": "/root/cold_plan_review",
+      "reviewer": "/root (relayed separate fresh-context review)",
       "revision": "41c3eb22",
       "scope": "Consumer runner",
       "result": "No remaining findings; full execution separate."
