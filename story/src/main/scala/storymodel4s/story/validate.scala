@@ -186,7 +186,7 @@ object StoryValidator:
     }
     allClaims.foreach(c => c.evidence.toVector.foreach(e => anchorsInBundle(s"claims/${c.id.value}", e)))
     (h.boundaryBeliefs ++ m.trajectory.steps.flatMap(_.boundaryBeliefs)).zipWithIndex.foreach { (belief, i) =>
-      belief.evidence.foreach(e => anchorsInBundle(s"boundaryBeliefs/$i", e))
+      belief.evidence.toVector.foreach(e => anchorsInBundle(s"boundaryBeliefs/$i", e))
     }
     // resolved values: no duplicate or self alternative
     def alternativesLaw[A](path: String, r: Resolved[A]): Unit =

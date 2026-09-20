@@ -238,7 +238,7 @@ object StoryModel:
     val allClaims = graph.allMeta ++ hierarchy.allMeta ++ trajectory.allMeta ++
       descriptors.map(_.meta) ++ hypotheses.map(_.meta)
     val boundaries = hierarchy.boundaryBeliefs ++ trajectory.steps.flatMap(_.boundaryBeliefs)
-    val evidence = allClaims.flatMap(_.evidence.toVector) ++ boundaries.flatMap(_.evidence)
+    val evidence = allClaims.flatMap(_.evidence.toVector) ++ boundaries.flatMap(_.evidence.toVector)
     val (storyId, checksum) = identityOf(atlas)
     def invalid(path: String, reason: String): Left[DomainError, Nothing] =
       Left(DomainError.InvariantViolation(path, reason))
