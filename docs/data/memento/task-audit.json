@@ -1,0 +1,344 @@
+{
+  "byCondition": {
+    "1": {
+      "code1MissingScene": 85,
+      "code2MissingScene": 1139,
+      "codeCounts": {
+        "1": 1877,
+        "2": 1448,
+        "3": 174,
+        "4": 427,
+        "5": 276,
+        "missing-or-invalid": 4743
+      },
+      "eligibleCode1": 1775,
+      "eligibleCode2": 307,
+      "evaluableParticipants": 27,
+      "goldUnits": 2082,
+      "missingOrInvalidClocks": 1203,
+      "participants": 27,
+      "reasonCounts": {
+        "invalid-recall-code": 2,
+        "missing-recall-code": 4741,
+        "missing-scene-gold": 6789,
+        "missing-transcript": 3441,
+        "not-accurate-recall": 877
+      },
+      "units": 8945,
+      "withoutOverlays": {
+        "code1MissingScene": 85,
+        "code2MissingScene": 1139,
+        "codeCounts": {
+          "1": 1877,
+          "2": 1448,
+          "3": 174,
+          "4": 427,
+          "5": 276,
+          "missing-or-invalid": 4743
+        },
+        "eligibleCode1": 1756,
+        "eligibleCode2": 265,
+        "evaluableParticipants": 26,
+        "goldUnits": 2021,
+        "missingOrInvalidClocks": 1320,
+        "reasonCounts": {
+          "invalid-recall-code": 2,
+          "missing-recall-code": 4741,
+          "missing-scene-gold": 6789,
+          "missing-transcript": 3542,
+          "not-accurate-recall": 877
+        },
+        "units": 8945
+      }
+    },
+    "2": {
+      "code1MissingScene": 15,
+      "code2MissingScene": 881,
+      "codeCounts": {
+        "1": 4431,
+        "2": 1109,
+        "3": 153,
+        "4": 472,
+        "5": 326,
+        "missing-or-invalid": 3374
+      },
+      "eligibleCode1": 4402,
+      "eligibleCode2": 224,
+      "evaluableParticipants": 33,
+      "goldUnits": 4626,
+      "missingOrInvalidClocks": 277,
+      "participants": 33,
+      "reasonCounts": {
+        "invalid-recall-code": 4,
+        "missing-recall-code": 3370,
+        "missing-scene-gold": 5199,
+        "missing-transcript": 3267,
+        "not-accurate-recall": 951
+      },
+      "units": 9865,
+      "withoutOverlays": {
+        "code1MissingScene": 15,
+        "code2MissingScene": 838,
+        "codeCounts": {
+          "1": 4195,
+          "2": 1066,
+          "3": 149,
+          "4": 453,
+          "5": 280,
+          "missing-or-invalid": 3722
+        },
+        "eligibleCode1": 3952,
+        "eligibleCode2": 224,
+        "evaluableParticipants": 31,
+        "goldUnits": 4176,
+        "missingOrInvalidClocks": 277,
+        "reasonCounts": {
+          "invalid-recall-code": 4,
+          "missing-recall-code": 3718,
+          "missing-scene-gold": 5199,
+          "missing-transcript": 3612,
+          "not-accurate-recall": 882
+        },
+        "units": 9865
+      }
+    },
+    "3": {
+      "code1MissingScene": 15,
+      "code2MissingScene": 919,
+      "codeCounts": {
+        "1": 3621,
+        "2": 1683,
+        "3": 202,
+        "4": 503,
+        "5": 299,
+        "missing-or-invalid": 4057
+      },
+      "eligibleCode1": 3577,
+      "eligibleCode2": 751,
+      "evaluableParticipants": 30,
+      "goldUnits": 4328,
+      "missingOrInvalidClocks": 1962,
+      "participants": 30,
+      "reasonCounts": {
+        "invalid-recall-code": 4,
+        "invalid-scene-gold": 2,
+        "missing-recall-code": 4053,
+        "missing-scene-gold": 5915,
+        "missing-transcript": 2885,
+        "not-accurate-recall": 1004
+      },
+      "units": 10365,
+      "withoutOverlays": {
+        "code1MissingScene": 15,
+        "code2MissingScene": 919,
+        "codeCounts": {
+          "1": 3621,
+          "2": 1683,
+          "3": 202,
+          "4": 503,
+          "5": 299,
+          "missing-or-invalid": 4057
+        },
+        "eligibleCode1": 3577,
+        "eligibleCode2": 751,
+        "evaluableParticipants": 30,
+        "goldUnits": 4328,
+        "missingOrInvalidClocks": 1962,
+        "reasonCounts": {
+          "invalid-recall-code": 4,
+          "invalid-scene-gold": 2,
+          "missing-recall-code": 4053,
+          "missing-scene-gold": 5915,
+          "missing-transcript": 2885,
+          "not-accurate-recall": 1004
+        },
+        "units": 10365
+      }
+    },
+    "4": {
+      "code1MissingScene": 2,
+      "code2MissingScene": 353,
+      "codeCounts": {
+        "1": 1904,
+        "2": 559,
+        "3": 32,
+        "4": 13,
+        "5": 16,
+        "missing-or-invalid": 5774
+      },
+      "eligibleCode1": 1886,
+      "eligibleCode2": 203,
+      "evaluableParticipants": 33,
+      "goldUnits": 2089,
+      "missingOrInvalidClocks": 542,
+      "participants": 33,
+      "reasonCounts": {
+        "missing-recall-code": 5774,
+        "missing-scene-gold": 6190,
+        "missing-transcript": 5667,
+        "not-accurate-recall": 61
+      },
+      "units": 8298,
+      "withoutOverlays": {
+        "code1MissingScene": 2,
+        "code2MissingScene": 353,
+        "codeCounts": {
+          "1": 1904,
+          "2": 559,
+          "3": 32,
+          "4": 13,
+          "5": 16,
+          "missing-or-invalid": 5774
+        },
+        "eligibleCode1": 1406,
+        "eligibleCode2": 195,
+        "evaluableParticipants": 31,
+        "goldUnits": 1601,
+        "missingOrInvalidClocks": 542,
+        "reasonCounts": {
+          "missing-recall-code": 5774,
+          "missing-scene-gold": 6190,
+          "missing-transcript": 6181,
+          "not-accurate-recall": 61
+        },
+        "units": 8298
+      }
+    }
+  },
+  "invalidCodeCells": [
+    {
+      "excelRow": 26,
+      "participant": "S80",
+      "reason": "invalid-recall-code",
+      "unitId": "573d8ed1984d817408fa80b170043449c3c475b458a968329e66115099343ff6"
+    },
+    {
+      "excelRow": 53,
+      "participant": "S93",
+      "reason": "invalid-recall-code",
+      "unitId": "0bcbe27f37bdc1f5d5a2a2a7799f6b950437ad07af202881276d269dc295af51"
+    },
+    {
+      "excelRow": 209,
+      "participant": "S50",
+      "reason": "invalid-recall-code",
+      "unitId": "e0e2c5d0db15c7ba3556d7229ca897581a6f3de3fc007da482d5bc130b1cec80"
+    },
+    {
+      "excelRow": 484,
+      "participant": "S71",
+      "reason": "invalid-recall-code",
+      "unitId": "969157c1048212be7c85f7bf7c019640a01584a8fe7791debe8b13bcbab1a748"
+    },
+    {
+      "excelRow": 578,
+      "participant": "S71",
+      "reason": "invalid-recall-code",
+      "unitId": "ceef1baaf14828c02fd5b72722e66ccbb3d7bbc290dbde7f0c2ea66f1dcf46ad"
+    },
+    {
+      "excelRow": 65,
+      "participant": "S86",
+      "reason": "invalid-recall-code",
+      "unitId": "275da4501008f4010e7a58769048f2a6f7f95a375c5759b17c7862b10aaf5bf5"
+    },
+    {
+      "excelRow": 68,
+      "participant": "S109",
+      "reason": "invalid-recall-code",
+      "unitId": "4177b559c2f0b0342b3f15a7359a0fa81ddbe5f6c3588470ed50e8f002e670bf"
+    },
+    {
+      "excelRow": 69,
+      "participant": "S109",
+      "reason": "invalid-recall-code",
+      "unitId": "8eb07df40c4adc90cb1474860989804a0d1bfadb388f63396e57cb0c0687abe0"
+    },
+    {
+      "excelRow": 8,
+      "participant": "S128",
+      "reason": "invalid-recall-code",
+      "unitId": "58379d556fb92f731009549283aa08170caa2ea354f0c510629336d9a50d3a8e"
+    },
+    {
+      "excelRow": 9,
+      "participant": "S128",
+      "reason": "invalid-recall-code",
+      "unitId": "6c8736b9bd5f298c577b16f28654e3a0ea9e2a639f193060bb00d8cb27fca5fd"
+    }
+  ],
+  "invalidSceneRows": [
+    {
+      "excelRow": 68,
+      "participant": "S109",
+      "reason": "invalid-scene-gold",
+      "unitId": "4177b559c2f0b0342b3f15a7359a0fa81ddbe5f6c3588470ed50e8f002e670bf"
+    },
+    {
+      "excelRow": 69,
+      "participant": "S109",
+      "reason": "invalid-scene-gold",
+      "unitId": "8eb07df40c4adc90cb1474860989804a0d1bfadb388f63396e57cb0c0687abe0"
+    }
+  ],
+  "overlayEffects": [
+    {
+      "condition": "1",
+      "eligibleWithOverlay": 61,
+      "eligibleWithoutOverlay": 0,
+      "evaluableWithOverlay": 1,
+      "evaluableWithoutOverlay": 0,
+      "participant": "S53",
+      "unitsWithOverlay": 121,
+      "unitsWithoutOverlay": 121
+    },
+    {
+      "condition": "2",
+      "eligibleWithOverlay": 236,
+      "eligibleWithoutOverlay": 0,
+      "evaluableWithOverlay": 1,
+      "evaluableWithoutOverlay": 0,
+      "participant": "S42",
+      "unitsWithOverlay": 440,
+      "unitsWithoutOverlay": 440
+    },
+    {
+      "condition": "2",
+      "eligibleWithOverlay": 214,
+      "eligibleWithoutOverlay": 0,
+      "evaluableWithOverlay": 1,
+      "evaluableWithoutOverlay": 0,
+      "participant": "S72",
+      "unitsWithOverlay": 395,
+      "unitsWithoutOverlay": 395
+    },
+    {
+      "condition": "4",
+      "eligibleWithOverlay": 295,
+      "eligibleWithoutOverlay": 0,
+      "evaluableWithOverlay": 1,
+      "evaluableWithoutOverlay": 0,
+      "participant": "S162",
+      "unitsWithOverlay": 328,
+      "unitsWithoutOverlay": 328
+    },
+    {
+      "condition": "4",
+      "eligibleWithOverlay": 193,
+      "eligibleWithoutOverlay": 0,
+      "evaluableWithOverlay": 1,
+      "evaluableWithoutOverlay": 0,
+      "participant": "S175",
+      "unitsWithOverlay": 233,
+      "unitsWithoutOverlay": 233
+    }
+  ],
+  "populationSha256": "0a947d304c2016e2cb4e7b3369ce996ac5f245107a78add2b0b3ea42c3d2f6a2",
+  "schema": "storymodel4s.memento.task-audit/v1",
+  "sourceManifestSha256": "ab94b85821005d393aea6f6c8f59ea0af23c8ba3d0d790336a96f3c92542e1f2",
+  "taskDefinitionSha256": "d1c12c09979bcff9fdcbf939139d29ae8b76c31b194db8824fe5e487f9ab6deb",
+  "taskImplementationSha256": "320f0ff027f4090dd839fa6a2f5b062dccbf2454785e559eba72aa73a36d035e",
+  "workbookSha256": "5ab22bfe404422aa423b8b42db8f389a4c351ee7c63154470ea5a0bb698ea8b2",
+  "xlsxReaderSha256": "3a64908d946d98f964a3e8cec7e1aaebeaec0b34a83d3b5c54b21618454a29b8",
+  "zeroEligibleParticipants": []
+}

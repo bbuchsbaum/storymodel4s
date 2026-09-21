@@ -1,0 +1,600 @@
+{
+  "accounting": {
+    "bySideAndCondition": {
+      "development": {
+        "1": {
+          "code1MissingScene": 6,
+          "code2MissingScene": 314,
+          "codeCounts": {
+            "1": 797,
+            "2": 452,
+            "3": 58,
+            "4": 177,
+            "5": 68,
+            "missing-or-invalid": 1946
+          },
+          "eligibleCode1": 780,
+          "eligibleCode2": 138,
+          "evaluableParticipants": 13,
+          "goldUnits": 918,
+          "missingOrInvalidClocks": 435,
+          "participants": 13,
+          "reasonCounts": {
+            "invalid-recall-code": 1,
+            "missing-recall-code": 1945,
+            "missing-scene-gold": 2559,
+            "missing-transcript": 1471,
+            "not-accurate-recall": 303
+          },
+          "units": 3498
+        },
+        "2": {
+          "code1MissingScene": 14,
+          "code2MissingScene": 390,
+          "codeCounts": {
+            "1": 2088,
+            "2": 534,
+            "3": 109,
+            "4": 199,
+            "5": 92,
+            "missing-or-invalid": 1799
+          },
+          "eligibleCode1": 2070,
+          "eligibleCode2": 144,
+          "evaluableParticipants": 16,
+          "goldUnits": 2214,
+          "missingOrInvalidClocks": 174,
+          "participants": 16,
+          "reasonCounts": {
+            "invalid-recall-code": 3,
+            "missing-recall-code": 1796,
+            "missing-scene-gold": 2587,
+            "missing-transcript": 1716,
+            "not-accurate-recall": 400
+          },
+          "units": 4821
+        },
+        "3": {
+          "code1MissingScene": 1,
+          "code2MissingScene": 310,
+          "codeCounts": {
+            "1": 2169,
+            "2": 682,
+            "3": 27,
+            "4": 150,
+            "5": 58,
+            "missing-or-invalid": 2172
+          },
+          "eligibleCode1": 2140,
+          "eligibleCode2": 359,
+          "evaluableParticipants": 15,
+          "goldUnits": 2499,
+          "missingOrInvalidClocks": 782,
+          "participants": 15,
+          "reasonCounts": {
+            "invalid-recall-code": 4,
+            "invalid-scene-gold": 2,
+            "missing-recall-code": 2168,
+            "missing-scene-gold": 2700,
+            "missing-transcript": 2115,
+            "not-accurate-recall": 235
+          },
+          "units": 5258
+        },
+        "4": {
+          "code1MissingScene": 0,
+          "code2MissingScene": 152,
+          "codeCounts": {
+            "1": 1231,
+            "2": 318,
+            "3": 12,
+            "4": 8,
+            "5": 8,
+            "missing-or-invalid": 2299
+          },
+          "eligibleCode1": 1223,
+          "eligibleCode2": 163,
+          "evaluableParticipants": 16,
+          "goldUnits": 1386,
+          "missingOrInvalidClocks": 1,
+          "participants": 16,
+          "reasonCounts": {
+            "missing-recall-code": 2299,
+            "missing-scene-gold": 2479,
+            "missing-transcript": 2246,
+            "not-accurate-recall": 28
+          },
+          "units": 3876
+        }
+      },
+      "test": {
+        "1": {
+          "code1MissingScene": 79,
+          "code2MissingScene": 825,
+          "codeCounts": {
+            "1": 1080,
+            "2": 996,
+            "3": 116,
+            "4": 250,
+            "5": 208,
+            "missing-or-invalid": 2797
+          },
+          "eligibleCode1": 995,
+          "eligibleCode2": 169,
+          "evaluableParticipants": 14,
+          "goldUnits": 1164,
+          "missingOrInvalidClocks": 768,
+          "participants": 14,
+          "reasonCounts": {
+            "invalid-recall-code": 1,
+            "missing-recall-code": 2796,
+            "missing-scene-gold": 4230,
+            "missing-transcript": 1970,
+            "not-accurate-recall": 574
+          },
+          "units": 5447
+        },
+        "2": {
+          "code1MissingScene": 1,
+          "code2MissingScene": 491,
+          "codeCounts": {
+            "1": 2343,
+            "2": 575,
+            "3": 44,
+            "4": 273,
+            "5": 234,
+            "missing-or-invalid": 1575
+          },
+          "eligibleCode1": 2332,
+          "eligibleCode2": 80,
+          "evaluableParticipants": 17,
+          "goldUnits": 2412,
+          "missingOrInvalidClocks": 103,
+          "participants": 17,
+          "reasonCounts": {
+            "invalid-recall-code": 1,
+            "missing-recall-code": 1574,
+            "missing-scene-gold": 2612,
+            "missing-transcript": 1551,
+            "not-accurate-recall": 551
+          },
+          "units": 5044
+        },
+        "3": {
+          "code1MissingScene": 14,
+          "code2MissingScene": 609,
+          "codeCounts": {
+            "1": 1452,
+            "2": 1001,
+            "3": 175,
+            "4": 353,
+            "5": 241,
+            "missing-or-invalid": 1885
+          },
+          "eligibleCode1": 1437,
+          "eligibleCode2": 392,
+          "evaluableParticipants": 15,
+          "goldUnits": 1829,
+          "missingOrInvalidClocks": 1180,
+          "participants": 15,
+          "reasonCounts": {
+            "missing-recall-code": 1885,
+            "missing-scene-gold": 3215,
+            "missing-transcript": 770,
+            "not-accurate-recall": 769
+          },
+          "units": 5107
+        },
+        "4": {
+          "code1MissingScene": 2,
+          "code2MissingScene": 201,
+          "codeCounts": {
+            "1": 673,
+            "2": 241,
+            "3": 20,
+            "4": 5,
+            "5": 8,
+            "missing-or-invalid": 3475
+          },
+          "eligibleCode1": 663,
+          "eligibleCode2": 40,
+          "evaluableParticipants": 17,
+          "goldUnits": 703,
+          "missingOrInvalidClocks": 541,
+          "participants": 17,
+          "reasonCounts": {
+            "missing-recall-code": 3475,
+            "missing-scene-gold": 3711,
+            "missing-transcript": 3421,
+            "not-accurate-recall": 33
+          },
+          "units": 4422
+        }
+      }
+    },
+    "totals": {
+      "development": {
+        "goldUnits": 7017,
+        "participants": 60
+      },
+      "test": {
+        "goldUnits": 6108,
+        "participants": 63
+      }
+    },
+    "workbookSha256": "5ab22bfe404422aa423b8b42db8f389a4c351ee7c63154470ea5a0bb698ea8b2"
+  },
+  "auditSha256": "20059c08517e7bc2f464bdd44fb6d6e9c98578244fe8d4450d5cb54baddcd084",
+  "corpus": "memento",
+  "development": {
+    "participants": [
+      "S1",
+      "S17",
+      "S21",
+      "S24",
+      "S25",
+      "S32",
+      "S33",
+      "S40",
+      "S43",
+      "S44",
+      "S45",
+      "S46",
+      "S48",
+      "S51",
+      "S54",
+      "S63",
+      "S71",
+      "S72",
+      "S75",
+      "S80",
+      "S81",
+      "S86",
+      "S90",
+      "S95",
+      "S98",
+      "S100",
+      "S106",
+      "S109",
+      "S113",
+      "S117",
+      "S118",
+      "S119",
+      "S120",
+      "S126",
+      "S127",
+      "S128",
+      "S129",
+      "S130",
+      "S134",
+      "S138",
+      "S139",
+      "S152",
+      "S153",
+      "S154",
+      "S156",
+      "S158",
+      "S162",
+      "S163",
+      "S167",
+      "S171",
+      "S172",
+      "S175",
+      "S180",
+      "S181",
+      "S185",
+      "S188",
+      "S192",
+      "S195",
+      "S198",
+      "S206"
+    ]
+  },
+  "draw": "Within each condition, ascending SHA-256 of UTF-8 fields memento-split/v1, decimal seed, condition, participant, separated by LF (U+000A, byte 0A), with no trailing separator; first n test, remainder development; output IDs sorted by numeric suffix.",
+  "exposure": {
+    "beforeSeal": "Source structure, code distributions, population, anomalies, header-overlay effects and condition-level gold availability were inspected; no model outputs were used to define the task or draw membership.",
+    "modelOutputSurvey": "No Memento model output was found in the local named-path survey recorded with this admission; this is not a proof against arbitrarily renamed outputs.",
+    "status": "model-untouched, not unseen",
+    "zeroEligibleParticipants": []
+  },
+  "guard": {
+    "finalOpening": "Explicit committed release manifest and digest; every authorization is recorded, not a one-use capability.",
+    "ledger": "docs/data/memento/test-split-reads.json",
+    "module": "tools/recall-study/memento_guard.py",
+    "shared": "tools/recall-study/sealed_split.py"
+  },
+  "pool": {
+    "participants": [
+      "S1",
+      "S2",
+      "S9",
+      "S12",
+      "S17",
+      "S18",
+      "S19",
+      "S20",
+      "S21",
+      "S23",
+      "S24",
+      "S25",
+      "S29",
+      "S32",
+      "S33",
+      "S35",
+      "S40",
+      "S42",
+      "S43",
+      "S44",
+      "S45",
+      "S46",
+      "S48",
+      "S50",
+      "S51",
+      "S52",
+      "S53",
+      "S54",
+      "S60",
+      "S62",
+      "S63",
+      "S64",
+      "S65",
+      "S66",
+      "S67",
+      "S70",
+      "S71",
+      "S72",
+      "S73",
+      "S74",
+      "S75",
+      "S78",
+      "S80",
+      "S81",
+      "S84",
+      "S85",
+      "S86",
+      "S89",
+      "S90",
+      "S93",
+      "S95",
+      "S98",
+      "S100",
+      "S101",
+      "S103",
+      "S105",
+      "S106",
+      "S109",
+      "S111",
+      "S112",
+      "S113",
+      "S114",
+      "S115",
+      "S117",
+      "S118",
+      "S119",
+      "S120",
+      "S121",
+      "S124",
+      "S126",
+      "S127",
+      "S128",
+      "S129",
+      "S130",
+      "S132",
+      "S133",
+      "S134",
+      "S137",
+      "S138",
+      "S139",
+      "S140",
+      "S141",
+      "S146",
+      "S147",
+      "S148",
+      "S151",
+      "S152",
+      "S153",
+      "S154",
+      "S156",
+      "S157",
+      "S158",
+      "S160",
+      "S161",
+      "S162",
+      "S163",
+      "S164",
+      "S167",
+      "S168",
+      "S169",
+      "S171",
+      "S172",
+      "S173",
+      "S174",
+      "S175",
+      "S177",
+      "S179",
+      "S180",
+      "S181",
+      "S182",
+      "S184",
+      "S185",
+      "S186",
+      "S188",
+      "S190",
+      "S191",
+      "S192",
+      "S194",
+      "S195",
+      "S196",
+      "S198",
+      "S205",
+      "S206"
+    ]
+  },
+  "populationSha256": "0a947d304c2016e2cb4e7b3369ce996ac5f245107a78add2b0b3ea42c3d2f6a2",
+  "power": {
+    "alpha": 0.05,
+    "byCondition": {
+      "1": {
+        "hypotheticalSdPp": [
+          {
+            "mdePp": 4.051,
+            "sdPp": 5
+          },
+          {
+            "mdePp": 8.101,
+            "sdPp": 10
+          },
+          {
+            "mdePp": 12.152,
+            "sdPp": 15
+          }
+        ],
+        "standardizedMde": 0.810147,
+        "testParticipants": 14
+      },
+      "2": {
+        "hypotheticalSdPp": [
+          {
+            "mdePp": 3.619,
+            "sdPp": 5
+          },
+          {
+            "mdePp": 7.239,
+            "sdPp": 10
+          },
+          {
+            "mdePp": 10.858,
+            "sdPp": 15
+          }
+        ],
+        "standardizedMde": 0.723858,
+        "testParticipants": 17
+      },
+      "3": {
+        "hypotheticalSdPp": [
+          {
+            "mdePp": 3.89,
+            "sdPp": 5
+          },
+          {
+            "mdePp": 7.78,
+            "sdPp": 10
+          },
+          {
+            "mdePp": 11.67,
+            "sdPp": 15
+          }
+        ],
+        "standardizedMde": 0.778023,
+        "testParticipants": 15
+      },
+      "4": {
+        "hypotheticalSdPp": [
+          {
+            "mdePp": 3.619,
+            "sdPp": 5
+          },
+          {
+            "mdePp": 7.239,
+            "sdPp": 10
+          },
+          {
+            "mdePp": 10.858,
+            "sdPp": 15
+          }
+        ],
+        "standardizedMde": 0.723858,
+        "testParticipants": 17
+      }
+    },
+    "estimand": "Within each condition, equal-participant paired difference in any-annotated-scene accuracy",
+    "limits": [
+      "Planning assumptions, not measured Memento effect sizes or calibrated power.",
+      "Rows are correlated; row counts are not independent sample size.",
+      "Four marginal calculations, not familywise or between-condition interaction power.",
+      "Does not measure generalization across films; shared stimulus dependence remains."
+    ],
+    "method": "Two-sided paired-t planning using noncentral t, alpha=.05 and power=.80; standardized by participant-level paired-difference SD",
+    "power": 0.8
+  },
+  "schema": "storymodel4s.sealed-split/v1",
+  "sealedAtUtc": "2026-09-21T21:19:44+00:00",
+  "seed": 20260921,
+  "sourceManifestSha256": "ab94b85821005d393aea6f6c8f59ea0af23c8ba3d0d790336a96f3c92542e1f2",
+  "taskDefinitionSha256": "d1c12c09979bcff9fdcbf939139d29ae8b76c31b194db8824fe5e487f9ab6deb",
+  "taskImplementationSha256": "320f0ff027f4090dd839fa6a2f5b062dccbf2454785e559eba72aa73a36d035e",
+  "test": {
+    "participants": [
+      "S2",
+      "S9",
+      "S12",
+      "S18",
+      "S19",
+      "S20",
+      "S23",
+      "S29",
+      "S35",
+      "S42",
+      "S50",
+      "S52",
+      "S53",
+      "S60",
+      "S62",
+      "S64",
+      "S65",
+      "S66",
+      "S67",
+      "S70",
+      "S73",
+      "S74",
+      "S78",
+      "S84",
+      "S85",
+      "S89",
+      "S93",
+      "S101",
+      "S103",
+      "S105",
+      "S111",
+      "S112",
+      "S114",
+      "S115",
+      "S121",
+      "S124",
+      "S132",
+      "S133",
+      "S137",
+      "S140",
+      "S141",
+      "S146",
+      "S147",
+      "S148",
+      "S151",
+      "S157",
+      "S160",
+      "S161",
+      "S164",
+      "S168",
+      "S169",
+      "S173",
+      "S174",
+      "S177",
+      "S179",
+      "S182",
+      "S184",
+      "S186",
+      "S190",
+      "S191",
+      "S194",
+      "S196",
+      "S205"
+    ]
+  },
+  "testByCondition": {
+    "1": 14,
+    "2": 17,
+    "3": 15,
+    "4": 17
+  },
+  "xlsxReaderSha256": "3a64908d946d98f964a3e8cec7e1aaebeaec0b34a83d3b5c54b21618454a29b8"
+}

@@ -25,9 +25,9 @@ data/
     recall_scenematched/                      recall-to-scene gold, 15 participants
     textdata/                                 crowd descriptions and predictions, six films
     derived/, subtitles/, FILMS.md            network metrics, one caption track, film sourcing
-  memento/                                  proposed third corpus; see docs/data/memento/
+  memento/                                  admitted local row task; see docs/data/memento/
     MementoStoryBoard.xlsx                    129 subscenes / 44 scenes, presentation and story order
-    Subjects.xlsx                             133 participants' recall, five-second grid, scene gold
+    Subjects.xlsx                             133 recall sheets; 123 admitted participants, nominal five-second grain
     ratings/r1-r7.xlsx                        seven raters' causal matrix and importance
   friends/                                  proposed Friends source set; see docs/data/friends/
     FriendsRecallScoring.xlsx                 23 participant recall-scoring sheets, raw workbook
@@ -43,8 +43,9 @@ data/
 
 Identities: `docs/data/<corpus>/*.json` for the sources, and the study documents under
 `docs/plans/` for every arm and packet, each of which records the digests of what it read and wrote.
-`filmfestival/`, `memento/`, and `friends/` are staged but **not admitted**: their records state
-`admissionStatus.state = proposed`, and no court is open for any of them.
+`memento/` is admitted for the local row task and sealed split described in `docs/data/memento/`.
+Consult each corpus record for its own admission scope. Local analysis never authorizes
+redistribution of participant recall prose.
 
 ## Rules
 

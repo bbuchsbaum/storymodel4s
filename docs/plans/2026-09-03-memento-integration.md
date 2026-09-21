@@ -1,5 +1,10 @@
 # Memento as a third corpus: what integration costs, and what it buys
 
+Status update 2026-09-21: the owner authorized local task admission and a 63/60 sealed split.
+The executable contract in `docs/data/memento/task-definition.json` supersedes this scouting
+plan's population and row-unit assumptions; 123 participants remain from 133 raw recall sheets.
+The historical integration options below do not establish an implemented Scala adapter.
+
 *2026-09-03.* Companion to `2026-09-03-second-corpus-scouting.md`, which recommends Film Festival
 first and does not mention Memento. This document does not propose changing that order. It argues
 that Memento is worth a court **after** Film Festival, for a reason no other corpus supplies.
@@ -138,7 +143,7 @@ unit pairs matched by mutual-best IDF overlap **of recall text alone**. It never
 
 That means Memento can be run through the judge of record *without* solving the `RecallType` legend,
 without a gold join, and without touching `gold_scene.py`. The only prerequisites are the Scala
-adapter and the single-part offset table. With 133 participants against Sherlock's 17, Memento is
+adapter and the single-part offset table. With 123 admitted participants against Sherlock's 17, Memento is
 also by far the strongest test of cross-participant agreement the testbed has had.
 
 Do that first. The gold-dependent work — `scene-exact`, `scene-within-1`, `scene-distance`, and

@@ -14,6 +14,7 @@ silently converting them is precisely the bug this reader avoids.
 `sheet_rows(path, sheet)` yields one list per row, padded to the sheet's widest column, with None
 for empty cells.
 """
+from dataclasses import dataclass
 import re
 import zipfile
 from xml.etree import ElementTree
@@ -21,6 +22,13 @@ from xml.etree import ElementTree
 _NS = "{http://schemas.openxmlformats.org/spreadsheetml/2006/main}"
 _REL_NS = "{http://schemas.openxmlformats.org/package/2006/relationships}"
 _CELL_RE = re.compile(r"^([A-Z]+)(\d+)$")
+
+
+@dataclass(frozen=True)
+class CellError:
+    """A populated invalid cell, distinct from missing data in indexed reads."""
+
+    code: str | None
 
 
 def _col_index(ref):
@@ -66,18 +74,32 @@ def _sheet_path(zf, sheet):
     raise KeyError(f"no sheet named {sheet!r} in {zf.filename}")
 
 
-def sheet_rows(path, sheet):
-    """Yield each row of `sheet` as a list of str/float/None, padded to the widest row."""
+def sheet_rows(path, sheet, *, indexed=False):
+    """Read padded rows; `indexed=True` retains and validates physical Excel row numbers."""
     with zipfile.ZipFile(path) as zf:
         shared = _shared_strings(zf)
         data = zf.read(_sheet_path(zf, sheet))
     root = ElementTree.fromstring(data)
     rows = []
+    row_numbers = []
     width = 0
     for r in root.iter(f"{_NS}row"):
+        if indexed:
+            number = int(r.get("r", "0"))
+            if number <= 0 or (row_numbers and number <= row_numbers[-1]):
+                raise ValueError(
+                    "XLSX physical row numbers must be positive and increasing"
+                )
+            row_numbers.append(number)
         cells = {}
+        seen = set()
         for c in r.findall(f"{_NS}c"):
             ref = c.get("r") or ""
+            if indexed:
+                match = _CELL_RE.fullmatch(ref)
+                if not match or int(match.group(2)) != number or ref in seen:
+                    raise ValueError("invalid or duplicate XLSX cell coordinate")
+                seen.add(ref)
             idx = _col_index(ref)
             ctype = c.get("t")
             if ctype == "inlineStr":
@@ -89,7 +111,9 @@ def sheet_rows(path, sheet):
                 )
             else:
                 v = c.find(f"{_NS}v")
-                if v is None or v.text is None:
+                if ctype == "e" and indexed:
+                    val = CellError(v.text if v is not None else None)
+                elif v is None or v.text is None:
                     val = None
                 elif ctype == "s":
                     val = shared[int(v.text)]
@@ -118,7 +142,7 @@ def sheet_rows(path, sheet):
     out = [[row.get(i) for i in range(width)] for row in rows]
     while out and all(v is None for v in out[-1]):
         out.pop()
-    return out
+    return list(zip(row_numbers, out)) if indexed else out
 
 
 def serial_time_seconds(value):
