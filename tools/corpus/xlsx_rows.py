@@ -66,15 +66,21 @@ def _sheet_path(zf, sheet):
     raise KeyError(f"no sheet named {sheet!r} in {zf.filename}")
 
 
-def sheet_rows(path, sheet):
-    """Yield each row of `sheet` as a list of str/float/None, padded to the widest row."""
+def sheet_rows(path, sheet, *, indexed=False):
+    """Read padded rows; `indexed=True` retains and validates physical Excel row numbers."""
     with zipfile.ZipFile(path) as zf:
         shared = _shared_strings(zf)
         data = zf.read(_sheet_path(zf, sheet))
     root = ElementTree.fromstring(data)
     rows = []
+    row_numbers = []
     width = 0
     for r in root.iter(f"{_NS}row"):
+        if indexed:
+            number = int(r.get("r", "0"))
+            if number <= 0 or (row_numbers and number <= row_numbers[-1]):
+                raise ValueError("XLSX physical row numbers must be positive and increasing")
+            row_numbers.append(number)
         cells = {}
         for c in r.findall(f"{_NS}c"):
             ref = c.get("r") or ""
@@ -118,7 +124,7 @@ def sheet_rows(path, sheet):
     out = [[row.get(i) for i in range(width)] for row in rows]
     while out and all(v is None for v in out[-1]):
         out.pop()
-    return out
+    return list(zip(row_numbers, out)) if indexed else out
 
 
 def serial_time_seconds(value):

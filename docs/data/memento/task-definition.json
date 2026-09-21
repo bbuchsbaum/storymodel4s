@@ -1,0 +1,98 @@
+{
+  "schema": "storymodel4s.memento.task/v1",
+  "workbookSha256": "5ab22bfe404422aa423b8b42db8f389a4c351ee7c63154470ea5a0bb698ea8b2",
+  "decisionDate": "2026-09-21",
+  "unit": "One substantive physical worksheet row; no merging or imputation; nominal five-second annotation grain, not guaranteed measured intervals.",
+  "identity": [
+    "workbookSha256",
+    "participantSheet",
+    "physicalExcelRow"
+  ],
+  "eligibility": "Nonblank transcript, RecallType 1 or 2, and one or two valid BroadSceneNum annotations in 1..44; both populated scene fields must validate.",
+  "noGold": "Missing scene gold remains accounted for, including code 2; it is not a model error.",
+  "clock": "Optional SecondsOfRecall; integer seconds or H:MM:SS. Missing/invalid time does not alter gold eligibility. No row-index time or fallback clock is invented.",
+  "estimand": "Equal-participant mean of uniform eligible-row any-annotated-scene accuracy, separately for each condition. A predicted scene matches either annotated scene; complete recovery of multi-scene content is not measured.",
+  "undefinedParticipant": "Retain in the population; report undefined full-population accuracy if any retained participant has zero eligible rows.",
+  "predictionAccounting": "Every source unit requires exactly one outcome. Missing/duplicate/extra IDs refuse scoring; invalid labels, abstention and failure are wrong on eligible units.",
+  "headerOverlays": [
+    {
+      "participant": "S42",
+      "headerSha256": "9aa4b1529ef0cdccacd9fbaddefe2bf8cd6f657ad6697b630d47f25ed8364839",
+      "columns": [
+        {
+          "index": 2,
+          "name": "RecallType",
+          "originalCellSha256": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b"
+        }
+      ],
+      "status": "inferred-header-normalization",
+      "basis": "Pinned sheet layout and column types; not independently confirmed by the upstream authors."
+    },
+    {
+      "participant": "S53",
+      "headerSha256": "6e6f04db38cba88510e21f9bccf7fee5241071ad69543b9597884b15445dc9f8",
+      "columns": [
+        {
+          "index": 1,
+          "name": "SecondsOfRecall",
+          "originalCellSha256": "663d4763175f5bb6ad1f5f8d1e554571ce4acefbe5e8e55a60c6a2ad4427d31d"
+        },
+        {
+          "index": 8,
+          "name": "Transcript",
+          "originalCellSha256": "ada3a209790c64952b1fa27281dcf1a75425df70656b70dd622a6dca8cf848f7"
+        }
+      ],
+      "status": "inferred-header-normalization",
+      "basis": "Pinned sheet layout and column types; not independently confirmed by the upstream authors."
+    },
+    {
+      "participant": "S162",
+      "headerSha256": "fc569ca2623b5a8b627dc7f7a20ff61a0f60ba571fc55bacef3e76f62a7d3abf",
+      "columns": [
+        {
+          "index": 8,
+          "name": "Transcript",
+          "originalCellSha256": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b"
+        }
+      ],
+      "status": "inferred-header-normalization",
+      "basis": "Pinned sheet layout and column types; not independently confirmed by the upstream authors."
+    },
+    {
+      "participant": "S175",
+      "headerSha256": "fc569ca2623b5a8b627dc7f7a20ff61a0f60ba571fc55bacef3e76f62a7d3abf",
+      "columns": [
+        {
+          "index": 8,
+          "name": "Transcript",
+          "originalCellSha256": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b"
+        }
+      ],
+      "status": "inferred-header-normalization",
+      "basis": "Pinned sheet layout and column types; not independently confirmed by the upstream authors."
+    }
+  ],
+  "headerSensitivity": "Freeze eligible-row counts with all inferred overlays disabled; no model outcomes inspected.",
+  "populationRule": "recall-population.json; eligibility never replaces the identifiable-event population rule",
+  "conditions": "Report separately; four marginal power calculations do not establish familywise or interaction power.",
+  "notEstablished": [
+    "annotation correctness against audio",
+    "fixed-duration row intervals",
+    "accuracy on all accurate recall",
+    "generalization across films",
+    "author confirmation of inferred headers",
+    "interpretation of the qualification in S53 long transcript header; mapping is inferred and sensitivity is reported"
+  ],
+  "split": {
+    "seed": 20260921,
+    "testByCondition": {
+      "1": 14,
+      "2": 17,
+      "3": 15,
+      "4": 17
+    },
+    "algorithm": "Within each condition, ascending SHA-256 of UTF-8 memento-split/v1\\n{seed}\\n{condition}\\n{participant}; first n test, remainder development; output IDs sorted by numeric suffix.",
+    "allocationDecision": "Owner selected 63 test / 60 development on 2026-09-21; no gold balancing or reseeding."
+  }
+}
