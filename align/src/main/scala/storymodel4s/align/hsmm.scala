@@ -580,13 +580,52 @@ object HsmmResult:
             )
           )
         else None
+      // AN EXTERNAL KEY CARRIES EXTERNAL SUPPORT, whether or not it is readable. The mode check
+      // above passes an excluded record under any key it was dropped from, and an external key has
+      // no anchor to be unassessable or unreachable about - so without this an external state could
+      // carry an assessed share (hsmm/v4, bd-01M19956MFSG7076QE4J66T7E9).
+      def externalSupport(u: RecallUnitId, s: AlignState, b: CostBreakdown): Option[AlignError] =
+        val external = b.support match
+          case value: SupportAssessment.NotApplicable =>
+            value.reason == SupportNotApplicableReason.ExternalState
+          case _ => false
+        Option.when(s.isExternal && (b.excluded || !external))(
+          AlignError.MalformedRecord(
+            "CostBreakdown",
+            s"unit ${u.value}, state ${s.key}: an external state's support must be " +
+              "NotApplicable(ExternalState)"
+          )
+        )
       val costV = costs.toVector.sortBy(_._1.value).iterator.flatMap { (u, m) =>
         m.toVector.sortBy(_._1.key).iterator.flatMap { (s, b) =>
-          check(u, s, "cost entry").orElse(coherent(u, s, b))
+          check(u, s, "cost entry").orElse(coherent(u, s, b)).orElse(externalSupport(u, s, b))
         }
       }
       val pathV = rows.zip(viterbi).iterator.flatMap { (r, s) => check(r.unit, s, "viterbi step") }
       (posteriorV ++ flowV ++ costV ++ pathV).nextOption().toLeft(())
+    // ONE RESULT, ONE WEIGHT PER TERM. Each cell's support basis carries the eligible weights its
+    // share was derived from; within one result they must agree term by term, or a single artifact
+    // could re-weight individual cells to move their shares while every cell stayed internally
+    // coherent. This proves consistency across the result only, not which weights the cost model
+    // priced with (bd-01M1DA6NJXYT4NEA18745FM3KY).
+    val supportWeights: Either[AlignError, Unit] =
+      val claimed = costs.toVector.sortBy(_._1.value).flatMap { (_, m) =>
+        m.toVector.sortBy(_._1.key).flatMap { (_, b) =>
+          SupportAssessment.basisOf(b.support).toVector.flatMap(_.eligibleWeights.toVector)
+        }
+      }
+      claimed
+        .groupMap(_._1)(entry => java.lang.Double.doubleToLongBits(entry._2))
+        .toVector
+        .sortBy(_._1.ordinal)
+        .collectFirst {
+          case (term, bits) if bits.distinct.size > 1 =>
+            AlignError.MalformedRecord(
+              "CostBreakdown",
+              s"support bases in one result disagree on the weight of $term"
+            )
+        }
+        .toLeft(())
     for
       _ <- inventory
       _ <- structural
@@ -594,6 +633,7 @@ object HsmmResult:
       admissibility = derive
       _ <- drift(admissibility)
       _ <- gate(admissibility)
+      _ <- supportWeights
     yield new HsmmResult(
       posterior,
       flow,
@@ -740,7 +780,7 @@ object GraphHsmm:
           else AlignState.externals
         val ext = externals.map {
           case s @ AlignState.External(x) =>
-            s -> CostBreakdown(Map.empty, None, None, costModel.externalCost(u, x))
+            s -> CostBreakdown.external(costModel.externalCost(u, x))
           case s => s -> CostBreakdown.unreachable
         }
         (sources ++ ext).toMap

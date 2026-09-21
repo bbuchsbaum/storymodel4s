@@ -14,6 +14,11 @@ class CostSuite extends FunSuite:
 
   private val eps = 1e-12
 
+  /** The assessed share of a record, failing the court if its support carries no number. */
+  private def share(b: CostBreakdown): Double = b.support match
+    case assessed: SupportAssessment.Assessed => assessed.share
+    case other                                => fail(s"expected assessed support, got $other")
+
   /** One valid hand chart, shared by the eligibility laws below. Suite-level so the chartless and
     * charted views are built from the same evidence and differ only in where it is attached.
     */
@@ -333,8 +338,12 @@ class CostSuite extends FunSuite:
     // AND THE AUDIT TRAIL SURVIVES. Dropping the excluded records would make an exclusion
     // indistinguishable from a candidate that was never nominated.
     assert(
-      excluded.forall(_.supportWeight == 0.0),
-      "an excluded zero-support record must carry supportWeight 0, not a fabricated 1.0"
+      excluded.forall(b =>
+        b.support match
+          case assessed: SupportAssessment.Assessed => assessed.share == 0.0
+          case _                                    => false
+      ),
+      "an excluded zero-support record must carry an assessed share of 0, not a fabricated 1.0"
     )
   }
 
@@ -362,7 +371,7 @@ class CostSuite extends FunSuite:
     *
     * The consequence was compound and both halves pointed the same way. `wPresent` exceeded
     * `wEligible`, so `scaleToEligible` fell to 0.9054 and multiplied the cost DOWN — the cell was
-    * made to look better BECAUSE it had measured more — while `supportOf`, which clamps with
+    * made to look better BECAUSE it had measured more — while the pre-v4 `supportOf`, which clamps with
     * `math.min(1.0, _)`, reported the ratio above one as a flat 1.0: full support, nothing assumed,
     * on a cell that had in fact assumed Sensory. Measured against the correct scaling of 1.0405 the
     * cell was priced 14.9% too low.
@@ -398,10 +407,10 @@ class CostSuite extends FunSuite:
     // Sensory is eligible and absent here, so honest support is below one. Before the fix this read
     // exactly 1.0 — the clamp turning an over-unity ratio into a claim that nothing was assumed.
     assert(
-      b.supportWeight < 1.0,
-      s"support ${b.supportWeight} claims nothing was assumed, but Sensory was"
+      share(b) < 1.0,
+      s"support ${share(b)} claims nothing was assumed, but Sensory was"
     )
-    assertEqualsDouble(b.supportWeight, 0.961038961038961, 1e-9)
+    assertEqualsDouble(share(b), 0.961038961038961, 1e-9)
   }
 
   /** Configuring a structural provider must be inert on a cell with no source chart to compare.
@@ -410,7 +419,7 @@ class CostSuite extends FunSuite:
     * `structuralReduction` reads the same `structuralMembers` population, but `structuralEligible`
     * asked only whether a provider was configured and the unit had evidence — never whether the
     * source had a chart at all. On a chartless cell the Structural term is absent either way, so
-    * configuration alone moved `(supportWeight, total)` from `(0.9552, 1.37045)` to
+    * configuration alone moved `(support share, total)` from `(0.9552, 1.37045)` to
     * `(0.8312, 1.575)`: the cell paid a 15% inflation for a measurement it could never have had,
     * which biases chartless cells toward External.
     *
@@ -440,7 +449,7 @@ class CostSuite extends FunSuite:
       !configured.terms.contains(CostTerm.Structural),
       "fixture: the Structural term must be absent on a chartless cell"
     )
-    assertEqualsDouble(configured.supportWeight, absent.supportWeight, eps)
+    assertEqualsDouble(share(configured), share(absent), eps)
     assertEqualsDouble(configured.total, absent.total, eps)
   }
 
@@ -472,9 +481,9 @@ class CostSuite extends FunSuite:
     // different, and every assertion up to here stays green. Under that mutation the configured
     // cell reads (1.0, 1.2) - full support, because nothing eligible went unmeasured once the
     // eligible set stopped containing Structural. Pinning the true tuple is what kills it.
-    assertEqualsDouble(configured.supportWeight, 0.9655172413793105, eps)
+    assertEqualsDouble(share(configured), 0.9655172413793105, eps)
     assertEqualsDouble(configured.total, 1.3558441558441556, eps)
-    assertEqualsDouble(absent.supportWeight, 0.961038961038961, eps)
+    assertEqualsDouble(share(absent), 0.961038961038961, eps)
     assertEqualsDouble(absent.total, 1.3621621621621622, eps)
   }
 
@@ -526,7 +535,7 @@ class CostSuite extends FunSuite:
     assertEquals(m.missingTerms, i.missingTerms)
 
     // Court 3: support differs by EXACTLY the semantic share of eligible weight, and by nothing
-    // else. MUTATION KILLED: counting imputed weight as measured (supportOf over `terms.keySet`
+    // else. MUTATION KILLED: counting imputed weight as measured (support over `terms.keySet`
     // instead of `measured`) makes these equal at 0.9552238805970149 and fails here.
     val w = CostWeights.default
     val eligible = Set(
@@ -537,10 +546,10 @@ class CostSuite extends FunSuite:
       CostTerm.Distortion,
       CostTerm.Sensory
     )
-    assertEqualsDouble(m.supportWeight, 0.9552238805970149, eps)
-    assertEqualsDouble(i.supportWeight, 0.6567164179104478, eps)
+    assertEqualsDouble(share(m), 0.9552238805970149, eps)
+    assertEqualsDouble(share(i), 0.6567164179104478, eps)
     assertEqualsDouble(
-      m.supportWeight - i.supportWeight,
+      share(m) - share(i),
       w(CostTerm.Semantic) / eligible.toVector.map(w(_)).sum,
       eps
     )

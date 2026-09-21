@@ -26,8 +26,37 @@ class WireSuite extends FunSuite:
       .infer(AnnaFixture.recall, view, AnnaFixture.candidates, AnnaFixture.costModel)
       .fold(e => fail(e.message), identity)
 
-  private def rebuild(b: CostBreakdown): Either[AlignError, CostBreakdown] =
-    AlignWire.costBreakdown(
+  /** The fields of a [[CostBreakdown]] as an editable value. `CostBreakdown` is sealed (no `copy`,
+    * no product door), so a court that perturbs one field edits these parts and sends them back
+    * through the checked factory, which is the only way a perturbed record could be built anyway.
+    */
+  private final case class Parts(
+      terms: Map[CostTerm, Double],
+      mode: Option[FidelityMode],
+      exclusion: Option[Exclusion],
+      total: Double,
+      missingTerms: Set[CostTerm],
+      sourceChartCoverage: Option[StructuralCoverage],
+      reductions: Map[CostTerm, StructuralReductionReceipt],
+      support: SupportAssessment,
+      imputedTerms: Map[CostTerm, MissingReason]
+  ):
+    /** Support re-derived for these parts' own terms, so a court's perturbation of `terms` or
+      * `imputedTerms` is judged on the defect it targets rather than refused as a support mismatch.
+      * Eligibility widens to every measured term, weighted as the fixture's model weights it.
+      */
+    def coherent: Parts = SupportAssessment.basisOf(support) match
+      case None        => this
+      case Some(basis) =>
+        val measured = terms.keySet -- imputedTerms.keySet
+        val eligible = basis.eligibleTerms.toSet ++ terms.keySet
+        val weights = AnnaFixture.costModel.weights
+        SupportAssessment
+          .fromEvidence(measured, eligible, eligible.map(t => t -> weights(t)).toMap)
+          .fold(e => fail(e.message), rederived => copy(support = rederived))
+
+  private def parts(b: CostBreakdown): Parts =
+    Parts(
       b.terms,
       b.mode,
       b.exclusion,
@@ -35,9 +64,28 @@ class WireSuite extends FunSuite:
       b.missingTerms,
       b.sourceChartCoverage,
       b.reductions,
-      b.supportWeight,
+      b.support,
       b.imputedTerms
     )
+
+  /** Rebuild parts exactly as given, support included. */
+  private def rebuildExact(p: Parts): Either[AlignError, CostBreakdown] =
+    AlignWire.costBreakdown(
+      p.terms,
+      p.mode,
+      p.exclusion,
+      p.total,
+      p.missingTerms,
+      p.sourceChartCoverage,
+      p.reductions,
+      p.support,
+      p.imputedTerms
+    )
+
+  /** Rebuild perturbed parts with support re-derived for their terms (see [[Parts.coherent]]). */
+  private def rebuild(p: Parts): Either[AlignError, CostBreakdown] = rebuildExact(p.coherent)
+
+  private def rebuild(b: CostBreakdown): Either[AlignError, CostBreakdown] = rebuildExact(parts(b))
 
   /** A small checked chart (as in EvidenceSuite), for evidence toggles. */
   private def chart(agent: String, patient: String): PropositionChart[Checked] =
@@ -71,52 +119,52 @@ class WireSuite extends FunSuite:
 
   test("the factory refuses non-finite and negative values") {
     val b = result.costs.values.flatMap(_.values).find(_.mode.exists(_.isFaithful)).get
-    assert(malformed(rebuild(b.copy(terms = b.terms.updated(CostTerm.Semantic, Double.NaN)))))
-    assert(malformed(rebuild(b.copy(terms = b.terms.updated(CostTerm.Entity, -0.1)))))
-    assert(malformed(rebuild(b.copy(total = Double.PositiveInfinity))))
-    assert(malformed(rebuild(b.copy(total = -1.0))))
+    assert(malformed(rebuild(parts(b).copy(terms = b.terms.updated(CostTerm.Semantic, Double.NaN)))))
+    assert(malformed(rebuild(parts(b).copy(terms = b.terms.updated(CostTerm.Entity, -0.1)))))
+    assert(malformed(rebuild(parts(b).copy(total = Double.PositiveInfinity))))
+    assert(malformed(rebuild(parts(b).copy(total = -1.0))))
   }
 
   test("the factory refuses term–mode and term–missing inconsistencies") {
     val b = result.costs.values.flatMap(_.values).find(_.mode.exists(_.isFaithful)).get
     // a faithful state with a distortion penalty
-    assert(malformed(rebuild(b.copy(terms = b.terms.updated(CostTerm.Distortion, 0.3)))))
+    assert(malformed(rebuild(parts(b).copy(terms = b.terms.updated(CostTerm.Distortion, 0.3)))))
     // a mandatory term declared missing, or a term both present and missing
-    assert(malformed(rebuild(b.copy(missingTerms = Set(CostTerm.Semantic)))))
+    assert(malformed(rebuild(parts(b).copy(missingTerms = Set(CostTerm.Semantic)))))
     // Sensory may be absent (it can lack evidence) but cannot carry a structural receipt
     assert(
       rebuild(
-        b.copy(terms = b.terms - CostTerm.Sensory, missingTerms = b.missingTerms + CostTerm.Sensory)
+        parts(b).copy(terms = b.terms - CostTerm.Sensory, missingTerms = b.missingTerms + CostTerm.Sensory)
       ).isRight
     )
     assert(
       malformed(
         rebuild(
-          b.copy(reductions = b.reductions + (CostTerm.Sensory -> b.reductions(CostTerm.Chart)))
+          parts(b).copy(reductions = b.reductions + (CostTerm.Sensory -> b.reductions(CostTerm.Chart)))
         )
       )
     )
     assert(
       malformed(
         rebuild(
-          b.copy(terms = b.terms.updated(CostTerm.Chart, 0.1), missingTerms = Set(CostTerm.Chart))
+          parts(b).copy(terms = b.terms.updated(CostTerm.Chart, 0.1), missingTerms = Set(CostTerm.Chart))
         )
       )
     )
     // a receipt on a term that has no reduction
     assert(
-      malformed(rebuild(b.copy(reductions = b.reductions.map((_, r) => CostTerm.Semantic -> r))))
+      malformed(rebuild(parts(b).copy(reductions = b.reductions.map((_, r) => CostTerm.Semantic -> r))))
     )
     // an excluded state with content, an external state with content
     assert(
-      malformed(rebuild(CostBreakdown.unreachable.copy(terms = Map(CostTerm.Semantic -> 0.1))))
+      malformed(rebuild(parts(CostBreakdown.unreachable).copy(terms = Map(CostTerm.Semantic -> 0.1))))
     )
-    assert(malformed(rebuild(CostBreakdown.unreachable.copy(mode = Some(FidelityMode.Faithful)))))
+    assert(malformed(rebuild(parts(CostBreakdown.unreachable).copy(mode = Some(FidelityMode.Faithful)))))
     val external = result.costs.values.flatMap(_.values).find(_.mode.isEmpty).get
-    assert(malformed(rebuild(external.copy(terms = Map(CostTerm.Semantic -> 0.1)))))
+    assert(malformed(rebuild(parts(external).copy(terms = Map(CostTerm.Semantic -> 0.1)))))
     // malformed coverage
-    assert(malformed(rebuild(b.copy(sourceChartCoverage = Some(StructuralCoverage(0, 2, 1))))))
-    assert(malformed(rebuild(b.copy(sourceChartCoverage = Some(StructuralCoverage(-1, 0, 1))))))
+    assert(malformed(rebuild(parts(b).copy(sourceChartCoverage = Some(StructuralCoverage(0, 2, 1))))))
+    assert(malformed(rebuild(parts(b).copy(sourceChartCoverage = Some(StructuralCoverage(-1, 0, 1))))))
   }
 
   // ---- structural reductions -------------------------------------------------------------------
@@ -478,7 +526,7 @@ class WireSuite extends FunSuite:
     assert(
       malformed(
         rebuild(
-          b.copy(
+          parts(b).copy(
             terms = b.terms.updated(CostTerm.Chart, 0.2),
             missingTerms = b.missingTerms - CostTerm.Chart
           )
@@ -488,14 +536,14 @@ class WireSuite extends FunSuite:
     )
     // a term that reduces to nothing must be recorded missing
     assert(
-      malformed(rebuild(b.copy(missingTerms = b.missingTerms - CostTerm.Chart))),
+      malformed(rebuild(parts(b).copy(missingTerms = b.missingTerms - CostTerm.Chart))),
       "unrecorded missing term"
     )
     // a present optional term without any receipt
     assert(
       malformed(
         rebuild(
-          b.copy(
+          parts(b).copy(
             terms = b.terms.updated(CostTerm.Chart, 0.2),
             missingTerms = b.missingTerms - CostTerm.Chart,
             reductions = b.reductions - CostTerm.Chart
@@ -518,7 +566,7 @@ class WireSuite extends FunSuite:
       .fold(e => fail(e.message), identity)
     def withChart(v: Double, receipt: StructuralReductionReceipt) =
       rebuild(
-        b.copy(
+        parts(b).copy(
           terms = b.terms.updated(CostTerm.Chart, v),
           missingTerms = b.missingTerms - CostTerm.Chart,
           reductions = b.reductions.updated(CostTerm.Chart, receipt)
@@ -528,7 +576,7 @@ class WireSuite extends FunSuite:
     assert(malformed(withChart(0.4, rc)), "not the reducer value")
     assert(malformed(withChart(0.1, rc)), "flattering term")
     assert(
-      malformed(rebuild(b.copy(reductions = b.reductions.updated(CostTerm.Chart, rc)))),
+      malformed(rebuild(parts(b).copy(reductions = b.reductions.updated(CostTerm.Chart, rc)))),
       "receipt reduces to a value but the term is recorded missing"
     )
     // the receipt's source-chart coverage must be the breakdown's
@@ -612,7 +660,7 @@ class WireSuite extends FunSuite:
             b.missingTerms,
             b.sourceChartCoverage,
             receipts,
-            b.supportWeight,
+            b.support,
             b.imputedTerms
           )
           .fold(e => fail(e.message), identity)
@@ -669,7 +717,7 @@ class WireSuite extends FunSuite:
       b.missingTerms,
       b.sourceChartCoverage,
       b.reductions,
-      b.supportWeight,
+      b.support,
       b.imputedTerms
     )
     assert(notPriced.isLeft, "an imputed term that is not priced was accepted")
@@ -689,7 +737,7 @@ class WireSuite extends FunSuite:
       b.missingTerms + CostTerm.Semantic,
       b.sourceChartCoverage,
       b.reductions,
-      b.supportWeight,
+      b.support,
       b.imputedTerms
     )
     assert(alsoMissing.isLeft, "a term recorded as both imputed and missing was accepted")
@@ -719,7 +767,7 @@ class WireSuite extends FunSuite:
         b.missingTerms,
         b.sourceChartCoverage,
         b.reductions,
-        b.supportWeight,
+        b.support,
         b.imputedTerms + (deterministic -> MissingReason.ProviderAbstained)
       )
       assert(forged.isLeft, s"$deterministic was accepted as imputed")
