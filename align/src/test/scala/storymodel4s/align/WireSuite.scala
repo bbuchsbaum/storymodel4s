@@ -119,7 +119,9 @@ class WireSuite extends FunSuite:
 
   test("the factory refuses non-finite and negative values") {
     val b = result.costs.values.flatMap(_.values).find(_.mode.exists(_.isFaithful)).get
-    assert(malformed(rebuild(parts(b).copy(terms = b.terms.updated(CostTerm.Semantic, Double.NaN)))))
+    assert(
+      malformed(rebuild(parts(b).copy(terms = b.terms.updated(CostTerm.Semantic, Double.NaN))))
+    )
     assert(malformed(rebuild(parts(b).copy(terms = b.terms.updated(CostTerm.Entity, -0.1)))))
     assert(malformed(rebuild(parts(b).copy(total = Double.PositiveInfinity))))
     assert(malformed(rebuild(parts(b).copy(total = -1.0))))
@@ -134,37 +136,53 @@ class WireSuite extends FunSuite:
     // Sensory may be absent (it can lack evidence) but cannot carry a structural receipt
     assert(
       rebuild(
-        parts(b).copy(terms = b.terms - CostTerm.Sensory, missingTerms = b.missingTerms + CostTerm.Sensory)
+        parts(b).copy(
+          terms = b.terms - CostTerm.Sensory,
+          missingTerms = b.missingTerms + CostTerm.Sensory
+        )
       ).isRight
     )
     assert(
       malformed(
         rebuild(
-          parts(b).copy(reductions = b.reductions + (CostTerm.Sensory -> b.reductions(CostTerm.Chart)))
+          parts(b).copy(reductions =
+            b.reductions + (CostTerm.Sensory -> b.reductions(CostTerm.Chart))
+          )
         )
       )
     )
     assert(
       malformed(
         rebuild(
-          parts(b).copy(terms = b.terms.updated(CostTerm.Chart, 0.1), missingTerms = Set(CostTerm.Chart))
+          parts(b)
+            .copy(terms = b.terms.updated(CostTerm.Chart, 0.1), missingTerms = Set(CostTerm.Chart))
         )
       )
     )
     // a receipt on a term that has no reduction
     assert(
-      malformed(rebuild(parts(b).copy(reductions = b.reductions.map((_, r) => CostTerm.Semantic -> r))))
+      malformed(
+        rebuild(parts(b).copy(reductions = b.reductions.map((_, r) => CostTerm.Semantic -> r)))
+      )
     )
     // an excluded state with content, an external state with content
     assert(
-      malformed(rebuild(parts(CostBreakdown.unreachable).copy(terms = Map(CostTerm.Semantic -> 0.1))))
+      malformed(
+        rebuild(parts(CostBreakdown.unreachable).copy(terms = Map(CostTerm.Semantic -> 0.1)))
+      )
     )
-    assert(malformed(rebuild(parts(CostBreakdown.unreachable).copy(mode = Some(FidelityMode.Faithful)))))
+    assert(
+      malformed(rebuild(parts(CostBreakdown.unreachable).copy(mode = Some(FidelityMode.Faithful))))
+    )
     val external = result.costs.values.flatMap(_.values).find(_.mode.isEmpty).get
     assert(malformed(rebuild(parts(external).copy(terms = Map(CostTerm.Semantic -> 0.1)))))
     // malformed coverage
-    assert(malformed(rebuild(parts(b).copy(sourceChartCoverage = Some(StructuralCoverage(0, 2, 1))))))
-    assert(malformed(rebuild(parts(b).copy(sourceChartCoverage = Some(StructuralCoverage(-1, 0, 1))))))
+    assert(
+      malformed(rebuild(parts(b).copy(sourceChartCoverage = Some(StructuralCoverage(0, 2, 1)))))
+    )
+    assert(
+      malformed(rebuild(parts(b).copy(sourceChartCoverage = Some(StructuralCoverage(-1, 0, 1)))))
+    )
   }
 
   // ---- structural reductions -------------------------------------------------------------------

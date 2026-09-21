@@ -371,10 +371,10 @@ class CostSuite extends FunSuite:
     *
     * The consequence was compound and both halves pointed the same way. `wPresent` exceeded
     * `wEligible`, so `scaleToEligible` fell to 0.9054 and multiplied the cost DOWN — the cell was
-    * made to look better BECAUSE it had measured more — while the pre-v4 `supportOf`, which clamps with
-    * `math.min(1.0, _)`, reported the ratio above one as a flat 1.0: full support, nothing assumed,
-    * on a cell that had in fact assumed Sensory. Measured against the correct scaling of 1.0405 the
-    * cell was priced 14.9% too low.
+    * made to look better BECAUSE it had measured more — while the pre-v4 `supportOf`, which clamps
+    * with `math.min(1.0, _)`, reported the ratio above one as a flat 1.0: full support, nothing
+    * assumed, on a cell that had in fact assumed Sensory. Measured against the correct scaling of
+    * 1.0405 the cell was priced 14.9% too low.
     *
     * It lands only on segment cells and only once charts exist, which is a systematic thumb on the
     * scale for coarse anchors over leaf anchors — recall made to look more scene-level than it is.

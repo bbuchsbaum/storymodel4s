@@ -119,8 +119,8 @@ object HsmmResultCodec:
   /** The exact weight of one eligible term in a cell's support basis. */
   private final case class WeightWire(term: CostTerm, weight: Double)
 
-  /** The tagged support of one cost record, as carried on the wire. Every field is EVIDENCE for
-    * the decoder to re-derive from, never a claim it adopts: the share and reasons are recomputed.
+  /** The tagged support of one cost record, as carried on the wire. Every field is EVIDENCE for the
+    * decoder to re-derive from, never a claim it adopts: the share and reasons are recomputed.
     */
   private enum SupportWire:
     case Assessed(
@@ -856,8 +856,7 @@ object HsmmResultCodec:
           }
         case SupportWire.Unestablished(reason, measured, eligible, weights) =>
           derived(measured, eligible, weights).flatMap {
-            case unestablished: SupportAssessment.Unestablished
-                if unestablished.reason == reason =>
+            case unestablished: SupportAssessment.Unestablished if unestablished.reason == reason =>
               Right(unestablished)
             case unestablished: SupportAssessment.Unestablished =>
               Left(
@@ -880,8 +879,7 @@ object HsmmResultCodec:
           // (external vs unreachable); a mismatch is refused there.
           Right(reason match
             case SupportNotApplicableReason.ExternalState => SupportAssessment.externalState
-            case SupportNotApplicableReason.Unreachable   => SupportAssessment.unreachable
-          )
+            case SupportNotApplicableReason.Unreachable   => SupportAssessment.unreachable)
 
   extension (wire: ReductionReceiptWire)
     private def materialize: Either[AlignError, StructuralReductionReceipt] =

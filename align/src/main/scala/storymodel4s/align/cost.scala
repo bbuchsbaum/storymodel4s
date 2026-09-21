@@ -209,9 +209,9 @@ final class CellSupportBasis private (
 object CellSupportBasis:
   private given Ordering[CostTerm] = Ordering.by(_.ordinal)
 
-  /** The checked door, for wire evidence and custom producers: measured terms must be eligible,
-    * the weights must cover exactly the eligible terms, and each weight must be finite and
-    * nonnegative with a representable sum.
+  /** The checked door, for wire evidence and custom producers: measured terms must be eligible, the
+    * weights must cover exactly the eligible terms, and each weight must be finite and nonnegative
+    * with a representable sum.
     */
   def of(
       measuredTerms: Set[CostTerm],
@@ -287,7 +287,7 @@ object SupportAssessment:
 
     override def equals(other: Any): Boolean = other match
       case that: Assessed => share == that.share && basis == that.basis
-      case _ => false
+      case _              => false
     override def hashCode: Int = (share, basis).hashCode
     override def toString: String = s"Assessed($share, $basis)"
 
@@ -348,8 +348,7 @@ object SupportAssessment:
           Unestablished.derived(SupportUnestablishedReason.ZeroEligibleWeight, basis)
         else if basis.measuredTerms == basis.eligibleTerms then
           Assessed.derived(1.0, basis, eligible)
-        else
-          Assessed.derived(math.min(1.0, basis.measuredWeight / denominator), basis, eligible)
+        else Assessed.derived(math.min(1.0, basis.measuredWeight / denominator), basis, eligible)
 
   /** Rebuild support from wire evidence through the checked [[CellSupportBasis.of]]. */
   def fromEvidence(
@@ -511,10 +510,11 @@ final class StructuralReduction private[align] (
   * NOT A CASE CLASS, and the constructor is bare `private`. Until `hsmm/v4` this was a case class
   * with a `private[align]` constructor, so `summon[Mirror.ProductOf[CostBreakdown]].fromProduct`
   * rebuilt it field by field outside `align`, and any `storymodel4s.align.*` subpackage could call
-  * the constructor, `apply` or `copy` directly — every door that bypassed [[AlignWire.costBreakdown]]
-  * (bd-01M17ZNXY6AS1CMBQJRH3JMNVX). The remaining doors are: [[AlignWire.costBreakdown]] (checked),
-  * [[CostBreakdown.unreachable]] (a constant), and the `align`-internal producers in the companion,
-  * each of which DERIVES support from the record it builds rather than accepting one.
+  * the constructor, `apply` or `copy` directly — every door that bypassed
+  * [[AlignWire.costBreakdown]] (bd-01M17ZNXY6AS1CMBQJRH3JMNVX). The remaining doors are:
+  * [[AlignWire.costBreakdown]] (checked), [[CostBreakdown.unreachable]] (a constant), and the
+  * `align`-internal producers in the companion, each of which DERIVES support from the record it
+  * builds rather than accepting one.
   */
 final class CostBreakdown private (
     val terms: Map[CostTerm, Double],
@@ -617,8 +617,8 @@ object CostBreakdown:
       Map.empty
     )
 
-  /** The checked door behind [[AlignWire.costBreakdown]]: the constructor is reached only when every
-    * record, support and coherence check passes.
+  /** The checked door behind [[AlignWire.costBreakdown]]: the constructor is reached only when
+    * every record, support and coherence check passes.
     */
   private[align] def checked(
       terms: Map[CostTerm, Double],
@@ -1176,11 +1176,11 @@ object DefaultLocalCostModel:
     * aligner must produce a posterior — so the refusal is the consumer's to make.
     *
     * THE FACTOR-1 BRANCHES ARE PRICES, NOT SUPPORT CLAIMS. An undeclared (empty) eligible set and a
-    * zero eligible weight both leave the cost unscaled, exactly as before `hsmm/v4`; what changed is
-    * that neither may be PUBLISHED as full support. [[SupportAssessment.derive]] makes both
-    * [[SupportAssessment.Unestablished]]. This function moves no number (bd-01M19956MFSG7076QE4J66T7E9
-    * is a representation change); whether a zero-weight cell should be priced at all is a separate
-    * estimand decision.
+    * zero eligible weight both leave the cost unscaled, exactly as before `hsmm/v4`; what changed
+    * is that neither may be PUBLISHED as full support. [[SupportAssessment.derive]] makes both
+    * [[SupportAssessment.Unestablished]]. This function moves no number
+    * (bd-01M19956MFSG7076QE4J66T7E9 is a representation change); whether a zero-weight cell should
+    * be priced at all is a separate estimand decision.
     */
   private[align] def scaleToEligible(
       presentCost: Double,

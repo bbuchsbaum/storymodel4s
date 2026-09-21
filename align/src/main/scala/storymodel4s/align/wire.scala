@@ -444,14 +444,14 @@ object AlignWire:
     checks.flatten.headOption
 
   /** SUPPORT MUST DESCRIBE THE RECORD IT SITS ON. The support value itself is already derived — no
-    * caller can pick a share or a reason — so what remains is whether the right KIND of support sits
-    * on the right kind of record, and whether its basis is this record's basis:
+    * caller can pick a share or a reason — so what remains is whether the right KIND of support
+    * sits on the right kind of record, and whether its basis is this record's basis:
     *
     *   - a ranked source record is a content comparison: its support is Assessed or Unestablished,
-    *     its measured population is exactly the priced terms that were not imputed, and every priced
-    *     term is eligible;
-    *   - an Unassessable exclusion rests on no weighted measurement: its assessed share is exactly 0,
-    *     or it has no denominator at all;
+    *     its measured population is exactly the priced terms that were not imputed, and every
+    *     priced term is eligible;
+    *   - an Unassessable exclusion rests on no weighted measurement: its assessed share is exactly
+    *     0, or it has no denominator at all;
     *   - an Unreachable exclusion measured nothing: NotApplicable(Unreachable), with no basis;
     *   - an external record is not a content comparison: NotApplicable(ExternalState), with no
     *     basis. Before `hsmm/v4` it published support 1.0 with zero terms.
@@ -466,7 +466,9 @@ object AlignWire:
     val r = "CostBreakdown"
     def boundTo(basis: CellSupportBasis): Option[AlignError] =
       if basis.measuredTerms.toSet != terms.keySet -- imputedTerms.keySet then
-        Some(bad(r, "support's measured terms must be exactly the priced terms that were not imputed"))
+        Some(
+          bad(r, "support's measured terms must be exactly the priced terms that were not imputed")
+        )
       else if !terms.keySet.subsetOf(basis.eligibleTerms.toSet) then
         Some(bad(r, "every priced term must be eligible in the support basis"))
       else None
@@ -478,23 +480,29 @@ object AlignWire:
         support match
           case assessed: SupportAssessment.Assessed           => boundTo(assessed.basis)
           case unestablished: SupportAssessment.Unestablished => boundTo(unestablished.basis)
-          case _: SupportAssessment.NotApplicable              =>
+          case _: SupportAssessment.NotApplicable             =>
             Some(bad(r, "a ranked source record is a content comparison; support must apply"))
       case (None, Some(Exclusion.Unassessable)) =>
         support match
           case assessed: SupportAssessment.Assessed if assessed.share == 0.0 => None
-          case _: SupportAssessment.Assessed                                   =>
+          case _: SupportAssessment.Assessed                                 =>
             Some(bad(r, "an unassessable record must carry exactly zero assessed support"))
           case _: SupportAssessment.Unestablished => None
           case _: SupportAssessment.NotApplicable =>
             Some(bad(r, "an unassessable record is a source cell; support must apply"))
       case (None, Some(Exclusion.Unreachable)) =>
         Option.unless(notApplicable(SupportNotApplicableReason.Unreachable))(
-          bad(r, "an unreachable record measured nothing; support must be NotApplicable(Unreachable)")
+          bad(
+            r,
+            "an unreachable record measured nothing; support must be NotApplicable(Unreachable)"
+          )
         )
       case (None, None) =>
         Option.unless(notApplicable(SupportNotApplicableReason.ExternalState))(
-          bad(r, "an external record is not a content comparison; support must be NotApplicable(ExternalState)")
+          bad(
+            r,
+            "an external record is not a content comparison; support must be NotApplicable(ExternalState)"
+          )
         )
       // A mode AND an exclusion is refused above as "an excluded state carries neither terms nor a
       // mode"; there is no support to judge on a record that is already malformed.
