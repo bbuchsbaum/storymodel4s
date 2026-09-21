@@ -5,6 +5,7 @@ import munit.FunSuite
 import scala.compiletime.testing.typeCheckErrors
 import storymodel4s.align.*
 import storymodel4s.core.*
+import storymodel4s.features.CanonicalDouble
 import storymodel4s.recall.*
 import storymodel4s.recall.RecallGraphStatus.Checked
 
@@ -25,6 +26,8 @@ class AlignCodecSuite extends FunSuite:
     assert(encoded.contains("\"admissibilityEcho\""))
     assert(encoded.contains("\"viewFingerprint\""))
     assert(encoded.contains("\"recallChecksum\""))
+    assert(encoded.contains("\"support\":{"))
+    assert(!encoded.contains("supportWeight"), "the v3 numeric support leaked into v4")
   }
 
   test("a view-only change is rejected by the mandatory fingerprint match") {
@@ -139,12 +142,357 @@ class AlignCodecSuite extends FunSuite:
       case other => fail(s"expected a duplicate-key rejection, got $other")
   }
 
-  test("the HSMM artifact has its own required schema version") {
-    val changed = json.mapObject(_.add("schemaVersion", Json.fromString("hsmm/v0")))
-    HsmmResultCodec.decodeJson(changed, fixture.recall, fixture.view) match
-      case Left(HsmmCodecError.Wire(error)) =>
-        assert(error.message.contains("unsupported HSMM schema"), error.message)
-      case other => fail(s"expected a wire-version rejection, got $other")
+  test("the HSMM artifact has its own required schema version, refused with a typed error") {
+    // hsmm/v3 is refused as UnsupportedSchema, whatever its body looks like: a v3 artifact's
+    // numeric supportWeight cannot say which support state applied, so it is re-derived from its
+    // inputs, never upgraded. The v3 body is judged by its tag, not by the first v4 field it lacks.
+    val v3Tagged = json.mapObject(_.add("schemaVersion", Json.fromString("hsmm/v3")))
+    val v3Body = mapCosts(v3Tagged) { cost =>
+      cost.mapObject(
+        _.remove("support").add("supportWeight", Json.fromString(CanonicalDouble.render(1.0)))
+      )
+    }
+    Vector("hsmm/v3" -> v3Tagged, "hsmm/v3" -> v3Body).foreach { (version, document) =>
+      assertEquals(
+        HsmmResultCodec.decodeJson(document, fixture.recall, fixture.view),
+        Left(
+          HsmmCodecError.Wire(
+            CodecError.UnsupportedSchema(version, Vector(HsmmResultCodec.SchemaVersion))
+          )
+        )
+      )
+      assertEquals(
+        HsmmResultCodec.decode(Canonical.print(document), fixture.recall, fixture.view),
+        Left(
+          HsmmCodecError.Wire(
+            CodecError.UnsupportedSchema(version, Vector(HsmmResultCodec.SchemaVersion))
+          )
+        )
+      )
+    }
+    val v0 = json.mapObject(_.add("schemaVersion", Json.fromString("hsmm/v0")))
+    assertEquals(
+      HsmmResultCodec.decodeJson(v0, fixture.recall, fixture.view),
+      Left(HsmmCodecError.Wire(CodecError.UnsupportedSchema("hsmm/v0", Vector("hsmm/v4"))))
+    )
+    // An untagged artifact is a wire error, not a guess at the current version.
+    HsmmResultCodec.decodeJson(
+      json.mapObject(_.remove("schemaVersion")),
+      fixture.recall,
+      fixture.view
+    ) match
+      case Left(HsmmCodecError.Wire(CodecError.Decode(_, _))) => ()
+      case other => fail(s"expected an untagged-artifact wire error, got $other")
+  }
+
+  // ---- hsmm/v4 support -------------------------------------------------------------------------
+
+  private def support(cost: Json): Json =
+    cost.hcursor.downField("support").focus.getOrElse(fail("cost carries no support"))
+
+  private def withSupport(document: Json, stateType: String)(f: Json => Json): Json =
+    updateFirstCost(document, stateType)(cost => cost.mapObject(_.add("support", f(support(cost)))))
+
+  private def terms(support: Json, field: String): Vector[CostTerm] =
+    support.hcursor
+      .downField(field)
+      .focus
+      .flatMap(_.asArray)
+      .getOrElse(fail(s"support has no $field"))
+      .map(term => CostTerm.valueOf(term.asString.getOrElse(fail("term is not a string"))))
+
+  private def weights(support: Json): Map[CostTerm, Double] =
+    support.hcursor
+      .downField("eligibleWeights")
+      .focus
+      .flatMap(_.asArray)
+      .getOrElse(fail("support has no eligibleWeights"))
+      .map { entry =>
+        val c = entry.hcursor
+        CostTerm.valueOf(c.get[String]("term").fold(e => fail(e.message), identity)) ->
+          CanonicalPrimitives
+            .parseHexDouble(c.get[String]("weight").fold(e => fail(e.message), identity))
+            .getOrElse(fail("weight is not a canonical double"))
+      }
+      .toMap
+
+  private def assessedJson(
+      measured: Set[CostTerm],
+      eligible: Map[CostTerm, Double],
+      share: Option[Double] = None
+  ): Json =
+    val derived = SupportAssessment
+      .fromEvidence(measured, eligible.keySet, eligible)
+      .fold(e => fail(e.message), identity) match
+      case a: SupportAssessment.Assessed => a.share
+      case other                         => fail(s"fixture basis derives $other")
+    val order = (ts: Iterable[CostTerm]) => ts.toVector.sortBy(_.ordinal)
+    Json.obj(
+      "type" -> Json.fromString("Assessed"),
+      "share" -> Json.fromString(CanonicalDouble.render(share.getOrElse(derived))),
+      "measuredTerms" -> Json.fromValues(order(measured).map(t => Json.fromString(t.toString))),
+      "eligibleTerms" -> Json.fromValues(
+        order(eligible.keys).map(t => Json.fromString(t.toString))
+      ),
+      "eligibleWeights" -> Json.fromValues(order(eligible.keys).map { t =>
+        Json.obj(
+          "term" -> Json.fromString(t.toString),
+          "weight" -> Json.fromString(CanonicalDouble.render(eligible(t)))
+        )
+      })
+    )
+
+  private def rejected(label: String, document: Json, record: String): Unit =
+    HsmmResultCodec.decodeJson(document, fixture.recall, fixture.view) match
+      case Left(HsmmCodecError.Rejected(AlignError.MalformedRecord(`record`, _))) => ()
+      case other => fail(s"$label: expected a $record rejection, got $other")
+
+  test("an assessed share is re-derived from its carried basis and compared bit for bit") {
+    val source = support(firstCost(json, "Source"))
+    val measured = terms(source, "measuredTerms").toSet
+    val eligible = weights(source)
+    // Control: re-encoding the carried basis through the test's own writer is accepted.
+    assertEquals(
+      HsmmResultCodec.decodeJson(
+        withSupport(json, "Source")(_ => assessedJson(measured, eligible)),
+        fixture.recall,
+        fixture.view
+      ),
+      Right(fixture.result)
+    )
+    // THE ALL-MEASURED-BUT-0.5 ATTACK: a basis whose eligible population is exactly its measured
+    // population derives exactly 1.0, so a carried 0.5 is refused rather than adopted.
+    val complete = eligible.view.filterKeys(measured).toMap
+    HsmmResultCodec.decodeJson(
+      withSupport(json, "Source")(_ => assessedJson(measured, complete, Some(0.5))),
+      fixture.recall,
+      fixture.view
+    ) match
+      case Left(HsmmCodecError.Rejected(AlignError.MalformedRecord("SupportAssessment", detail))) =>
+        assert(detail.contains("(1.0)"), detail)
+      case other => fail(s"a caller-selected 0.5 over a complete measurement was accepted: $other")
+    // One ULP is a different claim.
+    val share = CanonicalPrimitives
+      .parseHexDouble(source.hcursor.get[String]("share").fold(e => fail(e.message), identity))
+      .getOrElse(fail("share is not a canonical double"))
+    rejected(
+      "a share one ULP off its basis",
+      withSupport(json, "Source")(_ => assessedJson(measured, eligible, Some(math.nextUp(share)))),
+      "SupportAssessment"
+    )
+    // A share on the wire is required: v4 carries it redundantly, never optionally.
+    HsmmResultCodec.decodeJson(
+      withSupport(json, "Source")(_.mapObject(_.remove("share"))),
+      fixture.recall,
+      fixture.view
+    ) match
+      case Left(HsmmCodecError.Wire(_)) => ()
+      case other                        => fail(s"an Assessed support without its share: $other")
+  }
+
+  test(
+    "the carried basis must be this record's basis, coherent, and consistent across the result"
+  ) {
+    val source = support(firstCost(json, "Source"))
+    val measured = terms(source, "measuredTerms").toSet
+    val eligible = weights(source)
+    // A priced term dropped from the measured population, share recomputed so only the binding
+    // to the record is wrong.
+    rejected(
+      "a priced term missing from measuredTerms",
+      withSupport(json, "Source")(_ => assessedJson(measured - measured.head, eligible)),
+      "CostBreakdown"
+    )
+    // Weights that do not cover the eligible population, and a non-finite or negative weight.
+    rejected(
+      "an eligible term without a weight",
+      withSupport(json, "Source")(
+        _.mapObject(o =>
+          o.add(
+            "eligibleWeights",
+            Json.fromValues(o("eligibleWeights").flatMap(_.asArray).getOrElse(Vector.empty).drop(1))
+          )
+        )
+      ),
+      "CellSupportBasis"
+    )
+    Vector(Double.NaN, Double.PositiveInfinity, -1.0).foreach { bad =>
+      rejected(
+        s"eligible weight $bad",
+        withSupport(json, "Source")(_ =>
+          assessedJson(measured, eligible, Some(1.0)).mapObject { o =>
+            val entries = o("eligibleWeights").flatMap(_.asArray).getOrElse(Vector.empty)
+            o.add(
+              "eligibleWeights",
+              Json.fromValues(
+                entries.head.mapObject(
+                  _.add("weight", Json.fromString(CanonicalDouble.render(bad)))
+                ) +:
+                  entries.tail
+              )
+            )
+          }
+        ),
+        "CellSupportBasis"
+      )
+    }
+    rejected(
+      "a duplicate measured term",
+      withSupport(json, "Source")(
+        _.mapObject(o =>
+          o.add(
+            "measuredTerms",
+            Json.fromValues(
+              o("measuredTerms").flatMap(_.asArray).toVector.flatMap(v => v.head +: v)
+            )
+          )
+        )
+      ),
+      "SupportAssessment.measuredTerms"
+    )
+    // A single cell re-weighted with its share re-derived: coherent on its own, refused because
+    // one result carries one weight per term.
+    rejected(
+      "a re-weighted cell",
+      withSupport(json, "Source")(_ =>
+        assessedJson(measured, eligible.updated(CostTerm.Semantic, eligible(CostTerm.Semantic) * 2))
+      ),
+      "CostBreakdown"
+    )
+  }
+
+  test("support variants cannot move between source, external and unreachable records") {
+    val notApplicable = (reason: String) =>
+      Json.obj("type" -> Json.fromString("NotApplicable"), "reason" -> Json.fromString(reason))
+    rejected(
+      "a source record claiming ExternalState",
+      withSupport(json, "Source")(_ => notApplicable("ExternalState")),
+      "CostBreakdown"
+    )
+    rejected(
+      "a source record claiming Unreachable",
+      withSupport(json, "Source")(_ => notApplicable("Unreachable")),
+      "CostBreakdown"
+    )
+    val sourceSupport = support(firstCost(json, "Source"))
+    rejected(
+      "an external record carrying a measured share",
+      withSupport(json, "External")(_ => sourceSupport),
+      "CostBreakdown"
+    )
+    rejected(
+      "an external record claiming Unreachable",
+      withSupport(json, "External")(_ => notApplicable("Unreachable")),
+      "CostBreakdown"
+    )
+    // An external state dressed as an unreachable exclusion is still an external key.
+    val masquerade = updateFirstCost(json, "External")(
+      _.mapObject(
+        _.add("exclusion", Json.fromString("Unreachable"))
+          .add("support", notApplicable("Unreachable"))
+      )
+    )
+    rejected("an external key carrying an unreachable record", masquerade, "CostBreakdown")
+  }
+
+  test("variants that make no numeric claim refuse a share and every measurement field") {
+    def wireRefused(label: String, next: Json, expected: String): Unit =
+      HsmmResultCodec.decodeJson(
+        withSupport(json, "External")(_ => next),
+        fixture.recall,
+        fixture.view
+      ) match
+        case Left(HsmmCodecError.Wire(error)) =>
+          assert(error.message.contains(expected), s"$label: ${error.message}")
+        case other => fail(s"$label was accepted: $other")
+    val external = Json.obj(
+      "type" -> Json.fromString("NotApplicable"),
+      "reason" -> Json.fromString("ExternalState")
+    )
+    wireRefused(
+      "NotApplicable with a share",
+      external.mapObject(_.add("share", Json.fromString(CanonicalDouble.render(1.0)))),
+      "cannot carry a numeric claim"
+    )
+    wireRefused(
+      "NotApplicable with measured terms",
+      external.mapObject(_.add("measuredTerms", Json.arr())),
+      "unexpected measuredTerms"
+    )
+    wireRefused(
+      "Unreachable with a basis",
+      Json.obj(
+        "type" -> Json.fromString("NotApplicable"),
+        "reason" -> Json.fromString("Unreachable"),
+        "eligibleTerms" -> Json.arr(),
+        "eligibleWeights" -> Json.arr()
+      ),
+      "unexpected eligibleTerms, eligibleWeights"
+    )
+    wireRefused(
+      "Unestablished with a share",
+      Json.obj(
+        "type" -> Json.fromString("Unestablished"),
+        "reason" -> Json.fromString("EmptyEligibility"),
+        "share" -> Json.fromString(CanonicalDouble.render(1.0)),
+        "measuredTerms" -> Json.arr(),
+        "eligibleTerms" -> Json.arr(),
+        "eligibleWeights" -> Json.arr()
+      ),
+      "cannot carry a numeric claim"
+    )
+    // The external cells of a real artifact publish no number at all - on WOG they published 1.0.
+    val externals = allCosts(json, "External")
+    assert(externals.nonEmpty)
+    externals.foreach(cost => assertEquals(support(cost), external))
+  }
+
+  test("zero eligible weight round-trips as derived Unestablished; its reason cannot be chosen") {
+    val zero = CostWeights
+      .of(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
+      .fold(e => fail(e.message), identity)
+    val result = GraphHsmm
+      .infer(
+        fixture.recall,
+        fixture.view,
+        fixture.candidates,
+        DefaultLocalCostModel(weights = zero, semantic = SemanticDistance.lexicalJaccard)
+      )
+      .fold(e => fail(e.message), identity)
+    val document = HsmmResultCodec.encode(result).fold(e => fail(e.message), identity)
+    assert(document.contains("\"reason\":\"ZeroEligibleWeight\""), document)
+    assertEquals(HsmmResultCodec.decode(document, fixture.recall, fixture.view), Right(result))
+    val parsed = Canonical.parse(document).fold(e => fail(e.message), identity)
+    rejected(
+      "a caller-selected Unestablished reason",
+      withSupport(parsed, "Source")(
+        _.mapObject(_.add("reason", Json.fromString("EmptyEligibility")))
+      ),
+      "SupportAssessment"
+    )
+    rejected(
+      "an Assessed tag over a zero-weight basis",
+      withSupport(parsed, "Source")(
+        _.mapObject(
+          _.remove("reason")
+            .add("type", Json.fromString("Assessed"))
+            .add("share", Json.fromString(CanonicalDouble.render(1.0)))
+        )
+      ),
+      "SupportAssessment"
+    )
+    // And the converse: an Unestablished tag over a basis that derives a share.
+    rejected(
+      "an Unestablished tag over an assessable basis",
+      withSupport(json, "Source")(
+        _.mapObject(
+          _.remove("share")
+            .add("type", Json.fromString("Unestablished"))
+            .add("reason", Json.fromString("ZeroEligibleWeight"))
+        )
+      ),
+      "SupportAssessment"
+    )
   }
 
   test("there is no context-free Decoder[HsmmResult]") {
@@ -316,16 +664,59 @@ class AlignCodecSuite extends FunSuite:
     }
 
   private def updateFirstSourceCost(document: Json)(f: Json => Json): Json =
+    updateFirstCost(document, "Source")(f)
+
+  private def stateType(stateCost: Json): Either[io.circe.DecodingFailure, String] =
+    stateCost.hcursor.downField("state").get[String]("type")
+
+  private def allCosts(document: Json, kind: String): Vector[Json] =
+    document.hcursor
+      .downField("costs")
+      .focus
+      .flatMap(_.asArray)
+      .getOrElse(Vector.empty)
+      .flatMap(unit =>
+        unit.hcursor.downField("costs").focus.flatMap(_.asArray).getOrElse(Vector.empty)
+      )
+      .collect {
+        case stateCost if stateType(stateCost) == Right(kind) =>
+          stateCost.hcursor.downField("cost").focus.getOrElse(fail("state cost has no cost"))
+      }
+
+  private def firstCost(document: Json, kind: String): Json =
+    allCosts(document, kind).headOption.getOrElse(fail(s"no $kind cost in the artifact"))
+
+  private def mapCosts(document: Json)(f: Json => Json): Json =
     document.mapObject { root =>
       val units = root("costs").flatMap(_.asArray).getOrElse(Vector.empty)
+      root.add(
+        "costs",
+        Json.fromValues(units.map { unit =>
+          unit.mapObject { unitFields =>
+            val costs = unitFields("costs").flatMap(_.asArray).getOrElse(Vector.empty)
+            unitFields.add(
+              "costs",
+              Json.fromValues(costs.map { stateCost =>
+                stateCost.mapObject(fields =>
+                  fields("cost").fold(fields)(c => fields.add("cost", f(c)))
+                )
+              })
+            )
+          }
+        })
+      )
+    }
+
+  /** Rewrite the FIRST cost of `kind` in the whole artifact (one cell, not one per unit). */
+  private def updateFirstCost(document: Json, kind: String)(f: Json => Json): Json =
+    document.mapObject { root =>
+      val units = root("costs").flatMap(_.asArray).getOrElse(Vector.empty)
+      var changed = false
       val updated = units.map { unit =>
         unit.mapObject { unitFields =>
           val costs = unitFields("costs").flatMap(_.asArray).getOrElse(Vector.empty)
-          var changed = false
           val rewritten = costs.map { stateCost =>
-            val isSource =
-              stateCost.hcursor.downField("state").get[String]("type") == Right("Source")
-            if !changed && isSource then
+            if !changed && stateType(stateCost) == Right(kind) then
               changed = true
               stateCost.mapObject { fields =>
                 fields("cost").fold(fields)(cost => fields.add("cost", f(cost)))
@@ -341,6 +732,7 @@ class AlignCodecSuite extends FunSuite:
   private final case class Fixture(
       recall: RecallGraph[Checked],
       view: InMemorySourceView,
+      candidates: Candidates,
       result: HsmmResult
   )
 
@@ -430,4 +822,4 @@ class AlignCodecSuite extends FunSuite:
       val result = GraphHsmm
         .infer(recall, view, candidates, costModel)
         .fold(error => throw new IllegalStateException(error.message), identity)
-      Fixture(recall, view, result)
+      Fixture(recall, view, candidates, result)
