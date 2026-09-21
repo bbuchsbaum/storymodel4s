@@ -1,0 +1,27 @@
+{
+  "schema": "masc-rescue/cold-review/v1",
+  "reviewedCommit": "924e8dd6d2d56eccec4ffc92c84f23729853d5c5",
+  "reviewedScope": "Progress note and commit body; every count recomputed read-only against both repositories",
+  "reviewer": "fresh-context general-purpose agent (default model), read-only",
+  "criteria": {
+    "1": "MET: refs/heads/rescue/audit-masc-role-corpus -> b756b4bb",
+    "2": "MET: for-each-ref --contains b756b4bb lists exactly that ref",
+    "3": "MET: tree 69b7c7c3 in both. Weak by construction for an identical SHA; stronger evidence is that all 12 objects are main's own loose files and rev-list --objects --all exits 0 in main",
+    "4": "MET: before the new refs, only b756b4bb and 91333a46 were outside main's refs; now none are",
+    "5": "MET via README; the Mote note is added at closure"
+  },
+  "discrepancies": "None; every count reproduced",
+  "overclaims": [
+    "'The only copy' was unscoped: GitHub and other clones were not searched",
+    "'165 unreferenced commits' counted dangling tips; with ancestors, 258 are unreachable from refs, 244 protected only by reflogs and 14 by nothing",
+    "The three pins preserved 49 commits, 46 of them under d736dc56",
+    "The 157-object reachability claim lacked a recorded check",
+    "The 51/176 split holds only before the salvage pins"
+  ],
+  "missed": [
+    "FETCH_HEAD and ORIG_HEAD (both reachable from main refs)",
+    "One dangling blob and one dangling tree in main's store, seen through the alternate"
+  ],
+  "repairs": "All five overclaims and both misses are addressed in the README. Author re-measurement confirmed 258/14 and found that d736dc56 is a grakern commit held on ../grakern main and origin/main; its pin was removed. Two pins remain, protecting 3 commits. The overclaims in 924e8dd6's commit body are corrected in the follow-up commit body; history was not rewritten.",
+  "limits": "Read-only git inspection only; no content review of the MASC audit, no test run, no network check of GitHub."
+}
