@@ -5,12 +5,16 @@ on:
     paths:
       - 'tools/recall-study/**'
       - 'docs/data/friends/**'
+      - 'docs/data/memento/**'
+      - 'tools/corpus/xlsx_rows.py'
       - 'embed-bench/src/main/resources/storymodel4s/bench/sherlock/scene-coding-rule.json'
       - '.github/workflows/baseline-integrity.yml'
   push:
     paths:
       - 'tools/recall-study/**'
       - 'docs/data/friends/**'
+      - 'docs/data/memento/**'
+      - 'tools/corpus/xlsx_rows.py'
       - 'embed-bench/src/main/resources/storymodel4s/bench/sherlock/scene-coding-rule.json'
       - '.github/workflows/baseline-integrity.yml'
 
@@ -37,3 +41,8 @@ jobs:
           python3 tools/recall-study/tests/test_sealed_split.py -v
           python3 tools/recall-study/tests/test_friends_guard.py -v
           python3 tools/recall-study/tests/mutate_friends_guard.py
+      - name: Memento task, sealed split and mutation courts (no corpus or model)
+        run: |
+          python3 tools/recall-study/tests/test_memento_task.py -v
+          python3 tools/recall-study/tests/test_memento_guard.py -v
+          python3 tools/recall-study/tests/mutate_memento.py

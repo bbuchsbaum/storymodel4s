@@ -180,19 +180,25 @@ green gate and a separate cold review.
   all 23 participants. This is a model-untouched split, not an entirely unseen corpus.
 
 **Step 1b. Admit and seal Memento (owner decision, 2026-09-18).** Friends alone would leave the
-single final test with perhaps ten participants. Memento has 133 (`docs/data/memento/README.md`).
+single final test with perhaps ten participants. Memento has 123 admitted participants from 133
+raw sheets (`docs/data/memento/README.md`), with 27/33/30/33 across conditions.
 - **Admission.** The owner's decision clears blocker 1 in the Memento record. Blocker 2, an ethics
   basis for committing recall prose, bars only committing text. Analysis reads the staged bytes
   from the ignored data root, and nothing text-bearing is committed.
 - **Task, fixed at admission and before any model output:**
-  - scene gold on the five-second grid;
+  - one substantive physical Excel row per observation; nominal five-second grain, optional observed time;
+  - exact workbook/header-bound inferred overlays, including S42, with no-overlay sensitivity;
+  - any valid annotated scene is a match once; both populated scene fields must validate;
   - only accurate recall (codes 1–2) enters accuracy; codes 3–5 never do;
-  - the seven non-integer rows are excluded explicitly;
+  - ten invalid code cells are excluded explicitly, without coercion;
+  - scene-less code-2 rows remain accounted for outside the accuracy denominator;
   - the population comes from `recall-population.json`, not sheet order.
 - **Seal** a participant-level test split, **stratified by the four conditions**, before any model
   or tuning inspection. Commit the seed and membership, and record the counts and power
   assumptions. Condition 1 (the nonlinear cut) is the hardest transfer test for monotone
   decoding. Condition 4 (the linear re-cut) is its within-corpus control.
+- Owner allocation (2026-09-21): 63 test / 60 development, with 14/17/15/17 test by condition.
+  `task-definition.json`, `task-audit.json` and `test-split.json` fix the executable contract.
 - The final test opening (§3, Phase 3) covers both sealed corpora.
 
 **Step 2. The scoring contract.** This is a fix in `tools/recall-study`, because today the scorer
@@ -332,7 +338,7 @@ decided. Until an explicit P1 decision changes it, the recorded full film route 
   - FilmFestival: film identity. Scene within film waits for the clock work: the +106 offset,
     run-relative times, and media equivalence, which Phase 0 step 6 enables.
   - Friends: `WhichEvent`, veridical recall only.
-  - Memento: scene on the five-second grid for accurate recall, per condition (Step 1b).
+  - Memento: any annotated scene per eligible physical row, per condition (Step 1b).
 - **Tracks:**
 
   | Track | Input | Corpora |

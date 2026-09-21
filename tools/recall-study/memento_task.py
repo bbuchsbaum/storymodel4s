@@ -210,11 +210,22 @@ def normalize(indexed_rows, participant, workbook_sha256, contract, *, overlays=
 def score(units, predictions, participants):
     """Exact unit reconciliation and equal-participant any-annotated-scene accuracy.
 
-    Predictions are an integer scene or a nonlabel (None/invalid). Nonlabels are wrong on eligible
-    rows; no-gold rows remain accounted for. Call separately for each experimental condition.
+    Predictions are a sequence of (unit ID, integer scene or nonlabel) pairs, never a mapping:
+    duplicates must remain visible at this boundary. Nonlabels are wrong on eligible rows;
+    no-gold rows remain accounted for. Call separately for each experimental condition.
     """
+    if not isinstance(predictions, (list, tuple)):
+        raise ValueError("prediction outcomes must be pairs, not a collapsed mapping")
+    outcomes = {}
+    for pair in predictions:
+        if not isinstance(pair, (list, tuple)) or len(pair) != 2:
+            raise ValueError("prediction outcome must be a unit ID and label pair")
+        identity, label = pair
+        if not isinstance(identity, str) or identity in outcomes:
+            raise ValueError("duplicate or invalid prediction unit IDs")
+        outcomes[identity] = label
     ids = [u.unit_id for u in units]
-    if len(set(ids)) != len(ids) or set(predictions) != set(ids):
+    if len(set(ids)) != len(ids) or set(outcomes) != set(ids):
         raise ValueError(
             "prediction unit IDs must match the complete unique unit manifest"
         )
@@ -234,7 +245,7 @@ def score(units, predictions, participants):
         counts["units"] += 1
         if unit.eligible:
             counts["eligible"] += 1
-            prediction = predictions[unit.unit_id]
+            prediction = outcomes[unit.unit_id]
             counts["correct"] += int(
                 type(prediction) is int and prediction in unit.gold_scenes
             )

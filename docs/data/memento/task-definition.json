@@ -13,7 +13,7 @@
   "clock": "Optional SecondsOfRecall; integer seconds or H:MM:SS. Missing/invalid time does not alter gold eligibility. No row-index time or fallback clock is invented.",
   "estimand": "Equal-participant mean of uniform eligible-row any-annotated-scene accuracy, separately for each condition. A predicted scene matches either annotated scene; complete recovery of multi-scene content is not measured.",
   "undefinedParticipant": "Retain in the population; report undefined full-population accuracy if any retained participant has zero eligible rows.",
-  "predictionAccounting": "Every source unit requires exactly one outcome. Missing/duplicate/extra IDs refuse scoring; invalid labels, abstention and failure are wrong on eligible units.",
+  "predictionAccounting": "Every source unit requires exactly one outcome. Missing/duplicate/extra IDs refuse scoring; invalid labels, abstention and failure are wrong on eligible units. Scorer input is a sequence of [unit ID, outcome] pairs; mappings are refused because they erase duplicates.",
   "headerOverlays": [
     {
       "participant": "S42",
@@ -92,7 +92,7 @@
       "3": 15,
       "4": 17
     },
-    "algorithm": "Within each condition, ascending SHA-256 of UTF-8 memento-split/v1\\n{seed}\\n{condition}\\n{participant}; first n test, remainder development; output IDs sorted by numeric suffix.",
+    "algorithm": "Within each condition, ascending SHA-256 of UTF-8 fields memento-split/v1, decimal seed, condition, participant, separated by LF (U+000A, byte 0A), with no trailing separator; first n test, remainder development; output IDs sorted by numeric suffix.",
     "allocationDecision": "Owner selected 63 test / 60 development on 2026-09-21; no gold balancing or reseeding."
   }
 }

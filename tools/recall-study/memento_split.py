@@ -21,6 +21,7 @@ AUDIT = "docs/data/memento/task-audit.json"
 
 
 def power_block(counts):
+    effects = {n: paired_mde_effect_size(n)[0] for n in set(counts.values())}
     return {
         "estimand": "Within each condition, equal-participant paired difference in any-annotated-scene accuracy",
         "method": "Two-sided paired-t planning using noncentral t, alpha=.05 and power=.80; standardized by participant-level paired-difference SD",
@@ -29,9 +30,9 @@ def power_block(counts):
         "byCondition": {
             c: {
                 "testParticipants": n,
-                "standardizedMde": round(paired_mde_effect_size(n)[0], 6),
+                "standardizedMde": round(effects[n], 6),
                 "hypotheticalSdPp": [
-                    {"sdPp": sd, "mdePp": round(sd * paired_mde_effect_size(n)[0], 3)}
+                    {"sdPp": sd, "mdePp": round(sd * effects[n], 3)}
                     for sd in (5, 10, 15)
                 ],
             }
@@ -159,7 +160,9 @@ def main(argv=None):
     )
     _write_new(guard.MEMENTO.split, record)
     _write_new(guard.MEMENTO.ledger, guard.ss.empty_ledger(guard.MEMENTO))
-    print("Sealed Memento: 63 test / 60 development; commit the split and empty ledger")
+    print(
+        f"Sealed Memento: {len(record['test']['participants'])} test / {len(record['development']['participants'])} development; commit the split and empty ledger"
+    )
     return 0
 
 

@@ -69,3 +69,19 @@ a recount requires an explicit purpose and ledger entry. Rejected: rereading rec
 ordinary integrity checks, rewriting historical seal digests, and treating an import-only
 reader scan as proof of guarded access. This adds no Scala module or dependency and does
 not establish the future release-manifest content contract.
+
+The Memento task and seal (2026-09-21) use the same shared guard with fixed corpus paths.
+The independent population rule retains 123 participants; the owner chose 63 test and 60
+development, stratified 14/17/15/17 test across conditions, with seed 20260921. SHA-256 ranking
+uses explicit LF-separated fields and is independent of gold counts and Python RNG versions.
+Physical worksheet rows define observations; optional observed time does not define identity.
+Accuracy requires transcript, accurate code and valid scene gold; either annotated scene is a
+single correct match. Keep no-gold rows and zero-eligible participants explicitly accounted for.
+The scorer accepts ID/outcome pairs and refuses duplicate IDs before building its lookup.
+Indexed XLSX reads preserve error cells and validate physical coordinates; legacy unindexed
+reads retain their prior behavior. Exact-byte inferred header overlays are admitted with
+pre-seal no-overlay sensitivity, not as author-confirmed labels. S53 qualification semantics
+remain unestablished. Pin task, population and parser identities in the seal. Rejected: merging
+repeated text, inventing row clocks, salvaging one valid half of malformed scene gold, treating
+missing gold as model error, generic positional header fallbacks, and substituting an
+eligibility-selected population. This adds no Scala module, dependency or public Scala type.

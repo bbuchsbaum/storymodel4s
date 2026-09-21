@@ -5,12 +5,9 @@
   "recordedAt": "2026-09-03",
   "scientificRole": "candidate-third-corpus-presentation-versus-story-order-probe",
   "admissionStatus": {
-    "state": "proposed",
-    "courtOpened": false,
-    "blocking": [
-      "owner decision to open an acquisition court",
-      "story-text-admission-checklist section 3 REB/IRB basis, required before any participant recall prose is committed"
-    ],
+    "state": "admitted-local-row-task",
+    "courtOpened": true,
+    "blocking": [],
     "licenceDecision": {
       "decidedBy": "owner",
       "decidedAt": "2026-09-04",
@@ -23,7 +20,14 @@
         "this decision covers licence only; it does not address human-subject provenance, which section 3 of the story-text admission checklist governs separately"
       ],
       "disclaimer": "Derived from openly released research data. Where the upstream release carries no explicit licence, it is used here for non-commercial academic research under an open-science reading, with attribution to the original authors. No source bytes are redistributed. The original authors have not reviewed or endorsed this use."
-    }
+    },
+    "decision": {
+      "decidedBy": "owner",
+      "decidedAt": "2026-09-18",
+      "implementedAt": "2026-09-21",
+      "scope": "Local row-task admission and condition-stratified sealed split; task-definition.json is the scoring contract. Source bytes remain external; no model results or accepted narrative semantics are asserted."
+    },
+    "redistributionNotAdmitted": "Participant recall prose still requires the separate section 3 REB/IRB basis before Git admission."
   },
   "publicRelease": {
     "repository": "https://github.com/JamesWardAntony/memento",
@@ -61,7 +65,19 @@
       "memento.ipynb",
       "memento_5_28_24.ipynb"
     ],
-    "notStagedReason": "analysis notebooks, not source data"
+    "notStagedReason": "analysis notebooks, not source data",
+    "localSha256Recheck": {
+      "date": "2026-09-21",
+      "artifactsChecked": 10,
+      "allMatchPinnedDigests": true
+    },
+    "presealModelOutputSurvey": {
+      "date": "2026-09-21",
+      "method": "Path-name survey for memento under data, tmp, docs, .worktrees, excluding .git/target/node_modules; no contents read",
+      "unexpectedPaths": [],
+      "matchingPaths": 21,
+      "limit": "Does not detect arbitrarily renamed outputs."
+    }
   },
   "artifacts": [
     {
@@ -134,7 +150,14 @@
           "45": 1
         },
         "headerLayoutVariants": 12,
-        "samplingGrid": "five-second segments"
+        "samplingGrid": "Nominal five-second annotation grain; physical rows and observed clocks are retained, no fixed duration assumed.",
+        "historicalInventoryScope": "All 133 sheets, before pinned header overlays and the 123-participant population filter; these are not task gold counts.",
+        "invalidRecallCodeCells": 10,
+        "invalidRecallCodeBreakdown": {
+          "malformedText": 5,
+          "excelDateSerials": 2,
+          "outOfRangeIntegers": 3
+        }
       }
     },
     {
@@ -245,7 +268,6 @@
     }
   },
   "nonClaims": [
-    "acquisition-court-opened",
     "ethical-basis-for-redistribution-of-recall-prose",
     "exact-experimental-presentation-edition",
     "frame-exact-annotation-alignment",

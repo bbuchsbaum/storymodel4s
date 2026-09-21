@@ -1,12 +1,14 @@
 # Memento nonlinear-narrative recall source set
 
-This directory is the content-free admission record for a **proposed** third corpus: the
-behavioural release accompanying Antony, Lozano, Dhoat, Chen & Bennion (2024), in which 133
-participants freely recalled the film *Memento* under four experimental conditions.
+This directory records the local row-task admission for the behavioural release accompanying
+Antony, Lozano, Dhoat, Chen & Bennion (2024). The analysis population is **123 participants**,
+with **27/33/30/33** in conditions 1–4. The workbook has 133 recall sheets; these are not 133
+admitted participants. The extra condition-2 participant relative to the article remains an
+explicit discrepancy in `recall-population.json`.
 
-**Nothing here opens a court.** The state is `proposed`. What this record does is establish
-scientific identity — which upstream bytes, which counts, which code books, which population —
-so that a decision to admit or decline is made against facts rather than against a description.
+The owner authorized admission on 2026-09-18 and selected **63 test / 60 development** on
+2026-09-21: test **14/17/15/17**, development **13/16/15/16** across conditions 1–4.
+`task-definition.json` freezes the task before model outputs. Raw recall stays local and ignored.
 
 ## Why this corpus was scouted at all
 
@@ -23,22 +25,12 @@ chronology varies. Sherlock cannot separate those two hypotheses because in Sher
 Conditions 2 and 3 additionally move recall order by instruction with the nonlinear stimulus held
 fixed. `docs/plans/2026-09-03-memento-integration.md` sets out what that buys and what it costs.
 
-## What blocks admission
+## Scope of admission
 
-1. **Owner decision.** Whether to open an acquisition court, and in what order relative to Film
-   Festival. The scouting brief reserves this.
-2. **`docs/design/story-text-admission-checklist.md` §3.** The workbook contains participant recall
-   prose: 21,854 rows of transcript text. No such text may be committed until an REB/IRB basis for
-   redistribution is recorded by the owner and checked by someone other than the proposer. §1
-   separately bars admitting recall transcripts on a public-domain basis, so "it is on GitHub" is
-   not a basis. This slice proposes **no** text-bearing artifact for Git admission.
-~~3. Licence.~~ **Resolved 2026-09-04** — see below. The upstream repository carries no LICENSE
-   file, but the owner has accepted open-science research use under a recorded disclaimer.
-
-Neither remaining item blocks analysis. §3 bars *committing* recall prose to Git; it does not bar
-reading the staged bytes from the git-ignored data root, which is where they live and stay.
-
-The stimulus is a commercial feature. No video is stored, hashed or referenced by path.
+Local task parsing, scoring and a sealed participant split are admitted. No model comparison,
+accepted narrative semantics, or permission to redistribute recall prose follows from this.
+`docs/design/story-text-admission-checklist.md` §3 still governs any future Git admission of
+participant text. The commercial stimulus is not stored or redistributed.
 
 ## Licence, and the disclaimer that goes with it
 
@@ -63,8 +55,13 @@ This decision covers **licence only**. Human-subject provenance is a separate qu
 |---|---|
 | `source-manifest.json` | Upstream repository, commit and article identity; per-artifact upstream blob, byte length and SHA-256 for all ten staged files; content policy; the article's `RecallType`, `Detail`, causality and importance code books; non-claims |
 | `recall-population.json` | Reconciliation of 134 index rows against 133 sheets and the article's reported n, the identifiable-event exclusion rule, a stated partition rule, and the one residual disagreement |
+| `task-definition.json` | Physical-row identity, eligibility, estimand, pinned inferred header overlays and split recipe |
+| `task-audit.json` | Pre-seal condition totals, explicit anomaly coordinates and header-overlay sensitivity; no recall text |
+| `test-split.json` | Seed, membership, bound task and reader digests, aggregate accounting and planning power |
+| `test-split-reads.json` | Separate final-opening and count-only read attempts |
 
-Both files are data, not prose conventions. Canonicalize with `jq -S -c` before digesting.
+File-identity pins use SHA-256 of exact bytes. The audit object digest uses the canonical JSON
+routine in `memento_task.digest` (UTF-8, sorted keys, compact separators, no NaN).
 
 ## Verification performed
 
@@ -84,8 +81,9 @@ therefore mean what the article says they mean in this copy of the workbook.
 - **`RecallType` is the accuracy filter, and its code book is now recorded.** Strict veridical is
   code 1 (11,762 rows). A gist-inclusive variant is codes 1+2 (16,726 rows; both are accurate by
   the article's definition). Codes 3, 4 and 5 must never enter an accuracy measure — 3 is
-  *inaccurate* content, 4 is commentary, 5 is not recall. Seven rows carry non-integer values
-  (Excel dates and free text) and must be excluded explicitly rather than coerced.
+  *inaccurate* content, 4 is commentary, 5 is not recall. These are historical all-sheet counts
+  before header overlays. Ten invalid code cells are explicitly excluded: five malformed text
+  values, two Excel date serials, and three out-of-range integers; none is coerced.
 - **Code 3 is a confabulation signal**, distinct from the 150 rows flagged in the `FalseMemory`
   column. Neither has an analogue in Sherlock or Film Festival.
 - **The causal graph is not gold.** Seven raters, leave-one-out interrater reliability r = .10 to
@@ -110,12 +108,52 @@ Three, all measured on the staged bytes:
   `SecondsInMinuteTime, SecondsOfRecall, RecallType, BroadSceneNum, SubsceneNum, Detail, FalseMemory,
   FalseMemExp, Transcript`. Variants add `BroadSceneNum2`/`SubsceneNum2` for a recall unit spanning
   two scenes, append code-book legend columns, or drop `RecallType` or `Transcript` entirely. A
-  loader must key on header names and never on column position.
+  loader keys on names, except the exact workbook/header/cell-bound overlays below.
 - **`SecondsInMinuteTime` mixes three encodings** — `00:00:05`, `0:00:00`, and Excel datetimes
   serialized as `1900-01-01 00:00:05` — plus blanks. `SecondsOfRecall` is the safer clock, while
   itself occasionally being a time string rather than a number.
-- **`RecallType` is not uniformly integral**: seven rows carry Excel dates, out-of-range integers
-  (`22`, `45`), or free text (`'3? 2?'`, multi-line strings). Exclude explicitly; do not coerce.
+- **`RecallType` has ten invalid cells**: two Excel date serials, three out-of-range integers,
+  and five malformed text values. Exclude explicitly; do not coerce.
+
+## Frozen task and access
+
+One substantive **physical Excel row** is one observation. Identity binds workbook SHA-256,
+participant sheet and physical row number; blank row gaps and repeated text are preserved.
+Eligible rows have a nonblank transcript, code 1 or 2, and valid scene annotations in 1–44.
+Both populated scene fields must validate. An integer prediction matching either annotation
+is correct once. This measures any-annotated-scene recovery, not recovery of all multi-scene
+content. Missing scene gold (including code-2 gist rows) remains in accounting outside accuracy.
+Missing or invalid time does not change eligibility; no row-index clock is invented.
+
+The primary statistic averages eligible-row accuracy equally across participants, separately
+by condition. A retained participant with no eligible rows makes full-population accuracy
+undefined. Prediction input is a sequence of unit-ID/outcome pairs: duplicates, omissions and
+extra IDs refuse scoring; invalid labels and nonlabels are wrong on eligible rows.
+
+S42's unlabeled code column and S53/S162/S175 transcript headings have **inferred** overlays
+bound to exact bytes and full header signatures. S53's truncated clock heading is also normalized.
+These are not author-confirmed corrections. Interpretation of the qualification in S53's long
+transcript header remains unresolved. The pre-seal audit reports counts with overlays disabled
+and each affected sheet's contribution, so this assumption remains visible. S84's noncanonical
+clock heading is left unresolved because time is optional for this task.
+
+All recall readers use `memento_guard`. Development text reads are permitted; test text reads
+require an explicit committed release manifest and matching digest. Every final authorization
+is logged; the capability is not one-use. After sealing, population surveys and admission-audit
+forms refuse access, even if the committed split is deleted locally. Whole-corpus accounting
+returns aggregates and logs its attempt before reading; commit the ledger before the next read.
+The reader scan is a cooperative tripwire, not an operating-system security boundary.
+
+Reproduce the committed seal without reading recall:
+
+```sh
+python3 tools/recall-study/memento_split.py --check --data-root /nonexistent
+```
+
+Planning power uses participant-level paired differences, not row counts, and reports the four
+conditions separately. Its hypothetical SD grid is not an observed variance estimate; four
+marginal calculations establish neither interaction nor familywise power nor film generalization.
+The split is model-untouched, not unseen: structural and aggregate annotation audits preceded it.
 
 ## Primary sources
 
