@@ -1,5 +1,8 @@
 {
-  "readCount": 0,
-  "reads": [],
-  "schema": "storymodel4s.friends.test-split-reads/v1"
+  "corpus": "friends",
+  "countOnlyReadCount": 0,
+  "countOnlyReads": [],
+  "finalOpeningCount": 0,
+  "finalOpenings": [],
+  "schema": "storymodel4s.sealed-split-reads/v1"
 }
