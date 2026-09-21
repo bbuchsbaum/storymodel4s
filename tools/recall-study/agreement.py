@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Cross-participant agreement: a gold-free proxy that confidence alone cannot win.
+"""Cross-participant agreement: a gold-free diagnostic, not an accuracy measure.
 
 Every outcome the study has used so far can be inflated by making the model more certain. Kendall
 tau rises with a sequential prior because tau *is* sequentiality; concentration and localizability
@@ -10,8 +10,9 @@ improves all three should not be believed on their word alone.
 This measures something else. Different participants watched the *same* film, so when two of them
 recall the same moment, a correct mapping puts both of their descriptions at the same place in the
 film. The pairing of recall units across participants is computed from the recall text alone and is
-identical for every arm, so no arm can change which units are compared. A model that became more
-confident without becoming more accurate would move both anchors no closer together.
+identical for every arm, so no arm can change which units are compared. It is not accuracy: two
+anchors can agree at the wrong place, and a constant anchor attains a zero gap (the control
+printed below).
 
 Units are paired by mutual-best inverse-document-frequency overlap above a floor, which keeps only
 pairs likely to describe the same event and discards the rest rather than pairing them badly. The

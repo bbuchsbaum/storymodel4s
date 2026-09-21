@@ -71,18 +71,26 @@ weight it ranks by the semantic distance itself and the re-ranking is the identi
 is run as a guard before the sweep. It is worth more than a unit test here: it exercises the whole
 path, including table construction, abstention handling and the remapping, against a known answer.
 
-## The primary outcome is cross-participant agreement
+## Cross-participant agreement is a gold-free diagnostic
 
-`agreement.py A DIR_A B DIR_B` is the judge of record. Seventeen people watched the same film, so
-when two of them describe the same moment a correct mapping puts both descriptions in the same
-place. Units are paired *across* participants by mutual-best IDF overlap of the recall text alone, so
-the pairing is identical for every arm and no arm can change which comparisons it is scored on.
+`agreement.py A DIR_A B DIR_B` compares arms on cross-participant agreement. Seventeen people
+watched the same film, so when two of them describe the same moment a correct mapping puts both
+descriptions in the same place. Units are paired *across* participants by mutual-best IDF overlap
+of the recall text alone, so the pairing is identical for every arm and no arm can change which
+comparisons it is scored on.
+
+The study once used agreement as its gold-free primary outcome; it chose the ordering-prior scale.
+It is not an accuracy measure. A constant anchor attains a zero gap (the script prints that
+control), and in the navigation-ladder readout agreement favoured the content and hierarchy rungs
+(median gap 69.5 s against 92.0 s) while their scene-accuracy difference from the full rung spanned
+zero (+0.55 points, CI [-1.28, +2.55]; [study log](../../docs/plans/2026-09-02-recall-to-video-study-log.md#navigation-ladder-readout-2026-09-05)).
+Scene localization against gold is scored by `gold_scene.py` under [SCORING.md](SCORING.md).
 
 **Concentration and localizability are demoted to diagnostics and may no longer choose an arm.**
 Both measure how peaked the posterior is, so any stronger prior improves them whether or not it is
 right. Measured: as the ordering prior strengthens they rise monotonically and unanimously all the
 way to scale 8, while agreement peaks at 1.5 and by scale 8 is *worse than doing nothing*. A model
-can top both while getting further from the truth.
+can top both while agreement worsens.
 
 **Use the paired bootstrap and the signed-rank, not a sign test.** About 40% of anchors are unchanged
 between any two arms, so the median of per-pair differences is 0 by construction and a sign test

@@ -2,7 +2,7 @@ package storymodel4s.bench.video
 
 import storymodel4s.align.{HsmmConfig, TransitionKind, TransitionModel}
 
-/** The control that makes the sequential model judgeable, and the knob it lets us turn.
+/** A sensitivity control for the sequential model, and the knob it lets us turn.
   *
   * Kendall tau may not judge a change to the transition model on its own, because tau *is*
   * sequentiality: strengthening a forward prior raises it mechanically, and a model that simply
@@ -62,7 +62,9 @@ object RecallOrderControl:
       buf.map(_.trim.stripSuffix(".")).filter(_.nonEmpty).mkString(". ") + "."
 
   /** Scale the ordering prior. `1.0` is the shipped model; `0.0` removes the direction of time
-    * while leaving every other transition, and therefore the state space, untouched.
+    * while leaving every other transition, and therefore the state space, untouched. Zero is still
+    * a reconstruction ablation, not an order-free reference measurement: `Stay`, the external
+    * logits and any post-inference scene decode remain (docs/refactor/PLAN.md §1, ADR 0019).
     */
   def scaledConfig(scale: Double): HsmmConfig =
     val theta = TransitionModel.default.theta.map {

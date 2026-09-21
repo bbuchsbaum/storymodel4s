@@ -33,7 +33,12 @@ and programme work.
   with transition flow `F` over the recall trajectory.
 - Derives a recall *signature* (coverage, fidelity facets, localizability,
   compression, chronology deformation, causal preservation, association and
-  intrusion mass) — a scalar score is only ever a declared projection.
+  intrusion mass) — a scalar score is only ever a declared projection. These
+  are computed outputs, not validated detectors: the distorted fidelity modes
+  and facets (role reversal and modality among them) and intrusion mass have no
+  efficacy evidence. Apart from hand-authored War of the Ghosts foils scored as
+  diagnostics, none has been tested against labelled errors in real recall.
+  Capability evidence is tracked in the [delivery plan](docs/refactor/PLAN.md).
 - Scores Autobiographical Interviews as detail atoms with probabilistic memory
   addresses; traditional internal/external totals are a versioned derived view.
 - Compiles validated models into renderer-neutral Codex and Atlas views whose
@@ -77,35 +82,47 @@ rendering, and the application live in the separate, currently unpublished
 
 ## Maturity
 
-Seventeen build modules are present:
+Twenty-four build modules are present, sixteen cross-platform (JVM, Scala.js,
+Native) and eight JVM-only:
 
 - evidence and semantics: `core`, `proposition`, `amr-interop`, `features`,
   `acquire`, `story`, `document`, `recall`, `align`, and `interview`;
-- portable embeddings and outputs: `embed-core`, `view`, and `codec`;
+- portable embeddings, outputs and corpus intake: `embed-core`, `view`,
+  `codec`, and `corpus`;
 - verification material: `fixtures` and `laws`;
-- JVM-only structural work: `embed-grakern` and `embed-bench`.
+- JVM-only adapters, orchestration and evaluation: `provider-parser`,
+  `provider-agent`, `embed-grakern`, `embed-onnx`, `embed-bench`, `media`,
+  `pipeline`, and `corpus-intake`.
 
 `embed-core` includes deterministic hashed n-gram and TF-IDF baselines;
 `embed-grakern` provides the JVM structural channel; `embed-onnx` runs a pinned
 sentence encoder locally and offline, with committed model and tokenizer
-checksums. That encoder has not yet been compared against the lexical baselines
-on any story, so no claim is made here about what it improves. The repository
-does not yet include an unattended text→AMR parser, an LLM acquisition adapter,
-a remote (HTTP) embedding provider, or calibrated production defaults. Complete
-automatic construction remains programme work.
+checksums. That encoder has been compared with lexical rankers, including
+against the hashed n-gram and TF-IDF baselines on the War of the
+Ghosts cases (`embed-bench/src/test/resources/onnx/wog-minilm-comparison.txt`),
+and against Okapi BM25 on 11 Sherlock development participants with the
+sequential model removed, where it ranked better alone and a blend beat both
+([study log, "Diagnosis 2"](docs/plans/2026-09-02-recall-to-video-study-log.md#diagnosis-2-the-retrieval-channel-measured-with-the-sequential-model-removed)).
+Both are diagnostics (a hand-declared fixture and a gold-free ordering proxy),
+so no claim is made here about what the encoder improves.
+The repository does not yet include an unattended text→AMR parser, an LLM
+acquisition adapter, a remote (HTTP) embedding provider, or calibrated
+production defaults. Complete automatic construction remains programme work.
 
 ## Build and verify
 
 Scala 3.7.4, sbt 1.12.14.
 
 ```
-sbt -Dstorymodel4s.grakern.build=/path/to/grakern testJVM      # fast loop
-sbt -Dstorymodel4s.grakern.build=/path/to/grakern checkAll     # scalafmt + compile + test on JVM, Scala.js, Native
+sbt testJVM      # fast loop
+sbt checkAll     # scalafmt + compile + test on JVM, Scala.js, Native
 ```
 
-The `-D` (or `STORYMODEL4S_GRAKERN_BUILD`) override points the JVM-only
-`embed-grakern` project at a local checkout of the in-house `grakern` library,
-which is consumed as an immutable SHA source pin but is not yet published or
-pushed; grakern's own build fetches its graph4s/gale pins from GitHub.
+The JVM-only `embed-grakern` project consumes the in-house `grakern` library as
+an immutable SHA source pin. grakern has no published artifacts, so sbt clones
+the pinned revision from `github.com/canardlapin/grakern`; CI builds this way.
+`-Dstorymodel4s.grakern.build=/path/to/grakern` (or
+`STORYMODEL4S_GRAKERN_BUILD`) substitutes a local checkout. grakern's own build
+fetches its graph4s/gale pins from GitHub.
 
 Apache-2.0.

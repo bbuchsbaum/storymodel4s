@@ -8,7 +8,7 @@ onset in column two, the shape Sherlock's released word-timestamped exports alre
 The conversion therefore invents within-utterance timing, and says so rather than hiding it: each
 utterance's words are spread evenly across its span (see `convert`). That is an approximation,
 recorded in the receipt as `withinUtteranceTiming: "linear-interpolation"`. It is good enough for
-the gold-free judge of record, which matches units by text overlap, and it is **not** good enough
+the gold-free agreement scorer, which matches units by text overlap, and it is **not** good enough
 for any claim about word-level timing. Real word onsets exist for this corpus in the Chen lab
 release (Zenodo 10.5281/zenodo.8208709, "Film Festival Timestamps"); wiring those in needs a mapping
 from three-letter participant codes to `sub-NN` numbers that the release does not document.

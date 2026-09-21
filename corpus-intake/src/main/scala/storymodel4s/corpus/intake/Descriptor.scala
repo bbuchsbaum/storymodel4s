@@ -11,8 +11,8 @@ import storymodel4s.corpus.*
   *
   * The in-tree precedent is `tools/recall-study/agreement.py:31-45`, which already reads
   * `parts.json` from disk and falls back to a literal only when it is absent. That is the only
-  * data-driven seam in the scoring tree, and it belongs to the judge of record. This generalizes it
-  * rather than inventing a mechanism.
+  * data-driven seam in the scoring tree, and it belongs to the agreement scorer. This generalizes
+  * it rather than inventing a mechanism.
   *
   * It is CONTENT-FREE by construction: counts, ranges, encodings and checksums. No column value is
   * ever written, because a descriptor travels outside the data root.

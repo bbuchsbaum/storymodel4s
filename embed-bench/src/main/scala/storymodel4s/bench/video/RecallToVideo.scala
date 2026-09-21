@@ -456,9 +456,11 @@ object RecallToVideo:
       traceSourceChecksum: Option[Checksum] = None
   ): Unit =
     val t0 = System.nanoTime()
-    // The shuffle control. With a seed set, the recall's sentences are permuted before segmentation
-    // and the run measures how much ordering the pipeline produces from a scrambled transcript.
-    // Whatever survives was the prior talking, not the recall.
+    // The shuffle control: a reconstruction sensitivity diagnostic, not a bias correction (see
+    // RecallOrderControl). With a seed set, the segmented recall units are permuted and
+    // re-segmented, and the run shows how much ordering the pipeline produces from a scrambled
+    // transcript. What survives is not attributable to the prior alone: the prior can interact
+    // differently with shuffled content, and re-segmentation can change the units being compared.
     val rawTranscript = RecallWordsCsv.transcriptText(words)
     val shuffleSeed = sys.env.get("STORYMODEL4S_SHUFFLE_RECALL").flatMap(_.trim.toLongOption)
     def sourceOf(text: String) = StorySource
@@ -551,14 +553,17 @@ object RecallToVideo:
         .generate(recall.ordered, built.view)
     // Strength of the ordering prior, over weights the transition model still marks provisional.
     //
-    // 1.5 rather than the shipped 1.0, chosen on development against cross-participant agreement,
-    // which is the one outcome a merely more confident model cannot win: two people describing the
-    // same moment should be mapped to the same place in the film, and the pairing is computed from
-    // recall text alone so no setting can change which units are compared. Agreement traces an
-    // inverted U with its peak here, median gap 85.5s against 99.0s at 1.0 and 132.0s unblended,
-    // and it is *worse than doing nothing* by scale 8. Concentration and localizability meanwhile
-    // rise monotonically all the way out, which is precisely why they could not be trusted to
-    // choose this: they measure how peaked the posterior is, not whether it is right.
+    // 1.5 rather than the shipped 1.0, chosen on development using cross-participant agreement, a
+    // gold-free diagnostic: two people describing the same moment should be mapped to the same
+    // place in the film, and the pairing is computed from recall text alone so no setting can change
+    // which units are compared. Agreement traced an inverted U with its peak here, median gap 85.5s
+    // against 99.0s at 1.0 and 132.0s unblended, and was *worse than doing nothing* by scale 8.
+    // Concentration and localizability meanwhile rose monotonically all the way out: they measure
+    // how peaked the posterior is, not whether it is right. Agreement is not accuracy either: a
+    // constant anchor attains a zero gap, and the navigation-ladder readout in
+    // docs/plans/2026-09-02-recall-to-video-study-log.md shows it separating rungs whose
+    // scene-accuracy difference spanned zero. The scaled prior is a structured-reconstruction
+    // setting, not a reference-measurement policy (ADR 0019).
     //
     // Honest status: development-only. The untouched participants were already spent confirming the
     // lexical blend, so this value has not been checked out of sample, and the sign test that most

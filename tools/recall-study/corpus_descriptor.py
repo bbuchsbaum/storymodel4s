@@ -18,7 +18,7 @@ semantics. Here they are two DECLARED kinds, and the ambiguity stops being repre
 
 The in-tree precedent for reading this from disk is `agreement.py:31-45`, which already loads
 `parts.json` and falls back to a literal only when it is absent. That is the only data-driven seam
-in this tree and it belongs to the judge of record; this generalizes it rather than inventing a
+in this tree and it belongs to the agreement scorer; this generalizes it rather than inventing a
 mechanism.
 """
 import json
