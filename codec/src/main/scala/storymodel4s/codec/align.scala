@@ -448,10 +448,47 @@ object HsmmResultCodec:
   }
   private given Decoder[WeightWire] = Decoder.instance { c =>
     for
+      _ <- onlyFields(c, "eligible weight", Set("term", "weight"))
       term <- field[CostTerm](c, "term")
       weight <- field[Double](c, "weight")
     yield WeightWire(term, weight)
   }
+
+  /** The exact field sets of the artifact and its cost records (`mode`, `exclusion` and
+    * `sourceChartCoverage` are optional). A field outside them is refused, not ignored: an ignored
+    * field is a claim the artifact makes and the decoder never checked — a v3 `supportWeight` of
+    * `1.0` beside a v4 `NotApplicable`, read by anyone but this decoder, still says "fully
+    * supported".
+    */
+  private val ArtifactFields: Set[String] = Set(
+    "schemaVersion",
+    "posterior",
+    "flow",
+    "viterbi",
+    "logLikelihood",
+    "costs",
+    "candidateAnchors",
+    "admissibilityEcho",
+    "viewFingerprint",
+    "recallChecksum",
+    "refinementPasses"
+  )
+  private val CostFields: Set[String] = Set(
+    "terms",
+    "mode",
+    "exclusion",
+    "total",
+    "missingTerms",
+    "sourceChartCoverage",
+    "reductions",
+    "support",
+    "imputedTerms"
+  )
+
+  private def onlyFields(c: HCursor, record: String, allowed: Set[String]): Decoder.Result[Unit] =
+    val extra = c.keys.map(_.toSet -- allowed).getOrElse(Set.empty).toVector.sorted
+    if extra.isEmpty then Right(())
+    else Left(DecodingFailure(s"$record carries unknown ${extra.mkString(", ")}", c.history))
 
   private val BasisFields: Set[String] = Set("measuredTerms", "eligibleTerms", "eligibleWeights")
   private val AssessedFields: Set[String] = BasisFields ++ Set("type", "share")
@@ -540,6 +577,7 @@ object HsmmResultCodec:
   }
   private given Decoder[CostBreakdownWire] = Decoder.instance { c =>
     for
+      _ <- onlyFields(c, "cost", CostFields)
       terms <- field[Vector[TermWire]](c, "terms")
       mode <- field[Option[FidelityMode]](c, "mode")
       exclusion <- field[Option[Exclusion]](c, "exclusion")
@@ -567,6 +605,7 @@ object HsmmResultCodec:
   }
   private given Decoder[StateCostWire] = Decoder.instance { c =>
     for
+      _ <- onlyFields(c, "state cost", Set("state", "cost"))
       state <- field[AlignState](c, "state")
       cost <- field[CostBreakdownWire](c, "cost")
     yield StateCostWire(state, cost)
@@ -577,6 +616,7 @@ object HsmmResultCodec:
   }
   private given Decoder[UnitCostsWire] = Decoder.instance { c =>
     for
+      _ <- onlyFields(c, "unit costs", Set("unit", "costs"))
       unit <- field[RecallUnitId](c, "unit")
       costs <- field[Vector[StateCostWire]](c, "costs")
     yield UnitCostsWire(unit, costs)
@@ -612,6 +652,7 @@ object HsmmResultCodec:
       // The value is judged before the body is decoded (see `decodeSupported`); the field is
       // still required here, so an artifact without a schema tag is a wire error.
       _ <- field[String](c, "schemaVersion")
+      _ <- onlyFields(c, "HSMM artifact", ArtifactFields)
       posterior <- field[Vector[RowWire]](c, "posterior")
       flow <- field[Vector[FlowStepWire]](c, "flow")
       viterbi <- field[Vector[AlignState]](c, "viterbi")

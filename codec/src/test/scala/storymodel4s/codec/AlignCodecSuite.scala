@@ -291,7 +291,7 @@ class AlignCodecSuite extends FunSuite:
   }
 
   test(
-    "the carried basis must be this record's basis, coherent, and consistent across the result"
+    "the carried basis must be this record's basis and coherent"
   ) {
     val source = support(firstCost(json, "Source"))
     val measured = terms(source, "measuredTerms").toSet
@@ -350,14 +350,58 @@ class AlignCodecSuite extends FunSuite:
       ),
       "SupportAssessment.measuredTerms"
     )
-    // A single cell re-weighted with its share re-derived: coherent on its own, refused because
-    // one result carries one weight per term.
-    rejected(
-      "a re-weighted cell",
-      withSupport(json, "Source")(_ =>
-        assessedJson(measured, eligible.updated(CostTerm.Semantic, eligible(CostTerm.Semantic) * 2))
+  }
+
+  test("fields the schema does not define are refused, not ignored") {
+    // A v3 supportWeight of 1.0 smuggled beside a v4 NotApplicable would be dropped by this
+    // decoder and re-encoded away, but any other reader of the artifact would still see "fully
+    // supported". Unknown fields are refused at the artifact, cost and basis levels.
+    def wireRefused(label: String, document: Json, expected: String): Unit =
+      HsmmResultCodec.decodeJson(document, fixture.recall, fixture.view) match
+        case Left(HsmmCodecError.Wire(error)) =>
+          assert(error.message.contains(expected), s"$label: ${error.message}")
+        case other => fail(s"$label was accepted: $other")
+    wireRefused(
+      "a supportWeight beside NotApplicable",
+      updateFirstCost(json, "External")(
+        _.mapObject(_.add("supportWeight", Json.fromString(CanonicalDouble.render(1.0))))
       ),
-      "CostBreakdown"
+      "cost carries unknown supportWeight"
+    )
+    wireRefused(
+      "an unknown artifact field",
+      json.mapObject(_.add("supportWeights", Json.arr())),
+      "HSMM artifact carries unknown supportWeights"
+    )
+    wireRefused(
+      "an unknown eligible-weight field",
+      withSupport(json, "Source")(
+        _.mapObject { o =>
+          val entries = o("eligibleWeights").flatMap(_.asArray).getOrElse(Vector.empty)
+          o.add(
+            "eligibleWeights",
+            Json.fromValues(entries.head.mapObject(_.add("share", Json.True)) +: entries.tail)
+          )
+        }
+      ),
+      "eligible weight carries unknown share"
+    )
+    wireRefused(
+      "an unknown state-cost field",
+      json.mapObject { root =>
+        val units = root("costs").flatMap(_.asArray).getOrElse(Vector.empty)
+        root.add(
+          "costs",
+          Json.fromValues(units.head.mapObject { u =>
+            val costs = u("costs").flatMap(_.asArray).getOrElse(Vector.empty)
+            u.add(
+              "costs",
+              Json.fromValues(costs.head.mapObject(_.add("support", Json.Null)) +: costs.tail)
+            )
+          } +: units.tail)
+        )
+      },
+      "state cost carries unknown support"
     )
   }
 

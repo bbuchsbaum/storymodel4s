@@ -257,8 +257,10 @@ only the first carries a number:
 
 - `Assessed(share, basis)` — the share of eligible weight that was measured, over
   a nonempty eligible population with positive eligible weight; exactly `1.0`
-  when every eligible term was measured. Ranked source cells; and an
-  `Unassessable` exclusion, whose share is exactly `0`.
+  when every eligible term was measured (it can also round to `1.0` when an
+  unmeasured term's weight is below the sum's precision, so what was measured
+  is read from the basis). Ranked source cells carry a positive share; a share
+  of exactly `0` is an `Unassessable` exclusion, never a ranked cell.
 - `Unestablished(reason, basis)` — `EmptyEligibility` or `ZeroEligibleWeight`: no
   denominator, so no share. Before v4 both published `1.0`.
 - `NotApplicable(reason)` — `ExternalState` for every external-state record,
@@ -270,15 +272,24 @@ The basis (`CellSupportBasis`: measured terms, eligible terms, exact eligible
 weights; measured ⊆ eligible; weights cover exactly the eligible terms, finite,
 nonnegative, with a representable sum) is per cell and inspectable. Shares and
 reasons are derived from it (sums in `CostTerm` order), never supplied by a
-caller or the wire. `AlignWire.costBreakdown` binds support to its record: a
-ranked source record's measured terms are exactly its priced terms minus imputed
-ones, and every priced term is eligible; an external record carries
+caller or the wire. A producer's basis takes eligibility as declared and never
+widens it to what was measured, so an empty or zero-weight declaration cannot
+assess, and a producer that prices a term it declared ineligible fails the
+checked rebuild instead of being hidden. `AlignWire.costBreakdown` binds support
+to its record: a ranked source record's measured terms are exactly its priced
+terms minus imputed ones, every priced term is eligible, and its share is
+positive (or it is `Unestablished`); an external record carries
 `NotApplicable(ExternalState)`, an unreachable one `NotApplicable(Unreachable)`,
-an unassessable one a zero share or no share. `HsmmResult.validated` also refuses
-an external key whose record is not `NotApplicable(ExternalState)` and support
-bases that disagree on a term's weight anywhere in one result. `CostBreakdown`,
-the three variants and `CellSupportBasis` are non-case classes with bare-private
-constructors: no `apply`, `copy`, `fromProduct` or `Mirror` from any package.
+an unassessable one a zero share or no share. `HsmmResult.validated` also
+refuses an external key whose record is not `NotApplicable(ExternalState)` and
+an anchored key whose record claims `Unreachable` (nomination proved the anchor
+is in the view). `CostBreakdown`, the three variants and `CellSupportBasis` are
+non-case classes with bare-private constructors: no `apply`, `copy`,
+`fromProduct` or `Mirror` from any package. The companion's `align`-internal
+producers remain reachable from `storymodel4s.align` subpackages; none accepts a
+support value (each derives it), but they do not re-run the record checks, so
+an in-memory record built there can carry, for example, a non-finite term that
+the wire would refuse — the same trust boundary as before, narrowed.
 This change moves no number: totals (including `scaleToEligible`'s factor-1
 branches) are unchanged, and on the WOG goldens of every backend each assessed
 share equals the old `supportWeight` bit for bit (the share is now summed in
@@ -286,7 +297,8 @@ share equals the old `supportWeight` bit for bit (the share is now summed in
 residuals: the carried eligible population and weights are
 internally consistent, not proven to be the ones a cost model priced with
 (invocation binding is bd-01M1DA6NJXYT4NEA18745FM3KY), so a tampered artifact
-that shrinks a cell's eligible population is not detectable here; and a cell
+that shrinks a cell's eligible population, or re-weights its eligible terms, is
+not detectable here; and a cell
 with zero eligible weight is still priced at the function prior — it is now
 published as `Unestablished`, but whether it should be priced or excluded is an
 estimand decision this change does not make.
@@ -366,7 +378,10 @@ reaches the codec).
   the record's shape derives (`ExternalState` for an external record,
   `Unreachable` for an unreachable exclusion). The basis is internally
   consistent evidence, not invocation provenance (see D5.1, cost support).
-  `imputedTerms` (v3) remains required. `Estimate` and `Coverage` use their
+  `imputedTerms` (v3) remains required. The artifact, each unit-cost and
+  state-cost entry, each cost and each eligible weight also have exact field
+  sets: an unknown field (for example a v3 `supportWeight` beside a v4
+  `support`) is a wire error, not ignored. `Estimate` and `Coverage` use their
   shared codec schemas.
 - Encoding orders posterior and flow in inference order; Viterbi in recall
   order; state masses by state key; flow masses by `(fromState, toState)` key;
@@ -557,8 +572,10 @@ fixture. Details in the spike spec.
   support basis threaded through `GraphHsmm.infer` with fallible cost-model
   producers: it binds support to the invocation, which is the provenance work of
   bd-01M1DA6NJXYT4NEA18745FM3KY, and it changes the `infer`/`LocalCostModel`
-  API; v4 ships the per-cell basis and a within-result weight-agreement check
-  instead. Excluding zero-eligible-weight cells as `Unassessable`: it moves
+  API; v4 ships the per-cell basis instead. A within-result check that every
+  cell's basis agrees on each term's weight was tried and dropped: it made
+  `infer` fail for a lawful custom model that weights cells differently, and a
+  tamper that re-weights every cell consistently evades it anyway. Excluding zero-eligible-weight cells as `Unassessable`: it moves
   prices, so it is an estimand change, not a representation change. Omitting
   `share` from the wire: it is carried, redundantly and bit-checked, so a
   non-Scala reader of the JSON sees the number the decoder would derive.

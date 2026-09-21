@@ -447,9 +447,9 @@ object AlignWire:
     * caller can pick a share or a reason — so what remains is whether the right KIND of support
     * sits on the right kind of record, and whether its basis is this record's basis:
     *
-    *   - a ranked source record is a content comparison: its support is Assessed or Unestablished,
-    *     its measured population is exactly the priced terms that were not imputed, and every
-    *     priced term is eligible;
+    *   - a ranked source record is a content comparison: its support is Assessed with a positive
+    *     share, or Unestablished; its measured population is exactly the priced terms that were not
+    *     imputed, and every priced term is eligible;
     *   - an Unassessable exclusion rests on no weighted measurement: its assessed share is exactly
     *     0, or it has no denominator at all;
     *   - an Unreachable exclusion measured nothing: NotApplicable(Unreachable), with no basis;
@@ -478,6 +478,11 @@ object AlignWire:
     (mode, exclusion) match
       case (Some(_), None) =>
         support match
+          // ZERO ASSESSED SUPPORT IS AN EXCLUSION, NOT A PRICE - the producer's own rule
+          // (CostBreakdown.derived). A ranked cell that measured no weighted term would be priced
+          // at its function prior, below the external floor, and win for having measured nothing.
+          case assessed: SupportAssessment.Assessed if assessed.share == 0.0 =>
+            Some(bad(r, "a record with zero assessed support must be excluded as Unassessable"))
           case assessed: SupportAssessment.Assessed           => boundTo(assessed.basis)
           case unestablished: SupportAssessment.Unestablished => boundTo(unestablished.basis)
           case _: SupportAssessment.NotApplicable             =>

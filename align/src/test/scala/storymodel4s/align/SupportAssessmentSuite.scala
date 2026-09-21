@@ -78,13 +78,50 @@ class SupportAssessmentSuite extends FunSuite:
     val empty = unestablished(evidence(Set.empty, Map.empty))
     assertEquals(empty.reason, SupportUnestablishedReason.EmptyEligibility)
     assert(empty.basis.eligibleTerms.isEmpty && empty.basis.measuredTerms.isEmpty)
-    val producer = SupportAssessment.derive(
-      CellSupportBasis.fromWeights(Set.empty, Set.empty, CostWeights.default)
+    // The producer's basis for an empty DECLARED population must not assess either - not even
+    // when it measured something. Widening eligibility to the measured terms would let an empty
+    // declaration publish 1.0 (and hide a producer pricing a term it calls ineligible).
+    Vector(Set.empty[CostTerm], Set(CostTerm.Semantic, CostTerm.Entity)).foreach { measured =>
+      val producer = SupportAssessment.derive(
+        CellSupportBasis.fromWeights(measured, Set.empty, CostWeights.default)
+      )
+      assertEquals(
+        unestablished(producer).reason,
+        SupportUnestablishedReason.EmptyEligibility,
+        s"the producer's basis for an empty declared population assessed (measured $measured)"
+      )
+    }
+  }
+
+  test("a producer that prices a term it did not declare eligible fails the checked rebuild") {
+    // The present-but-not-eligible defect (once: Chart on segment cells) must stay VISIBLE. The
+    // basis counts only declared-eligible measurements, so the record's own support disagrees with
+    // its priced terms and the checked factory - the rebuild law every real result passes - refuses.
+    val b = CostBreakdown.derived(
+      Map(CostTerm.Semantic -> 0.2, CostTerm.Sensory -> 0.3),
+      FidelityMode.Faithful,
+      Set.empty,
+      None,
+      Map.empty,
+      Map.empty,
+      Set(CostTerm.Semantic),
+      CostWeights.default,
+      1.0
     )
-    assertEquals(
-      unestablished(producer).reason,
-      SupportUnestablishedReason.EmptyEligibility,
-      "the producer's basis for an empty population must not assess"
+    assertEquals(assessed(b.support).measuredTerms.toSet, Set(CostTerm.Semantic))
+    refusedRecord(
+      "a record priced over an undeclared term",
+      AlignWire.costBreakdown(
+        b.terms,
+        b.mode,
+        b.exclusion,
+        b.total,
+        b.missingTerms,
+        b.sourceChartCoverage,
+        b.reductions,
+        b.support,
+        b.imputedTerms
+      )
     )
   }
 
@@ -306,13 +343,69 @@ class SupportAssessmentSuite extends FunSuite:
       "an unpriced term in the measured population",
       rebuilt(source, evidence(basis.measuredTerms.toSet + unpriced, weightsOf))
     )
-    // A priced term outside the eligible population.
-    val narrowed = weightsOf - dropped
-    refusedRecord(
-      "a priced term that is not eligible",
-      rebuilt(source, evidence(basis.measuredTerms.toSet - dropped, narrowed))
-    )
     assertEquals(rebuilt(source, evidence(basis.measuredTerms.toSet, weightsOf)), Right(source))
+  }
+
+  test("every priced term must be eligible, including an imputed one") {
+    // The eligibility half of the binding can only fire when the measured population agrees:
+    // impute Semantic (it leaves the measured set) and drop it from eligibility, so measured =
+    // priced - imputed still holds and only "priced but not eligible" is wrong.
+    val basis = assessed(source.support).basis
+    val weightsOf = basis.eligibleWeights.toMap
+    val imputed = Map(CostTerm.Semantic -> MissingReason.ProviderAbstained)
+    def record(eligible: Map[CostTerm, Double]) = AlignWire.costBreakdown(
+      source.terms,
+      source.mode,
+      None,
+      source.total,
+      source.missingTerms,
+      source.sourceChartCoverage,
+      source.reductions,
+      evidence(basis.measuredTerms.toSet - CostTerm.Semantic, eligible),
+      imputed
+    )
+    record(weightsOf - CostTerm.Semantic) match
+      case Left(AlignError.MalformedRecord("CostBreakdown", detail)) =>
+        assert(detail.contains("eligible"), detail)
+      case other => fail(s"an imputed term outside eligibility was accepted: $other")
+    assert(record(weightsOf).isRight, "control: the same imputation over its eligible basis")
+  }
+
+  test("a ranked record with zero assessed support is refused; excluded, it is lawful") {
+    // Zero assessed support is an exclusion, not a price: ranked, a cell that measured no weighted
+    // term would be priced at its function prior, below the external floor, and win.
+    val zero = evidence(Set.empty, Map(CostTerm.Semantic -> 1.0))
+    val imputed = Map(CostTerm.Semantic -> MissingReason.ProviderAbstained)
+    AlignWire.costBreakdown(
+      Map(CostTerm.Semantic -> 0.5),
+      Some(FidelityMode.Faithful),
+      None,
+      0.5,
+      Set.empty,
+      None,
+      Map.empty,
+      zero,
+      imputed
+    ) match
+      case Left(AlignError.MalformedRecord("CostBreakdown", detail)) =>
+        assert(detail.contains("Unassessable"), detail)
+      case other => fail(s"a ranked record with zero support was accepted: $other")
+    // Control: the same record with one weighted measurement is a lawful ranked record.
+    assert(
+      AlignWire
+        .costBreakdown(
+          Map(CostTerm.Semantic -> 0.5),
+          Some(FidelityMode.Faithful),
+          None,
+          0.5,
+          Set.empty,
+          None,
+          Map.empty,
+          evidence(Set(CostTerm.Semantic), Map(CostTerm.Semantic -> 1.0)),
+          Map.empty[CostTerm, MissingReason]
+        )
+        .isRight
+    )
   }
 
   test("an unassessable exclusion must rest on exactly zero assessed support") {
@@ -329,6 +422,34 @@ class SupportAssessmentSuite extends FunSuite:
       Map.empty[CostTerm, MissingReason]
     )
     assert(unassessable.isRight, s"control: zero support is a lawful exclusion: $unassessable")
+    val noDenominator = AlignWire.costBreakdown(
+      Map.empty,
+      None,
+      Some(Exclusion.Unassessable),
+      Double.MaxValue / 4,
+      Set.empty,
+      None,
+      Map.empty,
+      evidence(Set.empty, Map(CostTerm.Semantic -> 0.0)),
+      Map.empty[CostTerm, MissingReason]
+    )
+    assert(noDenominator.isRight, s"control: no denominator is a lawful exclusion: $noDenominator")
+    Vector(SupportAssessment.externalState, SupportAssessment.unreachable).foreach { inapplicable =>
+      refusedRecord(
+        s"an unassessable record with $inapplicable",
+        AlignWire.costBreakdown(
+          Map.empty,
+          None,
+          Some(Exclusion.Unassessable),
+          Double.MaxValue / 4,
+          Set.empty,
+          None,
+          Map.empty,
+          inapplicable,
+          Map.empty[CostTerm, MissingReason]
+        )
+      )
+    }
     refusedRecord(
       "an unassessable record with a positive share",
       AlignWire.costBreakdown(
@@ -377,27 +498,52 @@ class SupportAssessmentSuite extends FunSuite:
     assertEquals(revalidate(r, r.costs), Right(r), "control")
   }
 
-  test("support bases in one result must agree on each term's weight") {
-    // Each basis is internally coherent on its own; without the cross-cell check one artifact could
-    // re-weight a single cell to move its share. The replacement is a VALID record in isolation.
-    val (unit, state) = result.costs.toVector
+  test("an anchored key is never Unreachable: nomination proved its anchor is in the view") {
+    // Reach a DROPPED anchored key (readable keys refuse any excluded record first): with only
+    // Sensory weighted and no sensory terms, every source cell is Unassessable and dropped.
+    val w = weights(0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.5, 0.5)
+    val stripped = storymodel4s.recall.RecallGraph
+      .validated(recall.copy(units = recall.units.map { u =>
+        u.copy(proposition = u.proposition.copy(sensoryTerms = Vector.empty))
+      }))
+      .fold(e => fail(e.toString), identity)
+    val r = GraphHsmm
+      .infer(stripped, view, candidates, costModel.copy(weights = w))
+      .fold(e => fail(e.message), identity)
+    val (unit, key) = r.costs.toVector
       .flatMap((u, m) =>
-        m.toVector.collect {
-          case (s, b) if b.mode.nonEmpty && assessed(b.support).share < 1.0 => (u, s)
-        }
+        m.toVector.collect { case (s, b) if !s.isExternal && b.excluded => (u, s) }
       )
-      .head
-    val b = result.costs(unit)(state)
-    val basis = assessed(b.support).basis
-    val reweighted = evidence(
-      basis.measuredTerms.toSet,
-      basis.eligibleWeights.toMap.updated(CostTerm.Semantic, 2.0)
-    )
-    val record = rebuilt(b, reweighted).fold(e => fail(e.message), identity)
-    assertNotEquals(assessed(record.support).share, assessed(b.support).share)
-    revalidate(result, result.costs.updated(unit, result.costs(unit).updated(state, record))) match
+      .headOption
+      .getOrElse(fail("fixture: no dropped source key"))
+    val forged = r.costs.updated(unit, r.costs(unit).updated(key, CostBreakdown.unreachable))
+    HsmmResult.validated(
+      stripped,
+      view,
+      r.candidateAnchors,
+      r.posterior,
+      r.flow,
+      r.viterbi,
+      r.logLikelihood,
+      forged,
+      r.refinementPasses
+    ) match
       case Left(AlignError.MalformedRecord("CostBreakdown", detail)) =>
-        assert(detail.contains("Semantic"), detail)
-      case other => fail(s"a re-weighted cell was accepted: $other")
-    assertEquals(revalidate(result, result.costs), Right(result), "control")
+        assert(detail.contains("not Unreachable"), detail)
+      case other => fail(s"an anchored key claimed Unreachable: $other")
+    assertEquals(
+      HsmmResult.validated(
+        stripped,
+        view,
+        r.candidateAnchors,
+        r.posterior,
+        r.flow,
+        r.viterbi,
+        r.logLikelihood,
+        r.costs,
+        r.refinementPasses
+      ),
+      Right(r),
+      "control"
+    )
   }

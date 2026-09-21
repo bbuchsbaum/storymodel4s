@@ -178,7 +178,7 @@ enum SupportNotApplicableReason:
   *
   * A share is a claim about this basis and nothing else, so the basis travels with it: a consumer
   * can see that `0.955` means "3.2 of 3.35 eligible weight" rather than trusting a bare number.
-  * Measured terms are always eligible (a term that was measured could have been), and sums run in
+  * Measured terms must be eligible (a term that was measured could have been), and sums run in
   * `CostTerm` order so the share is the same double on every platform.
   *
   * This is a PER-CELL accounting record. It does not prove which weights a cost model priced the
@@ -239,18 +239,24 @@ object CellSupportBasis:
             Left(malformed("the eligible weight sum must be representable"))
           else Right(basis)
 
-  /** The basis a producer that priced with `weights` measured. A measured term is eligible by
-    * definition, so it joins the eligible population if a caller omitted it; [[CostWeights.of]]
-    * already guarantees finite weights with a representable aggregate, so no check can fail.
+  /** The basis of a producer that priced with `weights` over its DECLARED eligible population.
+    * [[CostWeights.of]] already guarantees finite weights with a representable aggregate.
+    *
+    * Eligibility is taken as declared, never widened. A measured term the producer did not declare
+    * eligible is left out of the basis rather than added to it: widening would let an empty or
+    * zero-weight declaration publish a share of `1.0` (the defect this carrier removes), and would
+    * hide a producer that prices a term it calls ineligible — the present-but-not-eligible defect
+    * that once multiplied segment costs DOWN. Left out, such a record fails the checked factory's
+    * binding (measured = priced − imputed), so the rebuild laws expose it.
     */
   private[align] def fromWeights(
       measuredTerms: Set[CostTerm],
       eligibleTerms: Set[CostTerm],
       weights: CostWeights
   ): CellSupportBasis =
-    val eligible = SortedSet.from(eligibleTerms ++ measuredTerms)
+    val eligible = SortedSet.from(eligibleTerms)
     new CellSupportBasis(
-      SortedSet.from(measuredTerms),
+      SortedSet.from(measuredTerms.filter(eligibleTerms)),
       eligible,
       SortedMap.from(eligible.iterator.map(term => term -> weights(term)))
     )
@@ -274,7 +280,9 @@ sealed trait SupportAssessment
 
 object SupportAssessment:
   /** A share in `[0, 1]` of eligible weight that was measured, over a NONEMPTY eligible population
-    * with positive eligible weight. Exactly `1.0` when every eligible term was measured.
+    * with positive eligible weight. Exactly `1.0` when every eligible term was measured (and able
+    * to round to `1.0` when an unmeasured term's weight is below the sum's precision: the basis,
+    * not the share, says what was measured).
     */
   final class Assessed private (
       val share: Double,
@@ -527,11 +535,14 @@ final class CostBreakdown private (
     /** How much of the evidence this record's cost could rest on was measured.
       *
       * `total` is scaled up to eligible support, which assumes the unmeasured eligible terms behave
-      * like the measured ones. [[SupportAssessment.Assessed]] names that assumption: share `1.0`
-      * means nothing was assumed, and a lower share says how much of the cost is extrapolation. A
-      * consumer comparing costs across cells with different support is comparing claims of
-      * different strength, and this is what lets it notice — or refuse. A cell with no denominator
-      * is [[SupportAssessment.Unestablished]], and an external or unreachable record is
+      * like the measured ones. [[SupportAssessment.Assessed]] names that assumption: a share below
+      * `1.0` says how much of the cost is extrapolation. The share is exactly `1.0` when every
+      * eligible term was measured, but it can also ROUND to `1.0` when the unmeasured eligible
+      * weight is below the denominator's precision, so whether anything was assumed is answered by
+      * the basis (measured versus eligible terms), not by the number. A consumer comparing costs
+      * across cells with different support is comparing claims of different strength, and this is
+      * what lets it notice — or refuse. A cell with no denominator is
+      * [[SupportAssessment.Unestablished]], and an external or unreachable record is
       * [[SupportAssessment.NotApplicable]]: neither carries a number, so neither can be sorted
       * above a cell that measured something.
       */
@@ -675,7 +686,8 @@ object CostBreakdown:
     )
 
   /** A source record whose support is DERIVED from the record itself: measured terms are the priced
-    * terms that were not imputed, and the basis carries the exact weights of `eligible ∪ measured`.
+    * terms that were not imputed, over the DECLARED `eligible` population with its exact weights
+    * (see [[CellSupportBasis.fromWeights]]: eligibility is never widened to what was measured).
     *
     * ZERO ASSESSED SUPPORT IS AN EXCLUSION, NOT A PRICE. With no weighted evidence the blend
     * contributes nothing and the cost falls to the function prior, which is below the external

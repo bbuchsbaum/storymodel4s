@@ -102,6 +102,8 @@ basis it rests on); `CostBreakdown.unreachable` is a `val`.
 
 `HsmmResultCodec` writes and reads `hsmm/v4` only. An `hsmm/v3` artifact is refused
 with `HsmmCodecError.Wire(CodecError.UnsupportedSchema("hsmm/v3", Vector("hsmm/v4")))`.
+Unknown fields in the artifact, its cost entries and its support are now wire
+errors rather than silently ignored.
 There is no converter: a v3 `supportWeight` of `1.0` cannot say which support
 state applied, so a v3 artifact is re-derived from its inputs, not upgraded.
 

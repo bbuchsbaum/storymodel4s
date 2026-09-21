@@ -777,18 +777,17 @@ class WireSuite extends FunSuite:
         b.terms.contains(deterministic),
         s"fixture: $deterministic must be priced, or this court proves nothing"
       )
-      val forged = AlignWire.costBreakdown(
-        b.terms,
-        b.mode,
-        b.exclusion,
-        b.total,
-        b.missingTerms,
-        b.sourceChartCoverage,
-        b.reductions,
-        b.support,
-        b.imputedTerms + (deterministic -> MissingReason.ProviderAbstained)
-      )
-      assert(forged.isLeft, s"$deterministic was accepted as imputed")
+      // Support is re-derived for the forged imputation (Parts.coherent), so the record is
+      // otherwise coherent and ONLY the provider rule can refuse it. Reusing the original support
+      // let the support binding refuse it instead, and the court survived deleting the guard.
+      rebuild(
+        parts(b).copy(imputedTerms =
+          b.imputedTerms + (deterministic -> MissingReason.ProviderAbstained)
+        )
+      ) match
+        case Left(AlignError.MalformedRecord(_, detail)) =>
+          assert(detail.contains("provider"), s"$deterministic refused for another reason: $detail")
+        case other => fail(s"$deterministic was accepted as imputed: $other")
     // Control: Semantic, which does have a provider and a declared constant, is still admitted.
     assertEquals(rebuild(b), Right(b))
     assert(b.imputedTerms.contains(CostTerm.Semantic))
