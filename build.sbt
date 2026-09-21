@@ -533,4 +533,4 @@ addCommandAlias(
   (allModules.map(m => s"${m}JVM/test") ++ jvmOnlyModules.map(m => s"$m/test"))
     .mkString(";", ";", "")
 )
-addCommandAlias("checkAll", ";scalafmtCheckAll;scalafmtSbtCheck;compileAll;testAll")
+addCommandAlias("checkAll", ";compileAll;testAll;scalafmtCheckAll;scalafmtSbtCheck")

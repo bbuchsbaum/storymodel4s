@@ -373,9 +373,12 @@ AGENTS.md has grown from 765 to 1491 lines.
 
 ## 5. Traps that will cost you a session
 
-- **`sbt checkAll` runs scalafmt FIRST**, which `AGENTS.md:1144-1152` explicitly forbids: sbt's `;`
-  aborts on first failure, so a whitespace nit destroys the correctness signal. The alias
-  (`build.sbt:475`) contradicts the doctrine. Either fix the alias or run the phases separately.
+- **`sbt checkAll` ran scalafmt FIRST until 2026-09-21**, against the *Run the format check LAST*
+  rule in `AGENTS.md`: sbt's `;` aborts on first failure, so a whitespace nit destroyed the
+  correctness signal. Fixed: the alias (`build.sbt`, `addCommandAlias("checkAll", …)`) now runs
+  `compileAll;testAll` before `scalafmtCheckAll;scalafmtSbtCheck`. The chain still stops at the
+  first failure, so a failing test hides any formatting finding until the tests pass, and within
+  `testAll` the first failing module hides the modules after it.
 - **sbt does not build in a linked git worktree** (jgit `NoWorkTreeException`, `AGENTS.md:281-291`).
   The `zz-worktree-local.sbt` shim works for some tasks and is not reliable for all. Gate in a clone.
 - **`embed-grakern` needs `-Dstorymodel4s.grakern.build=<path>`** (or `STORYMODEL4S_GRAKERN_BUILD`)
