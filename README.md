@@ -119,7 +119,7 @@ Scala 3.7.4, sbt 1.12.14.
 
 ```
 sbt testJVM      # fast loop
-sbt checkAll     # scalafmt + compile + test on JVM, Scala.js, Native
+sbt checkAll     # compile + test on JVM, Scala.js, Native, then scalafmt
 ```
 
 The JVM-only `embed-grakern` project consumes the in-house `grakern` library as

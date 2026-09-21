@@ -102,8 +102,9 @@ an unresolved referent may not look resolved; a partial model renders as visibly
 - **Run `bash tools/reference-scope.sh "$(git merge-base main HEAD)" HEAD` before naming a SHA**, and
   gate every module it names. A rule that decides whether any model validates has a blast radius the
   size of every suite that builds a model, not the size of the files you edited.
-- **`scalafmtAll` before claiming green.** `checkAll` runs the format check first and aborts the
-  whole gate on one unformatted file, so zero tests run.
+- **`scalafmtAll` before claiming green.** Until 2026-09-21 `checkAll` ran the format check first
+  and aborted the whole gate on one unformatted file, so zero tests ran. It now runs
+  `compileAll;testAll` first and formatting last, but a format failure still fails the gate.
 - **Gate exports are ~2.8 GB.** Keep one live, delete it the moment its candidate lands, and delete
   only paths you created — a glob over `gate-*` once destroyed another agent's evidence.
 - **Watch a gate by its PID** (`until ! ps -p <pid>`), never by `pgrep -f <export-dir>`: the export
