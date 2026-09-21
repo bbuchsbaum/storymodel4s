@@ -1,0 +1,154 @@
+{
+  "schema": "storymodel4s.friends.test-split/v1",
+  "corpus": "friends",
+  "mote": "bd-01M2TA4QG638M6ZH8Q23CAK401",
+  "seed": 20260921,
+  "rule": "random.Random(SEED).shuffle(IDs sorted by numeric suffix); first 13 development, remaining 10 test",
+  "decision": "Owner chose 10 test / 13 development on 2026-09-21 (alternatives offered: 12/11, 8/15, hold). docs/plans/2026-09-17-friends-hill-climb-and-normalization.md:222-224 had suggested 14/9.",
+  "draw": {
+    "script": "tools/recall-study/friends_split.py",
+    "scriptSha256": "74b2ca67b39a00bb5feaef3eddfceada5a152e0dd76fb334677823f8ba585a4f",
+    "guardSha256AtSeal": "74e114585c59c35fb778ce42aad37915c55258311e9d90860ec8d747935eadb6",
+    "python": "3.14.7",
+    "readsNoRecallToDraw": true
+  },
+  "pool": {
+    "participants": [
+      "s1",
+      "s2",
+      "s3",
+      "s4",
+      "s5",
+      "s6",
+      "s7",
+      "s8",
+      "s9",
+      "s10",
+      "s11",
+      "s12",
+      "s13",
+      "s14",
+      "s15",
+      "s16",
+      "s19",
+      "s20",
+      "s21",
+      "s23",
+      "s24",
+      "s25",
+      "s26"
+    ],
+    "source": "docs/data/friends/source-manifest.json#workbookAudit.recallScoring.participantSheetIds"
+  },
+  "development": {
+    "participants": [
+      "s10",
+      "s24",
+      "s23",
+      "s1",
+      "s26",
+      "s9",
+      "s15",
+      "s11",
+      "s5",
+      "s14",
+      "s21",
+      "s19",
+      "s20"
+    ],
+    "count": 13,
+    "goldUnits": 352,
+    "medianGoldUnitsPerParticipant": 22
+  },
+  "test": {
+    "participants": [
+      "s16",
+      "s4",
+      "s12",
+      "s13",
+      "s6",
+      "s25",
+      "s3",
+      "s7",
+      "s2",
+      "s8"
+    ],
+    "count": 10,
+    "goldUnits": 278,
+    "individuallyExposedBeforeSeal": [
+      "s6"
+    ]
+  },
+  "goldUnitDefinition": "Per participant sheet, a maximal run of consecutive rows whose WhichEvent, normalized to a number, is non-blank and equal and whose RecallType is 1; any other row ends the run. Veridical recall only. Reproduces the 630 units in docs/plans/2026-09-17-friends-hill-climb-and-normalization.md:142.",
+  "sealAccounting": {
+    "workbookSha256": "db6b57955f4cd49458b54b559aa61723595abf7ff2142b023c88cbfbf8990fd1",
+    "scope": "friends_guard.seal_accounting: per-side participant and gold-unit totals, and the development median. No test participant's individual count is recorded."
+  },
+  "power": {
+    "estimand": "participant-average exact accuracy difference between two mappers (paired)",
+    "method": "two-sided one-sample t test on per-participant paired differences; noncentral t power by Simpson quadrature over the chi-square density (stdlib, this script)",
+    "testParticipants": 10,
+    "alpha": 0.05,
+    "power": 0.8,
+    "criticalT": 2.262157,
+    "mdeEffectSize": 0.996001,
+    "mdeBySdAssumption": [
+      {
+        "label": "Sherlock ladder-content, scene-exact, paired change",
+        "sdPp": 3.1916,
+        "participants": 10,
+        "source": "docs/data/sherlock/navigation-ladder-20260905/results.json#contrastsVersusFull.ladder-content.sceneExact.perParticipantChangePP",
+        "mdePp": 3.18
+      },
+      {
+        "label": "Sherlock chosen-shuffled-dev, scene-exact, paired change",
+        "sdPp": 7.6988,
+        "participants": 10,
+        "source": "docs/data/sherlock/navigation-ladder-20260905/results.json#contrastsVersusFull.chosen-shuffled-dev.sceneExact.perParticipantChangePP",
+        "mdePp": 7.67
+      },
+      {
+        "label": "Sherlock prior0-chosen-dev, scene-exact, paired change",
+        "sdPp": 8.1383,
+        "participants": 10,
+        "source": "docs/data/sherlock/navigation-ladder-20260905/results.json#contrastsVersusFull.prior0-chosen-dev.sceneExact.perParticipantChangePP",
+        "mdePp": 8.11
+      },
+      {
+        "label": "FilmFestival lexical minus ONNX, paired change per eligible unit",
+        "sdPp": 3.5052,
+        "participants": 15,
+        "source": "docs/data/filmfestival/stabilization-20260904/historical-rescored-final.json#comparisons.historical-lexical-minus-historical-onnx.participants[].deltaPp",
+        "mdePp": 3.49
+      },
+      {
+        "label": "FilmFestival SD rescaled to Friends unit counts (assumption)",
+        "sdPp": 11.5531,
+        "participants": null,
+        "source": "FilmFestival SD x sqrt(median eligible units 239 / Friends development median gold units 22); assumes unit-sampling noise dominates",
+        "mdePp": 11.51
+      }
+    ],
+    "caveats": [
+      "Friends has a median of 23 gold units per participant against hundreds per FilmFestival participant, so its per-participant accuracy is noisier; the rescaled row is the assumption closest to Friends and the others are optimistic.",
+      "The primary analysis may use a participant-cluster bootstrap rather than a t test; the t-based MDE is the planning figure, not the analysis."
+    ]
+  },
+  "exposure": {
+    "status": "model-untouched, not unseen",
+    "priorHumanCodingStatistics": [
+      "Aggregate recall-order statistics over all 23 participants: per-participant Spearman rho median 0.39 (range -0.53 to 0.98, 4 of 23 negative), within storyline median 0.90 (2 of 23 negative); 74.1% non-decreasing transitions, 81.5% within storyline, 38.2% storyline switches (docs/plans/2026-09-17-friends-hill-climb-and-normalization.md:96-105).",
+      "Individual rho values named for s6, s26 and s21 (docs/plans/2026-09-17-friends-hill-climb-and-normalization.md:107-109).",
+      "Gold-unit counts and per-event coverage over all 23: 630 units, median 23 per participant, range 4-46; per-event coverage median 11 of 23 (docs/plans/2026-09-17-friends-hill-climb-and-normalization.md:142-149).",
+      "Per-sheet recall extents and code-book counts in docs/data/friends/source-manifest.json."
+    ],
+    "modelOutputs": "None at seal time. Searched data/, tmp/, docs/ and .worktrees/ for Friends-named outputs on 2026-09-21 and found none; docs/plans/2026-09-18-best-recall-to-video-mapper.md:71 records Friends as never run.",
+    "rule": "Test metadata used for this accounting must not enter tuning; nothing in Phases 1a-2 reads the test side (docs/plans/2026-09-18-best-recall-to-video-mapper.md:172-180)."
+  },
+  "guard": {
+    "module": "tools/recall-study/friends_guard.py",
+    "readLedger": "docs/data/friends/test-split-reads.json",
+    "contract": "require_readable refuses test participants unless given a FinalOpening naming a committed release-candidate manifest whose SHA-256 matches; each final opening is appended to the read ledger before access is granted."
+  },
+  "sealedAtUtc": "2026-09-21T11:58:42+00:00"
+}
