@@ -27,6 +27,7 @@ class WarOfTheGhostsCodecGoldenResourceSuite extends FunSuite:
 
   test("the committed hsmm/v4 resource is the inferred artifact, with its terminal newline") {
     val backend = WogGoldenBackend.JVM
+    assertEquals(WogGoldenPlatform.current, backend, "the JVM read another backend's label")
     val committed = resource(backend.goldenResource)
     assertEquals(new String(committed, StandardCharsets.UTF_8), encoded + "\n")
     assertEquals(Checksum.ofBytes(committed).hex, backend.goldenFile)
