@@ -73,8 +73,9 @@ The `RecallType` code book was additionally checked against the data's own behav
 article was consulted, and the two agree. Scene-identifiability falls monotonically across the
 codes — 99.0%, 30.4%, 19.9%, 1.6%, 1.0% of rows carrying a `BroadSceneNum` for codes 1 to 5 — and
 code 3, which the article defines as *inaccurate* detail, carries the highest `FalseMemory` rate
-(2.4%). Mean transcript length also falls monotonically (100, 81, 62, 52, 38 characters). The codes
-therefore mean what the article says they mean in this copy of the workbook.
+(2.4%). Mean transcript length also falls monotonically (100, 81, 62, 52, 38 characters). These aggregate
+patterns are consistent with the recorded code book; they do not independently establish
+annotation accuracy against the original audio.
 
 ## Scientific use, and its limits
 
@@ -155,6 +156,19 @@ Planning power uses participant-level paired differences, not row counts, and re
 conditions separately. Its hypothetical SD grid is not an observed variance estimate; four
 marginal calculations establish neither interaction nor familywise power nor film generalization.
 The split is model-untouched, not unseen: structural and aggregate annotation audits preceded it.
+
+## Sealed accounting (2026-09-21)
+
+All 123 participants have eligible observations. The audit retains 37,473 source rows,
+including 13,125 eligible rows (11,640 code 1; 1,485 code 2). It retains 3,292 scene-less
+code-2 rows outside accuracy. Ten invalid-code cells and two invalid-scene rows have explicit
+coordinates and reasons. The five inferred sheet overlays contribute 999 eligible rows;
+without them 118 participants have eligible observations. No model predictions were inspected.
+
+| Side | Participants | Eligible rows |
+|---|---:|---:|
+| Development | 60 | 7,017 |
+| Test | 63 | 6,108 |
 
 ## Primary sources
 

@@ -16,7 +16,7 @@ MUTANTS = [
     (
         TASK,
         'if change.get("mustBeEmpty") and any(',
-        'if False and any(',
+        "if False and any(",
         "test_duplicate_transcript_heading_overlay_requires_unused_column_empty",
     ),
     (

@@ -342,5 +342,46 @@ class MementoGuardSuite(unittest.TestCase):
         self.assertEqual(scan(self.root)[1], [])
 
 
+class MementoCommittedSuite(unittest.TestCase):
+    def test_committed_seal_reconciles_population_audit_and_accounting_without_recall(
+        self,
+    ):
+        with patch.object(g, "_book", side_effect=AssertionError("recall read")):
+            record = g.load_split()
+            audit = g._record(split.AUDIT)
+            self.assertEqual(record["auditSha256"], g.task.digest(audit))
+            self.assertEqual(len(record["pool"]["participants"]), 123)
+            self.assertEqual(len(record["test"]["participants"]), 63)
+            self.assertEqual(len(record["development"]["participants"]), 60)
+            self.assertEqual(
+                record["testByCondition"], {"1": 14, "2": 17, "3": 15, "4": 17}
+            )
+            for condition, expected in audit["byCondition"].items():
+                sides = [
+                    record["accounting"]["bySideAndCondition"][s][condition]
+                    for s in ("development", "test")
+                ]
+                for key in (
+                    "participants",
+                    "evaluableParticipants",
+                    "units",
+                    "goldUnits",
+                    "eligibleCode1",
+                    "eligibleCode2",
+                    "code2MissingScene",
+                ):
+                    self.assertEqual(sum(side[key] for side in sides), expected[key])
+            self.assertEqual(
+                sum(r["goldUnits"] for r in audit["byCondition"].values()), 13125
+            )
+            self.assertEqual(audit["zeroEligibleParticipants"], [])
+            self.assertEqual(len(audit["invalidCodeCells"]), 10)
+            self.assertEqual(len(audit["invalidSceneRows"]), 2)
+            with self.assertRaises(g.GuardRefusal):
+                g.require_readable(record["test"]["participants"])
+            with self.assertRaises(g.GuardRefusal):
+                g.admission_audit("/nonexistent")
+
+
 if __name__ == "__main__":
     unittest.main()
