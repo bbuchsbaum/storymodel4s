@@ -246,9 +246,50 @@ equal the receipt's reducer over its observed members, clamped as the cost model
 clamps; the observed/missing partition must agree with `missingTerms`; each
 receipt's source-chart coverage must equal the breakdown's; a `Missing`
 reduction may not hide members that reduce to a value). Stated residual:
-`CostBreakdown.total` is a cached value, not verified on the wire — the weights
-and function prior that produced it are not on the record; a consumer that
+`CostBreakdown.total` is a cached value, not verified on the wire — the function
+prior and pricing rule that produced it are not on the record; a consumer that
 needs it re-derivable carries `CostWeights`/`FunctionPrior` and recomputes.
+
+**Cost support (2026-09-21, bd-01M19956MFSG7076QE4J66T7E9; `hsmm/v4`).** An empty
+eligible denominator cannot publish the numeric claim "fully supported". A cost
+record's `support` is a `SupportAssessment` with exactly one of three states, and
+only the first carries a number:
+
+- `Assessed(share, basis)` — the share of eligible weight that was measured, over
+  a nonempty eligible population with positive eligible weight; exactly `1.0`
+  when every eligible term was measured. Ranked source cells; and an
+  `Unassessable` exclusion, whose share is exactly `0`.
+- `Unestablished(reason, basis)` — `EmptyEligibility` or `ZeroEligibleWeight`: no
+  denominator, so no share. Before v4 both published `1.0`.
+- `NotApplicable(reason)` — `ExternalState` for every external-state record,
+  `Unreachable` for `CostBreakdown.unreachable`. No basis. Before v4 every
+  external cell published `1.0` with zero terms, above the WOG source anchors'
+  `0.955`.
+
+The basis (`CellSupportBasis`: measured terms, eligible terms, exact eligible
+weights; measured ⊆ eligible; weights cover exactly the eligible terms, finite,
+nonnegative, with a representable sum) is per cell and inspectable. Shares and
+reasons are derived from it (sums in `CostTerm` order), never supplied by a
+caller or the wire. `AlignWire.costBreakdown` binds support to its record: a
+ranked source record's measured terms are exactly its priced terms minus imputed
+ones, and every priced term is eligible; an external record carries
+`NotApplicable(ExternalState)`, an unreachable one `NotApplicable(Unreachable)`,
+an unassessable one a zero share or no share. `HsmmResult.validated` also refuses
+an external key whose record is not `NotApplicable(ExternalState)` and support
+bases that disagree on a term's weight anywhere in one result. `CostBreakdown`,
+the three variants and `CellSupportBasis` are non-case classes with bare-private
+constructors: no `apply`, `copy`, `fromProduct` or `Mirror` from any package.
+This change moves no number: totals (including `scaleToEligible`'s factor-1
+branches) are unchanged, and on the WOG goldens of every backend each assessed
+share equals the old `supportWeight` bit for bit (the share is now summed in
+`CostTerm` order, which the old `Set`-order sum did not guarantee). Stated
+residuals: the carried eligible population and weights are
+internally consistent, not proven to be the ones a cost model priced with
+(invocation binding is bd-01M1DA6NJXYT4NEA18745FM3KY), so a tampered artifact
+that shrinks a cell's eligible population is not detectable here; and a cell
+with zero eligible weight is still priced at the function prior — it is now
+published as `Unestablished`, but whether it should be priced or excluded is an
+estimand decision this change does not make.
 
 The wire digests are **versioned canonical renderings** with the same rule as
 receipt renderings: a change to what a gate or cost reads is a version bump. All
@@ -285,20 +326,18 @@ reaches the codec).
 - `admissibility-echo/v1` — tagged like the others: `entries` (count), then per
   `(unit, anchor)` sorted: `unit`, `anchor`, `contradictions` (list, in detection
   order), `faithful`, `facets` (list, sorted).
-- `hsmm/v3` is the canonical JSON object owned by `HsmmResultCodec` (the live
-  `SchemaVersion`; v1 and v2 tags are not accepted and have no migration).
+- `hsmm/v4` is the canonical JSON object owned by `HsmmResultCodec` (the live
+  `SchemaVersion`; v1, v2 and v3 tags are not accepted and have no migration —
+  a v3 artifact is refused with the typed `CodecError.UnsupportedSchema` and is
+  re-derived from its inputs, because its numeric `supportWeight` cannot reveal
+  which support state applied and inventing one would fabricate evidence).
   Its top-level fields are exactly `schemaVersion`, `posterior`, `flow`,
   `viterbi`, `logLikelihood`, `costs`, `candidateAnchors`,
   `admissibilityEcho`, `viewFingerprint`, `recallChecksum`, and
-  `refinementPasses`. Each `costs` entry is `{unit, costs}` and each cell cost
-  is `{terms, mode, exclusion, total, missingTerms, sourceChartCoverage,
-  reductions, supportWeight, imputedTerms}`; v2 added the required numeric
-  `supportWeight`, v3 added the required `imputedTerms`. The numeric
-  `supportWeight` cannot say whether support was assessed, unestablished, or
-  not applicable — a tagged support assessment with a result-level support
-  basis is the planned `hsmm/v4` (bd-01M19956MFSG7076QE4J66T7E9) and has not
-  landed; until it does, no document may describe it as live. The sparse DTOs
-  are arrays, never maps with composite string keys:
+  `refinementPasses`. v2 added the required numeric `supportWeight`, v3 the
+  required `imputedTerms`, and v4 replaced `supportWeight` with the required
+  tagged `support`. The sparse DTOs are arrays, never maps with composite string
+  keys:
   - each posterior row is `{unit, mass}` and each mass is `{state, mass}`;
   - each flow step is `{from, to, mass}` and each mass is
     `{fromState, toState, mass}`;
@@ -314,23 +353,27 @@ reaches the codec).
   receipt}`; and a receipt is `{reducer, members, excludedMembers,
   sourceChartCoverage, observedEstimateCoverage}`. Receipt members are `{member,
   estimate}` and exclusions are `{member, contradictions}`; structural coverage
-  is `{level, membersWithEvidence, members}`. `support` is the required tagged
-  assessment that replaced v2 `supportWeight`: `Assessed` carries
-  `measuredTerms`, `eligibleTerms`, and `eligibleWeights` and accepts neither
-  `share` nor `reason` (share is derived); `Unestablished` carries the same
-  evidence plus `reason` `EmptyEligibility` or `ZeroEligibleWeight` and accepts
-  no `share` (decode recomputes the reason and refuses a mismatch);
-  `NotApplicable` carries only `reason` `ExternalState` or `Unreachable` and
-  rejects measurement fields. A v3 artifact's numeric `supportWeight` cannot
-  reveal which of those three states applied, so inventing one would fabricate
-  evidence. `imputedTerms` (v3) remains required. `Estimate` and `Coverage` use
-  their shared codec schemas.
+  is `{level, membersWithEvidence, members}`. `support` is exactly one of
+  `{type: Assessed, share, measuredTerms, eligibleTerms, eligibleWeights}`,
+  `{type: Unestablished, reason, measuredTerms, eligibleTerms,
+  eligibleWeights}`, or `{type: NotApplicable, reason}`, where an eligible
+  weight is `{term, weight}`. Each variant's field set is exact: a `share` on a
+  variant that makes no numeric claim, or a basis on `NotApplicable`, is a wire
+  error. `share` is REDUNDANT — decoding recomputes it from the carried basis and
+  refuses any artifact whose share differs by even one bit (so an
+  all-measured basis carrying `0.5` is refused); `Unestablished`'s reason is
+  recomputed and a mismatch refused; `NotApplicable`'s reason must be the one
+  the record's shape derives (`ExternalState` for an external record,
+  `Unreachable` for an unreachable exclusion). The basis is internally
+  consistent evidence, not invocation provenance (see D5.1, cost support).
+  `imputedTerms` (v3) remains required. `Estimate` and `Coverage` use their
+  shared codec schemas.
 - Encoding orders posterior and flow in inference order; Viterbi in recall
   order; state masses by state key; flow masses by `(fromState, toState)` key;
   unit maps by recall-unit id; state costs by state key; terms, missing terms,
-  reductions, facets, and contradictions by enum order; the result-level
-  support basis by `CostTerm` order; and anchors and receipt members by
-  source-reference key. Duplicate sparse keys or set members are rejected
+  reductions, facets, and contradictions by enum order; each support basis's
+  measured terms, eligible terms and eligible weights by `CostTerm` order; and
+  anchors and receipt members by source-reference key. Duplicate sparse keys or set members are rejected
   before conversion to `Map`/`Set`. Optional fields are omitted when absent.
   Checksums are lowercase hexadecimal and every `Double` is the shared
   canonical IEEE-754 rendering. Thus decoding and re-encoding one artifact is
@@ -508,3 +551,16 @@ fixture. Details in the spike spec.
 - Pure-Scala BPE/WordPiece in the first slice; in-tree hashed-WL vector; a
   single HTTP adapter with provider logic; cosine as a probability; overloading
   `Checksum` for sensitive digests; machine-built selection fixtures.
+- (2026-09-21, cost support.) Keeping a numeric `supportWeight` and carrying the
+  eligible set beside it: the scalar is what gets sorted and averaged, and
+  `(1.0, {})` still sorts as the best-supported row. A result-level (invocation)
+  support basis threaded through `GraphHsmm.infer` with fallible cost-model
+  producers: it binds support to the invocation, which is the provenance work of
+  bd-01M1DA6NJXYT4NEA18745FM3KY, and it changes the `infer`/`LocalCostModel`
+  API; v4 ships the per-cell basis and a within-result weight-agreement check
+  instead. Excluding zero-eligible-weight cells as `Unassessable`: it moves
+  prices, so it is an estimand change, not a representation change. Omitting
+  `share` from the wire: it is carried, redundantly and bit-checked, so a
+  non-Scala reader of the JSON sees the number the decoder would derive.
+  A v3→v4 converter: it would have to invent which support state each v3 cell
+  was in.

@@ -1063,7 +1063,10 @@ retained support after the existing result/view/recall join. Existing proof/gate
 
 No generic non-text wire representation: hsmm/v3 JSON remains text-only and byte-identical;
 every generic encoding door refuses a non-text result with a typed error; any v4 support-
-bearing wire is deferred. Change both encode and toJson to checked Either results, remove
+bearing wire is deferred. (Amended 2026-09-21: the live text-only wire is now `hsmm/v4`, which
+changes only cost-record support — the tagged `SupportAssessment` of bd-01M19956MFSG7076QE4J66T7E9
+— and still refuses non-text source support with `UnsupportedSupport` at every door; a wire
+bearing typed source support still needs its own version.) Change both encode and toJson to checked Either results, remove
 the generic Encoder[HsmmResult], and refuse non-text views at both contextual decoding
 doors. Use HsmmCodecError.UnsupportedSupport for this refusal. A forged generic total
 encoder or silent support omission is rejected. WOG bytes remain the exact text court,

@@ -61,9 +61,9 @@ Circe `Encoder[HsmmResult]` is removed. Both encoding methods and both contextua
 decoding methods refuse non-text support or noncanonical scoring features with
 `UnsupportedSupport`.
 
-The `hsmm/v3` wire remains text-only, with unchanged canonical text JSON. A future
-support-bearing generic wire needs its own version and acceptance evidence; this
-migration does not introduce one. Detached evidence components containing points
+The HSMM wire remains text-only (now `hsmm/v4`; see below). A future
+source-support-bearing generic wire needs its own version and acceptance evidence;
+this migration does not introduce one. Detached evidence components containing points
 use `evidence-support/v2`, including the full bundle binding. Historical interval
 components retain their v1 bytes. Neither component encoder is a film model or
 HSMM codec; anchored component decoding remains refused.
@@ -72,6 +72,38 @@ The story model wire remains schema `0.7.0` for text. Text codec, rendering, and
 text slicing consumers require `TextModel`; obtain that witness through checked
 text construction or `StoryModel.asText`. General models cannot be paired with
 an unrelated text model through `StorySourceView`.
+
+## Cost support (`hsmm/v4`)
+
+`CostBreakdown.supportWeight: Double` is removed. `CostBreakdown.support` is a
+`SupportAssessment`: `Assessed` (a `share` in `[0, 1]` over a nonempty eligible
+population with positive eligible weight), `Unestablished` (`EmptyEligibility` or
+`ZeroEligibleWeight`: no denominator, no number), or `NotApplicable`
+(`ExternalState` for external cells, `Unreachable` for `CostBreakdown.unreachable`).
+Only `Assessed` has a `share`; the trait has none, so select the case before
+comparing support. `Assessed` and `Unestablished` expose their `CellSupportBasis`
+(measured terms, eligible terms, exact eligible weights). Shares and reasons are
+derived: obtain support from `SupportAssessment.fromEvidence` (checked) or
+`SupportAssessment.derive`, or the fixed `externalState` / `unreachable` values.
+Numbers did not move: every total is unchanged, and on the WOG goldens every
+assessed share is bit-identical to its old `supportWeight` (shares are now summed
+in `CostTerm` order). What changed is that an
+external cell no longer publishes `1.0`, and neither does a cell with an empty
+eligible set or zero eligible weight.
+
+`CostBreakdown` is no longer a case class. It has explicit accessors (`terms`,
+`mode`, `exclusion`, `total`, `missingTerms`, `sourceChartCoverage`, `reductions`,
+`support`, `imputedTerms`), structural equality and a `toString`, and no `apply`,
+`copy`, `unapply`, `Product` or `Mirror`. Build records through
+`AlignWire.costBreakdown`, whose eighth argument is now `support: SupportAssessment`
+and which refuses support that does not describe its record. The public no-argument
+`CostBreakdown.unassessable` is removed (an unassessable record now carries the
+basis it rests on); `CostBreakdown.unreachable` is a `val`.
+
+`HsmmResultCodec` writes and reads `hsmm/v4` only. An `hsmm/v3` artifact is refused
+with `HsmmCodecError.Wire(CodecError.UnsupportedSchema("hsmm/v3", Vector("hsmm/v4")))`.
+There is no converter: a v3 `supportWeight` of `1.0` cannot say which support
+state applied, so a v3 artifact is re-derived from its inputs, not upgraded.
 
 ## Qualification boundary
 
