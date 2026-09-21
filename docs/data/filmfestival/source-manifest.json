@@ -119,15 +119,24 @@
       {
         "id": "FILMS.md",
         "reason": "project-authored",
-        "byteLength": 5424,
-        "sha256": "800792e5ad96207fd5c68d0bb5985edc0c78ee5ccad5df636e09ad91efe4db6d",
-        "revised": {
-          "date": "2026-09-21",
-          "mote": "bd-01M2TA4BFRMK8WNA79PPRT8YCD",
-          "change": "the_prisoner rows corrected: the stimulus is a 260 s mid-episode excerpt (cafe to shop exit), not the opening",
-          "previousByteLength": 5340,
-          "previousSha256": "596e70fc4f93f3408e13a438c6b6d36f4da4158e1e31e58d85ac9a48cb35218c"
-        }
+        "byteLength": 5506,
+        "sha256": "741150d39c4b4dccb829e9d92440edde0387682045b68e86f86aad9fa2bc564d",
+        "revisions": [
+          {
+            "date": "2026-09-21",
+            "mote": "bd-01M2TA4BFRMK8WNA79PPRT8YCD",
+            "change": "the_prisoner rows corrected: the stimulus is a 260 s mid-episode excerpt (cafe to shop exit), not the opening",
+            "previousByteLength": 5340,
+            "previousSha256": "596e70fc4f93f3408e13a438c6b6d36f4da4158e1e31e58d85ac9a48cb35218c"
+          },
+          {
+            "date": "2026-09-21",
+            "mote": "bd-01M2TA4BFRMK8WNA79PPRT8YCD",
+            "change": "catch_me_if_you_can rows: 'opening 346 s of the feature' marked as reported, not verified locally",
+            "previousByteLength": 5424,
+            "previousSha256": "800792e5ad96207fd5c68d0bb5985edc0c78ee5ccad5df636e09ad91efe4db6d"
+          }
+        ]
       }
     ],
     "stagedFileCount": 104,

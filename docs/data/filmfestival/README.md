@@ -64,7 +64,7 @@ This decision covers **licence only**. Human-subject provenance is a separate qu
 | Record | Contract |
 |---|---|
 | `source-manifest.json` | Five upstream sources with commits, DOIs and licences; eight artifact groups accounting for all 104 staged files; verification receipt; content policy; non-claims |
-| `media-manifest.json` | The 53 files under `data/filmfestival/media` by path, SHA-256 and size, with container, codecs and duration per video; per film, trim, clip and scan durations by cover name; the two absent excerpts' boundaries as annotation rows and run-relative times; Trillium origins; non-claims. Regenerate with `python3 tools/corpus/filmfest_media_manifest.py`; `--check` exits 1 on drift |
+| `media-manifest.json` | The 53 files listed in `data/filmfestival/media/SHA256SUMS.local` by SHA-256 and size, with container, codecs and duration per video; paths whose names are not cover names are replaced by a label and a path digest; per film, trim, clip and scan durations by cover name; the two absent excerpts' boundaries as annotation rows and run-relative times; inferred Trillium origins; non-claims. Regenerate with `python3 tools/corpus/filmfest_media_manifest.py`; `--check` exits 1 on drift |
 
 Canonicalize with `jq -S -c` before digesting.
 

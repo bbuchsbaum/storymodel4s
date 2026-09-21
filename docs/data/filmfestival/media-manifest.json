@@ -1,6 +1,6 @@
 {
   "schema": "storymodel4s.filmfestival.media-manifest",
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "generator": "tools/corpus/filmfest_media_manifest.py",
   "mediaRoot": "data/filmfestival/media",
   "storage": "external-local-only",
@@ -11,136 +11,166 @@
   "fieldEvidence": {
     "files[].sha256": "computed; equal to SHA256SUMS.local",
     "files[].byteLength": "measured",
-    "files[].video": "ffprobe format_name, format duration and per-stream codec_name",
+    "files[].path": "published when the basename is a cover name, optionally with a transcriber suffix, or a listed provenance file",
+    "files[].label": "opaque label for a redacted path: <directory>/<cover or unassigned>#<n>, numbered in checksum-file order",
+    "files[].pathSha256": "SHA-256 of the redacted path's UTF-8 bytes as written in SHA256SUMS.local",
+    "files[].video": "ffprobe format_name, format duration and per-stream codec_name; a stream's durationSeconds is absent when the container reports none",
     "films[].presentations": "filmfestival/task-movie_run-0{1,2}_events.tsv (ds004042)",
     "films[].scanDurationSeconds": "events.tsv duration; equal to provenance manifest.tsv target_s",
     "films[].trimStartSeconds": "filmfestival/media/provenance/manifest.tsv column trim_start",
     "films[].sourceDurationSeconds": "ffprobe of the source file",
     "films[].clipDurationSeconds": "ffprobe of the clip file",
     "films[].clipShortfallSeconds": "scanDurationSeconds - clipDurationSeconds",
-    "excerpts[].coders[]": "filmfestival/derived/annotation-<coder>.tsv, bound to its replay receipt; of the film label only its ordinal prefix is used, and no description text enters this record"
+    "excerpts[].coders[]": "filmfestival/derived/annotation-<coder>.tsv and the workbook it was replayed from, both bound to the replay receipt; of the film label only its ordinal prefix is used, and no description text enters this record",
+    "excerpts[].coders[].*.coarseSceneRunRelative": "the coder's coarse number as written in the workbook, which restarts in run 2"
   },
   "checksumFile": {
     "path": "SHA256SUMS.local",
     "sha256": "47b0a1530e2e507721d3e8faf1364d2dfa0dc068ace4e1580a019fa718646a0e",
     "byteLength": 4762,
     "lineCount": 53,
-    "rerenderedByteForByte": true,
+    "verifiedLineForLine": "in order, each line's digest equals the entry's sha256, and its path equals the entry's path or, for a redacted entry, hashes to its pathSha256 (SHA-256 of the path's UTF-8 bytes)",
     "excludedFromFileList": "a checksum file cannot list its own digest"
   },
   "files": [
     {
       "path": "asr/bus_stop.json",
+      "coverName": "bus_stop",
       "sha256": "eb124171c9b3aefff6ccdc324e9953509803d724762222bfbee20254f5ffd40d",
       "byteLength": 38889
     },
     {
       "path": "asr/bus_stop_lang.npz",
+      "coverName": "bus_stop",
       "sha256": "f68532463748986741cc3ab583dced78a6a4af12ab3312ab76377a40676ea710",
       "byteLength": 833929
     },
     {
       "path": "asr/bus_stop_words.tsv",
+      "coverName": "bus_stop",
       "sha256": "1567dda53e5ab06a48270defc33281844d8676b938ae02c17154f6fa3d90a6b8",
       "byteLength": 8272
     },
     {
       "path": "asr/cartoon_introduction.json",
+      "coverName": "cartoon_introduction",
       "sha256": "4bcaf8dff06f7b97b7ae5191ccd79f7f0049e37f5fb6b95989ae6278074f7c2a",
       "byteLength": 7682
     },
     {
       "path": "asr/cartoon_introduction_lang.npz",
+      "coverName": "cartoon_introduction",
       "sha256": "00f7bd492f8a1638ffb041ef380d66c7224be3d0c7e98ed44733dc5b40bcb9e4",
       "byteLength": 189918
     },
     {
       "path": "asr/cartoon_introduction_words.tsv",
+      "coverName": "cartoon_introduction",
       "sha256": "bdba4f132a85654e13e03fa1abfec2a056f8d1a93cdc5aa84201747bcc027657",
       "byteLength": 1726
     },
     {
       "path": "asr/keith_reynolds.json",
+      "coverName": "keith_reynolds",
       "sha256": "ce16fec5077a39cb13df28b1524e5d971537a5688f6a878953e2045303996965",
       "byteLength": 103021
     },
     {
       "path": "asr/keith_reynolds_lang.npz",
+      "coverName": "keith_reynolds",
       "sha256": "d22a39090da57c08696d67f8a2de92144f17a79fae1417f188c1bfb72e4652a6",
       "byteLength": 2480837
     },
     {
       "path": "asr/keith_reynolds_words.tsv",
+      "coverName": "keith_reynolds",
       "sha256": "dfed9b6740b89210c0b8d2bcd4c30770bfe4c09aeca1cff90a4cdca052a96560",
       "byteLength": 24912
     },
     {
       "path": "asr/post_it_love.json",
+      "coverName": "post_it_love",
       "sha256": "fc0887824264b1cd1229c2f55abc72ffba32c8ead771f63c2075274d503db1f5",
       "byteLength": 272
     },
     {
       "path": "asr/post_it_love_words.tsv",
+      "coverName": "post_it_love",
       "sha256": "e688d3b40ccf3ff8fb4b75b142d7528096b38f8271486465732c8bc5a05937af",
       "byteLength": 24
     },
     {
       "path": "asr/the_black_hole.json",
+      "coverName": "the_black_hole",
       "sha256": "558e5a1209c041fb8463bb5a959967f2d2858f4d2b85fbdf42a2ec5c1c4a9389",
       "byteLength": 274
     },
     {
       "path": "asr/the_black_hole_words.tsv",
+      "coverName": "the_black_hole",
       "sha256": "e688d3b40ccf3ff8fb4b75b142d7528096b38f8271486465732c8bc5a05937af",
       "byteLength": 24
     },
     {
       "path": "asr/the_boyfriend.json",
+      "coverName": "the_boyfriend",
       "sha256": "cb76c7732d6033dee4e0a22d0e7688a23c655af35cd29fb5d7b011ca0c7f4a68",
       "byteLength": 44129
     },
     {
       "path": "asr/the_boyfriend_lang.npz",
+      "coverName": "the_boyfriend",
       "sha256": "684014fe891f5fdfba0da7f19373a63a44cb394cf4253e6cdc630b2597cdbace",
       "byteLength": 936940
     },
     {
       "path": "asr/the_boyfriend_words.tsv",
+      "coverName": "the_boyfriend",
       "sha256": "7cbb57120e741ed0ceceba4d1c6148d33841fefa60700b8a60f5b03e85dda87f",
       "byteLength": 9252
     },
     {
       "path": "asr/the_record.json",
+      "coverName": "the_record",
       "sha256": "ae543f59dbb33b33338b2e864476bd9f1fa0b38919d6df2d9901e42b98dadcb5",
       "byteLength": 270
     },
     {
       "path": "asr/the_record_words.tsv",
+      "coverName": "the_record",
       "sha256": "e688d3b40ccf3ff8fb4b75b142d7528096b38f8271486465732c8bc5a05937af",
       "byteLength": 24
     },
     {
       "path": "asr/the_rock.json",
+      "coverName": "the_rock",
       "sha256": "12edc8b59e0960140e222670e2c05644870e4eb3cbd5ee6f8a3a6c3b590acb6d",
       "byteLength": 268
     },
     {
       "path": "asr/the_rock_words.tsv",
+      "coverName": "the_rock",
       "sha256": "e688d3b40ccf3ff8fb4b75b142d7528096b38f8271486465732c8bc5a05937af",
       "byteLength": 24
     },
     {
       "path": "asr/the_shoe.json",
+      "coverName": "the_shoe",
       "sha256": "bd87ac1d694665f575d043ca78147d29ee38a0d46befef83d41a41b5d43cc960",
       "byteLength": 268
     },
     {
       "path": "asr/the_shoe_words.tsv",
+      "coverName": "the_shoe",
       "sha256": "e688d3b40ccf3ff8fb4b75b142d7528096b38f8271486465732c8bc5a05937af",
       "byteLength": 24
     },
     {
-      "path": "cand/postit_futureshorts.mp4",
+      "label": "cand/post_it_love#1",
+      "pathRedacted": true,
+      "pathSha256": "3e8ac970f30b525960ad51a79f796daff5f7afee801fbaab8b1ac0e7849e488a",
+      "coverName": "post_it_love",
+      "coverNameBasis": "identical bytes to source/post_it_love.mp4",
       "sha256": "eb797f8afd57c94dfda450fba733b9ded8cc61a2547baf6c907d85faf2ff4b85",
       "byteLength": 5696001,
       "video": {
@@ -164,7 +194,11 @@
       }
     },
     {
-      "path": "cand/shoe_eotws.mp4",
+      "label": "cand/the_shoe#1",
+      "pathRedacted": true,
+      "pathSha256": "e5be7bd8a594aeaf595b3e9d35c3ce542ef0f0f1c56232ed73350a13d4dda8e3",
+      "coverName": "the_shoe",
+      "coverNameBasis": "the file name's first token matches exactly one cover name",
       "sha256": "9599b097a902fa0933c6e1463fd41d257606aef23dce493dcd4fb318c0d3a255",
       "byteLength": 5069301,
       "video": {
@@ -188,7 +222,11 @@
       }
     },
     {
-      "path": "cand/shoe_filmz.mp4",
+      "label": "cand/the_shoe#2",
+      "pathRedacted": true,
+      "pathSha256": "071b48b5f7c3e3608e63843be91160197a8018f08f3b347b19090e77087b3867",
+      "coverName": "the_shoe",
+      "coverNameBasis": "the file name's first token matches exactly one cover name",
       "sha256": "3014b6e107d68c9e9ed425e6966dfc84624b320b9090e5393b5fb95ea49533ea",
       "byteLength": 5524417,
       "video": {
@@ -212,7 +250,11 @@
       }
     },
     {
-      "path": "cand/shoe_granite11.mp4",
+      "label": "cand/the_shoe#3",
+      "pathRedacted": true,
+      "pathSha256": "80b9ad4f280cb911234008aa13b3f5554a0c24cf0f96916fb1796930e025c593",
+      "coverName": "the_shoe",
+      "coverNameBasis": "identical bytes to source/the_shoe.mp4",
       "sha256": "164a5ca76c66f064ac6de072317f808012d28763b30a7b47ff3f92337468f817",
       "byteLength": 14444976,
       "video": {
@@ -237,6 +279,7 @@
     },
     {
       "path": "clips/bus_stop.mp4",
+      "coverName": "bus_stop",
       "sha256": "0305afb9af831b8616eb8308332515592713c8b10e822e4f08da7fe1b09fb448",
       "byteLength": 67402805,
       "video": {
@@ -261,6 +304,7 @@
     },
     {
       "path": "clips/cartoon_introduction.mp4",
+      "coverName": "cartoon_introduction",
       "sha256": "415529fe7b9825e2e3b25b1291920ad07564c99f0187f31455f18286eeed92ee",
       "byteLength": 8017893,
       "video": {
@@ -285,6 +329,7 @@
     },
     {
       "path": "clips/keith_reynolds.mp4",
+      "coverName": "keith_reynolds",
       "sha256": "b85c393e3bc1d6e8d938596b2cc846db6950fd578cfdea54cacc486e148bf805",
       "byteLength": 8332384,
       "video": {
@@ -309,6 +354,7 @@
     },
     {
       "path": "clips/post_it_love.mp4",
+      "coverName": "post_it_love",
       "sha256": "d1a9268218c1dc89aba6ad6fa6dbe67b143824078628342bd43ff0d4f03f8ee5",
       "byteLength": 11562260,
       "video": {
@@ -333,6 +379,7 @@
     },
     {
       "path": "clips/the_black_hole.mp4",
+      "coverName": "the_black_hole",
       "sha256": "39ce22ccfb586ab63213de18e4da2b79a2ad97dec6dd373e2a2748a345707252",
       "byteLength": 16036558,
       "video": {
@@ -357,6 +404,7 @@
     },
     {
       "path": "clips/the_boyfriend.mp4",
+      "coverName": "the_boyfriend",
       "sha256": "fa6b21a5f8dac72908cecfe6badc913964637eed7dcc1fc5c91c24db4313d0cc",
       "byteLength": 38285856,
       "video": {
@@ -381,6 +429,7 @@
     },
     {
       "path": "clips/the_record.mp4",
+      "coverName": "the_record",
       "sha256": "e56a680091412f2f7797a7da037d9eb1a98c957d921562a2de8eca72a02da6c5",
       "byteLength": 10648945,
       "video": {
@@ -405,6 +454,7 @@
     },
     {
       "path": "clips/the_rock.mp4",
+      "coverName": "the_rock",
       "sha256": "921cb00b9197fc2d6553670a13305e9bc4958821e592ddb6d225f4d2c816eb19",
       "byteLength": 45115717,
       "video": {
@@ -429,6 +479,7 @@
     },
     {
       "path": "clips/the_shoe.mp4",
+      "coverName": "the_shoe",
       "sha256": "ebb728db6bce64b57ac0f6f607297e07dad237be2b5a72f79b700cf0535e7211",
       "byteLength": 13813427,
       "video": {
@@ -498,6 +549,7 @@
     },
     {
       "path": "source/bus_stop.mp4",
+      "coverName": "bus_stop",
       "sha256": "a445f6495e46745ffbefa076985b83e620234dee353385dc0ab02a7b79c128f3",
       "byteLength": 271825290,
       "video": {
@@ -522,6 +574,7 @@
     },
     {
       "path": "source/cartoon_introduction.mkv",
+      "coverName": "cartoon_introduction",
       "sha256": "b9afccab3a5df7a6989cab92fa80f62d9c751d3ef968f72917067f1cf1f409ab",
       "byteLength": 34020829,
       "video": {
@@ -532,20 +585,19 @@
             "index": 0,
             "codecType": "video",
             "codecName": "mpeg2video",
-            "durationSeconds": null,
             "frameRate": "30000/1001"
           },
           {
             "index": 1,
             "codecType": "audio",
-            "codecName": "ac3",
-            "durationSeconds": null
+            "codecName": "ac3"
           }
         ]
       }
     },
     {
       "path": "source/keith_reynolds.mp4",
+      "coverName": "keith_reynolds",
       "sha256": "db04e72f509a5fab16602900a8e8cfd036c2c1ddfbf1b9e0208da5ecb54ec07b",
       "byteLength": 19350836,
       "video": {
@@ -570,6 +622,7 @@
     },
     {
       "path": "source/post_it_love.mp4",
+      "coverName": "post_it_love",
       "sha256": "eb797f8afd57c94dfda450fba733b9ded8cc61a2547baf6c907d85faf2ff4b85",
       "byteLength": 5696001,
       "video": {
@@ -594,6 +647,7 @@
     },
     {
       "path": "source/the_black_hole.mp4",
+      "coverName": "the_black_hole",
       "sha256": "a90f33d471d24dd4f990c7885510f7de422199614475868cf26a2b2f453b90de",
       "byteLength": 51535896,
       "video": {
@@ -618,6 +672,7 @@
     },
     {
       "path": "source/the_boyfriend.mp4",
+      "coverName": "the_boyfriend",
       "sha256": "a76362d93f57ab34c299ec8aadf59dc4859191a57f2091d1cd25a8d0927ff77b",
       "byteLength": 307793738,
       "video": {
@@ -642,6 +697,7 @@
     },
     {
       "path": "source/the_record.mp4",
+      "coverName": "the_record",
       "sha256": "b6e7d76309fb6d11e69fd932b128972bb871be3d8635417c69fcd0702c3e63db",
       "byteLength": 12488335,
       "video": {
@@ -666,6 +722,7 @@
     },
     {
       "path": "source/the_rock.mp4",
+      "coverName": "the_rock",
       "sha256": "f75d69b521877746ac39769b49e70c056f395f678747623239e32a63c1fb97cb",
       "byteLength": 100512562,
       "video": {
@@ -690,6 +747,7 @@
     },
     {
       "path": "source/the_shoe.mp4",
+      "coverName": "the_shoe",
       "sha256": "164a5ca76c66f064ac6de072317f808012d28763b30a7b47ff3f92337468f817",
       "byteLength": 14444976,
       "video": {
@@ -716,14 +774,14 @@
   "identicalDigestGroups": [
     {
       "sha256": "164a5ca76c66f064ac6de072317f808012d28763b30a7b47ff3f92337468f817",
-      "paths": [
-        "cand/shoe_granite11.mp4",
+      "members": [
+        "cand/the_shoe#3",
         "source/the_shoe.mp4"
       ]
     },
     {
       "sha256": "e688d3b40ccf3ff8fb4b75b142d7528096b38f8271486465732c8bc5a05937af",
-      "paths": [
+      "members": [
         "asr/post_it_love_words.tsv",
         "asr/the_black_hole_words.tsv",
         "asr/the_record_words.tsv",
@@ -733,8 +791,8 @@
     },
     {
       "sha256": "eb797f8afd57c94dfda450fba733b9ded8cc61a2547baf6c907d85faf2ff4b85",
-      "paths": [
-        "cand/postit_futureshorts.mp4",
+      "members": [
+        "cand/post_it_love#1",
         "source/post_it_love.mp4"
       ]
     }
@@ -755,6 +813,7 @@
         }
       ],
       "scanDurationSeconds": 39.0,
+      "mediaStatus": "staged",
       "sourcePath": "source/cartoon_introduction.mkv",
       "sourceDurationSeconds": 45.928,
       "trimStartSeconds": 0.42,
@@ -774,11 +833,8 @@
         }
       ],
       "scanDurationSeconds": 346.0,
-      "sourcePath": null,
-      "trimStartSeconds": null,
-      "clipPath": null,
-      "clipDurationSeconds": null,
-      "unestablished": "no source or clip exists under the media root; the provenance manifest's trim_start for this key was never applied to a file, so it is not recorded as a trim"
+      "mediaStatus": "absent",
+      "absentReason": "no source or clip exists under the media root; the provenance manifest's trim_start for this key was never applied to a file, so no trim is recorded"
     },
     {
       "coverName": "the_record",
@@ -790,6 +846,7 @@
         }
       ],
       "scanDurationSeconds": 132.0,
+      "mediaStatus": "staged",
       "sourcePath": "source/the_record.mp4",
       "sourceDurationSeconds": 143.021,
       "trimStartSeconds": 5.0,
@@ -809,6 +866,7 @@
         }
       ],
       "scanDurationSeconds": 465.0,
+      "mediaStatus": "staged",
       "sourcePath": "source/the_boyfriend.mp4",
       "sourceDurationSeconds": 543.765333,
       "trimStartSeconds": 0.0,
@@ -828,6 +886,7 @@
         }
       ],
       "scanDurationSeconds": 129.0,
+      "mediaStatus": "staged",
       "sourcePath": "source/the_shoe.mp4",
       "sourceDurationSeconds": 145.221,
       "trimStartSeconds": 0.7,
@@ -847,6 +906,7 @@
         }
       ],
       "scanDurationSeconds": 348.0,
+      "mediaStatus": "staged",
       "sourcePath": "source/keith_reynolds.mp4",
       "sourceDurationSeconds": 367.641,
       "trimStartSeconds": 1.72,
@@ -866,6 +926,7 @@
         }
       ],
       "scanDurationSeconds": 325.0,
+      "mediaStatus": "staged",
       "sourcePath": "source/the_rock.mp4",
       "sourceDurationSeconds": 343.423333,
       "trimStartSeconds": 0.62,
@@ -885,11 +946,8 @@
         }
       ],
       "scanDurationSeconds": 260.0,
-      "sourcePath": null,
-      "trimStartSeconds": null,
-      "clipPath": null,
-      "clipDurationSeconds": null,
-      "unestablished": "no source or clip exists under the media root; the provenance manifest's trim_start for this key was never applied to a file, so it is not recorded as a trim"
+      "mediaStatus": "absent",
+      "absentReason": "no source or clip exists under the media root; the provenance manifest's trim_start for this key was never applied to a file, so no trim is recorded"
     },
     {
       "coverName": "the_black_hole",
@@ -901,6 +959,7 @@
         }
       ],
       "scanDurationSeconds": 142.0,
+      "mediaStatus": "staged",
       "sourcePath": "source/the_black_hole.mp4",
       "sourceDurationSeconds": 154.853333,
       "trimStartSeconds": 0.0,
@@ -920,6 +979,7 @@
         }
       ],
       "scanDurationSeconds": 161.0,
+      "mediaStatus": "staged",
       "sourcePath": "source/post_it_love.mp4",
       "sourceDurationSeconds": 181.981,
       "trimStartSeconds": 10.28,
@@ -939,6 +999,7 @@
         }
       ],
       "scanDurationSeconds": 414.0,
+      "mediaStatus": "staged",
       "sourcePath": "source/bus_stop.mp4",
       "sourceDurationSeconds": 407.616,
       "trimStartSeconds": 1.63,
@@ -954,7 +1015,7 @@
       "path": "filmfestival/media/provenance/STATUS.md",
       "quote": "trim point confirmed by matching the frame at `trim_start`"
     },
-    "reverifiedByThisGenerator": false
+    "status": "not verified by this manifest"
   },
   "excerpts": [
     {
@@ -974,27 +1035,31 @@
             "path": "filmfestival/derived/annotation-JL.tsv",
             "sha256": "f8b164c1cc81fa4627fb1237f37a4fe85ee9183752bcfc527349b8f9bc7485bc"
           },
-          "coarseNumberingUsable": true,
           "run": "run-01",
+          "coarseSceneGlobalMapping": {
+            "status": "established",
+            "run2Offset": 106,
+            "basis": "replay receipt: sceneNumberingUsableForGold true, run2SceneNumberOffset 106"
+          },
           "fineRowCount": 59,
           "titleCardRow": {
             "fineRow": 8,
-            "coarseSceneGlobal": 3,
             "coarseSceneRunRelative": 3,
+            "coarseSceneGlobal": 3,
             "startSeconds": 41,
             "endSeconds": 44
           },
           "contentFirstRow": {
             "fineRow": 9,
-            "coarseSceneGlobal": 4,
             "coarseSceneRunRelative": 4,
+            "coarseSceneGlobal": 4,
             "startSeconds": 44,
             "endSeconds": 47
           },
           "contentLastRow": {
             "fineRow": 66,
-            "coarseSceneGlobal": 26,
             "coarseSceneRunRelative": 26,
+            "coarseSceneGlobal": 26,
             "startSeconds": 384,
             "endSeconds": 391
           },
@@ -1009,27 +1074,27 @@
             "path": "filmfestival/derived/annotation-KM.tsv",
             "sha256": "7f81022bf602a34458e7fef0cfe86c1f436a0f65e7e1c1261efb3cf421131fbd"
           },
-          "coarseNumberingUsable": false,
           "run": "run-01",
+          "coarseSceneGlobalMapping": {
+            "status": "unestablished",
+            "reason": "replay receipt: sceneNumberingUsableForGold false (total coarse count 191, expected 216; run-1 coarse count 81, expected 106; Run 1 numbering is not 1..n ascending: 1 restart(s), 2 gap(s), first restart at 1, first gap 26->39; Run 2 numbering is not 1..n ascending: 0 restart(s), 1 gap(s), first gap 2->28), so no run-2 offset maps this coder's numbers to the global 1..216 space"
+          },
           "fineRowCount": 59,
           "titleCardRow": {
             "fineRow": 1,
-            "coarseSceneGlobal": null,
-            "coarseSceneRunRelative": null,
+            "coarseSceneRunRelative": 3,
             "startSeconds": 41,
             "endSeconds": 44
           },
           "contentFirstRow": {
             "fineRow": 2,
-            "coarseSceneGlobal": null,
-            "coarseSceneRunRelative": null,
+            "coarseSceneRunRelative": 4,
             "startSeconds": 44,
             "endSeconds": 47
           },
           "contentLastRow": {
             "fineRow": 59,
-            "coarseSceneGlobal": null,
-            "coarseSceneRunRelative": null,
+            "coarseSceneRunRelative": 26,
             "startSeconds": 382,
             "endSeconds": 391
           },
@@ -1044,27 +1109,31 @@
             "path": "filmfestival/derived/annotation-RC.tsv",
             "sha256": "99715ad79eb1a95cfb3e04b58e5f55dfb7447eb01e7c18934ff74b70181e3883"
           },
-          "coarseNumberingUsable": true,
           "run": "run-01",
+          "coarseSceneGlobalMapping": {
+            "status": "established",
+            "run2Offset": 106,
+            "basis": "replay receipt: sceneNumberingUsableForGold true, run2SceneNumberOffset 106"
+          },
           "fineRowCount": 60,
           "titleCardRow": {
             "fineRow": 6,
-            "coarseSceneGlobal": 3,
             "coarseSceneRunRelative": 3,
+            "coarseSceneGlobal": 3,
             "startSeconds": 41,
             "endSeconds": 44
           },
           "contentFirstRow": {
             "fineRow": 7,
-            "coarseSceneGlobal": 4,
             "coarseSceneRunRelative": 4,
+            "coarseSceneGlobal": 4,
             "startSeconds": 44,
             "endSeconds": 47
           },
           "contentLastRow": {
             "fineRow": 65,
-            "coarseSceneGlobal": 26,
             "coarseSceneRunRelative": 26,
+            "coarseSceneGlobal": 26,
             "startSeconds": 383,
             "endSeconds": 391
           },
@@ -1074,7 +1143,16 @@
           "fineStartsNonDecreasing": true
         }
       ],
-      "codersAgreeOnContentBounds": true
+      "codersAgreeOnContentBounds": true,
+      "filmAssignment": {
+        "status": "verified-locally",
+        "method": "for each coder, the title-card row shares a run of at least 2 words with the title filmfestival/FILMS.md gives this cover name, and with no other cover name's title; compared locally, text not committed",
+        "coders": [
+          "JL",
+          "KM",
+          "RC"
+        ]
+      }
     },
     {
       "coverName": "the_prisoner",
@@ -1093,27 +1171,31 @@
             "path": "filmfestival/derived/annotation-JL.tsv",
             "sha256": "f8b164c1cc81fa4627fb1237f37a4fe85ee9183752bcfc527349b8f9bc7485bc"
           },
-          "coarseNumberingUsable": true,
           "run": "run-02",
+          "coarseSceneGlobalMapping": {
+            "status": "established",
+            "run2Offset": 106,
+            "basis": "replay receipt: sceneNumberingUsableForGold true, run2SceneNumberOffset 106"
+          },
           "fineRowCount": 50,
           "titleCardRow": {
             "fineRow": 404,
-            "coarseSceneGlobal": 137,
             "coarseSceneRunRelative": 31,
+            "coarseSceneGlobal": 137,
             "startSeconds": 370,
             "endSeconds": 375
           },
           "contentFirstRow": {
             "fineRow": 405,
-            "coarseSceneGlobal": 138,
             "coarseSceneRunRelative": 32,
+            "coarseSceneGlobal": 138,
             "startSeconds": 375,
             "endSeconds": 380
           },
           "contentLastRow": {
             "fineRow": 453,
-            "coarseSceneGlobal": 153,
             "coarseSceneRunRelative": 47,
+            "coarseSceneGlobal": 153,
             "startSeconds": 633,
             "endSeconds": 636
           },
@@ -1128,27 +1210,27 @@
             "path": "filmfestival/derived/annotation-KM.tsv",
             "sha256": "7f81022bf602a34458e7fef0cfe86c1f436a0f65e7e1c1261efb3cf421131fbd"
           },
-          "coarseNumberingUsable": false,
           "run": "run-02",
+          "coarseSceneGlobalMapping": {
+            "status": "unestablished",
+            "reason": "replay receipt: sceneNumberingUsableForGold false (total coarse count 191, expected 216; run-1 coarse count 81, expected 106; Run 1 numbering is not 1..n ascending: 1 restart(s), 2 gap(s), first restart at 1, first gap 26->39; Run 2 numbering is not 1..n ascending: 0 restart(s), 1 gap(s), first gap 2->28), so no run-2 offset maps this coder's numbers to the global 1..216 space"
+          },
           "fineRowCount": 52,
           "titleCardRow": {
             "fineRow": 308,
-            "coarseSceneGlobal": null,
-            "coarseSceneRunRelative": null,
+            "coarseSceneRunRelative": 56,
             "startSeconds": 370,
             "endSeconds": 375
           },
           "contentFirstRow": {
             "fineRow": 309,
-            "coarseSceneGlobal": null,
-            "coarseSceneRunRelative": null,
+            "coarseSceneRunRelative": 57,
             "startSeconds": 375,
             "endSeconds": 380
           },
           "contentLastRow": {
             "fineRow": 359,
-            "coarseSceneGlobal": null,
-            "coarseSceneRunRelative": null,
+            "coarseSceneRunRelative": 72,
             "startSeconds": 628,
             "endSeconds": 636
           },
@@ -1163,27 +1245,31 @@
             "path": "filmfestival/derived/annotation-RC.tsv",
             "sha256": "99715ad79eb1a95cfb3e04b58e5f55dfb7447eb01e7c18934ff74b70181e3883"
           },
-          "coarseNumberingUsable": true,
           "run": "run-02",
+          "coarseSceneGlobalMapping": {
+            "status": "established",
+            "run2Offset": 106,
+            "basis": "replay receipt: sceneNumberingUsableForGold true, run2SceneNumberOffset 106"
+          },
           "fineRowCount": 45,
           "titleCardRow": {
             "fineRow": 323,
-            "coarseSceneGlobal": 137,
             "coarseSceneRunRelative": 31,
+            "coarseSceneGlobal": 137,
             "startSeconds": 370,
             "endSeconds": 375
           },
           "contentFirstRow": {
             "fineRow": 324,
-            "coarseSceneGlobal": 138,
             "coarseSceneRunRelative": 32,
+            "coarseSceneGlobal": 138,
             "startSeconds": 375,
             "endSeconds": 382
           },
           "contentLastRow": {
             "fineRow": 367,
-            "coarseSceneGlobal": 153,
             "coarseSceneRunRelative": 47,
+            "coarseSceneGlobal": 153,
             "startSeconds": 628,
             "endSeconds": 636
           },
@@ -1193,7 +1279,16 @@
           "fineStartsNonDecreasing": true
         }
       ],
-      "codersAgreeOnContentBounds": true
+      "codersAgreeOnContentBounds": true,
+      "filmAssignment": {
+        "status": "verified-locally",
+        "method": "for each coder, the title-card row shares a run of at least 2 words with the title filmfestival/FILMS.md gives this cover name, and with no other cover name's title; compared locally, text not committed",
+        "coders": [
+          "JL",
+          "KM",
+          "RC"
+        ]
+      }
     }
   ],
   "excerptConventions": {
@@ -1203,7 +1298,7 @@
     },
     "contentEndSeconds": "the replay sets a row's end to the next fine start in the same run, so the last content row ends where the following film's title-card row starts",
     "clock": "annotation times are run-relative and are not the events.tsv clock",
-    "filmAssignment": "annotation film ordinal k is taken as events.tsv row k of run 1 (k <= 6) or row k-6 of run 2; the replay receipts list this as a non-claim",
+    "filmAssignment": "annotation film ordinal k is taken as events.tsv row k of run 1 (k <= 6) or row k-6 of run 2; for the two excerpts this is checked locally (excerpts[].filmAssignment), and no other film's assignment is used here",
     "fineRow": "the replay's 1-based annotated-row ordinal for that coder, not an upstream column"
   },
   "upstream": {
@@ -1216,7 +1311,7 @@
     "remoteChecksumMatch": {
       "reported": "SHA256SUMS.local matched the remote for all listed files",
       "reportedBy": "tracker bead bd-01M2TA4BFRMK8WNA79PPRT8YCD",
-      "reverifiedByThisGenerator": false
+      "verifiedByThisManifest": false
     },
     "directories": [
       {
@@ -1256,7 +1351,6 @@
       },
       {
         "local": "cand/",
-        "remote": null,
         "status": "unestablished",
         "reason": "no provenance script or note names the directory these candidate downloads were written to"
       },
@@ -1300,21 +1394,72 @@
   },
   "filmsNote": {
     "path": "filmfestival/FILMS.md",
-    "sha256": "800792e5ad96207fd5c68d0bb5985edc0c78ee5ccad5df636e09ad91efe4db6d",
-    "byteLength": 5424,
-    "sourceManifestRecordsSha256": "800792e5ad96207fd5c68d0bb5985edc0c78ee5ccad5df636e09ad91efe4db6d",
+    "sha256": "741150d39c4b4dccb829e9d92440edde0387682045b68e86f86aad9fa2bc564d",
+    "byteLength": 5506,
+    "sourceManifestRecordsSha256": "741150d39c4b4dccb829e9d92440edde0387682045b68e86f86aad9fa2bc564d",
     "sourceManifestDigestCurrent": true,
     "storage": "external-local-only; names commercial works and is not for Git admission"
   },
   "nonClaims": [
-    "clip-equals-presented-edition",
-    "trim-points-reverified-against-frames",
-    "annotation-to-events-tsv-clock-offset-resolved",
-    "excerpt-internal-cuts-known",
-    "excerpt-media-located",
-    "annotation-film-assignment-verified-against-presentation-schedule",
-    "remote-per-file-paths-verified",
-    "reference-annotator-selected",
-    "media-admitted-to-git"
+    {
+      "id": "clip-equals-presented-edition",
+      "why": "clips are cut from public copies; equivalence to the presented files is not established"
+    },
+    {
+      "id": "trim-points-verified-against-frames",
+      "why": "trim_start values are copied from the provenance manifest and are not verified by this manifest (see trimVerification)"
+    },
+    {
+      "id": "annotation-to-events-tsv-clock-offset-resolved",
+      "why": "the provenance README reports offsets between the annotation clock and events.tsv that drift within each run, and a difference depends on which annotation row is taken as a film's start; the differences below are observations, not an offset",
+      "basis": [
+        {
+          "path": "filmfestival/media/provenance/README.md",
+          "quote": "drifts monotonically within a run (3,6,8,7,8,10 s in run 1;"
+        },
+        {
+          "path": "filmfestival/media/provenance/README.md",
+          "quote": "3,6,7,7,7,11 s in run 2)"
+        }
+      ],
+      "observedDifferences": [
+        {
+          "coverName": "catch_me_if_you_can",
+          "annotatedContentStartSeconds": 44,
+          "eventsOnsetSeconds": 47.0,
+          "differenceSeconds": 3.0
+        },
+        {
+          "coverName": "the_prisoner",
+          "annotatedContentStartSeconds": 375,
+          "eventsOnsetSeconds": 377.0,
+          "differenceSeconds": 2.0
+        }
+      ]
+    },
+    {
+      "id": "excerpt-internal-cuts-known",
+      "why": "whether material inside either excerpt's annotated span was left out of the presentation is not known"
+    },
+    {
+      "id": "excerpt-position-within-work-verified",
+      "why": "where each excerpt sits in its full work is reported by the provenance notes, not verified locally"
+    },
+    {
+      "id": "excerpt-media-located",
+      "why": "no source for either excerpt is staged"
+    },
+    {
+      "id": "remote-per-file-paths-verified",
+      "why": "Trillium was not read; directory origins are inferred from provenance scripts"
+    },
+    {
+      "id": "reference-annotator-selected",
+      "why": "the three coders are reported side by side"
+    },
+    {
+      "id": "media-admitted-to-git",
+      "why": "the media stay in the git-ignored data root"
+    }
   ]
 }
