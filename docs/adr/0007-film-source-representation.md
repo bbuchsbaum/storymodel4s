@@ -1134,5 +1134,6 @@ the [F0 decision record](../refactor/evidence/film-f0-claim-status-20260921/READ
 Generated captions do not license `SurfaceExplicit`: the term keeps its text meaning and
 `ClaimMeta`'s span law is unchanged. A caption-only film claim is `Hypothesized` with its
 complete derivation, and `HumanAdjudicated` requires an adjudication record for that particular
-claim. No license basis, component version or wire change is added. F4 implements this rule; the
-decision itself implements nothing.
+claim. A adds no license basis and requires no component-version or wire change for licensing.
+This note records the decision and does not amend the term. F4 implements this rule; the decision
+itself implements nothing.

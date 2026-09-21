@@ -29,13 +29,23 @@ On 21 September 2026 the question was carried to the owner again, in this form:
 > text / human annotation / generated caption, and F4 must add construction, join, component,
 > provenance, consistency and wire consequences and a replacement basis rule.
 
+That wording is a shortened re-ask of the hash-bound brief; the brief itself was not shown in the
+session. It omits A's qualifier "when its only license is model conjecture", does not say that
+0.25 is a fallback that calibrated credence overrides, and leaves out several §7 disclosures:
+parsing, acceptance, raw score and authorship are not a license; receipts do not establish the
+depicted event; the same sentence as text source versus film derivative; hull versus frame
+inventory; and no reuse of text `SurfaceExplicit` assignments. "No ADR change" was added in the
+re-ask and means that A amends no term. The omissions do not favor the option chosen: A is the
+alternative that grants no new license, and every omitted disclosure is carried below.
+
 ## Answer
 
 **The owner selected A.** Generated captions cannot license film `SurfaceExplicit`.
 
-Provenance: the owner's explicit selection in the Claude Code session of 21 September 2026,
-in response to the question quoted above. No elapsed time, plan recommendation or agent
-inference stands in for it.
+Provenance: in the Claude Code session of 21 September 2026 the owner selected the option
+labelled "A: keep text meaning (Recommended)" in response to the question quoted above. The
+tracker decision note on F0 is by actor `claude-storymodel4s-march-20260921`. No elapsed time,
+plan recommendation or agent inference stands in for the answer.
 
 ## Consequences F4 implements
 
@@ -61,8 +71,9 @@ only A.
   version is required for licensing. The text model wire and the frozen S0 values are unchanged.
   Generic film-model wire remains V1 work.
 - **Consistency.** General graph and status consistency rules apply to film claims. The text
-  overlap and causal-cue rules remain text-witness rules and are declared inapplicable to film
-  inputs; they are neither silently skipped nor satisfied by film anchors.
+  overlap and causal-cue rules remain text-witness rules, inapplicable to film inputs as ADR 0007
+  S4b already provides; film anchors cannot satisfy them. No new runtime report entry is
+  required.
 - **StatusWeight.** Semantics are unchanged: `SurfaceExplicit` and `HumanAdjudicated` fall back to
   1.0, `Hypothesized` to 0.25, and calibrated credence overrides the fallback while raw score
   does not. Unadjudicated caption-derived film claims therefore carry the 0.25 fallback in
@@ -70,10 +81,11 @@ only A.
   multiplier.
 - **Text caption versus film claim.** The same sentence remains distinguishable as a separate
   text source, where it can be `SurfaceExplicit` relative to that text, and as a film
-  derivative, where it is a claim about the film and is `Hypothesized` under A.
-- **Support geometry.** A caption's support is its declared sampled-frame hull; the exact frame
-  inventory is retained separately and does not imply continuous observation. Claim unions keep
-  their gaps; the hull is never rewritten as per-frame intervals.
+  derivative, where it is a claim about the film and is `Hypothesized` under A when the caption
+  is its only license.
+- **Support geometry.** A caption's support is its declared sampled-frame hull, which does not
+  establish continuous observation; the exact frame inventory is retained separately. Claim
+  unions keep their gaps; the hull is never rewritten as per-frame intervals.
 
 ## Selected constraints
 

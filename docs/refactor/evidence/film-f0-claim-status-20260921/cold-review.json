@@ -1,0 +1,33 @@
+{
+  "schema": "film-f0/cold-review/v1",
+  "reviewedCommit": "473c69593d16e378d03fad7f4e55a16145bb8c53",
+  "reviewer": "fresh-context general-purpose agent, read-only",
+  "criteria": {
+    "1": "MET: record cites closed phase-plan ticket bd-01M2TAGST4EBFR1HM9Q3EWSYAH and its brief, bound by commit e52f62f6 and SHA-256 (both verified); brief carries the 'John opens the door' trigger and names F4. The 21 September re-ask is shorter than the brief (minor finding).",
+    "2": "MET: owner selected A; generated captions cannot license film SurfaceExplicit. Provenance adequate but thin (minor finding).",
+    "3": "MET: construction/span law, join, provenance, component/wire, consistency and StatusWeight consequences recorded; code-level statements verified correct. Three wording findings.",
+    "4": "MET so far as F0 can meet it: committed at a citable path and SHA; F4 AC1 already requires the citation. F4 carried no pointer yet (minor finding)."
+  },
+  "findings": [
+    {"severity": "minor", "location": "README.md:16-30", "issue": "21 September re-ask shorter than brief/§7; drops qualifiers and several disclosures; adds 'No ADR change'.", "fix": "State the re-ask was shortened and list the omitted disclosures.", "resolution": "Folded: paragraph after the quoted question lists every omission."},
+    {"severity": "minor", "location": "README.md:36-38", "issue": "Provenance names only the session; tracker op files untracked.", "fix": "Commit .mote/ops files; add verbatim selection and actor id.", "resolution": "Folded: verbatim option label and actor id added; op files committed."},
+    {"severity": "minor", "location": "README.md:63-65", "issue": "'neither silently skipped' could read as a new runtime obligation.", "fix": "Cite ADR 0007 S4b; state no new runtime report entry.", "resolution": "Folded."},
+    {"severity": "minor", "location": "README.md:71-73", "issue": "Film derivative 'is Hypothesized under A' overstates A.", "fix": "Qualify: when the caption is its only license.", "resolution": "Folded."},
+    {"severity": "minor", "location": "README.md:74-75", "issue": "'does not imply continuous observation' attached to the frame inventory instead of the hull.", "fix": "Attach it to the hull.", "resolution": "Folded."},
+    {"severity": "minor", "location": "docs/adr/0007-film-source-representation.md:1137", "issue": "Dropped 'for licensing' qualifier; not marked record-only.", "fix": "Reword with the qualifier; state the note amends no term.", "resolution": "Folded."},
+    {"severity": "minor", "location": "mote F4 bd-01M2YY3R25N9XWWAC4EZ3X3BJ9", "issue": "Nothing on F4 points to the record; the plan still says unselected.", "fix": "Note on F4 citing the record; leave the plan unchanged to keep its bound hash.", "resolution": "Folded: note added on F4; plan unchanged."}
+  ],
+  "checks": [
+    "git rev-parse/show --stat 473c6959: 3 files",
+    "shasum -a 256 of plan and brief at e52f62f6, 473c6959 and working tree match the record",
+    "brief added only in e52f62f6; unchanged since",
+    "F4 deps are F0 and F1 (F1 open)",
+    "core claim.scala spanLaw requires text spans for SurfaceExplicit",
+    "story relations.scala StatusWeight: SurfaceExplicit 1.0, HumanAdjudicated 1.0, Hypothesized 0.25; calibrated overrides; raw score unused",
+    "story consistency.scala text-only rules under text.foreach",
+    "ADR 0007 prior passages do not conflict with A",
+    "all relative links and the #7 anchor resolve",
+    "no build run, as the gate requires"
+  ],
+  "verdict": "findings (all minor, all folded in the follow-up commit)"
+}
