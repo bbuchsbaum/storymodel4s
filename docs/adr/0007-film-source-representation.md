@@ -1126,3 +1126,13 @@ SurfaceExplicit licensing remains unchosen: both disclosed alternatives are put
 to the owner only after the concrete plan and affected child are reviewable.
 No planned name or recommended alternative grants a film claim license, changes
 text bytes, lifts existing text/HSMM wire refusals, or completes film compilation.
+
+### Film claim-status decision — 21 September 2026
+
+The owner selected alternative A of the film phase plan's §7, recorded with its provenance in
+the [F0 decision record](../refactor/evidence/film-f0-claim-status-20260921/README.md).
+Generated captions do not license `SurfaceExplicit`: the term keeps its text meaning and
+`ClaimMeta`'s span law is unchanged. A caption-only film claim is `Hypothesized` with its
+complete derivation, and `HumanAdjudicated` requires an adjudication record for that particular
+claim. No license basis, component version or wire change is added. F4 implements this rule; the
+decision itself implements nothing.

@@ -309,10 +309,13 @@ scorer, clock integration and S0, with rescue as independent preservation work. 
 campaigns, viewer work, corpus expansion, interview enhancements and fleet-tool defects are
 visible separately. No benchmark win or optional hosted provider sits on the preview/film path.
 
-Remaining owner input is bounded: the CI account/runner route; per-corpus hosted transmission
-and spend only if those arms are pursued; human-coding resources before recruitment; missing
-commercial clips only for those media tracks; film claim licensing when its phase plan presents
-the concrete alternatives. None requires guessing permission now. Hash policy and measurement
+Remaining owner input is bounded: the CI account/runner route (deferred by the owner on
+21 September 2026: local exact-SHA gates qualify engineering meanwhile, and G5 stays open);
+per-corpus hosted transmission and spend only if those arms are pursued; human-coding resources
+before recruitment; missing commercial clips only for those media tracks. Film claim licensing
+was decided on 21 September 2026 (alternative A, see the
+[F0 decision record](evidence/film-f0-claim-status-20260921/README.md)). None requires guessing
+permission now. Hash policy and measurement
 architecture are decided here; P1 scope reduction is not adopted.
 
 After each gate, demonstrate one actual user journey and name the next failing witness. Do not
