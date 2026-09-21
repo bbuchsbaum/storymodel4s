@@ -47,6 +47,25 @@
       "basis": "Pinned sheet layout and column types; not independently confirmed by the upstream authors."
     },
     {
+      "participant": "S72",
+      "headerSha256": "e631a097928774d673a3e9ccb29df26d7e616d7971a47e684bf6c8d1deb8ddc3",
+      "columns": [
+        {
+          "index": 8,
+          "name": "UnusedTranscriptColumn",
+          "originalCellSha256": "79215cc8ac7d828f1a27d0d05ac504f5b51bf2156cfb15f6018b0be989901358",
+          "mustBeEmpty": true
+        },
+        {
+          "index": 10,
+          "name": "Transcript",
+          "originalCellSha256": "23c594e2a359beddc2233d090b92593f95ffae602aeb8e76c2c9f5bc8ce28565"
+        }
+      ],
+      "status": "inferred-header-normalization",
+      "basis": "Canonical Transcript column is empty throughout; second heading differs only by one trailing space and contains the transcript. Exact header and workbook binding; unused-column emptiness is checked."
+    },
+    {
       "participant": "S162",
       "headerSha256": "fc569ca2623b5a8b627dc7f7a20ff61a0f60ba571fc55bacef3e76f62a7d3abf",
       "columns": [

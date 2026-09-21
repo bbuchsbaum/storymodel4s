@@ -130,9 +130,10 @@ by condition. A retained participant with no eligible rows makes full-population
 undefined. Prediction input is a sequence of unit-ID/outcome pairs: duplicates, omissions and
 extra IDs refuse scoring; invalid labels and nonlabels are wrong on eligible rows.
 
-S42's unlabeled code column and S53/S162/S175 transcript headings have **inferred** overlays
+S42's unlabeled code column and S53/S72/S162/S175 transcript headings have **inferred** overlays
 bound to exact bytes and full header signatures. S53's truncated clock heading is also normalized.
-These are not author-confirmed corrections. Interpretation of the qualification in S53's long
+S72 has an empty canonical transcript column and a populated `Transcript ` column with a trailing
+space; the overlay checks that the unused column stays empty. These are not author-confirmed corrections. Interpretation of the qualification in S53's long
 transcript header remains unresolved. The pre-seal audit reports counts with overlays disabled
 and each affected sheet's contribution, so this assumption remains visible. S84's noncanonical
 clock heading is left unresolved because time is optional for this task.

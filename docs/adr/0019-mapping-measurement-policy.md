@@ -85,3 +85,8 @@ remain unestablished. Pin task, population and parser identities in the seal. Re
 repeated text, inventing row clocks, salvaging one valid half of malformed scene gold, treating
 missing gold as model error, generic positional header fallbacks, and substituting an
 eligibility-selected population. This adds no Scala module, dependency or public Scala type.
+
+The pre-seal audit exposed S72's empty canonical transcript column and populated duplicate
+heading with one trailing space. Bind a fifth sheet overlay to that exact header and require
+the displaced column to remain empty. Preserve the superseded audit in local evidence; no
+model output or split allocation informed this correction.

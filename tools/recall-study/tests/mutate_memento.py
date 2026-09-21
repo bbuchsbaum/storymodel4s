@@ -15,6 +15,12 @@ XLSX = HERE.parent / "corpus/xlsx_rows.py"
 MUTANTS = [
     (
         TASK,
+        'if change.get("mustBeEmpty") and any(',
+        'if False and any(',
+        "test_duplicate_transcript_heading_overlay_requires_unused_column_empty",
+    ),
+    (
+        TASK,
         "elif code not in (1, 2):",
         "elif False:",
         "test_invalid_and_nonaccurate_codes_never_enter_accuracy",

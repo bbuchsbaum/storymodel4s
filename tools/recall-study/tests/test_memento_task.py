@@ -219,8 +219,10 @@ class MementoTaskSuite(unittest.TestCase):
             }
         ]
         rows = [(1, header), (3, [0, 1, 3, None, "synthetic"])]
+
         def get(**kw):
             return task.normalize(rows, "S42", SHA, contract, **kw)
+
         self.assertTrue(get()[0].eligible)
         self.assertFalse(get(overlays=False)[0].eligible)
         self.assertEqual(get()[0].header_overlays, ("RecallType",))
@@ -254,6 +256,40 @@ class MementoTaskSuite(unittest.TestCase):
             workbook(path, {"S1": [(1, HEADER), (1, [0, 1, 3, None, "synthetic"])]})
             with self.assertRaisesRegex(ValueError, "increasing"):
                 sheet_rows(path, "S1", indexed=True)
+
+    def test_duplicate_transcript_heading_overlay_requires_unused_column_empty(self):
+        header = HEADER + ["Transcript "]
+        contract = copy.deepcopy(CONTRACT)
+        contract["headerOverlays"] = [
+            {
+                "participant": "S72",
+                "headerSha256": task.digest(header),
+                "columns": [
+                    {
+                        "index": 4,
+                        "name": "UnusedTranscriptColumn",
+                        "mustBeEmpty": True,
+                        "originalCellSha256": task.digest("Transcript"),
+                    },
+                    {
+                        "index": 5,
+                        "name": "Transcript",
+                        "originalCellSha256": task.digest("Transcript "),
+                    },
+                ],
+            }
+        ]
+        rows = [(1, header), (2, [0, 1, 3, None, None, "synthetic"])]
+        units = task.normalize(rows, "S72", SHA, contract)
+        self.assertTrue(units[0].eligible)
+        strict = task.normalize(rows, "S72", SHA, contract, overlays=False)
+        self.assertFalse(strict[0].eligible)
+        self.assertEqual(units[0].unit_id, strict[0].unit_id)
+        for value in ("conflicting synthetic", CellError("#VALUE!")):
+            # Check all physical rows, including rows ineligible for accuracy.
+            changed = rows + [(9, [None, 5, None, None, value, None])]
+            with self.assertRaisesRegex(ValueError, "unused transcript column"):
+                task.normalize(changed, "S72", SHA, contract)
 
     def test_stratified_draw_is_order_invariant_and_uses_conditions(self):
         groups = {str(c): [f"S{(c-1)*4+i}" for i in range(1, 5)] for c in range(1, 5)}

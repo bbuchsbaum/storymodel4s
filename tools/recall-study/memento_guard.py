@@ -328,6 +328,8 @@ def admission_audit(data_root):
                     {
                         "participant": name,
                         "condition": condition,
+                        "unitsWithOverlay": len(units),
+                        "unitsWithoutOverlay": len(strict),
                         "eligibleWithOverlay": sum(u.eligible for u in units),
                         "eligibleWithoutOverlay": sum(u.eligible for u in strict),
                         "evaluableWithOverlay": int(any(u.eligible for u in units)),

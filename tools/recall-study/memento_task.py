@@ -132,6 +132,11 @@ def normalize(indexed_rows, participant, workbook_sha256, contract, *, overlays=
             for change in rule["columns"]:
                 if digest(header[change["index"]]) != change["originalCellSha256"]:
                     raise ValueError("pinned header cell state changed")
+                if change.get("mustBeEmpty") and any(
+                    change["index"] < len(row) and not blank(row[change["index"]])
+                    for _, row in indexed_rows[1:]
+                ):
+                    raise ValueError("overlaid unused transcript column is populated")
                 header[change["index"]] = change["name"]
     for name in FIELDS:
         if header.count(name) > 1:
