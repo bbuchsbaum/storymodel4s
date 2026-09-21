@@ -30,3 +30,7 @@ jobs:
           python3 tools/recall-study/tests/test_gold_scene.py -v
           python3 tools/recall-study/tests/test_gold_rule_single.py
           python3 tools/recall-study/mutate_scorer_checks.py
+      - name: Friends sealed test split guard (committed records only, no corpus)
+        run: |
+          python3 tools/recall-study/tests/test_friends_guard.py -v
+          python3 tools/recall-study/tests/mutate_friends_guard.py

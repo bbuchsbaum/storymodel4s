@@ -48,6 +48,22 @@ Canonicalize that JSON with `jq -S -c` before digesting it.
 - Fifteen repeated-transcript runs change labels across their rows. The loader
   must retain row boundaries until a scoring-resolution rule is established.
 
+## Sealed test split
+
+The participant-level test split was sealed on 2026-09-21, before any model output on Friends
+existed: **10 test / 13 development** participants, seed `20260921`, drawn from the admitted sheet
+IDs alone ([`test-split.json`](test-split.json); `tools/recall-study/friends_split.py --check`
+re-derives it). The test side holds 278 of the 630 gold units. The record also carries the power
+assumptions and minimum detectable effects, and the exposure statement: the split is
+model-untouched, not unseen, since human-coding statistics were already computed over all 23.
+
+Every reader of Friends recall must go through `tools/recall-study/friends_guard.py`. The guard
+refuses test participants unless it is called with a final opening that names a committed
+release-candidate manifest by SHA-256, and it counts each such read in
+[`test-split-reads.json`](test-split-reads.json), which currently records zero reads.
+`tools/recall-study/tests/test_friends_guard.py` fails if any reader under `tools/` or the Scala
+sources bypasses the guard.
+
 ## Intended framework path
 
 The next work should be staged as separate contracts:
