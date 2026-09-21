@@ -16,7 +16,7 @@ The sentinels are correct for what they do -- both feed only Kendall tau-b, a ra
 any monotone offset works -- and wrong for anything that measures a duration. One name, two
 semantics. Here they are two DECLARED kinds, and the ambiguity stops being representable.
 
-The in-tree precedent for reading this from disk is `agreement.py:31-45`, which already loads
+The in-tree precedent for reading this from disk is `agreement.part_offsets`, which already loads
 `parts.json` and falls back to a literal only when it is absent. That is the only data-driven seam
 in this tree and it belongs to the agreement scorer; this generalizes it rather than inventing a
 mechanism.

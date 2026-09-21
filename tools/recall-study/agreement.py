@@ -7,12 +7,13 @@ are measures of how peaked the posterior is, so any stronger prior sharpens them
 is right. That is the standing weakness of gold-free evaluation, and it is why a prior sweep that
 improves all three should not be believed on their word alone.
 
-This measures something else. Different participants watched the *same* film, so when two of them
-recall the same moment, a correct mapping puts both of their descriptions at the same place in the
-film. The pairing of recall units across participants is computed from the recall text alone and is
-identical for every arm, so no arm can change which units are compared. It is not accuracy: two
-anchors can agree at the wrong place, and a constant anchor attains a zero gap (the control
-printed below).
+Agreement is not inflated by posterior sharpness as such, but it can be won by anchor collapse
+(see below), so it is a diagnostic rather than a way out of that weakness. Different participants
+watched the *same* film, so when two of them recall the same moment, a correct mapping puts both of
+their descriptions at the same place in the film. The pairing of recall units across participants
+is computed from the recall text alone and is identical for every arm, so no arm can change which
+units are compared. It is not accuracy: two anchors can agree at the wrong place, and a constant
+anchor attains a zero gap (the control printed below).
 
 Units are paired by mutual-best inverse-document-frequency overlap above a floor, which keeps only
 pairs likely to describe the same event and discards the rest rather than pairing them badly. The

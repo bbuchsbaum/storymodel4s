@@ -37,8 +37,10 @@ and programme work.
   are computed outputs, not validated detectors: the distorted fidelity modes
   and facets (role reversal and modality among them) and intrusion mass have no
   efficacy evidence. Apart from hand-authored War of the Ghosts foils scored as
-  diagnostics, none has been tested against labelled errors in real recall.
-  Capability evidence is tracked in the [delivery plan](docs/refactor/PLAN.md).
+  diagnostics (`WogDiagnostic`, [embed-bench](embed-bench/README.md)), none has
+  been tested against labelled errors in real recall, and the external-floor
+  [calibration court](docs/design/external-floor-calibration-court.md) behind
+  intrusion mass has not been run.
 - Scores Autobiographical Interviews as detail atoms with probabilistic memory
   addresses; traditional internal/external totals are a versioned derived view.
 - Compiles validated models into renderer-neutral Codex and Atlas views whose
@@ -105,9 +107,11 @@ sequential model removed, where it ranked better alone and a blend beat both
 ([study log, "Diagnosis 2"](docs/plans/2026-09-02-recall-to-video-study-log.md#diagnosis-2-the-retrieval-channel-measured-with-the-sequential-model-removed)).
 Both are diagnostics (a hand-declared fixture and a gold-free ordering proxy),
 so no claim is made here about what the encoder improves.
-The repository does not yet include an unattended text→AMR parser, an LLM
-acquisition adapter, a remote (HTTP) embedding provider, or calibrated
-production defaults. Complete automatic construction remains programme work.
+`provider-agent` puts a hosted model behind the parser transport (ADR 0008)
+and `pipeline` runs a text file through it to a `StoryModel` on disk
+(ADR 0009); neither has an established quality claim. The repository does not
+yet include a remote (HTTP) embedding provider or calibrated production
+defaults, and complete automatic construction remains programme work.
 
 ## Build and verify
 
@@ -120,7 +124,8 @@ sbt checkAll     # scalafmt + compile + test on JVM, Scala.js, Native
 
 The JVM-only `embed-grakern` project consumes the in-house `grakern` library as
 an immutable SHA source pin. grakern has no published artifacts, so sbt clones
-the pinned revision from `github.com/canardlapin/grakern`; CI builds this way.
+the pinned revision from `github.com/canardlapin/grakern` (CI is configured to
+build this way).
 `-Dstorymodel4s.grakern.build=/path/to/grakern` (or
 `STORYMODEL4S_GRAKERN_BUILD`) substitutes a local checkout. grakern's own build
 fetches its graph4s/gale pins from GitHub.

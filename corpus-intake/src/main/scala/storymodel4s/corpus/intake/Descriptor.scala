@@ -9,7 +9,7 @@ import storymodel4s.corpus.*
   * reading it would be the same defect as a source manifest no code reads -- a record that asserts
   * authority and is wired to nothing -- which is the whole subject of ADR 0018.
   *
-  * The in-tree precedent is `tools/recall-study/agreement.py:31-45`, which already reads
+  * The in-tree precedent is `part_offsets` in `tools/recall-study/agreement.py`, which reads
   * `parts.json` from disk and falls back to a literal only when it is absent. That is the only
   * data-driven seam in the scoring tree, and it belongs to the agreement scorer. This generalizes
   * it rather than inventing a mechanism.

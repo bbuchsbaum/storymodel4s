@@ -566,8 +566,8 @@ object RecallToVideo:
     // setting, not a reference-measurement policy (ADR 0019).
     //
     // Honest status: development-only. The untouched participants were already spent confirming the
-    // lexical blend, so this value has not been checked out of sample, and the sign test that most
-    // resists confidence is suggestive rather than significant (116 pairs closer, 95 farther).
+    // lexical blend, so this value has not been checked out of sample, and the agreement sign test
+    // is suggestive rather than significant (116 pairs closer, 95 farther).
     val priorScale =
       sys.env.get("STORYMODEL4S_PRIOR_SCALE").flatMap(_.trim.toDoubleOption).filter(_ >= 0.0)
     val scale = priorScale.getOrElse(1.5)

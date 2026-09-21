@@ -274,9 +274,10 @@ Package namespace is flat `storymodel4s.<module>`.
   modules cross-build to. The full `testAll` court is the **chief's**, run once
   before a push — concurrent full courts on one machine were the cause of
   stalled and killed audits, not any one slow suite. `sbt testJVM` for a fast
-  loop. The JVM-only `embed-grakern` project needs
-  `-Dstorymodel4s.grakern.build=/path/to/grakern` (or `STORYMODEL4S_GRAKERN_BUILD`)
-  until grakern is published; it is part of `compileAll`/`testAll`/`testJVM`.
+  loop. The JVM-only `embed-grakern` project clones grakern's pinned revision
+  from its public remote unless `-Dstorymodel4s.grakern.build=/path/to/grakern`
+  (or `STORYMODEL4S_GRAKERN_BUILD`) names a local checkout; it is part of
+  `compileAll`/`testAll`/`testJVM`.
 - Warnings are errors in spirit: keep `-Wunused:all -Wvalue-discard` clean.
 - munit + munit-scalacheck at test scope; law suites in `laws` use discipline-munit.
 - `Test / parallelExecution := false`.

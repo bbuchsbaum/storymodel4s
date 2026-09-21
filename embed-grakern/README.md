@@ -34,8 +34,8 @@ alone (law G2 holds by construction, on top of grakern's own invariance laws).
 ## Building
 
 grakern has no published artifacts. The pin in `build.sbt` (`grakernRevision`) is an immutable
-SHA; without an override sbt clones that revision from `github.com/canardlapin/grakern`, which is
-what CI does. To build against a local checkout instead:
+SHA; without an override sbt clones that revision from `github.com/canardlapin/grakern`, as the
+CI configuration does. To build against a local checkout instead:
 
 ```
 sbt -Dstorymodel4s.grakern.build=/path/to/grakern embedGrakern/test
