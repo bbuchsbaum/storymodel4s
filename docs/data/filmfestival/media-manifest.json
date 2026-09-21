@@ -1,0 +1,1320 @@
+{
+  "schema": "storymodel4s.filmfestival.media-manifest",
+  "schemaVersion": 1,
+  "generator": "tools/corpus/filmfest_media_manifest.py",
+  "mediaRoot": "data/filmfestival/media",
+  "storage": "external-local-only",
+  "contentStoredInGit": false,
+  "stagedAt": "2026-09-18",
+  "stagedAtBasis": "tracker bead bd-01M2TA4BFRMK8WNA79PPRT8YCD",
+  "ffprobeVersion": "7.1.1",
+  "fieldEvidence": {
+    "files[].sha256": "computed; equal to SHA256SUMS.local",
+    "files[].byteLength": "measured",
+    "files[].video": "ffprobe format_name, format duration and per-stream codec_name",
+    "films[].presentations": "filmfestival/task-movie_run-0{1,2}_events.tsv (ds004042)",
+    "films[].scanDurationSeconds": "events.tsv duration; equal to provenance manifest.tsv target_s",
+    "films[].trimStartSeconds": "filmfestival/media/provenance/manifest.tsv column trim_start",
+    "films[].sourceDurationSeconds": "ffprobe of the source file",
+    "films[].clipDurationSeconds": "ffprobe of the clip file",
+    "films[].clipShortfallSeconds": "scanDurationSeconds - clipDurationSeconds",
+    "excerpts[].coders[]": "filmfestival/derived/annotation-<coder>.tsv, bound to its replay receipt; of the film label only its ordinal prefix is used, and no description text enters this record"
+  },
+  "checksumFile": {
+    "path": "SHA256SUMS.local",
+    "sha256": "47b0a1530e2e507721d3e8faf1364d2dfa0dc068ace4e1580a019fa718646a0e",
+    "byteLength": 4762,
+    "lineCount": 53,
+    "rerenderedByteForByte": true,
+    "excludedFromFileList": "a checksum file cannot list its own digest"
+  },
+  "files": [
+    {
+      "path": "asr/bus_stop.json",
+      "sha256": "eb124171c9b3aefff6ccdc324e9953509803d724762222bfbee20254f5ffd40d",
+      "byteLength": 38889
+    },
+    {
+      "path": "asr/bus_stop_lang.npz",
+      "sha256": "f68532463748986741cc3ab583dced78a6a4af12ab3312ab76377a40676ea710",
+      "byteLength": 833929
+    },
+    {
+      "path": "asr/bus_stop_words.tsv",
+      "sha256": "1567dda53e5ab06a48270defc33281844d8676b938ae02c17154f6fa3d90a6b8",
+      "byteLength": 8272
+    },
+    {
+      "path": "asr/cartoon_introduction.json",
+      "sha256": "4bcaf8dff06f7b97b7ae5191ccd79f7f0049e37f5fb6b95989ae6278074f7c2a",
+      "byteLength": 7682
+    },
+    {
+      "path": "asr/cartoon_introduction_lang.npz",
+      "sha256": "00f7bd492f8a1638ffb041ef380d66c7224be3d0c7e98ed44733dc5b40bcb9e4",
+      "byteLength": 189918
+    },
+    {
+      "path": "asr/cartoon_introduction_words.tsv",
+      "sha256": "bdba4f132a85654e13e03fa1abfec2a056f8d1a93cdc5aa84201747bcc027657",
+      "byteLength": 1726
+    },
+    {
+      "path": "asr/keith_reynolds.json",
+      "sha256": "ce16fec5077a39cb13df28b1524e5d971537a5688f6a878953e2045303996965",
+      "byteLength": 103021
+    },
+    {
+      "path": "asr/keith_reynolds_lang.npz",
+      "sha256": "d22a39090da57c08696d67f8a2de92144f17a79fae1417f188c1bfb72e4652a6",
+      "byteLength": 2480837
+    },
+    {
+      "path": "asr/keith_reynolds_words.tsv",
+      "sha256": "dfed9b6740b89210c0b8d2bcd4c30770bfe4c09aeca1cff90a4cdca052a96560",
+      "byteLength": 24912
+    },
+    {
+      "path": "asr/post_it_love.json",
+      "sha256": "fc0887824264b1cd1229c2f55abc72ffba32c8ead771f63c2075274d503db1f5",
+      "byteLength": 272
+    },
+    {
+      "path": "asr/post_it_love_words.tsv",
+      "sha256": "e688d3b40ccf3ff8fb4b75b142d7528096b38f8271486465732c8bc5a05937af",
+      "byteLength": 24
+    },
+    {
+      "path": "asr/the_black_hole.json",
+      "sha256": "558e5a1209c041fb8463bb5a959967f2d2858f4d2b85fbdf42a2ec5c1c4a9389",
+      "byteLength": 274
+    },
+    {
+      "path": "asr/the_black_hole_words.tsv",
+      "sha256": "e688d3b40ccf3ff8fb4b75b142d7528096b38f8271486465732c8bc5a05937af",
+      "byteLength": 24
+    },
+    {
+      "path": "asr/the_boyfriend.json",
+      "sha256": "cb76c7732d6033dee4e0a22d0e7688a23c655af35cd29fb5d7b011ca0c7f4a68",
+      "byteLength": 44129
+    },
+    {
+      "path": "asr/the_boyfriend_lang.npz",
+      "sha256": "684014fe891f5fdfba0da7f19373a63a44cb394cf4253e6cdc630b2597cdbace",
+      "byteLength": 936940
+    },
+    {
+      "path": "asr/the_boyfriend_words.tsv",
+      "sha256": "7cbb57120e741ed0ceceba4d1c6148d33841fefa60700b8a60f5b03e85dda87f",
+      "byteLength": 9252
+    },
+    {
+      "path": "asr/the_record.json",
+      "sha256": "ae543f59dbb33b33338b2e864476bd9f1fa0b38919d6df2d9901e42b98dadcb5",
+      "byteLength": 270
+    },
+    {
+      "path": "asr/the_record_words.tsv",
+      "sha256": "e688d3b40ccf3ff8fb4b75b142d7528096b38f8271486465732c8bc5a05937af",
+      "byteLength": 24
+    },
+    {
+      "path": "asr/the_rock.json",
+      "sha256": "12edc8b59e0960140e222670e2c05644870e4eb3cbd5ee6f8a3a6c3b590acb6d",
+      "byteLength": 268
+    },
+    {
+      "path": "asr/the_rock_words.tsv",
+      "sha256": "e688d3b40ccf3ff8fb4b75b142d7528096b38f8271486465732c8bc5a05937af",
+      "byteLength": 24
+    },
+    {
+      "path": "asr/the_shoe.json",
+      "sha256": "bd87ac1d694665f575d043ca78147d29ee38a0d46befef83d41a41b5d43cc960",
+      "byteLength": 268
+    },
+    {
+      "path": "asr/the_shoe_words.tsv",
+      "sha256": "e688d3b40ccf3ff8fb4b75b142d7528096b38f8271486465732c8bc5a05937af",
+      "byteLength": 24
+    },
+    {
+      "path": "cand/postit_futureshorts.mp4",
+      "sha256": "eb797f8afd57c94dfda450fba733b9ded8cc61a2547baf6c907d85faf2ff4b85",
+      "byteLength": 5696001,
+      "video": {
+        "container": "mov,mp4,m4a,3gp,3g2,mj2",
+        "durationSeconds": 181.981,
+        "streams": [
+          {
+            "index": 0,
+            "codecType": "video",
+            "codecName": "av1",
+            "durationSeconds": 181.96,
+            "frameRate": "25/1"
+          },
+          {
+            "index": 1,
+            "codecType": "audio",
+            "codecName": "opus",
+            "durationSeconds": 181.981
+          }
+        ]
+      }
+    },
+    {
+      "path": "cand/shoe_eotws.mp4",
+      "sha256": "9599b097a902fa0933c6e1463fd41d257606aef23dce493dcd4fb318c0d3a255",
+      "byteLength": 5069301,
+      "video": {
+        "container": "mov,mp4,m4a,3gp,3g2,mj2",
+        "durationSeconds": 127.547211,
+        "streams": [
+          {
+            "index": 0,
+            "codecType": "video",
+            "codecName": "h264",
+            "durationSeconds": 127.494033,
+            "frameRate": "30000/1001"
+          },
+          {
+            "index": 1,
+            "codecType": "audio",
+            "codecName": "aac",
+            "durationSeconds": 127.547211
+          }
+        ]
+      }
+    },
+    {
+      "path": "cand/shoe_filmz.mp4",
+      "sha256": "3014b6e107d68c9e9ed425e6966dfc84624b320b9090e5393b5fb95ea49533ea",
+      "byteLength": 5524417,
+      "video": {
+        "container": "mov,mp4,m4a,3gp,3g2,mj2",
+        "durationSeconds": 145.481,
+        "streams": [
+          {
+            "index": 0,
+            "codecType": "video",
+            "codecName": "vp9",
+            "durationSeconds": 145.166,
+            "frameRate": "30/1"
+          },
+          {
+            "index": 1,
+            "codecType": "audio",
+            "codecName": "opus",
+            "durationSeconds": 145.481
+          }
+        ]
+      }
+    },
+    {
+      "path": "cand/shoe_granite11.mp4",
+      "sha256": "164a5ca76c66f064ac6de072317f808012d28763b30a7b47ff3f92337468f817",
+      "byteLength": 14444976,
+      "video": {
+        "container": "mov,mp4,m4a,3gp,3g2,mj2",
+        "durationSeconds": 145.221,
+        "streams": [
+          {
+            "index": 0,
+            "codecType": "video",
+            "codecName": "h264",
+            "durationSeconds": 145.186708,
+            "frameRate": "24000/1001"
+          },
+          {
+            "index": 1,
+            "codecType": "audio",
+            "codecName": "opus",
+            "durationSeconds": 145.221
+          }
+        ]
+      }
+    },
+    {
+      "path": "clips/bus_stop.mp4",
+      "sha256": "0305afb9af831b8616eb8308332515592713c8b10e822e4f08da7fe1b09fb448",
+      "byteLength": 67402805,
+      "video": {
+        "container": "mov,mp4,m4a,3gp,3g2,mj2",
+        "durationSeconds": 406.0,
+        "streams": [
+          {
+            "index": 0,
+            "codecType": "video",
+            "codecName": "h264",
+            "durationSeconds": 406.0,
+            "frameRate": "25/1"
+          },
+          {
+            "index": 1,
+            "codecType": "audio",
+            "codecName": "aac",
+            "durationSeconds": 405.985986
+          }
+        ]
+      }
+    },
+    {
+      "path": "clips/cartoon_introduction.mp4",
+      "sha256": "415529fe7b9825e2e3b25b1291920ad07564c99f0187f31455f18286eeed92ee",
+      "byteLength": 8017893,
+      "video": {
+        "container": "mov,mp4,m4a,3gp,3g2,mj2",
+        "durationSeconds": 39.0,
+        "streams": [
+          {
+            "index": 0,
+            "codecType": "video",
+            "codecName": "h264",
+            "durationSeconds": 39.0,
+            "frameRate": "25/1"
+          },
+          {
+            "index": 1,
+            "codecType": "audio",
+            "codecName": "aac",
+            "durationSeconds": 39.0
+          }
+        ]
+      }
+    },
+    {
+      "path": "clips/keith_reynolds.mp4",
+      "sha256": "b85c393e3bc1d6e8d938596b2cc846db6950fd578cfdea54cacc486e148bf805",
+      "byteLength": 8332384,
+      "video": {
+        "container": "mov,mp4,m4a,3gp,3g2,mj2",
+        "durationSeconds": 348.0,
+        "streams": [
+          {
+            "index": 0,
+            "codecType": "video",
+            "codecName": "h264",
+            "durationSeconds": 348.0,
+            "frameRate": "25/1"
+          },
+          {
+            "index": 1,
+            "codecType": "audio",
+            "codecName": "aac",
+            "durationSeconds": 348.0
+          }
+        ]
+      }
+    },
+    {
+      "path": "clips/post_it_love.mp4",
+      "sha256": "d1a9268218c1dc89aba6ad6fa6dbe67b143824078628342bd43ff0d4f03f8ee5",
+      "byteLength": 11562260,
+      "video": {
+        "container": "mov,mp4,m4a,3gp,3g2,mj2",
+        "durationSeconds": 161.0,
+        "streams": [
+          {
+            "index": 0,
+            "codecType": "video",
+            "codecName": "h264",
+            "durationSeconds": 161.0,
+            "frameRate": "25/1"
+          },
+          {
+            "index": 1,
+            "codecType": "audio",
+            "codecName": "aac",
+            "durationSeconds": 161.0
+          }
+        ]
+      }
+    },
+    {
+      "path": "clips/the_black_hole.mp4",
+      "sha256": "39ce22ccfb586ab63213de18e4da2b79a2ad97dec6dd373e2a2748a345707252",
+      "byteLength": 16036558,
+      "video": {
+        "container": "mov,mp4,m4a,3gp,3g2,mj2",
+        "durationSeconds": 142.0,
+        "streams": [
+          {
+            "index": 0,
+            "codecType": "video",
+            "codecName": "h264",
+            "durationSeconds": 142.0,
+            "frameRate": "25/1"
+          },
+          {
+            "index": 1,
+            "codecType": "audio",
+            "codecName": "aac",
+            "durationSeconds": 142.0
+          }
+        ]
+      }
+    },
+    {
+      "path": "clips/the_boyfriend.mp4",
+      "sha256": "fa6b21a5f8dac72908cecfe6badc913964637eed7dcc1fc5c91c24db4313d0cc",
+      "byteLength": 38285856,
+      "video": {
+        "container": "mov,mp4,m4a,3gp,3g2,mj2",
+        "durationSeconds": 465.0,
+        "streams": [
+          {
+            "index": 0,
+            "codecType": "video",
+            "codecName": "h264",
+            "durationSeconds": 465.0,
+            "frameRate": "25/1"
+          },
+          {
+            "index": 1,
+            "codecType": "audio",
+            "codecName": "aac",
+            "durationSeconds": 465.0
+          }
+        ]
+      }
+    },
+    {
+      "path": "clips/the_record.mp4",
+      "sha256": "e56a680091412f2f7797a7da037d9eb1a98c957d921562a2de8eca72a02da6c5",
+      "byteLength": 10648945,
+      "video": {
+        "container": "mov,mp4,m4a,3gp,3g2,mj2",
+        "durationSeconds": 132.0,
+        "streams": [
+          {
+            "index": 0,
+            "codecType": "video",
+            "codecName": "h264",
+            "durationSeconds": 132.0,
+            "frameRate": "25/1"
+          },
+          {
+            "index": 1,
+            "codecType": "audio",
+            "codecName": "aac",
+            "durationSeconds": 132.0
+          }
+        ]
+      }
+    },
+    {
+      "path": "clips/the_rock.mp4",
+      "sha256": "921cb00b9197fc2d6553670a13305e9bc4958821e592ddb6d225f4d2c816eb19",
+      "byteLength": 45115717,
+      "video": {
+        "container": "mov,mp4,m4a,3gp,3g2,mj2",
+        "durationSeconds": 325.0,
+        "streams": [
+          {
+            "index": 0,
+            "codecType": "video",
+            "codecName": "h264",
+            "durationSeconds": 325.0,
+            "frameRate": "25/1"
+          },
+          {
+            "index": 1,
+            "codecType": "audio",
+            "codecName": "aac",
+            "durationSeconds": 325.0
+          }
+        ]
+      }
+    },
+    {
+      "path": "clips/the_shoe.mp4",
+      "sha256": "ebb728db6bce64b57ac0f6f607297e07dad237be2b5a72f79b700cf0535e7211",
+      "byteLength": 13813427,
+      "video": {
+        "container": "mov,mp4,m4a,3gp,3g2,mj2",
+        "durationSeconds": 129.0,
+        "streams": [
+          {
+            "index": 0,
+            "codecType": "video",
+            "codecName": "h264",
+            "durationSeconds": 129.0,
+            "frameRate": "25/1"
+          },
+          {
+            "index": 1,
+            "codecType": "audio",
+            "codecName": "aac",
+            "durationSeconds": 129.0
+          }
+        ]
+      }
+    },
+    {
+      "path": "provenance/METHOD.md",
+      "sha256": "4f2120efa5a73c372c5a8930bd3ab5ad92a0e70308d401c3e5e8d844b85d0228",
+      "byteLength": 6786
+    },
+    {
+      "path": "provenance/README.md",
+      "sha256": "a18c4681e8df21eb8d7273de034810496765bc5696b17fdcf726c0f568719caa",
+      "byteLength": 7230
+    },
+    {
+      "path": "provenance/STATUS.md",
+      "sha256": "d2f30285fc649ceeb9cd8b917ce14c4cf494374be1bad315fe4f2a094821e5e1",
+      "byteLength": 18565
+    },
+    {
+      "path": "provenance/fetch.log",
+      "sha256": "426aa1a1024d5562fc78aac50ae5894cd1589cbcfcec41d0d099fe6a614117d1",
+      "byteLength": 260707
+    },
+    {
+      "path": "provenance/fetch.sh",
+      "sha256": "9a4a5a03bb758b013c4cbcf330cea47705b0d4bfac2eb54ce64235b638b50bc0",
+      "byteLength": 826
+    },
+    {
+      "path": "provenance/make_clips.sh",
+      "sha256": "5917640089ac5265d7107c6ebbb59035179e09834193517c8e43d0d82853e5ac",
+      "byteLength": 1535
+    },
+    {
+      "path": "provenance/manifest.tsv",
+      "sha256": "38732259d57e876a46c4009cbd511650b16fa085ca676ad1ed6a8628dc3fea79",
+      "byteLength": 2082
+    },
+    {
+      "path": "provenance/probe.sh",
+      "sha256": "b8caf16dd7b037c3b261c33035b46c7267c3e994fcdcba879c50ee6778025bfd",
+      "byteLength": 1036
+    },
+    {
+      "path": "provenance/propose_trim.sh",
+      "sha256": "05372dfbcdac2a9b253908f03fd625cf920951526b6214491cc70120b08f4789",
+      "byteLength": 1603
+    },
+    {
+      "path": "source/bus_stop.mp4",
+      "sha256": "a445f6495e46745ffbefa076985b83e620234dee353385dc0ab02a7b79c128f3",
+      "byteLength": 271825290,
+      "video": {
+        "container": "mov,mp4,m4a,3gp,3g2,mj2",
+        "durationSeconds": 407.616,
+        "streams": [
+          {
+            "index": 0,
+            "codecType": "video",
+            "codecName": "hevc",
+            "durationSeconds": 407.615542,
+            "frameRate": "24000/1001"
+          },
+          {
+            "index": 1,
+            "codecType": "audio",
+            "codecName": "aac",
+            "durationSeconds": 407.616
+          }
+        ]
+      }
+    },
+    {
+      "path": "source/cartoon_introduction.mkv",
+      "sha256": "b9afccab3a5df7a6989cab92fa80f62d9c751d3ef968f72917067f1cf1f409ab",
+      "byteLength": 34020829,
+      "video": {
+        "container": "matroska,webm",
+        "durationSeconds": 45.928,
+        "streams": [
+          {
+            "index": 0,
+            "codecType": "video",
+            "codecName": "mpeg2video",
+            "durationSeconds": null,
+            "frameRate": "30000/1001"
+          },
+          {
+            "index": 1,
+            "codecType": "audio",
+            "codecName": "ac3",
+            "durationSeconds": null
+          }
+        ]
+      }
+    },
+    {
+      "path": "source/keith_reynolds.mp4",
+      "sha256": "db04e72f509a5fab16602900a8e8cfd036c2c1ddfbf1b9e0208da5ecb54ec07b",
+      "byteLength": 19350836,
+      "video": {
+        "container": "mov,mp4,m4a,3gp,3g2,mj2",
+        "durationSeconds": 367.641,
+        "streams": [
+          {
+            "index": 0,
+            "codecType": "video",
+            "codecName": "h264",
+            "durationSeconds": 367.56,
+            "frameRate": "25/1"
+          },
+          {
+            "index": 1,
+            "codecType": "audio",
+            "codecName": "opus",
+            "durationSeconds": 367.641
+          }
+        ]
+      }
+    },
+    {
+      "path": "source/post_it_love.mp4",
+      "sha256": "eb797f8afd57c94dfda450fba733b9ded8cc61a2547baf6c907d85faf2ff4b85",
+      "byteLength": 5696001,
+      "video": {
+        "container": "mov,mp4,m4a,3gp,3g2,mj2",
+        "durationSeconds": 181.981,
+        "streams": [
+          {
+            "index": 0,
+            "codecType": "video",
+            "codecName": "av1",
+            "durationSeconds": 181.96,
+            "frameRate": "25/1"
+          },
+          {
+            "index": 1,
+            "codecType": "audio",
+            "codecName": "opus",
+            "durationSeconds": 181.981
+          }
+        ]
+      }
+    },
+    {
+      "path": "source/the_black_hole.mp4",
+      "sha256": "a90f33d471d24dd4f990c7885510f7de422199614475868cf26a2b2f453b90de",
+      "byteLength": 51535896,
+      "video": {
+        "container": "mov,mp4,m4a,3gp,3g2,mj2",
+        "durationSeconds": 154.853333,
+        "streams": [
+          {
+            "index": 0,
+            "codecType": "video",
+            "codecName": "h264",
+            "durationSeconds": 154.8,
+            "frameRate": "25/1"
+          },
+          {
+            "index": 1,
+            "codecType": "audio",
+            "codecName": "aac",
+            "durationSeconds": 154.853333
+          }
+        ]
+      }
+    },
+    {
+      "path": "source/the_boyfriend.mp4",
+      "sha256": "a76362d93f57ab34c299ec8aadf59dc4859191a57f2091d1cd25a8d0927ff77b",
+      "byteLength": 307793738,
+      "video": {
+        "container": "mov,mp4,m4a,3gp,3g2,mj2",
+        "durationSeconds": 543.765333,
+        "streams": [
+          {
+            "index": 0,
+            "codecType": "video",
+            "codecName": "h264",
+            "durationSeconds": 543.709833,
+            "frameRate": "24000/1001"
+          },
+          {
+            "index": 1,
+            "codecType": "audio",
+            "codecName": "aac",
+            "durationSeconds": 543.765333
+          }
+        ]
+      }
+    },
+    {
+      "path": "source/the_record.mp4",
+      "sha256": "b6e7d76309fb6d11e69fd932b128972bb871be3d8635417c69fcd0702c3e63db",
+      "byteLength": 12488335,
+      "video": {
+        "container": "mov,mp4,m4a,3gp,3g2,mj2",
+        "durationSeconds": 143.021,
+        "streams": [
+          {
+            "index": 0,
+            "codecType": "video",
+            "codecName": "av1",
+            "durationSeconds": 143.0,
+            "frameRate": "25/1"
+          },
+          {
+            "index": 1,
+            "codecType": "audio",
+            "codecName": "opus",
+            "durationSeconds": 143.021
+          }
+        ]
+      }
+    },
+    {
+      "path": "source/the_rock.mp4",
+      "sha256": "f75d69b521877746ac39769b49e70c056f395f678747623239e32a63c1fb97cb",
+      "byteLength": 100512562,
+      "video": {
+        "container": "mov,mp4,m4a,3gp,3g2,mj2",
+        "durationSeconds": 343.423333,
+        "streams": [
+          {
+            "index": 0,
+            "codecType": "video",
+            "codecName": "h264",
+            "durationSeconds": 343.416667,
+            "frameRate": "24/1"
+          },
+          {
+            "index": 1,
+            "codecType": "audio",
+            "codecName": "aac",
+            "durationSeconds": 343.423333
+          }
+        ]
+      }
+    },
+    {
+      "path": "source/the_shoe.mp4",
+      "sha256": "164a5ca76c66f064ac6de072317f808012d28763b30a7b47ff3f92337468f817",
+      "byteLength": 14444976,
+      "video": {
+        "container": "mov,mp4,m4a,3gp,3g2,mj2",
+        "durationSeconds": 145.221,
+        "streams": [
+          {
+            "index": 0,
+            "codecType": "video",
+            "codecName": "h264",
+            "durationSeconds": 145.186708,
+            "frameRate": "24000/1001"
+          },
+          {
+            "index": 1,
+            "codecType": "audio",
+            "codecName": "opus",
+            "durationSeconds": 145.221
+          }
+        ]
+      }
+    }
+  ],
+  "identicalDigestGroups": [
+    {
+      "sha256": "164a5ca76c66f064ac6de072317f808012d28763b30a7b47ff3f92337468f817",
+      "paths": [
+        "cand/shoe_granite11.mp4",
+        "source/the_shoe.mp4"
+      ]
+    },
+    {
+      "sha256": "e688d3b40ccf3ff8fb4b75b142d7528096b38f8271486465732c8bc5a05937af",
+      "paths": [
+        "asr/post_it_love_words.tsv",
+        "asr/the_black_hole_words.tsv",
+        "asr/the_record_words.tsv",
+        "asr/the_rock_words.tsv",
+        "asr/the_shoe_words.tsv"
+      ]
+    },
+    {
+      "sha256": "eb797f8afd57c94dfda450fba733b9ded8cc61a2547baf6c907d85faf2ff4b85",
+      "paths": [
+        "cand/postit_futureshorts.mp4",
+        "source/post_it_love.mp4"
+      ]
+    }
+  ],
+  "films": [
+    {
+      "coverName": "cartoon_introduction",
+      "presentations": [
+        {
+          "run": "run-01",
+          "onsetSeconds": 3.0,
+          "durationSeconds": 39.0
+        },
+        {
+          "run": "run-02",
+          "onsetSeconds": 3.0,
+          "durationSeconds": 39.0
+        }
+      ],
+      "scanDurationSeconds": 39.0,
+      "sourcePath": "source/cartoon_introduction.mkv",
+      "sourceDurationSeconds": 45.928,
+      "trimStartSeconds": 0.42,
+      "sourceSecondsAfterTrim": 45.508,
+      "clipPath": "clips/cartoon_introduction.mp4",
+      "clipDurationSeconds": 39.0,
+      "clipShortfallSeconds": 0.0,
+      "clipMatchesScanDuration": true
+    },
+    {
+      "coverName": "catch_me_if_you_can",
+      "presentations": [
+        {
+          "run": "run-01",
+          "onsetSeconds": 47.0,
+          "durationSeconds": 346.0
+        }
+      ],
+      "scanDurationSeconds": 346.0,
+      "sourcePath": null,
+      "trimStartSeconds": null,
+      "clipPath": null,
+      "clipDurationSeconds": null,
+      "unestablished": "no source or clip exists under the media root; the provenance manifest's trim_start for this key was never applied to a file, so it is not recorded as a trim"
+    },
+    {
+      "coverName": "the_record",
+      "presentations": [
+        {
+          "run": "run-01",
+          "onsetSeconds": 399.0,
+          "durationSeconds": 132.0
+        }
+      ],
+      "scanDurationSeconds": 132.0,
+      "sourcePath": "source/the_record.mp4",
+      "sourceDurationSeconds": 143.021,
+      "trimStartSeconds": 5.0,
+      "sourceSecondsAfterTrim": 138.021,
+      "clipPath": "clips/the_record.mp4",
+      "clipDurationSeconds": 132.0,
+      "clipShortfallSeconds": 0.0,
+      "clipMatchesScanDuration": true
+    },
+    {
+      "coverName": "the_boyfriend",
+      "presentations": [
+        {
+          "run": "run-01",
+          "onsetSeconds": 536.0,
+          "durationSeconds": 465.0
+        }
+      ],
+      "scanDurationSeconds": 465.0,
+      "sourcePath": "source/the_boyfriend.mp4",
+      "sourceDurationSeconds": 543.765333,
+      "trimStartSeconds": 0.0,
+      "sourceSecondsAfterTrim": 543.765,
+      "clipPath": "clips/the_boyfriend.mp4",
+      "clipDurationSeconds": 465.0,
+      "clipShortfallSeconds": 0.0,
+      "clipMatchesScanDuration": true
+    },
+    {
+      "coverName": "the_shoe",
+      "presentations": [
+        {
+          "run": "run-01",
+          "onsetSeconds": 1007.0,
+          "durationSeconds": 129.0
+        }
+      ],
+      "scanDurationSeconds": 129.0,
+      "sourcePath": "source/the_shoe.mp4",
+      "sourceDurationSeconds": 145.221,
+      "trimStartSeconds": 0.7,
+      "sourceSecondsAfterTrim": 144.521,
+      "clipPath": "clips/the_shoe.mp4",
+      "clipDurationSeconds": 129.0,
+      "clipShortfallSeconds": 0.0,
+      "clipMatchesScanDuration": true
+    },
+    {
+      "coverName": "keith_reynolds",
+      "presentations": [
+        {
+          "run": "run-01",
+          "onsetSeconds": 1144.0,
+          "durationSeconds": 348.0
+        }
+      ],
+      "scanDurationSeconds": 348.0,
+      "sourcePath": "source/keith_reynolds.mp4",
+      "sourceDurationSeconds": 367.641,
+      "trimStartSeconds": 1.72,
+      "sourceSecondsAfterTrim": 365.921,
+      "clipPath": "clips/keith_reynolds.mp4",
+      "clipDurationSeconds": 348.0,
+      "clipShortfallSeconds": 0.0,
+      "clipMatchesScanDuration": true
+    },
+    {
+      "coverName": "the_rock",
+      "presentations": [
+        {
+          "run": "run-02",
+          "onsetSeconds": 47.0,
+          "durationSeconds": 325.0
+        }
+      ],
+      "scanDurationSeconds": 325.0,
+      "sourcePath": "source/the_rock.mp4",
+      "sourceDurationSeconds": 343.423333,
+      "trimStartSeconds": 0.62,
+      "sourceSecondsAfterTrim": 342.803,
+      "clipPath": "clips/the_rock.mp4",
+      "clipDurationSeconds": 325.0,
+      "clipShortfallSeconds": 0.0,
+      "clipMatchesScanDuration": true
+    },
+    {
+      "coverName": "the_prisoner",
+      "presentations": [
+        {
+          "run": "run-02",
+          "onsetSeconds": 377.0,
+          "durationSeconds": 260.0
+        }
+      ],
+      "scanDurationSeconds": 260.0,
+      "sourcePath": null,
+      "trimStartSeconds": null,
+      "clipPath": null,
+      "clipDurationSeconds": null,
+      "unestablished": "no source or clip exists under the media root; the provenance manifest's trim_start for this key was never applied to a file, so it is not recorded as a trim"
+    },
+    {
+      "coverName": "the_black_hole",
+      "presentations": [
+        {
+          "run": "run-02",
+          "onsetSeconds": 643.0,
+          "durationSeconds": 142.0
+        }
+      ],
+      "scanDurationSeconds": 142.0,
+      "sourcePath": "source/the_black_hole.mp4",
+      "sourceDurationSeconds": 154.853333,
+      "trimStartSeconds": 0.0,
+      "sourceSecondsAfterTrim": 154.853,
+      "clipPath": "clips/the_black_hole.mp4",
+      "clipDurationSeconds": 142.0,
+      "clipShortfallSeconds": 0.0,
+      "clipMatchesScanDuration": true
+    },
+    {
+      "coverName": "post_it_love",
+      "presentations": [
+        {
+          "run": "run-02",
+          "onsetSeconds": 790.0,
+          "durationSeconds": 161.0
+        }
+      ],
+      "scanDurationSeconds": 161.0,
+      "sourcePath": "source/post_it_love.mp4",
+      "sourceDurationSeconds": 181.981,
+      "trimStartSeconds": 10.28,
+      "sourceSecondsAfterTrim": 171.701,
+      "clipPath": "clips/post_it_love.mp4",
+      "clipDurationSeconds": 161.0,
+      "clipShortfallSeconds": 0.0,
+      "clipMatchesScanDuration": true
+    },
+    {
+      "coverName": "bus_stop",
+      "presentations": [
+        {
+          "run": "run-02",
+          "onsetSeconds": 959.0,
+          "durationSeconds": 414.0
+        }
+      ],
+      "scanDurationSeconds": 414.0,
+      "sourcePath": "source/bus_stop.mp4",
+      "sourceDurationSeconds": 407.616,
+      "trimStartSeconds": 1.63,
+      "sourceSecondsAfterTrim": 405.986,
+      "clipPath": "clips/bus_stop.mp4",
+      "clipDurationSeconds": 406.0,
+      "clipShortfallSeconds": 8.0,
+      "clipMatchesScanDuration": false
+    }
+  ],
+  "trimVerification": {
+    "claimedBy": {
+      "path": "filmfestival/media/provenance/STATUS.md",
+      "quote": "trim point confirmed by matching the frame at `trim_start`"
+    },
+    "reverifiedByThisGenerator": false
+  },
+  "excerpts": [
+    {
+      "coverName": "catch_me_if_you_can",
+      "scanDurationSeconds": 346.0,
+      "presentations": [
+        {
+          "run": "run-01",
+          "onsetSeconds": 47.0,
+          "durationSeconds": 346.0
+        }
+      ],
+      "coders": [
+        {
+          "coder": "JL",
+          "annotation": {
+            "path": "filmfestival/derived/annotation-JL.tsv",
+            "sha256": "f8b164c1cc81fa4627fb1237f37a4fe85ee9183752bcfc527349b8f9bc7485bc"
+          },
+          "coarseNumberingUsable": true,
+          "run": "run-01",
+          "fineRowCount": 59,
+          "titleCardRow": {
+            "fineRow": 8,
+            "coarseSceneGlobal": 3,
+            "coarseSceneRunRelative": 3,
+            "startSeconds": 41,
+            "endSeconds": 44
+          },
+          "contentFirstRow": {
+            "fineRow": 9,
+            "coarseSceneGlobal": 4,
+            "coarseSceneRunRelative": 4,
+            "startSeconds": 44,
+            "endSeconds": 47
+          },
+          "contentLastRow": {
+            "fineRow": 66,
+            "coarseSceneGlobal": 26,
+            "coarseSceneRunRelative": 26,
+            "startSeconds": 384,
+            "endSeconds": 391
+          },
+          "contentStartSeconds": 44,
+          "contentEndSeconds": 391,
+          "annotatedContentSeconds": 347,
+          "fineStartsNonDecreasing": true
+        },
+        {
+          "coder": "KM",
+          "annotation": {
+            "path": "filmfestival/derived/annotation-KM.tsv",
+            "sha256": "7f81022bf602a34458e7fef0cfe86c1f436a0f65e7e1c1261efb3cf421131fbd"
+          },
+          "coarseNumberingUsable": false,
+          "run": "run-01",
+          "fineRowCount": 59,
+          "titleCardRow": {
+            "fineRow": 1,
+            "coarseSceneGlobal": null,
+            "coarseSceneRunRelative": null,
+            "startSeconds": 41,
+            "endSeconds": 44
+          },
+          "contentFirstRow": {
+            "fineRow": 2,
+            "coarseSceneGlobal": null,
+            "coarseSceneRunRelative": null,
+            "startSeconds": 44,
+            "endSeconds": 47
+          },
+          "contentLastRow": {
+            "fineRow": 59,
+            "coarseSceneGlobal": null,
+            "coarseSceneRunRelative": null,
+            "startSeconds": 382,
+            "endSeconds": 391
+          },
+          "contentStartSeconds": 44,
+          "contentEndSeconds": 391,
+          "annotatedContentSeconds": 347,
+          "fineStartsNonDecreasing": true
+        },
+        {
+          "coder": "RC",
+          "annotation": {
+            "path": "filmfestival/derived/annotation-RC.tsv",
+            "sha256": "99715ad79eb1a95cfb3e04b58e5f55dfb7447eb01e7c18934ff74b70181e3883"
+          },
+          "coarseNumberingUsable": true,
+          "run": "run-01",
+          "fineRowCount": 60,
+          "titleCardRow": {
+            "fineRow": 6,
+            "coarseSceneGlobal": 3,
+            "coarseSceneRunRelative": 3,
+            "startSeconds": 41,
+            "endSeconds": 44
+          },
+          "contentFirstRow": {
+            "fineRow": 7,
+            "coarseSceneGlobal": 4,
+            "coarseSceneRunRelative": 4,
+            "startSeconds": 44,
+            "endSeconds": 47
+          },
+          "contentLastRow": {
+            "fineRow": 65,
+            "coarseSceneGlobal": 26,
+            "coarseSceneRunRelative": 26,
+            "startSeconds": 383,
+            "endSeconds": 391
+          },
+          "contentStartSeconds": 44,
+          "contentEndSeconds": 391,
+          "annotatedContentSeconds": 347,
+          "fineStartsNonDecreasing": true
+        }
+      ],
+      "codersAgreeOnContentBounds": true
+    },
+    {
+      "coverName": "the_prisoner",
+      "scanDurationSeconds": 260.0,
+      "presentations": [
+        {
+          "run": "run-02",
+          "onsetSeconds": 377.0,
+          "durationSeconds": 260.0
+        }
+      ],
+      "coders": [
+        {
+          "coder": "JL",
+          "annotation": {
+            "path": "filmfestival/derived/annotation-JL.tsv",
+            "sha256": "f8b164c1cc81fa4627fb1237f37a4fe85ee9183752bcfc527349b8f9bc7485bc"
+          },
+          "coarseNumberingUsable": true,
+          "run": "run-02",
+          "fineRowCount": 50,
+          "titleCardRow": {
+            "fineRow": 404,
+            "coarseSceneGlobal": 137,
+            "coarseSceneRunRelative": 31,
+            "startSeconds": 370,
+            "endSeconds": 375
+          },
+          "contentFirstRow": {
+            "fineRow": 405,
+            "coarseSceneGlobal": 138,
+            "coarseSceneRunRelative": 32,
+            "startSeconds": 375,
+            "endSeconds": 380
+          },
+          "contentLastRow": {
+            "fineRow": 453,
+            "coarseSceneGlobal": 153,
+            "coarseSceneRunRelative": 47,
+            "startSeconds": 633,
+            "endSeconds": 636
+          },
+          "contentStartSeconds": 375,
+          "contentEndSeconds": 636,
+          "annotatedContentSeconds": 261,
+          "fineStartsNonDecreasing": true
+        },
+        {
+          "coder": "KM",
+          "annotation": {
+            "path": "filmfestival/derived/annotation-KM.tsv",
+            "sha256": "7f81022bf602a34458e7fef0cfe86c1f436a0f65e7e1c1261efb3cf421131fbd"
+          },
+          "coarseNumberingUsable": false,
+          "run": "run-02",
+          "fineRowCount": 52,
+          "titleCardRow": {
+            "fineRow": 308,
+            "coarseSceneGlobal": null,
+            "coarseSceneRunRelative": null,
+            "startSeconds": 370,
+            "endSeconds": 375
+          },
+          "contentFirstRow": {
+            "fineRow": 309,
+            "coarseSceneGlobal": null,
+            "coarseSceneRunRelative": null,
+            "startSeconds": 375,
+            "endSeconds": 380
+          },
+          "contentLastRow": {
+            "fineRow": 359,
+            "coarseSceneGlobal": null,
+            "coarseSceneRunRelative": null,
+            "startSeconds": 628,
+            "endSeconds": 636
+          },
+          "contentStartSeconds": 375,
+          "contentEndSeconds": 636,
+          "annotatedContentSeconds": 261,
+          "fineStartsNonDecreasing": true
+        },
+        {
+          "coder": "RC",
+          "annotation": {
+            "path": "filmfestival/derived/annotation-RC.tsv",
+            "sha256": "99715ad79eb1a95cfb3e04b58e5f55dfb7447eb01e7c18934ff74b70181e3883"
+          },
+          "coarseNumberingUsable": true,
+          "run": "run-02",
+          "fineRowCount": 45,
+          "titleCardRow": {
+            "fineRow": 323,
+            "coarseSceneGlobal": 137,
+            "coarseSceneRunRelative": 31,
+            "startSeconds": 370,
+            "endSeconds": 375
+          },
+          "contentFirstRow": {
+            "fineRow": 324,
+            "coarseSceneGlobal": 138,
+            "coarseSceneRunRelative": 32,
+            "startSeconds": 375,
+            "endSeconds": 382
+          },
+          "contentLastRow": {
+            "fineRow": 367,
+            "coarseSceneGlobal": 153,
+            "coarseSceneRunRelative": 47,
+            "startSeconds": 628,
+            "endSeconds": 636
+          },
+          "contentStartSeconds": 375,
+          "contentEndSeconds": 636,
+          "annotatedContentSeconds": 261,
+          "fineStartsNonDecreasing": true
+        }
+      ],
+      "codersAgreeOnContentBounds": true
+    }
+  ],
+  "excerptConventions": {
+    "titleCardRow": {
+      "path": "filmfestival/media/provenance/README.md",
+      "quote": "the annotators' `+0` row is always the"
+    },
+    "contentEndSeconds": "the replay sets a row's end to the next fine start in the same run, so the last content row ends where the following film's title-card row starts",
+    "clock": "annotation times are run-relative and are not the events.tsv clock",
+    "filmAssignment": "annotation film ordinal k is taken as events.tsv row k of run 1 (k <= 6) or row k-6 of run 2; the replay receipts list this as a non-claim",
+    "fineRow": "the replay's 1-based annotated-row ordinal for that coder, not an upstream column"
+  },
+  "upstream": {
+    "host": "Trillium",
+    "roots": [
+      "/project/rrg-brad/dsets/filmfestival/stimuli",
+      "/scratch/brad/ff_stim/transcripts"
+    ],
+    "rootsBasis": "tracker bead bd-01M2TA4BFRMK8WNA79PPRT8YCD, which records the 2026-09-18 copy",
+    "remoteChecksumMatch": {
+      "reported": "SHA256SUMS.local matched the remote for all listed files",
+      "reportedBy": "tracker bead bd-01M2TA4BFRMK8WNA79PPRT8YCD",
+      "reverifiedByThisGenerator": false
+    },
+    "directories": [
+      {
+        "local": "clips/",
+        "remote": "/project/rrg-brad/dsets/filmfestival/stimuli/clips/",
+        "status": "inferred",
+        "basis": [
+          {
+            "path": "filmfestival/media/provenance/make_clips.sh",
+            "quote": "D=/project/rrg-brad/dsets/filmfestival/stimuli"
+          },
+          {
+            "path": "filmfestival/media/provenance/make_clips.sh",
+            "quote": "out=$D/clips/${key}.mp4"
+          }
+        ]
+      },
+      {
+        "local": "source/",
+        "remote": "/project/rrg-brad/dsets/filmfestival/stimuli/video/",
+        "status": "inferred",
+        "basis": [
+          {
+            "path": "filmfestival/media/provenance/fetch.sh",
+            "quote": "D=/project/rrg-brad/dsets/filmfestival/stimuli"
+          },
+          {
+            "path": "filmfestival/media/provenance/fetch.sh",
+            "quote": "-o \"$D/video/${key}.%(ext)s\""
+          }
+        ],
+        "discrepancy": "the download log writes the same file names under /project/rrg-brad/dsets/filmfestival_stimuli/video/, a directory name that differs from the scripts' root",
+        "discrepancyBasis": {
+          "path": "filmfestival/media/provenance/fetch.log",
+          "quote": "/project/rrg-brad/dsets/filmfestival_stimuli/video/"
+        }
+      },
+      {
+        "local": "cand/",
+        "remote": null,
+        "status": "unestablished",
+        "reason": "no provenance script or note names the directory these candidate downloads were written to"
+      },
+      {
+        "local": "provenance/",
+        "remote": "/project/rrg-brad/dsets/filmfestival/stimuli/scripts/",
+        "status": "inferred-partial",
+        "basis": [
+          {
+            "path": "filmfestival/media/provenance/fetch.sh",
+            "quote": "$D/scripts/manifest.tsv"
+          },
+          {
+            "path": "filmfestival/media/provenance/STATUS.md",
+            "quote": "`scripts/propose_trim.sh`"
+          },
+          {
+            "path": "filmfestival/media/provenance/fetch.sh",
+            "quote": "$D/logs/fetch.log"
+          }
+        ],
+        "reason": "manifest.tsv and the four scripts are addressed under scripts/, and fetch.log under logs/; no local text places README.md, STATUS.md or METHOD.md"
+      },
+      {
+        "local": "asr/",
+        "remote": "/scratch/brad/ff_stim/transcripts/",
+        "status": "inferred-partial",
+        "basis": [
+          {
+            "path": "filmfestival/media/provenance/README.md",
+            "quote": "`transcripts/<key>.json`"
+          },
+          {
+            "path": "filmfestival/media/provenance/README.md",
+            "quote": "`/scratch/brad/ff_stim`"
+          }
+        ],
+        "reason": "the json and _words.tsv files match the transcriber's documented output; no local text names the producer of the _lang.npz files"
+      }
+    ]
+  },
+  "filmsNote": {
+    "path": "filmfestival/FILMS.md",
+    "sha256": "800792e5ad96207fd5c68d0bb5985edc0c78ee5ccad5df636e09ad91efe4db6d",
+    "byteLength": 5424,
+    "sourceManifestRecordsSha256": "800792e5ad96207fd5c68d0bb5985edc0c78ee5ccad5df636e09ad91efe4db6d",
+    "sourceManifestDigestCurrent": true,
+    "storage": "external-local-only; names commercial works and is not for Git admission"
+  },
+  "nonClaims": [
+    "clip-equals-presented-edition",
+    "trim-points-reverified-against-frames",
+    "annotation-to-events-tsv-clock-offset-resolved",
+    "excerpt-internal-cuts-known",
+    "excerpt-media-located",
+    "annotation-film-assignment-verified-against-presentation-schedule",
+    "remote-per-file-paths-verified",
+    "reference-annotator-selected",
+    "media-admitted-to-git"
+  ]
+}

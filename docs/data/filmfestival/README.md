@@ -36,9 +36,12 @@ wrong scene-number space, and look green while doing it.
 Neither remaining item blocks analysis. §3 bars *committing* recall prose to Git; it does not bar
 reading the staged bytes from the git-ignored data root, which is where they live and stay.
 
-No video is stored. The release withholds it: *"Due to copyright issues, we are not uploading the
-movie video files."* `data/filmfestival/FILMS.md` records where public copies of each film are, for
-local research use; it names commercial works and is itself not for Git admission.
+No video is committed. The release withholds it: *"Due to copyright issues, we are not uploading the
+movie video files."* Public copies of eight films and the cartoon, with their trimmed clips, are
+staged locally, git-ignored, at `data/filmfestival/media`; the two commercial excerpts are not.
+`media-manifest.json` identifies those files without their content. `data/filmfestival/FILMS.md`
+records where public copies of each film are, for local research use; it names commercial works and
+is itself not for Git admission.
 
 ## Licence, and the disclaimer that goes with it
 
@@ -61,6 +64,7 @@ This decision covers **licence only**. Human-subject provenance is a separate qu
 | Record | Contract |
 |---|---|
 | `source-manifest.json` | Five upstream sources with commits, DOIs and licences; eight artifact groups accounting for all 104 staged files; verification receipt; content policy; non-claims |
+| `media-manifest.json` | The 53 files under `data/filmfestival/media` by path, SHA-256 and size, with container, codecs and duration per video; per film, trim, clip and scan durations by cover name; the two absent excerpts' boundaries as annotation rows and run-relative times; Trillium origins; non-claims. Regenerate with `python3 tools/corpus/filmfest_media_manifest.py`; `--check` exits 1 on drift |
 
 Canonicalize with `jq -S -c` before digesting.
 
@@ -92,7 +96,7 @@ project-authored `FILMS.md`.
   fitted on Sherlock's 97.9% non-decreasing scene index, must be re-fitted on a development split
   rather than inherited.
 - **Five of the ten films contain no speech.** Anything leaning on transcript will behave differently
-  here, and with no video the captioning lane stays idle on this corpus.
+  here, and the captioning lane has no video for the two commercial excerpts.
 - **`filmfest-textdata` covers six films, not ten**, and its `cmiyc_long` is a longer cut than the
   346 s presented in the scanner, so its onsets are not interchangeable with the fMRI clock without
   care. Its value is a second, independent, crowd-sourced segmentation on the same timeline —
