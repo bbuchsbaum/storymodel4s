@@ -53,16 +53,36 @@ Canonicalize that JSON with `jq -S -c` before digesting it.
 The participant-level test split was sealed on 2026-09-21, before any model output on Friends
 existed: **10 test / 13 development** participants, seed `20260921`, drawn from the admitted sheet
 IDs alone ([`test-split.json`](test-split.json); `tools/recall-study/friends_split.py --check`
-re-derives it). The test side holds 278 of the 630 gold units. The record also carries the power
+re-derives membership and planning metadata without opening recall). The test side holds 278 of the 630 gold units. The record also carries the power
 assumptions and minimum detectable effects, and the exposure statement: the split is
 model-untouched, not unseen, since human-coding statistics were already computed over all 23.
 
 Every reader of Friends recall must go through `tools/recall-study/friends_guard.py`. The guard
 refuses test participants unless it is called with a final opening that names a committed
-release-candidate manifest by SHA-256, and it counts each such read in
-[`test-split-reads.json`](test-split-reads.json), which currently records zero reads.
-`tools/recall-study/tests/test_friends_guard.py` fails if any reader under `tools/` or the Scala
-sources bypasses the guard.
+release-candidate manifest by SHA-256. The split, manifest and ledger must match HEAD. The wrapper
+accepts no split, ledger or repository overrides; `sealed_split.py` owns the shared checks.
+
+[`test-split-reads.json`](test-split-reads.json) distinguishes final openings from count-only
+attempts. Its original empty ledger was migrated to the shared schema without opening recall;
+the split, membership, seal timestamp, historical script digests and accounting are unchanged.
+Each successful authorization or count-only attempt dirties the ledger, which must be committed
+before another can begin. Ledger checks and atomic replacement are serialized under a Git-local
+lock. Count-only reads require a purpose, use the committed sides, and return only participant
+and gold-unit totals for each side. They are logged **before** reading: completed attempts have
+totals; failed or interrupted attempts remain counted as `failed` or `started`.
+
+`friends_split.py --write` and both `sealing_split=` forms refuse before data access when a split
+exists (including a committed split deleted from the working tree). `--check` checks the draw and
+planning calculations using the historical counts; it does not remeasure those counts or compare
+historical script digests against today's changed implementation.
+
+The synthetic Git-repository courts are in `tests/test_sealed_split.py`; Friends accounting and
+reader-scan courts are in `tests/test_friends_guard.py`, under `tools/recall-study/`. The scanner
+flags literal-path readers without an actual guard call, including import-only readers, and Scala
+readers outside the named integrity-only exemption. It is a syntactic tripwire: it cannot prove
+control flow, call order, requested IDs, or detect arbitrary dynamically constructed paths. The
+guard binds cooperative callers; Python code can bypass it by ignoring the wrapper. These checks
+and their named mutation witnesses run in the baseline-integrity workflow.
 
 ## Intended framework path
 

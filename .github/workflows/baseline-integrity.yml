@@ -4,11 +4,13 @@ on:
   pull_request:
     paths:
       - 'tools/recall-study/**'
+      - 'docs/data/friends/**'
       - 'embed-bench/src/main/resources/storymodel4s/bench/sherlock/scene-coding-rule.json'
       - '.github/workflows/baseline-integrity.yml'
   push:
     paths:
       - 'tools/recall-study/**'
+      - 'docs/data/friends/**'
       - 'embed-bench/src/main/resources/storymodel4s/bench/sherlock/scene-coding-rule.json'
       - '.github/workflows/baseline-integrity.yml'
 
@@ -32,5 +34,6 @@ jobs:
           python3 tools/recall-study/mutate_scorer_checks.py
       - name: Friends sealed test split guard (committed records only, no corpus)
         run: |
+          python3 tools/recall-study/tests/test_sealed_split.py -v
           python3 tools/recall-study/tests/test_friends_guard.py -v
           python3 tools/recall-study/tests/mutate_friends_guard.py

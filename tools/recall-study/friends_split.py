@@ -4,7 +4,7 @@
 Why: Friends is the first corpus the mapper has never been run on. It stays useful as a final test
 only if its membership is fixed, committed and guarded before any model output exists. Membership is
 drawn from the admitted participant IDs and a committed seed alone; no recall is read to draw it.
-The one data read is friends_guard.seal_accounting, which returns per-side integer totals.
+Sealing reads counts through friends_guard. Checking an existing seal reads metadata only.
 
     python3 tools/recall-study/friends_split.py --write   # once; refuses if the split exists
     python3 tools/recall-study/friends_split.py --check   # re-derive and compare; exit 1 on drift
@@ -28,7 +28,7 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 import friends_guard as guard  # noqa: E402
 
-REPO = guard.REPO
+REPO = guard.ss.REPO
 SEED = 20260921
 N_TEST = 10
 RULE = (
@@ -51,7 +51,7 @@ def sha256_file(path):
 
 
 def pool_ids():
-    manifest = json.loads(guard.SOURCE_MANIFEST.read_text(encoding="utf-8"))
+    manifest = json.loads((REPO / guard.SOURCE_MANIFEST).read_text(encoding="utf-8"))
     return list(manifest["workbookAudit"]["recallScoring"]["participantSheetIds"])
 
 
@@ -251,19 +251,26 @@ EXPOSURE = {
 
 
 def build(data_root):
+    guard._require_unsealed()
     ids = pool_ids()
     dev, test = draw(ids)
     split = {
+        "schema": guard.FRIENDS.split_schema,
+        "corpus": guard.FRIENDS.name,
         "pool": {"participants": sorted(ids, key=lambda s: int(s.lstrip("s")))},
         "development": {"participants": dev},
         "test": {"participants": test},
     }
-    accounting = guard.seal_accounting(data_root, split)
-    dev_counts = guard.development_unit_counts(data_root, split)
-    dev_median = statistics.median(dev_counts)
+    accounting = guard.seal_accounting(data_root, sealing_split=split)
+    dev_counts = guard.development_unit_counts(data_root, sealing_split=split)
+    return _record(split, accounting, statistics.median(dev_counts))
+
+
+def _record(split, accounting, dev_median):
+    dev, test = split["development"]["participants"], split["test"]["participants"]
     individually_exposed = [s for s in ("s6", "s26", "s21") if s in test]
     return {
-        "schema": guard.SPLIT_SCHEMA,
+        "schema": guard.FRIENDS.split_schema,
         "corpus": "friends",
         "mote": "bd-01M2TA4QG638M6ZH8Q23CAK401",
         "seed": SEED,
@@ -328,6 +335,9 @@ def _comparable(record):
     out.pop("sealedAtUtc", None)
     out["draw"].pop("python", None)
     out["draw"].pop("guardSha256AtSeal", None)
+    out["draw"].pop(
+        "scriptSha256", None
+    )  # historical bytes at seal time, not current code
     return out
 
 
@@ -338,34 +348,47 @@ def main(argv=None):
     mode.add_argument("--check", action="store_true")
     ap.add_argument("--data-root", default=str(REPO / "data"))
     args = ap.parse_args(argv)
-    record = build(args.data_root)
+    split_path, ledger_path = REPO / guard.FRIENDS.split, REPO / guard.FRIENDS.ledger
     if args.write:
-        if guard.SPLIT.exists():
-            raise SystemExit(f"refusing to re-seal: {guard.SPLIT} exists")
+        guard._require_unsealed()  # refuse before any workbook access
+        if ledger_path.exists():
+            raise guard.GuardRefusal("refusing to overwrite an existing read ledger")
+        record = build(args.data_root)
         record["sealedAtUtc"] = datetime.datetime.now(datetime.timezone.utc).isoformat(
             timespec="seconds"
         )
-        guard.SPLIT.write_text(json.dumps(record, indent=2) + "\n", encoding="utf-8")
-        if not guard.LEDGER.exists():
-            guard.LEDGER.write_text(
-                json.dumps(
-                    {"schema": guard.LEDGER_SCHEMA, "readCount": 0, "reads": []},
-                    indent=2,
-                    sort_keys=True,
-                )
-                + "\n",
-                encoding="utf-8",
-            )
-        print(f"sealed {guard.SPLIT}")
+        with split_path.open("x", encoding="utf-8") as out:
+            out.write(json.dumps(record, indent=2) + "\n")
+        with ledger_path.open("x", encoding="utf-8") as out:
+            out.write(json.dumps(guard.ss.empty_ledger(guard.FRIENDS), indent=2) + "\n")
+        print(f"sealed {split_path}")
         return 0
-    committed = json.loads(guard.SPLIT.read_text(encoding="utf-8"))
+    committed = guard.load_split()
+    ids = pool_ids()
+    dev, test = draw(ids, committed["seed"])
+    split = {
+        "pool": {"participants": sorted(ids, key=lambda s: int(s.lstrip("s")))},
+        "development": {"participants": dev},
+        "test": {"participants": test},
+    }
+    # The recorded counts are historical inputs. --check never remeasures recall.
+    accounting = {
+        "workbookSha256": committed["sealAccounting"]["workbookSha256"],
+        "totals": {
+            side: {"goldUnits": committed[side]["goldUnits"]}
+            for side in ("development", "test")
+        },
+    }
+    record = _record(
+        split, accounting, committed["development"]["medianGoldUnitsPerParticipant"]
+    )
     if _comparable(committed) != _comparable(record):
         print(
             "DRIFT: re-derived split record differs from the committed one",
             file=sys.stderr,
         )
         return 1
-    print(f"{guard.SPLIT}: current")
+    print(f"{split_path}: membership and planning metadata current (no recall read)")
     return 0
 
 

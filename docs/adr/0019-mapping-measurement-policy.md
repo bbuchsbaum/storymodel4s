@@ -57,3 +57,15 @@ report pooled unit-weighted differences separately. Nonlabel outcomes remain wro
 eligible, and no-gold units remain accounted for. Empty populations and singleton bootstrap
 intervals are explicitly undefined. Timing, transcript-order and adjacent-transition coverage
 remain separate; unresolved units never create a synthetic direct transition across a gap.
+
+The Friends seal rework (2026-09-21) shares cooperative Python guard mechanics in
+`tools/recall-study/sealed_split.py`, with corpus-owned fixed paths and a committed split.
+Preserve the original seal record; migrate its empty read ledger to the shared schema with
+separate final-opening and count-only attempt counts. Reject caller-selected split/ledger
+paths and post-seal use of sealing-time APIs. Record aggregate-read attempts before access,
+including failures, and require the ledger to be committed before the next attempt. A
+content-free `--check` reproduces membership and planning metadata from historical counts;
+a recount requires an explicit purpose and ledger entry. Rejected: rereading recall during
+ordinary integrity checks, rewriting historical seal digests, and treating an import-only
+reader scan as proof of guarded access. This adds no Scala module or dependency and does
+not establish the future release-manifest content contract.
