@@ -187,7 +187,8 @@ object SourceRepresentation:
       composition: Option[DeclaredComposition],
       physical: Map[SourceNodeRef, SourceSupportStatus]
   ): Either[MappingRefusal, SourceRepresentation] =
-    val nodes = view.nodes
+    val checkedView = MappingBindingRender.snapshot(view)
+    val nodes = checkedView.nodes
     val refs = nodes.map(_.ref)
     val parts = bundles.toVector.collect { case m: BundleEntry.Media => m.bundle }
     val texts = bundles.toVector.collect { case t: BundleEntry.TextSource => t.canonicalText }
@@ -285,6 +286,6 @@ object SourceRepresentation:
       bundles,
       composition,
       targets,
-      ViewFingerprint.of(view),
+      ViewFingerprint.of(checkedView),
       MappingSourceRender.scope(nodes)
     )

@@ -100,7 +100,10 @@ admitted two different coordinate parts as one. Composition remains explicitly d
 G1 assessment decision (2026-09-22): capture a source view's node inventory and relation
 coordinates once, then validate and assess that immutable snapshot. Reject a later lookup
 as fidelity input: an executed counterexample changed Action from Correct to Wrong under
-an unchanged binding. This changes no inference or existing source-view contract.
+an unchanged binding. Source-representation construction uses the same exact snapshot: a second
+executed witness otherwise retained old target levels while accepting a binding to a new
+inventory fingerprint. Keep the independent original-lookup consistency refusal. This changes
+no inference or existing source-view contract.
 
 The Memento task and seal (2026-09-21) use the same shared guard with fixed corpus paths.
 The independent population rule retains 123 participants; the owner chose 63 test and 60
