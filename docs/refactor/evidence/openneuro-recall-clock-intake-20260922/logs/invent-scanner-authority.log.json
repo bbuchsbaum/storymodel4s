@@ -1,0 +1,5 @@
+{
+  "encoding": "utf-8",
+  "text": "test_no_duration_scanner_join_or_text_is_fabricated (__main__.RecallClockSuite.test_no_duration_scanner_join_or_text_is_fabricated) ... FAIL\n\n======================================================================\nFAIL: test_no_duration_scanner_join_or_text_is_fabricated (__main__.RecallClockSuite.test_no_duration_scanner_join_or_text_is_fabricated)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/Users/bbuchsbaum/code/scala/storymodel4s/.worktrees/openneuro-recall-clock-intake/tools/recall-study/tests/test_recall_clock.py\", line 169, in test_no_duration_scanner_join_or_text_is_fabricated\n    self.assertEqual(result[\"capabilities\"][capability][\"status\"], \"unavailable\")\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: 'verified' != 'unavailable'\n- verified\n+ unavailable\n\n\n----------------------------------------------------------------------\nRan 1 test in 0.001s\n\nFAILED (failures=1)\n",
+  "textSha256": "49fe6a80931ddb0b5cca0d0a905355b22ec7e485001fc9d63b20750d8c48327a"
+}

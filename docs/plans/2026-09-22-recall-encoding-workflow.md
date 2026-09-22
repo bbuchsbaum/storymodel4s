@@ -757,3 +757,21 @@ large exact ticks must round-trip rather than be refused. Synthetic illustration
 arithmetic and local document links were checked. The illustration was visually
 inspected; it is a static explanatory figure, not a completed dynamic UI or an
 empirical uncertainty measurement.
+
+## 13. First implementation checkpoint — 22 September 2026
+
+The independent clock-intake oracle is committed at `5a2c5387` on
+`solo/openneuro-recall-clock-intake`; [usage](../../tools/recall-study/README.md#explicit-recall-clock-intake)
+and [qualification evidence](../refactor/evidence/openneuro-recall-clock-intake-20260922/README.md)
+are recorded together. It requires an explicit released clock, checks declared
+CSV/alias identity, preserves all records and exact bounded numeric text, and
+publishes a content-free intake artifact. Twenty-two tests and eleven compiled
+mutations qualify the intake; both clock selections also matched all 2,495 records
+of one admitted development source. This is an independent validation target for
+the later Scala timing adapter, prepared alongside the active G1 implementation.
+
+The existing mapper still selects its historical clock. Canonical word joins and
+the verified OpenNeuro scanner-run crosswalk remain unimplemented by this slice;
+scanner ticket `bd-01M354E83Z4Z7DR4KPP6Q45MAJ` remains open. No G1, M1, uncertainty
+query or StoryAtlas acceptance criterion is closed by this helper. The next
+integration remains the canonical G1/evidence/timing/facade path above.
