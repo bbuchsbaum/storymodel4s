@@ -12,7 +12,7 @@ object ScannerCrosswalk:
   enum Refusal:
     case InvalidIdentity, InvalidSamples, InvalidLayout, InvalidDomain, InvalidScale
     case BindingMismatch, MissingEvidence, UnknownOccurrence, AmbiguousOccurrence
-    case ForeignClock, OutOfDomain, Unrepresentable, InvalidIndex, InvalidRational
+    case ForeignClock, OutOfDomain, Unrepresentable, InvalidIndex, InvalidRational, InexactTick
 
   final case class RunKey(
       dataset: String,
@@ -240,6 +240,12 @@ object ScannerCrosswalk:
       val seconds: ExactRational
   )
   final class RunTime private[ScannerCrosswalk] (val run: Checksum, val seconds: ExactRational)
+  final class MediaWindow private[ScannerCrosswalk] (
+      val binding: Binding,
+      val runWindow: Window,
+      val axis: PresentationAxis,
+      val interval: PlaybackInterval
+  )
   final class Window private (val start: ExactRational, val endExclusive: ExactRational):
     def contains(value: ExactRational): Boolean =
       compare(start, value) <= 0 && compare(value, endExclusive) < 0
@@ -279,17 +285,43 @@ object ScannerCrosswalk:
       if !canonical(time.seconds) then Left(Refusal.InvalidRational)
       else if time.run != run.digest then Left(Refusal.ForeignClock)
       else
-        val t = time.seconds
-        val b = repair.offset
-        val a = repair.scale
-        reduced(
-          (BigInt(t.numerator) * b.denominator - BigInt(
-            b.numerator
-          ) * t.denominator) * a.denominator,
-          BigInt(t.denominator) * b.denominator * a.numerator
-        ).flatMap { value =>
+        inverseSeconds(time.seconds).flatMap { value =>
           if domain.contains(value) then Right(reference.at(value)) else Left(Refusal.OutOfDomain)
         }
+
+    /** Caller-declared analysis bins, never acquisition windows inferred from sample points. */
+    def inverseWindow(expectedRun: Run, window: Window): Either[Refusal, Window] =
+      if expectedRun.digest != run.digest then Left(Refusal.ForeignClock)
+      else
+        for
+          start <- inverseSeconds(window.start)
+          end <- inverseSeconds(window.endExclusive)
+          _ <- Either.cond(
+            compare(start, domain.start) >= 0 && compare(end, domain.endExclusive) <= 0,
+            (),
+            Refusal.OutOfDomain
+          )
+          result <- Window.of(start, end)
+        yield result
+
+    /** Exact bridge to playback queries. Fractional ticks refuse instead of being rounded. */
+    def mediaWindow(expectedRun: Run, window: Window): Either[Refusal, MediaWindow] =
+      for
+        axis <- reference.mediaAxis.toRight(Refusal.ForeignClock)
+        seconds <- inverseWindow(expectedRun, window)
+        scale <- axis.timebase.map(_.scale).toRight(Refusal.ForeignClock)
+        start <- integralTick(seconds.start, scale)
+        end <- integralTick(seconds.endExclusive, scale)
+        interval <- PlaybackInterval.on(axis, start, end).left.map(_ => Refusal.OutOfDomain)
+      yield new MediaWindow(this, window, axis, interval)
+
+    private def inverseSeconds(t: ExactRational): Either[Refusal, ExactRational] =
+      val b = repair.offset
+      val a = repair.scale
+      reduced(
+        (BigInt(t.numerator) * b.denominator - BigInt(b.numerator) * t.denominator) * a.denominator,
+        BigInt(t.denominator) * b.denominator * a.numerator
+      )
   object Binding:
     def declared(
         reference: Reference,
@@ -365,6 +397,13 @@ object ScannerCrosswalk:
 
   private def canonical(value: ExactRational): Boolean =
     value.denominator > 0L && BigInt(value.numerator).gcd(BigInt(value.denominator)) == 1
+
+  private def integralTick(seconds: ExactRational, timebase: ExactRational): Either[Refusal, Long] =
+    val n = BigInt(seconds.numerator) * timebase.denominator
+    val d = BigInt(seconds.denominator) * timebase.numerator
+    if d <= 0 || n % d != 0 then Left(Refusal.InexactTick)
+    else if !(n / d).isValidLong then Left(Refusal.Unrepresentable)
+    else Right((n / d).toLong)
 
   private def compare(a: ExactRational, b: ExactRational): Int =
     (BigInt(a.numerator) * b.denominator).compare(BigInt(b.numerator) * a.denominator)

@@ -361,6 +361,22 @@ class ScannerCrosswalkSuite extends FunSuite:
       .toOption
       .get
     assertEquals(valid.project(occurrence.at(rational(4))).toOption.get.seconds, rational(0))
+    val whole = valid.mediaWindow(r, Window.of(rational(0), rational(4)).toOption.get).toOption.get
+    assertEquals(whole.interval.start, 40L)
+    assertEquals(whole.interval.endExclusive, 80L)
+    assertEquals(whole.axis, axis)
+    assertEquals(
+      valid.mediaWindow(r, Window.of(rational(0), rational(1, 3)).toOption.get),
+      Left(Refusal.InexactTick)
+    )
+    assertEquals(
+      valid.inverseWindow(r, Window.of(rational(-1), rational(1)).toOption.get),
+      Left(Refusal.OutOfDomain)
+    )
+    assertEquals(
+      valid.inverseWindow(run(), Window.of(rational(0), rational(1)).toOption.get),
+      Left(Refusal.ForeignClock)
+    )
     assertEquals(
       Binding.declared(
         occurrence,

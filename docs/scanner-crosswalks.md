@@ -50,3 +50,12 @@ receipts. Full-part alignment retains the introductory cartoon; episode-only vie
 need separate transition evidence. The historical clock discrepancies are regression
 witnesses, not reusable corrections. This generic synthetic workflow does not close
 that dataset acceptance gate.
+
+For an explicitly declared analysis bin, `binding.inverseWindow(run, window)` maps
+both bounds and permits an excluded endpoint at the validity boundary. A bin partly
+outside the declared domain refuses rather than silently losing a tail.
+`binding.mediaWindow(run, window)` additionally requires exact integral media ticks;
+its result carries the actual `PresentationAxis`, checked interval and binding.
+Use that axis and interval with `TemporalQuery.Region.on`, then `prepared.query`.
+The prepared query checks the full axis identity. Fractional-tick boundaries require
+a future explicitly declared resampling policy and are currently refused.

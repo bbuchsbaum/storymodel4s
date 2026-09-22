@@ -298,3 +298,9 @@ The sample CLI leaves scanner binding unestablished. Missing sample exposure and
 HRF/lag operators remain separate. Rejected: guessed Sherlock offsets, implicit
 rounding to volumes, treating padding as acquired data, inferring duration from TR
 points, or promoting declaration labels into verified scientific authority.
+
+The scanner binding also exposes `inverseWindow` for explicitly declared analysis
+bins and `mediaWindow` carrying the actual axis, exact playback interval and binding.
+Excluded endpoints can coincide with the validity boundary; partial-domain bins and
+fractional media ticks refuse. This bridges existing temporal region queries without
+adding a corpus-intake dependency on align or placing scientific arithmetic in pipeline.
