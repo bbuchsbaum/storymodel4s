@@ -246,8 +246,8 @@ object CellSupportBasis:
     * eligible is left out of the basis rather than added to it: widening would let an empty or
     * zero-weight declaration publish a share of `1.0` (the defect this carrier removes), and would
     * hide a producer that prices a term it calls ineligible — the present-but-not-eligible defect
-    * that once multiplied segment costs DOWN. Left out, such a record fails the checked factory's
-    * binding (measured = priced − imputed), so the rebuild laws expose it.
+    * that once multiplied segment costs DOWN. Left out, the checked producer refuses the
+    * inconsistent record before returning it (measured = priced − imputed).
     */
   private[align] def fromWeights(
       measuredTerms: Set[CostTerm],
@@ -672,8 +672,8 @@ object CostBreakdown:
     * is an alternative to source content, so there is nothing for it to have measured. Before
     * `hsmm/v4` it published support `1.0` with zero terms.
     */
-  private[align] def external(total: Double): CostBreakdown =
-    new CostBreakdown(
+  private[align] def external(total: Double): Either[AlignError, CostBreakdown] =
+    checked(
       Map.empty,
       None,
       None,
@@ -706,12 +706,12 @@ object CostBreakdown:
       eligible: Set[CostTerm],
       weights: CostWeights,
       total: => Double
-  ): CostBreakdown =
+  ): Either[AlignError, CostBreakdown] =
     val basis =
       CellSupportBasis.fromWeights(terms.keySet -- imputedTerms.keySet, eligible, weights)
     SupportAssessment.derive(basis) match
       case assessed: SupportAssessment.Assessed if assessed.share <= 0.0 =>
-        new CostBreakdown(
+        checked(
           Map.empty,
           None,
           Some(Exclusion.Unassessable),
@@ -723,7 +723,7 @@ object CostBreakdown:
           Map.empty
         )
       case support =>
-        new CostBreakdown(
+        checked(
           terms,
           Some(mode),
           None,
@@ -1337,20 +1337,22 @@ final case class DefaultLocalCostModel(
     // drops the state from the space entirely (hsmm.scala builds states from `!b.excluded`), which
     // says the true thing: we have no basis to rank this anchor, rather than a very good one. The
     // total is by-name and is not computed for such a cell.
-    CostBreakdown.derived(
-      terms,
-      mode,
-      missing,
-      Some(view.structuralCoverage(node.ref)),
-      Map(
-        CostTerm.Chart -> chartReduction.receipt,
-        CostTerm.Structural -> structuralReduction.receipt
-      ),
-      semImputed,
-      eligible,
-      weights,
-      DefaultLocalCostModel.blend(terms, weights, functionPrior(unit.function), eligible)
-    )
+    CostBreakdown
+      .derived(
+        terms,
+        mode,
+        missing,
+        Some(view.structuralCoverage(node.ref)),
+        Map(
+          CostTerm.Chart -> chartReduction.receipt,
+          CostTerm.Structural -> structuralReduction.receipt
+        ),
+        semImputed,
+        eligible,
+        weights,
+        DefaultLocalCostModel.blend(terms, weights, functionPrior(unit.function), eligible)
+      )
+      .fold(e => throw new IllegalStateException(e.message), identity)
 
   private def clamp(x: Double): Double =
     if x.isNaN then 1.0 else math.max(0.0, math.min(1.0, x))

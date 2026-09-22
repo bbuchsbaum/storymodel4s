@@ -93,34 +93,19 @@ class SupportAssessmentSuite extends FunSuite:
     }
   }
 
-  test("a producer that prices a term it did not declare eligible fails the checked rebuild") {
-    // The present-but-not-eligible defect (once: Chart on segment cells) must stay VISIBLE. The
-    // basis counts only declared-eligible measurements, so the record's own support disagrees with
-    // its priced terms and the checked factory - the rebuild law every real result passes - refuses.
-    val b = CostBreakdown.derived(
-      Map(CostTerm.Semantic -> 0.2, CostTerm.Sensory -> 0.3),
-      FidelityMode.Faithful,
-      Set.empty,
-      None,
-      Map.empty,
-      Map.empty,
-      Set(CostTerm.Semantic),
-      CostWeights.default,
-      1.0
-    )
-    assertEquals(assessed(b.support).measuredTerms.toSet, Set(CostTerm.Semantic))
+  test("a producer that prices a term it did not declare eligible refuses construction") {
     refusedRecord(
       "a record priced over an undeclared term",
-      AlignWire.costBreakdown(
-        b.terms,
-        b.mode,
-        b.exclusion,
-        b.total,
-        b.missingTerms,
-        b.sourceChartCoverage,
-        b.reductions,
-        b.support,
-        b.imputedTerms
+      CostBreakdown.derived(
+        Map(CostTerm.Semantic -> 0.2, CostTerm.Sensory -> 0.3),
+        FidelityMode.Faithful,
+        Set.empty,
+        None,
+        Map.empty,
+        Map.empty,
+        Set(CostTerm.Semantic),
+        CostWeights.default,
+        1.0
       )
     )
   }

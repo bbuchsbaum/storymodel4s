@@ -581,3 +581,14 @@ fixture. Details in the spike spec.
   non-Scala reader of the JSON sees the number the decoder would derive.
   A v3→v4 converter: it would have to invent which support state each v3 cell
   was in.
+
+The M1 integration review (2026-09-22) found that the package-visible `derived`
+and `external` cost producers could bypass the record checks. Both now return
+checked `Either` values. The default model treats a failed internally derived
+record as an invariant violation; its public `LocalCostModel` signature is
+unchanged. GraphHsmm sequences checked external records before arithmetic and
+returns a typed refusal for a nonfinite or negative custom external cost, in
+both gated and ablation paths. Zero assessed support still avoids evaluating
+the excluded total. Rejected: validating only at serialization or result
+construction, which would leave an invalid `CostBreakdown` publishable on its
+own. This changes invalid-input handling, not lawful inference prices.

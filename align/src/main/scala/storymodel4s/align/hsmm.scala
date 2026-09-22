@@ -1,5 +1,6 @@
 package storymodel4s.align
 
+import cats.syntax.all.*
 import storymodel4s.core.{Checksum, TypedSupport}
 import storymodel4s.features.CanonicalDouble
 import storymodel4s.recall.*
@@ -680,27 +681,28 @@ object GraphHsmm:
     val units = recall.ordered
     if units.isEmpty then Left(AlignError.EmptyRecall)
     else
-      val (post, flow, path, logZ, costs, adm, passes) =
-        run(units, recall, view, candidates, costModel, config, gate = true)
-      // The engine proves its own output: a gate violation here would be a bug, and it surfaces
-      // as a typed error rather than an unproven result (law: every infer output validates). The
-      // anchors it used are handed over as the nominated set — candidates that are not nodes of
-      // the view are dropped here and from the cost keys (`run`), never nominated: the proof
-      // refuses absent anchors, and an unreachable candidate is a nomination error, not a state.
-      HsmmResult.validated(
-        recall,
-        view,
-        candidates
-          .anchorsByUnit(units.map(_.id))
-          .map((u, refs) => u -> refs.filter(ref => view.node(ref).nonEmpty)),
-        post,
-        flow,
-        path,
-        logZ,
-        costs,
-        passes,
-        Some(AdmissibilityEcho.of(adm))
-      )
+      run(units, recall, view, candidates, costModel, config, gate = true).flatMap {
+        case (post, flow, path, logZ, costs, adm, passes) =>
+          // The engine proves its own output: a gate violation here would be a bug, and it surfaces
+          // as a typed error rather than an unproven result (law: every infer output validates). The
+          // anchors it used are handed over as the nominated set — candidates that are not nodes of
+          // the view are dropped here and from the cost keys (`run`), never nominated: the proof
+          // refuses absent anchors, and an unreachable candidate is a nomination error, not a state.
+          HsmmResult.validated(
+            recall,
+            view,
+            candidates
+              .anchorsByUnit(units.map(_.id))
+              .map((u, refs) => u -> refs.filter(ref => view.node(ref).nonEmpty)),
+            post,
+            flow,
+            path,
+            logZ,
+            costs,
+            passes,
+            Some(AdmissibilityEcho.of(adm))
+          )
+      }
 
   /** Ungated inference for ablations: every candidate is admitted in the faithful mode and no
     * distorted state exists. Returns an [[AblationResult]], never an `HsmmResult`.
@@ -715,9 +717,10 @@ object GraphHsmm:
     val units = recall.ordered
     if units.isEmpty then Left(AlignError.EmptyRecall)
     else
-      val (post, _, path, logZ, _, _, _) =
-        run(units, recall, view, candidates, costModel, config, gate = false)
-      Right(AblationResult(post.rows.map(r => r.unit -> r.mass), path, logZ, config.layerUse))
+      run(units, recall, view, candidates, costModel, config, gate = false).map {
+        case (post, _, path, logZ, _, _, _) =>
+          AblationResult(post.rows.map(r => r.unit -> r.mass), path, logZ, config.layerUse)
+      }
 
   private type Costs = Map[RecallUnitId, Map[AlignState, CostBreakdown]]
   private type Adm = Map[RecallUnitId, Map[SourceNodeRef, Admissibility]]
@@ -730,7 +733,10 @@ object GraphHsmm:
       costModel: LocalCostModel,
       config: HsmmConfig,
       gate: Boolean
-  ): (AlignmentMatrix, TransitionFlow, Vector[AlignState], Double, Costs, Adm, Int) =
+  ): Either[
+    AlignError,
+    (AlignmentMatrix, TransitionFlow, Vector[AlignState], Double, Costs, Adm, Int)
+  ] =
     val tau = config.temperature
 
     // 1. The mode gate (prepass): which (anchor, mode) pairs exist for each unit. The cost model
@@ -746,8 +752,8 @@ object GraphHsmm:
         }
         .toMap
     }
-    val breakdowns: Vector[Map[AlignState, CostBreakdown]] =
-      units.zip(admissibility).map { (u, adm) =>
+    val checkedBreakdowns: Either[AlignError, Vector[Map[AlignState, CostBreakdown]]] =
+      units.zip(admissibility).traverse { (u, adm) =>
         val set = candidates.set(u.id)
         // Candidates absent from the view are dropped (not priced, not nominated): the gated
         // result carries only anchors the proof can re-derive on this view.
@@ -759,95 +765,97 @@ object GraphHsmm:
         val externals =
           if set.abstained && set.ranked.isEmpty then Vector(AlignState.unranked)
           else AlignState.externals
-        val ext = externals.map {
+        val ext = externals.traverse {
           case s @ AlignState.External(x) =>
-            s -> CostBreakdown.external(costModel.externalCost(u, x))
-          case s => s -> CostBreakdown.unreachable
+            CostBreakdown.external(costModel.externalCost(u, x)).map(s -> _)
+          case s => Right(s -> CostBreakdown.unreachable)
         }
-        (sources ++ ext).toMap
+        ext.map(values => (sources ++ values).toMap)
       }
-    val states: Vector[Vector[AlignState]] = breakdowns.map { m =>
-      m.toVector.collect { case (s, b) if !b.excluded => s }.sortBy(_.key)
-    }
-    val baseCost: Vector[Map[AlignState, Double]] =
-      breakdowns.zip(states).map { (m, ss) => ss.map(s => s -> m(s).total).toMap }
-
-    // log transition matrices A_i(s, t): a mixture of "go/stay external" and a feature softmax
-    // over the source states available at i+1
-    val logA: Vector[Map[AlignState, Map[AlignState, Double]]] =
-      (0 until units.size - 1).toVector.map { i =>
-        val from = states(i)
-        val to = states(i + 1)
-        from.map(s => s -> transitionRow(view, config.transitions, s, to)).toMap
+    checkedBreakdowns.map { breakdowns =>
+      val states: Vector[Vector[AlignState]] = breakdowns.map { m =>
+        m.toVector.collect { case (s, b) if !b.excluded => s }.sortBy(_.key)
       }
+      val baseCost: Vector[Map[AlignState, Double]] =
+        breakdowns.zip(states).map { (m, ss) => ss.map(s => s -> m(s).total).toMap }
 
-    def forwardBackward(
-        costs: Vector[Map[AlignState, Double]]
-    ): (AlignmentMatrix, TransitionFlow, Double) =
-      val logE = costs.map(_.view.mapValues(c => -c / tau).toMap)
-      val n = units.size
-      val logAlpha = Array.ofDim[Map[AlignState, Double]](n)
-      val logPi = -math.log(states(0).size.toDouble)
-      logAlpha(0) = states(0).map(s => s -> (logPi + logE(0)(s))).toMap
-      for i <- 1 until n do
-        logAlpha(i) = states(i).map { t =>
-          val acc = states(i - 1).map(s => logAlpha(i - 1)(s) + logA(i - 1)(s)(t))
-          t -> (logE(i)(t) + logSumExp(acc))
-        }.toMap
-      val logBeta = Array.ofDim[Map[AlignState, Double]](n)
-      logBeta(n - 1) = states(n - 1).map(s => s -> 0.0).toMap
-      for i <- (n - 2) to 0 by -1 do
-        logBeta(i) = states(i).map { s =>
-          val acc = states(i + 1).map(t => logA(i)(s)(t) + logE(i + 1)(t) + logBeta(i + 1)(t))
-          s -> logSumExp(acc)
-        }.toMap
-      // deterministic summation order: iterate states, not a map (review #30)
-      val logZ = logSumExp(states(n - 1).map(s => logAlpha(n - 1)(s)))
-      val rows = (0 until n).toVector.map { i =>
-        AlignmentRow(
-          units(i).id,
-          states(i).map(s => s -> math.exp(logAlpha(i)(s) + logBeta(i)(s) - logZ)).toMap
+      // log transition matrices A_i(s, t): a mixture of "go/stay external" and a feature softmax
+      // over the source states available at i+1
+      val logA: Vector[Map[AlignState, Map[AlignState, Double]]] =
+        (0 until units.size - 1).toVector.map { i =>
+          val from = states(i)
+          val to = states(i + 1)
+          from.map(s => s -> transitionRow(view, config.transitions, s, to)).toMap
+        }
+
+      def forwardBackward(
+          costs: Vector[Map[AlignState, Double]]
+      ): (AlignmentMatrix, TransitionFlow, Double) =
+        val logE = costs.map(_.view.mapValues(c => -c / tau).toMap)
+        val n = units.size
+        val logAlpha = Array.ofDim[Map[AlignState, Double]](n)
+        val logPi = -math.log(states(0).size.toDouble)
+        logAlpha(0) = states(0).map(s => s -> (logPi + logE(0)(s))).toMap
+        for i <- 1 until n do
+          logAlpha(i) = states(i).map { t =>
+            val acc = states(i - 1).map(s => logAlpha(i - 1)(s) + logA(i - 1)(s)(t))
+            t -> (logE(i)(t) + logSumExp(acc))
+          }.toMap
+        val logBeta = Array.ofDim[Map[AlignState, Double]](n)
+        logBeta(n - 1) = states(n - 1).map(s => s -> 0.0).toMap
+        for i <- (n - 2) to 0 by -1 do
+          logBeta(i) = states(i).map { s =>
+            val acc = states(i + 1).map(t => logA(i)(s)(t) + logE(i + 1)(t) + logBeta(i + 1)(t))
+            s -> logSumExp(acc)
+          }.toMap
+        // deterministic summation order: iterate states, not a map (review #30)
+        val logZ = logSumExp(states(n - 1).map(s => logAlpha(n - 1)(s)))
+        val rows = (0 until n).toVector.map { i =>
+          AlignmentRow(
+            units(i).id,
+            states(i).map(s => s -> math.exp(logAlpha(i)(s) + logBeta(i)(s) - logZ)).toMap
+          )
+        }
+        val steps = (0 until n - 1).toVector.map { i =>
+          val mass = for
+            s <- states(i)
+            t <- states(i + 1)
+          yield (s, t) -> math.exp(
+            logAlpha(i)(s) + logA(i)(s)(t) + logE(i + 1)(t) + logBeta(i + 1)(t) - logZ
+          )
+          FlowStep(units(i).id, units(i + 1).id, mass.toMap)
+        }
+        (AlignmentMatrix(rows), TransitionFlow(steps), logZ)
+
+      var costs = baseCost
+      var (posterior, flow, logZ) = forwardBackward(costs)
+      var pass = 0
+      while pass < config.refinementPasses do
+        costs = RelationPreservation.reweight(
+          baseCost,
+          units,
+          posterior,
+          recall,
+          view,
+          config.refinementWeight
         )
-      }
-      val steps = (0 until n - 1).toVector.map { i =>
-        val mass = for
-          s <- states(i)
-          t <- states(i + 1)
-        yield (s, t) -> math.exp(
-          logAlpha(i)(s) + logA(i)(s)(t) + logE(i + 1)(t) + logBeta(i + 1)(t) - logZ
-        )
-        FlowStep(units(i).id, units(i + 1).id, mass.toMap)
-      }
-      (AlignmentMatrix(rows), TransitionFlow(steps), logZ)
+        val r = forwardBackward(costs)
+        posterior = r._1
+        flow = r._2
+        logZ = r._3
+        pass += 1
 
-    var costs = baseCost
-    var (posterior, flow, logZ) = forwardBackward(costs)
-    var pass = 0
-    while pass < config.refinementPasses do
-      costs = RelationPreservation.reweight(
-        baseCost,
-        units,
+      val path = viterbi(units, states, costs.map(_.view.mapValues(c => -c / tau).toMap), logA)
+      (
         posterior,
-        recall,
-        view,
-        config.refinementWeight
+        flow,
+        path,
+        logZ,
+        units.map(_.id).zip(breakdowns).toMap,
+        units.map(_.id).zip(admissibility).toMap,
+        pass
       )
-      val r = forwardBackward(costs)
-      posterior = r._1
-      flow = r._2
-      logZ = r._3
-      pass += 1
-
-    val path = viterbi(units, states, costs.map(_.view.mapValues(c => -c / tau).toMap), logA)
-    (
-      posterior,
-      flow,
-      path,
-      logZ,
-      units.map(_.id).zip(breakdowns).toMap,
-      units.map(_.id).zip(admissibility).toMap,
-      pass
-    )
+    }
 
   /** Log transition distribution from `s` over the states `to` available at the next unit. */
   private[align] def transitionRow(
