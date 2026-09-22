@@ -20,7 +20,9 @@ artifact, selector key, descriptor, declared recording identity and time origin.
 Unknown identity/origin and an unestablished recording link are explicit. Two
 identical numbers on different clocks cannot enter the same checked timing object.
 
-Negative seconds are allowed. Intervals must have strictly positive exact width.
+Negative seconds are allowed. An interval declares the temporal extent of a word;
+it is not an uncertainty bound on its onset. Intervals must have strictly positive
+exact width.
 Overlapping intervals and nonmonotonic onsets are retained. Missing values never
 become zero. Source records can include words that are unassigned to any unit;
 they remain in the complete word table.
@@ -91,3 +93,6 @@ word-clock fixture and Python `Fraction` arithmetic, including decimal intake
 acceptance vectors. It is a synthetic qualification check, not a general decoder
 or a production importer. JVM, Scala.js and Native run the shared Scala tests.
 No participant data or provider call is needed.
+
+The [qualification record](refactor/evidence/recall-timing-portable-20260922/README.md)
+contains exact source pins, portable test totals, mutation controls and examples.

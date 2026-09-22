@@ -741,10 +741,12 @@ skips. A doc-only plan does not requalify historical builds.
 
 ## 12. Immediate next action and plan boundary
 
-Finish the active G1 landing, then implement the smallest source + recall -> checked
-mapping -> independent reader journey using the existing facade/evidence tickets.
-Prepare the synthetic temporal witnesses alongside that work. The first new
-corpus-specific implementation is an OpenNeuro timing adapter, not another aligner.
+G1 is landed locally (`2e98b6fe`), and the portable timing foundation below is
+qualified. Continue the smallest source + recall -> checked mapping -> independent
+reader journey through the existing facade/evidence tickets. The timing follow-on
+is production intake and exact source-support integration, then the separately
+tracked temporal queries. The OpenNeuro adapter must establish its recording/run
+binding before claiming scanner coordinates.
 
 This planning pass verified the current contracts, existing ticket ownership and
 live G1 partial status; consulted an independent mathematical review; and checked
@@ -795,7 +797,9 @@ landing (`2e98b6fe`; G1 closed). It adds checked clock-scoped observations in
 they do not become a second production timing format. Timing observations account
 for every inventory word and distinguish missing/onset-only/interval and
 source-reported/estimated values. Onset diagnostics do not establish interval
-exposure. Qualification and the exact source revision are recorded in the timing
-evidence checkpoint. G2 timing remains open for producer intake, source-support
+exposure. Its [qualification evidence](../refactor/evidence/recall-timing-portable-20260922/README.md)
+binds exact source `be121883`: full checkAll has 7,966 passes and five optional
+live skips; 18 new tests pass on each backend, ten named mutations are killed,
+and independent exact Python answers agree. G2 timing remains open for producer intake, source-support
 integration and its downstream temporal contracts; scanner and StoryAtlas temporal
 acceptance remain separate.

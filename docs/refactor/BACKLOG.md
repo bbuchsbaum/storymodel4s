@@ -239,7 +239,12 @@ No generic joint posterior engine, arbitrary ratio bounds, or mandatory trajecto
 
 ### G2: stable recall words, timing and honest support projections
 
-Mote: `bd-01M2WVH1DC8ZPDC992G4MX3TXG` · new · lane `next` · priority 1.
+Mote: `bd-01M2WVH1DC8ZPDC992G4MX3TXG` · doing · lane `next` · priority 1.
+
+2026-09-22 checkpoint: checked portable word timing and contextual sidecar are
+[qualified](evidence/recall-timing-portable-20260922/README.md) at `be121883`.
+Production timing intake and occurrence-qualified source-support integration remain
+open; temporal queries and scanner transforms retain their separate owners.
 
 Prerequisites: `bd-01M2WVENSB0P955Y0B603CC20Y`.
 

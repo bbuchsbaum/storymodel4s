@@ -1,0 +1,15 @@
+{
+  "status": "pass",
+  "onset_words": 4,
+  "onset_units": 2,
+  "exact_words": 4,
+  "decimal_cases": 27,
+  "negative_controls_killed": 4,
+  "files": {
+    "/private/tmp/recall-timing-evidence/final-artifacts/onsets.json": "58c1b1b09c5fe7458eba1155112c7fbb7eb5e6d0df84ce77e6a4f95069769951",
+    "/private/tmp/recall-timing-evidence/final-artifacts/exact.json": "bd2ce7d2bad01bb1c3e8122220db83def1915e96d0658a1bb7d319d81203d73a",
+    "/private/tmp/recall-timing-evidence/final-artifacts/decimal-cases.json": "e82fe445cde2ea9ca68cca2be8bb06682108388d06e14cfca78bdf48e7a7d21c",
+    "/Users/bbuchsbaum/code/scala/storymodel4s/.worktrees/recall-timing-portable/docs/refactor/evidence/recall-word-clock-join-20260922/outputs/openneuro.json": "7a29a9ed87080a3c11b4ae95e214abf6061c991434c1f56ef6f0020f4592867a"
+  },
+  "scope": "synthetic numerical and onset-diagnostic agreement; not a full decoder, recording-identity proof, scanner transform or empirical validation"
+}
