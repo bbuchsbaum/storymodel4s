@@ -199,3 +199,23 @@ text, deriving ownership from a hull or empty span, silently repairing text
 coordinates, or calling first/last measured onsets unit boundaries. Reunitization
 changes the segmentation binding while word identity survives. Scanner authority,
 durations, temporal exposure and full mapping validation remain explicitly absent.
+
+Portable recall timing decision (2026-09-22): `RecallTiming.checked` binds exactly
+one observation per checked inventory word to an explicit recall `Clock` and
+correspondence provenance. `Missing`, `OnsetOnly` and half-open `Interval` stay
+distinct; `SourceReported` and `Estimated` carry evidence or recipe identities.
+Recording identity, time origin and recording linkage are declarations with explicit
+unestablished states. They do not establish scanner authority. Use exact rational
+seconds, allowing negative coordinates and refusing nonpositive intervals. Bounded
+decimal intake reduces before checking the core Long representation. Reject Double
+seconds, guessed timebases, inferred offsets or durations, and reuse of the edition
+playback axis for a recall recording. Unit onset diagnostics retain actual boundary
+members and available witnesses separately; they are not temporal exposure.
+
+`RecallTimingCodecs` owns the separate contextual `recall-timing/v0.1` sidecar in
+existing codec/recall modules, with numerator/denominator decimal strings, complete
+inventory accounting, rederived unit diagnostics and strict full-record comparison.
+Reject changing mapping-record/v0.1, accepting a digest as its own inventory proof,
+or letting unknown/null/duplicate fields disappear. Reuse the proven mapping JSON
+printer and duplicate-key scan without changing legacy codecs. Interval union,
+queries and scan transformations remain separate work. No new dependency or module.
