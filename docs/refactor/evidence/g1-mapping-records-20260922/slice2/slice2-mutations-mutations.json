@@ -1,0 +1,500 @@
+[
+  {
+    "metadata": {
+      "schema_version": 1,
+      "started_utc": "2026-09-22T14:45:54.317976+00:00",
+      "finished_utc": "2026-09-22T14:46:14.008788+00:00",
+      "duration_seconds": 19.690939,
+      "command": [
+        "sbt",
+        "-batch",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-m1-grakern-20260922",
+        "recallJVM/testOnly *RecallInventory*"
+      ],
+      "cwd": "/private/tmp/storymodel4s-workspace-m1-20260922",
+      "log": "/private/tmp/workspace-m1-evidence/g1/slice2-mutations/drop-unassigned-JVM.log",
+      "exit_code": 1,
+      "child_returncode": 1,
+      "reason": "exited",
+      "detail": null,
+      "timeout_seconds": 1800.0,
+      "log_bytes": 3580
+    },
+    "logSha256": "5674d492e42f961e834d0d251f181fa5bfc246e574dbde9cac96e20bfdf33013",
+    "totals": [
+      "[error] Failed: Total 17, Failed 2, Errors 0, Passed 15"
+    ],
+    "failures": [
+      "==> X storymodel4s.recall.RecallInventorySuite.every parsed word is accounted 0.039s munit.ComparisonFailException: recall/src/test/scala/storymodel4s/recall/RecallInventorySuite.scala:35",
+      "==> X storymodel4s.recall.RecallInventorySuite.discontiguous unit membership uses exact pieces rather than the hull 0.007s munit.ComparisonFailException: recall/src/test/scala/storymodel4s/recall/RecallInventorySuite.scala:150"
+    ],
+    "name": "drop-unassigned",
+    "platform": "JVM",
+    "sourceSha256": "2859d39108b5118efa58e8042d028e142e60a6b56e29e595621c4d92565bb6b1",
+    "mutantSha256": "20b642e6baced6dc8ad41546812a12951092bbca774fd4e5820b338a595e5b20",
+    "command": [
+      "recallJVM/testOnly *RecallInventory*"
+    ],
+    "cleanCompileAndTest": false,
+    "expectedFailure": "every parsed word is accounted",
+    "killed": true
+  },
+  {
+    "metadata": {
+      "schema_version": 1,
+      "started_utc": "2026-09-22T14:46:14.147632+00:00",
+      "finished_utc": "2026-09-22T14:46:31.997010+00:00",
+      "duration_seconds": 17.84926,
+      "command": [
+        "sbt",
+        "-batch",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-m1-grakern-20260922",
+        "recallJVM/testOnly *RecallInventory*"
+      ],
+      "cwd": "/private/tmp/storymodel4s-workspace-m1-20260922",
+      "log": "/private/tmp/workspace-m1-evidence/g1/slice2-mutations/first-overlap-JVM.log",
+      "exit_code": 1,
+      "child_returncode": 1,
+      "reason": "exited",
+      "detail": null,
+      "timeout_seconds": 1800.0,
+      "log_bytes": 2632
+    },
+    "logSha256": "f69e6b7f0858693b26bb3aae605b9a16b3d4e10b2e74758c213c60fb1839d904",
+    "totals": [
+      "[error] Failed: Total 17, Failed 1, Errors 0, Passed 16"
+    ],
+    "failures": [
+      "==> X storymodel4s.recall.RecallInventorySuite.word in two units refuses 0.004s java.util.NoSuchElementException: None.get"
+    ],
+    "name": "first-overlap",
+    "platform": "JVM",
+    "sourceSha256": "2859d39108b5118efa58e8042d028e142e60a6b56e29e595621c4d92565bb6b1",
+    "mutantSha256": "3a9491215290f19c19448304eaa39f129d3559e599e59cc4436a8254475bce61",
+    "command": [
+      "recallJVM/testOnly *RecallInventory*"
+    ],
+    "cleanCompileAndTest": false,
+    "expectedFailure": "word in two units refuses",
+    "killed": true
+  },
+  {
+    "metadata": {
+      "schema_version": 1,
+      "started_utc": "2026-09-22T14:46:32.085126+00:00",
+      "finished_utc": "2026-09-22T14:46:55.141000+00:00",
+      "duration_seconds": 23.055766,
+      "command": [
+        "sbt",
+        "-batch",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-m1-grakern-20260922",
+        "recallJVM/testOnly *RecallInventory*"
+      ],
+      "cwd": "/private/tmp/storymodel4s-workspace-m1-20260922",
+      "log": "/private/tmp/workspace-m1-evidence/g1/slice2-mutations/transcript-only-segmentation-JVM.log",
+      "exit_code": 1,
+      "child_returncode": 1,
+      "reason": "exited",
+      "detail": null,
+      "timeout_seconds": 1800.0,
+      "log_bytes": 3590
+    },
+    "logSha256": "72bd4fe2895e068b2e84c2c35cabf6c560fc77281f59c6d68c182db0d740147b",
+    "totals": [
+      "[error] Failed: Total 17, Failed 2, Errors 0, Passed 15"
+    ],
+    "failures": [
+      "==> X storymodel4s.recall.RecallInventorySuite.unitization changes SegmentationId 0.011s munit.ComparisonFailException: recall/src/test/scala/storymodel4s/recall/RecallInventorySuite.scala:66 values are the same, expected 2 different values: storymodel4s.recall.SegmentationId@a62a6acc is equal to storymodel4s.recall.SegmentationId@a62a6acc",
+      "==> X storymodel4s.recall.RecallInventorySuite.inventory does not describe a resegmented graph 0.003s munit.FailException: recall/src/test/scala/storymodel4s/recall/RecallInventorySuite.scala:71 assertion failed"
+    ],
+    "name": "transcript-only-segmentation",
+    "platform": "JVM",
+    "sourceSha256": "2859d39108b5118efa58e8042d028e142e60a6b56e29e595621c4d92565bb6b1",
+    "mutantSha256": "2f962d7a0a82f58f4e98530308783e329116db558badb39fca3bfa373ad82339",
+    "command": [
+      "recallJVM/testOnly *RecallInventory*"
+    ],
+    "cleanCompileAndTest": false,
+    "expectedFailure": "unitization changes SegmentationId",
+    "killed": true
+  },
+  {
+    "metadata": {
+      "schema_version": 1,
+      "started_utc": "2026-09-22T14:46:55.245336+00:00",
+      "finished_utc": "2026-09-22T14:47:11.946794+00:00",
+      "duration_seconds": 16.701321,
+      "command": [
+        "sbt",
+        "-batch",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-m1-grakern-20260922",
+        "recallJVM/testOnly *RecallInventory*"
+      ],
+      "cwd": "/private/tmp/storymodel4s-workspace-m1-20260922",
+      "log": "/private/tmp/workspace-m1-evidence/g1/slice2-mutations/skip-span-refusal-JVM.log",
+      "exit_code": 1,
+      "child_returncode": 1,
+      "reason": "exited",
+      "detail": null,
+      "timeout_seconds": 1800.0,
+      "log_bytes": 2810
+    },
+    "logSha256": "1fb58f8e8e900058574cf5c0c3af26e7a399efa00a6d339c09555c717e7fc75d",
+    "totals": [
+      "[error] Failed: Total 17, Failed 1, Errors 0, Passed 16"
+    ],
+    "failures": [
+      "==> X storymodel4s.recall.RecallInventorySuite.malformed word spans refuse 0.004s java.util.NoSuchElementException: None.get"
+    ],
+    "name": "skip-span-refusal",
+    "platform": "JVM",
+    "sourceSha256": "2859d39108b5118efa58e8042d028e142e60a6b56e29e595621c4d92565bb6b1",
+    "mutantSha256": "c06cb63dddf6a5d78867879ce5e1d7c3cf007d69b3af023ec3d299c34a27cb7b",
+    "command": [
+      "recallJVM/testOnly *RecallInventory*"
+    ],
+    "cleanCompileAndTest": false,
+    "expectedFailure": "malformed word spans refuse",
+    "killed": true
+  },
+  {
+    "metadata": {
+      "schema_version": 1,
+      "started_utc": "2026-09-22T14:47:12.038718+00:00",
+      "finished_utc": "2026-09-22T14:47:28.209184+00:00",
+      "duration_seconds": 16.170293,
+      "command": [
+        "sbt",
+        "-batch",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-m1-grakern-20260922",
+        "recallJVM/testOnly *RecallInventory*"
+      ],
+      "cwd": "/private/tmp/storymodel4s-workspace-m1-20260922",
+      "log": "/private/tmp/workspace-m1-evidence/g1/slice2-mutations/ignore-segmentation-JVM.log",
+      "exit_code": 1,
+      "child_returncode": 1,
+      "reason": "exited",
+      "detail": null,
+      "timeout_seconds": 1800.0,
+      "log_bytes": 2847
+    },
+    "logSha256": "8d0fe05ac1b9ba3038fd50d2e0f9b0c464bd8fe8add8329fb0e4ca91aea37f90",
+    "totals": [
+      "[error] Failed: Total 17, Failed 1, Errors 0, Passed 16"
+    ],
+    "failures": [
+      "==> X storymodel4s.recall.RecallInventorySuite.inventory does not describe a resegmented graph 0.01s munit.FailException: recall/src/test/scala/storymodel4s/recall/RecallInventorySuite.scala:71 assertion failed"
+    ],
+    "name": "ignore-segmentation",
+    "platform": "JVM",
+    "sourceSha256": "2859d39108b5118efa58e8042d028e142e60a6b56e29e595621c4d92565bb6b1",
+    "mutantSha256": "2b418c07109ba8acabe5b2b0feed4aeb2656bffe102d0bb2265bd9fa17107fc0",
+    "command": [
+      "recallJVM/testOnly *RecallInventory*"
+    ],
+    "cleanCompileAndTest": false,
+    "expectedFailure": "inventory does not describe a resegmented graph",
+    "killed": true
+  },
+  {
+    "metadata": {
+      "schema_version": 1,
+      "started_utc": "2026-09-22T14:47:28.306843+00:00",
+      "finished_utc": "2026-09-22T14:47:45.331645+00:00",
+      "duration_seconds": 17.024642,
+      "command": [
+        "sbt",
+        "-batch",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-m1-grakern-20260922",
+        "recallJVM/testOnly *RecallInventory*"
+      ],
+      "cwd": "/private/tmp/storymodel4s-workspace-m1-20260922",
+      "log": "/private/tmp/workspace-m1-evidence/g1/slice2-mutations/missing-decomposition-JVM.log",
+      "exit_code": 1,
+      "child_returncode": 1,
+      "reason": "exited",
+      "detail": null,
+      "timeout_seconds": 1800.0,
+      "log_bytes": 4211
+    },
+    "logSha256": "b1ec7f91a0b18c13ef72db332a55346cc9d3f80eef05a9be8e76657d95e2f537",
+    "totals": [
+      "[error] Failed: Total 17, Failed 2, Errors 0, Passed 15"
+    ],
+    "failures": [
+      "==> X storymodel4s.recall.RecallInventorySuite.every unit NotAssessed 0.025s munit.ComparisonFailException: recall/src/test/scala/storymodel4s/recall/RecallInventorySuite.scala:109",
+      "==> X storymodel4s.recall.RecallInventorySuite.digest binds parsing and policy while preserving unassigned words 0.002s java.lang.NullPointerException: Cannot invoke \"storymodel4s.recall.DecompositionStatus.toString()\" because the return value of \"storymodel4s.recall.RecallInventory$Unit.decomposition()\" is null"
+    ],
+    "name": "missing-decomposition",
+    "platform": "JVM",
+    "sourceSha256": "2859d39108b5118efa58e8042d028e142e60a6b56e29e595621c4d92565bb6b1",
+    "mutantSha256": "a3ae69bafd52ee33d5b0b8a986b178bf441498e8a8e9a325983ed3832119fcd3",
+    "command": [
+      "recallJVM/testOnly *RecallInventory*"
+    ],
+    "cleanCompileAndTest": false,
+    "expectedFailure": "every unit NotAssessed",
+    "killed": true
+  },
+  {
+    "metadata": {
+      "schema_version": 1,
+      "started_utc": "2026-09-22T14:47:45.431854+00:00",
+      "finished_utc": "2026-09-22T14:48:10.092495+00:00",
+      "duration_seconds": 24.660612,
+      "command": [
+        "sbt",
+        "-batch",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-m1-grakern-20260922",
+        "recallJVM/Compile/clean",
+        "recallJVM/Test/clean",
+        "recallJVM/testOnly *RecallInventory*"
+      ],
+      "cwd": "/private/tmp/storymodel4s-workspace-m1-20260922",
+      "log": "/private/tmp/workspace-m1-evidence/g1/slice2-mutations/public-word-factory-JVM.log",
+      "exit_code": 1,
+      "child_returncode": 1,
+      "reason": "exited",
+      "detail": null,
+      "timeout_seconds": 1800.0,
+      "log_bytes": 3584
+    },
+    "logSha256": "e1ffab553f8dd88cf4603d650bd87887f60f18fc2c4dc834e656e7b31450c2af",
+    "totals": [
+      "[error] Failed: Total 17, Failed 2, Errors 0, Passed 15"
+    ],
+    "failures": [
+      "==> X storymodel4s.recall.attack.RecallInventoryPackageAttackSuite.word has no caller construction 0.013s munit.FailException: recall/src/test/scala/storymodel4s/recall/attack/RecallInventoryPackageAttackSuite.scala:44 assertion failed",
+      "==> X storymodel4s.probes.RecallInventoryUnforgeableSuite.word has no caller construction 0.001s munit.FailException: recall/src/test/scala/storymodel4s/probes/RecallInventoryUnforgeableSuite.scala:44 assertion failed"
+    ],
+    "name": "public-word-factory",
+    "platform": "JVM",
+    "sourceSha256": "2859d39108b5118efa58e8042d028e142e60a6b56e29e595621c4d92565bb6b1",
+    "mutantSha256": "996e246d192c1459806a90694a6edba2f3ff320dc06d650f63dc815132203256",
+    "command": [
+      "recallJVM/Compile/clean",
+      "recallJVM/Test/clean",
+      "recallJVM/testOnly *RecallInventory*"
+    ],
+    "cleanCompileAndTest": true,
+    "expectedFailure": "word has no caller construction",
+    "killed": true
+  },
+  {
+    "metadata": {
+      "schema_version": 1,
+      "started_utc": "2026-09-22T14:48:39.116557+00:00",
+      "finished_utc": "2026-09-22T14:49:12.151101+00:00",
+      "duration_seconds": 33.034378,
+      "command": [
+        "sbt",
+        "-batch",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-m1-grakern-20260922",
+        "recallJS/Compile/clean",
+        "recallJS/Test/clean",
+        "recallJS/testOnly *RecallInventory*"
+      ],
+      "cwd": "/private/tmp/storymodel4s-workspace-m1-20260922",
+      "log": "/private/tmp/workspace-m1-evidence/g1/slice2-mutations/public-word-factory-JS.log",
+      "exit_code": 1,
+      "child_returncode": 1,
+      "reason": "exited",
+      "detail": null,
+      "timeout_seconds": 1800.0,
+      "log_bytes": 3969
+    },
+    "logSha256": "6a7744dafd0563bd8bfa92864652f7de075379b832cb6b240821d3fb32e4ca07",
+    "totals": [
+      "[error] Failed: Total 17, Failed 2, Errors 0, Passed 15"
+    ],
+    "failures": [
+      "==> X storymodel4s.recall.attack.RecallInventoryPackageAttackSuite.word has no caller construction 0.012s munit.FailException: recall/src/test/scala/storymodel4s/recall/attack/RecallInventoryPackageAttackSuite.scala:44 assertion failed",
+      "==> X storymodel4s.probes.RecallInventoryUnforgeableSuite.word has no caller construction 0.001s munit.FailException: recall/src/test/scala/storymodel4s/probes/RecallInventoryUnforgeableSuite.scala:44 assertion failed"
+    ],
+    "name": "public-word-factory",
+    "platform": "JS",
+    "sourceSha256": "2859d39108b5118efa58e8042d028e142e60a6b56e29e595621c4d92565bb6b1",
+    "mutantSha256": "996e246d192c1459806a90694a6edba2f3ff320dc06d650f63dc815132203256",
+    "command": [
+      "recallJS/Compile/clean",
+      "recallJS/Test/clean",
+      "recallJS/testOnly *RecallInventory*"
+    ],
+    "cleanCompileAndTest": true,
+    "expectedFailure": "word has no caller construction",
+    "killed": true
+  },
+  {
+    "metadata": {
+      "schema_version": 1,
+      "started_utc": "2026-09-22T14:49:51.486596+00:00",
+      "finished_utc": "2026-09-22T14:50:45.774790+00:00",
+      "duration_seconds": 54.288064,
+      "command": [
+        "sbt",
+        "-batch",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-m1-grakern-20260922",
+        "recallNative/Compile/clean",
+        "recallNative/Test/clean",
+        "recallNative/testOnly *RecallInventory*"
+      ],
+      "cwd": "/private/tmp/storymodel4s-workspace-m1-20260922",
+      "log": "/private/tmp/workspace-m1-evidence/g1/slice2-mutations/public-word-factory-Native.log",
+      "exit_code": 1,
+      "child_returncode": 1,
+      "reason": "exited",
+      "detail": null,
+      "timeout_seconds": 1800.0,
+      "log_bytes": 4177
+    },
+    "logSha256": "efe5ce5abc4cfecc1a7af8bb3c4489cc6a4a74025749bd99cbf0314ae18d38a0",
+    "totals": [
+      "[error] Failed: Total 17, Failed 2, Errors 0, Passed 15"
+    ],
+    "failures": [
+      "==> X storymodel4s.recall.attack.RecallInventoryPackageAttackSuite.word has no caller construction 0.005s munit.FailException: recall/src/test/scala/storymodel4s/recall/attack/RecallInventoryPackageAttackSuite.scala:44 assertion failed",
+      "==> X storymodel4s.probes.RecallInventoryUnforgeableSuite.word has no caller construction 0.001s munit.FailException: recall/src/test/scala/storymodel4s/probes/RecallInventoryUnforgeableSuite.scala:44 assertion failed"
+    ],
+    "name": "public-word-factory",
+    "platform": "Native",
+    "sourceSha256": "2859d39108b5118efa58e8042d028e142e60a6b56e29e595621c4d92565bb6b1",
+    "mutantSha256": "996e246d192c1459806a90694a6edba2f3ff320dc06d650f63dc815132203256",
+    "command": [
+      "recallNative/Compile/clean",
+      "recallNative/Test/clean",
+      "recallNative/testOnly *RecallInventory*"
+    ],
+    "cleanCompileAndTest": true,
+    "expectedFailure": "word has no caller construction",
+    "killed": true
+  },
+  {
+    "metadata": {
+      "schema_version": 1,
+      "started_utc": "2026-09-22T14:51:24.555898+00:00",
+      "finished_utc": "2026-09-22T14:51:57.390466+00:00",
+      "duration_seconds": 32.834423,
+      "command": [
+        "sbt",
+        "-batch",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-m1-grakern-20260922",
+        "recallJVM/Compile/clean",
+        "recallJVM/Test/clean",
+        "recallJVM/testOnly *RecallInventory*"
+      ],
+      "cwd": "/private/tmp/storymodel4s-workspace-m1-20260922",
+      "log": "/private/tmp/workspace-m1-evidence/g1/slice2-mutations/package-word-constructor-JVM.log",
+      "exit_code": 1,
+      "child_returncode": 1,
+      "reason": "exited",
+      "detail": null,
+      "timeout_seconds": 1800.0,
+      "log_bytes": 3091
+    },
+    "logSha256": "5da51ca219dfb650118fda32fc20b262dbe3fab6c86bdf90c490ecadc0fdd071",
+    "totals": [
+      "[error] Failed: Total 17, Failed 1, Errors 0, Passed 16"
+    ],
+    "failures": [
+      "==> X storymodel4s.recall.attack.RecallInventoryPackageAttackSuite.word has no caller construction 0.01s munit.FailException: recall/src/test/scala/storymodel4s/recall/attack/RecallInventoryPackageAttackSuite.scala:34 assertion failed"
+    ],
+    "name": "package-word-constructor",
+    "platform": "JVM",
+    "sourceSha256": "2859d39108b5118efa58e8042d028e142e60a6b56e29e595621c4d92565bb6b1",
+    "mutantSha256": "33ba86a22e705f4fc33916b0550c1d71eb18e2c7c1e1568439129453ed47622a",
+    "command": [
+      "recallJVM/Compile/clean",
+      "recallJVM/Test/clean",
+      "recallJVM/testOnly *RecallInventory*"
+    ],
+    "cleanCompileAndTest": true,
+    "expectedFailure": "word has no caller construction",
+    "killed": true
+  },
+  {
+    "metadata": {
+      "schema_version": 1,
+      "started_utc": "2026-09-22T14:52:21.921785+00:00",
+      "finished_utc": "2026-09-22T14:53:04.578981+00:00",
+      "duration_seconds": 42.657098,
+      "command": [
+        "sbt",
+        "-batch",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-m1-grakern-20260922",
+        "recallJS/Compile/clean",
+        "recallJS/Test/clean",
+        "recallJS/testOnly *RecallInventory*"
+      ],
+      "cwd": "/private/tmp/storymodel4s-workspace-m1-20260922",
+      "log": "/private/tmp/workspace-m1-evidence/g1/slice2-mutations/package-word-constructor-JS.log",
+      "exit_code": 1,
+      "child_returncode": 1,
+      "reason": "exited",
+      "detail": null,
+      "timeout_seconds": 1800.0,
+      "log_bytes": 3646
+    },
+    "logSha256": "c4de197c42dd55d9e8efc9c1f0580d57f4f633fd73a6ecda1cb8eaeff516d89a",
+    "totals": [
+      "[error] Failed: Total 17, Failed 1, Errors 0, Passed 16"
+    ],
+    "failures": [
+      "==> X storymodel4s.recall.attack.RecallInventoryPackageAttackSuite.word has no caller construction 0.013s munit.FailException: recall/src/test/scala/storymodel4s/recall/attack/RecallInventoryPackageAttackSuite.scala:34 assertion failed"
+    ],
+    "name": "package-word-constructor",
+    "platform": "JS",
+    "sourceSha256": "2859d39108b5118efa58e8042d028e142e60a6b56e29e595621c4d92565bb6b1",
+    "mutantSha256": "33ba86a22e705f4fc33916b0550c1d71eb18e2c7c1e1568439129453ed47622a",
+    "command": [
+      "recallJS/Compile/clean",
+      "recallJS/Test/clean",
+      "recallJS/testOnly *RecallInventory*"
+    ],
+    "cleanCompileAndTest": true,
+    "expectedFailure": "word has no caller construction",
+    "killed": true
+  },
+  {
+    "metadata": {
+      "schema_version": 1,
+      "started_utc": "2026-09-22T14:53:41.738702+00:00",
+      "finished_utc": "2026-09-22T14:54:24.073908+00:00",
+      "duration_seconds": 42.335064,
+      "command": [
+        "sbt",
+        "-batch",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-m1-grakern-20260922",
+        "recallNative/Compile/clean",
+        "recallNative/Test/clean",
+        "recallNative/testOnly *RecallInventory*"
+      ],
+      "cwd": "/private/tmp/storymodel4s-workspace-m1-20260922",
+      "log": "/private/tmp/workspace-m1-evidence/g1/slice2-mutations/package-word-constructor-Native.log",
+      "exit_code": 1,
+      "child_returncode": 1,
+      "reason": "exited",
+      "detail": null,
+      "timeout_seconds": 1800.0,
+      "log_bytes": 4004
+    },
+    "logSha256": "79fbb4eb518a613989466e4448a3f295003d2203ecfe7ff19cd58d530ef1e7e9",
+    "totals": [
+      "[error] Failed: Total 17, Failed 1, Errors 0, Passed 16"
+    ],
+    "failures": [
+      "==> X storymodel4s.recall.attack.RecallInventoryPackageAttackSuite.word has no caller construction 0.005s munit.FailException: recall/src/test/scala/storymodel4s/recall/attack/RecallInventoryPackageAttackSuite.scala:34 assertion failed"
+    ],
+    "name": "package-word-constructor",
+    "platform": "Native",
+    "sourceSha256": "2859d39108b5118efa58e8042d028e142e60a6b56e29e595621c4d92565bb6b1",
+    "mutantSha256": "33ba86a22e705f4fc33916b0550c1d71eb18e2c7c1e1568439129453ed47622a",
+    "command": [
+      "recallNative/Compile/clean",
+      "recallNative/Test/clean",
+      "recallNative/testOnly *RecallInventory*"
+    ],
+    "cleanCompileAndTest": true,
+    "expectedFailure": "word has no caller construction",
+    "killed": true
+  }
+]

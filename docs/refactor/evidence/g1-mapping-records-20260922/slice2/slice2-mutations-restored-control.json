@@ -1,0 +1,33 @@
+{
+  "metadata": {
+    "schema_version": 1,
+    "started_utc": "2026-09-22T14:55:01.523580+00:00",
+    "finished_utc": "2026-09-22T14:55:27.767954+00:00",
+    "duration_seconds": 26.244257,
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-m1-grakern-20260922",
+      "recallJVM/testOnly *RecallInventory*",
+      "recallJS/testOnly *RecallInventory*",
+      "recallNative/testOnly *RecallInventory*"
+    ],
+    "cwd": "/private/tmp/storymodel4s-workspace-m1-20260922",
+    "log": "/private/tmp/workspace-m1-evidence/g1/slice2-mutations/restored-control.log",
+    "exit_code": 0,
+    "child_returncode": 0,
+    "reason": "exited",
+    "detail": null,
+    "timeout_seconds": 1800.0,
+    "log_bytes": 4806
+  },
+  "logSha256": "29d3edb8fd14ff47f3d6b2b792385a1c86401627531279298afb6a0e54aea606",
+  "totals": [
+    "[info] Passed: Total 17, Failed 0, Errors 0, Passed 17",
+    "[info] Passed: Total 17, Failed 0, Errors 0, Passed 17",
+    "[info] Passed: Total 17, Failed 0, Errors 0, Passed 17"
+  ],
+  "failures": [],
+  "sourceSha256": "2859d39108b5118efa58e8042d028e142e60a6b56e29e595621c4d92565bb6b1",
+  "cleanCompileAndTest": false
+}

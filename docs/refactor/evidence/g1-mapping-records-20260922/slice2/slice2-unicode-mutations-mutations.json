@@ -1,0 +1,324 @@
+[
+  {
+    "metadata": {
+      "schema_version": 1,
+      "started_utc": "2026-09-22T14:58:50.950585+00:00",
+      "finished_utc": "2026-09-22T14:59:07.963959+00:00",
+      "duration_seconds": 17.013236,
+      "command": [
+        "sbt",
+        "-batch",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-m1-grakern-20260922",
+        "recallJVM/testOnly *RecallInventory*"
+      ],
+      "cwd": "/private/tmp/storymodel4s-workspace-m1-20260922",
+      "log": "/private/tmp/workspace-m1-evidence/g1/slice2-unicode-mutations/drop-unassigned-JVM.log",
+      "exit_code": 1,
+      "child_returncode": 1,
+      "reason": "exited",
+      "detail": null,
+      "timeout_seconds": 1800.0,
+      "log_bytes": 3582
+    },
+    "logSha256": "52bb41c2cd4ce90fc2fd58409172794ba35c8c5b555c8206d2511810488ec1f2",
+    "totals": [
+      "[error] Failed: Total 19, Failed 2, Errors 0, Passed 17"
+    ],
+    "failures": [
+      "==> X storymodel4s.recall.RecallInventorySuite.every parsed word is accounted 0.024s munit.ComparisonFailException: recall/src/test/scala/storymodel4s/recall/RecallInventorySuite.scala:65",
+      "==> X storymodel4s.recall.RecallInventorySuite.discontiguous unit membership uses exact pieces rather than the hull 0.007s munit.ComparisonFailException: recall/src/test/scala/storymodel4s/recall/RecallInventorySuite.scala:180"
+    ],
+    "name": "drop-unassigned",
+    "platform": "JVM",
+    "sourceSha256": "62c406d2ca12dfcea08878b28442d4a8a93eacadef5f8b48ddaaad46f771a163",
+    "mutantSha256": "fb2737d9723e2b80a92cc590968e369aebff5799371a13c51a86f540743c529c",
+    "command": [
+      "recallJVM/testOnly *RecallInventory*"
+    ],
+    "cleanCompileAndTest": false,
+    "expectedFailure": "every parsed word is accounted",
+    "killed": true
+  },
+  {
+    "metadata": {
+      "schema_version": 1,
+      "started_utc": "2026-09-22T14:59:08.054480+00:00",
+      "finished_utc": "2026-09-22T14:59:25.483552+00:00",
+      "duration_seconds": 17.428947,
+      "command": [
+        "sbt",
+        "-batch",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-m1-grakern-20260922",
+        "recallJVM/testOnly *RecallInventory*"
+      ],
+      "cwd": "/private/tmp/storymodel4s-workspace-m1-20260922",
+      "log": "/private/tmp/workspace-m1-evidence/g1/slice2-unicode-mutations/first-overlap-JVM.log",
+      "exit_code": 1,
+      "child_returncode": 1,
+      "reason": "exited",
+      "detail": null,
+      "timeout_seconds": 1800.0,
+      "log_bytes": 2633
+    },
+    "logSha256": "1afe8654d0d6ddd62568772572882e3d58e53503129751bec72b062d6b8f7e89",
+    "totals": [
+      "[error] Failed: Total 19, Failed 1, Errors 0, Passed 18"
+    ],
+    "failures": [
+      "==> X storymodel4s.recall.RecallInventorySuite.word in two units refuses 0.003s java.util.NoSuchElementException: None.get"
+    ],
+    "name": "first-overlap",
+    "platform": "JVM",
+    "sourceSha256": "62c406d2ca12dfcea08878b28442d4a8a93eacadef5f8b48ddaaad46f771a163",
+    "mutantSha256": "7784d5704bcedc25e2b6e904eeae787dec87f7f3ba7bb2d60c0ed1ed55001c5b",
+    "command": [
+      "recallJVM/testOnly *RecallInventory*"
+    ],
+    "cleanCompileAndTest": false,
+    "expectedFailure": "word in two units refuses",
+    "killed": true
+  },
+  {
+    "metadata": {
+      "schema_version": 1,
+      "started_utc": "2026-09-22T14:59:25.567551+00:00",
+      "finished_utc": "2026-09-22T14:59:42.019392+00:00",
+      "duration_seconds": 16.451693,
+      "command": [
+        "sbt",
+        "-batch",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-m1-grakern-20260922",
+        "recallJVM/testOnly *RecallInventory*"
+      ],
+      "cwd": "/private/tmp/storymodel4s-workspace-m1-20260922",
+      "log": "/private/tmp/workspace-m1-evidence/g1/slice2-unicode-mutations/transcript-only-segmentation-JVM.log",
+      "exit_code": 1,
+      "child_returncode": 1,
+      "reason": "exited",
+      "detail": null,
+      "timeout_seconds": 1800.0,
+      "log_bytes": 5039
+    },
+    "logSha256": "5e524841902aa6fb8527c945d47a847b1b10f6cb315f765047279fed0b602865",
+    "totals": [
+      "[error] Failed: Total 19, Failed 4, Errors 0, Passed 15"
+    ],
+    "failures": [
+      "==> X storymodel4s.recall.RecallInventorySuite.distinct UTF-16 unit identities never share segmentation or inventory 0.016s munit.ComparisonFailException: recall/src/test/scala/storymodel4s/recall/RecallInventorySuite.scala:43 values are the same, expected 2 different values: storymodel4s.recall.SegmentationId@9830432c is equal to storymodel4s.recall.SegmentationId@9830432c",
+      "==> X storymodel4s.recall.RecallInventorySuite.distinct admitted UTF-16 transcripts never share inventory identity 0.003s munit.ComparisonFailException: recall/src/test/scala/storymodel4s/recall/RecallInventorySuite.scala:57 values are the same, expected 2 different values: storymodel4s.recall.SegmentationId@904aa208 is equal to storymodel4s.recall.SegmentationId@904aa208",
+      "==> X storymodel4s.recall.RecallInventorySuite.unitization changes SegmentationId 0.001s munit.ComparisonFailException: recall/src/test/scala/storymodel4s/recall/RecallInventorySuite.scala:96 values are the same, expected 2 different values: storymodel4s.recall.SegmentationId@a62a6acc is equal to storymodel4s.recall.SegmentationId@a62a6acc",
+      "==> X storymodel4s.recall.RecallInventorySuite.inventory does not describe a resegmented graph 0.002s munit.FailException: recall/src/test/scala/storymodel4s/recall/RecallInventorySuite.scala:101 assertion failed"
+    ],
+    "name": "transcript-only-segmentation",
+    "platform": "JVM",
+    "sourceSha256": "62c406d2ca12dfcea08878b28442d4a8a93eacadef5f8b48ddaaad46f771a163",
+    "mutantSha256": "bc3c4fad1699839774a6d7c97c92c85ea64eaf368059aa3d3989c39a43f41e57",
+    "command": [
+      "recallJVM/testOnly *RecallInventory*"
+    ],
+    "cleanCompileAndTest": false,
+    "expectedFailure": "unitization changes SegmentationId",
+    "killed": true
+  },
+  {
+    "metadata": {
+      "schema_version": 1,
+      "started_utc": "2026-09-22T14:59:42.107611+00:00",
+      "finished_utc": "2026-09-22T14:59:58.439298+00:00",
+      "duration_seconds": 16.331391,
+      "command": [
+        "sbt",
+        "-batch",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-m1-grakern-20260922",
+        "recallJVM/testOnly *RecallInventory*"
+      ],
+      "cwd": "/private/tmp/storymodel4s-workspace-m1-20260922",
+      "log": "/private/tmp/workspace-m1-evidence/g1/slice2-unicode-mutations/skip-span-refusal-JVM.log",
+      "exit_code": 1,
+      "child_returncode": 1,
+      "reason": "exited",
+      "detail": null,
+      "timeout_seconds": 1800.0,
+      "log_bytes": 2813
+    },
+    "logSha256": "d72021570ea1b48dbccb33e1010616dee74dbb7632cfc71abefbe11037f630c5",
+    "totals": [
+      "[error] Failed: Total 19, Failed 1, Errors 0, Passed 18"
+    ],
+    "failures": [
+      "==> X storymodel4s.recall.RecallInventorySuite.malformed word spans refuse 0.003s java.util.NoSuchElementException: None.get"
+    ],
+    "name": "skip-span-refusal",
+    "platform": "JVM",
+    "sourceSha256": "62c406d2ca12dfcea08878b28442d4a8a93eacadef5f8b48ddaaad46f771a163",
+    "mutantSha256": "5d57cb6316c6646caeaee4d434e4ad3eb927073686875d021929122971f1e106",
+    "command": [
+      "recallJVM/testOnly *RecallInventory*"
+    ],
+    "cleanCompileAndTest": false,
+    "expectedFailure": "malformed word spans refuse",
+    "killed": true
+  },
+  {
+    "metadata": {
+      "schema_version": 1,
+      "started_utc": "2026-09-22T14:59:58.534036+00:00",
+      "finished_utc": "2026-09-22T15:00:14.747376+00:00",
+      "duration_seconds": 16.213179,
+      "command": [
+        "sbt",
+        "-batch",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-m1-grakern-20260922",
+        "recallJVM/testOnly *RecallInventory*"
+      ],
+      "cwd": "/private/tmp/storymodel4s-workspace-m1-20260922",
+      "log": "/private/tmp/workspace-m1-evidence/g1/slice2-unicode-mutations/ignore-segmentation-JVM.log",
+      "exit_code": 1,
+      "child_returncode": 1,
+      "reason": "exited",
+      "detail": null,
+      "timeout_seconds": 1800.0,
+      "log_bytes": 3827
+    },
+    "logSha256": "1e20c6bf210050dd1b3ea8195429019187399d1d95e44ae6804f771a7ef08e71",
+    "totals": [
+      "[error] Failed: Total 19, Failed 3, Errors 0, Passed 16"
+    ],
+    "failures": [
+      "==> X storymodel4s.recall.RecallInventorySuite.distinct UTF-16 unit identities never share segmentation or inventory 0.028s munit.FailException: recall/src/test/scala/storymodel4s/recall/RecallInventorySuite.scala:45 assertion failed",
+      "==> X storymodel4s.recall.RecallInventorySuite.distinct admitted UTF-16 transcripts never share inventory identity 0.007s munit.FailException: recall/src/test/scala/storymodel4s/recall/RecallInventorySuite.scala:59 assertion failed",
+      "==> X storymodel4s.recall.RecallInventorySuite.inventory does not describe a resegmented graph 0.003s munit.FailException: recall/src/test/scala/storymodel4s/recall/RecallInventorySuite.scala:101 assertion failed"
+    ],
+    "name": "ignore-segmentation",
+    "platform": "JVM",
+    "sourceSha256": "62c406d2ca12dfcea08878b28442d4a8a93eacadef5f8b48ddaaad46f771a163",
+    "mutantSha256": "b15b81af8b6ee1a4127d6fba05e1fc52500b79c589059f0c73b8dab9aaca4255",
+    "command": [
+      "recallJVM/testOnly *RecallInventory*"
+    ],
+    "cleanCompileAndTest": false,
+    "expectedFailure": "inventory does not describe a resegmented graph",
+    "killed": true
+  },
+  {
+    "metadata": {
+      "schema_version": 1,
+      "started_utc": "2026-09-22T15:00:14.832026+00:00",
+      "finished_utc": "2026-09-22T15:00:31.189336+00:00",
+      "duration_seconds": 16.357148,
+      "command": [
+        "sbt",
+        "-batch",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-m1-grakern-20260922",
+        "recallJVM/testOnly *RecallInventory*"
+      ],
+      "cwd": "/private/tmp/storymodel4s-workspace-m1-20260922",
+      "log": "/private/tmp/workspace-m1-evidence/g1/slice2-unicode-mutations/missing-decomposition-JVM.log",
+      "exit_code": 1,
+      "child_returncode": 1,
+      "reason": "exited",
+      "detail": null,
+      "timeout_seconds": 1800.0,
+      "log_bytes": 5603
+    },
+    "logSha256": "05352d1d73b93174964e574dcc0265f99cbe089676e52aa0413f53049f0db0c8",
+    "totals": [
+      "[error] Failed: Total 19, Failed 4, Errors 0, Passed 15"
+    ],
+    "failures": [
+      "==> X storymodel4s.recall.RecallInventorySuite.distinct UTF-16 unit identities never share segmentation or inventory 0.011s java.lang.NullPointerException: Cannot invoke \"storymodel4s.recall.DecompositionStatus.toString()\" because the return value of \"storymodel4s.recall.RecallInventory$Unit.decomposition()\" is null",
+      "==> X storymodel4s.recall.RecallInventorySuite.distinct admitted UTF-16 transcripts never share inventory identity 0.004s java.lang.NullPointerException: Cannot invoke \"storymodel4s.recall.DecompositionStatus.toString()\" because the return value of \"storymodel4s.recall.RecallInventory$Unit.decomposition()\" is null",
+      "==> X storymodel4s.recall.RecallInventorySuite.every unit NotAssessed 0.024s munit.ComparisonFailException: recall/src/test/scala/storymodel4s/recall/RecallInventorySuite.scala:139",
+      "==> X storymodel4s.recall.RecallInventorySuite.digest binds parsing and policy while preserving unassigned words 0.004s java.lang.NullPointerException: Cannot invoke \"storymodel4s.recall.DecompositionStatus.toString()\" because the return value of \"storymodel4s.recall.RecallInventory$Unit.decomposition()\" is null"
+    ],
+    "name": "missing-decomposition",
+    "platform": "JVM",
+    "sourceSha256": "62c406d2ca12dfcea08878b28442d4a8a93eacadef5f8b48ddaaad46f771a163",
+    "mutantSha256": "a73299cb6e06ba3a90ce83158308d2bc7d83347db1229c6f9dceee5da97072c1",
+    "command": [
+      "recallJVM/testOnly *RecallInventory*"
+    ],
+    "cleanCompileAndTest": false,
+    "expectedFailure": "every unit NotAssessed",
+    "killed": true
+  },
+  {
+    "metadata": {
+      "schema_version": 1,
+      "started_utc": "2026-09-22T15:00:31.273904+00:00",
+      "finished_utc": "2026-09-22T15:00:47.994238+00:00",
+      "duration_seconds": 16.720156,
+      "command": [
+        "sbt",
+        "-batch",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-m1-grakern-20260922",
+        "recallJVM/testOnly *RecallInventory*"
+      ],
+      "cwd": "/private/tmp/storymodel4s-workspace-m1-20260922",
+      "log": "/private/tmp/workspace-m1-evidence/g1/slice2-unicode-mutations/lossy-token-hash-JVM.log",
+      "exit_code": 1,
+      "child_returncode": 1,
+      "reason": "exited",
+      "detail": null,
+      "timeout_seconds": 1800.0,
+      "log_bytes": 3775
+    },
+    "logSha256": "093eb1d13371f12a96f80ed55343c8827f4a9a8497d2eb366f0fe86ad04e34c2",
+    "totals": [
+      "[error] Failed: Total 19, Failed 2, Errors 0, Passed 17"
+    ],
+    "failures": [
+      "==> X storymodel4s.recall.RecallInventorySuite.distinct UTF-16 unit identities never share segmentation or inventory 0.016s munit.ComparisonFailException: recall/src/test/scala/storymodel4s/recall/RecallInventorySuite.scala:43 values are the same, expected 2 different values: storymodel4s.recall.SegmentationId@c8b1f63f is equal to storymodel4s.recall.SegmentationId@c8b1f63f",
+      "==> X storymodel4s.recall.RecallInventorySuite.distinct admitted UTF-16 transcripts never share inventory identity 0.003s munit.ComparisonFailException: recall/src/test/scala/storymodel4s/recall/RecallInventorySuite.scala:57 values are the same, expected 2 different values: storymodel4s.recall.SegmentationId@f7c89e03 is equal to storymodel4s.recall.SegmentationId@f7c89e03"
+    ],
+    "name": "lossy-token-hash",
+    "platform": "JVM",
+    "sourceSha256": "62c406d2ca12dfcea08878b28442d4a8a93eacadef5f8b48ddaaad46f771a163",
+    "mutantSha256": "f7ab6a8bd2e7d3b045226ede23a1afa5354e535d71d088399bc08a5d54766ba0",
+    "command": [
+      "recallJVM/testOnly *RecallInventory*"
+    ],
+    "cleanCompileAndTest": false,
+    "expectedFailure": "distinct UTF-16 unit identities never share",
+    "killed": true
+  },
+  {
+    "metadata": {
+      "schema_version": 1,
+      "started_utc": "2026-09-22T15:00:48.080205+00:00",
+      "finished_utc": "2026-09-22T15:01:04.505601+00:00",
+      "duration_seconds": 16.425246,
+      "command": [
+        "sbt",
+        "-batch",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-m1-grakern-20260922",
+        "recallJVM/testOnly *RecallInventory*"
+      ],
+      "cwd": "/private/tmp/storymodel4s-workspace-m1-20260922",
+      "log": "/private/tmp/workspace-m1-evidence/g1/slice2-unicode-mutations/checksum-only-transcript-JVM.log",
+      "exit_code": 1,
+      "child_returncode": 1,
+      "reason": "exited",
+      "detail": null,
+      "timeout_seconds": 1800.0,
+      "log_bytes": 3052
+    },
+    "logSha256": "db273eb3b6622fe89a2df3f210a2e74ec7a604e6c64c2df49bfa961410cbc83d",
+    "totals": [
+      "[error] Failed: Total 19, Failed 1, Errors 0, Passed 18"
+    ],
+    "failures": [
+      "==> X storymodel4s.recall.RecallInventorySuite.distinct admitted UTF-16 transcripts never share inventory identity 0.012s munit.ComparisonFailException: recall/src/test/scala/storymodel4s/recall/RecallInventorySuite.scala:57 values are the same, expected 2 different values: storymodel4s.recall.SegmentationId@e913bae9 is equal to storymodel4s.recall.SegmentationId@e913bae9"
+    ],
+    "name": "checksum-only-transcript",
+    "platform": "JVM",
+    "sourceSha256": "62c406d2ca12dfcea08878b28442d4a8a93eacadef5f8b48ddaaad46f771a163",
+    "mutantSha256": "399f68fcc2971d5fc2a4d79b0af89d920908e47d8fd915258fcdbe809fe0eaae",
+    "command": [
+      "recallJVM/testOnly *RecallInventory*"
+    ],
+    "cleanCompileAndTest": false,
+    "expectedFailure": "distinct admitted UTF-16 transcripts never share",
+    "killed": true
+  }
+]

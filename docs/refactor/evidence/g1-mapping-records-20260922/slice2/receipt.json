@@ -1,0 +1,33 @@
+{
+  "schema": "storymodel4s.g1-slice-qualification/v1",
+  "slice": 2,
+  "initial": "e43dbafa",
+  "repair": "0f91fead",
+  "focused": {
+    "JVM": 19,
+    "JS": 19,
+    "Native": 19,
+    "failures": 0
+  },
+  "mutations": {
+    "distinct": 10,
+    "compiledRuns": 20,
+    "initialRuntimePlatform": "JVM",
+    "constructionPlatforms": [
+      "JVM",
+      "JS",
+      "Native"
+    ],
+    "constructionMutantAndControlClean": true,
+    "postRepair": "six behavior mutants rerun plus both Unicode guards; final 19-test control each backend"
+  },
+  "review": {
+    "reviewer": "m1_support_review",
+    "finding": "Distinct admitted surrogate IDs and transcripts collide under lossy legacy UTF-8 hashes.",
+    "executedReproduction": "11 JVM tests, 2 named identity failures, 9 controls passing",
+    "repair": "Lossless UTF-16 token rendering plus canonical transcript text in segmentation digest",
+    "followup": "No remaining finding in bounded repair; read-only review, no reviewer-run builds"
+  },
+  "archiveSha256": "240ae18b4d5ad9b737b2439ab35a5dd9108431df72394f6cbc72614a07e653e7",
+  "limits": "Inventory identifies caller-supplied parsing/unitization; no parser, decomposition detector, timing or inference authority. Existing clang-15 toolchain warning retained."
+}
