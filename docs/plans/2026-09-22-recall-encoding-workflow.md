@@ -787,3 +787,15 @@ this reader. Its [evidence](../refactor/evidence/recall-word-clock-join-20260922
 records 48 tests, 28 compiled mutation kills, both CLI clock examples and separate
 review repairs. This advances the independent timing/exchange validation target;
 the G2 timing, scanner, G1 and M1 completion boundaries remain unchanged.
+
+The portable timing slice on `solo/recall-timing-portable` follows G1's local
+landing (`2e98b6fe`; G1 closed). It adds checked clock-scoped observations in
+`recall`, contextual `recall-timing/v0.1` interchange in `codec`, and a
+[consumer guide](../recall-timing.md). The independent readers remain the oracle;
+they do not become a second production timing format. Timing observations account
+for every inventory word and distinguish missing/onset-only/interval and
+source-reported/estimated values. Onset diagnostics do not establish interval
+exposure. Qualification and the exact source revision are recorded in the timing
+evidence checkpoint. G2 timing remains open for producer intake, source-support
+integration and its downstream temporal contracts; scanner and StoryAtlas temporal
+acceptance remain separate.

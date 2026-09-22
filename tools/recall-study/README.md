@@ -233,3 +233,10 @@ the quantity it moves first.
 
 Development chooses everything. The untouched set is unsealed once, chooses nothing, and any
 outcome that changes a frozen choice contaminates it.
+
+The portable Scala counterpart is documented in [Exact recall timing](../../docs/recall-timing.md).
+`RecallTiming.checked` and `RecallTimingCodecs` bind complete word observations to
+an explicit clock and export exact rational seconds in a contextual sidecar.
+`check_recall_timing.py --artifacts DIRECTORY` compares its synthetic artifacts
+against the independent join and Python exact arithmetic; it is a qualification
+command, not the production CSV-to-mapping CLI.

@@ -226,3 +226,20 @@ class RecallTimingSuite extends FunSuite:
     )
     variants.foreach(c => assertNotEquals(c.digest, clock.digest))
   }
+
+  test("checked timing refuses malformed legacy rationals before comparison") {
+    val malformed = Vector((1L, 0L), (1L, -2L), (2L, 2L), (0L, 2L))
+      .map((n, d) => RecallTimingRationalForgery.make(n, d))
+    malformed.foreach { q =>
+      Vector(
+        Observation.OnsetOnly(q, reported),
+        Observation.Interval(q, time(10), reported),
+        Observation.Interval(time(-10), q, reported)
+      ).foreach { o =>
+        assertEquals(
+          checked(entries(observations.updated(0, o))),
+          Left(Refusal.InvalidRational(inventory.words.head.id))
+        )
+      }
+    }
+  }

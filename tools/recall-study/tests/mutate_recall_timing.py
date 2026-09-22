@@ -83,7 +83,8 @@ def main():
         mutated = source.replace(original, replacement).encode()
         try:
             path.write_bytes(mutated)
-            receipt, _ = run(name, [task], dict(file=filename,
+            tasks = ['recallJVM/Test/clean', task] if name == 'permit-package-forgery' else [task]
+            receipt, _ = run(name, tasks, dict(file=filename,
                 original_sha256=hashlib.sha256(before).hexdigest(),
                 mutant_sha256=hashlib.sha256(mutated).hexdigest()))
         finally:
