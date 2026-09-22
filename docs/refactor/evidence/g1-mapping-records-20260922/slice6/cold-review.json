@@ -1,0 +1,8 @@
+{
+  "reviewer": "m1_g1_plan_review",
+  "initial": "9c2bb5d0",
+  "finding": "DecodedTargetMass enum and DecisionCalibration.Unavailable case class exposed generated construction for standalone components. No corrupt UnitOutcome.computed path was found.",
+  "executedWitness": "New external and descendant probes:14 JVM tests,4failed10passed at the original source.",
+  "repair": "897f5cf6 nests bare-private cases under UnitOutcome with owner-only producers, read-only aliases and no calibrated door. Negative enclosing-constructor probes use typed placeholders to avoid incidental access failures.",
+  "followup": "No remaining findings at 897f5cf6; final d7144608 request-retention diff also reviewed with no findings. Read-only immutable-commit reviews; no reviewer builds."
+}

@@ -1,0 +1,377 @@
+[
+  {
+    "name": "decoded-argmax-conflation",
+    "platform": "JVM",
+    "sourceCommit": "897f5cf6",
+    "sourceSha256": "a1d37a5355108c289714da4f95bec9f65e722753b3fa0903a677351688b6f1cc",
+    "mutantSha256": "84dd814fa9146a8fc63c17a8465d24372a99429583a1558e9fcf8574168555c2",
+    "expectedFailures": [
+      "p3 keeps e7's value"
+    ],
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 22, Failed 2, Errors 0, Passed 20"
+    ],
+    "cleanCompileAndTest": false
+  },
+  {
+    "name": "outside-as-inside-zero",
+    "platform": "JVM",
+    "sourceCommit": "897f5cf6",
+    "sourceSha256": "a1d37a5355108c289714da4f95bec9f65e722753b3fa0903a677351688b6f1cc",
+    "mutantSha256": "d853f9f527358440b7a4885651c3b823c75f7de04e9c344e2c785f9e30d9ac49",
+    "expectedFailures": [
+      "fill is OutsideCandidateSupport"
+    ],
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 22, Failed 2, Errors 0, Passed 20"
+    ],
+    "cleanCompileAndTest": false
+  },
+  {
+    "name": "zero-as-outside",
+    "platform": "JVM",
+    "sourceCommit": "897f5cf6",
+    "sourceSha256": "a1d37a5355108c289714da4f95bec9f65e722753b3fa0903a677351688b6f1cc",
+    "mutantSha256": "0d6e83bc0ffc5428ca57b22e2784f2a09bc8ca7e0f7e0fff60da190083cc1cc1",
+    "expectedFailures": [
+      "in-support zero stays"
+    ],
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 22, Failed 1, Errors 0, Passed 21"
+    ],
+    "cleanCompileAndTest": false
+  },
+  {
+    "name": "link-union-as-basis",
+    "platform": "JVM",
+    "sourceCommit": "897f5cf6",
+    "sourceSha256": "a1d37a5355108c289714da4f95bec9f65e722753b3fa0903a677351688b6f1cc",
+    "mutantSha256": "8ffeadb537e55bb1bc3fbae12c811b95c8ddc4068fd21c3492b6ab49ec4ab324",
+    "expectedFailures": [
+      "listed fill target is still GapFill"
+    ],
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 22, Failed 1, Errors 0, Passed 21"
+    ],
+    "cleanCompileAndTest": false
+  },
+  {
+    "name": "agreeing-decode-as-argmax",
+    "platform": "JVM",
+    "sourceCommit": "897f5cf6",
+    "sourceSha256": "a1d37a5355108c289714da4f95bec9f65e722753b3fa0903a677351688b6f1cc",
+    "mutantSha256": "769da3d6dee5cd10087c000fb5ce1d5497b0e187f0182fde77bd50ab76614f4a",
+    "expectedFailures": [
+      "agreeing decode stays StructuredDecode"
+    ],
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 22, Failed 1, Errors 0, Passed 21"
+    ],
+    "cleanCompileAndTest": false
+  },
+  {
+    "name": "unranked-nonlocalizable",
+    "platform": "JVM",
+    "sourceCommit": "897f5cf6",
+    "sourceSha256": "a1d37a5355108c289714da4f95bec9f65e722753b3fa0903a677351688b6f1cc",
+    "mutantSha256": "46a3ea9e40597595856cb4e2167a76db047d31cec53586ebd83decf9db863b2b",
+    "expectedFailures": [
+      "unranked stays"
+    ],
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 22, Failed 1, Errors 0, Passed 21"
+    ],
+    "cleanCompileAndTest": false
+  },
+  {
+    "name": "insertion-order-ties",
+    "platform": "JVM",
+    "sourceCommit": "897f5cf6",
+    "sourceSha256": "a1d37a5355108c289714da4f95bec9f65e722753b3fa0903a677351688b6f1cc",
+    "mutantSha256": "b8550c89bbef4eda2bb64802c60ca88fae76ef195c9df4b10b0632f3851f3964",
+    "expectedFailures": [
+      "p7 tie by key, both kept"
+    ],
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 22, Failed 1, Errors 0, Passed 21"
+    ],
+    "cleanCompileAndTest": false
+  },
+  {
+    "name": "empty-basis-fallback",
+    "platform": "JVM",
+    "sourceCommit": "897f5cf6",
+    "sourceSha256": "a1d37a5355108c289714da4f95bec9f65e722753b3fa0903a677351688b6f1cc",
+    "mutantSha256": "9a85e0374dc7abb9e12c8d63d48b198df475b428fbe25de49dbe033ade0a3d49",
+    "expectedFailures": [
+      "empty basis is Abstention, NoDecision, Unranked"
+    ],
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 22, Failed 1, Errors 0, Passed 21"
+    ],
+    "cleanCompileAndTest": false
+  },
+  {
+    "name": "abstain-ignored",
+    "platform": "JVM",
+    "sourceCommit": "897f5cf6",
+    "sourceSha256": "a1d37a5355108c289714da4f95bec9f65e722753b3fa0903a677351688b6f1cc",
+    "mutantSha256": "f25d96586d07550470757dab9f62b9313c10ad361dcf79f4747fcba47fe56015",
+    "expectedFailures": [
+      "Abstain yields NoDecision, NotComputed"
+    ],
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 22, Failed 1, Errors 0, Passed 21"
+    ],
+    "cleanCompileAndTest": false
+  },
+  {
+    "name": "external-located",
+    "platform": "JVM",
+    "sourceCommit": "897f5cf6",
+    "sourceSha256": "a1d37a5355108c289714da4f95bec9f65e722753b3fa0903a677351688b6f1cc",
+    "mutantSha256": "807325b75c3f664f70b0c1c1ec5f33c908d742b1b769f5a2c3cdff71063e2a56",
+    "expectedFailures": [
+      "external choice Nonlocalizable"
+    ],
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 22, Failed 1, Errors 0, Passed 21"
+    ],
+    "cleanCompileAndTest": false
+  },
+  {
+    "name": "link-inventory-unchecked",
+    "platform": "JVM",
+    "sourceCommit": "897f5cf6",
+    "sourceSha256": "a1d37a5355108c289714da4f95bec9f65e722753b3fa0903a677351688b6f1cc",
+    "mutantSha256": "6003fcdc1df22bc2e0180627ce79947fd77fa3a7716a936bf433be587239636a",
+    "expectedFailures": [
+      "links equal measured alternatives"
+    ],
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 22, Failed 1, Errors 0, Passed 21"
+    ],
+    "cleanCompileAndTest": false
+  },
+  {
+    "name": "candidate-id-unchecked",
+    "platform": "JVM",
+    "sourceCommit": "897f5cf6",
+    "sourceSha256": "a1d37a5355108c289714da4f95bec9f65e722753b3fa0903a677351688b6f1cc",
+    "mutantSha256": "6975098d220b2bccaf293717539bff45bc2d798f2aa3d358d0e871f8ac340c67",
+    "expectedFailures": [
+      "forged candidate-set id refuses"
+    ],
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 22, Failed 1, Errors 0, Passed 21"
+    ],
+    "cleanCompileAndTest": false
+  },
+  {
+    "name": "raw-origin-unchecked",
+    "platform": "JVM",
+    "sourceCommit": "897f5cf6",
+    "sourceSha256": "a1d37a5355108c289714da4f95bec9f65e722753b3fa0903a677351688b6f1cc",
+    "mutantSha256": "b6860aad0368036d71a6da2f526b5c45fb7be604c6f2d9d556584ffd556b083e",
+    "expectedFailures": [
+      "unequal derived raw rows with identical candidate keys cannot move"
+    ],
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 22, Failed 1, Errors 0, Passed 21"
+    ],
+    "cleanCompileAndTest": false
+  },
+  {
+    "name": "posterior-origin-unchecked",
+    "platform": "JVM",
+    "sourceCommit": "897f5cf6",
+    "sourceSha256": "a1d37a5355108c289714da4f95bec9f65e722753b3fa0903a677351688b6f1cc",
+    "mutantSha256": "5ea0da18d44485bfa1860438cfbb6ae6c2a5370920b64ec5b49d9e4a2f87a1b6",
+    "expectedFailures": [
+      "unequal derived posterior rows with identical candidate keys cannot move"
+    ],
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 22, Failed 1, Errors 0, Passed 21"
+    ],
+    "cleanCompileAndTest": false
+  },
+  {
+    "name": "link-origin-unchecked",
+    "platform": "JVM",
+    "sourceCommit": "897f5cf6",
+    "sourceSha256": "a1d37a5355108c289714da4f95bec9f65e722753b3fa0903a677351688b6f1cc",
+    "mutantSha256": "dcd3f8703c7f8bf52d6caba7993a0dd9cdf5b1745a490e1d06486225dfea5041",
+    "expectedFailures": [
+      "derived links cannot move between units"
+    ],
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 22, Failed 1, Errors 0, Passed 21"
+    ],
+    "cleanCompileAndTest": false
+  },
+  {
+    "name": "lower-direction-reversed",
+    "platform": "JVM",
+    "sourceCommit": "897f5cf6",
+    "sourceSha256": "a1d37a5355108c289714da4f95bec9f65e722753b3fa0903a677351688b6f1cc",
+    "mutantSha256": "aa2f00b338b4374ef1b106f4e9c24864d945eb85f6ca34ed1ba937abd05b3a5c",
+    "expectedFailures": [
+      "raw direction is respected"
+    ],
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 22, Failed 1, Errors 0, Passed 21"
+    ],
+    "cleanCompileAndTest": false
+  },
+  {
+    "name": "abstention-policy-dropped",
+    "platform": "JVM",
+    "sourceCommit": "897f5cf6",
+    "sourceSha256": "a1d37a5355108c289714da4f95bec9f65e722753b3fa0903a677351688b6f1cc",
+    "mutantSha256": "ffc01929ca7fbae9c00a91f03ee9eb477c9d4bfbe8e1f30e3c45923dd0852fce",
+    "expectedFailures": [
+      "Abstain yields NoDecision, NotComputed"
+    ],
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 22, Failed 1, Errors 0, Passed 21"
+    ],
+    "cleanCompileAndTest": false
+  },
+  {
+    "name": "stage-refs-dropped",
+    "platform": "JVM",
+    "sourceCommit": "897f5cf6",
+    "sourceSha256": "a1d37a5355108c289714da4f95bec9f65e722753b3fa0903a677351688b6f1cc",
+    "mutantSha256": "c7356163e350f3eccb7e31a6036acf974316e925b3014953cdf6d65b88ac22be",
+    "expectedFailures": [
+      "Abstain yields NoDecision, NotComputed"
+    ],
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 22, Failed 1, Errors 0, Passed 21"
+    ],
+    "cleanCompileAndTest": false
+  },
+  {
+    "name": "link-stage-unchecked",
+    "platform": "JVM",
+    "sourceCommit": "897f5cf6",
+    "sourceSha256": "a1d37a5355108c289714da4f95bec9f65e722753b3fa0903a677351688b6f1cc",
+    "mutantSha256": "fa9b15b277c45a4f4227d3efff85aea8418f3158166b299f4d5bacf5915dea75",
+    "expectedFailures": [
+      "links retain the declared inference stage"
+    ],
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 22, Failed 1, Errors 0, Passed 21"
+    ],
+    "cleanCompileAndTest": false
+  },
+  {
+    "name": "empty-abstention-accepted",
+    "platform": "JVM",
+    "sourceCommit": "897f5cf6",
+    "sourceSha256": "a1d37a5355108c289714da4f95bec9f65e722753b3fa0903a677351688b6f1cc",
+    "mutantSha256": "15dd018f0c1cc2769ac366fa7ce401b1c094937d4ff545edaa9e87847de58bfe",
+    "expectedFailures": [
+      "empty abstention reason refuses"
+    ],
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 22, Failed 1, Errors 0, Passed 21"
+    ],
+    "cleanCompileAndTest": false
+  },
+  {
+    "name": "request-retention-dropped",
+    "platform": "JVM",
+    "sourceCommit": "d7144608",
+    "sourceSha256": "5da25683c451cd3adf8e98e8774dbe5af9a8b4c23d741582d9263536dce75864",
+    "mutantSha256": "0bfae0116a23aebe52c956116645ffff6ddb72f194d8e33c01b62309f966de12",
+    "expectedFailures": [
+      "the original decision request survives empty and nonempty rows for replay"
+    ],
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 23, Failed 1, Errors 0, Passed 22"
+    ],
+    "cleanCompileAndTest": false
+  },
+  {
+    "name": "package-construction-doors",
+    "platform": "JVM",
+    "sourceCommit": "d7144608",
+    "sourceSha256": "5da25683c451cd3adf8e98e8774dbe5af9a8b4c23d741582d9263536dce75864",
+    "mutantSha256": "ee01ed669971c33984b875b8c3b895af18beafce52eeba540e183502c67678c3",
+    "expectedFailures": [
+      "outcomes have no unchecked construction",
+      "decisions have no unchecked construction",
+      "calibrated decisions have no door",
+      "decision basis requires checked construction",
+      "decoded mass components have no caller construction",
+      "calibration status has no caller construction"
+    ],
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 14, Failed 6, Errors 0, Passed 8"
+    ],
+    "cleanCompileAndTest": true
+  },
+  {
+    "name": "package-construction-doors",
+    "platform": "JS",
+    "sourceCommit": "d7144608",
+    "sourceSha256": "5da25683c451cd3adf8e98e8774dbe5af9a8b4c23d741582d9263536dce75864",
+    "mutantSha256": "ee01ed669971c33984b875b8c3b895af18beafce52eeba540e183502c67678c3",
+    "expectedFailures": [
+      "outcomes have no unchecked construction",
+      "decisions have no unchecked construction",
+      "calibrated decisions have no door",
+      "decision basis requires checked construction",
+      "decoded mass components have no caller construction",
+      "calibration status has no caller construction"
+    ],
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 14, Failed 6, Errors 0, Passed 8"
+    ],
+    "cleanCompileAndTest": true
+  },
+  {
+    "name": "package-construction-doors",
+    "platform": "Native",
+    "sourceCommit": "d7144608",
+    "sourceSha256": "5da25683c451cd3adf8e98e8774dbe5af9a8b4c23d741582d9263536dce75864",
+    "mutantSha256": "ee01ed669971c33984b875b8c3b895af18beafce52eeba540e183502c67678c3",
+    "expectedFailures": [
+      "outcomes have no unchecked construction",
+      "decisions have no unchecked construction",
+      "calibrated decisions have no door",
+      "decision basis requires checked construction",
+      "decoded mass components have no caller construction",
+      "calibration status has no caller construction"
+    ],
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 14, Failed 6, Errors 0, Passed 8"
+    ],
+    "cleanCompileAndTest": true
+  }
+]

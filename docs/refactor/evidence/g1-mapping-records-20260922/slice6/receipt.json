@@ -1,0 +1,32 @@
+{
+  "schema": "storymodel4s.g1-slice-qualification/v1",
+  "slice": 6,
+  "initial": "9c2bb5d0",
+  "componentRepair": "897f5cf6",
+  "source": "d7144608",
+  "focused": {
+    "JVM": 37,
+    "JS": 37,
+    "Native": 37,
+    "failures": 0
+  },
+  "mutations": {
+    "distinct": 22,
+    "compiledRuns": 24,
+    "behavioral": 21,
+    "construction": "One compound package-visibility edit independently fails six named boundary probes on each backend. Clean Compile/Test outputs before each mutant and restored control.",
+    "sourceQualification": "Twenty original behavioral mutations ran at 897f5cf6. d7144608 adds only retained request data plus its replay test, probe arity and docs; the added retention mutant and construction court run at d7144608, with final 37-test restored controls on all backends.",
+    "driverReconstruction": "The original 20-case driver is reconstructed from the final driver by removing only the later request-retention mutation; run against 897f5cf6. Per-run source/mutant hashes and exact commands remain in the receipts."
+  },
+  "requestRetention": "Retain original typed request as well as policy/stage refs so empty ExternalDecode replays Unranked while explicit Abstain replays NotComputed. Neither invents a chosen destination.",
+  "review": {
+    "reviewer": "m1_g1_plan_review",
+    "initial": "9c2bb5d0",
+    "finding": "DecodedTargetMass enum and DecisionCalibration.Unavailable case class exposed generated construction for standalone components. No corrupt UnitOutcome.computed path was found.",
+    "executedWitness": "New external and descendant probes:14 JVM tests,4failed10passed at the original source.",
+    "repair": "897f5cf6 nests bare-private cases under UnitOutcome with owner-only producers, read-only aliases and no calibrated door. Negative enclosing-constructor probes use typed placeholders to avoid incidental access failures.",
+    "followup": "No remaining findings at 897f5cf6; final d7144608 request-retention diff also reviewed with no findings. Read-only immutable-commit reviews; no reviewer builds."
+  },
+  "archiveSha256": "718948ce68f857d4dd67b989224f8a68a8b8b1328d35a4132dc794c0b3ec451a",
+  "limits": "Local contract qualification only. No inference execution, calibrated probabilities, scientific efficacy or full G1/M1 acceptance claim. Existing clang-15 warning retained; isolated unchanged-pin sbt staging continues from slice 5."
+}
