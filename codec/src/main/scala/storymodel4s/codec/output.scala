@@ -618,22 +618,26 @@ object OutputCodecs:
   // has no BasisAuthority to admit. A decoder that silently dropped the tag would turn a refusable
   // claim into an unreadable one.
   given Encoder[ViewBasis] = Encoder.instance {
-    case ViewBasis.ValidatedBuild            => tagged("validated_build")
-    case ViewBasis.HumanAdjudicated          => tagged("human_adjudicated")
-    case ViewBasis.ResearcherReviewedFixture => tagged("researcher_reviewed_fixture")
-    case ViewBasis.DraftBuild                => tagged("draft_build")
-    case ViewBasis.AlignmentRun              => tagged("alignment_run")
-    case ViewBasis.SuppliedAlignmentArtifact => tagged("supplied_alignment_artifact")
+    case ViewBasis.ValidatedBuild                         => tagged("validated_build")
+    case ViewBasis.HumanAdjudicated                       => tagged("human_adjudicated")
+    case ViewBasis.ResearcherReviewedFixture              => tagged("researcher_reviewed_fixture")
+    case ViewBasis.DraftBuild                             => tagged("draft_build")
+    case ViewBasis.AlignmentRun                           => tagged("alignment_run")
+    case ViewBasis.SuppliedAlignmentArtifact              => tagged("supplied_alignment_artifact")
+    case ViewBasis.SuppliedAlignmentSyntheticPresentation =>
+      tagged("supplied_alignment_synthetic_presentation")
   }
   given Decoder[ViewBasis] = Decoder.instance { c =>
     field[String](c, "status").flatMap {
-      case "validated_build"             => Right(ViewBasis.ValidatedBuild)
-      case "human_adjudicated"           => Right(ViewBasis.HumanAdjudicated)
-      case "researcher_reviewed_fixture" => Right(ViewBasis.ResearcherReviewedFixture)
-      case "draft_build"                 => Right(ViewBasis.DraftBuild)
-      case "alignment_run"               => Right(ViewBasis.AlignmentRun)
-      case "supplied_alignment_artifact" => Right(ViewBasis.SuppliedAlignmentArtifact)
-      case other                         => unknown(c, "ViewBasis", other)
+      case "validated_build"                           => Right(ViewBasis.ValidatedBuild)
+      case "human_adjudicated"                         => Right(ViewBasis.HumanAdjudicated)
+      case "researcher_reviewed_fixture"               => Right(ViewBasis.ResearcherReviewedFixture)
+      case "draft_build"                               => Right(ViewBasis.DraftBuild)
+      case "alignment_run"                             => Right(ViewBasis.AlignmentRun)
+      case "supplied_alignment_artifact"               => Right(ViewBasis.SuppliedAlignmentArtifact)
+      case "supplied_alignment_synthetic_presentation" =>
+        Right(ViewBasis.SuppliedAlignmentSyntheticPresentation)
+      case other => unknown(c, "ViewBasis", other)
     }
   }
 

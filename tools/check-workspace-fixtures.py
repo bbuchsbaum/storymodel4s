@@ -15,26 +15,8 @@ import sys
 from pathlib import Path
 
 
-EXPECTED = {
-    "bell": {
-        "first": "sit:bell:sit:ring",
-        "second": "sit:bell:sit:quiet",
-        "recall": ["A bell rang.", "It rang again."],
-        "source": {
-            "sit:bell:sit:ring": ["A bell rang.", "The bell rang again."],
-            "sit:bell:sit:quiet": ["The clock remained silent."],
-        },
-    },
-    "wog": {
-        "first": "sit:wog:sit:hunt-seals",
-        "second": "sit:wog:sit:hear-war-cries",
-        "recall": ["Two men hunted.", "They heard cries."],
-        "source": {
-            "sit:wog:sit:hunt-seals": ["One night two young men went to hunt seals."],
-            "sit:wog:sit:hear-war-cries": ["While they were paddling they heard war-cries."],
-        },
-    },
-}
+EXPECTED = json.loads((Path(__file__).resolve().parents[1] /
+    "fixtures/workspace/expected-answers.json").read_text())["fixtures"]
 checks = 0
 
 
@@ -73,9 +55,9 @@ def verify(directory, revision):
     checks = 0
     index = json.loads((directory / "index.json").read_bytes())
     check(index["producerRevision"] == revision, "exact producer revision")
-    check(len(index["artifacts"]) == 18, "18 fixture artifacts")
+    check(len(index["artifacts"]) == 21, "21 fixture artifacts")
     names = [entry["path"] for entry in index["artifacts"]]
-    check(len(set(names)) == 18, "unique artifact paths")
+    check(len(set(names)) == 21, "unique artifact paths")
     for entry in index["artifacts"]:
         check(Path(entry["path"]).name == entry["path"], "local artifact basename")
         content = (directory / entry["path"]).read_bytes()
@@ -88,7 +70,12 @@ def verify(directory, revision):
         check(archive["schemaVersion"] == "workspace-archive/v0.1", "archive schema")
         files = {entry["path"]: entry["utf8"].encode("utf-8") for entry in archive["files"]}
         members = {}
+        member_digests = {}
         for entry in archive["entries"]:
+            if entry["disposition"]["status"] == "Absent":
+                check(name == "wog" and entry["role"]["kind"] == "PresentationClocks", "only declared missing fixture clock")
+                check(entry["path"] not in files, "absent clock has no payload")
+                continue
             check(entry["disposition"]["status"] == "Supplied", "fixture member supplied")
             metadata = entry["disposition"]["artifact"]
             content = files[entry["path"]]
@@ -97,6 +84,7 @@ def verify(directory, revision):
             role = entry["role"]
             key = role.get("id", role["kind"])
             members[key] = json.loads(content)
+            member_digests[key] = metadata["checksum"]
         check(members["Receipt"]["producerRevision"] == revision, "member producer revision")
         check(members["Receipt"]["origin"] == "AuthoredFixture", "fixture authority")
         check(members["Capabilities"]["inspection"] == "Granted", "inspection declaration")
@@ -114,6 +102,40 @@ def verify(directory, revision):
         for outcome in historical["outcomes"]:
             posterior = [number(v["raw_value"]) for v in outcome["mapping_links"] if v["measure_kind"] == "ModelPosterior"]
             check(bool(posterior) and abs(sum(posterior) - 1.0) <= 1e-9, "executed posterior row")
+        projection = json.loads((directory / f"{name}-voyage-projection.json").read_bytes())
+        check(projection["workspace_sha256"] == digest(archive_bytes), "projection bound to archive")
+        check(projection["policy"] == "historical-lexical", "projection policy")
+        check(projection["mapping_digest"] == historical["record_digest"], "projection mapping digest")
+        check([r["unit"] for r in projection["units"]] == expected["units"], "projection complete unit inventory")
+        check([r["ordinal"] for r in projection["units"]] == list(range(4)), "projection original ordinals")
+        check([r["disposition"] for r in projection["units"]] == expected["voyage"], "literal projection dispositions")
+        if name == "bell":
+            presentation = members["PresentationClocks"]
+            check(presentation["presentation_kind"] == "Synthetic", "synthetic clock declaration")
+            check(presentation["model_artifact"] == member_digests["SourceModel"], "clock model binding")
+            check(presentation["recall_artifact"] == member_digests["Recall"], "clock recall binding")
+            check(presentation["inventory_digest"] == members["Inventory"]["digest"], "clock inventory binding")
+            check(presentation["recording_correspondence"] == "unestablished", "no recording authority")
+            timing = presentation["word_timing"]
+            check(timing["clock"]["origin"]["reference"] == presentation["recall_origin"]["reference"], "clock origin reference binding")
+            check(presentation["recall_origin"]["status"] == "declared-recall-start", "recall-start declaration")
+            measured = [e for e in timing["entries"] if e["observation"]["status"] != "missing"]
+            check(len(measured) == 2, "exactly two independent word observations")
+            check([e["observation"]["seconds"] for e in measured] == [
+                {"numerator": "5", "denominator": "2"}, {"numerator": "4", "denominator": "1"}], "literal exact word coordinates")
+            check(all(e["observation"]["basis"]["status"] == "estimated" for e in measured), "synthetic word estimates")
+            voyage = json.loads((directory / "bell.voyage.json").read_bytes())
+            check(voyage["provenance"]["basis"]["status"] == "supplied_alignment_synthetic_presentation", "visible synthetic voyage provenance")
+            check(len(voyage["timeline"]["nodes"]) == expected["target_count"], "complete Voyage denominator")
+            check([u["ordinal"] for u in voyage["units"]] == list(range(4)), "Voyage ordinals")
+            for row, outcome in zip(voyage["rows"], historical["outcomes"]):
+                check(row["unit"] == outcome["unit"], "posterior row identity")
+                values = {json.dumps(v["state"]["value"], sort_keys=True): v["raw_value"] for v in outcome["mapping_links"] if v["measure_kind"] == "ModelPosterior"}
+                actual = {json.dumps(v["state"], sort_keys=True): v["mass"] for v in row["mass"]}
+                check(actual == values, "Voyage preserves original posterior bits")
+        else:
+            check("PresentationClocks" not in members, "untimed packet remains without word clocks")
+            check(not (directory / "wog.voyage.json").exists(), "untimed packet has no invented clock document")
         model = members["SourceModel"]
         recall = members["Recall"]
         if name == "bell":
@@ -135,6 +157,10 @@ def verify(directory, revision):
             record = members[policy]
             check(data["original_record_digest"] == receipt["original_record_digest"] == record["record_digest"], "original record binding")
             check(data["outcomes"] == record["outcomes"][:1], "unchanged original outcome")
+            if name == "bell":
+                check(data["presentation_clocks"] == {"status": "supplied", "value": members["PresentationClocks"]}, "export retains exact independent clocks")
+            else:
+                check(data["presentation_clocks"] == {"status": "absent"}, "export retains missing clocks")
             check([row["unit"] for row in record["outcomes"]] == [f"m1:u{i}" for i in range(4)], "unique complete outcome inventory")
             check(record["outcomes"][-1]["processing_status"]["status"] == "failed", "failed row retained")
             check(record["outcomes"][2]["localization_status"] == "Nonlocalizable", "all-external row retained")
@@ -143,8 +169,8 @@ def verify(directory, revision):
             keys = [(v["destination"], v["measure_kind"]) for v in links]
             check(len(keys) == len(set(keys)) == 6, "unique six fixture measure rows")
             values = {(v["destination"], v["measure_kind"]): number(v["raw_value"]) for v in links}
-            raw = (0.9, 0.4, 0.2) if policy == "authored-a" else (0.1, 0.8, 0.1)
-            mass = (0.25, 0.25, 0.5) if policy == "authored-a" else (0.1, 0.6, 0.3)
+            raw = expected["raw_a" if policy == "authored-a" else "raw_b"]
+            mass = expected["mass_a" if policy == "authored-a" else "mass_b"]
             for destination, r, m in zip((expected["first"], expected["second"], "ext:Intrusion"), raw, mass):
                 check(values[(destination, "RawScore")] == r, "literal authored raw answer")
                 check(values[(destination, "NormalizedScoreMass")] == m, "literal unrenormalized mass answer")
@@ -157,6 +183,7 @@ def verify(directory, revision):
             csv_keys = [(r["destination"], r["measure"], r["channel"], r["state"]) for r in rows]
             check(len(csv_keys) == len(set(csv_keys)), "unique CSV measure coordinates")
             targets = record["policies"]["target_universe_id"]["targets"]
+            check(len(targets) == expected["target_count"], "literal target inventory size")
             # Two source targets + Intrusion have two measures; Association and each other
             # fixed-cut target have one explicit absence. Externals are the whole-policy union.
             check(len(rows) == len(targets) + 5, "exact fixed-cut CSV row count")
@@ -178,7 +205,7 @@ def verify(directory, revision):
             check(f"Policy: {policy}" in text, "accessible policy label")
             check("This note is outside the selected evidence." not in text, "no recall hull in accessible export")
             check(all(piece in text for piece in expected["recall"]), "accessible exact recall")
-    return {"status": "passed", "checks": checks, "producerRevision": revision, "fixtures": ["wog", "bell"], "artifacts": 18}
+    return {"status": "passed", "checks": checks, "producerRevision": revision, "fixtures": ["wog", "bell"], "artifacts": 21}
 
 
 if __name__ == "__main__":

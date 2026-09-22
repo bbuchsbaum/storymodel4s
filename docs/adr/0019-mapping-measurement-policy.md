@@ -305,3 +305,23 @@ Reject changing mapping-record/v0.1, accepting a digest as its own inventory pro
 or letting unknown/null/duplicate fields disappear. Reuse the proven mapping JSON
 printer and duplicate-key scan without changing legacy codecs. Interval union,
 queries and scan transformations remain separate work. No new dependency or module.
+
+M1 legacy projection decision (2026-09-22): `WorkspaceVoyage` adapts only supplied
+model-posterior decisions whose declared argmax agrees with the legacy source
+argmax. Every inventory unit retains a `UnitDisposition`; incompatible decisions,
+failed rows, and unsupported clocks stay in the common matrix and inspector.
+The complete fixed-cut timeline is retained even when a row cannot project.
+`WorkspaceClockOrigin.RecallStart` explicitly binds a supplied clock origin
+reference; unestablished and arbitrary origins remain lawful workspace data but
+do not license the recall-clock axis. `WorkspaceClockKind` distinguishes synthetic
+presentation from other declarations. The emitted document visibly declares
+synthetic clocks through `ViewBasis.SuppliedAlignmentSyntheticPresentation`, or
+uses `SuppliedAlignmentArtifact` for other declared presentation; neither has an
+admitted scientific-authority construction path. Configuration provenance binds
+the original mapping and clock payload. Rejected: promoting unknown historical
+execution to an alignment-run receipt, translating arbitrary decode semantics,
+substituting the first available word for a missing first member, rounding exact
+timestamps, deriving word onset from unit annotations, and calling interval end
+the last word onset. The Bell profile deliberately uses a higher external cost
+to exercise actual source-winning posterior rows; this is a synthetic fixture
+control and establishes no scientific efficacy.

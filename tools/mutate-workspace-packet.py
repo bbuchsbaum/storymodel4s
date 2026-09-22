@@ -30,7 +30,21 @@ join = "codec/src/main/scala/storymodel4s/codec/workspacejoin.scala"
 manifest_task = "viewJVM/testOnly *WorkspaceManifestSuite"
 matrix_task = "codecJVM/testOnly *WorkspaceMatrixSuite"
 join_task = "fixturesJVM/testOnly *WorkspaceJoinSuite *WorkspaceFixtureSuite"
+voyage = "codec/src/main/scala/storymodel4s/codec/workspacevoyage.scala"
+voyage_task = "fixturesJVM/testOnly *WorkspaceVoyageSuite *WorkspaceClockSuite"
 mutants = [
+    ("undeclared-recall-origin", voyage,
+     "if clocks.origin == WorkspaceClockOrigin.Unestablished =>",
+     "if clocks.origin == WorkspaceClockOrigin.Unestablished && false =>",
+     voyage_task, "identical observations require an explicit bound recall-start declaration"),
+    ("drop-source-mark-bridge", voyage,
+     "anchor.flatMap(workspace.sourceAddress)",
+     "anchor.flatMap(_ => Option.empty[Address])",
+     voyage_task, "actual mark addresses bridge source and recall selection without phantom cells"),
+    ("round-word-clock", "codec/src/main/scala/storymodel4s/codec/workspaceclocks.scala",
+     "n * BigInt(value.denominator) == BigInt(value.numerator) * d",
+     "n * BigInt(value.denominator) == BigInt(value.numerator) * d || value.numerator >= 0",
+     voyage_task, "exact decimal and negative onsets remain in workspace while their projection is unavailable"),
     ("skip-byte-digest", manifest,
      "ref.checksum != Checksum.ofBytes(files(path).toArray)",
      "ref.checksum != Checksum.ofBytes(files(path).toArray) && false",
@@ -93,8 +107,9 @@ def save(receipt):
 
 
 def control(name):
-    receipt = run(name, [manifest_task, matrix_task, join_task])
-    receipt["passed"] = receipt["exit"] == 0 and len(receipt["totals"]) == 3 and all(
+    tasks = [manifest_task, matrix_task, join_task, voyage_task]
+    receipt = run(name, tasks)
+    receipt["passed"] = receipt["exit"] == 0 and len(receipt["totals"]) == len(tasks) and all(
         total == passed and total > 0 and failed == errors == 0
         for total, failed, errors, passed in receipt["totals"])
     save(receipt)

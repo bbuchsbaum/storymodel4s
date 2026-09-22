@@ -10,6 +10,13 @@ import storymodel4s.view.*
 import CanonicalPrimitives.given
 import VoyageCodecs.given
 
+enum WorkspaceClockOrigin:
+  case Unestablished
+  case RecallStart(reference: Checksum)
+
+enum WorkspaceClockKind:
+  case DeclaredPresentation, Synthetic
+
 /** Unchecked packaging input. Word observations are independent of WorkspaceTiming annotations. The
   * source timeline is a declared presentation, not a film/media correspondence certificate.
   */
@@ -17,7 +24,9 @@ final case class WorkspaceClockInput(
     words: RecallTiming,
     sourceTimeline: SourceTimeline,
     recallExtent: Seconds,
-    declaration: Checksum
+    declaration: Checksum,
+    origin: WorkspaceClockOrigin = WorkspaceClockOrigin.Unestablished,
+    kind: WorkspaceClockKind = WorkspaceClockKind.DeclaredPresentation
 )
 
 /** Optional clock-sidecar admission. Its complete fixed source dictionary never depends on which
@@ -31,6 +40,8 @@ object WorkspaceClocksCodec:
       val sourceTimeline: SourceTimeline,
       val recallExtent: Seconds,
       val declaration: Checksum,
+      val origin: WorkspaceClockOrigin,
+      val kind: WorkspaceClockKind,
       val json: Json
   )
 
@@ -55,6 +66,11 @@ object WorkspaceClocksCodec:
     "source_semantics" -> str("declared-presentation/closed-seconds/v1"),
     "recording_correspondence" -> str("unestablished"),
     "declaration" -> input.declaration.asJson,
+    "presentation_kind" -> str(input.kind.toString),
+    "recall_origin" -> (input.origin match
+      case WorkspaceClockOrigin.Unestablished          => Json.obj("status" -> str("unestablished"))
+      case WorkspaceClockOrigin.RecallStart(reference) =>
+        Json.obj("status" -> str("declared-recall-start"), "reference" -> reference.asJson)),
     "word_timing" -> RecallTimingCodecs.toJson(input.words),
     "source_timeline" -> input.sourceTimeline.asJson,
     "recall_extent" -> input.recallExtent.asJson
@@ -78,6 +94,26 @@ object WorkspaceClocksCodec:
       timeline <- field[SourceTimeline](json, "source_timeline")
       extent <- field[Seconds](json, "recall_extent")
       declaration <- field[Checksum](json, "declaration")
+      kindName <- field[String](json, "presentation_kind")
+      kind <- WorkspaceClockKind.values
+        .find(_.toString == kindName)
+        .toRight(WorkspaceRefusal.UnsupportedContent)
+      originJson <- field[Json](json, "recall_origin")
+      originStatus <- field[String](originJson, "status")
+      origin <- originStatus match
+        case "unestablished"         => Right(WorkspaceClockOrigin.Unestablished)
+        case "declared-recall-start" =>
+          field[Checksum](originJson, "reference").map(WorkspaceClockOrigin.RecallStart.apply)
+        case _ => Left(WorkspaceRefusal.UnsupportedContent)
+      _ <- Either.cond(
+        origin match
+          case WorkspaceClockOrigin.Unestablished          => true
+          case WorkspaceClockOrigin.RecallStart(reference) =>
+            words.clock.origin == RecallTiming.Origin.Declared(reference)
+        ,
+        (),
+        WorkspaceRefusal.SemanticJoinMismatch
+      )
       _ <- Either.cond(
         timeline.groups.isEmpty && timeline.nodes.forall(n =>
           n.group.isEmpty &&
@@ -100,7 +136,7 @@ object WorkspaceClocksCodec:
         WorkspaceRefusal.SemanticJoinMismatch
       )
       expected = toJson(
-        WorkspaceClockInput(words, timeline, extent, declaration),
+        WorkspaceClockInput(words, timeline, extent, declaration, origin, kind),
         model,
         recall,
         inventory,
@@ -111,7 +147,7 @@ object WorkspaceClocksCodec:
         (),
         WorkspaceRefusal.SemanticJoinMismatch
       )
-    yield new Checked(words, timeline, extent, declaration, expected)
+    yield new Checked(words, timeline, extent, declaration, origin, kind, expected)
 
   /** Exact rational represented by a finite nonnegative binary double. */
   private def binary(value: Double): (BigInt, BigInt) =

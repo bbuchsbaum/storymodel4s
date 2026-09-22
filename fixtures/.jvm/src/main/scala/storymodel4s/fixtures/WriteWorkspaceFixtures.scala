@@ -38,7 +38,36 @@ import storymodel4s.view.ArtifactId
         write(prefix + ".receipt.json", payload.receiptJson)
       )
     }
-    write(name + ".workspace.json", archive) +: exports
+    val voyage =
+      WorkspaceVoyage.from(workspace, ArtifactId.unsafe("historical-lexical")).toOption.get
+    val projection = Json.obj(
+      "schemaVersion" -> Json.fromString("workspace-fixture-voyage/v0.1"),
+      "workspace_sha256" -> Json.fromString(Checksum.ofText(archive).hex),
+      "policy" -> Json.fromString(voyage.policy.value),
+      "mapping_digest" -> Json.fromString(voyage.mappingDigest.hex),
+      "units" -> Json.fromValues(
+        voyage.units.map(u =>
+          Json.obj(
+            "unit" -> Json.fromString(u.unit.value),
+            "ordinal" -> Json.fromInt(u.ordinal),
+            "disposition" -> Json.fromString(u.disposition.toString)
+          )
+        )
+      ),
+      "addresses" -> Json.fromValues(voyage.addresses.toVector.sortBy(_._1.render).map {
+        (legacy, qualified) =>
+          Json.obj(
+            "legacy" -> Json.fromString(legacy.render),
+            "qualified" -> Json
+              .fromValues(qualified.toVector.map(_.render).sorted.map(Json.fromString))
+          )
+      })
+    )
+    Vector(
+      write(name + ".workspace.json", archive),
+      write(name + "-voyage-projection.json", projection.spaces2 + "\n")
+    ) ++ exports ++
+      voyage.document.toVector.map(d => write(name + ".voyage.json", VoyageCodecs.encode(d)))
   }
   val index = Json.obj(
     "schemaVersion" -> Json.fromString("workspace-fixture-index/v0.1"),

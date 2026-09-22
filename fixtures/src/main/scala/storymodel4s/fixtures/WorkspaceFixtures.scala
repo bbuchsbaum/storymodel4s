@@ -138,7 +138,8 @@ object WorkspaceFixtures:
       second: SourceNodeRef,
       partial: Boolean,
       revision: String,
-      includeHistorical: Boolean
+      includeHistorical: Boolean,
+      timed: Boolean
   ): SourceRecallWorkspace =
     val validation = StoryValidator.validate(draft)
     val validated =
@@ -253,7 +254,12 @@ object WorkspaceFixtures:
             recall,
             view,
             Candidates.of(recall.ordered.map(u => u.id -> Vector(first, second)).toMap),
-            DefaultLocalCostModel(semantic = SemanticDistance.lexicalJaccard)
+            // Deliberately synthetic profile: obtain source winners for the timed adapter court.
+            // This is fixture design, not evidence for a scientifically preferred estimator.
+            DefaultLocalCostModel(
+              semantic = SemanticDistance.lexicalJaccard,
+              externalFloor = if timed then 4.0 else 1.0
+            )
           )
         )
         Vector(
@@ -287,6 +293,67 @@ object WorkspaceFixtures:
       recall.ordered(2).id -> WorkspaceTiming.Interval(checked(ClockSpan.of(4.0, 5.0))),
       recall.ordered(3).id -> WorkspaceTiming.Untimed
     )
+    val presentation = Option.when(timed) {
+      val origin = Checksum.ofText("synthetic-bell-recall-start-zero/v1")
+      val declaration = Checksum.ofText("synthetic-bell-independent-word-and-source-clocks/v1")
+      val clock = RecallTiming.Clock.declared(
+        declaration,
+        RecallTiming.ClockKey.unsafe("scripted-word-onsets"),
+        declaration,
+        RecallTiming.RecordingIdentity.Unestablished,
+        RecallTiming.Origin.Declared(origin)
+      )
+      val supplied = Map(
+        inventory.units(1).words.head -> checked(ExactRational.of(5, 2)),
+        inventory.units(2).words.head -> checked(ExactRational.of(4, 1))
+      )
+      val words = checked(
+        RecallTiming.checked(
+          inventory,
+          clock,
+          inventory.words.map(w =>
+            RecallTiming.Entry(
+              w.id,
+              clock,
+              supplied
+                .get(w.id)
+                .fold[RecallTiming.Observation](
+                  RecallTiming.Observation.Missing(RecallTiming.MissingReason.NotProvided)
+                )(at =>
+                  RecallTiming.Observation.OnsetOnly(at, RecallTiming.Basis.Estimated(declaration))
+                )
+            )
+          ),
+          RecallTiming.Provenance(declaration, RecallTiming.RecordingLink.NotEstablished)
+        )
+      )
+      val timeline = checked(
+        SourceTimeline.of(
+          source.targets.map { target =>
+            val (start, end) =
+              if target.ref == first then (5.0, 25.0)
+              else if target.ref == second then (10.0, 12.0)
+              else (0.0, 30.0)
+            SourceTimelineNode(
+              target.ref,
+              target.level,
+              None,
+              checked(ClockSpan.of(start, end)),
+              "Synthetic presentation: " + target.ref.key
+            )
+          },
+          Vector.empty
+        )
+      )
+      WorkspaceClockInput(
+        words,
+        timeline,
+        checked(Seconds.of(10)),
+        declaration,
+        WorkspaceClockOrigin.RecallStart(origin),
+        WorkspaceClockKind.Synthetic
+      )
+    }
     checked(
       WorkspaceCodecs.create(
         draft,
@@ -298,7 +365,8 @@ object WorkspaceFixtures:
         WorkspaceOrigin.AuthoredFixture,
         revision,
         WorkspaceContentGrant.Granted,
-        WorkspaceContentGrant.Granted
+        WorkspaceContentGrant.Granted,
+        presentation
       )
     )
 
@@ -315,7 +383,8 @@ object WorkspaceFixtures:
         SourceNodeRef.Situation(WarOfTheGhostsModel.S.hearWarCries),
         false,
         producerRevision,
-        includeHistorical
+        includeHistorical,
+        false
       ),
       "bell" -> build(
         bellModel,
@@ -324,6 +393,7 @@ object WorkspaceFixtures:
         SourceNodeRef.Situation(clockId),
         true,
         producerRevision,
-        includeHistorical
+        includeHistorical,
+        true
       )
     )
