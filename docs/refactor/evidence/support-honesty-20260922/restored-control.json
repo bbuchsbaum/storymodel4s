@@ -1,0 +1,33 @@
+{
+  "metadata": {
+    "schema_version": 1,
+    "started_utc": "2026-09-22T13:21:26.256240+00:00",
+    "finished_utc": "2026-09-22T13:21:48.348495+00:00",
+    "duration_seconds": 22.091933,
+    "command": [
+      "sbt",
+      "-batch",
+      "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-m1-grakern-20260922",
+      "alignJVM/Compile/clean",
+      "alignJVM/Test/clean",
+      "alignJVM/testOnly storymodel4s.align.SupportAssessmentSuite storymodel4s.align.SupportProducerBoundarySuite",
+      "alignJVM/testOnly storymodel4s.probes.SupportAssessmentUnforgeableSuite storymodel4s.align.attack.SupportPackageAttack"
+    ],
+    "cwd": "/private/tmp/storymodel4s-workspace-m1-20260922",
+    "log": "/private/tmp/workspace-m1-evidence/support/mutations/restored-control.log",
+    "exit_code": 0,
+    "child_returncode": 0,
+    "reason": "exited",
+    "detail": null,
+    "timeout_seconds": 900.0,
+    "log_bytes": 2547
+  },
+  "logSha256": "de17b09c059a43d32a1ca5e97aa8e601c1df1360d9c6741b833c7ffceeefc3dd",
+  "totals": [
+    "[info] Passed: Total 22, Failed 0, Errors 0, Passed 22",
+    "[info] Passed: Total 4, Failed 0, Errors 0, Passed 4"
+  ],
+  "failures": [],
+  "sourceSha256": "da834be7198ca0a3316757adb750e126cb863aa3a311dbea22f51848fc06bcfb",
+  "cleanCompileAndTest": true
+}

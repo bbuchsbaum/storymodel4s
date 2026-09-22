@@ -274,8 +274,8 @@ nonnegative, with a representable sum) is per cell and inspectable. Shares and
 reasons are derived from it (sums in `CostTerm` order), never supplied by a
 caller or the wire. A producer's basis takes eligibility as declared and never
 widens it to what was measured, so an empty or zero-weight declaration cannot
-assess, and a producer that prices a term it declared ineligible fails the
-checked rebuild instead of being hidden. `AlignWire.costBreakdown` binds support
+assess, and a producer that prices a term it declared ineligible fails checked
+construction instead of being hidden. `AlignWire.costBreakdown` binds support
 to its record: a ranked source record's measured terms are exactly its priced
 terms minus imputed ones, every priced term is eligible, and its share is
 positive (or it is `Unestablished`); an external record carries
@@ -287,9 +287,8 @@ is in the view). `CostBreakdown`, the three variants and `CellSupportBasis` are
 non-case classes with bare-private constructors: no `apply`, `copy`,
 `fromProduct` or `Mirror` from any package. The companion's `align`-internal
 producers remain reachable from `storymodel4s.align` subpackages; none accepts a
-support value (each derives it), but they do not re-run the record checks, so
-an in-memory record built there can carry, for example, a non-finite term that
-the wire would refuse — the same trust boundary as before, narrowed.
+support value (each derives it), and both run the record checks before returning
+a value. Package visibility cannot bypass the checked construction boundary.
 This change moves no number: totals (including `scaleToEligible`'s factor-1
 branches) are unchanged, and on the WOG goldens of every backend each assessed
 share equals the old `supportWeight` bit for bit (the share is now summed in
@@ -585,8 +584,10 @@ fixture. Details in the spike spec.
 The M1 integration review (2026-09-22) found that the package-visible `derived`
 and `external` cost producers could bypass the record checks. Both now return
 checked `Either` values. The default model treats a failed internally derived
-record as an invariant violation; its public `LocalCostModel` signature is
-unchanged. GraphHsmm sequences checked external records before arithmetic and
+record as an invariant violation; invalid public configuration such as a NaN
+function prior can therefore throw before returning a record. Its public
+`LocalCostModel` signature is unchanged. GraphHsmm sequences checked external
+records before arithmetic and
 returns a typed refusal for a nonfinite or negative custom external cost, in
 both gated and ablation paths. Zero assessed support still avoids evaluating
 the excluded total. Rejected: validating only at serialization or result

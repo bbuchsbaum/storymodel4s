@@ -1,0 +1,14 @@
+{
+  "reviewer": "m1_support_review",
+  "initialRevision": "72b44c3b1419b053a4581dd6d3113981d5c015a7",
+  "repairRevision": "5865ad1be12210076423606b0e38cb1ab05cf5fb",
+  "initialFinding": "Package-visible derived/external factories directly constructed incoherent records that HsmmResult.validated accepted. Reproduced: two tests failed before repair.",
+  "repair": "Both factories return checked Either; default model preserves its signature; GraphHsmm sequences external checks before probability arithmetic in both paths.",
+  "coldReviewDisposition": "construction blocker resolved; arithmetic body unchanged by whitespace-insensitive diff; original ADR paragraph corrected",
+  "limits": [
+    "Reviewer ran no builds; executed court evidence is separate.",
+    "Invalid default-model public configuration such as NaN function prior throws before returning a malformed record.",
+    "No authentication of model execution; support weights and eligibility remain declared per-cell accounting.",
+    "WOG golden parity covers named cases, not universal numerical equivalence."
+  ]
+}

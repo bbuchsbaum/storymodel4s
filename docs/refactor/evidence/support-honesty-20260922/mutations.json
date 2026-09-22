@@ -1,0 +1,248 @@
+[
+  {
+    "metadata": {
+      "schema_version": 1,
+      "started_utc": "2026-09-22T13:19:59.047923+00:00",
+      "finished_utc": "2026-09-22T13:20:12.364464+00:00",
+      "duration_seconds": 13.316318,
+      "command": [
+        "sbt",
+        "-batch",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-m1-grakern-20260922",
+        "alignJVM/testOnly storymodel4s.align.SupportAssessmentSuite storymodel4s.align.SupportProducerBoundarySuite"
+      ],
+      "cwd": "/private/tmp/storymodel4s-workspace-m1-20260922",
+      "log": "/private/tmp/workspace-m1-evidence/support/mutations/empty-full-support.log",
+      "exit_code": 1,
+      "child_returncode": 1,
+      "reason": "exited",
+      "detail": null,
+      "timeout_seconds": 900.0,
+      "log_bytes": 3651
+    },
+    "logSha256": "5fdeefd4a98a1a9d30429523b4e0b5b7e3d22cc90c2d3bd898670dd36d3a5149",
+    "totals": [
+      "[error] Failed: Total 22, Failed 1, Errors 0, Passed 21"
+    ],
+    "failures": [
+      "==> X storymodel4s.align.SupportAssessmentSuite.an empty eligible population is Unestablished, never fully supported 0.009s munit.FailException: align/src/test/scala/storymodel4s/align/SupportAssessmentSuite.scala:32 expected Unestablished, got Assessed(1.0, CellSupportBasis(measured={}, eligibleWeights={}))"
+    ],
+    "name": "empty-full-support",
+    "sourceSha256": "da834be7198ca0a3316757adb750e126cb863aa3a311dbea22f51848fc06bcfb",
+    "mutantSha256": "9a7f341b0482360a122c76f8a69be9d735c579e0780b151ec499ea3e9e1673bd",
+    "command": [
+      "alignJVM/testOnly storymodel4s.align.SupportAssessmentSuite storymodel4s.align.SupportProducerBoundarySuite"
+    ],
+    "cleanCompileAndTest": false,
+    "killed": true,
+    "expectedFailure": "an empty eligible population is Unestablished"
+  },
+  {
+    "metadata": {
+      "schema_version": 1,
+      "started_utc": "2026-09-22T13:20:12.432935+00:00",
+      "finished_utc": "2026-09-22T13:20:25.194256+00:00",
+      "duration_seconds": 12.761106,
+      "command": [
+        "sbt",
+        "-batch",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-m1-grakern-20260922",
+        "alignJVM/testOnly storymodel4s.align.SupportAssessmentSuite storymodel4s.align.SupportProducerBoundarySuite"
+      ],
+      "cwd": "/private/tmp/storymodel4s-workspace-m1-20260922",
+      "log": "/private/tmp/workspace-m1-evidence/support/mutations/zero-full-support.log",
+      "exit_code": 1,
+      "child_returncode": 1,
+      "reason": "exited",
+      "detail": null,
+      "timeout_seconds": 900.0,
+      "log_bytes": 4825
+    },
+    "logSha256": "f7d2b32dcaab3b59830f2e708836d653f9ef9e40c5e8a72cfd74cc7f42ea7fdb",
+    "totals": [
+      "[error] Failed: Total 22, Failed 3, Errors 0, Passed 19"
+    ],
+    "failures": [
+      "==> X storymodel4s.align.SupportAssessmentSuite.zero eligible weight is Unestablished, never fully supported 0.008s munit.FailException: align/src/test/scala/storymodel4s/align/SupportAssessmentSuite.scala:32 expected Unestablished, got Assessed(1.0, CellSupportBasis(measured={Semantic,Propositional}, eligibleWeights={Semantic -> 0.0,Propositional -> 0.0}))",
+      "==> X storymodel4s.align.SupportAssessmentSuite.LAW 4: all-zero weights publish no share on any cell and keep today's totals 0.164s munit.FailException: align/src/test/scala/storymodel4s/align/SupportAssessmentSuite.scala:32 expected Unestablished, got Assessed(1.0, CellSupportBasis(measured={Semantic,Propositional,Entity,Sensory,Granularity,Distortion}, eligibleWeights={Semantic -> 0.0,Propositional -> 0.0,Entity -> 0.0,Sensory -> 0.0,Granularity -> 0.0,Distortion -> 0.0}))",
+      "==> X storymodel4s.align.SupportAssessmentSuite.an unassessable exclusion must rest on exactly zero assessed support 0.001s munit.FailException: align/src/test/scala/storymodel4s/align/SupportAssessmentSuite.scala:421 control: no denominator is a lawful exclusion: Left(MalformedRecord(CostBreakdown,an unassessable record must carry exactly zero assessed support))"
+    ],
+    "name": "zero-full-support",
+    "sourceSha256": "da834be7198ca0a3316757adb750e126cb863aa3a311dbea22f51848fc06bcfb",
+    "mutantSha256": "266f108e2f473d02821aeab63ffdc8b667d1b627eed960e1ce64494c8006550e",
+    "command": [
+      "alignJVM/testOnly storymodel4s.align.SupportAssessmentSuite storymodel4s.align.SupportProducerBoundarySuite"
+    ],
+    "cleanCompileAndTest": false,
+    "killed": true,
+    "expectedFailure": "zero eligible weight is Unestablished"
+  },
+  {
+    "metadata": {
+      "schema_version": 1,
+      "started_utc": "2026-09-22T13:20:25.250361+00:00",
+      "finished_utc": "2026-09-22T13:20:38.455051+00:00",
+      "duration_seconds": 13.204473,
+      "command": [
+        "sbt",
+        "-batch",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-m1-grakern-20260922",
+        "alignJVM/testOnly storymodel4s.align.SupportAssessmentSuite storymodel4s.align.SupportProducerBoundarySuite"
+      ],
+      "cwd": "/private/tmp/storymodel4s-workspace-m1-20260922",
+      "log": "/private/tmp/workspace-m1-evidence/support/mutations/external-wrong-reason.log",
+      "exit_code": 1,
+      "child_returncode": 1,
+      "reason": "exited",
+      "detail": null,
+      "timeout_seconds": 900.0,
+      "log_bytes": 13703
+    },
+    "logSha256": "04ca2b7c647585259a5f0217d01851375a86c67e39c69c82fbf8a3700673575b",
+    "totals": [
+      "[error] Failed: Total 22, Failed 11, Errors 0, Passed 11"
+    ],
+    "failures": [
+      "==> X storymodel4s.align.SupportAssessmentSuite.LAW 4: all-zero weights publish no share on any cell and keep today's totals 0.12s munit.FailException: align/src/test/scala/storymodel4s/align/SupportAssessmentSuite.scala:132 lawful all-zero weights must still infer: CostBreakdown: an external record is not a content comparison; support must be NotApplicable(ExternalState)",
+      "==> X storymodel4s.align.SupportAssessmentSuite.external cells are NotApplicable(ExternalState); unreachable is NotApplicable(Unreachable) 0.005s munit.FailException: align/src/test/scala/storymodel4s/align/SupportAssessmentSuite.scala:43 CostBreakdown: an external record is not a content comparison; support must be NotApplicable(ExternalState)",
+      "==> X storymodel4s.align.SupportAssessmentSuite.every ranked source cell of a real result carries its own derived, assessed basis 0.003s munit.FailException: align/src/test/scala/storymodel4s/align/SupportAssessmentSuite.scala:43 CostBreakdown: an external record is not a content comparison; support must be NotApplicable(ExternalState)",
+      "==> X storymodel4s.align.SupportAssessmentSuite.an external record cannot carry measured support, nor the unreachable reason 0.003s munit.FailException: align/src/test/scala/storymodel4s/align/SupportAssessmentSuite.scala:43 CostBreakdown: an external record is not a content comparison; support must be NotApplicable(ExternalState)",
+      "==> X storymodel4s.align.SupportAssessmentSuite.an unreachable record carries no measurement 0.003s munit.FailException: align/src/test/scala/storymodel4s/align/SupportAssessmentSuite.scala:43 CostBreakdown: an external record is not a content comparison; support must be NotApplicable(ExternalState)",
+      "==> X storymodel4s.align.SupportAssessmentSuite.a ranked source record's support must be its own 0.002s munit.FailException: align/src/test/scala/storymodel4s/align/SupportAssessmentSuite.scala:43 CostBreakdown: an external record is not a content comparison; support must be NotApplicable(ExternalState)",
+      "==> X storymodel4s.align.SupportAssessmentSuite.every priced term must be eligible, including an imputed one 0.003s munit.FailException: align/src/test/scala/storymodel4s/align/SupportAssessmentSuite.scala:43 CostBreakdown: an external record is not a content comparison; support must be NotApplicable(ExternalState)",
+      "==> X storymodel4s.align.SupportAssessmentSuite.an external key cannot carry a dropped record with measured support 0.002s munit.FailException: align/src/test/scala/storymodel4s/align/SupportAssessmentSuite.scala:462 CostBreakdown: an external record is not a content comparison; support must be NotApplicable(ExternalState)",
+      "==> X storymodel4s.align.SupportAssessmentSuite.an anchored key is never Unreachable: nomination proved its anchor is in the view 0.002s munit.FailException: align/src/test/scala/storymodel4s/align/SupportAssessmentSuite.scala:497 CostBreakdown: an external record is not a content comparison; support must be NotApplicable(ExternalState)",
+      "==> X storymodel4s.align.SupportProducerBoundarySuite.a producer cannot publish a nonfinite or negative external total 0.0s munit.FailException: align/src/test/scala/storymodel4s/align/SupportProducerBoundarySuite.scala:49 CostBreakdown: an external record is not a content comparison; support must be NotApplicable(ExternalState)",
+      "==> X storymodel4s.align.SupportProducerBoundarySuite.invalid custom external costs receive a typed refusal in both inference paths 0.011s munit.FailException: align/src/test/scala/storymodel4s/align/SupportProducerBoundarySuite.scala:85 assertion failed"
+    ],
+    "name": "external-wrong-reason",
+    "sourceSha256": "da834be7198ca0a3316757adb750e126cb863aa3a311dbea22f51848fc06bcfb",
+    "mutantSha256": "abb4b2b6b3abc6558ea88316b7cf4d97d658238541d7c891e1bc9c78c03eb8e2",
+    "command": [
+      "alignJVM/testOnly storymodel4s.align.SupportAssessmentSuite storymodel4s.align.SupportProducerBoundarySuite"
+    ],
+    "cleanCompileAndTest": false,
+    "killed": true,
+    "expectedFailure": "external cells are NotApplicable"
+  },
+  {
+    "metadata": {
+      "schema_version": 1,
+      "started_utc": "2026-09-22T13:20:38.522907+00:00",
+      "finished_utc": "2026-09-22T13:20:51.798475+00:00",
+      "duration_seconds": 13.275358,
+      "command": [
+        "sbt",
+        "-batch",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-m1-grakern-20260922",
+        "alignJVM/testOnly storymodel4s.align.SupportAssessmentSuite storymodel4s.align.SupportProducerBoundarySuite"
+      ],
+      "cwd": "/private/tmp/storymodel4s-workspace-m1-20260922",
+      "log": "/private/tmp/workspace-m1-evidence/support/mutations/derived-unchecked.log",
+      "exit_code": 1,
+      "child_returncode": 1,
+      "reason": "exited",
+      "detail": null,
+      "timeout_seconds": 900.0,
+      "log_bytes": 4239
+    },
+    "logSha256": "ea35d6a260f233b0ea2c21d93cb78db890c02b514ca31dd67e1c26f7dbd9e292",
+    "totals": [
+      "[error] Failed: Total 22, Failed 2, Errors 0, Passed 20"
+    ],
+    "failures": [
+      "==> X storymodel4s.align.SupportAssessmentSuite.a producer that prices a term it did not declare eligible refuses construction 0.009s munit.FailException: align/src/test/scala/storymodel4s/align/SupportAssessmentSuite.scala:283 a record priced over an undeclared term was accepted: Right(CostBreakdown(terms=Map(Semantic -> 0.2, Sensory -> 0.3), mode=Some(Faithful), exclusion=None, total=1.0, missingTerms=Set(), sourceChartCoverage=None, reductions=Map(), support=Assessed(1.0, CellSupportBasis(measured={Semantic}, eligibleWeights={Semantic -> 1.0})), imputedTerms=Map()))",
+      "==> X storymodel4s.align.SupportProducerBoundarySuite.a producer cannot publish priced terms outside its declared eligibility 0.001s munit.FailException: align/src/test/scala/storymodel4s/align/SupportProducerBoundarySuite.scala:12 expected a CostBreakdown refusal, got Right(CostBreakdown(terms=Map(Semantic -> 0.2, Sensory -> 0.3), mode=Some(Faithful), exclusion=None, total=1.0, missingTerms=Set(), sourceChartCoverage=None, reductions=Map(), support=Assessed(1.0, CellSupportBasis(measured={Semantic}, eligibleWeights={Semantic -> 1.0})), imputedTerms=Map()))"
+    ],
+    "name": "derived-unchecked",
+    "sourceSha256": "da834be7198ca0a3316757adb750e126cb863aa3a311dbea22f51848fc06bcfb",
+    "mutantSha256": "95ea6235ce5f583c0e578154858bf8a6f7e85eacc29a778a10e7550413512490",
+    "command": [
+      "alignJVM/testOnly storymodel4s.align.SupportAssessmentSuite storymodel4s.align.SupportProducerBoundarySuite"
+    ],
+    "cleanCompileAndTest": false,
+    "killed": true,
+    "expectedFailure": "a producer cannot publish priced terms"
+  },
+  {
+    "metadata": {
+      "schema_version": 1,
+      "started_utc": "2026-09-22T13:20:51.887379+00:00",
+      "finished_utc": "2026-09-22T13:21:05.081250+00:00",
+      "duration_seconds": 13.193655,
+      "command": [
+        "sbt",
+        "-batch",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-m1-grakern-20260922",
+        "alignJVM/testOnly storymodel4s.align.SupportAssessmentSuite storymodel4s.align.SupportProducerBoundarySuite"
+      ],
+      "cwd": "/private/tmp/storymodel4s-workspace-m1-20260922",
+      "log": "/private/tmp/workspace-m1-evidence/support/mutations/external-unchecked.log",
+      "exit_code": 1,
+      "child_returncode": 1,
+      "reason": "exited",
+      "detail": null,
+      "timeout_seconds": 900.0,
+      "log_bytes": 4250
+    },
+    "logSha256": "0a257c403d857d191361250cd23f325966feb595d7af94a9646fc69a5eda8782",
+    "totals": [
+      "[error] Failed: Total 22, Failed 2, Errors 0, Passed 20"
+    ],
+    "failures": [
+      "==> X storymodel4s.align.SupportProducerBoundarySuite.a producer cannot publish a nonfinite or negative external total 0.011s munit.FailException: align/src/test/scala/storymodel4s/align/SupportProducerBoundarySuite.scala:12 expected a CostBreakdown refusal, got Right(CostBreakdown(terms=Map(), mode=None, exclusion=None, total=NaN, missingTerms=Set(), sourceChartCoverage=None, reductions=Map(), support=NotApplicable(ExternalState), imputedTerms=Map()))",
+      "==> X storymodel4s.align.SupportProducerBoundarySuite.invalid custom external costs receive a typed refusal in both inference paths 0.008s munit.FailException: align/src/test/scala/storymodel4s/align/SupportProducerBoundarySuite.scala:12 expected a CostBreakdown refusal, got Left(MalformedRow(u0,mass must be nonnegative and finite))"
+    ],
+    "name": "external-unchecked",
+    "sourceSha256": "da834be7198ca0a3316757adb750e126cb863aa3a311dbea22f51848fc06bcfb",
+    "mutantSha256": "260bcb9a9a9959ebee3f9278720269358fdf3ee6624c095b698da2952100f6bb",
+    "command": [
+      "alignJVM/testOnly storymodel4s.align.SupportAssessmentSuite storymodel4s.align.SupportProducerBoundarySuite"
+    ],
+    "cleanCompileAndTest": false,
+    "killed": true,
+    "expectedFailure": "a producer cannot publish a nonfinite or negative"
+  },
+  {
+    "metadata": {
+      "schema_version": 1,
+      "started_utc": "2026-09-22T13:21:05.152359+00:00",
+      "finished_utc": "2026-09-22T13:21:26.184808+00:00",
+      "duration_seconds": 21.032186,
+      "command": [
+        "sbt",
+        "-batch",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-m1-grakern-20260922",
+        "alignJVM/Compile/clean",
+        "alignJVM/Test/clean",
+        "alignJVM/testOnly storymodel4s.probes.SupportAssessmentUnforgeableSuite storymodel4s.align.attack.SupportPackageAttack"
+      ],
+      "cwd": "/private/tmp/storymodel4s-workspace-m1-20260922",
+      "log": "/private/tmp/workspace-m1-evidence/support/mutations/cost-constructor-package-visible.log",
+      "exit_code": 1,
+      "child_returncode": 1,
+      "reason": "exited",
+      "detail": null,
+      "timeout_seconds": 900.0,
+      "log_bytes": 2871
+    },
+    "logSha256": "ac7026576724ac1a70605c5d08388d7ae2a0d653a96cc55c3cb44411498374dc",
+    "totals": [
+      "[error] Failed: Total 4, Failed 1, Errors 0, Passed 3"
+    ],
+    "failures": [
+      "==> X storymodel4s.probes.SupportAssessmentUnforgeableSuite.an align subpackage: same-shape controls compile, every product door is closed 0.011s munit.FailException: align/src/test/scala/storymodel4s/probes/SupportAssessmentUnforgeableSuite.scala:130 CostBreakdown constructor is open"
+    ],
+    "name": "cost-constructor-package-visible",
+    "sourceSha256": "da834be7198ca0a3316757adb750e126cb863aa3a311dbea22f51848fc06bcfb",
+    "mutantSha256": "a43c9148f3e881b44b6dfd9166f6d417029fda925221b1be611dead669265640",
+    "command": [
+      "alignJVM/Compile/clean",
+      "alignJVM/Test/clean",
+      "alignJVM/testOnly storymodel4s.probes.SupportAssessmentUnforgeableSuite storymodel4s.align.attack.SupportPackageAttack"
+    ],
+    "cleanCompileAndTest": true,
+    "killed": true,
+    "expectedFailure": "SupportAssessmentUnforgeableSuite"
+  }
+]
