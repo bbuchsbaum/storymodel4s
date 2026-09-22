@@ -68,7 +68,8 @@ object TemporalSupport:
         .traverse(t => locate(source, t, coordinate))
     yield new TemporalSupport(source.digest, target, coordinate, rows)
 
-  private def select(
+  /** Validate a coordinate selection independently of a target's availability. */
+  def select(
       source: SourceRepresentation,
       selection: Selection
   ): Either[Refusal, Coordinate] =

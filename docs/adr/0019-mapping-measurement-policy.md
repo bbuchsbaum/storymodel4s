@@ -247,3 +247,32 @@ The legacy `supportCoverage` field only examines immediate children; changing it
 would change existing source/mapping digests. Reject silently changing that wire
 meaning: temporal consumers use this named transitive derivation, while migration
 of the legacy producer field remains a compatibility task.
+
+Conditional temporal-query decision (2026-09-22): add `TemporalQuery` in `align`
+and contextual `temporal-query/v0.1` readouts in `codec`. These derive per-unit
+region bounds and explicitly declared interval/point allocations from a checked
+`MappingResult`; they do not create a new mapping record or inference authority.
+`TemporalSupport.select` exposes the existing checked coordinate selection for
+rows whose targets lack temporal support.
+
+Keep normalized score mass and model posterior distinct. Preserve posterior
+states, supplied totals, stage/binding identity, candidate policy, external states,
+unknown-location mass and support awaiting allocation. Read actual measures even
+when the decision abstains. Do not accept raw scores as probability mass or enable
+reserved calibrated/Derived vocabulary by labeling a query.
+
+Every allocation is conditional on an explicit `SuppliedSupportContainsReferent`
+assumption. Supplied support is evidence, not a proof of exhaustive localization.
+For this initial contract, multi-coordinate evidence, clipped occurrences,
+missing descendants and descendants outside the declared parent domain remain
+unavailable. Interval unions use length, point sets use counting measure; mixed
+support requires a declared mixture. Points inside intervals retain atomic mass.
+Regions are half-open interval unions plus points, checked on the selected axis;
+geometry arithmetic uses BigInt before numerical conversion. A region result is
+for the resolved component, with unresolved mass retained alongside it.
+
+Rejected: deriving occurrence weights from display selection; source-only
+renormalization; hull-based uniform allocation; treating point evidence as duration;
+using immediate-child coverage as an exhaustive-support certificate. Future domain
+adapters can recognize verified duplicate coordinate representations; the initial
+conservative refusal must not be relaxed by inspecting only selected geometry.
