@@ -10,13 +10,13 @@ import json
 from pathlib import Path
 import re
 import subprocess
-import sys
 import time
 
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument("--grakern", required=True)
 parser.add_argument("--staging", required=True)
 parser.add_argument("--out", required=True)
+parser.add_argument("--only", nargs="*")
 args = parser.parse_args()
 root = Path(__file__).resolve().parents[1]
 out = Path(args.out).resolve()
@@ -54,12 +54,20 @@ mutants = [
     ("ignore-export-grant", manifest,
      ") && exportPermission == WorkspaceContentGrant.Granted",
      ")",
-     join_task, "inspection-only imports cannot produce any export"),
+     manifest_task, "content declarations require exact identities and explicit inspection/export grants"),
+    ("serialize-denied-packet", "codec/src/main/scala/storymodel4s/codec/workspacearchive.scala",
+     "if archive.capabilities.exportPermission != WorkspaceContentGrant.Granted then",
+     "if archive.capabilities.exportPermission != WorkspaceContentGrant.Granted && false then",
+     "codecJVM/testOnly *WorkspaceArchiveSuite", "export denial blocks transferable packet serialization"),
     ("local-only-addresses", join,
      "        modelArtifact.hex,\n        recallArtifact.hex,\n",
      "",
      join_task, "two generated checked fixtures differ in hierarchy and retain partial authority"),
 ]
+if args.only:
+    if set(args.only) - {m[0] for m in mutants}:
+        raise SystemExit("Unknown selected mutant")
+    mutants = [m for m in mutants if m[0] in args.only]
 receipts = []
 
 

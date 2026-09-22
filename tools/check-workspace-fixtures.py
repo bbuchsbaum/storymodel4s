@@ -133,10 +133,14 @@ def verify(directory, revision):
             record = members[policy]
             check(data["original_record_digest"] == receipt["original_record_digest"] == record["record_digest"], "original record binding")
             check(data["outcomes"] == record["outcomes"][:1], "unchanged original outcome")
+            check([row["unit"] for row in record["outcomes"]] == [f"m1:u{i}" for i in range(4)], "unique complete outcome inventory")
             check(record["outcomes"][-1]["processing_status"]["status"] == "failed", "failed row retained")
             check(record["outcomes"][2]["localization_status"] == "Nonlocalizable", "all-external row retained")
             outcome = data["outcomes"][0]
-            values = {(v["destination"], v["measure_kind"]): number(v["raw_value"]) for v in outcome["mapping_links"]}
+            links = outcome["mapping_links"]
+            keys = [(v["destination"], v["measure_kind"]) for v in links]
+            check(len(keys) == len(set(keys)) == 6, "unique six fixture measure rows")
+            values = {(v["destination"], v["measure_kind"]): number(v["raw_value"]) for v in links}
             raw = (0.9, 0.4, 0.2) if policy == "authored-a" else (0.1, 0.8, 0.1)
             mass = (0.25, 0.25, 0.5) if policy == "authored-a" else (0.1, 0.6, 0.3)
             for destination, r, m in zip((expected["first"], expected["second"], "ext:Intrusion"), raw, mass):
@@ -148,6 +152,13 @@ def verify(directory, revision):
             check(present(decision["raw_argmax"])["destination"] == expected["first" if policy == "authored-a" else "second"], "argmax independent of decode")
             check(decision["calibration"]["status"] == "unavailable", "no fabricated calibration")
             rows = list(csv.DictReader(io.StringIO(table_bytes.decode("utf-8"))))
+            csv_keys = [(r["destination"], r["measure"], r["channel"], r["state"]) for r in rows]
+            check(len(csv_keys) == len(set(csv_keys)), "unique CSV measure coordinates")
+            targets = record["policies"]["target_universe_id"]["targets"]
+            # Two source targets + Intrusion have two measures; Association and each other
+            # fixed-cut target have one explicit absence. Externals are the whole-policy union.
+            check(len(rows) == len(targets) + 5, "exact fixed-cut CSV row count")
+            check(sum(r["measure"] != "NotSupplied" for r in rows) == 6, "six supplied CSV measures")
             supplied = {(r["destination"], r["measure"]): number(r["value_ieee754"]) for r in rows if r["measure"] != "NotSupplied"}
             check(supplied == values, "CSV independently recovers exact measures")
             untimed = {"status": "untimed", "semantics": "declared-unit-presentation/v1"}
@@ -158,6 +169,8 @@ def verify(directory, revision):
             check(evidence[0]["clock"] == untimed, "JSON explicit untimed annotation")
             check(pieces(evidence[0]["pieces"], recall["transcript"]["canonicalText"]) == expected["recall"], "literal discontiguous recall answer")
             source = {r["target"]: pieces(r["support"]["pieces"], model["source"]["canonicalText"]) for r in data["source_evidence"]}
+            check(len(data["source_evidence"]) == len(source) == 2, "unique source evidence identities")
+            check(len({r["address"] for r in data["source_evidence"]}) == 2, "unique source evidence addresses")
             check(source == expected["source"], "literal exact source answers")
             text = text_bytes.decode("utf-8")
             check(f"Policy: {policy}" in text, "accessible policy label")
