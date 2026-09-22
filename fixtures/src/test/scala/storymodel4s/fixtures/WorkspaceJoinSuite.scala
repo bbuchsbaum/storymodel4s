@@ -573,9 +573,22 @@ class WorkspaceJoinSuite extends FunSuite:
           "end" -> Json.fromString("0x4014000000000000")
         ),
         Json.obj("status" -> Json.fromString("untimed"))
-      )
+      ).map(_.mapObject(_.add("semantics", Json.fromString("declared-unit-presentation/v1"))))
     )
-    assert(exported.tableCsv.linesIterator.next().contains("recall_clock_seconds"))
+    assert(exported.tableCsv.linesIterator.next().contains("unit_presentation_seconds"))
+    assert(exported.tableCsv.contains("declared-unit-presentation/v1"))
+    assert(exported.accessibleText.contains("Supplied unit presentation annotation"))
+    val inventoryBytes = workspace.archive.manifest.bytes(WorkspaceRole.Inventory).get.toArray
+    val inventoryClocks = Canonical
+      .parse(new String(inventoryBytes, StandardCharsets.UTF_8))
+      .toOption
+      .get
+      .hcursor
+      .get[Vector[Json]]("timing")
+      .toOption
+      .get
+      .map(_.hcursor.downField("clock").focus.get)
+    assertEquals(inventoryClocks, clocks)
     assert(exported.tableCsv.contains("\"\"status\"\":\"\"untimed\"\""))
     assert(exported.tableCsv.contains("\"\"at\"\":\"\"0x4004000000000000\"\""))
     assert(exported.tableCsv.contains("\"\"start\"\":\"\"0x4010000000000000\"\""))

@@ -225,8 +225,15 @@ decision origin and exact evidence. A receipt binds the archive, policy, query, 
 all three exported payload digests. Export permission is checked before returning any payload.
 Reject UI-side row arithmetic, selected-only normalization and silent export-all defaults.
 Selected recall evidence retains the tagged recall clock in JSON and the CSV
-`recall_clock_seconds` column, including explicit untimed and onset-only cases. Clock
+`unit_presentation_seconds` column, including explicit untimed and onset-only cases. Clock
 coordinates use the same lossless IEEE-754 encoding as the admitted inventory.
+These are supplied **unit presentation annotations**, tagged
+`declared-unit-presentation/v1` in inventory, subset JSON and CSV. Nonnegative
+binary seconds and closed, possibly zero-width intervals retain the existing view
+convention. They establish no observation basis, clock origin, recording linkage
+or scanner correspondence. They are distinct from exact rational word observations
+in `RecallTiming`; no conversion from its unit summaries is supplied or licensed.
+Lossless encoding preserves a supplied binary value, not an original decimal measurement.
 
 `WorkspaceFixtures` and the JVM-only `writeWorkspaceFixtures` main in the existing
 fixtures module produce the WOG and structurally different bell/clock product courts.

@@ -23,7 +23,11 @@ import RecallCodecs.given
 enum WorkspaceOrigin:
   case AuthoredFixture, ImportedArtifact
 
-/** Unit-clock annotations are explicitly supplied, never inferred from ordinal or text length. */
+/** Supplied unit presentation annotations, never inferred from words, ordinal or text length.
+  * Values are nonnegative binary seconds; intervals are closed and may have zero width. These
+  * establish no observation basis, recording/clock origin, or scanner correspondence. Canonical
+  * word observations use RecallTiming instead; its unit summaries never imply these intervals.
+  */
 enum WorkspaceTiming:
   case Untimed
   case Onset(at: Seconds)
@@ -175,15 +179,17 @@ object WorkspaceCodecs:
       )
     ).map(view -> _)
 
-  private[codec] def timingJson(value: WorkspaceTiming): Json = value match
-    case WorkspaceTiming.Untimed        => obj("status" -> str("untimed"))
-    case WorkspaceTiming.Onset(at)      => obj("status" -> str("onset"), "at" -> at.value.asJson)
-    case WorkspaceTiming.Interval(span) =>
-      obj(
-        "status" -> str("interval"),
-        "start" -> span.start.value.asJson,
-        "end" -> span.end.value.asJson
-      )
+  private[codec] def timingJson(value: WorkspaceTiming): Json =
+    val annotation = value match
+      case WorkspaceTiming.Untimed        => obj("status" -> str("untimed"))
+      case WorkspaceTiming.Onset(at)      => obj("status" -> str("onset"), "at" -> at.value.asJson)
+      case WorkspaceTiming.Interval(span) =>
+        obj(
+          "status" -> str("interval"),
+          "start" -> span.start.value.asJson,
+          "end" -> span.end.value.asJson
+        )
+    annotation.mapObject(_.add("semantics", str("declared-unit-presentation/v1")))
   private def readTiming(json: Json): Result[WorkspaceTiming] =
     field[String](json, "status").flatMap {
       case "untimed" => Right(WorkspaceTiming.Untimed)

@@ -102,6 +102,7 @@ def verify(directory, revision):
         clocks = members["Inventory"]["timing"]
         check([r["unit"] for r in clocks] == [f"m1:u{i}" for i in range(4)], "all ordinal units")
         check([r["clock"]["status"] for r in clocks] == ["untimed", "onset", "interval", "untimed"], "clock missingness")
+        check(all(r["clock"]["semantics"] == "declared-unit-presentation/v1" for r in clocks), "unit annotation authority")
         check(number(clocks[1]["clock"]["at"]) == 2.5, "onset seconds")
         check(number(clocks[2]["clock"]["start"]) == 4.0, "interval start seconds")
         check(number(clocks[2]["clock"]["end"]) == 5.0, "interval end seconds")
@@ -149,11 +150,12 @@ def verify(directory, revision):
             rows = list(csv.DictReader(io.StringIO(table_bytes.decode("utf-8"))))
             supplied = {(r["destination"], r["measure"]): number(r["value_ieee754"]) for r in rows if r["measure"] != "NotSupplied"}
             check(supplied == values, "CSV independently recovers exact measures")
-            check(all(r["unit"] == "m1:u0" and json.loads(r["recall_clock_seconds"]) == {"status": "untimed"} for r in rows), "CSV unit and explicit untimed clock")
+            untimed = {"status": "untimed", "semantics": "declared-unit-presentation/v1"}
+            check(all(r["unit"] == "m1:u0" and json.loads(r["unit_presentation_seconds"]) == untimed for r in rows), "CSV unit and explicit untimed annotation")
             check(any(r["measure"] == "NotSupplied" for r in rows), "missing values retained")
             evidence = data["recall_evidence"]
             check(len(evidence) == 1 and evidence[0]["unit"] == "m1:u0", "recall evidence identity")
-            check(evidence[0]["clock"] == {"status": "untimed"}, "JSON explicit untimed clock")
+            check(evidence[0]["clock"] == untimed, "JSON explicit untimed annotation")
             check(pieces(evidence[0]["pieces"], recall["transcript"]["canonicalText"]) == expected["recall"], "literal discontiguous recall answer")
             source = {r["target"]: pieces(r["support"]["pieces"], model["source"]["canonicalText"]) for r in data["source_evidence"]}
             check(source == expected["source"], "literal exact source answers")

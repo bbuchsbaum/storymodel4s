@@ -150,7 +150,7 @@ object WorkspaceSubsetCodec:
       Vector(
         "unit",
         "address",
-        "recall_clock_seconds",
+        "unit_presentation_seconds",
         "destination",
         "measure",
         "channel",
@@ -266,7 +266,9 @@ object WorkspaceSubsetCodec:
         "Recall " + row.unit.id.value + " (ordinal " + row.unit.ordinal.toString + ")",
         "Processing: " + row.outcome.processing.toString,
         "Localization: " + row.outcome.localization.toString,
-        "Timing: " + workspace.timing(row.unit.id).toString
+        "Supplied unit presentation annotation (seconds; closed interval): " + workspace
+          .timing(row.unit.id)
+          .toString
       ) ++
         workspace
           .recallEvidence(row.unit.id)
