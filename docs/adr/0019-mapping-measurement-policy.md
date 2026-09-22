@@ -215,3 +215,12 @@ view. `WorkspaceTiming` preserves untimed, onset-only and interval annotations o
 policy. Exact evidence queries preserve each SpanRef and inverse queries retain repeated
 references. Reject unchecked source dictionaries, local-ID-only joins, estimator execution
 inside decode, inferred recall clocks and silent partial-to-complete promotion.
+
+`WorkspaceSubsetCodec.selected` is the provider-owned deterministic export query. A selected
+source expands to every referring recall row; selected recall rows retain every supplied
+alternative. An empty selection exports zero outcomes. The subset carries the unchanged
+mapping context and original record digest under its own schema, never impersonating a
+complete G1 record. CSV and accessible text retain missingness, measure/scale, processing,
+decision origin and exact evidence. A receipt binds the archive, policy, query, selection and
+all three exported payload digests. Export permission is checked before returning any payload.
+Reject UI-side row arithmetic, selected-only normalization and silent export-all defaults.

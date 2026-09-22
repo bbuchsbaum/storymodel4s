@@ -2,6 +2,7 @@ package storymodel4s.fixtures
 
 import java.nio.charset.StandardCharsets
 
+import io.circe.Json
 import munit.FunSuite
 import storymodel4s.align.*
 import storymodel4s.codec.*
@@ -399,4 +400,148 @@ class WorkspaceJoinSuite extends FunSuite:
       create(r = foreign, records = Vector(input)),
       Left(WorkspaceRefusal.SemanticJoinMismatch)
     )
+  }
+
+  test("selection export copies complete original rows and binds exact text/table/data payloads") {
+    val address = workspace.recallAddress(recall.ordered.head.id).get
+    val payload = WorkspaceSubsetCodec.selected(workspace, policyId, Set(address)).toOption.get
+    val data = Canonical.parse(payload.dataJson).toOption.get
+    val receipt = Canonical.parse(payload.receiptJson).toOption.get.hcursor
+    val original = MappingCodecs.toJson(record).hcursor.get[Vector[Json]]("outcomes").toOption.get
+    assertEquals(data.hcursor.get[Vector[Json]]("outcomes").toOption.get, Vector(original.head))
+    assertEquals(data.hcursor.get[String]("original_record_digest").toOption.get, record.digest.hex)
+    assertEquals(data.hcursor.get[String]("policy").toOption.get, policyId.value)
+    assertEquals(
+      receipt.get[String]("data_sha256").toOption.get,
+      Checksum.ofText(payload.dataJson).hex
+    )
+    assertEquals(
+      receipt.get[String]("table_sha256").toOption.get,
+      Checksum.ofText(payload.tableCsv).hex
+    )
+    assertEquals(
+      receipt.get[String]("text_sha256").toOption.get,
+      Checksum.ofText(payload.accessibleText).hex
+    )
+    assertEquals(receipt.get[Vector[String]]("units").toOption.get, Vector("u0"))
+    assert(
+      payload.tableCsv.contains("0x3fe3333333333333")
+    ) // supplied 0.6, never source-renormalized
+    assert(payload.tableCsv.contains("ext:Intrusion"))
+    assert(payload.tableCsv.contains("NotSupplied"))
+    assert(payload.accessibleText.contains("Two men walked."))
+    assert(payload.accessibleText.contains("A canoe arrived."))
+    assert(!payload.accessibleText.contains("A note was omitted."))
+    assertEquals(
+      WorkspaceSubsetCodec.selected(workspace, policyId, Set(address)).toOption.get.dataJson,
+      payload.dataJson
+    )
+  }
+
+  test("source selection exports repeated references; empty selection does not export all") {
+    val sourceSelection = Set(workspace.sourceAddress(target).get)
+    val exported = WorkspaceSubsetCodec.selected(workspace, policyId, sourceSelection).toOption.get
+    val receipt = Canonical.parse(exported.receiptJson).toOption.get.hcursor
+    assertEquals(receipt.get[Vector[String]]("units").toOption.get, Vector("u0", "u1"))
+    val empty = WorkspaceSubsetCodec.selected(workspace, policyId, Set.empty).toOption.get
+    assertEquals(
+      Canonical
+        .parse(empty.dataJson)
+        .toOption
+        .get
+        .hcursor
+        .get[Vector[Json]]("outcomes")
+        .toOption
+        .get,
+      Vector.empty
+    )
+    assertEquals(empty.tableCsv.linesIterator.size, 1)
+  }
+
+  test("a source outside the mapping cut exports its exact evidence without invented rows") {
+    val root = source.targets.find(_.level > 0).get.ref
+    val exported = WorkspaceSubsetCodec
+      .selected(workspace, policyId, Set(workspace.sourceAddress(root).get))
+      .toOption
+      .get
+    assert(exported.accessibleText.contains("Exact source " + root.key))
+    assertEquals(
+      Canonical
+        .parse(exported.dataJson)
+        .toOption
+        .get
+        .hcursor
+        .get[Vector[Json]]("outcomes")
+        .toOption
+        .get,
+      Vector.empty
+    )
+    assertEquals(
+      Canonical
+        .parse(exported.dataJson)
+        .toOption
+        .get
+        .hcursor
+        .get[Vector[Json]]("source_evidence")
+        .toOption
+        .get
+        .size,
+      1
+    )
+  }
+
+  test("foreign addresses and policy IDs cannot silently change an export") {
+    val foreign = Address(
+      ModuleTag.unsafe("workspace"),
+      AddressKind.unsafe("recall-unit"),
+      AddressKey.of("foreign")
+    )
+    assertEquals(
+      WorkspaceSubsetCodec.selected(workspace, policyId, Set(foreign)),
+      Left(WorkspaceRefusal.InvalidSelection)
+    )
+    assertEquals(
+      WorkspaceSubsetCodec.selected(workspace, ArtifactId.unsafe("unknown"), Set.empty),
+      Left(WorkspaceRefusal.IncompatiblePolicy)
+    )
+  }
+
+  test(
+    "failed outcomes remain in a table even when the declared dictionary and externals are empty"
+  ) {
+    val emptyUniverse = DeclaredUniverse.of(Vector.empty, grain).toOption.get
+    val emptyPolicies = MappingPolicies
+      .of(
+        policies.inference,
+        policies.context,
+        policies.candidate,
+        policies.referencePrior,
+        policies.decision,
+        emptyUniverse
+      )
+      .toOption
+      .get
+    val failures = recall.ordered.map(u =>
+      UnitOutcome.failed(u.id, ProcessingFailure.InferenceRefused("synthetic refusal"))
+    )
+    val failed =
+      MappingResult.checked(inventory, source, emptyPolicies, roles, ledger, failures).toOption.get
+    val input = WorkspaceMappingInput(ArtifactId.unsafe("empty-dictionary"), failed, None)
+    val opened = create(records = Vector(input)).toOption.get
+    val exported =
+      WorkspaceSubsetCodec.selected(opened, input.id, opened.recallAddresses.keySet).toOption.get
+    assertEquals(exported.tableCsv.linesIterator.size, 5)
+    assertEquals(
+      Canonical
+        .parse(exported.receiptJson)
+        .toOption
+        .get
+        .hcursor
+        .get[Vector[String]]("units")
+        .toOption
+        .get,
+      Vector("u0", "u1", "u2", "u3")
+    )
+    assert(exported.tableCsv.contains("NotComputed"))
+    assert(!exported.tableCsv.contains("0x0000000000000000"))
   }
