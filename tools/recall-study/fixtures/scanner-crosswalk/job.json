@@ -1,0 +1,95 @@
+{
+  "schemaVersion" : "scanner-samples-job/v0.1",
+  "run" : {
+    "key" : {
+      "dataset" : "synthetic",
+      "revision" : "v1",
+      "participant" : "p1",
+      "session" : {
+        "status" : "absent"
+      },
+      "task" : "recall",
+      "run" : "1"
+    },
+    "image_sha256" : "d7f7ea67f2b8731545c6cf1a849d8e17ceb549f10e1271858775e77382a86362",
+    "header_sha256" : "d7f7ea67f2b8731545c6cf1a849d8e17ceb549f10e1271858775e77382a86362",
+    "sample_count" : 8,
+    "sample_seconds" : [
+      {
+        "numerator" : "0",
+        "denominator" : "1"
+      },
+      {
+        "numerator" : "3",
+        "denominator" : "2"
+      },
+      {
+        "numerator" : "3",
+        "denominator" : "1"
+      },
+      {
+        "numerator" : "9",
+        "denominator" : "2"
+      },
+      {
+        "numerator" : "6",
+        "denominator" : "1"
+      },
+      {
+        "numerator" : "15",
+        "denominator" : "2"
+      },
+      {
+        "numerator" : "9",
+        "denominator" : "1"
+      },
+      {
+        "numerator" : "21",
+        "denominator" : "2"
+      }
+    ],
+    "origin" : {
+      "status" : "first-stored-sample"
+    },
+    "applied_history" : {
+      "status" : "unknown"
+    }
+  },
+  "layout" : {
+    "analysis_array_sha256" : "d7f7ea67f2b8731545c6cf1a849d8e17ceb549f10e1271858775e77382a86362",
+    "receipt" : "d7f7ea67f2b8731545c6cf1a849d8e17ceb549f10e1271858775e77382a86362",
+    "length" : 5,
+    "slots" : [
+      {
+        "status" : "padding",
+        "reason" : "leading"
+      },
+      {
+        "status" : "padding",
+        "reason" : "leading"
+      },
+      {
+        "status" : "acquired",
+        "stored_index" : 2,
+        "censoring" : {
+          "status" : "included"
+        }
+      },
+      {
+        "status" : "acquired",
+        "stored_index" : 4,
+        "censoring" : {
+          "status" : "censored",
+          "evidence" : "d7f7ea67f2b8731545c6cf1a849d8e17ceb549f10e1271858775e77382a86362"
+        }
+      },
+      {
+        "status" : "acquired",
+        "stored_index" : 7,
+        "censoring" : {
+          "status" : "unknown"
+        }
+      }
+    ]
+  }
+}

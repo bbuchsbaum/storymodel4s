@@ -1,0 +1,82 @@
+#!/usr/bin/env python3
+"""Run compiling temporal view handoff counterexamples in this isolated checkout; restore source bytes.
+
+Run with no other sbt process in the checkout. Compilation failures never count as kills.
+The final unmutated tests must pass. Receipts bind HEAD, source bytes, command and totals.
+"""
+import argparse
+import hashlib
+import json
+from pathlib import Path
+import re
+import subprocess
+import time
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--grakern', required=True)
+    parser.add_argument('--staging', required=True)
+    parser.add_argument('--out', type=Path, required=True)
+    args = parser.parse_args()
+    root = Path(__file__).resolve().parents[3]
+    args.out.mkdir(parents=True, exist_ok=False)
+    head = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=root, text=True).strip()
+    mutants = [('foreign-navigation', 'view/src/main/scala/storymodel4s/view/temporalquery.scala', 'Option.when(mapping == mappingDigest)(bins.flatMap(_.cells).filter(_.address == address))', 'Option.when(mapping == mappingDigest || mapping != mappingDigest)(bins.flatMap(_.cells).filter(_.address == address))', 'codecJVM/testOnly *TemporalPartitionViewSuite'), ('zero-outside', 'view/src/main/scala/storymodel4s/view/temporalquery.scala', 'def allocatedOutside: Double = partition.allocatedOutside', 'def allocatedOutside: Double = partition.allocatedOutside * 0.0', 'codecJVM/testOnly *TemporalPartitionViewSuite'), ('collapse-bin-marks', 'view/src/main/scala/storymodel4s/view/temporalquery.scala', ':$binIndex:$alternativeIndex', ':0:$alternativeIndex', 'codecJVM/testOnly *TemporalPartitionViewSuite')]
+    expected_failures = {'foreign-navigation': 'navigation requires mapping identity and never creates posterior cell states', 'zero-outside': 'view retains exact regions original contributions and all accounting without arithmetic', 'collapse-bin-marks': 'navigation requires mapping identity and never creates posterior cell states'}
+    originals = {name: (root / name).read_bytes() for name in sorted({m[1] for m in mutants})}
+    for name, data in originals.items():
+        committed = subprocess.check_output(['git', 'show', f'{head}:{name}'], cwd=root)
+        if committed != data:
+            raise RuntimeError(f'{name}: commit source before mutation')
+    receipts = []
+
+    def run(name, tasks, extra):
+        command = ['sbt', '-batch', f'-Dsbt.global.staging={args.staging}',
+                   f'-Dstorymodel4s.grakern.build={args.grakern}', *tasks]
+        started = time.time()
+        log = args.out / f'{name}.log'
+        with log.open('wb') as stream:
+            result = subprocess.run(command, cwd=root, stdout=stream, stderr=subprocess.STDOUT)
+        output = log.read_text()
+        totals = re.findall(r'Total (\d+), Failed (\d+), Errors (\d+), Passed (\d+)', output)
+        tested = bool(totals) and 'Compilation failed' not in output
+        failures = [line for line in output.splitlines() if line.startswith('==> X ')]
+        expected = expected_failures.get(name)
+        named_failure = expected is not None and any(re.sub(r'[^A-Za-z0-9 ]', '', expected) in re.sub(r'[^A-Za-z0-9 ]', '', line) for line in failures)
+        killed = result.returncode != 0 and tested and named_failure and any(int(f) > 0 for _, f, _, _ in totals)
+        receipt = dict(name=name, head=head, command=command, exit=result.returncode,
+                       elapsed_seconds=time.time()-started, totals=totals, killed=killed,
+                       expected_failure=expected, failure_lines=failures, **extra)
+        (args.out / f'{name}.json').write_text(json.dumps(receipt, indent=2) + '\n')
+        receipts.append(receipt)
+        (args.out / 'receipts.json').write_text(json.dumps(receipts, indent=2) + '\n')
+        print(json.dumps({'name': name, 'exit': result.returncode, 'killed': killed}), flush=True)
+        return receipt, tested
+
+    baseline, tested = run('before', ['codecJVM/testOnly *TemporalPartitionViewSuite'], {})
+    if baseline['exit'] != 0 or not tested:
+        raise RuntimeError('baseline failed')
+    for name, filename, original, replacement, task in mutants:
+        path, before = root / filename, originals[filename]
+        source = before.decode()
+        if source.count(original) != 1:
+            raise RuntimeError(f'{name}: expected one mutation site, found {source.count(original)}')
+        mutated = source.replace(original, replacement).encode()
+        try:
+            path.write_bytes(mutated)
+            tasks = [task]
+            receipt, _ = run(name, tasks, dict(file=filename,
+                original_sha256=hashlib.sha256(before).hexdigest(),
+                mutant_sha256=hashlib.sha256(mutated).hexdigest()))
+        finally:
+            path.write_bytes(before)
+        if not receipt['killed']:
+            raise RuntimeError(f'{name}: survived or failed without its named compiling test failure')
+    after, tested = run('after', ['codecJVM/testOnly *TemporalPartitionViewSuite'], {})
+    assert after['exit'] == 0 and tested
+    assert all((root / name).read_bytes() == data for name, data in originals.items())
+
+
+if __name__ == '__main__':
+    main()

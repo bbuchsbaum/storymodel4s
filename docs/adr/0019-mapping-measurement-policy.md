@@ -304,3 +304,13 @@ bins and `mediaWindow` carrying the actual axis, exact playback interval and bin
 Excluded endpoints can coincide with the validity boundary; partial-domain bins and
 fractional media ticks refuse. This bridges existing temporal region queries without
 adding a corpus-intake dependency on align or placing scientific arithmetic in pipeline.
+
+Temporal view handoff decision (2026-09-22): `TemporalPartitionView` retains a
+checked partition and projects its bins/contributions to stable marks and existing
+RecallRef addresses. It performs no probability or clock arithmetic and introduces
+no second scientific wire schema. Navigation requires the mapping digest; source
+targets and original alternatives remain explicit. Reject converting score mass
+to faithful posterior cells or labeling supplied measures as an executed aligner.
+A full scene awaits the neutral provenance vocabulary on the workspace M1 branch;
+its current text-only packet also needs media-aware source admission before these
+queries can be joined. A separate declared display timeline is not media support.

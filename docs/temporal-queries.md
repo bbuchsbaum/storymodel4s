@@ -37,8 +37,18 @@ reexecutes the query against the checked mapping and compares the entire record.
 This is a derived readout, not a second mapping schema.
 
 This initial API queries one inference unit and one coordinate domain at a time.
-Recall-time exposure, multi-occurrence allocation, scanner projection, concentration
-summaries and StoryAtlas packet integration retain their separate acceptance gates.
+Recall-time exposure, multi-occurrence allocation, concentration summaries and
+StoryAtlas packet integration retain their separate acceptance gates. Declared scanner
+bins can use the [exact scanner bridge](scanner-crosswalks.md); actual dataset/run
+admission remains separate.
 An onset alone does not define a recall interval; copying unit results to words does
 not create independent observations. Scanner alignment requires an admitted run
 crosswalk and never uses a guessed cartoon offset.
+
+`TemporalPartitionView.from(partition)` retains the original checked readouts and
+projects their contributions to marks and mapping-qualified local navigation.
+Exact regions, atoms, interval gaps, support-only bounds, unavailable mass and
+omitted top-k weight survive unchanged. There is no second scientific JSON schema.
+The Atlas scene/packet adapter still needs M1's neutral supplied-artifact provenance
+and a source package with actual media support. Its text-only source and separate
+display timeline cannot establish that join.
