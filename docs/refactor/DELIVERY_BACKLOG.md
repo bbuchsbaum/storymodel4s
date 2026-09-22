@@ -1,6 +1,10 @@
 # Delivery backlog overview
 
-These are proposed planning keys, not live tracker items. The JSON contains code boundaries, dependency edges, tests and required evidence. Reconcile with existing D1A/D1B and release work before importing.
+These are historical consultant planning keys, not live tracker items. Their import
+was reconciled into [BACKLOG.md](BACKLOG.md), [BACKLOG.json](BACKLOG.json) and live
+Mote on 19 September, with the temporal-workflow amendment on 22 September. Use
+those records and [PLAN.md](PLAN.md); do not import the TA keys again. This table
+and its companion JSON preserve the original proposal and are not an active queue.
 
 | ID | Gate | Owner responsibility | Depends on | Deliverable |
 |---|---|---|---|---|

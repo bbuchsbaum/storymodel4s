@@ -4051,5 +4051,85 @@
       "snapshot": "concurrent-intake-commit"
     }
   ],
-  "execution_receipt": "EXECUTION_RECEIPT.json"
+  "execution_receipt": "EXECUTION_RECEIPT.json",
+  "amendments": [
+    {
+      "date": "2026-09-22",
+      "plan": "../plans/2026-09-22-recall-encoding-workflow.md",
+      "receipt": "evidence/recall-workflow-reconciliation-20260922/receipt.json",
+      "new_storymodel_ids": {
+        "temporal": "bd-01M3549Q5W5KQFSY3ZH81FARM0",
+        "scan_crosswalk": "bd-01M354E83Z4Z7DR4KPP6Q45MAJ",
+        "fine_localization": "bd-01M354ETV6PTK1W0V9RDCW7RN6"
+      },
+      "new_storyatlas_id": "bd-01M354JNKNKJ15N4T5MGQTRSET",
+      "removed_dependencies": [
+        [
+          "bd-01M2WVHF4B5DAXJYY4W91VK4WV",
+          "bd-01M2WVGFA0J4D9T9ZBNR3MY2MR"
+        ]
+      ],
+      "preserved_active_ids": [
+        "bd-01M2WVENSB0P955Y0B603CC20Y",
+        "bd-01M34JAX5KKWECCY72KD4ZV0BW",
+        "bd-01M34J9FS10B14WQA309K0P6V8"
+      ],
+      "superseded_issue": "bd-01M183K7YXA46F66NMTEF8T3ZR",
+      "successor_repository": "storyatlas4s",
+      "successor_id": "bd-01M1C2TV1SJECKEQ6SNVSRBTHQ",
+      "scope": "Planning and ownership migration only; no implementation completion or empirical claim.",
+      "body_changes": [
+        {
+          "id": "bd-01M2TA01EHVRF6MQ1N00XTVK1K",
+          "before_sha256": "f683f088c0fdc34a52cb58b4a25e0a21f7312efc5bd552fc4925ce40f7bf50b0",
+          "after_sha256": "0c0cdd652569c4c0d564c83cfde1313179848d67c4b147611035fad89ab1d903"
+        },
+        {
+          "id": "bd-01M2TACM78289S4TECE91GT5K2",
+          "before_sha256": "c1fc36370fe6daafbc07089eb7780f819ab1058b63987c34df73c07aed83665e",
+          "after_sha256": "f358058cec13cb2fc4418d8413655e784d083ec051469a34a083a0b84c71a1ca"
+        },
+        {
+          "id": "bd-01M2WVH1DC8ZPDC992G4MX3TXG",
+          "before_sha256": "fe8eaa180c310643eaf35cefed83563492d781b40b4df97a4a54752b68333119",
+          "after_sha256": "5c23f615e30de12295082d65ffefa9e298bffbb2bd05b18dc93069129bb2649a"
+        },
+        {
+          "id": "bd-01M2TADC4VKSDZ2S9SXETH2MYM",
+          "before_sha256": "ad7ef008012b84366c11f84f3933621b8d8fdc0bf8cfab5f94d8b5e67513c763",
+          "after_sha256": "58ae18fca8f1a5340c9d6ed32564ed62b41c53cdff4c535f3648d09cc78c7124"
+        },
+        {
+          "id": "bd-01M2WVHF4B5DAXJYY4W91VK4WV",
+          "before_sha256": "2f8eeefe5e5eee4a9bd050dea55f8d97fbcf328bfe610b3f279317fa71717a1f",
+          "after_sha256": "5f010d4aadda054c207c8074c9265d4e94ec439e2290a30fb8e313a9d26f5f71"
+        },
+        {
+          "id": "bd-01M2WVJ8HKX6EHG2C5CXYEZYJ6",
+          "before_sha256": "3d67f38093b49f0116034af73331e27d178bee83fbbcc6a693f8c41f4f244174",
+          "after_sha256": "14c658499948f22debc4cd8d0c9c68812e768abe3e26ba448edfcfa8d8a40f60"
+        },
+        {
+          "id": "bd-01M2TADR4KM1S4J46HK2C3BN76",
+          "before_sha256": "045b6c2e4c37a12bf83a5c21ab7f922738ba9abf0590682dc844f99c07ea0a9a",
+          "after_sha256": "a43a43181462e0fc2cb67d0716bdefe601332b2dbae6919d9eae0eec34ed5997"
+        },
+        {
+          "id": "bd-01M2TAEW794XCR7D2HZJFNXVJY",
+          "before_sha256": "41d91da2b7ee33c62aab6eece0b8c0560505dd0643b46bbdb761cef82090af56",
+          "after_sha256": "55c5dce47ad43d4bf48253f78a31c5927bc51b031c957e1b7882354190eaa1f1"
+        },
+        {
+          "id": "bd-01M2TA9ZK64GTG3526RMNWNHCT",
+          "before_sha256": "2f65b40788441bf13d73287b59ae19bdada8e4a4f2613a45c67dea438ab09b3c",
+          "after_sha256": "f9355fce86e69b64ed323c9f948d2276aeca550d303fc7cdece95a1a48bc8bd7"
+        },
+        {
+          "id": "bd-01M2TAJABHFWN5ZDYNST15Y9G5",
+          "before_sha256": "f7f9240f5eabe05b05de07d0a819c25b2fe33888b8dd0b708fa808d9e2412ebe",
+          "after_sha256": "cdcfe5bdec5ae1395a6e51ef86104fa714a7e7c865d94cfefdfa2be9a68dc514"
+        }
+      ]
+    }
+  ]
 }

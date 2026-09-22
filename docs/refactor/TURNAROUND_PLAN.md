@@ -1,5 +1,11 @@
 # Storymodel4s: delivery turnaround plan
 
+> Historical consultant proposal. Operative delivery and dependencies are in
+> [PLAN.md](PLAN.md), [BACKLOG.md](BACKLOG.md) and live Mote, as reconciled on
+> 19 and 22 September 2026. Do not import this proposal as a second queue.
+> The [recall-to-encoding workflow](../plans/2026-09-22-recall-encoding-workflow.md)
+> adds the temporal-analysis and StoryAtlas contract without changing corpus gates.
+
 **Prepared:** 18 September 2026, America/Toronto.
 
 **Audit baseline:** `bbuchsbaum/storymodel4s` at `1113f96864a38a2869e49d9c8c5d4e2dc43f5d10`.

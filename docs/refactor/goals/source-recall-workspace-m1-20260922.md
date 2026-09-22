@@ -71,7 +71,9 @@ goal. This explicit receipt handoff is the cross-store gate, not a hidden status
 
 One implementation slice and one heavy build at a time. No fleet claims, reservations, candidate
 protocol or named dormant reviewer is introduced. Support honesty was the next executable task
-at setup; the live queries below identify the current executable work.
+at setup; the live queries below identify the current executable work. The 22 September
+[workflow reconciliation](../../plans/2026-09-22-recall-encoding-workflow.md) preserves active
+G1/M1 scope and places temporal-query work downstream.
 
 ## Required behaviors and falsifiers
 

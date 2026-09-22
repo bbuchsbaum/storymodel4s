@@ -1,0 +1,418 @@
+{
+  "schema": "storymodel4s.workflow-reconciliation-receipt/v1",
+  "timestamp_utc": "2026-09-22T18:12:23.715236+00:00",
+  "actor": "codex-recall-workflow-reconciliation",
+  "scope": "Local planning and Mote reconciliation; no runtime implementation, model inference, calibration, corpus read, publication or push.",
+  "heads": {
+    "storymodel4s": "9f88599773b322a3300d9ea72839fcb9c70c6a45",
+    "storyatlas4s": "39be6b7b6b5555c369a36578125e240d86e89829"
+  },
+  "new_tasks": [
+    {
+      "repository": "storymodel4s",
+      "id": "bd-01M3549Q5W5KQFSY3ZH81FARM0",
+      "key": "temporal",
+      "body_sha256": "70cdf1387ab293203b580253a1b409b66b66644bed9b8e8e5fd21f98e882dbf5",
+      "dependencies": [
+        "bd-01M2WVH1DC8ZPDC992G4MX3TXG",
+        "bd-01M2WVHF4B5DAXJYY4W91VK4WV",
+        "bd-01M2TADC4VKSDZ2S9SXETH2MYM",
+        "bd-01M34JAX5KKWECCY72KD4ZV0BW"
+      ],
+      "status": "open"
+    },
+    {
+      "repository": "storymodel4s",
+      "id": "bd-01M354E83Z4Z7DR4KPP6Q45MAJ",
+      "key": "scan_crosswalk",
+      "body_sha256": "7c960ac9a6a681a4018c9b34fa1f0e112536bf67078f57ea9704ae53ddae766d",
+      "dependencies": [
+        "bd-01M3549Q5W5KQFSY3ZH81FARM0",
+        "bd-01M2WTGF981AY7RCN8QC42JSPT"
+      ],
+      "status": "open"
+    },
+    {
+      "repository": "storymodel4s",
+      "id": "bd-01M354ETV6PTK1W0V9RDCW7RN6",
+      "key": "fine_localization",
+      "body_sha256": "60e36a26c4a7bd036f9d348be6456708089ead67c1d00265bdc93af2bcb4b66e",
+      "dependencies": [
+        "bd-01M3549Q5W5KQFSY3ZH81FARM0",
+        "bd-01M2TACM78289S4TECE91GT5K2"
+      ],
+      "status": "open"
+    },
+    {
+      "repository": "storyatlas4s",
+      "id": "bd-01M354JNKNKJ15N4T5MGQTRSET",
+      "key": "atlas_temporal",
+      "body_sha256": "93b8f4503dd4428d378797c6afe3b127fad71556beb7d09634d83a9fbf2b73ea",
+      "dependencies": [
+        "bd-01M34JJ7A88WEAR1MX61B5Q3J9"
+      ],
+      "status": "blocked",
+      "external_producer_ticket": "bd-01M3549Q5W5KQFSY3ZH81FARM0"
+    }
+  ],
+  "existing_changes": [
+    {
+      "repository": "storymodel4s",
+      "id": "bd-01M2TA01EHVRF6MQ1N00XTVK1K",
+      "before_body_sha256": "f683f088c0fdc34a52cb58b4a25e0a21f7312efc5bd552fc4925ce40f7bf50b0",
+      "after_body_sha256": "0c0cdd652569c4c0d564c83cfde1313179848d67c4b147611035fad89ab1d903",
+      "before_status": "open",
+      "after_status": "open",
+      "before_dependencies": [],
+      "after_dependencies": [],
+      "disposition": "amended"
+    },
+    {
+      "repository": "storymodel4s",
+      "id": "bd-01M2TACM78289S4TECE91GT5K2",
+      "before_body_sha256": "c1fc36370fe6daafbc07089eb7780f819ab1058b63987c34df73c07aed83665e",
+      "after_body_sha256": "f358058cec13cb2fc4418d8413655e784d083ec051469a34a083a0b84c71a1ca",
+      "before_status": "open",
+      "after_status": "open",
+      "before_dependencies": [
+        "bd-01M19956MFSG7076QE4J66T7E9",
+        "bd-01M2WVENSB0P955Y0B603CC20Y"
+      ],
+      "after_dependencies": [
+        "bd-01M19956MFSG7076QE4J66T7E9",
+        "bd-01M2WVENSB0P955Y0B603CC20Y"
+      ],
+      "disposition": "amended"
+    },
+    {
+      "repository": "storymodel4s",
+      "id": "bd-01M2WVH1DC8ZPDC992G4MX3TXG",
+      "before_body_sha256": "fe8eaa180c310643eaf35cefed83563492d781b40b4df97a4a54752b68333119",
+      "after_body_sha256": "5c23f615e30de12295082d65ffefa9e298bffbb2bd05b18dc93069129bb2649a",
+      "before_status": "open",
+      "after_status": "open",
+      "before_dependencies": [
+        "bd-01M2WVENSB0P955Y0B603CC20Y"
+      ],
+      "after_dependencies": [
+        "bd-01M2WVENSB0P955Y0B603CC20Y"
+      ],
+      "disposition": "amended"
+    },
+    {
+      "repository": "storymodel4s",
+      "id": "bd-01M2TADC4VKSDZ2S9SXETH2MYM",
+      "before_body_sha256": "ad7ef008012b84366c11f84f3933621b8d8fdc0bf8cfab5f94d8b5e67513c763",
+      "after_body_sha256": "58ae18fca8f1a5340c9d6ed32564ed62b41c53cdff4c535f3648d09cc78c7124",
+      "before_status": "open",
+      "after_status": "open",
+      "before_dependencies": [
+        "bd-01M2TAD04SR823TQVG9VPNH6R3",
+        "bd-01M2WVFV2WGF5BVQHX7JTYYWRH",
+        "bd-01M2WVH1DC8ZPDC992G4MX3TXG"
+      ],
+      "after_dependencies": [
+        "bd-01M2TAD04SR823TQVG9VPNH6R3",
+        "bd-01M2WVFV2WGF5BVQHX7JTYYWRH",
+        "bd-01M2WVH1DC8ZPDC992G4MX3TXG"
+      ],
+      "disposition": "amended"
+    },
+    {
+      "repository": "storymodel4s",
+      "id": "bd-01M2WVHF4B5DAXJYY4W91VK4WV",
+      "before_body_sha256": "2f8eeefe5e5eee4a9bd050dea55f8d97fbcf328bfe610b3f279317fa71717a1f",
+      "after_body_sha256": "5f010d4aadda054c207c8074c9265d4e94ec439e2290a30fb8e313a9d26f5f71",
+      "before_status": "open",
+      "after_status": "open",
+      "before_dependencies": [
+        "bd-01M2WVENSB0P955Y0B603CC20Y",
+        "bd-01M2WVGFA0J4D9T9ZBNR3MY2MR",
+        "bd-01M2WVH1DC8ZPDC992G4MX3TXG"
+      ],
+      "after_dependencies": [
+        "bd-01M2WVENSB0P955Y0B603CC20Y",
+        "bd-01M2WVH1DC8ZPDC992G4MX3TXG"
+      ],
+      "disposition": "amended"
+    },
+    {
+      "repository": "storymodel4s",
+      "id": "bd-01M2WVJ8HKX6EHG2C5CXYEZYJ6",
+      "before_body_sha256": "3d67f38093b49f0116034af73331e27d178bee83fbbcc6a693f8c41f4f244174",
+      "after_body_sha256": "14c658499948f22debc4cd8d0c9c68812e768abe3e26ba448edfcfa8d8a40f60",
+      "before_status": "open",
+      "after_status": "open",
+      "before_dependencies": [
+        "bd-01M2TA5FB4ATF9QS9ZA9MDJNE2",
+        "bd-01M2TADC4VKSDZ2S9SXETH2MYM",
+        "bd-01M2WTGF981AY7RCN8QC42JSPT",
+        "bd-01M2WVHF4B5DAXJYY4W91VK4WV",
+        "bd-01M2WVHVVYQBKSBSW573HZYR9Q"
+      ],
+      "after_dependencies": [
+        "bd-01M2TA5FB4ATF9QS9ZA9MDJNE2",
+        "bd-01M2TADC4VKSDZ2S9SXETH2MYM",
+        "bd-01M2WTGF981AY7RCN8QC42JSPT",
+        "bd-01M2WVHF4B5DAXJYY4W91VK4WV",
+        "bd-01M2WVHVVYQBKSBSW573HZYR9Q"
+      ],
+      "disposition": "amended"
+    },
+    {
+      "repository": "storymodel4s",
+      "id": "bd-01M2TADR4KM1S4J46HK2C3BN76",
+      "before_body_sha256": "045b6c2e4c37a12bf83a5c21ab7f922738ba9abf0590682dc844f99c07ea0a9a",
+      "after_body_sha256": "a43a43181462e0fc2cb67d0716bdefe601332b2dbae6919d9eae0eec34ed5997",
+      "before_status": "open",
+      "after_status": "open",
+      "before_dependencies": [
+        "bd-01M2TA8FJYASVK1WNBQZ26ASTG",
+        "bd-01M2TADC4VKSDZ2S9SXETH2MYM"
+      ],
+      "after_dependencies": [
+        "bd-01M2TA8FJYASVK1WNBQZ26ASTG",
+        "bd-01M2TADC4VKSDZ2S9SXETH2MYM"
+      ],
+      "disposition": "amended"
+    },
+    {
+      "repository": "storymodel4s",
+      "id": "bd-01M2TAEW794XCR7D2HZJFNXVJY",
+      "before_body_sha256": "41d91da2b7ee33c62aab6eece0b8c0560505dd0643b46bbdb761cef82090af56",
+      "after_body_sha256": "55c5dce47ad43d4bf48253f78a31c5927bc51b031c957e1b7882354190eaa1f1",
+      "before_status": "open",
+      "after_status": "open",
+      "before_dependencies": [
+        "bd-01M19956MFSG7076QE4J66T7E9",
+        "bd-01M2TAAQNS7RCCBBM8WFFZF6ZZ",
+        "bd-01M2TADC4VKSDZ2S9SXETH2MYM"
+      ],
+      "after_dependencies": [
+        "bd-01M19956MFSG7076QE4J66T7E9",
+        "bd-01M2TAAQNS7RCCBBM8WFFZF6ZZ",
+        "bd-01M2TADC4VKSDZ2S9SXETH2MYM"
+      ],
+      "disposition": "amended"
+    },
+    {
+      "repository": "storymodel4s",
+      "id": "bd-01M2TA9ZK64GTG3526RMNWNHCT",
+      "before_body_sha256": "2f65b40788441bf13d73287b59ae19bdada8e4a4f2613a45c67dea438ab09b3c",
+      "after_body_sha256": "f9355fce86e69b64ed323c9f948d2276aeca550d303fc7cdece95a1a48bc8bd7",
+      "before_status": "open",
+      "after_status": "open",
+      "before_dependencies": [],
+      "after_dependencies": [],
+      "disposition": "amended"
+    },
+    {
+      "repository": "storymodel4s",
+      "id": "bd-01M2TAJABHFWN5ZDYNST15Y9G5",
+      "before_body_sha256": "f7f9240f5eabe05b05de07d0a819c25b2fe33888b8dd0b708fa808d9e2412ebe",
+      "after_body_sha256": "cdcfe5bdec5ae1395a6e51ef86104fa714a7e7c865d94cfefdfa2be9a68dc514",
+      "before_status": "open",
+      "after_status": "open",
+      "before_dependencies": [
+        "bd-01M2TA4BFRMK8WNA79PPRT8YCD",
+        "bd-01M2TA83GA06RRHR193AV3XYA5",
+        "bd-01M2TADR4KM1S4J46HK2C3BN76",
+        "bd-01M2TAH5VA3WJBGR8WKAAH14Z8"
+      ],
+      "after_dependencies": [
+        "bd-01M2TA4BFRMK8WNA79PPRT8YCD",
+        "bd-01M2TA83GA06RRHR193AV3XYA5",
+        "bd-01M2TADR4KM1S4J46HK2C3BN76",
+        "bd-01M2TAH5VA3WJBGR8WKAAH14Z8"
+      ],
+      "disposition": "amended"
+    },
+    {
+      "repository": "storymodel4s",
+      "id": "bd-01M183K7YXA46F66NMTEF8T3ZR",
+      "before_body_sha256": "2e185ed9bbdb2439cc173e08bc0bfbb6b2755d688025a3f5036b82e164bddd1e",
+      "after_body_sha256": "f44b66163ea8e9f3015cb68d88f75761392e210efc0ded841e5be804c6bab39b",
+      "before_status": "open",
+      "after_status": "closed",
+      "before_dependencies": [],
+      "after_dependencies": [],
+      "disposition": "superseded"
+    },
+    {
+      "repository": "storyatlas4s",
+      "id": "bd-01M1C2TV1SJECKEQ6SNVSRBTHQ",
+      "before_body_sha256": "2660f774bece0d9ff39cad742bef1a6539c11db0b8d7adb5c14ed2a0c9ba4453",
+      "after_body_sha256": "ad2bc1b6991b7d703dd63ea9e668163d5e242dec73e4c8377c786e524cf75a57",
+      "before_status": "blocked",
+      "after_status": "blocked",
+      "before_dependencies": [],
+      "after_dependencies": [],
+      "disposition": "amended"
+    },
+    {
+      "repository": "storyatlas4s",
+      "id": "bd-01M19JQRMYBTYJN7V9HPN7DYKQ",
+      "before_body_sha256": "7a7ad6f380cd016caa74aeb0042d44a21d59c736d27070e2e23b4e6b835d8a8b",
+      "after_body_sha256": "5c99186834d5a09d06bab17c391c3c082128768656317eca2f678b1a815466e0",
+      "before_status": "open",
+      "after_status": "open",
+      "before_dependencies": [
+        "bd-01M1C2TTHJRV7BWMQMPS7ENR1D",
+        "bd-01M1C2TV1SJECKEQ6SNVSRBTHQ"
+      ],
+      "after_dependencies": [
+        "bd-01M1C2TTHJRV7BWMQMPS7ENR1D",
+        "bd-01M1C2TV1SJECKEQ6SNVSRBTHQ"
+      ],
+      "disposition": "amended"
+    },
+    {
+      "repository": "storyatlas4s",
+      "id": "bd-01M1C2TTHJRV7BWMQMPS7ENR1D",
+      "before_body_sha256": "20b0f95abbafe3daafbdfc2978ccef195582c42607f209ea7512a73eb6bd37d8",
+      "after_body_sha256": "b285c7e0e6307904c395aad27688e6ddf12b8580b5d9838ea60f9f751d416209",
+      "before_status": "open",
+      "after_status": "open",
+      "before_dependencies": [],
+      "after_dependencies": [],
+      "disposition": "amended"
+    }
+  ],
+  "checks": [
+    "All ten existing StoryModel amendments read back exactly; their statuses preserved; only declared exchange dependency removed.",
+    "All three existing StoryAtlas amendments read back exactly; statuses and dependencies preserved.",
+    "Four new tasks have exact bodies, local prerequisites and existing-epic parentage; temporal consumer remains blocked for external evidence.",
+    "Old pin issue is explicitly superseded; adoption is still blocked and retains declared-pin versus override qualification.",
+    "Active G1 and M1 producer/container/saved-export/final-acceptance bodies and prerequisites remain unchanged.",
+    "Compatibility -> organization -> synthetic recovery -> full preview preserved; transition implementation, reader integration and independent answers all transferred together.",
+    "All inspected prerequisite/parent IDs resolve in their own stores; inspected dependency graph is acyclic. New nodes only point downstream to existing prerequisites and each other; no new edge from an existing task to a new task introduces a cycle.",
+    "Machine-readable backlog bodies and dependency aliases agree with live affected tasks; preserved historical task entries are not asserted to be current status snapshots.",
+    "Both Mote stores pass doctor/fsck; existing uncommitted-operation warnings retained in receipt."
+  ],
+  "independent_review": {
+    "dependency_design": "reviewed before mutation",
+    "cold_review_corrections": [
+      "Cartoon transitions gate episode-only selection; verified full-part scan joins can retain introductions.",
+      "Preview owns codec/reader implementation as well as transferred transition acceptance.",
+      "Replaced obsolete first-product milestone wording."
+    ]
+  },
+  "mote_doctor": {
+    "storymodel4s": {
+      "actor": "codex-recall-workflow-reconciliation",
+      "actor_ok": true,
+      "actor_source": "flag",
+      "format": {
+        "error": null,
+        "ok": true,
+        "schema_version": 1
+      },
+      "fsck": {
+        "bad_filename": [],
+        "bad_hash": [],
+        "bad_json": [],
+        "bad_op_shape": [],
+        "ops_checked": 14494,
+        "tmp_cleaned": 0,
+        "tmp_total": 0
+      },
+      "fsck_clean": true,
+      "fsck_error": null,
+      "git_backing": {
+        "as_of_ts": "2026-09-22T18:12:19.157409Z",
+        "deleted_op_count": 0,
+        "head": "9f88599773b322a3300d9ea72839fcb9c70c6a45",
+        "mode": "git_backed",
+        "modified_op_count": 0,
+        "oldest_uncommitted_age_s": 108357,
+        "oldest_uncommitted_op_ts": "2026-09-21T12:06:22.642095Z",
+        "repository_root": "/Users/bbuchsbaum/code/scala/storymodel4s",
+        "staged_op_count": 0,
+        "tracked_op_count": 14448,
+        "uncommitted_op_count": 46,
+        "unparseable_uncommitted_count": 0,
+        "untracked_op_count": 46,
+        "working_op_count": 14494
+      },
+      "layout": {
+        "local": true,
+        "ops": true,
+        "root": true,
+        "tmp": true
+      },
+      "ok": true,
+      "store_root": "/Users/bbuchsbaum/code/scala/storymodel4s/.mote",
+      "warnings": [
+        "git-backed op store has 46 uncommitted operation(s); oldest is 1d06h05m; clones populated from Git cannot observe them; synchronize the op files before asking those producers to refresh"
+      ]
+    },
+    "storyatlas4s": {
+      "actor": "codex-recall-workflow-reconciliation",
+      "actor_ok": true,
+      "actor_source": "flag",
+      "format": {
+        "error": null,
+        "ok": true,
+        "schema_version": 1
+      },
+      "fsck": {
+        "bad_filename": [],
+        "bad_hash": [],
+        "bad_json": [],
+        "bad_op_shape": [],
+        "ops_checked": 681,
+        "tmp_cleaned": 0,
+        "tmp_total": 0
+      },
+      "fsck_clean": true,
+      "fsck_error": null,
+      "git_backing": {
+        "as_of_ts": "2026-09-22T18:12:23.626664Z",
+        "deleted_op_count": 0,
+        "head": "39be6b7b6b5555c369a36578125e240d86e89829",
+        "mode": "git_backed",
+        "modified_op_count": 0,
+        "oldest_uncommitted_age_s": 2100187,
+        "oldest_uncommitted_op_ts": "2026-08-29T10:49:16.790521Z",
+        "repository_root": "/Users/bbuchsbaum/code/scala/storyatlas4s",
+        "staged_op_count": 0,
+        "tracked_op_count": 70,
+        "uncommitted_op_count": 611,
+        "unparseable_uncommitted_count": 0,
+        "untracked_op_count": 611,
+        "working_op_count": 681
+      },
+      "layout": {
+        "local": true,
+        "ops": true,
+        "root": true,
+        "tmp": true
+      },
+      "ok": true,
+      "store_root": "/Users/bbuchsbaum/code/scala/storyatlas4s/.mote",
+      "warnings": [
+        "git-backed op store has 611 uncommitted operation(s); oldest is 24d07h23m; clones populated from Git cannot observe them; synchronize the op files before asking those producers to refresh"
+      ]
+    }
+  },
+  "not_executed": [
+    "Scala builds/tests",
+    "browser automation",
+    "participant inference",
+    "new calibration or empirical evaluation"
+  ],
+  "documentation_checks": {
+    "markdown_files": 11,
+    "resolved_local_links": 76,
+    "json_files_parsed": 3,
+    "whitespace_and_git_diff_checks": "passed in both repositories"
+  },
+  "verification_commands": [
+    "mote --json show <each of the 34 inspected issue IDs>",
+    "mote --json ls --all (both repositories)",
+    "mote --actor codex-recall-workflow-reconciliation --json doctor (both repositories)",
+    "python3 /private/tmp/recall-workflow-reconciliation-20260922/verify.py",
+    "git diff --check (StoryModel)",
+    "git diff --check -- docs/delivery/workspace-m1.md (StoryAtlas)"
+  ]
+}
