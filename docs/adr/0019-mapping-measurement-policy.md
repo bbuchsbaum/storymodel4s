@@ -185,3 +185,10 @@ certification: that existing manifest describes a story-build output profile.
 inspection/export grants, not an authenticated license and never an inference from a
 checksum. Checked scientific joins and permission enforcement remain separate from byte
 admission. This adds no module or dependency and leaves G1 authority reservations intact.
+
+The M1 `MappingMatrix` projection in `view` uses exactly the checked record's declared
+target universe. Its private-construction rows and cells retain every inventory outcome,
+all supplied external destinations, original measure metadata and separate posterior
+fidelity states. Missing values remain absent; literal zero remains zero. Reject a display
+cut that recomputes child or parent values, renormalizes a cropped row, or turns a processing
+failure into an external probability. Presentation selection does not alter this projection.
