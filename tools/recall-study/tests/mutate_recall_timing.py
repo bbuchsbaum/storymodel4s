@@ -46,6 +46,18 @@ def main():
          'requireEqual(json, toJson(result), "canonical-record")',
          'requireEqual(toJson(result), toJson(result), "canonical-record")', ct),
     ]
+    expected_failures = {
+        'permit-package-forgery': 'checked timing cannot be forged by a recall subpackage',
+        'admit-duplicate-word': 'complete accounting includes unassigned words',
+        'ignore-entry-clock': 'foreign clocks refuse even when the observation is missing',
+        'admit-zero-interval': 'intervals require positive exact width',
+        'float-rounding': 'exact decimal conversion reduces before range checks',
+        'reject-before-reduction': 'exact decimal conversion reduces before range checks',
+        'substitute-last-for-first': 'first available onset is not a missing boundary',
+        'invent-intervals-from-onsets': 'first available onset is not a missing boundary',
+        'discard-duplicate-json-key': 'unknown null missing reserved and duplicate fields refuse',
+        'trust-carried-diagnostics': 'summary forgery and declaration changes cannot retain the old digest',
+    }
     originals = {name: (root / name).read_bytes() for name in (timing, codec)}
     for name, data in originals.items():
         committed = subprocess.check_output(['git', 'show', f'{head}:{name}'], cwd=root)
@@ -63,16 +75,20 @@ def main():
         output = log.read_text()
         totals = re.findall(r'Total (\d+), Failed (\d+), Errors (\d+), Passed (\d+)', output)
         tested = bool(totals) and 'Compilation failed' not in output
-        killed = result.returncode != 0 and tested and any(int(f) > 0 for _, f, _, _ in totals)
+        failures = [line for line in output.splitlines() if line.startswith('==> X ')]
+        expected = expected_failures.get(name)
+        named_failure = expected is not None and any(expected in line for line in failures)
+        killed = result.returncode != 0 and tested and named_failure and any(int(f) > 0 for _, f, _, _ in totals)
         receipt = dict(name=name, head=head, command=command, exit=result.returncode,
-                       elapsed_seconds=time.time()-started, totals=totals, killed=killed, **extra)
+                       elapsed_seconds=time.time()-started, totals=totals, killed=killed,
+                       expected_failure=expected, failure_lines=failures, **extra)
         (args.out / f'{name}.json').write_text(json.dumps(receipt, indent=2) + '\n')
         receipts.append(receipt)
         (args.out / 'receipts.json').write_text(json.dumps(receipts, indent=2) + '\n')
         print(json.dumps({'name': name, 'exit': result.returncode, 'killed': killed}), flush=True)
         return receipt, tested
 
-    baseline, tested = run('before', [rt, ct], {})
+    baseline, tested = run('before', ['recallJVM/Test/clean', rt, ct], {})
     if baseline['exit'] != 0 or not tested:
         raise RuntimeError('baseline failed')
     for name, filename, original, replacement, task in mutants:
@@ -90,7 +106,11 @@ def main():
         finally:
             path.write_bytes(before)
         if not receipt['killed']:
-            raise RuntimeError(f'{name}: survived or failed without a compiling test failure')
+            raise RuntimeError(f'{name}: survived or failed without its named compiling test failure')
+        if name == 'permit-package-forgery':
+            restored, tested = run('restored-constructor', ['recallJVM/Test/clean', rt], {})
+            if restored['exit'] != 0 or not tested:
+                raise RuntimeError('restored compile-time construction control failed')
     after, tested = run('after', [rt, ct], {})
     assert after['exit'] == 0 and tested
     assert all((root / name).read_bytes() == data for name, data in originals.items())
