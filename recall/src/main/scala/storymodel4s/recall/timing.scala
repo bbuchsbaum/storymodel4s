@@ -69,7 +69,7 @@ object RecallTiming:
     * Seconds may be negative. No rounding, floating conversion or inferred time origin occurs.
     */
   def decimalSeconds(text: String): Either[DecimalRefusal, ExactRational] =
-    val decimal = "([+-]?)([0-9]+)(?:\\.([0-9]+))?(?:[eE]([+-]?[0-9]+))?".r
+    val decimal = "([+-]?)([0-9]*)(?:\\.([0-9]*))?(?:[eE]([+-]?[0-9]+))?".r
     if text.length > 512 then Left(DecimalRefusal.ResourceLimit)
     else
       text match
@@ -77,7 +77,8 @@ object RecallTiming:
           val fraction = Option(fractionOrNull).getOrElse("")
           val digits = whole + fraction
           val exponent = BigInt(Option(exponentOrNull).getOrElse("0"))
-          if digits.length > 128 || exponent.abs > 128 then Left(DecimalRefusal.ResourceLimit)
+          if digits.isEmpty then Left(DecimalRefusal.Malformed)
+          else if digits.length > 128 || exponent.abs > 128 then Left(DecimalRefusal.ResourceLimit)
           else
             val scale = fraction.length - exponent.toInt
             val coefficient = BigInt(digits) * (if sign == "-" then -1 else 1)

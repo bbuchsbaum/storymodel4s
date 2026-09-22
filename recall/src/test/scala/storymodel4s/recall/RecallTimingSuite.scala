@@ -60,7 +60,14 @@ class RecallTimingSuite extends FunSuite:
       "1.0000000000000000000" -> (1L, 1L),
       "+8.750e0" -> (35L, 4L),
       "-1.25e-2" -> (-1L, 80L),
-      "-0" -> (0L, 1L)
+      "-0" -> (0L, 1L),
+      ".1" -> (1L, 10L),
+      "1." -> (1L, 1L),
+      "1.e2" -> (100L, 1L),
+      "-.25E+2" -> (-25L, 1L),
+      "+.0" -> (0L, 1L),
+      "0e128" -> (0L, 1L),
+      "-0e-128" -> (0L, 1L)
     )
     examples.foreach { (s, expected) =>
       val result = decimalSeconds(s).toOption.get
@@ -71,7 +78,7 @@ class RecallTimingSuite extends FunSuite:
     }
   }
   test("bounded decimal intake refuses nonfinite malformed and excessive text") {
-    Vector("NaN", "Infinity", "", " 1", "1 ", "1/2", "1.", ".1", "--1", "1e").foreach { s =>
+    Vector("NaN", "Infinity", "", " 1", "1 ", "1/2", ".", ".e2", "--1", "1e").foreach { s =>
       assertEquals(decimalSeconds(s), Left(DecimalRefusal.Malformed))
     }
     Vector("1e129", "1e-129", "1" * 129, "0" * 513).foreach { s =>
