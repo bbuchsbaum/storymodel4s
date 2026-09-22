@@ -276,3 +276,25 @@ renormalization; hull-based uniform allocation; treating point evidence as durat
 using immediate-child coverage as an exhaustive-support certificate. Future domain
 adapters can recognize verified duplicate coordinate representations; the initial
 conservative refusal must not be relaxed by inspecting only selected geometry.
+
+Declared scanner-coordinate decision (2026-09-22): add `ScannerCrosswalk` and
+`ScannerCrosswalkJson` to `corpus-intake`, and offline `scannerSamples` orchestration
+to `pipeline`. Run inventories bind dataset revision, participant/session/task/run,
+image and header declarations, exact sample points, origin and applied-history
+knowledge. Analysis layouts bind explicit acquired indices, padding and censoring;
+dropping an acquisition never compresses the original time coordinate.
+
+Reference clocks bind either the full recall clock, a media part, or a mapping-qualified
+media occurrence. Positive affine seconds-to-seconds transforms reuse `ClockRepair`
+identity and receipts, with explicit validity domains. BigInt intermediates reduce
+before representability checks, and malformed package-internal rationals refuse.
+Media domains must fit the actual part/occurrence, and native-to-native mappings
+cannot borrow the primary axis timebase. No scanner presentation axis is invented.
+
+These types record checked declarations, not independent data admission. All scanner
+wire records explicitly say `declared-not-independently-verified`. Hash identity does
+not prove that a NIfTI header, recording/run join or preprocessing history was checked.
+The sample CLI leaves scanner binding unestablished. Missing sample exposure and
+HRF/lag operators remain separate. Rejected: guessed Sherlock offsets, implicit
+rounding to volumes, treating padding as acquired data, inferring duration from TR
+points, or promoting declaration labels into verified scientific authority.
