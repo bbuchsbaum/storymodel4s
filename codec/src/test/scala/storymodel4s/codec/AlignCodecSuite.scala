@@ -269,7 +269,12 @@ class AlignCodecSuite extends FunSuite:
       fixture.view
     ) match
       case Left(HsmmCodecError.Rejected(AlignError.MalformedRecord("SupportAssessment", detail))) =>
-        assert(detail.contains("(1.0)"), detail)
+        // Human diagnostics use the backend's Double rendering (JS prints 1, JVM prints 1.0).
+        // The wire above remains canonical IEEE-754 and the refusal still pins both values.
+        assertEquals(
+          detail,
+          s"carried share ${0.5.toString} is not the share its basis derives (${1.0.toString})"
+        )
       case other => fail(s"a caller-selected 0.5 over a complete measurement was accepted: $other")
     // One ULP is a different claim.
     val share = CanonicalPrimitives
