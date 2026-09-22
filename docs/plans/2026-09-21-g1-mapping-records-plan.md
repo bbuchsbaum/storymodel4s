@@ -1,8 +1,10 @@
 # G1 mapping records: implementation plan (revision 4)
 
-Mote `bd-01M2WVENSB0P955Y0B603CC20Y`. **Implementation in qualification.** Slices 1–9 are
-implemented with [focused evidence](../refactor/evidence/g1-mapping-records-20260922/);
-Slice 10 and the clean full landing gate remain open. Live Mote owns completion status.
+Mote `bd-01M2WVENSB0P955Y0B603CC20Y`. **Implementation qualified.** All ten slices and the
+[clean full gate](../refactor/evidence/g1-mapping-records-20260922/final/qualification.json) are complete
+at source `a4ad2e06`: 7,912 passed, five named optional live tests skipped, zero failures.
+[Focused and mutation evidence](../refactor/evidence/g1-mapping-records-20260922/) preserves the
+per-slice results and separate SD6 reviews. Live Mote owns landing/completion status.
 The sections below retain the accepted design and its required falsifiers. Governing
 documents: [PLAN](../refactor/PLAN.md) §§2–3, [ADR 0019](../adr/0019-mapping-measurement-policy.md),
 and the [analysis contract](../refactor/ANALYSIS_CONTRACT.md) ("the contract"). Code references

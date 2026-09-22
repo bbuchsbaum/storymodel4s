@@ -1,0 +1,69 @@
+{
+  "schema": "storymodel4s.g1-qualification/v1",
+  "qualifiedSource": "a4ad2e06123dcca61f4494a39fb4aaef832bff94",
+  "gatedMainBase": "5f39c3580d998c466b85dec72cbded9a0171abda",
+  "postGateIntegration": "8bacd1ae91751338d6c44c36e2d2f2bf3a406119",
+  "postGateMain": "073385a970badb15dd8acfaaeaf36ad23b72a583",
+  "postGateChangedPaths": [
+    ".mote/ops/20260922T191903.895108Z-p46566-c0000-rf862-hb94a10.json",
+    ".mote/ops/20260922T193746.649648Z-p83938-c0000-r06c5-h8acb42.json",
+    ".mote/ops/20260922T193758.193377Z-p84069-c0000-r9634-h38c615.json"
+  ],
+  "postGateQualification": "Only three concurrent Mote notebook operations were merged after the gate; executable sources, tests, build and goldens are unchanged.",
+  "fullGate": "checkAll.json",
+  "fullGateTasks": 56,
+  "counts": {
+    "Total": 7917,
+    "Passed": 7912,
+    "Failed": 0,
+    "Errors": 0,
+    "Skipped": 5,
+    "Ignored": 0
+  },
+  "referenceScope": {
+    "base": "5f39c3580d998c466b85dec72cbded9a0171abda",
+    "candidate": "a4ad2e06123dcca61f4494a39fb4aaef832bff94",
+    "exitCode": 0,
+    "logSha256": "2696e3c03c8f33eea3cab3d985f3f97f3e9e0dc9d8c9268de3e01d1265589287"
+  },
+  "slice10": {
+    "consumerPerBackend": 11,
+    "mappingCodecPerBackend": 40,
+    "snapshotMutation": "killed; restored JVM control 32 passed; final snapshot test passed on all three backends in checkAll",
+    "historicalCheckpoint": "../slice10/receipt.json"
+  },
+  "acceptance": {
+    "AC1": [
+      "../slice2/receipt.json",
+      "../slice6/receipt.json",
+      "../slice7/receipt.json"
+    ],
+    "AC2": [
+      "../slice5/receipt.json",
+      "../slice6/receipt.json"
+    ],
+    "AC3": [
+      "../slice3/receipt.json",
+      "../slice7/receipt.json",
+      "../slice8/receipt.json"
+    ],
+    "AC4": [
+      "../slice4/receipt.json",
+      "../slice9/receipt.json"
+    ],
+    "AC5": [
+      "../slice9/receipt.json",
+      "../slice10/receipt.json",
+      "checkAll.json"
+    ]
+  },
+  "compatibility": "Additive mapping-record/v0.1. Existing HSMM encoding and frozen benchmark files unchanged; see legacy-byte-parity.json. Exact Native historical mapping pin retains its measured one-ULP inference difference without rounding.",
+  "reviews": "Separate SD6 reviews are retained per slice, including the final consumer and snapshot review. Two final wording nits were corrected.",
+  "resourceHistory": "Disk-full interruptions retained as inconclusive in slice archives. Final gate completed after space recovered; only task-owned completed Native caches were cleared.",
+  "limits": [
+    "Local qualification, not hosted CI or publication.",
+    "Five named optional live tests skipped; local Clang 15 upgrade advisory retained.",
+    "No calibration or executed reference-inference authority.",
+    "G1 does not close M1: checked provider packet and Atlas end-to-end acceptance remain required."
+  ]
+}
