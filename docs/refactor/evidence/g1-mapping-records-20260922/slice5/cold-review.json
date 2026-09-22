@@ -1,0 +1,18 @@
+{
+  "reviewer": "m1_support_review",
+  "initial": "0b9b1b8f",
+  "repairCommit": "c5b0332c",
+  "findings": [
+    {
+      "finding": "Fidelity consumed view.node after checking the separately supplied view.nodes inventory.",
+      "executedWitness": "18 JVM tests,2failed16passed; Action changed Correct to Wrong under unchanged binding and repeated inventory reads refused.",
+      "repair": "Capture immutable nodes and all relation coordinates once; validate and assess that snapshot."
+    },
+    {
+      "finding": "The first snapshot helper synthesized hierarchy edges through InMemorySourceView for an explicitly empty layer.",
+      "executedWitness": "21 JVM tests,1failed20passed; matching public DerivationBinding.of returned BindingMismatch(viewFingerprint).",
+      "repair": "Plain SourceView preserves original adjacency maps exactly; lookup derives solely from captured nodes."
+    }
+  ],
+  "followup": "Both findings resolved at c5b0332c; no remaining findings in bounded repair review. Reviewer read code/tests without edits or builds."
+}

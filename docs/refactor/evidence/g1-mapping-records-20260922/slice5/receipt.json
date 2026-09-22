@@ -1,0 +1,67 @@
+{
+  "schema": "storymodel4s.g1-slice-qualification/v1",
+  "slice": 5,
+  "source": "c5b0332c",
+  "initial": "0b9b1b8f",
+  "focused": {
+    "JVM": 40,
+    "JS": 40,
+    "Native": 40,
+    "failures": 0
+  },
+  "mutations": {
+    "distinct": 27,
+    "compiledRuns": 35,
+    "runtime": 23,
+    "construction": 4,
+    "constructionPlatforms": [
+      "JVM",
+      "JS",
+      "Native"
+    ],
+    "constructionMutantAndControlClean": true,
+    "finalRestored": "40 passed on each backend",
+    "inconclusiveAttempt": "The first unbound-lookup-restored attempt failed during shared sbt dependency loading, with no totals; not counted as a killed mutant. Task-owned staging rerun killed it.",
+    "dependencyStaging": {
+      "reason": "Recurring shared sbt staging config-class cache files disappeared before compilation. The failed runtime mutation attempt is inconclusive.",
+      "verification": "Installed sbt 1.12.14 BuildPaths.getStagingDirectory reads sbt.global.staging (javap).",
+      "property": "-Dsbt.global.staging=/private/tmp/storymodel4s-m1-sbt-staging-20260922",
+      "pinsDeclaredIn": "/private/tmp/storymodel4s-m1-grakern-20260922/build.sbt",
+      "dependencies": {
+        "graph4s": {
+          "path": "/private/tmp/storymodel4s-m1-sbt-staging-20260922/8d03f2d14a9e2c9f6990/graph4s",
+          "head": "ea5d2d762f85f5a0f97ee188deb5fac0ef2bcbaf",
+          "trackedChanges": ""
+        },
+        "gale": {
+          "path": "/private/tmp/storymodel4s-m1-sbt-staging-20260922/c6b5fe94c20cf0d05b05/gale",
+          "head": "d55fe2f97196a76ab7879e1a12f1e92403aeba06",
+          "trackedChanges": ""
+        }
+      },
+      "scope": "Fresh task-owned clones of unchanged immutable ProjectRefs. Shared staging was not modified or deleted."
+    },
+    "scopeWitness": "Trusting node scope alone is equivalent within an admitted matching context; the authority fault witness also removes the context-scope guard and is refused by the twin-view court.",
+    "transportWitness": "An explicit unsafe implicit conversion demonstrates forbidden type interchangeability, including through an alias; it is a compilation-boundary mutant, never a legitimate runtime adapter."
+  },
+  "review": {
+    "reviewer": "m1_support_review",
+    "initial": "0b9b1b8f",
+    "repairCommit": "c5b0332c",
+    "findings": [
+      {
+        "finding": "Fidelity consumed view.node after checking the separately supplied view.nodes inventory.",
+        "executedWitness": "18 JVM tests,2failed16passed; Action changed Correct to Wrong under unchanged binding and repeated inventory reads refused.",
+        "repair": "Capture immutable nodes and all relation coordinates once; validate and assess that snapshot."
+      },
+      {
+        "finding": "The first snapshot helper synthesized hierarchy edges through InMemorySourceView for an explicitly empty layer.",
+        "executedWitness": "21 JVM tests,1failed20passed; matching public DerivationBinding.of returned BindingMismatch(viewFingerprint).",
+        "repair": "Plain SourceView preserves original adjacency maps exactly; lookup derives solely from captured nodes."
+      }
+    ],
+    "followup": "Both findings resolved at c5b0332c; no remaining findings in bounded repair review. Reviewer read code/tests without edits or builds."
+  },
+  "archiveSha256": "efebb8e3854f866233beebf9545319a16c006303389bf5df3e70b8fc1992da0b",
+  "limits": "Shape and exact content binding only. Caller-validated HSMM values and asserted stage receipts do not establish inference execution or scientific calibration. No calibrated construction door. Full G1 landing gate remains pending; existing clang-15 warning retained."
+}

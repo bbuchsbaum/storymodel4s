@@ -1,0 +1,564 @@
+[
+  {
+    "mutation": "sum-one-omitted",
+    "platform": "JVM",
+    "sourceSha256": {
+      "mappingmeasures.scala": "ac3a3566bf3555448a60fc443fcacc3b3924c474aa5e68f35729186d49c380e2"
+    },
+    "mutantSha256": {
+      "mappingmeasures.scala": "8db65a7cdefa4dd3d3bf510869be14477463b0179bce7a8e89aab63f950faf45"
+    },
+    "test": "unnormalized mass refuses",
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 28, Failed 1, Errors 0, Passed 27"
+    ],
+    "cleanCompileAndTest": false
+  },
+  {
+    "mutation": "mode-implies-assessed",
+    "platform": "JVM",
+    "sourceSha256": {
+      "mappingmeasures.scala": "ac3a3566bf3555448a60fc443fcacc3b3924c474aa5e68f35729186d49c380e2"
+    },
+    "mutantSha256": {
+      "mappingmeasures.scala": "c1ed78209f4a8bcd4d5e7e21274d6f0adfd70cdc10a408c31784223f71f0e061"
+    },
+    "test": "undeclared scope NotAssessed and twin view yields NotAssessed",
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 28, Failed 1, Errors 0, Passed 27"
+    ],
+    "cleanCompileAndTest": false
+  },
+  {
+    "mutation": "unit-zero-fidelity",
+    "platform": "JVM",
+    "sourceSha256": {
+      "mappingmeasures.scala": "ac3a3566bf3555448a60fc443fcacc3b3924c474aa5e68f35729186d49c380e2"
+    },
+    "mutantSha256": {
+      "mappingmeasures.scala": "116844201833251279b3aa35e82043f8dceaf4364a45fed19acd8b993a418a22"
+    },
+    "test": "fidelity on the link's own unit",
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 28, Failed 3, Errors 0, Passed 25"
+    ],
+    "cleanCompileAndTest": false
+  },
+  {
+    "mutation": "unit-zero-derived-origin",
+    "platform": "JVM",
+    "sourceSha256": {
+      "mappingbinding.scala": "537e00ffd919cf11a1766e9a7f3eac42588cb7087a63b984b9a67d2a9ee4afb9"
+    },
+    "mutantSha256": {
+      "mappingbinding.scala": "d04d5f70929259273feda24b9c51a22b54113c58ea57976150b700f37259e3d2"
+    },
+    "test": "raw costs retain their originating unit and binding",
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 28, Failed 2, Errors 0, Passed 26"
+    ],
+    "cleanCompileAndTest": false
+  },
+  {
+    "mutation": "unit-zero-posterior-origin",
+    "platform": "JVM",
+    "sourceSha256": {
+      "mappingmeasures.scala": "ac3a3566bf3555448a60fc443fcacc3b3924c474aa5e68f35729186d49c380e2"
+    },
+    "mutantSha256": {
+      "mappingmeasures.scala": "69a3f341ced2bcd929f40b92b8ced5fef6f4708d04df782992d479c13b033982"
+    },
+    "test": "model posterior preserves full state keys and exact values",
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 28, Failed 1, Errors 0, Passed 27"
+    ],
+    "cleanCompileAndTest": false
+  },
+  {
+    "mutation": "binding-recall-check-omitted",
+    "platform": "JVM",
+    "sourceSha256": {
+      "mappingbinding.scala": "537e00ffd919cf11a1766e9a7f3eac42588cb7087a63b984b9a67d2a9ee4afb9"
+    },
+    "mutantSha256": {
+      "mappingbinding.scala": "b9584442baf7edd9414ce59d1d887635cb962d2ef7471441705db9b3554ff551"
+    },
+    "test": "foreign recall sharing unit IDs refuses",
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 28, Failed 1, Errors 0, Passed 27"
+    ],
+    "cleanCompileAndTest": false
+  },
+  {
+    "mutation": "inventory-check-omitted",
+    "platform": "JVM",
+    "sourceSha256": {
+      "mappingbinding.scala": "537e00ffd919cf11a1766e9a7f3eac42588cb7087a63b984b9a67d2a9ee4afb9"
+    },
+    "mutantSha256": {
+      "mappingbinding.scala": "cbacdf27eac5c699da1b3793e4840e4970f05a9b1f1f5e6e218c82c368ba449c"
+    },
+    "test": "binding refuses a foreign inventory",
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 28, Failed 1, Errors 0, Passed 27"
+    ],
+    "cleanCompileAndTest": false
+  },
+  {
+    "mutation": "result-content-check-omitted",
+    "platform": "JVM",
+    "sourceSha256": {
+      "mappingbinding.scala": "537e00ffd919cf11a1766e9a7f3eac42588cb7087a63b984b9a67d2a9ee4afb9"
+    },
+    "mutantSha256": {
+      "mappingbinding.scala": "0339920fa0c633911a2b53fe2ea4ae7f3c0d3f8788ded802d09e336632c7eb4b"
+    },
+    "test": "posterior from a foreign result refuses",
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 28, Failed 3, Errors 0, Passed 25"
+    ],
+    "cleanCompileAndTest": false
+  },
+  {
+    "mutation": "posterior-producer-binding-omitted",
+    "platform": "JVM",
+    "sourceSha256": {
+      "mappingmeasures.scala": "ac3a3566bf3555448a60fc443fcacc3b3924c474aa5e68f35729186d49c380e2"
+    },
+    "mutantSha256": {
+      "mappingmeasures.scala": "2a9eaa3435c4c202799bba77c8bcc491ebeb3d357aaec5857adca71698f55020"
+    },
+    "test": "posterior from a foreign result refuses",
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 28, Failed 1, Errors 0, Passed 27"
+    ],
+    "cleanCompileAndTest": false
+  },
+  {
+    "mutation": "recall-supplement-check-omitted",
+    "platform": "JVM",
+    "sourceSha256": {
+      "mappingbinding.scala": "537e00ffd919cf11a1766e9a7f3eac42588cb7087a63b984b9a67d2a9ee4afb9"
+    },
+    "mutantSha256": {
+      "mappingbinding.scala": "69126a30319655c0e864708c30e18aa64cd7b1d4d773562ee49db6731dd3be33"
+    },
+    "test": "recall predicate preserves None versus Some empty",
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 28, Failed 4, Errors 0, Passed 24"
+    ],
+    "cleanCompileAndTest": false
+  },
+  {
+    "mutation": "binding-scope-check-omitted",
+    "platform": "JVM",
+    "sourceSha256": {
+      "mappingbinding.scala": "537e00ffd919cf11a1766e9a7f3eac42588cb7087a63b984b9a67d2a9ee4afb9"
+    },
+    "mutantSha256": {
+      "mappingbinding.scala": "187fd1f37e842882fa6e3ad016a4014e1ba1156bfaf9be59dbfcc428ac01af9e"
+    },
+    "test": "Declared twin view refuses binding",
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 28, Failed 1, Errors 0, Passed 27"
+    ],
+    "cleanCompileAndTest": false
+  },
+  {
+    "mutation": "unbound-view-scope-trusted",
+    "platform": "JVM",
+    "sourceSha256": {
+      "mappingbinding.scala": "537e00ffd919cf11a1766e9a7f3eac42588cb7087a63b984b9a67d2a9ee4afb9",
+      "mappingmeasures.scala": "ac3a3566bf3555448a60fc443fcacc3b3924c474aa5e68f35729186d49c380e2"
+    },
+    "mutantSha256": {
+      "mappingbinding.scala": "5f25ab2bc2c92c92791e793ea48cf1dc0d96c52c8931990551c5b2514dca886e",
+      "mappingmeasures.scala": "6118d508e7a73669bcc74967b715670756712b71a5760dfba53f3cc3c278efce"
+    },
+    "test": "Declared twin view refuses binding",
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 28, Failed 4, Errors 0, Passed 24"
+    ],
+    "cleanCompileAndTest": false
+  },
+  {
+    "mutation": "authored-support-evaluated",
+    "platform": "JVM",
+    "sourceSha256": {
+      "mappingmeasures.scala": "ac3a3566bf3555448a60fc443fcacc3b3924c474aa5e68f35729186d49c380e2"
+    },
+    "mutantSha256": {
+      "mappingmeasures.scala": "dcd3a238e4fe4ff9f6e05c562a786f3b0c2e3ea7fc589e308a5355f5d35fd4ba"
+    },
+    "test": "authored links NotComputed(NoCostBreakdown)",
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 28, Failed 1, Errors 0, Passed 27"
+    ],
+    "cleanCompileAndTest": false
+  },
+  {
+    "mutation": "unbound-lookup-restored",
+    "platform": "JVM",
+    "sourceSha256": {
+      "mappingmeasures.scala": "ac3a3566bf3555448a60fc443fcacc3b3924c474aa5e68f35729186d49c380e2"
+    },
+    "mutantSha256": {
+      "mappingmeasures.scala": "66f2c34fc812e597c034054df3a7c1ddb2bf0b36ce592cef7635614a537a622c"
+    },
+    "test": "fidelity consumes the checked inventory instead of an unbound lookup",
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 28, Failed 1, Errors 0, Passed 27"
+    ],
+    "cleanCompileAndTest": false
+  },
+  {
+    "mutation": "mutable-view-used-without-snapshot",
+    "platform": "JVM",
+    "sourceSha256": {
+      "mappingmeasures.scala": "ac3a3566bf3555448a60fc443fcacc3b3924c474aa5e68f35729186d49c380e2"
+    },
+    "mutantSha256": {
+      "mappingmeasures.scala": "66c0b585067d3f28221077dc1dd04abe36c92270be526ecd366aa4f8cdefc46e"
+    },
+    "test": "binding checks and fidelity consume one captured node inventory",
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 28, Failed 2, Errors 0, Passed 26"
+    ],
+    "cleanCompileAndTest": false
+  },
+  {
+    "mutation": "binding-mutable-view-used",
+    "platform": "JVM",
+    "sourceSha256": {
+      "mappingbinding.scala": "537e00ffd919cf11a1766e9a7f3eac42588cb7087a63b984b9a67d2a9ee4afb9"
+    },
+    "mutantSha256": {
+      "mappingbinding.scala": "37d680eeb73c09f39de70b129c028218514dff7ca82e8f22334aab5155044f35"
+    },
+    "test": "binding construction consumes one captured node inventory",
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 28, Failed 1, Errors 0, Passed 27"
+    ],
+    "cleanCompileAndTest": false
+  },
+  {
+    "mutation": "recall-predicate-presence-collapsed",
+    "platform": "JVM",
+    "sourceSha256": {
+      "mappingbinding.scala": "537e00ffd919cf11a1766e9a7f3eac42588cb7087a63b984b9a67d2a9ee4afb9"
+    },
+    "mutantSha256": {
+      "mappingbinding.scala": "39c574c121f8610e24748f93329c74f0095f240b75d63e538a87d70a021a3996"
+    },
+    "test": "recall predicate preserves None versus Some empty",
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 28, Failed 1, Errors 0, Passed 27"
+    ],
+    "cleanCompileAndTest": false
+  },
+  {
+    "mutation": "source-predicate-presence-collapsed",
+    "platform": "JVM",
+    "sourceSha256": {
+      "mappingsourcerender.scala": "c62b914432df0bcf4629e95afb1dd3abc453ea84a1c7aa226b418391677cf0ba"
+    },
+    "mutantSha256": {
+      "mappingsourcerender.scala": "1c33e70d65c10e39af7e8414e6d32e538f7eb6fde7a8a336df288a75e7e2d08d"
+    },
+    "test": "source predicate preserves None versus Some empty",
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 28, Failed 1, Errors 0, Passed 27"
+    ],
+    "cleanCompileAndTest": false
+  },
+  {
+    "mutation": "recall-outcome-presence-collapsed",
+    "platform": "JVM",
+    "sourceSha256": {
+      "mappingbinding.scala": "537e00ffd919cf11a1766e9a7f3eac42588cb7087a63b984b9a67d2a9ee4afb9"
+    },
+    "mutantSha256": {
+      "mappingbinding.scala": "b07c221951bf03b2ca517c0a16b1447279c0078bd9eff617dc63784c60730e47"
+    },
+    "test": "recall outcome preserves None versus Some empty",
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 28, Failed 1, Errors 0, Passed 27"
+    ],
+    "cleanCompileAndTest": false
+  },
+  {
+    "mutation": "source-outcome-presence-collapsed",
+    "platform": "JVM",
+    "sourceSha256": {
+      "mappingsourcerender.scala": "c62b914432df0bcf4629e95afb1dd3abc453ea84a1c7aa226b418391677cf0ba"
+    },
+    "mutantSha256": {
+      "mappingsourcerender.scala": "6bc7f4a80507671b97402b3cee1fe2fe34f4206d0095f844d1440f7f765c7d13"
+    },
+    "test": "source outcome preserves None versus Some empty",
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 28, Failed 1, Errors 0, Passed 27"
+    ],
+    "cleanCompileAndTest": false
+  },
+  {
+    "mutation": "recall-cause-presence-collapsed",
+    "platform": "JVM",
+    "sourceSha256": {
+      "mappingbinding.scala": "537e00ffd919cf11a1766e9a7f3eac42588cb7087a63b984b9a67d2a9ee4afb9"
+    },
+    "mutantSha256": {
+      "mappingbinding.scala": "b727e1dcf361d757c8b1807e8024f2f5fa9a7bb70d0e5162f100e594772cee5c"
+    },
+    "test": "recall cause preserves None versus Some empty",
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 28, Failed 1, Errors 0, Passed 27"
+    ],
+    "cleanCompileAndTest": false
+  },
+  {
+    "mutation": "source-cause-presence-collapsed",
+    "platform": "JVM",
+    "sourceSha256": {
+      "mappingsourcerender.scala": "c62b914432df0bcf4629e95afb1dd3abc453ea84a1c7aa226b418391677cf0ba"
+    },
+    "mutantSha256": {
+      "mappingsourcerender.scala": "ba7a648d2e9130de2c5d4bdc84a6a15fa5d9f034e7ddda3fd8b99a260c23b64b"
+    },
+    "test": "source cause preserves None versus Some empty",
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 28, Failed 1, Errors 0, Passed 27"
+    ],
+    "cleanCompileAndTest": false
+  },
+  {
+    "mutation": "snapshot-invents-hierarchy",
+    "platform": "JVM",
+    "sourceSha256": {
+      "mappingbinding.scala": "537e00ffd919cf11a1766e9a7f3eac42588cb7087a63b984b9a67d2a9ee4afb9"
+    },
+    "mutantSha256": {
+      "mappingbinding.scala": "c9b1f25208cc6bfbd57dab01c40a5a5ea9019046b4336097d5917f64314fb959"
+    },
+    "test": "snapshot preserves explicitly empty hierarchy adjacency",
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 28, Failed 1, Errors 0, Passed 27"
+    ],
+    "cleanCompileAndTest": false
+  },
+  {
+    "mutation": "posterior-matrix-door",
+    "platform": "JVM",
+    "sourceSha256": {
+      "mappingmeasures.scala": "ac3a3566bf3555448a60fc443fcacc3b3924c474aa5e68f35729186d49c380e2"
+    },
+    "mutantSha256": {
+      "mappingmeasures.scala": "3198f212b1b9df0146635e255203a90967895f4cbdbfc087e2147a0db0a70f79"
+    },
+    "test": "posterior requires a result not a matrix or transport",
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 12, Failed 2, Errors 0, Passed 10"
+    ],
+    "cleanCompileAndTest": true
+  },
+  {
+    "mutation": "posterior-matrix-door",
+    "platform": "JS",
+    "sourceSha256": {
+      "mappingmeasures.scala": "ac3a3566bf3555448a60fc443fcacc3b3924c474aa5e68f35729186d49c380e2"
+    },
+    "mutantSha256": {
+      "mappingmeasures.scala": "3198f212b1b9df0146635e255203a90967895f4cbdbfc087e2147a0db0a70f79"
+    },
+    "test": "posterior requires a result not a matrix or transport",
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 12, Failed 2, Errors 0, Passed 10"
+    ],
+    "cleanCompileAndTest": true
+  },
+  {
+    "mutation": "posterior-matrix-door",
+    "platform": "Native",
+    "sourceSha256": {
+      "mappingmeasures.scala": "ac3a3566bf3555448a60fc443fcacc3b3924c474aa5e68f35729186d49c380e2"
+    },
+    "mutantSha256": {
+      "mappingmeasures.scala": "3198f212b1b9df0146635e255203a90967895f4cbdbfc087e2147a0db0a70f79"
+    },
+    "test": "posterior requires a result not a matrix or transport",
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 12, Failed 2, Errors 0, Passed 10"
+    ],
+    "cleanCompileAndTest": true
+  },
+  {
+    "mutation": "transport-posterior-conversion-door",
+    "platform": "JVM",
+    "sourceSha256": {
+      "mappingmeasures.scala": "ac3a3566bf3555448a60fc443fcacc3b3924c474aa5e68f35729186d49c380e2"
+    },
+    "mutantSha256": {
+      "mappingmeasures.scala": "b8e4f90bbe72365f1bc211ad8d6ce6cda929c8f0a83247272359a97a35054b56"
+    },
+    "test": "posterior requires a result not a matrix or transport",
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 12, Failed 2, Errors 0, Passed 10"
+    ],
+    "cleanCompileAndTest": true
+  },
+  {
+    "mutation": "transport-posterior-conversion-door",
+    "platform": "JS",
+    "sourceSha256": {
+      "mappingmeasures.scala": "ac3a3566bf3555448a60fc443fcacc3b3924c474aa5e68f35729186d49c380e2"
+    },
+    "mutantSha256": {
+      "mappingmeasures.scala": "b8e4f90bbe72365f1bc211ad8d6ce6cda929c8f0a83247272359a97a35054b56"
+    },
+    "test": "posterior requires a result not a matrix or transport",
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 12, Failed 2, Errors 0, Passed 10"
+    ],
+    "cleanCompileAndTest": true
+  },
+  {
+    "mutation": "transport-posterior-conversion-door",
+    "platform": "Native",
+    "sourceSha256": {
+      "mappingmeasures.scala": "ac3a3566bf3555448a60fc443fcacc3b3924c474aa5e68f35729186d49c380e2"
+    },
+    "mutantSha256": {
+      "mappingmeasures.scala": "b8e4f90bbe72365f1bc211ad8d6ce6cda929c8f0a83247272359a97a35054b56"
+    },
+    "test": "posterior requires a result not a matrix or transport",
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 12, Failed 2, Errors 0, Passed 10"
+    ],
+    "cleanCompileAndTest": true
+  },
+  {
+    "mutation": "gated-factories-package-door",
+    "platform": "JVM",
+    "sourceSha256": {
+      "mappingmeasures.scala": "ac3a3566bf3555448a60fc443fcacc3b3924c474aa5e68f35729186d49c380e2"
+    },
+    "mutantSha256": {
+      "mappingmeasures.scala": "be67706a2f5f812cf5b2435405ca5ace171b13ebea07c76a93952efb23f3dd28"
+    },
+    "test": "gated and assessed statuses have no caller door",
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 12, Failed 1, Errors 0, Passed 11"
+    ],
+    "cleanCompileAndTest": true
+  },
+  {
+    "mutation": "gated-factories-package-door",
+    "platform": "JS",
+    "sourceSha256": {
+      "mappingmeasures.scala": "ac3a3566bf3555448a60fc443fcacc3b3924c474aa5e68f35729186d49c380e2"
+    },
+    "mutantSha256": {
+      "mappingmeasures.scala": "be67706a2f5f812cf5b2435405ca5ace171b13ebea07c76a93952efb23f3dd28"
+    },
+    "test": "gated and assessed statuses have no caller door",
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 12, Failed 1, Errors 0, Passed 11"
+    ],
+    "cleanCompileAndTest": true
+  },
+  {
+    "mutation": "gated-factories-package-door",
+    "platform": "Native",
+    "sourceSha256": {
+      "mappingmeasures.scala": "ac3a3566bf3555448a60fc443fcacc3b3924c474aa5e68f35729186d49c380e2"
+    },
+    "mutantSha256": {
+      "mappingmeasures.scala": "be67706a2f5f812cf5b2435405ca5ace171b13ebea07c76a93952efb23f3dd28"
+    },
+    "test": "gated and assessed statuses have no caller door",
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 12, Failed 1, Errors 0, Passed 11"
+    ],
+    "cleanCompileAndTest": true
+  },
+  {
+    "mutation": "calibrated-probability-door",
+    "platform": "JVM",
+    "sourceSha256": {
+      "mappingmeasures.scala": "ac3a3566bf3555448a60fc443fcacc3b3924c474aa5e68f35729186d49c380e2"
+    },
+    "mutantSha256": {
+      "mappingmeasures.scala": "babe59129804a290b3d7fd92a392634950b06e532986a40a18998e4934aa0483"
+    },
+    "test": "calibrated probability has no door",
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 12, Failed 2, Errors 0, Passed 10"
+    ],
+    "cleanCompileAndTest": true
+  },
+  {
+    "mutation": "calibrated-probability-door",
+    "platform": "JS",
+    "sourceSha256": {
+      "mappingmeasures.scala": "ac3a3566bf3555448a60fc443fcacc3b3924c474aa5e68f35729186d49c380e2"
+    },
+    "mutantSha256": {
+      "mappingmeasures.scala": "babe59129804a290b3d7fd92a392634950b06e532986a40a18998e4934aa0483"
+    },
+    "test": "calibrated probability has no door",
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 12, Failed 2, Errors 0, Passed 10"
+    ],
+    "cleanCompileAndTest": true
+  },
+  {
+    "mutation": "calibrated-probability-door",
+    "platform": "Native",
+    "sourceSha256": {
+      "mappingmeasures.scala": "ac3a3566bf3555448a60fc443fcacc3b3924c474aa5e68f35729186d49c380e2"
+    },
+    "mutantSha256": {
+      "mappingmeasures.scala": "babe59129804a290b3d7fd92a392634950b06e532986a40a18998e4934aa0483"
+    },
+    "test": "calibrated probability has no door",
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 12, Failed 2, Errors 0, Passed 10"
+    ],
+    "cleanCompileAndTest": true
+  }
+]

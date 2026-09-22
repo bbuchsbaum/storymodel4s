@@ -29,7 +29,7 @@ mockup, codec round trips alone, or an older browser run cannot substitute for t
 | Step | Store / owner | Mote | Deliverable | Setup disposition |
 |---|---|---|---|---|
 | 1 | StoryModel | `bd-01M19956MFSG7076QE4J66T7E9` | Finish and land support honesty | Existing; resume solo/support-honesty |
-| 2 | StoryModel | `bd-01M2WVENSB0P955Y0B603CC20Y` | Implement G1 mapping records revision 3 | Existing; blocked by support honesty |
+| 2 | StoryModel | `bd-01M2WVENSB0P955Y0B603CC20Y` | Implement G1 mapping records revision 4 | Existing; blocked by support honesty |
 | 3 / 4 upstream | StoryModel | `bd-01M34JAX5KKWECCY72KD4ZV0BW` | Checked manifest/join, fixed-cut matrix, evidence/subset queries and generated fixtures | New; blocked by G1 |
 | 3 adoption | StoryAtlas | `bd-01M1C2TV1SJECKEQ6SNVSRBTHQ` | Qualify and pin the actual producer package | Existing; blocked at the explicit external entry gate |
 | 3 loading | StoryAtlas | `bd-01M34JJ6YR2K714HPAPT8YTES6` | Open joined artifacts without rebuilding app.js | New; blocked by adoption |
@@ -44,7 +44,7 @@ interaction, saved-state handling and export orchestration. Intaglio remains gen
 Ownership names a repository responsibility, not an invented active agent or permanent role.
 
 The support-honesty and G1 acceptance criteria are preserved. G1 uses its
-[revision 3 implementation plan](../../plans/2026-09-21-g1-mapping-records-plan.md); public
+[revision 4 implementation plan](../../plans/2026-09-21-g1-mapping-records-plan.md); public
 vocabulary and changes to canonical interchange still require the appropriate ADR line.
 The packet is a separate downstream ticket so manifest, matrix and browser needs do not expand G1.
 
@@ -70,7 +70,8 @@ container only after that receipt passes; verify it from the StoryModel goal bef
 goal. This explicit receipt handoff is the cross-store gate, not a hidden status synchronization.
 
 One implementation slice and one heavy build at a time. No fleet claims, reservations, candidate
-protocol or named dormant reviewer is introduced. Current next executable task is support honesty.
+protocol or named dormant reviewer is introduced. Support honesty was the next executable task
+at setup; the live queries below identify the current executable work.
 
 ## Required behaviors and falsifiers
 
@@ -128,7 +129,8 @@ affected gates; document-only formalization does not claim to have rerun these c
 
 Setup rechecked the 245-test consumer archive at Atlas 77297769/provider 774fb1e8; it contains
 compiler warnings. The 260-check S4b browser receipt belongs to an earlier provider pair. Neither
-closes this new milestone. Support honesty remains unmerged at caf2d5ea; G1 remains a plan.
+closes this new milestone. At setup, support honesty was unmerged at caf2d5ea and G1 was a plan;
+these are historical setup observations, not a second live status ledger.
 
 ## Scope and the existing roadmaps
 
