@@ -2,6 +2,12 @@
 
 > Delivery sequencing was reconciled on 2026-09-19 in [docs/refactor/PLAN.md](../refactor/PLAN.md). This remains the research-protocol record; reference measurement and public extraction no longer wait for a benchmark checkpoint. Ruling E remains governing; P1 is not adopted.
 
+> The [22 September recall-to-encoding workflow](2026-09-22-recall-encoding-workflow.md)
+> and [active backlog](../refactor/BACKLOG.md) now own temporal queries, raw-BIDS
+> integration and the StoryAtlas consumer handoff. Historical Phase 2 HTML wording
+> does not authorize a second viewer in StoryModel. Research comparisons, fixed
+> human packets, exposure rules and calibration limitations below remain in force.
+
 *2026-09-18. Draft for owner approval, written against `main` at `598c7852`. Everything below is
 LocallyObserved.*
 

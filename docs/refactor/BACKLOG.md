@@ -9,7 +9,7 @@ The 30 consultant TA keys are crosswalk references, not another set of tickets. 
 ## What to do first
 
 The active next product milestone is [M1: one reproducible source-plus-recall investigation](goals/source-recall-workspace-m1-20260922.md),
-Mote `bd-01M34J9FS10B14WQA309K0P6V8`. Finish existing support honesty, then G1 revision 3, then the checked
+Mote `bd-01M34J9FS10B14WQA309K0P6V8`. Finish the active G1 revision 3 slice, then the checked
 provider packet and StoryAtlas's local adoption/loading/interaction/replay chain. Use the `workspace-m1`
 and `execution` tags for the bounded queue. One implementation slice and one heavy gate at a time.
 
@@ -42,24 +42,62 @@ mote ls --tag delivery-20260919
 mote show bd-01M2TA01EHVRF6MQ1N00XTVK1K
 ```
 
-The foundation filter is the immediate executable queue. Other lanes are visible in ticket titles and bodies, and every old issue is enumerated below. A ready research ticket is not permission to start it ahead of the delivery slice. Priorities: 0 foundation, 1 next implementation/film, 2 validation/release/maintenance, 3 deliberately later. Owner decisions apply only to their named track. Containers use nonblocking relationships; dependency edges encode technical prerequisites.
+The `workspace-m1` plus `execution` filter is the active bounded queue; the foundation filter retains its separate historical/infrastructure scope. Other lanes are visible in ticket titles and bodies, and every old issue is enumerated below. A ready research ticket is not permission to start it ahead of the delivery slice. Priorities: 0 foundation, 1 next implementation/film, 2 validation/release/maintenance, 3 deliberately later. Owner decisions apply only to their named track. Containers use nonblocking relationships; dependency edges encode technical prerequisites.
 
-## Critical dependency chain
+## Critical dependency chains
 
 ```text
-baseline -> scorer -> synthetic recovery ---------------------> preview
-    |      support -> shared local evidence -> reference
-    |           records -----------------------> compatibility -> readouts
-    |              |                                   |             |
-    |              +-> word/timing projection ---------+----------> exports
-    +-> clock repair                   structured decode -> command -> preview
+G1 records -> M1 packet -> Atlas adoption -> loading -> selection -> save/export -> M1 acceptance
+       |
+       +-> timing -> base exchange -> temporal queries -> OpenNeuro scan crosswalk
+       +-> shared evidence -> reference -> compatibility -> organization -> recovery -> full G2 preview
+                          -> reconstruction
+compatibility + reconstruction + timing -> facade -> full G2 preview
+M1 packet + base exchange + facade -> temporal queries
+temporal queries + exact provider handoff + Atlas M1 acceptance -> Atlas temporal consumer
 
-S0 -> S1 -> S2 -> {S3, S4a} -> S4b -> S4c -> D1B signatures
-                                        -> film plan -> film compile -> film proofs
-preview + film proofs + infrastructure/hardening -> stable release
+film substrate -> film compiler -> film proofs -> stable-release gate
 ```
 
-The machine-readable [backlog](BACKLOG.json) and [reconciliation](RECONCILIATION.json) contain exact edges. The diagram is a reading aid; the reference chain does not traverse the benchmark checkpoint or film migration. Synthetic recovery gates the scientific-analysis preview; independent human recovery gates empirical claims. It is not necessary to win the mapper comparison to ship the library.
+The diagrams summarize, rather than replace, live dependencies. Temporal queries also
+consume the existing facade and checked M1 producer packet. The full G2 preview owns
+transition-table production, its independent reader and known-answer checks; basic
+exchange explicitly reports that capability unavailable until supplied. Compatibility
+and organization still gate synthetic recovery, and recovery still gates full preview.
+An upstream completed issue does not automatically satisfy a cross-repository handoff.
+
+## Recall-to-encoding reconciliation (22 September 2026)
+
+The [workflow plan](../plans/2026-09-22-recall-encoding-workflow.md) and the
+[applied receipt](evidence/recall-workflow-reconciliation-20260922/receipt.json) reconcile this extension with both live stores.
+The original 19 September execution receipt remains a historical checkpoint.
+
+| Capability / disposition | Canonical owner |
+|---|---|
+| Active records and bounded M1 workspace | Existing G1/M1 tickets; acceptance unchanged |
+| Words, onset/interval timing and exact support | `bd-01M2WVH1DC8ZPDC992G4MX3TXG`; temporal numeric/query work is downstream |
+| Temporal measures, precision queries, sparse weights and checked view packets | New StoryModel `bd-01M3549Q5W5KQFSY3ZH81FARM0` |
+| OpenNeuro raw/BIDS scanner crosswalk and analysis walkthrough | New StoryModel `bd-01M354E83Z4Z7DR4KPP6Q45MAJ`; historical annotation ClockRepair does not certify scanner clocks |
+| Optional evidence-backed fine localization | New StoryModel `bd-01M354ETV6PTK1W0V9RDCW7RN6`; engineering can finish uncalibrated |
+| Linked temporal/uncertainty views | New StoryAtlas `bd-01M354JNKNKJ15N4T5MGQTRSET`; post-M1 sibling, blocked for exact producer handoff |
+| Annotation-only / AV evidence plumbing | Existing `bd-01M2TACM78289S4TECE91GT5K2`; optional verified sidecars, no caption-production prerequisite |
+| CLI and base exchange | Existing `bd-01M2TADC4VKSDZ2S9SXETH2MYM` and `bd-01M2WVHF4B5DAXJYY4W91VK4WV`; same artifacts for notebooks and viewer |
+| Transition exchange and independent transition answers | Existing full preview `bd-01M2WVJ8HKX6EHG2C5CXYEZYJ6`; all organization/recovery gates retained |
+| Empirical AV comparisons / fine-time reliability | Existing H3 `bd-01M2TAJABHFWN5ZDYNST15Y9G5` and reliability `bd-01M2TAEW794XCR7D2HZJFNXVJY`; legacy human packet stays diagnostic |
+| Portable HTML recall report | Existing Atlas `bd-01M19JQRMYBTYJN7V9HPN7DYKQ`, using static mechanics `bd-01M1C2TTHJRV7BWMQMPS7ENR1D` |
+| Benchmark migration and historical-arm retirement | Existing StoryModel `bd-01M2TADR4KM1S4J46HK2C3BN76`; every arm needs replay/parity before retirement |
+| Stale StoryModel pin-bump issue | `bd-01M183K7YXA46F66NMTEF8T3ZR` superseded by Atlas adoption `bd-01M1C2TV1SJECKEQ6SNVSRBTHQ`; no adoption completion claimed |
+
+Only one existing dependency is removed: organization -> basic exchange. Its entire
+transition-exchange obligation is transferred to full preview, not discarded. New
+tasks are children of existing delivery containers; they are not new M1 children.
+No calibration, benchmark win, optional AV provider, hosted service or full film-model
+wire is inserted as a prerequisite for basic uncertainty inspection. Film/release and
+corpus/exposure requirements remain in their existing lanes.
+
+Implementation details and future tests live in the ticket bodies and workflow plan.
+The machine-readable [backlog](BACKLOG.json) carries the same amendments and exact
+dependencies; [reconciliation](RECONCILIATION.json) preserves the dated migration.
 
 ## New and substantially revised execution tickets
 
@@ -206,24 +244,24 @@ Boundary: recall RecallTiming extraction, codec unit_words/support tables.
 
 Validation: `proposed RecallProjectionSuite on recall platforms; exact integer >2^53 and non-BMP consumer fixture`.
 
-Minimal source/word tables first; dense matrices and new granularity models deferred.
+This ticket completes source/word/timing tables and the projection input contract. Numeric temporal queries, precision and sparse grids are owned by the downstream temporal ticket above; no dense-grid implementation is required here.
 
 ### G2: mapping exchange tables and an independent Python or R consumer
 
 Mote: `bd-01M2WVHF4B5DAXJYY4W91VK4WV` · new · lane `next` · priority 1.
 
-Prerequisites: `bd-01M2WVENSB0P955Y0B603CC20Y`, `bd-01M2WVH1DC8ZPDC992G4MX3TXG`, `bd-01M2WVGFA0J4D9T9ZBNR3MY2MR`.
+Prerequisites: `bd-01M2WVENSB0P955Y0B603CC20Y`, `bd-01M2WVH1DC8ZPDC992G4MX3TXG`. Organization is no longer a prerequisite for base exchange.
 
 Boundary: codec exchange writer/reader, pipeline export, examples.
 
-1. Document TSV quoting and types plus JSON manifest; export target/word/unit/support/measure/decision/transition tables from one checked result. No inference is reconstructed from display strings.
-2. Independent Python or R reader checks hashes, joins, all outcomes, stage policies, exact ticks and interval membership; reproduces manually authored tiny transition answers without importing Scala exporter logic.
+1. Document TSV quoting and types plus JSON manifest; export target/word/unit/support/measure/decision tables from one checked result; declare optional capabilities explicitly. No inference is reconstructed from display strings.
+2. Independent Python or R reader checks hashes, joins, all outcomes, stage policies, exact ticks and interval membership; reproduces independently authored target-mass, exact-support and outcome-accounting answers without importing Scala exporter logic.
 3. Schema rejects duplicate/missing keys, foreign source/recall identity, digest mismatch, unsupported versions and partial publication unless explicitly requested. Do not round authoritative measures or cast exact ticks through floating point.
 4. Reference and structured views coexist with common evidence digest and separate policies/decisions. Calibration unavailable stays explicit; consumer sees ambiguity and coverage limitations.
 
 Validation: `proposed MappingExchangeSuite; python3 examples/mapping/read_mapping.py <miniature> (path to be implemented)`.
 
-One downstream language is enough; no viewer or Parquet requirement.
+One downstream language is enough; no viewer or Parquet requirement. Transition serialization, reader joins and tiny transition answers are owned together by full G2 preview. Absent capabilities remain explicitly unavailable.
 
 ### G3: frozen synthetic recovery court for recall organization
 
@@ -284,17 +322,18 @@ Mote: `bd-01M2WVJ8HKX6EHG2C5CXYEZYJ6` · new · lane `next` · priority 1.
 
 Prerequisites: `bd-01M2WTGF981AY7RCN8QC42JSPT`, `bd-01M2TADC4VKSDZ2S9SXETH2MYM`, `bd-01M2WVHF4B5DAXJYY4W91VK4WV`, `bd-01M2WVHVVYQBKSBSW573HZYR9Q`, `bd-01M2TA5FB4ATF9QS9ZA9MDJNE2`.
 
-Boundary: pipeline examples, docs-site analysis guide, docs/refactor/evidence.
+Boundary: codec transition exchange, independent exchange-reader integration, pipeline examples, docs-site analysis guide, docs/refactor/evidence.
 
 1. New analyst runs a text miniature and an admitted real annotated-video recall from ordinary local input paths through library/CLI to reference+reconstruction mapping tables and the independent consumer. No normal consumer imports bench.
 2. Configuration resolved once; source reused across two recall inputs without rewriting its identity. Offline replay forbids network and yields deterministic scientific payloads; provider failure remains one typed participant/unit outcome.
 3. Require reference-compatible organization readouts, per-unit and per-transition coverage and exact support/receipt joins. Declare annotation-assisted origin, inference grain and uncalibrated status. Do not claim automatic visual understanding or independent empirical recovery.
 4. Crash/partial-write/digest mutations cause incomplete output refusal. Execution completion, structural validity and requested capability readiness are separate. No media/prose leaks into committed logs.
 5. Commit command/config/input/output hashes, platform, totals and one reader walkthrough; private artifacts remain local. This gate is not D1A-film, V1, or the stable 1.0 release.
+6. Implement the transferred transition-table serialization, checked manifest/reader joins and independent tiny backward/forward/same/unresolved answers. Basic mapping exchange or temporal localization alone does not close this scientific preview.
 
 Validation: `proposed pipeline public recall-map invocation + offline replay + independent reader; docs-site executable example`.
 
-This is the first usable product milestone.
+This is the full G2 scientific-analysis preview milestone.
 
 ### G0: obtain an executed exact-SHA clean build and CI receipt
 
@@ -402,7 +441,10 @@ At the implementation SHA, record exact paths, command receipts, test totals and
 | TA-29 | `bd-01M2TAKTB61XNXV4Y6A9J3CB0C` (infra), `bd-01M2TAM66RTEMY3VVHA3N2MYXK` (hardening), `bd-01M2WVHF4B5DAXJYY4W91VK4WV` (exports) |
 | TA-30 | `bd-01M2TAMJ95K9D7H248A8387YW4` (release) |
 
-## Complete disposition of previously unfinished work
+## Historical 19 September disposition of previously unfinished work
+
+The 22 September amendments above and live Mote supersede affected rows below. This
+original inventory remains a historical crosswalk, not a second execution queue.
 
 All 119 rows from the initial snapshot and all 17 issues in the concurrent intake commit appear exactly once. The superseded new clock ticket is separately accounted for in BACKLOG.json. “Landed” means the cited commit is reachable and its existing evidence was inspected; it is not a claim of a fresh test run. Superseded/retired closures do not claim implementation. Historical assignees are cleared through the CLI; Mote represents an explicit cleared assignee as an empty string.
 

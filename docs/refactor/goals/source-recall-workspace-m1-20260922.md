@@ -70,7 +70,7 @@ container only after that receipt passes; verify it from the StoryModel goal bef
 goal. This explicit receipt handoff is the cross-store gate, not a hidden status synchronization.
 
 One implementation slice and one heavy build at a time. No fleet claims, reservations, candidate
-protocol or named dormant reviewer is introduced. Current next executable task is support honesty.
+protocol or named dormant reviewer is introduced. Current next executable task is the active G1 records slice; live Mote supersedes this dated queue statement.
 
 ## Required behaviors and falsifiers
 

@@ -90,3 +90,16 @@ The pre-seal audit exposed S72's empty canonical transcript column and populated
 heading with one trailing space. Bind a fifth sheet overlay to that exact header and require
 the displaced column to remain empty. Preserve the superseded audit in local evidence; no
 model output or split allocation informed this correction.
+
+The 2026-09-22 [workflow plan](../plans/2026-09-22-recall-encoding-workflow.md) extends
+the readout design to continuous-time queries and dynamic uncertainty views.
+Discrete mapping records remain authoritative; temporal allocation, recall exposure,
+clock transformations and neural response operators have separate provenance.
+Support-only bounds, assumed allocation, model localization and empirical calibration
+are distinct claims. “A or B” alternatives cannot stand in for “A and B” references.
+Reject a single forced time-warp, automatic uniform allocation, display-driven
+renormalization and per-frame claims from scene-only evidence. The exact public
+projection API follows G1 and its own checked implementation; this planning record
+adds no module, dependency or implemented Scala type. StoryAtlas consumes the same
+checked queries and exports as Python/R, preserving measure units, missingness and
+semantic identity under zoom, selection and replay.

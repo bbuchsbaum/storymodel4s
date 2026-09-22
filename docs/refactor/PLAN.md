@@ -16,6 +16,22 @@ the earlier deferral of viewer work for this milestone only. The reference-measu
 release commitments below remain in force on their own lanes and do not all gate M1.
 Live Mote and the goal's explicit dependency/receipt handoffs supersede older next-task prose.
 
+The [recall-to-encoding workflow plan](../plans/2026-09-22-recall-encoding-workflow.md)
+extends this delivery toward reusable temporal queries, uncertainty maps, structured
+analysis exports and dynamic StoryAtlas views, with OpenNeuro Sherlock as the first
+imaging adapter. It preserves the active G1 landing and existing scientific/release
+gates; its new command and projection contracts are planned, not implemented.
+Visualization implementation belongs in `~/code/scala/storyatlas4s`, extending the
+M1 workspace through the same checked producer contracts and exact-pair acceptance.
+
+The 22 September workflow reconciliation is indexed in [BACKLOG.md](BACKLOG.md).
+Base mapping exchange no longer waits for organization statistics. Transition-table
+production, independent reader checks and tiny-answer validation belong together
+to the full G2 preview, whose organization/compatibility/recovery gates remain.
+Temporal queries, raw-BIDS scan alignment and the post-M1 StoryAtlas temporal
+consumer have distinct execution tickets. Optional video acquisition, fine
+localization and empirical calibration do not gate the basic workflow.
+
 ## 1. Assessment
 
 The project needs a correction at its inference-to-analysis boundary, not a rewrite. Keep the
@@ -29,9 +45,12 @@ An order-prior switch, a shuffled-transcript subtraction, and a prose warning do
 The engineering response is a reference path whose information use is restricted and tested;
 the scientific response is recovery validation. Neither substitutes for the other.
 
-### Current evidence
+### Historical baseline evidence (19 September)
 
-These are findings at the baseline, not a fresh full build or an empirical reanalysis.
+These are findings at the baseline, not current defect/status assertions. The dated
+completion records in section 4 and live Mote supersede them; in particular, scorer
+and production annotation-clock repairs have since landed. This table is retained
+as the rationale for that work, not a fresh build or empirical reanalysis.
 
 | Finding | Evidence inspected or executed here | Consequence |
 |---|---|---|
@@ -314,10 +333,13 @@ open with a remaining-work statement; they are not closed merely to make the cou
 Remove stale assignees and doing/review states. No claims, reservations or candidates are created
 for this single-developer planning exercise.
 
-Use lane tags and dependency-filtered queries from BACKLOG. The immediate queue is baseline,
-scorer, clock integration and S0, with rescue as independent preservation work. Benchmark
-campaigns, viewer work, corpus expansion, interview enhancements and fleet-tool defects are
-visible separately. No benchmark win or optional hosted provider sits on the preview/film path.
+Use lane tags and dependency-filtered queries from BACKLOG. The active product queue is
+the M1 chain at the top of this document: finish the current G1 implementation, publish
+the checked workspace packet, then qualify StoryAtlas adoption and interaction. Completed
+baseline/scorer/clock/S0 work remains prerequisite evidence, not another execution queue.
+The temporal workflow extends this with bounded downstream tickets. Benchmark campaigns,
+corpus expansion, interview enhancements and fleet-tool defects remain separate. No
+benchmark win or optional hosted provider sits on the preview/film path.
 
 Remaining owner input is bounded: the CI account/runner route (deferred by the owner on
 21 September 2026: local exact-SHA gates qualify engineering meanwhile, and G5 stays open);
