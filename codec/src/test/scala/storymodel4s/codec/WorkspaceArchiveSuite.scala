@@ -99,18 +99,16 @@ class WorkspaceArchiveSuite extends FunSuite:
     assert(!result.toString.contains(secret))
     assertEquals(WorkspaceArchive.of(denied), Left(WorkspaceRefusal.PermissionDenied))
   }
-  test("export denial does not invent a grant while inspection remains permitted") {
-    val result = WorkspaceArchiveCodec
-      .decode(
-        WorkspaceArchiveCodec
-          .encode(manifest(exportPermission = WorkspaceContentGrant.Denied))
-          .toOption
-          .get
-      )
-      .toOption
-      .get
-    assert(result.capabilities.permitsInspection(Checksum.ofText(model), Checksum.ofText(recall)))
-    assert(!result.capabilities.permitsExport(Checksum.ofText(model), Checksum.ofText(recall)))
+  test(
+    "export denial blocks transferable packet serialization while inspection remains permitted"
+  ) {
+    val denied = manifest(exportPermission = WorkspaceContentGrant.Denied, modelText = secret)
+    val result = WorkspaceArchive.of(denied).toOption.get
+    assert(result.capabilities.permitsInspection(Checksum.ofText(secret), Checksum.ofText(recall)))
+    assert(!result.capabilities.permitsExport(Checksum.ofText(secret), Checksum.ofText(recall)))
+    val exported = WorkspaceArchiveCodec.encode(denied)
+    assertEquals(exported, Left(WorkspaceRefusal.PermissionDenied))
+    assert(!exported.toString.contains(secret))
   }
   test("capability identities and declaration receipt must match actual artifacts") {
     Vector[WorkspaceCapabilities => WorkspaceCapabilities](

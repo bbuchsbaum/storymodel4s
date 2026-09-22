@@ -198,5 +198,6 @@ transport. They verify the manifest and the actual capability artifact before re
 inspectable contents or serializing a packet. The owner declaration binds exact model,
 recall and declaration-receipt bytes, with no default grants. Unknown/duplicate fields and
 malformed UTF-8 refuse with content-free diagnostics. This is byte and permission admission,
-not the semantic join. Reject a permissive generic archive decoder or byte repair; binary
+not the semantic join. Packet serialization is content export and requires the export grant;
+inspection-only admission never licenses packet writing. Reject a permissive generic archive decoder or byte repair; binary
 sidecar transport is outside this first version and needs its own declared encoding.

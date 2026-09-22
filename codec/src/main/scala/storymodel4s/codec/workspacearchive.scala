@@ -164,7 +164,11 @@ object WorkspaceArchiveCodec:
 
   /** Permission is checked before any archive text is returned, including on the producer path. */
   def encode(manifest: WorkspaceManifest): Result[String] =
-    WorkspaceArchive.of(manifest).flatMap(_ => archiveJson(manifest).map(MappingJson.print))
+    WorkspaceArchive.of(manifest).flatMap { archive =>
+      if archive.capabilities.exportPermission != WorkspaceContentGrant.Granted then
+        Left(WorkspaceRefusal.PermissionDenied)
+      else archiveJson(manifest).map(MappingJson.print)
+    }
 
   def decode(text: String): Result[WorkspaceArchive] =
     for
