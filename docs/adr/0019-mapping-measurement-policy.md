@@ -85,6 +85,12 @@ The later slices add the detailed vocabulary and interchange amendments in the s
 G1 landing. `Derived`, calibrated probabilities and calibrated decisions remain reserved
 with no construction door; identity does not establish that inference executed.
 
+The inventory cold review reproduced distinct admitted surrogate code units collapsing in
+legacy UTF-8 checksums. New G1 digests therefore hash a lossless ASCII rendering of UTF-16
+tokens; segmentation includes canonical text alongside the legacy text checksum. Reject a
+hash-only transcript binding and lossy token hashing. This is local to the new identity
+contract and does not migrate existing core IDs, fingerprints or wire artifacts.
+
 The Memento task and seal (2026-09-21) use the same shared guard with fixed corpus paths.
 The independent population rule retains 123 participants; the owner chose 63 test and 60
 development, stratified 14/17/15/17 test across conditions, with seed 20260921. SHA-256 ranking

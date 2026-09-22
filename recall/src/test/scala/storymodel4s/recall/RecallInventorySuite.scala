@@ -30,6 +30,36 @@ class RecallInventorySuite extends FunSuite:
   private val recall = graph(text, spans.patch(1, Nil, 1))
   private def inventory = RecallInventory.of(recall, spans, policy).toOption.get
 
+  test("distinct UTF-16 unit identities never share segmentation or inventory") {
+    val plain = graph("one", Vector(TextSpan.unsafe(0, 3)))
+    def withId(code: Int): RecallGraph[Checked] =
+      val id = RecallUnitId.from(String.valueOf(code.toChar)).toOption.get
+      RecallGraph.validated(plain.copy(units = Vector(plain.units.head.copy(id = id)))).toOption.get
+    val a = withId(0xd800)
+    val b = withId(0xd801)
+    assertNotEquals(a.units.head.id, b.units.head.id)
+    val ia = RecallInventory.of(a, Vector(TextSpan.unsafe(0, 3)), policy).toOption.get
+    val ib = RecallInventory.of(b, Vector(TextSpan.unsafe(0, 3)), policy).toOption.get
+    assertNotEquals(ia.segmentation, ib.segmentation)
+    assertNotEquals(ia.digest, ib.digest)
+    assert(!ia.describes(b))
+    assert(ia.describes(a))
+  }
+
+  test("distinct admitted UTF-16 transcripts never share inventory identity") {
+    val a = graph("a" + String.valueOf(0xd800.toChar) + "b", Vector(TextSpan.unsafe(0, 3)))
+    val b = graph("a" + String.valueOf(0xd801.toChar) + "b", Vector(TextSpan.unsafe(0, 3)))
+    assertNotEquals(a.transcript.canonicalText, b.transcript.canonicalText)
+    // Legacy hashes replace both malformed sequences identically; G1 must supplement them.
+    assertEquals(a.transcript.canonicalChecksum, b.transcript.canonicalChecksum)
+    val ia = RecallInventory.of(a, Vector(TextSpan.unsafe(0, 3)), policy).toOption.get
+    val ib = RecallInventory.of(b, Vector(TextSpan.unsafe(0, 3)), policy).toOption.get
+    assertNotEquals(ia.segmentation, ib.segmentation)
+    assertNotEquals(ia.digest, ib.digest)
+    assert(!ia.describes(b))
+    assert(ia.describes(a))
+  }
+
   test("every parsed word is accounted") {
     val result = inventory
     assertEquals(result.words.map(_.index), (0 until 9).toVector)

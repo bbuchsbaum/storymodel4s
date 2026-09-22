@@ -38,6 +38,7 @@ object SegmentationId:
         Vector(
           "segmentation/v1",
           graph.transcript.canonicalChecksum.hex,
+          graph.transcript.canonicalText,
           InventoryRender.sequence(
             graph.ordered.map(u =>
               InventoryRender.sequence(
@@ -194,7 +195,11 @@ object RecallInventory:
 private object InventoryRender:
   def sequence(values: Vector[String]): String =
     values.size.toString + ":" + values.map(v => s"${v.length}:$v").mkString
-  def digest(values: Vector[String]): Checksum = Checksum.ofText(sequence(values))
+  // Core IDs and StorySource currently admit unpaired surrogate code units. UTF-8 encoding
+  // replaces those, so hashing raw tokens would merge different admitted identities. Hash an
+  // ASCII rendering of every code unit; supplement the legacy transcript hash above with text.
+  def digest(values: Vector[String]): Checksum =
+    Checksum.ofText(sequence(values).iterator.map(c => f"${c.toInt}%04x").mkString)
   def span(value: SpanSet): String = sequence(value.refs.toVector.map { ref =>
     sequence(
       Vector(

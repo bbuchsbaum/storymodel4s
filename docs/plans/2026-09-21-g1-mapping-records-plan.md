@@ -140,6 +140,10 @@ object RecallInventory:
 - **Membership** is span overlap (`:120-121`): a word in two units refuses; a word in no unit is
   `Unassigned` (the 94 G0 separators).
 - **`SegmentationId`** binds positional unit IDs (`segmenter.scala:435`) to the unitization.
+  Its new digest includes canonical text as well as the legacy checksum and encodes tokens
+  losslessly as UTF-16 code units before hashing. Existing IDs/text admit malformed surrogate
+  sequences that UTF-8 replaces identically. All new G1 identity digests preserve code units;
+  supplemental fidelity renders must cover such collisions as well as optional presence.
 
 **align:** outcomes in `mapping.scala` (§3 AC2 has decisions).
 
