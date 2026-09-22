@@ -134,3 +134,21 @@ an empty or abstained row still needs ledger validation and reproducible policy 
 Outcomes derive choices, candidate-support status and localization from an explicit measure
 basis; a listed alternative in another measure does not join that basis. No new module or
 dependency is introduced.
+
+G1 interchange decision (2026-09-22): `MappingCodecs` is a separate contextual
+`mapping-record/v0.1` wire. `ExpectedMappingContext` carries checked inventory/source;
+`DerivationContext` supplies the original result, recall and view for bound values.
+`MappingCodecError` follows the existing HSMM wrapper precedent: JSON/schema errors
+wrap `CodecError`, contract refusals wrap `MappingRefusal`, and numeric-coordinate,
+reserved-authority, context, digest and value mismatches remain typed. Reject adding
+mapping-specific cases to the shared generic JSON error enum.
+
+The JSON groups typed policy IDs, unit roles and stage-assumption receipts, flattens
+measure alternatives into per-outcome `mapping_links`, and keeps link assessment and
+chosen-link fidelity separate. Support uses `support_status`, `source_support`,
+`term_support` and `support_coverage`. Optional data is explicitly tagged. The codec
+rebuilds physical evidence against full checked bundles and re-derives bound measures,
+links and decisions before a canonical full-record match. Reject trusting a carried
+checksum alone or accepting a serialized assessment as its own authority. Mapping-only
+ASCII JSON escaping preserves all UTF-16 code units through byte serialization; the
+existing HSMM and generic canonical formats are unchanged.
