@@ -152,7 +152,7 @@ sealed trait ProcessingStatus // Complete | Failed(ProcessingFailure) | Excluded
 enum ProcessingFailure { case ProviderFailure(d: String); case InvalidOutput(d: String); case InferenceRefused(d: String) }
 enum LocalizationStatus { case Located, Nonlocalizable, Unranked, NotComputed }
 final class UnitOutcome private (val unit: RecallUnitId, val processing: ProcessingStatus, val localization: LocalizationStatus,
-    val links: Vector[MappingLink], val measures: UnitMeasures, val decision: Option[UnitDecision])
+    val links: Vector[MappingLink], val measures: UnitMeasures, val decision: Option[UnitDecision], val stages: Option[UnitStageRefs])
 object UnitOutcome:
   def computed(unit: RecallUnitId, measures: UnitMeasures, links: Vector[MappingLink], basis: DecisionBasis,
       request: DecisionRequest, stages: UnitStageRefs): Either[MappingRefusal, UnitOutcome]
@@ -284,8 +284,14 @@ enum DecisionOrigin { case RawArgmax; case StructuredDecode(p: DecisionPolicyId)
 sealed trait DecodedTargetMass   // InCandidateSupport(value) | OutsideCandidateSupport | NoDecision
 sealed trait DecisionCalibration // Unavailable(reason) | Calibrated(p) [no door in G1]
 final class UnitDecision private (val basis: DecisionBasis, val chosen: Option[Destination], val origin: DecisionOrigin,
-    val rawArgmax: Option[(Destination, Double)], val decodedMass: DecodedTargetMass, val calibration: DecisionCalibration)
+    val rawArgmax: Option[(Destination, Double)], val decodedMass: DecodedTargetMass, val calibration: DecisionCalibration,
+    val policy: Option[DecisionPolicyId])
 ```
+
+Implementation clarification (Slice 6): computed outcomes retain `Some(stages)`; failed/excluded
+outcomes retain `None`. Decisions retain the requested policy, including abstentions; raw argmax
+has no policy. This makes later ledger validation and codec replay possible even for empty rows.
+No caller supplies derived decision fields.
 
 **Candidate support** is the `Destination` projection of the basis measure's keys, externals
 included (N11). It is neither physical nor term support.

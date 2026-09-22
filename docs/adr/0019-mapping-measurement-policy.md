@@ -122,3 +122,10 @@ The pre-seal audit exposed S72's empty canonical transcript column and populated
 heading with one trailing space. Bind a fifth sheet overlay to that exact header and require
 the displaced column to remain empty. Preserve the superseded audit in local evidence; no
 model output or split allocation informed this correction.
+
+G1 outcome decision (2026-09-22): retain stage references on every computed outcome and the
+declared decision policy even on abstention. Reject dropping these as display-only details:
+an empty or abstained row still needs ledger validation and reproducible policy identity.
+Outcomes derive choices, candidate-support status and localization from an explicit measure
+basis; a listed alternative in another measure does not join that basis. No new module or
+dependency is introduced.
