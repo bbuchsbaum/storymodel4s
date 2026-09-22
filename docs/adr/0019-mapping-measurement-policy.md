@@ -227,3 +227,10 @@ Reject UI-side row arithmetic, selected-only normalization and silent export-all
 Selected recall evidence retains the tagged recall clock in JSON and the CSV
 `recall_clock_seconds` column, including explicit untimed and onset-only cases. Clock
 coordinates use the same lossless IEEE-754 encoding as the admitted inventory.
+
+`WorkspaceFixtures` and the JVM-only `writeWorkspaceFixtures` main in the existing
+fixtures module produce the WOG and structurally different bell/clock product courts.
+Authored controls, partial derivation, and optional offline lexical HSMM reconstruction
+retain their distinct authority. The writer takes an explicit producer revision and emits
+byte digests, archives and selected subsets. It adds no process spawning, remote inference,
+public user-file workflow, module or dependency.
