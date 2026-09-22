@@ -96,3 +96,10 @@ No participant data or provider call is needed.
 
 The [qualification record](refactor/evidence/recall-timing-portable-20260922/README.md)
 contains exact source pins, portable test totals, mutation controls and examples.
+
+
+For byte-pinned CSV inputs and an offline job command, see
+[production intake and source support](recall-timing-intake.md). It writes this
+same canonical sidecar, with complete record-to-word receipts. The accompanying
+support query selects exact part/occurrence geometry; neither operation supplies
+scanner linkage or allocates mapping mass in time.

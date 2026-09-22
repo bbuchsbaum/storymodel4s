@@ -826,8 +826,10 @@ Focused JVM and synthetic CLI checks pass. Independent Python intake/word-clock
 and exact Fraction answers agree; corrupted outputs are rejected. Separate cold
 review repaired occurrence provenance and partial completion-marker publication.
 Ten named compiled mutations were caught and restored controls passed all 23 focused
-JVM tests. The full exact-source portability gate is pending at this checkpoint;
-qualification evidence will record its actual outcome before landing.
+JVM tests. The full exact-source `checkAll` and formatting gate passed at
+`621a7249`: 8,015 passes, five optional live skips, zero failures/errors across
+56 test tasks. Exact candidate CLI outputs also pass both independent readers.
+See the [bound qualification evidence](../refactor/evidence/recall-intake-support-20260922/README.md).
 
 Next: integrate these checked inputs with the separately owned temporal query and
 exchange/facade contracts, preserving allocation-free bounds and unavailable mass.

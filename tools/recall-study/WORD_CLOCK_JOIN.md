@@ -118,6 +118,8 @@ empty spans; those envelopes are deliberately not full valid mapping results.
 See [fixture provenance](fixtures/word-clock-join/README.md).
 
 This reader does not change the existing Scala mapper's historical clock. The
-canonical timing adapter, word/support exchange tables and verified recording/run
-binding remain downstream work. StoryAtlas will consume that canonical handoff;
-this experimental reader does not create an alternative visualization contract.
+production [canonical timing adapter and supplied-support readout](../../docs/recall-timing-intake.md)
+now consume checked contexts and reuse this independent fixture. Whole-workspace
+exchange and verified recording/run binding remain downstream work. StoryAtlas
+will consume that canonical handoff; this experimental reader does not create an
+alternative visualization contract.
