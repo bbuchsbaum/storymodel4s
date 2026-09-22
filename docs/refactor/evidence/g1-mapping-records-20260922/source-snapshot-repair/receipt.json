@@ -1,0 +1,95 @@
+{
+  "schema": "storymodel4s.g1-repair-qualification/v1",
+  "source": "041e8cf4",
+  "before": "6946c9ce",
+  "finding": "SourceRepresentation retained first-read targets and scope but fingerprinted later view reads; a second stable inventory with different target levels was accepted by DerivationBinding.",
+  "executedBefore": {
+    "total": 2,
+    "failed": 2,
+    "observedInventoryReads": 3,
+    "foreignBinding": "accepted"
+  },
+  "repair": "Capture the exact source view once for target inventory, scope, coverage and fingerprint. Preserve original lookup agreement as an independent refusal.",
+  "focused": {
+    "JVM": 105,
+    "JS": 105,
+    "Native": 105,
+    "failed": 0,
+    "scope": "source representations, bound measures, optional presence and outcomes"
+  },
+  "mutation": {
+    "edit": "ViewFingerprint.of(checkedView) -> ViewFingerprint.of(view)",
+    "platform": "JVM",
+    "failed": 2,
+    "restoredPassed": 2,
+    "receipts": [
+      {
+        "name": "mutant",
+        "sourceSha256": "a7e70f0d6e5e71f0feb2daac1e9fa59429b67f121a12fef8330c8caaff6433e4",
+        "metadata": {
+          "schema_version": 1,
+          "started_utc": "2026-09-22T17:22:27.762467+00:00",
+          "finished_utc": "2026-09-22T17:22:40.969071+00:00",
+          "duration_seconds": 13.20657,
+          "command": [
+            "sbt",
+            "-batch",
+            "-Dsbt.global.staging=/private/tmp/storymodel4s-m1-sbt-staging-20260922",
+            "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-m1-grakern-20260922",
+            "alignJVM/testOnly *SourceRepresentationSnapshotSuite"
+          ],
+          "cwd": "/private/tmp/storymodel4s-workspace-m1-20260922",
+          "log": "/private/tmp/workspace-m1-evidence/g1/source-snapshot-mutant.log",
+          "exit_code": 1,
+          "child_returncode": 1,
+          "reason": "exited",
+          "detail": null,
+          "timeout_seconds": 1200.0,
+          "log_bytes": 3188
+        },
+        "totals": [
+          "[error] Failed: Total 2, Failed 2, Errors 0, Passed 0"
+        ],
+        "failures": [
+          "==> X storymodel4s.align.SourceRepresentationSnapshotSuite.source targets and fingerprint use one captured inventory 0.051s munit.ComparisonFailException: align/src/test/scala/storymodel4s/align/SourceRepresentationSnapshotSuite.scala:42",
+          "==> X storymodel4s.align.SourceRepresentationSnapshotSuite.a changing source cannot bind a second inventory with different levels 0.125s munit.ComparisonFailException: align/src/test/scala/storymodel4s/align/SourceRepresentationSnapshotSuite.scala:57"
+        ]
+      },
+      {
+        "name": "restored",
+        "sourceSha256": "4218f4af8e0a087b7ee7d347b7fe257ee83975b73d1eef60e2da2972d58c6829",
+        "metadata": {
+          "schema_version": 1,
+          "started_utc": "2026-09-22T17:22:41.035528+00:00",
+          "finished_utc": "2026-09-22T17:22:53.847824+00:00",
+          "duration_seconds": 12.812113,
+          "command": [
+            "sbt",
+            "-batch",
+            "-Dsbt.global.staging=/private/tmp/storymodel4s-m1-sbt-staging-20260922",
+            "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-m1-grakern-20260922",
+            "alignJVM/testOnly *SourceRepresentationSnapshotSuite"
+          ],
+          "cwd": "/private/tmp/storymodel4s-workspace-m1-20260922",
+          "log": "/private/tmp/workspace-m1-evidence/g1/source-snapshot-restored.log",
+          "exit_code": 0,
+          "child_returncode": 0,
+          "reason": "exited",
+          "detail": null,
+          "timeout_seconds": 1200.0,
+          "log_bytes": 1720
+        },
+        "totals": [
+          "[info] Passed: Total 2, Failed 0, Errors 0, Passed 2"
+        ],
+        "failures": []
+      }
+    ]
+  },
+  "review": {
+    "reviewer": "m1_support_review",
+    "result": "Source-traced counterexample confirmed; repaired immutable041e8cf4 reviewed with no remaining findings. No reviewer execution."
+  },
+  "archiveSha256": "72c417dde693487fa50e35aac52efb3f8b3ca76f6b18f40b66fa9ff5e0c74b6b",
+  "limits": "G1 remains unlanded pending its full record, adapter, codec and final gate. Pre-repair unused test import was removed; existing clang-15 warning remains."
+}
