@@ -12,6 +12,8 @@ HERE = Path(__file__).resolve().parent
 SOURCE = HERE.parent / "recall_clock.py"
 TEST = HERE / "test_recall_clock.py"
 CASES = [
+    ("skip-json-integer-limit", 'require(len(text.lstrip("-")) <= MAX_JSON_INTEGER_DIGITS, "json-integer-representation-limit")',
+     'require(True, "json-integer-representation-limit")', "test_json_integer_limits_and_nesting_are_structured_refusals"),
     ("wrong-release-column", '"openneuro": 4', '"openneuro": 1',
      "test_selected_clock_uses_released_column_not_added_offset"),
     ("skip-byte-identity", 'matches = [s for s in sources if s["localCsvSha256"] == checksum]',

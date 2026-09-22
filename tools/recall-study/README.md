@@ -86,6 +86,8 @@ integer-valued, but are **not verified zero-based BIDS volume indices**. Numeric
 text is bounded to 128 coefficient digits, an absolute exponent of 128 and 512
 characters; unsupported representations produce a located refusal, never a
 rounded substitute. The limits are recorded in `numericTextLimits`.
+JSON integers are limited to 128 decimal digits before conversion; decoder
+failures remain structured and content-free.
 
 The manifest establishes a declared byte identity and column interpretation.
 Supplying a different manifest does not authenticate a new release. An OpenNeuro
@@ -105,10 +107,19 @@ python3 tools/recall-study/tests/mutate_recall_clock.py \
 ```
 
 The mutation output directory must be new. The court runs restored controls
-before and after 11 compiled mutants and requires each named assertion to fail.
+before and after 12 compiled mutants and requires each named assertion to fail.
 The [fixture record](fixtures/recall-clock/README.md) explains the independent
 expected values. These checks qualify intake behavior, not mapping accuracy or
 temporal calibration.
+
+## Canonical word-clock join
+
+The next independent reader, `recall_word_clock.py`, joins those external clock
+records to a pinned G1 word/unit inventory through an explicit exact replay.
+It checks UTF-16 coordinates, digests and membership, and reports onset-only
+timing with missingness and order diagnostics. See
+[the runnable example and structured contract](WORD_CLOCK_JOIN.md).
+Structural correspondence and recording identity remain separate claims.
 
 ## Frozen engineering baseline
 

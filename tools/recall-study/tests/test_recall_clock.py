@@ -172,6 +172,15 @@ class RecallClockSuite(unittest.TestCase):
         self.assertNotIn(b"line\\nbreak", encoded)
         self.assertEqual(encoded, clock.encode(self.run_intake()))
 
+    def test_json_integer_limits_and_nesting_are_structured_refusals(self):
+        self.assertEqual(clock.decode_json(b'{"x":' + b'9' * 128 + b'}')["x"], int('9' * 128))
+        for size in [129, 5000]:
+            self.refuses("json-integer-representation-limit", lambda: clock.decode_json(b'{"x":' + b'9' * size + b'}'))
+        # Decoder depth limits vary by Python runtime; test translation of the
+        # decoder's exception, without inventing a fixed accepted nesting depth.
+        with patch.object(clock.json, "loads", side_effect=RecursionError("PRIVATE")):
+            self.refuses("invalid-json", lambda: clock.decode_json(b'[]'))
+
     def test_duplicate_json_keys_and_versions_refuse(self):
         self.refuses("duplicate-json-key", lambda: clock.decode_json(b'{"a":1,"a":2}'))
         for version in (True, 2):

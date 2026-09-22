@@ -1,0 +1,45 @@
+{
+  "schema": "storymodel4s.sherlock.recall-lineage",
+  "schemaVersion": 1,
+  "artifactSetId": "synthetic-word-clock-join-v1",
+  "fixtureOrigin": "original synthetic records, not participant data",
+  "columns": [
+    {
+      "id": "word",
+      "kind": "text"
+    },
+    {
+      "id": "princeton-word-onset-seconds",
+      "kind": "decimal-seconds"
+    },
+    {
+      "id": "princeton-tr-number",
+      "kind": "integer-tr"
+    },
+    {
+      "id": "princeton-tr-onset-seconds",
+      "kind": "decimal-seconds"
+    },
+    {
+      "id": "openneuro-word-onset-seconds",
+      "kind": "decimal-seconds"
+    },
+    {
+      "id": "openneuro-tr-number",
+      "kind": "integer-tr"
+    },
+    {
+      "id": "openneuro-tr-onset-seconds",
+      "kind": "decimal-seconds"
+    }
+  ],
+  "sources": [
+    {
+      "id": "recall-source-06",
+      "localCsvSha256": "8555a5468ff1854bf15b58feffd49ce5de0d59d6d9faf44c3952e3d740f07ff3",
+      "localCsvByteLength": 267,
+      "recordCount": 5,
+      "numericMissingCellCount": 1
+    }
+  ]
+}

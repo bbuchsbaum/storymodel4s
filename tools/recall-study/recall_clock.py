@@ -30,6 +30,7 @@ SHA256 = re.compile(r"[0-9a-f]{64}\Z")
 MAX_COEFFICIENT_DIGITS = 128
 MAX_ABSOLUTE_EXPONENT = 128
 MAX_TOKEN_CHARACTERS = 512
+MAX_JSON_INTEGER_DIGITS = 128
 
 
 class IntakeError(ValueError):
@@ -61,9 +62,14 @@ def decode_json(data):
         return result
     def constant(_):
         raise IntakeError("nonfinite-json-number")
+    def integer(text):
+        require(len(text.lstrip("-")) <= MAX_JSON_INTEGER_DIGITS, "json-integer-representation-limit")
+        return int(text)
     try:
-        return json.loads(data, object_pairs_hook=pairs, parse_constant=constant)
-    except (UnicodeError, json.JSONDecodeError):
+        return json.loads(data, object_pairs_hook=pairs, parse_constant=constant, parse_int=integer)
+    except IntakeError:
+        raise
+    except (UnicodeError, ValueError, RecursionError):
         raise IntakeError("invalid-json") from None
 
 
@@ -217,7 +223,8 @@ def intake(csv_bytes, lineage_bytes, clock, *, expected_source=None,
         "columns": [{"id": key, "kind": kind} for key, kind in COLUMNS[1:]],
         "numericTextLimits": {"coefficientDigits": MAX_COEFFICIENT_DIGITS,
                               "absoluteExponent": MAX_ABSOLUTE_EXPONENT,
-                              "tokenCharacters": MAX_TOKEN_CHARACTERS},
+                              "tokenCharacters": MAX_TOKEN_CHARACTERS,
+                              "jsonIntegerDigits": MAX_JSON_INTEGER_DIGITS},
         "counts": {"records": len(records), "emptyTextRecords": sum(r["textPresence"] == "empty" for r in records),
                    "missingNumericCells": missing,
                    "missingSelectedOnsets": sum(r["selectedOnset"]["status"] == "missing" for r in records)},
