@@ -19,7 +19,15 @@ The receipts distinguish typed-refusal changes from mutations that actually admi
 | [7](slice7/) | One checked record and public miniature construction |
 | [8](slice8/) | Honest historical HSMM adaptation |
 | [9](slice9/) | Contextual canonical codec and unchanged HSMM byte controls |
-| [10 checkpoint](slice10/) | Consumer integration; final Native and full gate pending |
+| [10](slice10/) and [final gate](final/qualification.json) | Consumer integration, snapshot mutation and complete cross-platform gate |
 
-Source snapshot repairs are also recorded beside the slice receipts. The full merge-result
-`checkAll` receipt, final consumer checks and landing reconciliation remain required.
+Source snapshot repairs are also recorded beside the slice receipts. The [final receipt](final/checkAll.json)
+binds clean source `a4ad2e06123dcca61f4494a39fb4aaef832bff94` to all 56 `checkAll` test tasks:
+7,912 passed, five named optional live tests skipped, zero failed/errors. Both formatting checks
+passed. The local Clang 15 upgrade advisory is retained. All 709 JUnit reports were written during
+this gate and are archived with its raw log and command receipt.
+
+The Slice 10 receipt is a historical checkpoint from the disk interruption; the final gate completes
+its Native and full-suite requirements. [Legacy byte parity](final/legacy-byte-parity.json) proves
+both WOG HSMM goldens unchanged. The later integration adds only three concurrent Mote operations;
+[qualification](final/qualification.json) records that distinction. No browser acceptance is claimed.

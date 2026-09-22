@@ -1,0 +1,19 @@
+{
+  "base": "5f39c3580d998c466b85dec72cbded9a0171abda",
+  "source": "a4ad2e06123dcca61f4494a39fb4aaef832bff94",
+  "wog": [
+    {
+      "path": "fixtures/src/test/resources/golden/hsmm-v4-wog.json",
+      "bytes": 30683,
+      "sha256": "6ee06ebbb90709ebe323e7bd98e99f9c839809489a780e113d4c2441b7abf1e6",
+      "exactBytesEqual": true
+    },
+    {
+      "path": "fixtures/src/test/resources/golden/hsmm-v4-wog.native.json",
+      "bytes": 30683,
+      "sha256": "12a263119a8799cac9e548b65238ffad2f29f1dc23234a86e57b22f752398a8d",
+      "exactBytesEqual": true
+    }
+  ],
+  "frozenBenchChangedPaths": []
+}
