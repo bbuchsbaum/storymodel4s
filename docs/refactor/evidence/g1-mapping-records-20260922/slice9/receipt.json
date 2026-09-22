@@ -1,0 +1,87 @@
+{
+  "schema": "storymodel4s.g1-slice-qualification/v1",
+  "slice": 9,
+  "source": "b7d908a8",
+  "checkpoints": [
+    "1219f168",
+    "6a36597d",
+    "e9f0b40c",
+    "b7d908a8"
+  ],
+  "focused": {
+    "JVM": 39,
+    "JS": 39,
+    "Native": 39,
+    "existingCodecRegressionPerPlatform": 20,
+    "failures": 0
+  },
+  "compatibility": {
+    "wogGoldenPerPlatform": 6,
+    "jvmGoldenResourceChecks": 4,
+    "legacyHsmmWire": "unchanged hsmm/v4 platform byte pins; shared codec-private support extraction only"
+  },
+  "mutations": {
+    "distinct": 22,
+    "compiledRuns": 23,
+    "killedRuns": 22,
+    "misidentifiedWitnessRuns": 1,
+    "initialSixSource": "e9f0b40c",
+    "remainingSource": "b7d908a8",
+    "qualification": "Typed refusal precedence is tested as well as rejection: bypassing one guard may still be refused by a later invariant. No claim that every bypass admitted a record.",
+    "initialRoundedFailure": "The rounded encoder was caught by the independent historical byte pin and the supplied-score record. Runner initially expected the contextual round-trip test instead, stopped, retained the run, then repeated with the measured golden witness. No threshold changed.",
+    "construction": "No new authority-bearing type in codec. External probes check context-only construction and private wire helpers; Slice 3/5/6/7 no-door probes remain the authority boundary."
+  },
+  "review": {
+    "reviewedSource": "6a36597d",
+    "reviewer": "m1_support_review",
+    "initialFindings": [
+      {
+        "path": "codec/src/main/scala/storymodel4s/codec/mappingjson.scala",
+        "finding": "Unknown null fields disappear under inherited dropNullValues=true and bypass canonical-record comparison.",
+        "witness": "slice9-null-field-witness.log",
+        "resolution": "Mapping-only printer retains nulls; root and nested-policy witnesses pass."
+      }
+    ],
+    "followup": {
+      "source": "e9f0b40c",
+      "findings": [],
+      "conclusion": "The mapping-only repair closes the null gap. Contextual refusals, original decision requests, full state keys, source/inventory tampering, Unicode and exact coordinates are covered. Backend pins preserve exact values; no cross-backend inference equality claim."
+    },
+    "limits": "Read-only independent reviews; reviewer ran no builds or mutations.",
+    "duplicateKeyReview": {
+      "source": "b7d908a8",
+      "reviewer": "m1_support_review",
+      "findings": [],
+      "conclusion": "Per-object key sets, array commas, escaped strings and decoded key spelling are handled correctly. Syntax/version/schema validation precedes the scan; reconstruction follows it. Tests cover duplicate and legal repeated names."
+    }
+  },
+  "artifacts": [
+    {
+      "file": "historical.json",
+      "bytes": 32202,
+      "sha256": "acea0831a78b03f5b7cfa548e81f037aa997d37dbdae8b6cdfd4b24ac82f59c7"
+    },
+    {
+      "file": "historical.native.json",
+      "bytes": 32202,
+      "sha256": "19cd12e4c86567679432f03a62527a6ed3bd21dbc4def135c6b819cc49190b16"
+    },
+    {
+      "file": "large-coordinates.json",
+      "bytes": 43604,
+      "sha256": "47f271def80ad4bafc668c54a11ae39baed4fa9758fcdd0b3e935da16952f076"
+    },
+    {
+      "file": "miniature.json",
+      "bytes": 45099,
+      "sha256": "11472f2ce40607676e3a7052af9e80a5fae388c8893dd27dcc1043aa81ec6286"
+    },
+    {
+      "file": "sherlock-shaped.json",
+      "bytes": 50731,
+      "sha256": "bc14faf9eda49e5e8536d6ba61f987acd7f2e0fe38bbdaa6619e9fe5d261d3ce"
+    }
+  ],
+  "archiveSha256": "8a95f433f20fcd95b5338941be37390c04f88ae8efd5ab80c7992ddcf421cfdb",
+  "limits": "Local codec contract only; no execution provenance, calibration, full G1/M1 acceptance, browser evidence or release claim. Native historical mapping has one published posterior ULP difference plus result/record identities; exact per-backend pins, no tolerance. Existing clang-15 warning retained. Early compiler/test-authoring failures, null/duplicate-key witnesses and Native pin diagnosis remain in the archive."
+}

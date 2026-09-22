@@ -1,0 +1,27 @@
+[
+  {
+    "file": "historical.json",
+    "bytes": 32202,
+    "sha256": "acea0831a78b03f5b7cfa548e81f037aa997d37dbdae8b6cdfd4b24ac82f59c7"
+  },
+  {
+    "file": "historical.native.json",
+    "bytes": 32202,
+    "sha256": "19cd12e4c86567679432f03a62527a6ed3bd21dbc4def135c6b819cc49190b16"
+  },
+  {
+    "file": "large-coordinates.json",
+    "bytes": 43604,
+    "sha256": "47f271def80ad4bafc668c54a11ae39baed4fa9758fcdd0b3e935da16952f076"
+  },
+  {
+    "file": "miniature.json",
+    "bytes": 45099,
+    "sha256": "11472f2ce40607676e3a7052af9e80a5fae388c8893dd27dcc1043aa81ec6286"
+  },
+  {
+    "file": "sherlock-shaped.json",
+    "bytes": 50731,
+    "sha256": "bc14faf9eda49e5e8536d6ba61f987acd7f2e0fe38bbdaa6619e9fe5d261d3ce"
+  }
+]

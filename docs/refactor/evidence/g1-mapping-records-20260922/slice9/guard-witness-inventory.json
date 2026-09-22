@@ -1,0 +1,310 @@
+[
+  {
+    "name": "numeric-coordinate-encoding",
+    "platform": "JVM",
+    "path": "codec/src/main/scala/storymodel4s/codec/mappingjson.scala",
+    "sourceSha256": "ae6c32e54cdc295a61ac87f35cb4568b2d421772c576afb0462ec139c028d69f",
+    "mutantSha256": "525206c6102583cad195e0b88ae3685345a7c22bd583c1697add826085ccf21b",
+    "expectedFailures": [
+      "ticks and rational denominator above 2^53 remain exact strings"
+    ],
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 33, Failed 18, Errors 0, Passed 15"
+    ]
+  },
+  {
+    "name": "numeric-coordinate-admission",
+    "platform": "JVM",
+    "path": "codec/src/main/scala/storymodel4s/codec/mappingjson.scala",
+    "sourceSha256": "ae6c32e54cdc295a61ac87f35cb4568b2d421772c576afb0462ec139c028d69f",
+    "mutantSha256": "caf8d1aa49584fb9a5888ef45184c77b6dde8b6367e0d62bec4cee696407c5f0",
+    "expectedFailures": [
+      "numeric tick refuses with NumericTick"
+    ],
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 33, Failed 1, Errors 0, Passed 32"
+    ]
+  },
+  {
+    "name": "derived-demoted",
+    "platform": "JVM",
+    "path": "codec/src/main/scala/storymodel4s/codec/mappingmetadataread.scala",
+    "sourceSha256": "99feb86794b1bc3e0f5a76af9070a1a0ac18f4ebe6b0df1b13578c883c22efea",
+    "mutantSha256": "588092ac2acccd591003b608c37ea5cdcdd6a124b959b2597c7bd1840801186e",
+    "expectedFailures": [
+      "derived refuses with Reserved"
+    ],
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 33, Failed 1, Errors 0, Passed 32"
+    ]
+  },
+  {
+    "name": "calibration-reserved-check-bypassed",
+    "platform": "JVM",
+    "path": "codec/src/main/scala/storymodel4s/codec/mapping.scala",
+    "sourceSha256": "702b70cd19322e65f2c38dc5d5b30302613652dab05bd817ceedb48c00ac11cc",
+    "mutantSha256": "452e39db21f2470b71a88da0afa925f4b3aa36ca39df381a9ffef77c1d3cc0f2",
+    "expectedFailures": [
+      "calibrated refuses with Reserved"
+    ],
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 33, Failed 1, Errors 0, Passed 32"
+    ]
+  },
+  {
+    "name": "unknown-reason-demoted",
+    "platform": "JVM",
+    "path": "codec/src/main/scala/storymodel4s/codec/mappingmetadataread.scala",
+    "sourceSha256": "99feb86794b1bc3e0f5a76af9070a1a0ac18f4ebe6b0df1b13578c883c22efea",
+    "mutantSha256": "f9b76e10e48cf727cfa171b5bf62f2a092d9d5cb31ba9313c182538a465b7a9d",
+    "expectedFailures": [
+      "historical text round-trips identically"
+    ],
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 33, Failed 8, Errors 0, Passed 25"
+    ]
+  },
+  {
+    "name": "asserted-receipt-dropped",
+    "platform": "JVM",
+    "path": "codec/src/main/scala/storymodel4s/codec/mappingmetadataread.scala",
+    "sourceSha256": "99feb86794b1bc3e0f5a76af9070a1a0ac18f4ebe6b0df1b13578c883c22efea",
+    "mutantSha256": "8740bea0a7844457aa4f33fc993f4a65622c7935edfc5aaf38edd834411a9c11",
+    "expectedFailures": [
+      "caller asserted receipt remains Unknown and round-trips exactly"
+    ],
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 33, Failed 1, Errors 0, Passed 32"
+    ]
+  },
+  {
+    "name": "rounded-value-encoding",
+    "platform": "JVM",
+    "path": "codec/src/main/scala/storymodel4s/codec/mappingjson.scala",
+    "sourceSha256": "d44293e52de4b5154eccc00b1774b1ddadebcd32ca895f74b79938c954f0f9d3",
+    "mutantSha256": "d41c50f64ed6a92d634738894583442b2e03cf9f02d0cfd616d682a9ba2291c2",
+    "expectedFailures": [
+      "historical canonical bytes and record identity are pinned"
+    ],
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 35, Failed 2, Errors 0, Passed 33"
+    ]
+  },
+  {
+    "name": "term-support-requirement-skipped",
+    "platform": "JVM",
+    "path": "codec/src/main/scala/storymodel4s/codec/mappingoutcomeread.scala",
+    "sourceSha256": "e2832af3507cc18b11019dff50b24ba0fa7dd326d8598c5c0d3ebbb82ee6bc34",
+    "mutantSha256": "bc0a59d3aa2b7c5a28d6e416200f830cef3d10b968b514b115caf497070bb164",
+    "expectedFailures": [
+      "missing term_support refuses"
+    ],
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 35, Failed 1, Errors 0, Passed 34"
+    ]
+  },
+  {
+    "name": "not-computed-omitted",
+    "platform": "JVM",
+    "path": "codec/src/main/scala/storymodel4s/codec/mappingrecordwire.scala",
+    "sourceSha256": "02b6cf2bbf18571a96ee5358fb87bc7347fed78beee8a88b40aa186f7832a88c",
+    "mutantSha256": "71f7d3b3b42025d7bbb7c9a809bc798a7bc52026b35054f622ce5a8e0a6b63a7",
+    "expectedFailures": [
+      "not-computed is encoded explicitly and only equals ungated evidence"
+    ],
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 35, Failed 16, Errors 0, Passed 19"
+    ]
+  },
+  {
+    "name": "not-computed-on-gated-link",
+    "platform": "JVM",
+    "path": "codec/src/main/scala/storymodel4s/codec/mappingrecordwire.scala",
+    "sourceSha256": "02b6cf2bbf18571a96ee5358fb87bc7347fed78beee8a88b40aa186f7832a88c",
+    "mutantSha256": "fdb7367bbbaf7acf5841a6c3e54362ad6967b7a6534a6aa3f97b0d4dde8432c4",
+    "expectedFailures": [
+      "not-computed is encoded explicitly and only equals ungated evidence"
+    ],
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 35, Failed 2, Errors 0, Passed 33"
+    ]
+  },
+  {
+    "name": "binding-fields-unchecked",
+    "platform": "JVM",
+    "path": "codec/src/main/scala/storymodel4s/codec/mappingmetadataread.scala",
+    "sourceSha256": "99feb86794b1bc3e0f5a76af9070a1a0ac18f4ebe6b0df1b13578c883c22efea",
+    "mutantSha256": "e7fb174389eb79cf8b707a45bde2af6ec0c5cc982df027c428ff6af738f8f995",
+    "expectedFailures": [
+      "each unmixed result needs its own context"
+    ],
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 35, Failed 1, Errors 0, Passed 34"
+    ]
+  },
+  {
+    "name": "recall-checksum-optional",
+    "platform": "JVM",
+    "path": "codec/src/main/scala/storymodel4s/codec/mappingmetadataread.scala",
+    "sourceSha256": "99feb86794b1bc3e0f5a76af9070a1a0ac18f4ebe6b0df1b13578c883c22efea",
+    "mutantSha256": "04905a9fb41782c4e91e5ea9a915ef32dd316920d82dcf9fef05cb765c606ae6",
+    "expectedFailures": [
+      "match fields are mandatory"
+    ],
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 35, Failed 1, Errors 0, Passed 34"
+    ]
+  },
+  {
+    "name": "timebase-absence-null",
+    "platform": "JVM",
+    "path": "codec/src/main/scala/storymodel4s/codec/mappingsourcewire.scala",
+    "sourceSha256": "a329d4e3fbbefb5b6be6e3aedbfabc65399aca1f69a0905f493a57d447b213bd",
+    "mutantSha256": "2e12cb439eee32c153996c3dac7c053a7146bf57770d9c1cd333b6c90da19a39",
+    "expectedFailures": [
+      "absent timebase is tagged"
+    ],
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 35, Failed 1, Errors 0, Passed 34"
+    ]
+  },
+  {
+    "name": "version-check-skipped",
+    "platform": "JVM",
+    "path": "codec/src/main/scala/storymodel4s/codec/mapping.scala",
+    "sourceSha256": "911b3ee2ab390400ffd8b77fa550ed82f8328670725c93fe0028379441c237e3",
+    "mutantSha256": "dcb3f741f3306ae124f6e226ad662b5de7d1f2cdceda1a0e8824b95c0150d811",
+    "expectedFailures": [
+      "v0.2 refuses with UnsupportedSchema before parsing its body"
+    ],
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 35, Failed 1, Errors 0, Passed 34"
+    ]
+  },
+  {
+    "name": "inventory-digest-check-skipped",
+    "platform": "JVM",
+    "path": "codec/src/main/scala/storymodel4s/codec/mapping.scala",
+    "sourceSha256": "911b3ee2ab390400ffd8b77fa550ed82f8328670725c93fe0028379441c237e3",
+    "mutantSha256": "cd46bf238a7114772b7fcd4b2692384c00f591759b85239e45724fe90d95311d",
+    "expectedFailures": [
+      "foreign inventory refuses with DigestMismatch despite shared unit IDs"
+    ],
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 35, Failed 1, Errors 0, Passed 34"
+    ]
+  },
+  {
+    "name": "failed-outcomes-filtered",
+    "platform": "JVM",
+    "path": "codec/src/main/scala/storymodel4s/codec/mappingrecordwire.scala",
+    "sourceSha256": "02b6cf2bbf18571a96ee5358fb87bc7347fed78beee8a88b40aa186f7832a88c",
+    "mutantSha256": "37b1702b77206e61029cc79e0060ecbdde8355b3504cb18a31d57c064d43d61a",
+    "expectedFailures": [
+      "miniature round-trips and retains p6"
+    ],
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 35, Failed 14, Errors 0, Passed 21"
+    ]
+  },
+  {
+    "name": "canonical-guard-skipped",
+    "platform": "JVM",
+    "path": "codec/src/main/scala/storymodel4s/codec/mapping.scala",
+    "sourceSha256": "911b3ee2ab390400ffd8b77fa550ed82f8328670725c93fe0028379441c237e3",
+    "mutantSha256": "424e120d367e102ed173c157c3d9f18c5115066bb00c5db052a9e90162df8f16",
+    "expectedFailures": [
+      "unknown field refuses"
+    ],
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 35, Failed 2, Errors 0, Passed 33"
+    ]
+  },
+  {
+    "name": "null-fields-dropped",
+    "platform": "JVM",
+    "path": "codec/src/main/scala/storymodel4s/codec/mappingjson.scala",
+    "sourceSha256": "d44293e52de4b5154eccc00b1774b1ddadebcd32ca895f74b79938c954f0f9d3",
+    "mutantSha256": "34657c4baad7fe48c4fee56ae684b6b34a8d376554456139e6bbc1796f0cf6ee",
+    "expectedFailures": [
+      "unknown null fields refuse at the root and inside policies"
+    ],
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 35, Failed 1, Errors 0, Passed 34"
+    ]
+  },
+  {
+    "name": "original-request-replaced",
+    "platform": "JVM",
+    "path": "codec/src/main/scala/storymodel4s/codec/mappingoutcomeread.scala",
+    "sourceSha256": "e2832af3507cc18b11019dff50b24ba0fa7dd326d8598c5c0d3ebbb82ee6bc34",
+    "mutantSha256": "45f7ab4aa08d00bbae04845958363cf167934f55ce89d555dbc416a9dfbb8418",
+    "expectedFailures": [
+      "empty external decode and explicit abstention retain their original requests"
+    ],
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 35, Failed 11, Errors 0, Passed 24"
+    ]
+  },
+  {
+    "name": "duplicate-key-check-skipped",
+    "platform": "JVM",
+    "path": "codec/src/main/scala/storymodel4s/codec/mapping.scala",
+    "sourceSha256": "911b3ee2ab390400ffd8b77fa550ed82f8328670725c93fe0028379441c237e3",
+    "mutantSha256": "4803bb3f9bebe6795116a1da272f2ae336d5f61d2d63ec1853c5711f731c7191",
+    "expectedFailures": [
+      "duplicate object keys refuse before parser normalization can erase them"
+    ],
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 35, Failed 1, Errors 0, Passed 34"
+    ]
+  },
+  {
+    "name": "duplicate-key-spelling-not-decoded",
+    "platform": "JVM",
+    "path": "codec/src/main/scala/storymodel4s/codec/mappingjson.scala",
+    "sourceSha256": "d44293e52de4b5154eccc00b1774b1ddadebcd32ca895f74b79938c954f0f9d3",
+    "mutantSha256": "34fb2b5d67f82dc21e326f526870cc72f82449dc48041f83bd76190c0398fe59",
+    "expectedFailures": [
+      "duplicate object keys refuse before parser normalization can erase them"
+    ],
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 35, Failed 1, Errors 0, Passed 34"
+    ]
+  },
+  {
+    "name": "duplicate-keys-shared-across-objects",
+    "platform": "JVM",
+    "path": "codec/src/main/scala/storymodel4s/codec/mappingjson.scala",
+    "sourceSha256": "d44293e52de4b5154eccc00b1774b1ddadebcd32ca895f74b79938c954f0f9d3",
+    "mutantSha256": "a8ab0ead359330cfe3048755c0973f281b4cbb879fa378c010cf822033110e9b",
+    "expectedFailures": [
+      "the same key in different nested objects remains legal"
+    ],
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 35, Failed 29, Errors 0, Passed 6"
+    ]
+  }
+]

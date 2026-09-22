@@ -1,0 +1,105 @@
+{
+  "nativeRecordDigest": "a171dc2555bc3ebf2664983c7814f1c7467607d7066564b25d07886090711c79",
+  "nativeCanonicalSha256": "19cd12e4c86567679432f03a62527a6ed3bd21dbc4def135c6b819cc49190b16",
+  "nativeBytes": 32202,
+  "differences": [
+    {
+      "path": "/derivation_source/binding/result_digest",
+      "jvm": "601a2090ee8eefd7cc76f3b4566a1a9d5f423640d59be0c063ae8cb9d62960d1",
+      "native": "3a16e051dcafc1d8ba9e9b7b6d6c52dcdf2ec25052a6674afc0c525d3a62be0c"
+    },
+    {
+      "path": "/outcomes/0/links/0/derivation/binding/result_digest",
+      "jvm": "601a2090ee8eefd7cc76f3b4566a1a9d5f423640d59be0c063ae8cb9d62960d1",
+      "native": "3a16e051dcafc1d8ba9e9b7b6d6c52dcdf2ec25052a6674afc0c525d3a62be0c"
+    },
+    {
+      "path": "/outcomes/0/links/1/derivation/binding/result_digest",
+      "jvm": "601a2090ee8eefd7cc76f3b4566a1a9d5f423640d59be0c063ae8cb9d62960d1",
+      "native": "3a16e051dcafc1d8ba9e9b7b6d6c52dcdf2ec25052a6674afc0c525d3a62be0c"
+    },
+    {
+      "path": "/outcomes/0/links/2/derivation/binding/result_digest",
+      "jvm": "601a2090ee8eefd7cc76f3b4566a1a9d5f423640d59be0c063ae8cb9d62960d1",
+      "native": "3a16e051dcafc1d8ba9e9b7b6d6c52dcdf2ec25052a6674afc0c525d3a62be0c"
+    },
+    {
+      "path": "/outcomes/0/links/3/derivation/binding/result_digest",
+      "jvm": "601a2090ee8eefd7cc76f3b4566a1a9d5f423640d59be0c063ae8cb9d62960d1",
+      "native": "3a16e051dcafc1d8ba9e9b7b6d6c52dcdf2ec25052a6674afc0c525d3a62be0c"
+    },
+    {
+      "path": "/outcomes/0/links/4/derivation/binding/result_digest",
+      "jvm": "601a2090ee8eefd7cc76f3b4566a1a9d5f423640d59be0c063ae8cb9d62960d1",
+      "native": "3a16e051dcafc1d8ba9e9b7b6d6c52dcdf2ec25052a6674afc0c525d3a62be0c"
+    },
+    {
+      "path": "/outcomes/0/links/5/derivation/binding/result_digest",
+      "jvm": "601a2090ee8eefd7cc76f3b4566a1a9d5f423640d59be0c063ae8cb9d62960d1",
+      "native": "3a16e051dcafc1d8ba9e9b7b6d6c52dcdf2ec25052a6674afc0c525d3a62be0c"
+    },
+    {
+      "path": "/outcomes/0/measures/posterior/value/binding/result_digest",
+      "jvm": "601a2090ee8eefd7cc76f3b4566a1a9d5f423640d59be0c063ae8cb9d62960d1",
+      "native": "3a16e051dcafc1d8ba9e9b7b6d6c52dcdf2ec25052a6674afc0c525d3a62be0c"
+    },
+    {
+      "path": "/outcomes/0/measures/raw/0/derivation/binding/result_digest",
+      "jvm": "601a2090ee8eefd7cc76f3b4566a1a9d5f423640d59be0c063ae8cb9d62960d1",
+      "native": "3a16e051dcafc1d8ba9e9b7b6d6c52dcdf2ec25052a6674afc0c525d3a62be0c"
+    },
+    {
+      "path": "/outcomes/1/links/0/derivation/binding/result_digest",
+      "jvm": "601a2090ee8eefd7cc76f3b4566a1a9d5f423640d59be0c063ae8cb9d62960d1",
+      "native": "3a16e051dcafc1d8ba9e9b7b6d6c52dcdf2ec25052a6674afc0c525d3a62be0c"
+    },
+    {
+      "path": "/outcomes/1/links/1/derivation/binding/result_digest",
+      "jvm": "601a2090ee8eefd7cc76f3b4566a1a9d5f423640d59be0c063ae8cb9d62960d1",
+      "native": "3a16e051dcafc1d8ba9e9b7b6d6c52dcdf2ec25052a6674afc0c525d3a62be0c"
+    },
+    {
+      "path": "/outcomes/1/links/2/derivation/binding/result_digest",
+      "jvm": "601a2090ee8eefd7cc76f3b4566a1a9d5f423640d59be0c063ae8cb9d62960d1",
+      "native": "3a16e051dcafc1d8ba9e9b7b6d6c52dcdf2ec25052a6674afc0c525d3a62be0c"
+    },
+    {
+      "path": "/outcomes/1/links/3/derivation/binding/result_digest",
+      "jvm": "601a2090ee8eefd7cc76f3b4566a1a9d5f423640d59be0c063ae8cb9d62960d1",
+      "native": "3a16e051dcafc1d8ba9e9b7b6d6c52dcdf2ec25052a6674afc0c525d3a62be0c"
+    },
+    {
+      "path": "/outcomes/1/links/4/derivation/binding/result_digest",
+      "jvm": "601a2090ee8eefd7cc76f3b4566a1a9d5f423640d59be0c063ae8cb9d62960d1",
+      "native": "3a16e051dcafc1d8ba9e9b7b6d6c52dcdf2ec25052a6674afc0c525d3a62be0c"
+    },
+    {
+      "path": "/outcomes/1/links/5/derivation/binding/result_digest",
+      "jvm": "601a2090ee8eefd7cc76f3b4566a1a9d5f423640d59be0c063ae8cb9d62960d1",
+      "native": "3a16e051dcafc1d8ba9e9b7b6d6c52dcdf2ec25052a6674afc0c525d3a62be0c"
+    },
+    {
+      "path": "/outcomes/1/mapping_links/2/raw_value",
+      "jvm": "0x3f0dcec356602802",
+      "native": "0x3f0dcec356602801",
+      "ulp": 1,
+      "jvmNumber": 5.685361502123788e-05,
+      "nativeNumber": 5.6853615021237876e-05
+    },
+    {
+      "path": "/outcomes/1/measures/posterior/value/binding/result_digest",
+      "jvm": "601a2090ee8eefd7cc76f3b4566a1a9d5f423640d59be0c063ae8cb9d62960d1",
+      "native": "3a16e051dcafc1d8ba9e9b7b6d6c52dcdf2ec25052a6674afc0c525d3a62be0c"
+    },
+    {
+      "path": "/outcomes/1/measures/raw/0/derivation/binding/result_digest",
+      "jvm": "601a2090ee8eefd7cc76f3b4566a1a9d5f423640d59be0c063ae8cb9d62960d1",
+      "native": "3a16e051dcafc1d8ba9e9b7b6d6c52dcdf2ec25052a6674afc0c525d3a62be0c"
+    },
+    {
+      "path": "/record_digest",
+      "jvm": "50089af8b939848e8c0d44180095eddd7ffae2f3c010c5a89f8a29deb91c9790",
+      "native": "a171dc2555bc3ebf2664983c7814f1c7467607d7066564b25d07886090711c79"
+    }
+  ]
+}

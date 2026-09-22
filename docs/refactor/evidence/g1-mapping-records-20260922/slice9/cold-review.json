@@ -1,0 +1,24 @@
+{
+  "reviewedSource": "6a36597d",
+  "reviewer": "m1_support_review",
+  "initialFindings": [
+    {
+      "path": "codec/src/main/scala/storymodel4s/codec/mappingjson.scala",
+      "finding": "Unknown null fields disappear under inherited dropNullValues=true and bypass canonical-record comparison.",
+      "witness": "slice9-null-field-witness.log",
+      "resolution": "Mapping-only printer retains nulls; root and nested-policy witnesses pass."
+    }
+  ],
+  "followup": {
+    "source": "e9f0b40c",
+    "findings": [],
+    "conclusion": "The mapping-only repair closes the null gap. Contextual refusals, original decision requests, full state keys, source/inventory tampering, Unicode and exact coordinates are covered. Backend pins preserve exact values; no cross-backend inference equality claim."
+  },
+  "limits": "Read-only independent reviews; reviewer ran no builds or mutations.",
+  "duplicateKeyReview": {
+    "source": "b7d908a8",
+    "reviewer": "m1_support_review",
+    "findings": [],
+    "conclusion": "Per-object key sets, array commas, escaped strings and decoded key spelling are handled correctly. Syntax/version/schema validation precedes the scan; reconstruction follows it. Tests cover duplicate and legal repeated names."
+  }
+}
