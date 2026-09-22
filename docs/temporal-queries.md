@@ -52,3 +52,45 @@ omitted top-k weight survive unchanged. There is no second scientific JSON schem
 The Atlas scene/packet adapter still needs M1's neutral supplied-artifact provenance
 and a source package with actual media support. Its text-only source and separate
 display timeline cannot establish that join.
+
+For callers already holding a checked mapping, the production API is:
+
+```scala
+import storymodel4s.align.{TemporalQuery, TemporalSupport}
+import storymodel4s.codec.TemporalQueryCodecs
+import storymodel4s.view.TemporalPartitionView
+
+// mapping, unit, bundle and target come from the same checked source/inventory.
+val result = for
+  prepared <- TemporalQuery.prepare(
+    mapping, unit, TemporalQuery.Measure.NormalizedScoreMass,
+    TemporalSupport.Selection.Part(bundle.identity),
+    Vector(TemporalQuery.Declaration(
+      target, TemporalQuery.Assumption.SuppliedSupportContainsReferent,
+      TemporalQuery.Allocation.UniformIntervals
+    ))
+  )
+  region <- TemporalQuery.Region.on(bundle.primaryAxis, Vector(10L -> 15L), Vector.empty)
+  partition <- prepared.partition(Vector(region))
+yield (partition.bins.map(TemporalQueryCodecs.encode), TemporalPartitionView.from(partition))
+```
+
+Use the actual axis timebase to choose ticks. The example's numbers are synthetic;
+no seconds or sample duration are implied. Each requested target needs its own
+declaration; undeclared targets retain unavailable location. The current public
+query surface is the library API and contextual codec. A standalone ordinary-file
+query command awaits the shared mapping/exchange intake instead of rebuilding its
+own source dictionary.
+
+To reproduce the checked synthetic JSON and independent numerical witness:
+
+```sh
+sbt 'codecJVM/testOnly *TemporalQueryCodecSuite' \
+    'codecJVM/Test/runMain storymodel4s.codec.TemporalQueryFixture' > /tmp/temporal-query.log 2>&1
+python3 tools/recall-study/check_temporal_query.py /tmp/temporal-query.log
+```
+
+A narrow region with high allocated mass is precise only **conditional on its
+supplied support and allocation assumptions**. Read the support bounds, unknown
+location, candidate coverage and measure label alongside that value. None of these
+checks establishes empirical second-level accuracy or calibrated confidence.

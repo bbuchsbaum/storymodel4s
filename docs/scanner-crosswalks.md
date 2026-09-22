@@ -4,11 +4,10 @@ The offline `scannerSamples` CLI prepares exact scanner sample/index metadata fr
 explicit declarations. It does not open an image array or infer a recording/run join.
 
 ```sh
-sbt 'pipeline/Test/runMain storymodel4s.pipeline.ScannerSampleFixture /tmp/scanner-job.json'
-sbt 'pipeline/runMain storymodel4s.pipeline.scannerSamples /tmp/scanner-job.json /tmp/scanner-samples.json'
+sbt 'pipeline/runMain storymodel4s.pipeline.scannerSamples tools/recall-study/fixtures/scanner-crosswalk/job.json /tmp/scanner-samples.json'
 ```
 
-Both paths must be new. The synthetic job declares eight samples at 1.5-second
+The output path must be new. The synthetic job declares eight samples at 1.5-second
 spacing. Its analysis array has two padding positions followed by stored indices
 2, 4 and 7. Their original times remain 3, 6 and 10.5 seconds. Index 4 is censored;
 index 7 has unknown censoring. Dropped indices and padding remain explicit.
@@ -18,7 +17,7 @@ The job has `schemaVersion: scanner-samples-job/v0.1`, a `run` declaration and a
 image/header SHA-256 identities, sample count, exact rational `sample_seconds`,
 origin and applied-history knowledge. `layout` contains analysis-array identity,
 receipt, output length and ordered slots. Acquired slots carry original stored
-indices and censor status. Padding slots carry a reason. The CLI binds the layout
+zero-based indices and censor status. Padding slots carry a reason. The CLI binds the layout
 to the run it just checked; do not supply a separate `run_digest` in the job.
 
 Output is one atomically published `scanner-samples/v0.1` JSON file with job hash,
