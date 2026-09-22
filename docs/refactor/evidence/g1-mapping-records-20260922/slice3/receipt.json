@@ -1,0 +1,31 @@
+{
+  "schema": "storymodel4s.g1-slice-qualification/v1",
+  "slice": 3,
+  "source": "3f2ba648",
+  "focused": {
+    "JVM": 18,
+    "JS": 18,
+    "Native": 18,
+    "failures": 0
+  },
+  "mutations": {
+    "distinct": 5,
+    "compiledRuns": 9,
+    "runtimePlatform": "JVM",
+    "constructionPlatforms": [
+      "JVM",
+      "JS",
+      "Native"
+    ],
+    "constructionMutantAndControlClean": true,
+    "finalRestored": "18 passed on each backend"
+  },
+  "review": {
+    "reviewer": "m1_g1_plan_review",
+    "verdict": "No findings in bounded AC3 code review at 3f2ba648; no reviewer-run build.",
+    "boundary": "Later slices must check candidate IDs against actual unit/basis/stage refs and universes against source levels."
+  },
+  "archiveSha256": "ff717c800888c4ed3ca8e87209a627211c50be63e66a5304aa47f9d66f2589d3",
+  "scope": "reference-scope union over slices 1-3 requires broad module coverage; final checkAll will cover it. Focused slice evidence is not a landing gate.",
+  "limits": "Unknown provenance and caller assertions remain distinct from executed authority; no Derived construction door. Existing clang-15 warning retained."
+}

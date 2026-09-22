@@ -1,0 +1,383 @@
+[
+  {
+    "metadata": {
+      "schema_version": 1,
+      "started_utc": "2026-09-22T15:10:24.115197+00:00",
+      "finished_utc": "2026-09-22T15:10:40.821275+00:00",
+      "duration_seconds": 16.764125,
+      "command": [
+        "sbt",
+        "-batch",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-m1-grakern-20260922",
+        "alignJVM/testOnly *MappingVocabulary*"
+      ],
+      "cwd": "/private/tmp/storymodel4s-workspace-m1-20260922",
+      "log": "/private/tmp/workspace-m1-evidence/g1/slice3-mutations/duplicate-entries-accepted-JVM.log",
+      "exit_code": 1,
+      "child_returncode": 1,
+      "reason": "exited",
+      "detail": null,
+      "timeout_seconds": 1800.0,
+      "log_bytes": 2652
+    },
+    "logSha256": "22a188662bdf4bdbf023b385a649b71506b7e218fb3b7758f4232b1bdbaac93c",
+    "totals": [
+      "[error] Failed: Total 18, Failed 1, Errors 0, Passed 17"
+    ],
+    "failures": [
+      "==> X storymodel4s.align.MappingVocabularySuite.duplicate stage entries refuse 0.006s java.util.NoSuchElementException: None.get"
+    ],
+    "name": "duplicate-entries-accepted",
+    "platform": "JVM",
+    "sourceSha256": "81c6b7c8841ca428f55c85f38cdcebc6c171661d89c1865c078a27558983b3fa",
+    "mutantSha256": "689d59d00f1d3c21a20a1c3969f4c8226d8aa67d125ade3957ef3e75c88a2b74",
+    "command": [
+      "alignJVM/testOnly *MappingVocabulary*"
+    ],
+    "cleanCompileAndTest": false,
+    "expectedFailure": "duplicate stage entries refuse",
+    "killed": true
+  },
+  {
+    "metadata": {
+      "schema_version": 1,
+      "started_utc": "2026-09-22T15:10:40.904806+00:00",
+      "finished_utc": "2026-09-22T15:10:57.438448+00:00",
+      "duration_seconds": 16.533736,
+      "command": [
+        "sbt",
+        "-batch",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-m1-grakern-20260922",
+        "alignJVM/testOnly *MappingVocabulary*"
+      ],
+      "cwd": "/private/tmp/storymodel4s-workspace-m1-20260922",
+      "log": "/private/tmp/workspace-m1-evidence/g1/slice3-mutations/missing-stage-accepted-JVM.log",
+      "exit_code": 1,
+      "child_returncode": 1,
+      "reason": "exited",
+      "detail": null,
+      "timeout_seconds": 1800.0,
+      "log_bytes": 2646
+    },
+    "logSha256": "b053b695bcd9c7a3dc947fe8a1c64e4370fd8c31b31787f37aab06373728e83d",
+    "totals": [
+      "[error] Failed: Total 18, Failed 1, Errors 0, Passed 17"
+    ],
+    "failures": [
+      "==> X storymodel4s.align.MappingVocabularySuite.ledger total over stages 0.005s java.util.NoSuchElementException: None.get"
+    ],
+    "name": "missing-stage-accepted",
+    "platform": "JVM",
+    "sourceSha256": "81c6b7c8841ca428f55c85f38cdcebc6c171661d89c1865c078a27558983b3fa",
+    "mutantSha256": "cd6615df5e8a025b66d6d44de102014343338beb0585c992d8b466c873b350e2",
+    "command": [
+      "alignJVM/testOnly *MappingVocabulary*"
+    ],
+    "cleanCompileAndTest": false,
+    "expectedFailure": "ledger total over stages",
+    "killed": true
+  },
+  {
+    "metadata": {
+      "schema_version": 1,
+      "started_utc": "2026-09-22T15:10:57.528254+00:00",
+      "finished_utc": "2026-09-22T15:11:14.237068+00:00",
+      "duration_seconds": 16.70892,
+      "command": [
+        "sbt",
+        "-batch",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-m1-grakern-20260922",
+        "alignJVM/testOnly *MappingVocabulary*"
+      ],
+      "cwd": "/private/tmp/storymodel4s-workspace-m1-20260922",
+      "log": "/private/tmp/workspace-m1-evidence/g1/slice3-mutations/unordered-ledger-accepted-JVM.log",
+      "exit_code": 1,
+      "child_returncode": 1,
+      "reason": "exited",
+      "detail": null,
+      "timeout_seconds": 1800.0,
+      "log_bytes": 2645
+    },
+    "logSha256": "aebd3d1121fb93158de15581dfa45554b127c04d9fcd106c968695b20ab96961",
+    "totals": [
+      "[error] Failed: Total 18, Failed 1, Errors 0, Passed 17"
+    ],
+    "failures": [
+      "==> X storymodel4s.align.MappingVocabularySuite.ledger order canonical 0.006s java.util.NoSuchElementException: None.get"
+    ],
+    "name": "unordered-ledger-accepted",
+    "platform": "JVM",
+    "sourceSha256": "81c6b7c8841ca428f55c85f38cdcebc6c171661d89c1865c078a27558983b3fa",
+    "mutantSha256": "26f9d3fb0b2d97e63687ab31179f7ee3a02fbf7bb4c33922bd103085e408e974",
+    "command": [
+      "alignJVM/testOnly *MappingVocabulary*"
+    ],
+    "cleanCompileAndTest": false,
+    "expectedFailure": "ledger order canonical",
+    "killed": true
+  },
+  {
+    "metadata": {
+      "schema_version": 1,
+      "started_utc": "2026-09-22T15:11:14.329606+00:00",
+      "finished_utc": "2026-09-22T15:11:46.493606+00:00",
+      "duration_seconds": 32.164374,
+      "command": [
+        "sbt",
+        "-batch",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-m1-grakern-20260922",
+        "alignJVM/Compile/clean",
+        "alignJVM/Test/clean",
+        "alignJVM/testOnly *MappingVocabulary*"
+      ],
+      "cwd": "/private/tmp/storymodel4s-workspace-m1-20260922",
+      "log": "/private/tmp/workspace-m1-evidence/g1/slice3-mutations/stage-id-string-door-JVM.log",
+      "exit_code": 1,
+      "child_returncode": 1,
+      "reason": "exited",
+      "detail": null,
+      "timeout_seconds": 1800.0,
+      "log_bytes": 3609
+    },
+    "logSha256": "f262654fc913c1e2f079d31cf56dd6599f58f4ca689eadbbd48aac964f79ab24",
+    "totals": [
+      "[error] Failed: Total 18, Failed 2, Errors 0, Passed 16"
+    ],
+    "failures": [
+      "==> X storymodel4s.probes.MappingVocabularyUnforgeableSuite.identifiers have no string door 0.011s munit.FailException: align/src/test/scala/storymodel4s/probes/MappingVocabularyUnforgeableSuite.scala:31 assertion failed",
+      "==> X storymodel4s.align.attack.MappingVocabularyPackageAttackSuite.identifiers have no string door 0.001s munit.FailException: align/src/test/scala/storymodel4s/align/attack/MappingVocabularyPackageAttackSuite.scala:31 assertion failed"
+    ],
+    "name": "stage-id-string-door",
+    "platform": "JVM",
+    "sourceSha256": "81c6b7c8841ca428f55c85f38cdcebc6c171661d89c1865c078a27558983b3fa",
+    "mutantSha256": "833c6fb4691b445aa322473fee743eb820cf93c55ea411e6cf198d7bfee876ef",
+    "command": [
+      "alignJVM/Compile/clean",
+      "alignJVM/Test/clean",
+      "alignJVM/testOnly *MappingVocabulary*"
+    ],
+    "cleanCompileAndTest": true,
+    "expectedFailure": "identifiers have no string door",
+    "killed": true
+  },
+  {
+    "metadata": {
+      "schema_version": 1,
+      "started_utc": "2026-09-22T15:12:21.731083+00:00",
+      "finished_utc": "2026-09-22T15:13:48.062075+00:00",
+      "duration_seconds": 86.33231,
+      "command": [
+        "sbt",
+        "-batch",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-m1-grakern-20260922",
+        "alignJS/Compile/clean",
+        "alignJS/Test/clean",
+        "alignJS/testOnly *MappingVocabulary*"
+      ],
+      "cwd": "/private/tmp/storymodel4s-workspace-m1-20260922",
+      "log": "/private/tmp/workspace-m1-evidence/g1/slice3-mutations/stage-id-string-door-JS.log",
+      "exit_code": 1,
+      "child_returncode": 1,
+      "reason": "exited",
+      "detail": null,
+      "timeout_seconds": 1800.0,
+      "log_bytes": 4134
+    },
+    "logSha256": "a5ee5be95fe623e847e9b9e64849df8f151240a31b6ecca1bdffb5880d4f50c7",
+    "totals": [
+      "[error] Failed: Total 18, Failed 2, Errors 0, Passed 16"
+    ],
+    "failures": [
+      "==> X storymodel4s.probes.MappingVocabularyUnforgeableSuite.identifiers have no string door 0.018s munit.FailException: align/src/test/scala/storymodel4s/probes/MappingVocabularyUnforgeableSuite.scala:31 assertion failed",
+      "==> X storymodel4s.align.attack.MappingVocabularyPackageAttackSuite.identifiers have no string door 0.002s munit.FailException: align/src/test/scala/storymodel4s/align/attack/MappingVocabularyPackageAttackSuite.scala:31 assertion failed"
+    ],
+    "name": "stage-id-string-door",
+    "platform": "JS",
+    "sourceSha256": "81c6b7c8841ca428f55c85f38cdcebc6c171661d89c1865c078a27558983b3fa",
+    "mutantSha256": "833c6fb4691b445aa322473fee743eb820cf93c55ea411e6cf198d7bfee876ef",
+    "command": [
+      "alignJS/Compile/clean",
+      "alignJS/Test/clean",
+      "alignJS/testOnly *MappingVocabulary*"
+    ],
+    "cleanCompileAndTest": true,
+    "expectedFailure": "identifiers have no string door",
+    "killed": true
+  },
+  {
+    "metadata": {
+      "schema_version": 1,
+      "started_utc": "2026-09-22T15:14:30.332763+00:00",
+      "finished_utc": "2026-09-22T15:15:30.710448+00:00",
+      "duration_seconds": 60.378547,
+      "command": [
+        "sbt",
+        "-batch",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-m1-grakern-20260922",
+        "alignNative/Compile/clean",
+        "alignNative/Test/clean",
+        "alignNative/testOnly *MappingVocabulary*"
+      ],
+      "cwd": "/private/tmp/storymodel4s-workspace-m1-20260922",
+      "log": "/private/tmp/workspace-m1-evidence/g1/slice3-mutations/stage-id-string-door-Native.log",
+      "exit_code": 1,
+      "child_returncode": 1,
+      "reason": "exited",
+      "detail": null,
+      "timeout_seconds": 1800.0,
+      "log_bytes": 4194
+    },
+    "logSha256": "3979ee0d59f43d5e7b7ad7f0a0588bfa9696106b716ef28bfc45a2a233f7285a",
+    "totals": [
+      "[error] Failed: Total 18, Failed 2, Errors 0, Passed 16"
+    ],
+    "failures": [
+      "==> X storymodel4s.probes.MappingVocabularyUnforgeableSuite.identifiers have no string door 0.007s munit.FailException: align/src/test/scala/storymodel4s/probes/MappingVocabularyUnforgeableSuite.scala:31 assertion failed",
+      "==> X storymodel4s.align.attack.MappingVocabularyPackageAttackSuite.identifiers have no string door 0.006s munit.FailException: align/src/test/scala/storymodel4s/align/attack/MappingVocabularyPackageAttackSuite.scala:31 assertion failed"
+    ],
+    "name": "stage-id-string-door",
+    "platform": "Native",
+    "sourceSha256": "81c6b7c8841ca428f55c85f38cdcebc6c171661d89c1865c078a27558983b3fa",
+    "mutantSha256": "833c6fb4691b445aa322473fee743eb820cf93c55ea411e6cf198d7bfee876ef",
+    "command": [
+      "alignNative/Compile/clean",
+      "alignNative/Test/clean",
+      "alignNative/testOnly *MappingVocabulary*"
+    ],
+    "cleanCompileAndTest": true,
+    "expectedFailure": "identifiers have no string door",
+    "killed": true
+  },
+  {
+    "metadata": {
+      "schema_version": 1,
+      "started_utc": "2026-09-22T15:16:24.861719+00:00",
+      "finished_utc": "2026-09-22T15:17:02.653676+00:00",
+      "duration_seconds": 37.792397,
+      "command": [
+        "sbt",
+        "-batch",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-m1-grakern-20260922",
+        "alignJVM/Compile/clean",
+        "alignJVM/Test/clean",
+        "alignJVM/testOnly *MappingVocabulary*"
+      ],
+      "cwd": "/private/tmp/storymodel4s-workspace-m1-20260922",
+      "log": "/private/tmp/workspace-m1-evidence/g1/slice3-mutations/derived-factory-door-JVM.log",
+      "exit_code": 1,
+      "child_returncode": 1,
+      "reason": "exited",
+      "detail": null,
+      "timeout_seconds": 1800.0,
+      "log_bytes": 3578
+    },
+    "logSha256": "8bb57b2f29c11877a3ac3a0cc86a689796e9d097dfa268f020dc7408f5c00d40",
+    "totals": [
+      "[error] Failed: Total 18, Failed 2, Errors 0, Passed 16"
+    ],
+    "failures": [
+      "==> X storymodel4s.probes.MappingVocabularyUnforgeableSuite.no Derived door 0.016s munit.FailException: align/src/test/scala/storymodel4s/probes/MappingVocabularyUnforgeableSuite.scala:58 assertion failed",
+      "==> X storymodel4s.align.attack.MappingVocabularyPackageAttackSuite.no Derived door 0.001s munit.FailException: align/src/test/scala/storymodel4s/align/attack/MappingVocabularyPackageAttackSuite.scala:58 assertion failed"
+    ],
+    "name": "derived-factory-door",
+    "platform": "JVM",
+    "sourceSha256": "81c6b7c8841ca428f55c85f38cdcebc6c171661d89c1865c078a27558983b3fa",
+    "mutantSha256": "1ab732101d7cab5e6ab0e44f9cd82a8ca9a46bb0cc1858899901fe657a70dfed",
+    "command": [
+      "alignJVM/Compile/clean",
+      "alignJVM/Test/clean",
+      "alignJVM/testOnly *MappingVocabulary*"
+    ],
+    "cleanCompileAndTest": true,
+    "expectedFailure": "no Derived door",
+    "killed": true
+  },
+  {
+    "metadata": {
+      "schema_version": 1,
+      "started_utc": "2026-09-22T15:17:38.084909+00:00",
+      "finished_utc": "2026-09-22T15:18:21.178571+00:00",
+      "duration_seconds": 43.094192,
+      "command": [
+        "sbt",
+        "-batch",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-m1-grakern-20260922",
+        "alignJS/Compile/clean",
+        "alignJS/Test/clean",
+        "alignJS/testOnly *MappingVocabulary*"
+      ],
+      "cwd": "/private/tmp/storymodel4s-workspace-m1-20260922",
+      "log": "/private/tmp/workspace-m1-evidence/g1/slice3-mutations/derived-factory-door-JS.log",
+      "exit_code": 1,
+      "child_returncode": 1,
+      "reason": "exited",
+      "detail": null,
+      "timeout_seconds": 1800.0,
+      "log_bytes": 4102
+    },
+    "logSha256": "4c716c6011656bc586b7607c84f7f5426b191d6d29bde282a47c233f3a72fb68",
+    "totals": [
+      "[error] Failed: Total 18, Failed 2, Errors 0, Passed 16"
+    ],
+    "failures": [
+      "==> X storymodel4s.probes.MappingVocabularyUnforgeableSuite.no Derived door 0.018s munit.FailException: align/src/test/scala/storymodel4s/probes/MappingVocabularyUnforgeableSuite.scala:58 assertion failed",
+      "==> X storymodel4s.align.attack.MappingVocabularyPackageAttackSuite.no Derived door 0.001s munit.FailException: align/src/test/scala/storymodel4s/align/attack/MappingVocabularyPackageAttackSuite.scala:58 assertion failed"
+    ],
+    "name": "derived-factory-door",
+    "platform": "JS",
+    "sourceSha256": "81c6b7c8841ca428f55c85f38cdcebc6c171661d89c1865c078a27558983b3fa",
+    "mutantSha256": "1ab732101d7cab5e6ab0e44f9cd82a8ca9a46bb0cc1858899901fe657a70dfed",
+    "command": [
+      "alignJS/Compile/clean",
+      "alignJS/Test/clean",
+      "alignJS/testOnly *MappingVocabulary*"
+    ],
+    "cleanCompileAndTest": true,
+    "expectedFailure": "no Derived door",
+    "killed": true
+  },
+  {
+    "metadata": {
+      "schema_version": 1,
+      "started_utc": "2026-09-22T15:19:03.736390+00:00",
+      "finished_utc": "2026-09-22T15:20:02.918201+00:00",
+      "duration_seconds": 59.182674,
+      "command": [
+        "sbt",
+        "-batch",
+        "-Dstorymodel4s.grakern.build=/private/tmp/storymodel4s-m1-grakern-20260922",
+        "alignNative/Compile/clean",
+        "alignNative/Test/clean",
+        "alignNative/testOnly *MappingVocabulary*"
+      ],
+      "cwd": "/private/tmp/storymodel4s-workspace-m1-20260922",
+      "log": "/private/tmp/workspace-m1-evidence/g1/slice3-mutations/derived-factory-door-Native.log",
+      "exit_code": 1,
+      "child_returncode": 1,
+      "reason": "exited",
+      "detail": null,
+      "timeout_seconds": 1800.0,
+      "log_bytes": 4310
+    },
+    "logSha256": "5f0cefaf2f06049b592a9d5bd68cf92c07927eddc5f85383b5b04d1981988870",
+    "totals": [
+      "[error] Failed: Total 18, Failed 2, Errors 0, Passed 16"
+    ],
+    "failures": [
+      "==> X storymodel4s.probes.MappingVocabularyUnforgeableSuite.no Derived door 0.007s munit.FailException: align/src/test/scala/storymodel4s/probes/MappingVocabularyUnforgeableSuite.scala:58 assertion failed",
+      "==> X storymodel4s.align.attack.MappingVocabularyPackageAttackSuite.no Derived door 0.001s munit.FailException: align/src/test/scala/storymodel4s/align/attack/MappingVocabularyPackageAttackSuite.scala:58 assertion failed"
+    ],
+    "name": "derived-factory-door",
+    "platform": "Native",
+    "sourceSha256": "81c6b7c8841ca428f55c85f38cdcebc6c171661d89c1865c078a27558983b3fa",
+    "mutantSha256": "1ab732101d7cab5e6ab0e44f9cd82a8ca9a46bb0cc1858899901fe657a70dfed",
+    "command": [
+      "alignNative/Compile/clean",
+      "alignNative/Test/clean",
+      "alignNative/testOnly *MappingVocabulary*"
+    ],
+    "cleanCompileAndTest": true,
+    "expectedFailure": "no Derived door",
+    "killed": true
+  }
+]
