@@ -38,8 +38,8 @@ mutants = [
      "if clocks.origin == WorkspaceClockOrigin.Unestablished && false =>",
      voyage_task, "identical observations require an explicit bound recall-start declaration"),
     ("drop-source-mark-bridge", voyage,
-     ".flatMap(workspace.sourceAddress)",
-     ".flatMap(_ => Option.empty[Address])",
+     "workspace.sourceAddress",
+     "_ => Option.empty[Address]",
      voyage_task, "actual mark addresses bridge source and recall selection without phantom cells"),
     ("round-word-clock", "codec/src/main/scala/storymodel4s/codec/workspaceclocks.scala",
      "n * BigInt(value.denominator) == BigInt(value.numerator) * d",
@@ -116,6 +116,10 @@ def control(name):
     if not receipt["passed"]:
         raise SystemExit("Control failed")
 
+
+for name, filename, original, _, _, _ in mutants:
+    if (root / filename).read_text().count(original) != 1:
+        raise SystemExit(f"{name}: expected one mutation site before starting builds")
 
 control("before")
 for name, filename, original, replacement, task, witness in mutants:
