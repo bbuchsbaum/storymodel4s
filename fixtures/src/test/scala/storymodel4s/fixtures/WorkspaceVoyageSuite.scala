@@ -13,6 +13,15 @@ class WorkspaceVoyageSuite extends FunSuite:
   import WorkspaceVoyage.{Disposition, Unavailable}
   private val revision = "0" * 40
   private lazy val fixtures = WorkspaceFixtures.all(revision).toMap
+  // Producer construction (including both HSMM executions) is shared fixture setup, not work
+  // performed by the adapter. Keep the default per-test timeout and every behavioral assertion.
+  override def beforeAll(): Unit =
+    val started = System.nanoTime()
+    val _ = fixtures
+    println(
+      s"WorkspaceVoyage producer fixture setup: ${(System.nanoTime() - started) / 1000000L} ms"
+    )
+
   private lazy val bell = fixtures("bell")
   private val historical = ArtifactId.unsafe("historical-lexical")
   private val u1 = RecallUnitId.unsafe("m1:u1")
