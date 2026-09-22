@@ -201,3 +201,17 @@ malformed UTF-8 refuse with content-free diagnostics. This is byte and permissio
 not the semantic join. Packet serialization is content export and requires the export grant;
 inspection-only admission never licenses packet writing. Reject a permissive generic archive decoder or byte repair; binary
 sidecar transport is outside this first version and needs its own declared encoding.
+
+`WorkspaceCodecs` owns the checked `SourceRecallWorkspace` construction door. Its text
+decoder revalidates the actual model and recall, rebuilds the word inventory and source
+dictionary, contextually decodes each G1 mapping and its optional HSMM result, and checks
+one target cut plus a receipt over every member. `WorkspaceMappingInput` is only unchecked
+packaging input. Structural validation licenses the existing source bridge, not scientific
+completeness: `DraftModel` retains the actual derivation record, gaps and abstentions. This
+version refuses structurally unpromotable source models rather than manufacturing a source
+view. `WorkspaceTiming` preserves untimed, onset-only and interval annotations on each unit;
+`WorkspaceOrigin` records authored-fixture versus imported-artifact provenance. Qualified
+`core.Address` values bind model and recall artifact checksums, independently of mapping
+policy. Exact evidence queries preserve each SpanRef and inverse queries retain repeated
+references. Reject unchecked source dictionaries, local-ID-only joins, estimator execution
+inside decode, inferred recall clocks and silent partial-to-complete promotion.
