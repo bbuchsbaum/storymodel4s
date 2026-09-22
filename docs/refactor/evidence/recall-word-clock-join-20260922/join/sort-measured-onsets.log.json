@@ -1,0 +1,5 @@
+{
+  "encoding": "utf-8",
+  "text": "test_backward_and_equal_onsets_are_diagnostics_not_repaired (__main__.WordClockSuite.test_backward_and_equal_onsets_are_diagnostics_not_repaired) ... FAIL\n\n======================================================================\nFAIL: test_backward_and_equal_onsets_are_diagnostics_not_repaired (__main__.WordClockSuite.test_backward_and_equal_onsets_are_diagnostics_not_repaired)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/Users/bbuchsbaum/code/scala/storymodel4s/.worktrees/openneuro-recall-clock-intake/tools/recall-study/tests/test_recall_word_clock.py\", line 118, in test_backward_and_equal_onsets_are_diagnostics_not_repaired\n    self.assertEqual(unit[\"firstMeasuredOnset\"][\"onset\"][\"decimal\"], \"10\")\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: '9' != '10'\n- 9\n+ 10\n\n\n----------------------------------------------------------------------\nRan 1 test in 0.002s\n\nFAILED (failures=1)\n",
+  "textSha256": "232711b773e7740086a2e4f23cda2a65668aee824fcd0856b836413a35e52909"
+}

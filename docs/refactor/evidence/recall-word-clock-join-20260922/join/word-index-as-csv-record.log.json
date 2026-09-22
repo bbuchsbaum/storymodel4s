@@ -1,0 +1,5 @@
+{
+  "encoding": "utf-8",
+  "text": "test_empty_record_is_retained_without_shifting_word_indices (__main__.WordClockSuite.test_empty_record_is_retained_without_shifting_word_indices) ... FAIL\n\n======================================================================\nFAIL: test_empty_record_is_retained_without_shifting_word_indices (__main__.WordClockSuite.test_empty_record_is_retained_without_shifting_word_indices)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/Users/bbuchsbaum/code/scala/storymodel4s/.worktrees/openneuro-recall-clock-intake/tools/recall-study/tests/test_recall_word_clock.py\", line 105, in test_empty_record_is_retained_without_shifting_word_indices\n    self.assertEqual(result[\"words\"][1][\"onset\"][\"decimal\"], \"8.75\")\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: '8.5' != '8.75'\n- 8.5\n+ 8.75\n?   +\n\n\n----------------------------------------------------------------------\nRan 1 test in 0.002s\n\nFAILED (failures=1)\n",
+  "textSha256": "1794156962b86879a7a58a62906973825942d850a65a2f9ba857335b46ae03d2"
+}

@@ -775,3 +775,15 @@ the verified OpenNeuro scanner-run crosswalk remain unimplemented by this slice;
 scanner ticket `bd-01M354E83Z4Z7DR4KPP6Q45MAJ` remains open. No G1, M1, uncertainty
 query or StoryAtlas acceptance criterion is closed by this helper. The next
 integration remains the canonical G1/evidence/timing/facade path above.
+
+The following slice, `9d366e26` on `solo/recall-word-clock-join`, adds the
+[independent word-clock reader](../../tools/recall-study/WORD_CLOCK_JOIN.md).
+It consumes the real G1 synthetic producer wire, verifies exact transcript and
+UTF-16 inventory correspondence, retains every CSV record and unit, and reports
+onsets with missingness and ordering diagnostics. Reunitization changes the
+segmentation binding while parsed word identity survives. Shared recording
+identity and full contextual mapping validation remain explicitly unverified by
+this reader. Its [evidence](../refactor/evidence/recall-word-clock-join-20260922/README.md)
+records 48 tests, 28 compiled mutation kills, both CLI clock examples and separate
+review repairs. This advances the independent timing/exchange validation target;
+the G2 timing, scanner, G1 and M1 completion boundaries remain unchanged.

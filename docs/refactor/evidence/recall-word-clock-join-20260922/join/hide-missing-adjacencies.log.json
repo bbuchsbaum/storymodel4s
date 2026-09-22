@@ -1,0 +1,5 @@
+{
+  "encoding": "utf-8",
+  "text": "test_missing_boundary_is_not_a_measured_unit_start (__main__.WordClockSuite.test_missing_boundary_is_not_a_measured_unit_start) ... FAIL\n\n======================================================================\nFAIL: test_missing_boundary_is_not_a_measured_unit_start (__main__.WordClockSuite.test_missing_boundary_is_not_a_measured_unit_start)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/Users/bbuchsbaum/code/scala/storymodel4s/.worktrees/openneuro-recall-clock-intake/tools/recall-study/tests/test_recall_word_clock.py\", line 114, in test_missing_boundary_is_not_a_measured_unit_start\n    self.assertEqual(unit[\"onsetOrder\"][\"unobservedPairs\"], 1)\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: 0 != 1\n\n----------------------------------------------------------------------\nRan 1 test in 0.002s\n\nFAILED (failures=1)\n",
+  "textSha256": "168c4615b1bfb2bb2c439aa40861e78872e59dfeb2dc8ca3fbb95dd7f0ff0e5b"
+}
