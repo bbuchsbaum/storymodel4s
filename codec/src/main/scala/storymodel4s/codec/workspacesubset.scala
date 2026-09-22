@@ -86,6 +86,7 @@ object WorkspaceSubsetCodec:
               obj(
                 "unit" -> str(row.unit.id.value),
                 "address" -> str(workspace.recallAddress(row.unit.id).get.render),
+                "clock" -> WorkspaceCodecs.timingJson(workspace.timing(row.unit.id)),
                 "pieces" -> pieces(evidence)
               )
             )
@@ -149,6 +150,7 @@ object WorkspaceSubsetCodec:
       Vector(
         "unit",
         "address",
+        "recall_clock_seconds",
         "destination",
         "measure",
         "channel",
@@ -169,6 +171,7 @@ object WorkspaceSubsetCodec:
         Vector(
           row.unit.id.value,
           workspace.recallAddress(row.unit.id).get.render,
+          MappingJson.print(WorkspaceCodecs.timingJson(workspace.timing(row.unit.id))),
           destination
         ) ++ values ++
           Vector(

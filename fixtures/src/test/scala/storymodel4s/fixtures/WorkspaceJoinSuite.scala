@@ -3,6 +3,7 @@ package storymodel4s.fixtures
 import java.nio.charset.StandardCharsets
 
 import io.circe.Json
+import io.circe.syntax.*
 import munit.FunSuite
 import storymodel4s.align.*
 import storymodel4s.codec.*
@@ -15,6 +16,7 @@ import storymodel4s.story.*
 import storymodel4s.view.*
 
 class WorkspaceJoinSuite extends FunSuite:
+  import OutputCodecs.given
   private val model = WarOfTheGhostsModel.draft
   private val pair = WorkspaceCodecs.sourceFor(WarOfTheGhostsModel.model).toOption.get
   private val source = pair._2
@@ -436,6 +438,148 @@ class WorkspaceJoinSuite extends FunSuite:
       WorkspaceSubsetCodec.selected(workspace, policyId, Set(address)).toOption.get.dataJson,
       payload.dataJson
     )
+  }
+
+  test("inspection-only imports cannot produce any export, including an empty selection") {
+    val manifest = workspace.archive.manifest
+    val entry = manifest.entry(WorkspaceRole.Capabilities).get
+    val previous = manifest.artifact(WorkspaceRole.Capabilities).get
+    val declaration = WorkspaceArchiveCodec.encodeCapabilities(
+      workspace.archive.capabilities.copy(exportPermission = WorkspaceContentGrant.Denied)
+    )
+    val changed = ArtifactRef.fromBytes(
+      previous.id,
+      previous.role,
+      previous.mediaType,
+      previous.schemaVersion,
+      declaration.getBytes(StandardCharsets.UTF_8)
+    )
+    val original = Canonical.parse(WorkspaceArchiveCodec.encode(manifest).toOption.get).toOption.get
+    val entries = original.hcursor.get[Vector[Json]]("entries").toOption.get.map { item =>
+      if item.hcursor.get[String]("path").toOption.contains(entry.path.value) then
+        item.mapObject(
+          _.add(
+            "disposition",
+            Json.obj("status" -> Json.fromString("Supplied"), "artifact" -> changed.asJson)
+          )
+        )
+      else item
+    }
+    val files = original.hcursor.get[Vector[Json]]("files").toOption.get.map { item =>
+      if item.hcursor.get[String]("path").toOption.contains(entry.path.value) then
+        item.mapObject(_.add("utf8", Json.fromString(declaration)))
+      else item
+    }
+    val incoming = original
+      .mapObject(
+        _.add("entries", Json.fromValues(entries))
+          .add("files", Json.fromValues(files))
+      )
+      .noSpaces
+    val inspected = WorkspaceCodecs.decode(incoming).fold(e => fail(e.toString), identity)
+    assertEquals(
+      inspected.recallEvidence(recall.ordered.head.id),
+      workspace.recallEvidence(recall.ordered.head.id)
+    )
+    assertEquals(
+      WorkspaceArchiveCodec.encode(inspected.archive.manifest),
+      Left(WorkspaceRefusal.PermissionDenied)
+    )
+    val denied =
+      WorkspaceSubsetCodec.selected(inspected, policyId, inspected.recallAddresses.keySet)
+    assertEquals(denied, Left(WorkspaceRefusal.PermissionDenied))
+    assert(!denied.toString.contains("Two men walked"))
+    assertEquals(
+      WorkspaceSubsetCodec.selected(inspected, policyId, Set.empty),
+      Left(WorkspaceRefusal.PermissionDenied)
+    )
+  }
+
+  test("a second precomputed policy exports its own values and digest") {
+    val first = outcomes.head
+    val values: Map[Destination, Double] = Map(
+      Destination.Target(target) -> 0.1,
+      Destination.Target(other) -> 0.8,
+      Destination.External(ExternalState.Intrusion) -> 0.1
+    )
+    val raw = RawScores
+      .of(
+        "authored",
+        ScoreDirection.HigherIsBetter,
+        "synthetic arbitrary units",
+        values,
+        stage(Stage.Scoring)
+      )
+      .toOption
+      .get
+    val measures = UnitMeasures.of(Vector(raw), None, None, None).toOption.get
+    val changed = UnitOutcome
+      .computed(
+        first.unit,
+        measures,
+        first.links,
+        DecisionBasis.of(MeasureKind.RawScore, Some("authored")).toOption.get,
+        DecisionRequest.RawArgmax,
+        stages
+      )
+      .toOption
+      .get
+    val second = MappingResult
+      .checked(inventory, source, policies, roles, ledger, outcomes.updated(0, changed))
+      .toOption
+      .get
+    val secondId = ArtifactId.unsafe("policy-b")
+    val opened =
+      create(records = Vector(mapping, WorkspaceMappingInput(secondId, second, None))).toOption.get
+    val exported = WorkspaceSubsetCodec
+      .selected(opened, secondId, Set(opened.recallAddress(recall.ordered.head.id).get))
+      .toOption
+      .get
+    val data = Canonical.parse(exported.dataJson).toOption.get.hcursor
+    assertEquals(data.get[String]("policy").toOption.get, "policy-b")
+    assertEquals(data.get[String]("original_record_digest").toOption.get, second.digest.hex)
+    assertEquals(
+      data.get[Vector[Json]]("outcomes").toOption.get,
+      MappingCodecs.toJson(second).hcursor.get[Vector[Json]]("outcomes").toOption.get.take(1)
+    )
+    assert(exported.tableCsv.contains("0x3fe999999999999a"))
+    assert(!exported.tableCsv.contains("0x3fe3333333333333"))
+    assert(exported.accessibleText.contains("Policy: policy-b"))
+  }
+
+  test("selection JSON and CSV retain untimed, onset-only and interval recall clocks") {
+    val exported = WorkspaceSubsetCodec
+      .selected(workspace, policyId, workspace.recallAddresses.keySet)
+      .toOption
+      .get
+    val rows = Canonical
+      .parse(exported.dataJson)
+      .toOption
+      .get
+      .hcursor
+      .get[Vector[Json]]("recall_evidence")
+      .toOption
+      .get
+    val clocks = rows.map(_.hcursor.downField("clock").focus.get)
+    assertEquals(
+      clocks,
+      Vector(
+        Json.obj("status" -> Json.fromString("untimed")),
+        Json
+          .obj("status" -> Json.fromString("onset"), "at" -> Json.fromString("0x4004000000000000")),
+        Json.obj(
+          "status" -> Json.fromString("interval"),
+          "start" -> Json.fromString("0x4010000000000000"),
+          "end" -> Json.fromString("0x4014000000000000")
+        ),
+        Json.obj("status" -> Json.fromString("untimed"))
+      )
+    )
+    assert(exported.tableCsv.linesIterator.next().contains("recall_clock_seconds"))
+    assert(exported.tableCsv.contains("\"\"status\"\":\"\"untimed\"\""))
+    assert(exported.tableCsv.contains("\"\"at\"\":\"\"0x4004000000000000\"\""))
+    assert(exported.tableCsv.contains("\"\"start\"\":\"\"0x4010000000000000\"\""))
+    assert(exported.tableCsv.contains("\"\"end\"\":\"\"0x4014000000000000\"\""))
   }
 
   test("source selection exports repeated references; empty selection does not export all") {

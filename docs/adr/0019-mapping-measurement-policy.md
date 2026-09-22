@@ -224,3 +224,6 @@ complete G1 record. CSV and accessible text retain missingness, measure/scale, p
 decision origin and exact evidence. A receipt binds the archive, policy, query, selection and
 all three exported payload digests. Export permission is checked before returning any payload.
 Reject UI-side row arithmetic, selected-only normalization and silent export-all defaults.
+Selected recall evidence retains the tagged recall clock in JSON and the CSV
+`recall_clock_seconds` column, including explicit untimed and onset-only cases. Clock
+coordinates use the same lossless IEEE-754 encoding as the admitted inventory.

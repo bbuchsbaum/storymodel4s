@@ -175,7 +175,7 @@ object WorkspaceCodecs:
       )
     ).map(view -> _)
 
-  private def timingJson(value: WorkspaceTiming): Json = value match
+  private[codec] def timingJson(value: WorkspaceTiming): Json = value match
     case WorkspaceTiming.Untimed        => obj("status" -> str("untimed"))
     case WorkspaceTiming.Onset(at)      => obj("status" -> str("onset"), "at" -> at.value.asJson)
     case WorkspaceTiming.Interval(span) =>
