@@ -1,0 +1,17 @@
+{
+  "schema": "storymodel4s.sherlock.recall-alias-map",
+  "schemaVersion": 1,
+  "sourceSetId": "synthetic-clock-fixture-v1",
+  "sourceCount": 2,
+  "aliasCount": 1,
+  "mappings": [
+    {
+      "aliasId": "recall-alias-05",
+      "sourceId": "recall-source-06",
+      "sha256": "38534374babcc723c050f4b0abcabf2b77bb5cf303ad1b138c6db209c3de23e5"
+    }
+  ],
+  "omittedSources": [
+    "recall-source-05"
+  ]
+}

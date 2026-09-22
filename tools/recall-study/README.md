@@ -29,6 +29,87 @@ one copy shared by every worktree; the study record is `data/study/recall-to-vid
   level in both arms, which is how an apparent ordering gain is told apart from a shift to coarser
   anchors.
 
+## Explicit recall-clock intake
+
+`recall_clock.py` is a standard-library Python intake oracle for the
+[recall–encoding workflow](../../docs/plans/2026-09-22-recall-encoding-workflow.md).
+It checks one CSV against the declared Sherlock lineage, preserves every data
+record and selects the released OpenNeuro or Princeton word-onset column. The
+clock is required. It does not run alignment or change the existing Scala mapper.
+
+Run the original synthetic example from the repository root:
+
+```sh
+python3 tools/recall-study/recall_clock.py \
+  --csv tools/recall-study/fixtures/recall-clock/words.csv \
+  --lineage tools/recall-study/fixtures/recall-clock/lineage.json \
+  --clock openneuro --expect-source recall-source-06 \
+  --alias-id recall-alias-05 \
+  --alias-map tools/recall-study/fixtures/recall-clock/aliases.json \
+  --out /tmp/synthetic-openneuro-clock.json
+```
+
+The output's parent directory must exist; an existing output is refused. For an
+admitted development CSV, set `RECALL_CSV` and `CLOCK_OUTPUT` to local paths and run:
+
+```sh
+python3 tools/recall-study/recall_clock.py \
+  --csv "$RECALL_CSV" --clock openneuro --out "$CLOCK_OUTPUT"
+```
+
+The default manifest is `docs/data/sherlock/recall-lineage.json`, resolved relative
+to the script. The study partition still governs access: this helper does not
+authorize opening untouched-test transcripts. `--expect-source recall-source-NN`
+adds an identity assertion; `--alias-id` and `--alias-map` optionally verify a
+convenience alias together. Canonical source IDs, aliases and BIDS subject IDs are
+different coordinates. No mapping is inferred from a filename or its number.
+
+The versioned JSON contract is
+`storymodel4s.sherlock.recall-clock-intake/v1`. It is an experimental intake
+artifact for adapter validation, not the public mapping-result wire format.
+
+| Field | Meaning |
+|---|---|
+| `identity` | Declared artifact set and canonical source, exact CSV digest/length, lineage digest and optional checked alias/map digest |
+| `clock` | Explicit release column in seconds; `appliedOffset` is zero because the selected column is copied directly |
+| `recordCoordinates` | One-based CSV data-record positions, excluding the header; these are not canonical word IDs |
+| `records` | Every record's six numeric cells, typed missingness, text-presence flag and selected onset; no recall prose |
+| `counts` | All records, empty text records, missing numeric cells and missing selected onsets |
+| `offsetDiagnostics` | Exact rational minima/maxima of observed OpenNeuro-minus-Princeton differences, with paired/unpaired counts; no correction is applied |
+| `capabilities` | Explicitly unavailable word offsets, scanner crosswalk and canonical word-inventory join |
+| `producer` | CLI script digest, allowing a consumer to bind the implementation |
+
+Observed numeric values remain decimal strings, with surrounding whitespace
+removed. Missing cells remain missing, including a missing selected onset; zero
+is an observed value. Finite negative onsets are preserved. TR numbers must be
+integer-valued, but are **not verified zero-based BIDS volume indices**. Numeric
+text is bounded to 128 coefficient digits, an absolute exponent of 128 and 512
+characters; unsupported representations produce a located refusal, never a
+rounded substitute. The limits are recorded in `numericTextLimits`.
+
+The manifest establishes a declared byte identity and column interpretation.
+Supplying a different manifest does not authenticate a new release. An OpenNeuro
+column alone does not establish scan onset, dropped volumes, stimulus/run
+boundaries, cartoon transitions or HRF treatment. Those belong to the later
+verified scanner crosswalk. Onsets also do not establish word durations.
+
+Successful stdout is a content-free summary with the output digest. Refusals use
+exit 2 and an error code, optionally a record/column location; argument errors
+use argparse's usage diagnostics. Output publication is complete-file and
+exclusive. It never overwrites an earlier result.
+
+```sh
+python3 tools/recall-study/tests/test_recall_clock.py -v
+python3 tools/recall-study/tests/mutate_recall_clock.py \
+  --out /tmp/recall-clock-mutation-evidence
+```
+
+The mutation output directory must be new. The court runs restored controls
+before and after 11 compiled mutants and requires each named assertion to fail.
+The [fixture record](fixtures/recall-clock/README.md) explains the independent
+expected values. These checks qualify intake behavior, not mapping accuracy or
+temporal calibration.
+
 ## Frozen engineering baseline
 
 `freeze_baseline.py` records one development participant twice using the current

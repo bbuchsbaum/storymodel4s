@@ -103,3 +103,16 @@ projection API follows G1 and its own checked implementation; this planning reco
 adds no module, dependency or implemented Scala type. StoryAtlas consumes the same
 checked queries and exports as Python/R, preserving measure units, missingness and
 semantic identity under zoom, selection and replay.
+
+The first executable clock slice (2026-09-22) is an independent standard-library
+Python intake oracle in `tools/recall-study/recall_clock.py`. Its experimental
+`storymodel4s.sherlock.recall-clock-intake/v1` artifact binds declared lineage and
+CSV bytes, requires an explicit released clock column, preserves all CSV records
+and exact bounded numeric text, and records unavailable scanner/word-duration
+authority. Alias identity is checked through the declared digest-bound map.
+This supplies an independent validation target for the later Scala adapter;
+canonical mapping and temporal contracts retain their existing owners. Rejected:
+hard-coding a 7.5-second correction, deriving source identity from filenames,
+equating CSV records with canonical word IDs, treating released TR numbers as
+verified BIDS volume indices, and adding a second scientific mapper in Python.
+This slice adds no Scala module, dependency or public Scala type.
