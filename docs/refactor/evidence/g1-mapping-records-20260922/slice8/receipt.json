@@ -1,0 +1,27 @@
+{
+  "schema": "storymodel4s.g1-slice-qualification/v1",
+  "slice": 8,
+  "source": "31c5c457",
+  "focused": {
+    "JVM": 14,
+    "JS": 14,
+    "Native": 14,
+    "failures": 0
+  },
+  "mutations": {
+    "distinct": 10,
+    "compiledRuns": 10,
+    "construction": "No new checked authority type; adapter is composed from qualified public factories. HistoricalDecode is caller-supplied intent.",
+    "bindingWitnesses": "Foreign-source mutation rebuilds the representation against the current view, discarding the supplied identity. Foreign-recall mutation bypasses both construction and per-link checksum checks; other result and inventory joins remain in place.",
+    "supportWitness": "External mutation substitutes a source assessed support value inside MappingLink producer; no new public construction door."
+  },
+  "review": {
+    "reviewer": "m1_g1_plan_review",
+    "source": "31c5c457",
+    "findings": [],
+    "conclusion": "Adapter binds result, recall, inventory and captured view before outcomes. Links cover posterior plus costs, full posterior determines candidate support and external argmax, None stays explicit abstention, and historical stages carry Unknown with no asserted receipts. Completes via MappingResult.checked.",
+    "limits": "Immutable source and test review only; no reviewer builds or edits."
+  },
+  "archiveSha256": "da47c6a5956cee537224f41c5c5b5bc84edbb1736e1bbc2ee0ee9c91d72762e8",
+  "limits": "Local historical adapter contract only; no execution provenance, calibration, inference-number change or full G1/M1 acceptance. Existing clang-15 warning retained. Native initial 14-test runtime was 140s; no performance qualification claimed."
+}

@@ -1,0 +1,7 @@
+{
+  "reviewer": "m1_g1_plan_review",
+  "source": "31c5c457",
+  "findings": [],
+  "conclusion": "Adapter binds result, recall, inventory and captured view before outcomes. Links cover posterior plus costs, full posterior determines candidate support and external argmax, None stays explicit abstention, and historical stages carry Unknown with no asserted receipts. Completes via MappingResult.checked.",
+  "limits": "Immutable source and test review only; no reviewer builds or edits."
+}

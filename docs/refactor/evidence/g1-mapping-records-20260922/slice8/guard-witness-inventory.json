@@ -1,0 +1,142 @@
+[
+  {
+    "name": "source-only-argmax",
+    "platform": "JVM",
+    "path": "align/src/main/scala/storymodel4s/align/mappinghistory.scala",
+    "sourceSha256": "fc559eb2bce7aca3d411318f44ae125a5cd1fddb4f29d33bffcbaf6d59f238d6",
+    "mutantSha256": "57690e198cd742da293a713cab3b8f058b57ca001b547df9bc89b15f87387860",
+    "expectedFailures": [
+      "Unranked row argmax is external"
+    ],
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 14, Failed 1, Errors 0, Passed 13"
+    ]
+  },
+  {
+    "name": "decoded-none-falls-back",
+    "platform": "JVM",
+    "path": "align/src/main/scala/storymodel4s/align/mappinghistory.scala",
+    "sourceSha256": "fc559eb2bce7aca3d411318f44ae125a5cd1fddb4f29d33bffcbaf6d59f238d6",
+    "mutantSha256": "e9eff839c75632f943f93dd10d2b6615e1b03a96ea06e507676a2bfdfbeead58",
+    "expectedFailures": [
+      "Decoded None is Abstention"
+    ],
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 14, Failed 1, Errors 0, Passed 13"
+    ]
+  },
+  {
+    "name": "decode-inventory-unchecked",
+    "platform": "JVM",
+    "path": "align/src/main/scala/storymodel4s/align/mappinghistory.scala",
+    "sourceSha256": "fc559eb2bce7aca3d411318f44ae125a5cd1fddb4f29d33bffcbaf6d59f238d6",
+    "mutantSha256": "19a1ab01250e960576b5be43a3d4fa8de34246e5fd945454ed08dbbafbbfbdad",
+    "expectedFailures": [
+      "decode must account for exactly the requested units"
+    ],
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 14, Failed 1, Errors 0, Passed 13"
+    ]
+  },
+  {
+    "name": "invented-historical-receipts",
+    "platform": "JVM",
+    "path": "align/src/main/scala/storymodel4s/align/mappinghistory.scala",
+    "sourceSha256": "fc559eb2bce7aca3d411318f44ae125a5cd1fddb4f29d33bffcbaf6d59f238d6",
+    "mutantSha256": "1dbe928819f0f51b5ce57b4b8793b956ecaf5f45497299238a55ff903a5996c8",
+    "expectedFailures": [
+      "historical ledger asserts no receipts"
+    ],
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 14, Failed 1, Errors 0, Passed 13"
+    ]
+  },
+  {
+    "name": "missing-cost-defaulted",
+    "platform": "JVM",
+    "path": "align/src/main/scala/storymodel4s/align/mappinghistory.scala",
+    "sourceSha256": "fc559eb2bce7aca3d411318f44ae125a5cd1fddb4f29d33bffcbaf6d59f238d6",
+    "mutantSha256": "210e86d9133a6df75cb6fc35a6cd343e32794e9cb4542f6c1527169b9735d345",
+    "expectedFailures": [
+      "missing breakdown refuses"
+    ],
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 14, Failed 2, Errors 0, Passed 12"
+    ]
+  },
+  {
+    "name": "view-reread",
+    "platform": "JVM",
+    "path": "align/src/main/scala/storymodel4s/align/mappinghistory.scala",
+    "sourceSha256": "fc559eb2bce7aca3d411318f44ae125a5cd1fddb4f29d33bffcbaf6d59f238d6",
+    "mutantSha256": "fd25f39d2cacb9757a7cc2a333abca99874880c0cdae14477d0ccdc0bc9598f3",
+    "expectedFailures": [
+      "adapter captures a changing view once for binding and all link assessment"
+    ],
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 14, Failed 1, Errors 0, Passed 13"
+    ]
+  },
+  {
+    "name": "basis-changed-to-cost",
+    "platform": "JVM",
+    "path": "align/src/main/scala/storymodel4s/align/mappinghistory.scala",
+    "sourceSha256": "fc559eb2bce7aca3d411318f44ae125a5cd1fddb4f29d33bffcbaf6d59f238d6",
+    "mutantSha256": "9f665973273221c2cbfecd929c508708f8be41636be5c155b62ba8ae128d68af",
+    "expectedFailures": [
+      "historical posterior is bit-equal to the supplied result"
+    ],
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 14, Failed 4, Errors 0, Passed 10"
+    ]
+  },
+  {
+    "name": "supplied-source-rebound",
+    "platform": "JVM",
+    "path": "align/src/main/scala/storymodel4s/align/mappinghistory.scala",
+    "sourceSha256": "fc559eb2bce7aca3d411318f44ae125a5cd1fddb4f29d33bffcbaf6d59f238d6",
+    "mutantSha256": "6d8774ed217f0a29445f2a435269c1273ee647082d302fe1fb7166a44ee84a99",
+    "expectedFailures": [
+      "source from another view refuses"
+    ],
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 14, Failed 2, Errors 0, Passed 12"
+    ]
+  },
+  {
+    "name": "recall-binding-checks-bypassed",
+    "platform": "JVM",
+    "path": "align/src/main/scala/storymodel4s/align/mappingbinding.scala",
+    "sourceSha256": "7a0605c34066c687dae30de3912536a187c748bc01d74b9b40b96ab5c122de3c",
+    "mutantSha256": "f6e48a19855164ffae065f5bb7825cb6129bc49d8290ea62cb4336b5b70e05c7",
+    "expectedFailures": [
+      "foreign recall with shared unit IDs refuses"
+    ],
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 14, Failed 1, Errors 0, Passed 13"
+    ]
+  },
+  {
+    "name": "external-as-assessed",
+    "platform": "JVM",
+    "path": "align/src/main/scala/storymodel4s/align/mappingmeasures.scala",
+    "sourceSha256": "ac3a3566bf3555448a60fc443fcacc3b3924c474aa5e68f35729186d49c380e2",
+    "mutantSha256": "b9d9f985944de5744c7f3bd181cd3d675c78c1bf02d8181564bcbbee3b1c332f",
+    "expectedFailures": [
+      "external links remain NotApplicable"
+    ],
+    "killed": true,
+    "totals": [
+      "[error] Failed: Total 14, Failed 1, Errors 0, Passed 13"
+    ]
+  }
+]
