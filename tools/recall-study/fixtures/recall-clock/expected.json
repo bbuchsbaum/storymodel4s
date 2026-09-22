@@ -1,0 +1,46 @@
+{
+  "basis": "independently authored exact answers; original synthetic fixture",
+  "openneuro": [
+    {
+      "status": "observed",
+      "decimal": "7.5"
+    },
+    {
+      "status": "observed",
+      "decimal": "8.750000000000001"
+    },
+    {
+      "status": "observed",
+      "decimal": "11.75"
+    }
+  ],
+  "princeton": [
+    {
+      "status": "observed",
+      "decimal": "0"
+    },
+    {
+      "status": "observed",
+      "decimal": "1.25"
+    },
+    {
+      "status": "missing",
+      "reason": "blank-cell"
+    }
+  ],
+  "wordDifferences": {
+    "pairedRecords": 2,
+    "unpairedRecords": 1,
+    "range": {
+      "status": "observed",
+      "minimum": {
+        "numerator": "15",
+        "denominator": "2"
+      },
+      "maximum": {
+        "numerator": "7500000000000001",
+        "denominator": "1000000000000000"
+      }
+    }
+  }
+}

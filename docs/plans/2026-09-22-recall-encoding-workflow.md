@@ -741,10 +741,12 @@ skips. A doc-only plan does not requalify historical builds.
 
 ## 12. Immediate next action and plan boundary
 
-Finish the active G1 landing, then implement the smallest source + recall -> checked
-mapping -> independent reader journey using the existing facade/evidence tickets.
-Prepare the synthetic temporal witnesses alongside that work. The first new
-corpus-specific implementation is an OpenNeuro timing adapter, not another aligner.
+G1 is landed locally (`2e98b6fe`), and the portable timing foundation below is
+qualified. Continue the smallest source + recall -> checked mapping -> independent
+reader journey through the existing facade/evidence tickets. The timing follow-on
+is production intake and exact source-support integration, then the separately
+tracked temporal queries. The OpenNeuro adapter must establish its recording/run
+binding before claiming scanner coordinates.
 
 This planning pass verified the current contracts, existing ticket ownership and
 live G1 partial status; consulted an independent mathematical review; and checked
@@ -757,3 +759,47 @@ large exact ticks must round-trip rather than be refused. Synthetic illustration
 arithmetic and local document links were checked. The illustration was visually
 inspected; it is a static explanatory figure, not a completed dynamic UI or an
 empirical uncertainty measurement.
+
+## 13. First implementation checkpoint — 22 September 2026
+
+The independent clock-intake oracle is committed at `5a2c5387` on
+`solo/openneuro-recall-clock-intake`; [usage](../../tools/recall-study/README.md#explicit-recall-clock-intake)
+and [qualification evidence](../refactor/evidence/openneuro-recall-clock-intake-20260922/README.md)
+are recorded together. It requires an explicit released clock, checks declared
+CSV/alias identity, preserves all records and exact bounded numeric text, and
+publishes a content-free intake artifact. Twenty-two tests and eleven compiled
+mutations qualify the intake; both clock selections also matched all 2,495 records
+of one admitted development source. This is an independent validation target for
+the later Scala timing adapter, prepared alongside the active G1 implementation.
+
+The existing mapper still selects its historical clock. Canonical word joins and
+the verified OpenNeuro scanner-run crosswalk remain unimplemented by this slice;
+scanner ticket `bd-01M354E83Z4Z7DR4KPP6Q45MAJ` remains open. No G1, M1, uncertainty
+query or StoryAtlas acceptance criterion is closed by this helper. The next
+integration remains the canonical G1/evidence/timing/facade path above.
+
+The following slice, `9d366e26` on `solo/recall-word-clock-join`, adds the
+[independent word-clock reader](../../tools/recall-study/WORD_CLOCK_JOIN.md).
+It consumes the real G1 synthetic producer wire, verifies exact transcript and
+UTF-16 inventory correspondence, retains every CSV record and unit, and reports
+onsets with missingness and ordering diagnostics. Reunitization changes the
+segmentation binding while parsed word identity survives. Shared recording
+identity and full contextual mapping validation remain explicitly unverified by
+this reader. Its [evidence](../refactor/evidence/recall-word-clock-join-20260922/README.md)
+records 48 tests, 28 compiled mutation kills, both CLI clock examples and separate
+review repairs. This advances the independent timing/exchange validation target;
+the G2 timing, scanner, G1 and M1 completion boundaries remain unchanged.
+
+The portable timing slice on `solo/recall-timing-portable` follows G1's local
+landing (`2e98b6fe`; G1 closed). It adds checked clock-scoped observations in
+`recall`, contextual `recall-timing/v0.1` interchange in `codec`, and a
+[consumer guide](../recall-timing.md). The independent readers remain the oracle;
+they do not become a second production timing format. Timing observations account
+for every inventory word and distinguish missing/onset-only/interval and
+source-reported/estimated values. Onset diagnostics do not establish interval
+exposure. Its [qualification evidence](../refactor/evidence/recall-timing-portable-20260922/README.md)
+binds exact source `be121883`: full checkAll has 7,966 passes and five optional
+live skips; 18 new tests pass on each backend, ten named mutations are killed,
+and independent exact Python answers agree. G2 timing remains open for producer intake, source-support
+integration and its downstream temporal contracts; scanner and StoryAtlas temporal
+acceptance remain separate.

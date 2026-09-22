@@ -1,0 +1,105 @@
+{
+  "schema": "storymodel4s.recall-clock-intake-evidence/v1",
+  "sourceRevision": "5a2c5387240ae44b18977b226c32f33d7928a742",
+  "sourceFiles": [
+    {
+      "path": "tools/recall-study/recall_clock.py",
+      "sha256": "622a87f84c793b8829fd075f6fba662b8f37f557506e0e878ee81fee055cdda3"
+    },
+    {
+      "path": "tools/recall-study/tests/test_recall_clock.py",
+      "sha256": "a765983bb721fc1f659d8d027f274b2d70e4787ebd7b4ef18d552b44b38bc00d"
+    },
+    {
+      "path": "tools/recall-study/tests/mutate_recall_clock.py",
+      "sha256": "bc7be2ca870d29b87068f74c0bb72e323c725641cc9787288a0ee07f79e8eb80"
+    },
+    {
+      "path": "tools/recall-study/fixtures/recall-clock/README.md",
+      "sha256": "87f06cd3a5b7a51eaa942a13efa79bfdd802576b05253202118917dc044a550b"
+    },
+    {
+      "path": "tools/recall-study/fixtures/recall-clock/aliases.json",
+      "sha256": "71fa4551de0f89e5eca73a4cd799fd9f159f029044f6083340c8e2f20a9112c2"
+    },
+    {
+      "path": "tools/recall-study/fixtures/recall-clock/expected.json",
+      "sha256": "994e6364891912d2b2c478019f977979ad4522d96fb47ace6d241d064bafe5ae"
+    },
+    {
+      "path": "tools/recall-study/fixtures/recall-clock/lineage.json",
+      "sha256": "2878207f155489dccb2a2156a6be3e6dda16d5b6c03a2aaea8f1e7f39fcd6f8e"
+    },
+    {
+      "path": "tools/recall-study/fixtures/recall-clock/omitted.csv",
+      "sha256": "ef51f30076fd5885f32eabb0358295c7ead5c6902cd474df9a305b8c2abfe75d"
+    },
+    {
+      "path": "tools/recall-study/fixtures/recall-clock/words.csv",
+      "sha256": "38534374babcc723c050f4b0abcabf2b77bb5cf303ad1b138c6db209c3de23e5"
+    }
+  ],
+  "controls": [
+    {
+      "phase": "before",
+      "command": [
+        "python3",
+        "tools/recall-study/tests/test_recall_clock.py",
+        "-v"
+      ],
+      "exit": 0,
+      "tests": 22,
+      "log": "logs/before.log.json",
+      "logSha256": "c1c4c5157e5ca6363f6a6cdac8d22f522b05f7f9633a8ef32f2de7114fb06b24",
+      "logEncoding": "json.text, UTF-8 bytes"
+    },
+    {
+      "phase": "after",
+      "command": [
+        "python3",
+        "tools/recall-study/tests/test_recall_clock.py",
+        "-v"
+      ],
+      "exit": 0,
+      "tests": 22,
+      "log": "logs/after.log.json",
+      "logSha256": "6949127c357343a4115772ced77ea05166ce6e5c9076fdbdb4f784e5400cf138",
+      "logEncoding": "json.text, UTF-8 bytes"
+    }
+  ],
+  "mutationCommand": [
+    "python3",
+    "tools/recall-study/tests/mutate_recall_clock.py",
+    "--out",
+    "<new-evidence-directory>"
+  ],
+  "mutationExit": 0,
+  "mutantsCompiledAndKilled": 11,
+  "mutationReceiptSha256": "4a4bb0c880bfefeea8d0d06006d15838f10c9385662ef80d30850d8b61bea446",
+  "developmentReceiptSha256": "3194d061198ad4e1c5327d4250da228dc52144e6af1c975a8be7f4d2cc1e010d",
+  "developmentProbeSha256": "38c6d2df32fa4962bb6dbbe646a053d6c7002cb67733cbc7182a12d4cb966a4e",
+  "scopeCheck": {
+    "command": [
+      "bash",
+      "tools/reference-scope.sh",
+      "a2723c7f20d48f4e674f528542e2bd252aa3c224",
+      "5a2c5387240ae44b18977b226c32f33d7928a742"
+    ],
+    "exit": 0,
+    "stdout": "no types defined in changed files"
+  },
+  "separateReview": {
+    "finding": "extreme numeric text could escape as Decimal or integer formatting exceptions",
+    "resolution": "bounded representation before arithmetic; located structured refusal",
+    "targetedRecheck": "two new numeric tests passed; no remaining finding"
+  },
+  "notEstablished": [
+    "scanner-run crosswalk",
+    "canonical word inventory join",
+    "word durations",
+    "mapping accuracy",
+    "temporal calibration",
+    "Scala build qualification"
+  ],
+  "mutationLogEncoding": "logs/<name>.log.json text property; logSha256 binds its UTF-8 bytes"
+}

@@ -1,0 +1,57 @@
+{
+  "sourceRecords": [
+    1,
+    3,
+    4,
+    5
+  ],
+  "utf16Spans": [
+    [
+      0,
+      4
+    ],
+    [
+      5,
+      13
+    ],
+    [
+      14,
+      17
+    ],
+    [
+      18,
+      23
+    ]
+  ],
+  "openneuro": [
+    null,
+    "8.75",
+    "10",
+    "9"
+  ],
+  "princeton": [
+    "0",
+    "1.25",
+    "2.5",
+    "3.5"
+  ],
+  "counts": {
+    "records": 5,
+    "words": 4,
+    "excludedRecords": 1,
+    "units": 2,
+    "unassignedWords": 0,
+    "missingWordOnsets": 1
+  },
+  "firstUnit": {
+    "firstMemberIndex": 0,
+    "firstMeasuredIndex": 1,
+    "firstMeasuredRecord": 3,
+    "coverage": "partial"
+  },
+  "secondUnit": {
+    "firstMeasured": "10",
+    "lastMeasured": "9",
+    "backwardPairs": 1
+  }
+}

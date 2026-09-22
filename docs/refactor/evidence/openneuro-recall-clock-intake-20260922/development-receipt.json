@@ -1,0 +1,133 @@
+{
+  "kind": "development-only-clock-intake-check",
+  "sourceRevision": "5a2c5387240ae44b18977b226c32f33d7928a742",
+  "sourceId": "recall-source-03",
+  "partitionSha256": "cc9958bf6d1cc6d07fde508ef7951dc90b3a85ca8744cedf5900ca60acea365f",
+  "developmentMembershipCheckedBeforeRead": true,
+  "goldRead": false,
+  "sealedTestRead": false,
+  "csvSha256": "5bfe5e4afa516e86d302912db8f6978f16f80ab00a84cb2a878eb2ed0c15e48e",
+  "csvByteLength": 91928,
+  "clocks": [
+    {
+      "selection": "openneuro",
+      "exit": 0,
+      "command": [
+        "python3",
+        "tools/recall-study/recall_clock.py",
+        "--csv",
+        "<development-csv:recall-source-03>",
+        "--clock",
+        "openneuro",
+        "--expect-source",
+        "recall-source-03",
+        "--alias-id",
+        "recall-alias-03",
+        "--alias-map",
+        "docs/data/sherlock/alias-map.json",
+        "--out",
+        "<private-output>"
+      ],
+      "counts": {
+        "emptyTextRecords": 0,
+        "missingNumericCells": 0,
+        "missingSelectedOnsets": 0,
+        "records": 2495
+      },
+      "outputSha256": "41382fbf71aeb0f1ec62625b12ead6dde0457037cd57a2ad33cb4a5e9894f378",
+      "stdoutSha256": "d22c29eebc560ce9026ae596009409d4f513c41e69576de1cf1f933918bbdd1f",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "selection": "princeton",
+      "exit": 0,
+      "command": [
+        "python3",
+        "tools/recall-study/recall_clock.py",
+        "--csv",
+        "<development-csv:recall-source-03>",
+        "--clock",
+        "princeton",
+        "--expect-source",
+        "recall-source-03",
+        "--alias-id",
+        "recall-alias-03",
+        "--alias-map",
+        "docs/data/sherlock/alias-map.json",
+        "--out",
+        "<private-output>"
+      ],
+      "counts": {
+        "emptyTextRecords": 0,
+        "missingNumericCells": 0,
+        "missingSelectedOnsets": 0,
+        "records": 2495
+      },
+      "outputSha256": "e08dcce056f322d2bf559cb6afce9b373f605e52356ba07caf3a681f152a7b2a",
+      "stdoutSha256": "e01660b3a416a51d39f3051338be09d329f9e6435563b71c63ffa12583e5f108",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "identity": {
+    "alias": {
+      "id": "recall-alias-03",
+      "mapSha256": "b3c4dace92f8d49b7daeaa1216e4474f2e84883d07a41fbe5e37fab252bbedc0",
+      "sourceId": "recall-source-03",
+      "status": "verified-byte-identity"
+    },
+    "artifactSetId": "sherlock-recall-export-set-v1",
+    "csvByteLength": 91928,
+    "csvSha256": "5bfe5e4afa516e86d302912db8f6978f16f80ab00a84cb2a878eb2ed0c15e48e",
+    "lineageSha256": "4b41ef7e6ebacbd0d24800fca0c7ee172a7540b9996cf903edc2782744f9363e",
+    "sourceId": "recall-source-03"
+  },
+  "offsetDiagnostics": {
+    "meaning": "openneuro-minus-princeton-observed-differences-not-an-applied-transform",
+    "trNumber": {
+      "pairedRecords": 2495,
+      "range": {
+        "maximum": {
+          "denominator": "1",
+          "numerator": "5"
+        },
+        "minimum": {
+          "denominator": "1",
+          "numerator": "5"
+        },
+        "status": "observed"
+      },
+      "unpairedRecords": 0
+    },
+    "trSeconds": {
+      "pairedRecords": 2495,
+      "range": {
+        "maximum": {
+          "denominator": "2",
+          "numerator": "15"
+        },
+        "minimum": {
+          "denominator": "2",
+          "numerator": "15"
+        },
+        "status": "observed"
+      },
+      "unpairedRecords": 0
+    },
+    "wordSeconds": {
+      "pairedRecords": 2495,
+      "range": {
+        "maximum": {
+          "denominator": "2",
+          "numerator": "15"
+        },
+        "minimum": {
+          "denominator": "2",
+          "numerator": "15"
+        },
+        "status": "observed"
+      },
+      "unpairedRecords": 0
+    }
+  },
+  "recordByRecordIndependentColumnComparison": "pass"
+}

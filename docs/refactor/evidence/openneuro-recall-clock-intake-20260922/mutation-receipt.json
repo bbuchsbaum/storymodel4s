@@ -1,0 +1,106 @@
+{
+  "sourceSha256": "622a87f84c793b8829fd075f6fba662b8f37f557506e0e878ee81fee055cdda3",
+  "controlBefore": "pass",
+  "controlAfter": "pass",
+  "mutations": [
+    {
+      "name": "wrong-release-column",
+      "test": "test_selected_clock_uses_released_column_not_added_offset",
+      "compiled": true,
+      "mutantSha256": "cb944436fec7590820886cfd97b533bbb955496e45cadbb825e97ef180f042d3",
+      "exit": 1,
+      "failures": 1,
+      "logSha256": "cd91d5ac6ace82ad8b7aeee72a3d4e29365bae956d85f36cfffce34d0e5f3030"
+    },
+    {
+      "name": "skip-byte-identity",
+      "test": "test_unknown_bytes_refuse_before_csv_parse",
+      "compiled": true,
+      "mutantSha256": "814aafa3f902e0816a6c80a24eb5a0beb7f6fa9cae4f945b4aa9ec0084fea8d0",
+      "exit": 1,
+      "failures": 1,
+      "logSha256": "5e6ae9d26dc9a209261ae08f2db452b5d5f9c33449d6a779c6461f94c8a8b80b"
+    },
+    {
+      "name": "discard-empty-record",
+      "test": "test_every_record_survives_quoted_csv_and_empty_word",
+      "compiled": true,
+      "mutantSha256": "b245e7c2a63dc472c3e7cc46e65ec2d35199c0ab8a328c32b1e5b5082e2a0d2c",
+      "exit": 1,
+      "failures": 1,
+      "logSha256": "2e97b49fcaf5659af30617e16d84f137bf92442eb5a01c12c04c520776ec93bb"
+    },
+    {
+      "name": "missing-selected-onset-as-zero",
+      "test": "test_princeton_selection_keeps_missing_distinct_from_zero",
+      "compiled": true,
+      "mutantSha256": "97b256a5c15c804a150b040ef8c30044c3b6d5720f99f5a2c8e9f688e5cfe342",
+      "exit": 1,
+      "failures": 1,
+      "logSha256": "dc98c1dcb70d931d4fd744fe7e13e42a1fe21e87be0f0b572d015c79b9a0642c"
+    },
+    {
+      "name": "float-rounding",
+      "test": "test_large_exact_and_negative_onsets_are_preserved",
+      "compiled": true,
+      "mutantSha256": "44edaa6f31d34696b60459dfa3149a002f06cbfec84a50e223c9f254735fa758",
+      "exit": 1,
+      "failures": 1,
+      "logSha256": "b86b6a0c5e39a438746b5381bb2c1c794471c2d94a12c50403bfc9b79d21073c"
+    },
+    {
+      "name": "skip-record-count",
+      "test": "test_declared_counts_are_checked",
+      "compiled": true,
+      "mutantSha256": "7cdf46928fa4335473958085827419bb14e7807aa58c85a2899e9c48d5b216ef",
+      "exit": 1,
+      "failures": 1,
+      "logSha256": "9107c00c57c2d3a383def44d713222056eb65228c046d6771832e4bab0e66dc4"
+    },
+    {
+      "name": "skip-alias-source-binding",
+      "test": "test_omitted_source_does_not_acquire_an_alias",
+      "compiled": true,
+      "mutantSha256": "c6256859248dda7542fda67a1bacaae1cb598968152549166d5e2dc6cb2a8d2b",
+      "exit": 1,
+      "failures": 1,
+      "logSha256": "5ae006bf9374ee28284bd8f40dd0572481eff8042544fa201739b995c7192519"
+    },
+    {
+      "name": "alias-sha-not-checked",
+      "test": "test_foreign_or_inconsistent_alias_map_refuses",
+      "compiled": true,
+      "mutantSha256": "816b4d8074720178abbec549b3d603ca8b7090394f4eab8077c0092f544c0a89",
+      "exit": 1,
+      "failures": 1,
+      "logSha256": "09b6fbb141a0a0bbf584747de0414a65c97f5d8e4eed174241754538b1ab5f09"
+    },
+    {
+      "name": "invent-scanner-authority",
+      "test": "test_no_duration_scanner_join_or_text_is_fabricated",
+      "compiled": true,
+      "mutantSha256": "4aa22773574df0008fa614d6af1126ce9c22d2282d7eeb59d129714c351aeda2",
+      "exit": 1,
+      "failures": 1,
+      "logSha256": "49fe6a80931ddb0b5cca0d0a905355b22ec7e485001fc9d63b20750d8c48327a"
+    },
+    {
+      "name": "leak-source-text",
+      "test": "test_no_duration_scanner_join_or_text_is_fabricated",
+      "compiled": true,
+      "mutantSha256": "9132e015a42e12bde84ada70d6bb0d9b5a769b5480eab95d048293acaff1ea7d",
+      "exit": 1,
+      "failures": 1,
+      "logSha256": "a40b39264cce7d22747c883b4b6b37c05bef4bff62e92ac692bf08adbc920ad1"
+    },
+    {
+      "name": "overwrite-existing-output",
+      "test": "test_publication_is_complete_and_never_overwrites",
+      "compiled": true,
+      "mutantSha256": "d5c55477e3048d03c323b7ffb9f6f41b8d1252fe3f477655543cc38678426fe3",
+      "exit": 1,
+      "failures": 1,
+      "logSha256": "5429ac884802d9ad506c3cf53ee106b0eecf57f597ee0472bfc34322302d58dd"
+    }
+  ]
+}

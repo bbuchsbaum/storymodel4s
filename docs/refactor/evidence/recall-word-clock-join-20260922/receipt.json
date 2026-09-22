@@ -1,0 +1,697 @@
+{
+  "schema": "storymodel4s.recall-word-clock-join-evidence/v1",
+  "sourceRevision": "9d366e267b48b174769c8f7b889b576917ce2321",
+  "baseRevision": "6a6f22f450d675c8e17fb3f0bf92e12d7a2404ee",
+  "sourceFiles": [
+    {
+      "path": "docs/adr/0019-mapping-measurement-policy.md",
+      "sha256": "b4291cad10468b286f907cde54823ba3f8c7acfaadf89ef45404aa12eb6e22d9"
+    },
+    {
+      "path": "tools/recall-study/README.md",
+      "sha256": "1fd73f50c39853720e1e42b19a64d9691de8a3db1bdb3c3eb93776343d226a67"
+    },
+    {
+      "path": "tools/recall-study/WORD_CLOCK_JOIN.md",
+      "sha256": "c7d84b385185c07e410efe491f7b5dd80093537d741e7a9a4eb497d644c92ea9"
+    },
+    {
+      "path": "tools/recall-study/fixtures/word-clock-join/README.md",
+      "sha256": "374396a67f47ffbffabc3adf714f89b56d80a97f8b92a76a68d2e34e7c4e8c74"
+    },
+    {
+      "path": "tools/recall-study/fixtures/word-clock-join/expected.json",
+      "sha256": "f15ec86631634114118ff9a517f5690cb829ce93ba1e6cacfd9cd03372d1c245"
+    },
+    {
+      "path": "tools/recall-study/fixtures/word-clock-join/g1-historical.json",
+      "sha256": "acea0831a78b03f5b7cfa548e81f037aa997d37dbdae8b6cdfd4b24ac82f59c7"
+    },
+    {
+      "path": "tools/recall-study/fixtures/word-clock-join/lineage.json",
+      "sha256": "63e568c8c31f2ae41269db38bec02311409ec796f550e8f0e82d2ed8cdd80f01"
+    },
+    {
+      "path": "tools/recall-study/fixtures/word-clock-join/provenance.json",
+      "sha256": "5e3ae683e2ebcfb6f11f4eea06535f56aa7e90a63989ad10825ca0bf35ecf978"
+    },
+    {
+      "path": "tools/recall-study/fixtures/word-clock-join/regrouped-inventory-envelope.json",
+      "sha256": "c1e647c9108f0b80f8c0a12cca31166fed2906c2f243e9d72c9918780ece11e5"
+    },
+    {
+      "path": "tools/recall-study/fixtures/word-clock-join/unicode-inventory-envelope.json",
+      "sha256": "ab1c0a000b233a489a45a2b0b7aa34c129b71947b8b4bd44b143af752e7b927d"
+    },
+    {
+      "path": "tools/recall-study/fixtures/word-clock-join/unicode-lineage.json",
+      "sha256": "3d30a312676db15574ab58e8013dfb16702d83a5734284c6229ef9edbcbf9fdd"
+    },
+    {
+      "path": "tools/recall-study/fixtures/word-clock-join/unicode.csv",
+      "sha256": "af6ce458bbeb900936ff49ada270bc4d4dbbff60019b20bd73a34c8cca62070b"
+    },
+    {
+      "path": "tools/recall-study/fixtures/word-clock-join/words.csv",
+      "sha256": "8555a5468ff1854bf15b58feffd49ce5de0d59d6d9faf44c3952e3d740f07ff3"
+    },
+    {
+      "path": "tools/recall-study/recall_clock.py",
+      "sha256": "11be103a55a81a76fade42de3a6c3d186c66b7617f4f9b82b698d3198793f607"
+    },
+    {
+      "path": "tools/recall-study/recall_word_clock.py",
+      "sha256": "9c6777d02a610841f505c3ae5b6667100bd0318eb26a82f87814e21c7255c29f"
+    },
+    {
+      "path": "tools/recall-study/tests/mutate_recall_clock.py",
+      "sha256": "559790d6c9d50ffaf7c3a85d422307f48b6a3fe5a8e732a8860a2a7658e60d0a"
+    },
+    {
+      "path": "tools/recall-study/tests/mutate_recall_word_clock.py",
+      "sha256": "11b27ae99134e8ea2d8fa36de68d0a62d76d668b4220097697bd3445f8f49965"
+    },
+    {
+      "path": "tools/recall-study/tests/test_recall_clock.py",
+      "sha256": "83455a80e182e55f88840e2d20fba27cb429a26bfc9ba543d81857bec4117175"
+    },
+    {
+      "path": "tools/recall-study/tests/test_recall_word_clock.py",
+      "sha256": "d0624f9a28cb3d22934159261711b6611c31e6983da3c000839b5d610125f405"
+    }
+  ],
+  "controls": [
+    {
+      "suite": "join",
+      "phase": "before",
+      "tests": 25,
+      "exit": 0,
+      "command": [
+        "python3",
+        "tools/recall-study/tests/test_recall_word_clock.py",
+        "-v"
+      ],
+      "log": "join/before.log.json",
+      "logSha256": "3c7285b95fdd7f57ff6e39368ce155a41aa654f5e16e9d2e2504236212963125"
+    },
+    {
+      "suite": "join",
+      "phase": "after",
+      "tests": 25,
+      "exit": 0,
+      "command": [
+        "python3",
+        "tools/recall-study/tests/test_recall_word_clock.py",
+        "-v"
+      ],
+      "log": "join/after.log.json",
+      "logSha256": "bcaba6014921aeb7ed126a85de8b6dbd7f52c23e8e1ed076655a5c51af783edc"
+    },
+    {
+      "suite": "intake",
+      "phase": "before",
+      "tests": 23,
+      "exit": 0,
+      "command": [
+        "python3",
+        "tools/recall-study/tests/test_recall_clock.py",
+        "-v"
+      ],
+      "log": "intake/before.log.json",
+      "logSha256": "79ef766f1c7cee3f9d656e5a1bbbc4e4f4af9387adb17b935aae0d9f8a3dc396"
+    },
+    {
+      "suite": "intake",
+      "phase": "after",
+      "tests": 23,
+      "exit": 0,
+      "command": [
+        "python3",
+        "tools/recall-study/tests/test_recall_clock.py",
+        "-v"
+      ],
+      "log": "intake/after.log.json",
+      "logSha256": "298f9d5e3315a8480c0b7c10938cddcf153cfc2a70ff9cda3499e564d57fc468"
+    }
+  ],
+  "testsAcrossSuites": 48,
+  "compiledMutantsKilled": 28,
+  "mutations": [
+    {
+      "name": "empty-span-as-owner",
+      "test": "test_interior_empty_span_cannot_own_a_word",
+      "command": [
+        "/opt/homebrew/opt/python@3.14/bin/python3.14",
+        "/Users/bbuchsbaum/code/scala/storymodel4s/.worktrees/openneuro-recall-clock-intake/tools/recall-study/tests/test_recall_word_clock.py",
+        "-v",
+        "WordClockSuite.test_interior_empty_span_cannot_own_a_word"
+      ],
+      "compiled": true,
+      "exit": 1,
+      "failures": 1,
+      "mutantSha256": "7df06cbc4ae11e0f1419b9d4b87b2e8e1432b43a520eba4e275002439187d4ec",
+      "logSha256": "1cd0bd609f35ffacc2e26385473351f4541494965d927e01f031e3936a205bdd",
+      "suite": "join",
+      "log": "join/empty-span-as-owner.log.json"
+    },
+    {
+      "name": "weaken-id-rules",
+      "test": "test_identifier_rules_match_g1_utf16_and_java_whitespace",
+      "command": [
+        "/opt/homebrew/opt/python@3.14/bin/python3.14",
+        "/Users/bbuchsbaum/code/scala/storymodel4s/.worktrees/openneuro-recall-clock-intake/tools/recall-study/tests/test_recall_word_clock.py",
+        "-v",
+        "WordClockSuite.test_identifier_rules_match_g1_utf16_and_java_whitespace"
+      ],
+      "compiled": true,
+      "exit": 1,
+      "failures": 1,
+      "mutantSha256": "1b1a2ffbc3cb0a7588f133d73c75fae279cc39dbc7d070d49864419cc6adbe27",
+      "logSha256": "d5ed77ec381ec64b30e2781191059ba1d058b0299ef48f7d92a93fd44968f8c5",
+      "suite": "join",
+      "log": "join/weaken-id-rules.log.json"
+    },
+    {
+      "name": "skip-mapping-byte-pin",
+      "test": "test_explicit_recipe_and_external_mapping_pin_are_required",
+      "command": [
+        "/opt/homebrew/opt/python@3.14/bin/python3.14",
+        "/Users/bbuchsbaum/code/scala/storymodel4s/.worktrees/openneuro-recall-clock-intake/tools/recall-study/tests/test_recall_word_clock.py",
+        "-v",
+        "WordClockSuite.test_explicit_recipe_and_external_mapping_pin_are_required"
+      ],
+      "compiled": true,
+      "exit": 1,
+      "failures": 1,
+      "mutantSha256": "e904e74435de646b453fc634b54db6d606da3453e2d99d61fdf9095b7ca9d3e4",
+      "logSha256": "1f3afb422e83c6ee98ba0edcfbea9a0200df453d223a8cdeda3e5489dc8b746e",
+      "suite": "join",
+      "log": "join/skip-mapping-byte-pin.log.json"
+    },
+    {
+      "name": "skip-inventory-digest",
+      "test": "test_inventory_and_segmentation_digests_are_independently_checked",
+      "command": [
+        "/opt/homebrew/opt/python@3.14/bin/python3.14",
+        "/Users/bbuchsbaum/code/scala/storymodel4s/.worktrees/openneuro-recall-clock-intake/tools/recall-study/tests/test_recall_word_clock.py",
+        "-v",
+        "WordClockSuite.test_inventory_and_segmentation_digests_are_independently_checked"
+      ],
+      "compiled": true,
+      "exit": 1,
+      "failures": 1,
+      "mutantSha256": "df6aab6ecae5f0beeca3488b87b506be4ecc7a8d114c773e294b5141dc95d623",
+      "logSha256": "6769159d76e945a51738c3420f9608e5d6f54b5a050578722a323bfc511a8476",
+      "suite": "join",
+      "log": "join/skip-inventory-digest.log.json"
+    },
+    {
+      "name": "skip-segmentation-digest",
+      "test": "test_inventory_and_segmentation_digests_are_independently_checked",
+      "command": [
+        "/opt/homebrew/opt/python@3.14/bin/python3.14",
+        "/Users/bbuchsbaum/code/scala/storymodel4s/.worktrees/openneuro-recall-clock-intake/tools/recall-study/tests/test_recall_word_clock.py",
+        "-v",
+        "WordClockSuite.test_inventory_and_segmentation_digests_are_independently_checked"
+      ],
+      "compiled": true,
+      "exit": 1,
+      "failures": 1,
+      "mutantSha256": "89a65dde17c0eb8ad03e96b871de203df5e85141f9e0f274334ee042995ff52b",
+      "logSha256": "5f4313a61abc68aea70f40bc674a87a1caefe7ed8e5f6882fe8f97dda4f6f52a",
+      "suite": "join",
+      "log": "join/skip-segmentation-digest.log.json"
+    },
+    {
+      "name": "codepoint-length",
+      "test": "test_utf16_nonbmp_ids_repeated_words_and_quoted_newline",
+      "command": [
+        "/opt/homebrew/opt/python@3.14/bin/python3.14",
+        "/Users/bbuchsbaum/code/scala/storymodel4s/.worktrees/openneuro-recall-clock-intake/tools/recall-study/tests/test_recall_word_clock.py",
+        "-v",
+        "WordClockSuite.test_utf16_nonbmp_ids_repeated_words_and_quoted_newline"
+      ],
+      "compiled": true,
+      "exit": 1,
+      "failures": 1,
+      "mutantSha256": "f0d02161848235ce43c1dfa474eb2552a0ef6080788ff3ad7b9e4e23126e1c43",
+      "logSha256": "e7a88f154b314bdeee298b30d84c3b32a7abfe73dfe10bd06f23c58b730f98bc",
+      "suite": "join",
+      "log": "join/codepoint-length.log.json"
+    },
+    {
+      "name": "word-index-as-csv-record",
+      "test": "test_empty_record_is_retained_without_shifting_word_indices",
+      "command": [
+        "/opt/homebrew/opt/python@3.14/bin/python3.14",
+        "/Users/bbuchsbaum/code/scala/storymodel4s/.worktrees/openneuro-recall-clock-intake/tools/recall-study/tests/test_recall_word_clock.py",
+        "-v",
+        "WordClockSuite.test_empty_record_is_retained_without_shifting_word_indices"
+      ],
+      "compiled": true,
+      "exit": 1,
+      "failures": 1,
+      "mutantSha256": "3ffa1fbbb2690b51d8dbfcad047edbc8b9b4cf4d384aba15ad393f1fd6a524f0",
+      "logSha256": "1794156962b86879a7a58a62906973825942d850a65a2f9ba857335b46ae03d2",
+      "suite": "join",
+      "log": "join/word-index-as-csv-record.log.json"
+    },
+    {
+      "name": "drop-excluded-records",
+      "test": "test_empty_record_is_retained_without_shifting_word_indices",
+      "command": [
+        "/opt/homebrew/opt/python@3.14/bin/python3.14",
+        "/Users/bbuchsbaum/code/scala/storymodel4s/.worktrees/openneuro-recall-clock-intake/tools/recall-study/tests/test_recall_word_clock.py",
+        "-v",
+        "WordClockSuite.test_empty_record_is_retained_without_shifting_word_indices"
+      ],
+      "compiled": true,
+      "exit": 1,
+      "failures": 1,
+      "mutantSha256": "cdbc6da0f4d5dadc9b743f3013b59e0f68e4a62ba5b200ef1cdf734672c3b2f1",
+      "logSha256": "3c0a8d27617390d4cde648fc20c06afa8c8cf6cf71c05041968d69ad81ebd80a",
+      "suite": "join",
+      "log": "join/drop-excluded-records.log.json"
+    },
+    {
+      "name": "invent-duration",
+      "test": "test_no_mapping_context_scanner_duration_or_interpolation_authority",
+      "command": [
+        "/opt/homebrew/opt/python@3.14/bin/python3.14",
+        "/Users/bbuchsbaum/code/scala/storymodel4s/.worktrees/openneuro-recall-clock-intake/tools/recall-study/tests/test_recall_word_clock.py",
+        "-v",
+        "WordClockSuite.test_no_mapping_context_scanner_duration_or_interpolation_authority"
+      ],
+      "compiled": true,
+      "exit": 1,
+      "failures": 1,
+      "mutantSha256": "30ef61118d4e4f7dc0ce692a32eb1ed56ed78722de15c46cef4d67416baf4aeb",
+      "logSha256": "acb2f07e50215540e110fcc3b33a07f58bd1f8a99e6982f70ec3932dcf468ee1",
+      "suite": "join",
+      "log": "join/invent-duration.log.json"
+    },
+    {
+      "name": "invent-context-validation",
+      "test": "test_no_mapping_context_scanner_duration_or_interpolation_authority",
+      "command": [
+        "/opt/homebrew/opt/python@3.14/bin/python3.14",
+        "/Users/bbuchsbaum/code/scala/storymodel4s/.worktrees/openneuro-recall-clock-intake/tools/recall-study/tests/test_recall_word_clock.py",
+        "-v",
+        "WordClockSuite.test_no_mapping_context_scanner_duration_or_interpolation_authority"
+      ],
+      "compiled": true,
+      "exit": 1,
+      "failures": 1,
+      "mutantSha256": "ff6053ab51c4e271311634b4e1dcd31777b562b59610cdc908d10d3e50255fdf",
+      "logSha256": "3679ed3f58e129df8880d91a8600ebf62474339b21d2993e403401eef0a92ebf",
+      "suite": "join",
+      "log": "join/invent-context-validation.log.json"
+    },
+    {
+      "name": "invent-recording-binding",
+      "test": "test_identical_text_different_recording_clocks_keep_distinct_provenance",
+      "command": [
+        "/opt/homebrew/opt/python@3.14/bin/python3.14",
+        "/Users/bbuchsbaum/code/scala/storymodel4s/.worktrees/openneuro-recall-clock-intake/tools/recall-study/tests/test_recall_word_clock.py",
+        "-v",
+        "WordClockSuite.test_identical_text_different_recording_clocks_keep_distinct_provenance"
+      ],
+      "compiled": true,
+      "exit": 1,
+      "failures": 1,
+      "mutantSha256": "c4895995853245eb6b20fd780e04b0fb0635aa5e23f0692da3d36fa7153fd661",
+      "logSha256": "8ef9d389432b8011bd10e5b2708cdedca33a8c14af96002dac15569e4d5266e7",
+      "suite": "join",
+      "log": "join/invent-recording-binding.log.json"
+    },
+    {
+      "name": "sort-measured-onsets",
+      "test": "test_backward_and_equal_onsets_are_diagnostics_not_repaired",
+      "command": [
+        "/opt/homebrew/opt/python@3.14/bin/python3.14",
+        "/Users/bbuchsbaum/code/scala/storymodel4s/.worktrees/openneuro-recall-clock-intake/tools/recall-study/tests/test_recall_word_clock.py",
+        "-v",
+        "WordClockSuite.test_backward_and_equal_onsets_are_diagnostics_not_repaired"
+      ],
+      "compiled": true,
+      "exit": 1,
+      "failures": 1,
+      "mutantSha256": "a3f887974f644a4f507a949444c52fb20ccae9c3b63c2665470e233f5be18406",
+      "logSha256": "232711b773e7740086a2e4f23cda2a65668aee824fcd0856b836413a35e52909",
+      "suite": "join",
+      "log": "join/sort-measured-onsets.log.json"
+    },
+    {
+      "name": "partial-as-complete",
+      "test": "test_missing_boundary_is_not_a_measured_unit_start",
+      "command": [
+        "/opt/homebrew/opt/python@3.14/bin/python3.14",
+        "/Users/bbuchsbaum/code/scala/storymodel4s/.worktrees/openneuro-recall-clock-intake/tools/recall-study/tests/test_recall_word_clock.py",
+        "-v",
+        "WordClockSuite.test_missing_boundary_is_not_a_measured_unit_start"
+      ],
+      "compiled": true,
+      "exit": 1,
+      "failures": 1,
+      "mutantSha256": "36d7fb2413f70e0d5344ba0813b02fc5d4dc374dd808dd4f605ef36fd4fe4273",
+      "logSha256": "440166604d7043323552b1c81dd3d1d622ef820ecf1b7e7ee3847c2751c76b02",
+      "suite": "join",
+      "log": "join/partial-as-complete.log.json"
+    },
+    {
+      "name": "hide-unassigned-words",
+      "test": "test_membership_uses_components_and_overlap_not_hull_or_containment",
+      "command": [
+        "/opt/homebrew/opt/python@3.14/bin/python3.14",
+        "/Users/bbuchsbaum/code/scala/storymodel4s/.worktrees/openneuro-recall-clock-intake/tools/recall-study/tests/test_recall_word_clock.py",
+        "-v",
+        "WordClockSuite.test_membership_uses_components_and_overlap_not_hull_or_containment"
+      ],
+      "compiled": true,
+      "exit": 1,
+      "failures": 1,
+      "mutantSha256": "5745012a3530807837e31599001d93f2d0bda8dd069d284fa13ecd62432547f9",
+      "logSha256": "0172b0a4c7f61c14e9b6a6c6b610c9085f1f87087f83b94d6eb8ad5e35d21bae",
+      "suite": "join",
+      "log": "join/hide-unassigned-words.log.json"
+    },
+    {
+      "name": "hull-as-membership",
+      "test": "test_membership_uses_components_and_overlap_not_hull_or_containment",
+      "command": [
+        "/opt/homebrew/opt/python@3.14/bin/python3.14",
+        "/Users/bbuchsbaum/code/scala/storymodel4s/.worktrees/openneuro-recall-clock-intake/tools/recall-study/tests/test_recall_word_clock.py",
+        "-v",
+        "WordClockSuite.test_membership_uses_components_and_overlap_not_hull_or_containment"
+      ],
+      "compiled": true,
+      "exit": 1,
+      "failures": 1,
+      "mutantSha256": "d2bf656559bffcdff7f19951d03140eba4a249851afd44f6e6f34df20b602f75",
+      "logSha256": "aedb4c424ba526881dc42fc9ec9c25860f552a869dc7d9b329809131416eacff",
+      "suite": "join",
+      "log": "join/hull-as-membership.log.json"
+    },
+    {
+      "name": "hide-missing-adjacencies",
+      "test": "test_missing_boundary_is_not_a_measured_unit_start",
+      "command": [
+        "/opt/homebrew/opt/python@3.14/bin/python3.14",
+        "/Users/bbuchsbaum/code/scala/storymodel4s/.worktrees/openneuro-recall-clock-intake/tools/recall-study/tests/test_recall_word_clock.py",
+        "-v",
+        "WordClockSuite.test_missing_boundary_is_not_a_measured_unit_start"
+      ],
+      "compiled": true,
+      "exit": 1,
+      "failures": 1,
+      "mutantSha256": "a0d6132095cd1a3b0fe75d9d758af32941dae5454b04a9a8d4f687a6813f7baa",
+      "logSha256": "168c4615b1bfb2bb2c439aa40861e78872e59dfeb2dc8ca3fbb95dd7f0ff0e5b",
+      "suite": "join",
+      "log": "join/hide-missing-adjacencies.log.json"
+    },
+    {
+      "name": "skip-json-integer-limit",
+      "test": "test_json_integer_limits_and_nesting_are_structured_refusals",
+      "compiled": true,
+      "mutantSha256": "93685d111263706a073fcd84614070a7b3ccf866636679ff736c6e33b2b32f4c",
+      "exit": 1,
+      "failures": 1,
+      "logSha256": "614ca2c9f83025a7cb9eb3fe537145ea05857e89b6df11cd82bd772660b8b842",
+      "suite": "intake",
+      "log": "intake/skip-json-integer-limit.log.json"
+    },
+    {
+      "name": "wrong-release-column",
+      "test": "test_selected_clock_uses_released_column_not_added_offset",
+      "compiled": true,
+      "mutantSha256": "684c5227444f0bc0b3693f1d03073a4baa8a301bd8d59cb8fb44f1c5ad739a42",
+      "exit": 1,
+      "failures": 1,
+      "logSha256": "838e0fa18d72a56f20429d836d5fcf8f016873865f998693d69a05e65e53923f",
+      "suite": "intake",
+      "log": "intake/wrong-release-column.log.json"
+    },
+    {
+      "name": "skip-byte-identity",
+      "test": "test_unknown_bytes_refuse_before_csv_parse",
+      "compiled": true,
+      "mutantSha256": "b955167f69619eca5f61e07e93cac9ed22b7097086fb53770f55eec88c0fbfc3",
+      "exit": 1,
+      "failures": 1,
+      "logSha256": "5e6ae9d26dc9a209261ae08f2db452b5d5f9c33449d6a779c6461f94c8a8b80b",
+      "suite": "intake",
+      "log": "intake/skip-byte-identity.log.json"
+    },
+    {
+      "name": "discard-empty-record",
+      "test": "test_every_record_survives_quoted_csv_and_empty_word",
+      "compiled": true,
+      "mutantSha256": "afd0a48fbbeaae834232150b92f8538e9361e32a0b166b4777e710129a330f24",
+      "exit": 1,
+      "failures": 1,
+      "logSha256": "2e97b49fcaf5659af30617e16d84f137bf92442eb5a01c12c04c520776ec93bb",
+      "suite": "intake",
+      "log": "intake/discard-empty-record.log.json"
+    },
+    {
+      "name": "missing-selected-onset-as-zero",
+      "test": "test_princeton_selection_keeps_missing_distinct_from_zero",
+      "compiled": true,
+      "mutantSha256": "3a44662710aecd88f8e4e2750b88b34f799e74a880a8da39c0d58bc57cf49281",
+      "exit": 1,
+      "failures": 1,
+      "logSha256": "dc98c1dcb70d931d4fd744fe7e13e42a1fe21e87be0f0b572d015c79b9a0642c",
+      "suite": "intake",
+      "log": "intake/missing-selected-onset-as-zero.log.json"
+    },
+    {
+      "name": "float-rounding",
+      "test": "test_large_exact_and_negative_onsets_are_preserved",
+      "compiled": true,
+      "mutantSha256": "c4f250313270bf49f2db19a06b833047ad06096e1f2023b1d5e797f743263a00",
+      "exit": 1,
+      "failures": 1,
+      "logSha256": "b86b6a0c5e39a438746b5381bb2c1c794471c2d94a12c50403bfc9b79d21073c",
+      "suite": "intake",
+      "log": "intake/float-rounding.log.json"
+    },
+    {
+      "name": "skip-record-count",
+      "test": "test_declared_counts_are_checked",
+      "compiled": true,
+      "mutantSha256": "140041c65a55a38058cd0e38732de68df4acb76b88fe9e1eb4989b1de37457ea",
+      "exit": 1,
+      "failures": 1,
+      "logSha256": "9107c00c57c2d3a383def44d713222056eb65228c046d6771832e4bab0e66dc4",
+      "suite": "intake",
+      "log": "intake/skip-record-count.log.json"
+    },
+    {
+      "name": "skip-alias-source-binding",
+      "test": "test_omitted_source_does_not_acquire_an_alias",
+      "compiled": true,
+      "mutantSha256": "5c867b51e5b8ffcefeecae90b79c95f2cd32615689c7d40f52048b885f86a2ff",
+      "exit": 1,
+      "failures": 1,
+      "logSha256": "5ae006bf9374ee28284bd8f40dd0572481eff8042544fa201739b995c7192519",
+      "suite": "intake",
+      "log": "intake/skip-alias-source-binding.log.json"
+    },
+    {
+      "name": "alias-sha-not-checked",
+      "test": "test_foreign_or_inconsistent_alias_map_refuses",
+      "compiled": true,
+      "mutantSha256": "5298f140003eba33dbe00c87c1b9f12194d6ed2b533b0f9ed379b6a2f1de33e7",
+      "exit": 1,
+      "failures": 1,
+      "logSha256": "09b6fbb141a0a0bbf584747de0414a65c97f5d8e4eed174241754538b1ab5f09",
+      "suite": "intake",
+      "log": "intake/alias-sha-not-checked.log.json"
+    },
+    {
+      "name": "invent-scanner-authority",
+      "test": "test_no_duration_scanner_join_or_text_is_fabricated",
+      "compiled": true,
+      "mutantSha256": "12e85f0858ed111afcb0490435879dd022e8f86e2a971a06a5a362390235f507",
+      "exit": 1,
+      "failures": 1,
+      "logSha256": "49fe6a80931ddb0b5cca0d0a905355b22ec7e485001fc9d63b20750d8c48327a",
+      "suite": "intake",
+      "log": "intake/invent-scanner-authority.log.json"
+    },
+    {
+      "name": "leak-source-text",
+      "test": "test_no_duration_scanner_join_or_text_is_fabricated",
+      "compiled": true,
+      "mutantSha256": "ebc8a5a43ae9c312583b90d47d00fbce8770a813e927e5ff2195de9474f2a5f0",
+      "exit": 1,
+      "failures": 1,
+      "logSha256": "3f4906be4ae7904abd985c8e088cba099d105f70a9ddb9ffd975a5327abeb0d3",
+      "suite": "intake",
+      "log": "intake/leak-source-text.log.json"
+    },
+    {
+      "name": "overwrite-existing-output",
+      "test": "test_publication_is_complete_and_never_overwrites",
+      "compiled": true,
+      "mutantSha256": "e098364c47b3fdb6fc8afc37259e2df39f1d16ad166480e237894bc5a04cb0f4",
+      "exit": 1,
+      "failures": 1,
+      "logSha256": "f6e56b7498e76427af45e788d66fb8750a8ac330572dd2a59a2ec4c74232b9a8",
+      "suite": "intake",
+      "log": "intake/overwrite-existing-output.log.json"
+    }
+  ],
+  "producerFixture": {
+    "schema": "storymodel4s.word-clock-fixture-provenance/v1",
+    "producerSource": "b7d908a8",
+    "producerEvidence": "80d4fbd2",
+    "producerArtifact": "historical.json",
+    "localFixture": "g1-historical.json",
+    "sha256": "acea0831a78b03f5b7cfa548e81f037aa997d37dbdae8b6cdfd4b24ac82f59c7",
+    "expectedSource": "codec/src/test/scala/storymodel4s/codec/MappingCodecFixture.scala",
+    "generator": "codec/.jvm/src/test/scala/storymodel4s/codec/MappingCodecArtifacts.scala",
+    "timingCsvOrigin": "original synthetic; independently authored after producer record",
+    "meaning": "real G1 synthetic mapping record, invented external onsets; no participant or accuracy claim"
+  },
+  "cliChecks": [
+    {
+      "command": [
+        "/opt/homebrew/opt/python@3.14/bin/python3.14",
+        "tools/recall-study/recall_word_clock.py",
+        "--csv",
+        "tools/recall-study/fixtures/word-clock-join/words.csv",
+        "--lineage",
+        "tools/recall-study/fixtures/word-clock-join/lineage.json",
+        "--clock",
+        "openneuro",
+        "--mapping",
+        "tools/recall-study/fixtures/word-clock-join/g1-historical.json",
+        "--mapping-sha256",
+        "acea0831a78b03f5b7cfa548e81f037aa997d37dbdae8b6cdfd4b24ac82f59c7",
+        "--recipe",
+        "external-clock-exact-replay/v1",
+        "--out",
+        "docs/refactor/evidence/recall-word-clock-join-20260922/outputs/openneuro.json"
+      ],
+      "exit": 0,
+      "stdout": {
+        "excludedRecords": 1,
+        "missingWordOnsets": 1,
+        "outputSha256": "7a29a9ed87080a3c11b4ae95e214abf6061c991434c1f56ef6f0020f4592867a",
+        "records": 5,
+        "schema": "storymodel4s.recall-word-clock-join/v1",
+        "unassignedWords": 0,
+        "units": 2,
+        "words": 4
+      },
+      "stderr": "",
+      "output": "outputs/openneuro.json",
+      "sha256": "7a29a9ed87080a3c11b4ae95e214abf6061c991434c1f56ef6f0020f4592867a",
+      "independentExpectedAnswerComparison": "pass"
+    },
+    {
+      "command": [
+        "/opt/homebrew/opt/python@3.14/bin/python3.14",
+        "tools/recall-study/recall_word_clock.py",
+        "--csv",
+        "tools/recall-study/fixtures/word-clock-join/words.csv",
+        "--lineage",
+        "tools/recall-study/fixtures/word-clock-join/lineage.json",
+        "--clock",
+        "princeton",
+        "--mapping",
+        "tools/recall-study/fixtures/word-clock-join/g1-historical.json",
+        "--mapping-sha256",
+        "acea0831a78b03f5b7cfa548e81f037aa997d37dbdae8b6cdfd4b24ac82f59c7",
+        "--recipe",
+        "external-clock-exact-replay/v1",
+        "--out",
+        "docs/refactor/evidence/recall-word-clock-join-20260922/outputs/princeton.json"
+      ],
+      "exit": 0,
+      "stdout": {
+        "excludedRecords": 1,
+        "missingWordOnsets": 0,
+        "outputSha256": "59b4e0007fa741be70a54c75a5986031f29d179f5ab92ad3316e40bbe4d16dda",
+        "records": 5,
+        "schema": "storymodel4s.recall-word-clock-join/v1",
+        "unassignedWords": 0,
+        "units": 2,
+        "words": 4
+      },
+      "stderr": "",
+      "output": "outputs/princeton.json",
+      "sha256": "59b4e0007fa741be70a54c75a5986031f29d179f5ab92ad3316e40bbe4d16dda",
+      "independentExpectedAnswerComparison": "pass"
+    }
+  ],
+  "identifierCodeUnitComparison": {
+    "command": [
+      "java",
+      "/private/tmp/RecallClockIdCharacters.java"
+    ],
+    "exit": 0,
+    "comparedUtf16CodeUnits": 65536,
+    "forbiddenCodeUnits": 81,
+    "match": true,
+    "javaVersion": "openjdk version \"22\" 2024-03-19\nOpenJDK Runtime Environment (build 22+36-2370)\nOpenJDK 64-Bit Server VM (build 22+36-2370, mixed mode, sharing)",
+    "probeSha256": "21c4ae727ef7a4ef4cc697fc1e71f57233745a912a92a57c663efa6a7d28d3db",
+    "stdoutSha256": "45e7ef556514210ef2ddc146814538171139bd985e95b7240ea280815f9334ac"
+  },
+  "scopeCheck": {
+    "command": [
+      "bash",
+      "tools/reference-scope.sh",
+      "6a6f22f450d675c8e17fb3f0bf92e12d7a2404ee",
+      "9d366e267b48b174769c8f7b889b576917ce2321"
+    ],
+    "exit": 0,
+    "stdout": "no types defined in changed files"
+  },
+  "review": {
+    "initialFindings": [
+      "empty unit spans could acquire words",
+      "ID whitespace/control/UTF16 length rules weaker than G1",
+      "oversized JSON integer escaped structured refusal"
+    ],
+    "repairs": [
+      "empty spans overlap nothing; interior-point accepting and forged-owner refusing fixtures",
+      "G1 ID rules and exhaustive 65536-code-unit Java comparison",
+      "128-digit pre-conversion JSON integer bound; private structured CLI refusal"
+    ],
+    "separateTargetedRecheck": {
+      "tests": 6,
+      "result": "pass",
+      "remainingFindings": []
+    }
+  },
+  "limits": [
+    "inventory-only validation, not MappingCodecs.decode",
+    "shared recording identity unverified",
+    "onsets, not durations or time exposure",
+    "no participant or gold data read",
+    "no scanner timing qualification",
+    "no Scala build or G1/M1 completion"
+  ],
+  "mutationCommands": [
+    {
+      "command": [
+        "python3",
+        "tools/recall-study/tests/mutate_recall_word_clock.py",
+        "--out",
+        "/private/tmp/recall-word-clock-court-20260922-03"
+      ],
+      "exit": 0
+    },
+    {
+      "command": [
+        "python3",
+        "tools/recall-study/tests/mutate_recall_clock.py",
+        "--out",
+        "/private/tmp/recall-clock-court-20260922-03"
+      ],
+      "exit": 0
+    }
+  ]
+}

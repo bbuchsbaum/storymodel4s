@@ -1,0 +1,5 @@
+{
+  "encoding": "utf-8",
+  "text": "test_membership_uses_components_and_overlap_not_hull_or_containment (__main__.WordClockSuite.test_membership_uses_components_and_overlap_not_hull_or_containment) ... FAIL\n\n======================================================================\nFAIL: test_membership_uses_components_and_overlap_not_hull_or_containment (__main__.WordClockSuite.test_membership_uses_components_and_overlap_not_hull_or_containment)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/Users/bbuchsbaum/code/scala/storymodel4s/.worktrees/openneuro-recall-clock-intake/tools/recall-study/tests/test_recall_word_clock.py\", line 147, in test_membership_uses_components_and_overlap_not_hull_or_containment\n    self.assertEqual(result[\"counts\"][\"unassignedWords\"], 2)\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: 0 != 2\n\n----------------------------------------------------------------------\nRan 1 test in 0.002s\n\nFAILED (failures=1)\n",
+  "textSha256": "0172b0a4c7f61c14e9b6a6c6b610c9085f1f87087f83b94d6eb8ad5e35d21bae"
+}

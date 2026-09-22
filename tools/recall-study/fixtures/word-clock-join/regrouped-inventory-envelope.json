@@ -1,0 +1,83 @@
+{
+  "schema": "storymodel4s.mapping-record",
+  "schemaVersion": "mapping-record/v0.1",
+  "record_digest": "0000000000000000000000000000000000000000000000000000000000000000",
+  "inventory": {
+    "digest": "12274ab5fb29162b0ef6f7b93061f9585f75e0c16a239e0578429ade95493cec",
+    "segmentation_id": "09bd6abe37126fd6d41f7531326465abda727ae47a2b69a593838f1a0c0ab58e",
+    "transcript_checksum": "4b8d9d501b96b4568c5a61b54afb37cab155afd8cd2bc7f180aeb28ec2e8709e",
+    "units": [
+      {
+        "id": "merged",
+        "ordinal": 0,
+        "spans": [
+          {
+            "start": 0,
+            "end_exclusive": 23,
+            "unit": {
+              "status": "absent",
+              "reason": "not-supplied"
+            }
+          }
+        ],
+        "words": [
+          "13357e4aff12718d0a5665307beebe7c71155d12f587bec29844ad62904f9f4f:word:0",
+          "13357e4aff12718d0a5665307beebe7c71155d12f587bec29844ad62904f9f4f:word:1",
+          "13357e4aff12718d0a5665307beebe7c71155d12f587bec29844ad62904f9f4f:word:2",
+          "13357e4aff12718d0a5665307beebe7c71155d12f587bec29844ad62904f9f4f:word:3"
+        ],
+        "decomposition": {
+          "status": "not-assessed",
+          "reason": "NoDecompositionDetector"
+        },
+        "semantics": "CategoricalReferent"
+      }
+    ],
+    "word_id_policy": {
+      "input_artifact": "13357e4aff12718d0a5665307beebe7c71155d12f587bec29844ad62904f9f4f",
+      "name": "input-artifact-sha256+zero-based-parsed-word-index/v1"
+    },
+    "words": [
+      {
+        "end_exclusive": 4,
+        "id": "13357e4aff12718d0a5665307beebe7c71155d12f587bec29844ad62904f9f4f:word:0",
+        "index": 0,
+        "membership": {
+          "status": "member",
+          "unit": "merged"
+        },
+        "start": 0
+      },
+      {
+        "end_exclusive": 13,
+        "id": "13357e4aff12718d0a5665307beebe7c71155d12f587bec29844ad62904f9f4f:word:1",
+        "index": 1,
+        "membership": {
+          "status": "member",
+          "unit": "merged"
+        },
+        "start": 5
+      },
+      {
+        "end_exclusive": 17,
+        "id": "13357e4aff12718d0a5665307beebe7c71155d12f587bec29844ad62904f9f4f:word:2",
+        "index": 2,
+        "membership": {
+          "status": "member",
+          "unit": "merged"
+        },
+        "start": 14
+      },
+      {
+        "end_exclusive": 23,
+        "id": "13357e4aff12718d0a5665307beebe7c71155d12f587bec29844ad62904f9f4f:word:3",
+        "index": 3,
+        "membership": {
+          "status": "member",
+          "unit": "merged"
+        },
+        "start": 18
+      }
+    ]
+  }
+}
